@@ -1,0 +1,230 @@
+check impl From
+
+fmpz_init: new, impl Default for Integer
+fmpz_init2: new
+fmpz_clear: impl Drop for Integer
+fmpz_init_set: impl From<i32> for Integer
+fmpz_init_set_ui: impl From<u32> for Integer
+: assign_bits_unsigned
+: IntegerContent, to_u32s
+
+RNG
+---
+
+fmpz_randbits: assign_random_bits, assign_random_bits_unsigned
+fmpz_randtest: assign_random_bits_variable
+fmpz_randtest_unsigned: assign_random_bits_unsigned_variable
+fmpz_randtest_not_zero: assign_random_bits_nonzero_variable
+fmpz_randm: random_below
+fmpz_randtest_mod: TODO
+fmpz_randtest_mod_signed: TODO
+
+Conversion
+----------
+: IntegerU32s
+fmpz_get_si: to_i32, to_i32_wrapping
+fmpz_get_ui: to_u32, to_u32_wrapping
+fmpz_set_d: impl Assign<f64> for Integer, impl Assign<f32> for Integer
+fmpz_get_d: to_f64, to_f32
+fmpz_set_mpf: WON'T IMPLEMENT
+fmpz_get_mpf: WON'T IMPLEMENT
+fmpz_get_mpfr: TODO
+fmpz_get_d_2exp: TODO
+fmpz_get_mpz: WON'T IMPLEMENT
+fmpz_get_str: to_string_radix, impl Display for Integer, impl Debug for Integer,
+fmpz_set_si: impl Assign<i32> for Integer
+fmpz_set_ui: impl Assign<u32> for Integer
+fmpz_neg_ui: TODO
+fmpz_set_uiui: TODO
+fmpz_neg_uiui: TODO
+fmpz_set_mpz: impl Assign<Integer> for Integer, impl From<Integer> for Integer, impl Clone for Integer
+fmpz_set_str: assign_str_radix, assign_str, from_string_radix, valid_str_radix, impl FromStr for Integer, impl Binary for Integer, impl Octal for Integer, impl LowerHex for Integer, impl UpperHex for Integer
+fmpz_set_ui_smod: PROBABLY WON'T IMPLEMENT
+flint_mpz_init_set_readonly: WON'T IMPLEMENT
+flint_mpz_clear_readonly: WON'T IMPLEMENT
+
+Basic properties and manipulation
+---------------------------------
+fmpz_sizeinbase: TODO
+fmpz_bits: significant_bits
+fmpz_size: sizeinbase
+fmpz_sgn: sign
+fmpz_val2: find_one, find_zero
+fmpz_swap: WON'T IMPLEMENT
+fmpz_set: impl Assign<Integer> for Integer
+fmpz_zero: impl Assign<u32> for Integer, new, impl Default for Integer
+fmpz_one: impl Assign<u32> for Integer
+fmpz_abs_fits_ui: use significant_bits
+fmpz_fits_si: significant_bits
+fmpz_abs_lbound_ui_2exp: TODO
+fmpz_abs_ubound_ui_2exp: TODO
+
+Comparison
+----------
+
+fmpz_cmp: impl Ord for Integer, impl PartialOrd for Integer
+fmpz_cmp_ui: impl Ord<u32> for Integer, impl PartialOrd<u32> for Integer, impl PartialOrd<Integer> for u32
+fmpz_cmp_si: impl Ord<i32> for Integer, impl PartialOrd<i32> for Integer, impl PartialOrd<Integer> for i32
+fmpz_cmpabs: cmp_abs
+fmpz_equal: impl Eq for Integer, impl PartialEq for Integer
+fmpz_equal_ui: impl Eq<u32> for Integer, impl PartialEq<u32> for Integer, impl PartialEq<Integer> for u32
+fmpz_equal_si: impl Eq<i32> for Integer, impl PartialEq<i32> for Integer, impl PartialEq<Integer> for i32
+fmpz_is_zero: use == 0
+fmpz_is_one: use == 1
+fmpz_is_pm1: TODO
+fmpz_is_even: TODO
+fmpz_is_odd: TODO
+: impl PartialEq<f32> for Integer, impl PartialEq<f64> for Integer
+: impl PartialOrd<f32> for Integer, impl PartialOrd<f64> for Integer
+: impl Hash for Integer
+
+Arithmetic
+----------
+
+fmpz_neg: impl Neg for Integer, impl NegAssign for Integer
+fmpz_abs: abs
+fmpz_add: impl Add for Integer, impl AddAssign for Integer
+fmpz_add_ui: impl Add<u32> for Integer, impl Add<Integer> for u32, impl AddAssign<u32> for Integer, impl AddAssign<Integer> for u32, impl Add<i32> for Integer, impl Add<Integer> for i32, impl AddAssign<i32> for Integer, impl AddAssign<Integer> for i32
+fmpz_sub: impl Sub for Integer, impl SubAssign for Integer, impl SubFromAssign for Integer
+fmpz_sub_ui: impl Sub<u32> for Integer, impl Sub<Integer> for u32, impl SubAssign<u32> for Integer, impl SubAssign<Integer> for u32, impl Sub<i32> for Integer, impl Sub<Integer> for i32, impl SubAssign<i32> for Integer, impl SubAssign<Integer> for i32
+fmpz_add: impl Mul for Integer, impl MulAssign for Integer
+fmpz_mul_si: impl Mul<i32> for Integer, impl Mul<Integer> for i32, impl MulAssign<i32> for Integer, impl MulAssign<Integer> for i32
+fmpz_mul_ui: impl Mul<u32> for Integer, impl Mul<Integer> for u32, impl MulAssign<u32> for Integer, impl MulAssign<Integer> for u32
+fmpz_mul2_uiui: TODO
+fmpz_mul_2exp: impl Shl<u32>, impl ShlAssign<u32>, impl Shr<u32>, impl ShrAssign<u32>, impl Shl<i32>, impl ShlAssign<i32>, impl Shr<i32>, impl ShrAssign<i32>
+fmpz_addmul: TODO
+fmpz_addmul_ui: TODO
+fmpz_submul: TODO
+fmpz_submul_ui: TODO
+fmpz_cdiv_q: TODO
+fmpz_cdiv_q_si: TODO
+fmpz_cdiv_q_ui: TODO
+fmpz_fdiv_q_2exp: impl Shl<u32>, impl ShlAssign<u32>, impl Shr<u32>, impl ShrAssign<u32>, impl Shl<i32>, impl ShlAssign<i32>, impl Shr<i32>, impl ShrAssign<i32>
+fmpz_fdiv_q: TODO
+fmpz_fdiv_q_si: TODO
+fmpz_fdiv_q_ui: TODO
+fmpz_fdiv_qr: TODO
+fmpz_fdiv_r: TODO
+fmpz_fdiv_r_2exp: TODO
+fmpz_tdiv_q: impl Div for Integer, impl DivAssign for Integer, impl DivFromAssign for Integer
+fmpz_tdiv_qr: div_rem
+fmpz_tdiv_q_si: impl Div<i32> for Integer, impl Div<Integer> for i32, impl DivAssign<i32> for Integer, impl DivAssign<Integer> for i32
+fmpz_tdiv_q_ui: impl Div<u32> for Integer, impl Div<Integer> for u32, impl DivAssign<u32> for Integer, impl DivAssign<Integer> for u32
+fmpz_tdiv_r: impl Rem for Integer, impl RemAssign for Integer, impl RemFromAssign for Integer
+fmpz_tdiv_r_si: impl Rem<i32> for Integer, impl Rem<Integer> for i32, impl RemAssign<i32> for Integer, impl RemAssign<Integer> for i32
+fmpz_tdiv_r_ui: impl Rem<u32> for Integer, impl Rem<Integer> for u32, impl RemAssign<u32> for Integer, impl RemAssign<Integer> for u32
+fmpz_tdiv_ui: TODO
+fmpz_tdiv_q_2exp: TODO
+fmpz_divexact: div_exact
+fmpz_divexact_si: TODO
+fmpz_divexact_ui: TODO
+fmpz_divexact2_uiui: TODO
+fmpz_divisible: is_divisible, is_congruent
+fmpz_divisible_si: TODO
+fmpz_mod: TODO
+fmpz_mod_ui: TODO
+fmpz_mods: TODO
+fmpz_fdiv_ui: TODO
+fmpz_preinvn_init: TODO
+fmpz_preinvn_clear: WON'T IMPLEMENT
+fmpz_fdiv_qr_preinvn: TODO
+fmpz_pow_ui: impl Pow<u32> for Integer, impl PowAssign<u32> for Integer
+fmpz_powm_ui: TODO
+fmpz_powm: TODO
+fmpz_clog: TODO
+fmpz_clog_ui: TODO
+fmpz_flog: TODO
+fmpz_flog_ui: TODO
+fmpz_dlog: TODO
+fmpz_sqrtmod: TODO
+fmpz_sqrt: sqrt
+fmpz_sqrtrem: sqrt_rem
+fmpz_is_square: is_perfect_square, is_perfect_power
+fmpz_root: root, root_rem
+fmpz_fac_ui: set_factorial, set_factorial_2, set_factorial_m
+fmpz_fib_ui: TODO
+fmpz_bin_uiui: binomial, set_binomial
+fmpz_rfac_ui: TODO
+fmpz_rfac_uiui: TODO
+fmpz_mul_tdiv_q_2exp: TODO
+fmpz_mul_si_tdiv_q_2exp: TODO
+
+GCD
+---
+
+fmpz_gcd: gcd
+fmpz_lcm: lcm
+fmpz_gcdinv: TODO
+fmpz_xgcd: TODO
+fmpz_xgcd_partial: TODO
+
+Modular arithmetic
+------------------
+
+_fmpz_remove: TODO
+fmpz_remove: TODO
+fmpz_invmod: invert
+fmpz_negmod: TODO
+fmpz_jacobi: TODO
+
+Bit packing and unpacking
+-------------------------
+
+fmpz_bit_pack: TODO
+fmpz_bit_unpack: TODO
+fmpz_bit_unpack_unsigned: TODO
+
+Logic operations
+----------------
+
+void fmpz_complement: impl Not for Integer, impl NotAssign for Integer
+fmpz_setbit: set_bit, assign_bit
+fmpz_tstbit: get_bit
+void fmpz_clrbit: clear_bit, assign_bit
+void fmpz_combit: invert_bit
+void fmpz_and: impl BitAnd for Integer, impl BitAndAssign for Integer
+void fmpz_or: impl BitOr for Integer, impl BitOrAssign for Integer
+void fmpz_xor: impl BitXor for Integer, impl BitXorAssign for Integer
+fmpz_popcnt: count_ones
+: ham_dist
+
+Chinese remaindering
+--------------------
+
+fmpz_CRT_ui: TODO
+fmpz_CRT: TODO
+fmpz_multi_mod_ui: TODO
+fmpz_multi_CRT_ui: TODO
+fmpz_comb_init: TODO
+fmpz_comb_temp_init: TODO
+fmpz_comb_clear: TODO
+fmpz_comb_temp_clear: TODO
+
+Primality testing
+-----------------
+
+fmpz_is_strong_probabprime: TODO
+fmpz_is_probabprime_lucas: TODO
+fmpz_is_probabprime_BPSW: TODO
+fmpz_is_probabprime: TODO
+fmpz_is_prime_pseudosquare: TODO
+fmpz_is_prime_pocklington: TODO
+_fmpz_nm1_trial_factors: TODO
+fmpz_is_prime_morrison: TODO
+_fmpz_np1_trial_factors: TODO
+fmpz_is_prime: TODO
+fmpz_lucas_chain: TODO
+fmpz_lucas_chain_full: TODO
+fmpz_lucas_chain_double: TODO
+fmpz_lucas_chain_add: TODO
+fmpz_lucas_chain_mul: TODO
+fmpz_lucas_chain_VtoU: TODO
+fmpz_divisor_in_residue_class_lenstra: TODO
+
+Special functions:
+-----------------
+
+fmpz_primorial: set_primorial
+fmpz_factor_euler_phi: TODO
+mpz_euler_phi: TODO
+fmpz_factor_moebius_mu: TODO

@@ -1,0 +1,12 @@
+[package]
+name = "malachite-gmp"
+version = "0.1.0"
+authors = ["Mikhail Hogrefe <mikhailhogrefe@gmail.com>"]
+
+[lib]
+name = "malachite_gmp"
+path = "src/lib.rs"
+
+[dependencies]
+gmp-mpfr-sys = "0.6.0"
+rand = "0.3.0"

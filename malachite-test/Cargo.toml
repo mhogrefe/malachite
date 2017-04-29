@@ -1,0 +1,14 @@
+[package]
+name = "malachite-test"
+version = "0.1.0"
+authors = ["Mikhail Hogrefe <mikhailhogrefe@gmail.com>"]
+
+[lib]
+name = "malachite_test"
+path = "src/lib.rs"
+
+[dependencies]
+malachite-gmp = { path = "../malachite-gmp" }
+malachite-native = { path = "../malachite-native" }
+num = "0.1.37"
+rugint = "0.2.0"
