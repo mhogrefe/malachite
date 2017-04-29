@@ -4,7 +4,7 @@ use natural::Natural;
 ///
 /// Any `Integer` whose absolute value is small enough to fit into an `u32` is represented inline.
 /// Only integers outside this range incur the costs of heap-allocation.
-#[derive(Clone, PartialEq, Eq, Debug, Hash)]
+#[derive(Clone, PartialEq, Eq, Hash)]
 pub struct Integer {
     sign: bool, // must be true if abs is zero
     abs: Natural,

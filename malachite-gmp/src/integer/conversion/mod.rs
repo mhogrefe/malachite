@@ -5,7 +5,6 @@ use integer::Integer::*;
 use std::cmp::Ordering;
 use std::ffi::CString;
 use std::fmt::{self, Debug, Display, Formatter};
-use std::mem;
 use std::os::raw::{c_char, c_int, c_long};
 use std::slice;
 use std::str::FromStr;
@@ -280,48 +279,8 @@ impl FromStr for Integer {
     }
 }
 
-//TODO test
-impl<'a> Assign<&'a Integer> for Integer {
-    fn assign(&mut self, other: &'a Integer) {
-        let mut assign_small_to_large = false;
-        let mut inner_small_to_assign = 0;
-        match self {
-            &mut Small(_) => {
-                match other {
-                    &Small(y) => *self = Small(y),
-                    &Large(y) => unsafe {
-                        let mut assigned: mpz_t = mem::uninitialized();
-                        gmp::mpz_init_set(&mut assigned, &y);
-                        *self = Large(assigned);
-                    },
-                }
-            }
-            &mut Large(ref mut x) => {
-                match other {
-                    &Small(y) => {
-                        assign_small_to_large = true;
-                        inner_small_to_assign = y;
-                    }
-                    &Large(y) => unsafe {
-                        gmp::mpz_set(x, &y);
-                    },
-                }
-            }
-        }
-        if assign_small_to_large {
-            *self = Small(inner_small_to_assign);
-        }
-    }
-}
-
-//TODO test
-impl<'a> Assign<Integer> for Integer {
-    fn assign(&mut self, other: Integer) {
-        self.assign(&other);
-    }
-}
-
 pub mod assign_i32;
+pub mod assign_integer;
 pub mod assign_u32;
 pub mod from_i32;
 pub mod from_u32;

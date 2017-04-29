@@ -1,11 +1,10 @@
 use error::ParseIntegerError;
-use gmp_mpfr_sys::gmp::{self, mpz_t};
+use gmp_mpfr_sys::gmp;
 use integer::Integer;
 use natural::Natural;
 use natural::Natural::*;
 use std::ffi::CString;
 use std::fmt::{self, Display, Formatter};
-use std::mem;
 use std::os::raw::{c_char, c_int};
 use std::str::FromStr;
 use traits::Assign;
@@ -19,7 +18,8 @@ impl Natural {
         let mut x = Integer::new_mpz_t();
         let err = unsafe { gmp::mpz_set_str(&mut x, c_str.as_ptr(), radix.into()) };
         assert!(err == 0);
-        self.assign_mpz_t(x);
+        *self = Large(x);
+        self.demote_if_small();
         Ok(())
     }
 
@@ -134,46 +134,6 @@ impl Display for Natural {
     }
 }
 
-//TODO test
-impl<'a> Assign<&'a Natural> for Natural {
-    fn assign(&mut self, other: &'a Natural) {
-        let mut assign_small_to_large = false;
-        let mut inner_small_to_assign = 0;
-        match self {
-            &mut Small(_) => {
-                match other {
-                    &Small(y) => *self = Small(y),
-                    &Large(y) => unsafe {
-                        let mut assigned: mpz_t = mem::uninitialized();
-                        gmp::mpz_init_set(&mut assigned, &y);
-                        *self = Large(assigned);
-                    },
-                }
-            }
-            &mut Large(ref mut x) => {
-                match other {
-                    &Small(y) => {
-                        assign_small_to_large = true;
-                        inner_small_to_assign = y;
-                    }
-                    &Large(y) => unsafe {
-                        gmp::mpz_set(x, &y);
-                    },
-                }
-            }
-        }
-        if assign_small_to_large {
-            *self = Small(inner_small_to_assign);
-        }
-    }
-}
-
-//TODO test
-impl<'a> Assign<Natural> for Natural {
-    fn assign(&mut self, other: Natural) {
-        self.assign(&other);
-    }
-}
-
+pub mod assign_natural;
 pub mod assign_u32;
 pub mod from_u32;

@@ -29,11 +29,6 @@ impl Natural {
         Small(0)
     }
 
-    fn assign_mpz_t(&mut self, x: mpz_t) {
-        *self = Large(x);
-        self.demote_if_small();
-    }
-
     fn demote_if_small(&mut self) {
         if let &mut Large(x) = self {
             if unsafe { gmp::mpz_sizeinbase(&x, 2) } <= 32 {

@@ -10,7 +10,6 @@ extern crate test;
 
 pub mod integer {
     pub mod basic {
-        pub mod default;
         pub mod new;
     }
     pub mod conversion {
@@ -28,7 +27,6 @@ pub mod integer {
 }
 pub mod natural {
     pub mod basic {
-        pub mod default;
         pub mod new;
     }
     pub mod comparison {

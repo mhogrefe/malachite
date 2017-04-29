@@ -6,8 +6,7 @@ extern crate rugint;
 
 pub mod integer {
     pub mod basic {
-        pub mod default;
-        pub mod new;
+        pub mod new_and_default;
     }
     pub mod comparison {
         pub mod partial_eq_i32;
@@ -26,8 +25,7 @@ pub mod integer {
 }
 pub mod natural {
     pub mod basic {
-        pub mod default;
-        pub mod new;
+        pub mod new_and_default;
     }
     pub mod comparison {
         pub mod partial_eq_u32;

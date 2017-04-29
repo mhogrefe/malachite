@@ -4,7 +4,7 @@ use natural::Natural::*;
 ///
 /// Any `Natural` small enough to fit into an `u32` is represented inline. Only naturals outside
 /// this range incur the costs of heap-allocation.
-#[derive(Clone, PartialEq, Eq, Debug, Hash)]
+#[derive(Clone, PartialEq, Eq, Hash)]
 pub enum Natural {
     Small(u32),
     Large(Vec<u32>),
