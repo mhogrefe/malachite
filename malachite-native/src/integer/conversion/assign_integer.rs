@@ -14,6 +14,6 @@ use traits::Assign;
 /// ```
 impl<'a> Assign<&'a Integer> for Integer {
     fn assign(&mut self, other: &'a Integer) {
-        *self = other.clone();
+        self.clone_from(other);
     }
 }

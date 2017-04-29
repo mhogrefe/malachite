@@ -13,6 +13,7 @@ pub mod integer {
         pub mod new;
     }
     pub mod conversion {
+        pub mod clone;
         pub mod from_i32;
         pub mod from_u32;
     }
@@ -33,6 +34,7 @@ pub mod natural {
         pub mod partial_eq_u32;
     }
     pub mod conversion {
+        pub mod clone;
         pub mod from_u32;
     }
     pub mod logic {

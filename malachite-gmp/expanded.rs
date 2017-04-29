@@ -147,16 +147,6 @@ pub mod integer {
     pub struct Integer {
         inner: mpz_t,
     }
-    impl Clone for Integer {
-        fn clone(&self) -> Integer {
-            let mut ret = Integer::new();
-            ret.assign(self);
-            ret
-        }
-        fn clone_from(&mut self, source: &Integer) {
-            self.assign(source);
-        }
-    }
     pub struct IntegerU32s<'a> {
         x: &'a Integer,
         i: u32,
@@ -850,20 +840,6 @@ pub mod integer {
             let mut ret = Integer::new();
             ret.assign(t);
             ret
-        }
-    }
-    impl<'a> Assign<&'a Integer> for Integer {
-        /// Assigns from another `Integer`.
-        fn assign(&mut self, other: &'a Integer) {
-            unsafe {
-                gmp::mpz_set(&mut self.inner, &other.inner);
-            }
-        }
-    }
-    impl<'a> Assign<Integer> for Integer {
-        /// Assigns from another `Integer`.
-        fn assign(&mut self, other: Integer) {
-            self.assign(&other);
         }
     }
     impl Assign<f64> for Integer {

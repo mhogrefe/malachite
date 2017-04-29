@@ -8,7 +8,6 @@ use std::fmt::{self, Debug, Display, Formatter};
 use std::os::raw::{c_char, c_int, c_long};
 use std::slice;
 use std::str::FromStr;
-use traits::Assign;
 
 //TODO test
 pub struct IntegerContent<'a> {
@@ -174,19 +173,6 @@ impl Integer {
     }
 }
 
-//TODO test
-impl Clone for Integer {
-    fn clone(&self) -> Integer {
-        let mut cloned = Integer::new();
-        cloned.assign(self);
-        cloned
-    }
-
-    fn clone_from(&mut self, source: &Integer) {
-        self.assign(source);
-    }
-}
-
 fn make_string(i: &Integer, radix: i32, to_upper: bool) -> String {
     assert!(radix >= 2 && radix <= 36, "radix out of range");
     match i {
@@ -282,5 +268,6 @@ impl FromStr for Integer {
 pub mod assign_i32;
 pub mod assign_integer;
 pub mod assign_u32;
+pub mod clone;
 pub mod from_i32;
 pub mod from_u32;

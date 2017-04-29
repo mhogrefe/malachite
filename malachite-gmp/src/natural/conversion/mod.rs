@@ -7,7 +7,6 @@ use std::ffi::CString;
 use std::fmt::{self, Display, Formatter};
 use std::os::raw::{c_char, c_int};
 use std::str::FromStr;
-use traits::Assign;
 
 impl Natural {
     //TODO test
@@ -78,19 +77,6 @@ impl FromStr for Natural {
     }
 }
 
-//TODO test
-impl Clone for Natural {
-    fn clone(&self) -> Natural {
-        let mut cloned = Natural::new();
-        cloned.assign(self);
-        cloned
-    }
-
-    fn clone_from(&mut self, source: &Natural) {
-        self.assign(source);
-    }
-}
-
 fn make_string(i: &Natural, radix: i32, to_upper: bool) -> String {
     assert!(radix >= 2 && radix <= 36, "radix out of range");
     match i {
@@ -136,4 +122,5 @@ impl Display for Natural {
 
 pub mod assign_natural;
 pub mod assign_u32;
+pub mod clone;
 pub mod from_u32;

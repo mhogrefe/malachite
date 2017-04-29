@@ -14,6 +14,6 @@ use traits::Assign;
 /// ```
 impl<'a> Assign<&'a Natural> for Natural {
     fn assign(&mut self, other: &'a Natural) {
-        *self = other.clone();
+        self.clone_from(other);
     }
 }
