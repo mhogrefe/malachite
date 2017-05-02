@@ -85,10 +85,34 @@ impl Drop for Natural {
     }
 }
 
+fn get_lower(val: u64) -> u32 {
+    (val & 0x0000_0000_ffff_ffff) as u32
+}
+
+fn get_upper(val: u64) -> u32 {
+    ((val & 0xffff_ffff_0000_0000) >> 32) as u32
+}
+
+pub enum LimbSize {
+    U32,
+    U64,
+}
+
+pub fn get_limb_size() -> LimbSize {
+    let zero: gmp::limb_t = 0;
+    match zero.leading_zeros() {
+        32 => LimbSize::U32,
+        64 => LimbSize::U64,
+        _ => unreachable!(),
+    }
+}
+
 pub mod conversion;
 pub mod comparison {
     pub mod partial_eq_u32;
 }
 pub mod logic {
+    pub mod limb_count;
+    pub mod limbs_le;
     pub mod significant_bits;
 }

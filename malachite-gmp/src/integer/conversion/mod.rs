@@ -9,7 +9,7 @@ use std::os::raw::{c_char, c_int, c_long};
 use std::slice;
 use std::str::FromStr;
 
-//TODO test
+//TODO remove
 pub struct IntegerContent<'a> {
     x: &'a Integer,
     i: u64,
@@ -29,7 +29,7 @@ impl<'a> IntegerContent<'a> {
     }
 }
 
-//TODO test
+//TODO remove
 impl<'a> Iterator for IntegerContent<'a> {
     type Item = u32;
 
@@ -167,7 +167,7 @@ impl Integer {
         *self = Large(x);
     }
 
-    //TODO test
+    //TODO remove
     pub fn to_u32s<'a>(&'a self) -> IntegerContent<'a> {
         IntegerContent::new(self)
     }

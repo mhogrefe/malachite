@@ -8,9 +8,11 @@ impl Natural {
     /// # Example
     /// ```
     /// use malachite_gmp::natural::Natural;
+    /// use std::str::FromStr;
     ///
     /// assert_eq!(Natural::from(0).significant_bits(), 0);
     /// assert_eq!(Natural::from(100).significant_bits(), 7);
+    /// assert_eq!(Natural::from_str("1000000000000").unwrap().significant_bits(), 40);
     /// ```
     pub fn significant_bits(&self) -> u64 {
         match self {

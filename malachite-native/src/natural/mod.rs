@@ -101,5 +101,7 @@ pub mod comparison {
     pub mod partial_eq_u32;
 }
 pub mod logic {
+    pub mod limb_count;
+    pub mod limbs_le;
     pub mod significant_bits;
 }
