@@ -261,13 +261,6 @@ pub mod integer {
                                  &divisor.inner)
             };
         }
-        /// Computes the absolute value of `self`.
-        pub fn abs(&mut self) -> &mut Integer {
-            unsafe {
-                gmp::mpz_abs(&mut self.inner, &self.inner);
-            }
-            self
-        }
         /// Divides `self` by `other`. This is much faster than normal
         /// division, but produces correct results only when the division
         /// is exact.
@@ -1816,16 +1809,10 @@ pub mod integer {
             gmp::mpz_mul_2exp(rop, op1, op2.wrapping_neg() as c_ulong);
         }
     }
-    impl Eq for Integer {}
     impl Ord for Integer {
         fn cmp(&self, other: &Integer) -> Ordering {
             let ord = unsafe { gmp::mpz_cmp(&self.inner, &other.inner) };
             ord.cmp(&0)
-        }
-    }
-    impl PartialEq for Integer {
-        fn eq(&self, other: &Integer) -> bool {
-            self.cmp(other) == Ordering::Equal
         }
     }
     impl PartialOrd for Integer {

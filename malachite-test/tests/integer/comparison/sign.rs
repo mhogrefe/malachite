@@ -10,11 +10,8 @@ use std::str::FromStr;
 fn test_sign() {
     let test = |s, out| {
         assert_eq!(native::Integer::from_str(s).unwrap().sign(), out);
-
         assert_eq!(gmp::Integer::from_str(s).unwrap().sign(), out);
-
         assert_eq!(num_sign(&num::BigInt::from_str(s).unwrap()), out);
-
         assert_eq!(rugint::Integer::from_str(s).unwrap().sign(), out);
     };
     test("0", Ordering::Equal);

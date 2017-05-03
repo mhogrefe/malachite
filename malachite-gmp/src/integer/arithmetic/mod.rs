@@ -255,3 +255,5 @@ impl MulAssign<Integer> for Integer {
         self.mul_assign(&op);
     }
 }
+
+pub mod abs;
