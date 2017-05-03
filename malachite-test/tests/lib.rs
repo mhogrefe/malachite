@@ -4,11 +4,14 @@ extern crate malachite_test;
 extern crate num;
 extern crate rugint;
 
+pub mod common;
 pub mod integer {
     pub mod basic {
         pub mod new_and_default;
     }
     pub mod comparison {
+        pub mod eq;
+        pub mod eq_natural;
         pub mod partial_eq_i32;
         pub mod partial_eq_u32;
         pub mod sign;
@@ -29,6 +32,8 @@ pub mod natural {
         pub mod new_and_default;
     }
     pub mod comparison {
+        pub mod eq;
+        pub mod eq_integer;
         pub mod partial_eq_u32;
     }
     pub mod conversion {

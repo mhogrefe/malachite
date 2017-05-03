@@ -1,6 +1,6 @@
 use error::ParseIntegerError;
 use natural::Natural::{self, Small};
-use std::fmt::{self, Display, Formatter};
+use std::fmt::{self, Debug, Display, Formatter};
 use std::str::FromStr;
 use traits::Assign;
 
@@ -61,6 +61,13 @@ fn fmt_radix(i: &Natural,
 
 //TODO test
 impl Display for Natural {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        fmt_radix(self, f, 10, false, "")
+    }
+}
+
+//TODO test
+impl Debug for Natural {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
         fmt_radix(self, f, 10, false, "")
     }

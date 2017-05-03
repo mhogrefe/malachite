@@ -33,29 +33,6 @@ impl PartialOrd<u32> for Integer {
     }
 }
 
-//TODO test
-impl Eq for Integer {}
-
-//TODO test
-impl PartialEq for Integer {
-    fn eq(&self, other: &Integer) -> bool {
-        match self {
-            &Small(x) => {
-                match other {
-                    &Small(y) => x == y,
-                    &Large(_) => false,
-                }
-            }
-            &Large(x) => {
-                match other {
-                    &Small(_) => false,
-                    &Large(y) => (unsafe { gmp::mpz_cmp(&x, &y) }) == 0,
-                }
-            }
-        }
-    }
-}
-
 impl Hash for Integer {
     fn hash<H: Hasher>(&self, state: &mut H) {
         self.sign().hash(state);
@@ -101,6 +78,8 @@ impl PartialOrd for Integer {
     }
 }
 
+pub mod eq_integer;
 pub mod partial_eq_i32;
+pub mod partial_eq_natural;
 pub mod partial_eq_u32;
 pub mod sign;

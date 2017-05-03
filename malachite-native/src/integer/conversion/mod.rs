@@ -1,6 +1,6 @@
 use error::ParseIntegerError;
 use integer::Integer;
-use std::fmt::{self, Display, Formatter, Write};
+use std::fmt::{self, Debug, Display, Formatter, Write};
 use std::str::FromStr;
 
 impl Integer {
@@ -36,7 +36,17 @@ impl Display for Integer {
         if !self.sign {
             f.write_char('-').unwrap();
         }
-        self.abs.fmt(f)
+        Display::fmt(&self.abs, f)
+    }
+}
+
+//TODO test
+impl Debug for Integer {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        if !self.sign {
+            f.write_char('-').unwrap();
+        }
+        Debug::fmt(&self.abs, f)
     }
 }
 

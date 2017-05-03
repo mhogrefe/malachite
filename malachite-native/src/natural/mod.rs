@@ -98,6 +98,7 @@ fn get_upper(val: u64) -> u32 {
 pub mod arithmetic;
 pub mod conversion;
 pub mod comparison {
+    pub mod partial_eq_integer;
     pub mod partial_eq_u32;
 }
 pub mod logic {

@@ -4,7 +4,7 @@ use integer::Integer;
 use natural::Natural;
 use natural::Natural::*;
 use std::ffi::CString;
-use std::fmt::{self, Display, Formatter};
+use std::fmt::{self, Debug, Display, Formatter};
 use std::os::raw::{c_char, c_int};
 use std::str::FromStr;
 
@@ -115,6 +115,13 @@ fn fmt_radix(i: &Natural,
 
 //TODO test
 impl Display for Natural {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        fmt_radix(self, f, 10, false, "")
+    }
+}
+
+//TODO test
+impl Debug for Natural {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
         fmt_radix(self, f, 10, false, "")
     }
