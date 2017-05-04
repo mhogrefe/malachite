@@ -1,4 +1,4 @@
-use natural::Natural;
+use natural::Natural::{self, Large, Small};
 
 impl Natural {
     /// Returns the number of limbs, or base-2^(32) digits, of `self`. Zero has 0 limbs.
@@ -13,11 +13,10 @@ impl Natural {
     /// assert_eq!(Natural::from_str("1000000000000").unwrap().limb_count(), 2);
     /// ```
     pub fn limb_count(&self) -> u64 {
-        let bit_size = self.significant_bits();
-        if bit_size & 0x1F == 0 {
-            bit_size >> 5
-        } else {
-            (bit_size >> 5) + 1
+        match self {
+            &Small(0) => 0,
+            &Small(_) => 1,
+            &Large(ref xs) => xs.len() as u64,
         }
     }
 }
