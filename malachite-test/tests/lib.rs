@@ -21,6 +21,7 @@ pub mod integer {
     }
     pub mod conversion {
         pub mod assign_i32;
+        pub mod assign_natural;
         pub mod assign_u32;
         pub mod clone_and_assign_integer;
         pub mod from_i32;
@@ -40,6 +41,7 @@ pub mod natural {
         pub mod partial_eq_u32;
     }
     pub mod conversion {
+        pub mod assign_integer;
         pub mod assign_u32;
         pub mod clone_and_assign_natural;
         pub mod from_u32;
