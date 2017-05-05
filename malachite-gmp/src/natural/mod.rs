@@ -5,7 +5,8 @@ use std::mem;
 /// A natural (non-negative) integer backed by [GMP](https://gmplib.org/).
 ///
 /// This code uses Trevor Spiteri's
-/// [gmp_mpfr_sys](https://tspiteri.gitlab.io/gmp-mpfr/gmp_mpfr_sys/index.html) low-level bindings.
+/// [`gmp_mpfr_sys`](https://tspiteri.gitlab.io/gmp-mpfr/gmp_mpfr_sys/index.html) low-level
+/// bindings.
 ///
 /// Any `Natural` small enough to fit into a `u32` is represented inline. Only integers outside this
 /// range incur the costs of FFI and heap-allocation.
@@ -30,7 +31,7 @@ impl Natural {
     }
 
     fn demote_if_small(&mut self) {
-        if let &mut Large(x) = self {
+        if let Large(x) = *self {
             if unsafe { gmp::mpz_sizeinbase(&x, 2) } <= 32 {
                 let s = (unsafe { gmp::mpz_get_ui(&x) }) as u32;
                 *self = Small(s);
@@ -39,13 +40,13 @@ impl Natural {
     }
 
     fn promote(&self) -> Natural {
-        match self {
-            &Small(x) => unsafe {
+        match *self {
+            Small(x) => unsafe {
                 let mut promoted: mpz_t = mem::uninitialized();
                 gmp::mpz_init_set_si(&mut promoted, x.into());
                 Large(promoted)
             },
-            x => x.clone(),
+            ref x => x.clone(),
         }
     }
 
@@ -53,9 +54,9 @@ impl Natural {
     /// Large when it is at least 2^(32). All Naturals used outside this crate are valid, but
     /// temporary Naturals used inside may not be.
     pub fn is_valid(&self) -> bool {
-        match self {
-            &Small(_) => true,
-            &Large(ref x) => (unsafe { gmp::mpz_cmp_ui(x, u32::max_value().into()) }) > 0,
+        match *self {
+            Small(_) => true,
+            Large(ref x) => (unsafe { gmp::mpz_cmp_ui(x, u32::max_value().into()) }) > 0,
         }
     }
 }

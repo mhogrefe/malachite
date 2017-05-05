@@ -13,10 +13,10 @@ impl Natural {
     /// assert_eq!(Natural::from_str("1000000000000").unwrap().limb_count(), 2);
     /// ```
     pub fn limb_count(&self) -> u64 {
-        match self {
-            &Small(0) => 0,
-            &Small(_) => 1,
-            &Large(ref xs) => xs.len() as u64,
+        match *self {
+            Small(0) => 0,
+            Small(_) => 1,
+            Large(ref xs) => xs.len() as u64,
         }
     }
 }

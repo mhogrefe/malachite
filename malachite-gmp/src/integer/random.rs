@@ -13,7 +13,7 @@ impl Integer {
     }
 
     pub fn random_below_raw<R: Rng>(&mut self, rng: &mut R) {
-        assert!(self.sign() == Ordering::Greater, "cannot be below zero");
+        assert_eq!(self.sign(), Ordering::Greater, "cannot be below zero");
         let bits = self.significant_bits();
         let limb_bits = gmp::LIMB_BITS as u64;
         let whole_limbs = (bits / limb_bits) as usize;

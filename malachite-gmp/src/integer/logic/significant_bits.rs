@@ -14,9 +14,9 @@ impl Integer {
     /// assert_eq!(Integer::from(-100).significant_bits(), 7);
     /// ```
     pub fn significant_bits(&self) -> u64 {
-        match self {
-            &Small(x) => (32 - (x.abs() as u32).leading_zeros()) as u64,
-            &Large(x) => (unsafe { gmp::mpz_sizeinbase(&x, 2) }) as u64,
+        match *self {
+            Small(x) => (32 - (x.abs() as u32).leading_zeros()) as u64,
+            Large(x) => (unsafe { gmp::mpz_sizeinbase(&x, 2) }) as u64,
         }
     }
 }

@@ -5,7 +5,8 @@ use std::mem;
 /// An integer backed by [GMP](https://gmplib.org/).
 ///
 /// This code uses Trevor Spiteri's
-/// [gmp_mpfr_sys](https://tspiteri.gitlab.io/gmp-mpfr/gmp_mpfr_sys/index.html) low-level bindings.
+/// [`gmp_mpfr_sys`](https://tspiteri.gitlab.io/gmp-mpfr/gmp_mpfr_sys/index.html) low-level
+/// bindings.
 ///
 /// Any `Integer` small enough to fit into an `i32` is represented inline. Only integers outside
 /// this range incur the costs of FFI and heap-allocation.
@@ -48,22 +49,22 @@ impl Integer {
         }
     }
 
-    fn promote_in_place<'a>(&'a mut self) -> &'a mut mpz_t {
-        if let &mut Small(x) = self {
+    fn promote_in_place(&mut self) -> &mut mpz_t {
+        if let Small(x) = *self {
             unsafe {
                 let mut promoted: mpz_t = mem::uninitialized();
                 gmp::mpz_init_set_si(&mut promoted, x.into());
                 *self = Large(promoted);
             }
         }
-        if let &mut Large(ref mut x) = self {
+        if let Large(ref mut x) = *self {
             return x;
         }
         unreachable!();
     }
 
     fn demote_if_small(&mut self) {
-        if let &mut Large(x) = self {
+        if let Large(x) = *self {
             if unsafe { gmp::mpz_sizeinbase(&x, 2) } < 32 {
                 let s = (unsafe { gmp::mpz_get_si(&x) }) as i32;
                 *self = Small(s);
@@ -81,9 +82,9 @@ impl Integer {
     /// Integers used inside may not be.
     pub fn is_valid(&self) -> bool {
         //TODO better range check
-        match self {
-            &Small(_) => true,
-            &Large(ref x) => {
+        match *self {
+            Small(_) => true,
+            Large(ref x) => {
                 (unsafe { gmp::mpz_cmp_si(x, i32::min_value().into()) }) < 0 ||
                 (unsafe { gmp::mpz_cmp_si(x, i32::max_value().into()) }) > 0
             }

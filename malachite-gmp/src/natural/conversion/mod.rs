@@ -11,12 +11,12 @@ use std::str::FromStr;
 impl Natural {
     //TODO test
     pub fn assign_str_radix(&mut self, src: &str, radix: i32) -> Result<(), ParseIntegerError> {
-        assert!(src.chars().next() != Some('-'));
+        assert!(!src.starts_with('-'));
         let s = check_str_radix(src, radix)?;
         let c_str = CString::new(s).unwrap();
         let mut x = Integer::new_mpz_t();
         let err = unsafe { gmp::mpz_set_str(&mut x, c_str.as_ptr(), radix.into()) };
-        assert!(err == 0);
+        assert_eq!(err, 0);
         *self = Large(x);
         self.demote_if_small();
         Ok(())
@@ -35,7 +35,7 @@ impl Natural {
     }
 }
 
-fn check_str_radix<'a>(src: &'a str, radix: i32) -> Result<&str, ParseIntegerError> {
+fn check_str_radix(src: &str, radix: i32) -> Result<&str, ParseIntegerError> {
     use error::ParseIntegerError as Error;
     use error::ParseErrorKind as Kind;
 
@@ -79,9 +79,9 @@ impl FromStr for Natural {
 
 fn make_string(i: &Natural, radix: i32, to_upper: bool) -> String {
     assert!(radix >= 2 && radix <= 36, "radix out of range");
-    match i {
-        &Small(_) => make_string(&i.promote(), radix, to_upper),
-        &Large(x) => {
+    match *i {
+        Small(_) => make_string(&i.promote(), radix, to_upper),
+        Large(x) => {
             let size = unsafe { gmp::mpz_sizeinbase(&x, radix) };
             // size + 2 for '-' and nul
             let size = size.checked_add(2).unwrap();

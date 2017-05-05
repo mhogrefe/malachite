@@ -13,8 +13,8 @@ use natural::Natural;
 /// ```
 impl PartialEq<Natural> for Integer {
     fn eq(&self, n: &Natural) -> bool {
-        match self {
-            &Integer { sign: true, ref abs } if abs == n => true,
+        match *self {
+            Integer { sign: true, ref abs } if abs == n => true,
             _ => false,
         }
     }

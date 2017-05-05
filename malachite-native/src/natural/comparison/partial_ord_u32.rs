@@ -17,9 +17,9 @@ use std::cmp::Ordering;
 /// ```
 impl PartialOrd<u32> for Natural {
     fn partial_cmp(&self, other: &u32) -> Option<Ordering> {
-        match self {
-            &Small(ref x) => x.partial_cmp(other),
-            &Large(_) => Some(Ordering::Greater),
+        match *self {
+            Small(ref x) => x.partial_cmp(other),
+            Large(_) => Some(Ordering::Greater),
         }
     }
 }

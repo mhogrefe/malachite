@@ -8,30 +8,30 @@ use std::os::raw::c_ulong;
 impl Integer {
     //TODO test
     pub fn div_rem_in_place(&mut self, val: &mut Integer) {
-        assert!(val.sign() != Ordering::Equal, "division by zero");
-        match self {
-            &mut Small(ref mut x) => {
-                match val {
-                    &mut Small(y) => {
+        assert_ne!(val.sign(), Ordering::Equal, "division by zero");
+        match *self {
+            Small(ref mut x) => {
+                match *val {
+                    Small(y) => {
                         let quotient = *x / y;
                         *val = Small(*x % y);
                         *x = quotient;
                     }
-                    &mut Large(_) => {
+                    Large(_) => {
                         *x = 0;
                     }
                 }
             }
-            &mut Large(ref mut x) => {
-                match val {
-                    &mut Small(y) => {
+            Large(ref mut x) => {
+                match *val {
+                    Small(y) => {
                         let mut r = Integer::new_mpz_t();
                         unsafe {
                             gmp::mpz_tdiv_qr_ui(x, &mut r, x, y as u64);
                         };
                         val.assign_mpz_t(r);
                     }
-                    &mut Large(ref mut y) => unsafe {
+                    Large(ref mut y) => unsafe {
                         gmp::mpz_tdiv_qr(x, y, x, y);
                     },
                 }
@@ -47,7 +47,7 @@ impl AddAssign<i32> for Integer {
             return;
         }
         let mut promote = false;
-        if let &mut Small(ref mut x) = self {
+        if let Small(ref mut x) = *self {
             match x.checked_add(op) {
                 Some(sum) => *x = sum,
                 None => promote = true,
@@ -74,8 +74,8 @@ impl<'a> AddAssign<&'a Integer> for Integer {
         if *op == 0 {
             return;
         }
-        if let &mut Small(ref mut x) = self {
-            if let &Small(y) = op {
+        if let Small(ref mut x) = *self {
+            if let Small(y) = *op {
                 if let Some(sum) = x.checked_add(y) {
                     *x = sum;
                     return;
@@ -83,8 +83,8 @@ impl<'a> AddAssign<&'a Integer> for Integer {
             }
         }
         let mut x = self.promote_in_place();
-        match op {
-            &Small(y) => {
+        match *op {
+            Small(y) => {
                 if y > 0 {
                     unsafe {
                         gmp::mpz_add_ui(x, x, y as c_ulong);
@@ -95,7 +95,7 @@ impl<'a> AddAssign<&'a Integer> for Integer {
                     }
                 }
             }
-            &Large(y) => unsafe {
+            Large(y) => unsafe {
                 gmp::mpz_add(x, x, &y);
             },
         }
@@ -116,7 +116,7 @@ impl SubAssign<i32> for Integer {
             return;
         }
         let mut promote = false;
-        if let &mut Small(ref mut x) = self {
+        if let Small(ref mut x) = *self {
             match x.checked_sub(op) {
                 Some(difference) => *x = difference,
                 None => promote = true,
@@ -143,8 +143,8 @@ impl<'a> SubAssign<&'a Integer> for Integer {
         if *op == 0 {
             return;
         }
-        if let &mut Small(ref mut x) = self {
-            if let &Small(y) = op {
+        if let Small(ref mut x) = *self {
+            if let Small(y) = *op {
                 if let Some(difference) = x.checked_sub(y) {
                     *x = difference;
                     return;
@@ -152,8 +152,8 @@ impl<'a> SubAssign<&'a Integer> for Integer {
             }
         }
         let mut x = self.promote_in_place();
-        match op {
-            &Small(y) => {
+        match *op {
+            Small(y) => {
                 if y > 0 {
                     unsafe {
                         gmp::mpz_sub_ui(x, x, y as c_ulong);
@@ -164,7 +164,7 @@ impl<'a> SubAssign<&'a Integer> for Integer {
                     }
                 }
             }
-            &Large(y) => unsafe {
+            Large(y) => unsafe {
                 gmp::mpz_sub(x, x, &y);
             },
         }
@@ -205,7 +205,7 @@ impl MulAssign<i32> for Integer {
             *self = Small(0);
         }
         let mut promote = false;
-        if let &mut Small(ref mut x) = self {
+        if let Small(ref mut x) = *self {
             match x.checked_mul(op) {
                 Some(product) => *x = product,
                 None => promote = true,
@@ -229,8 +229,8 @@ impl<'a> MulAssign<&'a Integer> for Integer {
         if *op == 0 {
             *self = Small(0);
         }
-        if let &mut Small(ref mut x) = self {
-            if let &Small(y) = op {
+        if let Small(ref mut x) = *self {
+            if let Small(y) = *op {
                 if let Some(product) = x.checked_mul(y) {
                     *x = product;
                     return;
@@ -238,11 +238,11 @@ impl<'a> MulAssign<&'a Integer> for Integer {
             }
         }
         let mut x = self.promote_in_place();
-        match op {
-            &Small(y) => unsafe {
+        match *op {
+            Small(y) => unsafe {
                 gmp::mpz_mul_si(x, x, y.into());
             },
-            &Large(y) => unsafe {
+            Large(y) => unsafe {
                 gmp::mpz_mul(x, x, &y);
             },
         }

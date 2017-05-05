@@ -15,10 +15,10 @@ impl Natural {
     /// assert_eq!(Natural::from_str("1000000000000").unwrap().limbs_le(), vec![3567587328, 232]);
     /// ```
     pub fn limbs_le(&self) -> Vec<u32> {
-        match self {
-            &Small(0) => Vec::new(),
-            &Small(x) => vec![x],
-            &Large(ref xs) => xs.clone(),
+        match *self {
+            Small(0) => Vec::new(),
+            Small(x) => vec![x],
+            Large(ref xs) => xs.clone(),
         }
     }
 }

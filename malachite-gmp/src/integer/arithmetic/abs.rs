@@ -15,14 +15,14 @@ impl Integer {
     /// assert_eq!(Integer::from(-123).abs().to_string(), "123");
     /// ```
     pub fn abs(&mut self) -> &mut Integer {
-        match self {
-            &mut Integer::Small(x) if x == i32::min_value() => unsafe {
+        match *self {
+            Integer::Small(x) if x == i32::min_value() => unsafe {
                 let mut x: mpz_t = mem::uninitialized();
                 gmp::mpz_init_set_ui(&mut x, 1 << 31);
                 *self = Integer::Large(x);
             },
-            &mut Integer::Small(ref mut x) => *x = x.abs(),
-            &mut Integer::Large(ref mut x) => unsafe {
+            Integer::Small(ref mut x) => *x = x.abs(),
+            Integer::Large(ref mut x) => unsafe {
                 gmp::mpz_abs(x, x);
             },
         }

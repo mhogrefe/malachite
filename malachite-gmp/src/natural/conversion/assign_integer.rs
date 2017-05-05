@@ -22,27 +22,28 @@ use traits::Assign;
 /// ```
 impl<'a> Assign<&'a Integer> for Natural {
     fn assign(&mut self, other: &'a Integer) {
-        assert!(other.sign() != Ordering::Less,
-                "Cannot assign from a negative Integer. Invalid other: {}",
-                other);
-        match other {
-            &Integer::Small(y) => {
-                match self {
-                    &mut Natural::Small(ref mut x) => *x = y as u32,
-                    &mut Natural::Large(_) => *self = Natural::Small(y as u32),
+        assert_ne!(other.sign(),
+                   Ordering::Less,
+                   "Cannot assign from a negative Integer. Invalid other: {}",
+                   other);
+        match *other {
+            Integer::Small(y) => {
+                match *self {
+                    Natural::Small(ref mut x) => *x = y as u32,
+                    Natural::Large(_) => *self = Natural::Small(y as u32),
                 }
             }
-            &Integer::Large(ref y) if unsafe { gmp::mpz_sizeinbase(y, 2) <= 32 } => {
+            Integer::Large(ref y) if unsafe { gmp::mpz_sizeinbase(y, 2) <= 32 } => {
                 *self = Natural::Small(unsafe { gmp::mpz_get_ui(y) } as u32);
             }
-            &Integer::Large(ref y) => {
-                match self {
-                    &mut Natural::Small(_) => unsafe {
+            Integer::Large(ref y) => {
+                match *self {
+                    Natural::Small(_) => unsafe {
                         let mut assigned: mpz_t = mem::uninitialized();
                         gmp::mpz_init_set(&mut assigned, y);
                         *self = Natural::Large(assigned);
                     },
-                    &mut Natural::Large(ref mut x) => unsafe {
+                    Natural::Large(ref mut x) => unsafe {
                         gmp::mpz_set(x, y);
                     },
                 }

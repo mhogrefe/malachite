@@ -7,7 +7,7 @@ use std::ops::{Add, AddAssign};
 impl Natural {
     //TODO test
     pub fn div_rem_in_place_u32(&mut self, op: u32) -> u32 {
-        assert!(op != 0, "TODO");
+        assert_ne!(op, 0);
         if op == 1 {
             return 0;
         }
@@ -41,12 +41,11 @@ impl Natural {
                 return;
             }
         }
-        let xs = self.promote();
-        let xs_len = xs.len();
+        let mut xs = self.promote();
         let mut carry = 0;
-        for i in 0..xs_len {
-            let product = xs[i] as u64 * op as u64 + carry as u64;
-            xs[i] = get_lower(product);
+        for x in xs.iter_mut() {
+            let product = *x as u64 * op as u64 + carry as u64;
+            *x = get_lower(product);
             carry = get_upper(product);
         }
         if carry != 0 {
@@ -67,9 +66,9 @@ impl AddAssign<u32> for Natural {
         };
         let mut xs = self.promote();
         let mut addend = op;
-        for i in 0..xs.len() {
-            let (sum, overflow) = xs[i].overflowing_add(op);
-            xs[i] = sum;
+        for x in xs.iter_mut() {
+            let (sum, overflow) = x.overflowing_add(op);
+            *x = sum;
             if overflow {
                 addend = 1;
             } else {
@@ -96,15 +95,14 @@ impl<'a> AddAssign<&'a Natural> for Natural {
         let ys_len = ys.len();
         let mut carry = false;
         for i in 0..max(xs_len, ys_len) {
-            let y: u32;
-            if i >= ys_len {
+            let y = if i >= ys_len {
                 if !carry {
                     break;
                 }
-                y = 1;
+                1
             } else {
-                y = ys[i];
-            }
+                ys[i]
+            };
             if i == xs_len {
                 xs.push(0);
             }

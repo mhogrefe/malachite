@@ -7,7 +7,7 @@ use traits::Assign;
 impl Natural {
     //TODO test
     pub fn assign_str_radix(&mut self, src: &str, radix: i32) -> Result<(), ParseIntegerError> {
-        assert!(src.chars().next() != Some('-'));
+        assert!(!src.starts_with('-'));
         self.assign(0);
         for c in src.chars() {
             self.mul_in_place_u32(radix as u32);

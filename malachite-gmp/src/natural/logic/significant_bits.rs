@@ -15,9 +15,9 @@ impl Natural {
     /// assert_eq!(Natural::from_str("1000000000000").unwrap().significant_bits(), 40);
     /// ```
     pub fn significant_bits(&self) -> u64 {
-        match self {
-            &Small(x) => (32 - x.leading_zeros()) as u64,
-            &Large(x) => (unsafe { gmp::mpz_sizeinbase(&x, 2) }) as u64,
+        match *self {
+            Small(x) => (32 - x.leading_zeros()) as u64,
+            Large(x) => (unsafe { gmp::mpz_sizeinbase(&x, 2) }) as u64,
         }
     }
 }

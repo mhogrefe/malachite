@@ -19,9 +19,9 @@ use std::cmp::Ordering;
 /// ```
 impl PartialOrd<i32> for Integer {
     fn partial_cmp(&self, other: &i32) -> Option<Ordering> {
-        match self {
-            &Small(ref x) => x.partial_cmp(other),
-            &Large(_) => Some(self.sign()),
+        match *self {
+            Small(ref x) => x.partial_cmp(other),
+            Large(_) => Some(self.sign()),
         }
     }
 }

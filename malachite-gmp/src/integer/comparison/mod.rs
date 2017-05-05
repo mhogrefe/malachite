@@ -16,23 +16,23 @@ impl Hash for Integer {
 //TODO test
 impl Ord for Integer {
     fn cmp(&self, other: &Integer) -> Ordering {
-        match self {
-            &Small(x) => {
-                match other {
-                    &Small(y) => x.cmp(&y),
-                    &Large(y) => {
+        match *self {
+            Small(x) => {
+                match *other {
+                    Small(y) => x.cmp(&y),
+                    Large(y) => {
                         let ord = unsafe { gmp::mpz_cmp_si(&y, x.into()) };
                         0.cmp(&ord)
                     }
                 }
             }
-            &Large(x) => {
-                match other {
-                    &Small(y) => {
+            Large(x) => {
+                match *other {
+                    Small(y) => {
                         let ord = unsafe { gmp::mpz_cmp_si(&x, y.into()) };
                         ord.cmp(&0)
                     }
-                    &Large(y) => {
+                    Large(y) => {
                         let ord = unsafe { gmp::mpz_cmp(&x, &y) };
                         ord.cmp(&0)
                     }

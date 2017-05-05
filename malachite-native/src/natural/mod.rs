@@ -23,19 +23,19 @@ impl Natural {
         Small(0)
     }
 
-    fn promote<'a>(&'a mut self) -> &'a mut Vec<u32> {
-        if let &mut Small(x) = self {
+    fn promote(&mut self) -> &mut Vec<u32> {
+        if let Small(x) = *self {
             let xs = vec![x];
             *self = Large(xs);
         }
-        if let &mut Large(ref mut xs) = self {
+        if let Large(ref mut xs) = *self {
             xs
         } else {
             unreachable!();
         }
     }
 
-    fn get_u32s_ref<'a>(&'a self) -> &'a Vec<u32> {
+    fn get_u32s_ref(&self) -> &Vec<u32> {
         if let Large(ref xs) = *self {
             xs
         } else {
@@ -62,9 +62,9 @@ impl Natural {
     /// 2^(32), and cannot have leading zero limbs. All Naturals used outside this crate are valid,
     /// but temporary Naturals used inside may not be.
     pub fn is_valid(&self) -> bool {
-        match self {
-            &Small(_) => true,
-            &Large(ref xs) => xs.len() > 1 && xs.last().unwrap() != &0,
+        match *self {
+            Small(_) => true,
+            Large(ref xs) => xs.len() > 1 && xs.last().unwrap() != &0,
         }
     }
 }

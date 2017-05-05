@@ -6,20 +6,20 @@ use test::Bencher;
 
 #[bench]
 fn bench_native(b: &mut Bencher) {
-    b.iter(|| native::Integer::new());
+    b.iter(native::Integer::new);
 }
 
 #[bench]
 fn bench_gmp(b: &mut Bencher) {
-    b.iter(|| gmp::Integer::new());
+    b.iter(gmp::Integer::new);
 }
 
 #[bench]
 fn bench_num(b: &mut Bencher) {
-    b.iter(|| num::BigInt::zero());
+    b.iter(num::BigInt::zero);
 }
 
 #[bench]
 fn bench_rugint(b: &mut Bencher) {
-    b.iter(|| rugint::Integer::new());
+    b.iter(rugint::Integer::new);
 }

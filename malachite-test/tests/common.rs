@@ -1,7 +1,7 @@
 use std::fmt::Debug;
 use std::str::FromStr;
 
-pub fn test_eq_helper<T: Debug + Eq + FromStr>(strings: &Vec<&str>)
+pub fn test_eq_helper<T: Debug + Eq + FromStr>(strings: &[&str])
     where T::Err: Debug
 {
     let xs: Vec<T> = strings.iter().map(|s| s.parse().unwrap()).collect();
@@ -11,7 +11,7 @@ pub fn test_eq_helper<T: Debug + Eq + FromStr>(strings: &Vec<&str>)
             if i == j {
                 assert_eq!(x, y);
             } else {
-                assert!(x != y);
+                assert_ne!(x, y);
             }
         }
     }

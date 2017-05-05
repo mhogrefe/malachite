@@ -20,9 +20,10 @@ use traits::Assign;
 /// ```
 impl<'a> Assign<&'a Integer> for Natural {
     fn assign(&mut self, other: &'a Integer) {
-        assert!(other.sign() != Ordering::Less,
-                "Cannot assign from a negative Integer. Invalid other: {}",
-                other);
+        assert_ne!(other.sign(),
+                   Ordering::Less,
+                   "Cannot assign from a negative Integer. Invalid other: {}",
+                   other);
         self.assign(&other.clone().unsigned_abs());
     }
 }

@@ -6,8 +6,8 @@ use std::cmp::Ordering;
 impl Integer {
     //TODO test
     pub fn find_one(&self, start: u64) -> Option<u64> {
-        match self {
-            &Small(x) => {
+        match *self {
+            Small(x) => {
                 let shifted = x >> start;
                 if shifted == 0 {
                     None
@@ -15,7 +15,7 @@ impl Integer {
                     Some(shifted.trailing_zeros().into())
                 }
             }
-            &Large(x) => {
+            Large(x) => {
                 if *self == 0 {
                     None
                 } else {
@@ -30,31 +30,31 @@ impl Integer {
         if self.sign() == Ordering::Less {
             None
         } else {
-            Some(match self {
-                     &Small(x) => x.count_ones().into(),
-                     &Large(x) => unsafe { gmp::mpz_popcount(&x) },
+            Some(match *self {
+                     Small(x) => x.count_ones().into(),
+                     Large(x) => unsafe { gmp::mpz_popcount(&x) },
                  })
         }
     }
 
     //TODO test
     pub fn get_bit(&self, index: u64) -> bool {
-        match self {
-            &Small(x) => index < 31 && x & (1 << index) != 0,
-            &Large(x) => unsafe { gmp::mpz_tstbit(&x, index.into()) != 0 },
+        match *self {
+            Small(x) => index < 31 && x & (1 << index) != 0,
+            Large(x) => unsafe { gmp::mpz_tstbit(&x, index.into()) != 0 },
         }
     }
 
     //TODO test
     pub fn set_bit(&mut self, index: u64) {
-        if let &mut Small(ref mut x) = self {
+        if let Small(ref mut x) = *self {
             if index < 31 {
                 *x |= 1 << index;
                 return;
             }
         }
         self.promote_in_place();
-        if let &mut Large(ref mut x) = self {
+        if let Large(ref mut x) = *self {
             unsafe {
                 gmp::mpz_setbit(x, index.into());
             }
@@ -63,13 +63,13 @@ impl Integer {
 
     //TODO test
     pub fn clear_bit(&mut self, index: u64) {
-        match self {
-            &mut Small(ref mut x) => {
+        match *self {
+            Small(ref mut x) => {
                 if index < 31 {
                     *x &= !(1 << index);
                 }
             }
-            &mut Large(ref mut x) => unsafe {
+            Large(ref mut x) => unsafe {
                 gmp::mpz_clrbit(x, index.into());
             },
         }

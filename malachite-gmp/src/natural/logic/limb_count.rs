@@ -15,7 +15,7 @@ impl Natural {
     /// ```
     pub fn limb_count(&self) -> u64 {
         let bit_size = self.significant_bits();
-        if bit_size & 0x1F == 0 {
+        if bit_size & 0x1f == 0 {
             bit_size >> 5
         } else {
             (bit_size >> 5) + 1

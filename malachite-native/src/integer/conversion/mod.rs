@@ -6,8 +6,8 @@ use std::str::FromStr;
 impl Integer {
     //TODO test
     pub fn assign_str_radix(&mut self, src: &str, radix: i32) -> Result<(), ParseIntegerError> {
-        assert!(radix == 10);
-        if src.chars().next() == Some('-') {
+        assert_eq!(radix, 10);
+        if src.starts_with('-') {
             self.sign = false;
             self.abs.assign_str_radix(&src[1..], radix)?;
         } else {

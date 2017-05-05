@@ -11,9 +11,9 @@ use integer::Integer::{self, Large, Small};
 /// ```
 impl PartialEq<i32> for Integer {
     fn eq(&self, i: &i32) -> bool {
-        match self {
-            &Small(x) => x == *i,
-            &Large(_) => false,
+        match *self {
+            Small(x) => x == *i,
+            Large(_) => false,
         }
     }
 }
@@ -29,9 +29,9 @@ impl PartialEq<i32> for Integer {
 /// ```
 impl PartialEq<Integer> for i32 {
     fn eq(&self, i: &Integer) -> bool {
-        match i {
-            &Small(y) => y == *self,
-            &Large(_) => false,
+        match *i {
+            Small(y) => y == *self,
+            Large(_) => false,
         }
     }
 }

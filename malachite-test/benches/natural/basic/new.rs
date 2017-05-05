@@ -5,15 +5,15 @@ use test::Bencher;
 
 #[bench]
 fn bench_native(b: &mut Bencher) {
-    b.iter(|| native::Natural::new());
+    b.iter(native::Natural::new);
 }
 
 #[bench]
 fn bench_gmp(b: &mut Bencher) {
-    b.iter(|| gmp::Natural::new());
+    b.iter(gmp::Natural::new);
 }
 
 #[bench]
 fn bench_num(b: &mut Bencher) {
-    b.iter(|| num::BigUint::zero());
+    b.iter(num::BigUint::zero);
 }

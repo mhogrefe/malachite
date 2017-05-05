@@ -54,9 +54,9 @@ impl<'a> Iterator for IntegerContent<'a> {
 impl Integer {
     //TODO test
     pub fn to_i32(&self) -> Option<i32> {
-        match self {
-            &Small(x) => Some(x),
-            &Large(x) => {
+        match *self {
+            Small(x) => Some(x),
+            Large(x) => {
                 if *self >= i32::min_value() && *self <= i32::max_value() {
                     Some(unsafe { gmp::mpz_get_si(&x) as i32 })
                 } else {
@@ -71,9 +71,9 @@ impl Integer {
         if self.sign() == Ordering::Less {
             return None;
         }
-        match self {
-            &Small(x) => Some(x as u32),
-            &Large(x) => {
+        match *self {
+            Small(x) => Some(x as u32),
+            Large(x) => {
                 if *self <= u32::max_value() {
                     Some(unsafe { gmp::mpz_get_ui(&x) as u32 })
                 } else {
@@ -94,7 +94,7 @@ impl Integer {
         let c_str = CString::new(s).unwrap();
         let mut x = Integer::new_mpz_t();
         let err = unsafe { gmp::mpz_set_str(&mut x, c_str.as_ptr(), radix.into()) };
-        assert!(err == 0);
+        assert_eq!(err, 0);
         self.assign_mpz_t(x);
         Ok(())
     }
@@ -121,8 +121,8 @@ impl Integer {
         if significant_bits < 32 {
             let mut x = 0;
             let mut mask = 1;
-            for i in 0..significant_bits {
-                if bits[i] {
+            for &bit in bits.iter().take(significant_bits) {
+                if bit {
                     x |= mask;
                 }
                 mask <<= 1;
@@ -168,16 +168,16 @@ impl Integer {
     }
 
     //TODO remove
-    pub fn to_u32s<'a>(&'a self) -> IntegerContent<'a> {
+    pub fn to_u32s(&self) -> IntegerContent {
         IntegerContent::new(self)
     }
 }
 
 fn make_string(i: &Integer, radix: i32, to_upper: bool) -> String {
     assert!(radix >= 2 && radix <= 36, "radix out of range");
-    match i {
-        &Small(_) => make_string(&i.promote(), radix, to_upper),
-        &Large(x) => {
+    match *i {
+        Small(_) => make_string(&i.promote(), radix, to_upper),
+        Large(x) => {
             let size = unsafe { gmp::mpz_sizeinbase(&x, radix) };
             // size + 2 for '-' and nul
             let size = size.checked_add(2).unwrap();
@@ -209,7 +209,7 @@ fn fmt_radix(i: &Integer,
     f.pad_integral(!neg, prefix, buf)
 }
 
-fn check_str_radix<'a>(src: &'a str, radix: i32) -> Result<&str, ParseIntegerError> {
+fn check_str_radix(src: &str, radix: i32) -> Result<&str, ParseIntegerError> {
     use error::ParseIntegerError as Error;
     use error::ParseErrorKind as Kind;
 

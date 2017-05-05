@@ -25,12 +25,10 @@ impl PartialOrd<i32> for Integer {
             } else {
                 Some(Ordering::Greater)
             }
+        } else if *other >= 0 {
+            Some(Ordering::Less)
         } else {
-            if *other >= 0 {
-                Some(Ordering::Less)
-            } else {
-                (other.abs() as u32).partial_cmp(&self.abs)
-            }
+            (other.abs() as u32).partial_cmp(&self.abs)
         }
     }
 }

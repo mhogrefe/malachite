@@ -12,17 +12,17 @@ use integer::Integer::{self, Large, Small};
 /// ```
 impl PartialEq<Integer> for Integer {
     fn eq(&self, i: &Integer) -> bool {
-        match self {
-            &Small(x) => {
-                match i {
-                    &Small(y) => x == y,
-                    &Large(_) => false,
+        match *self {
+            Small(x) => {
+                match *i {
+                    Small(y) => x == y,
+                    Large(_) => false,
                 }
             }
-            &Large(x) => {
-                match i {
-                    &Small(_) => false,
-                    &Large(y) => (unsafe { gmp::mpz_cmp(&x, &y) }) == 0,
+            Large(x) => {
+                match *i {
+                    Small(_) => false,
+                    Large(y) => (unsafe { gmp::mpz_cmp(&x, &y) }) == 0,
                 }
             }
         }
