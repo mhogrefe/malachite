@@ -3,7 +3,7 @@ use integer::Integer::{self, Large, Small};
 
 /// Determines whether `self` is equal to a `u32`.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_gmp::integer::Integer;
 ///
@@ -23,7 +23,7 @@ impl PartialEq<u32> for Integer {
 
 /// Determines whether a `u32` is equal to `self`.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_gmp::integer::Integer;
 ///

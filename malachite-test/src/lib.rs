@@ -7,6 +7,8 @@ pub mod integer {
         pub mod assign_u32;
     }
     pub mod comparison {
+        pub mod partial_cmp_i32;
+        pub mod partial_cmp_u32;
         pub mod partial_eq_i32;
         pub mod partial_eq_u32;
         pub mod sign;
@@ -14,6 +16,7 @@ pub mod integer {
 }
 pub mod natural {
     pub mod comparison {
+        pub mod partial_cmp_u32;
         pub mod partial_eq_u32;
     }
     pub mod conversion {

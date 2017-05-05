@@ -1881,44 +1881,6 @@ pub mod integer {
             }
         }
     }
-    impl PartialOrd<u32> for Integer {
-        fn partial_cmp(&self, other: &u32) -> Option<Ordering> {
-            let ord = unsafe { gmp::mpz_cmp_ui(&self.inner, (*other).into()) };
-            Some(ord.cmp(&0))
-        }
-    }
-    impl PartialOrd<Integer> for u32 {
-        fn partial_cmp(&self, other: &Integer) -> Option<Ordering> {
-            match other.partial_cmp(self) {
-                Some(x) => Some(x.reverse()),
-                None => None,
-            }
-        }
-    }
-    impl PartialOrd<i32> for Integer {
-        fn partial_cmp(&self, other: &i32) -> Option<Ordering> {
-            let ord = unsafe { gmp::mpz_cmp_si(&self.inner, (*other).into()) };
-            Some(ord.cmp(&0))
-        }
-    }
-    impl PartialEq<i32> for Integer {
-        fn eq(&self, other: &i32) -> bool {
-            self.partial_cmp(other) == Some(Ordering::Equal)
-        }
-    }
-    impl PartialOrd<Integer> for i32 {
-        fn partial_cmp(&self, other: &Integer) -> Option<Ordering> {
-            match other.partial_cmp(self) {
-                Some(x) => Some(x.reverse()),
-                None => None,
-            }
-        }
-    }
-    impl PartialEq<Integer> for i32 {
-        fn eq(&self, other: &Integer) -> bool {
-            other.eq(self)
-        }
-    }
     fn make_string(i: &Integer, radix: i32, to_upper: bool) -> String {
         if !(radix >= 2 && radix <= 36) {
             {

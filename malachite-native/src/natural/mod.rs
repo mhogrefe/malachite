@@ -100,6 +100,7 @@ pub mod conversion;
 pub mod comparison {
     pub mod partial_eq_integer;
     pub mod partial_eq_u32;
+    pub mod partial_ord_u32;
 }
 pub mod logic {
     pub mod limb_count;
