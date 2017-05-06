@@ -25,14 +25,10 @@ impl PartialOrd for Natural {
 /// Asserts that `Natural` ordering is a total order.
 impl Ord for Natural {
     fn cmp(&self, other: &Natural) -> Ordering {
-        match *self {
-            Small(x) => x.partial_cmp(other).unwrap(),
-            Large(ref x) => {
-                match *other {
-                    Small(ref y) => self.partial_cmp(y).unwrap(),
-                    Large(ref y) => (unsafe { gmp::mpz_cmp(x, y) }).cmp(&0),
-                }
-            }
+        match (self, other) {
+            (&Small(ref x), y) => x.partial_cmp(y).unwrap(),
+            (&Large(_), &Small(ref y)) => self.partial_cmp(y).unwrap(),
+            (&Large(ref x), &Large(ref y)) => (unsafe { gmp::mpz_cmp(x, y) }).cmp(&0),
         }
     }
 }

@@ -14,18 +14,14 @@ use natural::Natural;
 /// ```
 impl PartialEq<Natural> for Integer {
     fn eq(&self, n: &Natural) -> bool {
-        match *self {
-            Integer::Small(x) => {
-                match *n {
-                    Natural::Small(y) => x >= 0 && y == (x as u32),
-                    Natural::Large(_) => false,
-                }
+        match (self, n) {
+            (&Integer::Small(x), &Natural::Small(y)) => x >= 0 && y == (x as u32),
+            (&Integer::Small(_), &Natural::Large(_)) => false,
+            (&Integer::Large(ref x), &Natural::Small(y)) => {
+                (unsafe { gmp::mpz_cmp_ui(x, y.into()) }) == 0
             }
-            Integer::Large(ref x) => {
-                match *n {
-                    Natural::Small(y) => (unsafe { gmp::mpz_cmp_ui(x, y.into()) }) == 0,
-                    Natural::Large(ref y) => (unsafe { gmp::mpz_cmp(x, y) }) == 0,
-                }
+            (&Integer::Large(ref x), &Natural::Large(ref y)) => {
+                (unsafe { gmp::mpz_cmp(x, y) }) == 0
             }
         }
     }

@@ -27,14 +27,10 @@ impl PartialOrd for Integer {
 /// Asserts that `Integer` ordering is a total order.
 impl Ord for Integer {
     fn cmp(&self, other: &Integer) -> Ordering {
-        match *self {
-            Small(x) => x.partial_cmp(other).unwrap(),
-            Large(ref x) => {
-                match *other {
-                    Small(ref y) => self.partial_cmp(y).unwrap(),
-                    Large(ref y) => (unsafe { gmp::mpz_cmp(x, y) }).cmp(&0),
-                }
-            }
+        match (self, other) {
+            (&Small(ref x), y) => x.partial_cmp(y).unwrap(),
+            (&Large(_), &Small(ref y)) => self.partial_cmp(y).unwrap(),
+            (&Large(ref x), &Large(ref y)) => (unsafe { gmp::mpz_cmp(x, y) }).cmp(&0),
         }
     }
 }
