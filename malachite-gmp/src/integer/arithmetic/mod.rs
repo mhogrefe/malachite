@@ -257,3 +257,4 @@ impl MulAssign<Integer> for Integer {
 }
 
 pub mod abs;
+pub mod neg;

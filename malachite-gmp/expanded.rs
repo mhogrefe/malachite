@@ -1085,20 +1085,6 @@ pub mod integer {
             self.bitxor_assign(&op);
         }
     }
-    impl Neg for Integer {
-        type Output = Integer;
-        fn neg(mut self) -> Integer {
-            self.neg_assign();
-            self
-        }
-    }
-    impl NegAssign for Integer {
-        fn neg_assign(&mut self) {
-            unsafe {
-                gmp::mpz_neg(&mut self.inner, &self.inner);
-            }
-        }
-    }
     impl Not for Integer {
         type Output = Integer;
         fn not(mut self) -> Integer {

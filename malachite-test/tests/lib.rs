@@ -8,6 +8,7 @@ pub mod common;
 pub mod integer {
     pub mod arithmetic {
         pub mod abs;
+        pub mod neg;
     }
     pub mod basic {
         pub mod new_and_default;

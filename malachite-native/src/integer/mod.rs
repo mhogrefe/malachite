@@ -53,6 +53,7 @@ impl Default for Integer {
 
 pub mod arithmetic {
     pub mod abs;
+    pub mod neg;
 }
 pub mod comparison {
     pub mod ord_integer;

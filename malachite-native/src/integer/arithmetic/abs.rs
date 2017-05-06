@@ -12,7 +12,7 @@ impl Integer {
     /// assert_eq!(Integer::from(123).abs().to_string(), "123");
     /// assert_eq!(Integer::from(-123).abs().to_string(), "123");
     /// ```
-    pub fn abs(&mut self) -> &mut Integer {
+    pub fn abs(mut self) -> Integer {
         self.sign = true;
         self
     }
