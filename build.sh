@@ -18,5 +18,4 @@ cargo update &&
 cargo fmt &&
 cargo clippy &&
 cargo test --release &&
-cargo bench &&
 cargo rustc --release -- --emit asm
