@@ -1809,17 +1809,6 @@ pub mod integer {
             gmp::mpz_mul_2exp(rop, op1, op2.wrapping_neg() as c_ulong);
         }
     }
-    impl Ord for Integer {
-        fn cmp(&self, other: &Integer) -> Ordering {
-            let ord = unsafe { gmp::mpz_cmp(&self.inner, &other.inner) };
-            ord.cmp(&0)
-        }
-    }
-    impl PartialOrd for Integer {
-        fn partial_cmp(&self, other: &Integer) -> Option<Ordering> {
-            Some(self.cmp(other))
-        }
-    }
     impl PartialOrd<f64> for Integer {
         fn partial_cmp(&self, other: &f64) -> Option<Ordering> {
             if other.is_nan() {

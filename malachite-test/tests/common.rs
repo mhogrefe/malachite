@@ -8,11 +8,19 @@ pub fn test_eq_helper<T: Debug + Eq + FromStr>(strings: &[&str])
     let ys: Vec<T> = strings.iter().map(|s| s.parse().unwrap()).collect();
     for (i, x) in xs.iter().enumerate() {
         for (j, y) in ys.iter().enumerate() {
-            if i == j {
-                assert_eq!(x, y);
-            } else {
-                assert_ne!(x, y);
-            }
+            assert_eq!(i == j, x == y);
+        }
+    }
+}
+
+pub fn test_ord_helper<T: Debug + FromStr + Ord>(strings: &[&str])
+    where T::Err: Debug
+{
+    let xs: Vec<T> = strings.iter().map(|s| s.parse().unwrap()).collect();
+    let ys: Vec<T> = strings.iter().map(|s| s.parse().unwrap()).collect();
+    for (i, x) in xs.iter().enumerate() {
+        for (j, y) in ys.iter().enumerate() {
+            assert_eq!(i.cmp(&j), x.cmp(y));
         }
     }
 }

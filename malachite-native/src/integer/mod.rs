@@ -55,6 +55,7 @@ pub mod arithmetic {
     pub mod abs;
 }
 pub mod comparison {
+    pub mod ord_integer;
     pub mod partial_eq_i32;
     pub mod partial_eq_natural;
     pub mod partial_eq_u32;
