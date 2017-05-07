@@ -67,7 +67,7 @@ impl AddAssign<u32> for Natural {
         let mut xs = self.promote();
         let mut addend = op;
         for x in xs.iter_mut() {
-            let (sum, overflow) = x.overflowing_add(op);
+            let (sum, overflow) = x.overflowing_add(addend);
             *x = sum;
             if overflow {
                 addend = 1;

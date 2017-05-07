@@ -9,8 +9,6 @@ use traits::NegAssign;
 /// # Examples
 /// ```
 /// use malachite_gmp::integer::Integer;
-/// use std::ops::Neg;
-/// use std::str::FromStr;
 ///
 /// assert_eq!((-Integer::from(0)).to_string(), "0");
 /// assert_eq!((-Integer::from(123)).to_string(), "-123");

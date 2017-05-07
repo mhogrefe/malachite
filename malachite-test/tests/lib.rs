@@ -55,6 +55,7 @@ pub mod natural {
         pub mod from_u32;
     }
     pub mod logic {
+        pub mod assign_limbs_le;
         pub mod limb_count;
         pub mod limbs_le;
         pub mod significant_bits;
