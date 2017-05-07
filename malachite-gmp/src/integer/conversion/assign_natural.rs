@@ -4,7 +4,7 @@ use natural::Natural;
 use std::mem;
 use traits::Assign;
 
-/// Assigns a `&Natural` to `self`.
+/// Assigns a `Natural` to `self`.
 ///
 /// # Example
 /// ```

@@ -3,7 +3,7 @@ use malachite_gmp as gmp;
 use std::str::FromStr;
 
 #[test]
-fn test_eq_natural() {
+fn test_partial_eq_natural() {
     let test = |u, v, out| {
         assert_eq!(native::integer::Integer::from_str(u).unwrap() ==
                    native::natural::Natural::from_str(v).unwrap(),

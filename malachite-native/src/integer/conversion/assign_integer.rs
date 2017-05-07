@@ -1,7 +1,7 @@
 use integer::Integer;
 use traits::Assign;
 
-/// Assigns a `&Integer` to `self`.
+/// Assigns an `Integer` to `self`.
 ///
 /// # Example
 /// ```

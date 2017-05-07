@@ -3,7 +3,7 @@ use natural::Natural;
 use std::cmp::Ordering;
 use traits::Assign;
 
-/// Assigns a `&Integer` to `self`.
+/// Assigns an `Integer` to `self`.
 ///
 /// # Panics
 /// Panics if `other` is negative.

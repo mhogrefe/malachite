@@ -5,7 +5,7 @@ use std::cmp::Ordering;
 use std::mem;
 use traits::Assign;
 
-/// Assigns a `&Integer` to `self`.
+/// Assigns an `Integer` to `self`.
 ///
 /// # Panics
 /// Panics if `other` is negative.

@@ -7,16 +7,11 @@ use std::cmp::Ordering;
 /// # Examples
 /// ```
 /// use malachite_gmp::integer::Integer;
-/// use std::str::FromStr;
 ///
 /// assert!(Integer::from(-123) < Integer::from(-122));
 /// assert!(Integer::from(-123) <= Integer::from(-122));
 /// assert!(Integer::from(-123) > Integer::from(-124));
 /// assert!(Integer::from(-123) >= Integer::from(-124));
-/// assert!(Integer::from_str("1000000000000").unwrap() > Integer::from(123));
-/// assert!(Integer::from_str("1000000000000").unwrap() >= Integer::from(123));
-/// assert!(Integer::from_str("-1000000000000").unwrap() < Integer::from(123));
-/// assert!(Integer::from_str("-1000000000000").unwrap() <= Integer::from(123));
 /// ```
 impl PartialOrd for Integer {
     fn partial_cmp(&self, other: &Integer) -> Option<Ordering> {

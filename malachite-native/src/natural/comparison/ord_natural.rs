@@ -6,14 +6,11 @@ use std::cmp::Ordering;
 /// # Examples
 /// ```
 /// use malachite_native::natural::Natural;
-/// use std::str::FromStr;
 ///
 /// assert!(Natural::from(123) > Natural::from(122));
 /// assert!(Natural::from(123) >= Natural::from(122));
 /// assert!(Natural::from(123) < Natural::from(124));
 /// assert!(Natural::from(123) <= Natural::from(124));
-/// assert!(Natural::from_str("1000000000000").unwrap() > Natural::from(123));
-/// assert!(Natural::from_str("1000000000000").unwrap() >= Natural::from(123));
 /// ```
 impl PartialOrd for Natural {
     fn partial_cmp(&self, other: &Natural) -> Option<Ordering> {
