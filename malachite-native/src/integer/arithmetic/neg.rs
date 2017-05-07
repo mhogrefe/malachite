@@ -1,5 +1,6 @@
 use integer::Integer;
 use std::ops::Neg;
+use traits::NegAssign;
 
 /// Takes the negative of `self`.
 ///
@@ -15,9 +16,34 @@ impl Neg for Integer {
     type Output = Integer;
 
     fn neg(mut self) -> Integer {
+        self.neg_assign();
+        self
+    }
+}
+
+/// Negates `self`.
+///
+/// # Examples
+/// ```
+/// use malachite_native::integer::Integer;
+/// use malachite_native::traits::NegAssign;
+///
+/// let mut x = Integer::from(0);
+/// x.neg_assign();
+/// assert_eq!(x.to_string(), "0");
+///
+/// let mut x = Integer::from(123);
+/// x.neg_assign();
+/// assert_eq!(x.to_string(), "-123");
+///
+/// let mut x = Integer::from(-123);
+/// x.neg_assign();
+/// assert_eq!(x.to_string(), "123");
+/// ```
+impl NegAssign for Integer {
+    fn neg_assign(&mut self) {
         if self.abs != 0 {
             self.sign = !self.sign;
         }
-        self
     }
 }

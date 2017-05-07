@@ -1,5 +1,6 @@
 use integer::Integer;
 use natural::Natural;
+use traits::AbsAssign;
 
 impl Integer {
     /// Takes the absolute value of `self`.
@@ -29,5 +30,30 @@ impl Integer {
     /// ```
     pub fn unsigned_abs(self) -> Natural {
         self.abs
+    }
+}
+
+/// Replaces `self` with its absolute value.
+///
+/// # Examples
+/// ```
+/// use malachite_native::integer::Integer;
+/// use malachite_native::traits::AbsAssign;
+///
+/// let mut x = Integer::from(0);
+/// x.abs_assign();
+/// assert_eq!(x.to_string(), "0");
+///
+/// let mut x = Integer::from(123);
+/// x.abs_assign();
+/// assert_eq!(x.to_string(), "123");
+///
+/// let mut x = Integer::from(-123);
+/// x.abs_assign();
+/// assert_eq!(x.to_string(), "123");
+/// ```
+impl AbsAssign for Integer {
+    fn abs_assign(&mut self) {
+        self.sign = true;
     }
 }

@@ -2,6 +2,7 @@ use gmp_mpfr_sys::gmp::{self, mpz_t};
 use integer::Integer;
 use natural::Natural;
 use std::mem;
+use traits::AbsAssign;
 
 impl Integer {
     /// Takes the absolute value of `self`.
@@ -15,17 +16,7 @@ impl Integer {
     /// assert_eq!(Integer::from(-123).abs().to_string(), "123");
     /// ```
     pub fn abs(mut self) -> Integer {
-        match self {
-            Integer::Small(x) if x == i32::min_value() => unsafe {
-                let mut x: mpz_t = mem::uninitialized();
-                gmp::mpz_init_set_ui(&mut x, 1 << 31);
-                self = Integer::Large(x);
-            },
-            Integer::Small(ref mut x) => *x = x.abs(),
-            Integer::Large(ref mut x) => unsafe {
-                gmp::mpz_abs(x, x);
-            },
-        }
+        self.abs_assign();
         self
     }
 
@@ -51,6 +42,41 @@ impl Integer {
                 } else {
                     Natural::Large(abs)
                 }
+            },
+        }
+    }
+}
+
+/// Replaces `self` with its absolute value.
+///
+/// # Examples
+/// ```
+/// use malachite_gmp::integer::Integer;
+/// use malachite_gmp::traits::AbsAssign;
+///
+/// let mut x = Integer::from(0);
+/// x.abs_assign();
+/// assert_eq!(x.to_string(), "0");
+///
+/// let mut x = Integer::from(123);
+/// x.abs_assign();
+/// assert_eq!(x.to_string(), "123");
+///
+/// let mut x = Integer::from(-123);
+/// x.abs_assign();
+/// assert_eq!(x.to_string(), "123");
+/// ```
+impl AbsAssign for Integer {
+    fn abs_assign(&mut self) {
+        match *self {
+            Integer::Small(x) if x == i32::min_value() => unsafe {
+                let mut x: mpz_t = mem::uninitialized();
+                gmp::mpz_init_set_ui(&mut x, 1 << 31);
+                *self = Integer::Large(x);
+            },
+            Integer::Small(ref mut x) => *x = x.abs(),
+            Integer::Large(ref mut x) => unsafe {
+                gmp::mpz_abs(x, x);
             },
         }
     }
