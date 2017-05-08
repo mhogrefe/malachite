@@ -88,3 +88,4 @@ pub mod assign_integer;
 pub mod assign_natural;
 pub mod assign_u32;
 pub mod from_u32;
+pub mod to_u32;

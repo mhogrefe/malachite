@@ -9,7 +9,7 @@ use malachite_native::traits::Assign;
 use rand::Rng;
 
 /// Assigns a random number with up to `bits` bits to `n`; equivalently, assigns a random number
-/// uniformly sampled from [0, 2^`bits`) to `n`.
+/// uniformly sampled from [0, 2^(`bits`)) to `n`.
 ///
 /// # Example
 /// ```
