@@ -1,7 +1,9 @@
+extern crate malachite;
 extern crate malachite_gmp;
 extern crate malachite_native;
 extern crate malachite_test;
 extern crate num;
+extern crate rand;
 extern crate rugint;
 
 pub mod common;
@@ -59,5 +61,8 @@ pub mod natural {
         pub mod limb_count;
         pub mod limbs_le;
         pub mod significant_bits;
+    }
+    pub mod random {
+        pub mod assign_random_up_to_bits;
     }
 }

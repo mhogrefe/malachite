@@ -2,9 +2,11 @@
 name = "malachite-test"
 version = "0.1.0"
 dependencies = [
+ "malachite 0.1.0",
  "malachite-gmp 0.1.0",
  "malachite-native 0.1.0",
  "num 0.1.37 (registry+https://github.com/rust-lang/crates.io-index)",
+ "rand 0.3.15 (registry+https://github.com/rust-lang/crates.io-index)",
  "rugint 0.2.1 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
@@ -22,6 +24,14 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 name = "libc"
 version = "0.2.22"
 source = "registry+https://github.com/rust-lang/crates.io-index"
+
+[[package]]
+name = "malachite"
+version = "0.1.0"
+dependencies = [
+ "malachite-native 0.1.0",
+ "rand 0.3.15 (registry+https://github.com/rust-lang/crates.io-index)",
+]
 
 [[package]]
 name = "malachite-gmp"
