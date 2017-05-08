@@ -115,6 +115,7 @@ pub fn get_limb_size() -> LimbSize {
 pub mod conversion;
 pub mod comparison {
     pub mod eq_natural;
+    pub mod hash;
     pub mod ord_natural;
     pub mod partial_eq_integer;
     pub mod partial_eq_u32;
