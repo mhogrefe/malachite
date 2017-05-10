@@ -106,6 +106,7 @@ pub mod comparison {
 }
 pub mod logic {
     pub mod assign_limbs_le;
+    pub mod get_bit;
     pub mod limb_count;
     pub mod limbs_le;
     pub mod significant_bits;

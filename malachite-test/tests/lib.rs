@@ -35,6 +35,7 @@ pub mod integer {
         pub mod from_u32;
     }
     pub mod logic {
+        pub mod get_bit;
         pub mod significant_bits;
     }
 }
@@ -59,6 +60,7 @@ pub mod natural {
     }
     pub mod logic {
         pub mod assign_limbs_le;
+        pub mod get_bit;
         pub mod limb_count;
         pub mod limbs_le;
         pub mod significant_bits;

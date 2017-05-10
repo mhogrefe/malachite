@@ -38,14 +38,6 @@ impl Integer {
     }
 
     //TODO test
-    pub fn get_bit(&self, index: u64) -> bool {
-        match *self {
-            Small(x) => index < 31 && x & (1 << index) != 0,
-            Large(x) => unsafe { gmp::mpz_tstbit(&x, index.into()) != 0 },
-        }
-    }
-
-    //TODO test
     pub fn set_bit(&mut self, index: u64) {
         if let Small(ref mut x) = *self {
             if index < 31 {
@@ -86,4 +78,5 @@ impl Integer {
     }
 }
 
+pub mod get_bit;
 pub mod significant_bits;
