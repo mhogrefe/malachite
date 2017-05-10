@@ -183,23 +183,6 @@ pub mod integer {
         }
     }
     impl Integer {
-        /// Converts to a `u32` if the value fits.
-        pub fn to_u32(&self) -> Option<u32> {
-            if self.sign() != Ordering::Less && *self <= u32::MAX {
-                Some(self.to_u32_wrapping())
-            } else {
-                None
-            }
-        }
-        /// Converts to a `u32`, wrapping if the value is too large.
-        pub fn to_u32_wrapping(&self) -> u32 {
-            let u = unsafe { gmp::mpz_get_ui(&self.inner) as u32 };
-            if self.sign() == Ordering::Less {
-                u.wrapping_neg()
-            } else {
-                u
-            }
-        }
         /// Converts to an `i32` if the value fits.
         ///
         /// # Examples
@@ -480,11 +463,6 @@ pub mod integer {
                 }
             }
             self
-        }
-        /// Returns `true` if the bit at location `index` is 1 or `false`
-        /// if the bit is 0.
-        pub fn get_bit(&self, index: u32) -> bool {
-            unsafe { gmp::mpz_tstbit(&self.inner, index.into()) != 0 }
         }
         /// Toggles the bit at location `index`.
         pub fn invert_bit(&mut self, index: u32) -> &mut Integer {

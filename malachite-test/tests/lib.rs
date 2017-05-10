@@ -33,6 +33,7 @@ pub mod integer {
         pub mod clone_and_assign_integer;
         pub mod from_i32;
         pub mod from_u32;
+        pub mod to_u32;
     }
     pub mod logic {
         pub mod get_bit;

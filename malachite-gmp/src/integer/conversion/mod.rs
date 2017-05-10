@@ -2,7 +2,6 @@ use gmp_mpfr_sys::gmp::{self, mpz_t};
 use error::ParseIntegerError;
 use integer::Integer;
 use integer::Integer::*;
-use std::cmp::Ordering;
 use std::ffi::CString;
 use std::fmt::{self, Debug, Display, Formatter};
 use std::os::raw::{c_char, c_int, c_long};
@@ -59,23 +58,6 @@ impl Integer {
             Large(x) => {
                 if *self >= i32::min_value() && *self <= i32::max_value() {
                     Some(unsafe { gmp::mpz_get_si(&x) as i32 })
-                } else {
-                    None
-                }
-            }
-        }
-    }
-
-    //TODO test
-    pub fn to_u32(&self) -> Option<u32> {
-        if self.sign() == Ordering::Less {
-            return None;
-        }
-        match *self {
-            Small(x) => Some(x as u32),
-            Large(x) => {
-                if *self <= u32::max_value() {
-                    Some(unsafe { gmp::mpz_get_ui(&x) as u32 })
                 } else {
                     None
                 }
@@ -272,3 +254,4 @@ pub mod assign_u32;
 pub mod clone;
 pub mod from_i32;
 pub mod from_u32;
+pub mod to_u32;
