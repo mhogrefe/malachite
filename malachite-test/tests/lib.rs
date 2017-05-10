@@ -41,6 +41,9 @@ pub mod integer {
     }
 }
 pub mod natural {
+    pub mod arithmetic {
+        pub mod is_power_of_two;
+    }
     pub mod basic {
         pub mod new_and_default;
     }

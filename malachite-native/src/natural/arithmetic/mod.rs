@@ -144,3 +144,5 @@ impl Add<Natural> for Natural {
         self.add(&op)
     }
 }
+
+pub mod is_power_of_two;

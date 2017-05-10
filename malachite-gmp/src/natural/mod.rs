@@ -112,6 +112,9 @@ pub fn get_limb_size() -> LimbSize {
     }
 }
 
+pub mod arithmetic {
+    pub mod is_power_of_two;
+}
 pub mod conversion;
 pub mod comparison {
     pub mod eq_natural;
