@@ -65,7 +65,10 @@ impl Integer {
 
     fn demote_if_small(&mut self) {
         if let Large(x) = *self {
-            if unsafe { gmp::mpz_sizeinbase(&x, 2) } < 32 {
+            if unsafe {
+                   gmp::mpz_cmp_si(&x, i32::min_value().into()) >= 0 &&
+                   gmp::mpz_cmp_si(&x, i32::max_value().into()) <= 0
+               } {
                 let s = (unsafe { gmp::mpz_get_si(&x) }) as i32;
                 *self = Small(s);
             }

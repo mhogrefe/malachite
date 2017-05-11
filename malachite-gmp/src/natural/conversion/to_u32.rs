@@ -15,10 +15,7 @@ impl Natural {
     pub fn to_u32(&self) -> Option<u32> {
         match *self {
             Small(x) => Some(x),
-            Large(ref x) if unsafe { gmp::mpz_sizeinbase(x, 2) } <= 32 => {
-                Some(self.to_u32_wrapping())
-            }
-            _ => None,
+            Large(_) => None,
         }
     }
 

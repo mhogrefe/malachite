@@ -22,7 +22,7 @@ impl Integer {
         match *self {
             Small(x) => Some(x as u32),
             Large(x) => {
-                if *self <= u32::max_value() {
+                if self.significant_bits() <= 32 {
                     Some(unsafe { gmp::mpz_get_ui(&x) as u32 })
                 } else {
                     None

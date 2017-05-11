@@ -183,37 +183,6 @@ pub mod integer {
         }
     }
     impl Integer {
-        /// Converts to an `i32` if the value fits.
-        ///
-        /// # Examples
-        /// ```rust
-        /// use gmp_to_flint_adaptor_lib::integer::Integer;
-        /// use std::str::FromStr;
-        ///
-        /// assert_eq!(Integer::from(1000000).to_i32(), Some(1000000));
-        /// assert_eq!(Integer::from(-1000000).to_i32(), Some(-1000000));
-        /// assert_eq!(Integer::from_str("1000000000000").unwrap().to_i32(), None);
-        /// ```
-        pub fn to_i32(&self) -> Option<i32> {
-            if *self >= i32::MIN && *self <= i32::MAX {
-                Some(self.to_i32_wrapping())
-            } else {
-                None
-            }
-        }
-        /// Converts to an `i32`, wrapping if the value is too large.
-        /// # Examples
-        /// ```rust
-        /// use gmp_to_flint_adaptor_lib::integer::Integer;
-        /// use std::str::FromStr;
-        ///
-        /// assert_eq!(Integer::from(1000000).to_i32_wrapping(), 1000000);
-        /// assert_eq!(Integer::from(-1000000).to_i32_wrapping(), -1000000);
-        /// assert_eq!(Integer::from_str("1000000000000").unwrap().to_i32_wrapping(), -727379968);
-        /// ```
-        pub fn to_i32_wrapping(&self) -> i32 {
-            self.to_u32_wrapping() as i32
-        }
         /// Converts to an `f64`, rounding towards zero.
         pub fn to_f64(&self) -> f64 {
             unsafe { gmp::mpz_get_d(&self.inner) }
@@ -587,72 +556,6 @@ pub mod integer {
                 self.assign_random_bits_variable(max_bits, rng);
                 if self.sign() != Ordering::Equal {
                     break;
-                }
-            }
-        }
-        /// Generates a non-negative random number below the given
-        /// boundary value.
-        ///
-        /// # Examples
-        ///
-        /// ```rust
-        /// extern crate gmp_to_flint_adaptor_lib;
-        /// extern crate rand;
-        /// use gmp_to_flint_adaptor_lib::integer::Integer;
-        ///
-        /// fn main() {
-        ///     let mut rng = rand::thread_rng();
-        ///     let bound = Integer::from(15);
-        ///     let mut random = bound.clone();
-        ///     random.random_below(&mut rng);
-        ///     println!("0 <= {} < {}", random, bound);
-        ///     assert!(random < bound);
-        /// }
-        /// ```
-        ///
-        /// # Panics
-        ///
-        /// Panics if the boundary value is less than or equal to zero.
-        pub fn random_below<R: Rng>(&mut self, rng: &mut R) -> &mut Integer {
-            if !(self.sign() == Ordering::Greater) {
-                {
-                    ::rt::begin_panic("cannot be below zero", {
-                        static _FILE_LINE: (&'static str, u32) = ("src/integer_old.rs", 736u32);
-                        &_FILE_LINE
-                    })
-                }
-            };
-            let bits = self.significant_bits();
-            let limb_bits = gmp::LIMB_BITS as u32;
-            let whole_limbs = (bits / limb_bits) as usize;
-            let extra_bits = bits % limb_bits;
-            let total_limbs = whole_limbs + (((extra_bits + limb_bits - 1) / limb_bits) as usize);
-            let limbs = unsafe { slice::from_raw_parts_mut(self.inner.d, total_limbs) };
-            'restart: loop {
-                let mut limbs_used: c_int = 0;
-                let mut still_equal = true;
-                'next_limb: for i in (0..total_limbs).rev() {
-                    let mut val: gmp::limb_t = rng.gen();
-                    if i == whole_limbs {
-                        val &= ((1 as gmp::limb_t) << extra_bits) - 1;
-                    }
-                    if limbs_used == 0 && val != 0 {
-                        limbs_used = (i as c_int) + 1;
-                    }
-                    if still_equal {
-                        if val > limbs[i] {
-                            continue 'restart;
-                        }
-                        if val == limbs[i] {
-                            continue 'next_limb;
-                        }
-                        still_equal = false;
-                    }
-                    limbs[i] = val;
-                }
-                if !still_equal {
-                    self.inner.size = limbs_used;
-                    return self;
                 }
             }
         }

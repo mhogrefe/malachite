@@ -52,20 +52,6 @@ impl<'a> Iterator for IntegerContent<'a> {
 
 impl Integer {
     //TODO test
-    pub fn to_i32(&self) -> Option<i32> {
-        match *self {
-            Small(x) => Some(x),
-            Large(x) => {
-                if *self >= i32::min_value() && *self <= i32::max_value() {
-                    Some(unsafe { gmp::mpz_get_si(&x) as i32 })
-                } else {
-                    None
-                }
-            }
-        }
-    }
-
-    //TODO test
     pub fn to_string_radix(&self, radix: i32) -> String {
         make_string(self, radix, false)
     }
@@ -254,4 +240,5 @@ pub mod assign_u32;
 pub mod clone;
 pub mod from_i32;
 pub mod from_u32;
+pub mod to_i32;
 pub mod to_u32;
