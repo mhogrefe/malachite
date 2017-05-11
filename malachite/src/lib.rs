@@ -11,6 +11,7 @@ pub mod natural {
     pub use malachite_native::natural::Natural;
     pub mod random {
         pub mod assign_random_up_to_bits;
+        pub mod random_below;
     }
 }
 pub mod integer {
