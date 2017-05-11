@@ -37,7 +37,7 @@ impl Integer {
     pub fn to_u32_wrapping(&self) -> u32 {
         match *self {
             Integer { sign: true, ref abs } => abs.to_u32_wrapping(),
-            Integer { sign: false, ref abs } => (!abs.to_u32_wrapping()).wrapping_add(1),
+            Integer { sign: false, ref abs } => abs.to_u32_wrapping().wrapping_neg(),
         }
     }
 }

@@ -49,10 +49,11 @@ impl Integer {
         match *self {
             Small(x) => x as u32,
             Large(ref x) => {
+                let u = unsafe { gmp::mpz_get_ui(x) } as u32;
                 if self.sign() != Ordering::Less {
-                    unsafe { gmp::mpz_get_ui(x) as u32 }
+                    u
                 } else {
-                    (!unsafe { gmp::mpz_get_ui(x) as u32 }).wrapping_add(1)
+                    u.wrapping_neg()
                 }
             }
         }
