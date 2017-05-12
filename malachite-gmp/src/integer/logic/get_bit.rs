@@ -7,7 +7,7 @@ impl Integer {
     ///
     /// Negative integers are treated as though they are represented in two's complement.
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// use malachite_gmp::integer::Integer;
     /// use std::str::FromStr;

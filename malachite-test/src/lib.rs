@@ -15,6 +15,9 @@ pub mod integer {
     }
 }
 pub mod natural {
+    pub mod arithmetic {
+        pub mod add_u32;
+    }
     pub mod comparison {
         pub mod partial_cmp_u32;
         pub mod partial_eq_u32;

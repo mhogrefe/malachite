@@ -3,7 +3,7 @@ use integer::Integer::{self, Large, Small};
 
 /// Determines whether `self` is equal to another `Integer`.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_gmp::integer::Integer;
 ///

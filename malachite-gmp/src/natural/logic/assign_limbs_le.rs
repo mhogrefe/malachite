@@ -9,7 +9,7 @@ impl Natural {
     /// less significant limbs have lower indices in the input slice. Although GMP may use 32- or
     /// 64-bit limbs internally, this method always takes 32-bit limbs.
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// use malachite_gmp::natural::Natural;
     ///

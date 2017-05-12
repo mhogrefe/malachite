@@ -4,7 +4,7 @@ use natural::Natural::{self, Large, Small};
 impl Natural {
     /// Determines whether `self` is an integer power of 2.
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// use malachite_gmp::natural::Natural;
     /// use std::str::FromStr;

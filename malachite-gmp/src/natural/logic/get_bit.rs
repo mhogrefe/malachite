@@ -5,7 +5,7 @@ impl Natural {
     /// Determines whether the `index`th bit of `self`, or the coefficient of 2^(`index`) in the
     /// binary expansion of `self`, is 0 or 1. `false` means 0, `true` means 1.
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// use malachite_gmp::natural::Natural;
     /// use std::str::FromStr;

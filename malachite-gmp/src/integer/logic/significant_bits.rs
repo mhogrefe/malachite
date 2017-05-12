@@ -5,7 +5,7 @@ impl Integer {
     /// Returns the smallest number of bits necessary to represent the absolute value of `self`. 0
     /// has zero significant bits.
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// use malachite_gmp::integer::Integer;
     ///

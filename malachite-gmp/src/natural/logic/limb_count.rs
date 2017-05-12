@@ -4,7 +4,7 @@ impl Natural {
     /// Returns the number of limbs, or base-2^(32) digits, of `self`. Although GMP may use 32- or
     /// 64-bit limbs internally, this method always returns 32-bit limbs. Zero has 0 limbs.
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// use malachite_gmp::natural::Natural;
     /// use std::str::FromStr;

@@ -8,7 +8,7 @@ impl Natural {
     /// significant limbs have lower indices in the output vector. Although GMP may use 32- or
     /// 64-bit limbs internally, this method always returns 32-bit limbs.
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// use malachite_gmp::natural::Natural;
     /// use std::str::FromStr;

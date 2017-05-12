@@ -5,7 +5,7 @@ use std::cmp::Ordering;
 impl Integer {
     /// Converts an `Integer` to a `u32`, returning `None` if the `Integer` is too large.
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// use malachite_gmp::integer::Integer;
     /// use std::str::FromStr;
@@ -33,7 +33,7 @@ impl Integer {
 
     /// Converts an `Integer` to a `u32`, wrapping mod 2^(32).
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// use malachite_gmp::integer::Integer;
     /// use std::str::FromStr;

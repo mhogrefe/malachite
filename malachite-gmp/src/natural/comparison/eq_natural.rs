@@ -3,7 +3,7 @@ use natural::Natural::{self, Large, Small};
 
 /// Determines whether `self` is equal to another `Natural`.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_gmp::natural::Natural;
 ///

@@ -4,7 +4,7 @@ use std::mem;
 
 /// Clones `self`, producing a new `Integer`.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_gmp::integer::Integer;
 /// use malachite_gmp::traits::Assign;

@@ -4,7 +4,7 @@ impl Integer {
     /// Converts an `Integer` to an `i32`, returning `None` if the `Integer` is outside the range of
     /// an `i32`.
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// use malachite_gmp::integer::Integer;
     /// use std::str::FromStr;
@@ -23,7 +23,7 @@ impl Integer {
 
     /// Converts an `Integer` to a `i32`, wrapping mod 2^(32).
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// use malachite_gmp::integer::Integer;
     /// use std::str::FromStr;

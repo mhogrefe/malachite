@@ -4,7 +4,7 @@ use natural::Natural::{self, Large, Small};
 impl Natural {
     /// Converts a `Natural` to a `u32`, returning `None` if the `Natural` is too large.
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// use malachite_gmp::natural::Natural;
     /// use std::str::FromStr;
@@ -21,7 +21,7 @@ impl Natural {
 
     /// Converts a `Natural` to a `u32`, wrapping mod 2^(32).
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// use malachite_gmp::natural::Natural;
     /// use std::str::FromStr;

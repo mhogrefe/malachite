@@ -2,7 +2,7 @@ use integer::Integer::{self, Large, Small};
 
 /// Determines whether `self` is equal to an `i32`.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_gmp::integer::Integer;
 ///
@@ -20,7 +20,7 @@ impl PartialEq<i32> for Integer {
 
 /// Determines whether an `i32` is equal to `self`.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_gmp::integer::Integer;
 ///

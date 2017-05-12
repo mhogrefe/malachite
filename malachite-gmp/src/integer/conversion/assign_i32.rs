@@ -3,7 +3,7 @@ use traits::Assign;
 
 /// Assigns an `i32` to `self`.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_gmp::integer::Integer;
 /// use malachite_gmp::traits::Assign;

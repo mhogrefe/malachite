@@ -55,34 +55,6 @@ impl Natural {
 }
 
 //TODO test
-impl AddAssign<u32> for Natural {
-    fn add_assign(&mut self, op: u32) {
-        if let Small(ref mut x) = *self {
-            let (sum, overflow) = x.overflowing_add(op);
-            if !overflow {
-                *x = sum;
-                return;
-            }
-        };
-        let mut xs = self.promote();
-        let mut addend = op;
-        for x in xs.iter_mut() {
-            let (sum, overflow) = x.overflowing_add(addend);
-            *x = sum;
-            if overflow {
-                addend = 1;
-            } else {
-                addend = 0;
-                break;
-            }
-        }
-        if addend == 1 {
-            xs.push(1);
-        }
-    }
-}
-
-//TODO test
 impl<'a> AddAssign<&'a Natural> for Natural {
     fn add_assign(&mut self, op: &'a Natural) {
         if let Small(y) = *op {
@@ -145,4 +117,5 @@ impl Add<Natural> for Natural {
     }
 }
 
+pub mod add_u32;
 pub mod is_power_of_two;

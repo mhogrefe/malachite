@@ -20,7 +20,7 @@ impl PartialEq<u32> for Natural {
 
 /// Determines whether a `u32` is equal to `self`.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_gmp::natural::Natural;
 ///

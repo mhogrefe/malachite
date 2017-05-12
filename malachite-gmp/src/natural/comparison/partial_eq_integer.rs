@@ -4,7 +4,7 @@ use natural::Natural;
 
 /// Determines whether `self` is equal to an `Integer`.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_gmp::integer::Integer;
 /// use malachite_gmp::natural::Natural;

@@ -5,7 +5,7 @@ impl Natural {
     /// Returns the smallest number of bits necessary to represent `self`. 0 has zero significant
     /// bits.
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// use malachite_gmp::natural::Natural;
     /// use std::str::FromStr;

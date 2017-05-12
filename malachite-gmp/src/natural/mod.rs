@@ -112,7 +112,29 @@ pub fn get_limb_size() -> LimbSize {
     }
 }
 
+macro_rules! mutate_with_possible_promotion {
+    ($n: ident, $small: ident, $large: ident, $process_small: expr, $process_large: expr) => {
+        if let Small(ref mut $small) = *$n {
+            if let Some(x) = $process_small {
+                *$small = x;
+                return;
+            }
+        }
+        if let Small(x) = *$n {
+            unsafe {
+                let mut promoted: mpz_t = mem::uninitialized();
+                gmp::mpz_init_set_ui(&mut promoted, x.into());
+                *$n = Large(promoted);
+            }
+        }
+        if let Large(ref mut $large) = *$n {
+            $process_large
+        }
+    };
+}
+
 pub mod arithmetic {
+    pub mod add_u32;
     pub mod is_power_of_two;
 }
 pub mod conversion;

@@ -4,7 +4,7 @@ use std::mem;
 
 /// Clones `self`, producing a new `Natural`.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_gmp::natural::Natural;
 /// use malachite_gmp::traits::Assign;
