@@ -1,7 +1,5 @@
-use num::BigUint;
-use num::FromPrimitive;
-use num::Zero;
+use num::{BigUint, One, Zero};
 
-pub fn get_bit(x: &mut BigUint, index: u64) -> bool {
-    x.clone() & (BigUint::from_u32(1).unwrap() << index as usize) != BigUint::zero()
+pub fn num_get_bit(x: &BigUint, index: u64) -> bool {
+    x & (BigUint::one() << index as usize) != BigUint::zero()
 }

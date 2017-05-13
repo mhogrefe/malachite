@@ -1,6 +1,6 @@
 use malachite_native::natural as native;
 use malachite_gmp::natural as gmp;
-use malachite_test::natural::logic::get_bit::get_bit;
+use malachite_test::natural::logic::get_bit::num_get_bit;
 use num;
 use std::str::FromStr;
 
@@ -9,7 +9,7 @@ pub fn test_get_bit() {
     let test = |n, index, out| {
         assert_eq!(native::Natural::from_str(n).unwrap().get_bit(index), out);
         assert_eq!(gmp::Natural::from_str(n).unwrap().get_bit(index), out);
-        assert_eq!(get_bit(&mut num::BigUint::from_str(n).unwrap(), index), out);
+        assert_eq!(num_get_bit(&num::BigUint::from_str(n).unwrap(), index), out);
     };
 
     test("0", 0, false);

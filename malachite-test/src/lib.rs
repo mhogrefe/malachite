@@ -27,5 +27,6 @@ pub mod natural {
     }
     pub mod logic {
         pub mod get_bit;
+        pub mod set_bit;
     }
 }

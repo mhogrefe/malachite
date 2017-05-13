@@ -71,6 +71,7 @@ pub mod natural {
         pub mod get_bit;
         pub mod limb_count;
         pub mod limbs_le;
+        pub mod set_bit;
         pub mod significant_bits;
     }
     pub mod random {

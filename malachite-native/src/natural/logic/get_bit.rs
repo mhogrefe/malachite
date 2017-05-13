@@ -19,8 +19,8 @@ impl Natural {
         match *self {
             Small(x) => index < 32 && x & (1 << index) != 0,
             Large(ref xs) => {
-                let limb_index = index >> 5;
-                xs.get(limb_index as usize).map_or(false, |limb| limb & (1 << (index & 0x1f)) != 0)
+                let limb_index = (index >> 5) as usize;
+                xs.get(limb_index).map_or(false, |limb| limb & (1 << (index & 0x1f)) != 0)
             }
         }
     }
