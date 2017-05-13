@@ -132,4 +132,5 @@ pub mod assign_natural;
 pub mod assign_u32;
 pub mod clone;
 pub mod from_u32;
+pub mod into_integer;
 pub mod to_u32;

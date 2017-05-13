@@ -67,5 +67,6 @@ pub mod assign_natural;
 pub mod assign_u32;
 pub mod from_i32;
 pub mod from_u32;
+pub mod into_natural;
 pub mod to_i32;
 pub mod to_u32;
