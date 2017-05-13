@@ -1,11 +1,5 @@
-#[cfg(feature = "gmp")]
-use malachite_gmp::natural::Natural;
-#[cfg(feature = "gmp")]
-use malachite_gmp::traits::Assign;
-#[cfg(feature = "native")]
-use malachite_native::natural::Natural;
-#[cfg(feature = "native")]
-use malachite_native::traits::Assign;
+use natural::Natural;
+use traits::Assign;
 use rand::Rng;
 
 /// Assigns a random number with up to `bits` bits to `n`; equivalently, assigns a random number

@@ -1,7 +1,4 @@
-#[cfg(feature = "gmp")]
-use malachite_gmp::natural::Natural;
-#[cfg(feature = "native")]
-use malachite_native::natural::Natural;
+use natural::Natural;
 use natural::random::assign_random_up_to_bits::assign_random_up_to_bits;
 use rand::Rng;
 

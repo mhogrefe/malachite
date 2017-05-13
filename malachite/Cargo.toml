@@ -3,6 +3,10 @@ name = "malachite"
 version = "0.1.0"
 authors = ["Mikhail Hogrefe <mikhailhogrefe@gmail.com>"]
 
+[lib]
+name = "malachite"
+path = "src/lib.rs"
+
 [dependencies]
 malachite-gmp = { path = "../malachite-gmp", optional = true }
 malachite-native = { path = "../malachite-native", optional = true }

@@ -10,6 +10,7 @@ pub mod natural {
     #[cfg(feature = "native")]
     pub use malachite_native::natural::Natural;
     pub mod random {
+        pub mod assign_random_bits;
         pub mod assign_random_up_to_bits;
         pub mod random_below;
     }

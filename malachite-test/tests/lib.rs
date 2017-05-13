@@ -75,6 +75,7 @@ pub mod natural {
         pub mod significant_bits;
     }
     pub mod random {
+        pub mod assign_random_bits;
         pub mod assign_random_up_to_bits;
         pub mod random_below;
     }
