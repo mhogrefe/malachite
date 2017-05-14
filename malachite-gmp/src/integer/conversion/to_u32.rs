@@ -20,10 +20,10 @@ impl Integer {
             return None;
         }
         match *self {
-            Small(x) => Some(x as u32),
-            Large(x) => {
+            Small(small) => Some(small as u32),
+            Large(ref large) => {
                 if self.significant_bits() <= 32 {
-                    Some(unsafe { gmp::mpz_get_ui(&x) as u32 })
+                    Some(unsafe { gmp::mpz_get_ui(large) as u32 })
                 } else {
                     None
                 }
@@ -47,9 +47,9 @@ impl Integer {
     /// ```
     pub fn to_u32_wrapping(&self) -> u32 {
         match *self {
-            Small(x) => x as u32,
-            Large(ref x) => {
-                let u = unsafe { gmp::mpz_get_ui(x) } as u32;
+            Small(small) => small as u32,
+            Large(ref large) => {
+                let u = unsafe { gmp::mpz_get_ui(large) } as u32;
                 if self.sign() != Ordering::Less {
                     u
                 } else {

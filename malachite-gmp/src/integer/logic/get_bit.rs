@@ -25,9 +25,9 @@ impl Integer {
     /// ```
     pub fn get_bit(&self, index: u64) -> bool {
         match *self {
-            Small(x) if x >= 0 => index < 31 && x & (1 << index) != 0,
-            Small(x) => index >= 31 || x & (1 << index) != 0,
-            Large(ref x) => (unsafe { gmp::mpz_tstbit(x, index.into()) }) != 0,
+            Small(small) if small >= 0 => index < 31 && small & (1 << index) != 0,
+            Small(small) => index >= 31 || small & (1 << index) != 0,
+            Large(ref large) => (unsafe { gmp::mpz_tstbit(large, index.into()) }) != 0,
         }
     }
 }

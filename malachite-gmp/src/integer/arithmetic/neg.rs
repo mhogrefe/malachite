@@ -45,14 +45,14 @@ impl Neg for Integer {
 impl NegAssign for Integer {
     fn neg_assign(&mut self) {
         match *self {
-            Small(x) if x == i32::min_value() => unsafe {
+            Small(small) if small == i32::min_value() => unsafe {
                 let mut x: mpz_t = mem::uninitialized();
                 gmp::mpz_init_set_ui(&mut x, 1 << 31);
                 *self = Large(x);
             },
-            Small(ref mut x) => *x = -*x,
-            Large(ref mut x) => unsafe {
-                gmp::mpz_neg(x, x);
+            Small(ref mut small) => *small = -*small,
+            Large(ref mut large) => unsafe {
+                gmp::mpz_neg(large, large);
             },
         }
     }

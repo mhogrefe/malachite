@@ -17,9 +17,9 @@ impl Natural {
     /// ```
     pub fn is_power_of_two(&self) -> bool {
         match *self {
-            Small(x) => x != 0 && x & (x - 1) == 0,
-            Large(ref x) => unsafe {
-                gmp::mpz_scan1(x, 0) == (gmp::mpz_sizeinbase(x, 2)) as u64 - 1
+            Small(small) => small != 0 && small & (small - 1) == 0,
+            Large(ref large) => unsafe {
+                gmp::mpz_scan1(large, 0) == (gmp::mpz_sizeinbase(large, 2)) as u64 - 1
             },
         }
     }

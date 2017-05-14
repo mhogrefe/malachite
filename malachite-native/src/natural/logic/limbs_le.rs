@@ -17,8 +17,8 @@ impl Natural {
     pub fn limbs_le(&self) -> Vec<u32> {
         match *self {
             Small(0) => Vec::new(),
-            Small(x) => vec![x],
-            Large(ref xs) => xs.clone(),
+            Small(small) => vec![small],
+            Large(ref limbs) => limbs.clone(),
         }
     }
 }

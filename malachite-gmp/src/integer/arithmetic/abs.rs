@@ -32,10 +32,10 @@ impl Integer {
     /// ```
     pub fn unsigned_abs(self) -> Natural {
         match self {
-            Integer::Small(x) => Natural::Small(x.abs() as u32),
-            Integer::Large(ref x) => unsafe {
+            Integer::Small(small) => Natural::Small(small.abs() as u32),
+            Integer::Large(ref large) => unsafe {
                 let mut abs: mpz_t = mem::uninitialized();
-                gmp::mpz_init_set(&mut abs, x);
+                gmp::mpz_init_set(&mut abs, large);
                 gmp::mpz_abs(&mut abs, &abs);
                 if gmp::mpz_sizeinbase(&abs, 2) <= 32 {
                     Natural::Small(gmp::mpz_get_ui(&abs) as u32)
@@ -69,14 +69,14 @@ impl Integer {
 impl AbsAssign for Integer {
     fn abs_assign(&mut self) {
         match *self {
-            Integer::Small(x) if x == i32::min_value() => unsafe {
+            Integer::Small(small) if small == i32::min_value() => unsafe {
                 let mut x: mpz_t = mem::uninitialized();
                 gmp::mpz_init_set_ui(&mut x, 1 << 31);
                 *self = Integer::Large(x);
             },
-            Integer::Small(ref mut x) => *x = x.abs(),
-            Integer::Large(ref mut x) => unsafe {
-                gmp::mpz_abs(x, x);
+            Integer::Small(ref mut small) => *small = small.abs(),
+            Integer::Large(ref mut large) => unsafe {
+                gmp::mpz_abs(large, large);
             },
         }
     }

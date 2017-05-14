@@ -13,7 +13,7 @@ impl Natural {
     /// ```
     pub fn to_u32(&self) -> Option<u32> {
         match *self {
-            Small(x) => Some(x),
+            Small(small) => Some(small),
             Large(_) => None,
         }
     }
@@ -31,8 +31,8 @@ impl Natural {
     /// ```
     pub fn to_u32_wrapping(&self) -> u32 {
         match *self {
-            Small(x) => x,
-            Large(ref xs) => xs[0],
+            Small(small) => small,
+            Large(ref limbs) => limbs[0],
         }
     }
 }

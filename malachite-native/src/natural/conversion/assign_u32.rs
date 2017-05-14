@@ -13,7 +13,7 @@ use traits::Assign;
 /// assert_eq!(x.to_string(), "456");
 /// ```
 impl Assign<u32> for Natural {
-    fn assign(&mut self, u: u32) {
-        *self = Small(u);
+    fn assign(&mut self, other: u32) {
+        *self = Small(other);
     }
 }

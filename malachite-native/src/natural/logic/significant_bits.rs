@@ -1,3 +1,4 @@
+use natural::{LIMB_BITS, LOG_LIMB_BITS};
 use natural::Natural::{self, Large, Small};
 
 impl Natural {
@@ -13,8 +14,11 @@ impl Natural {
     /// ```
     pub fn significant_bits(&self) -> u64 {
         match *self {
-            Small(x) => (32 - x.leading_zeros()) as u64,
-            Large(ref xs) => ((xs.len() as u64) << 5) - xs.last().unwrap().leading_zeros() as u64,
+            Small(small) => (LIMB_BITS - small.leading_zeros()) as u64,
+            Large(ref limbs) => {
+                ((limbs.len() as u64) << LOG_LIMB_BITS as u64) -
+                limbs.last().unwrap().leading_zeros() as u64
+            }
         }
     }
 }

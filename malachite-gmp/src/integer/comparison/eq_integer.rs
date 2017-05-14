@@ -11,10 +11,10 @@ use integer::Integer::{self, Large, Small};
 /// assert!(Integer::from(-123) != Integer::from(5));
 /// ```
 impl PartialEq<Integer> for Integer {
-    fn eq(&self, i: &Integer) -> bool {
-        match (self, i) {
+    fn eq(&self, other: &Integer) -> bool {
+        match (self, other) {
             (&Small(x), &Small(y)) => x == y,
-            (&Large(x), &Large(y)) => (unsafe { gmp::mpz_cmp(&x, &y) }) == 0,
+            (&Large(ref x), &Large(ref y)) => (unsafe { gmp::mpz_cmp(x, y) }) == 0,
             _ => false,
         }
     }

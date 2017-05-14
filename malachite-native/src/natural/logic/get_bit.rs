@@ -1,3 +1,4 @@
+use natural::{LIMB_BITS, LIMB_BITS_MASK, LOG_LIMB_BITS};
 use natural::Natural::{self, Large, Small};
 
 impl Natural {
@@ -17,10 +18,12 @@ impl Natural {
     /// ```
     pub fn get_bit(&self, index: u64) -> bool {
         match *self {
-            Small(x) => index < 32 && x & (1 << index) != 0,
-            Large(ref xs) => {
-                let limb_index = (index >> 5) as usize;
-                xs.get(limb_index).map_or(false, |limb| limb & (1 << (index & 0x1f)) != 0)
+            Small(small) => index < LIMB_BITS as u64 && small & (1 << index) != 0,
+            Large(ref limbs) => {
+                let limb_index = (index >> LOG_LIMB_BITS) as usize;
+                limbs.get(limb_index).map_or(false, |limb| {
+                    limb & (1 << (index & LIMB_BITS_MASK as u64)) != 0
+                })
             }
         }
     }

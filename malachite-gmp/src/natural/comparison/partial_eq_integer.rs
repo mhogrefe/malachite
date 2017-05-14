@@ -13,8 +13,8 @@ use natural::Natural;
 /// assert!(Natural::from(123) != Integer::from(5));
 /// ```
 impl PartialEq<Integer> for Natural {
-    fn eq(&self, i: &Integer) -> bool {
-        match (self, i) {
+    fn eq(&self, other: &Integer) -> bool {
+        match (self, other) {
             (&Natural::Small(x), &Integer::Small(y)) => y >= 0 && x == (y as u32),
             (&Natural::Small(x), &Integer::Large(ref y)) => {
                 (unsafe { gmp::mpz_cmp_si(y, x.into()) }) == 0

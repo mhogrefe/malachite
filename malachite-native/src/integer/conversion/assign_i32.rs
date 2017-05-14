@@ -13,8 +13,8 @@ use traits::Assign;
 /// assert_eq!(x.to_string(), "-123");
 /// ```
 impl Assign<i32> for Integer {
-    fn assign(&mut self, i: i32) {
-        self.sign = i >= 0;
-        self.abs.assign(i.abs() as u32);
+    fn assign(&mut self, other: i32) {
+        self.sign = other >= 0;
+        self.abs.assign(other.abs() as u32);
     }
 }

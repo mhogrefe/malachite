@@ -17,8 +17,8 @@ use std::cmp::Ordering;
 impl Integer {
     pub fn sign(&self) -> Ordering {
         match *self {
-            Small(x) => x.cmp(&0),
-            Large(x) => (unsafe { gmp::mpz_sgn(&x) }).cmp(&0),
+            Small(small) => small.cmp(&0),
+            Large(ref large) => (unsafe { gmp::mpz_sgn(large) }).cmp(&0),
         }
     }
 }

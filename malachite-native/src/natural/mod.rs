@@ -1,5 +1,9 @@
 use natural::Natural::*;
 
+pub const LOG_LIMB_BITS: u32 = 5;
+pub const LIMB_BITS: u32 = 1 << LOG_LIMB_BITS;
+pub const LIMB_BITS_MASK: u32 = LIMB_BITS - 1;
+
 /// A natural (non-negative) integer.
 ///
 /// Any `Natural` small enough to fit into an `u32` is represented inline. Only naturals outside
@@ -24,17 +28,17 @@ impl Natural {
     }
 
     fn demote_if_small(&mut self) {
-        let mut small = None;
-        if let Large(ref xs) = *self {
-            let xs_len = xs.len();
-            match xs_len {
-                0 => small = Some(0),
-                1 => small = Some(xs[0]),
+        let mut demoted_value = None;
+        if let Large(ref limbs) = *self {
+            let limb_count = limbs.len();
+            match limb_count {
+                0 => demoted_value = Some(0),
+                1 => demoted_value = Some(limbs[0]),
                 _ => {}
             }
         }
-        if let Some(x) = small {
-            *self = Small(x);
+        if let Some(small) = demoted_value {
+            *self = Small(small);
         }
     }
 
@@ -107,8 +111,8 @@ fn get_upper(val: u64) -> u32 {
 macro_rules! mutate_with_possible_promotion {
     ($n: ident, $small: ident, $large: ident, $process_small: expr, $process_large: expr) => {
         if let Small(ref mut $small) = *$n {
-            if let Some(x) = $process_small {
-                *$small = x;
+            if let Some(small_result) = $process_small {
+                *$small = small_result;
                 return;
             }
         }

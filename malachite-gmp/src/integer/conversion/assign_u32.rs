@@ -15,14 +15,14 @@ use traits::Assign;
 /// assert_eq!(x.to_string(), "456");
 /// ```
 impl Assign<u32> for Integer {
-    fn assign(&mut self, u: u32) {
-        if u & 0x8000_0000 == 0 {
-            *self = Small(u as i32);
+    fn assign(&mut self, other: u32) {
+        if other & 0x8000_0000 == 0 {
+            *self = Small(other as i32);
         } else {
             unsafe {
-                let mut assigned: mpz_t = mem::uninitialized();
-                gmp::mpz_init_set_ui(&mut assigned, u.into());
-                self.assign_mpz_t(assigned);
+                let mut large: mpz_t = mem::uninitialized();
+                gmp::mpz_init_set_ui(&mut large, other.into());
+                self.assign_mpz_t(large);
             }
         }
     }

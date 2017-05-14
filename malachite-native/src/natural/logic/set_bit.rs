@@ -1,3 +1,4 @@
+use natural::{LIMB_BITS, LIMB_BITS_MASK, LOG_LIMB_BITS};
 use natural::Natural::{self, Large, Small};
 
 impl Natural {
@@ -16,21 +17,22 @@ impl Natural {
     /// ```
     pub fn set_bit(&mut self, index: u64) {
         mutate_with_possible_promotion!(self,
-                                        x,
-                                        xs,
+                                        small,
+                                        limbs,
                                         {
-                                            if index < 32 {
-                                                Some(*x | (1 << index))
+                                            if index < LIMB_BITS as u64 {
+                                                Some(*small | (1 << index))
                                             } else {
                                                 None
                                             }
                                         },
                                         {
-                                            let limb_index = (index >> 5) as usize;
-                                            if limb_index >= xs.len() {
-                                                xs.resize(limb_index + 1, 0);
+                                            let limb_index = (index >> LOG_LIMB_BITS) as usize;
+                                            if limb_index >= limbs.len() {
+                                                limbs.resize(limb_index + 1, 0);
                                             }
-                                            xs[limb_index] |= 1 << (index & 0x1f);
+                                            limbs[limb_index] |= 1 <<
+                                                                 (index & LIMB_BITS_MASK as u64);
                                         });
     }
 }

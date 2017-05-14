@@ -10,9 +10,9 @@ use natural::Natural::{self, Large, Small};
 /// assert!(Natural::from(123) != 5);
 /// ```
 impl PartialEq<u32> for Natural {
-    fn eq(&self, u: &u32) -> bool {
+    fn eq(&self, other: &u32) -> bool {
         match *self {
-            Small(x) => x == *u,
+            Small(x) => x == *other,
             Large(_) => false,
         }
     }
@@ -28,8 +28,8 @@ impl PartialEq<u32> for Natural {
 /// assert!(5 != Natural::from(123));
 /// ```
 impl PartialEq<Natural> for u32 {
-    fn eq(&self, n: &Natural) -> bool {
-        match *n {
+    fn eq(&self, other: &Natural) -> bool {
+        match *other {
             Small(y) => y == *self,
             Large(_) => false,
         }

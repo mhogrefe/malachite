@@ -12,9 +12,9 @@ use natural::Natural;
 /// assert!(Integer::from(123) != Natural::from(5));
 /// ```
 impl PartialEq<Natural> for Integer {
-    fn eq(&self, n: &Natural) -> bool {
+    fn eq(&self, other: &Natural) -> bool {
         match *self {
-            Integer { sign: true, ref abs } if abs == n => true,
+            Integer { sign: true, ref abs } if abs == other => true,
             _ => false,
         }
     }

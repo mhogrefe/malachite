@@ -14,7 +14,7 @@ impl Natural {
     /// ```
     pub fn to_u32(&self) -> Option<u32> {
         match *self {
-            Small(x) => Some(x),
+            Small(small) => Some(small),
             Large(_) => None,
         }
     }
@@ -32,8 +32,8 @@ impl Natural {
     /// ```
     pub fn to_u32_wrapping(&self) -> u32 {
         match *self {
-            Small(x) => x,
-            Large(ref x) => unsafe { gmp::mpz_get_ui(x) as u32 },
+            Small(small) => small,
+            Large(ref large) => unsafe { gmp::mpz_get_ui(large) as u32 },
         }
     }
 }

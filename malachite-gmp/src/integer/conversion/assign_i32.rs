@@ -13,7 +13,7 @@ use traits::Assign;
 /// assert_eq!(x.to_string(), "-123");
 /// ```
 impl Assign<i32> for Integer {
-    fn assign(&mut self, i: i32) {
-        *self = Small(i);
+    fn assign(&mut self, other: i32) {
+        *self = Small(other);
     }
 }

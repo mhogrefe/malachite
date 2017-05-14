@@ -16,7 +16,7 @@ impl Integer {
     /// ```
     pub fn to_i32(&self) -> Option<i32> {
         match *self {
-            Small(x) => Some(x),
+            Small(small) => Some(small),
             Large(_) => None,
         }
     }

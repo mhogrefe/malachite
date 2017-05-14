@@ -11,12 +11,12 @@ use integer::Integer::{self, Large, Small};
 /// assert!(Integer::from(123) != 5);
 /// ```
 impl PartialEq<u32> for Integer {
-    fn eq(&self, u: &u32) -> bool {
-        let u = *u;
+    fn eq(&self, other: &u32) -> bool {
+        let u = *other;
         match *self {
-            Small(x) => x >= 0 && x as u32 == u,
+            Small(small) => small >= 0 && small as u32 == u,
             Large(_) if u & 0x8000_0000 == 0 => false,
-            Large(x) => (unsafe { gmp::mpz_cmp_ui(&x, u.into()) }) == 0,
+            Large(ref large) => (unsafe { gmp::mpz_cmp_ui(large, u.into()) }) == 0,
         }
     }
 }
@@ -31,12 +31,12 @@ impl PartialEq<u32> for Integer {
 /// assert!(5 != Integer::from(123));
 /// ```
 impl PartialEq<Integer> for u32 {
-    fn eq(&self, i: &Integer) -> bool {
+    fn eq(&self, other: &Integer) -> bool {
         let x = *self;
-        match *i {
-            Small(y) => y >= 0 && y as u32 == x,
+        match *other {
+            Small(small) => small >= 0 && small as u32 == x,
             Large(_) if x & 0x8000_0000 == 0 => false,
-            Large(y) => (unsafe { gmp::mpz_cmp_ui(&y, x.into()) }) == 0,
+            Large(ref large) => (unsafe { gmp::mpz_cmp_ui(large, x.into()) }) == 0,
         }
     }
 }

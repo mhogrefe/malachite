@@ -60,16 +60,16 @@ impl AddAssign<u32> for Natural {
             return;
         }
         mutate_with_possible_promotion!(self,
-                                        x,
-                                        xs,
+                                        small,
+                                        limbs,
                                         {
-                                            x.checked_add(other)
+                                            small.checked_add(other)
                                         },
                                         {
                                             let mut addend = other;
-                                            for x in xs.iter_mut() {
-                                                let (sum, overflow) = x.overflowing_add(addend);
-                                                *x = sum;
+                                            for limb in limbs.iter_mut() {
+                                                let (sum, overflow) = limb.overflowing_add(addend);
+                                                *limb = sum;
                                                 if overflow {
                                                     addend = 1;
                                                 } else {
@@ -78,7 +78,7 @@ impl AddAssign<u32> for Natural {
                                                 }
                                             }
                                             if addend == 1 {
-                                                xs.push(1);
+                                                limbs.push(1);
                                             }
                                         });
     }

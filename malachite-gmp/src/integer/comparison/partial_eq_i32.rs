@@ -10,9 +10,9 @@ use integer::Integer::{self, Large, Small};
 /// assert!(Integer::from(123) != -5);
 /// ```
 impl PartialEq<i32> for Integer {
-    fn eq(&self, i: &i32) -> bool {
+    fn eq(&self, other: &i32) -> bool {
         match *self {
-            Small(x) => x == *i,
+            Small(x) => x == *other,
             Large(_) => false,
         }
     }
@@ -28,8 +28,8 @@ impl PartialEq<i32> for Integer {
 /// assert!(-5 != Integer::from(123));
 /// ```
 impl PartialEq<Integer> for i32 {
-    fn eq(&self, i: &Integer) -> bool {
-        match *i {
+    fn eq(&self, other: &Integer) -> bool {
+        match *other {
             Small(y) => y == *self,
             Large(_) => false,
         }

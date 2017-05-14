@@ -72,17 +72,17 @@ impl SubAssign<u32> for Natural {
         }
         let mut panic = false;
         match *self {
-            Small(ref mut x) => {
-                match x.checked_sub(other) {
-                    Some(difference) => *x = difference,
+            Small(ref mut small) => {
+                match small.checked_sub(other) {
+                    Some(difference) => *small = difference,
                     None => panic = true,
                 }
             }
-            Large(ref mut xs) => {
+            Large(ref mut limbs) => {
                 let mut subtrahend = other;
-                for x in xs.iter_mut() {
-                    let (difference, overflow) = x.overflowing_sub(subtrahend);
-                    *x = difference;
+                for limb in limbs.iter_mut() {
+                    let (difference, overflow) = limb.overflowing_sub(subtrahend);
+                    *limb = difference;
                     if overflow {
                         subtrahend = 1;
                     } else {

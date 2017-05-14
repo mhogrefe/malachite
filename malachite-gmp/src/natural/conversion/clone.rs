@@ -34,15 +34,15 @@ impl Clone for Natural {
                     Large(_) => *self = Small(y),
                 }
             }
-            Large(y) => {
+            Large(ref y) => {
                 match *self {
                     Small(_) => unsafe {
                         let mut assigned: mpz_t = mem::uninitialized();
-                        gmp::mpz_init_set(&mut assigned, &y);
+                        gmp::mpz_init_set(&mut assigned, y);
                         *self = Large(assigned);
                     },
                     Large(ref mut x) => unsafe {
-                        gmp::mpz_set(x, &y);
+                        gmp::mpz_set(x, y);
                     },
                 }
             }

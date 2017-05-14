@@ -21,10 +21,10 @@ impl Natural {
     pub fn limbs_le(&self) -> Vec<u32> {
         match *self {
             Small(0) => Vec::new(),
-            Small(x) => vec![x],
-            Large(x) => {
+            Small(small) => vec![small],
+            Large(ref large) => {
                 let raw_limbs =
-                    unsafe { from_raw_parts(gmp::mpz_limbs_read(&x), gmp::mpz_size(&x)) };
+                    unsafe { from_raw_parts(gmp::mpz_limbs_read(large), gmp::mpz_size(large)) };
                 match get_limb_size() {
                     LimbSize::U32 => raw_limbs.iter().map(|&i| i as u32).collect(),
                     LimbSize::U64 => {

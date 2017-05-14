@@ -16,7 +16,7 @@ impl Natural {
         match *self {
             Small(0) => 0,
             Small(_) => 1,
-            Large(ref xs) => xs.len() as u64,
+            Large(ref limbs) => limbs.len() as u64,
         }
     }
 }

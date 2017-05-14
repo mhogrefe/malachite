@@ -10,8 +10,8 @@ use integer::Integer;
 /// assert!(Integer::from(123) != -5);
 /// ```
 impl PartialEq<i32> for Integer {
-    fn eq(&self, i: &i32) -> bool {
-        self.sign == (*i >= 0) && self.abs == (i.abs() as u32)
+    fn eq(&self, other: &i32) -> bool {
+        self.sign == (*other >= 0) && self.abs == (other.abs() as u32)
     }
 }
 
@@ -25,7 +25,7 @@ impl PartialEq<i32> for Integer {
 /// assert!(-5 != Integer::from(123));
 /// ```
 impl PartialEq<Integer> for i32 {
-    fn eq(&self, i: &Integer) -> bool {
-        i.sign == (*self >= 0) && i.abs == (self.abs() as u32)
+    fn eq(&self, other: &Integer) -> bool {
+        other.sign == (*self >= 0) && other.abs == (self.abs() as u32)
     }
 }

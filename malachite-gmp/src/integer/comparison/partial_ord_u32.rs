@@ -22,8 +22,8 @@ impl PartialOrd<u32> for Integer {
     fn partial_cmp(&self, other: &u32) -> Option<Ordering> {
         match *self {
             Small(_) if other & 0x8000_0000 != 0 => Some(Ordering::Less),
-            Small(ref x) => x.partial_cmp(&(*other as i32)),
-            Large(ref x) => Some(unsafe { gmp::mpz_cmp_ui(x, (*other).into()) }.cmp(&0)),
+            Small(ref small) => small.partial_cmp(&(*other as i32)),
+            Large(ref large) => Some(unsafe { gmp::mpz_cmp_ui(large, (*other).into()) }.cmp(&0)),
         }
     }
 }

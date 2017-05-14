@@ -56,7 +56,7 @@ impl Natural {
     pub fn is_valid(&self) -> bool {
         match *self {
             Small(_) => true,
-            Large(ref x) => (unsafe { gmp::mpz_cmp_ui(x, u32::max_value().into()) }) > 0,
+            Large(ref large) => (unsafe { gmp::mpz_cmp_ui(large, u32::max_value().into()) }) > 0,
         }
     }
 }
@@ -78,9 +78,9 @@ impl Default for Natural {
 /// If `self` is large, clears the GMP-allocated memory.
 impl Drop for Natural {
     fn drop(&mut self) {
-        if let Large(ref mut x) = *self {
+        if let Large(ref mut large) = *self {
             unsafe {
-                gmp::mpz_clear(x);
+                gmp::mpz_clear(large);
             }
         }
     }

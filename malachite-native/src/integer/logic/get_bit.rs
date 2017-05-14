@@ -25,22 +25,25 @@ impl Integer {
     pub fn get_bit(&self, index: u64) -> bool {
         match *self {
             Integer { sign: true, ref abs } => abs.get_bit(index),
-            Integer { sign: false, ref abs } => abs.get_bit_neg(index),
+            Integer { sign: false, ref abs } => abs.internal_get_bit_neg(index),
         }
     }
 }
 
 mod internal {
+    use natural::{LIMB_BITS, LIMB_BITS_MASK, LOG_LIMB_BITS};
     use natural::Natural::{self, Large, Small};
 
     impl Natural {
         /// An internal function used by `Integer::get_bit`. Pretends that `self` is actually
         /// -`self` in two's complement and tests the bit at the given index.
-        pub fn get_bit_neg(&self, index: u64) -> bool {
+        pub fn internal_get_bit_neg(&self, index: u64) -> bool {
             match *self {
-                Small(x) => index >= 32 || ((!x).wrapping_add(1)) & (1 << index) != 0,
+                Small(small) => {
+                    index >= LIMB_BITS as u64 || ((!small).wrapping_add(1)) & (1 << index) != 0
+                }
                 Large(ref xs) => {
-                    let limb_index = (index >> 5) as usize;
+                    let limb_index = (index >> LOG_LIMB_BITS) as usize;
                     if limb_index >= xs.len() {
                         // We're indexing into the infinite suffix of 1s
                         return true;
@@ -52,7 +55,7 @@ mod internal {
                     } else {
                         !xs[limb_index]
                     };
-                    limb & (1 << (index & 0x1f)) != 0
+                    limb & (1 << (index & LIMB_BITS_MASK as u64)) != 0
                 }
             }
         }
