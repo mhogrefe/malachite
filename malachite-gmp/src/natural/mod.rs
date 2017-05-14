@@ -136,6 +136,7 @@ macro_rules! mutate_with_possible_promotion {
 pub mod arithmetic {
     pub mod add_u32;
     pub mod is_power_of_two;
+    pub mod sub_u32;
 }
 pub mod conversion;
 pub mod comparison {

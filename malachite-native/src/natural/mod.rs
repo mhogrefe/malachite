@@ -23,6 +23,21 @@ impl Natural {
         Small(0)
     }
 
+    fn demote_if_small(&mut self) {
+        let mut small = None;
+        if let Large(ref xs) = *self {
+            let xs_len = xs.len();
+            match xs_len {
+                0 => small = Some(0),
+                1 => small = Some(xs[0]),
+                _ => {}
+            }
+        }
+        if let Some(x) = small {
+            *self = Small(x);
+        }
+    }
+
     fn promote(&mut self) -> &mut Vec<u32> {
         if let Small(x) = *self {
             let xs = vec![x];
@@ -44,18 +59,12 @@ impl Natural {
     }
 
     fn trim(&mut self) {
-        let mut demote = None;
         if let Large(ref mut xs) = *self {
             while !xs.is_empty() && xs[xs.len() - 1] == 0 {
                 xs.pop();
             }
-            if xs.len() == 1 {
-                demote = Some(xs[0]);
-            }
         }
-        if let Some(x) = demote {
-            *self = Small(x)
-        }
+        self.demote_if_small();
     }
 
     /// Returns true iff `self` is valid. To be valid, `self` can only be Large when it is at least

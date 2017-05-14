@@ -67,9 +67,9 @@ impl AddAssign<u32> for Natural {
                                         },
                                         {
                                             let mut addend = other;
-                                            for limb in xs.iter_mut() {
-                                                let (sum, overflow) = limb.overflowing_add(addend);
-                                                *limb = sum;
+                                            for x in xs.iter_mut() {
+                                                let (sum, overflow) = x.overflowing_add(addend);
+                                                *x = sum;
                                                 if overflow {
                                                     addend = 1;
                                                 } else {

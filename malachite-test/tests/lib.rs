@@ -45,6 +45,7 @@ pub mod integer {
 pub mod natural {
     pub mod arithmetic {
         pub mod add_u32;
+        pub mod sub_u32;
         pub mod is_power_of_two;
     }
     pub mod basic {

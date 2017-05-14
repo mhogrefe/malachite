@@ -119,3 +119,4 @@ impl Add<Natural> for Natural {
 
 pub mod add_u32;
 pub mod is_power_of_two;
+pub mod sub_u32;
