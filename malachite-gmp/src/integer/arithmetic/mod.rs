@@ -257,4 +257,5 @@ impl MulAssign<Integer> for Integer {
 }
 
 pub mod abs;
+pub mod add_u32;
 pub mod neg;
