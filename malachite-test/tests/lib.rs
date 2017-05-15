@@ -12,6 +12,7 @@ pub mod integer {
         pub mod abs;
         pub mod add_u32;
         pub mod neg;
+        pub mod sub_u32;
     }
     pub mod basic {
         pub mod new_and_default;
