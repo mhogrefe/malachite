@@ -12,6 +12,7 @@ pub mod integer {
         pub mod abs;
         pub mod add_i32;
         pub mod add_u32;
+        pub mod even_odd;
         pub mod neg;
         pub mod sub_u32;
     }
@@ -48,6 +49,7 @@ pub mod integer {
 pub mod natural {
     pub mod arithmetic {
         pub mod add_u32;
+        pub mod even_odd;
         pub mod sub_u32;
         pub mod is_power_of_two;
     }
