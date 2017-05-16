@@ -41,34 +41,6 @@ impl Integer {
 }
 
 //TODO test
-impl AddAssign<i32> for Integer {
-    fn add_assign(&mut self, op: i32) {
-        if op == 0 {
-            return;
-        }
-        let mut promote = false;
-        if let Small(ref mut x) = *self {
-            match x.checked_add(op) {
-                Some(sum) => *x = sum,
-                None => promote = true,
-            }
-        }
-        if promote {
-            let x = self.promote_in_place();
-            if op > 0 {
-                unsafe {
-                    gmp::mpz_add_ui(x, x, op as c_ulong);
-                }
-            } else {
-                unsafe {
-                    gmp::mpz_sub_ui(x, x, op.wrapping_neg() as c_ulong);
-                }
-            }
-        }
-    }
-}
-
-//TODO test
 impl<'a> AddAssign<&'a Integer> for Integer {
     fn add_assign(&mut self, op: &'a Integer) {
         if *op == 0 {
@@ -257,6 +229,7 @@ impl MulAssign<Integer> for Integer {
 }
 
 pub mod abs;
+pub mod add_i32;
 pub mod add_u32;
 pub mod neg;
 pub mod sub_u32;

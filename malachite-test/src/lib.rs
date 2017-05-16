@@ -3,6 +3,7 @@ extern crate rugint;
 
 pub mod integer {
     pub mod arithmetic {
+        pub mod add_i32;
         pub mod add_u32;
     }
     pub mod conversion {

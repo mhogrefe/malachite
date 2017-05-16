@@ -53,6 +53,7 @@ impl Default for Integer {
 
 pub mod arithmetic {
     pub mod abs;
+    pub mod add_i32;
     pub mod add_u32;
     pub mod neg;
     pub mod sub_u32;
