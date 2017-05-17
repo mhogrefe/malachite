@@ -18,7 +18,7 @@ impl Add<u32> for Natural {
     type Output = Natural;
 
     fn add(mut self, other: u32) -> Natural {
-        self.add_assign(other);
+        self += other;
         self
     }
 }
@@ -38,7 +38,7 @@ impl Add<Natural> for u32 {
     type Output = Natural;
 
     fn add(self, mut other: Natural) -> Natural {
-        other.add_assign(self);
+        other += self;
         other
     }
 }

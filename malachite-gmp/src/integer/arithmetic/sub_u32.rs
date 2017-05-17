@@ -9,16 +9,16 @@ use std::mem;
 /// use malachite_gmp::integer::Integer;
 /// use std::str::FromStr;
 ///
-/// assert_eq!((Integer::from(123) - 123).to_string(), "0");
-/// assert_eq!((Integer::from(-123) - 0).to_string(), "-123");
-/// assert_eq!((Integer::from(123) - 456).to_string(), "-333");
-/// assert_eq!((Integer::from_str("1000000000000").unwrap() - 123).to_string(), "999999999877");
+/// assert_eq!((Integer::from(123) - 123u32).to_string(), "0");
+/// assert_eq!((Integer::from(-123) - 0u32).to_string(), "-123");
+/// assert_eq!((Integer::from(123) - 456u32).to_string(), "-333");
+/// assert_eq!((Integer::from_str("1000000000000").unwrap() - 123u32).to_string(), "999999999877");
 /// ```
 impl Sub<u32> for Integer {
     type Output = Integer;
 
     fn sub(mut self, other: u32) -> Integer {
-        self.sub_assign(other);
+        self -= other;
         self
     }
 }
@@ -29,16 +29,16 @@ impl Sub<u32> for Integer {
 /// use malachite_gmp::integer::Integer;
 /// use std::str::FromStr;
 ///
-/// assert_eq!((123 - Integer::from(123)).to_string(), "0");
-/// assert_eq!((0 - Integer::from(-123)).to_string(), "123");
-/// assert_eq!((456 - Integer::from(123)).to_string(), "333");
-/// assert_eq!((123 - Integer::from_str("1000000000000").unwrap()).to_string(), "-999999999877");
+/// assert_eq!((123u32 - Integer::from(123)).to_string(), "0");
+/// assert_eq!((0u32 - Integer::from(-123)).to_string(), "123");
+/// assert_eq!((456u32 - Integer::from(123)).to_string(), "333");
+/// assert_eq!((123u32 - Integer::from_str("1000000000000").unwrap()).to_string(), "-999999999877");
 /// ```
 impl Sub<Integer> for u32 {
     type Output = Integer;
 
     fn sub(self, mut other: Integer) -> Integer {
-        other.sub_assign(self);
+        other -= self;
         -other
     }
 }

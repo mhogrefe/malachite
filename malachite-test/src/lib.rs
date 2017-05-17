@@ -5,6 +5,8 @@ pub mod integer {
     pub mod arithmetic {
         pub mod add_i32;
         pub mod add_u32;
+        pub mod sub_i32;
+        pub mod sub_u32;
     }
     pub mod conversion {
         pub mod assign_i32;

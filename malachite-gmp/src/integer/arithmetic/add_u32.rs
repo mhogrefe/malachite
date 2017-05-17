@@ -19,7 +19,7 @@ impl Add<u32> for Integer {
     type Output = Integer;
 
     fn add(mut self, other: u32) -> Integer {
-        self.add_assign(other);
+        self += other;
         self
     }
 }
@@ -40,7 +40,7 @@ impl Add<Integer> for u32 {
     type Output = Integer;
 
     fn add(self, mut other: Integer) -> Integer {
-        other.add_assign(self);
+        other += self;
         other
     }
 }

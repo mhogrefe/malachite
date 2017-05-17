@@ -82,34 +82,6 @@ impl AddAssign<Integer> for Integer {
 }
 
 //TODO test
-impl SubAssign<i32> for Integer {
-    fn sub_assign(&mut self, op: i32) {
-        if op == 0 {
-            return;
-        }
-        let mut promote = false;
-        if let Small(ref mut x) = *self {
-            match x.checked_sub(op) {
-                Some(difference) => *x = difference,
-                None => promote = true,
-            }
-        }
-        if promote {
-            let x = self.promote_in_place();
-            if op > 0 {
-                unsafe {
-                    gmp::mpz_sub_ui(x, x, op as c_ulong);
-                }
-            } else {
-                unsafe {
-                    gmp::mpz_add_ui(x, x, op.wrapping_neg() as c_ulong);
-                }
-            }
-        }
-    }
-}
-
-//TODO test
 impl<'a> SubAssign<&'a Integer> for Integer {
     fn sub_assign(&mut self, op: &'a Integer) {
         if *op == 0 {
@@ -233,4 +205,5 @@ pub mod add_i32;
 pub mod add_u32;
 pub mod even_odd;
 pub mod neg;
+pub mod sub_i32;
 pub mod sub_u32;

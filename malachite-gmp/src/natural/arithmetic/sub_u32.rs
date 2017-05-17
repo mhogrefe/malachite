@@ -22,7 +22,7 @@ impl Sub<u32> for Natural {
 
     fn sub(mut self, other: u32) -> Option<Natural> {
         if self >= other {
-            self.sub_assign(other);
+            self -= other;
             Some(self)
         } else {
             None

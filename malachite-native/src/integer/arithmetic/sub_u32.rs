@@ -1,5 +1,5 @@
 use integer::Integer;
-use std::ops::{AddAssign, Sub, SubAssign};
+use std::ops::{Sub, SubAssign};
 use traits::Assign;
 
 /// Subtracts a `u32` from an `Integer`, taking ownership of the input `Integer`.
@@ -8,16 +8,16 @@ use traits::Assign;
 /// use malachite_native::integer::Integer;
 /// use std::str::FromStr;
 ///
-/// assert_eq!((Integer::from(123) - 123).to_string(), "0");
-/// assert_eq!((Integer::from(-123) - 0).to_string(), "-123");
-/// assert_eq!((Integer::from(123) - 456).to_string(), "-333");
-/// assert_eq!((Integer::from_str("1000000000000").unwrap() - 123).to_string(), "999999999877");
+/// assert_eq!((Integer::from(123) - 123u32).to_string(), "0");
+/// assert_eq!((Integer::from(-123) - 0u32).to_string(), "-123");
+/// assert_eq!((Integer::from(123) - 456u32).to_string(), "-333");
+/// assert_eq!((Integer::from_str("1000000000000").unwrap() - 123u32).to_string(), "999999999877");
 /// ```
 impl Sub<u32> for Integer {
     type Output = Integer;
 
     fn sub(mut self, other: u32) -> Integer {
-        self.sub_assign(other);
+        self -= other;
         self
     }
 }
@@ -28,16 +28,16 @@ impl Sub<u32> for Integer {
 /// use malachite_native::integer::Integer;
 /// use std::str::FromStr;
 ///
-/// assert_eq!((123 - Integer::from(123)).to_string(), "0");
-/// assert_eq!((0 - Integer::from(-123)).to_string(), "123");
-/// assert_eq!((456 - Integer::from(123)).to_string(), "333");
-/// assert_eq!((123 - Integer::from_str("1000000000000").unwrap()).to_string(), "-999999999877");
+/// assert_eq!((123u32 - Integer::from(123)).to_string(), "0");
+/// assert_eq!((0u32 - Integer::from(-123)).to_string(), "123");
+/// assert_eq!((456u32 - Integer::from(123)).to_string(), "333");
+/// assert_eq!((123u32 - Integer::from_str("1000000000000").unwrap()).to_string(), "-999999999877");
 /// ```
 impl Sub<Integer> for u32 {
     type Output = Integer;
 
     fn sub(self, mut other: Integer) -> Integer {
-        other.sub_assign(self);
+        other -= self;
         -other
     }
 }
@@ -61,19 +61,16 @@ impl SubAssign<u32> for Integer {
             return;
         }
         match *self {
-            Integer { sign: false, ref mut abs } => {
-                abs.add_assign(other);
-                return;
+            // e.g. -10 - 5; self stays negative
+            Integer { sign: false, ref mut abs } => *abs += other,
+            // e.g. 10 - 5 or 5 - 5; self stays non-negative
+            Integer { sign: true, ref mut abs } if *abs >= other => *abs -= other,
+            // e.g. 5 - 10; self becomes negative
+            Integer { ref mut sign, ref mut abs } => {
+                *sign = false;
+                let small_abs = abs.to_u32().unwrap();
+                abs.assign(other - small_abs);
             }
-            Integer { sign: true, ref mut abs } if *abs >= other => {
-                abs.sub_assign(other);
-                return;
-            }
-            _ => {}
         }
-        // self > 0 and self < other
-        self.sign = false;
-        let small_abs = self.abs.to_u32().unwrap();
-        self.abs.assign(other - small_abs);
     }
 }

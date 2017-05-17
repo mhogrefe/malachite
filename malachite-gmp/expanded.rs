@@ -1002,51 +1002,10 @@ pub mod integer {
         };
         gmp::mpz_tdiv_r(q, n, d);
     }
-    impl Add<u32> for Integer {
-        type Output = Integer;
-        fn add(mut self, op: u32) -> Integer {
-            self.add_assign(op);
-            self
-        }
-    }
-    impl AddAssign<u32> for Integer {
-        fn add_assign(&mut self, op: u32) {
-            unsafe {
-                gmp::mpz_add_ui(&mut self.inner, &self.inner, op.into());
-            }
-        }
-    }
-    impl Add<Integer> for u32 {
-        type Output = Integer;
-        fn add(self, op: Integer) -> Integer {
-            op.add(self)
-        }
-    }
     impl<'a> Add<&'a Integer> for u32 {
         type Output = Integer;
         fn add(self, op: &'a Integer) -> Integer {
             self.add(op.clone())
-        }
-    }
-    impl Sub<u32> for Integer {
-        type Output = Integer;
-        fn sub(mut self, op: u32) -> Integer {
-            self.sub_assign(op);
-            self
-        }
-    }
-    impl SubAssign<u32> for Integer {
-        fn sub_assign(&mut self, op: u32) {
-            unsafe {
-                gmp::mpz_sub_ui(&mut self.inner, &self.inner, op.into());
-            }
-        }
-    }
-    impl Sub<Integer> for u32 {
-        type Output = Integer;
-        fn sub(self, mut op: Integer) -> Integer {
-            op.sub_from_assign(self);
-            op
         }
     }
     impl<'a> Sub<&'a Integer> for u32 {
@@ -1276,51 +1235,10 @@ pub mod integer {
             self.bitxor(op.clone())
         }
     }
-    impl Add<i32> for Integer {
-        type Output = Integer;
-        fn add(mut self, op: i32) -> Integer {
-            self.add_assign(op);
-            self
-        }
-    }
-    impl AddAssign<i32> for Integer {
-        fn add_assign(&mut self, op: i32) {
-            unsafe {
-                mpz_add_si(&mut self.inner, &self.inner, op.into());
-            }
-        }
-    }
-    impl Add<Integer> for i32 {
-        type Output = Integer;
-        fn add(self, op: Integer) -> Integer {
-            op.add(self)
-        }
-    }
     impl<'a> Add<&'a Integer> for i32 {
         type Output = Integer;
         fn add(self, op: &'a Integer) -> Integer {
             self.add(op.clone())
-        }
-    }
-    impl Sub<i32> for Integer {
-        type Output = Integer;
-        fn sub(mut self, op: i32) -> Integer {
-            self.sub_assign(op);
-            self
-        }
-    }
-    impl SubAssign<i32> for Integer {
-        fn sub_assign(&mut self, op: i32) {
-            unsafe {
-                mpz_sub_si(&mut self.inner, &self.inner, op.into());
-            }
-        }
-    }
-    impl Sub<Integer> for i32 {
-        type Output = Integer;
-        fn sub(self, mut op: Integer) -> Integer {
-            op.sub_from_assign(self);
-            op
         }
     }
     impl<'a> Sub<&'a Integer> for i32 {
