@@ -79,6 +79,7 @@ pub mod natural {
         pub mod limbs_le;
         pub mod set_bit;
         pub mod significant_bits;
+        pub mod trailing_zeros;
     }
     pub mod random {
         pub mod assign_random_bits;
