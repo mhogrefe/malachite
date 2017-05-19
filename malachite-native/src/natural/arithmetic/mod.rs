@@ -1,8 +1,6 @@
 use natural::Natural;
 use natural::Natural::*;
 use natural::{get_lower, get_upper, make_u64};
-use std::cmp::max;
-use std::ops::{Add, AddAssign};
 
 impl Natural {
     //TODO test
@@ -54,69 +52,7 @@ impl Natural {
     }
 }
 
-//TODO test
-impl<'a> AddAssign<&'a Natural> for Natural {
-    fn add_assign(&mut self, op: &'a Natural) {
-        if let Small(y) = *op {
-            self.add_assign(y);
-            return;
-        }
-        let mut xs = self.promote();
-        let xs_len = xs.len();
-        let ys = op.get_u32s_ref();
-        let ys_len = ys.len();
-        let mut carry = false;
-        for i in 0..max(xs_len, ys_len) {
-            let y = if i >= ys_len {
-                if !carry {
-                    break;
-                }
-                1
-            } else {
-                ys[i]
-            };
-            if i == xs_len {
-                xs.push(0);
-            }
-            let (sum, overflow) = xs[i].overflowing_add(y);
-            xs[i] = sum;
-            if carry {
-                xs[i] += 1;
-            }
-            carry = overflow;
-        }
-        if carry {
-            xs.push(1);
-        }
-    }
-}
-
-//TODO test
-impl AddAssign<Natural> for Natural {
-    fn add_assign(&mut self, op: Natural) {
-        self.add_assign(&op);
-    }
-}
-
-//TODO test
-impl<'a> Add<&'a Natural> for Natural {
-    type Output = Natural;
-
-    fn add(mut self, op: &'a Natural) -> Natural {
-        AddAssign::<&'a Natural>::add_assign(&mut self, op);
-        self
-    }
-}
-
-//TODO test
-impl Add<Natural> for Natural {
-    type Output = Natural;
-
-    fn add(self, op: Natural) -> Natural {
-        self.add(&op)
-    }
-}
-
+pub mod add;
 pub mod add_u32;
 pub mod even_odd;
 pub mod is_power_of_two;

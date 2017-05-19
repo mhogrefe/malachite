@@ -54,14 +54,6 @@ impl Natural {
         }
     }
 
-    fn get_u32s_ref(&self) -> &Vec<u32> {
-        if let Large(ref xs) = *self {
-            xs
-        } else {
-            panic!("Can't get u32s from a Small Natural");
-        }
-    }
-
     fn trim(&mut self) {
         if let Large(ref mut xs) = *self {
             while !xs.is_empty() && xs[xs.len() - 1] == 0 {
