@@ -33,6 +33,7 @@ impl Sub<u32> for Natural {
 /// Subtracts a `Natural` from a `u32`, taking ownership of the input `Natural`. If the `Natural`
 /// is greater than the `u32`, returns `None`.
 ///
+/// # Examples
 /// ```
 /// use malachite_gmp::natural::Natural;
 /// use std::str::FromStr;

@@ -1,10 +1,11 @@
 use gmp_mpfr_sys::gmp::{self, mpz_t};
 use natural::Natural::{self, Large, Small};
-use std::ops::{Add, AddAssign};
 use std::mem;
+use std::ops::{Add, AddAssign};
 
 /// Adds a `u32` to a `Natural`, taking ownership of the input `Natural`.
 ///
+/// # Examples
 /// ```
 /// use malachite_gmp::natural::Natural;
 /// use std::str::FromStr;
@@ -25,6 +26,7 @@ impl Add<u32> for Natural {
 
 /// Adds a `Natural` to a `u32`, taking ownership of the input `Natural`.
 ///
+/// # Examples
 /// ```
 /// use malachite_gmp::natural::Natural;
 /// use std::str::FromStr;

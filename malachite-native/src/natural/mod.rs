@@ -108,6 +108,14 @@ fn get_upper(val: u64) -> u32 {
     ((val & 0xffff_ffff_0000_0000) >> 32) as u32
 }
 
+fn pad_left<T: Clone>(vec: &mut Vec<T>, pad_size: usize, value: T) {
+    let old_len = vec.len();
+    vec.resize(old_len + pad_size, value);
+    for i in (0..old_len).rev() {
+        vec.swap(i, i + pad_size);
+    }
+}
+
 macro_rules! mutate_with_possible_promotion {
     ($n: ident, $small: ident, $large: ident, $process_small: expr, $process_large: expr) => {
         if let Small(ref mut $small) = *$n {

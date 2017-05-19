@@ -5,6 +5,7 @@ use std::mem;
 
 /// Subtracts a `u32` from an `Integer`, taking ownership of the input `Integer`.
 ///
+/// # Examples
 /// ```
 /// use malachite_gmp::integer::Integer;
 /// use std::str::FromStr;
@@ -25,6 +26,7 @@ impl Sub<u32> for Integer {
 
 /// Subtracts an `Integer` from a `u32`, taking ownership of the input `Integer`.
 ///
+/// # Examples
 /// ```
 /// use malachite_gmp::integer::Integer;
 /// use std::str::FromStr;

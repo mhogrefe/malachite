@@ -5,6 +5,7 @@ use std::mem;
 
 /// Adds an `i32` to an `Integer`, taking ownership of the input `Integer`.
 ///
+/// # Examples
 /// ```
 /// use malachite_gmp::integer::Integer;
 /// use std::str::FromStr;
@@ -26,6 +27,7 @@ impl Add<i32> for Integer {
 
 /// Adds an `Integer` to an `i32`, taking ownership of the input `Integer`.
 ///
+/// # Examples
 /// ```
 /// use malachite_gmp::integer::Integer;
 /// use std::str::FromStr;
