@@ -7,7 +7,7 @@ dependencies = [
  "malachite-native 0.1.0",
  "num 0.1.37 (registry+https://github.com/rust-lang/crates.io-index)",
  "rand 0.3.15 (registry+https://github.com/rust-lang/crates.io-index)",
- "rugint 0.2.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "rugint 0.2.2 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -17,7 +17,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
 name = "gmp-mpfr-sys"
-version = "1.0.1"
+version = "1.0.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
@@ -124,10 +124,10 @@ dependencies = [
 
 [[package]]
 name = "rugint"
-version = "0.2.1"
+version = "0.2.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
- "gmp-mpfr-sys 1.0.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "gmp-mpfr-sys 1.0.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "rand 0.3.15 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
@@ -138,7 +138,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [metadata]
 "checksum gmp-mpfr-sys 0.6.0 (registry+https://github.com/rust-lang/crates.io-index)" = "98868b8f0e3833ec9225124b858188789107ce3f18fddd05ed0336a72bf62ed9"
-"checksum gmp-mpfr-sys 1.0.1 (registry+https://github.com/rust-lang/crates.io-index)" = "f1169839fff8c7dc88d0d5fe8b8febb04d7c14be12feb5453c45a1e5db7b92cc"
+"checksum gmp-mpfr-sys 1.0.2 (registry+https://github.com/rust-lang/crates.io-index)" = "eb6dbc800913427ada45aba17ca93f7aaf89276b2e727fcfeaad000a29f64004"
 "checksum libc 0.2.23 (registry+https://github.com/rust-lang/crates.io-index)" = "e7eb6b826bfc1fdea7935d46556250d1799b7fe2d9f7951071f4291710665e3e"
 "checksum num 0.1.37 (registry+https://github.com/rust-lang/crates.io-index)" = "98b15ba84e910ea7a1973bccd3df7b31ae282bf9d8bd2897779950c9b8303d40"
 "checksum num-bigint 0.1.37 (registry+https://github.com/rust-lang/crates.io-index)" = "ba6d838b16e56da1b6c383d065ff1ec3c7d7797f65a3e8f6ba7092fd87820bac"
@@ -148,5 +148,5 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 "checksum num-rational 0.1.36 (registry+https://github.com/rust-lang/crates.io-index)" = "c2dc5ea04020a8f18318ae485c751f8cfa1c0e69dcf465c29ddaaa64a313cc44"
 "checksum num-traits 0.1.37 (registry+https://github.com/rust-lang/crates.io-index)" = "e1cbfa3781f3fe73dc05321bed52a06d2d491eaa764c52335cf4399f046ece99"
 "checksum rand 0.3.15 (registry+https://github.com/rust-lang/crates.io-index)" = "022e0636ec2519ddae48154b028864bdce4eaf7d35226ab8e65c611be97b189d"
-"checksum rugint 0.2.1 (registry+https://github.com/rust-lang/crates.io-index)" = "801ad3c3ad1ff754ffaf10592e18e42323a382c1b51af24fadb9d81cc3366748"
+"checksum rugint 0.2.2 (registry+https://github.com/rust-lang/crates.io-index)" = "2183682d7d8b18f03c2e419e9b628ef1c6b7751d2d8977fda0715b78f7036e10"
 "checksum rustc-serialize 0.3.24 (registry+https://github.com/rust-lang/crates.io-index)" = "dcf128d1287d2ea9d80910b5f1120d0b8eede3fbf1abe91c40d39ea7d51e6fda"

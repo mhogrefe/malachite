@@ -84,7 +84,7 @@ fn large_add(xs: &mut Vec<u32>, ys: &[u32]) {
             }
         }
     }
-    if carry && xs_len > ys.len() {
+    if carry && xs_len > ys_len {
         for x in xs.iter_mut().take(xs_len).skip(ys_len) {
             let (sum, overflow) = x.overflowing_add(1);
             *x = sum;
