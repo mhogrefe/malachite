@@ -1,6 +1,9 @@
 use std::fmt::Debug;
 use std::str::FromStr;
 
+pub const SMALL_LIMIT: usize = 1000;
+pub const LARGE_LIMIT: usize = 10000;
+
 pub fn test_eq_helper<T: Debug + Eq + FromStr>(strings: &[&str])
     where T::Err: Debug
 {

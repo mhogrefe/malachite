@@ -5,6 +5,7 @@ extern crate malachite_test;
 extern crate num;
 extern crate rand;
 extern crate rugint;
+extern crate rust_wheels;
 
 pub mod common;
 pub mod integer {

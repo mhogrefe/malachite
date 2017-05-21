@@ -91,7 +91,7 @@ fn large_sub(xs: &mut Vec<u32>, ys: &[u32]) -> bool {
         }
     }
     if borrow && xs_len > ys_len {
-        for x in xs.iter_mut().take(xs_len).skip(ys_len) {
+        for x in xs.iter_mut().skip(ys_len) {
             let (difference, overflow) = x.overflowing_sub(1);
             *x = difference;
             if !overflow {
