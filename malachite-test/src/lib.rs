@@ -1,5 +1,6 @@
 extern crate num;
 extern crate rugint;
+extern crate rust_wheels;
 
 pub mod integer {
     pub mod arithmetic {
@@ -22,6 +23,7 @@ pub mod integer {
 }
 pub mod natural {
     pub mod arithmetic {
+        pub mod add;
         pub mod add_u32;
     }
     pub mod comparison {

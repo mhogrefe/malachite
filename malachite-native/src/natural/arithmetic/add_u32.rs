@@ -1,5 +1,6 @@
 use natural::Natural::{self, Large, Small};
 use std::ops::{Add, AddAssign};
+use traits::Assign;
 
 /// Adds a `u32` to a `Natural`, taking ownership of the input `Natural`.
 ///
@@ -57,6 +58,10 @@ impl Add<Natural> for u32 {
 impl AddAssign<u32> for Natural {
     fn add_assign(&mut self, other: u32) {
         if other == 0 {
+            return;
+        }
+        if *self == 0 {
+            self.assign(other);
             return;
         }
         mutate_with_possible_promotion!(self,

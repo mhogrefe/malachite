@@ -1,5 +1,6 @@
 use natural::Natural::{self, Large, Small};
 use std::ops::{Add, AddAssign};
+use traits::Assign;
 
 /// Adds a `Natural` to a `Natural`, taking ownership of both `Natural`s.
 ///
@@ -40,6 +41,10 @@ impl Add<Natural> for Natural {
 impl AddAssign<Natural> for Natural {
     fn add_assign(&mut self, mut other: Natural) {
         if other == 0 {
+            return;
+        }
+        if *self == 0 {
+            self.assign(&other);
             return;
         }
         if let Small(y) = other {

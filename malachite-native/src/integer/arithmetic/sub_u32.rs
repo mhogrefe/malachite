@@ -1,6 +1,6 @@
 use integer::Integer;
 use std::ops::{Sub, SubAssign};
-use traits::Assign;
+use traits::{Assign, NegAssign};
 
 /// Subtracts a `u32` from an `Integer`, taking ownership of the input `Integer`.
 ///
@@ -58,6 +58,11 @@ impl Sub<Integer> for u32 {
 impl SubAssign<u32> for Integer {
     fn sub_assign(&mut self, other: u32) {
         if other == 0 {
+            return;
+        }
+        if *self == 0 {
+            self.assign(other);
+            self.neg_assign();
             return;
         }
         match *self {

@@ -62,6 +62,10 @@ impl AddAssign<u32> for Integer {
         if other == 0 {
             return;
         }
+        if *self == 0 {
+            self.assign(other);
+            return;
+        }
         match *self {
             // e.g. 10 + 5; self stays positive
             Integer { sign: true, ref mut abs } => *abs += other,

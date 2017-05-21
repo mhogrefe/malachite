@@ -26,4 +26,4 @@ cargo update &&
 cargo fmt &&
 cargo clippy &&
 cargo test --release &&
-cargo rustc --release -- --emit llvm-ir
+cargo rustc --release --lib -- --emit llvm-ir
