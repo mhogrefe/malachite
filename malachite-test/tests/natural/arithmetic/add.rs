@@ -87,7 +87,10 @@ fn from_rugint(n: &rugint::Integer) -> gmp::Natural {
 
 #[test]
 fn add_properties() {
-    let valid_equivalent_and_commutative = |x: gmp::Natural, y: gmp::Natural| {
+    // x + y is valid.
+    // x + y is equivalent for malachite-gmp, malachite-native, num, and rugint.
+    // x + y == y + x
+    let two_naturals = |x: gmp::Natural, y: gmp::Natural| {
         let native_sum = from_native(&(to_native(&x) + to_native(&y)));
         let num_sum = from_num(&(to_num(&x) + to_num(&y)));
         let rugint_sum = from_rugint(&(to_rugint(&x) + to_rugint(&y)));
@@ -100,7 +103,9 @@ fn add_properties() {
         assert_eq!(reverse_sum, sum);
     };
 
-    let primitive_equivalent = |x: gmp::Natural, y: u32| {
+    // x + (y: u32) == x + from(y)
+    // (y: u32) + x == x + from(y)
+    let natural_and_u32 = |x: gmp::Natural, y: u32| {
         let primitive_sum_1 = x.clone() + y;
         let primitive_sum_2 = y + x.clone();
         let sum = x + gmp::Natural::from(y);
@@ -108,7 +113,10 @@ fn add_properties() {
         assert_eq!(primitive_sum_2, sum);
     };
 
-    let zero_identity_and_double = |x: gmp::Natural| {
+    // x + 0 == x
+    // 0 + x == x
+    // x + x == x << 1
+    let one_natural = |x: gmp::Natural| {
         let x_old = x.clone();
         let id_1 = x.clone() + gmp::Natural::from(0);
         let id_2 = gmp::Natural::from(0) + x.clone();
@@ -119,30 +127,30 @@ fn add_properties() {
     };
 
     for (x, y) in exhaustive_pairs_from_single(exhaustive_naturals()).take(LARGE_LIMIT) {
-        valid_equivalent_and_commutative(x, y);
+        two_naturals(x, y);
     }
 
     for (x, y) in random_pairs_from_single(random_naturals(&EXAMPLE_SEED, 32)).take(LARGE_LIMIT) {
-        valid_equivalent_and_commutative(x, y);
+        two_naturals(x, y);
     }
 
     for (x, y) in exhaustive_pairs(exhaustive_naturals(), exhaustive_u::<u32>()).take(LARGE_LIMIT) {
-        primitive_equivalent(x, y);
+        natural_and_u32(x, y);
     }
 
     for (x, y) in random_pairs(&EXAMPLE_SEED,
                                &(|seed| random_naturals(seed, 32)),
                                &(|seed| random_x(seed)))
                 .take(LARGE_LIMIT) {
-        primitive_equivalent(x, y);
+        natural_and_u32(x, y);
     }
 
     for n in exhaustive_naturals().take(LARGE_LIMIT) {
-        zero_identity_and_double(n);
+        one_natural(n);
     }
 
     for n in random_naturals(&EXAMPLE_SEED, 32).take(LARGE_LIMIT) {
-        zero_identity_and_double(n);
+        one_natural(n);
     }
 
     //TODO inverse of sub
