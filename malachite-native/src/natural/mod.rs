@@ -56,7 +56,7 @@ impl Natural {
 
     fn trim(&mut self) {
         if let Large(ref mut xs) = *self {
-            while !xs.is_empty() && xs[xs.len() - 1] == 0 {
+            while !xs.is_empty() && xs.last().unwrap() == &0 {
                 xs.pop();
             }
         }
@@ -128,7 +128,7 @@ macro_rules! mutate_with_possible_promotion {
 pub mod arithmetic;
 pub mod conversion;
 pub mod comparison {
-    pub mod ord_natural;
+    pub mod ord;
     pub mod partial_eq_integer;
     pub mod partial_eq_u32;
     pub mod partial_ord_integer;

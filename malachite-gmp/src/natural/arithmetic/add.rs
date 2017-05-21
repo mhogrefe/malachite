@@ -24,7 +24,7 @@ impl Add<Natural> for Natural {
     }
 }
 
-/// Adds a `u32` to a `Natural` in place.
+/// Adds a `Natural` to a `Natural` in place.
 ///
 /// # Examples
 /// ```
@@ -40,6 +40,9 @@ impl Add<Natural> for Natural {
 /// ```
 impl AddAssign<Natural> for Natural {
     fn add_assign(&mut self, mut other: Natural) {
+        if other == 0 {
+            return;
+        }
         if let Small(y) = other {
             *self += y;
         } else if let Small(x) = *self {

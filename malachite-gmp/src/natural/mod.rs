@@ -139,13 +139,14 @@ pub mod arithmetic {
     pub mod even_odd;
     pub mod is_power_of_two;
     pub mod shl_u32;
+    pub mod sub;
     pub mod sub_u32;
 }
 pub mod conversion;
 pub mod comparison {
     pub mod eq_natural;
     pub mod hash;
-    pub mod ord_natural;
+    pub mod ord;
     pub mod partial_eq_integer;
     pub mod partial_eq_u32;
     pub mod partial_ord_integer;
