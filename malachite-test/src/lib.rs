@@ -1,3 +1,5 @@
+extern crate malachite_gmp;
+extern crate malachite_native;
 extern crate num;
 extern crate rugint;
 extern crate rust_wheels;
