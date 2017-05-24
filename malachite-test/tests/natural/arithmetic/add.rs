@@ -1,6 +1,7 @@
 use common::LARGE_LIMIT;
 use malachite_native::natural as native;
 use malachite_gmp::natural as gmp;
+use malachite_test::common::{from_native, from_num, from_rugint, to_native, to_num, to_rugint};
 use num;
 use rugint;
 use rust_wheels::iterators::common::EXAMPLE_SEED;
@@ -59,41 +60,15 @@ fn test_add() {
     test("12345678987654321", "314159265358979", "12659838253013300");
 }
 
-fn to_native(n: &gmp::Natural) -> native::Natural {
-    let mut native = native::Natural::new();
-    native.assign_limbs_le(n.limbs_le().as_slice());
-    native
-}
-
-fn from_native(n: &native::Natural) -> gmp::Natural {
-    let mut gmp = gmp::Natural::new();
-    gmp.assign_limbs_le(n.limbs_le().as_slice());
-    gmp
-}
-
-fn to_num(n: &gmp::Natural) -> num::BigUint {
-    num::BigUint::from_str(n.to_string().as_ref()).unwrap()
-}
-
-fn from_num(n: &num::BigUint) -> gmp::Natural {
-    gmp::Natural::from_str(n.to_string().as_ref()).unwrap()
-}
-
-fn to_rugint(n: &gmp::Natural) -> rugint::Integer {
-    rugint::Integer::from_str(n.to_string().as_ref()).unwrap()
-}
-
-fn from_rugint(n: &rugint::Integer) -> gmp::Natural {
-    gmp::Natural::from_str(n.to_string().as_ref()).unwrap()
-}
-
 #[test]
 fn add_properties() {
     // x + y is valid.
     // x + y is equivalent for malachite-gmp, malachite-native, num, and rugint.
     // x + y == y + x
     let two_naturals = |x: gmp::Natural, y: gmp::Natural| {
-        let native_sum = from_native(&(to_native(&x) + to_native(&y)));
+        let raw_native_sum = to_native(&x) + to_native(&y);
+        assert!(raw_native_sum.is_valid());
+        let native_sum = from_native(&raw_native_sum);
         let num_sum = from_num(&(to_num(&x) + to_num(&y)));
         let rugint_sum = from_rugint(&(to_rugint(&x) + to_rugint(&y)));
         let reverse_sum = y.clone() + x.clone();

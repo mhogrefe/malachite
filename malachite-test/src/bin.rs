@@ -4,6 +4,8 @@ use malachite_test::natural::arithmetic::add::benchmark_exhaustive_natural_add;
 use malachite_test::natural::arithmetic::add::benchmark_random_natural_add;
 use malachite_test::natural::arithmetic::add::demo_exhaustive_natural_add;
 use malachite_test::natural::arithmetic::add::demo_random_natural_add;
+use malachite_test::natural::conversion::from_u32::demo_exhaustive_natural_from_u32;
+use malachite_test::natural::conversion::from_u32::demo_random_natural_from_u32;
 use std::env;
 
 fn main() {
@@ -21,7 +23,9 @@ fn main() {
         "demo" => {
             match item_name.as_ref() {
                 "exhaustive_natural_add" => demo_exhaustive_natural_add(limit),
+                "exhaustive_natural_from_u32" => demo_exhaustive_natural_from_u32(limit),
                 "random_natural_add" => demo_random_natural_add(limit),
+                "random_natural_from_u32" => demo_random_natural_from_u32(limit),
 
                 _ => panic!("Invalid demo name: {}", item_name),
             }

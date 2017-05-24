@@ -4,6 +4,7 @@ extern crate num;
 extern crate rugint;
 extern crate rust_wheels;
 
+pub mod common;
 pub mod integer {
     pub mod arithmetic {
         pub mod add_i32;
@@ -34,6 +35,7 @@ pub mod natural {
     }
     pub mod conversion {
         pub mod assign_u32;
+        pub mod from_u32;
     }
     pub mod logic {
         pub mod get_bit;

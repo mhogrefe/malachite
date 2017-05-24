@@ -1,12 +1,9 @@
-use malachite_native::natural as native;
-use malachite_gmp::natural as gmp;
-use num;
+use common::{to_native, to_num};
 use rust_wheels::benchmarks::benchmark_3;
 use rust_wheels::iterators::common::EXAMPLE_SEED;
 use rust_wheels::iterators::naturals::{exhaustive_naturals, random_naturals};
 use rust_wheels::iterators::tuples::{exhaustive_pairs_from_single, random_pairs_from_single};
 use std::cmp::max;
-use std::str::FromStr;
 
 pub fn demo_exhaustive_natural_add(limit: usize) {
     for (x, y) in exhaustive_pairs_from_single(exhaustive_naturals()).take(limit) {
@@ -22,16 +19,6 @@ pub fn demo_random_natural_add(limit: usize) {
         let y_old = y.clone();
         println!("{} + {} = {}", x_old, y_old, x + y);
     }
-}
-
-fn to_native(n: &gmp::Natural) -> native::Natural {
-    let mut native = native::Natural::new();
-    native.assign_limbs_le(n.limbs_le().as_slice());
-    native
-}
-
-fn to_num(n: &gmp::Natural) -> num::BigUint {
-    num::BigUint::from_str(n.to_string().as_ref()).unwrap()
 }
 
 pub fn benchmark_exhaustive_natural_add(limit: usize, file_name: &str) {
