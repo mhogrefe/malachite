@@ -24,6 +24,7 @@ fn test_add_assign() {
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
     };
+    test("0", "0", "0");
     test("0", "123", "123");
     test("123", "0", "123");
     test("123", "456", "579");
@@ -49,6 +50,7 @@ fn test_add() {
         let n = rugint::Integer::from_str(u).unwrap() + rugint::Integer::from_str(v).unwrap();
         assert_eq!(n.to_string(), out);
     };
+    test("0", "0", "0");
     test("0", "123", "123");
     test("123", "0", "123");
     test("123", "456", "579");

@@ -2,7 +2,7 @@ use gmp_mpfr_sys::gmp;
 use integer::Integer;
 use integer::Integer::*;
 use std::cmp::Ordering;
-use std::ops::{AddAssign, MulAssign, Sub, SubAssign};
+use std::ops::{MulAssign, Sub, SubAssign};
 use std::os::raw::c_ulong;
 
 impl Integer {
@@ -37,47 +37,6 @@ impl Integer {
                 }
             }
         }
-    }
-}
-
-//TODO test
-impl<'a> AddAssign<&'a Integer> for Integer {
-    fn add_assign(&mut self, op: &'a Integer) {
-        if *op == 0 {
-            return;
-        }
-        if let Small(ref mut x) = *self {
-            if let Small(y) = *op {
-                if let Some(sum) = x.checked_add(y) {
-                    *x = sum;
-                    return;
-                }
-            }
-        }
-        let mut x = self.promote_in_place();
-        match *op {
-            Small(y) => {
-                if y > 0 {
-                    unsafe {
-                        gmp::mpz_add_ui(x, x, y as c_ulong);
-                    }
-                } else {
-                    unsafe {
-                        gmp::mpz_sub_ui(x, x, y.wrapping_neg() as c_ulong);
-                    }
-                }
-            }
-            Large(y) => unsafe {
-                gmp::mpz_add(x, x, &y);
-            },
-        }
-    }
-}
-
-//TODO test
-impl AddAssign<Integer> for Integer {
-    fn add_assign(&mut self, op: Integer) {
-        self.add_assign(&op);
     }
 }
 
@@ -201,6 +160,7 @@ impl MulAssign<Integer> for Integer {
 }
 
 pub mod abs;
+pub mod add;
 pub mod add_i32;
 pub mod add_u32;
 pub mod even_odd;

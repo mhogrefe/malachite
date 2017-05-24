@@ -15,6 +15,7 @@ fn test_sub_assign_natural() {
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
     };
+    test("0", "0", "0");
     test("123", "0", "123");
     test("456", "123", "333");
     test("1000000000000", "123", "999999999877");
@@ -39,6 +40,7 @@ fn test_sub_natural() {
         assert_eq!(format!("{:?}", on), out);
         assert!(on.map_or(true, |n| n.is_valid()));
     };
+    test("0", "0", "Some(0)");
     test("0", "123", "None");
     test("123", "0", "Some(123)");
     test("456", "123", "Some(333)");

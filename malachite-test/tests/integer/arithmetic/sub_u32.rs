@@ -22,6 +22,7 @@ fn test_sub_assign_u32() {
         n -= v;
         assert_eq!(n.to_string(), out);
     };
+    test("0", 0, "0");
     test("123", 123, "0");
     test("123", 0, "123");
     test("456", 123, "333");
@@ -54,6 +55,7 @@ fn test_sub_u32() {
         let n = rugint::Integer::from_str(u).unwrap() - v;
         assert_eq!(n.to_string(), out);
     };
+    test("0", 0, "0");
     test("123", 123, "0");
     test("123", 0, "123");
     test("456", 123, "333");
@@ -83,6 +85,7 @@ fn test_u32_sub_integer() {
         let n = u - rugint::Integer::from_str(v).unwrap();
         assert_eq!(n.to_string(), out);
     };
+    test(0, "0", "0");
     test(123, "123", "0");
     test(123, "0", "123");
     test(456, "123", "333");

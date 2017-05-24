@@ -22,6 +22,7 @@ fn test_add_assign_u32() {
         n += v;
         assert_eq!(n.to_string(), out);
     };
+    test("0", 0, "0");
     test("0", 123, "123");
     test("123", 0, "123");
     test("123", 456, "579");
@@ -65,6 +66,7 @@ fn test_add_u32() {
         let n = v + rugint::Integer::from_str(u).unwrap();
         assert_eq!(n.to_string(), out);
     };
+    test("0", 0, "0");
     test("0", 123, "123");
     test("123", 0, "123");
     test("123", 456, "579");
