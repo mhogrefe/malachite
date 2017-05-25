@@ -9,8 +9,9 @@ use rust_wheels::iterators::common::EXAMPLE_SEED;
 use rust_wheels::iterators::general::random_x;
 use rust_wheels::iterators::naturals::{exhaustive_naturals, random_naturals};
 use rust_wheels::iterators::primitive_ints::exhaustive_u;
-use rust_wheels::iterators::tuples::{exhaustive_pairs, exhaustive_pairs_from_single, random_pairs,
-                                     random_pairs_from_single};
+use rust_wheels::iterators::tuples::{exhaustive_pairs, exhaustive_pairs_from_single,
+                                     exhaustive_triples_from_single, random_pairs,
+                                     random_pairs_from_single, random_triples_from_single};
 use std::str::FromStr;
 
 #[test]
@@ -75,12 +76,16 @@ fn add_properties() {
         let num_sum = num_to_native(&(native_to_num(&x) + native_to_num(&y)));
         let rugint_sum = rugint_to_native(&(native_to_rugint(&x) + native_to_rugint(&y)));
         let reverse_sum = y.clone() + x.clone();
-        let sum = x + y;
+        let sum = x.clone() + y.clone();
+        let inv_1 = (sum.clone() - x.clone()).unwrap();
+        let inv_2 = (sum.clone() - y.clone()).unwrap();
         assert!(sum.is_valid());
         assert_eq!(gmp_sum, sum);
         assert_eq!(num_sum, sum);
         assert_eq!(rugint_sum, sum);
         assert_eq!(reverse_sum, sum);
+        assert_eq!(inv_1, y);
+        assert_eq!(inv_2, x);
     };
 
     // x + (y: u32) == x + from(y)
@@ -106,6 +111,14 @@ fn add_properties() {
         assert_eq!(id_1, x_old);
         assert_eq!(id_2, x_old);
         assert_eq!(double, x_old << 1);
+    };
+
+    // (x + y) + z == x + (y + z)
+    let three_naturals = |gmp_x: gmp::Natural, gmp_y: gmp::Natural, gmp_z: gmp::Natural| {
+        let x = gmp_to_native(&gmp_x);
+        let y = gmp_to_native(&gmp_y);
+        let z = gmp_to_native(&gmp_z);
+        assert_eq!((x.clone() + y.clone()) + z.clone(), x + (y + z));
     };
 
     for (x, y) in exhaustive_pairs_from_single(exhaustive_naturals()).take(LARGE_LIMIT) {
@@ -135,7 +148,12 @@ fn add_properties() {
         one_natural(n);
     }
 
-    //TODO inverse of sub
+    for (x, y, z) in exhaustive_triples_from_single(exhaustive_naturals()).take(LARGE_LIMIT) {
+        three_naturals(x, y, z);
+    }
 
-    //TODO associativity
+    for (x, y, z) in random_triples_from_single(random_naturals(&EXAMPLE_SEED, 32))
+            .take(LARGE_LIMIT) {
+        three_naturals(x, y, z);
+    }
 }
