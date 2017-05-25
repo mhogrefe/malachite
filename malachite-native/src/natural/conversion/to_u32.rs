@@ -3,6 +3,9 @@ use natural::Natural::{self, Large, Small};
 impl Natural {
     /// Converts a `Natural` to a `u32`, returning `None` if the `Natural` is too large.
     ///
+    /// Time: worst case O(1)
+    /// Additional memory: worst case O(1)
+    ///
     /// # Example
     /// ```
     /// use malachite_native::natural::Natural;
@@ -19,6 +22,9 @@ impl Natural {
     }
 
     /// Converts a `Natural` to a `u32`, wrapping mod 2^(32).
+    ///
+    /// Time: worst case O(1)
+    /// Additional memory: worst case O(1)
     ///
     /// # Example
     /// ```

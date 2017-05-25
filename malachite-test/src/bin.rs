@@ -6,6 +6,10 @@ use malachite_test::natural::arithmetic::add::demo_exhaustive_natural_add;
 use malachite_test::natural::arithmetic::add::demo_random_natural_add;
 use malachite_test::natural::conversion::from_u32::demo_exhaustive_natural_from_u32;
 use malachite_test::natural::conversion::from_u32::demo_random_natural_from_u32;
+use malachite_test::natural::conversion::to_u32::demo_exhaustive_natural_to_u32;
+use malachite_test::natural::conversion::to_u32::demo_exhaustive_natural_to_u32_wrapping;
+use malachite_test::natural::conversion::to_u32::demo_random_natural_to_u32;
+use malachite_test::natural::conversion::to_u32::demo_random_natural_to_u32_wrapping;
 use std::env;
 
 fn main() {
@@ -24,8 +28,14 @@ fn main() {
             match item_name.as_ref() {
                 "exhaustive_natural_add" => demo_exhaustive_natural_add(limit),
                 "exhaustive_natural_from_u32" => demo_exhaustive_natural_from_u32(limit),
+                "exhaustive_natural_to_u32" => demo_exhaustive_natural_to_u32(limit),
+                "exhaustive_natural_to_u32_wrapping" => {
+                    demo_exhaustive_natural_to_u32_wrapping(limit)
+                }
                 "random_natural_add" => demo_random_natural_add(limit),
                 "random_natural_from_u32" => demo_random_natural_from_u32(limit),
+                "random_natural_to_u32" => demo_random_natural_to_u32(limit),
+                "random_natural_to_u32_wrapping" => demo_random_natural_to_u32_wrapping(limit),
 
                 _ => panic!("Invalid demo name: {}", item_name),
             }

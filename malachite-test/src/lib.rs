@@ -36,6 +36,7 @@ pub mod natural {
     pub mod conversion {
         pub mod assign_u32;
         pub mod from_u32;
+        pub mod to_u32;
     }
     pub mod logic {
         pub mod get_bit;
