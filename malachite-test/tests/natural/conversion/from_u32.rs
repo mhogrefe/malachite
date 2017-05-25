@@ -1,7 +1,7 @@
 use common::LARGE_LIMIT;
 use malachite_native::natural as native;
 use malachite_gmp::natural as gmp;
-use malachite_test::common::from_native;
+use malachite_test::common::gmp_to_native;
 use num;
 use rust_wheels::iterators::common::EXAMPLE_SEED;
 use rust_wheels::iterators::general::random_x;
@@ -30,13 +30,13 @@ fn from_u32_properties() {
     // from_u32(u) is valid.
     // from_u32(u).to_u32() == Some(u)
     let one_u32 = |u: u32| {
-        let n = gmp::Natural::from(u);
-        let raw_native_n = native::Natural::from(u);
-        assert!(raw_native_n.is_valid());
-        let native_n = from_native(&raw_native_n);
+        let n = native::Natural::from(u);
+        let raw_gmp_n = gmp::Natural::from(u);
+        assert!(raw_gmp_n.is_valid());
+        let gmp_n = gmp_to_native(&raw_gmp_n);
         assert!(n.is_valid());
         assert_eq!(n.to_u32(), Some(u));
-        assert_eq!(n, native_n);
+        assert_eq!(n, gmp_n);
     };
 
     for u in exhaustive_u().take(LARGE_LIMIT) {

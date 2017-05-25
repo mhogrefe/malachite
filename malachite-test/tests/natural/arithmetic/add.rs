@@ -1,7 +1,8 @@
 use common::LARGE_LIMIT;
 use malachite_native::natural as native;
 use malachite_gmp::natural as gmp;
-use malachite_test::common::{from_native, from_num, from_rugint, to_native, to_num, to_rugint};
+use malachite_test::common::{gmp_to_native, native_to_num, native_to_rugint, num_to_native,
+                             rugint_to_native};
 use num;
 use rugint;
 use rust_wheels::iterators::common::EXAMPLE_SEED;
@@ -65,16 +66,18 @@ fn add_properties() {
     // x + y is valid.
     // x + y is equivalent for malachite-gmp, malachite-native, num, and rugint.
     // x + y == y + x
-    let two_naturals = |x: gmp::Natural, y: gmp::Natural| {
-        let raw_native_sum = to_native(&x) + to_native(&y);
-        assert!(raw_native_sum.is_valid());
-        let native_sum = from_native(&raw_native_sum);
-        let num_sum = from_num(&(to_num(&x) + to_num(&y)));
-        let rugint_sum = from_rugint(&(to_rugint(&x) + to_rugint(&y)));
+    let two_naturals = |gmp_x: gmp::Natural, gmp_y: gmp::Natural| {
+        let x = gmp_to_native(&gmp_x);
+        let y = gmp_to_native(&gmp_y);
+        let raw_gmp_sum = gmp_x + gmp_y;
+        assert!(raw_gmp_sum.is_valid());
+        let gmp_sum = gmp_to_native(&raw_gmp_sum);
+        let num_sum = num_to_native(&(native_to_num(&x) + native_to_num(&y)));
+        let rugint_sum = rugint_to_native(&(native_to_rugint(&x) + native_to_rugint(&y)));
         let reverse_sum = y.clone() + x.clone();
-        let sum: gmp::Natural = x + y;
+        let sum = x + y;
         assert!(sum.is_valid());
-        assert_eq!(native_sum, sum);
+        assert_eq!(gmp_sum, sum);
         assert_eq!(num_sum, sum);
         assert_eq!(rugint_sum, sum);
         assert_eq!(reverse_sum, sum);
@@ -82,10 +85,11 @@ fn add_properties() {
 
     // x + (y: u32) == x + from(y)
     // (y: u32) + x == x + from(y)
-    let natural_and_u32 = |x: gmp::Natural, y: u32| {
+    let natural_and_u32 = |gmp_x: gmp::Natural, y: u32| {
+        let x = gmp_to_native(&gmp_x);
         let primitive_sum_1 = x.clone() + y;
         let primitive_sum_2 = y + x.clone();
-        let sum = x + gmp::Natural::from(y);
+        let sum = x + native::Natural::from(y);
         assert_eq!(primitive_sum_1, sum);
         assert_eq!(primitive_sum_2, sum);
     };
@@ -93,10 +97,11 @@ fn add_properties() {
     // x + 0 == x
     // 0 + x == x
     // x + x == x << 1
-    let one_natural = |x: gmp::Natural| {
+    let one_natural = |gmp_x: gmp::Natural| {
+        let x = gmp_to_native(&gmp_x);
         let x_old = x.clone();
-        let id_1 = x.clone() + gmp::Natural::from(0);
-        let id_2 = gmp::Natural::from(0) + x.clone();
+        let id_1 = x.clone() + native::Natural::from(0);
+        let id_2 = native::Natural::from(0) + x.clone();
         let double = x.clone() + x;
         assert_eq!(id_1, x_old);
         assert_eq!(id_2, x_old);

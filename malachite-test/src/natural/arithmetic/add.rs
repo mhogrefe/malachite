@@ -1,4 +1,4 @@
-use common::{to_native, to_num};
+use common::{gmp_to_native, gmp_to_num};
 use rust_wheels::benchmarks::benchmark_3;
 use rust_wheels::iterators::common::EXAMPLE_SEED;
 use rust_wheels::iterators::naturals::{exhaustive_naturals, random_naturals};
@@ -26,8 +26,8 @@ pub fn benchmark_exhaustive_natural_add(limit: usize, file_name: &str) {
                 &(|(x, y)| x + y),
                 &(|(x, y)| x + y),
                 &(|(x, y)| x + y),
-                &(|&(ref x, ref y)| (to_native(x), to_native(y))),
-                &(|&(ref x, ref y)| (to_num(x), to_num(y))),
+                &(|&(ref x, ref y)| (gmp_to_native(x), gmp_to_native(y))),
+                &(|&(ref x, ref y)| (gmp_to_num(x), gmp_to_num(y))),
                 &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),
                 limit,
                 "malachite-gmp",
@@ -44,8 +44,8 @@ pub fn benchmark_random_natural_add(limit: usize, scale: u32, file_name: &str) {
                 &(|(x, y)| x + y),
                 &(|(x, y)| x + y),
                 &(|(x, y)| x + y),
-                &(|&(ref x, ref y)| (to_native(x), to_native(y))),
-                &(|&(ref x, ref y)| (to_num(x), to_num(y))),
+                &(|&(ref x, ref y)| (gmp_to_native(x), gmp_to_native(y))),
+                &(|&(ref x, ref y)| (gmp_to_num(x), gmp_to_num(y))),
                 &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),
                 limit,
                 "malachite-gmp",
