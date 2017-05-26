@@ -8,9 +8,9 @@ use traits::Assign;
 /// use malachite_native::natural::Natural;
 /// use std::str::FromStr;
 ///
-/// assert_eq!((Natural::from(0) + 123).to_string(), "123");
-/// assert_eq!((Natural::from(123) + 0).to_string(), "123");
-/// assert_eq!((Natural::from(123) + 456).to_string(), "579");
+/// assert_eq!((Natural::from(0u32) + 123).to_string(), "123");
+/// assert_eq!((Natural::from(123u32) + 0).to_string(), "123");
+/// assert_eq!((Natural::from(123u32) + 456).to_string(), "579");
 /// assert_eq!((Natural::from_str("1000000000000").unwrap() + 123).to_string(), "1000000000123");
 /// ```
 impl Add<u32> for Natural {
@@ -28,9 +28,9 @@ impl Add<u32> for Natural {
 /// use malachite_native::natural::Natural;
 /// use std::str::FromStr;
 ///
-/// assert_eq!((123 + Natural::from(0)).to_string(), "123");
-/// assert_eq!((0 + Natural::from(123)).to_string(), "123");
-/// assert_eq!((456 + Natural::from(123)).to_string(), "579");
+/// assert_eq!((123 + Natural::from(0u32)).to_string(), "123");
+/// assert_eq!((0 + Natural::from(123u32)).to_string(), "123");
+/// assert_eq!((456 + Natural::from(123u32)).to_string(), "579");
 /// assert_eq!((123 + Natural::from_str("1000000000000").unwrap()).to_string(), "1000000000123");
 /// ```
 impl Add<Natural> for u32 {

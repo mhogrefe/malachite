@@ -9,8 +9,8 @@ use natural::Natural;
 /// use malachite_gmp::integer::Integer;
 /// use malachite_gmp::natural::Natural;
 ///
-/// assert!(Integer::from(123) == Natural::from(123));
-/// assert!(Integer::from(123) != Natural::from(5));
+/// assert!(Integer::from(123) == Natural::from(123u32));
+/// assert!(Integer::from(123) != Natural::from(5u32));
 /// ```
 impl PartialEq<Natural> for Integer {
     fn eq(&self, other: &Natural) -> bool {

@@ -9,9 +9,9 @@ use std::ops::{Add, AddAssign};
 /// use malachite_native::natural::Natural;
 /// use std::str::FromStr;
 ///
-/// assert_eq!((Natural::from(0) + Natural::from(123)).to_string(), "123");
-/// assert_eq!((Natural::from(123) + Natural::from(0)).to_string(), "123");
-/// assert_eq!((Natural::from(123) + Natural::from(456)).to_string(), "579");
+/// assert_eq!((Natural::from(0u32) + Natural::from(123u32)).to_string(), "123");
+/// assert_eq!((Natural::from(123u32) + Natural::from(0u32)).to_string(), "123");
+/// assert_eq!((Natural::from(123u32) + Natural::from(456u32)).to_string(), "579");
 /// assert_eq!((Natural::from_str("1000000000000").unwrap() + Natural::from_str("2000000000000")
 ///            .unwrap()).to_string(), "3000000000000");
 /// ```

@@ -10,7 +10,7 @@ impl Natural {
     /// use malachite_native::natural::Natural;
     /// use std::str::FromStr;
     ///
-    /// assert_eq!(Natural::from(123).into_integer().to_string(), "123");
+    /// assert_eq!(Natural::from(123u32).into_integer().to_string(), "123");
     /// assert_eq!(Natural::from_str("1000000000000").unwrap().into_integer().to_string(),
     ///            "1000000000000");
     /// ```

@@ -7,8 +7,8 @@ use natural::Natural::{self, Large, Small};
 /// ```
 /// use malachite_gmp::natural::Natural;
 ///
-/// assert!(Natural::from(123) == Natural::from(123));
-/// assert!(Natural::from(123) != Natural::from(5));
+/// assert!(Natural::from(123u32) == Natural::from(123u32));
+/// assert!(Natural::from(123u32) != Natural::from(5u32));
 /// ```
 impl PartialEq<Natural> for Natural {
     fn eq(&self, other: &Natural) -> bool {

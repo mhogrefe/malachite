@@ -9,8 +9,8 @@ impl Natural {
     /// use malachite_native::natural::Natural;
     /// use std::str::FromStr;
     ///
-    /// assert!(Natural::from(0).limbs_le().is_empty());
-    /// assert_eq!(Natural::from(123).limbs_le(), vec![123]);
+    /// assert!(Natural::from(0u32).limbs_le().is_empty());
+    /// assert_eq!(Natural::from(123u32).limbs_le(), vec![123]);
     /// // 10^12 = 232 * 2^32 + 3567587328
     /// assert_eq!(Natural::from_str("1000000000000").unwrap().limbs_le(), vec![3567587328, 232]);
     /// ```

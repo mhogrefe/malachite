@@ -8,8 +8,8 @@ use natural::Natural;
 /// use malachite_native::integer::Integer;
 /// use malachite_native::natural::Natural;
 ///
-/// assert!(Integer::from(123) == Natural::from(123));
-/// assert!(Integer::from(123) != Natural::from(5));
+/// assert!(Integer::from(123) == Natural::from(123u32));
+/// assert!(Integer::from(123) != Natural::from(5u32));
 /// ```
 impl PartialEq<Natural> for Integer {
     fn eq(&self, other: &Natural) -> bool {

@@ -10,9 +10,9 @@ use std::ops::{Shl, ShlAssign};
 /// ```
 /// use malachite_gmp::natural::Natural;
 ///
-/// assert_eq!((Natural::from(0) << 10).to_string(), "0");
-/// assert_eq!((Natural::from(123) << 2).to_string(), "492");
-/// assert_eq!((Natural::from(123) << 100).to_string(), "155921023828072216384094494261248");
+/// assert_eq!((Natural::from(0u32) << 10).to_string(), "0");
+/// assert_eq!((Natural::from(123u32) << 2).to_string(), "492");
+/// assert_eq!((Natural::from(123u32) << 100).to_string(), "155921023828072216384094494261248");
 /// ```
 impl Shl<u32> for Natural {
     type Output = Natural;
@@ -28,7 +28,7 @@ impl Shl<u32> for Natural {
 /// ```
 /// use malachite_gmp::natural::Natural;
 ///
-/// let mut x = Natural::from(1);
+/// let mut x = Natural::from(1u32);
 /// x <<= 1;
 /// x <<= 2;
 /// x <<= 3;

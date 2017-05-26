@@ -10,10 +10,10 @@ use std::ops::{Sub, SubAssign};
 /// use malachite_gmp::natural::Natural;
 /// use std::str::FromStr;
 ///
-/// assert_eq!(format!("{:?}", Natural::from(123) - 123), "Some(0)");
-/// assert_eq!(format!("{:?}", Natural::from(123) - 0), "Some(123)");
-/// assert_eq!(format!("{:?}", Natural::from(456) - 123), "Some(333)");
-/// assert_eq!(format!("{:?}", Natural::from(123) - 456), "None");
+/// assert_eq!(format!("{:?}", Natural::from(123u32) - 123), "Some(0)");
+/// assert_eq!(format!("{:?}", Natural::from(123u32) - 0), "Some(123)");
+/// assert_eq!(format!("{:?}", Natural::from(456u32) - 123), "Some(333)");
+/// assert_eq!(format!("{:?}", Natural::from(123u32) - 456), "None");
 /// assert_eq!(format!("{:?}", Natural::from_str("1000000000000").unwrap() - 123),
 ///            "Some(999999999877)");
 /// ```
@@ -38,10 +38,10 @@ impl Sub<u32> for Natural {
 /// use malachite_gmp::natural::Natural;
 /// use std::str::FromStr;
 ///
-/// assert_eq!(format!("{:?}", 123 - Natural::from(123)), "Some(0)");
-/// assert_eq!(format!("{:?}", 123 - Natural::from(0)), "Some(123)");
-/// assert_eq!(format!("{:?}", 456 - Natural::from(123)), "Some(333)");
-/// assert_eq!(format!("{:?}", 123 - Natural::from(456)), "None");
+/// assert_eq!(format!("{:?}", 123 - Natural::from(123u32)), "Some(0)");
+/// assert_eq!(format!("{:?}", 123 - Natural::from(0u32)), "Some(123)");
+/// assert_eq!(format!("{:?}", 456 - Natural::from(123u32)), "Some(333)");
+/// assert_eq!(format!("{:?}", 123 - Natural::from(456u32)), "None");
 /// assert_eq!(format!("{:?}", 123 - Natural::from_str("1000000000000").unwrap()), "None");
 /// ```
 impl Sub<Natural> for u32 {
@@ -61,7 +61,7 @@ impl Sub<Natural> for u32 {
 /// ```
 /// use malachite_gmp::natural::Natural;
 ///
-/// let mut x = Natural::from(15);
+/// let mut x = Natural::from(15u32);
 /// x -= 1;
 /// x -= 2;
 /// x -= 3;

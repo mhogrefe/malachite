@@ -88,5 +88,6 @@ pub mod assign_integer;
 pub mod assign_natural;
 pub mod assign_u32;
 pub mod from_u32;
+pub mod from_u64;
 pub mod into_integer;
 pub mod to_u32;

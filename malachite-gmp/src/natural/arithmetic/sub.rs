@@ -9,9 +9,9 @@ use std::ops::{Sub, SubAssign};
 /// use malachite_gmp::natural::Natural;
 /// use std::str::FromStr;
 ///
-/// assert_eq!(format!("{:?}", Natural::from(0) - Natural::from(123)), "None");
-/// assert_eq!(format!("{:?}", Natural::from(123) - Natural::from(0)), "Some(123)");
-/// assert_eq!(format!("{:?}", Natural::from(456) - Natural::from(123)), "Some(333)");
+/// assert_eq!(format!("{:?}", Natural::from(0u32) - Natural::from(123u32)), "None");
+/// assert_eq!(format!("{:?}", Natural::from(123u32) - Natural::from(0u32)), "Some(123)");
+/// assert_eq!(format!("{:?}", Natural::from(456u32) - Natural::from(123u32)), "Some(333)");
 /// assert_eq!(format!("{:?}", Natural::from_str("3000000000000").unwrap() -
 ///                            Natural::from_str("1000000000000").unwrap()), "Some(2000000000000)");
 /// ```

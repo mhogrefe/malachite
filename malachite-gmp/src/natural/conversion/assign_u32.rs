@@ -8,7 +8,7 @@ use traits::Assign;
 /// use malachite_gmp::natural::Natural;
 /// use malachite_gmp::traits::Assign;
 ///
-/// let mut x = Natural::from(123);
+/// let mut x = Natural::from(123u32);
 /// x.assign(456);
 /// assert_eq!(x.to_string(), "456");
 /// ```

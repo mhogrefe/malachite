@@ -9,9 +9,9 @@ impl Natural {
     /// use malachite_gmp::natural::Natural;
     /// use std::str::FromStr;
     ///
-    /// assert_eq!(Natural::from(0).is_power_of_two(), false);
-    /// assert_eq!(Natural::from(123).is_power_of_two(), false);
-    /// assert_eq!(Natural::from(128).is_power_of_two(), true);
+    /// assert_eq!(Natural::from(0u32).is_power_of_two(), false);
+    /// assert_eq!(Natural::from(123u32).is_power_of_two(), false);
+    /// assert_eq!(Natural::from(128u32).is_power_of_two(), true);
     /// assert_eq!(Natural::from_str("1000000000000").unwrap().is_power_of_two(), false);
     /// assert_eq!(Natural::from_str("1099511627776").unwrap().is_power_of_two(), true);
     /// ```

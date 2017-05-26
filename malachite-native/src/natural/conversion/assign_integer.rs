@@ -14,7 +14,7 @@ use traits::Assign;
 /// use malachite_native::natural::Natural;
 /// use malachite_native::traits::Assign;
 ///
-/// let mut x = Natural::from(456);
+/// let mut x = Natural::from(456u32);
 /// x.assign(&Integer::from(123));
 /// assert_eq!(x.to_string(), "123");
 /// ```

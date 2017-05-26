@@ -10,9 +10,9 @@ impl Natural {
     /// use malachite_native::natural::Natural;
     /// use std::str::FromStr;
     ///
-    /// assert_eq!(Natural::from(123).get_bit(2), false);
-    /// assert_eq!(Natural::from(123).get_bit(3), true);
-    /// assert_eq!(Natural::from(123).get_bit(100), false);
+    /// assert_eq!(Natural::from(123u32).get_bit(2), false);
+    /// assert_eq!(Natural::from(123u32).get_bit(3), true);
+    /// assert_eq!(Natural::from(123u32).get_bit(100), false);
     /// assert_eq!(Natural::from_str("1000000000000").unwrap().get_bit(12), true);
     /// assert_eq!(Natural::from_str("1000000000000").unwrap().get_bit(100), false);
     /// ```

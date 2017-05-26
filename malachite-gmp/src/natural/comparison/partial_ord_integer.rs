@@ -10,12 +10,12 @@ use std::cmp::Ordering;
 /// use malachite_gmp::integer::Integer;
 /// use malachite_gmp::natural::Natural;
 ///
-/// assert!(Natural::from(123) > Integer::from(122));
-/// assert!(Natural::from(123) >= Integer::from(122));
-/// assert!(Natural::from(123) < Integer::from(124));
-/// assert!(Natural::from(123) <= Integer::from(124));
-/// assert!(Natural::from(123) > Integer::from(-123));
-/// assert!(Natural::from(123) >= Integer::from(-123));
+/// assert!(Natural::from(123u32) > Integer::from(122));
+/// assert!(Natural::from(123u32) >= Integer::from(122));
+/// assert!(Natural::from(123u32) < Integer::from(124));
+/// assert!(Natural::from(123u32) <= Integer::from(124));
+/// assert!(Natural::from(123u32) > Integer::from(-123));
+/// assert!(Natural::from(123u32) >= Integer::from(-123));
 /// ```
 impl PartialOrd<Integer> for Natural {
     fn partial_cmp(&self, other: &Integer) -> Option<Ordering> {

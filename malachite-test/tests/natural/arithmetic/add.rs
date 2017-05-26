@@ -105,8 +105,8 @@ fn add_properties() {
     let one_natural = |gmp_x: gmp::Natural| {
         let x = gmp_to_native(&gmp_x);
         let x_old = x.clone();
-        let id_1 = x.clone() + native::Natural::from(0);
-        let id_2 = native::Natural::from(0) + x.clone();
+        let id_1 = x.clone() + native::Natural::from(0u32);
+        let id_2 = native::Natural::from(0u32) + x.clone();
         let double = x.clone() + x;
         assert_eq!(id_1, x_old);
         assert_eq!(id_2, x_old);

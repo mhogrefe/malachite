@@ -8,10 +8,10 @@ use std::cmp::Ordering;
 /// use malachite_gmp::natural::Natural;
 /// use std::str::FromStr;
 ///
-/// assert!(Natural::from(123) > 122);
-/// assert!(Natural::from(123) >= 122);
-/// assert!(Natural::from(123) < 124);
-/// assert!(Natural::from(123) <= 124);
+/// assert!(Natural::from(123u32) > 122);
+/// assert!(Natural::from(123u32) >= 122);
+/// assert!(Natural::from(123u32) < 124);
+/// assert!(Natural::from(123u32) <= 124);
 /// assert!(Natural::from_str("1000000000000").unwrap() > 123);
 /// assert!(Natural::from_str("1000000000000").unwrap() >= 123);
 /// ```
@@ -31,10 +31,10 @@ impl PartialOrd<u32> for Natural {
 /// use malachite_gmp::natural::Natural;
 /// use std::str::FromStr;
 ///
-/// assert!(122 < Natural::from(123));
-/// assert!(122 <= Natural::from(123));
-/// assert!(124 > Natural::from(123));
-/// assert!(124 >= Natural::from(123));
+/// assert!(122 < Natural::from(123u32));
+/// assert!(122 <= Natural::from(123u32));
+/// assert!(124 > Natural::from(123u32));
+/// assert!(124 >= Natural::from(123u32));
 /// assert!(123 < Natural::from_str("1000000000000").unwrap());
 /// assert!(123 <= Natural::from_str("1000000000000").unwrap());
 /// ```

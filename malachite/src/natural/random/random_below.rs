@@ -17,8 +17,8 @@ use rand::Rng;
 /// fn main() {
 ///     let seed: &[_] = &[1, 2, 3, 4];
 ///     let mut rng: StdRng = SeedableRng::from_seed(seed);
-///     assert_eq!(random_below(&mut rng, &Natural::from(10)).to_string(), "2");
-///     assert_eq!(random_below(&mut rng, &Natural::from(1000000)).to_string(), "293069");
+///     assert_eq!(random_below(&mut rng, &Natural::from(10u32)).to_string(), "2");
+///     assert_eq!(random_below(&mut rng, &Natural::from(1000000u32)).to_string(), "293069");
 ///     assert_eq!(random_below(&mut rng, &Natural::from_str("1000000000000").unwrap()).to_string(),
 ///                "525916362607");
 /// }

@@ -9,8 +9,8 @@ impl Natural {
     /// ```
     /// use malachite_native::natural::Natural;
     ///
-    /// assert_eq!(Natural::from(0).significant_bits(), 0);
-    /// assert_eq!(Natural::from(100).significant_bits(), 7);
+    /// assert_eq!(Natural::from(0u32).significant_bits(), 0);
+    /// assert_eq!(Natural::from(100u32).significant_bits(), 7);
     /// ```
     pub fn significant_bits(&self) -> u64 {
         match *self {

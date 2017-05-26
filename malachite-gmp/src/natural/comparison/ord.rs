@@ -8,10 +8,10 @@ use std::cmp::Ordering;
 /// ```
 /// use malachite_gmp::natural::Natural;
 ///
-/// assert!(Natural::from(123) > Natural::from(122));
-/// assert!(Natural::from(123) >= Natural::from(122));
-/// assert!(Natural::from(123) < Natural::from(124));
-/// assert!(Natural::from(123) <= Natural::from(124));
+/// assert!(Natural::from(123u32) > Natural::from(122u32));
+/// assert!(Natural::from(123u32) >= Natural::from(122u32));
+/// assert!(Natural::from(123u32) < Natural::from(124u32));
+/// assert!(Natural::from(123u32) <= Natural::from(124u32));
 /// ```
 impl PartialOrd for Natural {
     fn partial_cmp(&self, other: &Natural) -> Option<Ordering> {

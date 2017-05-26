@@ -11,7 +11,7 @@ impl Natural {
     /// use malachite_native::natural::Natural;
     /// use std::str::FromStr;
     ///
-    /// assert_eq!(format!("{:?}", Natural::from(123).to_u32()), "Some(123)");
+    /// assert_eq!(format!("{:?}", Natural::from(123u32).to_u32()), "Some(123)");
     /// assert_eq!(format!("{:?}", Natural::from_str("1000000000000").unwrap().to_u32()), "None");
     /// ```
     pub fn to_u32(&self) -> Option<u32> {
@@ -31,7 +31,7 @@ impl Natural {
     /// use malachite_native::natural::Natural;
     /// use std::str::FromStr;
     ///
-    /// assert_eq!(Natural::from(123).to_u32_wrapping().to_string(), "123");
+    /// assert_eq!(Natural::from(123u32).to_u32_wrapping().to_string(), "123");
     /// assert_eq!(Natural::from_str("1000000000000").unwrap().to_u32_wrapping().to_string(),
     ///            "3567587328");
     /// ```

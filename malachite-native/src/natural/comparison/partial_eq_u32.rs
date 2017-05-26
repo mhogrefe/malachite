@@ -6,8 +6,8 @@ use natural::Natural::{self, Large, Small};
 /// ```
 /// use malachite_native::natural::Natural;
 ///
-/// assert!(Natural::from(123) == 123);
-/// assert!(Natural::from(123) != 5);
+/// assert!(Natural::from(123u32) == 123);
+/// assert!(Natural::from(123u32) != 5);
 /// ```
 impl PartialEq<u32> for Natural {
     fn eq(&self, other: &u32) -> bool {
@@ -24,8 +24,8 @@ impl PartialEq<u32> for Natural {
 /// ```
 /// use malachite_native::natural::Natural;
 ///
-/// assert!(123 == Natural::from(123));
-/// assert!(5 != Natural::from(123));
+/// assert!(123 == Natural::from(123u32));
+/// assert!(5 != Natural::from(123u32));
 /// ```
 impl PartialEq<Natural> for u32 {
     fn eq(&self, other: &Natural) -> bool {

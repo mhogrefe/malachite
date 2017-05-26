@@ -6,7 +6,7 @@ use natural::Natural::{self, Small};
 /// ```
 /// use malachite_gmp::natural::Natural;
 ///
-/// assert_eq!(Natural::from(123).to_string(), "123");
+/// assert_eq!(Natural::from(123u32).to_string(), "123");
 /// ```
 impl From<u32> for Natural {
     fn from(u: u32) -> Natural {

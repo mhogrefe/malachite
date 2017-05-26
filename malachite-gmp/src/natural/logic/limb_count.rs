@@ -9,8 +9,8 @@ impl Natural {
     /// use malachite_gmp::natural::Natural;
     /// use std::str::FromStr;
     ///
-    /// assert_eq!(Natural::from(0).limb_count(), 0);
-    /// assert_eq!(Natural::from(123).limb_count(), 1);
+    /// assert_eq!(Natural::from(0u32).limb_count(), 0);
+    /// assert_eq!(Natural::from(123u32).limb_count(), 1);
     /// assert_eq!(Natural::from_str("1000000000000").unwrap().limb_count(), 2);
     /// ```
     pub fn limb_count(&self) -> u64 {

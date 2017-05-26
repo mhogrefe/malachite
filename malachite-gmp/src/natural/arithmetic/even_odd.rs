@@ -8,9 +8,9 @@ impl Natural {
     /// use malachite_gmp::natural::Natural;
     /// use std::str::FromStr;
     ///
-    /// assert_eq!(Natural::from(0).is_even(), true);
-    /// assert_eq!(Natural::from(123).is_even(), false);
-    /// assert_eq!(Natural::from(128).is_even(), true);
+    /// assert_eq!(Natural::from(0u32).is_even(), true);
+    /// assert_eq!(Natural::from(123u32).is_even(), false);
+    /// assert_eq!(Natural::from(128u32).is_even(), true);
     /// assert_eq!(Natural::from_str("1000000000000").unwrap().is_even(), true);
     /// assert_eq!(Natural::from_str("1000000000001").unwrap().is_even(), false);
     /// ```
@@ -25,9 +25,9 @@ impl Natural {
     /// use malachite_gmp::natural::Natural;
     /// use std::str::FromStr;
     ///
-    /// assert_eq!(Natural::from(0).is_odd(), false);
-    /// assert_eq!(Natural::from(123).is_odd(), true);
-    /// assert_eq!(Natural::from(128).is_odd(), false);
+    /// assert_eq!(Natural::from(0u32).is_odd(), false);
+    /// assert_eq!(Natural::from(123u32).is_odd(), true);
+    /// assert_eq!(Natural::from(128u32).is_odd(), false);
     /// assert_eq!(Natural::from_str("1000000000000").unwrap().is_odd(), false);
     /// assert_eq!(Natural::from_str("1000000000001").unwrap().is_odd(), true);
     /// ```

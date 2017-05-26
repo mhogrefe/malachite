@@ -75,6 +75,7 @@ pub mod natural {
         pub mod assign_u32;
         pub mod clone_and_assign_natural;
         pub mod from_u32;
+        pub mod from_u64;
         pub mod into_integer;
         pub mod to_u32;
     }
