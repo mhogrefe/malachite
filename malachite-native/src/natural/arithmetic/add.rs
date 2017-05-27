@@ -43,35 +43,40 @@ impl AddAssign<Natural> for Natural {
         if self.limb_count() < other.limb_count() {
             swap(self, &mut other);
         }
-        if other == 0 {
-            return;
-        }
-        if let Small(y) = other {
-            *self += y;
-        } else {
-            match (self, other) {
-                (&mut Large(ref mut xs), Large(ref ys)) => {
-                    large_add(xs, ys);
+        match other {
+            Small(y) => *self += y,
+            Large(ref ys) => {
+                match *self {
+                    Large(ref mut xs) => large_add(xs, ys),
+                    _ => unreachable!(),
                 }
-                _ => unreachable!(),
             }
         }
     }
 }
 
+fn add_and_carry(x: u32, y: u32, carry: &mut bool) -> u32 {
+    let (sum, overflow) = x.overflowing_add(y);
+    if *carry {
+        *carry = overflow;
+        let (sum, overflow) = sum.overflowing_add(1);
+        *carry |= overflow;
+        sum
+    } else {
+        *carry = overflow;
+        sum
+    }
+}
+
 // assumes that xs.len() >= ys.len()
 fn large_add(xs: &mut Vec<u32>, ys: &[u32]) {
+    let mut ys_iter = ys.iter();
     let mut carry = false;
-    for (i, x) in xs.iter_mut().enumerate() {
-        let (sum, overflow) = x.overflowing_add(*ys.get(i).unwrap_or(&0));
-        if carry {
-            carry = overflow;
-            let (sum, overflow) = sum.overflowing_add(1);
-            *x = sum;
-            carry |= overflow;
-        } else {
-            *x = sum;
-            carry = overflow;
+    for x in xs.iter_mut() {
+        match ys_iter.next() {
+            Some(y) => *x = add_and_carry(*x, *y, &mut carry),
+            None if carry => *x = add_and_carry(*x, 0, &mut carry),
+            None => break,
         }
     }
     if carry {
