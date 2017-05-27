@@ -1,4 +1,5 @@
-use natural::{get_lower, get_upper, Natural};
+use natural::{get_lower, get_upper};
+use natural::Natural::{self, Large, Small};
 
 /// Converts a `u64` to a `Natural`.
 ///
@@ -13,8 +14,10 @@ use natural::{get_lower, get_upper, Natural};
 /// ```
 impl From<u64> for Natural {
     fn from(u: u64) -> Natural {
-        let mut n = Natural::new();
-        n.assign_limbs_le(&[get_lower(u), get_upper(u)]);
-        n
+        if u < u32::max_value() as u64 {
+            Small(u as u32)
+        } else {
+            Large(vec![get_lower(u), get_upper(u)])
+        }
     }
 }
