@@ -30,14 +30,15 @@ fn test_from_u64() {
 fn from_u64_properties() {
     // from(u: u64) is valid.
     // from(u: u64) is equivalent for malachite-gmp, malachite-native, and num.
-    // TODO to_u64
-    let one_u64 = |u: u32| {
+    // from(u: u64).to_64() == Some(u)
+    let one_u64 = |u: u64| {
         let n = native::Natural::from(u);
         let raw_gmp_n = gmp::Natural::from(u);
         assert!(raw_gmp_n.is_valid());
         let gmp_n = gmp_to_native(&raw_gmp_n);
         let num_n = num_to_native(&num::BigUint::from(u));
         assert!(n.is_valid());
+        assert_eq!(n.to_u64(), Some(u));
         assert_eq!(n, gmp_n);
         assert_eq!(n, num_n);
     };

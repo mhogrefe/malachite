@@ -78,6 +78,7 @@ pub mod natural {
         pub mod from_u64;
         pub mod into_integer;
         pub mod to_u32;
+        pub mod to_u64;
     }
     pub mod logic {
         pub mod assign_limbs_le;

@@ -38,6 +38,7 @@ pub mod natural {
         pub mod from_u32;
         pub mod from_u64;
         pub mod to_u32;
+        pub mod to_u64;
     }
     pub mod logic {
         pub mod get_bit;
