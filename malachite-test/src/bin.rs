@@ -1,25 +1,11 @@
 extern crate malachite_test;
 
-use malachite_test::natural::arithmetic::add::benchmark_exhaustive_natural_add;
-use malachite_test::natural::arithmetic::add::benchmark_random_natural_add;
-use malachite_test::natural::arithmetic::add::demo_exhaustive_natural_add;
-use malachite_test::natural::arithmetic::add::demo_random_natural_add;
-use malachite_test::natural::conversion::from_u32::benchmark_exhaustive_natural_from_u32;
-use malachite_test::natural::conversion::from_u32::benchmark_random_natural_from_u32;
-use malachite_test::natural::conversion::from_u32::demo_exhaustive_natural_from_u32;
-use malachite_test::natural::conversion::from_u32::demo_random_natural_from_u32;
-use malachite_test::natural::conversion::from_u64::demo_exhaustive_natural_from_u64;
-use malachite_test::natural::conversion::from_u64::demo_random_natural_from_u64;
-use malachite_test::natural::conversion::from_u64::benchmark_exhaustive_natural_from_u64;
-use malachite_test::natural::conversion::from_u64::benchmark_random_natural_from_u64;
-use malachite_test::natural::conversion::to_u32::demo_exhaustive_natural_to_u32;
-use malachite_test::natural::conversion::to_u32::demo_exhaustive_natural_to_u32_wrapping;
-use malachite_test::natural::conversion::to_u32::demo_random_natural_to_u32;
-use malachite_test::natural::conversion::to_u32::demo_random_natural_to_u32_wrapping;
-use malachite_test::natural::conversion::to_u64::demo_exhaustive_natural_to_u64;
-use malachite_test::natural::conversion::to_u64::demo_exhaustive_natural_to_u64_wrapping;
-use malachite_test::natural::conversion::to_u64::demo_random_natural_to_u64;
-use malachite_test::natural::conversion::to_u64::demo_random_natural_to_u64_wrapping;
+use malachite_test::natural::arithmetic::add::*;
+use malachite_test::natural::conversion::clone_and_assign::*;
+use malachite_test::natural::conversion::from_u32::*;
+use malachite_test::natural::conversion::from_u64::*;
+use malachite_test::natural::conversion::to_u32::*;
+use malachite_test::natural::conversion::to_u64::*;
 use std::env;
 
 fn main() {
@@ -37,6 +23,10 @@ fn main() {
         "demo" => {
             match item_name.as_ref() {
                 "exhaustive_natural_add" => demo_exhaustive_natural_add(limit),
+                "exhaustive_natural_assign" => demo_exhaustive_natural_assign(limit),
+                "exhaustive_natural_assign_ref" => demo_exhaustive_natural_assign_ref(limit),
+                "exhaustive_natural_clone" => demo_exhaustive_natural_clone(limit),
+                "exhaustive_natural_clone_from" => demo_exhaustive_natural_clone_from(limit),
                 "exhaustive_natural_from_u32" => demo_exhaustive_natural_from_u32(limit),
                 "exhaustive_natural_from_u64" => demo_exhaustive_natural_from_u64(limit),
                 "exhaustive_natural_to_u32" => demo_exhaustive_natural_to_u32(limit),
@@ -48,6 +38,10 @@ fn main() {
                     demo_exhaustive_natural_to_u64_wrapping(limit)
                 }
                 "random_natural_add" => demo_random_natural_add(limit),
+                "random_natural_assign" => demo_random_natural_assign(limit),
+                "random_natural_assign_ref" => demo_random_natural_assign_ref(limit),
+                "random_natural_clone" => demo_random_natural_clone(limit),
+                "random_natural_clone_from" => demo_random_natural_clone_from(limit),
                 "random_natural_from_u32" => demo_random_natural_from_u32(limit),
                 "random_natural_from_u64" => demo_random_natural_from_u64(limit),
                 "random_natural_to_u32" => demo_random_natural_to_u32(limit),

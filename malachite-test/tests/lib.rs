@@ -37,7 +37,7 @@ pub mod integer {
         pub mod assign_i32;
         pub mod assign_natural;
         pub mod assign_u32;
-        pub mod clone_and_assign_integer;
+        pub mod clone_and_assign;
         pub mod from_i32;
         pub mod from_u32;
         pub mod into_natural;
@@ -73,7 +73,7 @@ pub mod natural {
     pub mod conversion {
         pub mod assign_integer;
         pub mod assign_u32;
-        pub mod clone_and_assign_natural;
+        pub mod clone_and_assign;
         pub mod from_u32;
         pub mod from_u64;
         pub mod into_integer;

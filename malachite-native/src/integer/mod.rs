@@ -62,7 +62,7 @@ pub mod arithmetic {
     pub mod sub_u32;
 }
 pub mod comparison {
-    pub mod ord_integer;
+    pub mod ord;
     pub mod partial_eq_i32;
     pub mod partial_eq_natural;
     pub mod partial_eq_u32;

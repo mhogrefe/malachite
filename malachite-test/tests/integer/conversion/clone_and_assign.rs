@@ -7,7 +7,7 @@ use rugint;
 use std::str::FromStr;
 
 #[test]
-fn test_assign_integer() {
+fn test_assign() {
     let test = |u, v, out| {
         let mut x = native::Integer::from_str(u).unwrap();
         x.assign(&native::Integer::from_str(v).unwrap());

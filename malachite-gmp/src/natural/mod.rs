@@ -144,7 +144,7 @@ pub mod arithmetic {
 }
 pub mod conversion;
 pub mod comparison {
-    pub mod eq_natural;
+    pub mod eq;
     pub mod hash;
     pub mod ord;
     pub mod partial_eq_integer;
