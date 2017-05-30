@@ -34,6 +34,7 @@ pub mod natural {
         pub mod partial_eq_u32;
     }
     pub mod conversion {
+        pub mod assign_integer;
         pub mod assign_u32;
         pub mod clone_and_assign;
         pub mod from_u32;

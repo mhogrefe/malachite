@@ -1,7 +1,7 @@
 use common::LARGE_LIMIT;
 use malachite_native::natural as native;
 use malachite_gmp::natural as gmp;
-use malachite_test::common::gmp_to_native;
+use malachite_test::common::gmp_natural_to_native;
 use rust_wheels::iterators::common::EXAMPLE_SEED;
 use rust_wheels::iterators::naturals::{exhaustive_naturals, random_naturals};
 use std::str::FromStr;
@@ -39,7 +39,7 @@ fn to_u64_properties() {
     // if x < 2^64, x.to_u64() == Some(x.to_u64_wrapping())
     // if x >= 2^64, x.to_u64().is_none()
     let one_natural = |gmp_x: gmp::Natural| {
-        let x = gmp_to_native(&gmp_x);
+        let x = gmp_natural_to_native(&gmp_x);
         let native_u64 = x.to_u64();
         assert_eq!(gmp_x.to_u64(), native_u64);
         if x.significant_bits() <= 64 {
@@ -64,7 +64,7 @@ fn to_u64_wrapping_properties() {
     // x.to_u64_wrapping() is equivalent for malachite-gmp and malachite-native.
     // TODO relate with BitAnd
     let one_natural = |gmp_x: gmp::Natural| {
-        let x = gmp_to_native(&gmp_x);
+        let x = gmp_natural_to_native(&gmp_x);
         let native_u64 = x.to_u64_wrapping();
         assert_eq!(gmp_x.to_u64_wrapping(), native_u64);
     };

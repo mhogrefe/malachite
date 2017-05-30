@@ -1,7 +1,7 @@
 use common::LARGE_LIMIT;
 use malachite_native::natural as native;
 use malachite_gmp::natural as gmp;
-use malachite_test::common::{gmp_to_native, native_to_rugint};
+use malachite_test::common::{gmp_natural_to_native, native_natural_to_rugint_integer};
 use rugint;
 use rust_wheels::iterators::common::EXAMPLE_SEED;
 use rust_wheels::iterators::naturals::{exhaustive_naturals, random_naturals};
@@ -42,10 +42,10 @@ fn to_u32_properties() {
     // if x < 2^32, x.to_u32() == Some(x.to_u32_wrapping())
     // if x >= 2^32, x.to_u32().is_none()
     let one_natural = |gmp_x: gmp::Natural| {
-        let x = gmp_to_native(&gmp_x);
+        let x = gmp_natural_to_native(&gmp_x);
         let native_u32 = x.to_u32();
         assert_eq!(gmp_x.to_u32(), native_u32);
-        assert_eq!(native_to_rugint(&x).to_u32(), native_u32);
+        assert_eq!(native_natural_to_rugint_integer(&x).to_u32(), native_u32);
         if x.significant_bits() <= 32 {
             assert_eq!(native::Natural::from(native_u32.unwrap()), x);
             assert_eq!(native_u32, Some(x.to_u32_wrapping()));
@@ -68,10 +68,11 @@ fn to_u32_wrapping_properties() {
     // x.to_u32_wrapping() is equivalent for malachite-gmp, malachite-native, and rugint.
     // TODO relate with BitAnd
     let one_natural = |gmp_x: gmp::Natural| {
-        let x = gmp_to_native(&gmp_x);
+        let x = gmp_natural_to_native(&gmp_x);
         let native_u32 = x.to_u32_wrapping();
         assert_eq!(gmp_x.to_u32_wrapping(), native_u32);
-        assert_eq!(native_to_rugint(&x).to_u32_wrapping(), native_u32);
+        assert_eq!(native_natural_to_rugint_integer(&x).to_u32_wrapping(),
+                   native_u32);
     };
 
     for n in exhaustive_naturals().take(LARGE_LIMIT) {

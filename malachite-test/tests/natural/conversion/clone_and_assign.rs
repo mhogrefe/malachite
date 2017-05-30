@@ -3,8 +3,9 @@ use malachite_native::natural as native;
 use malachite_native::traits::Assign as native_assign;
 use malachite_gmp::natural as gmp;
 use malachite_gmp::traits::Assign as gmp_assign;
-use malachite_test::common::{gmp_to_native, native_to_gmp, native_to_num, native_to_rugint,
-                             num_to_native, rugint_to_native};
+use malachite_test::common::{gmp_natural_to_native, native_natural_to_gmp,
+                             native_natural_to_num_biguint, native_natural_to_rugint_integer,
+                             num_biguint_to_native_natural, rugint_integer_to_native_natural};
 use num;
 use rugint;
 use rugint::Assign as rugint_assign;
@@ -98,20 +99,31 @@ fn clone_and_assign_properties() {
     // x.clone() is valid.
     // x.clone() == x
     let one_natural = |gmp_x: gmp::Natural| {
-        let x = gmp_to_native(&gmp_x);
+        let x = gmp_natural_to_native(&gmp_x);
         let x_cloned = x.clone();
         assert!(x_cloned.is_valid());
         let gmp_x_cloned = gmp_x.clone();
         assert!(gmp_x_cloned.is_valid());
-        assert_eq!(gmp_to_native(&gmp_x_cloned), x_cloned);
-        assert_eq!(num_to_native(&native_to_num(&x).clone()), x);
-        assert_eq!(rugint_to_native(&native_to_rugint(&x).clone()), x);
+        assert_eq!(gmp_natural_to_native(&gmp_x_cloned), x_cloned);
+        assert_eq!(num_biguint_to_native_natural(&native_natural_to_num_biguint(&x).clone()),
+                   x);
+        assert_eq!(rugint_integer_to_native_natural(&native_natural_to_rugint_integer(&x).clone()),
+                   x);
         assert_eq!(x_cloned, x);
     };
 
+    // x.clone_from(y) is equivalent for malachite-gmp, malachite-native, num, and rugint.
+    // x.clone_from(y) is valid.
+    // x.clone_from(y); x == y
+    // x.assign(y) is equivalent for malachite-gmp, malachite-native, and rugint.
+    // x.assign(y) is valid.
+    // x.assign(y); x == y
+    // x.assign(&y) is equivalent for malachite-gmp, malachite-native, and rugint.
+    // x.assign(&y) is valid.
+    // x.assign(&y); x == y
     let two_naturals = |mut gmp_x: gmp::Natural, gmp_y: gmp::Natural| {
-        let mut x = gmp_to_native(&gmp_x);
-        let y = gmp_to_native(&gmp_y);
+        let mut x = gmp_natural_to_native(&gmp_x);
+        let y = gmp_natural_to_native(&gmp_y);
         let old_x = x.clone();
         gmp_x.clone_from(&gmp_y);
         assert!(gmp_x.is_valid());
@@ -119,40 +131,40 @@ fn clone_and_assign_properties() {
         x.clone_from(&y);
         assert!(x.is_valid());
         assert_eq!(x, y);
-        let mut num_x = native_to_num(&old_x);
-        let num_y = native_to_num(&y);
+        let mut num_x = native_natural_to_num_biguint(&old_x);
+        let num_y = native_natural_to_num_biguint(&y);
         num_x.clone_from(&num_y);
-        assert_eq!(num_to_native(&num_x), y);
-        let mut rugint_x = native_to_rugint(&old_x);
-        let rugint_y = native_to_rugint(&y);
+        assert_eq!(num_biguint_to_native_natural(&num_x), y);
+        let mut rugint_x = native_natural_to_rugint_integer(&old_x);
+        let rugint_y = native_natural_to_rugint_integer(&y);
         rugint_x.clone_from(&rugint_y);
-        assert_eq!(rugint_to_native(&rugint_x), y);
+        assert_eq!(rugint_integer_to_native_natural(&rugint_x), y);
 
         x = old_x.clone();
-        gmp_x = native_to_gmp(&old_x);
+        gmp_x = native_natural_to_gmp(&old_x);
         gmp_x.assign(gmp_y.clone());
         assert!(gmp_x.is_valid());
         assert_eq!(gmp_x, gmp_y);
         x.assign(y.clone());
         assert!(x.is_valid());
         assert_eq!(x, y);
-        let mut rugint_x = native_to_rugint(&old_x);
-        let rugint_y = native_to_rugint(&y);
+        let mut rugint_x = native_natural_to_rugint_integer(&old_x);
+        let rugint_y = native_natural_to_rugint_integer(&y);
         rugint_x.assign(rugint_y);
-        assert_eq!(rugint_to_native(&rugint_x), y);
+        assert_eq!(rugint_integer_to_native_natural(&rugint_x), y);
 
         x = old_x.clone();
-        gmp_x = native_to_gmp(&old_x);
+        gmp_x = native_natural_to_gmp(&old_x);
         gmp_x.assign(&gmp_y);
         assert!(gmp_x.is_valid());
         assert_eq!(gmp_x, gmp_y);
         x.assign(&y);
         assert!(x.is_valid());
         assert_eq!(x, y);
-        let mut rugint_x = native_to_rugint(&old_x);
-        let rugint_y = native_to_rugint(&y);
+        let mut rugint_x = native_natural_to_rugint_integer(&old_x);
+        let rugint_y = native_natural_to_rugint_integer(&y);
         rugint_x.assign(&rugint_y);
-        assert_eq!(rugint_to_native(&rugint_x), y);
+        assert_eq!(rugint_integer_to_native_natural(&rugint_x), y);
     };
 
     for n in exhaustive_naturals().take(LARGE_LIMIT) {

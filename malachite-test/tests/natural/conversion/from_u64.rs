@@ -1,7 +1,7 @@
 use common::LARGE_LIMIT;
 use malachite_native::natural as native;
 use malachite_gmp::natural as gmp;
-use malachite_test::common::{gmp_to_native, num_to_native};
+use malachite_test::common::{gmp_natural_to_native, num_biguint_to_native_natural};
 use num;
 use rust_wheels::iterators::common::EXAMPLE_SEED;
 use rust_wheels::iterators::general::random_x;
@@ -35,8 +35,8 @@ fn from_u64_properties() {
         let n = native::Natural::from(u);
         let raw_gmp_n = gmp::Natural::from(u);
         assert!(raw_gmp_n.is_valid());
-        let gmp_n = gmp_to_native(&raw_gmp_n);
-        let num_n = num_to_native(&num::BigUint::from(u));
+        let gmp_n = gmp_natural_to_native(&raw_gmp_n);
+        let num_n = num_biguint_to_native_natural(&num::BigUint::from(u));
         assert!(n.is_valid());
         assert_eq!(n.to_u64(), Some(u));
         assert_eq!(n, gmp_n);
