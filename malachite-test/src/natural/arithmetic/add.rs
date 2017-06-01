@@ -33,9 +33,9 @@ pub fn benchmark_exhaustive_natural_add(limit: usize, file_name: &str) {
                     x_to_z: &(|&(ref x, ref y)| {
                                   (gmp_natural_to_num_biguint(x), gmp_natural_to_num_biguint(y))
                               }),
-                    x_size: &(|&(ref x, ref y)| {
-                                  max(x.significant_bits(), y.significant_bits()) as usize
-                              }),
+                    x_param: &(|&(ref x, ref y)| {
+                                   max(x.significant_bits(), y.significant_bits()) as usize
+                               }),
                     limit: limit,
                     f_name: "malachite-gmp",
                     g_name: "malachite-native",
@@ -59,9 +59,9 @@ pub fn benchmark_random_natural_add(limit: usize, scale: u32, file_name: &str) {
                     x_to_z: &(|&(ref x, ref y)| {
                                   (gmp_natural_to_num_biguint(x), gmp_natural_to_num_biguint(y))
                               }),
-                    x_size: &(|&(ref x, ref y)| {
-                                  max(x.significant_bits(), y.significant_bits()) as usize
-                              }),
+                    x_param: &(|&(ref x, ref y)| {
+                                   max(x.significant_bits(), y.significant_bits()) as usize
+                               }),
                     limit: limit,
                     f_name: "malachite-gmp",
                     g_name: "malachite-native",
