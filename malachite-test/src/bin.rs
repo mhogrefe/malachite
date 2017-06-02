@@ -66,23 +66,55 @@ fn main() {
         "bench" => {
             match item_name.as_ref() {
                 "exhaustive_natural_add" => benchmark_exhaustive_natural_add(limit, "temp.gp"),
-                "random_natural_add" => benchmark_random_natural_add(limit, 1024, "temp.gp"),
                 "exhaustive_natural_from_u32" => {
                     benchmark_exhaustive_natural_from_u32(limit, "temp.gp")
                 }
-                "random_natural_from_u32" => benchmark_random_natural_from_u32(limit, "temp.gp"),
                 "exhaustive_natural_from_u64" => {
                     benchmark_exhaustive_natural_from_u64(limit, "temp.gp")
                 }
+                "exhaustive_natural_to_u32" => {
+                    benchmark_exhaustive_natural_to_u32(limit, "temp.gp")
+                }
+                "exhaustive_natural_to_u32_wrapping" => {
+                    benchmark_exhaustive_natural_to_u32_wrapping(limit, "temp.gp")
+                }
+                "exhaustive_natural_to_u64" => {
+                    benchmark_exhaustive_natural_to_u64(limit, "temp.gp")
+                }
+                "exhaustive_natural_to_u64_wrapping" => {
+                    benchmark_exhaustive_natural_to_u64_wrapping(limit, "temp.gp")
+                }
+                "random_natural_add" => benchmark_random_natural_add(limit, 1024, "temp.gp"),
+                "random_natural_from_u32" => benchmark_random_natural_from_u32(limit, "temp.gp"),
                 "random_natural_from_u64" => benchmark_random_natural_from_u64(limit, "temp.gp"),
+                "random_natural_to_u32" => benchmark_random_natural_to_u32(limit, "temp.gp"),
+                "random_natural_to_u32_wrapping" => {
+                    benchmark_random_natural_to_u32_wrapping(limit, "temp.gp")
+                }
+                "random_natural_to_u64" => benchmark_random_natural_to_u64(limit, "temp.gp"),
+                "random_natural_to_u64_wrapping" => {
+                    benchmark_random_natural_to_u64_wrapping(limit, "temp.gp")
+                }
 
                 "all" => {
                     benchmark_exhaustive_natural_add(100000, "exhaustive_natural_add.gp");
-                    benchmark_random_natural_add(100000, 1024, "random_natural_add.gp");
                     benchmark_exhaustive_natural_from_u32(100000, "exhaustive_natural_from_u32.gp");
-                    benchmark_random_natural_from_u32(100000, "random_natural_from_u32.gp");
                     benchmark_exhaustive_natural_from_u64(100000, "exhaustive_natural_from_u64.gp");
+                    benchmark_exhaustive_natural_to_u32(100000, "exhaustive_natural_to_u32.gp");
+                    let f1 = "exhaustive_natural_to_u32_wrapping.gp";
+                    benchmark_exhaustive_natural_to_u32_wrapping(100000, f1);
+                    benchmark_exhaustive_natural_to_u64(100000, "exhaustive_natural_to_u64.gp");
+                    let f2 = "exhaustive_natural_to_u64_wrapping.gp";
+                    benchmark_exhaustive_natural_to_u64_wrapping(100000, f2);
+                    benchmark_random_natural_add(100000, 1024, "random_natural_add.gp");
+                    benchmark_random_natural_from_u32(100000, "random_natural_from_u32.gp");
                     benchmark_random_natural_from_u64(100000, "random_natural_from_u64.gp");
+                    benchmark_random_natural_to_u32(100000, "random_natural_to_u32.gp");
+                    benchmark_random_natural_to_u32_wrapping(100000,
+                                                             "random_natural_to_u32_wrapping.gp");
+                    benchmark_random_natural_to_u64(100000, "random_natural_to_u64.gp");
+                    benchmark_random_natural_to_u64_wrapping(100000,
+                                                             "random_natural_to_u64_wrapping.gp");
                 }
 
                 _ => panic!("Invalid bench name: {}", item_name),
