@@ -22,6 +22,7 @@ pub fn demo_random_natural_add(limit: usize) {
 }
 
 pub fn benchmark_exhaustive_natural_add(limit: usize, file_name: &str) {
+    println!("benchmarking exhaustive Natural + Natural");
     benchmark_4(BenchmarkOptions4 {
                     xs: exhaustive_pairs_from_single(exhaustive_naturals()),
                     function_f: &(|(x, y)| x + y),
@@ -54,6 +55,7 @@ pub fn benchmark_exhaustive_natural_add(limit: usize, file_name: &str) {
 }
 
 pub fn benchmark_random_natural_add(limit: usize, scale: u32, file_name: &str) {
+    println!("benchmarking random Natural + Natural");
     benchmark_4(BenchmarkOptions4 {
                     xs: random_pairs_from_single(random_naturals(&EXAMPLE_SEED, scale)),
                     function_f: &(|(x, y)| x + y),

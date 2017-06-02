@@ -19,6 +19,7 @@ pub fn demo_random_natural_from_u64(limit: usize) {
 }
 
 pub fn benchmark_exhaustive_natural_from_u64(limit: usize, file_name: &str) {
+    println!("benchmarking exhaustive Natural::from(u64)");
     benchmark_3(BenchmarkOptions3 {
                     xs: exhaustive_u::<u64>(),
                     function_f: &(|u| gmp::Natural::from(u)),
@@ -39,6 +40,7 @@ pub fn benchmark_exhaustive_natural_from_u64(limit: usize, file_name: &str) {
 }
 
 pub fn benchmark_random_natural_from_u64(limit: usize, file_name: &str) {
+    println!("benchmarking exhaustive Natural::from(u64)");
     benchmark_3(BenchmarkOptions3 {
                     xs: random_x::<u64>(&EXAMPLE_SEED),
                     function_f: &(|u| gmp::Natural::from(u)),

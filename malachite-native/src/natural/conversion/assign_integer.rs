@@ -57,6 +57,6 @@ impl<'a> Assign<&'a Integer> for Natural {
                    Ordering::Less,
                    "Cannot assign from a negative Integer. Invalid other: {}",
                    other);
-        self.clone_from(&other.unsigned_abs_by_ref());
+        self.clone_from(other.internal_unsigned_abs_ref());
     }
 }

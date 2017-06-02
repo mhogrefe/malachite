@@ -36,6 +36,11 @@ impl Integer {
     pub fn unsigned_abs_by_ref(&self) -> Natural {
         self.abs.clone()
     }
+
+    //TODO document and test
+    pub fn internal_unsigned_abs_ref(&self) -> &Natural {
+        &self.abs
+    }
 }
 
 /// Replaces `self` with its absolute value.
