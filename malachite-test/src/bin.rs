@@ -2,6 +2,8 @@ extern crate malachite_test;
 
 use malachite_test::natural::arithmetic::add::*;
 use malachite_test::natural::conversion::assign_integer::*;
+use malachite_test::natural::conversion::assign_u32::*;
+use malachite_test::natural::conversion::assign_u64::*;
 use malachite_test::natural::conversion::clone_and_assign::*;
 use malachite_test::natural::conversion::from_u32::*;
 use malachite_test::natural::conversion::from_u64::*;
@@ -32,6 +34,8 @@ fn main() {
                 "exhaustive_natural_assign_integer_ref" => {
                     demo_exhaustive_natural_assign_integer_ref(limit)
                 }
+                "exhaustive_natural_assign_u32" => demo_exhaustive_natural_assign_u32(limit),
+                "exhaustive_natural_assign_u64" => demo_exhaustive_natural_assign_u64(limit),
                 "exhaustive_natural_clone" => demo_exhaustive_natural_clone(limit),
                 "exhaustive_natural_clone_from" => demo_exhaustive_natural_clone_from(limit),
                 "exhaustive_natural_from_u32" => demo_exhaustive_natural_from_u32(limit),
@@ -51,6 +55,8 @@ fn main() {
                 "random_natural_assign_integer_ref" => {
                     demo_random_natural_assign_integer_ref(limit)
                 }
+                "random_natural_assign_u32" => demo_random_natural_assign_u32(limit),
+                "random_natural_assign_u64" => demo_random_natural_assign_u64(limit),
                 "random_natural_clone" => demo_random_natural_clone(limit),
                 "random_natural_clone_from" => demo_random_natural_clone_from(limit),
                 "random_natural_from_u32" => demo_random_natural_from_u32(limit),
@@ -71,6 +77,12 @@ fn main() {
                 }
                 "exhaustive_natural_assign_integer" => {
                     benchmark_exhaustive_natural_assign_integer(limit, "temp.gp")
+                }
+                "exhaustive_natural_assign_u32" => {
+                    benchmark_exhaustive_natural_assign_u32(limit, "temp.gp")
+                }
+                "exhaustive_natural_assign_u64" => {
+                    benchmark_exhaustive_natural_assign_u64(limit, "temp.gp")
                 }
                 "exhaustive_natural_clone" => benchmark_exhaustive_natural_clone(limit, "temp.gp"),
                 "exhaustive_natural_clone_from" => {
@@ -99,6 +111,12 @@ fn main() {
                 "random_natural_assign_integer" => {
                     benchmark_random_natural_assign_integer(limit, 1024, "temp.gp")
                 }
+                "random_natural_assign_u32" => {
+                    benchmark_random_natural_assign_u32(limit, 1024, "temp.gp")
+                }
+                "random_natural_assign_u64" => {
+                    benchmark_random_natural_assign_u64(limit, 1024, "temp.gp")
+                }
                 "random_natural_clone" => benchmark_random_natural_clone(limit, 1024, "temp.gp"),
                 "random_natural_clone_from" => {
                     benchmark_random_natural_clone_from(limit, 1024, "temp.gp")
@@ -119,6 +137,10 @@ fn main() {
                     benchmark_exhaustive_natural_assign(100000, "exhaustive_natural_assign.gp");
                     let s = "exhaustive_natural_assign_integer.gp";
                     benchmark_exhaustive_natural_assign_integer(100000, s);
+                    benchmark_exhaustive_natural_assign_u32(100000,
+                                                            "exhaustive_natural_assign_u32.gp");
+                    benchmark_exhaustive_natural_assign_u64(100000,
+                                                            "exhaustive_natural_assign_u64.gp");
                     benchmark_exhaustive_natural_clone(100000, "exhaustive_natural_clone.gp");
                     benchmark_exhaustive_natural_clone_from(100000,
                                                             "exhaustive_natural_clone_from.gp");
@@ -135,6 +157,12 @@ fn main() {
                     benchmark_random_natural_assign_integer(100000,
                                                             1024,
                                                             "random_natural_assign_integer.gp");
+                    benchmark_random_natural_assign_u32(100000,
+                                                        1024,
+                                                        "random_natural_assign_u32.gp");
+                    benchmark_random_natural_assign_u64(100000,
+                                                        1024,
+                                                        "random_natural_assign_u64.gp");
                     benchmark_random_natural_clone(100000, 1024, "random_natural_clone.gp");
                     benchmark_random_natural_clone_from(100000,
                                                         1024,

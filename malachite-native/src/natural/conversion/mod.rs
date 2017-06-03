@@ -8,7 +8,7 @@ impl Natural {
     //TODO test
     pub fn assign_str_radix(&mut self, src: &str, radix: i32) -> Result<(), ParseIntegerError> {
         assert!(!src.starts_with('-'));
-        self.assign(0);
+        self.assign(0u32);
         for c in src.chars() {
             self.mul_in_place_u32(radix as u32);
             if c >= '0' && c <= '9' {
@@ -87,6 +87,7 @@ impl FromStr for Natural {
 pub mod assign_integer;
 pub mod assign;
 pub mod assign_u32;
+pub mod assign_u64;
 pub mod from_u32;
 pub mod from_u64;
 pub mod into_integer;

@@ -9,7 +9,7 @@ use traits::Assign;
 /// use malachite_gmp::traits::Assign;
 ///
 /// let mut x = Natural::from(123u32);
-/// x.assign(456);
+/// x.assign(456u32);
 /// assert_eq!(x.to_string(), "456");
 /// ```
 impl Assign<u32> for Natural {

@@ -28,7 +28,7 @@ impl Natural {
         }
         let limbs = &limbs[0..sig_size];
         match sig_size {
-            0 => self.assign(0),
+            0 => self.assign(0u32),
             1 => self.assign(limbs[0]),
             _ => *self = Large(limbs.to_vec()),
         }

@@ -28,7 +28,7 @@ use rand::Rng;
 /// ```
 pub fn assign_random_up_to_bits<R: Rng>(rng: &mut R, n: &mut Natural, bits: u64) {
     if bits == 0 {
-        n.assign(0);
+        n.assign(0u32);
         return;
     }
     let remainder_bits = bits & 0x1f;

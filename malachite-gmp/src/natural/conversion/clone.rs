@@ -15,7 +15,7 @@ use std::mem;
 ///
 /// let mut y = x.clone();
 /// assert_eq!(y.to_string(), "123");
-/// y.assign(789);
+/// y.assign(789u32);
 /// assert_eq!(x.to_string(), "123");
 /// assert_eq!(y.to_string(), "789");
 /// ```
