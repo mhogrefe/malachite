@@ -134,6 +134,6 @@ pub mod assign_u64;
 pub mod clone;
 pub mod from_u32;
 pub mod from_u64;
-pub mod into_integer;
+pub mod to_integer;
 pub mod to_u32;
 pub mod to_u64;

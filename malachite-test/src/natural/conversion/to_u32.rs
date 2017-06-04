@@ -30,7 +30,7 @@ pub fn demo_random_natural_to_u32_wrapping(limit: usize) {
 }
 
 pub fn benchmark_exhaustive_natural_to_u32(limit: usize, file_name: &str) {
-    println!("benchmarking exhaustive Natural.to_u32(u32)");
+    println!("benchmarking exhaustive Natural.to_u32()");
     benchmark_3(BenchmarkOptions3 {
                     xs: exhaustive_naturals(),
                     function_f: &(|n| n.to_u32()),
@@ -43,7 +43,7 @@ pub fn benchmark_exhaustive_natural_to_u32(limit: usize, file_name: &str) {
                     f_name: "malachite-gmp",
                     g_name: "malachite-native",
                     h_name: "rugint",
-                    title: "Natural.to\\\\_u32(u32)",
+                    title: "Natural.to\\\\_u32()",
                     x_axis_label: "n.significant\\\\_bits()",
                     y_axis_label: "time (ns)",
                     file_name: &format!("benchmarks/{}", file_name),
@@ -51,7 +51,7 @@ pub fn benchmark_exhaustive_natural_to_u32(limit: usize, file_name: &str) {
 }
 
 pub fn benchmark_random_natural_to_u32(limit: usize, file_name: &str) {
-    println!("benchmarking random Natural.to_u32(u32)");
+    println!("benchmarking random Natural.to_u32()");
     benchmark_3(BenchmarkOptions3 {
                     xs: random_naturals(&EXAMPLE_SEED, 32),
                     function_f: &(|n| n.to_u32()),
@@ -64,7 +64,7 @@ pub fn benchmark_random_natural_to_u32(limit: usize, file_name: &str) {
                     f_name: "malachite-gmp",
                     g_name: "malachite-native",
                     h_name: "rugint",
-                    title: "Natural.to\\\\_u32(u32)",
+                    title: "Natural.to\\\\_u32()",
                     x_axis_label: "n.significant\\\\_bits()",
                     y_axis_label: "time (ns)",
                     file_name: &format!("benchmarks/{}", file_name),
@@ -72,7 +72,7 @@ pub fn benchmark_random_natural_to_u32(limit: usize, file_name: &str) {
 }
 
 pub fn benchmark_exhaustive_natural_to_u32_wrapping(limit: usize, file_name: &str) {
-    println!("benchmarking exhaustive Natural.to_u32_wrapping(u32)");
+    println!("benchmarking exhaustive Natural.to_u32_wrapping()");
     benchmark_3(BenchmarkOptions3 {
                     xs: exhaustive_naturals(),
                     function_f: &(|n| n.to_u32_wrapping()),
@@ -85,7 +85,7 @@ pub fn benchmark_exhaustive_natural_to_u32_wrapping(limit: usize, file_name: &st
                     f_name: "malachite-gmp",
                     g_name: "malachite-native",
                     h_name: "rugint",
-                    title: "Natural.to\\\\_u32\\\\_wrapping(u32)",
+                    title: "Natural.to\\\\_u32\\\\_wrapping()",
                     x_axis_label: "n.significant\\\\_bits()",
                     y_axis_label: "time (ns)",
                     file_name: &format!("benchmarks/{}", file_name),
@@ -93,7 +93,7 @@ pub fn benchmark_exhaustive_natural_to_u32_wrapping(limit: usize, file_name: &st
 }
 
 pub fn benchmark_random_natural_to_u32_wrapping(limit: usize, file_name: &str) {
-    println!("benchmarking random Natural.to_u32_wrapping(u32)");
+    println!("benchmarking random Natural.to_u32_wrapping()");
     benchmark_3(BenchmarkOptions3 {
                     xs: random_naturals(&EXAMPLE_SEED, 32),
                     function_f: &(|n| n.to_u32_wrapping()),
@@ -106,7 +106,7 @@ pub fn benchmark_random_natural_to_u32_wrapping(limit: usize, file_name: &str) {
                     f_name: "malachite-gmp",
                     g_name: "malachite-native",
                     h_name: "rugint",
-                    title: "Natural.to\\\\_u32\\\\_wrapping(u32)",
+                    title: "Natural.to\\\\_u32\\\\_wrapping()",
                     x_axis_label: "n.significant\\\\_bits()",
                     y_axis_label: "time (ns)",
                     file_name: &format!("benchmarks/{}", file_name),

@@ -40,6 +40,7 @@ pub mod natural {
         pub mod clone_and_assign;
         pub mod from_u32;
         pub mod from_u64;
+        pub mod to_integer;
         pub mod to_u32;
         pub mod to_u64;
     }

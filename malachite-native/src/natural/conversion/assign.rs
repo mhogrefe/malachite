@@ -26,7 +26,7 @@ impl Assign<Natural> for Natural {
 /// Time: worst case O(n)
 /// Additional memory: worst case O(n)
 ///
-/// where n = `*other.significant_bits()`
+/// where n = `other.significant_bits()`
 ///
 /// # Example
 /// ```

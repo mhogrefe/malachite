@@ -1,7 +1,5 @@
-use gmp_mpfr_sys::gmp::{self, mpz_t};
 use integer::Integer;
 use natural::Natural;
-use std::mem;
 use traits::Assign;
 
 /// Assigns a `Natural` to `self`.
@@ -18,30 +16,13 @@ use traits::Assign;
 /// ```
 impl<'a> Assign<&'a Natural> for Integer {
     fn assign(&mut self, other: &'a Natural) {
-        match *other {
-            Natural::Small(y) if y & 0x8000_0000 != 0 => unsafe {
-                let mut assigned: mpz_t = mem::uninitialized();
-                gmp::mpz_init_set_ui(&mut assigned, y.into());
-                *self = Integer::Large(assigned);
-            },
-            Natural::Small(y) => {
-                match *self {
-                    Integer::Small(ref mut x) => *x = y as i32,
-                    Integer::Large(_) => *self = Integer::Small(y as i32),
-                }
-            }
-            Natural::Large(ref y) => {
-                match *self {
-                    Integer::Small(_) => unsafe {
-                        let mut assigned: mpz_t = mem::uninitialized();
-                        gmp::mpz_init_set(&mut assigned, y);
-                        *self = Integer::Large(assigned);
-                    },
-                    Integer::Large(ref mut x) => unsafe {
-                        gmp::mpz_set(x, y);
-                    },
-                }
-            }
-        }
+        *self = other.to_integer();
+    }
+}
+
+//TODO document and test
+impl Assign<Natural> for Integer {
+    fn assign(&mut self, other: Natural) {
+        *self = other.into_integer();
     }
 }

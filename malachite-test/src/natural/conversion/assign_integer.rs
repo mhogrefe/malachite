@@ -1,9 +1,9 @@
 use common::{gmp_integer_to_native, gmp_integer_to_rugint, gmp_natural_to_native,
              gmp_natural_to_rugint_integer};
-use malachite_native as native;
-use malachite_native::traits::Assign as native_assign;
 use malachite_gmp as gmp;
 use malachite_gmp::traits::Assign as gmp_assign;
+use malachite_native as native;
+use malachite_native::traits::Assign as native_assign;
 use rugint;
 use rugint::Assign as rugint_assign;
 use rust_wheels::benchmarks::{BenchmarkOptions6, benchmark_6};

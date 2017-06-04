@@ -36,7 +36,7 @@ impl Assign<Integer> for Natural {
 /// Time: worst case O(n)
 /// Additional memory: worst case O(n)
 ///
-/// where n = `*other.significant_bits()`
+/// where n = `other.significant_bits()`
 ///
 /// # Panics
 /// Panics if `other` is negative.
