@@ -3,6 +3,12 @@ use natural::Natural;
 
 /// Determines whether `self` is equal to an `Integer`.
 ///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = `other.significant_bits()`
+///
 /// # Example
 /// ```
 /// use malachite_native::integer::Integer;

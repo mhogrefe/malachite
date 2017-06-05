@@ -1,5 +1,11 @@
+use common::LARGE_LIMIT;
 use malachite_native as native;
 use malachite_gmp as gmp;
+use malachite_test::common::{gmp_integer_to_native, gmp_natural_to_native};
+use rust_wheels::iterators::common::EXAMPLE_SEED;
+use rust_wheels::iterators::integers::{exhaustive_integers, random_integers};
+use rust_wheels::iterators::naturals::{exhaustive_naturals, random_naturals};
+use rust_wheels::iterators::tuples::{exhaustive_pairs, random_pairs};
 use std::str::FromStr;
 
 #[test]
@@ -21,4 +27,28 @@ fn test_partial_eq_integer() {
     test("123", "1000000000000", false);
     test("1000000000000", "1000000000000", true);
     test("1000000000000", "-1000000000000", false);
+}
+
+#[test]
+fn partial_eq_integer_properties() {
+    // x == y is equivalent for malachite-gmp and malachite-native.
+    // x.into_integer() == y is equivalent to x == y.
+    let natural_and_integer = |gmp_x: gmp::natural::Natural, gmp_y: gmp::integer::Integer| {
+        let x = gmp_natural_to_native(&gmp_x);
+        let y = gmp_integer_to_native(&gmp_y);
+        let eq = x == y;
+        assert_eq!(gmp_x == gmp_y, eq);
+        assert_eq!(x.into_integer() == y, eq)
+    };
+
+    for (x, y) in exhaustive_pairs(exhaustive_naturals(), exhaustive_integers()).take(LARGE_LIMIT) {
+        natural_and_integer(x, y);
+    }
+
+    for (x, y) in random_pairs(&EXAMPLE_SEED,
+                               &(|seed| random_naturals(seed, 32)),
+                               &(|seed| random_integers(seed, 32)))
+                .take(LARGE_LIMIT) {
+        natural_and_integer(x, y);
+    }
 }
