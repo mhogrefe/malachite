@@ -14,7 +14,7 @@ impl PartialEq<Natural> for Natural {
     fn eq(&self, other: &Natural) -> bool {
         match (self, other) {
             (&Small(x), &Small(y)) => x == y,
-            (&Large(x), &Large(y)) => (unsafe { gmp::mpz_cmp(&x, &y) }) == 0,
+            (&Large(ref x), &Large(ref y)) => (unsafe { gmp::mpz_cmp(x, y) }) == 0,
             _ => false,
         }
     }
