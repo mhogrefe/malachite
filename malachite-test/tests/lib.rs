@@ -64,6 +64,7 @@ pub mod natural {
     }
     pub mod comparison {
         pub mod eq;
+        pub mod hash;
         pub mod ord;
         pub mod partial_eq_integer;
         pub mod partial_eq_u32;
