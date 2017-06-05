@@ -4,6 +4,7 @@ use natural::Natural::{self, Large, Small};
 /// Converts a `u64` to a `Natural`.
 ///
 /// Time: worst case O(1)
+///
 /// Additional memory: worst case O(1)
 ///
 /// # Example

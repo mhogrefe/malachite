@@ -5,6 +5,7 @@ impl Natural {
     /// Converts a `Natural` to an `Integer`. This implementation takes `self` by value.
     ///
     /// Time: worst case O(1)
+    ///
     /// Additional memory: worst case O(1)
     ///
     /// # Examples
@@ -23,6 +24,7 @@ impl Natural {
     /// Converts a `Natural` to an `Integer`. This implementation takes `self` by reference.
     ///
     /// Time: worst case O(n)
+    ///
     /// Additional memory: worst case O(n)
     ///
     /// where n = `self.significant_bits()`

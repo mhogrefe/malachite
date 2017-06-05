@@ -5,6 +5,7 @@ impl Natural {
     /// Converts a `Natural` to a `u64`, returning `None` if the `Natural` is too large.
     ///
     /// Time: worst case O(1)
+    ///
     /// Additional memory: worst case O(1)
     ///
     /// # Example
@@ -27,6 +28,7 @@ impl Natural {
     /// Converts a `Natural` to a `u64`, wrapping mod 2^(64).
     ///
     /// Time: worst case O(1)
+    ///
     /// Additional memory: worst case O(1)
     ///
     /// # Example

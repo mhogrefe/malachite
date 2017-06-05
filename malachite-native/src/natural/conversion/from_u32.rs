@@ -3,6 +3,7 @@ use natural::Natural::{self, Small};
 /// Converts a `u32` to a `Natural`.
 ///
 /// Time: worst case O(1)
+///
 /// Additional memory: worst case O(1)
 ///
 /// # Example

@@ -38,9 +38,10 @@ fn test_assign_u64() {
 
 #[test]
 fn assign_u64_properties() {
-    // x.assign(y) is equivalent for malachite-gmp, malachite-native, and num.
-    // x.assign(y) is valid.
-    // x.assign(y); x == y
+    // n.assign(u) is equivalent for malachite-gmp, malachite-native, and num.
+    // n.assign(u) is valid.
+    // n.assign(u); n == u
+    // n.assign(Natural::from(u)) is equivalent to n.assign(u)
     let natural_and_u64 = |mut gmp_n: gmp::Natural, u: u64| {
         let mut n = gmp_natural_to_native(&gmp_n);
         let old_n = n.clone();
@@ -51,6 +52,10 @@ fn assign_u64_properties() {
         assert!(n.is_valid());
         let natural_u = native::Natural::from(u);
         assert_eq!(n, natural_u);
+        let mut alt_n = old_n.clone();
+        alt_n.assign(native::Natural::from(u));
+        assert_eq!(alt_n, n);
+
         let mut num_n = native_natural_to_num_biguint(&old_n);
         num_assign_u64(&mut num_n, u);
         assert_eq!(num_biguint_to_native_natural(&num_n), natural_u);

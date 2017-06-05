@@ -2,6 +2,10 @@ use natural::Natural::{self, Large, Small};
 
 /// Determines whether `self` is equal to a `u32`.
 ///
+/// Time: worst case O(1)
+///
+/// Additional memory: worst case O(1)
+///
 /// # Example
 /// ```
 /// use malachite_native::natural::Natural;
@@ -19,6 +23,10 @@ impl PartialEq<u32> for Natural {
 }
 
 /// Determines whether a `u32` is equal to `self`.
+///
+/// Time: worst case O(1)
+///
+/// Additional memory: worst case O(1)
 ///
 /// # Example
 /// ```

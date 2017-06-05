@@ -4,6 +4,7 @@ use traits::Assign;
 /// Assigns a `u64` to `self`.
 ///
 /// Time: worst case O(1)
+///
 /// Additional memory: worst case O(1)
 ///
 /// # Example

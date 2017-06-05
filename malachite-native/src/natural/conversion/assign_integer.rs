@@ -6,6 +6,7 @@ use traits::Assign;
 /// Assigns an `Integer` to `self`. This implementation takes `other` by value.
 ///
 /// Time: worst case O(1)
+///
 /// Additional memory: worst case O(1)
 ///
 /// # Panics
@@ -34,6 +35,7 @@ impl Assign<Integer> for Natural {
 /// Assigns an `Integer` to `self`. This implementation takes `other` by reference.
 ///
 /// Time: worst case O(n)
+///
 /// Additional memory: worst case O(n)
 ///
 /// where n = `other.significant_bits()`
