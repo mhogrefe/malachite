@@ -38,14 +38,14 @@ fn partial_eq_u32_properties() {
     // n == u is equivalent for malachite-gmp, malachite-native, num, and rugint.
     // n == Natural::from(u) is equivalent to n == u.
     //
-    // u == n is equivalent for malachite-gmp, malachite-native, num, and rugint.
+    // u == n is equivalent for malachite-gmp, malachite-native, and rugint.
     // Natural::from(u) == n is equivalent to u == n.
     // n == u is equivalent to u == n.
     let natural_and_u32 = |gmp_n: gmp::Natural, u: u32| {
         let n = gmp_natural_to_native(&gmp_n);
         let eq_1 = n == u;
         assert_eq!(gmp_n == u, eq_1);
-        assert_eq!(num_partial_eq_u32(&mut native_natural_to_num_biguint(&n), u),
+        assert_eq!(num_partial_eq_u32(&native_natural_to_num_biguint(&n), u),
                    eq_1);
         assert_eq!(native_natural_to_rugint_integer(&n) == u, eq_1);
         assert_eq!(n == native::Natural::from(u), eq_1);

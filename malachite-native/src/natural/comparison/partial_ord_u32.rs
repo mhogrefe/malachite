@@ -3,6 +3,10 @@ use std::cmp::Ordering;
 
 /// Compares `self` to a `u32`.
 ///
+/// Time: worst case O(1)
+///
+/// Additional memory: worst case O(1)
+///
 /// # Examples
 /// ```
 /// use malachite_native::natural::Natural;
@@ -26,6 +30,10 @@ impl PartialOrd<u32> for Natural {
 
 /// Compares a `u32` to `self`.
 ///
+/// Time: worst case O(1)
+///
+/// Additional memory: worst case O(1)
+///
 /// # Examples
 /// ```
 /// use malachite_native::natural::Natural;
@@ -40,6 +48,9 @@ impl PartialOrd<u32> for Natural {
 /// ```
 impl PartialOrd<Natural> for u32 {
     fn partial_cmp(&self, other: &Natural) -> Option<Ordering> {
-        other.partial_cmp(self).map(|o| o.reverse())
+        match *other {
+            Small(ref small) => self.partial_cmp(small),
+            Large(_) => Some(Ordering::Less),
+        }
     }
 }

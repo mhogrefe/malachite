@@ -45,7 +45,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
 name = "gmp-mpfr-sys"
-version = "1.0.2"
+version = "1.0.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
@@ -195,7 +195,7 @@ name = "rugint"
 version = "0.2.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
- "gmp-mpfr-sys 1.0.2 (registry+https://github.com/rust-lang/crates.io-index)",
+ "gmp-mpfr-sys 1.0.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "rand 0.3.15 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
@@ -267,7 +267,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 "checksum either 1.1.0 (registry+https://github.com/rust-lang/crates.io-index)" = "18785c1ba806c258137c937e44ada9ee7e69a37e3c72077542cd2f069d78562a"
 "checksum generic-array 0.6.0 (registry+https://github.com/rust-lang/crates.io-index)" = "7229d82657e79be00d5f2a110a973ab5340681b945cf1bc022be7cfebf2dc00c"
 "checksum gmp-mpfr-sys 0.6.0 (registry+https://github.com/rust-lang/crates.io-index)" = "98868b8f0e3833ec9225124b858188789107ce3f18fddd05ed0336a72bf62ed9"
-"checksum gmp-mpfr-sys 1.0.2 (registry+https://github.com/rust-lang/crates.io-index)" = "eb6dbc800913427ada45aba17ca93f7aaf89276b2e727fcfeaad000a29f64004"
+"checksum gmp-mpfr-sys 1.0.3 (registry+https://github.com/rust-lang/crates.io-index)" = "0f0f2149b2f33847eb6c84034f320d53d804a11144f431e67ff68bbeedf48f09"
 "checksum gnuplot 0.0.22 (registry+https://github.com/rust-lang/crates.io-index)" = "c37cb0149f34c62e6d0c5bf9a8c37ff8ff9d9f588ccff2aa76bd247c7ebbef97"
 "checksum itertools 0.5.10 (registry+https://github.com/rust-lang/crates.io-index)" = "4833d6978da405305126af4ac88569b5d71ff758581ce5a987dbfa3755f694fc"
 "checksum kernel32-sys 0.2.2 (registry+https://github.com/rust-lang/crates.io-index)" = "7507624b29483431c0ba2d82aece8ca6cdba9382bff4ddd0f7490560c056098d"
