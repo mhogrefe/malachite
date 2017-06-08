@@ -7,7 +7,7 @@ use natural::Natural;
 ///
 /// Additional memory: worst case O(1)
 ///
-/// where n = `other.significant_bits()`
+/// where n = `self.significant_bits() + other.significant_bits()`
 ///
 /// # Example
 /// ```

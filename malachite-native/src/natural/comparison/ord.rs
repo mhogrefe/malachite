@@ -3,6 +3,12 @@ use std::cmp::Ordering;
 
 /// Compares `self` to a `Natural`.
 ///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = `self.significant_bits() + other.significant_bits()`
+///
 /// # Examples
 /// ```
 /// use malachite_native::natural::Natural;
@@ -26,17 +32,7 @@ impl Ord for Natural {
             (&Small(_), &Large(_)) => Ordering::Less,
             (&Large(_), &Small(_)) => Ordering::Greater,
             (&Large(ref xs), &Large(ref ys)) => {
-                let len_compare = xs.len().cmp(&ys.len());
-                if len_compare != Ordering::Equal {
-                    return len_compare;
-                }
-                for (x, y) in xs.into_iter().zip(ys.into_iter()).rev() {
-                    let limb_compare = x.cmp(y);
-                    if limb_compare != Ordering::Equal {
-                        return limb_compare;
-                    }
-                }
-                Ordering::Equal
+                xs.len().cmp(&ys.len()).then_with(|| xs.into_iter().rev().cmp(ys.into_iter().rev()))
             }
         }
     }

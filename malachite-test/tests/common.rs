@@ -16,7 +16,7 @@ pub fn test_eq_helper<T: Debug + Eq + FromStr>(strings: &[&str])
     }
 }
 
-pub fn test_ord_helper<T: Debug + FromStr + Ord>(strings: &[&str])
+pub fn test_cmp_helper<T: Debug + FromStr + Ord>(strings: &[&str])
     where T::Err: Debug
 {
     let xs: Vec<T> = strings.iter().map(|s| s.parse().unwrap()).collect();

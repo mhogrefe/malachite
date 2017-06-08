@@ -14,7 +14,7 @@ pub fn num_partial_cmp_u32(x: &num::BigUint, u: u32) -> Option<Ordering> {
     x.partial_cmp(&num::BigUint::from(u))
 }
 
-pub fn demo_exhaustive_natural_partial_ord_u32(limit: usize) {
+pub fn demo_exhaustive_natural_partial_cmp_u32(limit: usize) {
     for (n, u) in exhaustive_pairs(exhaustive_naturals(), exhaustive_u::<u32>()).take(limit) {
         match n.partial_cmp(&u).unwrap() {
             Ordering::Less => println!("{} < {}", n, u),
@@ -24,7 +24,7 @@ pub fn demo_exhaustive_natural_partial_ord_u32(limit: usize) {
     }
 }
 
-pub fn demo_random_natural_partial_ord_u32(limit: usize) {
+pub fn demo_random_natural_partial_cmp_u32(limit: usize) {
     for (n, u) in random_pairs(&EXAMPLE_SEED,
                                &(|seed| random_naturals(seed, 32)),
                                &(|seed| random_x::<u32>(seed)))
@@ -37,7 +37,7 @@ pub fn demo_random_natural_partial_ord_u32(limit: usize) {
     }
 }
 
-pub fn demo_exhaustive_u32_partial_ord_natural(limit: usize) {
+pub fn demo_exhaustive_u32_partial_cmp_natural(limit: usize) {
     for (u, n) in exhaustive_pairs(exhaustive_u::<u32>(), exhaustive_naturals()).take(limit) {
         match u.partial_cmp(&n).unwrap() {
             Ordering::Less => println!("{} < {}", u, n),
@@ -47,7 +47,7 @@ pub fn demo_exhaustive_u32_partial_ord_natural(limit: usize) {
     }
 }
 
-pub fn demo_random_u32_partial_ord_natural(limit: usize) {
+pub fn demo_random_u32_partial_cmp_natural(limit: usize) {
     for (u, n) in random_pairs(&EXAMPLE_SEED,
                                &(|seed| random_x::<u32>(seed)),
                                &(|seed| random_naturals(seed, 32)))
@@ -77,7 +77,7 @@ pub fn benchmark_exhaustive_natural_partial_cmp_u32(limit: usize, file_name: &st
                     g_name: "malachite-native",
                     h_name: "num",
                     i_name: "rugint",
-                    title: "Natural.partial_cmp(&u32)",
+                    title: "Natural.partial\\\\_cmp(&u32)",
                     x_axis_label: "n.significant\\\\_bits()",
                     y_axis_label: "time (ns)",
                     file_name: &format!("benchmarks/{}", file_name),
@@ -103,7 +103,7 @@ pub fn benchmark_random_natural_partial_cmp_u32(limit: usize, scale: u32, file_n
                     g_name: "malachite-native",
                     h_name: "num",
                     i_name: "rugint",
-                    title: "Natural.partial_cmp(&u32)",
+                    title: "Natural.partial\\\\_cmp(&u32)",
                     x_axis_label: "n.significant\\\\_bits()",
                     y_axis_label: "time (ns)",
                     file_name: &format!("benchmarks/{}", file_name),
@@ -124,7 +124,7 @@ pub fn benchmark_exhaustive_u32_partial_cmp_natural(limit: usize, file_name: &st
                     f_name: "malachite-gmp",
                     g_name: "malachite-native",
                     h_name: "rugint",
-                    title: "u32.partial_cmp(&Natural)",
+                    title: "u32.partial\\\\_cmp(&Natural)",
                     x_axis_label: "n.significant\\\\_bits()",
                     y_axis_label: "time (ns)",
                     file_name: &format!("benchmarks/{}", file_name),
@@ -147,7 +147,7 @@ pub fn benchmark_random_u32_partial_cmp_natural(limit: usize, scale: u32, file_n
                     f_name: "malachite-gmp",
                     g_name: "malachite-native",
                     h_name: "rugint",
-                    title: "u32.partial_cmp(&Natural)",
+                    title: "u32.partial\\\\_cmp(&Natural)",
                     x_axis_label: "n.significant\\\\_bits()",
                     y_axis_label: "time (ns)",
                     file_name: &format!("benchmarks/{}", file_name),

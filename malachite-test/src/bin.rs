@@ -3,6 +3,7 @@ extern crate malachite_test;
 use malachite_test::natural::arithmetic::add::*;
 use malachite_test::natural::comparison::eq::*;
 use malachite_test::natural::comparison::hash::*;
+use malachite_test::natural::comparison::ord::*;
 use malachite_test::natural::comparison::partial_eq_integer::*;
 use malachite_test::natural::comparison::partial_eq_u32::*;
 use malachite_test::natural::comparison::partial_ord_u32::*;
@@ -44,10 +45,17 @@ fn main() {
                 "exhaustive_natural_assign_u64" => demo_exhaustive_natural_assign_u64(limit),
                 "exhaustive_natural_clone" => demo_exhaustive_natural_clone(limit),
                 "exhaustive_natural_clone_from" => demo_exhaustive_natural_clone_from(limit),
+                "exhaustive_natural_cmp" => demo_exhaustive_natural_cmp(limit),
                 "exhaustive_natural_eq" => demo_exhaustive_natural_eq(limit),
                 "exhaustive_natural_from_u32" => demo_exhaustive_natural_from_u32(limit),
                 "exhaustive_natural_from_u64" => demo_exhaustive_natural_from_u64(limit),
                 "exhaustive_natural_hash" => demo_exhaustive_natural_hash(limit),
+                "exhaustive_natural_partial_cmp_u32" => {
+                    demo_exhaustive_natural_partial_cmp_u32(limit)
+                }
+                "exhaustive_u32_partial_cmp_natural" => {
+                    demo_exhaustive_u32_partial_cmp_natural(limit)
+                }
                 "exhaustive_natural_partial_eq_integer" => {
                     demo_exhaustive_natural_partial_eq_integer(limit)
                 }
@@ -56,12 +64,6 @@ fn main() {
                 }
                 "exhaustive_u32_partial_eq_natural" => {
                     demo_exhaustive_u32_partial_eq_natural(limit)
-                }
-                "exhaustive_natural_partial_ord_u32" => {
-                    demo_exhaustive_natural_partial_ord_u32(limit)
-                }
-                "exhaustive_u32_partial_ord_natural" => {
-                    demo_exhaustive_u32_partial_ord_natural(limit)
                 }
                 "exhaustive_natural_into_integer" => demo_exhaustive_natural_into_integer(limit),
                 "exhaustive_natural_to_integer" => demo_exhaustive_natural_to_integer(limit),
@@ -84,6 +86,7 @@ fn main() {
                 "random_natural_assign_u64" => demo_random_natural_assign_u64(limit),
                 "random_natural_clone" => demo_random_natural_clone(limit),
                 "random_natural_clone_from" => demo_random_natural_clone_from(limit),
+                "random_natural_cmp" => demo_random_natural_cmp(limit),
                 "random_natural_eq" => demo_random_natural_eq(limit),
                 "random_natural_from_u32" => demo_random_natural_from_u32(limit),
                 "random_natural_from_u64" => demo_random_natural_from_u64(limit),
@@ -94,8 +97,8 @@ fn main() {
                 }
                 "random_natural_partial_eq_u32" => demo_random_natural_partial_eq_u32(limit),
                 "random_u32_partial_eq_natural" => demo_random_u32_partial_eq_natural(limit),
-                "random_natural_partial_ord_u32" => demo_random_natural_partial_ord_u32(limit),
-                "random_u32_partial_ord_natural" => demo_random_u32_partial_ord_natural(limit),
+                "random_natural_partial_cmp_u32" => demo_random_natural_partial_cmp_u32(limit),
+                "random_u32_partial_cmp_natural" => demo_random_u32_partial_cmp_natural(limit),
                 "random_natural_to_integer" => demo_random_natural_to_integer(limit),
                 "random_natural_to_u32" => demo_random_natural_to_u32(limit),
                 "random_natural_to_u32_wrapping" => demo_random_natural_to_u32_wrapping(limit),
@@ -124,6 +127,7 @@ fn main() {
                 "exhaustive_natural_clone_from" => {
                     benchmark_exhaustive_natural_clone_from(limit, "temp.gp")
                 }
+                "exhaustive_natural_cmp" => benchmark_exhaustive_natural_cmp(limit, "temp.gp"),
                 "exhaustive_natural_eq" => benchmark_exhaustive_natural_eq(limit, "temp.gp"),
                 "exhaustive_natural_from_u32" => {
                     benchmark_exhaustive_natural_from_u32(limit, "temp.gp")
@@ -177,6 +181,7 @@ fn main() {
                 "random_natural_clone_from" => {
                     benchmark_random_natural_clone_from(limit, 1024, "temp.gp")
                 }
+                "random_natural_cmp" => benchmark_random_natural_cmp(limit, 1024, "temp.gp"),
                 "random_natural_eq" => benchmark_random_natural_eq(limit, 1024, "temp.gp"),
                 "random_natural_from_u32" => benchmark_random_natural_from_u32(limit, "temp.gp"),
                 "random_natural_from_u64" => benchmark_random_natural_from_u64(limit, "temp.gp"),
@@ -220,6 +225,7 @@ fn main() {
                     benchmark_exhaustive_natural_clone(100000, "exhaustive_natural_clone.gp");
                     benchmark_exhaustive_natural_clone_from(100000,
                                                             "exhaustive_natural_clone_from.gp");
+                    benchmark_exhaustive_natural_cmp(100000, "exhaustive_natural_cmp.gp");
                     benchmark_exhaustive_natural_eq(100000, "exhaustive_natural_eq.gp");
                     benchmark_exhaustive_natural_from_u32(100000, "exhaustive_natural_from_u32.gp");
                     benchmark_exhaustive_natural_from_u64(100000, "exhaustive_natural_from_u64.gp");
@@ -257,6 +263,7 @@ fn main() {
                     benchmark_random_natural_clone_from(100000,
                                                         1024,
                                                         "random_natural_clone_from.gp");
+                    benchmark_random_natural_cmp(100000, 1024, "random_natural_cmp.gp");
                     benchmark_random_natural_eq(100000, 1024, "random_natural_eq.gp");
                     benchmark_random_natural_from_u32(100000, "random_natural_from_u32.gp");
                     benchmark_random_natural_from_u64(100000, "random_natural_from_u64.gp");
