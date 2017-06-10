@@ -19,6 +19,9 @@ use natural::Natural;
 /// ```
 impl PartialEq<Integer> for Natural {
     fn eq(&self, other: &Integer) -> bool {
-        other == self
+        match *other {
+            Integer { sign: true, ref abs } if self == abs => true,
+            _ => false,
+        }
     }
 }

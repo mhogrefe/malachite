@@ -18,7 +18,10 @@ impl Natural {
     ///            "1000000000000");
     /// ```
     pub fn into_integer(self) -> Integer {
-        Integer::internal_from_natural(self)
+        Integer {
+            sign: true,
+            abs: self,
+        }
     }
 
     /// Converts a `Natural` to an `Integer`. This implementation takes `self` by reference.
@@ -39,6 +42,9 @@ impl Natural {
     ///            "1000000000000");
     /// ```
     pub fn to_integer(&self) -> Integer {
-        Integer::internal_from_natural_ref(self)
+        Integer {
+            sign: true,
+            abs: self.clone(),
+        }
     }
 }

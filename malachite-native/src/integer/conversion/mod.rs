@@ -1,6 +1,5 @@
 use error::ParseIntegerError;
 use integer::Integer;
-use natural::Natural;
 use std::fmt::{self, Debug, Display, Formatter, Write};
 use std::str::FromStr;
 
@@ -28,20 +27,6 @@ impl Integer {
     //TODO test
     pub fn assign_str(&mut self, src: &str) -> Result<(), ParseIntegerError> {
         self.assign_str_radix(src, 10)
-    }
-
-    pub fn internal_from_natural(n: Natural) -> Integer {
-        Integer {
-            sign: true,
-            abs: n,
-        }
-    }
-
-    pub fn internal_from_natural_ref(n: &Natural) -> Integer {
-        Integer {
-            sign: true,
-            abs: n.clone(),
-        }
     }
 }
 

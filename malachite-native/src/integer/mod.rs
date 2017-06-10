@@ -6,8 +6,8 @@ use natural::Natural;
 /// Only integers outside this range incur the costs of heap-allocation.
 #[derive(Clone, PartialEq, Eq, Hash)]
 pub struct Integer {
-    sign: bool, // must be true if abs is zero
-    abs: Natural,
+    pub(crate) sign: bool, // must be true if abs is zero
+    pub(crate) abs: Natural,
 }
 
 impl Integer {
