@@ -4,6 +4,12 @@ use std::cmp::Ordering;
 
 /// Compares `self` to an `Integer`.
 ///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = `self.significant_bits() + other.significant_bits()`
+///
 /// # Examples
 /// ```
 /// use malachite_native::integer::Integer;
@@ -18,6 +24,10 @@ use std::cmp::Ordering;
 /// ```
 impl PartialOrd<Integer> for Natural {
     fn partial_cmp(&self, other: &Integer) -> Option<Ordering> {
-        other.partial_cmp(self).map(|o| o.reverse())
+        if other.sign {
+            self.partial_cmp(&other.abs)
+        } else {
+            Some(Ordering::Greater)
+        }
     }
 }

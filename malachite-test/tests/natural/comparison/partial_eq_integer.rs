@@ -1,7 +1,9 @@
 use common::LARGE_LIMIT;
 use malachite_native as native;
 use malachite_gmp as gmp;
-use malachite_test::common::{gmp_integer_to_native, gmp_natural_to_native};
+use malachite_test::common::{gmp_integer_to_native, gmp_natural_to_native, native_integer_to_rugint,
+                             native_natural_to_rugint_integer};
+use rugint;
 use rust_wheels::iterators::common::EXAMPLE_SEED;
 use rust_wheels::iterators::integers::{exhaustive_integers, random_integers};
 use rust_wheels::iterators::naturals::{exhaustive_naturals, random_naturals};
@@ -17,6 +19,8 @@ fn test_partial_eq_integer() {
         assert_eq!(gmp::natural::Natural::from_str(u).unwrap() ==
                    gmp::integer::Integer::from_str(v).unwrap(),
                    out);
+        assert_eq!(rugint::Integer::from_str(u).unwrap() == rugint::Integer::from_str(v).unwrap(),
+                   out);
     };
     test("0", "0", true);
     test("0", "5", false);
@@ -31,13 +35,15 @@ fn test_partial_eq_integer() {
 
 #[test]
 fn partial_eq_integer_properties() {
-    // x == y is equivalent for malachite-gmp and malachite-native.
+    // x == y is equivalent for malachite-gmp, malachite-native, and rugint.
     // x.into_integer() == y is equivalent to x == y.
     let natural_and_integer = |gmp_x: gmp::natural::Natural, gmp_y: gmp::integer::Integer| {
         let x = gmp_natural_to_native(&gmp_x);
         let y = gmp_integer_to_native(&gmp_y);
         let eq = x == y;
         assert_eq!(gmp_x == gmp_y, eq);
+        assert_eq!(native_natural_to_rugint_integer(&x) == native_integer_to_rugint(&y),
+                   eq);
         assert_eq!(x.into_integer() == y, eq)
     };
 
