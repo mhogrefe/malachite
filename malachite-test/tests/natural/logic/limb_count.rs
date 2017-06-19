@@ -1,5 +1,9 @@
+use common::LARGE_LIMIT;
 use malachite_native::natural as native;
 use malachite_gmp::natural as gmp;
+use malachite_test::common::gmp_natural_to_native;
+use rust_wheels::iterators::common::EXAMPLE_SEED;
+use rust_wheels::iterators::naturals::{exhaustive_naturals, random_naturals};
 use std::str::FromStr;
 
 #[test]
@@ -15,4 +19,24 @@ fn test_limb_count() {
     test("4294967296", 2);
     test("18446744073709551615", 2);
     test("18446744073709551616", 3);
+}
+
+#[test]
+fn limb_count_properties() {
+    // x.limb_count() is equivalent for malachite-gmp and malachite-native.
+    // (x < 2^32) == (x.limb_count() <= 1)
+    let one_natural = |gmp_x: gmp::Natural| {
+        let x = gmp_natural_to_native(&gmp_x);
+        let native_limb_count = x.limb_count();
+        assert_eq!(gmp_x.limb_count(), native_limb_count);
+        assert_eq!(x <= u32::max_value(), x.limb_count() <= 1);
+    };
+
+    for n in exhaustive_naturals().take(LARGE_LIMIT) {
+        one_natural(n);
+    }
+
+    for n in random_naturals(&EXAMPLE_SEED, 32).take(LARGE_LIMIT) {
+        one_natural(n);
+    }
 }

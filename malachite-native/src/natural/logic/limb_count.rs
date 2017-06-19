@@ -3,6 +3,10 @@ use natural::Natural::{self, Large, Small};
 impl Natural {
     /// Returns the number of limbs, or base-2^(32) digits, of `self`. Zero has 0 limbs.
     ///
+    /// Time: worst case O(1)
+    ///
+    /// Additional memory: worst case O(1)
+    ///
     /// # Example
     /// ```
     /// use malachite_native::natural::Natural;

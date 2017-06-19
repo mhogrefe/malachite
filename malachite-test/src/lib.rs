@@ -51,6 +51,8 @@ pub mod natural {
     }
     pub mod logic {
         pub mod get_bit;
+        pub mod limb_count;
         pub mod set_bit;
+        pub mod significant_bits;
     }
 }

@@ -17,6 +17,8 @@ use malachite_test::natural::conversion::from_u64::*;
 use malachite_test::natural::conversion::to_integer::*;
 use malachite_test::natural::conversion::to_u32::*;
 use malachite_test::natural::conversion::to_u64::*;
+use malachite_test::natural::logic::limb_count::*;
+use malachite_test::natural::logic::significant_bits::*;
 use std::env;
 
 fn main() {
@@ -51,6 +53,7 @@ fn main() {
                 "exhaustive_natural_from_u32" => demo_exhaustive_natural_from_u32(limit),
                 "exhaustive_natural_from_u64" => demo_exhaustive_natural_from_u64(limit),
                 "exhaustive_natural_hash" => demo_exhaustive_natural_hash(limit),
+                "exhaustive_natural_limb_count" => demo_exhaustive_natural_limb_count(limit),
                 "exhaustive_natural_partial_cmp_integer" => {
                     demo_exhaustive_natural_partial_cmp_integer(limit)
                 }
@@ -68,6 +71,9 @@ fn main() {
                 }
                 "exhaustive_u32_partial_eq_natural" => {
                     demo_exhaustive_u32_partial_eq_natural(limit)
+                }
+                "exhaustive_natural_significant_bits" => {
+                    demo_exhaustive_natural_significant_bits(limit)
                 }
                 "exhaustive_natural_into_integer" => demo_exhaustive_natural_into_integer(limit),
                 "exhaustive_natural_to_integer" => demo_exhaustive_natural_to_integer(limit),
@@ -95,7 +101,7 @@ fn main() {
                 "random_natural_from_u32" => demo_random_natural_from_u32(limit),
                 "random_natural_from_u64" => demo_random_natural_from_u64(limit),
                 "random_natural_hash" => demo_random_natural_hash(limit),
-                "random_natural_into_integer" => demo_random_natural_into_integer(limit),
+                "random_natural_limb_count" => demo_random_natural_limb_count(limit),
                 "random_natural_partial_eq_integer" => {
                     demo_random_natural_partial_eq_integer(limit)
                 }
@@ -106,6 +112,8 @@ fn main() {
                 }
                 "random_natural_partial_cmp_u32" => demo_random_natural_partial_cmp_u32(limit),
                 "random_u32_partial_cmp_natural" => demo_random_u32_partial_cmp_natural(limit),
+                "random_natural_significant_bits" => demo_random_natural_significant_bits(limit),
+                "random_natural_into_integer" => demo_random_natural_into_integer(limit),
                 "random_natural_to_integer" => demo_random_natural_to_integer(limit),
                 "random_natural_to_u32" => demo_random_natural_to_u32(limit),
                 "random_natural_to_u32_wrapping" => demo_random_natural_to_u32_wrapping(limit),
@@ -143,6 +151,9 @@ fn main() {
                     benchmark_exhaustive_natural_from_u64(limit, "temp.gp")
                 }
                 "exhaustive_natural_hash" => benchmark_exhaustive_natural_hash(limit, "temp.gp"),
+                "exhaustive_natural_limb_count" => {
+                    benchmark_exhaustive_natural_limb_count(limit, "temp.gp")
+                }
                 "exhaustive_natural_partial_eq_integer" => {
                     benchmark_exhaustive_natural_partial_eq_integer(limit, "temp.gp")
                 }
@@ -160,6 +171,9 @@ fn main() {
                 }
                 "exhaustive_u32_partial_cmp_natural" => {
                     benchmark_exhaustive_u32_partial_cmp_natural(limit, "temp.gp")
+                }
+                "exhaustive_natural_significant_bits" => {
+                    benchmark_exhaustive_natural_significant_bits(limit, "temp.gp")
                 }
                 "exhaustive_natural_to_integer" => {
                     benchmark_exhaustive_natural_to_integer(limit, "temp.gp")
@@ -196,6 +210,9 @@ fn main() {
                 "random_natural_from_u32" => benchmark_random_natural_from_u32(limit, "temp.gp"),
                 "random_natural_from_u64" => benchmark_random_natural_from_u64(limit, "temp.gp"),
                 "random_natural_hash" => benchmark_random_natural_hash(limit, 1024, "temp.gp"),
+                "random_natural_limb_count" => {
+                    benchmark_random_natural_limb_count(limit, 1024, "temp.gp")
+                }
                 "random_natural_partial_eq_integer" => {
                     benchmark_random_natural_partial_eq_integer(limit, 1024, "temp.gp")
                 }
@@ -213,6 +230,9 @@ fn main() {
                 }
                 "random_u32_partial_cmp_natural" => {
                     benchmark_random_u32_partial_cmp_natural(limit, 1024, "temp.gp")
+                }
+                "random_natural_significant_bits" => {
+                    benchmark_random_natural_significant_bits(limit, 1024, "temp.gp")
                 }
                 "random_natural_to_integer" => {
                     benchmark_random_natural_to_integer(limit, 1024, "temp.gp")
@@ -243,6 +263,8 @@ fn main() {
                     benchmark_exhaustive_natural_from_u32(100000, "exhaustive_natural_from_u32.gp");
                     benchmark_exhaustive_natural_from_u64(100000, "exhaustive_natural_from_u64.gp");
                     benchmark_exhaustive_natural_hash(100000, "exhaustive_natural_hash.gp");
+                    benchmark_exhaustive_natural_limb_count(100000,
+                                                            "exhaustive_natural_limb_count.gp");
                     let s = "exhaustive_natural_partial_eq_integer.gp";
                     benchmark_exhaustive_natural_partial_eq_integer(100000, s);
                     let s = "exhaustive_natural_partial_eq_u32.gp";
@@ -253,8 +275,10 @@ fn main() {
                     benchmark_exhaustive_natural_partial_cmp_integer(100000, s);
                     let s = "exhaustive_natural_partial_cmp_u32.gp";
                     benchmark_exhaustive_natural_partial_cmp_u32(100000, s);
-                    let s = "exhaustive_u32_partial_cmp_natural.gp";
-                    benchmark_exhaustive_u32_partial_cmp_natural(100000, s);
+                    let s = "exhaustive_natural_partial_cmp_u32.gp";
+                    benchmark_exhaustive_natural_partial_cmp_u32(100000, s);
+                    let s = "exhaustive_natural_significant_bits.gp";
+                    benchmark_exhaustive_natural_significant_bits(100000, s);
                     benchmark_exhaustive_natural_to_integer(100000,
                                                             "exhaustive_natural_to_integer.gp");
                     benchmark_exhaustive_natural_to_u32(100000, "exhaustive_natural_to_u32.gp");
@@ -283,6 +307,9 @@ fn main() {
                     benchmark_random_natural_from_u32(100000, "random_natural_from_u32.gp");
                     benchmark_random_natural_from_u64(100000, "random_natural_from_u64.gp");
                     benchmark_random_natural_hash(100000, 1024, "random_natural_hash.gp");
+                    benchmark_random_natural_limb_count(100000,
+                                                        1024,
+                                                        "random_natural_limb_count.gp");
                     let s = "random_natural_partial_eq_integer.gp";
                     benchmark_random_natural_partial_eq_integer(100000, 1024, s);
                     benchmark_random_natural_partial_eq_u32(100000,
@@ -299,6 +326,9 @@ fn main() {
                     benchmark_random_u32_partial_cmp_natural(100000,
                                                              1024,
                                                              "random_u32_partial_cmp_natural.gp");
+                    benchmark_random_natural_significant_bits(100000,
+                                                              1024,
+                                                              "random_natural_significant_bits.gp");
                     benchmark_random_natural_to_integer(100000,
                                                         1024,
                                                         "random_natural_to_integer.gp");

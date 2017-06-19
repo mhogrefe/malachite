@@ -5,6 +5,10 @@ impl Natural {
     /// Returns the smallest number of bits necessary to represent `self`. 0 has zero significant
     /// bits.
     ///
+    /// Time: worst case O(1)
+    ///
+    /// Additional memory: worst case O(1)
+    ///
     /// # Example
     /// ```
     /// use malachite_native::natural::Natural;

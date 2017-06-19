@@ -1,6 +1,12 @@
+use common::LARGE_LIMIT;
 use malachite_native::natural as native;
 use malachite_gmp::natural as gmp;
+use malachite_test::common::{gmp_natural_to_native, native_natural_to_num_biguint,
+                             native_natural_to_rugint_integer};
 use num;
+use rugint;
+use rust_wheels::iterators::common::EXAMPLE_SEED;
+use rust_wheels::iterators::naturals::{exhaustive_naturals, random_naturals};
 use std::str::FromStr;
 
 #[test]
@@ -10,6 +16,8 @@ fn test_significant_bits() {
                    out);
         assert_eq!(gmp::Natural::from_str(n).unwrap().significant_bits(), out);
         assert_eq!(num::BigUint::from_str(n).unwrap().bits() as u64, out);
+        assert_eq!(rugint::Integer::from_str(n).unwrap().significant_bits() as u64,
+                   out);
     };
     test("0", 0);
     test("100", 7);
@@ -18,4 +26,28 @@ fn test_significant_bits() {
     test("4294967296", 33);
     test("18446744073709551615", 64);
     test("18446744073709551616", 65);
+}
+
+#[test]
+fn significant_bits_properties() {
+    // x.significant_bits() is equivalent for malachite-gmp, malachite-native, num, and rugint.
+    // (x < 2^32) == (x.significant_bits() <= 32)
+    let one_natural = |gmp_x: gmp::Natural| {
+        let x = gmp_natural_to_native(&gmp_x);
+        let native_significant_bits = x.significant_bits();
+        assert_eq!(gmp_x.significant_bits(), native_significant_bits);
+        assert_eq!(native_natural_to_num_biguint(&x).bits() as u64,
+                   native_significant_bits);
+        assert_eq!(native_natural_to_rugint_integer(&x).significant_bits() as u64,
+                   native_significant_bits);
+        assert_eq!(x <= u32::max_value(), native_significant_bits <= 32);
+    };
+
+    for n in exhaustive_naturals().take(LARGE_LIMIT) {
+        one_natural(n);
+    }
+
+    for n in random_naturals(&EXAMPLE_SEED, 32).take(LARGE_LIMIT) {
+        one_natural(n);
+    }
 }
