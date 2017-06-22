@@ -32,15 +32,21 @@ fn test_significant_bits() {
 fn significant_bits_properties() {
     // x.significant_bits() is equivalent for malachite-gmp, malachite-native, num, and rugint.
     // (x < 2^32) == (x.significant_bits() <= 32)
+    // if x != 0, (x.significant_bits() == n) == (2^(n-1) <= x < 2^n)
     let one_natural = |gmp_x: gmp::Natural| {
         let x = gmp_natural_to_native(&gmp_x);
-        let native_significant_bits = x.significant_bits();
-        assert_eq!(gmp_x.significant_bits(), native_significant_bits);
+        let significant_bits = x.significant_bits();
+        assert_eq!(gmp_x.significant_bits(), significant_bits);
         assert_eq!(native_natural_to_num_biguint(&x).bits() as u64,
-                   native_significant_bits);
+                   significant_bits);
         assert_eq!(native_natural_to_rugint_integer(&x).significant_bits() as u64,
-                   native_significant_bits);
-        assert_eq!(x <= u32::max_value(), native_significant_bits <= 32);
+                   significant_bits);
+        assert_eq!(x <= u32::max_value(), significant_bits <= 32);
+        if x != 0 {
+            let n = significant_bits as u32;
+            assert!(native::Natural::from(1u32) << (n - 1) <= x);
+            assert!(x < native::Natural::from(1u32) << n);
+        }
     };
 
     for n in exhaustive_naturals().take(LARGE_LIMIT) {

@@ -5,15 +5,11 @@ use rugint;
 use std::str::FromStr;
 
 pub fn gmp_natural_to_native(n: &gmp::natural::Natural) -> native::natural::Natural {
-    let mut native = native::natural::Natural::new();
-    native.assign_limbs_le(n.limbs_le().as_slice());
-    native
+    native::natural::Natural::from_limbs_le(n.limbs_le().as_slice())
 }
 
 pub fn native_natural_to_gmp(n: &native::natural::Natural) -> gmp::natural::Natural {
-    let mut gmp = gmp::natural::Natural::new();
-    gmp.assign_limbs_le(n.limbs_le().as_slice());
-    gmp
+    gmp::natural::Natural::from_limbs_le(n.limbs_le().as_slice())
 }
 
 pub fn num_biguint_to_native_natural(n: &num::BigUint) -> native::natural::Natural {
@@ -41,12 +37,11 @@ pub fn gmp_natural_to_rugint_integer(n: &gmp::natural::Natural) -> rugint::Integ
 }
 
 pub fn gmp_integer_to_native(n: &gmp::integer::Integer) -> native::integer::Integer {
-    let mut native = native::natural::Natural::new();
     //TODO use better unsigned_abs
-    native.assign_limbs_le(n.clone()
-                               .unsigned_abs()
-                               .limbs_le()
-                               .as_slice());
+    let native = native::natural::Natural::from_limbs_le(n.clone()
+                                                             .unsigned_abs()
+                                                             .limbs_le()
+                                                             .as_slice());
     if n >= &0 {
         native.into_integer()
     } else {
@@ -54,17 +49,16 @@ pub fn gmp_integer_to_native(n: &gmp::integer::Integer) -> native::integer::Inte
     }
 }
 
-pub fn native_integer_to_gmp(n: &gmp::integer::Integer) -> gmp::integer::Integer {
-    let mut native = gmp::natural::Natural::new();
+pub fn native_integer_to_gmp(n: &native::integer::Integer) -> gmp::integer::Integer {
     //TODO use better unsigned_abs
-    native.assign_limbs_le(n.clone()
-                               .unsigned_abs()
-                               .limbs_le()
-                               .as_slice());
+    let gmp = gmp::natural::Natural::from_limbs_le(n.clone()
+                                                       .unsigned_abs()
+                                                       .limbs_le()
+                                                       .as_slice());
     if n >= &0 {
-        native.into_integer()
+        gmp.into_integer()
     } else {
-        -native.into_integer()
+        -gmp.into_integer()
     }
 }
 

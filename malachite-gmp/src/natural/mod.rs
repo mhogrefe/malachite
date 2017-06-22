@@ -153,10 +153,10 @@ pub mod comparison {
     pub mod partial_ord_u32;
 }
 pub mod logic {
-    pub mod assign_limbs_le;
+    pub mod from_limbs;
     pub mod get_bit;
     pub mod limb_count;
-    pub mod limbs_le;
+    pub mod limbs;
     pub mod set_bit;
     pub mod significant_bits;
     pub mod trailing_zeros;

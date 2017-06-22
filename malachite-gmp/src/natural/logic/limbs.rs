@@ -8,6 +8,8 @@ impl Natural {
     /// significant limbs have lower indices in the output vector. Although GMP may use 32- or
     /// 64-bit limbs internally, this method always returns 32-bit limbs.
     ///
+    /// This method is more efficient than `Natural::limbs_be`.
+    ///
     /// # Examples
     /// ```
     /// use malachite_gmp::natural::Natural;
@@ -42,5 +44,28 @@ impl Natural {
                 }
             }
         }
+    }
+
+    /// Returns the limbs, or base-2^(32) digits, of `self`, in big-endian order, so that less
+    /// significant limbs have higher indices in the output vector. Although GMP may use 32- or
+    /// 64-bit limbs internally, this method always returns 32-bit limbs.
+    ///
+    /// This method is less efficient than `Natural::limbs_le`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_gmp::natural::Natural;
+    /// use std::str::FromStr;
+    ///
+    /// assert!(Natural::from(0u32).limbs_be().is_empty());
+    /// assert_eq!(Natural::from(123u32).limbs_be(), vec![123]);
+    /// // 10^12 = 232 * 2^32 + 3567587328
+    /// assert_eq!(Natural::from_str("1000000000000").unwrap().limbs_be(), vec![232, 3567587328]);
+    /// ```
+    pub fn limbs_be(&self) -> Vec<u32> {
+        self.limbs_le()
+            .into_iter()
+            .rev()
+            .collect()
     }
 }

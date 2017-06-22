@@ -8,13 +8,13 @@ use rust_wheels::iterators::naturals::{exhaustive_naturals, random_naturals};
 
 pub fn demo_exhaustive_natural_significant_bits(limit: usize) {
     for n in exhaustive_naturals().take(limit) {
-        println!("significant_bits({}) = {:?}", n, n.significant_bits());
+        println!("significant_bits({}) = {}", n, n.significant_bits());
     }
 }
 
 pub fn demo_random_natural_significant_bits(limit: usize) {
     for n in random_naturals(&EXAMPLE_SEED, 32).take(limit) {
-        println!("significant_bits({}) = {:?}", n, n.significant_bits());
+        println!("significant_bits({}) = {}", n, n.significant_bits());
     }
 }
 

@@ -8,26 +8,26 @@ use rust_wheels::iterators::naturals::{exhaustive_naturals, random_naturals};
 pub fn demo_exhaustive_natural_into_integer(limit: usize) {
     for n in exhaustive_naturals().take(limit) {
         let n_clone = n.clone();
-        println!("into_integer({}) = {:?}", n_clone, n.into_integer());
+        println!("into_integer({}) = {}", n_clone, n.into_integer());
     }
 }
 
 pub fn demo_random_natural_into_integer(limit: usize) {
     for n in random_naturals(&EXAMPLE_SEED, 32).take(limit) {
         let n_clone = n.clone();
-        println!("into_integer({}) = {:?}", n_clone, n.into_integer());
+        println!("into_integer({}) = {}", n_clone, n.into_integer());
     }
 }
 
 pub fn demo_exhaustive_natural_to_integer(limit: usize) {
     for n in exhaustive_naturals().take(limit) {
-        println!("to_integer(&{}) = {:?}", n, n.to_integer());
+        println!("to_integer(&{}) = {}", n, n.to_integer());
     }
 }
 
 pub fn demo_random_natural_to_integer(limit: usize) {
     for n in random_naturals(&EXAMPLE_SEED, 32).take(limit) {
-        println!("to_integer(&{}) = {:?}", n, n.to_integer());
+        println!("to_integer(&{}) = {}", n, n.to_integer());
     }
 }
 

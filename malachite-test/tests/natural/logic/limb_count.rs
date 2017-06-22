@@ -25,11 +25,17 @@ fn test_limb_count() {
 fn limb_count_properties() {
     // x.limb_count() is equivalent for malachite-gmp and malachite-native.
     // (x < 2^32) == (x.limb_count() <= 1)
+    // if x != 0, (x.limb_count() == n) == (2^(32*(n-1)) <= x < 2^(32*n))
     let one_natural = |gmp_x: gmp::Natural| {
         let x = gmp_natural_to_native(&gmp_x);
-        let native_limb_count = x.limb_count();
-        assert_eq!(gmp_x.limb_count(), native_limb_count);
+        let limb_count = x.limb_count();
+        assert_eq!(gmp_x.limb_count(), limb_count);
         assert_eq!(x <= u32::max_value(), x.limb_count() <= 1);
+        if x != 0 {
+            let n = limb_count as u32;
+            assert!(native::Natural::from(1u32) << ((n - 1) << 5) <= x);
+            assert!(x < native::Natural::from(1u32) << (n << 5));
+        }
     };
 
     for n in exhaustive_naturals().take(LARGE_LIMIT) {

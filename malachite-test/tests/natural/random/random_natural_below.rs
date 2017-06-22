@@ -1,5 +1,5 @@
 use malachite::natural::Natural;
-use malachite::natural::random::random_below::random_below;
+use malachite::natural::random::random_natural_below::random_natural_below;
 use rand::{SeedableRng, StdRng};
 use std::str::FromStr;
 
@@ -8,7 +8,7 @@ fn test_random_below() {
     let test = |n, out| {
         let seed: &[_] = &[1, 2, 3, 4];
         let mut rng: StdRng = SeedableRng::from_seed(seed);
-        let x = random_below(&mut rng, &Natural::from_str(n).unwrap());
+        let x = random_natural_below(&mut rng, &Natural::from_str(n).unwrap());
         assert_eq!(x.to_string(), out);
         assert!(x.is_valid());
     };

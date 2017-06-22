@@ -83,17 +83,17 @@ pub mod natural {
         pub mod to_u64;
     }
     pub mod logic {
-        pub mod assign_limbs_le;
+        pub mod from_limbs;
         pub mod get_bit;
         pub mod limb_count;
-        pub mod limbs_le;
+        pub mod limbs;
         pub mod set_bit;
         pub mod significant_bits;
         pub mod trailing_zeros;
     }
     pub mod random {
-        pub mod assign_random_bits;
-        pub mod assign_random_up_to_bits;
-        pub mod random_below;
+        pub mod random_natural_from_bits;
+        pub mod random_natural_up_to_bits;
+        pub mod random_natural_below;
     }
 }

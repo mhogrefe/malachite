@@ -14,6 +14,6 @@ use traits::Assign;
 /// ```
 impl Assign<u64> for Natural {
     fn assign(&mut self, other: u64) {
-        self.assign_limbs_le(&[get_lower(other), get_upper(other)]);
+        *self = Natural::from_limbs_le(&[get_lower(other), get_upper(other)]);
     }
 }

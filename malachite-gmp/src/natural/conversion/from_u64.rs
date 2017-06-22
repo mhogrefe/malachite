@@ -10,8 +10,6 @@ use natural::{get_lower, get_upper, Natural};
 /// ```
 impl From<u64> for Natural {
     fn from(u: u64) -> Natural {
-        let mut n = Natural::new();
-        n.assign_limbs_le(&[get_lower(u), get_upper(u)]);
-        n
+        Natural::from_limbs_le(&[get_lower(u), get_upper(u)])
     }
 }

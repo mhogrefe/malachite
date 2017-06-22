@@ -1,28 +1,25 @@
 use gmp_mpfr_sys::gmp::{self, mpz_t};
-use natural::{get_limb_size, Large, LimbSize, make_u64, Natural};
+use natural::{get_limb_size, Large, LimbSize, make_u64, Natural, Small};
 use std::mem;
 use std::slice::from_raw_parts_mut;
-use traits::Assign;
 
 impl Natural {
-    /// Assigns a slice of limbs, or base-2^(32) digits, to `self`, in little-endian order, so that
-    /// less significant limbs have lower indices in the input slice. Although GMP may use 32- or
-    /// 64-bit limbs internally, this method always takes 32-bit limbs.
+    /// Converts a slice of limbs, or base-2^(32) digits, to a `Natural`, in little-endian order, so
+    /// that less significant limbs have lower indices in the input slice. Although GMP may use 32-
+    /// or 64-bit limbs internally, this method always takes 32-bit limbs.
+    ///
+    /// This method is more efficient than `from_limbs_be`.
     ///
     /// # Examples
     /// ```
     /// use malachite_gmp::natural::Natural;
     ///
-    /// let mut x = Natural::new();
-    /// x.assign_limbs_le(&[]);
-    /// assert_eq!(x.to_string(), "0");
-    /// x.assign_limbs_le(&[123]);
-    /// assert_eq!(x.to_string(), "123");
+    /// assert_eq!(Natural::from_limbs_le(&[]).to_string(), "0");
+    /// assert_eq!(Natural::from_limbs_le(&[123]).to_string(), "123");
     /// // 10^12 = 232 * 2^32 + 3567587328
-    /// x.assign_limbs_le(&[3567587328, 232]);
-    /// assert_eq!(x.to_string(), "1000000000000");
+    /// assert_eq!(Natural::from_limbs_le(&[3567587328, 232]).to_string(), "1000000000000");
     /// ```
-    pub fn assign_limbs_le(&mut self, limbs: &[u32]) {
+    pub fn from_limbs_le(limbs: &[u32]) -> Natural {
         let mut sig_size = 0;
         for (i, limb) in limbs.iter().enumerate().rev() {
             if *limb != 0 {
@@ -32,8 +29,8 @@ impl Natural {
         }
         let limbs = &limbs[0..sig_size];
         match sig_size {
-            0 => self.assign(0u32),
-            1 => self.assign(limbs[0]),
+            0 => Small(0),
+            1 => Small(limbs[0]),
             _ => unsafe {
                 let mut large: mpz_t = mem::uninitialized();
                 gmp::mpz_init(&mut large);
@@ -67,8 +64,30 @@ impl Natural {
                         gmp::mpz_limbs_finish(&mut large, raw_sig_size as i64);
                     }
                 }
-                *self = Large(large);
+                Large(large)
             },
         }
+    }
+
+    /// Converts a slice of limbs, or base-2^(32) digits, to a `Natural`, in big-endian order, so
+    /// that less significant limbs have higher indices in the input slice. Although GMP may use 32-
+    /// or 64-bit limbs internally, this method always takes 32-bit limbs.
+    ///
+    /// This method is less efficient than `from_limbs_le`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_gmp::natural::Natural;
+    ///
+    /// assert_eq!(Natural::from_limbs_be(&[]).to_string(), "0");
+    /// assert_eq!(Natural::from_limbs_be(&[123]).to_string(), "123");
+    /// // 10^12 = 232 * 2^32 + 3567587328
+    /// assert_eq!(Natural::from_limbs_be(&[232, 3567587328]).to_string(), "1000000000000");
+    /// ```
+    pub fn from_limbs_be(limbs: &[u32]) -> Natural {
+        Natural::from_limbs_le(&limbs.iter()
+                                    .cloned()
+                                    .rev()
+                                    .collect::<Vec<u32>>())
     }
 }

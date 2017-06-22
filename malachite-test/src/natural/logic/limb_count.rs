@@ -6,13 +6,13 @@ use rust_wheels::iterators::naturals::{exhaustive_naturals, random_naturals};
 
 pub fn demo_exhaustive_natural_limb_count(limit: usize) {
     for n in exhaustive_naturals().take(limit) {
-        println!("limb_count({}) = {:?}", n, n.limb_count());
+        println!("limb_count({}) = {}", n, n.limb_count());
     }
 }
 
 pub fn demo_random_natural_limb_count(limit: usize) {
     for n in random_naturals(&EXAMPLE_SEED, 32).take(limit) {
-        println!("limb_count({}) = {:?}", n, n.limb_count());
+        println!("limb_count({}) = {}", n, n.limb_count());
     }
 }
 
@@ -28,7 +28,7 @@ pub fn benchmark_exhaustive_natural_limb_count(limit: usize, file_name: &str) {
                     f_name: "malachite-gmp",
                     g_name: "malachite-native",
                     title: "Natural.limb\\\\_count()",
-                    x_axis_label: "n.limb\\\\_count()",
+                    x_axis_label: "n.significant\\\\_bits()",
                     y_axis_label: "time (ns)",
                     file_name: &format!("benchmarks/{}", file_name),
                 });
@@ -46,7 +46,7 @@ pub fn benchmark_random_natural_limb_count(limit: usize, scale: u32, file_name: 
                     f_name: "malachite-gmp",
                     g_name: "malachite-native",
                     title: "Natural.limb\\\\_count()",
-                    x_axis_label: "n.limb\\\\_count()",
+                    x_axis_label: "n.significant\\\\_bits()",
                     y_axis_label: "time (ns)",
                     file_name: &format!("benchmarks/{}", file_name),
                 });

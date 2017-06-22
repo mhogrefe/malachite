@@ -46,8 +46,7 @@ fn make_string(i: &Natural, radix: i32, to_upper: bool) -> String {
                     .next()
                     .unwrap());
     }
-    cs.reverse();
-    cs.into_iter().collect()
+    cs.into_iter().rev().collect()
 }
 
 fn fmt_radix(i: &Natural,
