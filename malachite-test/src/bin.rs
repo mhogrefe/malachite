@@ -21,6 +21,7 @@ use malachite_test::natural::logic::from_limbs::*;
 use malachite_test::natural::logic::limb_count::*;
 use malachite_test::natural::logic::limbs::*;
 use malachite_test::natural::logic::significant_bits::*;
+use malachite_test::natural::logic::trailing_zeros::*;
 use std::env;
 
 fn main() {
@@ -91,6 +92,9 @@ fn main() {
                 "exhaustive_natural_to_u64_wrapping" => {
                     demo_exhaustive_natural_to_u64_wrapping(limit)
                 }
+                "exhaustive_natural_trailing_zeros" => {
+                    demo_exhaustive_natural_trailing_zeros(limit)
+                }
                 "random_natural_add" => demo_random_natural_add(limit),
                 "random_natural_assign" => demo_random_natural_assign(limit),
                 "random_natural_assign_ref" => demo_random_natural_assign_ref(limit),
@@ -129,6 +133,7 @@ fn main() {
                 "random_natural_to_u32_wrapping" => demo_random_natural_to_u32_wrapping(limit),
                 "random_natural_to_u64" => demo_random_natural_to_u64(limit),
                 "random_natural_to_u64_wrapping" => demo_random_natural_to_u64_wrapping(limit),
+                "random_natural_trailing_zeros" => demo_random_natural_trailing_zeros(limit),
 
                 _ => panic!("Invalid demo name: {}", item_name),
             }
@@ -209,6 +214,9 @@ fn main() {
                 "exhaustive_natural_to_u64" => {
                     benchmark_exhaustive_natural_to_u64(limit, "temp.gp")
                 }
+                "exhaustive_natural_trailing_zeros" => {
+                    benchmark_exhaustive_natural_trailing_zeros(limit, "temp.gp")
+                }
                 "exhaustive_natural_to_u64_wrapping" => {
                     benchmark_exhaustive_natural_to_u64_wrapping(limit, "temp.gp")
                 }
@@ -279,6 +287,9 @@ fn main() {
                 "random_natural_to_u64_wrapping" => {
                     benchmark_random_natural_to_u64_wrapping(limit, "temp.gp")
                 }
+                "random_natural_trailing_zeros" => {
+                    benchmark_random_natural_trailing_zeros(limit, 1024, "temp.gp")
+                }
 
                 "all" => {
                     benchmark_exhaustive_natural_add(100000, "exhaustive_natural_add.gp");
@@ -327,6 +338,8 @@ fn main() {
                     benchmark_exhaustive_natural_to_u64(100000, "exhaustive_natural_to_u64.gp");
                     let s = "exhaustive_natural_to_u64_wrapping.gp";
                     benchmark_exhaustive_natural_to_u64_wrapping(100000, s);
+                    let s = "exhaustive_natural_trailing_zeros.gp";
+                    benchmark_exhaustive_natural_trailing_zeros(100000, s);
                     benchmark_random_natural_add(100000, 1024, "random_natural_add.gp");
                     benchmark_random_natural_assign(100000, 1024, "random_natural_assign.gp");
                     benchmark_random_natural_assign_integer(100000,
@@ -386,6 +399,9 @@ fn main() {
                     benchmark_random_natural_to_u64(100000, "random_natural_to_u64.gp");
                     benchmark_random_natural_to_u64_wrapping(100000,
                                                              "random_natural_to_u64_wrapping.gp");
+                    benchmark_random_natural_trailing_zeros(100000,
+                                                            1024,
+                                                            "random_natural_trailing_zeros.gp");
                 }
 
                 _ => panic!("Invalid bench name: {}", item_name),

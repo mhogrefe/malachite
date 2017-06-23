@@ -5,6 +5,12 @@ impl Natural {
     /// Returns the number of trailing zeros in the binary expansion of `self` (equivalently, the
     /// multiplicity of 2 in the prime factorization of `self`) or `None` is `self` is 0.
     ///
+    /// Time: worst case O(n)
+    ///
+    /// Additional memory: worst case O(1)
+    ///
+    /// where n = `self.significant_bits()`
+    ///
     /// # Examples
     /// ```
     /// use malachite_native::natural::Natural;

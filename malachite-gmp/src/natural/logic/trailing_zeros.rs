@@ -20,7 +20,7 @@ impl Natural {
         match *self {
             Small(0) => None,
             Small(small) => Some(small.trailing_zeros() as u64),
-            Large(ref large) => unsafe { Some(gmp::mpz_scan1(large, 0)) },
+            Large(ref large) => Some(unsafe { gmp::mpz_scan1(large, 0) }),
         }
     }
 }

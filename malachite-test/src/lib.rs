@@ -56,5 +56,6 @@ pub mod natural {
         pub mod limbs;
         pub mod set_bit;
         pub mod significant_bits;
+        pub mod trailing_zeros;
     }
 }
