@@ -18,6 +18,7 @@ use malachite_test::natural::conversion::to_integer::*;
 use malachite_test::natural::conversion::to_u32::*;
 use malachite_test::natural::conversion::to_u64::*;
 use malachite_test::natural::logic::from_limbs::*;
+use malachite_test::natural::logic::get_bit::*;
 use malachite_test::natural::logic::limb_count::*;
 use malachite_test::natural::logic::limbs::*;
 use malachite_test::natural::logic::significant_bits::*;
@@ -57,6 +58,7 @@ fn main() {
                 "exhaustive_natural_from_limbs_be" => demo_exhaustive_natural_from_limbs_be(limit),
                 "exhaustive_natural_from_u32" => demo_exhaustive_natural_from_u32(limit),
                 "exhaustive_natural_from_u64" => demo_exhaustive_natural_from_u64(limit),
+                "exhaustive_natural_get_bit" => demo_exhaustive_natural_get_bit(limit),
                 "exhaustive_natural_hash" => demo_exhaustive_natural_hash(limit),
                 "exhaustive_natural_limb_count" => demo_exhaustive_natural_limb_count(limit),
                 "exhaustive_natural_limbs_le" => demo_exhaustive_natural_limbs_le(limit),
@@ -112,6 +114,7 @@ fn main() {
                 "random_natural_from_limbs_be" => demo_random_natural_from_limbs_be(limit),
                 "random_natural_from_u32" => demo_random_natural_from_u32(limit),
                 "random_natural_from_u64" => demo_random_natural_from_u64(limit),
+                "random_natural_get_bit" => demo_random_natural_get_bit(limit),
                 "random_natural_hash" => demo_random_natural_hash(limit),
                 "random_natural_limb_count" => demo_random_natural_limb_count(limit),
                 "random_natural_limbs_le" => demo_random_natural_limbs_le(limit),
@@ -170,6 +173,9 @@ fn main() {
                 }
                 "exhaustive_natural_from_u64" => {
                     benchmark_exhaustive_natural_from_u64(limit, "temp.gp")
+                }
+                "exhaustive_natural_get_bit" => {
+                    benchmark_exhaustive_natural_get_bit(limit, "temp.gp")
                 }
                 "exhaustive_natural_hash" => benchmark_exhaustive_natural_hash(limit, "temp.gp"),
                 "exhaustive_natural_limb_count" => {
@@ -245,6 +251,9 @@ fn main() {
                 }
                 "random_natural_from_u32" => benchmark_random_natural_from_u32(limit, "temp.gp"),
                 "random_natural_from_u64" => benchmark_random_natural_from_u64(limit, "temp.gp"),
+                "random_natural_get_bit" => {
+                    benchmark_random_natural_get_bit(limit, 1024, "temp.gp")
+                }
                 "random_natural_hash" => benchmark_random_natural_hash(limit, 1024, "temp.gp"),
                 "random_natural_limb_count" => {
                     benchmark_random_natural_limb_count(limit, 1024, "temp.gp")
@@ -311,6 +320,7 @@ fn main() {
                     benchmark_exhaustive_natural_from_limbs_be(100000, s);
                     benchmark_exhaustive_natural_from_u32(100000, "exhaustive_natural_from_u32.gp");
                     benchmark_exhaustive_natural_from_u64(100000, "exhaustive_natural_from_u64.gp");
+                    benchmark_exhaustive_natural_get_bit(100000, "exhaustive_natural_get_bit.gp");
                     benchmark_exhaustive_natural_hash(100000, "exhaustive_natural_hash.gp");
                     benchmark_exhaustive_natural_limb_count(100000,
                                                             "exhaustive_natural_limb_count.gp");
@@ -365,6 +375,7 @@ fn main() {
                                                            "random_natural_from_limbs_be.gp");
                     benchmark_random_natural_from_u32(100000, "random_natural_from_u32.gp");
                     benchmark_random_natural_from_u64(100000, "random_natural_from_u64.gp");
+                    benchmark_random_natural_get_bit(100000, 1024, "random_natural_get_bit.gp");
                     benchmark_random_natural_hash(100000, 1024, "random_natural_hash.gp");
                     benchmark_random_natural_limb_count(100000,
                                                         1024,
