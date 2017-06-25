@@ -33,8 +33,7 @@ impl Natural {
     fn demote_if_small(&mut self) {
         if let Large(x) = *self {
             if unsafe { gmp::mpz_sizeinbase(&x, 2) } <= 32 {
-                let s = (unsafe { gmp::mpz_get_ui(&x) }) as u32;
-                *self = Small(s);
+                *self = Small((unsafe { gmp::mpz_get_ui(&x) }) as u32)
             }
         }
     }
@@ -153,6 +152,7 @@ pub mod comparison {
     pub mod partial_ord_u32;
 }
 pub mod logic {
+    pub mod clear_bit;
     pub mod from_limbs;
     pub mod get_bit;
     pub mod limb_count;
