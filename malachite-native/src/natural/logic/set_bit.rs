@@ -5,6 +5,10 @@ impl Natural {
     /// Set the `index`th bit of `self`, or the coefficient of 2^(`index`) in the binary expansion
     /// of `self`, to 1.
     ///
+    /// Time: worst case O(`index`)
+    ///
+    /// Additional memory: worst case O(`index`)
+    ///
     /// # Examples
     /// ```
     /// use malachite_native::natural::Natural;

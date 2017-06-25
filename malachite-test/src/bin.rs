@@ -21,6 +21,7 @@ use malachite_test::natural::logic::from_limbs::*;
 use malachite_test::natural::logic::get_bit::*;
 use malachite_test::natural::logic::limb_count::*;
 use malachite_test::natural::logic::limbs::*;
+use malachite_test::natural::logic::set_bit::*;
 use malachite_test::natural::logic::significant_bits::*;
 use malachite_test::natural::logic::trailing_zeros::*;
 use std::env;
@@ -81,6 +82,7 @@ fn main() {
                 "exhaustive_u32_partial_eq_natural" => {
                     demo_exhaustive_u32_partial_eq_natural(limit)
                 }
+                "exhaustive_natural_set_bit" => demo_exhaustive_natural_set_bit(limit),
                 "exhaustive_natural_significant_bits" => {
                     demo_exhaustive_natural_significant_bits(limit)
                 }
@@ -129,6 +131,7 @@ fn main() {
                 }
                 "random_natural_partial_cmp_u32" => demo_random_natural_partial_cmp_u32(limit),
                 "random_u32_partial_cmp_natural" => demo_random_u32_partial_cmp_natural(limit),
+                "random_natural_set_bit" => demo_random_natural_set_bit(limit),
                 "random_natural_significant_bits" => demo_random_natural_significant_bits(limit),
                 "random_natural_into_integer" => demo_random_natural_into_integer(limit),
                 "random_natural_to_integer" => demo_random_natural_to_integer(limit),
@@ -204,6 +207,9 @@ fn main() {
                 }
                 "exhaustive_u32_partial_cmp_natural" => {
                     benchmark_exhaustive_u32_partial_cmp_natural(limit, "temp.gp")
+                }
+                "exhaustive_natural_set_bit" => {
+                    benchmark_exhaustive_natural_set_bit(limit, "temp.gp")
                 }
                 "exhaustive_natural_significant_bits" => {
                     benchmark_exhaustive_natural_significant_bits(limit, "temp.gp")
@@ -282,6 +288,9 @@ fn main() {
                 "random_u32_partial_cmp_natural" => {
                     benchmark_random_u32_partial_cmp_natural(limit, 1024, "temp.gp")
                 }
+                "random_natural_set_bit" => {
+                    benchmark_random_natural_set_bit(limit, 1024, "temp.gp")
+                }
                 "random_natural_significant_bits" => {
                     benchmark_random_natural_significant_bits(limit, 1024, "temp.gp")
                 }
@@ -338,6 +347,7 @@ fn main() {
                     benchmark_exhaustive_natural_partial_cmp_u32(100000, s);
                     let s = "exhaustive_natural_partial_cmp_u32.gp";
                     benchmark_exhaustive_natural_partial_cmp_u32(100000, s);
+                    benchmark_exhaustive_natural_set_bit(100000, "exhaustive_natural_set_bit.gp");
                     let s = "exhaustive_natural_significant_bits.gp";
                     benchmark_exhaustive_natural_significant_bits(100000, s);
                     benchmark_exhaustive_natural_to_integer(100000,
@@ -398,6 +408,7 @@ fn main() {
                     benchmark_random_u32_partial_cmp_natural(100000,
                                                              1024,
                                                              "random_u32_partial_cmp_natural.gp");
+                    benchmark_random_natural_set_bit(100000, 1024, "random_natural_set_bit.gp");
                     benchmark_random_natural_significant_bits(100000,
                                                               1024,
                                                               "random_natural_significant_bits.gp");
