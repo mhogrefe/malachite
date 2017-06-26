@@ -46,7 +46,7 @@ impl Natural {
     ///
     /// where n = `limbs.len()`
     ///
-    /// This method is more efficient than `Natural::from_limbs_le`.
+    /// This method is less efficient than `Natural::from_limbs_le`.
     ///
     /// # Example
     /// ```
