@@ -39,6 +39,7 @@ fn test_set_bit() {
 #[test]
 fn set_bit_properties() {
     // n.set_bit(index) is equivalent for malachite-gmp, malachite-native, and num.
+    // n.set_bit(index) is equivalent to n.assign_bit(index, true).
     // n.set_bit(index); n != 0
     // Setting a bit does not decrease n.
     // If n.get_bit(index), setting at index won't do anything.
@@ -52,6 +53,10 @@ fn set_bit_properties() {
         n.set_bit(index);
         assert!(n.is_valid());
         assert_eq!(gmp_natural_to_native(&gmp_n), n);
+
+        let mut n2 = old_n.clone();
+        n2.assign_bit(index, true);
+        assert_eq!(n2, n);
 
         let mut num_n = native_natural_to_num_biguint(&old_n);
         num_set_bit(&mut num_n, index);

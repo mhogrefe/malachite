@@ -17,6 +17,7 @@ use malachite_test::natural::conversion::from_u64::*;
 use malachite_test::natural::conversion::to_integer::*;
 use malachite_test::natural::conversion::to_u32::*;
 use malachite_test::natural::conversion::to_u64::*;
+use malachite_test::natural::logic::assign_bit::*;
 use malachite_test::natural::logic::clear_bit::*;
 use malachite_test::natural::logic::from_limbs::*;
 use malachite_test::natural::logic::get_bit::*;
@@ -52,6 +53,7 @@ fn main() {
                 }
                 "exhaustive_natural_assign_u32" => demo_exhaustive_natural_assign_u32(limit),
                 "exhaustive_natural_assign_u64" => demo_exhaustive_natural_assign_u64(limit),
+                "exhaustive_natural_assign_bit" => demo_exhaustive_natural_assign_bit(limit),
                 "exhaustive_natural_clear_bit" => demo_exhaustive_natural_clear_bit(limit),
                 "exhaustive_natural_clone" => demo_exhaustive_natural_clone(limit),
                 "exhaustive_natural_clone_from" => demo_exhaustive_natural_clone_from(limit),
@@ -110,6 +112,7 @@ fn main() {
                 }
                 "random_natural_assign_u32" => demo_random_natural_assign_u32(limit),
                 "random_natural_assign_u64" => demo_random_natural_assign_u64(limit),
+                "random_natural_assign_bit" => demo_random_natural_assign_bit(limit),
                 "random_natural_clear_bit" => demo_random_natural_clear_bit(limit),
                 "random_natural_clone" => demo_random_natural_clone(limit),
                 "random_natural_clone_from" => demo_random_natural_clone_from(limit),
@@ -161,6 +164,9 @@ fn main() {
                 }
                 "exhaustive_natural_assign_u64" => {
                     benchmark_exhaustive_natural_assign_u64(limit, "temp.gp")
+                }
+                "exhaustive_natural_assign_bit" => {
+                    benchmark_exhaustive_natural_assign_bit(limit, "temp.gp")
                 }
                 "exhaustive_natural_clear_bit" => {
                     benchmark_exhaustive_natural_clear_bit(limit, "temp.gp")
@@ -249,6 +255,9 @@ fn main() {
                 "random_natural_assign_u64" => {
                     benchmark_random_natural_assign_u64(limit, 1024, "temp.gp")
                 }
+                "random_natural_assign_bit" => {
+                    benchmark_random_natural_assign_bit(limit, 1024, "temp.gp")
+                }
                 "random_natural_clear_bit" => {
                     benchmark_random_natural_clear_bit(limit, 1024, "temp.gp")
                 }
@@ -327,6 +336,8 @@ fn main() {
                                                             "exhaustive_natural_assign_u32.gp");
                     benchmark_exhaustive_natural_assign_u64(100000,
                                                             "exhaustive_natural_assign_u64.gp");
+                    benchmark_exhaustive_natural_assign_bit(100000,
+                                                            "exhaustive_natural_assign_bit.gp");
                     benchmark_exhaustive_natural_clear_bit(100000,
                                                            "exhaustive_natural_clear_bit.gp");
                     benchmark_exhaustive_natural_clone(100000, "exhaustive_natural_clone.gp");
@@ -382,6 +393,9 @@ fn main() {
                     benchmark_random_natural_assign_u64(100000,
                                                         1024,
                                                         "random_natural_assign_u64.gp");
+                    benchmark_random_natural_assign_bit(100000,
+                                                        1024,
+                                                        "random_natural_assign_bit.gp");
                     benchmark_random_natural_clear_bit(100000, 1024, "random_natural_clear_bit.gp");
                     benchmark_random_natural_clone(100000, 1024, "random_natural_clone.gp");
                     benchmark_random_natural_clone_from(100000,

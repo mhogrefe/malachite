@@ -152,6 +152,7 @@ pub mod comparison {
     pub mod partial_ord_u32;
 }
 pub mod logic {
+    pub mod assign_bit;
     pub mod clear_bit;
     pub mod from_limbs;
     pub mod get_bit;

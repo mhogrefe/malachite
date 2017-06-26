@@ -50,6 +50,7 @@ pub mod natural {
         pub mod to_u64;
     }
     pub mod logic {
+        pub mod assign_bit;
         pub mod clear_bit;
         pub mod from_limbs;
         pub mod get_bit;
