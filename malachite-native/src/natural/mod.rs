@@ -137,6 +137,7 @@ pub mod comparison {
 pub mod logic {
     pub mod assign_bit;
     pub mod clear_bit;
+    pub mod flip_bit;
     pub mod from_limbs;
     pub mod get_bit;
     pub mod limb_count;

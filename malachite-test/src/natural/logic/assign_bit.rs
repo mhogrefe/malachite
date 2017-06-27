@@ -1,6 +1,7 @@
-use common::gmp_natural_to_native;
+use common::{gmp_natural_to_native, gmp_natural_to_rugint_integer};
 use malachite_native::natural as native;
-use rust_wheels::benchmarks::{BenchmarkOptions2, benchmark_2};
+use rugint;
+use rust_wheels::benchmarks::{BenchmarkOptions3, benchmark_3};
 use rust_wheels::iterators::bools::exhaustive_bools;
 use rust_wheels::iterators::common::EXAMPLE_SEED;
 use rust_wheels::iterators::general::random_x;
@@ -44,18 +45,25 @@ pub fn demo_random_natural_assign_bit(limit: usize) {
 
 pub fn benchmark_exhaustive_natural_assign_bit(limit: usize, file_name: &str) {
     println!("benchmarking exhaustive Natural.assign_bit(u64)");
-    benchmark_2(BenchmarkOptions2 {
+    benchmark_3(BenchmarkOptions3 {
                     xs: log_pairs(exhaustive_pairs(exhaustive_naturals(), exhaustive_u::<u64>()),
                                   exhaustive_bools()),
                     function_f: &(|((mut n, index), bit)| n.assign_bit(index, bit)),
                     function_g: &(|((mut n, index), bit): ((native::Natural, u64), bool)| {
                                       n.assign_bit(index, bit)
                                   }),
+                    function_h: &(|((mut n, index), bit): ((rugint::Integer, u64), bool)| {
+                                      n.set_bit(index as u32, bit);
+                                  }),
                     x_to_y: &(|&((ref n, index), bit)| ((gmp_natural_to_native(n), index), bit)),
+                    x_to_z: &(|&((ref n, index), bit)| {
+                                  ((gmp_natural_to_rugint_integer(n), index), bit)
+                              }),
                     x_param: &(|&((ref n, index), _)| max(n.significant_bits(), index) as usize),
                     limit: limit,
                     f_name: "malachite-gmp",
                     g_name: "malachite-native",
+                    h_name: "rugint",
                     title: "Natural.assign\\\\_bit(u64, bool)",
                     x_axis_label: "max(n.significant\\\\_bits(), index)",
                     y_axis_label: "time (ns)",
@@ -65,7 +73,7 @@ pub fn benchmark_exhaustive_natural_assign_bit(limit: usize, file_name: &str) {
 
 pub fn benchmark_random_natural_assign_bit(limit: usize, scale: u32, file_name: &str) {
     println!("benchmarking random Natural.assign_bit(u64, bool)");
-    benchmark_2(BenchmarkOptions2 {
+    benchmark_3(BenchmarkOptions3 {
                     xs: random_triples(&EXAMPLE_SEED,
                                        &(|seed| random_naturals(seed, scale)),
                                        &(|seed| {
@@ -76,11 +84,18 @@ pub fn benchmark_random_natural_assign_bit(limit: usize, scale: u32, file_name: 
                     function_g: &(|(mut n, index, bit): (native::Natural, u64, bool)| {
                                       n.assign_bit(index, bit)
                                   }),
+                    function_h: &(|(mut n, index, bit): (rugint::Integer, u64, bool)| {
+                                      n.set_bit(index as u32, bit);
+                                  }),
                     x_to_y: &(|&(ref n, index, bit)| (gmp_natural_to_native(n), index, bit)),
+                    x_to_z: &(|&(ref n, index, bit)| {
+                                  (gmp_natural_to_rugint_integer(n), index, bit)
+                              }),
                     x_param: &(|&(ref n, index, _)| max(n.significant_bits(), index) as usize),
                     limit: limit,
                     f_name: "malachite-gmp",
                     g_name: "malachite-native",
+                    h_name: "rugint",
                     title: "Natural.assign\\\\_bit(u64, bool)",
                     x_axis_label: "max(n.significant\\\\_bits(), index)",
                     y_axis_label: "time (ns)",

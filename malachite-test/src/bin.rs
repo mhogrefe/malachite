@@ -19,6 +19,7 @@ use malachite_test::natural::conversion::to_u32::*;
 use malachite_test::natural::conversion::to_u64::*;
 use malachite_test::natural::logic::assign_bit::*;
 use malachite_test::natural::logic::clear_bit::*;
+use malachite_test::natural::logic::flip_bit::*;
 use malachite_test::natural::logic::from_limbs::*;
 use malachite_test::natural::logic::get_bit::*;
 use malachite_test::natural::logic::limb_count::*;
@@ -59,6 +60,7 @@ fn main() {
                 "exhaustive_natural_clone_from" => demo_exhaustive_natural_clone_from(limit),
                 "exhaustive_natural_cmp" => demo_exhaustive_natural_cmp(limit),
                 "exhaustive_natural_eq" => demo_exhaustive_natural_eq(limit),
+                "exhaustive_natural_flip_bit" => demo_exhaustive_natural_flip_bit(limit),
                 "exhaustive_natural_from_limbs_le" => demo_exhaustive_natural_from_limbs_le(limit),
                 "exhaustive_natural_from_limbs_be" => demo_exhaustive_natural_from_limbs_be(limit),
                 "exhaustive_natural_from_u32" => demo_exhaustive_natural_from_u32(limit),
@@ -118,6 +120,7 @@ fn main() {
                 "random_natural_clone_from" => demo_random_natural_clone_from(limit),
                 "random_natural_cmp" => demo_random_natural_cmp(limit),
                 "random_natural_eq" => demo_random_natural_eq(limit),
+                "random_natural_flip_bit" => demo_random_natural_flip_bit(limit),
                 "random_natural_from_limbs_le" => demo_random_natural_from_limbs_le(limit),
                 "random_natural_from_limbs_be" => demo_random_natural_from_limbs_be(limit),
                 "random_natural_from_u32" => demo_random_natural_from_u32(limit),
@@ -177,6 +180,9 @@ fn main() {
                 }
                 "exhaustive_natural_cmp" => benchmark_exhaustive_natural_cmp(limit, "temp.gp"),
                 "exhaustive_natural_eq" => benchmark_exhaustive_natural_eq(limit, "temp.gp"),
+                "exhaustive_natural_flip_bit" => {
+                    benchmark_exhaustive_natural_flip_bit(limit, "temp.gp")
+                }
                 "exhaustive_natural_from_limbs_le" => {
                     benchmark_exhaustive_natural_from_limbs_le(limit, "temp.gp")
                 }
@@ -267,6 +273,9 @@ fn main() {
                 }
                 "random_natural_cmp" => benchmark_random_natural_cmp(limit, 1024, "temp.gp"),
                 "random_natural_eq" => benchmark_random_natural_eq(limit, 1024, "temp.gp"),
+                "random_natural_flip_bit" => {
+                    benchmark_random_natural_flip_bit(limit, 128, "temp.gp")
+                }
                 "random_natural_from_limbs_le" => {
                     benchmark_random_natural_from_limbs_le(limit, 128, "temp.gp")
                 }
@@ -345,6 +354,8 @@ fn main() {
                                                             "exhaustive_natural_clone_from.gp");
                     benchmark_exhaustive_natural_cmp(100000, "exhaustive_natural_cmp.gp");
                     benchmark_exhaustive_natural_eq(100000, "exhaustive_natural_eq.gp");
+                    let s = "exhaustive_natural_flip_bit.gp";
+                    benchmark_exhaustive_natural_flip_bit(100000, s);
                     let s = "exhaustive_natural_from_limbs_le.gp";
                     benchmark_exhaustive_natural_from_limbs_le(100000, s);
                     let s = "exhaustive_natural_from_limbs_be.gp";
@@ -403,6 +414,7 @@ fn main() {
                                                         "random_natural_clone_from.gp");
                     benchmark_random_natural_cmp(100000, 1024, "random_natural_cmp.gp");
                     benchmark_random_natural_eq(100000, 1024, "random_natural_eq.gp");
+                    benchmark_random_natural_flip_bit(100000, 128, "random_natural_flip_bit.gp");
                     benchmark_random_natural_from_limbs_le(100000,
                                                            128,
                                                            "random_natural_from_limbs_le.gp");

@@ -1,7 +1,9 @@
 use common::LARGE_LIMIT;
 use malachite_native::natural as native;
 use malachite_gmp::natural as gmp;
-use malachite_test::common::gmp_natural_to_native;
+use malachite_test::common::{gmp_natural_to_native, native_natural_to_rugint_integer,
+                             rugint_integer_to_native_natural};
+use rugint;
 use rust_wheels::iterators::common::EXAMPLE_SEED;
 use rust_wheels::iterators::bools::exhaustive_bools;
 use rust_wheels::iterators::general::random_x;
@@ -23,6 +25,10 @@ fn test_assign_bit() {
         n.assign_bit(index, bit);
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
+
+        let mut n = rugint::Integer::from_str(u).unwrap();
+        n.set_bit(index as u32, bit);
+        assert_eq!(n.to_string(), out);
     };
     test("0", 10, true, "1024");
     test("100", 0, true, "101");
@@ -50,12 +56,17 @@ fn assign_bit_properties() {
     // n.assign_bit(index) is equivalent for malachite-gmp and malachite-native.
     let natural_u64_and_bool = |mut gmp_n: gmp::Natural, index: u64, bit: bool| {
         let mut n = gmp_natural_to_native(&gmp_n);
+        let old_n = n.clone();
         gmp_n.assign_bit(index, bit);
         assert!(gmp_n.is_valid());
 
         n.assign_bit(index, bit);
         assert!(n.is_valid());
         assert_eq!(gmp_natural_to_native(&gmp_n), n);
+
+        let mut rugint_n = native_natural_to_rugint_integer(&old_n);
+        rugint_n.set_bit(index as u32, bit);
+        assert_eq!(rugint_integer_to_native_natural(&rugint_n), n);
     };
 
     for ((n, index), bit) in
