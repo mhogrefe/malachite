@@ -3,6 +3,10 @@ use natural::Natural::{self, Large, Small};
 impl Natural {
     /// Determines whether `self` is even.
     ///
+    /// Time: worst case O(1)
+    ///
+    /// Additional memory: worst case O(1)
+    ///
     /// # Examples
     /// ```
     /// use malachite_native::natural::Natural;
@@ -22,6 +26,10 @@ impl Natural {
     }
 
     /// Determines whether `self` is odd.
+    ///
+    /// Time: worst case O(1)
+    ///
+    /// Additional memory: worst case O(1)
     ///
     /// # Examples
     /// ```

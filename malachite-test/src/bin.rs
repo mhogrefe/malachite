@@ -1,6 +1,7 @@
 extern crate malachite_test;
 
 use malachite_test::natural::arithmetic::add::*;
+use malachite_test::natural::arithmetic::even_odd::*;
 use malachite_test::natural::comparison::eq::*;
 use malachite_test::natural::comparison::hash::*;
 use malachite_test::natural::comparison::ord::*;
@@ -67,6 +68,8 @@ fn main() {
                 "exhaustive_natural_from_u64" => demo_exhaustive_natural_from_u64(limit),
                 "exhaustive_natural_get_bit" => demo_exhaustive_natural_get_bit(limit),
                 "exhaustive_natural_hash" => demo_exhaustive_natural_hash(limit),
+                "exhaustive_natural_is_even" => demo_exhaustive_natural_is_even(limit),
+                "exhaustive_natural_is_odd" => demo_exhaustive_natural_is_odd(limit),
                 "exhaustive_natural_limb_count" => demo_exhaustive_natural_limb_count(limit),
                 "exhaustive_natural_limbs_le" => demo_exhaustive_natural_limbs_le(limit),
                 "exhaustive_natural_limbs_be" => demo_exhaustive_natural_limbs_be(limit),
@@ -127,6 +130,8 @@ fn main() {
                 "random_natural_from_u64" => demo_random_natural_from_u64(limit),
                 "random_natural_get_bit" => demo_random_natural_get_bit(limit),
                 "random_natural_hash" => demo_random_natural_hash(limit),
+                "random_natural_is_even" => demo_random_natural_is_even(limit),
+                "random_natural_is_odd" => demo_random_natural_is_odd(limit),
                 "random_natural_limb_count" => demo_random_natural_limb_count(limit),
                 "random_natural_limbs_le" => demo_random_natural_limbs_le(limit),
                 "random_natural_limbs_be" => demo_random_natural_limbs_be(limit),
@@ -199,6 +204,12 @@ fn main() {
                     benchmark_exhaustive_natural_get_bit(limit, "temp.gp")
                 }
                 "exhaustive_natural_hash" => benchmark_exhaustive_natural_hash(limit, "temp.gp"),
+                "exhaustive_natural_is_even" => {
+                    benchmark_exhaustive_natural_is_even(limit, "temp.gp")
+                }
+                "exhaustive_natural_is_odd" => {
+                    benchmark_exhaustive_natural_is_odd(limit, "temp.gp")
+                }
                 "exhaustive_natural_limb_count" => {
                     benchmark_exhaustive_natural_limb_count(limit, "temp.gp")
                 }
@@ -288,6 +299,10 @@ fn main() {
                     benchmark_random_natural_get_bit(limit, 1024, "temp.gp")
                 }
                 "random_natural_hash" => benchmark_random_natural_hash(limit, 1024, "temp.gp"),
+                "random_natural_is_even" => {
+                    benchmark_random_natural_is_even(limit, 1024, "temp.gp")
+                }
+                "random_natural_is_odd" => benchmark_random_natural_is_odd(limit, 1024, "temp.gp"),
                 "random_natural_limb_count" => {
                     benchmark_random_natural_limb_count(limit, 1024, "temp.gp")
                 }
@@ -364,6 +379,8 @@ fn main() {
                     benchmark_exhaustive_natural_from_u64(100000, "exhaustive_natural_from_u64.gp");
                     benchmark_exhaustive_natural_get_bit(100000, "exhaustive_natural_get_bit.gp");
                     benchmark_exhaustive_natural_hash(100000, "exhaustive_natural_hash.gp");
+                    benchmark_exhaustive_natural_is_even(100000, "exhaustive_natural_is_even.gp");
+                    benchmark_exhaustive_natural_is_odd(100000, "exhaustive_natural_is_odd.gp");
                     benchmark_exhaustive_natural_limb_count(100000,
                                                             "exhaustive_natural_limb_count.gp");
                     benchmark_exhaustive_natural_limbs_le(100000, "exhaustive_natural_limbs_le.gp");
@@ -425,6 +442,8 @@ fn main() {
                     benchmark_random_natural_from_u64(100000, "random_natural_from_u64.gp");
                     benchmark_random_natural_get_bit(100000, 1024, "random_natural_get_bit.gp");
                     benchmark_random_natural_hash(100000, 1024, "random_natural_hash.gp");
+                    benchmark_random_natural_is_even(100000, 1024, "random_natural_is_even.gp");
+                    benchmark_random_natural_is_odd(100000, 1024, "random_natural_is_odd.gp");
                     benchmark_random_natural_limb_count(100000,
                                                         1024,
                                                         "random_natural_limb_count.gp");
