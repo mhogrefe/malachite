@@ -3,6 +3,12 @@ use natural::Natural::{self, Large, Small};
 impl Natural {
     /// Determines whether `self` is an integer power of 2.
     ///
+    /// Time: worst case O(n)
+    ///
+    /// Additional memory: worst case O(1)
+    ///
+    /// where n = `self.significant_bits()`
+    ///
     /// # Example
     /// ```
     /// use malachite_native::natural::Natural;
