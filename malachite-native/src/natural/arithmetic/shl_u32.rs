@@ -2,8 +2,12 @@ use natural::{LIMB_BITS, LIMB_BITS_MASK, LOG_LIMB_BITS, pad_left};
 use natural::Natural::{self, Large, Small};
 use std::ops::{Shl, ShlAssign};
 
-/// Shifts a `Natural` left (multiplies it by a power of 2), taking ownership of the input
-/// `Natural`.
+/// Shifts a `Natural` left (multiplies it by a power of 2). This implementation takes `self` by
+/// value.
+///
+/// Time: worst case O(`other`)
+///
+/// Additional memory: worst case O(`other`)
 ///
 /// # Examples
 /// ```
@@ -15,13 +19,78 @@ use std::ops::{Shl, ShlAssign};
 /// ```
 impl Shl<u32> for Natural {
     type Output = Natural;
+
     fn shl(mut self, other: u32) -> Natural {
         self <<= other;
         self
     }
 }
 
+/// Shifts a `Natural` left (multiplies it by a power of 2). This implementation takes `self` by
+/// reference.
+///
+/// Time: worst case O(`other`)
+///
+/// Additional memory: worst case O(`other`)
+///
+/// # Examples
+/// ```
+/// use malachite_native::natural::Natural;
+///
+/// assert_eq!((&Natural::from(0u32) << 10).to_string(), "0");
+/// assert_eq!((&Natural::from(123u32) << 2).to_string(), "492");
+/// assert_eq!((&Natural::from(123u32) << 100).to_string(), "155921023828072216384094494261248");
+/// ```
+impl<'a> Shl<u32> for &'a Natural {
+    type Output = Natural;
+
+    fn shl(self, other: u32) -> Natural {
+        if other == 0 || self == &0 {
+            return self.clone();
+        }
+        match *self {
+            Small(small) if other <= small.leading_zeros() => Small(small << other),
+            Small(small) => {
+                let mut result_limbs = vec![0; (other >> LOG_LIMB_BITS) as usize];
+                let remaining_shift = other & LIMB_BITS_MASK;
+                if remaining_shift == 0 {
+                    result_limbs.push(small);
+                } else {
+                    result_limbs.push(small << remaining_shift);
+                    if remaining_shift > small.leading_zeros() {
+                        result_limbs.push(small >> (LIMB_BITS - remaining_shift));
+                    }
+                };
+                Large(result_limbs)
+            }
+            Large(ref limbs) => {
+                let mut result_limbs = vec![0; (other >> LOG_LIMB_BITS) as usize];
+                let remaining_shift = other & LIMB_BITS_MASK;
+                if remaining_shift == 0 {
+                    result_limbs.extend(limbs.iter().cloned());
+                } else {
+                    let shift_complement = LIMB_BITS - remaining_shift;
+                    let mut previous = 0;
+                    for &limb in limbs.iter() {
+                        result_limbs.push((limb << remaining_shift) |
+                                          (previous >> shift_complement));
+                        previous = limb;
+                    }
+                    if previous.leading_zeros() < remaining_shift {
+                        result_limbs.push(previous >> shift_complement);
+                    }
+                }
+                Large(result_limbs)
+            }
+        }
+    }
+}
+
 /// Shifts a `Natural` left (multiplies it by a power of 2) in place.
+///
+/// Time: worst case O(`other`)
+///
+/// Additional memory: worst case O(`other`)
 ///
 /// # Examples
 /// ```
@@ -50,10 +119,6 @@ impl ShlAssign<u32> for Natural {
                                             }
                                         },
                                         {
-                                            // rustfmt doesn't like when the next two lines are
-                                            // chained
-                                            let last = *limbs.last().unwrap();
-                                            let leading_zeros = last.leading_zeros();
                                             let remaining_shift = other & LIMB_BITS_MASK;
                                             if remaining_shift != 0 {
                                                 let shift_complement = LIMB_BITS - remaining_shift;
@@ -64,7 +129,7 @@ impl ShlAssign<u32> for Natural {
                                                             (previous >> shift_complement);
                                                     previous = old_limb;
                                                 }
-                                                if remaining_shift > leading_zeros {
+                                                if previous.leading_zeros() < remaining_shift {
                                                     limbs.push(previous >> shift_complement);
                                                 }
                                             }

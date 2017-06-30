@@ -3,8 +3,8 @@ use natural::Natural::{self, Large, Small};
 use std::mem;
 use std::ops::{Shl, ShlAssign};
 
-/// Shifts a `Natural` left (multiplies it by a power of 2), taking ownership of the input
-/// `Natural`.
+/// Shifts a `Natural` left (multiplies it by a power of 2). This implementation takes `self` by
+/// value.
 ///
 /// # Examples
 /// ```
@@ -16,9 +16,46 @@ use std::ops::{Shl, ShlAssign};
 /// ```
 impl Shl<u32> for Natural {
     type Output = Natural;
+
     fn shl(mut self, other: u32) -> Natural {
         self <<= other;
         self
+    }
+}
+
+/// Shifts a `Natural` left (multiplies it by a power of 2). This implementation takes `self` by
+/// reference.
+///
+/// # Examples
+/// ```
+/// use malachite_gmp::natural::Natural;
+///
+/// assert_eq!((&Natural::from(0u32) << 10).to_string(), "0");
+/// assert_eq!((&Natural::from(123u32) << 2).to_string(), "492");
+/// assert_eq!((&Natural::from(123u32) << 100).to_string(), "155921023828072216384094494261248");
+/// ```
+impl<'a> Shl<u32> for &'a Natural {
+    type Output = Natural;
+
+    fn shl(self, other: u32) -> Natural {
+        if other == 0 || self == &0 {
+            return self.clone();
+        }
+        match *self {
+            Small(small) if other <= small.leading_zeros() => Small(small << other),
+            Small(small) => unsafe {
+                let mut result: mpz_t = mem::uninitialized();
+                gmp::mpz_init_set_ui(&mut result, small.into());
+                gmp::mpz_mul_2exp(&mut result, &result, other.into());
+                Large(result)
+            },
+            Large(ref large) => unsafe {
+                let mut result: mpz_t = mem::uninitialized();
+                gmp::mpz_init(&mut result);
+                gmp::mpz_mul_2exp(&mut result, large, other.into());
+                Large(result)
+            },
+        }
     }
 }
 
