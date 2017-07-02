@@ -1,6 +1,7 @@
 extern crate malachite_test;
 
 use malachite_test::natural::arithmetic::add::*;
+use malachite_test::natural::arithmetic::add_u32::*;
 use malachite_test::natural::arithmetic::even_odd::*;
 use malachite_test::natural::arithmetic::is_power_of_two::*;
 use malachite_test::natural::arithmetic::shl_u32::*;
@@ -47,6 +48,13 @@ fn main() {
         "demo" => {
             match item_name.as_ref() {
                 "exhaustive_natural_add" => demo_exhaustive_natural_add(limit),
+                "exhaustive_natural_add_assign_u32" => {
+                    demo_exhaustive_natural_add_assign_u32(limit)
+                }
+                "exhaustive_natural_add_u32" => demo_exhaustive_natural_add_u32(limit),
+                "exhaustive_natural_add_u32_ref" => demo_exhaustive_natural_add_u32_ref(limit),
+                "exhaustive_u32_add_natural" => demo_exhaustive_u32_add_natural(limit),
+                "exhaustive_u32_add_natural_ref" => demo_exhaustive_u32_add_natural_ref(limit),
                 "exhaustive_natural_assign" => demo_exhaustive_natural_assign(limit),
                 "exhaustive_natural_assign_ref" => demo_exhaustive_natural_assign_ref(limit),
                 "exhaustive_natural_assign_integer" => {
@@ -119,6 +127,11 @@ fn main() {
                     demo_exhaustive_natural_trailing_zeros(limit)
                 }
                 "random_natural_add" => demo_random_natural_add(limit),
+                "random_natural_add_assign_u32" => demo_random_natural_add_assign_u32(limit),
+                "random_natural_add_u32" => demo_random_natural_add_u32(limit),
+                "random_natural_add_u32_ref" => demo_random_natural_add_u32_ref(limit),
+                "random_u32_add_natural" => demo_random_u32_add_natural(limit),
+                "random_u32_add_natural_ref" => demo_random_u32_add_natural_ref(limit),
                 "random_natural_assign" => demo_random_natural_assign(limit),
                 "random_natural_assign_ref" => demo_random_natural_assign_ref(limit),
                 "random_natural_assign_integer" => demo_random_natural_assign_integer(limit),
@@ -175,6 +188,21 @@ fn main() {
         "bench" => {
             match item_name.as_ref() {
                 "exhaustive_natural_add" => benchmark_exhaustive_natural_add(limit, "temp.gp"),
+                "exhaustive_natural_add_assign_u32" => {
+                    benchmark_exhaustive_natural_add_assign_u32(limit, "temp.gp")
+                }
+                "exhaustive_natural_add_u32" => {
+                    benchmark_exhaustive_natural_add_u32(limit, "temp.gp")
+                }
+                "exhaustive_natural_add_u32_ref" => {
+                    benchmark_exhaustive_natural_add_u32_ref(limit, "temp.gp")
+                }
+                "exhaustive_u32_add_natural" => {
+                    benchmark_exhaustive_u32_add_natural(limit, "temp.gp")
+                }
+                "exhaustive_u32_add_natural_ref" => {
+                    benchmark_exhaustive_u32_add_natural_ref(limit, "temp.gp")
+                }
                 "exhaustive_natural_assign" => {
                     benchmark_exhaustive_natural_assign(limit, "temp.gp")
                 }
@@ -288,6 +316,21 @@ fn main() {
                     benchmark_exhaustive_natural_to_u64_wrapping(limit, "temp.gp")
                 }
                 "random_natural_add" => benchmark_random_natural_add(limit, 1024, "temp.gp"),
+                "random_natural_add_assign_u32" => {
+                    benchmark_random_natural_add_assign_u32(limit, 1024, "temp.gp")
+                }
+                "random_natural_add_u32" => {
+                    benchmark_random_natural_add_u32(limit, 1024, "temp.gp")
+                }
+                "random_natural_add_u32_ref" => {
+                    benchmark_random_natural_add_u32_ref(limit, 1024, "temp.gp")
+                }
+                "random_u32_add_natural" => {
+                    benchmark_random_u32_add_natural(limit, 1024, "temp.gp")
+                }
+                "random_u32_add_natural_ref" => {
+                    benchmark_random_u32_add_natural_ref(limit, 1024, "temp.gp")
+                }
                 "random_natural_assign" => benchmark_random_natural_assign(limit, 1024, "temp.gp"),
                 "random_natural_assign_integer" => {
                     benchmark_random_natural_assign_integer(limit, 1024, "temp.gp")
@@ -391,6 +434,14 @@ fn main() {
 
                 "all" => {
                     benchmark_exhaustive_natural_add(100000, "exhaustive_natural_add.gp");
+                    let s = "exhaustive_natural_add_assign_u32.gp";
+                    benchmark_exhaustive_natural_add_assign_u32(100000, s);
+                    benchmark_exhaustive_natural_add_u32(100000, "exhaustive_natural_add_u32.gp");
+                    benchmark_exhaustive_natural_add_u32_ref(100000,
+                                                             "exhaustive_natural_add_u32_ref.gp");
+                    benchmark_exhaustive_u32_add_natural(100000, "exhaustive_u32_add_natural.gp");
+                    benchmark_exhaustive_u32_add_natural_ref(100000,
+                                                             "exhaustive_u32_add_natural_ref.gp");
                     benchmark_exhaustive_natural_assign(100000, "exhaustive_natural_assign.gp");
                     let s = "exhaustive_natural_assign_integer.gp";
                     benchmark_exhaustive_natural_assign_integer(100000, s);
@@ -456,6 +507,17 @@ fn main() {
                     let s = "exhaustive_natural_trailing_zeros.gp";
                     benchmark_exhaustive_natural_trailing_zeros(100000, s);
                     benchmark_random_natural_add(100000, 1024, "random_natural_add.gp");
+                    benchmark_random_natural_add_assign_u32(100000,
+                                                            1024,
+                                                            "random_natural_add_assign_u32.gp");
+                    benchmark_random_natural_add_u32(100000, 1024, "random_natural_add_u32.gp");
+                    benchmark_random_natural_add_u32_ref(100000,
+                                                         1024,
+                                                         "random_natural_add_u32_ref.gp");
+                    benchmark_random_u32_add_natural(100000, 1024, "random_u32_add_natural.gp");
+                    benchmark_random_u32_add_natural_ref(100000,
+                                                         1024,
+                                                         "random_u32_add_natural_ref.gp");
                     benchmark_random_natural_assign(100000, 1024, "random_natural_assign.gp");
                     benchmark_random_natural_assign_integer(100000,
                                                             1024,

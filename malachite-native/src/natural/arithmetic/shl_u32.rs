@@ -51,36 +51,36 @@ impl<'a> Shl<u32> for &'a Natural {
         match *self {
             Small(small) if other <= small.leading_zeros() => Small(small << other),
             Small(small) => {
-                let mut result_limbs = vec![0; (other >> LOG_LIMB_BITS) as usize];
+                let mut shifted_limbs = vec![0; (other >> LOG_LIMB_BITS) as usize];
                 let remaining_shift = other & LIMB_BITS_MASK;
                 if remaining_shift == 0 {
-                    result_limbs.push(small);
+                    shifted_limbs.push(small);
                 } else {
-                    result_limbs.push(small << remaining_shift);
+                    shifted_limbs.push(small << remaining_shift);
                     if remaining_shift > small.leading_zeros() {
-                        result_limbs.push(small >> (LIMB_BITS - remaining_shift));
+                        shifted_limbs.push(small >> (LIMB_BITS - remaining_shift));
                     }
                 };
-                Large(result_limbs)
+                Large(shifted_limbs)
             }
             Large(ref limbs) => {
-                let mut result_limbs = vec![0; (other >> LOG_LIMB_BITS) as usize];
+                let mut shifted_limbs = vec![0; (other >> LOG_LIMB_BITS) as usize];
                 let remaining_shift = other & LIMB_BITS_MASK;
                 if remaining_shift == 0 {
-                    result_limbs.extend(limbs.iter().cloned());
+                    shifted_limbs.extend(limbs.iter().cloned());
                 } else {
                     let shift_complement = LIMB_BITS - remaining_shift;
                     let mut previous = 0;
                     for &limb in limbs.iter() {
-                        result_limbs.push((limb << remaining_shift) |
-                                          (previous >> shift_complement));
+                        shifted_limbs.push((limb << remaining_shift) |
+                                           (previous >> shift_complement));
                         previous = limb;
                     }
                     if previous.leading_zeros() < remaining_shift {
-                        result_limbs.push(previous >> shift_complement);
+                        shifted_limbs.push(previous >> shift_complement);
                     }
                 }
-                Large(result_limbs)
+                Large(shifted_limbs)
             }
         }
     }

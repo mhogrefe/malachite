@@ -7,7 +7,6 @@ use malachite_test::common::{gmp_natural_to_native, native_natural_to_gmp,
 use num;
 use rugint;
 use rust_wheels::iterators::common::EXAMPLE_SEED;
-use rust_wheels::iterators::general::random_x;
 use rust_wheels::iterators::integers_geometric::natural_u32s_geometric;
 use rust_wheels::iterators::naturals::{exhaustive_naturals, random_naturals};
 use rust_wheels::iterators::primitive_ints::exhaustive_u;
@@ -86,6 +85,7 @@ fn shl_u32_properties() {
     // n << u is valid.
     // &n << u is valid.
     // n <<= u, n << u, and &n << u give the same result.
+    // n << u >= n
     // TODO multiplication
     // TODO >>
     let natural_and_u32 = |mut gmp_n: gmp::Natural, u: u32| {
@@ -106,17 +106,17 @@ fn shl_u32_properties() {
         let result = &n2 << u;
         assert_eq!(result, n);
         assert!(result.is_valid());
-        assert_eq!(result, n);
         let result = n2 << u;
         assert!(result.is_valid());
+        assert_eq!(result, n);
 
         let gmp_n2 = native_natural_to_gmp(&old_n);
         let result = &gmp_n2 << u;
-        assert_eq!(gmp_natural_to_native(&result), n);
         assert!(result.is_valid());
+        assert_eq!(gmp_natural_to_native(&result), n);
         let result = gmp_n2 << u;
-        assert_eq!(gmp_natural_to_native(&result), n);
         assert!(result.is_valid());
+        assert_eq!(gmp_natural_to_native(&result), n);
 
         let num_n2 = native_natural_to_num_biguint(&old_n);
         assert_eq!(num_biguint_to_native_natural(&(&num_n2 << u as usize)), n);
@@ -133,8 +133,10 @@ fn shl_u32_properties() {
     };
 
     // 0 << n == 0
+    // 1 << n is a power of 2
     let one_u32 = |u: u32| {
         assert_eq!(native::Natural::from(0u32) << u, 0);
+        assert!((native::Natural::from(1u32) << u).is_power_of_two());
     };
 
     for (n, u) in log_pairs(exhaustive_naturals(), exhaustive_u::<u32>()).take(LARGE_LIMIT) {
@@ -160,7 +162,7 @@ fn shl_u32_properties() {
         one_u32(n);
     }
 
-    for n in random_x(&EXAMPLE_SEED).take(LARGE_LIMIT) {
+    for n in natural_u32s_geometric(&EXAMPLE_SEED, 32).take(LARGE_LIMIT) {
         one_u32(n);
     }
 }
