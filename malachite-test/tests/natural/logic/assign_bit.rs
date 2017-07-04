@@ -10,7 +10,7 @@ use rust_wheels::iterators::general::random_x;
 use rust_wheels::iterators::integers_geometric::natural_u32s_geometric;
 use rust_wheels::iterators::naturals::{exhaustive_naturals, random_naturals};
 use rust_wheels::iterators::primitive_ints::exhaustive_u;
-use rust_wheels::iterators::tuples::{exhaustive_pairs, log_pairs, random_triples};
+use rust_wheels::iterators::tuples::{exhaustive_pairs, lex_pairs, random_triples};
 use std::str::FromStr;
 
 #[test]
@@ -70,7 +70,7 @@ fn assign_bit_properties() {
     };
 
     for ((n, index), bit) in
-        log_pairs(exhaustive_pairs(exhaustive_naturals(), exhaustive_u::<u64>()),
+        lex_pairs(exhaustive_pairs(exhaustive_naturals(), exhaustive_u::<u64>()),
                   exhaustive_bools())
                 .take(LARGE_LIMIT) {
         natural_u64_and_bool(n, index, bit);

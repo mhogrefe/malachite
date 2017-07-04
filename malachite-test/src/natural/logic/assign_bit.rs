@@ -8,12 +8,12 @@ use rust_wheels::iterators::general::random_x;
 use rust_wheels::iterators::integers_geometric::natural_u32s_geometric;
 use rust_wheels::iterators::naturals::{exhaustive_naturals, random_naturals};
 use rust_wheels::iterators::primitive_ints::exhaustive_u;
-use rust_wheels::iterators::tuples::{exhaustive_pairs, log_pairs, random_triples};
+use rust_wheels::iterators::tuples::{exhaustive_pairs, lex_pairs, random_triples};
 use std::cmp::max;
 
 pub fn demo_exhaustive_natural_assign_bit(limit: usize) {
     for ((mut n, index), bit) in
-        log_pairs(exhaustive_pairs(exhaustive_naturals(), exhaustive_u::<u64>()),
+        lex_pairs(exhaustive_pairs(exhaustive_naturals(), exhaustive_u::<u64>()),
                   exhaustive_bools())
                 .take(limit) {
         let n_old = n.clone();
@@ -46,7 +46,7 @@ pub fn demo_random_natural_assign_bit(limit: usize) {
 pub fn benchmark_exhaustive_natural_assign_bit(limit: usize, file_name: &str) {
     println!("benchmarking exhaustive Natural.assign_bit(u64)");
     benchmark_3(BenchmarkOptions3 {
-                    xs: log_pairs(exhaustive_pairs(exhaustive_naturals(), exhaustive_u::<u64>()),
+                    xs: lex_pairs(exhaustive_pairs(exhaustive_naturals(), exhaustive_u::<u64>()),
                                   exhaustive_bools()),
                     function_f: &(|((mut n, index), bit)| n.assign_bit(index, bit)),
                     function_g: &(|((mut n, index), bit): ((native::Natural, u64), bool)| {
