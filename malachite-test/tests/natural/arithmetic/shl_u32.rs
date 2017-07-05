@@ -127,6 +127,7 @@ fn shl_u32_properties() {
     };
 
     // n << 0 == n
+    #[allow(identity_op)]
     let one_natural = |gmp_n: gmp::Natural| {
         let n = gmp_natural_to_native(&gmp_n);
         assert_eq!(&n << 0, n);

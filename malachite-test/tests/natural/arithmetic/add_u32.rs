@@ -11,11 +11,12 @@ use rust_wheels::iterators::common::EXAMPLE_SEED;
 use rust_wheels::iterators::general::random_x;
 use rust_wheels::iterators::naturals::{exhaustive_naturals, random_naturals};
 use rust_wheels::iterators::primitive_ints::exhaustive_u;
-use rust_wheels::iterators::tuples::{log_pairs, random_pairs};
+use rust_wheels::iterators::tuples::{exhaustive_pairs, random_pairs};
 use std::str::FromStr;
 
 #[test]
 fn test_add_assign_u32() {
+    #[allow(cyclomatic_complexity)]
     let test = |u, v: u32, out| {
         let mut n = native::Natural::from_str(u).unwrap();
         n += v;
@@ -95,7 +96,8 @@ fn add_u32_properties() {
     // n += u, n + u, u + n, &n + u, and u + &n give the same result.
     // n + u == n + from(u)
     // n + u >= n and n + u >= u
-    // TODO subtraction
+    // n + u - u == n
+    #[allow(cyclomatic_complexity)]
     let natural_and_u32 = |mut gmp_n: gmp::Natural, u: u32| {
         let mut n = gmp_natural_to_native(&gmp_n);
         let old_n = n.clone();
@@ -112,19 +114,19 @@ fn add_u32_properties() {
 
         let n2 = old_n.clone();
         let result = &n2 + u;
-        assert_eq!(result, n);
         assert!(result.is_valid());
+        assert_eq!(result, n);
         let result = n2 + u;
         assert!(result.is_valid());
         assert_eq!(result, n);
 
         let n2 = old_n.clone();
         let result = u + &n2;
-        assert_eq!(result, n);
         assert!(result.is_valid());
+        assert_eq!(result, n);
         let result = u + n2;
-        assert!(result.is_valid());
         assert_eq!(result, n);
+        assert!(result.is_valid());
 
         let n2 = old_n.clone();
         let result = n2 + native::Natural::from(u);
@@ -135,19 +137,19 @@ fn add_u32_properties() {
 
         let gmp_n2 = native_natural_to_gmp(&old_n);
         let result = &gmp_n2 + u;
-        assert_eq!(gmp_natural_to_native(&result), n);
         assert!(result.is_valid());
+        assert_eq!(gmp_natural_to_native(&result), n);
         let result = gmp_n2 + u;
-        assert_eq!(gmp_natural_to_native(&result), n);
         assert!(result.is_valid());
+        assert_eq!(gmp_natural_to_native(&result), n);
 
         let gmp_n2 = native_natural_to_gmp(&old_n);
         let result = u + &gmp_n2;
-        assert_eq!(gmp_natural_to_native(&result), n);
         assert!(result.is_valid());
+        assert_eq!(gmp_natural_to_native(&result), n);
         let result = u + gmp_n2;
-        assert_eq!(gmp_natural_to_native(&result), n);
         assert!(result.is_valid());
+        assert_eq!(gmp_natural_to_native(&result), n);
 
         let num_n2 = native_natural_to_num_biguint(&old_n);
         assert_eq!(num_biguint_to_native_natural(&num_add_u32(num_n2, u)), n);
@@ -157,10 +159,12 @@ fn add_u32_properties() {
 
         assert!(n >= old_n);
         assert!(n >= u);
+        assert_eq!(n - u, Some(old_n));
     };
 
     // n + 0 == n
     // 0 + n == n
+    #[allow(identity_op)]
     let one_natural = |gmp_n: gmp::Natural| {
         let n = gmp_natural_to_native(&gmp_n);
         assert_eq!(&n + 0, n);
@@ -174,7 +178,7 @@ fn add_u32_properties() {
         assert_eq!(u + native::Natural::from(0u32), native::Natural::from(u));
     };
 
-    for (n, u) in log_pairs(exhaustive_naturals(), exhaustive_u::<u32>()).take(LARGE_LIMIT) {
+    for (n, u) in exhaustive_pairs(exhaustive_naturals(), exhaustive_u::<u32>()).take(LARGE_LIMIT) {
         natural_and_u32(n, u);
     }
 
