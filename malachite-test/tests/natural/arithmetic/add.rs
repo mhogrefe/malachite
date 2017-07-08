@@ -98,17 +98,27 @@ fn add_properties() {
     // x + y is equivalent for malachite-gmp, malachite-native, num, and rugint.
     // x += y, x += &y, x + y, x + &y, &x + y, and &x + &y give the same result.
     // x + y == y + x
-    // TODO x += y lib comparison
     let two_naturals = |gmp_x: gmp::Natural, gmp_y: gmp::Natural| {
         let x = gmp_natural_to_native(&gmp_x);
         let y = gmp_natural_to_native(&gmp_y);
-        let raw_gmp_sum = gmp_x + gmp_y;
+        let raw_gmp_sum = gmp_x.clone() + gmp_y.clone();
         assert!(raw_gmp_sum.is_valid());
         let gmp_sum = gmp_natural_to_native(&raw_gmp_sum);
         let num_sum = num_biguint_to_native_natural(&(native_natural_to_num_biguint(&x) +
                                                       native_natural_to_num_biguint(&y)));
         let rugint_sum = rugint_integer_to_native_natural(&(native_natural_to_rugint_integer(&x) +
                                                             native_natural_to_rugint_integer(&y)));
+
+        let sum_val_val = gmp_x.clone() + gmp_y.clone();
+        let sum_val_ref = gmp_x.clone() + &gmp_y;
+        let sum_ref_val = &gmp_x + gmp_y.clone();
+        assert!(sum_val_val.is_valid());
+        assert!(sum_val_ref.is_valid());
+        assert!(sum_ref_val.is_valid());
+        assert_eq!(sum_val_val, raw_gmp_sum);
+        assert_eq!(sum_val_ref, raw_gmp_sum);
+        assert_eq!(sum_ref_val, raw_gmp_sum);
+
         let sum_val_val = x.clone() + y.clone();
         let sum_val_ref = x.clone() + &y;
         let sum_ref_val = &x + y.clone();
@@ -117,13 +127,31 @@ fn add_properties() {
         assert!(sum_val_ref.is_valid());
         assert!(sum_ref_val.is_valid());
         assert!(sum.is_valid());
+        assert_eq!(sum_val_val, sum);
+        assert_eq!(sum_val_ref, sum);
+        assert_eq!(sum_ref_val, sum);
 
         let mut mut_x = x.clone();
         mut_x += y.clone();
+        assert!(mut_x.is_valid());
         assert_eq!(mut_x, sum);
         let mut mut_x = x.clone();
         mut_x += &y;
         assert_eq!(mut_x, sum);
+        assert!(mut_x.is_valid());
+
+        let mut mut_x = gmp_x.clone();
+        mut_x += gmp_y.clone();
+        assert!(mut_x.is_valid());
+        assert_eq!(mut_x, raw_gmp_sum);
+        let mut mut_x = gmp_x.clone();
+        mut_x += &gmp_y;
+        assert_eq!(mut_x, raw_gmp_sum);
+        assert!(mut_x.is_valid());
+
+        let mut mut_x = native_natural_to_rugint_integer(&x);
+        mut_x += native_natural_to_rugint_integer(&y);
+        assert_eq!(rugint_integer_to_native_natural(&mut_x), sum);
 
         let reverse_sum = &y + &x;
         let inv_1 = (sum.clone() - x.clone()).unwrap();

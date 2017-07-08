@@ -37,10 +37,11 @@ pub fn benchmark_exhaustive_natural_partial_eq_integer(limit: usize, file_name: 
                     function_f: &(|(x, y)| x == y),
                     function_g: &(|(x, y)| x == y),
                     function_h: &(|(x, y)| x == y),
-                    x_to_y: &(|&(ref x, ref y)| {
+                    x_cons: &(|p| p.clone()),
+                    y_cons: &(|&(ref x, ref y)| {
                                   (gmp_natural_to_native(x), gmp_integer_to_native(y))
                               }),
-                    x_to_z: &(|&(ref x, ref y)| {
+                    z_cons: &(|&(ref x, ref y)| {
                                   (gmp_natural_to_rugint_integer(x), gmp_integer_to_rugint(y))
                               }),
                     x_param: &(|&(ref x, ref y)| {
@@ -66,10 +67,11 @@ pub fn benchmark_random_natural_partial_eq_integer(limit: usize, scale: u32, fil
                     function_f: &(|(x, y)| x == y),
                     function_g: &(|(x, y)| x == y),
                     function_h: &(|(x, y)| x == y),
-                    x_to_y: &(|&(ref x, ref y)| {
+                    x_cons: &(|p| p.clone()),
+                    y_cons: &(|&(ref x, ref y)| {
                                   (gmp_natural_to_native(x), gmp_integer_to_native(y))
                               }),
-                    x_to_z: &(|&(ref x, ref y)| {
+                    z_cons: &(|&(ref x, ref y)| {
                                   (gmp_natural_to_rugint_integer(x), gmp_integer_to_rugint(y))
                               }),
                     x_param: &(|&(ref x, ref y)| {

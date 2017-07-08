@@ -111,10 +111,11 @@ pub fn benchmark_exhaustive_natural_add_assign(limit: usize, file_name: &str) {
                     function_f: &(|(mut x, y)| x += y),
                     function_g: &(|(mut x, y): (native::Natural, native::Natural)| x += y),
                     function_h: &(|(mut x, y): (rugint::Integer, rugint::Integer)| x += y),
-                    x_to_y: &(|&(ref x, ref y)| {
+                    x_cons: &(|p| p.clone()),
+                    y_cons: &(|&(ref x, ref y)| {
                                   (gmp_natural_to_native(x), gmp_natural_to_native(y))
                               }),
-                    x_to_z: &(|&(ref x, ref y)| {
+                    z_cons: &(|&(ref x, ref y)| {
                                   (gmp_natural_to_rugint_integer(x),
                                    gmp_natural_to_rugint_integer(y))
                               }),
@@ -139,10 +140,11 @@ pub fn benchmark_random_natural_add_assign(limit: usize, scale: u32, file_name: 
                     function_f: &(|(mut x, y)| x += y),
                     function_g: &(|(mut x, y): (native::Natural, native::Natural)| x += y),
                     function_h: &(|(mut x, y): (rugint::Integer, rugint::Integer)| x += y),
-                    x_to_y: &(|&(ref x, ref y)| {
+                    x_cons: &(|p| p.clone()),
+                    y_cons: &(|&(ref x, ref y)| {
                                   (gmp_natural_to_native(x), gmp_natural_to_native(y))
                               }),
-                    x_to_z: &(|&(ref x, ref y)| {
+                    z_cons: &(|&(ref x, ref y)| {
                                   (gmp_natural_to_rugint_integer(x),
                                    gmp_natural_to_rugint_integer(y))
                               }),
@@ -160,14 +162,16 @@ pub fn benchmark_random_natural_add_assign(limit: usize, scale: u32, file_name: 
                 });
 }
 
-// TODO preprocess arg of f
 pub fn benchmark_exhaustive_natural_add_assign_evaluation_strategy(limit: usize, file_name: &str) {
     println!("benchmarking exhaustive Natural += Natural evaluation strategy");
     benchmark_2(BenchmarkOptions2 {
                     xs: exhaustive_pairs_from_single(exhaustive_naturals()),
                     function_f: &(|(mut x, y)| x += y),
                     function_g: &(|(mut x, y): (native::Natural, native::Natural)| x += &y),
-                    x_to_y: &(|&(ref x, ref y)| {
+                    x_cons: &(|&(ref x, ref y)| {
+                                  (gmp_natural_to_native(x), gmp_natural_to_native(y))
+                              }),
+                    y_cons: &(|&(ref x, ref y)| {
                                   (gmp_natural_to_native(x), gmp_natural_to_native(y))
                               }),
                     x_param: &(|&(ref x, ref y)| {
@@ -183,7 +187,6 @@ pub fn benchmark_exhaustive_natural_add_assign_evaluation_strategy(limit: usize,
                 });
 }
 
-// TODO preprocess arg of f
 pub fn benchmark_random_natural_add_assign_evaluation_strategy(limit: usize,
                                                                scale: u32,
                                                                file_name: &str) {
@@ -192,7 +195,10 @@ pub fn benchmark_random_natural_add_assign_evaluation_strategy(limit: usize,
                     xs: random_pairs_from_single(random_naturals(&EXAMPLE_SEED, scale)),
                     function_f: &(|(mut x, y)| x += y),
                     function_g: &(|(mut x, y): (native::Natural, native::Natural)| x += &y),
-                    x_to_y: &(|&(ref x, ref y)| {
+                    x_cons: &(|&(ref x, ref y)| {
+                                  (gmp_natural_to_native(x), gmp_natural_to_native(y))
+                              }),
+                    y_cons: &(|&(ref x, ref y)| {
                                   (gmp_natural_to_native(x), gmp_natural_to_native(y))
                               }),
                     x_param: &(|&(ref x, ref y)| {
@@ -216,13 +222,14 @@ pub fn benchmark_exhaustive_natural_add(limit: usize, file_name: &str) {
                     function_g: &(|(x, y)| x + y),
                     function_h: &(|(x, y)| x + y),
                     function_i: &(|(x, y)| x + y),
-                    x_to_y: &(|&(ref x, ref y)| {
+                    x_cons: &(|p| p.clone()),
+                    y_cons: &(|&(ref x, ref y)| {
                                   (gmp_natural_to_native(x), gmp_natural_to_native(y))
                               }),
-                    x_to_z: &(|&(ref x, ref y)| {
+                    z_cons: &(|&(ref x, ref y)| {
                                   (gmp_natural_to_num_biguint(x), gmp_natural_to_num_biguint(y))
                               }),
-                    x_to_w: &(|&(ref x, ref y)| {
+                    w_cons: &(|&(ref x, ref y)| {
                                   (gmp_natural_to_rugint_integer(x),
                                    gmp_natural_to_rugint_integer(y))
                               }),
@@ -249,13 +256,14 @@ pub fn benchmark_random_natural_add(limit: usize, scale: u32, file_name: &str) {
                     function_g: &(|(x, y)| x + y),
                     function_h: &(|(x, y)| x + y),
                     function_i: &(|(x, y)| x + y),
-                    x_to_y: &(|&(ref x, ref y)| {
+                    x_cons: &(|p| p.clone()),
+                    y_cons: &(|&(ref x, ref y)| {
                                   (gmp_natural_to_native(x), gmp_natural_to_native(y))
                               }),
-                    x_to_z: &(|&(ref x, ref y)| {
+                    z_cons: &(|&(ref x, ref y)| {
                                   (gmp_natural_to_num_biguint(x), gmp_natural_to_num_biguint(y))
                               }),
-                    x_to_w: &(|&(ref x, ref y)| {
+                    w_cons: &(|&(ref x, ref y)| {
                                   (gmp_natural_to_rugint_integer(x),
                                    gmp_natural_to_rugint_integer(y))
                               }),
@@ -282,23 +290,26 @@ pub fn benchmark_exhaustive_natural_add_evaluation_strategy(limit: usize, file_n
                     function_g: &(|(x, y)| x + &y),
                     function_h: &(|(x, y)| &x + y),
                     function_i: &(|(x, y)| &x + &y),
-                    x_to_y: &(|&(ref x, ref y)| {
+                    x_cons: &(|&(ref x, ref y)| {
                                   (gmp_natural_to_native(x), gmp_natural_to_native(y))
                               }),
-                    x_to_z: &(|&(ref x, ref y)| {
+                    y_cons: &(|&(ref x, ref y)| {
                                   (gmp_natural_to_native(x), gmp_natural_to_native(y))
                               }),
-                    x_to_w: &(|&(ref x, ref y)| {
+                    z_cons: &(|&(ref x, ref y)| {
+                                  (gmp_natural_to_native(x), gmp_natural_to_native(y))
+                              }),
+                    w_cons: &(|&(ref x, ref y)| {
                                   (gmp_natural_to_native(x), gmp_natural_to_native(y))
                               }),
                     x_param: &(|&(ref x, ref y)| {
                                    max(x.significant_bits(), y.significant_bits()) as usize
                                }),
                     limit: limit,
-                    f_name: "val + val",
-                    g_name: "val + ref",
-                    h_name: "ref + val",
-                    i_name: "ref + ref",
+                    f_name: "Natural + Natural",
+                    g_name: "Natural + \\\\&Natural",
+                    h_name: "\\\\&Natural + Natural",
+                    i_name: "\\\\&Natural + \\\\&Natural",
                     title: "Natural + Natural evaluation strategy",
                     x_axis_label: "max(x.significant\\\\_bits(), y.significant\\\\_bits())",
                     y_axis_label: "time (ns)",
@@ -316,13 +327,16 @@ pub fn benchmark_random_natural_add_evaluation_strategy(limit: usize,
                     function_g: &(|(x, y)| x + &y),
                     function_h: &(|(x, y)| &x + y),
                     function_i: &(|(x, y)| &x + &y),
-                    x_to_y: &(|&(ref x, ref y)| {
+                    x_cons: &(|&(ref x, ref y)| {
                                   (gmp_natural_to_native(x), gmp_natural_to_native(y))
                               }),
-                    x_to_z: &(|&(ref x, ref y)| {
+                    y_cons: &(|&(ref x, ref y)| {
                                   (gmp_natural_to_native(x), gmp_natural_to_native(y))
                               }),
-                    x_to_w: &(|&(ref x, ref y)| {
+                    z_cons: &(|&(ref x, ref y)| {
+                                  (gmp_natural_to_native(x), gmp_natural_to_native(y))
+                              }),
+                    w_cons: &(|&(ref x, ref y)| {
                                   (gmp_natural_to_native(x), gmp_natural_to_native(y))
                               }),
                     x_param: &(|&(ref x, ref y)| {

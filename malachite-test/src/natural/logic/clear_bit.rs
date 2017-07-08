@@ -1,4 +1,5 @@
 use common::gmp_natural_to_native;
+use malachite_gmp::natural as gmp;
 use malachite_native::natural as native;
 use rust_wheels::benchmarks::{BenchmarkOptions2, benchmark_2};
 use rust_wheels::iterators::common::EXAMPLE_SEED;
@@ -32,9 +33,10 @@ pub fn benchmark_exhaustive_natural_clear_bit(limit: usize, file_name: &str) {
     println!("benchmarking exhaustive Natural.clear_bit(u64)");
     benchmark_2(BenchmarkOptions2 {
                     xs: log_pairs(exhaustive_naturals(), exhaustive_u::<u64>()),
-                    function_f: &(|(mut n, index)| n.clear_bit(index)),
+                    function_f: &(|(mut n, index): (gmp::Natural, u64)| n.clear_bit(index)),
                     function_g: &(|(mut n, index): (native::Natural, u64)| n.clear_bit(index)),
-                    x_to_y: &(|&(ref n, index)| (gmp_natural_to_native(n), index)),
+                    x_cons: &(|p| p.clone()),
+                    y_cons: &(|&(ref n, index)| (gmp_natural_to_native(n), index)),
                     x_param: &(|&(ref n, _)| n.significant_bits() as usize),
                     limit: limit,
                     f_name: "malachite-gmp",
@@ -54,9 +56,10 @@ pub fn benchmark_random_natural_clear_bit(limit: usize, scale: u32, file_name: &
                                      &(|seed| {
                                            natural_u32s_geometric(seed, scale).map(|i| i as u64)
                                        })),
-                    function_f: &(|(mut n, index)| n.clear_bit(index)),
+                    function_f: &(|(mut n, index): (gmp::Natural, u64)| n.clear_bit(index)),
                     function_g: &(|(mut n, index): (native::Natural, u64)| n.clear_bit(index)),
-                    x_to_y: &(|&(ref n, index)| (gmp_natural_to_native(n), index)),
+                    x_cons: &(|p| p.clone()),
+                    y_cons: &(|&(ref n, index)| (gmp_natural_to_native(n), index)),
                     x_param: &(|&(ref n, _)| n.significant_bits() as usize),
                     limit: limit,
                     f_name: "malachite-gmp",

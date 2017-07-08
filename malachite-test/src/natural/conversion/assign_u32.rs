@@ -1,4 +1,5 @@
 use common::{gmp_natural_to_native, gmp_natural_to_num_biguint, gmp_natural_to_rugint_integer};
+use malachite_gmp::natural as gmp;
 use malachite_native::natural as native;
 use malachite_native::traits::Assign as native_assign;
 use malachite_gmp::traits::Assign as gmp_assign;
@@ -39,13 +40,14 @@ pub fn benchmark_exhaustive_natural_assign_u32(limit: usize, file_name: &str) {
     println!("benchmarking exhaustive Natural.assign(u32)");
     benchmark_4(BenchmarkOptions4 {
                     xs: exhaustive_pairs(exhaustive_naturals(), exhaustive_u::<u32>()),
-                    function_f: &(|(mut n, u)| n.assign(u)),
+                    function_f: &(|(mut n, u): (gmp::Natural, u32)| n.assign(u)),
                     function_g: &(|(mut n, u): (native::Natural, u32)| n.assign(u)),
                     function_h: &(|(mut n, u): (num::BigUint, u32)| num_assign_u32(&mut n, u)),
                     function_i: &(|(mut n, u): (rugint::Integer, u32)| n.assign(u)),
-                    x_to_y: &(|&(ref n, u)| (gmp_natural_to_native(n), u)),
-                    x_to_z: &(|&(ref n, u)| (gmp_natural_to_num_biguint(n), u)),
-                    x_to_w: &(|&(ref n, u)| (gmp_natural_to_rugint_integer(n), u)),
+                    x_cons: &(|p| p.clone()),
+                    y_cons: &(|&(ref n, u)| (gmp_natural_to_native(n), u)),
+                    z_cons: &(|&(ref n, u)| (gmp_natural_to_num_biguint(n), u)),
+                    w_cons: &(|&(ref n, u)| (gmp_natural_to_rugint_integer(n), u)),
                     x_param: &(|&(ref n, _)| n.significant_bits() as usize),
                     limit: limit,
                     f_name: "malachite-gmp",
@@ -65,13 +67,14 @@ pub fn benchmark_random_natural_assign_u32(limit: usize, scale: u32, file_name: 
                     xs: random_pairs(&EXAMPLE_SEED,
                                      &(|seed| random_naturals(seed, scale)),
                                      &(|seed| random_x::<u32>(seed))),
-                    function_f: &(|(mut n, u)| n.assign(u)),
+                    function_f: &(|(mut n, u): (gmp::Natural, u32)| n.assign(u)),
                     function_g: &(|(mut n, u): (native::Natural, u32)| n.assign(u)),
                     function_h: &(|(mut n, u): (num::BigUint, u32)| num_assign_u32(&mut n, u)),
                     function_i: &(|(mut n, u): (rugint::Integer, u32)| n.assign(u)),
-                    x_to_y: &(|&(ref n, u)| (gmp_natural_to_native(n), u)),
-                    x_to_z: &(|&(ref n, u)| (gmp_natural_to_num_biguint(n), u)),
-                    x_to_w: &(|&(ref n, u)| (gmp_natural_to_rugint_integer(n), u)),
+                    x_cons: &(|p| p.clone()),
+                    y_cons: &(|&(ref n, u)| (gmp_natural_to_native(n), u)),
+                    z_cons: &(|&(ref n, u)| (gmp_natural_to_num_biguint(n), u)),
+                    w_cons: &(|&(ref n, u)| (gmp_natural_to_rugint_integer(n), u)),
                     x_param: &(|&(ref n, _)| n.significant_bits() as usize),
                     limit: limit,
                     f_name: "malachite-gmp",

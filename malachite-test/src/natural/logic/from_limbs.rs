@@ -42,9 +42,10 @@ pub fn benchmark_exhaustive_natural_from_limbs_le(limit: usize, file_name: &str)
     println!("benchmarking exhaustive Natural::from_limbs_le(&[u32])");
     benchmark_2(BenchmarkOptions2 {
                     xs: exhaustive_vecs(exhaustive_u::<u32>()),
-                    function_f: &(|xs| gmp::Natural::from_limbs_le(xs.as_slice())),
+                    function_f: &(|xs: Vec<u32>| gmp::Natural::from_limbs_le(xs.as_slice())),
                     function_g: &(|xs: Vec<u32>| native::Natural::from_limbs_le(xs.as_slice())),
-                    x_to_y: &(|xs| xs.clone()),
+                    x_cons: &(|xs| xs.clone()),
+                    y_cons: &(|xs| xs.clone()),
                     x_param: &(|xs| xs.len()),
                     limit: limit,
                     f_name: "malachite-gmp",
@@ -60,9 +61,10 @@ pub fn benchmark_random_natural_from_limbs_le(limit: usize, scale: u32, file_nam
     println!("benchmarking random Natural::from_limbs_le(&[u32])");
     benchmark_2(BenchmarkOptions2 {
                     xs: random_vecs(&EXAMPLE_SEED, scale, &(|seed| random_x::<u32>(seed))),
-                    function_f: &(|xs| gmp::Natural::from_limbs_le(xs.as_slice())),
+                    function_f: &(|xs: Vec<u32>| gmp::Natural::from_limbs_le(xs.as_slice())),
                     function_g: &(|xs: Vec<u32>| native::Natural::from_limbs_le(xs.as_slice())),
-                    x_to_y: &(|xs| xs.clone()),
+                    x_cons: &(|xs| xs.clone()),
+                    y_cons: &(|xs| xs.clone()),
                     x_param: &(|xs| xs.len()),
                     limit: limit,
                     f_name: "malachite-gmp",
@@ -78,9 +80,10 @@ pub fn benchmark_exhaustive_natural_from_limbs_be(limit: usize, file_name: &str)
     println!("benchmarking exhaustive Natural::from_limbs_be(&[u32])");
     benchmark_2(BenchmarkOptions2 {
                     xs: exhaustive_vecs(exhaustive_u::<u32>()),
-                    function_f: &(|xs| gmp::Natural::from_limbs_le(xs.as_slice())),
+                    function_f: &(|xs: Vec<u32>| gmp::Natural::from_limbs_le(xs.as_slice())),
                     function_g: &(|xs: Vec<u32>| native::Natural::from_limbs_be(xs.as_slice())),
-                    x_to_y: &(|xs| xs.clone()),
+                    x_cons: &(|xs| xs.clone()),
+                    y_cons: &(|xs| xs.clone()),
                     x_param: &(|xs| xs.len()),
                     limit: limit,
                     f_name: "malachite-gmp",
@@ -96,9 +99,10 @@ pub fn benchmark_random_natural_from_limbs_be(limit: usize, scale: u32, file_nam
     println!("benchmarking random Natural::from_limbs_be(&[u32])");
     benchmark_2(BenchmarkOptions2 {
                     xs: random_vecs(&EXAMPLE_SEED, scale, &(|seed| random_x::<u32>(seed))),
-                    function_f: &(|xs| gmp::Natural::from_limbs_le(xs.as_slice())),
+                    function_f: &(|xs: Vec<u32>| gmp::Natural::from_limbs_le(xs.as_slice())),
                     function_g: &(|xs: Vec<u32>| native::Natural::from_limbs_be(xs.as_slice())),
-                    x_to_y: &(|xs| xs.clone()),
+                    x_cons: &(|xs| xs.clone()),
+                    y_cons: &(|xs| xs.clone()),
                     x_param: &(|xs| xs.len()),
                     limit: limit,
                     f_name: "malachite-gmp",

@@ -1,5 +1,6 @@
 use common::{gmp_natural_to_native, gmp_natural_to_num_biguint, gmp_natural_to_rugint_integer};
-use malachite_native::natural as gmp;
+use malachite_gmp::natural as gmp;
+use malachite_native::natural as native;
 use num;
 use rugint;
 use rust_wheels::benchmarks::{BenchmarkOptions4, benchmark_4};
@@ -32,17 +33,18 @@ pub fn benchmark_exhaustive_natural_cmp(limit: usize, file_name: &str) {
     println!("benchmarking exhaustive Natural.cmp(&Natural)");
     benchmark_4(BenchmarkOptions4 {
                     xs: exhaustive_pairs_from_single(exhaustive_naturals()),
-                    function_f: &(|(x, y)| x.cmp(&y)),
-                    function_g: &(|(x, y): (gmp::Natural, gmp::Natural)| x.cmp(&y)),
+                    function_f: &(|(x, y): (gmp::Natural, gmp::Natural)| x.cmp(&y)),
+                    function_g: &(|(x, y): (native::Natural, native::Natural)| x.cmp(&y)),
                     function_h: &(|(x, y): (num::BigUint, num::BigUint)| x.cmp(&y)),
                     function_i: &(|(x, y): (rugint::Integer, rugint::Integer)| x.cmp(&y)),
-                    x_to_y: &(|&(ref x, ref y)| {
+                    x_cons: &(|p| p.clone()),
+                    y_cons: &(|&(ref x, ref y)| {
                                   (gmp_natural_to_native(x), gmp_natural_to_native(y))
                               }),
-                    x_to_z: &(|&(ref x, ref y)| {
+                    z_cons: &(|&(ref x, ref y)| {
                                   (gmp_natural_to_num_biguint(x), gmp_natural_to_num_biguint(y))
                               }),
-                    x_to_w: &(|&(ref x, ref y)| {
+                    w_cons: &(|&(ref x, ref y)| {
                                   (gmp_natural_to_rugint_integer(x),
                                    gmp_natural_to_rugint_integer(y))
                               }),
@@ -65,17 +67,18 @@ pub fn benchmark_random_natural_cmp(limit: usize, scale: u32, file_name: &str) {
     println!("benchmarking random Natural.cmp(&Natural)");
     benchmark_4(BenchmarkOptions4 {
                     xs: random_pairs_from_single(random_naturals(&EXAMPLE_SEED, scale)),
-                    function_f: &(|(x, y)| x.cmp(&y)),
-                    function_g: &(|(x, y): (gmp::Natural, gmp::Natural)| x.cmp(&y)),
+                    function_f: &(|(x, y): (gmp::Natural, gmp::Natural)| x.cmp(&y)),
+                    function_g: &(|(x, y): (native::Natural, native::Natural)| x.cmp(&y)),
                     function_h: &(|(x, y): (num::BigUint, num::BigUint)| x.cmp(&y)),
                     function_i: &(|(x, y): (rugint::Integer, rugint::Integer)| x.cmp(&y)),
-                    x_to_y: &(|&(ref x, ref y)| {
+                    x_cons: &(|p| p.clone()),
+                    y_cons: &(|&(ref x, ref y)| {
                                   (gmp_natural_to_native(x), gmp_natural_to_native(y))
                               }),
-                    x_to_z: &(|&(ref x, ref y)| {
+                    z_cons: &(|&(ref x, ref y)| {
                                   (gmp_natural_to_num_biguint(x), gmp_natural_to_num_biguint(y))
                               }),
-                    x_to_w: &(|&(ref x, ref y)| {
+                    w_cons: &(|&(ref x, ref y)| {
                                   (gmp_natural_to_rugint_integer(x),
                                    gmp_natural_to_rugint_integer(y))
                               }),

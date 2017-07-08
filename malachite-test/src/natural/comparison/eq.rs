@@ -33,13 +33,14 @@ pub fn benchmark_exhaustive_natural_eq(limit: usize, file_name: &str) {
                     function_g: &(|(x, y)| x == y),
                     function_h: &(|(x, y)| x == y),
                     function_i: &(|(x, y)| x == y),
-                    x_to_y: &(|&(ref x, ref y)| {
+                    x_cons: &(|p| p.clone()),
+                    y_cons: &(|&(ref x, ref y)| {
                                   (gmp_natural_to_native(x), gmp_natural_to_native(y))
                               }),
-                    x_to_z: &(|&(ref x, ref y)| {
+                    z_cons: &(|&(ref x, ref y)| {
                                   (gmp_natural_to_num_biguint(x), gmp_natural_to_num_biguint(y))
                               }),
-                    x_to_w: &(|&(ref x, ref y)| {
+                    w_cons: &(|&(ref x, ref y)| {
                                   (gmp_natural_to_rugint_integer(x),
                                    gmp_natural_to_rugint_integer(y))
                               }),
@@ -66,13 +67,14 @@ pub fn benchmark_random_natural_eq(limit: usize, scale: u32, file_name: &str) {
                     function_g: &(|(x, y)| x == y),
                     function_h: &(|(x, y)| x == y),
                     function_i: &(|(x, y)| x == y),
-                    x_to_y: &(|&(ref x, ref y)| {
+                    x_cons: &(|p| p.clone()),
+                    y_cons: &(|&(ref x, ref y)| {
                                   (gmp_natural_to_native(x), gmp_natural_to_native(y))
                               }),
-                    x_to_z: &(|&(ref x, ref y)| {
+                    z_cons: &(|&(ref x, ref y)| {
                                   (gmp_natural_to_num_biguint(x), gmp_natural_to_num_biguint(y))
                               }),
-                    x_to_w: &(|&(ref x, ref y)| {
+                    w_cons: &(|&(ref x, ref y)| {
                                   (gmp_natural_to_rugint_integer(x),
                                    gmp_natural_to_rugint_integer(y))
                               }),

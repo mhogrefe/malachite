@@ -1,4 +1,5 @@
 use common::{gmp_natural_to_native, gmp_natural_to_rugint_integer};
+use malachite_gmp::natural as gmp;
 use malachite_native::natural as native;
 use rugint;
 use rust_wheels::benchmarks::{BenchmarkOptions3, benchmark_3};
@@ -34,13 +35,14 @@ pub fn benchmark_exhaustive_natural_flip_bit(limit: usize, file_name: &str) {
     println!("benchmarking exhaustive Natural.flip_bit(u64)");
     benchmark_3(BenchmarkOptions3 {
                     xs: log_pairs(exhaustive_naturals(), exhaustive_u::<u64>()),
-                    function_f: &(|(mut n, index)| n.flip_bit(index)),
+                    function_f: &(|(mut n, index): (gmp::Natural, u64)| n.flip_bit(index)),
                     function_g: &(|(mut n, index): (native::Natural, u64)| n.flip_bit(index)),
                     function_h: &(|(mut n, index): (rugint::Integer, u64)| {
                                       n.invert_bit(index as u32);
                                   }),
-                    x_to_y: &(|&(ref n, index)| (gmp_natural_to_native(n), index)),
-                    x_to_z: &(|&(ref n, index)| (gmp_natural_to_rugint_integer(n), index)),
+                    x_cons: &(|p| p.clone()),
+                    y_cons: &(|&(ref n, index)| (gmp_natural_to_native(n), index)),
+                    z_cons: &(|&(ref n, index)| (gmp_natural_to_rugint_integer(n), index)),
                     x_param: &(|&(ref n, index)| max(n.significant_bits(), index) as usize),
                     limit: limit,
                     f_name: "malachite-gmp",
@@ -61,13 +63,14 @@ pub fn benchmark_random_natural_flip_bit(limit: usize, scale: u32, file_name: &s
                                      &(|seed| {
                                            natural_u32s_geometric(seed, scale).map(|i| i as u64)
                                        })),
-                    function_f: &(|(mut n, index)| n.flip_bit(index)),
+                    function_f: &(|(mut n, index): (gmp::Natural, u64)| n.flip_bit(index)),
                     function_g: &(|(mut n, index): (native::Natural, u64)| n.flip_bit(index)),
                     function_h: &(|(mut n, index): (rugint::Integer, u64)| {
                                       n.invert_bit(index as u32);
                                   }),
-                    x_to_y: &(|&(ref n, index)| (gmp_natural_to_native(n), index)),
-                    x_to_z: &(|&(ref n, index)| (gmp_natural_to_rugint_integer(n), index)),
+                    x_cons: &(|p| p.clone()),
+                    y_cons: &(|&(ref n, index)| (gmp_natural_to_native(n), index)),
+                    z_cons: &(|&(ref n, index)| (gmp_natural_to_rugint_integer(n), index)),
                     x_param: &(|&(ref n, index)| max(n.significant_bits(), index) as usize),
                     limit: limit,
                     f_name: "malachite-gmp",

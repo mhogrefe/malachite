@@ -60,7 +60,9 @@ pub fn benchmark_exhaustive_natural_assign_integer(limit: usize, file_name: &str
     type T = (gmp::natural::Natural, gmp::integer::Integer);
     benchmark_6(BenchmarkOptions6 {
                     xs: exhaustive_pairs(exhaustive_naturals(), exhaustive_natural_integers()),
-                    function_f: &(|(mut x, y)| x.assign(y)),
+                    function_f: &(|(mut x, y): (gmp::natural::Natural, gmp::integer::Integer)| {
+                                      x.assign(y)
+                                  }),
                     function_g: &(|(mut x, y): T| x.assign(&y)),
                     function_h: &(|(mut x, y): (native::natural::Natural,
                                                 native::integer::Integer)| x.assign(y)),
@@ -68,17 +70,18 @@ pub fn benchmark_exhaustive_natural_assign_integer(limit: usize, file_name: &str
                                                 native::integer::Integer)| x.assign(&y)),
                     function_j: &(|(mut x, y): (rugint::Integer, rugint::Integer)| x.assign(y)),
                     function_k: &(|(mut x, y): (rugint::Integer, rugint::Integer)| x.assign(&y)),
-                    x_to_y: &(|p| p.clone()),
-                    x_to_z: &(|&(ref x, ref y)| {
+                    x_cons: &(|p| p.clone()),
+                    y_cons: &(|p| p.clone()),
+                    z_cons: &(|&(ref x, ref y)| {
                                   (gmp_natural_to_native(x), gmp_integer_to_native(y))
                               }),
-                    x_to_w: &(|&(ref x, ref y)| {
+                    w_cons: &(|&(ref x, ref y)| {
                                   (gmp_natural_to_native(x), gmp_integer_to_native(y))
                               }),
-                    x_to_v: &(|&(ref x, ref y)| {
+                    v_cons: &(|&(ref x, ref y)| {
                                   (gmp_natural_to_rugint_integer(x), gmp_integer_to_rugint(y))
                               }),
-                    x_to_u: &(|&(ref x, ref y)| {
+                    u_cons: &(|&(ref x, ref y)| {
                                   (gmp_natural_to_rugint_integer(x), gmp_integer_to_rugint(y))
                               }),
                     x_param: &(|&(ref x, ref y)| {
@@ -105,7 +108,9 @@ pub fn benchmark_random_natural_assign_integer(limit: usize, scale: u32, file_na
                     xs: random_pairs(&EXAMPLE_SEED,
                                      &(|seed| random_naturals(seed, scale)),
                                      &(|seed| random_natural_integers(seed, scale))),
-                    function_f: &(|(mut x, y)| x.assign(y)),
+                    function_f: &(|(mut x, y): (gmp::natural::Natural, gmp::integer::Integer)| {
+                                      x.assign(y)
+                                  }),
                     function_g: &(|(mut x, y): T| x.assign(&y)),
                     function_h: &(|(mut x, y): (native::natural::Natural,
                                                 native::integer::Integer)| x.assign(y)),
@@ -113,17 +118,18 @@ pub fn benchmark_random_natural_assign_integer(limit: usize, scale: u32, file_na
                                                 native::integer::Integer)| x.assign(&y)),
                     function_j: &(|(mut x, y): (rugint::Integer, rugint::Integer)| x.assign(y)),
                     function_k: &(|(mut x, y): (rugint::Integer, rugint::Integer)| x.assign(&y)),
-                    x_to_y: &(|p| p.clone()),
-                    x_to_z: &(|&(ref x, ref y)| {
+                    x_cons: &(|p| p.clone()),
+                    y_cons: &(|p| p.clone()),
+                    z_cons: &(|&(ref x, ref y)| {
                                   (gmp_natural_to_native(x), gmp_integer_to_native(y))
                               }),
-                    x_to_w: &(|&(ref x, ref y)| {
+                    w_cons: &(|&(ref x, ref y)| {
                                   (gmp_natural_to_native(x), gmp_integer_to_native(y))
                               }),
-                    x_to_v: &(|&(ref x, ref y)| {
+                    v_cons: &(|&(ref x, ref y)| {
                                   (gmp_natural_to_rugint_integer(x), gmp_integer_to_rugint(y))
                               }),
-                    x_to_u: &(|&(ref x, ref y)| {
+                    u_cons: &(|&(ref x, ref y)| {
                                   (gmp_natural_to_rugint_integer(x), gmp_integer_to_rugint(y))
                               }),
                     x_param: &(|&(ref x, ref y)| {

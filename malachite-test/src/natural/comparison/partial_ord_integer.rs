@@ -1,5 +1,6 @@
 use common::{gmp_integer_to_native, gmp_integer_to_rugint, gmp_natural_to_native,
              gmp_natural_to_rugint_integer};
+use malachite_gmp as gmp;
 use malachite_native as native;
 use rugint;
 use rust_wheels::benchmarks::{BenchmarkOptions3, benchmark_3};
@@ -36,14 +37,17 @@ pub fn benchmark_exhaustive_natural_partial_cmp_integer(limit: usize, file_name:
     println!("benchmarking exhaustive Natural.partial_cmp(&Integer)");
     benchmark_3(BenchmarkOptions3 {
                     xs: exhaustive_pairs(exhaustive_naturals(), exhaustive_integers()),
-                    function_f: &(|(x, y)| x.partial_cmp(&y)),
+                    function_f: &(|(x, y): (gmp::natural::Natural, gmp::integer::Integer)| {
+                                      x.partial_cmp(&y)
+                                  }),
                     function_g: &(|(x, y): (native::natural::Natural,
                                             native::integer::Integer)| x.partial_cmp(&y)),
                     function_h: &(|(x, y): (rugint::Integer, rugint::Integer)| x.partial_cmp(&y)),
-                    x_to_y: &(|&(ref x, ref y)| {
+                    x_cons: &(|p| p.clone()),
+                    y_cons: &(|&(ref x, ref y)| {
                                   (gmp_natural_to_native(x), gmp_integer_to_native(y))
                               }),
-                    x_to_z: &(|&(ref x, ref y)| {
+                    z_cons: &(|&(ref x, ref y)| {
                                   (gmp_natural_to_rugint_integer(x), gmp_integer_to_rugint(y))
                               }),
                     x_param: &(|&(ref x, ref y)| {
@@ -66,14 +70,17 @@ pub fn benchmark_random_natural_partial_cmp_integer(limit: usize, scale: u32, fi
                     xs: random_pairs(&EXAMPLE_SEED,
                                      &(|seed| random_naturals(seed, scale)),
                                      &(|seed| random_integers(seed, scale))),
-                    function_f: &(|(x, y)| x.partial_cmp(&y)),
+                    function_f: &(|(x, y): (gmp::natural::Natural, gmp::integer::Integer)| {
+                                      x.partial_cmp(&y)
+                                  }),
                     function_g: &(|(x, y): (native::natural::Natural,
                                             native::integer::Integer)| x.partial_cmp(&y)),
                     function_h: &(|(x, y): (rugint::Integer, rugint::Integer)| x.partial_cmp(&y)),
-                    x_to_y: &(|&(ref x, ref y)| {
+                    x_cons: &(|p| p.clone()),
+                    y_cons: &(|&(ref x, ref y)| {
                                   (gmp_natural_to_native(x), gmp_integer_to_native(y))
                               }),
-                    x_to_z: &(|&(ref x, ref y)| {
+                    z_cons: &(|&(ref x, ref y)| {
                                   (gmp_natural_to_rugint_integer(x), gmp_integer_to_rugint(y))
                               }),
                     x_param: &(|&(ref x, ref y)| {

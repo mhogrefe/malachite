@@ -1,4 +1,5 @@
 use common::gmp_natural_to_native;
+use malachite_gmp::natural as gmp;
 use malachite_native::natural as native;
 use rust_wheels::benchmarks::{BenchmarkOptions2, benchmark_2};
 use rust_wheels::iterators::common::EXAMPLE_SEED;
@@ -48,9 +49,10 @@ pub fn benchmark_exhaustive_natural_is_even(limit: usize, file_name: &str) {
     println!("benchmarking exhaustive Natural.is_even()");
     benchmark_2(BenchmarkOptions2 {
                     xs: exhaustive_naturals(),
-                    function_f: &(|n| n.is_even()),
+                    function_f: &(|n: gmp::Natural| n.is_even()),
                     function_g: &(|n: native::Natural| n.is_even()),
-                    x_to_y: &(|x| gmp_natural_to_native(x)),
+                    x_cons: &(|x| x.clone()),
+                    y_cons: &(|x| gmp_natural_to_native(x)),
                     x_param: &(|n| n.significant_bits() as usize),
                     limit: limit,
                     f_name: "malachite-gmp",
@@ -66,9 +68,10 @@ pub fn benchmark_random_natural_is_even(limit: usize, scale: u32, file_name: &st
     println!("benchmarking random Natural.is_even()");
     benchmark_2(BenchmarkOptions2 {
                     xs: random_naturals(&EXAMPLE_SEED, scale),
-                    function_f: &(|n| n.is_even()),
+                    function_f: &(|n: gmp::Natural| n.is_even()),
                     function_g: &(|n: native::Natural| n.is_even()),
-                    x_to_y: &(|x| gmp_natural_to_native(x)),
+                    x_cons: &(|x| x.clone()),
+                    y_cons: &(|x| gmp_natural_to_native(x)),
                     x_param: &(|n| n.significant_bits() as usize),
                     limit: limit,
                     f_name: "malachite-gmp",
@@ -84,9 +87,10 @@ pub fn benchmark_exhaustive_natural_is_odd(limit: usize, file_name: &str) {
     println!("benchmarking exhaustive Natural.is_odd()");
     benchmark_2(BenchmarkOptions2 {
                     xs: exhaustive_naturals(),
-                    function_f: &(|n| n.is_odd()),
+                    function_f: &(|n: gmp::Natural| n.is_odd()),
                     function_g: &(|n: native::Natural| n.is_odd()),
-                    x_to_y: &(|x| gmp_natural_to_native(x)),
+                    x_cons: &(|x| x.clone()),
+                    y_cons: &(|x| gmp_natural_to_native(x)),
                     x_param: &(|n| n.significant_bits() as usize),
                     limit: limit,
                     f_name: "malachite-gmp",
@@ -102,9 +106,10 @@ pub fn benchmark_random_natural_is_odd(limit: usize, scale: u32, file_name: &str
     println!("benchmarking random Natural.is_odd()");
     benchmark_2(BenchmarkOptions2 {
                     xs: random_naturals(&EXAMPLE_SEED, scale),
-                    function_f: &(|n| n.is_odd()),
+                    function_f: &(|n: gmp::Natural| n.is_odd()),
                     function_g: &(|n: native::Natural| n.is_odd()),
-                    x_to_y: &(|x| gmp_natural_to_native(x)),
+                    x_cons: &(|x| x.clone()),
+                    y_cons: &(|x| gmp_natural_to_native(x)),
                     x_param: &(|n| n.significant_bits() as usize),
                     limit: limit,
                     f_name: "malachite-gmp",
