@@ -17,9 +17,15 @@ use std::str::FromStr;
 
 #[test]
 fn test_add_assign() {
+    #[allow(cyclomatic_complexity)]
     let test = |u, v, out| {
         let mut n = native::Natural::from_str(u).unwrap();
         n += native::Natural::from_str(v).unwrap();
+        assert_eq!(n.to_string(), out);
+        assert!(n.is_valid());
+
+        let mut n = native::Natural::from_str(u).unwrap();
+        n += &native::Natural::from_str(v).unwrap();
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
@@ -27,24 +33,41 @@ fn test_add_assign() {
         n += gmp::Natural::from_str(v).unwrap();
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
-    };
-    test("0", "0", "0");
-    test("0", "123", "123");
-    test("123", "0", "123");
-    test("123", "456", "579");
-    test("1000000000000", "123", "1000000000123");
-    test("123", "1000000000000", "1000000000123");
-    test("12345678987654321", "314159265358979", "12659838253013300");
-}
 
-#[test]
-fn test_add() {
-    let test = |u, v, out| {
+        let mut n = gmp::Natural::from_str(u).unwrap();
+        n += &gmp::Natural::from_str(v).unwrap();
+        assert_eq!(n.to_string(), out);
+        assert!(n.is_valid());
+
         let n = native::Natural::from_str(u).unwrap() + native::Natural::from_str(v).unwrap();
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
+        let n = &native::Natural::from_str(u).unwrap() + native::Natural::from_str(v).unwrap();
+        assert_eq!(n.to_string(), out);
+        assert!(n.is_valid());
+
+        let n = native::Natural::from_str(u).unwrap() + &native::Natural::from_str(v).unwrap();
+        assert_eq!(n.to_string(), out);
+        assert!(n.is_valid());
+
+        let n = &native::Natural::from_str(u).unwrap() + &native::Natural::from_str(v).unwrap();
+        assert_eq!(n.to_string(), out);
+        assert!(n.is_valid());
+
         let n = gmp::Natural::from_str(u).unwrap() + gmp::Natural::from_str(v).unwrap();
+        assert_eq!(n.to_string(), out);
+        assert!(n.is_valid());
+
+        let n = gmp::Natural::from_str(u).unwrap() + &gmp::Natural::from_str(v).unwrap();
+        assert_eq!(n.to_string(), out);
+        assert!(n.is_valid());
+
+        let n = &gmp::Natural::from_str(u).unwrap() + gmp::Natural::from_str(v).unwrap();
+        assert_eq!(n.to_string(), out);
+        assert!(n.is_valid());
+
+        let n = &gmp::Natural::from_str(u).unwrap() + &gmp::Natural::from_str(v).unwrap();
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
@@ -61,13 +84,21 @@ fn test_add() {
     test("1000000000000", "123", "1000000000123");
     test("123", "1000000000000", "1000000000123");
     test("12345678987654321", "314159265358979", "12659838253013300");
+    test("1000000000000",
+         "1000000000000000000000000",
+         "1000000000001000000000000");
 }
 
 #[test]
 fn add_properties() {
     // x + y is valid.
+    // x + &y is valid.
+    // &x + y is valid.
+    // &x + &y is valid.
     // x + y is equivalent for malachite-gmp, malachite-native, num, and rugint.
+    // x += y, x += &y, x + y, x + &y, &x + y, and &x + &y give the same result.
     // x + y == y + x
+    // TODO x += y lib comparison
     let two_naturals = |gmp_x: gmp::Natural, gmp_y: gmp::Natural| {
         let x = gmp_natural_to_native(&gmp_x);
         let y = gmp_natural_to_native(&gmp_y);
@@ -78,11 +109,25 @@ fn add_properties() {
                                                       native_natural_to_num_biguint(&y)));
         let rugint_sum = rugint_integer_to_native_natural(&(native_natural_to_rugint_integer(&x) +
                                                             native_natural_to_rugint_integer(&y)));
-        let reverse_sum = y.clone() + x.clone();
-        let sum = x.clone() + y.clone();
+        let sum_val_val = x.clone() + y.clone();
+        let sum_val_ref = x.clone() + &y;
+        let sum_ref_val = &x + y.clone();
+        let sum = &x + &y;
+        assert!(sum_val_val.is_valid());
+        assert!(sum_val_ref.is_valid());
+        assert!(sum_ref_val.is_valid());
+        assert!(sum.is_valid());
+
+        let mut mut_x = x.clone();
+        mut_x += y.clone();
+        assert_eq!(mut_x, sum);
+        let mut mut_x = x.clone();
+        mut_x += &y;
+        assert_eq!(mut_x, sum);
+
+        let reverse_sum = &y + &x;
         let inv_1 = (sum.clone() - x.clone()).unwrap();
         let inv_2 = (sum.clone() - y.clone()).unwrap();
-        assert!(sum.is_valid());
         assert_eq!(gmp_sum, sum);
         assert_eq!(num_sum, sum);
         assert_eq!(rugint_sum, sum);
@@ -95,8 +140,8 @@ fn add_properties() {
     // (y: u32) + x == x + from(y)
     let natural_and_u32 = |gmp_x: gmp::Natural, y: u32| {
         let x = gmp_natural_to_native(&gmp_x);
-        let primitive_sum_1 = x.clone() + y;
-        let primitive_sum_2 = y + x.clone();
+        let primitive_sum_1 = &x + y;
+        let primitive_sum_2 = y + &x;
         let sum = x + native::Natural::from(y);
         assert_eq!(primitive_sum_1, sum);
         assert_eq!(primitive_sum_2, sum);
@@ -108,9 +153,9 @@ fn add_properties() {
     let one_natural = |gmp_x: gmp::Natural| {
         let x = gmp_natural_to_native(&gmp_x);
         let x_old = x.clone();
-        let id_1 = x.clone() + native::Natural::from(0u32);
-        let id_2 = native::Natural::from(0u32) + x.clone();
-        let double = x.clone() + x;
+        let id_1 = &x + native::Natural::from(0u32);
+        let id_2 = native::Natural::from(0u32) + &x;
+        let double = &x + &x;
         assert_eq!(id_1, x_old);
         assert_eq!(id_2, x_old);
         assert_eq!(double, x_old << 1);
@@ -121,7 +166,7 @@ fn add_properties() {
         let x = gmp_natural_to_native(&gmp_x);
         let y = gmp_natural_to_native(&gmp_y);
         let z = gmp_natural_to_native(&gmp_z);
-        assert_eq!((x.clone() + y.clone()) + z.clone(), x + (y + z));
+        assert_eq!((&x + &y) + &z, x + (y + z));
     };
 
     for (x, y) in exhaustive_pairs_from_single(exhaustive_naturals()).take(LARGE_LIMIT) {

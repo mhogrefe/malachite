@@ -1,7 +1,7 @@
 use gmp_mpfr_sys::gmp;
 use natural::Natural::{self, Large, Small};
 
-/// Determines whether `self` is equal to another `Natural`.
+/// Determines whether a `Natural` is equal to another `Natural`.
 ///
 /// # Examples
 /// ```

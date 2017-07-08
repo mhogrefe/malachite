@@ -4,7 +4,7 @@ use std::mem;
 use std::ops::{Sub, SubAssign};
 
 /// Subtracts a `u32` from a `Natural`. If the `u32` is greater than the `Natural`, returns `None`.
-/// This implementation takes `self` by value.
+/// This implementation takes the `Natural` by value.
 ///
 /// # Examples
 /// ```
@@ -32,7 +32,7 @@ impl Sub<u32> for Natural {
 }
 
 /// Subtracts a `u32` from a `Natural`, If the `u32` is greater than the `Natural`, returns `None`.
-/// This implementation takes `self` by reference.
+/// This implementation takes the `Natural` by reference.
 ///
 /// # Examples
 /// ```

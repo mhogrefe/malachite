@@ -3,7 +3,7 @@ use natural::Natural::{self, Large, Small};
 use std::mem;
 use std::ops::{Add, AddAssign};
 
-/// Adds a `u32` to a `Natural`. This implementation takes `self` by value.
+/// Adds a `u32` to a `Natural`. This implementation takes the `Natural` by value.
 ///
 /// # Examples
 /// ```
@@ -24,7 +24,7 @@ impl Add<u32> for Natural {
     }
 }
 
-/// Adds a `u32` to a `Natural`. This implementation takes `self` by reference.
+/// Adds a `u32` to a `Natural`. This implementation takes the `Natural` by reference.
 ///
 /// # Examples
 /// ```
@@ -65,8 +65,7 @@ impl<'a> Add<u32> for &'a Natural {
     }
 }
 
-/// Adds a `Natural` to a `u32`, taking ownership of the input `Natural`. This implementation takes
-/// `other` by value.
+/// Adds a `Natural` to a `u32`. This implementation takes the `Natural` by value.
 ///
 /// # Examples
 /// ```
@@ -87,8 +86,7 @@ impl Add<Natural> for u32 {
     }
 }
 
-/// Adds a `Natural` to a `u32`, taking ownership of the input `Natural`. This implementation takes
-/// `other` by reference.
+/// Adds a `Natural` to a `u32`, This implementation takes the `Natural` by reference.
 ///
 /// # Examples
 /// ```

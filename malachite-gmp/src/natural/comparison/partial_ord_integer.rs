@@ -3,7 +3,7 @@ use integer::Integer;
 use natural::Natural;
 use std::cmp::Ordering;
 
-/// Compares `self` to an `Integer`.
+/// Compares a `Natural` to an `Integer`.
 ///
 /// # Examples
 /// ```

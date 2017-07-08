@@ -2,7 +2,7 @@ use gmp_mpfr_sys::gmp;
 use natural::Natural::{self, Large, Small};
 
 impl Natural {
-    /// Determines whether `self` is an integer power of 2.
+    /// Determines whether a `Natural` is an integer power of 2.
     ///
     /// # Examples
     /// ```

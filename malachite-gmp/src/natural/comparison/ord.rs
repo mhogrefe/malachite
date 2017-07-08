@@ -2,7 +2,7 @@ use gmp_mpfr_sys::gmp;
 use natural::Natural::{self, Large, Small};
 use std::cmp::Ordering;
 
-/// Compares `self` to a `Natural`.
+/// Compares `self` to another `Natural`.
 ///
 /// # Examples
 /// ```

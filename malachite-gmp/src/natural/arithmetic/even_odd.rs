@@ -1,7 +1,7 @@
 use natural::Natural;
 
 impl Natural {
-    /// Determines whether `self` is even.
+    /// Determines whether a `Natural` is even.
     ///
     /// # Examples
     /// ```
@@ -18,7 +18,7 @@ impl Natural {
         self.to_u32_wrapping() & 1 == 0
     }
 
-    /// Determines whether `self` is odd.
+    /// Determines whether a `Natural` is odd.
     ///
     /// # Examples
     /// ```
