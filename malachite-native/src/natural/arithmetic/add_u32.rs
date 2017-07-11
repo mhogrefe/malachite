@@ -2,7 +2,7 @@ use natural::Natural::{self, Large, Small};
 use std::ops::{Add, AddAssign};
 use traits::Assign;
 
-/// Adds a `u32` to a `Natural`. This implementation takes `self` by value.
+/// Adds a `u32` to a `Natural`, taking the `Natural` by value.
 ///
 /// Time: worst case O(n)
 ///
@@ -23,12 +23,12 @@ impl Add<u32> for Natural {
     type Output = Natural;
 
     fn add(mut self, other: u32) -> Natural {
-        self.add_assign(other);
+        self += other;
         self
     }
 }
 
-/// Adds a `u32` to a `Natural`. This implementation takes `self` by reference.
+/// Adds a `u32` to a `Natural`, taking the `Natural` by reference.
 ///
 /// Time: worst case O(n)
 ///
@@ -84,7 +84,7 @@ impl<'a> Add<u32> for &'a Natural {
     }
 }
 
-/// Adds a `Natural` to a `u32`. This implementation takes `other` by value.
+/// Adds a `Natural` to a `u32`, taking the `Natural` by value.
 ///
 /// Time: worst case O(n)
 ///
@@ -110,7 +110,7 @@ impl Add<Natural> for u32 {
     }
 }
 
-/// Adds a `Natural` to a `u32`. This implementation takes `other` by reference.
+/// Adds a `Natural` to a `u32`, taking the `Natural` by reference.
 ///
 /// Time: worst case O(n)
 ///

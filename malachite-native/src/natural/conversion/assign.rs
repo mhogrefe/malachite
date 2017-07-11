@@ -1,7 +1,7 @@
 use natural::Natural;
 use traits::Assign;
 
-/// Assigns a `Natural` to `self`. This implementation takes `other` by value.
+/// Assigns a `Natural` to another `Natural`, taking the `Natural` on the RHS by value.
 ///
 /// Time: worst case O(1)
 ///
@@ -22,7 +22,7 @@ impl Assign<Natural> for Natural {
     }
 }
 
-/// Assigns a `Natural` to `self`. This implementation takes `other` by reference.
+/// Assigns a `Natural` to another `Natural`, taking the `Natural` on the RHS by reference.
 ///
 /// Time: worst case O(n)
 ///

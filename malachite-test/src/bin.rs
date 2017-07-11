@@ -5,6 +5,7 @@ use malachite_test::natural::arithmetic::add_u32::*;
 use malachite_test::natural::arithmetic::even_odd::*;
 use malachite_test::natural::arithmetic::is_power_of_two::*;
 use malachite_test::natural::arithmetic::shl_u32::*;
+use malachite_test::natural::arithmetic::sub::*;
 use malachite_test::natural::arithmetic::sub_u32::*;
 use malachite_test::natural::comparison::eq::*;
 use malachite_test::natural::comparison::hash::*;
@@ -121,6 +122,9 @@ fn main() {
                 "exhaustive_natural_significant_bits" => {
                     demo_exhaustive_natural_significant_bits(limit)
                 }
+                "exhaustive_natural_sub_assign" => demo_exhaustive_natural_sub_assign(limit),
+                "exhaustive_natural_sub" => demo_exhaustive_natural_sub(limit),
+                "exhaustive_natural_sub_ref_ref" => demo_exhaustive_natural_sub_ref_ref(limit),
                 "exhaustive_natural_sub_assign_u32" => {
                     demo_exhaustive_natural_sub_assign_u32(limit)
                 }
@@ -193,6 +197,9 @@ fn main() {
                 "random_natural_shl_u32" => demo_random_natural_shl_u32(limit),
                 "random_natural_shl_u32_ref" => demo_random_natural_shl_u32_ref(limit),
                 "random_natural_significant_bits" => demo_random_natural_significant_bits(limit),
+                "random_natural_sub_assign" => demo_random_natural_sub_assign(limit),
+                "random_natural_sub" => demo_random_natural_sub(limit),
+                "random_natural_sub_ref_ref" => demo_random_natural_sub_ref_ref(limit),
                 "random_natural_sub_assign_u32" => demo_random_natural_sub_assign_u32(limit),
                 "random_natural_sub_u32" => demo_random_natural_sub_u32(limit),
                 "random_natural_sub_u32_ref" => demo_random_natural_sub_u32_ref(limit),
@@ -328,6 +335,13 @@ fn main() {
                 }
                 "exhaustive_natural_significant_bits" => {
                     benchmark_exhaustive_natural_significant_bits(limit, "temp.gp")
+                }
+                "exhaustive_natural_sub_assign" => {
+                    benchmark_exhaustive_natural_sub_assign(limit, "temp.gp")
+                }
+                "exhaustive_natural_sub" => benchmark_exhaustive_natural_sub(limit, "temp.gp"),
+                "exhaustive_natural_sub_evaluation_strategy" => {
+                    benchmark_exhaustive_natural_sub_evaluation_strategy(limit, "temp.gp")
                 }
                 "exhaustive_natural_sub_assign_u32" => {
                     benchmark_exhaustive_natural_sub_assign_u32(limit, "temp.gp")
@@ -470,6 +484,13 @@ fn main() {
                 "random_natural_significant_bits" => {
                     benchmark_random_natural_significant_bits(limit, 1024, "temp.gp")
                 }
+                "random_natural_sub_assign" => {
+                    benchmark_random_natural_sub_assign(limit, 1024, "temp.gp")
+                }
+                "random_natural_sub" => benchmark_random_natural_sub(limit, 1024, "temp.gp"),
+                "random_natural_sub_evaluation_strategy" => {
+                    benchmark_random_natural_sub_evaluation_strategy(limit, 1024, "temp.gp")
+                }
                 "random_natural_sub_assign_u32" => {
                     benchmark_random_natural_sub_assign_u32(limit, 1024, "temp.gp")
                 }
@@ -567,6 +588,11 @@ fn main() {
                                                              "exhaustive_natural_shl_u32_ref.gp");
                     let s = "exhaustive_natural_significant_bits.gp";
                     benchmark_exhaustive_natural_significant_bits(100000, s);
+                    benchmark_exhaustive_natural_sub_assign(100000,
+                                                            "exhaustive_natural_sub_assign.gp");
+                    benchmark_exhaustive_natural_sub(100000, "exhaustive_natural_sub.gp");
+                    let s = "exhaustive_natural_sub_evaluation_strategy.gp";
+                    benchmark_exhaustive_natural_sub_evaluation_strategy(100000, s);
                     let s = "exhaustive_natural_sub_assign_u32.gp";
                     benchmark_exhaustive_natural_sub_assign_u32(100000, s);
                     benchmark_exhaustive_natural_sub_u32(100000, "exhaustive_natural_sub_u32.gp");
@@ -670,6 +696,12 @@ fn main() {
                     benchmark_random_natural_significant_bits(100000,
                                                               1024,
                                                               "random_natural_significant_bits.gp");
+                    benchmark_random_natural_sub_assign(100000,
+                                                        1024,
+                                                        "random_natural_sub_assign.gp");
+                    benchmark_random_natural_sub(100000, 1024, "random_natural_sub.gp");
+                    let s = "random_natural_sub_evaluation_strategy.gp";
+                    benchmark_random_natural_sub_evaluation_strategy(100000, 1024, s);
                     benchmark_random_natural_sub_assign_u32(100000,
                                                             1024,
                                                             "random_natural_sub_assign_u32.gp");

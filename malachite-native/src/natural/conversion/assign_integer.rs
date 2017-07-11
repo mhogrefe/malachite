@@ -3,7 +3,7 @@ use natural::Natural;
 use std::cmp::Ordering;
 use traits::Assign;
 
-/// Assigns an `Integer` to `self`. This implementation takes `other` by value.
+/// Assigns an `Integer` to a `Natural`, taking the `Integer` by value.
 ///
 /// Time: worst case O(1)
 ///
@@ -32,7 +32,7 @@ impl Assign<Integer> for Natural {
     }
 }
 
-/// Assigns an `Integer` to `self`. This implementation takes `other` by reference.
+/// Assigns an `Integer` to a `Natural`, taking the `Integer` by reference.
 ///
 /// Time: worst case O(n)
 ///

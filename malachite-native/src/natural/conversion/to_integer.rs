@@ -2,7 +2,7 @@ use integer::Integer;
 use natural::Natural;
 
 impl Natural {
-    /// Converts a `Natural` to an `Integer`. This implementation takes `self` by value.
+    /// Converts a `Natural` to an `Integer`, taking the `Natural` by value.
     ///
     /// Time: worst case O(1)
     ///
@@ -24,7 +24,7 @@ impl Natural {
         }
     }
 
-    /// Converts a `Natural` to an `Integer`. This implementation takes `self` by reference.
+    /// Converts a `Natural` to an `Integer`, taking the `Natural` by reference.
     ///
     /// Time: worst case O(n)
     ///

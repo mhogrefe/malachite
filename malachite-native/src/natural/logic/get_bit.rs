@@ -2,8 +2,8 @@ use natural::{LIMB_BITS, LIMB_BITS_MASK, LOG_LIMB_BITS};
 use natural::Natural::{self, Large, Small};
 
 impl Natural {
-    /// Determines whether the `index`th bit of `self`, or the coefficient of 2^(`index`) in the
-    /// binary expansion of `self`, is 0 or 1. `false` means 0, `true` means 1.
+    /// Determines whether the `index`th bit of a `Natural`, or the coefficient of 2^(`index`) in
+    /// its binary expansion, is 0 or 1. `false` means 0, `true` means 1.
     ///
     /// Time: worst case O(1)
     ///

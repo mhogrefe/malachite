@@ -4,7 +4,7 @@ use natural::Natural;
 use std::mem;
 
 impl Natural {
-    /// Converts a `Natural` to an `Integer`. This implementation takes `self` by value.
+    /// Converts a `Natural` to an `Integer`, taking the `Natural` by value.
     ///
     /// # Examples
     /// ```
@@ -34,7 +34,7 @@ impl Natural {
         }
     }
 
-    /// Converts a `Natural` to an `Integer`. This implementation takes `self` by reference.
+    /// Converts a `Natural` to an `Integer`, taking the `Natural` by reference.
     ///
     /// # Examples
     /// ```

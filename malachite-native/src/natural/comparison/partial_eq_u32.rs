@@ -1,6 +1,6 @@
 use natural::Natural::{self, Large, Small};
 
-/// Determines whether `self` is equal to a `u32`.
+/// Determines whether a `Natural` is equal to a `u32`.
 ///
 /// Time: worst case O(1)
 ///
@@ -22,7 +22,7 @@ impl PartialEq<u32> for Natural {
     }
 }
 
-/// Determines whether a `u32` is equal to `self`.
+/// Determines whether a `u32` is equal to a `Natural`.
 ///
 /// Time: worst case O(1)
 ///

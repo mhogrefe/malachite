@@ -2,8 +2,7 @@ use natural::{LIMB_BITS, LIMB_BITS_MASK, LOG_LIMB_BITS, pad_left};
 use natural::Natural::{self, Large, Small};
 use std::ops::{Shl, ShlAssign};
 
-/// Shifts a `Natural` left (multiplies it by a power of 2). This implementation takes `self` by
-/// value.
+/// Shifts a `Natural` left (multiplies it by a power of 2), taking the `Natural` by value.
 ///
 /// Time: worst case O(`other`)
 ///
@@ -26,8 +25,7 @@ impl Shl<u32> for Natural {
     }
 }
 
-/// Shifts a `Natural` left (multiplies it by a power of 2). This implementation takes `self` by
-/// reference.
+/// Shifts a `Natural` left (multiplies it by a power of 2), taking the `Natural` by reference.
 ///
 /// Time: worst case O(`other`)
 ///

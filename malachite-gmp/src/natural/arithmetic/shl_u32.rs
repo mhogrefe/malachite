@@ -3,8 +3,7 @@ use natural::Natural::{self, Large, Small};
 use std::mem;
 use std::ops::{Shl, ShlAssign};
 
-/// Shifts a `Natural` left (multiplies it by a power of 2). This implementation takes the
-/// `Natural` by value.
+/// Shifts a `Natural` left (multiplies it by a power of 2), taking the `Natural` by value.
 ///
 /// # Examples
 /// ```
@@ -23,8 +22,7 @@ impl Shl<u32> for Natural {
     }
 }
 
-/// Shifts a `Natural` left (multiplies it by a power of 2). This implementation takes the
-/// `Natural` by reference.
+/// Shifts a `Natural` left (multiplies it by a power of 2), taking the `Natural` by reference.
 ///
 /// # Examples
 /// ```

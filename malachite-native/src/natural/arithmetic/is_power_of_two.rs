@@ -1,7 +1,7 @@
 use natural::Natural::{self, Large, Small};
 
 impl Natural {
-    /// Determines whether `self` is an integer power of 2.
+    /// Determines whether a `Natural` is an integer power of 2.
     ///
     /// Time: worst case O(n)
     ///

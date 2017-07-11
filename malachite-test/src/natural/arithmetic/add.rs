@@ -59,48 +59,40 @@ pub fn demo_random_natural_add(limit: usize) {
 pub fn demo_exhaustive_natural_add_val_ref(limit: usize) {
     for (x, y) in exhaustive_pairs_from_single(exhaustive_naturals()).take(limit) {
         let x_old = x.clone();
-        let y_old = y.clone();
-        println!("{} + &{} = {}", x_old, y_old, x + y);
+        println!("{} + &{} = {}", x_old, y, x + &y);
     }
 }
 
 pub fn demo_random_natural_add_val_ref(limit: usize) {
     for (x, y) in random_pairs_from_single(random_naturals(&EXAMPLE_SEED, 32)).take(limit) {
         let x_old = x.clone();
-        let y_old = y.clone();
-        println!("{} + &{} = {}", x_old, y_old, x + y);
+        println!("{} + &{} = {}", x_old, y, x + &y);
     }
 }
 
 pub fn demo_exhaustive_natural_add_ref_val(limit: usize) {
     for (x, y) in exhaustive_pairs_from_single(exhaustive_naturals()).take(limit) {
-        let x_old = x.clone();
         let y_old = y.clone();
-        println!("&{} + {} = {}", x_old, y_old, x + y);
+        println!("&{} + {} = {}", x, y_old, &x + y);
     }
 }
 
 pub fn demo_random_natural_add_ref_val(limit: usize) {
     for (x, y) in random_pairs_from_single(random_naturals(&EXAMPLE_SEED, 32)).take(limit) {
-        let x_old = x.clone();
         let y_old = y.clone();
-        println!("&{} + {} = {}", x_old, y_old, x + y);
+        println!("&{} + {} = {}", x, y_old, &x + y);
     }
 }
 
 pub fn demo_exhaustive_natural_add_ref_ref(limit: usize) {
     for (x, y) in exhaustive_pairs_from_single(exhaustive_naturals()).take(limit) {
-        let x_old = x.clone();
-        let y_old = y.clone();
-        println!("&{} + &{} = {}", x_old, y_old, x + y);
+        println!("&{} + &{} = {}", x, y, &x + &y);
     }
 }
 
 pub fn demo_random_natural_add_ref_ref(limit: usize) {
     for (x, y) in random_pairs_from_single(random_naturals(&EXAMPLE_SEED, 32)).take(limit) {
-        let x_old = x.clone();
-        let y_old = y.clone();
-        println!("&{} + &{} = {}", x_old, y_old, x + y);
+        println!("&{} + &{} = {}", x, y, &x + &y);
     }
 }
 

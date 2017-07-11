@@ -4,8 +4,8 @@ use natural::Natural::{self, Large, Small};
 use std::slice::from_raw_parts;
 
 impl Natural {
-    /// Returns the limbs, or base-2^(32) digits, of `self`, in little-endian order, so that less
-    /// significant limbs have lower indices in the output vector. Although GMP may use 32- or
+    /// Returns the limbs, or base-2^(32) digits, of a `Natural`, in little-endian order, so that
+    /// less significant limbs have lower indices in the output vector. Although GMP may use 32- or
     /// 64-bit limbs internally, this method always returns 32-bit limbs.
     ///
     /// This method is more efficient than `Natural::limbs_be`.
@@ -46,7 +46,7 @@ impl Natural {
         }
     }
 
-    /// Returns the limbs, or base-2^(32) digits, of `self`, in big-endian order, so that less
+    /// Returns the limbs, or base-2^(32) digits, of a `Natural`, in big-endian order, so that less
     /// significant limbs have higher indices in the output vector. Although GMP may use 32- or
     /// 64-bit limbs internally, this method always returns 32-bit limbs.
     ///

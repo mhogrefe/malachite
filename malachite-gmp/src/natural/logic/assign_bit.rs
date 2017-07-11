@@ -1,8 +1,8 @@
 use natural::Natural;
 
 impl Natural {
-    /// Set the `index`th bit of `self`, or the coefficient of 2^(`index`) in the binary expansion
-    /// of `self`, to 1 if `bit` or to 0 if `!bit`.
+    /// Sets the `index`th bit of a `Natural`, or the coefficient of 2^(`index`) in its binary
+    /// expansion, to 1 if `bit` or to 0 if `!bit`.
     ///
     /// # Examples
     /// ```

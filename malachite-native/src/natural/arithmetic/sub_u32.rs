@@ -1,8 +1,8 @@
 use natural::Natural::{self, Large, Small};
 use std::ops::{Sub, SubAssign};
 
-/// Subtracts a `u32` from a `Natural`. If the `u32` is greater than the `Natural`, returns `None`.
-/// This implementation takes `self` by value.
+/// Subtracts a `u32` from a `Natural`, taking the `Natural` by value. If the `u32` is greater than
+/// the `Natural`, returns `None`.
 ///
 /// Time: worst case O(n)
 ///
@@ -27,7 +27,7 @@ impl Sub<u32> for Natural {
 
     fn sub(mut self, other: u32) -> Option<Natural> {
         if self >= other {
-            self.sub_assign(other);
+            self -= other;
             Some(self)
         } else {
             None
@@ -35,8 +35,8 @@ impl Sub<u32> for Natural {
     }
 }
 
-/// Subtracts a `u32` from a `Natural`. If the `u32` is greater than the `Natural`, returns `None`.
-/// This implementation takes `self` by reference.
+/// Subtracts a `u32` from a `Natural`, taking the `Natural` by reference. If the `u32` is greater
+/// than the `Natural`, returns `None`.
 ///
 /// Time: worst case O(n)
 ///
@@ -98,7 +98,8 @@ impl<'a> Sub<u32> for &'a Natural {
     }
 }
 
-/// Subtracts a `Natural` from a `u32`. If the `Natural` is greater than the `u32`, returns `None`.
+/// Subtracts a `Natural` from a `u32`, taking the `Natural` by reference. If the `Natural` is
+/// greater than the `u32`, returns `None`.
 ///
 /// ```
 /// use malachite_native::natural::Natural;

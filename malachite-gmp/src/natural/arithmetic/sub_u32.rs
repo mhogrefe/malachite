@@ -3,8 +3,8 @@ use natural::Natural::{self, Large, Small};
 use std::mem;
 use std::ops::{Sub, SubAssign};
 
-/// Subtracts a `u32` from a `Natural`. If the `u32` is greater than the `Natural`, returns `None`.
-/// This implementation takes the `Natural` by value.
+/// Subtracts a `u32` from a `Natural`, taking the `Natural` by value. If the `u32` is greater than
+/// the `Natural`, returns `None`.
 ///
 /// # Examples
 /// ```
@@ -31,8 +31,8 @@ impl Sub<u32> for Natural {
     }
 }
 
-/// Subtracts a `u32` from a `Natural`, If the `u32` is greater than the `Natural`, returns `None`.
-/// This implementation takes the `Natural` by reference.
+/// Subtracts a `u32` from a `Natural`, taking the `Natural` by reference. If the `u32` is greater
+/// than the `Natural`, returns `None`.
 ///
 /// # Examples
 /// ```
@@ -79,7 +79,8 @@ impl<'a> Sub<u32> for &'a Natural {
     }
 }
 
-/// Subtracts a `Natural` from a `u32`. If the `Natural` is greater than the `u32`, returns `None`.
+/// Subtracts a `Natural` from a `u32`, taking the `Natural` by reference. If the `Natural` is
+/// greater than the `u32`, returns `None`.
 ///
 /// # Examples
 /// ```

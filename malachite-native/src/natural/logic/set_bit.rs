@@ -2,8 +2,8 @@ use natural::{LIMB_BITS, LIMB_BITS_MASK, LOG_LIMB_BITS};
 use natural::Natural::{self, Large, Small};
 
 impl Natural {
-    /// Set the `index`th bit of `self`, or the coefficient of 2^(`index`) in the binary expansion
-    /// of `self`, to 1.
+    /// Sets the `index`th bit of a `Natural`, or the coefficient of 2^(`index`) in its binary
+    /// expansion, to 1.
     ///
     /// Time: worst case O(`index`)
     ///

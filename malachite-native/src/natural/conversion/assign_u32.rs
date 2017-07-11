@@ -1,7 +1,7 @@
 use natural::Natural::{self, Small};
 use traits::Assign;
 
-/// Assigns a `u32` to `self`.
+/// Assigns a `u32` to a `Natural`.
 ///
 /// Time: worst case O(1)
 ///

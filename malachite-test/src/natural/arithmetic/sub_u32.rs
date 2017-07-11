@@ -21,6 +21,10 @@ pub fn num_sub_u32(mut x: num::BigUint, u: u32) -> Option<num::BigUint> {
     }
 }
 
+pub fn rugint_sub_u32(x: rugint::Integer, u: u32) -> Option<rugint::Integer> {
+    if x >= u { Some(x - u) } else { None }
+}
+
 pub fn demo_exhaustive_natural_sub_assign_u32(limit: usize) {
     for (mut n, u) in exhaustive_pairs(exhaustive_naturals(), exhaustive_u::<u32>())
             .filter(|&(ref n, u)| *n >= u)
@@ -204,7 +208,7 @@ pub fn benchmark_exhaustive_natural_sub_u32_ref(limit: usize, file_name: &str) {
                     limit: limit,
                     f_name: "malachite-gmp",
                     g_name: "malachite-native",
-                    title: "&Natural - u32",
+                    title: "\\\\&Natural - u32",
                     x_axis_label: "other",
                     y_axis_label: "time (ns)",
                     file_name: &format!("benchmarks/{}", file_name),
@@ -225,7 +229,7 @@ pub fn benchmark_random_natural_sub_u32_ref(limit: usize, scale: u32, file_name:
                     limit: limit,
                     f_name: "malachite-gmp",
                     g_name: "malachite-native",
-                    title: "&Natural - u32",
+                    title: "\\\\&Natural - u32",
                     x_axis_label: "other",
                     y_axis_label: "time (ns)",
                     file_name: &format!("benchmarks/{}", file_name),

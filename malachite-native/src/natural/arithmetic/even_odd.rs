@@ -1,7 +1,7 @@
 use natural::Natural::{self, Large, Small};
 
 impl Natural {
-    /// Determines whether `self` is even.
+    /// Determines whether a `Natural` is even.
     ///
     /// Time: worst case O(1)
     ///
@@ -25,7 +25,7 @@ impl Natural {
         }
     }
 
-    /// Determines whether `self` is odd.
+    /// Determines whether a `Natural` is odd.
     ///
     /// Time: worst case O(1)
     ///

@@ -1,7 +1,7 @@
 use integer::Integer;
 use natural::Natural;
 
-/// Determines whether `self` is equal to an `Integer`.
+/// Determines whether a `Natural` is equal to an `Integer`.
 ///
 /// Time: worst case O(n)
 ///

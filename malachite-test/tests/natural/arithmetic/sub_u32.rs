@@ -4,7 +4,9 @@ use malachite_gmp::natural as gmp;
 use malachite_test::common::{gmp_natural_to_native, native_natural_to_gmp,
                              native_natural_to_num_biguint, native_natural_to_rugint_integer,
                              num_biguint_to_native_natural, rugint_integer_to_native_natural};
-use malachite_test::natural::arithmetic::sub_u32::num_sub_u32;
+use malachite_test::natural::arithmetic::sub_u32::{num_sub_u32, rugint_sub_u32};
+use num;
+use rugint;
 use rust_wheels::iterators::common::EXAMPLE_SEED;
 use rust_wheels::iterators::general::random_x;
 use rust_wheels::iterators::naturals::{exhaustive_naturals, random_naturals};
@@ -66,6 +68,13 @@ fn test_sub_u32() {
         let on = &gmp::Natural::from_str(u).unwrap() - v;
         assert_eq!(format!("{:?}", on), out);
         assert!(on.map_or(true, |n| n.is_valid()));
+
+        let ux = num::BigUint::from_str(u).unwrap();
+        let on = num_sub_u32(ux, v).map(|x| num_biguint_to_native_natural(&x));
+        assert_eq!(format!("{:?}", on), out);
+
+        let on = rugint_sub_u32(rugint::Integer::from_str(u).unwrap(), v);
+        assert_eq!(format!("{:?}", on), out);
     };
     test("0", 0, "Some(0)");
     test("123", 123, "Some(0)");
@@ -108,7 +117,7 @@ fn sub_u32_properties() {
     // n -= u, n - u, and &n - u give the same result.
     // n - u == n - from(u)
     // u - n == from(u) - n
-    // if n >= u, n - u == n
+    // if n >= u, n - u <= n
     // if n >= u, (n - u).unwrap() + u == n
     #[allow(cyclomatic_complexity)]
     let natural_and_u32 = |mut gmp_n: gmp::Natural, u: u32| {
@@ -146,10 +155,10 @@ fn sub_u32_properties() {
         assert!(result.map_or(true, |n| n.is_valid()));
 
         let n2 = old_n.clone();
-        let result = n2 - native::Natural::from(u);
+        let result = n2 - &native::Natural::from(u);
         assert_eq!(result, on);
         let n2 = old_n.clone();
-        assert_eq!(u - &n2, native::Natural::from(u) - n2);
+        assert_eq!(u - &n2, native::Natural::from(u) - &n2);
 
         let gmp_n2 = native_natural_to_gmp(&old_n);
         let result = &gmp_n2 - u;
@@ -172,9 +181,8 @@ fn sub_u32_properties() {
                    on);
 
         let rugint_n2 = native_natural_to_rugint_integer(&old_n);
-        if rugint_n2 >= u {
-            assert_eq!(Some(rugint_integer_to_native_natural(&(rugint_n2 - u))), on);
-        }
+        assert_eq!(rugint_sub_u32(rugint_n2, u).map(|x| rugint_integer_to_native_natural(&x)),
+                   on);
 
         if on.is_some() {
             assert!(on.clone().unwrap() <= old_n);

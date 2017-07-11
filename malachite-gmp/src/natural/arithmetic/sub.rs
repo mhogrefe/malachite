@@ -1,25 +1,28 @@
-use gmp_mpfr_sys::gmp;
+use gmp_mpfr_sys::gmp::{self, mpz_t};
 use natural::Natural::{self, Large, Small};
+use std::mem;
 use std::ops::{Sub, SubAssign};
 
-/// Subtracts a `Natural` from a `Natural`, taking ownership of both `Natural`s.
+/// Subtracts a `Natural` from a `Natural`, taking the left `Natural` by value and the right
+/// `Natural` by reference.
 ///
 /// # Examples
 /// ```
 /// use malachite_gmp::natural::Natural;
 /// use std::str::FromStr;
 ///
-/// assert_eq!(format!("{:?}", Natural::from(0u32) - Natural::from(123u32)), "None");
-/// assert_eq!(format!("{:?}", Natural::from(123u32) - Natural::from(0u32)), "Some(123)");
-/// assert_eq!(format!("{:?}", Natural::from(456u32) - Natural::from(123u32)), "Some(333)");
+/// assert_eq!(format!("{:?}", Natural::from(0u32) - &Natural::from(123u32)), "None");
+/// assert_eq!(format!("{:?}", Natural::from(123u32) - &Natural::from(0u32)), "Some(123)");
+/// assert_eq!(format!("{:?}", Natural::from(456u32) - &Natural::from(123u32)), "Some(333)");
 /// assert_eq!(format!("{:?}", Natural::from_str("3000000000000").unwrap() -
-///                            Natural::from_str("1000000000000").unwrap()), "Some(2000000000000)");
+///                            &Natural::from_str("1000000000000").unwrap()),
+///            "Some(2000000000000)");
 /// ```
-impl Sub<Natural> for Natural {
+impl<'a> Sub<&'a Natural> for Natural {
     type Output = Option<Natural>;
 
-    fn sub(mut self, other: Natural) -> Option<Natural> {
-        if self >= other {
+    fn sub(mut self, other: &'a Natural) -> Option<Natural> {
+        if self >= *other {
             self -= other;
             Some(self)
         } else {
@@ -28,7 +31,49 @@ impl Sub<Natural> for Natural {
     }
 }
 
-/// Subtracts a `Natural` from a `Natural` in place.
+/// Subtracts a `Natural` from a `Natural`, taking both `Natural`s by reference.
+///
+/// # Examples
+/// ```
+/// use malachite_gmp::natural::Natural;
+/// use std::str::FromStr;
+///
+/// assert_eq!(format!("{:?}", &Natural::from(0u32) - &Natural::from(123u32)), "None");
+/// assert_eq!(format!("{:?}", &Natural::from(123u32) - &Natural::from(0u32)), "Some(123)");
+/// assert_eq!(format!("{:?}", &Natural::from(456u32) - &Natural::from(123u32)), "Some(333)");
+/// assert_eq!(format!("{:?}", &Natural::from_str("3000000000000").unwrap() -
+///                            &Natural::from_str("1000000000000").unwrap()),
+///            "Some(2000000000000)");
+/// ```
+impl<'a, 'b> Sub<&'a Natural> for &'b Natural {
+    type Output = Option<Natural>;
+
+    fn sub(self, other: &'a Natural) -> Option<Natural> {
+        if *other == 0 {
+            Some(self.clone())
+        } else if let Small(y) = *other {
+            self - y
+        } else if let Small(_) = *self {
+            None
+        } else if *self < *other {
+            None
+        } else {
+            match (self, other) {
+                (&Large(ref x), &Large(ref y)) => unsafe {
+                    let mut result: mpz_t = mem::uninitialized();
+                    gmp::mpz_init(&mut result);
+                    gmp::mpz_sub(&mut result, x, y);
+                    let mut result = Large(result);
+                    result.demote_if_small();
+                    Some(result)
+                },
+                _ => unreachable!(),
+            }
+        }
+    }
+}
+
+/// Subtracts a `Natural` from a `Natural` in place, taking the `Natural` on the RHS by reference.
 ///
 /// # Examples
 /// ```
@@ -36,30 +81,30 @@ impl Sub<Natural> for Natural {
 /// use std::str::FromStr;
 ///
 /// let mut x = Natural::from_str("10000000000000").unwrap();
-/// x -= Natural::from_str("1000000000000").unwrap();
-/// x -= Natural::from_str("2000000000000").unwrap();
-/// x -= Natural::from_str("3000000000000").unwrap();
-/// x -= Natural::from_str("4000000000000").unwrap();
+/// x -= &Natural::from_str("1000000000000").unwrap();
+/// x -= &Natural::from_str("2000000000000").unwrap();
+/// x -= &Natural::from_str("3000000000000").unwrap();
+/// x -= &Natural::from_str("4000000000000").unwrap();
 /// assert_eq!(x.to_string(), "0");
 /// ```
-impl SubAssign<Natural> for Natural {
-    fn sub_assign(&mut self, other: Natural) {
-        if other == 0 {
+impl<'a> SubAssign<&'a Natural> for Natural {
+    fn sub_assign(&mut self, other: &'a Natural) {
+        if *other == 0 {
             return;
         }
-        if let Small(y) = other {
+        if let Small(y) = *other {
             *self -= y;
         } else if let Small(_) = *self {
             panic!("Cannot subtract a Natural from a smaller Natural. self: {}, other: {}",
                    *self,
                    other);
-        } else if *self < other {
+        } else if *self < *other {
             panic!("Cannot subtract a Natural from a smaller Natural. self: {}, other: {}",
                    *self,
                    other);
         } else {
             match (&mut (*self), other) {
-                (&mut Large(ref mut x), Large(ref y)) => unsafe {
+                (&mut Large(ref mut x), &Large(ref y)) => unsafe {
                     gmp::mpz_sub(x, x, y);
                 },
                 _ => unreachable!(),

@@ -18,7 +18,7 @@ impl PartialEq<u32> for Natural {
     }
 }
 
-/// Determines whether a `Natural` is equal to `self`.
+/// Determines whether a `u32` is equal to a `Natural`.
 ///
 /// # Examples
 /// ```

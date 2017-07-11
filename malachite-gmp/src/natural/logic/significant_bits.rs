@@ -2,8 +2,8 @@ use gmp_mpfr_sys::gmp;
 use natural::Natural::{self, Large, Small};
 
 impl Natural {
-    /// Returns the smallest number of bits necessary to represent `self`. 0 has zero significant
-    /// bits.
+    /// Returns the smallest number of bits necessary to represent a `Natural`. 0 has zero
+    /// significant bits.
     ///
     /// # Examples
     /// ```

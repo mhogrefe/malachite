@@ -1,7 +1,7 @@
 use natural::Natural::{self, Large, Small};
 use std::cmp::Ordering;
 
-/// Compares `self` to a `u32`.
+/// Compares a `Natural` to a `u32`.
 ///
 /// Time: worst case O(1)
 ///
@@ -28,7 +28,7 @@ impl PartialOrd<u32> for Natural {
     }
 }
 
-/// Compares a `u32` to `self`.
+/// Compares a `u32` to `Natural`.
 ///
 /// Time: worst case O(1)
 ///

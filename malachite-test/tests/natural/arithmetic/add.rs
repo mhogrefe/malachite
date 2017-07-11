@@ -155,8 +155,8 @@ fn add_properties() {
         assert_eq!(rugint_integer_to_native_natural(&mut_x), sum);
 
         let reverse_sum = &y + &x;
-        let inv_1 = (sum.clone() - x.clone()).unwrap();
-        let inv_2 = (sum.clone() - y.clone()).unwrap();
+        let inv_1 = (&sum - &x).unwrap();
+        let inv_2 = (&sum - &y).unwrap();
         assert_eq!(gmp_sum, sum);
         assert_eq!(num_sum, sum);
         assert_eq!(rugint_sum, sum);

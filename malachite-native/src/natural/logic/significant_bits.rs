@@ -2,8 +2,8 @@ use natural::{LIMB_BITS, LOG_LIMB_BITS};
 use natural::Natural::{self, Large, Small};
 
 impl Natural {
-    /// Returns the smallest number of bits necessary to represent `self`. 0 has zero significant
-    /// bits.
+    /// Returns the smallest number of bits necessary to represent a `Natural`. 0 has zero
+    /// significant bits.
     ///
     /// Time: worst case O(1)
     ///

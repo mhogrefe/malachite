@@ -24,7 +24,7 @@ impl PartialOrd<u32> for Natural {
     }
 }
 
-/// Compares a `Natural` to `self`.
+/// Compares a `u32` to `Natural`.
 ///
 /// # Examples
 /// ```

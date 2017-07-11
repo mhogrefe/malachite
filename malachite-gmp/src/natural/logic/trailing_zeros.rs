@@ -2,8 +2,8 @@ use gmp_mpfr_sys::gmp;
 use natural::Natural::{self, Large, Small};
 
 impl Natural {
-    /// Returns the number of trailing zeros in the binary expansion of `self` (equivalently, the
-    /// multiplicity of 2 in the prime factorization of `self`) or `None` is `self` is 0.
+    /// Returns the number of trailing zeros in the binary expansion of a `Natural` (equivalently,
+    /// the multiplicity of 2 in its prime factorization) or `None` is the `Natural` is 0.
     ///
     /// # Examples
     /// ```

@@ -1,7 +1,7 @@
 use natural::{get_lower, get_upper, Natural};
 use traits::Assign;
 
-/// Assigns a `u64` to `self`.
+/// Assigns a `u64` to a `Natural`.
 ///
 /// # Example
 /// ```
