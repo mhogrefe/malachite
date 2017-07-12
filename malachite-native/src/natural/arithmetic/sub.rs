@@ -59,22 +59,16 @@ impl<'a, 'b> Sub<&'a Natural> for &'b Natural {
     type Output = Option<Natural>;
 
     fn sub(self, other: &'a Natural) -> Option<Natural> {
-        if *other == 0 {
-            Some(self.clone())
-        } else if let Small(y) = *other {
-            self - y
-        } else if let Small(_) = *self {
-            None
-        } else {
-            match (self, other) {
-                (&Large(ref xs), &Large(ref ys)) => {
-                    large_sub(xs, ys).map(|limbs| {
-                                              let mut result = Large(limbs);
-                                              result.trim();
-                                              result
-                                          })
-                }
-                _ => unreachable!(),
+        match (self, other) {
+            (x, &Small(0)) => Some(x.clone()),
+            (x, &Small(y)) => x - y,
+            (&Small(_), _) => None,
+            (&Large(ref xs), &Large(ref ys)) => {
+                large_sub(xs, ys).map(|limbs| {
+                                          let mut result = Large(limbs);
+                                          result.trim();
+                                          result
+                                      })
             }
         }
     }

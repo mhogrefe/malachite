@@ -116,19 +116,12 @@ impl<'a, 'b> Add<&'a Natural> for &'b Natural {
     type Output = Natural;
 
     fn add(self, other: &'a Natural) -> Natural {
-        if *self == 0 {
-            return other.clone();
-        } else if *other == 0 {
-            return self.clone();
-        }
-        match *other {
-            Small(y) => self + y,
-            Large(ref ys) => {
-                match *self {
-                    Small(x) => other + x,
-                    Large(ref xs) => Large(large_add(xs, ys)),
-                }
-            }
+        match (self, other) {
+            (&Small(0), _) => other.clone(),
+            (_, &Small(0)) => self.clone(),
+            (x, &Small(y)) => x + y,
+            (&Small(x), y) => x + y,
+            (&Large(ref xs), &Large(ref ys)) => Large(large_add(xs, ys)),
         }
     }
 }
