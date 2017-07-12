@@ -1,7 +1,7 @@
 use integer::Integer;
 use natural::Natural;
 
-/// Converts a `u32` to an `Integer`.
+/// Converts a `u64` to an `Integer`.
 ///
 /// Time: worst case O(1)
 ///
@@ -11,10 +11,10 @@ use natural::Natural;
 /// ```
 /// use malachite_native::integer::Integer;
 ///
-/// assert_eq!(Integer::from(123).to_string(), "123");
+/// assert_eq!(Integer::from(123u64).to_string(), "123");
 /// ```
-impl From<u32> for Integer {
-    fn from(u: u32) -> Integer {
+impl From<u64> for Integer {
+    fn from(u: u64) -> Integer {
         Integer {
             sign: true,
             abs: Natural::from(u),

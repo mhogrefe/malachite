@@ -6,6 +6,7 @@ use integer::{Integer, Small};
 /// ```
 /// use malachite_gmp::integer::Integer;
 ///
+/// assert_eq!(Integer::from(123).to_string(), "123");
 /// assert_eq!(Integer::from(-123).to_string(), "-123");
 /// ```
 impl From<i32> for Integer {

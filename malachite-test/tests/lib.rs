@@ -39,7 +39,9 @@ pub mod integer {
         pub mod assign_u32;
         pub mod clone_and_assign;
         pub mod from_i32;
+        pub mod from_i64;
         pub mod from_u32;
+        pub mod from_u64;
         pub mod into_natural;
         pub mod to_i32;
         pub mod to_u32;

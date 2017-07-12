@@ -1,5 +1,6 @@
-use integer::Integer;
-use traits::Assign;
+use gmp_mpfr_sys::gmp::{self, mpz_t};
+use integer::{Integer, Large, Small};
+use std::mem;
 
 /// Converts a `u32` to an `Integer`.
 ///
@@ -11,8 +12,14 @@ use traits::Assign;
 /// ```
 impl From<u32> for Integer {
     fn from(u: u32) -> Integer {
-        let mut out = Integer::new();
-        out.assign(u);
-        out
+        if u & 0x8000_0000 == 0 {
+            Small(u as i32)
+        } else {
+            unsafe {
+                let mut large: mpz_t = mem::uninitialized();
+                gmp::mpz_init_set_ui(&mut large, u.into());
+                Large(large)
+            }
+        }
     }
 }
