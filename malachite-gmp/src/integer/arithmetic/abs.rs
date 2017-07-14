@@ -20,6 +20,14 @@ impl Integer {
         self
     }
 
+    pub fn abs_ref(&self) -> Integer {
+        self.clone().abs()
+    }
+
+    pub fn unsigned_abs_ref(&self) -> Natural {
+        self.clone().unsigned_abs()
+    }
+
     /// Takes the absolute value of `self`, converting the result to a `Natural`.
     ///
     /// # Examples

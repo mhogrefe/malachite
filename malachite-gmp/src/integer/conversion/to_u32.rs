@@ -3,7 +3,8 @@ use integer::Integer::{self, Large, Small};
 use std::cmp::Ordering;
 
 impl Integer {
-    /// Converts an `Integer` to a `u32`, returning `None` if the `Integer` is too large.
+    /// Converts an `Integer` to a `u32`, returning `None` if the `Integer` is negative or too
+    /// large.
     ///
     /// # Examples
     /// ```

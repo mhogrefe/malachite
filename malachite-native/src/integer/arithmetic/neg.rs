@@ -16,8 +16,20 @@ impl Neg for Integer {
     type Output = Integer;
 
     fn neg(mut self) -> Integer {
-        self.neg_assign();
+        if self.abs != 0 {
+            self.sign = !self.sign;
+        }
         self
+    }
+}
+
+impl<'a> Neg for &'a Integer {
+    type Output = Integer;
+
+    fn neg(self) -> Integer {
+        let mut negative = self.clone();
+        negative.neg_assign();
+        negative
     }
 }
 

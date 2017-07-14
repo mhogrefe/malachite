@@ -1,7 +1,12 @@
 use integer::Integer;
 
 impl Integer {
-    /// Converts an `Integer` to a `u32`, returning `None` if the `Integer` is too large.
+    /// Converts an `Integer` to a `u32`, returning `None` if the `Integer` is negative or too
+    /// large.
+    ///
+    /// Time: worst case O(1)
+    ///
+    /// Additional memory: worst case O(1)
     ///
     /// # Example
     /// ```
@@ -21,6 +26,10 @@ impl Integer {
     }
 
     /// Converts an `Integer` to a `u32`, wrapping mod 2^(32).
+    ///
+    /// Time: worst case O(1)
+    ///
+    /// Additional memory: worst case O(1)
     ///
     /// # Example
     /// ```

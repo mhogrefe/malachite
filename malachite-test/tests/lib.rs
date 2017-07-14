@@ -44,7 +44,9 @@ pub mod integer {
         pub mod from_u64;
         pub mod into_natural;
         pub mod to_i32;
+        pub mod to_i64;
         pub mod to_u32;
+        pub mod to_u64;
     }
     pub mod logic {
         pub mod get_bit;

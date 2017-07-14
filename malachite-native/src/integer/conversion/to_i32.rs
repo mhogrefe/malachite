@@ -4,15 +4,19 @@ impl Integer {
     /// Converts an `Integer` to an `i32`, returning `None` if the `Integer` is outside the range of
     /// an `i32`.
     ///
+    /// Time: worst case O(1)
+    ///
+    /// Additional memory: worst case O(1)
+    ///
     /// # Example
     /// ```
     /// use malachite_native::integer::Integer;
     /// use std::str::FromStr;
     ///
-    /// assert_eq!(format!("{:?}", Integer::from(123).to_u32()), "Some(123)");
-    /// assert_eq!(format!("{:?}", Integer::from(-123).to_u32()), "None");
-    /// assert_eq!(format!("{:?}", Integer::from_str("1000000000000").unwrap().to_u32()), "None");
-    /// assert_eq!(format!("{:?}", Integer::from_str("-1000000000000").unwrap().to_u32()), "None");
+    /// assert_eq!(format!("{:?}", Integer::from(123).to_i32()), "Some(123)");
+    /// assert_eq!(format!("{:?}", Integer::from(-123).to_i32()), "Some(-123)");
+    /// assert_eq!(format!("{:?}", Integer::from_str("1000000000000").unwrap().to_i32()), "None");
+    /// assert_eq!(format!("{:?}", Integer::from_str("-1000000000000").unwrap().to_i32()), "None");
     /// ```
     pub fn to_i32(&self) -> Option<i32> {
         if *self >= i32::min_value() && *self <= i32::max_value() {
@@ -23,6 +27,10 @@ impl Integer {
     }
 
     /// Converts an `Integer` to a `i32`, wrapping mod 2^(32).
+    ///
+    /// Time: worst case O(1)
+    ///
+    /// Additional memory: worst case O(1)
     ///
     /// # Example
     /// ```

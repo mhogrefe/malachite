@@ -19,6 +19,10 @@ pub mod integer {
         pub mod from_i64;
         pub mod from_u32;
         pub mod from_u64;
+        pub mod to_i32;
+        pub mod to_i64;
+        pub mod to_u32;
+        pub mod to_u64;
     }
     pub mod comparison {
         pub mod partial_cmp_i32;

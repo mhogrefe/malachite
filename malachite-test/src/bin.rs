@@ -4,6 +4,10 @@ use malachite_test::integer::conversion::from_i32::*;
 use malachite_test::integer::conversion::from_i64::*;
 use malachite_test::integer::conversion::from_u32::*;
 use malachite_test::integer::conversion::from_u64::*;
+use malachite_test::integer::conversion::to_i32::*;
+use malachite_test::integer::conversion::to_i64::*;
+use malachite_test::integer::conversion::to_u32::*;
+use malachite_test::integer::conversion::to_u64::*;
 use malachite_test::natural::arithmetic::add::*;
 use malachite_test::natural::arithmetic::add_u32::*;
 use malachite_test::natural::arithmetic::even_odd::*;
@@ -57,6 +61,22 @@ fn main() {
                 "exhaustive_integer_from_i64" => demo_exhaustive_integer_from_i64(limit),
                 "exhaustive_integer_from_u32" => demo_exhaustive_integer_from_u32(limit),
                 "exhaustive_integer_from_u64" => demo_exhaustive_integer_from_u64(limit),
+                "exhaustive_integer_to_i32" => demo_exhaustive_integer_to_i32(limit),
+                "exhaustive_integer_to_i32_wrapping" => {
+                    demo_exhaustive_integer_to_i32_wrapping(limit)
+                }
+                "exhaustive_integer_to_i64" => demo_exhaustive_integer_to_i64(limit),
+                "exhaustive_integer_to_i64_wrapping" => {
+                    demo_exhaustive_integer_to_i64_wrapping(limit)
+                }
+                "exhaustive_integer_to_u32" => demo_exhaustive_integer_to_u32(limit),
+                "exhaustive_integer_to_u32_wrapping" => {
+                    demo_exhaustive_integer_to_u32_wrapping(limit)
+                }
+                "exhaustive_integer_to_u64" => demo_exhaustive_integer_to_u64(limit),
+                "exhaustive_integer_to_u64_wrapping" => {
+                    demo_exhaustive_integer_to_u64_wrapping(limit)
+                }
                 "exhaustive_natural_add_assign" => demo_exhaustive_natural_add_assign(limit),
                 "exhaustive_natural_add_assign_ref" => {
                     demo_exhaustive_natural_add_assign_ref(limit)
@@ -156,6 +176,14 @@ fn main() {
                 "random_integer_from_i64" => demo_random_integer_from_i64(limit),
                 "random_integer_from_u32" => demo_random_integer_from_u32(limit),
                 "random_integer_from_u64" => demo_random_integer_from_u64(limit),
+                "random_integer_to_i32" => demo_random_integer_to_i32(limit),
+                "random_integer_to_i32_wrapping" => demo_random_integer_to_i32_wrapping(limit),
+                "random_integer_to_i64" => demo_random_integer_to_i64(limit),
+                "random_integer_to_i64_wrapping" => demo_random_integer_to_i64_wrapping(limit),
+                "random_integer_to_u32" => demo_random_integer_to_u32(limit),
+                "random_integer_to_u32_wrapping" => demo_random_integer_to_u32_wrapping(limit),
+                "random_integer_to_u64" => demo_random_integer_to_u64(limit),
+                "random_integer_to_u64_wrapping" => demo_random_integer_to_u64_wrapping(limit),
                 "random_natural_add_assign" => demo_random_natural_add_assign(limit),
                 "random_natural_add_assign_ref" => demo_random_natural_add_assign_ref(limit),
                 "random_natural_add" => demo_random_natural_add(limit),
@@ -240,6 +268,30 @@ fn main() {
                 }
                 "exhaustive_integer_from_u64" => {
                     benchmark_exhaustive_integer_from_u64(limit, "temp.gp")
+                }
+                "exhaustive_integer_to_i32" => {
+                    benchmark_exhaustive_integer_to_i32(limit, "temp.gp")
+                }
+                "exhaustive_integer_to_i32_wrapping" => {
+                    benchmark_exhaustive_integer_to_i32_wrapping(limit, "temp.gp")
+                }
+                "exhaustive_integer_to_i64" => {
+                    benchmark_exhaustive_integer_to_i64(limit, "temp.gp")
+                }
+                "exhaustive_integer_to_i64_wrapping" => {
+                    benchmark_exhaustive_integer_to_i64_wrapping(limit, "temp.gp")
+                }
+                "exhaustive_integer_to_u32" => {
+                    benchmark_exhaustive_integer_to_u32(limit, "temp.gp")
+                }
+                "exhaustive_integer_to_u32_wrapping" => {
+                    benchmark_exhaustive_integer_to_u32_wrapping(limit, "temp.gp")
+                }
+                "exhaustive_integer_to_u64" => {
+                    benchmark_exhaustive_integer_to_u64(limit, "temp.gp")
+                }
+                "exhaustive_integer_to_u64_wrapping" => {
+                    benchmark_exhaustive_integer_to_u64_wrapping(limit, "temp.gp")
                 }
                 "exhaustive_natural_add_assign" => {
                     benchmark_exhaustive_natural_add_assign(limit, "temp.gp")
@@ -391,16 +443,32 @@ fn main() {
                 "exhaustive_natural_to_u64" => {
                     benchmark_exhaustive_natural_to_u64(limit, "temp.gp")
                 }
-                "exhaustive_natural_trailing_zeros" => {
-                    benchmark_exhaustive_natural_trailing_zeros(limit, "temp.gp")
-                }
                 "exhaustive_natural_to_u64_wrapping" => {
                     benchmark_exhaustive_natural_to_u64_wrapping(limit, "temp.gp")
+                }
+                "exhaustive_natural_trailing_zeros" => {
+                    benchmark_exhaustive_natural_trailing_zeros(limit, "temp.gp")
                 }
                 "random_integer_from_i32" => benchmark_random_integer_from_i32(limit, "temp.gp"),
                 "random_integer_from_i64" => benchmark_random_integer_from_i64(limit, "temp.gp"),
                 "random_integer_from_u32" => benchmark_random_integer_from_u32(limit, "temp.gp"),
                 "random_integer_from_u64" => benchmark_random_integer_from_u64(limit, "temp.gp"),
+                "random_integer_to_i32" => benchmark_random_integer_to_i32(limit, "temp.gp"),
+                "random_integer_to_i32_wrapping" => {
+                    benchmark_random_integer_to_i32_wrapping(limit, "temp.gp")
+                }
+                "random_integer_to_i64" => benchmark_random_integer_to_i64(limit, "temp.gp"),
+                "random_integer_to_i64_wrapping" => {
+                    benchmark_random_integer_to_i64_wrapping(limit, "temp.gp")
+                }
+                "random_integer_to_u32" => benchmark_random_integer_to_u32(limit, "temp.gp"),
+                "random_integer_to_u32_wrapping" => {
+                    benchmark_random_integer_to_u32_wrapping(limit, "temp.gp")
+                }
+                "random_integer_to_u64" => benchmark_random_integer_to_u64(limit, "temp.gp"),
+                "random_integer_to_u64_wrapping" => {
+                    benchmark_random_integer_to_u64_wrapping(limit, "temp.gp")
+                }
                 "random_natural_add_assign" => {
                     benchmark_random_natural_add_assign(limit, 1024, "temp.gp")
                 }
@@ -551,6 +619,18 @@ fn main() {
                     benchmark_exhaustive_integer_from_i64(100000, "exhaustive_integer_from_i64.gp");
                     benchmark_exhaustive_integer_from_u32(100000, "exhaustive_integer_from_u32.gp");
                     benchmark_exhaustive_integer_from_u64(100000, "exhaustive_integer_from_u64.gp");
+                    benchmark_exhaustive_integer_to_i32(100000, "exhaustive_integer_to_i32.gp");
+                    let s = "exhaustive_integer_to_i32_wrapping.gp";
+                    benchmark_exhaustive_integer_to_i32_wrapping(100000, s);
+                    benchmark_exhaustive_integer_to_i64(100000, "exhaustive_integer_to_i64.gp");
+                    let s = "exhaustive_integer_to_i64_wrapping.gp";
+                    benchmark_exhaustive_integer_to_i64_wrapping(100000, s);
+                    benchmark_exhaustive_integer_to_u32(100000, "exhaustive_integer_to_u32.gp");
+                    let s = "exhaustive_integer_to_u32_wrapping.gp";
+                    benchmark_exhaustive_integer_to_u32_wrapping(100000, s);
+                    benchmark_exhaustive_integer_to_u64(100000, "exhaustive_integer_to_u64.gp");
+                    let s = "exhaustive_integer_to_u64_wrapping.gp";
+                    benchmark_exhaustive_integer_to_u64_wrapping(100000, s);
                     benchmark_exhaustive_natural_add_assign(100000,
                                                             "exhaustive_natural_add_assign.gp");
                     let s = "exhaustive_natural_add_assign_evaluation_strategy.gp";
@@ -645,6 +725,18 @@ fn main() {
                     benchmark_random_integer_from_i64(100000, "random_integer_from_i64.gp");
                     benchmark_random_integer_from_u32(100000, "random_integer_from_u32.gp");
                     benchmark_random_integer_from_u64(100000, "random_integer_from_u64.gp");
+                    benchmark_random_integer_to_i32(100000, "random_integer_to_i32.gp");
+                    benchmark_random_integer_to_i32_wrapping(100000,
+                                                             "random_integer_to_i32_wrapping.gp");
+                    benchmark_random_integer_to_i64(100000, "random_integer_to_i64.gp");
+                    benchmark_random_integer_to_i64_wrapping(100000,
+                                                             "random_integer_to_i64_wrapping.gp");
+                    benchmark_random_integer_to_u32(100000, "random_integer_to_u32.gp");
+                    benchmark_random_integer_to_u32_wrapping(100000,
+                                                             "random_integer_to_u32_wrapping.gp");
+                    benchmark_random_integer_to_u64(100000, "random_integer_to_u64.gp");
+                    benchmark_random_integer_to_u64_wrapping(100000,
+                                                             "random_integer_to_u64_wrapping.gp");
                     benchmark_random_natural_add_assign(100000,
                                                         1024,
                                                         "random_natural_add_assign.gp");

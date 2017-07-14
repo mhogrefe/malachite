@@ -128,6 +128,10 @@ fn get_upper(val: u64) -> u32 {
     ((val & 0xffff_ffff_0000_0000) >> 32) as u32
 }
 
+fn make_u64(upper: u32, lower: u32) -> u64 {
+    (upper as u64) << 32 | (lower as u64)
+}
+
 macro_rules! mutate_with_possible_promotion {
     ($n: ident, $small: ident, $large: ident, $process_small: expr, $process_large: expr) => {
         if let Small(ref mut $small) = *$n {

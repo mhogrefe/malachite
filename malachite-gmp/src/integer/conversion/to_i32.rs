@@ -9,10 +9,10 @@ impl Integer {
     /// use malachite_gmp::integer::Integer;
     /// use std::str::FromStr;
     ///
-    /// assert_eq!(format!("{:?}", Integer::from(123).to_u32()), "Some(123)");
-    /// assert_eq!(format!("{:?}", Integer::from(-123).to_u32()), "None");
-    /// assert_eq!(format!("{:?}", Integer::from_str("1000000000000").unwrap().to_u32()), "None");
-    /// assert_eq!(format!("{:?}", Integer::from_str("-1000000000000").unwrap().to_u32()), "None");
+    /// assert_eq!(format!("{:?}", Integer::from(123).to_i32()), "Some(123)");
+    /// assert_eq!(format!("{:?}", Integer::from(-123).to_i32()), "Some(-123)");
+    /// assert_eq!(format!("{:?}", Integer::from_str("1000000000000").unwrap().to_i32()), "None");
+    /// assert_eq!(format!("{:?}", Integer::from_str("-1000000000000").unwrap().to_i32()), "None");
     /// ```
     pub fn to_i32(&self) -> Option<i32> {
         match *self {

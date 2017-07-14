@@ -38,7 +38,7 @@ fn from_u64_properties() {
         let gmp_n = gmp_integer_to_native(&raw_gmp_n);
         let num_n = num_bigint_to_native_integer(&num::BigInt::from(u));
         assert!(n.is_valid());
-        //TODO assert_eq!(n.to_u64(), Some(u));
+        assert_eq!(n.to_u64(), Some(u));
         assert_eq!(n, gmp_n);
         assert_eq!(n, num_n);
     };
