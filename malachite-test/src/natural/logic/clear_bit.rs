@@ -49,7 +49,7 @@ pub fn benchmark_exhaustive_natural_clear_bit(limit: usize, file_name: &str) {
 }
 
 pub fn benchmark_random_natural_clear_bit(limit: usize, scale: u32, file_name: &str) {
-    println!("benchmarking random Natural.set_bit(u64)");
+    println!("benchmarking random Natural.clear_bit(u64)");
     benchmark_2(BenchmarkOptions2 {
                     xs: random_pairs(&EXAMPLE_SEED,
                                      &(|seed| random_naturals(seed, scale)),

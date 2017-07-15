@@ -3,7 +3,7 @@ use integer::Integer::{self, Small};
 use std::mem;
 use traits::Assign;
 
-/// Assigns a `u32` to `self`.
+/// Assigns a `u32` to an `Integer`.
 ///
 /// # Examples
 /// ```

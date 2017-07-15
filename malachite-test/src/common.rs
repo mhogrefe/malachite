@@ -66,11 +66,11 @@ pub fn num_bigint_to_native_integer(n: &num::BigInt) -> native::integer::Integer
     native::integer::Integer::from_str(n.to_string().as_ref()).unwrap()
 }
 
-pub fn native_integer_to_num_bigint(n: &native::natural::Natural) -> num::BigInt {
+pub fn native_integer_to_num_bigint(n: &native::integer::Integer) -> num::BigInt {
     num::BigInt::from_str(n.to_string().as_ref()).unwrap()
 }
 
-pub fn gmp_integer_to_num_bigint(n: &gmp::natural::Natural) -> num::BigInt {
+pub fn gmp_integer_to_num_bigint(n: &gmp::integer::Integer) -> num::BigInt {
     num::BigInt::from_str(n.to_string().as_ref()).unwrap()
 }
 

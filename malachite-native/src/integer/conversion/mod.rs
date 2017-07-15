@@ -61,10 +61,12 @@ impl FromStr for Integer {
     }
 }
 
-pub mod assign_i32;
 pub mod assign;
+pub mod assign_i32;
+pub mod assign_i64;
 pub mod assign_natural;
 pub mod assign_u32;
+pub mod assign_u64;
 pub mod from_i32;
 pub mod from_i64;
 pub mod from_u32;

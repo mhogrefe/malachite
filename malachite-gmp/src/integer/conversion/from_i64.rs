@@ -14,7 +14,7 @@ impl From<i64> for Integer {
         if i >= 0 {
             Integer::from(i as u64)
         } else {
-            -Integer::from(i.abs() as u64)
+            -Integer::from((-i) as u64)
         }
     }
 }

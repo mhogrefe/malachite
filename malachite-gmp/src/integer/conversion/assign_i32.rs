@@ -1,7 +1,7 @@
 use integer::Integer::{self, Small};
 use traits::Assign;
 
-/// Assigns an `i32` to `self`.
+/// Assigns an `i32` to an `Integer`.
 ///
 /// # Examples
 /// ```

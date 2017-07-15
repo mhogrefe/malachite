@@ -15,7 +15,7 @@ use natural::Natural::{self, Large, Small};
 /// ```
 impl From<u64> for Natural {
     fn from(u: u64) -> Natural {
-        if u < u32::max_value() as u64 {
+        if u <= u32::max_value().into() {
             Small(u as u32)
         } else {
             Large(vec![get_lower(u), get_upper(u)])
