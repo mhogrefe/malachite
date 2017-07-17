@@ -48,8 +48,7 @@ fn assign_i64_properties() {
         assert!(n.is_valid());
         assert_eq!(n, native::Integer::from(i));
         let mut alt_n = old_n.clone();
-        //TODO assign by value
-        alt_n.assign(&native::Integer::from(i));
+        alt_n.assign(native::Integer::from(i));
         assert_eq!(alt_n, n);
     };
 

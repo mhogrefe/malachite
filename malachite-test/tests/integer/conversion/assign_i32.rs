@@ -60,8 +60,7 @@ fn assign_i32_properties() {
         assert!(n.is_valid());
         assert_eq!(n, i);
         let mut alt_n = old_n.clone();
-        //TODO assign by value
-        alt_n.assign(&native::Integer::from(i));
+        alt_n.assign(native::Integer::from(i));
         assert_eq!(alt_n, n);
 
         let mut num_n = native_integer_to_num_bigint(&old_n);

@@ -2,7 +2,7 @@ use integer::Integer::{self, Large, Small};
 use gmp_mpfr_sys::gmp::{self, mpz_t};
 use std::mem;
 
-/// Clones `self`, producing a new `Integer`.
+/// Clones an `Integer`, producing a new `Integer`.
 ///
 /// # Examples
 /// ```
