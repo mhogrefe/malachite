@@ -127,7 +127,6 @@ impl Debug for Natural {
     }
 }
 
-pub mod assign_integer;
 pub mod assign;
 pub mod assign_u32;
 pub mod assign_u64;

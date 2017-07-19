@@ -72,6 +72,7 @@ pub mod from_i64;
 pub mod from_u32;
 pub mod from_u64;
 pub mod into_natural;
+pub mod natural_assign_integer;
 pub mod to_i32;
 pub mod to_i64;
 pub mod to_u32;

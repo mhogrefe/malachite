@@ -2,6 +2,7 @@ extern crate malachite_test;
 
 use malachite_test::integer::conversion::assign_i32::*;
 use malachite_test::integer::conversion::assign_i64::*;
+use malachite_test::integer::conversion::assign_natural::*;
 use malachite_test::integer::conversion::assign_u32::*;
 use malachite_test::integer::conversion::assign_u64::*;
 use malachite_test::integer::conversion::clone_and_assign::*;
@@ -9,6 +10,7 @@ use malachite_test::integer::conversion::from_i32::*;
 use malachite_test::integer::conversion::from_i64::*;
 use malachite_test::integer::conversion::from_u32::*;
 use malachite_test::integer::conversion::from_u64::*;
+use malachite_test::integer::conversion::natural_assign_integer::*;
 use malachite_test::integer::conversion::to_i32::*;
 use malachite_test::integer::conversion::to_i64::*;
 use malachite_test::integer::conversion::to_u32::*;
@@ -27,7 +29,6 @@ use malachite_test::natural::comparison::partial_eq_integer::*;
 use malachite_test::natural::comparison::partial_eq_u32::*;
 use malachite_test::natural::comparison::partial_ord_integer::*;
 use malachite_test::natural::comparison::partial_ord_u32::*;
-use malachite_test::natural::conversion::assign_integer::*;
 use malachite_test::natural::conversion::assign_u32::*;
 use malachite_test::natural::conversion::assign_u64::*;
 use malachite_test::natural::conversion::clone_and_assign::*;
@@ -66,6 +67,12 @@ fn main() {
                 "exhaustive_integer_assign_ref" => demo_exhaustive_integer_assign_ref(limit),
                 "exhaustive_integer_assign_i32" => demo_exhaustive_integer_assign_i32(limit),
                 "exhaustive_integer_assign_i64" => demo_exhaustive_integer_assign_i64(limit),
+                "exhaustive_integer_assign_natural" => {
+                    demo_exhaustive_integer_assign_natural(limit)
+                }
+                "exhaustive_integer_assign_natural_ref" => {
+                    demo_exhaustive_integer_assign_natural_ref(limit)
+                }
                 "exhaustive_integer_assign_u32" => demo_exhaustive_integer_assign_u32(limit),
                 "exhaustive_integer_assign_u64" => demo_exhaustive_integer_assign_u64(limit),
                 "exhaustive_integer_clone" => demo_exhaustive_integer_clone(limit),
@@ -189,6 +196,10 @@ fn main() {
                 "random_integer_assign_ref" => demo_random_integer_assign_ref(limit),
                 "random_integer_assign_i32" => demo_random_integer_assign_i32(limit),
                 "random_integer_assign_i64" => demo_random_integer_assign_i64(limit),
+                "random_integer_assign_natural" => demo_random_integer_assign_natural(limit),
+                "random_integer_assign_natural_ref" => {
+                    demo_random_integer_assign_natural_ref(limit)
+                }
                 "random_integer_assign_u32" => demo_random_integer_assign_u32(limit),
                 "random_integer_assign_u64" => demo_random_integer_assign_u64(limit),
                 "random_integer_clone" => demo_random_integer_clone(limit),
@@ -290,6 +301,13 @@ fn main() {
                 "exhaustive_integer_assign_i64" => {
                     benchmark_exhaustive_integer_assign_i64(limit, "temp.gp")
                 }
+                "exhaustive_integer_assign_natural" => {
+                    benchmark_exhaustive_integer_assign_natural(limit, "temp.gp")
+                }
+                "exhaustive_integer_assign_natural_evaluation_strategy" => {
+                    benchmark_exhaustive_integer_assign_natural_evaluation_strategy(limit,
+                                                                                    "temp.gp")
+                }
                 "exhaustive_integer_assign_u32" => {
                     benchmark_exhaustive_integer_assign_u32(limit, "temp.gp")
                 }
@@ -369,6 +387,10 @@ fn main() {
                 }
                 "exhaustive_natural_assign_integer" => {
                     benchmark_exhaustive_natural_assign_integer(limit, "temp.gp")
+                }
+                "exhaustive_natural_assign_integer_evaluation_strategy" => {
+                    benchmark_exhaustive_natural_assign_integer_evaluation_strategy(limit,
+                                                                                    "temp.gp")
                 }
                 "exhaustive_natural_assign_u32" => {
                     benchmark_exhaustive_natural_assign_u32(limit, "temp.gp")
@@ -505,6 +527,14 @@ fn main() {
                 "random_integer_assign_i64" => {
                     benchmark_random_integer_assign_i64(limit, 1024, "temp.gp")
                 }
+                "random_integer_assign_natural" => {
+                    benchmark_random_integer_assign_natural(limit, 1024, "temp.gp")
+                }
+                "random_integer_assign_natural_evaluation_strategy" => {
+                    benchmark_random_integer_assign_natural_evaluation_strategy(limit,
+                                                                                1024,
+                                                                                "temp.gp")
+                }
                 "random_integer_assign_u32" => {
                     benchmark_random_integer_assign_u32(limit, 1024, "temp.gp")
                 }
@@ -566,6 +596,11 @@ fn main() {
                 }
                 "random_natural_assign_integer" => {
                     benchmark_random_natural_assign_integer(limit, 1024, "temp.gp")
+                }
+                "random_natural_assign_integer_evaluation_strategy" => {
+                    benchmark_random_natural_assign_integer_evaluation_strategy(limit,
+                                                                                1024,
+                                                                                "temp.gp")
                 }
                 "random_natural_assign_u32" => {
                     benchmark_random_natural_assign_u32(limit, 1024, "temp.gp")
@@ -691,6 +726,10 @@ fn main() {
                                                             "exhaustive_integer_assign_i32.gp");
                     benchmark_exhaustive_integer_assign_i64(100000,
                                                             "exhaustive_integer_assign_i64.gp");
+                    let s = "exhaustive_integer_assign_natural.gp";
+                    benchmark_exhaustive_integer_assign_natural(100000, s);
+                    let s = "exhaustive_integer_assign_natural_evaluation_strategy.gp";
+                    benchmark_exhaustive_integer_assign_natural_evaluation_strategy(100000, s);
                     benchmark_exhaustive_integer_assign_u32(100000,
                                                             "exhaustive_integer_assign_u32.gp");
                     benchmark_exhaustive_integer_assign_u64(100000,
@@ -734,6 +773,8 @@ fn main() {
                     benchmark_exhaustive_natural_assign(100000, s);
                     let s = "exhaustive_natural_assign_integer.gp";
                     benchmark_exhaustive_natural_assign_integer(100000, s);
+                    let s = "exhaustive_natural_assign_integer_evaluation_strategy.gp";
+                    benchmark_exhaustive_natural_assign_integer_evaluation_strategy(100000, s);
                     benchmark_exhaustive_natural_assign_u32(100000,
                                                             "exhaustive_natural_assign_u32.gp");
                     benchmark_exhaustive_natural_assign_u64(100000,
@@ -815,6 +856,11 @@ fn main() {
                     benchmark_random_integer_assign_i64(100000,
                                                         1024,
                                                         "random_integer_assign_i64.gp");
+                    benchmark_random_integer_assign_natural(100000,
+                                                            1024,
+                                                            "random_integer_assign_natural.gp");
+                    let s = "random_integer_assign_natural_evaluation_strategy.gp";
+                    benchmark_random_integer_assign_natural_evaluation_strategy(100000, 1024, s);
                     benchmark_random_integer_assign_u32(100000,
                                                         1024,
                                                         "random_integer_assign_u32.gp");
@@ -864,6 +910,8 @@ fn main() {
                     benchmark_random_natural_assign_integer(100000,
                                                             1024,
                                                             "random_natural_assign_integer.gp");
+                    let s = "random_natural_assign_integer_evaluation_strategy.gp";
+                    benchmark_random_natural_assign_integer_evaluation_strategy(100000, 1024, s);
                     benchmark_random_natural_assign_u32(100000,
                                                         1024,
                                                         "random_natural_assign_u32.gp");

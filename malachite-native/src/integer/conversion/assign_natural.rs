@@ -2,7 +2,39 @@ use integer::Integer;
 use natural::Natural;
 use traits::Assign;
 
-/// Assigns a `Natural` to `self`.
+/// Assigns a `Natural` to an `Integer`, taking the `Natural` by value.
+///
+/// Time: worst case O(1)
+///
+/// Additional memory: worst case O(1)
+///
+/// # Panics
+/// Panics if `other` is negative.
+///
+/// # Example
+/// ```
+/// use malachite_native::integer::Integer;
+/// use malachite_native::natural::Natural;
+/// use malachite_native::traits::Assign;
+///
+/// let mut x = Integer::from(-456);
+/// x.assign(Natural::from(123u32));
+/// assert_eq!(x.to_string(), "123");
+/// ```
+impl Assign<Natural> for Integer {
+    fn assign(&mut self, other: Natural) {
+        self.sign = true;
+        self.abs.assign(other);
+    }
+}
+
+/// Assigns a `Natural` to an `Integer`, taking the `Natural` by reference.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(n)
+///
+/// where n = `other.significant_bits()`
 ///
 /// # Panics
 /// Panics if `other` is negative.

@@ -15,6 +15,7 @@ pub mod integer {
     pub mod conversion {
         pub mod assign_i32;
         pub mod assign_i64;
+        pub mod assign_natural;
         pub mod assign_u32;
         pub mod assign_u64;
         pub mod clone_and_assign;
@@ -22,6 +23,7 @@ pub mod integer {
         pub mod from_i64;
         pub mod from_u32;
         pub mod from_u64;
+        pub mod natural_assign_integer;
         pub mod to_i32;
         pub mod to_i64;
         pub mod to_u32;
@@ -55,7 +57,6 @@ pub mod natural {
         pub mod partial_eq_u32;
     }
     pub mod conversion {
-        pub mod assign_integer;
         pub mod assign_u32;
         pub mod assign_u64;
         pub mod clone_and_assign;

@@ -15,7 +15,7 @@ use rust_wheels::iterators::tuples::{exhaustive_pairs, random_pairs};
 use std::str::FromStr;
 
 #[test]
-fn test_assign_integer() {
+fn test_natural_assign_integer() {
     let test = |u, v, out| {
         // assign Integer by value
         let mut x = native::natural::Natural::from_str(u).unwrap();
@@ -55,20 +55,20 @@ fn test_assign_integer() {
 
 #[test]
 #[should_panic(expected = "Cannot assign from a negative Integer. Invalid other: -456")]
-fn assign_integer_fail_native() {
+fn natural_assign_integer_fail_native() {
     let mut x = native::natural::Natural::from_str("123").unwrap();
     x.assign(&native::integer::Integer::from_str("-456").unwrap());
 }
 
 #[test]
 #[should_panic(expected = "Cannot assign from a negative Integer. Invalid other: -456")]
-fn assign_integer_fail_gmp() {
+fn natural_assign_integer_fail_gmp() {
     let mut x = gmp::natural::Natural::from_str("123").unwrap();
     x.assign(&gmp::integer::Integer::from_str("-456").unwrap());
 }
 
 #[test]
-fn assign_integer_properties() {
+fn natural_assign_integer_properties() {
     // x.assign(y) is equivalent for malachite-gmp, malachite-native, and rugint.
     // x.assign(y) is valid.
     // x.assign(y); x == y
