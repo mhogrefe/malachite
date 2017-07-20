@@ -41,7 +41,8 @@ fn to_integer_properties() {
     // x.to_integer() is equivalent for malachite-gmp and malachite-native.
     // x.to_integer() is valid.
     // x.to_integer() == x.into_integer()
-    // TODO invert with into_natural and to_natural
+    //
+    // x.to_integer().to_natural() == x
     let one_natural = |gmp_x: gmp::Natural| {
         let x = gmp_natural_to_native(&gmp_x);
         let native_integer = x.clone().into_integer();
@@ -58,6 +59,9 @@ fn to_integer_properties() {
         assert_eq!(native_integer_2, native_integer);
         assert_eq!(gmp_integer_to_native(&gmp_integer_2), native_integer_2);
         assert_eq!(gmp_integer_2, gmp_integer);
+
+        assert_eq!(native_integer_2.to_natural().unwrap(), x);
+        assert_eq!(native_integer_2.into_natural().unwrap(), x);
     };
 
     for n in exhaustive_naturals().take(LARGE_LIMIT) {

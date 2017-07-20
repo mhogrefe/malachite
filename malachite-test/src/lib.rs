@@ -26,6 +26,7 @@ pub mod integer {
         pub mod natural_assign_integer;
         pub mod to_i32;
         pub mod to_i64;
+        pub mod to_natural;
         pub mod to_u32;
         pub mod to_u64;
     }
