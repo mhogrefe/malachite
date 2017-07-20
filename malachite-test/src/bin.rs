@@ -1,5 +1,6 @@
 extern crate malachite_test;
 
+use malachite_test::integer::arithmetic::abs::*;
 use malachite_test::integer::conversion::assign_i32::*;
 use malachite_test::integer::conversion::assign_i64::*;
 use malachite_test::integer::conversion::assign_natural::*;
@@ -64,6 +65,13 @@ fn main() {
     match args[1].as_ref() {
         "demo" => {
             match item_name.as_ref() {
+                "exhaustive_integer_abs_assign" => demo_exhaustive_integer_abs_assign(limit),
+                "exhaustive_integer_abs" => demo_exhaustive_integer_abs(limit),
+                "exhaustive_integer_abs_ref" => demo_exhaustive_integer_abs_ref(limit),
+                "exhaustive_integer_natural_abs" => demo_exhaustive_integer_natural_abs(limit),
+                "exhaustive_integer_natural_abs_ref" => {
+                    demo_exhaustive_integer_natural_abs_ref(limit)
+                }
                 "exhaustive_integer_assign" => demo_exhaustive_integer_assign(limit),
                 "exhaustive_integer_assign_ref" => demo_exhaustive_integer_assign_ref(limit),
                 "exhaustive_integer_assign_i32" => demo_exhaustive_integer_assign_i32(limit),
@@ -195,6 +203,11 @@ fn main() {
                 "exhaustive_natural_trailing_zeros" => {
                     demo_exhaustive_natural_trailing_zeros(limit)
                 }
+                "random_integer_abs_assign" => demo_random_integer_abs_assign(limit),
+                "random_integer_abs" => demo_random_integer_abs(limit),
+                "random_integer_abs_ref" => demo_random_integer_abs_ref(limit),
+                "random_integer_natural_abs" => demo_random_integer_natural_abs(limit),
+                "random_integer_natural_abs_ref" => demo_random_integer_natural_abs_ref(limit),
                 "random_integer_assign" => demo_random_integer_assign(limit),
                 "random_integer_assign_ref" => demo_random_integer_assign_ref(limit),
                 "random_integer_assign_i32" => demo_random_integer_assign_i32(limit),
@@ -294,6 +307,19 @@ fn main() {
         }
         "bench" => {
             match item_name.as_ref() {
+                "exhaustive_integer_abs_assign" => {
+                    benchmark_exhaustive_integer_abs_assign(limit, "temp.gp")
+                }
+                "exhaustive_integer_abs" => benchmark_exhaustive_integer_abs(limit, "temp.gp"),
+                "exhaustive_integer_abs_evaluation_strategy" => {
+                    benchmark_exhaustive_integer_abs_evaluation_strategy(limit, "temp.gp")
+                }
+                "exhaustive_integer_natural_abs" => {
+                    benchmark_exhaustive_integer_natural_abs(limit, "temp.gp")
+                }
+                "exhaustive_integer_natural_abs_evaluation_strategy" => {
+                    benchmark_exhaustive_integer_natural_abs_evaluation_strategy(limit, "temp.gp")
+                }
                 "exhaustive_integer_assign" => {
                     benchmark_exhaustive_integer_assign(limit, "temp.gp")
                 }
@@ -531,6 +557,19 @@ fn main() {
                 "exhaustive_natural_trailing_zeros" => {
                     benchmark_exhaustive_natural_trailing_zeros(limit, "temp.gp")
                 }
+                "random_integer_abs_assign" => {
+                    benchmark_random_integer_abs_assign(limit, 1024, "temp.gp")
+                }
+                "random_integer_abs" => benchmark_random_integer_abs(limit, 1024, "temp.gp"),
+                "random_integer_abs_evaluation_strategy" => {
+                    benchmark_random_integer_abs_evaluation_strategy(limit, 1024, "temp.gp")
+                }
+                "random_integer_natural_abs" => {
+                    benchmark_random_integer_natural_abs(limit, 1024, "temp.gp")
+                }
+                "random_integer_natural_abs_evaluation_strategy" => {
+                    benchmark_random_integer_natural_abs_evaluation_strategy(limit, 1024, "temp.gp")
+                }
                 "random_integer_assign" => benchmark_random_integer_assign(limit, 1024, "temp.gp"),
                 "random_integer_assign_evaluation_strategy" => {
                     benchmark_random_integer_assign_evaluation_strategy(limit, 1024, "temp.gp")
@@ -742,6 +781,15 @@ fn main() {
                 }
 
                 "all" => {
+                    benchmark_exhaustive_integer_abs_assign(100000,
+                                                            "exhaustive_integer_abs_assign.gp");
+                    benchmark_exhaustive_integer_abs(100000, "exhaustive_integer_abs.gp");
+                    let s = "exhaustive_integer_abs_evaluation_strategy.gp";
+                    benchmark_exhaustive_integer_abs_evaluation_strategy(100000, s);
+                    benchmark_exhaustive_integer_natural_abs(100000,
+                                                             "exhaustive_integer_natural_abs.gp");
+                    let s = "exhaustive_integer_natural_abs_evaluation_strategy.gp";
+                    benchmark_exhaustive_integer_natural_abs_evaluation_strategy(100000, s);
                     benchmark_exhaustive_integer_assign(100000, "exhaustive_integer_assign.gp");
                     let s = "exhaustive_integer_assign_evaluation_strategy.gp";
                     benchmark_exhaustive_integer_assign_evaluation_strategy(100000, s);
@@ -876,6 +924,17 @@ fn main() {
                     benchmark_exhaustive_natural_to_u64_wrapping(100000, s);
                     let s = "exhaustive_natural_trailing_zeros.gp";
                     benchmark_exhaustive_natural_trailing_zeros(100000, s);
+                    benchmark_random_integer_abs_assign(100000,
+                                                        1024,
+                                                        "random_integer_abs_assign.gp");
+                    benchmark_random_integer_abs(100000, 1024, "random_integer_abs.gp");
+                    let s = "random_integer_abs_evaluation_strategy.gp";
+                    benchmark_random_integer_abs_evaluation_strategy(100000, 1024, s);
+                    benchmark_random_integer_natural_abs(100000,
+                                                         1024,
+                                                         "random_integer_natural_abs.gp");
+                    let s = "random_integer_natural_abs_evaluation_strategy.gp";
+                    benchmark_random_integer_natural_abs_evaluation_strategy(100000, 1024, s);
                     benchmark_random_integer_assign(100000, 1024, "random_integer_assign.gp");
                     let s = "random_integer_assign_evaluation_strategy.gp";
                     benchmark_random_integer_assign_evaluation_strategy(100000, 1024, s);

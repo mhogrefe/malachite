@@ -3,7 +3,11 @@ use natural::Natural;
 use traits::AbsAssign;
 
 impl Integer {
-    /// Takes the absolute value of `self`.
+    /// Finds the absolute value of an `Integer`, taking the `Integer` by value.
+    ///
+    /// Time: worst case O(1)
+    ///
+    /// Additional memory: worst case O(1)
     ///
     /// # Examples
     /// ```
@@ -18,27 +22,75 @@ impl Integer {
         self
     }
 
-    /// Takes the absolute value of `self`, converting the result to a `Natural`.
+    /// Finds the absolute value of an `Integer`, taking the `Integer` by reference.
+    ///
+    /// Time: worst case O(n)
+    ///
+    /// Additional memory: worst case O(n)
+    ///
+    /// where n = `self.significant_bits()`
     ///
     /// # Examples
     /// ```
     /// use malachite_native::integer::Integer;
     ///
-    /// assert_eq!(Integer::from(0).unsigned_abs().to_string(), "0");
-    /// assert_eq!(Integer::from(123).unsigned_abs().to_string(), "123");
-    /// assert_eq!(Integer::from(-123).unsigned_abs().to_string(), "123");
+    /// assert_eq!(Integer::from(0).abs_ref().to_string(), "0");
+    /// assert_eq!(Integer::from(123).abs_ref().to_string(), "123");
+    /// assert_eq!(Integer::from(-123).abs_ref().to_string(), "123");
     /// ```
-    pub fn unsigned_abs(self) -> Natural {
+    pub fn abs_ref(&self) -> Integer {
+        Integer {
+            sign: true,
+            abs: self.abs.clone(),
+        }
+    }
+
+    /// Finds the absolute value of an `Integer`, taking the `Integer` by value and converting the
+    /// result to a `Natural`.
+    ///
+    /// Time: worst case O(1)
+    ///
+    /// Additional memory: worst case O(1)
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_native::integer::Integer;
+    ///
+    /// assert_eq!(Integer::from(0).natural_abs().to_string(), "0");
+    /// assert_eq!(Integer::from(123).natural_abs().to_string(), "123");
+    /// assert_eq!(Integer::from(-123).natural_abs().to_string(), "123");
+    /// ```
+    pub fn natural_abs(self) -> Natural {
         self.abs
     }
 
-    //TODO document and test
-    pub fn unsigned_abs_by_ref(&self) -> Natural {
+    /// Finds the absolute value of an `Integer`, taking the `Integer` by reference and converting
+    /// the result to a `Natural`.
+    ///
+    /// Time: worst case O(n)
+    ///
+    /// Additional memory: worst case O(n)
+    ///
+    /// where n = `self.significant_bits()`
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_native::integer::Integer;
+    ///
+    /// assert_eq!(Integer::from(0).natural_abs_ref().to_string(), "0");
+    /// assert_eq!(Integer::from(123).natural_abs_ref().to_string(), "123");
+    /// assert_eq!(Integer::from(-123).natural_abs_ref().to_string(), "123");
+    /// ```
+    pub fn natural_abs_ref(&self) -> Natural {
         self.abs.clone()
     }
 }
 
-/// Replaces `self` with its absolute value.
+/// Replaces an `Integer` with its absolute value.
+///
+/// Time: worst case O(1)
+///
+/// Additional memory: worst case O(1)
 ///
 /// # Examples
 /// ```
