@@ -137,6 +137,7 @@ pub mod arithmetic {
     pub mod add_u32;
     pub mod even_odd;
     pub mod is_power_of_two;
+    pub mod neg;
     pub mod shl_u32;
     pub mod sub;
     pub mod sub_u32;

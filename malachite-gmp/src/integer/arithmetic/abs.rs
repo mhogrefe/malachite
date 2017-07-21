@@ -5,7 +5,7 @@ use std::mem;
 use traits::AbsAssign;
 
 impl Integer {
-    /// Finds the absolute value of an `Integer`, taking the `Integer` by value.
+    /// Returns the absolute value of an `Integer`, taking the `Integer` by value.
     ///
     /// # Examples
     /// ```
@@ -20,7 +20,7 @@ impl Integer {
         self
     }
 
-    /// Finds the absolute value of an `Integer`, taking the `Integer` by reference.
+    /// Returns the absolute value of an `Integer`, taking the `Integer` by reference.
     ///
     /// # Examples
     /// ```
@@ -40,14 +40,14 @@ impl Integer {
             Integer::Small(ref small) => Integer::Small(small.abs()),
             Integer::Large(ref large) => unsafe {
                 let mut abs: mpz_t = mem::uninitialized();
-                gmp::mpz_init_set(&mut abs, large);
-                gmp::mpz_abs(&mut abs, &abs);
+                gmp::mpz_init(&mut abs);
+                gmp::mpz_abs(&mut abs, large);
                 Integer::Large(abs)
             },
         }
     }
 
-    /// Finds the absolute value of an `Integer`, taking the `Integer` by value and converting the
+    /// Returns the absolute value of an `Integer`, taking the `Integer` by value and converting the
     /// result to a `Natural`.
     ///
     /// # Examples
@@ -91,8 +91,8 @@ impl Integer {
             Integer::Small(small) => Natural::Small(small.abs() as u32),
             Integer::Large(ref large) => unsafe {
                 let mut abs: mpz_t = mem::uninitialized();
-                gmp::mpz_init_set(&mut abs, large);
-                gmp::mpz_abs(&mut abs, &abs);
+                gmp::mpz_init(&mut abs);
+                gmp::mpz_abs(&mut abs, large);
                 if gmp::mpz_sizeinbase(&abs, 2) <= 32 {
                     Natural::Small(gmp::mpz_get_ui(&abs) as u32)
                 } else {

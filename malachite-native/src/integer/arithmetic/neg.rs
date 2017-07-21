@@ -2,7 +2,11 @@ use integer::Integer;
 use std::ops::Neg;
 use traits::NegAssign;
 
-/// Takes the negative of `self`.
+/// Returns the negative of an `Integer`, taking the `Integer` by value.
+///
+/// Time: worst case O(1)
+///
+/// Additional memory: worst case O(1)
 ///
 /// # Examples
 /// ```
@@ -23,17 +27,42 @@ impl Neg for Integer {
     }
 }
 
+/// Returns the negative of an `Integer`, taking the `Integer` by reference.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(n)
+///
+/// where n = `self.significant_bits()`
+///
+/// # Examples
+/// ```
+/// use malachite_native::integer::Integer;
+///
+/// assert_eq!((-&Integer::from(0)).to_string(), "0");
+/// assert_eq!((-&Integer::from(123)).to_string(), "-123");
+/// assert_eq!((-&Integer::from(-123)).to_string(), "123");
+/// ```
 impl<'a> Neg for &'a Integer {
     type Output = Integer;
 
     fn neg(self) -> Integer {
-        let mut negative = self.clone();
-        negative.neg_assign();
-        negative
+        if self.abs == 0 {
+            Integer::from(0)
+        } else {
+            Integer {
+                sign: !self.sign,
+                abs: self.abs.clone(),
+            }
+        }
     }
 }
 
-/// Negates `self`.
+/// Replaces an `Integer` with its negative.
+///
+/// Time: worst case O(1)
+///
+/// Additional memory: worst case O(1)
 ///
 /// # Examples
 /// ```

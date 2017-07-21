@@ -55,7 +55,7 @@ fn test_abs() {
 }
 
 #[test]
-fn to_integer_properties() {
+fn abs_properties() {
     // x.abs() is equivalent for malachite-gmp, malachite-native, num, and rugint.
     // x.abs() is valid.
     //
@@ -101,7 +101,7 @@ fn to_integer_properties() {
 
         assert!(native_abs >= 0);
         assert_eq!(native_abs == x, x >= 0);
-        assert_eq!(native_abs.clone().abs(), native_abs);
+        assert_eq!(native_abs.abs_ref(), native_abs);
 
         let native_abs_3 = x.clone().natural_abs();
         assert!(native_abs_3.is_valid());
