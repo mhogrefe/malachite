@@ -1,6 +1,10 @@
 use integer::Integer;
 
-/// Determines whether `self` is equal to an `i32`.
+/// Determines whether an `Integer` is equal to an `i32`.
+///
+/// Time: worst case O(1)
+///
+/// Additional memory: worst case O(1)
 ///
 /// # Example
 /// ```
@@ -15,7 +19,11 @@ impl PartialEq<i32> for Integer {
     }
 }
 
-/// Determines whether an `i32` is equal to `self`.
+/// Determines whether an `i32` is equal to an `Integer`.
+///
+/// Time: worst case O(1)
+///
+/// Additional memory: worst case O(1)
 ///
 /// # Example
 /// ```

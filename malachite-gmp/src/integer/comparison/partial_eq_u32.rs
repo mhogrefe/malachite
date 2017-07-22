@@ -1,7 +1,7 @@
 use gmp_mpfr_sys::gmp;
 use integer::Integer::{self, Large, Small};
 
-/// Determines whether `self` is equal to a `u32`.
+/// Determines whether an `Integer` is equal to a `u32`.
 ///
 /// # Examples
 /// ```
@@ -15,13 +15,13 @@ impl PartialEq<u32> for Integer {
         let u = *other;
         match *self {
             Small(small) => small >= 0 && small as u32 == u,
-            Large(_) if u & 0x8000_0000 == 0 => false,
+            Large(_) if u <= i32::max_value() as u32 => false,
             Large(ref large) => (unsafe { gmp::mpz_cmp_ui(large, u.into()) }) == 0,
         }
     }
 }
 
-/// Determines whether a `u32` is equal to `self`.
+/// Determines whether a `u32` is equal to an `Integer`.
 ///
 /// # Examples
 /// ```
@@ -32,11 +32,11 @@ impl PartialEq<u32> for Integer {
 /// ```
 impl PartialEq<Integer> for u32 {
     fn eq(&self, other: &Integer) -> bool {
-        let x = *self;
+        let u = *self;
         match *other {
-            Small(small) => small >= 0 && small as u32 == x,
-            Large(_) if x & 0x8000_0000 == 0 => false,
-            Large(ref large) => (unsafe { gmp::mpz_cmp_ui(large, x.into()) }) == 0,
+            Small(small) => small >= 0 && small as u32 == u,
+            Large(_) if u <= i32::max_value() as u32 => false,
+            Large(ref large) => (unsafe { gmp::mpz_cmp_ui(large, u.into()) }) == 0,
         }
     }
 }

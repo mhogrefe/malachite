@@ -59,8 +59,9 @@ pub fn benchmark_exhaustive_natural_assign_integer(limit: usize, file_name: &str
     println!("benchmarking exhaustive Natural.assign(Integer)");
     benchmark_3(BenchmarkOptions3 {
                     xs: exhaustive_pairs(exhaustive_naturals(), exhaustive_natural_integers()),
-                    function_f:
-                        &(|(mut x, y): (gmp::natural::Natural, gmp::integer::Integer)| x.assign(y)),
+                    function_f: &(|(mut x, y): (gmp::natural::Natural, gmp::integer::Integer)| {
+                                      x.assign(y)
+                                  }),
                     function_g: &(|(mut x, y): (native::natural::Natural,
                                                 native::integer::Integer)| x.assign(y)),
                     function_h: &(|(mut x, y): (rugint::Integer, rugint::Integer)| x.assign(y)),
@@ -91,8 +92,9 @@ pub fn benchmark_random_natural_assign_integer(limit: usize, scale: u32, file_na
                     xs: random_pairs(&EXAMPLE_SEED,
                                      &(|seed| random_naturals(seed, scale)),
                                      &(|seed| random_natural_integers(seed, scale))),
-                    function_f:
-                        &(|(mut x, y): (gmp::natural::Natural, gmp::integer::Integer)| x.assign(y)),
+                    function_f: &(|(mut x, y): (gmp::natural::Natural, gmp::integer::Integer)| {
+                                      x.assign(y)
+                                  }),
                     function_g: &(|(mut x, y): (native::natural::Natural,
                                                 native::integer::Integer)| x.assign(y)),
                     function_h: &(|(mut x, y): (rugint::Integer, rugint::Integer)| x.assign(y)),

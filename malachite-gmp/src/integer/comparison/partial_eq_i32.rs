@@ -1,6 +1,6 @@
 use integer::Integer::{self, Large, Small};
 
-/// Determines whether `self` is equal to an `i32`.
+/// Determines whether an `Integer` is equal to an `i32`.
 ///
 /// # Examples
 /// ```
@@ -18,7 +18,7 @@ impl PartialEq<i32> for Integer {
     }
 }
 
-/// Determines whether an `i32` is equal to `self`.
+/// Determines whether an `i32` is equal to an `Integer`.
 ///
 /// # Examples
 /// ```

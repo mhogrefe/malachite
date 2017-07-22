@@ -1,8 +1,16 @@
+use common::LARGE_LIMIT;
 use malachite_native::integer as native;
 use malachite_gmp::integer as gmp;
+use malachite_test::common::{gmp_integer_to_native, native_integer_to_num_bigint,
+                             native_integer_to_rugint};
 use malachite_test::integer::comparison::partial_eq_i32::num_partial_eq_i32;
 use num;
 use rugint;
+use rust_wheels::iterators::common::EXAMPLE_SEED;
+use rust_wheels::iterators::general::random_x;
+use rust_wheels::iterators::integers::{exhaustive_integers, random_integers};
+use rust_wheels::iterators::primitive_ints::exhaustive_i;
+use rust_wheels::iterators::tuples::{exhaustive_pairs, random_pairs};
 use std::str::FromStr;
 
 #[test]
@@ -27,4 +35,40 @@ fn test_partial_eq_i32() {
     test("123", -123, false);
     test("1000000000000", 123, false);
     test("-1000000000000", 123, false);
+}
+
+#[test]
+fn partial_eq_i32_properties() {
+    // n == i is equivalent for malachite-gmp, malachite-native, num, and rugint.
+    // n == Natural::from(i) is equivalent to n == i.
+    //
+    // i == n is equivalent for malachite-gmp, malachite-native, and rugint.
+    // Integer::from(i) == n is equivalent to i == n.
+    // n == i is equivalent to i == n.
+    let integer_and_i32 = |gmp_n: gmp::Integer, i: i32| {
+        let n = gmp_integer_to_native(&gmp_n);
+        let eq_1 = n == i;
+        assert_eq!(gmp_n == i, eq_1);
+        assert_eq!(num_partial_eq_i32(&native_integer_to_num_bigint(&n), i),
+                   eq_1);
+        assert_eq!(native_integer_to_rugint(&n) == i, eq_1);
+        assert_eq!(n == native::Integer::from(i), eq_1);
+
+        let eq_2 = i == n;
+        assert_eq!(i == gmp_n, eq_2);
+        assert_eq!(i == native_integer_to_rugint(&n), eq_2);
+        assert_eq!(eq_1, eq_2);
+        assert_eq!(native::Integer::from(i) == n, eq_2);
+    };
+
+    for (n, i) in exhaustive_pairs(exhaustive_integers(), exhaustive_i::<i32>()).take(LARGE_LIMIT) {
+        integer_and_i32(n, i);
+    }
+
+    for (n, i) in random_pairs(&EXAMPLE_SEED,
+                               &(|seed| random_integers(seed, 32)),
+                               &(|seed| random_x::<i32>(seed)))
+                .take(LARGE_LIMIT) {
+        integer_and_i32(n, i);
+    }
 }
