@@ -149,32 +149,6 @@ pub struct IntegerOld {
     inner: mpz_t,
 }
 
-impl Drop for IntegerOld {
-    fn drop(&mut self) {
-        unsafe {
-            gmp::mpz_clear(&mut self.inner);
-        }
-    }
-}
-
-impl Default for IntegerOld {
-    fn default() -> IntegerOld {
-        IntegerOld::new()
-    }
-}
-
-impl Clone for IntegerOld {
-    fn clone(&self) -> IntegerOld {
-        let mut ret = IntegerOld::new();
-        ret.assign(self);
-        ret
-    }
-
-    fn clone_from(&mut self, source: &IntegerOld) {
-        self.assign(source);
-    }
-}
-
 pub struct IntegerContent<'a> {
     x: &'a IntegerOld,
     i: u32,
@@ -215,67 +189,6 @@ impl<'a> Iterator for IntegerContent<'a> {
 }
 
 impl IntegerOld {
-    /// Constructs a new arbitrary-precision integer with value 0.
-    pub fn new() -> IntegerOld {
-        unsafe {
-            let mut inner: mpz_t = mem::uninitialized();
-            gmp::mpz_init(&mut inner);
-            IntegerOld { inner: inner }
-        }
-    }
-
-    /// Converts to a `u32` if the value fits.
-    pub fn to_u32(&self) -> Option<u32> {
-        if self.sign() != Ordering::Less && *self <= u32::MAX {
-            Some(self.to_u32_wrapping())
-        } else {
-            None
-        }
-    }
-
-    /// Converts to a `u32`, wrapping if the value is too large.
-    pub fn to_u32_wrapping(&self) -> u32 {
-        let u = unsafe { gmp::mpz_get_ui(&self.inner) as u32 };
-        if self.sign() == Ordering::Less {
-            u.wrapping_neg()
-        } else {
-            u
-        }
-    }
-
-    /// Converts to an `i32` if the value fits.
-    ///
-    /// # Examples
-    /// ```rust
-    /// use gmp_to_flint_adaptor_lib::integer_old::IntegerOld;
-    /// use std::str::FromStr;
-    ///
-    /// assert_eq!(IntegerOld::from(1000000).to_i32(), Some(1000000));
-    /// assert_eq!(IntegerOld::from(-1000000).to_i32(), Some(-1000000));
-    /// assert_eq!(IntegerOld::from_str("1000000000000").unwrap().to_i32(), None);
-    /// ```
-    pub fn to_i32(&self) -> Option<i32> {
-        if *self >= i32::MIN && *self <= i32::MAX {
-            Some(self.to_i32_wrapping())
-        } else {
-            None
-        }
-    }
-
-    /// Converts to an `i32`, wrapping if the value is too large.
-    /// # Examples
-    /// ```rust
-    /// use gmp_to_flint_adaptor_lib::integer_old::IntegerOld;
-    /// use std::str::FromStr;
-    ///
-    /// assert_eq!(IntegerOld::from(1000000).to_i32_wrapping(), 1000000);
-    /// assert_eq!(IntegerOld::from(-1000000).to_i32_wrapping(), -1000000);
-    /// assert_eq!(IntegerOld::from_str("1000000000000").unwrap().to_i32_wrapping(), -727379968);
-    /// ```
-    pub fn to_i32_wrapping(&self) -> i32 {
-        self.to_u32_wrapping() as i32
-    }
-
     /// Converts to an `f64`, rounding towards zero.
     pub fn to_f64(&self) -> f64 {
         unsafe { gmp::mpz_get_d(&self.inner) }
@@ -300,14 +213,6 @@ impl IntegerOld {
                              &self.inner,
                              &divisor.inner)
         };
-    }
-
-    /// Computes the absolute value of `self`.
-    pub fn abs(&mut self) -> &mut IntegerOld {
-        unsafe {
-            gmp::mpz_abs(&mut self.inner, &self.inner);
-        }
-        self
     }
 
     /// Divides `self` by `other`. This is much faster than normal
@@ -907,68 +812,6 @@ impl FromStr for IntegerOld {
     }
 }
 
-macro_rules! from_borrow {
-    { $d: expr, $t:ty } => {
-        impl<'a> From<&'a $t> for IntegerOld {
-            /// Constructs an `Integer` from
-            #[doc=$d]
-            fn from(t: &$t) -> IntegerOld {
-                let mut ret = IntegerOld::new();
-                ret.assign(t);
-                ret
-            }
-        }
-    };
-}
-
-macro_rules! from {
-    { $d: expr, $t:ty } => {
-        impl From<$t> for IntegerOld {
-            /// Constructs an `Integer` from
-            #[doc=$d]
-            fn from(t: $t) -> IntegerOld {
-                let mut ret = IntegerOld::new();
-                ret.assign(t);
-                ret
-            }
-        }
-    };
-}
-
-from_borrow! { "another `Integer`.", IntegerOld }
-from! { "a `u32`.", u32 }
-from! { "an `i32`.", i32 }
-
-impl<'a> Assign<&'a IntegerOld> for IntegerOld {
-    /// Assigns from another `Integer`.
-    fn assign(&mut self, other: &'a IntegerOld) {
-        unsafe {
-            gmp::mpz_set(&mut self.inner, &other.inner);
-        }
-    }
-}
-
-impl<'a> Assign<IntegerOld> for IntegerOld {
-    /// Assigns from another `Integer`.
-    fn assign(&mut self, other: IntegerOld) {
-        self.assign(&other);
-    }
-}
-
-impl Assign<u32> for IntegerOld {
-    /// Assigns from a `u32`.
-    fn assign(&mut self, val: u32) {
-        unsafe { gmp::mpz_set_ui(&mut self.inner, val.into()) }
-    }
-}
-
-impl Assign<i32> for IntegerOld {
-    /// Assigns from an `i32`.
-    fn assign(&mut self, val: i32) {
-        unsafe { gmp::mpz_set_si(&mut self.inner, val.into()) }
-    }
-}
-
 impl Assign<f64> for IntegerOld {
     /// Assigns from an `f64`, rounding towards zero.
     fn assign(&mut self, val: f64) {
@@ -1059,22 +902,6 @@ arith_noncommut_integer! { Rem rem, RemAssign rem_assign,
 arith_integer! { BitAnd bitand, BitAndAssign bitand_assign, gmp::mpz_and }
 arith_integer! { BitOr bitor, BitOrAssign bitor_assign, gmp::mpz_ior }
 arith_integer! { BitXor bitxor, BitXorAssign bitxor_assign, gmp::mpz_xor }
-
-impl Neg for IntegerOld {
-    type Output = IntegerOld;
-    fn neg(mut self) -> IntegerOld {
-        self.neg_assign();
-        self
-    }
-}
-
-impl NegAssign for IntegerOld {
-    fn neg_assign(&mut self) {
-        unsafe {
-            gmp::mpz_neg(&mut self.inner, &self.inner);
-        }
-    }
-}
 
 impl Not for IntegerOld {
     type Output = IntegerOld;
@@ -1412,18 +1239,10 @@ unsafe fn mpz_rshift_si(rop: *mut mpz_t, op1: *const mpz_t, op2: c_long) {
     }
 }
 
-impl Eq for IntegerOld {}
-
 impl Ord for IntegerOld {
     fn cmp(&self, other: &IntegerOld) -> Ordering {
         let ord = unsafe { gmp::mpz_cmp(&self.inner, &other.inner) };
         ord.cmp(&0)
-    }
-}
-
-impl PartialEq for IntegerOld {
-    fn eq(&self, other: &IntegerOld) -> bool {
-        self.cmp(other) == Ordering::Equal
     }
 }
 
