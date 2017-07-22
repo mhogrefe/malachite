@@ -33,6 +33,7 @@ pub mod integer {
         pub mod to_u64;
     }
     pub mod comparison {
+        pub mod eq;
         pub mod partial_cmp_i32;
         pub mod partial_cmp_u32;
         pub mod partial_eq_i32;

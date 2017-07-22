@@ -4,6 +4,7 @@ use malachite_gmp::natural as gmp;
 use malachite_test::common::{gmp_natural_to_native, native_natural_to_num_biguint,
                              native_natural_to_rugint_integer};
 use num;
+use rugint;
 use rust_wheels::iterators::common::EXAMPLE_SEED;
 use rust_wheels::iterators::naturals::{exhaustive_naturals, random_naturals};
 use rust_wheels::iterators::tuples::{exhaustive_pairs_from_single, exhaustive_triples_from_single,
@@ -15,6 +16,7 @@ fn test_eq() {
     test_eq_helper::<native::Natural>(&strings);
     test_eq_helper::<gmp::Natural>(&strings);
     test_eq_helper::<num::BigUint>(&strings);
+    test_eq_helper::<rugint::Integer>(&strings);
 }
 
 #[test]

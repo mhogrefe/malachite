@@ -1,7 +1,7 @@
 use gmp_mpfr_sys::gmp;
 use integer::Integer::{self, Large, Small};
 
-/// Determines whether `self` is equal to another `Integer`.
+/// Determines whether an `Integer` is equal to another `Integer`.
 ///
 /// # Examples
 /// ```
