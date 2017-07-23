@@ -3,6 +3,10 @@ use std::cmp::Ordering;
 
 /// Compares `self` to an `i32`.
 ///
+/// Time: worst case O(1)
+///
+/// Additional memory: worst case O(1)
+///
 /// # Examples
 /// ```
 /// use malachite_native::integer::Integer;
@@ -35,6 +39,10 @@ impl PartialOrd<i32> for Integer {
 
 /// Compares an `i32` to `self`.
 ///
+/// Time: worst case O(1)
+///
+/// Additional memory: worst case O(1)
+///
 /// # Examples
 /// ```
 /// use malachite_native::integer::Integer;
@@ -51,6 +59,16 @@ impl PartialOrd<i32> for Integer {
 /// ```
 impl PartialOrd<Integer> for i32 {
     fn partial_cmp(&self, other: &Integer) -> Option<Ordering> {
-        other.partial_cmp(self).map(|o| o.reverse())
+        if other.sign {
+            if *self >= 0 {
+                (*self as u32).partial_cmp(&other.abs)
+            } else {
+                Some(Ordering::Less)
+            }
+        } else if *self >= 0 {
+            Some(Ordering::Greater)
+        } else {
+            other.abs.partial_cmp(&(self.abs() as u32))
+        }
     }
 }

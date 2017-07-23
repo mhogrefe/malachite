@@ -1,7 +1,11 @@
 use integer::Integer;
 use std::cmp::Ordering;
 
-/// Compares `self` to a `u32`.
+/// Compares an `Integer` to a `u32`.
+///
+/// Time: worst case O(1)
+///
+/// Additional memory: worst case O(1)
 ///
 /// # Examples
 /// ```
@@ -27,7 +31,11 @@ impl PartialOrd<u32> for Integer {
     }
 }
 
-/// Compares a `u32` to `self`.
+/// Compares a `u32` to an `Integer`.
+///
+/// Time: worst case O(1)
+///
+/// Additional memory: worst case O(1)
 ///
 /// # Examples
 /// ```
@@ -45,6 +53,10 @@ impl PartialOrd<u32> for Integer {
 /// ```
 impl PartialOrd<Integer> for u32 {
     fn partial_cmp(&self, other: &Integer) -> Option<Ordering> {
-        other.partial_cmp(self).map(|o| o.reverse())
+        if other.sign {
+            self.partial_cmp(&other.abs)
+        } else {
+            Some(Ordering::Greater)
+        }
     }
 }

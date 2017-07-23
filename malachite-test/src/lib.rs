@@ -34,8 +34,8 @@ pub mod integer {
     }
     pub mod comparison {
         pub mod eq;
-        pub mod partial_cmp_i32;
-        pub mod partial_cmp_u32;
+        pub mod partial_ord_i32;
+        pub mod partial_ord_u32;
         pub mod partial_eq_i32;
         pub mod partial_eq_natural;
         pub mod partial_eq_u32;

@@ -44,6 +44,9 @@ impl PartialOrd<i32> for Integer {
 /// ```
 impl PartialOrd<Integer> for i32 {
     fn partial_cmp(&self, other: &Integer) -> Option<Ordering> {
-        other.partial_cmp(self).map(|o| o.reverse())
+        match *other {
+            Small(ref small) => self.partial_cmp(small),
+            Large(_) => Some(other.sign().reverse()),
+        }
     }
 }
