@@ -37,6 +37,7 @@ pub mod integer {
         pub mod partial_cmp_i32;
         pub mod partial_cmp_u32;
         pub mod partial_eq_i32;
+        pub mod partial_eq_natural;
         pub mod partial_eq_u32;
         pub mod sign;
     }
@@ -58,7 +59,6 @@ pub mod natural {
         pub mod ord;
         pub mod partial_ord_integer;
         pub mod partial_ord_u32;
-        pub mod partial_eq_integer;
         pub mod partial_eq_u32;
     }
     pub mod conversion {

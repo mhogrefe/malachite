@@ -24,7 +24,7 @@ cargo rustc --release --features native -- --emit mir &&
 cd ../malachite-test &&
 cargo update &&
 cargo fmt &&
-cargo clippy &&
+rustup run nightly cargo clippy &&
 cargo test --release &&
 cargo run --release -- bench 0 all &&
 cargo rustc --release --lib -- --emit mir

@@ -74,7 +74,6 @@ pub mod natural {
         pub mod eq;
         pub mod hash;
         pub mod ord;
-        pub mod partial_eq_integer;
         pub mod partial_eq_u32;
         pub mod partial_ord_integer;
         pub mod partial_ord_u32;

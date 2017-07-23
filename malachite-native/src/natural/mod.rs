@@ -129,7 +129,6 @@ pub mod arithmetic;
 pub mod conversion;
 pub mod comparison {
     pub mod ord;
-    pub mod partial_eq_integer;
     pub mod partial_eq_u32;
     pub mod partial_ord_integer;
     pub mod partial_ord_u32;
