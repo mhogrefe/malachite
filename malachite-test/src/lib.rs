@@ -14,6 +14,16 @@ pub mod integer {
         pub mod sub_i32;
         pub mod sub_u32;
     }
+    pub mod comparison {
+        pub mod eq;
+        pub mod hash;
+        pub mod partial_ord_i32;
+        pub mod partial_ord_u32;
+        pub mod partial_eq_i32;
+        pub mod partial_eq_natural;
+        pub mod partial_eq_u32;
+        pub mod sign;
+    }
     pub mod conversion {
         pub mod assign_i32;
         pub mod assign_i64;
@@ -31,15 +41,6 @@ pub mod integer {
         pub mod to_natural;
         pub mod to_u32;
         pub mod to_u64;
-    }
-    pub mod comparison {
-        pub mod eq;
-        pub mod partial_ord_i32;
-        pub mod partial_ord_u32;
-        pub mod partial_eq_i32;
-        pub mod partial_eq_natural;
-        pub mod partial_eq_u32;
-        pub mod sign;
     }
 }
 pub mod natural {

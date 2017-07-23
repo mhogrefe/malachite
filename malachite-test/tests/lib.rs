@@ -24,6 +24,7 @@ pub mod integer {
     }
     pub mod comparison {
         pub mod eq;
+        pub mod hash;
         pub mod ord;
         pub mod partial_eq_i32;
         pub mod partial_eq_natural;

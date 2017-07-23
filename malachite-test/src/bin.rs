@@ -3,6 +3,7 @@ extern crate malachite_test;
 use malachite_test::integer::arithmetic::abs::*;
 use malachite_test::integer::arithmetic::neg::*;
 use malachite_test::integer::comparison::eq::*;
+use malachite_test::integer::comparison::hash::*;
 use malachite_test::integer::comparison::partial_ord_i32::*;
 use malachite_test::integer::comparison::partial_ord_u32::*;
 use malachite_test::integer::comparison::partial_eq_i32::*;
@@ -98,6 +99,7 @@ fn main() {
                 "exhaustive_integer_from_i64" => demo_exhaustive_integer_from_i64(limit),
                 "exhaustive_integer_from_u32" => demo_exhaustive_integer_from_u32(limit),
                 "exhaustive_integer_from_u64" => demo_exhaustive_integer_from_u64(limit),
+                "exhaustive_integer_hash" => demo_exhaustive_integer_hash(limit),
                 "exhaustive_integer_neg_assign" => demo_exhaustive_integer_neg_assign(limit),
                 "exhaustive_integer_neg" => demo_exhaustive_integer_neg(limit),
                 "exhaustive_integer_neg_ref" => demo_exhaustive_integer_neg_ref(limit),
@@ -265,6 +267,7 @@ fn main() {
                 "random_integer_from_i64" => demo_random_integer_from_i64(limit),
                 "random_integer_from_u32" => demo_random_integer_from_u32(limit),
                 "random_integer_from_u64" => demo_random_integer_from_u64(limit),
+                "random_integer_hash" => demo_random_integer_hash(limit),
                 "random_integer_neg_assign" => demo_random_integer_neg_assign(limit),
                 "random_integer_neg" => demo_random_integer_neg(limit),
                 "random_integer_neg_ref" => demo_random_integer_neg_ref(limit),
@@ -419,6 +422,7 @@ fn main() {
                 "exhaustive_integer_from_u64" => {
                     benchmark_exhaustive_integer_from_u64(limit, "temp.gp")
                 }
+                "exhaustive_integer_hash" => benchmark_exhaustive_integer_hash(limit, "temp.gp"),
                 "exhaustive_integer_neg_assign" => {
                     benchmark_exhaustive_integer_neg_assign(limit, "temp.gp")
                 }
@@ -699,6 +703,7 @@ fn main() {
                 "random_integer_from_i64" => benchmark_random_integer_from_i64(limit, "temp.gp"),
                 "random_integer_from_u32" => benchmark_random_integer_from_u32(limit, "temp.gp"),
                 "random_integer_from_u64" => benchmark_random_integer_from_u64(limit, "temp.gp"),
+                "random_integer_hash" => benchmark_random_integer_hash(limit, 1024, "temp.gp"),
                 "random_integer_neg_assign" => {
                     benchmark_random_integer_neg_assign(limit, 1024, "temp.gp")
                 }
@@ -948,6 +953,7 @@ fn main() {
                     benchmark_exhaustive_integer_from_i64(100000, "exhaustive_integer_from_i64.gp");
                     benchmark_exhaustive_integer_from_u32(100000, "exhaustive_integer_from_u32.gp");
                     benchmark_exhaustive_integer_from_u64(100000, "exhaustive_integer_from_u64.gp");
+                    benchmark_exhaustive_integer_hash(100000, "exhaustive_integer_hash.gp");
                     benchmark_exhaustive_integer_neg_assign(100000,
                                                             "exhaustive_integer_neg_assign.gp");
                     benchmark_exhaustive_integer_neg(100000, "exhaustive_integer_neg.gp");
@@ -1000,7 +1006,7 @@ fn main() {
                                                              "exhaustive_u32_add_natural_ref.gp");
                     benchmark_exhaustive_natural_assign(100000, "exhaustive_natural_assign.gp");
                     let s = "exhaustive_natural_assign_evaluation_strategy.gp";
-                    benchmark_exhaustive_natural_assign(100000, s);
+                    benchmark_exhaustive_natural_assign_evaluation_strategy(100000, s);
                     let s = "exhaustive_natural_assign_integer.gp";
                     benchmark_exhaustive_natural_assign_integer(100000, s);
                     let s = "exhaustive_natural_assign_integer_evaluation_strategy.gp";
@@ -1122,6 +1128,7 @@ fn main() {
                     benchmark_random_integer_from_i64(100000, "random_integer_from_i64.gp");
                     benchmark_random_integer_from_u32(100000, "random_integer_from_u32.gp");
                     benchmark_random_integer_from_u64(100000, "random_integer_from_u64.gp");
+                    benchmark_random_integer_hash(100000, 1024, "random_integer_hash.gp");
                     benchmark_random_integer_neg_assign(100000,
                                                         1024,
                                                         "random_integer_neg_assign.gp");
