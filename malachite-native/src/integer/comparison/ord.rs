@@ -1,7 +1,13 @@
 use integer::Integer;
 use std::cmp::Ordering;
 
-/// Compares `self` to an `Integer`.
+/// Compares an `Integer` to another `Integer`.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = min(`self.significant_bits(), other.significant_bits()`)
 ///
 /// # Examples
 /// ```

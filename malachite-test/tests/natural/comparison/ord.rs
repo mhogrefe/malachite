@@ -24,6 +24,7 @@ fn test_cmp() {
 fn cmp_properties() {
     // x.cmp(&y) is equivalent for malachite-gmp, malachite-native, num, and rugint.
     // x.cmp(&y) == y.cmp(&x).reverse()
+    // x.cmp(&y) == (-y).cmp(-x)
     let two_naturals = |gmp_x: gmp::Natural, gmp_y: gmp::Natural| {
         let x = gmp_natural_to_native(&gmp_x);
         let y = gmp_natural_to_native(&gmp_y);
@@ -34,6 +35,7 @@ fn cmp_properties() {
         assert_eq!(native_natural_to_rugint_integer(&x).cmp(&native_natural_to_rugint_integer(&y)),
                    ord);
         assert_eq!(y.cmp(&x).reverse(), ord);
+        assert_eq!((-y).cmp(&(-x)), ord);
     };
 
     // x == x

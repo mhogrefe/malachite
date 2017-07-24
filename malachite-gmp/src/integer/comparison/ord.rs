@@ -2,7 +2,7 @@ use gmp_mpfr_sys::gmp;
 use integer::Integer::{self, Large, Small};
 use std::cmp::Ordering;
 
-/// Compares `self` to an `Integer`.
+/// Compares an `Integer` to another `Integer`.
 ///
 /// # Examples
 /// ```

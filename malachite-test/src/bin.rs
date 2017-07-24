@@ -4,6 +4,7 @@ use malachite_test::integer::arithmetic::abs::*;
 use malachite_test::integer::arithmetic::neg::*;
 use malachite_test::integer::comparison::eq::*;
 use malachite_test::integer::comparison::hash::*;
+use malachite_test::integer::comparison::ord::*;
 use malachite_test::integer::comparison::partial_ord_i32::*;
 use malachite_test::integer::comparison::partial_ord_u32::*;
 use malachite_test::integer::comparison::partial_eq_i32::*;
@@ -94,6 +95,7 @@ fn main() {
                 "exhaustive_integer_assign_u64" => demo_exhaustive_integer_assign_u64(limit),
                 "exhaustive_integer_clone" => demo_exhaustive_integer_clone(limit),
                 "exhaustive_integer_clone_from" => demo_exhaustive_integer_clone_from(limit),
+                "exhaustive_integer_cmp" => demo_exhaustive_integer_cmp(limit),
                 "exhaustive_integer_eq" => demo_exhaustive_integer_eq(limit),
                 "exhaustive_integer_from_i32" => demo_exhaustive_integer_from_i32(limit),
                 "exhaustive_integer_from_i64" => demo_exhaustive_integer_from_i64(limit),
@@ -262,6 +264,7 @@ fn main() {
                 "random_integer_assign_u64" => demo_random_integer_assign_u64(limit),
                 "random_integer_clone" => demo_random_integer_clone(limit),
                 "random_integer_clone_from" => demo_random_integer_clone_from(limit),
+                "random_integer_cmp" => demo_random_integer_cmp(limit),
                 "random_integer_eq" => demo_random_integer_eq(limit),
                 "random_integer_from_i32" => demo_random_integer_from_i32(limit),
                 "random_integer_from_i64" => demo_random_integer_from_i64(limit),
@@ -409,6 +412,7 @@ fn main() {
                 "exhaustive_integer_clone_from" => {
                     benchmark_exhaustive_integer_clone_from(limit, "temp.gp")
                 }
+                "exhaustive_integer_cmp" => benchmark_exhaustive_integer_cmp(limit, "temp.gp"),
                 "exhaustive_integer_eq" => benchmark_exhaustive_integer_eq(limit, "temp.gp"),
                 "exhaustive_integer_from_i32" => {
                     benchmark_exhaustive_integer_from_i32(limit, "temp.gp")
@@ -698,6 +702,7 @@ fn main() {
                 "random_integer_clone_from" => {
                     benchmark_random_integer_clone_from(limit, 1024, "temp.gp")
                 }
+                "random_integer_cmp" => benchmark_random_integer_cmp(limit, 1024, "temp.gp"),
                 "random_integer_eq" => benchmark_random_integer_eq(limit, 1024, "temp.gp"),
                 "random_integer_from_i32" => benchmark_random_integer_from_i32(limit, "temp.gp"),
                 "random_integer_from_i64" => benchmark_random_integer_from_i64(limit, "temp.gp"),
@@ -948,6 +953,7 @@ fn main() {
                     benchmark_exhaustive_integer_clone(100000, "exhaustive_integer_clone.gp");
                     benchmark_exhaustive_integer_clone_from(100000,
                                                             "exhaustive_integer_clone_from.gp");
+                    benchmark_exhaustive_integer_cmp(100000, "exhaustive_integer_cmp.gp");
                     benchmark_exhaustive_integer_eq(100000, "exhaustive_integer_eq.gp");
                     benchmark_exhaustive_integer_from_i32(100000, "exhaustive_integer_from_i32.gp");
                     benchmark_exhaustive_integer_from_i64(100000, "exhaustive_integer_from_i64.gp");
@@ -1123,6 +1129,7 @@ fn main() {
                     benchmark_random_integer_clone_from(100000,
                                                         1024,
                                                         "random_integer_clone_from.gp");
+                    benchmark_random_integer_cmp(100000, 1024, "random_integer_cmp.gp");
                     benchmark_random_integer_eq(100000, 1024, "random_integer_eq.gp");
                     benchmark_random_integer_from_i32(100000, "random_integer_from_i32.gp");
                     benchmark_random_integer_from_i64(100000, "random_integer_from_i64.gp");

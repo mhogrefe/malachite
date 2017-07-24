@@ -1,7 +1,7 @@
 use natural::Natural::{self, Large, Small};
 use std::cmp::Ordering;
 
-/// /// Compares a `Natural` to another `Natural`.
+/// Compares a `Natural` to another `Natural`.
 ///
 /// Time: worst case O(n)
 ///
