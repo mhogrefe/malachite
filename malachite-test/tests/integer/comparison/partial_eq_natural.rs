@@ -42,7 +42,7 @@ fn test_integer_partial_eq_natural() {
 }
 
 #[test]
-fn integer_partial_eq_natural_properties() {
+fn partial_eq_natural_properties() {
     // x == y is equivalent for malachite-gmp, malachite-native, and rugint.
     // x == y.into_integer() is equivalent to x == y.
     let integer_and_natural = |gmp_x: gmp::integer::Integer, gmp_y: gmp::natural::Natural| {
