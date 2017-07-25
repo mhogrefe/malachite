@@ -20,6 +20,7 @@ pub mod integer {
         pub mod ord;
         pub mod ord_abs;
         pub mod partial_ord_abs_i32;
+        pub mod partial_ord_abs_natural;
         pub mod partial_ord_abs_u32;
         pub mod partial_ord_i32;
         pub mod partial_ord_natural;
