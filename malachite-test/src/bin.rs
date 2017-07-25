@@ -14,6 +14,7 @@ use malachite_test::integer::comparison::partial_ord_u32::*;
 use malachite_test::integer::comparison::partial_eq_i32::*;
 use malachite_test::integer::comparison::partial_eq_natural::*;
 use malachite_test::integer::comparison::partial_eq_u32::*;
+use malachite_test::integer::comparison::sign::*;
 use malachite_test::integer::conversion::assign_i32::*;
 use malachite_test::integer::conversion::assign_i64::*;
 use malachite_test::integer::conversion::assign_natural::*;
@@ -151,6 +152,7 @@ fn main() {
                 "exhaustive_integer_partial_eq_natural" => {
                     demo_exhaustive_integer_partial_eq_natural(limit)
                 }
+                "exhaustive_integer_sign" => demo_exhaustive_integer_sign(limit),
                 "exhaustive_integer_to_i32" => demo_exhaustive_integer_to_i32(limit),
                 "exhaustive_integer_to_i32_wrapping" => {
                     demo_exhaustive_integer_to_i32_wrapping(limit)
@@ -320,6 +322,7 @@ fn main() {
                 "random_integer_partial_eq_natural" => {
                     demo_random_integer_partial_eq_natural(limit)
                 }
+                "random_integer_sign" => demo_random_integer_sign(limit),
                 "random_integer_to_i32" => demo_random_integer_to_i32(limit),
                 "random_integer_to_i32_wrapping" => demo_random_integer_to_i32_wrapping(limit),
                 "random_integer_to_i64" => demo_random_integer_to_i64(limit),
@@ -514,6 +517,7 @@ fn main() {
                 "exhaustive_integer_partial_eq_natural" => {
                     benchmark_exhaustive_integer_partial_eq_natural(limit, "temp.gp")
                 }
+                "exhaustive_integer_sign" => benchmark_exhaustive_integer_sign(limit, "temp.gp"),
                 "exhaustive_integer_to_i32" => {
                     benchmark_exhaustive_integer_to_i32(limit, "temp.gp")
                 }
@@ -814,6 +818,7 @@ fn main() {
                 "random_integer_partial_eq_natural" => {
                     benchmark_random_integer_partial_eq_natural(limit, 1024, "temp.gp")
                 }
+                "random_integer_sign" => benchmark_random_integer_sign(limit, 1024, "temp.gp"),
                 "random_integer_to_i32" => benchmark_random_integer_to_i32(limit, "temp.gp"),
                 "random_integer_to_i32_wrapping" => {
                     benchmark_random_integer_to_i32_wrapping(limit, "temp.gp")
@@ -1061,6 +1066,7 @@ fn main() {
                     benchmark_exhaustive_u32_partial_eq_integer(100000, s);
                     let s = "exhaustive_integer_partial_eq_natural.gp";
                     benchmark_exhaustive_integer_partial_eq_natural(100000, s);
+                    benchmark_exhaustive_integer_sign(100000, "exhaustive_integer_sign.gp");
                     benchmark_exhaustive_integer_to_i32(100000, "exhaustive_integer_to_i32.gp");
                     let s = "exhaustive_integer_to_i32_wrapping.gp";
                     benchmark_exhaustive_integer_to_i32_wrapping(100000, s);
@@ -1249,6 +1255,7 @@ fn main() {
                     benchmark_random_u32_partial_eq_integer(100000, 1024, s);
                     let s = "random_integer_partial_eq_natural.gp";
                     benchmark_random_integer_partial_eq_natural(100000, 1024, s);
+                    benchmark_random_integer_sign(100000, 1024, "random_integer_sign.gp");
                     benchmark_random_integer_to_i32(100000, "random_integer_to_i32.gp");
                     benchmark_random_integer_to_i32_wrapping(100000,
                                                              "random_integer_to_i32_wrapping.gp");

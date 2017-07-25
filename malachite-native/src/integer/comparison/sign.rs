@@ -2,8 +2,12 @@ use integer::Integer;
 use std::cmp::Ordering;
 
 impl Integer {
-    /// Returns the sign of `self`. Interpret the result as the result of a comparison to zero, so
-    /// that `Equal` means zero, `Greater` means positive, and `Less` means negative.
+    /// Returns the sign of an `Integer`. Interpret the result as the result of a comparison to
+    /// zero, so that `Equal` means zero, `Greater` means positive, and `Less` means negative.
+    ///
+    /// Time: worst case O(1)
+    ///
+    /// Additional memory: worst case O(1)
     ///
     /// # Examples
     /// ```
