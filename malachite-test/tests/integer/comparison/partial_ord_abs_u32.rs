@@ -41,22 +41,24 @@ fn test_partial_ord_u32_abs() {
 #[test]
 fn partial_cmp_u32_properties() {
     // n.partial_cmp_abs(&u) is equivalent for malachite-gmp and malachite-native.
-    // TODO n.partial_cmp_abs(&Integer::from(u)) is equivalent to n.partial_cmp_abs(&u).
+    // n.partial_cmp_abs(&Integer::from(u)) is equivalent to n.partial_cmp_abs(&u).
+    // n.partial_cmp_abs(&u) == n.abs().partial_cmp(&u.abs())
     //
     // u.partial_cmp_abs(&n) is equivalent for malachite-gmp and malachite-native.
-    // TODO Integer::from(u).partial_cmp_abs(&n) is equivalent to u.partial_cmp_abs(&n).
-    // n.lt_abs(u) <=> u.gt_abs(n) and n.gt_abs(u) <=> u.lt_abs(n).
-    //
-    // n.partial_cmp_abs(&u) == n.abs().partial_cmp(&u.abs())
+    // Integer::from(u).partial_cmp_abs(&n) is equivalent to u.partial_cmp_abs(&n).
     // u.partial_cmp_abs(&n) == u.partial_cmp(&n.abs())
+    //
+    // n.lt_abs(u) <=> u.gt_abs(n) and n.gt_abs(u) <=> u.lt_abs(n).
     let integer_and_u32 = |gmp_n: gmp::Integer, u: u32| {
         let n = gmp_integer_to_native(&gmp_n);
         let cmp_1 = n.partial_cmp_abs(&u);
         assert_eq!(gmp_n.partial_cmp_abs(&u), cmp_1);
+        assert_eq!(n.partial_cmp_abs(&native::Integer::from(u)), cmp_1);
         assert_eq!(n.abs_ref().partial_cmp(&u), cmp_1);
 
         let cmp_2 = native_ord_abs::partial_cmp_abs(&u, &n);
         assert_eq!(gmp_ord_abs::partial_cmp_abs(&u, &gmp_n), cmp_2);
+        assert_eq!(native::Integer::from(u).partial_cmp_abs(&n), cmp_2);
         assert_eq!(cmp_2, cmp_1.map(|o| o.reverse()));
         assert_eq!(u.partial_cmp(&n.abs_ref()), cmp_2);
     };
@@ -66,13 +68,11 @@ fn partial_cmp_u32_properties() {
     let integer_u32_and_integer = |gmp_n: gmp::Integer, u: u32, gmp_m: gmp::Integer| {
         let n = gmp_integer_to_native(&gmp_n);
         let m = gmp_integer_to_native(&gmp_m);
-        //TODO
-        /*
         if n.lt_abs(&u) && native_ord_abs::lt_abs(&u, &m) {
             assert!(n.lt_abs(&m));
-        } else if n.gt_abs(&u) && u.gt_abs(&m) {
+        } else if n.gt_abs(&u) && native_ord_abs::gt_abs(&u, &m) {
             assert!(n.gt_abs(&m));
-        }*/
+        }
 
     };
 

@@ -2,7 +2,7 @@ use integer::Integer;
 use std::cmp::Ordering;
 use traits::PartialOrdAbs;
 
-/// Compares an `Integer` to a `u32`.
+/// Compares the absolute value of an `Integer` to a `u32`.
 ///
 /// Time: worst case O(1)
 ///
@@ -29,7 +29,7 @@ impl PartialOrdAbs<u32> for Integer {
     }
 }
 
-/// Compares a `u32` to an `Integer`.
+/// Compares a `u32` to the absolute value of an `Integer`.
 ///
 /// Time: worst case O(1)
 ///

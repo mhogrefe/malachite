@@ -43,22 +43,24 @@ fn test_partial_ord_i32_abs() {
 #[test]
 fn partial_cmp_i32_properties() {
     // n.partial_cmp_abs(&i) is equivalent for malachite-gmp and malachite-native.
-    // TODO n.partial_cmp_abs(&Integer::from(i)) is equivalent to n.partial_cmp_abs(&i).
-    //
-    // u.partial_cmp_abs(&n) is equivalent for malachite-gmp and malachite-native.
-    // TODO Integer::from(i).partial_cmp_abs(&n) is equivalent to i.partial_cmp_abs(&n).
-    // n.lt_abs(u) <=> u.gt_abs(n) and n.gt_abs(u) <=> u.lt_abs(n).
-    //
+    // n.partial_cmp_abs(&Integer::from(i)) is equivalent to n.partial_cmp_abs(&i).
     // n.partial_cmp_abs(&i) == n.abs().partial_cmp(&i.abs())
-    // u.partial_cmp_abs(&n) == i.abs().partial_cmp(&n.abs())
+    //
+    // i.partial_cmp_abs(&n) is equivalent for malachite-gmp and malachite-native.
+    // Integer::from(i).partial_cmp_abs(&n) is equivalent to i.partial_cmp_abs(&n).
+    // i.partial_cmp_abs(&n) == i.abs().partial_cmp(&n.abs())
+    //
+    // n.lt_abs(u) <=> u.gt_abs(n) and n.gt_abs(u) <=> u.lt_abs(n).
     let integer_and_i32 = |gmp_n: gmp::Integer, i: i32| {
         let n = gmp_integer_to_native(&gmp_n);
         let cmp_1 = n.partial_cmp_abs(&i);
         assert_eq!(gmp_n.partial_cmp_abs(&i), cmp_1);
+        assert_eq!(n.partial_cmp_abs(&native::Integer::from(i)), cmp_1);
         assert_eq!(n.abs_ref().partial_cmp(&(i.abs() as u32)), cmp_1);
 
         let cmp_2 = native_ord_abs::partial_cmp_abs(&i, &n);
         assert_eq!(gmp_ord_abs::partial_cmp_abs(&i, &gmp_n), cmp_2);
+        assert_eq!(native::Integer::from(i).partial_cmp_abs(&n), cmp_2);
         assert_eq!(cmp_2, cmp_1.map(|o| o.reverse()));
         assert_eq!((i.abs() as u32).partial_cmp(&n.abs_ref()), cmp_2);
     };
@@ -68,14 +70,11 @@ fn partial_cmp_i32_properties() {
     let integer_i32_and_integer = |gmp_n: gmp::Integer, i: i32, gmp_m: gmp::Integer| {
         let n = gmp_integer_to_native(&gmp_n);
         let m = gmp_integer_to_native(&gmp_m);
-        //TODO
-        /*
-        if n.lt_abs(&u) && native_ord_abs::lt_abs(&u, &m) {
+        if n.lt_abs(&i) && native_ord_abs::lt_abs(&i, &m) {
             assert!(n.lt_abs(&m));
-        } else if n.gt_abs(&u) && u.gt_abs(&m) {
+        } else if n.gt_abs(&i) && native_ord_abs::gt_abs(&i, &m) {
             assert!(n.gt_abs(&m));
-        }*/
-
+        }
     };
 
     // i.lt_abs(n) and n.lt_abs(j) => i < j

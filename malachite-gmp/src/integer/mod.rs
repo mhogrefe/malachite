@@ -158,6 +158,7 @@ pub mod comparison {
     pub mod eq;
     pub mod hash;
     pub mod ord;
+    pub mod ord_abs;
     pub mod partial_eq_i32;
     pub mod partial_eq_natural;
     pub mod partial_eq_u32;
