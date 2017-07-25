@@ -29,6 +29,8 @@ pub mod integer {
         pub mod partial_eq_i32;
         pub mod partial_eq_natural;
         pub mod partial_eq_u32;
+        pub mod partial_ord_abs_i32;
+        pub mod partial_ord_abs_u32;
         pub mod partial_ord_i32;
         pub mod partial_ord_natural;
         pub mod partial_ord_u32;

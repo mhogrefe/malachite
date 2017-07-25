@@ -22,7 +22,7 @@ impl PartialOrd<u32> for Integer {
     fn partial_cmp(&self, other: &u32) -> Option<Ordering> {
         match *self {
             Small(_) if *other > i32::max_value() as u32 => Some(Ordering::Less),
-            Small(ref small) => small.partial_cmp(&(*other as i32)),
+            Small(small) => small.partial_cmp(&(*other as i32)),
             Large(ref large) => Some(unsafe { gmp::mpz_cmp_ui(large, (*other).into()) }.cmp(&0)),
         }
     }
