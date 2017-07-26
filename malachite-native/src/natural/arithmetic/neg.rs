@@ -20,7 +20,10 @@ impl Neg for Natural {
 
     fn neg(self) -> Integer {
         if self == 0 {
-            Integer::from(0)
+            Integer {
+                sign: true,
+                abs: self,
+            }
         } else {
             Integer {
                 sign: false,
@@ -51,7 +54,10 @@ impl<'a> Neg for &'a Natural {
 
     fn neg(self) -> Integer {
         if *self == 0 {
-            Integer::from(0)
+            Integer {
+                sign: true,
+                abs: self.clone(),
+            }
         } else {
             Integer {
                 sign: false,

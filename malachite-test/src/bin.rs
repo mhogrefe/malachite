@@ -32,6 +32,7 @@ use malachite_test::integer::conversion::to_i64::*;
 use malachite_test::integer::conversion::to_natural::*;
 use malachite_test::integer::conversion::to_u32::*;
 use malachite_test::integer::conversion::to_u64::*;
+use malachite_test::integer::logic::not::*;
 use malachite_test::natural::arithmetic::add::*;
 use malachite_test::natural::arithmetic::add_u32::*;
 use malachite_test::natural::arithmetic::even_odd::*;
@@ -60,6 +61,7 @@ use malachite_test::natural::logic::from_limbs::*;
 use malachite_test::natural::logic::get_bit::*;
 use malachite_test::natural::logic::limb_count::*;
 use malachite_test::natural::logic::limbs::*;
+use malachite_test::natural::logic::not::*;
 use malachite_test::natural::logic::set_bit::*;
 use malachite_test::natural::logic::significant_bits::*;
 use malachite_test::natural::logic::trailing_zeros::*;
@@ -111,6 +113,9 @@ fn main() {
                 "exhaustive_integer_neg_assign" => demo_exhaustive_integer_neg_assign(limit),
                 "exhaustive_integer_neg" => demo_exhaustive_integer_neg(limit),
                 "exhaustive_integer_neg_ref" => demo_exhaustive_integer_neg_ref(limit),
+                "exhaustive_integer_not_assign" => demo_exhaustive_integer_not_assign(limit),
+                "exhaustive_integer_not" => demo_exhaustive_integer_not(limit),
+                "exhaustive_integer_not_ref" => demo_exhaustive_integer_not_ref(limit),
                 "exhaustive_integer_partial_cmp_abs_i32" => {
                     demo_exhaustive_integer_partial_cmp_abs_i32(limit)
                 }
@@ -223,6 +228,8 @@ fn main() {
                 "exhaustive_natural_limbs_be" => demo_exhaustive_natural_limbs_be(limit),
                 "exhaustive_natural_neg" => demo_exhaustive_natural_neg(limit),
                 "exhaustive_natural_neg_ref" => demo_exhaustive_natural_neg_ref(limit),
+                "exhaustive_natural_not" => demo_exhaustive_natural_not(limit),
+                "exhaustive_natural_not_ref" => demo_exhaustive_natural_not_ref(limit),
                 "exhaustive_natural_partial_cmp_abs_integer" => {
                     demo_exhaustive_natural_partial_cmp_abs_integer(limit)
                 }
@@ -303,6 +310,9 @@ fn main() {
                 "random_integer_neg_assign" => demo_random_integer_neg_assign(limit),
                 "random_integer_neg" => demo_random_integer_neg(limit),
                 "random_integer_neg_ref" => demo_random_integer_neg_ref(limit),
+                "random_integer_not_assign" => demo_random_integer_not_assign(limit),
+                "random_integer_not" => demo_random_integer_not(limit),
+                "random_integer_not_ref" => demo_random_integer_not_ref(limit),
                 "random_integer_partial_cmp_abs_i32" => {
                     demo_random_integer_partial_cmp_abs_i32(limit)
                 }
@@ -383,6 +393,8 @@ fn main() {
                 "random_natural_limbs_be" => demo_random_natural_limbs_be(limit),
                 "random_natural_neg" => demo_random_natural_neg(limit),
                 "random_natural_neg_ref" => demo_random_natural_neg_ref(limit),
+                "random_natural_not" => demo_random_natural_not(limit),
+                "random_natural_not_ref" => demo_random_natural_not_ref(limit),
                 "random_natural_partial_eq_u32" => demo_random_natural_partial_eq_u32(limit),
                 "random_u32_partial_eq_natural" => demo_random_u32_partial_eq_natural(limit),
                 "random_natural_partial_eq_integer" => {
@@ -487,6 +499,10 @@ fn main() {
                 "exhaustive_integer_neg" => benchmark_exhaustive_integer_neg(limit, "temp.gp"),
                 "exhaustive_integer_neg_evaluation_strategy" => {
                     benchmark_exhaustive_integer_neg_evaluation_strategy(limit, "temp.gp")
+                }
+                "exhaustive_integer_not" => benchmark_exhaustive_integer_not(limit, "temp.gp"),
+                "exhaustive_integer_not_evaluation_strategy" => {
+                    benchmark_exhaustive_integer_not_evaluation_strategy(limit, "temp.gp")
                 }
                 "exhaustive_integer_partial_cmp_abs_i32" => {
                     benchmark_exhaustive_integer_partial_cmp_abs_i32(limit, "temp.gp")
@@ -661,6 +677,10 @@ fn main() {
                 "exhaustive_natural_neg_evaluation_strategy" => {
                     benchmark_exhaustive_natural_neg_evaluation_strategy(limit, "temp.gp")
                 }
+                "exhaustive_natural_not" => benchmark_exhaustive_natural_not(limit, "temp.gp"),
+                "exhaustive_natural_not_evaluation_strategy" => {
+                    benchmark_exhaustive_natural_not_evaluation_strategy(limit, "temp.gp")
+                }
                 "exhaustive_natural_partial_cmp_integer" => {
                     benchmark_exhaustive_natural_partial_cmp_integer(limit, "temp.gp")
                 }
@@ -794,6 +814,13 @@ fn main() {
                 "random_integer_neg" => benchmark_random_integer_neg(limit, 1024, "temp.gp"),
                 "random_integer_neg_evaluation_strategy" => {
                     benchmark_random_integer_neg_evaluation_strategy(limit, 1024, "temp.gp")
+                }
+                "random_integer_not_assign" => {
+                    benchmark_random_integer_not_assign(limit, 1024, "temp.gp")
+                }
+                "random_integer_not" => benchmark_random_integer_not(limit, 1024, "temp.gp"),
+                "random_integer_not_evaluation_strategy" => {
+                    benchmark_random_integer_not_evaluation_strategy(limit, 1024, "temp.gp")
                 }
                 "random_integer_partial_cmp_abs_i32" => {
                     benchmark_random_integer_partial_cmp_abs_i32(limit, 1024, "temp.gp")
@@ -953,6 +980,10 @@ fn main() {
                 "random_natural_neg_evaluation_strategy" => {
                     benchmark_random_natural_neg_evaluation_strategy(limit, 1024, "temp.gp")
                 }
+                "random_natural_not" => benchmark_random_natural_not(limit, 1024, "temp.gp"),
+                "random_natural_not_evaluation_strategy" => {
+                    benchmark_random_natural_not_evaluation_strategy(limit, 1024, "temp.gp")
+                }
                 "random_natural_partial_cmp_abs_integer" => {
                     benchmark_random_natural_partial_cmp_abs_integer(limit, 1024, "temp.gp")
                 }
@@ -1067,6 +1098,11 @@ fn main() {
                     benchmark_exhaustive_integer_neg(100000, "exhaustive_integer_neg.gp");
                     let s = "exhaustive_integer_neg_evaluation_strategy.gp";
                     benchmark_exhaustive_integer_neg_evaluation_strategy(100000, s);
+                    benchmark_exhaustive_integer_not_assign(100000,
+                                                            "exhaustive_integer_not_assign.gp");
+                    benchmark_exhaustive_integer_not(100000, "exhaustive_integer_not.gp");
+                    let s = "exhaustive_integer_not_evaluation_strategy.gp";
+                    benchmark_exhaustive_integer_not_evaluation_strategy(100000, s);
                     let s = "exhaustive_integer_partial_cmp_abs_i32.gp";
                     benchmark_exhaustive_integer_partial_cmp_abs_i32(100000, s);
                     let s = "exhaustive_i32_partial_cmp_abs_integer.gp";
@@ -1166,6 +1202,9 @@ fn main() {
                     benchmark_exhaustive_natural_neg(100000, "exhaustive_natural_neg.gp");
                     let s = "exhaustive_natural_neg_evaluation_strategy.gp";
                     benchmark_exhaustive_natural_neg_evaluation_strategy(100000, s);
+                    benchmark_exhaustive_natural_not(100000, "exhaustive_natural_not.gp");
+                    let s = "exhaustive_natural_not_evaluation_strategy.gp";
+                    benchmark_exhaustive_natural_not_evaluation_strategy(100000, s);
                     let s = "exhaustive_natural_partial_cmp_abs_integer.gp";
                     benchmark_exhaustive_natural_partial_cmp_abs_integer(100000, s);
                     let s = "exhaustive_natural_partial_cmp_u32.gp";
@@ -1260,6 +1299,12 @@ fn main() {
                     benchmark_random_integer_neg(100000, 1024, "random_integer_neg.gp");
                     let s = "random_integer_neg_evaluation_strategy.gp";
                     benchmark_random_integer_neg_evaluation_strategy(100000, 1024, s);
+                    benchmark_random_integer_not_assign(100000,
+                                                        1024,
+                                                        "random_integer_not_assign.gp");
+                    benchmark_random_integer_not(100000, 1024, "random_integer_not.gp");
+                    let s = "random_integer_not_evaluation_strategy.gp";
+                    benchmark_random_integer_not_evaluation_strategy(100000, 1024, s);
                     let s = "random_integer_partial_cmp_abs_i32.gp";
                     benchmark_random_integer_partial_cmp_abs_i32(100000, 1024, s);
                     let s = "random_i32_partial_cmp_abs_integer.gp";
@@ -1369,8 +1414,9 @@ fn main() {
                     benchmark_random_natural_neg(100000, 1024, "random_natural_neg.gp");
                     let s = "random_natural_neg_evaluation_strategy.gp";
                     benchmark_random_natural_neg_evaluation_strategy(100000, 1024, s);
-                    let s = "random_natural_partial_cmp_integer.gp";
-                    benchmark_random_natural_partial_cmp_integer(100000, 1024, s);
+                    benchmark_random_natural_not(100000, 1024, "random_natural_not.gp");
+                    let s = "random_natural_not_evaluation_strategy.gp";
+                    benchmark_random_natural_not_evaluation_strategy(100000, 1024, s);
                     let s = "random_natural_partial_cmp_integer.gp";
                     benchmark_random_natural_partial_cmp_integer(100000, 1024, s);
                     benchmark_random_natural_partial_cmp_u32(100000,

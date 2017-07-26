@@ -8,4 +8,5 @@ impl Integer {
 }
 
 pub mod get_bit;
+pub mod not;
 pub mod significant_bits;

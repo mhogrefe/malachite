@@ -48,6 +48,9 @@ pub mod integer {
         pub mod to_u32;
         pub mod to_u64;
     }
+    pub mod logic {
+        pub mod not;
+    }
 }
 pub mod natural {
     pub mod arithmetic {
@@ -85,6 +88,7 @@ pub mod natural {
         pub mod get_bit;
         pub mod limb_count;
         pub mod limbs;
+        pub mod not;
         pub mod set_bit;
         pub mod significant_bits;
         pub mod trailing_zeros;

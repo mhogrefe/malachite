@@ -12,6 +12,10 @@ pub trait NegAssign {
     fn neg_assign(&mut self);
 }
 
+pub trait NotAssign {
+    fn not_assign(&mut self);
+}
+
 pub trait PartialOrdAbs<Rhs: ?Sized = Self>: PartialEq<Rhs> {
     fn partial_cmp_abs(&self, other: &Rhs) -> Option<Ordering>;
 

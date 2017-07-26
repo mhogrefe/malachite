@@ -80,3 +80,4 @@ impl Integer {
 
 pub mod get_bit;
 pub mod significant_bits;
+pub mod not;
