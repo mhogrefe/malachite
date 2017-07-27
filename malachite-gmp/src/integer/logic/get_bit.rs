@@ -2,8 +2,8 @@ use gmp_mpfr_sys::gmp;
 use integer::Integer::{self, Large, Small};
 
 impl Integer {
-    /// Determines whether the `index`th bit of `self`, or the coefficient of 2^(`index`) in the
-    /// binary expansion of `self`, is 0 or 1. `false` means 0, `true` means 1.
+    /// Determines whether the `index`th bit of an `Integer`, or the coefficient of 2^(`index`) in
+    /// its binary expansion, is 0 or 1. `false` means 0, `true` means 1.
     ///
     /// Negative integers are treated as though they are represented in two's complement.
     ///

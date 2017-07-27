@@ -49,6 +49,7 @@ pub mod integer {
         pub mod to_u64;
     }
     pub mod logic {
+        pub mod get_bit;
         pub mod not;
     }
 }
