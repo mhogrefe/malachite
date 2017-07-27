@@ -8,6 +8,12 @@ impl Integer {
     ///
     /// Negative integers are treated as though they are represented in two's complement.
     ///
+    /// Time: worst case O(n)
+    ///
+    /// Additional memory: worst case O(1)
+    ///
+    /// where n = `self.significant_bits()`
+    ///
     /// # Example
     /// ```
     /// use malachite_native::integer::Integer;

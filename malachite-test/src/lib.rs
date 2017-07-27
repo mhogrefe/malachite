@@ -51,6 +51,7 @@ pub mod integer {
     pub mod logic {
         pub mod get_bit;
         pub mod not;
+        pub mod significant_bits;
     }
 }
 pub mod natural {

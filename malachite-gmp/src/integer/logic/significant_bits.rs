@@ -2,8 +2,8 @@ use gmp_mpfr_sys::gmp;
 use integer::Integer::{self, Large, Small};
 
 impl Integer {
-    /// Returns the smallest number of bits necessary to represent the absolute value of `self`. 0
-    /// has zero significant bits.
+    /// Returns the smallest number of bits necessary to represent the absolute value of an
+    /// `Integer`. 0 has zero significant bits.
     ///
     /// # Examples
     /// ```
