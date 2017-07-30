@@ -62,6 +62,7 @@ pub mod integer {
         pub mod not;
         pub mod sign_and_limbs;
         pub mod significant_bits;
+        pub mod trailing_zeros;
     }
 }
 pub mod natural {

@@ -37,6 +37,7 @@ use malachite_test::integer::logic::get_bit::*;
 use malachite_test::integer::logic::not::*;
 use malachite_test::integer::logic::sign_and_limbs::*;
 use malachite_test::integer::logic::significant_bits::*;
+use malachite_test::integer::logic::trailing_zeros::*;
 use malachite_test::natural::arithmetic::add::*;
 use malachite_test::natural::arithmetic::add_u32::*;
 use malachite_test::natural::arithmetic::even_odd::*;
@@ -199,6 +200,9 @@ fn main() {
                 "exhaustive_integer_to_u64" => demo_exhaustive_integer_to_u64(limit),
                 "exhaustive_integer_to_u64_wrapping" => {
                     demo_exhaustive_integer_to_u64_wrapping(limit)
+                }
+                "exhaustive_integer_trailing_zeros" => {
+                    demo_exhaustive_integer_trailing_zeros(limit)
                 }
                 "exhaustive_natural_add_assign" => demo_exhaustive_natural_add_assign(limit),
                 "exhaustive_natural_add_assign_ref" => {
@@ -383,6 +387,7 @@ fn main() {
                 "random_integer_to_u32_wrapping" => demo_random_integer_to_u32_wrapping(limit),
                 "random_integer_to_u64" => demo_random_integer_to_u64(limit),
                 "random_integer_to_u64_wrapping" => demo_random_integer_to_u64_wrapping(limit),
+                "random_integer_trailing_zeros" => demo_random_integer_trailing_zeros(limit),
                 "random_natural_add_assign" => demo_random_natural_add_assign(limit),
                 "random_natural_add_assign_ref" => demo_random_natural_add_assign_ref(limit),
                 "random_natural_add" => demo_random_natural_add(limit),
@@ -627,6 +632,9 @@ fn main() {
                 }
                 "exhaustive_integer_to_u64_wrapping" => {
                     benchmark_exhaustive_integer_to_u64_wrapping(limit, "temp.gp")
+                }
+                "exhaustive_integer_trailing_zeros" => {
+                    benchmark_exhaustive_integer_trailing_zeros(limit, "temp.gp")
                 }
                 "exhaustive_natural_add_assign" => {
                     benchmark_exhaustive_natural_add_assign(limit, "temp.gp")
@@ -956,6 +964,9 @@ fn main() {
                 "random_integer_to_u64_wrapping" => {
                     benchmark_random_integer_to_u64_wrapping(limit, "temp.gp")
                 }
+                "random_integer_trailing_zeros" => {
+                    benchmark_random_integer_trailing_zeros(limit, 1024, "temp.gp")
+                }
                 "random_natural_add_assign" => {
                     benchmark_random_natural_add_assign(limit, 1024, "temp.gp")
                 }
@@ -1223,6 +1234,8 @@ fn main() {
                     benchmark_exhaustive_integer_to_u64(100000, "exhaustive_integer_to_u64.gp");
                     let s = "exhaustive_integer_to_u64_wrapping.gp";
                     benchmark_exhaustive_integer_to_u64_wrapping(100000, s);
+                    let s = "exhaustive_integer_trailing_zeros.gp";
+                    benchmark_exhaustive_integer_trailing_zeros(100000, s);
                     benchmark_exhaustive_natural_add_assign(100000,
                                                             "exhaustive_natural_add_assign.gp");
                     let s = "exhaustive_natural_add_assign_evaluation_strategy.gp";
@@ -1438,6 +1451,9 @@ fn main() {
                     benchmark_random_integer_to_u64(100000, "random_integer_to_u64.gp");
                     benchmark_random_integer_to_u64_wrapping(100000,
                                                              "random_integer_to_u64_wrapping.gp");
+                    benchmark_random_integer_trailing_zeros(100000,
+                                                            1024,
+                                                            "random_integer_trailing_zeros.gp");
                     benchmark_random_natural_add_assign(100000,
                                                         1024,
                                                         "random_natural_add_assign.gp");
