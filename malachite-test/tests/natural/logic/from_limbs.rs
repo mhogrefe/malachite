@@ -58,6 +58,7 @@ fn from_limbs_le_properties() {
     // (Natural::from_limbs_le(limbs) == x) ==
     //      (x.limbs_le() == limbs.rev().skip_while(|u| u == 0).rev())
     // Natural::from_limbs_le(limbs.reverse()) == Natural::from_limbs_be(limbs)
+    // if !limbs.is_empty() and limbs.last() != 0, Natural::from_limbs_le(limbs).limbs_le() == x
     let u32_slice = |limbs: &[u32]| {
         let x = native::Natural::from_limbs_le(limbs);
         assert_eq!(gmp_natural_to_native(&gmp::Natural::from_limbs_le(limbs)),
@@ -74,6 +75,9 @@ fn from_limbs_le_properties() {
                                                        .rev()
                                                        .collect::<Vec<u32>>()),
                    x);
+        if !limbs.is_empty() && *limbs.last().unwrap() != 0 {
+            assert_eq!(&x.limbs_le()[..], limbs);
+        }
     };
 
     for xs in exhaustive_vecs(exhaustive_u::<u32>()).take(LARGE_LIMIT) {
@@ -90,6 +94,7 @@ fn from_limbs_be_properties() {
     // Natural::from_limbs_be(limbs) is equivalent for malachite-gmp and malachite-native.
     // (Natural::from_limbs_be(limbs) == x) == (x.limbs_be() == limbs.skip_while(|u| u == 0))
     // Natural::from_limbs_be(limbs.reverse()) == Natural::from_limbs_le(limbs)
+    // if !limbs.is_empty() and limbs[0] != 0, Natural::from_limbs_be(limbs).limbs_le() == x
     let u32_slice = |limbs: &[u32]| {
         let x = native::Natural::from_limbs_be(limbs);
         assert_eq!(gmp_natural_to_native(&gmp::Natural::from_limbs_be(limbs)),
@@ -104,6 +109,9 @@ fn from_limbs_be_properties() {
                                                        .rev()
                                                        .collect::<Vec<u32>>()),
                    x);
+        if !limbs.is_empty() && limbs[0] != 0 {
+            assert_eq!(&x.limbs_be()[..], limbs);
+        }
     };
 
     for xs in exhaustive_vecs(exhaustive_u::<u32>()).take(LARGE_LIMIT) {

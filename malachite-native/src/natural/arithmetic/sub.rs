@@ -82,6 +82,9 @@ impl<'a, 'b> Sub<&'a Natural> for &'b Natural {
 ///
 /// where n = `self.significant_bits()`
 ///
+/// # Panics
+/// Panics if `other` is greater than `self`.
+///
 /// # Examples
 /// ```
 /// use malachite_native::natural::Natural;

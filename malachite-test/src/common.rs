@@ -37,21 +37,13 @@ pub fn gmp_natural_to_rugint_integer(n: &gmp::natural::Natural) -> rugint::Integ
 }
 
 pub fn gmp_integer_to_native(n: &gmp::integer::Integer) -> native::integer::Integer {
-    let native = native::natural::Natural::from_limbs_le(n.natural_abs_ref().limbs_le().as_slice());
-    if n >= &0 {
-        native.into_integer()
-    } else {
-        -native.into_integer()
-    }
+    let (sign, limbs) = n.sign_and_limbs_le();
+    native::integer::Integer::from_sign_and_limbs_le(sign, &limbs[..])
 }
 
 pub fn native_integer_to_gmp(n: &native::integer::Integer) -> gmp::integer::Integer {
-    let gmp = gmp::natural::Natural::from_limbs_le(n.natural_abs_ref().limbs_le().as_slice());
-    if n >= &0 {
-        gmp.into_integer()
-    } else {
-        -gmp.into_integer()
-    }
+    let (sign, limbs) = n.sign_and_limbs_le();
+    gmp::integer::Integer::from_sign_and_limbs_le(sign, &limbs[..])
 }
 
 pub fn num_bigint_to_native_integer(n: &num::BigInt) -> native::integer::Integer {

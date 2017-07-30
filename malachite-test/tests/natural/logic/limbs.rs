@@ -45,6 +45,7 @@ fn limbs_le_properties() {
     // x.limbs_le() is equivalent for malachite-gmp and malachite-native.
     // from_limbs_le(x.limbs_le()) == x
     // x.limbs_le().rev() == x.limbs_be()
+    // if x != 0, x.limbs_le().last() != 0
     let one_natural = |gmp_x: gmp::Natural| {
         let x = gmp_natural_to_native(&gmp_x);
         let limbs = x.limbs_le();
@@ -55,6 +56,9 @@ fn limbs_le_properties() {
                        .cloned()
                        .rev()
                        .collect::<Vec<u32>>());
+        if x != 0 {
+            assert_ne!(*limbs.last().unwrap(), 0);
+        }
     };
 
     for n in exhaustive_naturals().take(LARGE_LIMIT) {
@@ -71,6 +75,7 @@ fn limbs_be_properties() {
     // x.limbs_be() is equivalent for malachite-gmp and malachite-native.
     // from_limbs_be(x.limbs_be()) == x
     // x.limbs_be().rev() == x.limbs_le()
+    // if x != 0, x.limbs_be().last() != 0
     let one_natural = |gmp_x: gmp::Natural| {
         let x = gmp_natural_to_native(&gmp_x);
         let limbs = x.limbs_be();
@@ -81,6 +86,9 @@ fn limbs_be_properties() {
                        .cloned()
                        .rev()
                        .collect::<Vec<u32>>());
+        if x != 0 {
+            assert_ne!(limbs[0], 0);
+        }
     };
 
     for n in exhaustive_naturals().take(LARGE_LIMIT) {
