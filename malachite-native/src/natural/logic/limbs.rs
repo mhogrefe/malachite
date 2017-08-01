@@ -2,7 +2,8 @@ use natural::Natural::{self, Large, Small};
 
 impl Natural {
     /// Returns the limbs, or base-2^(32) digits, of a `Natural`, in little-endian order, so that
-    /// less significant limbs have lower indices in the output vector.
+    /// less significant limbs have lower indices in the output vector. There are no trailing zero
+    /// limbs.
     ///
     /// Time: worst case O(n)
     ///
@@ -31,7 +32,7 @@ impl Natural {
     }
 
     /// Returns the limbs, or base-2^(32) digits, of a `Natural`, in big-endian order, so that less
-    /// significant limbs have higher indices in the output vector.
+    /// significant limbs have higher indices in the output vector. There are no leading zero limbs.
     ///
     /// Time: worst case O(n)
     ///

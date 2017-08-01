@@ -71,13 +71,13 @@ fn sign_and_limbs_le_properties() {
     // (sign, limbs) := x.sign_and_limbs_le();
     //     (sign == Ordering::Equals) == limbs.is_empty() == (x == 0)
     // (sign, limbs) := x.sign_and_limbs_le(); if x != 0, limbs.last() != 0
+    // (sign, limbs) := x.sign_and_limbs_le(); (-x).sign_and_limbs_le() == (sign.reverse(), limbs)
     let one_integer = |gmp_x: gmp::Integer| {
         let x = gmp_integer_to_native(&gmp_x);
         let (sign, limbs) = x.sign_and_limbs_le();
         assert_eq!(gmp_x.sign_and_limbs_le(), (sign, limbs.clone()));
         assert_eq!(native::Integer::from_sign_and_limbs_le(sign, &limbs), x);
-        let (sign2, limbs2) = x.sign_and_limbs_be();
-        assert_eq!((sign2, limbs2),
+        assert_eq!(x.sign_and_limbs_be(),
                    (sign,
                     limbs.iter()
                         .cloned()
@@ -88,6 +88,7 @@ fn sign_and_limbs_le_properties() {
         if x != 0 {
             assert_ne!(*limbs.last().unwrap(), 0);
         }
+        assert_eq!((-x).sign_and_limbs_le(), (sign.reverse(), limbs));
     };
 
     for n in exhaustive_integers().take(LARGE_LIMIT) {
@@ -106,14 +107,14 @@ fn sign_and_limbs_be_properties() {
     // (sign, limbs) := x.sign_and_limbs_be(); x.sign_and_limbs_le() == (sign, limbs.rev())
     // (sign, limbs) := x.sign_and_limbs_be();
     //     (sign == Ordering::Equals) == limbs.is_empty() == (x == 0)
-    // (sign, limbs) := x.sign_and_limbs_le(); if x != 0, limbs[0] != 0
+    // (sign, limbs) := x.sign_and_limbs_be(); if x != 0, limbs[0] != 0
+    // (sign, limbs) := x.sign_and_limbs_be(); (-x).sign_and_limbs_be() == (sign.reverse(), limbs)
     let one_integer = |gmp_x: gmp::Integer| {
         let x = gmp_integer_to_native(&gmp_x);
         let (sign, limbs) = x.sign_and_limbs_be();
         assert_eq!(gmp_x.sign_and_limbs_be(), (sign, limbs.clone()));
         assert_eq!(native::Integer::from_sign_and_limbs_be(sign, &limbs), x);
-        let (sign2, limbs2) = x.sign_and_limbs_le();
-        assert_eq!((sign2, limbs2),
+        assert_eq!(x.sign_and_limbs_le(),
                    (sign,
                     limbs.iter()
                         .cloned()
@@ -124,6 +125,7 @@ fn sign_and_limbs_be_properties() {
         if x != 0 {
             assert_ne!(limbs[0], 0);
         }
+        assert_eq!((-x).sign_and_limbs_be(), (sign.reverse(), limbs));
     };
 
     for n in exhaustive_integers().take(LARGE_LIMIT) {

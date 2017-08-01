@@ -12,7 +12,7 @@ fn test_limbs_le() {
         assert_eq!(native::Natural::from_str(n).unwrap().limbs_le(), out);
         assert_eq!(gmp::Natural::from_str(n).unwrap().limbs_le(), out);
     };
-    test("0", Vec::new());
+    test("0", vec![]);
     test("123", vec![123]);
     test("1000000000000", vec![3567587328, 232]);
     test("1701411834921604967429270619762735448065",
@@ -29,7 +29,7 @@ fn test_limbs_be() {
         assert_eq!(native::Natural::from_str(n).unwrap().limbs_be(), out);
         assert_eq!(gmp::Natural::from_str(n).unwrap().limbs_be(), out);
     };
-    test("0", Vec::new());
+    test("0", vec![]);
     test("123", vec![123]);
     test("1000000000000", vec![232, 3567587328]);
     test("1701411834921604967429270619762735448065",
