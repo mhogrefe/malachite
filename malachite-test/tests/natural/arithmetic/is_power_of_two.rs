@@ -37,8 +37,10 @@ fn is_power_of_two_properties() {
         let is_power_of_two = x.is_power_of_two();
         assert_eq!(gmp_x.is_power_of_two(), is_power_of_two);
         if x != 0 {
-            assert_eq!(x.trailing_zeros().unwrap() == x.significant_bits() - 1,
-                       is_power_of_two);
+            assert_eq!(
+                x.trailing_zeros().unwrap() == x.significant_bits() - 1,
+                is_power_of_two
+            );
         }
     };
 

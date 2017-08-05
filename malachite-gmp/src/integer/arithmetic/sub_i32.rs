@@ -65,28 +65,21 @@ impl SubAssign<i32> for Integer {
         if other == 0 {
             return;
         }
-        mutate_with_possible_promotion!(self,
-                                        small,
-                                        large,
-                                        {
-                                            small.checked_sub(other)
-                                        },
-                                        {
-                                            if other > 0 {
-                                                unsafe {
-                                                    gmp::mpz_sub_ui(large,
-                                                                    large,
-                                                                    other as gmp::limb_t)
-                                                }
-                                            } else {
-                                                unsafe {
-                                                    gmp::mpz_add_ui(large,
-                                                                    large,
-                                                                    other.wrapping_neg() as
-                                                                    gmp::limb_t)
-                                                }
-                                            }
-                                        });
+        mutate_with_possible_promotion!(
+            self,
+            small,
+            large,
+            {
+                small.checked_sub(other)
+            },
+            {
+                if other > 0 {
+                    unsafe { gmp::mpz_sub_ui(large, large, other as gmp::limb_t) }
+                } else {
+                    unsafe { gmp::mpz_add_ui(large, large, other.wrapping_neg() as gmp::limb_t) }
+                }
+            }
+        );
         self.demote_if_small();
     }
 }

@@ -70,8 +70,10 @@ impl<'a> Shl<u32> for &'a Natural {
                     let shift_complement = LIMB_BITS - remaining_shift;
                     let mut previous = 0;
                     for &limb in limbs.iter() {
-                        shifted_limbs.push((limb << remaining_shift) |
-                                           (previous >> shift_complement));
+                        shifted_limbs.push(
+                            (limb << remaining_shift) |
+                                (previous >> shift_complement),
+                        );
                         previous = limb;
                     }
                     if previous.leading_zeros() < remaining_shift {
@@ -106,32 +108,33 @@ impl ShlAssign<u32> for Natural {
         if other == 0 || *self == 0 {
             return;
         }
-        mutate_with_possible_promotion!(self,
-                                        small,
-                                        limbs,
-                                        {
-                                            if other <= small.leading_zeros() {
-                                                Some(*small << other)
-                                            } else {
-                                                None
-                                            }
-                                        },
-                                        {
-                                            let remaining_shift = other & LIMB_BITS_MASK;
-                                            if remaining_shift != 0 {
-                                                let shift_complement = LIMB_BITS - remaining_shift;
-                                                let mut previous = 0;
-                                                for limb in limbs.iter_mut() {
-                                                    let old_limb = *limb;
-                                                    *limb = (*limb << remaining_shift) |
-                                                            (previous >> shift_complement);
-                                                    previous = old_limb;
-                                                }
-                                                if previous.leading_zeros() < remaining_shift {
-                                                    limbs.push(previous >> shift_complement);
-                                                }
-                                            }
-                                            pad_left(limbs, (other >> LOG_LIMB_BITS) as usize, 0);
-                                        });
+        mutate_with_possible_promotion!(
+            self,
+            small,
+            limbs,
+            {
+                if other <= small.leading_zeros() {
+                    Some(*small << other)
+                } else {
+                    None
+                }
+            },
+            {
+                let remaining_shift = other & LIMB_BITS_MASK;
+                if remaining_shift != 0 {
+                    let shift_complement = LIMB_BITS - remaining_shift;
+                    let mut previous = 0;
+                    for limb in limbs.iter_mut() {
+                        let old_limb = *limb;
+                        *limb = (*limb << remaining_shift) | (previous >> shift_complement);
+                        previous = old_limb;
+                    }
+                    if previous.leading_zeros() < remaining_shift {
+                        limbs.push(previous >> shift_complement);
+                    }
+                }
+                pad_left(limbs, (other >> LOG_LIMB_BITS) as usize, 0);
+            }
+        );
     }
 }

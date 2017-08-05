@@ -71,9 +71,11 @@ fn test_shl_u32() {
     test("1000000000000", 31, "2147483648000000000000");
     test("1000000000000", 32, "4294967296000000000000");
     test("1000000000000", 33, "8589934592000000000000");
-    test("1000000000000",
-         100,
-         "1267650600228229401496703205376000000000000");
+    test(
+        "1000000000000",
+        100,
+        "1267650600228229401496703205376000000000000",
+    );
 }
 
 #[test]
@@ -144,10 +146,12 @@ fn shl_u32_properties() {
         natural_and_u32(n, u);
     }
 
-    for (n, u) in random_pairs(&EXAMPLE_SEED,
-                               &(|seed| random_naturals(seed, 32)),
-                               &(|seed| natural_u32s_geometric(seed, 32)))
-                .take(LARGE_LIMIT) {
+    for (n, u) in random_pairs(
+        &EXAMPLE_SEED,
+        &(|seed| random_naturals(seed, 32)),
+        &(|seed| natural_u32s_geometric(seed, 32)),
+    ).take(LARGE_LIMIT)
+    {
         natural_and_u32(n, u);
     }
 

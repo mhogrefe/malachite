@@ -24,10 +24,12 @@ use traits::Assign;
 /// ```
 impl Assign<Integer> for Natural {
     fn assign(&mut self, other: Integer) {
-        assert_ne!(other.sign(),
-                   Ordering::Less,
-                   "Cannot assign from a negative Integer. Invalid other: {}",
-                   other);
+        assert_ne!(
+            other.sign(),
+            Ordering::Less,
+            "Cannot assign from a negative Integer. Invalid other: {}",
+            other
+        );
         *self = other.abs;
     }
 }
@@ -55,10 +57,12 @@ impl Assign<Integer> for Natural {
 /// ```
 impl<'a> Assign<&'a Integer> for Natural {
     fn assign(&mut self, other: &'a Integer) {
-        assert_ne!(other.sign(),
-                   Ordering::Less,
-                   "Cannot assign from a negative Integer. Invalid other: {}",
-                   other);
+        assert_ne!(
+            other.sign(),
+            Ordering::Less,
+            "Cannot assign from a negative Integer. Invalid other: {}",
+            other
+        );
         self.clone_from(&other.abs);
     }
 }

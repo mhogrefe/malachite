@@ -40,21 +40,25 @@ fn make_string(i: &Natural, radix: i32, to_upper: bool) -> String {
     let mut i_cloned = i.clone();
     let mut cs = Vec::new();
     while i_cloned != Natural::new() {
-        cs.push(i_cloned.div_rem_in_place_u32(10)
-                    .to_string()
-                    .chars()
-                    .next()
-                    .unwrap());
+        cs.push(
+            i_cloned
+                .div_rem_in_place_u32(10)
+                .to_string()
+                .chars()
+                .next()
+                .unwrap(),
+        );
     }
     cs.into_iter().rev().collect()
 }
 
-fn fmt_radix(i: &Natural,
-             f: &mut Formatter,
-             radix: i32,
-             to_upper: bool,
-             prefix: &str)
-             -> fmt::Result {
+fn fmt_radix(
+    i: &Natural,
+    f: &mut Formatter,
+    radix: i32,
+    to_upper: bool,
+    prefix: &str,
+) -> fmt::Result {
     f.pad_integral(true, prefix, &make_string(i, radix, to_upper))
 }
 

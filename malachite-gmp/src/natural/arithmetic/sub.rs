@@ -95,13 +95,17 @@ impl<'a> SubAssign<&'a Natural> for Natural {
         if let Small(y) = *other {
             *self -= y;
         } else if let Small(_) = *self {
-            panic!("Cannot subtract a Natural from a smaller Natural. self: {}, other: {}",
-                   *self,
-                   other);
+            panic!(
+                "Cannot subtract a Natural from a smaller Natural. self: {}, other: {}",
+                *self,
+                other
+            );
         } else if *self < *other {
-            panic!("Cannot subtract a Natural from a smaller Natural. self: {}, other: {}",
-                   *self,
-                   other);
+            panic!(
+                "Cannot subtract a Natural from a smaller Natural. self: {}, other: {}",
+                *self,
+                other
+            );
         } else {
             match (&mut (*self), other) {
                 (&mut Large(ref mut x), &Large(ref y)) => unsafe {

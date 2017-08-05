@@ -4,8 +4,8 @@ use malachite_gmp::traits::PartialOrdAbs as gmp_partial_ord_abs;
 use malachite_native as native;
 use malachite_native::traits::OrdAbs as native_ord_abs;
 use malachite_native::traits::PartialOrdAbs as native_partial_ord_abs;
-use malachite_test::common::{gmp_integer_to_native, gmp_natural_to_native, native_integer_to_rugint,
-                             native_natural_to_rugint_integer};
+use malachite_test::common::{gmp_integer_to_native, gmp_natural_to_native,
+                             native_integer_to_rugint, native_natural_to_rugint_integer};
 use rust_wheels::iterators::common::EXAMPLE_SEED;
 use rust_wheels::iterators::integers::{exhaustive_integers, random_integers};
 use rust_wheels::iterators::naturals::{exhaustive_naturals, random_naturals};
@@ -17,25 +17,33 @@ use std::str::FromStr;
 #[test]
 fn test_partial_ord_integer_natural() {
     let test = |u, v, out| {
-        assert_eq!(native::integer::Integer::from_str(u)
-                       .unwrap()
-                       .partial_cmp_abs(&native::natural::Natural::from_str(v).unwrap()),
-                   out);
-        assert_eq!(gmp::integer::Integer::from_str(u)
-                       .unwrap()
-                       .partial_cmp_abs(&gmp::natural::Natural::from_str(v).unwrap()),
-                   out);
+        assert_eq!(
+            native::integer::Integer::from_str(u)
+                .unwrap()
+                .partial_cmp_abs(&native::natural::Natural::from_str(v).unwrap()),
+            out
+        );
+        assert_eq!(
+            gmp::integer::Integer::from_str(u)
+                .unwrap()
+                .partial_cmp_abs(&gmp::natural::Natural::from_str(v).unwrap()),
+            out
+        );
 
-        assert_eq!(native::natural::Natural::from_str(v)
-                       .unwrap()
-                       .partial_cmp_abs(&native::integer::Integer::from_str(u).unwrap())
-                       .map(|o| o.reverse()),
-                   out);
-        assert_eq!(gmp::natural::Natural::from_str(v)
-                       .unwrap()
-                       .partial_cmp_abs(&gmp::integer::Integer::from_str(u).unwrap())
-                       .map(|o| o.reverse()),
-                   out);
+        assert_eq!(
+            native::natural::Natural::from_str(v)
+                .unwrap()
+                .partial_cmp_abs(&native::integer::Integer::from_str(u).unwrap())
+                .map(|o| o.reverse()),
+            out
+        );
+        assert_eq!(
+            gmp::natural::Natural::from_str(v)
+                .unwrap()
+                .partial_cmp_abs(&gmp::integer::Integer::from_str(u).unwrap())
+                .map(|o| o.reverse()),
+            out
+        );
     };
     test("0", "0", Some(Ordering::Equal));
     test("0", "5", Some(Ordering::Less));
@@ -59,16 +67,22 @@ fn partial_cmp_integer_natural_properties() {
         let y = gmp_integer_to_native(&gmp_y);
         let cmp_1 = x.partial_cmp_abs(&y);
         assert_eq!(gmp_x.partial_cmp_abs(&gmp_y), cmp_1);
-        assert_eq!(Some(native_natural_to_rugint_integer(&x)
-                            .cmp_abs(&native_integer_to_rugint(&y))),
-                   cmp_1);
+        assert_eq!(
+            Some(native_natural_to_rugint_integer(&x).cmp_abs(
+                &native_integer_to_rugint(&y),
+            )),
+            cmp_1
+        );
         assert_eq!(x.to_integer().cmp_abs(&y), cmp_1.unwrap());
 
         let cmp_2 = y.partial_cmp_abs(&x);
         assert_eq!(gmp_y.partial_cmp_abs(&gmp_x), cmp_2);
-        assert_eq!(Some(native_integer_to_rugint(&y)
-                            .cmp_abs(&native_natural_to_rugint_integer(&x))),
-                   cmp_2);
+        assert_eq!(
+            Some(native_integer_to_rugint(&y).cmp_abs(
+                &native_natural_to_rugint_integer(&x),
+            )),
+            cmp_2
+        );
         assert_eq!(cmp_2, cmp_1.map(|o| o.reverse()));
         assert_eq!(y.cmp_abs(&x.into_integer()), cmp_2.unwrap());
     };
@@ -107,40 +121,50 @@ fn partial_cmp_integer_natural_properties() {
         natural_and_integer(x, y);
     }
 
-    for (x, y) in random_pairs(&EXAMPLE_SEED,
-                               &(|seed| random_naturals(seed, 32)),
-                               &(|seed| random_integers(seed, 32)))
-                .take(LARGE_LIMIT) {
+    for (x, y) in random_pairs(
+        &EXAMPLE_SEED,
+        &(|seed| random_naturals(seed, 32)),
+        &(|seed| random_integers(seed, 32)),
+    ).take(LARGE_LIMIT)
+    {
         natural_and_integer(x, y);
     }
 
-    for (x, y, z) in exhaustive_triples(exhaustive_naturals(),
-                                        exhaustive_integers(),
-                                        exhaustive_naturals())
-                .take(LARGE_LIMIT) {
+    for (x, y, z) in exhaustive_triples(
+        exhaustive_naturals(),
+        exhaustive_integers(),
+        exhaustive_naturals(),
+    ).take(LARGE_LIMIT)
+    {
         natural_integer_and_natural(x, y, z);
     }
 
-    for (x, y, z) in random_triples(&EXAMPLE_SEED,
-                                    &(|seed| random_naturals(seed, 32)),
-                                    &(|seed| random_integers(seed, 32)),
-                                    &(|seed| random_naturals(seed, 32)))
-                .take(LARGE_LIMIT) {
+    for (x, y, z) in random_triples(
+        &EXAMPLE_SEED,
+        &(|seed| random_naturals(seed, 32)),
+        &(|seed| random_integers(seed, 32)),
+        &(|seed| random_naturals(seed, 32)),
+    ).take(LARGE_LIMIT)
+    {
         natural_integer_and_natural(x, y, z);
     }
 
-    for (x, y, z) in exhaustive_triples(exhaustive_integers(),
-                                        exhaustive_naturals(),
-                                        exhaustive_integers())
-                .take(LARGE_LIMIT) {
+    for (x, y, z) in exhaustive_triples(
+        exhaustive_integers(),
+        exhaustive_naturals(),
+        exhaustive_integers(),
+    ).take(LARGE_LIMIT)
+    {
         integer_natural_and_integer(x, y, z);
     }
 
-    for (x, y, z) in random_triples(&EXAMPLE_SEED,
-                                    &(|seed| random_integers(seed, 32)),
-                                    &(|seed| random_naturals(seed, 32)),
-                                    &(|seed| random_integers(seed, 32)))
-                .take(LARGE_LIMIT) {
+    for (x, y, z) in random_triples(
+        &EXAMPLE_SEED,
+        &(|seed| random_integers(seed, 32)),
+        &(|seed| random_naturals(seed, 32)),
+        &(|seed| random_integers(seed, 32)),
+    ).take(LARGE_LIMIT)
+    {
         integer_natural_and_integer(x, y, z);
     }
 }

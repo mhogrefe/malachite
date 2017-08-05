@@ -77,10 +77,12 @@ fn set_bit_properties() {
         natural_and_u64(n, index);
     }
 
-    for (n, index) in random_pairs(&EXAMPLE_SEED,
-                                   &(|seed| random_naturals(seed, 32)),
-                                   &(|seed| natural_u32s_geometric(seed, 32).map(|i| i as u64)))
-                .take(LARGE_LIMIT) {
+    for (n, index) in random_pairs(
+        &EXAMPLE_SEED,
+        &(|seed| random_naturals(seed, 32)),
+        &(|seed| natural_u32s_geometric(seed, 32).map(|i| i as u64)),
+    ).take(LARGE_LIMIT)
+    {
         natural_and_u64(n, index);
     }
 }

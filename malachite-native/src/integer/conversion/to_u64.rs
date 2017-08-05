@@ -23,7 +23,10 @@ impl Integer {
     pub fn to_u64(&self) -> Option<u64> {
         match *self {
             Integer { sign: false, .. } => None,
-            Integer { sign: true, ref abs } => abs.to_u64(),
+            Integer {
+                sign: true,
+                ref abs,
+            } => abs.to_u64(),
         }
     }
 
@@ -49,8 +52,14 @@ impl Integer {
     /// ```
     pub fn to_u64_wrapping(&self) -> u64 {
         match *self {
-            Integer { sign: true, ref abs } => abs.to_u64_wrapping(),
-            Integer { sign: false, ref abs } => abs.to_u64_wrapping().wrapping_neg(),
+            Integer {
+                sign: true,
+                ref abs,
+            } => abs.to_u64_wrapping(),
+            Integer {
+                sign: false,
+                ref abs,
+            } => abs.to_u64_wrapping().wrapping_neg(),
         }
     }
 }

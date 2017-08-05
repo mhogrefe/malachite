@@ -3,9 +3,9 @@ use malachite_native as native;
 use malachite_native::traits::Assign as native_assign;
 use malachite_gmp as gmp;
 use malachite_gmp::traits::Assign as gmp_assign;
-use malachite_test::common::{gmp_integer_to_native, gmp_natural_to_native, native_integer_to_rugint,
-                             native_natural_to_gmp, native_natural_to_rugint_integer,
-                             rugint_integer_to_native_natural};
+use malachite_test::common::{gmp_integer_to_native, gmp_natural_to_native,
+                             native_integer_to_rugint, native_natural_to_gmp,
+                             native_natural_to_rugint_integer, rugint_integer_to_native_natural};
 use rugint;
 use rugint::Assign as rugint_assign;
 use rust_wheels::iterators::common::EXAMPLE_SEED;
@@ -105,14 +105,17 @@ fn natural_assign_integer_properties() {
     };
 
     for (x, y) in exhaustive_pairs(exhaustive_naturals(), exhaustive_natural_integers())
-            .take(LARGE_LIMIT) {
+        .take(LARGE_LIMIT)
+    {
         natural_and_integer(x, y);
     }
 
-    for (x, y) in random_pairs(&EXAMPLE_SEED,
-                               &(|seed| random_naturals(seed, 32)),
-                               &(|seed| random_natural_integers(seed, 32)))
-                .take(LARGE_LIMIT) {
+    for (x, y) in random_pairs(
+        &EXAMPLE_SEED,
+        &(|seed| random_naturals(seed, 32)),
+        &(|seed| random_natural_integers(seed, 32)),
+    ).take(LARGE_LIMIT)
+    {
         natural_and_integer(x, y);
     }
 }

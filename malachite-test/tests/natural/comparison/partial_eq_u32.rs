@@ -18,8 +18,10 @@ fn test_partial_eq_u32() {
     let test = |u, v: u32, out| {
         assert_eq!(native::Natural::from_str(u).unwrap() == v, out);
         assert_eq!(gmp::Natural::from_str(u).unwrap() == v, out);
-        assert_eq!(num_partial_eq_u32(&num::BigUint::from_str(u).unwrap(), v),
-                   out);
+        assert_eq!(
+            num_partial_eq_u32(&num::BigUint::from_str(u).unwrap(), v),
+            out
+        );
         assert_eq!(rugint::Integer::from_str(u).unwrap() == v, out);
 
         assert_eq!(v == native::Natural::from_str(u).unwrap(), out);
@@ -45,8 +47,10 @@ fn partial_eq_u32_properties() {
         let n = gmp_natural_to_native(&gmp_n);
         let eq_1 = n == u;
         assert_eq!(gmp_n == u, eq_1);
-        assert_eq!(num_partial_eq_u32(&native_natural_to_num_biguint(&n), u),
-                   eq_1);
+        assert_eq!(
+            num_partial_eq_u32(&native_natural_to_num_biguint(&n), u),
+            eq_1
+        );
         assert_eq!(native_natural_to_rugint_integer(&n) == u, eq_1);
         assert_eq!(n == native::Natural::from(u), eq_1);
 
@@ -61,10 +65,12 @@ fn partial_eq_u32_properties() {
         natural_and_u32(n, u);
     }
 
-    for (n, u) in random_pairs(&EXAMPLE_SEED,
-                               &(|seed| random_naturals(seed, 32)),
-                               &(|seed| random_x::<u32>(seed)))
-                .take(LARGE_LIMIT) {
+    for (n, u) in random_pairs(
+        &EXAMPLE_SEED,
+        &(|seed| random_naturals(seed, 32)),
+        &(|seed| random_x::<u32>(seed)),
+    ).take(LARGE_LIMIT)
+    {
         natural_and_u32(n, u);
     }
 }

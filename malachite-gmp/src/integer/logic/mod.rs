@@ -31,9 +31,9 @@ impl Integer {
             None
         } else {
             Some(match *self {
-                     Small(x) => x.count_ones().into(),
-                     Large(x) => unsafe { gmp::mpz_popcount(&x) },
-                 })
+                Small(x) => x.count_ones().into(),
+                Large(x) => unsafe { gmp::mpz_popcount(&x) },
+            })
         }
     }
 

@@ -25,13 +25,14 @@ impl Integer {
             Small(small) => Some(small as i64),
             Large(_) => {
                 if self.significant_bits() < 64 ||
-                   *self == -((Natural::from(1u32) << 63).into_integer()) {
+                    *self == -((Natural::from(1u32) << 63).into_integer())
+                {
                     let abs = self.abs_ref().to_u64().unwrap() as i64;
                     Some(if self.sign() == Ordering::Less {
-                             -abs
-                         } else {
-                             abs
-                         })
+                        -abs
+                    } else {
+                        abs
+                    })
                 } else {
                     None
                 }

@@ -32,65 +32,49 @@ pub fn demo_random_integer_cmp(limit: usize) {
 pub fn benchmark_exhaustive_integer_cmp(limit: usize, file_name: &str) {
     println!("benchmarking exhaustive Integer.cmp(&Integer)");
     benchmark_4(BenchmarkOptions4 {
-                    xs: exhaustive_pairs_from_single(exhaustive_integers()),
-                    function_f: &(|(x, y): (gmp::Integer, gmp::Integer)| x.cmp(&y)),
-                    function_g: &(|(x, y): (native::Integer, native::Integer)| x.cmp(&y)),
-                    function_h: &(|(x, y): (num::BigInt, num::BigInt)| x.cmp(&y)),
-                    function_i: &(|(x, y): (rugint::Integer, rugint::Integer)| x.cmp(&y)),
-                    x_cons: &(|p| p.clone()),
-                    y_cons: &(|&(ref x, ref y)| {
-                                  (gmp_integer_to_native(x), gmp_integer_to_native(y))
-                              }),
-                    z_cons: &(|&(ref x, ref y)| {
-                                  (gmp_integer_to_num_bigint(x), gmp_integer_to_num_bigint(y))
-                              }),
-                    w_cons: &(|&(ref x, ref y)| {
-                                  (gmp_integer_to_rugint(x), gmp_integer_to_rugint(y))
-                              }),
-                    x_param: &(|&(ref x, ref y)| {
-                                   max(x.significant_bits(), y.significant_bits()) as usize
-                               }),
-                    limit: limit,
-                    f_name: "malachite-gmp",
-                    g_name: "malachite-native",
-                    h_name: "num",
-                    i_name: "rugint",
-                    title: "Integer.cmp(\\\\&Integer)",
-                    x_axis_label: "max(x.significant\\\\_bits(), y.significant\\\\_bits())",
-                    y_axis_label: "time (ns)",
-                    file_name: &format!("benchmarks/{}", file_name),
-                });
+        xs: exhaustive_pairs_from_single(exhaustive_integers()),
+        function_f: &(|(x, y): (gmp::Integer, gmp::Integer)| x.cmp(&y)),
+        function_g: &(|(x, y): (native::Integer, native::Integer)| x.cmp(&y)),
+        function_h: &(|(x, y): (num::BigInt, num::BigInt)| x.cmp(&y)),
+        function_i: &(|(x, y): (rugint::Integer, rugint::Integer)| x.cmp(&y)),
+        x_cons: &(|p| p.clone()),
+        y_cons: &(|&(ref x, ref y)| (gmp_integer_to_native(x), gmp_integer_to_native(y))),
+        z_cons: &(|&(ref x, ref y)| (gmp_integer_to_num_bigint(x), gmp_integer_to_num_bigint(y))),
+        w_cons: &(|&(ref x, ref y)| (gmp_integer_to_rugint(x), gmp_integer_to_rugint(y))),
+        x_param: &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),
+        limit: limit,
+        f_name: "malachite-gmp",
+        g_name: "malachite-native",
+        h_name: "num",
+        i_name: "rugint",
+        title: "Integer.cmp(\\\\&Integer)",
+        x_axis_label: "max(x.significant\\\\_bits(), y.significant\\\\_bits())",
+        y_axis_label: "time (ns)",
+        file_name: &format!("benchmarks/{}", file_name),
+    });
 }
 
 pub fn benchmark_random_integer_cmp(limit: usize, scale: u32, file_name: &str) {
     println!("benchmarking random Integer.cmp(&Integer)");
     benchmark_4(BenchmarkOptions4 {
-                    xs: random_pairs_from_single(random_integers(&EXAMPLE_SEED, scale)),
-                    function_f: &(|(x, y): (gmp::Integer, gmp::Integer)| x.cmp(&y)),
-                    function_g: &(|(x, y): (native::Integer, native::Integer)| x.cmp(&y)),
-                    function_h: &(|(x, y): (num::BigInt, num::BigInt)| x.cmp(&y)),
-                    function_i: &(|(x, y): (rugint::Integer, rugint::Integer)| x.cmp(&y)),
-                    x_cons: &(|p| p.clone()),
-                    y_cons: &(|&(ref x, ref y)| {
-                                  (gmp_integer_to_native(x), gmp_integer_to_native(y))
-                              }),
-                    z_cons: &(|&(ref x, ref y)| {
-                                  (gmp_integer_to_num_bigint(x), gmp_integer_to_num_bigint(y))
-                              }),
-                    w_cons: &(|&(ref x, ref y)| {
-                                  (gmp_integer_to_rugint(x), gmp_integer_to_rugint(y))
-                              }),
-                    x_param: &(|&(ref x, ref y)| {
-                                   max(x.significant_bits(), y.significant_bits()) as usize
-                               }),
-                    limit: limit,
-                    f_name: "malachite-gmp",
-                    g_name: "malachite-native",
-                    h_name: "num",
-                    i_name: "rugint",
-                    title: "Integer.cmp(\\\\&Integer)",
-                    x_axis_label: "max(x.significant\\\\_bits(), y.significant\\\\_bits())",
-                    y_axis_label: "time (ns)",
-                    file_name: &format!("benchmarks/{}", file_name),
-                });
+        xs: random_pairs_from_single(random_integers(&EXAMPLE_SEED, scale)),
+        function_f: &(|(x, y): (gmp::Integer, gmp::Integer)| x.cmp(&y)),
+        function_g: &(|(x, y): (native::Integer, native::Integer)| x.cmp(&y)),
+        function_h: &(|(x, y): (num::BigInt, num::BigInt)| x.cmp(&y)),
+        function_i: &(|(x, y): (rugint::Integer, rugint::Integer)| x.cmp(&y)),
+        x_cons: &(|p| p.clone()),
+        y_cons: &(|&(ref x, ref y)| (gmp_integer_to_native(x), gmp_integer_to_native(y))),
+        z_cons: &(|&(ref x, ref y)| (gmp_integer_to_num_bigint(x), gmp_integer_to_num_bigint(y))),
+        w_cons: &(|&(ref x, ref y)| (gmp_integer_to_rugint(x), gmp_integer_to_rugint(y))),
+        x_param: &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),
+        limit: limit,
+        f_name: "malachite-gmp",
+        g_name: "malachite-native",
+        h_name: "num",
+        i_name: "rugint",
+        title: "Integer.cmp(\\\\&Integer)",
+        x_axis_label: "max(x.significant\\\\_bits(), y.significant\\\\_bits())",
+        y_axis_label: "time (ns)",
+        file_name: &format!("benchmarks/{}", file_name),
+    });
 }

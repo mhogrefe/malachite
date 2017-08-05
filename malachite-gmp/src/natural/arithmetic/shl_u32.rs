@@ -75,18 +75,20 @@ impl ShlAssign<u32> for Natural {
         if other == 0 || *self == 0 {
             return;
         }
-        mutate_with_possible_promotion!(self,
-                                        small,
-                                        large,
-                                        {
-                                            if other <= small.leading_zeros() {
-                                                Some(*small << other)
-                                            } else {
-                                                None
-                                            }
-                                        },
-                                        {
-                                            unsafe { gmp::mpz_mul_2exp(large, large, other.into()) }
-                                        });
+        mutate_with_possible_promotion!(
+            self,
+            small,
+            large,
+            {
+                if other <= small.leading_zeros() {
+                    Some(*small << other)
+                } else {
+                    None
+                }
+            },
+            {
+                unsafe { gmp::mpz_mul_2exp(large, large, other.into()) }
+            }
+        );
     }
 }

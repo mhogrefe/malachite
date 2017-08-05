@@ -1,4 +1,4 @@
-use common::{LARGE_LIMIT, test_eq_helper};
+use common::{test_eq_helper, LARGE_LIMIT};
 use malachite_native::integer as native;
 use malachite_gmp::integer as gmp;
 use malachite_test::common::{gmp_integer_to_native, native_integer_to_num_bigint,
@@ -12,7 +12,17 @@ use rust_wheels::iterators::tuples::{exhaustive_pairs_from_single, exhaustive_tr
 
 #[test]
 fn test_eq() {
-    let strings = vec!["0", "1", "-1", "2", "-2", "123", "-123", "1000000000000", "-1000000000000"];
+    let strings = vec![
+        "0",
+        "1",
+        "-1",
+        "2",
+        "-2",
+        "123",
+        "-123",
+        "1000000000000",
+        "-1000000000000",
+    ];
     test_eq_helper::<native::Integer>(&strings);
     test_eq_helper::<gmp::Integer>(&strings);
     test_eq_helper::<num::BigInt>(&strings);
@@ -28,10 +38,14 @@ fn eq_properties() {
         let y = gmp_integer_to_native(&gmp_y);
         let eq = x == y;
         assert_eq!(gmp_x == gmp_y, eq);
-        assert_eq!(native_integer_to_num_bigint(&x) == native_integer_to_num_bigint(&y),
-                   eq);
-        assert_eq!(native_integer_to_rugint(&x) == native_integer_to_rugint(&y),
-                   eq);
+        assert_eq!(
+            native_integer_to_num_bigint(&x) == native_integer_to_num_bigint(&y),
+            eq
+        );
+        assert_eq!(
+            native_integer_to_rugint(&x) == native_integer_to_rugint(&y),
+            eq
+        );
         assert_eq!(y == x, eq);
     };
 
@@ -72,7 +86,8 @@ fn eq_properties() {
     }
 
     for (x, y, z) in random_triples_from_single(random_integers(&EXAMPLE_SEED, 32))
-            .take(LARGE_LIMIT) {
+        .take(LARGE_LIMIT)
+    {
         three_integers(x, y, z);
     }
 }

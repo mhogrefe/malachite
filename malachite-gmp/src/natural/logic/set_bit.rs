@@ -17,18 +17,20 @@ impl Natural {
     /// assert_eq!(x.to_string(), "100");
     /// ```
     pub fn set_bit(&mut self, index: u64) {
-        mutate_with_possible_promotion!(self,
-                                        small,
-                                        large,
-                                        {
-                                            if index < 32 {
-                                                Some(*small | (1 << index))
-                                            } else {
-                                                None
-                                            }
-                                        },
-                                        {
-                                            unsafe { gmp::mpz_setbit(large, index) }
-                                        });
+        mutate_with_possible_promotion!(
+            self,
+            small,
+            large,
+            {
+                if index < 32 {
+                    Some(*small | (1 << index))
+                } else {
+                    None
+                }
+            },
+            {
+                unsafe { gmp::mpz_setbit(large, index) }
+            }
+        );
     }
 }

@@ -36,9 +36,10 @@ impl Natural {
                 gmp::mpz_init(&mut large);
                 match get_limb_size() {
                     LimbSize::U32 => {
-                        let mut raw_limbs =
-                            from_raw_parts_mut(gmp::mpz_limbs_write(&mut large, sig_size as i64),
-                                               sig_size);
+                        let mut raw_limbs = from_raw_parts_mut(
+                            gmp::mpz_limbs_write(&mut large, sig_size as i64),
+                            sig_size,
+                        );
                         for (i, limb) in limbs.iter().enumerate() {
                             raw_limbs[i] = (*limb).into();
                         }
@@ -50,10 +51,10 @@ impl Natural {
                         } else {
                             (sig_size >> 1) + 1
                         };
-                        let mut raw_limbs = from_raw_parts_mut(gmp::mpz_limbs_write(&mut large,
-                                                                                    raw_sig_size as
-                                                                                    i64),
-                                                               raw_sig_size);
+                        let mut raw_limbs = from_raw_parts_mut(
+                            gmp::mpz_limbs_write(&mut large, raw_sig_size as i64),
+                            raw_sig_size,
+                        );
                         for (i, chunk) in limbs.chunks(2).enumerate() {
                             if chunk.len() == 2 {
                                 raw_limbs[i] = make_u64(chunk[1], chunk[0]);
@@ -85,9 +86,6 @@ impl Natural {
     /// assert_eq!(Natural::from_limbs_be(&[232, 3567587328]).to_string(), "1000000000000");
     /// ```
     pub fn from_limbs_be(limbs: &[u32]) -> Natural {
-        Natural::from_limbs_le(&limbs.iter()
-                                    .cloned()
-                                    .rev()
-                                    .collect::<Vec<u32>>())
+        Natural::from_limbs_le(&limbs.iter().cloned().rev().collect::<Vec<u32>>())
     }
 }

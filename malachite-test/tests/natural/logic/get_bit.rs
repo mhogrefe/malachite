@@ -19,8 +19,10 @@ pub fn test_get_bit() {
         assert_eq!(native::Natural::from_str(n).unwrap().get_bit(index), out);
         assert_eq!(gmp::Natural::from_str(n).unwrap().get_bit(index), out);
         assert_eq!(num_get_bit(&num::BigUint::from_str(n).unwrap(), index), out);
-        assert_eq!(rugint::Integer::from_str(n).unwrap().get_bit(index as u32),
-                   out);
+        assert_eq!(
+            rugint::Integer::from_str(n).unwrap().get_bit(index as u32),
+            out
+        );
     };
 
     test("0", 0, false);
@@ -40,8 +42,10 @@ fn get_bit_properties() {
         let bit = n.get_bit(index);
         assert_eq!(gmp_n.get_bit(index), bit);
         assert_eq!(num_get_bit(&native_natural_to_num_biguint(&n), index), bit);
-        assert_eq!(native_natural_to_rugint_integer(&n).get_bit(index as u32),
-                   bit);
+        assert_eq!(
+            native_natural_to_rugint_integer(&n).get_bit(index as u32),
+            bit
+        );
     };
 
     // !n.get_bit(n.significant_bits())
@@ -59,10 +63,12 @@ fn get_bit_properties() {
         natural_and_u64(n, index);
     }
 
-    for (n, index) in random_pairs(&EXAMPLE_SEED,
-                                   &(|seed| random_naturals(seed, 32)),
-                                   &(|seed| natural_u32s_geometric(seed, 32).map(|i| i as u64)))
-                .take(LARGE_LIMIT) {
+    for (n, index) in random_pairs(
+        &EXAMPLE_SEED,
+        &(|seed| random_naturals(seed, 32)),
+        &(|seed| natural_u32s_geometric(seed, 32).map(|i| i as u64)),
+    ).take(LARGE_LIMIT)
+    {
         natural_and_u64(n, index);
     }
 

@@ -28,8 +28,8 @@ impl Natural {
             Small(small) => Some(small.trailing_zeros() as u64),
             Large(ref limbs) => {
                 let zero_limbs = limbs.iter().take_while(|&&limb| limb == 0).count();
-                Some(((zero_limbs as u64) << LOG_LIMB_BITS) +
-                     limbs[zero_limbs].trailing_zeros() as u64)
+                let remaining_zeros = limbs[zero_limbs].trailing_zeros() as u64;
+                Some(((zero_limbs as u64) << LOG_LIMB_BITS) + remaining_zeros)
             }
         }
     }

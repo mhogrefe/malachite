@@ -30,8 +30,14 @@ impl Integer {
     /// ```
     pub fn set_bit(&mut self, index: u64) {
         match *self {
-            Integer { sign: true, ref mut abs } => abs.set_bit(index),
-            Integer { sign: false, ref mut abs } => abs.set_bit_neg(index),
+            Integer {
+                sign: true,
+                ref mut abs,
+            } => abs.set_bit(index),
+            Integer {
+                sign: false,
+                ref mut abs,
+            } => abs.set_bit_neg(index),
         }
     }
 }

@@ -52,7 +52,10 @@ impl Integer {
     pub fn to_natural(&self) -> Option<Natural> {
         match *self {
             Integer { sign: false, .. } => None,
-            Integer { sign: true, ref abs } => Some(abs.clone()),
+            Integer {
+                sign: true,
+                ref abs,
+            } => Some(abs.clone()),
         }
     }
 }

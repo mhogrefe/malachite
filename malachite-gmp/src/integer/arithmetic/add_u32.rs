@@ -65,20 +65,21 @@ impl AddAssign<u32> for Integer {
         if other == 0 {
             return;
         }
-        mutate_with_possible_promotion!(self,
-                                        small,
-                                        large,
-                                        {
-                                            let sum = *small as i64 + other as i64;
-                                            if sum >= i32::min_value() as i64 &&
-                                               sum <= i32::max_value() as i64 {
-                                                Some(sum as i32)
-                                            } else {
-                                                None
-                                            }
-                                        },
-                                        {
-                                            unsafe { gmp::mpz_add_ui(large, large, other.into()) }
-                                        });
+        mutate_with_possible_promotion!(
+            self,
+            small,
+            large,
+            {
+                let sum = *small as i64 + other as i64;
+                if sum >= i32::min_value() as i64 && sum <= i32::max_value() as i64 {
+                    Some(sum as i32)
+                } else {
+                    None
+                }
+            },
+            {
+                unsafe { gmp::mpz_add_ui(large, large, other.into()) }
+            }
+        );
     }
 }

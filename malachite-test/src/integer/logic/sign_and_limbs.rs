@@ -32,75 +32,75 @@ pub fn demo_random_integer_sign_and_limbs_be(limit: usize) {
 pub fn benchmark_exhaustive_integer_sign_and_limbs_le(limit: usize, file_name: &str) {
     println!("benchmarking exhaustive Integer.sign_and_limbs_le()");
     benchmark_2(BenchmarkOptions2 {
-                    xs: exhaustive_integers(),
-                    function_f: &(|n: gmp::Integer| n.sign_and_limbs_le()),
-                    function_g: &(|n: native::Integer| n.sign_and_limbs_le()),
-                    x_cons: &(|x| x.clone()),
-                    y_cons: &(|x| gmp_integer_to_native(x)),
-                    x_param: &(|n| n.significant_bits() as usize),
-                    limit: limit,
-                    f_name: "malachite-gmp",
-                    g_name: "malachite-native",
-                    title: "Integer.sign\\\\_and\\\\_limbs\\\\_le()",
-                    x_axis_label: "n.significant\\\\_bits()",
-                    y_axis_label: "time (ns)",
-                    file_name: &format!("benchmarks/{}", file_name),
-                });
+        xs: exhaustive_integers(),
+        function_f: &(|n: gmp::Integer| n.sign_and_limbs_le()),
+        function_g: &(|n: native::Integer| n.sign_and_limbs_le()),
+        x_cons: &(|x| x.clone()),
+        y_cons: &(|x| gmp_integer_to_native(x)),
+        x_param: &(|n| n.significant_bits() as usize),
+        limit: limit,
+        f_name: "malachite-gmp",
+        g_name: "malachite-native",
+        title: "Integer.sign\\\\_and\\\\_limbs\\\\_le()",
+        x_axis_label: "n.significant\\\\_bits()",
+        y_axis_label: "time (ns)",
+        file_name: &format!("benchmarks/{}", file_name),
+    });
 }
 
 pub fn benchmark_random_integer_sign_and_limbs_le(limit: usize, scale: u32, file_name: &str) {
     println!("benchmarking random Integer.sign_and_limbs_le()");
     benchmark_2(BenchmarkOptions2 {
-                    xs: random_integers(&EXAMPLE_SEED, scale),
-                    function_f: &(|n: gmp::Integer| n.sign_and_limbs_le()),
-                    function_g: &(|n: native::Integer| n.sign_and_limbs_le()),
-                    x_cons: &(|x| x.clone()),
-                    y_cons: &(|x| gmp_integer_to_native(x)),
-                    x_param: &(|n| n.significant_bits() as usize),
-                    limit: limit,
-                    f_name: "malachite-gmp",
-                    g_name: "malachite-native",
-                    title: "Integer.sign\\\\_and\\\\_limbs\\\\_le()",
-                    x_axis_label: "n.significant\\\\_bits()",
-                    y_axis_label: "time (ns)",
-                    file_name: &format!("benchmarks/{}", file_name),
-                });
+        xs: random_integers(&EXAMPLE_SEED, scale),
+        function_f: &(|n: gmp::Integer| n.sign_and_limbs_le()),
+        function_g: &(|n: native::Integer| n.sign_and_limbs_le()),
+        x_cons: &(|x| x.clone()),
+        y_cons: &(|x| gmp_integer_to_native(x)),
+        x_param: &(|n| n.significant_bits() as usize),
+        limit: limit,
+        f_name: "malachite-gmp",
+        g_name: "malachite-native",
+        title: "Integer.sign\\\\_and\\\\_limbs\\\\_le()",
+        x_axis_label: "n.significant\\\\_bits()",
+        y_axis_label: "time (ns)",
+        file_name: &format!("benchmarks/{}", file_name),
+    });
 }
 
 pub fn benchmark_exhaustive_integer_sign_and_limbs_be(limit: usize, file_name: &str) {
     println!("benchmarking exhaustive Integer.sign_and_limbs_be()");
     benchmark_2(BenchmarkOptions2 {
-                    xs: exhaustive_integers(),
-                    function_f: &(|n: gmp::Integer| n.sign_and_limbs_be()),
-                    function_g: &(|n: native::Integer| n.sign_and_limbs_be()),
-                    x_cons: &(|x| x.clone()),
-                    y_cons: &(|x| gmp_integer_to_native(x)),
-                    x_param: &(|n| n.significant_bits() as usize),
-                    limit: limit,
-                    f_name: "malachite-gmp",
-                    g_name: "malachite-native",
-                    title: "Integer.sign\\\\_and\\\\_limbs\\\\_be()",
-                    x_axis_label: "n.significant\\\\_bits()",
-                    y_axis_label: "time (ns)",
-                    file_name: &format!("benchmarks/{}", file_name),
-                });
+        xs: exhaustive_integers(),
+        function_f: &(|n: gmp::Integer| n.sign_and_limbs_be()),
+        function_g: &(|n: native::Integer| n.sign_and_limbs_be()),
+        x_cons: &(|x| x.clone()),
+        y_cons: &(|x| gmp_integer_to_native(x)),
+        x_param: &(|n| n.significant_bits() as usize),
+        limit: limit,
+        f_name: "malachite-gmp",
+        g_name: "malachite-native",
+        title: "Integer.sign\\\\_and\\\\_limbs\\\\_be()",
+        x_axis_label: "n.significant\\\\_bits()",
+        y_axis_label: "time (ns)",
+        file_name: &format!("benchmarks/{}", file_name),
+    });
 }
 
 pub fn benchmark_random_integer_sign_and_limbs_be(limit: usize, scale: u32, file_name: &str) {
     println!("benchmarking random Integer.sign_and_limbs_be()");
     benchmark_2(BenchmarkOptions2 {
-                    xs: random_integers(&EXAMPLE_SEED, scale),
-                    function_f: &(|n: gmp::Integer| n.sign_and_limbs_be()),
-                    function_g: &(|n: native::Integer| n.sign_and_limbs_be()),
-                    x_cons: &(|x| x.clone()),
-                    y_cons: &(|x| gmp_integer_to_native(x)),
-                    x_param: &(|n| n.significant_bits() as usize),
-                    limit: limit,
-                    f_name: "malachite-gmp",
-                    g_name: "malachite-native",
-                    title: "Integer.sign\\\\_and\\\\_limbs\\\\_be()",
-                    x_axis_label: "n.significant\\\\_bits()",
-                    y_axis_label: "time (ns)",
-                    file_name: &format!("benchmarks/{}", file_name),
-                });
+        xs: random_integers(&EXAMPLE_SEED, scale),
+        function_f: &(|n: gmp::Integer| n.sign_and_limbs_be()),
+        function_g: &(|n: native::Integer| n.sign_and_limbs_be()),
+        x_cons: &(|x| x.clone()),
+        y_cons: &(|x| gmp_integer_to_native(x)),
+        x_param: &(|n| n.significant_bits() as usize),
+        limit: limit,
+        f_name: "malachite-gmp",
+        g_name: "malachite-native",
+        title: "Integer.sign\\\\_and\\\\_limbs\\\\_be()",
+        x_axis_label: "n.significant\\\\_bits()",
+        y_axis_label: "time (ns)",
+        file_name: &format!("benchmarks/{}", file_name),
+    });
 }

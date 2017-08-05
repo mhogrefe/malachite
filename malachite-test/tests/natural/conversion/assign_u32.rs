@@ -75,10 +75,12 @@ fn assign_u32_properties() {
         natural_and_u32(n, u);
     }
 
-    for (n, u) in random_pairs(&EXAMPLE_SEED,
-                               &(|seed| random_naturals(seed, 32)),
-                               &(|seed| random_x::<u32>(seed)))
-                .take(LARGE_LIMIT) {
+    for (n, u) in random_pairs(
+        &EXAMPLE_SEED,
+        &(|seed| random_naturals(seed, 32)),
+        &(|seed| random_x::<u32>(seed)),
+    ).take(LARGE_LIMIT)
+    {
         natural_and_u32(n, u);
     }
 }

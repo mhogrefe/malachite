@@ -162,12 +162,13 @@ fn make_string(i: &Integer, radix: i32, to_upper: bool) -> String {
     }
 }
 
-fn fmt_radix(i: &Integer,
-             f: &mut Formatter,
-             radix: i32,
-             to_upper: bool,
-             prefix: &str)
-             -> fmt::Result {
+fn fmt_radix(
+    i: &Integer,
+    f: &mut Formatter,
+    radix: i32,
+    to_upper: bool,
+    prefix: &str,
+) -> fmt::Result {
     let s = make_string(i, radix, to_upper);
     let (neg, buf) = if s.starts_with('-') {
         (true, &s[1..])

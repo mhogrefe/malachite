@@ -177,12 +177,16 @@ fn sub_u32_properties() {
         assert!(result.map_or(true, |n| n.is_valid()));
 
         let num_n2 = native_natural_to_num_biguint(&old_n);
-        assert_eq!(num_sub_u32(num_n2, u).map(|x| num_biguint_to_native_natural(&x)),
-                   on);
+        assert_eq!(
+            num_sub_u32(num_n2, u).map(|x| num_biguint_to_native_natural(&x)),
+            on
+        );
 
         let rugint_n2 = native_natural_to_rugint_integer(&old_n);
-        assert_eq!(rugint_sub_u32(rugint_n2, u).map(|x| rugint_integer_to_native_natural(&x)),
-                   on);
+        assert_eq!(
+            rugint_sub_u32(rugint_n2, u).map(|x| rugint_integer_to_native_natural(&x)),
+            on
+        );
 
         if on.is_some() {
             assert!(on.clone().unwrap() <= old_n);
@@ -205,8 +209,10 @@ fn sub_u32_properties() {
     // u - 0 == u
     // if u != 0, 0 - u == None
     let one_u32 = |u: u32| {
-        assert_eq!(u - &native::Natural::from(0u32),
-                   Some(native::Natural::from(u)));
+        assert_eq!(
+            u - &native::Natural::from(0u32),
+            Some(native::Natural::from(u))
+        );
         if u != 0 {
             assert!((native::Natural::from(0u32) - u).is_none());
         }
@@ -216,10 +222,12 @@ fn sub_u32_properties() {
         natural_and_u32(n, u);
     }
 
-    for (n, u) in random_pairs(&EXAMPLE_SEED,
-                               &(|seed| random_naturals(seed, 32)),
-                               &(|seed| random_x(seed)))
-                .take(LARGE_LIMIT) {
+    for (n, u) in random_pairs(
+        &EXAMPLE_SEED,
+        &(|seed| random_naturals(seed, 32)),
+        &(|seed| random_x(seed)),
+    ).take(LARGE_LIMIT)
+    {
         natural_and_u32(n, u);
     }
 

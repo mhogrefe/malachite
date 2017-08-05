@@ -250,10 +250,10 @@ fn large_add(xs: &[u32], ys: &[u32]) -> Vec<u32> {
     let mut ys_iter = ys.iter();
     for x in xs.iter() {
         sum_limbs.push(match ys_iter.next() {
-                           Some(y) => add_and_carry(*x, *y, &mut carry),
-                           None if carry => add_and_carry(*x, 0, &mut carry),
-                           None => *x,
-                       });
+            Some(y) => add_and_carry(*x, *y, &mut carry),
+            None if carry => add_and_carry(*x, 0, &mut carry),
+            None => *x,
+        });
     }
     for y in ys_iter {
         if carry {

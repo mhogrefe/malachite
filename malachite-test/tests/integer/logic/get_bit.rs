@@ -16,8 +16,10 @@ pub fn test_get_bit() {
     let test = |n, index, out| {
         assert_eq!(native::Integer::from_str(n).unwrap().get_bit(index), out);
         assert_eq!(gmp::Integer::from_str(n).unwrap().get_bit(index), out);
-        assert_eq!(rugint::Integer::from_str(n).unwrap().get_bit(index as u32),
-                   out);
+        assert_eq!(
+            rugint::Integer::from_str(n).unwrap().get_bit(index as u32),
+            out
+        );
     };
 
     test("0", 0, false);
@@ -76,10 +78,12 @@ fn get_bit_properties() {
         integer_and_u64(n, index);
     }
 
-    for (n, index) in random_pairs(&EXAMPLE_SEED,
-                                   &(|seed| random_integers(seed, 32)),
-                                   &(|seed| natural_u32s_geometric(seed, 32).map(|i| i as u64)))
-                .take(LARGE_LIMIT) {
+    for (n, index) in random_pairs(
+        &EXAMPLE_SEED,
+        &(|seed| random_integers(seed, 32)),
+        &(|seed| natural_u32s_geometric(seed, 32).map(|i| i as u64)),
+    ).take(LARGE_LIMIT)
+    {
         integer_and_u64(n, index);
     }
 

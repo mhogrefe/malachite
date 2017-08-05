@@ -94,10 +94,12 @@ fn assign_natural_properties() {
         integer_and_natural(x, y);
     }
 
-    for (x, y) in random_pairs(&EXAMPLE_SEED,
-                               &(|seed| random_integers(seed, 32)),
-                               &(|seed| random_naturals(seed, 32)))
-                .take(LARGE_LIMIT) {
+    for (x, y) in random_pairs(
+        &EXAMPLE_SEED,
+        &(|seed| random_integers(seed, 32)),
+        &(|seed| random_naturals(seed, 32)),
+    ).take(LARGE_LIMIT)
+    {
         integer_and_natural(x, y);
     }
 }

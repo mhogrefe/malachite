@@ -25,21 +25,23 @@ impl Integer {
     /// assert_eq!(x.to_string(), "-156");
     /// ```
     pub fn set_bit(&mut self, index: u64) {
-        mutate_with_possible_promotion!(self,
-                                        small,
-                                        large,
-                                        {
-                                            if index < 31 {
-                                                Some(*small | (1 << index))
-                                            } else if *small < 0 {
-                Some(*small)
-            } else {
-                None
+        mutate_with_possible_promotion!(
+            self,
+            small,
+            large,
+            {
+                if index < 31 {
+                    Some(*small | (1 << index))
+                } else if *small < 0 {
+                    Some(*small)
+                } else {
+                    None
+                }
+            },
+            {
+                unsafe { gmp::mpz_setbit(large, index) }
             }
-                                        },
-                                        {
-                                            unsafe { gmp::mpz_setbit(large, index) }
-                                        });
+        );
         self.demote_if_small();
     }
 }

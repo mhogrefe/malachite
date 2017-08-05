@@ -1,4 +1,4 @@
-use common::{LARGE_LIMIT, test_eq_helper};
+use common::{test_eq_helper, LARGE_LIMIT};
 use malachite_native::natural as native;
 use malachite_gmp::natural as gmp;
 use malachite_test::common::{gmp_natural_to_native, native_natural_to_num_biguint,
@@ -28,10 +28,14 @@ fn eq_properties() {
         let y = gmp_natural_to_native(&gmp_y);
         let eq = x == y;
         assert_eq!(gmp_x == gmp_y, eq);
-        assert_eq!(native_natural_to_num_biguint(&x) == native_natural_to_num_biguint(&y),
-                   eq);
-        assert_eq!(native_natural_to_rugint_integer(&x) == native_natural_to_rugint_integer(&y),
-                   eq);
+        assert_eq!(
+            native_natural_to_num_biguint(&x) == native_natural_to_num_biguint(&y),
+            eq
+        );
+        assert_eq!(
+            native_natural_to_rugint_integer(&x) == native_natural_to_rugint_integer(&y),
+            eq
+        );
         assert_eq!(y == x, eq);
     };
 
@@ -72,7 +76,8 @@ fn eq_properties() {
     }
 
     for (x, y, z) in random_triples_from_single(random_naturals(&EXAMPLE_SEED, 32))
-            .take(LARGE_LIMIT) {
+        .take(LARGE_LIMIT)
+    {
         three_naturals(x, y, z);
     }
 }

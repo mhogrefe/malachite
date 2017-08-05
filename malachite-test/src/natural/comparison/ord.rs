@@ -32,67 +32,59 @@ pub fn demo_random_natural_cmp(limit: usize) {
 pub fn benchmark_exhaustive_natural_cmp(limit: usize, file_name: &str) {
     println!("benchmarking exhaustive Natural.cmp(&Natural)");
     benchmark_4(BenchmarkOptions4 {
-                    xs: exhaustive_pairs_from_single(exhaustive_naturals()),
-                    function_f: &(|(x, y): (gmp::Natural, gmp::Natural)| x.cmp(&y)),
-                    function_g: &(|(x, y): (native::Natural, native::Natural)| x.cmp(&y)),
-                    function_h: &(|(x, y): (num::BigUint, num::BigUint)| x.cmp(&y)),
-                    function_i: &(|(x, y): (rugint::Integer, rugint::Integer)| x.cmp(&y)),
-                    x_cons: &(|p| p.clone()),
-                    y_cons: &(|&(ref x, ref y)| {
-                                  (gmp_natural_to_native(x), gmp_natural_to_native(y))
-                              }),
-                    z_cons: &(|&(ref x, ref y)| {
-                                  (gmp_natural_to_num_biguint(x), gmp_natural_to_num_biguint(y))
-                              }),
-                    w_cons: &(|&(ref x, ref y)| {
-                                  (gmp_natural_to_rugint_integer(x),
-                                   gmp_natural_to_rugint_integer(y))
-                              }),
-                    x_param: &(|&(ref x, ref y)| {
-                                   max(x.significant_bits(), y.significant_bits()) as usize
-                               }),
-                    limit: limit,
-                    f_name: "malachite-gmp",
-                    g_name: "malachite-native",
-                    h_name: "num",
-                    i_name: "rugint",
-                    title: "Natural.cmp(\\\\&Natural)",
-                    x_axis_label: "max(x.significant\\\\_bits(), y.significant\\\\_bits())",
-                    y_axis_label: "time (ns)",
-                    file_name: &format!("benchmarks/{}", file_name),
-                });
+        xs: exhaustive_pairs_from_single(exhaustive_naturals()),
+        function_f: &(|(x, y): (gmp::Natural, gmp::Natural)| x.cmp(&y)),
+        function_g: &(|(x, y): (native::Natural, native::Natural)| x.cmp(&y)),
+        function_h: &(|(x, y): (num::BigUint, num::BigUint)| x.cmp(&y)),
+        function_i: &(|(x, y): (rugint::Integer, rugint::Integer)| x.cmp(&y)),
+        x_cons: &(|p| p.clone()),
+        y_cons: &(|&(ref x, ref y)| (gmp_natural_to_native(x), gmp_natural_to_native(y))),
+        z_cons: &(|&(ref x, ref y)| (gmp_natural_to_num_biguint(x), gmp_natural_to_num_biguint(y))),
+        w_cons: &(|&(ref x, ref y)| {
+            (
+                gmp_natural_to_rugint_integer(x),
+                gmp_natural_to_rugint_integer(y),
+            )
+        }),
+        x_param: &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),
+        limit: limit,
+        f_name: "malachite-gmp",
+        g_name: "malachite-native",
+        h_name: "num",
+        i_name: "rugint",
+        title: "Natural.cmp(\\\\&Natural)",
+        x_axis_label: "max(x.significant\\\\_bits(), y.significant\\\\_bits())",
+        y_axis_label: "time (ns)",
+        file_name: &format!("benchmarks/{}", file_name),
+    });
 }
 
 pub fn benchmark_random_natural_cmp(limit: usize, scale: u32, file_name: &str) {
     println!("benchmarking random Natural.cmp(&Natural)");
     benchmark_4(BenchmarkOptions4 {
-                    xs: random_pairs_from_single(random_naturals(&EXAMPLE_SEED, scale)),
-                    function_f: &(|(x, y): (gmp::Natural, gmp::Natural)| x.cmp(&y)),
-                    function_g: &(|(x, y): (native::Natural, native::Natural)| x.cmp(&y)),
-                    function_h: &(|(x, y): (num::BigUint, num::BigUint)| x.cmp(&y)),
-                    function_i: &(|(x, y): (rugint::Integer, rugint::Integer)| x.cmp(&y)),
-                    x_cons: &(|p| p.clone()),
-                    y_cons: &(|&(ref x, ref y)| {
-                                  (gmp_natural_to_native(x), gmp_natural_to_native(y))
-                              }),
-                    z_cons: &(|&(ref x, ref y)| {
-                                  (gmp_natural_to_num_biguint(x), gmp_natural_to_num_biguint(y))
-                              }),
-                    w_cons: &(|&(ref x, ref y)| {
-                                  (gmp_natural_to_rugint_integer(x),
-                                   gmp_natural_to_rugint_integer(y))
-                              }),
-                    x_param: &(|&(ref x, ref y)| {
-                                   max(x.significant_bits(), y.significant_bits()) as usize
-                               }),
-                    limit: limit,
-                    f_name: "malachite-gmp",
-                    g_name: "malachite-native",
-                    h_name: "num",
-                    i_name: "rugint",
-                    title: "Natural.cmp(\\\\&Natural)",
-                    x_axis_label: "max(x.significant\\\\_bits(), y.significant\\\\_bits())",
-                    y_axis_label: "time (ns)",
-                    file_name: &format!("benchmarks/{}", file_name),
-                });
+        xs: random_pairs_from_single(random_naturals(&EXAMPLE_SEED, scale)),
+        function_f: &(|(x, y): (gmp::Natural, gmp::Natural)| x.cmp(&y)),
+        function_g: &(|(x, y): (native::Natural, native::Natural)| x.cmp(&y)),
+        function_h: &(|(x, y): (num::BigUint, num::BigUint)| x.cmp(&y)),
+        function_i: &(|(x, y): (rugint::Integer, rugint::Integer)| x.cmp(&y)),
+        x_cons: &(|p| p.clone()),
+        y_cons: &(|&(ref x, ref y)| (gmp_natural_to_native(x), gmp_natural_to_native(y))),
+        z_cons: &(|&(ref x, ref y)| (gmp_natural_to_num_biguint(x), gmp_natural_to_num_biguint(y))),
+        w_cons: &(|&(ref x, ref y)| {
+            (
+                gmp_natural_to_rugint_integer(x),
+                gmp_natural_to_rugint_integer(y),
+            )
+        }),
+        x_param: &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),
+        limit: limit,
+        f_name: "malachite-gmp",
+        g_name: "malachite-native",
+        h_name: "num",
+        i_name: "rugint",
+        title: "Natural.cmp(\\\\&Natural)",
+        x_axis_label: "max(x.significant\\\\_bits(), y.significant\\\\_bits())",
+        y_axis_label: "time (ns)",
+        file_name: &format!("benchmarks/{}", file_name),
+    });
 }

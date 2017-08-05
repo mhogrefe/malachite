@@ -18,18 +18,16 @@ impl Natural {
     pub fn to_u64(&self) -> Option<u64> {
         match *self {
             Small(small) => Some(small.into()),
-            Large(ref large) if unsafe { gmp::mpz_sizeinbase(large, 2) } <= 64 => {
-                unsafe {
-                    Some(match get_limb_size() {
-                             LimbSize::U32 => {
-                        let raw_limbs = from_raw_parts(gmp::mpz_limbs_read(large),
-                                                       gmp::mpz_size(large));
+            Large(ref large) if unsafe { gmp::mpz_sizeinbase(large, 2) } <= 64 => unsafe {
+                Some(match get_limb_size() {
+                    LimbSize::U32 => {
+                        let raw_limbs =
+                            from_raw_parts(gmp::mpz_limbs_read(large), gmp::mpz_size(large));
                         make_u64(raw_limbs[1] as u32, raw_limbs[0] as u32)
                     }
-                             LimbSize::U64 => gmp::mpz_get_ui(large),
-                         })
-                }
-            }
+                    LimbSize::U64 => gmp::mpz_get_ui(large),
+                })
+            },
             Large(_) => None,
         }
     }
@@ -52,8 +50,8 @@ impl Natural {
             Large(ref large) => unsafe {
                 match get_limb_size() {
                     LimbSize::U32 => {
-                        let raw_limbs = from_raw_parts(gmp::mpz_limbs_read(large),
-                                                       gmp::mpz_size(large));
+                        let raw_limbs =
+                            from_raw_parts(gmp::mpz_limbs_read(large), gmp::mpz_size(large));
                         make_u64(raw_limbs[1] as u32, raw_limbs[0] as u32)
                     }
                     LimbSize::U64 => gmp::mpz_get_ui(large),

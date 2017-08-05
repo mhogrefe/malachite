@@ -33,10 +33,12 @@ fn test_assign_bit() {
     test("0", 10, true, "1024");
     test("100", 0, true, "101");
     test("1000000000000", 10, true, "1000000001024");
-    test("1000000000000",
-         100,
-         true,
-         "1267650600228229402496703205376");
+    test(
+        "1000000000000",
+        100,
+        true,
+        "1267650600228229402496703205376",
+    );
     test("5", 100, true, "1267650600228229401496703205381");
     test("0", 10, false, "0");
     test("0", 100, false, "0");
@@ -44,10 +46,12 @@ fn test_assign_bit() {
     test("101", 0, false, "100");
     test("1000000001024", 10, false, "1000000000000");
     test("1000000001024", 100, false, "1000000001024");
-    test("1267650600228229402496703205376",
-         100,
-         false,
-         "1000000000000");
+    test(
+        "1267650600228229402496703205376",
+        100,
+        false,
+        "1000000000000",
+    );
     test("1267650600228229401496703205381", 100, false, "5");
 }
 
@@ -70,19 +74,21 @@ fn assign_bit_properties() {
     };
 
     for ((n, index), bit) in
-        lex_pairs(exhaustive_pairs(exhaustive_naturals(), exhaustive_u::<u64>()),
-                  exhaustive_bools())
-                .take(LARGE_LIMIT) {
+        lex_pairs(
+            exhaustive_pairs(exhaustive_naturals(), exhaustive_u::<u64>()),
+            exhaustive_bools(),
+        ).take(LARGE_LIMIT)
+    {
         natural_u64_and_bool(n, index, bit);
     }
 
-    for (n, index, bit) in random_triples(&EXAMPLE_SEED,
-                                          &(|seed| random_naturals(seed, 32)),
-                                          &(|seed| {
-                                                natural_u32s_geometric(seed, 32).map(|i| i as u64)
-                                            }),
-                                          &(|seed| random_x(seed)))
-                .take(LARGE_LIMIT) {
+    for (n, index, bit) in random_triples(
+        &EXAMPLE_SEED,
+        &(|seed| random_naturals(seed, 32)),
+        &(|seed| natural_u32s_geometric(seed, 32).map(|i| i as u64)),
+        &(|seed| random_x(seed)),
+    ).take(LARGE_LIMIT)
+    {
         natural_u64_and_bool(n, index, bit);
     }
 }

@@ -22,10 +22,12 @@ use traits::Assign;
 /// ```
 impl Assign<Integer> for Natural {
     fn assign(&mut self, mut other: Integer) {
-        assert_ne!(other.sign(),
-                   Ordering::Less,
-                   "Cannot assign from a negative Integer. Invalid other: {}",
-                   other);
+        assert_ne!(
+            other.sign(),
+            Ordering::Less,
+            "Cannot assign from a negative Integer. Invalid other: {}",
+            other
+        );
         match other {
             Integer::Small(y) => *self = Natural::Small(y as u32),
             Integer::Large(ref y) if unsafe { gmp::mpz_sizeinbase(y, 2) <= 32 } => {
@@ -58,10 +60,12 @@ impl Assign<Integer> for Natural {
 /// ```
 impl<'a> Assign<&'a Integer> for Natural {
     fn assign(&mut self, other: &'a Integer) {
-        assert_ne!(other.sign(),
-                   Ordering::Less,
-                   "Cannot assign from a negative Integer. Invalid other: {}",
-                   other);
+        assert_ne!(
+            other.sign(),
+            Ordering::Less,
+            "Cannot assign from a negative Integer. Invalid other: {}",
+            other
+        );
         match *other {
             Integer::Small(y) => *self = Natural::Small(y as u32),
             Integer::Large(ref y) if unsafe { gmp::mpz_sizeinbase(y, 2) <= 32 } => {

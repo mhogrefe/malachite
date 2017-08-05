@@ -18,8 +18,10 @@ fn test_partial_eq_i32() {
     let test = |u, v: i32, out| {
         assert_eq!(native::Integer::from_str(u).unwrap() == v, out);
         assert_eq!(gmp::Integer::from_str(u).unwrap() == v, out);
-        assert_eq!(num_partial_eq_i32(&num::BigInt::from_str(u).unwrap(), v),
-                   out);
+        assert_eq!(
+            num_partial_eq_i32(&num::BigInt::from_str(u).unwrap(), v),
+            out
+        );
         assert_eq!(rugint::Integer::from_str(u).unwrap() == v, out);
 
         assert_eq!(v == native::Integer::from_str(u).unwrap(), out);
@@ -49,8 +51,10 @@ fn partial_eq_i32_properties() {
         let n = gmp_integer_to_native(&gmp_n);
         let eq_1 = n == i;
         assert_eq!(gmp_n == i, eq_1);
-        assert_eq!(num_partial_eq_i32(&native_integer_to_num_bigint(&n), i),
-                   eq_1);
+        assert_eq!(
+            num_partial_eq_i32(&native_integer_to_num_bigint(&n), i),
+            eq_1
+        );
         assert_eq!(native_integer_to_rugint(&n) == i, eq_1);
         assert_eq!(n == native::Integer::from(i), eq_1);
 
@@ -65,10 +69,12 @@ fn partial_eq_i32_properties() {
         integer_and_i32(n, i);
     }
 
-    for (n, i) in random_pairs(&EXAMPLE_SEED,
-                               &(|seed| random_integers(seed, 32)),
-                               &(|seed| random_x::<i32>(seed)))
-                .take(LARGE_LIMIT) {
+    for (n, i) in random_pairs(
+        &EXAMPLE_SEED,
+        &(|seed| random_integers(seed, 32)),
+        &(|seed| random_x::<i32>(seed)),
+    ).take(LARGE_LIMIT)
+    {
         integer_and_i32(n, i);
     }
 }

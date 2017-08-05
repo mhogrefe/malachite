@@ -34,77 +34,79 @@ pub fn demo_random_integer_to_natural(limit: usize) {
 pub fn benchmark_exhaustive_integer_to_natural(limit: usize, file_name: &str) {
     println!("benchmarking exhaustive Integer.to_natural()");
     benchmark_2(BenchmarkOptions2 {
-                    xs: exhaustive_integers(),
-                    function_f: &(|n: gmp::Integer| n.into_natural()),
-                    function_g: &(|n: native::Integer| n.into_natural()),
-                    x_cons: &(|x| x.clone()),
-                    y_cons: &(|x| gmp_integer_to_native(x)),
-                    x_param: &(|n| n.significant_bits() as usize),
-                    limit: limit,
-                    f_name: "malachite-gmp",
-                    g_name: "malachite-native",
-                    title: "Integer.to\\\\_natural()",
-                    x_axis_label: "n.significant\\\\_bits()",
-                    y_axis_label: "time (ns)",
-                    file_name: &format!("benchmarks/{}", file_name),
-                });
+        xs: exhaustive_integers(),
+        function_f: &(|n: gmp::Integer| n.into_natural()),
+        function_g: &(|n: native::Integer| n.into_natural()),
+        x_cons: &(|x| x.clone()),
+        y_cons: &(|x| gmp_integer_to_native(x)),
+        x_param: &(|n| n.significant_bits() as usize),
+        limit: limit,
+        f_name: "malachite-gmp",
+        g_name: "malachite-native",
+        title: "Integer.to\\\\_natural()",
+        x_axis_label: "n.significant\\\\_bits()",
+        y_axis_label: "time (ns)",
+        file_name: &format!("benchmarks/{}", file_name),
+    });
 }
 
 pub fn benchmark_random_integer_to_natural(limit: usize, scale: u32, file_name: &str) {
     println!("benchmarking random Integer.to_natural()");
     benchmark_2(BenchmarkOptions2 {
-                    xs: random_integers(&EXAMPLE_SEED, scale),
-                    function_f: &(|n: gmp::Integer| n.into_natural()),
-                    function_g: &(|n: native::Integer| n.into_natural()),
-                    x_cons: &(|x| x.clone()),
-                    y_cons: &(|x| gmp_integer_to_native(x)),
-                    x_param: &(|n| n.significant_bits() as usize),
-                    limit: limit,
-                    f_name: "malachite-gmp",
-                    g_name: "malachite-native",
-                    title: "Integer.to\\\\_natural()",
-                    x_axis_label: "n.significant\\\\_bits()",
-                    y_axis_label: "time (ns)",
-                    file_name: &format!("benchmarks/{}", file_name),
-                });
+        xs: random_integers(&EXAMPLE_SEED, scale),
+        function_f: &(|n: gmp::Integer| n.into_natural()),
+        function_g: &(|n: native::Integer| n.into_natural()),
+        x_cons: &(|x| x.clone()),
+        y_cons: &(|x| gmp_integer_to_native(x)),
+        x_param: &(|n| n.significant_bits() as usize),
+        limit: limit,
+        f_name: "malachite-gmp",
+        g_name: "malachite-native",
+        title: "Integer.to\\\\_natural()",
+        x_axis_label: "n.significant\\\\_bits()",
+        y_axis_label: "time (ns)",
+        file_name: &format!("benchmarks/{}", file_name),
+    });
 }
 
 pub fn benchmark_exhaustive_integer_to_natural_evaluation_strategy(limit: usize, file_name: &str) {
     println!("benchmarking exhaustive Integer.to_natural() evaluation_strategy");
     benchmark_2(BenchmarkOptions2 {
-                    xs: exhaustive_integers(),
-                    function_f: &(|n: native::Integer| n.into_natural()),
-                    function_g: &(|n: native::Integer| n.to_natural()),
-                    x_cons: &(|x| gmp_integer_to_native(x)),
-                    y_cons: &(|x| gmp_integer_to_native(x)),
-                    x_param: &(|n| n.significant_bits() as usize),
-                    limit: limit,
-                    f_name: "into\\\\_natural (by value)",
-                    g_name: "to\\\\_natural (by reference)",
-                    title: "Integer.to\\\\_natural()",
-                    x_axis_label: "n.significant\\\\_bits()",
-                    y_axis_label: "time (ns)",
-                    file_name: &format!("benchmarks/{}", file_name),
-                });
+        xs: exhaustive_integers(),
+        function_f: &(|n: native::Integer| n.into_natural()),
+        function_g: &(|n: native::Integer| n.to_natural()),
+        x_cons: &(|x| gmp_integer_to_native(x)),
+        y_cons: &(|x| gmp_integer_to_native(x)),
+        x_param: &(|n| n.significant_bits() as usize),
+        limit: limit,
+        f_name: "into\\\\_natural (by value)",
+        g_name: "to\\\\_natural (by reference)",
+        title: "Integer.to\\\\_natural()",
+        x_axis_label: "n.significant\\\\_bits()",
+        y_axis_label: "time (ns)",
+        file_name: &format!("benchmarks/{}", file_name),
+    });
 }
 
-pub fn benchmark_random_integer_to_natural_evaluation_strategy(limit: usize,
-                                                               scale: u32,
-                                                               file_name: &str) {
+pub fn benchmark_random_integer_to_natural_evaluation_strategy(
+    limit: usize,
+    scale: u32,
+    file_name: &str,
+) {
     println!("benchmarking random Integer.to_natural() evaluation_strategy");
     benchmark_2(BenchmarkOptions2 {
-                    xs: random_integers(&EXAMPLE_SEED, scale),
-                    function_f: &(|n: native::Integer| n.into_natural()),
-                    function_g: &(|n: native::Integer| n.to_natural()),
-                    x_cons: &(|x| gmp_integer_to_native(x)),
-                    y_cons: &(|x| gmp_integer_to_native(x)),
-                    x_param: &(|n| n.significant_bits() as usize),
-                    limit: limit,
-                    f_name: "into\\\\_natural (by value)",
-                    g_name: "to\\\\_natural (by reference)",
-                    title: "Integer.to\\\\_natural()",
-                    x_axis_label: "n.significant\\\\_bits()",
-                    y_axis_label: "time (ns)",
-                    file_name: &format!("benchmarks/{}", file_name),
-                });
+        xs: random_integers(&EXAMPLE_SEED, scale),
+        function_f: &(|n: native::Integer| n.into_natural()),
+        function_g: &(|n: native::Integer| n.to_natural()),
+        x_cons: &(|x| gmp_integer_to_native(x)),
+        y_cons: &(|x| gmp_integer_to_native(x)),
+        x_param: &(|n| n.significant_bits() as usize),
+        limit: limit,
+        f_name: "into\\\\_natural (by value)",
+        g_name: "to\\\\_natural (by reference)",
+        title: "Integer.to\\\\_natural()",
+        x_axis_label: "n.significant\\\\_bits()",
+        y_axis_label: "time (ns)",
+        file_name: &format!("benchmarks/{}", file_name),
+    });
 }

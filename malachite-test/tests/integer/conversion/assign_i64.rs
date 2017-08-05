@@ -56,10 +56,12 @@ fn assign_i64_properties() {
         integer_and_i64(n, i);
     }
 
-    for (n, i) in random_pairs(&EXAMPLE_SEED,
-                               &(|seed| random_integers(seed, 32)),
-                               &(|seed| random_x::<i64>(seed)))
-                .take(LARGE_LIMIT) {
+    for (n, i) in random_pairs(
+        &EXAMPLE_SEED,
+        &(|seed| random_integers(seed, 32)),
+        &(|seed| random_x::<i64>(seed)),
+    ).take(LARGE_LIMIT)
+    {
         integer_and_i64(n, i);
     }
 }

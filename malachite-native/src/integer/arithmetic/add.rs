@@ -45,18 +45,16 @@ impl AddAssign<Integer> for Integer {
         }
         let add_strategy;
         match (&mut (*self), &other) {
-            (&mut Integer { sign: sx, .. }, &Integer { sign: sy, abs: ref ay }) if sx ==
-                                                                                   (sy &&
-                                                                                    *ay != 0) => {
-                add_strategy = 0
-            }
-            (&mut Integer { sign: sx, abs: ref mut ax }, &Integer { abs: ref ay, .. }) if sx &&
-                                                                                          *ax ==
-                                                                                          *ay ||
-                                                                                          *ax >
-                                                                                          *ay => {
-                add_strategy = 1
-            }
+            (&mut Integer { sign: sx, .. },
+             &Integer {
+                 sign: sy,
+                 abs: ref ay,
+             }) if sx == (sy && *ay != 0) => add_strategy = 0,
+            (&mut Integer {
+                 sign: sx,
+                 abs: ref mut ax,
+             },
+             &Integer { abs: ref ay, .. }) if sx && *ax == *ay || *ax > *ay => add_strategy = 1,
             _ => add_strategy = 2,
         }
         match add_strategy {

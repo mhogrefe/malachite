@@ -76,10 +76,12 @@ fn assign_i32_properties() {
         integer_and_i32(n, i);
     }
 
-    for (n, i) in random_pairs(&EXAMPLE_SEED,
-                               &(|seed| random_integers(seed, 32)),
-                               &(|seed| random_x::<i32>(seed)))
-                .take(LARGE_LIMIT) {
+    for (n, i) in random_pairs(
+        &EXAMPLE_SEED,
+        &(|seed| random_integers(seed, 32)),
+        &(|seed| random_x::<i32>(seed)),
+    ).take(LARGE_LIMIT)
+    {
         integer_and_i32(n, i);
     }
 }

@@ -65,10 +65,10 @@ impl<'a, 'b> Sub<&'a Natural> for &'b Natural {
             (&Small(_), _) => None,
             (&Large(ref xs), &Large(ref ys)) => {
                 large_sub(xs, ys).map(|limbs| {
-                                          let mut result = Large(limbs);
-                                          result.trim();
-                                          result
-                                      })
+                    let mut result = Large(limbs);
+                    result.trim();
+                    result
+                })
             }
         }
     }
@@ -118,9 +118,11 @@ impl<'a> SubAssign<&'a Natural> for Natural {
             }
         }
         if panic {
-            panic!("Cannot subtract a u32 from a smaller Natural. self: {}, other: {}",
-                   *self,
-                   other);
+            panic!(
+                "Cannot subtract a u32 from a smaller Natural. self: {}, other: {}",
+                *self,
+                other
+            );
         }
         self.trim();
     }

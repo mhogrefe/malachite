@@ -124,14 +124,16 @@ impl AddAssign<u32> for Natural {
         if other == 0 {
             return;
         }
-        mutate_with_possible_promotion!(self,
-                                        small,
-                                        large,
-                                        {
-                                            small.checked_add(other)
-                                        },
-                                        {
-                                            unsafe { gmp::mpz_add_ui(large, large, other.into()) }
-                                        });
+        mutate_with_possible_promotion!(
+            self,
+            small,
+            large,
+            {
+                small.checked_add(other)
+            },
+            {
+                unsafe { gmp::mpz_add_ui(large, large, other.into()) }
+            }
+        );
     }
 }

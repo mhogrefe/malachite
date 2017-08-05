@@ -105,10 +105,14 @@ fn clone_and_assign_properties() {
         let gmp_x_cloned = gmp_x.clone();
         assert!(gmp_x_cloned.is_valid());
         assert_eq!(gmp_natural_to_native(&gmp_x_cloned), x_cloned);
-        assert_eq!(num_biguint_to_native_natural(&native_natural_to_num_biguint(&x).clone()),
-                   x);
-        assert_eq!(rugint_integer_to_native_natural(&native_natural_to_rugint_integer(&x).clone()),
-                   x);
+        assert_eq!(
+            num_biguint_to_native_natural(&native_natural_to_num_biguint(&x).clone()),
+            x
+        );
+        assert_eq!(
+            rugint_integer_to_native_natural(&native_natural_to_rugint_integer(&x).clone()),
+            x
+        );
         assert_eq!(x_cloned, x);
     };
 

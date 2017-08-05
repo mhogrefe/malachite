@@ -68,11 +68,20 @@ impl AddAssign<u32> for Integer {
         }
         match *self {
             // e.g. 10 + 5; self stays positive
-            Integer { sign: true, ref mut abs } => *abs += other,
+            Integer {
+                sign: true,
+                ref mut abs,
+            } => *abs += other,
             // e.g. -10 + 5; self stays negative
-            Integer { sign: false, ref mut abs } if *abs > other => *abs -= other,
+            Integer {
+                sign: false,
+                ref mut abs,
+            } if *abs > other => *abs -= other,
             // e.g. -5 + 10 or -5 + 5; self becomes non-negative
-            Integer { ref mut sign, ref mut abs } => {
+            Integer {
+                ref mut sign,
+                ref mut abs,
+            } => {
                 *sign = true;
                 let small_abs = abs.to_u32().unwrap();
                 abs.assign(other - small_abs);

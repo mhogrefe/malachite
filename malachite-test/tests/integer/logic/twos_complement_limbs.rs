@@ -10,20 +10,32 @@ use std::str::FromStr;
 #[test]
 fn test_twos_complement_limbs_le() {
     let test = |n, out| {
-        assert_eq!(native::Integer::from_str(n).unwrap().twos_complement_limbs_le(),
-                   out);
-        assert_eq!(gmp::Integer::from_str(n).unwrap().twos_complement_limbs_le(),
-                   out);
+        assert_eq!(
+            native::Integer::from_str(n)
+                .unwrap()
+                .twos_complement_limbs_le(),
+            out
+        );
+        assert_eq!(
+            gmp::Integer::from_str(n)
+                .unwrap()
+                .twos_complement_limbs_le(),
+            out
+        );
     };
     test("0", vec![]);
     test("123", vec![123]);
     test("-123", vec![4294967173]);
     test("1000000000000", vec![3567587328, 232]);
     test("-1000000000000", vec![727379968, 4294967063]);
-    test("1701411834921604967429270619762735448065",
-         vec![1, 2, 3, 4, 5]);
-    test("-1701411834921604967429270619762735448065",
-         vec![4294967295, 4294967293, 4294967292, 4294967291, 4294967290]);
+    test(
+        "1701411834921604967429270619762735448065",
+        vec![1, 2, 3, 4, 5],
+    );
+    test(
+        "-1701411834921604967429270619762735448065",
+        vec![4294967295, 4294967293, 4294967292, 4294967291, 4294967290],
+    );
     test("4294967295", vec![4294967295, 0]);
     test("-4294967295", vec![1, 4294967295]);
     test("4294967296", vec![0, 1]);
@@ -37,20 +49,32 @@ fn test_twos_complement_limbs_le() {
 #[test]
 fn test_twos_complement_limbs_be() {
     let test = |n, out| {
-        assert_eq!(native::Integer::from_str(n).unwrap().twos_complement_limbs_be(),
-                   out);
-        assert_eq!(gmp::Integer::from_str(n).unwrap().twos_complement_limbs_be(),
-                   out);
+        assert_eq!(
+            native::Integer::from_str(n)
+                .unwrap()
+                .twos_complement_limbs_be(),
+            out
+        );
+        assert_eq!(
+            gmp::Integer::from_str(n)
+                .unwrap()
+                .twos_complement_limbs_be(),
+            out
+        );
     };
     test("0", vec![]);
     test("123", vec![123]);
     test("-123", vec![4294967173]);
     test("1000000000000", vec![232, 3567587328]);
     test("-1000000000000", vec![4294967063, 727379968]);
-    test("1701411834921604967429270619762735448065",
-         vec![5, 4, 3, 2, 1]);
-    test("-1701411834921604967429270619762735448065",
-         vec![4294967290, 4294967291, 4294967292, 4294967293, 4294967295]);
+    test(
+        "1701411834921604967429270619762735448065",
+        vec![5, 4, 3, 2, 1],
+    );
+    test(
+        "-1701411834921604967429270619762735448065",
+        vec![4294967290, 4294967291, 4294967292, 4294967293, 4294967295],
+    );
     test("4294967295", vec![0, 4294967295]);
     test("-4294967295", vec![4294967295, 1]);
     test("4294967296", vec![1, 0]);
@@ -75,11 +99,10 @@ fn twos_complement_limbs_le_properties() {
         let limbs = x.twos_complement_limbs_le();
         assert_eq!(gmp_x.twos_complement_limbs_le(), limbs);
         assert_eq!(native::Integer::from_twos_complement_limbs_le(&limbs), x);
-        assert_eq!(x.twos_complement_limbs_be(),
-                   limbs.iter()
-                       .cloned()
-                       .rev()
-                       .collect::<Vec<u32>>());
+        assert_eq!(
+            x.twos_complement_limbs_be(),
+            limbs.iter().cloned().rev().collect::<Vec<u32>>()
+        );
         match x.sign() {
             Ordering::Equal => assert!(limbs.is_empty()),
             Ordering::Greater => {
@@ -121,11 +144,10 @@ fn limbs_be_properties() {
         let limbs = x.twos_complement_limbs_be();
         assert_eq!(gmp_x.twos_complement_limbs_be(), limbs);
         assert_eq!(native::Integer::from_twos_complement_limbs_be(&limbs), x);
-        assert_eq!(x.twos_complement_limbs_le(),
-                   limbs.iter()
-                       .cloned()
-                       .rev()
-                       .collect::<Vec<u32>>());
+        assert_eq!(
+            x.twos_complement_limbs_le(),
+            limbs.iter().cloned().rev().collect::<Vec<u32>>()
+        );
         match x.sign() {
             Ordering::Equal => assert!(limbs.is_empty()),
             Ordering::Greater => {

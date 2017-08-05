@@ -73,9 +73,6 @@ impl Integer {
     ///     "-1000000000000");
     /// ```
     pub fn from_twos_complement_limbs_be(limbs: &[u32]) -> Integer {
-        Integer::from_twos_complement_limbs_le(&limbs.iter()
-                                                    .cloned()
-                                                    .rev()
-                                                    .collect::<Vec<u32>>())
+        Integer::from_twos_complement_limbs_le(&limbs.iter().cloned().rev().collect::<Vec<u32>>())
     }
 }

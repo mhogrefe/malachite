@@ -24,10 +24,12 @@ pub fn demo_exhaustive_natural_assign_u64(limit: usize) {
 }
 
 pub fn demo_random_natural_assign_u64(limit: usize) {
-    for (mut n, u) in random_pairs(&EXAMPLE_SEED,
-                                   &(|seed| random_naturals(seed, 32)),
-                                   &(|seed| random_x::<u64>(seed)))
-                .take(limit) {
+    for (mut n, u) in random_pairs(
+        &EXAMPLE_SEED,
+        &(|seed| random_naturals(seed, 32)),
+        &(|seed| random_x::<u64>(seed)),
+    ).take(limit)
+    {
         let n_old = n.clone();
         n.assign(u);
         println!("x := {}; x.assign({}); x = {}", n_old, u, n);
@@ -37,45 +39,47 @@ pub fn demo_random_natural_assign_u64(limit: usize) {
 pub fn benchmark_exhaustive_natural_assign_u64(limit: usize, file_name: &str) {
     println!("benchmarking exhaustive Natural.assign(u64)");
     benchmark_3(BenchmarkOptions3 {
-                    xs: exhaustive_pairs(exhaustive_naturals(), exhaustive_u::<u64>()),
-                    function_f: &(|(mut n, u): (gmp::Natural, u64)| n.assign(u)),
-                    function_g: &(|(mut n, u): (native::Natural, u64)| n.assign(u)),
-                    function_h: &(|(mut n, u): (num::BigUint, u64)| num_assign_u64(&mut n, u)),
-                    x_cons: &(|p| p.clone()),
-                    y_cons: &(|&(ref n, u)| (gmp_natural_to_native(n), u)),
-                    z_cons: &(|&(ref n, u)| (gmp_natural_to_num_biguint(n), u)),
-                    x_param: &(|&(ref n, _)| n.significant_bits() as usize),
-                    limit: limit,
-                    f_name: "malachite-gmp",
-                    g_name: "malachite-native",
-                    h_name: "num",
-                    title: "Natural.assign(u64)",
-                    x_axis_label: "n.significant\\\\_bits()",
-                    y_axis_label: "time (ns)",
-                    file_name: &format!("benchmarks/{}", file_name),
-                });
+        xs: exhaustive_pairs(exhaustive_naturals(), exhaustive_u::<u64>()),
+        function_f: &(|(mut n, u): (gmp::Natural, u64)| n.assign(u)),
+        function_g: &(|(mut n, u): (native::Natural, u64)| n.assign(u)),
+        function_h: &(|(mut n, u): (num::BigUint, u64)| num_assign_u64(&mut n, u)),
+        x_cons: &(|p| p.clone()),
+        y_cons: &(|&(ref n, u)| (gmp_natural_to_native(n), u)),
+        z_cons: &(|&(ref n, u)| (gmp_natural_to_num_biguint(n), u)),
+        x_param: &(|&(ref n, _)| n.significant_bits() as usize),
+        limit: limit,
+        f_name: "malachite-gmp",
+        g_name: "malachite-native",
+        h_name: "num",
+        title: "Natural.assign(u64)",
+        x_axis_label: "n.significant\\\\_bits()",
+        y_axis_label: "time (ns)",
+        file_name: &format!("benchmarks/{}", file_name),
+    });
 }
 
 pub fn benchmark_random_natural_assign_u64(limit: usize, scale: u32, file_name: &str) {
     println!("benchmarking random Natural.assign(u64)");
     benchmark_3(BenchmarkOptions3 {
-                    xs: random_pairs(&EXAMPLE_SEED,
-                                     &(|seed| random_naturals(seed, scale)),
-                                     &(|seed| random_x::<u64>(seed))),
-                    function_f: &(|(mut n, u): (gmp::Natural, u64)| n.assign(u)),
-                    function_g: &(|(mut n, u): (native::Natural, u64)| n.assign(u)),
-                    function_h: &(|(mut n, u): (num::BigUint, u64)| num_assign_u64(&mut n, u)),
-                    x_cons: &(|p| p.clone()),
-                    y_cons: &(|&(ref n, u)| (gmp_natural_to_native(n), u)),
-                    z_cons: &(|&(ref n, u)| (gmp_natural_to_num_biguint(n), u)),
-                    x_param: &(|&(ref n, _)| n.significant_bits() as usize),
-                    limit: limit,
-                    f_name: "malachite-gmp",
-                    g_name: "malachite-native",
-                    h_name: "num",
-                    title: "Natural.assign(u64)",
-                    x_axis_label: "n.significant\\\\_bits()",
-                    y_axis_label: "time (ns)",
-                    file_name: &format!("benchmarks/{}", file_name),
-                });
+        xs: random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| random_naturals(seed, scale)),
+            &(|seed| random_x::<u64>(seed)),
+        ),
+        function_f: &(|(mut n, u): (gmp::Natural, u64)| n.assign(u)),
+        function_g: &(|(mut n, u): (native::Natural, u64)| n.assign(u)),
+        function_h: &(|(mut n, u): (num::BigUint, u64)| num_assign_u64(&mut n, u)),
+        x_cons: &(|p| p.clone()),
+        y_cons: &(|&(ref n, u)| (gmp_natural_to_native(n), u)),
+        z_cons: &(|&(ref n, u)| (gmp_natural_to_num_biguint(n), u)),
+        x_param: &(|&(ref n, _)| n.significant_bits() as usize),
+        limit: limit,
+        f_name: "malachite-gmp",
+        g_name: "malachite-native",
+        h_name: "num",
+        title: "Natural.assign(u64)",
+        x_axis_label: "n.significant\\\\_bits()",
+        y_axis_label: "time (ns)",
+        file_name: &format!("benchmarks/{}", file_name),
+    });
 }

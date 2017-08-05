@@ -34,12 +34,16 @@ fn test_from_sign_and_limbs_le() {
     test(Ordering::Less, &[3567587328, 232], "-1000000000000");
     test(Ordering::Greater, &[3567587328, 232, 0], "1000000000000");
     test(Ordering::Less, &[3567587328, 232, 0], "-1000000000000");
-    test(Ordering::Greater,
-         &[1, 2, 3, 4, 5],
-         "1701411834921604967429270619762735448065");
-    test(Ordering::Less,
-         &[1, 2, 3, 4, 5],
-         "-1701411834921604967429270619762735448065");
+    test(
+        Ordering::Greater,
+        &[1, 2, 3, 4, 5],
+        "1701411834921604967429270619762735448065",
+    );
+    test(
+        Ordering::Less,
+        &[1, 2, 3, 4, 5],
+        "-1701411834921604967429270619762735448065",
+    );
 }
 
 #[test]
@@ -108,12 +112,16 @@ fn test_from_sign_and_limbs_be() {
     test(Ordering::Less, &[232, 3567587328], "-1000000000000");
     test(Ordering::Greater, &[0, 232, 3567587328], "1000000000000");
     test(Ordering::Less, &[0, 232, 3567587328], "-1000000000000");
-    test(Ordering::Greater,
-         &[5, 4, 3, 2, 1],
-         "1701411834921604967429270619762735448065");
-    test(Ordering::Less,
-         &[5, 4, 3, 2, 1],
-         "-1701411834921604967429270619762735448065");
+    test(
+        Ordering::Greater,
+        &[5, 4, 3, 2, 1],
+        "1701411834921604967429270619762735448065",
+    );
+    test(
+        Ordering::Less,
+        &[5, 4, 3, 2, 1],
+        "-1701411834921604967429270619762735448065",
+    );
 }
 
 #[test]
@@ -169,9 +177,12 @@ fn from_sign_and_limbs_le_properties() {
     //      Integer::from_sign_and_limbs_be(sign, limbs)
     let ordering_and_u32_slice = |sign: Ordering, limbs: &[u32]| {
         let x = native::Integer::from_sign_and_limbs_le(sign, limbs);
-        assert_eq!(gmp_integer_to_native(&gmp::Integer::from_sign_and_limbs_le(sign, limbs)),
-                   x);
-        let mut trimmed_limbs: Vec<u32> = limbs.iter()
+        assert_eq!(
+            gmp_integer_to_native(&gmp::Integer::from_sign_and_limbs_le(sign, limbs)),
+            x
+        );
+        let mut trimmed_limbs: Vec<u32> = limbs
+            .iter()
             .cloned()
             .rev()
             .skip_while(|&u| u == 0)
@@ -180,34 +191,35 @@ fn from_sign_and_limbs_le_properties() {
         let (sign_2, limbs_2) = x.sign_and_limbs_le();
         assert_eq!(sign_2, sign);
         assert_eq!(limbs_2, trimmed_limbs);
-        assert_eq!(native::Integer::from_sign_and_limbs_be(sign,
-                                                           &limbs.iter()
-                                                                .cloned()
-                                                                .rev()
-                                                                .collect::<Vec<u32>>()),
-                   x);
+        assert_eq!(
+            native::Integer::from_sign_and_limbs_be(
+                sign,
+                &limbs.iter().cloned().rev().collect::<Vec<u32>>(),
+            ),
+            x
+        );
     };
 
-    for (sign, limbs) in exhaustive_pairs(exhaustive_orderings(),
-                                          exhaustive_vecs(exhaustive_u::<u32>()))
-                .filter(|&(sign, ref limbs)| {
-                            limbs.iter().all(|&limb| limb == 0) == (sign == Ordering::Equal)
-                        })
-                .take(LARGE_LIMIT) {
+    for (sign, limbs) in exhaustive_pairs(
+        exhaustive_orderings(),
+        exhaustive_vecs(exhaustive_u::<u32>()),
+    ).filter(|&(sign, ref limbs)| {
+        limbs.iter().all(|&limb| limb == 0) == (sign == Ordering::Equal)
+    })
+        .take(LARGE_LIMIT)
+    {
         ordering_and_u32_slice(sign, &limbs);
     }
 
-    for (sign, limbs) in random_pairs(&EXAMPLE_SEED,
-                                      &(|seed| random_orderings(seed)),
-                                      &(|seed| {
-                                            random_vecs(seed,
-                                                        32,
-                                                        &(|seed_2| random_x::<u32>(seed_2)))
-                                        }))
-                .filter(|&(sign, ref limbs)| {
-                            limbs.iter().all(|&limb| limb == 0) == (sign == Ordering::Equal)
-                        })
-                .take(LARGE_LIMIT) {
+    for (sign, limbs) in random_pairs(
+        &EXAMPLE_SEED,
+        &(|seed| random_orderings(seed)),
+        &(|seed| random_vecs(seed, 32, &(|seed_2| random_x::<u32>(seed_2)))),
+    ).filter(|&(sign, ref limbs)| {
+        limbs.iter().all(|&limb| limb == 0) == (sign == Ordering::Equal)
+    })
+        .take(LARGE_LIMIT)
+    {
         ordering_and_u32_slice(sign, &limbs);
     }
 }
@@ -222,43 +234,49 @@ fn from_sign_and_limbs_be_properties() {
     //      Integer::from_sign_and_limbs_le(sign, limbs)
     let ordering_and_u32_slice = |sign: Ordering, limbs: &[u32]| {
         let x = native::Integer::from_sign_and_limbs_be(sign, limbs);
-        assert_eq!(gmp_integer_to_native(&gmp::Integer::from_sign_and_limbs_be(sign, limbs)),
-                   x);
+        assert_eq!(
+            gmp_integer_to_native(&gmp::Integer::from_sign_and_limbs_be(sign, limbs)),
+            x
+        );
         let (sign_2, limbs_2) = x.sign_and_limbs_be();
         assert_eq!(sign_2, sign);
-        assert_eq!(limbs_2,
-                   limbs.iter()
-                       .cloned()
-                       .skip_while(|&u| u == 0)
-                       .collect::<Vec<u32>>());
-        assert_eq!(native::Integer::from_sign_and_limbs_le(sign,
-                                                           &limbs.iter()
-                                                                .cloned()
-                                                                .rev()
-                                                                .collect::<Vec<u32>>()),
-                   x);
+        assert_eq!(
+            limbs_2,
+            limbs
+                .iter()
+                .cloned()
+                .skip_while(|&u| u == 0)
+                .collect::<Vec<u32>>()
+        );
+        assert_eq!(
+            native::Integer::from_sign_and_limbs_le(
+                sign,
+                &limbs.iter().cloned().rev().collect::<Vec<u32>>(),
+            ),
+            x
+        );
     };
 
-    for (sign, limbs) in exhaustive_pairs(exhaustive_orderings(),
-                                          exhaustive_vecs(exhaustive_u::<u32>()))
-                .filter(|&(sign, ref limbs)| {
-                            limbs.iter().all(|&limb| limb == 0) == (sign == Ordering::Equal)
-                        })
-                .take(LARGE_LIMIT) {
+    for (sign, limbs) in exhaustive_pairs(
+        exhaustive_orderings(),
+        exhaustive_vecs(exhaustive_u::<u32>()),
+    ).filter(|&(sign, ref limbs)| {
+        limbs.iter().all(|&limb| limb == 0) == (sign == Ordering::Equal)
+    })
+        .take(LARGE_LIMIT)
+    {
         ordering_and_u32_slice(sign, &limbs);
     }
 
-    for (sign, limbs) in random_pairs(&EXAMPLE_SEED,
-                                      &(|seed| random_orderings(seed)),
-                                      &(|seed| {
-                                            random_vecs(seed,
-                                                        32,
-                                                        &(|seed_2| random_x::<u32>(seed_2)))
-                                        }))
-                .filter(|&(sign, ref limbs)| {
-                            limbs.iter().all(|&limb| limb == 0) == (sign == Ordering::Equal)
-                        })
-                .take(LARGE_LIMIT) {
+    for (sign, limbs) in random_pairs(
+        &EXAMPLE_SEED,
+        &(|seed| random_orderings(seed)),
+        &(|seed| random_vecs(seed, 32, &(|seed_2| random_x::<u32>(seed_2)))),
+    ).filter(|&(sign, ref limbs)| {
+        limbs.iter().all(|&limb| limb == 0) == (sign == Ordering::Equal)
+    })
+        .take(LARGE_LIMIT)
+    {
         ordering_and_u32_slice(sign, &limbs);
     }
 }

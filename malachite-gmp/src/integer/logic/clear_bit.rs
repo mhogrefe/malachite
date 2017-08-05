@@ -24,21 +24,23 @@ impl Integer {
     /// assert_eq!(x.to_string(), "-256");
     /// ```
     pub fn clear_bit(&mut self, index: u64) {
-        mutate_with_possible_promotion!(self,
-                                        small,
-                                        large,
-                                        {
-                                            if index < 31 {
-                                                Some(*small & !(1 << index))
-                                            } else if *small < 0 {
-                None
-            } else {
-                Some(*small)
+        mutate_with_possible_promotion!(
+            self,
+            small,
+            large,
+            {
+                if index < 31 {
+                    Some(*small & !(1 << index))
+                } else if *small < 0 {
+                    None
+                } else {
+                    Some(*small)
+                }
+            },
+            {
+                unsafe { gmp::mpz_clrbit(large, index) }
             }
-                                        },
-                                        {
-                                            unsafe { gmp::mpz_clrbit(large, index) }
-                                        });
+        );
         self.demote_if_small();
     }
 }

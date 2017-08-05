@@ -1,4 +1,4 @@
-use common::{LARGE_LIMIT, test_cmp_helper};
+use common::{test_cmp_helper, LARGE_LIMIT};
 use malachite_native::natural as native;
 use malachite_gmp::natural as gmp;
 use malachite_test::common::{gmp_natural_to_native, native_natural_to_num_biguint,
@@ -13,7 +13,15 @@ use std::cmp::Ordering;
 
 #[test]
 fn test_cmp() {
-    let strings = vec!["0", "1", "2", "123", "999999999999", "1000000000000", "1000000000001"];
+    let strings = vec![
+        "0",
+        "1",
+        "2",
+        "123",
+        "999999999999",
+        "1000000000000",
+        "1000000000001",
+    ];
     test_cmp_helper::<native::Natural>(&strings);
     test_cmp_helper::<gmp::Natural>(&strings);
     test_cmp_helper::<num::BigUint>(&strings);
@@ -30,10 +38,14 @@ fn cmp_properties() {
         let y = gmp_natural_to_native(&gmp_y);
         let ord = x.cmp(&y);
         assert_eq!(gmp_x.cmp(&gmp_y), ord);
-        assert_eq!(native_natural_to_num_biguint(&x).cmp(&native_natural_to_num_biguint(&y)),
-                   ord);
-        assert_eq!(native_natural_to_rugint_integer(&x).cmp(&native_natural_to_rugint_integer(&y)),
-                   ord);
+        assert_eq!(
+            native_natural_to_num_biguint(&x).cmp(&native_natural_to_num_biguint(&y)),
+            ord
+        );
+        assert_eq!(
+            native_natural_to_rugint_integer(&x).cmp(&native_natural_to_rugint_integer(&y)),
+            ord
+        );
         assert_eq!(y.cmp(&x).reverse(), ord);
         assert_eq!((-y).cmp(&(-x)), ord);
     };
@@ -77,7 +89,8 @@ fn cmp_properties() {
     }
 
     for (x, y, z) in random_triples_from_single(random_naturals(&EXAMPLE_SEED, 32))
-            .take(LARGE_LIMIT) {
+        .take(LARGE_LIMIT)
+    {
         three_naturals(x, y, z);
     }
 }

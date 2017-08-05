@@ -32,8 +32,14 @@ impl Integer {
     /// ```
     pub fn get_bit(&self, index: u64) -> bool {
         match *self {
-            Integer { sign: true, ref abs } => abs.get_bit(index),
-            Integer { sign: false, ref abs } => abs.get_bit_neg(index),
+            Integer {
+                sign: true,
+                ref abs,
+            } => abs.get_bit(index),
+            Integer {
+                sign: false,
+                ref abs,
+            } => abs.get_bit_neg(index),
         }
     }
 }

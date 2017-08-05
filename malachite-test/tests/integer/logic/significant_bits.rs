@@ -12,13 +12,23 @@ use std::str::FromStr;
 #[test]
 fn test_significant_bits() {
     let test = |n, out| {
-        assert_eq!(native::integer::Integer::from_str(n).unwrap().significant_bits(),
-                   out);
-        assert_eq!(gmp::integer::Integer::from_str(n).unwrap().significant_bits(),
-                   out);
+        assert_eq!(
+            native::integer::Integer::from_str(n)
+                .unwrap()
+                .significant_bits(),
+            out
+        );
+        assert_eq!(
+            gmp::integer::Integer::from_str(n)
+                .unwrap()
+                .significant_bits(),
+            out
+        );
         assert_eq!(num::BigInt::from_str(n).unwrap().bits() as u64, out);
-        assert_eq!(rugint::Integer::from_str(n).unwrap().significant_bits() as u64,
-                   out);
+        assert_eq!(
+            rugint::Integer::from_str(n).unwrap().significant_bits() as u64,
+            out
+        );
     };
     test("0", 0);
     test("100", 7);
@@ -36,10 +46,14 @@ fn significant_bits_properties() {
         let x = gmp_integer_to_native(&gmp_x);
         let significant_bits = x.significant_bits();
         assert_eq!(gmp_x.significant_bits(), significant_bits);
-        assert_eq!(native_integer_to_num_bigint(&x).bits() as u64,
-                   significant_bits);
-        assert_eq!(native_integer_to_rugint(&x).significant_bits() as u64,
-                   significant_bits);
+        assert_eq!(
+            native_integer_to_num_bigint(&x).bits() as u64,
+            significant_bits
+        );
+        assert_eq!(
+            native_integer_to_rugint(&x).significant_bits() as u64,
+            significant_bits
+        );
 
         let x_abs = x.abs();
         assert_eq!(x_abs <= u32::max_value(), significant_bits <= 32);

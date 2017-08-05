@@ -71,7 +71,10 @@ impl AddAssign<i32> for Integer {
                 *abs -= abs_other;
             }
             // e.g. 5 + -10, -5 + 10, or -5 + 5; sign of self is flipped
-            Integer { ref mut sign, ref mut abs } => {
+            Integer {
+                ref mut sign,
+                ref mut abs,
+            } => {
                 *sign = !*sign;
                 let small_abs = abs.to_u32().unwrap();
                 abs.assign(abs_other - small_abs);

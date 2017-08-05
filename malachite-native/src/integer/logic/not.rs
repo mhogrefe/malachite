@@ -50,13 +50,19 @@ impl<'a> Not for &'a Integer {
 
     fn not(self) -> Integer {
         match *self {
-            Integer { sign: true, ref abs } => {
+            Integer {
+                sign: true,
+                ref abs,
+            } => {
                 Integer {
                     sign: false,
                     abs: abs + 1,
                 }
             }
-            Integer { sign: false, ref abs } => {
+            Integer {
+                sign: false,
+                ref abs,
+            } => {
                 Integer {
                     sign: true,
                     abs: (abs - 1).unwrap(),

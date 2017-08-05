@@ -29,11 +29,13 @@ impl Integer {
     ///     "-1000000000000");
     /// ```
     pub fn from_sign_and_limbs_le(sign: Ordering, limbs: &[u32]) -> Integer {
-        assert_eq!(limbs.iter().all(|&limb| limb == 0),
-                   sign == Ordering::Equal,
-                   "sign should be Equal iff limbs only contains zeros. sign: {:?}, limbs: {:?}",
-                   sign,
-                   limbs);
+        assert_eq!(
+            limbs.iter().all(|&limb| limb == 0),
+            sign == Ordering::Equal,
+            "sign should be Equal iff limbs only contains zeros. sign: {:?}, limbs: {:?}",
+            sign,
+            limbs
+        );
         match sign {
             Ordering::Equal => Integer::from(0),
             Ordering::Greater => Natural::from_limbs_le(limbs).into_integer(),
@@ -67,11 +69,13 @@ impl Integer {
     ///     "-1000000000000");
     /// ```
     pub fn from_sign_and_limbs_be(sign: Ordering, limbs: &[u32]) -> Integer {
-        assert_eq!(limbs.iter().all(|&limb| limb == 0),
-                   sign == Ordering::Equal,
-                   "sign should be Equal iff limbs only contains zeros. sign: {:?}, limbs: {:?}",
-                   sign,
-                   limbs);
+        assert_eq!(
+            limbs.iter().all(|&limb| limb == 0),
+            sign == Ordering::Equal,
+            "sign should be Equal iff limbs only contains zeros. sign: {:?}, limbs: {:?}",
+            sign,
+            limbs
+        );
         match sign {
             Ordering::Equal => Integer::from(0),
             Ordering::Greater => Natural::from_limbs_be(limbs).into_integer(),

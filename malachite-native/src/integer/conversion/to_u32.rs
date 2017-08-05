@@ -21,7 +21,10 @@ impl Integer {
     pub fn to_u32(&self) -> Option<u32> {
         match *self {
             Integer { sign: false, .. } => None,
-            Integer { sign: true, ref abs } => abs.to_u32(),
+            Integer {
+                sign: true,
+                ref abs,
+            } => abs.to_u32(),
         }
     }
 
@@ -45,8 +48,14 @@ impl Integer {
     /// ```
     pub fn to_u32_wrapping(&self) -> u32 {
         match *self {
-            Integer { sign: true, ref abs } => abs.to_u32_wrapping(),
-            Integer { sign: false, ref abs } => abs.to_u32_wrapping().wrapping_neg(),
+            Integer {
+                sign: true,
+                ref abs,
+            } => abs.to_u32_wrapping(),
+            Integer {
+                sign: false,
+                ref abs,
+            } => abs.to_u32_wrapping().wrapping_neg(),
         }
     }
 }

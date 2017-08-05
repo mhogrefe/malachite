@@ -6,8 +6,8 @@ use malachite_gmp::traits::Assign as gmp_assign;
 use num;
 use rugint;
 use rugint::Assign as rugint_assign;
-use rust_wheels::benchmarks::{BenchmarkOptions2, benchmark_2, BenchmarkOptions3, benchmark_3,
-                              BenchmarkOptions4, benchmark_4};
+use rust_wheels::benchmarks::{BenchmarkOptions2, BenchmarkOptions3, BenchmarkOptions4,
+                              benchmark_2, benchmark_3, benchmark_4};
 use rust_wheels::iterators::common::EXAMPLE_SEED;
 use rust_wheels::iterators::naturals::{exhaustive_naturals, random_naturals};
 use rust_wheels::iterators::tuples::{exhaustive_pairs_from_single, random_pairs_from_single};
@@ -78,235 +78,205 @@ pub fn demo_random_natural_assign_ref(limit: usize) {
 pub fn benchmark_exhaustive_natural_clone(limit: usize, file_name: &str) {
     println!("benchmarking exhaustive Natural.clone()");
     benchmark_4(BenchmarkOptions4 {
-                    xs: exhaustive_naturals(),
-                    function_f: &(|n: gmp::Natural| n.clone()),
-                    function_g: &(|n: native::Natural| n.clone()),
-                    function_h: &(|n: num::BigUint| n.clone()),
-                    function_i: &(|n: rugint::Integer| n.clone()),
-                    x_cons: &(|x| x.clone()),
-                    y_cons: &(|x| gmp_natural_to_native(x)),
-                    z_cons: &(|x| gmp_natural_to_num_biguint(x)),
-                    w_cons: &(|x| gmp_natural_to_rugint_integer(x)),
-                    x_param: &(|n| n.significant_bits() as usize),
-                    limit: limit,
-                    f_name: "malachite-gmp",
-                    g_name: "malachite-native",
-                    h_name: "num",
-                    i_name: "rugint",
-                    title: "Natural.clone()",
-                    x_axis_label: "n.significant\\\\_bits()",
-                    y_axis_label: "time (ns)",
-                    file_name: &format!("benchmarks/{}", file_name),
-                });
+        xs: exhaustive_naturals(),
+        function_f: &(|n: gmp::Natural| n.clone()),
+        function_g: &(|n: native::Natural| n.clone()),
+        function_h: &(|n: num::BigUint| n.clone()),
+        function_i: &(|n: rugint::Integer| n.clone()),
+        x_cons: &(|x| x.clone()),
+        y_cons: &(|x| gmp_natural_to_native(x)),
+        z_cons: &(|x| gmp_natural_to_num_biguint(x)),
+        w_cons: &(|x| gmp_natural_to_rugint_integer(x)),
+        x_param: &(|n| n.significant_bits() as usize),
+        limit: limit,
+        f_name: "malachite-gmp",
+        g_name: "malachite-native",
+        h_name: "num",
+        i_name: "rugint",
+        title: "Natural.clone()",
+        x_axis_label: "n.significant\\\\_bits()",
+        y_axis_label: "time (ns)",
+        file_name: &format!("benchmarks/{}", file_name),
+    });
 }
 
 pub fn benchmark_random_natural_clone(limit: usize, scale: u32, file_name: &str) {
     println!("benchmarking random Natural.clone()");
     benchmark_4(BenchmarkOptions4 {
-                    xs: random_naturals(&EXAMPLE_SEED, scale),
-                    function_f: &(|n: gmp::Natural| n.clone()),
-                    function_g: &(|n: native::Natural| n.clone()),
-                    function_h: &(|n: num::BigUint| n.clone()),
-                    function_i: &(|n: rugint::Integer| n.clone()),
-                    x_cons: &(|x| x.clone()),
-                    y_cons: &(|x| gmp_natural_to_native(x)),
-                    z_cons: &(|x| gmp_natural_to_num_biguint(x)),
-                    w_cons: &(|x| gmp_natural_to_rugint_integer(x)),
-                    x_param: &(|n| n.significant_bits() as usize),
-                    limit: limit,
-                    f_name: "malachite-gmp",
-                    g_name: "malachite-native",
-                    h_name: "num",
-                    i_name: "rugint",
-                    title: "Natural.clone()",
-                    x_axis_label: "n.significant\\\\_bits()",
-                    y_axis_label: "time (ns)",
-                    file_name: &format!("benchmarks/{}", file_name),
-                });
+        xs: random_naturals(&EXAMPLE_SEED, scale),
+        function_f: &(|n: gmp::Natural| n.clone()),
+        function_g: &(|n: native::Natural| n.clone()),
+        function_h: &(|n: num::BigUint| n.clone()),
+        function_i: &(|n: rugint::Integer| n.clone()),
+        x_cons: &(|x| x.clone()),
+        y_cons: &(|x| gmp_natural_to_native(x)),
+        z_cons: &(|x| gmp_natural_to_num_biguint(x)),
+        w_cons: &(|x| gmp_natural_to_rugint_integer(x)),
+        x_param: &(|n| n.significant_bits() as usize),
+        limit: limit,
+        f_name: "malachite-gmp",
+        g_name: "malachite-native",
+        h_name: "num",
+        i_name: "rugint",
+        title: "Natural.clone()",
+        x_axis_label: "n.significant\\\\_bits()",
+        y_axis_label: "time (ns)",
+        file_name: &format!("benchmarks/{}", file_name),
+    });
 }
 
 pub fn benchmark_exhaustive_natural_clone_from(limit: usize, file_name: &str) {
     println!("benchmarking exhaustive Natural.clone_from(Natural)");
     benchmark_4(BenchmarkOptions4 {
-                    xs: exhaustive_pairs_from_single(exhaustive_naturals()),
-                    function_f: &(|(mut x, y): (gmp::Natural, gmp::Natural)| x.clone_from(&y)),
-                    function_g: &(|(mut x, y): (native::Natural, native::Natural)| {
-                                      x.clone_from(&y)
-                                  }),
-                    function_h: &(|(mut x, y): (num::BigUint, num::BigUint)| x.clone_from(&y)),
-                    function_i: &(|(mut x, y): (rugint::Integer, rugint::Integer)| {
-                                      x.clone_from(&y)
-                                  }),
-                    x_cons: &(|p| p.clone()),
-                    y_cons: &(|&(ref x, ref y)| {
-                                  (gmp_natural_to_native(x), gmp_natural_to_native(y))
-                              }),
-                    z_cons: &(|&(ref x, ref y)| {
-                                  (gmp_natural_to_num_biguint(x), gmp_natural_to_num_biguint(y))
-                              }),
-                    w_cons: &(|&(ref x, ref y)| {
-                                  (gmp_natural_to_rugint_integer(x),
-                                   gmp_natural_to_rugint_integer(y))
-                              }),
-                    x_param: &(|&(ref x, ref y)| {
-                                   max(x.significant_bits(), y.significant_bits()) as usize
-                               }),
-                    limit: limit,
-                    f_name: "malachite-gmp",
-                    g_name: "malachite-native",
-                    h_name: "num",
-                    i_name: "rugint",
-                    title: "Natural.clone\\\\_from(Natural)",
-                    x_axis_label: "max(x.significant\\\\_bits(), y.significant\\\\_bits())",
-                    y_axis_label: "time (ns)",
-                    file_name: &format!("benchmarks/{}", file_name),
-                });
+        xs: exhaustive_pairs_from_single(exhaustive_naturals()),
+        function_f: &(|(mut x, y): (gmp::Natural, gmp::Natural)| x.clone_from(&y)),
+        function_g: &(|(mut x, y): (native::Natural, native::Natural)| x.clone_from(&y)),
+        function_h: &(|(mut x, y): (num::BigUint, num::BigUint)| x.clone_from(&y)),
+        function_i: &(|(mut x, y): (rugint::Integer, rugint::Integer)| x.clone_from(&y)),
+        x_cons: &(|p| p.clone()),
+        y_cons: &(|&(ref x, ref y)| (gmp_natural_to_native(x), gmp_natural_to_native(y))),
+        z_cons: &(|&(ref x, ref y)| (gmp_natural_to_num_biguint(x), gmp_natural_to_num_biguint(y))),
+        w_cons: &(|&(ref x, ref y)| {
+            (
+                gmp_natural_to_rugint_integer(x),
+                gmp_natural_to_rugint_integer(y),
+            )
+        }),
+        x_param: &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),
+        limit: limit,
+        f_name: "malachite-gmp",
+        g_name: "malachite-native",
+        h_name: "num",
+        i_name: "rugint",
+        title: "Natural.clone\\\\_from(Natural)",
+        x_axis_label: "max(x.significant\\\\_bits(), y.significant\\\\_bits())",
+        y_axis_label: "time (ns)",
+        file_name: &format!("benchmarks/{}", file_name),
+    });
 }
 
 pub fn benchmark_random_natural_clone_from(limit: usize, scale: u32, file_name: &str) {
     println!("benchmarking random Natural.clone_from(Natural)");
     benchmark_4(BenchmarkOptions4 {
-                    xs: random_pairs_from_single(random_naturals(&EXAMPLE_SEED, scale)),
-                    function_f: &(|(mut x, y): (gmp::Natural, gmp::Natural)| x.clone_from(&y)),
-                    function_g: &(|(mut x, y): (native::Natural, native::Natural)| {
-                                      x.clone_from(&y)
-                                  }),
-                    function_h: &(|(mut x, y): (num::BigUint, num::BigUint)| x.clone_from(&y)),
-                    function_i: &(|(mut x, y): (rugint::Integer, rugint::Integer)| {
-                                      x.clone_from(&y)
-                                  }),
-                    x_cons: &(|p| p.clone()),
-                    y_cons: &(|&(ref x, ref y)| {
-                                  (gmp_natural_to_native(x), gmp_natural_to_native(y))
-                              }),
-                    z_cons: &(|&(ref x, ref y)| {
-                                  (gmp_natural_to_num_biguint(x), gmp_natural_to_num_biguint(y))
-                              }),
-                    w_cons: &(|&(ref x, ref y)| {
-                                  (gmp_natural_to_rugint_integer(x),
-                                   gmp_natural_to_rugint_integer(y))
-                              }),
-                    x_param: &(|&(ref x, ref y)| {
-                                   max(x.significant_bits(), y.significant_bits()) as usize
-                               }),
-                    limit: limit,
-                    f_name: "malachite-gmp",
-                    g_name: "malachite-native",
-                    h_name: "num",
-                    i_name: "rugint",
-                    title: "Natural.clone\\\\_from(Natural)",
-                    x_axis_label: "max(x.significant\\\\_bits(), y.significant\\\\_bits())",
-                    y_axis_label: "time (ns)",
-                    file_name: &format!("benchmarks/{}", file_name),
-                });
+        xs: random_pairs_from_single(random_naturals(&EXAMPLE_SEED, scale)),
+        function_f: &(|(mut x, y): (gmp::Natural, gmp::Natural)| x.clone_from(&y)),
+        function_g: &(|(mut x, y): (native::Natural, native::Natural)| x.clone_from(&y)),
+        function_h: &(|(mut x, y): (num::BigUint, num::BigUint)| x.clone_from(&y)),
+        function_i: &(|(mut x, y): (rugint::Integer, rugint::Integer)| x.clone_from(&y)),
+        x_cons: &(|p| p.clone()),
+        y_cons: &(|&(ref x, ref y)| (gmp_natural_to_native(x), gmp_natural_to_native(y))),
+        z_cons: &(|&(ref x, ref y)| (gmp_natural_to_num_biguint(x), gmp_natural_to_num_biguint(y))),
+        w_cons: &(|&(ref x, ref y)| {
+            (
+                gmp_natural_to_rugint_integer(x),
+                gmp_natural_to_rugint_integer(y),
+            )
+        }),
+        x_param: &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),
+        limit: limit,
+        f_name: "malachite-gmp",
+        g_name: "malachite-native",
+        h_name: "num",
+        i_name: "rugint",
+        title: "Natural.clone\\\\_from(Natural)",
+        x_axis_label: "max(x.significant\\\\_bits(), y.significant\\\\_bits())",
+        y_axis_label: "time (ns)",
+        file_name: &format!("benchmarks/{}", file_name),
+    });
 }
 
 pub fn benchmark_exhaustive_natural_assign(limit: usize, file_name: &str) {
     println!("benchmarking exhaustive Natural.assign(Natural)");
     benchmark_3(BenchmarkOptions3 {
-                    xs: exhaustive_pairs_from_single(exhaustive_naturals()),
-                    function_f: &(|(mut x, y): (gmp::Natural, gmp::Natural)| x.assign(y)),
-                    function_g: &(|(mut x, y): (native::Natural, native::Natural)| x.assign(y)),
-                    function_h: &(|(mut x, y): (rugint::Integer, rugint::Integer)| x.assign(y)),
-                    x_cons: &(|p| p.clone()),
-                    y_cons: &(|&(ref x, ref y)| {
-                                  (gmp_natural_to_native(x), gmp_natural_to_native(y))
-                              }),
-                    z_cons: &(|&(ref x, ref y)| {
-                                  (gmp_natural_to_rugint_integer(x),
-                                   gmp_natural_to_rugint_integer(y))
-                              }),
-                    x_param: &(|&(ref x, ref y)| {
-                                   max(x.significant_bits(), y.significant_bits()) as usize
-                               }),
-                    limit: limit,
-                    f_name: "malachite-gmp",
-                    g_name: "malachite-native",
-                    h_name: "rugint",
-                    title: "Natural.assign(Natural)",
-                    x_axis_label: "max(x.significant\\\\_bits(), y.significant\\\\_bits())",
-                    y_axis_label: "time (ns)",
-                    file_name: &format!("benchmarks/{}", file_name),
-                });
+        xs: exhaustive_pairs_from_single(exhaustive_naturals()),
+        function_f: &(|(mut x, y): (gmp::Natural, gmp::Natural)| x.assign(y)),
+        function_g: &(|(mut x, y): (native::Natural, native::Natural)| x.assign(y)),
+        function_h: &(|(mut x, y): (rugint::Integer, rugint::Integer)| x.assign(y)),
+        x_cons: &(|p| p.clone()),
+        y_cons: &(|&(ref x, ref y)| (gmp_natural_to_native(x), gmp_natural_to_native(y))),
+        z_cons: &(|&(ref x, ref y)| {
+            (
+                gmp_natural_to_rugint_integer(x),
+                gmp_natural_to_rugint_integer(y),
+            )
+        }),
+        x_param: &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),
+        limit: limit,
+        f_name: "malachite-gmp",
+        g_name: "malachite-native",
+        h_name: "rugint",
+        title: "Natural.assign(Natural)",
+        x_axis_label: "max(x.significant\\\\_bits(), y.significant\\\\_bits())",
+        y_axis_label: "time (ns)",
+        file_name: &format!("benchmarks/{}", file_name),
+    });
 }
 
 pub fn benchmark_random_natural_assign(limit: usize, scale: u32, file_name: &str) {
     println!("benchmarking random Natural.assign(Natural)");
     benchmark_3(BenchmarkOptions3 {
-                    xs: random_pairs_from_single(random_naturals(&EXAMPLE_SEED, scale)),
-                    function_f: &(|(mut x, y): (gmp::Natural, gmp::Natural)| x.assign(y)),
-                    function_g: &(|(mut x, y): (native::Natural, native::Natural)| x.assign(y)),
-                    function_h: &(|(mut x, y): (rugint::Integer, rugint::Integer)| x.assign(y)),
-                    x_cons: &(|p| p.clone()),
-                    y_cons: &(|&(ref x, ref y)| {
-                                  (gmp_natural_to_native(x), gmp_natural_to_native(y))
-                              }),
-                    z_cons: &(|&(ref x, ref y)| {
-                                  (gmp_natural_to_rugint_integer(x),
-                                   gmp_natural_to_rugint_integer(y))
-                              }),
-                    x_param: &(|&(ref x, ref y)| {
-                                   max(x.significant_bits(), y.significant_bits()) as usize
-                               }),
-                    limit: limit,
-                    f_name: "malachite-gmp",
-                    g_name: "malachite-native",
-                    h_name: "rugint",
-                    title: "Natural.assign(Natural)",
-                    x_axis_label: "max(x.significant\\\\_bits(), y.significant\\\\_bits())",
-                    y_axis_label: "time (ns)",
-                    file_name: &format!("benchmarks/{}", file_name),
-                });
+        xs: random_pairs_from_single(random_naturals(&EXAMPLE_SEED, scale)),
+        function_f: &(|(mut x, y): (gmp::Natural, gmp::Natural)| x.assign(y)),
+        function_g: &(|(mut x, y): (native::Natural, native::Natural)| x.assign(y)),
+        function_h: &(|(mut x, y): (rugint::Integer, rugint::Integer)| x.assign(y)),
+        x_cons: &(|p| p.clone()),
+        y_cons: &(|&(ref x, ref y)| (gmp_natural_to_native(x), gmp_natural_to_native(y))),
+        z_cons: &(|&(ref x, ref y)| {
+            (
+                gmp_natural_to_rugint_integer(x),
+                gmp_natural_to_rugint_integer(y),
+            )
+        }),
+        x_param: &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),
+        limit: limit,
+        f_name: "malachite-gmp",
+        g_name: "malachite-native",
+        h_name: "rugint",
+        title: "Natural.assign(Natural)",
+        x_axis_label: "max(x.significant\\\\_bits(), y.significant\\\\_bits())",
+        y_axis_label: "time (ns)",
+        file_name: &format!("benchmarks/{}", file_name),
+    });
 }
 
 pub fn benchmark_exhaustive_natural_assign_evaluation_strategy(limit: usize, file_name: &str) {
     println!("benchmarking exhaustive Natural.assign(Natural) evaluation strategy");
     benchmark_2(BenchmarkOptions2 {
-                    xs: exhaustive_pairs_from_single(exhaustive_naturals()),
-                    function_f: &(|(mut x, y): (native::Natural, native::Natural)| x.assign(y)),
-                    function_g: &(|(mut x, y): (native::Natural, native::Natural)| x.assign(&y)),
-                    x_cons: &(|&(ref x, ref y)| {
-                                  (gmp_natural_to_native(x), gmp_natural_to_native(y))
-                              }),
-                    y_cons: &(|&(ref x, ref y)| {
-                                  (gmp_natural_to_native(x), gmp_natural_to_native(y))
-                              }),
-                    x_param: &(|&(ref x, ref y)| {
-                                   max(x.significant_bits(), y.significant_bits()) as usize
-                               }),
-                    limit: limit,
-                    f_name: "Natural.assign(Integer)",
-                    g_name: "Natural.assign(\\\\&Natural)",
-                    title: "Natural.assign(Natural) evaluation strategy",
-                    x_axis_label: "max(x.significant\\\\_bits(), y.significant\\\\_bits())",
-                    y_axis_label: "time (ns)",
-                    file_name: &format!("benchmarks/{}", file_name),
-                });
+        xs: exhaustive_pairs_from_single(exhaustive_naturals()),
+        function_f: &(|(mut x, y): (native::Natural, native::Natural)| x.assign(y)),
+        function_g: &(|(mut x, y): (native::Natural, native::Natural)| x.assign(&y)),
+        x_cons: &(|&(ref x, ref y)| (gmp_natural_to_native(x), gmp_natural_to_native(y))),
+        y_cons: &(|&(ref x, ref y)| (gmp_natural_to_native(x), gmp_natural_to_native(y))),
+        x_param: &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),
+        limit: limit,
+        f_name: "Natural.assign(Integer)",
+        g_name: "Natural.assign(\\\\&Natural)",
+        title: "Natural.assign(Natural) evaluation strategy",
+        x_axis_label: "max(x.significant\\\\_bits(), y.significant\\\\_bits())",
+        y_axis_label: "time (ns)",
+        file_name: &format!("benchmarks/{}", file_name),
+    });
 }
 
-pub fn benchmark_random_natural_assign_evaluation_strategy(limit: usize,
-                                                           scale: u32,
-                                                           file_name: &str) {
+pub fn benchmark_random_natural_assign_evaluation_strategy(
+    limit: usize,
+    scale: u32,
+    file_name: &str,
+) {
     println!("benchmarking random Natural.assign(Natural) evaluation strategy");
     benchmark_2(BenchmarkOptions2 {
-                    xs: random_pairs_from_single(random_naturals(&EXAMPLE_SEED, scale)),
-                    function_f: &(|(mut x, y): (native::Natural, native::Natural)| x.assign(y)),
-                    function_g: &(|(mut x, y): (native::Natural, native::Natural)| x.assign(&y)),
-                    x_cons: &(|&(ref x, ref y)| {
-                                  (gmp_natural_to_native(x), gmp_natural_to_native(y))
-                              }),
-                    y_cons: &(|&(ref x, ref y)| {
-                                  (gmp_natural_to_native(x), gmp_natural_to_native(y))
-                              }),
-                    x_param: &(|&(ref x, ref y)| {
-                                   max(x.significant_bits(), y.significant_bits()) as usize
-                               }),
-                    limit: limit,
-                    f_name: "Natural.assign(Integer)",
-                    g_name: "Natural.assign(\\\\&Natural)",
-                    title: "Natural.assign(Natural) evaluation strategy",
-                    x_axis_label: "max(x.significant\\\\_bits(), y.significant\\\\_bits())",
-                    y_axis_label: "time (ns)",
-                    file_name: &format!("benchmarks/{}", file_name),
-                });
+        xs: random_pairs_from_single(random_naturals(&EXAMPLE_SEED, scale)),
+        function_f: &(|(mut x, y): (native::Natural, native::Natural)| x.assign(y)),
+        function_g: &(|(mut x, y): (native::Natural, native::Natural)| x.assign(&y)),
+        x_cons: &(|&(ref x, ref y)| (gmp_natural_to_native(x), gmp_natural_to_native(y))),
+        y_cons: &(|&(ref x, ref y)| (gmp_natural_to_native(x), gmp_natural_to_native(y))),
+        x_param: &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),
+        limit: limit,
+        f_name: "Natural.assign(Integer)",
+        g_name: "Natural.assign(\\\\&Natural)",
+        title: "Natural.assign(Natural) evaluation strategy",
+        x_axis_label: "max(x.significant\\\\_bits(), y.significant\\\\_bits())",
+        y_axis_label: "time (ns)",
+        file_name: &format!("benchmarks/{}", file_name),
+    });
 }

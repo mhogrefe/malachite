@@ -32,75 +32,75 @@ pub fn demo_random_integer_to_i64_wrapping(limit: usize) {
 pub fn benchmark_exhaustive_integer_to_i64(limit: usize, file_name: &str) {
     println!("benchmarking exhaustive Integer.to_i64()");
     benchmark_2(BenchmarkOptions2 {
-                    xs: exhaustive_integers(),
-                    function_f: &(|n: gmp::Integer| n.to_i64()),
-                    function_g: &(|n: native::Integer| n.to_i64()),
-                    x_cons: &(|x| x.clone()),
-                    y_cons: &(|x| gmp_integer_to_native(x)),
-                    x_param: &(|n| n.significant_bits() as usize),
-                    limit: limit,
-                    f_name: "malachite-gmp",
-                    g_name: "malachite-native",
-                    title: "Integer.to\\\\_i64()",
-                    x_axis_label: "n.significant\\\\_bits()",
-                    y_axis_label: "time (ns)",
-                    file_name: &format!("benchmarks/{}", file_name),
-                });
+        xs: exhaustive_integers(),
+        function_f: &(|n: gmp::Integer| n.to_i64()),
+        function_g: &(|n: native::Integer| n.to_i64()),
+        x_cons: &(|x| x.clone()),
+        y_cons: &(|x| gmp_integer_to_native(x)),
+        x_param: &(|n| n.significant_bits() as usize),
+        limit: limit,
+        f_name: "malachite-gmp",
+        g_name: "malachite-native",
+        title: "Integer.to\\\\_i64()",
+        x_axis_label: "n.significant\\\\_bits()",
+        y_axis_label: "time (ns)",
+        file_name: &format!("benchmarks/{}", file_name),
+    });
 }
 
 pub fn benchmark_random_integer_to_i64(limit: usize, file_name: &str) {
     println!("benchmarking random Integer.to_i64()");
     benchmark_2(BenchmarkOptions2 {
-                    xs: random_integers(&EXAMPLE_SEED, 32),
-                    function_f: &(|n: gmp::Integer| n.to_i64()),
-                    function_g: &(|n: native::Integer| n.to_i64()),
-                    x_cons: &(|x| x.clone()),
-                    y_cons: &(|x| gmp_integer_to_native(x)),
-                    x_param: &(|n| n.significant_bits() as usize),
-                    limit: limit,
-                    f_name: "malachite-gmp",
-                    g_name: "malachite-native",
-                    title: "Integer.to\\\\_i64()",
-                    x_axis_label: "n.significant\\\\_bits()",
-                    y_axis_label: "time (ns)",
-                    file_name: &format!("benchmarks/{}", file_name),
-                });
+        xs: random_integers(&EXAMPLE_SEED, 32),
+        function_f: &(|n: gmp::Integer| n.to_i64()),
+        function_g: &(|n: native::Integer| n.to_i64()),
+        x_cons: &(|x| x.clone()),
+        y_cons: &(|x| gmp_integer_to_native(x)),
+        x_param: &(|n| n.significant_bits() as usize),
+        limit: limit,
+        f_name: "malachite-gmp",
+        g_name: "malachite-native",
+        title: "Integer.to\\\\_i64()",
+        x_axis_label: "n.significant\\\\_bits()",
+        y_axis_label: "time (ns)",
+        file_name: &format!("benchmarks/{}", file_name),
+    });
 }
 
 pub fn benchmark_exhaustive_integer_to_i64_wrapping(limit: usize, file_name: &str) {
     println!("benchmarking exhaustive Integer.to_i64_wrapping()");
     benchmark_2(BenchmarkOptions2 {
-                    xs: exhaustive_integers(),
-                    function_f: &(|n: gmp::Integer| n.to_i64_wrapping()),
-                    function_g: &(|n: native::Integer| n.to_i64_wrapping()),
-                    x_cons: &(|x| x.clone()),
-                    y_cons: &(|x| gmp_integer_to_native(x)),
-                    x_param: &(|n| n.significant_bits() as usize),
-                    limit: limit,
-                    f_name: "malachite-gmp",
-                    g_name: "malachite-native",
-                    title: "Integer.to\\\\_i64\\\\_wrapping()",
-                    x_axis_label: "n.significant\\\\_bits()",
-                    y_axis_label: "time (ns)",
-                    file_name: &format!("benchmarks/{}", file_name),
-                });
+        xs: exhaustive_integers(),
+        function_f: &(|n: gmp::Integer| n.to_i64_wrapping()),
+        function_g: &(|n: native::Integer| n.to_i64_wrapping()),
+        x_cons: &(|x| x.clone()),
+        y_cons: &(|x| gmp_integer_to_native(x)),
+        x_param: &(|n| n.significant_bits() as usize),
+        limit: limit,
+        f_name: "malachite-gmp",
+        g_name: "malachite-native",
+        title: "Integer.to\\\\_i64\\\\_wrapping()",
+        x_axis_label: "n.significant\\\\_bits()",
+        y_axis_label: "time (ns)",
+        file_name: &format!("benchmarks/{}", file_name),
+    });
 }
 
 pub fn benchmark_random_integer_to_i64_wrapping(limit: usize, file_name: &str) {
     println!("benchmarking random Integer.to_i64_wrapping()");
     benchmark_2(BenchmarkOptions2 {
-                    xs: random_integers(&EXAMPLE_SEED, 32),
-                    function_f: &(|n: gmp::Integer| n.to_i64_wrapping()),
-                    function_g: &(|n: native::Integer| n.to_i64_wrapping()),
-                    x_cons: &(|x| x.clone()),
-                    y_cons: &(|x| gmp_integer_to_native(x)),
-                    x_param: &(|n| n.significant_bits() as usize),
-                    limit: limit,
-                    f_name: "malachite-gmp",
-                    g_name: "malachite-native",
-                    title: "Integer.to\\\\_i64\\\\_wrapping()",
-                    x_axis_label: "n.significant\\\\_bits()",
-                    y_axis_label: "time (ns)",
-                    file_name: &format!("benchmarks/{}", file_name),
-                });
+        xs: random_integers(&EXAMPLE_SEED, 32),
+        function_f: &(|n: gmp::Integer| n.to_i64_wrapping()),
+        function_g: &(|n: native::Integer| n.to_i64_wrapping()),
+        x_cons: &(|x| x.clone()),
+        y_cons: &(|x| gmp_integer_to_native(x)),
+        x_param: &(|n| n.significant_bits() as usize),
+        limit: limit,
+        f_name: "malachite-gmp",
+        g_name: "malachite-native",
+        title: "Integer.to\\\\_i64\\\\_wrapping()",
+        x_axis_label: "n.significant\\\\_bits()",
+        y_axis_label: "time (ns)",
+        file_name: &format!("benchmarks/{}", file_name),
+    });
 }

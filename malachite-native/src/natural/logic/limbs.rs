@@ -53,9 +53,6 @@ impl Natural {
     /// assert_eq!(Natural::from_str("1000000000000").unwrap().limbs_le(), vec![3567587328, 232]);
     /// ```
     pub fn limbs_be(&self) -> Vec<u32> {
-        self.limbs_le()
-            .into_iter()
-            .rev()
-            .collect()
+        self.limbs_le().into_iter().rev().collect()
     }
 }

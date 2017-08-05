@@ -20,7 +20,10 @@ use natural::Natural;
 impl PartialEq<Natural> for Integer {
     fn eq(&self, other: &Natural) -> bool {
         match *self {
-            Integer { sign: true, ref abs } if abs == other => true,
+            Integer {
+                sign: true,
+                ref abs,
+            } if abs == other => true,
             _ => false,
         }
     }
@@ -45,7 +48,10 @@ impl PartialEq<Natural> for Integer {
 impl PartialEq<Integer> for Natural {
     fn eq(&self, other: &Integer) -> bool {
         match *other {
-            Integer { sign: true, ref abs } if self == abs => true,
+            Integer {
+                sign: true,
+                ref abs,
+            } if self == abs => true,
             _ => false,
         }
     }

@@ -1,4 +1,4 @@
-use common::{LARGE_LIMIT, test_custom_cmp_helper};
+use common::{test_custom_cmp_helper, LARGE_LIMIT};
 use malachite_native::integer as native;
 use malachite_native::traits::OrdAbs as native_ord_abs;
 use malachite_native::traits::PartialOrdAbs as native_partial_ord_abs;
@@ -14,8 +14,16 @@ use std::cmp::Ordering;
 
 #[test]
 fn test_ord_abs() {
-    let strings =
-        vec!["0", "1", "-2", "123", "-124", "999999999999", "-1000000000000", "1000000000001"];
+    let strings = vec![
+        "0",
+        "1",
+        "-2",
+        "123",
+        "-124",
+        "999999999999",
+        "-1000000000000",
+        "1000000000001",
+    ];
     test_custom_cmp_helper::<native::Integer, _>(&strings, |x, y| x.cmp_abs(y));
     test_custom_cmp_helper::<gmp::Integer, _>(&strings, |x, y| x.cmp_abs(y));
     test_custom_cmp_helper::<rugint::Integer, _>(&strings, |x, y| x.cmp_abs(y));
@@ -32,8 +40,10 @@ fn cmp_properties() {
         let y = gmp_integer_to_native(&gmp_y);
         let ord = x.cmp_abs(&y);
         assert_eq!(gmp_x.cmp_abs(&gmp_y), ord);
-        assert_eq!(native_integer_to_rugint(&x).cmp_abs(&native_integer_to_rugint(&y)),
-                   ord);
+        assert_eq!(
+            native_integer_to_rugint(&x).cmp_abs(&native_integer_to_rugint(&y)),
+            ord
+        );
         assert_eq!(x.abs_ref().cmp(&y.abs_ref()), ord);
         assert_eq!(y.cmp_abs(&x).reverse(), ord);
         assert_eq!((-x).cmp_abs(&(-y)), ord);
@@ -80,7 +90,8 @@ fn cmp_properties() {
     }
 
     for (x, y, z) in random_triples_from_single(random_integers(&EXAMPLE_SEED, 32))
-            .take(LARGE_LIMIT) {
+        .take(LARGE_LIMIT)
+    {
         three_integers(x, y, z);
     }
 }

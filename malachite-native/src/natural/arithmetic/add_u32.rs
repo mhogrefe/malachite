@@ -157,27 +157,29 @@ impl AddAssign<u32> for Natural {
             self.assign(other);
             return;
         }
-        mutate_with_possible_promotion!(self,
-                                        small,
-                                        limbs,
-                                        {
-                                            small.checked_add(other)
-                                        },
-                                        {
-                                            let mut addend = other;
-                                            for limb in limbs.iter_mut() {
-                                                let (sum, overflow) = limb.overflowing_add(addend);
-                                                *limb = sum;
-                                                if overflow {
-                                                    addend = 1;
-                                                } else {
-                                                    addend = 0;
-                                                    break;
-                                                }
-                                            }
-                                            if addend == 1 {
-                                                limbs.push(1);
-                                            }
-                                        });
+        mutate_with_possible_promotion!(
+            self,
+            small,
+            limbs,
+            {
+                small.checked_add(other)
+            },
+            {
+                let mut addend = other;
+                for limb in limbs.iter_mut() {
+                    let (sum, overflow) = limb.overflowing_add(addend);
+                    *limb = sum;
+                    if overflow {
+                        addend = 1;
+                    } else {
+                        addend = 0;
+                        break;
+                    }
+                }
+                if addend == 1 {
+                    limbs.push(1);
+                }
+            }
+        );
     }
 }

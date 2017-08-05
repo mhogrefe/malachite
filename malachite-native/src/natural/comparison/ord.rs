@@ -32,7 +32,9 @@ impl Ord for Natural {
             (&Small(_), &Large(_)) => Ordering::Less,
             (&Large(_), &Small(_)) => Ordering::Greater,
             (&Large(ref xs), &Large(ref ys)) => {
-                xs.len().cmp(&ys.len()).then_with(|| xs.into_iter().rev().cmp(ys.into_iter().rev()))
+                xs.len().cmp(&ys.len()).then_with(|| {
+                    xs.into_iter().rev().cmp(ys.into_iter().rev())
+                })
             }
         }
     }

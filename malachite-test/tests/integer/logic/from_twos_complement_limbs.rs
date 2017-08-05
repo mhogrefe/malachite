@@ -29,8 +29,10 @@ fn test_from_from_twos_complement_limbs_le() {
     test(&[3567587328, 232], "1000000000000");
     test(&[727379968, 4294967063], "-1000000000000");
     test(&[1, 2, 3, 4, 5], "1701411834921604967429270619762735448065");
-    test(&[4294967295, 4294967293, 4294967292, 4294967291, 4294967290],
-         "-1701411834921604967429270619762735448065");
+    test(
+        &[4294967295, 4294967293, 4294967292, 4294967291, 4294967290],
+        "-1701411834921604967429270619762735448065",
+    );
     test(&[4294967295, 0], "4294967295");
     test(&[1, 4294967295], "-4294967295");
     test(&[0, 1], "4294967296");
@@ -62,8 +64,10 @@ fn test_from_from_twos_complement_limbs_be() {
     test(&[232, 3567587328], "1000000000000");
     test(&[4294967063, 727379968], "-1000000000000");
     test(&[5, 4, 3, 2, 1], "1701411834921604967429270619762735448065");
-    test(&[4294967290, 4294967291, 4294967292, 4294967293, 4294967295],
-         "-1701411834921604967429270619762735448065");
+    test(
+        &[4294967290, 4294967291, 4294967292, 4294967293, 4294967295],
+        "-1701411834921604967429270619762735448065",
+    );
     test(&[0, 4294967295], "4294967295");
     test(&[4294967295, 1], "-4294967295");
     test(&[1, 0], "4294967296");
@@ -83,10 +87,7 @@ fn trim_be_limbs(xs: &mut Vec<u32>) {
             None => xs.clear(),
             Some(i) => {
                 let i = if xs[i] & 0x8000_0000 != 0 { i - 1 } else { i };
-                *xs = xs.iter()
-                    .cloned()
-                    .skip(i)
-                    .collect();
+                *xs = xs.iter().cloned().skip(i).collect();
             }
         }
     } else {
@@ -97,10 +98,7 @@ fn trim_be_limbs(xs: &mut Vec<u32>) {
             }
             Some(i) => {
                 let i = if xs[i] & 0x8000_0000 == 0 { i - 1 } else { i };
-                *xs = xs.iter()
-                    .cloned()
-                    .skip(i)
-                    .collect();
+                *xs = xs.iter().cloned().skip(i).collect();
             }
         }
     }
@@ -117,32 +115,33 @@ fn from_twos_complement_limbs_le_properties() {
     // if limbs is canonical, Integer::from_twos_complement_limbs_le(limbs).limbs_le() == x
     let u32_slice = |limbs: &[u32]| {
         let x = native::Integer::from_twos_complement_limbs_le(limbs);
-        assert_eq!(gmp_integer_to_native(&gmp::Integer::from_twos_complement_limbs_le(limbs)),
-                   x);
-        let mut trimmed_limbs: Vec<u32> = limbs.iter()
-            .cloned()
-            .rev()
-            .collect();
+        assert_eq!(
+            gmp_integer_to_native(&gmp::Integer::from_twos_complement_limbs_le(limbs)),
+            x
+        );
+        let mut trimmed_limbs: Vec<u32> = limbs.iter().cloned().rev().collect();
         trim_be_limbs(&mut trimmed_limbs);
         trimmed_limbs.reverse();
         assert_eq!(x.twos_complement_limbs_le(), trimmed_limbs);
-        assert_eq!(native::Integer::from_twos_complement_limbs_be(&limbs.iter()
-                                                                       .cloned()
-                                                                       .rev()
-                                                                       .collect::<Vec<u32>>()),
-                   x);
+        assert_eq!(
+            native::Integer::from_twos_complement_limbs_be(
+                &limbs.iter().cloned().rev().collect::<Vec<u32>>(),
+            ),
+            x
+        );
         if match x.sign() {
-               Ordering::Equal => limbs.is_empty(),
-               Ordering::Greater => {
-            let last = *limbs.last().unwrap();
-            last & 0x8000_0000 == 0 && (last != 0 || limbs[limbs.len() - 2] & 0x8000_0000 != 0)
+            Ordering::Equal => limbs.is_empty(),
+            Ordering::Greater => {
+                let last = *limbs.last().unwrap();
+                last & 0x8000_0000 == 0 && (last != 0 || limbs[limbs.len() - 2] & 0x8000_0000 != 0)
+            }
+            Ordering::Less => {
+                let last = *limbs.last().unwrap();
+                last & 0x8000_0000 != 0 &&
+                    (last != !0 || limbs.len() <= 1 || limbs[limbs.len() - 2] & 0x8000_0000 == 0)
+            }
         }
-               Ordering::Less => {
-            let last = *limbs.last().unwrap();
-            last & 0x8000_0000 != 0 &&
-            (last != !0 || limbs.len() <= 1 || limbs[limbs.len() - 2] & 0x8000_0000 == 0)
-        }
-           } {
+        {
             assert_eq!(&x.twos_complement_limbs_le()[..], limbs);
         }
     };
@@ -167,28 +166,32 @@ fn from_twos_complement_limbs_be_properties() {
     // if limbs is canonical, Integer::from_twos_complement_limbs_be(limbs).limbs_be() == x
     let u32_slice = |limbs: &[u32]| {
         let x = native::Integer::from_twos_complement_limbs_be(limbs);
-        assert_eq!(gmp_integer_to_native(&gmp::Integer::from_twos_complement_limbs_be(limbs)),
-                   x);
+        assert_eq!(
+            gmp_integer_to_native(&gmp::Integer::from_twos_complement_limbs_be(limbs)),
+            x
+        );
         let mut trimmed_limbs: Vec<u32> = limbs.to_vec();
         trim_be_limbs(&mut trimmed_limbs);
         assert_eq!(x.twos_complement_limbs_be(), trimmed_limbs);
-        assert_eq!(native::Integer::from_twos_complement_limbs_le(&limbs.iter()
-                                                                       .cloned()
-                                                                       .rev()
-                                                                       .collect::<Vec<u32>>()),
-                   x);
+        assert_eq!(
+            native::Integer::from_twos_complement_limbs_le(
+                &limbs.iter().cloned().rev().collect::<Vec<u32>>(),
+            ),
+            x
+        );
         if match x.sign() {
-               Ordering::Equal => limbs.is_empty(),
-               Ordering::Greater => {
-            let first = limbs[0];
-            first & 0x8000_0000 == 0 && (first != 0 || limbs[1] & 0x8000_0000 != 0)
+            Ordering::Equal => limbs.is_empty(),
+            Ordering::Greater => {
+                let first = limbs[0];
+                first & 0x8000_0000 == 0 && (first != 0 || limbs[1] & 0x8000_0000 != 0)
+            }
+            Ordering::Less => {
+                let first = limbs[0];
+                first & 0x8000_0000 != 0 &&
+                    (first != !0 || limbs.len() <= 1 || limbs[1] & 0x8000_0000 == 0)
+            }
         }
-               Ordering::Less => {
-            let first = limbs[0];
-            first & 0x8000_0000 != 0 &&
-            (first != !0 || limbs.len() <= 1 || limbs[1] & 0x8000_0000 == 0)
-        }
-           } {
+        {
             assert_eq!(&x.twos_complement_limbs_be()[..], limbs);
         }
     };

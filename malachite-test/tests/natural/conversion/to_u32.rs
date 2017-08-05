@@ -71,8 +71,10 @@ fn to_u32_wrapping_properties() {
         let x = gmp_natural_to_native(&gmp_x);
         let native_u32 = x.to_u32_wrapping();
         assert_eq!(gmp_x.to_u32_wrapping(), native_u32);
-        assert_eq!(native_natural_to_rugint_integer(&x).to_u32_wrapping(),
-                   native_u32);
+        assert_eq!(
+            native_natural_to_rugint_integer(&x).to_u32_wrapping(),
+            native_u32
+        );
     };
 
     for n in exhaustive_naturals().take(LARGE_LIMIT) {

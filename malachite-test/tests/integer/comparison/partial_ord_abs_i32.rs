@@ -16,14 +16,20 @@ use std::str::FromStr;
 #[test]
 fn test_partial_ord_i32_abs() {
     let test = |u, v: i32, out| {
-        assert_eq!(native::Integer::from_str(u).unwrap().partial_cmp_abs(&v),
-                   out);
+        assert_eq!(
+            native::Integer::from_str(u).unwrap().partial_cmp_abs(&v),
+            out
+        );
         assert_eq!(gmp::Integer::from_str(u).unwrap().partial_cmp_abs(&v), out);
 
-        assert_eq!(native_ord_abs::partial_cmp_abs(&v, &native::Integer::from_str(u).unwrap()),
-                   out.map(|o| o.reverse()));
-        assert_eq!(gmp_ord_abs::partial_cmp_abs(&v, &gmp::Integer::from_str(u).unwrap()),
-                   out.map(|o| o.reverse()));
+        assert_eq!(
+            native_ord_abs::partial_cmp_abs(&v, &native::Integer::from_str(u).unwrap()),
+            out.map(|o| o.reverse())
+        );
+        assert_eq!(
+            gmp_ord_abs::partial_cmp_abs(&v, &gmp::Integer::from_str(u).unwrap()),
+            out.map(|o| o.reverse())
+        );
     };
     test("0", 0, Some(Ordering::Equal));
     test("0", 5, Some(Ordering::Less));
@@ -92,40 +98,50 @@ fn partial_cmp_i32_properties() {
         integer_and_i32(n, i);
     }
 
-    for (n, i) in random_pairs(&EXAMPLE_SEED,
-                               &(|seed| random_integers(seed, 32)),
-                               &(|seed| random_x::<i32>(seed)))
-                .take(LARGE_LIMIT) {
+    for (n, i) in random_pairs(
+        &EXAMPLE_SEED,
+        &(|seed| random_integers(seed, 32)),
+        &(|seed| random_x::<i32>(seed)),
+    ).take(LARGE_LIMIT)
+    {
         integer_and_i32(n, i);
     }
 
-    for (n, i, m) in exhaustive_triples(exhaustive_integers(),
-                                        exhaustive_i::<i32>(),
-                                        exhaustive_integers())
-                .take(LARGE_LIMIT) {
+    for (n, i, m) in exhaustive_triples(
+        exhaustive_integers(),
+        exhaustive_i::<i32>(),
+        exhaustive_integers(),
+    ).take(LARGE_LIMIT)
+    {
         integer_i32_and_integer(n, i, m);
     }
 
-    for (n, i, m) in random_triples(&EXAMPLE_SEED,
-                                    &(|seed| random_integers(seed, 32)),
-                                    &(|seed| random_x::<i32>(seed)),
-                                    &(|seed| random_integers(seed, 32)))
-                .take(LARGE_LIMIT) {
+    for (n, i, m) in random_triples(
+        &EXAMPLE_SEED,
+        &(|seed| random_integers(seed, 32)),
+        &(|seed| random_x::<i32>(seed)),
+        &(|seed| random_integers(seed, 32)),
+    ).take(LARGE_LIMIT)
+    {
         integer_i32_and_integer(n, i, m);
     }
 
-    for (i, n, j) in exhaustive_triples(exhaustive_i::<i32>(),
-                                        exhaustive_integers(),
-                                        exhaustive_i::<i32>())
-                .take(LARGE_LIMIT) {
+    for (i, n, j) in exhaustive_triples(
+        exhaustive_i::<i32>(),
+        exhaustive_integers(),
+        exhaustive_i::<i32>(),
+    ).take(LARGE_LIMIT)
+    {
         i32_integer_and_i32(i, n, j);
     }
 
-    for (i, n, j) in random_triples(&EXAMPLE_SEED,
-                                    &(|seed| random_x::<i32>(seed)),
-                                    &(|seed| random_integers(seed, 32)),
-                                    &(|seed| random_x::<i32>(seed)))
-                .take(LARGE_LIMIT) {
+    for (i, n, j) in random_triples(
+        &EXAMPLE_SEED,
+        &(|seed| random_x::<i32>(seed)),
+        &(|seed| random_integers(seed, 32)),
+        &(|seed| random_x::<i32>(seed)),
+    ).take(LARGE_LIMIT)
+    {
         i32_integer_and_i32(i, n, j);
     }
 }

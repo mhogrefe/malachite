@@ -72,13 +72,16 @@ fn test_sub_natural() {
         assert_eq!(format!("{:?}", on), out);
         assert!(on.map_or(true, |n| n.is_valid()));
 
-        let on = num_sub(num::BigUint::from_str(u).unwrap(),
-                         num::BigUint::from_str(v).unwrap())
-                .map(|x| num_biguint_to_native_natural(&x));
+        let on = num_sub(
+            num::BigUint::from_str(u).unwrap(),
+            num::BigUint::from_str(v).unwrap(),
+        ).map(|x| num_biguint_to_native_natural(&x));
         assert_eq!(format!("{:?}", on), out);
 
-        let on = rugint_sub(rugint::Integer::from_str(u).unwrap(),
-                            rugint::Integer::from_str(v).unwrap());
+        let on = rugint_sub(
+            rugint::Integer::from_str(u).unwrap(),
+            rugint::Integer::from_str(v).unwrap(),
+        );
         assert_eq!(format!("{:?}", on), out);
     };
     test("0", "0", "Some(0)");
@@ -87,9 +90,11 @@ fn test_sub_natural() {
     test("456", "123", "Some(333)");
     test("1000000000000", "123", "Some(999999999877)");
     test("123", "1000000000000", "None");
-    test("12345678987654321",
-         "314159265358979",
-         "Some(12031519722295342)");
+    test(
+        "12345678987654321",
+        "314159265358979",
+        "Some(12031519722295342)",
+    );
     test("4294967296", "1", "Some(4294967295)");
     test("4294967295", "4294967295", "Some(0)");
     test("4294967296", "4294967295", "Some(1)");
@@ -99,9 +104,11 @@ fn test_sub_natural() {
     test("18446744073709551615", "18446744073709551615", "Some(0)");
     test("18446744073709551616", "18446744073709551615", "Some(1)");
     test("18446744073709551615", "18446744073709551616", "None");
-    test("70734740290631708",
-         "282942734368",
-         "Some(70734457347897340)");
+    test(
+        "70734740290631708",
+        "282942734368",
+        "Some(70734457347897340)",
+    );
     test("282942734368", "70734740290631708", "None");
 }
 
@@ -162,13 +169,17 @@ fn sub_properties() {
 
         let num_x2 = native_natural_to_num_biguint(&old_x);
         let num_y = native_natural_to_num_biguint(&y);
-        assert_eq!(num_sub(num_x2, num_y).map(|x| num_biguint_to_native_natural(&x)),
-                   ox);
+        assert_eq!(
+            num_sub(num_x2, num_y).map(|x| num_biguint_to_native_natural(&x)),
+            ox
+        );
 
         let rugint_x2 = native_natural_to_rugint_integer(&old_x);
         let rugint_y = native_natural_to_rugint_integer(&y);
-        assert_eq!(rugint_sub(rugint_x2, rugint_y).map(|x| rugint_integer_to_native_natural(&x)),
-                   ox);
+        assert_eq!(
+            rugint_sub(rugint_x2, rugint_y).map(|x| rugint_integer_to_native_natural(&x)),
+            ox
+        );
 
         if ox.is_some() {
             assert!(ox.clone().unwrap() <= old_x);

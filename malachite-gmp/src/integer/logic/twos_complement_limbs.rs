@@ -83,9 +83,6 @@ impl Integer {
     /// assert_eq!(Integer::from_str("-1000000000000").unwrap().twos_complement_limbs_be(),
     ///     vec![4294967063, 727379968]);
     pub fn twos_complement_limbs_be(&self) -> Vec<u32> {
-        self.twos_complement_limbs_le()
-            .into_iter()
-            .rev()
-            .collect()
+        self.twos_complement_limbs_le().into_iter().rev().collect()
     }
 }

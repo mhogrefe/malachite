@@ -63,21 +63,22 @@ impl SubAssign<u32> for Integer {
         if other == 0 {
             return;
         }
-        mutate_with_possible_promotion!(self,
-                                        small,
-                                        large,
-                                        {
-                                            let difference = *small as i64 - other as i64;
-                                            if difference >= i32::min_value() as i64 &&
-                                               difference <= i32::max_value() as i64 {
-                                                Some(difference as i32)
-                                            } else {
-                                                None
-                                            }
-                                        },
-                                        {
-                                            unsafe { gmp::mpz_sub_ui(large, large, other.into()) }
-                                        });
+        mutate_with_possible_promotion!(
+            self,
+            small,
+            large,
+            {
+                let difference = *small as i64 - other as i64;
+                if difference >= i32::min_value() as i64 && difference <= i32::max_value() as i64 {
+                    Some(difference as i32)
+                } else {
+                    None
+                }
+            },
+            {
+                unsafe { gmp::mpz_sub_ui(large, large, other.into()) }
+            }
+        );
         self.demote_if_small();
     }
 }

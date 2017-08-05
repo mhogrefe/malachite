@@ -26,10 +26,12 @@ pub fn demo_exhaustive_integer_assign_u32(limit: usize) {
 }
 
 pub fn demo_random_integer_assign_u32(limit: usize) {
-    for (mut n, u) in random_pairs(&EXAMPLE_SEED,
-                                   &(|seed| random_integers(seed, 32)),
-                                   &(|seed| random_x::<u32>(seed)))
-                .take(limit) {
+    for (mut n, u) in random_pairs(
+        &EXAMPLE_SEED,
+        &(|seed| random_integers(seed, 32)),
+        &(|seed| random_x::<u32>(seed)),
+    ).take(limit)
+    {
         let n_old = n.clone();
         n.assign(u);
         println!("x := {}; x.assign({}); x = {}", n_old, u, n);
@@ -39,51 +41,53 @@ pub fn demo_random_integer_assign_u32(limit: usize) {
 pub fn benchmark_exhaustive_integer_assign_u32(limit: usize, file_name: &str) {
     println!("benchmarking exhaustive Integer.assign(u32)");
     benchmark_4(BenchmarkOptions4 {
-                    xs: exhaustive_pairs(exhaustive_integers(), exhaustive_u::<u32>()),
-                    function_f: &(|(mut n, u): (gmp::Integer, u32)| n.assign(u)),
-                    function_g: &(|(mut n, u): (native::Integer, u32)| n.assign(u)),
-                    function_h: &(|(mut n, u): (num::BigInt, u32)| num_assign_u32(&mut n, u)),
-                    function_i: &(|(mut n, u): (rugint::Integer, u32)| n.assign(u)),
-                    x_cons: &(|p| p.clone()),
-                    y_cons: &(|&(ref n, u)| (gmp_integer_to_native(n), u)),
-                    z_cons: &(|&(ref n, u)| (gmp_integer_to_num_bigint(n), u)),
-                    w_cons: &(|&(ref n, u)| (gmp_integer_to_rugint(n), u)),
-                    x_param: &(|&(ref n, _)| n.significant_bits() as usize),
-                    limit: limit,
-                    f_name: "malachite-gmp",
-                    g_name: "malachite-native",
-                    h_name: "num",
-                    i_name: "rugint",
-                    title: "Integer.assign(u32)",
-                    x_axis_label: "n.significant\\\\_bits()",
-                    y_axis_label: "time (ns)",
-                    file_name: &format!("benchmarks/{}", file_name),
-                });
+        xs: exhaustive_pairs(exhaustive_integers(), exhaustive_u::<u32>()),
+        function_f: &(|(mut n, u): (gmp::Integer, u32)| n.assign(u)),
+        function_g: &(|(mut n, u): (native::Integer, u32)| n.assign(u)),
+        function_h: &(|(mut n, u): (num::BigInt, u32)| num_assign_u32(&mut n, u)),
+        function_i: &(|(mut n, u): (rugint::Integer, u32)| n.assign(u)),
+        x_cons: &(|p| p.clone()),
+        y_cons: &(|&(ref n, u)| (gmp_integer_to_native(n), u)),
+        z_cons: &(|&(ref n, u)| (gmp_integer_to_num_bigint(n), u)),
+        w_cons: &(|&(ref n, u)| (gmp_integer_to_rugint(n), u)),
+        x_param: &(|&(ref n, _)| n.significant_bits() as usize),
+        limit: limit,
+        f_name: "malachite-gmp",
+        g_name: "malachite-native",
+        h_name: "num",
+        i_name: "rugint",
+        title: "Integer.assign(u32)",
+        x_axis_label: "n.significant\\\\_bits()",
+        y_axis_label: "time (ns)",
+        file_name: &format!("benchmarks/{}", file_name),
+    });
 }
 
 pub fn benchmark_random_integer_assign_u32(limit: usize, scale: u32, file_name: &str) {
     println!("benchmarking random Integer.assign(u32)");
     benchmark_4(BenchmarkOptions4 {
-                    xs: random_pairs(&EXAMPLE_SEED,
-                                     &(|seed| random_integers(seed, scale)),
-                                     &(|seed| random_x::<u32>(seed))),
-                    function_f: &(|(mut n, u): (gmp::Integer, u32)| n.assign(u)),
-                    function_g: &(|(mut n, u): (native::Integer, u32)| n.assign(u)),
-                    function_h: &(|(mut n, u): (num::BigInt, u32)| num_assign_u32(&mut n, u)),
-                    function_i: &(|(mut n, u): (rugint::Integer, u32)| n.assign(u)),
-                    x_cons: &(|p| p.clone()),
-                    y_cons: &(|&(ref n, u)| (gmp_integer_to_native(n), u)),
-                    z_cons: &(|&(ref n, u)| (gmp_integer_to_num_bigint(n), u)),
-                    w_cons: &(|&(ref n, u)| (gmp_integer_to_rugint(n), u)),
-                    x_param: &(|&(ref n, _)| n.significant_bits() as usize),
-                    limit: limit,
-                    f_name: "malachite-gmp",
-                    g_name: "malachite-native",
-                    h_name: "num",
-                    i_name: "rugint",
-                    title: "Integer.assign(u32)",
-                    x_axis_label: "n.significant\\\\_bits()",
-                    y_axis_label: "time (ns)",
-                    file_name: &format!("benchmarks/{}", file_name),
-                });
+        xs: random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| random_integers(seed, scale)),
+            &(|seed| random_x::<u32>(seed)),
+        ),
+        function_f: &(|(mut n, u): (gmp::Integer, u32)| n.assign(u)),
+        function_g: &(|(mut n, u): (native::Integer, u32)| n.assign(u)),
+        function_h: &(|(mut n, u): (num::BigInt, u32)| num_assign_u32(&mut n, u)),
+        function_i: &(|(mut n, u): (rugint::Integer, u32)| n.assign(u)),
+        x_cons: &(|p| p.clone()),
+        y_cons: &(|&(ref n, u)| (gmp_integer_to_native(n), u)),
+        z_cons: &(|&(ref n, u)| (gmp_integer_to_num_bigint(n), u)),
+        w_cons: &(|&(ref n, u)| (gmp_integer_to_rugint(n), u)),
+        x_param: &(|&(ref n, _)| n.significant_bits() as usize),
+        limit: limit,
+        f_name: "malachite-gmp",
+        g_name: "malachite-native",
+        h_name: "num",
+        i_name: "rugint",
+        title: "Integer.assign(u32)",
+        x_axis_label: "n.significant\\\\_bits()",
+        y_axis_label: "time (ns)",
+        file_name: &format!("benchmarks/{}", file_name),
+    });
 }

@@ -84,9 +84,11 @@ fn test_add_assign() {
     test("1000000000000", "123", "1000000000123");
     test("123", "1000000000000", "1000000000123");
     test("12345678987654321", "314159265358979", "12659838253013300");
-    test("1000000000000",
-         "1000000000000000000000000",
-         "1000000000001000000000000");
+    test(
+        "1000000000000",
+        "1000000000000000000000000",
+        "1000000000001000000000000",
+    );
 }
 
 #[test]
@@ -105,10 +107,13 @@ fn add_properties() {
         let raw_gmp_sum = gmp_x.clone() + gmp_y.clone();
         assert!(raw_gmp_sum.is_valid());
         let gmp_sum = gmp_natural_to_native(&raw_gmp_sum);
-        let num_sum = num_biguint_to_native_natural(&(native_natural_to_num_biguint(&x) +
-                                                      native_natural_to_num_biguint(&y)));
-        let rugint_sum = rugint_integer_to_native_natural(&(native_natural_to_rugint_integer(&x) +
-                                                            native_natural_to_rugint_integer(&y)));
+        let num_sum = num_biguint_to_native_natural(
+            &(native_natural_to_num_biguint(&x) + native_natural_to_num_biguint(&y)),
+        );
+        let rugint_sum = rugint_integer_to_native_natural(
+            &(native_natural_to_rugint_integer(&x) +
+                  native_natural_to_rugint_integer(&y)),
+        );
 
         let sum_val_val = gmp_x.clone() + gmp_y.clone();
         let sum_val_ref = gmp_x.clone() + &gmp_y;
@@ -210,10 +215,12 @@ fn add_properties() {
         natural_and_u32(x, y);
     }
 
-    for (x, y) in random_pairs(&EXAMPLE_SEED,
-                               &(|seed| random_naturals(seed, 32)),
-                               &(|seed| random_x(seed)))
-                .take(LARGE_LIMIT) {
+    for (x, y) in random_pairs(
+        &EXAMPLE_SEED,
+        &(|seed| random_naturals(seed, 32)),
+        &(|seed| random_x(seed)),
+    ).take(LARGE_LIMIT)
+    {
         natural_and_u32(x, y);
     }
 
@@ -230,7 +237,8 @@ fn add_properties() {
     }
 
     for (x, y, z) in random_triples_from_single(random_naturals(&EXAMPLE_SEED, 32))
-            .take(LARGE_LIMIT) {
+        .take(LARGE_LIMIT)
+    {
         three_naturals(x, y, z);
     }
 }

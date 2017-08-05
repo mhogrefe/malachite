@@ -94,10 +94,14 @@ fn clone_and_assign_properties() {
         let gmp_x_cloned = gmp_x.clone();
         assert!(gmp_x_cloned.is_valid());
         assert_eq!(gmp_integer_to_native(&gmp_x_cloned), x_cloned);
-        assert_eq!(num_bigint_to_native_integer(&native_integer_to_num_bigint(&x).clone()),
-                   x);
-        assert_eq!(rugint_integer_to_native(&native_integer_to_rugint(&x).clone()),
-                   x);
+        assert_eq!(
+            num_bigint_to_native_integer(&native_integer_to_num_bigint(&x).clone()),
+            x
+        );
+        assert_eq!(
+            rugint_integer_to_native(&native_integer_to_rugint(&x).clone()),
+            x
+        );
         assert_eq!(x_cloned, x);
     };
 

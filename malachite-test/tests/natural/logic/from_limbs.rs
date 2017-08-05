@@ -48,8 +48,10 @@ fn test_from_limbs_be() {
     test(vec![0, 0, 0, 123], "123");
     test(vec![232, 3567587328], "1000000000000");
     test(vec![0, 232, 3567587328], "1000000000000");
-    test(vec![5, 4, 3, 2, 1],
-         "1701411834921604967429270619762735448065");
+    test(
+        vec![5, 4, 3, 2, 1],
+        "1701411834921604967429270619762735448065",
+    );
 }
 
 #[test]
@@ -61,20 +63,22 @@ fn from_limbs_le_properties() {
     // if !limbs.is_empty() and limbs.last() != 0, Natural::from_limbs_le(limbs).limbs_le() == x
     let u32_slice = |limbs: &[u32]| {
         let x = native::Natural::from_limbs_le(limbs);
-        assert_eq!(gmp_natural_to_native(&gmp::Natural::from_limbs_le(limbs)),
-                   x);
-        let mut trimmed_limbs: Vec<u32> = limbs.iter()
+        assert_eq!(
+            gmp_natural_to_native(&gmp::Natural::from_limbs_le(limbs)),
+            x
+        );
+        let mut trimmed_limbs: Vec<u32> = limbs
+            .iter()
             .cloned()
             .rev()
             .skip_while(|&u| u == 0)
             .collect();
         trimmed_limbs.reverse();
         assert_eq!(x.limbs_le(), trimmed_limbs);
-        assert_eq!(native::Natural::from_limbs_be(&limbs.iter()
-                                                       .cloned()
-                                                       .rev()
-                                                       .collect::<Vec<u32>>()),
-                   x);
+        assert_eq!(
+            native::Natural::from_limbs_be(&limbs.iter().cloned().rev().collect::<Vec<u32>>()),
+            x
+        );
         if !limbs.is_empty() && *limbs.last().unwrap() != 0 {
             assert_eq!(&x.limbs_le()[..], limbs);
         }
@@ -97,18 +101,22 @@ fn from_limbs_be_properties() {
     // if !limbs.is_empty() and limbs[0] != 0, Natural::from_limbs_be(limbs).limbs_le() == x
     let u32_slice = |limbs: &[u32]| {
         let x = native::Natural::from_limbs_be(limbs);
-        assert_eq!(gmp_natural_to_native(&gmp::Natural::from_limbs_be(limbs)),
-                   x);
-        assert_eq!(x.limbs_be(),
-                   limbs.iter()
-                       .cloned()
-                       .skip_while(|&u| u == 0)
-                       .collect::<Vec<u32>>());
-        assert_eq!(native::Natural::from_limbs_le(&limbs.iter()
-                                                       .cloned()
-                                                       .rev()
-                                                       .collect::<Vec<u32>>()),
-                   x);
+        assert_eq!(
+            gmp_natural_to_native(&gmp::Natural::from_limbs_be(limbs)),
+            x
+        );
+        assert_eq!(
+            x.limbs_be(),
+            limbs
+                .iter()
+                .cloned()
+                .skip_while(|&u| u == 0)
+                .collect::<Vec<u32>>()
+        );
+        assert_eq!(
+            native::Natural::from_limbs_le(&limbs.iter().cloned().rev().collect::<Vec<u32>>()),
+            x
+        );
         if !limbs.is_empty() && limbs[0] != 0 {
             assert_eq!(&x.limbs_be()[..], limbs);
         }

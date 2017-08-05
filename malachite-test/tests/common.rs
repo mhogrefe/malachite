@@ -6,7 +6,8 @@ pub const SMALL_LIMIT: usize = 1000;
 pub const LARGE_LIMIT: usize = 10000;
 
 pub fn test_eq_helper<T: Debug + Eq + FromStr>(strings: &[&str])
-    where T::Err: Debug
+where
+    T::Err: Debug,
 {
     let xs: Vec<T> = strings.iter().map(|s| s.parse().unwrap()).collect();
     let ys: Vec<T> = strings.iter().map(|s| s.parse().unwrap()).collect();
@@ -18,7 +19,8 @@ pub fn test_eq_helper<T: Debug + Eq + FromStr>(strings: &[&str])
 }
 
 pub fn test_cmp_helper<T: Debug + FromStr + Ord>(strings: &[&str])
-    where T::Err: Debug
+where
+    T::Err: Debug,
 {
     let xs: Vec<T> = strings.iter().map(|s| s.parse().unwrap()).collect();
     let ys: Vec<T> = strings.iter().map(|s| s.parse().unwrap()).collect();
@@ -31,9 +33,9 @@ pub fn test_cmp_helper<T: Debug + FromStr + Ord>(strings: &[&str])
 
 pub fn test_custom_cmp_helper<T: Debug + FromStr + Ord, F: FnMut(&T, &T) -> Ordering>(
     strings: &[&str],
-    mut compare: F
-)
-    where T::Err: Debug
+    mut compare: F,
+) where
+    T::Err: Debug,
 {
     let xs: Vec<T> = strings.iter().map(|s| s.parse().unwrap()).collect();
     let ys: Vec<T> = strings.iter().map(|s| s.parse().unwrap()).collect();

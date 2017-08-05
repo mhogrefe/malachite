@@ -20,37 +20,37 @@ pub fn demo_random_integer_trailing_zeros(limit: usize) {
 pub fn benchmark_exhaustive_integer_trailing_zeros(limit: usize, file_name: &str) {
     println!("benchmarking exhaustive Integer.trailing_zeros()");
     benchmark_2(BenchmarkOptions2 {
-                    xs: exhaustive_integers(),
-                    function_f: &(|n: gmp::Integer| n.trailing_zeros()),
-                    function_g: &(|n: native::Integer| n.trailing_zeros()),
-                    x_cons: &(|x| x.clone()),
-                    y_cons: &(|x| gmp_integer_to_native(x)),
-                    x_param: &(|n| n.significant_bits() as usize),
-                    limit: limit,
-                    f_name: "malachite-gmp",
-                    g_name: "malachite-native",
-                    title: "Integer.trailing\\\\_zeros()",
-                    x_axis_label: "n.significant\\\\_bits()",
-                    y_axis_label: "time (ns)",
-                    file_name: &format!("benchmarks/{}", file_name),
-                });
+        xs: exhaustive_integers(),
+        function_f: &(|n: gmp::Integer| n.trailing_zeros()),
+        function_g: &(|n: native::Integer| n.trailing_zeros()),
+        x_cons: &(|x| x.clone()),
+        y_cons: &(|x| gmp_integer_to_native(x)),
+        x_param: &(|n| n.significant_bits() as usize),
+        limit: limit,
+        f_name: "malachite-gmp",
+        g_name: "malachite-native",
+        title: "Integer.trailing\\\\_zeros()",
+        x_axis_label: "n.significant\\\\_bits()",
+        y_axis_label: "time (ns)",
+        file_name: &format!("benchmarks/{}", file_name),
+    });
 }
 
 pub fn benchmark_random_integer_trailing_zeros(limit: usize, scale: u32, file_name: &str) {
     println!("benchmarking random Integer.trailing_zeros()");
     benchmark_2(BenchmarkOptions2 {
-                    xs: random_integers(&EXAMPLE_SEED, scale),
-                    function_f: &(|n: gmp::Integer| n.trailing_zeros()),
-                    function_g: &(|n: native::Integer| n.trailing_zeros()),
-                    x_cons: &(|x| x.clone()),
-                    y_cons: &(|x| gmp_integer_to_native(x)),
-                    x_param: &(|n| n.significant_bits() as usize),
-                    limit: limit,
-                    f_name: "malachite-gmp",
-                    g_name: "malachite-native",
-                    title: "Integer.trailing\\\\_zeros()",
-                    x_axis_label: "n.significant\\\\_bits()",
-                    y_axis_label: "time (ns)",
-                    file_name: &format!("benchmarks/{}", file_name),
-                });
+        xs: random_integers(&EXAMPLE_SEED, scale),
+        function_f: &(|n: gmp::Integer| n.trailing_zeros()),
+        function_g: &(|n: native::Integer| n.trailing_zeros()),
+        x_cons: &(|x| x.clone()),
+        y_cons: &(|x| gmp_integer_to_native(x)),
+        x_param: &(|n| n.significant_bits() as usize),
+        limit: limit,
+        f_name: "malachite-gmp",
+        g_name: "malachite-native",
+        title: "Integer.trailing\\\\_zeros()",
+        x_axis_label: "n.significant\\\\_bits()",
+        y_axis_label: "time (ns)",
+        file_name: &format!("benchmarks/{}", file_name),
+    });
 }

@@ -58,9 +58,6 @@ impl Natural {
     /// assert_eq!(Natural::from_limbs_be(&[232, 3567587328]).to_string(), "1000000000000");
     /// ```
     pub fn from_limbs_be(limbs: &[u32]) -> Natural {
-        Natural::from_limbs_le(&limbs.iter()
-                                    .cloned()
-                                    .rev()
-                                    .collect::<Vec<u32>>())
+        Natural::from_limbs_le(&limbs.iter().cloned().rev().collect::<Vec<u32>>())
     }
 }

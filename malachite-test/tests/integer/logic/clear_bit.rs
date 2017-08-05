@@ -87,10 +87,12 @@ fn clear_bit_properties() {
         integer_and_u64(n, index);
     }
 
-    for (n, index) in random_pairs(&EXAMPLE_SEED,
-                                   &(|seed| random_integers(seed, 32)),
-                                   &(|seed| natural_u32s_geometric(seed, 32).map(|i| i as u64)))
-                .take(LARGE_LIMIT) {
+    for (n, index) in random_pairs(
+        &EXAMPLE_SEED,
+        &(|seed| random_integers(seed, 32)),
+        &(|seed| natural_u32s_geometric(seed, 32).map(|i| i as u64)),
+    ).take(LARGE_LIMIT)
+    {
         integer_and_u64(n, index);
     }
 }

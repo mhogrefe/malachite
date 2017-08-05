@@ -28,7 +28,9 @@ impl PartialOrdAbs<u32> for Integer {
             }
             Small(_) if *other > i32::max_value() as u32 => Some(Ordering::Less),
             Small(small) => small.abs().partial_cmp(&(*other as i32)),
-            Large(ref large) => Some(unsafe { gmp::mpz_cmpabs_ui(large, (*other).into()) }.cmp(&0)),
+            Large(ref large) => Some(unsafe { gmp::mpz_cmpabs_ui(large, (*other).into()) }.cmp(
+                &0,
+            )),
         }
     }
 }

@@ -20,14 +20,20 @@ fn test_partial_ord_u32() {
     let test = |u, v: u32, out| {
         assert_eq!(native::Natural::from_str(u).unwrap().partial_cmp(&v), out);
         assert_eq!(gmp::Natural::from_str(u).unwrap().partial_cmp(&v), out);
-        assert_eq!(num_partial_cmp_u32(&num::BigUint::from_str(u).unwrap(), v),
-                   out);
+        assert_eq!(
+            num_partial_cmp_u32(&num::BigUint::from_str(u).unwrap(), v),
+            out
+        );
         assert_eq!(rugint::Integer::from_str(u).unwrap().partial_cmp(&v), out);
 
-        assert_eq!(v.partial_cmp(&native::Natural::from_str(u).unwrap()),
-                   out.map(|o| o.reverse()));
-        assert_eq!(v.partial_cmp(&gmp::Natural::from_str(u).unwrap()),
-                   out.map(|o| o.reverse()));
+        assert_eq!(
+            v.partial_cmp(&native::Natural::from_str(u).unwrap()),
+            out.map(|o| o.reverse())
+        );
+        assert_eq!(
+            v.partial_cmp(&gmp::Natural::from_str(u).unwrap()),
+            out.map(|o| o.reverse())
+        );
     };
     test("0", 0, Some(Ordering::Equal));
     test("0", 5, Some(Ordering::Less));
@@ -49,8 +55,10 @@ fn partial_cmp_u32_properties() {
         let n = gmp_natural_to_native(&gmp_n);
         let cmp_1 = n.partial_cmp(&u);
         assert_eq!(gmp_n.partial_cmp(&u), cmp_1);
-        assert_eq!(num_partial_cmp_u32(&native_natural_to_num_biguint(&n), u),
-                   cmp_1);
+        assert_eq!(
+            num_partial_cmp_u32(&native_natural_to_num_biguint(&n), u),
+            cmp_1
+        );
         assert_eq!(native_natural_to_rugint_integer(&n).partial_cmp(&u), cmp_1);
         assert_eq!(n.partial_cmp(&native::Natural::from(u)), cmp_1);
 
@@ -88,40 +96,50 @@ fn partial_cmp_u32_properties() {
         natural_and_u32(n, u);
     }
 
-    for (n, u) in random_pairs(&EXAMPLE_SEED,
-                               &(|seed| random_naturals(seed, 32)),
-                               &(|seed| random_x::<u32>(seed)))
-                .take(LARGE_LIMIT) {
+    for (n, u) in random_pairs(
+        &EXAMPLE_SEED,
+        &(|seed| random_naturals(seed, 32)),
+        &(|seed| random_x::<u32>(seed)),
+    ).take(LARGE_LIMIT)
+    {
         natural_and_u32(n, u);
     }
 
-    for (n, u, m) in exhaustive_triples(exhaustive_naturals(),
-                                        exhaustive_u::<u32>(),
-                                        exhaustive_naturals())
-                .take(LARGE_LIMIT) {
+    for (n, u, m) in exhaustive_triples(
+        exhaustive_naturals(),
+        exhaustive_u::<u32>(),
+        exhaustive_naturals(),
+    ).take(LARGE_LIMIT)
+    {
         natural_u32_and_natural(n, u, m);
     }
 
-    for (n, u, m) in random_triples(&EXAMPLE_SEED,
-                                    &(|seed| random_naturals(seed, 32)),
-                                    &(|seed| random_x::<u32>(seed)),
-                                    &(|seed| random_naturals(seed, 32)))
-                .take(LARGE_LIMIT) {
+    for (n, u, m) in random_triples(
+        &EXAMPLE_SEED,
+        &(|seed| random_naturals(seed, 32)),
+        &(|seed| random_x::<u32>(seed)),
+        &(|seed| random_naturals(seed, 32)),
+    ).take(LARGE_LIMIT)
+    {
         natural_u32_and_natural(n, u, m);
     }
 
-    for (u, n, v) in exhaustive_triples(exhaustive_u::<u32>(),
-                                        exhaustive_naturals(),
-                                        exhaustive_u::<u32>())
-                .take(LARGE_LIMIT) {
+    for (u, n, v) in exhaustive_triples(
+        exhaustive_u::<u32>(),
+        exhaustive_naturals(),
+        exhaustive_u::<u32>(),
+    ).take(LARGE_LIMIT)
+    {
         u32_natural_and_u32(u, n, v);
     }
 
-    for (u, n, v) in random_triples(&EXAMPLE_SEED,
-                                    &(|seed| random_x::<u32>(seed)),
-                                    &(|seed| random_naturals(seed, 32)),
-                                    &(|seed| random_x::<u32>(seed)))
-                .take(LARGE_LIMIT) {
+    for (u, n, v) in random_triples(
+        &EXAMPLE_SEED,
+        &(|seed| random_x::<u32>(seed)),
+        &(|seed| random_naturals(seed, 32)),
+        &(|seed| random_x::<u32>(seed)),
+    ).take(LARGE_LIMIT)
+    {
         u32_natural_and_u32(u, n, v);
     }
 }
