@@ -38,37 +38,6 @@ impl Integer {
     }
 
     //TODO test
-    pub fn set_bit(&mut self, index: u64) {
-        if let Small(ref mut x) = *self {
-            if index < 31 {
-                *x |= 1 << index;
-                return;
-            }
-        }
-        self.promote_in_place();
-        if let Large(ref mut x) = *self {
-            unsafe {
-                gmp::mpz_setbit(x, index.into());
-            }
-        }
-    }
-
-    //TODO test
-    pub fn clear_bit(&mut self, index: u64) {
-        match *self {
-            Small(ref mut x) => {
-                if index < 31 {
-                    *x &= !(1 << index);
-                }
-            }
-            Large(ref mut x) => unsafe {
-                gmp::mpz_clrbit(x, index.into());
-            },
-        }
-        self.demote_if_small();
-    }
-
-    //TODO test
     pub fn assign_bit(&mut self, index: u64, val: bool) {
         if val {
             self.set_bit(index);
@@ -78,10 +47,12 @@ impl Integer {
     }
 }
 
+pub mod clear_bit;
 pub mod from_sign_and_limbs;
 pub mod from_twos_complement_limbs;
 pub mod get_bit;
 pub mod not;
+pub mod set_bit;
 pub mod sign_and_limbs;
 pub mod significant_bits;
 pub mod trailing_zeros;

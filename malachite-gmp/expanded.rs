@@ -25,21 +25,6 @@ pub mod integer {
     use std::os::raw::{c_char, c_int, c_long, c_ulong};
     use std::slice;
     use std::str::FromStr;
-    /// Assigns to a number from another value.
-    pub trait Assign<Rhs = Self> {
-        /// Peforms the assignement.
-        fn assign(&mut self, rhs: Rhs);
-    }
-    /// Negates the value inside `self`.
-    pub trait NegAssign {
-        /// Peforms the negation.
-        fn neg_assign(&mut self);
-    }
-    /// Peforms a bitwise complement of the value inside `self`.
-    pub trait NotAssign {
-        /// Peforms the complement.
-        fn not_assign(&mut self);
-    }
     /// Subtract and assigns the result to the rhs operand.
     ///
     /// `rhs.sub_from_assign(lhs)` has the same effect as
@@ -107,80 +92,6 @@ pub mod integer {
     pub trait PowAssign<Rhs> {
         /// Peforms the power operation.
         fn pow_assign(&mut self, rhs: Rhs);
-    }
-    /// An arbitrary-precision integer.
-    ///
-    /// Standard arithmetic operations, bitwise operations and comparisons
-    /// are supported. In standard arithmetic operations such as addition,
-    /// you can mix `Integer` and primitive integer types; the result will
-    /// be an `Integer`.
-    ///
-    /// Internally the integer is not stored using two's-complement
-    /// representation, however, for bitwise operations and shifts, the
-    /// functionality is the same as if the representation was using two's
-    /// complement.
-    ///
-    /// # Examples
-    ///
-    /// ```rust
-    /// use gmp_to_flint_adaptor_lib::integer::Integer;
-    ///
-    /// let mut i = Integer::from(1);
-    /// i = i << 1000;
-    /// // i is now 1000000... (1000 zeros)
-    /// assert!(i.significant_bits() == 1001);
-    /// assert!(i.find_one(0) == Some(1000));
-    /// i -= 1;
-    /// // i is now 111111... (1000 ones)
-    /// assert!(i.count_ones() == Some(1000));
-    ///
-    /// let a = Integer::from(0xf00d);
-    /// let all_ones_xor_a = Integer::from(-1) ^ &a;
-    /// // a is unchanged as we borrowed it
-    /// let complement_a = !a;
-    /// // now a has been moved, so this would cause an error:
-    /// // assert!(a > 0);
-    /// assert!(all_ones_xor_a == complement_a);
-    /// assert!(complement_a == -0xf00e);
-    /// assert!(format!("{:x}", complement_a) == "-f00e");
-    /// ```
-    pub struct Integer {
-        inner: mpz_t,
-    }
-    pub struct IntegerU32s<'a> {
-        x: &'a Integer,
-        i: u32,
-        mask: u32,
-        length: u32,
-    }
-    impl<'a> IntegerU32s<'a> {
-        pub fn new(x: &'a Integer) -> IntegerU32s {
-            IntegerU32s {
-                x: x,
-                i: 0,
-                mask: 1,
-                length: x.significant_bits(),
-            }
-        }
-    }
-    impl<'a> Iterator for IntegerU32s<'a> {
-        type Item = u32;
-        fn next(&mut self) -> Option<u32> {
-            let mut val: u32 = 0;
-            while self.i < self.length {
-                if self.x.get_bit(self.i) {
-                    val |= self.mask;
-                }
-                self.mask <<= 1;
-                self.i += 1;
-                if self.mask == 0 {
-                    val = 0;
-                    self.mask = 1;
-                    return Some(val);
-                }
-            }
-            if val == 0 { None } else { Some(val) }
-        }
     }
     impl Integer {
         /// Converts to an `f64`, rounding towards zero.
@@ -364,10 +275,6 @@ pub mod integer {
             }
             self
         }
-        /// Compares the absolute values of `self` and `other`.
-        pub fn cmp_abs(&self, other: &Integer) -> Ordering {
-            unsafe { gmp::mpz_cmpabs(&self.inner, &other.inner).cmp(&0) }
-        }
 
         /// Returns the number of ones in `self` if the value >= 0.
         ///
@@ -439,9 +346,6 @@ pub mod integer {
                 gmp::mpz_combit(&mut self.inner, index.into());
             }
             self
-        }
-        pub fn to_u32s<'a>(&'a self) -> IntegerU32s<'a> {
-            IntegerU32s::new(self)
         }
         pub fn assign_bits_unsigned(&mut self, bits: &[bool]) {
             self.assign(0);
@@ -698,24 +602,6 @@ pub mod integer {
             Ok(i)
         }
     }
-    impl<'a> From<&'a Integer> for Integer {
-        #[doc = r" Constructs an `Integer` from"]
-        #[doc = "another `Integer`."]
-        fn from(t: &Integer) -> Integer {
-            let mut ret = Integer::new();
-            ret.assign(t);
-            ret
-        }
-    }
-    impl From<i32> for Integer {
-        #[doc = r" Constructs an `Integer` from"]
-        #[doc = "an `i32`."]
-        fn from(t: i32) -> Integer {
-            let mut ret = Integer::new();
-            ret.assign(t);
-            ret
-        }
-    }
     impl Assign<f64> for Integer {
         /// Assigns from an `f64`, rounding towards zero.
         fn assign(&mut self, val: f64) {
@@ -964,20 +850,6 @@ pub mod integer {
     impl BitXorAssign<Integer> for Integer {
         fn bitxor_assign(&mut self, op: Integer) {
             self.bitxor_assign(&op);
-        }
-    }
-    impl Not for Integer {
-        type Output = Integer;
-        fn not(mut self) -> Integer {
-            self.not_assign();
-            self
-        }
-    }
-    impl NotAssign for Integer {
-        fn not_assign(&mut self) {
-            unsafe {
-                gmp::mpz_com(&mut self.inner, &self.inner);
-            }
         }
     }
     unsafe fn mpz_tdiv_q(q: *mut mpz_t, n: *const mpz_t, d: *const mpz_t) {
@@ -1644,14 +1516,6 @@ pub mod integer {
             match other.partial_cmp(self) {
                 None => None,
                 Some(x) => Some(x.reverse()),
-            }
-        }
-    }
-    impl Hash for Integer {
-        fn hash<H: Hasher>(&self, state: &mut H) {
-            self.sign().hash(state);
-            for i in self.to_u32s() {
-                i.hash(state);
             }
         }
     }

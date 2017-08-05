@@ -1,0 +1,87 @@
+use integer::Integer;
+use natural::{LIMB_BITS, LIMB_BITS_MASK, LOG_LIMB_BITS};
+use natural::Natural::{self, Large, Small};
+
+impl Integer {
+    /// Sets the `index`th bit of a `Integer`, or the coefficient of 2^(`index`) in its binary
+    /// expansion, to 0.
+    ///
+    /// Time: worst case O(`index`)
+    ///
+    /// Additional memory: worst case O(`index`)
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_native::integer::Integer;
+    ///
+    /// let mut x = Integer::from(127);
+    /// x.clear_bit(0);
+    /// x.clear_bit(1);
+    /// x.clear_bit(3);
+    /// x.clear_bit(4);
+    /// assert_eq!(x.to_string(), "100");
+    ///
+    /// let mut x = Integer::from(-156);
+    /// x.clear_bit(2);
+    /// x.clear_bit(5);
+    /// x.clear_bit(6);
+    /// assert_eq!(x.to_string(), "-256");
+    /// ```
+    pub fn clear_bit(&mut self, index: u64) {
+        match *self {
+            Integer { sign: true, ref mut abs } => abs.clear_bit(index),
+            Integer { sign: false, ref mut abs } => abs.clear_bit_neg(index),
+        }
+    }
+}
+
+impl Natural {
+    // self cannot be zero
+    fn clear_bit_neg(&mut self, index: u64) {
+        mutate_with_possible_promotion!(self,
+                                        small,
+                                        limbs,
+                                        {
+                                            if index < LIMB_BITS as u64 {
+                                                Some(((*small - 1) | (1 << index)).wrapping_add(1))
+                                            } else {
+                                                None
+                                            }
+                                        },
+                                        {
+                                            let limb_index = (index >> LOG_LIMB_BITS) as usize;
+                                            let mask = index & LIMB_BITS_MASK as u64;
+                                            let mask = 1 << (mask as u32);
+                                            if limb_index < limbs.len() {
+                                                let mut zero_bound = 0;
+                                                // No index upper bound on this loop; we're sure
+                                                // there's a nonzero limb sooner or later.
+                                                while limbs[zero_bound] == 0 {
+                                                    zero_bound += 1;
+                                                }
+                                                if limb_index > zero_bound {
+                                                    limbs[limb_index] |= mask;
+                                                } else if limb_index == zero_bound {
+                    let dlimb = ((limbs[limb_index] - 1) | mask) + 1;
+                    limbs[limb_index] = dlimb;
+                    if dlimb == 0 {
+                        limbs.push(0);
+                        for limb in limbs.iter_mut().skip(limb_index + 1) {
+                            let (sum, overflow) = (*limb).overflowing_add(1);
+                            *limb = sum;
+                            if !overflow {
+                                break;
+                            }
+                        }
+                        if *limbs.last().unwrap() == 0 {
+                            limbs.pop();
+                        }
+                    }
+                }
+                                            } else {
+                                                limbs.resize(limb_index, 0);
+                                                limbs.push(mask);
+                                            }
+                                        });
+    }
+}

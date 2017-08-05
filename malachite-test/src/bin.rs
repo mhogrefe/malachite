@@ -32,10 +32,12 @@ use malachite_test::integer::conversion::to_i64::*;
 use malachite_test::integer::conversion::to_natural::*;
 use malachite_test::integer::conversion::to_u32::*;
 use malachite_test::integer::conversion::to_u64::*;
+use malachite_test::integer::logic::clear_bit::*;
 use malachite_test::integer::logic::from_sign_and_limbs::*;
 use malachite_test::integer::logic::from_twos_complement_limbs::*;
 use malachite_test::integer::logic::get_bit::*;
 use malachite_test::integer::logic::not::*;
+use malachite_test::integer::logic::set_bit::*;
 use malachite_test::integer::logic::sign_and_limbs::*;
 use malachite_test::integer::logic::significant_bits::*;
 use malachite_test::integer::logic::trailing_zeros::*;
@@ -107,6 +109,7 @@ fn main() {
                 }
                 "exhaustive_integer_assign_u32" => demo_exhaustive_integer_assign_u32(limit),
                 "exhaustive_integer_assign_u64" => demo_exhaustive_integer_assign_u64(limit),
+                "exhaustive_integer_clear_bit" => demo_exhaustive_integer_clear_bit(limit),
                 "exhaustive_integer_clone" => demo_exhaustive_integer_clone(limit),
                 "exhaustive_integer_clone_from" => demo_exhaustive_integer_clone_from(limit),
                 "exhaustive_integer_cmp" => demo_exhaustive_integer_cmp(limit),
@@ -181,6 +184,7 @@ fn main() {
                 "exhaustive_integer_partial_eq_natural" => {
                     demo_exhaustive_integer_partial_eq_natural(limit)
                 }
+                "exhaustive_integer_set_bit" => demo_exhaustive_integer_set_bit(limit),
                 "exhaustive_integer_sign" => demo_exhaustive_integer_sign(limit),
                 "exhaustive_integer_sign_and_limbs_le" => {
                     demo_exhaustive_integer_sign_and_limbs_le(limit)
@@ -335,6 +339,7 @@ fn main() {
                 }
                 "random_integer_assign_u32" => demo_random_integer_assign_u32(limit),
                 "random_integer_assign_u64" => demo_random_integer_assign_u64(limit),
+                "random_integer_clear_bit" => demo_random_integer_clear_bit(limit),
                 "random_integer_clone" => demo_random_integer_clone(limit),
                 "random_integer_clone_from" => demo_random_integer_clone_from(limit),
                 "random_integer_cmp" => demo_random_integer_cmp(limit),
@@ -393,6 +398,7 @@ fn main() {
                 "random_integer_partial_eq_natural" => {
                     demo_random_integer_partial_eq_natural(limit)
                 }
+                "random_integer_set_bit" => demo_random_integer_set_bit(limit),
                 "random_integer_sign" => demo_random_integer_sign(limit),
                 "random_integer_sign_and_limbs_le" => demo_random_integer_sign_and_limbs_le(limit),
                 "random_integer_sign_and_limbs_be" => demo_random_integer_sign_and_limbs_be(limit),
@@ -532,6 +538,9 @@ fn main() {
                 "exhaustive_integer_assign_u64" => {
                     benchmark_exhaustive_integer_assign_u64(limit, "temp.gp")
                 }
+                "exhaustive_integer_clear_bit" => {
+                    benchmark_exhaustive_integer_clear_bit(limit, "temp.gp")
+                }
                 "exhaustive_integer_clone" => benchmark_exhaustive_integer_clone(limit, "temp.gp"),
                 "exhaustive_integer_clone_from" => {
                     benchmark_exhaustive_integer_clone_from(limit, "temp.gp")
@@ -624,6 +633,9 @@ fn main() {
                 }
                 "exhaustive_integer_partial_eq_natural" => {
                     benchmark_exhaustive_integer_partial_eq_natural(limit, "temp.gp")
+                }
+                "exhaustive_integer_set_bit" => {
+                    benchmark_exhaustive_integer_set_bit(limit, "temp.gp")
                 }
                 "exhaustive_integer_sign" => benchmark_exhaustive_integer_sign(limit, "temp.gp"),
                 "exhaustive_integer_sign_and_limbs_le" => {
@@ -888,6 +900,9 @@ fn main() {
                 "random_integer_assign_u64" => {
                     benchmark_random_integer_assign_u64(limit, 1024, "temp.gp")
                 }
+                "random_integer_clear_bit" => {
+                    benchmark_random_integer_clear_bit(limit, 1024, "temp.gp")
+                }
                 "random_integer_clone" => benchmark_random_integer_clone(limit, 1024, "temp.gp"),
                 "random_integer_clone_from" => {
                     benchmark_random_integer_clone_from(limit, 1024, "temp.gp")
@@ -975,6 +990,9 @@ fn main() {
                 }
                 "random_integer_partial_eq_natural" => {
                     benchmark_random_integer_partial_eq_natural(limit, 1024, "temp.gp")
+                }
+                "random_integer_set_bit" => {
+                    benchmark_random_integer_set_bit(limit, 1024, "temp.gp")
                 }
                 "random_integer_sign" => benchmark_random_integer_sign(limit, 1024, "temp.gp"),
                 "random_integer_sign_and_limbs_le" => {
@@ -1209,6 +1227,8 @@ fn main() {
                                                             "exhaustive_integer_assign_u32.gp");
                     benchmark_exhaustive_integer_assign_u64(100000,
                                                             "exhaustive_integer_assign_u64.gp");
+                    benchmark_exhaustive_integer_clear_bit(100000,
+                                                           "exhaustive_integer_clear_bit.gp");
                     benchmark_exhaustive_integer_clone(100000, "exhaustive_integer_clone.gp");
                     benchmark_exhaustive_integer_clone_from(100000,
                                                             "exhaustive_integer_clone_from.gp");
@@ -1265,6 +1285,7 @@ fn main() {
                     benchmark_exhaustive_u32_partial_eq_integer(100000, s);
                     let s = "exhaustive_integer_partial_eq_natural.gp";
                     benchmark_exhaustive_integer_partial_eq_natural(100000, s);
+                    benchmark_exhaustive_integer_set_bit(100000, "exhaustive_integer_set_bit.gp");
                     benchmark_exhaustive_integer_sign(100000, "exhaustive_integer_sign.gp");
                     let s = "exhaustive_integer_sign_and_limbs_le.gp";
                     benchmark_exhaustive_integer_sign_and_limbs_le(100000, s);
@@ -1429,6 +1450,7 @@ fn main() {
                     benchmark_random_integer_assign_u64(100000,
                                                         1024,
                                                         "random_integer_assign_u64.gp");
+                    benchmark_random_integer_clear_bit(100000, 1024, "random_integer_clear_bit.gp");
                     benchmark_random_integer_clone(100000, 1024, "random_integer_clone.gp");
                     benchmark_random_integer_clone_from(100000,
                                                         1024,
@@ -1488,6 +1510,7 @@ fn main() {
                     benchmark_random_u32_partial_eq_integer(100000, 1024, s);
                     let s = "random_integer_partial_eq_natural.gp";
                     benchmark_random_integer_partial_eq_natural(100000, 1024, s);
+                    benchmark_random_integer_set_bit(100000, 1024, "random_integer_set_bit.gp");
                     benchmark_random_integer_sign(100000, 1024, "random_integer_sign.gp");
                     let s = "random_integer_sign_and_limbs_le.gp";
                     benchmark_random_integer_sign_and_limbs_le(100000, 1024, s);

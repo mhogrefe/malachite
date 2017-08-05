@@ -54,7 +54,7 @@ impl Natural {
         }
     }
 
-    fn trim(&mut self) {
+    pub(crate) fn trim(&mut self) {
         if let Large(ref mut xs) = *self {
             while !xs.is_empty() && xs.last().unwrap() == &0 {
                 xs.pop();
