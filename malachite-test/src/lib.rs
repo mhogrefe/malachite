@@ -10,6 +10,7 @@ pub mod integer {
         pub mod abs;
         pub mod add_i32;
         pub mod add_u32;
+        pub mod even_odd;
         pub mod neg;
         pub mod sub_i32;
         pub mod sub_u32;
@@ -49,7 +50,9 @@ pub mod integer {
         pub mod to_u64;
     }
     pub mod logic {
+        pub mod assign_bit;
         pub mod clear_bit;
+        pub mod flip_bit;
         pub mod from_sign_and_limbs;
         pub mod from_twos_complement_limbs;
         pub mod get_bit;

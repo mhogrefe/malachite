@@ -7,7 +7,9 @@ impl Integer {
     }
 }
 
+pub mod assign_bit;
 pub mod clear_bit;
+pub mod flip_bit;
 pub mod from_sign_and_limbs;
 pub mod from_twos_complement_limbs;
 pub mod get_bit;

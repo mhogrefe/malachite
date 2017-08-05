@@ -36,18 +36,11 @@ impl Integer {
             })
         }
     }
-
-    //TODO test
-    pub fn assign_bit(&mut self, index: u64, val: bool) {
-        if val {
-            self.set_bit(index);
-        } else {
-            self.clear_bit(index);
-        }
-    }
 }
 
+pub mod assign_bit;
 pub mod clear_bit;
+pub mod flip_bit;
 pub mod from_sign_and_limbs;
 pub mod from_twos_complement_limbs;
 pub mod get_bit;

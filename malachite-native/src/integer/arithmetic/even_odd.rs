@@ -3,6 +3,10 @@ use integer::Integer;
 impl Integer {
     /// Determines whether `self` is even.
     ///
+    /// Time: worst case O(1)
+    ///
+    /// Additional memory: worst case O(1)
+    ///
     /// # Examples
     /// ```
     /// use malachite_native::integer::Integer;
@@ -21,6 +25,10 @@ impl Integer {
     }
 
     /// Determines whether `self` is odd.
+    ///
+    /// Time: worst case O(1)
+    ///
+    /// Additional memory: worst case O(1)
     ///
     /// # Examples
     /// ```

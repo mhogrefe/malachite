@@ -328,25 +328,6 @@ pub mod integer {
         pub fn find_one(&self, start: u32) -> Option<u32> {
             bitcount_to_u32(unsafe { gmp::mpz_scan1(&self.inner, start.into()) })
         }
-        /// Sets the bit at location `index` to 1 if `val` is `true` or 0
-        /// if `val` is `false`.
-        pub fn set_bit(&mut self, index: u32, val: bool) -> &mut Integer {
-            unsafe {
-                if val {
-                    gmp::mpz_setbit(&mut self.inner, index.into());
-                } else {
-                    gmp::mpz_clrbit(&mut self.inner, index.into());
-                }
-            }
-            self
-        }
-        /// Toggles the bit at location `index`.
-        pub fn invert_bit(&mut self, index: u32) -> &mut Integer {
-            unsafe {
-                gmp::mpz_combit(&mut self.inner, index.into());
-            }
-            self
-        }
         pub fn assign_bits_unsigned(&mut self, bits: &[bool]) {
             self.assign(0);
             if bits.is_empty() {

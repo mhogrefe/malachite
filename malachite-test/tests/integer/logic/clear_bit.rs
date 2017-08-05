@@ -47,7 +47,7 @@ fn test_clear_bit() {
 #[test]
 fn clear_bit_properties() {
     // n.clear_bit(index) is equivalent for malachite-gmp and malachite-native.
-    // TODO n.clear_bit(index) is equivalent to n.assign_bit(index, false).
+    // n.clear_bit(index) is equivalent to n.assign_bit(index, false).
     // If n.get_bit(index), clearing and then setting at index won't do anything.
     // Setting a bit does not increase n.
     // If !n.get_bit(index), clearing at index won't do anything.
@@ -60,11 +60,11 @@ fn clear_bit_properties() {
 
         n.clear_bit(index);
         assert!(n.is_valid());
-        assert_eq!(gmp_integer_to_native(&gmp_n), n, "Invalid {} {}", n, index);
+        assert_eq!(gmp_integer_to_native(&gmp_n), n);
 
-        /*let mut n2 = old_n.clone();
+        let mut n2 = old_n.clone();
         n2.assign_bit(index, false);
-        assert_eq!(n2, n);*/
+        assert_eq!(n2, n);
 
         assert!(n <= old_n);
         if old_n.get_bit(index) {
