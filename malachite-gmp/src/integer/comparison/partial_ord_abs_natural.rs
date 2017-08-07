@@ -22,9 +22,9 @@ use traits::PartialOrdAbs;
 impl PartialOrdAbs<Natural> for Integer {
     fn partial_cmp_abs(&self, other: &Natural) -> Option<Ordering> {
         match (self, other) {
-            (&Integer::Small(x), &Natural::Small(y)) => (x.abs() as u32).partial_cmp(&y),
+            (&Integer::Small(x), &Natural::Small(y)) => (x.wrapping_abs() as u32).partial_cmp(&y),
             (&Integer::Small(x), &Natural::Large(ref y)) => {
-                0.partial_cmp(&unsafe { gmp::mpz_cmpabs_ui(y, x.abs() as u64) })
+                0.partial_cmp(&unsafe { gmp::mpz_cmpabs_ui(y, x.wrapping_abs() as u64) })
             }
             (&Integer::Large(ref x), &Natural::Small(y)) => {
                 (unsafe { gmp::mpz_cmpabs_ui(x, y.into()) }).partial_cmp(&0)
@@ -54,12 +54,12 @@ impl PartialOrdAbs<Natural> for Integer {
 impl PartialOrdAbs<Integer> for Natural {
     fn partial_cmp_abs(&self, other: &Integer) -> Option<Ordering> {
         match (self, other) {
-            (&Natural::Small(x), &Integer::Small(y)) => x.partial_cmp(&(y.abs() as u32)),
+            (&Natural::Small(x), &Integer::Small(y)) => x.partial_cmp(&(y.wrapping_abs() as u32)),
             (&Natural::Small(x), &Integer::Large(ref y)) => {
                 0.partial_cmp(&unsafe { gmp::mpz_cmpabs_ui(y, x.into()) })
             }
             (&Natural::Large(ref x), &Integer::Small(y)) => {
-                (unsafe { gmp::mpz_cmpabs_ui(x, y.abs() as u64) }).partial_cmp(&0)
+                (unsafe { gmp::mpz_cmpabs_ui(x, y.wrapping_abs() as u64) }).partial_cmp(&0)
             }
             (&Natural::Large(ref x), &Integer::Large(ref y)) => {
                 (unsafe { gmp::mpz_cmpabs(x, y) }).partial_cmp(&0)

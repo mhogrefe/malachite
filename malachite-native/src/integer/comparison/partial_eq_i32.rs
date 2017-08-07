@@ -15,7 +15,7 @@ use integer::Integer;
 /// ```
 impl PartialEq<i32> for Integer {
     fn eq(&self, other: &i32) -> bool {
-        self.sign == (*other >= 0) && self.abs == (other.abs() as u32)
+        self.sign == (*other >= 0) && self.abs == (other.wrapping_abs() as u32)
     }
 }
 
@@ -34,6 +34,6 @@ impl PartialEq<i32> for Integer {
 /// ```
 impl PartialEq<Integer> for i32 {
     fn eq(&self, other: &Integer) -> bool {
-        other.sign == (*self >= 0) && other.abs == (self.abs() as u32)
+        other.sign == (*self >= 0) && other.abs == (self.wrapping_abs() as u32)
     }
 }

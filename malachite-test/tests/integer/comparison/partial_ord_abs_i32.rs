@@ -62,13 +62,13 @@ fn partial_cmp_i32_properties() {
         let cmp_1 = n.partial_cmp_abs(&i);
         assert_eq!(gmp_n.partial_cmp_abs(&i), cmp_1);
         assert_eq!(n.partial_cmp_abs(&native::Integer::from(i)), cmp_1);
-        assert_eq!(n.abs_ref().partial_cmp(&(i.abs() as u32)), cmp_1);
+        assert_eq!(n.abs_ref().partial_cmp(&(i.wrapping_abs() as u32)), cmp_1);
 
         let cmp_2 = native_ord_abs::partial_cmp_abs(&i, &n);
         assert_eq!(gmp_ord_abs::partial_cmp_abs(&i, &gmp_n), cmp_2);
         assert_eq!(native::Integer::from(i).partial_cmp_abs(&n), cmp_2);
         assert_eq!(cmp_2, cmp_1.map(|o| o.reverse()));
-        assert_eq!((i.abs() as u32).partial_cmp(&n.abs_ref()), cmp_2);
+        assert_eq!((i.wrapping_abs() as u32).partial_cmp(&n.abs_ref()), cmp_2);
     };
 
     // n.lt_abs(i) and i.lt_abs(m) => n.lt_abs(m)
@@ -88,9 +88,9 @@ fn partial_cmp_i32_properties() {
     let i32_integer_and_i32 = |i: i32, gmp_n: gmp::Integer, j: i32| {
         let n = gmp_integer_to_native(&gmp_n);
         if native_ord_abs::lt_abs(&i, &n) && n.lt_abs(&j) {
-            assert!((i.abs() as u32) < (j.abs() as u32));
+            assert!((i.wrapping_abs() as u32) < (j.wrapping_abs() as u32));
         } else if native_ord_abs::gt_abs(&i, &n) && n.gt_abs(&j) {
-            assert!((i.abs() as u32) > (j.abs() as u32));
+            assert!((i.wrapping_abs() as u32) > (j.wrapping_abs() as u32));
         }
     };
 

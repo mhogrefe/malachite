@@ -19,6 +19,6 @@ use traits::Assign;
 impl Assign<i64> for Integer {
     fn assign(&mut self, other: i64) {
         self.sign = other >= 0;
-        self.abs.assign(other.abs() as u64);
+        self.abs.assign(other.wrapping_abs() as u64);
     }
 }

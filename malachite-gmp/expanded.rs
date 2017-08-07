@@ -968,20 +968,6 @@ pub mod integer {
             }
         }
     }
-    impl Shl<u32> for Integer {
-        type Output = Integer;
-        fn shl(mut self, op: u32) -> Integer {
-            self.shl_assign(op);
-            self
-        }
-    }
-    impl ShlAssign<u32> for Integer {
-        fn shl_assign(&mut self, op: u32) {
-            unsafe {
-                gmp::mpz_mul_2exp(&mut self.inner, &self.inner, op.into());
-            }
-        }
-    }
     impl Shr<u32> for Integer {
         type Output = Integer;
         fn shr(mut self, op: u32) -> Integer {

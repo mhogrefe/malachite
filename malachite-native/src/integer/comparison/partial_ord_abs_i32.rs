@@ -25,7 +25,7 @@ use traits::PartialOrdAbs;
 /// ```
 impl PartialOrdAbs<i32> for Integer {
     fn partial_cmp_abs(&self, other: &i32) -> Option<Ordering> {
-        self.abs.partial_cmp(&(other.abs() as u32))
+        self.abs.partial_cmp(&(other.wrapping_abs() as u32))
     }
 }
 
@@ -52,6 +52,6 @@ impl PartialOrdAbs<i32> for Integer {
 /// ```
 impl PartialOrdAbs<Integer> for i32 {
     fn partial_cmp_abs(&self, other: &Integer) -> Option<Ordering> {
-        (self.abs() as u32).partial_cmp(&other.abs)
+        (self.wrapping_abs() as u32).partial_cmp(&other.abs)
     }
 }

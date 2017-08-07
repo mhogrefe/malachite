@@ -18,7 +18,7 @@ impl From<i32> for Integer {
     fn from(i: i32) -> Integer {
         Integer {
             sign: i >= 0,
-            abs: Natural::from(i.abs() as u32),
+            abs: Natural::from(i.wrapping_abs() as u32),
         }
     }
 }

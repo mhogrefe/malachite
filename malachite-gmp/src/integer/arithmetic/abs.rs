@@ -60,7 +60,7 @@ impl Integer {
     /// ```
     pub fn natural_abs(mut self) -> Natural {
         match self {
-            Integer::Small(small) => Natural::Small(small.abs() as u32),
+            Integer::Small(small) => Natural::Small(small.wrapping_abs() as u32),
             Integer::Large(ref mut large) => unsafe {
                 let mut abs: mpz_t = mem::uninitialized();
                 gmp::mpz_init(&mut abs);
@@ -88,7 +88,7 @@ impl Integer {
     /// ```
     pub fn natural_abs_ref(&self) -> Natural {
         match *self {
-            Integer::Small(small) => Natural::Small(small.abs() as u32),
+            Integer::Small(small) => Natural::Small(small.wrapping_abs() as u32),
             Integer::Large(ref large) => unsafe {
                 let mut abs: mpz_t = mem::uninitialized();
                 gmp::mpz_init(&mut abs);

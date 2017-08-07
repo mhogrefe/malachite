@@ -32,7 +32,7 @@ impl PartialOrd<i32> for Integer {
         } else if *other >= 0 {
             Some(Ordering::Less)
         } else {
-            (other.abs() as u32).partial_cmp(&self.abs)
+            (other.wrapping_abs() as u32).partial_cmp(&self.abs)
         }
     }
 }
@@ -68,7 +68,7 @@ impl PartialOrd<Integer> for i32 {
         } else if *self >= 0 {
             Some(Ordering::Greater)
         } else {
-            other.abs.partial_cmp(&(self.abs() as u32))
+            other.abs.partial_cmp(&(self.wrapping_abs() as u32))
         }
     }
 }
