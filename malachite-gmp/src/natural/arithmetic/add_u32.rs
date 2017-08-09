@@ -57,7 +57,7 @@ impl<'a> Add<u32> for &'a Natural {
             }
             Large(ref large) => unsafe {
                 let mut result: mpz_t = mem::uninitialized();
-                gmp::mpz_init(&mut result);
+                gmp::mpz_init_set(&mut result, large);
                 gmp::mpz_add_ui(&mut result, large, other.into());
                 Large(result)
             },

@@ -212,43 +212,47 @@ pub fn benchmark_random_natural_add_u32(limit: usize, scale: u32, file_name: &st
     });
 }
 
-pub fn benchmark_exhaustive_natural_add_u32_ref(limit: usize, file_name: &str) {
-    println!("benchmarking exhaustive &Natural + u32");
+pub fn benchmark_exhaustive_natural_add_u32_evaluation_strategy(limit: usize, file_name: &str) {
+    println!("benchmarking exhaustive Natural + u32 evaluation strategy");
     benchmark_2(BenchmarkOptions2 {
         xs: exhaustive_pairs(exhaustive_naturals(), exhaustive_u::<u32>()),
-        function_f: &(|(n, u)| &n + u),
-        function_g: &(|(n, u): (native::Natural, u32)| &n + u),
-        x_cons: &(|p| p.clone()),
-        y_cons: &(|&(ref n, other)| (gmp_natural_to_native(n), other)),
+        function_f: &(|(n, u)| n + u),
+        function_g: &(|(n, u)| &n + u),
+        x_cons: &(|&(ref n, u)| (gmp_natural_to_native(n), u)),
+        y_cons: &(|&(ref n, u)| (gmp_natural_to_native(n), u)),
         x_param: &(|&(ref n, _)| n.significant_bits() as usize),
         limit: limit,
-        f_name: "malachite-gmp",
-        g_name: "malachite-native",
-        title: "\\\\&Natural + u32",
-        x_axis_label: "other",
+        f_name: "Natural + u32",
+        g_name: "\\\\&Natural + u32",
+        title: "Natural + u32 evaluation strategy",
+        x_axis_label: "n.significant\\\\_bits()",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),
     });
 }
 
-pub fn benchmark_random_natural_add_u32_ref(limit: usize, scale: u32, file_name: &str) {
-    println!("benchmarking random &Natural + u32");
+pub fn benchmark_random_natural_add_u32_evaluation_strategy(
+    limit: usize,
+    scale: u32,
+    file_name: &str,
+) {
+    println!("benchmarking random Natural + u32 evaluation strategy");
     benchmark_2(BenchmarkOptions2 {
         xs: random_pairs(
             &EXAMPLE_SEED,
             &(|seed| random_naturals(seed, scale)),
             &(|seed| random_x::<u32>(seed)),
         ),
-        function_f: &(|(n, u)| &n + u),
-        function_g: &(|(n, u): (native::Natural, u32)| &n + u),
-        x_cons: &(|p| p.clone()),
-        y_cons: &(|&(ref n, other)| (gmp_natural_to_native(n), other)),
+        function_f: &(|(n, u)| n + u),
+        function_g: &(|(n, u)| &n + u),
+        x_cons: &(|&(ref n, u)| (gmp_natural_to_native(n), u)),
+        y_cons: &(|&(ref n, u)| (gmp_natural_to_native(n), u)),
         x_param: &(|&(ref n, _)| n.significant_bits() as usize),
         limit: limit,
-        f_name: "malachite-gmp",
-        g_name: "malachite-native",
-        title: "\\\\&Natural + u32",
-        x_axis_label: "other",
+        f_name: "Natural + u32",
+        g_name: "\\\\&Natural + u32",
+        title: "Natural + u32 evaluation strategy",
+        x_axis_label: "n.significant\\\\_bits()",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),
     });
@@ -302,43 +306,47 @@ pub fn benchmark_random_u32_add_natural(limit: usize, scale: u32, file_name: &st
     });
 }
 
-pub fn benchmark_exhaustive_u32_add_natural_ref(limit: usize, file_name: &str) {
-    println!("benchmarking exhaustive u32 + &Natural");
+pub fn benchmark_exhaustive_u32_add_natural_evaluation_strategy(limit: usize, file_name: &str) {
+    println!("benchmarking exhaustive u32 + Natural evaluation strategy");
     benchmark_2(BenchmarkOptions2 {
         xs: exhaustive_pairs(exhaustive_u::<u32>(), exhaustive_naturals()),
-        function_f: &(|(u, n)| u + &n),
-        function_g: &(|(u, n): (u32, native::Natural)| u + &n),
-        x_cons: &(|p| p.clone()),
+        function_f: &(|(u, n)| u + n),
+        function_g: &(|(u, n)| u + &n),
+        x_cons: &(|&(u, ref n)| (u, gmp_natural_to_native(n))),
         y_cons: &(|&(u, ref n)| (u, gmp_natural_to_native(n))),
         x_param: &(|&(_, ref n)| n.significant_bits() as usize),
         limit: limit,
-        f_name: "malachite-gmp",
-        g_name: "malachite-native",
-        title: "u32 + \\\\&Natural",
-        x_axis_label: "other",
+        f_name: "u32 + Natural",
+        g_name: "u32 + \\\\&Natural",
+        title: "u32 + Natural evaluation strategy",
+        x_axis_label: "n.significant\\\\_bits()",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),
     });
 }
 
-pub fn benchmark_random_u32_add_natural_ref(limit: usize, scale: u32, file_name: &str) {
-    println!("benchmarking random u32 + &Natural");
+pub fn benchmark_random_u32_add_natural_evaluation_strategy(
+    limit: usize,
+    scale: u32,
+    file_name: &str,
+) {
+    println!("benchmarking exhaustive u32 + Natural evaluation strategy");
     benchmark_2(BenchmarkOptions2 {
         xs: random_pairs(
             &EXAMPLE_SEED,
             &(|seed| random_x::<u32>(seed)),
             &(|seed| random_naturals(seed, scale)),
         ),
-        function_f: &(|(u, n)| u + &n),
-        function_g: &(|(u, n): (u32, native::Natural)| u + &n),
-        x_cons: &(|p| p.clone()),
+        function_f: &(|(u, n)| u + n),
+        function_g: &(|(u, n)| u + &n),
+        x_cons: &(|&(u, ref n)| (u, gmp_natural_to_native(n))),
         y_cons: &(|&(u, ref n)| (u, gmp_natural_to_native(n))),
         x_param: &(|&(_, ref n)| n.significant_bits() as usize),
         limit: limit,
-        f_name: "malachite-gmp",
-        g_name: "malachite-native",
-        title: "u32 + \\\\&Natural",
-        x_axis_label: "other",
+        f_name: "u32 + Natural",
+        g_name: "u32 + \\\\&Natural",
+        title: "u32 + Natural evaluation strategy",
+        x_axis_label: "n.significant\\\\_bits()",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),
     });

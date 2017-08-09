@@ -137,6 +137,12 @@ impl<'a> Add<&'a Natural> for u32 {
 
 /// Adds a `u32` to a `Natural` in place.
 ///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = `self.significant_bits()`
+///
 /// # Examples
 /// ```
 /// use malachite_native::natural::Natural;

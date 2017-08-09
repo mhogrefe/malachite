@@ -2,7 +2,13 @@ use integer::Integer;
 use std::ops::{Add, AddAssign};
 use traits::Assign;
 
-/// Adds a `u32` to an `Integer`, taking ownership of the input `Integer`.
+/// Adds a `u32` to an `Integer`, taking the `Integer` by value.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = `self.significant_bits()`
 ///
 /// ```
 /// use malachite_native::integer::Integer;
@@ -23,7 +29,65 @@ impl Add<u32> for Integer {
     }
 }
 
-/// Adds an `Integer` to a `u32`, taking ownership of the input `Integer`.
+/// Adds a `u32` to an `Integer`, taking the `Integer` by reference.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(n)
+///
+/// where n = `self.significant_bits()`
+///
+/// # Examples
+/// ```
+/// use malachite_native::integer::Integer;
+/// use std::str::FromStr;
+///
+/// assert_eq!((&Integer::from(0) + 123u32).to_string(), "123");
+/// assert_eq!((&Integer::from(-123) + 0u32).to_string(), "-123");
+/// assert_eq!((&Integer::from(-123) + 456u32).to_string(), "333");
+/// assert_eq!((&Integer::from_str("-1000000000000").unwrap() + 123u32).to_string(),
+///            "-999999999877");
+/// ```
+impl<'a> Add<u32> for &'a Integer {
+    type Output = Integer;
+
+    fn add(self, other: u32) -> Integer {
+        if other == 0 {
+            return self.clone();
+        }
+        if *self == 0 {
+            return Integer::from(other);
+        }
+        match *self {
+            // e.g. 10 + 5; self stays positive
+            Integer {
+                sign: true,
+                ref abs,
+            } => Integer {
+                sign: true,
+                abs: abs + other,
+            },
+            // e.g. -10 + 5; self stays negative
+            Integer {
+                sign: false,
+                ref abs,
+            } if *abs > other => Integer {
+                sign: false,
+                abs: (abs - other).unwrap(),
+            },
+            // e.g. -5 + 10 or -5 + 5; self becomes non-negative
+            Integer { ref abs, .. } => Integer::from(other - abs.to_u32().unwrap()),
+        }
+    }
+}
+
+/// Adds an `Integer` to a `u32`, taking the `Integer` by value.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = `other.significant_bits()`
 ///
 /// ```
 /// use malachite_native::integer::Integer;
@@ -44,7 +108,40 @@ impl Add<Integer> for u32 {
     }
 }
 
+/// Adds an `Integer` to a `u32`, taking the `Integer` by reference.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(n)
+///
+/// where n = `other.significant_bits()`
+///
+/// # Examples
+/// ```
+/// use malachite_native::integer::Integer;
+/// use std::str::FromStr;
+///
+/// assert_eq!((123u32 + &Integer::from(0)).to_string(), "123");
+/// assert_eq!((0u32 + &Integer::from(-123)).to_string(), "-123");
+/// assert_eq!((456u32 + &Integer::from(-123)).to_string(), "333");
+/// assert_eq!((123u32 + &Integer::from_str("-1000000000000").unwrap()).to_string(),
+///            "-999999999877");
+/// ```
+impl<'a> Add<&'a Integer> for u32 {
+    type Output = Integer;
+
+    fn add(self, other: &'a Integer) -> Integer {
+        other + self
+    }
+}
+
 /// Adds a `u32` to an `Integer` in place.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = `self.significant_bits()`
 ///
 /// # Examples
 /// ```

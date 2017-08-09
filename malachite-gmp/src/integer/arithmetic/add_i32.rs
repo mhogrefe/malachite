@@ -3,7 +3,7 @@ use integer::Integer::{self, Large, Small};
 use std::ops::{Add, AddAssign};
 use std::mem;
 
-/// Adds an `i32` to an `Integer`, taking ownership of the input `Integer`.
+/// Adds an `i32` to an `Integer`, taking the `Integer` by value.
 ///
 /// # Examples
 /// ```
@@ -25,7 +25,65 @@ impl Add<i32> for Integer {
     }
 }
 
-/// Adds an `Integer` to an `i32`, taking ownership of the input `Integer`.
+/// Adds an `i32` to an `Integer`, taking the `Integer` by reference.
+///
+/// # Examples
+/// ```
+/// use malachite_gmp::integer::Integer;
+/// use std::str::FromStr;
+///
+/// assert_eq!((&Integer::from(0) + -123i32).to_string(), "-123");
+/// assert_eq!((&Integer::from(-123) + 0i32).to_string(), "-123");
+/// assert_eq!((&Integer::from(-123) + -456i32).to_string(), "-579");
+/// assert_eq!((&Integer::from_str("-1000000000000").unwrap() + -123i32).to_string(),
+///            "-1000000000123");
+/// ```
+impl<'a> Add<i32> for &'a Integer {
+    type Output = Integer;
+
+    fn add(self, other: i32) -> Integer {
+        if other == 0 {
+            return self.clone();
+        }
+        match *self {
+            Small(small) => {
+                match small.checked_add(other) {
+                    Some(sum) => Small(sum),
+                    None => unsafe {
+                        let mut result: mpz_t = mem::uninitialized();
+                        gmp::mpz_init_set_si(&mut result, small.into());
+                        if other > 0 {
+                            gmp::mpz_add_ui(&mut result, &result, other as u64);
+                        } else {
+                            gmp::mpz_sub_ui(
+                                &mut result,
+                                &result,
+                                (other.wrapping_abs() as u32).into(),
+                            );
+                        }
+                        let mut result = Large(result);
+                        result.demote_if_small();
+                        result
+                    },
+                }
+            }
+            Large(ref large) => unsafe {
+                let mut result: mpz_t = mem::uninitialized();
+                gmp::mpz_init_set(&mut result, large);
+                if other > 0 {
+                    gmp::mpz_add_ui(&mut result, &result, other as u64);
+                } else {
+                    gmp::mpz_sub_ui(&mut result, &result, (other.wrapping_abs() as u32).into());
+                }
+                let mut result = Large(result);
+                result.demote_if_small();
+                result
+            },
+        }
+    }
+}
+
+/// Adds an `Integer` to an `i32`, taking the `Integer` by value.
 ///
 /// # Examples
 /// ```
@@ -44,6 +102,27 @@ impl Add<Integer> for i32 {
     fn add(self, mut other: Integer) -> Integer {
         other += self;
         other
+    }
+}
+
+/// Adds an `Integer` to an `i32`, taking the `Integer` by reference.
+///
+/// # Examples
+/// ```
+/// use malachite_gmp::integer::Integer;
+/// use std::str::FromStr;
+///
+/// assert_eq!((-123i32 + &Integer::from(0)).to_string(), "-123");
+/// assert_eq!((0i32 + &Integer::from(-123)).to_string(), "-123");
+/// assert_eq!((-456i32 + &Integer::from(-123)).to_string(), "-579");
+/// assert_eq!((-123i32 + &Integer::from_str("-1000000000000").unwrap()).to_string(),
+///            "-1000000000123");
+/// ```
+impl<'a> Add<&'a Integer> for i32 {
+    type Output = Integer;
+
+    fn add(self, other: &'a Integer) -> Integer {
+        other + self
     }
 }
 
@@ -74,9 +153,9 @@ impl AddAssign<i32> for Integer {
             },
             {
                 if other > 0 {
-                    unsafe { gmp::mpz_add_ui(large, large, other as gmp::limb_t) }
+                    unsafe { gmp::mpz_add_ui(large, large, other as u64) }
                 } else {
-                    unsafe { gmp::mpz_sub_ui(large, large, other.wrapping_neg() as gmp::limb_t) }
+                    unsafe { gmp::mpz_sub_ui(large, large, (other.wrapping_abs() as u32).into()) }
                 }
             }
         );
