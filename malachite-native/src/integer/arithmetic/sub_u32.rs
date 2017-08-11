@@ -1,8 +1,15 @@
 use integer::Integer;
+use natural::Natural;
 use std::ops::{Sub, SubAssign};
 use traits::{Assign, NegAssign};
 
-/// Subtracts a `u32` from an `Integer`, taking ownership of the input `Integer`.
+/// Subtracts a `u32` from an `Integer`, taking the `Integer` by value.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = `self.significant_bits()`
 ///
 /// ```
 /// use malachite_native::integer::Integer;
@@ -22,7 +29,67 @@ impl Sub<u32> for Integer {
     }
 }
 
-/// Subtracts an `Integer` from a `u32`, taking ownership of the input `Integer`.
+/// Subtracts a `u32` from an `Integer`, taking the `Integer` by reference.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(n)
+///
+/// where n = `self.significant_bits()`
+///
+/// # Examples
+/// ```
+/// use malachite_native::integer::Integer;
+/// use std::str::FromStr;
+///
+/// assert_eq!((&Integer::from(123) - 123u32).to_string(), "0");
+/// assert_eq!((&Integer::from(-123) - 0u32).to_string(), "-123");
+/// assert_eq!((&Integer::from(123) - 456u32).to_string(), "-333");
+/// assert_eq!((&Integer::from_str("1000000000000").unwrap() - 123u32).to_string(), "999999999877");
+/// ```
+impl<'a> Sub<u32> for &'a Integer {
+    type Output = Integer;
+
+    fn sub(self, other: u32) -> Integer {
+        if other == 0 {
+            return self.clone();
+        }
+        if *self == 0 {
+            return -Integer::from(other);
+        }
+        match *self {
+            // e.g. -10 - 5; self stays negative
+            Integer {
+                sign: false,
+                ref abs,
+            } => Integer {
+                sign: false,
+                abs: abs + other,
+            },
+            // e.g. 10 - 5 or 5 - 5; self stays non-negative
+            Integer {
+                sign: true,
+                ref abs,
+            } if *abs >= other => Integer {
+                sign: true,
+                abs: (abs - other).unwrap(),
+            },
+            // e.g. 5 - 10; self becomes negative
+            Integer { ref abs, .. } => Integer {
+                sign: false,
+                abs: Natural::from(other - abs.to_u32().unwrap()),
+            },
+        }
+    }
+}
+
+/// Subtracts an `Integer` from a `u32`, taking the `Integer` by value.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = `other.significant_bits()`
 ///
 /// ```
 /// use malachite_native::integer::Integer;
@@ -42,7 +109,40 @@ impl Sub<Integer> for u32 {
     }
 }
 
+/// Subtracts an `Integer` from a `u32`, taking the `Integer` by reference.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(n)
+///
+/// where n = `other.significant_bits()`
+///
+/// # Examples
+/// ```
+/// use malachite_native::integer::Integer;
+/// use std::str::FromStr;
+///
+/// assert_eq!((123u32 - &Integer::from(123)).to_string(), "0");
+/// assert_eq!((0u32 - &Integer::from(-123)).to_string(), "123");
+/// assert_eq!((456u32 - &Integer::from(123)).to_string(), "333");
+/// assert_eq!((123u32 - &Integer::from_str("1000000000000").unwrap()).to_string(),
+///            "-999999999877");
+/// ```
+impl<'a> Sub<&'a Integer> for u32 {
+    type Output = Integer;
+
+    fn sub(self, other: &'a Integer) -> Integer {
+        -(other - self)
+    }
+}
+
 /// Subtracts a `u32` from an `Integer` in place.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = `self.significant_bits()`
 ///
 /// # Examples
 /// ```

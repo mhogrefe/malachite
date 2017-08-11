@@ -15,7 +15,7 @@ use rust_wheels::iterators::tuples::{exhaustive_pairs, random_pairs};
 use std::str::FromStr;
 
 #[test]
-fn test_add_assign_i32() {
+fn test_add_i32() {
     #[allow(cyclomatic_complexity)]
     let test = |u, v: i32, out| {
         let mut n = native::Integer::from_str(u).unwrap();
@@ -185,8 +185,8 @@ fn add_i32_properties() {
     #[allow(identity_op)]
     let one_integer = |gmp_n: gmp::Integer| {
         let n = gmp_integer_to_native(&gmp_n);
-        assert_eq!(&n + 0, n);
-        assert_eq!(0 + &n, n);
+        assert_eq!(&n + 0i32, n);
+        assert_eq!(0i32 + &n, n);
     };
 
     // 0 + i == i

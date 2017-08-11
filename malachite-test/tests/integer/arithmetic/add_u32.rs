@@ -15,7 +15,7 @@ use rust_wheels::iterators::tuples::{exhaustive_pairs, random_pairs};
 use std::str::FromStr;
 
 #[test]
-fn test_add_assign_u32() {
+fn test_add_u32() {
     #[allow(cyclomatic_complexity)]
     let test = |u, v: u32, out| {
         let mut n = native::Integer::from_str(u).unwrap();
