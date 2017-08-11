@@ -1,4 +1,5 @@
 use integer::Integer;
+use natural::arithmetic::add_u32::large_add_u32;
 use natural::{LIMB_BITS, LIMB_BITS_MASK, LOG_LIMB_BITS};
 use natural::Natural::{self, Large, Small};
 
@@ -71,16 +72,8 @@ impl Natural {
                         let dlimb = ((limbs[limb_index] - 1) | mask) + 1;
                         limbs[limb_index] = dlimb;
                         if dlimb == 0 {
-                            limbs.push(0);
-                            for limb in limbs.iter_mut().skip(limb_index + 1) {
-                                let (sum, overflow) = (*limb).overflowing_add(1);
-                                *limb = sum;
-                                if !overflow {
-                                    break;
-                                }
-                            }
-                            if *limbs.last().unwrap() == 0 {
-                                limbs.pop();
+                            if large_add_u32(&mut limbs[limb_index + 1..], 1) {
+                                limbs.push(1);
                             }
                         }
                     }

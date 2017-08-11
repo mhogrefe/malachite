@@ -157,18 +157,7 @@ impl SubAssign<u32> for Natural {
                 }
             }
             Large(ref mut limbs) => {
-                let mut subtrahend = other;
-                for limb in limbs.iter_mut() {
-                    let (difference, overflow) = limb.overflowing_sub(subtrahend);
-                    *limb = difference;
-                    if overflow {
-                        subtrahend = 1;
-                    } else {
-                        subtrahend = 0;
-                        break;
-                    }
-                }
-                if subtrahend == 1 {
+                if large_sub_u32(&mut limbs[..], other) {
                     panic = true;
                 }
             }
@@ -182,4 +171,18 @@ impl SubAssign<u32> for Natural {
         }
         self.trim();
     }
+}
+
+pub(crate) fn large_sub_u32(limbs: &mut [u32], mut subtrahend: u32) -> bool {
+    for limb in limbs.iter_mut() {
+        let (difference, overflow) = limb.overflowing_sub(subtrahend);
+        *limb = difference;
+        if overflow {
+            subtrahend = 1;
+        } else {
+            subtrahend = 0;
+            break;
+        }
+    }
+    subtrahend == 1
 }

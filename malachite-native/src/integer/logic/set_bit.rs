@@ -1,4 +1,5 @@
 use integer::Integer;
+use natural::arithmetic::sub_u32::large_sub_u32;
 use natural::{LIMB_BITS, LIMB_BITS_MASK, LOG_LIMB_BITS};
 use natural::Natural::{self, Large, Small};
 
@@ -69,16 +70,7 @@ impl Natural {
                 } else if limb_index == zero_bound {
                     limbs[limb_index] = ((limbs[limb_index] - 1) & !mask) + 1;
                 } else {
-                    let mut subtrahend = mask;
-                    for limb in limbs.iter_mut().skip(limb_index) {
-                        let (difference, overflow) = limb.overflowing_sub(subtrahend);
-                        *limb = difference;
-                        if overflow {
-                            subtrahend = 1;
-                        } else {
-                            break;
-                        }
-                    }
+                    large_sub_u32(&mut limbs[limb_index..], mask);
                 }
             }
         }

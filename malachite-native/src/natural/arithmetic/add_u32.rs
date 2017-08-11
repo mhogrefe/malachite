@@ -171,21 +171,24 @@ impl AddAssign<u32> for Natural {
                 small.checked_add(other)
             },
             {
-                let mut addend = other;
-                for limb in limbs.iter_mut() {
-                    let (sum, overflow) = limb.overflowing_add(addend);
-                    *limb = sum;
-                    if overflow {
-                        addend = 1;
-                    } else {
-                        addend = 0;
-                        break;
-                    }
-                }
-                if addend == 1 {
+                if large_add_u32(&mut limbs[..], other) {
                     limbs.push(1);
                 }
             }
         );
     }
+}
+
+pub(crate) fn large_add_u32(limbs: &mut [u32], mut addend: u32) -> bool {
+    for limb in limbs.iter_mut() {
+        let (sum, overflow) = limb.overflowing_add(addend);
+        *limb = sum;
+        if overflow {
+            addend = 1;
+        } else {
+            addend = 0;
+            break;
+        }
+    }
+    addend == 1
 }
