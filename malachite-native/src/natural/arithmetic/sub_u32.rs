@@ -184,5 +184,5 @@ pub(crate) fn large_sub_u32(limbs: &mut [u32], mut subtrahend: u32) -> bool {
             break;
         }
     }
-    subtrahend == 1
+    subtrahend != 0
 }

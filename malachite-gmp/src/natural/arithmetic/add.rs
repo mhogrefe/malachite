@@ -20,7 +20,7 @@ impl Add<Natural> for Natural {
     type Output = Natural;
 
     fn add(mut self, mut other: Natural) -> Natural {
-        if self.limb_count() >= other.limb_count() {
+        if self.significant_bits() >= other.significant_bits() {
             self += other;
             self
         } else {

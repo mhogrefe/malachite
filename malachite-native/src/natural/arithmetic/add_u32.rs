@@ -190,5 +190,5 @@ pub(crate) fn large_add_u32(limbs: &mut [u32], mut addend: u32) -> bool {
             break;
         }
     }
-    addend == 1
+    addend != 0
 }

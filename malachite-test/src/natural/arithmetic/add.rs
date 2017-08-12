@@ -28,7 +28,7 @@ pub fn demo_exhaustive_natural_add_assign_ref(limit: usize) {
     for (mut x, y) in exhaustive_pairs_from_single(exhaustive_naturals()).take(limit) {
         let x_old = x.clone();
         x += &y;
-        println!("x := {}; x += {}; x = {}", x_old, y, x);
+        println!("x := {}; x += &{}; x = {}", x_old, y, x);
     }
 }
 
@@ -36,7 +36,7 @@ pub fn demo_random_natural_add_assign_ref(limit: usize) {
     for (mut x, y) in random_pairs_from_single(random_naturals(&EXAMPLE_SEED, 32)).take(limit) {
         let x_old = x.clone();
         x += &y;
-        println!("x := {}; x += {}; x = {}", x_old, y, x);
+        println!("x := {}; x += &{}; x = {}", x_old, y, x);
     }
 }
 

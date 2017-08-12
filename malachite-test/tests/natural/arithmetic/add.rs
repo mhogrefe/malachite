@@ -100,6 +100,7 @@ fn add_properties() {
     // x + y is equivalent for malachite-gmp, malachite-native, num, and rugint.
     // x += y, x += &y, x + y, x + &y, &x + y, and &x + &y give the same result.
     // x + y == y + x
+    // x + y >= x and x + y >= y
     #[allow(cyclomatic_complexity)]
     let two_naturals = |gmp_x: gmp::Natural, gmp_y: gmp::Natural| {
         let x = gmp_natural_to_native(&gmp_x);
@@ -168,6 +169,9 @@ fn add_properties() {
         assert_eq!(reverse_sum, sum);
         assert_eq!(inv_1, y);
         assert_eq!(inv_2, x);
+
+        assert!(sum >= x);
+        assert!(sum >= y);
     };
 
     // x + (y: u32) == x + from(y)
