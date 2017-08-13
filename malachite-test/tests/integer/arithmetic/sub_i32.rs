@@ -148,13 +148,12 @@ fn sub_i32_properties() {
         assert_eq!(result, -&n);
         assert!(result.is_valid());
 
-        //TODO
-        /*let n2 = old_n.clone();
+        let n2 = old_n.clone();
         let result = n2 - native::Integer::from(i);
         assert_eq!(result, n);
         let n2 = old_n.clone();
         let result = native::Integer::from(i) - n2;
-        assert_eq!(result, n);*/
+        assert_eq!(result, -&n);
 
         let gmp_n2 = native_integer_to_gmp(&old_n);
         let result = &gmp_n2 - i;
@@ -178,8 +177,8 @@ fn sub_i32_properties() {
         let rugint_n2 = native_integer_to_rugint(&old_n);
         assert_eq!(rugint_integer_to_native(&(rugint_n2 - i)), n);
 
-        assert_eq!(n + i, old_n);
-        //TODO assert_eq!(old_n - n, i);
+        assert_eq!(&n + i, old_n);
+        assert_eq!(old_n - n, i);
     };
 
     // n - 0 == n

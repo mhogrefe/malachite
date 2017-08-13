@@ -159,14 +159,14 @@ fn add_properties() {
         assert_eq!(rugint_integer_to_native(&mut_x), sum);
 
         let reverse_sum = &y + &x;
-        //TODO let inv_1 = &sum - &x;
-        //TODO let inv_2 = &sum - &y;
+        let inv_1 = &sum - &x;
+        let inv_2 = &sum - &y;
         assert_eq!(gmp_sum, sum);
         assert_eq!(num_sum, sum);
         assert_eq!(rugint_sum, sum);
         assert_eq!(reverse_sum, sum);
-        //TODO assert_eq!(inv_1, y);
-        //TODO assert_eq!(inv_2, x);
+        assert_eq!(inv_1, y);
+        assert_eq!(inv_2, x);
     };
 
     // x + (y: i32) == x + from(y)

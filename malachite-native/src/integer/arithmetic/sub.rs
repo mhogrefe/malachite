@@ -1,8 +1,9 @@
 use integer::Integer;
 use std::mem::swap;
-use std::ops::{Add, AddAssign};
+use std::ops::{Sub, SubAssign};
+use traits::NegAssign;
 
-/// Adds an `Integer` to an `Integer`, taking both `Integer`s by value.
+/// Subtracts an `Integer` from an `Integer`, taking both `Integer`s by value.
 ///
 /// Time: worst case O(n)
 ///
@@ -15,28 +16,28 @@ use std::ops::{Add, AddAssign};
 /// use malachite_native::integer::Integer;
 /// use std::str::FromStr;
 ///
-/// assert_eq!((Integer::from(0) + Integer::from(123)).to_string(), "123");
-/// assert_eq!((Integer::from(-123) + Integer::from(0)).to_string(), "-123");
-/// assert_eq!((Integer::from(-123) + Integer::from(456)).to_string(), "333");
-/// assert_eq!((Integer::from_str("-1000000000000").unwrap() + Integer::from_str("2000000000000")
+/// assert_eq!((Integer::from(0) - Integer::from(123)).to_string(), "-123");
+/// assert_eq!((Integer::from(123) - Integer::from(0)).to_string(), "123");
+/// assert_eq!((Integer::from(456) - Integer::from(-123)).to_string(), "579");
+/// assert_eq!((Integer::from_str("-1000000000000").unwrap() - Integer::from_str("-2000000000000")
 ///            .unwrap()).to_string(), "1000000000000");
 /// ```
-impl Add<Integer> for Integer {
+impl Sub<Integer> for Integer {
     type Output = Integer;
 
-    fn add(mut self, mut other: Integer) -> Integer {
+    fn sub(mut self, mut other: Integer) -> Integer {
         if self.abs.limb_count() >= other.abs.limb_count() {
-            self += other;
+            self -= other;
             self
         } else {
-            other += self;
-            other
+            other -= self;
+            -other
         }
     }
 }
 
-/// Adds an `Integer` to an `Integer`, taking the left `Integer` by value and the right `Integer` by
-/// reference.
+/// Subtracts an `Integer` from an `Integer`, taking the left `Integer` by value and the right
+/// `Integer` by reference.
 ///
 /// Time: worst case O(n)
 ///
@@ -49,22 +50,22 @@ impl Add<Integer> for Integer {
 /// use malachite_native::integer::Integer;
 /// use std::str::FromStr;
 ///
-/// assert_eq!((Integer::from(0) + &Integer::from(123)).to_string(), "123");
-/// assert_eq!((Integer::from(-123) + &Integer::from(0)).to_string(), "-123");
-/// assert_eq!((Integer::from(-123) + &Integer::from(456)).to_string(), "333");
-/// assert_eq!((Integer::from_str("-1000000000000").unwrap() + &Integer::from_str("2000000000000")
+/// assert_eq!((Integer::from(0) - &Integer::from(123)).to_string(), "-123");
+/// assert_eq!((Integer::from(123) - &Integer::from(0)).to_string(), "123");
+/// assert_eq!((Integer::from(456) - &Integer::from(-123)).to_string(), "579");
+/// assert_eq!((Integer::from_str("-1000000000000").unwrap() - &Integer::from_str("-2000000000000")
 ///            .unwrap()).to_string(), "1000000000000");
 /// ```
-impl<'a> Add<&'a Integer> for Integer {
+impl<'a> Sub<&'a Integer> for Integer {
     type Output = Integer;
 
-    fn add(mut self, other: &'a Integer) -> Integer {
-        self += other;
+    fn sub(mut self, other: &'a Integer) -> Integer {
+        self -= other;
         self
     }
 }
 
-/// Adds an `Integer` to an `Integer`, taking the left `Integer` by reference and the right
+/// Subtracts an `Integer` from an `Integer`, taking the left `Integer` by reference and the right
 /// `Integer` by value.
 ///
 /// Time: worst case O(n)
@@ -78,22 +79,22 @@ impl<'a> Add<&'a Integer> for Integer {
 /// use malachite_native::integer::Integer;
 /// use std::str::FromStr;
 ///
-/// assert_eq!((&Integer::from(0) + Integer::from(123)).to_string(), "123");
-/// assert_eq!((&Integer::from(-123) + Integer::from(0)).to_string(), "-123");
-/// assert_eq!((&Integer::from(-123) + Integer::from(456)).to_string(), "333");
-/// assert_eq!((&Integer::from_str("-1000000000000").unwrap() + Integer::from_str("2000000000000")
+/// assert_eq!((&Integer::from(0) - Integer::from(123)).to_string(), "-123");
+/// assert_eq!((&Integer::from(123) - Integer::from(0)).to_string(), "123");
+/// assert_eq!((&Integer::from(456) - Integer::from(-123)).to_string(), "579");
+/// assert_eq!((&Integer::from_str("-1000000000000").unwrap() - Integer::from_str("-2000000000000")
 ///            .unwrap()).to_string(), "1000000000000");
 /// ```
-impl<'a> Add<Integer> for &'a Integer {
+impl<'a> Sub<Integer> for &'a Integer {
     type Output = Integer;
 
-    fn add(self, mut other: Integer) -> Integer {
-        other += self;
-        other
+    fn sub(self, mut other: Integer) -> Integer {
+        other -= self;
+        -other
     }
 }
 
-/// Adds an `Integer` to an `Integer`, taking both `Integer`s by reference.
+/// Subtracts an `Integer` from an `Integer`, taking both `Integer`s by reference.
 ///
 /// Time: worst case O(n)
 ///
@@ -106,23 +107,23 @@ impl<'a> Add<Integer> for &'a Integer {
 /// use malachite_native::integer::Integer;
 /// use std::str::FromStr;
 ///
-/// assert_eq!((&Integer::from(0) + &Integer::from(123)).to_string(), "123");
-/// assert_eq!((&Integer::from(-123) + &Integer::from(0)).to_string(), "-123");
-/// assert_eq!((&Integer::from(-123) + &Integer::from(456)).to_string(), "333");
-/// assert_eq!((&Integer::from_str("-1000000000000").unwrap() + &Integer::from_str("2000000000000")
+/// assert_eq!((&Integer::from(0) - &Integer::from(123)).to_string(), "-123");
+/// assert_eq!((&Integer::from(123) - &Integer::from(0)).to_string(), "123");
+/// assert_eq!((&Integer::from(456) - &Integer::from(-123)).to_string(), "579");
+/// assert_eq!((&Integer::from_str("-1000000000000").unwrap() - &Integer::from_str("-2000000000000")
 ///            .unwrap()).to_string(), "1000000000000");
 /// ```
-impl<'a, 'b> Add<&'a Integer> for &'b Integer {
+impl<'a, 'b> Sub<&'a Integer> for &'b Integer {
     type Output = Integer;
 
-    fn add(self, other: &'a Integer) -> Integer {
+    fn sub(self, other: &'a Integer) -> Integer {
         if *self == 0 {
-            other.clone()
+            -other.clone()
         } else if *other == 0 {
             self.clone()
         } else {
             match (self, other) {
-                // e.g. 10 + 5 or -10 + -5; sign of result is sign of self
+                // e.g. 10 - -5 or -10 - 5; sign of result is sign of self
                 (&Integer {
                      sign: sx,
                      abs: ref ax,
@@ -130,11 +131,11 @@ impl<'a, 'b> Add<&'a Integer> for &'b Integer {
                  &Integer {
                      sign: sy,
                      abs: ref ay,
-                 }) if sx == (sy && *ay != 0) => Integer {
+                 }) if sx == (!sy && *ay != 0) => Integer {
                     sign: sx,
                     abs: ax + ay,
                 },
-                // e.g. 10 + -5, -10 + 5, or 5 + -5; sign of result is sign of self
+                // e.g. 10 - 5, -10 - -5, or 5 - 5; sign of result is sign of self
                 (&Integer {
                      sign: sx,
                      abs: ref ax,
@@ -143,13 +144,13 @@ impl<'a, 'b> Add<&'a Integer> for &'b Integer {
                     sign: sx,
                     abs: (ax - ay).unwrap(),
                 },
-                // e.g. 5 + -10, -5 + 10, or -5 + 5; sign of result is sign of other
+                // e.g. 5 - 10, -5 - -10, or -5 - -5; sign of result is opposite of sign of other
                 (&Integer { abs: ref ax, .. },
                  &Integer {
                      sign: sy,
                      abs: ref ay,
                  }) => Integer {
-                    sign: sy,
+                    sign: !sy,
                     abs: (ay - ax).unwrap(),
                 },
             }
@@ -157,7 +158,7 @@ impl<'a, 'b> Add<&'a Integer> for &'b Integer {
     }
 }
 
-/// Adds an `Integer` to an `Integer` in place, taking the `Integer` on the RHS by value.
+/// Subtracts an `Integer` from an `Integer` in place, taking the `Integer` on the RHS by value.
 ///
 /// Time: worst case O(n)
 ///
@@ -171,18 +172,19 @@ impl<'a, 'b> Add<&'a Integer> for &'b Integer {
 /// use std::str::FromStr;
 ///
 /// let mut x = Integer::new();
-/// x += Integer::from_str("-1000000000000").unwrap();
-/// x += Integer::from_str("2000000000000").unwrap();
-/// x += Integer::from_str("-3000000000000").unwrap();
-/// x += Integer::from_str("4000000000000").unwrap();
-/// assert_eq!(x.to_string(), "2000000000000");
+/// x -= Integer::from_str("-1000000000000").unwrap();
+/// x -= Integer::from_str("2000000000000").unwrap();
+/// x -= Integer::from_str("-3000000000000").unwrap();
+/// x -= Integer::from_str("4000000000000").unwrap();
+/// assert_eq!(x.to_string(), "-2000000000000");
 /// ```
-impl AddAssign<Integer> for Integer {
-    fn add_assign(&mut self, mut other: Integer) {
+impl SubAssign<Integer> for Integer {
+    fn sub_assign(&mut self, mut other: Integer) {
         if other == 0 {
             return;
         } else if *self == 0 {
             *self = other;
+            self.neg_assign();
             return;
         }
         let add_strategy = match (&mut (*self), &other) {
@@ -190,7 +192,7 @@ impl AddAssign<Integer> for Integer {
              &Integer {
                  sign: sy,
                  abs: ref ay,
-             }) if sx == (sy && *ay != 0) => 0,
+             }) if sx == (!sy && *ay != 0) => 0,
             (&mut Integer {
                  sign: sx,
                  abs: ref mut ax,
@@ -199,20 +201,21 @@ impl AddAssign<Integer> for Integer {
             _ => 2,
         };
         match add_strategy {
-            // e.g. 10 + 5 or -10 + -5; sign of self is unchanged
+            // e.g. 10 - -5 or -10 - 5; sign of self is unchanged
             0 => self.abs += other.abs,
-            // e.g. 10 + -5, -10 + 5, or 5 + -5; sign of self is unchanged
+            // e.g. 10 - 5, -10 - -5, or 5 - 5; sign of self is unchanged
             1 => self.abs -= &other.abs,
-            // e.g. 5 + -10, -5 + 10, or -5 + 5; sign of self is flipped
+            // e.g. 5 - 10, -5 - -10, or -5 - -5; sign of self is flipped
             _ => {
                 swap(self, &mut other);
                 self.abs -= &other.abs;
+                self.sign = !self.sign;
             }
         }
     }
 }
 
-/// Adds an `Integer` to an `Integer` in place, taking the `Integer` on the RHS by reference.
+/// Subtracts an `Integer` from an `Integer` in place, taking the `Integer` on the RHS by reference.
 ///
 /// Time: worst case O(n)
 ///
@@ -226,18 +229,18 @@ impl AddAssign<Integer> for Integer {
 /// use std::str::FromStr;
 ///
 /// let mut x = Integer::new();
-/// x += &Integer::from_str("-1000000000000").unwrap();
-/// x += &Integer::from_str("2000000000000").unwrap();
-/// x += &Integer::from_str("-3000000000000").unwrap();
-/// x += &Integer::from_str("4000000000000").unwrap();
-/// assert_eq!(x.to_string(), "2000000000000");
+/// x -= &Integer::from_str("-1000000000000").unwrap();
+/// x -= &Integer::from_str("2000000000000").unwrap();
+/// x -= &Integer::from_str("-3000000000000").unwrap();
+/// x -= &Integer::from_str("4000000000000").unwrap();
+/// assert_eq!(x.to_string(), "-2000000000000");
 /// ```
-impl<'a> AddAssign<&'a Integer> for Integer {
-    fn add_assign(&mut self, other: &'a Integer) {
+impl<'a> SubAssign<&'a Integer> for Integer {
+    fn sub_assign(&mut self, other: &'a Integer) {
         if *other == 0 {
             return;
         } else if *self == 0 {
-            *self = other.clone();
+            *self = -other.clone();
             return;
         }
         let add_strategy = match (&mut (*self), other) {
@@ -245,7 +248,7 @@ impl<'a> AddAssign<&'a Integer> for Integer {
              &Integer {
                  sign: sy,
                  abs: ref ay,
-             }) if sx == (sy && *ay != 0) => 0,
+             }) if sx == (!sy && *ay != 0) => 0,
             (&mut Integer {
                  sign: sx,
                  abs: ref mut ax,
@@ -254,14 +257,14 @@ impl<'a> AddAssign<&'a Integer> for Integer {
             _ => 2,
         };
         match add_strategy {
-            // e.g. 10 + 5 or -10 + -5; sign of self is unchanged
+            // e.g. 10 - -5 or -10 - 5; sign of self is unchanged
             0 => self.abs += &other.abs,
-            // e.g. 10 + -5, -10 + 5, or 5 + -5; sign of self is unchanged
+            // e.g. 10 - 5, -10 - -5, or 5 - 5; sign of self is unchanged
             1 => self.abs -= &other.abs,
-            // e.g. 5 + -10, -5 + 10, or -5 + 5; sign of self is flipped
+            // e.g. 5 - 10, -5 - -10, or -5 - -5; sign of self is flipped
             _ => {
                 *self = Integer {
-                    sign: other.sign,
+                    sign: !other.sign,
                     abs: (&other.abs - &self.abs).unwrap(),
                 }
             }

@@ -176,8 +176,8 @@ fn add_i32_properties() {
         let rugint_n2 = native_integer_to_rugint(&old_n);
         assert_eq!(rugint_integer_to_native(&(rugint_n2 + i)), n);
 
-        assert_eq!(n - i, old_n);
-        //TODO assert_eq!(n - old_n, i);
+        assert_eq!(&n - i, old_n);
+        assert_eq!(n - old_n, i);
     };
 
     // n + 0 == n

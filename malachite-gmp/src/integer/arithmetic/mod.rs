@@ -2,8 +2,7 @@ use gmp_mpfr_sys::gmp;
 use integer::Integer;
 use integer::Integer::*;
 use std::cmp::Ordering;
-use std::ops::{MulAssign, Sub, SubAssign};
-use std::os::raw::c_ulong;
+use std::ops::MulAssign;
 
 impl Integer {
     //TODO test
@@ -37,64 +36,6 @@ impl Integer {
                 }
             }
         }
-    }
-}
-
-//TODO test
-impl<'a> SubAssign<&'a Integer> for Integer {
-    fn sub_assign(&mut self, op: &'a Integer) {
-        if *op == 0 {
-            return;
-        }
-        if let Small(ref mut x) = *self {
-            if let Small(y) = *op {
-                if let Some(difference) = x.checked_sub(y) {
-                    *x = difference;
-                    return;
-                }
-            }
-        }
-        let mut x = self.promote_in_place();
-        match *op {
-            Small(y) => {
-                if y > 0 {
-                    unsafe {
-                        gmp::mpz_sub_ui(x, x, y as c_ulong);
-                    }
-                } else {
-                    unsafe {
-                        gmp::mpz_add_ui(x, x, y.wrapping_neg() as c_ulong);
-                    }
-                }
-            }
-            Large(y) => unsafe {
-                gmp::mpz_sub(x, x, &y);
-            },
-        }
-    }
-}
-
-//TODO test
-impl SubAssign<Integer> for Integer {
-    fn sub_assign(&mut self, op: Integer) {
-        self.sub_assign(&op);
-    }
-}
-
-//TODO test
-impl<'a> Sub<&'a Integer> for Integer {
-    type Output = Integer;
-    fn sub(mut self, op: &'a Integer) -> Integer {
-        SubAssign::<&'a Integer>::sub_assign(&mut self, op);
-        self
-    }
-}
-
-//TODO test
-impl Sub<Integer> for Integer {
-    type Output = Integer;
-    fn sub(self, op: Integer) -> Integer {
-        self.sub(&op)
     }
 }
 
@@ -166,5 +107,6 @@ pub mod add_u32;
 pub mod even_odd;
 pub mod neg;
 pub mod shl_u32;
+pub mod sub;
 pub mod sub_i32;
 pub mod sub_u32;
