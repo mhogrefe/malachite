@@ -10,7 +10,7 @@ impl Natural {
         assert!(!src.starts_with('-'));
         self.assign(0u32);
         for c in src.chars() {
-            self.mul_in_place_u32(radix as u32);
+            *self *= radix as u32;
             if c >= '0' && c <= '9' {
                 *self += c as u32 - 48;
             }

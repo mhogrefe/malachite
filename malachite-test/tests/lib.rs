@@ -78,6 +78,7 @@ pub mod natural {
         pub mod add;
         pub mod add_u32;
         pub mod even_odd;
+        pub mod mul_u32;
         pub mod neg;
         pub mod shl_u32;
         pub mod sub;

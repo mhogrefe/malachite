@@ -56,6 +56,7 @@ use malachite_test::natural::arithmetic::add::*;
 use malachite_test::natural::arithmetic::add_u32::*;
 use malachite_test::natural::arithmetic::even_odd::*;
 use malachite_test::natural::arithmetic::is_power_of_two::*;
+use malachite_test::natural::arithmetic::mul_u32::*;
 use malachite_test::natural::arithmetic::neg::*;
 use malachite_test::natural::arithmetic::shl_u32::*;
 use malachite_test::natural::arithmetic::sub::*;
@@ -331,6 +332,13 @@ fn main() {
                 "exhaustive_natural_limb_count" => demo_exhaustive_natural_limb_count(limit),
                 "exhaustive_natural_limbs_le" => demo_exhaustive_natural_limbs_le(limit),
                 "exhaustive_natural_limbs_be" => demo_exhaustive_natural_limbs_be(limit),
+                "exhaustive_natural_mul_assign_u32" => demo_exhaustive_natural_mul_assign_u32(
+                    limit,
+                ),
+                "exhaustive_natural_mul_u32" => demo_exhaustive_natural_mul_u32(limit),
+                "exhaustive_natural_mul_u32_ref" => demo_exhaustive_natural_mul_u32_ref(limit),
+                "exhaustive_u32_mul_natural" => demo_exhaustive_u32_mul_natural(limit),
+                "exhaustive_u32_mul_natural_ref" => demo_exhaustive_u32_mul_natural_ref(limit),
                 "exhaustive_natural_neg" => demo_exhaustive_natural_neg(limit),
                 "exhaustive_natural_neg_ref" => demo_exhaustive_natural_neg_ref(limit),
                 "exhaustive_natural_not" => demo_exhaustive_natural_not(limit),
@@ -560,6 +568,11 @@ fn main() {
                 "random_natural_limb_count" => demo_random_natural_limb_count(limit),
                 "random_natural_limbs_le" => demo_random_natural_limbs_le(limit),
                 "random_natural_limbs_be" => demo_random_natural_limbs_be(limit),
+                "random_natural_mul_assign_u32" => demo_random_natural_mul_assign_u32(limit),
+                "random_natural_mul_u32" => demo_random_natural_mul_u32(limit),
+                "random_natural_mul_u32_ref" => demo_random_natural_mul_u32_ref(limit),
+                "random_u32_mul_natural" => demo_random_u32_mul_natural(limit),
+                "random_u32_mul_natural_ref" => demo_random_u32_mul_natural_ref(limit),
                 "random_natural_neg" => demo_random_natural_neg(limit),
                 "random_natural_neg_ref" => demo_random_natural_neg_ref(limit),
                 "random_natural_not" => demo_random_natural_not(limit),
@@ -985,6 +998,21 @@ fn main() {
                 }
                 "exhaustive_natural_limbs_be" => {
                     benchmark_exhaustive_natural_limbs_be(limit, "temp.gp")
+                }
+                "exhaustive_natural_mul_assign_u32" => {
+                    benchmark_exhaustive_natural_mul_assign_u32(limit, "temp.gp")
+                }
+                "exhaustive_natural_mul_u32" => {
+                    benchmark_exhaustive_natural_mul_u32(limit, "temp.gp")
+                }
+                "exhaustive_natural_mul_u32_evaluation_strategy" => {
+                    benchmark_exhaustive_natural_mul_u32_evaluation_strategy(limit, "temp.gp")
+                }
+                "exhaustive_u32_mul_natural" => {
+                    benchmark_exhaustive_u32_mul_natural(limit, "temp.gp")
+                }
+                "exhaustive_u32_mul_natural_evaluation_strategy" => {
+                    benchmark_exhaustive_u32_mul_natural_evaluation_strategy(limit, "temp.gp")
                 }
                 "exhaustive_natural_neg" => benchmark_exhaustive_natural_neg(limit, "temp.gp"),
                 "exhaustive_natural_neg_evaluation_strategy" => {
@@ -1431,6 +1459,21 @@ fn main() {
                 "random_natural_limbs_be" => {
                     benchmark_random_natural_limbs_be(limit, 1024, "temp.gp")
                 }
+                "random_natural_mul_assign_u32" => {
+                    benchmark_random_natural_mul_assign_u32(limit, 1024, "temp.gp")
+                }
+                "random_natural_mul_u32" => {
+                    benchmark_random_natural_mul_u32(limit, 1024, "temp.gp")
+                }
+                "random_natural_mul_u32_evaluation_strategy" => {
+                    benchmark_random_natural_mul_u32_evaluation_strategy(limit, 1024, "temp.gp")
+                }
+                "random_u32_mul_natural" => {
+                    benchmark_random_u32_mul_natural(limit, 1024, "temp.gp")
+                }
+                "random_u32_mul_natural_evaluation_strategy" => {
+                    benchmark_random_u32_mul_natural_evaluation_strategy(limit, 1024, "temp.gp")
+                }
                 "random_natural_neg" => benchmark_random_natural_neg(limit, 1024, "temp.gp"),
                 "random_natural_neg_evaluation_strategy" => {
                     benchmark_random_natural_neg_evaluation_strategy(limit, 1024, "temp.gp")
@@ -1797,6 +1840,18 @@ fn main() {
                     );
                     benchmark_exhaustive_natural_limbs_le(100000, "exhaustive_natural_limbs_le.gp");
                     benchmark_exhaustive_natural_limbs_be(100000, "exhaustive_natural_limbs_be.gp");
+                    let s = "exhaustive_natural_mul_assign_u32.gp";
+                    benchmark_exhaustive_natural_mul_assign_u32(100000, s);
+                    benchmark_exhaustive_natural_mul_u32(100000, "exhaustive_natural_mul_u32.gp");
+                    benchmark_exhaustive_natural_mul_u32_evaluation_strategy(
+                        100000,
+                        "exhaustive_natural_mul_u32_evaluation_strategy.gp",
+                    );
+                    benchmark_exhaustive_u32_mul_natural(100000, "exhaustive_u32_mul_natural.gp");
+                    benchmark_exhaustive_u32_mul_natural_evaluation_strategy(
+                        100000,
+                        "exhaustive_u32_mul_natural_evaluation_strategy.gp",
+                    );
                     benchmark_exhaustive_natural_neg(100000, "exhaustive_natural_neg.gp");
                     let s = "exhaustive_natural_neg_evaluation_strategy.gp";
                     benchmark_exhaustive_natural_neg_evaluation_strategy(100000, s);
@@ -2209,6 +2264,23 @@ fn main() {
                     );
                     benchmark_random_natural_limbs_le(100000, 1024, "random_natural_limbs_le.gp");
                     benchmark_random_natural_limbs_be(100000, 1024, "random_natural_limbs_be.gp");
+                    benchmark_random_natural_mul_assign_u32(
+                        100000,
+                        1024,
+                        "random_natural_mul_assign_u32.gp",
+                    );
+                    benchmark_random_natural_mul_u32(100000, 1024, "random_natural_mul_u32.gp");
+                    benchmark_random_natural_mul_u32_evaluation_strategy(
+                        100000,
+                        1024,
+                        "random_natural_mul_u32_evaluation_strategy.gp",
+                    );
+                    benchmark_random_u32_mul_natural(100000, 1024, "random_u32_mul_natural.gp");
+                    benchmark_random_u32_mul_natural_evaluation_strategy(
+                        100000,
+                        1024,
+                        "random_u32_mul_natural_evaluation_strategy.gp",
+                    );
                     benchmark_random_natural_neg(100000, 1024, "random_natural_neg.gp");
                     let s = "random_natural_neg_evaluation_strategy.gp";
                     benchmark_random_natural_neg_evaluation_strategy(100000, 1024, s);

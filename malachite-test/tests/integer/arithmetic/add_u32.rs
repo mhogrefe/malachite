@@ -180,8 +180,8 @@ fn add_u32_properties() {
     // 0 + u == u
     // u + 0 == u
     let one_u32 = |u: u32| {
-        assert_eq!(native::Integer::from(0u32) + u, native::Integer::from(u));
-        assert_eq!(u + native::Integer::from(0u32), native::Integer::from(u));
+        assert_eq!(native::Integer::from(0u32) + u, u);
+        assert_eq!(u + native::Integer::from(0u32), u);
     };
 
     for (n, u) in exhaustive_pairs(exhaustive_integers(), exhaustive_u::<u32>()).take(LARGE_LIMIT) {

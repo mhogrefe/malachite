@@ -73,6 +73,7 @@ pub mod natural {
         pub mod add_u32;
         pub mod even_odd;
         pub mod is_power_of_two;
+        pub mod mul_u32;
         pub mod neg;
         pub mod shl_u32;
         pub mod sub;

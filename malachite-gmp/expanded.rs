@@ -19,9 +19,9 @@ pub mod integer {
     use std::hash::Hash;
     use std::hash::Hasher;
     use std::mem;
-    use std::ops::{Add, AddAssign, BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign,
-                   Div, DivAssign, Mul, MulAssign, Neg, Not, Rem, RemAssign, Shl, ShlAssign, Shr,
-                   ShrAssign, Sub, SubAssign};
+    use std::ops::{BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign,
+                   Div, DivAssign, Mul, MulAssign, Rem, RemAssign, Shl, ShlAssign, Shr,
+                   ShrAssign};
     use std::os::raw::{c_char, c_int, c_long, c_ulong};
     use std::slice;
     use std::str::FromStr;
@@ -597,56 +597,6 @@ pub mod integer {
             self.assign(val as f64);
         }
     }
-    impl<'a> Add<&'a Integer> for Integer {
-        type Output = Integer;
-        fn add(mut self, op: &'a Integer) -> Integer {
-            AddAssign::<&'a Integer>::add_assign(&mut self, op);
-            self
-        }
-    }
-    impl Add<Integer> for Integer {
-        type Output = Integer;
-        fn add(self, op: Integer) -> Integer {
-            self.add(&op)
-        }
-    }
-    impl<'a> AddAssign<&'a Integer> for Integer {
-        fn add_assign(&mut self, op: &'a Integer) {
-            unsafe {
-                gmp::mpz_add(&mut self.inner, &self.inner, &op.inner);
-            }
-        }
-    }
-    impl AddAssign<Integer> for Integer {
-        fn add_assign(&mut self, op: Integer) {
-            self.add_assign(&op);
-        }
-    }
-    impl<'a> Sub<&'a Integer> for Integer {
-        type Output = Integer;
-        fn sub(mut self, op: &'a Integer) -> Integer {
-            SubAssign::<&'a Integer>::sub_assign(&mut self, op);
-            self
-        }
-    }
-    impl Sub<Integer> for Integer {
-        type Output = Integer;
-        fn sub(self, op: Integer) -> Integer {
-            self.sub(&op)
-        }
-    }
-    impl<'a> SubAssign<&'a Integer> for Integer {
-        fn sub_assign(&mut self, op: &'a Integer) {
-            unsafe {
-                gmp::mpz_sub(&mut self.inner, &self.inner, &op.inner);
-            }
-        }
-    }
-    impl SubAssign<Integer> for Integer {
-        fn sub_assign(&mut self, op: Integer) {
-            self.sub_assign(&op);
-        }
-    }
     impl<'a> SubFromAssign<&'a Integer> for Integer {
         fn sub_from_assign(&mut self, lhs: &'a Integer) {
             unsafe {
@@ -855,18 +805,6 @@ pub mod integer {
         };
         gmp::mpz_tdiv_r(q, n, d);
     }
-    impl<'a> Add<&'a Integer> for u32 {
-        type Output = Integer;
-        fn add(self, op: &'a Integer) -> Integer {
-            self.add(op.clone())
-        }
-    }
-    impl<'a> Sub<&'a Integer> for u32 {
-        type Output = Integer;
-        fn sub(self, op: &'a Integer) -> Integer {
-            self.sub(op.clone())
-        }
-    }
     impl SubFromAssign<u32> for Integer {
         fn sub_from_assign(&mut self, lhs: u32) {
             unsafe {
@@ -1072,18 +1010,6 @@ pub mod integer {
         type Output = Integer;
         fn bitxor(self, op: &'a Integer) -> Integer {
             self.bitxor(op.clone())
-        }
-    }
-    impl<'a> Add<&'a Integer> for i32 {
-        type Output = Integer;
-        fn add(self, op: &'a Integer) -> Integer {
-            self.add(op.clone())
-        }
-    }
-    impl<'a> Sub<&'a Integer> for i32 {
-        type Output = Integer;
-        fn sub(self, op: &'a Integer) -> Integer {
-            self.sub(op.clone())
         }
     }
     impl SubFromAssign<i32> for Integer {
