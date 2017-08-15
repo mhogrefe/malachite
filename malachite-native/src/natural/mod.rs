@@ -97,7 +97,7 @@ fn get_lower(val: u64) -> u32 {
 }
 
 fn get_upper(val: u64) -> u32 {
-    ((val & 0xffff_ffff_0000_0000) >> 32) as u32
+    (val >> 32) as u32
 }
 
 fn pad_left<T: Clone>(vec: &mut Vec<T>, pad_size: usize, value: T) {

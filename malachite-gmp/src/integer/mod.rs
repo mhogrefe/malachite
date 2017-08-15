@@ -126,7 +126,7 @@ fn get_lower(val: u64) -> u32 {
 }
 
 fn get_upper(val: u64) -> u32 {
-    ((val & 0xffff_ffff_0000_0000) >> 32) as u32
+    (val >> 32) as u32
 }
 
 fn make_u64(upper: u32, lower: u32) -> u64 {
