@@ -40,31 +40,6 @@ impl Integer {
 }
 
 //TODO test
-impl MulAssign<i32> for Integer {
-    fn mul_assign(&mut self, op: i32) {
-        if op == 1 || *self == 0 {
-            return;
-        }
-        if op == 0 {
-            *self = Small(0);
-        }
-        let mut promote = false;
-        if let Small(ref mut x) = *self {
-            match x.checked_mul(op) {
-                Some(product) => *x = product,
-                None => promote = true,
-            }
-        }
-        if promote {
-            let x = self.promote_in_place();
-            unsafe {
-                gmp::mpz_mul_si(x, x, op.into());
-            }
-        }
-    }
-}
-
-//TODO test
 impl<'a> MulAssign<&'a Integer> for Integer {
     fn mul_assign(&mut self, op: &'a Integer) {
         if *op == 1 || *self == 0 {
@@ -105,6 +80,8 @@ pub mod add;
 pub mod add_i32;
 pub mod add_u32;
 pub mod even_odd;
+pub mod mul_i32;
+pub mod mul_u32;
 pub mod neg;
 pub mod shl_u32;
 pub mod sub;
