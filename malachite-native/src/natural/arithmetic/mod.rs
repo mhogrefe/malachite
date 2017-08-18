@@ -16,7 +16,7 @@ impl Natural {
         }
         let mut upper = 0u32;
         {
-            let xs = self.promote();
+            let xs = self.promote_in_place();
             let xs_len = xs.len();
             for i_rev in 0..xs_len {
                 let i = xs_len - i_rev - 1;
@@ -34,6 +34,7 @@ impl Natural {
 
 pub mod add;
 pub mod add_u32;
+pub mod add_mul_u32;
 pub mod even_odd;
 pub mod is_power_of_two;
 pub mod mul_u32;

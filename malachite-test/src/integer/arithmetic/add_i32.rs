@@ -111,7 +111,7 @@ pub fn demo_random_i32_add_integer_ref(limit: usize) {
 }
 
 pub fn benchmark_exhaustive_integer_add_assign_i32(limit: usize, file_name: &str) {
-    println!("benchmarking exhaustive integer += i32");
+    println!("benchmarking exhaustive Integer += i32");
     benchmark_3(BenchmarkOptions3 {
         xs: exhaustive_pairs(exhaustive_integers(), exhaustive_i::<i32>()),
         function_f: &(|(mut n, i)| n += i),
@@ -125,7 +125,7 @@ pub fn benchmark_exhaustive_integer_add_assign_i32(limit: usize, file_name: &str
         f_name: "malachite-gmp",
         g_name: "malachite-native",
         h_name: "rugint",
-        title: "integer += i32",
+        title: "Integer += i32",
         x_axis_label: "other",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),
@@ -133,7 +133,7 @@ pub fn benchmark_exhaustive_integer_add_assign_i32(limit: usize, file_name: &str
 }
 
 pub fn benchmark_random_integer_add_assign_i32(limit: usize, scale: u32, file_name: &str) {
-    println!("benchmarking random integer += i32");
+    println!("benchmarking random Integer += i32");
     benchmark_3(BenchmarkOptions3 {
         xs: random_pairs(
             &EXAMPLE_SEED,
@@ -151,7 +151,7 @@ pub fn benchmark_random_integer_add_assign_i32(limit: usize, scale: u32, file_na
         f_name: "malachite-gmp",
         g_name: "malachite-native",
         h_name: "rugint",
-        title: "integer += i32",
+        title: "Integer += i32",
         x_axis_label: "other",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),
@@ -159,7 +159,7 @@ pub fn benchmark_random_integer_add_assign_i32(limit: usize, scale: u32, file_na
 }
 
 pub fn benchmark_exhaustive_integer_add_i32(limit: usize, file_name: &str) {
-    println!("benchmarking exhaustive integer + i32");
+    println!("benchmarking exhaustive Integer + i32");
     benchmark_4(BenchmarkOptions4 {
         xs: exhaustive_pairs(exhaustive_integers(), exhaustive_i::<i32>()),
         function_f: &(|(n, i)| n + i),
@@ -176,7 +176,7 @@ pub fn benchmark_exhaustive_integer_add_i32(limit: usize, file_name: &str) {
         g_name: "malachite-native",
         h_name: "num",
         i_name: "rugint",
-        title: "integer + i32",
+        title: "Integer + i32",
         x_axis_label: "other",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),
@@ -184,7 +184,7 @@ pub fn benchmark_exhaustive_integer_add_i32(limit: usize, file_name: &str) {
 }
 
 pub fn benchmark_random_integer_add_i32(limit: usize, scale: u32, file_name: &str) {
-    println!("benchmarking random integer + i32");
+    println!("benchmarking random Integer + i32");
     benchmark_4(BenchmarkOptions4 {
         xs: random_pairs(
             &EXAMPLE_SEED,
@@ -205,7 +205,7 @@ pub fn benchmark_random_integer_add_i32(limit: usize, scale: u32, file_name: &st
         g_name: "malachite-native",
         h_name: "num",
         i_name: "rugint",
-        title: "integer + i32",
+        title: "Integer + i32",
         x_axis_label: "other",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),
@@ -213,7 +213,7 @@ pub fn benchmark_random_integer_add_i32(limit: usize, scale: u32, file_name: &st
 }
 
 pub fn benchmark_exhaustive_integer_add_i32_evaluation_strategy(limit: usize, file_name: &str) {
-    println!("benchmarking exhaustive integer + i32 evaluation strategy");
+    println!("benchmarking exhaustive Integer + i32 evaluation strategy");
     benchmark_2(BenchmarkOptions2 {
         xs: exhaustive_pairs(exhaustive_integers(), exhaustive_i::<i32>()),
         function_f: &(|(n, i)| n + i),
@@ -222,9 +222,9 @@ pub fn benchmark_exhaustive_integer_add_i32_evaluation_strategy(limit: usize, fi
         y_cons: &(|&(ref n, i)| (gmp_integer_to_native(n), i)),
         x_param: &(|&(ref n, _)| n.significant_bits() as usize),
         limit: limit,
-        f_name: "integer + i32",
-        g_name: "\\\\&integer + i32",
-        title: "integer + i32 evaluation strategy",
+        f_name: "Integer + i32",
+        g_name: "\\\\&Integer + i32",
+        title: "Integer + i32 evaluation strategy",
         x_axis_label: "n.significant\\\\_bits()",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),
@@ -236,7 +236,7 @@ pub fn benchmark_random_integer_add_i32_evaluation_strategy(
     scale: u32,
     file_name: &str,
 ) {
-    println!("benchmarking random integer + i32 evaluation strategy");
+    println!("benchmarking random Integer + i32 evaluation strategy");
     benchmark_2(BenchmarkOptions2 {
         xs: random_pairs(
             &EXAMPLE_SEED,
@@ -249,9 +249,9 @@ pub fn benchmark_random_integer_add_i32_evaluation_strategy(
         y_cons: &(|&(ref n, i)| (gmp_integer_to_native(n), i)),
         x_param: &(|&(ref n, _)| n.significant_bits() as usize),
         limit: limit,
-        f_name: "integer + i32",
-        g_name: "\\\\&integer + i32",
-        title: "integer + i32 evaluation strategy",
+        f_name: "Integer + i32",
+        g_name: "\\\\&Integer + i32",
+        title: "Integer + i32 evaluation strategy",
         x_axis_label: "n.significant\\\\_bits()",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),
@@ -259,7 +259,7 @@ pub fn benchmark_random_integer_add_i32_evaluation_strategy(
 }
 
 pub fn benchmark_exhaustive_i32_add_integer(limit: usize, file_name: &str) {
-    println!("benchmarking exhaustive i32 + integer");
+    println!("benchmarking exhaustive i32 + Integer");
     benchmark_3(BenchmarkOptions3 {
         xs: exhaustive_pairs(exhaustive_i::<i32>(), exhaustive_integers()),
         function_f: &(|(i, n)| i + n),
@@ -273,7 +273,7 @@ pub fn benchmark_exhaustive_i32_add_integer(limit: usize, file_name: &str) {
         f_name: "malachite-gmp",
         g_name: "malachite-native",
         h_name: "rugint",
-        title: "i32 + integer",
+        title: "i32 + Integer",
         x_axis_label: "other",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),
@@ -281,7 +281,7 @@ pub fn benchmark_exhaustive_i32_add_integer(limit: usize, file_name: &str) {
 }
 
 pub fn benchmark_random_i32_add_integer(limit: usize, scale: u32, file_name: &str) {
-    println!("benchmarking random i32 + integer");
+    println!("benchmarking random i32 + Integer");
     benchmark_3(BenchmarkOptions3 {
         xs: random_pairs(
             &EXAMPLE_SEED,
@@ -299,7 +299,7 @@ pub fn benchmark_random_i32_add_integer(limit: usize, scale: u32, file_name: &st
         f_name: "malachite-gmp",
         g_name: "malachite-native",
         h_name: "rugint",
-        title: "i32 + integer",
+        title: "i32 + Integer",
         x_axis_label: "other",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),
@@ -307,7 +307,7 @@ pub fn benchmark_random_i32_add_integer(limit: usize, scale: u32, file_name: &st
 }
 
 pub fn benchmark_exhaustive_i32_add_integer_evaluation_strategy(limit: usize, file_name: &str) {
-    println!("benchmarking exhaustive i32 + integer evaluation strategy");
+    println!("benchmarking exhaustive i32 + Integer evaluation strategy");
     benchmark_2(BenchmarkOptions2 {
         xs: exhaustive_pairs(exhaustive_i::<i32>(), exhaustive_integers()),
         function_f: &(|(i, n)| i + n),
@@ -316,9 +316,9 @@ pub fn benchmark_exhaustive_i32_add_integer_evaluation_strategy(limit: usize, fi
         y_cons: &(|&(i, ref n)| (i, gmp_integer_to_native(n))),
         x_param: &(|&(_, ref n)| n.significant_bits() as usize),
         limit: limit,
-        f_name: "i32 + integer",
-        g_name: "i32 + \\\\&integer",
-        title: "i32 + integer evaluation strategy",
+        f_name: "i32 + Integer",
+        g_name: "i32 + \\\\&Integer",
+        title: "i32 + Integer evaluation strategy",
         x_axis_label: "n.significant\\\\_bits()",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),
@@ -330,7 +330,7 @@ pub fn benchmark_random_i32_add_integer_evaluation_strategy(
     scale: u32,
     file_name: &str,
 ) {
-    println!("benchmarking random i32 + integer evaluation strategy");
+    println!("benchmarking random i32 + Integer evaluation strategy");
     benchmark_2(BenchmarkOptions2 {
         xs: random_pairs(
             &EXAMPLE_SEED,
@@ -343,9 +343,9 @@ pub fn benchmark_random_i32_add_integer_evaluation_strategy(
         y_cons: &(|&(i, ref n)| (i, gmp_integer_to_native(n))),
         x_param: &(|&(_, ref n)| n.significant_bits() as usize),
         limit: limit,
-        f_name: "i32 + integer",
-        g_name: "i32 + \\\\&integer",
-        title: "i32 + integer evaluation strategy",
+        f_name: "i32 + Integer",
+        g_name: "i32 + \\\\&Integer",
+        title: "i32 + Integer evaluation strategy",
         x_axis_label: "n.significant\\\\_bits()",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),

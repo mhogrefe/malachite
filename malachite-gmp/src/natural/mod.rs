@@ -49,6 +49,20 @@ impl Natural {
         }
     }
 
+    fn promote_in_place(&mut self) -> &mut mpz_t {
+        if let Small(x) = *self {
+            unsafe {
+                let mut promoted: mpz_t = mem::uninitialized();
+                gmp::mpz_init_set_ui(&mut promoted, x.into());
+                *self = Large(promoted);
+            }
+        }
+        if let Large(ref mut x) = *self {
+            return x;
+        }
+        unreachable!();
+    }
+
     /// Returns true iff `self` is valid. To be valid, `self` cannot be negative and can only be
     /// Large when it is at least 2^(32). All Naturals used outside this crate are valid, but
     /// temporary Naturals used inside may not be.
@@ -135,6 +149,7 @@ macro_rules! mutate_with_possible_promotion {
 pub mod arithmetic {
     pub mod add;
     pub mod add_u32;
+    pub mod add_mul_u32;
     pub mod even_odd;
     pub mod is_power_of_two;
     pub mod mul_u32;

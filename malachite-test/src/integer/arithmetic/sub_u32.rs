@@ -111,7 +111,7 @@ pub fn demo_random_u32_sub_integer_ref(limit: usize) {
 }
 
 pub fn benchmark_exhaustive_integer_sub_assign_u32(limit: usize, file_name: &str) {
-    println!("benchmarking exhaustive integer -= u32");
+    println!("benchmarking exhaustive Integer -= u32");
     benchmark_3(BenchmarkOptions3 {
         xs: exhaustive_pairs(exhaustive_integers(), exhaustive_u::<u32>()),
         function_f: &(|(mut n, u)| n -= u),
@@ -125,7 +125,7 @@ pub fn benchmark_exhaustive_integer_sub_assign_u32(limit: usize, file_name: &str
         f_name: "malachite-gmp",
         g_name: "malachite-native",
         h_name: "rugint",
-        title: "integer -= u32",
+        title: "Integer -= u32",
         x_axis_label: "other",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),
@@ -133,7 +133,7 @@ pub fn benchmark_exhaustive_integer_sub_assign_u32(limit: usize, file_name: &str
 }
 
 pub fn benchmark_random_integer_sub_assign_u32(limit: usize, scale: u32, file_name: &str) {
-    println!("benchmarking random integer -= u32");
+    println!("benchmarking random Integer -= u32");
     benchmark_3(BenchmarkOptions3 {
         xs: random_pairs(
             &EXAMPLE_SEED,
@@ -151,7 +151,7 @@ pub fn benchmark_random_integer_sub_assign_u32(limit: usize, scale: u32, file_na
         f_name: "malachite-gmp",
         g_name: "malachite-native",
         h_name: "rugint",
-        title: "integer -= u32",
+        title: "Integer -= u32",
         x_axis_label: "other",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),
@@ -159,7 +159,7 @@ pub fn benchmark_random_integer_sub_assign_u32(limit: usize, scale: u32, file_na
 }
 
 pub fn benchmark_exhaustive_integer_sub_u32(limit: usize, file_name: &str) {
-    println!("benchmarking exhaustive integer - u32");
+    println!("benchmarking exhaustive Integer - u32");
     benchmark_4(BenchmarkOptions4 {
         xs: exhaustive_pairs(exhaustive_integers(), exhaustive_u::<u32>()),
         function_f: &(|(n, u)| n - u),
@@ -176,7 +176,7 @@ pub fn benchmark_exhaustive_integer_sub_u32(limit: usize, file_name: &str) {
         g_name: "malachite-native",
         h_name: "num",
         i_name: "rugint",
-        title: "integer - u32",
+        title: "Integer - u32",
         x_axis_label: "other",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),
@@ -184,7 +184,7 @@ pub fn benchmark_exhaustive_integer_sub_u32(limit: usize, file_name: &str) {
 }
 
 pub fn benchmark_random_integer_sub_u32(limit: usize, scale: u32, file_name: &str) {
-    println!("benchmarking random integer - u32");
+    println!("benchmarking random Integer - u32");
     benchmark_4(BenchmarkOptions4 {
         xs: random_pairs(
             &EXAMPLE_SEED,
@@ -205,7 +205,7 @@ pub fn benchmark_random_integer_sub_u32(limit: usize, scale: u32, file_name: &st
         g_name: "malachite-native",
         h_name: "num",
         i_name: "rugint",
-        title: "integer - u32",
+        title: "Integer - u32",
         x_axis_label: "other",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),
@@ -213,7 +213,7 @@ pub fn benchmark_random_integer_sub_u32(limit: usize, scale: u32, file_name: &st
 }
 
 pub fn benchmark_exhaustive_integer_sub_u32_evaluation_strategy(limit: usize, file_name: &str) {
-    println!("benchmarking exhaustive integer - u32 evaluation strategy");
+    println!("benchmarking exhaustive Integer - u32 evaluation strategy");
     benchmark_2(BenchmarkOptions2 {
         xs: exhaustive_pairs(exhaustive_integers(), exhaustive_u::<u32>()),
         function_f: &(|(n, u)| n - u),
@@ -222,9 +222,9 @@ pub fn benchmark_exhaustive_integer_sub_u32_evaluation_strategy(limit: usize, fi
         y_cons: &(|&(ref n, u)| (gmp_integer_to_native(n), u)),
         x_param: &(|&(ref n, _)| n.significant_bits() as usize),
         limit: limit,
-        f_name: "integer - u32",
-        g_name: "\\\\&integer - u32",
-        title: "integer - u32 evaluation strategy",
+        f_name: "Integer - u32",
+        g_name: "\\\\&Integer - u32",
+        title: "Integer - u32 evaluation strategy",
         x_axis_label: "n.significant\\\\_bits()",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),
@@ -236,7 +236,7 @@ pub fn benchmark_random_integer_sub_u32_evaluation_strategy(
     scale: u32,
     file_name: &str,
 ) {
-    println!("benchmarking random integer - u32 evaluation strategy");
+    println!("benchmarking random Integer - u32 evaluation strategy");
     benchmark_2(BenchmarkOptions2 {
         xs: random_pairs(
             &EXAMPLE_SEED,
@@ -249,9 +249,9 @@ pub fn benchmark_random_integer_sub_u32_evaluation_strategy(
         y_cons: &(|&(ref n, u)| (gmp_integer_to_native(n), u)),
         x_param: &(|&(ref n, _)| n.significant_bits() as usize),
         limit: limit,
-        f_name: "integer - u32",
-        g_name: "\\\\&integer - u32",
-        title: "integer - u32 evaluation strategy",
+        f_name: "Integer - u32",
+        g_name: "\\\\&Integer - u32",
+        title: "Integer - u32 evaluation strategy",
         x_axis_label: "n.significant\\\\_bits()",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),
@@ -259,7 +259,7 @@ pub fn benchmark_random_integer_sub_u32_evaluation_strategy(
 }
 
 pub fn benchmark_exhaustive_u32_sub_integer(limit: usize, file_name: &str) {
-    println!("benchmarking exhaustive u32 - integer");
+    println!("benchmarking exhaustive u32 - Integer");
     benchmark_3(BenchmarkOptions3 {
         xs: exhaustive_pairs(exhaustive_u::<u32>(), exhaustive_integers()),
         function_f: &(|(u, n)| u - n),
@@ -273,7 +273,7 @@ pub fn benchmark_exhaustive_u32_sub_integer(limit: usize, file_name: &str) {
         f_name: "malachite-gmp",
         g_name: "malachite-native",
         h_name: "rugint",
-        title: "u32 - integer",
+        title: "u32 - Integer",
         x_axis_label: "other",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),
@@ -281,7 +281,7 @@ pub fn benchmark_exhaustive_u32_sub_integer(limit: usize, file_name: &str) {
 }
 
 pub fn benchmark_random_u32_sub_integer(limit: usize, scale: u32, file_name: &str) {
-    println!("benchmarking random u32 - integer");
+    println!("benchmarking random u32 - Integer");
     benchmark_3(BenchmarkOptions3 {
         xs: random_pairs(
             &EXAMPLE_SEED,
@@ -299,7 +299,7 @@ pub fn benchmark_random_u32_sub_integer(limit: usize, scale: u32, file_name: &st
         f_name: "malachite-gmp",
         g_name: "malachite-native",
         h_name: "rugint",
-        title: "u32 - integer",
+        title: "u32 - Integer",
         x_axis_label: "other",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),
@@ -307,7 +307,7 @@ pub fn benchmark_random_u32_sub_integer(limit: usize, scale: u32, file_name: &st
 }
 
 pub fn benchmark_exhaustive_u32_sub_integer_evaluation_strategy(limit: usize, file_name: &str) {
-    println!("benchmarking exhaustive u32 - integer evaluation strategy");
+    println!("benchmarking exhaustive u32 - Integer evaluation strategy");
     benchmark_2(BenchmarkOptions2 {
         xs: exhaustive_pairs(exhaustive_u::<u32>(), exhaustive_integers()),
         function_f: &(|(u, n)| u - n),
@@ -316,9 +316,9 @@ pub fn benchmark_exhaustive_u32_sub_integer_evaluation_strategy(limit: usize, fi
         y_cons: &(|&(u, ref n)| (u, gmp_integer_to_native(n))),
         x_param: &(|&(_, ref n)| n.significant_bits() as usize),
         limit: limit,
-        f_name: "u32 - integer",
-        g_name: "u32 - \\\\&integer",
-        title: "u32 - integer evaluation strategy",
+        f_name: "u32 - Integer",
+        g_name: "u32 - \\\\&Integer",
+        title: "u32 - Integer evaluation strategy",
         x_axis_label: "n.significant\\\\_bits()",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),
@@ -330,7 +330,7 @@ pub fn benchmark_random_u32_sub_integer_evaluation_strategy(
     scale: u32,
     file_name: &str,
 ) {
-    println!("benchmarking exhaustive u32 - integer evaluation strategy");
+    println!("benchmarking exhaustive u32 - Integer evaluation strategy");
     benchmark_2(BenchmarkOptions2 {
         xs: random_pairs(
             &EXAMPLE_SEED,
@@ -343,9 +343,9 @@ pub fn benchmark_random_u32_sub_integer_evaluation_strategy(
         y_cons: &(|&(u, ref n)| (u, gmp_integer_to_native(n))),
         x_param: &(|&(_, ref n)| n.significant_bits() as usize),
         limit: limit,
-        f_name: "u32 - integer",
-        g_name: "u32 - \\\\&integer",
-        title: "u32 - integer evaluation strategy",
+        f_name: "u32 - Integer",
+        g_name: "u32 - \\\\&Integer",
+        title: "u32 - Integer evaluation strategy",
         x_axis_label: "n.significant\\\\_bits()",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),

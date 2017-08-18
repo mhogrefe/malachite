@@ -38,7 +38,7 @@ pub fn demo_random_integer_sign(limit: usize) {
 }
 
 pub fn benchmark_exhaustive_integer_sign(limit: usize, file_name: &str) {
-    println!("benchmarking exhaustive Integer sign");
+    println!("benchmarking exhaustive Integer.sign()");
     benchmark_4(BenchmarkOptions4 {
         xs: exhaustive_integers(),
         function_f: &(|n: gmp::Integer| n.sign()),
@@ -55,7 +55,7 @@ pub fn benchmark_exhaustive_integer_sign(limit: usize, file_name: &str) {
         g_name: "malachite-native",
         h_name: "num",
         i_name: "rugint",
-        title: "Integer sign",
+        title: "Integer.sign()",
         x_axis_label: "n.significant\\\\_bits()",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),
@@ -63,7 +63,7 @@ pub fn benchmark_exhaustive_integer_sign(limit: usize, file_name: &str) {
 }
 
 pub fn benchmark_random_integer_sign(limit: usize, scale: u32, file_name: &str) {
-    println!("benchmarking random Integer sign");
+    println!("benchmarking random Integer.sign()");
     benchmark_4(BenchmarkOptions4 {
         xs: random_integers(&EXAMPLE_SEED, scale),
         function_f: &(|n: gmp::Integer| n.sign()),
@@ -80,7 +80,7 @@ pub fn benchmark_random_integer_sign(limit: usize, scale: u32, file_name: &str) 
         g_name: "malachite-native",
         h_name: "num",
         i_name: "rugint",
-        title: "Integer sign",
+        title: "Integer.sign()",
         x_axis_label: "n.significant\\\\_bits()",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),

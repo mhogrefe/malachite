@@ -42,7 +42,7 @@ impl Natural {
         }
     }
 
-    fn promote(&mut self) -> &mut Vec<u32> {
+    fn promote_in_place(&mut self) -> &mut Vec<u32> {
         if let Small(x) = *self {
             let xs = vec![x];
             *self = Large(xs);

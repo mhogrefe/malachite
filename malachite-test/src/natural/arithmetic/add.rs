@@ -117,7 +117,7 @@ pub fn benchmark_exhaustive_natural_add_assign(limit: usize, file_name: &str) {
         g_name: "malachite-native",
         h_name: "rugint",
         title: "Natural += Natural",
-        x_axis_label: "other",
+        x_axis_label: "max(x.significant\\\\_bits(), y.significant\\\\_bits())",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),
     });
@@ -144,7 +144,7 @@ pub fn benchmark_random_natural_add_assign(limit: usize, scale: u32, file_name: 
         g_name: "malachite-native",
         h_name: "rugint",
         title: "Natural += Natural",
-        x_axis_label: "other",
+        x_axis_label: "max(x.significant\\\\_bits(), y.significant\\\\_bits())",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),
     });
@@ -163,7 +163,7 @@ pub fn benchmark_exhaustive_natural_add_assign_evaluation_strategy(limit: usize,
         f_name: "Natural += Natural",
         g_name: "Natural += \\\\&Natural",
         title: "Natural += Natural evaluation strategy",
-        x_axis_label: "other",
+        x_axis_label: "max(x.significant\\\\_bits(), y.significant\\\\_bits())",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),
     });
@@ -186,7 +186,7 @@ pub fn benchmark_random_natural_add_assign_evaluation_strategy(
         f_name: "Natural += Natural",
         g_name: "Natural += \\\\&Natural",
         title: "Natural += Natural evaluation strategy",
-        x_axis_label: "other",
+        x_axis_label: "max(x.significant\\\\_bits(), y.significant\\\\_bits())",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),
     });

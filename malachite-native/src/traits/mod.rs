@@ -16,6 +16,18 @@ pub trait NotAssign {
     fn not_assign(&mut self);
 }
 
+pub trait AddMulAssign<B, C> {
+    // Equivalent to self += b * c
+    fn add_mul_assign(&mut self, b: B, c: C);
+}
+
+pub trait AddMul<B, C> {
+    type Output;
+
+    // Equivalent to self + b * c
+    fn add_mul(self, b: B, c: C) -> Self::Output;
+}
+
 pub trait PartialOrdAbs<Rhs: ?Sized = Self>: PartialEq<Rhs> {
     fn partial_cmp_abs(&self, other: &Rhs) -> Option<Ordering>;
 

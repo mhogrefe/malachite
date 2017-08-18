@@ -79,6 +79,7 @@ pub mod natural {
     pub mod arithmetic {
         pub mod add;
         pub mod add_u32;
+        pub mod add_mul_u32;
         pub mod even_odd;
         pub mod mul_u32;
         pub mod neg;
