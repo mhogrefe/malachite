@@ -5,6 +5,12 @@ use traits::{AddMul, AddMulAssign};
 /// Adds the product of a `Natural` (b) and a `u32` (c) to a `Natural` (self), taking `self` by
 /// value.
 ///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(n)
+///
+/// where n = `b.significant_bits`
+///
 /// # Examples
 /// ```
 /// use malachite_native::natural::Natural;
@@ -27,6 +33,12 @@ impl<'a> AddMul<&'a Natural, u32> for Natural {
 
 /// Adds the product of a `Natural` (b) and a `u32` (c) to a `Natural` (self), taking `self` by
 /// reference.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(n)
+///
+/// where n = `max(self.significant_bits(), b.significant_bits)`
 ///
 /// # Examples
 /// ```
@@ -72,6 +84,12 @@ impl<'a, 'b> AddMul<&'a Natural, u32> for &'b Natural {
 }
 
 /// Adds the product of a `Natural` (b) and a `u32` (c) to a `Natural` (self), in place.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(n)
+///
+/// where n = `b.significant_bits`
 ///
 /// # Examples
 /// ```

@@ -117,12 +117,12 @@ fn add_mul_u32_properties() {
     };
 
     // a.add_mul(b, 0) == a
-    // TODO a.add_mul(b, 1) == a * b
+    // a.add_mul(b, 1) == a + b
     let two_naturals = |gmp_a: gmp::Natural, gmp_b: gmp::Natural| {
         let a = &gmp_natural_to_native(&gmp_a);
         let b = &gmp_natural_to_native(&gmp_b);
         assert_eq!(a.add_mul(b, 0), *a);
-        //TODO assert_eq!(a.add_mul(b, 1), a * b);
+        assert_eq!(a.add_mul(b, 1), a + b);
     };
 
     for (a, b, c) in exhaustive_triples(
