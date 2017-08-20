@@ -88,7 +88,7 @@ fn shl_u32_properties() {
     // &n << u is valid.
     // n <<= u, n << u, and &n << u give the same result.
     // n << u >= n
-    // TODO multiplication
+    // n << u == n * (1 << u)
     // TODO >>
     let natural_and_u32 = |mut gmp_n: gmp::Natural, u: u32| {
         let mut n = gmp_natural_to_native(&gmp_n);
@@ -128,6 +128,7 @@ fn shl_u32_properties() {
         assert_eq!(rugint_integer_to_native_natural(&(rugint_n2 << u)), n);
 
         assert!(&old_n << u >= old_n);
+        assert_eq!(&old_n << u, old_n * (native::Natural::from(1u32) << u));
     };
 
     // n << 0 == n

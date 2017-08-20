@@ -16,7 +16,7 @@ use rust_wheels::iterators::tuples::{exhaustive_pairs, exhaustive_pairs_from_sin
 use std::str::FromStr;
 
 #[test]
-fn test_add_assign() {
+fn test_add() {
     #[allow(cyclomatic_complexity)]
     let test = |u, v, out| {
         let mut n = native::Natural::from_str(u).unwrap();
@@ -100,6 +100,7 @@ fn add_properties() {
     // x + y is equivalent for malachite-gmp, malachite-native, num, and rugint.
     // x += y, x += &y, x + y, x + &y, &x + y, and &x + &y give the same result.
     // x + y == y + x
+    // x + y - y == x and x + y - x == y
     // x + y >= x and x + y >= y
     #[allow(cyclomatic_complexity)]
     let two_naturals = |gmp_x: gmp::Natural, gmp_y: gmp::Natural| {

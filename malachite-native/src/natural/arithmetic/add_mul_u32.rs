@@ -153,6 +153,21 @@ fn large_add_mul_u32_in_place(xs: &mut Vec<u32>, ys: &[u32], multiplicand: u32) 
     }
 }
 
+//TODO use this everywhere instead of large_add_mul_u32_in_place
+// xs.len() must be > ys.len() and its highest-order limb must be 0.
+pub(crate) fn large_add_mul_u32_in_place_2(xs: &mut [u32], ys: &[u32], multiplicand: u32) {
+    let mut carry = 0;
+    let mut ys_iter = ys.iter();
+    let multiplicand = multiplicand as u64;
+    for x in xs.iter_mut() {
+        match ys_iter.next() {
+            Some(y) => *x = add_mul_and_carry(*x, *y, multiplicand, &mut carry),
+            None if carry != 0 => *x = add_mul_and_carry(*x, 0, multiplicand, &mut carry),
+            None => break,
+        }
+    }
+}
+
 fn large_add_mul_u32(xs: &[u32], ys: &[u32], multiplicand: u32) -> Vec<u32> {
     let mut result_limbs = Vec::with_capacity(xs.len());
     let mut carry = 0;

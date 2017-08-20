@@ -132,15 +132,12 @@ fn mul_u32_properties() {
         assert_eq!(result, n);
         assert!(result.is_valid());
 
-        //TODO
-        /*
         let n2 = old_n.clone();
         let result = n2 * native::Natural::from(u);
         assert_eq!(result, n);
         let n2 = old_n.clone();
         let result = native::Natural::from(u) * n2;
         assert_eq!(result, n);
-        */
 
         let gmp_n2 = native_natural_to_gmp(&old_n);
         let result = &gmp_n2 * u;

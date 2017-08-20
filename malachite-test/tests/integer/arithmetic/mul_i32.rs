@@ -164,10 +164,10 @@ fn mul_i32_properties() {
         //TODO
         /*
         let n2 = old_n.clone();
-        let result = n2 * native::Integer::from(u);
+        let result = n2 * native::Integer::from(i);
         assert_eq!(result, n);
         let n2 = old_n.clone();
-        let result = native::Integer::from(u) * n2;
+        let result = native::Integer::from(i) * n2;
         assert_eq!(result, n);
         */
 
