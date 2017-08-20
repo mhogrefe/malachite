@@ -25,13 +25,8 @@ impl Add<Natural> for Natural {
     type Output = Natural;
 
     fn add(mut self, mut other: Natural) -> Natural {
-        if self.limb_count() >= other.limb_count() {
-            self += other;
-            self
-        } else {
-            other += self;
-            other
-        }
+        self += other;
+        self
     }
 }
 

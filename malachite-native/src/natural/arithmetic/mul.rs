@@ -28,13 +28,8 @@ impl Mul<Natural> for Natural {
     type Output = Natural;
 
     fn mul(mut self, mut other: Natural) -> Natural {
-        if self.significant_bits() >= other.significant_bits() {
-            self *= other;
-            self
-        } else {
-            other *= self;
-            other
-        }
+        self *= other;
+        self
     }
 }
 

@@ -26,13 +26,8 @@ impl Sub<Integer> for Integer {
     type Output = Integer;
 
     fn sub(mut self, mut other: Integer) -> Integer {
-        if self.abs.limb_count() >= other.abs.limb_count() {
-            self -= other;
-            self
-        } else {
-            other -= self;
-            -other
-        }
+        self -= other;
+        self
     }
 }
 
