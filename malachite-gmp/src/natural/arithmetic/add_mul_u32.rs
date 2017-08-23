@@ -3,8 +3,31 @@ use natural::Natural::{self, Large, Small};
 use std::mem;
 use traits::{AddMul, AddMulAssign};
 
+/// Adds the product of a `Natural` (b) and a `u32` (c) to a `Natural` (self), taking `self` and b
+/// by value.
+///
+/// # Examples
+/// ```
+/// use malachite_gmp::natural::Natural;
+/// use malachite_gmp::traits::AddMul;
+/// use std::str::FromStr;
+///
+/// assert_eq!(Natural::from(10u32).add_mul(Natural::from(3u32), 4), 22);
+/// assert_eq!(Natural::from_str("1000000000000").unwrap()
+///                     .add_mul(Natural::from(65536u32), 65536).to_string(),
+///            "1004294967296");
+/// ```
+impl AddMul<Natural, u32> for Natural {
+    type Output = Natural;
+
+    fn add_mul(mut self, b: Natural, c: u32) -> Natural {
+        self.add_mul_assign(b, c);
+        self
+    }
+}
+
 /// Adds the product of a `Natural` (b) and a `u32` (c) to a `Natural` (self), taking `self` by
-/// value.
+/// value and b by reference.
 ///
 /// # Examples
 /// ```
@@ -27,7 +50,29 @@ impl<'a> AddMul<&'a Natural, u32> for Natural {
 }
 
 /// Adds the product of a `Natural` (b) and a `u32` (c) to a `Natural` (self), taking `self` by
-/// reference.
+/// reference and b by value.
+///
+/// # Examples
+/// ```
+/// use malachite_gmp::natural::Natural;
+/// use malachite_gmp::traits::AddMul;
+/// use std::str::FromStr;
+///
+/// assert_eq!((&Natural::from(10u32)).add_mul(Natural::from(3u32), 4), 22);
+/// assert_eq!((&Natural::from_str("1000000000000").unwrap())
+///                     .add_mul(Natural::from(65536u32), 65536).to_string(),
+///            "1004294967296");
+/// ```
+impl<'a> AddMul<Natural, u32> for &'a Natural {
+    type Output = Natural;
+
+    fn add_mul(self, b: Natural, c: u32) -> Natural {
+        self.add_mul(&b, c)
+    }
+}
+
+/// Adds the product of a `Natural` (b) and a `u32` (c) to a `Natural` (self), taking `self` and b
+/// by reference.
 ///
 /// # Examples
 /// ```
@@ -71,7 +116,31 @@ impl<'a, 'b> AddMul<&'a Natural, u32> for &'b Natural {
     }
 }
 
-/// Adds the product of a `Natural` (b) and a `u32` (c) to a `Natural` (self), in place.
+/// Adds the product of a `Natural` (b) and a `u32` (c) to a `Natural` (self), in place, taking b by
+/// value.
+///
+/// # Examples
+/// ```
+/// use malachite_gmp::natural::Natural;
+/// use malachite_gmp::traits::AddMulAssign;
+/// use std::str::FromStr;
+///
+/// let mut x = Natural::from(10u32);
+/// x.add_mul_assign(Natural::from(3u32), 4);
+/// assert_eq!(x, 22);
+///
+/// let mut x = Natural::from_str("1000000000000").unwrap();
+/// x.add_mul_assign(Natural::from(65536u32), 65536);
+/// assert_eq!(x.to_string(), "1004294967296");
+/// ```
+impl AddMulAssign<Natural, u32> for Natural {
+    fn add_mul_assign(&mut self, b: Natural, c: u32) {
+        self.add_mul_assign(&b, c);
+    }
+}
+
+/// Adds the product of a `Natural` (b) and a `u32` (c) to a `Natural` (self), in place, taking b by
+/// reference.
 ///
 /// # Examples
 /// ```

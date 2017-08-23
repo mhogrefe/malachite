@@ -1,4 +1,5 @@
-use natural::arithmetic::add_mul_u32::large_add_mul_u32_in_place_2;
+use natural::arithmetic::add_mul_u32::large_add_mul_u32_mut_a;
+use natural::arithmetic::mul_u32::large_mul_u32;
 use natural::Natural::{self, Large, Small};
 use std::ops::{Mul, MulAssign};
 
@@ -27,7 +28,7 @@ use std::ops::{Mul, MulAssign};
 impl Mul<Natural> for Natural {
     type Output = Natural;
 
-    fn mul(mut self, mut other: Natural) -> Natural {
+    fn mul(mut self, other: Natural) -> Natural {
         self *= other;
         self
     }
@@ -242,12 +243,15 @@ impl<'a> MulAssign<&'a Natural> for Natural {
     }
 }
 
+// ys cannot be empty
 fn basecase_mul(xs: &[u32], ys: &[u32]) -> Vec<u32> {
     let product_length_bound = xs.len() + ys.len();
-    let mut product_limbs = Vec::with_capacity(product_length_bound);
+    let mut product_limbs = large_mul_u32(xs, ys[0]);
     product_limbs.resize(product_length_bound, 0);
-    for (i, y) in ys.iter().enumerate() {
-        large_add_mul_u32_in_place_2(&mut product_limbs[i..], xs, *y);
+    for (i, y) in ys.iter().enumerate().skip(1) {
+        if *y != 0 {
+            large_add_mul_u32_mut_a(&mut product_limbs[i..], xs, *y);
+        }
     }
     product_limbs
 }

@@ -5,7 +5,7 @@ use malachite_native::traits::AddMulAssign as native_add_mul_assign;
 use malachite_gmp::natural as gmp;
 use malachite_gmp::traits::AddMul as gmp_add_mul;
 use malachite_gmp::traits::AddMulAssign as gmp_add_mul_assign;
-use malachite_test::common::gmp_natural_to_native;
+use malachite_test::common::{gmp_natural_to_native, native_natural_to_gmp};
 use rust_wheels::iterators::common::EXAMPLE_SEED;
 use rust_wheels::iterators::general::random_x;
 use rust_wheels::iterators::naturals::{exhaustive_naturals, random_naturals};
@@ -16,9 +16,19 @@ use rust_wheels::iterators::tuples::{exhaustive_pairs, exhaustive_pairs_from_sin
 use std::str::FromStr;
 
 #[test]
-fn test_add_u32() {
+fn test_add_mul_u32() {
     #[allow(cyclomatic_complexity)]
     let test = |u, v, c: u32, out| {
+        let mut a = native::Natural::from_str(u).unwrap();
+        a.add_mul_assign(native::Natural::from_str(v).unwrap(), c);
+        assert_eq!(a.to_string(), out);
+        assert!(a.is_valid());
+
+        let mut a = gmp::Natural::from_str(u).unwrap();
+        a.add_mul_assign(gmp::Natural::from_str(v).unwrap(), c);
+        assert_eq!(a.to_string(), out);
+        assert!(a.is_valid());
+
         let mut a = native::Natural::from_str(u).unwrap();
         a.add_mul_assign(&native::Natural::from_str(v).unwrap(), c);
         assert_eq!(a.to_string(), out);
@@ -26,6 +36,21 @@ fn test_add_u32() {
 
         let mut a = gmp::Natural::from_str(u).unwrap();
         a.add_mul_assign(&gmp::Natural::from_str(v).unwrap(), c);
+        assert_eq!(a.to_string(), out);
+        assert!(a.is_valid());
+
+        let a = native::Natural::from_str(u).unwrap().add_mul(
+            native::Natural::from_str(v).unwrap(),
+            c,
+        );
+        assert_eq!(a.to_string(), out);
+        assert!(a.is_valid());
+
+        let a = gmp::Natural::from_str(u).unwrap().add_mul(
+            gmp::Natural::from_str(v)
+                .unwrap(),
+            c,
+        );
         assert_eq!(a.to_string(), out);
         assert!(a.is_valid());
 
@@ -41,6 +66,18 @@ fn test_add_u32() {
                 .unwrap(),
             c,
         );
+        assert_eq!(a.to_string(), out);
+        assert!(a.is_valid());
+
+        let a = (&native::Natural::from_str(u).unwrap()).add_mul(
+            native::Natural::from_str(v).unwrap(),
+            c,
+        );
+        assert_eq!(a.to_string(), out);
+        assert!(a.is_valid());
+
+        let a =
+            (&gmp::Natural::from_str(u).unwrap()).add_mul(gmp::Natural::from_str(v).unwrap(), c);
         assert_eq!(a.to_string(), out);
         assert!(a.is_valid());
 
@@ -77,28 +114,71 @@ fn test_add_u32() {
 #[test]
 fn add_mul_u32_properties() {
     // a.add_mul_assign(&b, c) is equivalent for malachite-gmp and malachite-native.
+    // a.add_mul(b, c) is equivalent for malachite-gmp and malachite-native.
     // a.add_mul(&b, c) is equivalent for malachite-gmp and malachite-native.
+    // (&a).add_mul(b, c) is equivalent for malachite-gmp and malachite-native.
     // (&a).add_mul(&b, c) is equivalent for malachite-gmp and malachite-native.
+    // a.add_mul_assign(b, c); a is valid.
     // a.add_mul_assign(&b, c); a is valid.
+    // a.add_mul(b, c) is valid.
     // a.add_mul(&b, c) is valid.
+    // (&a).add_mul(b, c) is valid.
     // (&a).add_mul(&b, c) is valid.
-    // a.add_mul_assign(&b, c), a.add_mul(&b, c), and (&a).add_mul(&b, c) give the same result.
+    // a.add_mul_assign(b, c), a.add_mul_assign(&b, c), a.add_mul(b, c), a.add_mul(&b, c),
+    //      (&a).add_mul(b, c), and (&a).add_mul(&b, c) give the same result.
     // a.add_mul(&b, c) is equivalent to a + b * c.
     let natural_natural_and_u32 = |mut gmp_a: gmp::Natural, gmp_b: gmp::Natural, c: u32| {
         let mut a = gmp_natural_to_native(&gmp_a);
         let b = gmp_natural_to_native(&gmp_b);
         let old_a = a.clone();
-        gmp_a.add_mul_assign(&gmp_b, c);
+        gmp_a.add_mul_assign(gmp_b.clone(), c);
         assert!(gmp_a.is_valid());
 
-        a.add_mul_assign(&b, c);
+        let mut gmp_a_2 = native_natural_to_gmp(&old_a);
+        gmp_a_2.add_mul_assign(&gmp_b, c);
+        assert!(gmp_a_2.is_valid());
+        assert_eq!(gmp_a_2, gmp_a);
+
+        a.add_mul_assign(b.clone(), c);
         assert!(a.is_valid());
         assert_eq!(gmp_natural_to_native(&gmp_a), a);
+
+        let mut a2 = old_a.clone();
+        a2.add_mul_assign(&b, c);
+        assert!(a2.is_valid());
+        assert_eq!(a2, a);
+
+        let gmp_a_2 = native_natural_to_gmp(&old_a);
+        let result = (&gmp_a_2).add_mul(gmp_b.clone(), c);
+        assert!(result.is_valid());
+        assert_eq!(result, gmp_a);
+
+        let result = (&gmp_a_2).add_mul(&gmp_b, c);
+        assert!(result.is_valid());
+        assert_eq!(result, gmp_a);
+
+        let result = gmp_a_2.clone().add_mul(gmp_b.clone(), c);
+        assert!(result.is_valid());
+        assert_eq!(result, gmp_a);
+
+        let result = gmp_a_2.add_mul(&gmp_b, c);
+        assert!(result.is_valid());
+        assert_eq!(result, gmp_a);
+
+        let a2 = old_a.clone();
+        let result = (&a2).add_mul(b.clone(), c);
+        assert!(result.is_valid());
+        assert_eq!(result, a);
 
         let a2 = old_a.clone();
         let result = (&a2).add_mul(&b, c);
         assert!(result.is_valid());
         assert_eq!(result, a);
+
+        let result = a2.clone().add_mul(b.clone(), c);
+        assert!(result.is_valid());
+        assert_eq!(result, a);
+
         let result = a2.add_mul(&b, c);
         assert!(result.is_valid());
         assert_eq!(result, a);

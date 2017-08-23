@@ -203,7 +203,7 @@ fn mul_properties() {
         assert_eq!(native::Natural::from(0u32) * 0, 0);
         let id_1 = &x * native::Natural::from(1u32);
         let id_2 = native::Natural::from(1u32) * &x;
-        //TODO let double = &x + &x;
+        //TODO let double = &x * &x;
         assert_eq!(id_1, x_old);
         assert_eq!(id_2, x_old);
         //TODO assert_eq!(double, x_old.pow(2));

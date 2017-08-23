@@ -25,7 +25,7 @@ use traits::NegAssign;
 impl Sub<Integer> for Integer {
     type Output = Integer;
 
-    fn sub(mut self, mut other: Integer) -> Integer {
+    fn sub(mut self, other: Integer) -> Integer {
         self -= other;
         self
     }

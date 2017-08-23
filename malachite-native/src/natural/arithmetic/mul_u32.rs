@@ -67,20 +67,7 @@ impl<'a> Mul<u32> for &'a Natural {
                     Large(vec![lower, upper])
                 }
             }
-            Large(ref limbs) => {
-                let mut product_limbs = Vec::with_capacity(limbs.len());
-                let mut carry = 0;
-                let multiplicand_u64 = other as u64;
-                for &limb in limbs {
-                    let limb_result = limb as u64 * multiplicand_u64 + carry as u64;
-                    product_limbs.push(get_lower(limb_result));
-                    carry = get_upper(limb_result);
-                }
-                if carry != 0 {
-                    product_limbs.push(carry);
-                }
-                Large(product_limbs)
-            }
+            Large(ref limbs) => Large(large_mul_u32(limbs, other)),
         }
     }
 }
@@ -176,7 +163,7 @@ impl MulAssign<u32> for Natural {
                 small.checked_mul(other)
             },
             {
-                let carry = large_mul_u32(&mut limbs[..], other);
+                let carry = large_mul_u32_in_place(&mut limbs[..], other);
                 if carry != 0 {
                     limbs.push(carry);
                 }
@@ -185,7 +172,7 @@ impl MulAssign<u32> for Natural {
     }
 }
 
-fn large_mul_u32(limbs: &mut [u32], multiplicand: u32) -> u32 {
+fn large_mul_u32_in_place(limbs: &mut [u32], multiplicand: u32) -> u32 {
     let mut carry = 0;
     let multiplicand_u64 = multiplicand as u64;
     for limb in limbs.iter_mut() {
@@ -194,4 +181,19 @@ fn large_mul_u32(limbs: &mut [u32], multiplicand: u32) -> u32 {
         carry = get_upper(limb_result);
     }
     carry
+}
+
+pub(crate) fn large_mul_u32(limbs: &[u32], multiplicand: u32) -> Vec<u32> {
+    let mut product_limbs = Vec::with_capacity(limbs.len());
+    let mut carry = 0;
+    let multiplicand_u64 = multiplicand as u64;
+    for limb in limbs.iter() {
+        let limb_result = *limb as u64 * multiplicand_u64 + carry as u64;
+        product_limbs.push(get_lower(limb_result));
+        carry = get_upper(limb_result);
+    }
+    if carry != 0 {
+        product_limbs.push(carry);
+    }
+    product_limbs
 }
