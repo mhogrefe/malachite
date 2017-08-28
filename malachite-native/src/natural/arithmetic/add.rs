@@ -111,12 +111,16 @@ impl<'a, 'b> Add<&'a Natural> for &'b Natural {
     type Output = Natural;
 
     fn add(self, other: &'a Natural) -> Natural {
-        match (self, other) {
-            (&Small(0), _) => other.clone(),
-            (_, &Small(0)) => self.clone(),
-            (x, &Small(y)) => x + y,
-            (&Small(x), y) => x + y,
-            (&Large(ref xs), &Large(ref ys)) => Large(large_add(xs, ys)),
+        if self as *const Natural == other as *const Natural {
+            self << 1
+        } else {
+            match (self, other) {
+                (&Small(0), _) => other.clone(),
+                (_, &Small(0)) => self.clone(),
+                (x, &Small(y)) => x + y,
+                (&Small(x), y) => x + y,
+                (&Large(ref xs), &Large(ref ys)) => Large(large_add(xs, ys)),
+            }
         }
     }
 }
@@ -145,19 +149,17 @@ impl AddAssign<Natural> for Natural {
     fn add_assign(&mut self, mut other: Natural) {
         if *self == 0 {
             *self = other;
-            return;
-        } else if other == 0 {
-            return;
-        }
-        if self.limb_count() < other.limb_count() {
-            swap(self, &mut other);
-        }
-        match other {
-            Small(y) => *self += y,
-            Large(ref ys) => {
-                match *self {
-                    Large(ref mut xs) => large_add_in_place(xs, ys),
-                    _ => unreachable!(),
+        } else if other != 0 {
+            if self.limb_count() < other.limb_count() {
+                swap(self, &mut other);
+            }
+            match other {
+                Small(y) => *self += y,
+                Large(ref ys) => {
+                    match *self {
+                        Large(ref mut xs) => large_add_in_place(xs, ys),
+                        _ => unreachable!(),
+                    }
                 }
             }
         }
@@ -188,16 +190,16 @@ impl<'a> AddAssign<&'a Natural> for Natural {
     fn add_assign(&mut self, other: &'a Natural) {
         if *self == 0 {
             self.clone_from(other);
-            return;
-        } else if *other == 0 {
-            return;
-        }
-        match *other {
-            Small(y) => *self += y,
-            Large(ref ys) => {
-                match *self {
-                    Small(x) => *self = other + x,
-                    Large(ref mut xs) => large_add_in_place(xs, ys),
+        } else if self as *const Natural == other as *const Natural {
+            *self <<= 1;
+        } else if *other != 0 {
+            match *other {
+                Small(y) => *self += y,
+                Large(ref ys) => {
+                    match *self {
+                        Small(x) => *self = other + x,
+                        Large(ref mut xs) => large_add_in_place(xs, ys),
+                    }
                 }
             }
         }

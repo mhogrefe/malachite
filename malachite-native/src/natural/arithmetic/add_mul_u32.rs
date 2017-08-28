@@ -285,7 +285,7 @@ fn add_mul_and_carry(x: u32, y: u32, multiplicand: u64, carry: &mut u64) -> u32 
     get_lower(sum)
 }
 
-// xs.len() must be > ys.len() and the highest-order limb of xs must be 0.
+// xs.len() must be >= ys.len() and the operation must not overflow xs.
 pub(crate) fn large_add_mul_u32_mut_a(xs: &mut [u32], ys: &[u32], multiplicand: u32) {
     let mut carry = 0;
     let mut ys_iter = ys.iter();
@@ -299,7 +299,7 @@ pub(crate) fn large_add_mul_u32_mut_a(xs: &mut [u32], ys: &[u32], multiplicand: 
     }
 }
 
-// ys.len() must be > xs.len() and the highest-order limb of ys must be 0.
+// ys.len() must be >= xs.len() and the operation must not overflow ys.
 pub(crate) fn large_add_mul_u32_mut_b(xs: &[u32], ys: &mut [u32], multiplicand: u32) {
     let mut carry = 0;
     let mut xs_iter = xs.iter();

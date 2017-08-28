@@ -40,14 +40,14 @@ fn test_sub_assign_natural() {
 }
 
 #[test]
-#[should_panic(expected = "Cannot subtract a u32 from a smaller Natural. self: 123, other: 456")]
+#[should_panic(expected = "Cannot subtract a Natural from a smaller Natural")]
 fn sub_assign_fail_native() {
     let mut x = native::Natural::from_str("123").unwrap();
     x -= &native::Natural::from_str("456").unwrap();
 }
 
 #[test]
-#[should_panic(expected = "Cannot subtract a u32 from a smaller Natural. self: 123, other: 456")]
+#[should_panic(expected = "Cannot subtract a Natural from a smaller Natural")]
 fn sub_assign_fail_gmp() {
     let mut x = gmp::Natural::from_str("123").unwrap();
     x -= &gmp::Natural::from_str("456").unwrap();

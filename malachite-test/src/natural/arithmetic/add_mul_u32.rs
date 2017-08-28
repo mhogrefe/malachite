@@ -243,7 +243,7 @@ pub fn benchmark_random_natural_add_mul_assign_u32(limit: usize, scale: u32, fil
             &(|seed| random_naturals(seed, scale)),
             &(|seed| random_x(seed)),
         ),
-        function_f: &(|(mut a, b, c): (gmp::Natural, gmp::Natural, u32)| a.add_mul_assign(&b, c)),
+        function_f: &(|(mut a, b, c): (gmp::Natural, gmp::Natural, u32)| a.add_mul_assign(b, c)),
         function_g: &(|(mut a, b, c): (native::Natural, native::Natural, u32)| {
                           a.add_mul_assign(b, c)
                       }),

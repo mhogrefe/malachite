@@ -1,3 +1,4 @@
+use natural::arithmetic::sub_u32::sub_assign_u32_helper;
 use natural::Natural::{self, Large, Small};
 use std::ops::{Sub, SubAssign};
 
@@ -26,8 +27,7 @@ impl<'a> Sub<&'a Natural> for Natural {
     type Output = Option<Natural>;
 
     fn sub(mut self, other: &'a Natural) -> Option<Natural> {
-        if self >= *other {
-            self -= other;
+        if sub_assign_helper(&mut self, other) {
             Some(self)
         } else {
             None
@@ -59,16 +59,20 @@ impl<'a, 'b> Sub<&'a Natural> for &'b Natural {
     type Output = Option<Natural>;
 
     fn sub(self, other: &'a Natural) -> Option<Natural> {
-        match (self, other) {
-            (x, &Small(0)) => Some(x.clone()),
-            (x, &Small(y)) => x - y,
-            (&Small(_), _) => None,
-            (&Large(ref xs), &Large(ref ys)) => {
-                large_sub(xs, ys).map(|limbs| {
-                    let mut result = Large(limbs);
-                    result.trim();
-                    result
-                })
+        if self as *const Natural == other as *const Natural {
+            Some(Small(0))
+        } else {
+            match (self, other) {
+                (x, &Small(0)) => Some(x.clone()),
+                (x, &Small(y)) => x - y,
+                (&Small(_), _) => None,
+                (&Large(ref xs), &Large(ref ys)) => {
+                    large_sub(xs, ys).map(|limbs| {
+                        let mut result = Large(limbs);
+                        result.trim();
+                        result
+                    })
+                }
             }
         }
     }
@@ -99,30 +103,8 @@ impl<'a, 'b> Sub<&'a Natural> for &'b Natural {
 /// ```
 impl<'a> SubAssign<&'a Natural> for Natural {
     fn sub_assign(&mut self, other: &'a Natural) {
-        if *other == 0 {
-            return;
-        }
-        let mut panic = false;
-        if let Small(y) = *other {
-            *self -= y;
-        } else if let Small(_) = *self {
-            panic = true;
-        } else if *self < *other {
-            panic = true;
-        } else {
-            match (&mut (*self), other) {
-                (&mut Large(ref mut xs), &Large(ref ys)) => {
-                    panic = !large_sub_in_place(xs, ys);
-                }
-                _ => unreachable!(),
-            }
-        }
-        if panic {
-            panic!(
-                "Cannot subtract a u32 from a smaller Natural. self: {}, other: {}",
-                *self,
-                other
-            );
+        if !sub_assign_helper(self, other) {
+            panic!("Cannot subtract a Natural from a smaller Natural");
         }
         self.trim();
     }
@@ -179,4 +161,30 @@ fn large_sub(xs: &[u32], ys: &[u32]) -> Option<Vec<u32>> {
         }
     }
     if borrow { None } else { Some(difference_limbs) }
+}
+
+fn sub_assign_helper<'a>(x: &mut Natural, y: &'a Natural) -> bool {
+    if *y == 0 {
+        true
+    } else if x as *const Natural == y as *const Natural {
+        *x = Small(0);
+        true
+    } else if x.limb_count() < y.limb_count() {
+        false
+    } else if let Small(y) = *y {
+        sub_assign_u32_helper(x, y)
+    } else if let Small(_) = *x {
+        false
+    } else {
+        match (&mut (*x), y) {
+            (&mut Large(ref mut xs), &Large(ref ys)) => {
+                if !large_sub_in_place(xs, ys) {
+                    return false;
+                }
+            }
+            _ => unreachable!(),
+        }
+        x.trim();
+        true
+    }
 }

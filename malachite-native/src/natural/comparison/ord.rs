@@ -27,6 +27,9 @@ impl PartialOrd for Natural {
 /// Asserts that `Natural` ordering is a total order.
 impl Ord for Natural {
     fn cmp(&self, other: &Natural) -> Ordering {
+        if self as *const Natural == other as *const Natural {
+            return Ordering::Equal;
+        }
         match (self, other) {
             (&Small(ref x), &Small(ref y)) => x.cmp(y),
             (&Small(_), &Large(_)) => Ordering::Less,

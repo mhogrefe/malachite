@@ -1,4 +1,5 @@
 use gmp_mpfr_sys::gmp::{self, mpz_t};
+use natural::arithmetic::sub_u32::sub_assign_u32_helper;
 use natural::Natural::{self, Large, Small};
 use std::mem;
 use std::ops::{Sub, SubAssign};
@@ -22,8 +23,7 @@ impl<'a> Sub<&'a Natural> for Natural {
     type Output = Option<Natural>;
 
     fn sub(mut self, other: &'a Natural) -> Option<Natural> {
-        if self >= *other {
-            self -= other;
+        if sub_assign_helper(&mut self, other) {
             Some(self)
         } else {
             None
@@ -55,17 +55,19 @@ impl<'a, 'b> Sub<&'a Natural> for &'b Natural {
             self - y
         } else if let Small(_) = *self {
             None
-        } else if *self < *other {
-            None
         } else {
             match (self, other) {
                 (&Large(ref x), &Large(ref y)) => unsafe {
                     let mut result: mpz_t = mem::uninitialized();
                     gmp::mpz_init(&mut result);
                     gmp::mpz_sub(&mut result, x, y);
-                    let mut result = Large(result);
-                    result.demote_if_small();
-                    Some(result)
+                    if gmp::mpz_sgn(&result) == -1 {
+                        None
+                    } else {
+                        let mut result = Large(result);
+                        result.demote_if_small();
+                        Some(result)
+                    }
                 },
                 _ => unreachable!(),
             }
@@ -89,31 +91,30 @@ impl<'a, 'b> Sub<&'a Natural> for &'b Natural {
 /// ```
 impl<'a> SubAssign<&'a Natural> for Natural {
     fn sub_assign(&mut self, other: &'a Natural) {
-        if *other == 0 {
-            return;
+        if !sub_assign_helper(self, other) {
+            panic!("Cannot subtract a Natural from a smaller Natural");
         }
-        if let Small(y) = *other {
-            *self -= y;
-        } else if let Small(_) = *self {
-            panic!(
-                "Cannot subtract a Natural from a smaller Natural. self: {}, other: {}",
-                *self,
-                other
-            );
-        } else if *self < *other {
-            panic!(
-                "Cannot subtract a Natural from a smaller Natural. self: {}, other: {}",
-                *self,
-                other
-            );
-        } else {
-            match (&mut (*self), other) {
-                (&mut Large(ref mut x), &Large(ref y)) => unsafe {
-                    gmp::mpz_sub(x, x, y);
-                },
-                _ => unreachable!(),
-            }
+    }
+}
+
+fn sub_assign_helper<'a>(x: &mut Natural, y: &'a Natural) -> bool {
+    if *y == 0 {
+        true
+    } else if let Small(y) = *y {
+        sub_assign_u32_helper(x, y)
+    } else if let Small(_) = *x {
+        false
+    } else {
+        match (&mut (*x), y) {
+            (&mut Large(ref mut x), &Large(ref y)) => unsafe {
+                gmp::mpz_sub(x, x, y);
+                if gmp::mpz_sgn(x) == -1 {
+                    return false;
+                }
+            },
+            _ => unreachable!(),
         }
-        self.demote_if_small();
+        x.demote_if_small();
+        true
     }
 }

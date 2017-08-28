@@ -22,8 +22,7 @@ impl Sub<u32> for Natural {
     type Output = Option<Natural>;
 
     fn sub(mut self, other: u32) -> Option<Natural> {
-        if self >= other {
-            self -= other;
+        if sub_assign_u32_helper(&mut self, other) {
             Some(self)
         } else {
             None
@@ -121,28 +120,34 @@ impl<'a> Sub<&'a Natural> for u32 {
 /// ```
 impl SubAssign<u32> for Natural {
     fn sub_assign(&mut self, other: u32) {
-        if other == 0 {
-            return;
-        }
-        let mut panic = false;
-        match *self {
-            Small(ref mut small) => {
-                match small.checked_sub(other) {
-                    Some(difference) => *small = difference,
-                    None => panic = true,
-                }
-            }
-            Large(ref mut large) => unsafe {
-                gmp::mpz_sub_ui(large, large, other.into());
-            },
-        }
-        if panic {
+        if !sub_assign_u32_helper(self, other) {
             panic!(
                 "Cannot subtract a u32 from a smaller Natural. self: {}, other: {}",
                 *self,
                 other
             );
         }
-        self.demote_if_small();
     }
+}
+
+pub(crate) fn sub_assign_u32_helper(x: &mut Natural, y: u32) -> bool {
+    if y == 0 {
+        return true;
+    }
+    match *x {
+        Small(ref mut small) => {
+            return match small.checked_sub(y) {
+                Some(difference) => {
+                    *small = difference;
+                    true
+                }
+                None => false,
+            };
+        }
+        Large(ref mut large) => unsafe {
+            gmp::mpz_sub_ui(large, large, y.into());
+        },
+    }
+    x.demote_if_small();
+    true
 }

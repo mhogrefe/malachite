@@ -158,6 +158,7 @@ pub mod arithmetic {
     pub mod shl_u32;
     pub mod sub;
     pub mod sub_u32;
+    pub mod sub_mul_u32;
 }
 pub mod conversion;
 pub mod comparison {

@@ -113,6 +113,7 @@ fn test_add_mul_u32() {
 
 #[test]
 fn add_mul_u32_properties() {
+    // a.add_mul_assign(b, c) is equivalent for malachite-gmp and malachite-native.
     // a.add_mul_assign(&b, c) is equivalent for malachite-gmp and malachite-native.
     // a.add_mul(b, c) is equivalent for malachite-gmp and malachite-native.
     // a.add_mul(&b, c) is equivalent for malachite-gmp and malachite-native.

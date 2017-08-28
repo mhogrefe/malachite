@@ -26,8 +26,7 @@ impl Sub<u32> for Natural {
     type Output = Option<Natural>;
 
     fn sub(mut self, other: u32) -> Option<Natural> {
-        if self >= other {
-            self -= other;
+        if sub_assign_u32_helper(&mut self, other) {
             Some(self)
         } else {
             None
@@ -145,31 +144,13 @@ impl<'a> Sub<&'a Natural> for u32 {
 /// ```
 impl SubAssign<u32> for Natural {
     fn sub_assign(&mut self, other: u32) {
-        if other == 0 {
-            return;
-        }
-        let mut panic = false;
-        match *self {
-            Small(ref mut small) => {
-                match small.checked_sub(other) {
-                    Some(difference) => *small = difference,
-                    None => panic = true,
-                }
-            }
-            Large(ref mut limbs) => {
-                if large_sub_u32(&mut limbs[..], other) {
-                    panic = true;
-                }
-            }
-        }
-        if panic {
+        if !sub_assign_u32_helper(self, other) {
             panic!(
                 "Cannot subtract a u32 from a smaller Natural. self: {}, other: {}",
                 *self,
                 other
             );
         }
-        self.trim();
     }
 }
 
@@ -184,5 +165,29 @@ pub(crate) fn large_sub_u32(limbs: &mut [u32], mut subtrahend: u32) -> bool {
             break;
         }
     }
-    subtrahend != 0
+    subtrahend == 0
+}
+
+pub(crate) fn sub_assign_u32_helper(x: &mut Natural, y: u32) -> bool {
+    if y == 0 {
+        return true;
+    }
+    match *x {
+        Small(ref mut small) => {
+            return match small.checked_sub(y) {
+                Some(difference) => {
+                    *small = difference;
+                    true
+                }
+                None => false,
+            }
+        }
+        Large(ref mut limbs) => {
+            if !large_sub_u32(&mut limbs[..], y) {
+                return false;
+            }
+        }
+    }
+    x.trim();
+    true
 }
