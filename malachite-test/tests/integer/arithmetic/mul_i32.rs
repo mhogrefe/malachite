@@ -161,15 +161,12 @@ fn mul_i32_properties() {
         assert_eq!(result, n);
         assert!(result.is_valid());
 
-        //TODO
-        /*
         let n2 = old_n.clone();
         let result = n2 * native::Integer::from(i);
         assert_eq!(result, n);
         let n2 = old_n.clone();
         let result = native::Integer::from(i) * n2;
         assert_eq!(result, n);
-        */
 
         let gmp_n2 = native_integer_to_gmp(&old_n);
         let result = &gmp_n2 * i;

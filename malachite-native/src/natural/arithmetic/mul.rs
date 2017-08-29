@@ -118,13 +118,6 @@ impl<'a, 'b> Mul<&'a Natural> for &'b Natural {
     type Output = Natural;
 
     fn mul(self, other: &'a Natural) -> Natural {
-        if *self == 0 || *other == 0 {
-            return Small(0);
-        } else if *self == 1 {
-            return other.clone();
-        } else if *other == 1 {
-            return self.clone();
-        }
         if let Small(y) = *other {
             self * y
         } else if let Small(x) = *self {
@@ -169,12 +162,7 @@ impl<'a, 'b> Mul<&'a Natural> for &'b Natural {
 /// ```
 impl MulAssign<Natural> for Natural {
     fn mul_assign(&mut self, mut other: Natural) {
-        if other == 0 {
-            *self = Small(0);
-        } else if *self == 1 {
-            *self = other;
-        } else if *self == 0 || other == 1 {
-        } else if let Small(y) = other {
+        if let Small(y) = other {
             *self *= y;
         } else if let Small(x) = *self {
             other *= x;
@@ -218,12 +206,7 @@ impl MulAssign<Natural> for Natural {
 /// ```
 impl<'a> MulAssign<&'a Natural> for Natural {
     fn mul_assign(&mut self, other: &'a Natural) {
-        if *other == 0 {
-            *self = Small(0);
-        } else if *self == 1 {
-            self.clone_from(other);
-        } else if *self == 0 || *other == 1 {
-        } else if let Small(y) = *other {
+        if let Small(y) = *other {
             *self *= y;
         } else if let Small(x) = *self {
             *self = other * x;

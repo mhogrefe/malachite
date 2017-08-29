@@ -109,7 +109,7 @@ fn shl_u32_properties() {
     // &n << u is valid.
     // n <<= u, n << u, and &n << u give the same result.
     // |n << u| >= |n|
-    // //TODO n << u == n * (1 << u)
+    // n << u == n * (1 << u)
     // TODO >>
     let integer_and_u32 = |mut gmp_n: gmp::Integer, u: u32| {
         let mut n = gmp_integer_to_native(&gmp_n);
@@ -151,7 +151,7 @@ fn shl_u32_properties() {
         assert!((&old_n << u).abs() >= old_n.abs_ref());
         assert_eq!(-&old_n << u, -(&old_n << u));
 
-        //TODO assert_eq!(&old_n << u, old_n * (native::Integer::from(1u32) << u));
+        assert_eq!(&old_n << u, old_n * (native::Integer::from(1u32) << u));
     };
 
     // n << 0 == n

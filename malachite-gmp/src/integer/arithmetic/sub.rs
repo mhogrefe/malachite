@@ -20,14 +20,9 @@ use traits::NegAssign;
 impl Sub<Integer> for Integer {
     type Output = Integer;
 
-    fn sub(mut self, mut other: Integer) -> Integer {
-        if self.significant_bits() >= other.significant_bits() {
-            self -= other;
-            self
-        } else {
-            other -= self;
-            -other
-        }
+    fn sub(mut self, other: Integer) -> Integer {
+        self -= other;
+        self
     }
 }
 

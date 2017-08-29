@@ -2,7 +2,6 @@ use gmp_mpfr_sys::gmp;
 use integer::Integer;
 use integer::Integer::*;
 use std::cmp::Ordering;
-use std::ops::MulAssign;
 
 impl Integer {
     //TODO test
@@ -39,47 +38,12 @@ impl Integer {
     }
 }
 
-//TODO test
-impl<'a> MulAssign<&'a Integer> for Integer {
-    fn mul_assign(&mut self, op: &'a Integer) {
-        if *op == 1 || *self == 0 {
-            return;
-        }
-        if *op == 0 {
-            *self = Small(0);
-        }
-        if let Small(ref mut x) = *self {
-            if let Small(y) = *op {
-                if let Some(product) = x.checked_mul(y) {
-                    *x = product;
-                    return;
-                }
-            }
-        }
-        let mut x = self.promote_in_place();
-        match *op {
-            Small(y) => unsafe {
-                gmp::mpz_mul_si(x, x, y.into());
-            },
-            Large(y) => unsafe {
-                gmp::mpz_mul(x, x, &y);
-            },
-        }
-    }
-}
-
-//TODO test
-impl MulAssign<Integer> for Integer {
-    fn mul_assign(&mut self, op: Integer) {
-        self.mul_assign(&op);
-    }
-}
-
 pub mod abs;
 pub mod add;
 pub mod add_i32;
 pub mod add_u32;
 pub mod even_odd;
+pub mod mul;
 pub mod mul_i32;
 pub mod mul_u32;
 pub mod neg;

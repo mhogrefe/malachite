@@ -15,6 +15,7 @@ pub mod integer {
         pub mod add_i32;
         pub mod add_u32;
         pub mod even_odd;
+        pub mod mul;
         pub mod mul_i32;
         pub mod mul_u32;
         pub mod neg;

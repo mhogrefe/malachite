@@ -19,14 +19,9 @@ use std::ops::{Add, AddAssign};
 impl Add<Natural> for Natural {
     type Output = Natural;
 
-    fn add(mut self, mut other: Natural) -> Natural {
-        if self.significant_bits() >= other.significant_bits() {
-            self += other;
-            self
-        } else {
-            other += self;
-            other
-        }
+    fn add(mut self, other: Natural) -> Natural {
+        self += other;
+        self
     }
 }
 

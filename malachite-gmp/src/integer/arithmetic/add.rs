@@ -19,14 +19,9 @@ use std::mem;
 impl Add<Integer> for Integer {
     type Output = Integer;
 
-    fn add(mut self, mut other: Integer) -> Integer {
-        if self.significant_bits() >= other.significant_bits() {
-            self += other;
-            self
-        } else {
-            other += self;
-            other
-        }
+    fn add(mut self, other: Integer) -> Integer {
+        self += other;
+        self
     }
 }
 
