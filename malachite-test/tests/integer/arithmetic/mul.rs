@@ -242,11 +242,15 @@ fn mul_properties() {
     };
 
     // (x * y) * z == x * (y * z)
+    // x * (y + z) == x * y + x * z
+    // (x + y) * z == x * z + y * z
     let three_integers = |gmp_x: gmp::Integer, gmp_y: gmp::Integer, gmp_z: gmp::Integer| {
         let x = gmp_integer_to_native(&gmp_x);
         let y = gmp_integer_to_native(&gmp_y);
         let z = gmp_integer_to_native(&gmp_z);
-        assert_eq!((&x * &y) * &z, x * (y * z));
+        assert_eq!((&x * &y) * &z, &x * (&y * &z));
+        assert_eq!(&x * (&y + &z), &x * &y + &x * &z);
+        assert_eq!((&x + &y) * &z, x * &z + y * z);
     };
 
     for (x, y) in exhaustive_pairs_from_single(exhaustive_integers()).take(LARGE_LIMIT) {

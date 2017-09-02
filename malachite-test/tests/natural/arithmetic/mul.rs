@@ -210,11 +210,15 @@ fn mul_properties() {
     };
 
     // (x * y) * z == x * (y * z)
+    // x * (y + z) == x * y + x * z
+    // (x + y) * z == x * z + y * z
     let three_naturals = |gmp_x: gmp::Natural, gmp_y: gmp::Natural, gmp_z: gmp::Natural| {
         let x = gmp_natural_to_native(&gmp_x);
         let y = gmp_natural_to_native(&gmp_y);
         let z = gmp_natural_to_native(&gmp_z);
-        assert_eq!((&x * &y) * &z, x * (y * z));
+        assert_eq!((&x * &y) * &z, &x * (&y * &z));
+        assert_eq!(&x * (&y + &z), &x * &y + &x * &z);
+        assert_eq!((&x + &y) * &z, x * &z + y * z);
     };
 
     for (x, y) in exhaustive_pairs_from_single(exhaustive_naturals()).take(LARGE_LIMIT) {
