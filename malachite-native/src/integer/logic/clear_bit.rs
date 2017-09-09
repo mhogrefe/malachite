@@ -69,7 +69,7 @@ impl Natural {
                     if limb_index > zero_bound {
                         limbs[limb_index] |= mask;
                     } else if limb_index == zero_bound {
-                        let dlimb = ((limbs[limb_index] - 1) | mask) + 1;
+                        let dlimb = ((limbs[limb_index] - 1) | mask).wrapping_add(1);
                         limbs[limb_index] = dlimb;
                         if dlimb == 0 {
                             if large_add_u32(&mut limbs[limb_index + 1..], 1) {

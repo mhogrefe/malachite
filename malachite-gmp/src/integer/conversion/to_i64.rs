@@ -29,7 +29,7 @@ impl Integer {
                 {
                     let abs = self.abs_ref().to_u64().unwrap() as i64;
                     Some(if self.sign() == Ordering::Less {
-                        -abs
+                        abs.wrapping_neg()
                     } else {
                         abs
                     })

@@ -1,5 +1,6 @@
+use natural::arithmetic::add::large_add_in_place_and_carry;
 use natural::arithmetic::add_mul_u32::large_add_mul_u32_mut_a;
-use natural::arithmetic::mul_u32::large_mul_u32;
+use natural::arithmetic::mul_u32::{large_mul_u32, large_mul_u32_to_buffer};
 use natural::Natural::{self, Large, Small};
 use std::ops::{Mul, MulAssign};
 
@@ -170,11 +171,7 @@ impl MulAssign<Natural> for Natural {
         } else {
             match (&mut (*self), other) {
                 (&mut Large(ref mut xs), Large(ref mut ys)) => {
-                    if xs.len() >= ys.len() {
-                        *xs = basecase_mul(xs, ys);
-                    } else {
-                        *xs = basecase_mul(ys, xs);
-                    }
+                    *xs = mul_helper(xs, ys);
                 }
                 _ => unreachable!(),
             }
@@ -213,15 +210,39 @@ impl<'a> MulAssign<&'a Natural> for Natural {
         } else {
             match (&mut (*self), other) {
                 (&mut Large(ref mut xs), &Large(ref ys)) => {
-                    if xs.len() >= ys.len() {
-                        *xs = basecase_mul(xs, ys);
-                    } else {
-                        *xs = basecase_mul(ys, xs);
-                    }
+                    *xs = mul_helper(xs, ys);
                 }
                 _ => unreachable!(),
             }
             self.trim();
+        }
+    }
+}
+
+fn mul_helper(xs: &[u32], ys: &[u32]) -> Vec<u32> {
+    if xs.len() >= ys.len() {
+        basecase_mul(xs, ys)
+    } else {
+        basecase_mul(ys, xs)
+    }
+}
+
+// xs.len() >= ys.len()
+fn basecase_mul_with_mem_opt(xs: &[u32], ys: &[u32]) -> Vec<u32> {
+    let ys_len = ys.len();
+    if ys_len > 1 && ys_len < MUL_TOOM22_THRESHOLD && xs.len() > MUL_BASECASE_MAX_UN {
+        basecase_mem_opt_mul(xs, ys)
+    } else {
+        basecase_mul(xs, ys)
+    }
+}
+
+// xs.len() >= ys.len(), ys cannot be empty
+fn basecase_mul_to_buffer(buffer: &mut [u32], xs: &[u32], ys: &[u32]) {
+    large_mul_u32_to_buffer(buffer, xs, ys[0]);
+    for (i, y) in ys.iter().enumerate().skip(1) {
+        if *y != 0 {
+            large_add_mul_u32_mut_a(&mut buffer[i..], xs, *y);
         }
     }
 }
@@ -236,4 +257,59 @@ fn basecase_mul(xs: &[u32], ys: &[u32]) -> Vec<u32> {
         }
     }
     product_limbs
+}
+
+
+const MUL_BASECASE_MAX_UN: usize = 500;
+const MUL_TOOM22_THRESHOLD: usize = 300;
+
+// 1 < ys.len() < MUL_TOOM22_THRESHOLD < MUL_BASECASE_MAX_UN < xs.len()
+//
+// This is currently not measurably better than just basecase.
+fn basecase_mem_opt_mul(xs: &[u32], ys: &[u32]) -> Vec<u32> {
+    let x_len = xs.len();
+    let y_len = ys.len();
+    let output_length = x_len + y_len;
+    let mut buffer = Vec::with_capacity(output_length);
+    buffer.resize(output_length, 0);
+    let mut triangle_buffer = [0; MUL_TOOM22_THRESHOLD];
+    let mut offset = 0;
+    for chunk in xs.chunks(MUL_BASECASE_MAX_UN) {
+        if chunk.len() >= y_len {
+            basecase_mul_to_buffer(&mut buffer[offset..], chunk, ys);
+        } else {
+            basecase_mul_to_buffer(&mut buffer[offset..], ys, chunk);
+        }
+        if offset != 0 {
+            large_add_in_place_and_carry(&mut buffer[offset..], &triangle_buffer[0..y_len]);
+        }
+        offset += MUL_BASECASE_MAX_UN;
+        if offset < x_len {
+            &triangle_buffer[0..y_len].copy_from_slice(&buffer[offset..offset + y_len]);
+        }
+    }
+    buffer
+}
+
+impl Natural {
+    pub fn _basecase_mul_assign_with_mem_opt(&mut self, mut other: Natural) {
+        if let Small(y) = other {
+            *self *= y;
+        } else if let Small(x) = *self {
+            other *= x;
+            *self = other;
+        } else {
+            match (&mut (*self), other) {
+                (&mut Large(ref mut xs), Large(ref ys)) => {
+                    *xs = if xs.len() >= ys.len() {
+                        basecase_mul_with_mem_opt(xs, ys)
+                    } else {
+                        basecase_mul_with_mem_opt(ys, xs)
+                    };
+                }
+                _ => unreachable!(),
+            }
+            self.trim();
+        }
+    }
 }

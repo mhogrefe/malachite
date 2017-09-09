@@ -1243,6 +1243,9 @@ fn main() {
                 "exhaustive_natural_mul_assign" => {
                     benchmark_exhaustive_natural_mul_assign(limit, "temp.gp")
                 }
+                "exhaustive_natural_mul_assign_algorithms" => {
+                    benchmark_exhaustive_natural_mul_assign_algorithms(limit, "temp.gp")
+                }
                 "exhaustive_natural_mul_assign_evaluation_strategy" => {
                     benchmark_exhaustive_natural_mul_assign_evaluation_strategy(limit, "temp.gp")
                 }
@@ -1850,6 +1853,9 @@ fn main() {
                 "random_natural_mul_assign_evaluation_strategy" => {
                     benchmark_random_natural_mul_assign_evaluation_strategy(limit, 1024, "temp.gp")
                 }
+                "random_natural_mul_assign_algorithms" => {
+                    benchmark_random_natural_mul_assign_algorithms(limit, 16384, "temp.gp")
+                }
                 "random_natural_mul" => benchmark_random_natural_mul(limit, 1024, "temp.gp"),
                 "random_natural_mul_evaluation_strategy" => {
                     benchmark_random_natural_mul_evaluation_strategy(limit, 1024, "temp.gp")
@@ -2329,6 +2335,10 @@ fn main() {
                     benchmark_exhaustive_natural_mul_assign(
                         100000,
                         "exhaustive_natural_mul_assign.gp",
+                    );
+                    benchmark_exhaustive_natural_mul_assign_algorithms(
+                        100000,
+                        "exhaustive_natural_mul_assign_algorithms.gp",
                     );
                     let s = "exhaustive_natural_mul_assign_evaluation_strategy.gp";
                     benchmark_exhaustive_natural_mul_assign_evaluation_strategy(100000, s);
@@ -2867,6 +2877,11 @@ fn main() {
                         100000,
                         1024,
                         "random_natural_mul_assign.gp",
+                    );
+                    benchmark_random_natural_mul_assign_algorithms(
+                        100000,
+                        16384,
+                        "random_natural_mul_assign_algorithms.gp",
                     );
                     let s = "random_natural_mul_assign_evaluation_strategy.gp";
                     benchmark_random_natural_mul_assign_evaluation_strategy(100000, 1024, s);

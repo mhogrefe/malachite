@@ -149,6 +149,48 @@ pub fn benchmark_random_natural_mul_assign(limit: usize, scale: u32, file_name: 
     });
 }
 
+pub fn benchmark_exhaustive_natural_mul_assign_algorithms(limit: usize, file_name: &str) {
+    println!("benchmarking exhaustive Natural *= Natural algorithms");
+    benchmark_2(BenchmarkOptions2 {
+        xs: exhaustive_pairs_from_single(exhaustive_naturals()),
+        function_f: &(|(mut x, y)| x *= y),
+        function_g: &(|(mut x, y): (native::Natural, native::Natural)| {
+                          x._basecase_mul_assign_with_mem_opt(y)
+                      }),
+        x_cons: &(|&(ref x, ref y)| (gmp_natural_to_native(x), gmp_natural_to_native(y))),
+        y_cons: &(|&(ref x, ref y)| (gmp_natural_to_native(x), gmp_natural_to_native(y))),
+        x_param: &(|&(ref x, ref y)| (x.significant_bits() + y.significant_bits()) as usize),
+        limit: limit,
+        f_name: "combined",
+        g_name: "basecase only",
+        title: "Natural *= Natural algorithms",
+        x_axis_label: "x.significant\\\\_bits() + y.significant\\\\_bits()",
+        y_axis_label: "time (ns)",
+        file_name: &format!("benchmarks/{}", file_name),
+    });
+}
+
+pub fn benchmark_random_natural_mul_assign_algorithms(limit: usize, scale: u32, file_name: &str) {
+    println!("benchmarking random Natural *= Natural algorithms");
+    benchmark_2(BenchmarkOptions2 {
+        xs: random_pairs_from_single(random_naturals(&EXAMPLE_SEED, scale)),
+        function_f: &(|(mut x, y)| x *= y),
+        function_g: &(|(mut x, y): (native::Natural, native::Natural)| {
+                          x._basecase_mul_assign_with_mem_opt(y)
+                      }),
+        x_cons: &(|&(ref x, ref y)| (gmp_natural_to_native(x), gmp_natural_to_native(y))),
+        y_cons: &(|&(ref x, ref y)| (gmp_natural_to_native(x), gmp_natural_to_native(y))),
+        x_param: &(|&(ref x, ref y)| (x.significant_bits() + y.significant_bits()) as usize),
+        limit: limit,
+        f_name: "combined",
+        g_name: "basecase only",
+        title: "Natural *= Natural algorithms",
+        x_axis_label: "x.significant\\\\_bits() + y.significant\\\\_bits()",
+        y_axis_label: "time (ns)",
+        file_name: &format!("benchmarks/{}", file_name),
+    });
+}
+
 pub fn benchmark_exhaustive_natural_mul_assign_evaluation_strategy(limit: usize, file_name: &str) {
     println!("benchmarking exhaustive Natural *= Natural evaluation strategy");
     benchmark_2(BenchmarkOptions2 {

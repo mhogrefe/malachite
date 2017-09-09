@@ -34,6 +34,11 @@ fn test_mul() {
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
+        let mut n = native::Natural::from_str(u).unwrap();
+        n._basecase_mul_assign_with_mem_opt(native::Natural::from_str(v).unwrap());
+        assert_eq!(n.to_string(), out);
+        assert!(n.is_valid());
+
         let mut n = gmp::Natural::from_str(u).unwrap();
         n *= &gmp::Natural::from_str(v).unwrap();
         assert_eq!(n.to_string(), out);
@@ -150,6 +155,10 @@ fn mul_properties() {
         mut_x *= &y;
         assert_eq!(mut_x, product);
         assert!(mut_x.is_valid());
+        let mut mut_x = x.clone();
+        mut_x._basecase_mul_assign_with_mem_opt(y.clone());
+        assert!(mut_x.is_valid());
+        assert_eq!(mut_x, product, "x: {}, y: {}", x, y);
 
         let mut mut_x = gmp_x.clone();
         mut_x *= gmp_y.clone();
@@ -225,7 +234,7 @@ fn mul_properties() {
         two_naturals(x, y);
     }
 
-    for (x, y) in random_pairs_from_single(random_naturals(&EXAMPLE_SEED, 32)).take(LARGE_LIMIT) {
+    for (x, y) in random_pairs_from_single(random_naturals(&EXAMPLE_SEED, 2048)).take(LARGE_LIMIT) {
         two_naturals(x, y);
     }
 
@@ -235,7 +244,7 @@ fn mul_properties() {
 
     for (x, y) in random_pairs(
         &EXAMPLE_SEED,
-        &(|seed| random_naturals(seed, 32)),
+        &(|seed| random_naturals(seed, 2048)),
         &(|seed| random_x(seed)),
     ).take(LARGE_LIMIT)
     {
@@ -246,7 +255,7 @@ fn mul_properties() {
         one_natural(n);
     }
 
-    for n in random_naturals(&EXAMPLE_SEED, 32).take(LARGE_LIMIT) {
+    for n in random_naturals(&EXAMPLE_SEED, 2048).take(LARGE_LIMIT) {
         one_natural(n);
     }
 
@@ -254,7 +263,7 @@ fn mul_properties() {
         three_naturals(x, y, z);
     }
 
-    for (x, y, z) in random_triples_from_single(random_naturals(&EXAMPLE_SEED, 32))
+    for (x, y, z) in random_triples_from_single(random_naturals(&EXAMPLE_SEED, 2048))
         .take(LARGE_LIMIT)
     {
         three_naturals(x, y, z);

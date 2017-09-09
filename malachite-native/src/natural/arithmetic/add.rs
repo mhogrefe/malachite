@@ -241,6 +241,19 @@ fn large_add_in_place(xs: &mut Vec<u32>, ys: &[u32]) {
     }
 }
 
+// xs must not overflow
+pub(crate) fn large_add_in_place_and_carry(xs: &mut [u32], ys: &[u32]) {
+    let mut carry = false;
+    let mut i = 0;
+    for y in ys.iter() {
+        xs[i] = add_and_carry(xs[i], *y, &mut carry);
+        i += 1;
+    }
+    if carry {
+        xs[i] += 1;
+    }
+}
+
 fn large_add(xs: &[u32], ys: &[u32]) -> Vec<u32> {
     let mut sum_limbs = Vec::with_capacity(xs.len());
     let mut carry = false;

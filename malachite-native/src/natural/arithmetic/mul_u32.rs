@@ -197,3 +197,18 @@ pub(crate) fn large_mul_u32(limbs: &[u32], multiplicand: u32) -> Vec<u32> {
     }
     product_limbs
 }
+
+pub(crate) fn large_mul_u32_to_buffer(buffer: &mut [u32], limbs: &[u32], multiplicand: u32) {
+    let mut carry = 0;
+    let multiplicand_u64 = multiplicand as u64;
+    let mut i = 0;
+    for limb in limbs.iter() {
+        let limb_result = *limb as u64 * multiplicand_u64 + carry as u64;
+        buffer[i] = get_lower(limb_result);
+        carry = get_upper(limb_result);
+        i += 1;
+    }
+    if carry != 0 {
+        buffer[i] = carry;
+    }
+}

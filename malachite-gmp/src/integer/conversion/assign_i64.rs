@@ -17,7 +17,7 @@ impl Assign<i64> for Integer {
         if other >= 0 {
             self.assign(other as u64);
         } else {
-            self.assign((-other) as u64);
+            self.assign(other.wrapping_neg() as u64);
             self.neg_assign();
         }
     }
