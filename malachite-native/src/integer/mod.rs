@@ -66,6 +66,7 @@ pub mod arithmetic {
     pub mod sub;
     pub mod sub_i32;
     pub mod sub_u32;
+    pub mod sub_mul_u32;
 }
 pub mod comparison {
     pub mod ord;

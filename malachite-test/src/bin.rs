@@ -14,6 +14,7 @@ use malachite_test::integer::arithmetic::shl_u32::*;
 use malachite_test::integer::arithmetic::sub::*;
 use malachite_test::integer::arithmetic::sub_i32::*;
 use malachite_test::integer::arithmetic::sub_u32::*;
+use malachite_test::integer::arithmetic::sub_mul_u32::*;
 use malachite_test::integer::comparison::eq::*;
 use malachite_test::integer::comparison::hash::*;
 use malachite_test::integer::comparison::ord::*;
@@ -304,6 +305,22 @@ fn main() {
                 "exhaustive_integer_sub_u32_ref" => demo_exhaustive_integer_sub_u32_ref(limit),
                 "exhaustive_u32_sub_integer" => demo_exhaustive_u32_sub_integer(limit),
                 "exhaustive_u32_sub_integer_ref" => demo_exhaustive_u32_sub_integer_ref(limit),
+                "exhaustive_integer_sub_mul_assign_u32" => {
+                    demo_exhaustive_integer_sub_mul_assign_u32(limit)
+                }
+                "exhaustive_integer_sub_mul_assign_u32_ref" => {
+                    demo_exhaustive_integer_sub_mul_assign_u32_ref(limit)
+                }
+                "exhaustive_integer_sub_mul_u32" => demo_exhaustive_integer_sub_mul_u32(limit),
+                "exhaustive_integer_sub_mul_u32_val_ref" => {
+                    demo_exhaustive_integer_sub_mul_u32_val_ref(limit)
+                }
+                "exhaustive_integer_sub_mul_u32_ref_val" => {
+                    demo_exhaustive_integer_sub_mul_u32_ref_val(limit)
+                }
+                "exhaustive_integer_sub_mul_u32_ref_ref" => {
+                    demo_exhaustive_integer_sub_mul_u32_ref_ref(limit)
+                }
                 "exhaustive_integer_to_i32" => demo_exhaustive_integer_to_i32(limit),
                 "exhaustive_integer_to_i32_wrapping" => demo_exhaustive_integer_to_i32_wrapping(
                     limit,
@@ -621,6 +638,22 @@ fn main() {
                 "random_integer_sub_u32_ref" => demo_random_integer_sub_u32_ref(limit),
                 "random_u32_sub_integer" => demo_random_u32_sub_integer(limit),
                 "random_u32_sub_integer_ref" => demo_random_u32_sub_integer_ref(limit),
+                "random_integer_sub_mul_assign_u32" => demo_random_integer_sub_mul_assign_u32(
+                    limit,
+                ),
+                "random_integer_sub_mul_assign_u32_ref" => {
+                    demo_random_integer_sub_mul_assign_u32_ref(limit)
+                }
+                "random_integer_sub_mul_u32" => demo_random_integer_sub_mul_u32(limit),
+                "random_integer_sub_mul_u32_val_ref" => demo_random_integer_sub_mul_u32_val_ref(
+                    limit,
+                ),
+                "random_integer_sub_mul_u32_ref_val" => demo_random_integer_sub_mul_u32_ref_val(
+                    limit,
+                ),
+                "random_integer_sub_mul_u32_ref_ref" => demo_random_integer_sub_mul_u32_ref_ref(
+                    limit,
+                ),
                 "random_integer_to_i32" => demo_random_integer_to_i32(limit),
                 "random_integer_to_i32_wrapping" => demo_random_integer_to_i32_wrapping(limit),
                 "random_integer_to_i64" => demo_random_integer_to_i64(limit),
@@ -1072,6 +1105,39 @@ fn main() {
                 }
                 "exhaustive_u32_sub_integer_evaluation_strategy" => {
                     benchmark_exhaustive_u32_sub_integer_evaluation_strategy(limit, "temp.gp")
+                }
+                "exhaustive_integer_sub_mul_assign_u32" => {
+                    benchmark_exhaustive_integer_sub_mul_assign_u32(limit, "temp.gp")
+                }
+                "exhaustive_integer_sub_mul_assign_u32_evaluation_strategy" => {
+                    benchmark_exhaustive_integer_sub_mul_assign_u32_evaluation_strategy(
+                        limit,
+                        "temp.gp",
+                    )
+                }
+                "exhaustive_integer_sub_mul_assign_u32_algorithms" => {
+                    benchmark_exhaustive_integer_sub_mul_assign_u32_algorithms(limit, "temp.gp")
+                }
+                "exhaustive_integer_sub_mul_assign_u32_ref_algorithms" => {
+                    benchmark_exhaustive_integer_sub_mul_assign_u32_ref_algorithms(limit, "temp.gp")
+                }
+                "exhaustive_integer_sub_mul_u32" => {
+                    benchmark_exhaustive_integer_sub_mul_u32(limit, "temp.gp")
+                }
+                "exhaustive_integer_sub_mul_u32_evaluation_strategy" => {
+                    benchmark_exhaustive_integer_sub_mul_u32_evaluation_strategy(limit, "temp.gp")
+                }
+                "exhaustive_integer_sub_mul_u32_algorithms" => {
+                    benchmark_exhaustive_integer_sub_mul_u32_algorithms(limit, "temp.gp")
+                }
+                "exhaustive_integer_sub_mul_u32_val_ref_algorithms" => {
+                    benchmark_exhaustive_integer_sub_mul_u32_val_ref_algorithms(limit, "temp.gp")
+                }
+                "exhaustive_integer_sub_mul_u32_ref_val_algorithms" => {
+                    benchmark_exhaustive_integer_sub_mul_u32_ref_val_algorithms(limit, "temp.gp")
+                }
+                "exhaustive_integer_sub_mul_u32_ref_ref_algorithms" => {
+                    benchmark_exhaustive_integer_sub_mul_u32_ref_ref_algorithms(limit, "temp.gp")
                 }
                 "exhaustive_integer_to_i32" => {
                     benchmark_exhaustive_integer_to_i32(limit, "temp.gp")
@@ -1690,6 +1756,44 @@ fn main() {
                 "random_u32_sub_integer_evaluation_strategy" => {
                     benchmark_random_u32_sub_integer_evaluation_strategy(limit, 1024, "temp.gp")
                 }
+                "random_integer_sub_mul_assign_u32" => {
+                    benchmark_random_integer_sub_mul_assign_u32(limit, 1024, "temp.gp")
+                }
+                "random_integer_sub_mul_assign_u32_evaluation_strategy" => {
+                    benchmark_random_integer_sub_mul_assign_u32_evaluation_strategy(
+                        limit,
+                        1024,
+                        "temp.gp",
+                    )
+                }
+                "random_integer_sub_mul_assign_u32_algorithms" => {
+                    benchmark_random_integer_sub_mul_assign_u32_algorithms(limit, 1024, "temp.gp")
+                }
+                "random_integer_sub_mul_assign_u32_ref_algorithms" => {
+                    benchmark_random_integer_sub_mul_assign_u32_ref_algorithms(
+                        limit,
+                        1024,
+                        "temp.gp",
+                    )
+                }
+                "random_integer_sub_mul_u32" => {
+                    benchmark_random_integer_sub_mul_u32(limit, 1024, "temp.gp")
+                }
+                "random_integer_sub_mul_u32_evaluation_strategy" => {
+                    benchmark_random_integer_sub_mul_u32_evaluation_strategy(limit, 1024, "temp.gp")
+                }
+                "random_integer_sub_mul_u32_algorithms" => {
+                    benchmark_random_integer_sub_mul_u32_algorithms(limit, 1024, "temp.gp")
+                }
+                "random_integer_sub_mul_u32_val_ref_algorithms" => {
+                    benchmark_random_integer_sub_mul_u32_val_ref_algorithms(limit, 1024, "temp.gp")
+                }
+                "random_integer_sub_mul_u32_ref_val_algorithms" => {
+                    benchmark_random_integer_sub_mul_u32_ref_val_algorithms(limit, 1024, "temp.gp")
+                }
+                "random_integer_sub_mul_u32_ref_ref_algorithms" => {
+                    benchmark_random_integer_sub_mul_u32_ref_ref_algorithms(limit, 1024, "temp.gp")
+                }
                 "random_integer_to_i32" => benchmark_random_integer_to_i32(limit, "temp.gp"),
                 "random_integer_to_i32_wrapping" => {
                     benchmark_random_integer_to_i32_wrapping(limit, "temp.gp")
@@ -2217,6 +2321,26 @@ fn main() {
                         100000,
                         "exhaustive_u32_sub_integer_evaluation_strategy.gp",
                     );
+                    let s = "exhaustive_integer_sub_mul_assign_u32.gp";
+                    benchmark_exhaustive_integer_sub_mul_assign_u32(100000, s);
+                    let s = "exhaustive_integer_sub_mul_assign_u32_evaluation_strategy.gp";
+                    benchmark_exhaustive_integer_sub_mul_assign_u32_evaluation_strategy(100000, s);
+                    let s = "exhaustive_integer_sub_mul_assign_u32_algorithms.gp";
+                    benchmark_exhaustive_integer_sub_mul_assign_u32_algorithms(100000, s);
+                    let s = "exhaustive_integer_sub_mul_assign_u32_ref_algorithms.gp";
+                    benchmark_exhaustive_integer_sub_mul_assign_u32_ref_algorithms(100000, s);
+                    let s = "exhaustive_integer_sub_mul_u32.gp";
+                    benchmark_exhaustive_integer_sub_mul_u32(100000, s);
+                    let s = "exhaustive_integer_sub_mul_u32_evaluation_strategy.gp";
+                    benchmark_exhaustive_integer_sub_mul_u32_evaluation_strategy(100000, s);
+                    let s = "exhaustive_integer_sub_mul_u32_algorithms.gp";
+                    benchmark_exhaustive_integer_sub_mul_u32_algorithms(100000, s);
+                    let s = "exhaustive_integer_sub_mul_u32_val_ref_algorithms.gp";
+                    benchmark_exhaustive_integer_sub_mul_u32_val_ref_algorithms(100000, s);
+                    let s = "exhaustive_integer_sub_mul_u32_ref_val_algorithms.gp";
+                    benchmark_exhaustive_integer_sub_mul_u32_ref_val_algorithms(100000, s);
+                    let s = "exhaustive_integer_sub_mul_u32_ref_ref_algorithms.gp";
+                    benchmark_exhaustive_integer_sub_mul_u32_ref_ref_algorithms(100000, s);
                     benchmark_exhaustive_integer_to_i32(100000, "exhaustive_integer_to_i32.gp");
                     let s = "exhaustive_integer_to_i32_wrapping.gp";
                     benchmark_exhaustive_integer_to_i32_wrapping(100000, s);
@@ -2725,6 +2849,30 @@ fn main() {
                         1024,
                         "random_u32_sub_integer_evaluation_strategy.gp",
                     );
+                    let s = "random_integer_sub_mul_assign_u32.gp";
+                    benchmark_random_integer_sub_mul_assign_u32(100000, 1024, s);
+                    let s = "random_integer_sub_mul_assign_u32_evaluation_strategy.gp";
+                    benchmark_random_integer_sub_mul_assign_u32_evaluation_strategy(
+                        100000,
+                        1024,
+                        s,
+                    );
+                    let s = "random_integer_sub_mul_assign_u32_algorithms.gp";
+                    benchmark_random_integer_sub_mul_assign_u32_algorithms(100000, 1024, s);
+                    let s = "random_integer_sub_mul_assign_u32_ref_algorithms.gp";
+                    benchmark_random_integer_sub_mul_assign_u32_ref_algorithms(100000, 1024, s);
+                    let s = "random_integer_sub_mul_u32.gp";
+                    benchmark_random_integer_sub_mul_u32(100000, 1024, s);
+                    let s = "random_integer_sub_mul_u32_evaluation_strategy.gp";
+                    benchmark_random_integer_sub_mul_u32_evaluation_strategy(100000, 1024, s);
+                    let s = "random_integer_sub_mul_u32_algorithms.gp";
+                    benchmark_random_integer_sub_mul_u32_algorithms(100000, 1024, s);
+                    let s = "random_integer_sub_mul_u32_val_ref_algorithms.gp";
+                    benchmark_random_integer_sub_mul_u32_val_ref_algorithms(100000, 1024, s);
+                    let s = "random_integer_sub_mul_u32_ref_val_algorithms.gp";
+                    benchmark_random_integer_sub_mul_u32_ref_val_algorithms(100000, 1024, s);
+                    let s = "random_integer_sub_mul_u32_ref_ref_algorithms.gp";
+                    benchmark_random_integer_sub_mul_u32_ref_ref_algorithms(100000, 1024, s);
                     benchmark_random_integer_to_i32(100000, "random_integer_to_i32.gp");
                     benchmark_random_integer_to_i32_wrapping(
                         100000,

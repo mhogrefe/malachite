@@ -52,3 +52,4 @@ pub mod shl_u32;
 pub mod sub;
 pub mod sub_i32;
 pub mod sub_u32;
+pub mod sub_mul_u32;

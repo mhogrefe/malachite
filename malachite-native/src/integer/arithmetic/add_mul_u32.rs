@@ -1,6 +1,6 @@
 use integer::Integer;
 use natural::arithmetic::add_u32::large_add_u32;
-use natural::Natural::{Large, Small};
+use natural::Natural::{self, Large, Small};
 use traits::{AddMul, AddMulAssign, SubMul, SubMulAssign};
 
 /// Adds the product of an `Integer` (b) and a `u32` (c) to an `Integer` (self), taking `self` and b
@@ -139,42 +139,7 @@ impl<'a, 'b> AddMul<&'a Integer, u32> for &'b Integer {
                     }
                 }
             }
-            let b_limb_count = b.abs.limb_count();
-            if self.abs.limb_count() > b_limb_count + 1 {
-                Integer {
-                    sign: self.sign,
-                    abs: (&self.abs).sub_mul(&b.abs, c).unwrap(),
-                }
-            } else {
-                let mut a_limbs = self.abs.limbs_le();
-                a_limbs.resize(b_limb_count as usize + 1, 0);
-                // push a limb so that sub_mul_assign won't overflow
-                a_limbs.push(1);
-                let mut result_abs = Large(a_limbs);
-                result_abs.sub_mul_assign(&b.abs, c);
-                let result_sign = if result_abs.limb_count() == b_limb_count + 2 {
-                    // extra limb wasn't needed
-                    {
-                        let a_limbs = result_abs.promote_in_place();
-                        a_limbs.pop();
-                    }
-                    self.sign
-                } else {
-                    {
-                        let a_limbs = result_abs.promote_in_place();
-                        for limb in a_limbs.iter_mut() {
-                            *limb = !*limb;
-                        }
-                        large_add_u32(a_limbs, 1);
-                    }
-                    !self.sign
-                };
-                result_abs.trim();
-                Integer {
-                    sign: result_sign,
-                    abs: result_abs,
-                }
-            }
+            large_aors_ref(self.sign, &self.abs, &b.abs, c)
         }
     }
 }
@@ -226,35 +191,7 @@ impl AddMulAssign<Integer, u32> for Integer {
                     }
                 }
             }
-            let b_limb_count = b.abs.limb_count();
-            if self.abs.limb_count() > b_limb_count + 1 {
-                self.abs.sub_mul_assign(&b.abs, c);
-            } else {
-                {
-                    let a_limbs = self.abs.promote_in_place();
-                    a_limbs.resize(b_limb_count as usize + 1, 0);
-                    // push a limb so that sub_mul_assign won't overflow
-                    a_limbs.push(1);
-                }
-                self.abs.sub_mul_assign(&b.abs, c);
-                if self.abs.limb_count() == b_limb_count + 2 {
-                    // extra limb wasn't needed
-                    {
-                        let a_limbs = self.abs.promote_in_place();
-                        a_limbs.pop();
-                    }
-                } else {
-                    {
-                        let a_limbs = self.abs.promote_in_place();
-                        for limb in a_limbs.iter_mut() {
-                            *limb = !*limb;
-                        }
-                        large_add_u32(a_limbs, 1);
-                    }
-                    self.sign = !self.sign;
-                }
-                self.abs.trim();
-            }
+            large_aors_val(&mut self.sign, &mut self.abs, &b.abs, c);
         }
     }
 }
@@ -306,35 +243,78 @@ impl<'a> AddMulAssign<&'a Integer, u32> for Integer {
                     }
                 }
             }
-            let b_limb_count = b.abs.limb_count();
-            if self.abs.limb_count() > b_limb_count + 1 {
-                self.abs.sub_mul_assign(&b.abs, c);
-            } else {
-                {
-                    let a_limbs = self.abs.promote_in_place();
-                    a_limbs.resize(b_limb_count as usize + 1, 0);
-                    // push a limb so that sub_mul_assign won't overflow
-                    a_limbs.push(1);
-                }
-                self.abs.sub_mul_assign(&b.abs, c);
-                if self.abs.limb_count() == b_limb_count + 2 {
-                    // extra limb wasn't needed
-                    {
-                        let a_limbs = self.abs.promote_in_place();
-                        a_limbs.pop();
-                    }
-                } else {
-                    {
-                        let a_limbs = self.abs.promote_in_place();
-                        for limb in a_limbs.iter_mut() {
-                            *limb = !*limb;
-                        }
-                        large_add_u32(a_limbs, 1);
-                    }
-                    self.sign = !self.sign;
-                }
-                self.abs.trim();
+            large_aors_val(&mut self.sign, &mut self.abs, &b.abs, c);
+        }
+    }
+}
+
+pub(crate) fn large_aors_val(a_sign: &mut bool, a_abs: &mut Natural, b_abs: &Natural, c: u32) {
+    let b_limb_count = b_abs.limb_count();
+    if a_abs.limb_count() > b_limb_count + 1 {
+        a_abs.sub_mul_assign(&b_abs, c);
+    } else {
+        {
+            let a_limbs = a_abs.promote_in_place();
+            a_limbs.resize(b_limb_count as usize + 1, 0);
+            // push a limb so that sub_mul_assign won't overflow
+            a_limbs.push(1);
+        }
+        a_abs.sub_mul_assign(&b_abs, c);
+        if a_abs.limb_count() == b_limb_count + 2 {
+            // extra limb wasn't needed
+            {
+                let a_limbs = a_abs.promote_in_place();
+                a_limbs.pop();
             }
+        } else {
+            {
+                let a_limbs = a_abs.promote_in_place();
+                for limb in a_limbs.iter_mut() {
+                    *limb = !*limb;
+                }
+                large_add_u32(a_limbs, 1);
+            }
+            *a_sign = !*a_sign;
+        }
+        a_abs.trim();
+    }
+}
+
+pub(crate) fn large_aors_ref(a_sign: bool, a_abs: &Natural, b_abs: &Natural, c: u32) -> Integer {
+    let b_limb_count = b_abs.limb_count();
+    if a_abs.limb_count() > b_limb_count + 1 {
+        Integer {
+            sign: a_sign,
+            abs: a_abs.sub_mul(b_abs, c).unwrap(),
+        }
+    } else {
+        let mut a_limbs = a_abs.limbs_le();
+        a_limbs.resize(b_limb_count as usize + 1, 0);
+        // push a limb so that sub_mul_assign won't overflow
+        a_limbs.push(1);
+        let mut result_abs = Large(a_limbs);
+        result_abs.sub_mul_assign(&b_abs, c);
+        let result_sign = if result_abs.limb_count() == b_limb_count + 2 {
+            // extra limb wasn't needed
+            {
+                let a_limbs = result_abs.promote_in_place();
+                a_limbs.pop();
+            }
+            a_sign
+        } else {
+            {
+                let a_limbs = result_abs.promote_in_place();
+                for limb in a_limbs.iter_mut() {
+                    *limb = !*limb;
+                }
+                large_add_u32(a_limbs, 1);
+            }
+            !a_sign
+        };
+        result_abs.trim();
+        Integer {
+            sign: result_sign,
+            abs: result_abs,
         }
     }
 }
