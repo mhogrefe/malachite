@@ -1,4 +1,4 @@
-use natural::arithmetic::add::large_add_in_place_and_carry;
+use natural::arithmetic::add::mpn_add_in_place;
 use natural::arithmetic::add_mul_u32::large_add_mul_u32_mut_a;
 use natural::arithmetic::mul_u32::{large_mul_u32, large_mul_u32_to_buffer};
 use natural::Natural::{self, Large, Small};
@@ -281,7 +281,7 @@ fn basecase_mem_opt_mul(xs: &[u32], ys: &[u32]) -> Vec<u32> {
             basecase_mul_to_buffer(&mut buffer[offset..], ys, chunk);
         }
         if offset != 0 {
-            large_add_in_place_and_carry(&mut buffer[offset..], &triangle_buffer[0..y_len]);
+            mpn_add_in_place(&mut buffer[offset..], &triangle_buffer[0..y_len]);
         }
         offset += MUL_BASECASE_MAX_UN;
         if offset < x_len {

@@ -2,6 +2,39 @@ use natural::Natural::{self, Large, Small};
 use std::ops::{Add, AddAssign};
 use traits::Assign;
 
+// Add s1 and s2limb, and write the s1.len() least significant limbs of the result to r. Return
+// carry. r must have size at least s1.len().
+pub fn mpn_add_1(r: &mut [u32], s1: &[u32], mut s2limb: u32) -> bool {
+    for i in 0..s1.len() {
+        let (sum, overflow) = s1[i].overflowing_add(s2limb);
+        r[i] = sum;
+        if overflow {
+            s2limb = 1;
+        } else {
+            s2limb = 0;
+            let copy_index = i + 1;
+            &r[copy_index..].copy_from_slice(&s1[copy_index..]);
+            break;
+        }
+    }
+    s2limb != 0
+}
+
+// Add s1 and s2limb, and write the s1.len() least significant limbs of the result to s1. Return
+// carry.
+pub fn mpn_add_1_in_place(s1: &mut [u32], mut s2limb: u32) -> bool {
+    for i in 0..s1.len() {
+        let (sum, overflow) = s1[i].overflowing_add(s2limb);
+        s1[i] = sum;
+        if overflow {
+            s2limb = 1;
+        } else {
+            return false;
+        }
+    }
+    true
+}
+
 /// Adds a `u32` to a `Natural`, taking the `Natural` by value.
 ///
 /// Time: worst case O(n)
@@ -60,22 +93,10 @@ impl<'a> Add<u32> for &'a Natural {
                 }
             }
             Large(ref limbs) => {
-                let mut sum_limbs = Vec::with_capacity(limbs.len());
-                let mut addend = other;
-                for limb in limbs {
-                    if addend == 0 {
-                        sum_limbs.push(*limb);
-                    } else {
-                        let (sum, overflow) = limb.overflowing_add(addend);
-                        sum_limbs.push(sum);
-                        if overflow {
-                            addend = 1;
-                        } else {
-                            addend = 0;
-                        }
-                    }
-                }
-                if addend == 1 {
+                let length = limbs.len();
+                let mut sum_limbs = Vec::with_capacity(length);
+                sum_limbs.resize(length, 0);
+                if mpn_add_1(&mut sum_limbs[..], limbs, other) {
                     sum_limbs.push(1);
                 }
                 Large(sum_limbs)
@@ -171,24 +192,10 @@ impl AddAssign<u32> for Natural {
                 small.checked_add(other)
             },
             {
-                if large_add_u32(&mut limbs[..], other) {
+                if mpn_add_1_in_place(&mut limbs[..], other) {
                     limbs.push(1);
                 }
             }
         );
     }
-}
-
-pub(crate) fn large_add_u32(limbs: &mut [u32], mut addend: u32) -> bool {
-    for limb in limbs.iter_mut() {
-        let (sum, overflow) = limb.overflowing_add(addend);
-        *limb = sum;
-        if overflow {
-            addend = 1;
-        } else {
-            addend = 0;
-            break;
-        }
-    }
-    addend != 0
 }

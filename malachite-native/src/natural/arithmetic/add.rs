@@ -1,6 +1,71 @@
+use natural::arithmetic::add_u32::{mpn_add_1, mpn_add_1_in_place};
 use natural::Natural::{self, Large, Small};
 use std::mem::swap;
 use std::ops::{Add, AddAssign};
+
+fn add_and_carry(x: u32, y: u32, carry: &mut bool) -> u32 {
+    let (sum, overflow) = x.overflowing_add(y);
+    if *carry {
+        *carry = overflow;
+        let (sum, overflow) = sum.overflowing_add(1);
+        *carry |= overflow;
+        sum
+    } else {
+        *carry = overflow;
+        sum
+    }
+}
+
+// Add s1 and s2 (which must both have length n), and write the n least significant limbs of the
+// result to r. Return carry. r must have size at least n.
+pub fn mpn_add_n(r: &mut [u32], s1: &[u32], s2: &[u32]) -> bool {
+    let mut carry = false;
+    let n = s1.len();
+    for i in 0..n {
+        r[i] = add_and_carry(s1[i], s2[i], &mut carry);
+    }
+    carry
+}
+
+// Add s1 and s2 (which must both have length n), and write the n least significant limbs of the
+// result to s1. Return carry.
+pub fn mpn_add_n_in_place(s1: &mut [u32], s2: &[u32]) -> bool {
+    let mut carry = false;
+    let n = s1.len();
+    for i in 0..n {
+        s1[i] = add_and_carry(s1[i], s2[i], &mut carry);
+    }
+    carry
+}
+
+// Add s1 and s2, and write the s1.len() least significant limbs of the result to r. Return carry.
+// This function requires that s1.len() >= s2.len() and r.len() >= s1.len().
+pub fn mpn_add(r: &mut [u32], s1: &[u32], s2: &[u32]) -> bool {
+    let s2_len = s2.len();
+    let carry = mpn_add_n(r, &s1[0..s2_len], s2);
+    if s1.len() == s2_len {
+        carry
+    } else if carry {
+        mpn_add_1(&mut r[s2_len..], &s1[s2_len..], 1)
+    } else {
+        &mut r[s2_len..].copy_from_slice(&s1[s2_len..]);
+        false
+    }
+}
+
+// Add s1 and s2, and write the s1.len() least significant limbs of the result to s1. Return carry.
+// This function requires that s1.len() >= s2.len().
+pub fn mpn_add_in_place(s1: &mut [u32], s2: &[u32]) -> bool {
+    let s2_len = s2.len();
+    let carry = mpn_add_n_in_place(&mut s1[0..s2_len], s2);
+    if s1.len() == s2_len {
+        carry
+    } else if carry {
+        mpn_add_1_in_place(&mut s1[s2_len..], 1)
+    } else {
+        false
+    }
+}
 
 /// Adds a `Natural` to a `Natural`, taking both `Natural`s by value.
 ///
@@ -119,7 +184,25 @@ impl<'a, 'b> Add<&'a Natural> for &'b Natural {
                 (_, &Small(0)) => self.clone(),
                 (x, &Small(y)) => x + y,
                 (&Small(x), y) => x + y,
-                (&Large(ref xs), &Large(ref ys)) => Large(large_add(xs, ys)),
+                (&Large(ref xs), &Large(ref ys)) => {
+                    let xs_len = xs.len();
+                    let ys_len = ys.len();
+                    if xs_len >= ys_len {
+                        let mut sum_limbs = Vec::with_capacity(xs_len);
+                        sum_limbs.resize(xs_len, 0);
+                        if mpn_add(&mut sum_limbs, xs, ys) {
+                            sum_limbs.push(1);
+                        }
+                        Large(sum_limbs)
+                    } else {
+                        let mut sum_limbs = Vec::with_capacity(ys_len);
+                        sum_limbs.resize(ys_len, 0);
+                        if mpn_add(&mut sum_limbs, ys, xs) {
+                            sum_limbs.push(1);
+                        }
+                        Large(sum_limbs)
+                    }
+                }
             }
         }
     }
@@ -157,7 +240,11 @@ impl AddAssign<Natural> for Natural {
                 Small(y) => *self += y,
                 Large(ref ys) => {
                     match *self {
-                        Large(ref mut xs) => large_add_in_place(xs, ys),
+                        Large(ref mut xs) => {
+                            if mpn_add_in_place(xs, ys) {
+                                xs.push(1);
+                            }
+                        }
                         _ => unreachable!(),
                     }
                 }
@@ -198,82 +285,18 @@ impl<'a> AddAssign<&'a Natural> for Natural {
                 Large(ref ys) => {
                     match *self {
                         Small(x) => *self = other + x,
-                        Large(ref mut xs) => large_add_in_place(xs, ys),
+                        Large(ref mut xs) => {
+                            let ys_len = ys.len();
+                            if xs.len() < ys_len {
+                                xs.resize(ys_len, 0);
+                            }
+                            if mpn_add_in_place(xs, ys) {
+                                xs.push(1);
+                            }
+                        }
                     }
                 }
             }
         }
     }
-}
-
-fn add_and_carry(x: u32, y: u32, carry: &mut bool) -> u32 {
-    let (sum, overflow) = x.overflowing_add(y);
-    if *carry {
-        *carry = overflow;
-        let (sum, overflow) = sum.overflowing_add(1);
-        *carry |= overflow;
-        sum
-    } else {
-        *carry = overflow;
-        sum
-    }
-}
-
-fn large_add_in_place(xs: &mut Vec<u32>, ys: &[u32]) {
-    let mut carry = false;
-    let mut ys_iter = ys.iter();
-    for x in xs.iter_mut() {
-        match ys_iter.next() {
-            Some(y) => *x = add_and_carry(*x, *y, &mut carry),
-            None if carry => *x = add_and_carry(*x, 0, &mut carry),
-            None => break,
-        }
-    }
-    for y in ys_iter {
-        if carry {
-            xs.push(add_and_carry(0, *y, &mut carry));
-        } else {
-            xs.push(*y);
-        }
-    }
-    if carry {
-        xs.push(1);
-    }
-}
-
-// xs must not overflow
-pub(crate) fn large_add_in_place_and_carry(xs: &mut [u32], ys: &[u32]) {
-    let mut carry = false;
-    let mut i = 0;
-    for y in ys.iter() {
-        xs[i] = add_and_carry(xs[i], *y, &mut carry);
-        i += 1;
-    }
-    if carry {
-        xs[i] += 1;
-    }
-}
-
-fn large_add(xs: &[u32], ys: &[u32]) -> Vec<u32> {
-    let mut sum_limbs = Vec::with_capacity(xs.len());
-    let mut carry = false;
-    let mut ys_iter = ys.iter();
-    for x in xs.iter() {
-        sum_limbs.push(match ys_iter.next() {
-            Some(y) => add_and_carry(*x, *y, &mut carry),
-            None if carry => add_and_carry(*x, 0, &mut carry),
-            None => *x,
-        });
-    }
-    for y in ys_iter {
-        if carry {
-            sum_limbs.push(add_and_carry(0, *y, &mut carry));
-        } else {
-            sum_limbs.push(*y);
-        }
-    }
-    if carry {
-        sum_limbs.push(1);
-    }
-    sum_limbs
 }

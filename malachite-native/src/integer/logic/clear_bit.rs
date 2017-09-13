@@ -1,5 +1,5 @@
 use integer::Integer;
-use natural::arithmetic::add_u32::large_add_u32;
+use natural::arithmetic::add_u32::mpn_add_1_in_place;
 use natural::{LIMB_BITS, LIMB_BITS_MASK, LOG_LIMB_BITS};
 use natural::Natural::{self, Large, Small};
 
@@ -72,7 +72,7 @@ impl Natural {
                         let dlimb = ((limbs[limb_index] - 1) | mask).wrapping_add(1);
                         limbs[limb_index] = dlimb;
                         if dlimb == 0 {
-                            if large_add_u32(&mut limbs[limb_index + 1..], 1) {
+                            if mpn_add_1_in_place(&mut limbs[limb_index + 1..], 1) {
                                 limbs.push(1);
                             }
                         }

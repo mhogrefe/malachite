@@ -1,5 +1,5 @@
 use integer::Integer;
-use natural::arithmetic::add_u32::large_add_u32;
+use natural::arithmetic::add_u32::mpn_add_1_in_place;
 use natural::Natural::{self, Large, Small};
 use traits::{AddMul, AddMulAssign, SubMul, SubMulAssign};
 
@@ -272,7 +272,9 @@ pub(crate) fn large_aors_val(a_sign: &mut bool, a_abs: &mut Natural, b_abs: &Nat
                 for limb in a_limbs.iter_mut() {
                     *limb = !*limb;
                 }
-                large_add_u32(a_limbs, 1);
+                if mpn_add_1_in_place(a_limbs, 1) {
+                    a_limbs.push(1);
+                }
             }
             *a_sign = !*a_sign;
         }
@@ -307,7 +309,9 @@ pub(crate) fn large_aors_ref(a_sign: bool, a_abs: &Natural, b_abs: &Natural, c: 
                 for limb in a_limbs.iter_mut() {
                     *limb = !*limb;
                 }
-                large_add_u32(a_limbs, 1);
+                if mpn_add_1_in_place(a_limbs, 1) {
+                    a_limbs.push(1);
+                }
             }
             !a_sign
         };
