@@ -1,5 +1,5 @@
 use integer::Integer;
-use natural::arithmetic::sub_u32::large_sub_u32;
+use natural::arithmetic::sub_u32::mpn_sub_1_in_place;
 use natural::{LIMB_BITS, LIMB_BITS_MASK, LOG_LIMB_BITS};
 use natural::Natural::{self, Large, Small};
 
@@ -70,7 +70,7 @@ impl Natural {
                 } else if limb_index == zero_bound {
                     limbs[limb_index] = ((limbs[limb_index] - 1) & !mask) + 1;
                 } else {
-                    large_sub_u32(&mut limbs[limb_index..], mask);
+                    mpn_sub_1_in_place(&mut limbs[limb_index..], mask);
                 }
             }
         }

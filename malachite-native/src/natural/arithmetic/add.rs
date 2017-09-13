@@ -20,8 +20,7 @@ fn add_and_carry(x: u32, y: u32, carry: &mut bool) -> u32 {
 // result to r. Return carry. r must have size at least n.
 pub fn mpn_add_n(r: &mut [u32], s1: &[u32], s2: &[u32]) -> bool {
     let mut carry = false;
-    let n = s1.len();
-    for i in 0..n {
+    for i in 0..s1.len() {
         r[i] = add_and_carry(s1[i], s2[i], &mut carry);
     }
     carry
@@ -31,8 +30,7 @@ pub fn mpn_add_n(r: &mut [u32], s1: &[u32], s2: &[u32]) -> bool {
 // result to s1. Return carry.
 pub fn mpn_add_n_in_place(s1: &mut [u32], s2: &[u32]) -> bool {
     let mut carry = false;
-    let n = s1.len();
-    for i in 0..n {
+    for i in 0..s1.len() {
         s1[i] = add_and_carry(s1[i], s2[i], &mut carry);
     }
     carry

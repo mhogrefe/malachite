@@ -174,7 +174,7 @@ fn sub_mul_assign_u32_helper(a: &mut Natural, b: &Natural, c: u32) -> bool {
     }
     if let Small(small_b) = *b {
         if let Some(product) = small_b.checked_mul(c) {
-            return sub_assign_u32_helper(a, product);
+            return !sub_assign_u32_helper(a, product);
         }
     }
     if a.limb_count() < b.limb_count() {

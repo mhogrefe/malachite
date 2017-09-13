@@ -1,6 +1,64 @@
 use natural::Natural::{self, Large, Small};
 use std::ops::{Sub, SubAssign};
 
+// Subtract s2limb from s1, and write the s1.len() least significant limbs of the result to r.
+// Return borrow. r must have size at least s1.len().
+pub fn mpn_sub_1(r: &mut [u32], s1: &[u32], mut s2limb: u32) -> bool {
+    for i in 0..s1.len() {
+        let (difference, overflow) = s1[i].overflowing_sub(s2limb);
+        r[i] = difference;
+        if overflow {
+            s2limb = 1;
+        } else {
+            s2limb = 0;
+            let copy_index = i + 1;
+            &r[copy_index..].copy_from_slice(&s1[copy_index..]);
+            break;
+        }
+    }
+    s2limb != 0
+}
+
+// Subtract s2limb from s1, and write the s1.len() least significant limbs of the result to s1.
+// Return borrow.
+pub fn mpn_sub_1_in_place(s1: &mut [u32], mut s2limb: u32) -> bool {
+    for i in 0..s1.len() {
+        let (difference, overflow) = s1[i].overflowing_sub(s2limb);
+        s1[i] = difference;
+        if overflow {
+            s2limb = 1;
+        } else {
+            return false;
+        }
+    }
+    true
+}
+
+// x -= y, return borrow
+pub(crate) fn sub_assign_u32_helper(x: &mut Natural, y: u32) -> bool {
+    if y == 0 {
+        return false;
+    }
+    match *x {
+        Small(ref mut small) => {
+            return match small.checked_sub(y) {
+                Some(difference) => {
+                    *small = difference;
+                    false
+                }
+                None => true,
+            }
+        }
+        Large(ref mut limbs) => {
+            if mpn_sub_1_in_place(&mut limbs[..], y) {
+                return true;
+            }
+        }
+    }
+    x.trim();
+    false
+}
+
 /// Subtracts a `u32` from a `Natural`, taking the `Natural` by value. If the `u32` is greater than
 /// the `Natural`, returns `None`.
 ///
@@ -27,9 +85,9 @@ impl Sub<u32> for Natural {
 
     fn sub(mut self, other: u32) -> Option<Natural> {
         if sub_assign_u32_helper(&mut self, other) {
-            Some(self)
-        } else {
             None
+        } else {
+            Some(self)
         }
     }
 }
@@ -65,32 +123,13 @@ impl<'a> Sub<u32> for &'a Natural {
         match *self {
             Small(small) => small.checked_sub(other).map(Small),
             Large(ref limbs) => {
-                let mut subtrahend = other;
-                let mut difference_limbs = Vec::with_capacity(limbs.len());
-                for limb in limbs.iter() {
-                    if subtrahend == 0 {
-                        difference_limbs.push(*limb);
-                    } else {
-                        let (difference, overflow) = limb.overflowing_sub(subtrahend);
-                        difference_limbs.push(difference);
-                        if overflow {
-                            subtrahend = 1;
-                        } else {
-                            subtrahend = 0;
-                        }
-                    }
-                }
-                if subtrahend == 1 {
+                let mut difference_limbs = vec![0; limbs.len()];
+                if mpn_sub_1(&mut difference_limbs, limbs, other) {
                     None
-                } else if *difference_limbs.last().unwrap() == 0 {
-                    if difference_limbs.len() == 2 {
-                        Some(Small(difference_limbs[0]))
-                    } else {
-                        difference_limbs.pop();
-                        Some(Large(difference_limbs))
-                    }
                 } else {
-                    Some(Large(difference_limbs))
+                    let mut difference = Large(difference_limbs);
+                    difference.trim();
+                    Some(difference)
                 }
             }
         }
@@ -144,7 +183,7 @@ impl<'a> Sub<&'a Natural> for u32 {
 /// ```
 impl SubAssign<u32> for Natural {
     fn sub_assign(&mut self, other: u32) {
-        if !sub_assign_u32_helper(self, other) {
+        if sub_assign_u32_helper(self, other) {
             panic!(
                 "Cannot subtract a u32 from a smaller Natural. self: {}, other: {}",
                 *self,
@@ -152,42 +191,4 @@ impl SubAssign<u32> for Natural {
             );
         }
     }
-}
-
-pub(crate) fn large_sub_u32(limbs: &mut [u32], mut subtrahend: u32) -> bool {
-    for limb in limbs.iter_mut() {
-        let (difference, overflow) = limb.overflowing_sub(subtrahend);
-        *limb = difference;
-        if overflow {
-            subtrahend = 1;
-        } else {
-            subtrahend = 0;
-            break;
-        }
-    }
-    subtrahend == 0
-}
-
-pub(crate) fn sub_assign_u32_helper(x: &mut Natural, y: u32) -> bool {
-    if y == 0 {
-        return true;
-    }
-    match *x {
-        Small(ref mut small) => {
-            return match small.checked_sub(y) {
-                Some(difference) => {
-                    *small = difference;
-                    true
-                }
-                None => false,
-            }
-        }
-        Large(ref mut limbs) => {
-            if !large_sub_u32(&mut limbs[..], y) {
-                return false;
-            }
-        }
-    }
-    x.trim();
-    true
 }

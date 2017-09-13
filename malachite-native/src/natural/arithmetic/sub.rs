@@ -1,6 +1,95 @@
-use natural::arithmetic::sub_u32::sub_assign_u32_helper;
+use natural::arithmetic::sub_u32::{mpn_sub_1, mpn_sub_1_in_place, sub_assign_u32_helper};
 use natural::Natural::{self, Large, Small};
 use std::ops::{Sub, SubAssign};
+
+fn sub_and_borrow(x: u32, y: u32, borrow: &mut bool) -> u32 {
+    let (difference, overflow) = x.overflowing_sub(y);
+    if *borrow {
+        *borrow = overflow;
+        let (difference, overflow) = difference.overflowing_sub(1);
+        *borrow |= overflow;
+        difference
+    } else {
+        *borrow = overflow;
+        difference
+    }
+}
+
+// Subtract s2 from s1 (which must both have length n), and write the n least significant limbs of
+// the result to r. Return borrow. r must have size at least n.
+pub fn mpn_sub_n(r: &mut [u32], s1: &[u32], s2: &[u32]) -> bool {
+    let mut borrow = false;
+    for i in 0..s1.len() {
+        r[i] = sub_and_borrow(s1[i], s2[i], &mut borrow);
+    }
+    borrow
+}
+
+// Subtract s2 from s1 (which must both have length n), and write the n least significant limbs of
+// the result to s1. Return borrow.
+pub fn mpn_sub_n_in_place(s1: &mut [u32], s2: &[u32]) -> bool {
+    let mut borrow = false;
+    for i in 0..s1.len() {
+        s1[i] = sub_and_borrow(s1[i], s2[i], &mut borrow);
+    }
+    borrow
+}
+
+// Subtract s2 from s1, and write the s1.len() least significant limbs of the result to r. Return
+// borrow. This function requires that s1.len() >= s2.len() and r.len() >= s1.len().
+pub fn mpn_sub(r: &mut [u32], s1: &[u32], s2: &[u32]) -> bool {
+    let s2_len = s2.len();
+    let borrow = mpn_sub_n(r, &s1[0..s2_len], s2);
+    if s1.len() == s2_len {
+        borrow
+    } else if borrow {
+        mpn_sub_1(&mut r[s2_len..], &s1[s2_len..], 1)
+    } else {
+        &mut r[s2_len..].copy_from_slice(&s1[s2_len..]);
+        false
+    }
+}
+
+// Subtract s2 from s1, and write the s1.len() least significant limbs of the result to s1. Return
+// borrow. This function requires that s1.len() >= s2.len().
+pub fn mpn_sub_in_place(s1: &mut [u32], s2: &[u32]) -> bool {
+    let s2_len = s2.len();
+    let borrow = mpn_sub_n_in_place(&mut s1[0..s2_len], s2);
+    if s1.len() == s2_len {
+        borrow
+    } else if borrow {
+        mpn_sub_1_in_place(&mut s1[s2_len..], 1)
+    } else {
+        false
+    }
+}
+
+// x -= y, return borrow
+fn sub_assign_helper<'a>(x: &mut Natural, y: &'a Natural) -> bool {
+    if *y == 0 {
+        false
+    } else if x as *const Natural == y as *const Natural {
+        *x = Small(0);
+        false
+    } else if x.limb_count() < y.limb_count() {
+        true
+    } else if let Small(y) = *y {
+        sub_assign_u32_helper(x, y)
+    } else if let Small(_) = *x {
+        true
+    } else {
+        match (&mut (*x), y) {
+            (&mut Large(ref mut xs), &Large(ref ys)) => {
+                if mpn_sub_in_place(xs, ys) {
+                    return true;
+                }
+            }
+            _ => unreachable!(),
+        }
+        x.trim();
+        false
+    }
+}
 
 /// Subtracts a `Natural` from a `Natural`, taking the left `Natural` by value and the right
 /// `Natural` by reference.
@@ -28,9 +117,9 @@ impl<'a> Sub<&'a Natural> for Natural {
 
     fn sub(mut self, other: &'a Natural) -> Option<Natural> {
         if sub_assign_helper(&mut self, other) {
-            Some(self)
-        } else {
             None
+        } else {
+            Some(self)
         }
     }
 }
@@ -67,11 +156,19 @@ impl<'a, 'b> Sub<&'a Natural> for &'b Natural {
                 (x, &Small(y)) => x - y,
                 (&Small(_), _) => None,
                 (&Large(ref xs), &Large(ref ys)) => {
-                    large_sub(xs, ys).map(|limbs| {
-                        let mut result = Large(limbs);
-                        result.trim();
-                        result
-                    })
+                    let xs_len = xs.len();
+                    if xs_len < ys.len() {
+                        None
+                    } else {
+                        let mut difference_limbs = vec![0; xs_len];
+                        if mpn_sub(&mut difference_limbs, xs, ys) {
+                            None
+                        } else {
+                            let mut difference = Large(difference_limbs);
+                            difference.trim();
+                            Some(difference)
+                        }
+                    }
                 }
             }
         }
@@ -103,88 +200,9 @@ impl<'a, 'b> Sub<&'a Natural> for &'b Natural {
 /// ```
 impl<'a> SubAssign<&'a Natural> for Natural {
     fn sub_assign(&mut self, other: &'a Natural) {
-        if !sub_assign_helper(self, other) {
+        if sub_assign_helper(self, other) {
             panic!("Cannot subtract a Natural from a smaller Natural");
         }
         self.trim();
-    }
-}
-
-fn sub_and_borrow(x: u32, y: u32, borrow: &mut bool) -> u32 {
-    let (difference, overflow) = x.overflowing_sub(y);
-    if *borrow {
-        *borrow = overflow;
-        let (difference, overflow) = difference.overflowing_sub(1);
-        *borrow |= overflow;
-        difference
-    } else {
-        *borrow = overflow;
-        difference
-    }
-}
-
-fn large_sub_in_place(xs: &mut Vec<u32>, ys: &[u32]) -> bool {
-    let mut borrow = false;
-    let mut xs_iter = xs.iter_mut();
-    for y in ys.iter() {
-        let x = match xs_iter.next() {
-            Some(x) => x,
-            None => return false,
-        };
-        *x = sub_and_borrow(*x, *y, &mut borrow);
-    }
-    for x in xs_iter {
-        if !borrow {
-            break;
-        }
-        *x = sub_and_borrow(*x, 0, &mut borrow);
-    }
-    !borrow
-}
-
-fn large_sub(xs: &[u32], ys: &[u32]) -> Option<Vec<u32>> {
-    let mut difference_limbs = Vec::with_capacity(xs.len());
-    let mut borrow = false;
-    let mut xs_iter = xs.iter();
-    for y in ys.iter() {
-        let x = match xs_iter.next() {
-            Some(x) => x,
-            None => return None,
-        };
-        difference_limbs.push(sub_and_borrow(*x, *y, &mut borrow));
-    }
-    for x in xs_iter {
-        if borrow {
-            difference_limbs.push(sub_and_borrow(*x, 0, &mut borrow));
-        } else {
-            difference_limbs.push(*x);
-        }
-    }
-    if borrow { None } else { Some(difference_limbs) }
-}
-
-fn sub_assign_helper<'a>(x: &mut Natural, y: &'a Natural) -> bool {
-    if *y == 0 {
-        true
-    } else if x as *const Natural == y as *const Natural {
-        *x = Small(0);
-        true
-    } else if x.limb_count() < y.limb_count() {
-        false
-    } else if let Small(y) = *y {
-        sub_assign_u32_helper(x, y)
-    } else if let Small(_) = *x {
-        false
-    } else {
-        match (&mut (*x), y) {
-            (&mut Large(ref mut xs), &Large(ref ys)) => {
-                if !large_sub_in_place(xs, ys) {
-                    return false;
-                }
-            }
-            _ => unreachable!(),
-        }
-        x.trim();
-        true
     }
 }
