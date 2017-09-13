@@ -153,6 +153,15 @@ impl<'a> Add<Natural> for &'a Natural {
     }
 }
 
+// xs.len() >= ys.len()
+fn add_helper(xs: &[u32], ys: &[u32]) -> Natural {
+    let mut sum_limbs = vec![0; xs.len()];
+    if mpn_add(&mut sum_limbs, xs, ys) {
+        sum_limbs.push(1);
+    }
+    Large(sum_limbs)
+}
+
 /// Adds a `Natural` to a `Natural`, taking both `Natural`s by reference.
 ///
 /// Time: worst case O(n)
@@ -185,22 +194,10 @@ impl<'a, 'b> Add<&'a Natural> for &'b Natural {
                 (x, &Small(y)) => x + y,
                 (&Small(x), y) => x + y,
                 (&Large(ref xs), &Large(ref ys)) => {
-                    let xs_len = xs.len();
-                    let ys_len = ys.len();
-                    if xs_len >= ys_len {
-                        let mut sum_limbs = Vec::with_capacity(xs_len);
-                        sum_limbs.resize(xs_len, 0);
-                        if mpn_add(&mut sum_limbs, xs, ys) {
-                            sum_limbs.push(1);
-                        }
-                        Large(sum_limbs)
+                    if xs.len() >= ys.len() {
+                        add_helper(xs, ys)
                     } else {
-                        let mut sum_limbs = Vec::with_capacity(ys_len);
-                        sum_limbs.resize(ys_len, 0);
-                        if mpn_add(&mut sum_limbs, ys, xs) {
-                            sum_limbs.push(1);
-                        }
-                        Large(sum_limbs)
+                        add_helper(ys, xs)
                     }
                 }
             }

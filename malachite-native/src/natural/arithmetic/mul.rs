@@ -269,9 +269,7 @@ const MUL_TOOM22_THRESHOLD: usize = 300;
 fn basecase_mem_opt_mul(xs: &[u32], ys: &[u32]) -> Vec<u32> {
     let x_len = xs.len();
     let y_len = ys.len();
-    let output_length = x_len + y_len;
-    let mut buffer = Vec::with_capacity(output_length);
-    buffer.resize(output_length, 0);
+    let mut buffer = vec![0; x_len + y_len];
     let mut triangle_buffer = [0; MUL_TOOM22_THRESHOLD];
     let mut offset = 0;
     for chunk in xs.chunks(MUL_BASECASE_MAX_UN) {

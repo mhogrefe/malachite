@@ -93,9 +93,7 @@ impl<'a> Add<u32> for &'a Natural {
                 }
             }
             Large(ref limbs) => {
-                let length = limbs.len();
-                let mut sum_limbs = Vec::with_capacity(length);
-                sum_limbs.resize(length, 0);
+                let mut sum_limbs = vec![0; limbs.len()];
                 if mpn_add_1(&mut sum_limbs[..], limbs, other) {
                     sum_limbs.push(1);
                 }
