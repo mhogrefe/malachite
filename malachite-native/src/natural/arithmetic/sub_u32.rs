@@ -22,9 +22,9 @@ pub fn mpn_sub_1(r: &mut [u32], s1: &[u32], mut s2limb: u32) -> bool {
 // Subtract s2limb from s1, and write the s1.len() least significant limbs of the result to s1.
 // Return borrow.
 pub fn mpn_sub_1_in_place(s1: &mut [u32], mut s2limb: u32) -> bool {
-    for i in 0..s1.len() {
-        let (difference, overflow) = s1[i].overflowing_sub(s2limb);
-        s1[i] = difference;
+    for limb in s1.iter_mut() {
+        let (difference, overflow) = limb.overflowing_sub(s2limb);
+        *limb = difference;
         if overflow {
             s2limb = 1;
         } else {

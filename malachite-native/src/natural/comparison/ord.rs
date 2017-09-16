@@ -1,6 +1,13 @@
 use natural::Natural::{self, Large, Small};
 use std::cmp::Ordering;
 
+// Compare s1p and s2p.
+pub fn mpn_cmp(s1: &[u32], s2: &[u32]) -> Ordering {
+    s1.len().cmp(&s2.len()).then_with(|| {
+        s1.into_iter().rev().cmp(s2.into_iter().rev())
+    })
+}
+
 /// Compares a `Natural` to another `Natural`.
 ///
 /// Time: worst case O(n)
@@ -34,11 +41,7 @@ impl Ord for Natural {
             (&Small(ref x), &Small(ref y)) => x.cmp(y),
             (&Small(_), &Large(_)) => Ordering::Less,
             (&Large(_), &Small(_)) => Ordering::Greater,
-            (&Large(ref xs), &Large(ref ys)) => {
-                xs.len().cmp(&ys.len()).then_with(|| {
-                    xs.into_iter().rev().cmp(ys.into_iter().rev())
-                })
-            }
+            (&Large(ref xs), &Large(ref ys)) => mpn_cmp(xs, ys),
         }
     }
 }

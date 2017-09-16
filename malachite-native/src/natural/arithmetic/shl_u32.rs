@@ -2,6 +2,34 @@ use natural::{LIMB_BITS, LIMB_BITS_MASK, LOG_LIMB_BITS, pad_left};
 use natural::Natural::{self, Large, Small};
 use std::ops::{Shl, ShlAssign};
 
+// Shift u left by bits, and write the result to r. The bits shifted out at the left are returned in
+// the least significant bits of the return value (the rest of the return value is zero).
+// u.len() > 0, r.len() >= u.len(), 1 <= bits < LIMB_BITS
+pub fn mpn_lshift(r: &mut [u32], u: &[u32], bits: u32) -> u32 {
+    let cobits = LIMB_BITS - bits;
+    let mut remaining_bits = 0;
+    for i in 0..u.len() {
+        let limb = u[i];
+        r[i] = (limb << bits) | remaining_bits;
+        remaining_bits = limb >> cobits;
+    }
+    remaining_bits
+}
+
+// Shift u left by bits, and write the result to u. The bits shifted out at the left are returned in
+// the least significant bits of the return value (the rest of the return value is zero).
+// u.len() > 0, 1 <= bits < LIMB_BITS
+pub fn mpn_lshift_in_place(u: &mut [u32], bits: u32) -> u32 {
+    let cobits = LIMB_BITS - bits;
+    let mut remaining_bits = 0;
+    for limb in u.iter_mut() {
+        let old_limb = *limb;
+        *limb = (old_limb << bits) | remaining_bits;
+        remaining_bits = old_limb >> cobits;
+    }
+    remaining_bits
+}
+
 /// Shifts a `Natural` left (multiplies it by a power of 2), taking the `Natural` by value.
 ///
 /// Time: worst case O(`other`)
@@ -23,6 +51,23 @@ impl Shl<u32> for Natural {
         self <<= other;
         self
     }
+}
+
+fn shl_helper(limbs: &[u32], other: u32) -> Natural {
+    let small_shift = other & LIMB_BITS_MASK;
+    Large(if small_shift != 0 {
+        let mut shifted_limbs = vec![0; limbs.len()];
+        let remaining_bits = mpn_lshift(&mut shifted_limbs, limbs, other);
+        pad_left(&mut shifted_limbs, (other >> LOG_LIMB_BITS) as usize, 0);
+        if remaining_bits != 0 {
+            shifted_limbs.push(remaining_bits);
+        }
+        shifted_limbs
+    } else {
+        let mut shifted_limbs = limbs.to_vec();
+        pad_left(&mut shifted_limbs, (other >> LOG_LIMB_BITS) as usize, 0);
+        shifted_limbs
+    })
 }
 
 /// Shifts a `Natural` left (multiplies it by a power of 2), taking the `Natural` by reference.
@@ -48,40 +93,8 @@ impl<'a> Shl<u32> for &'a Natural {
         }
         match *self {
             Small(small) if other <= small.leading_zeros() => Small(small << other),
-            Small(small) => {
-                let mut shifted_limbs = vec![0; (other >> LOG_LIMB_BITS) as usize];
-                let remaining_shift = other & LIMB_BITS_MASK;
-                if remaining_shift == 0 {
-                    shifted_limbs.push(small);
-                } else {
-                    shifted_limbs.push(small << remaining_shift);
-                    if remaining_shift > small.leading_zeros() {
-                        shifted_limbs.push(small >> (LIMB_BITS - remaining_shift));
-                    }
-                };
-                Large(shifted_limbs)
-            }
-            Large(ref limbs) => {
-                let mut shifted_limbs = vec![0; (other >> LOG_LIMB_BITS) as usize];
-                let remaining_shift = other & LIMB_BITS_MASK;
-                if remaining_shift == 0 {
-                    shifted_limbs.extend(limbs.iter().cloned());
-                } else {
-                    let shift_complement = LIMB_BITS - remaining_shift;
-                    let mut previous = 0;
-                    for &limb in limbs.iter() {
-                        shifted_limbs.push(
-                            (limb << remaining_shift) |
-                                (previous >> shift_complement),
-                        );
-                        previous = limb;
-                    }
-                    if previous.leading_zeros() < remaining_shift {
-                        shifted_limbs.push(previous >> shift_complement);
-                    }
-                }
-                Large(shifted_limbs)
-            }
+            Small(small) => shl_helper(&[small], other),
+            Large(ref limbs) => shl_helper(limbs, other),
         }
     }
 }
@@ -120,20 +133,16 @@ impl ShlAssign<u32> for Natural {
                 }
             },
             {
-                let remaining_shift = other & LIMB_BITS_MASK;
-                if remaining_shift != 0 {
-                    let shift_complement = LIMB_BITS - remaining_shift;
-                    let mut previous = 0;
-                    for limb in limbs.iter_mut() {
-                        let old_limb = *limb;
-                        *limb = (*limb << remaining_shift) | (previous >> shift_complement);
-                        previous = old_limb;
-                    }
-                    if previous.leading_zeros() < remaining_shift {
-                        limbs.push(previous >> shift_complement);
-                    }
-                }
+                let small_shift = other & LIMB_BITS_MASK;
+                let remaining_bits = if small_shift != 0 {
+                    mpn_lshift_in_place(limbs, small_shift)
+                } else {
+                    0
+                };
                 pad_left(limbs, (other >> LOG_LIMB_BITS) as usize, 0);
+                if remaining_bits != 0 {
+                    limbs.push(remaining_bits);
+                }
             }
         );
     }

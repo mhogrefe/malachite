@@ -23,9 +23,9 @@ pub fn mpn_add_1(r: &mut [u32], s1: &[u32], mut s2limb: u32) -> bool {
 // Add s1 and s2limb, and write the s1.len() least significant limbs of the result to s1. Return
 // carry.
 pub fn mpn_add_1_in_place(s1: &mut [u32], mut s2limb: u32) -> bool {
-    for i in 0..s1.len() {
-        let (sum, overflow) = s1[i].overflowing_add(s2limb);
-        s1[i] = sum;
+    for limb in s1.iter_mut() {
+        let (sum, overflow) = limb.overflowing_add(s2limb);
+        *limb = sum;
         if overflow {
             s2limb = 1;
         } else {
