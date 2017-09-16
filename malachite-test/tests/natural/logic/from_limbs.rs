@@ -74,13 +74,13 @@ fn from_limbs_le_properties() {
             .skip_while(|&u| u == 0)
             .collect();
         trimmed_limbs.reverse();
-        assert_eq!(x.limbs_le(), trimmed_limbs);
+        assert_eq!(x.to_limbs_le(), trimmed_limbs);
         assert_eq!(
             native::Natural::from_limbs_be(&limbs.iter().cloned().rev().collect::<Vec<u32>>()),
             x
         );
         if !limbs.is_empty() && *limbs.last().unwrap() != 0 {
-            assert_eq!(&x.limbs_le()[..], limbs);
+            assert_eq!(&x.to_limbs_le()[..], limbs);
         }
     };
 
@@ -106,7 +106,7 @@ fn from_limbs_be_properties() {
             x
         );
         assert_eq!(
-            x.limbs_be(),
+            x.to_limbs_be(),
             limbs
                 .iter()
                 .cloned()
@@ -118,7 +118,7 @@ fn from_limbs_be_properties() {
             x
         );
         if !limbs.is_empty() && limbs[0] != 0 {
-            assert_eq!(&x.limbs_be()[..], limbs);
+            assert_eq!(&x.to_limbs_be()[..], limbs);
         }
     };
 

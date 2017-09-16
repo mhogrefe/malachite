@@ -7,10 +7,10 @@ use rust_wheels::iterators::naturals::{exhaustive_naturals, random_naturals};
 use std::str::FromStr;
 
 #[test]
-fn test_limbs_le() {
+fn test_to_limbs_le() {
     let test = |n, out| {
-        assert_eq!(native::Natural::from_str(n).unwrap().limbs_le(), out);
-        assert_eq!(gmp::Natural::from_str(n).unwrap().limbs_le(), out);
+        assert_eq!(native::Natural::from_str(n).unwrap().to_limbs_le(), out);
+        assert_eq!(gmp::Natural::from_str(n).unwrap().to_limbs_le(), out);
     };
     test("0", vec![]);
     test("123", vec![123]);
@@ -26,10 +26,10 @@ fn test_limbs_le() {
 }
 
 #[test]
-fn test_limbs_be() {
+fn test_to_limbs_be() {
     let test = |n, out| {
-        assert_eq!(native::Natural::from_str(n).unwrap().limbs_be(), out);
-        assert_eq!(gmp::Natural::from_str(n).unwrap().limbs_be(), out);
+        assert_eq!(native::Natural::from_str(n).unwrap().to_limbs_be(), out);
+        assert_eq!(gmp::Natural::from_str(n).unwrap().to_limbs_be(), out);
     };
     test("0", vec![]);
     test("123", vec![123]);
@@ -45,18 +45,18 @@ fn test_limbs_be() {
 }
 
 #[test]
-fn limbs_le_properties() {
-    // x.limbs_le() is equivalent for malachite-gmp and malachite-native.
-    // from_limbs_le(x.limbs_le()) == x
-    // x.limbs_le().rev() == x.limbs_be()
-    // if x != 0, x.limbs_le().last() != 0
+fn to_limbs_le_properties() {
+    // x.to_limbs_le() is equivalent for malachite-gmp and malachite-native.
+    // from_limbs_le(x.to_limbs_le()) == x
+    // x.to_limbs_le().rev() == x.to_limbs_be()
+    // if x != 0, x.to_limbs_le().last() != 0
     let one_natural = |gmp_x: gmp::Natural| {
         let x = gmp_natural_to_native(&gmp_x);
-        let limbs = x.limbs_le();
-        assert_eq!(gmp_x.limbs_le(), limbs);
+        let limbs = x.to_limbs_le();
+        assert_eq!(gmp_x.to_limbs_le(), limbs);
         assert_eq!(native::Natural::from_limbs_le(&limbs), x);
         assert_eq!(
-            x.limbs_be(),
+            x.to_limbs_be(),
             limbs.iter().cloned().rev().collect::<Vec<u32>>()
         );
         if x != 0 {
@@ -75,17 +75,17 @@ fn limbs_le_properties() {
 
 #[test]
 fn limbs_be_properties() {
-    // x.limbs_be() is equivalent for malachite-gmp and malachite-native.
-    // from_limbs_be(x.limbs_be()) == x
-    // x.limbs_be().rev() == x.limbs_le()
-    // if x != 0, x.limbs_be().last() != 0
+    // x.to_limbs_be() is equivalent for malachite-gmp and malachite-native.
+    // from_limbs_be(x.to_limbs_be()) == x
+    // x.to_limbs_be().rev() == x.to_limbs_le()
+    // if x != 0, x.to_limbs_be().last() != 0
     let one_natural = |gmp_x: gmp::Natural| {
         let x = gmp_natural_to_native(&gmp_x);
-        let limbs = x.limbs_be();
-        assert_eq!(gmp_x.limbs_be(), limbs);
+        let limbs = x.to_limbs_be();
+        assert_eq!(gmp_x.to_limbs_be(), limbs);
         assert_eq!(native::Natural::from_limbs_be(&limbs), x);
         assert_eq!(
-            x.limbs_le(),
+            x.to_limbs_le(),
             limbs.iter().cloned().rev().collect::<Vec<u32>>()
         );
         if x != 0 {

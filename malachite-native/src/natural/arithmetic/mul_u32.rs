@@ -3,6 +3,32 @@ use natural::Natural::{self, Large, Small};
 use std::ops::{Mul, MulAssign};
 use traits::Assign;
 
+// Multiply s1 by s2limb, and write the n least significant limbs of the product to r. Return the
+// most significant limb of the product. r.len() >= s1.len().
+pub fn mpn_mul_1(r: &mut [u32], s1: &[u32], s2limb: u32) -> u32 {
+    let mut carry = 0;
+    let s2limb_u64 = s2limb as u64;
+    for i in 0..s1.len() {
+        let limb_result = s1[i] as u64 * s2limb_u64 + carry as u64;
+        r[i] = get_lower(limb_result);
+        carry = get_upper(limb_result);
+    }
+    carry
+}
+
+// Multiply s1 by s2limb, and write the n least significant limbs of the product to s1. Return the
+// most significant limb of the product.
+pub fn mpn_mul_1_in_place(s1: &mut [u32], s2limb: u32) -> u32 {
+    let mut carry = 0;
+    let s2limb_u64 = s2limb as u64;
+    for limb in s1.iter_mut() {
+        let limb_result = *limb as u64 * s2limb_u64 + carry as u64;
+        *limb = get_lower(limb_result);
+        carry = get_upper(limb_result);
+    }
+    carry
+}
+
 /// Multiplies a `Natural` by a `u32`, taking the `Natural` by value.
 ///
 /// Time: worst case O(n)
@@ -67,7 +93,14 @@ impl<'a> Mul<u32> for &'a Natural {
                     Large(vec![lower, upper])
                 }
             }
-            Large(ref limbs) => Large(large_mul_u32(limbs, other)),
+            Large(ref limbs) => {
+                let mut product_limbs = vec![0; limbs.len()];
+                let carry = mpn_mul_1(&mut product_limbs, limbs, other);
+                if carry != 0 {
+                    product_limbs.push(carry);
+                }
+                Large(product_limbs)
+            }
         }
     }
 }
@@ -163,52 +196,11 @@ impl MulAssign<u32> for Natural {
                 small.checked_mul(other)
             },
             {
-                let carry = large_mul_u32_in_place(&mut limbs[..], other);
+                let carry = mpn_mul_1_in_place(limbs, other);
                 if carry != 0 {
                     limbs.push(carry);
                 }
             }
         );
-    }
-}
-
-fn large_mul_u32_in_place(limbs: &mut [u32], multiplicand: u32) -> u32 {
-    let mut carry = 0;
-    let multiplicand_u64 = multiplicand as u64;
-    for limb in limbs.iter_mut() {
-        let limb_result = *limb as u64 * multiplicand_u64 + carry as u64;
-        *limb = get_lower(limb_result);
-        carry = get_upper(limb_result);
-    }
-    carry
-}
-
-pub(crate) fn large_mul_u32(limbs: &[u32], multiplicand: u32) -> Vec<u32> {
-    let mut product_limbs = Vec::with_capacity(limbs.len());
-    let mut carry = 0;
-    let multiplicand_u64 = multiplicand as u64;
-    for limb in limbs.iter() {
-        let limb_result = *limb as u64 * multiplicand_u64 + carry as u64;
-        product_limbs.push(get_lower(limb_result));
-        carry = get_upper(limb_result);
-    }
-    if carry != 0 {
-        product_limbs.push(carry);
-    }
-    product_limbs
-}
-
-pub(crate) fn large_mul_u32_to_buffer(buffer: &mut [u32], limbs: &[u32], multiplicand: u32) {
-    let mut carry = 0;
-    let multiplicand_u64 = multiplicand as u64;
-    let mut i = 0;
-    for limb in limbs.iter() {
-        let limb_result = *limb as u64 * multiplicand_u64 + carry as u64;
-        buffer[i] = get_lower(limb_result);
-        carry = get_upper(limb_result);
-        i += 1;
-    }
-    if carry != 0 {
-        buffer[i] = carry;
     }
 }

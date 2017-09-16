@@ -408,8 +408,8 @@ fn main() {
                     limit,
                 ),
                 "exhaustive_natural_limb_count" => demo_exhaustive_natural_limb_count(limit),
-                "exhaustive_natural_limbs_le" => demo_exhaustive_natural_limbs_le(limit),
-                "exhaustive_natural_limbs_be" => demo_exhaustive_natural_limbs_be(limit),
+                "exhaustive_natural_to_limbs_le" => demo_exhaustive_natural_to_limbs_le(limit),
+                "exhaustive_natural_to_limbs_be" => demo_exhaustive_natural_to_limbs_be(limit),
                 "exhaustive_natural_mul_assign" => demo_exhaustive_natural_mul_assign(limit),
                 "exhaustive_natural_mul_assign_ref" => demo_exhaustive_natural_mul_assign_ref(
                     limit,
@@ -723,8 +723,8 @@ fn main() {
                 "random_natural_is_odd" => demo_random_natural_is_odd(limit),
                 "random_natural_is_power_of_two" => demo_random_natural_is_power_of_two(limit),
                 "random_natural_limb_count" => demo_random_natural_limb_count(limit),
-                "random_natural_limbs_le" => demo_random_natural_limbs_le(limit),
-                "random_natural_limbs_be" => demo_random_natural_limbs_be(limit),
+                "random_natural_to_limbs_le" => demo_random_natural_to_limbs_le(limit),
+                "random_natural_to_limbs_be" => demo_random_natural_to_limbs_be(limit),
                 "random_natural_mul_assign" => demo_random_natural_mul_assign(limit),
                 "random_natural_mul_assign_ref" => demo_random_natural_mul_assign_ref(limit),
                 "random_natural_mul" => demo_random_natural_mul(limit),
@@ -1300,11 +1300,11 @@ fn main() {
                 "exhaustive_natural_limb_count" => {
                     benchmark_exhaustive_natural_limb_count(limit, "temp.gp")
                 }
-                "exhaustive_natural_limbs_le" => {
-                    benchmark_exhaustive_natural_limbs_le(limit, "temp.gp")
+                "exhaustive_natural_to_limbs_le" => {
+                    benchmark_exhaustive_natural_to_limbs_le(limit, "temp.gp")
                 }
-                "exhaustive_natural_limbs_be" => {
-                    benchmark_exhaustive_natural_limbs_be(limit, "temp.gp")
+                "exhaustive_natural_to_limbs_be" => {
+                    benchmark_exhaustive_natural_to_limbs_be(limit, "temp.gp")
                 }
                 "exhaustive_natural_mul_assign" => {
                     benchmark_exhaustive_natural_mul_assign(limit, "temp.gp")
@@ -1945,11 +1945,11 @@ fn main() {
                 "random_natural_limb_count" => {
                     benchmark_random_natural_limb_count(limit, 1024, "temp.gp")
                 }
-                "random_natural_limbs_le" => {
-                    benchmark_random_natural_limbs_le(limit, 1024, "temp.gp")
+                "random_natural_to_limbs_le" => {
+                    benchmark_random_natural_to_limbs_le(limit, 1024, "temp.gp")
                 }
-                "random_natural_limbs_be" => {
-                    benchmark_random_natural_limbs_be(limit, 1024, "temp.gp")
+                "random_natural_to_limbs_be" => {
+                    benchmark_random_natural_to_limbs_be(limit, 1024, "temp.gp")
                 }
                 "random_natural_mul_assign" => {
                     benchmark_random_natural_mul_assign(limit, 1024, "temp.gp")
@@ -2454,8 +2454,14 @@ fn main() {
                         100000,
                         "exhaustive_natural_limb_count.gp",
                     );
-                    benchmark_exhaustive_natural_limbs_le(100000, "exhaustive_natural_limbs_le.gp");
-                    benchmark_exhaustive_natural_limbs_be(100000, "exhaustive_natural_limbs_be.gp");
+                    benchmark_exhaustive_natural_to_limbs_le(
+                        100000,
+                        "exhaustive_natural_to_limbs_le.gp",
+                    );
+                    benchmark_exhaustive_natural_to_limbs_be(
+                        100000,
+                        "exhaustive_natural_to_limbs_be.gp",
+                    );
                     benchmark_exhaustive_natural_mul_assign(
                         100000,
                         "exhaustive_natural_mul_assign.gp",
@@ -3019,8 +3025,16 @@ fn main() {
                         1024,
                         "random_natural_limb_count.gp",
                     );
-                    benchmark_random_natural_limbs_le(100000, 1024, "random_natural_limbs_le.gp");
-                    benchmark_random_natural_limbs_be(100000, 1024, "random_natural_limbs_be.gp");
+                    benchmark_random_natural_to_limbs_le(
+                        100000,
+                        1024,
+                        "random_natural_to_limbs_le.gp",
+                    );
+                    benchmark_random_natural_to_limbs_be(
+                        100000,
+                        1024,
+                        "random_natural_to_limbs_be.gp",
+                    );
                     benchmark_random_natural_mul_assign(
                         100000,
                         1024,

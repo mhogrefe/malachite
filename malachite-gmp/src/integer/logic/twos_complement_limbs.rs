@@ -27,7 +27,7 @@ impl Integer {
     ///     vec![727379968, 4294967063]);
     /// ```
     pub fn twos_complement_limbs_le(&self) -> Vec<u32> {
-        let mut limbs = self.natural_abs_ref().limbs_le();
+        let mut limbs = self.natural_abs_ref().to_limbs_le();
         if *self >= 0 {
             if !limbs.is_empty() && limbs.last().unwrap() & 0x8000_0000 != 0 {
                 // Sign-extend with an extra 0 limb to indicate a positive Integer

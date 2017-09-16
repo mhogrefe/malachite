@@ -5,11 +5,11 @@ use rugint;
 use std::str::FromStr;
 
 pub fn gmp_natural_to_native(n: &gmp::natural::Natural) -> native::natural::Natural {
-    native::natural::Natural::from_limbs_le(n.limbs_le().as_slice())
+    native::natural::Natural::from_limbs_le(n.to_limbs_le().as_slice())
 }
 
 pub fn native_natural_to_gmp(n: &native::natural::Natural) -> gmp::natural::Natural {
-    gmp::natural::Natural::from_limbs_le(n.limbs_le().as_slice())
+    gmp::natural::Natural::from_limbs_le(n.to_limbs_le().as_slice())
 }
 
 pub fn num_biguint_to_native_natural(n: &num::BigUint) -> native::natural::Natural {

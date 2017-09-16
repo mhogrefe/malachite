@@ -16,12 +16,13 @@ impl Natural {
     /// use malachite_gmp::natural::Natural;
     /// use std::str::FromStr;
     ///
-    /// assert!(Natural::from(0u32).limbs_le().is_empty());
-    /// assert_eq!(Natural::from(123u32).limbs_le(), vec![123]);
+    /// assert!(Natural::from(0u32).to_limbs_le().is_empty());
+    /// assert_eq!(Natural::from(123u32).to_limbs_le(), vec![123]);
     /// // 10^12 = 232 * 2^32 + 3567587328
-    /// assert_eq!(Natural::from_str("1000000000000").unwrap().limbs_le(), vec![3567587328, 232]);
+    /// assert_eq!(Natural::from_str("1000000000000").unwrap().to_limbs_le(),
+    ///         vec![3567587328, 232]);
     /// ```
-    pub fn limbs_le(&self) -> Vec<u32> {
+    pub fn to_limbs_le(&self) -> Vec<u32> {
         match *self {
             Small(0) => Vec::new(),
             Small(small) => vec![small],
@@ -59,12 +60,13 @@ impl Natural {
     /// use malachite_gmp::natural::Natural;
     /// use std::str::FromStr;
     ///
-    /// assert!(Natural::from(0u32).limbs_be().is_empty());
-    /// assert_eq!(Natural::from(123u32).limbs_be(), vec![123]);
+    /// assert!(Natural::from(0u32).to_limbs_be().is_empty());
+    /// assert_eq!(Natural::from(123u32).to_limbs_be(), vec![123]);
     /// // 10^12 = 232 * 2^32 + 3567587328
-    /// assert_eq!(Natural::from_str("1000000000000").unwrap().limbs_be(), vec![232, 3567587328]);
+    /// assert_eq!(Natural::from_str("1000000000000").unwrap().to_limbs_be(),
+    ///         vec![232, 3567587328]);
     /// ```
-    pub fn limbs_be(&self) -> Vec<u32> {
-        self.limbs_le().into_iter().rev().collect()
+    pub fn to_limbs_be(&self) -> Vec<u32> {
+        self.to_limbs_le().into_iter().rev().collect()
     }
 }

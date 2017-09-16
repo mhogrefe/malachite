@@ -290,7 +290,7 @@ pub(crate) fn large_aors_ref(a_sign: bool, a_abs: &Natural, b_abs: &Natural, c: 
             abs: a_abs.sub_mul(b_abs, c).unwrap(),
         }
     } else {
-        let mut a_limbs = a_abs.limbs_le();
+        let mut a_limbs = a_abs.to_limbs_le();
         a_limbs.resize(b_limb_count as usize + 1, 0);
         // push a limb so that sub_mul_assign won't overflow
         a_limbs.push(1);

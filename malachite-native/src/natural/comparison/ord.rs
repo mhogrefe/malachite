@@ -1,7 +1,7 @@
 use natural::Natural::{self, Large, Small};
 use std::cmp::Ordering;
 
-// Compare s1p and s2p.
+// Compare s1 and s2.
 pub fn mpn_cmp(s1: &[u32], s2: &[u32]) -> Ordering {
     s1.len().cmp(&s2.len()).then_with(|| {
         s1.into_iter().rev().cmp(s2.into_iter().rev())

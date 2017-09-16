@@ -1,6 +1,7 @@
 use natural::arithmetic::add::mpn_add_in_place;
-use natural::arithmetic::add_mul_u32::large_add_mul_u32_mut_a;
-use natural::arithmetic::mul_u32::{large_mul_u32, large_mul_u32_to_buffer};
+use natural::arithmetic::add_u32::mpn_add_1_in_place;
+use natural::arithmetic::add_mul_u32::mpn_addmul_1;
+use natural::arithmetic::mul_u32::mpn_mul_1;
 use natural::Natural::{self, Large, Small};
 use std::ops::{Mul, MulAssign};
 
@@ -239,21 +240,35 @@ fn basecase_mul_with_mem_opt(xs: &[u32], ys: &[u32]) -> Vec<u32> {
 
 // xs.len() >= ys.len(), ys cannot be empty
 fn basecase_mul_to_buffer(buffer: &mut [u32], xs: &[u32], ys: &[u32]) {
-    large_mul_u32_to_buffer(buffer, xs, ys[0]);
+    let xs_len = xs.len();
+    let carry = mpn_mul_1(buffer, xs, ys[0]);
+    if carry != 0 {
+        buffer[xs_len] = carry;
+    }
     for (i, y) in ys.iter().enumerate().skip(1) {
         if *y != 0 {
-            large_add_mul_u32_mut_a(&mut buffer[i..], xs, *y);
+            let carry = mpn_addmul_1(&mut buffer[i..], xs, *y);
+            if carry != 0 {
+                mpn_add_1_in_place(&mut buffer[i + xs_len..], carry);
+            }
         }
     }
 }
 
 // ys cannot be empty
 fn basecase_mul(xs: &[u32], ys: &[u32]) -> Vec<u32> {
-    let mut product_limbs = large_mul_u32(xs, ys[0]);
-    product_limbs.resize(xs.len() + ys.len(), 0);
+    let xs_len = xs.len();
+    let mut product_limbs = vec![0; xs_len + ys.len()];
+    let carry = mpn_mul_1(&mut product_limbs, xs, ys[0]);
+    if carry != 0 {
+        product_limbs[xs_len] = carry;
+    }
     for (i, y) in ys.iter().enumerate().skip(1) {
         if *y != 0 {
-            large_add_mul_u32_mut_a(&mut product_limbs[i..], xs, *y);
+            let carry = mpn_addmul_1(&mut product_limbs[i..], xs, *y);
+            if carry != 0 {
+                mpn_add_1_in_place(&mut product_limbs[i + xs.len()..], carry);
+            }
         }
     }
     product_limbs

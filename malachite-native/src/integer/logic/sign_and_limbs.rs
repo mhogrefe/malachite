@@ -33,7 +33,7 @@ impl Integer {
     ///            (Ordering::Less, vec![3567587328, 232]));
     /// ```
     pub fn sign_and_limbs_le(&self) -> (Ordering, Vec<u32>) {
-        (self.sign(), self.abs.limbs_le())
+        (self.sign(), self.abs.to_limbs_le())
     }
 
     /// Returns the sign and limbs, or base-2^(32) digits, of a `Natural`. The sign is
@@ -67,6 +67,6 @@ impl Integer {
     ///            (Ordering::Less, vec![232, 3567587328]));
     /// ```
     pub fn sign_and_limbs_be(&self) -> (Ordering, Vec<u32>) {
-        (self.sign(), self.abs.limbs_be())
+        (self.sign(), self.abs.to_limbs_be())
     }
 }

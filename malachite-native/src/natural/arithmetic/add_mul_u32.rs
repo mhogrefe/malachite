@@ -1,8 +1,21 @@
+use natural::arithmetic::add_u32::mpn_add_1_in_place;
 use natural::Natural::{self, Large, Small};
 use natural::{get_lower, LIMB_BITS};
-use std::cmp::max;
-use std::mem::swap;
 use traits::{AddMul, AddMulAssign};
+
+// Multiply s1 and s2limb, and add the s1.len() least significant limbs of the product to r and
+// write the result to r. Return the most significant limb of the product, plus carry-out from the
+// addition. r.len() >= s1.len()
+pub fn mpn_addmul_1(r: &mut [u32], s1: &[u32], s2limb: u32) -> u32 {
+    let mut carry = 0;
+    let s2limb_u64 = s2limb as u64;
+    for i in 0..s1.len() {
+        let limb_result = r[i] as u64 + s1[i] as u64 * s2limb_u64 + carry;
+        r[i] = get_lower(limb_result);
+        carry = limb_result >> LIMB_BITS;
+    }
+    carry as u32
+}
 
 /// Adds the product of a `Natural` (b) and a `u32` (c) to a `Natural` (self), taking `self` and b
 /// by value.
@@ -85,30 +98,36 @@ impl<'a> AddMul<&'a Natural, u32> for Natural {
 impl<'a> AddMul<Natural, u32> for &'a Natural {
     type Output = Natural;
 
-    fn add_mul(self, mut b: Natural, c: u32) -> Natural {
+    fn add_mul(self, b: Natural, c: u32) -> Natural {
         if c == 0 || b == 0 {
             return self.clone();
         }
         if c == 1 {
-            b += self;
-            return b;
+            return self + b;
         }
         if let Small(small_b) = b {
             if let Some(product) = small_b.checked_mul(c) {
                 return self + product;
             }
         }
-        {
-            let mut b_limbs = b.promote_in_place();
-            let old_len = b_limbs.len();
-            b_limbs.resize(max(self.limb_count() as usize, old_len) + 1, 0);
-            match self {
-                &Small(small) => large_add_mul_u32_mut_b(&[small], &mut b_limbs, c),
-                &Large(ref limbs) => large_add_mul_u32_mut_b(limbs, &mut b_limbs, c),
+        let mut result_limbs = self.to_limbs_le();
+        let a_len = result_limbs.len();
+        let b_len = b.limb_count() as usize;
+        if a_len < b_len {
+            result_limbs.resize(b_len, 0);
+        }
+        let carry = match b {
+            Small(small) => mpn_addmul_1(&mut result_limbs[..], &[small], c),
+            Large(ref b_limbs) => mpn_addmul_1(&mut result_limbs[..], b_limbs, c),
+        };
+        if carry != 0 {
+            if a_len > b_len {
+                mpn_add_1_in_place(&mut result_limbs[b_len..], carry);
+            } else {
+                result_limbs.push(carry);
             }
         }
-        b.trim();
-        b
+        Large(result_limbs)
     }
 }
 
@@ -147,20 +166,24 @@ impl<'a, 'b> AddMul<&'a Natural, u32> for &'b Natural {
                 return self + product;
             }
         }
-        Large(match (self, b) {
-            (&Small(small_self), &Small(small_b)) => {
-                large_add_mul_u32(&[small_self], &[small_b], c)
+        let mut result_limbs = self.to_limbs_le();
+        let a_len = result_limbs.len();
+        let b_len = b.limb_count() as usize;
+        if a_len < b_len {
+            result_limbs.resize(b_len, 0);
+        }
+        let carry = match b {
+            &Small(small) => mpn_addmul_1(&mut result_limbs[..], &[small], c),
+            &Large(ref b_limbs) => mpn_addmul_1(&mut result_limbs[..], b_limbs, c),
+        };
+        if carry != 0 {
+            if a_len > b_len {
+                mpn_add_1_in_place(&mut result_limbs[b_len..], carry);
+            } else {
+                result_limbs.push(carry);
             }
-            (&Small(small_self), &Large(ref b_limbs)) => {
-                large_add_mul_u32(&[small_self], b_limbs, c)
-            }
-            (&Large(ref self_limbs), &Small(small_b)) => {
-                large_add_mul_u32(self_limbs, &[small_b], c)
-            }
-            (&Large(ref self_limbs), &Large(ref b_limbs)) => {
-                large_add_mul_u32(self_limbs, b_limbs, c)
-            }
-        })
+        }
+        Large(result_limbs)
     }
 }
 
@@ -188,7 +211,7 @@ impl<'a, 'b> AddMul<&'a Natural, u32> for &'b Natural {
 /// assert_eq!(x.to_string(), "1004294967296");
 /// ```
 impl AddMulAssign<Natural, u32> for Natural {
-    fn add_mul_assign(&mut self, mut b: Natural, c: u32) {
+    fn add_mul_assign(&mut self, b: Natural, c: u32) {
         if c == 0 || b == 0 {
             return;
         }
@@ -202,29 +225,25 @@ impl AddMulAssign<Natural, u32> for Natural {
                 return;
             }
         }
-        let self_limb_count = self.limb_count();
-        let b_limb_count = b.limb_count();
-        if self_limb_count >= b_limb_count {
+        {
             let mut self_limbs = self.promote_in_place();
-            let old_len = self_limbs.len();
-            self_limbs.resize(max(old_len, b.limb_count() as usize) + 1, 0);
-            match b {
-                Small(small) => large_add_mul_u32_mut_a(&mut self_limbs, &[small], c),
-                Large(ref b_limbs) => large_add_mul_u32_mut_a(&mut self_limbs, b_limbs, c),
+            let a_len = self_limbs.len();
+            let b_len = b.limb_count() as usize;
+            if a_len < b_len {
+                self_limbs.resize(b_len, 0);
             }
-        } else {
-            {
-                let mut b_limbs = b.promote_in_place();
-                let old_len = b_limbs.len();
-                b_limbs.resize(max(self.limb_count() as usize, old_len) + 1, 0);
-                match self {
-                    &mut Small(small) => large_add_mul_u32_mut_b(&[small], &mut b_limbs, c),
-                    &mut Large(ref limbs) => large_add_mul_u32_mut_b(limbs, &mut b_limbs, c),
+            let carry = match b {
+                Small(small) => mpn_addmul_1(self_limbs, &[small], c),
+                Large(ref b_limbs) => mpn_addmul_1(self_limbs, b_limbs, c),
+            };
+            if carry != 0 {
+                if a_len > b_len {
+                    mpn_add_1_in_place(&mut self_limbs[b_len..], carry);
+                } else {
+                    self_limbs.push(carry);
                 }
             }
-            swap(self, &mut b);
         }
-        self.trim();
     }
 }
 
@@ -268,67 +287,22 @@ impl<'a> AddMulAssign<&'a Natural, u32> for Natural {
         }
         {
             let mut self_limbs = self.promote_in_place();
-            let old_len = self_limbs.len();
-            self_limbs.resize(max(old_len, b.limb_count() as usize) + 1, 0);
-            match b {
-                &Small(small) => large_add_mul_u32_mut_a(&mut self_limbs, &[small], c),
-                &Large(ref b_limbs) => large_add_mul_u32_mut_a(&mut self_limbs, b_limbs, c),
+            let a_len = self_limbs.len();
+            let b_len = b.limb_count() as usize;
+            if a_len < b_len {
+                self_limbs.resize(b_len, 0);
+            }
+            let carry = match b {
+                &Small(small) => mpn_addmul_1(self_limbs, &[small], c),
+                &Large(ref b_limbs) => mpn_addmul_1(self_limbs, b_limbs, c),
+            };
+            if carry != 0 {
+                if a_len > b_len {
+                    mpn_add_1_in_place(&mut self_limbs[b_len..], carry);
+                } else {
+                    self_limbs.push(carry);
+                }
             }
         }
-        self.trim();
     }
-}
-
-fn add_mul_and_carry(x: u32, y: u32, multiplicand: u64, carry: &mut u64) -> u32 {
-    let sum = y as u64 * multiplicand + x as u64 + *carry;
-    *carry = sum >> LIMB_BITS;
-    get_lower(sum)
-}
-
-// xs.len() must be >= ys.len() and the operation must not overflow xs.
-pub(crate) fn large_add_mul_u32_mut_a(xs: &mut [u32], ys: &[u32], multiplicand: u32) {
-    let mut carry = 0;
-    let mut ys_iter = ys.iter();
-    let multiplicand = multiplicand as u64;
-    for x in xs.iter_mut() {
-        match ys_iter.next() {
-            Some(y) => *x = add_mul_and_carry(*x, *y, multiplicand, &mut carry),
-            None if carry != 0 => *x = add_mul_and_carry(*x, 0, multiplicand, &mut carry),
-            None => break,
-        }
-    }
-}
-
-// ys.len() must be >= xs.len() and the operation must not overflow ys.
-pub(crate) fn large_add_mul_u32_mut_b(xs: &[u32], ys: &mut [u32], multiplicand: u32) {
-    let mut carry = 0;
-    let mut xs_iter = xs.iter();
-    let multiplicand = multiplicand as u64;
-    for y in ys.iter_mut() {
-        match xs_iter.next() {
-            Some(x) => *y = add_mul_and_carry(*x, *y, multiplicand, &mut carry),
-            None => *y = add_mul_and_carry(0, *y, multiplicand, &mut carry),
-        }
-    }
-}
-
-fn large_add_mul_u32(xs: &[u32], ys: &[u32], multiplicand: u32) -> Vec<u32> {
-    let mut result_limbs = Vec::with_capacity(xs.len());
-    let mut carry = 0;
-    let mut ys_iter = ys.iter();
-    let multiplicand = multiplicand as u64;
-    for &x in xs.iter() {
-        result_limbs.push(match ys_iter.next() {
-            Some(&y) => add_mul_and_carry(x, y, multiplicand, &mut carry),
-            None if carry != 0 => add_mul_and_carry(x, 0, multiplicand, &mut carry),
-            None => x,
-        });
-    }
-    for y in ys_iter {
-        result_limbs.push(add_mul_and_carry(0, *y, multiplicand, &mut carry));
-    }
-    if carry != 0 {
-        result_limbs.push(carry as u32);
-    }
-    result_limbs
 }
