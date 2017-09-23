@@ -1,7 +1,33 @@
-use natural::arithmetic::sub_u32::sub_assign_u32_helper;
+use natural::arithmetic::sub_u32::{mpn_sub_1_in_place, sub_assign_u32_helper};
 use natural::{get_lower, get_upper};
 use natural::Natural::{self, Large, Small};
 use traits::{SubMul, SubMulAssign};
+
+// Multiply s1 and s2limb, and subtract the s1.len() least significant limbs of the product from r
+// and write the result to r. Return the most significant limb of the product, plus borrow-out from
+// the subtraction. r.len() >= s1.len().
+pub fn mpn_submul_1(r: &mut [u32], s1: &[u32], s2limb: u32) -> u32 {
+    let mut borrow = 0;
+    let s2limb_u64 = s2limb as u64;
+    for i in 0..s1.len() {
+        let product = s1[i] as u64 * s2limb_u64;
+        let upper = get_upper(product);
+        let mut lower = get_lower(product);
+        lower = lower.wrapping_add(borrow);
+        if lower < borrow {
+            borrow = upper.wrapping_add(1);
+        } else {
+            borrow = upper;
+        }
+        let limb = r[i];
+        lower = limb.wrapping_sub(lower);
+        if lower > limb {
+            borrow = borrow.wrapping_add(1);
+        }
+        r[i] = lower;
+    }
+    borrow
+}
 
 /// Subtracts the product of a `Natural` (b) and a `u32` (c) from a `Natural` (self), taking `self`
 /// by value and b by reference.
@@ -29,9 +55,9 @@ impl<'a> SubMul<&'a Natural, u32> for Natural {
 
     fn sub_mul(mut self, b: &'a Natural, c: u32) -> Option<Natural> {
         if sub_mul_assign_u32_helper(&mut self, b, c) {
-            Some(self)
-        } else {
             None
+        } else {
+            Some(self)
         }
     }
 }
@@ -65,33 +91,34 @@ impl<'a, 'b> SubMul<&'a Natural, u32> for &'b Natural {
     fn sub_mul(self, b: &'a Natural, c: u32) -> Option<Natural> {
         if c == 0 || *b == 0 {
             return Some(self.clone());
-        } else if self.limb_count() < b.limb_count() {
+        }
+        let a_limb_count = self.limb_count();
+        let b_limb_count = b.limb_count();
+        if a_limb_count < b_limb_count {
             return None;
         } else if let Small(small_b) = *b {
             if let Some(product) = small_b.checked_mul(c) {
                 return self - product;
             }
         }
-        let (borrow, difference_limbs) = match (self, b) {
-            (&Small(small_self), &Small(small_b)) => {
-                large_sub_mul_u32(&[small_self], &[small_b], c)
-            }
-            (&Small(small_self), &Large(ref b_limbs)) => {
-                large_sub_mul_u32(&[small_self], b_limbs, c)
-            }
-            (&Large(ref self_limbs), &Small(small_b)) => {
-                large_sub_mul_u32(self_limbs, &[small_b], c)
-            }
-            (&Large(ref self_limbs), &Large(ref b_limbs)) => {
-                large_sub_mul_u32(self_limbs, b_limbs, c)
+        let mut a_limbs = self.to_limbs_le();
+        let borrow = match b {
+            &Small(small_b) => mpn_submul_1(&mut a_limbs[..], &[small_b], c),
+            &Large(ref b_limbs) => mpn_submul_1(&mut a_limbs[..], b_limbs, c),
+        };
+        let nonzero_borrow = {
+            if a_limb_count == b_limb_count {
+                borrow != 0
+            } else {
+                mpn_sub_1_in_place(&mut a_limbs[b_limb_count as usize..], borrow)
             }
         };
-        if borrow == 0 {
-            let mut difference = Large(difference_limbs);
+        if nonzero_borrow {
+            None
+        } else {
+            let mut difference = Large(a_limbs);
             difference.trim();
             Some(difference)
-        } else {
-            None
         }
     }
 }
@@ -121,74 +148,40 @@ impl<'a, 'b> SubMul<&'a Natural, u32> for &'b Natural {
 /// ```
 impl<'a> SubMulAssign<&'a Natural, u32> for Natural {
     fn sub_mul_assign(&mut self, b: &'a Natural, c: u32) {
-        if !sub_mul_assign_u32_helper(self, b, c) {
+        if sub_mul_assign_u32_helper(self, b, c) {
             panic!("Natural sub_mul_assign can not have a negative result");
         }
     }
 }
 
-fn sub_mul_and_borrow(x: u32, y: u32, multiplicand: u64, borrow: &mut u32) -> u32 {
-    let difference = (x as u64)
-        .wrapping_sub(y as u64 * multiplicand)
-        .wrapping_sub(*borrow as u64);
-    let lower = get_lower(difference);
-    let upper = get_upper(difference);
-    *borrow = upper.wrapping_neg();
-    lower
-}
-
-// xs.len() must be >= ys.len()
-fn large_sub_mul_u32_in_place(xs: &mut [u32], ys: &[u32], multiplicand: u32) -> u32 {
-    let mut borrow = 0;
-    let mut ys_iter = ys.iter();
-    let multiplicand = multiplicand as u64;
-    for x in xs.iter_mut() {
-        match ys_iter.next() {
-            Some(y) => *x = sub_mul_and_borrow(*x, *y, multiplicand, &mut borrow),
-            None if borrow != 0 => *x = sub_mul_and_borrow(*x, 0, multiplicand, &mut borrow),
-            None => break,
-        }
-    }
-    borrow
-}
-
-// xs.len() must be >= ys.len()
-fn large_sub_mul_u32(xs: &[u32], ys: &[u32], multiplicand: u32) -> (u32, Vec<u32>) {
-    let mut difference_limbs = Vec::new();
-    let mut borrow = 0;
-    let mut ys_iter = ys.iter();
-    let multiplicand = multiplicand as u64;
-    for x in xs.iter() {
-        difference_limbs.push(match ys_iter.next() {
-            Some(y) => sub_mul_and_borrow(*x, *y, multiplicand, &mut borrow),
-            None if borrow != 0 => sub_mul_and_borrow(*x, 0, multiplicand, &mut borrow),
-            None => *x,
-        });
-    }
-    (borrow, difference_limbs)
-}
-
 fn sub_mul_assign_u32_helper(a: &mut Natural, b: &Natural, c: u32) -> bool {
     if c == 0 || *b == 0 {
-        return true;
+        return false;
     }
     if let Small(small_b) = *b {
         if let Some(product) = small_b.checked_mul(c) {
-            return !sub_assign_u32_helper(a, product);
+            return sub_assign_u32_helper(a, product);
         }
     }
-    if a.limb_count() < b.limb_count() {
-        return false;
+    let a_limb_count = a.limb_count();
+    let b_limb_count = b.limb_count();
+    if a_limb_count < b_limb_count {
+        return true;
     }
-    let valid = {
+    let nonzero_borrow = {
         let a_limbs = a.promote_in_place();
-        match b {
-            &Small(small) => large_sub_mul_u32_in_place(a_limbs, &[small], c) == 0,
-            &Large(ref b_limbs) => large_sub_mul_u32_in_place(a_limbs, b_limbs, c) == 0,
+        let borrow = match b {
+            &Small(small) => mpn_submul_1(a_limbs, &[small], c),
+            &Large(ref b_limbs) => mpn_submul_1(a_limbs, b_limbs, c),
+        };
+        if a_limb_count == b_limb_count {
+            borrow != 0
+        } else {
+            mpn_sub_1_in_place(&mut a_limbs[b_limb_count as usize..], borrow)
         }
     };
-    if valid {
+    if !nonzero_borrow {
         a.trim();
     }
-    valid
+    nonzero_borrow
 }
