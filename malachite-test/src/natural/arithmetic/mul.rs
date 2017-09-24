@@ -155,7 +155,7 @@ pub fn benchmark_exhaustive_natural_mul_assign_algorithms(limit: usize, file_nam
         xs: exhaustive_pairs_from_single(exhaustive_naturals()),
         function_f: &(|(mut x, y)| x *= y),
         function_g: &(|(mut x, y): (native::Natural, native::Natural)| {
-                          x._basecase_mul_assign_with_mem_opt(y)
+                          x._mul_assign_basecase_mem_opt(y)
                       }),
         x_cons: &(|&(ref x, ref y)| (gmp_natural_to_native(x), gmp_natural_to_native(y))),
         y_cons: &(|&(ref x, ref y)| (gmp_natural_to_native(x), gmp_natural_to_native(y))),
@@ -176,7 +176,7 @@ pub fn benchmark_random_natural_mul_assign_algorithms(limit: usize, scale: u32, 
         xs: random_pairs_from_single(random_naturals(&EXAMPLE_SEED, scale)),
         function_f: &(|(mut x, y)| x *= y),
         function_g: &(|(mut x, y): (native::Natural, native::Natural)| {
-                          x._basecase_mul_assign_with_mem_opt(y)
+                          x._mul_assign_basecase_mem_opt(y)
                       }),
         x_cons: &(|&(ref x, ref y)| (gmp_natural_to_native(x), gmp_natural_to_native(y))),
         y_cons: &(|&(ref x, ref y)| (gmp_natural_to_native(x), gmp_natural_to_native(y))),

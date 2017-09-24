@@ -35,7 +35,7 @@ fn test_mul() {
         assert!(n.is_valid());
 
         let mut n = native::Natural::from_str(u).unwrap();
-        n._basecase_mul_assign_with_mem_opt(native::Natural::from_str(v).unwrap());
+        n._mul_assign_basecase_mem_opt(native::Natural::from_str(v).unwrap());
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
@@ -156,7 +156,7 @@ fn mul_properties() {
         assert_eq!(mut_x, product);
         assert!(mut_x.is_valid());
         let mut mut_x = x.clone();
-        mut_x._basecase_mul_assign_with_mem_opt(y.clone());
+        mut_x._mul_assign_basecase_mem_opt(y.clone());
         assert!(mut_x.is_valid());
         assert_eq!(mut_x, product, "x: {}, y: {}", x, y);
 
