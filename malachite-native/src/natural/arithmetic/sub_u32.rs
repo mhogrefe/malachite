@@ -4,7 +4,9 @@ use std::ops::{Sub, SubAssign};
 // Subtract s2limb from s1, and write the s1.len() least significant limbs of the result to r.
 // Return borrow. r must have size at least s1.len().
 pub fn mpn_sub_1(r: &mut [u32], s1: &[u32], mut s2limb: u32) -> bool {
-    for i in 0..s1.len() {
+    let s1_len = s1.len();
+    assert!(r.len() >= s1_len);
+    for i in 0..s1_len {
         let (difference, overflow) = s1[i].overflowing_sub(s2limb);
         r[i] = difference;
         if overflow {
@@ -12,7 +14,7 @@ pub fn mpn_sub_1(r: &mut [u32], s1: &[u32], mut s2limb: u32) -> bool {
         } else {
             s2limb = 0;
             let copy_index = i + 1;
-            &r[copy_index..].copy_from_slice(&s1[copy_index..]);
+            &r[copy_index..s1_len].copy_from_slice(&s1[copy_index..]);
             break;
         }
     }

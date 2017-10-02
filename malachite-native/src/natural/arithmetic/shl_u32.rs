@@ -6,9 +6,14 @@ use std::ops::{Shl, ShlAssign};
 // the least significant bits of the return value (the rest of the return value is zero).
 // u.len() > 0, r.len() >= u.len(), 1 <= bits < LIMB_BITS
 pub fn mpn_lshift(r: &mut [u32], u: &[u32], bits: u32) -> u32 {
+    let u_len = u.len();
+    assert!(u_len > 0);
+    assert!(r.len() >= u_len);
+    assert!(bits > 0);
+    assert!(bits < LIMB_BITS);
     let cobits = LIMB_BITS - bits;
     let mut remaining_bits = 0;
-    for i in 0..u.len() {
+    for i in 0..u_len {
         let limb = u[i];
         r[i] = (limb << bits) | remaining_bits;
         remaining_bits = limb >> cobits;
@@ -20,6 +25,9 @@ pub fn mpn_lshift(r: &mut [u32], u: &[u32], bits: u32) -> u32 {
 // the least significant bits of the return value (the rest of the return value is zero).
 // u.len() > 0, 1 <= bits < LIMB_BITS
 pub fn mpn_lshift_in_place(u: &mut [u32], bits: u32) -> u32 {
+    assert!(!u.is_empty());
+    assert!(bits > 0);
+    assert!(bits < LIMB_BITS);
     let cobits = LIMB_BITS - bits;
     let mut remaining_bits = 0;
     for limb in u.iter_mut() {
@@ -57,7 +65,7 @@ fn shl_helper(limbs: &[u32], other: u32) -> Natural {
     let small_shift = other & LIMB_BITS_MASK;
     Large(if small_shift != 0 {
         let mut shifted_limbs = vec![0; limbs.len()];
-        let remaining_bits = mpn_lshift(&mut shifted_limbs, limbs, other);
+        let remaining_bits = mpn_lshift(&mut shifted_limbs, limbs, small_shift);
         pad_left(&mut shifted_limbs, (other >> LOG_LIMB_BITS) as usize, 0);
         if remaining_bits != 0 {
             shifted_limbs.push(remaining_bits);

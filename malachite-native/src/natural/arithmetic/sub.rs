@@ -18,8 +18,11 @@ fn sub_and_borrow(x: u32, y: u32, borrow: &mut bool) -> u32 {
 // Subtract s2 from s1 (which must both have length n), and write the n least significant limbs of
 // the result to r. Return borrow. r must have size at least n.
 pub fn mpn_sub_n(r: &mut [u32], s1: &[u32], s2: &[u32]) -> bool {
+    let s1_len = s1.len();
+    assert_eq!(s1_len, s2.len());
+    assert!(r.len() >= s1_len);
     let mut borrow = false;
-    for i in 0..s1.len() {
+    for i in 0..s1_len {
         r[i] = sub_and_borrow(s1[i], s2[i], &mut borrow);
     }
     borrow
@@ -28,9 +31,23 @@ pub fn mpn_sub_n(r: &mut [u32], s1: &[u32], s2: &[u32]) -> bool {
 // Subtract s2 from s1 (which must both have length n), and write the n least significant limbs of
 // the result to s1. Return borrow.
 pub fn mpn_sub_n_in_place(s1: &mut [u32], s2: &[u32]) -> bool {
+    let s1_len = s1.len();
+    assert_eq!(s1_len, s2.len());
     let mut borrow = false;
-    for i in 0..s1.len() {
+    for i in 0..s1_len {
         s1[i] = sub_and_borrow(s1[i], s2[i], &mut borrow);
+    }
+    borrow
+}
+
+//TODO docs
+// s1 = s2 - s1
+pub fn mpn_sub_n_aba(s1: &mut [u32], s2: &[u32]) -> bool {
+    let s1_len = s1.len();
+    assert_eq!(s1_len, s2.len());
+    let mut borrow = false;
+    for i in 0..s1_len {
+        s1[i] = sub_and_borrow(s2[i], s1[i], &mut borrow);
     }
     borrow
 }
@@ -38,14 +55,17 @@ pub fn mpn_sub_n_in_place(s1: &mut [u32], s2: &[u32]) -> bool {
 // Subtract s2 from s1, and write the s1.len() least significant limbs of the result to r. Return
 // borrow. This function requires that s1.len() >= s2.len() and r.len() >= s1.len().
 pub fn mpn_sub(r: &mut [u32], s1: &[u32], s2: &[u32]) -> bool {
+    let s1_len = s1.len();
     let s2_len = s2.len();
+    assert!(s1_len >= s2_len);
+    assert!(r.len() >= s1_len);
     let borrow = mpn_sub_n(r, &s1[0..s2_len], s2);
-    if s1.len() == s2_len {
+    if s1_len == s2_len {
         borrow
     } else if borrow {
         mpn_sub_1(&mut r[s2_len..], &s1[s2_len..], 1)
     } else {
-        &mut r[s2_len..].copy_from_slice(&s1[s2_len..]);
+        &mut r[s2_len..s1_len].copy_from_slice(&s1[s2_len..]);
         false
     }
 }
@@ -53,9 +73,11 @@ pub fn mpn_sub(r: &mut [u32], s1: &[u32], s2: &[u32]) -> bool {
 // Subtract s2 from s1, and write the s1.len() least significant limbs of the result to s1. Return
 // borrow. This function requires that s1.len() >= s2.len().
 pub fn mpn_sub_in_place(s1: &mut [u32], s2: &[u32]) -> bool {
+    let s1_len = s1.len();
     let s2_len = s2.len();
+    assert!(s1_len >= s2_len);
     let borrow = mpn_sub_n_in_place(&mut s1[0..s2_len], s2);
-    if s1.len() == s2_len {
+    if s1_len == s2_len {
         borrow
     } else if borrow {
         mpn_sub_1_in_place(&mut s1[s2_len..], 1)

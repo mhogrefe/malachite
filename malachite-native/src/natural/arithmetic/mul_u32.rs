@@ -6,9 +6,11 @@ use traits::Assign;
 // Multiply s1 by s2limb, and write the n least significant limbs of the product to r. Return the
 // most significant limb of the product. r.len() >= s1.len().
 pub fn mpn_mul_1(r: &mut [u32], s1: &[u32], s2limb: u32) -> u32 {
+    let s1_len = s1.len();
+    assert!(r.len() >= s1_len);
     let mut carry = 0;
     let s2limb_u64 = s2limb as u64;
-    for i in 0..s1.len() {
+    for i in 0..s1_len {
         let limb_result = s1[i] as u64 * s2limb_u64 + carry as u64;
         r[i] = get_lower(limb_result);
         carry = get_upper(limb_result);

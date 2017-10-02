@@ -1,8 +1,16 @@
 use natural::Natural::{self, Large, Small};
 use std::cmp::Ordering;
 
-// Compare s1 and s2.
+// Compare s1 and s2, which must have the same length.
 pub fn mpn_cmp(s1: &[u32], s2: &[u32]) -> Ordering {
+    let s1_len = s1.len();
+    let s2_len = s2.len();
+    assert_eq!(s1_len, s2_len);
+    s1.into_iter().rev().cmp(s2.into_iter().rev())
+}
+
+// Compare s1 and s2.
+fn mpn_cmp_helper(s1: &[u32], s2: &[u32]) -> Ordering {
     s1.len().cmp(&s2.len()).then_with(|| {
         s1.into_iter().rev().cmp(s2.into_iter().rev())
     })
@@ -41,7 +49,7 @@ impl Ord for Natural {
             (&Small(ref x), &Small(ref y)) => x.cmp(y),
             (&Small(_), &Large(_)) => Ordering::Less,
             (&Large(_), &Small(_)) => Ordering::Greater,
-            (&Large(ref xs), &Large(ref ys)) => mpn_cmp(xs, ys),
+            (&Large(ref xs), &Large(ref ys)) => mpn_cmp_helper(xs, ys),
         }
     }
 }

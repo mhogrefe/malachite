@@ -5,7 +5,9 @@ use traits::Assign;
 // Add s1 and s2limb, and write the s1.len() least significant limbs of the result to r. Return
 // carry. r must have size at least s1.len().
 pub fn mpn_add_1(r: &mut [u32], s1: &[u32], mut s2limb: u32) -> bool {
-    for i in 0..s1.len() {
+    let s1_len = s1.len();
+    assert!(r.len() >= s1_len);
+    for i in 0..s1_len {
         let (sum, overflow) = s1[i].overflowing_add(s2limb);
         r[i] = sum;
         if overflow {
@@ -13,7 +15,7 @@ pub fn mpn_add_1(r: &mut [u32], s1: &[u32], mut s2limb: u32) -> bool {
         } else {
             s2limb = 0;
             let copy_index = i + 1;
-            &r[copy_index..].copy_from_slice(&s1[copy_index..]);
+            &r[copy_index..s1_len].copy_from_slice(&s1[copy_index..]);
             break;
         }
     }

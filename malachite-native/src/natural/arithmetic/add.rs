@@ -19,8 +19,11 @@ fn add_and_carry(x: u32, y: u32, carry: &mut bool) -> u32 {
 // Add s1 and s2 (which must both have length n), and write the n least significant limbs of the
 // result to r. Return carry. r must have size at least n.
 pub fn mpn_add_n(r: &mut [u32], s1: &[u32], s2: &[u32]) -> bool {
+    let s1_len = s1.len();
+    assert_eq!(s1_len, s2.len());
+    assert!(r.len() >= s1_len);
     let mut carry = false;
-    for i in 0..s1.len() {
+    for i in 0..s1_len {
         r[i] = add_and_carry(s1[i], s2[i], &mut carry);
     }
     carry
@@ -29,8 +32,10 @@ pub fn mpn_add_n(r: &mut [u32], s1: &[u32], s2: &[u32]) -> bool {
 // Add s1 and s2 (which must both have length n), and write the n least significant limbs of the
 // result to s1. Return carry.
 pub fn mpn_add_n_in_place(s1: &mut [u32], s2: &[u32]) -> bool {
+    let s1_len = s1.len();
+    assert_eq!(s1_len, s2.len());
     let mut carry = false;
-    for i in 0..s1.len() {
+    for i in 0..s1_len {
         s1[i] = add_and_carry(s1[i], s2[i], &mut carry);
     }
     carry
@@ -39,14 +44,17 @@ pub fn mpn_add_n_in_place(s1: &mut [u32], s2: &[u32]) -> bool {
 // Add s1 and s2, and write the s1.len() least significant limbs of the result to r. Return carry.
 // This function requires that s1.len() >= s2.len() and r.len() >= s1.len().
 pub fn mpn_add(r: &mut [u32], s1: &[u32], s2: &[u32]) -> bool {
+    let s1_len = s1.len();
     let s2_len = s2.len();
+    assert!(s1_len >= s2_len);
+    assert!(r.len() >= s1_len);
     let carry = mpn_add_n(r, &s1[0..s2_len], s2);
-    if s1.len() == s2_len {
+    if s1_len == s2_len {
         carry
     } else if carry {
         mpn_add_1(&mut r[s2_len..], &s1[s2_len..], 1)
     } else {
-        &mut r[s2_len..].copy_from_slice(&s1[s2_len..]);
+        &mut r[s2_len..s1_len].copy_from_slice(&s1[s2_len..]);
         false
     }
 }
@@ -54,9 +62,11 @@ pub fn mpn_add(r: &mut [u32], s1: &[u32], s2: &[u32]) -> bool {
 // Add s1 and s2, and write the s1.len() least significant limbs of the result to s1. Return carry.
 // This function requires that s1.len() >= s2.len().
 pub fn mpn_add_in_place(s1: &mut [u32], s2: &[u32]) -> bool {
+    let s1_len = s1.len();
     let s2_len = s2.len();
+    assert!(s1_len >= s2_len);
     let carry = mpn_add_n_in_place(&mut s1[0..s2_len], s2);
-    if s1.len() == s2_len {
+    if s1_len == s2_len {
         carry
     } else if carry {
         mpn_add_1_in_place(&mut s1[s2_len..], 1)

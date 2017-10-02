@@ -18,8 +18,10 @@ fn neg_and_borrow(x: u32, borrow: &mut bool) -> u32 {
 // Perform the negation of s and write the result to r. This is equivalent to calling mpn_sub_n with
 // a n-limb zero minuend and passing s as subtrahend. Return borrow. r.len() >= s.len().
 pub fn mpn_neg(r: &mut [u32], s: &[u32]) -> bool {
+    let s_len = s.len();
+    assert!(r.len() >= s_len);
     let mut borrow = false;
-    for i in 0..s.len() {
+    for i in 0..s_len {
         r[i] = neg_and_borrow(s[i], &mut borrow);
     }
     borrow

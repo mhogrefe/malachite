@@ -14,6 +14,18 @@ pub enum Natural {
     Large(Vec<u32>),
 }
 
+// Test s and return whether the operand is zero.
+pub fn mpn_zero_p(s: &[u32]) -> bool {
+    s.iter().all(|&x| x == 0)
+}
+
+// Zero r.
+pub fn mpn_zero(r: &mut [u32]) {
+    for x in r.iter_mut() {
+        *x = 0;
+    }
+}
+
 impl Natural {
     /// Creates a new `Natural` equal to 0.
     ///

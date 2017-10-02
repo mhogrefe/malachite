@@ -7,9 +7,11 @@ use traits::{SubMul, SubMulAssign};
 // and write the result to r. Return the most significant limb of the product, plus borrow-out from
 // the subtraction. r.len() >= s1.len().
 pub fn mpn_submul_1(r: &mut [u32], s1: &[u32], s2limb: u32) -> u32 {
+    let s1_len = s1.len();
+    assert!(r.len() >= s1_len);
     let mut borrow = 0;
     let s2limb_u64 = s2limb as u64;
-    for i in 0..s1.len() {
+    for i in 0..s1_len {
         let product = s1[i] as u64 * s2limb_u64;
         let upper = get_upper(product);
         let mut lower = get_lower(product);
