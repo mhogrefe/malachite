@@ -18,9 +18,9 @@ use traits::{AddMul, AddMulAssign, SubMul, SubMulAssign};
 /// use malachite_native::traits::AddMul;
 /// use std::str::FromStr;
 ///
-/// assert_eq!(Integer::from(10u32).add_mul(Integer::from(3u32), 4), 22);
+/// assert_eq!(Integer::from(10u32).add_mul(Integer::from(3u32), 4u32), 22);
 /// assert_eq!(Integer::from_str("-1000000000000").unwrap()
-///                     .add_mul(Integer::from(65536u32), 65536).to_string(),
+///                     .add_mul(Integer::from(65536u32), 65536u32).to_string(),
 ///            "-995705032704");
 /// ```
 impl AddMul<Integer, u32> for Integer {
@@ -47,9 +47,9 @@ impl AddMul<Integer, u32> for Integer {
 /// use malachite_native::traits::AddMul;
 /// use std::str::FromStr;
 ///
-/// assert_eq!(Integer::from(10u32).add_mul(&Integer::from(3u32), 4), 22);
+/// assert_eq!(Integer::from(10u32).add_mul(&Integer::from(3u32), 4u32), 22);
 /// assert_eq!(Integer::from_str("-1000000000000").unwrap()
-///                     .add_mul(&Integer::from(65536u32), 65536).to_string(),
+///                     .add_mul(&Integer::from(65536u32), 65536u32).to_string(),
 ///            "-995705032704");
 /// ```
 impl<'a> AddMul<&'a Integer, u32> for Integer {
@@ -76,9 +76,9 @@ impl<'a> AddMul<&'a Integer, u32> for Integer {
 /// use malachite_native::traits::AddMul;
 /// use std::str::FromStr;
 ///
-/// assert_eq!((&Integer::from(10u32)).add_mul(Integer::from(3u32), 4), 22);
+/// assert_eq!((&Integer::from(10u32)).add_mul(Integer::from(3u32), 4u32), 22);
 /// assert_eq!((&Integer::from_str("-1000000000000").unwrap())
-///                     .add_mul(Integer::from(65536u32), 65536).to_string(),
+///                     .add_mul(Integer::from(65536u32), 65536u32).to_string(),
 ///            "-995705032704");
 /// ```
 impl<'a> AddMul<Integer, u32> for &'a Integer {
@@ -104,9 +104,9 @@ impl<'a> AddMul<Integer, u32> for &'a Integer {
 /// use malachite_native::traits::AddMul;
 /// use std::str::FromStr;
 ///
-/// assert_eq!((&Integer::from(10u32)).add_mul(&Integer::from(3u32), 4), 22);
+/// assert_eq!((&Integer::from(10u32)).add_mul(&Integer::from(3u32), 4u32), 22);
 /// assert_eq!((&Integer::from_str("-1000000000000").unwrap())
-///                     .add_mul(&Integer::from(65536u32), 65536).to_string(),
+///                     .add_mul(&Integer::from(65536u32), 65536u32).to_string(),
 ///             "-995705032704");
 /// ```
 impl<'a, 'b> AddMul<&'a Integer, u32> for &'b Integer {
@@ -160,11 +160,11 @@ impl<'a, 'b> AddMul<&'a Integer, u32> for &'b Integer {
 /// use std::str::FromStr;
 ///
 /// let mut x = Integer::from(10u32);
-/// x.add_mul_assign(Integer::from(3u32), 4);
+/// x.add_mul_assign(Integer::from(3u32), 4u32);
 /// assert_eq!(x, 22);
 ///
 /// let mut x = Integer::from_str("-1000000000000").unwrap();
-/// x.add_mul_assign(Integer::from(65536u32), 65536);
+/// x.add_mul_assign(Integer::from(65536u32), 65536u32);
 /// assert_eq!(x.to_string(), "-995705032704");
 /// ```
 impl AddMulAssign<Integer, u32> for Integer {
@@ -212,11 +212,11 @@ impl AddMulAssign<Integer, u32> for Integer {
 /// use std::str::FromStr;
 ///
 /// let mut x = Integer::from(10u32);
-/// x.add_mul_assign(&Integer::from(3u32), 4);
+/// x.add_mul_assign(&Integer::from(3u32), 4u32);
 /// assert_eq!(x, 22);
 ///
 /// let mut x = Integer::from_str("-1000000000000").unwrap();
-/// x.add_mul_assign(&Integer::from(65536u32), 65536);
+/// x.add_mul_assign(&Integer::from(65536u32), 65536u32);
 /// assert_eq!(x.to_string(), "-995705032704");
 /// ```
 impl<'a> AddMulAssign<&'a Integer, u32> for Integer {

@@ -42,6 +42,7 @@ pub mod abs;
 pub mod add;
 pub mod add_i32;
 pub mod add_u32;
+pub mod add_mul_i32;
 pub mod add_mul_u32;
 pub mod even_odd;
 pub mod mul;
