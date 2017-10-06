@@ -7,19 +7,19 @@ use traits::{AddMul, AddMulAssign, SubMul, SubMulAssign};
 /// # Examples
 /// ```
 /// use malachite_gmp::integer::Integer;
-/// use malachite_gmp::traits::AddMul;
+/// use malachite_gmp::traits::SubMul;
 /// use std::str::FromStr;
 ///
-/// assert_eq!(Integer::from(10u32).add_mul(Integer::from(3u32), 4i32), 22);
+/// assert_eq!(Integer::from(10u32).sub_mul(Integer::from(3u32), -4i32), 22);
 /// assert_eq!(Integer::from_str("-1000000000000").unwrap()
-///                     .add_mul(Integer::from(-65536i32), -65536i32).to_string(),
+///                     .sub_mul(Integer::from(-65536i32), 65536i32).to_string(),
 ///            "-995705032704");
 /// ```
-impl AddMul<Integer, i32> for Integer {
+impl SubMul<Integer, i32> for Integer {
     type Output = Integer;
 
-    fn add_mul(mut self, b: Integer, c: i32) -> Integer {
-        self.add_mul_assign(b, c);
+    fn sub_mul(mut self, b: Integer, c: i32) -> Integer {
+        self.sub_mul_assign(b, c);
         self
     }
 }
@@ -30,19 +30,19 @@ impl AddMul<Integer, i32> for Integer {
 /// # Examples
 /// ```
 /// use malachite_gmp::integer::Integer;
-/// use malachite_gmp::traits::AddMul;
+/// use malachite_gmp::traits::SubMul;
 /// use std::str::FromStr;
 ///
-/// assert_eq!(Integer::from(10u32).add_mul(&Integer::from(3u32), 4i32), 22);
+/// assert_eq!(Integer::from(10u32).sub_mul(&Integer::from(3u32), -4i32), 22);
 /// assert_eq!(Integer::from_str("-1000000000000").unwrap()
-///                     .add_mul(&Integer::from(-65536i32), -65536i32).to_string(),
+///                     .sub_mul(&Integer::from(-65536i32), 65536i32).to_string(),
 ///            "-995705032704");
 /// ```
-impl<'a> AddMul<&'a Integer, i32> for Integer {
+impl<'a> SubMul<&'a Integer, i32> for Integer {
     type Output = Integer;
 
-    fn add_mul(mut self, b: &'a Integer, c: i32) -> Integer {
-        self.add_mul_assign(b, c);
+    fn sub_mul(mut self, b: &'a Integer, c: i32) -> Integer {
+        self.sub_mul_assign(b, c);
         self
     }
 }
@@ -53,19 +53,19 @@ impl<'a> AddMul<&'a Integer, i32> for Integer {
 /// # Examples
 /// ```
 /// use malachite_gmp::integer::Integer;
-/// use malachite_gmp::traits::AddMul;
+/// use malachite_gmp::traits::SubMul;
 /// use std::str::FromStr;
 ///
-/// assert_eq!((&Integer::from(10u32)).add_mul(Integer::from(3u32), 4i32), 22);
+/// assert_eq!((&Integer::from(10u32)).sub_mul(Integer::from(3u32), -4i32), 22);
 /// assert_eq!((&Integer::from_str("-1000000000000").unwrap())
-///                     .add_mul(Integer::from(-65536i32), -65536i32).to_string(),
+///                     .sub_mul(Integer::from(-65536i32), 65536i32).to_string(),
 ///            "-995705032704");
 /// ```
-impl<'a> AddMul<Integer, i32> for &'a Integer {
+impl<'a> SubMul<Integer, i32> for &'a Integer {
     type Output = Integer;
 
-    fn add_mul(self, b: Integer, c: i32) -> Integer {
-        self.add_mul(&b, c)
+    fn sub_mul(self, b: Integer, c: i32) -> Integer {
+        self.sub_mul(&b, c)
     }
 }
 
@@ -75,22 +75,22 @@ impl<'a> AddMul<Integer, i32> for &'a Integer {
 /// # Examples
 /// ```
 /// use malachite_gmp::integer::Integer;
-/// use malachite_gmp::traits::AddMul;
+/// use malachite_gmp::traits::SubMul;
 /// use std::str::FromStr;
 ///
-/// assert_eq!((&Integer::from(10u32)).add_mul(&Integer::from(3u32), 4i32), 22);
+/// assert_eq!((&Integer::from(10u32)).sub_mul(&Integer::from(3u32), -4i32), 22);
 /// assert_eq!((&Integer::from_str("-1000000000000").unwrap())
-///                     .add_mul(&Integer::from(-65536i32), -65536i32).to_string(),
+///                     .sub_mul(&Integer::from(-65536i32), 65536i32).to_string(),
 ///             "-995705032704");
 /// ```
-impl<'a, 'b> AddMul<&'a Integer, i32> for &'b Integer {
+impl<'a, 'b> SubMul<&'a Integer, i32> for &'b Integer {
     type Output = Integer;
 
-    fn add_mul(self, b: &'a Integer, c: i32) -> Integer {
+    fn sub_mul(self, b: &'a Integer, c: i32) -> Integer {
         if c >= 0 {
-            self.add_mul(b, c as u32)
+            self.sub_mul(b, c as u32)
         } else {
-            self.sub_mul(b, c.wrapping_neg() as u32)
+            self.add_mul(b, c.wrapping_neg() as u32)
         }
     }
 }
@@ -101,20 +101,20 @@ impl<'a, 'b> AddMul<&'a Integer, i32> for &'b Integer {
 /// # Examples
 /// ```
 /// use malachite_gmp::integer::Integer;
-/// use malachite_gmp::traits::AddMulAssign;
+/// use malachite_gmp::traits::SubMulAssign;
 /// use std::str::FromStr;
 ///
 /// let mut x = Integer::from(10u32);
-/// x.add_mul_assign(Integer::from(3u32), 4i32);
+/// x.sub_mul_assign(Integer::from(3u32), -4i32);
 /// assert_eq!(x, 22);
 ///
 /// let mut x = Integer::from_str("-1000000000000").unwrap();
-/// x.add_mul_assign(Integer::from(-65536i32), -65536i32);
+/// x.sub_mul_assign(Integer::from(-65536i32), 65536i32);
 /// assert_eq!(x.to_string(), "-995705032704");
 /// ```
-impl AddMulAssign<Integer, i32> for Integer {
-    fn add_mul_assign(&mut self, b: Integer, c: i32) {
-        self.add_mul_assign(&b, c);
+impl SubMulAssign<Integer, i32> for Integer {
+    fn sub_mul_assign(&mut self, b: Integer, c: i32) {
+        self.sub_mul_assign(&b, c);
     }
 }
 
@@ -124,23 +124,23 @@ impl AddMulAssign<Integer, i32> for Integer {
 /// # Examples
 /// ```
 /// use malachite_gmp::integer::Integer;
-/// use malachite_gmp::traits::AddMulAssign;
+/// use malachite_gmp::traits::SubMulAssign;
 /// use std::str::FromStr;
 ///
 /// let mut x = Integer::from(10u32);
-/// x.add_mul_assign(&Integer::from(3u32), 4i32);
+/// x.sub_mul_assign(&Integer::from(3u32), -4i32);
 /// assert_eq!(x, 22);
 ///
 /// let mut x = Integer::from_str("-1000000000000").unwrap();
-/// x.add_mul_assign(&Integer::from(-65536i32), -65536i32);
+/// x.sub_mul_assign(&Integer::from(-65536i32), 65536i32);
 /// assert_eq!(x.to_string(), "-995705032704");
 /// ```
-impl<'a> AddMulAssign<&'a Integer, i32> for Integer {
-    fn add_mul_assign(&mut self, b: &'a Integer, c: i32) {
+impl<'a> SubMulAssign<&'a Integer, i32> for Integer {
+    fn sub_mul_assign(&mut self, b: &'a Integer, c: i32) {
         if c >= 0 {
-            self.add_mul_assign(b, c as u32);
+            self.sub_mul_assign(b, c as u32);
         } else {
-            self.sub_mul_assign(b, c.wrapping_neg() as u32)
+            self.add_mul_assign(b, c.wrapping_neg() as u32)
         }
     }
 }

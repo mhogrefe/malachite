@@ -1,8 +1,8 @@
 use integer::Integer;
 use traits::{AddMul, AddMulAssign, SubMul, SubMulAssign};
 
-/// Adds the product of an `Integer` (b) and a `u32` (c) to an `Integer` (self), taking `self` and b
-/// by value.
+/// Adds the product of an `Integer` (b) and an `i32` (c) to an `Integer` (self), taking `self` and
+/// b by value.
 ///
 /// Time: worst case O(n)
 ///
@@ -30,7 +30,7 @@ impl AddMul<Integer, i32> for Integer {
     }
 }
 
-/// Adds the product of an `Integer` (b) and a `u32` (c) to an `Integer` (self), taking `self` by
+/// Adds the product of an `Integer` (b) and an `i32` (c) to an `Integer` (self), taking `self` by
 /// value and b by reference.
 ///
 /// Time: worst case O(n)
@@ -59,7 +59,7 @@ impl<'a> AddMul<&'a Integer, i32> for Integer {
     }
 }
 
-/// Adds the product of an `Integer` (b) and a `u32` (c) to an `Integer` (self), taking `self` by
+/// Adds the product of an `Integer` (b) and an `i32` (c) to an `Integer` (self), taking `self` by
 /// reference and b by value.
 ///
 /// Time: worst case O(n)
@@ -87,8 +87,8 @@ impl<'a> AddMul<Integer, i32> for &'a Integer {
     }
 }
 
-/// Adds the product of an `Integer` (b) and a `u32` (c) to an `Integer` (self), taking `self` and b
-/// by reference.
+/// Adds the product of an `Integer` (b) and an `i32` (c) to an `Integer` (self), taking `self` and
+/// b by reference.
 ///
 /// Time: worst case O(n)
 ///
@@ -119,7 +119,7 @@ impl<'a, 'b> AddMul<&'a Integer, i32> for &'b Integer {
     }
 }
 
-/// Adds the product of an `Integer` (b) and a `u32` (c) to an `Integer` (self), in place, taking b
+/// Adds the product of an `Integer` (b) and an `i32` (c) to an `Integer` (self), in place, taking b
 /// by value.
 ///
 /// Time: worst case O(n)
@@ -148,7 +148,7 @@ impl AddMulAssign<Integer, i32> for Integer {
     }
 }
 
-/// Adds the product of an `Integer` (b) and a `u32` (c) to an `Integer` (self), in place, taking b
+/// Adds the product of an `Integer` (b) and an `i32` (c) to an `Integer` (self), in place, taking b
 /// by reference.
 ///
 /// Time: worst case O(n)

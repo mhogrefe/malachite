@@ -12,9 +12,9 @@ use traits::{SubMul, SubMulAssign};
 /// use malachite_gmp::traits::SubMul;
 /// use std::str::FromStr;
 ///
-/// assert_eq!(Integer::from(-10i32).sub_mul(Integer::from(3u32), 4), -22);
+/// assert_eq!(Integer::from(-10i32).sub_mul(Integer::from(3u32), 4u32), -22);
 /// assert_eq!(Integer::from_str("1000000000000").unwrap()
-///                     .sub_mul(Integer::from(65536u32), 65536).to_string(),
+///                     .sub_mul(Integer::from(65536u32), 65536u32).to_string(),
 ///            "995705032704");
 /// ```
 impl SubMul<Integer, u32> for Integer {
@@ -35,9 +35,9 @@ impl SubMul<Integer, u32> for Integer {
 /// use malachite_gmp::traits::SubMul;
 /// use std::str::FromStr;
 ///
-/// assert_eq!(Integer::from(-10i32).sub_mul(&Integer::from(3u32), 4), -22);
+/// assert_eq!(Integer::from(-10i32).sub_mul(&Integer::from(3u32), 4u32), -22);
 /// assert_eq!(Integer::from_str("1000000000000").unwrap()
-///                     .sub_mul(&Integer::from(65536u32), 65536).to_string(),
+///                     .sub_mul(&Integer::from(65536u32), 65536u32).to_string(),
 ///            "995705032704");
 /// ```
 impl<'a> SubMul<&'a Integer, u32> for Integer {
@@ -58,9 +58,9 @@ impl<'a> SubMul<&'a Integer, u32> for Integer {
 /// use malachite_gmp::traits::SubMul;
 /// use std::str::FromStr;
 ///
-/// assert_eq!((&Integer::from(-10i32)).sub_mul(Integer::from(3u32), 4), -22);
+/// assert_eq!((&Integer::from(-10i32)).sub_mul(Integer::from(3u32), 4u32), -22);
 /// assert_eq!((&Integer::from_str("1000000000000").unwrap())
-///                     .sub_mul(Integer::from(65536u32), 65536).to_string(),
+///                     .sub_mul(Integer::from(65536u32), 65536u32).to_string(),
 ///            "995705032704");
 /// ```
 impl<'a> SubMul<Integer, u32> for &'a Integer {
@@ -80,9 +80,9 @@ impl<'a> SubMul<Integer, u32> for &'a Integer {
 /// use malachite_gmp::traits::SubMul;
 /// use std::str::FromStr;
 ///
-/// assert_eq!((&Integer::from(-10i32)).sub_mul(&Integer::from(3u32), 4), -22);
+/// assert_eq!((&Integer::from(-10i32)).sub_mul(&Integer::from(3u32), 4u32), -22);
 /// assert_eq!((&Integer::from_str("1000000000000").unwrap())
-///                     .sub_mul(&Integer::from(65536u32), 65536).to_string(),
+///                     .sub_mul(&Integer::from(65536u32), 65536u32).to_string(),
 ///             "995705032704");
 /// ```
 impl<'a, 'b> SubMul<&'a Integer, u32> for &'b Integer {
@@ -133,11 +133,11 @@ impl<'a, 'b> SubMul<&'a Integer, u32> for &'b Integer {
 /// use std::str::FromStr;
 ///
 /// let mut x = Integer::from(-10i32);
-/// x.sub_mul_assign(Integer::from(3u32), 4);
+/// x.sub_mul_assign(Integer::from(3u32), 4u32);
 /// assert_eq!(x, -22);
 ///
 /// let mut x = Integer::from_str("1000000000000").unwrap();
-/// x.sub_mul_assign(Integer::from(65536u32), 65536);
+/// x.sub_mul_assign(Integer::from(65536u32), 65536u32);
 /// assert_eq!(x.to_string(), "995705032704");
 /// ```
 impl SubMulAssign<Integer, u32> for Integer {
@@ -156,11 +156,11 @@ impl SubMulAssign<Integer, u32> for Integer {
 /// use std::str::FromStr;
 ///
 /// let mut x = Integer::from(-10i32);
-/// x.sub_mul_assign(&Integer::from(3u32), 4);
+/// x.sub_mul_assign(&Integer::from(3u32), 4u32);
 /// assert_eq!(x, -22);
 ///
 /// let mut x = Integer::from_str("1000000000000").unwrap();
-/// x.sub_mul_assign(&Integer::from(65536u32), 65536);
+/// x.sub_mul_assign(&Integer::from(65536u32), 65536u32);
 /// assert_eq!(x.to_string(), "995705032704");
 /// ```
 impl<'a> SubMulAssign<&'a Integer, u32> for Integer {
