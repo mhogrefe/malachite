@@ -37,6 +37,22 @@ pub fn mpn_neg_in_place(s: &mut [u32]) -> bool {
     borrow
 }
 
+//TODO use
+/*
+pub(crate) fn mpn_com(r: &mut [u32], s: &[u32]) {
+    let s_len = s.len();
+    assert!(r.len() >= s_len);
+    for i in 0..s_len {
+        r[i] = !s[i];
+    }
+}*/
+
+pub(crate) fn mpn_com_in_place(s: &mut [u32]) {
+    for limb in s.iter_mut() {
+        *limb = !*limb;
+    }
+}
+
 /// Returns the bitwise complement of a `Natural`, as if it were represented in two's complement,
 /// taking the `Natural` by value and returning an `Integer`.
 ///

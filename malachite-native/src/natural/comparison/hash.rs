@@ -10,8 +10,13 @@ use std::hash::{Hash, Hasher};
 /// where n = `other.significant_bits()`
 impl Hash for Natural {
     fn hash<H: Hasher>(&self, state: &mut H) {
-        for i in self.limbs_le() {
-            i.hash(state);
+        match self {
+            Small(small) => small.hash(state),
+            Large(ref limbs) => {
+                for limb in limbs {
+                    limb.hash(state);
+                }
+            }
         }
     }
 }

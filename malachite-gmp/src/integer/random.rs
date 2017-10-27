@@ -21,7 +21,7 @@ impl Integer {
         // Avoid conditions and overflow, equivalent to:
         // let total_limbs = whole_limbs + if extra_bits == 0 { 0 } else { 1 };
         let total_limbs = whole_limbs + ((extra_bits + limb_bits - 1) / limb_bits) as usize;
-        let mut s = self.promote_in_place();
+        let s = self.promote_in_place();
         let limbs = unsafe { slice::from_raw_parts_mut(s.d, total_limbs) };
         // if the random number is >= bound, restart
         'restart: loop {

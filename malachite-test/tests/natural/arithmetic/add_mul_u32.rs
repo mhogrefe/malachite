@@ -128,6 +128,7 @@ fn add_mul_u32_properties() {
     // a.add_mul_assign(b, c), a.add_mul_assign(&b, c), a.add_mul(b, c), a.add_mul(&b, c),
     //      (&a).add_mul(b, c), and (&a).add_mul(&b, c) give the same result.
     // a.add_mul(&b, c) is equivalent to a + b * c.
+    // a.add_mul(&b, c) is equivalent to a.add_mul(&b, Natural::from(c))
     let natural_natural_and_u32 = |mut gmp_a: gmp::Natural, gmp_b: gmp::Natural, c: u32| {
         let mut a = gmp_natural_to_native(&gmp_a);
         let b = gmp_natural_to_native(&gmp_b);
@@ -184,7 +185,8 @@ fn add_mul_u32_properties() {
         assert!(result.is_valid());
         assert_eq!(result, a);
 
-        assert_eq!(&old_a + b * c, result);
+        assert_eq!(&old_a + &b * c, result);
+        assert_eq!(&old_a + b * native::Natural::from(c), result);
     };
 
     // n.add_mul(0, c) == n

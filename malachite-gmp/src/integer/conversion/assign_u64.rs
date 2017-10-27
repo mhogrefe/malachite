@@ -20,7 +20,7 @@ impl Assign<u64> for Integer {
         if upper == 0 {
             self.assign(other as u32)
         } else {
-            let mut large = self.promote_in_place();
+            let large = self.promote_in_place();
             unsafe {
                 gmp::mpz_set_ui(large, upper.into());
                 gmp::mpz_mul_2exp(large, large, 32);

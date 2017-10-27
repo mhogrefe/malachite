@@ -228,7 +228,7 @@ impl AddMulAssign<Natural, u32> for Natural {
             }
         }
         {
-            let mut self_limbs = self.promote_in_place();
+            let self_limbs = self.promote_in_place();
             let a_len = self_limbs.len();
             let b_len = b.limb_count() as usize;
             if a_len < b_len {
@@ -288,7 +288,7 @@ impl<'a> AddMulAssign<&'a Natural, u32> for Natural {
             }
         }
         {
-            let mut self_limbs = self.promote_in_place();
+            let self_limbs = self.promote_in_place();
             let a_len = self_limbs.len();
             let b_len = b.limb_count() as usize;
             if a_len < b_len {

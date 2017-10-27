@@ -36,7 +36,7 @@ impl Natural {
                 gmp::mpz_init(&mut large);
                 match get_limb_size() {
                     LimbSize::U32 => {
-                        let mut raw_limbs = from_raw_parts_mut(
+                        let raw_limbs = from_raw_parts_mut(
                             gmp::mpz_limbs_write(&mut large, sig_size as i64),
                             sig_size,
                         );
@@ -51,7 +51,7 @@ impl Natural {
                         } else {
                             (sig_size >> 1) + 1
                         };
-                        let mut raw_limbs = from_raw_parts_mut(
+                        let raw_limbs = from_raw_parts_mut(
                             gmp::mpz_limbs_write(&mut large, raw_sig_size as i64),
                             raw_sig_size,
                         );

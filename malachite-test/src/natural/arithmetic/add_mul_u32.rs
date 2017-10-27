@@ -38,7 +38,7 @@ pub fn demo_random_natural_add_mul_assign_u32(limit: usize) {
         &EXAMPLE_SEED,
         &(|seed| random_naturals(seed, 32)),
         &(|seed| random_naturals(seed, 32)),
-        &(|seed| random_x(seed)),
+        &(|seed| random_x::<u32>(seed)),
     ).take(limit)
     {
         let a_old = a.clone();
@@ -72,7 +72,7 @@ pub fn demo_random_natural_add_mul_assign_u32_ref(limit: usize) {
         &EXAMPLE_SEED,
         &(|seed| random_naturals(seed, 32)),
         &(|seed| random_naturals(seed, 32)),
-        &(|seed| random_x(seed)),
+        &(|seed| random_x::<u32>(seed)),
     ).take(limit)
     {
         let a_old = a.clone();
@@ -99,7 +99,7 @@ pub fn demo_random_natural_add_mul_u32(limit: usize) {
         &EXAMPLE_SEED,
         &(|seed| random_naturals(seed, 32)),
         &(|seed| random_naturals(seed, 32)),
-        &(|seed| random_x(seed)),
+        &(|seed| random_x::<u32>(seed)),
     ).take(limit)
     {
         let a_old = a.clone();
@@ -125,7 +125,7 @@ pub fn demo_random_natural_add_mul_u32_val_ref(limit: usize) {
         &EXAMPLE_SEED,
         &(|seed| random_naturals(seed, 32)),
         &(|seed| random_naturals(seed, 32)),
-        &(|seed| random_x(seed)),
+        &(|seed| random_x::<u32>(seed)),
     ).take(limit)
     {
         let a_old = a.clone();
@@ -157,7 +157,7 @@ pub fn demo_random_natural_add_mul_u32_ref_val(limit: usize) {
         &EXAMPLE_SEED,
         &(|seed| random_naturals(seed, 32)),
         &(|seed| random_naturals(seed, 32)),
-        &(|seed| random_x(seed)),
+        &(|seed| random_x::<u32>(seed)),
     ).take(limit)
     {
         let a_old = a.clone();
@@ -195,7 +195,7 @@ pub fn demo_random_natural_add_mul_u32_ref_ref(limit: usize) {
         &EXAMPLE_SEED,
         &(|seed| random_naturals(seed, 32)),
         &(|seed| random_naturals(seed, 32)),
-        &(|seed| random_x(seed)),
+        &(|seed| random_x::<u32>(seed)),
     ).take(limit)
     {
         let a_old = a.clone();

@@ -86,6 +86,22 @@ pub fn mpn_sub_in_place(s1: &mut [u32], s2: &[u32]) -> bool {
     }
 }
 
+//TODO docs
+pub fn mpn_sub_aba(a: &mut [u32], b: &[u32], len: usize) -> bool {
+    let s1_len = b.len();
+    assert!(s1_len >= len);
+    assert!(a.len() >= s1_len);
+    let borrow = mpn_sub_n_aba(&mut a[0..len], &b[0..len]);
+    if s1_len == len {
+        borrow
+    } else if borrow {
+        mpn_sub_1(&mut a[len..], &b[len..], 1)
+    } else {
+        &mut a[len..s1_len].copy_from_slice(&b[len..]);
+        false
+    }
+}
+
 // x -= y, return borrow
 fn sub_assign_helper<'a>(x: &mut Natural, y: &'a Natural) -> bool {
     if *y == 0 {
@@ -97,8 +113,6 @@ fn sub_assign_helper<'a>(x: &mut Natural, y: &'a Natural) -> bool {
         true
     } else if let Small(y) = *y {
         sub_assign_u32_helper(x, y)
-    } else if let Small(_) = *x {
-        true
     } else {
         match (&mut (*x), y) {
             (&mut Large(ref mut xs), &Large(ref ys)) => {

@@ -1,4 +1,4 @@
-use integer::arithmetic::add_mul_u32::{large_aors_ref, large_aors_val};
+use integer::arithmetic::add_mul_u32::{large_aorsmul_ref, large_aorsmul_val};
 use integer::Integer;
 use natural::Natural::Small;
 use traits::{AddMul, AddMulAssign, SubMul, SubMulAssign};
@@ -108,6 +108,9 @@ impl<'a> SubMul<Integer, u32> for &'a Integer {
 /// assert_eq!((&Integer::from_str("1000000000000").unwrap())
 ///                     .sub_mul(&Integer::from(65536u32), 65536u32).to_string(),
 ///             "995705032704");
+/// assert_eq!((&Integer::from_str("-1000000000000").unwrap())
+///                     .sub_mul(&Integer::from(-65536i32), 65536u32).to_string(),
+///            "-995705032704");
 /// ```
 impl<'a, 'b> SubMul<&'a Integer, u32> for &'b Integer {
     type Output = Integer;
@@ -139,7 +142,7 @@ impl<'a, 'b> SubMul<&'a Integer, u32> for &'b Integer {
                     }
                 }
             }
-            large_aors_ref(self.sign, &self.abs, &b.abs, c)
+            large_aorsmul_ref(self.sign, &self.abs, b.sign, &b.abs, c, false)
         }
     }
 }
@@ -191,7 +194,7 @@ impl SubMulAssign<Integer, u32> for Integer {
                     }
                 }
             }
-            large_aors_val(&mut self.sign, &mut self.abs, &b.abs, c);
+            large_aorsmul_val(&mut self.sign, &mut self.abs, b.sign, &b.abs, c, false);
         }
     }
 }
@@ -242,7 +245,7 @@ impl<'a> SubMulAssign<&'a Integer, u32> for Integer {
                     }
                 }
             }
-            large_aors_val(&mut self.sign, &mut self.abs, &b.abs, c);
+            large_aorsmul_val(&mut self.sign, &mut self.abs, b.sign, &b.abs, c, false);
         }
     }
 }

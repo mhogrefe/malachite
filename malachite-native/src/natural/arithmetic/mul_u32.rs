@@ -31,6 +31,18 @@ pub fn mpn_mul_1_in_place(s1: &mut [u32], s2limb: u32) -> u32 {
     carry
 }
 
+pub(crate) fn mpn_mul_1c(r: &mut [u32], s1: &[u32], s2limb: u32, mut carry: u32) -> u32 {
+    let s1_len = s1.len();
+    assert!(r.len() >= s1_len);
+    let s2limb_u64 = s2limb as u64;
+    for i in 0..s1_len {
+        let limb_result = s1[i] as u64 * s2limb_u64 + carry as u64;
+        r[i] = get_lower(limb_result);
+        carry = get_upper(limb_result);
+    }
+    carry
+}
+
 /// Multiplies a `Natural` by a `u32`, taking the `Natural` by value.
 ///
 /// Time: worst case O(n)
