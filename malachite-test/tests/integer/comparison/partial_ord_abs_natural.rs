@@ -1,9 +1,7 @@
 use common::LARGE_LIMIT;
+use malachite_base::traits::{OrdAbs, PartialOrdAbs};
 use malachite_gmp as gmp;
-use malachite_gmp::traits::PartialOrdAbs as gmp_partial_ord_abs;
 use malachite_native as native;
-use malachite_native::traits::OrdAbs as native_ord_abs;
-use malachite_native::traits::PartialOrdAbs as native_partial_ord_abs;
 use malachite_test::common::{gmp_integer_to_native, gmp_natural_to_native,
                              native_integer_to_rugint, native_natural_to_rugint_integer};
 use rust_wheels::iterators::common::EXAMPLE_SEED;

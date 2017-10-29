@@ -1,6 +1,6 @@
 use integer::Integer;
+use malachite_base::traits::Assign;
 use std::ops::{Add, AddAssign};
-use traits::Assign;
 
 /// Adds a `u32` to an `Integer`, taking the `Integer` by value.
 ///

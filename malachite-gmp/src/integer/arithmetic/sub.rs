@@ -2,7 +2,7 @@ use gmp_mpfr_sys::gmp::{self, mpz_t};
 use integer::Integer::{self, Large, Small};
 use std::ops::{Sub, SubAssign};
 use std::mem;
-use traits::NegAssign;
+use malachite_base::traits::NegAssign;
 
 /// Subtracts an `Integer` from an `Integer`, taking both `Integer`s by value.
 ///

@@ -1,6 +1,6 @@
 use integer::Integer;
 use natural::Natural;
-use traits::Assign;
+use malachite_base::traits::Assign;
 
 impl Natural {
     /// Converts a `Natural` to an `Integer`, taking the `Natural` by value.

@@ -1,5 +1,5 @@
 use integer::Integer;
-use traits::Assign;
+use malachite_base::traits::Assign;
 
 /// Assigns an `Integer` to another `Integer`, taking the `Integer` on the RHS by value.
 ///
@@ -9,12 +9,17 @@ use traits::Assign;
 ///
 /// # Example
 /// ```
-/// use malachite_native::integer::Integer;
-/// use malachite_native::traits::Assign;
+/// extern crate malachite_base;
+/// extern crate malachite_native;
 ///
-/// let mut x = Integer::from(45);
-/// x.assign(Integer::from(-123));
-/// assert_eq!(x.to_string(), "-123");
+/// use malachite_base::traits::Assign;
+/// use malachite_native::integer::Integer;
+///
+/// fn main() {
+///     let mut x = Integer::from(45);
+///     x.assign(Integer::from(-123));
+///     assert_eq!(x.to_string(), "-123");
+/// }
 /// ```
 impl Assign<Integer> for Integer {
     fn assign(&mut self, other: Integer) {
@@ -32,12 +37,17 @@ impl Assign<Integer> for Integer {
 ///
 /// # Example
 /// ```
-/// use malachite_native::integer::Integer;
-/// use malachite_native::traits::Assign;
+/// extern crate malachite_base;
+/// extern crate malachite_native;
 ///
-/// let mut x = Integer::from(456);
-/// x.assign(&Integer::from(-123));
-/// assert_eq!(x.to_string(), "-123");
+/// use malachite_base::traits::Assign;
+/// use malachite_native::integer::Integer;
+///
+/// fn main() {
+///     let mut x = Integer::from(456);
+///     x.assign(&Integer::from(-123));
+///     assert_eq!(x.to_string(), "-123");
+/// }
 /// ```
 impl<'a> Assign<&'a Integer> for Integer {
     fn assign(&mut self, other: &'a Integer) {

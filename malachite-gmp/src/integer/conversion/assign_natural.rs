@@ -2,19 +2,24 @@ use gmp_mpfr_sys::gmp::{self, mpz_t};
 use integer::Integer;
 use natural::Natural;
 use std::mem;
-use traits::Assign;
+use malachite_base::traits::Assign;
 
 /// Assigns an `Integer` to a `Natural`, taking the `Integer` by value.
 ///
 /// # Example
 /// ```
+/// extern crate malachite_base;
+/// extern crate malachite_gmp;
+///
+/// use malachite_base::traits::Assign;
 /// use malachite_gmp::integer::Integer;
 /// use malachite_gmp::natural::Natural;
-/// use malachite_gmp::traits::Assign;
 ///
-/// let mut x = Integer::from(-456);
-/// x.assign(Natural::from(123u32));
-/// assert_eq!(x.to_string(), "123");
+/// fn main() {
+///     let mut x = Integer::from(-456);
+///     x.assign(Natural::from(123u32));
+///     assert_eq!(x.to_string(), "123");
+/// }
 /// ```
 impl Assign<Natural> for Integer {
     fn assign(&mut self, mut other: Natural) {
@@ -39,13 +44,18 @@ impl Assign<Natural> for Integer {
 ///
 /// # Example
 /// ```
+/// extern crate malachite_base;
+/// extern crate malachite_gmp;
+///
+/// use malachite_base::traits::Assign;
 /// use malachite_gmp::integer::Integer;
 /// use malachite_gmp::natural::Natural;
-/// use malachite_gmp::traits::Assign;
 ///
-/// let mut x = Integer::from(-456);
-/// x.assign(&Natural::from(123u32));
-/// assert_eq!(x.to_string(), "123");
+/// fn main() {
+///     let mut x = Integer::from(-456);
+///     x.assign(&Natural::from(123u32));
+///     assert_eq!(x.to_string(), "123");
+/// }
 /// ```
 impl<'a> Assign<&'a Natural> for Integer {
     fn assign(&mut self, other: &'a Natural) {

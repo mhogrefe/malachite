@@ -1,7 +1,7 @@
 use integer::Integer;
+use malachite_base::traits::{Assign, NegAssign};
 use natural::Natural;
 use std::ops::{Sub, SubAssign};
-use traits::{Assign, NegAssign};
 
 /// Subtracts an `i32` from an `Integer`, taking the `Integer` by value.
 ///

@@ -1,10 +1,7 @@
 use common::LARGE_LIMIT;
+use malachite_base::traits::{SubMul, SubMulAssign};
 use malachite_native::integer as native;
-use malachite_native::traits::SubMul as native_sub_mul;
-use malachite_native::traits::SubMulAssign as native_sub_mul_assign;
 use malachite_gmp::integer as gmp;
-use malachite_gmp::traits::SubMul as gmp_sub_mul;
-use malachite_gmp::traits::SubMulAssign as gmp_sub_mul_assign;
 use malachite_test::common::{gmp_integer_to_native, native_integer_to_gmp};
 use rust_wheels::iterators::common::EXAMPLE_SEED;
 use rust_wheels::iterators::general::random_x;

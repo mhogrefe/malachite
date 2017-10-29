@@ -1,8 +1,7 @@
 use common::{gmp_integer_to_native, gmp_integer_to_rugint};
+use malachite_base::traits::NotAssign;
 use malachite_gmp::integer as gmp;
-use malachite_gmp::traits::NotAssign as gmp_not_assign;
 use malachite_native::integer as native;
-use malachite_native::traits::NotAssign as native_not_assign;
 use rugint;
 use rust_wheels::benchmarks::{BenchmarkOptions2, BenchmarkOptions3, benchmark_2, benchmark_3};
 use rust_wheels::iterators::common::EXAMPLE_SEED;
@@ -57,7 +56,7 @@ pub fn benchmark_exhaustive_integer_not_assign(limit: usize, file_name: &str) {
         x_cons: &(|x| x.clone()),
         y_cons: &(|x| gmp_integer_to_native(x)),
         x_param: &(|n| n.significant_bits() as usize),
-        limit: limit,
+        limit,
         f_name: "malachite-gmp",
         g_name: "malachite-native",
         title: "Integer.not_assign()",
@@ -76,7 +75,7 @@ pub fn benchmark_random_integer_not_assign(limit: usize, scale: u32, file_name: 
         x_cons: &(|x| x.clone()),
         y_cons: &(|x| gmp_integer_to_native(x)),
         x_param: &(|n| n.significant_bits() as usize),
-        limit: limit,
+        limit,
         f_name: "malachite-gmp",
         g_name: "malachite-native",
         title: "Integer.not_assign()",
@@ -97,7 +96,7 @@ pub fn benchmark_exhaustive_integer_not(limit: usize, file_name: &str) {
         y_cons: &(|x| gmp_integer_to_native(x)),
         z_cons: &(|x| gmp_integer_to_rugint(x)),
         x_param: &(|n| n.significant_bits() as usize),
-        limit: limit,
+        limit,
         f_name: "malachite-gmp",
         g_name: "malachite-native",
         h_name: "rugint",
@@ -119,7 +118,7 @@ pub fn benchmark_random_integer_not(limit: usize, scale: u32, file_name: &str) {
         y_cons: &(|x| gmp_integer_to_native(x)),
         z_cons: &(|x| gmp_integer_to_rugint(x)),
         x_param: &(|n| n.significant_bits() as usize),
-        limit: limit,
+        limit,
         f_name: "malachite-gmp",
         g_name: "malachite-native",
         h_name: "rugint",
@@ -139,7 +138,7 @@ pub fn benchmark_exhaustive_integer_not_evaluation_strategy(limit: usize, file_n
         x_cons: &(|x| gmp_integer_to_native(x)),
         y_cons: &(|x| gmp_integer_to_native(x)),
         x_param: &(|n| n.significant_bits() as usize),
-        limit: limit,
+        limit,
         f_name: "-Integer",
         g_name: "-\\\\&Integer",
         title: "-Integer evaluation strategy",
@@ -158,7 +157,7 @@ pub fn benchmark_random_integer_not_evaluation_strategy(limit: usize, scale: u32
         x_cons: &(|x| gmp_integer_to_native(x)),
         y_cons: &(|x| gmp_integer_to_native(x)),
         x_param: &(|n| n.significant_bits() as usize),
-        limit: limit,
+        limit,
         f_name: "-Integer",
         g_name: "-\\\\&Integer",
         title: "-Integer evaluation strategy",

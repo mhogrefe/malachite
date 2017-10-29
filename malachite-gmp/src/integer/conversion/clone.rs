@@ -6,18 +6,23 @@ use std::mem;
 ///
 /// # Examples
 /// ```
+/// extern crate malachite_base;
+/// extern crate malachite_gmp;
+///
+/// use malachite_base::traits::Assign;
 /// use malachite_gmp::integer::Integer;
-/// use malachite_gmp::traits::Assign;
 ///
-/// let mut x = Integer::from(456);
-/// x.clone_from(&Integer::from(-123));
-/// assert_eq!(x.to_string(), "-123");
+/// fn main() {
+///     let mut x = Integer::from(456);
+///     x.clone_from(&Integer::from(-123));
+///     assert_eq!(x.to_string(), "-123");
 ///
-/// let mut y = x.clone();
-/// assert_eq!(y.to_string(), "-123");
-/// y.assign(789);
-/// assert_eq!(x.to_string(), "-123");
-/// assert_eq!(y.to_string(), "789");
+///     let mut y = x.clone();
+///     assert_eq!(y.to_string(), "-123");
+///     y.assign(789);
+///     assert_eq!(x.to_string(), "-123");
+///     assert_eq!(y.to_string(), "789");
+/// }
 /// ```
 impl Clone for Integer {
     fn clone(&self) -> Integer {

@@ -1,5 +1,5 @@
 use integer::Integer;
-use traits::Assign;
+use malachite_base::traits::Assign;
 
 /// Assigns a `u32` to to an `Integer`.
 ///
@@ -9,12 +9,17 @@ use traits::Assign;
 ///
 /// # Example
 /// ```
-/// use malachite_native::integer::Integer;
-/// use malachite_native::traits::Assign;
+/// extern crate malachite_base;
+/// extern crate malachite_native;
 ///
-/// let mut x = Integer::from(-123);
-/// x.assign(456);
-/// assert_eq!(x.to_string(), "456");
+/// use malachite_base::traits::Assign;
+/// use malachite_native::integer::Integer;
+///
+/// fn main() {
+///     let mut x = Integer::from(-123);
+///     x.assign(456);
+///     assert_eq!(x.to_string(), "456");
+/// }
 /// ```
 impl Assign<u32> for Integer {
     fn assign(&mut self, other: u32) {

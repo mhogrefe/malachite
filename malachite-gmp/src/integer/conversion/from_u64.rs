@@ -1,5 +1,6 @@
 use gmp_mpfr_sys::gmp::{self, mpz_t};
-use integer::{Integer, get_lower, get_upper, Large};
+use integer::{Integer, Large};
+use malachite_base::num::{get_lower, get_upper};
 use std::mem;
 
 /// Converts a `u64` to an `Integer`.

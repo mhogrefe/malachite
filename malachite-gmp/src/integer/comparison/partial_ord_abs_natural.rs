@@ -2,22 +2,27 @@ use gmp_mpfr_sys::gmp;
 use integer::Integer;
 use natural::Natural;
 use std::cmp::Ordering;
-use traits::PartialOrdAbs;
+use malachite_base::traits::PartialOrdAbs;
 
 /// Compares the absolute value of an `Integer` to the absolute value of a `Natural`.
 ///
 /// # Examples
 /// ```
+/// extern crate malachite_base;
+/// extern crate malachite_gmp;
+///
+/// use malachite_base::traits::PartialOrdAbs;
 /// use malachite_gmp::integer::Integer;
 /// use malachite_gmp::natural::Natural;
-/// use malachite_gmp::traits::PartialOrdAbs;
 ///
-/// assert!(Integer::from(123).gt_abs(&Natural::from(122u32)));
-/// assert!(Integer::from(123).ge_abs(&Natural::from(122u32)));
-/// assert!(Integer::from(123).lt_abs(&Natural::from(124u32)));
-/// assert!(Integer::from(123).le_abs(&Natural::from(124u32)));
-/// assert!(Integer::from(-124).gt_abs(&Natural::from(123u32)));
-/// assert!(Integer::from(-124).ge_abs(&Natural::from(123u32)));
+/// fn main() {
+///     assert!(Integer::from(123).gt_abs(&Natural::from(122u32)));
+///     assert!(Integer::from(123).ge_abs(&Natural::from(122u32)));
+///     assert!(Integer::from(123).lt_abs(&Natural::from(124u32)));
+///     assert!(Integer::from(123).le_abs(&Natural::from(124u32)));
+///     assert!(Integer::from(-124).gt_abs(&Natural::from(123u32)));
+///     assert!(Integer::from(-124).ge_abs(&Natural::from(123u32)));
+/// }
 /// ```
 impl PartialOrdAbs<Natural> for Integer {
     fn partial_cmp_abs(&self, other: &Natural) -> Option<Ordering> {
@@ -40,16 +45,21 @@ impl PartialOrdAbs<Natural> for Integer {
 ///
 /// # Examples
 /// ```
+/// extern crate malachite_base;
+/// extern crate malachite_gmp;
+///
+/// use malachite_base::traits::PartialOrdAbs;
 /// use malachite_gmp::integer::Integer;
 /// use malachite_gmp::natural::Natural;
-/// use malachite_gmp::traits::PartialOrdAbs;
 ///
-/// assert!(Natural::from(123u32).gt_abs(&Integer::from(122)));
-/// assert!(Natural::from(123u32).ge_abs(&Integer::from(122)));
-/// assert!(Natural::from(123u32).lt_abs(&Integer::from(124)));
-/// assert!(Natural::from(123u32).le_abs(&Integer::from(124)));
-/// assert!(Natural::from(123u32).lt_abs(&Integer::from(-124)));
-/// assert!(Natural::from(123u32).le_abs(&Integer::from(-124)));
+/// fn main() {
+///     assert!(Natural::from(123u32).gt_abs(&Integer::from(122)));
+///     assert!(Natural::from(123u32).ge_abs(&Integer::from(122)));
+///     assert!(Natural::from(123u32).lt_abs(&Integer::from(124)));
+///     assert!(Natural::from(123u32).le_abs(&Integer::from(124)));
+///     assert!(Natural::from(123u32).lt_abs(&Integer::from(-124)));
+///     assert!(Natural::from(123u32).le_abs(&Integer::from(-124)));
+/// }
 /// ```
 impl PartialOrdAbs<Integer> for Natural {
     fn partial_cmp_abs(&self, other: &Integer) -> Option<Ordering> {

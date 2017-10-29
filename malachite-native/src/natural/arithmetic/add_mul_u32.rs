@@ -1,7 +1,8 @@
+use malachite_base::num::get_lower;
+use malachite_base::traits::{AddMul, AddMulAssign};
 use natural::arithmetic::add_u32::mpn_add_1_in_place;
+use natural::LIMB_BITS;
 use natural::Natural::{self, Large, Small};
-use natural::{get_lower, LIMB_BITS};
-use traits::{AddMul, AddMulAssign};
 
 // Multiply s1 and s2limb, and add the s1.len() least significant limbs of the product to r and
 // write the result to r. Return the most significant limb of the product, plus carry-out from the
@@ -30,14 +31,19 @@ pub fn mpn_addmul_1(r: &mut [u32], s1: &[u32], s2limb: u32) -> u32 {
 ///
 /// # Examples
 /// ```
+/// extern crate malachite_base;
+/// extern crate malachite_native;
+///
+/// use malachite_base::traits::AddMul;
 /// use malachite_native::natural::Natural;
-/// use malachite_native::traits::AddMul;
 /// use std::str::FromStr;
 ///
-/// assert_eq!(Natural::from(10u32).add_mul(Natural::from(3u32), 4), 22);
-/// assert_eq!(Natural::from_str("1000000000000").unwrap()
-///                     .add_mul(Natural::from(65536u32), 65536).to_string(),
-///            "1004294967296");
+/// fn main() {
+///     assert_eq!(Natural::from(10u32).add_mul(Natural::from(3u32), 4), 22);
+///     assert_eq!(Natural::from_str("1000000000000").unwrap()
+///                         .add_mul(Natural::from(65536u32), 65536).to_string(),
+///                "1004294967296");
+/// }
 /// ```
 impl AddMul<Natural, u32> for Natural {
     type Output = Natural;
@@ -59,14 +65,19 @@ impl AddMul<Natural, u32> for Natural {
 ///
 /// # Examples
 /// ```
+/// extern crate malachite_base;
+/// extern crate malachite_native;
+///
+/// use malachite_base::traits::AddMul;
 /// use malachite_native::natural::Natural;
-/// use malachite_native::traits::AddMul;
 /// use std::str::FromStr;
 ///
-/// assert_eq!(Natural::from(10u32).add_mul(&Natural::from(3u32), 4), 22);
-/// assert_eq!(Natural::from_str("1000000000000").unwrap()
-///                     .add_mul(&Natural::from(65536u32), 65536).to_string(),
-///            "1004294967296");
+/// fn main() {
+///     assert_eq!(Natural::from(10u32).add_mul(&Natural::from(3u32), 4), 22);
+///     assert_eq!(Natural::from_str("1000000000000").unwrap()
+///                         .add_mul(&Natural::from(65536u32), 65536).to_string(),
+///                "1004294967296");
+/// }
 /// ```
 impl<'a> AddMul<&'a Natural, u32> for Natural {
     type Output = Natural;
@@ -88,14 +99,19 @@ impl<'a> AddMul<&'a Natural, u32> for Natural {
 ///
 /// # Examples
 /// ```
+/// extern crate malachite_base;
+/// extern crate malachite_native;
+///
+/// use malachite_base::traits::AddMul;
 /// use malachite_native::natural::Natural;
-/// use malachite_native::traits::AddMul;
 /// use std::str::FromStr;
 ///
-/// assert_eq!((&Natural::from(10u32)).add_mul(Natural::from(3u32), 4), 22);
-/// assert_eq!((&Natural::from_str("1000000000000").unwrap())
-///                     .add_mul(Natural::from(65536u32), 65536).to_string(),
-///            "1004294967296");
+/// fn main() {
+///     assert_eq!((&Natural::from(10u32)).add_mul(Natural::from(3u32), 4), 22);
+///     assert_eq!((&Natural::from_str("1000000000000").unwrap())
+///                         .add_mul(Natural::from(65536u32), 65536).to_string(),
+///                "1004294967296");
+/// }
 /// ```
 impl<'a> AddMul<Natural, u32> for &'a Natural {
     type Output = Natural;
@@ -144,14 +160,19 @@ impl<'a> AddMul<Natural, u32> for &'a Natural {
 ///
 /// # Examples
 /// ```
+/// extern crate malachite_base;
+/// extern crate malachite_native;
+///
+/// use malachite_base::traits::AddMul;
 /// use malachite_native::natural::Natural;
-/// use malachite_native::traits::AddMul;
 /// use std::str::FromStr;
 ///
-/// assert_eq!((&Natural::from(10u32)).add_mul(&Natural::from(3u32), 4), 22);
-/// assert_eq!((&Natural::from_str("1000000000000").unwrap())
-///                     .add_mul(&Natural::from(65536u32), 65536).to_string(),
-///             "1004294967296");
+/// fn main() {
+///     assert_eq!((&Natural::from(10u32)).add_mul(&Natural::from(3u32), 4), 22);
+///     assert_eq!((&Natural::from_str("1000000000000").unwrap())
+///                         .add_mul(&Natural::from(65536u32), 65536).to_string(),
+///                 "1004294967296");
+/// }
 /// ```
 impl<'a, 'b> AddMul<&'a Natural, u32> for &'b Natural {
     type Output = Natural;
@@ -200,17 +221,22 @@ impl<'a, 'b> AddMul<&'a Natural, u32> for &'b Natural {
 ///
 /// # Examples
 /// ```
+/// extern crate malachite_base;
+/// extern crate malachite_native;
+///
+/// use malachite_base::traits::AddMulAssign;
 /// use malachite_native::natural::Natural;
-/// use malachite_native::traits::AddMulAssign;
 /// use std::str::FromStr;
 ///
-/// let mut x = Natural::from(10u32);
-/// x.add_mul_assign(Natural::from(3u32), 4);
-/// assert_eq!(x, 22);
+/// fn main() {
+///     let mut x = Natural::from(10u32);
+///     x.add_mul_assign(Natural::from(3u32), 4);
+///     assert_eq!(x, 22);
 ///
-/// let mut x = Natural::from_str("1000000000000").unwrap();
-/// x.add_mul_assign(Natural::from(65536u32), 65536);
-/// assert_eq!(x.to_string(), "1004294967296");
+///     let mut x = Natural::from_str("1000000000000").unwrap();
+///     x.add_mul_assign(Natural::from(65536u32), 65536);
+///     assert_eq!(x.to_string(), "1004294967296");
+/// }
 /// ```
 impl AddMulAssign<Natural, u32> for Natural {
     fn add_mul_assign(&mut self, b: Natural, c: u32) {
@@ -260,17 +286,22 @@ impl AddMulAssign<Natural, u32> for Natural {
 ///
 /// # Examples
 /// ```
+/// extern crate malachite_base;
+/// extern crate malachite_native;
+///
+/// use malachite_base::traits::AddMulAssign;
 /// use malachite_native::natural::Natural;
-/// use malachite_native::traits::AddMulAssign;
 /// use std::str::FromStr;
 ///
-/// let mut x = Natural::from(10u32);
-/// x.add_mul_assign(&Natural::from(3u32), 4);
-/// assert_eq!(x, 22);
+/// fn main() {
+///     let mut x = Natural::from(10u32);
+///     x.add_mul_assign(&Natural::from(3u32), 4);
+///     assert_eq!(x, 22);
 ///
-/// let mut x = Natural::from_str("1000000000000").unwrap();
-/// x.add_mul_assign(&Natural::from(65536u32), 65536);
-/// assert_eq!(x.to_string(), "1004294967296");
+///     let mut x = Natural::from_str("1000000000000").unwrap();
+///     x.add_mul_assign(&Natural::from(65536u32), 65536);
+///     assert_eq!(x.to_string(), "1004294967296");
+/// }
 /// ```
 impl<'a> AddMulAssign<&'a Natural, u32> for Natural {
     fn add_mul_assign(&mut self, b: &'a Natural, c: u32) {

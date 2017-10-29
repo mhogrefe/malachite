@@ -1,4 +1,4 @@
-use natural::{get_lower, get_upper};
+use malachite_base::num::{get_lower, get_upper};
 use natural::Natural::{self, Large, Small};
 
 /// Converts a `u64` to a `Natural`.

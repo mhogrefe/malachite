@@ -1,10 +1,7 @@
 use common::gmp_natural_to_native;
+use malachite_base::traits::{AddMul, AddMulAssign};
 use malachite_native::natural as native;
-use malachite_native::traits::AddMul as native_add_mul;
-use malachite_native::traits::AddMulAssign as native_add_mul_assign;
 use malachite_gmp::natural as gmp;
-use malachite_gmp::traits::AddMul as gmp_add_mul;
-use malachite_gmp::traits::AddMulAssign as gmp_add_mul_assign;
 use rust_wheels::benchmarks::{benchmark_2, BenchmarkOptions2, benchmark_4, BenchmarkOptions4,
                               benchmark_5, BenchmarkOptions5};
 use rust_wheels::iterators::common::EXAMPLE_SEED;

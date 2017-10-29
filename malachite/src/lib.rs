@@ -21,9 +21,3 @@ pub mod integer {
     #[cfg(feature = "native")]
     pub use malachite_native::integer::Integer;
 }
-pub mod traits {
-    #[cfg(feature = "gmp")]
-    pub use malachite_gmp::traits::Assign;
-    #[cfg(feature = "native")]
-    pub use malachite_native::traits::Assign;
-}

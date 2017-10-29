@@ -1,9 +1,7 @@
 use common::{test_custom_cmp_helper, LARGE_LIMIT};
+use malachite_base::traits::{OrdAbs, PartialOrdAbs};
 use malachite_native::integer as native;
-use malachite_native::traits::OrdAbs as native_ord_abs;
-use malachite_native::traits::PartialOrdAbs as native_partial_ord_abs;
 use malachite_gmp::integer as gmp;
-use malachite_gmp::traits::OrdAbs as gmp_ord_abs;
 use malachite_test::common::{gmp_integer_to_native, native_integer_to_rugint};
 use rugint;
 use rust_wheels::iterators::common::EXAMPLE_SEED;

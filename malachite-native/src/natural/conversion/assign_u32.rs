@@ -1,5 +1,5 @@
+use malachite_base::traits::Assign;
 use natural::Natural::{self, Small};
-use traits::Assign;
 
 /// Assigns a `u32` to a `Natural`.
 ///
@@ -9,12 +9,17 @@ use traits::Assign;
 ///
 /// # Example
 /// ```
-/// use malachite_native::natural::Natural;
-/// use malachite_native::traits::Assign;
+/// extern crate malachite_base;
+/// extern crate malachite_native;
 ///
-/// let mut x = Natural::from(123u32);
-/// x.assign(456u32);
-/// assert_eq!(x.to_string(), "456");
+/// use malachite_base::traits::Assign;
+/// use malachite_native::natural::Natural;
+///
+/// fn main() {
+///     let mut x = Natural::from(123u32);
+///     x.assign(456u32);
+///     assert_eq!(x.to_string(), "456");
+/// }
 /// ```
 impl Assign<u32> for Natural {
     fn assign(&mut self, other: u32) {

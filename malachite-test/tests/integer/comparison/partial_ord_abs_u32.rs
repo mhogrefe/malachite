@@ -1,8 +1,7 @@
 use common::LARGE_LIMIT;
+use malachite_base::traits::PartialOrdAbs;
 use malachite_gmp::integer as gmp;
-use malachite_gmp::traits::PartialOrdAbs as gmp_ord_abs;
 use malachite_native::integer as native;
-use malachite_native::traits::PartialOrdAbs as native_ord_abs;
 use malachite_test::common::gmp_integer_to_native;
 use rust_wheels::iterators::common::EXAMPLE_SEED;
 use rust_wheels::iterators::general::random_x;
@@ -23,11 +22,11 @@ fn test_partial_ord_u32_abs() {
         assert_eq!(gmp::Integer::from_str(u).unwrap().partial_cmp_abs(&v), out);
 
         assert_eq!(
-            native_ord_abs::partial_cmp_abs(&v, &native::Integer::from_str(u).unwrap()),
+            PartialOrdAbs::partial_cmp_abs(&v, &native::Integer::from_str(u).unwrap()),
             out.map(|o| o.reverse())
         );
         assert_eq!(
-            gmp_ord_abs::partial_cmp_abs(&v, &gmp::Integer::from_str(u).unwrap()),
+            PartialOrdAbs::partial_cmp_abs(&v, &gmp::Integer::from_str(u).unwrap()),
             out.map(|o| o.reverse())
         );
     };
@@ -62,8 +61,8 @@ fn partial_cmp_u32_properties() {
         assert_eq!(n.partial_cmp_abs(&native::Integer::from(u)), cmp_1);
         assert_eq!(n.abs_ref().partial_cmp(&u), cmp_1);
 
-        let cmp_2 = native_ord_abs::partial_cmp_abs(&u, &n);
-        assert_eq!(gmp_ord_abs::partial_cmp_abs(&u, &gmp_n), cmp_2);
+        let cmp_2 = PartialOrdAbs::partial_cmp_abs(&u, &n);
+        assert_eq!(PartialOrdAbs::partial_cmp_abs(&u, &gmp_n), cmp_2);
         assert_eq!(native::Integer::from(u).partial_cmp_abs(&n), cmp_2);
         assert_eq!(cmp_2, cmp_1.map(|o| o.reverse()));
         assert_eq!(u.partial_cmp(&n.abs_ref()), cmp_2);
@@ -74,9 +73,9 @@ fn partial_cmp_u32_properties() {
     let integer_u32_and_integer = |gmp_n: gmp::Integer, u: u32, gmp_m: gmp::Integer| {
         let n = gmp_integer_to_native(&gmp_n);
         let m = gmp_integer_to_native(&gmp_m);
-        if n.lt_abs(&u) && native_ord_abs::lt_abs(&u, &m) {
+        if n.lt_abs(&u) && PartialOrdAbs::lt_abs(&u, &m) {
             assert!(n.lt_abs(&m));
-        } else if n.gt_abs(&u) && native_ord_abs::gt_abs(&u, &m) {
+        } else if n.gt_abs(&u) && PartialOrdAbs::gt_abs(&u, &m) {
             assert!(n.gt_abs(&m));
         }
 
@@ -86,9 +85,9 @@ fn partial_cmp_u32_properties() {
     // u.gt_abs(n) and n.gt_abs(v) => u > v
     let u32_integer_and_u32 = |u: u32, gmp_n: gmp::Integer, v: u32| {
         let n = gmp_integer_to_native(&gmp_n);
-        if native_ord_abs::lt_abs(&u, &n) && n.lt_abs(&v) {
+        if PartialOrdAbs::lt_abs(&u, &n) && n.lt_abs(&v) {
             assert!(u < v);
-        } else if native_ord_abs::gt_abs(&u, &n) && n.gt_abs(&v) {
+        } else if PartialOrdAbs::gt_abs(&u, &n) && n.gt_abs(&v) {
             assert!(u > v);
         }
     };

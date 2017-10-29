@@ -1,7 +1,7 @@
-use natural::{get_lower, get_upper};
+use malachite_base::num::{get_lower, get_upper};
+use malachite_base::traits::Assign;
 use natural::Natural::{self, Large, Small};
 use std::ops::{Mul, MulAssign};
-use traits::Assign;
 
 // Multiply s1 by s2limb, and write the n least significant limbs of the product to r. Return the
 // most significant limb of the product. r.len() >= s1.len().

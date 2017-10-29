@@ -8,4 +8,5 @@ name = "malachite_native"
 path = "src/lib.rs"
 
 [dependencies]
+malachite-base = { path = "../malachite-base" }
 rand = "0.3.0"

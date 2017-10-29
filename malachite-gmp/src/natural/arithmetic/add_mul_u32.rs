@@ -1,21 +1,26 @@
 use gmp_mpfr_sys::gmp::{self, mpz_t};
 use natural::Natural::{self, Large, Small};
 use std::mem;
-use traits::{AddMul, AddMulAssign};
+use malachite_base::traits::{AddMul, AddMulAssign};
 
 /// Adds the product of a `Natural` (b) and a `u32` (c) to a `Natural` (self), taking `self` and b
 /// by value.
 ///
 /// # Examples
 /// ```
+/// extern crate malachite_base;
+/// extern crate malachite_gmp;
+///
+/// use malachite_base::traits::AddMul;
 /// use malachite_gmp::natural::Natural;
-/// use malachite_gmp::traits::AddMul;
 /// use std::str::FromStr;
 ///
-/// assert_eq!(Natural::from(10u32).add_mul(Natural::from(3u32), 4), 22);
-/// assert_eq!(Natural::from_str("1000000000000").unwrap()
-///                     .add_mul(Natural::from(65536u32), 65536).to_string(),
-///            "1004294967296");
+/// fn main() {
+///     assert_eq!(Natural::from(10u32).add_mul(Natural::from(3u32), 4), 22);
+///     assert_eq!(Natural::from_str("1000000000000").unwrap()
+///                         .add_mul(Natural::from(65536u32), 65536).to_string(),
+///                "1004294967296");
+/// }
 /// ```
 impl AddMul<Natural, u32> for Natural {
     type Output = Natural;
@@ -31,14 +36,19 @@ impl AddMul<Natural, u32> for Natural {
 ///
 /// # Examples
 /// ```
+/// extern crate malachite_base;
+/// extern crate malachite_gmp;
+///
+/// use malachite_base::traits::AddMul;
 /// use malachite_gmp::natural::Natural;
-/// use malachite_gmp::traits::AddMul;
 /// use std::str::FromStr;
 ///
-/// assert_eq!(Natural::from(10u32).add_mul(&Natural::from(3u32), 4), 22);
-/// assert_eq!(Natural::from_str("1000000000000").unwrap()
-///                     .add_mul(&Natural::from(65536u32), 65536).to_string(),
-///            "1004294967296");
+/// fn main() {
+///     assert_eq!(Natural::from(10u32).add_mul(&Natural::from(3u32), 4), 22);
+///     assert_eq!(Natural::from_str("1000000000000").unwrap()
+///                         .add_mul(&Natural::from(65536u32), 65536).to_string(),
+///                "1004294967296");
+/// }
 /// ```
 impl<'a> AddMul<&'a Natural, u32> for Natural {
     type Output = Natural;
@@ -54,14 +64,19 @@ impl<'a> AddMul<&'a Natural, u32> for Natural {
 ///
 /// # Examples
 /// ```
+/// extern crate malachite_base;
+/// extern crate malachite_gmp;
+///
+/// use malachite_base::traits::AddMul;
 /// use malachite_gmp::natural::Natural;
-/// use malachite_gmp::traits::AddMul;
 /// use std::str::FromStr;
 ///
-/// assert_eq!((&Natural::from(10u32)).add_mul(Natural::from(3u32), 4), 22);
-/// assert_eq!((&Natural::from_str("1000000000000").unwrap())
-///                     .add_mul(Natural::from(65536u32), 65536).to_string(),
-///            "1004294967296");
+/// fn main() {
+///     assert_eq!((&Natural::from(10u32)).add_mul(Natural::from(3u32), 4), 22);
+///     assert_eq!((&Natural::from_str("1000000000000").unwrap())
+///                         .add_mul(Natural::from(65536u32), 65536).to_string(),
+///                "1004294967296");
+/// }
 /// ```
 impl<'a> AddMul<Natural, u32> for &'a Natural {
     type Output = Natural;
@@ -76,14 +91,19 @@ impl<'a> AddMul<Natural, u32> for &'a Natural {
 ///
 /// # Examples
 /// ```
+/// extern crate malachite_base;
+/// extern crate malachite_gmp;
+///
+/// use malachite_base::traits::AddMul;
 /// use malachite_gmp::natural::Natural;
-/// use malachite_gmp::traits::AddMul;
 /// use std::str::FromStr;
 ///
-/// assert_eq!((&Natural::from(10u32)).add_mul(&Natural::from(3u32), 4), 22);
-/// assert_eq!((&Natural::from_str("1000000000000").unwrap())
-///                     .add_mul(&Natural::from(65536u32), 65536).to_string(),
-///             "1004294967296");
+/// fn main() {
+///     assert_eq!((&Natural::from(10u32)).add_mul(&Natural::from(3u32), 4), 22);
+///     assert_eq!((&Natural::from_str("1000000000000").unwrap())
+///                         .add_mul(&Natural::from(65536u32), 65536).to_string(),
+///                 "1004294967296");
+/// }
 /// ```
 impl<'a, 'b> AddMul<&'a Natural, u32> for &'b Natural {
     type Output = Natural;
@@ -121,17 +141,22 @@ impl<'a, 'b> AddMul<&'a Natural, u32> for &'b Natural {
 ///
 /// # Examples
 /// ```
+/// extern crate malachite_base;
+/// extern crate malachite_gmp;
+///
+/// use malachite_base::traits::AddMulAssign;
 /// use malachite_gmp::natural::Natural;
-/// use malachite_gmp::traits::AddMulAssign;
 /// use std::str::FromStr;
 ///
-/// let mut x = Natural::from(10u32);
-/// x.add_mul_assign(Natural::from(3u32), 4);
-/// assert_eq!(x, 22);
+/// fn main() {
+///     let mut x = Natural::from(10u32);
+///     x.add_mul_assign(Natural::from(3u32), 4);
+///     assert_eq!(x, 22);
 ///
-/// let mut x = Natural::from_str("1000000000000").unwrap();
-/// x.add_mul_assign(Natural::from(65536u32), 65536);
-/// assert_eq!(x.to_string(), "1004294967296");
+///     let mut x = Natural::from_str("1000000000000").unwrap();
+///     x.add_mul_assign(Natural::from(65536u32), 65536);
+///     assert_eq!(x.to_string(), "1004294967296");
+/// }
 /// ```
 impl AddMulAssign<Natural, u32> for Natural {
     fn add_mul_assign(&mut self, b: Natural, c: u32) {
@@ -144,17 +169,22 @@ impl AddMulAssign<Natural, u32> for Natural {
 ///
 /// # Examples
 /// ```
+/// extern crate malachite_base;
+/// extern crate malachite_gmp;
+///
+/// use malachite_base::traits::AddMulAssign;
 /// use malachite_gmp::natural::Natural;
-/// use malachite_gmp::traits::AddMulAssign;
 /// use std::str::FromStr;
 ///
-/// let mut x = Natural::from(10u32);
-/// x.add_mul_assign(&Natural::from(3u32), 4);
-/// assert_eq!(x, 22);
+/// fn main() {
+///     let mut x = Natural::from(10u32);
+///     x.add_mul_assign(&Natural::from(3u32), 4);
+///     assert_eq!(x, 22);
 ///
-/// let mut x = Natural::from_str("1000000000000").unwrap();
-/// x.add_mul_assign(&Natural::from(65536u32), 65536);
-/// assert_eq!(x.to_string(), "1004294967296");
+///     let mut x = Natural::from_str("1000000000000").unwrap();
+///     x.add_mul_assign(&Natural::from(65536u32), 65536);
+///     assert_eq!(x.to_string(), "1004294967296");
+/// }
 /// ```
 impl<'a> AddMulAssign<&'a Natural, u32> for Natural {
     fn add_mul_assign(&mut self, b: &'a Natural, c: u32) {

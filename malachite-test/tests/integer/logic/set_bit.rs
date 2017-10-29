@@ -1,6 +1,6 @@
 use common::LARGE_LIMIT;
+use malachite_base::traits::NotAssign;
 use malachite_native::integer as native;
-use malachite_native::traits::NotAssign;
 use malachite_gmp::integer as gmp;
 use malachite_test::common::gmp_integer_to_native;
 use rust_wheels::iterators::common::EXAMPLE_SEED;

@@ -88,7 +88,7 @@ pub fn benchmark_exhaustive_natural_sub_assign(limit: usize, file_name: &str) {
             )
         }),
         x_param: &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),
-        limit: limit,
+        limit,
         f_name: "malachite-gmp",
         g_name: "malachite-native",
         h_name: "rugint",
@@ -116,7 +116,7 @@ pub fn benchmark_random_natural_sub_assign(limit: usize, scale: u32, file_name: 
             )
         }),
         x_param: &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),
-        limit: limit,
+        limit,
         f_name: "malachite-gmp",
         g_name: "malachite-native",
         h_name: "rugint",
@@ -145,7 +145,7 @@ pub fn benchmark_exhaustive_natural_sub(limit: usize, file_name: &str) {
             )
         }),
         x_param: &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),
-        limit: limit,
+        limit,
         f_name: "malachite-gmp",
         g_name: "malachite-native",
         h_name: "num",
@@ -175,7 +175,7 @@ pub fn benchmark_random_natural_sub(limit: usize, scale: u32, file_name: &str) {
             )
         }),
         x_param: &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),
-        limit: limit,
+        limit,
         f_name: "malachite-gmp",
         g_name: "malachite-native",
         h_name: "num",
@@ -196,7 +196,7 @@ pub fn benchmark_exhaustive_natural_sub_evaluation_strategy(limit: usize, file_n
         x_cons: &(|&(ref x, ref y)| (gmp_natural_to_native(x), gmp_natural_to_native(y))),
         y_cons: &(|&(ref x, ref y)| (gmp_natural_to_native(x), gmp_natural_to_native(y))),
         x_param: &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),
-        limit: limit,
+        limit,
         f_name: "Natural - \\\\&Natural",
         g_name: "\\\\&Natural - \\\\&Natural",
         title: "Natural + Natural evaluation strategy",
@@ -215,7 +215,7 @@ pub fn benchmark_random_natural_sub_evaluation_strategy(limit: usize, scale: u32
         x_cons: &(|&(ref x, ref y)| (gmp_natural_to_native(x), gmp_natural_to_native(y))),
         y_cons: &(|&(ref x, ref y)| (gmp_natural_to_native(x), gmp_natural_to_native(y))),
         x_param: &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),
-        limit: limit,
+        limit,
         f_name: "Natural - \\\\&Natural",
         g_name: "\\\\&Natural - \\\\&Natural",
         title: "Natural + Natural evaluation strategy",

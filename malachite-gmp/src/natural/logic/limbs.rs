@@ -1,5 +1,5 @@
 use gmp_mpfr_sys::gmp;
-use natural::{get_lower, get_limb_size, get_upper, LimbSize};
+use malachite_base::num::{get_lower, get_upper};
 use natural::Natural::{self, Large, Small};
 use std::slice::from_raw_parts;
 
@@ -29,21 +29,16 @@ impl Natural {
             Large(ref large) => {
                 let raw_limbs =
                     unsafe { from_raw_parts(gmp::mpz_limbs_read(large), gmp::mpz_size(large)) };
-                match get_limb_size() {
-                    LimbSize::U32 => raw_limbs.iter().map(|&i| i as u32).collect(),
-                    LimbSize::U64 => {
-                        let mut out_limbs: Vec<u32> = Vec::with_capacity(raw_limbs.len() << 1);
-                        for &limb in raw_limbs {
-                            let limb = limb as u64;
-                            out_limbs.push(get_lower(limb));
-                            out_limbs.push(get_upper(limb));
-                        }
-                        if out_limbs.last().unwrap() == &0 {
-                            out_limbs.pop();
-                        }
-                        out_limbs
-                    }
+                let mut out_limbs: Vec<u32> = Vec::with_capacity(raw_limbs.len() << 1);
+                for &limb in raw_limbs {
+                    let limb = limb as u64;
+                    out_limbs.push(get_lower(limb));
+                    out_limbs.push(get_upper(limb));
                 }
+                if out_limbs.last().unwrap() == &0 {
+                    out_limbs.pop();
+                }
+                out_limbs
             }
         }
     }

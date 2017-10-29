@@ -1,8 +1,7 @@
 use common::{gmp_natural_to_native, gmp_natural_to_num_biguint, gmp_natural_to_rugint_integer};
+use malachite_base::traits::Assign;
 use malachite_native::natural as native;
-use malachite_native::traits::Assign as native_assign;
 use malachite_gmp::natural as gmp;
-use malachite_gmp::traits::Assign as gmp_assign;
 use num;
 use rugint;
 use rugint::Assign as rugint_assign;
@@ -88,7 +87,7 @@ pub fn benchmark_exhaustive_natural_clone(limit: usize, file_name: &str) {
         z_cons: &(|x| gmp_natural_to_num_biguint(x)),
         w_cons: &(|x| gmp_natural_to_rugint_integer(x)),
         x_param: &(|n| n.significant_bits() as usize),
-        limit: limit,
+        limit,
         f_name: "malachite-gmp",
         g_name: "malachite-native",
         h_name: "num",
@@ -113,7 +112,7 @@ pub fn benchmark_random_natural_clone(limit: usize, scale: u32, file_name: &str)
         z_cons: &(|x| gmp_natural_to_num_biguint(x)),
         w_cons: &(|x| gmp_natural_to_rugint_integer(x)),
         x_param: &(|n| n.significant_bits() as usize),
-        limit: limit,
+        limit,
         f_name: "malachite-gmp",
         g_name: "malachite-native",
         h_name: "num",
@@ -143,7 +142,7 @@ pub fn benchmark_exhaustive_natural_clone_from(limit: usize, file_name: &str) {
             )
         }),
         x_param: &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),
-        limit: limit,
+        limit,
         f_name: "malachite-gmp",
         g_name: "malachite-native",
         h_name: "num",
@@ -173,7 +172,7 @@ pub fn benchmark_random_natural_clone_from(limit: usize, scale: u32, file_name: 
             )
         }),
         x_param: &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),
-        limit: limit,
+        limit,
         f_name: "malachite-gmp",
         g_name: "malachite-native",
         h_name: "num",
@@ -201,7 +200,7 @@ pub fn benchmark_exhaustive_natural_assign(limit: usize, file_name: &str) {
             )
         }),
         x_param: &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),
-        limit: limit,
+        limit,
         f_name: "malachite-gmp",
         g_name: "malachite-native",
         h_name: "rugint",
@@ -228,7 +227,7 @@ pub fn benchmark_random_natural_assign(limit: usize, scale: u32, file_name: &str
             )
         }),
         x_param: &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),
-        limit: limit,
+        limit,
         f_name: "malachite-gmp",
         g_name: "malachite-native",
         h_name: "rugint",
@@ -248,7 +247,7 @@ pub fn benchmark_exhaustive_natural_assign_evaluation_strategy(limit: usize, fil
         x_cons: &(|&(ref x, ref y)| (gmp_natural_to_native(x), gmp_natural_to_native(y))),
         y_cons: &(|&(ref x, ref y)| (gmp_natural_to_native(x), gmp_natural_to_native(y))),
         x_param: &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),
-        limit: limit,
+        limit,
         f_name: "Natural.assign(Integer)",
         g_name: "Natural.assign(\\\\&Natural)",
         title: "Natural.assign(Natural) evaluation strategy",
@@ -271,7 +270,7 @@ pub fn benchmark_random_natural_assign_evaluation_strategy(
         x_cons: &(|&(ref x, ref y)| (gmp_natural_to_native(x), gmp_natural_to_native(y))),
         y_cons: &(|&(ref x, ref y)| (gmp_natural_to_native(x), gmp_natural_to_native(y))),
         x_param: &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),
-        limit: limit,
+        limit,
         f_name: "Natural.assign(Integer)",
         g_name: "Natural.assign(\\\\&Natural)",
         title: "Natural.assign(Natural) evaluation strategy",

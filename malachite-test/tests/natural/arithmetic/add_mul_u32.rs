@@ -1,10 +1,7 @@
 use common::LARGE_LIMIT;
+use malachite_base::traits::{AddMul, AddMulAssign};
 use malachite_native::natural as native;
-use malachite_native::traits::AddMul as native_add_mul;
-use malachite_native::traits::AddMulAssign as native_add_mul_assign;
 use malachite_gmp::natural as gmp;
-use malachite_gmp::traits::AddMul as gmp_add_mul;
-use malachite_gmp::traits::AddMulAssign as gmp_add_mul_assign;
 use malachite_test::common::{gmp_natural_to_native, native_natural_to_gmp};
 use rust_wheels::iterators::common::EXAMPLE_SEED;
 use rust_wheels::iterators::general::random_x;

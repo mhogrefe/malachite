@@ -43,7 +43,7 @@ pub fn benchmark_exhaustive_natural_eq(limit: usize, file_name: &str) {
             )
         }),
         x_param: &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),
-        limit: limit,
+        limit,
         f_name: "malachite-gmp",
         g_name: "malachite-native",
         h_name: "num",
@@ -73,7 +73,7 @@ pub fn benchmark_random_natural_eq(limit: usize, scale: u32, file_name: &str) {
             )
         }),
         x_param: &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),
-        limit: limit,
+        limit,
         f_name: "malachite-gmp",
         g_name: "malachite-native",
         h_name: "num",

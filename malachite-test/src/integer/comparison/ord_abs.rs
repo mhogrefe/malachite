@@ -1,6 +1,6 @@
 use common::{gmp_integer_to_native, gmp_integer_to_rugint};
+use malachite_base::traits::OrdAbs;
 use malachite_gmp::integer as gmp;
-use malachite_gmp::traits::OrdAbs;
 use malachite_native::integer as native;
 use rugint;
 use rust_wheels::benchmarks::{BenchmarkOptions3, benchmark_3};
@@ -40,7 +40,7 @@ pub fn benchmark_exhaustive_integer_cmp_abs(limit: usize, file_name: &str) {
         y_cons: &(|&(ref x, ref y)| (gmp_integer_to_native(x), gmp_integer_to_native(y))),
         z_cons: &(|&(ref x, ref y)| (gmp_integer_to_rugint(x), gmp_integer_to_rugint(y))),
         x_param: &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),
-        limit: limit,
+        limit,
         f_name: "malachite-gmp",
         g_name: "malachite-native",
         h_name: "rugint",
@@ -62,7 +62,7 @@ pub fn benchmark_random_integer_cmp_abs(limit: usize, scale: u32, file_name: &st
         y_cons: &(|&(ref x, ref y)| (gmp_integer_to_native(x), gmp_integer_to_native(y))),
         z_cons: &(|&(ref x, ref y)| (gmp_integer_to_rugint(x), gmp_integer_to_rugint(y))),
         x_param: &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),
-        limit: limit,
+        limit,
         f_name: "malachite-gmp",
         g_name: "malachite-native",
         h_name: "rugint",

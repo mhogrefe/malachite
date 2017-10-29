@@ -1,7 +1,7 @@
+use malachite_base::num::{get_lower, get_upper};
+use malachite_base::traits::{SubMul, SubMulAssign};
 use natural::arithmetic::sub_u32::{mpn_sub_1_in_place, sub_assign_u32_helper};
-use natural::{get_lower, get_upper};
 use natural::Natural::{self, Large, Small};
-use traits::{SubMul, SubMulAssign};
 
 // Multiply s1 and s2limb, and subtract the s1.len() least significant limbs of the product from r
 // and write the result to r. Return the most significant limb of the product, plus borrow-out from
@@ -42,15 +42,21 @@ pub fn mpn_submul_1(r: &mut [u32], s1: &[u32], s2limb: u32) -> u32 {
 ///
 /// # Examples
 /// ```
+/// extern crate malachite_base;
+/// extern crate malachite_native;
+///
+/// use malachite_base::traits::SubMul;
 /// use malachite_native::natural::Natural;
-/// use malachite_native::traits::SubMul;
 /// use std::str::FromStr;
 ///
-/// assert_eq!(format!("{:?}", Natural::from(10u32).sub_mul(&Natural::from(3u32), 4)), "None");
-/// assert_eq!(format!("{:?}", Natural::from(15u32).sub_mul(&Natural::from(3u32), 4)), "Some(3)");
-/// assert_eq!(format!("{:?}", Natural::from_str("1000000000000").unwrap()
-///                     .sub_mul(&Natural::from(65536u32), 65536)),
-///             "Some(995705032704)");
+/// fn main() {
+///     assert_eq!(format!("{:?}", Natural::from(10u32).sub_mul(&Natural::from(3u32), 4)), "None");
+///     assert_eq!(format!("{:?}", Natural::from(15u32).sub_mul(&Natural::from(3u32), 4)),
+///         "Some(3)");
+///     assert_eq!(format!("{:?}", Natural::from_str("1000000000000").unwrap()
+///                         .sub_mul(&Natural::from(65536u32), 65536)),
+///                 "Some(995705032704)");
+/// }
 /// ```
 impl<'a> SubMul<&'a Natural, u32> for Natural {
     type Output = Option<Natural>;
@@ -75,17 +81,22 @@ impl<'a> SubMul<&'a Natural, u32> for Natural {
 ///
 /// # Examples
 /// ```
+/// extern crate malachite_base;
+/// extern crate malachite_native;
+///
+/// use malachite_base::traits::SubMul;
 /// use malachite_native::natural::Natural;
-/// use malachite_native::traits::SubMul;
 /// use std::str::FromStr;
 ///
-/// assert_eq!(format!("{:?}", (&Natural::from(10u32)).sub_mul(&Natural::from(3u32), 4)),
-///             "None");
-/// assert_eq!(format!("{:?}", (&Natural::from(15u32)).sub_mul(&Natural::from(3u32), 4)),
-///             "Some(3)");
-/// assert_eq!(format!("{:?}", (&Natural::from_str("1000000000000").unwrap())
-///                     .sub_mul(&Natural::from(65536u32), 65536)),
-///             "Some(995705032704)");
+/// fn main() {
+///     assert_eq!(format!("{:?}", (&Natural::from(10u32)).sub_mul(&Natural::from(3u32), 4)),
+///                 "None");
+///     assert_eq!(format!("{:?}", (&Natural::from(15u32)).sub_mul(&Natural::from(3u32), 4)),
+///                 "Some(3)");
+///     assert_eq!(format!("{:?}", (&Natural::from_str("1000000000000").unwrap())
+///                         .sub_mul(&Natural::from(65536u32), 65536)),
+///                 "Some(995705032704)");
+/// }
 /// ```
 impl<'a, 'b> SubMul<&'a Natural, u32> for &'b Natural {
     type Output = Option<Natural>;
@@ -136,17 +147,22 @@ impl<'a, 'b> SubMul<&'a Natural, u32> for &'b Natural {
 ///
 /// # Examples
 /// ```
+/// extern crate malachite_base;
+/// extern crate malachite_native;
+///
+/// use malachite_base::traits::SubMulAssign;
 /// use malachite_native::natural::Natural;
-/// use malachite_native::traits::SubMulAssign;
 /// use std::str::FromStr;
 ///
-/// let mut x = Natural::from(15u32);
-/// x.sub_mul_assign(&Natural::from(3u32), 4);
-/// assert_eq!(x, 3);
+/// fn main() {
+///     let mut x = Natural::from(15u32);
+///     x.sub_mul_assign(&Natural::from(3u32), 4);
+///     assert_eq!(x, 3);
 ///
-/// let mut x = Natural::from_str("1000000000000").unwrap();
-/// x.sub_mul_assign(&Natural::from(65536u32), 65536);
-/// assert_eq!(x.to_string(), "995705032704");
+///     let mut x = Natural::from_str("1000000000000").unwrap();
+///     x.sub_mul_assign(&Natural::from(65536u32), 65536);
+///     assert_eq!(x.to_string(), "995705032704");
+/// }
 /// ```
 impl<'a> SubMulAssign<&'a Natural, u32> for Natural {
     fn sub_mul_assign(&mut self, b: &'a Natural, c: u32) {

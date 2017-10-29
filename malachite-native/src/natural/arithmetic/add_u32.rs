@@ -1,6 +1,6 @@
+use malachite_base::traits::Assign;
 use natural::Natural::{self, Large, Small};
 use std::ops::{Add, AddAssign};
-use traits::Assign;
 
 // Add s1 and s2limb, and write the s1.len() least significant limbs of the result to r. Return
 // carry. r must have size at least s1.len().

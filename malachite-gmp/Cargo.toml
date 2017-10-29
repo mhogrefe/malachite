@@ -8,5 +8,6 @@ name = "malachite_gmp"
 path = "src/lib.rs"
 
 [dependencies]
+malachite-base = { path = "../malachite-base" }
 gmp-mpfr-sys = "0.6.0"
 rand = "0.3.0"

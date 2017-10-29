@@ -1,8 +1,7 @@
 use common::LARGE_LIMIT;
+use malachite_base::traits::Assign;
 use malachite_native as native;
-use malachite_native::traits::Assign as native_assign;
 use malachite_gmp as gmp;
-use malachite_gmp::traits::Assign as gmp_assign;
 use malachite_test::common::{gmp_integer_to_native, gmp_natural_to_native, native_integer_to_gmp,
                              native_integer_to_rugint, native_natural_to_rugint_integer,
                              rugint_integer_to_native};

@@ -1,8 +1,7 @@
 use common::{gmp_natural_to_native, gmp_natural_to_num_biguint};
+use malachite_base::traits::Assign;
 use malachite_gmp::natural as gmp;
 use malachite_native::natural as native;
-use malachite_native::traits::Assign as native_assign;
-use malachite_gmp::traits::Assign as gmp_assign;
 use num;
 use rust_wheels::benchmarks::{BenchmarkOptions3, benchmark_3};
 use rust_wheels::iterators::common::EXAMPLE_SEED;
@@ -47,7 +46,7 @@ pub fn benchmark_exhaustive_natural_assign_u64(limit: usize, file_name: &str) {
         y_cons: &(|&(ref n, u)| (gmp_natural_to_native(n), u)),
         z_cons: &(|&(ref n, u)| (gmp_natural_to_num_biguint(n), u)),
         x_param: &(|&(ref n, _)| n.significant_bits() as usize),
-        limit: limit,
+        limit,
         f_name: "malachite-gmp",
         g_name: "malachite-native",
         h_name: "num",
@@ -73,7 +72,7 @@ pub fn benchmark_random_natural_assign_u64(limit: usize, scale: u32, file_name: 
         y_cons: &(|&(ref n, u)| (gmp_natural_to_native(n), u)),
         z_cons: &(|&(ref n, u)| (gmp_natural_to_num_biguint(n), u)),
         x_param: &(|&(ref n, _)| n.significant_bits() as usize),
-        limit: limit,
+        limit,
         f_name: "malachite-gmp",
         g_name: "malachite-native",
         h_name: "num",

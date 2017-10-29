@@ -2,7 +2,7 @@ use gmp_mpfr_sys::gmp::{self, mpz_t};
 use integer::Integer::{self, Large, Small};
 use std::mem;
 use std::ops::{Mul, MulAssign};
-use traits::Assign;
+use malachite_base::traits::Assign;
 
 /// Multiplies an `Integer` by a `u32`, taking the `Integer` by value.
 ///

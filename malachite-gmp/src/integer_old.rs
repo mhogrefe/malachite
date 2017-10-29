@@ -18,24 +18,6 @@ use std::os::raw::{c_char, c_int, c_long, c_ulong};
 use std::slice;
 use std::str::FromStr;
 
-/// Assigns to a number from another value.
-pub trait Assign<Rhs = Self> {
-    /// Peforms the assignement.
-    fn assign(&mut self, rhs: Rhs);
-}
-
-/// Negates the value inside `self`.
-pub trait NegAssign {
-    /// Peforms the negation.
-    fn neg_assign(&mut self);
-}
-
-/// Peforms a bitwise complement of the value inside `self`.
-pub trait NotAssign {
-    /// Peforms the complement.
-    fn not_assign(&mut self);
-}
-
 /// Subtract and assigns the result to the rhs operand.
 ///
 /// `rhs.sub_from_assign(lhs)` has the same effect as
@@ -107,85 +89,6 @@ pub trait Pow<Rhs> {
 pub trait PowAssign<Rhs> {
     /// Peforms the power operation.
     fn pow_assign(&mut self, rhs: Rhs);
-}
-
-/// An arbitrary-precision integer.
-///
-/// Standard arithmetic operations, bitwise operations and comparisons
-/// are supported. In standard arithmetic operations such as addition,
-/// you can mix `Integer` and primitive integer types; the result will
-/// be an `Integer`.
-///
-/// Internally the integer is not stored using two's-complement
-/// representation, however, for bitwise operations and shifts, the
-/// functionality is the same as if the representation was using two's
-/// complement.
-///
-/// # Examples
-///
-/// ```rust
-/// use gmp_to_flint_adaptor_lib::integer_old::IntegerOld;
-///
-/// let mut i = IntegerOld::from(1);
-/// i = i << 1000;
-/// // i is now 1000000... (1000 zeros)
-/// assert!(i.significant_bits() == 1001);
-/// assert!(i.find_one(0) == Some(1000));
-/// i -= 1;
-/// // i is now 111111... (1000 ones)
-/// assert!(i.count_ones() == Some(1000));
-///
-/// let a = IntegerOld::from(0xf00d);
-/// let all_ones_xor_a = IntegerOld::from(-1) ^ &a;
-/// // a is unchanged as we borrowed it
-/// let complement_a = !a;
-/// // now a has been moved, so this would cause an error:
-/// // assert!(a > 0);
-/// assert!(all_ones_xor_a == complement_a);
-/// assert!(complement_a == -0xf00e);
-/// assert!(format!("{:x}", complement_a) == "-f00e");
-/// ```
-pub struct IntegerOld {
-    inner: mpz_t,
-}
-
-pub struct IntegerContent<'a> {
-    x: &'a IntegerOld,
-    i: u32,
-    mask: u32,
-    length: u32,
-}
-
-impl<'a> IntegerContent<'a> {
-    pub fn new(x: &'a IntegerOld) -> IntegerContent {
-        IntegerContent {
-            x: x,
-            i: 0,
-            mask: 1,
-            length: x.significant_bits(),
-        }
-    }
-}
-
-impl<'a> Iterator for IntegerContent<'a> {
-    type Item = u32;
-
-    fn next(&mut self) -> Option<u32> {
-        let mut val: u32 = 0;
-        while self.i < self.length {
-            if self.x.get_bit(self.i) {
-                val |= self.mask;
-            }
-            self.mask <<= 1;
-            self.i += 1;
-            if self.mask == 0 {
-                val = 0;
-                self.mask = 1;
-                return Some(val);
-            }
-        }
-        if val == 0 { None } else { Some(val) }
-    }
 }
 
 impl IntegerOld {
@@ -370,45 +273,6 @@ impl IntegerOld {
         self
     }
 
-    /// Compares the absolute values of `self` and `other`.
-    pub fn cmp_abs(&self, other: &IntegerOld) -> Ordering {
-        unsafe { gmp::mpz_cmpabs(&self.inner, &other.inner).cmp(&0) }
-    }
-
-    /// Returns the same result as self.cmp(0), but is faster.
-    pub fn sign(&self) -> Ordering {
-        unsafe { gmp::mpz_sgn(&self.inner).cmp(&0) }
-    }
-
-    /// Returns the number of bits required to represent the absolute
-    /// value of `self`.
-    ///
-    /// # Examples
-    ///
-    /// ```rust
-    /// use gmp_to_flint_adaptor_lib::integer_old::IntegerOld;
-    ///
-    /// assert!(IntegerOld::from(0).significant_bits() == 0);
-    /// assert!(IntegerOld::from(1).significant_bits() == 1);
-    /// assert!(IntegerOld::from(-1).significant_bits() == 1);
-    /// assert!(IntegerOld::from(4).significant_bits() == 3);
-    /// assert!(IntegerOld::from(-4).significant_bits() == 3);
-    /// assert!(IntegerOld::from(7).significant_bits() == 3);
-    /// assert!(IntegerOld::from(-7).significant_bits() == 3);
-    /// ```
-    pub fn significant_bits(&self) -> u32 {
-        let bits = unsafe { gmp::mpz_sizeinbase(&self.inner, 2) };
-        if bits > u32::MAX as usize {
-            panic!("overflow");
-        }
-        // sizeinbase returns 1 if number is 0
-        if bits == 1 && *self == 0 {
-            0
-        } else {
-            bits as u32
-        }
-    }
-
     /// Returns the number of ones in `self` if the value >= 0.
     ///
     /// # Examples
@@ -463,219 +327,6 @@ impl IntegerOld {
     /// assert!(IntegerOld::from(-16).find_one(20) == Some(20));
     pub fn find_one(&self, start: u32) -> Option<u32> {
         bitcount_to_u32(unsafe { gmp::mpz_scan1(&self.inner, start.into()) })
-    }
-
-    /// Sets the bit at location `index` to 1 if `val` is `true` or 0
-    /// if `val` is `false`.
-    pub fn set_bit(&mut self, index: u32, val: bool) -> &mut IntegerOld {
-        unsafe {
-            if val {
-                gmp::mpz_setbit(&mut self.inner, index.into());
-            } else {
-                gmp::mpz_clrbit(&mut self.inner, index.into());
-            }
-        }
-        self
-    }
-
-    /// Returns `true` if the bit at location `index` is 1 or `false`
-    /// if the bit is 0.
-    pub fn get_bit(&self, index: u32) -> bool {
-        unsafe { gmp::mpz_tstbit(&self.inner, index.into()) != 0 }
-    }
-
-    /// Toggles the bit at location `index`.
-    pub fn invert_bit(&mut self, index: u32) -> &mut IntegerOld {
-        unsafe {
-            gmp::mpz_combit(&mut self.inner, index.into());
-        }
-        self
-    }
-
-    pub fn to_u32s<'a>(&'a self) -> IntegerContent<'a> {
-        IntegerContent::new(self)
-    }
-
-    pub fn assign_bits_unsigned(&mut self, bits: &[bool]) {
-        self.assign(0);
-        if bits.is_empty() {
-            return;
-        }
-        let bit_length = bits.len();
-        let limb_bits = gmp::LIMB_BITS as usize;
-        let whole_limbs = bit_length / limb_bits;
-        let extra_bits = bit_length % limb_bits;
-        // Avoid conditions and overflow, equivalent to:
-        // let total_limbs = whole_limbs + if extra_bits == 0 { 0 } else { 1 };
-        let total_limbs = whole_limbs + ((extra_bits + limb_bits - 1) / limb_bits) as usize;
-        let limbs = unsafe {
-            if (self.inner.alloc as usize) < total_limbs {
-                gmp::_mpz_realloc(&mut self.inner, total_limbs as c_long);
-            }
-            slice::from_raw_parts_mut(self.inner.d, total_limbs)
-        };
-        let mut limbs_used: c_int = 0;
-        let mut j = 0;
-        let mut mask = 1;
-        for (i, limb) in limbs.iter_mut().enumerate() {
-            let mut val: gmp::limb_t = 0;
-            while j < bit_length && mask != 0 {
-                if bits[j] {
-                    val |= mask;
-                }
-                j += 1;
-                mask <<= 1;
-            }
-            if val != 0 {
-                limbs_used = i as c_int + 1;
-            }
-            *limb = val;
-            if j == bit_length {
-                break;
-            }
-        }
-        self.inner.size = limbs_used;
-    }
-
-    /// Generates a random number with a specified number of bits.
-    ///
-    /// # Examples
-    ///
-    /// ```rust
-    /// extern crate gmp_to_flint_adaptor_lib;
-    /// extern crate rand;
-    /// use gmp_to_flint_adaptor_lib::integer_old::IntegerOld;
-    ///
-    /// fn main() {
-    ///     let mut rng = rand::thread_rng();
-    ///     let mut i = IntegerOld::new();
-    ///     i.assign_random_bits_unsigned(0, &mut rng);
-    ///     assert!(i == 0);
-    ///     i.assign_random_bits_unsigned(80, &mut rng);
-    ///     assert_eq!(i.significant_bits(), 80);
-    /// }
-    /// ```
-    pub fn assign_random_bits_unsigned<R: Rng>(&mut self, bits: u32, rng: &mut R) {
-        self.assign(0);
-        if bits == 0 {
-            return;
-        }
-        let limb_bits = gmp::LIMB_BITS as u32;
-        let whole_limbs = (bits / limb_bits) as usize;
-        let extra_bits = bits % limb_bits;
-        // Avoid conditions and overflow, equivalent to:
-        // let total_limbs = whole_limbs + if extra_bits == 0 { 0 } else { 1 };
-        let total_limbs = whole_limbs + ((extra_bits + limb_bits - 1) / limb_bits) as usize;
-        let limbs = unsafe {
-            if (self.inner.alloc as usize) < total_limbs {
-                gmp::_mpz_realloc(&mut self.inner, total_limbs as c_long);
-            }
-            slice::from_raw_parts_mut(self.inner.d, total_limbs)
-        };
-        let mut limbs_used: c_int = 0;
-        for (i, limb) in limbs.iter_mut().enumerate() {
-            let mut val: gmp::limb_t = rng.gen();
-            if i == whole_limbs {
-                val &= ((1 as gmp::limb_t) << extra_bits) - 1;
-                val |= (1 as gmp::limb_t) << (extra_bits - 1);
-            }
-            limbs_used = i as c_int + 1;
-            *limb = val;
-        }
-        self.inner.size = limbs_used;
-    }
-
-    pub fn assign_random_bits<R: Rng>(&mut self, bits: u32, rng: &mut R) {
-        self.assign_random_bits_unsigned(bits, rng);
-        let sign: bool = rng.gen();
-        if !sign {
-            self.neg_assign();
-        }
-    }
-
-    pub fn assign_random_bits_unsigned_variable<R: Rng>(&mut self, max_bits: u32, rng: &mut R) {
-        let bits = Range::new(0, max_bits + 1).ind_sample(rng);
-        self.assign_random_bits_unsigned(bits, rng);
-    }
-
-    pub fn assign_random_bits_variable<R: Rng>(&mut self, max_bits: u32, rng: &mut R) {
-        let bits = Range::new(0, max_bits + 1).ind_sample(rng);
-        self.assign_random_bits(bits, rng);
-    }
-
-    pub fn assign_random_bits_nonzero_variable<R: Rng>(&mut self, max_bits: u32, rng: &mut R) {
-        if max_bits == 0 {
-            panic!("max_bits must be positive");
-        }
-        loop {
-            self.assign_random_bits_variable(max_bits, rng);
-            if self.sign() != Ordering::Equal {
-                break;
-            }
-        }
-    }
-
-    /// Generates a non-negative random number below the given
-    /// boundary value.
-    ///
-    /// # Examples
-    ///
-    /// ```rust
-    /// extern crate gmp_to_flint_adaptor_lib;
-    /// extern crate rand;
-    /// use gmp_to_flint_adaptor_lib::integer_old::IntegerOld;
-    ///
-    /// fn main() {
-    ///     let mut rng = rand::thread_rng();
-    ///     let bound = IntegerOld::from(15);
-    ///     let mut random = bound.clone();
-    ///     random.random_below(&mut rng);
-    ///     println!("0 <= {} < {}", random, bound);
-    ///     assert!(random < bound);
-    /// }
-    /// ```
-    ///
-    /// # Panics
-    ///
-    /// Panics if the boundary value is less than or equal to zero.
-    pub fn random_below<R: Rng>(&mut self, rng: &mut R) -> &mut IntegerOld {
-        assert!(self.sign() == Ordering::Greater, "cannot be below zero");
-        let bits = self.significant_bits();
-        let limb_bits = gmp::LIMB_BITS as u32;
-        let whole_limbs = (bits / limb_bits) as usize;
-        let extra_bits = bits % limb_bits;
-        // Avoid conditions and overflow, equivalent to:
-        // let total_limbs = whole_limbs + if extra_bits == 0 { 0 } else { 1 };
-        let total_limbs = whole_limbs + ((extra_bits + limb_bits - 1) / limb_bits) as usize;
-        let limbs = unsafe { slice::from_raw_parts_mut(self.inner.d, total_limbs) };
-        // if the random number is >= bound, restart
-        'restart: loop {
-            let mut limbs_used: c_int = 0;
-            let mut still_equal = true;
-            'next_limb: for i in (0..total_limbs).rev() {
-                let mut val: gmp::limb_t = rng.gen();
-                if i == whole_limbs {
-                    val &= ((1 as gmp::limb_t) << extra_bits) - 1;
-                }
-                if limbs_used == 0 && val != 0 {
-                    limbs_used = i as c_int + 1;
-                }
-                if still_equal {
-                    if val > limbs[i] {
-                        continue 'restart;
-                    }
-                    if val == limbs[i] {
-                        continue 'next_limb;
-                    }
-                    still_equal = false;
-                }
-                limbs[i] = val;
-            }
-            if !still_equal {
-                self.inner.size = limbs_used;
-                return self;
-            }
-        }
     }
 
     /// Returns a string representation of `self` for the specified
@@ -891,10 +542,6 @@ macro_rules! arith_noncommut_integer {
     };
 }
 
-arith_integer! { Add add, AddAssign add_assign, gmp::mpz_add }
-arith_noncommut_integer! { Sub sub, SubAssign sub_assign,
-                           SubFromAssign sub_from_assign, gmp::mpz_sub }
-arith_integer! { Mul mul, MulAssign mul_assign, gmp::mpz_mul }
 arith_noncommut_integer! { Div div, DivAssign div_assign,
                            DivFromAssign div_from_assign, mpz_tdiv_q }
 arith_noncommut_integer! { Rem rem, RemAssign rem_assign,
@@ -902,22 +549,6 @@ arith_noncommut_integer! { Rem rem, RemAssign rem_assign,
 arith_integer! { BitAnd bitand, BitAndAssign bitand_assign, gmp::mpz_and }
 arith_integer! { BitOr bitor, BitOrAssign bitor_assign, gmp::mpz_ior }
 arith_integer! { BitXor bitxor, BitXorAssign bitxor_assign, gmp::mpz_xor }
-
-impl Not for IntegerOld {
-    type Output = IntegerOld;
-    fn not(mut self) -> IntegerOld {
-        self.not_assign();
-        self
-    }
-}
-
-impl NotAssign for IntegerOld {
-    fn not_assign(&mut self) {
-        unsafe {
-            gmp::mpz_com(&mut self.inner, &self.inner);
-        }
-    }
-}
 
 unsafe fn mpz_tdiv_q(q: *mut mpz_t, n: *const mpz_t, d: *const mpz_t) {
     assert!(gmp::mpz_sgn(d) != 0, "division by zero");
@@ -1019,11 +650,9 @@ macro_rules! arith_prim_commut {
     };
 }
 
-arith_prim_commut! { Add add, AddAssign add_assign, u32, gmp::mpz_add_ui }
 arith_prim_non_commut! { Sub sub, SubAssign sub_assign,
                          SubFromAssign sub_from_assign,
                          u32, gmp::mpz_sub_ui, gmp::mpz_ui_sub }
-arith_prim_commut! { Mul mul, MulAssign mul_assign, u32, gmp::mpz_mul_ui }
 arith_prim_non_commut! { Div div, DivAssign div_assign,
                          DivFromAssign div_from_assign,
                          u32, mpz_tdiv_q_ui, mpz_ui_tdiv_q }
@@ -1040,11 +669,9 @@ arith_prim_commut! { BitAnd bitand, BitAndAssign bitand_assign, u32, bitand_ui }
 arith_prim_commut! { BitOr bitor, BitOrAssign bitor_assign, u32, bitor_ui }
 arith_prim_commut! { BitXor bitxor, BitXorAssign bitxor_assign, u32, bitxor_ui }
 
-arith_prim_commut! { Add add, AddAssign add_assign, i32, mpz_add_si }
 arith_prim_non_commut! { Sub sub, SubAssign sub_assign,
                          SubFromAssign sub_from_assign,
                          i32, mpz_sub_si, mpz_si_sub }
-arith_prim_commut! { Mul mul, MulAssign mul_assign, i32, gmp::mpz_mul_si }
 arith_prim_non_commut! { Div div, DivAssign div_assign,
                          DivFromAssign div_from_assign,
                          i32, mpz_tdiv_q_si, mpz_si_tdiv_q }
@@ -1169,32 +796,6 @@ unsafe fn bitxor_ui(rop: *mut mpz_t, op1: *const mpz_t, op2: c_ulong) {
     }
 }
 
-unsafe fn mpz_add_si(rop: *mut mpz_t, op1: *const mpz_t, op2: c_long) {
-    if op2 >= 0 {
-        gmp::mpz_add_ui(rop, op1, op2 as c_ulong);
-    } else {
-        gmp::mpz_sub_ui(rop, op1, op2.wrapping_neg() as c_ulong);
-    }
-}
-
-unsafe fn mpz_sub_si(rop: *mut mpz_t, op1: *const mpz_t, op2: c_long) {
-    if op2 >= 0 {
-        gmp::mpz_sub_ui(rop, op1, op2 as c_ulong);
-    } else {
-        gmp::mpz_add_ui(rop, op1, op2.wrapping_neg() as c_ulong);
-    }
-}
-
-unsafe fn mpz_si_sub(rop: *mut mpz_t, op1: c_long, op2: *const mpz_t) {
-    if op1 >= 0 {
-        gmp::mpz_ui_sub(rop, op1 as c_ulong, op2);
-    } else {
-        // is this the best we can do?
-        gmp::mpz_neg(rop, op2);
-        gmp::mpz_sub_ui(rop, rop, op1.wrapping_neg() as c_ulong);
-    }
-}
-
 unsafe fn mpz_tdiv_q_si(q: *mut mpz_t, n: *const mpz_t, d: c_long) {
     let neg = d < 0;
     mpz_tdiv_q_ui(q, n, d.wrapping_abs() as c_ulong);
@@ -1236,19 +837,6 @@ unsafe fn mpz_rshift_si(rop: *mut mpz_t, op1: *const mpz_t, op2: c_long) {
         gmp::mpz_fdiv_q_2exp(rop, op1, op2 as c_ulong);
     } else {
         gmp::mpz_mul_2exp(rop, op1, op2.wrapping_neg() as c_ulong);
-    }
-}
-
-impl Ord for IntegerOld {
-    fn cmp(&self, other: &IntegerOld) -> Ordering {
-        let ord = unsafe { gmp::mpz_cmp(&self.inner, &other.inner) };
-        ord.cmp(&0)
-    }
-}
-
-impl PartialOrd for IntegerOld {
-    fn partial_cmp(&self, other: &IntegerOld) -> Option<Ordering> {
-        Some(self.cmp(other))
     }
 }
 
@@ -1312,50 +900,6 @@ impl PartialOrd<IntegerOld> for f32 {
         }
     }
 }
-
-impl Hash for IntegerOld {
-    fn hash<H: Hasher>(&self, state: &mut H) {
-        self.sign().hash(state);
-        for i in self.to_u32s() {
-            i.hash(state);
-        }
-    }
-}
-
-macro_rules! cmp_int {
-    { $t:ty, $func:path } => {
-        impl PartialOrd<$t> for IntegerOld {
-            fn partial_cmp(&self, other: &$t) -> Option<Ordering> {
-                let ord = unsafe { $func(&self.inner, (*other).into()) };
-                Some(ord.cmp(&0))
-            }
-        }
-
-        impl PartialEq<$t> for IntegerOld {
-            fn eq(&self, other: &$t) -> bool {
-                self.partial_cmp(other) == Some(Ordering::Equal)
-            }
-        }
-
-        impl PartialOrd<IntegerOld> for $t {
-            fn partial_cmp(&self, other: &IntegerOld) -> Option<Ordering> {
-                match other.partial_cmp(self) {
-                    Some(x) => Some(x.reverse()),
-                    None => None,
-                }
-            }
-        }
-
-        impl PartialEq<IntegerOld> for $t {
-            fn eq(&self, other: &IntegerOld) -> bool {
-                other.eq(self)
-            }
-        }
-    };
-}
-
-cmp_int! { u32, gmp::mpz_cmp_ui }
-cmp_int! { i32, gmp::mpz_cmp_si }
 
 fn make_string(i: &IntegerOld, radix: i32, to_upper: bool) -> String {
     assert!(radix >= 2 && radix <= 36, "radix out of range");
@@ -1462,210 +1006,5 @@ fn bitcount_to_u32(bits: gmp::bitcnt_t) -> Option<u32> {
         panic!("overflow")
     } else {
         Some(bits as u32)
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use integer_old::*;
-    use std::{f32, f64, i32, u32};
-    use std::cmp::Ordering;
-    use std::mem;
-
-    #[test]
-    fn check_arith_u_s() {
-        let large = [(1, 100), (-11, 200), (33, 150)];
-        let u = [0, 1, 100, u32::MAX];
-        let s = [i32::MIN, -100, -1, 0, 1, 100, i32::MAX];
-        for &op in &u {
-            let iop = IntegerOld::from(op);
-            let against = (large.iter().map(|&(n, s)| IntegerOld::from(n) << s))
-                .chain(s.iter().map(|&x| IntegerOld::from(x)))
-                .chain(u.iter().map(|&x| IntegerOld::from(x)));
-            for b in against {
-                assert!(b.clone() + op == b.clone() + &iop);
-                assert!(b.clone() - op == b.clone() - &iop);
-                assert!(b.clone() * op == b.clone() * &iop);
-                if op != 0 {
-                    assert!(b.clone() / op == b.clone() / &iop);
-                    assert!(b.clone() % op == b.clone() % &iop);
-                }
-                assert!(b.clone() & op == b.clone() & &iop);
-                assert!(b.clone() | op == b.clone() | &iop);
-                assert!(b.clone() ^ op == b.clone() ^ &iop);
-                assert!(op + &b == iop.clone() + &b);
-                assert!(op - &b == iop.clone() - &b);
-                assert!(op * &b == iop.clone() * &b);
-                if b.sign() != Ordering::Equal {
-                    assert!(op / &b == iop.clone() / &b);
-                    assert!(op % &b == iop.clone() % &b);
-                }
-                assert!(op & &b == iop.clone() & &b);
-                assert!(op | &b == iop.clone() | &b);
-                assert!(op ^ &b == iop.clone() ^ &b);
-            }
-        }
-        for &op in &s {
-            let iop = IntegerOld::from(op);
-            let against = (large.iter().map(|&(n, s)| IntegerOld::from(n) << s))
-                .chain(s.iter().map(|&x| IntegerOld::from(x)))
-                .chain(u.iter().map(|&x| IntegerOld::from(x)));
-            for b in against {
-                assert!(b.clone() + op == b.clone() + &iop);
-                assert!(b.clone() - op == b.clone() - &iop);
-                assert!(b.clone() * op == b.clone() * &iop);
-                if op != 0 {
-                    assert!(b.clone() / op == b.clone() / &iop);
-                    assert!(b.clone() % op == b.clone() % &iop);
-                }
-                assert!(op + &b == iop.clone() + &b);
-                assert!(op - &b == iop.clone() - &b);
-                assert!(op * &b == iop.clone() * &b);
-                if b.sign() != Ordering::Equal {
-                    assert!(op / &b == iop.clone() / &b);
-                    assert!(op % &b == iop.clone() % &b);
-                }
-            }
-        }
-    }
-
-    #[test]
-    fn check_shift_u_s() {
-        let pos: IntegerOld = IntegerOld::from(11) << 100;
-        let neg: IntegerOld = IntegerOld::from(-33) << 50;
-        assert!(pos.clone() << 10 == pos.clone() >> -10);
-        assert!(pos.clone() << 10 == IntegerOld::from(11) << 110);
-        assert!(pos.clone() << -100 == pos.clone() >> 100);
-        assert!(pos.clone() << -100 == 11);
-        assert!(neg.clone() << 10 == neg.clone() >> -10);
-        assert!(neg.clone() << 10 == IntegerOld::from(-33) << 60);
-        assert!(neg.clone() << -100 == neg.clone() >> 100);
-        assert!(neg.clone() << -100 == -1);
-    }
-
-    #[test]
-    fn check_int_conversions() {
-        let mut i = IntegerOld::from(-1);
-        assert!(i.to_u32_wrapping() == u32::MAX);
-        assert!(i.to_i32_wrapping() == -1);
-        i.assign(0xff000000u32);
-        i <<= 4;
-        assert!(i.to_u32_wrapping() == 0xf0000000u32);
-        assert!(i.to_i32_wrapping() == 0xf0000000u32 as i32);
-        i = i.clone() << 32 | i;
-        assert!(i.to_u32_wrapping() == 0xf0000000u32);
-        assert!(i.to_i32_wrapping() == 0xf0000000u32 as i32);
-        i.neg_assign();
-        assert!(i.to_u32_wrapping() == 0x10000000u32);
-        assert!(i.to_i32_wrapping() == 0x10000000i32);
-    }
-
-    #[test]
-    fn check_option_conversion() {
-        let mut i = IntegerOld::new();
-        assert!(i.to_u32() == Some(0));
-        assert!(i.to_i32() == Some(0));
-        i -= 1;
-        assert!(i.to_u32() == None);
-        assert!(i.to_i32() == Some(-1));
-        i.assign(i32::MIN);
-        assert!(i.to_u32() == None);
-        assert!(i.to_i32() == Some(i32::MIN));
-        i -= 1;
-        assert!(i.to_u32() == None);
-        assert!(i.to_i32() == None);
-        i.assign(i32::MAX);
-        assert!(i.to_u32() == Some(i32::MAX as u32));
-        assert!(i.to_i32() == Some(i32::MAX));
-        i += 1;
-        assert!(i.to_u32() == Some(i32::MAX as u32 + 1));
-        assert!(i.to_i32() == None);
-        i.assign(u32::MAX);
-        assert!(i.to_u32() == Some(u32::MAX));
-        assert!(i.to_i32() == None);
-        i += 1;
-        assert!(i.to_u32() == None);
-        assert!(i.to_i32() == None);
-    }
-
-    #[test]
-    fn check_float_conversions() {
-        let mut i = IntegerOld::from(0);
-        assert!(i.to_f32() == 0.0);
-        assert!(i.to_f64() == 0.0);
-        i.assign(0xff);
-        assert!(i.to_f32() == 255.0);
-        assert!(i.to_f64() == 255.0);
-        i <<= 80;
-        assert!(i.to_f32() == 255.0 * 2f32.powi(80));
-        assert!(i.to_f64() == 255.0 * 2f64.powi(80));
-        i = i.clone() << 30 | i;
-        assert!(i.to_f32() == 255.0 * 2f32.powi(110));
-        assert!(i.to_f64() == 255.0 * (2f64.powi(80) + 2f64.powi(110)));
-        i <<= 100;
-        assert!(i.to_f32() == f32::INFINITY);
-        assert!(i.to_f64() == 255.0 * (2f64.powi(180) + 2f64.powi(210)));
-        i <<= 1000;
-        assert!(i.to_f32() == f32::INFINITY);
-        assert!(i.to_f64() == f64::INFINITY);
-    }
-
-    #[test]
-    fn check_from_str() {
-        let mut i: IntegerOld = "+134".parse().unwrap();
-        assert!(i == 134);
-        i.assign_str_radix("-ffFFffffFfFfffffffffffffffffffff", 16).unwrap();
-        assert!(i.significant_bits() == 128);
-        i -= 1;
-        assert!(i.significant_bits() == 129);
-
-        let bad_strings = [(" 1", None),
-                           ("+-3", None),
-                           ("-+3", None),
-                           ("++3", None),
-                           ("--3", None),
-                           ("0+3", None),
-                           ("0 ", None),
-                           ("", None),
-                           ("80", Some(8)),
-                           ("0xf", Some(16)),
-                           ("9", Some(9))];
-        for &(s, radix) in bad_strings.into_iter() {
-            assert!(IntegerOld::valid_str_radix(s, radix.unwrap_or(10)).is_err());
-        }
-        let good_strings = [("0", 10, 0),
-                            ("+0", 16, 0),
-                            ("-0", 2, 0),
-                            ("99", 10, 99),
-                            ("+Cc", 16, 0xcc),
-                            ("-77", 8, -0o77)];
-        for &(s, radix, i) in good_strings.into_iter() {
-            assert!(IntegerOld::from_str_radix(s, radix).unwrap() == i);
-        }
-    }
-
-    #[test]
-    fn check_formatting() {
-        let i = IntegerOld::from((-11));
-        assert!(format!("{}", i) == "-11");
-        assert!(format!("{:?}", i) == "-11");
-        assert!(format!("{:b}", i) == "-1011");
-        assert!(format!("{:#b}", i) == "-0b1011");
-        assert!(format!("{:o}", i) == "-13");
-        assert!(format!("{:#o}", i) == "-0o13");
-        assert!(format!("{:x}", i) == "-b");
-        assert!(format!("{:X}", i) == "-B");
-        assert!(format!("{:8x}", i) == "      -b");
-        assert!(format!("{:08X}", i) == "-000000B");
-        assert!(format!("{:#08x}", i) == "-0x0000b");
-        assert!(format!("{:#8X}", i) == "    -0xB");
-    }
-
-    #[test]
-    fn check_no_nails() {
-        // we assume no nail bits when we use limbs
-        assert!(gmp::NAIL_BITS == 0);
-        assert!(gmp::NUMB_BITS == gmp::LIMB_BITS);
-        assert!(gmp::NUMB_BITS as usize == 8 * mem::size_of::<gmp::limb_t>());
     }
 }

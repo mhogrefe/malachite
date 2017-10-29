@@ -1,18 +1,23 @@
 use gmp_mpfr_sys::gmp;
-use integer::{get_lower, get_upper};
 use integer::Integer;
-use traits::Assign;
+use malachite_base::num::{get_lower, get_upper};
+use malachite_base::traits::Assign;
 
 /// Assigns a `u64` to an `Integer`.
 ///
 /// # Examples
 /// ```
-/// use malachite_gmp::integer::Integer;
-/// use malachite_gmp::traits::Assign;
+/// extern crate malachite_base;
+/// extern crate malachite_gmp;
 ///
-/// let mut x = Integer::from(-123);
-/// x.assign(456u64);
-/// assert_eq!(x.to_string(), "456");
+/// use malachite_base::traits::Assign;
+/// use malachite_gmp::integer::Integer;
+///
+/// fn main() {
+///     let mut x = Integer::from(-123);
+///     x.assign(456u64);
+///     assert_eq!(x.to_string(), "456");
+/// }
 /// ```
 impl Assign<u64> for Integer {
     fn assign(&mut self, other: u64) {

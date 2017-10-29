@@ -1,6 +1,6 @@
 use integer::Integer;
+use malachite_base::traits::AbsAssign;
 use natural::Natural;
-use traits::AbsAssign;
 
 impl Integer {
     /// Finds the absolute value of an `Integer`, taking the `Integer` by value.
@@ -94,20 +94,25 @@ impl Integer {
 ///
 /// # Examples
 /// ```
+/// extern crate malachite_base;
+/// extern crate malachite_native;
+///
+/// use malachite_base::traits::AbsAssign;
 /// use malachite_native::integer::Integer;
-/// use malachite_native::traits::AbsAssign;
 ///
-/// let mut x = Integer::from(0);
-/// x.abs_assign();
-/// assert_eq!(x.to_string(), "0");
+/// fn main() {
+///     let mut x = Integer::from(0);
+///     x.abs_assign();
+///     assert_eq!(x.to_string(), "0");
 ///
-/// let mut x = Integer::from(123);
-/// x.abs_assign();
-/// assert_eq!(x.to_string(), "123");
+///     let mut x = Integer::from(123);
+///     x.abs_assign();
+///     assert_eq!(x.to_string(), "123");
 ///
-/// let mut x = Integer::from(-123);
-/// x.abs_assign();
-/// assert_eq!(x.to_string(), "123");
+///     let mut x = Integer::from(-123);
+///     x.abs_assign();
+///     assert_eq!(x.to_string(), "123");
+/// }
 /// ```
 impl AbsAssign for Integer {
     fn abs_assign(&mut self) {

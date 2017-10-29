@@ -1,6 +1,6 @@
 use integer::Integer;
+use malachite_base::traits::Assign;
 use std::ops::{Mul, MulAssign};
-use traits::Assign;
 
 /// Multiplies an `Integer` by a `u32`, taking the `Integer` by value.
 ///

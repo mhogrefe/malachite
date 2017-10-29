@@ -1,4 +1,5 @@
 extern crate malachite;
+extern crate malachite_base;
 extern crate malachite_gmp;
 extern crate malachite_native;
 extern crate malachite_test;

@@ -1,8 +1,7 @@
 use common::{gmp_integer_to_native, gmp_integer_to_num_bigint, gmp_integer_to_rugint};
+use malachite_base::traits::AbsAssign;
 use malachite_gmp::integer as gmp;
-use malachite_gmp::traits::AbsAssign as gmp_abs_assign;
 use malachite_native::integer as native;
-use malachite_native::traits::AbsAssign as native_abs_assign;
 use num::{self, Signed};
 use rugint;
 use rust_wheels::benchmarks::{BenchmarkOptions2, BenchmarkOptions4, benchmark_2, benchmark_4};
@@ -86,7 +85,7 @@ pub fn benchmark_exhaustive_integer_abs_assign(limit: usize, file_name: &str) {
         z_cons: &(|x| gmp_integer_to_num_bigint(x)),
         w_cons: &(|x| gmp_integer_to_rugint(x)),
         x_param: &(|n| n.significant_bits() as usize),
-        limit: limit,
+        limit,
         f_name: "malachite-gmp",
         g_name: "malachite-native",
         h_name: "num",
@@ -107,7 +106,7 @@ pub fn benchmark_random_integer_abs_assign(limit: usize, scale: u32, file_name: 
         x_cons: &(|x| x.clone()),
         y_cons: &(|x| gmp_integer_to_native(x)),
         x_param: &(|n| n.significant_bits() as usize),
-        limit: limit,
+        limit,
         f_name: "malachite-gmp",
         g_name: "malachite-native",
         title: "Integer.abs\\\\_assign()",
@@ -126,7 +125,7 @@ pub fn benchmark_exhaustive_integer_abs(limit: usize, file_name: &str) {
         x_cons: &(|x| x.clone()),
         y_cons: &(|x| gmp_integer_to_native(x)),
         x_param: &(|n| n.significant_bits() as usize),
-        limit: limit,
+        limit,
         f_name: "malachite-gmp",
         g_name: "malachite-native",
         title: "Integer.abs()",
@@ -145,7 +144,7 @@ pub fn benchmark_random_integer_abs(limit: usize, scale: u32, file_name: &str) {
         x_cons: &(|x| x.clone()),
         y_cons: &(|x| gmp_integer_to_native(x)),
         x_param: &(|n| n.significant_bits() as usize),
-        limit: limit,
+        limit,
         f_name: "malachite-gmp",
         g_name: "malachite-native",
         title: "Integer.abs()",
@@ -164,7 +163,7 @@ pub fn benchmark_exhaustive_integer_abs_evaluation_strategy(limit: usize, file_n
         x_cons: &(|x| gmp_integer_to_native(x)),
         y_cons: &(|x| gmp_integer_to_native(x)),
         x_param: &(|n| n.significant_bits() as usize),
-        limit: limit,
+        limit,
         f_name: "Integer.abs()",
         g_name: "Integer.abs_ref()",
         title: "Integer.abs() evaluation strategy",
@@ -183,7 +182,7 @@ pub fn benchmark_random_integer_abs_evaluation_strategy(limit: usize, scale: u32
         x_cons: &(|x| gmp_integer_to_native(x)),
         y_cons: &(|x| gmp_integer_to_native(x)),
         x_param: &(|n| n.significant_bits() as usize),
-        limit: limit,
+        limit,
         f_name: "Integer.abs()",
         g_name: "Integer.abs_ref()",
         title: "Integer.abs()",
@@ -202,7 +201,7 @@ pub fn benchmark_exhaustive_integer_natural_abs(limit: usize, file_name: &str) {
         x_cons: &(|x| x.clone()),
         y_cons: &(|x| gmp_integer_to_native(x)),
         x_param: &(|n| n.significant_bits() as usize),
-        limit: limit,
+        limit,
         f_name: "malachite-gmp",
         g_name: "malachite-native",
         title: "Integer.natural\\\\_abs()",
@@ -221,7 +220,7 @@ pub fn benchmark_random_integer_natural_abs(limit: usize, scale: u32, file_name:
         x_cons: &(|x| x.clone()),
         y_cons: &(|x| gmp_integer_to_native(x)),
         x_param: &(|n| n.significant_bits() as usize),
-        limit: limit,
+        limit,
         f_name: "malachite-gmp",
         g_name: "malachite-native",
         title: "Integer.natural\\\\_abs()",
@@ -240,7 +239,7 @@ pub fn benchmark_exhaustive_integer_natural_abs_evaluation_strategy(limit: usize
         x_cons: &(|x| gmp_integer_to_native(x)),
         y_cons: &(|x| gmp_integer_to_native(x)),
         x_param: &(|n| n.significant_bits() as usize),
-        limit: limit,
+        limit,
         f_name: "Integer.natural_abs()",
         g_name: "Integer.natural_abs_ref()",
         title: "Integer.natural\\\\_abs() evaluation strategy",
@@ -263,7 +262,7 @@ pub fn benchmark_random_integer_natural_abs_evaluation_strategy(
         x_cons: &(|x| gmp_integer_to_native(x)),
         y_cons: &(|x| gmp_integer_to_native(x)),
         x_param: &(|n| n.significant_bits() as usize),
-        limit: limit,
+        limit,
         f_name: "Integer.natural_abs()",
         g_name: "Integer.natural_abs_ref()",
         title: "Integer.natural\\\\_abs() evaluation strategy",

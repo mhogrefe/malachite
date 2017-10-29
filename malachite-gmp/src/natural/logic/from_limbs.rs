@@ -1,5 +1,6 @@
 use gmp_mpfr_sys::gmp::{self, mpz_t};
-use natural::{get_limb_size, Large, LimbSize, make_u64, Natural, Small};
+use malachite_base::num::make_u64;
+use natural::{Large, Natural, Small};
 use std::mem;
 use std::slice::from_raw_parts_mut;
 
@@ -34,37 +35,23 @@ impl Natural {
             _ => unsafe {
                 let mut large: mpz_t = mem::uninitialized();
                 gmp::mpz_init(&mut large);
-                match get_limb_size() {
-                    LimbSize::U32 => {
-                        let raw_limbs = from_raw_parts_mut(
-                            gmp::mpz_limbs_write(&mut large, sig_size as i64),
-                            sig_size,
-                        );
-                        for (i, limb) in limbs.iter().enumerate() {
-                            raw_limbs[i] = (*limb).into();
-                        }
-                        gmp::mpz_limbs_finish(&mut large, sig_size as i64);
-                    }
-                    LimbSize::U64 => {
-                        let raw_sig_size = if sig_size & 1 == 0 {
-                            sig_size >> 1
-                        } else {
-                            (sig_size >> 1) + 1
-                        };
-                        let raw_limbs = from_raw_parts_mut(
-                            gmp::mpz_limbs_write(&mut large, raw_sig_size as i64),
-                            raw_sig_size,
-                        );
-                        for (i, chunk) in limbs.chunks(2).enumerate() {
-                            if chunk.len() == 2 {
-                                raw_limbs[i] = make_u64(chunk[1], chunk[0]);
-                            } else {
-                                raw_limbs[i] = chunk[0] as u64;
-                            }
-                        }
-                        gmp::mpz_limbs_finish(&mut large, raw_sig_size as i64);
+                let raw_sig_size = if sig_size & 1 == 0 {
+                    sig_size >> 1
+                } else {
+                    (sig_size >> 1) + 1
+                };
+                let raw_limbs = from_raw_parts_mut(
+                    gmp::mpz_limbs_write(&mut large, raw_sig_size as i64),
+                    raw_sig_size,
+                );
+                for (i, chunk) in limbs.chunks(2).enumerate() {
+                    if chunk.len() == 2 {
+                        raw_limbs[i] = make_u64(chunk[1], chunk[0]);
+                    } else {
+                        raw_limbs[i] = chunk[0] as u64;
                     }
                 }
+                gmp::mpz_limbs_finish(&mut large, raw_sig_size as i64);
                 Large(large)
             },
         }

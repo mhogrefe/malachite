@@ -1,7 +1,7 @@
 use integer::Integer;
+use malachite_base::traits::Assign;
 use natural::Natural;
 use std::ops::{Add, AddAssign};
-use traits::Assign;
 
 /// Adds an `i32` to an `Integer`, taking the `Integer` by value.
 ///

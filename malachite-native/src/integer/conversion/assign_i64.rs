@@ -1,5 +1,5 @@
 use integer::Integer;
-use traits::Assign;
+use malachite_base::traits::Assign;
 
 /// Assigns an `i64` to an `Integer`.
 ///
@@ -9,12 +9,17 @@ use traits::Assign;
 ///
 /// # Example
 /// ```
-/// use malachite_native::integer::Integer;
-/// use malachite_native::traits::Assign;
+/// extern crate malachite_base;
+/// extern crate malachite_native;
 ///
-/// let mut x = Integer::from(456);
-/// x.assign(-123i64);
-/// assert_eq!(x.to_string(), "-123");
+/// use malachite_base::traits::Assign;
+/// use malachite_native::integer::Integer;
+///
+/// fn main() {
+///     let mut x = Integer::from(456);
+///     x.assign(-123i64);
+///     assert_eq!(x.to_string(), "-123");
+/// }
 /// ```
 impl Assign<i64> for Integer {
     fn assign(&mut self, other: i64) {

@@ -1,4 +1,4 @@
-use natural::make_u64;
+use malachite_base::num::make_u64;
 use natural::Natural::{self, Large, Small};
 
 impl Natural {

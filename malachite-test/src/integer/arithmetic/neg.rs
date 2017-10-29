@@ -1,8 +1,7 @@
 use common::{gmp_integer_to_native, gmp_integer_to_num_bigint, gmp_integer_to_rugint};
+use malachite_base::traits::NegAssign;
 use malachite_gmp::integer as gmp;
-use malachite_gmp::traits::NegAssign as gmp_neg_assign;
 use malachite_native::integer as native;
-use malachite_native::traits::NegAssign as native_neg_assign;
 use num;
 use rugint;
 use rust_wheels::benchmarks::{BenchmarkOptions2, BenchmarkOptions4, benchmark_2, benchmark_4};
@@ -58,7 +57,7 @@ pub fn benchmark_exhaustive_integer_neg_assign(limit: usize, file_name: &str) {
         x_cons: &(|x| x.clone()),
         y_cons: &(|x| gmp_integer_to_native(x)),
         x_param: &(|n| n.significant_bits() as usize),
-        limit: limit,
+        limit,
         f_name: "malachite-gmp",
         g_name: "malachite-native",
         title: "Integer.neg_assign()",
@@ -77,7 +76,7 @@ pub fn benchmark_random_integer_neg_assign(limit: usize, scale: u32, file_name: 
         x_cons: &(|x| x.clone()),
         y_cons: &(|x| gmp_integer_to_native(x)),
         x_param: &(|n| n.significant_bits() as usize),
-        limit: limit,
+        limit,
         f_name: "malachite-gmp",
         g_name: "malachite-native",
         title: "Integer.neg_assign()",
@@ -100,7 +99,7 @@ pub fn benchmark_exhaustive_integer_neg(limit: usize, file_name: &str) {
         z_cons: &(|x| gmp_integer_to_num_bigint(x)),
         w_cons: &(|x| gmp_integer_to_rugint(x)),
         x_param: &(|n| n.significant_bits() as usize),
-        limit: limit,
+        limit,
         f_name: "malachite-gmp",
         g_name: "malachite-native",
         h_name: "num",
@@ -125,7 +124,7 @@ pub fn benchmark_random_integer_neg(limit: usize, scale: u32, file_name: &str) {
         z_cons: &(|x| gmp_integer_to_num_bigint(x)),
         w_cons: &(|x| gmp_integer_to_rugint(x)),
         x_param: &(|n| n.significant_bits() as usize),
-        limit: limit,
+        limit,
         f_name: "malachite-gmp",
         g_name: "malachite-native",
         h_name: "num",
@@ -146,7 +145,7 @@ pub fn benchmark_exhaustive_integer_neg_evaluation_strategy(limit: usize, file_n
         x_cons: &(|x| gmp_integer_to_native(x)),
         y_cons: &(|x| gmp_integer_to_native(x)),
         x_param: &(|n| n.significant_bits() as usize),
-        limit: limit,
+        limit,
         f_name: "-Integer",
         g_name: "-\\\\&Integer",
         title: "-Integer evaluation strategy",
@@ -165,7 +164,7 @@ pub fn benchmark_random_integer_neg_evaluation_strategy(limit: usize, scale: u32
         x_cons: &(|x| gmp_integer_to_native(x)),
         y_cons: &(|x| gmp_integer_to_native(x)),
         x_param: &(|n| n.significant_bits() as usize),
-        limit: limit,
+        limit,
         f_name: "-Integer",
         g_name: "-\\\\&Integer",
         title: "-Integer evaluation strategy",

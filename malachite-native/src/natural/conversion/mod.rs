@@ -1,8 +1,8 @@
 use error::ParseIntegerError;
+use malachite_base::traits::Assign;
 use natural::Natural::{self, Small};
 use std::fmt::{self, Debug, Display, Formatter};
 use std::str::FromStr;
-use traits::Assign;
 
 impl Natural {
     //TODO test

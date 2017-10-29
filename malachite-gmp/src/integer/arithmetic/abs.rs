@@ -2,7 +2,7 @@ use gmp_mpfr_sys::gmp::{self, mpz_t};
 use integer::Integer;
 use natural::Natural;
 use std::mem;
-use traits::AbsAssign;
+use malachite_base::traits::AbsAssign;
 
 impl Integer {
     /// Returns the absolute value of an `Integer`, taking the `Integer` by value.
@@ -107,20 +107,25 @@ impl Integer {
 ///
 /// # Examples
 /// ```
+/// extern crate malachite_base;
+/// extern crate malachite_gmp;
+///
+/// use malachite_base::traits::AbsAssign;
 /// use malachite_gmp::integer::Integer;
-/// use malachite_gmp::traits::AbsAssign;
 ///
-/// let mut x = Integer::from(0);
-/// x.abs_assign();
-/// assert_eq!(x.to_string(), "0");
+/// fn main() {
+///     let mut x = Integer::from(0);
+///     x.abs_assign();
+///     assert_eq!(x.to_string(), "0");
 ///
-/// let mut x = Integer::from(123);
-/// x.abs_assign();
-/// assert_eq!(x.to_string(), "123");
+///     let mut x = Integer::from(123);
+///     x.abs_assign();
+///     assert_eq!(x.to_string(), "123");
 ///
-/// let mut x = Integer::from(-123);
-/// x.abs_assign();
-/// assert_eq!(x.to_string(), "123");
+///     let mut x = Integer::from(-123);
+///     x.abs_assign();
+///     assert_eq!(x.to_string(), "123");
+/// }
 /// ```
 impl AbsAssign for Integer {
     fn abs_assign(&mut self) {

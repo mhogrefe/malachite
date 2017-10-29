@@ -1,6 +1,5 @@
-use natural::Natural;
-use natural::Natural::*;
-use natural::make_u64;
+use malachite_base::num::make_u64;
+use natural::Natural::{self, Small};
 
 impl Natural {
     //TODO test

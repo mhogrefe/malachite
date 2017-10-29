@@ -1,9 +1,8 @@
 use common::{gmp_integer_to_native, gmp_integer_to_rugint, gmp_natural_to_native,
              gmp_natural_to_rugint_integer};
+use malachite_base::traits::Assign;
 use malachite_gmp as gmp;
-use malachite_gmp::traits::Assign as gmp_assign;
 use malachite_native as native;
-use malachite_native::traits::Assign as native_assign;
 use rugint;
 use rugint::Assign as rugint_assign;
 use rust_wheels::benchmarks::{BenchmarkOptions2, BenchmarkOptions3, benchmark_2, benchmark_3};
@@ -70,7 +69,7 @@ pub fn benchmark_exhaustive_integer_assign_natural(limit: usize, file_name: &str
         y_cons: &(|&(ref x, ref y)| (gmp_integer_to_native(x), gmp_natural_to_native(y))),
         z_cons: &(|&(ref x, ref y)| (gmp_integer_to_rugint(x), gmp_natural_to_rugint_integer(y))),
         x_param: &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),
-        limit: limit,
+        limit,
         f_name: "malachite-gmp",
         g_name: "malachite-native",
         h_name: "rugint",
@@ -98,7 +97,7 @@ pub fn benchmark_random_integer_assign_natural(limit: usize, scale: u32, file_na
         y_cons: &(|&(ref x, ref y)| (gmp_integer_to_native(x), gmp_natural_to_native(y))),
         z_cons: &(|&(ref x, ref y)| (gmp_integer_to_rugint(x), gmp_natural_to_rugint_integer(y))),
         x_param: &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),
-        limit: limit,
+        limit,
         f_name: "malachite-gmp",
         g_name: "malachite-native",
         h_name: "rugint",
@@ -125,7 +124,7 @@ pub fn benchmark_exhaustive_integer_assign_natural_evaluation_strategy(
         x_cons: &(|&(ref x, ref y)| (gmp_integer_to_native(x), gmp_natural_to_native(y))),
         y_cons: &(|&(ref x, ref y)| (gmp_integer_to_native(x), gmp_natural_to_native(y))),
         x_param: &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),
-        limit: limit,
+        limit,
         f_name: "Integer.assign(Natural)",
         g_name: "Integer.assign(\\\\&Natural)",
         title: "Integer.assign(Natural) evaluation strategy",
@@ -156,7 +155,7 @@ pub fn benchmark_random_integer_assign_natural_evaluation_strategy(
         x_cons: &(|&(ref x, ref y)| (gmp_integer_to_native(x), gmp_natural_to_native(y))),
         y_cons: &(|&(ref x, ref y)| (gmp_integer_to_native(x), gmp_natural_to_native(y))),
         x_param: &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),
-        limit: limit,
+        limit,
         f_name: "Integer.assign(Natural)",
         g_name: "Integer.assign(\\\\&Natural)",
         title: "Integer.assign(Natural) evaluation strategy",

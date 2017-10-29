@@ -1,7 +1,7 @@
 use integer::Integer;
 use natural::Natural;
 use std::cmp::Ordering;
-use traits::Assign;
+use malachite_base::traits::Assign;
 
 impl Integer {
     /// Converts an `Integer` to a `Natural`, taking the `Natural` by value. If the `Integer` is

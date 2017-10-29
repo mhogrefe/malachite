@@ -2,7 +2,7 @@ use gmp_mpfr_sys::gmp::{self, mpz_t};
 use integer::Integer::{self, Large, Small};
 use std::mem;
 use std::ops::Neg;
-use traits::NegAssign;
+use malachite_base::traits::NegAssign;
 
 /// Returns the negative of an `Integer`, taking the `Integer` by value.
 ///
@@ -61,20 +61,25 @@ impl<'a> Neg for &'a Integer {
 ///
 /// # Examples
 /// ```
+/// extern crate malachite_base;
+/// extern crate malachite_gmp;
+///
+/// use malachite_base::traits::NegAssign;
 /// use malachite_gmp::integer::Integer;
-/// use malachite_gmp::traits::NegAssign;
 ///
-/// let mut x = Integer::from(0);
-/// x.neg_assign();
-/// assert_eq!(x.to_string(), "0");
+/// fn main() {
+///     let mut x = Integer::from(0);
+///     x.neg_assign();
+///     assert_eq!(x.to_string(), "0");
 ///
-/// let mut x = Integer::from(123);
-/// x.neg_assign();
-/// assert_eq!(x.to_string(), "-123");
+///     let mut x = Integer::from(123);
+///     x.neg_assign();
+///     assert_eq!(x.to_string(), "-123");
 ///
-/// let mut x = Integer::from(-123);
-/// x.neg_assign();
-/// assert_eq!(x.to_string(), "123");
+///     let mut x = Integer::from(-123);
+///     x.neg_assign();
+///     assert_eq!(x.to_string(), "123");
+/// }
 /// ```
 impl NegAssign for Integer {
     fn neg_assign(&mut self) {

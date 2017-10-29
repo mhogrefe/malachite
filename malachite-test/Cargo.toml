@@ -13,6 +13,7 @@ path = "src/bin.rs"
 
 [dependencies]
 malachite = { path = "../malachite" }
+malachite-base = { path = "../malachite-base" }
 malachite-gmp = { path = "../malachite-gmp" }
 malachite-native = { path = "../malachite-native" }
 rust-wheels = { path = "../../rust-wheels" }

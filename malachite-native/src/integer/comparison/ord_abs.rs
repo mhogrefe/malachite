@@ -1,6 +1,6 @@
 use integer::Integer;
+use malachite_base::traits::{OrdAbs, PartialOrdAbs};
 use std::cmp::Ordering;
-use traits::{OrdAbs, PartialOrdAbs};
 
 /// Compares the absolute value of an `Integer` to the absolute value of another `Integer`.
 ///
@@ -12,13 +12,18 @@ use traits::{OrdAbs, PartialOrdAbs};
 ///
 /// # Examples
 /// ```
-/// use malachite_native::integer::Integer;
-/// use malachite_native::traits::PartialOrdAbs;
+/// extern crate malachite_base;
+/// extern crate malachite_native;
 ///
-/// assert!(Integer::from(-123).lt_abs(&Integer::from(-124)));
-/// assert!(Integer::from(-123).le_abs(&Integer::from(-124)));
-/// assert!(Integer::from(-124).gt_abs(&Integer::from(-123)));
-/// assert!(Integer::from(-124).ge_abs(&Integer::from(-123)));
+/// use malachite_base::traits::PartialOrdAbs;
+/// use malachite_native::integer::Integer;
+///
+/// fn main() {
+///     assert!(Integer::from(-123).lt_abs(&Integer::from(-124)));
+///     assert!(Integer::from(-123).le_abs(&Integer::from(-124)));
+///     assert!(Integer::from(-124).gt_abs(&Integer::from(-123)));
+///     assert!(Integer::from(-124).ge_abs(&Integer::from(-123)));
+/// }
 /// ```
 impl PartialOrdAbs for Integer {
     fn partial_cmp_abs(&self, other: &Integer) -> Option<Ordering> {

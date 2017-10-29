@@ -100,18 +100,6 @@ impl Default for Natural {
     }
 }
 
-fn make_u64(upper: u32, lower: u32) -> u64 {
-    (upper as u64) << 32 | (lower as u64)
-}
-
-fn get_lower(val: u64) -> u32 {
-    (val & 0x0000_0000_ffff_ffff) as u32
-}
-
-fn get_upper(val: u64) -> u32 {
-    (val >> 32) as u32
-}
-
 fn pad_left<T: Clone>(vec: &mut Vec<T>, pad_size: usize, value: T) {
     let old_len = vec.len();
     vec.resize(old_len + pad_size, value);

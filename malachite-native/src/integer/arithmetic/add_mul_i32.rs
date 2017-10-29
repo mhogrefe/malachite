@@ -1,5 +1,5 @@
 use integer::Integer;
-use traits::{AddMul, AddMulAssign, SubMul, SubMulAssign};
+use malachite_base::traits::{AddMul, AddMulAssign, SubMul, SubMulAssign};
 
 /// Adds the product of an `Integer` (b) and an `i32` (c) to an `Integer` (self), taking `self` and
 /// b by value.
@@ -12,14 +12,19 @@ use traits::{AddMul, AddMulAssign, SubMul, SubMulAssign};
 ///
 /// # Examples
 /// ```
+/// extern crate malachite_base;
+/// extern crate malachite_native;
+///
+/// use malachite_base::traits::AddMul;
 /// use malachite_native::integer::Integer;
-/// use malachite_native::traits::AddMul;
 /// use std::str::FromStr;
 ///
-/// assert_eq!(Integer::from(10u32).add_mul(Integer::from(3u32), 4i32), 22);
-/// assert_eq!(Integer::from_str("-1000000000000").unwrap()
-///                     .add_mul(Integer::from(-65536i32), -65536i32).to_string(),
-///            "-995705032704");
+/// fn main() {
+///     assert_eq!(Integer::from(10u32).add_mul(Integer::from(3u32), 4i32), 22);
+///     assert_eq!(Integer::from_str("-1000000000000").unwrap()
+///                         .add_mul(Integer::from(-65536i32), -65536i32).to_string(),
+///                "-995705032704");
+/// }
 /// ```
 impl AddMul<Integer, i32> for Integer {
     type Output = Integer;
@@ -41,14 +46,19 @@ impl AddMul<Integer, i32> for Integer {
 ///
 /// # Examples
 /// ```
+/// extern crate malachite_base;
+/// extern crate malachite_native;
+///
+/// use malachite_base::traits::AddMul;
 /// use malachite_native::integer::Integer;
-/// use malachite_native::traits::AddMul;
 /// use std::str::FromStr;
 ///
-/// assert_eq!(Integer::from(10u32).add_mul(&Integer::from(3u32), 4i32), 22);
-/// assert_eq!(Integer::from_str("-1000000000000").unwrap()
-///                     .add_mul(&Integer::from(-65536i32), -65536i32).to_string(),
-///            "-995705032704");
+/// fn main() {
+///     assert_eq!(Integer::from(10u32).add_mul(&Integer::from(3u32), 4i32), 22);
+///     assert_eq!(Integer::from_str("-1000000000000").unwrap()
+///                         .add_mul(&Integer::from(-65536i32), -65536i32).to_string(),
+///                "-995705032704");
+/// }
 /// ```
 impl<'a> AddMul<&'a Integer, i32> for Integer {
     type Output = Integer;
@@ -70,14 +80,19 @@ impl<'a> AddMul<&'a Integer, i32> for Integer {
 ///
 /// # Examples
 /// ```
+/// extern crate malachite_base;
+/// extern crate malachite_native;
+///
+/// use malachite_base::traits::AddMul;
 /// use malachite_native::integer::Integer;
-/// use malachite_native::traits::AddMul;
 /// use std::str::FromStr;
 ///
-/// assert_eq!((&Integer::from(10u32)).add_mul(Integer::from(3u32), 4i32), 22);
-/// assert_eq!((&Integer::from_str("-1000000000000").unwrap())
-///                     .add_mul(Integer::from(-65536i32), -65536i32).to_string(),
-///            "-995705032704");
+/// fn main() {
+///     assert_eq!((&Integer::from(10u32)).add_mul(Integer::from(3u32), 4i32), 22);
+///     assert_eq!((&Integer::from_str("-1000000000000").unwrap())
+///                         .add_mul(Integer::from(-65536i32), -65536i32).to_string(),
+///                "-995705032704");
+/// }
 /// ```
 impl<'a> AddMul<Integer, i32> for &'a Integer {
     type Output = Integer;
@@ -98,14 +113,19 @@ impl<'a> AddMul<Integer, i32> for &'a Integer {
 ///
 /// # Examples
 /// ```
+/// extern crate malachite_base;
+/// extern crate malachite_native;
+///
+/// use malachite_base::traits::AddMul;
 /// use malachite_native::integer::Integer;
-/// use malachite_native::traits::AddMul;
 /// use std::str::FromStr;
 ///
-/// assert_eq!((&Integer::from(10u32)).add_mul(&Integer::from(3u32), 4i32), 22);
-/// assert_eq!((&Integer::from_str("-1000000000000").unwrap())
-///                     .add_mul(&Integer::from(-65536i32), -65536i32).to_string(),
-///             "-995705032704");
+/// fn main() {
+///     assert_eq!((&Integer::from(10u32)).add_mul(&Integer::from(3u32), 4i32), 22);
+///     assert_eq!((&Integer::from_str("-1000000000000").unwrap())
+///                         .add_mul(&Integer::from(-65536i32), -65536i32).to_string(),
+///                 "-995705032704");
+/// }
 /// ```
 impl<'a, 'b> AddMul<&'a Integer, i32> for &'b Integer {
     type Output = Integer;
@@ -130,17 +150,22 @@ impl<'a, 'b> AddMul<&'a Integer, i32> for &'b Integer {
 ///
 /// # Examples
 /// ```
+/// extern crate malachite_base;
+/// extern crate malachite_native;
+///
+/// use malachite_base::traits::AddMulAssign;
 /// use malachite_native::integer::Integer;
-/// use malachite_native::traits::AddMulAssign;
 /// use std::str::FromStr;
 ///
-/// let mut x = Integer::from(10u32);
-/// x.add_mul_assign(Integer::from(3u32), 4i32);
-/// assert_eq!(x, 22);
+/// fn main() {
+///     let mut x = Integer::from(10u32);
+///     x.add_mul_assign(Integer::from(3u32), 4i32);
+///     assert_eq!(x, 22);
 ///
-/// let mut x = Integer::from_str("-1000000000000").unwrap();
-/// x.add_mul_assign(Integer::from(-65536i32), -65536i32);
-/// assert_eq!(x.to_string(), "-995705032704");
+///     let mut x = Integer::from_str("-1000000000000").unwrap();
+///     x.add_mul_assign(Integer::from(-65536i32), -65536i32);
+///     assert_eq!(x.to_string(), "-995705032704");
+/// }
 /// ```
 impl AddMulAssign<Integer, i32> for Integer {
     fn add_mul_assign(&mut self, b: Integer, c: i32) {
@@ -159,17 +184,22 @@ impl AddMulAssign<Integer, i32> for Integer {
 ///
 /// # Examples
 /// ```
+/// extern crate malachite_base;
+/// extern crate malachite_native;
+///
+/// use malachite_base::traits::AddMulAssign;
 /// use malachite_native::integer::Integer;
-/// use malachite_native::traits::AddMulAssign;
 /// use std::str::FromStr;
 ///
-/// let mut x = Integer::from(10u32);
-/// x.add_mul_assign(&Integer::from(3u32), 4i32);
-/// assert_eq!(x, 22);
+/// fn main() {
+///     let mut x = Integer::from(10u32);
+///     x.add_mul_assign(&Integer::from(3u32), 4i32);
+///     assert_eq!(x, 22);
 ///
-/// let mut x = Integer::from_str("-1000000000000").unwrap();
-/// x.add_mul_assign(&Integer::from(-65536i32), -65536i32);
-/// assert_eq!(x.to_string(), "-995705032704");
+///     let mut x = Integer::from_str("-1000000000000").unwrap();
+///     x.add_mul_assign(&Integer::from(-65536i32), -65536i32);
+///     assert_eq!(x.to_string(), "-995705032704");
+/// }
 /// ```
 impl<'a> AddMulAssign<&'a Integer, i32> for Integer {
     fn add_mul_assign(&mut self, b: &'a Integer, c: i32) {

@@ -1,8 +1,7 @@
 use common::{gmp_integer_to_native, gmp_integer_to_num_bigint, gmp_integer_to_rugint};
+use malachite_base::traits::Assign;
 use malachite_native::integer as native;
-use malachite_native::traits::Assign as native_assign;
 use malachite_gmp::integer as gmp;
-use malachite_gmp::traits::Assign as gmp_assign;
 use num;
 use rugint;
 use rugint::Assign as rugint_assign;
@@ -88,7 +87,7 @@ pub fn benchmark_exhaustive_integer_clone(limit: usize, file_name: &str) {
         z_cons: &(|x| gmp_integer_to_num_bigint(x)),
         w_cons: &(|x| gmp_integer_to_rugint(x)),
         x_param: &(|n| n.significant_bits() as usize),
-        limit: limit,
+        limit,
         f_name: "malachite-gmp",
         g_name: "malachite-native",
         h_name: "num",
@@ -113,7 +112,7 @@ pub fn benchmark_random_integer_clone(limit: usize, scale: u32, file_name: &str)
         z_cons: &(|x| gmp_integer_to_num_bigint(x)),
         w_cons: &(|x| gmp_integer_to_rugint(x)),
         x_param: &(|n| n.significant_bits() as usize),
-        limit: limit,
+        limit,
         f_name: "malachite-gmp",
         g_name: "malachite-native",
         h_name: "num",
@@ -138,7 +137,7 @@ pub fn benchmark_exhaustive_integer_clone_from(limit: usize, file_name: &str) {
         z_cons: &(|&(ref x, ref y)| (gmp_integer_to_num_bigint(x), gmp_integer_to_num_bigint(y))),
         w_cons: &(|&(ref x, ref y)| (gmp_integer_to_rugint(x), gmp_integer_to_rugint(y))),
         x_param: &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),
-        limit: limit,
+        limit,
         f_name: "malachite-gmp",
         g_name: "malachite-native",
         h_name: "num",
@@ -163,7 +162,7 @@ pub fn benchmark_random_integer_clone_from(limit: usize, scale: u32, file_name: 
         z_cons: &(|&(ref x, ref y)| (gmp_integer_to_num_bigint(x), gmp_integer_to_num_bigint(y))),
         w_cons: &(|&(ref x, ref y)| (gmp_integer_to_rugint(x), gmp_integer_to_rugint(y))),
         x_param: &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),
-        limit: limit,
+        limit,
         f_name: "malachite-gmp",
         g_name: "malachite-native",
         h_name: "num",
@@ -186,7 +185,7 @@ pub fn benchmark_exhaustive_integer_assign(limit: usize, file_name: &str) {
         y_cons: &(|&(ref x, ref y)| (gmp_integer_to_native(x), gmp_integer_to_native(y))),
         z_cons: &(|&(ref x, ref y)| (gmp_integer_to_rugint(x), gmp_integer_to_rugint(y))),
         x_param: &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),
-        limit: limit,
+        limit,
         f_name: "malachite-gmp",
         g_name: "malachite-native",
         h_name: "rugint",
@@ -208,7 +207,7 @@ pub fn benchmark_random_integer_assign(limit: usize, scale: u32, file_name: &str
         y_cons: &(|&(ref x, ref y)| (gmp_integer_to_native(x), gmp_integer_to_native(y))),
         z_cons: &(|&(ref x, ref y)| (gmp_integer_to_rugint(x), gmp_integer_to_rugint(y))),
         x_param: &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),
-        limit: limit,
+        limit,
         f_name: "malachite-gmp",
         g_name: "malachite-native",
         h_name: "rugint",
@@ -228,7 +227,7 @@ pub fn benchmark_exhaustive_integer_assign_evaluation_strategy(limit: usize, fil
         x_cons: &(|&(ref x, ref y)| (gmp_integer_to_native(x), gmp_integer_to_native(y))),
         y_cons: &(|&(ref x, ref y)| (gmp_integer_to_native(x), gmp_integer_to_native(y))),
         x_param: &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),
-        limit: limit,
+        limit,
         f_name: "Integer.assign(Integer)",
         g_name: "Integer.assign(\\\\&Integer)",
         title: "Integer.assign(Integer) evaluation strategy",
@@ -251,7 +250,7 @@ pub fn benchmark_random_integer_assign_evaluation_strategy(
         x_cons: &(|&(ref x, ref y)| (gmp_integer_to_native(x), gmp_integer_to_native(y))),
         y_cons: &(|&(ref x, ref y)| (gmp_integer_to_native(x), gmp_integer_to_native(y))),
         x_param: &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),
-        limit: limit,
+        limit,
         f_name: "Integer.assign(Integer)",
         g_name: "Integer.assign(\\\\&Integer)",
         title: "Integer.assign(Integer) evaluation strategy",

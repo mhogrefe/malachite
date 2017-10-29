@@ -1,7 +1,7 @@
 use integer::Integer;
+use malachite_base::traits::NegAssign;
 use std::mem::swap;
 use std::ops::{Sub, SubAssign};
-use traits::NegAssign;
 
 /// Subtracts an `Integer` from an `Integer`, taking both `Integer`s by value.
 ///

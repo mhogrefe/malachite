@@ -1,16 +1,21 @@
 use natural::Natural;
-use traits::Assign;
+use malachite_base::traits::Assign;
 
 /// Assigns a `Natural` to another `Natural`, taking the `Natural` on the RHS by value.
 ///
 /// # Example
 /// ```
-/// use malachite_gmp::natural::Natural;
-/// use malachite_gmp::traits::Assign;
+/// extern crate malachite_base;
+/// extern crate malachite_gmp;
 ///
-/// let mut x = Natural::from(456u32);
-/// x.assign(Natural::from(123u32));
-/// assert_eq!(x.to_string(), "123");
+/// use malachite_base::traits::Assign;
+/// use malachite_gmp::natural::Natural;
+///
+/// fn main() {
+///     let mut x = Natural::from(456u32);
+///     x.assign(Natural::from(123u32));
+///     assert_eq!(x.to_string(), "123");
+/// }
 /// ```
 impl Assign<Natural> for Natural {
     fn assign(&mut self, other: Natural) {
@@ -22,12 +27,17 @@ impl Assign<Natural> for Natural {
 ///
 /// # Example
 /// ```
-/// use malachite_gmp::natural::Natural;
-/// use malachite_gmp::traits::Assign;
+/// extern crate malachite_base;
+/// extern crate malachite_gmp;
 ///
-/// let mut x = Natural::from(456u32);
-/// x.assign(&Natural::from(123u32));
-/// assert_eq!(x.to_string(), "123");
+/// use malachite_base::traits::Assign;
+/// use malachite_gmp::natural::Natural;
+///
+/// fn main() {
+///     let mut x = Natural::from(456u32);
+///     x.assign(&Natural::from(123u32));
+///     assert_eq!(x.to_string(), "123");
+/// }
 /// ```
 impl<'a> Assign<&'a Natural> for Natural {
     fn assign(&mut self, other: &'a Natural) {

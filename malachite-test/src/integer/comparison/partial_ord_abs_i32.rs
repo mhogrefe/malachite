@@ -1,8 +1,7 @@
 use common::gmp_integer_to_native;
+use malachite_base::traits::PartialOrdAbs;
 use malachite_gmp::integer as gmp;
-use malachite_gmp::traits::PartialOrdAbs as gmp_ord_abs;
 use malachite_native::integer as native;
-use malachite_native::traits::PartialOrdAbs as native_ord_abs;
 use rust_wheels::benchmarks::{BenchmarkOptions2, benchmark_2};
 use rust_wheels::iterators::common::EXAMPLE_SEED;
 use rust_wheels::iterators::general::random_x;
@@ -38,7 +37,7 @@ pub fn demo_random_integer_partial_cmp_abs_i32(limit: usize) {
 
 pub fn demo_exhaustive_i32_partial_cmp_abs_integer(limit: usize) {
     for (i, n) in exhaustive_pairs(exhaustive_i::<i32>(), exhaustive_integers()).take(limit) {
-        match gmp_ord_abs::partial_cmp_abs(&i, &n).unwrap() {
+        match PartialOrdAbs::partial_cmp_abs(&i, &n).unwrap() {
             Ordering::Less => println!("|{}| < |{}|", i, n),
             Ordering::Equal => println!("|{}| = |{}|", i, n),
             Ordering::Greater => println!("|{}| > |{}|", i, n),
@@ -53,7 +52,7 @@ pub fn demo_random_i32_partial_cmp_abs_integer(limit: usize) {
         &(|seed| random_integers(seed, 32)),
     ).take(limit)
     {
-        match gmp_ord_abs::partial_cmp_abs(&i, &n).unwrap() {
+        match PartialOrdAbs::partial_cmp_abs(&i, &n).unwrap() {
             Ordering::Less => println!("|{}| < |{}|", i, n),
             Ordering::Equal => println!("|{}| = |{}|", i, n),
             Ordering::Greater => println!("|{}| > |{}|", i, n),
@@ -70,7 +69,7 @@ pub fn benchmark_exhaustive_integer_partial_cmp_abs_i32(limit: usize, file_name:
         x_cons: &(|p| p.clone()),
         y_cons: &(|&(ref n, i)| (gmp_integer_to_native(n), i)),
         x_param: &(|&(ref n, _)| n.significant_bits() as usize),
-        limit: limit,
+        limit,
         f_name: "malachite-gmp",
         g_name: "malachite-native",
         title: "Integer.partial\\\\_cmp\\\\_abs(\\\\&i32)",
@@ -93,7 +92,7 @@ pub fn benchmark_random_integer_partial_cmp_abs_i32(limit: usize, scale: u32, fi
         x_cons: &(|p| p.clone()),
         y_cons: &(|&(ref n, i)| (gmp_integer_to_native(n), i)),
         x_param: &(|&(ref n, _)| n.significant_bits() as usize),
-        limit: limit,
+        limit,
         f_name: "malachite-gmp",
         g_name: "malachite-native",
         title: "Integer.partial\\\\_cmp\\\\_abs(\\\\&i32)",
@@ -107,12 +106,12 @@ pub fn benchmark_exhaustive_i32_partial_cmp_abs_integer(limit: usize, file_name:
     println!("benchmarking exhaustive i32.partial_cmp_abs(&Integer)");
     benchmark_2(BenchmarkOptions2 {
         xs: exhaustive_pairs(exhaustive_i::<i32>(), exhaustive_integers()),
-        function_f: &(|(i, n): (i32, gmp::Integer)| gmp_ord_abs::partial_cmp_abs(&i, &n)),
-        function_g: &(|(i, n): (i32, native::Integer)| native_ord_abs::partial_cmp_abs(&i, &n)),
+        function_f: &(|(i, n): (i32, gmp::Integer)| PartialOrdAbs::partial_cmp_abs(&i, &n)),
+        function_g: &(|(i, n): (i32, native::Integer)| PartialOrdAbs::partial_cmp_abs(&i, &n)),
         x_cons: &(|p| p.clone()),
         y_cons: &(|&(i, ref n)| (i, gmp_integer_to_native(n))),
         x_param: &(|&(_, ref n)| n.significant_bits() as usize),
-        limit: limit,
+        limit,
         f_name: "malachite-gmp",
         g_name: "malachite-native",
         title: "i32.partial\\\\_cmp\\\\_abs(\\\\&Integer)",
@@ -130,12 +129,12 @@ pub fn benchmark_random_i32_partial_cmp_abs_integer(limit: usize, scale: u32, fi
             &(|seed| random_x::<i32>(seed)),
             &(|seed| random_integers(seed, scale)),
         ),
-        function_f: &(|(i, n): (i32, gmp::Integer)| gmp_ord_abs::partial_cmp_abs(&i, &n)),
-        function_g: &(|(i, n): (i32, native::Integer)| native_ord_abs::partial_cmp_abs(&i, &n)),
+        function_f: &(|(i, n): (i32, gmp::Integer)| PartialOrdAbs::partial_cmp_abs(&i, &n)),
+        function_g: &(|(i, n): (i32, native::Integer)| PartialOrdAbs::partial_cmp_abs(&i, &n)),
         x_cons: &(|p| p.clone()),
         y_cons: &(|&(i, ref n)| (i, gmp_integer_to_native(n))),
         x_param: &(|&(_, ref n)| n.significant_bits() as usize),
-        limit: limit,
+        limit,
         f_name: "malachite-gmp",
         g_name: "malachite-native",
         title: "i32.partial\\\\_cmp\\\\_abs(\\\\&Integer)",

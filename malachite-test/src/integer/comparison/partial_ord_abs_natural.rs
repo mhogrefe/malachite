@@ -1,9 +1,8 @@
 use common::{gmp_integer_to_native, gmp_integer_to_rugint, gmp_natural_to_native,
              gmp_natural_to_rugint_integer};
+use malachite_base::traits::PartialOrdAbs;
 use malachite_gmp as gmp;
-use malachite_gmp::traits::PartialOrdAbs as gmp_partial_ord_abs;
 use malachite_native as native;
-use malachite_native::traits::PartialOrdAbs as native_partial_ord_abs;
 use rugint;
 use rust_wheels::benchmarks::{BenchmarkOptions3, benchmark_3};
 use rust_wheels::iterators::common::EXAMPLE_SEED;
@@ -77,7 +76,7 @@ pub fn benchmark_exhaustive_integer_partial_cmp_abs_natural(limit: usize, file_n
         y_cons: &(|&(ref x, ref y)| (gmp_integer_to_native(x), gmp_natural_to_native(y))),
         z_cons: &(|&(ref x, ref y)| (gmp_integer_to_rugint(x), gmp_natural_to_rugint_integer(y))),
         x_param: &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),
-        limit: limit,
+        limit,
         f_name: "malachite-gmp",
         g_name: "malachite-native",
         h_name: "rugint",
@@ -107,7 +106,7 @@ pub fn benchmark_random_integer_partial_cmp_abs_natural(limit: usize, scale: u32
         y_cons: &(|&(ref x, ref y)| (gmp_integer_to_native(x), gmp_natural_to_native(y))),
         z_cons: &(|&(ref x, ref y)| (gmp_integer_to_rugint(x), gmp_natural_to_rugint_integer(y))),
         x_param: &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),
-        limit: limit,
+        limit,
         f_name: "malachite-gmp",
         g_name: "malachite-native",
         h_name: "rugint",
@@ -133,7 +132,7 @@ pub fn benchmark_exhaustive_natural_partial_cmp_abs_integer(limit: usize, file_n
         y_cons: &(|&(ref x, ref y)| (gmp_natural_to_native(x), gmp_integer_to_native(y))),
         z_cons: &(|&(ref x, ref y)| (gmp_natural_to_rugint_integer(x), gmp_integer_to_rugint(y))),
         x_param: &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),
-        limit: limit,
+        limit,
         f_name: "malachite-gmp",
         g_name: "malachite-native",
         h_name: "rugint",
@@ -163,7 +162,7 @@ pub fn benchmark_random_natural_partial_cmp_abs_integer(limit: usize, scale: u32
         y_cons: &(|&(ref x, ref y)| (gmp_natural_to_native(x), gmp_integer_to_native(y))),
         z_cons: &(|&(ref x, ref y)| (gmp_natural_to_rugint_integer(x), gmp_integer_to_rugint(y))),
         x_param: &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),
-        limit: limit,
+        limit,
         f_name: "malachite-gmp",
         g_name: "malachite-native",
         h_name: "rugint",

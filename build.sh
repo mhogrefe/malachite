@@ -1,5 +1,12 @@
 #!/bin/bash
-cd malachite-gmp &&
+cd malachite-base &&
+cargo update &&
+cargo fmt &&
+#rustup run nightly cargo clippy &&
+cargo test --release &&
+cargo doc &&
+cargo rustc --release -- --emit mir &&
+cd ../malachite-gmp &&
 cargo update &&
 cargo fmt &&
 #rustup run nightly cargo clippy &&

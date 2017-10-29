@@ -1,16 +1,21 @@
 use integer::Integer;
-use traits::{Assign, NegAssign};
+use malachite_base::traits::{Assign, NegAssign};
 
 /// Assigns an `i64` to an `Integer`.
 ///
 /// # Examples
 /// ```
-/// use malachite_gmp::integer::Integer;
-/// use malachite_gmp::traits::Assign;
+/// extern crate malachite_base;
+/// extern crate malachite_gmp;
 ///
-/// let mut x = Integer::from(-123);
-/// x.assign(-456i64);
-/// assert_eq!(x.to_string(), "-456");
+/// use malachite_base::traits::Assign;
+/// use malachite_gmp::integer::Integer;
+///
+/// fn main() {
+///     let mut x = Integer::from(-123);
+///     x.assign(-456i64);
+///     assert_eq!(x.to_string(), "-456");
+/// }
 /// ```
 impl Assign<i64> for Integer {
     fn assign(&mut self, other: i64) {

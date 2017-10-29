@@ -1,6 +1,6 @@
 use gmp_mpfr_sys::gmp::{self, mpz_t};
 use integer::Integer::{self, Large, Small};
-use integer::make_u64;
+use malachite_base::num::make_u64;
 use std::cmp::Ordering;
 use std::mem;
 
