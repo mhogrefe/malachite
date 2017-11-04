@@ -143,8 +143,8 @@ impl<'a, 'b, 'c> AddMul<&'a Natural, &'b Natural> for &'c Natural {
     type Output = Natural;
 
     fn add_mul(self, b: &'a Natural, c: &'b Natural) -> Natural {
-        if *b == 0 {
-            self.clone()
+        if let Small(small_b) = *b {
+            self.add_mul(c, small_b)
         } else if let Small(small_c) = *c {
             self.add_mul(b, small_c)
         } else {
@@ -154,22 +154,11 @@ impl<'a, 'b, 'c> AddMul<&'a Natural, &'b Natural> for &'c Natural {
                     Small(small) => gmp::mpz_init_set_ui(&mut result, small.into()),
                     Large(ref large) => gmp::mpz_init_set(&mut result, large),
                 }
-                match b {
-                    &Small(small_b) => {
-                        let mut large_b: mpz_t = mem::uninitialized();
-                        gmp::mpz_init_set_ui(&mut large_b, small_b.into());
-                        if let &Large(ref large_c) = c {
-                            gmp::mpz_addmul(&mut result, &large_b, large_c);
-                        } else {
-                            unreachable!()
-                        }
-                    }
-                    &Large(ref large_b) => {
-                        if let &Large(ref large_c) = c {
-                            gmp::mpz_addmul(&mut result, large_b, large_c)
-                        } else {
-                            unreachable!()
-                        }
+                if let Large(ref large_b) = *b {
+                    if let &Large(ref large_c) = c {
+                        gmp::mpz_addmul(&mut result, large_b, large_c)
+                    } else {
+                        unreachable!()
                     }
                 }
                 Large(result)
@@ -293,18 +282,9 @@ impl<'a, 'b> AddMulAssign<&'a Natural, &'b Natural> for Natural {
         } else {
             let large_self = self.promote_in_place();
             unsafe {
-                match b {
-                    &Small(small) => {
-                        let mut large_b: mpz_t = mem::uninitialized();
-                        gmp::mpz_init_set_ui(&mut large_b, small.into());
-                        if let &Large(ref large_c) = c {
-                            gmp::mpz_addmul(large_self, &large_b, large_c);
-                        }
-                    }
-                    &Large(ref large_b) => {
-                        if let &Large(ref large_c) = c {
-                            gmp::mpz_addmul(large_self, large_b, large_c)
-                        }
+                if let Large(ref large_b) = *b {
+                    if let &Large(ref large_c) = c {
+                        gmp::mpz_addmul(large_self, large_b, large_c)
                     }
                 }
             }

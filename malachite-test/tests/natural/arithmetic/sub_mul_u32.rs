@@ -43,28 +43,28 @@ fn test_sub_mul_assign_u32() {
 
 
 #[test]
-#[should_panic(expected = "Natural sub_mul_assign can not have a negative result")]
+#[should_panic(expected = "Natural sub_mul_assign cannot have a negative result")]
 fn sub_mul_assign_fail_native_1() {
     let mut x = native::Natural::from_str("123").unwrap();
     x.sub_mul_assign(&native::Natural::from_str("5").unwrap(), 100);
 }
 
 #[test]
-#[should_panic(expected = "Natural sub_mul_assign can not have a negative result")]
+#[should_panic(expected = "Natural sub_mul_assign cannot have a negative result")]
 fn sub_mul_assign_fail_native_2() {
     let mut x = native::Natural::from_str("1000000000000").unwrap();
     x.sub_mul_assign(&native::Natural::from_str("1000000000000").unwrap(), 100);
 }
 
 #[test]
-#[should_panic(expected = "Natural sub_mul_assign can not have a negative result")]
+#[should_panic(expected = "Natural sub_mul_assign cannot have a negative result")]
 fn sub_mul_assign_fail_gmp_1() {
     let mut x = gmp::Natural::from_str("123").unwrap();
     x.sub_mul_assign(&gmp::Natural::from_str("5").unwrap(), 100);
 }
 
 #[test]
-#[should_panic(expected = "Natural sub_mul_assign can not have a negative result")]
+#[should_panic(expected = "Natural sub_mul_assign cannot have a negative result")]
 fn sub_mul_assign_fail_gmp_2() {
     let mut x = gmp::Natural::from_str("1000000000000").unwrap();
     x.sub_mul_assign(&gmp::Natural::from_str("1000000000000").unwrap(), 100);
@@ -72,7 +72,7 @@ fn sub_mul_assign_fail_gmp_2() {
 
 #[test]
 fn test_sub_mul_u32() {
-    let test = |u, v, c, out| {
+    let test = |u, v, c: u32, out| {
         let on = native::Natural::from_str(u).unwrap().sub_mul(
             &native::Natural::from_str(v).unwrap(),
             c,
@@ -181,7 +181,7 @@ fn sub_mul_u32_properties() {
         let a = &gmp_natural_to_native(&gmp_a);
         let b = &gmp_natural_to_native(&gmp_b);
         assert_eq!(a.sub_mul(b, 0), Some(a.clone()));
-        assert_eq!(a.sub_mul(b, 1), a - b, "a: {}, b: {}", a, b);
+        assert_eq!(a.sub_mul(b, 1), a - b);
     };
 
     for (a, b, c) in exhaustive_triples(

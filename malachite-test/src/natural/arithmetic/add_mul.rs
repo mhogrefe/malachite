@@ -1143,7 +1143,7 @@ pub fn benchmark_random_natural_add_mul_val_val_ref_algorithms(
     scale: u32,
     file_name: &str,
 ) {
-    println!("benchmarking exhaustive Natural.add_mul(Natural, &Natural) algorithms");
+    println!("benchmarking random Natural.add_mul(Natural, &Natural) algorithms");
     benchmark_2(BenchmarkOptions2 {
         xs: random_triples_from_single(random_naturals(&EXAMPLE_SEED, scale)),
         function_f: &(|(a, b, c): (native::Natural, native::Natural, native::Natural)| {
@@ -1223,7 +1223,7 @@ pub fn benchmark_random_natural_add_mul_val_ref_val_algorithms(
     scale: u32,
     file_name: &str,
 ) {
-    println!("benchmarking exhaustive Natural.add_mul(&Natural, Natural) algorithms");
+    println!("benchmarking random Natural.add_mul(&Natural, Natural) algorithms");
     benchmark_2(BenchmarkOptions2 {
         xs: random_triples_from_single(random_naturals(&EXAMPLE_SEED, scale)),
         function_f: &(|(a, b, c): (native::Natural, native::Natural, native::Natural)| {
@@ -1303,7 +1303,7 @@ pub fn benchmark_random_natural_add_mul_val_ref_ref_algorithms(
     scale: u32,
     file_name: &str,
 ) {
-    println!("benchmarking exhaustive Natural.add_mul(&Natural, &Natural) algorithms");
+    println!("benchmarking random Natural.add_mul(&Natural, &Natural) algorithms");
     benchmark_2(BenchmarkOptions2 {
         xs: random_triples_from_single(random_naturals(&EXAMPLE_SEED, scale)),
         function_f: &(|(a, b, c): (native::Natural, native::Natural, native::Natural)| {
@@ -1385,7 +1385,7 @@ pub fn benchmark_random_natural_add_mul_ref_ref_ref_algorithms(
     scale: u32,
     file_name: &str,
 ) {
-    println!("benchmarking exhaustive (&Natural).add_mul(&Natural, &Natural) algorithms");
+    println!("benchmarking random (&Natural).add_mul(&Natural, &Natural) algorithms");
     benchmark_2(BenchmarkOptions2 {
         xs: random_triples_from_single(random_naturals(&EXAMPLE_SEED, scale)),
         function_f: &(|(a, b, c): (native::Natural, native::Natural, native::Natural)| {

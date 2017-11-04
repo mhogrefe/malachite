@@ -71,6 +71,7 @@ use malachite_test::natural::arithmetic::neg::*;
 use malachite_test::natural::arithmetic::shl_u32::*;
 use malachite_test::natural::arithmetic::sub::*;
 use malachite_test::natural::arithmetic::sub_u32::*;
+use malachite_test::natural::arithmetic::sub_mul::*;
 use malachite_test::natural::arithmetic::sub_mul_u32::*;
 use malachite_test::natural::comparison::eq::*;
 use malachite_test::natural::comparison::hash::*;
@@ -528,6 +529,11 @@ fn main() {
                 "exhaustive_natural_sub_u32" => demo_exhaustive_natural_sub_u32(limit),
                 "exhaustive_natural_sub_u32_ref" => demo_exhaustive_natural_sub_u32_ref(limit),
                 "exhaustive_u32_sub_natural" => demo_exhaustive_u32_sub_natural(limit),
+                "exhaustive_natural_sub_mul_assign" => demo_exhaustive_natural_sub_mul_assign(
+                    limit,
+                ),
+                "exhaustive_natural_sub_mul" => demo_exhaustive_natural_sub_mul(limit),
+                "exhaustive_natural_sub_mul_ref" => demo_exhaustive_natural_sub_mul_ref(limit),
                 "exhaustive_natural_sub_mul_assign_u32" => {
                     demo_exhaustive_natural_sub_mul_assign_u32(limit)
                 }
@@ -880,6 +886,9 @@ fn main() {
                 "random_natural_sub_u32" => demo_random_natural_sub_u32(limit),
                 "random_natural_sub_u32_ref" => demo_random_natural_sub_u32_ref(limit),
                 "random_u32_sub_natural" => demo_random_u32_sub_natural(limit),
+                "random_natural_sub_mul_assign" => demo_random_natural_sub_mul_assign(limit),
+                "random_natural_sub_mul" => demo_random_natural_sub_mul(limit),
+                "random_natural_sub_mul_ref" => demo_random_natural_sub_mul_ref(limit),
                 "random_natural_sub_mul_assign_u32" => demo_random_natural_sub_mul_assign_u32(
                     limit,
                 ),
@@ -1619,6 +1628,24 @@ fn main() {
                 }
                 "exhaustive_u32_sub_natural" => {
                     benchmark_exhaustive_u32_sub_natural(limit, "temp.gp")
+                }
+                "exhaustive_natural_sub_mul_assign" => {
+                    benchmark_exhaustive_natural_sub_mul_assign(limit, "temp.gp")
+                }
+                "exhaustive_natural_sub_mul_assign_algorithms" => {
+                    benchmark_exhaustive_natural_sub_mul_assign_algorithms(limit, "temp.gp")
+                }
+                "exhaustive_natural_sub_mul" => {
+                    benchmark_exhaustive_natural_sub_mul(limit, "temp.gp")
+                }
+                "exhaustive_natural_sub_mul_evaluation_strategy" => {
+                    benchmark_exhaustive_natural_sub_mul_evaluation_strategy(limit, "temp.gp")
+                }
+                "exhaustive_natural_sub_mul_algorithms" => {
+                    benchmark_exhaustive_natural_sub_mul_algorithms(limit, "temp.gp")
+                }
+                "exhaustive_natural_sub_mul_ref_algorithms" => {
+                    benchmark_exhaustive_natural_sub_mul_ref_algorithms(limit, "temp.gp")
                 }
                 "exhaustive_natural_sub_mul_assign_u32" => {
                     benchmark_exhaustive_natural_sub_mul_assign_u32(limit, "temp.gp")
@@ -2396,6 +2423,24 @@ fn main() {
                 "random_u32_sub_natural" => {
                     benchmark_random_u32_sub_natural(limit, 1024, "temp.gp")
                 }
+                "random_natural_sub_mul_assign" => {
+                    benchmark_random_natural_sub_mul_assign(limit, 1024, "temp.gp")
+                }
+                "random_natural_sub_mul_assign_algorithms" => {
+                    benchmark_random_natural_sub_mul_assign_algorithms(limit, 1024, "temp.gp")
+                }
+                "random_natural_sub_mul" => {
+                    benchmark_random_natural_sub_mul(limit, 1024, "temp.gp")
+                }
+                "random_natural_sub_mul_evaluation_strategy" => {
+                    benchmark_random_natural_sub_mul_evaluation_strategy(limit, 1024, "temp.gp")
+                }
+                "random_natural_sub_mul_algorithms" => {
+                    benchmark_random_natural_sub_mul_algorithms(limit, 1024, "temp.gp")
+                }
+                "random_natural_sub_mul_ref_algorithms" => {
+                    benchmark_random_natural_sub_mul_ref_algorithms(limit, 1024, "temp.gp")
+                }
                 "random_natural_sub_mul_assign_u32" => {
                     benchmark_random_natural_sub_mul_assign_u32(limit, 1024, "temp.gp")
                 }
@@ -2952,6 +2997,18 @@ fn main() {
                         "exhaustive_natural_sub_u32_ref.gp",
                     );
                     benchmark_exhaustive_u32_sub_natural(100000, "exhaustive_u32_sub_natural.gp");
+                    let s = "exhaustive_natural_sub_mul_assign.gp";
+                    benchmark_exhaustive_natural_sub_mul_assign(100000, s);
+                    let s = "exhaustive_natural_sub_mul_assign_algorithms.gp";
+                    benchmark_exhaustive_natural_sub_mul_assign_algorithms(100000, s);
+                    let s = "exhaustive_natural_sub_mul.gp";
+                    benchmark_exhaustive_natural_sub_mul(100000, s);
+                    let s = "exhaustive_natural_sub_mul_evaluation_strategy.gp";
+                    benchmark_exhaustive_natural_sub_mul_evaluation_strategy(100000, s);
+                    let s = "exhaustive_natural_sub_mul_algorithms.gp";
+                    benchmark_exhaustive_natural_sub_mul_algorithms(100000, s);
+                    let s = "exhaustive_natural_sub_mul_ref_algorithms.gp";
+                    benchmark_exhaustive_natural_sub_mul_ref_algorithms(100000, s);
                     let s = "exhaustive_natural_sub_mul_assign_u32.gp";
                     benchmark_exhaustive_natural_sub_mul_assign_u32(100000, s);
                     let s = "exhaustive_natural_sub_mul_assign_u32_algorithms.gp";
@@ -3628,6 +3685,18 @@ fn main() {
                         "random_natural_sub_u32_ref.gp",
                     );
                     benchmark_random_u32_sub_natural(100000, 1024, "random_u32_sub_natural.gp");
+                    let s = "random_natural_sub_mul_assign.gp";
+                    benchmark_random_natural_sub_mul_assign(100000, 1024, s);
+                    let s = "random_natural_sub_mul_assign_algorithms.gp";
+                    benchmark_random_natural_sub_mul_assign_algorithms(100000, 1024, s);
+                    let s = "random_natural_sub_mul.gp";
+                    benchmark_random_natural_sub_mul(100000, 1024, s);
+                    let s = "random_natural_sub_mul_evaluation_strategy.gp";
+                    benchmark_random_natural_sub_mul_evaluation_strategy(100000, 1024, s);
+                    let s = "random_natural_sub_mul_algorithms.gp";
+                    benchmark_random_natural_sub_mul_algorithms(100000, 1024, s);
+                    let s = "random_natural_sub_mul_ref_algorithms.gp";
+                    benchmark_random_natural_sub_mul_ref_algorithms(100000, 1024, s);
                     let s = "random_natural_sub_mul_assign_u32.gp";
                     benchmark_random_natural_sub_mul_assign_u32(100000, 1024, s);
                     let s = "random_natural_sub_mul_assign_u32_algorithms.gp";

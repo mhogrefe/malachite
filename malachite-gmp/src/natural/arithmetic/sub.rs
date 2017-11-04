@@ -24,9 +24,9 @@ impl<'a> Sub<&'a Natural> for Natural {
 
     fn sub(mut self, other: &'a Natural) -> Option<Natural> {
         if sub_assign_helper(&mut self, other) {
-            Some(self)
-        } else {
             None
+        } else {
+            Some(self)
         }
     }
 }
@@ -91,7 +91,7 @@ impl<'a, 'b> Sub<&'a Natural> for &'b Natural {
 /// ```
 impl<'a> SubAssign<&'a Natural> for Natural {
     fn sub_assign(&mut self, other: &'a Natural) {
-        if !sub_assign_helper(self, other) {
+        if sub_assign_helper(self, other) {
             panic!("Cannot subtract a Natural from a smaller Natural");
         }
     }
@@ -99,22 +99,22 @@ impl<'a> SubAssign<&'a Natural> for Natural {
 
 fn sub_assign_helper<'a>(x: &mut Natural, y: &'a Natural) -> bool {
     if *y == 0 {
-        true
+        false
     } else if let Small(y) = *y {
         sub_assign_u32_helper(x, y)
     } else if let Small(_) = *x {
-        false
+        true
     } else {
         match (&mut (*x), y) {
             (&mut Large(ref mut x), &Large(ref y)) => unsafe {
                 gmp::mpz_sub(x, x, y);
                 if gmp::mpz_sgn(x) == -1 {
-                    return false;
+                    return true;
                 }
             },
             _ => unreachable!(),
         }
         x.demote_if_small();
-        true
+        false
     }
 }

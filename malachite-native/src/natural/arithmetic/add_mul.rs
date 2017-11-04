@@ -202,29 +202,16 @@ impl<'a, 'b, 'c> AddMul<&'a Natural, &'b Natural> for &'c Natural {
                 let mut result_limbs = self.to_limbs_le();
                 if let &Large(ref c_limbs) = c {
                     let mut self_sign = false;
-                    match b {
-                        &Small(small_b) => {
-                            mpz_aorsmul(
-                                &mut self_sign,
-                                &mut result_limbs,
-                                false,
-                                &[small_b],
-                                false,
-                                c_limbs,
-                                true,
-                            );
-                        }
-                        &Large(ref b_limbs) => {
-                            mpz_aorsmul(
-                                &mut self_sign,
-                                &mut result_limbs,
-                                false,
-                                b_limbs,
-                                false,
-                                c_limbs,
-                                true,
-                            );
-                        }
+                    if let &Large(ref b_limbs) = b {
+                        mpz_aorsmul(
+                            &mut self_sign,
+                            &mut result_limbs,
+                            false,
+                            b_limbs,
+                            false,
+                            c_limbs,
+                            true,
+                        );
                     }
                     assert!(!self_sign, "{} {} {}", self, b, c);
                 }
@@ -279,29 +266,16 @@ impl<'a> AddMulAssign<Natural, Natural> for Natural {
                 let self_limbs = self.promote_in_place();
                 if let Large(ref c_limbs) = c {
                     let mut self_sign = false;
-                    match b {
-                        Small(small_b) => {
-                            mpz_aorsmul(
-                                &mut self_sign,
-                                self_limbs,
-                                false,
-                                &[small_b],
-                                false,
-                                c_limbs,
-                                true,
-                            );
-                        }
-                        Large(ref b_limbs) => {
-                            mpz_aorsmul(
-                                &mut self_sign,
-                                self_limbs,
-                                false,
-                                b_limbs,
-                                false,
-                                c_limbs,
-                                true,
-                            );
-                        }
+                    if let Large(ref b_limbs) = b {
+                        mpz_aorsmul(
+                            &mut self_sign,
+                            self_limbs,
+                            false,
+                            b_limbs,
+                            false,
+                            c_limbs,
+                            true,
+                        );
                     }
                     assert!(!self_sign);
                 }
@@ -354,29 +328,16 @@ impl<'a> AddMulAssign<Natural, &'a Natural> for Natural {
                 let self_limbs = self.promote_in_place();
                 if let &Large(ref c_limbs) = c {
                     let mut self_sign = false;
-                    match b {
-                        Small(small_b) => {
-                            mpz_aorsmul(
-                                &mut self_sign,
-                                self_limbs,
-                                false,
-                                &[small_b],
-                                false,
-                                c_limbs,
-                                true,
-                            );
-                        }
-                        Large(ref b_limbs) => {
-                            mpz_aorsmul(
-                                &mut self_sign,
-                                self_limbs,
-                                false,
-                                b_limbs,
-                                false,
-                                c_limbs,
-                                true,
-                            );
-                        }
+                    if let Large(ref b_limbs) = b {
+                        mpz_aorsmul(
+                            &mut self_sign,
+                            self_limbs,
+                            false,
+                            b_limbs,
+                            false,
+                            c_limbs,
+                            true,
+                        );
                     }
                     assert!(!self_sign);
                 }
@@ -429,29 +390,16 @@ impl<'a> AddMulAssign<&'a Natural, Natural> for Natural {
                 let self_limbs = self.promote_in_place();
                 if let Large(ref c_limbs) = c {
                     let mut self_sign = false;
-                    match b {
-                        &Small(small_b) => {
-                            mpz_aorsmul(
-                                &mut self_sign,
-                                self_limbs,
-                                false,
-                                &[small_b],
-                                false,
-                                c_limbs,
-                                true,
-                            );
-                        }
-                        &Large(ref b_limbs) => {
-                            mpz_aorsmul(
-                                &mut self_sign,
-                                self_limbs,
-                                false,
-                                b_limbs,
-                                false,
-                                c_limbs,
-                                true,
-                            );
-                        }
+                    if let &Large(ref b_limbs) = b {
+                        mpz_aorsmul(
+                            &mut self_sign,
+                            self_limbs,
+                            false,
+                            b_limbs,
+                            false,
+                            c_limbs,
+                            true,
+                        );
                     }
                     assert!(!self_sign);
                 }
@@ -504,29 +452,16 @@ impl<'a, 'b> AddMulAssign<&'a Natural, &'b Natural> for Natural {
                 let self_limbs = self.promote_in_place();
                 if let &Large(ref c_limbs) = c {
                     let mut self_sign = false;
-                    match b {
-                        &Small(small_b) => {
-                            mpz_aorsmul(
-                                &mut self_sign,
-                                self_limbs,
-                                false,
-                                &[small_b],
-                                false,
-                                c_limbs,
-                                true,
-                            );
-                        }
-                        &Large(ref b_limbs) => {
-                            mpz_aorsmul(
-                                &mut self_sign,
-                                self_limbs,
-                                false,
-                                b_limbs,
-                                false,
-                                c_limbs,
-                                true,
-                            );
-                        }
+                    if let &Large(ref b_limbs) = b {
+                        mpz_aorsmul(
+                            &mut self_sign,
+                            self_limbs,
+                            false,
+                            b_limbs,
+                            false,
+                            c_limbs,
+                            true,
+                        );
                     }
                     assert!(!self_sign);
                 }
@@ -541,7 +476,7 @@ fn mpn_cmp_twosizes_lt(x: &[u32], y: &[u32]) -> bool {
     mpn_cmp_helper(x, y) == Ordering::Less
 }
 
-fn mpz_aorsmul(
+pub(crate) fn mpz_aorsmul(
     w_sign: &mut bool,
     w: &mut Vec<u32>,
     x_sign: bool,
@@ -574,7 +509,7 @@ fn mpz_aorsmul(
     if wsize == 0 {
         // Nothing to add to, just set w=x*y.  No w==x or w==y overlap here, since we know x,y != 0
         // but w == 0.
-        let high = mpn_mul(w, &x[0..xsize], &y[0..ysize]);
+        let high = mpn_mul(w, x, y);
         if high == 0 {
             tsize -= 1;
         }
@@ -583,7 +518,7 @@ fn mpz_aorsmul(
     }
 
     let mut t = vec![0; tsize];
-    let high = mpn_mul(&mut t, &x[0..xsize], &y[0..ysize]);
+    let high = mpn_mul(&mut t, x, y);
     if high == 0 {
         tsize -= 1;
     }

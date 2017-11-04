@@ -89,6 +89,7 @@ pub mod natural {
         pub mod shl_u32;
         pub mod sub;
         pub mod sub_u32;
+        pub mod sub_mul;
         pub mod sub_mul_u32;
     }
     pub mod comparison {

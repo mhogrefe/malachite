@@ -30,7 +30,9 @@ pub fn demo_random_natural_sub_mul_assign_u32(limit: usize) {
         &(|seed| random_naturals(seed, 32)),
         &(|seed| random_naturals(seed, 32)),
         &(|seed| random_x(seed)),
-    ).filter(|&(ref a, ref b, c)| a >= &(b * c))
+    ).filter(|&(ref a, ref b, c): &(gmp::Natural, gmp::Natural, u32)| {
+        a >= &(b * c)
+    })
         .take(limit)
     {
         let a_old = a.clone();
@@ -56,7 +58,7 @@ pub fn demo_random_natural_sub_mul_u32(limit: usize) {
         &EXAMPLE_SEED,
         &(|seed| random_naturals(seed, 32)),
         &(|seed| random_naturals(seed, 32)),
-        &(|seed| random_x(seed)),
+        &(|seed| random_x::<u32>(seed)),
     ).take(limit)
     {
         let a_old = a.clone();
@@ -87,7 +89,7 @@ pub fn demo_random_natural_sub_mul_u32_ref(limit: usize) {
         &EXAMPLE_SEED,
         &(|seed| random_naturals(seed, 32)),
         &(|seed| random_naturals(seed, 32)),
-        &(|seed| random_x(seed)),
+        &(|seed| random_x::<u32>(seed)),
     ).take(limit)
     {
         let a_old = a.clone();
@@ -163,7 +165,7 @@ pub fn benchmark_exhaustive_natural_sub_mul_assign_u32_algorithms(limit: usize, 
         function_f: &(|(mut a, b, c): (native::Natural, native::Natural, u32)| {
                           a.sub_mul_assign(&b, c)
                       }),
-        function_g: &(|(mut a, b, c): (native::Natural, native::Natural, u32)| a -= &(b * c)),
+        function_g: &(|(mut a, b, c): (native::Natural, native::Natural, u32)| a -= &(&b * c)),
         x_cons: &(|&(ref a, ref b, c)| (gmp_natural_to_native(a), gmp_natural_to_native(b), c)),
         y_cons: &(|&(ref a, ref b, c)| (gmp_natural_to_native(a), gmp_natural_to_native(b), c)),
         x_param: &(|&(ref a, ref b, _)| max(a.significant_bits(), b.significant_bits()) as usize),
@@ -193,7 +195,7 @@ pub fn benchmark_random_natural_sub_mul_assign_u32_algorithms(
         function_f: &(|(mut a, b, c): (native::Natural, native::Natural, u32)| {
                           a.sub_mul_assign(&b, c)
                       }),
-        function_g: &(|(mut a, b, c): (native::Natural, native::Natural, u32)| a -= &(b * c)),
+        function_g: &(|(mut a, b, c): (native::Natural, native::Natural, u32)| a -= &(&b * c)),
         x_cons: &(|&(ref a, ref b, c)| (gmp_natural_to_native(a), gmp_natural_to_native(b), c)),
         y_cons: &(|&(ref a, ref b, c)| (gmp_natural_to_native(a), gmp_natural_to_native(b), c)),
         x_param: &(|&(ref a, ref b, _)| max(a.significant_bits(), b.significant_bits()) as usize),
@@ -314,7 +316,7 @@ pub fn benchmark_exhaustive_natural_sub_mul_u32_algorithms(limit: usize, file_na
             exhaustive_u::<u32>(),
         ),
         function_f: &(|(a, b, c): (native::Natural, native::Natural, u32)| a.sub_mul(&b, c)),
-        function_g: &(|(a, b, c): (native::Natural, native::Natural, u32)| a - &(b * c)),
+        function_g: &(|(a, b, c): (native::Natural, native::Natural, u32)| a - &(&b * c)),
         x_cons: &(|&(ref a, ref b, c)| (gmp_natural_to_native(a), gmp_natural_to_native(b), c)),
         y_cons: &(|&(ref a, ref b, c)| (gmp_natural_to_native(a), gmp_natural_to_native(b), c)),
         x_param: &(|&(ref a, ref b, _)| max(a.significant_bits(), b.significant_bits()) as usize),
@@ -338,7 +340,7 @@ pub fn benchmark_random_natural_sub_mul_u32_algorithms(limit: usize, scale: u32,
             &(|seed| random_x(seed)),
         ),
         function_f: &(|(a, b, c): (native::Natural, native::Natural, u32)| a.sub_mul(&b, c)),
-        function_g: &(|(a, b, c): (native::Natural, native::Natural, u32)| a - &(b * c)),
+        function_g: &(|(a, b, c): (native::Natural, native::Natural, u32)| a - &(&b * c)),
         x_cons: &(|&(ref a, ref b, c)| (gmp_natural_to_native(a), gmp_natural_to_native(b), c)),
         y_cons: &(|&(ref a, ref b, c)| (gmp_natural_to_native(a), gmp_natural_to_native(b), c)),
         x_param: &(|&(ref a, ref b, _)| max(a.significant_bits(), b.significant_bits()) as usize),
@@ -361,7 +363,7 @@ pub fn benchmark_exhaustive_natural_sub_mul_u32_ref_algorithms(limit: usize, fil
             exhaustive_u::<u32>(),
         ),
         function_f: &(|(a, b, c): (native::Natural, native::Natural, u32)| (&a).sub_mul(&b, c)),
-        function_g: &(|(a, b, c): (native::Natural, native::Natural, u32)| &a - &(b * c)),
+        function_g: &(|(a, b, c): (native::Natural, native::Natural, u32)| &a - &(&b * c)),
         x_cons: &(|&(ref a, ref b, c)| (gmp_natural_to_native(a), gmp_natural_to_native(b), c)),
         y_cons: &(|&(ref a, ref b, c)| (gmp_natural_to_native(a), gmp_natural_to_native(b), c)),
         x_param: &(|&(ref a, ref b, _)| max(a.significant_bits(), b.significant_bits()) as usize),
@@ -389,7 +391,7 @@ pub fn benchmark_random_natural_sub_mul_u32_ref_algorithms(
             &(|seed| random_x(seed)),
         ),
         function_f: &(|(a, b, c): (native::Natural, native::Natural, u32)| (&a).sub_mul(&b, c)),
-        function_g: &(|(a, b, c): (native::Natural, native::Natural, u32)| &a - &(b * c)),
+        function_g: &(|(a, b, c): (native::Natural, native::Natural, u32)| &a - &(&b * c)),
         x_cons: &(|&(ref a, ref b, c)| (gmp_natural_to_native(a), gmp_natural_to_native(b), c)),
         y_cons: &(|&(ref a, ref b, c)| (gmp_natural_to_native(a), gmp_natural_to_native(b), c)),
         x_param: &(|&(ref a, ref b, _)| max(a.significant_bits(), b.significant_bits()) as usize),

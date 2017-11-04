@@ -30,9 +30,9 @@ impl<'a> SubMul<&'a Natural, u32> for Natural {
 
     fn sub_mul(mut self, b: &'a Natural, c: u32) -> Option<Natural> {
         if sub_mul_assign_u32_helper(&mut self, b, c) {
-            Some(self)
-        } else {
             None
+        } else {
+            Some(self)
         }
     }
 }
@@ -120,15 +120,15 @@ impl<'a, 'b> SubMul<&'a Natural, u32> for &'b Natural {
 /// ```
 impl<'a> SubMulAssign<&'a Natural, u32> for Natural {
     fn sub_mul_assign(&mut self, b: &'a Natural, c: u32) {
-        if !sub_mul_assign_u32_helper(self, b, c) {
-            panic!("Natural sub_mul_assign can not have a negative result");
+        if sub_mul_assign_u32_helper(self, b, c) {
+            panic!("Natural sub_mul_assign cannot have a negative result");
         }
     }
 }
 
-fn sub_mul_assign_u32_helper(a: &mut Natural, b: &Natural, c: u32) -> bool {
+pub(crate) fn sub_mul_assign_u32_helper(a: &mut Natural, b: &Natural, c: u32) -> bool {
     if c == 0 || *b == 0 {
-        return true;
+        return false;
     }
     if let Small(small_b) = *b {
         if let Some(product) = small_b.checked_mul(c) {
@@ -150,5 +150,5 @@ fn sub_mul_assign_u32_helper(a: &mut Natural, b: &Natural, c: u32) -> bool {
     if valid {
         a.demote_if_small();
     }
-    valid
+    !valid
 }
