@@ -39,6 +39,8 @@ fn test_sub_mul_assign_u32() {
     test("1000000000000", "1000000000000", 0, "1000000000000");
     test("1000000000000", "1000000000000", 1, "0");
     test("4294967296", "1", 1, "4294967295");
+    test("1000000000000", "1000000000000", 1, "0");
+    test("1000000000000000000000", "1000000000000", 1000000000, "0");
 }
 
 
@@ -119,6 +121,13 @@ fn test_sub_mul_u32() {
     test("0", "1000000000000", 100, "None");
     test("4294967296", "1", 1, "Some(4294967295)");
     test("3902609153", "88817093856604", 1, "None");
+    test("1000000000000", "1000000000000", 1, "Some(0)");
+    test(
+        "1000000000000000000000",
+        "1000000000000",
+        1000000000,
+        "Some(0)",
+    );
 }
 
 #[test]
@@ -131,6 +140,7 @@ fn sub_mul_u32_properties() {
     // (&a).sub_mul(&b, c) is valid.
     // a.sub_mul_assign(&b, c), a.sub_mul(&b, c), and (&a).sub_mul(&b, c) give the same result.
     // a.sub_mul(&b, c) is equivalent to a - b * c.
+    // a.sub_mul(&b, c) is equivalent to a.sub_mul(&b, Natural::from(c))
     let natural_natural_and_u32 = |mut gmp_a: gmp::Natural, gmp_b: gmp::Natural, c: u32| {
         let mut a = gmp_natural_to_native(&gmp_a);
         let b = gmp_natural_to_native(&gmp_b);
@@ -164,15 +174,24 @@ fn sub_mul_u32_properties() {
         assert!(result.clone().map_or(true, |n| n.is_valid()));
         assert_eq!(result, oa);
 
-        assert_eq!(old_a - &(b * c), oa);
+        assert_eq!(&old_a - &(&b * c), oa);
+        assert_eq!(old_a.sub_mul(&b, &native::Natural::from(c)), result);
+    };
+
+    // n.sub_mul(n, 1) == 0
+    let single_natural = |gmp_n: gmp::Natural| {
+        let n = &gmp_natural_to_native(&gmp_n);
+        assert_eq!(n.sub_mul(n, 1), Some(native::Natural::from(0u32)));
     };
 
     // n.sub_mul(0, c) == Some(n)
     // n.sub_mul(1, c) == n - c
+    // (n * c).sub_mul(n, c) == 0
     let natural_and_u32 = |gmp_n: gmp::Natural, c: u32| {
         let n = &gmp_natural_to_native(&gmp_n);
         assert_eq!(n.sub_mul(&native::Natural::from(0u32), c), Some(n.clone()));
         assert_eq!(n.sub_mul(&native::Natural::from(1u32), c), n - c);
+        assert_eq!((n * c).sub_mul(n, c), Some(native::Natural::from(0u32)));
     };
 
     // a.sub_mul(b, 0) == Some(a)
@@ -191,6 +210,14 @@ fn sub_mul_u32_properties() {
     ).take(LARGE_LIMIT)
     {
         natural_natural_and_u32(a, b, c);
+    }
+
+    for n in exhaustive_naturals().take(LARGE_LIMIT) {
+        single_natural(n);
+    }
+
+    for n in random_naturals(&EXAMPLE_SEED, 32).take(LARGE_LIMIT) {
+        single_natural(n);
     }
 
     for (a, b, c) in random_triples(

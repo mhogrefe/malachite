@@ -6,6 +6,7 @@ use natural::arithmetic::mul_u32::{mpn_mul_1, mpn_mul_1c};
 use natural::arithmetic::sub_mul_u32::mpn_submul_1;
 use natural::arithmetic::sub_u32::mpn_sub_1_in_place;
 use natural::logic::not::mpn_com_in_place;
+use natural::mpn_zero_p;
 use natural::Natural::{self, Large, Small};
 use std::cmp::{max, min};
 
@@ -418,7 +419,7 @@ pub(crate) fn mpz_aorsmul_1(
         } else {
             // wsize < xsize
 
-            // x bigger than w, so want x*y-w.  Submul has given w-x*y, so take twos complement and
+            // x bigger than w, so want x*y-w. Submul has given w-x*y, so take twos complement and
             // use an mpn_mul_1 for the rest.
 
             // -(-cy*b^n + w-x*y) = (cy-1)*b^n + ~(w-x*y) + 1
@@ -427,7 +428,7 @@ pub(crate) fn mpz_aorsmul_1(
                 cy = cy.wrapping_sub(1);
             }
 
-            // If cy - 1 == -1 then hold that -1 for latter.  mpn_submul_1 never returns
+            // If cy - 1 == -1 then hold that -1 for latter. mpn_submul_1 never returns
             // cy == MP_LIMB_T_MAX so that value always indicates a -1.
             let cy2 = if cy == u32::max_value() { 1 } else { 0 };
             cy = cy.wrapping_add(cy2);
@@ -437,7 +438,7 @@ pub(crate) fn mpz_aorsmul_1(
                 new_wsize += 1;
             }
 
-            // Apply any -1 from above.  The value at wp+wsize is non-zero because y != 0 and the
+            // Apply any -1 from above. The value at wp+wsize is non-zero because y != 0 and the
             // high limb of x will be non-zero.
             if cy2 != 0 {
                 mpn_sub_1_in_place(&mut w[wsize..new_wsize], 1);
@@ -447,5 +448,8 @@ pub(crate) fn mpz_aorsmul_1(
             }
         }
         w.resize(new_wsize, 0);
+        if mpn_zero_p(w) {
+            *w_sign = true;
+        }
     }
 }

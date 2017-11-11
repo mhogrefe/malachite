@@ -116,6 +116,10 @@ fn test_add_mul_u32() {
     test("-1", "1000000000000", 100, "99999999999999");
     test("0", "-1000000000000", 100, "-100000000000000");
     test("1", "-1000000000000", 100, "-99999999999999");
+    test("1000000000000", "-1000000000000", 1, "0");
+    test("-1000000000000", "1000000000000", 1, "0");
+    test("1000000000000000000000", "-1000000000000", 1000000000, "0");
+    test("-1000000000000000000000", "1000000000000", 1000000000, "0");
 }
 
 #[test]
@@ -135,6 +139,8 @@ fn add_mul_u32_properties() {
     // a.add_mul_assign(b, c), a.add_mul_assign(&b, c), a.add_mul(b, c), a.add_mul(&b, c),
     //      (&a).add_mul(b, c), and (&a).add_mul(&b, c) give the same result.
     // a.add_mul(&b, c) is equivalent to a + b * c.
+    // -(a.add_mul(b, c)) = (-a).add_mul(-b, c)
+    // a.add_mul(&b, c) is equivalent to a.add_mul(&b, Integer::from(c))
     let integer_integer_and_u32 = |mut gmp_a: gmp::Integer, gmp_b: gmp::Integer, c: u32| {
         let mut a = gmp_integer_to_native(&gmp_a);
         let b = gmp_integer_to_native(&gmp_b);
@@ -191,19 +197,29 @@ fn add_mul_u32_properties() {
         assert!(result.is_valid());
         assert_eq!(result, a);
 
-        assert_eq!(&old_a + b * c, result);
+        assert_eq!(&old_a + &b * c, result);
+        assert_eq!((-&old_a).add_mul(-&b, c), -&result);
+        assert_eq!(old_a.add_mul(b, native::Integer::from(c)), result);
+    };
+
+    // n.add_mul(-n, 1) == 0
+    let single_integer = |gmp_n: gmp::Integer| {
+        let n = &gmp_integer_to_native(&gmp_n);
+        assert_eq!(n.add_mul(-n, 1), 0);
     };
 
     // n.add_mul(0, c) == n
     // n.add_mul(1, c) == n + c
     // n.add_mul(-1, c) == n + c
     // 0.add_mul(n, c) == n * c
+    // (n * c).add_mul(-n, c) == 0
     let integer_and_u32 = |gmp_n: gmp::Integer, c: u32| {
         let n = &gmp_integer_to_native(&gmp_n);
         assert_eq!(n.add_mul(&native::Integer::from(0u32), c), *n);
         assert_eq!(n.add_mul(&native::Integer::from(1u32), c), n + c);
         assert_eq!(n.add_mul(&native::Integer::from(-1i32), c), n - c);
         assert_eq!(native::Integer::from(0u32).add_mul(n, c), n * c);
+        assert_eq!((n * c).add_mul(-n, c), 0);
     };
 
     // a.add_mul(b, 0) == a
@@ -232,6 +248,14 @@ fn add_mul_u32_properties() {
     ).take(LARGE_LIMIT)
     {
         integer_integer_and_u32(a, b, c);
+    }
+
+    for n in exhaustive_integers().take(LARGE_LIMIT) {
+        single_integer(n);
+    }
+
+    for n in random_integers(&EXAMPLE_SEED, 32).take(LARGE_LIMIT) {
+        single_integer(n);
     }
 
     for (n, c) in exhaustive_pairs(exhaustive_integers(), exhaustive_u::<u32>()).take(LARGE_LIMIT) {

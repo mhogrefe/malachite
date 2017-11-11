@@ -4,6 +4,7 @@ use natural::arithmetic::add::mpn_add_in_place;
 use natural::arithmetic::mul::mpn_mul;
 use natural::arithmetic::sub::{mpn_sub_aba, mpn_sub_in_place};
 use natural::comparison::ord::mpn_cmp_helper;
+use natural::mpn_zero_p;
 use natural::Natural::{self, Large, Small};
 use std::cmp::{max, Ordering};
 
@@ -181,10 +182,6 @@ impl<'a, 'b> AddMul<&'a Natural, &'b Natural> for Natural {
 ///                         .add_mul(&Natural::from(65536u32),
 ///                         &Natural::from_str("1000000000000").unwrap()).to_string(),
 ///                 "65537000000000000");
-///     assert_eq!((&Natural::from_str("0").unwrap())
-///                         .add_mul(&Natural::from_str("1000000000000").unwrap(),
-///                         &Natural::from_str("1000000000000").unwrap()).to_string(),
-///                 "1000000000000000000000000");
 /// }
 /// ```
 impl<'a, 'b, 'c> AddMul<&'a Natural, &'b Natural> for &'c Natural {
@@ -213,7 +210,7 @@ impl<'a, 'b, 'c> AddMul<&'a Natural, &'b Natural> for &'c Natural {
                             true,
                         );
                     }
-                    assert!(!self_sign, "{} {} {}", self, b, c);
+                    assert!(!self_sign);
                 }
                 Large(result_limbs)
             };
@@ -253,7 +250,7 @@ impl<'a, 'b, 'c> AddMul<&'a Natural, &'b Natural> for &'c Natural {
 ///     assert_eq!(x.to_string(), "65537000000000000");
 /// }
 /// ```
-impl<'a> AddMulAssign<Natural, Natural> for Natural {
+impl AddMulAssign<Natural, Natural> for Natural {
     fn add_mul_assign(&mut self, b: Natural, c: Natural) {
         if let Small(small_b) = b {
             self.add_mul_assign(c, small_b);
@@ -513,7 +510,7 @@ pub(crate) fn mpz_aorsmul(
         if high == 0 {
             tsize -= 1;
         }
-        *w_sign = sub || tsize == 0;
+        *w_sign = !sub && tsize != 0;
         return;
     }
 
@@ -548,5 +545,8 @@ pub(crate) fn mpz_aorsmul(
         } else {
             assert!(!mpn_sub_in_place(&mut w[0..wsize], &t[0..tsize]));
         }
+    }
+    if mpn_zero_p(w) {
+        *w_sign = false;
     }
 }

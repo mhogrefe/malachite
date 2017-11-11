@@ -183,7 +183,7 @@ fn add_mul_u32_properties() {
         assert_eq!(result, a);
 
         assert_eq!(&old_a + &b * c, result);
-        assert_eq!(&old_a + b * native::Natural::from(c), result);
+        assert_eq!(old_a.add_mul(b, native::Natural::from(c)), result);
     };
 
     // n.add_mul(0, c) == n
