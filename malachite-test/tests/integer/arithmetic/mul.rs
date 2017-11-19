@@ -1,4 +1,5 @@
 use common::LARGE_LIMIT;
+use malachite_base::traits::{One, Zero};
 use malachite_native::integer as native;
 use malachite_gmp::integer as gmp;
 use malachite_test::common::{gmp_integer_to_native, native_integer_to_num_bigint,
@@ -231,10 +232,10 @@ fn mul_properties() {
     let one_integer = |gmp_x: gmp::Integer| {
         let x = gmp_integer_to_native(&gmp_x);
         let x_old = x.clone();
-        assert_eq!(&x * native::Integer::from(0u32), 0);
-        assert_eq!(native::Integer::from(0u32) * 0, 0);
-        let id_1 = &x * native::Integer::from(1u32);
-        let id_2 = native::Integer::from(1u32) * &x;
+        assert_eq!(&x * native::Integer::zero(), 0);
+        assert_eq!(native::Integer::zero() * 0, 0);
+        let id_1 = &x * native::Integer::one();
+        let id_2 = native::Integer::one() * &x;
         //TODO let square = &x * &x;
         assert_eq!(id_1, x_old);
         assert_eq!(id_2, x_old);

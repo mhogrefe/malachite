@@ -1,5 +1,5 @@
 use common::LARGE_LIMIT;
-use malachite_base::traits::{AddMul, AddMulAssign};
+use malachite_base::traits::{AddMul, AddMulAssign, NegativeOne, One, Zero};
 use malachite_native::integer as native;
 use malachite_gmp::integer as gmp;
 use malachite_test::common::{gmp_integer_to_native, native_integer_to_gmp};
@@ -215,10 +215,10 @@ fn add_mul_u32_properties() {
     // (n * c).add_mul(-n, c) == 0
     let integer_and_u32 = |gmp_n: gmp::Integer, c: u32| {
         let n = &gmp_integer_to_native(&gmp_n);
-        assert_eq!(n.add_mul(&native::Integer::from(0u32), c), *n);
-        assert_eq!(n.add_mul(&native::Integer::from(1u32), c), n + c);
-        assert_eq!(n.add_mul(&native::Integer::from(-1i32), c), n - c);
-        assert_eq!(native::Integer::from(0u32).add_mul(n, c), n * c);
+        assert_eq!(n.add_mul(&native::Integer::zero(), c), *n);
+        assert_eq!(n.add_mul(&native::Integer::one(), c), n + c);
+        assert_eq!(n.add_mul(&native::Integer::negative_one(), c), n - c);
+        assert_eq!(native::Integer::zero().add_mul(n, c), n * c);
         assert_eq!((n * c).add_mul(-n, c), 0);
     };
 

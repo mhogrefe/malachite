@@ -1,4 +1,5 @@
 use common::LARGE_LIMIT;
+use malachite_base::traits::{One, Zero};
 use malachite_native::integer as native;
 use malachite_gmp::integer as gmp;
 use malachite_test::common::{gmp_integer_to_native, native_integer_to_gmp,
@@ -151,7 +152,7 @@ fn shl_u32_properties() {
         assert!((&old_n << u).abs() >= old_n.abs_ref());
         assert_eq!(-&old_n << u, -(&old_n << u));
 
-        assert_eq!(&old_n << u, old_n * (native::Integer::from(1u32) << u));
+        assert_eq!(&old_n << u, old_n * (native::Integer::one() << u));
     };
 
     // n << 0 == n
@@ -164,9 +165,9 @@ fn shl_u32_properties() {
     // 0 << n == 0
     // 1 << n is a power of 2
     let one_u32 = |u: u32| {
-        assert_eq!(native::Integer::from(0u32) << u, 0);
+        assert_eq!(native::Integer::zero() << u, 0);
         assert!(
-            (native::Integer::from(1u32) << u)
+            (native::Integer::one() << u)
                 .into_natural()
                 .unwrap()
                 .is_power_of_two()

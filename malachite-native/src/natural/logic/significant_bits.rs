@@ -11,10 +11,16 @@ impl Natural {
     ///
     /// # Example
     /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_native;
+    ///
+    /// use malachite_base::traits::Zero;
     /// use malachite_native::natural::Natural;
     ///
-    /// assert_eq!(Natural::from(0u32).significant_bits(), 0);
-    /// assert_eq!(Natural::from(100u32).significant_bits(), 7);
+    /// fn main() {
+    ///     assert_eq!(Natural::zero().significant_bits(), 0);
+    ///     assert_eq!(Natural::from(100u32).significant_bits(), 7);
+    /// }
     /// ```
     pub fn significant_bits(&self) -> u64 {
         match *self {

@@ -1,4 +1,5 @@
 use integer::Integer;
+use malachite_base::traits::Zero;
 use natural::Natural;
 
 impl Integer {
@@ -32,7 +33,7 @@ impl Integer {
     /// ```
     pub fn from_twos_complement_limbs_le(limbs: &[u32]) -> Integer {
         if limbs.is_empty() {
-            return Integer::new();
+            return Integer::zero();
         }
         if limbs.last().unwrap() & 0x8000_0000 == 0 {
             Natural::from_limbs_le(limbs).into_integer()

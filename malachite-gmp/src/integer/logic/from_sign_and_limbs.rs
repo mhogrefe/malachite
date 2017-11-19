@@ -1,4 +1,5 @@
 use integer::Integer;
+use malachite_base::traits::Zero;
 use natural::Natural;
 use std::cmp::Ordering;
 
@@ -37,7 +38,7 @@ impl Integer {
             limbs
         );
         match sign {
-            Ordering::Equal => Integer::from(0),
+            Ordering::Equal => Integer::zero(),
             Ordering::Greater => Natural::from_limbs_le(limbs).into_integer(),
             Ordering::Less => -Natural::from_limbs_le(limbs),
         }
@@ -77,7 +78,7 @@ impl Integer {
             limbs
         );
         match sign {
-            Ordering::Equal => Integer::from(0),
+            Ordering::Equal => Integer::zero(),
             Ordering::Greater => Natural::from_limbs_be(limbs).into_integer(),
             Ordering::Less => -Natural::from_limbs_be(limbs),
         }

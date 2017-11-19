@@ -1,6 +1,6 @@
 use integer::Integer;
 use natural::Natural;
-use malachite_base::traits::Assign;
+use malachite_base::traits::{Assign, Zero};
 
 impl Natural {
     /// Converts a `Natural` to an `Integer`, taking the `Natural` by value.
@@ -15,7 +15,7 @@ impl Natural {
     ///            "1000000000000");
     /// ```
     pub fn into_integer(self) -> Integer {
-        let mut n = Integer::new();
+        let mut n = Integer::zero();
         n.assign(self);
         n
     }
@@ -32,7 +32,7 @@ impl Natural {
     ///            "1000000000000");
     /// ```
     pub fn to_integer(&self) -> Integer {
-        let mut n = Integer::new();
+        let mut n = Integer::zero();
         n.assign(self);
         n
     }

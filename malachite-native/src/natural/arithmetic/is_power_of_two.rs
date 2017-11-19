@@ -11,14 +11,20 @@ impl Natural {
     ///
     /// # Example
     /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_native;
+    ///
+    /// use malachite_base::traits::Zero;
     /// use malachite_native::natural::Natural;
     /// use std::str::FromStr;
     ///
-    /// assert_eq!(Natural::from(0u32).is_power_of_two(), false);
-    /// assert_eq!(Natural::from(123u32).is_power_of_two(), false);
-    /// assert_eq!(Natural::from(128u32).is_power_of_two(), true);
-    /// assert_eq!(Natural::from_str("1000000000000").unwrap().is_power_of_two(), false);
-    /// assert_eq!(Natural::from_str("1099511627776").unwrap().is_power_of_two(), true);
+    /// fn main() {
+    ///     assert_eq!(Natural::zero().is_power_of_two(), false);
+    ///     assert_eq!(Natural::from(123u32).is_power_of_two(), false);
+    ///     assert_eq!(Natural::from(128u32).is_power_of_two(), true);
+    ///     assert_eq!(Natural::from_str("1000000000000").unwrap().is_power_of_two(), false);
+    ///     assert_eq!(Natural::from_str("1099511627776").unwrap().is_power_of_two(), true);
+    /// }
     /// ```
     pub fn is_power_of_two(&self) -> bool {
         match *self {

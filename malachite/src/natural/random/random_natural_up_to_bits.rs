@@ -1,3 +1,4 @@
+use malachite_base::traits::Zero;
 use natural::Natural;
 use rand::Rng;
 
@@ -23,7 +24,7 @@ use rand::Rng;
 /// ```
 pub fn random_natural_up_to_bits<R: Rng>(rng: &mut R, bits: u64) -> Natural {
     if bits == 0 {
-        return Natural::new();
+        return Natural::zero();
     }
     let remainder_bits = bits & 0x1f;
     let limb_count = if remainder_bits == 0 {

@@ -32,7 +32,8 @@ pub mod integer {
         pub mod sub_mul_u32;
     }
     pub mod basic {
-        pub mod new_and_default;
+        pub mod constants;
+        pub mod default;
     }
     pub mod comparison {
         pub mod eq;
@@ -101,7 +102,8 @@ pub mod natural {
         pub mod is_power_of_two;
     }
     pub mod basic {
-        pub mod new_and_default;
+        pub mod constants;
+        pub mod default;
     }
     pub mod comparison {
         pub mod eq;

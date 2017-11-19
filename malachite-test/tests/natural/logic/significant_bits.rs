@@ -1,4 +1,5 @@
 use common::LARGE_LIMIT;
+use malachite_base::traits::One;
 use malachite_native::natural as native;
 use malachite_gmp::natural as gmp;
 use malachite_test::common::{gmp_natural_to_native, native_natural_to_num_biguint,
@@ -52,8 +53,8 @@ fn significant_bits_properties() {
         assert_eq!(x <= u32::max_value(), significant_bits <= 32);
         if x != 0 {
             let n = significant_bits as u32;
-            assert!(native::Natural::from(1u32) << (n - 1) <= x);
-            assert!(x < native::Natural::from(1u32) << n);
+            assert!(native::Natural::one() << (n - 1) <= x);
+            assert!(x < native::Natural::one() << n);
         }
     };
 

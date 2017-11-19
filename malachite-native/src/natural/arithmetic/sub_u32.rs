@@ -142,14 +142,20 @@ impl<'a> Sub<u32> for &'a Natural {
 /// greater than the `u32`, returns `None`.
 ///
 /// ```
+/// extern crate malachite_base;
+/// extern crate malachite_native;
+///
+/// use malachite_base::traits::Zero;
 /// use malachite_native::natural::Natural;
 /// use std::str::FromStr;
 ///
-/// assert_eq!(format!("{:?}", 123 - &Natural::from(123u32)), "Some(0)");
-/// assert_eq!(format!("{:?}", 123 - &Natural::from(0u32)), "Some(123)");
-/// assert_eq!(format!("{:?}", 456 - &Natural::from(123u32)), "Some(333)");
-/// assert_eq!(format!("{:?}", 123 - &Natural::from(456u32)), "None");
-/// assert_eq!(format!("{:?}", 123 - &Natural::from_str("1000000000000").unwrap()), "None");
+/// fn main() {
+///     assert_eq!(format!("{:?}", 123 - &Natural::from(123u32)), "Some(0)");
+///     assert_eq!(format!("{:?}", 123 - &Natural::zero()), "Some(123)");
+///     assert_eq!(format!("{:?}", 456 - &Natural::from(123u32)), "Some(333)");
+///     assert_eq!(format!("{:?}", 123 - &Natural::from(456u32)), "None");
+///     assert_eq!(format!("{:?}", 123 - &Natural::from_str("1000000000000").unwrap()), "None");
+/// }
 /// ```
 impl<'a> Sub<&'a Natural> for u32 {
     type Output = Option<Natural>;

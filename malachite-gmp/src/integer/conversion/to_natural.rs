@@ -1,7 +1,7 @@
 use integer::Integer;
 use natural::Natural;
 use std::cmp::Ordering;
-use malachite_base::traits::Assign;
+use malachite_base::traits::{Assign, Zero};
 
 impl Integer {
     /// Converts an `Integer` to a `Natural`, taking the `Natural` by value. If the `Integer` is
@@ -23,7 +23,7 @@ impl Integer {
         if self.sign() == Ordering::Less {
             None
         } else {
-            let mut n = Natural::new();
+            let mut n = Natural::zero();
             n.assign(self);
             Some(n)
         }
@@ -48,7 +48,7 @@ impl Integer {
         if self.sign() == Ordering::Less {
             None
         } else {
-            let mut n = Natural::new();
+            let mut n = Natural::zero();
             n.assign(self);
             Some(n)
         }

@@ -11,13 +11,19 @@ impl Natural {
     ///
     /// # Examples
     /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_native;
+    ///
+    /// use malachite_base::traits::Zero;
     /// use malachite_native::natural::Natural;
     ///
-    /// let mut x = Natural::new();
-    /// x.set_bit(2);
-    /// x.set_bit(5);
-    /// x.set_bit(6);
-    /// assert_eq!(x.to_string(), "100");
+    /// fn main() {
+    ///     let mut x = Natural::zero();
+    ///     x.set_bit(2);
+    ///     x.set_bit(5);
+    ///     x.set_bit(6);
+    ///     assert_eq!(x.to_string(), "100");
+    /// }
     /// ```
     pub fn set_bit(&mut self, index: u64) {
         mutate_with_possible_promotion!(

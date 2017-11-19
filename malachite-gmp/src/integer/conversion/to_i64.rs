@@ -1,4 +1,5 @@
 use integer::Integer::{self, Large, Small};
+use malachite_base::traits::One;
 use natural::Natural;
 use std::cmp::Ordering;
 
@@ -25,7 +26,7 @@ impl Integer {
             Small(small) => Some(small as i64),
             Large(_) => {
                 if self.significant_bits() < 64 ||
-                    *self == -((Natural::from(1u32) << 63).into_integer())
+                    *self == -((Natural::one() << 63).into_integer())
                 {
                     let abs = self.abs_ref().to_u64().unwrap() as i64;
                     Some(if self.sign() == Ordering::Less {

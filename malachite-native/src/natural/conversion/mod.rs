@@ -1,5 +1,5 @@
 use error::ParseIntegerError;
-use malachite_base::traits::Assign;
+use malachite_base::traits::{Assign, Zero};
 use natural::Natural::{self, Small};
 use std::fmt::{self, Debug, Display, Formatter};
 use std::str::FromStr;
@@ -20,7 +20,7 @@ impl Natural {
 
     //TODO test
     pub fn from_str_radix(src: &str, radix: i32) -> Result<Natural, ParseIntegerError> {
-        let mut i = Natural::new();
+        let mut i = Natural::zero();
         i.assign_str_radix(src, radix)?;
         Ok(i)
     }
@@ -39,7 +39,7 @@ fn make_string(i: &Natural, radix: i32, to_upper: bool) -> String {
     }
     let mut i_cloned = i.clone();
     let mut cs = Vec::new();
-    while i_cloned != Natural::new() {
+    while i_cloned != Natural::zero() {
         cs.push(
             i_cloned
                 .div_rem_in_place_u32(10)
@@ -81,7 +81,7 @@ impl FromStr for Natural {
     type Err = ParseIntegerError;
 
     fn from_str(src: &str) -> Result<Natural, ParseIntegerError> {
-        let mut i = Natural::new();
+        let mut i = Natural::zero();
         i.assign_str(src)?;
         Ok(i)
     }

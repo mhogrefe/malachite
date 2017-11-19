@@ -1,4 +1,5 @@
 use integer::Integer;
+use malachite_base::traits::One;
 use natural::Natural;
 
 impl Integer {
@@ -24,7 +25,7 @@ impl Integer {
     ///     "None");
     /// ```
     pub fn to_i64(&self) -> Option<i64> {
-        if self.significant_bits() < 64 || *self == -((Natural::from(1u32) << 63).into_integer()) {
+        if self.significant_bits() < 64 || *self == -((Natural::one() << 63).into_integer()) {
             Some(self.to_i64_wrapping())
         } else {
             None

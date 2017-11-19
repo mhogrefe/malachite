@@ -1,5 +1,6 @@
 use natural::Natural::{self, Large, Small};
 use gmp_mpfr_sys::gmp::{self, mpz_t};
+use malachite_base::traits::Zero;
 use std::mem;
 
 /// Clones a `Natural`, producing a new `Natural`.
@@ -26,7 +27,7 @@ use std::mem;
 /// ```
 impl Clone for Natural {
     fn clone(&self) -> Natural {
-        let mut cloned = Natural::new();
+        let mut cloned = Natural::zero();
         cloned.clone_from(self);
         cloned
     }

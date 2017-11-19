@@ -2,6 +2,7 @@
 name = "malachite"
 version = "0.1.0"
 dependencies = [
+ "malachite-base 0.1.0",
  "malachite-gmp 0.1.0",
  "malachite-native 0.1.0",
  "rand 0.3.18 (registry+https://github.com/rust-lang/crates.io-index)",

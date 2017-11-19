@@ -1,4 +1,5 @@
 use common::LARGE_LIMIT;
+use malachite_base::traits::Zero;
 use malachite_native::integer as native;
 use malachite_gmp::integer as gmp;
 use malachite_test::common::{gmp_integer_to_native, native_integer_to_gmp,
@@ -193,8 +194,8 @@ fn sub_i32_properties() {
     // 0 - i == i
     // i - 0 == i
     let one_i32 = |i: i32| {
-        assert_eq!(native::Integer::from(0i32) - i, -native::Integer::from(i));
-        assert_eq!(i - native::Integer::from(0i32), i);
+        assert_eq!(native::Integer::zero() - i, -native::Integer::from(i));
+        assert_eq!(i - native::Integer::zero(), i);
     };
 
     for (n, i) in exhaustive_pairs(exhaustive_integers(), exhaustive_i::<i32>()).take(LARGE_LIMIT) {

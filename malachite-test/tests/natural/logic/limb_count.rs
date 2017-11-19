@@ -1,4 +1,5 @@
 use common::LARGE_LIMIT;
+use malachite_base::traits::One;
 use malachite_native::natural as native;
 use malachite_gmp::natural as gmp;
 use malachite_test::common::gmp_natural_to_native;
@@ -33,8 +34,8 @@ fn limb_count_properties() {
         assert_eq!(x <= u32::max_value(), x.limb_count() <= 1);
         if x != 0 {
             let n = limb_count as u32;
-            assert!(native::Natural::from(1u32) << ((n - 1) << 5) <= x);
-            assert!(x < native::Natural::from(1u32) << (n << 5));
+            assert!(native::Natural::one() << ((n - 1) << 5) <= x);
+            assert!(x < native::Natural::one() << (n << 5));
         }
     };
 

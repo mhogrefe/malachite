@@ -330,7 +330,7 @@ pub fn benchmark_random_u32_add_integer_evaluation_strategy(
     scale: u32,
     file_name: &str,
 ) {
-    println!("benchmarking exhaustive u32 + Integer evaluation strategy");
+    println!("benchmarking random u32 + Integer evaluation strategy");
     benchmark_2(BenchmarkOptions2 {
         xs: random_pairs(
             &EXAMPLE_SEED,

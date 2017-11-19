@@ -14,27 +14,33 @@ impl Integer {
     ///
     /// # Examples
     /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_native;
+    ///
+    /// use malachite_base::traits::Zero;
     /// use malachite_native::integer::Integer;
     ///
-    /// let mut x = Integer::new();
-    /// x.assign_bit(2, true);
-    /// x.assign_bit(5, true);
-    /// x.assign_bit(6, true);
-    /// assert_eq!(x.to_string(), "100");
-    /// x.assign_bit(2, false);
-    /// x.assign_bit(5, false);
-    /// x.assign_bit(6, false);
-    /// assert_eq!(x.to_string(), "0");
+    /// fn main() {
+    ///     let mut x = Integer::zero();
+    ///     x.assign_bit(2, true);
+    ///     x.assign_bit(5, true);
+    ///     x.assign_bit(6, true);
+    ///     assert_eq!(x.to_string(), "100");
+    ///     x.assign_bit(2, false);
+    ///     x.assign_bit(5, false);
+    ///     x.assign_bit(6, false);
+    ///     assert_eq!(x.to_string(), "0");
     ///
-    /// let mut x = Integer::from(-256);
-    /// x.assign_bit(2, true);
-    /// x.assign_bit(5, true);
-    /// x.assign_bit(6, true);
-    /// assert_eq!(x.to_string(), "-156");
-    /// x.assign_bit(2, false);
-    /// x.assign_bit(5, false);
-    /// x.assign_bit(6, false);
-    /// assert_eq!(x.to_string(), "-256");
+    ///     let mut x = Integer::from(-256);
+    ///     x.assign_bit(2, true);
+    ///     x.assign_bit(5, true);
+    ///     x.assign_bit(6, true);
+    ///     assert_eq!(x.to_string(), "-156");
+    ///     x.assign_bit(2, false);
+    ///     x.assign_bit(5, false);
+    ///     x.assign_bit(6, false);
+    ///     assert_eq!(x.to_string(), "-256");
+    /// }
     /// ```
     pub fn assign_bit(&mut self, index: u64, bit: bool) {
         if bit {

@@ -1,4 +1,5 @@
 use common::LARGE_LIMIT;
+use malachite_base::traits::Zero;
 use malachite_native::natural as native;
 use malachite_gmp::natural as gmp;
 use malachite_test::common::{gmp_natural_to_native, native_natural_to_gmp,
@@ -209,12 +210,9 @@ fn sub_u32_properties() {
     // u - 0 == u
     // if u != 0, 0 - u == None
     let one_u32 = |u: u32| {
-        assert_eq!(
-            u - &native::Natural::from(0u32),
-            Some(native::Natural::from(u))
-        );
+        assert_eq!(u - &native::Natural::zero(), Some(native::Natural::from(u)));
         if u != 0 {
-            assert!((native::Natural::from(0u32) - u).is_none());
+            assert!((native::Natural::zero() - u).is_none());
         }
     };
 

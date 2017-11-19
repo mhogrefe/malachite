@@ -13,18 +13,24 @@ impl Integer {
     ///
     /// # Examples
     /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_gmp;
+    ///
+    /// use malachite_base::traits::Zero;
     /// use malachite_gmp::integer::Integer;
     /// use std::cmp::Ordering;
     /// use std::str::FromStr;
     ///
-    /// assert_eq!(Integer::from(0).sign_and_limbs_le(), (Ordering::Equal, vec![]));
-    /// assert_eq!(Integer::from(123).sign_and_limbs_le(), (Ordering::Greater, vec![123]));
-    /// assert_eq!(Integer::from(-123).sign_and_limbs_le(), (Ordering::Less, vec![123]));
-    /// // 10^12 = 232 * 2^32 + 3567587328
-    /// assert_eq!(Integer::from_str("1000000000000").unwrap().sign_and_limbs_le(),
-    ///            (Ordering::Greater, vec![3567587328, 232]));
-    /// assert_eq!(Integer::from_str("-1000000000000").unwrap().sign_and_limbs_le(),
-    ///            (Ordering::Less, vec![3567587328, 232]));
+    /// fn main() {
+    ///     assert_eq!(Integer::zero().sign_and_limbs_le(), (Ordering::Equal, vec![]));
+    ///     assert_eq!(Integer::from(123).sign_and_limbs_le(), (Ordering::Greater, vec![123]));
+    ///     assert_eq!(Integer::from(-123).sign_and_limbs_le(), (Ordering::Less, vec![123]));
+    ///     // 10^12 = 232 * 2^32 + 3567587328
+    ///     assert_eq!(Integer::from_str("1000000000000").unwrap().sign_and_limbs_le(),
+    ///                (Ordering::Greater, vec![3567587328, 232]));
+    ///     assert_eq!(Integer::from_str("-1000000000000").unwrap().sign_and_limbs_le(),
+    ///                (Ordering::Less, vec![3567587328, 232]));
+    /// }
     /// ```
     pub fn sign_and_limbs_le(&self) -> (Ordering, Vec<u32>) {
         (self.sign(), self.natural_abs_ref().to_limbs_le())
@@ -41,18 +47,24 @@ impl Integer {
     ///
     /// # Examples
     /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_gmp;
+    ///
+    /// use malachite_base::traits::Zero;
     /// use malachite_gmp::integer::Integer;
     /// use std::cmp::Ordering;
     /// use std::str::FromStr;
     ///
-    /// assert_eq!(Integer::from(0).sign_and_limbs_be(), (Ordering::Equal, vec![]));
-    /// assert_eq!(Integer::from(123).sign_and_limbs_be(), (Ordering::Greater, vec![123]));
-    /// assert_eq!(Integer::from(-123).sign_and_limbs_be(), (Ordering::Less, vec![123]));
-    /// // 10^12 = 232 * 2^32 + 3567587328
-    /// assert_eq!(Integer::from_str("1000000000000").unwrap().sign_and_limbs_be(),
-    ///            (Ordering::Greater, vec![232, 3567587328]));
-    /// assert_eq!(Integer::from_str("-1000000000000").unwrap().sign_and_limbs_be(),
-    ///            (Ordering::Less, vec![232, 3567587328]));
+    /// fn main() {
+    ///     assert_eq!(Integer::zero().sign_and_limbs_be(), (Ordering::Equal, vec![]));
+    ///     assert_eq!(Integer::from(123).sign_and_limbs_be(), (Ordering::Greater, vec![123]));
+    ///     assert_eq!(Integer::from(-123).sign_and_limbs_be(), (Ordering::Less, vec![123]));
+    ///     // 10^12 = 232 * 2^32 + 3567587328
+    ///     assert_eq!(Integer::from_str("1000000000000").unwrap().sign_and_limbs_be(),
+    ///                (Ordering::Greater, vec![232, 3567587328]));
+    ///     assert_eq!(Integer::from_str("-1000000000000").unwrap().sign_and_limbs_be(),
+    ///                (Ordering::Less, vec![232, 3567587328]));
+    /// }
     /// ```
     pub fn sign_and_limbs_be(&self) -> (Ordering, Vec<u32>) {
         (self.sign(), self.natural_abs_ref().to_limbs_be())

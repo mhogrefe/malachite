@@ -1,4 +1,5 @@
 use common::LARGE_LIMIT;
+use malachite_base::traits::{One, Zero};
 use malachite_base::traits::{AddMul, AddMulAssign};
 use malachite_native::natural as native;
 use malachite_gmp::natural as gmp;
@@ -191,9 +192,9 @@ fn add_mul_u32_properties() {
     // 0.add_mul(n, c) == n * c
     let natural_and_u32 = |gmp_n: gmp::Natural, c: u32| {
         let n = &gmp_natural_to_native(&gmp_n);
-        assert_eq!(n.add_mul(&native::Natural::from(0u32), c), *n);
-        assert_eq!(n.add_mul(&native::Natural::from(1u32), c), n + c);
-        assert_eq!(native::Natural::from(0u32).add_mul(n, c), n * c);
+        assert_eq!(n.add_mul(&native::Natural::zero(), c), *n);
+        assert_eq!(n.add_mul(&native::Natural::one(), c), n + c);
+        assert_eq!(native::Natural::zero().add_mul(n, c), n * c);
     };
 
     // a.add_mul(b, 0) == a

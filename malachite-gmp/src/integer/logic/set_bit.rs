@@ -10,19 +10,25 @@ impl Integer {
     ///
     /// # Examples
     /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_gmp;
+    ///
+    /// use malachite_base::traits::Zero;
     /// use malachite_gmp::integer::Integer;
     ///
-    /// let mut x = Integer::new();
-    /// x.set_bit(2);
-    /// x.set_bit(5);
-    /// x.set_bit(6);
-    /// assert_eq!(x.to_string(), "100");
+    /// fn main() {
+    ///     let mut x = Integer::zero();
+    ///     x.set_bit(2);
+    ///     x.set_bit(5);
+    ///     x.set_bit(6);
+    ///     assert_eq!(x.to_string(), "100");
     ///
-    /// let mut x = Integer::from(-256);
-    /// x.set_bit(2);
-    /// x.set_bit(5);
-    /// x.set_bit(6);
-    /// assert_eq!(x.to_string(), "-156");
+    ///     let mut x = Integer::from(-256);
+    ///     x.set_bit(2);
+    ///     x.set_bit(5);
+    ///     x.set_bit(6);
+    ///     assert_eq!(x.to_string(), "-156");
+    /// }
     /// ```
     pub fn set_bit(&mut self, index: u64) {
         mutate_with_possible_promotion!(

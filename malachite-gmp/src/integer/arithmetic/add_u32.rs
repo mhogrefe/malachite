@@ -7,14 +7,20 @@ use std::mem;
 ///
 /// # Examples
 /// ```
+/// extern crate malachite_base;
+/// extern crate malachite_gmp;
+///
+/// use malachite_base::traits::Zero;
 /// use malachite_gmp::integer::Integer;
 /// use std::str::FromStr;
 ///
-/// assert_eq!((Integer::from(0) + 123u32).to_string(), "123");
-/// assert_eq!((Integer::from(-123) + 0u32).to_string(), "-123");
-/// assert_eq!((Integer::from(-123) + 456u32).to_string(), "333");
-/// assert_eq!((Integer::from_str("-1000000000000").unwrap() + 123u32).to_string(),
-///            "-999999999877");
+/// fn main() {
+///     assert_eq!((Integer::zero() + 123u32).to_string(), "123");
+///     assert_eq!((Integer::from(-123) + 0u32).to_string(), "-123");
+///     assert_eq!((Integer::from(-123) + 456u32).to_string(), "333");
+///     assert_eq!((Integer::from_str("-1000000000000").unwrap() + 123u32).to_string(),
+///                "-999999999877");
+/// }
 /// ```
 impl Add<u32> for Integer {
     type Output = Integer;
@@ -29,14 +35,20 @@ impl Add<u32> for Integer {
 ///
 /// # Examples
 /// ```
+/// extern crate malachite_base;
+/// extern crate malachite_gmp;
+///
+/// use malachite_base::traits::Zero;
 /// use malachite_gmp::integer::Integer;
 /// use std::str::FromStr;
 ///
-/// assert_eq!((&Integer::from(0) + 123u32).to_string(), "123");
-/// assert_eq!((&Integer::from(-123) + 0u32).to_string(), "-123");
-/// assert_eq!((&Integer::from(-123) + 456u32).to_string(), "333");
-/// assert_eq!((&Integer::from_str("-1000000000000").unwrap() + 123u32).to_string(),
-///            "-999999999877");
+/// fn main() {
+///     assert_eq!((&Integer::zero() + 123u32).to_string(), "123");
+///     assert_eq!((&Integer::from(-123) + 0u32).to_string(), "-123");
+///     assert_eq!((&Integer::from(-123) + 456u32).to_string(), "333");
+///     assert_eq!((&Integer::from_str("-1000000000000").unwrap() + 123u32).to_string(),
+///                "-999999999877");
+/// }
 /// ```
 impl<'a> Add<u32> for &'a Integer {
     type Output = Integer;
@@ -77,14 +89,20 @@ impl<'a> Add<u32> for &'a Integer {
 ///
 /// # Examples
 /// ```
+/// extern crate malachite_base;
+/// extern crate malachite_gmp;
+///
+/// use malachite_base::traits::Zero;
 /// use malachite_gmp::integer::Integer;
 /// use std::str::FromStr;
 ///
-/// assert_eq!((123u32 + Integer::from(0)).to_string(), "123");
-/// assert_eq!((0u32 + Integer::from(-123)).to_string(), "-123");
-/// assert_eq!((456u32 + Integer::from(-123)).to_string(), "333");
-/// assert_eq!((123u32 + Integer::from_str("-1000000000000").unwrap()).to_string(),
-///            "-999999999877");
+/// fn main() {
+///     assert_eq!((123u32 + Integer::zero()).to_string(), "123");
+///     assert_eq!((0u32 + Integer::from(-123)).to_string(), "-123");
+///     assert_eq!((456u32 + Integer::from(-123)).to_string(), "333");
+///     assert_eq!((123u32 + Integer::from_str("-1000000000000").unwrap()).to_string(),
+///                "-999999999877");
+/// }
 /// ```
 impl Add<Integer> for u32 {
     type Output = Integer;
@@ -99,14 +117,20 @@ impl Add<Integer> for u32 {
 ///
 /// # Examples
 /// ```
+/// extern crate malachite_base;
+/// extern crate malachite_gmp;
+///
+/// use malachite_base::traits::Zero;
 /// use malachite_gmp::integer::Integer;
 /// use std::str::FromStr;
 ///
-/// assert_eq!((123u32 + &Integer::from(0)).to_string(), "123");
-/// assert_eq!((0u32 + &Integer::from(-123)).to_string(), "-123");
-/// assert_eq!((456u32 + &Integer::from(-123)).to_string(), "333");
-/// assert_eq!((123u32 + &Integer::from_str("-1000000000000").unwrap()).to_string(),
-///            "-999999999877");
+/// fn main() {
+///     assert_eq!((123u32 + &Integer::zero()).to_string(), "123");
+///     assert_eq!((0u32 + &Integer::from(-123)).to_string(), "-123");
+///     assert_eq!((456u32 + &Integer::from(-123)).to_string(), "333");
+///     assert_eq!((123u32 + &Integer::from_str("-1000000000000").unwrap()).to_string(),
+///                "-999999999877");
+/// }
 /// ```
 impl<'a> Add<&'a Integer> for u32 {
     type Output = Integer;

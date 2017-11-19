@@ -13,11 +13,17 @@ use std::ops::Not;
 ///
 /// # Examples
 /// ```
+/// extern crate malachite_base;
+/// extern crate malachite_native;
+///
+/// use malachite_base::traits::Zero;
 /// use malachite_native::integer::Integer;
 ///
-/// assert_eq!((!Integer::from(0)).to_string(), "-1");
-/// assert_eq!((!Integer::from(123)).to_string(), "-124");
-/// assert_eq!((!Integer::from(-123)).to_string(), "122");
+/// fn main() {
+///     assert_eq!((!Integer::zero()).to_string(), "-1");
+///     assert_eq!((!Integer::from(123)).to_string(), "-124");
+///     assert_eq!((!Integer::from(-123)).to_string(), "122");
+/// }
 /// ```
 impl Not for Integer {
     type Output = Integer;
@@ -39,11 +45,17 @@ impl Not for Integer {
 ///
 /// # Examples
 /// ```
+/// extern crate malachite_base;
+/// extern crate malachite_native;
+///
+/// use malachite_base::traits::Zero;
 /// use malachite_native::integer::Integer;
 ///
-/// assert_eq!((!&Integer::from(0)).to_string(), "-1");
-/// assert_eq!((!&Integer::from(123)).to_string(), "-124");
-/// assert_eq!((!&Integer::from(-123)).to_string(), "122");
+/// fn main() {
+///     assert_eq!((!&Integer::zero()).to_string(), "-1");
+///     assert_eq!((!&Integer::from(123)).to_string(), "-124");
+///     assert_eq!((!&Integer::from(-123)).to_string(), "122");
+/// }
 /// ```
 impl<'a> Not for &'a Integer {
     type Output = Integer;
@@ -86,11 +98,11 @@ impl<'a> Not for &'a Integer {
 /// extern crate malachite_base;
 /// extern crate malachite_native;
 ///
-/// use malachite_base::traits::NotAssign;
+/// use malachite_base::traits::{NotAssign, Zero};
 /// use malachite_native::integer::Integer;
 ///
 /// fn main() {
-///     let mut x = Integer::from(0);
+///     let mut x = Integer::zero();
 ///     x.not_assign();
 ///     assert_eq!(x.to_string(), "-1");
 ///

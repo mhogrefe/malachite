@@ -13,14 +13,20 @@ impl Natural {
     ///
     /// # Examples
     /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_native;
+    ///
+    /// use malachite_base::traits::Zero;
     /// use malachite_native::natural::Natural;
     /// use std::str::FromStr;
     ///
-    /// assert_eq!(Natural::from(0u32).trailing_zeros(), None);
-    /// assert_eq!(Natural::from(3u32).trailing_zeros(), Some(0));
-    /// assert_eq!(Natural::from(72u32).trailing_zeros(), Some(3));
-    /// assert_eq!(Natural::from(100u32).trailing_zeros(), Some(2));
-    /// assert_eq!(Natural::from_str("1000000000000").unwrap().trailing_zeros(), Some(12));
+    /// fn main() {
+    ///     assert_eq!(Natural::zero().trailing_zeros(), None);
+    ///     assert_eq!(Natural::from(3u32).trailing_zeros(), Some(0));
+    ///     assert_eq!(Natural::from(72u32).trailing_zeros(), Some(3));
+    ///     assert_eq!(Natural::from(100u32).trailing_zeros(), Some(2));
+    ///     assert_eq!(Natural::from_str("1000000000000").unwrap().trailing_zeros(), Some(12));
+    /// }
     /// ```
     pub fn trailing_zeros(&self) -> Option<u64> {
         match *self {

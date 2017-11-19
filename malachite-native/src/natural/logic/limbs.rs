@@ -15,14 +15,20 @@ impl Natural {
     ///
     /// # Example
     /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_native;
+    ///
+    /// use malachite_base::traits::Zero;
     /// use malachite_native::natural::Natural;
     /// use std::str::FromStr;
     ///
-    /// assert!(Natural::from(0u32).to_limbs_le().is_empty());
-    /// assert_eq!(Natural::from(123u32).to_limbs_le(), vec![123]);
-    /// // 10^12 = 232 * 2^32 + 3567587328
-    /// assert_eq!(Natural::from_str("1000000000000").unwrap().to_limbs_le(),
-    ///         vec![3567587328, 232]);
+    /// fn main() {
+    ///     assert!(Natural::zero().to_limbs_le().is_empty());
+    ///     assert_eq!(Natural::from(123u32).to_limbs_le(), vec![123]);
+    ///     // 10^12 = 232 * 2^32 + 3567587328
+    ///     assert_eq!(Natural::from_str("1000000000000").unwrap().to_limbs_le(),
+    ///             vec![3567587328, 232]);
+    /// }
     /// ```
     pub fn to_limbs_le(&self) -> Vec<u32> {
         match *self {
@@ -45,14 +51,20 @@ impl Natural {
     ///
     /// # Example
     /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_native;
+    ///
+    /// use malachite_base::traits::Zero;
     /// use malachite_native::natural::Natural;
     /// use std::str::FromStr;
     ///
-    /// assert!(Natural::from(0u32).to_limbs_be().is_empty());
-    /// assert_eq!(Natural::from(123u32).to_limbs_be(), vec![123]);
-    /// // 10^12 = 232 * 2^32 + 3567587328
-    /// assert_eq!(Natural::from_str("1000000000000").unwrap().to_limbs_be(),
-    ///         vec![232, 3567587328]);
+    /// fn main() {
+    ///     assert!(Natural::zero().to_limbs_be().is_empty());
+    ///     assert_eq!(Natural::from(123u32).to_limbs_be(), vec![123]);
+    ///     // 10^12 = 232 * 2^32 + 3567587328
+    ///     assert_eq!(Natural::from_str("1000000000000").unwrap().to_limbs_be(),
+    ///             vec![232, 3567587328]);
+    /// }
     /// ```
     pub fn to_limbs_be(&self) -> Vec<u32> {
         self.to_limbs_le().into_iter().rev().collect()

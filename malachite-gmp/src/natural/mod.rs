@@ -1,4 +1,5 @@
 use gmp_mpfr_sys::gmp::{self, mpz_t};
+use malachite_base::traits::{One, Two, Zero};
 use natural::Natural::*;
 use std::mem;
 
@@ -18,18 +19,6 @@ pub enum Natural {
 }
 
 impl Natural {
-    /// Creates a new `Natural` equal to 0.
-    ///
-    /// # Example
-    /// ```
-    /// use malachite_gmp::natural::Natural;
-    ///
-    /// assert_eq!(Natural::new().to_string(), "0");
-    /// ```
-    pub fn new() -> Natural {
-        Small(0)
-    }
-
     fn demote_if_small(&mut self) {
         if let Large(x) = *self {
             if unsafe { gmp::mpz_sizeinbase(&x, 2) } <= 32 {
@@ -96,6 +85,27 @@ impl Drop for Natural {
                 gmp::mpz_clear(large);
             }
         }
+    }
+}
+
+/// The constant 0.
+impl Zero for Natural {
+    fn zero() -> Natural {
+        Small(0)
+    }
+}
+
+/// The constant 1.
+impl One for Natural {
+    fn one() -> Natural {
+        Small(1)
+    }
+}
+
+/// The constant 2.
+impl Two for Natural {
+    fn two() -> Natural {
+        Small(2)
     }
 }
 

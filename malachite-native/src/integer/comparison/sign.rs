@@ -11,12 +11,18 @@ impl Integer {
     ///
     /// # Examples
     /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_native;
+    ///
+    /// use malachite_base::traits::Zero;
     /// use malachite_native::integer::Integer;
     /// use std::cmp::Ordering;
     ///
-    /// assert_eq!(Integer::from(0).sign(), Ordering::Equal);
-    /// assert_eq!(Integer::from(123).sign(), Ordering::Greater);
-    /// assert_eq!(Integer::from(-123).sign(), Ordering::Less);
+    /// fn main() {
+    ///     assert_eq!(Integer::zero().sign(), Ordering::Equal);
+    ///     assert_eq!(Integer::from(123).sign(), Ordering::Greater);
+    ///     assert_eq!(Integer::from(-123).sign(), Ordering::Less);
+    /// }
     /// ```
     pub fn sign(&self) -> Ordering {
         if self.sign {

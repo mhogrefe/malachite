@@ -7,14 +7,20 @@ use std::ops::{Add, AddAssign};
 ///
 /// # Examples
 /// ```
+/// extern crate malachite_base;
+/// extern crate malachite_gmp;
+///
+/// use malachite_base::traits::Zero;
 /// use malachite_gmp::natural::Natural;
 /// use std::str::FromStr;
 ///
-/// assert_eq!((Natural::from(0u32) + Natural::from(123u32)).to_string(), "123");
-/// assert_eq!((Natural::from(123u32) + Natural::from(0u32)).to_string(), "123");
-/// assert_eq!((Natural::from(123u32) + Natural::from(456u32)).to_string(), "579");
-/// assert_eq!((Natural::from_str("1000000000000").unwrap() + Natural::from_str("2000000000000")
-///            .unwrap()).to_string(), "3000000000000");
+/// fn main() {
+///     assert_eq!((Natural::zero() + Natural::from(123u32)).to_string(), "123");
+///     assert_eq!((Natural::from(123u32) + Natural::zero()).to_string(), "123");
+///     assert_eq!((Natural::from(123u32) + Natural::from(456u32)).to_string(), "579");
+///     assert_eq!((Natural::from_str("1000000000000").unwrap() + Natural::from_str("2000000000000")
+///                .unwrap()).to_string(), "3000000000000");
+/// }
 /// ```
 impl Add<Natural> for Natural {
     type Output = Natural;
@@ -30,14 +36,21 @@ impl Add<Natural> for Natural {
 ///
 /// # Examples
 /// ```
+extern crate malachite_base;
+/// extern crate malachite_gmp;
+///
+/// use malachite_base::traits::Zero;
 /// use malachite_gmp::natural::Natural;
 /// use std::str::FromStr;
 ///
-/// assert_eq!((Natural::from(0u32) + &Natural::from(123u32)).to_string(), "123");
-/// assert_eq!((Natural::from(123u32) + &Natural::from(0u32)).to_string(), "123");
-/// assert_eq!((Natural::from(123u32) + &Natural::from(456u32)).to_string(), "579");
-/// assert_eq!((Natural::from_str("1000000000000").unwrap() + &Natural::from_str("2000000000000")
-///            .unwrap()).to_string(), "3000000000000");
+/// fn main() {
+///     assert_eq!((Natural::zero() + &Natural::from(123u32)).to_string(), "123");
+///     assert_eq!((Natural::from(123u32) + &Natural::zero()).to_string(), "123");
+///     assert_eq!((Natural::from(123u32) + &Natural::from(456u32)).to_string(), "579");
+///     assert_eq!((Natural::from_str("1000000000000").unwrap() +
+///                 &Natural::from_str("2000000000000")
+///                .unwrap()).to_string(), "3000000000000");
+/// }
 /// ```
 impl<'a> Add<&'a Natural> for Natural {
     type Output = Natural;
@@ -53,14 +66,21 @@ impl<'a> Add<&'a Natural> for Natural {
 ///
 /// # Examples
 /// ```
+/// extern crate malachite_base;
+/// extern crate malachite_gmp;
+///
+/// use malachite_base::traits::Zero;
 /// use malachite_gmp::natural::Natural;
 /// use std::str::FromStr;
 ///
-/// assert_eq!((&Natural::from(0u32) + Natural::from(123u32)).to_string(), "123");
-/// assert_eq!((&Natural::from(123u32) + Natural::from(0u32)).to_string(), "123");
-/// assert_eq!((&Natural::from(123u32) + Natural::from(456u32)).to_string(), "579");
-/// assert_eq!((&Natural::from_str("1000000000000").unwrap() + Natural::from_str("2000000000000")
-///            .unwrap()).to_string(), "3000000000000");
+/// fn main() {
+///     assert_eq!((&Natural::zero() + Natural::from(123u32)).to_string(), "123");
+///     assert_eq!((&Natural::from(123u32) + Natural::zero()).to_string(), "123");
+///     assert_eq!((&Natural::from(123u32) + Natural::from(456u32)).to_string(), "579");
+///     assert_eq!((&Natural::from_str("1000000000000").unwrap() +
+///                 Natural::from_str("2000000000000")
+///                .unwrap()).to_string(), "3000000000000");
+/// }
 /// ```
 impl<'a> Add<Natural> for &'a Natural {
     type Output = Natural;
@@ -75,25 +95,33 @@ impl<'a> Add<Natural> for &'a Natural {
 ///
 /// # Examples
 /// ```
+/// extern crate malachite_base;
+/// extern crate malachite_gmp;
+///
+/// use malachite_base::traits::Zero;
 /// use malachite_gmp::natural::Natural;
 /// use std::str::FromStr;
 ///
-/// assert_eq!((&Natural::from(0u32) + &Natural::from(123u32)).to_string(), "123");
-/// assert_eq!((&Natural::from(123u32) + &Natural::from(0u32)).to_string(), "123");
-/// assert_eq!((&Natural::from(123u32) + &Natural::from(456u32)).to_string(), "579");
-/// assert_eq!((&Natural::from_str("1000000000000").unwrap() + &Natural::from_str("2000000000000")
-///            .unwrap()).to_string(), "3000000000000");
+/// fn main() {
+///     assert_eq!((&Natural::zero() + &Natural::from(123u32)).to_string(), "123");
+///     assert_eq!((&Natural::from(123u32) + &Natural::zero()).to_string(), "123");
+///     assert_eq!((&Natural::from(123u32) + &Natural::from(456u32)).to_string(), "579");
+///     assert_eq!((&Natural::from_str("1000000000000").unwrap() +
+///                 &Natural::from_str("2000000000000")
+///                .unwrap()).to_string(), "3000000000000");
+/// }
 /// ```
 impl<'a, 'b> Add<&'a Natural> for &'b Natural {
     type Output = Natural;
 
     fn add(self, other: &'a Natural) -> Natural {
-        if *self == 0 {
-            return other.clone();
+        if self as *const Natural == other as *const Natural {
+            self << 1
+        } else if *self == 0 {
+            other.clone()
         } else if *other == 0 {
-            return self.clone();
-        }
-        if let Small(y) = *other {
+            self.clone()
+        } else if let Small(y) = *other {
             self + y
         } else if let Small(x) = *self {
             other + x
@@ -115,15 +143,21 @@ impl<'a, 'b> Add<&'a Natural> for &'b Natural {
 ///
 /// # Examples
 /// ```
+/// extern crate malachite_base;
+/// extern crate malachite_gmp;
+///
+/// use malachite_base::traits::Zero;
 /// use malachite_gmp::natural::Natural;
 /// use std::str::FromStr;
 ///
-/// let mut x = Natural::new();
-/// x += Natural::from_str("1000000000000").unwrap();
-/// x += Natural::from_str("2000000000000").unwrap();
-/// x += Natural::from_str("3000000000000").unwrap();
-/// x += Natural::from_str("4000000000000").unwrap();
-/// assert_eq!(x.to_string(), "10000000000000");
+/// fn main() {
+///     let mut x = Natural::zero();
+///     x += Natural::from_str("1000000000000").unwrap();
+///     x += Natural::from_str("2000000000000").unwrap();
+///     x += Natural::from_str("3000000000000").unwrap();
+///     x += Natural::from_str("4000000000000").unwrap();
+///     assert_eq!(x.to_string(), "10000000000000");
+/// }
 /// ```
 impl AddAssign<Natural> for Natural {
     fn add_assign(&mut self, mut other: Natural) {
@@ -150,15 +184,21 @@ impl AddAssign<Natural> for Natural {
 ///
 /// # Examples
 /// ```
+/// extern crate malachite_base;
+/// extern crate malachite_gmp;
+///
+/// use malachite_base::traits::Zero;
 /// use malachite_gmp::natural::Natural;
 /// use std::str::FromStr;
 ///
-/// let mut x = Natural::new();
-/// x += &Natural::from_str("1000000000000").unwrap();
-/// x += &Natural::from_str("2000000000000").unwrap();
-/// x += &Natural::from_str("3000000000000").unwrap();
-/// x += &Natural::from_str("4000000000000").unwrap();
-/// assert_eq!(x.to_string(), "10000000000000");
+/// fn main() {
+///     let mut x = Natural::zero();
+///     x += &Natural::from_str("1000000000000").unwrap();
+///     x += &Natural::from_str("2000000000000").unwrap();
+///     x += &Natural::from_str("3000000000000").unwrap();
+///     x += &Natural::from_str("4000000000000").unwrap();
+///     assert_eq!(x.to_string(), "10000000000000");
+/// }
 /// ```
 impl<'a> AddAssign<&'a Natural> for Natural {
     fn add_assign(&mut self, other: &'a Natural) {

@@ -11,11 +11,17 @@ impl Integer {
     ///
     /// # Examples
     /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_native;
+    ///
+    /// use malachite_base::traits::Zero;
     /// use malachite_native::integer::Integer;
     ///
-    /// assert_eq!(Integer::from(0).abs().to_string(), "0");
-    /// assert_eq!(Integer::from(123).abs().to_string(), "123");
-    /// assert_eq!(Integer::from(-123).abs().to_string(), "123");
+    /// fn main() {
+    ///     assert_eq!(Integer::zero().abs().to_string(), "0");
+    ///     assert_eq!(Integer::from(123).abs().to_string(), "123");
+    ///     assert_eq!(Integer::from(-123).abs().to_string(), "123");
+    /// }
     /// ```
     pub fn abs(mut self) -> Integer {
         self.sign = true;
@@ -32,11 +38,17 @@ impl Integer {
     ///
     /// # Examples
     /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_native;
+    ///
+    /// use malachite_base::traits::Zero;
     /// use malachite_native::integer::Integer;
     ///
-    /// assert_eq!(Integer::from(0).abs_ref().to_string(), "0");
-    /// assert_eq!(Integer::from(123).abs_ref().to_string(), "123");
-    /// assert_eq!(Integer::from(-123).abs_ref().to_string(), "123");
+    /// fn main() {
+    ///     assert_eq!(Integer::zero().abs_ref().to_string(), "0");
+    ///     assert_eq!(Integer::from(123).abs_ref().to_string(), "123");
+    ///     assert_eq!(Integer::from(-123).abs_ref().to_string(), "123");
+    /// }
     /// ```
     pub fn abs_ref(&self) -> Integer {
         Integer {
@@ -54,11 +66,17 @@ impl Integer {
     ///
     /// # Examples
     /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_native;
+    ///
+    /// use malachite_base::traits::Zero;
     /// use malachite_native::integer::Integer;
     ///
-    /// assert_eq!(Integer::from(0).natural_abs().to_string(), "0");
-    /// assert_eq!(Integer::from(123).natural_abs().to_string(), "123");
-    /// assert_eq!(Integer::from(-123).natural_abs().to_string(), "123");
+    /// fn main() {
+    ///     assert_eq!(Integer::zero().natural_abs().to_string(), "0");
+    ///     assert_eq!(Integer::from(123).natural_abs().to_string(), "123");
+    ///     assert_eq!(Integer::from(-123).natural_abs().to_string(), "123");
+    /// }
     /// ```
     pub fn natural_abs(self) -> Natural {
         self.abs
@@ -75,11 +93,17 @@ impl Integer {
     ///
     /// # Examples
     /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_native;
+    ///
+    /// use malachite_base::traits::Zero;
     /// use malachite_native::integer::Integer;
     ///
-    /// assert_eq!(Integer::from(0).natural_abs_ref().to_string(), "0");
-    /// assert_eq!(Integer::from(123).natural_abs_ref().to_string(), "123");
-    /// assert_eq!(Integer::from(-123).natural_abs_ref().to_string(), "123");
+    /// fn main() {
+    ///     assert_eq!(Integer::zero().natural_abs_ref().to_string(), "0");
+    ///     assert_eq!(Integer::from(123).natural_abs_ref().to_string(), "123");
+    ///     assert_eq!(Integer::from(-123).natural_abs_ref().to_string(), "123");
+    /// }
     /// ```
     pub fn natural_abs_ref(&self) -> Natural {
         self.abs.clone()
@@ -97,11 +121,11 @@ impl Integer {
 /// extern crate malachite_base;
 /// extern crate malachite_native;
 ///
-/// use malachite_base::traits::AbsAssign;
+/// use malachite_base::traits::{AbsAssign, Zero};
 /// use malachite_native::integer::Integer;
 ///
 /// fn main() {
-///     let mut x = Integer::from(0);
+///     let mut x = Integer::zero();
 ///     x.abs_assign();
 ///     assert_eq!(x.to_string(), "0");
 ///

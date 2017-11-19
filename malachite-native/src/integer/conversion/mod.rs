@@ -1,5 +1,6 @@
 use error::ParseIntegerError;
 use integer::Integer;
+use malachite_base::traits::Zero;
 use std::fmt::{self, Debug, Display, Formatter, Write};
 use std::str::FromStr;
 
@@ -19,7 +20,7 @@ impl Integer {
 
     //TODO test
     pub fn from_str_radix(src: &str, radix: i32) -> Result<Integer, ParseIntegerError> {
-        let mut i = Integer::new();
+        let mut i = Integer::zero();
         i.assign_str_radix(src, radix)?;
         Ok(i)
     }
@@ -55,7 +56,7 @@ impl FromStr for Integer {
     type Err = ParseIntegerError;
 
     fn from_str(src: &str) -> Result<Integer, ParseIntegerError> {
-        let mut i = Integer::new();
+        let mut i = Integer::zero();
         i.assign_str(src)?;
         Ok(i)
     }

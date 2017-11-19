@@ -1,6 +1,7 @@
 use error::ParseIntegerError;
 use gmp_mpfr_sys::gmp;
 use integer::Integer;
+use malachite_base::traits::Zero;
 use natural::Natural;
 use natural::Natural::*;
 use std::ffi::CString;
@@ -24,7 +25,7 @@ impl Natural {
 
     //TODO test
     pub fn from_str_radix(src: &str, radix: i32) -> Result<Natural, ParseIntegerError> {
-        let mut i = Natural::new();
+        let mut i = Natural::zero();
         i.assign_str_radix(src, radix)?;
         Ok(i)
     }
@@ -71,7 +72,7 @@ impl FromStr for Natural {
     type Err = ParseIntegerError;
 
     fn from_str(src: &str) -> Result<Natural, ParseIntegerError> {
-        let mut i = Natural::new();
+        let mut i = Natural::zero();
         i.assign_str(src)?;
         Ok(i)
     }

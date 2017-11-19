@@ -7,11 +7,17 @@ impl Integer {
     ///
     /// # Examples
     /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_gmp;
+    ///
+    /// use malachite_base::traits::Zero;
     /// use malachite_gmp::integer::Integer;
     ///
-    /// assert_eq!(Integer::from(0).significant_bits(), 0);
-    /// assert_eq!(Integer::from(100).significant_bits(), 7);
-    /// assert_eq!(Integer::from(-100).significant_bits(), 7);
+    /// fn main() {
+    ///     assert_eq!(Integer::zero().significant_bits(), 0);
+    ///     assert_eq!(Integer::from(100).significant_bits(), 7);
+    ///     assert_eq!(Integer::from(-100).significant_bits(), 7);
+    /// }
     /// ```
     pub fn significant_bits(&self) -> u64 {
         match *self {

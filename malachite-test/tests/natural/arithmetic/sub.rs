@@ -1,4 +1,5 @@
 use common::LARGE_LIMIT;
+use malachite_base::traits::Zero;
 use malachite_native::natural as native;
 use malachite_gmp::natural as gmp;
 use malachite_test::common::{gmp_natural_to_native, native_natural_to_gmp,
@@ -194,7 +195,7 @@ fn sub_properties() {
     let one_natural = |gmp_x: gmp::Natural| {
         let x = gmp_natural_to_native(&gmp_x);
         assert_eq!((&x - 0).unwrap(), x);
-        assert_eq!((&x - &x).unwrap(), native::Natural::from(0u32));
+        assert_eq!((&x - &x).unwrap(), native::Natural::zero());
         if x != 0 {
             assert!((0 - &x).is_none());
         }

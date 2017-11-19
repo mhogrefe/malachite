@@ -9,12 +9,18 @@ impl Natural {
     ///
     /// # Example
     /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_native;
+    ///
+    /// use malachite_base::traits::Zero;
     /// use malachite_native::natural::Natural;
     /// use std::str::FromStr;
     ///
-    /// assert_eq!(Natural::from(0u32).limb_count(), 0);
-    /// assert_eq!(Natural::from(123u32).limb_count(), 1);
-    /// assert_eq!(Natural::from_str("1000000000000").unwrap().limb_count(), 2);
+    /// fn main() {
+    ///     assert_eq!(Natural::zero().limb_count(), 0);
+    ///     assert_eq!(Natural::from(123u32).limb_count(), 1);
+    ///     assert_eq!(Natural::from_str("1000000000000").unwrap().limb_count(), 2);
+    /// }
     /// ```
     pub fn limb_count(&self) -> u64 {
         match *self {

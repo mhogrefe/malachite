@@ -77,3 +77,96 @@ pub trait PartialOrdAbs<Rhs: ?Sized = Self>: PartialEq<Rhs> {
 pub trait OrdAbs: Eq + PartialOrdAbs<Self> {
     fn cmp_abs(&self, other: &Self) -> Ordering;
 }
+
+pub trait Zero {
+    fn zero() -> Self;
+}
+
+pub trait One {
+    fn one() -> Self;
+}
+
+pub trait Two {
+    fn two() -> Self;
+}
+
+pub trait NegativeOne {
+    fn negative_one() -> Self;
+}
+
+macro_rules! impl01u {
+    ($t: ty) => {
+        impl Zero for $t {
+            fn zero() -> $t {
+                0
+            }
+        }
+
+        impl One for $t {
+            fn one() -> $t {
+                1
+            }
+        }
+
+        impl Two for $t {
+            fn two() -> $t {
+                2
+            }
+        }
+    }
+}
+
+macro_rules! impl01i {
+    ($t: ty) => {
+        impl01u!($t);
+
+        impl NegativeOne for $t {
+            fn negative_one() -> $t {
+                -1
+            }
+        }
+    }
+}
+
+macro_rules! impl01f {
+    ($t: ty) => {
+        impl Zero for $t {
+            fn zero() -> $t {
+                0.0
+            }
+        }
+
+        impl One for $t {
+            fn one() -> $t {
+                1.0
+            }
+        }
+
+        impl Two for $t {
+            fn two() -> $t {
+                2.0
+            }
+        }
+
+        impl NegativeOne for $t {
+            fn negative_one() -> $t {
+                -1.0
+            }
+        }
+    }
+}
+
+impl01u!(u8);
+impl01u!(u16);
+impl01u!(u32);
+impl01u!(u64);
+impl01u!(usize);
+
+impl01i!(i8);
+impl01i!(i16);
+impl01i!(i32);
+impl01i!(i64);
+impl01i!(isize);
+
+impl01f!(f32);
+impl01f!(f64);

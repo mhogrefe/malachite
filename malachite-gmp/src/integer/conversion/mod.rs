@@ -2,6 +2,7 @@ use gmp_mpfr_sys::gmp::{self, mpz_t};
 use error::ParseIntegerError;
 use integer::Integer;
 use integer::Integer::*;
+use malachite_base::traits::Zero;
 use std::ffi::CString;
 use std::fmt::{self, Debug, Display, Formatter};
 use std::os::raw::{c_char, c_int, c_long};
@@ -69,7 +70,7 @@ impl Integer {
 
     //TODO test
     pub fn from_str_radix(src: &str, radix: i32) -> Result<Integer, ParseIntegerError> {
-        let mut i = Integer::new();
+        let mut i = Integer::zero();
         i.assign_str_radix(src, radix)?;
         Ok(i)
     }
@@ -228,7 +229,7 @@ impl FromStr for Integer {
     type Err = ParseIntegerError;
 
     fn from_str(src: &str) -> Result<Integer, ParseIntegerError> {
-        let mut i = Integer::new();
+        let mut i = Integer::zero();
         i.assign_str(src)?;
         Ok(i)
     }

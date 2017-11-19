@@ -10,10 +10,16 @@ use std::ops::Neg;
 ///
 /// # Examples
 /// ```
+/// extern crate malachite_base;
+/// extern crate malachite_native;
+///
+/// use malachite_base::traits::Zero;
 /// use malachite_native::natural::Natural;
 ///
-/// assert_eq!((-Natural::from(0u32)).to_string(), "0");
-/// assert_eq!((-Natural::from(123u32)).to_string(), "-123");
+/// fn main() {
+///     assert_eq!((-Natural::zero()).to_string(), "0");
+///     assert_eq!((-Natural::from(123u32)).to_string(), "-123");
+/// }
 /// ```
 impl Neg for Natural {
     type Output = Integer;
@@ -44,10 +50,16 @@ impl Neg for Natural {
 ///
 /// # Examples
 /// ```
+/// extern crate malachite_base;
+/// extern crate malachite_native;
+///
+/// use malachite_base::traits::Zero;
 /// use malachite_native::natural::Natural;
 ///
-/// assert_eq!((-&Natural::from(0u32)).to_string(), "0");
-/// assert_eq!((-&Natural::from(123u32)).to_string(), "-123");
+/// fn main() {
+///     assert_eq!((-&Natural::zero()).to_string(), "0");
+///     assert_eq!((-&Natural::from(123u32)).to_string(), "-123");
+/// }
 /// ```
 impl<'a> Neg for &'a Natural {
     type Output = Integer;

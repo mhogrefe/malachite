@@ -1,4 +1,5 @@
-use natural::Natural;
+use malachite_base::traits::{NegativeOne, One, Two, Zero};
+use natural::Natural::{self, Small};
 
 /// An integer.
 ///
@@ -11,21 +12,6 @@ pub struct Integer {
 }
 
 impl Integer {
-    /// Creates a new `Integer` equal to 0.
-    ///
-    /// # Example
-    /// ```
-    /// use malachite_native::integer::Integer;
-    ///
-    /// assert_eq!(Integer::new().to_string(), "0");
-    /// ```
-    pub fn new() -> Integer {
-        Integer {
-            sign: true,
-            abs: Natural::new(),
-        }
-    }
-
     /// Returns true iff `self` is valid. To be valid, can only be Large when its absolute value
     /// is at least 2^(31). All Integers used outside this crate are valid, but temporary Integers
     /// used inside may not be.
@@ -46,7 +32,47 @@ impl Default for Integer {
     fn default() -> Integer {
         Integer {
             sign: true,
-            abs: Natural::new(),
+            abs: Natural::zero(),
+        }
+    }
+}
+
+/// The constant 0.
+impl Zero for Integer {
+    fn zero() -> Integer {
+        Integer {
+            sign: true,
+            abs: Small(0),
+        }
+    }
+}
+
+/// The constant 1.
+impl One for Integer {
+    fn one() -> Integer {
+        Integer {
+            sign: true,
+            abs: Small(1),
+        }
+    }
+}
+
+/// The constant 2.
+impl Two for Integer {
+    fn two() -> Integer {
+        Integer {
+            sign: true,
+            abs: Small(2),
+        }
+    }
+}
+
+/// The constant -1.
+impl NegativeOne for Integer {
+    fn negative_one() -> Integer {
+        Integer {
+            sign: false,
+            abs: Small(1),
         }
     }
 }

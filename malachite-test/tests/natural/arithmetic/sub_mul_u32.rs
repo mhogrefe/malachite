@@ -1,4 +1,5 @@
 use common::LARGE_LIMIT;
+use malachite_base::traits::{One, Zero};
 use malachite_base::traits::{SubMul, SubMulAssign};
 use malachite_native::natural as native;
 use malachite_gmp::natural as gmp;
@@ -181,7 +182,7 @@ fn sub_mul_u32_properties() {
     // n.sub_mul(n, 1) == 0
     let single_natural = |gmp_n: gmp::Natural| {
         let n = &gmp_natural_to_native(&gmp_n);
-        assert_eq!(n.sub_mul(n, 1), Some(native::Natural::from(0u32)));
+        assert_eq!(n.sub_mul(n, 1), Some(native::Natural::zero()));
     };
 
     // n.sub_mul(0, c) == Some(n)
@@ -189,9 +190,9 @@ fn sub_mul_u32_properties() {
     // (n * c).sub_mul(n, c) == 0
     let natural_and_u32 = |gmp_n: gmp::Natural, c: u32| {
         let n = &gmp_natural_to_native(&gmp_n);
-        assert_eq!(n.sub_mul(&native::Natural::from(0u32), c), Some(n.clone()));
-        assert_eq!(n.sub_mul(&native::Natural::from(1u32), c), n - c);
-        assert_eq!((n * c).sub_mul(n, c), Some(native::Natural::from(0u32)));
+        assert_eq!(n.sub_mul(&native::Natural::zero(), c), Some(n.clone()));
+        assert_eq!(n.sub_mul(&native::Natural::one(), c), n - c);
+        assert_eq!((n * c).sub_mul(n, c), Some(native::Natural::zero()));
     };
 
     // a.sub_mul(b, 0) == Some(a)

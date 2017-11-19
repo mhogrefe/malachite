@@ -1,4 +1,5 @@
 use gmp_mpfr_sys::gmp::{self, mpz_t};
+use malachite_base::traits::Zero;
 use natural::arithmetic::sub_u32::sub_assign_u32_helper;
 use natural::Natural::{self, Large, Small};
 use std::mem;
@@ -9,15 +10,21 @@ use std::ops::{Sub, SubAssign};
 ///
 /// # Examples
 /// ```
+/// extern crate malachite_base;
+/// extern crate malachite_gmp;
+///
+/// use malachite_base::traits::Zero;
 /// use malachite_gmp::natural::Natural;
 /// use std::str::FromStr;
 ///
-/// assert_eq!(format!("{:?}", Natural::from(0u32) - &Natural::from(123u32)), "None");
-/// assert_eq!(format!("{:?}", Natural::from(123u32) - &Natural::from(0u32)), "Some(123)");
-/// assert_eq!(format!("{:?}", Natural::from(456u32) - &Natural::from(123u32)), "Some(333)");
-/// assert_eq!(format!("{:?}", Natural::from_str("3000000000000").unwrap() -
-///                            &Natural::from_str("1000000000000").unwrap()),
-///            "Some(2000000000000)");
+/// fn main() {
+///     assert_eq!(format!("{:?}", Natural::zero() - &Natural::from(123u32)), "None");
+///     assert_eq!(format!("{:?}", Natural::from(123u32) - &Natural::zero()), "Some(123)");
+///     assert_eq!(format!("{:?}", Natural::from(456u32) - &Natural::from(123u32)), "Some(333)");
+///     assert_eq!(format!("{:?}", Natural::from_str("3000000000000").unwrap() -
+///                                &Natural::from_str("1000000000000").unwrap()),
+///                "Some(2000000000000)");
+/// }
 /// ```
 impl<'a> Sub<&'a Natural> for Natural {
     type Output = Option<Natural>;
@@ -35,21 +42,29 @@ impl<'a> Sub<&'a Natural> for Natural {
 ///
 /// # Examples
 /// ```
+/// extern crate malachite_base;
+/// extern crate malachite_gmp;
+///
+/// use malachite_base::traits::Zero;
 /// use malachite_gmp::natural::Natural;
 /// use std::str::FromStr;
 ///
-/// assert_eq!(format!("{:?}", &Natural::from(0u32) - &Natural::from(123u32)), "None");
-/// assert_eq!(format!("{:?}", &Natural::from(123u32) - &Natural::from(0u32)), "Some(123)");
-/// assert_eq!(format!("{:?}", &Natural::from(456u32) - &Natural::from(123u32)), "Some(333)");
-/// assert_eq!(format!("{:?}", &Natural::from_str("3000000000000").unwrap() -
-///                            &Natural::from_str("1000000000000").unwrap()),
-///            "Some(2000000000000)");
+/// fn main() {
+///     assert_eq!(format!("{:?}", &Natural::zero() - &Natural::from(123u32)), "None");
+///     assert_eq!(format!("{:?}", &Natural::from(123u32) - &Natural::zero()), "Some(123)");
+///     assert_eq!(format!("{:?}", &Natural::from(456u32) - &Natural::from(123u32)), "Some(333)");
+///     assert_eq!(format!("{:?}", &Natural::from_str("3000000000000").unwrap() -
+///                                &Natural::from_str("1000000000000").unwrap()),
+///                "Some(2000000000000)");
+/// }
 /// ```
 impl<'a, 'b> Sub<&'a Natural> for &'b Natural {
     type Output = Option<Natural>;
 
     fn sub(self, other: &'a Natural) -> Option<Natural> {
-        if *other == 0 {
+        if self as *const Natural == other as *const Natural {
+            Some(Natural::zero())
+        } else if *other == 0 {
             Some(self.clone())
         } else if let Small(y) = *other {
             self - y

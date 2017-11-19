@@ -1,5 +1,5 @@
 use common::LARGE_LIMIT;
-use malachite_base::traits::{SubMul, SubMulAssign};
+use malachite_base::traits::{One, SubMul, SubMulAssign, Zero};
 use malachite_native::integer as native;
 use malachite_gmp::integer as gmp;
 use malachite_test::common::{gmp_integer_to_native, native_integer_to_gmp};
@@ -215,9 +215,9 @@ fn sub_mul_u32_properties() {
     // (n * c).sub_mul(n, c) == 0
     let integer_and_u32 = |gmp_n: gmp::Integer, c: u32| {
         let n = &gmp_integer_to_native(&gmp_n);
-        assert_eq!(n.sub_mul(&native::Integer::from(0u32), c), *n);
-        assert_eq!(n.sub_mul(&native::Integer::from(1u32), c), n - c);
-        assert_eq!(native::Integer::from(0u32).sub_mul(n, c), -(n * c));
+        assert_eq!(n.sub_mul(&native::Integer::zero(), c), *n);
+        assert_eq!(n.sub_mul(&native::Integer::one(), c), n - c);
+        assert_eq!(native::Integer::zero().sub_mul(n, c), -(n * c));
         assert_eq!((n * c).sub_mul(n, c), 0);
     };
 

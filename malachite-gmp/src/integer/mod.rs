@@ -1,5 +1,6 @@
 use gmp_mpfr_sys::gmp::{self, mpz_t};
 use integer::Integer::*;
+use malachite_base::traits::{NegativeOne, One, Two, Zero};
 use std::mem;
 
 /// An integer backed by [GMP](https://gmplib.org/).
@@ -18,18 +19,6 @@ pub enum Integer {
 }
 
 impl Integer {
-    /// Creates a new `Integer` equal to 0.
-    ///
-    /// # Example
-    /// ```
-    /// use malachite_gmp::integer::Integer;
-    ///
-    /// assert_eq!(Integer::new().to_string(), "0");
-    /// ```
-    pub fn new() -> Integer {
-        Small(0)
-    }
-
     pub fn new_mpz_t() -> mpz_t {
         let mut x: mpz_t = unsafe { mem::uninitialized() };
         unsafe {
@@ -118,6 +107,34 @@ impl Drop for Integer {
                 gmp::mpz_clear(x);
             }
         }
+    }
+}
+
+/// The constant 0.
+impl Zero for Integer {
+    fn zero() -> Integer {
+        Small(0)
+    }
+}
+
+/// The constant 1.
+impl One for Integer {
+    fn one() -> Integer {
+        Small(1)
+    }
+}
+
+/// The constant 2.
+impl Two for Integer {
+    fn two() -> Integer {
+        Small(2)
+    }
+}
+
+/// The constant -1.
+impl NegativeOne for Integer {
+    fn negative_one() -> Integer {
+        Small(-1)
     }
 }
 

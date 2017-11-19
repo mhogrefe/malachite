@@ -8,11 +8,17 @@ use malachite_base::traits::NegAssign;
 ///
 /// # Examples
 /// ```
+/// extern crate malachite_base;
+/// extern crate malachite_gmp;
+///
+/// use malachite_base::traits::Zero;
 /// use malachite_gmp::integer::Integer;
 ///
-/// assert_eq!((-Integer::from(0)).to_string(), "0");
-/// assert_eq!((-Integer::from(123)).to_string(), "-123");
-/// assert_eq!((-Integer::from(-123)).to_string(), "123");
+/// fn main() {
+///     assert_eq!((-Integer::zero()).to_string(), "0");
+///     assert_eq!((-Integer::from(123)).to_string(), "-123");
+///     assert_eq!((-Integer::from(-123)).to_string(), "123");
+/// }
 /// ```
 impl Neg for Integer {
     type Output = Integer;
@@ -27,11 +33,17 @@ impl Neg for Integer {
 ///
 /// # Examples
 /// ```
+/// extern crate malachite_base;
+/// extern crate malachite_gmp;
+///
+/// use malachite_base::traits::Zero;
 /// use malachite_gmp::integer::Integer;
 ///
-/// assert_eq!((-&Integer::from(0)).to_string(), "0");
-/// assert_eq!((-&Integer::from(123)).to_string(), "-123");
-/// assert_eq!((-&Integer::from(-123)).to_string(), "123");
+/// fn main() {
+///     assert_eq!((-&Integer::zero()).to_string(), "0");
+///     assert_eq!((-&Integer::from(123)).to_string(), "-123");
+///     assert_eq!((-&Integer::from(-123)).to_string(), "123");
+/// }
 /// ```
 impl<'a> Neg for &'a Integer {
     type Output = Integer;
@@ -64,11 +76,11 @@ impl<'a> Neg for &'a Integer {
 /// extern crate malachite_base;
 /// extern crate malachite_gmp;
 ///
-/// use malachite_base::traits::NegAssign;
+/// use malachite_base::traits::{NegAssign, Zero};
 /// use malachite_gmp::integer::Integer;
 ///
 /// fn main() {
-///     let mut x = Integer::from(0);
+///     let mut x = Integer::zero();
 ///     x.neg_assign();
 ///     assert_eq!(x.to_string(), "0");
 ///

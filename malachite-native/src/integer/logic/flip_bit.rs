@@ -12,19 +12,25 @@ impl Integer {
     ///
     /// # Examples
     /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_native;
+    ///
+    /// use malachite_base::traits::{NegativeOne, Zero};
     /// use malachite_native::integer::Integer;
     ///
-    /// let mut x = Integer::new();
-    /// x.flip_bit(10);
-    /// assert_eq!(x.to_string(), "1024");
-    /// x.flip_bit(10);
-    /// assert_eq!(x.to_string(), "0");
+    /// fn main() {
+    ///     let mut x = Integer::zero();
+    ///     x.flip_bit(10);
+    ///     assert_eq!(x.to_string(), "1024");
+    ///     x.flip_bit(10);
+    ///     assert_eq!(x.to_string(), "0");
     ///
-    /// let mut x = Integer::from(-1);
-    /// x.flip_bit(10);
-    /// assert_eq!(x.to_string(), "-1025");
-    /// x.flip_bit(10);
-    /// assert_eq!(x.to_string(), "-1");
+    ///     let mut x = Integer::negative_one();
+    ///     x.flip_bit(10);
+    ///     assert_eq!(x.to_string(), "-1025");
+    ///     x.flip_bit(10);
+    ///     assert_eq!(x.to_string(), "-1");
+    /// }
     /// ```
     pub fn flip_bit(&mut self, index: u64) {
         if self.get_bit(index) {

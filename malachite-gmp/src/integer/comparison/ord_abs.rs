@@ -29,6 +29,9 @@ impl PartialOrdAbs for Integer {
 /// Asserts that `Integer` absolute value ordering is a total order.
 impl OrdAbs for Integer {
     fn cmp_abs(&self, other: &Integer) -> Ordering {
+        if self as *const Integer == other as *const Integer {
+            return Ordering::Equal;
+        }
         match (self, other) {
             (&Small(ref x), y) => x.partial_cmp_abs(y).unwrap(),
             (&Large(_), &Small(ref y)) => self.partial_cmp_abs(y).unwrap(),

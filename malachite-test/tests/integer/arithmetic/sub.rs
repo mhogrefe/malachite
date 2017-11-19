@@ -1,4 +1,5 @@
 use common::LARGE_LIMIT;
+use malachite_base::traits::Zero;
 use malachite_native::integer as native;
 use malachite_gmp::integer as gmp;
 use malachite_test::common::{gmp_integer_to_native, native_integer_to_num_bigint,
@@ -185,8 +186,8 @@ fn sub_properties() {
     // x - -x == x << 1
     let one_integer = |gmp_x: gmp::Integer| {
         let x = gmp_integer_to_native(&gmp_x);
-        let id_1 = &x - native::Integer::from(0i32);
-        let id_2 = native::Integer::from(0i32) - &x;
+        let id_1 = &x - native::Integer::zero();
+        let id_2 = native::Integer::zero() - &x;
         let double = &x - -&x;
         assert_eq!(id_1, x);
         assert_eq!(id_2, -&x);

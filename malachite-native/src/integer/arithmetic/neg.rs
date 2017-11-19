@@ -1,5 +1,5 @@
 use integer::Integer;
-use malachite_base::traits::NegAssign;
+use malachite_base::traits::{NegAssign, Zero};
 use std::ops::Neg;
 
 /// Returns the negative of an `Integer`, taking the `Integer` by value.
@@ -10,11 +10,17 @@ use std::ops::Neg;
 ///
 /// # Examples
 /// ```
+/// extern crate malachite_base;
+/// extern crate malachite_native;
+///
+/// use malachite_base::traits::Zero;
 /// use malachite_native::integer::Integer;
 ///
-/// assert_eq!((-Integer::from(0)).to_string(), "0");
-/// assert_eq!((-Integer::from(123)).to_string(), "-123");
-/// assert_eq!((-Integer::from(-123)).to_string(), "123");
+/// fn main() {
+///     assert_eq!((-Integer::zero()).to_string(), "0");
+///     assert_eq!((-Integer::from(123)).to_string(), "-123");
+///     assert_eq!((-Integer::from(-123)).to_string(), "123");
+/// }
 /// ```
 impl Neg for Integer {
     type Output = Integer;
@@ -37,18 +43,24 @@ impl Neg for Integer {
 ///
 /// # Examples
 /// ```
+/// extern crate malachite_base;
+/// extern crate malachite_native;
+///
+/// use malachite_base::traits::Zero;
 /// use malachite_native::integer::Integer;
 ///
-/// assert_eq!((-&Integer::from(0)).to_string(), "0");
-/// assert_eq!((-&Integer::from(123)).to_string(), "-123");
-/// assert_eq!((-&Integer::from(-123)).to_string(), "123");
+/// fn main() {
+///     assert_eq!((-&Integer::zero()).to_string(), "0");
+///     assert_eq!((-&Integer::from(123)).to_string(), "-123");
+///     assert_eq!((-&Integer::from(-123)).to_string(), "123");
+/// }
 /// ```
 impl<'a> Neg for &'a Integer {
     type Output = Integer;
 
     fn neg(self) -> Integer {
         if self.abs == 0 {
-            Integer::from(0)
+            Integer::zero()
         } else {
             Integer {
                 sign: !self.sign,
@@ -69,11 +81,11 @@ impl<'a> Neg for &'a Integer {
 /// extern crate malachite_base;
 /// extern crate malachite_native;
 ///
-/// use malachite_base::traits::NegAssign;
+/// use malachite_base::traits::{NegAssign, Zero};
 /// use malachite_native::integer::Integer;
 ///
 /// fn main() {
-///     let mut x = Integer::from(0);
+///     let mut x = Integer::zero();
 ///     x.neg_assign();
 ///     assert_eq!(x.to_string(), "0");
 ///

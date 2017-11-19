@@ -1,4 +1,5 @@
 use common::LARGE_LIMIT;
+use malachite_base::traits::One;
 use malachite_gmp::integer as gmp;
 use malachite_native::integer as native;
 use malachite_native::natural as native_natural;
@@ -64,7 +65,7 @@ fn to_i64_properties() {
         let native_i64 = x.to_i64();
         assert_eq!(gmp_x.to_i64(), native_i64);
         if x.significant_bits() < 64 ||
-            x == -((native_natural::Natural::from(1u32) << 63).into_integer())
+            x == -((native_natural::Natural::one() << 63).into_integer())
         {
             assert_eq!(native::Integer::from(native_i64.unwrap()), x);
             assert_eq!(native_i64, Some(x.to_i64_wrapping()));

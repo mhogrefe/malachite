@@ -1,4 +1,5 @@
 use common::LARGE_LIMIT;
+use malachite_base::traits::{NegativeOne, One, Zero};
 use malachite_native::integer as native;
 use malachite_gmp::integer as gmp;
 use malachite_test::common::{gmp_integer_to_native, native_integer_to_gmp,
@@ -224,13 +225,13 @@ fn mul_i32_properties() {
     // i * 1 == i
     // if i != -2^31, i * -1 == -i and -1 * i == -i
     let one_i32 = |i: i32| {
-        assert_eq!(native::Integer::from(0i32) * i, 0);
-        assert_eq!(i * native::Integer::from(0i32), 0);
-        assert_eq!(native::Integer::from(1i32) * i, i);
-        assert_eq!(i * native::Integer::from(1i32), i);
+        assert_eq!(native::Integer::zero() * i, 0);
+        assert_eq!(i * native::Integer::zero(), 0);
+        assert_eq!(native::Integer::one() * i, i);
+        assert_eq!(i * native::Integer::one(), i);
         if i != i32::min_value() {
-            assert_eq!(native::Integer::from(-1i32) * i, -i);
-            assert_eq!(i * native::Integer::from(-1i32), -i);
+            assert_eq!(native::Integer::negative_one() * i, -i);
+            assert_eq!(i * native::Integer::negative_one(), -i);
         }
     };
 

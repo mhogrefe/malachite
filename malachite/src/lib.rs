@@ -1,3 +1,4 @@
+extern crate malachite_base;
 #[cfg(feature = "gmp")]
 extern crate malachite_gmp;
 #[cfg(feature = "native")]

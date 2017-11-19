@@ -1,4 +1,5 @@
 use common::LARGE_LIMIT;
+use malachite_base::traits::{One, Zero};
 use malachite_native::natural as native;
 use malachite_gmp::natural as gmp;
 use malachite_test::common::{gmp_natural_to_native, native_natural_to_num_biguint,
@@ -240,10 +241,10 @@ fn mul_properties() {
     let one_natural = |gmp_x: gmp::Natural| {
         let x = gmp_natural_to_native(&gmp_x);
         let x_old = x.clone();
-        assert_eq!(&x * native::Natural::from(0u32), 0);
-        assert_eq!(native::Natural::from(0u32) * 0, 0);
-        let id_1 = &x * native::Natural::from(1u32);
-        let id_2 = native::Natural::from(1u32) * &x;
+        assert_eq!(&x * native::Natural::zero(), 0);
+        assert_eq!(native::Natural::zero() * 0, 0);
+        let id_1 = &x * native::Natural::one();
+        let id_2 = native::Natural::one() * &x;
         //TODO let double = &x * &x;
         assert_eq!(id_1, x_old);
         assert_eq!(id_2, x_old);

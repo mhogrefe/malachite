@@ -1,4 +1,5 @@
 use common::LARGE_LIMIT;
+use malachite_base::traits::{One, Zero};
 use malachite_native::natural as native;
 use malachite_gmp::natural as gmp;
 use malachite_test::common::{gmp_natural_to_native, native_natural_to_gmp,
@@ -128,7 +129,7 @@ fn shl_u32_properties() {
         assert_eq!(rugint_integer_to_native_natural(&(rugint_n2 << u)), n);
 
         assert!(&old_n << u >= old_n);
-        assert_eq!(&old_n << u, old_n * (native::Natural::from(1u32) << u));
+        assert_eq!(&old_n << u, old_n * (native::Natural::one() << u));
     };
 
     // n << 0 == n
@@ -141,8 +142,8 @@ fn shl_u32_properties() {
     // 0 << n == 0
     // 1 << n is a power of 2
     let one_u32 = |u: u32| {
-        assert_eq!(native::Natural::from(0u32) << u, 0);
-        assert!((native::Natural::from(1u32) << u).is_power_of_two());
+        assert_eq!(native::Natural::zero() << u, 0);
+        assert!((native::Natural::one() << u).is_power_of_two());
     };
 
     for (n, u) in log_pairs(exhaustive_naturals(), exhaustive_u::<u32>()).take(LARGE_LIMIT) {

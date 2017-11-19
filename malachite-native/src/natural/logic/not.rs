@@ -64,10 +64,16 @@ pub(crate) fn mpn_com_in_place(s: &mut [u32]) {
 ///
 /// # Examples
 /// ```
+/// extern crate malachite_base;
+/// extern crate malachite_native;
+///
+/// use malachite_base::traits::Zero;
 /// use malachite_native::natural::Natural;
 ///
-/// assert_eq!((!Natural::from(0u32)).to_string(), "-1");
-/// assert_eq!((!Natural::from(123u32)).to_string(), "-124");
+/// fn main() {
+///     assert_eq!((!Natural::zero()).to_string(), "-1");
+///     assert_eq!((!Natural::from(123u32)).to_string(), "-124");
+/// }
 /// ```
 impl Not for Natural {
     type Output = Integer;
@@ -90,11 +96,16 @@ impl Not for Natural {
 /// where n = `self.significant_bits()`
 ///
 /// # Examples
-/// ```
+/// extern crate malachite_base;
+/// extern crate malachite_native;
+///
+/// use malachite_base::traits::Zero;
 /// use malachite_native::natural::Natural;
 ///
-/// assert_eq!((!&Natural::from(0u32)).to_string(), "-1");
-/// assert_eq!((!&Natural::from(123u32)).to_string(), "-124");
+/// fn main() {
+///     assert_eq!((!&Natural::zero()).to_string(), "-1");
+///     assert_eq!((!&Natural::from(123u32)).to_string(), "-124");
+/// }
 /// ```
 impl<'a> Not for &'a Natural {
     type Output = Integer;

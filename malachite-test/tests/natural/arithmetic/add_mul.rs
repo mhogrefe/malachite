@@ -1,4 +1,5 @@
 use common::LARGE_LIMIT;
+use malachite_base::traits::{One, Zero};
 use malachite_base::traits::{AddMul, AddMulAssign};
 use malachite_native::natural as native;
 use malachite_gmp::natural as gmp;
@@ -304,11 +305,11 @@ fn add_mul_u32_properties() {
     let two_naturals = |gmp_a: gmp::Natural, gmp_b: gmp::Natural| {
         let a = &gmp_natural_to_native(&gmp_a);
         let b = &gmp_natural_to_native(&gmp_b);
-        assert_eq!(a.add_mul(&native::Natural::from(0u32), b), *a);
-        assert_eq!(a.add_mul(&native::Natural::from(1u32), b), a + b);
-        assert_eq!(native::Natural::from(0u32).add_mul(a, b), a * b);
-        assert_eq!(a.add_mul(b, &native::Natural::from(0u32)), *a);
-        assert_eq!(a.add_mul(b, &native::Natural::from(1u32)), a + b);
+        assert_eq!(a.add_mul(&native::Natural::zero(), b), *a);
+        assert_eq!(a.add_mul(&native::Natural::one(), b), a + b);
+        assert_eq!(native::Natural::zero().add_mul(a, b), a * b);
+        assert_eq!(a.add_mul(b, &native::Natural::zero()), *a);
+        assert_eq!(a.add_mul(b, &native::Natural::one()), a + b);
     };
 
     for (a, b, c) in exhaustive_triples_from_single(exhaustive_naturals()).take(LARGE_LIMIT) {

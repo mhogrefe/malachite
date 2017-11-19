@@ -12,14 +12,20 @@ use std::ops::{Mul, MulAssign};
 ///
 /// # Examples
 /// ```
+/// extern crate malachite_base;
+/// extern crate malachite_native;
+///
+/// use malachite_base::traits::{One, Zero};
 /// use malachite_native::integer::Integer;
 /// use std::str::FromStr;
 ///
-/// assert_eq!((Integer::from(1) * Integer::from(123)).to_string(), "123");
-/// assert_eq!((Integer::from(123) * Integer::from(0)).to_string(), "0");
-/// assert_eq!((Integer::from(123) * Integer::from(-456)).to_string(), "-56088");
-/// assert_eq!((Integer::from_str("-123456789000").unwrap() * Integer::from_str("-987654321000")
-///            .unwrap()).to_string(), "121932631112635269000000");
+/// fn main() {
+///     assert_eq!((Integer::one() * Integer::from(123)).to_string(), "123");
+///     assert_eq!((Integer::from(123) * Integer::zero()).to_string(), "0");
+///     assert_eq!((Integer::from(123) * Integer::from(-456)).to_string(), "-56088");
+///     assert_eq!((Integer::from_str("-123456789000").unwrap() * Integer::from_str("-987654321000")
+///                .unwrap()).to_string(), "121932631112635269000000");
+/// }
 /// ```
 impl Mul<Integer> for Integer {
     type Output = Integer;
@@ -42,14 +48,21 @@ impl Mul<Integer> for Integer {
 ///
 /// # Examples
 /// ```
+/// extern crate malachite_base;
+/// extern crate malachite_native;
+///
+/// use malachite_base::traits::{One, Zero};
 /// use malachite_native::integer::Integer;
 /// use std::str::FromStr;
 ///
-/// assert_eq!((Integer::from(1) * &Integer::from(123)).to_string(), "123");
-/// assert_eq!((Integer::from(123) * &Integer::from(0)).to_string(), "0");
-/// assert_eq!((Integer::from(123) * &Integer::from(-456)).to_string(), "-56088");
-/// assert_eq!((Integer::from_str("-123456789000").unwrap() * &Integer::from_str("-987654321000")
-///            .unwrap()).to_string(), "121932631112635269000000");
+/// fn main() {
+///     assert_eq!((Integer::one() * &Integer::from(123)).to_string(), "123");
+///     assert_eq!((Integer::from(123) * &Integer::zero()).to_string(), "0");
+///     assert_eq!((Integer::from(123) * &Integer::from(-456)).to_string(), "-56088");
+///     assert_eq!((Integer::from_str("-123456789000").unwrap() *
+///                 &Integer::from_str("-987654321000")
+///                .unwrap()).to_string(), "121932631112635269000000");
+/// }
 /// ```
 impl<'a> Mul<&'a Integer> for Integer {
     type Output = Integer;
@@ -72,14 +85,21 @@ impl<'a> Mul<&'a Integer> for Integer {
 ///
 /// # Examples
 /// ```
+/// extern crate malachite_base;
+/// extern crate malachite_native;
+///
+/// use malachite_base::traits::{One, Zero};
 /// use malachite_native::integer::Integer;
 /// use std::str::FromStr;
 ///
-/// assert_eq!((&Integer::from(1) * Integer::from(123)).to_string(), "123");
-/// assert_eq!((&Integer::from(123) * Integer::from(0)).to_string(), "0");
-/// assert_eq!((&Integer::from(123) * Integer::from(-456)).to_string(), "-56088");
-/// assert_eq!((&Integer::from_str("-123456789000").unwrap() * Integer::from_str("-987654321000")
-///            .unwrap()).to_string(), "121932631112635269000000");
+/// fn main() {
+///     assert_eq!((&Integer::one() * Integer::from(123)).to_string(), "123");
+///     assert_eq!((&Integer::from(123) * Integer::zero()).to_string(), "0");
+///     assert_eq!((&Integer::from(123) * Integer::from(-456)).to_string(), "-56088");
+///     assert_eq!((&Integer::from_str("-123456789000").unwrap() *
+///                 Integer::from_str("-987654321000")
+///                .unwrap()).to_string(), "121932631112635269000000");
+/// }
 /// ```
 impl<'a> Mul<Integer> for &'a Integer {
     type Output = Integer;
@@ -101,14 +121,21 @@ impl<'a> Mul<Integer> for &'a Integer {
 ///
 /// # Examples
 /// ```
+/// extern crate malachite_base;
+/// extern crate malachite_native;
+///
+/// use malachite_base::traits::{One, Zero};
 /// use malachite_native::integer::Integer;
 /// use std::str::FromStr;
 ///
-/// assert_eq!((&Integer::from(1) * &Integer::from(123)).to_string(), "123");
-/// assert_eq!((&Integer::from(123) * &Integer::from(0)).to_string(), "0");
-/// assert_eq!((&Integer::from(123) * &Integer::from(-456)).to_string(), "-56088");
-/// assert_eq!((&Integer::from_str("-123456789000").unwrap() * &Integer::from_str("-987654321000")
-///            .unwrap()).to_string(), "121932631112635269000000");
+/// fn main() {
+///     assert_eq!((&Integer::one() * &Integer::from(123)).to_string(), "123");
+///     assert_eq!((&Integer::from(123) * &Integer::zero()).to_string(), "0");
+///     assert_eq!((&Integer::from(123) * &Integer::from(-456)).to_string(), "-56088");
+///     assert_eq!((&Integer::from_str("-123456789000").unwrap() *
+///                 &Integer::from_str("-987654321000")
+///                .unwrap()).to_string(), "121932631112635269000000");
+/// }
 /// ```
 impl<'a, 'b> Mul<&'a Integer> for &'b Integer {
     type Output = Integer;
@@ -133,15 +160,21 @@ impl<'a, 'b> Mul<&'a Integer> for &'b Integer {
 ///
 /// # Examples
 /// ```
+/// extern crate malachite_base;
+/// extern crate malachite_native;
+///
+/// use malachite_base::traits::NegativeOne;
 /// use malachite_native::integer::Integer;
 /// use std::str::FromStr;
 ///
-/// let mut x = Integer::from(-1);
-/// x *= Integer::from_str("1000").unwrap();
-/// x *= Integer::from_str("2000").unwrap();
-/// x *= Integer::from_str("3000").unwrap();
-/// x *= Integer::from_str("4000").unwrap();
-/// assert_eq!(x.to_string(), "-24000000000000");
+/// fn main() {
+///     let mut x = Integer::negative_one();
+///     x *= Integer::from_str("1000").unwrap();
+///     x *= Integer::from_str("2000").unwrap();
+///     x *= Integer::from_str("3000").unwrap();
+///     x *= Integer::from_str("4000").unwrap();
+///     assert_eq!(x.to_string(), "-24000000000000");
+/// }
 /// ```
 impl MulAssign<Integer> for Integer {
     fn mul_assign(&mut self, other: Integer) {
@@ -161,15 +194,21 @@ impl MulAssign<Integer> for Integer {
 ///
 /// # Examples
 /// ```
+/// extern crate malachite_base;
+/// extern crate malachite_native;
+///
+/// use malachite_base::traits::NegativeOne;
 /// use malachite_native::integer::Integer;
 /// use std::str::FromStr;
 ///
-/// let mut x = Integer::from(-1);
-/// x *= &Integer::from_str("1000").unwrap();
-/// x *= &Integer::from_str("2000").unwrap();
-/// x *= &Integer::from_str("3000").unwrap();
-/// x *= &Integer::from_str("4000").unwrap();
-/// assert_eq!(x.to_string(), "-24000000000000");
+/// fn main() {
+///     let mut x = Integer::negative_one();
+///     x *= &Integer::from_str("1000").unwrap();
+///     x *= &Integer::from_str("2000").unwrap();
+///     x *= &Integer::from_str("3000").unwrap();
+///     x *= &Integer::from_str("4000").unwrap();
+///     assert_eq!(x.to_string(), "-24000000000000");
+/// }
 /// ```
 impl<'a> MulAssign<&'a Integer> for Integer {
     fn mul_assign(&mut self, other: &'a Integer) {

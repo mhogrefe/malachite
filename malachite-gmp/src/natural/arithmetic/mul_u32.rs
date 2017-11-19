@@ -2,19 +2,26 @@ use gmp_mpfr_sys::gmp::{self, mpz_t};
 use natural::Natural::{self, Large, Small};
 use std::mem;
 use std::ops::{Mul, MulAssign};
-use malachite_base::traits::Assign;
+use malachite_base::traits::{Assign, Zero};
 
 /// Multiplies a `Natural` by a `u32`, taking the `Natural` by value.
 ///
 /// # Examples
 /// ```
+/// extern crate malachite_base;
+/// extern crate malachite_gmp;
+///
+/// use malachite_base::traits::Zero;
 /// use malachite_gmp::natural::Natural;
 /// use std::str::FromStr;
 ///
-/// assert_eq!((Natural::from(0u32) * 123).to_string(), "0");
-/// assert_eq!((Natural::from(123u32) * 1).to_string(), "123");
-/// assert_eq!((Natural::from(123u32) * 456).to_string(), "56088");
-/// assert_eq!((Natural::from_str("1000000000000").unwrap() * 123).to_string(), "123000000000000");
+/// fn main() {
+///     assert_eq!((Natural::zero() * 123).to_string(), "0");
+///     assert_eq!((Natural::from(123u32) * 1).to_string(), "123");
+///     assert_eq!((Natural::from(123u32) * 456).to_string(), "56088");
+///     assert_eq!((Natural::from_str("1000000000000").unwrap() * 123).to_string(),
+///         "123000000000000");
+/// }
 /// ```
 impl Mul<u32> for Natural {
     type Output = Natural;
@@ -29,20 +36,27 @@ impl Mul<u32> for Natural {
 ///
 /// # Examples
 /// ```
+/// extern crate malachite_base;
+/// extern crate malachite_gmp;
+///
+/// use malachite_base::traits::Zero;
 /// use malachite_gmp::natural::Natural;
 /// use std::str::FromStr;
 ///
-/// assert_eq!((&Natural::from(0u32) * 123).to_string(), "0");
-/// assert_eq!((&Natural::from(123u32) * 1).to_string(), "123");
-/// assert_eq!((&Natural::from(123u32) * 456).to_string(), "56088");
-/// assert_eq!((&Natural::from_str("1000000000000").unwrap() * 123).to_string(), "123000000000000");
+/// fn main() {
+///     assert_eq!((&Natural::zero() * 123).to_string(), "0");
+///     assert_eq!((&Natural::from(123u32) * 1).to_string(), "123");
+///     assert_eq!((&Natural::from(123u32) * 456).to_string(), "56088");
+///     assert_eq!((&Natural::from_str("1000000000000").unwrap() * 123).to_string(),
+///         "123000000000000");
+/// }
 /// ```
 impl<'a> Mul<u32> for &'a Natural {
     type Output = Natural;
 
     fn mul(self, other: u32) -> Natural {
         if *self == 0 || other == 0 {
-            return Natural::from(0u32);
+            return Natural::zero();
         } else if other == 1 {
             return self.clone();
         }
@@ -72,13 +86,20 @@ impl<'a> Mul<u32> for &'a Natural {
 ///
 /// # Examples
 /// ```
+/// extern crate malachite_base;
+/// extern crate malachite_gmp;
+///
+/// use malachite_base::traits::Zero;
 /// use malachite_gmp::natural::Natural;
 /// use std::str::FromStr;
 ///
-/// assert_eq!((123 * Natural::from(0u32)).to_string(), "0");
-/// assert_eq!((1 * Natural::from(123u32)).to_string(), "123");
-/// assert_eq!((456 * Natural::from(123u32)).to_string(), "56088");
-/// assert_eq!((123 * Natural::from_str("1000000000000").unwrap()).to_string(), "123000000000000");
+/// fn main() {
+///     assert_eq!((123 * Natural::zero()).to_string(), "0");
+///     assert_eq!((1 * Natural::from(123u32)).to_string(), "123");
+///     assert_eq!((456 * Natural::from(123u32)).to_string(), "56088");
+///     assert_eq!((123 * Natural::from_str("1000000000000").unwrap()).to_string(),
+///         "123000000000000");
+/// }
 /// ```
 impl Mul<Natural> for u32 {
     type Output = Natural;
@@ -93,13 +114,20 @@ impl Mul<Natural> for u32 {
 ///
 /// # Examples
 /// ```
+/// extern crate malachite_base;
+/// extern crate malachite_gmp;
+///
+/// use malachite_base::traits::Zero;
 /// use malachite_gmp::natural::Natural;
 /// use std::str::FromStr;
 ///
-/// assert_eq!((123 * &Natural::from(0u32)).to_string(), "0");
-/// assert_eq!((1 * &Natural::from(123u32)).to_string(), "123");
-/// assert_eq!((456 * &Natural::from(123u32)).to_string(), "56088");
-/// assert_eq!((123 * &Natural::from_str("1000000000000").unwrap()).to_string(), "123000000000000");
+/// fn main() {
+///     assert_eq!((123 * &Natural::zero()).to_string(), "0");
+///     assert_eq!((1 * &Natural::from(123u32)).to_string(), "123");
+///     assert_eq!((456 * &Natural::from(123u32)).to_string(), "56088");
+///     assert_eq!((123 * &Natural::from_str("1000000000000").unwrap()).to_string(),
+///         "123000000000000");
+/// }
 /// ```
 impl<'a> Mul<&'a Natural> for u32 {
     type Output = Natural;
@@ -113,14 +141,20 @@ impl<'a> Mul<&'a Natural> for u32 {
 ///
 /// # Examples
 /// ```
+/// extern crate malachite_base;
+/// extern crate malachite_gmp;
+///
+/// use malachite_base::traits::One;
 /// use malachite_gmp::natural::Natural;
 ///
-/// let mut x = Natural::from(1u32);
-/// x *= 1;
-/// x *= 2;
-/// x *= 3;
-/// x *= 4;
-/// assert_eq!(x.to_string(), "24");
+/// fn main() {
+///     let mut x = Natural::one();
+///     x *= 1;
+///     x *= 2;
+///     x *= 3;
+///     x *= 4;
+///     assert_eq!(x.to_string(), "24");
+/// }
 /// ```
 impl MulAssign<u32> for Natural {
     fn mul_assign(&mut self, other: u32) {

@@ -7,11 +7,17 @@ use std::ops::{Shl, ShlAssign};
 ///
 /// # Examples
 /// ```
+/// extern crate malachite_base;
+/// extern crate malachite_gmp;
+///
+/// use malachite_base::traits::Zero;
 /// use malachite_gmp::natural::Natural;
 ///
-/// assert_eq!((Natural::from(0u32) << 10).to_string(), "0");
-/// assert_eq!((Natural::from(123u32) << 2).to_string(), "492");
-/// assert_eq!((Natural::from(123u32) << 100).to_string(), "155921023828072216384094494261248");
+/// fn main() {
+///     assert_eq!((Natural::zero() << 10).to_string(), "0");
+///     assert_eq!((Natural::from(123u32) << 2).to_string(), "492");
+///     assert_eq!((Natural::from(123u32) << 100).to_string(), "155921023828072216384094494261248");
+/// }
 /// ```
 impl Shl<u32> for Natural {
     type Output = Natural;
@@ -26,11 +32,18 @@ impl Shl<u32> for Natural {
 ///
 /// # Examples
 /// ```
+/// extern crate malachite_base;
+/// extern crate malachite_gmp;
+///
+/// use malachite_base::traits::Zero;
 /// use malachite_gmp::natural::Natural;
 ///
-/// assert_eq!((&Natural::from(0u32) << 10).to_string(), "0");
-/// assert_eq!((&Natural::from(123u32) << 2).to_string(), "492");
-/// assert_eq!((&Natural::from(123u32) << 100).to_string(), "155921023828072216384094494261248");
+/// fn main() {
+///     assert_eq!((&Natural::zero() << 10).to_string(), "0");
+///     assert_eq!((&Natural::from(123u32) << 2).to_string(), "492");
+///     assert_eq!((&Natural::from(123u32) << 100).to_string(),
+///         "155921023828072216384094494261248");
+/// }
 /// ```
 impl<'a> Shl<u32> for &'a Natural {
     type Output = Natural;
@@ -61,14 +74,20 @@ impl<'a> Shl<u32> for &'a Natural {
 ///
 /// # Examples
 /// ```
+/// extern crate malachite_base;
+/// extern crate malachite_gmp;
+///
+/// use malachite_base::traits::One;
 /// use malachite_gmp::natural::Natural;
 ///
-/// let mut x = Natural::from(1u32);
-/// x <<= 1;
-/// x <<= 2;
-/// x <<= 3;
-/// x <<= 4;
-/// assert_eq!(x.to_string(), "1024");
+/// fn main() {
+///     let mut x = Natural::one();
+///     x <<= 1;
+///     x <<= 2;
+///     x <<= 3;
+///     x <<= 4;
+///     assert_eq!(x.to_string(), "1024");
+/// }
 /// ```
 impl ShlAssign<u32> for Natural {
     fn shl_assign(&mut self, other: u32) {

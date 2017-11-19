@@ -1,4 +1,5 @@
 use common::LARGE_LIMIT;
+use malachite_base::traits::{One, Zero};
 use malachite_native::integer as native;
 use malachite_gmp::integer as gmp;
 use malachite_test::common::{gmp_integer_to_native, native_integer_to_gmp,
@@ -196,10 +197,10 @@ fn mul_u32_properties() {
     // 1 * u == u
     // u * 1 == u
     let one_u32 = |u: u32| {
-        assert_eq!(native::Integer::from(0u32) * u, 0);
-        assert_eq!(u * native::Integer::from(0u32), 0);
-        assert_eq!(native::Integer::from(1u32) * u, u);
-        assert_eq!(u * native::Integer::from(1u32), u);
+        assert_eq!(native::Integer::zero() * u, 0);
+        assert_eq!(u * native::Integer::zero(), 0);
+        assert_eq!(native::Integer::one() * u, u);
+        assert_eq!(u * native::Integer::one(), u);
     };
 
     for (n, u) in exhaustive_pairs(exhaustive_integers(), exhaustive_u::<u32>()).take(LARGE_LIMIT) {

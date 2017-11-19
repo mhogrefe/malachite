@@ -7,14 +7,21 @@ use std::mem;
 ///
 /// # Examples
 /// ```
+/// extern crate malachite_base;
+/// extern crate malachite_gmp;
+///
+/// use malachite_base::traits::Zero;
 /// use malachite_gmp::integer::Integer;
 /// use std::str::FromStr;
 ///
-/// assert_eq!((Integer::from(0) + Integer::from(123)).to_string(), "123");
-/// assert_eq!((Integer::from(-123) + Integer::from(0)).to_string(), "-123");
-/// assert_eq!((Integer::from(-123) + Integer::from(456)).to_string(), "333");
-/// assert_eq!((Integer::from_str("-1000000000000").unwrap() + Integer::from_str("2000000000000")
-///            .unwrap()).to_string(), "1000000000000");
+/// fn main() {
+///     assert_eq!((Integer::zero() + Integer::from(123)).to_string(), "123");
+///     assert_eq!((Integer::from(-123) + Integer::zero()).to_string(), "-123");
+///     assert_eq!((Integer::from(-123) + Integer::from(456)).to_string(), "333");
+///     assert_eq!((Integer::from_str("-1000000000000").unwrap() +
+///                 Integer::from_str("2000000000000")
+///                .unwrap()).to_string(), "1000000000000");
+/// }
 /// ```
 impl Add<Integer> for Integer {
     type Output = Integer;
@@ -30,14 +37,21 @@ impl Add<Integer> for Integer {
 ///
 /// # Examples
 /// ```
+/// extern crate malachite_base;
+/// extern crate malachite_gmp;
+///
+/// use malachite_base::traits::Zero;
 /// use malachite_gmp::integer::Integer;
 /// use std::str::FromStr;
 ///
-/// assert_eq!((Integer::from(0) + &Integer::from(123)).to_string(), "123");
-/// assert_eq!((Integer::from(-123) + &Integer::from(0)).to_string(), "-123");
-/// assert_eq!((Integer::from(-123) + &Integer::from(456)).to_string(), "333");
-/// assert_eq!((Integer::from_str("-1000000000000").unwrap() + &Integer::from_str("2000000000000")
-///            .unwrap()).to_string(), "1000000000000");
+/// fn main() {
+///     assert_eq!((Integer::zero() + &Integer::from(123)).to_string(), "123");
+///     assert_eq!((Integer::from(-123) + &Integer::zero()).to_string(), "-123");
+///     assert_eq!((Integer::from(-123) + &Integer::from(456)).to_string(), "333");
+///     assert_eq!((Integer::from_str("-1000000000000").unwrap() +
+///                 &Integer::from_str("2000000000000")
+///                .unwrap()).to_string(), "1000000000000");
+/// }
 /// ```
 impl<'a> Add<&'a Integer> for Integer {
     type Output = Integer;
@@ -53,14 +67,21 @@ impl<'a> Add<&'a Integer> for Integer {
 ///
 /// # Examples
 /// ```
+/// extern crate malachite_base;
+/// extern crate malachite_gmp;
+///
+/// use malachite_base::traits::Zero;
 /// use malachite_gmp::integer::Integer;
 /// use std::str::FromStr;
 ///
-/// assert_eq!((&Integer::from(0) + Integer::from(123)).to_string(), "123");
-/// assert_eq!((&Integer::from(-123) + Integer::from(0)).to_string(), "-123");
-/// assert_eq!((&Integer::from(-123) + Integer::from(456)).to_string(), "333");
-/// assert_eq!((&Integer::from_str("-1000000000000").unwrap() + Integer::from_str("2000000000000")
-///            .unwrap()).to_string(), "1000000000000");
+/// fn main() {
+///     assert_eq!((&Integer::zero() + Integer::from(123)).to_string(), "123");
+///     assert_eq!((&Integer::from(-123) + Integer::zero()).to_string(), "-123");
+///     assert_eq!((&Integer::from(-123) + Integer::from(456)).to_string(), "333");
+///     assert_eq!((&Integer::from_str("-1000000000000").unwrap() +
+///                 Integer::from_str("2000000000000")
+///                .unwrap()).to_string(), "1000000000000");
+/// }
 /// ```
 impl<'a> Add<Integer> for &'a Integer {
     type Output = Integer;
@@ -75,25 +96,33 @@ impl<'a> Add<Integer> for &'a Integer {
 ///
 /// # Examples
 /// ```
+/// extern crate malachite_base;
+/// extern crate malachite_gmp;
+///
+/// use malachite_base::traits::Zero;
 /// use malachite_gmp::integer::Integer;
 /// use std::str::FromStr;
 ///
-/// assert_eq!((&Integer::from(0) + &Integer::from(123)).to_string(), "123");
-/// assert_eq!((&Integer::from(-123) + &Integer::from(0)).to_string(), "-123");
-/// assert_eq!((&Integer::from(-123) + &Integer::from(456)).to_string(), "333");
-/// assert_eq!((&Integer::from_str("-1000000000000").unwrap() + &Integer::from_str("2000000000000")
-///            .unwrap()).to_string(), "1000000000000");
+/// fn main() {
+///     assert_eq!((&Integer::zero() + &Integer::from(123)).to_string(), "123");
+///     assert_eq!((&Integer::from(-123) + &Integer::zero()).to_string(), "-123");
+///     assert_eq!((&Integer::from(-123) + &Integer::from(456)).to_string(), "333");
+///     assert_eq!((&Integer::from_str("-1000000000000").unwrap() +
+///                 &Integer::from_str("2000000000000")
+///                .unwrap()).to_string(), "1000000000000");
+/// }
 /// ```
 impl<'a, 'b> Add<&'a Integer> for &'b Integer {
     type Output = Integer;
 
     fn add(self, other: &'a Integer) -> Integer {
-        if *self == 0 {
-            return other.clone();
+        if self as *const Integer == other as *const Integer {
+            self << 1
+        } else if *self == 0 {
+            other.clone()
         } else if *other == 0 {
-            return self.clone();
-        }
-        if let Small(y) = *other {
+            self.clone()
+        } else if let Small(y) = *other {
             self + y
         } else if let Small(x) = *self {
             other + x
@@ -117,15 +146,21 @@ impl<'a, 'b> Add<&'a Integer> for &'b Integer {
 ///
 /// # Examples
 /// ```
+/// extern crate malachite_base;
+/// extern crate malachite_gmp;
+///
+/// use malachite_base::traits::Zero;
 /// use malachite_gmp::integer::Integer;
 /// use std::str::FromStr;
 ///
-/// let mut x = Integer::new();
-/// x += Integer::from_str("-1000000000000").unwrap();
-/// x += Integer::from_str("2000000000000").unwrap();
-/// x += Integer::from_str("-3000000000000").unwrap();
-/// x += Integer::from_str("4000000000000").unwrap();
-/// assert_eq!(x.to_string(), "2000000000000");
+/// fn main() {
+///     let mut x = Integer::zero();
+///     x += Integer::from_str("-1000000000000").unwrap();
+///     x += Integer::from_str("2000000000000").unwrap();
+///     x += Integer::from_str("-3000000000000").unwrap();
+///     x += Integer::from_str("4000000000000").unwrap();
+///     assert_eq!(x.to_string(), "2000000000000");
+/// }
 /// ```
 impl AddAssign<Integer> for Integer {
     fn add_assign(&mut self, mut other: Integer) {
@@ -153,15 +188,21 @@ impl AddAssign<Integer> for Integer {
 ///
 /// # Examples
 /// ```
+/// extern crate malachite_base;
+/// extern crate malachite_gmp;
+///
+/// use malachite_base::traits::Zero;
 /// use malachite_gmp::integer::Integer;
 /// use std::str::FromStr;
 ///
-/// let mut x = Integer::new();
-/// x += &Integer::from_str("-1000000000000").unwrap();
-/// x += &Integer::from_str("2000000000000").unwrap();
-/// x += &Integer::from_str("-3000000000000").unwrap();
-/// x += &Integer::from_str("4000000000000").unwrap();
-/// assert_eq!(x.to_string(), "2000000000000");
+/// fn main() {
+///     let mut x = Integer::zero();
+///     x += &Integer::from_str("-1000000000000").unwrap();
+///     x += &Integer::from_str("2000000000000").unwrap();
+///     x += &Integer::from_str("-3000000000000").unwrap();
+///     x += &Integer::from_str("4000000000000").unwrap();
+///     assert_eq!(x.to_string(), "2000000000000");
+/// }
 /// ```
 impl<'a> AddAssign<&'a Integer> for Integer {
     fn add_assign(&mut self, other: &'a Integer) {

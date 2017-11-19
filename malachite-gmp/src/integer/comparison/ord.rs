@@ -22,6 +22,9 @@ impl PartialOrd for Integer {
 /// Asserts that `Integer` ordering is a total order.
 impl Ord for Integer {
     fn cmp(&self, other: &Integer) -> Ordering {
+        if self as *const Integer == other as *const Integer {
+            return Ordering::Equal;
+        }
         match (self, other) {
             (&Small(ref x), y) => x.partial_cmp(y).unwrap(),
             (&Large(_), &Small(ref y)) => self.partial_cmp(y).unwrap(),

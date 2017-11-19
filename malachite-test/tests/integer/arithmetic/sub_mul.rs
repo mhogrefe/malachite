@@ -1,5 +1,5 @@
 use common::LARGE_LIMIT;
-use malachite_base::traits::{SubMul, SubMulAssign};
+use malachite_base::traits::{SubMul, SubMulAssign, NegativeOne, One, Zero};
 use malachite_native::integer as native;
 use malachite_gmp::integer as gmp;
 use malachite_test::common::{gmp_integer_to_native, native_integer_to_gmp};
@@ -463,8 +463,8 @@ fn sub_mul_properties() {
     // a.sub_mul(-a, -1) == 0
     let single_integer = |gmp_n: gmp::Integer| {
         let a = &gmp_integer_to_native(&gmp_n);
-        assert_eq!(a.sub_mul(a, &native::Integer::from(1u32)), 0);
-        assert_eq!(a.sub_mul(&(-a), &native::Integer::from(-1)), 0);
+        assert_eq!(a.sub_mul(a, &native::Integer::one()), 0);
+        assert_eq!(a.sub_mul(&(-a), &native::Integer::negative_one()), 0);
     };
 
     // a.sub_mul(0, b) == a
@@ -477,11 +477,11 @@ fn sub_mul_properties() {
     let two_integers = |gmp_a: gmp::Integer, gmp_b: gmp::Integer| {
         let a = &gmp_integer_to_native(&gmp_a);
         let b = &gmp_integer_to_native(&gmp_b);
-        assert_eq!(a.sub_mul(&native::Integer::from(0u32), b), *a);
-        assert_eq!(a.sub_mul(&native::Integer::from(1u32), b), a - b);
-        assert_eq!(native::Integer::from(0u32).sub_mul(a, b), -a * b);
-        assert_eq!(a.sub_mul(b, &native::Integer::from(0u32)), *a);
-        assert_eq!(a.sub_mul(b, &native::Integer::from(1u32)), a - b);
+        assert_eq!(a.sub_mul(&native::Integer::zero(), b), *a);
+        assert_eq!(a.sub_mul(&native::Integer::one(), b), a - b);
+        assert_eq!(native::Integer::zero().sub_mul(a, b), -a * b);
+        assert_eq!(a.sub_mul(b, &native::Integer::zero()), *a);
+        assert_eq!(a.sub_mul(b, &native::Integer::one()), a - b);
         assert_eq!((a * b).sub_mul(a, b), 0);
         assert_eq!((a * b).sub_mul(-a, -b), 0);
     };

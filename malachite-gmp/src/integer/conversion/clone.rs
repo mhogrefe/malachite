@@ -1,5 +1,6 @@
 use integer::Integer::{self, Large, Small};
 use gmp_mpfr_sys::gmp::{self, mpz_t};
+use malachite_base::traits::Zero;
 use std::mem;
 
 /// Clones an `Integer`, producing a new `Integer`.
@@ -26,7 +27,7 @@ use std::mem;
 /// ```
 impl Clone for Integer {
     fn clone(&self) -> Integer {
-        let mut cloned = Integer::new();
+        let mut cloned = Integer::zero();
         cloned.clone_from(self);
         cloned
     }

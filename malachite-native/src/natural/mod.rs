@@ -1,3 +1,4 @@
+use malachite_base::traits::{One, Two, Zero};
 use natural::Natural::*;
 
 pub const LOG_LIMB_BITS: u32 = 5;
@@ -27,18 +28,6 @@ pub fn mpn_zero(r: &mut [u32]) {
 }
 
 impl Natural {
-    /// Creates a new `Natural` equal to 0.
-    ///
-    /// # Example
-    /// ```
-    /// use malachite_native::natural::Natural;
-    ///
-    /// assert_eq!(Natural::new().to_string(), "0");
-    /// ```
-    pub fn new() -> Natural {
-        Small(0)
-    }
-
     fn demote_if_small(&mut self) {
         let mut demoted_value = None;
         if let Large(ref limbs) = *self {
@@ -97,6 +86,27 @@ impl Natural {
 impl Default for Natural {
     fn default() -> Natural {
         Small(0)
+    }
+}
+
+/// The constant 0.
+impl Zero for Natural {
+    fn zero() -> Natural {
+        Small(0)
+    }
+}
+
+/// The constant 1.
+impl One for Natural {
+    fn one() -> Natural {
+        Small(1)
+    }
+}
+
+/// The constant 2.
+impl Two for Natural {
+    fn two() -> Natural {
+        Small(2)
     }
 }
 
