@@ -1,7 +1,7 @@
 use gmp_mpfr_sys::gmp::{self, mpz_t};
 use integer::Integer;
 use natural::Natural;
-use std::mem;
+use std::{i32, mem};
 use malachite_base::traits::AbsAssign;
 
 impl Integer {
@@ -44,7 +44,7 @@ impl Integer {
     /// ```
     pub fn abs_ref(&self) -> Integer {
         match *self {
-            Integer::Small(small) if small == i32::min_value() => unsafe {
+            Integer::Small(i32::MIN) => unsafe {
                 let mut x: mpz_t = mem::uninitialized();
                 gmp::mpz_init_set_ui(&mut x, 1 << 31);
                 Integer::Large(x)
@@ -154,7 +154,7 @@ impl Integer {
 impl AbsAssign for Integer {
     fn abs_assign(&mut self) {
         match *self {
-            Integer::Small(small) if small == i32::min_value() => unsafe {
+            Integer::Small(i32::MIN) => unsafe {
                 let mut x: mpz_t = mem::uninitialized();
                 gmp::mpz_init_set_ui(&mut x, 1 << 31);
                 *self = Integer::Large(x);

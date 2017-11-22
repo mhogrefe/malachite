@@ -90,6 +90,11 @@ impl Default for Natural {
 }
 
 /// The constant 0.
+///
+/// Time: worst case O(1)
+///
+/// Additional memory: worst case O(1)
+///
 impl Zero for Natural {
     fn zero() -> Natural {
         Small(0)
@@ -97,6 +102,11 @@ impl Zero for Natural {
 }
 
 /// The constant 1.
+///
+/// Time: worst case O(1)
+///
+/// Additional memory: worst case O(1)
+///
 impl One for Natural {
     fn one() -> Natural {
         Small(1)
@@ -104,6 +114,11 @@ impl One for Natural {
 }
 
 /// The constant 2.
+///
+/// Time: worst case O(1)
+///
+/// Additional memory: worst case O(1)
+///
 impl Two for Natural {
     fn two() -> Natural {
         Small(2)

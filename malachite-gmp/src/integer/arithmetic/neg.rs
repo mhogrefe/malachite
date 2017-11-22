@@ -1,6 +1,6 @@
 use gmp_mpfr_sys::gmp::{self, mpz_t};
 use integer::Integer::{self, Large, Small};
-use std::mem;
+use std::{i32, mem};
 use std::ops::Neg;
 use malachite_base::traits::NegAssign;
 
@@ -50,7 +50,7 @@ impl<'a> Neg for &'a Integer {
 
     fn neg(self) -> Integer {
         match *self {
-            Small(small) if small == i32::min_value() => unsafe {
+            Small(i32::MIN) => unsafe {
                 let mut negative: mpz_t = mem::uninitialized();
                 gmp::mpz_init_set_ui(&mut negative, 1 << 31);
                 Large(negative)
@@ -96,7 +96,7 @@ impl<'a> Neg for &'a Integer {
 impl NegAssign for Integer {
     fn neg_assign(&mut self) {
         let result_is_i32_min = match *self {
-            Small(small) if small == i32::min_value() => unsafe {
+            Small(i32::MIN) => unsafe {
                 let mut x: mpz_t = mem::uninitialized();
                 gmp::mpz_init_set_ui(&mut x, 1 << 31);
                 *self = Large(x);

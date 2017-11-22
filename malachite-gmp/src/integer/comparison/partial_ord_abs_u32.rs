@@ -1,6 +1,7 @@
 use gmp_mpfr_sys::gmp;
 use integer::Integer::{self, Large, Small};
 use std::cmp::Ordering;
+use std::i32;
 use malachite_base::traits::PartialOrdAbs;
 
 /// Compares the absolute value of an `Integer` to a `u32`.
@@ -28,9 +29,7 @@ use malachite_base::traits::PartialOrdAbs;
 impl PartialOrdAbs<u32> for Integer {
     fn partial_cmp_abs(&self, other: &u32) -> Option<Ordering> {
         match *self {
-            Small(small) if small == i32::min_value() && *other == 0x8000_0000 as u32 => {
-                Some(Ordering::Equal)
-            }
+            Small(i32::MIN) if *other == 0x8000_0000 as u32 => Some(Ordering::Equal),
             Small(_) if *other > i32::max_value() as u32 => Some(Ordering::Less),
             Small(small) => small.abs().partial_cmp(&(*other as i32)),
             Large(ref large) => Some(unsafe { gmp::mpz_cmpabs_ui(large, (*other).into()) }.cmp(
@@ -65,9 +64,7 @@ impl PartialOrdAbs<u32> for Integer {
 impl PartialOrdAbs<Integer> for u32 {
     fn partial_cmp_abs(&self, other: &Integer) -> Option<Ordering> {
         match *other {
-            Small(small) if small == i32::min_value() && *self == 0x8000_0000 as u32 => {
-                Some(Ordering::Equal)
-            }
+            Small(i32::MIN) if *self == 0x8000_0000 as u32 => Some(Ordering::Equal),
             Small(_) if *self > i32::max_value() as u32 => Some(Ordering::Greater),
             Small(small) => (*self as i32).partial_cmp(&small.abs()),
             Large(ref large) => Some(0.cmp(&unsafe { gmp::mpz_cmpabs_ui(large, (*self).into()) })),

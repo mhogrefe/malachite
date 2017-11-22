@@ -7,6 +7,7 @@ use malachite_test::integer::arithmetic::add_u32::*;
 use malachite_test::integer::arithmetic::add_mul::*;
 use malachite_test::integer::arithmetic::add_mul_i32::*;
 use malachite_test::integer::arithmetic::add_mul_u32::*;
+use malachite_test::integer::arithmetic::divisible_by_power_of_2::*;
 use malachite_test::integer::arithmetic::even_odd::*;
 use malachite_test::integer::arithmetic::mul::*;
 use malachite_test::integer::arithmetic::mul_i32::*;
@@ -65,6 +66,7 @@ use malachite_test::natural::arithmetic::add::*;
 use malachite_test::natural::arithmetic::add_u32::*;
 use malachite_test::natural::arithmetic::add_mul::*;
 use malachite_test::natural::arithmetic::add_mul_u32::*;
+use malachite_test::natural::arithmetic::divisible_by_power_of_2::*;
 use malachite_test::natural::arithmetic::even_odd::*;
 use malachite_test::natural::arithmetic::is_power_of_two::*;
 use malachite_test::natural::arithmetic::mul::*;
@@ -219,6 +221,9 @@ fn main() {
                 "exhaustive_integer_clone_from" => demo_exhaustive_integer_clone_from(limit),
                 "exhaustive_integer_cmp" => demo_exhaustive_integer_cmp(limit),
                 "exhaustive_integer_cmp_abs" => demo_exhaustive_integer_cmp_abs(limit),
+                "exhaustive_integer_divisible_by_power_of_2" => {
+                    demo_exhaustive_integer_divisible_by_power_of_2(limit)
+                }
                 "exhaustive_integer_eq" => demo_exhaustive_integer_eq(limit),
                 "exhaustive_integer_flip_bit" => demo_exhaustive_integer_flip_bit(limit),
                 "exhaustive_integer_from_i32" => demo_exhaustive_integer_from_i32(limit),
@@ -507,6 +512,9 @@ fn main() {
                 "exhaustive_natural_clone" => demo_exhaustive_natural_clone(limit),
                 "exhaustive_natural_clone_from" => demo_exhaustive_natural_clone_from(limit),
                 "exhaustive_natural_cmp" => demo_exhaustive_natural_cmp(limit),
+                "exhaustive_natural_divisible_by_power_of_2" => {
+                    demo_exhaustive_natural_divisible_by_power_of_2(limit)
+                }
                 "exhaustive_natural_eq" => demo_exhaustive_natural_eq(limit),
                 "exhaustive_natural_flip_bit" => demo_exhaustive_natural_flip_bit(limit),
                 "exhaustive_natural_from_limbs_le" => demo_exhaustive_natural_from_limbs_le(limit),
@@ -698,6 +706,9 @@ fn main() {
                 "random_integer_clone_from" => demo_random_integer_clone_from(limit),
                 "random_integer_cmp" => demo_random_integer_cmp(limit),
                 "random_integer_cmp_abs" => demo_random_integer_cmp_abs(limit),
+                "random_integer_divisible_by_power_of_2" => {
+                    demo_random_integer_divisible_by_power_of_2(limit)
+                }
                 "random_integer_eq" => demo_random_integer_eq(limit),
                 "random_integer_flip_bit" => demo_random_integer_flip_bit(limit),
                 "random_integer_from_i32" => demo_random_integer_from_i32(limit),
@@ -930,6 +941,9 @@ fn main() {
                 "random_natural_clone" => demo_random_natural_clone(limit),
                 "random_natural_clone_from" => demo_random_natural_clone_from(limit),
                 "random_natural_cmp" => demo_random_natural_cmp(limit),
+                "random_natural_divisible_by_power_of_2" => {
+                    demo_random_natural_divisible_by_power_of_2(limit)
+                }
                 "random_natural_eq" => demo_random_natural_eq(limit),
                 "random_natural_flip_bit" => demo_random_natural_flip_bit(limit),
                 "random_natural_from_limbs_le" => demo_random_natural_from_limbs_le(limit),
@@ -1206,6 +1220,15 @@ fn main() {
                 "exhaustive_integer_cmp" => benchmark_exhaustive_integer_cmp(limit, "temp.gp"),
                 "exhaustive_integer_cmp_abs" => {
                     benchmark_exhaustive_integer_cmp_abs(limit, "temp.gp")
+                }
+                "exhaustive_integer_divisible_by_power_of_2" => {
+                    benchmark_exhaustive_integer_divisible_by_power_of_2(limit, "temp.gp")
+                }
+                "exhaustive_integer_divisible_by_power_of_2_algorithms" => {
+                    benchmark_exhaustive_integer_divisible_by_power_of_2_algorithms(
+                        limit,
+                        "temp.gp",
+                    )
                 }
                 "exhaustive_integer_eq" => benchmark_exhaustive_integer_eq(limit, "temp.gp"),
                 "exhaustive_integer_flip_bit" => {
@@ -1682,6 +1705,15 @@ fn main() {
                     benchmark_exhaustive_natural_clone_from(limit, "temp.gp")
                 }
                 "exhaustive_natural_cmp" => benchmark_exhaustive_natural_cmp(limit, "temp.gp"),
+                "exhaustive_natural_divisible_by_power_of_2" => {
+                    benchmark_exhaustive_natural_divisible_by_power_of_2(limit, "temp.gp")
+                }
+                "exhaustive_natural_divisible_by_power_of_2_algorithms" => {
+                    benchmark_exhaustive_natural_divisible_by_power_of_2_algorithms(
+                        limit,
+                        "temp.gp",
+                    )
+                }
                 "exhaustive_natural_eq" => benchmark_exhaustive_natural_eq(limit, "temp.gp"),
                 "exhaustive_natural_flip_bit" => {
                     benchmark_exhaustive_natural_flip_bit(limit, "temp.gp")
@@ -2592,6 +2624,16 @@ fn main() {
                     benchmark_random_natural_clone_from(limit, 1024, "temp.gp")
                 }
                 "random_natural_cmp" => benchmark_random_natural_cmp(limit, 1024, "temp.gp"),
+                "random_natural_divisible_by_power_of_2" => {
+                    benchmark_random_natural_divisible_by_power_of_2(limit, 1024, "temp.gp")
+                }
+                "random_natural_divisible_by_power_of_2_algorithms" => {
+                    benchmark_random_natural_divisible_by_power_of_2_algorithms(
+                        limit,
+                        1024,
+                        "temp.gp",
+                    )
+                }
                 "random_natural_eq" => benchmark_random_natural_eq(limit, 1024, "temp.gp"),
                 "random_natural_flip_bit" => {
                     benchmark_random_natural_flip_bit(limit, 128, "temp.gp")
@@ -2920,6 +2962,10 @@ fn main() {
                     );
                     benchmark_exhaustive_integer_cmp(100000, "exhaustive_integer_cmp.gp");
                     benchmark_exhaustive_integer_cmp_abs(100000, "exhaustive_integer_cmp_abs.gp");
+                    let s = "exhaustive_integer_divisible_by_power_of_2.gp";
+                    benchmark_exhaustive_integer_divisible_by_power_of_2(100000, s);
+                    let s = "exhaustive_integer_divisible_by_power_of_2_algorithms.gp";
+                    benchmark_exhaustive_integer_divisible_by_power_of_2_algorithms(100000, s);
                     benchmark_exhaustive_integer_eq(100000, "exhaustive_integer_eq.gp");
                     benchmark_exhaustive_integer_flip_bit(100000, "exhaustive_integer_flip_bit.gp");
                     benchmark_exhaustive_integer_from_i32(100000, "exhaustive_integer_from_i32.gp");
@@ -3244,6 +3290,10 @@ fn main() {
                         "exhaustive_natural_clone_from.gp",
                     );
                     benchmark_exhaustive_natural_cmp(100000, "exhaustive_natural_cmp.gp");
+                    let s = "exhaustive_natural_divisible_by_power_of_2.gp";
+                    benchmark_exhaustive_natural_divisible_by_power_of_2(100000, s);
+                    let s = "exhaustive_natural_divisible_by_power_of_2_algorithms.gp";
+                    benchmark_exhaustive_natural_divisible_by_power_of_2_algorithms(100000, s);
                     benchmark_exhaustive_natural_eq(100000, "exhaustive_natural_eq.gp");
                     let s = "exhaustive_natural_flip_bit.gp";
                     benchmark_exhaustive_natural_flip_bit(100000, s);
@@ -3556,6 +3606,10 @@ fn main() {
                     );
                     benchmark_random_integer_cmp(100000, 1024, "random_integer_cmp.gp");
                     benchmark_random_integer_cmp_abs(100000, 1024, "random_integer_cmp_abs.gp");
+                    let s = "random_integer_divisible_by_power_of_2.gp";
+                    benchmark_random_integer_divisible_by_power_of_2(100000, 1024, s);
+                    let s = "random_integer_divisible_by_power_of_2_algorithms.gp";
+                    benchmark_random_integer_divisible_by_power_of_2_algorithms(100000, 1024, s);
                     benchmark_random_integer_eq(100000, 1024, "random_integer_eq.gp");
                     benchmark_random_integer_flip_bit(100000, 1024, "random_integer_flip_bit.gp");
                     benchmark_random_integer_from_i32(100000, "random_integer_from_i32.gp");
@@ -3944,6 +3998,10 @@ fn main() {
                         "random_natural_clone_from.gp",
                     );
                     benchmark_random_natural_cmp(100000, 1024, "random_natural_cmp.gp");
+                    let s = "random_natural_divisible_by_power_of_2.gp";
+                    benchmark_random_natural_divisible_by_power_of_2(100000, 1024, s);
+                    let s = "random_natural_divisible_by_power_of_2_algorithms.gp";
+                    benchmark_random_natural_divisible_by_power_of_2_algorithms(100000, 1024, s);
                     benchmark_random_natural_eq(100000, 1024, "random_natural_eq.gp");
                     benchmark_random_natural_flip_bit(100000, 128, "random_natural_flip_bit.gp");
                     benchmark_random_natural_from_limbs_le(

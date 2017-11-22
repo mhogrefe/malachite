@@ -18,6 +18,7 @@ pub mod integer {
         pub mod add_mul;
         pub mod add_mul_i32;
         pub mod add_mul_u32;
+        pub mod divisible_by_power_of_2;
         pub mod even_odd;
         pub mod mul;
         pub mod mul_i32;
@@ -90,6 +91,7 @@ pub mod natural {
         pub mod add_u32;
         pub mod add_mul;
         pub mod add_mul_u32;
+        pub mod divisible_by_power_of_2;
         pub mod even_odd;
         pub mod mul;
         pub mod mul_u32;

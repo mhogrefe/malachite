@@ -38,6 +38,11 @@ impl Default for Integer {
 }
 
 /// The constant 0.
+///
+/// Time: worst case O(1)
+///
+/// Additional memory: worst case O(1)
+///
 impl Zero for Integer {
     fn zero() -> Integer {
         Integer {
@@ -48,6 +53,11 @@ impl Zero for Integer {
 }
 
 /// The constant 1.
+///
+/// Time: worst case O(1)
+///
+/// Additional memory: worst case O(1)
+///
 impl One for Integer {
     fn one() -> Integer {
         Integer {
@@ -58,6 +68,11 @@ impl One for Integer {
 }
 
 /// The constant 2.
+///
+/// Time: worst case O(1)
+///
+/// Additional memory: worst case O(1)
+///
 impl Two for Integer {
     fn two() -> Integer {
         Integer {
@@ -68,6 +83,11 @@ impl Two for Integer {
 }
 
 /// The constant -1.
+///
+/// Time: worst case O(1)
+///
+/// Additional memory: worst case O(1)
+///
 impl NegativeOne for Integer {
     fn negative_one() -> Integer {
         Integer {
@@ -85,6 +105,7 @@ pub mod arithmetic {
     pub mod add_mul;
     pub mod add_mul_i32;
     pub mod add_mul_u32;
+    pub mod divisible_by_power_of_2;
     pub mod even_odd;
     pub mod mul;
     pub mod mul_i32;
