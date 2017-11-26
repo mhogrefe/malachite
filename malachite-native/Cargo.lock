@@ -1,11 +1,3 @@
-[root]
-name = "malachite-native"
-version = "0.1.0"
-dependencies = [
- "malachite-base 0.1.0",
- "rand 0.3.18 (registry+https://github.com/rust-lang/crates.io-index)",
-]
-
 [[package]]
 name = "bitflags"
 version = "0.7.0"
@@ -35,6 +27,14 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 [[package]]
 name = "malachite-base"
 version = "0.1.0"
+
+[[package]]
+name = "malachite-native"
+version = "0.1.0"
+dependencies = [
+ "malachite-base 0.1.0",
+ "rand 0.3.18 (registry+https://github.com/rust-lang/crates.io-index)",
+]
 
 [[package]]
 name = "rand"

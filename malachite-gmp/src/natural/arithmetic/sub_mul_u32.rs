@@ -99,6 +99,9 @@ impl<'a, 'b> SubMul<&'a Natural, u32> for &'b Natural {
 /// Subtracts the product of a `Natural` (b) and a `u32` (c) from a `Natural` (self), in place,
 /// taking b by reference.
 ///
+/// # Panics
+/// Panics if `b * c` is greater than `self`.
+///
 /// # Examples
 /// ```
 /// extern crate malachite_base;

@@ -73,6 +73,7 @@ use malachite_test::natural::arithmetic::mul::*;
 use malachite_test::natural::arithmetic::mul_u32::*;
 use malachite_test::natural::arithmetic::neg::*;
 use malachite_test::natural::arithmetic::shl_u32::*;
+use malachite_test::natural::arithmetic::shr_u32::*;
 use malachite_test::natural::arithmetic::sub::*;
 use malachite_test::natural::arithmetic::sub_u32::*;
 use malachite_test::natural::arithmetic::sub_mul::*;
@@ -577,6 +578,18 @@ fn main() {
                 ),
                 "exhaustive_natural_shl_u32" => demo_exhaustive_natural_shl_u32(limit),
                 "exhaustive_natural_shl_u32_ref" => demo_exhaustive_natural_shl_u32_ref(limit),
+                "exhaustive_natural_shr_assign_u32" => demo_exhaustive_natural_shr_assign_u32(
+                    limit,
+                ),
+                "exhaustive_natural_shr_u32" => demo_exhaustive_natural_shr_u32(limit),
+                "exhaustive_natural_shr_u32_ref" => demo_exhaustive_natural_shr_u32_ref(limit),
+                "exhaustive_natural_shr_round_assign_u32" => {
+                    demo_exhaustive_natural_shr_round_assign_u32(limit)
+                }
+                "exhaustive_natural_shr_round_u32" => demo_exhaustive_natural_shr_round_u32(limit),
+                "exhaustive_natural_shr_round_u32_ref" => {
+                    demo_exhaustive_natural_shr_round_u32_ref(limit)
+                }
                 "exhaustive_natural_significant_bits" => {
                     demo_exhaustive_natural_significant_bits(limit)
                 }
@@ -990,6 +1003,14 @@ fn main() {
                 "random_natural_shl_assign_u32" => demo_random_natural_shl_assign_u32(limit),
                 "random_natural_shl_u32" => demo_random_natural_shl_u32(limit),
                 "random_natural_shl_u32_ref" => demo_random_natural_shl_u32_ref(limit),
+                "random_natural_shr_assign_u32" => demo_random_natural_shr_assign_u32(limit),
+                "random_natural_shr_u32" => demo_random_natural_shr_u32(limit),
+                "random_natural_shr_u32_ref" => demo_random_natural_shr_u32_ref(limit),
+                "random_natural_shr_round_assign_u32" => demo_random_natural_shr_round_assign_u32(
+                    limit,
+                ),
+                "random_natural_shr_round_u32" => demo_random_natural_shr_round_u32(limit),
+                "random_natural_shr_round_u32_ref" => demo_random_natural_shr_round_u32_ref(limit),
                 "random_natural_significant_bits" => demo_random_natural_significant_bits(limit),
                 "random_natural_sub_assign" => demo_random_natural_sub_assign(limit),
                 "random_natural_sub" => demo_random_natural_sub(limit),
@@ -1820,6 +1841,24 @@ fn main() {
                 }
                 "exhaustive_natural_shl_u32_ref" => {
                     benchmark_exhaustive_natural_shl_u32_ref(limit, "temp.gp")
+                }
+                "exhaustive_natural_shr_assign_u32" => {
+                    benchmark_exhaustive_natural_shr_assign_u32(limit, "temp.gp")
+                }
+                "exhaustive_natural_shr_u32" => {
+                    benchmark_exhaustive_natural_shr_u32(limit, "temp.gp")
+                }
+                "exhaustive_natural_shr_u32_ref" => {
+                    benchmark_exhaustive_natural_shr_u32_ref(limit, "temp.gp")
+                }
+                "exhaustive_natural_shr_round_assign_u32" => {
+                    benchmark_exhaustive_natural_shr_round_assign_u32(limit, "temp.gp")
+                }
+                "exhaustive_natural_shr_round_u32" => {
+                    benchmark_exhaustive_natural_shr_round_u32(limit, "temp.gp")
+                }
+                "exhaustive_natural_shr_round_u32_ref" => {
+                    benchmark_exhaustive_natural_shr_round_u32_ref(limit, "temp.gp")
                 }
                 "exhaustive_natural_significant_bits" => {
                     benchmark_exhaustive_natural_significant_bits(limit, "temp.gp")
@@ -2735,6 +2774,24 @@ fn main() {
                 "random_natural_shl_u32_ref" => {
                     benchmark_random_natural_shl_u32_ref(limit, 1024, "temp.gp")
                 }
+                "random_natural_shr_assign_u32" => {
+                    benchmark_random_natural_shr_assign_u32(limit, 1024, "temp.gp")
+                }
+                "random_natural_shr_u32" => {
+                    benchmark_random_natural_shr_u32(limit, 1024, "temp.gp")
+                }
+                "random_natural_shr_u32_ref" => {
+                    benchmark_random_natural_shr_u32_ref(limit, 1024, "temp.gp")
+                }
+                "random_natural_shr_round_assign_u32" => {
+                    benchmark_random_natural_shr_round_assign_u32(limit, 1024, "temp.gp")
+                }
+                "random_natural_shr_round_u32" => {
+                    benchmark_random_natural_shr_round_u32(limit, 1024, "temp.gp")
+                }
+                "random_natural_shr_round_u32_ref" => {
+                    benchmark_random_natural_shr_round_u32_ref(limit, 1024, "temp.gp")
+                }
                 "random_natural_significant_bits" => {
                     benchmark_random_natural_significant_bits(limit, 1024, "temp.gp")
                 }
@@ -3373,6 +3430,23 @@ fn main() {
                     benchmark_exhaustive_natural_shl_u32_ref(
                         100000,
                         "exhaustive_natural_shl_u32_ref.gp",
+                    );
+                    let s = "exhaustive_natural_shr_assign_u32.gp";
+                    benchmark_exhaustive_natural_shr_assign_u32(100000, s);
+                    benchmark_exhaustive_natural_shr_u32(100000, "exhaustive_natural_shr_u32.gp");
+                    benchmark_exhaustive_natural_shr_u32_ref(
+                        100000,
+                        "exhaustive_natural_shr_u32_ref.gp",
+                    );
+                    let s = "exhaustive_natural_shr_round_assign_u32.gp";
+                    benchmark_exhaustive_natural_shr_round_assign_u32(100000, s);
+                    benchmark_exhaustive_natural_shr_round_u32(
+                        100000,
+                        "exhaustive_natural_shr_round_u32.gp",
+                    );
+                    benchmark_exhaustive_natural_shr_round_u32_ref(
+                        100000,
+                        "exhaustive_natural_shr_round_u32_ref.gp",
                     );
                     let s = "exhaustive_natural_significant_bits.gp";
                     benchmark_exhaustive_natural_significant_bits(100000, s);
@@ -4113,6 +4187,32 @@ fn main() {
                         100000,
                         1024,
                         "random_natural_shl_u32_ref.gp",
+                    );
+                    benchmark_random_natural_shr_assign_u32(
+                        100000,
+                        1024,
+                        "random_natural_shr_assign_u32.gp",
+                    );
+                    benchmark_random_natural_shr_u32(100000, 1024, "random_natural_shr_u32.gp");
+                    benchmark_random_natural_shr_u32_ref(
+                        100000,
+                        1024,
+                        "random_natural_shr_u32_ref.gp",
+                    );
+                    benchmark_random_natural_shr_round_assign_u32(
+                        100000,
+                        1024,
+                        "random_natural_shr_round_assign_u32.gp",
+                    );
+                    benchmark_random_natural_shr_round_u32(
+                        100000,
+                        1024,
+                        "random_natural_shr_round_u32.gp",
+                    );
+                    benchmark_random_natural_shr_round_u32_ref(
+                        100000,
+                        1024,
+                        "random_natural_shr_round_u32_ref.gp",
                     );
                     benchmark_random_natural_significant_bits(
                         100000,

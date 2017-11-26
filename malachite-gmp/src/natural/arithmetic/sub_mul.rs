@@ -106,9 +106,8 @@ impl<'a, 'b, 'c> SubMul<&'a Natural, &'b Natural> for &'c Natural {
 /// Subtracts the product of a `Natural` (b) and a `Natural` (c) from a `Natural` (self), in place,
 /// taking b and c by reference.
 ///
-/// where m = `a.significant_bits()`,
-///       n = `b.significant_bits()`
-///       p = `c.significant_bits()`
+/// # Panics
+/// Panics if `b * c` is greater than `self`.
 ///
 /// # Examples
 /// ```

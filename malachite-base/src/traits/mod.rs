@@ -1,3 +1,4 @@
+use round::RoundingMode;
 use std::cmp::Ordering;
 
 pub trait AbsAssign {
@@ -170,3 +171,23 @@ impl01i!(isize);
 
 impl01f!(f32);
 impl01f!(f64);
+
+pub trait ShlRound<RHS> {
+    type Output;
+
+    fn shl_round(self, rhs: RHS, rm: RoundingMode) -> Self::Output;
+}
+
+pub trait ShrRound<RHS> {
+    type Output;
+
+    fn shr_round(self, rhs: RHS, rm: RoundingMode) -> Self::Output;
+}
+
+pub trait ShlRoundAssign<Rhs = Self> {
+    fn shl_round_assign(&mut self, rhs: Rhs, rm: RoundingMode);
+}
+
+pub trait ShrRoundAssign<Rhs = Self> {
+    fn shr_round_assign(&mut self, rhs: Rhs, rm: RoundingMode);
+}

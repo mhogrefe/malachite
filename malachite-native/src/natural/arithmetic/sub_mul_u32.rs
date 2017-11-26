@@ -145,6 +145,9 @@ impl<'a, 'b> SubMul<&'a Natural, u32> for &'b Natural {
 ///
 /// where n = `self.significant_bits()`
 ///
+/// # Panics
+/// Panics if `b * c` is greater than `self`.
+///
 /// # Examples
 /// ```
 /// extern crate malachite_base;

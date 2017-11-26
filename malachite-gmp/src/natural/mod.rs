@@ -142,6 +142,7 @@ pub mod arithmetic {
     pub mod mul_u32;
     pub mod neg;
     pub mod shl_u32;
+    pub mod shr_u32;
     pub mod sub;
     pub mod sub_u32;
     pub mod sub_mul;

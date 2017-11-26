@@ -3,6 +3,7 @@ use natural::arithmetic::add_u32::{mpn_add_1, mpn_add_1_in_place};
 use natural::arithmetic::add_mul_u32::mpn_addmul_1;
 use natural::arithmetic::mul_u32::mpn_mul_1;
 use natural::arithmetic::shl_u32::{mpn_lshift, mpn_lshift_in_place};
+use natural::arithmetic::shr_u32::mpn_rshift_in_place;
 use natural::arithmetic::sub::{mpn_sub, mpn_sub_n, mpn_sub_n_aba, mpn_sub_n_in_place};
 use natural::arithmetic::sub_u32::mpn_sub_1_in_place;
 use natural::comparison::ord::mpn_cmp;
@@ -377,13 +378,6 @@ fn mpn_toom_eval_dgr3_pm1(
 //TODO move to a better location
 fn mpn_divexact_by3_in_place(p: &mut [u32]) -> u32 {
     println!("{}", p.len());
-    unimplemented!();
-}
-
-//TODO move to a better location
-pub fn mpn_rshift_in_place(u: &mut [u32], bits: u32) -> u32 {
-    println!("{}", u.len());
-    println!("{}", bits);
     unimplemented!();
 }
 

@@ -11,7 +11,8 @@ use rust_wheels::iterators::common::EXAMPLE_SEED;
 use rust_wheels::iterators::integers_geometric::natural_u32s_geometric;
 use rust_wheels::iterators::naturals::{exhaustive_naturals, random_naturals};
 use rust_wheels::iterators::primitive_ints::exhaustive_u;
-use rust_wheels::iterators::tuples::{log_pairs, random_pairs};
+use rust_wheels::iterators::tuples::{exhaustive_pairs_from_single, log_pairs, random_pairs,
+                                     random_triples};
 use std::str::FromStr;
 
 #[test]
@@ -90,7 +91,7 @@ fn shl_u32_properties() {
     // n <<= u, n << u, and &n << u give the same result.
     // n << u >= n
     // n << u == n * (1 << u)
-    // TODO >>
+    // n << u >> u == n
     let natural_and_u32 = |mut gmp_n: gmp::Natural, u: u32| {
         let mut n = gmp_natural_to_native(&gmp_n);
         let old_n = n.clone();
@@ -129,7 +130,14 @@ fn shl_u32_properties() {
         assert_eq!(rugint_integer_to_native_natural(&(rugint_n2 << u)), n);
 
         assert!(&old_n << u >= old_n);
-        assert_eq!(&old_n << u, old_n * (native::Natural::one() << u));
+        assert_eq!(&old_n << u, &old_n * (native::Natural::one() << u));
+        assert_eq!(&old_n << u >> u, old_n);
+    };
+
+    // n << u << v == n << (u + v)
+    let natural_and_two_u32s = |gmp_n: gmp::Natural, u: u32, v: u32| {
+        let n = gmp_natural_to_native(&gmp_n);
+        assert_eq!(&n << u << v, &n << (u + v));
     };
 
     // n << 0 == n
@@ -157,6 +165,24 @@ fn shl_u32_properties() {
     ).take(LARGE_LIMIT)
     {
         natural_and_u32(n, u);
+    }
+
+    for (n, (u, v)) in log_pairs(
+        exhaustive_naturals(),
+        exhaustive_pairs_from_single(exhaustive_u::<u32>()),
+    ).take(LARGE_LIMIT)
+    {
+        natural_and_two_u32s(n, u, v);
+    }
+
+    for (n, u, v) in random_triples(
+        &EXAMPLE_SEED,
+        &(|seed| random_naturals(seed, 32)),
+        &(|seed| natural_u32s_geometric(seed, 32)),
+        &(|seed| natural_u32s_geometric(seed, 32)),
+    ).take(LARGE_LIMIT)
+    {
+        natural_and_two_u32s(n, u, v);
     }
 
     for n in exhaustive_naturals().take(LARGE_LIMIT) {

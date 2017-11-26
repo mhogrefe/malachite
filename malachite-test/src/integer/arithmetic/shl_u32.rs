@@ -140,7 +140,7 @@ pub fn benchmark_exhaustive_integer_shl_u32(limit: usize, file_name: &str) {
 }
 
 pub fn benchmark_random_integer_shl_u32(limit: usize, scale: u32, file_name: &str) {
-    println!("benchmarking random Integer <<= u32");
+    println!("benchmarking random Integer << u32");
     benchmark_4(BenchmarkOptions4 {
         xs: random_pairs(
             &EXAMPLE_SEED,
@@ -191,7 +191,7 @@ pub fn benchmark_exhaustive_integer_shl_u32_ref(limit: usize, file_name: &str) {
 }
 
 pub fn benchmark_random_integer_shl_u32_ref(limit: usize, scale: u32, file_name: &str) {
-    println!("benchmarking random &Integer <<= u32");
+    println!("benchmarking random &Integer << u32");
     benchmark_3(BenchmarkOptions3 {
         xs: random_pairs(
             &EXAMPLE_SEED,

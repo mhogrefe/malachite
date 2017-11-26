@@ -1,4 +1,4 @@
-[root]
+[[package]]
 name = "malachite-base"
 version = "0.1.0"
 

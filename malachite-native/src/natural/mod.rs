@@ -133,6 +133,15 @@ fn pad_left<T: Clone>(vec: &mut Vec<T>, pad_size: usize, value: T) {
     }
 }
 
+fn delete_left<T>(vec: &mut Vec<T>, delete_size: usize) {
+    assert!(vec.len() >= delete_size);
+    let remaining_size = vec.len() - delete_size;
+    for i in 0..remaining_size {
+        vec.swap(i, i + delete_size);
+    }
+    vec.truncate(remaining_size);
+}
+
 macro_rules! mutate_with_possible_promotion {
     ($n: ident, $small: ident, $large: ident, $process_small: expr, $process_large: expr) => {
         if let Small(ref mut $small) = *$n {

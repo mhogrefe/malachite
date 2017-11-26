@@ -92,6 +92,9 @@ impl<'a, 'b> Sub<&'a Natural> for &'b Natural {
 
 /// Subtracts a `Natural` from a `Natural` in place, taking the `Natural` on the RHS by reference.
 ///
+/// # Panics
+/// Panics if `other` is greater than `self`.
+///
 /// # Examples
 /// ```
 /// use malachite_gmp::natural::Natural;

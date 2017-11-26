@@ -14,6 +14,9 @@ use natural::Natural::{self, Large, Small};
 ///       n = `b.significant_bits()`
 ///       p = `c.significant_bits()`
 ///
+/// # Panics
+/// Panics if `b * c` is greater than `self`.
+///
 /// # Examples
 /// ```
 /// extern crate malachite_base;
