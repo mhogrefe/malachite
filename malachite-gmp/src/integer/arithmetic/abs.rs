@@ -16,7 +16,7 @@ impl Integer {
     /// use malachite_gmp::integer::Integer;
     ///
     /// fn main() {
-    ///     assert_eq!(Integer::zero().abs().to_string(), "0");
+    ///     assert_eq!(Integer::ZERO.abs().to_string(), "0");
     ///     assert_eq!(Integer::from(123).abs().to_string(), "123");
     ///     assert_eq!(Integer::from(-123).abs().to_string(), "123");
     /// }
@@ -37,7 +37,7 @@ impl Integer {
     /// use malachite_gmp::integer::Integer;
     ///
     /// fn main() {
-    ///     assert_eq!(Integer::zero().abs_ref().to_string(), "0");
+    ///     assert_eq!(Integer::ZERO.abs_ref().to_string(), "0");
     ///     assert_eq!(Integer::from(123).abs_ref().to_string(), "123");
     ///     assert_eq!(Integer::from(-123).abs_ref().to_string(), "123");
     /// }
@@ -71,7 +71,7 @@ impl Integer {
     /// use malachite_gmp::integer::Integer;
     ///
     /// fn main() {
-    ///     assert_eq!(Integer::zero().natural_abs().to_string(), "0");
+    ///     assert_eq!(Integer::ZERO.natural_abs().to_string(), "0");
     ///     assert_eq!(Integer::from(123).natural_abs().to_string(), "123");
     ///     assert_eq!(Integer::from(-123).natural_abs().to_string(), "123");
     /// }
@@ -105,7 +105,7 @@ impl Integer {
     /// use malachite_gmp::integer::Integer;
     ///
     /// fn main() {
-    ///     assert_eq!(Integer::zero().natural_abs().to_string(), "0");
+    ///     assert_eq!(Integer::ZERO.natural_abs().to_string(), "0");
     ///     assert_eq!(Integer::from(123).natural_abs().to_string(), "123");
     ///     assert_eq!(Integer::from(-123).natural_abs().to_string(), "123");
     /// }
@@ -138,7 +138,7 @@ impl Integer {
 /// use malachite_gmp::integer::Integer;
 ///
 /// fn main() {
-///     let mut x = Integer::zero();
+///     let mut x = Integer::ZERO;
 ///     x.abs_assign();
 ///     assert_eq!(x.to_string(), "0");
 ///

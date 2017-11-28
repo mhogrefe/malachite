@@ -101,7 +101,7 @@ fn add_properties() {
     // x + y is equivalent for malachite-gmp, malachite-native, num, and rugint.
     // x += y, x += &y, x + y, x + &y, &x + y, and &x + &y give the same result.
     // x + y == y + x
-    #[allow(cyclomatic_complexity)]
+    #[allow(unknown_lints, cyclomatic_complexity)]
     let two_integers = |gmp_x: gmp::Integer, gmp_y: gmp::Integer| {
         let x = gmp_integer_to_native(&gmp_x);
         let y = gmp_integer_to_native(&gmp_y);
@@ -187,8 +187,8 @@ fn add_properties() {
     // x + -x == 0
     let one_integer = |gmp_x: gmp::Integer| {
         let x = gmp_integer_to_native(&gmp_x);
-        let id_1 = &x + native::Integer::zero();
-        let id_2 = native::Integer::zero() + &x;
+        let id_1 = &x + native::Integer::ZERO;
+        let id_2 = native::Integer::ZERO + &x;
         let double = &x + &x;
         assert_eq!(id_1, x);
         assert_eq!(id_2, x);

@@ -28,7 +28,7 @@ impl Integer {
     /// use std::str::FromStr;
     ///
     /// fn main() {
-    ///     assert_eq!(Integer::zero().sign_and_limbs_le(), (Ordering::Equal, vec![]));
+    ///     assert_eq!(Integer::ZERO.sign_and_limbs_le(), (Ordering::Equal, vec![]));
     ///     assert_eq!(Integer::from(123).sign_and_limbs_le(), (Ordering::Greater, vec![123]));
     ///     assert_eq!(Integer::from(-123).sign_and_limbs_le(), (Ordering::Less, vec![123]));
     ///     // 10^12 = 232 * 2^32 + 3567587328
@@ -68,7 +68,7 @@ impl Integer {
     /// use std::str::FromStr;
     ///
     /// fn main() {
-    ///     assert_eq!(Integer::zero().sign_and_limbs_be(), (Ordering::Equal, vec![]));
+    ///     assert_eq!(Integer::ZERO.sign_and_limbs_be(), (Ordering::Equal, vec![]));
     ///     assert_eq!(Integer::from(123).sign_and_limbs_be(), (Ordering::Greater, vec![123]));
     ///     assert_eq!(Integer::from(-123).sign_and_limbs_be(), (Ordering::Less, vec![123]));
     ///     // 10^12 = 232 * 2^32 + 3567587328

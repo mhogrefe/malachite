@@ -17,7 +17,7 @@ impl Integer {
     /// use malachite_native::integer::Integer;
     ///
     /// fn main() {
-    ///     assert_eq!(Integer::zero().significant_bits(), 0);
+    ///     assert_eq!(Integer::ZERO.significant_bits(), 0);
     ///     assert_eq!(Integer::from(100).significant_bits(), 7);
     ///     assert_eq!(Integer::from(-100).significant_bits(), 7);
     /// }

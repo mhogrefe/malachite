@@ -27,7 +27,7 @@ impl Integer {
     /// ```
     pub fn from_twos_complement_limbs_le(limbs: &[u32]) -> Integer {
         if limbs.is_empty() {
-            return Integer::zero();
+            return Integer::ZERO;
         }
         if limbs.last().unwrap() & 0x8000_0000 == 0 {
             Natural::from_limbs_le(limbs).into_integer()

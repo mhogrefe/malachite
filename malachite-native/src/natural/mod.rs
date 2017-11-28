@@ -65,27 +65,12 @@ impl Natural {
     }
 
     /// Returns true iff `self` is valid. To be valid, `self` can only be Large when it is at least
-    /// 2^(32), and cannot have leading zero limbs. All Naturals used outside this crate are valid,
-    /// but temporary Naturals used inside may not be.
+    /// 2^(32), and cannot have leading zero limbs. All Naturals must be valid.
     pub fn is_valid(&self) -> bool {
         match *self {
             Small(_) => true,
             Large(ref xs) => xs.len() > 1 && xs.last().unwrap() != &0,
         }
-    }
-}
-
-/// Creates a default `Natural` equal to 0.
-///
-/// # Example
-/// ```
-/// use malachite_native::natural::Natural;
-///
-/// assert_eq!(Natural::default().to_string(), "0");
-/// ```
-impl Default for Natural {
-    fn default() -> Natural {
-        Small(0)
     }
 }
 
@@ -96,9 +81,7 @@ impl Default for Natural {
 /// Additional memory: worst case O(1)
 ///
 impl Zero for Natural {
-    fn zero() -> Natural {
-        Small(0)
-    }
+    const ZERO: Natural = Small(0);
 }
 
 /// The constant 1.
@@ -108,9 +91,7 @@ impl Zero for Natural {
 /// Additional memory: worst case O(1)
 ///
 impl One for Natural {
-    fn one() -> Natural {
-        Small(1)
-    }
+    const ONE: Natural = Small(1);
 }
 
 /// The constant 2.
@@ -120,9 +101,7 @@ impl One for Natural {
 /// Additional memory: worst case O(1)
 ///
 impl Two for Natural {
-    fn two() -> Natural {
-        Small(2)
-    }
+    const TWO: Natural = Small(2);
 }
 
 fn pad_left<T: Clone>(vec: &mut Vec<T>, pad_size: usize, value: T) {

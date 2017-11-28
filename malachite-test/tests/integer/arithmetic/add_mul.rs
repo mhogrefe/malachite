@@ -11,7 +11,7 @@ use std::str::FromStr;
 
 #[test]
 fn test_add_mul() {
-    #[allow(cyclomatic_complexity)]
+    #[allow(unknown_lints, cyclomatic_complexity)]
     let test = |u, v, w, out| {
         let mut a = native::Integer::from_str(u).unwrap();
         a.add_mul_assign(
@@ -468,8 +468,8 @@ fn add_mul_properties() {
     // a.add_mul(-a, 1) == 0
     let single_integer = |gmp_n: gmp::Integer| {
         let a = &gmp_integer_to_native(&gmp_n);
-        assert_eq!(a.add_mul(a, &native::Integer::negative_one()), 0);
-        assert_eq!(a.add_mul(&(-a), &native::Integer::one()), 0);
+        assert_eq!(a.add_mul(a, &native::Integer::NEGATIVE_ONE), 0);
+        assert_eq!(a.add_mul(&(-a), &native::Integer::ONE), 0);
     };
 
     // a.add_mul(0, b) == a
@@ -482,11 +482,11 @@ fn add_mul_properties() {
     let two_integers = |gmp_a: gmp::Integer, gmp_b: gmp::Integer| {
         let a = &gmp_integer_to_native(&gmp_a);
         let b = &gmp_integer_to_native(&gmp_b);
-        assert_eq!(a.add_mul(&native::Integer::zero(), b), *a);
-        assert_eq!(a.add_mul(&native::Integer::one(), b), a + b);
-        assert_eq!(native::Integer::zero().add_mul(a, b), a * b);
-        assert_eq!(a.add_mul(b, &native::Integer::zero()), *a);
-        assert_eq!(a.add_mul(b, &native::Integer::one()), a + b);
+        assert_eq!(a.add_mul(&native::Integer::ZERO, b), *a);
+        assert_eq!(a.add_mul(&native::Integer::ONE, b), a + b);
+        assert_eq!(native::Integer::ZERO.add_mul(a, b), a * b);
+        assert_eq!(a.add_mul(b, &native::Integer::ZERO), *a);
+        assert_eq!(a.add_mul(b, &native::Integer::ONE), a + b);
         assert_eq!((a * b).add_mul(-a, b), 0);
         assert_eq!((a * b).add_mul(a, -b), 0);
     };

@@ -182,7 +182,7 @@ fn sub_mul_u32_properties() {
     // n.sub_mul(n, 1) == 0
     let single_natural = |gmp_n: gmp::Natural| {
         let n = &gmp_natural_to_native(&gmp_n);
-        assert_eq!(n.sub_mul(n, 1), Some(native::Natural::zero()));
+        assert_eq!(n.sub_mul(n, 1), Some(native::Natural::ZERO));
     };
 
     // n.sub_mul(0, c) == Some(n)
@@ -190,9 +190,9 @@ fn sub_mul_u32_properties() {
     // (n * c).sub_mul(n, c) == 0
     let natural_and_u32 = |gmp_n: gmp::Natural, c: u32| {
         let n = &gmp_natural_to_native(&gmp_n);
-        assert_eq!(n.sub_mul(&native::Natural::zero(), c), Some(n.clone()));
-        assert_eq!(n.sub_mul(&native::Natural::one(), c), n - c);
-        assert_eq!((n * c).sub_mul(n, c), Some(native::Natural::zero()));
+        assert_eq!(n.sub_mul(&native::Natural::ZERO, c), Some(n.clone()));
+        assert_eq!(n.sub_mul(&native::Natural::ONE, c), n - c);
+        assert_eq!((n * c).sub_mul(n, c), Some(native::Natural::ZERO));
     };
 
     // a.sub_mul(b, 0) == Some(a)

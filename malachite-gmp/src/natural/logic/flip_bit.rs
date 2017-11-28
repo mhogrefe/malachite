@@ -13,7 +13,7 @@ impl Natural {
     /// use malachite_gmp::natural::Natural;
     ///
     /// fn main() {
-    ///     let mut x = Natural::zero();
+    ///     let mut x = Natural::ZERO;
     ///     x.flip_bit(10);
     ///     assert_eq!(x.to_string(), "1024");
     ///     x.flip_bit(10);

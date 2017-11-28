@@ -21,7 +21,7 @@ impl Natural {
     /// use std::str::FromStr;
     ///
     /// fn main() {
-    ///     assert_eq!(Natural::zero().trailing_zeros(), None);
+    ///     assert_eq!(Natural::ZERO.trailing_zeros(), None);
     ///     assert_eq!(Natural::from(3u32).trailing_zeros(), Some(0));
     ///     assert_eq!(Natural::from(72u32).trailing_zeros(), Some(3));
     ///     assert_eq!(Natural::from(100u32).trailing_zeros(), Some(2));

@@ -18,7 +18,7 @@ use std::str::FromStr;
 
 #[test]
 fn test_mul() {
-    #[allow(cyclomatic_complexity)]
+    #[allow(unknown_lints, cyclomatic_complexity)]
     let test = |u, v, out| {
         let mut n = native::Integer::from_str(u).unwrap();
         n *= native::Integer::from_str(v).unwrap();
@@ -141,7 +141,7 @@ fn mul_properties() {
     //TODO x * y / y == x and x * y / x == y
     // (-x) * y == -(x * y)
     // x * (-y) == -(x * y)
-    #[allow(cyclomatic_complexity)]
+    #[allow(unknown_lints, cyclomatic_complexity)]
     let two_integers = |gmp_x: gmp::Integer, gmp_y: gmp::Integer| {
         let x = gmp_integer_to_native(&gmp_x);
         let y = gmp_integer_to_native(&gmp_y);
@@ -232,10 +232,10 @@ fn mul_properties() {
     let one_integer = |gmp_x: gmp::Integer| {
         let x = gmp_integer_to_native(&gmp_x);
         let x_old = x.clone();
-        assert_eq!(&x * native::Integer::zero(), 0);
-        assert_eq!(native::Integer::zero() * 0, 0);
-        let id_1 = &x * native::Integer::one();
-        let id_2 = native::Integer::one() * &x;
+        assert_eq!(&x * native::Integer::ZERO, 0);
+        assert_eq!(native::Integer::ZERO * 0, 0);
+        let id_1 = &x * native::Integer::ONE;
+        let id_2 = native::Integer::ONE * &x;
         //TODO let square = &x * &x;
         assert_eq!(id_1, x_old);
         assert_eq!(id_2, x_old);

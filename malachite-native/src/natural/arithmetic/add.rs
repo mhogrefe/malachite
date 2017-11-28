@@ -93,8 +93,8 @@ pub fn mpn_add_in_place(s1: &mut [u32], s2: &[u32]) -> bool {
 /// use std::str::FromStr;
 ///
 /// fn main() {
-///     assert_eq!((Natural::zero() + Natural::from(123u32)).to_string(), "123");
-///     assert_eq!((Natural::from(123u32) + Natural::zero()).to_string(), "123");
+///     assert_eq!((Natural::ZERO + Natural::from(123u32)).to_string(), "123");
+///     assert_eq!((Natural::from(123u32) + Natural::ZERO).to_string(), "123");
 ///     assert_eq!((Natural::from(123u32) + Natural::from(456u32)).to_string(), "579");
 ///     assert_eq!((Natural::from_str("1000000000000").unwrap() + Natural::from_str("2000000000000")
 ///                .unwrap()).to_string(), "3000000000000");
@@ -128,8 +128,8 @@ impl Add<Natural> for Natural {
 /// use std::str::FromStr;
 ///
 /// fn main() {
-///     assert_eq!((Natural::zero() + &Natural::from(123u32)).to_string(), "123");
-///     assert_eq!((Natural::from(123u32) +&Natural::zero()).to_string(), "123");
+///     assert_eq!((Natural::ZERO + &Natural::from(123u32)).to_string(), "123");
+///     assert_eq!((Natural::from(123u32) +&Natural::ZERO).to_string(), "123");
 ///     assert_eq!((Natural::from(123u32) +&Natural::from(456u32)).to_string(), "579");
 ///     assert_eq!((Natural::from_str("1000000000000").unwrap() +
 ///                 &Natural::from_str("2000000000000")
@@ -164,8 +164,8 @@ impl<'a> Add<&'a Natural> for Natural {
 /// use std::str::FromStr;
 ///
 /// fn main() {
-///     assert_eq!((&Natural::zero() + Natural::from(123u32)).to_string(), "123");
-///     assert_eq!((&Natural::from(123u32) + Natural::zero()).to_string(), "123");
+///     assert_eq!((&Natural::ZERO + Natural::from(123u32)).to_string(), "123");
+///     assert_eq!((&Natural::from(123u32) + Natural::ZERO).to_string(), "123");
 ///     assert_eq!((&Natural::from(123u32) + Natural::from(456u32)).to_string(), "579");
 ///     assert_eq!((&Natural::from_str("1000000000000").unwrap() +
 ///                 Natural::from_str("2000000000000")
@@ -208,8 +208,8 @@ fn add_helper(xs: &[u32], ys: &[u32]) -> Natural {
 /// use std::str::FromStr;
 ///
 /// fn main() {
-///     assert_eq!((&Natural::zero() + &Natural::from(123u32)).to_string(), "123");
-///     assert_eq!((&Natural::from(123u32) + &Natural::zero()).to_string(), "123");
+///     assert_eq!((&Natural::ZERO + &Natural::from(123u32)).to_string(), "123");
+///     assert_eq!((&Natural::from(123u32) + &Natural::ZERO).to_string(), "123");
 ///     assert_eq!((&Natural::from(123u32) + &Natural::from(456u32)).to_string(), "579");
 ///     assert_eq!((&Natural::from_str("1000000000000").unwrap() +
 ///                 &Natural::from_str("2000000000000")
@@ -258,7 +258,7 @@ impl<'a, 'b> Add<&'a Natural> for &'b Natural {
 /// use std::str::FromStr;
 ///
 /// fn main() {
-///     let mut x = Natural::zero();
+///     let mut x = Natural::ZERO;
 ///     x += Natural::from_str("1000000000000").unwrap();
 ///     x += Natural::from_str("2000000000000").unwrap();
 ///     x += Natural::from_str("3000000000000").unwrap();
@@ -309,7 +309,7 @@ impl AddAssign<Natural> for Natural {
 /// use std::str::FromStr;
 ///
 /// fn main() {
-///     let mut x = Natural::zero();
+///     let mut x = Natural::ZERO;
 ///     x += &Natural::from_str("1000000000000").unwrap();
 ///     x += &Natural::from_str("2000000000000").unwrap();
 ///     x += &Natural::from_str("3000000000000").unwrap();

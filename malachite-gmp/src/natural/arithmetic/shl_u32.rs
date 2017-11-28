@@ -14,7 +14,7 @@ use std::ops::{Shl, ShlAssign};
 /// use malachite_gmp::natural::Natural;
 ///
 /// fn main() {
-///     assert_eq!((Natural::zero() << 10).to_string(), "0");
+///     assert_eq!((Natural::ZERO << 10).to_string(), "0");
 ///     assert_eq!((Natural::from(123u32) << 2).to_string(), "492");
 ///     assert_eq!((Natural::from(123u32) << 100).to_string(), "155921023828072216384094494261248");
 /// }
@@ -39,7 +39,7 @@ impl Shl<u32> for Natural {
 /// use malachite_gmp::natural::Natural;
 ///
 /// fn main() {
-///     assert_eq!((&Natural::zero() << 10).to_string(), "0");
+///     assert_eq!((&Natural::ZERO << 10).to_string(), "0");
 ///     assert_eq!((&Natural::from(123u32) << 2).to_string(), "492");
 ///     assert_eq!((&Natural::from(123u32) << 100).to_string(),
 ///         "155921023828072216384094494261248");
@@ -81,7 +81,7 @@ impl<'a> Shl<u32> for &'a Natural {
 /// use malachite_gmp::natural::Natural;
 ///
 /// fn main() {
-///     let mut x = Natural::one();
+///     let mut x = Natural::ONE;
 ///     x <<= 1;
 ///     x <<= 2;
 ///     x <<= 3;

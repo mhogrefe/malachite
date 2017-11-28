@@ -53,8 +53,8 @@ fn significant_bits_properties() {
         assert_eq!(x <= u32::max_value(), significant_bits <= 32);
         if x != 0 {
             let n = significant_bits as u32;
-            assert!(native::Natural::one() << (n - 1) <= x);
-            assert!(x < native::Natural::one() << n);
+            assert!(native::Natural::ONE << (n - 1) <= x);
+            assert!(x < native::Natural::ONE << n);
         }
     };
 

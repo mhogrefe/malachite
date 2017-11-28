@@ -19,13 +19,13 @@ impl Integer {
     /// use malachite_native::integer::Integer;
     ///
     /// fn main() {
-    ///     let mut x = Integer::zero();
+    ///     let mut x = Integer::ZERO;
     ///     x.flip_bit(10);
     ///     assert_eq!(x.to_string(), "1024");
     ///     x.flip_bit(10);
     ///     assert_eq!(x.to_string(), "0");
     ///
-    ///     let mut x = Integer::negative_one();
+    ///     let mut x = Integer::NEGATIVE_ONE;
     ///     x.flip_bit(10);
     ///     assert_eq!(x.to_string(), "-1025");
     ///     x.flip_bit(10);

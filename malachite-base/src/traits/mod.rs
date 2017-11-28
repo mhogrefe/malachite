@@ -80,39 +80,33 @@ pub trait OrdAbs: Eq + PartialOrdAbs<Self> {
 }
 
 pub trait Zero {
-    fn zero() -> Self;
+    const ZERO: Self;
 }
 
 pub trait One {
-    fn one() -> Self;
+    const ONE: Self;
 }
 
 pub trait Two {
-    fn two() -> Self;
+    const TWO: Self;
 }
 
 pub trait NegativeOne {
-    fn negative_one() -> Self;
+    const NEGATIVE_ONE: Self;
 }
 
 macro_rules! impl01u {
     ($t: ty) => {
         impl Zero for $t {
-            fn zero() -> $t {
-                0
-            }
+            const ZERO: $t = 0;
         }
 
         impl One for $t {
-            fn one() -> $t {
-                1
-            }
+            const ONE: $t = 1;
         }
 
         impl Two for $t {
-            fn two() -> $t {
-                2
-            }
+            const TWO: $t = 2;
         }
     }
 }
@@ -122,9 +116,7 @@ macro_rules! impl01i {
         impl01u!($t);
 
         impl NegativeOne for $t {
-            fn negative_one() -> $t {
-                -1
-            }
+            const NEGATIVE_ONE: $t = -1;
         }
     }
 }
@@ -132,27 +124,19 @@ macro_rules! impl01i {
 macro_rules! impl01f {
     ($t: ty) => {
         impl Zero for $t {
-            fn zero() -> $t {
-                0.0
-            }
+            const ZERO: $t = 0.0;
         }
 
         impl One for $t {
-            fn one() -> $t {
-                1.0
-            }
+            const ONE: $t = 1.0;
         }
 
         impl Two for $t {
-            fn two() -> $t {
-                2.0
-            }
+            const TWO: $t = 2.0;
         }
 
         impl NegativeOne for $t {
-            fn negative_one() -> $t {
-                -1.0
-            }
+            const NEGATIVE_ONE: $t = -1.0;
         }
     }
 }

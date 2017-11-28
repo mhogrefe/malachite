@@ -23,7 +23,7 @@ impl Natural {
     /// use std::str::FromStr;
     ///
     /// fn main() {
-    ///     assert!(Natural::zero().to_limbs_le().is_empty());
+    ///     assert!(Natural::ZERO.to_limbs_le().is_empty());
     ///     assert_eq!(Natural::from(123u32).to_limbs_le(), vec![123]);
     ///     // 10^12 = 232 * 2^32 + 3567587328
     ///     assert_eq!(Natural::from_str("1000000000000").unwrap().to_limbs_le(),
@@ -59,7 +59,7 @@ impl Natural {
     /// use std::str::FromStr;
     ///
     /// fn main() {
-    ///     assert!(Natural::zero().to_limbs_be().is_empty());
+    ///     assert!(Natural::ZERO.to_limbs_be().is_empty());
     ///     assert_eq!(Natural::from(123u32).to_limbs_be(), vec![123]);
     ///     // 10^12 = 232 * 2^32 + 3567587328
     ///     assert_eq!(Natural::from_str("1000000000000").unwrap().to_limbs_be(),

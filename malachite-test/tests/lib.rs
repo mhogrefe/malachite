@@ -34,7 +34,6 @@ pub mod integer {
     }
     pub mod basic {
         pub mod constants;
-        pub mod default;
     }
     pub mod comparison {
         pub mod eq;
@@ -106,7 +105,6 @@ pub mod natural {
     }
     pub mod basic {
         pub mod constants;
-        pub mod default;
     }
     pub mod comparison {
         pub mod eq;

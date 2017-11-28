@@ -18,7 +18,7 @@ impl Natural {
     /// use malachite_native::natural::Natural;
     ///
     /// fn main() {
-    ///     assert_eq!(Natural::zero().significant_bits(), 0);
+    ///     assert_eq!(Natural::ZERO.significant_bits(), 0);
     ///     assert_eq!(Natural::from(100u32).significant_bits(), 7);
     /// }
     /// ```

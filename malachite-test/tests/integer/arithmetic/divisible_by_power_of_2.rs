@@ -88,7 +88,7 @@ fn divisible_by_power_of_2_properties() {
 
     // 0.divisible_by_power_of_2(pow)
     let one_u64 = |pow: u64| {
-        assert!(native::Integer::zero().divisible_by_power_of_2(pow));
+        assert!(native::Integer::ZERO.divisible_by_power_of_2(pow));
     };
 
     for (x, pow) in log_pairs(exhaustive_integers(), exhaustive_u::<u64>()).take(LARGE_LIMIT) {

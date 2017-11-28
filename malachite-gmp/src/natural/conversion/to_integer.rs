@@ -15,7 +15,7 @@ impl Natural {
     ///            "1000000000000");
     /// ```
     pub fn into_integer(self) -> Integer {
-        let mut n = Integer::zero();
+        let mut n = Integer::ZERO;
         n.assign(self);
         n
     }
@@ -32,7 +32,7 @@ impl Natural {
     ///            "1000000000000");
     /// ```
     pub fn to_integer(&self) -> Integer {
-        let mut n = Integer::zero();
+        let mut n = Integer::ZERO;
         n.assign(self);
         n
     }

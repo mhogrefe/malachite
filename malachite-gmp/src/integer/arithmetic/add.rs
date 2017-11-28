@@ -15,8 +15,8 @@ use std::mem;
 /// use std::str::FromStr;
 ///
 /// fn main() {
-///     assert_eq!((Integer::zero() + Integer::from(123)).to_string(), "123");
-///     assert_eq!((Integer::from(-123) + Integer::zero()).to_string(), "-123");
+///     assert_eq!((Integer::ZERO + Integer::from(123)).to_string(), "123");
+///     assert_eq!((Integer::from(-123) + Integer::ZERO).to_string(), "-123");
 ///     assert_eq!((Integer::from(-123) + Integer::from(456)).to_string(), "333");
 ///     assert_eq!((Integer::from_str("-1000000000000").unwrap() +
 ///                 Integer::from_str("2000000000000")
@@ -45,8 +45,8 @@ impl Add<Integer> for Integer {
 /// use std::str::FromStr;
 ///
 /// fn main() {
-///     assert_eq!((Integer::zero() + &Integer::from(123)).to_string(), "123");
-///     assert_eq!((Integer::from(-123) + &Integer::zero()).to_string(), "-123");
+///     assert_eq!((Integer::ZERO + &Integer::from(123)).to_string(), "123");
+///     assert_eq!((Integer::from(-123) + &Integer::ZERO).to_string(), "-123");
 ///     assert_eq!((Integer::from(-123) + &Integer::from(456)).to_string(), "333");
 ///     assert_eq!((Integer::from_str("-1000000000000").unwrap() +
 ///                 &Integer::from_str("2000000000000")
@@ -75,8 +75,8 @@ impl<'a> Add<&'a Integer> for Integer {
 /// use std::str::FromStr;
 ///
 /// fn main() {
-///     assert_eq!((&Integer::zero() + Integer::from(123)).to_string(), "123");
-///     assert_eq!((&Integer::from(-123) + Integer::zero()).to_string(), "-123");
+///     assert_eq!((&Integer::ZERO + Integer::from(123)).to_string(), "123");
+///     assert_eq!((&Integer::from(-123) + Integer::ZERO).to_string(), "-123");
 ///     assert_eq!((&Integer::from(-123) + Integer::from(456)).to_string(), "333");
 ///     assert_eq!((&Integer::from_str("-1000000000000").unwrap() +
 ///                 Integer::from_str("2000000000000")
@@ -104,8 +104,8 @@ impl<'a> Add<Integer> for &'a Integer {
 /// use std::str::FromStr;
 ///
 /// fn main() {
-///     assert_eq!((&Integer::zero() + &Integer::from(123)).to_string(), "123");
-///     assert_eq!((&Integer::from(-123) + &Integer::zero()).to_string(), "-123");
+///     assert_eq!((&Integer::ZERO + &Integer::from(123)).to_string(), "123");
+///     assert_eq!((&Integer::from(-123) + &Integer::ZERO).to_string(), "-123");
 ///     assert_eq!((&Integer::from(-123) + &Integer::from(456)).to_string(), "333");
 ///     assert_eq!((&Integer::from_str("-1000000000000").unwrap() +
 ///                 &Integer::from_str("2000000000000")
@@ -154,7 +154,7 @@ impl<'a, 'b> Add<&'a Integer> for &'b Integer {
 /// use std::str::FromStr;
 ///
 /// fn main() {
-///     let mut x = Integer::zero();
+///     let mut x = Integer::ZERO;
 ///     x += Integer::from_str("-1000000000000").unwrap();
 ///     x += Integer::from_str("2000000000000").unwrap();
 ///     x += Integer::from_str("-3000000000000").unwrap();
@@ -196,7 +196,7 @@ impl AddAssign<Integer> for Integer {
 /// use std::str::FromStr;
 ///
 /// fn main() {
-///     let mut x = Integer::zero();
+///     let mut x = Integer::ZERO;
 ///     x += &Integer::from_str("-1000000000000").unwrap();
 ///     x += &Integer::from_str("2000000000000").unwrap();
 ///     x += &Integer::from_str("-3000000000000").unwrap();

@@ -48,7 +48,7 @@ impl Integer {
             limbs
         );
         match sign {
-            Ordering::Equal => Integer::zero(),
+            Ordering::Equal => Integer::ZERO,
             Ordering::Greater => Natural::from_limbs_le(limbs).into_integer(),
             Ordering::Less => -Natural::from_limbs_le(limbs),
         }
@@ -98,7 +98,7 @@ impl Integer {
             limbs
         );
         match sign {
-            Ordering::Equal => Integer::zero(),
+            Ordering::Equal => Integer::ZERO,
             Ordering::Greater => Natural::from_limbs_be(limbs).into_integer(),
             Ordering::Less => -Natural::from_limbs_be(limbs),
         }

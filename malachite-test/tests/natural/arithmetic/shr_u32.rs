@@ -169,7 +169,7 @@ fn shr_u32_properties() {
     };
 
     // n >> 0 == n
-    #[allow(identity_op)]
+    #[allow(unknown_lints, identity_op)]
     let one_natural = |gmp_n: gmp::Natural| {
         let n = gmp_natural_to_native(&gmp_n);
         assert_eq!(&n >> 0, n);
@@ -177,7 +177,7 @@ fn shr_u32_properties() {
 
     // 0 >> n == 0
     let one_u32 = |u: u32| {
-        assert_eq!(native::Natural::zero() >> u, 0);
+        assert_eq!(native::Natural::ZERO >> u, 0);
     };
 
     for (n, u) in log_pairs(exhaustive_naturals(), exhaustive_u::<u32>()).take(LARGE_LIMIT) {
@@ -1031,7 +1031,7 @@ fn shr_round_u32_properties() {
     };
 
     // n.shr_round(0, rm) == n
-    #[allow(identity_op)]
+    #[allow(unknown_lints, identity_op)]
     let natural_and_rounding_mode = |gmp_n: gmp::Natural, rm: RoundingMode| {
         let n = gmp_natural_to_native(&gmp_n);
         assert_eq!((&n).shr_round(0, rm), n);
@@ -1039,7 +1039,7 @@ fn shr_round_u32_properties() {
 
     // 0.shr_round(u, rm) == 0
     let u32_and_rounding_mode = |u: u32, rm: RoundingMode| {
-        assert_eq!(native::Natural::zero().shr_round(u, rm), 0);
+        assert_eq!(native::Natural::ZERO.shr_round(u, rm), 0);
     };
 
     for (n, u) in log_pairs(exhaustive_naturals(), exhaustive_u::<u32>()).take(LARGE_LIMIT) {

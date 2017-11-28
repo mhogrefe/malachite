@@ -22,7 +22,7 @@ impl Integer {
     /// use malachite_native::integer::Integer;
     ///
     /// fn main() {
-    ///     let mut x = Integer::zero();
+    ///     let mut x = Integer::ZERO;
     ///     x.set_bit(2);
     ///     x.set_bit(5);
     ///     x.set_bit(6);

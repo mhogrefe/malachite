@@ -18,7 +18,7 @@ use std::str::FromStr;
 
 #[test]
 fn test_add() {
-    #[allow(cyclomatic_complexity)]
+    #[allow(unknown_lints, cyclomatic_complexity)]
     let test = |u, v, out| {
         let mut n = native::Natural::from_str(u).unwrap();
         n += native::Natural::from_str(v).unwrap();
@@ -103,7 +103,7 @@ fn add_properties() {
     // x + y == y + x
     // x + y - y == x and x + y - x == y
     // x + y >= x and x + y >= y
-    #[allow(cyclomatic_complexity)]
+    #[allow(unknown_lints, cyclomatic_complexity)]
     let two_naturals = |gmp_x: gmp::Natural, gmp_y: gmp::Natural| {
         let x = gmp_natural_to_native(&gmp_x);
         let y = gmp_natural_to_native(&gmp_y);
@@ -193,8 +193,8 @@ fn add_properties() {
     let one_natural = |gmp_x: gmp::Natural| {
         let x = gmp_natural_to_native(&gmp_x);
         let x_old = x.clone();
-        let id_1 = &x + native::Natural::zero();
-        let id_2 = native::Natural::zero() + &x;
+        let id_1 = &x + native::Natural::ZERO;
+        let id_2 = native::Natural::ZERO + &x;
         let double = &x + &x;
         assert_eq!(id_1, x_old);
         assert_eq!(id_2, x_old);

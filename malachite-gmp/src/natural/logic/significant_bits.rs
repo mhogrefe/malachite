@@ -15,7 +15,7 @@ impl Natural {
     /// use std::str::FromStr;
     ///
     /// fn main() {
-    ///     assert_eq!(Natural::zero().significant_bits(), 0);
+    ///     assert_eq!(Natural::ZERO.significant_bits(), 0);
     ///     assert_eq!(Natural::from(100u32).significant_bits(), 7);
     ///     assert_eq!(Natural::from_str("1000000000000").unwrap().significant_bits(), 40);
     /// }

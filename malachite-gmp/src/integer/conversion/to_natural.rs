@@ -23,7 +23,7 @@ impl Integer {
         if self.sign() == Ordering::Less {
             None
         } else {
-            let mut n = Natural::zero();
+            let mut n = Natural::ZERO;
             n.assign(self);
             Some(n)
         }
@@ -48,7 +48,7 @@ impl Integer {
         if self.sign() == Ordering::Less {
             None
         } else {
-            let mut n = Natural::zero();
+            let mut n = Natural::ZERO;
             n.assign(self);
             Some(n)
         }

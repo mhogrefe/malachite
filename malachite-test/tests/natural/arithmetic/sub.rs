@@ -191,11 +191,11 @@ fn sub_properties() {
     // x - 0 == x
     // x - x == 0
     // if x != 0, 0 - x == None
-    #[allow(identity_op, eq_op)]
+    #[allow(unknown_lints, identity_op, eq_op)]
     let one_natural = |gmp_x: gmp::Natural| {
         let x = gmp_natural_to_native(&gmp_x);
         assert_eq!((&x - 0).unwrap(), x);
-        assert_eq!((&x - &x).unwrap(), native::Natural::zero());
+        assert_eq!((&x - &x).unwrap(), native::Natural::ZERO);
         if x != 0 {
             assert!((0 - &x).is_none());
         }

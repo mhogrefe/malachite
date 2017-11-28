@@ -13,7 +13,7 @@ impl Integer {
     /// use std::str::FromStr;
     ///
     /// fn main() {
-    ///     assert_eq!(Integer::zero().is_even(), true);
+    ///     assert_eq!(Integer::ZERO.is_even(), true);
     ///     assert_eq!(Integer::from(123).is_even(), false);
     ///     assert_eq!(Integer::from(-128).is_even(), true);
     ///     assert_eq!(Integer::from_str("1000000000000").unwrap().is_even(), true);
@@ -36,7 +36,7 @@ impl Integer {
     /// use std::str::FromStr;
     ///
     /// fn main() {
-    ///     assert_eq!(Integer::zero().is_odd(), false);
+    ///     assert_eq!(Integer::ZERO.is_odd(), false);
     ///     assert_eq!(Integer::from(123).is_odd(), true);
     ///     assert_eq!(Integer::from(-128).is_odd(), false);
     ///     assert_eq!(Integer::from_str("1000000000000").unwrap().is_odd(), false);

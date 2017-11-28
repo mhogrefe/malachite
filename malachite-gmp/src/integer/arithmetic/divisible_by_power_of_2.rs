@@ -16,7 +16,7 @@ impl Integer {
     /// use std::str::FromStr;
     ///
     /// fn main() {
-    ///     assert_eq!(Integer::zero().divisible_by_power_of_2(100), true);
+    ///     assert_eq!(Integer::ZERO.divisible_by_power_of_2(100), true);
     ///     assert_eq!(Integer::from(-100).divisible_by_power_of_2(2), true);
     ///     assert_eq!(Integer::from(100u32).divisible_by_power_of_2(3), false);
     ///     assert_eq!(Integer::from_str("-1000000000000").unwrap().divisible_by_power_of_2(12),

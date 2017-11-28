@@ -19,7 +19,7 @@ impl Natural {
     /// use std::str::FromStr;
     ///
     /// fn main() {
-    ///     assert_eq!(Natural::zero().is_power_of_two(), false);
+    ///     assert_eq!(Natural::ZERO.is_power_of_two(), false);
     ///     assert_eq!(Natural::from(123u32).is_power_of_two(), false);
     ///     assert_eq!(Natural::from(128u32).is_power_of_two(), true);
     ///     assert_eq!(Natural::from_str("1000000000000").unwrap().is_power_of_two(), false);

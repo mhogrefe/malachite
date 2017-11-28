@@ -25,9 +25,7 @@ impl Integer {
         match *self {
             Small(small) => Some(small as i64),
             Large(_) => {
-                if self.significant_bits() < 64 ||
-                    *self == -((Natural::one() << 63).into_integer())
-                {
+                if self.significant_bits() < 64 || *self == -((Natural::ONE << 63).into_integer()) {
                     let abs = self.abs_ref().to_u64().unwrap() as i64;
                     Some(if self.sign() == Ordering::Less {
                         abs.wrapping_neg()

@@ -60,7 +60,7 @@ pub(crate) fn mpn_mul_1c(r: &mut [u32], s1: &[u32], s2limb: u32, mut carry: u32)
 /// use std::str::FromStr;
 ///
 /// fn main() {
-///     assert_eq!((Natural::zero() * 123).to_string(), "0");
+///     assert_eq!((Natural::ZERO * 123).to_string(), "0");
 ///     assert_eq!((Natural::from(123u32) * 1).to_string(), "123");
 ///     assert_eq!((Natural::from(123u32) * 456).to_string(), "56088");
 ///     assert_eq!((Natural::from_str("1000000000000").unwrap() * 123).to_string(),
@@ -93,7 +93,7 @@ impl Mul<u32> for Natural {
 /// use std::str::FromStr;
 ///
 /// fn main() {
-///     assert_eq!((&Natural::zero() * 123).to_string(), "0");
+///     assert_eq!((&Natural::ZERO * 123).to_string(), "0");
 ///     assert_eq!((&Natural::from(123u32) * 1).to_string(), "123");
 ///     assert_eq!((&Natural::from(123u32) * 456).to_string(), "56088");
 ///     assert_eq!((&Natural::from_str("1000000000000").unwrap() * 123).to_string(),
@@ -105,7 +105,7 @@ impl<'a> Mul<u32> for &'a Natural {
 
     fn mul(self, other: u32) -> Natural {
         if *self == 0 || other == 0 {
-            return Natural::zero();
+            return Natural::ZERO;
         }
         if other == 1 {
             return self.clone();
@@ -150,7 +150,7 @@ impl<'a> Mul<u32> for &'a Natural {
 /// use std::str::FromStr;
 ///
 /// fn main() {
-///     assert_eq!((123 * Natural::zero()).to_string(), "0");
+///     assert_eq!((123 * Natural::ZERO).to_string(), "0");
 ///     assert_eq!((1 * Natural::from(123u32)).to_string(), "123");
 ///     assert_eq!((456 * Natural::from(123u32)).to_string(), "56088");
 ///     assert_eq!((123 * Natural::from_str("1000000000000").unwrap()).to_string(),
@@ -183,7 +183,7 @@ impl Mul<Natural> for u32 {
 /// use std::str::FromStr;
 ///
 /// fn main() {
-///     assert_eq!((123 * &Natural::zero()).to_string(), "0");
+///     assert_eq!((123 * &Natural::ZERO).to_string(), "0");
 ///     assert_eq!((1 * &Natural::from(123u32)).to_string(), "123");
 ///     assert_eq!((456 * &Natural::from(123u32)).to_string(), "56088");
 ///     assert_eq!((123 * &Natural::from_str("1000000000000").unwrap()).to_string(),
@@ -215,7 +215,7 @@ impl<'a> Mul<&'a Natural> for u32 {
 /// use malachite_native::natural::Natural;
 ///
 /// fn main() {
-///     let mut x = Natural::one();
+///     let mut x = Natural::ONE;
 ///     x *= 1;
 ///     x *= 2;
 ///     x *= 3;

@@ -17,7 +17,7 @@ use std::str::FromStr;
 
 #[test]
 fn test_add_i32() {
-    #[allow(cyclomatic_complexity)]
+    #[allow(unknown_lints, cyclomatic_complexity)]
     let test = |u, v: i32, out| {
         let mut n = native::Integer::from_str(u).unwrap();
         n *= v;
@@ -131,7 +131,7 @@ fn mul_i32_properties() {
     // (-n) * i == -(n * i)
     // if i != -2^31, n * (-i) == -(n * i)
     // TODO n * i / i == n
-    #[allow(cyclomatic_complexity)]
+    #[allow(unknown_lints, cyclomatic_complexity)]
     let integer_and_i32 = |mut gmp_n: gmp::Integer, i: i32| {
         let mut n = gmp_integer_to_native(&gmp_n);
         let old_n = n.clone();
@@ -206,7 +206,7 @@ fn mul_i32_properties() {
     // 2 * n == n << 1
     // n * -1 == -n
     // -1 * n == -n
-    #[allow(identity_op)]
+    #[allow(unknown_lints, identity_op)]
     let one_integer = |gmp_n: gmp::Integer| {
         let n = gmp_integer_to_native(&gmp_n);
         assert_eq!(&n * 0i32, 0);
@@ -225,13 +225,13 @@ fn mul_i32_properties() {
     // i * 1 == i
     // if i != -2^31, i * -1 == -i and -1 * i == -i
     let one_i32 = |i: i32| {
-        assert_eq!(native::Integer::zero() * i, 0);
-        assert_eq!(i * native::Integer::zero(), 0);
-        assert_eq!(native::Integer::one() * i, i);
-        assert_eq!(i * native::Integer::one(), i);
+        assert_eq!(native::Integer::ZERO * i, 0);
+        assert_eq!(i * native::Integer::ZERO, 0);
+        assert_eq!(native::Integer::ONE * i, i);
+        assert_eq!(i * native::Integer::ONE, i);
         if i != i32::min_value() {
-            assert_eq!(native::Integer::negative_one() * i, -i);
-            assert_eq!(i * native::Integer::negative_one(), -i);
+            assert_eq!(native::Integer::NEGATIVE_ONE * i, -i);
+            assert_eq!(i * native::Integer::NEGATIVE_ONE, -i);
         }
     };
 

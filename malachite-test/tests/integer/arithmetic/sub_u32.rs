@@ -106,7 +106,7 @@ fn sub_u32_properties() {
     // n - u == n - from(u)
     // n - u + u == n
     // n - (n - u) == u
-    #[allow(cyclomatic_complexity)]
+    #[allow(unknown_lints, cyclomatic_complexity)]
     let integer_and_u32 = |mut gmp_n: gmp::Integer, u: u32| {
         let mut n = gmp_integer_to_native(&gmp_n);
         let old_n = n.clone();
@@ -172,7 +172,7 @@ fn sub_u32_properties() {
 
     // n - 0 == n
     // 0 - n == -n
-    #[allow(identity_op)]
+    #[allow(unknown_lints, identity_op)]
     let one_integer = |gmp_n: gmp::Integer| {
         let n = gmp_integer_to_native(&gmp_n);
         assert_eq!(&n + 0u32, n);
@@ -182,8 +182,8 @@ fn sub_u32_properties() {
     // 0 - u == u
     // u - 0 == u
     let one_u32 = |u: u32| {
-        assert_eq!(native::Integer::zero() - u, -native::Integer::from(u));
-        assert_eq!(u - native::Integer::zero(), u);
+        assert_eq!(native::Integer::ZERO - u, -native::Integer::from(u));
+        assert_eq!(u - native::Integer::ZERO, u);
     };
 
     for (n, u) in exhaustive_pairs(exhaustive_integers(), exhaustive_u::<u32>()).take(LARGE_LIMIT) {

@@ -20,7 +20,7 @@ use std::ops::Not;
 /// use malachite_native::integer::Integer;
 ///
 /// fn main() {
-///     assert_eq!((!Integer::zero()).to_string(), "-1");
+///     assert_eq!((!Integer::ZERO).to_string(), "-1");
 ///     assert_eq!((!Integer::from(123)).to_string(), "-124");
 ///     assert_eq!((!Integer::from(-123)).to_string(), "122");
 /// }
@@ -52,7 +52,7 @@ impl Not for Integer {
 /// use malachite_native::integer::Integer;
 ///
 /// fn main() {
-///     assert_eq!((!&Integer::zero()).to_string(), "-1");
+///     assert_eq!((!&Integer::ZERO).to_string(), "-1");
 ///     assert_eq!((!&Integer::from(123)).to_string(), "-124");
 ///     assert_eq!((!&Integer::from(-123)).to_string(), "122");
 /// }
@@ -102,7 +102,7 @@ impl<'a> Not for &'a Integer {
 /// use malachite_native::integer::Integer;
 ///
 /// fn main() {
-///     let mut x = Integer::zero();
+///     let mut x = Integer::ZERO;
 ///     x.not_assign();
 ///     assert_eq!(x.to_string(), "-1");
 ///

@@ -15,7 +15,7 @@ use std::ops::Neg;
 /// use malachite_gmp::natural::Natural;
 ///
 /// fn main() {
-///     assert_eq!((-Natural::zero()).to_string(), "0");
+///     assert_eq!((-Natural::ZERO).to_string(), "0");
 ///     assert_eq!((-Natural::from(123u32)).to_string(), "-123");
 /// }
 /// ```
@@ -57,7 +57,7 @@ impl Neg for Natural {
 /// use malachite_gmp::natural::Natural;
 ///
 /// fn main() {
-///     assert_eq!((-&Natural::zero()).to_string(), "0");
+///     assert_eq!((-&Natural::ZERO).to_string(), "0");
 ///     assert_eq!((-&Natural::from(123u32)).to_string(), "-123");
 /// }
 /// ```

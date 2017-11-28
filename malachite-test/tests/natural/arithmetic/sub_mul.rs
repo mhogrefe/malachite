@@ -202,10 +202,10 @@ fn sub_mul_properties() {
     let two_naturals = |gmp_a: gmp::Natural, gmp_b: gmp::Natural| {
         let a = &gmp_natural_to_native(&gmp_a);
         let b = &gmp_natural_to_native(&gmp_b);
-        assert_eq!(a.sub_mul(&native::Natural::zero(), b), Some(a.clone()));
-        assert_eq!(a.sub_mul(b, &native::Natural::zero()), Some(a.clone()));
-        assert_eq!(a.sub_mul(&native::Natural::one(), b), a - b);
-        assert_eq!(a.sub_mul(b, &native::Natural::one()), a - b);
+        assert_eq!(a.sub_mul(&native::Natural::ZERO, b), Some(a.clone()));
+        assert_eq!(a.sub_mul(b, &native::Natural::ZERO), Some(a.clone()));
+        assert_eq!(a.sub_mul(&native::Natural::ONE, b), a - b);
+        assert_eq!(a.sub_mul(b, &native::Natural::ONE), a - b);
     };
 
     for (a, b, c) in exhaustive_triples_from_single(exhaustive_naturals()).take(LARGE_LIMIT) {

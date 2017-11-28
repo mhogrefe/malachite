@@ -71,8 +71,7 @@ impl Integer {
     }
 
     /// Returns true iff `self` is valid. To be valid, `self` can only be Large when it is less than
-    /// -2^(31) or at least 2^(31). All Integers used outside this crate are valid, but temporary
-    /// Integers used inside may not be.
+    /// -2^(31) or at least 2^(31). All Integers must be valid.
     pub fn is_valid(&self) -> bool {
         //TODO better range check
         match *self {
@@ -82,20 +81,6 @@ impl Integer {
                     (unsafe { gmp::mpz_cmp_si(x, i32::max_value().into()) }) > 0
             }
         }
-    }
-}
-
-/// Creates a default `Integer` equal to 0.
-///
-/// # Example
-/// ```
-/// use malachite_gmp::integer::Integer;
-///
-/// assert_eq!(Integer::default().to_string(), "0");
-/// ```
-impl Default for Integer {
-    fn default() -> Integer {
-        Small(0)
     }
 }
 
@@ -112,30 +97,22 @@ impl Drop for Integer {
 
 /// The constant 0.
 impl Zero for Integer {
-    fn zero() -> Integer {
-        Small(0)
-    }
+    const ZERO: Integer = Small(0);
 }
 
 /// The constant 1.
 impl One for Integer {
-    fn one() -> Integer {
-        Small(1)
-    }
+    const ONE: Integer = Small(1);
 }
 
 /// The constant 2.
 impl Two for Integer {
-    fn two() -> Integer {
-        Small(2)
-    }
+    const TWO: Integer = Small(2);
 }
 
 /// The constant -1.
 impl NegativeOne for Integer {
-    fn negative_one() -> Integer {
-        Small(-1)
-    }
+    const NEGATIVE_ONE: Integer = Small(-1);
 }
 
 macro_rules! mutate_with_possible_promotion {

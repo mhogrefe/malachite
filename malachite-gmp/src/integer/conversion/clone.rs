@@ -27,7 +27,7 @@ use std::mem;
 /// ```
 impl Clone for Integer {
     fn clone(&self) -> Integer {
-        let mut cloned = Integer::zero();
+        let mut cloned = Integer::ZERO;
         cloned.clone_from(self);
         cloned
     }

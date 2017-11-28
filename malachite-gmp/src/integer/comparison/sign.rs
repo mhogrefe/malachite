@@ -15,7 +15,7 @@ use std::cmp::Ordering;
 /// use std::cmp::Ordering;
 ///
 /// fn main() {
-///     assert_eq!(Integer::zero().sign(), Ordering::Equal);
+///     assert_eq!(Integer::ZERO.sign(), Ordering::Equal);
 ///     assert_eq!(Integer::from(123).sign(), Ordering::Greater);
 ///     assert_eq!(Integer::from(-123).sign(), Ordering::Less);
 /// }

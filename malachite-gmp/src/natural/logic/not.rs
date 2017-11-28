@@ -16,7 +16,7 @@ use std::ops::Not;
 /// use malachite_gmp::natural::Natural;
 ///
 /// fn main() {
-///     assert_eq!((!Natural::zero()).to_string(), "-1");
+///     assert_eq!((!Natural::ZERO).to_string(), "-1");
 ///     assert_eq!((!Natural::from(123u32)).to_string(), "-124");
 /// }
 /// ```
@@ -57,7 +57,7 @@ impl Not for Natural {
 /// use malachite_gmp::natural::Natural;
 ///
 /// fn main() {
-///     assert_eq!((!&Natural::zero()).to_string(), "-1");
+///     assert_eq!((!&Natural::ZERO).to_string(), "-1");
 ///     assert_eq!((!&Natural::from(123u32)).to_string(), "-124");
 /// }
 /// ```

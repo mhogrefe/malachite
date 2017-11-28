@@ -92,7 +92,7 @@ impl<'a> Sub<u32> for &'a Natural {
 ///
 /// fn main() {
 ///     assert_eq!(format!("{:?}", 123 - &Natural::from(123u32)), "Some(0)");
-///     assert_eq!(format!("{:?}", 123 - &Natural::zero()), "Some(123)");
+///     assert_eq!(format!("{:?}", 123 - &Natural::ZERO), "Some(123)");
 ///     assert_eq!(format!("{:?}", 456 - &Natural::from(123u32)), "Some(333)");
 ///     assert_eq!(format!("{:?}", 123 - &Natural::from(456u32)), "None");
 ///     assert_eq!(format!("{:?}", 123 - &Natural::from_str("1000000000000").unwrap()), "None");

@@ -17,7 +17,7 @@ use std::str::FromStr;
 
 #[test]
 fn test_add_u32() {
-    #[allow(cyclomatic_complexity)]
+    #[allow(unknown_lints, cyclomatic_complexity)]
     let test = |u, v: u32, out| {
         let mut n = native::Natural::from_str(u).unwrap();
         n += v;
@@ -98,7 +98,7 @@ fn add_u32_properties() {
     // n + u == n + from(u)
     // n + u >= n and n + u >= u
     // n + u - u == n
-    #[allow(cyclomatic_complexity)]
+    #[allow(unknown_lints, cyclomatic_complexity)]
     let natural_and_u32 = |mut gmp_n: gmp::Natural, u: u32| {
         let mut n = gmp_natural_to_native(&gmp_n);
         let old_n = n.clone();
@@ -165,7 +165,7 @@ fn add_u32_properties() {
 
     // n + 0 == n
     // 0 + n == n
-    #[allow(identity_op)]
+    #[allow(unknown_lints, identity_op)]
     let one_natural = |gmp_n: gmp::Natural| {
         let n = gmp_natural_to_native(&gmp_n);
         assert_eq!(&n + 0u32, n);
@@ -175,8 +175,8 @@ fn add_u32_properties() {
     // 0 + u == u
     // u + 0 == u
     let one_u32 = |u: u32| {
-        assert_eq!(native::Natural::zero() + u, u);
-        assert_eq!(u + native::Natural::zero(), u);
+        assert_eq!(native::Natural::ZERO + u, u);
+        assert_eq!(u + native::Natural::ZERO, u);
     };
 
     for (n, u) in exhaustive_pairs(exhaustive_naturals(), exhaustive_u::<u32>()).take(LARGE_LIMIT) {

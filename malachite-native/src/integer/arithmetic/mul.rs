@@ -20,8 +20,8 @@ use std::ops::{Mul, MulAssign};
 /// use std::str::FromStr;
 ///
 /// fn main() {
-///     assert_eq!((Integer::one() * Integer::from(123)).to_string(), "123");
-///     assert_eq!((Integer::from(123) * Integer::zero()).to_string(), "0");
+///     assert_eq!((Integer::ONE * Integer::from(123)).to_string(), "123");
+///     assert_eq!((Integer::from(123) * Integer::ZERO).to_string(), "0");
 ///     assert_eq!((Integer::from(123) * Integer::from(-456)).to_string(), "-56088");
 ///     assert_eq!((Integer::from_str("-123456789000").unwrap() * Integer::from_str("-987654321000")
 ///                .unwrap()).to_string(), "121932631112635269000000");
@@ -56,8 +56,8 @@ impl Mul<Integer> for Integer {
 /// use std::str::FromStr;
 ///
 /// fn main() {
-///     assert_eq!((Integer::one() * &Integer::from(123)).to_string(), "123");
-///     assert_eq!((Integer::from(123) * &Integer::zero()).to_string(), "0");
+///     assert_eq!((Integer::ONE * &Integer::from(123)).to_string(), "123");
+///     assert_eq!((Integer::from(123) * &Integer::ZERO).to_string(), "0");
 ///     assert_eq!((Integer::from(123) * &Integer::from(-456)).to_string(), "-56088");
 ///     assert_eq!((Integer::from_str("-123456789000").unwrap() *
 ///                 &Integer::from_str("-987654321000")
@@ -93,8 +93,8 @@ impl<'a> Mul<&'a Integer> for Integer {
 /// use std::str::FromStr;
 ///
 /// fn main() {
-///     assert_eq!((&Integer::one() * Integer::from(123)).to_string(), "123");
-///     assert_eq!((&Integer::from(123) * Integer::zero()).to_string(), "0");
+///     assert_eq!((&Integer::ONE * Integer::from(123)).to_string(), "123");
+///     assert_eq!((&Integer::from(123) * Integer::ZERO).to_string(), "0");
 ///     assert_eq!((&Integer::from(123) * Integer::from(-456)).to_string(), "-56088");
 ///     assert_eq!((&Integer::from_str("-123456789000").unwrap() *
 ///                 Integer::from_str("-987654321000")
@@ -129,8 +129,8 @@ impl<'a> Mul<Integer> for &'a Integer {
 /// use std::str::FromStr;
 ///
 /// fn main() {
-///     assert_eq!((&Integer::one() * &Integer::from(123)).to_string(), "123");
-///     assert_eq!((&Integer::from(123) * &Integer::zero()).to_string(), "0");
+///     assert_eq!((&Integer::ONE * &Integer::from(123)).to_string(), "123");
+///     assert_eq!((&Integer::from(123) * &Integer::ZERO).to_string(), "0");
 ///     assert_eq!((&Integer::from(123) * &Integer::from(-456)).to_string(), "-56088");
 ///     assert_eq!((&Integer::from_str("-123456789000").unwrap() *
 ///                 &Integer::from_str("-987654321000")
@@ -168,7 +168,7 @@ impl<'a, 'b> Mul<&'a Integer> for &'b Integer {
 /// use std::str::FromStr;
 ///
 /// fn main() {
-///     let mut x = Integer::negative_one();
+///     let mut x = Integer::NEGATIVE_ONE;
 ///     x *= Integer::from_str("1000").unwrap();
 ///     x *= Integer::from_str("2000").unwrap();
 ///     x *= Integer::from_str("3000").unwrap();
@@ -202,7 +202,7 @@ impl MulAssign<Integer> for Integer {
 /// use std::str::FromStr;
 ///
 /// fn main() {
-///     let mut x = Integer::negative_one();
+///     let mut x = Integer::NEGATIVE_ONE;
 ///     x *= &Integer::from_str("1000").unwrap();
 ///     x *= &Integer::from_str("2000").unwrap();
 ///     x *= &Integer::from_str("3000").unwrap();

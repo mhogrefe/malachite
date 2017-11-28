@@ -152,11 +152,11 @@ fn shl_u32_properties() {
         assert!((&old_n << u).abs() >= old_n.abs_ref());
         assert_eq!(-&old_n << u, -(&old_n << u));
 
-        assert_eq!(&old_n << u, old_n * (native::Integer::one() << u));
+        assert_eq!(&old_n << u, old_n * (native::Integer::ONE << u));
     };
 
     // n << 0 == n
-    #[allow(identity_op)]
+    #[allow(unknown_lints, identity_op)]
     let one_integer = |gmp_n: gmp::Integer| {
         let n = gmp_integer_to_native(&gmp_n);
         assert_eq!(&n << 0, n);
@@ -165,9 +165,9 @@ fn shl_u32_properties() {
     // 0 << n == 0
     // 1 << n is a power of 2
     let one_u32 = |u: u32| {
-        assert_eq!(native::Integer::zero() << u, 0);
+        assert_eq!(native::Integer::ZERO << u, 0);
         assert!(
-            (native::Integer::one() << u)
+            (native::Integer::ONE << u)
                 .into_natural()
                 .unwrap()
                 .is_power_of_two()

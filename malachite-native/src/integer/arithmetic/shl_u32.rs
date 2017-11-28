@@ -16,7 +16,7 @@ use std::ops::{Shl, ShlAssign};
 /// use malachite_native::integer::Integer;
 ///
 /// fn main() {
-///     assert_eq!((Integer::zero() << 10).to_string(), "0");
+///     assert_eq!((Integer::ZERO << 10).to_string(), "0");
 ///     assert_eq!((Integer::from(123) << 2).to_string(), "492");
 ///     assert_eq!((Integer::from(123) << 100).to_string(), "155921023828072216384094494261248");
 ///     assert_eq!((Integer::from(-123) << 2).to_string(), "-492");
@@ -49,7 +49,7 @@ impl Shl<u32> for Integer {
 /// use malachite_native::integer::Integer;
 ///
 /// fn main() {
-///     assert_eq!((&Integer::zero() << 10).to_string(), "0");
+///     assert_eq!((&Integer::ZERO << 10).to_string(), "0");
 ///     assert_eq!((&Integer::from(123) << 2).to_string(), "492");
 ///     assert_eq!((&Integer::from(123) << 100).to_string(), "155921023828072216384094494261248");
 ///     assert_eq!((&Integer::from(-123) << 2).to_string(), "-492");
@@ -82,13 +82,13 @@ impl<'a> Shl<u32> for &'a Integer {
 /// use malachite_native::integer::Integer;
 ///
 /// fn main() {
-///     let mut x = Integer::one();
+///     let mut x = Integer::ONE;
 ///     x <<= 1;
 ///     x <<= 2;
 ///     x <<= 3;
 ///     x <<= 4;
 ///     assert_eq!(x.to_string(), "1024");
-///     let mut x = Integer::negative_one();
+///     let mut x = Integer::NEGATIVE_ONE;
 ///     x <<= 1;
 ///     x <<= 2;
 ///     x <<= 3;

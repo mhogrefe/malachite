@@ -17,7 +17,7 @@ use std::str::FromStr;
 
 #[test]
 fn test_add_u32() {
-    #[allow(cyclomatic_complexity)]
+    #[allow(unknown_lints, cyclomatic_complexity)]
     let test = |u, v: u32, out| {
         let mut n = native::Integer::from_str(u).unwrap();
         n *= v;
@@ -111,7 +111,7 @@ fn mul_u32_properties() {
     // n * u == n * from(u)
     // (-n) * u == -(n * u)
     // TODO n * u / u == n
-    #[allow(cyclomatic_complexity)]
+    #[allow(unknown_lints, cyclomatic_complexity)]
     let integer_and_u32 = |mut gmp_n: gmp::Integer, u: u32| {
         let mut n = gmp_integer_to_native(&gmp_n);
         let old_n = n.clone();
@@ -181,7 +181,7 @@ fn mul_u32_properties() {
     // 1 * n == n
     // n * 2 == n << 1
     // 2 * n == n << 1
-    #[allow(identity_op)]
+    #[allow(unknown_lints, identity_op)]
     let one_integer = |gmp_n: gmp::Integer| {
         let n = gmp_integer_to_native(&gmp_n);
         assert_eq!(&n * 0u32, 0);
@@ -197,10 +197,10 @@ fn mul_u32_properties() {
     // 1 * u == u
     // u * 1 == u
     let one_u32 = |u: u32| {
-        assert_eq!(native::Integer::zero() * u, 0);
-        assert_eq!(u * native::Integer::zero(), 0);
-        assert_eq!(native::Integer::one() * u, u);
-        assert_eq!(u * native::Integer::one(), u);
+        assert_eq!(native::Integer::ZERO * u, 0);
+        assert_eq!(u * native::Integer::ZERO, 0);
+        assert_eq!(native::Integer::ONE * u, u);
+        assert_eq!(u * native::Integer::ONE, u);
     };
 
     for (n, u) in exhaustive_pairs(exhaustive_integers(), exhaustive_u::<u32>()).take(LARGE_LIMIT) {

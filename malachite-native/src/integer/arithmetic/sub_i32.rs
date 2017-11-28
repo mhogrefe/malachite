@@ -20,7 +20,7 @@ use std::ops::{Sub, SubAssign};
 /// use std::str::FromStr;
 ///
 /// fn main() {
-///     assert_eq!((Integer::zero() - 123i32).to_string(), "-123");
+///     assert_eq!((Integer::ZERO - 123i32).to_string(), "-123");
 ///     assert_eq!((Integer::from(-123) - -0i32).to_string(), "-123");
 ///     assert_eq!((Integer::from(-123) - 456i32).to_string(), "-579");
 ///     assert_eq!((Integer::from_str("-1000000000000").unwrap() - 123i32).to_string(),
@@ -54,7 +54,7 @@ impl Sub<i32> for Integer {
 /// use std::str::FromStr;
 ///
 /// fn main() {
-///     assert_eq!((&Integer::zero() - 123i32).to_string(), "-123");
+///     assert_eq!((&Integer::ZERO - 123i32).to_string(), "-123");
 ///     assert_eq!((&Integer::from(-123) - -0i32).to_string(), "-123");
 ///     assert_eq!((&Integer::from(-123) - 456i32).to_string(), "-579");
 ///     assert_eq!((&Integer::from_str("-1000000000000").unwrap() - 123i32).to_string(),
@@ -113,7 +113,7 @@ impl<'a> Sub<i32> for &'a Integer {
 /// use std::str::FromStr;
 ///
 /// fn main() {
-///     assert_eq!((-123i32 - Integer::zero()).to_string(), "-123");
+///     assert_eq!((-123i32 - Integer::ZERO).to_string(), "-123");
 ///     assert_eq!((0i32 - Integer::from(123)).to_string(), "-123");
 ///     assert_eq!((-456i32 - Integer::from(123)).to_string(), "-579");
 ///     assert_eq!((-123i32 - Integer::from_str("1000000000000").unwrap()).to_string(),
@@ -147,7 +147,7 @@ impl Sub<Integer> for i32 {
 /// use std::str::FromStr;
 ///
 /// fn main() {
-///     assert_eq!((-123i32 - &Integer::zero()).to_string(), "-123");
+///     assert_eq!((-123i32 - &Integer::ZERO).to_string(), "-123");
 ///     assert_eq!((0i32 - &Integer::from(123)).to_string(), "-123");
 ///     assert_eq!((-456i32 - &Integer::from(123)).to_string(), "-579");
 ///     assert_eq!((-123i32 - &Integer::from_str("1000000000000").unwrap()).to_string(),
@@ -179,7 +179,7 @@ impl<'a> Sub<&'a Integer> for i32 {
 /// use malachite_native::integer::Integer;
 ///
 /// fn main() {
-///     let mut x = Integer::zero();
+///     let mut x = Integer::ZERO;
 ///     x -= -1;
 ///     x -= 2;
 ///     x -= -3;

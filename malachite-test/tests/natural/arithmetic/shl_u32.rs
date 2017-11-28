@@ -130,7 +130,7 @@ fn shl_u32_properties() {
         assert_eq!(rugint_integer_to_native_natural(&(rugint_n2 << u)), n);
 
         assert!(&old_n << u >= old_n);
-        assert_eq!(&old_n << u, &old_n * (native::Natural::one() << u));
+        assert_eq!(&old_n << u, &old_n * (native::Natural::ONE << u));
         assert_eq!(&old_n << u >> u, old_n);
     };
 
@@ -141,7 +141,7 @@ fn shl_u32_properties() {
     };
 
     // n << 0 == n
-    #[allow(identity_op)]
+    #[allow(unknown_lints, identity_op)]
     let one_natural = |gmp_n: gmp::Natural| {
         let n = gmp_natural_to_native(&gmp_n);
         assert_eq!(&n << 0, n);
@@ -150,8 +150,8 @@ fn shl_u32_properties() {
     // 0 << n == 0
     // 1 << n is a power of 2
     let one_u32 = |u: u32| {
-        assert_eq!(native::Natural::zero() << u, 0);
-        assert!((native::Natural::one() << u).is_power_of_two());
+        assert_eq!(native::Natural::ZERO << u, 0);
+        assert!((native::Natural::ONE << u).is_power_of_two());
     };
 
     for (n, u) in log_pairs(exhaustive_naturals(), exhaustive_u::<u32>()).take(LARGE_LIMIT) {

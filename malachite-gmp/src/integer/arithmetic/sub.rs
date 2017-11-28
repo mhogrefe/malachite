@@ -16,8 +16,8 @@ use malachite_base::traits::{NegAssign, Zero};
 /// use std::str::FromStr;
 ///
 /// fn main() {
-///     assert_eq!((Integer::zero() - Integer::from(123)).to_string(), "-123");
-///     assert_eq!((Integer::from(123) - Integer::zero()).to_string(), "123");
+///     assert_eq!((Integer::ZERO - Integer::from(123)).to_string(), "-123");
+///     assert_eq!((Integer::from(123) - Integer::ZERO).to_string(), "123");
 ///     assert_eq!((Integer::from(456) - Integer::from(-123)).to_string(), "579");
 ///     assert_eq!((Integer::from_str("-1000000000000").unwrap() -
 ///                 Integer::from_str("-2000000000000")
@@ -46,8 +46,8 @@ impl Sub<Integer> for Integer {
 /// use std::str::FromStr;
 ///
 /// fn main() {
-///     assert_eq!((Integer::zero() - &Integer::from(123)).to_string(), "-123");
-///     assert_eq!((Integer::from(123) - &Integer::zero()).to_string(), "123");
+///     assert_eq!((Integer::ZERO - &Integer::from(123)).to_string(), "-123");
+///     assert_eq!((Integer::from(123) - &Integer::ZERO).to_string(), "123");
 ///     assert_eq!((Integer::from(456) - &Integer::from(-123)).to_string(), "579");
 ///     assert_eq!((Integer::from_str("-1000000000000").unwrap() -
 ///                 &Integer::from_str("-2000000000000")
@@ -76,8 +76,8 @@ impl<'a> Sub<&'a Integer> for Integer {
 /// use std::str::FromStr;
 ///
 /// fn main() {
-///     assert_eq!((&Integer::zero() - Integer::from(123)).to_string(), "-123");
-///     assert_eq!((&Integer::from(123) - Integer::zero()).to_string(), "123");
+///     assert_eq!((&Integer::ZERO - Integer::from(123)).to_string(), "-123");
+///     assert_eq!((&Integer::from(123) - Integer::ZERO).to_string(), "123");
 ///     assert_eq!((&Integer::from(456) - Integer::from(-123)).to_string(), "579");
 ///     assert_eq!((&Integer::from_str("-1000000000000").unwrap() -
 ///                 Integer::from_str("-2000000000000")
@@ -105,8 +105,8 @@ impl<'a> Sub<Integer> for &'a Integer {
 /// use std::str::FromStr;
 ///
 /// fn main() {
-///     assert_eq!((&Integer::zero() - &Integer::from(123)).to_string(), "-123");
-///     assert_eq!((&Integer::from(123) - &Integer::zero()).to_string(), "123");
+///     assert_eq!((&Integer::ZERO - &Integer::from(123)).to_string(), "-123");
+///     assert_eq!((&Integer::from(123) - &Integer::ZERO).to_string(), "123");
 ///     assert_eq!((&Integer::from(456) - &Integer::from(-123)).to_string(), "579");
 ///     assert_eq!((&Integer::from_str("-1000000000000").unwrap() -
 ///                 &Integer::from_str("-2000000000000")
@@ -118,7 +118,7 @@ impl<'a, 'b> Sub<&'a Integer> for &'b Integer {
 
     fn sub(self, other: &'a Integer) -> Integer {
         if self as *const Integer == other as *const Integer {
-            Integer::zero()
+            Integer::ZERO
         } else if *self == 0 {
             -other
         } else if *other == 0 {
@@ -155,7 +155,7 @@ impl<'a, 'b> Sub<&'a Integer> for &'b Integer {
 /// use std::str::FromStr;
 ///
 /// fn main() {
-///     let mut x = Integer::zero();
+///     let mut x = Integer::ZERO;
 ///     x -= Integer::from_str("-1000000000000").unwrap();
 ///     x -= Integer::from_str("2000000000000").unwrap();
 ///     x -= Integer::from_str("-3000000000000").unwrap();
@@ -198,7 +198,7 @@ impl SubAssign<Integer> for Integer {
 /// use std::str::FromStr;
 ///
 /// fn main() {
-///     let mut x = Integer::zero();
+///     let mut x = Integer::ZERO;
 ///     x -= &Integer::from_str("-1000000000000").unwrap();
 ///     x -= &Integer::from_str("2000000000000").unwrap();
 ///     x -= &Integer::from_str("-3000000000000").unwrap();

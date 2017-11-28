@@ -15,7 +15,7 @@ use malachite_base::traits::NegAssign;
 /// use malachite_gmp::integer::Integer;
 ///
 /// fn main() {
-///     assert_eq!((-Integer::zero()).to_string(), "0");
+///     assert_eq!((-Integer::ZERO).to_string(), "0");
 ///     assert_eq!((-Integer::from(123)).to_string(), "-123");
 ///     assert_eq!((-Integer::from(-123)).to_string(), "123");
 /// }
@@ -40,7 +40,7 @@ impl Neg for Integer {
 /// use malachite_gmp::integer::Integer;
 ///
 /// fn main() {
-///     assert_eq!((-&Integer::zero()).to_string(), "0");
+///     assert_eq!((-&Integer::ZERO).to_string(), "0");
 ///     assert_eq!((-&Integer::from(123)).to_string(), "-123");
 ///     assert_eq!((-&Integer::from(-123)).to_string(), "123");
 /// }
@@ -80,7 +80,7 @@ impl<'a> Neg for &'a Integer {
 /// use malachite_gmp::integer::Integer;
 ///
 /// fn main() {
-///     let mut x = Integer::zero();
+///     let mut x = Integer::ZERO;
 ///     x.neg_assign();
 ///     assert_eq!(x.to_string(), "0");
 ///

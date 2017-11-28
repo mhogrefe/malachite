@@ -15,7 +15,7 @@ impl Integer {
     /// use std::str::FromStr;
     ///
     /// fn main() {
-    ///     assert_eq!(Integer::zero().trailing_zeros(), None);
+    ///     assert_eq!(Integer::ZERO.trailing_zeros(), None);
     ///     assert_eq!(Integer::from(3).trailing_zeros(), Some(0));
     ///     assert_eq!(Integer::from(-72).trailing_zeros(), Some(3));
     ///     assert_eq!(Integer::from(100).trailing_zeros(), Some(2));

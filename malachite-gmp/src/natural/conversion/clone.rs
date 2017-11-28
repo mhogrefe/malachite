@@ -27,7 +27,7 @@ use std::mem;
 /// ```
 impl Clone for Natural {
     fn clone(&self) -> Natural {
-        let mut cloned = Natural::zero();
+        let mut cloned = Natural::ZERO;
         cloned.clone_from(self);
         cloned
     }

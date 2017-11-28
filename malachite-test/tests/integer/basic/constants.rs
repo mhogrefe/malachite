@@ -4,44 +4,36 @@ use malachite_gmp::integer as gmp;
 
 #[test]
 fn test_zero() {
-    let zero = native::Integer::zero();
-    assert_eq!(zero.to_string(), "0");
-    assert!(zero.is_valid());
+    assert_eq!(native::Integer::ZERO.to_string(), "0");
+    assert!(native::Integer::ZERO.is_valid());
 
-    let zero = gmp::Integer::zero();
-    assert_eq!(zero.to_string(), "0");
-    assert!(zero.is_valid());
+    assert_eq!(gmp::Integer::ZERO.to_string(), "0");
+    assert!(gmp::Integer::ZERO.is_valid());
 }
 
 #[test]
 fn test_one() {
-    let one = native::Integer::one();
-    assert_eq!(one.to_string(), "1");
-    assert!(one.is_valid());
+    assert_eq!(native::Integer::ONE.to_string(), "1");
+    assert!(native::Integer::ONE.is_valid());
 
-    let one = gmp::Integer::one();
-    assert_eq!(one.to_string(), "1");
-    assert!(one.is_valid());
+    assert_eq!(gmp::Integer::ONE.to_string(), "1");
+    assert!(gmp::Integer::ONE.is_valid());
 }
 
 #[test]
 fn test_two() {
-    let two = native::Integer::two();
-    assert_eq!(two.to_string(), "2");
-    assert!(two.is_valid());
+    assert_eq!(native::Integer::TWO.to_string(), "2");
+    assert!(native::Integer::TWO.is_valid());
 
-    let two = gmp::Integer::two();
-    assert_eq!(two.to_string(), "2");
-    assert!(two.is_valid());
+    assert_eq!(gmp::Integer::TWO.to_string(), "2");
+    assert!(gmp::Integer::TWO.is_valid());
 }
 
 #[test]
 fn test_negative_one() {
-    let negative_one = native::Integer::negative_one();
-    assert_eq!(negative_one.to_string(), "-1");
-    assert!(negative_one.is_valid());
+    assert_eq!(native::Integer::NEGATIVE_ONE.to_string(), "-1");
+    assert!(native::Integer::NEGATIVE_ONE.is_valid());
 
-    let negative_one = gmp::Integer::negative_one();
-    assert_eq!(negative_one.to_string(), "-1");
-    assert!(negative_one.is_valid());
+    assert_eq!(gmp::Integer::NEGATIVE_ONE.to_string(), "-1");
+    assert!(gmp::Integer::NEGATIVE_ONE.is_valid());
 }

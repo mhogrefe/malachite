@@ -22,7 +22,7 @@ impl Integer {
     /// use std::str::FromStr;
     ///
     /// fn main() {
-    ///     assert!(Integer::zero().twos_complement_limbs_le().is_empty());
+    ///     assert!(Integer::ZERO.twos_complement_limbs_le().is_empty());
     ///     assert_eq!(Integer::from(123).twos_complement_limbs_le(), vec![123]);
     ///     assert_eq!(Integer::from(-123).twos_complement_limbs_le(), vec![4294967173]);
     ///     // 10^12 = 232 * 2^32 + 3567587328
@@ -85,7 +85,7 @@ impl Integer {
     /// use std::str::FromStr;
     ///
     /// fn main() {
-    ///     assert!(Integer::zero().twos_complement_limbs_be().is_empty());
+    ///     assert!(Integer::ZERO.twos_complement_limbs_be().is_empty());
     ///     assert_eq!(Integer::from(123).twos_complement_limbs_be(), vec![123]);
     ///     assert_eq!(Integer::from(-123).twos_complement_limbs_be(), vec![4294967173]);
     ///     // 10^12 = 232 * 2^32 + 3567587328

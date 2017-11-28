@@ -15,7 +15,7 @@ impl Natural {
     /// use std::str::FromStr;
     ///
     /// fn main() {
-    ///     assert_eq!(Natural::zero().limb_count(), 0);
+    ///     assert_eq!(Natural::ZERO.limb_count(), 0);
     ///     assert_eq!(Natural::from(123u32).limb_count(), 1);
     ///     assert_eq!(Natural::from_str("1000000000000").unwrap().limb_count(), 2);
     /// }

@@ -54,7 +54,7 @@ pub fn mpn_add_1_in_place(s1: &mut [u32], mut s2limb: u32) -> bool {
 /// use std::str::FromStr;
 ///
 /// fn main() {
-///     assert_eq!((Natural::zero() + 123).to_string(), "123");
+///     assert_eq!((Natural::ZERO + 123).to_string(), "123");
 ///     assert_eq!((Natural::from(123u32) + 0).to_string(), "123");
 ///     assert_eq!((Natural::from(123u32) + 456).to_string(), "579");
 ///     assert_eq!((Natural::from_str("1000000000000").unwrap() + 123).to_string(),
@@ -87,7 +87,7 @@ impl Add<u32> for Natural {
 /// use std::str::FromStr;
 ///
 /// fn main() {
-///     assert_eq!((&Natural::zero() + 123).to_string(), "123");
+///     assert_eq!((&Natural::ZERO + 123).to_string(), "123");
 ///     assert_eq!((&Natural::from(123u32) + 0).to_string(), "123");
 ///     assert_eq!((&Natural::from(123u32) + 456).to_string(), "579");
 ///     assert_eq!((&Natural::from_str("1000000000000").unwrap() + 123).to_string(),
@@ -136,7 +136,7 @@ impl<'a> Add<u32> for &'a Natural {
 /// use std::str::FromStr;
 ///
 /// fn main() {
-///     assert_eq!((123 + Natural::zero()).to_string(), "123");
+///     assert_eq!((123 + Natural::ZERO).to_string(), "123");
 ///     assert_eq!((0 + Natural::from(123u32)).to_string(), "123");
 ///     assert_eq!((456 + Natural::from(123u32)).to_string(), "579");
 ///     assert_eq!((123 + Natural::from_str("1000000000000").unwrap()).to_string(),
@@ -169,7 +169,7 @@ impl Add<Natural> for u32 {
 /// use std::str::FromStr;
 ///
 /// fn main() {
-///     assert_eq!((123 + &Natural::zero()).to_string(), "123");
+///     assert_eq!((123 + &Natural::ZERO).to_string(), "123");
 ///     assert_eq!((0 + &Natural::from(123u32)).to_string(), "123");
 ///     assert_eq!((456 + &Natural::from(123u32)).to_string(), "579");
 ///     assert_eq!((123 + &Natural::from_str("1000000000000").unwrap()).to_string(),
@@ -201,7 +201,7 @@ impl<'a> Add<&'a Natural> for u32 {
 /// use malachite_native::natural::Natural;
 ///
 /// fn main() {
-///     let mut x = Natural::zero();
+///     let mut x = Natural::ZERO;
 ///     x += 1;
 ///     x += 2;
 ///     x += 3;

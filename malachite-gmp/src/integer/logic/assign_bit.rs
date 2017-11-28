@@ -15,7 +15,7 @@ impl Integer {
     /// use malachite_gmp::integer::Integer;
     ///
     /// fn main() {
-    ///     let mut x = Integer::zero();
+    ///     let mut x = Integer::ZERO;
     ///     x.assign_bit(2, true);
     ///     x.assign_bit(5, true);
     ///     x.assign_bit(6, true);

@@ -15,7 +15,7 @@ use std::str::FromStr;
 
 #[test]
 fn test_add_mul_u32() {
-    #[allow(cyclomatic_complexity)]
+    #[allow(unknown_lints, cyclomatic_complexity)]
     let test = |u, v, c: u32, out| {
         let mut a = native::Natural::from_str(u).unwrap();
         a.add_mul_assign(native::Natural::from_str(v).unwrap(), c);
@@ -192,9 +192,9 @@ fn add_mul_u32_properties() {
     // 0.add_mul(n, c) == n * c
     let natural_and_u32 = |gmp_n: gmp::Natural, c: u32| {
         let n = &gmp_natural_to_native(&gmp_n);
-        assert_eq!(n.add_mul(&native::Natural::zero(), c), *n);
-        assert_eq!(n.add_mul(&native::Natural::one(), c), n + c);
-        assert_eq!(native::Natural::zero().add_mul(n, c), n * c);
+        assert_eq!(n.add_mul(&native::Natural::ZERO, c), *n);
+        assert_eq!(n.add_mul(&native::Natural::ONE, c), n + c);
+        assert_eq!(native::Natural::ZERO.add_mul(n, c), n * c);
     };
 
     // a.add_mul(b, 0) == a

@@ -25,7 +25,7 @@ impl Integer {
     ///     "None");
     /// ```
     pub fn to_i64(&self) -> Option<i64> {
-        if self.significant_bits() < 64 || *self == -((Natural::one() << 63).into_integer()) {
+        if self.significant_bits() < 64 || *self == -((Natural::ONE << 63).into_integer()) {
             Some(self.to_i64_wrapping())
         } else {
             None

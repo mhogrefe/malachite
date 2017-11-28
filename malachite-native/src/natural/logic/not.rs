@@ -71,7 +71,7 @@ pub(crate) fn mpn_com_in_place(s: &mut [u32]) {
 /// use malachite_native::natural::Natural;
 ///
 /// fn main() {
-///     assert_eq!((!Natural::zero()).to_string(), "-1");
+///     assert_eq!((!Natural::ZERO).to_string(), "-1");
 ///     assert_eq!((!Natural::from(123u32)).to_string(), "-124");
 /// }
 /// ```
@@ -103,7 +103,7 @@ impl Not for Natural {
 /// use malachite_native::natural::Natural;
 ///
 /// fn main() {
-///     assert_eq!((!&Natural::zero()).to_string(), "-1");
+///     assert_eq!((!&Natural::ZERO).to_string(), "-1");
 ///     assert_eq!((!&Natural::from(123u32)).to_string(), "-124");
 /// }
 /// ```

@@ -120,7 +120,7 @@ fn sub_u32_properties() {
     // u - n == from(u) - n
     // if n >= u, n - u <= n
     // if n >= u, (n - u).unwrap() + u == n
-    #[allow(cyclomatic_complexity)]
+    #[allow(unknown_lints, cyclomatic_complexity)]
     let natural_and_u32 = |mut gmp_n: gmp::Natural, u: u32| {
         let mut n = gmp_natural_to_native(&gmp_n);
         let old_n = n.clone();
@@ -198,7 +198,7 @@ fn sub_u32_properties() {
 
     // n - 0 == n
     // if n != 0, 0 - n == None
-    #[allow(identity_op)]
+    #[allow(unknown_lints, identity_op)]
     let one_natural = |gmp_n: gmp::Natural| {
         let n = gmp_natural_to_native(&gmp_n);
         assert_eq!((&n - 0).unwrap(), n);
@@ -210,9 +210,9 @@ fn sub_u32_properties() {
     // u - 0 == u
     // if u != 0, 0 - u == None
     let one_u32 = |u: u32| {
-        assert_eq!(u - &native::Natural::zero(), Some(native::Natural::from(u)));
+        assert_eq!(u - &native::Natural::ZERO, Some(native::Natural::from(u)));
         if u != 0 {
-            assert!((native::Natural::zero() - u).is_none());
+            assert!((native::Natural::ZERO - u).is_none());
         }
     };
 

@@ -58,7 +58,7 @@ pub fn mpn_rshift_in_place(u: &mut [u32], bits: u32) -> u32 {
 /// use std::str::FromStr;
 ///
 /// fn main() {
-///     assert_eq!((Natural::zero() >> 10).to_string(), "0");
+///     assert_eq!((Natural::ZERO >> 10).to_string(), "0");
 ///     assert_eq!((Natural::from(492u32) >> 2).to_string(), "123");
 ///     assert_eq!((Natural::from_str("1000000000000").unwrap() >> 10).to_string(), "976562500");
 /// }
@@ -85,7 +85,7 @@ impl Shr<u32> for Natural {
 /// use malachite_native::natural::Natural;
 ///
 /// fn main() {
-///     assert_eq!((&Natural::zero() >> 10).to_string(), "0");
+///     assert_eq!((&Natural::ZERO >> 10).to_string(), "0");
 ///     assert_eq!((&Natural::from(492u32) >> 2).to_string(), "123");
 ///     assert_eq!((&Natural::from_str("1000000000000").unwrap() >> 10).to_string(), "976562500");
 /// }
@@ -98,12 +98,12 @@ impl<'a> Shr<u32> for &'a Natural {
             return self.clone();
         }
         match *self {
-            Small(_) if other >= 32 => Natural::zero(),
+            Small(_) if other >= 32 => Natural::ZERO,
             Small(small) => Small(small >> other),
             Large(ref limbs) => {
                 let limbs_to_delete = (other >> LOG_LIMB_BITS) as usize;
                 if limbs_to_delete >= limbs.len() {
-                    Natural::zero()
+                    Natural::ZERO
                 } else {
                     let small_shift = other & LIMB_BITS_MASK;
                     let mut result = vec![0; limbs.len() - limbs_to_delete];
@@ -291,7 +291,7 @@ impl<'a> ShrRound<u32> for &'a Natural {
                     RoundingMode::Down | RoundingMode::Floor => {
                         let limbs_to_delete = (other >> LOG_LIMB_BITS) as usize;
                         let result = if limbs_to_delete >= limbs.len() {
-                            return Natural::zero();
+                            return Natural::ZERO;
                         } else {
                             let small_shift = other & LIMB_BITS_MASK;
                             let mut result = vec![0; limbs.len() - limbs_to_delete];
@@ -306,7 +306,7 @@ impl<'a> ShrRound<u32> for &'a Natural {
                     RoundingMode::Up | RoundingMode::Ceiling => {
                         let limbs_to_delete = (other >> LOG_LIMB_BITS) as usize;
                         if limbs_to_delete >= limbs.len() {
-                            return Natural::one();
+                            return Natural::ONE;
                         } else {
                             let mut exact = mpn_zero_p(&limbs[0..limbs_to_delete]);
                             let small_shift = other & LIMB_BITS_MASK;
@@ -354,7 +354,7 @@ impl<'a> ShrRound<u32> for &'a Natural {
                             // round down
                             if let &Large(ref limbs) = self {
                                 if limbs_to_delete >= limbs.len() {
-                                    return Natural::zero();
+                                    return Natural::ZERO;
                                 } else {
                                     let small_shift = other & LIMB_BITS_MASK;
                                     let mut result = vec![0; limbs.len() - limbs_to_delete];
@@ -371,7 +371,7 @@ impl<'a> ShrRound<u32> for &'a Natural {
                             // round up
                             if let &Large(ref limbs) = self {
                                 return if limbs_to_delete >= limbs.len() {
-                                    Natural::one()
+                                    Natural::ONE
                                 } else {
                                     let mut exact = mpn_zero_p(&limbs[0..limbs_to_delete]);
                                     let small_shift = other & LIMB_BITS_MASK;
@@ -396,7 +396,7 @@ impl<'a> ShrRound<u32> for &'a Natural {
                             // result is half-integer; round to even
                             let result = if let &Large(ref limbs) = self {
                                 if limbs_to_delete >= limbs.len() {
-                                    return Natural::zero();
+                                    return Natural::ZERO;
                                 } else {
                                     let small_shift = other & LIMB_BITS_MASK;
                                     let mut result = vec![0; limbs.len() - limbs_to_delete];

@@ -34,8 +34,8 @@ fn limb_count_properties() {
         assert_eq!(x <= u32::max_value(), x.limb_count() <= 1);
         if x != 0 {
             let n = limb_count as u32;
-            assert!(native::Natural::one() << ((n - 1) << 5) <= x);
-            assert!(x < native::Natural::one() << (n << 5));
+            assert!(native::Natural::ONE << ((n - 1) << 5) <= x);
+            assert!(x < native::Natural::ONE << (n << 5));
         }
     };
 

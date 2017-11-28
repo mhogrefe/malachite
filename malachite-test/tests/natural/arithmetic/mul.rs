@@ -18,7 +18,7 @@ use std::str::FromStr;
 
 #[test]
 fn test_mul() {
-    #[allow(cyclomatic_complexity)]
+    #[allow(unknown_lints, cyclomatic_complexity)]
     let test = |u, v, out| {
         let mut n = native::Natural::from_str(u).unwrap();
         n *= native::Natural::from_str(v).unwrap();
@@ -143,7 +143,7 @@ fn mul_properties() {
     // x * y == y * x
     //TODO x * y / y == x and x * y / x == y
     // if x != 0 and y != 0, x * y >= x and x * y >= y
-    #[allow(cyclomatic_complexity)]
+    #[allow(unknown_lints, cyclomatic_complexity)]
     let two_naturals = |gmp_x: gmp::Natural, gmp_y: gmp::Natural| {
         let x = gmp_natural_to_native(&gmp_x);
         let y = gmp_natural_to_native(&gmp_y);
@@ -241,10 +241,10 @@ fn mul_properties() {
     let one_natural = |gmp_x: gmp::Natural| {
         let x = gmp_natural_to_native(&gmp_x);
         let x_old = x.clone();
-        assert_eq!(&x * native::Natural::zero(), 0);
-        assert_eq!(native::Natural::zero() * 0, 0);
-        let id_1 = &x * native::Natural::one();
-        let id_2 = native::Natural::one() * &x;
+        assert_eq!(&x * native::Natural::ZERO, 0);
+        assert_eq!(native::Natural::ZERO * 0, 0);
+        let id_1 = &x * native::Natural::ONE;
+        let id_2 = native::Natural::ONE * &x;
         //TODO let double = &x * &x;
         assert_eq!(id_1, x_old);
         assert_eq!(id_2, x_old);

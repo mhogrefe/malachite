@@ -18,8 +18,8 @@ use std::ops::{Sub, SubAssign};
 /// use std::str::FromStr;
 ///
 /// fn main() {
-///     assert_eq!(format!("{:?}", Natural::zero() - &Natural::from(123u32)), "None");
-///     assert_eq!(format!("{:?}", Natural::from(123u32) - &Natural::zero()), "Some(123)");
+///     assert_eq!(format!("{:?}", Natural::ZERO - &Natural::from(123u32)), "None");
+///     assert_eq!(format!("{:?}", Natural::from(123u32) - &Natural::ZERO), "Some(123)");
 ///     assert_eq!(format!("{:?}", Natural::from(456u32) - &Natural::from(123u32)), "Some(333)");
 ///     assert_eq!(format!("{:?}", Natural::from_str("3000000000000").unwrap() -
 ///                                &Natural::from_str("1000000000000").unwrap()),
@@ -50,8 +50,8 @@ impl<'a> Sub<&'a Natural> for Natural {
 /// use std::str::FromStr;
 ///
 /// fn main() {
-///     assert_eq!(format!("{:?}", &Natural::zero() - &Natural::from(123u32)), "None");
-///     assert_eq!(format!("{:?}", &Natural::from(123u32) - &Natural::zero()), "Some(123)");
+///     assert_eq!(format!("{:?}", &Natural::ZERO - &Natural::from(123u32)), "None");
+///     assert_eq!(format!("{:?}", &Natural::from(123u32) - &Natural::ZERO), "Some(123)");
 ///     assert_eq!(format!("{:?}", &Natural::from(456u32) - &Natural::from(123u32)), "Some(333)");
 ///     assert_eq!(format!("{:?}", &Natural::from_str("3000000000000").unwrap() -
 ///                                &Natural::from_str("1000000000000").unwrap()),
@@ -63,7 +63,7 @@ impl<'a, 'b> Sub<&'a Natural> for &'b Natural {
 
     fn sub(self, other: &'a Natural) -> Option<Natural> {
         if self as *const Natural == other as *const Natural {
-            Some(Natural::zero())
+            Some(Natural::ZERO)
         } else if *other == 0 {
             Some(self.clone())
         } else if let Small(y) = *other {

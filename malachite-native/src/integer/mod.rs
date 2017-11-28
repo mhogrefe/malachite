@@ -13,27 +13,9 @@ pub struct Integer {
 
 impl Integer {
     /// Returns true iff `self` is valid. To be valid, can only be Large when its absolute value
-    /// is at least 2^(31). All Integers used outside this crate are valid, but temporary Integers
-    /// used inside may not be.
+    /// is at least 2^(31). All Integers must be valid.
     pub fn is_valid(&self) -> bool {
         self.abs.is_valid() && (self.sign || self.abs != 0)
-    }
-}
-
-/// Creates a default `Integer` equal to 0.
-///
-/// # Example
-/// ```
-/// use malachite_native::integer::Integer;
-///
-/// assert_eq!(Integer::default().to_string(), "0");
-/// ```
-impl Default for Integer {
-    fn default() -> Integer {
-        Integer {
-            sign: true,
-            abs: Natural::zero(),
-        }
     }
 }
 
@@ -44,12 +26,10 @@ impl Default for Integer {
 /// Additional memory: worst case O(1)
 ///
 impl Zero for Integer {
-    fn zero() -> Integer {
-        Integer {
-            sign: true,
-            abs: Small(0),
-        }
-    }
+    const ZERO: Integer = Integer {
+        sign: true,
+        abs: Small(0),
+    };
 }
 
 /// The constant 1.
@@ -59,12 +39,10 @@ impl Zero for Integer {
 /// Additional memory: worst case O(1)
 ///
 impl One for Integer {
-    fn one() -> Integer {
-        Integer {
-            sign: true,
-            abs: Small(1),
-        }
-    }
+    const ONE: Integer = Integer {
+        sign: true,
+        abs: Small(1),
+    };
 }
 
 /// The constant 2.
@@ -74,12 +52,10 @@ impl One for Integer {
 /// Additional memory: worst case O(1)
 ///
 impl Two for Integer {
-    fn two() -> Integer {
-        Integer {
-            sign: true,
-            abs: Small(2),
-        }
-    }
+    const TWO: Integer = Integer {
+        sign: true,
+        abs: Small(2),
+    };
 }
 
 /// The constant -1.
@@ -89,12 +65,10 @@ impl Two for Integer {
 /// Additional memory: worst case O(1)
 ///
 impl NegativeOne for Integer {
-    fn negative_one() -> Integer {
-        Integer {
-            sign: false,
-            abs: Small(1),
-        }
-    }
+    const NEGATIVE_ONE: Integer = Integer {
+        sign: false,
+        abs: Small(1),
+    };
 }
 
 pub mod arithmetic {

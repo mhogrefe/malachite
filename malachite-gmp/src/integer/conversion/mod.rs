@@ -70,7 +70,7 @@ impl Integer {
 
     //TODO test
     pub fn from_str_radix(src: &str, radix: i32) -> Result<Integer, ParseIntegerError> {
-        let mut i = Integer::zero();
+        let mut i = Integer::ZERO;
         i.assign_str_radix(src, radix)?;
         Ok(i)
     }
@@ -229,7 +229,7 @@ impl FromStr for Integer {
     type Err = ParseIntegerError;
 
     fn from_str(src: &str) -> Result<Integer, ParseIntegerError> {
-        let mut i = Integer::zero();
+        let mut i = Integer::ZERO;
         i.assign_str(src)?;
         Ok(i)
     }

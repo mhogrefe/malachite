@@ -17,7 +17,7 @@ use std::ops::Neg;
 /// use malachite_native::integer::Integer;
 ///
 /// fn main() {
-///     assert_eq!((-Integer::zero()).to_string(), "0");
+///     assert_eq!((-Integer::ZERO).to_string(), "0");
 ///     assert_eq!((-Integer::from(123)).to_string(), "-123");
 ///     assert_eq!((-Integer::from(-123)).to_string(), "123");
 /// }
@@ -50,7 +50,7 @@ impl Neg for Integer {
 /// use malachite_native::integer::Integer;
 ///
 /// fn main() {
-///     assert_eq!((-&Integer::zero()).to_string(), "0");
+///     assert_eq!((-&Integer::ZERO).to_string(), "0");
 ///     assert_eq!((-&Integer::from(123)).to_string(), "-123");
 ///     assert_eq!((-&Integer::from(-123)).to_string(), "123");
 /// }
@@ -60,7 +60,7 @@ impl<'a> Neg for &'a Integer {
 
     fn neg(self) -> Integer {
         if self.abs == 0 {
-            Integer::zero()
+            Integer::ZERO
         } else {
             Integer {
                 sign: !self.sign,
@@ -85,7 +85,7 @@ impl<'a> Neg for &'a Integer {
 /// use malachite_native::integer::Integer;
 ///
 /// fn main() {
-///     let mut x = Integer::zero();
+///     let mut x = Integer::ZERO;
 ///     x.neg_assign();
 ///     assert_eq!(x.to_string(), "0");
 ///

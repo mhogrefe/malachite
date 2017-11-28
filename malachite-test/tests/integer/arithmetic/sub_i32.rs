@@ -118,7 +118,7 @@ fn sub_i32_properties() {
     // n - i == n - from(i)
     // n - i + i == n
     // n - (n - i) == i
-    #[allow(cyclomatic_complexity)]
+    #[allow(unknown_lints, cyclomatic_complexity)]
     let integer_and_i32 = |mut gmp_n: gmp::Integer, i: i32| {
         let mut n = gmp_integer_to_native(&gmp_n);
         let old_n = n.clone();
@@ -184,7 +184,7 @@ fn sub_i32_properties() {
 
     // n - 0 == n
     // 0 - n == -n
-    #[allow(identity_op)]
+    #[allow(unknown_lints, identity_op)]
     let one_integer = |gmp_n: gmp::Integer| {
         let n = gmp_integer_to_native(&gmp_n);
         assert_eq!(&n + 0i32, n);
@@ -194,8 +194,8 @@ fn sub_i32_properties() {
     // 0 - i == i
     // i - 0 == i
     let one_i32 = |i: i32| {
-        assert_eq!(native::Integer::zero() - i, -native::Integer::from(i));
-        assert_eq!(i - native::Integer::zero(), i);
+        assert_eq!(native::Integer::ZERO - i, -native::Integer::from(i));
+        assert_eq!(i - native::Integer::ZERO, i);
     };
 
     for (n, i) in exhaustive_pairs(exhaustive_integers(), exhaustive_i::<i32>()).take(LARGE_LIMIT) {

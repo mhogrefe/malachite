@@ -14,7 +14,7 @@ use std::str::FromStr;
 
 #[test]
 fn test_sub_mul_u32() {
-    #[allow(cyclomatic_complexity)]
+    #[allow(unknown_lints, cyclomatic_complexity)]
     let test = |u, v, c: u32, out| {
         let mut a = native::Integer::from_str(u).unwrap();
         a.sub_mul_assign(native::Integer::from_str(v).unwrap(), c);
@@ -215,9 +215,9 @@ fn sub_mul_u32_properties() {
     // (n * c).sub_mul(n, c) == 0
     let integer_and_u32 = |gmp_n: gmp::Integer, c: u32| {
         let n = &gmp_integer_to_native(&gmp_n);
-        assert_eq!(n.sub_mul(&native::Integer::zero(), c), *n);
-        assert_eq!(n.sub_mul(&native::Integer::one(), c), n - c);
-        assert_eq!(native::Integer::zero().sub_mul(n, c), -(n * c));
+        assert_eq!(n.sub_mul(&native::Integer::ZERO, c), *n);
+        assert_eq!(n.sub_mul(&native::Integer::ONE, c), n - c);
+        assert_eq!(native::Integer::ZERO.sub_mul(n, c), -(n * c));
         assert_eq!((n * c).sub_mul(n, c), 0);
     };
 

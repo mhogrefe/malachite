@@ -15,7 +15,7 @@ impl Natural {
     /// use malachite_gmp::natural::Natural;
     ///
     /// fn main() {
-    ///     let mut x = Natural::zero();
+    ///     let mut x = Natural::ZERO;
     ///     x.set_bit(2);
     ///     x.set_bit(5);
     ///     x.set_bit(6);

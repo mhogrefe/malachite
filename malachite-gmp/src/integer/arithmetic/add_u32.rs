@@ -15,7 +15,7 @@ use std::mem;
 /// use std::str::FromStr;
 ///
 /// fn main() {
-///     assert_eq!((Integer::zero() + 123u32).to_string(), "123");
+///     assert_eq!((Integer::ZERO + 123u32).to_string(), "123");
 ///     assert_eq!((Integer::from(-123) + 0u32).to_string(), "-123");
 ///     assert_eq!((Integer::from(-123) + 456u32).to_string(), "333");
 ///     assert_eq!((Integer::from_str("-1000000000000").unwrap() + 123u32).to_string(),
@@ -43,7 +43,7 @@ impl Add<u32> for Integer {
 /// use std::str::FromStr;
 ///
 /// fn main() {
-///     assert_eq!((&Integer::zero() + 123u32).to_string(), "123");
+///     assert_eq!((&Integer::ZERO + 123u32).to_string(), "123");
 ///     assert_eq!((&Integer::from(-123) + 0u32).to_string(), "-123");
 ///     assert_eq!((&Integer::from(-123) + 456u32).to_string(), "333");
 ///     assert_eq!((&Integer::from_str("-1000000000000").unwrap() + 123u32).to_string(),
@@ -97,7 +97,7 @@ impl<'a> Add<u32> for &'a Integer {
 /// use std::str::FromStr;
 ///
 /// fn main() {
-///     assert_eq!((123u32 + Integer::zero()).to_string(), "123");
+///     assert_eq!((123u32 + Integer::ZERO).to_string(), "123");
 ///     assert_eq!((0u32 + Integer::from(-123)).to_string(), "-123");
 ///     assert_eq!((456u32 + Integer::from(-123)).to_string(), "333");
 ///     assert_eq!((123u32 + Integer::from_str("-1000000000000").unwrap()).to_string(),
@@ -125,7 +125,7 @@ impl Add<Integer> for u32 {
 /// use std::str::FromStr;
 ///
 /// fn main() {
-///     assert_eq!((123u32 + &Integer::zero()).to_string(), "123");
+///     assert_eq!((123u32 + &Integer::ZERO).to_string(), "123");
 ///     assert_eq!((0u32 + &Integer::from(-123)).to_string(), "-123");
 ///     assert_eq!((456u32 + &Integer::from(-123)).to_string(), "333");
 ///     assert_eq!((123u32 + &Integer::from_str("-1000000000000").unwrap()).to_string(),

@@ -17,7 +17,7 @@ use std::str::FromStr;
 
 #[test]
 fn test_add_i32() {
-    #[allow(cyclomatic_complexity)]
+    #[allow(unknown_lints, cyclomatic_complexity)]
     let test = |u, v: i32, out| {
         let mut n = native::Integer::from_str(u).unwrap();
         n += v;
@@ -117,7 +117,7 @@ fn add_i32_properties() {
     // n + i == n + from(u)
     // n + i - i == n
     // n + i - n == i
-    #[allow(cyclomatic_complexity)]
+    #[allow(unknown_lints, cyclomatic_complexity)]
     let integer_and_i32 = |mut gmp_n: gmp::Integer, i: i32| {
         let mut n = gmp_integer_to_native(&gmp_n);
         let old_n = n.clone();
@@ -183,7 +183,7 @@ fn add_i32_properties() {
 
     // n + 0 == n
     // 0 + n == n
-    #[allow(identity_op)]
+    #[allow(unknown_lints, identity_op)]
     let one_integer = |gmp_n: gmp::Integer| {
         let n = gmp_integer_to_native(&gmp_n);
         assert_eq!(&n + 0i32, n);
@@ -193,8 +193,8 @@ fn add_i32_properties() {
     // 0 + i == i
     // i + 0 == i
     let one_i32 = |i: i32| {
-        assert_eq!(native::Integer::zero() + i, native::Integer::from(i));
-        assert_eq!(i + native::Integer::zero(), native::Integer::from(i));
+        assert_eq!(native::Integer::ZERO + i, native::Integer::from(i));
+        assert_eq!(i + native::Integer::ZERO, native::Integer::from(i));
     };
 
     for (n, i) in exhaustive_pairs(exhaustive_integers(), exhaustive_i()).take(LARGE_LIMIT) {

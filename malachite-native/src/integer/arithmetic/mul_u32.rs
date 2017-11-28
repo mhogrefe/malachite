@@ -20,7 +20,7 @@ use std::ops::{Mul, MulAssign};
 /// use std::str::FromStr;
 ///
 /// fn main() {
-///     assert_eq!((Integer::zero() * 123u32).to_string(), "0");
+///     assert_eq!((Integer::ZERO * 123u32).to_string(), "0");
 ///     assert_eq!((Integer::from(123i32) * 1u32).to_string(), "123");
 ///     assert_eq!((Integer::from(-123i32) * 456u32).to_string(), "-56088");
 ///     assert_eq!((Integer::from_str("-1000000000000").unwrap() * 123u32).to_string(),
@@ -54,7 +54,7 @@ impl Mul<u32> for Integer {
 /// use std::str::FromStr;
 ///
 /// fn main() {
-///     assert_eq!((&Integer::zero() * 123u32).to_string(), "0");
+///     assert_eq!((&Integer::ZERO * 123u32).to_string(), "0");
 ///     assert_eq!((&Integer::from(123i32) * 1u32).to_string(), "123");
 ///     assert_eq!((&Integer::from(-123i32) * 456u32).to_string(), "-56088");
 ///     assert_eq!((&Integer::from_str("-1000000000000").unwrap() * 123u32).to_string(),
@@ -66,7 +66,7 @@ impl<'a> Mul<u32> for &'a Integer {
 
     fn mul(self, other: u32) -> Integer {
         if *self == 0 || other == 0 {
-            Integer::zero()
+            Integer::ZERO
         } else {
             Integer {
                 sign: self.sign,
@@ -94,7 +94,7 @@ impl<'a> Mul<u32> for &'a Integer {
 /// use std::str::FromStr;
 ///
 /// fn main() {
-///     assert_eq!((123u32 * Integer::zero()).to_string(), "0");
+///     assert_eq!((123u32 * Integer::ZERO).to_string(), "0");
 ///     assert_eq!((1u32 * Integer::from(123i32)).to_string(), "123");
 ///     assert_eq!((456u32 * Integer::from(-123i32)).to_string(), "-56088");
 ///     assert_eq!((123u32 * Integer::from_str("-1000000000000").unwrap()).to_string(),
@@ -128,7 +128,7 @@ impl Mul<Integer> for u32 {
 /// use std::str::FromStr;
 ///
 /// fn main() {
-///     assert_eq!((123u32 * &Integer::zero()).to_string(), "0");
+///     assert_eq!((123u32 * &Integer::ZERO).to_string(), "0");
 ///     assert_eq!((1u32 * &Integer::from(123i32)).to_string(), "123");
 ///     assert_eq!((456u32 * &Integer::from(-123i32)).to_string(), "-56088");
 ///     assert_eq!((123u32 * &Integer::from_str("-1000000000000").unwrap()).to_string(),
@@ -160,7 +160,7 @@ impl<'a> Mul<&'a Integer> for u32 {
 /// use malachite_native::integer::Integer;
 ///
 /// fn main() {
-///     let mut x = Integer::negative_one();
+///     let mut x = Integer::NEGATIVE_ONE;
 ///     x *= 1u32;
 ///     x *= 2u32;
 ///     x *= 3u32;

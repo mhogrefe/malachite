@@ -18,7 +18,7 @@ use std::ops::{Shr, ShrAssign};
 /// use std::str::FromStr;
 ///
 /// fn main() {
-///     assert_eq!((Natural::zero() >> 10).to_string(), "0");
+///     assert_eq!((Natural::ZERO >> 10).to_string(), "0");
 ///     assert_eq!((Natural::from(492u32) >> 2).to_string(), "123");
 ///     assert_eq!((Natural::from_str("1000000000000").unwrap() >> 10).to_string(), "976562500");
 /// }
@@ -45,7 +45,7 @@ impl Shr<u32> for Natural {
 /// use malachite_gmp::natural::Natural;
 ///
 /// fn main() {
-///     assert_eq!((&Natural::zero() >> 10).to_string(), "0");
+///     assert_eq!((&Natural::ZERO >> 10).to_string(), "0");
 ///     assert_eq!((&Natural::from(492u32) >> 2).to_string(), "123");
 ///     assert_eq!((&Natural::from_str("1000000000000").unwrap() >> 10).to_string(), "976562500");
 /// }
@@ -58,7 +58,7 @@ impl<'a> Shr<u32> for &'a Natural {
             return self.clone();
         }
         match *self {
-            Small(_) if other >= 32 => Natural::zero(),
+            Small(_) if other >= 32 => Natural::ZERO,
             Small(small) => Small(small >> other),
             Large(ref large) => unsafe {
                 let mut result: mpz_t = mem::uninitialized();

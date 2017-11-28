@@ -17,7 +17,7 @@ impl Natural {
     /// use std::str::FromStr;
     ///
     /// fn main() {
-    ///     assert_eq!(Natural::zero().is_even(), true);
+    ///     assert_eq!(Natural::ZERO.is_even(), true);
     ///     assert_eq!(Natural::from(123u32).is_even(), false);
     ///     assert_eq!(Natural::from(128u32).is_even(), true);
     ///     assert_eq!(Natural::from_str("1000000000000").unwrap().is_even(), true);
@@ -47,7 +47,7 @@ impl Natural {
     /// use std::str::FromStr;
     ///
     /// fn main() {
-    ///     assert_eq!(Natural::zero().is_odd(), false);
+    ///     assert_eq!(Natural::ZERO.is_odd(), false);
     ///     assert_eq!(Natural::from(123u32).is_odd(), true);
     ///     assert_eq!(Natural::from(128u32).is_odd(), false);
     ///     assert_eq!(Natural::from_str("1000000000000").unwrap().is_odd(), false);
