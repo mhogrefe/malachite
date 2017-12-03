@@ -25,6 +25,7 @@ pub mod integer {
         pub mod mul_u32;
         pub mod neg;
         pub mod shl_u32;
+        pub mod shr_u32;
         pub mod sub;
         pub mod sub_i32;
         pub mod sub_u32;
