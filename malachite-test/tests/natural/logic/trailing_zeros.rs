@@ -25,12 +25,21 @@ fn test_trailing_zeros() {
 fn trailing_zeros_properties() {
     // x.trailing_zeros() is equivalent for malachite-gmp and malachite-native.
     // x.trailing_zeros().is_none() == (x == 0)
-    // TODO >> <<
+    // if x != 0, x >> x.trailing_zeros() is odd
+    // if x != 0, x >> x.trailing_zeros() << x.trailing_zeros() == x
     let one_natural = |gmp_x: gmp::Natural| {
         let x = gmp_natural_to_native(&gmp_x);
         let trailing_zeros = x.trailing_zeros();
         assert_eq!(gmp_x.trailing_zeros(), trailing_zeros);
         assert_eq!(trailing_zeros.is_none(), x == 0);
+        if x != 0 {
+            let trailing_zeros = trailing_zeros.unwrap();
+            if trailing_zeros <= u32::max_value().into() {
+                let trailing_zeros = trailing_zeros as u32;
+                assert!((&x >> trailing_zeros).is_odd());
+                assert_eq!(&x >> trailing_zeros << trailing_zeros, x);
+            }
+        }
     };
 
     for n in exhaustive_naturals().take(LARGE_LIMIT) {

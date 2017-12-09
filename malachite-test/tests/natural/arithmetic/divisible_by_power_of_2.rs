@@ -53,7 +53,7 @@ fn divisible_by_power_of_2_properties() {
     // if x != 0, x.divisible_by_power_of_2(pow) == (x.trailing_zeros().unwrap() >= pow)
     // (-x).divisible_by_power_of_2(pow) == x.divisible_by_power_of_2()
     // (x << pow).divisible_by_power_of_2(pow)
-    // TODO >> <<
+    // x.divisible_by_power_of_2(pow) == (x >> pow << pow == x)
     let natural_and_u64 = |gmp_x: gmp::Natural, pow: u64| {
         let x = gmp_natural_to_native(&gmp_x);
         let divisible = x.divisible_by_power_of_2(pow);
@@ -62,7 +62,11 @@ fn divisible_by_power_of_2_properties() {
             assert_eq!(x.trailing_zeros().unwrap() >= pow, divisible);
         }
         assert_eq!((-&x).divisible_by_power_of_2(pow), divisible);
-        assert!((x << pow as u32).divisible_by_power_of_2(pow));
+        assert!((&x << pow as u32).divisible_by_power_of_2(pow));
+        if pow <= u32::max_value().into() {
+            let pow = pow as u32;
+            assert_eq!(&x >> pow << pow == x, divisible);
+        }
     };
 
     // x.divisible_by_power_of_2(0)

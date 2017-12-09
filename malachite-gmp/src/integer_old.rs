@@ -12,8 +12,7 @@ use std::hash::Hash;
 use std::hash::Hasher;
 use std::mem;
 use std::ops::{Add, AddAssign, BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign, Div,
-               DivAssign, Mul, MulAssign, Neg, Not, Rem, RemAssign, Shl, ShlAssign, Shr, ShrAssign,
-               Sub, SubAssign};
+               DivAssign, Mul, MulAssign, Neg, Not, Rem, RemAssign, Sub, SubAssign};
 use std::os::raw::{c_char, c_int, c_long, c_ulong};
 use std::slice;
 use std::str::FromStr;
@@ -659,10 +658,6 @@ arith_prim_non_commut! { Div div, DivAssign div_assign,
 arith_prim_non_commut! { Rem rem, RemAssign rem_assign,
                          RemFromAssign rem_from_assign,
                          u32, mpz_tdiv_r_ui, mpz_ui_tdiv_r }
-arith_prim_for_integer! { Shl shl, ShlAssign shl_assign, u32,
-                          gmp::mpz_mul_2exp }
-arith_prim_for_integer! { Shr shr, ShrAssign shr_assign, u32,
-                          gmp::mpz_fdiv_q_2exp }
 arith_prim_for_integer! { Pow pow, PowAssign pow_assign, u32,
                           gmp::mpz_pow_ui }
 arith_prim_commut! { BitAnd bitand, BitAndAssign bitand_assign, u32, bitand_ui }
@@ -678,10 +673,6 @@ arith_prim_non_commut! { Div div, DivAssign div_assign,
 arith_prim_non_commut! { Rem rem, RemAssign rem_assign,
                          RemFromAssign rem_from_assign,
                          i32, mpz_tdiv_r_si, mpz_si_tdiv_r }
-arith_prim_for_integer! { Shl shl, ShlAssign shl_assign, i32,
-                          mpz_lshift_si }
-arith_prim_for_integer! { Shr shr, ShrAssign shr_assign, i32,
-                          mpz_rshift_si }
 
 unsafe fn mpz_tdiv_q_ui(q: *mut mpz_t, n: *const mpz_t, d: c_ulong) {
     assert!(d != 0, "division by zero");
@@ -821,22 +812,6 @@ unsafe fn mpz_si_tdiv_r(q: *mut mpz_t, n: c_long, d: *const mpz_t) {
     mpz_ui_tdiv_r(q, n.wrapping_abs() as c_ulong, d);
     if neg {
         gmp::mpz_neg(q, q);
-    }
-}
-
-unsafe fn mpz_lshift_si(rop: *mut mpz_t, op1: *const mpz_t, op2: c_long) {
-    if op2 >= 0 {
-        gmp::mpz_mul_2exp(rop, op1, op2 as c_ulong);
-    } else {
-        gmp::mpz_fdiv_q_2exp(rop, op1, op2.wrapping_neg() as c_ulong);
-    }
-}
-
-unsafe fn mpz_rshift_si(rop: *mut mpz_t, op1: *const mpz_t, op2: c_long) {
-    if op2 >= 0 {
-        gmp::mpz_fdiv_q_2exp(rop, op1, op2 as c_ulong);
-    } else {
-        gmp::mpz_mul_2exp(rop, op1, op2.wrapping_neg() as c_ulong);
     }
 }
 

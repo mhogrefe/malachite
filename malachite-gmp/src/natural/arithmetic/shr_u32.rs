@@ -18,9 +18,9 @@ use std::ops::{Shr, ShrAssign};
 /// use std::str::FromStr;
 ///
 /// fn main() {
-///     assert_eq!((Natural::ZERO >> 10).to_string(), "0");
-///     assert_eq!((Natural::from(492u32) >> 2).to_string(), "123");
-///     assert_eq!((Natural::from_str("1000000000000").unwrap() >> 10).to_string(), "976562500");
+///     assert_eq!((Natural::ZERO >> 10u32).to_string(), "0");
+///     assert_eq!((Natural::from(492u32) >> 2u32).to_string(), "123");
+///     assert_eq!((Natural::from_str("1000000000000").unwrap() >> 10u32).to_string(), "976562500");
 /// }
 /// ```
 impl Shr<u32> for Natural {
@@ -45,9 +45,10 @@ impl Shr<u32> for Natural {
 /// use malachite_gmp::natural::Natural;
 ///
 /// fn main() {
-///     assert_eq!((&Natural::ZERO >> 10).to_string(), "0");
-///     assert_eq!((&Natural::from(492u32) >> 2).to_string(), "123");
-///     assert_eq!((&Natural::from_str("1000000000000").unwrap() >> 10).to_string(), "976562500");
+///     assert_eq!((&Natural::ZERO >> 10u32).to_string(), "0");
+///     assert_eq!((&Natural::from(492u32) >> 2u32).to_string(), "123");
+///     assert_eq!((&Natural::from_str("1000000000000").unwrap() >> 10u32).to_string(),
+///         "976562500");
 /// }
 /// ```
 impl<'a> Shr<u32> for &'a Natural {
@@ -123,16 +124,16 @@ impl ShrAssign<u32> for Natural {
 /// use malachite_gmp::natural::Natural;
 ///
 /// fn main() {
-///     assert_eq!(Natural::from(257u32).shr_round(8, RoundingMode::Down).to_string(), "1");
-///     assert_eq!(Natural::from(257u32).shr_round(8, RoundingMode::Up).to_string(), "2");
+///     assert_eq!(Natural::from(257u32).shr_round(8u32, RoundingMode::Down).to_string(), "1");
+///     assert_eq!(Natural::from(257u32).shr_round(8u32, RoundingMode::Up).to_string(), "2");
 ///
-///     assert_eq!(Natural::from(257u32).shr_round(9, RoundingMode::Down).to_string(), "0");
-///     assert_eq!(Natural::from(257u32).shr_round(9, RoundingMode::Up).to_string(), "1");
-///     assert_eq!(Natural::from(257u32).shr_round(9, RoundingMode::Nearest).to_string(), "1");
-///     assert_eq!(Natural::from(255u32).shr_round(9, RoundingMode::Nearest).to_string(), "0");
-///     assert_eq!(Natural::from(256u32).shr_round(9, RoundingMode::Nearest).to_string(), "0");
+///     assert_eq!(Natural::from(257u32).shr_round(9u32, RoundingMode::Down).to_string(), "0");
+///     assert_eq!(Natural::from(257u32).shr_round(9u32, RoundingMode::Up).to_string(), "1");
+///     assert_eq!(Natural::from(257u32).shr_round(9u32, RoundingMode::Nearest).to_string(), "1");
+///     assert_eq!(Natural::from(255u32).shr_round(9u32, RoundingMode::Nearest).to_string(), "0");
+///     assert_eq!(Natural::from(256u32).shr_round(9u32, RoundingMode::Nearest).to_string(), "0");
 ///
-///     assert_eq!(Natural::from(256u32).shr_round(8, RoundingMode::Exact).to_string(), "1");
+///     assert_eq!(Natural::from(256u32).shr_round(8u32, RoundingMode::Exact).to_string(), "1");
 /// }
 impl ShrRound<u32> for Natural {
     type Output = Natural;
@@ -161,16 +162,19 @@ impl ShrRound<u32> for Natural {
 /// use malachite_gmp::natural::Natural;
 ///
 /// fn main() {
-///     assert_eq!((&Natural::from(257u32)).shr_round(8, RoundingMode::Down).to_string(), "1");
-///     assert_eq!((&Natural::from(257u32)).shr_round(8, RoundingMode::Up).to_string(), "2");
+///     assert_eq!((&Natural::from(257u32)).shr_round(8u32, RoundingMode::Down).to_string(), "1");
+///     assert_eq!((&Natural::from(257u32)).shr_round(8u32, RoundingMode::Up).to_string(), "2");
 ///
-///     assert_eq!((&Natural::from(257u32)).shr_round(9, RoundingMode::Down).to_string(), "0");
-///     assert_eq!((&Natural::from(257u32)).shr_round(9, RoundingMode::Up).to_string(), "1");
-///     assert_eq!((&Natural::from(257u32)).shr_round(9, RoundingMode::Nearest).to_string(), "1");
-///     assert_eq!((&Natural::from(255u32)).shr_round(9, RoundingMode::Nearest).to_string(), "0");
-///     assert_eq!((&Natural::from(256u32)).shr_round(9, RoundingMode::Nearest).to_string(), "0");
+///     assert_eq!((&Natural::from(257u32)).shr_round(9u32, RoundingMode::Down).to_string(), "0");
+///     assert_eq!((&Natural::from(257u32)).shr_round(9u32, RoundingMode::Up).to_string(), "1");
+///     assert_eq!((&Natural::from(257u32)).shr_round(9u32, RoundingMode::Nearest).to_string(),
+///         "1");
+///     assert_eq!((&Natural::from(255u32)).shr_round(9u32, RoundingMode::Nearest).to_string(),
+///         "0");
+///     assert_eq!((&Natural::from(256u32)).shr_round(9u32, RoundingMode::Nearest).to_string(),
+///         "0");
 ///
-///     assert_eq!((&Natural::from(256u32)).shr_round(8, RoundingMode::Exact).to_string(), "1");
+///     assert_eq!((&Natural::from(256u32)).shr_round(8u32, RoundingMode::Exact).to_string(), "1");
 /// }
 impl<'a> ShrRound<u32> for &'a Natural {
     type Output = Natural;
@@ -311,35 +315,35 @@ impl<'a> ShrRound<u32> for &'a Natural {
 ///
 /// fn main() {
 ///     let mut n = Natural::from(257u32);
-///     n.shr_round_assign(8, RoundingMode::Down);
+///     n.shr_round_assign(8u32, RoundingMode::Down);
 ///     assert_eq!(n.to_string(), "1");
 ///
 ///     let mut n = Natural::from(257u32);
-///     n.shr_round_assign(8, RoundingMode::Up);
+///     n.shr_round_assign(8u32, RoundingMode::Up);
 ///     assert_eq!(n.to_string(), "2");
 ///
 ///     let mut n = Natural::from(257u32);
-///     n.shr_round_assign(9, RoundingMode::Down);
+///     n.shr_round_assign(9u32, RoundingMode::Down);
 ///     assert_eq!(n.to_string(), "0");
 ///
 ///     let mut n = Natural::from(257u32);
-///     n.shr_round_assign(9, RoundingMode::Up);
+///     n.shr_round_assign(9u32, RoundingMode::Up);
 ///     assert_eq!(n.to_string(), "1");
 ///
 ///     let mut n = Natural::from(257u32);
-///     n.shr_round_assign(9, RoundingMode::Nearest);
+///     n.shr_round_assign(9u32, RoundingMode::Nearest);
 ///     assert_eq!(n.to_string(), "1");
 ///
 ///     let mut n = Natural::from(255u32);
-///     n.shr_round_assign(9, RoundingMode::Nearest);
+///     n.shr_round_assign(9u32, RoundingMode::Nearest);
 ///     assert_eq!(n.to_string(), "0");
 ///
 ///     let mut n = Natural::from(256u32);
-///     n.shr_round_assign(9, RoundingMode::Nearest);
+///     n.shr_round_assign(9u32, RoundingMode::Nearest);
 ///     assert_eq!(n.to_string(), "0");
 ///
 ///     let mut n = Natural::from(256u32);
-///     n.shr_round_assign(8, RoundingMode::Exact);
+///     n.shr_round_assign(8u32, RoundingMode::Exact);
 ///     assert_eq!(n.to_string(), "1");
 /// }
 impl ShrRoundAssign<u32> for Natural {

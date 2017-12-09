@@ -16,11 +16,12 @@ use std::ops::{Shl, ShlAssign};
 /// use malachite_native::integer::Integer;
 ///
 /// fn main() {
-///     assert_eq!((Integer::ZERO << 10).to_string(), "0");
-///     assert_eq!((Integer::from(123) << 2).to_string(), "492");
-///     assert_eq!((Integer::from(123) << 100).to_string(), "155921023828072216384094494261248");
-///     assert_eq!((Integer::from(-123) << 2).to_string(), "-492");
-///     assert_eq!((Integer::from(-123) << 100).to_string(), "-155921023828072216384094494261248");
+///     assert_eq!((Integer::ZERO << 10u32).to_string(), "0");
+///     assert_eq!((Integer::from(123) << 2u32).to_string(), "492");
+///     assert_eq!((Integer::from(123) << 100u32).to_string(), "155921023828072216384094494261248");
+///     assert_eq!((Integer::from(-123) << 2u32).to_string(), "-492");
+///     assert_eq!((Integer::from(-123) << 100u32).to_string(),
+///         "-155921023828072216384094494261248");
 /// }
 /// ```
 impl Shl<u32> for Integer {
@@ -49,11 +50,13 @@ impl Shl<u32> for Integer {
 /// use malachite_native::integer::Integer;
 ///
 /// fn main() {
-///     assert_eq!((&Integer::ZERO << 10).to_string(), "0");
-///     assert_eq!((&Integer::from(123) << 2).to_string(), "492");
-///     assert_eq!((&Integer::from(123) << 100).to_string(), "155921023828072216384094494261248");
-///     assert_eq!((&Integer::from(-123) << 2).to_string(), "-492");
-///     assert_eq!((&Integer::from(-123) << 100).to_string(), "-155921023828072216384094494261248");
+///     assert_eq!((&Integer::ZERO << 10u32).to_string(), "0");
+///     assert_eq!((&Integer::from(123) << 2u32).to_string(), "492");
+///     assert_eq!((&Integer::from(123) << 100u32).to_string(),
+///         "155921023828072216384094494261248");
+///     assert_eq!((&Integer::from(-123) << 2u32).to_string(), "-492");
+///     assert_eq!((&Integer::from(-123) << 100u32).to_string(),
+///         "-155921023828072216384094494261248");
 /// }
 /// ```
 impl<'a> Shl<u32> for &'a Integer {

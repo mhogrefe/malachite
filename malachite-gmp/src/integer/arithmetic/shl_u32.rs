@@ -3,7 +3,7 @@ use integer::Integer::{self, Large, Small};
 use std::mem;
 use std::ops::{Shl, ShlAssign};
 
-/// Shifts a `Integer` left (multiplies it by a power of 2), taking the `Integer` by value.
+/// Shifts an `Integer` left (multiplies it by a power of 2), taking the `Integer` by value.
 ///
 /// # Examples
 /// ```
@@ -14,11 +14,12 @@ use std::ops::{Shl, ShlAssign};
 /// use malachite_gmp::integer::Integer;
 ///
 /// fn main() {
-///     assert_eq!((Integer::ZERO << 10).to_string(), "0");
-///     assert_eq!((Integer::from(123) << 2).to_string(), "492");
-///     assert_eq!((Integer::from(123) << 100).to_string(), "155921023828072216384094494261248");
-///     assert_eq!((Integer::from(-123) << 2).to_string(), "-492");
-///     assert_eq!((Integer::from(-123) << 100).to_string(), "-155921023828072216384094494261248");
+///     assert_eq!((Integer::ZERO << 10u32).to_string(), "0");
+///     assert_eq!((Integer::from(123) << 2u32).to_string(), "492");
+///     assert_eq!((Integer::from(123) << 100u32).to_string(), "155921023828072216384094494261248");
+///     assert_eq!((Integer::from(-123) << 2u32).to_string(), "-492");
+///     assert_eq!((Integer::from(-123) << 100u32).to_string(),
+///         "-155921023828072216384094494261248");
 /// }
 /// ```
 impl Shl<u32> for Integer {
@@ -30,7 +31,7 @@ impl Shl<u32> for Integer {
     }
 }
 
-/// Shifts a `Integer` left (multiplies it by a power of 2), taking the `Integer` by reference.
+/// Shifts an `Integer` left (multiplies it by a power of 2), taking the `Integer` by reference.
 ///
 /// # Examples
 /// ```
@@ -41,11 +42,13 @@ impl Shl<u32> for Integer {
 /// use malachite_gmp::integer::Integer;
 ///
 /// fn main() {
-///     assert_eq!((&Integer::ZERO << 10).to_string(), "0");
-///     assert_eq!((&Integer::from(123) << 2).to_string(), "492");
-///     assert_eq!((&Integer::from(123) << 100).to_string(), "155921023828072216384094494261248");
-///     assert_eq!((&Integer::from(-123) << 2).to_string(), "-492");
-///     assert_eq!((&Integer::from(-123) << 100).to_string(), "-155921023828072216384094494261248");
+///     assert_eq!((&Integer::ZERO << 10u32).to_string(), "0");
+///     assert_eq!((&Integer::from(123) << 2u32).to_string(), "492");
+///     assert_eq!((&Integer::from(123) << 100u32).to_string(),
+///         "155921023828072216384094494261248");
+///     assert_eq!((&Integer::from(-123) << 2u32).to_string(), "-492");
+///     assert_eq!((&Integer::from(-123) << 100u32).to_string(),
+///         "-155921023828072216384094494261248");
 /// }
 /// ```
 impl<'a> Shl<u32> for &'a Integer {
@@ -75,7 +78,7 @@ impl<'a> Shl<u32> for &'a Integer {
     }
 }
 
-/// Shifts a `Integer` left (multiplies it by a power of 2) in place.
+/// Shifts an `Integer` left (multiplies it by a power of 2) in place.
 ///
 /// # Examples
 /// ```

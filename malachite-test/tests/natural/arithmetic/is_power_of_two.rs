@@ -31,16 +31,18 @@ fn test_is_power_of_two() {
 fn is_power_of_two_properties() {
     // x.is_power_of_two() is equivalent for malachite-gmp and malachite-native.
     // if x != 0, x.is_power_of_two() == (x.trailing_zeros().unwrap() == x.significant_bits() - 1)
-    // TODO >> <<
+    // if x != 0, x.is_power_of_two() == (x >> x.trailing_zeros() == 1)
     let one_natural = |gmp_x: gmp::Natural| {
         let x = gmp_natural_to_native(&gmp_x);
         let is_power_of_two = x.is_power_of_two();
         assert_eq!(gmp_x.is_power_of_two(), is_power_of_two);
         if x != 0 {
-            assert_eq!(
-                x.trailing_zeros().unwrap() == x.significant_bits() - 1,
-                is_power_of_two
-            );
+            let trailing_zeros = x.trailing_zeros().unwrap();
+            assert_eq!(trailing_zeros == x.significant_bits() - 1, is_power_of_two);
+            if trailing_zeros <= u32::max_value().into() {
+                let trailing_zeros = trailing_zeros as u32;
+                assert_eq!(x >> trailing_zeros == 1, is_power_of_two);
+            }
         }
     };
 

@@ -6,6 +6,10 @@ use std::ops::{Shr, ShrAssign};
 /// Shifts a `Integer` right (divides it by a power of 2 and takes the floor), taking the `Integer`
 /// by value.
 ///
+/// Time: worst case O(`other`)
+///
+/// Additional memory: worst case O(1)
+///
 /// # Examples
 /// ```
 /// extern crate malachite_base;
@@ -16,9 +20,10 @@ use std::ops::{Shr, ShrAssign};
 /// use std::str::FromStr;
 ///
 /// fn main() {
-///     assert_eq!((Integer::ZERO >> 10).to_string(), "0");
-///     assert_eq!((Integer::from(492) >> 2).to_string(), "123");
-///     assert_eq!((Integer::from_str("-1000000000000").unwrap() >> 10).to_string(), "-976562500");
+///     assert_eq!((Integer::ZERO >> 10u32).to_string(), "0");
+///     assert_eq!((Integer::from(492) >> 2u32).to_string(), "123");
+///     assert_eq!((Integer::from_str("-1000000000000").unwrap() >> 10u32).to_string(),
+///         "-976562500");
 /// }
 /// ```
 impl Shr<u32> for Integer {
@@ -33,6 +38,10 @@ impl Shr<u32> for Integer {
 /// Shifts a `Integer` right (divides it by a power of 2 and takes the floor), taking the `Integer`
 /// by reference.
 ///
+/// Time: worst case O(`other`)
+///
+/// Additional memory: worst case O(`other`)
+///
 /// # Examples
 /// ```
 /// extern crate malachite_base;
@@ -43,9 +52,10 @@ impl Shr<u32> for Integer {
 /// use malachite_native::integer::Integer;
 ///
 /// fn main() {
-///     assert_eq!((&Integer::ZERO >> 10).to_string(), "0");
-///     assert_eq!((&Integer::from(492) >> 2).to_string(), "123");
-///     assert_eq!((&Integer::from_str("-1000000000000").unwrap() >> 10).to_string(), "-976562500");
+///     assert_eq!((&Integer::ZERO >> 10u32).to_string(), "0");
+///     assert_eq!((&Integer::from(492) >> 2u32).to_string(), "123");
+///     assert_eq!((&Integer::from_str("-1000000000000").unwrap() >> 10u32).to_string(),
+///         "-976562500");
 /// }
 /// ```
 impl<'a> Shr<u32> for &'a Integer {
@@ -81,6 +91,10 @@ impl<'a> Shr<u32> for &'a Integer {
 }
 
 /// Shifts a `Integer` right (divides it by a power of 2 and takes the floor) in place.
+///
+/// Time: worst case O(`other`)
+///
+/// Additional memory: worst case O(1)
 ///
 /// # Examples
 /// ```
@@ -120,6 +134,10 @@ impl ShrAssign<u32> for Integer {
 /// `RoundingMode::Down` is equivalent to using `>>`. To test whether `RoundingMode::Exact` can be
 /// passed, use `self.is_divisible_by_power_of_two(other)`.
 ///
+/// Time: worst case O(`other`)
+///
+/// Additional memory: worst case O(1)
+///
 /// # Panics
 /// Panics if `rm` is `RoundingMode::Exact`
 /// but `self` is not divisible by 2^(`other`).
@@ -134,16 +152,16 @@ impl ShrAssign<u32> for Integer {
 /// use malachite_native::integer::Integer;
 ///
 /// fn main() {
-///     assert_eq!(Integer::from(257).shr_round(8, RoundingMode::Down).to_string(), "1");
-///     assert_eq!(Integer::from(257).shr_round(8, RoundingMode::Up).to_string(), "2");
+///     assert_eq!(Integer::from(257).shr_round(8u32, RoundingMode::Down).to_string(), "1");
+///     assert_eq!(Integer::from(257).shr_round(8u32, RoundingMode::Up).to_string(), "2");
 ///
-///     assert_eq!(Integer::from(-257).shr_round(9, RoundingMode::Down).to_string(), "0");
-///     assert_eq!(Integer::from(-257).shr_round(9, RoundingMode::Up).to_string(), "-1");
-///     assert_eq!(Integer::from(-257).shr_round(9, RoundingMode::Nearest).to_string(), "-1");
-///     assert_eq!(Integer::from(-255).shr_round(9, RoundingMode::Nearest).to_string(), "0");
-///     assert_eq!(Integer::from(-256).shr_round(9, RoundingMode::Nearest).to_string(), "0");
+///     assert_eq!(Integer::from(-257).shr_round(9u32, RoundingMode::Down).to_string(), "0");
+///     assert_eq!(Integer::from(-257).shr_round(9u32, RoundingMode::Up).to_string(), "-1");
+///     assert_eq!(Integer::from(-257).shr_round(9u32, RoundingMode::Nearest).to_string(), "-1");
+///     assert_eq!(Integer::from(-255).shr_round(9u32, RoundingMode::Nearest).to_string(), "0");
+///     assert_eq!(Integer::from(-256).shr_round(9u32, RoundingMode::Nearest).to_string(), "0");
 ///
-///     assert_eq!(Integer::from(256u32).shr_round(8, RoundingMode::Exact).to_string(), "1");
+///     assert_eq!(Integer::from(256u32).shr_round(8u32, RoundingMode::Exact).to_string(), "1");
 /// }
 impl ShrRound<u32> for Integer {
     type Output = Integer;
@@ -159,6 +177,10 @@ impl ShrRound<u32> for Integer {
 /// `RoundingMode::Down` is equivalent to using `>>`. To test whether `RoundingMode::Exact` can be
 /// passed, use `self.is_divisible_by_power_of_two(other)`.
 ///
+/// Time: worst case O(`other`)
+///
+/// Additional memory: worst case O(`other`)
+///
 /// # Panics
 /// Panics if `rm` is `RoundingMode::Exact` but `self` is not divisible by 2^(`other`).
 ///
@@ -172,16 +194,16 @@ impl ShrRound<u32> for Integer {
 /// use malachite_native::integer::Integer;
 ///
 /// fn main() {
-///     assert_eq!((&Integer::from(257)).shr_round(8, RoundingMode::Down).to_string(), "1");
-///     assert_eq!((&Integer::from(257)).shr_round(8, RoundingMode::Up).to_string(), "2");
+///     assert_eq!((&Integer::from(257)).shr_round(8u32, RoundingMode::Down).to_string(), "1");
+///     assert_eq!((&Integer::from(257)).shr_round(8u32, RoundingMode::Up).to_string(), "2");
 ///
-///     assert_eq!((&Integer::from(-257)).shr_round(9, RoundingMode::Down).to_string(), "0");
-///     assert_eq!((&Integer::from(-257)).shr_round(9, RoundingMode::Up).to_string(), "-1");
-///     assert_eq!((&Integer::from(-257)).shr_round(9, RoundingMode::Nearest).to_string(), "-1");
-///     assert_eq!((&Integer::from(-255)).shr_round(9, RoundingMode::Nearest).to_string(), "0");
-///     assert_eq!((&Integer::from(-256)).shr_round(9, RoundingMode::Nearest).to_string(), "0");
+///     assert_eq!((&Integer::from(-257)).shr_round(9u32, RoundingMode::Down).to_string(), "0");
+///     assert_eq!((&Integer::from(-257)).shr_round(9u32, RoundingMode::Up).to_string(), "-1");
+///     assert_eq!((&Integer::from(-257)).shr_round(9u32, RoundingMode::Nearest).to_string(), "-1");
+///     assert_eq!((&Integer::from(-255)).shr_round(9u32, RoundingMode::Nearest).to_string(), "0");
+///     assert_eq!((&Integer::from(-256)).shr_round(9u32, RoundingMode::Nearest).to_string(), "0");
 ///
-///     assert_eq!((&Integer::from(256)).shr_round(8, RoundingMode::Exact).to_string(), "1");
+///     assert_eq!((&Integer::from(256)).shr_round(8u32, RoundingMode::Exact).to_string(), "1");
 /// }
 impl<'a> ShrRound<u32> for &'a Integer {
     type Output = Integer;
@@ -219,6 +241,10 @@ impl<'a> ShrRound<u32> for &'a Integer {
 /// rounding mode, in place. Passing `RoundingMode::Floor` or `RoundingMode::Down` is equivalent to
 /// using `>>=`. To test whether `RoundingMode::Exact` can be passed, use
 /// `self.is_divisible_by_power_of_two(other)`.
+///
+/// Time: worst case O(`other`)
+///
+/// Additional memory: worst case O(1)
 ///
 /// # Panics
 /// Panics if `rm` is `RoundingMode::Exact` but `self` is not divisible by 2^(`other`).

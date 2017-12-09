@@ -111,7 +111,8 @@ fn shl_u32_properties() {
     // n <<= u, n << u, and &n << u give the same result.
     // |n << u| >= |n|
     // n << u == n * (1 << u)
-    // TODO >>
+    // n << u >> u == n
+    // if u < 2^31, n << u == n << (u as i32) == n >> -(u as i32)
     let integer_and_u32 = |mut gmp_n: gmp::Integer, u: u32| {
         let mut n = gmp_integer_to_native(&gmp_n);
         let old_n = n.clone();
@@ -152,7 +153,13 @@ fn shl_u32_properties() {
         assert!((&old_n << u).abs() >= old_n.abs_ref());
         assert_eq!(-&old_n << u, -(&old_n << u));
 
-        assert_eq!(&old_n << u, old_n * (native::Integer::ONE << u));
+        assert_eq!(&old_n << u, &old_n * (native::Integer::ONE << u));
+        assert_eq!(&old_n << u >> u, old_n);
+
+        if u <= (i32::max_value() as u32) {
+            assert_eq!(&old_n << (u as i32), n);
+            assert_eq!(&old_n >> -(u as i32), n);
+        }
     };
 
     // n << 0 == n

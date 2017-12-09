@@ -53,9 +53,10 @@ pub fn mpn_lshift_in_place(u: &mut [u32], bits: u32) -> u32 {
 /// use malachite_native::natural::Natural;
 ///
 /// fn main() {
-///     assert_eq!((Natural::ZERO << 10).to_string(), "0");
-///     assert_eq!((Natural::from(123u32) << 2).to_string(), "492");
-///     assert_eq!((Natural::from(123u32) << 100).to_string(), "155921023828072216384094494261248");
+///     assert_eq!((Natural::ZERO << 10u32).to_string(), "0");
+///     assert_eq!((Natural::from(123u32) << 2u32).to_string(), "492");
+///     assert_eq!((Natural::from(123u32) << 100u32).to_string(),
+///         "155921023828072216384094494261248");
 /// }
 /// ```
 impl Shl<u32> for Natural {
@@ -99,9 +100,9 @@ fn shl_helper(limbs: &[u32], other: u32) -> Natural {
 /// use malachite_native::natural::Natural;
 ///
 /// fn main() {
-///     assert_eq!((&Natural::ZERO << 10).to_string(), "0");
-///     assert_eq!((&Natural::from(123u32) << 2).to_string(), "492");
-///     assert_eq!((&Natural::from(123u32) << 100).to_string(),
+///     assert_eq!((&Natural::ZERO << 10u32).to_string(), "0");
+///     assert_eq!((&Natural::from(123u32) << 2u32).to_string(), "492");
+///     assert_eq!((&Natural::from(123u32) << 100u32).to_string(),
 ///         "155921023828072216384094494261248");
 /// }
 /// ```

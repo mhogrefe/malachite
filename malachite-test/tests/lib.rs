@@ -24,7 +24,9 @@ pub mod integer {
         pub mod mul_i32;
         pub mod mul_u32;
         pub mod neg;
+        pub mod shl_i32;
         pub mod shl_u32;
+        pub mod shr_i32;
         pub mod shr_u32;
         pub mod sub;
         pub mod sub_i32;
@@ -96,7 +98,9 @@ pub mod natural {
         pub mod mul;
         pub mod mul_u32;
         pub mod neg;
+        pub mod shl_i32;
         pub mod shl_u32;
+        pub mod shr_i32;
         pub mod shr_u32;
         pub mod sub;
         pub mod sub_u32;

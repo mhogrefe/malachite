@@ -33,7 +33,8 @@ fn trailing_zeros_properties() {
     // x.trailing_zeros().is_none() == (x == 0)
     // (-x).trailing_zeros() == x.trailing_zeros()
     // if x != 0, ((!x).trailing_zeros() == Some(0)) == (x.trailing_zeros() == Some(0))
-    // TODO >> <<
+    // if x != 0, x >> x.trailing_zeros() is odd
+    // if x != 0, x >> x.trailing_zeros() << x.trailing_zeros() == x
     let one_integer = |gmp_x: gmp::Integer| {
         let x = gmp_integer_to_native(&gmp_x);
         let trailing_zeros = x.trailing_zeros();
@@ -41,7 +42,13 @@ fn trailing_zeros_properties() {
         assert_eq!(trailing_zeros.is_none(), x == 0);
         assert_eq!((-&x).trailing_zeros(), trailing_zeros);
         if x != 0 {
-            assert_ne!((!x).trailing_zeros() == Some(0), trailing_zeros == Some(0));
+            let trailing_zeros = trailing_zeros.unwrap();
+            assert_ne!((!&x).trailing_zeros() == Some(0), trailing_zeros == 0);
+            if trailing_zeros <= u32::max_value().into() {
+                let trailing_zeros = trailing_zeros as u32;
+                assert!((&x >> trailing_zeros).is_odd());
+                assert_eq!(&x >> trailing_zeros << trailing_zeros, x);
+            }
         }
     };
 
