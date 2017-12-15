@@ -30,20 +30,20 @@ impl Natural {
     ///         false);
     /// }
     /// ```
-    pub fn divisible_by_power_of_2(&self, pow: u64) -> bool {
+    pub fn divisible_by_power_of_2(&self, pow: u32) -> bool {
         match (self, pow) {
             (_, 0) => true,
             (&Small(0), _) => true,
-            (&Small(_), pow) if pow >= LIMB_BITS as u64 => false,
+            (&Small(_), pow) if pow >= LIMB_BITS => false,
             (&Small(small), pow) => small & ((1 << pow) - 1) == 0,
             (&Large(ref limbs), pow) => {
-                let zero_limbs = (pow >> LOG_LIMB_BITS as u64) as usize;
+                let zero_limbs = (pow >> LOG_LIMB_BITS) as usize;
                 if zero_limbs >= limbs.len() ||
                     limbs.iter().take(zero_limbs).any(|&limb| limb != 0)
                 {
                     return false;
                 }
-                limbs[zero_limbs] & ((1 << (pow & LIMB_BITS_MASK as u64)) - 1) == 0
+                limbs[zero_limbs] & ((1 << (pow & LIMB_BITS_MASK)) - 1) == 0
             }
         }
     }

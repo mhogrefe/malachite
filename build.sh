@@ -33,5 +33,5 @@ cargo update &&
 cargo fmt &&
 #rustup run nightly cargo clippy &&
 cargo test --release &&
-cargo run --release -- bench 0 all &&
+cargo run --release -- all &&
 cargo rustc --release --lib -- --emit mir

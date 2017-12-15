@@ -74,7 +74,7 @@ pub fn demo_exhaustive_integer_shr_round_assign_i32(limit: usize) {
         log_pairs(exhaustive_integers(), exhaustive_i::<i32>()),
         exhaustive_rounding_modes(),
     ).filter(|&((ref n, i), rm)| {
-        i <= 0 || rm != RoundingMode::Exact || n.divisible_by_power_of_2(i as u64)
+        i <= 0 || rm != RoundingMode::Exact || n.divisible_by_power_of_2(i as u32)
     })
         .take(limit)
     {
@@ -97,7 +97,7 @@ pub fn demo_random_integer_shr_round_assign_i32(limit: usize) {
         &(|seed| i32s_geometric(seed, 32)),
         &(|seed| random_rounding_modes(seed)),
     ).filter(|&(ref n, i, rm)| {
-        i <= 0 || rm != RoundingMode::Exact || n.divisible_by_power_of_2(i as u64)
+        i <= 0 || rm != RoundingMode::Exact || n.divisible_by_power_of_2(i as u32)
     })
         .take(limit)
     {
@@ -118,7 +118,7 @@ pub fn demo_exhaustive_integer_shr_round_i32(limit: usize) {
         log_pairs(exhaustive_integers(), exhaustive_i::<i32>()),
         exhaustive_rounding_modes(),
     ).filter(|&((ref n, i), rm)| {
-        i <= 0 || rm != RoundingMode::Exact || n.divisible_by_power_of_2(i as u64)
+        i <= 0 || rm != RoundingMode::Exact || n.divisible_by_power_of_2(i as u32)
     })
         .take(limit)
     {
@@ -140,7 +140,7 @@ pub fn demo_random_integer_shr_round_i32(limit: usize) {
         &(|seed| i32s_geometric(seed, 32)),
         &(|seed| random_rounding_modes(seed)),
     ).filter(|&(ref n, i, rm)| {
-        i <= 0 || rm != RoundingMode::Exact || n.divisible_by_power_of_2(i as u64)
+        i <= 0 || rm != RoundingMode::Exact || n.divisible_by_power_of_2(i as u32)
     })
         .take(limit)
     {
@@ -160,7 +160,7 @@ pub fn demo_exhaustive_integer_shr_round_i32_ref(limit: usize) {
         log_pairs(exhaustive_integers(), exhaustive_i::<i32>()),
         exhaustive_rounding_modes(),
     ).filter(|&((ref n, i), rm)| {
-        i <= 0 || rm != RoundingMode::Exact || n.divisible_by_power_of_2(i as u64)
+        i <= 0 || rm != RoundingMode::Exact || n.divisible_by_power_of_2(i as u32)
     })
         .take(limit)
     {
@@ -181,7 +181,7 @@ pub fn demo_random_integer_shr_round_i32_ref(limit: usize) {
         &(|seed| i32s_geometric(seed, 32)),
         &(|seed| random_rounding_modes(seed)),
     ).filter(|&(ref n, i, rm)| {
-        i <= 0 || rm != RoundingMode::Exact || n.divisible_by_power_of_2(i as u64)
+        i <= 0 || rm != RoundingMode::Exact || n.divisible_by_power_of_2(i as u32)
     })
         .take(limit)
     {
@@ -340,7 +340,7 @@ pub fn benchmark_exhaustive_integer_shr_round_assign_i32(limit: usize, file_name
             log_pairs(exhaustive_integers(), exhaustive_i::<i32>()),
             exhaustive_rounding_modes(),
         ).filter(|&((ref n, i), rm)| {
-            i <= 0 || rm != RoundingMode::Exact || n.divisible_by_power_of_2(i as u64)
+            i <= 0 || rm != RoundingMode::Exact || n.divisible_by_power_of_2(i as u32)
         }),
         function_f: &(|((mut n, i), rm): ((gmp::Integer, i32), RoundingMode)| {
                           n.shr_round_assign(i, rm)
@@ -370,7 +370,7 @@ pub fn benchmark_random_integer_shr_round_assign_i32(limit: usize, scale: u32, f
             &(|seed| i32s_geometric(seed, scale)),
             &(|seed| random_rounding_modes(seed)),
         ).filter(|&(ref n, i, rm)| {
-            i <= 0 || rm != RoundingMode::Exact || n.divisible_by_power_of_2(i as u64)
+            i <= 0 || rm != RoundingMode::Exact || n.divisible_by_power_of_2(i as u32)
         }),
         function_f: &(|(mut n, i, rm): (gmp::Integer, i32, RoundingMode)| {
             n.shr_round_assign(i, rm)
@@ -398,7 +398,7 @@ pub fn benchmark_exhaustive_integer_shr_round_i32(limit: usize, file_name: &str)
             log_pairs(exhaustive_integers(), exhaustive_i::<i32>()),
             exhaustive_rounding_modes(),
         ).filter(|&((ref n, i), rm)| {
-            i <= 0 || rm != RoundingMode::Exact || n.divisible_by_power_of_2(i as u64)
+            i <= 0 || rm != RoundingMode::Exact || n.divisible_by_power_of_2(i as u32)
         }),
         function_f: &(|((n, i), rm): ((gmp::Integer, i32), RoundingMode)| n.shr_round(i, rm)),
         function_g: &(|((n, i), rm): ((native::Integer, i32), RoundingMode)| n.shr_round(i, rm)),
@@ -424,7 +424,7 @@ pub fn benchmark_random_integer_shr_round_i32(limit: usize, scale: u32, file_nam
             &(|seed| i32s_geometric(seed, scale)),
             &(|seed| random_rounding_modes(seed)),
         ).filter(|&(ref n, i, rm)| {
-            i <= 0 || rm != RoundingMode::Exact || n.divisible_by_power_of_2(i as u64)
+            i <= 0 || rm != RoundingMode::Exact || n.divisible_by_power_of_2(i as u32)
         }),
         function_f: &(|(n, i, rm): (gmp::Integer, i32, RoundingMode)| n.shr_round(i, rm)),
         function_g: &(|(n, i, rm): (native::Integer, i32, RoundingMode)| n.shr_round(i, rm)),
@@ -448,7 +448,7 @@ pub fn benchmark_exhaustive_integer_shr_round_i32_ref(limit: usize, file_name: &
             log_pairs(exhaustive_integers(), exhaustive_i::<i32>()),
             exhaustive_rounding_modes(),
         ).filter(|&((ref n, i), rm)| {
-            i <= 0 || rm != RoundingMode::Exact || n.divisible_by_power_of_2(i as u64)
+            i <= 0 || rm != RoundingMode::Exact || n.divisible_by_power_of_2(i as u32)
         }),
         function_f: &(|((n, i), rm): ((gmp::Integer, i32), RoundingMode)| (&n).shr_round(i, rm)),
         function_g: &(|((n, i), rm): ((native::Integer, i32), RoundingMode)| (&n).shr_round(i, rm)),
@@ -474,7 +474,7 @@ pub fn benchmark_random_integer_shr_round_i32_ref(limit: usize, scale: u32, file
             &(|seed| i32s_geometric(seed, scale)),
             &(|seed| random_rounding_modes(seed)),
         ).filter(|&(ref n, i, rm)| {
-            i <= 0 || rm != RoundingMode::Exact || n.divisible_by_power_of_2(i as u64)
+            i <= 0 || rm != RoundingMode::Exact || n.divisible_by_power_of_2(i as u32)
         }),
         function_f: &(|(n, i, rm): (gmp::Integer, i32, RoundingMode)| (&n).shr_round(i, rm)),
         function_g: &(|(n, i, rm): (native::Integer, i32, RoundingMode)| (&n).shr_round(i, rm)),

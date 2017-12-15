@@ -9,7 +9,7 @@ use rust_wheels::iterators::primitive_ints::exhaustive_u;
 use rust_wheels::iterators::tuples::{log_pairs, random_pairs};
 
 pub fn demo_exhaustive_integer_divisible_by_power_of_2(limit: usize) {
-    for (n, pow) in log_pairs(exhaustive_integers(), exhaustive_u::<u64>()).take(limit) {
+    for (n, pow) in log_pairs(exhaustive_integers(), exhaustive_u::<u32>()).take(limit) {
         if n.divisible_by_power_of_2(pow) {
             println!("{} is divisible by 2^{}", n, pow);
         } else {
@@ -22,7 +22,7 @@ pub fn demo_random_integer_divisible_by_power_of_2(limit: usize) {
     for (n, pow) in random_pairs(
         &EXAMPLE_SEED,
         &(|seed| random_integers(seed, 32)),
-        &(|seed| natural_u32s_geometric(seed, 32).map(|u| u as u64)),
+        &(|seed| natural_u32s_geometric(seed, 32)),
     ).take(limit)
     {
         if n.divisible_by_power_of_2(pow) {
@@ -34,18 +34,18 @@ pub fn demo_random_integer_divisible_by_power_of_2(limit: usize) {
 }
 
 pub fn benchmark_exhaustive_integer_divisible_by_power_of_2(limit: usize, file_name: &str) {
-    println!("benchmarking exhaustive Integer.divisible_by_power_of_2(u64)");
+    println!("benchmarking exhaustive Integer.divisible_by_power_of_2(u32)");
     benchmark_2(BenchmarkOptions2 {
-        xs: log_pairs(exhaustive_integers(), exhaustive_u::<u64>()),
-        function_f: &(|(n, pow): (gmp::Integer, u64)| n.divisible_by_power_of_2(pow)),
-        function_g: &(|(n, pow): (native::Integer, u64)| n.divisible_by_power_of_2(pow)),
+        xs: log_pairs(exhaustive_integers(), exhaustive_u::<u32>()),
+        function_f: &(|(n, pow): (gmp::Integer, u32)| n.divisible_by_power_of_2(pow)),
+        function_g: &(|(n, pow): (native::Integer, u32)| n.divisible_by_power_of_2(pow)),
         x_cons: &(|&(ref n, pow)| (n.clone(), pow)),
         y_cons: &(|&(ref n, pow)| (gmp_integer_to_native(n), pow)),
         x_param: &(|&(ref n, _)| n.significant_bits() as usize),
         limit,
         f_name: "malachite-gmp",
         g_name: "malachite-native",
-        title: "Integer.divisible\\\\_by\\\\_power\\\\_of\\\\_2(u64)",
+        title: "Integer.divisible\\\\_by\\\\_power\\\\_of\\\\_2(u32)",
         x_axis_label: "n.significant\\\\_bits()",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),
@@ -53,22 +53,22 @@ pub fn benchmark_exhaustive_integer_divisible_by_power_of_2(limit: usize, file_n
 }
 
 pub fn benchmark_random_integer_divisible_by_power_of_2(limit: usize, scale: u32, file_name: &str) {
-    println!("benchmarking random Integer.divisible_by_power_of_2(u64)");
+    println!("benchmarking random Integer.divisible_by_power_of_2(u32)");
     benchmark_2(BenchmarkOptions2 {
         xs: random_pairs(
             &EXAMPLE_SEED,
             &(|seed| random_integers(seed, scale)),
-            &(|seed| natural_u32s_geometric(seed, scale).map(|u| u as u64)),
+            &(|seed| natural_u32s_geometric(seed, scale)),
         ),
-        function_f: &(|(n, pow): (gmp::Integer, u64)| n.divisible_by_power_of_2(pow)),
-        function_g: &(|(n, pow): (native::Integer, u64)| n.divisible_by_power_of_2(pow)),
+        function_f: &(|(n, pow): (gmp::Integer, u32)| n.divisible_by_power_of_2(pow)),
+        function_g: &(|(n, pow): (native::Integer, u32)| n.divisible_by_power_of_2(pow)),
         x_cons: &(|&(ref n, pow)| (n.clone(), pow)),
         y_cons: &(|&(ref n, pow)| (gmp_integer_to_native(n), pow)),
         x_param: &(|&(ref n, _)| n.significant_bits() as usize),
         limit,
         f_name: "malachite-gmp",
         g_name: "malachite-native",
-        title: "Integer.divisible\\\\_by\\\\_power\\\\_of\\\\_2(u64)",
+        title: "Integer.divisible\\\\_by\\\\_power\\\\_of\\\\_2(u32)",
         x_axis_label: "n.significant\\\\_bits()",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),
@@ -79,20 +79,20 @@ pub fn benchmark_exhaustive_integer_divisible_by_power_of_2_algorithms(
     limit: usize,
     file_name: &str,
 ) {
-    println!("benchmarking exhaustive Integer.divisible_by_power_of_2(u64)");
+    println!("benchmarking exhaustive Integer.divisible_by_power_of_2(u32)");
     benchmark_2(BenchmarkOptions2 {
-        xs: log_pairs(exhaustive_integers(), exhaustive_u::<u64>()),
-        function_f: &(|(n, pow): (native::Integer, u64)| n.divisible_by_power_of_2(pow)),
-        function_g: &(|(n, pow): (native::Integer, u64)| {
-                          n.trailing_zeros().map_or(true, |z| z >= pow)
+        xs: log_pairs(exhaustive_integers(), exhaustive_u::<u32>()),
+        function_f: &(|(n, pow): (native::Integer, u32)| n.divisible_by_power_of_2(pow)),
+        function_g: &(|(n, pow): (native::Integer, u32)| {
+                          n.trailing_zeros().map_or(true, |z| z >= pow.into())
                       }),
         x_cons: &(|&(ref n, pow)| (gmp_integer_to_native(n), pow)),
         y_cons: &(|&(ref n, pow)| (gmp_integer_to_native(n), pow)),
         x_param: &(|&(ref n, _)| n.significant_bits() as usize),
         limit,
-        f_name: "Integer.divisible\\\\_by\\\\_power\\\\_of\\\\_2(u64)",
-        g_name: "Integer.trailing\\\\_zeros().map\\\\_or(true, |z| z >= u64)",
-        title: "Integer.divisible\\\\_by\\\\_power\\\\_of\\\\_2(u64)",
+        f_name: "Integer.divisible\\\\_by\\\\_power\\\\_of\\\\_2(u32)",
+        g_name: "Integer.trailing\\\\_zeros().map\\\\_or(true, |z| z >= u32)",
+        title: "Integer.divisible\\\\_by\\\\_power\\\\_of\\\\_2(u32)",
         x_axis_label: "n.significant\\\\_bits()",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),
@@ -104,24 +104,24 @@ pub fn benchmark_random_integer_divisible_by_power_of_2_algorithms(
     scale: u32,
     file_name: &str,
 ) {
-    println!("benchmarking random Integer.divisible_by_power_of_2(u64)");
+    println!("benchmarking random Integer.divisible_by_power_of_2(u32)");
     benchmark_2(BenchmarkOptions2 {
         xs: random_pairs(
             &EXAMPLE_SEED,
             &(|seed| random_integers(seed, scale)),
-            &(|seed| natural_u32s_geometric(seed, scale).map(|u| u as u64)),
+            &(|seed| natural_u32s_geometric(seed, scale)),
         ),
-        function_f: &(|(n, pow): (native::Integer, u64)| n.divisible_by_power_of_2(pow)),
-        function_g: &(|(n, pow): (native::Integer, u64)| {
-                          n.trailing_zeros().map_or(true, |z| z >= pow)
+        function_f: &(|(n, pow): (native::Integer, u32)| n.divisible_by_power_of_2(pow)),
+        function_g: &(|(n, pow): (native::Integer, u32)| {
+                          n.trailing_zeros().map_or(true, |z| z >= pow.into())
                       }),
         x_cons: &(|&(ref n, pow)| (gmp_integer_to_native(n), pow)),
         y_cons: &(|&(ref n, pow)| (gmp_integer_to_native(n), pow)),
         x_param: &(|&(ref n, _)| n.significant_bits() as usize),
         limit,
-        f_name: "Integer.divisible\\\\_by\\\\_power\\\\_of\\\\_2(u64)",
-        g_name: "Integer.trailing\\\\_zeros().map\\\\_or(true, |z| z >= u64)",
-        title: "Integer.divisible\\\\_by\\\\_power\\\\_of\\\\_2(u64)",
+        f_name: "Integer.divisible\\\\_by\\\\_power\\\\_of\\\\_2(u32)",
+        g_name: "Integer.trailing\\\\_zeros().map\\\\_or(true, |z| z >= u32)",
+        title: "Integer.divisible\\\\_by\\\\_power\\\\_of\\\\_2(u32)",
         x_axis_label: "n.significant\\\\_bits()",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),

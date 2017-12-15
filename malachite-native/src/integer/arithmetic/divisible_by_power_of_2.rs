@@ -29,7 +29,7 @@ impl Integer {
     ///         false);
     /// }
     /// ```
-    pub fn divisible_by_power_of_2(&self, pow: u64) -> bool {
+    pub fn divisible_by_power_of_2(&self, pow: u32) -> bool {
         self.abs.divisible_by_power_of_2(pow)
     }
 }

@@ -45,8 +45,7 @@ impl Natural {
 
     pub(crate) fn promote_in_place(&mut self) -> &mut Vec<u32> {
         if let Small(x) = *self {
-            let xs = vec![x];
-            *self = Large(xs);
+            *self = Large(vec![x]);
         }
         if let Large(ref mut xs) = *self {
             xs

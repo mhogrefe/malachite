@@ -7,10 +7,10 @@ use rust_wheels::iterators::naturals::{exhaustive_naturals, random_naturals};
 use std::str::FromStr;
 
 #[test]
-fn test_is_power_of_two() {
+fn test_is_power_of_2() {
     let test = |n, out| {
-        assert_eq!(native::Natural::from_str(n).unwrap().is_power_of_two(), out);
-        assert_eq!(gmp::Natural::from_str(n).unwrap().is_power_of_two(), out);
+        assert_eq!(native::Natural::from_str(n).unwrap().is_power_of_2(), out);
+        assert_eq!(gmp::Natural::from_str(n).unwrap().is_power_of_2(), out);
     };
     test("0", false);
     test("1", true);
@@ -28,20 +28,20 @@ fn test_is_power_of_two() {
 }
 
 #[test]
-fn is_power_of_two_properties() {
-    // x.is_power_of_two() is equivalent for malachite-gmp and malachite-native.
-    // if x != 0, x.is_power_of_two() == (x.trailing_zeros().unwrap() == x.significant_bits() - 1)
-    // if x != 0, x.is_power_of_two() == (x >> x.trailing_zeros() == 1)
+fn is_power_of_2_properties() {
+    // x.is_power_of_2() is equivalent for malachite-gmp and malachite-native.
+    // if x != 0, x.is_power_of_2() == (x.trailing_zeros().unwrap() == x.significant_bits() - 1)
+    // if x != 0, x.is_power_of_2() == (x >> x.trailing_zeros() == 1)
     let one_natural = |gmp_x: gmp::Natural| {
         let x = gmp_natural_to_native(&gmp_x);
-        let is_power_of_two = x.is_power_of_two();
-        assert_eq!(gmp_x.is_power_of_two(), is_power_of_two);
+        let is_power_of_2 = x.is_power_of_2();
+        assert_eq!(gmp_x.is_power_of_2(), is_power_of_2);
         if x != 0 {
             let trailing_zeros = x.trailing_zeros().unwrap();
-            assert_eq!(trailing_zeros == x.significant_bits() - 1, is_power_of_two);
+            assert_eq!(trailing_zeros == x.significant_bits() - 1, is_power_of_2);
             if trailing_zeros <= u32::max_value().into() {
                 let trailing_zeros = trailing_zeros as u32;
-                assert_eq!(x >> trailing_zeros == 1, is_power_of_two);
+                assert_eq!(x >> trailing_zeros == 1, is_power_of_2);
             }
         }
     };

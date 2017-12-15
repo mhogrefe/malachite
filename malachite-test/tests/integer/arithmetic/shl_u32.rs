@@ -177,7 +177,7 @@ fn shl_u32_properties() {
             (native::Integer::ONE << u)
                 .into_natural()
                 .unwrap()
-                .is_power_of_two()
+                .is_power_of_2()
         );
     };
 

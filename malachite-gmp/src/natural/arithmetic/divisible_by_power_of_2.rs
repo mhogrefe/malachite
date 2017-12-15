@@ -24,13 +24,15 @@ impl Natural {
     ///         false);
     /// }
     /// ```
-    pub fn divisible_by_power_of_2(&self, pow: u64) -> bool {
+    pub fn divisible_by_power_of_2(&self, pow: u32) -> bool {
         match (self, pow) {
             (_, 0) => true,
             (&Small(0), _) => true,
             (&Small(_), pow) if pow >= 32 => false,
             (&Small(small), pow) => small & ((1 << pow) - 1) == 0,
-            (&Large(ref large), pow) => unsafe { gmp::mpz_divisible_2exp_p(large, pow) != 0 },
+            (&Large(ref large), pow) => unsafe {
+                gmp::mpz_divisible_2exp_p(large, pow.into()) != 0
+            },
         }
     }
 }

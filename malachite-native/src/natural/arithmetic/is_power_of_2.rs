@@ -19,14 +19,14 @@ impl Natural {
     /// use std::str::FromStr;
     ///
     /// fn main() {
-    ///     assert_eq!(Natural::ZERO.is_power_of_two(), false);
-    ///     assert_eq!(Natural::from(123u32).is_power_of_two(), false);
-    ///     assert_eq!(Natural::from(128u32).is_power_of_two(), true);
-    ///     assert_eq!(Natural::from_str("1000000000000").unwrap().is_power_of_two(), false);
-    ///     assert_eq!(Natural::from_str("1099511627776").unwrap().is_power_of_two(), true);
+    ///     assert_eq!(Natural::ZERO.is_power_of_2(), false);
+    ///     assert_eq!(Natural::from(123u32).is_power_of_2(), false);
+    ///     assert_eq!(Natural::from(128u32).is_power_of_2(), true);
+    ///     assert_eq!(Natural::from_str("1000000000000").unwrap().is_power_of_2(), false);
+    ///     assert_eq!(Natural::from_str("1099511627776").unwrap().is_power_of_2(), true);
     /// }
     /// ```
-    pub fn is_power_of_two(&self) -> bool {
+    pub fn is_power_of_2(&self) -> bool {
         match *self {
             Small(small) => small != 0 && small & (small - 1) == 0,
             Large(ref limbs) => {

@@ -54,19 +54,16 @@ fn divisible_by_power_of_2_properties() {
     // (-x).divisible_by_power_of_2(pow) == x.divisible_by_power_of_2()
     // (x << pow).divisible_by_power_of_2(pow)
     // x.divisible_by_power_of_2(pow) == (x >> pow << pow == x)
-    let natural_and_u64 = |gmp_x: gmp::Natural, pow: u64| {
+    let natural_and_u32 = |gmp_x: gmp::Natural, pow: u32| {
         let x = gmp_natural_to_native(&gmp_x);
         let divisible = x.divisible_by_power_of_2(pow);
         assert_eq!(gmp_x.divisible_by_power_of_2(pow), divisible);
         if x != 0 {
-            assert_eq!(x.trailing_zeros().unwrap() >= pow, divisible);
+            assert_eq!(x.trailing_zeros().unwrap() >= pow.into(), divisible);
         }
         assert_eq!((-&x).divisible_by_power_of_2(pow), divisible);
         assert!((&x << pow as u32).divisible_by_power_of_2(pow));
-        if pow <= u32::max_value().into() {
-            let pow = pow as u32;
-            assert_eq!(&x >> pow << pow == x, divisible);
-        }
+        assert_eq!(&x >> pow << pow == x, divisible);
     };
 
     // x.divisible_by_power_of_2(0)
@@ -76,21 +73,21 @@ fn divisible_by_power_of_2_properties() {
     };
 
     // 0.divisible_by_power_of_2(pow)
-    let one_u64 = |pow: u64| {
+    let one_u32 = |pow: u32| {
         assert!(native::Natural::ZERO.divisible_by_power_of_2(pow));
     };
 
-    for (x, pow) in log_pairs(exhaustive_naturals(), exhaustive_u::<u64>()).take(LARGE_LIMIT) {
-        natural_and_u64(x, pow);
+    for (x, pow) in log_pairs(exhaustive_naturals(), exhaustive_u::<u32>()).take(LARGE_LIMIT) {
+        natural_and_u32(x, pow);
     }
 
     for (x, pow) in random_pairs(
         &EXAMPLE_SEED,
         &(|seed| random_naturals(seed, 32)),
-        &(|seed| natural_u32s_geometric(seed, 32).map(|u| u as u64)),
+        &(|seed| natural_u32s_geometric(seed, 32)),
     ).take(LARGE_LIMIT)
     {
-        natural_and_u64(x, pow);
+        natural_and_u32(x, pow);
     }
 
     for n in exhaustive_naturals().take(LARGE_LIMIT) {
@@ -102,10 +99,10 @@ fn divisible_by_power_of_2_properties() {
     }
 
     for n in exhaustive_u().take(LARGE_LIMIT) {
-        one_u64(n);
+        one_u32(n);
     }
 
     for n in random_x(&EXAMPLE_SEED).take(LARGE_LIMIT) {
-        one_u64(n);
+        one_u32(n);
     }
 }

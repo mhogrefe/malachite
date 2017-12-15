@@ -2,41 +2,6 @@ use integer::Integer;
 use natural::Natural;
 use std::ops::Not;
 
-fn neg_and_borrow(x: u32, borrow: &mut bool) -> u32 {
-    let (neg, overflow) = 0u32.overflowing_sub(x);
-    if *borrow {
-        *borrow = overflow;
-        let (difference, overflow) = neg.overflowing_sub(1);
-        *borrow |= overflow;
-        difference
-    } else {
-        *borrow = overflow;
-        neg
-    }
-}
-
-// Perform the negation of s and write the result to r. This is equivalent to calling mpn_sub_n with
-// a n-limb zero minuend and passing s as subtrahend. Return borrow. r.len() >= s.len().
-pub fn mpn_neg(r: &mut [u32], s: &[u32]) -> bool {
-    let s_len = s.len();
-    assert!(r.len() >= s_len);
-    let mut borrow = false;
-    for i in 0..s_len {
-        r[i] = neg_and_borrow(s[i], &mut borrow);
-    }
-    borrow
-}
-
-// Perform the negation of s and write the result to s. This is equivalent to calling
-// mpn_sub_n_in_place with a n-limb zero minuend and passing s as subtrahend.
-pub fn mpn_neg_in_place(s: &mut [u32]) -> bool {
-    let mut borrow = false;
-    for limb in s.iter_mut() {
-        *limb = neg_and_borrow(*limb, &mut borrow);
-    }
-    borrow
-}
-
 //TODO use
 /*
 pub(crate) fn mpn_com(r: &mut [u32], s: &[u32]) {

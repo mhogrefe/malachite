@@ -1594,7 +1594,7 @@ fn shr_round_i32_properties() {
         log_pairs(exhaustive_integers(), exhaustive_i::<i32>()),
         exhaustive_rounding_modes(),
     ).filter(|&((ref n, i), rm)| {
-        i < 0 || rm != RoundingMode::Exact || n.divisible_by_power_of_2(i as u64)
+        i < 0 || rm != RoundingMode::Exact || n.divisible_by_power_of_2(i as u32)
     })
         .take(LARGE_LIMIT)
     {
@@ -1607,7 +1607,7 @@ fn shr_round_i32_properties() {
         &(|seed| i32s_geometric(seed, 32)),
         &(|seed| random_rounding_modes(seed)),
     ).filter(|&(ref n, i, rm)| {
-        i < 0 || rm != RoundingMode::Exact || n.divisible_by_power_of_2(i as u64)
+        i < 0 || rm != RoundingMode::Exact || n.divisible_by_power_of_2(i as u32)
     })
         .take(LARGE_LIMIT)
     {

@@ -157,7 +157,7 @@ fn shl_u32_properties() {
     // 1 << n is a power of 2
     let one_u32 = |u: u32| {
         assert_eq!(native::Natural::ZERO << u, 0);
-        assert!((native::Natural::ONE << u).is_power_of_two());
+        assert!((native::Natural::ONE << u).is_power_of_2());
     };
 
     for (n, u) in log_pairs(exhaustive_naturals(), exhaustive_u::<u32>()).take(LARGE_LIMIT) {

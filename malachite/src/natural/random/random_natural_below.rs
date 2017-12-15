@@ -27,7 +27,7 @@ use rand::Rng;
 /// ```
 pub fn random_natural_below<R: Rng>(rng: &mut R, n: &Natural) -> Natural {
     assert_ne!(*n, 0, "Cannot generate a Natural below 0");
-    if n.is_power_of_two() {
+    if n.is_power_of_2() {
         random_natural_up_to_bits(rng, n.significant_bits())
     } else {
         let bits = n.significant_bits();

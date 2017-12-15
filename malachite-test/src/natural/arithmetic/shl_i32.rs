@@ -74,7 +74,7 @@ pub fn demo_exhaustive_natural_shl_round_assign_i32(limit: usize) {
         log_pairs(exhaustive_naturals(), exhaustive_i::<i32>()),
         exhaustive_rounding_modes(),
     ).filter(|&((ref n, i), rm)| {
-        i >= 0 || rm != RoundingMode::Exact || n.divisible_by_power_of_2(i.wrapping_neg() as u64)
+        i >= 0 || rm != RoundingMode::Exact || n.divisible_by_power_of_2(i.wrapping_neg() as u32)
     })
         .take(limit)
     {
@@ -97,7 +97,7 @@ pub fn demo_random_natural_shl_round_assign_i32(limit: usize) {
         &(|seed| i32s_geometric(seed, 32)),
         &(|seed| random_rounding_modes(seed)),
     ).filter(|&(ref n, i, rm)| {
-        i >= 0 || rm != RoundingMode::Exact || n.divisible_by_power_of_2(i.wrapping_neg() as u64)
+        i >= 0 || rm != RoundingMode::Exact || n.divisible_by_power_of_2(i.wrapping_neg() as u32)
     })
         .take(limit)
     {
@@ -118,7 +118,7 @@ pub fn demo_exhaustive_natural_shl_round_i32(limit: usize) {
         log_pairs(exhaustive_naturals(), exhaustive_i::<i32>()),
         exhaustive_rounding_modes(),
     ).filter(|&((ref n, i), rm)| {
-        i >= 0 || rm != RoundingMode::Exact || n.divisible_by_power_of_2(i.wrapping_neg() as u64)
+        i >= 0 || rm != RoundingMode::Exact || n.divisible_by_power_of_2(i.wrapping_neg() as u32)
     })
         .take(limit)
     {
@@ -140,7 +140,7 @@ pub fn demo_random_natural_shl_round_i32(limit: usize) {
         &(|seed| i32s_geometric(seed, 32)),
         &(|seed| random_rounding_modes(seed)),
     ).filter(|&(ref n, i, rm)| {
-        i >= 0 || rm != RoundingMode::Exact || n.divisible_by_power_of_2(i.wrapping_neg() as u64)
+        i >= 0 || rm != RoundingMode::Exact || n.divisible_by_power_of_2(i.wrapping_neg() as u32)
     })
         .take(limit)
     {
@@ -160,7 +160,7 @@ pub fn demo_exhaustive_natural_shl_round_i32_ref(limit: usize) {
         log_pairs(exhaustive_naturals(), exhaustive_i::<i32>()),
         exhaustive_rounding_modes(),
     ).filter(|&((ref n, i), rm)| {
-        i >= 0 || rm != RoundingMode::Exact || n.divisible_by_power_of_2(i.wrapping_neg() as u64)
+        i >= 0 || rm != RoundingMode::Exact || n.divisible_by_power_of_2(i.wrapping_neg() as u32)
     })
         .take(limit)
     {
@@ -181,7 +181,7 @@ pub fn demo_random_natural_shl_round_i32_ref(limit: usize) {
         &(|seed| i32s_geometric(seed, 32)),
         &(|seed| random_rounding_modes(seed)),
     ).filter(|&(ref n, i, rm)| {
-        i >= 0 || rm != RoundingMode::Exact || n.divisible_by_power_of_2(i.wrapping_neg() as u64)
+        i >= 0 || rm != RoundingMode::Exact || n.divisible_by_power_of_2(i.wrapping_neg() as u32)
     })
         .take(limit)
     {
@@ -341,7 +341,7 @@ pub fn benchmark_exhaustive_natural_shl_round_assign_i32(limit: usize, file_name
             exhaustive_rounding_modes(),
         ).filter(|&((ref n, i), rm)| {
             i >= 0 || rm != RoundingMode::Exact ||
-                n.divisible_by_power_of_2(i.wrapping_neg() as u64)
+                n.divisible_by_power_of_2(i.wrapping_neg() as u32)
         }),
         function_f: &(|((mut n, i), rm): ((gmp::Natural, i32), RoundingMode)| {
                           n.shl_round_assign(i, rm)
@@ -372,7 +372,7 @@ pub fn benchmark_random_natural_shl_round_assign_i32(limit: usize, scale: u32, f
             &(|seed| random_rounding_modes(seed)),
         ).filter(|&(ref n, i, rm)| {
             i >= 0 || rm != RoundingMode::Exact ||
-                n.divisible_by_power_of_2(i.wrapping_neg() as u64)
+                n.divisible_by_power_of_2(i.wrapping_neg() as u32)
         }),
         function_f: &(|(mut n, i, rm): (gmp::Natural, i32, RoundingMode)| {
             n.shl_round_assign(i, rm)
@@ -401,7 +401,7 @@ pub fn benchmark_exhaustive_natural_shl_round_i32(limit: usize, file_name: &str)
             exhaustive_rounding_modes(),
         ).filter(|&((ref n, i), rm)| {
             i >= 0 || rm != RoundingMode::Exact ||
-                n.divisible_by_power_of_2(i.wrapping_neg() as u64)
+                n.divisible_by_power_of_2(i.wrapping_neg() as u32)
         }),
         function_f: &(|((n, i), rm): ((gmp::Natural, i32), RoundingMode)| n.shl_round(i, rm)),
         function_g: &(|((n, i), rm): ((native::Natural, i32), RoundingMode)| n.shl_round(i, rm)),
@@ -428,7 +428,7 @@ pub fn benchmark_random_natural_shl_round_i32(limit: usize, scale: u32, file_nam
             &(|seed| random_rounding_modes(seed)),
         ).filter(|&(ref n, i, rm)| {
             i >= 0 || rm != RoundingMode::Exact ||
-                n.divisible_by_power_of_2(i.wrapping_neg() as u64)
+                n.divisible_by_power_of_2(i.wrapping_neg() as u32)
         }),
         function_f: &(|(n, i, rm): (gmp::Natural, i32, RoundingMode)| n.shl_round(i, rm)),
         function_g: &(|(n, i, rm): (native::Natural, i32, RoundingMode)| n.shl_round(i, rm)),
@@ -453,7 +453,7 @@ pub fn benchmark_exhaustive_natural_shl_round_i32_ref(limit: usize, file_name: &
             exhaustive_rounding_modes(),
         ).filter(|&((ref n, i), rm)| {
             i >= 0 || rm != RoundingMode::Exact ||
-                n.divisible_by_power_of_2(i.wrapping_neg() as u64)
+                n.divisible_by_power_of_2(i.wrapping_neg() as u32)
         }),
         function_f: &(|((n, i), rm): ((gmp::Natural, i32), RoundingMode)| (&n).shl_round(i, rm)),
         function_g: &(|((n, i), rm): ((native::Natural, i32), RoundingMode)| (&n).shl_round(i, rm)),
@@ -480,7 +480,7 @@ pub fn benchmark_random_natural_shl_round_i32_ref(limit: usize, scale: u32, file
             &(|seed| random_rounding_modes(seed)),
         ).filter(|&(ref n, i, rm)| {
             i >= 0 || rm != RoundingMode::Exact ||
-                n.divisible_by_power_of_2(i.wrapping_neg() as u64)
+                n.divisible_by_power_of_2(i.wrapping_neg() as u32)
         }),
         function_f: &(|(n, i, rm): (gmp::Natural, i32, RoundingMode)| (&n).shl_round(i, rm)),
         function_g: &(|(n, i, rm): (native::Natural, i32, RoundingMode)| (&n).shl_round(i, rm)),
