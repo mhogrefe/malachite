@@ -115,8 +115,7 @@ impl<'a> Shr<u32> for &'a Natural {
                     Natural::ZERO
                 } else {
                     let small_shift = other & LIMB_BITS_MASK;
-                    let mut result = vec![0; limbs.len() - limbs_to_delete];
-                    result.copy_from_slice(&limbs[limbs_to_delete..]);
+                    let mut result = limbs[limbs_to_delete..].to_vec();
                     if small_shift != 0 {
                         mpn_rshift_in_place(&mut result, small_shift);
                     }
@@ -317,8 +316,7 @@ impl<'a> ShrRound<u32> for &'a Natural {
                             return Natural::ZERO;
                         } else {
                             let small_shift = other & LIMB_BITS_MASK;
-                            let mut result = vec![0; limbs.len() - limbs_to_delete];
-                            result.copy_from_slice(&limbs[limbs_to_delete..]);
+                            let mut result = limbs[limbs_to_delete..].to_vec();
                             if small_shift != 0 {
                                 mpn_rshift_in_place(&mut result, small_shift);
                             }
@@ -333,8 +331,7 @@ impl<'a> ShrRound<u32> for &'a Natural {
                         } else {
                             let mut exact = mpn_zero_p(&limbs[0..limbs_to_delete]);
                             let small_shift = other & LIMB_BITS_MASK;
-                            let mut result = vec![0; limbs.len() - limbs_to_delete];
-                            result.copy_from_slice(&limbs[limbs_to_delete..]);
+                            let mut result = limbs[limbs_to_delete..].to_vec();
                             if small_shift != 0 {
                                 let remaining_bits = mpn_rshift_in_place(&mut result, small_shift);
                                 exact &= remaining_bits == 0;
@@ -353,8 +350,7 @@ impl<'a> ShrRound<u32> for &'a Natural {
                             panic!("Right shift is not exact: {} >> {}", self, other);
                         } else {
                             let small_shift = other & LIMB_BITS_MASK;
-                            let mut result = vec![0; limbs.len() - limbs_to_delete];
-                            result.copy_from_slice(&limbs[limbs_to_delete..]);
+                            let mut result = limbs[limbs_to_delete..].to_vec();
                             if small_shift != 0 {
                                 if mpn_rshift_in_place(&mut result, small_shift) != 0 {
                                     panic!("Right shift is not exact: {} >> {}", self, other);
@@ -380,8 +376,7 @@ impl<'a> ShrRound<u32> for &'a Natural {
                                     return Natural::ZERO;
                                 } else {
                                     let small_shift = other & LIMB_BITS_MASK;
-                                    let mut result = vec![0; limbs.len() - limbs_to_delete];
-                                    result.copy_from_slice(&limbs[limbs_to_delete..]);
+                                    let mut result = limbs[limbs_to_delete..].to_vec();
                                     if small_shift != 0 {
                                         mpn_rshift_in_place(&mut result, small_shift);
                                     }
@@ -398,8 +393,7 @@ impl<'a> ShrRound<u32> for &'a Natural {
                                 } else {
                                     let mut exact = mpn_zero_p(&limbs[0..limbs_to_delete]);
                                     let small_shift = other & LIMB_BITS_MASK;
-                                    let mut result = vec![0; limbs.len() - limbs_to_delete];
-                                    result.copy_from_slice(&limbs[limbs_to_delete..]);
+                                    let mut result = limbs[limbs_to_delete..].to_vec();
                                     if small_shift != 0 {
                                         let remaining_bits =
                                             mpn_rshift_in_place(&mut result, small_shift);
@@ -422,8 +416,7 @@ impl<'a> ShrRound<u32> for &'a Natural {
                                     return Natural::ZERO;
                                 } else {
                                     let small_shift = other & LIMB_BITS_MASK;
-                                    let mut result = vec![0; limbs.len() - limbs_to_delete];
-                                    result.copy_from_slice(&limbs[limbs_to_delete..]);
+                                    let mut result = limbs[limbs_to_delete..].to_vec();
                                     if small_shift != 0 {
                                         mpn_rshift_in_place(&mut result, small_shift);
                                     }

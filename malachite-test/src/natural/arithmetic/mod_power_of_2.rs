@@ -338,7 +338,7 @@ pub fn benchmark_random_natural_complement_mod_power_of_2_assign(
 }
 
 pub fn benchmark_exhaustive_natural_complement_mod_power_of_2(limit: usize, file_name: &str) {
-    println!("benchmarking exhaustive Natural.mod_power_of_2(u32)");
+    println!("benchmarking exhaustive Natural.complement_mod_power_of_2(u32)");
     benchmark_2(BenchmarkOptions2 {
         xs: log_pairs(exhaustive_naturals(), exhaustive_u::<u32>()),
         function_f: &(|(n, u): (gmp::Natural, u32)| n.complement_mod_power_of_2(u)),

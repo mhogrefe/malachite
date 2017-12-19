@@ -54,6 +54,15 @@ fn test_mod_power_of_2() {
     test("1000000000000", 100, "1000000000000");
     test("1000000000000000000000000", 40, "1020608380928");
     test("1000000000000000000000000", 64, "2003764205206896640");
+    test("4294967295", 31, "2147483647");
+    test("4294967295", 32, "4294967295");
+    test("4294967295", 33, "4294967295");
+    test("4294967296", 31, "0");
+    test("4294967296", 32, "0");
+    test("4294967296", 33, "4294967296");
+    test("4294967297", 31, "1");
+    test("4294967297", 32, "1");
+    test("4294967297", 33, "4294967297");
 }
 
 #[test]
@@ -93,6 +102,7 @@ fn test_complement_mod_power_of_2() {
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
     };
+
     test("0", 0, "0");
     test("260", 8, "252");
     test("1611", 4, "5");
@@ -105,6 +115,15 @@ fn test_complement_mod_power_of_2() {
     test("1000000000000", 100, "1267650600228229400496703205376");
     test("1000000000000000000000000", 40, "78903246848");
     test("1000000000000000000000000", 64, "16442979868502654976");
+    test("4294967295", 31, "1");
+    test("4294967295", 32, "1");
+    test("4294967295", 33, "4294967297");
+    test("4294967296", 31, "0");
+    test("4294967296", 32, "0");
+    test("4294967296", 33, "4294967296");
+    test("4294967297", 31, "2147483647");
+    test("4294967297", 32, "4294967295");
+    test("4294967297", 33, "4294967295");
 }
 
 #[test]
@@ -119,7 +138,7 @@ fn mod_power_of_2_properties() {
     //      result.
     // (n >> u << u) + n.mod_power_of_2(u) == n
     // n.mod_power_of_2(u) < (1 << u)
-    // (n.mod_power_of_2(u) == 0) == (n.divisible_by_power_of_2(u))
+    // (n.mod_power_of_2(u) == 0) == n.divisible_by_power_of_2(u)
     // n.mod_power_of_2(u).mod_power_of_2(u) == n.mod_power_of_2(u)
     let natural_and_u32 = |mut gmp_n: gmp::Natural, u: u32| {
         let mut n = gmp_natural_to_native(&gmp_n);
@@ -284,7 +303,7 @@ fn complement_mod_power_of_2_properties() {
     //      (&n).complement_mod_power_of_2(u) give the same result.
     // (n.shr_round(u, Ceiling) << u) - n.complement_mod_power_of_2(u) == n
     // n.complement_mod_power_of_2(u) < (1 << u)
-    // (n.complement_mod_power_of_2(u) == 0) == (n.divisible_by_power_of_2(u))
+    // (n.complement_mod_power_of_2(u) == 0) == n.divisible_by_power_of_2(u)
     // n.complement_mod_power_of_2(u).complement_mod_power_of_2(u) == n.mod_power_of_2(u)
     let natural_and_u32 = |mut gmp_n: gmp::Natural, u: u32| {
         let mut n = gmp_natural_to_native(&gmp_n);

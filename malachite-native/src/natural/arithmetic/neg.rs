@@ -3,7 +3,7 @@ use natural::Natural;
 use std::ops::Neg;
 
 fn neg_and_borrow(x: u32, borrow: &mut bool) -> u32 {
-    let (neg, overflow) = 0u32.overflowing_sub(x);
+    let (neg, overflow) = x.overflowing_neg();
     if *borrow {
         *borrow = overflow;
         let (difference, overflow) = neg.overflowing_sub(1);

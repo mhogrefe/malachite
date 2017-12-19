@@ -35,14 +35,12 @@ impl Natural {
     /// assert_eq!(Natural::from(1611u32).mod_power_of_2_ref(4).to_string(), "11");
     /// ```
     pub fn mod_power_of_2_ref(&self, other: u32) -> Natural {
-        if other == 0 {
+        if other == 0 || *self == 0 {
             Natural::ZERO
-        } else if *self == 0 {
-            self.clone()
         } else {
             match self {
                 &Small(_) if other >= 32 => self.clone(),
-                &Small(ref small) => Small(small & ((1 << other) - 1)),
+                &Small(small) => Small(small & ((1 << other) - 1)),
                 &Large(ref large) => unsafe {
                     let mut result = mem::uninitialized();
                     gmp::mpz_init(&mut result);

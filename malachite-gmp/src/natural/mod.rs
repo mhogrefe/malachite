@@ -19,7 +19,7 @@ pub enum Natural {
 }
 
 impl Natural {
-    fn demote_if_small(&mut self) {
+    pub(crate) fn demote_if_small(&mut self) {
         if let Large(x) = *self {
             if unsafe { gmp::mpz_sizeinbase(&x, 2) } <= 32 {
                 *self = Small((unsafe { gmp::mpz_get_ui(&x) }) as u32)
