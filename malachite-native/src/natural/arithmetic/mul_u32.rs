@@ -236,19 +236,11 @@ impl MulAssign<u32> for Natural {
             self.assign(other);
             return;
         }
-        mutate_with_possible_promotion!(
-            self,
-            small,
-            limbs,
-            {
-                small.checked_mul(other)
-            },
-            {
-                let carry = mpn_mul_1_in_place(limbs, other);
-                if carry != 0 {
-                    limbs.push(carry);
-                }
+        mutate_with_possible_promotion!(self, small, limbs, { small.checked_mul(other) }, {
+            let carry = mpn_mul_1_in_place(limbs, other);
+            if carry != 0 {
+                limbs.push(carry);
             }
-        );
+        });
     }
 }

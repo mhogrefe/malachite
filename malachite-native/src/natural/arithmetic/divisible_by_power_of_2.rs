@@ -38,8 +38,7 @@ impl Natural {
             (&Small(small), pow) => small & ((1 << pow) - 1) == 0,
             (&Large(ref limbs), pow) => {
                 let zero_limbs = (pow >> LOG_LIMB_BITS) as usize;
-                if zero_limbs >= limbs.len() ||
-                    limbs.iter().take(zero_limbs).any(|&limb| limb != 0)
+                if zero_limbs >= limbs.len() || limbs.iter().take(zero_limbs).any(|&limb| limb != 0)
                 {
                     return false;
                 }

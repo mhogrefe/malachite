@@ -2,12 +2,8 @@ use common::LARGE_LIMIT;
 use malachite_base::traits::Assign;
 use malachite_native::integer as native;
 use malachite_gmp::integer as gmp;
-use malachite_test::common::gmp_integer_to_native;
-use rust_wheels::iterators::common::EXAMPLE_SEED;
-use rust_wheels::iterators::general::random_x;
-use rust_wheels::iterators::integers::{exhaustive_integers, random_integers};
-use rust_wheels::iterators::primitive_ints::exhaustive_i;
-use rust_wheels::iterators::tuples::{exhaustive_pairs, random_pairs};
+use malachite_test::common::{gmp_integer_to_native, GenerationMode};
+use malachite_test::integer::conversion::assign_i64::select_inputs;
 use std::str::FromStr;
 
 #[test]
@@ -51,16 +47,11 @@ fn assign_i64_properties() {
         assert_eq!(alt_n, n);
     };
 
-    for (n, i) in exhaustive_pairs(exhaustive_integers(), exhaustive_i::<i64>()).take(LARGE_LIMIT) {
+    for (n, i) in select_inputs(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         integer_and_i64(n, i);
     }
 
-    for (n, i) in random_pairs(
-        &EXAMPLE_SEED,
-        &(|seed| random_integers(seed, 32)),
-        &(|seed| random_x::<i64>(seed)),
-    ).take(LARGE_LIMIT)
-    {
+    for (n, i) in select_inputs(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         integer_and_i64(n, i);
     }
 }

@@ -2,16 +2,15 @@ use common::LARGE_LIMIT;
 use malachite_native::integer as native;
 use malachite_gmp::integer as gmp;
 use malachite_test::common::{gmp_integer_to_native, native_integer_to_num_bigint,
-                             native_integer_to_rugint};
-use malachite_test::integer::comparison::partial_ord_i32::num_partial_cmp_i32;
+                             native_integer_to_rugint, GenerationMode};
+use malachite_test::integer::comparison::partial_ord_i32::{num_partial_cmp_i32, select_inputs_1};
 use num;
 use rugint;
 use rust_wheels::iterators::common::EXAMPLE_SEED;
 use rust_wheels::iterators::general::random_x;
 use rust_wheels::iterators::integers::{exhaustive_integers, random_integers};
 use rust_wheels::iterators::primitive_ints::exhaustive_i;
-use rust_wheels::iterators::tuples::{exhaustive_pairs, exhaustive_triples, random_pairs,
-                                     random_triples};
+use rust_wheels::iterators::tuples::{exhaustive_triples, random_triples};
 use std::cmp::Ordering;
 use std::str::FromStr;
 
@@ -103,16 +102,11 @@ fn partial_cmp_i32_properties() {
         }
     };
 
-    for (n, i) in exhaustive_pairs(exhaustive_integers(), exhaustive_i::<i32>()).take(LARGE_LIMIT) {
+    for (n, i) in select_inputs_1(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         integer_and_i32(n, i);
     }
 
-    for (n, i) in random_pairs(
-        &EXAMPLE_SEED,
-        &(|seed| random_integers(seed, 32)),
-        &(|seed| random_x::<i32>(seed)),
-    ).take(LARGE_LIMIT)
-    {
+    for (n, i) in select_inputs_1(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         integer_and_i32(n, i);
     }
 

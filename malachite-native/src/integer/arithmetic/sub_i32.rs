@@ -79,19 +79,15 @@ impl<'a> Sub<i32> for &'a Integer {
                 abs: abs + abs_other,
             },
             // e.g. 10 - 5, -10 - -5, or 5 - 5; sign of self is unchanged
-            Integer { sign, ref abs } if sign && *abs == abs_other || *abs > abs_other => {
-                Integer {
-                    sign: sign,
-                    abs: (abs - abs_other).unwrap(),
-                }
-            }
+            Integer { sign, ref abs } if sign && *abs == abs_other || *abs > abs_other => Integer {
+                sign: sign,
+                abs: (abs - abs_other).unwrap(),
+            },
             // e.g. 5 - 10, -5 - -10, or -5 - -5; sign of self is flipped
-            Integer { ref sign, ref abs } => {
-                Integer {
-                    sign: !sign,
-                    abs: Natural::from(abs_other - abs.to_u32().unwrap()),
-                }
-            }
+            Integer { ref sign, ref abs } => Integer {
+                sign: !sign,
+                abs: Natural::from(abs_other - abs.to_u32().unwrap()),
+            },
         }
     }
 }

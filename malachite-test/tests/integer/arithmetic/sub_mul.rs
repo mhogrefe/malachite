@@ -1,12 +1,12 @@
 use common::LARGE_LIMIT;
-use malachite_base::traits::{SubMul, SubMulAssign, NegativeOne, One, Zero};
+use malachite_base::traits::{NegativeOne, One, SubMul, SubMulAssign, Zero};
 use malachite_native::integer as native;
 use malachite_gmp::integer as gmp;
-use malachite_test::common::{gmp_integer_to_native, native_integer_to_gmp};
+use malachite_test::common::{gmp_integer_to_native, native_integer_to_gmp, GenerationMode};
+use malachite_test::integer::arithmetic::sub_mul::select_inputs;
 use rust_wheels::iterators::common::EXAMPLE_SEED;
 use rust_wheels::iterators::integers::{exhaustive_integers, random_integers};
-use rust_wheels::iterators::tuples::{exhaustive_pairs_from_single, exhaustive_triples_from_single,
-                                     random_pairs_from_single, random_triples_from_single};
+use rust_wheels::iterators::tuples::{exhaustive_pairs_from_single, random_pairs_from_single};
 use std::str::FromStr;
 
 #[test]
@@ -486,13 +486,11 @@ fn sub_mul_properties() {
         assert_eq!((a * b).sub_mul(-a, -b), 0);
     };
 
-    for (a, b, c) in exhaustive_triples_from_single(exhaustive_integers()).take(LARGE_LIMIT) {
+    for (a, b, c) in select_inputs(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         three_integers(a, b, c);
     }
 
-    for (a, b, c) in random_triples_from_single(random_integers(&EXAMPLE_SEED, 32))
-        .take(LARGE_LIMIT)
-    {
+    for (a, b, c) in select_inputs(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         three_integers(a, b, c);
     }
 

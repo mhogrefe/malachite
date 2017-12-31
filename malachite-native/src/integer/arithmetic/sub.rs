@@ -149,32 +149,44 @@ impl<'a, 'b> Sub<&'a Integer> for &'b Integer {
         } else {
             match (self, other) {
                 // e.g. 10 - -5 or -10 - 5; sign of result is sign of self
-                (&Integer {
-                     sign: sx,
-                     abs: ref ax,
-                 },
-                 &Integer {
-                     sign: sy,
-                     abs: ref ay,
-                 }) if sx == (!sy && *ay != 0) => Integer {
-                    sign: sx,
-                    abs: ax + ay,
-                },
+                (
+                    &Integer {
+                        sign: sx,
+                        abs: ref ax,
+                    },
+                    &Integer {
+                        sign: sy,
+                        abs: ref ay,
+                    },
+                ) if sx == (!sy && *ay != 0) =>
+                {
+                    Integer {
+                        sign: sx,
+                        abs: ax + ay,
+                    }
+                }
                 // e.g. 10 - 5, -10 - -5, or 5 - 5; sign of result is sign of self
-                (&Integer {
-                     sign: sx,
-                     abs: ref ax,
-                 },
-                 &Integer { abs: ref ay, .. }) if sx && *ax == *ay || *ax > *ay => Integer {
-                    sign: sx,
-                    abs: (ax - ay).unwrap(),
-                },
+                (
+                    &Integer {
+                        sign: sx,
+                        abs: ref ax,
+                    },
+                    &Integer { abs: ref ay, .. },
+                ) if sx && *ax == *ay || *ax > *ay =>
+                {
+                    Integer {
+                        sign: sx,
+                        abs: (ax - ay).unwrap(),
+                    }
+                }
                 // e.g. 5 - 10, -5 - -10, or -5 - -5; sign of result is opposite of sign of other
-                (&Integer { abs: ref ax, .. },
-                 &Integer {
-                     sign: sy,
-                     abs: ref ay,
-                 }) => Integer {
+                (
+                    &Integer { abs: ref ax, .. },
+                    &Integer {
+                        sign: sy,
+                        abs: ref ay,
+                    },
+                ) => Integer {
                     sign: !sy,
                     abs: (ay - ax).unwrap(),
                 },
@@ -219,16 +231,26 @@ impl SubAssign<Integer> for Integer {
             return;
         }
         let add_strategy = match (&mut (*self), &other) {
-            (&mut Integer { sign: sx, .. },
-             &Integer {
-                 sign: sy,
-                 abs: ref ay,
-             }) if sx == (!sy && *ay != 0) => 0,
-            (&mut Integer {
-                 sign: sx,
-                 abs: ref mut ax,
-             },
-             &Integer { abs: ref ay, .. }) if sx && *ax == *ay || *ax > *ay => 1,
+            (
+                &mut Integer { sign: sx, .. },
+                &Integer {
+                    sign: sy,
+                    abs: ref ay,
+                },
+            ) if sx == (!sy && *ay != 0) =>
+            {
+                0
+            }
+            (
+                &mut Integer {
+                    sign: sx,
+                    abs: ref mut ax,
+                },
+                &Integer { abs: ref ay, .. },
+            ) if sx && *ax == *ay || *ax > *ay =>
+            {
+                1
+            }
             _ => 2,
         };
         match add_strategy {
@@ -281,16 +303,26 @@ impl<'a> SubAssign<&'a Integer> for Integer {
             return;
         }
         let add_strategy = match (&mut (*self), other) {
-            (&mut Integer { sign: sx, .. },
-             &Integer {
-                 sign: sy,
-                 abs: ref ay,
-             }) if sx == (!sy && *ay != 0) => 0,
-            (&mut Integer {
-                 sign: sx,
-                 abs: ref mut ax,
-             },
-             &Integer { abs: ref ay, .. }) if sx && *ax == *ay || *ax > *ay => 1,
+            (
+                &mut Integer { sign: sx, .. },
+                &Integer {
+                    sign: sy,
+                    abs: ref ay,
+                },
+            ) if sx == (!sy && *ay != 0) =>
+            {
+                0
+            }
+            (
+                &mut Integer {
+                    sign: sx,
+                    abs: ref mut ax,
+                },
+                &Integer { abs: ref ay, .. },
+            ) if sx && *ax == *ay || *ax > *ay =>
+            {
+                1
+            }
             _ => 2,
         };
         match add_strategy {

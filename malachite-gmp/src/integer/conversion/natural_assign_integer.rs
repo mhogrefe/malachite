@@ -81,18 +81,16 @@ impl<'a> Assign<&'a Integer> for Natural {
             Integer::Large(ref y) if unsafe { gmp::mpz_sizeinbase(y, 2) <= 32 } => {
                 *self = Natural::Small(unsafe { gmp::mpz_get_ui(y) } as u32)
             }
-            Integer::Large(ref y) => {
-                match *self {
-                    Natural::Small(_) => unsafe {
-                        let mut assigned: mpz_t = mem::uninitialized();
-                        gmp::mpz_init_set(&mut assigned, y);
-                        *self = Natural::Large(assigned);
-                    },
-                    Natural::Large(ref mut x) => unsafe {
-                        gmp::mpz_set(x, y);
-                    },
-                }
-            }
+            Integer::Large(ref y) => match *self {
+                Natural::Small(_) => unsafe {
+                    let mut assigned: mpz_t = mem::uninitialized();
+                    gmp::mpz_init_set(&mut assigned, y);
+                    *self = Natural::Large(assigned);
+                },
+                Natural::Large(ref mut x) => unsafe {
+                    gmp::mpz_set(x, y);
+                },
+            },
         }
     }
 }

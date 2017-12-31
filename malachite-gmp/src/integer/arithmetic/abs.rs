@@ -1,7 +1,7 @@
 use gmp_mpfr_sys::gmp::{self, mpz_t};
 use integer::Integer;
 use natural::Natural;
-use std::{i32, mem};
+use std::{mem, i32};
 use malachite_base::traits::AbsAssign;
 
 impl Integer {

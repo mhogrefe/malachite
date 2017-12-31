@@ -4,15 +4,16 @@ use malachite_native::natural as native;
 use malachite_gmp::natural as gmp;
 use malachite_test::common::{gmp_natural_to_native, native_natural_to_gmp,
                              native_natural_to_num_biguint, native_natural_to_rugint_integer,
-                             num_biguint_to_native_natural, rugint_integer_to_native_natural};
+                             num_biguint_to_native_natural, rugint_integer_to_native_natural,
+                             GenerationMode};
+use malachite_test::natural::arithmetic::shl_u32::select_inputs;
 use num;
 use rugint;
 use rust_wheels::iterators::common::EXAMPLE_SEED;
 use rust_wheels::iterators::integers_geometric::natural_u32s_geometric;
 use rust_wheels::iterators::naturals::{exhaustive_naturals, random_naturals};
 use rust_wheels::iterators::primitive_ints::exhaustive_u;
-use rust_wheels::iterators::tuples::{exhaustive_pairs_from_single, log_pairs, random_pairs,
-                                     random_triples};
+use rust_wheels::iterators::tuples::{exhaustive_pairs_from_single, log_pairs, random_triples};
 use std::str::FromStr;
 
 #[test]
@@ -160,16 +161,11 @@ fn shl_u32_properties() {
         assert!((native::Natural::ONE << u).is_power_of_2());
     };
 
-    for (n, u) in log_pairs(exhaustive_naturals(), exhaustive_u::<u32>()).take(LARGE_LIMIT) {
+    for (n, u) in select_inputs(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         natural_and_u32(n, u);
     }
 
-    for (n, u) in random_pairs(
-        &EXAMPLE_SEED,
-        &(|seed| random_naturals(seed, 32)),
-        &(|seed| natural_u32s_geometric(seed, 32)),
-    ).take(LARGE_LIMIT)
-    {
+    for (n, u) in select_inputs(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         natural_and_u32(n, u);
     }
 

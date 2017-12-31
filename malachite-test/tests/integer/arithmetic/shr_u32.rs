@@ -4,8 +4,9 @@ use malachite_base::traits::{PartialOrdAbs, ShrRound, ShrRoundAssign, Zero};
 use malachite_native::integer as native;
 use malachite_gmp::integer as gmp;
 use malachite_test::common::{gmp_integer_to_native, native_integer_to_gmp,
-                             native_integer_to_rugint, rugint_integer_to_native};
+                             native_integer_to_rugint, rugint_integer_to_native, GenerationMode};
 use rugint;
+use malachite_test::integer::arithmetic::shr_u32::{select_inputs_1, select_inputs_2};
 use rust_wheels::iterators::common::EXAMPLE_SEED;
 use rust_wheels::iterators::general::random_x;
 use rust_wheels::iterators::integers_geometric::natural_u32s_geometric;
@@ -13,7 +14,7 @@ use rust_wheels::iterators::integers::{exhaustive_integers, random_integers};
 use rust_wheels::iterators::primitive_ints::{exhaustive_negative_i, exhaustive_positive_x,
                                              exhaustive_u, random_negative_i, random_positive_i};
 use rust_wheels::iterators::rounding_modes::{exhaustive_rounding_modes, random_rounding_modes};
-use rust_wheels::iterators::tuples::{exhaustive_pairs_from_single, lex_pairs, log_pairs,
+use rust_wheels::iterators::tuples::{exhaustive_pairs_from_single, log_pairs,
                                      log_pairs_from_single, random_pairs, random_triples};
 use std::str::FromStr;
 
@@ -216,16 +217,11 @@ fn shr_u32_properties() {
         assert_eq!(native::Integer::ZERO >> u, 0);
     };
 
-    for (n, u) in log_pairs(exhaustive_integers(), exhaustive_u::<u32>()).take(LARGE_LIMIT) {
+    for (n, u) in select_inputs_1(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         integer_and_u32(n, u);
     }
 
-    for (n, u) in random_pairs(
-        &EXAMPLE_SEED,
-        &(|seed| random_integers(seed, 32)),
-        &(|seed| natural_u32s_geometric(seed, 32)),
-    ).take(LARGE_LIMIT)
-    {
+    for (n, u) in select_inputs_1(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         integer_and_u32(n, u);
     }
 
@@ -1418,19 +1414,17 @@ fn shr_round_u32_fail_gmp_2() {
 #[test]
 #[should_panic(expected = "Right shift is not exact: 1000000000001 >>= 1")]
 fn shr_round_u32_fail_gmp_3() {
-    gmp::Integer::from_str("1000000000001").unwrap().shr_round(
-        1u32,
-        RoundingMode::Exact,
-    );
+    gmp::Integer::from_str("1000000000001")
+        .unwrap()
+        .shr_round(1u32, RoundingMode::Exact);
 }
 
 #[test]
 #[should_panic(expected = "Right shift is not exact: 1000000000001 >>= 100")]
 fn shr_round_u32_fail_gmp_4() {
-    gmp::Integer::from_str("1000000000001").unwrap().shr_round(
-        100u32,
-        RoundingMode::Exact,
-    );
+    gmp::Integer::from_str("1000000000001")
+        .unwrap()
+        .shr_round(100u32, RoundingMode::Exact);
 }
 
 #[test]
@@ -1632,32 +1626,15 @@ fn shr_round_u32_properties() {
         integer_and_u32_inexact(n, u);
     }
 
-    for ((n, u), rm) in lex_pairs(
-        log_pairs(exhaustive_integers(), exhaustive_u::<u32>()),
-        exhaustive_rounding_modes(),
-    ).filter(|&((ref n, u), rm)| {
-        rm != RoundingMode::Exact || n.divisible_by_power_of_2(u.into())
-    })
-        .take(LARGE_LIMIT)
-    {
+    for (n, u, rm) in select_inputs_2(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         integer_u32_and_rounding_mode(n, u, rm);
     }
 
-    for (n, u, rm) in random_triples(
-        &EXAMPLE_SEED,
-        &(|seed| random_integers(seed, 32)),
-        &(|seed| natural_u32s_geometric(seed, 32)),
-        &(|seed| random_rounding_modes(seed)),
-    ).filter(|&(ref n, u, rm)| {
-        rm != RoundingMode::Exact || n.divisible_by_power_of_2(u.into())
-    })
-        .take(LARGE_LIMIT)
-    {
+    for (n, u, rm) in select_inputs_2(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         integer_u32_and_rounding_mode(n, u, rm);
     }
 
-    for (n, u) in log_pairs(exhaustive_positive_x::<i32>(), exhaustive_u::<u32>())
-        .take(LARGE_LIMIT)
+    for (n, u) in log_pairs(exhaustive_positive_x::<i32>(), exhaustive_u::<u32>()).take(LARGE_LIMIT)
     {
         positive_i32_and_u32(n, u);
     }

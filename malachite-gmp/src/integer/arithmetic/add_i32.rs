@@ -58,27 +58,21 @@ impl<'a> Add<i32> for &'a Integer {
             return self.clone();
         }
         match *self {
-            Small(small) => {
-                match small.checked_add(other) {
-                    Some(sum) => Small(sum),
-                    None => unsafe {
-                        let mut result: mpz_t = mem::uninitialized();
-                        gmp::mpz_init_set_si(&mut result, small.into());
-                        if other > 0 {
-                            gmp::mpz_add_ui(&mut result, &result, other as u64);
-                        } else {
-                            gmp::mpz_sub_ui(
-                                &mut result,
-                                &result,
-                                (other.wrapping_abs() as u32).into(),
-                            );
-                        }
-                        let mut result = Large(result);
-                        result.demote_if_small();
-                        result
-                    },
-                }
-            }
+            Small(small) => match small.checked_add(other) {
+                Some(sum) => Small(sum),
+                None => unsafe {
+                    let mut result: mpz_t = mem::uninitialized();
+                    gmp::mpz_init_set_si(&mut result, small.into());
+                    if other > 0 {
+                        gmp::mpz_add_ui(&mut result, &result, other as u64);
+                    } else {
+                        gmp::mpz_sub_ui(&mut result, &result, (other.wrapping_abs() as u32).into());
+                    }
+                    let mut result = Large(result);
+                    result.demote_if_small();
+                    result
+                },
+            },
             Large(ref large) => unsafe {
                 let mut result: mpz_t = mem::uninitialized();
                 gmp::mpz_init_set(&mut result, large);
@@ -174,21 +168,13 @@ impl AddAssign<i32> for Integer {
         if other == 0 {
             return;
         }
-        mutate_with_possible_promotion!(
-            self,
-            small,
-            large,
-            {
-                small.checked_add(other)
-            },
-            {
-                if other > 0 {
-                    unsafe { gmp::mpz_add_ui(large, large, other as u64) }
-                } else {
-                    unsafe { gmp::mpz_sub_ui(large, large, (other.wrapping_abs() as u32).into()) }
-                }
+        mutate_with_possible_promotion!(self, small, large, { small.checked_add(other) }, {
+            if other > 0 {
+                unsafe { gmp::mpz_add_ui(large, large, other as u64) }
+            } else {
+                unsafe { gmp::mpz_sub_ui(large, large, (other.wrapping_abs() as u32).into()) }
             }
-        );
+        });
         self.demote_if_small();
     }
 }

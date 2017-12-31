@@ -30,13 +30,13 @@ impl Natural {
         match *self {
             Small(small) => small != 0 && small & (small - 1) == 0,
             Large(ref limbs) => {
-                limbs.into_iter().take(limbs.len() - 1).all(
-                    |&limb| limb == 0,
-                ) &&
-                    {
-                        let last = limbs.last().unwrap();
-                        last & (last - 1) == 0
-                    }
+                limbs
+                    .into_iter()
+                    .take(limbs.len() - 1)
+                    .all(|&limb| limb == 0) && {
+                    let last = limbs.last().unwrap();
+                    last & (last - 1) == 0
+                }
             }
         }
     }

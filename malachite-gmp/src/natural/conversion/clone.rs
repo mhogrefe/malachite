@@ -34,24 +34,20 @@ impl Clone for Natural {
 
     fn clone_from(&mut self, source: &Natural) {
         match *source {
-            Small(y) => {
-                match *self {
-                    Small(ref mut x) => *x = y,
-                    Large(_) => *self = Small(y),
-                }
-            }
-            Large(ref y) => {
-                match *self {
-                    Small(_) => unsafe {
-                        let mut assigned: mpz_t = mem::uninitialized();
-                        gmp::mpz_init_set(&mut assigned, y);
-                        *self = Large(assigned);
-                    },
-                    Large(ref mut x) => unsafe {
-                        gmp::mpz_set(x, y);
-                    },
-                }
-            }
+            Small(y) => match *self {
+                Small(ref mut x) => *x = y,
+                Large(_) => *self = Small(y),
+            },
+            Large(ref y) => match *self {
+                Small(_) => unsafe {
+                    let mut assigned: mpz_t = mem::uninitialized();
+                    gmp::mpz_init_set(&mut assigned, y);
+                    *self = Large(assigned);
+                },
+                Large(ref mut x) => unsafe {
+                    gmp::mpz_set(x, y);
+                },
+            },
         }
     }
 }

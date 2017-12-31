@@ -61,17 +61,15 @@ impl<'a> Mul<u32> for &'a Natural {
             return self.clone();
         }
         match *self {
-            Small(small) => {
-                match small.checked_mul(other) {
-                    Some(product) => Small(product),
-                    None => unsafe {
-                        let mut result: mpz_t = mem::uninitialized();
-                        gmp::mpz_init_set_ui(&mut result, small.into());
-                        gmp::mpz_mul_ui(&mut result, &result, other.into());
-                        Large(result)
-                    },
-                }
-            }
+            Small(small) => match small.checked_mul(other) {
+                Some(product) => Small(product),
+                None => unsafe {
+                    let mut result: mpz_t = mem::uninitialized();
+                    gmp::mpz_init_set_ui(&mut result, small.into());
+                    gmp::mpz_mul_ui(&mut result, &result, other.into());
+                    Large(result)
+                },
+            },
             Large(ref large) => unsafe {
                 let mut result: mpz_t = mem::uninitialized();
                 gmp::mpz_init_set(&mut result, large);
@@ -164,16 +162,8 @@ impl MulAssign<u32> for Natural {
         } else if other == 1 {
             return;
         }
-        mutate_with_possible_promotion!(
-            self,
-            small,
-            large,
-            {
-                small.checked_mul(other)
-            },
-            {
-                unsafe { gmp::mpz_mul_ui(large, large, other.into()) }
-            }
-        );
+        mutate_with_possible_promotion!(self, small, large, { small.checked_mul(other) }, {
+            unsafe { gmp::mpz_mul_ui(large, large, other.into()) }
+        });
     }
 }

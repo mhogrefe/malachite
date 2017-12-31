@@ -1,11 +1,9 @@
 use common::LARGE_LIMIT;
 use malachite_native::integer as native;
 use malachite_gmp::integer as gmp;
-use malachite_test::common::{gmp_integer_to_native, num_bigint_to_native_integer};
+use malachite_test::common::{gmp_integer_to_native, num_bigint_to_native_integer, GenerationMode};
+use malachite_test::integer::conversion::from_i64::select_inputs;
 use num;
-use rust_wheels::iterators::common::EXAMPLE_SEED;
-use rust_wheels::iterators::general::random_x;
-use rust_wheels::iterators::primitive_ints::exhaustive_i;
 
 #[test]
 fn test_from_i64() {
@@ -46,11 +44,11 @@ fn from_i64_properties() {
         assert_eq!(n, num_n);
     };
 
-    for i in exhaustive_i().take(LARGE_LIMIT) {
+    for i in select_inputs(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         one_i64(i);
     }
 
-    for i in random_x(&EXAMPLE_SEED).take(LARGE_LIMIT) {
+    for i in select_inputs(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         one_i64(i);
     }
 }

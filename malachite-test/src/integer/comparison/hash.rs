@@ -1,4 +1,4 @@
-use common::{gmp_integer_to_native, gmp_integer_to_num_bigint};
+use common::{gmp_integer_to_native, gmp_integer_to_num_bigint, GenerationMode};
 use malachite_gmp::integer as gmp;
 use malachite_native::integer as native;
 use num;
@@ -8,67 +8,42 @@ use rust_wheels::iterators::integers::{exhaustive_integers, random_integers};
 use std::collections::hash_map::DefaultHasher;
 use std::hash::{Hash, Hasher};
 
-fn native_hash(n: &native::Integer) -> u64 {
+fn hash<T: Hash>(n: &T) -> u64 {
     let mut s = DefaultHasher::new();
     n.hash(&mut s);
     s.finish()
 }
 
-fn gmp_hash(n: &gmp::Integer) -> u64 {
-    let mut s = DefaultHasher::new();
-    n.hash(&mut s);
-    s.finish()
+type It = Iterator<Item = gmp::Integer>;
+
+pub fn exhaustive_inputs() -> Box<It> {
+    Box::new(exhaustive_integers())
 }
 
-fn num_hash(n: &num::BigInt) -> u64 {
-    let mut s = DefaultHasher::new();
-    n.hash(&mut s);
-    s.finish()
+pub fn random_inputs(scale: u32) -> Box<It> {
+    Box::new(random_integers(&EXAMPLE_SEED, scale))
 }
 
-pub fn demo_exhaustive_integer_hash(limit: usize) {
-    for n in exhaustive_integers().take(limit) {
-        let hash = gmp_hash(&n);
-        println!("hash({}) = {}", n, hash);
+pub fn select_inputs(gm: GenerationMode) -> Box<It> {
+    match gm {
+        GenerationMode::Exhaustive => exhaustive_inputs(),
+        GenerationMode::Random(scale) => random_inputs(scale),
     }
 }
 
-pub fn demo_random_integer_hash(limit: usize) {
-    for n in random_integers(&EXAMPLE_SEED, 32).take(limit) {
-        let hash = gmp_hash(&n);
-        println!("hash({}) = {}", n, hash);
+pub fn demo_integer_hash(gm: GenerationMode, limit: usize) {
+    for n in select_inputs(gm).take(limit) {
+        println!("hash({}) = {}", n, hash(&n));
     }
 }
 
-pub fn benchmark_exhaustive_integer_hash(limit: usize, file_name: &str) {
-    println!("benchmarking exhaustive Integer hash");
+pub fn benchmark_integer_hash(gm: GenerationMode, limit: usize, file_name: &str) {
+    println!("benchmarking {} Integer hash", gm.name());
     benchmark_3(BenchmarkOptions3 {
-        xs: exhaustive_integers(),
-        function_f: &(|n| gmp_hash(&n)),
-        function_g: &(|n: native::Integer| native_hash(&n)),
-        function_h: &(|n: num::BigInt| num_hash(&n)),
-        x_cons: &(|x| x.clone()),
-        y_cons: &(|x| gmp_integer_to_native(x)),
-        z_cons: &(|x| gmp_integer_to_num_bigint(x)),
-        x_param: &(|n| n.significant_bits() as usize),
-        limit,
-        f_name: "malachite-gmp",
-        g_name: "malachite-native",
-        h_name: "num",
-        title: "Integer hash",
-        x_axis_label: "n.significant\\\\_bits()",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
-}
-
-pub fn benchmark_random_integer_hash(limit: usize, scale: u32, file_name: &str) {
-    println!("benchmarking random Integer hash");
-    benchmark_3(BenchmarkOptions3 {
-        xs: random_integers(&EXAMPLE_SEED, scale),
-        function_f: &(|n| gmp_hash(&n)),
-        function_g: &(|n: native::Integer| native_hash(&n)),
-        function_h: &(|n: num::BigInt| num_hash(&n)),
+        xs: select_inputs(gm),
+        function_f: &(|n| hash(&n)),
+        function_g: &(|n: native::Integer| hash(&n)),
+        function_h: &(|n: num::BigInt| hash(&n)),
         x_cons: &(|x| x.clone()),
         y_cons: &(|x| gmp_integer_to_native(x)),
         z_cons: &(|x| gmp_integer_to_num_bigint(x)),

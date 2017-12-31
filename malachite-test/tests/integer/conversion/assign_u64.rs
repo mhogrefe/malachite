@@ -2,14 +2,9 @@ use common::LARGE_LIMIT;
 use malachite_base::traits::Assign;
 use malachite_native::integer as native;
 use malachite_gmp::integer as gmp;
-use malachite_test::common::gmp_integer_to_native;
-use malachite_test::integer::conversion::assign_u64::num_assign_u64;
+use malachite_test::common::{gmp_integer_to_native, GenerationMode};
+use malachite_test::integer::conversion::assign_u64::{select_inputs, num_assign_u64};
 use num;
-use rust_wheels::iterators::common::EXAMPLE_SEED;
-use rust_wheels::iterators::general::random_x;
-use rust_wheels::iterators::integers::{exhaustive_integers, random_integers};
-use rust_wheels::iterators::primitive_ints::exhaustive_u;
-use rust_wheels::iterators::tuples::{exhaustive_pairs, random_pairs};
 use std::str::FromStr;
 
 #[test]
@@ -55,16 +50,11 @@ fn assign_u64_properties() {
         assert_eq!(alt_n, n);
     };
 
-    for (n, u) in exhaustive_pairs(exhaustive_integers(), exhaustive_u::<u64>()).take(LARGE_LIMIT) {
+    for (n, u) in select_inputs(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         integer_and_u64(n, u);
     }
 
-    for (n, u) in random_pairs(
-        &EXAMPLE_SEED,
-        &(|seed| random_integers(seed, 32)),
-        &(|seed| random_x::<u64>(seed)),
-    ).take(LARGE_LIMIT)
-    {
+    for (n, u) in select_inputs(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         integer_and_u64(n, u);
     }
 }

@@ -8,32 +8,28 @@ impl Integer {
     pub fn div_rem_in_place(&mut self, val: &mut Integer) {
         assert_ne!(val.sign(), Ordering::Equal, "division by zero");
         match *self {
-            Small(ref mut x) => {
-                match *val {
-                    Small(y) => {
-                        let quotient = *x / y;
-                        *val = Small(*x % y);
-                        *x = quotient;
-                    }
-                    Large(_) => {
-                        *x = 0;
-                    }
+            Small(ref mut x) => match *val {
+                Small(y) => {
+                    let quotient = *x / y;
+                    *val = Small(*x % y);
+                    *x = quotient;
                 }
-            }
-            Large(ref mut x) => {
-                match *val {
-                    Small(y) => {
-                        let mut r = Integer::new_mpz_t();
-                        unsafe {
-                            gmp::mpz_tdiv_qr_ui(x, &mut r, x, y as u64);
-                        };
-                        val.assign_mpz_t(r);
-                    }
-                    Large(ref mut y) => unsafe {
-                        gmp::mpz_tdiv_qr(x, y, x, y);
-                    },
+                Large(_) => {
+                    *x = 0;
                 }
-            }
+            },
+            Large(ref mut x) => match *val {
+                Small(y) => {
+                    let mut r = Integer::new_mpz_t();
+                    unsafe {
+                        gmp::mpz_tdiv_qr_ui(x, &mut r, x, y as u64);
+                    };
+                    val.assign_mpz_t(r);
+                }
+                Large(ref mut y) => unsafe {
+                    gmp::mpz_tdiv_qr(x, y, x, y);
+                },
+            },
         }
     }
 }

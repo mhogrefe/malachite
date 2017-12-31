@@ -2,7 +2,7 @@ use gmp_mpfr_sys::gmp;
 use malachite_base::traits::{Assign, Zero};
 use integer::Integer;
 use natural::Natural;
-use std::{i32, mem};
+use std::{mem, i32};
 
 impl Integer {
     /// Takes a `Integer` mod a power of 2, taking the `Integer` by value. In other words, returns

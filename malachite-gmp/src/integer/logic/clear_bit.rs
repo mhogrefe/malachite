@@ -37,9 +37,7 @@ impl Integer {
                     Some(*small)
                 }
             },
-            {
-                unsafe { gmp::mpz_clrbit(large, index) }
-            }
+            { unsafe { gmp::mpz_clrbit(large, index) } }
         );
         self.demote_if_small();
     }

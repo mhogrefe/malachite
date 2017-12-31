@@ -1,12 +1,10 @@
 use common::LARGE_LIMIT;
 use malachite_native::integer as native;
 use malachite_gmp::integer as gmp;
-use malachite_test::common::gmp_integer_to_native;
-use malachite_test::integer::comparison::sign::num_sign;
+use malachite_test::common::{gmp_integer_to_native, GenerationMode};
+use malachite_test::integer::comparison::sign::{num_sign, select_inputs};
 use num;
 use rugint;
-use rust_wheels::iterators::common::EXAMPLE_SEED;
-use rust_wheels::iterators::integers::{exhaustive_integers, random_integers};
 use std::cmp::Ordering;
 use std::str::FromStr;
 
@@ -38,11 +36,11 @@ fn sign_properties() {
         assert_eq!((-n).sign(), sign.reverse());
     };
 
-    for n in exhaustive_integers().take(LARGE_LIMIT) {
+    for n in select_inputs(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         one_integer(n);
     }
 
-    for n in random_integers(&EXAMPLE_SEED, 32).take(LARGE_LIMIT) {
+    for n in select_inputs(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         one_integer(n);
     }
 }

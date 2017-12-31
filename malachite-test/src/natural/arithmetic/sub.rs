@@ -1,4 +1,6 @@
-use common::{gmp_natural_to_native, gmp_natural_to_num_biguint, gmp_natural_to_rugint_integer};
+use common::{gmp_natural_to_native, gmp_natural_to_num_biguint, gmp_natural_to_rugint_integer,
+             GenerationMode};
+use malachite_gmp::natural as gmp;
 use malachite_native::natural as native;
 use num;
 use rugint;
@@ -19,63 +21,76 @@ pub fn num_sub(mut x: num::BigUint, y: num::BigUint) -> Option<num::BigUint> {
 }
 
 pub fn rugint_sub(x: rugint::Integer, y: rugint::Integer) -> Option<rugint::Integer> {
-    if x >= y { Some(x - y) } else { None }
+    if x >= y {
+        Some(x - y)
+    } else {
+        None
+    }
 }
 
+type It1 = Iterator<Item = (gmp::Natural, gmp::Natural)>;
+
 //TODO use subset_pairs
-pub fn demo_exhaustive_natural_sub_assign(limit: usize) {
-    for (mut x, y) in exhaustive_pairs_from_single(exhaustive_naturals())
-        .filter(|&(ref x, ref y)| x >= y)
-        .take(limit)
-    {
+pub fn exhaustive_inputs_1() -> Box<It1> {
+    Box::new(exhaustive_inputs_2().filter(|&(ref x, ref y)| x >= y))
+}
+
+pub fn random_inputs_1(scale: u32) -> Box<It1> {
+    Box::new(random_inputs_2(scale).filter(|&(ref x, ref y)| x >= y))
+}
+
+pub fn select_inputs_1(gm: GenerationMode) -> Box<It1> {
+    match gm {
+        GenerationMode::Exhaustive => exhaustive_inputs_1(),
+        GenerationMode::Random(scale) => random_inputs_1(scale),
+    }
+}
+
+type It2 = Iterator<Item = (gmp::Natural, gmp::Natural)>;
+
+pub fn exhaustive_inputs_2() -> Box<It2> {
+    Box::new(exhaustive_pairs_from_single(exhaustive_naturals()))
+}
+
+pub fn random_inputs_2(scale: u32) -> Box<It2> {
+    Box::new(random_pairs_from_single(random_naturals(
+        &EXAMPLE_SEED,
+        scale,
+    )))
+}
+
+pub fn select_inputs_2(gm: GenerationMode) -> Box<It2> {
+    match gm {
+        GenerationMode::Exhaustive => exhaustive_inputs_2(),
+        GenerationMode::Random(scale) => random_inputs_2(scale),
+    }
+}
+
+pub fn demo_natural_sub_assign(gm: GenerationMode, limit: usize) {
+    for (mut x, y) in select_inputs_1(gm).take(limit) {
         let x_old = x.clone();
         x -= &y;
         println!("x := {}; x -= &{}; x = {}", x_old, y, x);
     }
 }
 
-pub fn demo_random_natural_sub_assign(limit: usize) {
-    for (mut x, y) in random_pairs_from_single(random_naturals(&EXAMPLE_SEED, 32))
-        .filter(|&(ref x, ref y)| x >= y)
-        .take(limit)
-    {
-        let x_old = x.clone();
-        x -= &y;
-        println!("x := {}; x -= &{}; x = {}", x_old, y, x);
-    }
-}
-
-pub fn demo_exhaustive_natural_sub(limit: usize) {
-    for (x, y) in exhaustive_pairs_from_single(exhaustive_naturals()).take(limit) {
+pub fn demo_natural_sub(gm: GenerationMode, limit: usize) {
+    for (x, y) in select_inputs_2(gm).take(limit) {
         let x_old = x.clone();
         println!("{} - &{} = {:?}", x_old, y, x - &y);
     }
 }
 
-pub fn demo_random_natural_sub(limit: usize) {
-    for (x, y) in random_pairs_from_single(random_naturals(&EXAMPLE_SEED, 32)).take(limit) {
-        let x_old = x.clone();
-        println!("{} - &{} = {:?}", x_old, y, x - &y);
-    }
-}
-
-pub fn demo_exhaustive_natural_sub_ref_ref(limit: usize) {
-    for (x, y) in exhaustive_pairs_from_single(exhaustive_naturals()).take(limit) {
+pub fn demo_natural_sub_ref_ref(gm: GenerationMode, limit: usize) {
+    for (x, y) in select_inputs_2(gm).take(limit) {
         println!("&{} - &{} = {:?}", x, y, &x - &y);
     }
 }
 
-pub fn demo_random_natural_sub_ref_ref(limit: usize) {
-    for (x, y) in random_pairs_from_single(random_naturals(&EXAMPLE_SEED, 32)).take(limit) {
-        println!("&{} - &{} = {:?}", x, y, &x - &y);
-    }
-}
-
-//TODO use subset_pairs
-pub fn benchmark_exhaustive_natural_sub_assign(limit: usize, file_name: &str) {
-    println!("benchmarking exhaustive Natural -= &Natural");
+pub fn benchmark_natural_sub_assign(gm: GenerationMode, limit: usize, file_name: &str) {
+    println!("benchmarking {} Natural -= &Natural", gm.name());
     benchmark_3(BenchmarkOptions3 {
-        xs: exhaustive_pairs_from_single(exhaustive_naturals()).filter(|&(ref x, ref y)| x >= y),
+        xs: select_inputs_1(gm),
         function_f: &(|(mut x, y)| x -= &y),
         function_g: &(|(mut x, y): (native::Natural, native::Natural)| x -= &y),
         function_h: &(|(mut x, y): (rugint::Integer, rugint::Integer)| x -= &y),
@@ -99,38 +114,10 @@ pub fn benchmark_exhaustive_natural_sub_assign(limit: usize, file_name: &str) {
     });
 }
 
-pub fn benchmark_random_natural_sub_assign(limit: usize, scale: u32, file_name: &str) {
-    println!("benchmarking random Natural -= &Natural");
-    benchmark_3(BenchmarkOptions3 {
-        xs: random_pairs_from_single(random_naturals(&EXAMPLE_SEED, scale))
-            .filter(|&(ref x, ref y)| x >= y),
-        function_f: &(|(mut x, y)| x -= &y),
-        function_g: &(|(mut x, y): (native::Natural, native::Natural)| x -= &y),
-        function_h: &(|(mut x, y): (rugint::Integer, rugint::Integer)| x -= &y),
-        x_cons: &(|p| p.clone()),
-        y_cons: &(|&(ref x, ref y)| (gmp_natural_to_native(x), gmp_natural_to_native(y))),
-        z_cons: &(|&(ref x, ref y)| {
-            (
-                gmp_natural_to_rugint_integer(x),
-                gmp_natural_to_rugint_integer(y),
-            )
-        }),
-        x_param: &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),
-        limit,
-        f_name: "malachite-gmp",
-        g_name: "malachite-native",
-        h_name: "rugint",
-        title: "Natural -= \\\\&Natural",
-        x_axis_label: "other",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
-}
-
-pub fn benchmark_exhaustive_natural_sub(limit: usize, file_name: &str) {
-    println!("benchmarking exhaustive Natural - &Natural");
+pub fn benchmark_natural_sub(gm: GenerationMode, limit: usize, file_name: &str) {
+    println!("benchmarking {} Natural - &Natural", gm.name());
     benchmark_4(BenchmarkOptions4 {
-        xs: exhaustive_pairs_from_single(exhaustive_naturals()),
+        xs: select_inputs_2(gm),
         function_f: &(|(x, y)| x - &y),
         function_g: &(|(x, y)| x - &y),
         function_h: &(|(x, y)| num_sub(x, y)),
@@ -157,59 +144,17 @@ pub fn benchmark_exhaustive_natural_sub(limit: usize, file_name: &str) {
     });
 }
 
-pub fn benchmark_random_natural_sub(limit: usize, scale: u32, file_name: &str) {
-    println!("benchmarking random Natural - &Natural");
-    benchmark_4(BenchmarkOptions4 {
-        xs: random_pairs_from_single(random_naturals(&EXAMPLE_SEED, scale)),
-        function_f: &(|(x, y)| x - &y),
-        function_g: &(|(x, y)| x - &y),
-        function_h: &(|(x, y)| num_sub(x, y)),
-        function_i: &(|(x, y)| rugint_sub(x, y)),
-        x_cons: &(|p| p.clone()),
-        y_cons: &(|&(ref x, ref y)| (gmp_natural_to_native(x), gmp_natural_to_native(y))),
-        z_cons: &(|&(ref x, ref y)| (gmp_natural_to_num_biguint(x), gmp_natural_to_num_biguint(y))),
-        w_cons: &(|&(ref x, ref y)| {
-            (
-                gmp_natural_to_rugint_integer(x),
-                gmp_natural_to_rugint_integer(y),
-            )
-        }),
-        x_param: &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),
-        limit,
-        f_name: "malachite-gmp",
-        g_name: "malachite-native",
-        h_name: "num",
-        i_name: "rugint",
-        title: "Natural - \\\\&Natural",
-        x_axis_label: "max(x.significant\\\\_bits(), y.significant\\\\_bits())",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
-}
-
-pub fn benchmark_exhaustive_natural_sub_evaluation_strategy(limit: usize, file_name: &str) {
-    println!("benchmarking exhaustive Natural - Natural evaluation strategy");
+pub fn benchmark_natural_sub_evaluation_strategy(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    println!(
+        "benchmarking {} Natural - Natural evaluation strategy",
+        gm.name()
+    );
     benchmark_2(BenchmarkOptions2 {
-        xs: exhaustive_pairs_from_single(exhaustive_naturals()),
-        function_f: &(|(x, y)| x - &y),
-        function_g: &(|(x, y)| &x - &y),
-        x_cons: &(|&(ref x, ref y)| (gmp_natural_to_native(x), gmp_natural_to_native(y))),
-        y_cons: &(|&(ref x, ref y)| (gmp_natural_to_native(x), gmp_natural_to_native(y))),
-        x_param: &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),
-        limit,
-        f_name: "Natural - \\\\&Natural",
-        g_name: "\\\\&Natural - \\\\&Natural",
-        title: "Natural + Natural evaluation strategy",
-        x_axis_label: "max(x.significant\\\\_bits(), y.significant\\\\_bits())",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
-}
-
-pub fn benchmark_random_natural_sub_evaluation_strategy(limit: usize, scale: u32, file_name: &str) {
-    println!("benchmarking random Natural - Natural evaluation strategy");
-    benchmark_2(BenchmarkOptions2 {
-        xs: random_pairs_from_single(random_naturals(&EXAMPLE_SEED, scale)),
+        xs: select_inputs_2(gm),
         function_f: &(|(x, y)| x - &y),
         function_g: &(|(x, y)| &x - &y),
         x_cons: &(|&(ref x, ref y)| (gmp_natural_to_native(x), gmp_natural_to_native(y))),

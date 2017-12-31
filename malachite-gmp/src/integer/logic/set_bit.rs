@@ -44,9 +44,7 @@ impl Integer {
                     None
                 }
             },
-            {
-                unsafe { gmp::mpz_setbit(large, index) }
-            }
+            { unsafe { gmp::mpz_setbit(large, index) } }
         );
         self.demote_if_small();
     }

@@ -4,14 +4,15 @@ use malachite_base::traits::{ShlRound, ShlRoundAssign, Zero};
 use malachite_native::integer as native;
 use malachite_gmp::integer as gmp;
 use malachite_test::common::{gmp_integer_to_native, native_integer_to_gmp,
-                             native_integer_to_rugint, rugint_integer_to_native};
+                             native_integer_to_rugint, rugint_integer_to_native, GenerationMode};
+use malachite_test::integer::arithmetic::shl_i32::{select_inputs_1, select_inputs_2};
 use rugint;
 use rust_wheels::iterators::common::EXAMPLE_SEED;
 use rust_wheels::iterators::integers_geometric::i32s_geometric;
 use rust_wheels::iterators::integers::{exhaustive_integers, random_integers};
 use rust_wheels::iterators::primitive_ints::exhaustive_i;
 use rust_wheels::iterators::rounding_modes::{exhaustive_rounding_modes, random_rounding_modes};
-use rust_wheels::iterators::tuples::{lex_pairs, log_pairs, random_pairs, random_triples};
+use rust_wheels::iterators::tuples::{log_pairs, random_pairs};
 use std::str::FromStr;
 
 #[test]
@@ -228,16 +229,11 @@ fn shl_u32_properties() {
         assert_eq!(native::Integer::ZERO << i, 0);
     };
 
-    for (n, i) in log_pairs(exhaustive_integers(), exhaustive_i::<i32>()).take(LARGE_LIMIT) {
+    for (n, i) in select_inputs_1(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         integer_and_i32(n, i);
     }
 
-    for (n, u) in random_pairs(
-        &EXAMPLE_SEED,
-        &(|seed| random_integers(seed, 32)),
-        &(|seed| i32s_geometric(seed, 32)),
-    ).take(LARGE_LIMIT)
-    {
+    for (n, u) in select_inputs_1(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         integer_and_i32(n, u);
     }
 
@@ -1523,19 +1519,17 @@ fn shl_round_i32_fail_gmp_2() {
 #[test]
 #[should_panic(expected = "Right shift is not exact: 1000000000001 >>= 1")]
 fn shl_round_i32_fail_gmp_3() {
-    gmp::Integer::from_str("1000000000001").unwrap().shl_round(
-        -1i32,
-        RoundingMode::Exact,
-    );
+    gmp::Integer::from_str("1000000000001")
+        .unwrap()
+        .shl_round(-1i32, RoundingMode::Exact);
 }
 
 #[test]
 #[should_panic(expected = "Right shift is not exact: 1000000000001 >>= 100")]
 fn shl_round_i32_fail_gmp_4() {
-    gmp::Integer::from_str("1000000000001").unwrap().shl_round(
-        -100i32,
-        RoundingMode::Exact,
-    );
+    gmp::Integer::from_str("1000000000001")
+        .unwrap()
+        .shl_round(-100i32, RoundingMode::Exact);
 }
 
 #[test]
@@ -1614,27 +1608,11 @@ fn shl_round_i32_properties() {
         assert_eq!(native::Integer::ZERO.shl_round(i, rm), 0);
     };
 
-    for ((n, i), rm) in lex_pairs(
-        log_pairs(exhaustive_integers(), exhaustive_i::<i32>()),
-        exhaustive_rounding_modes(),
-    ).filter(|&((ref n, i), rm)| {
-        i >= 0 || rm != RoundingMode::Exact || n.divisible_by_power_of_2(i.wrapping_abs() as u32)
-    })
-        .take(LARGE_LIMIT)
-    {
+    for (n, i, rm) in select_inputs_2(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         integer_i32_and_rounding_mode(n, i, rm);
     }
 
-    for (n, i, rm) in random_triples(
-        &EXAMPLE_SEED,
-        &(|seed| random_integers(seed, 32)),
-        &(|seed| i32s_geometric(seed, 32)),
-        &(|seed| random_rounding_modes(seed)),
-    ).filter(|&(ref n, i, rm)| {
-        i >= 0 || rm != RoundingMode::Exact || n.divisible_by_power_of_2(i.wrapping_abs() as u32)
-    })
-        .take(LARGE_LIMIT)
-    {
+    for (n, i, rm) in select_inputs_2(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         integer_i32_and_rounding_mode(n, i, rm);
     }
 

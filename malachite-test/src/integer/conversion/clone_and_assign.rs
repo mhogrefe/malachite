@@ -1,4 +1,5 @@
-use common::{gmp_integer_to_native, gmp_integer_to_num_bigint, gmp_integer_to_rugint};
+use common::{gmp_integer_to_native, gmp_integer_to_num_bigint, gmp_integer_to_rugint,
+             GenerationMode};
 use malachite_base::traits::Assign;
 use malachite_native::integer as native;
 use malachite_gmp::integer as gmp;
@@ -12,36 +13,59 @@ use rust_wheels::iterators::integers::{exhaustive_integers, random_integers};
 use rust_wheels::iterators::tuples::{exhaustive_pairs_from_single, random_pairs_from_single};
 use std::cmp::max;
 
-pub fn demo_exhaustive_integer_clone(limit: usize) {
-    for n in exhaustive_integers().take(limit) {
+type It1 = Iterator<Item = gmp::Integer>;
+
+pub fn exhaustive_inputs_1() -> Box<It1> {
+    Box::new(exhaustive_integers())
+}
+
+pub fn random_inputs_1(scale: u32) -> Box<It1> {
+    Box::new(random_integers(&EXAMPLE_SEED, scale))
+}
+
+pub fn select_inputs_1(gm: GenerationMode) -> Box<It1> {
+    match gm {
+        GenerationMode::Exhaustive => exhaustive_inputs_1(),
+        GenerationMode::Random(scale) => random_inputs_1(scale),
+    }
+}
+
+type It2 = Iterator<Item = (gmp::Integer, gmp::Integer)>;
+
+pub fn exhaustive_inputs_2() -> Box<It2> {
+    Box::new(exhaustive_pairs_from_single(exhaustive_integers()))
+}
+
+pub fn random_inputs_2(scale: u32) -> Box<It2> {
+    Box::new(random_pairs_from_single(random_integers(
+        &EXAMPLE_SEED,
+        scale,
+    )))
+}
+
+pub fn select_inputs_2(gm: GenerationMode) -> Box<It2> {
+    match gm {
+        GenerationMode::Exhaustive => exhaustive_inputs_2(),
+        GenerationMode::Random(scale) => random_inputs_2(scale),
+    }
+}
+
+pub fn demo_integer_clone(gm: GenerationMode, limit: usize) {
+    for n in select_inputs_1(gm).take(limit) {
         println!("clone({}) = {:?}", n, n.clone());
     }
 }
 
-pub fn demo_random_integer_clone(limit: usize) {
-    for n in random_integers(&EXAMPLE_SEED, 32).take(limit) {
-        println!("clone({}) = {:?}", n, n.clone());
-    }
-}
-
-pub fn demo_exhaustive_integer_clone_from(limit: usize) {
-    for (mut x, y) in exhaustive_pairs_from_single(exhaustive_integers()).take(limit) {
+pub fn demo_integer_clone_from(gm: GenerationMode, limit: usize) {
+    for (mut x, y) in select_inputs_2(gm).take(limit) {
         let x_old = x.clone();
         x.clone_from(&y);
         println!("x := {}; x.clone_from({}); x = {}", x_old, y, x);
     }
 }
 
-pub fn demo_random_integer_clone_from(limit: usize) {
-    for (mut x, y) in random_pairs_from_single(random_integers(&EXAMPLE_SEED, 32)).take(limit) {
-        let x_old = x.clone();
-        x.clone_from(&y);
-        println!("x := {}; x.clone_from({}); x = {}", x_old, y, x);
-    }
-}
-
-pub fn demo_exhaustive_integer_assign(limit: usize) {
-    for (mut x, y) in exhaustive_pairs_from_single(exhaustive_integers()).take(limit) {
+pub fn demo_integer_assign(gm: GenerationMode, limit: usize) {
+    for (mut x, y) in select_inputs_2(gm).take(limit) {
         let x_old = x.clone();
         let y_old = y.clone();
         x.assign(y);
@@ -49,35 +73,18 @@ pub fn demo_exhaustive_integer_assign(limit: usize) {
     }
 }
 
-pub fn demo_random_integer_assign(limit: usize) {
-    for (mut x, y) in random_pairs_from_single(random_integers(&EXAMPLE_SEED, 32)).take(limit) {
-        let x_old = x.clone();
-        let y_old = y.clone();
-        x.assign(y);
-        println!("x := {}; x.assign({}); x = {}", x_old, y_old, x);
-    }
-}
-
-pub fn demo_exhaustive_integer_assign_ref(limit: usize) {
-    for (mut x, y) in exhaustive_pairs_from_single(exhaustive_integers()).take(limit) {
+pub fn demo_integer_assign_ref(gm: GenerationMode, limit: usize) {
+    for (mut x, y) in select_inputs_2(gm).take(limit) {
         let x_old = x.clone();
         x.assign(&y);
         println!("x := {}; x.assign(&{}); x = {}", x_old, y, x);
     }
 }
 
-pub fn demo_random_integer_assign_ref(limit: usize) {
-    for (mut x, y) in random_pairs_from_single(random_integers(&EXAMPLE_SEED, 32)).take(limit) {
-        let x_old = x.clone();
-        x.assign(&y);
-        println!("x := {}; x.assign(&{}); x = {}", x_old, y, x);
-    }
-}
-
-pub fn benchmark_exhaustive_integer_clone(limit: usize, file_name: &str) {
-    println!("benchmarking exhaustive Integer.clone()");
+pub fn benchmark_integer_clone(gm: GenerationMode, limit: usize, file_name: &str) {
+    println!("benchmarking {} Integer.clone()", gm.name());
     benchmark_4(BenchmarkOptions4 {
-        xs: exhaustive_integers(),
+        xs: select_inputs_1(gm),
         function_f: &(|n: gmp::Integer| n.clone()),
         function_g: &(|n: native::Integer| n.clone()),
         function_h: &(|n: num::BigInt| n.clone()),
@@ -99,35 +106,10 @@ pub fn benchmark_exhaustive_integer_clone(limit: usize, file_name: &str) {
     });
 }
 
-pub fn benchmark_random_integer_clone(limit: usize, scale: u32, file_name: &str) {
-    println!("benchmarking random Integer.clone()");
+pub fn benchmark_integer_clone_from(gm: GenerationMode, limit: usize, file_name: &str) {
+    println!("benchmarking {} Integer.clone_from(Integer)", gm.name());
     benchmark_4(BenchmarkOptions4 {
-        xs: random_integers(&EXAMPLE_SEED, scale),
-        function_f: &(|n: gmp::Integer| n.clone()),
-        function_g: &(|n: native::Integer| n.clone()),
-        function_h: &(|n: num::BigInt| n.clone()),
-        function_i: &(|n: rugint::Integer| n.clone()),
-        x_cons: &(|x| x.clone()),
-        y_cons: &(|x| gmp_integer_to_native(x)),
-        z_cons: &(|x| gmp_integer_to_num_bigint(x)),
-        w_cons: &(|x| gmp_integer_to_rugint(x)),
-        x_param: &(|n| n.significant_bits() as usize),
-        limit,
-        f_name: "malachite-gmp",
-        g_name: "malachite-native",
-        h_name: "num",
-        i_name: "rugint",
-        title: "Integer.clone()",
-        x_axis_label: "n.significant\\\\_bits()",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
-}
-
-pub fn benchmark_exhaustive_integer_clone_from(limit: usize, file_name: &str) {
-    println!("benchmarking exhaustive Integer.clone_from(Integer)");
-    benchmark_4(BenchmarkOptions4 {
-        xs: exhaustive_pairs_from_single(exhaustive_integers()),
+        xs: select_inputs_2(gm),
         function_f: &(|(mut x, y): (gmp::Integer, gmp::Integer)| x.clone_from(&y)),
         function_g: &(|(mut x, y): (native::Integer, native::Integer)| x.clone_from(&y)),
         function_h: &(|(mut x, y): (num::BigInt, num::BigInt)| x.clone_from(&y)),
@@ -149,35 +131,10 @@ pub fn benchmark_exhaustive_integer_clone_from(limit: usize, file_name: &str) {
     });
 }
 
-pub fn benchmark_random_integer_clone_from(limit: usize, scale: u32, file_name: &str) {
-    println!("benchmarking random Integer.clone_from(Integer)");
-    benchmark_4(BenchmarkOptions4 {
-        xs: random_pairs_from_single(random_integers(&EXAMPLE_SEED, scale)),
-        function_f: &(|(mut x, y): (gmp::Integer, gmp::Integer)| x.clone_from(&y)),
-        function_g: &(|(mut x, y): (native::Integer, native::Integer)| x.clone_from(&y)),
-        function_h: &(|(mut x, y): (num::BigInt, num::BigInt)| x.clone_from(&y)),
-        function_i: &(|(mut x, y): (rugint::Integer, rugint::Integer)| x.clone_from(&y)),
-        x_cons: &(|p| p.clone()),
-        y_cons: &(|&(ref x, ref y)| (gmp_integer_to_native(x), gmp_integer_to_native(y))),
-        z_cons: &(|&(ref x, ref y)| (gmp_integer_to_num_bigint(x), gmp_integer_to_num_bigint(y))),
-        w_cons: &(|&(ref x, ref y)| (gmp_integer_to_rugint(x), gmp_integer_to_rugint(y))),
-        x_param: &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),
-        limit,
-        f_name: "malachite-gmp",
-        g_name: "malachite-native",
-        h_name: "num",
-        i_name: "rugint",
-        title: "Integer.clone\\\\_from(Integer)",
-        x_axis_label: "max(x.significant\\\\_bits(), y.significant\\\\_bits())",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
-}
-
-pub fn benchmark_exhaustive_integer_assign(limit: usize, file_name: &str) {
-    println!("benchmarking exhaustive Integer.assign(Integer)");
+pub fn benchmark_integer_assign(gm: GenerationMode, limit: usize, file_name: &str) {
+    println!("benchmarking {} Integer.assign(Integer)", gm.name());
     benchmark_3(BenchmarkOptions3 {
-        xs: exhaustive_pairs_from_single(exhaustive_integers()),
+        xs: select_inputs_2(gm),
         function_f: &(|(mut x, y): (gmp::Integer, gmp::Integer)| x.assign(y)),
         function_g: &(|(mut x, y): (native::Integer, native::Integer)| x.assign(y)),
         function_h: &(|(mut x, y): (rugint::Integer, rugint::Integer)| x.assign(y)),
@@ -196,55 +153,17 @@ pub fn benchmark_exhaustive_integer_assign(limit: usize, file_name: &str) {
     });
 }
 
-pub fn benchmark_random_integer_assign(limit: usize, scale: u32, file_name: &str) {
-    println!("benchmarking random Integer.assign(Integer)");
-    benchmark_3(BenchmarkOptions3 {
-        xs: random_pairs_from_single(random_integers(&EXAMPLE_SEED, scale)),
-        function_f: &(|(mut x, y): (gmp::Integer, gmp::Integer)| x.assign(y)),
-        function_g: &(|(mut x, y): (native::Integer, native::Integer)| x.assign(y)),
-        function_h: &(|(mut x, y): (rugint::Integer, rugint::Integer)| x.assign(y)),
-        x_cons: &(|p| p.clone()),
-        y_cons: &(|&(ref x, ref y)| (gmp_integer_to_native(x), gmp_integer_to_native(y))),
-        z_cons: &(|&(ref x, ref y)| (gmp_integer_to_rugint(x), gmp_integer_to_rugint(y))),
-        x_param: &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),
-        limit,
-        f_name: "malachite-gmp",
-        g_name: "malachite-native",
-        h_name: "rugint",
-        title: "Integer.assign(Integer)",
-        x_axis_label: "max(x.significant\\\\_bits(), y.significant\\\\_bits())",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
-}
-
-pub fn benchmark_exhaustive_integer_assign_evaluation_strategy(limit: usize, file_name: &str) {
-    println!("benchmarking exhaustive Integer.assign(Integer) evaluation strategy");
-    benchmark_2(BenchmarkOptions2 {
-        xs: exhaustive_pairs_from_single(exhaustive_integers()),
-        function_f: &(|(mut x, y): (native::Integer, native::Integer)| x.assign(y)),
-        function_g: &(|(mut x, y): (native::Integer, native::Integer)| x.assign(&y)),
-        x_cons: &(|&(ref x, ref y)| (gmp_integer_to_native(x), gmp_integer_to_native(y))),
-        y_cons: &(|&(ref x, ref y)| (gmp_integer_to_native(x), gmp_integer_to_native(y))),
-        x_param: &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),
-        limit,
-        f_name: "Integer.assign(Integer)",
-        g_name: "Integer.assign(\\\\&Integer)",
-        title: "Integer.assign(Integer) evaluation strategy",
-        x_axis_label: "max(x.significant\\\\_bits(), y.significant\\\\_bits())",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
-}
-
-pub fn benchmark_random_integer_assign_evaluation_strategy(
+pub fn benchmark_integer_assign_evaluation_strategy(
+    gm: GenerationMode,
     limit: usize,
-    scale: u32,
     file_name: &str,
 ) {
-    println!("benchmarking random Integer.assign(Integer) evaluation strategy");
+    println!(
+        "benchmarking {} Integer.assign(Integer) evaluation strategy",
+        gm.name()
+    );
     benchmark_2(BenchmarkOptions2 {
-        xs: random_pairs_from_single(random_integers(&EXAMPLE_SEED, scale)),
+        xs: select_inputs_2(gm),
         function_f: &(|(mut x, y): (native::Integer, native::Integer)| x.assign(y)),
         function_g: &(|(mut x, y): (native::Integer, native::Integer)| x.assign(&y)),
         x_cons: &(|&(ref x, ref y)| (gmp_integer_to_native(x), gmp_integer_to_native(y))),

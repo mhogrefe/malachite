@@ -3,7 +3,9 @@ use malachite_base::round::RoundingMode;
 use malachite_base::traits::{One, PartialOrdAbs, ShrRound, Zero};
 use malachite_gmp as gmp;
 use malachite_native as native;
-use malachite_test::common::{gmp_integer_to_native, gmp_natural_to_native, native_integer_to_gmp};
+use malachite_test::common::{gmp_integer_to_native, gmp_natural_to_native, native_integer_to_gmp,
+                             GenerationMode};
+use malachite_test::integer::arithmetic::mod_power_of_2::select_inputs;
 use rust_wheels::iterators::common::EXAMPLE_SEED;
 use rust_wheels::iterators::integers_geometric::natural_u32s_geometric;
 use rust_wheels::iterators::integers::{exhaustive_integers, random_integers};
@@ -32,9 +34,9 @@ fn test_mod_power_of_2() {
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = gmp::integer::Integer::from_str(u).unwrap().mod_power_of_2(
-            v,
-        );
+        let n = gmp::integer::Integer::from_str(u)
+            .unwrap()
+            .mod_power_of_2(v);
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
@@ -134,9 +136,9 @@ fn test_rem_power_of_2() {
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = gmp::integer::Integer::from_str(u).unwrap().rem_power_of_2(
-            v,
-        );
+        let n = gmp::integer::Integer::from_str(u)
+            .unwrap()
+            .rem_power_of_2(v);
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
@@ -402,7 +404,7 @@ fn mod_power_of_2_properties() {
         assert_eq!(native::integer::Integer::ZERO.mod_power_of_2(u), 0);
     };
 
-    for (n, u) in log_pairs(exhaustive_integers(), exhaustive_u::<u32>()).take(LARGE_LIMIT) {
+    for (n, u) in select_inputs(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         integer_and_u32(n, u);
     }
 
@@ -415,7 +417,7 @@ fn mod_power_of_2_properties() {
         integer_and_u32(n, u);
     }
 
-    for (n, u) in log_pairs(exhaustive_integers(), exhaustive_u::<u32>())
+    for (n, u) in select_inputs(GenerationMode::Exhaustive)
         .map(|(n, u)| (n << u, u))
         .take(LARGE_LIMIT)
     {
@@ -432,7 +434,7 @@ fn mod_power_of_2_properties() {
         integer_and_u32_divisible(n, u);
     }
 
-    for (n, u) in log_pairs(exhaustive_integers(), exhaustive_u::<u32>())
+    for (n, u) in select_inputs(GenerationMode::Exhaustive)
         .filter(|&(ref n, u)| !n.divisible_by_power_of_2(u))
         .take(LARGE_LIMIT)
     {
@@ -569,48 +571,37 @@ fn rem_power_of_2_properties() {
         assert_eq!(native::integer::Integer::ZERO.rem_power_of_2(u), 0);
     };
 
-    for (n, u) in log_pairs(exhaustive_integers(), exhaustive_u::<u32>()).take(LARGE_LIMIT) {
+    for (n, u) in select_inputs(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         integer_and_u32(n, u);
     }
 
-    for (n, u) in random_pairs(
-        &EXAMPLE_SEED,
-        &(|seed| random_integers(seed, 32)),
-        &(|seed| natural_u32s_geometric(seed, 32)),
-    ).take(LARGE_LIMIT)
-    {
+    for (n, u) in select_inputs(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         integer_and_u32(n, u);
     }
 
-    for (n, u) in log_pairs(exhaustive_integers(), exhaustive_u::<u32>())
+    for (n, u) in select_inputs(GenerationMode::Exhaustive)
         .map(|(n, u)| (n << u, u))
         .take(LARGE_LIMIT)
     {
         integer_and_u32_divisible(n, u);
     }
 
-    for (n, u) in random_pairs(
-        &EXAMPLE_SEED,
-        &(|seed| random_integers(seed, 32)),
-        &(|seed| natural_u32s_geometric(seed, 32)),
-    ).map(|(n, u)| (n << u, u))
+    for (n, u) in select_inputs(GenerationMode::Random(32))
+        .map(|(n, u)| (n << u, u))
         .take(LARGE_LIMIT)
     {
         integer_and_u32_divisible(n, u);
     }
 
-    for (n, u) in log_pairs(exhaustive_integers(), exhaustive_u::<u32>())
+    for (n, u) in select_inputs(GenerationMode::Exhaustive)
         .filter(|&(ref n, u)| !n.divisible_by_power_of_2(u))
         .take(LARGE_LIMIT)
     {
         integer_and_u32_non_divisible(n, u);
     }
 
-    for (n, u) in random_pairs(
-        &EXAMPLE_SEED,
-        &(|seed| random_integers(seed, 32)),
-        &(|seed| natural_u32s_geometric(seed, 32)),
-    ).filter(|&(ref n, u)| !n.divisible_by_power_of_2(u))
+    for (n, u) in select_inputs(GenerationMode::Random(32))
+        .filter(|&(ref n, u)| !n.divisible_by_power_of_2(u))
         .take(LARGE_LIMIT)
     {
         integer_and_u32_non_divisible(n, u);
@@ -724,48 +715,37 @@ fn ceiling_mod_power_of_2_properties() {
         assert_eq!(native::integer::Integer::ZERO.ceiling_mod_power_of_2(u), 0);
     };
 
-    for (n, u) in log_pairs(exhaustive_integers(), exhaustive_u::<u32>()).take(LARGE_LIMIT) {
+    for (n, u) in select_inputs(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         integer_and_u32(n, u);
     }
 
-    for (n, u) in random_pairs(
-        &EXAMPLE_SEED,
-        &(|seed| random_integers(seed, 32)),
-        &(|seed| natural_u32s_geometric(seed, 32)),
-    ).take(LARGE_LIMIT)
-    {
+    for (n, u) in select_inputs(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         integer_and_u32(n, u);
     }
 
-    for (n, u) in log_pairs(exhaustive_integers(), exhaustive_u::<u32>())
+    for (n, u) in select_inputs(GenerationMode::Exhaustive)
         .map(|(n, u)| (n << u, u))
         .take(LARGE_LIMIT)
     {
         integer_and_u32_divisible(n, u);
     }
 
-    for (n, u) in random_pairs(
-        &EXAMPLE_SEED,
-        &(|seed| random_integers(seed, 32)),
-        &(|seed| natural_u32s_geometric(seed, 32)),
-    ).map(|(n, u)| (n << u, u))
+    for (n, u) in select_inputs(GenerationMode::Random(32))
+        .map(|(n, u)| (n << u, u))
         .take(LARGE_LIMIT)
     {
         integer_and_u32_divisible(n, u);
     }
 
-    for (n, u) in log_pairs(exhaustive_integers(), exhaustive_u::<u32>())
+    for (n, u) in select_inputs(GenerationMode::Exhaustive)
         .filter(|&(ref n, u)| !n.divisible_by_power_of_2(u))
         .take(LARGE_LIMIT)
     {
         integer_and_u32_non_divisible(n, u);
     }
 
-    for (n, u) in random_pairs(
-        &EXAMPLE_SEED,
-        &(|seed| random_integers(seed, 32)),
-        &(|seed| natural_u32s_geometric(seed, 32)),
-    ).filter(|&(ref n, u)| !n.divisible_by_power_of_2(u))
+    for (n, u) in select_inputs(GenerationMode::Random(32))
+        .filter(|&(ref n, u)| !n.divisible_by_power_of_2(u))
         .take(LARGE_LIMIT)
     {
         integer_and_u32_non_divisible(n, u);

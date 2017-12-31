@@ -4,13 +4,13 @@ use malachite_native::natural as native;
 use malachite_gmp::natural as gmp;
 use malachite_test::common::{gmp_natural_to_native, native_natural_to_gmp,
                              native_natural_to_num_biguint, native_natural_to_rugint_integer,
-                             num_biguint_to_native_natural, rugint_integer_to_native_natural};
-use malachite_test::natural::arithmetic::sub::{num_sub, rugint_sub};
+                             num_biguint_to_native_natural, rugint_integer_to_native_natural,
+                             GenerationMode};
+use malachite_test::natural::arithmetic::sub::{num_sub, rugint_sub, select_inputs_2};
 use num;
 use rugint;
 use rust_wheels::iterators::common::EXAMPLE_SEED;
 use rust_wheels::iterators::naturals::{exhaustive_naturals, random_naturals};
-use rust_wheels::iterators::tuples::{exhaustive_pairs_from_single, random_pairs_from_single};
 use std::str::FromStr;
 
 #[test]
@@ -201,11 +201,11 @@ fn sub_properties() {
         }
     };
 
-    for (x, y) in exhaustive_pairs_from_single(exhaustive_naturals()).take(LARGE_LIMIT) {
+    for (x, y) in select_inputs_2(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         two_naturals(x, y);
     }
 
-    for (x, y) in random_pairs_from_single(random_naturals(&EXAMPLE_SEED, 32)).take(LARGE_LIMIT) {
+    for (x, y) in select_inputs_2(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         two_naturals(x, y);
     }
 

@@ -1,11 +1,8 @@
 use common::LARGE_LIMIT;
 use malachite_native::integer as native;
 use malachite_gmp::integer as gmp;
-use malachite_test::common::gmp_integer_to_native;
-use rust_wheels::iterators::common::EXAMPLE_SEED;
-use rust_wheels::iterators::general::random_x;
-use rust_wheels::iterators::primitive_ints::exhaustive_u;
-use rust_wheels::iterators::vecs::{exhaustive_vecs, random_vecs};
+use malachite_test::common::{gmp_integer_to_native, GenerationMode};
+use malachite_test::integer::logic::from_twos_complement_limbs::select_inputs;
 use std::cmp::Ordering;
 
 #[test]
@@ -124,9 +121,11 @@ fn from_twos_complement_limbs_le_properties() {
         trimmed_limbs.reverse();
         assert_eq!(x.twos_complement_limbs_le(), trimmed_limbs);
         assert_eq!(
-            native::Integer::from_twos_complement_limbs_be(
-                &limbs.iter().cloned().rev().collect::<Vec<u32>>(),
-            ),
+            native::Integer::from_twos_complement_limbs_be(&limbs
+                .iter()
+                .cloned()
+                .rev()
+                .collect::<Vec<u32>>(),),
             x
         );
         if match x.sign() {
@@ -137,20 +136,19 @@ fn from_twos_complement_limbs_le_properties() {
             }
             Ordering::Less => {
                 let last = *limbs.last().unwrap();
-                last & 0x8000_0000 != 0 &&
-                    (last != !0 || limbs.len() <= 1 || limbs[limbs.len() - 2] & 0x8000_0000 == 0)
+                last & 0x8000_0000 != 0
+                    && (last != !0 || limbs.len() <= 1 || limbs[limbs.len() - 2] & 0x8000_0000 == 0)
             }
-        }
-        {
+        } {
             assert_eq!(&x.twos_complement_limbs_le()[..], limbs);
         }
     };
 
-    for xs in exhaustive_vecs(exhaustive_u::<u32>()).take(LARGE_LIMIT) {
+    for xs in select_inputs(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         u32_slice(&xs);
     }
 
-    for xs in random_vecs(&EXAMPLE_SEED, 32, &(|seed| random_x::<u32>(seed))).take(LARGE_LIMIT) {
+    for xs in select_inputs(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         u32_slice(&xs);
     }
 }
@@ -174,9 +172,11 @@ fn from_twos_complement_limbs_be_properties() {
         trim_be_limbs(&mut trimmed_limbs);
         assert_eq!(x.twos_complement_limbs_be(), trimmed_limbs);
         assert_eq!(
-            native::Integer::from_twos_complement_limbs_le(
-                &limbs.iter().cloned().rev().collect::<Vec<u32>>(),
-            ),
+            native::Integer::from_twos_complement_limbs_le(&limbs
+                .iter()
+                .cloned()
+                .rev()
+                .collect::<Vec<u32>>(),),
             x
         );
         if match x.sign() {
@@ -187,20 +187,19 @@ fn from_twos_complement_limbs_be_properties() {
             }
             Ordering::Less => {
                 let first = limbs[0];
-                first & 0x8000_0000 != 0 &&
-                    (first != !0 || limbs.len() <= 1 || limbs[1] & 0x8000_0000 == 0)
+                first & 0x8000_0000 != 0
+                    && (first != !0 || limbs.len() <= 1 || limbs[1] & 0x8000_0000 == 0)
             }
-        }
-        {
+        } {
             assert_eq!(&x.twos_complement_limbs_be()[..], limbs);
         }
     };
 
-    for xs in exhaustive_vecs(exhaustive_u::<u32>()).take(LARGE_LIMIT) {
+    for xs in select_inputs(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         u32_slice(&xs);
     }
 
-    for xs in random_vecs(&EXAMPLE_SEED, 32, &(|seed| random_x::<u32>(seed))).take(LARGE_LIMIT) {
+    for xs in select_inputs(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         u32_slice(&xs);
     }
 }

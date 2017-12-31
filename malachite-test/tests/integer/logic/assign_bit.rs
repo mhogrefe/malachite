@@ -2,15 +2,9 @@ use common::LARGE_LIMIT;
 use malachite_native::integer as native;
 use malachite_gmp::integer as gmp;
 use malachite_test::common::{gmp_integer_to_native, native_integer_to_rugint,
-                             rugint_integer_to_native};
+                             rugint_integer_to_native, GenerationMode};
+use malachite_test::integer::logic::assign_bit::select_inputs;
 use rugint;
-use rust_wheels::iterators::common::EXAMPLE_SEED;
-use rust_wheels::iterators::bools::exhaustive_bools;
-use rust_wheels::iterators::general::random_x;
-use rust_wheels::iterators::integers_geometric::natural_u32s_geometric;
-use rust_wheels::iterators::integers::{exhaustive_integers, random_integers};
-use rust_wheels::iterators::primitive_ints::exhaustive_u;
-use rust_wheels::iterators::tuples::{exhaustive_pairs, lex_pairs, random_triples};
 use std::str::FromStr;
 
 #[test]
@@ -73,22 +67,11 @@ fn assign_bit_properties() {
         assert_eq!(rugint_integer_to_native(&rugint_n), n);
     };
 
-    for ((n, index), bit) in
-        lex_pairs(
-            exhaustive_pairs(exhaustive_integers(), exhaustive_u::<u64>()),
-            exhaustive_bools(),
-        ).take(LARGE_LIMIT)
-    {
+    for (n, index, bit) in select_inputs(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         integer_u64_and_bool(n, index, bit);
     }
 
-    for (n, index, bit) in random_triples(
-        &EXAMPLE_SEED,
-        &(|seed| random_integers(seed, 32)),
-        &(|seed| natural_u32s_geometric(seed, 32).map(|i| i as u64)),
-        &(|seed| random_x(seed)),
-    ).take(LARGE_LIMIT)
-    {
+    for (n, index, bit) in select_inputs(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         integer_u64_and_bool(n, index, bit);
     }
 }

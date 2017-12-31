@@ -143,9 +143,7 @@ impl SubAssign<u32> for Integer {
                     None
                 }
             },
-            {
-                unsafe { gmp::mpz_sub_ui(large, large, other.into()) }
-            }
+            { unsafe { gmp::mpz_sub_ui(large, large, other.into()) } }
         );
         self.demote_if_small();
     }

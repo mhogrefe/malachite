@@ -47,7 +47,11 @@ impl<'a> Iterator for IntegerContent<'a> {
                 return Some(val);
             }
         }
-        if val == 0 { None } else { Some(val) }
+        if val == 0 {
+            None
+        } else {
+            Some(val)
+        }
     }
 }
 
@@ -197,15 +201,23 @@ fn check_str_radix(src: &str, radix: i32) -> Result<&str, ParseIntegerError> {
             '0'...'9' => c as i32 - '0' as i32,
             'a'...'z' => c as i32 - 'a' as i32 + 10,
             'A'...'Z' => c as i32 - 'A' as i32 + 10,
-            _ => return Err(Error { kind: Kind::InvalidDigit }),
+            _ => {
+                return Err(Error {
+                    kind: Kind::InvalidDigit,
+                })
+            }
         };
         if digit_value >= radix {
-            return Err(Error { kind: Kind::InvalidDigit });
+            return Err(Error {
+                kind: Kind::InvalidDigit,
+            });
         }
         got_digit = true;
     }
     if !got_digit {
-        return Err(Error { kind: Kind::NoDigits });
+        return Err(Error {
+            kind: Kind::NoDigits,
+        });
     }
     Ok(skip_plus)
 }

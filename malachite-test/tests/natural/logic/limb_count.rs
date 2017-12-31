@@ -2,9 +2,8 @@ use common::LARGE_LIMIT;
 use malachite_base::traits::One;
 use malachite_native::natural as native;
 use malachite_gmp::natural as gmp;
-use malachite_test::common::gmp_natural_to_native;
-use rust_wheels::iterators::common::EXAMPLE_SEED;
-use rust_wheels::iterators::naturals::{exhaustive_naturals, random_naturals};
+use malachite_test::common::{gmp_natural_to_native, GenerationMode};
+use malachite_test::natural::logic::limb_count::select_inputs;
 use std::str::FromStr;
 
 #[test]
@@ -39,11 +38,11 @@ fn limb_count_properties() {
         }
     };
 
-    for n in exhaustive_naturals().take(LARGE_LIMIT) {
+    for n in select_inputs(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         one_natural(n);
     }
 
-    for n in random_naturals(&EXAMPLE_SEED, 32).take(LARGE_LIMIT) {
+    for n in select_inputs(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         one_natural(n);
     }
 }

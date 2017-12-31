@@ -4,13 +4,12 @@ use malachite_native::integer as native;
 use malachite_gmp::integer as gmp;
 use malachite_test::common::{gmp_integer_to_native, native_integer_to_gmp,
                              native_integer_to_num_bigint, native_integer_to_rugint,
-                             num_bigint_to_native_integer, rugint_integer_to_native};
+                             num_bigint_to_native_integer, rugint_integer_to_native,
+                             GenerationMode};
+use malachite_test::integer::conversion::clone_and_assign::{select_inputs_1, select_inputs_2};
 use num;
 use rugint;
 use rugint::Assign as rugint_assign;
-use rust_wheels::iterators::common::EXAMPLE_SEED;
-use rust_wheels::iterators::integers::{exhaustive_integers, random_integers};
-use rust_wheels::iterators::tuples::{exhaustive_pairs_from_single, random_pairs_from_single};
 use std::str::FromStr;
 
 #[test]
@@ -79,7 +78,6 @@ fn test_clone_from() {
     test("1000000000000", "-123", "-123");
     test("1000000000000", "2000000000000", "2000000000000");
 }
-
 
 #[test]
 fn clone_and_assign_properties() {
@@ -159,19 +157,19 @@ fn clone_and_assign_properties() {
         assert_eq!(rugint_integer_to_native(&rugint_x), y);
     };
 
-    for n in exhaustive_integers().take(LARGE_LIMIT) {
+    for n in select_inputs_1(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         one_integer(n);
     }
 
-    for n in random_integers(&EXAMPLE_SEED, 32).take(LARGE_LIMIT) {
+    for n in select_inputs_1(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         one_integer(n);
     }
 
-    for (x, y) in exhaustive_pairs_from_single(exhaustive_integers()).take(LARGE_LIMIT) {
+    for (x, y) in select_inputs_2(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         two_integers(x, y);
     }
 
-    for (x, y) in random_pairs_from_single(random_integers(&EXAMPLE_SEED, 32)).take(LARGE_LIMIT) {
+    for (x, y) in select_inputs_2(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         two_integers(x, y);
     }
 }

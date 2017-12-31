@@ -1,14 +1,11 @@
 use common::LARGE_LIMIT;
 use malachite_native::integer as native;
 use malachite_gmp::integer as gmp;
-use malachite_test::common::{gmp_integer_to_native, native_integer_to_rugint};
+use malachite_test::common::{gmp_integer_to_native, native_integer_to_rugint, GenerationMode};
+use malachite_test::integer::logic::get_bit::select_inputs;
 use rugint;
 use rust_wheels::iterators::common::EXAMPLE_SEED;
-use rust_wheels::iterators::integers::{exhaustive_integers, exhaustive_natural_integers,
-                                       random_integers, random_natural_integers};
-use rust_wheels::iterators::integers_geometric::natural_u32s_geometric;
-use rust_wheels::iterators::primitive_ints::exhaustive_u;
-use rust_wheels::iterators::tuples::{log_pairs, random_pairs};
+use rust_wheels::iterators::integers::{exhaustive_natural_integers, random_natural_integers};
 use std::str::FromStr;
 
 #[test]
@@ -74,16 +71,11 @@ fn get_bit_properties() {
         }
     };
 
-    for (n, index) in log_pairs(exhaustive_integers(), exhaustive_u::<u64>()).take(LARGE_LIMIT) {
+    for (n, index) in select_inputs(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         integer_and_u64(n, index);
     }
 
-    for (n, index) in random_pairs(
-        &EXAMPLE_SEED,
-        &(|seed| random_integers(seed, 32)),
-        &(|seed| natural_u32s_geometric(seed, 32).map(|i| i as u64)),
-    ).take(LARGE_LIMIT)
-    {
+    for (n, index) in select_inputs(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         integer_and_u64(n, index);
     }
 

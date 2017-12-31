@@ -69,3 +69,18 @@ pub fn native_integer_to_rugint(n: &native::integer::Integer) -> rugint::Integer
 pub fn gmp_integer_to_rugint(n: &gmp::integer::Integer) -> rugint::Integer {
     rugint::Integer::from_str(n.to_string().as_ref()).unwrap()
 }
+
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
+pub enum GenerationMode {
+    Exhaustive,
+    Random(u32),
+}
+
+impl GenerationMode {
+    pub fn name(&self) -> &str {
+        match *self {
+            GenerationMode::Exhaustive => "exhaustive",
+            GenerationMode::Random(_) => "random",
+        }
+    }
+}

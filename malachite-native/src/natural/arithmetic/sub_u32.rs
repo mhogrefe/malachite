@@ -161,9 +161,10 @@ impl<'a> Sub<&'a Natural> for u32 {
     type Output = Option<Natural>;
 
     fn sub(self, other: &'a Natural) -> Option<Natural> {
-        other.to_u32().and_then(|x| self.checked_sub(x)).map(
-            Natural::from,
-        )
+        other
+            .to_u32()
+            .and_then(|x| self.checked_sub(x))
+            .map(Natural::from)
     }
 }
 
@@ -194,8 +195,7 @@ impl SubAssign<u32> for Natural {
         if sub_assign_u32_helper(self, other) {
             panic!(
                 "Cannot subtract a u32 from a smaller Natural. self: {}, other: {}",
-                *self,
-                other
+                *self, other
             );
         }
     }

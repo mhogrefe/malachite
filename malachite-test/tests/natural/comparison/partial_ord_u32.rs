@@ -2,16 +2,15 @@ use common::LARGE_LIMIT;
 use malachite_native::natural as native;
 use malachite_gmp::natural as gmp;
 use malachite_test::common::{gmp_natural_to_native, native_natural_to_num_biguint,
-                             native_natural_to_rugint_integer};
-use malachite_test::natural::comparison::partial_ord_u32::num_partial_cmp_u32;
+                             native_natural_to_rugint_integer, GenerationMode};
+use malachite_test::natural::comparison::partial_ord_u32::{num_partial_cmp_u32, select_inputs_1};
 use num;
 use rugint;
 use rust_wheels::iterators::common::EXAMPLE_SEED;
 use rust_wheels::iterators::general::random_x;
 use rust_wheels::iterators::naturals::{exhaustive_naturals, random_naturals};
 use rust_wheels::iterators::primitive_ints::exhaustive_u;
-use rust_wheels::iterators::tuples::{exhaustive_pairs, exhaustive_triples, random_pairs,
-                                     random_triples};
+use rust_wheels::iterators::tuples::{exhaustive_triples, random_triples};
 use std::cmp::Ordering;
 use std::str::FromStr;
 
@@ -92,16 +91,11 @@ fn partial_cmp_u32_properties() {
         }
     };
 
-    for (n, u) in exhaustive_pairs(exhaustive_naturals(), exhaustive_u::<u32>()).take(LARGE_LIMIT) {
+    for (n, u) in select_inputs_1(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         natural_and_u32(n, u);
     }
 
-    for (n, u) in random_pairs(
-        &EXAMPLE_SEED,
-        &(|seed| random_naturals(seed, 32)),
-        &(|seed| random_x::<u32>(seed)),
-    ).take(LARGE_LIMIT)
-    {
+    for (n, u) in select_inputs_1(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         natural_and_u32(n, u);
     }
 

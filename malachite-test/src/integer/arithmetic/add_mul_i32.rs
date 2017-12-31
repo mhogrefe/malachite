@@ -1,8 +1,8 @@
-use common::gmp_integer_to_native;
+use common::{gmp_integer_to_native, GenerationMode};
 use malachite_base::traits::{AddMul, AddMulAssign};
 use malachite_native::integer as native;
 use malachite_gmp::integer as gmp;
-use rust_wheels::benchmarks::{benchmark_2, BenchmarkOptions2, benchmark_4, BenchmarkOptions4};
+use rust_wheels::benchmarks::{BenchmarkOptions2, BenchmarkOptions4, benchmark_2, benchmark_4};
 use rust_wheels::iterators::common::EXAMPLE_SEED;
 use rust_wheels::iterators::general::random_x;
 use rust_wheels::iterators::integers::{exhaustive_integers, random_integers};
@@ -10,133 +10,69 @@ use rust_wheels::iterators::primitive_ints::exhaustive_i;
 use rust_wheels::iterators::tuples::{exhaustive_triples, random_triples};
 use std::cmp::max;
 
-pub fn demo_exhaustive_integer_add_mul_assign_i32(limit: usize) {
-    for (mut a, b, c) in exhaustive_triples(
+type It = Iterator<Item = (gmp::Integer, gmp::Integer, i32)>;
+
+pub fn exhaustive_inputs() -> Box<It> {
+    Box::new(exhaustive_triples(
         exhaustive_integers(),
         exhaustive_integers(),
-        exhaustive_i::<i32>(),
-    ).take(limit)
-    {
-        let a_old = a.clone();
-        let b_old = b.clone();
-        a.add_mul_assign(b, c);
-        println!(
-            "a := {}; x.add_mul_assign({}, {}); x = {}",
-            a_old,
-            b_old,
-            c,
-            a
-        );
-    }
+        exhaustive_i(),
+    ))
 }
 
-pub fn demo_random_integer_add_mul_assign_i32(limit: usize) {
-    for (mut a, b, c) in random_triples(
+pub fn random_inputs(scale: u32) -> Box<It> {
+    Box::new(random_triples(
         &EXAMPLE_SEED,
-        &(|seed| random_integers(seed, 32)),
-        &(|seed| random_integers(seed, 32)),
-        &(|seed| random_x::<i32>(seed)),
-    ).take(limit)
-    {
+        &(|seed| random_integers(seed, scale)),
+        &(|seed| random_integers(seed, scale)),
+        &(|seed| random_x(seed)),
+    ))
+}
+
+pub fn select_inputs(gm: GenerationMode) -> Box<It> {
+    match gm {
+        GenerationMode::Exhaustive => exhaustive_inputs(),
+        GenerationMode::Random(scale) => random_inputs(scale),
+    }
+}
+
+pub fn demo_integer_add_mul_assign_i32(gm: GenerationMode, limit: usize) {
+    for (mut a, b, c) in select_inputs(gm).take(limit) {
         let a_old = a.clone();
         let b_old = b.clone();
         a.add_mul_assign(b, c);
         println!(
             "a := {}; x.add_mul_assign({}, {}); x = {}",
-            a_old,
-            b_old,
-            c,
-            a
+            a_old, b_old, c, a
         );
     }
 }
 
-pub fn demo_exhaustive_integer_add_mul_assign_i32_ref(limit: usize) {
-    for (mut a, b, c) in exhaustive_triples(
-        exhaustive_integers(),
-        exhaustive_integers(),
-        exhaustive_i::<i32>(),
-    ).take(limit)
-    {
+pub fn demo_integer_add_mul_assign_i32_ref(gm: GenerationMode, limit: usize) {
+    for (mut a, b, c) in select_inputs(gm).take(limit) {
         let a_old = a.clone();
         a.add_mul_assign(&b, c);
         println!("a := {}; x.add_mul_assign(&{}, {}); x = {}", a_old, b, c, a);
     }
 }
 
-pub fn demo_random_integer_add_mul_assign_i32_ref(limit: usize) {
-    for (mut a, b, c) in random_triples(
-        &EXAMPLE_SEED,
-        &(|seed| random_integers(seed, 32)),
-        &(|seed| random_integers(seed, 32)),
-        &(|seed| random_x::<i32>(seed)),
-    ).take(limit)
-    {
-        let a_old = a.clone();
-        a.add_mul_assign(&b, c);
-        println!("a := {}; x.add_mul_assign(&{}, {}); x = {}", a_old, b, c, a);
-    }
-}
-
-pub fn demo_exhaustive_integer_add_mul_i32(limit: usize) {
-    for (a, b, c) in exhaustive_triples(
-        exhaustive_integers(),
-        exhaustive_integers(),
-        exhaustive_i::<i32>(),
-    ).take(limit)
-    {
+pub fn demo_integer_add_mul_i32(gm: GenerationMode, limit: usize) {
+    for (a, b, c) in select_inputs(gm).take(limit) {
         let a_old = a.clone();
         let b_old = b.clone();
         println!("{}.add_mul({}, {}) = {}", a_old, b_old, c, a.add_mul(b, c));
     }
 }
 
-pub fn demo_random_integer_add_mul_i32(limit: usize) {
-    for (a, b, c) in random_triples(
-        &EXAMPLE_SEED,
-        &(|seed| random_integers(seed, 32)),
-        &(|seed| random_integers(seed, 32)),
-        &(|seed| random_x::<i32>(seed)),
-    ).take(limit)
-    {
-        let a_old = a.clone();
-        let b_old = b.clone();
-        println!("{}.add_mul({}, {}) = {}", a_old, b_old, c, a.add_mul(b, c));
-    }
-}
-
-pub fn demo_exhaustive_integer_add_mul_i32_val_ref(limit: usize) {
-    for (a, b, c) in exhaustive_triples(
-        exhaustive_integers(),
-        exhaustive_integers(),
-        exhaustive_i::<i32>(),
-    ).take(limit)
-    {
+pub fn demo_integer_add_mul_i32_val_ref(gm: GenerationMode, limit: usize) {
+    for (a, b, c) in select_inputs(gm).take(limit) {
         let a_old = a.clone();
         println!("{}.add_mul(&{}, {}) = {}", a_old, b, c, a.add_mul(&b, c));
     }
 }
 
-pub fn demo_random_integer_add_mul_i32_val_ref(limit: usize) {
-    for (a, b, c) in random_triples(
-        &EXAMPLE_SEED,
-        &(|seed| random_integers(seed, 32)),
-        &(|seed| random_integers(seed, 32)),
-        &(|seed| random_x::<i32>(seed)),
-    ).take(limit)
-    {
-        let a_old = a.clone();
-        println!("{}.add_mul(&{}, {}) = {}", a_old, b, c, a.add_mul(&b, c));
-    }
-}
-
-pub fn demo_exhaustive_integer_add_mul_i32_ref_val(limit: usize) {
-    for (a, b, c) in exhaustive_triples(
-        exhaustive_integers(),
-        exhaustive_integers(),
-        exhaustive_i::<i32>(),
-    ).take(limit)
-    {
+pub fn demo_integer_add_mul_i32_ref_val(gm: GenerationMode, limit: usize) {
+    for (a, b, c) in select_inputs(gm).take(limit) {
         let a_old = a.clone();
         let b_old = b.clone();
         println!(
@@ -149,33 +85,8 @@ pub fn demo_exhaustive_integer_add_mul_i32_ref_val(limit: usize) {
     }
 }
 
-pub fn demo_random_integer_add_mul_i32_ref_val(limit: usize) {
-    for (a, b, c) in random_triples(
-        &EXAMPLE_SEED,
-        &(|seed| random_integers(seed, 32)),
-        &(|seed| random_integers(seed, 32)),
-        &(|seed| random_x::<i32>(seed)),
-    ).take(limit)
-    {
-        let a_old = a.clone();
-        let b_old = b.clone();
-        println!(
-            "(&{}).add_mul({}, {}) = {}",
-            a_old,
-            b_old,
-            c,
-            (&a).add_mul(b, c)
-        );
-    }
-}
-
-pub fn demo_exhaustive_integer_add_mul_i32_ref_ref(limit: usize) {
-    for (a, b, c) in exhaustive_triples(
-        exhaustive_integers(),
-        exhaustive_integers(),
-        exhaustive_i::<i32>(),
-    ).take(limit)
-    {
+pub fn demo_integer_add_mul_i32_ref_ref(gm: GenerationMode, limit: usize) {
+    for (a, b, c) in select_inputs(gm).take(limit) {
         let a_old = a.clone();
         println!(
             "(&{}).add_mul(&{}, {}) = {}",
@@ -187,37 +98,17 @@ pub fn demo_exhaustive_integer_add_mul_i32_ref_ref(limit: usize) {
     }
 }
 
-pub fn demo_random_integer_add_mul_i32_ref_ref(limit: usize) {
-    for (a, b, c) in random_triples(
-        &EXAMPLE_SEED,
-        &(|seed| random_integers(seed, 32)),
-        &(|seed| random_integers(seed, 32)),
-        &(|seed| random_x::<i32>(seed)),
-    ).take(limit)
-    {
-        let a_old = a.clone();
-        println!(
-            "(&{}).add_mul(&{}, {}) = {}",
-            a_old,
-            b,
-            c,
-            (&a).add_mul(&b, c)
-        );
-    }
-}
-
-pub fn benchmark_exhaustive_integer_add_mul_assign_i32(limit: usize, file_name: &str) {
-    println!("benchmarking exhaustive Integer.add_mul_assign(Integer, i32)");
+pub fn benchmark_integer_add_mul_assign_i32(gm: GenerationMode, limit: usize, file_name: &str) {
+    println!(
+        "benchmarking {} Integer.add_mul_assign(Integer, i32)",
+        gm.name()
+    );
     benchmark_2(BenchmarkOptions2 {
-        xs: exhaustive_triples(
-            exhaustive_integers(),
-            exhaustive_integers(),
-            exhaustive_i::<i32>(),
-        ),
+        xs: select_inputs(gm),
         function_f: &(|(mut a, b, c): (gmp::Integer, gmp::Integer, i32)| a.add_mul_assign(b, c)),
         function_g: &(|(mut a, b, c): (native::Integer, native::Integer, i32)| {
-                          a.add_mul_assign(b, c)
-                      }),
+            a.add_mul_assign(b, c)
+        }),
         x_cons: &(|t| t.clone()),
         y_cons: &(|&(ref a, ref b, c)| (gmp_integer_to_native(a), gmp_integer_to_native(b), c)),
         x_param: &(|&(ref a, ref b, _)| max(a.significant_bits(), b.significant_bits()) as usize),
@@ -231,49 +122,23 @@ pub fn benchmark_exhaustive_integer_add_mul_assign_i32(limit: usize, file_name: 
     });
 }
 
-pub fn benchmark_random_integer_add_mul_assign_i32(limit: usize, scale: u32, file_name: &str) {
-    println!("benchmarking random Integer.add_mul_assign(Integer, i32)");
-    benchmark_2(BenchmarkOptions2 {
-        xs: random_triples(
-            &EXAMPLE_SEED,
-            &(|seed| random_integers(seed, scale)),
-            &(|seed| random_integers(seed, scale)),
-            &(|seed| random_x(seed)),
-        ),
-        function_f: &(|(mut a, b, c): (gmp::Integer, gmp::Integer, i32)| a.add_mul_assign(b, c)),
-        function_g: &(|(mut a, b, c): (native::Integer, native::Integer, i32)| {
-                          a.add_mul_assign(b, c)
-                      }),
-        x_cons: &(|t| t.clone()),
-        y_cons: &(|&(ref a, ref b, c)| (gmp_integer_to_native(a), gmp_integer_to_native(b), c)),
-        x_param: &(|&(ref a, ref b, _)| max(a.significant_bits(), b.significant_bits()) as usize),
-        limit,
-        f_name: "malachite-gmp",
-        g_name: "malachite-native",
-        title: "Integer.add\\\\_mul\\\\_assign(Integer, i32)",
-        x_axis_label: "max(a.significant\\\\_bits(), b.significant\\\\_bits())",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
-}
-
-pub fn benchmark_exhaustive_integer_add_mul_assign_i32_evaluation_strategy(
+pub fn benchmark_integer_add_mul_assign_i32_evaluation_strategy(
+    gm: GenerationMode,
     limit: usize,
     file_name: &str,
 ) {
-    println!("benchmarking exhaustive Integer.add_mul_assign(Integer, i32) evaluation strategy");
+    println!(
+        "benchmarking {} Integer.add_mul_assign(Integer, i32) evaluation strategy",
+        gm.name()
+    );
     benchmark_2(BenchmarkOptions2 {
-        xs: exhaustive_triples(
-            exhaustive_integers(),
-            exhaustive_integers(),
-            exhaustive_i::<i32>(),
-        ),
+        xs: select_inputs(gm),
         function_f: &(|(mut a, b, c): (native::Integer, native::Integer, i32)| {
-                          a.add_mul_assign(b, c)
-                      }),
+            a.add_mul_assign(b, c)
+        }),
         function_g: &(|(mut a, b, c): (native::Integer, native::Integer, i32)| {
-                          a.add_mul_assign(&b, c)
-                      }),
+            a.add_mul_assign(&b, c)
+        }),
         x_cons: &(|&(ref a, ref b, c)| (gmp_integer_to_native(a), gmp_integer_to_native(b), c)),
         y_cons: &(|&(ref a, ref b, c)| (gmp_integer_to_native(a), gmp_integer_to_native(b), c)),
         x_param: &(|&(ref a, ref b, _)| max(a.significant_bits(), b.significant_bits()) as usize),
@@ -287,49 +152,20 @@ pub fn benchmark_exhaustive_integer_add_mul_assign_i32_evaluation_strategy(
     });
 }
 
-pub fn benchmark_random_integer_add_mul_assign_i32_evaluation_strategy(
+pub fn benchmark_integer_add_mul_assign_i32_algorithms(
+    gm: GenerationMode,
     limit: usize,
-    scale: u32,
     file_name: &str,
 ) {
-    println!("benchmarking random Integer.add_mul_assign(Integer, i32) evaluation strategy");
+    println!(
+        "benchmarking {} Integer.add_mul_assign(Integer, i32) algorithms",
+        gm.name()
+    );
     benchmark_2(BenchmarkOptions2 {
-        xs: random_triples(
-            &EXAMPLE_SEED,
-            &(|seed| random_integers(seed, scale)),
-            &(|seed| random_integers(seed, scale)),
-            &(|seed| random_x(seed)),
-        ),
+        xs: select_inputs(gm),
         function_f: &(|(mut a, b, c): (native::Integer, native::Integer, i32)| {
-                          a.add_mul_assign(b, c)
-                      }),
-        function_g: &(|(mut a, b, c): (native::Integer, native::Integer, i32)| {
-                          a.add_mul_assign(&b, c)
-                      }),
-        x_cons: &(|&(ref a, ref b, c)| (gmp_integer_to_native(a), gmp_integer_to_native(b), c)),
-        y_cons: &(|&(ref a, ref b, c)| (gmp_integer_to_native(a), gmp_integer_to_native(b), c)),
-        x_param: &(|&(ref a, ref b, _)| max(a.significant_bits(), b.significant_bits()) as usize),
-        limit,
-        f_name: "Integer.add\\\\_mul\\\\_assign(Integer, i32)",
-        g_name: "Integer.add\\\\_mul\\\\_assign(\\\\&Integer, i32)",
-        title: "Integer.add\\\\_mul\\\\_assign(Integer, i32) evaluation strategy",
-        x_axis_label: "max(a.significant\\\\_bits(), b.significant\\\\_bits())",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
-}
-
-pub fn benchmark_exhaustive_integer_add_mul_assign_i32_algorithms(limit: usize, file_name: &str) {
-    println!("benchmarking exhaustive Integer.add_mul_assign(Integer, i32) algorithms");
-    benchmark_2(BenchmarkOptions2 {
-        xs: exhaustive_triples(
-            exhaustive_integers(),
-            exhaustive_integers(),
-            exhaustive_i::<i32>(),
-        ),
-        function_f: &(|(mut a, b, c): (native::Integer, native::Integer, i32)| {
-                          a.add_mul_assign(b, c)
-                      }),
+            a.add_mul_assign(b, c)
+        }),
         function_g: &(|(mut a, b, c): (native::Integer, native::Integer, i32)| a += b * c),
         x_cons: &(|&(ref a, ref b, c)| (gmp_integer_to_native(a), gmp_integer_to_native(b), c)),
         y_cons: &(|&(ref a, ref b, c)| (gmp_integer_to_native(a), gmp_integer_to_native(b), c)),
@@ -344,50 +180,20 @@ pub fn benchmark_exhaustive_integer_add_mul_assign_i32_algorithms(limit: usize, 
     });
 }
 
-pub fn benchmark_random_integer_add_mul_assign_i32_algorithms(
-    limit: usize,
-    scale: u32,
-    file_name: &str,
-) {
-    println!("benchmarking random Integer.add_mul_assign(Integer, i32) algorithms");
-    benchmark_2(BenchmarkOptions2 {
-        xs: random_triples(
-            &EXAMPLE_SEED,
-            &(|seed| random_integers(seed, scale)),
-            &(|seed| random_integers(seed, scale)),
-            &(|seed| random_x(seed)),
-        ),
-        function_f: &(|(mut a, b, c): (native::Integer, native::Integer, i32)| {
-                          a.add_mul_assign(b, c)
-                      }),
-        function_g: &(|(mut a, b, c): (native::Integer, native::Integer, i32)| a += b * c),
-        x_cons: &(|&(ref a, ref b, c)| (gmp_integer_to_native(a), gmp_integer_to_native(b), c)),
-        y_cons: &(|&(ref a, ref b, c)| (gmp_integer_to_native(a), gmp_integer_to_native(b), c)),
-        x_param: &(|&(ref a, ref b, _)| max(a.significant_bits(), b.significant_bits()) as usize),
-        limit,
-        f_name: "Integer.add\\\\_mul\\\\_assign(Integer, i32)",
-        g_name: "Integer += Integer * i32",
-        title: "Integer.add\\\\_mul\\\\_assign(Integer, i32) algorithms",
-        x_axis_label: "max(a.significant\\\\_bits(), b.significant\\\\_bits())",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
-}
-
-pub fn benchmark_exhaustive_integer_add_mul_assign_i32_ref_algorithms(
+pub fn benchmark_integer_add_mul_assign_i32_ref_algorithms(
+    gm: GenerationMode,
     limit: usize,
     file_name: &str,
 ) {
-    println!("benchmarking exhaustive Integer.add_mul_assign(&Integer, i32) algorithms");
+    println!(
+        "benchmarking {} Integer.add_mul_assign(&Integer, i32) algorithms",
+        gm.name()
+    );
     benchmark_2(BenchmarkOptions2 {
-        xs: exhaustive_triples(
-            exhaustive_integers(),
-            exhaustive_integers(),
-            exhaustive_i::<i32>(),
-        ),
+        xs: select_inputs(gm),
         function_f: &(|(mut a, b, c): (native::Integer, native::Integer, i32)| {
-                          a.add_mul_assign(&b, c)
-                      }),
+            a.add_mul_assign(&b, c)
+        }),
         function_g: &(|(mut a, b, c): (native::Integer, native::Integer, i32)| a += &b * c),
         x_cons: &(|&(ref a, ref b, c)| (gmp_integer_to_native(a), gmp_integer_to_native(b), c)),
         y_cons: &(|&(ref a, ref b, c)| (gmp_integer_to_native(a), gmp_integer_to_native(b), c)),
@@ -402,44 +208,10 @@ pub fn benchmark_exhaustive_integer_add_mul_assign_i32_ref_algorithms(
     });
 }
 
-pub fn benchmark_random_integer_add_mul_assign_i32_ref_algorithms(
-    limit: usize,
-    scale: u32,
-    file_name: &str,
-) {
-    println!("benchmarking random Integer.add_mul_assign(&Integer, i32) algorithms");
+pub fn benchmark_integer_add_mul_i32(gm: GenerationMode, limit: usize, file_name: &str) {
+    println!("benchmarking {} Integer.add_mul(Integer, i32)", gm.name());
     benchmark_2(BenchmarkOptions2 {
-        xs: random_triples(
-            &EXAMPLE_SEED,
-            &(|seed| random_integers(seed, scale)),
-            &(|seed| random_integers(seed, scale)),
-            &(|seed| random_x(seed)),
-        ),
-        function_f: &(|(mut a, b, c): (native::Integer, native::Integer, i32)| {
-                          a.add_mul_assign(&b, c)
-                      }),
-        function_g: &(|(mut a, b, c): (native::Integer, native::Integer, i32)| a += &b * c),
-        x_cons: &(|&(ref a, ref b, c)| (gmp_integer_to_native(a), gmp_integer_to_native(b), c)),
-        y_cons: &(|&(ref a, ref b, c)| (gmp_integer_to_native(a), gmp_integer_to_native(b), c)),
-        x_param: &(|&(ref a, ref b, _)| max(a.significant_bits(), b.significant_bits()) as usize),
-        limit,
-        f_name: "Integer.add\\\\_mul\\\\_assign(\\\\&Integer, i32)",
-        g_name: "Integer += \\\\&Integer * i32",
-        title: "Integer.add\\\\_mul\\\\_assign(\\\\&Integer, i32) algorithms",
-        x_axis_label: "max(a.significant\\\\_bits(), b.significant\\\\_bits())",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
-}
-
-pub fn benchmark_exhaustive_integer_add_mul_i32(limit: usize, file_name: &str) {
-    println!("benchmarking exhaustive Integer.add_mul(Integer, i32)");
-    benchmark_2(BenchmarkOptions2 {
-        xs: exhaustive_triples(
-            exhaustive_integers(),
-            exhaustive_integers(),
-            exhaustive_i::<i32>(),
-        ),
+        xs: select_inputs(gm),
         function_f: &(|(a, b, c): (gmp::Integer, gmp::Integer, i32)| a.add_mul(b, c)),
         function_g: &(|(a, b, c): (native::Integer, native::Integer, i32)| a.add_mul(b, c)),
         x_cons: &(|t| t.clone()),
@@ -455,38 +227,17 @@ pub fn benchmark_exhaustive_integer_add_mul_i32(limit: usize, file_name: &str) {
     });
 }
 
-pub fn benchmark_random_integer_add_mul_i32(limit: usize, scale: u32, file_name: &str) {
-    println!("benchmarking random Integer.add_mul(Integer, i32)");
-    benchmark_2(BenchmarkOptions2 {
-        xs: random_triples(
-            &EXAMPLE_SEED,
-            &(|seed| random_integers(seed, scale)),
-            &(|seed| random_integers(seed, scale)),
-            &(|seed| random_x(seed)),
-        ),
-        function_f: &(|(a, b, c): (gmp::Integer, gmp::Integer, i32)| a.add_mul(b, c)),
-        function_g: &(|(a, b, c): (native::Integer, native::Integer, i32)| a.add_mul(b, c)),
-        x_cons: &(|t| t.clone()),
-        y_cons: &(|&(ref a, ref b, c)| (gmp_integer_to_native(a), gmp_integer_to_native(b), c)),
-        x_param: &(|&(ref a, ref b, _)| max(a.significant_bits(), b.significant_bits()) as usize),
-        limit,
-        f_name: "malachite-gmp",
-        g_name: "malachite-native",
-        title: "Integer.add\\\\_mul(Integer, i32)",
-        x_axis_label: "max(a.significant\\\\_bits(), b.significant\\\\_bits())",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
-}
-
-pub fn benchmark_exhaustive_integer_add_mul_i32_evaluation_strategy(limit: usize, file_name: &str) {
-    println!("benchmarking exhaustive Integer.add_mul(Integer, i32) evaluation strategy");
+pub fn benchmark_integer_add_mul_i32_evaluation_strategy(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    println!(
+        "benchmarking {} Integer.add_mul(Integer, i32) evaluation strategy",
+        gm.name()
+    );
     benchmark_4(BenchmarkOptions4 {
-        xs: exhaustive_triples(
-            exhaustive_integers(),
-            exhaustive_integers(),
-            exhaustive_i::<i32>(),
-        ),
+        xs: select_inputs(gm),
         function_f: &(|(a, b, c): (native::Integer, native::Integer, i32)| a.add_mul(b, c)),
         function_g: &(|(a, b, c): (native::Integer, native::Integer, i32)| a.add_mul(&b, c)),
         function_h: &(|(a, b, c): (native::Integer, native::Integer, i32)| (&a).add_mul(b, c)),
@@ -508,48 +259,13 @@ pub fn benchmark_exhaustive_integer_add_mul_i32_evaluation_strategy(limit: usize
     });
 }
 
-pub fn benchmark_random_integer_add_mul_i32_evaluation_strategy(
-    limit: usize,
-    scale: u32,
-    file_name: &str,
-) {
-    println!("benchmarking random Integer.add_mul(Integer, i32) evaluation strategy");
-    benchmark_4(BenchmarkOptions4 {
-        xs: random_triples(
-            &EXAMPLE_SEED,
-            &(|seed| random_integers(seed, scale)),
-            &(|seed| random_integers(seed, scale)),
-            &(|seed| random_x(seed)),
-        ),
-        function_f: &(|(a, b, c): (native::Integer, native::Integer, i32)| a.add_mul(b, c)),
-        function_g: &(|(a, b, c): (native::Integer, native::Integer, i32)| a.add_mul(&b, c)),
-        function_h: &(|(a, b, c): (native::Integer, native::Integer, i32)| (&a).add_mul(b, c)),
-        function_i: &(|(a, b, c): (native::Integer, native::Integer, i32)| (&a).add_mul(&b, c)),
-        x_cons: &(|&(ref a, ref b, c)| (gmp_integer_to_native(a), gmp_integer_to_native(b), c)),
-        y_cons: &(|&(ref a, ref b, c)| (gmp_integer_to_native(a), gmp_integer_to_native(b), c)),
-        z_cons: &(|&(ref a, ref b, c)| (gmp_integer_to_native(a), gmp_integer_to_native(b), c)),
-        w_cons: &(|&(ref a, ref b, c)| (gmp_integer_to_native(a), gmp_integer_to_native(b), c)),
-        x_param: &(|&(ref a, ref b, _)| max(a.significant_bits(), b.significant_bits()) as usize),
-        limit,
-        f_name: "Integer.add\\\\_mul(Integer, i32)",
-        g_name: "Integer.add\\\\_mul(\\\\&Integer, i32)",
-        h_name: "(\\\\&Integer).add\\\\_mul(Integer, i32)",
-        i_name: "(\\\\&Integer).add\\\\_mul(\\\\&Integer, i32)",
-        title: "Integer.add\\\\_mul(\\\\&Integer, i32) evaluation strategy",
-        x_axis_label: "max(a.significant\\\\_bits(), b.significant\\\\_bits())",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
-}
-
-pub fn benchmark_exhaustive_integer_add_mul_i32_algorithms(limit: usize, file_name: &str) {
-    println!("benchmarking exhaustive Integer.add_mul(Integer, i32) algorithms");
+pub fn benchmark_integer_add_mul_i32_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
+    println!(
+        "benchmarking {} Integer.add_mul(Integer, i32) algorithms",
+        gm.name()
+    );
     benchmark_2(BenchmarkOptions2 {
-        xs: exhaustive_triples(
-            exhaustive_integers(),
-            exhaustive_integers(),
-            exhaustive_i::<i32>(),
-        ),
+        xs: select_inputs(gm),
         function_f: &(|(a, b, c): (native::Integer, native::Integer, i32)| a.add_mul(b, c)),
         function_g: &(|(a, b, c): (native::Integer, native::Integer, i32)| a + b * c),
         x_cons: &(|&(ref a, ref b, c)| (gmp_integer_to_native(a), gmp_integer_to_native(b), c)),
@@ -565,38 +281,17 @@ pub fn benchmark_exhaustive_integer_add_mul_i32_algorithms(limit: usize, file_na
     });
 }
 
-pub fn benchmark_random_integer_add_mul_i32_algorithms(limit: usize, scale: u32, file_name: &str) {
-    println!("benchmarking random Integer.add_mul(Integer, i32) algorithms");
+pub fn benchmark_integer_add_mul_i32_val_ref_algorithms(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    println!(
+        "benchmarking {} Integer.add_mul(&Integer, i32) algorithms",
+        gm.name()
+    );
     benchmark_2(BenchmarkOptions2 {
-        xs: random_triples(
-            &EXAMPLE_SEED,
-            &(|seed| random_integers(seed, scale)),
-            &(|seed| random_integers(seed, scale)),
-            &(|seed| random_x(seed)),
-        ),
-        function_f: &(|(a, b, c): (native::Integer, native::Integer, i32)| a.add_mul(b, c)),
-        function_g: &(|(a, b, c): (native::Integer, native::Integer, i32)| a + b * c),
-        x_cons: &(|&(ref a, ref b, c)| (gmp_integer_to_native(a), gmp_integer_to_native(b), c)),
-        y_cons: &(|&(ref a, ref b, c)| (gmp_integer_to_native(a), gmp_integer_to_native(b), c)),
-        x_param: &(|&(ref a, ref b, _)| max(a.significant_bits(), b.significant_bits()) as usize),
-        limit,
-        f_name: "Integer.add\\\\_mul(Integer, i32)",
-        g_name: "Integer + Integer * i32",
-        title: "Integer.add\\\\_mul(Integer, i32) algorithms",
-        x_axis_label: "max(a.significant\\\\_bits(), b.significant\\\\_bits())",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
-}
-
-pub fn benchmark_exhaustive_integer_add_mul_i32_val_ref_algorithms(limit: usize, file_name: &str) {
-    println!("benchmarking exhaustive Integer.add_mul(&Integer, i32) algorithms");
-    benchmark_2(BenchmarkOptions2 {
-        xs: exhaustive_triples(
-            exhaustive_integers(),
-            exhaustive_integers(),
-            exhaustive_i::<i32>(),
-        ),
+        xs: select_inputs(gm),
         function_f: &(|(a, b, c): (native::Integer, native::Integer, i32)| a.add_mul(&b, c)),
         function_g: &(|(a, b, c): (native::Integer, native::Integer, i32)| a + &b * c),
         x_cons: &(|&(ref a, ref b, c)| (gmp_integer_to_native(a), gmp_integer_to_native(b), c)),
@@ -612,42 +307,17 @@ pub fn benchmark_exhaustive_integer_add_mul_i32_val_ref_algorithms(limit: usize,
     });
 }
 
-pub fn benchmark_random_integer_add_mul_i32_val_ref_algorithms(
+pub fn benchmark_integer_add_mul_i32_ref_val_algorithms(
+    gm: GenerationMode,
     limit: usize,
-    scale: u32,
     file_name: &str,
 ) {
-    println!("benchmarking random Integer.add_mul(&Integer, i32) algorithms");
+    println!(
+        "benchmarking {} (&Integer).add_mul(Integer, i32) algorithms",
+        gm.name()
+    );
     benchmark_2(BenchmarkOptions2 {
-        xs: random_triples(
-            &EXAMPLE_SEED,
-            &(|seed| random_integers(seed, scale)),
-            &(|seed| random_integers(seed, scale)),
-            &(|seed| random_x(seed)),
-        ),
-        function_f: &(|(a, b, c): (native::Integer, native::Integer, i32)| a.add_mul(&b, c)),
-        function_g: &(|(a, b, c): (native::Integer, native::Integer, i32)| a + &b * c),
-        x_cons: &(|&(ref a, ref b, c)| (gmp_integer_to_native(a), gmp_integer_to_native(b), c)),
-        y_cons: &(|&(ref a, ref b, c)| (gmp_integer_to_native(a), gmp_integer_to_native(b), c)),
-        x_param: &(|&(ref a, ref b, _)| max(a.significant_bits(), b.significant_bits()) as usize),
-        limit,
-        f_name: "Integer.add\\\\_mul(\\\\&Integer, i32)",
-        g_name: "Integer + \\\\&Integer * i32",
-        title: "Integer.add\\\\_mul(\\\\&Integer, i32) algorithms",
-        x_axis_label: "max(a.significant\\\\_bits(), b.significant\\\\_bits())",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
-}
-
-pub fn benchmark_exhaustive_integer_add_mul_i32_ref_val_algorithms(limit: usize, file_name: &str) {
-    println!("benchmarking exhaustive (&Integer).add_mul(Integer, i32) algorithms");
-    benchmark_2(BenchmarkOptions2 {
-        xs: exhaustive_triples(
-            exhaustive_integers(),
-            exhaustive_integers(),
-            exhaustive_i::<i32>(),
-        ),
+        xs: select_inputs(gm),
         function_f: &(|(a, b, c): (native::Integer, native::Integer, i32)| (&a).add_mul(b, c)),
         function_g: &(|(a, b, c): (native::Integer, native::Integer, i32)| &a + b * c),
         x_cons: &(|&(ref a, ref b, c)| (gmp_integer_to_native(a), gmp_integer_to_native(b), c)),
@@ -663,70 +333,17 @@ pub fn benchmark_exhaustive_integer_add_mul_i32_ref_val_algorithms(limit: usize,
     });
 }
 
-pub fn benchmark_random_integer_add_mul_i32_ref_val_algorithms(
+pub fn benchmark_integer_add_mul_i32_ref_ref_algorithms(
+    gm: GenerationMode,
     limit: usize,
-    scale: u32,
     file_name: &str,
 ) {
-    println!("benchmarking random (&Integer).add_mul(Integer, i32) algorithms");
+    println!(
+        "benchmarking {} (&Integer).add_mul(&Integer, i32) algorithms",
+        gm.name()
+    );
     benchmark_2(BenchmarkOptions2 {
-        xs: random_triples(
-            &EXAMPLE_SEED,
-            &(|seed| random_integers(seed, scale)),
-            &(|seed| random_integers(seed, scale)),
-            &(|seed| random_x(seed)),
-        ),
-        function_f: &(|(a, b, c): (native::Integer, native::Integer, i32)| (&a).add_mul(b, c)),
-        function_g: &(|(a, b, c): (native::Integer, native::Integer, i32)| &a + b * c),
-        x_cons: &(|&(ref a, ref b, c)| (gmp_integer_to_native(a), gmp_integer_to_native(b), c)),
-        y_cons: &(|&(ref a, ref b, c)| (gmp_integer_to_native(a), gmp_integer_to_native(b), c)),
-        x_param: &(|&(ref a, ref b, _)| max(a.significant_bits(), b.significant_bits()) as usize),
-        limit,
-        f_name: "(\\\\&Integer).add\\\\_mul(Integer, i32)",
-        g_name: "(\\\\&Integer) + Integer * i32",
-        title: "(\\\\&Integer).add\\\\_mul(Integer, i32) algorithms",
-        x_axis_label: "max(a.significant\\\\_bits(), b.significant\\\\_bits())",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
-}
-
-pub fn benchmark_exhaustive_integer_add_mul_i32_ref_ref_algorithms(limit: usize, file_name: &str) {
-    println!("benchmarking exhaustive (&Integer).add_mul(&Integer, i32) algorithms");
-    benchmark_2(BenchmarkOptions2 {
-        xs: exhaustive_triples(
-            exhaustive_integers(),
-            exhaustive_integers(),
-            exhaustive_i::<i32>(),
-        ),
-        function_f: &(|(a, b, c): (native::Integer, native::Integer, i32)| (&a).add_mul(&b, c)),
-        function_g: &(|(a, b, c): (native::Integer, native::Integer, i32)| &a + &b * c),
-        x_cons: &(|&(ref a, ref b, c)| (gmp_integer_to_native(a), gmp_integer_to_native(b), c)),
-        y_cons: &(|&(ref a, ref b, c)| (gmp_integer_to_native(a), gmp_integer_to_native(b), c)),
-        x_param: &(|&(ref a, ref b, _)| max(a.significant_bits(), b.significant_bits()) as usize),
-        limit,
-        f_name: "(\\\\&Integer).add\\\\_mul(\\\\&Integer, i32)",
-        g_name: "(\\\\&Integer) + \\\\&Integer * i32",
-        title: "(\\\\&Integer).add\\\\_mul(\\\\&Integer, i32) algorithms",
-        x_axis_label: "max(a.significant\\\\_bits(), b.significant\\\\_bits())",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
-}
-
-pub fn benchmark_random_integer_add_mul_i32_ref_ref_algorithms(
-    limit: usize,
-    scale: u32,
-    file_name: &str,
-) {
-    println!("benchmarking random (&Integer).add_mul(&Integer, i32) algorithms");
-    benchmark_2(BenchmarkOptions2 {
-        xs: random_triples(
-            &EXAMPLE_SEED,
-            &(|seed| random_integers(seed, scale)),
-            &(|seed| random_integers(seed, scale)),
-            &(|seed| random_x(seed)),
-        ),
+        xs: select_inputs(gm),
         function_f: &(|(a, b, c): (native::Integer, native::Integer, i32)| (&a).add_mul(&b, c)),
         function_g: &(|(a, b, c): (native::Integer, native::Integer, i32)| &a + &b * c),
         x_cons: &(|&(ref a, ref b, c)| (gmp_integer_to_native(a), gmp_integer_to_native(b), c)),

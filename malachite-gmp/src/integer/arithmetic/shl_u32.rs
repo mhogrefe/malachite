@@ -119,9 +119,7 @@ impl ShlAssign<u32> for Integer {
                     None
                 }
             },
-            {
-                unsafe { gmp::mpz_mul_2exp(large, large, other.into()) }
-            }
+            { unsafe { gmp::mpz_mul_2exp(large, large, other.into()) } }
         );
     }
 }

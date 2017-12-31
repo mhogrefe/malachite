@@ -3,14 +3,14 @@ use malachite_base::traits::{One, Zero};
 use malachite_base::traits::{SubMul, SubMulAssign};
 use malachite_native::natural as native;
 use malachite_gmp::natural as gmp;
-use malachite_test::common::{gmp_natural_to_native, native_natural_to_gmp};
+use malachite_test::common::{gmp_natural_to_native, native_natural_to_gmp, GenerationMode};
+use malachite_test::natural::arithmetic::sub_mul_u32::select_inputs_2;
 use rust_wheels::iterators::common::EXAMPLE_SEED;
 use rust_wheels::iterators::general::random_x;
 use rust_wheels::iterators::naturals::{exhaustive_naturals, random_naturals};
 use rust_wheels::iterators::primitive_ints::exhaustive_u;
-use rust_wheels::iterators::tuples::{exhaustive_pairs, exhaustive_pairs_from_single,
-                                     exhaustive_triples, random_pairs, random_pairs_from_single,
-                                     random_triples};
+use rust_wheels::iterators::tuples::{exhaustive_pairs, exhaustive_pairs_from_single, random_pairs,
+                                     random_pairs_from_single};
 use std::str::FromStr;
 
 #[test]
@@ -44,7 +44,6 @@ fn test_sub_mul_assign_u32() {
     test("1000000000000000000000", "1000000000000", 1000000000, "0");
 }
 
-
 #[test]
 #[should_panic(expected = "Natural sub_mul_assign cannot have a negative result")]
 fn sub_mul_assign_fail_native_1() {
@@ -76,25 +75,20 @@ fn sub_mul_assign_fail_gmp_2() {
 #[test]
 fn test_sub_mul_u32() {
     let test = |u, v, c: u32, out| {
-        let on = native::Natural::from_str(u).unwrap().sub_mul(
-            &native::Natural::from_str(v).unwrap(),
-            c,
-        );
+        let on = native::Natural::from_str(u)
+            .unwrap()
+            .sub_mul(&native::Natural::from_str(v).unwrap(), c);
         assert_eq!(format!("{:?}", on), out);
         assert!(on.map_or(true, |n| n.is_valid()));
 
-        let on = gmp::Natural::from_str(u).unwrap().sub_mul(
-            &gmp::Natural::from_str(v)
-                .unwrap(),
-            c,
-        );
+        let on = gmp::Natural::from_str(u)
+            .unwrap()
+            .sub_mul(&gmp::Natural::from_str(v).unwrap(), c);
         assert_eq!(format!("{:?}", on), out);
         assert!(on.map_or(true, |n| n.is_valid()));
 
-        let on = (&native::Natural::from_str(u).unwrap()).sub_mul(
-            &native::Natural::from_str(v).unwrap(),
-            c,
-        );
+        let on = (&native::Natural::from_str(u).unwrap())
+            .sub_mul(&native::Natural::from_str(v).unwrap(), c);
         assert_eq!(format!("{:?}", on), out);
         assert!(on.map_or(true, |n| n.is_valid()));
 
@@ -204,12 +198,11 @@ fn sub_mul_u32_properties() {
         assert_eq!(a.sub_mul(b, 1), a - b);
     };
 
-    for (a, b, c) in exhaustive_triples(
-        exhaustive_naturals(),
-        exhaustive_naturals(),
-        exhaustive_u::<u32>(),
-    ).take(LARGE_LIMIT)
-    {
+    for (a, b, c) in select_inputs_2(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
+        natural_natural_and_u32(a, b, c);
+    }
+
+    for (a, b, c) in select_inputs_2(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         natural_natural_and_u32(a, b, c);
     }
 
@@ -219,16 +212,6 @@ fn sub_mul_u32_properties() {
 
     for n in random_naturals(&EXAMPLE_SEED, 32).take(LARGE_LIMIT) {
         single_natural(n);
-    }
-
-    for (a, b, c) in random_triples(
-        &EXAMPLE_SEED,
-        &(|seed| random_naturals(seed, 32)),
-        &(|seed| random_naturals(seed, 32)),
-        &(|seed| random_x(seed)),
-    ).take(LARGE_LIMIT)
-    {
-        natural_natural_and_u32(a, b, c);
     }
 
     for (n, c) in exhaustive_pairs(exhaustive_naturals(), exhaustive_u::<u32>()).take(LARGE_LIMIT) {

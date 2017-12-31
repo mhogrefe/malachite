@@ -65,21 +65,17 @@ impl<'a> Not for &'a Integer {
             Integer {
                 sign: true,
                 ref abs,
-            } => {
-                Integer {
-                    sign: false,
-                    abs: abs + 1,
-                }
-            }
+            } => Integer {
+                sign: false,
+                abs: abs + 1,
+            },
             Integer {
                 sign: false,
                 ref abs,
-            } => {
-                Integer {
-                    sign: true,
-                    abs: (abs - 1).unwrap(),
-                }
-            }
+            } => Integer {
+                sign: true,
+                abs: (abs - 1).unwrap(),
+            },
         }
     }
 }

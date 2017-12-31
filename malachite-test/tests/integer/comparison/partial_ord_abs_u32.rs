@@ -2,13 +2,13 @@ use common::LARGE_LIMIT;
 use malachite_base::traits::PartialOrdAbs;
 use malachite_gmp::integer as gmp;
 use malachite_native::integer as native;
-use malachite_test::common::gmp_integer_to_native;
+use malachite_test::common::{gmp_integer_to_native, GenerationMode};
+use malachite_test::integer::comparison::partial_ord_abs_u32::select_inputs_1;
 use rust_wheels::iterators::common::EXAMPLE_SEED;
 use rust_wheels::iterators::general::random_x;
 use rust_wheels::iterators::integers::{exhaustive_integers, random_integers};
 use rust_wheels::iterators::primitive_ints::exhaustive_u;
-use rust_wheels::iterators::tuples::{exhaustive_pairs, exhaustive_triples, random_pairs,
-                                     random_triples};
+use rust_wheels::iterators::tuples::{exhaustive_triples, random_triples};
 use std::cmp::Ordering;
 use std::str::FromStr;
 
@@ -78,7 +78,6 @@ fn partial_cmp_u32_properties() {
         } else if n.gt_abs(&u) && PartialOrdAbs::gt_abs(&u, &m) {
             assert!(n.gt_abs(&m));
         }
-
     };
 
     // u.lt_abs(n) and n.lt_abs(v) => u < v
@@ -92,16 +91,11 @@ fn partial_cmp_u32_properties() {
         }
     };
 
-    for (n, u) in exhaustive_pairs(exhaustive_integers(), exhaustive_u::<u32>()).take(LARGE_LIMIT) {
+    for (n, u) in select_inputs_1(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         integer_and_u32(n, u);
     }
 
-    for (n, u) in random_pairs(
-        &EXAMPLE_SEED,
-        &(|seed| random_integers(seed, 32)),
-        &(|seed| random_x::<u32>(seed)),
-    ).take(LARGE_LIMIT)
-    {
+    for (n, u) in select_inputs_1(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         integer_and_u32(n, u);
     }
 

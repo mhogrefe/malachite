@@ -170,9 +170,7 @@ impl AddAssign<u32> for Integer {
                     None
                 }
             },
-            {
-                unsafe { gmp::mpz_add_ui(large, large, other.into()) }
-            }
+            { unsafe { gmp::mpz_add_ui(large, large, other.into()) } }
         );
         self.demote_if_small();
     }

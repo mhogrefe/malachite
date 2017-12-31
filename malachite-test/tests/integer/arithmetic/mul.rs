@@ -4,16 +4,16 @@ use malachite_native::integer as native;
 use malachite_gmp::integer as gmp;
 use malachite_test::common::{gmp_integer_to_native, native_integer_to_num_bigint,
                              native_integer_to_rugint, num_bigint_to_native_integer,
-                             rugint_integer_to_native};
+                             rugint_integer_to_native, GenerationMode};
+use malachite_test::integer::arithmetic::mul::select_inputs;
 use num;
 use rugint;
 use rust_wheels::iterators::common::EXAMPLE_SEED;
 use rust_wheels::iterators::general::random_x;
 use rust_wheels::iterators::integers::{exhaustive_integers, random_integers};
 use rust_wheels::iterators::primitive_ints::exhaustive_u;
-use rust_wheels::iterators::tuples::{exhaustive_pairs, exhaustive_pairs_from_single,
-                                     exhaustive_triples_from_single, random_pairs,
-                                     random_pairs_from_single, random_triples_from_single};
+use rust_wheels::iterators::tuples::{exhaustive_pairs, exhaustive_triples_from_single,
+                                     random_pairs, random_triples_from_single};
 use std::str::FromStr;
 
 #[test]
@@ -254,11 +254,11 @@ fn mul_properties() {
         assert_eq!((&x + &y) * &z, x * &z + y * z);
     };
 
-    for (x, y) in exhaustive_pairs_from_single(exhaustive_integers()).take(LARGE_LIMIT) {
+    for (x, y) in select_inputs(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         two_integers(x, y);
     }
 
-    for (x, y) in random_pairs_from_single(random_integers(&EXAMPLE_SEED, 32)).take(LARGE_LIMIT) {
+    for (x, y) in select_inputs(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         two_integers(x, y);
     }
 
@@ -287,8 +287,8 @@ fn mul_properties() {
         three_integers(x, y, z);
     }
 
-    for (x, y, z) in random_triples_from_single(random_integers(&EXAMPLE_SEED, 32))
-        .take(LARGE_LIMIT)
+    for (x, y, z) in
+        random_triples_from_single(random_integers(&EXAMPLE_SEED, 32)).take(LARGE_LIMIT)
     {
         three_integers(x, y, z);
     }

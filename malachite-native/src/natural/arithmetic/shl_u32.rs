@@ -1,4 +1,4 @@
-use natural::{LIMB_BITS, LIMB_BITS_MASK, LOG_LIMB_BITS, pad_left};
+use natural::{pad_left, LIMB_BITS, LIMB_BITS_MASK, LOG_LIMB_BITS};
 use natural::Natural::{self, Large, Small};
 use std::ops::{Shl, ShlAssign};
 

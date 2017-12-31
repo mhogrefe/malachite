@@ -2,14 +2,14 @@ use common::LARGE_LIMIT;
 use malachite_base::traits::{NegativeOne, One, SubMul, SubMulAssign, Zero};
 use malachite_native::integer as native;
 use malachite_gmp::integer as gmp;
-use malachite_test::common::{gmp_integer_to_native, native_integer_to_gmp};
+use malachite_test::common::{gmp_integer_to_native, native_integer_to_gmp, GenerationMode};
+use malachite_test::integer::arithmetic::sub_mul_i32::select_inputs;
 use rust_wheels::iterators::common::EXAMPLE_SEED;
 use rust_wheels::iterators::general::random_x;
 use rust_wheels::iterators::integers::{exhaustive_integers, random_integers};
 use rust_wheels::iterators::primitive_ints::exhaustive_i;
-use rust_wheels::iterators::tuples::{exhaustive_pairs, exhaustive_pairs_from_single,
-                                     exhaustive_triples, random_pairs, random_pairs_from_single,
-                                     random_triples};
+use rust_wheels::iterators::tuples::{exhaustive_pairs, exhaustive_pairs_from_single, random_pairs,
+                                     random_pairs_from_single};
 use std::str::FromStr;
 
 #[test]
@@ -36,40 +36,32 @@ fn test_sub_mul_i32() {
         assert_eq!(a.to_string(), out);
         assert!(a.is_valid());
 
-        let a = native::Integer::from_str(u).unwrap().sub_mul(
-            native::Integer::from_str(v).unwrap(),
-            c,
-        );
+        let a = native::Integer::from_str(u)
+            .unwrap()
+            .sub_mul(native::Integer::from_str(v).unwrap(), c);
         assert_eq!(a.to_string(), out);
         assert!(a.is_valid());
 
-        let a = gmp::Integer::from_str(u).unwrap().sub_mul(
-            gmp::Integer::from_str(v)
-                .unwrap(),
-            c,
-        );
+        let a = gmp::Integer::from_str(u)
+            .unwrap()
+            .sub_mul(gmp::Integer::from_str(v).unwrap(), c);
         assert_eq!(a.to_string(), out);
         assert!(a.is_valid());
 
-        let a = native::Integer::from_str(u).unwrap().sub_mul(
-            &native::Integer::from_str(v).unwrap(),
-            c,
-        );
+        let a = native::Integer::from_str(u)
+            .unwrap()
+            .sub_mul(&native::Integer::from_str(v).unwrap(), c);
         assert_eq!(a.to_string(), out);
         assert!(a.is_valid());
 
-        let a = gmp::Integer::from_str(u).unwrap().sub_mul(
-            &gmp::Integer::from_str(v)
-                .unwrap(),
-            c,
-        );
+        let a = gmp::Integer::from_str(u)
+            .unwrap()
+            .sub_mul(&gmp::Integer::from_str(v).unwrap(), c);
         assert_eq!(a.to_string(), out);
         assert!(a.is_valid());
 
-        let a = (&native::Integer::from_str(u).unwrap()).sub_mul(
-            native::Integer::from_str(v).unwrap(),
-            c,
-        );
+        let a = (&native::Integer::from_str(u).unwrap())
+            .sub_mul(native::Integer::from_str(v).unwrap(), c);
         assert_eq!(a.to_string(), out);
         assert!(a.is_valid());
 
@@ -78,10 +70,8 @@ fn test_sub_mul_i32() {
         assert_eq!(a.to_string(), out);
         assert!(a.is_valid());
 
-        let a = (&native::Integer::from_str(u).unwrap()).sub_mul(
-            &native::Integer::from_str(v).unwrap(),
-            c,
-        );
+        let a = (&native::Integer::from_str(u).unwrap())
+            .sub_mul(&native::Integer::from_str(v).unwrap(), c);
         assert_eq!(a.to_string(), out);
         assert!(a.is_valid());
 
@@ -268,22 +258,11 @@ fn sub_mul_i32_properties() {
         assert_eq!(a.sub_mul(b, -1), a + b);
     };
 
-    for (a, b, c) in exhaustive_triples(
-        exhaustive_integers(),
-        exhaustive_integers(),
-        exhaustive_i::<i32>(),
-    ).take(LARGE_LIMIT)
-    {
+    for (a, b, c) in select_inputs(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         integer_integer_and_i32(a, b, c);
     }
 
-    for (a, b, c) in random_triples(
-        &EXAMPLE_SEED,
-        &(|seed| random_integers(seed, 32)),
-        &(|seed| random_integers(seed, 32)),
-        &(|seed| random_x(seed)),
-    ).take(LARGE_LIMIT)
-    {
+    for (a, b, c) in select_inputs(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         integer_integer_and_i32(a, b, c);
     }
 

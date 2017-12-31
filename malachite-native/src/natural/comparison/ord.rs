@@ -9,9 +9,9 @@ pub fn mpn_cmp(s1: &[u32], s2: &[u32]) -> Ordering {
 
 // Compare s1 and s2.
 pub(crate) fn mpn_cmp_helper(s1: &[u32], s2: &[u32]) -> Ordering {
-    s1.len().cmp(&s2.len()).then_with(|| {
-        s1.into_iter().rev().cmp(s2.into_iter().rev())
-    })
+    s1.len()
+        .cmp(&s2.len())
+        .then_with(|| s1.into_iter().rev().cmp(s2.into_iter().rev()))
 }
 
 /// Compares a `Natural` to another `Natural`.

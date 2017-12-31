@@ -1,6 +1,6 @@
 use gmp_mpfr_sys::gmp::{self, mpz_t};
 use integer::Integer::{self, Large, Small};
-use std::{i32, mem};
+use std::{mem, i32};
 use std::ops::Neg;
 use malachite_base::traits::NegAssign;
 

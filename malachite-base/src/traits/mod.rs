@@ -53,8 +53,7 @@ pub trait PartialOrdAbs<Rhs: ?Sized = Self>: PartialEq<Rhs> {
 
     fn le_abs(&self, other: &Rhs) -> bool {
         match self.partial_cmp_abs(other) {
-            Some(Ordering::Less) |
-            Some(Ordering::Equal) => true,
+            Some(Ordering::Less) | Some(Ordering::Equal) => true,
             _ => false,
         }
     }
@@ -68,8 +67,7 @@ pub trait PartialOrdAbs<Rhs: ?Sized = Self>: PartialEq<Rhs> {
 
     fn ge_abs(&self, other: &Rhs) -> bool {
         match self.partial_cmp_abs(other) {
-            Some(Ordering::Greater) |
-            Some(Ordering::Equal) => true,
+            Some(Ordering::Greater) | Some(Ordering::Equal) => true,
             _ => false,
         }
     }

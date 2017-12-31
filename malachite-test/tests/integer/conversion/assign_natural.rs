@@ -4,13 +4,10 @@ use malachite_native as native;
 use malachite_gmp as gmp;
 use malachite_test::common::{gmp_integer_to_native, gmp_natural_to_native, native_integer_to_gmp,
                              native_integer_to_rugint, native_natural_to_rugint_integer,
-                             rugint_integer_to_native};
+                             rugint_integer_to_native, GenerationMode};
+use malachite_test::integer::conversion::assign_natural::select_inputs;
 use rugint;
 use rugint::Assign as rugint_assign;
-use rust_wheels::iterators::common::EXAMPLE_SEED;
-use rust_wheels::iterators::integers::{exhaustive_integers, random_integers};
-use rust_wheels::iterators::naturals::{exhaustive_naturals, random_naturals};
-use rust_wheels::iterators::tuples::{exhaustive_pairs, random_pairs};
 use std::str::FromStr;
 
 #[test]
@@ -89,16 +86,11 @@ fn assign_natural_properties() {
         assert_eq!(rugint_integer_to_native(&rugint_x), y);
     };
 
-    for (x, y) in exhaustive_pairs(exhaustive_integers(), exhaustive_naturals()).take(LARGE_LIMIT) {
+    for (x, y) in select_inputs(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         integer_and_natural(x, y);
     }
 
-    for (x, y) in random_pairs(
-        &EXAMPLE_SEED,
-        &(|seed| random_integers(seed, 32)),
-        &(|seed| random_naturals(seed, 32)),
-    ).take(LARGE_LIMIT)
-    {
+    for (x, y) in select_inputs(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         integer_and_natural(x, y);
     }
 }

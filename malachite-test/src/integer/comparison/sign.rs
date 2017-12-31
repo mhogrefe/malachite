@@ -1,4 +1,5 @@
-use common::{gmp_integer_to_native, gmp_integer_to_num_bigint, gmp_integer_to_rugint};
+use common::{gmp_integer_to_native, gmp_integer_to_num_bigint, gmp_integer_to_rugint,
+             GenerationMode};
 use malachite_gmp::integer as gmp;
 use malachite_native::integer as native;
 use num;
@@ -17,8 +18,25 @@ pub fn num_sign(x: &num::BigInt) -> Ordering {
     }
 }
 
-pub fn demo_exhaustive_integer_sign(limit: usize) {
-    for n in exhaustive_integers().take(limit) {
+type It = Iterator<Item = gmp::Integer>;
+
+pub fn exhaustive_inputs() -> Box<It> {
+    Box::new(exhaustive_integers())
+}
+
+pub fn random_inputs(scale: u32) -> Box<It> {
+    Box::new(random_integers(&EXAMPLE_SEED, scale))
+}
+
+pub fn select_inputs(gm: GenerationMode) -> Box<It> {
+    match gm {
+        GenerationMode::Exhaustive => exhaustive_inputs(),
+        GenerationMode::Random(scale) => random_inputs(scale),
+    }
+}
+
+pub fn demo_integer_sign(gm: GenerationMode, limit: usize) {
+    for n in select_inputs(gm).take(limit) {
         match n.sign() {
             Ordering::Less => println!("{} is negative", n),
             Ordering::Equal => println!("{} is zero", n),
@@ -27,45 +45,10 @@ pub fn demo_exhaustive_integer_sign(limit: usize) {
     }
 }
 
-pub fn demo_random_integer_sign(limit: usize) {
-    for n in random_integers(&EXAMPLE_SEED, 32).take(limit) {
-        match n.sign() {
-            Ordering::Less => println!("{} is negative", n),
-            Ordering::Equal => println!("{} is zero", n),
-            Ordering::Greater => println!("{} is positive", n),
-        }
-    }
-}
-
-pub fn benchmark_exhaustive_integer_sign(limit: usize, file_name: &str) {
-    println!("benchmarking exhaustive Integer.sign()");
+pub fn benchmark_integer_sign(gm: GenerationMode, limit: usize, file_name: &str) {
+    println!("benchmarking {} Integer.sign()", gm.name());
     benchmark_4(BenchmarkOptions4 {
-        xs: exhaustive_integers(),
-        function_f: &(|n: gmp::Integer| n.sign()),
-        function_g: &(|n: native::Integer| n.sign()),
-        function_h: &(|n: num::BigInt| num_sign(&n)),
-        function_i: &(|n: rugint::Integer| n.sign()),
-        x_cons: &(|x| x.clone()),
-        y_cons: &(|x| gmp_integer_to_native(x)),
-        z_cons: &(|x| gmp_integer_to_num_bigint(x)),
-        w_cons: &(|x| gmp_integer_to_rugint(x)),
-        x_param: &(|n| n.significant_bits() as usize),
-        limit,
-        f_name: "malachite-gmp",
-        g_name: "malachite-native",
-        h_name: "num",
-        i_name: "rugint",
-        title: "Integer.sign()",
-        x_axis_label: "n.significant\\\\_bits()",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
-}
-
-pub fn benchmark_random_integer_sign(limit: usize, scale: u32, file_name: &str) {
-    println!("benchmarking random Integer.sign()");
-    benchmark_4(BenchmarkOptions4 {
-        xs: random_integers(&EXAMPLE_SEED, scale),
+        xs: select_inputs(gm),
         function_f: &(|n: gmp::Integer| n.sign()),
         function_g: &(|n: native::Integer| n.sign()),
         function_h: &(|n: num::BigInt| num_sign(&n)),

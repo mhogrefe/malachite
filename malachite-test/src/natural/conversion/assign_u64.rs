@@ -1,4 +1,4 @@
-use common::{gmp_natural_to_native, gmp_natural_to_num_biguint};
+use common::{gmp_natural_to_native, gmp_natural_to_num_biguint, GenerationMode};
 use malachite_base::traits::Assign;
 use malachite_gmp::natural as gmp;
 use malachite_native::natural as native;
@@ -14,57 +14,39 @@ pub fn num_assign_u64(x: &mut num::BigUint, u: u64) {
     *x = num::BigUint::from(u);
 }
 
-pub fn demo_exhaustive_natural_assign_u64(limit: usize) {
-    for (mut n, u) in exhaustive_pairs(exhaustive_naturals(), exhaustive_u::<u64>()).take(limit) {
-        let n_old = n.clone();
-        n.assign(u);
-        println!("x := {}; x.assign({}); x = {}", n_old, u, n);
-    }
+type It = Iterator<Item = (gmp::Natural, u64)>;
+
+pub fn exhaustive_inputs() -> Box<It> {
+    Box::new(exhaustive_pairs(exhaustive_naturals(), exhaustive_u()))
 }
 
-pub fn demo_random_natural_assign_u64(limit: usize) {
-    for (mut n, u) in random_pairs(
+pub fn random_inputs(scale: u32) -> Box<It> {
+    Box::new(random_pairs(
         &EXAMPLE_SEED,
-        &(|seed| random_naturals(seed, 32)),
-        &(|seed| random_x::<u64>(seed)),
-    ).take(limit)
-    {
+        &(|seed| random_naturals(seed, scale)),
+        &(|seed| random_x(seed)),
+    ))
+}
+
+pub fn select_inputs(gm: GenerationMode) -> Box<It> {
+    match gm {
+        GenerationMode::Exhaustive => exhaustive_inputs(),
+        GenerationMode::Random(scale) => random_inputs(scale),
+    }
+}
+
+pub fn demo_natural_assign_u64(gm: GenerationMode, limit: usize) {
+    for (mut n, u) in select_inputs(gm).take(limit) {
         let n_old = n.clone();
         n.assign(u);
         println!("x := {}; x.assign({}); x = {}", n_old, u, n);
     }
 }
 
-pub fn benchmark_exhaustive_natural_assign_u64(limit: usize, file_name: &str) {
-    println!("benchmarking exhaustive Natural.assign(u64)");
+pub fn benchmark_natural_assign_u64(gm: GenerationMode, limit: usize, file_name: &str) {
+    println!("benchmarking {} Natural.assign(u64)", gm.name());
     benchmark_3(BenchmarkOptions3 {
-        xs: exhaustive_pairs(exhaustive_naturals(), exhaustive_u::<u64>()),
-        function_f: &(|(mut n, u): (gmp::Natural, u64)| n.assign(u)),
-        function_g: &(|(mut n, u): (native::Natural, u64)| n.assign(u)),
-        function_h: &(|(mut n, u): (num::BigUint, u64)| num_assign_u64(&mut n, u)),
-        x_cons: &(|p| p.clone()),
-        y_cons: &(|&(ref n, u)| (gmp_natural_to_native(n), u)),
-        z_cons: &(|&(ref n, u)| (gmp_natural_to_num_biguint(n), u)),
-        x_param: &(|&(ref n, _)| n.significant_bits() as usize),
-        limit,
-        f_name: "malachite-gmp",
-        g_name: "malachite-native",
-        h_name: "num",
-        title: "Natural.assign(u64)",
-        x_axis_label: "n.significant\\\\_bits()",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
-}
-
-pub fn benchmark_random_natural_assign_u64(limit: usize, scale: u32, file_name: &str) {
-    println!("benchmarking random Natural.assign(u64)");
-    benchmark_3(BenchmarkOptions3 {
-        xs: random_pairs(
-            &EXAMPLE_SEED,
-            &(|seed| random_naturals(seed, scale)),
-            &(|seed| random_x::<u64>(seed)),
-        ),
+        xs: select_inputs(gm),
         function_f: &(|(mut n, u): (gmp::Natural, u64)| n.assign(u)),
         function_g: &(|(mut n, u): (native::Natural, u64)| n.assign(u)),
         function_h: &(|(mut n, u): (num::BigUint, u64)| num_assign_u64(&mut n, u)),

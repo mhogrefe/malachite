@@ -7,7 +7,7 @@ use natural::arithmetic::shr_u32::mpn_rshift_in_place;
 use natural::arithmetic::sub::{mpn_sub, mpn_sub_n, mpn_sub_n_aba, mpn_sub_n_in_place};
 use natural::arithmetic::sub_u32::mpn_sub_1_in_place;
 use natural::comparison::ord::mpn_cmp;
-use natural::{LIMB_BITS, mpn_zero, mpn_zero_p};
+use natural::{mpn_zero, mpn_zero_p, LIMB_BITS};
 use natural::Natural::{self, Large, Small};
 use std::cmp::Ordering;
 use std::ops::{Mul, MulAssign};
@@ -39,12 +39,11 @@ fn mpn_toom33_mul_itch(an: usize) -> usize {
 }
 
 fn mpn_toom32_mul_itch(an: usize, bn: usize) -> usize {
-    let n = 1 +
-        (if 2 * an >= 3 * bn {
-             (an - 1) / 3
-         } else {
-             (bn - 1) >> 1
-         });
+    let n = 1 + (if 2 * an >= 3 * bn {
+        (an - 1) / 3
+    } else {
+        (bn - 1) >> 1
+    });
     2 * n + 1
 }
 
@@ -58,12 +57,11 @@ fn mpn_toom42_mul_itch(an: usize, bn: usize) -> usize {
 }
 
 fn mpn_toom43_mul_itch(an: usize, bn: usize) -> usize {
-    let n = 1 +
-        (if 3 * an >= 4 * bn {
-             (an - 1) >> 2
-         } else {
-             (bn - 1) / 3
-         });
+    let n = 1 + (if 3 * an >= 4 * bn {
+        (an - 1) >> 2
+    } else {
+        (bn - 1) / 3
+    });
     6 * n + 4
 }
 
@@ -72,22 +70,20 @@ fn mpn_toom44_mul_itch(an: usize) -> usize {
 }
 
 fn mpn_toom53_mul_itch(an: usize, bn: usize) -> usize {
-    let n = 1 +
-        (if 3 * an >= 5 * bn {
-             (an - 1) / 5
-         } else {
-             (bn - 1) / 3
-         });
+    let n = 1 + (if 3 * an >= 5 * bn {
+        (an - 1) / 5
+    } else {
+        (bn - 1) / 3
+    });
     10 * n + 10
 }
 
 fn mpn_toom63_mul_itch(an: usize, bn: usize) -> usize {
-    let n = 1 +
-        (if an >= 2 * bn {
-             (an - 1) / 6
-         } else {
-             (bn - 1) / 3
-         });
+    let n = 1 + (if an >= 2 * bn {
+        (an - 1) / 6
+    } else {
+        (bn - 1) / 3
+    });
     9 * n + 3
 }
 
@@ -137,7 +133,6 @@ pub fn mpn_mul_n(p: &mut [u32], a: &[u32], b: &[u32]) {
         let mut ws = vec![0; mpn_toom8_mul_n_itch(n)];
         mpn_toom8h_mul(p, a, b, &mut ws[..]);
     }
-
 }
 
 fn toom22_mul_n_rec(p: &mut [u32], a: &[u32], b: &[u32], ws: &mut [u32]) {
@@ -205,12 +200,11 @@ fn mpn_toom22_mul(p: &mut [u32], a: &[u32], b: &[u32], scratch: &mut [u32]) {
             p[s] = 0;
             vm1_neg = true;
         } else {
-            p[s] = a[s] -
-                if mpn_sub_n(&mut p[..], &a[0..s], &a[n..n + s]) {
-                    1
-                } else {
-                    0
-                };
+            p[s] = a[s] - if mpn_sub_n(&mut p[..], &a[0..s], &a[n..n + s]) {
+                1
+            } else {
+                0
+            };
         }
     }
 
@@ -344,7 +338,6 @@ fn mpn_toom_eval_dgr3_pm1(
     x3n: usize,
     t: &mut [u32],
 ) -> bool {
-
     assert!(x3n > 0);
     assert!(x3n <= n);
 
@@ -415,7 +408,7 @@ fn mpn_toom_interpolate_5pts(
     //     v0       v1       hi(vinf)       |vm1|     v2-vm1      EMPTY
 
     assert_eq!(mpn_divexact_by3_in_place(&mut v2[0..kk1]), 0); // v2 <- v2 / 3
-    // (5 3 1 1 0)
+                                                               // (5 3 1 1 0)
 
     // {c,2k} {c+2k,2k+1} {c+4k+1,2r-1} {t,2k+1} {t+2k+1,2k+1} {t+4k+2,2r}
     //    v0       v1      hi(vinf)       |vm1|     (v2-vm1)/3    EMPTY
@@ -470,13 +463,13 @@ fn mpn_toom_interpolate_5pts(
         0
     };
     mpn_add_1_in_place(&mut c[3 * k + 1..4 * k + twor], cy); // 2n-(3k+1) = 2r+k-1
-    // Memory allocated for vm1 is now free, it can be recycled ...
+                                                             // Memory allocated for vm1 is now free, it can be recycled ...
 
     // (6) v2 <- v2 - 2*vinf,     (2 1 0 0 0) - 2*(1 0 0 0 0) = (0 1 0 0 0)
     // result is v2 >= 0
     let saved = c[4 * k]; // Remember v1's highest byte (will be overwritten).
     c[4 * k] = vinf0; // Set the right value for vinf0
-    // Overwrite unused vm1
+                      // Overwrite unused vm1
     cy = mpn_lshift(vm1, &c[4 * k..4 * k + twor], 1);
     cy += if mpn_sub_n_in_place(&mut v2[0..twor], &vm1[0..twor]) {
         1
@@ -698,12 +691,11 @@ fn mpn_toom42_mul(p: &mut [u32], a: &[u32], b: &[u32], scratch: &mut [u32]) {
         // v1, 2n+1 limbs
         toom42_mul_n_rec(v1_vinf, &as1[0..n], &bs1[0..n]);
         if as1[n] == 1 {
-            cy = bs1[n] +
-                if mpn_add_n_in_place(&mut v1_vinf[n..2 * n], &bs1[0..n]) {
-                    1
-                } else {
-                    0
-                };
+            cy = bs1[n] + if mpn_add_n_in_place(&mut v1_vinf[n..2 * n], &bs1[0..n]) {
+                1
+            } else {
+                0
+            };
         } else if as1[n] == 2 {
             cy = 2 * bs1[n] + mpn_addmul_1(&mut v1_vinf[n..2 * n], &bs1[0..n], 2);
         } else if as1[n] == 3 {
@@ -724,7 +716,6 @@ fn mpn_toom42_mul(p: &mut [u32], a: &[u32], b: &[u32], scratch: &mut [u32]) {
         vinf0
     };
     mpn_toom_interpolate_5pts(p, v2, vm1, n, s + t, vm1_neg, vinf0);
-
 }
 
 fn mpn_toom43_mul(prod: &mut [u32], u: &[u32], v: &[u32], scratch: &mut [u32]) {

@@ -3,14 +3,14 @@ use malachite_base::traits::{One, Zero};
 use malachite_base::traits::{AddMul, AddMulAssign};
 use malachite_native::natural as native;
 use malachite_gmp::natural as gmp;
-use malachite_test::common::{gmp_natural_to_native, native_natural_to_gmp};
+use malachite_test::common::{gmp_natural_to_native, native_natural_to_gmp, GenerationMode};
+use malachite_test::natural::arithmetic::add_mul_u32::select_inputs;
 use rust_wheels::iterators::common::EXAMPLE_SEED;
 use rust_wheels::iterators::general::random_x;
 use rust_wheels::iterators::naturals::{exhaustive_naturals, random_naturals};
 use rust_wheels::iterators::primitive_ints::exhaustive_u;
-use rust_wheels::iterators::tuples::{exhaustive_pairs, exhaustive_pairs_from_single,
-                                     exhaustive_triples, random_pairs, random_pairs_from_single,
-                                     random_triples};
+use rust_wheels::iterators::tuples::{exhaustive_pairs, exhaustive_pairs_from_single, random_pairs,
+                                     random_pairs_from_single};
 use std::str::FromStr;
 
 #[test]
@@ -37,40 +37,32 @@ fn test_add_mul_u32() {
         assert_eq!(a.to_string(), out);
         assert!(a.is_valid());
 
-        let a = native::Natural::from_str(u).unwrap().add_mul(
-            native::Natural::from_str(v).unwrap(),
-            c,
-        );
+        let a = native::Natural::from_str(u)
+            .unwrap()
+            .add_mul(native::Natural::from_str(v).unwrap(), c);
         assert_eq!(a.to_string(), out);
         assert!(a.is_valid());
 
-        let a = gmp::Natural::from_str(u).unwrap().add_mul(
-            gmp::Natural::from_str(v)
-                .unwrap(),
-            c,
-        );
+        let a = gmp::Natural::from_str(u)
+            .unwrap()
+            .add_mul(gmp::Natural::from_str(v).unwrap(), c);
         assert_eq!(a.to_string(), out);
         assert!(a.is_valid());
 
-        let a = native::Natural::from_str(u).unwrap().add_mul(
-            &native::Natural::from_str(v).unwrap(),
-            c,
-        );
+        let a = native::Natural::from_str(u)
+            .unwrap()
+            .add_mul(&native::Natural::from_str(v).unwrap(), c);
         assert_eq!(a.to_string(), out);
         assert!(a.is_valid());
 
-        let a = gmp::Natural::from_str(u).unwrap().add_mul(
-            &gmp::Natural::from_str(v)
-                .unwrap(),
-            c,
-        );
+        let a = gmp::Natural::from_str(u)
+            .unwrap()
+            .add_mul(&gmp::Natural::from_str(v).unwrap(), c);
         assert_eq!(a.to_string(), out);
         assert!(a.is_valid());
 
-        let a = (&native::Natural::from_str(u).unwrap()).add_mul(
-            native::Natural::from_str(v).unwrap(),
-            c,
-        );
+        let a = (&native::Natural::from_str(u).unwrap())
+            .add_mul(native::Natural::from_str(v).unwrap(), c);
         assert_eq!(a.to_string(), out);
         assert!(a.is_valid());
 
@@ -79,10 +71,8 @@ fn test_add_mul_u32() {
         assert_eq!(a.to_string(), out);
         assert!(a.is_valid());
 
-        let a = (&native::Natural::from_str(u).unwrap()).add_mul(
-            &native::Natural::from_str(v).unwrap(),
-            c,
-        );
+        let a = (&native::Natural::from_str(u).unwrap())
+            .add_mul(&native::Natural::from_str(v).unwrap(), c);
         assert_eq!(a.to_string(), out);
         assert!(a.is_valid());
 
@@ -206,22 +196,11 @@ fn add_mul_u32_properties() {
         assert_eq!(a.add_mul(b, 1), a + b);
     };
 
-    for (a, b, c) in exhaustive_triples(
-        exhaustive_naturals(),
-        exhaustive_naturals(),
-        exhaustive_u::<u32>(),
-    ).take(LARGE_LIMIT)
-    {
+    for (a, b, c) in select_inputs(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         natural_natural_and_u32(a, b, c);
     }
 
-    for (a, b, c) in random_triples(
-        &EXAMPLE_SEED,
-        &(|seed| random_naturals(seed, 32)),
-        &(|seed| random_naturals(seed, 32)),
-        &(|seed| random_x(seed)),
-    ).take(LARGE_LIMIT)
-    {
+    for (a, b, c) in select_inputs(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         natural_natural_and_u32(a, b, c);
     }
 

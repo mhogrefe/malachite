@@ -1,4 +1,4 @@
-use common::{gmp_integer_to_native, gmp_integer_to_num_bigint};
+use common::{gmp_integer_to_native, gmp_integer_to_num_bigint, GenerationMode};
 use malachite_base::traits::Assign;
 use malachite_gmp::integer as gmp;
 use malachite_native::integer as native;
@@ -14,57 +14,39 @@ pub fn num_assign_i64(x: &mut num::BigInt, i: i64) {
     *x = num::BigInt::from(i);
 }
 
-pub fn demo_exhaustive_integer_assign_i64(limit: usize) {
-    for (mut n, i) in exhaustive_pairs(exhaustive_integers(), exhaustive_i::<i64>()).take(limit) {
-        let n_old = n.clone();
-        n.assign(i);
-        println!("x := {}; x.assign({}); x = {}", n_old, i, n);
-    }
+type It = Iterator<Item = (gmp::Integer, i64)>;
+
+pub fn exhaustive_inputs() -> Box<It> {
+    Box::new(exhaustive_pairs(exhaustive_integers(), exhaustive_i()))
 }
 
-pub fn demo_random_integer_assign_i64(limit: usize) {
-    for (mut n, i) in random_pairs(
+pub fn random_inputs(scale: u32) -> Box<It> {
+    Box::new(random_pairs(
         &EXAMPLE_SEED,
-        &(|seed| random_integers(seed, 32)),
-        &(|seed| random_x::<i64>(seed)),
-    ).take(limit)
-    {
+        &(|seed| random_integers(seed, scale)),
+        &(|seed| random_x(seed)),
+    ))
+}
+
+pub fn select_inputs(gm: GenerationMode) -> Box<It> {
+    match gm {
+        GenerationMode::Exhaustive => exhaustive_inputs(),
+        GenerationMode::Random(scale) => random_inputs(scale),
+    }
+}
+
+pub fn demo_integer_assign_i64(gm: GenerationMode, limit: usize) {
+    for (mut n, i) in select_inputs(gm).take(limit) {
         let n_old = n.clone();
         n.assign(i);
         println!("x := {}; x.assign({}); x = {}", n_old, i, n);
     }
 }
 
-pub fn benchmark_exhaustive_integer_assign_i64(limit: usize, file_name: &str) {
-    println!("benchmarking exhaustive Integer.assign(i64)");
+pub fn benchmark_integer_assign_i64(gm: GenerationMode, limit: usize, file_name: &str) {
+    println!("benchmarking {} Integer.assign(i64)", gm.name());
     benchmark_3(BenchmarkOptions3 {
-        xs: exhaustive_pairs(exhaustive_integers(), exhaustive_i::<i64>()),
-        function_f: &(|(mut n, i): (gmp::Integer, i64)| n.assign(i)),
-        function_g: &(|(mut n, i): (native::Integer, i64)| n.assign(i)),
-        function_h: &(|(mut n, i): (num::BigInt, i64)| num_assign_i64(&mut n, i)),
-        x_cons: &(|p| p.clone()),
-        y_cons: &(|&(ref n, i)| (gmp_integer_to_native(n), i)),
-        z_cons: &(|&(ref n, i)| (gmp_integer_to_num_bigint(n), i)),
-        x_param: &(|&(ref n, _)| n.significant_bits() as usize),
-        limit,
-        f_name: "malachite-gmp",
-        g_name: "malachite-native",
-        h_name: "num",
-        title: "Integer.assign(i64)",
-        x_axis_label: "n.significant\\\\_bits()",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
-}
-
-pub fn benchmark_random_integer_assign_i64(limit: usize, scale: u32, file_name: &str) {
-    println!("benchmarking random Integer.assign(i64)");
-    benchmark_3(BenchmarkOptions3 {
-        xs: random_pairs(
-            &EXAMPLE_SEED,
-            &(|seed| random_integers(seed, scale)),
-            &(|seed| random_x::<i64>(seed)),
-        ),
+        xs: select_inputs(gm),
         function_f: &(|(mut n, i): (gmp::Integer, i64)| n.assign(i)),
         function_g: &(|(mut n, i): (native::Integer, i64)| n.assign(i)),
         function_h: &(|(mut n, i): (num::BigInt, i64)| num_assign_i64(&mut n, i)),

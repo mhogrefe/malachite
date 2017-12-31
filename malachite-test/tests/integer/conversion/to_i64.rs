@@ -3,7 +3,8 @@ use malachite_base::traits::One;
 use malachite_gmp::integer as gmp;
 use malachite_native::integer as native;
 use malachite_native::natural as native_natural;
-use malachite_test::common::gmp_integer_to_native;
+use malachite_test::common::{gmp_integer_to_native, GenerationMode};
+use malachite_test::integer::conversion::to_i64::select_inputs;
 use rust_wheels::iterators::common::EXAMPLE_SEED;
 use rust_wheels::iterators::integers::{exhaustive_integers, random_integers};
 use std::str::FromStr;
@@ -64,8 +65,8 @@ fn to_i64_properties() {
         let x = gmp_integer_to_native(&gmp_x);
         let native_i64 = x.to_i64();
         assert_eq!(gmp_x.to_i64(), native_i64);
-        if x.significant_bits() < 64 ||
-            x == -((native_natural::Natural::ONE << 63u32).into_integer())
+        if x.significant_bits() < 64
+            || x == -((native_natural::Natural::ONE << 63u32).into_integer())
         {
             assert_eq!(native::Integer::from(native_i64.unwrap()), x);
             assert_eq!(native_i64, Some(x.to_i64_wrapping()));
@@ -95,11 +96,11 @@ fn to_i32_wrapping_properties() {
         assert_eq!(-native_i64, (-&x).to_i64_wrapping());
     };
 
-    for n in exhaustive_integers().take(LARGE_LIMIT) {
+    for n in select_inputs(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         one_integer(n);
     }
 
-    for n in random_integers(&EXAMPLE_SEED, 32).take(LARGE_LIMIT) {
+    for n in select_inputs(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         one_integer(n);
     }
 }

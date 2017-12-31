@@ -276,16 +276,14 @@ impl AddAssign<Natural> for Natural {
             }
             match other {
                 Small(y) => *self += y,
-                Large(ref ys) => {
-                    match *self {
-                        Large(ref mut xs) => {
-                            if mpn_add_in_place(xs, ys) {
-                                xs.push(1);
-                            }
+                Large(ref ys) => match *self {
+                    Large(ref mut xs) => {
+                        if mpn_add_in_place(xs, ys) {
+                            xs.push(1);
                         }
-                        _ => unreachable!(),
                     }
-                }
+                    _ => unreachable!(),
+                },
             }
         }
     }
@@ -326,20 +324,18 @@ impl<'a> AddAssign<&'a Natural> for Natural {
         } else if *other != 0 {
             match *other {
                 Small(y) => *self += y,
-                Large(ref ys) => {
-                    match *self {
-                        Small(x) => *self = other + x,
-                        Large(ref mut xs) => {
-                            let ys_len = ys.len();
-                            if xs.len() < ys_len {
-                                xs.resize(ys_len, 0);
-                            }
-                            if mpn_add_in_place(xs, ys) {
-                                xs.push(1);
-                            }
+                Large(ref ys) => match *self {
+                    Small(x) => *self = other + x,
+                    Large(ref mut xs) => {
+                        let ys_len = ys.len();
+                        if xs.len() < ys_len {
+                            xs.resize(ys_len, 0);
+                        }
+                        if mpn_add_in_place(xs, ys) {
+                            xs.push(1);
                         }
                     }
-                }
+                },
             }
         }
     }

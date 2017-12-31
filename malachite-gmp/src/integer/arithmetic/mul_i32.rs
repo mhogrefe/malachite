@@ -61,17 +61,15 @@ impl<'a> Mul<i32> for &'a Integer {
             return self.clone();
         }
         match *self {
-            Small(small) => {
-                match small.checked_mul(other) {
-                    Some(product) => Small(product),
-                    None => unsafe {
-                        let mut result: mpz_t = mem::uninitialized();
-                        gmp::mpz_init_set_si(&mut result, small.into());
-                        gmp::mpz_mul_si(&mut result, &result, other.into());
-                        Large(result)
-                    },
-                }
-            }
+            Small(small) => match small.checked_mul(other) {
+                Some(product) => Small(product),
+                None => unsafe {
+                    let mut result: mpz_t = mem::uninitialized();
+                    gmp::mpz_init_set_si(&mut result, small.into());
+                    gmp::mpz_mul_si(&mut result, &result, other.into());
+                    Large(result)
+                },
+            },
             Large(ref large) => unsafe {
                 let mut result: mpz_t = mem::uninitialized();
                 gmp::mpz_init_set(&mut result, large);
@@ -164,17 +162,9 @@ impl MulAssign<i32> for Integer {
         } else if other == 1 {
             return;
         }
-        mutate_with_possible_promotion!(
-            self,
-            small,
-            large,
-            {
-                small.checked_mul(other)
-            },
-            {
-                unsafe { gmp::mpz_mul_si(large, large, other.into()) }
-            }
-        );
+        mutate_with_possible_promotion!(self, small, large, { small.checked_mul(other) }, {
+            unsafe { gmp::mpz_mul_si(large, large, other.into()) }
+        });
         self.demote_if_small();
     }
 }

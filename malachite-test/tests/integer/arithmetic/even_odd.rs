@@ -1,9 +1,8 @@
 use common::LARGE_LIMIT;
 use malachite_native::integer as native;
 use malachite_gmp::integer as gmp;
-use malachite_test::common::gmp_integer_to_native;
-use rust_wheels::iterators::common::EXAMPLE_SEED;
-use rust_wheels::iterators::integers::{exhaustive_integers, random_integers};
+use malachite_test::common::{gmp_integer_to_native, GenerationMode};
+use malachite_test::integer::arithmetic::even_odd::select_inputs;
 use std::str::FromStr;
 
 #[test]
@@ -65,11 +64,11 @@ fn is_even_properties() {
         assert_eq!((x - 1u32).is_odd(), is_even);
     };
 
-    for n in exhaustive_integers().take(LARGE_LIMIT) {
+    for n in select_inputs(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         one_integer(n);
     }
 
-    for n in random_integers(&EXAMPLE_SEED, 32).take(LARGE_LIMIT) {
+    for n in select_inputs(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         one_integer(n);
     }
 }
@@ -91,11 +90,11 @@ fn is_odd_properties() {
         assert_eq!((x - 1u32).is_even(), is_odd);
     };
 
-    for n in exhaustive_integers().take(LARGE_LIMIT) {
+    for n in select_inputs(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         one_integer(n);
     }
 
-    for n in random_integers(&EXAMPLE_SEED, 32).take(LARGE_LIMIT) {
+    for n in select_inputs(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         one_integer(n);
     }
 }

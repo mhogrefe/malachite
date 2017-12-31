@@ -4,16 +4,16 @@ use malachite_native::natural as native;
 use malachite_gmp::natural as gmp;
 use malachite_test::common::{gmp_natural_to_native, native_natural_to_num_biguint,
                              native_natural_to_rugint_integer, num_biguint_to_native_natural,
-                             rugint_integer_to_native_natural};
+                             rugint_integer_to_native_natural, GenerationMode};
+use malachite_test::natural::arithmetic::add::select_inputs;
 use num;
 use rugint;
 use rust_wheels::iterators::common::EXAMPLE_SEED;
 use rust_wheels::iterators::general::random_x;
 use rust_wheels::iterators::naturals::{exhaustive_naturals, random_naturals};
 use rust_wheels::iterators::primitive_ints::exhaustive_u;
-use rust_wheels::iterators::tuples::{exhaustive_pairs, exhaustive_pairs_from_single,
-                                     exhaustive_triples_from_single, random_pairs,
-                                     random_pairs_from_single, random_triples_from_single};
+use rust_wheels::iterators::tuples::{exhaustive_pairs, exhaustive_triples_from_single,
+                                     random_pairs, random_triples_from_single};
 use std::str::FromStr;
 
 #[test]
@@ -114,8 +114,7 @@ fn add_properties() {
             &(native_natural_to_num_biguint(&x) + native_natural_to_num_biguint(&y)),
         );
         let rugint_sum = rugint_integer_to_native_natural(
-            &(native_natural_to_rugint_integer(&x) +
-                  native_natural_to_rugint_integer(&y)),
+            &(native_natural_to_rugint_integer(&x) + native_natural_to_rugint_integer(&y)),
         );
 
         let sum_val_val = gmp_x.clone() + gmp_y.clone();
@@ -209,11 +208,11 @@ fn add_properties() {
         assert_eq!((&x + &y) + &z, x + (y + z));
     };
 
-    for (x, y) in exhaustive_pairs_from_single(exhaustive_naturals()).take(LARGE_LIMIT) {
+    for (x, y) in select_inputs(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         two_naturals(x, y);
     }
 
-    for (x, y) in random_pairs_from_single(random_naturals(&EXAMPLE_SEED, 32)).take(LARGE_LIMIT) {
+    for (x, y) in select_inputs(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         two_naturals(x, y);
     }
 
@@ -242,8 +241,8 @@ fn add_properties() {
         three_naturals(x, y, z);
     }
 
-    for (x, y, z) in random_triples_from_single(random_naturals(&EXAMPLE_SEED, 32))
-        .take(LARGE_LIMIT)
+    for (x, y, z) in
+        random_triples_from_single(random_naturals(&EXAMPLE_SEED, 32)).take(LARGE_LIMIT)
     {
         three_naturals(x, y, z);
     }

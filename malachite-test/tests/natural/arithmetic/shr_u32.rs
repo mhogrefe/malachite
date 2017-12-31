@@ -5,7 +5,9 @@ use malachite_native::natural as native;
 use malachite_gmp::natural as gmp;
 use malachite_test::common::{gmp_natural_to_native, native_natural_to_gmp,
                              native_natural_to_num_biguint, native_natural_to_rugint_integer,
-                             num_biguint_to_native_natural, rugint_integer_to_native_natural};
+                             num_biguint_to_native_natural, rugint_integer_to_native_natural,
+                             GenerationMode};
+use malachite_test::natural::arithmetic::shr_u32::{select_inputs_1, select_inputs_2};
 use num;
 use rugint;
 use rust_wheels::iterators::common::EXAMPLE_SEED;
@@ -15,7 +17,7 @@ use rust_wheels::iterators::naturals::{exhaustive_naturals, random_naturals};
 use rust_wheels::iterators::primitive_ints::{exhaustive_positive_x, exhaustive_u,
                                              random_positive_u};
 use rust_wheels::iterators::rounding_modes::{exhaustive_rounding_modes, random_rounding_modes};
-use rust_wheels::iterators::tuples::{exhaustive_pairs_from_single, lex_pairs, log_pairs,
+use rust_wheels::iterators::tuples::{exhaustive_pairs_from_single, log_pairs,
                                      log_pairs_from_single, random_pairs, random_triples};
 use std::str::FromStr;
 
@@ -186,16 +188,11 @@ fn shr_u32_properties() {
         assert_eq!(native::Natural::ZERO >> u, 0);
     };
 
-    for (n, u) in log_pairs(exhaustive_naturals(), exhaustive_u::<u32>()).take(LARGE_LIMIT) {
+    for (n, u) in select_inputs_1(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         natural_and_u32(n, u);
     }
 
-    for (n, u) in random_pairs(
-        &EXAMPLE_SEED,
-        &(|seed| random_naturals(seed, 32)),
-        &(|seed| natural_u32s_geometric(seed, 32)),
-    ).take(LARGE_LIMIT)
-    {
+    for (n, u) in select_inputs_1(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         natural_and_u32(n, u);
     }
 
@@ -901,19 +898,17 @@ fn shr_round_u32_fail_gmp_2() {
 #[test]
 #[should_panic(expected = "Right shift is not exact: 1000000000001 >>= 1")]
 fn shr_round_u32_fail_gmp_3() {
-    gmp::Natural::from_str("1000000000001").unwrap().shr_round(
-        1,
-        RoundingMode::Exact,
-    );
+    gmp::Natural::from_str("1000000000001")
+        .unwrap()
+        .shr_round(1, RoundingMode::Exact);
 }
 
 #[test]
 #[should_panic(expected = "Right shift is not exact: 1000000000001 >>= 100")]
 fn shr_round_u32_fail_gmp_4() {
-    gmp::Natural::from_str("1000000000001").unwrap().shr_round(
-        100,
-        RoundingMode::Exact,
-    );
+    gmp::Natural::from_str("1000000000001")
+        .unwrap()
+        .shr_round(100, RoundingMode::Exact);
 }
 
 #[test]
@@ -1078,32 +1073,15 @@ fn shr_round_u32_properties() {
         natural_and_u32_inexact(n, u);
     }
 
-    for ((n, u), rm) in lex_pairs(
-        log_pairs(exhaustive_naturals(), exhaustive_u::<u32>()),
-        exhaustive_rounding_modes(),
-    ).filter(|&((ref n, u), rm)| {
-        rm != RoundingMode::Exact || n.divisible_by_power_of_2(u.into())
-    })
-        .take(LARGE_LIMIT)
-    {
+    for (n, u, rm) in select_inputs_2(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         natural_u32_and_rounding_mode(n, u, rm);
     }
 
-    for (n, u, rm) in random_triples(
-        &EXAMPLE_SEED,
-        &(|seed| random_naturals(seed, 32)),
-        &(|seed| natural_u32s_geometric(seed, 32)),
-        &(|seed| random_rounding_modes(seed)),
-    ).filter(|&(ref n, u, rm)| {
-        rm != RoundingMode::Exact || n.divisible_by_power_of_2(u.into())
-    })
-        .take(LARGE_LIMIT)
-    {
+    for (n, u, rm) in select_inputs_2(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         natural_u32_and_rounding_mode(n, u, rm);
     }
 
-    for (n, u) in log_pairs(exhaustive_positive_x::<u32>(), exhaustive_u::<u32>())
-        .take(LARGE_LIMIT)
+    for (n, u) in log_pairs(exhaustive_positive_x::<u32>(), exhaustive_u::<u32>()).take(LARGE_LIMIT)
     {
         positive_u32_and_u32(n, u);
     }

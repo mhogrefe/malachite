@@ -3,11 +3,10 @@ use malachite_base::traits::One;
 use malachite_native::natural as native;
 use malachite_gmp::natural as gmp;
 use malachite_test::common::{gmp_natural_to_native, native_natural_to_num_biguint,
-                             native_natural_to_rugint_integer};
+                             native_natural_to_rugint_integer, GenerationMode};
+use malachite_test::natural::logic::significant_bits::select_inputs;
 use num;
 use rugint;
-use rust_wheels::iterators::common::EXAMPLE_SEED;
-use rust_wheels::iterators::naturals::{exhaustive_naturals, random_naturals};
 use std::str::FromStr;
 
 #[test]
@@ -58,11 +57,11 @@ fn significant_bits_properties() {
         }
     };
 
-    for n in exhaustive_naturals().take(LARGE_LIMIT) {
+    for n in select_inputs(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         one_natural(n);
     }
 
-    for n in random_naturals(&EXAMPLE_SEED, 32).take(LARGE_LIMIT) {
+    for n in select_inputs(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         one_natural(n);
     }
 }

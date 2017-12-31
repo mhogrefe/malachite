@@ -1,7 +1,8 @@
 use common::LARGE_LIMIT;
 use malachite_native::integer as native;
 use malachite_gmp::integer as gmp;
-use malachite_test::common::{gmp_integer_to_native, native_integer_to_rugint};
+use malachite_test::common::{gmp_integer_to_native, native_integer_to_rugint, GenerationMode};
+use malachite_test::integer::conversion::to_u32::select_inputs;
 use rugint;
 use rust_wheels::iterators::common::EXAMPLE_SEED;
 use rust_wheels::iterators::integers::{exhaustive_integers, random_integers};
@@ -83,11 +84,11 @@ fn to_u32_wrapping_properties() {
         assert_eq!(native_u32.wrapping_add((-&x).to_u32_wrapping()), 0);
     };
 
-    for n in exhaustive_integers().take(LARGE_LIMIT) {
+    for n in select_inputs(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         one_integer(n);
     }
 
-    for n in random_integers(&EXAMPLE_SEED, 32).take(LARGE_LIMIT) {
+    for n in select_inputs(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         one_integer(n);
     }
 }

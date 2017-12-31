@@ -3,7 +3,8 @@ use malachite_base::round::RoundingMode;
 use malachite_base::traits::{One, ShrRound, Zero};
 use malachite_gmp::natural as gmp;
 use malachite_native::natural as native;
-use malachite_test::common::{gmp_natural_to_native, native_natural_to_gmp};
+use malachite_test::common::{gmp_natural_to_native, native_natural_to_gmp, GenerationMode};
+use malachite_test::natural::arithmetic::mod_power_of_2::select_inputs;
 use rust_wheels::iterators::common::EXAMPLE_SEED;
 use rust_wheels::iterators::integers_geometric::natural_u32s_geometric;
 use rust_wheels::iterators::naturals::{exhaustive_naturals, random_naturals};
@@ -209,16 +210,11 @@ fn mod_power_of_2_properties() {
         assert_eq!(native::Natural::ZERO.mod_power_of_2(u), 0);
     };
 
-    for (n, u) in log_pairs(exhaustive_naturals(), exhaustive_u::<u32>()).take(LARGE_LIMIT) {
+    for (n, u) in select_inputs(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         natural_and_u32(n, u);
     }
 
-    for (n, u) in random_pairs(
-        &EXAMPLE_SEED,
-        &(|seed| random_naturals(seed, 32)),
-        &(|seed| natural_u32s_geometric(seed, 32)),
-    ).take(LARGE_LIMIT)
-    {
+    for (n, u) in select_inputs(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         natural_and_u32(n, u);
     }
 
@@ -365,16 +361,11 @@ fn complement_mod_power_of_2_properties() {
         assert_eq!(native::Natural::ZERO.complement_mod_power_of_2(u), 0);
     };
 
-    for (n, u) in log_pairs(exhaustive_naturals(), exhaustive_u::<u32>()).take(LARGE_LIMIT) {
+    for (n, u) in select_inputs(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         natural_and_u32(n, u);
     }
 
-    for (n, u) in random_pairs(
-        &EXAMPLE_SEED,
-        &(|seed| random_naturals(seed, 32)),
-        &(|seed| natural_u32s_geometric(seed, 32)),
-    ).take(LARGE_LIMIT)
-    {
+    for (n, u) in select_inputs(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         natural_and_u32(n, u);
     }
 

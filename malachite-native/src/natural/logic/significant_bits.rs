@@ -26,8 +26,8 @@ impl Natural {
         match *self {
             Small(small) => (LIMB_BITS - small.leading_zeros()) as u64,
             Large(ref limbs) => {
-                ((limbs.len() as u64) << LOG_LIMB_BITS as u64) -
-                    limbs.last().unwrap().leading_zeros() as u64
+                ((limbs.len() as u64) << LOG_LIMB_BITS as u64)
+                    - limbs.last().unwrap().leading_zeros() as u64
             }
         }
     }

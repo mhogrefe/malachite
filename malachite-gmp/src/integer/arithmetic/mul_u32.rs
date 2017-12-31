@@ -178,9 +178,7 @@ impl MulAssign<u32> for Integer {
                     None
                 }
             },
-            {
-                unsafe { gmp::mpz_mul_ui(large, large, other.into()) }
-            }
+            { unsafe { gmp::mpz_mul_ui(large, large, other.into()) } }
         );
     }
 }

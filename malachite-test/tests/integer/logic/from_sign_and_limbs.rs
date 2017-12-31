@@ -1,13 +1,8 @@
 use common::LARGE_LIMIT;
 use malachite_native::integer as native;
 use malachite_gmp::integer as gmp;
-use malachite_test::common::gmp_integer_to_native;
-use rust_wheels::iterators::common::EXAMPLE_SEED;
-use rust_wheels::iterators::general::random_x;
-use rust_wheels::iterators::orderings::{exhaustive_orderings, random_orderings};
-use rust_wheels::iterators::primitive_ints::exhaustive_u;
-use rust_wheels::iterators::tuples::{exhaustive_pairs, random_pairs};
-use rust_wheels::iterators::vecs::{exhaustive_vecs, random_vecs};
+use malachite_test::common::{gmp_integer_to_native, GenerationMode};
+use malachite_test::integer::logic::from_sign_and_limbs::select_inputs;
 use std::cmp::Ordering;
 
 #[test]
@@ -48,42 +43,42 @@ fn test_from_sign_and_limbs_le() {
 
 #[test]
 #[should_panic(expected = "sign should be Equal iff limbs only contains zeros. sign: Equal, \
-limbs: [1]")]
+                           limbs: [1]")]
 fn from_sign_and_limbs_le_fail_native_1() {
     native::Integer::from_sign_and_limbs_le(Ordering::Equal, &[1]);
 }
 
 #[test]
 #[should_panic(expected = "sign should be Equal iff limbs only contains zeros. sign: Greater, \
-limbs: []")]
+                           limbs: []")]
 fn from_sign_and_limbs_le_fail_native_2() {
     native::Integer::from_sign_and_limbs_le(Ordering::Greater, &[]);
 }
 
 #[test]
 #[should_panic(expected = "sign should be Equal iff limbs only contains zeros. sign: Greater, \
-limbs: [0, 0, 0]")]
+                           limbs: [0, 0, 0]")]
 fn from_sign_and_limbs_le_fail_native_3() {
     native::Integer::from_sign_and_limbs_le(Ordering::Greater, &[0, 0, 0]);
 }
 
 #[test]
 #[should_panic(expected = "sign should be Equal iff limbs only contains zeros. sign: Equal, \
-limbs: [1]")]
+                           limbs: [1]")]
 fn from_sign_and_limbs_le_fail_gmp_1() {
     gmp::Integer::from_sign_and_limbs_le(Ordering::Equal, &[1]);
 }
 
 #[test]
 #[should_panic(expected = "sign should be Equal iff limbs only contains zeros. sign: Greater, \
-limbs: []")]
+                           limbs: []")]
 fn from_sign_and_limbs_le_fail_gmp_2() {
     gmp::Integer::from_sign_and_limbs_le(Ordering::Greater, &[]);
 }
 
 #[test]
 #[should_panic(expected = "sign should be Equal iff limbs only contains zeros. sign: Greater, \
-limbs: [0, 0, 0]")]
+                           limbs: [0, 0, 0]")]
 fn from_sign_and_limbs_le_fail_gmp_3() {
     gmp::Integer::from_sign_and_limbs_le(Ordering::Greater, &[0, 0, 0]);
 }
@@ -126,46 +121,45 @@ fn test_from_sign_and_limbs_be() {
 
 #[test]
 #[should_panic(expected = "sign should be Equal iff limbs only contains zeros. sign: Equal, \
-limbs: [1]")]
+                           limbs: [1]")]
 fn from_sign_and_limbs_be_fail_native_1() {
     native::Integer::from_sign_and_limbs_be(Ordering::Equal, &[1]);
 }
 
 #[test]
 #[should_panic(expected = "sign should be Equal iff limbs only contains zeros. sign: Greater, \
-limbs: []")]
+                           limbs: []")]
 fn from_sign_and_limbs_be_fail_native_2() {
     native::Integer::from_sign_and_limbs_be(Ordering::Greater, &[]);
 }
 
 #[test]
 #[should_panic(expected = "sign should be Equal iff limbs only contains zeros. sign: Greater, \
-limbs: [0, 0, 0]")]
+                           limbs: [0, 0, 0]")]
 fn from_sign_and_limbs_be_fail_native_3() {
     native::Integer::from_sign_and_limbs_be(Ordering::Greater, &[0, 0, 0]);
 }
 
 #[test]
 #[should_panic(expected = "sign should be Equal iff limbs only contains zeros. sign: Equal, \
-limbs: [1]")]
+                           limbs: [1]")]
 fn from_sign_and_limbs_be_fail_gmp_1() {
     gmp::Integer::from_sign_and_limbs_be(Ordering::Equal, &[1]);
 }
 
 #[test]
 #[should_panic(expected = "sign should be Equal iff limbs only contains zeros. sign: Greater, \
-limbs: []")]
+                           limbs: []")]
 fn from_sign_and_limbs_be_fail_gmp_2() {
     gmp::Integer::from_sign_and_limbs_be(Ordering::Greater, &[]);
 }
 
 #[test]
 #[should_panic(expected = "sign should be Equal iff limbs only contains zeros. sign: Greater, \
-limbs: [0, 0, 0]")]
+                           limbs: [0, 0, 0]")]
 fn from_sign_and_limbs_be_fail_gmp_3() {
     gmp::Integer::from_sign_and_limbs_be(Ordering::Greater, &[0, 0, 0]);
 }
-
 
 #[test]
 fn from_sign_and_limbs_le_properties() {
@@ -200,26 +194,16 @@ fn from_sign_and_limbs_le_properties() {
         );
     };
 
-    for (sign, limbs) in exhaustive_pairs(
-        exhaustive_orderings(),
-        exhaustive_vecs(exhaustive_u::<u32>()),
-    ).filter(|&(sign, ref limbs)| {
-        limbs.iter().all(|&limb| limb == 0) == (sign == Ordering::Equal)
-    })
+    for (sign, limbs) in select_inputs(GenerationMode::Exhaustive)
+        .filter(|&(sign, ref limbs)| {
+            limbs.iter().all(|&limb| limb == 0) == (sign == Ordering::Equal)
+        })
         .take(LARGE_LIMIT)
     {
         ordering_and_u32_slice(sign, &limbs);
     }
 
-    for (sign, limbs) in random_pairs(
-        &EXAMPLE_SEED,
-        &(|seed| random_orderings(seed)),
-        &(|seed| random_vecs(seed, 32, &(|seed_2| random_x::<u32>(seed_2)))),
-    ).filter(|&(sign, ref limbs)| {
-        limbs.iter().all(|&limb| limb == 0) == (sign == Ordering::Equal)
-    })
-        .take(LARGE_LIMIT)
-    {
+    for (sign, limbs) in select_inputs(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         ordering_and_u32_slice(sign, &limbs);
     }
 }
@@ -257,26 +241,11 @@ fn from_sign_and_limbs_be_properties() {
         );
     };
 
-    for (sign, limbs) in exhaustive_pairs(
-        exhaustive_orderings(),
-        exhaustive_vecs(exhaustive_u::<u32>()),
-    ).filter(|&(sign, ref limbs)| {
-        limbs.iter().all(|&limb| limb == 0) == (sign == Ordering::Equal)
-    })
-        .take(LARGE_LIMIT)
-    {
+    for (sign, limbs) in select_inputs(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         ordering_and_u32_slice(sign, &limbs);
     }
 
-    for (sign, limbs) in random_pairs(
-        &EXAMPLE_SEED,
-        &(|seed| random_orderings(seed)),
-        &(|seed| random_vecs(seed, 32, &(|seed_2| random_x::<u32>(seed_2)))),
-    ).filter(|&(sign, ref limbs)| {
-        limbs.iter().all(|&limb| limb == 0) == (sign == Ordering::Equal)
-    })
-        .take(LARGE_LIMIT)
-    {
+    for (sign, limbs) in select_inputs(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         ordering_and_u32_slice(sign, &limbs);
     }
 }

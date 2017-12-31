@@ -2,13 +2,12 @@ use common::LARGE_LIMIT;
 use malachite_base::traits::Zero;
 use malachite_gmp::natural as gmp;
 use malachite_native::natural as native;
-use malachite_test::common::gmp_natural_to_native;
+use malachite_test::common::{gmp_natural_to_native, GenerationMode};
+use malachite_test::natural::arithmetic::divisible_by_power_of_2::select_inputs;
 use rust_wheels::iterators::common::EXAMPLE_SEED;
 use rust_wheels::iterators::general::random_x;
-use rust_wheels::iterators::integers_geometric::natural_u32s_geometric;
 use rust_wheels::iterators::naturals::{exhaustive_naturals, random_naturals};
 use rust_wheels::iterators::primitive_ints::exhaustive_u;
-use rust_wheels::iterators::tuples::{log_pairs, random_pairs};
 use std::str::FromStr;
 
 #[test]
@@ -21,9 +20,9 @@ fn test_divisible_by_power_of_2() {
             out
         );
         assert_eq!(
-            gmp::Natural::from_str(n).unwrap().divisible_by_power_of_2(
-                pow,
-            ),
+            gmp::Natural::from_str(n)
+                .unwrap()
+                .divisible_by_power_of_2(pow,),
             out
         );
     };
@@ -77,16 +76,11 @@ fn divisible_by_power_of_2_properties() {
         assert!(native::Natural::ZERO.divisible_by_power_of_2(pow));
     };
 
-    for (x, pow) in log_pairs(exhaustive_naturals(), exhaustive_u::<u32>()).take(LARGE_LIMIT) {
+    for (x, pow) in select_inputs(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         natural_and_u32(x, pow);
     }
 
-    for (x, pow) in random_pairs(
-        &EXAMPLE_SEED,
-        &(|seed| random_naturals(seed, 32)),
-        &(|seed| natural_u32s_geometric(seed, 32)),
-    ).take(LARGE_LIMIT)
-    {
+    for (x, pow) in select_inputs(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         natural_and_u32(x, pow);
     }
 

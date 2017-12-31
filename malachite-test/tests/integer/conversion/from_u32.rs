@@ -2,12 +2,10 @@ use common::LARGE_LIMIT;
 use malachite_native::integer as native;
 use malachite_gmp::integer as gmp;
 use malachite_test::common::{gmp_integer_to_native, num_bigint_to_native_integer,
-                             rugint_integer_to_native};
+                             rugint_integer_to_native, GenerationMode};
+use malachite_test::integer::conversion::from_u32::select_inputs;
 use num;
 use rugint;
-use rust_wheels::iterators::common::EXAMPLE_SEED;
-use rust_wheels::iterators::general::random_x;
-use rust_wheels::iterators::primitive_ints::exhaustive_u;
 
 #[test]
 fn test_from_u32() {
@@ -48,11 +46,11 @@ fn from_u32_properties() {
         assert_eq!(n, rugint_n);
     };
 
-    for u in exhaustive_u().take(LARGE_LIMIT) {
+    for u in select_inputs(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         one_u32(u);
     }
 
-    for u in random_x(&EXAMPLE_SEED).take(LARGE_LIMIT) {
+    for u in select_inputs(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         one_u32(u);
     }
 }

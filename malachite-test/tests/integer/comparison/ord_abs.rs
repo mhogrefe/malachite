@@ -2,12 +2,12 @@ use common::{test_custom_cmp_helper, LARGE_LIMIT};
 use malachite_base::traits::{OrdAbs, PartialOrdAbs};
 use malachite_native::integer as native;
 use malachite_gmp::integer as gmp;
-use malachite_test::common::{gmp_integer_to_native, native_integer_to_rugint};
+use malachite_test::common::{gmp_integer_to_native, native_integer_to_rugint, GenerationMode};
+use malachite_test::integer::comparison::ord_abs::select_inputs;
 use rugint;
 use rust_wheels::iterators::common::EXAMPLE_SEED;
 use rust_wheels::iterators::integers::{exhaustive_integers, random_integers};
-use rust_wheels::iterators::tuples::{exhaustive_pairs_from_single, exhaustive_triples_from_single,
-                                     random_pairs_from_single, random_triples_from_single};
+use rust_wheels::iterators::tuples::{exhaustive_triples_from_single, random_triples_from_single};
 use std::cmp::Ordering;
 
 #[test]
@@ -67,11 +67,11 @@ fn cmp_properties() {
         }
     };
 
-    for (x, y) in exhaustive_pairs_from_single(exhaustive_integers()).take(LARGE_LIMIT) {
+    for (x, y) in select_inputs(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         two_integers(x, y);
     }
 
-    for (x, y) in random_pairs_from_single(random_integers(&EXAMPLE_SEED, 32)).take(LARGE_LIMIT) {
+    for (x, y) in select_inputs(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         two_integers(x, y);
     }
 
@@ -87,8 +87,8 @@ fn cmp_properties() {
         three_integers(x, y, z);
     }
 
-    for (x, y, z) in random_triples_from_single(random_integers(&EXAMPLE_SEED, 32))
-        .take(LARGE_LIMIT)
+    for (x, y, z) in
+        random_triples_from_single(random_integers(&EXAMPLE_SEED, 32)).take(LARGE_LIMIT)
     {
         three_integers(x, y, z);
     }

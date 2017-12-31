@@ -1,4 +1,5 @@
-use common::{gmp_integer_to_native, gmp_integer_to_num_bigint, gmp_integer_to_rugint};
+use common::{gmp_integer_to_native, gmp_integer_to_num_bigint, gmp_integer_to_rugint,
+             GenerationMode};
 use malachite_base::traits::AbsAssign;
 use malachite_gmp::integer as gmp;
 use malachite_native::integer as native;
@@ -8,74 +9,59 @@ use rust_wheels::benchmarks::{BenchmarkOptions2, BenchmarkOptions4, benchmark_2,
 use rust_wheels::iterators::common::EXAMPLE_SEED;
 use rust_wheels::iterators::integers::{exhaustive_integers, random_integers};
 
-pub fn demo_exhaustive_integer_abs_assign(limit: usize) {
-    for mut n in exhaustive_integers().take(limit) {
+type It = Iterator<Item = gmp::Integer>;
+
+pub fn exhaustive_inputs() -> Box<It> {
+    Box::new(exhaustive_integers())
+}
+
+pub fn random_inputs(scale: u32) -> Box<It> {
+    Box::new(random_integers(&EXAMPLE_SEED, scale))
+}
+
+pub fn select_inputs(gm: GenerationMode) -> Box<It> {
+    match gm {
+        GenerationMode::Exhaustive => exhaustive_inputs(),
+        GenerationMode::Random(scale) => random_inputs(scale),
+    }
+}
+
+pub fn demo_integer_abs_assign(gm: GenerationMode, limit: usize) {
+    for mut n in select_inputs(gm).take(limit) {
         let n_old = n.clone();
         n.abs_assign();
         println!("n := {}; n.abs_assign(); n = {}", n_old, n);
     }
 }
 
-pub fn demo_random_integer_abs_assign(limit: usize) {
-    for mut n in random_integers(&EXAMPLE_SEED, 32).take(limit) {
-        let n_old = n.clone();
-        n.abs_assign();
-        println!("n := {}; n.abs_assign(); n = {}", n_old, n);
-    }
-}
-
-pub fn demo_exhaustive_integer_abs(limit: usize) {
-    for n in exhaustive_integers().take(limit) {
+pub fn demo_integer_abs(gm: GenerationMode, limit: usize) {
+    for n in select_inputs(gm).take(limit) {
         println!("abs({}) = {}", n.clone(), n.abs());
     }
 }
 
-pub fn demo_random_integer_abs(limit: usize) {
-    for n in random_integers(&EXAMPLE_SEED, 32).take(limit) {
-        println!("abs({}) = {}", n.clone(), n.abs());
-    }
-}
-
-pub fn demo_exhaustive_integer_abs_ref(limit: usize) {
-    for n in exhaustive_integers().take(limit) {
+pub fn demo_integer_abs_ref(gm: GenerationMode, limit: usize) {
+    for n in select_inputs(gm).take(limit) {
         println!("abs_ref(&{}) = {}", n, n.abs_ref());
     }
 }
 
-pub fn demo_random_integer_abs_ref(limit: usize) {
-    for n in random_integers(&EXAMPLE_SEED, 32).take(limit) {
-        println!("abs_ref(&{}) = {}", n, n.abs_ref());
-    }
-}
-
-pub fn demo_exhaustive_integer_natural_abs(limit: usize) {
-    for n in exhaustive_integers().take(limit) {
+pub fn demo_integer_natural_abs(gm: GenerationMode, limit: usize) {
+    for n in select_inputs(gm).take(limit) {
         println!("natural_abs({}) = {}", n.clone(), n.natural_abs());
     }
 }
 
-pub fn demo_random_integer_natural_abs(limit: usize) {
-    for n in random_integers(&EXAMPLE_SEED, 32).take(limit) {
-        println!("natural_abs({}) = {}", n.clone(), n.natural_abs());
-    }
-}
-
-pub fn demo_exhaustive_integer_natural_abs_ref(limit: usize) {
-    for n in exhaustive_integers().take(limit) {
+pub fn demo_integer_natural_abs_ref(gm: GenerationMode, limit: usize) {
+    for n in select_inputs(gm).take(limit) {
         println!("natural_abs_ref(&{}) = {}", n, n.natural_abs_ref());
     }
 }
 
-pub fn demo_random_integer_natural_abs_ref(limit: usize) {
-    for n in random_integers(&EXAMPLE_SEED, 32).take(limit) {
-        println!("natural_abs_ref(&{}) = {}", n, n.natural_abs_ref());
-    }
-}
-
-pub fn benchmark_exhaustive_integer_abs_assign(limit: usize, file_name: &str) {
-    println!("benchmarking exhaustive Integer.abs_assign()");
+pub fn benchmark_integer_abs_assign(gm: GenerationMode, limit: usize, file_name: &str) {
+    println!("benchmarking {} Integer.abs_assign()", gm.name());
     benchmark_4(BenchmarkOptions4 {
-        xs: exhaustive_integers(),
+        xs: select_inputs(gm),
         function_f: &(|n: gmp::Integer| n.abs()),
         function_g: &(|n: native::Integer| n.abs()),
         function_h: &(|n: num::BigInt| n.abs()),
@@ -97,29 +83,10 @@ pub fn benchmark_exhaustive_integer_abs_assign(limit: usize, file_name: &str) {
     });
 }
 
-pub fn benchmark_random_integer_abs_assign(limit: usize, scale: u32, file_name: &str) {
-    println!("benchmarking random Integer.abs_assign()");
+pub fn benchmark_integer_abs(gm: GenerationMode, limit: usize, file_name: &str) {
+    println!("benchmarking {} Integer.abs()", gm.name());
     benchmark_2(BenchmarkOptions2 {
-        xs: random_integers(&EXAMPLE_SEED, scale),
-        function_f: &(|mut n: gmp::Integer| n.abs_assign()),
-        function_g: &(|mut n: native::Integer| n.abs_assign()),
-        x_cons: &(|x| x.clone()),
-        y_cons: &(|x| gmp_integer_to_native(x)),
-        x_param: &(|n| n.significant_bits() as usize),
-        limit,
-        f_name: "malachite-gmp",
-        g_name: "malachite-native",
-        title: "Integer.abs\\\\_assign()",
-        x_axis_label: "n.significant\\\\_bits()",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
-}
-
-pub fn benchmark_exhaustive_integer_abs(limit: usize, file_name: &str) {
-    println!("benchmarking exhaustive Integer.abs()");
-    benchmark_2(BenchmarkOptions2 {
-        xs: exhaustive_integers(),
+        xs: select_inputs(gm),
         function_f: &(|n: gmp::Integer| n.abs()),
         function_g: &(|n: native::Integer| n.abs()),
         x_cons: &(|x| x.clone()),
@@ -135,29 +102,17 @@ pub fn benchmark_exhaustive_integer_abs(limit: usize, file_name: &str) {
     });
 }
 
-pub fn benchmark_random_integer_abs(limit: usize, scale: u32, file_name: &str) {
-    println!("benchmarking random Integer.abs()");
+pub fn benchmark_integer_abs_evaluation_strategy(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    println!(
+        "benchmarking {} Integer.abs() evaluation strategy",
+        gm.name()
+    );
     benchmark_2(BenchmarkOptions2 {
-        xs: random_integers(&EXAMPLE_SEED, scale),
-        function_f: &(|n: gmp::Integer| n.abs()),
-        function_g: &(|n: native::Integer| n.abs()),
-        x_cons: &(|x| x.clone()),
-        y_cons: &(|x| gmp_integer_to_native(x)),
-        x_param: &(|n| n.significant_bits() as usize),
-        limit,
-        f_name: "malachite-gmp",
-        g_name: "malachite-native",
-        title: "Integer.abs()",
-        x_axis_label: "n.significant\\\\_bits()",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
-}
-
-pub fn benchmark_exhaustive_integer_abs_evaluation_strategy(limit: usize, file_name: &str) {
-    println!("benchmarking exhaustive Integer.abs() evaluation_strategy");
-    benchmark_2(BenchmarkOptions2 {
-        xs: exhaustive_integers(),
+        xs: select_inputs(gm),
         function_f: &(|n: native::Integer| n.abs()),
         function_g: &(|n: native::Integer| n.abs_ref()),
         x_cons: &(|x| gmp_integer_to_native(x)),
@@ -173,29 +128,10 @@ pub fn benchmark_exhaustive_integer_abs_evaluation_strategy(limit: usize, file_n
     });
 }
 
-pub fn benchmark_random_integer_abs_evaluation_strategy(limit: usize, scale: u32, file_name: &str) {
-    println!("benchmarking random Integer.abs() evaluation_strategy");
+pub fn benchmark_integer_natural_abs(gm: GenerationMode, limit: usize, file_name: &str) {
+    println!("benchmarking {} Integer.natural_abs()", gm.name());
     benchmark_2(BenchmarkOptions2 {
-        xs: random_integers(&EXAMPLE_SEED, scale),
-        function_f: &(|n: native::Integer| n.abs()),
-        function_g: &(|n: native::Integer| n.abs_ref()),
-        x_cons: &(|x| gmp_integer_to_native(x)),
-        y_cons: &(|x| gmp_integer_to_native(x)),
-        x_param: &(|n| n.significant_bits() as usize),
-        limit,
-        f_name: "Integer.abs()",
-        g_name: "Integer.abs_ref()",
-        title: "Integer.abs()",
-        x_axis_label: "n.significant\\\\_bits() evaluation strategy",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
-}
-
-pub fn benchmark_exhaustive_integer_natural_abs(limit: usize, file_name: &str) {
-    println!("benchmarking exhaustive Integer.natural_abs()");
-    benchmark_2(BenchmarkOptions2 {
-        xs: exhaustive_integers(),
+        xs: select_inputs(gm),
         function_f: &(|n: gmp::Integer| n.natural_abs()),
         function_g: &(|n: native::Integer| n.natural_abs()),
         x_cons: &(|x| x.clone()),
@@ -211,52 +147,17 @@ pub fn benchmark_exhaustive_integer_natural_abs(limit: usize, file_name: &str) {
     });
 }
 
-pub fn benchmark_random_integer_natural_abs(limit: usize, scale: u32, file_name: &str) {
-    println!("benchmarking random Integer.natural_abs()");
-    benchmark_2(BenchmarkOptions2 {
-        xs: random_integers(&EXAMPLE_SEED, scale),
-        function_f: &(|n: gmp::Integer| n.natural_abs()),
-        function_g: &(|n: native::Integer| n.natural_abs()),
-        x_cons: &(|x| x.clone()),
-        y_cons: &(|x| gmp_integer_to_native(x)),
-        x_param: &(|n| n.significant_bits() as usize),
-        limit,
-        f_name: "malachite-gmp",
-        g_name: "malachite-native",
-        title: "Integer.natural\\\\_abs()",
-        x_axis_label: "n.significant\\\\_bits()",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
-}
-
-pub fn benchmark_exhaustive_integer_natural_abs_evaluation_strategy(limit: usize, file_name: &str) {
-    println!("benchmarking exhaustive Integer.natural_abs() evaluation_strategy");
-    benchmark_2(BenchmarkOptions2 {
-        xs: exhaustive_integers(),
-        function_f: &(|n: native::Integer| n.natural_abs()),
-        function_g: &(|n: native::Integer| n.natural_abs_ref()),
-        x_cons: &(|x| gmp_integer_to_native(x)),
-        y_cons: &(|x| gmp_integer_to_native(x)),
-        x_param: &(|n| n.significant_bits() as usize),
-        limit,
-        f_name: "Integer.natural_abs()",
-        g_name: "Integer.natural_abs_ref()",
-        title: "Integer.natural\\\\_abs() evaluation strategy",
-        x_axis_label: "n.significant\\\\_bits()",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
-}
-
-pub fn benchmark_random_integer_natural_abs_evaluation_strategy(
+pub fn benchmark_integer_natural_abs_evaluation_strategy(
+    gm: GenerationMode,
     limit: usize,
-    scale: u32,
     file_name: &str,
 ) {
-    println!("benchmarking random Integer.natural_abs() evaluation_strategy");
+    println!(
+        "benchmarking {} Integer.natural_abs() evaluation strategy",
+        gm.name()
+    );
     benchmark_2(BenchmarkOptions2 {
-        xs: random_integers(&EXAMPLE_SEED, scale),
+        xs: select_inputs(gm),
         function_f: &(|n: native::Integer| n.natural_abs()),
         function_g: &(|n: native::Integer| n.natural_abs_ref()),
         x_cons: &(|x| gmp_integer_to_native(x)),

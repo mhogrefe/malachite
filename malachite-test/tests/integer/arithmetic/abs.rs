@@ -4,11 +4,10 @@ use malachite_native::integer as native;
 use malachite_gmp::integer as gmp;
 use malachite_test::common::{gmp_integer_to_native, native_integer_to_num_bigint,
                              native_integer_to_rugint, num_bigint_to_native_integer,
-                             rugint_integer_to_native};
+                             rugint_integer_to_native, GenerationMode};
+use malachite_test::integer::arithmetic::abs::select_inputs;
 use num::{self, Signed};
 use rugint;
-use rust_wheels::iterators::common::EXAMPLE_SEED;
-use rust_wheels::iterators::integers::{exhaustive_integers, random_integers};
 use std::str::FromStr;
 
 #[test]
@@ -119,11 +118,11 @@ fn abs_properties() {
         assert_eq!(Some(native_abs_4), gmp_abs.to_natural());
     };
 
-    for n in exhaustive_integers().take(LARGE_LIMIT) {
+    for n in select_inputs(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         one_integer(n);
     }
 
-    for n in random_integers(&EXAMPLE_SEED, 32).take(LARGE_LIMIT) {
+    for n in select_inputs(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         one_integer(n);
     }
 }

@@ -1,4 +1,4 @@
-use natural::{Natural, Large, Small};
+use natural::{Large, Natural, Small};
 
 impl Natural {
     /// Converts a slice of limbs, or base-2^(32) digits, to a `Natural`, in little-endian order, so

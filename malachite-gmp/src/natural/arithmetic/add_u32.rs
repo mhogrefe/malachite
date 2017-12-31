@@ -58,17 +58,15 @@ impl<'a> Add<u32> for &'a Natural {
             return self.clone();
         }
         match *self {
-            Small(small) => {
-                match small.checked_add(other) {
-                    Some(sum) => Small(sum),
-                    None => unsafe {
-                        let mut result: mpz_t = mem::uninitialized();
-                        gmp::mpz_init_set_ui(&mut result, small.into());
-                        gmp::mpz_add_ui(&mut result, &result, other.into());
-                        Large(result)
-                    },
-                }
-            }
+            Small(small) => match small.checked_add(other) {
+                Some(sum) => Small(sum),
+                None => unsafe {
+                    let mut result: mpz_t = mem::uninitialized();
+                    gmp::mpz_init_set_ui(&mut result, small.into());
+                    gmp::mpz_add_ui(&mut result, &result, other.into());
+                    Large(result)
+                },
+            },
             Large(ref large) => unsafe {
                 let mut result: mpz_t = mem::uninitialized();
                 gmp::mpz_init_set(&mut result, large);
@@ -158,16 +156,8 @@ impl AddAssign<u32> for Natural {
         if other == 0 {
             return;
         }
-        mutate_with_possible_promotion!(
-            self,
-            small,
-            large,
-            {
-                small.checked_add(other)
-            },
-            {
-                unsafe { gmp::mpz_add_ui(large, large, other.into()) }
-            }
-        );
+        mutate_with_possible_promotion!(self, small, large, { small.checked_add(other) }, {
+            unsafe { gmp::mpz_add_ui(large, large, other.into()) }
+        });
     }
 }

@@ -184,48 +184,60 @@ impl<'a, 'b, 'c> AddMul<&'a Integer, &'b Integer> for &'c Integer {
 
     fn add_mul(self, b: &'a Integer, c: &'b Integer) -> Integer {
         match (self, b, c) {
-            (&Integer {
-                 sign: true,
-                 abs: Small(0),
-             },
-             b,
-             c) => b * c,
-            (a,
-             &Integer {
-                 sign: true,
-                 abs: Small(b),
-             },
-             c) => a.add_mul(c, b),
-            (a,
-             &Integer {
-                 sign: false,
-                 abs: Small(b),
-             },
-             c) => a.sub_mul(c, b),
-            (a,
-             b,
-             &Integer {
-                 sign: true,
-                 abs: Small(c),
-             }) => a.add_mul(b, c),
-            (a,
-             b,
-             &Integer {
-                 sign: false,
-                 abs: Small(c),
-             }) => a.sub_mul(b, c),
-            (&Integer {
-                 sign: a_sign,
-                 abs: ref a_abs,
-             },
-             &Integer {
-                 sign: b_sign,
-                 abs: Large(ref b_limbs),
-             },
-             &Integer {
-                 sign: c_sign,
-                 abs: Large(ref c_limbs),
-             }) => {
+            (
+                &Integer {
+                    sign: true,
+                    abs: Small(0),
+                },
+                b,
+                c,
+            ) => b * c,
+            (
+                a,
+                &Integer {
+                    sign: true,
+                    abs: Small(b),
+                },
+                c,
+            ) => a.add_mul(c, b),
+            (
+                a,
+                &Integer {
+                    sign: false,
+                    abs: Small(b),
+                },
+                c,
+            ) => a.sub_mul(c, b),
+            (
+                a,
+                b,
+                &Integer {
+                    sign: true,
+                    abs: Small(c),
+                },
+            ) => a.add_mul(b, c),
+            (
+                a,
+                b,
+                &Integer {
+                    sign: false,
+                    abs: Small(c),
+                },
+            ) => a.sub_mul(b, c),
+            (
+                &Integer {
+                    sign: a_sign,
+                    abs: ref a_abs,
+                },
+                &Integer {
+                    sign: b_sign,
+                    abs: Large(ref b_limbs),
+                },
+                &Integer {
+                    sign: c_sign,
+                    abs: Large(ref c_limbs),
+                },
+            ) => {
                 let mut result_sign = !a_sign;
                 let mut result_limbs = a_abs.to_limbs_le();
                 mpz_aorsmul(
@@ -282,48 +294,60 @@ impl<'a, 'b, 'c> AddMul<&'a Integer, &'b Integer> for &'c Integer {
 impl AddMulAssign<Integer, Integer> for Integer {
     fn add_mul_assign(&mut self, b: Integer, c: Integer) {
         match (self, b, c) {
-            (a @ &mut Integer {
-                 sign: true,
-                 abs: Small(0),
-             },
-             b,
-             c) => *a = b * c,
-            (a,
-             Integer {
-                 sign: true,
-                 abs: Small(b),
-             },
-             c) => a.add_mul_assign(c, b),
-            (a,
-             Integer {
-                 sign: false,
-                 abs: Small(b),
-             },
-             c) => a.sub_mul_assign(c, b),
-            (a,
-             b,
-             Integer {
-                 sign: true,
-                 abs: Small(c),
-             }) => a.add_mul_assign(b, c),
-            (a,
-             b,
-             Integer {
-                 sign: false,
-                 abs: Small(c),
-             }) => a.sub_mul_assign(b, c),
-            (&mut Integer {
-                 sign: ref mut a_sign,
-                 abs: ref mut a_abs,
-             },
-             Integer {
-                 sign: b_sign,
-                 abs: Large(ref b_limbs),
-             },
-             Integer {
-                 sign: c_sign,
-                 abs: Large(ref c_limbs),
-             }) => {
+            (
+                a @ &mut Integer {
+                    sign: true,
+                    abs: Small(0),
+                },
+                b,
+                c,
+            ) => *a = b * c,
+            (
+                a,
+                Integer {
+                    sign: true,
+                    abs: Small(b),
+                },
+                c,
+            ) => a.add_mul_assign(c, b),
+            (
+                a,
+                Integer {
+                    sign: false,
+                    abs: Small(b),
+                },
+                c,
+            ) => a.sub_mul_assign(c, b),
+            (
+                a,
+                b,
+                Integer {
+                    sign: true,
+                    abs: Small(c),
+                },
+            ) => a.add_mul_assign(b, c),
+            (
+                a,
+                b,
+                Integer {
+                    sign: false,
+                    abs: Small(c),
+                },
+            ) => a.sub_mul_assign(b, c),
+            (
+                &mut Integer {
+                    sign: ref mut a_sign,
+                    abs: ref mut a_abs,
+                },
+                Integer {
+                    sign: b_sign,
+                    abs: Large(ref b_limbs),
+                },
+                Integer {
+                    sign: c_sign,
+                    abs: Large(ref c_limbs),
+                },
+            ) => {
                 let mut result_sign = !*a_sign;
                 mpz_aorsmul(
                     &mut result_sign,
@@ -374,48 +398,60 @@ impl AddMulAssign<Integer, Integer> for Integer {
 impl<'a> AddMulAssign<Integer, &'a Integer> for Integer {
     fn add_mul_assign(&mut self, b: Integer, c: &'a Integer) {
         match (self, b, c) {
-            (a @ &mut Integer {
-                 sign: true,
-                 abs: Small(0),
-             },
-             b,
-             c) => *a = b * c,
-            (a,
-             Integer {
-                 sign: true,
-                 abs: Small(b),
-             },
-             c) => a.add_mul_assign(c, b),
-            (a,
-             Integer {
-                 sign: false,
-                 abs: Small(b),
-             },
-             c) => a.sub_mul_assign(c, b),
-            (a,
-             b,
-             &Integer {
-                 sign: true,
-                 abs: Small(c),
-             }) => a.add_mul_assign(b, c),
-            (a,
-             b,
-             &Integer {
-                 sign: false,
-                 abs: Small(c),
-             }) => a.sub_mul_assign(b, c),
-            (&mut Integer {
-                 sign: ref mut a_sign,
-                 abs: ref mut a_abs,
-             },
-             Integer {
-                 sign: b_sign,
-                 abs: Large(ref b_limbs),
-             },
-             &Integer {
-                 sign: c_sign,
-                 abs: Large(ref c_limbs),
-             }) => {
+            (
+                a @ &mut Integer {
+                    sign: true,
+                    abs: Small(0),
+                },
+                b,
+                c,
+            ) => *a = b * c,
+            (
+                a,
+                Integer {
+                    sign: true,
+                    abs: Small(b),
+                },
+                c,
+            ) => a.add_mul_assign(c, b),
+            (
+                a,
+                Integer {
+                    sign: false,
+                    abs: Small(b),
+                },
+                c,
+            ) => a.sub_mul_assign(c, b),
+            (
+                a,
+                b,
+                &Integer {
+                    sign: true,
+                    abs: Small(c),
+                },
+            ) => a.add_mul_assign(b, c),
+            (
+                a,
+                b,
+                &Integer {
+                    sign: false,
+                    abs: Small(c),
+                },
+            ) => a.sub_mul_assign(b, c),
+            (
+                &mut Integer {
+                    sign: ref mut a_sign,
+                    abs: ref mut a_abs,
+                },
+                Integer {
+                    sign: b_sign,
+                    abs: Large(ref b_limbs),
+                },
+                &Integer {
+                    sign: c_sign,
+                    abs: Large(ref c_limbs),
+                },
+            ) => {
                 let mut result_sign = !*a_sign;
                 mpz_aorsmul(
                     &mut result_sign,
@@ -466,48 +502,60 @@ impl<'a> AddMulAssign<Integer, &'a Integer> for Integer {
 impl<'a> AddMulAssign<&'a Integer, Integer> for Integer {
     fn add_mul_assign(&mut self, b: &'a Integer, c: Integer) {
         match (self, b, c) {
-            (a @ &mut Integer {
-                 sign: true,
-                 abs: Small(0),
-             },
-             b,
-             c) => *a = b * c,
-            (a,
-             &Integer {
-                 sign: true,
-                 abs: Small(b),
-             },
-             c) => a.add_mul_assign(c, b),
-            (a,
-             &Integer {
-                 sign: false,
-                 abs: Small(b),
-             },
-             c) => a.sub_mul_assign(c, b),
-            (a,
-             b,
-             Integer {
-                 sign: true,
-                 abs: Small(c),
-             }) => a.add_mul_assign(b, c),
-            (a,
-             b,
-             Integer {
-                 sign: false,
-                 abs: Small(c),
-             }) => a.sub_mul_assign(b, c),
-            (&mut Integer {
-                 sign: ref mut a_sign,
-                 abs: ref mut a_abs,
-             },
-             &Integer {
-                 sign: b_sign,
-                 abs: Large(ref b_limbs),
-             },
-             Integer {
-                 sign: c_sign,
-                 abs: Large(ref c_limbs),
-             }) => {
+            (
+                a @ &mut Integer {
+                    sign: true,
+                    abs: Small(0),
+                },
+                b,
+                c,
+            ) => *a = b * c,
+            (
+                a,
+                &Integer {
+                    sign: true,
+                    abs: Small(b),
+                },
+                c,
+            ) => a.add_mul_assign(c, b),
+            (
+                a,
+                &Integer {
+                    sign: false,
+                    abs: Small(b),
+                },
+                c,
+            ) => a.sub_mul_assign(c, b),
+            (
+                a,
+                b,
+                Integer {
+                    sign: true,
+                    abs: Small(c),
+                },
+            ) => a.add_mul_assign(b, c),
+            (
+                a,
+                b,
+                Integer {
+                    sign: false,
+                    abs: Small(c),
+                },
+            ) => a.sub_mul_assign(b, c),
+            (
+                &mut Integer {
+                    sign: ref mut a_sign,
+                    abs: ref mut a_abs,
+                },
+                &Integer {
+                    sign: b_sign,
+                    abs: Large(ref b_limbs),
+                },
+                Integer {
+                    sign: c_sign,
+                    abs: Large(ref c_limbs),
+                },
+            ) => {
                 let mut result_sign = !*a_sign;
                 mpz_aorsmul(
                     &mut result_sign,
@@ -558,48 +606,60 @@ impl<'a> AddMulAssign<&'a Integer, Integer> for Integer {
 impl<'a, 'b> AddMulAssign<&'a Integer, &'b Integer> for Integer {
     fn add_mul_assign(&mut self, b: &'a Integer, c: &'b Integer) {
         match (self, b, c) {
-            (a @ &mut Integer {
-                 sign: true,
-                 abs: Small(0),
-             },
-             b,
-             c) => *a = b * c,
-            (a,
-             &Integer {
-                 sign: true,
-                 abs: Small(b),
-             },
-             c) => a.add_mul_assign(c, b),
-            (a,
-             &Integer {
-                 sign: false,
-                 abs: Small(b),
-             },
-             c) => a.sub_mul_assign(c, b),
-            (a,
-             b,
-             &Integer {
-                 sign: true,
-                 abs: Small(c),
-             }) => a.add_mul_assign(b, c),
-            (a,
-             b,
-             &Integer {
-                 sign: false,
-                 abs: Small(c),
-             }) => a.sub_mul_assign(b, c),
-            (&mut Integer {
-                 sign: ref mut a_sign,
-                 abs: ref mut a_abs,
-             },
-             &Integer {
-                 sign: b_sign,
-                 abs: Large(ref b_limbs),
-             },
-             &Integer {
-                 sign: c_sign,
-                 abs: Large(ref c_limbs),
-             }) => {
+            (
+                a @ &mut Integer {
+                    sign: true,
+                    abs: Small(0),
+                },
+                b,
+                c,
+            ) => *a = b * c,
+            (
+                a,
+                &Integer {
+                    sign: true,
+                    abs: Small(b),
+                },
+                c,
+            ) => a.add_mul_assign(c, b),
+            (
+                a,
+                &Integer {
+                    sign: false,
+                    abs: Small(b),
+                },
+                c,
+            ) => a.sub_mul_assign(c, b),
+            (
+                a,
+                b,
+                &Integer {
+                    sign: true,
+                    abs: Small(c),
+                },
+            ) => a.add_mul_assign(b, c),
+            (
+                a,
+                b,
+                &Integer {
+                    sign: false,
+                    abs: Small(c),
+                },
+            ) => a.sub_mul_assign(b, c),
+            (
+                &mut Integer {
+                    sign: ref mut a_sign,
+                    abs: ref mut a_abs,
+                },
+                &Integer {
+                    sign: b_sign,
+                    abs: Large(ref b_limbs),
+                },
+                &Integer {
+                    sign: c_sign,
+                    abs: Large(ref c_limbs),
+                },
+            ) => {
                 let mut result_sign = !*a_sign;
                 mpz_aorsmul(
                     &mut result_sign,

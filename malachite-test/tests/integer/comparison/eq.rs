@@ -2,13 +2,13 @@ use common::{test_eq_helper, LARGE_LIMIT};
 use malachite_native::integer as native;
 use malachite_gmp::integer as gmp;
 use malachite_test::common::{gmp_integer_to_native, native_integer_to_num_bigint,
-                             native_integer_to_rugint};
+                             native_integer_to_rugint, GenerationMode};
+use malachite_test::integer::comparison::eq::select_inputs;
 use num;
 use rugint;
 use rust_wheels::iterators::common::EXAMPLE_SEED;
 use rust_wheels::iterators::integers::{exhaustive_integers, random_integers};
-use rust_wheels::iterators::tuples::{exhaustive_pairs_from_single, exhaustive_triples_from_single,
-                                     random_pairs_from_single, random_triples_from_single};
+use rust_wheels::iterators::tuples::{exhaustive_triples_from_single, random_triples_from_single};
 
 #[test]
 fn test_eq() {
@@ -65,11 +65,11 @@ fn eq_properties() {
         }
     };
 
-    for (x, y) in exhaustive_pairs_from_single(exhaustive_integers()).take(LARGE_LIMIT) {
+    for (x, y) in select_inputs(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         two_integers(x, y);
     }
 
-    for (x, y) in random_pairs_from_single(random_integers(&EXAMPLE_SEED, 32)).take(LARGE_LIMIT) {
+    for (x, y) in select_inputs(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         two_integers(x, y);
     }
 
@@ -85,8 +85,8 @@ fn eq_properties() {
         three_integers(x, y, z);
     }
 
-    for (x, y, z) in random_triples_from_single(random_integers(&EXAMPLE_SEED, 32))
-        .take(LARGE_LIMIT)
+    for (x, y, z) in
+        random_triples_from_single(random_integers(&EXAMPLE_SEED, 32)).take(LARGE_LIMIT)
     {
         three_integers(x, y, z);
     }

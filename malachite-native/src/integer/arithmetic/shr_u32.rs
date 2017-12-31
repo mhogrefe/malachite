@@ -66,12 +66,10 @@ impl<'a> Shr<u32> for &'a Integer {
             &Integer {
                 sign: true,
                 ref abs,
-            } => {
-                Integer {
-                    sign: true,
-                    abs: abs >> other,
-                }
-            }
+            } => Integer {
+                sign: true,
+                abs: abs >> other,
+            },
             &Integer {
                 sign: false,
                 ref abs,
@@ -213,12 +211,10 @@ impl<'a> ShrRound<u32> for &'a Integer {
             &Integer {
                 sign: true,
                 ref abs,
-            } => {
-                Integer {
-                    sign: true,
-                    abs: abs.shr_round(other, rm),
-                }
-            }
+            } => Integer {
+                sign: true,
+                abs: abs.shr_round(other, rm),
+            },
             &Integer {
                 sign: false,
                 ref abs,

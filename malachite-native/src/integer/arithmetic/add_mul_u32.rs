@@ -314,16 +314,14 @@ pub(crate) fn large_aorsmul_ref(
     let mut result_sign = a_sign;
     let mut result_limbs = a_abs.to_limbs_le();
     match b_abs {
-        &Small(small_b) => {
-            mpz_aorsmul_1(
-                &mut result_sign,
-                &mut result_limbs,
-                b_sign,
-                &[small_b],
-                c,
-                add,
-            )
-        }
+        &Small(small_b) => mpz_aorsmul_1(
+            &mut result_sign,
+            &mut result_limbs,
+            b_sign,
+            &[small_b],
+            c,
+            add,
+        ),
         &Large(ref b_limbs) => {
             mpz_aorsmul_1(&mut result_sign, &mut result_limbs, b_sign, b_limbs, c, add)
         }
@@ -383,12 +381,11 @@ pub(crate) fn mpz_aorsmul_1(
                 dsize = -dsize;
                 0
             };
-            cy = cy2 +
-                if mpn_add_1_in_place(&mut w[min_size..min_size + dsize as usize], cy) {
-                    1
-                } else {
-                    0
-                };
+            cy = cy2 + if mpn_add_1_in_place(&mut w[min_size..min_size + dsize as usize], cy) {
+                1
+            } else {
+                0
+            };
         }
         let dsize = dsize as usize;
         w[min_size + dsize] = cy;

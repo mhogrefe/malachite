@@ -4,16 +4,11 @@ use malachite_native::integer as native;
 use malachite_gmp::integer as gmp;
 use malachite_test::common::{gmp_integer_to_native, native_integer_to_num_bigint,
                              native_integer_to_rugint, num_bigint_to_native_integer,
-                             rugint_integer_to_native};
-use malachite_test::integer::conversion::assign_u32::num_assign_u32;
+                             rugint_integer_to_native, GenerationMode};
+use malachite_test::integer::conversion::assign_u32::{select_inputs, num_assign_u32};
 use num;
 use rugint;
 use rugint::Assign as rugint_assign;
-use rust_wheels::iterators::common::EXAMPLE_SEED;
-use rust_wheels::iterators::general::random_x;
-use rust_wheels::iterators::integers::{exhaustive_integers, random_integers};
-use rust_wheels::iterators::primitive_ints::exhaustive_u;
-use rust_wheels::iterators::tuples::{exhaustive_pairs, random_pairs};
 use std::str::FromStr;
 
 #[test]
@@ -70,16 +65,11 @@ fn assign_u32_properties() {
         assert_eq!(rugint_integer_to_native(&rugint_n), u);
     };
 
-    for (n, u) in exhaustive_pairs(exhaustive_integers(), exhaustive_u::<u32>()).take(LARGE_LIMIT) {
+    for (n, u) in select_inputs(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         integer_and_u32(n, u);
     }
 
-    for (n, u) in random_pairs(
-        &EXAMPLE_SEED,
-        &(|seed| random_integers(seed, 32)),
-        &(|seed| random_x::<u32>(seed)),
-    ).take(LARGE_LIMIT)
-    {
+    for (n, u) in select_inputs(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         integer_and_u32(n, u);
     }
 }

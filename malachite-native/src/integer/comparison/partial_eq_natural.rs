@@ -23,7 +23,10 @@ impl PartialEq<Natural> for Integer {
             Integer {
                 sign: true,
                 ref abs,
-            } if abs == other => true,
+            } if abs == other =>
+            {
+                true
+            }
             _ => false,
         }
     }
@@ -51,7 +54,10 @@ impl PartialEq<Integer> for Natural {
             Integer {
                 sign: true,
                 ref abs,
-            } if self == abs => true,
+            } if self == abs =>
+            {
+                true
+            }
             _ => false,
         }
     }

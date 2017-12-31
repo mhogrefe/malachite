@@ -34,9 +34,7 @@ impl Natural {
                     None
                 }
             },
-            {
-                unsafe { gmp::mpz_setbit(large, index) }
-            }
+            { unsafe { gmp::mpz_setbit(large, index) } }
         );
     }
 }

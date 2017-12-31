@@ -1,11 +1,8 @@
 use common::LARGE_LIMIT;
 use malachite_native::natural as native;
 use malachite_gmp::natural as gmp;
-use malachite_test::common::gmp_natural_to_native;
-use rust_wheels::iterators::common::EXAMPLE_SEED;
-use rust_wheels::iterators::general::random_x;
-use rust_wheels::iterators::primitive_ints::exhaustive_u;
-use rust_wheels::iterators::vecs::{exhaustive_vecs, random_vecs};
+use malachite_test::common::{gmp_natural_to_native, GenerationMode};
+use malachite_test::natural::logic::from_limbs::select_inputs;
 
 #[test]
 fn test_from_limbs_le() {
@@ -84,11 +81,11 @@ fn from_limbs_le_properties() {
         }
     };
 
-    for xs in exhaustive_vecs(exhaustive_u::<u32>()).take(LARGE_LIMIT) {
+    for xs in select_inputs(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         u32_slice(&xs);
     }
 
-    for xs in random_vecs(&EXAMPLE_SEED, 32, &(|seed| random_x::<u32>(seed))).take(LARGE_LIMIT) {
+    for xs in select_inputs(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         u32_slice(&xs);
     }
 }
@@ -122,11 +119,11 @@ fn from_limbs_be_properties() {
         }
     };
 
-    for xs in exhaustive_vecs(exhaustive_u::<u32>()).take(LARGE_LIMIT) {
+    for xs in select_inputs(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         u32_slice(&xs);
     }
 
-    for xs in random_vecs(&EXAMPLE_SEED, 32, &(|seed| random_x::<u32>(seed))).take(LARGE_LIMIT) {
+    for xs in select_inputs(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         u32_slice(&xs);
     }
 }

@@ -102,12 +102,10 @@ impl<'a> Add<u32> for &'a Natural {
             return self.clone();
         }
         match *self {
-            Small(small) => {
-                match small.overflowing_add(other) {
-                    (sum, false) => Small(sum),
-                    (sum, true) => Large(vec![sum, 1]),
-                }
-            }
+            Small(small) => match small.overflowing_add(other) {
+                (sum, false) => Small(sum),
+                (sum, true) => Large(vec![sum, 1]),
+            },
             Large(ref limbs) => {
                 let mut sum_limbs = vec![0; limbs.len()];
                 if mpn_add_1(&mut sum_limbs[..], limbs, other) {
@@ -218,18 +216,10 @@ impl AddAssign<u32> for Natural {
             self.assign(other);
             return;
         }
-        mutate_with_possible_promotion!(
-            self,
-            small,
-            limbs,
-            {
-                small.checked_add(other)
-            },
-            {
-                if mpn_add_1_in_place(&mut limbs[..], other) {
-                    limbs.push(1);
-                }
+        mutate_with_possible_promotion!(self, small, limbs, { small.checked_add(other) }, {
+            if mpn_add_1_in_place(&mut limbs[..], other) {
+                limbs.push(1);
             }
-        );
+        });
     }
 }

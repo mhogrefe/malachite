@@ -3,11 +3,11 @@ use malachite_base::traits::{One, Zero};
 use malachite_base::traits::{AddMul, AddMulAssign};
 use malachite_native::natural as native;
 use malachite_gmp::natural as gmp;
-use malachite_test::common::{gmp_natural_to_native, native_natural_to_gmp};
+use malachite_test::common::{gmp_natural_to_native, native_natural_to_gmp, GenerationMode};
+use malachite_test::natural::arithmetic::add_mul::select_inputs;
 use rust_wheels::iterators::common::EXAMPLE_SEED;
 use rust_wheels::iterators::naturals::{exhaustive_naturals, random_naturals};
-use rust_wheels::iterators::tuples::{exhaustive_pairs_from_single, exhaustive_triples_from_single,
-                                     random_pairs_from_single, random_triples_from_single};
+use rust_wheels::iterators::tuples::{exhaustive_pairs_from_single, random_pairs_from_single};
 use std::str::FromStr;
 
 #[test]
@@ -312,13 +312,11 @@ fn add_mul_u32_properties() {
         assert_eq!(a.add_mul(b, &native::Natural::ONE), a + b);
     };
 
-    for (a, b, c) in exhaustive_triples_from_single(exhaustive_naturals()).take(LARGE_LIMIT) {
+    for (a, b, c) in select_inputs(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         three_naturals(a, b, c);
     }
 
-    for (a, b, c) in random_triples_from_single(random_naturals(&EXAMPLE_SEED, 32))
-        .take(LARGE_LIMIT)
-    {
+    for (a, b, c) in select_inputs(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         three_naturals(a, b, c);
     }
 
