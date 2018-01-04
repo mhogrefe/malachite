@@ -17,13 +17,11 @@ use std::ops::{Shr, ShrAssign};
 ///
 /// use malachite_base::traits::Zero;
 /// use malachite_native::integer::Integer;
-/// use std::str::FromStr;
 ///
 /// fn main() {
 ///     assert_eq!((Integer::ZERO >> 10i32).to_string(), "0");
 ///     assert_eq!((Integer::from(492) >> 2i32).to_string(), "123");
-///     assert_eq!((Integer::from_str("-1000000000000").unwrap() >> 10i32).to_string(),
-///         "-976562500");
+///     assert_eq!((-Integer::trillion() >> 10i32).to_string(), "-976562500");
 ///     assert_eq!((Integer::ZERO >> -10i32).to_string(), "0");
 ///     assert_eq!((Integer::from(123) >> -2i32).to_string(), "492");
 ///     assert_eq!((Integer::from(123) >> -100i32).to_string(),
@@ -56,13 +54,11 @@ impl Shr<i32> for Integer {
 ///
 /// use malachite_base::traits::Zero;
 /// use malachite_native::integer::Integer;
-/// use std::str::FromStr;
 ///
 /// fn main() {
 ///     assert_eq!((&Integer::ZERO >> 10i32).to_string(), "0");
 ///     assert_eq!((&Integer::from(492) >> 2i32).to_string(), "123");
-///     assert_eq!((&Integer::from_str("-1000000000000").unwrap() >> 10i32).to_string(),
-///         "-976562500");
+///     assert_eq!((&(-Integer::trillion()) >> 10i32).to_string(), "-976562500");
 ///     assert_eq!((&Integer::ZERO >> -10i32).to_string(), "0");
 ///     assert_eq!((&Integer::from(123) >> -2i32).to_string(), "492");
 ///     assert_eq!((&Integer::from(123) >> -100i32).to_string(),
@@ -155,16 +151,16 @@ impl ShrAssign<i32> for Integer {
 /// use malachite_native::integer::Integer;
 ///
 /// fn main() {
-///     assert_eq!(Integer::from(257u32).shr_round(8i32, RoundingMode::Down).to_string(), "1");
-///     assert_eq!(Integer::from(257u32).shr_round(8i32, RoundingMode::Up).to_string(), "2");
+///     assert_eq!(Integer::from(0x101u32).shr_round(8i32, RoundingMode::Down).to_string(), "1");
+///     assert_eq!(Integer::from(0x101u32).shr_round(8i32, RoundingMode::Up).to_string(), "2");
 ///
-///     assert_eq!(Integer::from(-257).shr_round(9i32, RoundingMode::Down).to_string(), "0");
-///     assert_eq!(Integer::from(-257).shr_round(9i32, RoundingMode::Up).to_string(), "-1");
-///     assert_eq!(Integer::from(-257).shr_round(9i32, RoundingMode::Nearest).to_string(), "-1");
-///     assert_eq!(Integer::from(-255).shr_round(9i32, RoundingMode::Nearest).to_string(), "0");
-///     assert_eq!(Integer::from(-256).shr_round(9i32, RoundingMode::Nearest).to_string(), "0");
+///     assert_eq!(Integer::from(-0x101).shr_round(9i32, RoundingMode::Down).to_string(), "0");
+///     assert_eq!(Integer::from(-0x101).shr_round(9i32, RoundingMode::Up).to_string(), "-1");
+///     assert_eq!(Integer::from(-0x101).shr_round(9i32, RoundingMode::Nearest).to_string(), "-1");
+///     assert_eq!(Integer::from(-0xff).shr_round(9i32, RoundingMode::Nearest).to_string(), "0");
+///     assert_eq!(Integer::from(-0x100).shr_round(9i32, RoundingMode::Nearest).to_string(), "0");
 ///
-///     assert_eq!(Integer::from(256u32).shr_round(8i32, RoundingMode::Exact).to_string(), "1");
+///     assert_eq!(Integer::from(0x100u32).shr_round(8i32, RoundingMode::Exact).to_string(), "1");
 ///
 ///     assert_eq!(Integer::ZERO.shr_round(-10i32, RoundingMode::Exact).to_string(), "0");
 ///     assert_eq!(Integer::from(123u32).shr_round(-2i32, RoundingMode::Exact).to_string(), "492");
@@ -204,19 +200,20 @@ impl ShrRound<i32> for Integer {
 /// use malachite_native::integer::Integer;
 ///
 /// fn main() {
-///     assert_eq!((&Integer::from(257u32)).shr_round(8i32, RoundingMode::Down).to_string(), "1");
-///     assert_eq!((&Integer::from(257u32)).shr_round(8i32, RoundingMode::Up).to_string(), "2");
+///     assert_eq!((&Integer::from(0x101u32)).shr_round(8i32, RoundingMode::Down).to_string(), "1");
+///     assert_eq!((&Integer::from(0x101u32)).shr_round(8i32, RoundingMode::Up).to_string(), "2");
 ///
-///     assert_eq!((&Integer::from(-257)).shr_round(9i32, RoundingMode::Down).to_string(), "0");
-///     assert_eq!((&Integer::from(-257)).shr_round(9i32, RoundingMode::Up).to_string(), "-1");
-///     assert_eq!((&Integer::from(-257)).shr_round(9i32, RoundingMode::Nearest).to_string(),
+///     assert_eq!((&Integer::from(-0x101)).shr_round(9i32, RoundingMode::Down).to_string(), "0");
+///     assert_eq!((&Integer::from(-0x101)).shr_round(9i32, RoundingMode::Up).to_string(), "-1");
+///     assert_eq!((&Integer::from(-0x101)).shr_round(9i32, RoundingMode::Nearest).to_string(),
 ///         "-1");
-///     assert_eq!((&Integer::from(-255)).shr_round(9i32, RoundingMode::Nearest).to_string(),
+///     assert_eq!((&Integer::from(-0xff)).shr_round(9i32, RoundingMode::Nearest).to_string(),
 ///         "0");
-///     assert_eq!((&Integer::from(-256)).shr_round(9i32, RoundingMode::Nearest).to_string(),
+///     assert_eq!((&Integer::from(-0x100)).shr_round(9i32, RoundingMode::Nearest).to_string(),
 ///         "0");
 ///
-///     assert_eq!((&Integer::from(256u32)).shr_round(8i32, RoundingMode::Exact).to_string(), "1");
+///     assert_eq!((&Integer::from(0x100u32)).shr_round(8i32, RoundingMode::Exact).to_string(),
+///         "1");
 ///
 ///     assert_eq!((&Integer::ZERO).shr_round(-10i32, RoundingMode::Exact).to_string(), "0");
 ///     assert_eq!((&Integer::from(123u32)).shr_round(-2i32, RoundingMode::Exact).to_string(),
@@ -260,35 +257,35 @@ impl<'a> ShrRound<i32> for &'a Integer {
 /// use malachite_native::integer::Integer;
 ///
 /// fn main() {
-///     let mut n = Integer::from(257u32);
+///     let mut n = Integer::from(0x101u32);
 ///     n.shr_round_assign(8i32, RoundingMode::Down);
 ///     assert_eq!(n.to_string(), "1");
 ///
-///     let mut n = Integer::from(257);
+///     let mut n = Integer::from(0x101u32);
 ///     n.shr_round_assign(8i32, RoundingMode::Up);
 ///     assert_eq!(n.to_string(), "2");
 ///
-///     let mut n = Integer::from(-257);
+///     let mut n = Integer::from(-0x101);
 ///     n.shr_round_assign(9i32, RoundingMode::Down);
 ///     assert_eq!(n.to_string(), "0");
 ///
-///     let mut n = Integer::from(-257);
+///     let mut n = Integer::from(-0x101);
 ///     n.shr_round_assign(9i32, RoundingMode::Up);
 ///     assert_eq!(n.to_string(), "-1");
 ///
-///     let mut n = Integer::from(-257);
+///     let mut n = Integer::from(-0x101);
 ///     n.shr_round_assign(9i32, RoundingMode::Nearest);
 ///     assert_eq!(n.to_string(), "-1");
 ///
-///     let mut n = Integer::from(-255);
+///     let mut n = Integer::from(-0xff);
 ///     n.shr_round_assign(9i32, RoundingMode::Nearest);
 ///     assert_eq!(n.to_string(), "0");
 ///
-///     let mut n = Integer::from(-256);
+///     let mut n = Integer::from(-0x100);
 ///     n.shr_round_assign(9i32, RoundingMode::Nearest);
 ///     assert_eq!(n.to_string(), "0");
 ///
-///     let mut n = Integer::from(256u32);
+///     let mut n = Integer::from(0x100u32);
 ///     n.shr_round_assign(8i32, RoundingMode::Exact);
 ///     assert_eq!(n.to_string(), "1");
 ///

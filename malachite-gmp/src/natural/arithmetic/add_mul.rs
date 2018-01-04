@@ -13,14 +13,11 @@ use malachite_base::traits::{AddMul, AddMulAssign};
 ///
 /// use malachite_base::traits::AddMul;
 /// use malachite_gmp::natural::Natural;
-/// use std::str::FromStr;
 ///
 /// fn main() {
 ///     assert_eq!(Natural::from(10u32).add_mul(Natural::from(3u32), Natural::from(4u32)), 22);
-///     assert_eq!(Natural::from_str("1000000000000").unwrap()
-///                         .add_mul(Natural::from(65536u32),
-///                         Natural::from_str("1000000000000").unwrap()).to_string(),
-///                "65537000000000000");
+///     assert_eq!(Natural::trillion().add_mul(Natural::from(0x1_0000u32),
+///         Natural::trillion()).to_string(), "65537000000000000");
 /// }
 /// ```
 impl AddMul<Natural, Natural> for Natural {
@@ -42,14 +39,11 @@ impl AddMul<Natural, Natural> for Natural {
 ///
 /// use malachite_base::traits::AddMul;
 /// use malachite_gmp::natural::Natural;
-/// use std::str::FromStr;
 ///
 /// fn main() {
 ///     assert_eq!(Natural::from(10u32).add_mul(Natural::from(3u32), &Natural::from(4u32)), 22);
-///     assert_eq!(Natural::from_str("1000000000000").unwrap()
-///                         .add_mul(Natural::from(65536u32),
-///                         &Natural::from_str("1000000000000").unwrap()).to_string(),
-///                "65537000000000000");
+///     assert_eq!(Natural::trillion().add_mul(Natural::from(0x1_0000u32),
+///         &Natural::trillion()).to_string(), "65537000000000000");
 /// }
 /// ```
 impl<'a> AddMul<Natural, &'a Natural> for Natural {
@@ -71,14 +65,11 @@ impl<'a> AddMul<Natural, &'a Natural> for Natural {
 ///
 /// use malachite_base::traits::AddMul;
 /// use malachite_gmp::natural::Natural;
-/// use std::str::FromStr;
 ///
 /// fn main() {
 ///     assert_eq!(Natural::from(10u32).add_mul(&Natural::from(3u32), Natural::from(4u32)), 22);
-///     assert_eq!(Natural::from_str("1000000000000").unwrap()
-///                         .add_mul(&Natural::from(65536u32),
-///                         Natural::from_str("1000000000000").unwrap()).to_string(),
-///                "65537000000000000");
+///     assert_eq!(Natural::trillion().add_mul(&Natural::from(0x1_0000u32),
+///         Natural::trillion()).to_string(), "65537000000000000");
 /// }
 /// ```
 impl<'a> AddMul<&'a Natural, Natural> for Natural {
@@ -100,14 +91,11 @@ impl<'a> AddMul<&'a Natural, Natural> for Natural {
 ///
 /// use malachite_base::traits::AddMul;
 /// use malachite_gmp::natural::Natural;
-/// use std::str::FromStr;
 ///
 /// fn main() {
 ///     assert_eq!(Natural::from(10u32).add_mul(&Natural::from(3u32), &Natural::from(4u32)), 22);
-///     assert_eq!(Natural::from_str("1000000000000").unwrap()
-///                         .add_mul(&Natural::from(65536u32),
-///                         &Natural::from_str("1000000000000").unwrap()).to_string(),
-///                "65537000000000000");
+///     assert_eq!(Natural::trillion().add_mul(&Natural::from(0x1_0000u32),
+///         &Natural::trillion()).to_string(), "65537000000000000");
 /// }
 /// ```
 impl<'a, 'b> AddMul<&'a Natural, &'b Natural> for Natural {
@@ -129,14 +117,11 @@ impl<'a, 'b> AddMul<&'a Natural, &'b Natural> for Natural {
 ///
 /// use malachite_base::traits::AddMul;
 /// use malachite_gmp::natural::Natural;
-/// use std::str::FromStr;
 ///
 /// fn main() {
 ///     assert_eq!((&Natural::from(10u32)).add_mul(&Natural::from(3u32), &Natural::from(4u32)), 22);
-///     assert_eq!((&Natural::from_str("1000000000000").unwrap())
-///                         .add_mul(&Natural::from(65536u32),
-///                         &Natural::from_str("1000000000000").unwrap()).to_string(),
-///                 "65537000000000000");
+///     assert_eq!((&Natural::trillion()).add_mul(&Natural::from(0x1_0000u32),
+///         &Natural::trillion()).to_string(), "65537000000000000");
 /// }
 /// ```
 impl<'a, 'b, 'c> AddMul<&'a Natural, &'b Natural> for &'c Natural {
@@ -177,15 +162,14 @@ impl<'a, 'b, 'c> AddMul<&'a Natural, &'b Natural> for &'c Natural {
 ///
 /// use malachite_base::traits::AddMulAssign;
 /// use malachite_gmp::natural::Natural;
-/// use std::str::FromStr;
 ///
 /// fn main() {
 ///     let mut x = Natural::from(10u32);
 ///     x.add_mul_assign(Natural::from(3u32), Natural::from(4u32));
 ///     assert_eq!(x, 22);
 ///
-///     let mut x = Natural::from_str("1000000000000").unwrap();
-///     x.add_mul_assign(Natural::from(65536u32), Natural::from_str("1000000000000").unwrap());
+///     let mut x = Natural::trillion();
+///     x.add_mul_assign(Natural::from(0x1_0000u32), Natural::trillion());
 ///     assert_eq!(x.to_string(), "65537000000000000");
 /// }
 /// ```
@@ -205,15 +189,14 @@ impl AddMulAssign<Natural, Natural> for Natural {
 ///
 /// use malachite_base::traits::AddMulAssign;
 /// use malachite_gmp::natural::Natural;
-/// use std::str::FromStr;
 ///
 /// fn main() {
 ///     let mut x = Natural::from(10u32);
 ///     x.add_mul_assign(Natural::from(3u32), &Natural::from(4u32));
 ///     assert_eq!(x, 22);
 ///
-///     let mut x = Natural::from_str("1000000000000").unwrap();
-///     x.add_mul_assign(Natural::from(65536u32), &Natural::from_str("1000000000000").unwrap());
+///     let mut x = Natural::trillion();
+///     x.add_mul_assign(Natural::from(0x1_0000u32), &Natural::trillion());
 ///     assert_eq!(x.to_string(), "65537000000000000");
 /// }
 /// ```
@@ -233,15 +216,14 @@ impl<'a> AddMulAssign<Natural, &'a Natural> for Natural {
 ///
 /// use malachite_base::traits::AddMulAssign;
 /// use malachite_gmp::natural::Natural;
-/// use std::str::FromStr;
 ///
 /// fn main() {
 ///     let mut x = Natural::from(10u32);
 ///     x.add_mul_assign(&Natural::from(3u32), Natural::from(4u32));
 ///     assert_eq!(x, 22);
 ///
-///     let mut x = Natural::from_str("1000000000000").unwrap();
-///     x.add_mul_assign(&Natural::from(65536u32), Natural::from_str("1000000000000").unwrap());
+///     let mut x = Natural::trillion();
+///     x.add_mul_assign(&Natural::from(0x1_0000u32), Natural::trillion());
 ///     assert_eq!(x.to_string(), "65537000000000000");
 /// }
 /// ```
@@ -261,15 +243,14 @@ impl<'a> AddMulAssign<&'a Natural, Natural> for Natural {
 ///
 /// use malachite_base::traits::AddMulAssign;
 /// use malachite_gmp::natural::Natural;
-/// use std::str::FromStr;
 ///
 /// fn main() {
 ///     let mut x = Natural::from(10u32);
 ///     x.add_mul_assign(&Natural::from(3u32), &Natural::from(4u32));
 ///     assert_eq!(x, 22);
 ///
-///     let mut x = Natural::from_str("1000000000000").unwrap();
-///     x.add_mul_assign(&Natural::from(65536u32), &Natural::from_str("1000000000000").unwrap());
+///     let mut x = Natural::trillion();
+///     x.add_mul_assign(&Natural::from(0x1_0000u32), &Natural::trillion());
 ///     assert_eq!(x.to_string(), "65537000000000000");
 /// }
 /// ```
@@ -283,7 +264,7 @@ impl<'a, 'b> AddMulAssign<&'a Natural, &'b Natural> for Natural {
             let large_self = self.promote_in_place();
             unsafe {
                 if let Large(ref large_b) = *b {
-                    if let &Large(ref large_c) = c {
+                    if let Large(ref large_c) = *c {
                         gmp::mpz_addmul(large_self, large_b, large_c)
                     }
                 }

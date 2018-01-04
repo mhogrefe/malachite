@@ -66,7 +66,7 @@ pub fn mpn_sub(r: &mut [u32], s1: &[u32], s2: &[u32]) -> bool {
     } else if borrow {
         mpn_sub_1(&mut r[s2_len..], &s1[s2_len..], 1)
     } else {
-        &mut r[s2_len..s1_len].copy_from_slice(&s1[s2_len..]);
+        r[s2_len..s1_len].copy_from_slice(&s1[s2_len..]);
         false
     }
 }
@@ -144,15 +144,13 @@ fn sub_assign_helper<'a>(x: &mut Natural, y: &'a Natural) -> bool {
 ///
 /// use malachite_base::traits::Zero;
 /// use malachite_native::natural::Natural;
-/// use std::str::FromStr;
 ///
 /// fn main() {
 ///     assert_eq!(format!("{:?}", Natural::ZERO - &Natural::from(123u32)), "None");
 ///     assert_eq!(format!("{:?}", Natural::from(123u32) - &Natural::ZERO), "Some(123)");
 ///     assert_eq!(format!("{:?}", Natural::from(456u32) - &Natural::from(123u32)), "Some(333)");
-///     assert_eq!(format!("{:?}", Natural::from_str("3000000000000").unwrap() -
-///                                &Natural::from_str("1000000000000").unwrap()),
-///                        "Some(2000000000000)");
+///     assert_eq!(format!("{:?}", Natural::trillion() * 3 - &Natural::trillion()),
+///         "Some(2000000000000)");
 /// }
 /// ```
 impl<'a> Sub<&'a Natural> for Natural {
@@ -182,15 +180,13 @@ impl<'a> Sub<&'a Natural> for Natural {
 ///
 /// use malachite_base::traits::Zero;
 /// use malachite_native::natural::Natural;
-/// use std::str::FromStr;
 ///
 /// fn main() {
 ///     assert_eq!(format!("{:?}", &Natural::ZERO - &Natural::from(123u32)), "None");
 ///     assert_eq!(format!("{:?}", &Natural::from(123u32) - &Natural::ZERO), "Some(123)");
 ///     assert_eq!(format!("{:?}", &Natural::from(456u32) - &Natural::from(123u32)), "Some(333)");
-///     assert_eq!(format!("{:?}", &Natural::from_str("3000000000000").unwrap() -
-///                                &Natural::from_str("1000000000000").unwrap()),
-///                        "Some(2000000000000)");
+///     assert_eq!(format!("{:?}", &(Natural::trillion() * 3) - &Natural::trillion()),
+///         "Some(2000000000000)");
 /// }
 /// ```
 impl<'a, 'b> Sub<&'a Natural> for &'b Natural {
@@ -238,13 +234,12 @@ impl<'a, 'b> Sub<&'a Natural> for &'b Natural {
 /// # Examples
 /// ```
 /// use malachite_native::natural::Natural;
-/// use std::str::FromStr;
 ///
-/// let mut x = Natural::from_str("10000000000000").unwrap();
-/// x -= &Natural::from_str("1000000000000").unwrap();
-/// x -= &Natural::from_str("2000000000000").unwrap();
-/// x -= &Natural::from_str("3000000000000").unwrap();
-/// x -= &Natural::from_str("4000000000000").unwrap();
+/// let mut x = Natural::trillion() * 10;
+/// x -= &Natural::trillion();
+/// x -= &(Natural::trillion() * 2);
+/// x -= &(Natural::trillion() * 3);
+/// x -= &(Natural::trillion() * 4);
 /// assert_eq!(x.to_string(), "0");
 /// ```
 impl<'a> SubAssign<&'a Natural> for Natural {

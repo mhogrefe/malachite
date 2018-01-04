@@ -90,14 +90,12 @@ pub fn mpn_add_in_place(s1: &mut [u32], s2: &[u32]) -> bool {
 ///
 /// use malachite_base::traits::Zero;
 /// use malachite_native::natural::Natural;
-/// use std::str::FromStr;
 ///
 /// fn main() {
 ///     assert_eq!((Natural::ZERO + Natural::from(123u32)).to_string(), "123");
 ///     assert_eq!((Natural::from(123u32) + Natural::ZERO).to_string(), "123");
 ///     assert_eq!((Natural::from(123u32) + Natural::from(456u32)).to_string(), "579");
-///     assert_eq!((Natural::from_str("1000000000000").unwrap() + Natural::from_str("2000000000000")
-///                .unwrap()).to_string(), "3000000000000");
+///     assert_eq!((Natural::trillion() + Natural::trillion() * 2).to_string(), "3000000000000");
 /// }
 /// ```
 impl Add<Natural> for Natural {
@@ -125,15 +123,12 @@ impl Add<Natural> for Natural {
 ///
 /// use malachite_base::traits::Zero;
 /// use malachite_native::natural::Natural;
-/// use std::str::FromStr;
 ///
 /// fn main() {
 ///     assert_eq!((Natural::ZERO + &Natural::from(123u32)).to_string(), "123");
 ///     assert_eq!((Natural::from(123u32) +&Natural::ZERO).to_string(), "123");
 ///     assert_eq!((Natural::from(123u32) +&Natural::from(456u32)).to_string(), "579");
-///     assert_eq!((Natural::from_str("1000000000000").unwrap() +
-///                 &Natural::from_str("2000000000000")
-///                .unwrap()).to_string(), "3000000000000");
+///     assert_eq!((Natural::trillion() + &(Natural::trillion() * 2)).to_string(), "3000000000000");
 /// }
 /// ```
 impl<'a> Add<&'a Natural> for Natural {
@@ -161,15 +156,12 @@ impl<'a> Add<&'a Natural> for Natural {
 ///
 /// use malachite_base::traits::Zero;
 /// use malachite_native::natural::Natural;
-/// use std::str::FromStr;
 ///
 /// fn main() {
 ///     assert_eq!((&Natural::ZERO + Natural::from(123u32)).to_string(), "123");
 ///     assert_eq!((&Natural::from(123u32) + Natural::ZERO).to_string(), "123");
 ///     assert_eq!((&Natural::from(123u32) + Natural::from(456u32)).to_string(), "579");
-///     assert_eq!((&Natural::from_str("1000000000000").unwrap() +
-///                 Natural::from_str("2000000000000")
-///                .unwrap()).to_string(), "3000000000000");
+///     assert_eq!((&Natural::trillion() + Natural::trillion() * 2).to_string(), "3000000000000");
 /// }
 /// ```
 impl<'a> Add<Natural> for &'a Natural {
@@ -205,15 +197,13 @@ fn add_helper(xs: &[u32], ys: &[u32]) -> Natural {
 ///
 /// use malachite_base::traits::Zero;
 /// use malachite_native::natural::Natural;
-/// use std::str::FromStr;
 ///
 /// fn main() {
 ///     assert_eq!((&Natural::ZERO + &Natural::from(123u32)).to_string(), "123");
 ///     assert_eq!((&Natural::from(123u32) + &Natural::ZERO).to_string(), "123");
 ///     assert_eq!((&Natural::from(123u32) + &Natural::from(456u32)).to_string(), "579");
-///     assert_eq!((&Natural::from_str("1000000000000").unwrap() +
-///                 &Natural::from_str("2000000000000")
-///                .unwrap()).to_string(), "3000000000000");
+///     assert_eq!((&Natural::trillion() + &(Natural::trillion() * 2)).to_string(),
+///         "3000000000000");
 /// }
 /// ```
 impl<'a, 'b> Add<&'a Natural> for &'b Natural {
@@ -255,14 +245,13 @@ impl<'a, 'b> Add<&'a Natural> for &'b Natural {
 ///
 /// use malachite_base::traits::Zero;
 /// use malachite_native::natural::Natural;
-/// use std::str::FromStr;
 ///
 /// fn main() {
 ///     let mut x = Natural::ZERO;
-///     x += Natural::from_str("1000000000000").unwrap();
-///     x += Natural::from_str("2000000000000").unwrap();
-///     x += Natural::from_str("3000000000000").unwrap();
-///     x += Natural::from_str("4000000000000").unwrap();
+///     x += Natural::trillion();
+///     x += Natural::trillion() * 2;
+///     x += Natural::trillion() * 3;
+///     x += Natural::trillion() * 4;
 ///     assert_eq!(x.to_string(), "10000000000000");
 /// }
 /// ```
@@ -304,14 +293,13 @@ impl AddAssign<Natural> for Natural {
 ///
 /// use malachite_base::traits::Zero;
 /// use malachite_native::natural::Natural;
-/// use std::str::FromStr;
 ///
 /// fn main() {
 ///     let mut x = Natural::ZERO;
-///     x += &Natural::from_str("1000000000000").unwrap();
-///     x += &Natural::from_str("2000000000000").unwrap();
-///     x += &Natural::from_str("3000000000000").unwrap();
-///     x += &Natural::from_str("4000000000000").unwrap();
+///     x += &Natural::trillion();
+///     x += &(Natural::trillion() * 2);
+///     x += &(Natural::trillion() * 3);
+///     x += &(Natural::trillion() * 4);
 ///     assert_eq!(x.to_string(), "10000000000000");
 /// }
 /// ```

@@ -13,14 +13,12 @@ use malachite_base::traits::{Assign, Zero};
 ///
 /// use malachite_base::traits::Zero;
 /// use malachite_gmp::integer::Integer;
-/// use std::str::FromStr;
 ///
 /// fn main() {
 ///     assert_eq!((Integer::ZERO * 123u32).to_string(), "0");
 ///     assert_eq!((Integer::from(123i32) * 1u32).to_string(), "123");
 ///     assert_eq!((Integer::from(-123i32) * 456u32).to_string(), "-56088");
-///     assert_eq!((Integer::from_str("-1000000000000").unwrap() * 123u32).to_string(),
-///                 "-123000000000000");
+///     assert_eq!((-Integer::trillion() * 123u32).to_string(), "-123000000000000");
 /// }
 /// ```
 impl Mul<u32> for Integer {
@@ -41,14 +39,12 @@ impl Mul<u32> for Integer {
 ///
 /// use malachite_base::traits::Zero;
 /// use malachite_gmp::integer::Integer;
-/// use std::str::FromStr;
 ///
 /// fn main() {
 ///     assert_eq!((&Integer::ZERO * 123u32).to_string(), "0");
 ///     assert_eq!((&Integer::from(123i32) * 1u32).to_string(), "123");
 ///     assert_eq!((&Integer::from(-123i32) * 456u32).to_string(), "-56088");
-///     assert_eq!((&Integer::from_str("-1000000000000").unwrap() * 123u32).to_string(),
-///                "-123000000000000");
+///     assert_eq!((&(-Integer::trillion()) * 123u32).to_string(), "-123000000000000");
 /// }
 /// ```
 impl<'a> Mul<u32> for &'a Integer {
@@ -93,14 +89,12 @@ impl<'a> Mul<u32> for &'a Integer {
 ///
 /// use malachite_base::traits::Zero;
 /// use malachite_gmp::integer::Integer;
-/// use std::str::FromStr;
 ///
 /// fn main() {
 ///     assert_eq!((123u32 * Integer::ZERO).to_string(), "0");
 ///     assert_eq!((1u32 * Integer::from(123i32)).to_string(), "123");
 ///     assert_eq!((456u32 * Integer::from(-123i32)).to_string(), "-56088");
-///     assert_eq!((123u32 * Integer::from_str("-1000000000000").unwrap()).to_string(),
-///                "-123000000000000");
+///     assert_eq!((123u32 * -Integer::trillion()).to_string(), "-123000000000000");
 /// }
 /// ```
 impl Mul<Integer> for u32 {
@@ -121,14 +115,12 @@ impl Mul<Integer> for u32 {
 ///
 /// use malachite_base::traits::Zero;
 /// use malachite_gmp::integer::Integer;
-/// use std::str::FromStr;
 ///
 /// fn main() {
 ///     assert_eq!((123u32 * &Integer::ZERO).to_string(), "0");
 ///     assert_eq!((1u32 * &Integer::from(123i32)).to_string(), "123");
 ///     assert_eq!((456u32 * &Integer::from(-123i32)).to_string(), "-56088");
-///     assert_eq!((123u32 * &Integer::from_str("-1000000000000").unwrap()).to_string(),
-///                "-123000000000000");
+///     assert_eq!((123u32 * &(-Integer::trillion())).to_string(), "-123000000000000");
 /// }
 /// ```
 impl<'a> Mul<&'a Integer> for u32 {

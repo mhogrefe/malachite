@@ -12,12 +12,11 @@ impl Natural {
     ///
     /// use malachite_base::traits::Zero;
     /// use malachite_gmp::natural::Natural;
-    /// use std::str::FromStr;
     ///
     /// fn main() {
     ///     assert_eq!(Natural::ZERO.significant_bits(), 0);
     ///     assert_eq!(Natural::from(100u32).significant_bits(), 7);
-    ///     assert_eq!(Natural::from_str("1000000000000").unwrap().significant_bits(), 40);
+    ///     assert_eq!(Natural::trillion().significant_bits(), 40);
     /// }
     /// ```
     pub fn significant_bits(&self) -> u64 {

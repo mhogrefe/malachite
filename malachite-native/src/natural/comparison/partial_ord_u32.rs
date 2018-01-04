@@ -10,14 +10,13 @@ use std::cmp::Ordering;
 /// # Examples
 /// ```
 /// use malachite_native::natural::Natural;
-/// use std::str::FromStr;
 ///
 /// assert!(Natural::from(123u32) > 122);
 /// assert!(Natural::from(123u32) >= 122);
 /// assert!(Natural::from(123u32) < 124);
 /// assert!(Natural::from(123u32) <= 124);
-/// assert!(Natural::from_str("1000000000000").unwrap() > 123);
-/// assert!(Natural::from_str("1000000000000").unwrap() >= 123);
+/// assert!(Natural::trillion() > 123);
+/// assert!(Natural::trillion() >= 123);
 /// ```
 impl PartialOrd<u32> for Natural {
     fn partial_cmp(&self, other: &u32) -> Option<Ordering> {
@@ -37,14 +36,13 @@ impl PartialOrd<u32> for Natural {
 /// # Examples
 /// ```
 /// use malachite_native::natural::Natural;
-/// use std::str::FromStr;
 ///
 /// assert!(122 < Natural::from(123u32));
 /// assert!(122 <= Natural::from(123u32));
 /// assert!(124 > Natural::from(123u32));
 /// assert!(124 >= Natural::from(123u32));
-/// assert!(123 < Natural::from_str("1000000000000").unwrap());
-/// assert!(123 <= Natural::from_str("1000000000000").unwrap());
+/// assert!(123 < Natural::trillion());
+/// assert!(123 <= Natural::trillion());
 /// ```
 impl PartialOrd<Natural> for u32 {
     fn partial_cmp(&self, other: &Natural) -> Option<Ordering> {

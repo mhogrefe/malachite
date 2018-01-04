@@ -14,12 +14,11 @@ impl Natural {
     ///
     /// use malachite_base::traits::Zero;
     /// use malachite_native::natural::Natural;
-    /// use std::str::FromStr;
     ///
     /// fn main() {
     ///     assert_eq!(Natural::ZERO.limb_count(), 0);
     ///     assert_eq!(Natural::from(123u32).limb_count(), 1);
-    ///     assert_eq!(Natural::from_str("1000000000000").unwrap().limb_count(), 2);
+    ///     assert_eq!(Natural::trillion().limb_count(), 2);
     /// }
     /// ```
     pub fn limb_count(&self) -> u64 {

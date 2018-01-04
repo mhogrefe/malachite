@@ -13,15 +13,13 @@ use malachite_base::traits::{NegAssign, Zero};
 ///
 /// use malachite_base::traits::Zero;
 /// use malachite_gmp::integer::Integer;
-/// use std::str::FromStr;
 ///
 /// fn main() {
 ///     assert_eq!((Integer::ZERO - Integer::from(123)).to_string(), "-123");
 ///     assert_eq!((Integer::from(123) - Integer::ZERO).to_string(), "123");
 ///     assert_eq!((Integer::from(456) - Integer::from(-123)).to_string(), "579");
-///     assert_eq!((Integer::from_str("-1000000000000").unwrap() -
-///                 Integer::from_str("-2000000000000")
-///                .unwrap()).to_string(), "1000000000000");
+///     assert_eq!((-Integer::trillion() - -Integer::trillion() * 2u32).to_string(),
+///         "1000000000000");
 /// }
 /// ```
 impl Sub<Integer> for Integer {
@@ -43,15 +41,13 @@ impl Sub<Integer> for Integer {
 ///
 /// use malachite_base::traits::Zero;
 /// use malachite_gmp::integer::Integer;
-/// use std::str::FromStr;
 ///
 /// fn main() {
 ///     assert_eq!((Integer::ZERO - &Integer::from(123)).to_string(), "-123");
 ///     assert_eq!((Integer::from(123) - &Integer::ZERO).to_string(), "123");
 ///     assert_eq!((Integer::from(456) - &Integer::from(-123)).to_string(), "579");
-///     assert_eq!((Integer::from_str("-1000000000000").unwrap() -
-///                 &Integer::from_str("-2000000000000")
-///                .unwrap()).to_string(), "1000000000000");
+///     assert_eq!((-Integer::trillion() - &(-Integer::trillion() * 2u32)).to_string(),
+///         "1000000000000");
 /// }
 /// ```
 impl<'a> Sub<&'a Integer> for Integer {
@@ -73,15 +69,13 @@ impl<'a> Sub<&'a Integer> for Integer {
 ///
 /// use malachite_base::traits::Zero;
 /// use malachite_gmp::integer::Integer;
-/// use std::str::FromStr;
 ///
 /// fn main() {
 ///     assert_eq!((&Integer::ZERO - Integer::from(123)).to_string(), "-123");
 ///     assert_eq!((&Integer::from(123) - Integer::ZERO).to_string(), "123");
 ///     assert_eq!((&Integer::from(456) - Integer::from(-123)).to_string(), "579");
-///     assert_eq!((&Integer::from_str("-1000000000000").unwrap() -
-///                 Integer::from_str("-2000000000000")
-///                .unwrap()).to_string(), "1000000000000");
+///     assert_eq!((&(-Integer::trillion()) - -Integer::trillion() * 2u32).to_string(),
+///         "1000000000000");
 /// }
 /// ```
 impl<'a> Sub<Integer> for &'a Integer {
@@ -102,15 +96,13 @@ impl<'a> Sub<Integer> for &'a Integer {
 ///
 /// use malachite_base::traits::Zero;
 /// use malachite_gmp::integer::Integer;
-/// use std::str::FromStr;
 ///
 /// fn main() {
 ///     assert_eq!((&Integer::ZERO - &Integer::from(123)).to_string(), "-123");
 ///     assert_eq!((&Integer::from(123) - &Integer::ZERO).to_string(), "123");
 ///     assert_eq!((&Integer::from(456) - &Integer::from(-123)).to_string(), "579");
-///     assert_eq!((&Integer::from_str("-1000000000000").unwrap() -
-///                 &Integer::from_str("-2000000000000")
-///                .unwrap()).to_string(), "1000000000000");
+///     assert_eq!((&(-Integer::trillion()) - &(-Integer::trillion() * 2u32)).to_string(),
+///         "1000000000000");
 /// }
 /// ```
 impl<'a, 'b> Sub<&'a Integer> for &'b Integer {
@@ -152,14 +144,13 @@ impl<'a, 'b> Sub<&'a Integer> for &'b Integer {
 ///
 /// use malachite_base::traits::Zero;
 /// use malachite_gmp::integer::Integer;
-/// use std::str::FromStr;
 ///
 /// fn main() {
 ///     let mut x = Integer::ZERO;
-///     x -= Integer::from_str("-1000000000000").unwrap();
-///     x -= Integer::from_str("2000000000000").unwrap();
-///     x -= Integer::from_str("-3000000000000").unwrap();
-///     x -= Integer::from_str("4000000000000").unwrap();
+///     x -= -Integer::trillion();
+///     x -= Integer::trillion() * 2;
+///     x -= -Integer::trillion() * 3;
+///     x -= Integer::trillion() * 4;
 ///     assert_eq!(x.to_string(), "-2000000000000");
 /// }
 /// ```
@@ -195,14 +186,13 @@ impl SubAssign<Integer> for Integer {
 ///
 /// use malachite_base::traits::Zero;
 /// use malachite_gmp::integer::Integer;
-/// use std::str::FromStr;
 ///
 /// fn main() {
 ///     let mut x = Integer::ZERO;
-///     x -= &Integer::from_str("-1000000000000").unwrap();
-///     x -= &Integer::from_str("2000000000000").unwrap();
-///     x -= &Integer::from_str("-3000000000000").unwrap();
-///     x -= &Integer::from_str("4000000000000").unwrap();
+///     x -= &(-Integer::trillion());
+///     x -= &(Integer::trillion() * 2);
+///     x -= &(-Integer::trillion() * 3);
+///     x -= &(Integer::trillion() * 4);
 ///     assert_eq!(x.to_string(), "-2000000000000");
 /// }
 /// ```

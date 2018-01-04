@@ -104,7 +104,7 @@ fn test_u32_sub_natural() {
     test(456, "123", "Some(333)");
     test(123, "456", "None");
     test(123, "1000000000000", "None");
-    test(4294967295, "4294967295", "Some(0)");
+    test(u32::max_value(), "4294967295", "Some(0)");
 }
 
 #[test]

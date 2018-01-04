@@ -18,16 +18,13 @@ impl Natural {
     ///
     /// use malachite_base::traits::Zero;
     /// use malachite_native::natural::Natural;
-    /// use std::str::FromStr;
     ///
     /// fn main() {
     ///     assert_eq!(Natural::ZERO.divisible_by_power_of_2(100), true);
     ///     assert_eq!(Natural::from(100u32).divisible_by_power_of_2(2), true);
     ///     assert_eq!(Natural::from(100u32).divisible_by_power_of_2(3), false);
-    ///     assert_eq!(Natural::from_str("1000000000000").unwrap().divisible_by_power_of_2(12),
-    ///         true);
-    ///     assert_eq!(Natural::from_str("1000000000000").unwrap().divisible_by_power_of_2(13),
-    ///         false);
+    ///     assert_eq!(Natural::trillion().divisible_by_power_of_2(12), true);
+    ///     assert_eq!(Natural::trillion().divisible_by_power_of_2(13), false);
     /// }
     /// ```
     pub fn divisible_by_power_of_2(&self, pow: u32) -> bool {

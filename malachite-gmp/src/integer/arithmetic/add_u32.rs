@@ -12,14 +12,12 @@ use std::mem;
 ///
 /// use malachite_base::traits::Zero;
 /// use malachite_gmp::integer::Integer;
-/// use std::str::FromStr;
 ///
 /// fn main() {
 ///     assert_eq!((Integer::ZERO + 123u32).to_string(), "123");
 ///     assert_eq!((Integer::from(-123) + 0u32).to_string(), "-123");
 ///     assert_eq!((Integer::from(-123) + 456u32).to_string(), "333");
-///     assert_eq!((Integer::from_str("-1000000000000").unwrap() + 123u32).to_string(),
-///                "-999999999877");
+///     assert_eq!((-Integer::trillion() + 123u32).to_string(), "-999999999877");
 /// }
 /// ```
 impl Add<u32> for Integer {
@@ -40,14 +38,12 @@ impl Add<u32> for Integer {
 ///
 /// use malachite_base::traits::Zero;
 /// use malachite_gmp::integer::Integer;
-/// use std::str::FromStr;
 ///
 /// fn main() {
 ///     assert_eq!((&Integer::ZERO + 123u32).to_string(), "123");
 ///     assert_eq!((&Integer::from(-123) + 0u32).to_string(), "-123");
 ///     assert_eq!((&Integer::from(-123) + 456u32).to_string(), "333");
-///     assert_eq!((&Integer::from_str("-1000000000000").unwrap() + 123u32).to_string(),
-///                "-999999999877");
+///     assert_eq!((&(-Integer::trillion()) + 123u32).to_string(), "-999999999877");
 /// }
 /// ```
 impl<'a> Add<u32> for &'a Integer {
@@ -59,8 +55,8 @@ impl<'a> Add<u32> for &'a Integer {
         }
         match *self {
             Small(small) => {
-                let sum = small as i64 + other as i64;
-                if sum >= i32::min_value() as i64 && sum <= i32::max_value() as i64 {
+                let sum = i64::from(small) + i64::from(other);
+                if sum >= i32::min_value().into() && sum <= i32::max_value().into() {
                     Small(sum as i32)
                 } else {
                     unsafe {
@@ -94,14 +90,12 @@ impl<'a> Add<u32> for &'a Integer {
 ///
 /// use malachite_base::traits::Zero;
 /// use malachite_gmp::integer::Integer;
-/// use std::str::FromStr;
 ///
 /// fn main() {
 ///     assert_eq!((123u32 + Integer::ZERO).to_string(), "123");
 ///     assert_eq!((0u32 + Integer::from(-123)).to_string(), "-123");
 ///     assert_eq!((456u32 + Integer::from(-123)).to_string(), "333");
-///     assert_eq!((123u32 + Integer::from_str("-1000000000000").unwrap()).to_string(),
-///                "-999999999877");
+///     assert_eq!((123u32 + -Integer::trillion()).to_string(), "-999999999877");
 /// }
 /// ```
 impl Add<Integer> for u32 {
@@ -122,14 +116,12 @@ impl Add<Integer> for u32 {
 ///
 /// use malachite_base::traits::Zero;
 /// use malachite_gmp::integer::Integer;
-/// use std::str::FromStr;
 ///
 /// fn main() {
 ///     assert_eq!((123u32 + &Integer::ZERO).to_string(), "123");
 ///     assert_eq!((0u32 + &Integer::from(-123)).to_string(), "-123");
 ///     assert_eq!((456u32 + &Integer::from(-123)).to_string(), "333");
-///     assert_eq!((123u32 + &Integer::from_str("-1000000000000").unwrap()).to_string(),
-///                "-999999999877");
+///     assert_eq!((123u32 + &(-Integer::trillion())).to_string(), "-999999999877");
 /// }
 /// ```
 impl<'a> Add<&'a Integer> for u32 {
@@ -163,8 +155,8 @@ impl AddAssign<u32> for Integer {
             small,
             large,
             {
-                let sum = *small as i64 + other as i64;
-                if sum >= i32::min_value() as i64 && sum <= i32::max_value() as i64 {
+                let sum = i64::from(*small) + i64::from(other);
+                if sum >= i32::min_value().into() && sum <= i32::max_value().into() {
                     Some(sum as i32)
                 } else {
                     None

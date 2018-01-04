@@ -15,7 +15,7 @@ impl Integer {
     /// ```
     /// use malachite_native::integer::Integer;
     ///
-    /// let mut x = Integer::from(127);
+    /// let mut x = Integer::from(0x7f);
     /// x.clear_bit(0);
     /// x.clear_bit(1);
     /// x.clear_bit(3);
@@ -50,7 +50,7 @@ impl Natural {
             small,
             limbs,
             {
-                if index < LIMB_BITS as u64 {
+                if index < LIMB_BITS.into() {
                     Some(((*small - 1) | (1 << index)).wrapping_add(1))
                 } else {
                     None

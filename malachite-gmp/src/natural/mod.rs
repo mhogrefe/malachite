@@ -2,6 +2,7 @@ use gmp_mpfr_sys::gmp::{self, mpz_t};
 use malachite_base::traits::{One, Two, Zero};
 use natural::Natural::*;
 use std::mem;
+use std::str::FromStr;
 
 /// A natural (non-negative) integer backed by [GMP](https://gmplib.org/).
 ///
@@ -59,6 +60,10 @@ impl Natural {
             Small(_) => true,
             Large(ref large) => (unsafe { gmp::mpz_cmp_ui(large, u32::max_value().into()) }) > 0,
         }
+    }
+
+    pub fn trillion() -> Natural {
+        Natural::from_str("1000000000000").unwrap()
     }
 }
 

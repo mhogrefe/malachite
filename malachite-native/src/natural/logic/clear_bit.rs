@@ -13,7 +13,7 @@ impl Natural {
     /// ```
     /// use malachite_native::natural::Natural;
     ///
-    /// let mut x = Natural::from(127u32);
+    /// let mut x = Natural::from(0x7fu32);
     /// x.clear_bit(0);
     /// x.clear_bit(1);
     /// x.clear_bit(3);
@@ -23,7 +23,7 @@ impl Natural {
     pub fn clear_bit(&mut self, index: u64) {
         match *self {
             Small(ref mut small) => {
-                if index < LIMB_BITS as u64 {
+                if index < LIMB_BITS.into() {
                     *small &= !(1 << index);
                 }
                 return;

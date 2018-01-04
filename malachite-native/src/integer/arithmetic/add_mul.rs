@@ -21,14 +21,11 @@ use natural::Natural::{Large, Small};
 ///
 /// use malachite_base::traits::AddMul;
 /// use malachite_native::integer::Integer;
-/// use std::str::FromStr;
 ///
 /// fn main() {
 ///     assert_eq!(Integer::from(10u32).add_mul(Integer::from(3u32), Integer::from(4u32)), 22);
-///     assert_eq!(Integer::from_str("-1000000000000").unwrap()
-///                         .add_mul(Integer::from(65536u32),
-///                         Integer::from_str("-1000000000000").unwrap()).to_string(),
-///                "-65537000000000000");
+///     assert_eq!((-Integer::trillion()).add_mul(Integer::from(0x1_0000),
+///         -Integer::trillion()).to_string(), "-65537000000000000");
 /// }
 /// ```
 impl<'a> AddMul<Integer, Integer> for Integer {
@@ -58,14 +55,11 @@ impl<'a> AddMul<Integer, Integer> for Integer {
 ///
 /// use malachite_base::traits::AddMul;
 /// use malachite_native::integer::Integer;
-/// use std::str::FromStr;
 ///
 /// fn main() {
 ///     assert_eq!(Integer::from(10u32).add_mul(Integer::from(3u32), &Integer::from(4u32)), 22);
-///     assert_eq!(Integer::from_str("-1000000000000").unwrap()
-///                         .add_mul(Integer::from(65536u32),
-///                         &Integer::from_str("-1000000000000").unwrap()).to_string(),
-///                "-65537000000000000");
+///     assert_eq!((-Integer::trillion()).add_mul(Integer::from(0x1_0000),
+///         &(-Integer::trillion())).to_string(), "-65537000000000000");
 /// }
 /// ```
 impl<'a> AddMul<Integer, &'a Integer> for Integer {
@@ -95,14 +89,11 @@ impl<'a> AddMul<Integer, &'a Integer> for Integer {
 ///
 /// use malachite_base::traits::AddMul;
 /// use malachite_native::integer::Integer;
-/// use std::str::FromStr;
 ///
 /// fn main() {
 ///     assert_eq!(Integer::from(10u32).add_mul(&Integer::from(3u32), Integer::from(4u32)), 22);
-///     assert_eq!(Integer::from_str("-1000000000000").unwrap()
-///                         .add_mul(&Integer::from(65536u32),
-///                         Integer::from_str("-1000000000000").unwrap()).to_string(),
-///                "-65537000000000000");
+///     assert_eq!((-Integer::trillion()).add_mul(&Integer::from(0x1_0000),
+///         -Integer::trillion()).to_string(), "-65537000000000000");
 /// }
 /// ```
 impl<'a> AddMul<&'a Integer, Integer> for Integer {
@@ -132,14 +123,11 @@ impl<'a> AddMul<&'a Integer, Integer> for Integer {
 ///
 /// use malachite_base::traits::AddMul;
 /// use malachite_native::integer::Integer;
-/// use std::str::FromStr;
 ///
 /// fn main() {
 ///     assert_eq!(Integer::from(10u32).add_mul(&Integer::from(3u32), &Integer::from(4u32)), 22);
-///     assert_eq!(Integer::from_str("-1000000000000").unwrap()
-///                         .add_mul(&Integer::from(65536u32),
-///                         &Integer::from_str("-1000000000000").unwrap()).to_string(),
-///                "-65537000000000000");
+///     assert_eq!((-Integer::trillion()).add_mul(&Integer::from(0x1_0000),
+///         &(-Integer::trillion())).to_string(), "-65537000000000000");
 /// }
 /// ```
 impl<'a, 'b> AddMul<&'a Integer, &'b Integer> for Integer {
@@ -169,14 +157,11 @@ impl<'a, 'b> AddMul<&'a Integer, &'b Integer> for Integer {
 ///
 /// use malachite_base::traits::AddMul;
 /// use malachite_native::integer::Integer;
-/// use std::str::FromStr;
 ///
 /// fn main() {
 ///     assert_eq!((&Integer::from(10u32)).add_mul(&Integer::from(3u32), &Integer::from(4u32)), 22);
-///     assert_eq!((&Integer::from_str("-1000000000000").unwrap())
-///                         .add_mul(&Integer::from(65536u32),
-///                         &Integer::from_str("-1000000000000").unwrap()).to_string(),
-///                 "-65537000000000000");
+///     assert_eq!((&(-Integer::trillion())).add_mul(&Integer::from(0x1_0000),
+///         &(-Integer::trillion())).to_string(), "-65537000000000000");
 /// }
 /// ```
 impl<'a, 'b, 'c> AddMul<&'a Integer, &'b Integer> for &'c Integer {
@@ -279,15 +264,14 @@ impl<'a, 'b, 'c> AddMul<&'a Integer, &'b Integer> for &'c Integer {
 ///
 /// use malachite_base::traits::AddMulAssign;
 /// use malachite_native::integer::Integer;
-/// use std::str::FromStr;
 ///
 /// fn main() {
 ///     let mut x = Integer::from(10u32);
 ///     x.add_mul_assign(Integer::from(3u32), Integer::from(4u32));
 ///     assert_eq!(x, 22);
 ///
-///     let mut x = Integer::from_str("-1000000000000").unwrap();
-///     x.add_mul_assign(Integer::from(65536u32), Integer::from_str("-1000000000000").unwrap());
+///     let mut x = -Integer::trillion();
+///     x.add_mul_assign(Integer::from(0x1_0000), -Integer::trillion());
 ///     assert_eq!(x.to_string(), "-65537000000000000");
 /// }
 /// ```
@@ -383,15 +367,14 @@ impl AddMulAssign<Integer, Integer> for Integer {
 ///
 /// use malachite_base::traits::AddMulAssign;
 /// use malachite_native::integer::Integer;
-/// use std::str::FromStr;
 ///
 /// fn main() {
 ///     let mut x = Integer::from(10u32);
 ///     x.add_mul_assign(Integer::from(3u32), &Integer::from(4u32));
 ///     assert_eq!(x, 22);
 ///
-///     let mut x = Integer::from_str("-1000000000000").unwrap();
-///     x.add_mul_assign(Integer::from(65536u32), &Integer::from_str("-1000000000000").unwrap());
+///     let mut x = -Integer::trillion();
+///     x.add_mul_assign(Integer::from(0x1_0000), &(-Integer::trillion()));
 ///     assert_eq!(x.to_string(), "-65537000000000000");
 /// }
 /// ```
@@ -487,15 +470,14 @@ impl<'a> AddMulAssign<Integer, &'a Integer> for Integer {
 ///
 /// use malachite_base::traits::AddMulAssign;
 /// use malachite_native::integer::Integer;
-/// use std::str::FromStr;
 ///
 /// fn main() {
 ///     let mut x = Integer::from(10u32);
 ///     x.add_mul_assign(&Integer::from(3u32), Integer::from(4u32));
 ///     assert_eq!(x, 22);
 ///
-///     let mut x = Integer::from_str("-1000000000000").unwrap();
-///     x.add_mul_assign(&Integer::from(65536u32), Integer::from_str("-1000000000000").unwrap());
+///     let mut x = -Integer::trillion();
+///     x.add_mul_assign(&Integer::from(0x1_0000), -Integer::trillion());
 ///     assert_eq!(x.to_string(), "-65537000000000000");
 /// }
 /// ```
@@ -591,15 +573,14 @@ impl<'a> AddMulAssign<&'a Integer, Integer> for Integer {
 ///
 /// use malachite_base::traits::AddMulAssign;
 /// use malachite_native::integer::Integer;
-/// use std::str::FromStr;
 ///
 /// fn main() {
 ///     let mut x = Integer::from(10u32);
 ///     x.add_mul_assign(&Integer::from(3u32), &Integer::from(4u32));
 ///     assert_eq!(x, 22);
 ///
-///     let mut x = Integer::from_str("-1000000000000").unwrap();
-///     x.add_mul_assign(&Integer::from(65536u32), &Integer::from_str("-1000000000000").unwrap());
+///     let mut x = -Integer::trillion();
+///     x.add_mul_assign(&Integer::from(0x1_0000), &(-Integer::trillion()));
 ///     assert_eq!(x.to_string(), "-65537000000000000");
 /// }
 /// ```

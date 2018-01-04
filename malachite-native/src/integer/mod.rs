@@ -1,5 +1,6 @@
 use malachite_base::traits::{NegativeOne, One, Two, Zero};
 use natural::Natural::{self, Small};
+use std::str::FromStr;
 
 /// An integer.
 ///
@@ -16,6 +17,10 @@ impl Integer {
     /// is at least 2^(31). All Integers must be valid.
     pub fn is_valid(&self) -> bool {
         self.abs.is_valid() && (self.sign || self.abs != 0)
+    }
+
+    pub fn trillion() -> Integer {
+        Integer::from_str("1000000000000").unwrap()
     }
 }
 

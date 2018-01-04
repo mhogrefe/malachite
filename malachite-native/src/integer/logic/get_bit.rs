@@ -17,7 +17,6 @@ impl Integer {
     /// # Example
     /// ```
     /// use malachite_native::integer::Integer;
-    /// use std::str::FromStr;
     ///
     /// assert_eq!(Integer::from(123).get_bit(2), false);
     /// assert_eq!(Integer::from(123).get_bit(3), true);
@@ -25,10 +24,10 @@ impl Integer {
     /// assert_eq!(Integer::from(-123).get_bit(0), true);
     /// assert_eq!(Integer::from(-123).get_bit(1), false);
     /// assert_eq!(Integer::from(-123).get_bit(100), true);
-    /// assert_eq!(Integer::from_str("1000000000000").unwrap().get_bit(12), true);
-    /// assert_eq!(Integer::from_str("1000000000000").unwrap().get_bit(100), false);
-    /// assert_eq!(Integer::from_str("-1000000000000").unwrap().get_bit(12), true);
-    /// assert_eq!(Integer::from_str("-1000000000000").unwrap().get_bit(100), true);
+    /// assert_eq!(Integer::trillion().get_bit(12), true);
+    /// assert_eq!(Integer::trillion().get_bit(100), false);
+    /// assert_eq!((-Integer::trillion()).get_bit(12), true);
+    /// assert_eq!((-Integer::trillion()).get_bit(100), true);
     /// ```
     pub fn get_bit(&self, index: u64) -> bool {
         match *self {
@@ -48,7 +47,7 @@ impl Natural {
     fn get_bit_neg(&self, index: u64) -> bool {
         match *self {
             Small(small) => {
-                index >= LIMB_BITS as u64 || ((!small).wrapping_add(1)) & (1 << index) != 0
+                index >= LIMB_BITS.into() || ((!small).wrapping_add(1)) & (1 << index) != 0
             }
             Large(ref xs) => {
                 let limb_index = (index >> LOG_LIMB_BITS) as usize;

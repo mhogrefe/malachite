@@ -8,12 +8,11 @@ use std::mem;
 /// # Examples
 /// ```
 /// use malachite_gmp::integer::Integer;
-/// use std::str::FromStr;
 ///
 /// assert_eq!((Integer::from(123) - 123u32).to_string(), "0");
 /// assert_eq!((Integer::from(-123) - 0u32).to_string(), "-123");
 /// assert_eq!((Integer::from(123) - 456u32).to_string(), "-333");
-/// assert_eq!((Integer::from_str("1000000000000").unwrap() - 123u32).to_string(), "999999999877");
+/// assert_eq!((Integer::trillion() - 123u32).to_string(), "999999999877");
 /// ```
 impl Sub<u32> for Integer {
     type Output = Integer;
@@ -29,12 +28,11 @@ impl Sub<u32> for Integer {
 /// # Examples
 /// ```
 /// use malachite_gmp::integer::Integer;
-/// use std::str::FromStr;
 ///
 /// assert_eq!((&Integer::from(123) - 123u32).to_string(), "0");
 /// assert_eq!((&Integer::from(-123) - 0u32).to_string(), "-123");
 /// assert_eq!((&Integer::from(123) - 456u32).to_string(), "-333");
-/// assert_eq!((&Integer::from_str("1000000000000").unwrap() - 123u32).to_string(), "999999999877");
+/// assert_eq!((&Integer::trillion() - 123u32).to_string(), "999999999877");
 /// ```
 impl<'a> Sub<u32> for &'a Integer {
     type Output = Integer;
@@ -76,12 +74,11 @@ impl<'a> Sub<u32> for &'a Integer {
 /// # Examples
 /// ```
 /// use malachite_gmp::integer::Integer;
-/// use std::str::FromStr;
 ///
 /// assert_eq!((123u32 - Integer::from(123)).to_string(), "0");
 /// assert_eq!((0u32 - Integer::from(-123)).to_string(), "123");
 /// assert_eq!((456u32 - Integer::from(123)).to_string(), "333");
-/// assert_eq!((123u32 - Integer::from_str("1000000000000").unwrap()).to_string(), "-999999999877");
+/// assert_eq!((123u32 - Integer::trillion()).to_string(), "-999999999877");
 /// ```
 impl Sub<Integer> for u32 {
     type Output = Integer;
@@ -97,13 +94,11 @@ impl Sub<Integer> for u32 {
 /// # Examples
 /// ```
 /// use malachite_gmp::integer::Integer;
-/// use std::str::FromStr;
 ///
 /// assert_eq!((123u32 - &Integer::from(123)).to_string(), "0");
 /// assert_eq!((0u32 - &Integer::from(-123)).to_string(), "123");
 /// assert_eq!((456u32 - &Integer::from(123)).to_string(), "333");
-/// assert_eq!((123u32 - &Integer::from_str("1000000000000").unwrap()).to_string(),
-///            "-999999999877");
+/// assert_eq!((123u32 - &Integer::trillion()).to_string(), "-999999999877");
 /// ```
 impl<'a> Sub<&'a Integer> for u32 {
     type Output = Integer;

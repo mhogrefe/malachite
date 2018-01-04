@@ -14,7 +14,7 @@ pub fn mpn_sub_1(r: &mut [u32], s1: &[u32], mut s2limb: u32) -> bool {
         } else {
             s2limb = 0;
             let copy_index = i + 1;
-            &r[copy_index..s1_len].copy_from_slice(&s1[copy_index..]);
+            r[copy_index..s1_len].copy_from_slice(&s1[copy_index..]);
             break;
         }
     }
@@ -73,14 +73,12 @@ pub(crate) fn sub_assign_u32_helper(x: &mut Natural, y: u32) -> bool {
 /// # Examples
 /// ```
 /// use malachite_native::natural::Natural;
-/// use std::str::FromStr;
 ///
 /// assert_eq!(format!("{:?}", Natural::from(123u32) - 123), "Some(0)");
 /// assert_eq!(format!("{:?}", Natural::from(123u32) - 0), "Some(123)");
 /// assert_eq!(format!("{:?}", Natural::from(456u32) - 123), "Some(333)");
 /// assert_eq!(format!("{:?}", Natural::from(123u32) - 456), "None");
-/// assert_eq!(format!("{:?}", Natural::from_str("1000000000000").unwrap() - 123),
-///            "Some(999999999877)");
+/// assert_eq!(format!("{:?}", Natural::trillion() - 123), "Some(999999999877)");
 /// ```
 impl Sub<u32> for Natural {
     type Output = Option<Natural>;
@@ -106,14 +104,12 @@ impl Sub<u32> for Natural {
 /// # Examples
 /// ```
 /// use malachite_native::natural::Natural;
-/// use std::str::FromStr;
 ///
 /// assert_eq!(format!("{:?}", &Natural::from(123u32) - 123), "Some(0)");
 /// assert_eq!(format!("{:?}", &Natural::from(123u32) - 0), "Some(123)");
 /// assert_eq!(format!("{:?}", &Natural::from(456u32) - 123), "Some(333)");
 /// assert_eq!(format!("{:?}", &Natural::from(123u32) - 456), "None");
-/// assert_eq!(format!("{:?}", &Natural::from_str("1000000000000").unwrap() - 123),
-///            "Some(999999999877)");
+/// assert_eq!(format!("{:?}", &Natural::trillion() - 123), "Some(999999999877)");
 /// ```
 impl<'a> Sub<u32> for &'a Natural {
     type Output = Option<Natural>;
@@ -147,14 +143,13 @@ impl<'a> Sub<u32> for &'a Natural {
 ///
 /// use malachite_base::traits::Zero;
 /// use malachite_native::natural::Natural;
-/// use std::str::FromStr;
 ///
 /// fn main() {
 ///     assert_eq!(format!("{:?}", 123 - &Natural::from(123u32)), "Some(0)");
 ///     assert_eq!(format!("{:?}", 123 - &Natural::ZERO), "Some(123)");
 ///     assert_eq!(format!("{:?}", 456 - &Natural::from(123u32)), "Some(333)");
 ///     assert_eq!(format!("{:?}", 123 - &Natural::from(456u32)), "None");
-///     assert_eq!(format!("{:?}", 123 - &Natural::from_str("1000000000000").unwrap()), "None");
+///     assert_eq!(format!("{:?}", 123 - &Natural::trillion()), "None");
 /// }
 /// ```
 impl<'a> Sub<&'a Natural> for u32 {

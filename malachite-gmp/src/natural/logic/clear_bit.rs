@@ -9,7 +9,7 @@ impl Natural {
     /// ```
     /// use malachite_gmp::natural::Natural;
     ///
-    /// let mut x = Natural::from(127u32);
+    /// let mut x = Natural::from(0x7fu32);
     /// x.clear_bit(0);
     /// x.clear_bit(1);
     /// x.clear_bit(3);

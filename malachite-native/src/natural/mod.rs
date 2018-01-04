@@ -1,5 +1,6 @@
 use malachite_base::traits::{One, Two, Zero};
 use natural::Natural::*;
+use std::str::FromStr;
 
 pub const LOG_LIMB_BITS: u32 = 5;
 pub const LIMB_BITS: u32 = 1 << LOG_LIMB_BITS;
@@ -70,6 +71,10 @@ impl Natural {
             Small(_) => true,
             Large(ref xs) => xs.len() > 1 && xs.last().unwrap() != &0,
         }
+    }
+
+    pub fn trillion() -> Natural {
+        Natural::from_str("1000000000000").unwrap()
     }
 }
 

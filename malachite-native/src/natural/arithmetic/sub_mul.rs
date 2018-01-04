@@ -24,7 +24,6 @@ use natural::Natural::{self, Large, Small};
 ///
 /// use malachite_base::traits::SubMul;
 /// use malachite_native::natural::Natural;
-/// use std::str::FromStr;
 ///
 /// fn main() {
 ///     assert_eq!(format!("{:?}", Natural::from(20u32)
@@ -32,9 +31,8 @@ use natural::Natural::{self, Large, Small};
 ///         "Some(8)");
 ///     assert_eq!(Natural::from(10u32).sub_mul(&Natural::from(3u32), &Natural::from(4u32)),
 ///         None);
-///     assert_eq!(format!("{:?}", Natural::from_str("1000000000000").unwrap()
-///         .sub_mul(&Natural::from(65536u32), &Natural::from(65536u32))),
-///         "Some(995705032704)");
+///     assert_eq!(format!("{:?}", Natural::trillion().sub_mul(&Natural::from(0x1_0000u32),
+///         &Natural::from(0x1_0000u32))), "Some(995705032704)");
 /// }
 /// ```
 impl<'a, 'b> SubMul<&'a Natural, &'b Natural> for Natural {
@@ -67,7 +65,6 @@ impl<'a, 'b> SubMul<&'a Natural, &'b Natural> for Natural {
 ///
 /// use malachite_base::traits::SubMul;
 /// use malachite_native::natural::Natural;
-/// use std::str::FromStr;
 ///
 /// fn main() {
 ///     assert_eq!(format!("{:?}", (&Natural::from(20u32))
@@ -75,9 +72,8 @@ impl<'a, 'b> SubMul<&'a Natural, &'b Natural> for Natural {
 ///         "Some(8)");
 ///     assert_eq!((&Natural::from(10u32)).sub_mul(&Natural::from(3u32), &Natural::from(4u32)),
 ///         None);
-///     assert_eq!(format!("{:?}", (&Natural::from_str("1000000000000").unwrap())
-///         .sub_mul(&Natural::from(65536u32), &Natural::from(65536u32))),
-///         "Some(995705032704)");
+///     assert_eq!(format!("{:?}", (&Natural::trillion()).sub_mul(&Natural::from(0x1_0000u32),
+///         &Natural::from(0x1_0000u32))), "Some(995705032704)");
 /// }
 /// ```
 impl<'a, 'b, 'c> SubMul<&'a Natural, &'b Natural> for &'c Natural {
@@ -134,15 +130,14 @@ impl<'a, 'b, 'c> SubMul<&'a Natural, &'b Natural> for &'c Natural {
 ///
 /// use malachite_base::traits::SubMulAssign;
 /// use malachite_native::natural::Natural;
-/// use std::str::FromStr;
 ///
 /// fn main() {
 ///     let mut x = Natural::from(20u32);
 ///     x.sub_mul_assign(&Natural::from(3u32), &Natural::from(4u32));
 ///     assert_eq!(x, 8);
 ///
-///     let mut x = Natural::from_str("1000000000000").unwrap();
-///     x.sub_mul_assign(&Natural::from(65536u32), &Natural::from(65536u32));
+///     let mut x = Natural::trillion();
+///     x.sub_mul_assign(&Natural::from(0x1_0000u32), &Natural::from(0x1_0000u32));
 ///     assert_eq!(x.to_string(), "995705032704");
 /// }
 /// ```

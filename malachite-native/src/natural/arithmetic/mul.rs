@@ -364,8 +364,7 @@ fn mpn_toom_eval_dgr3_pm1(
 
     assert!(xp1[n] <= 3);
     assert!(xm1[n] <= 1);
-
-    return neg;
+    neg
 }
 
 //TODO move to a better location
@@ -818,7 +817,7 @@ fn mpn_mul_basecase_mem_opt_helper(prod: &mut [u32], u: &[u32], v: &[u32]) {
         }
         offset += MUL_BASECASE_MAX_UN;
         if offset < u_len {
-            &triangle_buffer[0..v_len].copy_from_slice(&prod[offset..offset + v_len]);
+            triangle_buffer[0..v_len].copy_from_slice(&prod[offset..offset + v_len]);
         }
     }
 }
@@ -955,7 +954,7 @@ pub fn mpn_mul_unfinished(prod: &mut [u32], u: &[u32], v: &[u32]) -> u32 {
                 //mp_ptr ws;
 
                 // The maximum ws usage is for the mpn_mul result.
-                let mut ws = vec![0; 7 * vn >> 1];
+                let mut ws = vec![0; (7 * vn) >> 1];
 
                 if vn < MUL_TOOM42_TO_TOOM63_THRESHOLD {
                     mpn_toom42_mul(prod, &u[0..2 * vn], v, &mut scratch[..]);
@@ -1025,32 +1024,26 @@ pub fn mpn_mul_unfinished(prod: &mut [u32], u: &[u32], v: &[u32]) -> u32 {
                         } else {
                             mpn_toom53_mul(prod, u, v, &mut scratch[..]);
                         }
-                    } else {
-                        if vn < MUL_TOOM42_TO_TOOM53_THRESHOLD {
-                            mpn_toom42_mul(prod, u, v, &mut scratch[..]);
-                        } else {
-                            mpn_toom53_mul(prod, u, v, &mut scratch[..]);
-                        }
-                    }
-                } else {
-                    if vn < MUL_TOOM42_TO_TOOM63_THRESHOLD {
+                    } else if vn < MUL_TOOM42_TO_TOOM53_THRESHOLD {
                         mpn_toom42_mul(prod, u, v, &mut scratch[..]);
                     } else {
-                        mpn_toom63_mul(prod, u, v, &mut scratch[..]);
+                        mpn_toom53_mul(prod, u, v, &mut scratch[..]);
                     }
+                } else if vn < MUL_TOOM42_TO_TOOM63_THRESHOLD {
+                    mpn_toom42_mul(prod, u, v, &mut scratch[..]);
+                } else {
+                    mpn_toom63_mul(prod, u, v, &mut scratch[..]);
                 }
             }
+        } else if vn < MUL_TOOM6H_THRESHOLD {
+            let mut scratch = vec![0; mpn_toom44_mul_itch(un)];
+            mpn_toom44_mul(prod, u, v, &mut scratch[..]);
+        } else if vn < MUL_TOOM8H_THRESHOLD {
+            let mut scratch = vec![0; mpn_toom6h_mul_itch(un, vn)];
+            mpn_toom6h_mul(prod, u, v, &mut scratch[..]);
         } else {
-            if vn < MUL_TOOM6H_THRESHOLD {
-                let mut scratch = vec![0; mpn_toom44_mul_itch(un)];
-                mpn_toom44_mul(prod, u, v, &mut scratch[..]);
-            } else if vn < MUL_TOOM8H_THRESHOLD {
-                let mut scratch = vec![0; mpn_toom6h_mul_itch(un, vn)];
-                mpn_toom6h_mul(prod, u, v, &mut scratch[..]);
-            } else {
-                let mut scratch = vec![0; mpn_toom8h_mul_itch(un, vn)];
-                mpn_toom8h_mul(prod, u, v, &mut scratch[..]);
-            }
+            let mut scratch = vec![0; mpn_toom8h_mul_itch(un, vn)];
+            mpn_toom8h_mul(prod, u, v, &mut scratch[..]);
         }
     }
     prod[un + vn - 1] // historic

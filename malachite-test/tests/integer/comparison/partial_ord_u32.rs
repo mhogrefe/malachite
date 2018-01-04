@@ -46,9 +46,9 @@ fn test_partial_ord_u32() {
     test("-123", 123, Some(Ordering::Less));
     test("1000000000000", 123, Some(Ordering::Greater));
     test("-1000000000000", 123, Some(Ordering::Less));
-    test("3000000000", 3000000000, Some(Ordering::Equal));
-    test("3000000000", 3000000001, Some(Ordering::Less));
-    test("3000000000", 2999999999, Some(Ordering::Greater));
+    test("3000000000", 3_000_000_000, Some(Ordering::Equal));
+    test("3000000000", 3_000_000_001, Some(Ordering::Less));
+    test("3000000000", 2_999_999_999, Some(Ordering::Greater));
 }
 
 #[test]

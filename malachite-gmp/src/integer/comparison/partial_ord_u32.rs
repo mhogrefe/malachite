@@ -7,16 +7,15 @@ use std::cmp::Ordering;
 /// # Examples
 /// ```
 /// use malachite_gmp::integer::Integer;
-/// use std::str::FromStr;
 ///
 /// assert!(Integer::from(123) > 122);
 /// assert!(Integer::from(123) >= 122);
 /// assert!(Integer::from(123) < 124);
 /// assert!(Integer::from(123) <= 124);
-/// assert!(Integer::from_str("1000000000000").unwrap() > 123);
-/// assert!(Integer::from_str("1000000000000").unwrap() >= 123);
-/// assert!(Integer::from_str("-1000000000000").unwrap() < 123);
-/// assert!(Integer::from_str("-1000000000000").unwrap() <= 123);
+/// assert!(Integer::trillion() > 123);
+/// assert!(Integer::trillion() >= 123);
+/// assert!(-Integer::trillion() < 123);
+/// assert!(-Integer::trillion() <= 123);
 /// ```
 impl PartialOrd<u32> for Integer {
     fn partial_cmp(&self, other: &u32) -> Option<Ordering> {
@@ -33,16 +32,15 @@ impl PartialOrd<u32> for Integer {
 /// # Examples
 /// ```
 /// use malachite_gmp::integer::Integer;
-/// use std::str::FromStr;
 ///
 /// assert!(122 < Integer::from(123));
 /// assert!(122 <= Integer::from(123));
 /// assert!(124 > Integer::from(123));
 /// assert!(123 >= Integer::from(123));
-/// assert!(123 < Integer::from_str("1000000000000").unwrap());
-/// assert!(123 <= Integer::from_str("1000000000000").unwrap());
-/// assert!(123 > Integer::from_str("-1000000000000").unwrap());
-/// assert!(123 >= Integer::from_str("-1000000000000").unwrap());
+/// assert!(123 < Integer::trillion());
+/// assert!(123 <= Integer::trillion());
+/// assert!(123 > -Integer::trillion());
+/// assert!(123 >= -Integer::trillion());
 /// ```
 impl PartialOrd<Integer> for u32 {
     fn partial_cmp(&self, other: &Integer) -> Option<Ordering> {

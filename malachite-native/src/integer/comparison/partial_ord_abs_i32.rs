@@ -15,17 +15,16 @@ use std::cmp::Ordering;
 ///
 /// use malachite_base::traits::PartialOrdAbs;
 /// use malachite_native::integer::Integer;
-/// use std::str::FromStr;
 ///
 /// fn main() {
 ///     assert!(Integer::from(-123).gt_abs(&-122));
 ///     assert!(Integer::from(-123).ge_abs(&-122));
 ///     assert!(Integer::from(-123).lt_abs(&-124));
 ///     assert!(Integer::from(-123).le_abs(&-124));
-///     assert!(Integer::from_str("1000000000000").unwrap().gt_abs(&123));
-///     assert!(Integer::from_str("1000000000000").unwrap().ge_abs(&123));
-///     assert!(Integer::from_str("-1000000000000").unwrap().gt_abs(&123));
-///     assert!(Integer::from_str("-1000000000000").unwrap().ge_abs(&123));
+///     assert!(Integer::trillion().gt_abs(&123));
+///     assert!(Integer::trillion().ge_abs(&123));
+///     assert!((-Integer::trillion()).gt_abs(&123));
+///     assert!((-Integer::trillion()).ge_abs(&123));
 /// }
 /// ```
 impl PartialOrdAbs<i32> for Integer {
@@ -47,17 +46,16 @@ impl PartialOrdAbs<i32> for Integer {
 ///
 /// use malachite_base::traits::PartialOrdAbs;
 /// use malachite_native::integer::Integer;
-/// use std::str::FromStr;
 ///
 /// fn main() {
 ///     assert!((-122).lt_abs(&Integer::from(-123)));
 ///     assert!((-122).le_abs(&Integer::from(-123)));
 ///     assert!((-124).gt_abs(&Integer::from(-123)));
 ///     assert!((-123).ge_abs(&Integer::from(-123)));
-///     assert!(123.lt_abs(&Integer::from_str("1000000000000").unwrap()));
-///     assert!(123.le_abs(&Integer::from_str("1000000000000").unwrap()));
-///     assert!(123.lt_abs(&Integer::from_str("-1000000000000").unwrap()));
-///     assert!(123.le_abs(&Integer::from_str("-1000000000000").unwrap()));
+///     assert!(123.lt_abs(&Integer::trillion()));
+///     assert!(123.le_abs(&Integer::trillion()));
+///     assert!(123.lt_abs(&(-Integer::trillion())));
+///     assert!(123.le_abs(&(-Integer::trillion())));
 /// }
 /// ```
 impl PartialOrdAbs<Integer> for i32 {

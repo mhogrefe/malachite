@@ -2,6 +2,7 @@ use gmp_mpfr_sys::gmp::{self, mpz_t};
 use integer::Integer::*;
 use malachite_base::traits::{NegativeOne, One, Two, Zero};
 use std::mem;
+use std::str::FromStr;
 
 /// An integer backed by [GMP](https://gmplib.org/).
 ///
@@ -82,6 +83,10 @@ impl Integer {
                     > 0
             }
         }
+    }
+
+    pub fn trillion() -> Integer {
+        Integer::from_str("1000000000000").unwrap()
     }
 }
 

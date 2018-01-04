@@ -11,11 +11,9 @@ impl Natural {
     /// # Examples
     /// ```
     /// use malachite_native::natural::Natural;
-    /// use std::str::FromStr;
     ///
     /// assert_eq!(Natural::from(123u32).into_integer().to_string(), "123");
-    /// assert_eq!(Natural::from_str("1000000000000").unwrap().into_integer().to_string(),
-    ///            "1000000000000");
+    /// assert_eq!(Natural::trillion().into_integer().to_string(), "1000000000000");
     /// ```
     pub fn into_integer(self) -> Integer {
         Integer {
@@ -35,11 +33,9 @@ impl Natural {
     /// # Examples
     /// ```
     /// use malachite_native::natural::Natural;
-    /// use std::str::FromStr;
     ///
     /// assert_eq!(Natural::from(123u32).to_integer().to_string(), "123");
-    /// assert_eq!(Natural::from_str("1000000000000").unwrap().to_integer().to_string(),
-    ///            "1000000000000");
+    /// assert_eq!(Natural::trillion().to_integer().to_string(), "1000000000000");
     /// ```
     pub fn to_integer(&self) -> Integer {
         Integer {

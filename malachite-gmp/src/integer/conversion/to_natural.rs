@@ -10,14 +10,11 @@ impl Integer {
     /// # Examples
     /// ```
     /// use malachite_gmp::integer::Integer;
-    /// use std::str::FromStr;
     ///
     /// assert_eq!(format!("{:?}", Integer::from(123).into_natural()), "Some(123)");
     /// assert_eq!(format!("{:?}", Integer::from(-123).into_natural()), "None");
-    /// assert_eq!(format!("{:?}", Integer::from_str("1000000000000").unwrap().into_natural()),
-    ///            "Some(1000000000000)");
-    /// assert_eq!(format!("{:?}", Integer::from_str("-1000000000000").unwrap().into_natural()),
-    ///            "None");
+    /// assert_eq!(format!("{:?}", Integer::trillion().into_natural()), "Some(1000000000000)");
+    /// assert_eq!(format!("{:?}", (-Integer::trillion()).into_natural()), "None");
     /// ```
     pub fn into_natural(self) -> Option<Natural> {
         if self.sign() == Ordering::Less {
@@ -35,14 +32,11 @@ impl Integer {
     /// # Examples
     /// ```
     /// use malachite_gmp::integer::Integer;
-    /// use std::str::FromStr;
     ///
     /// assert_eq!(format!("{:?}", Integer::from(123).to_natural()), "Some(123)");
     /// assert_eq!(format!("{:?}", Integer::from(-123).to_natural()), "None");
-    /// assert_eq!(format!("{:?}", Integer::from_str("1000000000000").unwrap().to_natural()),
-    ///            "Some(1000000000000)");
-    /// assert_eq!(format!("{:?}", Integer::from_str("-1000000000000").unwrap().to_natural()),
-    ///            "None");
+    /// assert_eq!(format!("{:?}", Integer::trillion().to_natural()), "Some(1000000000000)");
+    /// assert_eq!(format!("{:?}", (-Integer::trillion()).to_natural()), "None");
     /// ```
     pub fn to_natural(&self) -> Option<Natural> {
         if self.sign() == Ordering::Less {

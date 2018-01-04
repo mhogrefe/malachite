@@ -13,14 +13,12 @@ use malachite_base::traits::{Assign, Zero};
 ///
 /// use malachite_base::traits::Zero;
 /// use malachite_gmp::natural::Natural;
-/// use std::str::FromStr;
 ///
 /// fn main() {
 ///     assert_eq!((Natural::ZERO * 123).to_string(), "0");
 ///     assert_eq!((Natural::from(123u32) * 1).to_string(), "123");
 ///     assert_eq!((Natural::from(123u32) * 456).to_string(), "56088");
-///     assert_eq!((Natural::from_str("1000000000000").unwrap() * 123).to_string(),
-///         "123000000000000");
+///     assert_eq!((Natural::trillion() * 123).to_string(), "123000000000000");
 /// }
 /// ```
 impl Mul<u32> for Natural {
@@ -41,14 +39,12 @@ impl Mul<u32> for Natural {
 ///
 /// use malachite_base::traits::Zero;
 /// use malachite_gmp::natural::Natural;
-/// use std::str::FromStr;
 ///
 /// fn main() {
 ///     assert_eq!((&Natural::ZERO * 123).to_string(), "0");
 ///     assert_eq!((&Natural::from(123u32) * 1).to_string(), "123");
 ///     assert_eq!((&Natural::from(123u32) * 456).to_string(), "56088");
-///     assert_eq!((&Natural::from_str("1000000000000").unwrap() * 123).to_string(),
-///         "123000000000000");
+///     assert_eq!((&Natural::trillion() * 123).to_string(), "123000000000000");
 /// }
 /// ```
 impl<'a> Mul<u32> for &'a Natural {
@@ -89,14 +85,12 @@ impl<'a> Mul<u32> for &'a Natural {
 ///
 /// use malachite_base::traits::Zero;
 /// use malachite_gmp::natural::Natural;
-/// use std::str::FromStr;
 ///
 /// fn main() {
 ///     assert_eq!((123 * Natural::ZERO).to_string(), "0");
 ///     assert_eq!((1 * Natural::from(123u32)).to_string(), "123");
 ///     assert_eq!((456 * Natural::from(123u32)).to_string(), "56088");
-///     assert_eq!((123 * Natural::from_str("1000000000000").unwrap()).to_string(),
-///         "123000000000000");
+///     assert_eq!((123 * Natural::trillion()).to_string(), "123000000000000");
 /// }
 /// ```
 impl Mul<Natural> for u32 {
@@ -117,14 +111,12 @@ impl Mul<Natural> for u32 {
 ///
 /// use malachite_base::traits::Zero;
 /// use malachite_gmp::natural::Natural;
-/// use std::str::FromStr;
 ///
 /// fn main() {
 ///     assert_eq!((123 * &Natural::ZERO).to_string(), "0");
 ///     assert_eq!((1 * &Natural::from(123u32)).to_string(), "123");
 ///     assert_eq!((456 * &Natural::from(123u32)).to_string(), "56088");
-///     assert_eq!((123 * &Natural::from_str("1000000000000").unwrap()).to_string(),
-///         "123000000000000");
+///     assert_eq!((123 * &Natural::trillion()).to_string(), "123000000000000");
 /// }
 /// ```
 impl<'a> Mul<&'a Natural> for u32 {

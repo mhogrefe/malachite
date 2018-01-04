@@ -31,7 +31,7 @@ impl Natural {
             small,
             limbs,
             {
-                if index < LIMB_BITS as u64 {
+                if index < LIMB_BITS.into() {
                     Some(*small | (1 << index))
                 } else {
                     None

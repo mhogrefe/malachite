@@ -27,7 +27,7 @@ pub fn random_inputs(scale: u32) -> Box<It> {
     Box::new(random_triples(
         &EXAMPLE_SEED,
         &(|seed| random_integers(seed, scale)),
-        &(|seed| natural_u32s_geometric(seed, scale).map(|i| u64::from(i))),
+        &(|seed| natural_u32s_geometric(seed, scale).map(|i| i.into())),
         &(|seed| random_x(seed)),
     ))
 }

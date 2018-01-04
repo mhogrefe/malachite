@@ -156,9 +156,7 @@ impl Integer {
             match self {
                 &Integer::Small(i32::MIN) if other < 32 => Integer::ZERO,
                 &Integer::Small(_) if other >= 31 => self.clone(),
-                &Integer::Small(small) if small >= 0 => {
-                    Integer::Small((small & ((1 << other) - 1)))
-                }
+                &Integer::Small(small) if small >= 0 => Integer::Small(small & ((1 << other) - 1)),
                 &Integer::Small(small) => {
                     let mask = (1 << other) - 1;
                     if (small & mask) == 0 {

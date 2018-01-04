@@ -17,14 +17,12 @@ use std::ops::{Sub, SubAssign};
 ///
 /// use malachite_base::traits::Zero;
 /// use malachite_native::integer::Integer;
-/// use std::str::FromStr;
 ///
 /// fn main() {
 ///     assert_eq!((Integer::ZERO - 123i32).to_string(), "-123");
 ///     assert_eq!((Integer::from(-123) - -0i32).to_string(), "-123");
 ///     assert_eq!((Integer::from(-123) - 456i32).to_string(), "-579");
-///     assert_eq!((Integer::from_str("-1000000000000").unwrap() - 123i32).to_string(),
-///                "-1000000000123");
+///     assert_eq!((-Integer::trillion() - 123i32).to_string(), "-1000000000123");
 /// }
 /// ```
 impl Sub<i32> for Integer {
@@ -51,14 +49,12 @@ impl Sub<i32> for Integer {
 ///
 /// use malachite_base::traits::Zero;
 /// use malachite_native::integer::Integer;
-/// use std::str::FromStr;
 ///
 /// fn main() {
 ///     assert_eq!((&Integer::ZERO - 123i32).to_string(), "-123");
 ///     assert_eq!((&Integer::from(-123) - -0i32).to_string(), "-123");
 ///     assert_eq!((&Integer::from(-123) - 456i32).to_string(), "-579");
-///     assert_eq!((&Integer::from_str("-1000000000000").unwrap() - 123i32).to_string(),
-///                "-1000000000123");
+///     assert_eq!((&(-Integer::trillion()) - 123i32).to_string(), "-1000000000123");
 /// }
 /// ```
 impl<'a> Sub<i32> for &'a Integer {
@@ -106,14 +102,12 @@ impl<'a> Sub<i32> for &'a Integer {
 ///
 /// use malachite_base::traits::Zero;
 /// use malachite_native::integer::Integer;
-/// use std::str::FromStr;
 ///
 /// fn main() {
 ///     assert_eq!((-123i32 - Integer::ZERO).to_string(), "-123");
 ///     assert_eq!((0i32 - Integer::from(123)).to_string(), "-123");
 ///     assert_eq!((-456i32 - Integer::from(123)).to_string(), "-579");
-///     assert_eq!((-123i32 - Integer::from_str("1000000000000").unwrap()).to_string(),
-///                "-1000000000123");
+///     assert_eq!((-123i32 - Integer::trillion()).to_string(), "-1000000000123");
 /// }
 /// ```
 impl Sub<Integer> for i32 {
@@ -140,14 +134,12 @@ impl Sub<Integer> for i32 {
 ///
 /// use malachite_base::traits::Zero;
 /// use malachite_native::integer::Integer;
-/// use std::str::FromStr;
 ///
 /// fn main() {
 ///     assert_eq!((-123i32 - &Integer::ZERO).to_string(), "-123");
 ///     assert_eq!((0i32 - &Integer::from(123)).to_string(), "-123");
 ///     assert_eq!((-456i32 - &Integer::from(123)).to_string(), "-579");
-///     assert_eq!((-123i32 - &Integer::from_str("1000000000000").unwrap()).to_string(),
-///                "-1000000000123");
+///     assert_eq!((-123i32 - &Integer::trillion()).to_string(), "-1000000000123");
 /// }
 /// ```
 impl<'a> Sub<&'a Integer> for i32 {

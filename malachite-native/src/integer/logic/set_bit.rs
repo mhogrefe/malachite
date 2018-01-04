@@ -28,7 +28,7 @@ impl Integer {
     ///     x.set_bit(6);
     ///     assert_eq!(x.to_string(), "100");
     ///
-    ///     let mut x = Integer::from(-256);
+    ///     let mut x = Integer::from(-0x100);
     ///     x.set_bit(2);
     ///     x.set_bit(5);
     ///     x.set_bit(6);
@@ -54,7 +54,7 @@ impl Natural {
     fn set_bit_neg(&mut self, index: u64) {
         match *self {
             Small(ref mut small) => {
-                if index < LIMB_BITS as u64 {
+                if index < LIMB_BITS.into() {
                     *small = ((*small - 1) & !(1 << index)) + 1;
                 }
                 return;

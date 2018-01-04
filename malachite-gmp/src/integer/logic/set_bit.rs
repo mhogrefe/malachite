@@ -23,7 +23,7 @@ impl Integer {
     ///     x.set_bit(6);
     ///     assert_eq!(x.to_string(), "100");
     ///
-    ///     let mut x = Integer::from(-256);
+    ///     let mut x = Integer::from(-0x100);
     ///     x.set_bit(2);
     ///     x.set_bit(5);
     ///     x.set_bit(6);

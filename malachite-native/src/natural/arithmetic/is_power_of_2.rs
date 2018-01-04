@@ -21,8 +21,8 @@ impl Natural {
     /// fn main() {
     ///     assert_eq!(Natural::ZERO.is_power_of_2(), false);
     ///     assert_eq!(Natural::from(123u32).is_power_of_2(), false);
-    ///     assert_eq!(Natural::from(128u32).is_power_of_2(), true);
-    ///     assert_eq!(Natural::from_str("1000000000000").unwrap().is_power_of_2(), false);
+    ///     assert_eq!(Natural::from(0x80u32).is_power_of_2(), true);
+    ///     assert_eq!(Natural::trillion().is_power_of_2(), false);
     ///     assert_eq!(Natural::from_str("1099511627776").unwrap().is_power_of_2(), true);
     /// }
     /// ```

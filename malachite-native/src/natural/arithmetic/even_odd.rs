@@ -14,14 +14,13 @@ impl Natural {
     ///
     /// use malachite_base::traits::Zero;
     /// use malachite_native::natural::Natural;
-    /// use std::str::FromStr;
     ///
     /// fn main() {
     ///     assert_eq!(Natural::ZERO.is_even(), true);
     ///     assert_eq!(Natural::from(123u32).is_even(), false);
-    ///     assert_eq!(Natural::from(128u32).is_even(), true);
-    ///     assert_eq!(Natural::from_str("1000000000000").unwrap().is_even(), true);
-    ///     assert_eq!(Natural::from_str("1000000000001").unwrap().is_even(), false);
+    ///     assert_eq!(Natural::from(0x80u32).is_even(), true);
+    ///     assert_eq!(Natural::trillion().is_even(), true);
+    ///     assert_eq!((Natural::trillion() + 1).is_even(), false);
     /// }
     /// ```
     pub fn is_even(&self) -> bool {
@@ -44,14 +43,13 @@ impl Natural {
     ///
     /// use malachite_base::traits::Zero;
     /// use malachite_native::natural::Natural;
-    /// use std::str::FromStr;
     ///
     /// fn main() {
     ///     assert_eq!(Natural::ZERO.is_odd(), false);
     ///     assert_eq!(Natural::from(123u32).is_odd(), true);
-    ///     assert_eq!(Natural::from(128u32).is_odd(), false);
-    ///     assert_eq!(Natural::from_str("1000000000000").unwrap().is_odd(), false);
-    ///     assert_eq!(Natural::from_str("1000000000001").unwrap().is_odd(), true);
+    ///     assert_eq!(Natural::from(0x80u32).is_odd(), false);
+    ///     assert_eq!(Natural::trillion().is_odd(), false);
+    ///     assert_eq!((Natural::trillion() + 1).is_odd(), true);
     /// }
     /// ```
     pub fn is_odd(&self) -> bool {

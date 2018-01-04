@@ -12,6 +12,7 @@ use rust_wheels::iterators::naturals::{exhaustive_naturals, random_naturals};
 use rust_wheels::iterators::primitive_ints::exhaustive_u;
 use rust_wheels::iterators::tuples::{exhaustive_pairs, random_pairs};
 
+#[allow(unknown_lints, assign_op_pattern)]
 pub fn num_add_u32(mut x: num::BigUint, u: u32) -> num::BigUint {
     x = x + num::BigUint::from(u);
     x

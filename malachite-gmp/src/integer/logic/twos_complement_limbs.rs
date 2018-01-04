@@ -19,16 +19,14 @@ impl Integer {
     ///
     /// use malachite_base::traits::Zero;
     /// use malachite_gmp::integer::Integer;
-    /// use std::str::FromStr;
     ///
     /// fn main() {
     ///     assert!(Integer::ZERO.twos_complement_limbs_le().is_empty());
     ///     assert_eq!(Integer::from(123).twos_complement_limbs_le(), vec![123]);
     ///     assert_eq!(Integer::from(-123).twos_complement_limbs_le(), vec![4294967173]);
     ///     // 10^12 = 232 * 2^32 + 3567587328
-    ///     assert_eq!(Integer::from_str("1000000000000").unwrap().twos_complement_limbs_le(),
-    ///         vec![3567587328, 232]);
-    ///     assert_eq!(Integer::from_str("-1000000000000").unwrap().twos_complement_limbs_le(),
+    ///     assert_eq!(Integer::trillion().twos_complement_limbs_le(), vec![3567587328, 232]);
+    ///     assert_eq!((-Integer::trillion()).twos_complement_limbs_le(),
     ///         vec![727379968, 4294967063]);
     /// }
     /// ```
@@ -82,16 +80,14 @@ impl Integer {
     ///
     /// use malachite_base::traits::Zero;
     /// use malachite_gmp::integer::Integer;
-    /// use std::str::FromStr;
     ///
     /// fn main() {
     ///     assert!(Integer::ZERO.twos_complement_limbs_be().is_empty());
     ///     assert_eq!(Integer::from(123).twos_complement_limbs_be(), vec![123]);
     ///     assert_eq!(Integer::from(-123).twos_complement_limbs_be(), vec![4294967173]);
     ///     // 10^12 = 232 * 2^32 + 3567587328
-    ///     assert_eq!(Integer::from_str("1000000000000").unwrap().twos_complement_limbs_be(),
-    ///         vec![232, 3567587328]);
-    ///     assert_eq!(Integer::from_str("-1000000000000").unwrap().twos_complement_limbs_be(),
+    ///     assert_eq!(Integer::trillion().twos_complement_limbs_be(), vec![232, 3567587328]);
+    ///     assert_eq!((-Integer::trillion()).twos_complement_limbs_be(),
     ///         vec![4294967063, 727379968]);
     /// }
     pub fn twos_complement_limbs_be(&self) -> Vec<u32> {

@@ -14,15 +14,13 @@ use malachite_base::traits::{SubMul, SubMulAssign};
 ///
 /// use malachite_base::traits::SubMul;
 /// use malachite_gmp::natural::Natural;
-/// use std::str::FromStr;
 ///
 /// fn main() {
 ///     assert_eq!(format!("{:?}", Natural::from(10u32).sub_mul(&Natural::from(3u32), 4)), "None");
 ///     assert_eq!(format!("{:?}", Natural::from(15u32).sub_mul(&Natural::from(3u32), 4)),
 ///         "Some(3)");
-///     assert_eq!(format!("{:?}", Natural::from_str("1000000000000").unwrap()
-///                         .sub_mul(&Natural::from(65536u32), 65536)),
-///                 "Some(995705032704)");
+///     assert_eq!(format!("{:?}", Natural::trillion()
+///         .sub_mul(&Natural::from(0x1_0000u32), 0x1_0000)), "Some(995705032704)");
 /// }
 /// ```
 impl<'a> SubMul<&'a Natural, u32> for Natural {
@@ -47,16 +45,14 @@ impl<'a> SubMul<&'a Natural, u32> for Natural {
 ///
 /// use malachite_base::traits::SubMul;
 /// use malachite_gmp::natural::Natural;
-/// use std::str::FromStr;
 ///
 /// fn main() {
 ///     assert_eq!(format!("{:?}", (&Natural::from(10u32)).sub_mul(&Natural::from(3u32), 4)),
 ///                 "None");
 ///     assert_eq!(format!("{:?}", (&Natural::from(15u32)).sub_mul(&Natural::from(3u32), 4)),
 ///                 "Some(3)");
-///     assert_eq!(format!("{:?}", (&Natural::from_str("1000000000000").unwrap())
-///                         .sub_mul(&Natural::from(65536u32), 65536)),
-///                 "Some(995705032704)");
+///     assert_eq!(format!("{:?}", (&Natural::trillion())
+///         .sub_mul(&Natural::from(0x1_0000u32), 0x1_0000)), "Some(995705032704)");
 /// }
 /// ```
 impl<'a, 'b> SubMul<&'a Natural, u32> for &'b Natural {
@@ -109,15 +105,14 @@ impl<'a, 'b> SubMul<&'a Natural, u32> for &'b Natural {
 ///
 /// use malachite_base::traits::SubMulAssign;
 /// use malachite_gmp::natural::Natural;
-/// use std::str::FromStr;
 ///
 /// fn main() {
 ///     let mut x = Natural::from(15u32);
 ///     x.sub_mul_assign(&Natural::from(3u32), 4);
 ///     assert_eq!(x, 3);
 ///
-///     let mut x = Natural::from_str("1000000000000").unwrap();
-///     x.sub_mul_assign(&Natural::from(65536u32), 65536);
+///     let mut x = Natural::trillion();
+///     x.sub_mul_assign(&Natural::from(0x1_0000u32), 0x1_0000);
 ///     assert_eq!(x.to_string(), "995705032704");
 /// }
 /// ```

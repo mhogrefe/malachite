@@ -12,17 +12,16 @@ impl Natural {
     /// # Example
     /// ```
     /// use malachite_native::natural::Natural;
-    /// use std::str::FromStr;
     ///
     /// assert_eq!(Natural::from(123u32).get_bit(2), false);
     /// assert_eq!(Natural::from(123u32).get_bit(3), true);
     /// assert_eq!(Natural::from(123u32).get_bit(100), false);
-    /// assert_eq!(Natural::from_str("1000000000000").unwrap().get_bit(12), true);
-    /// assert_eq!(Natural::from_str("1000000000000").unwrap().get_bit(100), false);
+    /// assert_eq!(Natural::trillion().get_bit(12), true);
+    /// assert_eq!(Natural::trillion().get_bit(100), false);
     /// ```
     pub fn get_bit(&self, index: u64) -> bool {
         match *self {
-            Small(small) => index < LIMB_BITS as u64 && small & (1 << index) != 0,
+            Small(small) => index < LIMB_BITS.into() && small & (1 << index) != 0,
             Large(ref limbs) => {
                 let limb_index = (index >> LOG_LIMB_BITS) as usize;
                 limbs.get(limb_index).map_or(false, |limb| {

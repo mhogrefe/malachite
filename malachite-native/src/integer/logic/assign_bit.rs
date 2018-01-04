@@ -31,7 +31,7 @@ impl Integer {
     ///     x.assign_bit(6, false);
     ///     assert_eq!(x.to_string(), "0");
     ///
-    ///     let mut x = Integer::from(-256);
+    ///     let mut x = Integer::from(-0x100);
     ///     x.assign_bit(2, true);
     ///     x.assign_bit(5, true);
     ///     x.assign_bit(6, true);

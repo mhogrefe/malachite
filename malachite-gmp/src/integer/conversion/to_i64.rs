@@ -4,6 +4,7 @@ use natural::Natural;
 use std::cmp::Ordering;
 
 impl Integer {
+    //TODO use trillion ^ 2 in doctests
     /// Converts an `Integer` to an `i64`, returning `None` if the `Integer` is outside the range of
     /// an `i64`.
     ///

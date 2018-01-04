@@ -10,7 +10,6 @@ impl Integer {
     /// # Examples
     /// ```
     /// use malachite_gmp::integer::Integer;
-    /// use std::str::FromStr;
     ///
     /// assert_eq!(Integer::from(123).get_bit(2), false);
     /// assert_eq!(Integer::from(123).get_bit(3), true);
@@ -18,10 +17,10 @@ impl Integer {
     /// assert_eq!(Integer::from(-123).get_bit(0), true);
     /// assert_eq!(Integer::from(-123).get_bit(1), false);
     /// assert_eq!(Integer::from(-123).get_bit(100), true);
-    /// assert_eq!(Integer::from_str("1000000000000").unwrap().get_bit(12), true);
-    /// assert_eq!(Integer::from_str("1000000000000").unwrap().get_bit(100), false);
-    /// assert_eq!(Integer::from_str("-1000000000000").unwrap().get_bit(12), true);
-    /// assert_eq!(Integer::from_str("-1000000000000").unwrap().get_bit(100), true);
+    /// assert_eq!(Integer::trillion().get_bit(12), true);
+    /// assert_eq!(Integer::trillion().get_bit(100), false);
+    /// assert_eq!((-Integer::trillion()).get_bit(12), true);
+    /// assert_eq!((-Integer::trillion()).get_bit(100), true);
     /// ```
     pub fn get_bit(&self, index: u64) -> bool {
         match *self {

@@ -25,10 +25,10 @@ fn test_from_sign_and_limbs_le() {
     test(Ordering::Less, &[123, 0], "-123");
     test(Ordering::Greater, &[123, 0, 0, 0], "123");
     test(Ordering::Less, &[123, 0, 0, 0], "-123");
-    test(Ordering::Greater, &[3567587328, 232], "1000000000000");
-    test(Ordering::Less, &[3567587328, 232], "-1000000000000");
-    test(Ordering::Greater, &[3567587328, 232, 0], "1000000000000");
-    test(Ordering::Less, &[3567587328, 232, 0], "-1000000000000");
+    test(Ordering::Greater, &[3_567_587_328, 232], "1000000000000");
+    test(Ordering::Less, &[3_567_587_328, 232], "-1000000000000");
+    test(Ordering::Greater, &[3_567_587_328, 232, 0], "1000000000000");
+    test(Ordering::Less, &[3_567_587_328, 232, 0], "-1000000000000");
     test(
         Ordering::Greater,
         &[1, 2, 3, 4, 5],
@@ -103,10 +103,10 @@ fn test_from_sign_and_limbs_be() {
     test(Ordering::Less, &[0, 123], "-123");
     test(Ordering::Greater, &[0, 0, 0, 123], "123");
     test(Ordering::Less, &[0, 0, 0, 123], "-123");
-    test(Ordering::Greater, &[232, 3567587328], "1000000000000");
-    test(Ordering::Less, &[232, 3567587328], "-1000000000000");
-    test(Ordering::Greater, &[0, 232, 3567587328], "1000000000000");
-    test(Ordering::Less, &[0, 232, 3567587328], "-1000000000000");
+    test(Ordering::Greater, &[232, 3_567_587_328], "1000000000000");
+    test(Ordering::Less, &[232, 3_567_587_328], "-1000000000000");
+    test(Ordering::Greater, &[0, 232, 3_567_587_328], "1000000000000");
+    test(Ordering::Less, &[0, 232, 3_567_587_328], "-1000000000000");
     test(
         Ordering::Greater,
         &[5, 4, 3, 2, 1],

@@ -24,10 +24,10 @@ impl Natural {
     /// ```
     pub fn significant_bits(&self) -> u64 {
         match *self {
-            Small(small) => (LIMB_BITS - small.leading_zeros()) as u64,
+            Small(small) => (LIMB_BITS - small.leading_zeros()).into(),
             Large(ref limbs) => {
-                ((limbs.len() as u64) << LOG_LIMB_BITS as u64)
-                    - limbs.last().unwrap().leading_zeros() as u64
+                ((limbs.len() as u64) << u64::from(LOG_LIMB_BITS))
+                    - u64::from(limbs.last().unwrap().leading_zeros())
             }
         }
     }

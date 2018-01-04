@@ -10,7 +10,7 @@ impl Integer {
     /// ```
     /// use malachite_gmp::integer::Integer;
     ///
-    /// let mut x = Integer::from(127);
+    /// let mut x = Integer::from(0x7f);
     /// x.clear_bit(0);
     /// x.clear_bit(1);
     /// x.clear_bit(3);

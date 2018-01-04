@@ -17,14 +17,13 @@ impl Integer {
     ///
     /// use malachite_base::traits::Zero;
     /// use malachite_native::integer::Integer;
-    /// use std::str::FromStr;
     ///
     /// fn main() {
     ///     assert_eq!(Integer::ZERO.trailing_zeros(), None);
     ///     assert_eq!(Integer::from(3).trailing_zeros(), Some(0));
     ///     assert_eq!(Integer::from(-72).trailing_zeros(), Some(3));
     ///     assert_eq!(Integer::from(100).trailing_zeros(), Some(2));
-    ///     assert_eq!(Integer::from_str("-1000000000000").unwrap().trailing_zeros(), Some(12));
+    ///     assert_eq!((-Integer::trillion()).trailing_zeros(), Some(12));
     /// }
     /// ```
     pub fn trailing_zeros(&self) -> Option<u64> {

@@ -11,6 +11,7 @@ use rust_wheels::iterators::naturals::{exhaustive_naturals, random_naturals};
 use rust_wheels::iterators::tuples::{exhaustive_pairs_from_single, random_pairs_from_single};
 use std::cmp::max;
 
+#[allow(unknown_lints, assign_op_pattern)]
 pub fn num_sub(mut x: num::BigUint, y: num::BigUint) -> Option<num::BigUint> {
     if x >= y {
         x = x - y;

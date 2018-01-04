@@ -8,13 +8,12 @@ impl Natural {
     /// # Examples
     /// ```
     /// use malachite_gmp::natural::Natural;
-    /// use std::str::FromStr;
     ///
     /// assert_eq!(Natural::from(123u32).get_bit(2), false);
     /// assert_eq!(Natural::from(123u32).get_bit(3), true);
     /// assert_eq!(Natural::from(123u32).get_bit(100), false);
-    /// assert_eq!(Natural::from_str("1000000000000").unwrap().get_bit(12), true);
-    /// assert_eq!(Natural::from_str("1000000000000").unwrap().get_bit(100), false);
+    /// assert_eq!(Natural::trillion().get_bit(12), true);
+    /// assert_eq!(Natural::trillion().get_bit(100), false);
     /// ```
     pub fn get_bit(&self, index: u64) -> bool {
         match *self {

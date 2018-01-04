@@ -2,6 +2,7 @@ use gmp_mpfr_sys::gmp;
 use natural::Natural::{self, Large, Small};
 
 impl Natural {
+    //TODO use trillion ^ 2
     /// Converts a `Natural` to a `u64`, returning `None` if the `Natural` is too large.
     ///
     /// # Examples
