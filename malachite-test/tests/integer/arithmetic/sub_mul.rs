@@ -368,6 +368,7 @@ fn sub_mul_properties() {
     // a.sub_mul(b, c) is equivalent to a.sub_mul(c, b).
     // a.sub_mul(b, c) = a.sub_mul(-b, -c)
     // -(a.sub_mul(b, c)) = (-a).sub_mul(-b, c) = (-a).sub_mul(b, -c)
+    #[allow(unknown_lints, cyclomatic_complexity)]
     let three_integers = |mut gmp_a: gmp::Integer, gmp_b: gmp::Integer, gmp_c: gmp::Integer| {
         let mut a = gmp_integer_to_native(&gmp_a);
         let b = gmp_integer_to_native(&gmp_b);

@@ -43,8 +43,8 @@ impl<'a> Sub<u32> for &'a Integer {
         }
         match *self {
             Small(small) => {
-                let difference = small as i64 - other as i64;
-                if difference >= i32::min_value() as i64 && difference <= i32::max_value() as i64 {
+                let difference = i64::from(small) - i64::from(other);
+                if difference >= i32::min_value().into() && difference <= i32::max_value().into() {
                     Small(difference as i32)
                 } else {
                     unsafe {
@@ -131,8 +131,8 @@ impl SubAssign<u32> for Integer {
             small,
             large,
             {
-                let difference = *small as i64 - other as i64;
-                if difference >= i32::min_value() as i64 && difference <= i32::max_value() as i64 {
+                let difference = i64::from(*small) - i64::from(other);
+                if difference >= i32::min_value().into() && difference <= i32::max_value().into() {
                     Some(difference as i32)
                 } else {
                     None

@@ -16,6 +16,7 @@ use rust_wheels::iterators::tuples::{exhaustive_pairs, random_pairs};
 use std::str::FromStr;
 
 #[test]
+#[allow(unknown_lints, cyclomatic_complexity)]
 fn test_sub() {
     let test = |u, v, out| {
         let mut n = native::Integer::from_str(u).unwrap();
@@ -184,6 +185,7 @@ fn sub_properties() {
     // 0 - x == -x
     // x - x == 0
     // x - -x == x << 1
+    #[allow(unknown_lints, eq_op)]
     let one_integer = |gmp_x: gmp::Integer| {
         let x = gmp_integer_to_native(&gmp_x);
         let id_1 = &x - native::Integer::ZERO;

@@ -229,6 +229,7 @@ fn mul_properties() {
     // x * 1 == x
     // 1 * x == x
     //TODO x * x == x ^ 2
+    #[allow(unknown_lints, erasing_op)]
     let one_integer = |gmp_x: gmp::Integer| {
         let x = gmp_integer_to_native(&gmp_x);
         let x_old = x.clone();

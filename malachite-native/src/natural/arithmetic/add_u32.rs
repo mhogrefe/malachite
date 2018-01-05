@@ -15,7 +15,7 @@ pub fn mpn_add_1(r: &mut [u32], s1: &[u32], mut s2limb: u32) -> bool {
         } else {
             s2limb = 0;
             let copy_index = i + 1;
-            &r[copy_index..s1_len].copy_from_slice(&s1[copy_index..]);
+            r[copy_index..s1_len].copy_from_slice(&s1[copy_index..]);
             break;
         }
     }

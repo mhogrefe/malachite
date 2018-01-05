@@ -62,7 +62,7 @@ impl Natural {
                 } else {
                     !xs[limb_index]
                 };
-                limb & (1 << (index & LIMB_BITS_MASK as u64)) != 0
+                limb & (1 << (index & u64::from(LIMB_BITS_MASK))) != 0
             }
         }
     }

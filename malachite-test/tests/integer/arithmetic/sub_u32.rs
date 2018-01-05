@@ -16,6 +16,7 @@ use rust_wheels::iterators::primitive_ints::exhaustive_u;
 use std::str::FromStr;
 
 #[test]
+#[allow(unknown_lints, cyclomatic_complexity)]
 fn test_sub_assign_u32() {
     let test = |u, v: u32, out| {
         let mut n = native::Integer::from_str(u).unwrap();

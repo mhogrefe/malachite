@@ -373,6 +373,7 @@ fn add_mul_properties() {
     // a.add_mul(b, c) is equivalent to a.add_mul(c, b).
     // a.add_mul(b, c) = a.add_mul(-b, -c)
     // -(a.add_mul(b, c)) = (-a).add_mul(-b, c) = (-a).add_mul(b, -c)
+    #[allow(unknown_lints, cyclomatic_complexity)]
     let three_integers = |mut gmp_a: gmp::Integer, gmp_b: gmp::Integer, gmp_c: gmp::Integer| {
         let mut a = gmp_integer_to_native(&gmp_a);
         let b = gmp_integer_to_native(&gmp_b);

@@ -267,7 +267,7 @@ impl<'a, 'b> AddMulAssign<&'a Integer, &'b Integer> for Integer {
                 let large_self = self.promote_in_place();
                 unsafe {
                     if let Large(ref large_b) = *b {
-                        if let &Large(ref large_c) = c {
+                        if let Large(ref large_c) = *c {
                             gmp::mpz_addmul(large_self, large_b, large_c)
                         }
                     }

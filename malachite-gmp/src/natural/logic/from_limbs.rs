@@ -48,7 +48,7 @@ impl Natural {
                     if chunk.len() == 2 {
                         raw_limbs[i] = make_u64(chunk[1], chunk[0]);
                     } else {
-                        raw_limbs[i] = chunk[0] as u64;
+                        raw_limbs[i] = chunk[0].into();
                     }
                 }
                 gmp::mpz_limbs_finish(&mut large, raw_sig_size as i64);

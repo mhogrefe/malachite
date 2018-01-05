@@ -181,7 +181,7 @@ fn mul_u32_properties() {
     // 1 * n == n
     // n * 2 == n << 1
     // 2 * n == n << 1
-    #[allow(unknown_lints, identity_op)]
+    #[allow(unknown_lints, erasing_op, identity_op)]
     let one_integer = |gmp_n: gmp::Integer| {
         let n = gmp_integer_to_native(&gmp_n);
         assert_eq!(&n * 0u32, 0);

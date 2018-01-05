@@ -73,13 +73,13 @@ impl<'a, 'b> SubMul<&'a Natural, u32> for &'b Natural {
                 Small(small) => gmp::mpz_init_set_ui(&mut result, small.into()),
                 Large(ref large) => gmp::mpz_init_set(&mut result, large),
             }
-            match b {
-                &Small(small) => {
+            match *b {
+                Small(small) => {
                     let mut large_b: mpz_t = mem::uninitialized();
                     gmp::mpz_init_set_ui(&mut large_b, small.into());
                     gmp::mpz_submul_ui(&mut result, &large_b, c.into());
                 }
-                &Large(ref large_b) => gmp::mpz_submul_ui(&mut result, large_b, c.into()),
+                Large(ref large_b) => gmp::mpz_submul_ui(&mut result, large_b, c.into()),
             }
             if gmp::mpz_sgn(&result) == -1 {
                 None
@@ -135,13 +135,13 @@ pub(crate) fn sub_mul_assign_u32_helper(a: &mut Natural, b: &Natural, c: u32) ->
     }
     let valid = unsafe {
         let large_a = a.promote_in_place();
-        match b {
-            &Small(small) => {
+        match *b {
+            Small(small) => {
                 let mut large_b: mpz_t = mem::uninitialized();
                 gmp::mpz_init_set_ui(&mut large_b, small.into());
                 gmp::mpz_submul_ui(large_a, &large_b, c.into());
             }
-            &Large(ref large_b) => gmp::mpz_submul_ui(large_a, large_b, c.into()),
+            Large(ref large_b) => gmp::mpz_submul_ui(large_a, large_b, c.into()),
         }
         gmp::mpz_sgn(large_a) != -1
     };

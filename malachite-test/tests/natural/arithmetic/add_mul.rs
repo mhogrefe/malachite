@@ -209,6 +209,7 @@ fn add_mul_u32_properties() {
     //      a.add_mul(&b, &c), and (&a).add_mul(&b, &c) give the same result.
     // a.add_mul(b, c) is equivalent to a + b * c.
     // a.add_mul(b, c) is equivalent to a.add_mul(c, b).
+    #[allow(unknown_lints, cyclomatic_complexity)]
     let three_naturals = |mut gmp_a: gmp::Natural, gmp_b: gmp::Natural, gmp_c: gmp::Natural| {
         let mut a = gmp_natural_to_native(&gmp_a);
         let b = gmp_natural_to_native(&gmp_b);

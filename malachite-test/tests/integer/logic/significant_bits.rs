@@ -26,7 +26,7 @@ fn test_significant_bits() {
         );
         assert_eq!(num::BigInt::from_str(n).unwrap().bits() as u64, out);
         assert_eq!(
-            rugint::Integer::from_str(n).unwrap().significant_bits() as u64,
+            u64::from(rugint::Integer::from_str(n).unwrap().significant_bits()),
             out
         );
     };
@@ -51,7 +51,7 @@ fn significant_bits_properties() {
             significant_bits
         );
         assert_eq!(
-            native_integer_to_rugint(&x).significant_bits() as u64,
+            u64::from(native_integer_to_rugint(&x).significant_bits()),
             significant_bits
         );
 

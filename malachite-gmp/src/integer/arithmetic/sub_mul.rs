@@ -140,7 +140,7 @@ impl<'a, 'b, 'c> SubMul<&'a Integer, &'b Integer> for &'c Integer {
                     Large(ref large) => gmp::mpz_init_set(&mut result, large),
                 }
                 if let Large(ref large_b) = *b {
-                    if let &Large(ref large_c) = c {
+                    if let Large(ref large_c) = *c {
                         gmp::mpz_submul(&mut result, large_b, large_c)
                     } else {
                         unreachable!()
@@ -267,7 +267,7 @@ impl<'a, 'b> SubMulAssign<&'a Integer, &'b Integer> for Integer {
                 let large_self = self.promote_in_place();
                 unsafe {
                     if let Large(ref large_b) = *b {
-                        if let &Large(ref large_c) = c {
+                        if let Large(ref large_c) = *c {
                             gmp::mpz_submul(large_self, large_b, large_c)
                         }
                     }

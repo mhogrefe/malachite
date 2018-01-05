@@ -61,6 +61,7 @@ impl Not for Natural {
 /// where n = `self.significant_bits()`
 ///
 /// # Examples
+/// ```
 /// extern crate malachite_base;
 /// extern crate malachite_native;
 ///

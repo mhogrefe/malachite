@@ -19,7 +19,7 @@ fn test_significant_bits() {
         assert_eq!(gmp::Natural::from_str(n).unwrap().significant_bits(), out);
         assert_eq!(num::BigUint::from_str(n).unwrap().bits() as u64, out);
         assert_eq!(
-            rugint::Integer::from_str(n).unwrap().significant_bits() as u64,
+            u64::from(rugint::Integer::from_str(n).unwrap().significant_bits()),
             out
         );
     };
@@ -46,7 +46,7 @@ fn significant_bits_properties() {
             significant_bits
         );
         assert_eq!(
-            native_natural_to_rugint_integer(&x).significant_bits() as u64,
+            u64::from(native_natural_to_rugint_integer(&x).significant_bits()),
             significant_bits
         );
         assert_eq!(x <= u32::max_value(), significant_bits <= 32);

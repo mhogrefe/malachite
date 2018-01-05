@@ -25,7 +25,7 @@ impl Natural {
             Large(ref limbs) => {
                 let limb_index = (index >> LOG_LIMB_BITS) as usize;
                 limbs.get(limb_index).map_or(false, |limb| {
-                    limb & (1 << (index & LIMB_BITS_MASK as u64)) != 0
+                    limb & (1 << (index & u64::from(LIMB_BITS_MASK))) != 0
                 })
             }
         }

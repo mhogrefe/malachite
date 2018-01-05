@@ -24,7 +24,7 @@ impl Integer {
     pub fn trailing_zeros(&self) -> Option<u64> {
         match *self {
             Small(0) => None,
-            Small(small) => Some(small.trailing_zeros() as u64),
+            Small(small) => Some(small.trailing_zeros().into()),
             Large(ref large) => Some(unsafe { gmp::mpz_scan1(large, 0) }),
         }
     }

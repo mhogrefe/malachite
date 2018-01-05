@@ -9,9 +9,9 @@ pub fn mpn_mul_1(r: &mut [u32], s1: &[u32], s2limb: u32) -> u32 {
     let s1_len = s1.len();
     assert!(r.len() >= s1_len);
     let mut carry = 0;
-    let s2limb_u64 = s2limb as u64;
+    let s2limb_u64 = u64::from(s2limb);
     for i in 0..s1_len {
-        let limb_result = s1[i] as u64 * s2limb_u64 + carry as u64;
+        let limb_result = u64::from(s1[i]) * s2limb_u64 + u64::from(carry);
         r[i] = get_lower(limb_result);
         carry = get_upper(limb_result);
     }
@@ -22,9 +22,9 @@ pub fn mpn_mul_1(r: &mut [u32], s1: &[u32], s2limb: u32) -> u32 {
 // most significant limb of the product.
 pub fn mpn_mul_1_in_place(s1: &mut [u32], s2limb: u32) -> u32 {
     let mut carry = 0;
-    let s2limb_u64 = s2limb as u64;
+    let s2limb_u64 = u64::from(s2limb);
     for limb in s1.iter_mut() {
-        let limb_result = *limb as u64 * s2limb_u64 + carry as u64;
+        let limb_result = u64::from(*limb) * s2limb_u64 + u64::from(carry);
         *limb = get_lower(limb_result);
         carry = get_upper(limb_result);
     }
@@ -34,9 +34,9 @@ pub fn mpn_mul_1_in_place(s1: &mut [u32], s2limb: u32) -> u32 {
 pub(crate) fn mpn_mul_1c(r: &mut [u32], s1: &[u32], s2limb: u32, mut carry: u32) -> u32 {
     let s1_len = s1.len();
     assert!(r.len() >= s1_len);
-    let s2limb_u64 = s2limb as u64;
+    let s2limb_u64 = u64::from(s2limb);
     for i in 0..s1_len {
-        let limb_result = s1[i] as u64 * s2limb_u64 + carry as u64;
+        let limb_result = u64::from(s1[i]) * s2limb_u64 + u64::from(carry);
         r[i] = get_lower(limb_result);
         carry = get_upper(limb_result);
     }
@@ -108,7 +108,7 @@ impl<'a> Mul<u32> for &'a Natural {
         }
         match *self {
             Small(small) => {
-                let product = small as u64 * other as u64;
+                let product = u64::from(small) * u64::from(other);
                 let lower = get_lower(product);
                 let upper = get_upper(product);
                 if upper == 0 {

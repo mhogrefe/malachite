@@ -89,13 +89,13 @@ impl ShrAssign<u32> for Natural {
         if other == 0 || *self == 0 {
             return;
         }
-        match self {
-            &mut Small(ref mut small) if other >= 32 => *small = 0,
-            &mut Small(ref mut small) => {
+        match *self {
+            Small(ref mut small) if other >= 32 => *small = 0,
+            Small(ref mut small) => {
                 *small >>= other;
                 return;
             }
-            &mut Large(ref mut large) => unsafe {
+            Large(ref mut large) => unsafe {
                 gmp::mpz_tdiv_q_2exp(large, large, other.into());
             },
         }
@@ -178,13 +178,15 @@ impl ShrRound<u32> for Natural {
 impl<'a> ShrRound<u32> for &'a Natural {
     type Output = Natural;
 
-    #[allow(unknown_lints, unit_expr)] // rustfmt insists on adding a semicolon
+    // rustfmt insists on adding a semicolon
+    // TODO lower complexity
+    #[allow(unknown_lints, unit_expr, cyclomatic_complexity)]
     fn shr_round(self, other: u32, rm: RoundingMode) -> Natural {
         if other == 0 || *self == 0 {
             return self.clone();
         }
-        let opt_result = match self {
-            &Small(ref small) => {
+        let opt_result = match *self {
+            Small(ref small) => {
                 return Small(match rm {
                     RoundingMode::Down | RoundingMode::Floor if other >= 32 => 0,
                     RoundingMode::Down | RoundingMode::Floor => *small >> other,
@@ -229,7 +231,7 @@ impl<'a> ShrRound<u32> for &'a Natural {
                     }
                 });
             }
-            &Large(ref large) => unsafe {
+            Large(ref large) => unsafe {
                 match rm {
                     RoundingMode::Down | RoundingMode::Floor => {
                         let mut result: mpz_t = mem::uninitialized();
@@ -256,17 +258,17 @@ impl<'a> ShrRound<u32> for &'a Natural {
                     RoundingMode::Nearest => {
                         if !self.get_bit((other - 1).into()) {
                             // round down
-                            if let &Large(ref large) = self {
+                            if let Large(ref large) = *self {
                                 gmp::mpz_tdiv_q_2exp(&mut result, large, other.into());
                             }
-                        } else if !self.divisible_by_power_of_2((other - 1).into()) {
+                        } else if !self.divisible_by_power_of_2(other - 1) {
                             // round up
-                            if let &Large(ref large) = self {
+                            if let Large(ref large) = *self {
                                 gmp::mpz_cdiv_q_2exp(&mut result, large, other.into());
                             }
                         } else {
                             // result is half-integer; round to even
-                            if let &Large(ref large) = self {
+                            if let Large(ref large) = *self {
                                 gmp::mpz_tdiv_q_2exp(&mut result, large, other.into());
                             }
                             let mut result = Large(result);
@@ -278,10 +280,10 @@ impl<'a> ShrRound<u32> for &'a Natural {
                         }
                     }
                     RoundingMode::Exact => {
-                        if !self.divisible_by_power_of_2(other.into()) {
+                        if !self.divisible_by_power_of_2(other) {
                             panic!("Right shift is not exact: {} >> {}", self, other);
                         }
-                        if let &Large(ref large) = self {
+                        if let Large(ref large) = *self {
                             gmp::mpz_tdiv_q_2exp(&mut result, large, other.into());
                         }
                     }
@@ -351,8 +353,8 @@ impl ShrRoundAssign<u32> for Natural {
         if other == 0 || *self == 0 {
             return;
         }
-        let needs_more_work = match self {
-            &mut Small(ref mut small) => {
+        let needs_more_work = match *self {
+            Small(ref mut small) => {
                 match rm {
                     RoundingMode::Down | RoundingMode::Floor if other >= 32 => *small = 0,
                     RoundingMode::Down | RoundingMode::Floor => *small >>= other,
@@ -397,7 +399,7 @@ impl ShrRoundAssign<u32> for Natural {
                 }
                 return;
             }
-            &mut Large(ref mut large) => unsafe {
+            Large(ref mut large) => unsafe {
                 match rm {
                     RoundingMode::Down | RoundingMode::Floor => {
                         gmp::mpz_tdiv_q_2exp(large, large, other.into());
@@ -416,21 +418,21 @@ impl ShrRoundAssign<u32> for Natural {
                 RoundingMode::Nearest => {
                     if !self.get_bit((other - 1).into()) {
                         // round down
-                        if let &mut Large(ref mut large) = self {
+                        if let Large(ref mut large) = *self {
                             unsafe {
                                 gmp::mpz_tdiv_q_2exp(large, large, other.into());
                             }
                         }
-                    } else if !self.divisible_by_power_of_2((other - 1).into()) {
+                    } else if !self.divisible_by_power_of_2(other - 1) {
                         // round up
-                        if let &mut Large(ref mut large) = self {
+                        if let Large(ref mut large) = *self {
                             unsafe {
                                 gmp::mpz_cdiv_q_2exp(large, large, other.into());
                             }
                         }
                     } else {
                         // result is half-integer; round to even
-                        if let &mut Large(ref mut large) = self {
+                        if let Large(ref mut large) = *self {
                             unsafe {
                                 gmp::mpz_tdiv_q_2exp(large, large, other.into());
                             }
@@ -443,10 +445,10 @@ impl ShrRoundAssign<u32> for Natural {
                     }
                 }
                 RoundingMode::Exact => {
-                    if !self.divisible_by_power_of_2(other.into()) {
+                    if !self.divisible_by_power_of_2(other) {
                         panic!("Right shift is not exact: {} >>= {}", self, other);
                     }
-                    if let &mut Large(ref mut large) = self {
+                    if let Large(ref mut large) = *self {
                         unsafe {
                             gmp::mpz_tdiv_q_2exp(large, large, other.into());
                         }

@@ -160,13 +160,13 @@ impl ShrAssign<u32> for Natural {
         if other == 0 || *self == 0 {
             return;
         }
-        match self {
-            &mut Small(ref mut small) if other >= 32 => *small = 0,
-            &mut Small(ref mut small) => {
+        match *self {
+            Small(ref mut small) if other >= 32 => *small = 0,
+            Small(ref mut small) => {
                 *small >>= other;
                 return;
             }
-            &mut Large(ref mut limbs) => {
+            Large(ref mut limbs) => {
                 shr_helper(limbs, other);
             }
         }
@@ -253,6 +253,8 @@ impl ShrRound<u32> for Natural {
 ///     assert_eq!((&Natural::from(0x100u32)).shr_round(8u32, RoundingMode::Exact).to_string(),
 ///         "1");
 /// }
+// TODO fix complexity
+#[allow(unknown_lints, cyclomatic_complexity, unit_expr)]
 impl<'a> ShrRound<u32> for &'a Natural {
     type Output = Natural;
 
@@ -260,8 +262,8 @@ impl<'a> ShrRound<u32> for &'a Natural {
         if other == 0 || *self == 0 {
             return self.clone();
         }
-        let opt_result = match self {
-            &Small(ref small) => {
+        let opt_result = match *self {
+            Small(ref small) => {
                 return Small(match rm {
                     RoundingMode::Down | RoundingMode::Floor if other >= 32 => 0,
                     RoundingMode::Down | RoundingMode::Floor => *small >> other,
@@ -306,7 +308,7 @@ impl<'a> ShrRound<u32> for &'a Natural {
                     }
                 });
             }
-            &Large(ref limbs) => match rm {
+            Large(ref limbs) => match rm {
                 RoundingMode::Down | RoundingMode::Floor => {
                     let limbs_to_delete = (other >> LOG_LIMB_BITS) as usize;
                     let result = if limbs_to_delete >= limbs.len() {
@@ -348,10 +350,8 @@ impl<'a> ShrRound<u32> for &'a Natural {
                     } else {
                         let small_shift = other & LIMB_BITS_MASK;
                         let mut result = limbs[limbs_to_delete..].to_vec();
-                        if small_shift != 0 {
-                            if mpn_rshift_in_place(&mut result, small_shift) != 0 {
-                                panic!("Right shift is not exact: {} >> {}", self, other);
-                            }
+                        if small_shift != 0 && mpn_rshift_in_place(&mut result, small_shift) != 0 {
+                            panic!("Right shift is not exact: {} >> {}", self, other);
                         }
                         Some(result)
                     }
@@ -367,7 +367,7 @@ impl<'a> ShrRound<u32> for &'a Natural {
                         let limbs_to_delete = (other >> LOG_LIMB_BITS) as usize;
                         if !self.get_bit((other - 1).into()) {
                             // round down
-                            if let &Large(ref limbs) = self {
+                            if let Large(ref limbs) = *self {
                                 if limbs_to_delete >= limbs.len() {
                                     return Natural::ZERO;
                                 } else {
@@ -383,7 +383,7 @@ impl<'a> ShrRound<u32> for &'a Natural {
                             }
                         } else if !self.divisible_by_power_of_2(other - 1) {
                             // round up
-                            if let &Large(ref limbs) = self {
+                            if let Large(ref limbs) = *self {
                                 return if limbs_to_delete >= limbs.len() {
                                     Natural::ONE
                                 } else {
@@ -407,7 +407,7 @@ impl<'a> ShrRound<u32> for &'a Natural {
                             }
                         } else {
                             // result is half-integer; round to even
-                            let result = if let &Large(ref limbs) = self {
+                            let result = if let Large(ref limbs) = *self {
                                 if limbs_to_delete >= limbs.len() {
                                     return Natural::ZERO;
                                 } else {
@@ -498,8 +498,8 @@ impl ShrRoundAssign<u32> for Natural {
         if other == 0 || *self == 0 {
             return;
         }
-        let needs_more_work = match self {
-            &mut Small(ref mut small) => {
+        let needs_more_work = match *self {
+            Small(ref mut small) => {
                 match rm {
                     RoundingMode::Down | RoundingMode::Floor if other >= 32 => *small = 0,
                     RoundingMode::Down | RoundingMode::Floor => *small >>= other,
@@ -544,7 +544,7 @@ impl ShrRoundAssign<u32> for Natural {
                 }
                 return;
             }
-            &mut Large(ref mut limbs) => match rm {
+            Large(ref mut limbs) => match rm {
                 RoundingMode::Down | RoundingMode::Floor => {
                     shr_helper(limbs, other);
                     false
@@ -555,8 +555,8 @@ impl ShrRoundAssign<u32> for Natural {
         if needs_more_work {
             match rm {
                 RoundingMode::Up | RoundingMode::Ceiling => {
-                    let exact = self.divisible_by_power_of_2(other.into());
-                    if let &mut Large(ref mut limbs) = self {
+                    let exact = self.divisible_by_power_of_2(other);
+                    if let Large(ref mut limbs) = *self {
                         shr_helper(limbs, other);
                     }
                     self.trim();
@@ -567,12 +567,12 @@ impl ShrRoundAssign<u32> for Natural {
                 RoundingMode::Nearest => {
                     if !self.get_bit((other - 1).into()) {
                         // round down
-                        if let &mut Large(ref mut limbs) = self {
+                        if let Large(ref mut limbs) = *self {
                             shr_helper(limbs, other);
                         }
-                    } else if !self.divisible_by_power_of_2((other - 1).into()) {
+                    } else if !self.divisible_by_power_of_2(other - 1) {
                         // round up
-                        if let &mut Large(ref mut limbs) = self {
+                        if let Large(ref mut limbs) = *self {
                             shr_helper(limbs, other);
                         }
                         self.trim();
@@ -580,7 +580,7 @@ impl ShrRoundAssign<u32> for Natural {
                         return;
                     } else {
                         // result is half-integer; round to even
-                        if let &mut Large(ref mut limbs) = self {
+                        if let Large(ref mut limbs) = *self {
                             shr_helper(limbs, other);
                         }
                         self.trim();
@@ -591,10 +591,10 @@ impl ShrRoundAssign<u32> for Natural {
                     }
                 }
                 RoundingMode::Exact => {
-                    if !self.divisible_by_power_of_2(other.into()) {
+                    if !self.divisible_by_power_of_2(other) {
                         panic!("Right shift is not exact: {} >>= {}", self, other);
                     }
-                    if let &mut Large(ref mut limbs) = self {
+                    if let Large(ref mut limbs) = *self {
                         shr_helper(limbs, other);
                     }
                 }

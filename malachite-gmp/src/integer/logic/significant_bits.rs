@@ -21,7 +21,7 @@ impl Integer {
     /// ```
     pub fn significant_bits(&self) -> u64 {
         match *self {
-            Small(small) => (32 - (small.wrapping_abs() as u32).leading_zeros()) as u64,
+            Small(small) => (32 - (small.wrapping_abs() as u32).leading_zeros()).into(),
             Large(ref large) => (unsafe { gmp::mpz_sizeinbase(large, 2) }) as u64,
         }
     }

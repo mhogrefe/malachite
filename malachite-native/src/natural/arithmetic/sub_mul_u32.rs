@@ -10,9 +10,9 @@ pub fn mpn_submul_1(r: &mut [u32], s1: &[u32], s2limb: u32) -> u32 {
     let s1_len = s1.len();
     assert!(r.len() >= s1_len);
     let mut borrow = 0;
-    let s2limb_u64 = s2limb as u64;
+    let s2limb_u64 = u64::from(s2limb);
     for i in 0..s1_len {
-        let product = s1[i] as u64 * s2limb_u64;
+        let product = u64::from(s1[i]) * s2limb_u64;
         let upper = get_upper(product);
         let mut lower = get_lower(product);
         lower = lower.wrapping_add(borrow);
@@ -111,9 +111,9 @@ impl<'a, 'b> SubMul<&'a Natural, u32> for &'b Natural {
             }
         }
         let mut a_limbs = self.to_limbs_le();
-        let borrow = match b {
-            &Small(small_b) => mpn_submul_1(&mut a_limbs[..], &[small_b], c),
-            &Large(ref b_limbs) => mpn_submul_1(&mut a_limbs[..], b_limbs, c),
+        let borrow = match *b {
+            Small(small_b) => mpn_submul_1(&mut a_limbs[..], &[small_b], c),
+            Large(ref b_limbs) => mpn_submul_1(&mut a_limbs[..], b_limbs, c),
         };
         let nonzero_borrow = {
             if a_limb_count == b_limb_count {
@@ -186,9 +186,9 @@ pub(crate) fn sub_mul_assign_u32_helper(a: &mut Natural, b: &Natural, c: u32) ->
     }
     let nonzero_borrow = {
         let a_limbs = a.promote_in_place();
-        let borrow = match b {
-            &Small(small) => mpn_submul_1(a_limbs, &[small], c),
-            &Large(ref b_limbs) => mpn_submul_1(a_limbs, b_limbs, c),
+        let borrow = match *b {
+            Small(small) => mpn_submul_1(a_limbs, &[small], c),
+            Large(ref b_limbs) => mpn_submul_1(a_limbs, b_limbs, c),
         };
         if a_limb_count == b_limb_count {
             borrow != 0

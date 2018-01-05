@@ -1610,7 +1610,7 @@ fn shr_round_u32_properties() {
     }
 
     for (n, u) in log_pairs(exhaustive_integers(), exhaustive_u::<u32>())
-        .filter(|&(ref n, u)| !n.divisible_by_power_of_2(u.into()))
+        .filter(|&(ref n, u)| !n.divisible_by_power_of_2(u))
         .take(LARGE_LIMIT)
     {
         integer_and_u32_inexact(n, u);
@@ -1620,7 +1620,7 @@ fn shr_round_u32_properties() {
         &EXAMPLE_SEED,
         &(|seed| random_integers(seed, 32)),
         &(|seed| natural_u32s_geometric(seed, 32)),
-    ).filter(|&(ref n, u)| !n.divisible_by_power_of_2(u.into()))
+    ).filter(|&(ref n, u)| !n.divisible_by_power_of_2(u))
         .take(LARGE_LIMIT)
     {
         integer_and_u32_inexact(n, u);

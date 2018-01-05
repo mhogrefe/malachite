@@ -88,9 +88,9 @@ impl<'a, 'b, 'c> SubMul<&'a Natural, &'b Natural> for &'c Natural {
             None
         } else {
             let mut self_limbs = self.to_limbs_le();
-            if let &Large(ref c_limbs) = c {
+            if let Large(ref c_limbs) = *c {
                 let mut self_sign = false;
-                if let &Large(ref b_limbs) = b {
+                if let Large(ref b_limbs) = *b {
                     mpz_aorsmul(
                         &mut self_sign,
                         &mut self_limbs,
@@ -159,9 +159,9 @@ fn sub_mul_assign_helper(a: &mut Natural, b: &Natural, c: &Natural) -> bool {
     } else {
         {
             let a_limbs = a.promote_in_place();
-            if let &Large(ref c_limbs) = c {
+            if let Large(ref c_limbs) = *c {
                 let mut self_sign = false;
-                if let &Large(ref b_limbs) = b {
+                if let Large(ref b_limbs) = *b {
                     mpz_aorsmul(
                         &mut self_sign,
                         a_limbs,

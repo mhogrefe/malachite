@@ -42,7 +42,7 @@ impl Natural {
                 if limb_index >= limbs.len() {
                     limbs.resize(limb_index + 1, 0);
                 }
-                limbs[limb_index] |= 1 << (index & LIMB_BITS_MASK as u64);
+                limbs[limb_index] |= 1 << (index & u64::from(LIMB_BITS_MASK));
             }
         );
     }

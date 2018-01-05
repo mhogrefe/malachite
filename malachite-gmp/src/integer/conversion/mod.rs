@@ -66,7 +66,7 @@ impl Integer {
         let s = check_str_radix(src, radix)?;
         let c_str = CString::new(s).unwrap();
         let mut x = Integer::new_mpz_t();
-        let err = unsafe { gmp::mpz_set_str(&mut x, c_str.as_ptr(), radix.into()) };
+        let err = unsafe { gmp::mpz_set_str(&mut x, c_str.as_ptr(), radix) };
         assert_eq!(err, 0);
         self.assign_mpz_t(x);
         Ok(())

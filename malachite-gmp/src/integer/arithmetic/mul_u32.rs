@@ -58,8 +58,8 @@ impl<'a> Mul<u32> for &'a Integer {
         }
         match *self {
             Small(small) => {
-                let product = small as i64 * other as i64;
-                if product >= i32::min_value() as i64 && product <= i32::max_value() as i64 {
+                let product = i64::from(small) * i64::from(other);
+                if product >= i32::min_value().into() && product <= i32::max_value().into() {
                     Small(product as i32)
                 } else {
                     unsafe {
@@ -163,8 +163,8 @@ impl MulAssign<u32> for Integer {
             small,
             large,
             {
-                let product = *small as i64 * other as i64;
-                if product >= i32::min_value() as i64 && product <= i32::max_value() as i64 {
+                let product = i64::from(*small) * i64::from(other);
+                if product >= i32::min_value().into() && product <= i32::max_value().into() {
                     Some(product as i32)
                 } else {
                     None

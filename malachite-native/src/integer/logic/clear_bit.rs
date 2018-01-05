@@ -58,7 +58,7 @@ impl Natural {
             },
             {
                 let limb_index = (index >> LOG_LIMB_BITS) as usize;
-                let mask = 1 << ((index & LIMB_BITS_MASK as u64) as u32);
+                let mask = 1 << ((index & u64::from(LIMB_BITS_MASK)) as u32);
                 if limb_index < limbs.len() {
                     let mut zero_bound = 0;
                     // No index upper bound on this loop; we're sure there's a nonzero limb sooner
@@ -71,10 +71,8 @@ impl Natural {
                     } else if limb_index == zero_bound {
                         let dlimb = ((limbs[limb_index] - 1) | mask).wrapping_add(1);
                         limbs[limb_index] = dlimb;
-                        if dlimb == 0 {
-                            if mpn_add_1_in_place(&mut limbs[limb_index + 1..], 1) {
-                                limbs.push(1);
-                            }
+                        if dlimb == 0 && mpn_add_1_in_place(&mut limbs[limb_index + 1..], 1) {
+                            limbs.push(1);
                         }
                     }
                 } else {

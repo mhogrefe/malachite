@@ -83,8 +83,8 @@ impl<'a, 'b, 'c> SubMul<&'a Natural, &'b Natural> for &'c Natural {
                     Small(small) => gmp::mpz_init_set_ui(&mut result, small.into()),
                     Large(ref large) => gmp::mpz_init_set(&mut result, large),
                 }
-                if let &Large(ref large_c) = c {
-                    if let &Large(ref large_b) = b {
+                if let Large(ref large_c) = *c {
+                    if let Large(ref large_b) = *b {
                         gmp::mpz_submul(&mut result, large_b, large_c);
                     }
                 }
@@ -141,8 +141,8 @@ fn sub_mul_assign_helper(a: &mut Natural, b: &Natural, c: &Natural) -> bool {
     } else {
         {
             let large_a = a.promote_in_place();
-            if let &Large(ref large_c) = c {
-                if let &Large(ref large_b) = b {
+            if let Large(ref large_c) = *c {
+                if let Large(ref large_b) = *b {
                     unsafe {
                         gmp::mpz_submul(large_a, large_b, large_c);
                         if gmp::mpz_sgn(large_a) < 0 {

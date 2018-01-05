@@ -180,6 +180,7 @@ fn add_mul_i32_properties() {
     // a.add_mul(b, c) = a.add_mul(-b, -c)
     // -(a.add_mul(b, c)) = (-a).add_mul(-b, c) = (-a).add_mul(b, -c)
     // a.add_mul(&b, c) is equivalent to a.add_mul(&b, Integer::from(c))
+    #[allow(unknown_lints, cyclomatic_complexity)]
     let integer_integer_and_i32 = |mut gmp_a: gmp::Integer, gmp_b: gmp::Integer, c: i32| {
         let mut a = gmp_integer_to_native(&gmp_a);
         let b = gmp_integer_to_native(&gmp_b);

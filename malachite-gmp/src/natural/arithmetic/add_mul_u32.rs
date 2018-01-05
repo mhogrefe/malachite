@@ -115,13 +115,13 @@ impl<'a, 'b> AddMul<&'a Natural, u32> for &'b Natural {
                 Small(small) => gmp::mpz_init_set_ui(&mut result, small.into()),
                 Large(ref large) => gmp::mpz_init_set(&mut result, large),
             }
-            match b {
-                &Small(small) => {
+            match *b {
+                Small(small) => {
                     let mut large_b: mpz_t = mem::uninitialized();
                     gmp::mpz_init_set_ui(&mut large_b, small.into());
                     gmp::mpz_addmul_ui(&mut result, &large_b, c.into());
                 }
-                &Large(ref large_b) => gmp::mpz_addmul_ui(&mut result, large_b, c.into()),
+                Large(ref large_b) => gmp::mpz_addmul_ui(&mut result, large_b, c.into()),
             }
             Large(result)
         }
@@ -189,13 +189,13 @@ impl<'a> AddMulAssign<&'a Natural, u32> for Natural {
         }
         let large_self = self.promote_in_place();
         unsafe {
-            match b {
-                &Small(small) => {
+            match *b {
+                Small(small) => {
                     let mut large_b: mpz_t = mem::uninitialized();
                     gmp::mpz_init_set_ui(&mut large_b, small.into());
                     gmp::mpz_addmul_ui(large_self, &large_b, c.into());
                 }
-                &Large(ref large_b) => gmp::mpz_addmul_ui(large_self, large_b, c.into()),
+                Large(ref large_b) => gmp::mpz_addmul_ui(large_self, large_b, c.into()),
             }
         }
     }

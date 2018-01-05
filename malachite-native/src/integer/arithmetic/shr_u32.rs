@@ -59,15 +59,15 @@ impl<'a> Shr<u32> for &'a Integer {
     type Output = Integer;
 
     fn shr(self, other: u32) -> Integer {
-        match self {
-            &Integer {
+        match *self {
+            Integer {
                 sign: true,
                 ref abs,
             } => Integer {
                 sign: true,
                 abs: abs >> other,
             },
-            &Integer {
+            Integer {
                 sign: false,
                 ref abs,
             } => {
@@ -104,14 +104,14 @@ impl<'a> Shr<u32> for &'a Integer {
 /// ```
 impl ShrAssign<u32> for Integer {
     fn shr_assign(&mut self, other: u32) {
-        match self {
-            &mut Integer {
+        match *self {
+            Integer {
                 sign: true,
                 ref mut abs,
             } => {
                 *abs >>= other;
             }
-            &mut Integer {
+            Integer {
                 sign: false,
                 ref mut abs,
             } => {
@@ -206,15 +206,15 @@ impl<'a> ShrRound<u32> for &'a Integer {
     type Output = Integer;
 
     fn shr_round(self, other: u32, rm: RoundingMode) -> Integer {
-        match self {
-            &Integer {
+        match *self {
+            Integer {
                 sign: true,
                 ref abs,
             } => Integer {
                 sign: true,
                 abs: abs.shr_round(other, rm),
             },
-            &Integer {
+            Integer {
                 sign: false,
                 ref abs,
             } => {
@@ -288,14 +288,14 @@ impl<'a> ShrRound<u32> for &'a Integer {
 /// }
 impl ShrRoundAssign<u32> for Integer {
     fn shr_round_assign(&mut self, other: u32, rm: RoundingMode) {
-        match self {
-            &mut Integer {
+        match *self {
+            Integer {
                 sign: true,
                 ref mut abs,
             } => {
                 abs.shr_round_assign(other, rm);
             }
-            &mut Integer {
+            Integer {
                 sign: false,
                 ref mut abs,
             } => {

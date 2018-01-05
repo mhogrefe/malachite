@@ -64,7 +64,7 @@ impl Natural {
                 if limb_index >= limbs.len() {
                     return;
                 }
-                let mask = 1 << ((index & LIMB_BITS_MASK as u64) as u32);
+                let mask = 1 << ((index & u64::from(LIMB_BITS_MASK)) as u32);
                 let mut zero_bound = 0;
                 // No index upper bound on this loop; we're sure there's a nonzero limb sooner or
                 // later.

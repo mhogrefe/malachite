@@ -140,7 +140,7 @@ impl<'a, 'b, 'c> AddMul<&'a Natural, &'b Natural> for &'c Natural {
                     Large(ref large) => gmp::mpz_init_set(&mut result, large),
                 }
                 if let Large(ref large_b) = *b {
-                    if let &Large(ref large_c) = c {
+                    if let Large(ref large_c) = *c {
                         gmp::mpz_addmul(&mut result, large_b, large_c)
                     } else {
                         unreachable!()

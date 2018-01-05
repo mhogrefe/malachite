@@ -89,14 +89,14 @@ impl ShrAssign<u32> for Integer {
         if other == 0 || *self == 0 {
             return;
         }
-        match self {
-            &mut Small(ref mut small) if *small > 0 && other >= 31 => *small = 0,
-            &mut Small(ref mut small) if *small < 0 && other >= 31 => *small = -1,
-            &mut Small(ref mut small) => {
+        match *self {
+            Small(ref mut small) if *small > 0 && other >= 31 => *small = 0,
+            Small(ref mut small) if *small < 0 && other >= 31 => *small = -1,
+            Small(ref mut small) => {
                 *small >>= other;
                 return;
             }
-            &mut Large(ref mut large) => unsafe {
+            Large(ref mut large) => unsafe {
                 gmp::mpz_fdiv_q_2exp(large, large, other.into());
             },
         }

@@ -141,6 +141,7 @@ fn add_mul_u32_properties() {
     // a.add_mul(&b, c) is equivalent to a + b * c.
     // -(a.add_mul(b, c)) = (-a).add_mul(-b, c)
     // a.add_mul(&b, c) is equivalent to a.add_mul(&b, Integer::from(c))
+    #[allow(unknown_lints, cyclomatic_complexity)]
     let integer_integer_and_u32 = |mut gmp_a: gmp::Integer, gmp_b: gmp::Integer, c: u32| {
         let mut a = gmp_integer_to_native(&gmp_a);
         let b = gmp_integer_to_native(&gmp_b);

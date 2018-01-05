@@ -55,36 +55,36 @@ pub fn demo_natural_mod_power_of_2_ref(gm: GenerationMode, limit: usize) {
     }
 }
 
-pub fn demo_natural_complement_mod_power_of_2_assign(gm: GenerationMode, limit: usize) {
+pub fn demo_natural_neg_mod_power_of_2_assign(gm: GenerationMode, limit: usize) {
     for (mut n, u) in select_inputs(gm).take(limit) {
         let n_old = n.clone();
-        n.complement_mod_power_of_2_assign(u);
+        n.neg_mod_power_of_2_assign(u);
         println!(
-            "x := {}; x.complement_mod_power_of_2_assign({}); x = {}",
+            "x := {}; x.neg_mod_power_of_2_assign({}); x = {}",
             n_old, u, n
         );
     }
 }
 
-pub fn demo_natural_complement_mod_power_of_2(gm: GenerationMode, limit: usize) {
+pub fn demo_natural_neg_mod_power_of_2(gm: GenerationMode, limit: usize) {
     for (n, u) in select_inputs(gm).take(limit) {
         let n_old = n.clone();
         println!(
-            "{}.complement_mod_power_of_2({}) = {}",
+            "{}.neg_mod_power_of_2({}) = {}",
             n_old,
             u,
-            n.complement_mod_power_of_2(u)
+            n.neg_mod_power_of_2(u)
         );
     }
 }
 
-pub fn demo_natural_complement_mod_power_of_2_ref(gm: GenerationMode, limit: usize) {
+pub fn demo_natural_neg_mod_power_of_2_ref(gm: GenerationMode, limit: usize) {
     for (n, u) in select_inputs(gm).take(limit) {
         println!(
-            "{}.complement_mod_power_of_2_ref({}) = {}",
+            "{}.neg_mod_power_of_2_ref({}) = {}",
             n,
             u,
-            n.complement_mod_power_of_2_ref(u)
+            n.neg_mod_power_of_2_ref(u)
         );
     }
 }
@@ -149,78 +149,67 @@ pub fn benchmark_natural_mod_power_of_2_ref(gm: GenerationMode, limit: usize, fi
     });
 }
 
-pub fn benchmark_natural_complement_mod_power_of_2_assign(
+pub fn benchmark_natural_neg_mod_power_of_2_assign(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,
 ) {
     println!(
-        "benchmarking {} Natural.complement_mod_power_of_2_assign(u32)",
+        "benchmarking {} Natural.neg_mod_power_of_2_assign(u32)",
         gm.name()
     );
     benchmark_2(BenchmarkOptions2 {
         xs: select_inputs(gm),
-        function_f: &(|(mut n, u): (gmp::Natural, u32)| n.complement_mod_power_of_2_assign(u)),
-        function_g: &(|(mut n, u): (native::Natural, u32)| n.complement_mod_power_of_2_assign(u)),
+        function_f: &(|(mut n, u): (gmp::Natural, u32)| n.neg_mod_power_of_2_assign(u)),
+        function_g: &(|(mut n, u): (native::Natural, u32)| n.neg_mod_power_of_2_assign(u)),
         x_cons: &(|p| p.clone()),
         y_cons: &(|&(ref n, index)| (gmp_natural_to_native(n), index)),
         x_param: &(|&(_, index)| index as usize),
         limit,
         f_name: "malachite-gmp",
         g_name: "malachite-native",
-        title: "Natural.complement\\\\_mod\\\\_power\\\\_of\\\\_2\\\\_assign(u32)",
+        title: "Natural.neg\\\\_mod\\\\_power\\\\_of\\\\_2\\\\_assign(u32)",
         x_axis_label: "other",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),
     });
 }
 
-pub fn benchmark_natural_complement_mod_power_of_2(
-    gm: GenerationMode,
-    limit: usize,
-    file_name: &str,
-) {
-    println!(
-        "benchmarking {} Natural.complement_mod_power_of_2(u32)",
-        gm.name()
-    );
+pub fn benchmark_natural_neg_mod_power_of_2(gm: GenerationMode, limit: usize, file_name: &str) {
+    println!("benchmarking {} Natural.neg_mod_power_of_2(u32)", gm.name());
     benchmark_2(BenchmarkOptions2 {
         xs: select_inputs(gm),
-        function_f: &(|(n, u): (gmp::Natural, u32)| n.complement_mod_power_of_2(u)),
-        function_g: &(|(n, u): (native::Natural, u32)| n.complement_mod_power_of_2(u)),
+        function_f: &(|(n, u): (gmp::Natural, u32)| n.neg_mod_power_of_2(u)),
+        function_g: &(|(n, u): (native::Natural, u32)| n.neg_mod_power_of_2(u)),
         x_cons: &(|p| p.clone()),
         y_cons: &(|&(ref n, index)| (gmp_natural_to_native(n), index)),
         x_param: &(|&(_, index)| index as usize),
         limit,
         f_name: "malachite-gmp",
         g_name: "malachite-native",
-        title: "Natural.complement\\\\_mod\\\\_power\\\\_of\\\\_2(u32)",
+        title: "Natural.neg\\\\_mod\\\\_power\\\\_of\\\\_2(u32)",
         x_axis_label: "other",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),
     });
 }
 
-pub fn benchmark_natural_complement_mod_power_of_2_ref(
-    gm: GenerationMode,
-    limit: usize,
-    file_name: &str,
-) {
+pub fn benchmark_natural_neg_mod_power_of_2_ref(gm: GenerationMode, limit: usize, file_name: &str) {
     println!(
-        "benchmarking {} Natural.complement_mod_power_of_2_ref(u32)",
+        "benchmarking {} Natural.neg_mod_power_of_2_ref(u32)",
         gm.name()
     );
     benchmark_2(BenchmarkOptions2 {
         xs: select_inputs(gm),
-        function_f: &(|(n, u): (gmp::Natural, u32)| n.complement_mod_power_of_2_ref(u)),
-        function_g: &(|(n, u): (native::Natural, u32)| n.complement_mod_power_of_2_ref(u)),
+        function_f: &(|(n, u): (gmp::Natural, u32)| n.neg_mod_power_of_2_ref(u)),
+        function_g: &(|(n, u): (native::Natural, u32)| n.neg_mod_power_of_2_ref(u)),
         x_cons: &(|p| p.clone()),
         y_cons: &(|&(ref n, index)| (gmp_natural_to_native(n), index)),
         x_param: &(|&(_, index)| index as usize),
         limit,
         f_name: "malachite-gmp",
         g_name: "malachite-native",
-        title: "Natural.complement\\\\_mod\\\\_power\\\\_of\\\\_2\\\\_ref(u32)",
+        title: "Natural.neg\\\\_mod\\\\_power\\\\_of\\\\_2\\\\_ref(u32)",
         x_axis_label: "other",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),

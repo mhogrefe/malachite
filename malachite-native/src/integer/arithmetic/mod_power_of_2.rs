@@ -21,7 +21,7 @@ impl Integer {
         if self.sign {
             self.abs.mod_power_of_2(other)
         } else {
-            self.abs.complement_mod_power_of_2(other)
+            self.abs.neg_mod_power_of_2(other)
         }
     }
 
@@ -43,7 +43,7 @@ impl Integer {
         if self.sign {
             self.abs.mod_power_of_2_ref(other)
         } else {
-            self.abs.complement_mod_power_of_2_ref(other)
+            self.abs.neg_mod_power_of_2_ref(other)
         }
     }
 
@@ -71,7 +71,7 @@ impl Integer {
             self.abs.mod_power_of_2_assign(other)
         } else {
             self.sign = true;
-            self.abs.complement_mod_power_of_2_assign(other)
+            self.abs.neg_mod_power_of_2_assign(other)
         }
     }
 
@@ -166,7 +166,7 @@ impl Integer {
     /// ```
     pub fn ceiling_mod_power_of_2(self, other: u32) -> Integer {
         let abs_mod = if self.sign {
-            self.abs.complement_mod_power_of_2(other)
+            self.abs.neg_mod_power_of_2(other)
         } else {
             self.abs.mod_power_of_2(other)
         };
@@ -190,7 +190,7 @@ impl Integer {
     /// ```
     pub fn ceiling_mod_power_of_2_ref(&self, other: u32) -> Integer {
         let abs_mod = if self.sign {
-            self.abs.complement_mod_power_of_2_ref(other)
+            self.abs.neg_mod_power_of_2_ref(other)
         } else {
             self.abs.mod_power_of_2_ref(other)
         };
@@ -219,7 +219,7 @@ impl Integer {
     /// ```
     pub fn ceiling_mod_power_of_2_assign(&mut self, other: u32) {
         if self.sign {
-            self.abs.complement_mod_power_of_2_assign(other)
+            self.abs.neg_mod_power_of_2_assign(other)
         } else {
             self.abs.mod_power_of_2_assign(other)
         };

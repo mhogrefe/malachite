@@ -11,9 +11,9 @@ pub fn mpn_addmul_1(r: &mut [u32], s1: &[u32], s2limb: u32) -> u32 {
     let s1_len = s1.len();
     assert!(r.len() >= s1_len);
     let mut carry = 0;
-    let s2limb_u64 = s2limb as u64;
+    let s2limb_u64 = u64::from(s2limb);
     for i in 0..s1_len {
-        let limb_result = r[i] as u64 + s1[i] as u64 * s2limb_u64 + carry;
+        let limb_result = u64::from(r[i]) + u64::from(s1[i]) * s2limb_u64 + carry;
         r[i] = get_lower(limb_result);
         carry = limb_result >> LIMB_BITS;
     }
@@ -187,9 +187,9 @@ impl<'a, 'b> AddMul<&'a Natural, u32> for &'b Natural {
         if a_len < b_len {
             result_limbs.resize(b_len, 0);
         }
-        let carry = match b {
-            &Small(small) => mpn_addmul_1(&mut result_limbs[..], &[small], c),
-            &Large(ref b_limbs) => mpn_addmul_1(&mut result_limbs[..], b_limbs, c),
+        let carry = match *b {
+            Small(small) => mpn_addmul_1(&mut result_limbs[..], &[small], c),
+            Large(ref b_limbs) => mpn_addmul_1(&mut result_limbs[..], b_limbs, c),
         };
         if carry != 0 {
             if a_len > b_len {
@@ -315,9 +315,9 @@ impl<'a> AddMulAssign<&'a Natural, u32> for Natural {
             if a_len < b_len {
                 self_limbs.resize(b_len, 0);
             }
-            let carry = match b {
-                &Small(small) => mpn_addmul_1(self_limbs, &[small], c),
-                &Large(ref b_limbs) => mpn_addmul_1(self_limbs, b_limbs, c),
+            let carry = match *b {
+                Small(small) => mpn_addmul_1(self_limbs, &[small], c),
+                Large(ref b_limbs) => mpn_addmul_1(self_limbs, b_limbs, c),
             };
             if carry != 0 {
                 if a_len > b_len {

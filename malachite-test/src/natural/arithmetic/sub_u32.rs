@@ -14,6 +14,7 @@ use rust_wheels::iterators::primitive_ints::exhaustive_u;
 use rust_wheels::iterators::tuples::{exhaustive_pairs, random_pairs};
 use std::cmp::Ordering;
 
+#[allow(unknown_lints, assign_op_pattern)]
 pub fn num_sub_u32(mut x: num::BigUint, u: u32) -> Option<num::BigUint> {
     if num_partial_cmp_u32(&x, u) != Some(Ordering::Less) {
         x = x - num::BigUint::from(u);

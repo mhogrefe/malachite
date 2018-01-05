@@ -98,7 +98,7 @@ pub fn mpn_sub_aba(a: &mut [u32], b: &[u32], len: usize) -> bool {
     } else if borrow {
         mpn_sub_1(&mut a[len..], &b[len..], 1)
     } else {
-        &mut a[len..s1_len].copy_from_slice(&b[len..]);
+        a[len..s1_len].copy_from_slice(&b[len..]);
         false
     }
 }

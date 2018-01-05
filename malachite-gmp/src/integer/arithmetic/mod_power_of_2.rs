@@ -43,9 +43,9 @@ impl Integer {
         if other == 0 || *self == 0 {
             Natural::ZERO
         } else {
-            match self {
-                &Integer::Small(small) if small >= 0 && other >= 32 => Natural::Small(small as u32),
-                &Integer::Small(small) if other >= 32 => unsafe {
+            match *self {
+                Integer::Small(small) if small >= 0 && other >= 32 => Natural::Small(small as u32),
+                Integer::Small(small) if other >= 32 => unsafe {
                     let mut result = mem::uninitialized();
                     gmp::mpz_init_set_si(&mut result, small.into());
                     gmp::mpz_fdiv_r_2exp(&mut result, &result, other.into());
@@ -53,8 +53,8 @@ impl Integer {
                     result.demote_if_small();
                     result
                 },
-                &Integer::Small(small) => Natural::Small((small & ((1 << other) - 1)) as u32),
-                &Integer::Large(ref large) => unsafe {
+                Integer::Small(small) => Natural::Small((small & ((1 << other) - 1)) as u32),
+                Integer::Large(ref large) => unsafe {
                     let mut result = mem::uninitialized();
                     gmp::mpz_init(&mut result);
                     gmp::mpz_fdiv_r_2exp(&mut result, large, other.into());
@@ -91,19 +91,19 @@ impl Integer {
         } else if *self == 0 {
             return;
         } else {
-            match self {
-                &mut Integer::Small(small) if small >= 0 && other >= 32 => return,
-                &mut Integer::Small(small) if other >= 32 => unsafe {
+            match *self {
+                Integer::Small(small) if small >= 0 && other >= 32 => return,
+                Integer::Small(small) if other >= 32 => unsafe {
                     let mut large = mem::uninitialized();
                     gmp::mpz_init_set_si(&mut large, small.into());
                     gmp::mpz_fdiv_r_2exp(&mut large, &large, other.into());
                     *self = Integer::Large(large);
                 },
-                &mut Integer::Small(ref mut small) => {
+                Integer::Small(ref mut small) => {
                     *small &= (1 << other) - 1;
                     return;
                 }
-                &mut Integer::Large(ref mut large) => unsafe {
+                Integer::Large(ref mut large) => unsafe {
                     gmp::mpz_fdiv_r_2exp(large, large, other.into())
                 },
             }
@@ -153,11 +153,11 @@ impl Integer {
         if other == 0 || *self == 0 {
             Integer::ZERO
         } else {
-            match self {
-                &Integer::Small(i32::MIN) if other < 32 => Integer::ZERO,
-                &Integer::Small(_) if other >= 31 => self.clone(),
-                &Integer::Small(small) if small >= 0 => Integer::Small(small & ((1 << other) - 1)),
-                &Integer::Small(small) => {
+            match *self {
+                Integer::Small(i32::MIN) if other < 32 => Integer::ZERO,
+                Integer::Small(_) if other >= 31 => self.clone(),
+                Integer::Small(small) if small >= 0 => Integer::Small(small & ((1 << other) - 1)),
+                Integer::Small(small) => {
                     let mask = (1 << other) - 1;
                     if (small & mask) == 0 {
                         Integer::ZERO
@@ -165,7 +165,7 @@ impl Integer {
                         Integer::Small(small | !mask)
                     }
                 }
-                &Integer::Large(ref large) => unsafe {
+                Integer::Large(ref large) => unsafe {
                     let mut result = mem::uninitialized();
                     gmp::mpz_init(&mut result);
                     gmp::mpz_tdiv_r_2exp(&mut result, large, other.into());
@@ -203,17 +203,17 @@ impl Integer {
         } else if *self == 0 {
             return;
         } else {
-            match self {
-                &mut Integer::Small(i32::MIN) if other < 32 => {
+            match *self {
+                Integer::Small(i32::MIN) if other < 32 => {
                     *self = Integer::ZERO;
                     return;
                 }
-                &mut Integer::Small(_) if other >= 31 => return,
-                &mut Integer::Small(ref mut small) if *small >= 0 => {
+                Integer::Small(_) if other >= 31 => return,
+                Integer::Small(ref mut small) if *small >= 0 => {
                     *small &= (1 << other) - 1;
                     return;
                 }
-                &mut Integer::Small(ref mut small) => {
+                Integer::Small(ref mut small) => {
                     let mask = (1 << other) - 1;
                     if (*small & mask) == 0 {
                         *small = 0;
@@ -222,7 +222,7 @@ impl Integer {
                     }
                     return;
                 }
-                &mut Integer::Large(ref mut large) => unsafe {
+                Integer::Large(ref mut large) => unsafe {
                     gmp::mpz_tdiv_r_2exp(large, large, other.into())
                 },
             }
@@ -264,10 +264,10 @@ impl Integer {
         if other == 0 || *self == 0 {
             Integer::ZERO
         } else {
-            match self {
-                &Integer::Small(i32::MIN) if other < 32 => Integer::ZERO,
-                &Integer::Small(small) if small < 0 && other >= 31 => self.clone(),
-                &Integer::Small(small) if small >= 0 && other < 31 || small < 0 => {
+            match *self {
+                Integer::Small(i32::MIN) if other < 32 => Integer::ZERO,
+                Integer::Small(small) if small < 0 && other >= 31 => self.clone(),
+                Integer::Small(small) if small >= 0 && other < 31 || small < 0 => {
                     let mask = (1 << other) - 1;
                     if (small & mask) == 0 {
                         Integer::ZERO
@@ -275,7 +275,7 @@ impl Integer {
                         Integer::Small(small | !mask)
                     }
                 }
-                &Integer::Small(small) => unsafe {
+                Integer::Small(small) => unsafe {
                     let mut result = mem::uninitialized();
                     gmp::mpz_init_set_si(&mut result, small.into());
                     gmp::mpz_cdiv_r_2exp(&mut result, &result, other.into());
@@ -283,7 +283,7 @@ impl Integer {
                     result.demote_if_small();
                     result
                 },
-                &Integer::Large(ref large) => unsafe {
+                Integer::Large(ref large) => unsafe {
                     let mut result = mem::uninitialized();
                     gmp::mpz_init(&mut result);
                     gmp::mpz_cdiv_r_2exp(&mut result, large, other.into());
@@ -318,12 +318,12 @@ impl Integer {
         } else if *self == 0 {
             return;
         } else {
-            match self {
-                &mut Integer::Small(i32::MIN) if other < 32 => {
+            match *self {
+                Integer::Small(i32::MIN) if other < 32 => {
                     *self = Integer::ZERO;
                 }
-                &mut Integer::Small(small) if small < 0 && other >= 31 => return,
-                &mut Integer::Small(ref mut small) if *small >= 0 && other < 31 || *small < 0 => {
+                Integer::Small(small) if small < 0 && other >= 31 => return,
+                Integer::Small(ref mut small) if *small >= 0 && other < 31 || *small < 0 => {
                     let mask = (1 << other) - 1;
                     if (*small & mask) == 0 {
                         *small = 0;
@@ -331,13 +331,13 @@ impl Integer {
                         *small |= !mask;
                     }
                 }
-                &mut Integer::Small(small) => unsafe {
+                Integer::Small(small) => unsafe {
                     let mut result = mem::uninitialized();
                     gmp::mpz_init_set_si(&mut result, small.into());
                     gmp::mpz_cdiv_r_2exp(&mut result, &result, other.into());
                     *self = Integer::Large(result);
                 },
-                &mut Integer::Large(ref mut large) => unsafe {
+                Integer::Large(ref mut large) => unsafe {
                     gmp::mpz_cdiv_r_2exp(large, large, other.into())
                 },
             }

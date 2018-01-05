@@ -30,10 +30,10 @@ impl Natural {
     pub fn trailing_zeros(&self) -> Option<u64> {
         match *self {
             Small(0) => None,
-            Small(small) => Some(small.trailing_zeros() as u64),
+            Small(small) => Some(small.trailing_zeros().into()),
             Large(ref limbs) => {
                 let zero_limbs = limbs.iter().take_while(|&&limb| limb == 0).count();
-                let remaining_zeros = limbs[zero_limbs].trailing_zeros() as u64;
+                let remaining_zeros = u64::from(limbs[zero_limbs].trailing_zeros());
                 Some(((zero_limbs as u64) << LOG_LIMB_BITS) + remaining_zeros)
             }
         }

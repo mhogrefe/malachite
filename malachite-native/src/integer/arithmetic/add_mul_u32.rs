@@ -285,9 +285,9 @@ pub(crate) fn large_aorsmul_val(
 ) {
     {
         let mut a_limbs = a_abs.promote_in_place();
-        match b_abs {
-            &Small(small_b) => mpz_aorsmul_1(a_sign, &mut a_limbs, b_sign, &[small_b], c, add),
-            &Large(ref b_limbs) => mpz_aorsmul_1(a_sign, &mut a_limbs, b_sign, b_limbs, c, add),
+        match *b_abs {
+            Small(small_b) => mpz_aorsmul_1(a_sign, &mut a_limbs, b_sign, &[small_b], c, add),
+            Large(ref b_limbs) => mpz_aorsmul_1(a_sign, &mut a_limbs, b_sign, b_limbs, c, add),
         }
     }
     a_abs.trim();
@@ -303,8 +303,8 @@ pub(crate) fn large_aorsmul_ref(
 ) -> Integer {
     let mut result_sign = a_sign;
     let mut result_limbs = a_abs.to_limbs_le();
-    match b_abs {
-        &Small(small_b) => mpz_aorsmul_1(
+    match *b_abs {
+        Small(small_b) => mpz_aorsmul_1(
             &mut result_sign,
             &mut result_limbs,
             b_sign,
@@ -312,7 +312,7 @@ pub(crate) fn large_aorsmul_ref(
             c,
             add,
         ),
-        &Large(ref b_limbs) => {
+        Large(ref b_limbs) => {
             mpz_aorsmul_1(&mut result_sign, &mut result_limbs, b_sign, b_limbs, c, add)
         }
     }

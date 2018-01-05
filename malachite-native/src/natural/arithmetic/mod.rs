@@ -21,9 +21,10 @@ impl Natural {
                 let i = xs_len - i_rev - 1;
                 let lower = xs[i];
                 let x = make_u64(upper, lower);
-                let q = (x / op as u64) as u32;
+                let op_u64 = u64::from(op);
+                let q = (x / op_u64) as u32;
                 xs[i] = q;
-                upper = (x % op as u64) as u32;
+                upper = (x % op_u64) as u32;
             }
         }
         self.trim();

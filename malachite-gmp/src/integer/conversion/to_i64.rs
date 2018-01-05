@@ -24,7 +24,7 @@ impl Integer {
     /// ```
     pub fn to_i64(&self) -> Option<i64> {
         match *self {
-            Small(small) => Some(small as i64),
+            Small(small) => Some(small.into()),
             Large(_) => {
                 if self.significant_bits() < 64
                     || *self == -((Natural::ONE << 63u32).into_integer())

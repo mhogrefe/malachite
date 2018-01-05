@@ -182,9 +182,9 @@ impl<'a, 'b, 'c> AddMul<&'a Natural, &'b Natural> for &'c Natural {
         } else {
             let mut result = {
                 let mut result_limbs = self.to_limbs_le();
-                if let &Large(ref c_limbs) = c {
+                if let Large(ref c_limbs) = *c {
                     let mut self_sign = false;
-                    if let &Large(ref b_limbs) = b {
+                    if let Large(ref b_limbs) = *b {
                         mpz_aorsmul(
                             &mut self_sign,
                             &mut result_limbs,
@@ -306,7 +306,7 @@ impl<'a> AddMulAssign<Natural, &'a Natural> for Natural {
         } else {
             {
                 let self_limbs = self.promote_in_place();
-                if let &Large(ref c_limbs) = c {
+                if let Large(ref c_limbs) = *c {
                     let mut self_sign = false;
                     if let Large(ref b_limbs) = b {
                         mpz_aorsmul(
@@ -369,7 +369,7 @@ impl<'a> AddMulAssign<&'a Natural, Natural> for Natural {
                 let self_limbs = self.promote_in_place();
                 if let Large(ref c_limbs) = c {
                     let mut self_sign = false;
-                    if let &Large(ref b_limbs) = b {
+                    if let Large(ref b_limbs) = *b {
                         mpz_aorsmul(
                             &mut self_sign,
                             self_limbs,
@@ -428,9 +428,9 @@ impl<'a, 'b> AddMulAssign<&'a Natural, &'b Natural> for Natural {
         } else {
             {
                 let self_limbs = self.promote_in_place();
-                if let &Large(ref c_limbs) = c {
+                if let Large(ref c_limbs) = *c {
                     let mut self_sign = false;
-                    if let &Large(ref b_limbs) = b {
+                    if let Large(ref b_limbs) = *b {
                         mpz_aorsmul(
                             &mut self_sign,
                             self_limbs,
@@ -454,6 +454,7 @@ fn mpn_cmp_twosizes_lt(x: &[u32], y: &[u32]) -> bool {
     mpn_cmp_helper(x, y) == Ordering::Less
 }
 
+#[allow(unknown_lints, many_single_char_names)]
 pub(crate) fn mpz_aorsmul(
     w_sign: &mut bool,
     w: &mut Vec<u32>,
@@ -517,15 +518,13 @@ pub(crate) fn mpz_aorsmul(
             };
             w[wsize] = c;
         }
-    } else {
-        if mpn_cmp_twosizes_lt(&w[0..wsize], &t[0..tsize]) {
-            if tsize != 0 {
-                *w_sign = !*w_sign;
-            }
-            assert!(!mpn_sub_aba(w, &t[0..tsize], wsize));
-        } else {
-            assert!(!mpn_sub_in_place(&mut w[0..wsize], &t[0..tsize]));
+    } else if mpn_cmp_twosizes_lt(&w[0..wsize], &t[0..tsize]) {
+        if tsize != 0 {
+            *w_sign = !*w_sign;
         }
+        assert!(!mpn_sub_aba(w, &t[0..tsize], wsize));
+    } else {
+        assert!(!mpn_sub_in_place(&mut w[0..wsize], &t[0..tsize]));
     }
     if mpn_zero_p(w) {
         *w_sign = false;

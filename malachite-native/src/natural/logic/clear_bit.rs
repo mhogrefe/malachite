@@ -31,7 +31,7 @@ impl Natural {
             Large(ref mut limbs) => {
                 let limb_index = (index >> LOG_LIMB_BITS) as usize;
                 if limb_index < limbs.len() {
-                    limbs[limb_index] &= !(1 << (index & LIMB_BITS_MASK as u64));
+                    limbs[limb_index] &= !(1 << (index & u64::from(LIMB_BITS_MASK)));
                 } else {
                     return;
                 }

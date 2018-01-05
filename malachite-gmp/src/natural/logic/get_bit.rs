@@ -18,7 +18,7 @@ impl Natural {
     pub fn get_bit(&self, index: u64) -> bool {
         match *self {
             Small(small) => index < 32 && small & (1 << index) != 0,
-            Large(ref large) => (unsafe { gmp::mpz_tstbit(large, index.into()) }) != 0,
+            Large(ref large) => (unsafe { gmp::mpz_tstbit(large, index) }) != 0,
         }
     }
 }

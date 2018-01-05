@@ -237,6 +237,7 @@ fn mul_properties() {
     // x * 1 == x
     // 1 * x == x
     //TODO x * x == x ^ 2
+    #[allow(unknown_lints, erasing_op)]
     let one_natural = |gmp_x: gmp::Natural| {
         let x = gmp_natural_to_native(&gmp_x);
         let x_old = x.clone();

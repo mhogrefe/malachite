@@ -54,7 +54,7 @@ pub fn mpn_add(r: &mut [u32], s1: &[u32], s2: &[u32]) -> bool {
     } else if carry {
         mpn_add_1(&mut r[s2_len..], &s1[s2_len..], 1)
     } else {
-        &mut r[s2_len..s1_len].copy_from_slice(&s1[s2_len..]);
+        r[s2_len..s1_len].copy_from_slice(&s1[s2_len..]);
         false
     }
 }

@@ -105,8 +105,8 @@ impl<'a, 'b> AddMul<&'a Integer, u32> for &'b Integer {
             return self.clone();
         }
         if let Small(small_b) = *b {
-            let product = small_b as i64 * c as i64;
-            if product >= i32::min_value() as i64 && product <= u32::max_value() as i64 {
+            let product = i64::from(small_b) * i64::from(c);
+            if product >= i32::min_value().into() && product <= u32::max_value().into() {
                 return if product >= 0 {
                     self + (product as u32)
                 } else {
@@ -120,13 +120,13 @@ impl<'a, 'b> AddMul<&'a Integer, u32> for &'b Integer {
                 Small(small) => gmp::mpz_init_set_si(&mut result, small.into()),
                 Large(ref large) => gmp::mpz_init_set(&mut result, large),
             }
-            match b {
-                &Small(small) => {
+            match *b {
+                Small(small) => {
                     let mut large_b: mpz_t = mem::uninitialized();
                     gmp::mpz_init_set_si(&mut large_b, small.into());
                     gmp::mpz_addmul_ui(&mut result, &large_b, c.into());
                 }
-                &Large(ref large_b) => gmp::mpz_addmul_ui(&mut result, large_b, c.into()),
+                Large(ref large_b) => gmp::mpz_addmul_ui(&mut result, large_b, c.into()),
             }
             let mut result = Large(result);
             result.demote_if_small();
@@ -189,8 +189,8 @@ impl<'a> AddMulAssign<&'a Integer, u32> for Integer {
             return;
         }
         if let Small(small_b) = *b {
-            let product = small_b as i64 * c as i64;
-            if product >= i32::min_value() as i64 && product <= u32::max_value() as i64 {
+            let product = i64::from(small_b) * i64::from(c);
+            if product >= i32::min_value().into() && product <= u32::max_value().into() {
                 if product >= 0 {
                     *self += product as u32;
                 } else {
@@ -201,13 +201,13 @@ impl<'a> AddMulAssign<&'a Integer, u32> for Integer {
         }
         unsafe {
             let large_self = self.promote_in_place();
-            match b {
-                &Small(small) => {
+            match *b {
+                Small(small) => {
                     let mut large_b: mpz_t = mem::uninitialized();
                     gmp::mpz_init_set_si(&mut large_b, small.into());
                     gmp::mpz_addmul_ui(large_self, &large_b, c.into());
                 }
-                &Large(ref large_b) => gmp::mpz_addmul_ui(large_self, large_b, c.into()),
+                Large(ref large_b) => gmp::mpz_addmul_ui(large_self, large_b, c.into()),
             }
         }
         self.demote_if_small();

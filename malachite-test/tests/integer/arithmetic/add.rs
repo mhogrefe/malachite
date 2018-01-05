@@ -17,6 +17,7 @@ use rust_wheels::iterators::tuples::{exhaustive_pairs, exhaustive_triples_from_s
 use std::str::FromStr;
 
 #[test]
+#[allow(unknown_lints, cyclomatic_complexity)]
 fn test_add() {
     let test = |u, v, out| {
         let mut n = native::Integer::from_str(u).unwrap();

@@ -26,7 +26,7 @@ impl Integer {
         match *self {
             Small(small) if small >= 0 => index < 31 && small & (1 << index) != 0,
             Small(small) => index >= 31 || small & (1 << index) != 0,
-            Large(ref large) => (unsafe { gmp::mpz_tstbit(large, index.into()) }) != 0,
+            Large(ref large) => (unsafe { gmp::mpz_tstbit(large, index) }) != 0,
         }
     }
 }
