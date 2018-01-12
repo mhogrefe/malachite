@@ -1,8 +1,6 @@
 use common::LARGE_LIMIT;
-use malachite_native::integer as native;
-use malachite_gmp::integer as gmp;
-use malachite_test::common::{gmp_integer_to_native, native_integer_to_rugint,
-                             rugint_integer_to_native, GenerationMode};
+use malachite_nz::integer::Integer;
+use malachite_test::common::{integer_to_rugint_integer, rugint_integer_to_integer, GenerationMode};
 use malachite_test::integer::logic::flip_bit::select_inputs;
 use rugint;
 use std::str::FromStr;
@@ -10,12 +8,7 @@ use std::str::FromStr;
 #[test]
 fn test_flip_bit() {
     let test = |u, index, out| {
-        let mut n = native::Integer::from_str(u).unwrap();
-        n.flip_bit(index);
-        assert_eq!(n.to_string(), out);
-        assert!(n.is_valid());
-
-        let mut n = gmp::Integer::from_str(u).unwrap();
+        let mut n = Integer::from_str(u).unwrap();
         n.flip_bit(index);
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
@@ -38,23 +31,18 @@ fn test_flip_bit() {
 
 #[test]
 fn flip_bit_properties() {
-    // n.flip_bit(index) is equivalent for malachite-gmp, malachite-native, and rugint.
+    // n.flip_bit(index) is equivalent for malachite and rugint.
     // Flipping a bit once always changes a number.
     // Flipping the same bit twice leaves a number unchanged.
-    let integer_and_u64 = |mut gmp_n: gmp::Integer, index: u64| {
-        let mut n = gmp_integer_to_native(&gmp_n);
+    let integer_and_u64 = |mut n: Integer, index: u64| {
         let old_n = n.clone();
-        gmp_n.flip_bit(index);
-        assert!(gmp_n.is_valid());
-
         n.flip_bit(index);
         assert!(n.is_valid());
         assert_ne!(n, old_n);
-        assert_eq!(gmp_integer_to_native(&gmp_n), n);
 
-        let mut rugint_n = native_integer_to_rugint(&old_n);
+        let mut rugint_n = integer_to_rugint_integer(&old_n);
         rugint_n.invert_bit(index as u32);
-        assert_eq!(rugint_integer_to_native(&rugint_n), n);
+        assert_eq!(rugint_integer_to_integer(&rugint_n), n);
 
         n.flip_bit(index);
         assert_eq!(n, old_n);

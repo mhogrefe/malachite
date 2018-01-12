@@ -171,36 +171,36 @@ macro_rules! demos_and_benchmarks {
                     $(
                         $no_scale_bench_fn(
                             GenerationMode::Exhaustive,
-                            100_000,
+                            limit,
                             &format!("exhaustive_{}.gp", stringify!($no_scale_bench_fn))
                         );
                         $no_scale_bench_fn(
                             GenerationMode::Random(32),
-                            100_000,
+                            limit,
                             &format!("random_{}.gp", stringify!($no_scale_bench_fn))
                         );
                     )*
                     $(
                         $small_scale_bench_fn(
                             GenerationMode::Exhaustive,
-                            100_000,
+                            limit,
                             &format!("exhaustive_{}.gp", stringify!($small_scale_bench_fn))
                         );
                         $small_scale_bench_fn(
                             GenerationMode::Random(128),
-                            100_000,
+                            limit,
                             &format!("random_{}.gp", stringify!($small_scale_bench_fn))
                         );
                     )*
                     $(
                         $large_scale_bench_fn(
                             GenerationMode::Exhaustive,
-                            100_000,
+                            limit,
                             &format!("exhaustive_{}.gp", stringify!($large_scale_bench_fn))
                         );
                         $large_scale_bench_fn(
-                            GenerationMode::Random(2048),
-                            100_000,
+                            GenerationMode::Random(1024),
+                            limit,
                             &format!("random_{}.gp", stringify!($large_scale_bench_fn))
                         );
                     )*

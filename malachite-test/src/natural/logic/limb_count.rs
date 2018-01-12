@@ -1,11 +1,10 @@
-use common::{gmp_natural_to_native, GenerationMode};
-use malachite_gmp::natural as gmp;
-use malachite_native::natural as native;
-use rust_wheels::benchmarks::{BenchmarkOptions2, benchmark_2};
+use common::GenerationMode;
+use malachite_nz::natural::Natural;
+use rust_wheels::benchmarks::{BenchmarkOptions1, benchmark_1};
 use rust_wheels::iterators::common::EXAMPLE_SEED;
 use rust_wheels::iterators::naturals::{exhaustive_naturals, random_naturals};
 
-type It = Iterator<Item = gmp::Natural>;
+type It = Iterator<Item = Natural>;
 
 pub fn exhaustive_inputs() -> Box<It> {
     Box::new(exhaustive_naturals())
@@ -30,16 +29,13 @@ pub fn demo_natural_limb_count(gm: GenerationMode, limit: usize) {
 
 pub fn benchmark_natural_limb_count(gm: GenerationMode, limit: usize, file_name: &str) {
     println!("benchmarking {} Natural.limb_count()", gm.name());
-    benchmark_2(BenchmarkOptions2 {
+    benchmark_1(BenchmarkOptions1 {
         xs: select_inputs(gm),
-        function_f: &(|n: gmp::Natural| n.limb_count()),
-        function_g: &(|n: native::Natural| n.limb_count()),
+        function_f: &(|n: Natural| n.limb_count()),
         x_cons: &(|x| x.clone()),
-        y_cons: &(|x| gmp_natural_to_native(x)),
         x_param: &(|n| n.significant_bits() as usize),
         limit,
-        f_name: "malachite-gmp",
-        g_name: "malachite-native",
+        f_name: "malachite",
         title: "Natural.limb\\\\_count()",
         x_axis_label: "n.significant\\\\_bits()",
         y_axis_label: "time (ns)",

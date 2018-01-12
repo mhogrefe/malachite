@@ -1,13 +1,10 @@
 use common::LARGE_LIMIT;
 use malachite_base::traits::{One, Zero};
-use malachite_native::integer as native;
-use malachite_gmp::integer as gmp;
-use malachite_test::common::{gmp_integer_to_native, native_integer_to_gmp,
-                             native_integer_to_num_bigint, native_integer_to_rugint,
-                             num_bigint_to_native_integer, rugint_integer_to_native,
-                             GenerationMode};
+use malachite_nz::integer::Integer;
+use malachite_test::common::{bigint_to_integer, integer_to_bigint, integer_to_rugint_integer,
+                             rugint_integer_to_integer, GenerationMode};
 use malachite_test::integer::arithmetic::shl_u32::select_inputs;
-use num;
+use num::BigInt;
 use rugint;
 use rust_wheels::iterators::common::EXAMPLE_SEED;
 use rust_wheels::iterators::integers_geometric::natural_u32s_geometric;
@@ -18,12 +15,7 @@ use std::str::FromStr;
 #[test]
 fn test_shl_u32() {
     let test = |u, v: u32, out| {
-        let mut n = native::Integer::from_str(u).unwrap();
-        n <<= v;
-        assert_eq!(n.to_string(), out);
-        assert!(n.is_valid());
-
-        let mut n = gmp::Integer::from_str(u).unwrap();
+        let mut n = Integer::from_str(u).unwrap();
         n <<= v;
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
@@ -32,29 +24,21 @@ fn test_shl_u32() {
         n <<= v;
         assert_eq!(n.to_string(), out);
 
-        let n = native::Integer::from_str(u).unwrap() << v;
-        assert_eq!(n.to_string(), out);
-        assert!(n.is_valid());
-
-        let n = gmp::Integer::from_str(u).unwrap() << v;
+        let n = Integer::from_str(u).unwrap() << v;
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
         let n = rugint::Integer::from_str(u).unwrap() << v;
         assert_eq!(n.to_string(), out);
 
-        let n = num::BigInt::from_str(u).unwrap() << v as usize;
+        let n = BigInt::from_str(u).unwrap() << v as usize;
         assert_eq!(n.to_string(), out);
 
-        let n = &native::Integer::from_str(u).unwrap() << v;
-        assert_eq!(n.to_string(), out);
-        assert!(n.is_valid());
-
-        let n = &gmp::Integer::from_str(u).unwrap() << v;
+        let n = &Integer::from_str(u).unwrap() << v;
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = &num::BigInt::from_str(u).unwrap() << v as usize;
+        let n = &BigInt::from_str(u).unwrap() << v as usize;
         assert_eq!(n.to_string(), out);
     };
     test("0", 0, "0");
@@ -103,9 +87,9 @@ fn test_shl_u32() {
 
 #[test]
 fn shl_u32_properties() {
-    // n <<= u is equivalent for malachite-gmp, malachite-native, and rugint.
-    // n << u is equivalent for malachite-gmp, malachite-native, num, and rugint.
-    // &n << u is equivalent for malachite-gmp, malachite-native, and num.
+    // n <<= u is equivalent for malachite and rugint.
+    // n << u is equivalent for malachite, num, and rugint.
+    // &n << u is equivalent for malachite and num.
     // n <<= u; n is valid.
     // n << u is valid.
     // &n << u is valid.
@@ -114,19 +98,14 @@ fn shl_u32_properties() {
     // n << u == n * (1 << u)
     // n << u >> u == n
     // if u < 2^31, n << u == n << (u as i32) == n >> -(u as i32)
-    let integer_and_u32 = |mut gmp_n: gmp::Integer, u: u32| {
-        let mut n = gmp_integer_to_native(&gmp_n);
+    let integer_and_u32 = |mut n: Integer, u: u32| {
         let old_n = n.clone();
-        gmp_n <<= u;
-        assert!(gmp_n.is_valid());
-
         n <<= u;
         assert!(n.is_valid());
-        assert_eq!(gmp_integer_to_native(&gmp_n), n);
 
-        let mut rugint_n = native_integer_to_rugint(&old_n);
+        let mut rugint_n = integer_to_rugint_integer(&old_n);
         rugint_n <<= u;
-        assert_eq!(rugint_integer_to_native(&rugint_n), n);
+        assert_eq!(rugint_integer_to_integer(&rugint_n), n);
 
         let n2 = old_n.clone();
         let result = &n2 << u;
@@ -136,25 +115,17 @@ fn shl_u32_properties() {
         assert!(result.is_valid());
         assert_eq!(result, n);
 
-        let gmp_n2 = native_integer_to_gmp(&old_n);
-        let result = &gmp_n2 << u;
-        assert!(result.is_valid());
-        assert_eq!(gmp_integer_to_native(&result), n);
-        let result = gmp_n2 << u;
-        assert!(result.is_valid());
-        assert_eq!(gmp_integer_to_native(&result), n);
+        let num_n2 = integer_to_bigint(&old_n);
+        assert_eq!(bigint_to_integer(&(&num_n2 << u as usize)), n);
+        assert_eq!(bigint_to_integer(&(num_n2 << u as usize)), n);
 
-        let num_n2 = native_integer_to_num_bigint(&old_n);
-        assert_eq!(num_bigint_to_native_integer(&(&num_n2 << u as usize)), n);
-        assert_eq!(num_bigint_to_native_integer(&(num_n2 << u as usize)), n);
-
-        let rugint_n2 = native_integer_to_rugint(&old_n);
-        assert_eq!(rugint_integer_to_native(&(rugint_n2 << u)), n);
+        let rugint_n2 = integer_to_rugint_integer(&old_n);
+        assert_eq!(rugint_integer_to_integer(&(rugint_n2 << u)), n);
 
         assert!((&old_n << u).abs() >= old_n.abs_ref());
         assert_eq!(-&old_n << u, -(&old_n << u));
 
-        assert_eq!(&old_n << u, &old_n * (native::Integer::ONE << u));
+        assert_eq!(&old_n << u, &old_n * (Integer::ONE << u));
         assert_eq!(&old_n << u >> u, old_n);
 
         if u <= (i32::max_value() as u32) {
@@ -165,21 +136,15 @@ fn shl_u32_properties() {
 
     // n << 0 == n
     #[allow(unknown_lints, identity_op)]
-    let one_integer = |gmp_n: gmp::Integer| {
-        let n = gmp_integer_to_native(&gmp_n);
+    let one_integer = |n: Integer| {
         assert_eq!(&n << 0, n);
     };
 
     // 0 << n == 0
     // 1 << n is a power of 2
     let one_u32 = |u: u32| {
-        assert_eq!(native::Integer::ZERO << u, 0);
-        assert!(
-            (native::Integer::ONE << u)
-                .into_natural()
-                .unwrap()
-                .is_power_of_2()
-        );
+        assert_eq!(Integer::ZERO << u, 0);
+        assert!((Integer::ONE << u).into_natural().unwrap().is_power_of_2());
     };
 
     for (n, u) in select_inputs(GenerationMode::Exhaustive).take(LARGE_LIMIT) {

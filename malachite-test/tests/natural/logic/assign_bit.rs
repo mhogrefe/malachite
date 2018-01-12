@@ -1,8 +1,6 @@
 use common::LARGE_LIMIT;
-use malachite_native::natural as native;
-use malachite_gmp::natural as gmp;
-use malachite_test::common::{gmp_natural_to_native, native_natural_to_rugint_integer,
-                             rugint_integer_to_native_natural, GenerationMode};
+use malachite_nz::natural::Natural;
+use malachite_test::common::{natural_to_rugint_integer, rugint_integer_to_natural, GenerationMode};
 use malachite_test::natural::logic::assign_bit::select_inputs;
 use rugint;
 use std::str::FromStr;
@@ -10,12 +8,7 @@ use std::str::FromStr;
 #[test]
 fn test_assign_bit() {
     let test = |u, index, bit, out| {
-        let mut n = native::Natural::from_str(u).unwrap();
-        n.assign_bit(index, bit);
-        assert_eq!(n.to_string(), out);
-        assert!(n.is_valid());
-
-        let mut n = gmp::Natural::from_str(u).unwrap();
+        let mut n = Natural::from_str(u).unwrap();
         n.assign_bit(index, bit);
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
@@ -51,20 +44,15 @@ fn test_assign_bit() {
 
 #[test]
 fn assign_bit_properties() {
-    // n.assign_bit(index) is equivalent for malachite-gmp and malachite-native.
-    let natural_u64_and_bool = |mut gmp_n: gmp::Natural, index: u64, bit: bool| {
-        let mut n = gmp_natural_to_native(&gmp_n);
+    // n.assign_bit(index) is equivalent for malachite and rugint.
+    let natural_u64_and_bool = |mut n: Natural, index: u64, bit: bool| {
         let old_n = n.clone();
-        gmp_n.assign_bit(index, bit);
-        assert!(gmp_n.is_valid());
-
         n.assign_bit(index, bit);
         assert!(n.is_valid());
-        assert_eq!(gmp_natural_to_native(&gmp_n), n);
 
-        let mut rugint_n = native_natural_to_rugint_integer(&old_n);
+        let mut rugint_n = natural_to_rugint_integer(&old_n);
         rugint_n.set_bit(index as u32, bit);
-        assert_eq!(rugint_integer_to_native_natural(&rugint_n), n);
+        assert_eq!(rugint_integer_to_natural(&rugint_n), n);
     };
 
     for (n, index, bit) in select_inputs(GenerationMode::Exhaustive).take(LARGE_LIMIT) {

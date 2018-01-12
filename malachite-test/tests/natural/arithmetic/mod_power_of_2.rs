@@ -1,9 +1,8 @@
 use common::LARGE_LIMIT;
 use malachite_base::round::RoundingMode;
 use malachite_base::traits::{One, ShrRound, Zero};
-use malachite_gmp::natural as gmp;
-use malachite_native::natural as native;
-use malachite_test::common::{gmp_natural_to_native, native_natural_to_gmp, GenerationMode};
+use malachite_nz::natural::Natural;
+use malachite_test::common::GenerationMode;
 use malachite_test::natural::arithmetic::mod_power_of_2::select_inputs;
 use rust_wheels::iterators::common::EXAMPLE_SEED;
 use rust_wheels::iterators::integers_geometric::natural_u32s_geometric;
@@ -17,29 +16,16 @@ use std::str::FromStr;
 #[test]
 fn test_mod_power_of_2() {
     let test = |u, v: u32, out| {
-        let mut n = native::Natural::from_str(u).unwrap();
+        let mut n = Natural::from_str(u).unwrap();
         n.mod_power_of_2_assign(v);
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let mut n = gmp::Natural::from_str(u).unwrap();
-        n.mod_power_of_2_assign(v);
+        let n = Natural::from_str(u).unwrap().mod_power_of_2(v);
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = native::Natural::from_str(u).unwrap().mod_power_of_2(v);
-        assert_eq!(n.to_string(), out);
-        assert!(n.is_valid());
-
-        let n = gmp::Natural::from_str(u).unwrap().mod_power_of_2(v);
-        assert_eq!(n.to_string(), out);
-        assert!(n.is_valid());
-
-        let n = native::Natural::from_str(u).unwrap().mod_power_of_2_ref(v);
-        assert_eq!(n.to_string(), out);
-        assert!(n.is_valid());
-
-        let n = gmp::Natural::from_str(u).unwrap().mod_power_of_2_ref(v);
+        let n = Natural::from_str(u).unwrap().mod_power_of_2_ref(v);
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
     };
@@ -69,31 +55,16 @@ fn test_mod_power_of_2() {
 #[test]
 fn test_neg_mod_power_of_2() {
     let test = |u, v: u32, out| {
-        let mut n = native::Natural::from_str(u).unwrap();
+        let mut n = Natural::from_str(u).unwrap();
         n.neg_mod_power_of_2_assign(v);
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let mut n = gmp::Natural::from_str(u).unwrap();
-        n.neg_mod_power_of_2_assign(v);
+        let n = Natural::from_str(u).unwrap().neg_mod_power_of_2(v);
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = native::Natural::from_str(u).unwrap().neg_mod_power_of_2(v);
-        assert_eq!(n.to_string(), out);
-        assert!(n.is_valid());
-
-        let n = gmp::Natural::from_str(u).unwrap().neg_mod_power_of_2(v);
-        assert_eq!(n.to_string(), out);
-        assert!(n.is_valid());
-
-        let n = native::Natural::from_str(u)
-            .unwrap()
-            .neg_mod_power_of_2_ref(v);
-        assert_eq!(n.to_string(), out);
-        assert!(n.is_valid());
-
-        let n = gmp::Natural::from_str(u).unwrap().neg_mod_power_of_2_ref(v);
+        let n = Natural::from_str(u).unwrap().neg_mod_power_of_2_ref(v);
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
     };
@@ -123,9 +94,6 @@ fn test_neg_mod_power_of_2() {
 
 #[test]
 fn mod_power_of_2_properties() {
-    // n.mod_power_of_2(u) is equivalent for malachite-gmp and malachite-native.
-    // n.mod_power_of_2(u) is equivalent for malachite-gmp and malachite-native.
-    // n.mod_power_of_2_ref(u) is equivalent for malachite-gmp and malachite-native.
     // n.mod_power_of_2_assign(u); n is valid.
     // n.mod_power_of_2(u) is valid.
     // n.mod_power_of_2_ref(u) is valid.
@@ -135,15 +103,10 @@ fn mod_power_of_2_properties() {
     // n.mod_power_of_2(u) < (1 << u)
     // (n.mod_power_of_2(u) == 0) == n.divisible_by_power_of_2(u)
     // n.mod_power_of_2(u).mod_power_of_2(u) == n.mod_power_of_2(u)
-    let natural_and_u32 = |mut gmp_n: gmp::Natural, u: u32| {
-        let mut n = gmp_natural_to_native(&gmp_n);
+    let natural_and_u32 = |mut n: Natural, u: u32| {
         let old_n = n.clone();
-        gmp_n.mod_power_of_2_assign(u);
-        assert!(gmp_n.is_valid());
-
         n.mod_power_of_2_assign(u);
         assert!(n.is_valid());
-        assert_eq!(gmp_natural_to_native(&gmp_n), n);
 
         let n2 = old_n.clone();
         let result = n2.mod_power_of_2_ref(u);
@@ -153,40 +116,29 @@ fn mod_power_of_2_properties() {
         assert!(result.is_valid());
         assert_eq!(result, n);
 
-        let gmp_n2 = native_natural_to_gmp(&old_n);
-        let result = gmp_n2.mod_power_of_2_ref(u);
-        assert!(result.is_valid());
-        assert_eq!(gmp_natural_to_native(&result), n);
-        let result = gmp_n2.mod_power_of_2(u);
-        assert!(result.is_valid());
-        assert_eq!(gmp_natural_to_native(&result), n);
-
         assert_eq!((&old_n >> u << u) + &n, old_n);
-        assert!(n < (native::Natural::ONE << u));
+        assert!(n < (Natural::ONE << u));
         assert_eq!(n == 0, old_n.divisible_by_power_of_2(u));
         assert_eq!(n.mod_power_of_2_ref(u), n);
     };
 
     // If n is divisible by 2^u, n.mod_power_of_2(u) == 0
-    let natural_and_u32_divisible = |gmp_n: gmp::Natural, u: u32| {
-        let n = gmp_natural_to_native(&gmp_n);
+    let natural_and_u32_divisible = |n: Natural, u: u32| {
         assert_eq!(n.mod_power_of_2(u), 0);
     };
 
     // If n is not divisible by 2^u, n.mod_power_of_2(u) != 0
     // If n is not divisible by 2^u, n.mod_power_of_2(u) + n.neg_mod_power_of_2(u) == 1 << u
-    let natural_and_u32_non_divisible = |gmp_n: gmp::Natural, u: u32| {
-        let n = gmp_natural_to_native(&gmp_n);
+    let natural_and_u32_non_divisible = |n: Natural, u: u32| {
         assert_ne!(n.mod_power_of_2_ref(u), 0);
         assert_eq!(
             n.mod_power_of_2_ref(u) + n.neg_mod_power_of_2(u),
-            native::Natural::ONE << u
+            Natural::ONE << u
         );
     };
 
     // n.mod_power_of_2(u).mod_power_of_2(v) == n.mod_power_of_2(min(u, v))
-    let natural_and_two_u32s = |gmp_n: gmp::Natural, u: u32, v: u32| {
-        let n = gmp_natural_to_native(&gmp_n);
+    let natural_and_two_u32s = |n: Natural, u: u32, v: u32| {
         assert_eq!(
             n.mod_power_of_2_ref(u).mod_power_of_2(v),
             n.mod_power_of_2(min(u, v))
@@ -194,14 +146,13 @@ fn mod_power_of_2_properties() {
     };
 
     // n.mod_power_of_2(0) == 0
-    let one_natural = |gmp_n: gmp::Natural| {
-        let n = gmp_natural_to_native(&gmp_n);
+    let one_natural = |n: Natural| {
         assert_eq!(n.mod_power_of_2_ref(0), 0);
     };
 
     // 0.mod_power_of_2(n) == 0
     let one_u32 = |u: u32| {
-        assert_eq!(native::Natural::ZERO.mod_power_of_2(u), 0);
+        assert_eq!(Natural::ZERO.mod_power_of_2(u), 0);
     };
 
     for (n, u) in select_inputs(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
@@ -283,9 +234,6 @@ fn mod_power_of_2_properties() {
 
 #[test]
 fn neg_mod_power_of_2_properties() {
-    // n.neg_mod_power_of_2(u) is equivalent for malachite-gmp and malachite-native.
-    // n.neg_mod_power_of_2(u) is equivalent for malachite-gmp and malachite-native.
-    // n.neg_mod_power_of_2_ref(u) is equivalent for malachite-gmp and malachite-native.
     // n.neg_mod_power_of_2_assign(u); n is valid.
     // n.neg_mod_power_of_2(u) is valid.
     // n.neg_mod_power_of_2_ref(u) is valid.
@@ -296,15 +244,10 @@ fn neg_mod_power_of_2_properties() {
     // (n.neg_mod_power_of_2(u) == 0) == n.divisible_by_power_of_2(u)
     // n.neg_mod_power_of_2(u).neg_mod_power_of_2(u) == n.mod_power_of_2(u)
     // n.neg_mod_power_of_2(u) = (-n).mod_power_of_2(u)
-    let natural_and_u32 = |mut gmp_n: gmp::Natural, u: u32| {
-        let mut n = gmp_natural_to_native(&gmp_n);
+    let natural_and_u32 = |mut n: Natural, u: u32| {
         let old_n = n.clone();
-        gmp_n.neg_mod_power_of_2_assign(u);
-        assert!(gmp_n.is_valid());
-
         n.neg_mod_power_of_2_assign(u);
         assert!(n.is_valid());
-        assert_eq!(gmp_natural_to_native(&gmp_n), n);
 
         let n2 = old_n.clone();
         let result = n2.neg_mod_power_of_2_ref(u);
@@ -314,47 +257,36 @@ fn neg_mod_power_of_2_properties() {
         assert!(result.is_valid());
         assert_eq!(result, n);
 
-        let gmp_n2 = native_natural_to_gmp(&old_n);
-        let result = gmp_n2.neg_mod_power_of_2_ref(u);
-        assert!(result.is_valid());
-        assert_eq!(gmp_natural_to_native(&result), n);
-        let result = gmp_n2.neg_mod_power_of_2(u);
-        assert!(result.is_valid());
-        assert_eq!(gmp_natural_to_native(&result), n);
-
         assert_eq!(
             (((&old_n).shr_round(u, RoundingMode::Ceiling) << u) - &n),
             Some(old_n.clone())
         );
-        assert!(n < (native::Natural::ONE << u));
+        assert!(n < (Natural::ONE << u));
         assert_eq!(n == 0, old_n.divisible_by_power_of_2(u));
         assert_eq!(n.neg_mod_power_of_2_ref(u), old_n.mod_power_of_2_ref(u));
         assert_eq!(n, (-old_n).mod_power_of_2(u));
     };
 
     // If n is divisible by 2^u, n.neg_mod_power_of_2(u) == 0
-    let natural_and_u32_divisible = |gmp_n: gmp::Natural, u: u32| {
-        let n = gmp_natural_to_native(&gmp_n);
+    let natural_and_u32_divisible = |n: Natural, u: u32| {
         assert_eq!(n.neg_mod_power_of_2(u), 0);
     };
 
-    let natural_and_u32_non_divisible = |gmp_n: gmp::Natural, u: u32| {
-        let n = gmp_natural_to_native(&gmp_n);
+    let natural_and_u32_non_divisible = |n: Natural, u: u32| {
         let m = n.neg_mod_power_of_2_ref(u);
         assert_ne!(m, 0);
         assert_eq!(((((&n >> u) + 1) << u) - &m), Some(n.clone()));
-        assert_eq!(n.mod_power_of_2(u) + m, native::Natural::ONE << u);
+        assert_eq!(n.mod_power_of_2(u) + m, Natural::ONE << u);
     };
 
     // n.neg_mod_power_of_2(0) == 0
-    let one_natural = |gmp_n: gmp::Natural| {
-        let n = gmp_natural_to_native(&gmp_n);
+    let one_natural = |n: Natural| {
         assert_eq!(n.neg_mod_power_of_2_ref(0), 0);
     };
 
     // 0.neg_mod_power_of_2(n) == 0
     let one_u32 = |u: u32| {
-        assert_eq!(native::Natural::ZERO.neg_mod_power_of_2(u), 0);
+        assert_eq!(Natural::ZERO.neg_mod_power_of_2(u), 0);
     };
 
     for (n, u) in select_inputs(GenerationMode::Exhaustive).take(LARGE_LIMIT) {

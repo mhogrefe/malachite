@@ -1,24 +1,18 @@
 use common::LARGE_LIMIT;
-use malachite_native::natural as native;
-use malachite_gmp::natural as gmp;
-use malachite_test::common::{gmp_natural_to_native, num_biguint_to_native_natural,
-                             rugint_integer_to_native_natural, GenerationMode};
+use malachite_nz::natural::Natural;
+use malachite_test::common::{biguint_to_natural, rugint_integer_to_natural, GenerationMode};
 use malachite_test::natural::conversion::from_u32::select_inputs;
-use num;
+use num::BigUint;
 use rugint;
 
 #[test]
 fn test_from_u32() {
     let test = |u: u32, out| {
-        let x = native::Natural::from(u);
+        let x = Natural::from(u);
         assert_eq!(x.to_string(), out);
         assert!(x.is_valid());
 
-        let x = gmp::Natural::from(u);
-        assert_eq!(x.to_string(), out);
-        assert!(x.is_valid());
-
-        assert_eq!(num::BigUint::from(u).to_string(), out);
+        assert_eq!(BigUint::from(u).to_string(), out);
 
         assert_eq!(rugint::Integer::from(u).to_string(), out);
     };
@@ -30,18 +24,14 @@ fn test_from_u32() {
 #[test]
 fn from_u32_properties() {
     // from(u: u32) is valid.
-    // from(u: u32) is equivalent for malachite-gmp, malachite-native, num, and rugint.
+    // from(u: u32) is equivalent for malachite, num, and rugint.
     // from(u: u32).to_u32() == Some(u)
     let one_u32 = |u: u32| {
-        let n = native::Natural::from(u);
-        let raw_gmp_n = gmp::Natural::from(u);
-        assert!(raw_gmp_n.is_valid());
-        let gmp_n = gmp_natural_to_native(&raw_gmp_n);
-        let num_n = num_biguint_to_native_natural(&num::BigUint::from(u));
-        let rugint_n = rugint_integer_to_native_natural(&rugint::Integer::from(u));
+        let n = Natural::from(u);
+        let num_n = biguint_to_natural(&BigUint::from(u));
+        let rugint_n = rugint_integer_to_natural(&rugint::Integer::from(u));
         assert!(n.is_valid());
         assert_eq!(n.to_u32(), Some(u));
-        assert_eq!(n, gmp_n);
         assert_eq!(n, num_n);
         assert_eq!(n, rugint_n);
     };

@@ -1,5 +1,5 @@
-use malachite::natural::Natural;
-use malachite::natural::random::random_natural_below::random_natural_below;
+use malachite_nz::natural::Natural;
+use malachite_nz::natural::random::random_natural_below;
 use rand::{SeedableRng, StdRng};
 use std::str::FromStr;
 

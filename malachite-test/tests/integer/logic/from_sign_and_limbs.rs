@@ -1,18 +1,13 @@
 use common::LARGE_LIMIT;
-use malachite_native::integer as native;
-use malachite_gmp::integer as gmp;
-use malachite_test::common::{gmp_integer_to_native, GenerationMode};
+use malachite_nz::integer::Integer;
+use malachite_test::common::GenerationMode;
 use malachite_test::integer::logic::from_sign_and_limbs::select_inputs;
 use std::cmp::Ordering;
 
 #[test]
 fn test_from_sign_and_limbs_le() {
     let test = |sign: Ordering, limbs: &[u32], out| {
-        let x = native::Integer::from_sign_and_limbs_le(sign, limbs);
-        assert_eq!(x.to_string(), out);
-        assert!(x.is_valid());
-
-        let x = gmp::Integer::from_sign_and_limbs_le(sign, limbs);
+        let x = Integer::from_sign_and_limbs_le(sign, limbs);
         assert_eq!(x.to_string(), out);
         assert!(x.is_valid());
     };
@@ -44,53 +39,28 @@ fn test_from_sign_and_limbs_le() {
 #[test]
 #[should_panic(expected = "sign should be Equal iff limbs only contains zeros. sign: Equal, \
                            limbs: [1]")]
-fn from_sign_and_limbs_le_fail_native_1() {
-    native::Integer::from_sign_and_limbs_le(Ordering::Equal, &[1]);
+fn from_sign_and_limbs_le_fail_1() {
+    Integer::from_sign_and_limbs_le(Ordering::Equal, &[1]);
 }
 
 #[test]
 #[should_panic(expected = "sign should be Equal iff limbs only contains zeros. sign: Greater, \
                            limbs: []")]
-fn from_sign_and_limbs_le_fail_native_2() {
-    native::Integer::from_sign_and_limbs_le(Ordering::Greater, &[]);
+fn from_sign_and_limbs_le_fail_2() {
+    Integer::from_sign_and_limbs_le(Ordering::Greater, &[]);
 }
 
 #[test]
 #[should_panic(expected = "sign should be Equal iff limbs only contains zeros. sign: Greater, \
                            limbs: [0, 0, 0]")]
-fn from_sign_and_limbs_le_fail_native_3() {
-    native::Integer::from_sign_and_limbs_le(Ordering::Greater, &[0, 0, 0]);
-}
-
-#[test]
-#[should_panic(expected = "sign should be Equal iff limbs only contains zeros. sign: Equal, \
-                           limbs: [1]")]
-fn from_sign_and_limbs_le_fail_gmp_1() {
-    gmp::Integer::from_sign_and_limbs_le(Ordering::Equal, &[1]);
-}
-
-#[test]
-#[should_panic(expected = "sign should be Equal iff limbs only contains zeros. sign: Greater, \
-                           limbs: []")]
-fn from_sign_and_limbs_le_fail_gmp_2() {
-    gmp::Integer::from_sign_and_limbs_le(Ordering::Greater, &[]);
-}
-
-#[test]
-#[should_panic(expected = "sign should be Equal iff limbs only contains zeros. sign: Greater, \
-                           limbs: [0, 0, 0]")]
-fn from_sign_and_limbs_le_fail_gmp_3() {
-    gmp::Integer::from_sign_and_limbs_le(Ordering::Greater, &[0, 0, 0]);
+fn from_sign_and_limbs_le_fail_3() {
+    Integer::from_sign_and_limbs_le(Ordering::Greater, &[0, 0, 0]);
 }
 
 #[test]
 fn test_from_sign_and_limbs_be() {
     let test = |sign: Ordering, limbs: &[u32], out| {
-        let x = native::Integer::from_sign_and_limbs_be(sign, limbs);
-        assert_eq!(x.to_string(), out);
-        assert!(x.is_valid());
-
-        let x = gmp::Integer::from_sign_and_limbs_be(sign, limbs);
+        let x = Integer::from_sign_and_limbs_be(sign, limbs);
         assert_eq!(x.to_string(), out);
         assert!(x.is_valid());
     };
@@ -122,59 +92,32 @@ fn test_from_sign_and_limbs_be() {
 #[test]
 #[should_panic(expected = "sign should be Equal iff limbs only contains zeros. sign: Equal, \
                            limbs: [1]")]
-fn from_sign_and_limbs_be_fail_native_1() {
-    native::Integer::from_sign_and_limbs_be(Ordering::Equal, &[1]);
+fn from_sign_and_limbs_be_fail_1() {
+    Integer::from_sign_and_limbs_be(Ordering::Equal, &[1]);
 }
 
 #[test]
 #[should_panic(expected = "sign should be Equal iff limbs only contains zeros. sign: Greater, \
                            limbs: []")]
-fn from_sign_and_limbs_be_fail_native_2() {
-    native::Integer::from_sign_and_limbs_be(Ordering::Greater, &[]);
+fn from_sign_and_limbs_be_fail_2() {
+    Integer::from_sign_and_limbs_be(Ordering::Greater, &[]);
 }
 
 #[test]
 #[should_panic(expected = "sign should be Equal iff limbs only contains zeros. sign: Greater, \
                            limbs: [0, 0, 0]")]
-fn from_sign_and_limbs_be_fail_native_3() {
-    native::Integer::from_sign_and_limbs_be(Ordering::Greater, &[0, 0, 0]);
-}
-
-#[test]
-#[should_panic(expected = "sign should be Equal iff limbs only contains zeros. sign: Equal, \
-                           limbs: [1]")]
-fn from_sign_and_limbs_be_fail_gmp_1() {
-    gmp::Integer::from_sign_and_limbs_be(Ordering::Equal, &[1]);
-}
-
-#[test]
-#[should_panic(expected = "sign should be Equal iff limbs only contains zeros. sign: Greater, \
-                           limbs: []")]
-fn from_sign_and_limbs_be_fail_gmp_2() {
-    gmp::Integer::from_sign_and_limbs_be(Ordering::Greater, &[]);
-}
-
-#[test]
-#[should_panic(expected = "sign should be Equal iff limbs only contains zeros. sign: Greater, \
-                           limbs: [0, 0, 0]")]
-fn from_sign_and_limbs_be_fail_gmp_3() {
-    gmp::Integer::from_sign_and_limbs_be(Ordering::Greater, &[0, 0, 0]);
+fn from_sign_and_limbs_be_fail_3() {
+    Integer::from_sign_and_limbs_be(Ordering::Greater, &[0, 0, 0]);
 }
 
 #[test]
 fn from_sign_and_limbs_le_properties() {
-    // Integer::from_sign_and_limbs_le(sign, limbs) is equivalent for malachite-gmp and
-    // malachite-native.
     // x := Integer::from_sign_and_limbs_le(sign, limbs); x.sign() == sign and
     //      x.limbs_le() == limbs.rev().skip_while(|u| u == 0).rev()
     // Integer::from_sign_and-limbs_le(sign, limbs.reverse()) ==
     //      Integer::from_sign_and_limbs_be(sign, limbs)
     let ordering_and_u32_slice = |sign: Ordering, limbs: &[u32]| {
-        let x = native::Integer::from_sign_and_limbs_le(sign, limbs);
-        assert_eq!(
-            gmp_integer_to_native(&gmp::Integer::from_sign_and_limbs_le(sign, limbs)),
-            x
-        );
+        let x = Integer::from_sign_and_limbs_le(sign, limbs);
         let mut trimmed_limbs: Vec<u32> = limbs
             .iter()
             .cloned()
@@ -186,7 +129,7 @@ fn from_sign_and_limbs_le_properties() {
         assert_eq!(sign_2, sign);
         assert_eq!(limbs_2, trimmed_limbs);
         assert_eq!(
-            native::Integer::from_sign_and_limbs_be(
+            Integer::from_sign_and_limbs_be(
                 sign,
                 &limbs.iter().cloned().rev().collect::<Vec<u32>>(),
             ),
@@ -210,18 +153,12 @@ fn from_sign_and_limbs_le_properties() {
 
 #[test]
 fn from_sign_and_limbs_be_properties() {
-    // Integer::from_sign_and_limbs_be(sign, limbs) is equivalent for malachite-gmp and
-    // malachite-native.
     // x := Integer::from_sign_and_limbs_be(sign, limbs); x.sign() == sign and
     //      x.limbs_le() == limbs.skip_while(|u| u == 0)
     // Integer::from_sign_and-limbs_be(sign, limbs.reverse()) ==
     //      Integer::from_sign_and_limbs_le(sign, limbs)
     let ordering_and_u32_slice = |sign: Ordering, limbs: &[u32]| {
-        let x = native::Integer::from_sign_and_limbs_be(sign, limbs);
-        assert_eq!(
-            gmp_integer_to_native(&gmp::Integer::from_sign_and_limbs_be(sign, limbs)),
-            x
-        );
+        let x = Integer::from_sign_and_limbs_be(sign, limbs);
         let (sign_2, limbs_2) = x.sign_and_limbs_be();
         assert_eq!(sign_2, sign);
         assert_eq!(
@@ -233,7 +170,7 @@ fn from_sign_and_limbs_be_properties() {
                 .collect::<Vec<u32>>()
         );
         assert_eq!(
-            native::Integer::from_sign_and_limbs_le(
+            Integer::from_sign_and_limbs_le(
                 sign,
                 &limbs.iter().cloned().rev().collect::<Vec<u32>>(),
             ),

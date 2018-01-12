@@ -1,9 +1,7 @@
 use common::LARGE_LIMIT;
-use malachite_native as native;
-use malachite_gmp as gmp;
-use malachite_test::common::{gmp_integer_to_native, gmp_natural_to_native,
-                             native_integer_to_rugint, native_natural_to_rugint_integer,
-                             GenerationMode};
+use malachite_nz::integer::Integer;
+use malachite_nz::natural::Natural;
+use malachite_test::common::{integer_to_rugint_integer, natural_to_rugint_integer, GenerationMode};
 use malachite_test::integer::comparison::partial_ord_natural::select_inputs_2;
 use rust_wheels::iterators::common::EXAMPLE_SEED;
 use rust_wheels::iterators::integers::{exhaustive_integers, random_integers};
@@ -16,29 +14,16 @@ use std::str::FromStr;
 fn test_partial_ord_integer_natural() {
     let test = |u, v, out| {
         assert_eq!(
-            native::integer::Integer::from_str(u)
+            Integer::from_str(u)
                 .unwrap()
-                .partial_cmp(&native::natural::Natural::from_str(v).unwrap(),),
-            out
-        );
-        assert_eq!(
-            gmp::integer::Integer::from_str(u)
-                .unwrap()
-                .partial_cmp(&gmp::natural::Natural::from_str(v).unwrap(),),
+                .partial_cmp(&Natural::from_str(v).unwrap(),),
             out
         );
 
         assert_eq!(
-            native::natural::Natural::from_str(v)
+            Natural::from_str(v)
                 .unwrap()
-                .partial_cmp(&native::integer::Integer::from_str(u).unwrap())
-                .map(|o| o.reverse()),
-            out
-        );
-        assert_eq!(
-            gmp::natural::Natural::from_str(v)
-                .unwrap()
-                .partial_cmp(&gmp::integer::Integer::from_str(u).unwrap())
+                .partial_cmp(&Integer::from_str(u).unwrap())
                 .map(|o| o.reverse()),
             out
         );
@@ -57,24 +42,20 @@ fn test_partial_ord_integer_natural() {
 
 #[test]
 fn partial_cmp_integer_natural_properties() {
-    // x.partial_cmp(&y) is equivalent for malachite-gmp, malachite-native, and rugint.
+    // x.partial_cmp(&y) is equivalent for malachite and rugint.
     // x.into_integer().partial_cmp(&y) is equivalent to x.partial_cmp(&y).
     // x < y <=> y > x, x > y <=> y < x, and x == y <=> y == x.
-    let natural_and_integer = |gmp_x: gmp::natural::Natural, gmp_y: gmp::integer::Integer| {
-        let x = gmp_natural_to_native(&gmp_x);
-        let y = gmp_integer_to_native(&gmp_y);
+    let natural_and_integer = |x: Natural, y: Integer| {
         let cmp_1 = x.partial_cmp(&y);
-        assert_eq!(gmp_x.partial_cmp(&gmp_y), cmp_1);
         assert_eq!(
-            native_natural_to_rugint_integer(&x).partial_cmp(&native_integer_to_rugint(&y)),
+            natural_to_rugint_integer(&x).partial_cmp(&integer_to_rugint_integer(&y)),
             cmp_1
         );
         assert_eq!(x.to_integer().cmp(&y), cmp_1.unwrap());
 
         let cmp_2 = y.partial_cmp(&x);
-        assert_eq!(gmp_y.partial_cmp(&gmp_x), cmp_2);
         assert_eq!(
-            native_integer_to_rugint(&y).partial_cmp(&native_natural_to_rugint_integer(&x)),
+            integer_to_rugint_integer(&y).partial_cmp(&natural_to_rugint_integer(&x)),
             cmp_2
         );
         assert_eq!(cmp_2, cmp_1.map(|o| o.reverse()));
@@ -83,35 +64,23 @@ fn partial_cmp_integer_natural_properties() {
 
     // x < y and y < z => x < z
     // x > y and y > z => x > z
-    let natural_integer_and_natural =
-        |gmp_x: gmp::natural::Natural,
-         gmp_y: gmp::integer::Integer,
-         gmp_z: gmp::natural::Natural| {
-            let x = gmp_natural_to_native(&gmp_x);
-            let y = gmp_integer_to_native(&gmp_y);
-            let z = gmp_natural_to_native(&gmp_z);
-            if x < y && y < z {
-                assert!(x < z);
-            } else if x > y && y > z {
-                assert!(x > z);
-            }
-        };
+    let natural_integer_and_natural = |x: Natural, y: Integer, z: Natural| {
+        if x < y && y < z {
+            assert!(x < z);
+        } else if x > y && y > z {
+            assert!(x > z);
+        }
+    };
 
     // y < x and x < z => y < z
     // y > x and x > z => y > z
-    let integer_natural_and_integer =
-        |gmp_x: gmp::integer::Integer,
-         gmp_y: gmp::natural::Natural,
-         gmp_z: gmp::integer::Integer| {
-            let x = gmp_integer_to_native(&gmp_x);
-            let y = gmp_natural_to_native(&gmp_y);
-            let z = gmp_integer_to_native(&gmp_z);
-            if x < y && y < z {
-                assert!(x < z);
-            } else if x > y && y > z {
-                assert!(x > z);
-            }
-        };
+    let integer_natural_and_integer = |x: Integer, y: Natural, z: Integer| {
+        if x < y && y < z {
+            assert!(x < z);
+        } else if x > y && y > z {
+            assert!(x > z);
+        }
+    };
 
     for (x, y) in select_inputs_2(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         natural_and_integer(x, y);

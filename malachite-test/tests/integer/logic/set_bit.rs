@@ -1,20 +1,14 @@
 use common::LARGE_LIMIT;
 use malachite_base::traits::NotAssign;
-use malachite_native::integer as native;
-use malachite_gmp::integer as gmp;
-use malachite_test::common::{gmp_integer_to_native, GenerationMode};
+use malachite_nz::integer::Integer;
+use malachite_test::common::GenerationMode;
 use malachite_test::integer::logic::set_bit::select_inputs;
 use std::str::FromStr;
 
 #[test]
 fn test_set_bit() {
     let test = |u, index, out| {
-        let mut n = native::Integer::from_str(u).unwrap();
-        n.set_bit(index);
-        assert_eq!(n.to_string(), out);
-        assert!(n.is_valid());
-
-        let mut n = gmp::Integer::from_str(u).unwrap();
+        let mut n = Integer::from_str(u).unwrap();
         n.set_bit(index);
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
@@ -41,22 +35,16 @@ fn test_set_bit() {
 
 #[test]
 fn set_bit_properties() {
-    // n.set_bit(index) is equivalent for malachite-gmp and malachite-native.
     // n.set_bit(index) is equivalent to n.assign_bit(index, true).
     // n.set_bit(index); n != 0
     // Setting a bit does not decrease n.
     // If n.get_bit(index), setting at index won't do anything.
     // If !n.get_bit(index), setting and then clearing at index won't do anything.
     // { n.set_bit(index) } is equivalent to { n := !n; n.clear_bit(index); n := !n }
-    let integer_and_u64 = |mut gmp_n: gmp::Integer, index: u64| {
-        let mut n = gmp_integer_to_native(&gmp_n);
+    let integer_and_u64 = |mut n: Integer, index: u64| {
         let old_n = n.clone();
-        gmp_n.set_bit(index);
-        assert!(gmp_n.is_valid());
-
         n.set_bit(index);
         assert!(n.is_valid());
-        assert_eq!(gmp_integer_to_native(&gmp_n), n);
 
         let mut n2 = old_n.clone();
         n2.assign_bit(index, true);

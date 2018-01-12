@@ -1,11 +1,9 @@
 use common::LARGE_LIMIT;
 use malachite_base::traits::Assign;
-use malachite_native as native;
-use malachite_gmp as gmp;
-use malachite_test::common::{gmp_integer_to_native, gmp_natural_to_native,
-                             native_integer_to_rugint, native_natural_to_gmp,
-                             native_natural_to_rugint_integer, rugint_integer_to_native_natural,
-                             GenerationMode};
+use malachite_nz::integer::Integer;
+use malachite_nz::natural::Natural;
+use malachite_test::common::{integer_to_rugint_integer, natural_to_rugint_integer,
+                             rugint_integer_to_integer, GenerationMode};
 use malachite_test::integer::conversion::natural_assign_integer::select_inputs;
 use rugint;
 use rugint::Assign as rugint_assign;
@@ -15,13 +13,8 @@ use std::str::FromStr;
 fn test_natural_assign_integer() {
     let test = |u, v, out| {
         // assign Integer by value
-        let mut x = native::natural::Natural::from_str(u).unwrap();
-        x.assign(native::integer::Integer::from_str(v).unwrap());
-        assert_eq!(x.to_string(), out);
-        assert!(x.is_valid());
-
-        let mut x = gmp::natural::Natural::from_str(u).unwrap();
-        x.assign(gmp::integer::Integer::from_str(v).unwrap());
+        let mut x = Natural::from_str(u).unwrap();
+        x.assign(Integer::from_str(v).unwrap());
         assert_eq!(x.to_string(), out);
         assert!(x.is_valid());
 
@@ -30,13 +23,8 @@ fn test_natural_assign_integer() {
         assert_eq!(x.to_string(), out);
 
         // assign Integer by reference
-        let mut x = native::natural::Natural::from_str(u).unwrap();
-        x.assign(&native::integer::Integer::from_str(v).unwrap());
-        assert_eq!(x.to_string(), out);
-        assert!(x.is_valid());
-
-        let mut x = gmp::natural::Natural::from_str(u).unwrap();
-        x.assign(&gmp::integer::Integer::from_str(v).unwrap());
+        let mut x = Natural::from_str(u).unwrap();
+        x.assign(&Integer::from_str(v).unwrap());
         assert_eq!(x.to_string(), out);
         assert!(x.is_valid());
 
@@ -52,53 +40,37 @@ fn test_natural_assign_integer() {
 
 #[test]
 #[should_panic(expected = "Cannot assign from a negative Integer. Invalid other: -456")]
-fn natural_assign_integer_fail_native() {
-    let mut x = native::natural::Natural::from_str("123").unwrap();
-    x.assign(&native::integer::Integer::from_str("-456").unwrap());
-}
-
-#[test]
-#[should_panic(expected = "Cannot assign from a negative Integer. Invalid other: -456")]
-fn natural_assign_integer_fail_gmp() {
-    let mut x = gmp::natural::Natural::from_str("123").unwrap();
-    x.assign(&gmp::integer::Integer::from_str("-456").unwrap());
+fn natural_assign_integer_fail() {
+    let mut x = Natural::from_str("123").unwrap();
+    x.assign(&Integer::from_str("-456").unwrap());
 }
 
 #[test]
 fn natural_assign_integer_properties() {
-    // x.assign(y) is equivalent for malachite-gmp, malachite-native, and rugint.
+    // x.assign(y) is equivalent for malachite and rugint.
     // x.assign(y) is valid.
     // x.assign(y); x == y
-    // x.assign(&y) is equivalent for malachite-gmp, malachite-native, and rugint.
+    // x.assign(&y) is equivalent for malachite and rugint.
     // x.assign(&y) is valid.
     // x.assign(&y); x == y
-    let natural_and_integer = |mut gmp_x: gmp::natural::Natural, gmp_y: gmp::integer::Integer| {
-        let mut x = gmp_natural_to_native(&gmp_x);
-        let y = gmp_integer_to_native(&gmp_y);
+    let natural_and_integer = |mut x: Natural, y: Integer| {
         let old_x = x.clone();
-        gmp_x.assign(gmp_y.clone());
-        assert!(gmp_x.is_valid());
-        assert_eq!(gmp_x, gmp_y);
         x.assign(y.clone());
         assert!(x.is_valid());
         assert_eq!(x, y);
-        let mut rugint_x = native_natural_to_rugint_integer(&old_x);
-        let rugint_y = native_integer_to_rugint(&y);
+        let mut rugint_x = natural_to_rugint_integer(&old_x);
+        let rugint_y = integer_to_rugint_integer(&y);
         rugint_x.assign(rugint_y);
-        assert_eq!(rugint_integer_to_native_natural(&rugint_x), y);
+        assert_eq!(rugint_integer_to_integer(&rugint_x), y);
 
         x = old_x.clone();
-        gmp_x = native_natural_to_gmp(&old_x);
-        gmp_x.assign(&gmp_y);
-        assert!(gmp_x.is_valid());
-        assert_eq!(gmp_x, gmp_y);
         x.assign(&y);
         assert!(x.is_valid());
         assert_eq!(x, y);
-        let mut rugint_x = native_natural_to_rugint_integer(&old_x);
-        let rugint_y = native_integer_to_rugint(&y);
+        let mut rugint_x = natural_to_rugint_integer(&old_x);
+        let rugint_y = integer_to_rugint_integer(&y);
         rugint_x.assign(&rugint_y);
-        assert_eq!(rugint_integer_to_native_natural(&rugint_x), y);
+        assert_eq!(rugint_integer_to_integer(&rugint_x), y);
     };
 
     for (x, y) in select_inputs(GenerationMode::Exhaustive).take(LARGE_LIMIT) {

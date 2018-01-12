@@ -1,12 +1,10 @@
 use common::LARGE_LIMIT;
 use malachite_base::traits::Zero;
-use malachite_native::integer as native;
-use malachite_gmp::integer as gmp;
-use malachite_test::common::{gmp_integer_to_native, native_integer_to_num_bigint,
-                             native_integer_to_rugint, num_bigint_to_native_integer,
-                             rugint_integer_to_native, GenerationMode};
+use malachite_nz::integer::Integer;
+use malachite_test::common::{bigint_to_integer, integer_to_bigint, integer_to_rugint_integer,
+                             rugint_integer_to_integer, GenerationMode};
 use malachite_test::integer::arithmetic::add::select_inputs;
-use num;
+use num::BigInt;
 use rugint;
 use rust_wheels::iterators::common::EXAMPLE_SEED;
 use rust_wheels::iterators::general::random_x;
@@ -17,62 +15,35 @@ use rust_wheels::iterators::tuples::{exhaustive_pairs, exhaustive_triples_from_s
 use std::str::FromStr;
 
 #[test]
-#[allow(unknown_lints, cyclomatic_complexity)]
 fn test_add() {
     let test = |u, v, out| {
-        let mut n = native::Integer::from_str(u).unwrap();
-        n += native::Integer::from_str(v).unwrap();
+        let mut n = Integer::from_str(u).unwrap();
+        n += Integer::from_str(v).unwrap();
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let mut n = native::Integer::from_str(u).unwrap();
-        n += &native::Integer::from_str(v).unwrap();
+        let mut n = Integer::from_str(u).unwrap();
+        n += &Integer::from_str(v).unwrap();
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let mut n = gmp::Integer::from_str(u).unwrap();
-        n += gmp::Integer::from_str(v).unwrap();
+        let n = Integer::from_str(u).unwrap() + Integer::from_str(v).unwrap();
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let mut n = gmp::Integer::from_str(u).unwrap();
-        n += &gmp::Integer::from_str(v).unwrap();
+        let n = &Integer::from_str(u).unwrap() + Integer::from_str(v).unwrap();
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = native::Integer::from_str(u).unwrap() + native::Integer::from_str(v).unwrap();
+        let n = Integer::from_str(u).unwrap() + &Integer::from_str(v).unwrap();
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = &native::Integer::from_str(u).unwrap() + native::Integer::from_str(v).unwrap();
+        let n = &Integer::from_str(u).unwrap() + &Integer::from_str(v).unwrap();
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = native::Integer::from_str(u).unwrap() + &native::Integer::from_str(v).unwrap();
-        assert_eq!(n.to_string(), out);
-        assert!(n.is_valid());
-
-        let n = &native::Integer::from_str(u).unwrap() + &native::Integer::from_str(v).unwrap();
-        assert_eq!(n.to_string(), out);
-        assert!(n.is_valid());
-
-        let n = gmp::Integer::from_str(u).unwrap() + gmp::Integer::from_str(v).unwrap();
-        assert_eq!(n.to_string(), out);
-        assert!(n.is_valid());
-
-        let n = gmp::Integer::from_str(u).unwrap() + &gmp::Integer::from_str(v).unwrap();
-        assert_eq!(n.to_string(), out);
-        assert!(n.is_valid());
-
-        let n = &gmp::Integer::from_str(u).unwrap() + gmp::Integer::from_str(v).unwrap();
-        assert_eq!(n.to_string(), out);
-        assert!(n.is_valid());
-
-        let n = &gmp::Integer::from_str(u).unwrap() + &gmp::Integer::from_str(v).unwrap();
-        assert_eq!(n.to_string(), out);
-        assert!(n.is_valid());
-
-        let n = num::BigInt::from_str(u).unwrap() + num::BigInt::from_str(v).unwrap();
+        let n = BigInt::from_str(u).unwrap() + BigInt::from_str(v).unwrap();
         assert_eq!(n.to_string(), out);
 
         let n = rugint::Integer::from_str(u).unwrap() + rugint::Integer::from_str(v).unwrap();
@@ -99,32 +70,14 @@ fn add_properties() {
     // x + &y is valid.
     // &x + y is valid.
     // &x + &y is valid.
-    // x + y is equivalent for malachite-gmp, malachite-native, num, and rugint.
+    // x + y is equivalent for malachite, num, and rugint.
     // x += y, x += &y, x + y, x + &y, &x + y, and &x + &y give the same result.
     // x + y == y + x
-    #[allow(unknown_lints, cyclomatic_complexity)]
-    let two_integers = |gmp_x: gmp::Integer, gmp_y: gmp::Integer| {
-        let x = gmp_integer_to_native(&gmp_x);
-        let y = gmp_integer_to_native(&gmp_y);
-        let raw_gmp_sum = gmp_x.clone() + gmp_y.clone();
-        assert!(raw_gmp_sum.is_valid());
-        let gmp_sum = gmp_integer_to_native(&raw_gmp_sum);
-        let num_sum = num_bigint_to_native_integer(
-            &(native_integer_to_num_bigint(&x) + native_integer_to_num_bigint(&y)),
+    let two_integers = |x: Integer, y: Integer| {
+        let num_sum = bigint_to_integer(&(integer_to_bigint(&x) + integer_to_bigint(&y)));
+        let rugint_sum = rugint_integer_to_integer(
+            &(integer_to_rugint_integer(&x) + integer_to_rugint_integer(&y)),
         );
-        let rugint_sum = rugint_integer_to_native(
-            &(native_integer_to_rugint(&x) + native_integer_to_rugint(&y)),
-        );
-
-        let sum_val_val = gmp_x.clone() + gmp_y.clone();
-        let sum_val_ref = gmp_x.clone() + &gmp_y;
-        let sum_ref_val = &gmp_x + gmp_y.clone();
-        assert!(sum_val_val.is_valid());
-        assert!(sum_val_ref.is_valid());
-        assert!(sum_ref_val.is_valid());
-        assert_eq!(sum_val_val, raw_gmp_sum);
-        assert_eq!(sum_val_ref, raw_gmp_sum);
-        assert_eq!(sum_ref_val, raw_gmp_sum);
 
         let sum_val_val = x.clone() + y.clone();
         let sum_val_ref = x.clone() + &y;
@@ -147,23 +100,13 @@ fn add_properties() {
         assert_eq!(mut_x, sum);
         assert!(mut_x.is_valid());
 
-        let mut mut_x = gmp_x.clone();
-        mut_x += gmp_y.clone();
-        assert!(mut_x.is_valid());
-        assert_eq!(mut_x, raw_gmp_sum);
-        let mut mut_x = gmp_x.clone();
-        mut_x += &gmp_y;
-        assert_eq!(mut_x, raw_gmp_sum);
-        assert!(mut_x.is_valid());
-
-        let mut mut_x = native_integer_to_rugint(&x);
-        mut_x += native_integer_to_rugint(&y);
-        assert_eq!(rugint_integer_to_native(&mut_x), sum);
+        let mut mut_x = integer_to_rugint_integer(&x);
+        mut_x += integer_to_rugint_integer(&y);
+        assert_eq!(rugint_integer_to_integer(&mut_x), sum);
 
         let reverse_sum = &y + &x;
         let inv_1 = &sum - &x;
         let inv_2 = &sum - &y;
-        assert_eq!(gmp_sum, sum);
         assert_eq!(num_sum, sum);
         assert_eq!(rugint_sum, sum);
         assert_eq!(reverse_sum, sum);
@@ -173,11 +116,10 @@ fn add_properties() {
 
     // x + (y: i32) == x + from(y)
     // (y: i32) + x == x + from(y)
-    let integer_and_i32 = |gmp_x: gmp::Integer, y: i32| {
-        let x = gmp_integer_to_native(&gmp_x);
+    let integer_and_i32 = |x: Integer, y: i32| {
         let primitive_sum_1 = &x + y;
         let primitive_sum_2 = y + &x;
-        let sum = x + native::Integer::from(y);
+        let sum = x + Integer::from(y);
         assert_eq!(primitive_sum_1, sum);
         assert_eq!(primitive_sum_2, sum);
     };
@@ -186,10 +128,9 @@ fn add_properties() {
     // 0 + x == x
     // x + x == x << 1
     // x + -x == 0
-    let one_integer = |gmp_x: gmp::Integer| {
-        let x = gmp_integer_to_native(&gmp_x);
-        let id_1 = &x + native::Integer::ZERO;
-        let id_2 = native::Integer::ZERO + &x;
+    let one_integer = |x: Integer| {
+        let id_1 = &x + Integer::ZERO;
+        let id_2 = Integer::ZERO + &x;
         let double = &x + &x;
         assert_eq!(id_1, x);
         assert_eq!(id_2, x);
@@ -198,10 +139,7 @@ fn add_properties() {
     };
 
     // (x + y) + z == x + (y + z)
-    let three_integers = |gmp_x: gmp::Integer, gmp_y: gmp::Integer, gmp_z: gmp::Integer| {
-        let x = gmp_integer_to_native(&gmp_x);
-        let y = gmp_integer_to_native(&gmp_y);
-        let z = gmp_integer_to_native(&gmp_z);
+    let three_integers = |x: Integer, y: Integer, z: Integer| {
         assert_eq!((&x + &y) + &z, x + (y + z));
     };
 

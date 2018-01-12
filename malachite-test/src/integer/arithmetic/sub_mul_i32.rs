@@ -1,8 +1,8 @@
-use common::{gmp_integer_to_native, GenerationMode};
+use common::GenerationMode;
 use malachite_base::traits::{SubMul, SubMulAssign};
-use malachite_native::integer as native;
-use malachite_gmp::integer as gmp;
-use rust_wheels::benchmarks::{BenchmarkOptions2, BenchmarkOptions4, benchmark_2, benchmark_4};
+use malachite_nz::integer::Integer;
+use rust_wheels::benchmarks::{BenchmarkOptions1, BenchmarkOptions2, BenchmarkOptions4,
+                              benchmark_1, benchmark_2, benchmark_4};
 use rust_wheels::iterators::common::EXAMPLE_SEED;
 use rust_wheels::iterators::general::random_x;
 use rust_wheels::iterators::integers::{exhaustive_integers, random_integers};
@@ -10,7 +10,7 @@ use rust_wheels::iterators::primitive_ints::exhaustive_i;
 use rust_wheels::iterators::tuples::{exhaustive_triples, random_triples};
 use std::cmp::max;
 
-type It = Iterator<Item = (gmp::Integer, gmp::Integer, i32)>;
+type It = Iterator<Item = (Integer, Integer, i32)>;
 
 pub fn exhaustive_inputs() -> Box<It> {
     Box::new(exhaustive_triples(
@@ -103,18 +103,13 @@ pub fn benchmark_integer_sub_mul_assign_i32(gm: GenerationMode, limit: usize, fi
         "benchmarking {} Integer.sub_mul_assign(Integer, i32)",
         gm.name()
     );
-    benchmark_2(BenchmarkOptions2 {
+    benchmark_1(BenchmarkOptions1 {
         xs: select_inputs(gm),
-        function_f: &(|(mut a, b, c): (gmp::Integer, gmp::Integer, i32)| a.sub_mul_assign(b, c)),
-        function_g: &(|(mut a, b, c): (native::Integer, native::Integer, i32)| {
-            a.sub_mul_assign(b, c)
-        }),
+        function_f: &(|(mut a, b, c): (Integer, Integer, i32)| a.sub_mul_assign(b, c)),
         x_cons: &(|t| t.clone()),
-        y_cons: &(|&(ref a, ref b, c)| (gmp_integer_to_native(a), gmp_integer_to_native(b), c)),
         x_param: &(|&(ref a, ref b, _)| max(a.significant_bits(), b.significant_bits()) as usize),
         limit,
-        f_name: "malachite-gmp",
-        g_name: "malachite-native",
+        f_name: "malachite",
         title: "Integer.sub\\\\_mul\\\\_assign(Integer, i32)",
         x_axis_label: "max(a.significant\\\\_bits(), b.significant\\\\_bits())",
         y_axis_label: "time (ns)",
@@ -133,14 +128,10 @@ pub fn benchmark_integer_sub_mul_assign_i32_evaluation_strategy(
     );
     benchmark_2(BenchmarkOptions2 {
         xs: select_inputs(gm),
-        function_f: &(|(mut a, b, c): (native::Integer, native::Integer, i32)| {
-            a.sub_mul_assign(b, c)
-        }),
-        function_g: &(|(mut a, b, c): (native::Integer, native::Integer, i32)| {
-            a.sub_mul_assign(&b, c)
-        }),
-        x_cons: &(|&(ref a, ref b, c)| (gmp_integer_to_native(a), gmp_integer_to_native(b), c)),
-        y_cons: &(|&(ref a, ref b, c)| (gmp_integer_to_native(a), gmp_integer_to_native(b), c)),
+        function_f: &(|(mut a, b, c): (Integer, Integer, i32)| a.sub_mul_assign(b, c)),
+        function_g: &(|(mut a, b, c): (Integer, Integer, i32)| a.sub_mul_assign(&b, c)),
+        x_cons: &(|t| t.clone()),
+        y_cons: &(|t| t.clone()),
         x_param: &(|&(ref a, ref b, _)| max(a.significant_bits(), b.significant_bits()) as usize),
         limit,
         f_name: "Integer.sub\\\\_mul\\\\_assign(Integer, i32)",
@@ -163,12 +154,10 @@ pub fn benchmark_integer_sub_mul_assign_i32_algorithms(
     );
     benchmark_2(BenchmarkOptions2 {
         xs: select_inputs(gm),
-        function_f: &(|(mut a, b, c): (native::Integer, native::Integer, i32)| {
-            a.sub_mul_assign(b, c)
-        }),
-        function_g: &(|(mut a, b, c): (native::Integer, native::Integer, i32)| a -= b * c),
-        x_cons: &(|&(ref a, ref b, c)| (gmp_integer_to_native(a), gmp_integer_to_native(b), c)),
-        y_cons: &(|&(ref a, ref b, c)| (gmp_integer_to_native(a), gmp_integer_to_native(b), c)),
+        function_f: &(|(mut a, b, c): (Integer, Integer, i32)| a.sub_mul_assign(b, c)),
+        function_g: &(|(mut a, b, c): (Integer, Integer, i32)| a -= b * c),
+        x_cons: &(|t| t.clone()),
+        y_cons: &(|t| t.clone()),
         x_param: &(|&(ref a, ref b, _)| max(a.significant_bits(), b.significant_bits()) as usize),
         limit,
         f_name: "Integer.sub\\\\_mul\\\\_assign(Integer, i32)",
@@ -191,12 +180,10 @@ pub fn benchmark_integer_sub_mul_assign_i32_ref_algorithms(
     );
     benchmark_2(BenchmarkOptions2 {
         xs: select_inputs(gm),
-        function_f: &(|(mut a, b, c): (native::Integer, native::Integer, i32)| {
-            a.sub_mul_assign(&b, c)
-        }),
-        function_g: &(|(mut a, b, c): (native::Integer, native::Integer, i32)| a -= &b * c),
-        x_cons: &(|&(ref a, ref b, c)| (gmp_integer_to_native(a), gmp_integer_to_native(b), c)),
-        y_cons: &(|&(ref a, ref b, c)| (gmp_integer_to_native(a), gmp_integer_to_native(b), c)),
+        function_f: &(|(mut a, b, c): (Integer, Integer, i32)| a.sub_mul_assign(&b, c)),
+        function_g: &(|(mut a, b, c): (Integer, Integer, i32)| a -= &b * c),
+        x_cons: &(|t| t.clone()),
+        y_cons: &(|t| t.clone()),
         x_param: &(|&(ref a, ref b, _)| max(a.significant_bits(), b.significant_bits()) as usize),
         limit,
         f_name: "Integer.sub\\\\_mul\\\\_assign(\\\\&Integer, i32)",
@@ -210,16 +197,13 @@ pub fn benchmark_integer_sub_mul_assign_i32_ref_algorithms(
 
 pub fn benchmark_integer_sub_mul_i32(gm: GenerationMode, limit: usize, file_name: &str) {
     println!("benchmarking {} Integer.sub_mul(Integer, i32)", gm.name());
-    benchmark_2(BenchmarkOptions2 {
+    benchmark_1(BenchmarkOptions1 {
         xs: select_inputs(gm),
-        function_f: &(|(a, b, c): (gmp::Integer, gmp::Integer, i32)| a.sub_mul(b, c)),
-        function_g: &(|(a, b, c): (native::Integer, native::Integer, i32)| a.sub_mul(b, c)),
+        function_f: &(|(a, b, c): (Integer, Integer, i32)| a.sub_mul(b, c)),
         x_cons: &(|t| t.clone()),
-        y_cons: &(|&(ref a, ref b, c)| (gmp_integer_to_native(a), gmp_integer_to_native(b), c)),
         x_param: &(|&(ref a, ref b, _)| max(a.significant_bits(), b.significant_bits()) as usize),
         limit,
-        f_name: "malachite-gmp",
-        g_name: "malachite-native",
+        f_name: "malachite",
         title: "Integer.sub\\\\_mul(Integer, i32)",
         x_axis_label: "max(a.significant\\\\_bits(), b.significant\\\\_bits())",
         y_axis_label: "time (ns)",
@@ -238,14 +222,14 @@ pub fn benchmark_integer_sub_mul_i32_evaluation_strategy(
     );
     benchmark_4(BenchmarkOptions4 {
         xs: select_inputs(gm),
-        function_f: &(|(a, b, c): (native::Integer, native::Integer, i32)| a.sub_mul(b, c)),
-        function_g: &(|(a, b, c): (native::Integer, native::Integer, i32)| a.sub_mul(&b, c)),
-        function_h: &(|(a, b, c): (native::Integer, native::Integer, i32)| (&a).sub_mul(b, c)),
-        function_i: &(|(a, b, c): (native::Integer, native::Integer, i32)| (&a).sub_mul(&b, c)),
-        x_cons: &(|&(ref a, ref b, c)| (gmp_integer_to_native(a), gmp_integer_to_native(b), c)),
-        y_cons: &(|&(ref a, ref b, c)| (gmp_integer_to_native(a), gmp_integer_to_native(b), c)),
-        z_cons: &(|&(ref a, ref b, c)| (gmp_integer_to_native(a), gmp_integer_to_native(b), c)),
-        w_cons: &(|&(ref a, ref b, c)| (gmp_integer_to_native(a), gmp_integer_to_native(b), c)),
+        function_f: &(|(a, b, c): (Integer, Integer, i32)| a.sub_mul(b, c)),
+        function_g: &(|(a, b, c): (Integer, Integer, i32)| a.sub_mul(&b, c)),
+        function_h: &(|(a, b, c): (Integer, Integer, i32)| (&a).sub_mul(b, c)),
+        function_i: &(|(a, b, c): (Integer, Integer, i32)| (&a).sub_mul(&b, c)),
+        x_cons: &(|t| t.clone()),
+        y_cons: &(|t| t.clone()),
+        z_cons: &(|t| t.clone()),
+        w_cons: &(|t| t.clone()),
         x_param: &(|&(ref a, ref b, _)| max(a.significant_bits(), b.significant_bits()) as usize),
         limit,
         f_name: "Integer.sub\\\\_mul(Integer, i32)",
@@ -266,10 +250,10 @@ pub fn benchmark_integer_sub_mul_i32_algorithms(gm: GenerationMode, limit: usize
     );
     benchmark_2(BenchmarkOptions2 {
         xs: select_inputs(gm),
-        function_f: &(|(a, b, c): (native::Integer, native::Integer, i32)| a.sub_mul(b, c)),
-        function_g: &(|(a, b, c): (native::Integer, native::Integer, i32)| a - b * c),
-        x_cons: &(|&(ref a, ref b, c)| (gmp_integer_to_native(a), gmp_integer_to_native(b), c)),
-        y_cons: &(|&(ref a, ref b, c)| (gmp_integer_to_native(a), gmp_integer_to_native(b), c)),
+        function_f: &(|(a, b, c): (Integer, Integer, i32)| a.sub_mul(b, c)),
+        function_g: &(|(a, b, c): (Integer, Integer, i32)| a - b * c),
+        x_cons: &(|t| t.clone()),
+        y_cons: &(|t| t.clone()),
         x_param: &(|&(ref a, ref b, _)| max(a.significant_bits(), b.significant_bits()) as usize),
         limit,
         f_name: "Integer.sub\\\\_mul(Integer, i32)",
@@ -292,10 +276,10 @@ pub fn benchmark_integer_sub_mul_i32_val_ref_algorithms(
     );
     benchmark_2(BenchmarkOptions2 {
         xs: select_inputs(gm),
-        function_f: &(|(a, b, c): (native::Integer, native::Integer, i32)| a.sub_mul(&b, c)),
-        function_g: &(|(a, b, c): (native::Integer, native::Integer, i32)| a - &b * c),
-        x_cons: &(|&(ref a, ref b, c)| (gmp_integer_to_native(a), gmp_integer_to_native(b), c)),
-        y_cons: &(|&(ref a, ref b, c)| (gmp_integer_to_native(a), gmp_integer_to_native(b), c)),
+        function_f: &(|(a, b, c): (Integer, Integer, i32)| a.sub_mul(&b, c)),
+        function_g: &(|(a, b, c): (Integer, Integer, i32)| a - &b * c),
+        x_cons: &(|t| t.clone()),
+        y_cons: &(|t| t.clone()),
         x_param: &(|&(ref a, ref b, _)| max(a.significant_bits(), b.significant_bits()) as usize),
         limit,
         f_name: "Integer.sub\\\\_mul(\\\\&Integer, i32)",
@@ -318,10 +302,10 @@ pub fn benchmark_integer_sub_mul_i32_ref_val_algorithms(
     );
     benchmark_2(BenchmarkOptions2 {
         xs: select_inputs(gm),
-        function_f: &(|(a, b, c): (native::Integer, native::Integer, i32)| (&a).sub_mul(b, c)),
-        function_g: &(|(a, b, c): (native::Integer, native::Integer, i32)| &a - b * c),
-        x_cons: &(|&(ref a, ref b, c)| (gmp_integer_to_native(a), gmp_integer_to_native(b), c)),
-        y_cons: &(|&(ref a, ref b, c)| (gmp_integer_to_native(a), gmp_integer_to_native(b), c)),
+        function_f: &(|(a, b, c): (Integer, Integer, i32)| (&a).sub_mul(b, c)),
+        function_g: &(|(a, b, c): (Integer, Integer, i32)| &a - b * c),
+        x_cons: &(|t| t.clone()),
+        y_cons: &(|t| t.clone()),
         x_param: &(|&(ref a, ref b, _)| max(a.significant_bits(), b.significant_bits()) as usize),
         limit,
         f_name: "(\\\\&Integer).sub\\\\_mul(Integer, i32)",
@@ -344,10 +328,10 @@ pub fn benchmark_integer_sub_mul_i32_ref_ref_algorithms(
     );
     benchmark_2(BenchmarkOptions2 {
         xs: select_inputs(gm),
-        function_f: &(|(a, b, c): (native::Integer, native::Integer, i32)| (&a).sub_mul(&b, c)),
-        function_g: &(|(a, b, c): (native::Integer, native::Integer, i32)| &a - &b * c),
-        x_cons: &(|&(ref a, ref b, c)| (gmp_integer_to_native(a), gmp_integer_to_native(b), c)),
-        y_cons: &(|&(ref a, ref b, c)| (gmp_integer_to_native(a), gmp_integer_to_native(b), c)),
+        function_f: &(|(a, b, c): (Integer, Integer, i32)| (&a).sub_mul(&b, c)),
+        function_g: &(|(a, b, c): (Integer, Integer, i32)| &a - &b * c),
+        x_cons: &(|t| t.clone()),
+        y_cons: &(|t| t.clone()),
         x_param: &(|&(ref a, ref b, _)| max(a.significant_bits(), b.significant_bits()) as usize),
         limit,
         f_name: "(\\\\&Integer).sub\\\\_mul(\\\\&Integer, i32)",

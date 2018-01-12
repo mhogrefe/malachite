@@ -1,15 +1,13 @@
 use common::LARGE_LIMIT;
-use malachite_native::natural as native;
-use malachite_gmp::natural as gmp;
-use malachite_test::common::{gmp_natural_to_native, GenerationMode};
+use malachite_nz::natural::Natural;
+use malachite_test::common::GenerationMode;
 use malachite_test::natural::logic::limbs::select_inputs;
 use std::str::FromStr;
 
 #[test]
 fn test_to_limbs_le() {
     let test = |n, out| {
-        assert_eq!(native::Natural::from_str(n).unwrap().to_limbs_le(), out);
-        assert_eq!(gmp::Natural::from_str(n).unwrap().to_limbs_le(), out);
+        assert_eq!(Natural::from_str(n).unwrap().to_limbs_le(), out);
     };
     test("0", vec![]);
     test("123", vec![123]);
@@ -30,8 +28,7 @@ fn test_to_limbs_le() {
 #[test]
 fn test_to_limbs_be() {
     let test = |n, out| {
-        assert_eq!(native::Natural::from_str(n).unwrap().to_limbs_be(), out);
-        assert_eq!(gmp::Natural::from_str(n).unwrap().to_limbs_be(), out);
+        assert_eq!(Natural::from_str(n).unwrap().to_limbs_be(), out);
     };
     test("0", vec![]);
     test("123", vec![123]);
@@ -51,15 +48,12 @@ fn test_to_limbs_be() {
 
 #[test]
 fn to_limbs_le_properties() {
-    // x.to_limbs_le() is equivalent for malachite-gmp and malachite-native.
     // from_limbs_le(x.to_limbs_le()) == x
     // x.to_limbs_le().rev() == x.to_limbs_be()
     // if x != 0, x.to_limbs_le().last() != 0
-    let one_natural = |gmp_x: gmp::Natural| {
-        let x = gmp_natural_to_native(&gmp_x);
+    let one_natural = |x: Natural| {
         let limbs = x.to_limbs_le();
-        assert_eq!(gmp_x.to_limbs_le(), limbs);
-        assert_eq!(native::Natural::from_limbs_le(&limbs), x);
+        assert_eq!(Natural::from_limbs_le(&limbs), x);
         assert_eq!(
             x.to_limbs_be(),
             limbs.iter().cloned().rev().collect::<Vec<u32>>()
@@ -80,15 +74,12 @@ fn to_limbs_le_properties() {
 
 #[test]
 fn limbs_be_properties() {
-    // x.to_limbs_be() is equivalent for malachite-gmp and malachite-native.
     // from_limbs_be(x.to_limbs_be()) == x
     // x.to_limbs_be().rev() == x.to_limbs_le()
     // if x != 0, x.to_limbs_be().last() != 0
-    let one_natural = |gmp_x: gmp::Natural| {
-        let x = gmp_natural_to_native(&gmp_x);
+    let one_natural = |x: Natural| {
         let limbs = x.to_limbs_be();
-        assert_eq!(gmp_x.to_limbs_be(), limbs);
-        assert_eq!(native::Natural::from_limbs_be(&limbs), x);
+        assert_eq!(Natural::from_limbs_be(&limbs), x);
         assert_eq!(
             x.to_limbs_le(),
             limbs.iter().cloned().rev().collect::<Vec<u32>>()

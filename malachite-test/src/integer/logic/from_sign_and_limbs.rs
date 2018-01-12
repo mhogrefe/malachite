@@ -1,7 +1,6 @@
 use common::GenerationMode;
-use malachite_gmp::integer as gmp;
-use malachite_native::integer as native;
-use rust_wheels::benchmarks::{BenchmarkOptions2, benchmark_2};
+use malachite_nz::integer::Integer;
+use rust_wheels::benchmarks::{BenchmarkOptions1, benchmark_1};
 use rust_wheels::iterators::common::EXAMPLE_SEED;
 use rust_wheels::iterators::general::random_x;
 use rust_wheels::iterators::orderings::{exhaustive_orderings, random_orderings};
@@ -47,7 +46,7 @@ pub fn demo_integer_from_sign_and_limbs_le(gm: GenerationMode, limit: usize) {
             "from_sign_and_limbs_le({:?}, {:?}) = {:?}",
             sign,
             limbs,
-            gmp::Integer::from_sign_and_limbs_le(sign, limbs.as_slice())
+            Integer::from_sign_and_limbs_le(sign, limbs.as_slice())
         );
     }
 }
@@ -58,7 +57,7 @@ pub fn demo_integer_from_sign_and_limbs_be(gm: GenerationMode, limit: usize) {
             "from_sign_and_limbs_be({:?}, {:?}) = {:?}",
             sign,
             limbs,
-            gmp::Integer::from_sign_and_limbs_be(sign, limbs.as_slice())
+            Integer::from_sign_and_limbs_be(sign, limbs.as_slice())
         );
     }
 }
@@ -68,20 +67,15 @@ pub fn benchmark_integer_from_sign_and_limbs_le(gm: GenerationMode, limit: usize
         "benchmarking {} Integer::from_sign_and_limbs_le(&[u32])",
         gm.name()
     );
-    benchmark_2(BenchmarkOptions2 {
+    benchmark_1(BenchmarkOptions1 {
         xs: select_inputs(gm),
         function_f: &(|(sign, limbs): (Ordering, Vec<u32>)| {
-            gmp::Integer::from_sign_and_limbs_le(sign, limbs.as_slice())
-        }),
-        function_g: &(|(sign, limbs): (Ordering, Vec<u32>)| {
-            native::Integer::from_sign_and_limbs_le(sign, limbs.as_slice())
+            Integer::from_sign_and_limbs_le(sign, limbs.as_slice())
         }),
         x_cons: &(|p| p.clone()),
-        y_cons: &(|p| p.clone()),
         x_param: &(|&(_, ref limbs)| limbs.len()),
         limit,
-        f_name: "malachite-gmp",
-        g_name: "malachite-native",
+        f_name: "malachite",
         title: "Integer::from\\\\_sign\\\\_and\\\\_limbs\\\\_le(Ordering, \\\\&[u32])",
         x_axis_label: "xs.len()",
         y_axis_label: "time (ns)",
@@ -94,20 +88,15 @@ pub fn benchmark_integer_from_sign_and_limbs_be(gm: GenerationMode, limit: usize
         "benchmarking {} Integer::from_sign_and_limbs_be(&[u32])",
         gm.name()
     );
-    benchmark_2(BenchmarkOptions2 {
+    benchmark_1(BenchmarkOptions1 {
         xs: select_inputs(gm),
         function_f: &(|(sign, limbs): (Ordering, Vec<u32>)| {
-            gmp::Integer::from_sign_and_limbs_be(sign, limbs.as_slice())
-        }),
-        function_g: &(|(sign, limbs): (Ordering, Vec<u32>)| {
-            native::Integer::from_sign_and_limbs_be(sign, limbs.as_slice())
+            Integer::from_sign_and_limbs_be(sign, limbs.as_slice())
         }),
         x_cons: &(|p| p.clone()),
-        y_cons: &(|p| p.clone()),
         x_param: &(|&(_, ref limbs)| limbs.len()),
         limit,
-        f_name: "malachite-gmp",
-        g_name: "malachite-native",
+        f_name: "malachite",
         title: "Integer::from\\\\_sign\\\\_and\\\\_limbs\\\\_be(Ordering, \\\\&[u32])",
         x_axis_label: "xs.len()",
         y_axis_label: "time (ns)",

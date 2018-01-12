@@ -1,9 +1,8 @@
 use common::LARGE_LIMIT;
 use malachite_base::traits::{One, Zero};
 use malachite_base::traits::{SubMul, SubMulAssign};
-use malachite_native::natural as native;
-use malachite_gmp::natural as gmp;
-use malachite_test::common::{gmp_natural_to_native, native_natural_to_gmp, GenerationMode};
+use malachite_nz::natural::Natural;
+use malachite_test::common::GenerationMode;
 use malachite_test::natural::arithmetic::sub_mul::select_inputs_2;
 use rust_wheels::iterators::common::EXAMPLE_SEED;
 use rust_wheels::iterators::naturals::{exhaustive_naturals, random_naturals};
@@ -13,18 +12,10 @@ use std::str::FromStr;
 #[test]
 fn test_sub_mul_assign() {
     let test = |u, v, w, out: &str| {
-        let mut n = native::Natural::from_str(u).unwrap();
+        let mut n = Natural::from_str(u).unwrap();
         n.sub_mul_assign(
-            &native::Natural::from_str(v).unwrap(),
-            &native::Natural::from_str(w).unwrap(),
-        );
-        assert_eq!(n.to_string(), out);
-        assert!(n.is_valid());
-
-        let mut n = gmp::Natural::from_str(u).unwrap();
-        n.sub_mul_assign(
-            &gmp::Natural::from_str(v).unwrap(),
-            &gmp::Natural::from_str(w).unwrap(),
+            &Natural::from_str(v).unwrap(),
+            &Natural::from_str(w).unwrap(),
         );
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
@@ -59,71 +50,37 @@ fn test_sub_mul_assign() {
 
 #[test]
 #[should_panic(expected = "Natural sub_mul_assign cannot have a negative result")]
-fn sub_mul_assign_fail_native_1() {
-    let mut x = native::Natural::from_str("123").unwrap();
+fn sub_mul_assign_fail_1() {
+    let mut x = Natural::from_str("123").unwrap();
     x.sub_mul_assign(
-        &native::Natural::from_str("5").unwrap(),
-        &native::Natural::from_str("100").unwrap(),
+        &Natural::from_str("5").unwrap(),
+        &Natural::from_str("100").unwrap(),
     );
 }
 
 #[test]
 #[should_panic(expected = "Natural sub_mul_assign cannot have a negative result")]
-fn sub_mul_assign_fail_native_2() {
-    let mut x = native::Natural::from_str("1000000000000").unwrap();
+fn sub_mul_assign_fail_2() {
+    let mut x = Natural::from_str("1000000000000").unwrap();
     x.sub_mul_assign(
-        &native::Natural::from_str("1000000000000").unwrap(),
-        &native::Natural::from_str("100").unwrap(),
-    );
-}
-
-#[test]
-#[should_panic(expected = "Natural sub_mul_assign cannot have a negative result")]
-fn sub_mul_assign_fail_gmp_1() {
-    let mut x = gmp::Natural::from_str("123").unwrap();
-    x.sub_mul_assign(
-        &gmp::Natural::from_str("5").unwrap(),
-        &gmp::Natural::from_str("100").unwrap(),
-    );
-}
-
-#[test]
-#[should_panic(expected = "Natural sub_mul_assign cannot have a negative result")]
-fn sub_mul_assign_fail_gmp_2() {
-    let mut x = gmp::Natural::from_str("1000000000000").unwrap();
-    x.sub_mul_assign(
-        &gmp::Natural::from_str("1000000000000").unwrap(),
-        &gmp::Natural::from_str("100").unwrap(),
+        &Natural::from_str("1000000000000").unwrap(),
+        &Natural::from_str("100").unwrap(),
     );
 }
 
 #[test]
 fn test_sub_mul() {
     let test = |u, v, w, out| {
-        let on = native::Natural::from_str(u).unwrap().sub_mul(
-            &native::Natural::from_str(v).unwrap(),
-            &native::Natural::from_str(w).unwrap(),
+        let on = Natural::from_str(u).unwrap().sub_mul(
+            &Natural::from_str(v).unwrap(),
+            &Natural::from_str(w).unwrap(),
         );
         assert_eq!(format!("{:?}", on), out);
         assert!(on.map_or(true, |n| n.is_valid()));
 
-        let on = gmp::Natural::from_str(u).unwrap().sub_mul(
-            &gmp::Natural::from_str(v).unwrap(),
-            &gmp::Natural::from_str(w).unwrap(),
-        );
-        assert_eq!(format!("{:?}", on), out);
-        assert!(on.map_or(true, |n| n.is_valid()));
-
-        let on = (&native::Natural::from_str(u).unwrap()).sub_mul(
-            &native::Natural::from_str(v).unwrap(),
-            &native::Natural::from_str(w).unwrap(),
-        );
-        assert_eq!(format!("{:?}", on), out);
-        assert!(on.map_or(true, |n| n.is_valid()));
-
-        let on = (&gmp::Natural::from_str(u).unwrap()).sub_mul(
-            &gmp::Natural::from_str(v).unwrap(),
-            &gmp::Natural::from_str(w).unwrap(),
+        let on = (&Natural::from_str(u).unwrap()).sub_mul(
+            &Natural::from_str(v).unwrap(),
+            &Natural::from_str(w).unwrap(),
         );
         assert_eq!(format!("{:?}", on), out);
         assert!(on.map_or(true, |n| n.is_valid()));
@@ -151,38 +108,18 @@ fn test_sub_mul() {
 
 #[test]
 fn sub_mul_properties() {
-    // a.sub_mul_assign(&b, c) is equivalent for malachite-gmp and malachite-native.
-    // a.sub_mul(&b, c) is equivalent for malachite-gmp and malachite-native.
-    // (&a).sub_mul(&b, c) is equivalent for malachite-gmp and malachite-native.
     // a.sub_mul_assign(&b, c); a is valid.
     // a.sub_mul(&b, c) is valid.
     // (&a).sub_mul(&b, c) is valid.
     // a.sub_mul_assign(&b, c), a.sub_mul(&b, c), and (&a).sub_mul(&b, c) give the same result.
     // a.sub_mul(&b, c) is equivalent to a - b * c.
-    let three_naturals = |mut gmp_a: gmp::Natural, gmp_b: gmp::Natural, gmp_c: gmp::Natural| {
-        let mut a = gmp_natural_to_native(&gmp_a);
-        let b = gmp_natural_to_native(&gmp_b);
-        let c = gmp_natural_to_native(&gmp_c);
+    let three_naturals = |mut a: Natural, b: Natural, c: Natural| {
         let old_a = a.clone();
-
         if a >= &b * &c {
-            gmp_a.sub_mul_assign(&gmp_b, &gmp_c);
-            assert!(gmp_a.is_valid());
-
             a.sub_mul_assign(&b, &c);
             assert!(a.is_valid());
-            assert_eq!(gmp_natural_to_native(&gmp_a), a);
         }
         let oa = if old_a >= &b * &c { Some(a) } else { None };
-
-        let gmp_a_2 = native_natural_to_gmp(&old_a);
-        let result = (&gmp_a_2).sub_mul(&gmp_b, &gmp_c);
-        assert!(result.clone().map_or(true, |n| n.is_valid()));
-        assert_eq!(result.map(|x| gmp_natural_to_native(&x)), oa);
-
-        let result = gmp_a_2.sub_mul(&gmp_b, &gmp_c);
-        assert!(result.clone().map_or(true, |n| n.is_valid()));
-        assert_eq!(result.map(|x| gmp_natural_to_native(&x)), oa);
 
         let a2 = old_a.clone();
         let result = (&a2).sub_mul(&b, &c);
@@ -198,13 +135,11 @@ fn sub_mul_properties() {
 
     // a.sub_mul(b, 0) == Some(a)
     // a.sub_mul(b, 1) == a - b
-    let two_naturals = |gmp_a: gmp::Natural, gmp_b: gmp::Natural| {
-        let a = &gmp_natural_to_native(&gmp_a);
-        let b = &gmp_natural_to_native(&gmp_b);
-        assert_eq!(a.sub_mul(&native::Natural::ZERO, b), Some(a.clone()));
-        assert_eq!(a.sub_mul(b, &native::Natural::ZERO), Some(a.clone()));
-        assert_eq!(a.sub_mul(&native::Natural::ONE, b), a - b);
-        assert_eq!(a.sub_mul(b, &native::Natural::ONE), a - b);
+    let two_naturals = |a: &Natural, b: &Natural| {
+        assert_eq!(a.sub_mul(&Natural::ZERO, b), Some(a.clone()));
+        assert_eq!(a.sub_mul(b, &Natural::ZERO), Some(a.clone()));
+        assert_eq!(a.sub_mul(&Natural::ONE, b), a - b);
+        assert_eq!(a.sub_mul(b, &Natural::ONE), a - b);
     };
 
     for (a, b, c) in select_inputs_2(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
@@ -216,10 +151,10 @@ fn sub_mul_properties() {
     }
 
     for (a, b) in exhaustive_pairs_from_single(exhaustive_naturals()).take(LARGE_LIMIT) {
-        two_naturals(a, b);
+        two_naturals(&a, &b);
     }
 
     for (a, b) in random_pairs_from_single(random_naturals(&EXAMPLE_SEED, 32)).take(LARGE_LIMIT) {
-        two_naturals(a, b);
+        two_naturals(&a, &b);
     }
 }

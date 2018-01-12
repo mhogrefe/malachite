@@ -1,27 +1,26 @@
 use common::LARGE_LIMIT;
-use malachite_native::natural as native;
-use malachite_gmp::natural as gmp;
-use malachite_test::common::{gmp_natural_to_native, native_natural_to_num_biguint,
-                             num_biguint_to_native_natural, GenerationMode};
+use malachite_nz::natural::Natural;
+use malachite_test::common::{biguint_to_natural, natural_to_biguint, natural_to_rugint_integer,
+                             rugint_integer_to_natural, GenerationMode};
 use malachite_test::natural::logic::set_bit::{num_set_bit, select_inputs};
-use num;
+use num::BigUint;
+use rugint;
 use std::str::FromStr;
 
 #[test]
 fn test_set_bit() {
     let test = |u, index, out| {
-        let mut n = native::Natural::from_str(u).unwrap();
+        let mut n = Natural::from_str(u).unwrap();
         n.set_bit(index);
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let mut n = gmp::Natural::from_str(u).unwrap();
-        n.set_bit(index);
-        assert_eq!(n.to_string(), out);
-        assert!(n.is_valid());
-
-        let mut n = num::BigUint::from_str(u).unwrap();
+        let mut n = BigUint::from_str(u).unwrap();
         num_set_bit(&mut n, index);
+        assert_eq!(n.to_string(), out);
+
+        let mut n = rugint::Integer::from_str(u).unwrap();
+        n.set_bit(index as u32, true);
         assert_eq!(n.to_string(), out);
     };
     test("0", 10, "1024");
@@ -33,29 +32,28 @@ fn test_set_bit() {
 
 #[test]
 fn set_bit_properties() {
-    // n.set_bit(index) is equivalent for malachite-gmp, malachite-native, and num.
+    // n.set_bit(index) is equivalent for malachite, num, and rugint.
     // n.set_bit(index) is equivalent to n.assign_bit(index, true).
     // n.set_bit(index); n != 0
     // Setting a bit does not decrease n.
     // If n.get_bit(index), setting at index won't do anything.
     // If !n.get_bit(index), setting and then clearing at index won't do anything.
-    let natural_and_u64 = |mut gmp_n: gmp::Natural, index: u64| {
-        let mut n = gmp_natural_to_native(&gmp_n);
+    let natural_and_u64 = |mut n: Natural, index: u64| {
         let old_n = n.clone();
-        gmp_n.set_bit(index);
-        assert!(gmp_n.is_valid());
-
         n.set_bit(index);
         assert!(n.is_valid());
-        assert_eq!(gmp_natural_to_native(&gmp_n), n);
 
         let mut n2 = old_n.clone();
         n2.assign_bit(index, true);
         assert_eq!(n2, n);
 
-        let mut num_n = native_natural_to_num_biguint(&old_n);
+        let mut num_n = natural_to_biguint(&old_n);
         num_set_bit(&mut num_n, index);
-        assert_eq!(num_biguint_to_native_natural(&num_n), n);
+        assert_eq!(biguint_to_natural(&num_n), n);
+
+        let mut rugint_n = natural_to_rugint_integer(&old_n);
+        rugint_n.set_bit(index as u32, true);
+        assert_eq!(rugint_integer_to_natural(&rugint_n), n);
 
         assert_ne!(n, 0);
         assert!(n >= old_n);

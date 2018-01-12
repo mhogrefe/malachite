@@ -1,17 +1,16 @@
-use common::{gmp_integer_to_native, gmp_integer_to_rugint, gmp_natural_to_native,
-             gmp_natural_to_rugint_integer, GenerationMode};
+use common::{integer_to_rugint_integer, natural_to_rugint_integer, GenerationMode};
 use malachite_base::traits::PartialOrdAbs;
-use malachite_gmp as gmp;
-use malachite_native as native;
+use malachite_nz::integer::Integer;
+use malachite_nz::natural::Natural;
 use rugint;
-use rust_wheels::benchmarks::{BenchmarkOptions3, benchmark_3};
+use rust_wheels::benchmarks::{BenchmarkOptions2, benchmark_2};
 use rust_wheels::iterators::common::EXAMPLE_SEED;
 use rust_wheels::iterators::integers::{exhaustive_integers, random_integers};
 use rust_wheels::iterators::naturals::{exhaustive_naturals, random_naturals};
 use rust_wheels::iterators::tuples::{exhaustive_pairs, random_pairs};
 use std::cmp::{max, Ordering};
 
-type It1 = Iterator<Item = (gmp::integer::Integer, gmp::natural::Natural)>;
+type It1 = Iterator<Item = (Integer, Natural)>;
 
 pub fn exhaustive_inputs_1() -> Box<It1> {
     Box::new(exhaustive_pairs(
@@ -35,7 +34,7 @@ pub fn select_inputs_1(gm: GenerationMode) -> Box<It1> {
     }
 }
 
-type It2 = Iterator<Item = (gmp::natural::Natural, gmp::integer::Integer)>;
+type It2 = Iterator<Item = (Natural, Integer)>;
 
 pub fn exhaustive_inputs_2() -> Box<It2> {
     Box::new(exhaustive_pairs(
@@ -88,23 +87,16 @@ pub fn benchmark_integer_partial_cmp_abs_natural(
         "benchmarking {} Integer.partial_cmp_abs(&Natural)",
         gm.name()
     );
-    benchmark_3(BenchmarkOptions3 {
+    benchmark_2(BenchmarkOptions2 {
         xs: select_inputs_1(gm),
-        function_f: &(|(x, y): (gmp::integer::Integer, gmp::natural::Natural)| {
-            x.partial_cmp_abs(&y)
-        }),
-        function_g: &(|(x, y): (native::integer::Integer, native::natural::Natural)| {
-            x.partial_cmp_abs(&y)
-        }),
-        function_h: &(|(x, y): (rugint::Integer, rugint::Integer)| x.cmp_abs(&y)),
+        function_f: &(|(x, y): (Integer, Natural)| x.partial_cmp_abs(&y)),
+        function_g: &(|(x, y): (rugint::Integer, rugint::Integer)| x.cmp_abs(&y)),
         x_cons: &(|p| p.clone()),
-        y_cons: &(|&(ref x, ref y)| (gmp_integer_to_native(x), gmp_natural_to_native(y))),
-        z_cons: &(|&(ref x, ref y)| (gmp_integer_to_rugint(x), gmp_natural_to_rugint_integer(y))),
+        y_cons: &(|&(ref x, ref y)| (integer_to_rugint_integer(x), natural_to_rugint_integer(y))),
         x_param: &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),
         limit,
-        f_name: "malachite-gmp",
-        g_name: "malachite-native",
-        h_name: "rugint",
+        f_name: "malachite",
+        g_name: "rugint",
         title: "Integer.partial\\\\_cmp\\\\_abs(\\\\&Natural)",
         x_axis_label: "max(x.significant\\\\_bits(), y.significant\\\\_bits())",
         y_axis_label: "time (ns)",
@@ -121,23 +113,16 @@ pub fn benchmark_natural_partial_cmp_abs_integer(
         "benchmarking {} Natural.partial_cmp_abs(&Integer)",
         gm.name()
     );
-    benchmark_3(BenchmarkOptions3 {
+    benchmark_2(BenchmarkOptions2 {
         xs: select_inputs_2(gm),
-        function_f: &(|(x, y): (gmp::natural::Natural, gmp::integer::Integer)| {
-            x.partial_cmp_abs(&y)
-        }),
-        function_g: &(|(x, y): (native::natural::Natural, native::integer::Integer)| {
-            x.partial_cmp_abs(&y)
-        }),
-        function_h: &(|(x, y): (rugint::Integer, rugint::Integer)| x.cmp_abs(&y)),
+        function_f: &(|(x, y): (Natural, Integer)| x.partial_cmp_abs(&y)),
+        function_g: &(|(x, y): (rugint::Integer, rugint::Integer)| x.cmp_abs(&y)),
         x_cons: &(|p| p.clone()),
-        y_cons: &(|&(ref x, ref y)| (gmp_natural_to_native(x), gmp_integer_to_native(y))),
-        z_cons: &(|&(ref x, ref y)| (gmp_natural_to_rugint_integer(x), gmp_integer_to_rugint(y))),
+        y_cons: &(|&(ref x, ref y)| (natural_to_rugint_integer(x), integer_to_rugint_integer(y))),
         x_param: &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),
         limit,
-        f_name: "malachite-gmp",
-        g_name: "malachite-native",
-        h_name: "rugint",
+        f_name: "malachite",
+        g_name: "rugint",
         title: "Natural.partial\\\\_cmp\\\\_abs(\\\\&Integer)",
         x_axis_label: "max(x.significant\\\\_bits(), y.significant\\\\_bits())",
         y_axis_label: "time (ns)",

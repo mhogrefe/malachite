@@ -1,30 +1,13 @@
 use common::LARGE_LIMIT;
-use malachite_native::integer as native;
-use malachite_gmp::integer as gmp;
-use malachite_test::common::{gmp_integer_to_native, GenerationMode};
-use malachite_test::integer::comparison::hash::select_inputs;
-use std::collections::hash_map::DefaultHasher;
-use std::hash::{Hash, Hasher};
-
-fn native_hash(n: &native::Integer) -> u64 {
-    let mut s = DefaultHasher::new();
-    n.hash(&mut s);
-    s.finish()
-}
-
-fn gmp_hash(n: &gmp::Integer) -> u64 {
-    let mut s = DefaultHasher::new();
-    n.hash(&mut s);
-    s.finish()
-}
+use malachite_nz::integer::Integer;
+use malachite_test::common::GenerationMode;
+use malachite_test::integer::comparison::hash::{hash, select_inputs};
 
 #[test]
 fn hash_properties() {
     // n.hash() == n.clone().hash()
-    let one_integer = |gmp_x: gmp::Integer| {
-        let x = gmp_integer_to_native(&gmp_x);
-        assert_eq!(native_hash(&x), native_hash(&x.clone()));
-        assert_eq!(gmp_hash(&gmp_x), gmp_hash(&gmp_x.clone()));
+    let one_integer = |x: Integer| {
+        assert_eq!(hash(&x), hash(&x.clone()));
     };
 
     for n in select_inputs(GenerationMode::Exhaustive).take(LARGE_LIMIT) {

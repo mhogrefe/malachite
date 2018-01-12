@@ -1,15 +1,13 @@
 use common::LARGE_LIMIT;
-use malachite_native::natural as native;
-use malachite_gmp::natural as gmp;
-use malachite_test::common::{gmp_natural_to_native, GenerationMode};
+use malachite_nz::natural::Natural;
+use malachite_test::common::GenerationMode;
 use malachite_test::natural::conversion::to_u64::select_inputs;
 use std::str::FromStr;
 
 #[test]
 fn test_to_u64() {
     let test = |n, out| {
-        assert_eq!(native::Natural::from_str(n).unwrap().to_u64(), out);
-        assert_eq!(gmp::Natural::from_str(n).unwrap().to_u64(), out);
+        assert_eq!(Natural::from_str(n).unwrap().to_u64(), out);
     };
     test("0", Some(0));
     test("123", Some(123));
@@ -21,8 +19,7 @@ fn test_to_u64() {
 #[test]
 fn test_to_u64_wrapping() {
     let test = |n, out| {
-        assert_eq!(native::Natural::from_str(n).unwrap().to_u64_wrapping(), out);
-        assert_eq!(gmp::Natural::from_str(n).unwrap().to_u64_wrapping(), out);
+        assert_eq!(Natural::from_str(n).unwrap().to_u64_wrapping(), out);
     };
     test("0", 0);
     test("123", 123);
@@ -33,19 +30,16 @@ fn test_to_u64_wrapping() {
 
 #[test]
 fn to_u64_properties() {
-    // x.to_u64() is equivalent for malachite-gmp and malachite-native.
     // if x < 2^64, from(x.to_u64().unwrap()) == x
     // if x < 2^64, x.to_u64() == Some(x.to_u64_wrapping())
     // if x >= 2^64, x.to_u64().is_none()
-    let one_natural = |gmp_x: gmp::Natural| {
-        let x = gmp_natural_to_native(&gmp_x);
-        let native_u64 = x.to_u64();
-        assert_eq!(gmp_x.to_u64(), native_u64);
+    let one_natural = |x: Natural| {
+        let result = x.to_u64();
         if x.significant_bits() <= 64 {
-            assert_eq!(native::Natural::from(native_u64.unwrap()), x);
-            assert_eq!(native_u64, Some(x.to_u64_wrapping()));
+            assert_eq!(Natural::from(result.unwrap()), x);
+            assert_eq!(result, Some(x.to_u64_wrapping()));
         } else {
-            assert!(native_u64.is_none());
+            assert!(result.is_none());
         }
     };
 
@@ -60,12 +54,9 @@ fn to_u64_properties() {
 
 #[test]
 fn to_u64_wrapping_properties() {
-    // x.to_u64_wrapping() is equivalent for malachite-gmp and malachite-native.
     // TODO relate with BitAnd
-    let one_natural = |gmp_x: gmp::Natural| {
-        let x = gmp_natural_to_native(&gmp_x);
-        let native_u64 = x.to_u64_wrapping();
-        assert_eq!(gmp_x.to_u64_wrapping(), native_u64);
+    let one_natural = |x: Natural| {
+        x.to_u64_wrapping();
     };
 
     for n in select_inputs(GenerationMode::Exhaustive).take(LARGE_LIMIT) {

@@ -1,8 +1,7 @@
-use common::{gmp_natural_to_native, GenerationMode};
+use common::GenerationMode;
 use malachite_base::traits::{SubMul, SubMulAssign};
-use malachite_native::natural as native;
-use malachite_gmp::natural as gmp;
-use rust_wheels::benchmarks::{BenchmarkOptions2, benchmark_2};
+use malachite_nz::natural::Natural;
+use rust_wheels::benchmarks::{BenchmarkOptions1, BenchmarkOptions2, benchmark_1, benchmark_2};
 use rust_wheels::iterators::common::EXAMPLE_SEED;
 use rust_wheels::iterators::general::random_x;
 use rust_wheels::iterators::naturals::{exhaustive_naturals, random_naturals};
@@ -10,7 +9,7 @@ use rust_wheels::iterators::primitive_ints::exhaustive_u;
 use rust_wheels::iterators::tuples::{exhaustive_triples, random_triples};
 use std::cmp::max;
 
-type It1 = Iterator<Item = (gmp::Natural, gmp::Natural, u32)>;
+type It1 = Iterator<Item = (Natural, Natural, u32)>;
 
 pub fn exhaustive_inputs_1() -> Box<It1> {
     Box::new(exhaustive_inputs_2().filter(|&(ref a, ref b, c)| a >= &(b * c)))
@@ -27,7 +26,7 @@ pub fn select_inputs_1(gm: GenerationMode) -> Box<It1> {
     }
 }
 
-type It2 = Iterator<Item = (gmp::Natural, gmp::Natural, u32)>;
+type It2 = Iterator<Item = (Natural, Natural, u32)>;
 
 pub fn exhaustive_inputs_2() -> Box<It2> {
     Box::new(exhaustive_triples(
@@ -86,18 +85,13 @@ pub fn benchmark_natural_sub_mul_assign_u32(gm: GenerationMode, limit: usize, fi
         "benchmarking {} Natural.sub_mul_assign(&Natural, u32)",
         gm.name()
     );
-    benchmark_2(BenchmarkOptions2 {
+    benchmark_1(BenchmarkOptions1 {
         xs: select_inputs_1(gm),
-        function_f: &(|(mut a, b, c): (gmp::Natural, gmp::Natural, u32)| a.sub_mul_assign(&b, c)),
-        function_g: &(|(mut a, b, c): (native::Natural, native::Natural, u32)| {
-            a.sub_mul_assign(&b, c)
-        }),
+        function_f: &(|(mut a, b, c): (Natural, Natural, u32)| a.sub_mul_assign(&b, c)),
         x_cons: &(|t| t.clone()),
-        y_cons: &(|&(ref a, ref b, c)| (gmp_natural_to_native(a), gmp_natural_to_native(b), c)),
         x_param: &(|&(ref a, ref b, _)| max(a.significant_bits(), b.significant_bits()) as usize),
         limit,
-        f_name: "malachite-gmp",
-        g_name: "malachite-native",
+        f_name: "malachite",
         title: "Natural.sub\\\\_mul\\\\_assign(\\\\&Natural, u32)",
         x_axis_label: "max(a.significant\\\\_bits(), b.significant\\\\_bits())",
         y_axis_label: "time (ns)",
@@ -116,12 +110,10 @@ pub fn benchmark_natural_sub_mul_assign_u32_algorithms(
     );
     benchmark_2(BenchmarkOptions2 {
         xs: select_inputs_1(gm),
-        function_f: &(|(mut a, b, c): (native::Natural, native::Natural, u32)| {
-            a.sub_mul_assign(&b, c)
-        }),
-        function_g: &(|(mut a, b, c): (native::Natural, native::Natural, u32)| a -= &(&b * c)),
-        x_cons: &(|&(ref a, ref b, c)| (gmp_natural_to_native(a), gmp_natural_to_native(b), c)),
-        y_cons: &(|&(ref a, ref b, c)| (gmp_natural_to_native(a), gmp_natural_to_native(b), c)),
+        function_f: &(|(mut a, b, c): (Natural, Natural, u32)| a.sub_mul_assign(&b, c)),
+        function_g: &(|(mut a, b, c): (Natural, Natural, u32)| a -= &(&b * c)),
+        x_cons: &(|t| t.clone()),
+        y_cons: &(|t| t.clone()),
         x_param: &(|&(ref a, ref b, _)| max(a.significant_bits(), b.significant_bits()) as usize),
         limit,
         f_name: "Natural.sub\\\\_mul\\\\_assign(\\\\&Natural, u32)",
@@ -135,16 +127,13 @@ pub fn benchmark_natural_sub_mul_assign_u32_algorithms(
 
 pub fn benchmark_natural_sub_mul_u32(gm: GenerationMode, limit: usize, file_name: &str) {
     println!("benchmarking {} Natural.sub_mul(&Natural, u32)", gm.name());
-    benchmark_2(BenchmarkOptions2 {
+    benchmark_1(BenchmarkOptions1 {
         xs: select_inputs_2(gm),
-        function_f: &(|(a, b, c): (gmp::Natural, gmp::Natural, u32)| a.sub_mul(&b, c)),
-        function_g: &(|(a, b, c): (native::Natural, native::Natural, u32)| a.sub_mul(&b, c)),
+        function_f: &(|(a, b, c): (Natural, Natural, u32)| a.sub_mul(&b, c)),
         x_cons: &(|t| t.clone()),
-        y_cons: &(|&(ref a, ref b, c)| (gmp_natural_to_native(a), gmp_natural_to_native(b), c)),
         x_param: &(|&(ref a, ref b, _)| max(a.significant_bits(), b.significant_bits()) as usize),
         limit,
-        f_name: "malachite-gmp",
-        g_name: "malachite-native",
+        f_name: "malachite",
         title: "Natural.sub\\\\_mul(\\\\&Natural, u32)",
         x_axis_label: "max(a.significant\\\\_bits(), b.significant\\\\_bits())",
         y_axis_label: "time (ns)",
@@ -163,10 +152,10 @@ pub fn benchmark_natural_sub_mul_u32_evaluation_strategy(
     );
     benchmark_2(BenchmarkOptions2 {
         xs: select_inputs_2(gm),
-        function_f: &(|(a, b, c): (native::Natural, native::Natural, u32)| a.sub_mul(&b, c)),
-        function_g: &(|(a, b, c): (native::Natural, native::Natural, u32)| (&a).sub_mul(&b, c)),
-        x_cons: &(|&(ref a, ref b, c)| (gmp_natural_to_native(a), gmp_natural_to_native(b), c)),
-        y_cons: &(|&(ref a, ref b, c)| (gmp_natural_to_native(a), gmp_natural_to_native(b), c)),
+        function_f: &(|(a, b, c): (Natural, Natural, u32)| a.sub_mul(&b, c)),
+        function_g: &(|(a, b, c): (Natural, Natural, u32)| (&a).sub_mul(&b, c)),
+        x_cons: &(|t| t.clone()),
+        y_cons: &(|t| t.clone()),
         x_param: &(|&(ref a, ref b, _)| max(a.significant_bits(), b.significant_bits()) as usize),
         limit,
         f_name: "Natural.sub\\\\_mul(\\\\&Natural, u32)",
@@ -185,10 +174,10 @@ pub fn benchmark_natural_sub_mul_u32_algorithms(gm: GenerationMode, limit: usize
     );
     benchmark_2(BenchmarkOptions2 {
         xs: select_inputs_2(gm),
-        function_f: &(|(a, b, c): (native::Natural, native::Natural, u32)| a.sub_mul(&b, c)),
-        function_g: &(|(a, b, c): (native::Natural, native::Natural, u32)| a - &(&b * c)),
-        x_cons: &(|&(ref a, ref b, c)| (gmp_natural_to_native(a), gmp_natural_to_native(b), c)),
-        y_cons: &(|&(ref a, ref b, c)| (gmp_natural_to_native(a), gmp_natural_to_native(b), c)),
+        function_f: &(|(a, b, c): (Natural, Natural, u32)| a.sub_mul(&b, c)),
+        function_g: &(|(a, b, c): (Natural, Natural, u32)| a - &(&b * c)),
+        x_cons: &(|t| t.clone()),
+        y_cons: &(|t| t.clone()),
         x_param: &(|&(ref a, ref b, _)| max(a.significant_bits(), b.significant_bits()) as usize),
         limit,
         f_name: "Natural.sub\\\\_mul(\\\\&Natural, u32)",
@@ -211,10 +200,10 @@ pub fn benchmark_natural_sub_mul_u32_ref_algorithms(
     );
     benchmark_2(BenchmarkOptions2 {
         xs: select_inputs_2(gm),
-        function_f: &(|(a, b, c): (native::Natural, native::Natural, u32)| (&a).sub_mul(&b, c)),
-        function_g: &(|(a, b, c): (native::Natural, native::Natural, u32)| &a - &(&b * c)),
-        x_cons: &(|&(ref a, ref b, c)| (gmp_natural_to_native(a), gmp_natural_to_native(b), c)),
-        y_cons: &(|&(ref a, ref b, c)| (gmp_natural_to_native(a), gmp_natural_to_native(b), c)),
+        function_f: &(|(a, b, c): (Natural, Natural, u32)| (&a).sub_mul(&b, c)),
+        function_g: &(|(a, b, c): (Natural, Natural, u32)| &a - &(&b * c)),
+        x_cons: &(|t| t.clone()),
+        y_cons: &(|t| t.clone()),
         x_param: &(|&(ref a, ref b, _)| max(a.significant_bits(), b.significant_bits()) as usize),
         limit,
         f_name: "(\\\\&Natural).sub\\\\_mul(\\\\&Natural, u32)",

@@ -1,10 +1,9 @@
-use common::{gmp_integer_to_native, gmp_integer_to_rugint, GenerationMode};
+use common::{integer_to_rugint_integer, GenerationMode};
 use malachite_base::round::RoundingMode;
 use malachite_base::traits::{ShrRound, ShrRoundAssign};
-use malachite_gmp::integer as gmp;
-use malachite_native::integer as native;
+use malachite_nz::integer::Integer;
 use rugint;
-use rust_wheels::benchmarks::{BenchmarkOptions2, BenchmarkOptions3, benchmark_2, benchmark_3};
+use rust_wheels::benchmarks::{BenchmarkOptions1, BenchmarkOptions2, benchmark_1, benchmark_2};
 use rust_wheels::iterators::common::EXAMPLE_SEED;
 use rust_wheels::iterators::integers_geometric::i32s_geometric;
 use rust_wheels::iterators::integers::{exhaustive_integers, random_integers};
@@ -12,7 +11,7 @@ use rust_wheels::iterators::primitive_ints::exhaustive_i;
 use rust_wheels::iterators::rounding_modes::{exhaustive_rounding_modes, random_rounding_modes};
 use rust_wheels::iterators::tuples::{lex_pairs, log_pairs, random_pairs, random_triples};
 
-type It1 = Iterator<Item = (gmp::Integer, i32)>;
+type It1 = Iterator<Item = (Integer, i32)>;
 
 pub fn exhaustive_inputs_1() -> Box<It1> {
     Box::new(log_pairs(exhaustive_integers(), exhaustive_i()))
@@ -33,7 +32,7 @@ pub fn select_inputs_1(gm: GenerationMode) -> Box<It1> {
     }
 }
 
-type It2 = Iterator<Item = (gmp::Integer, i32, RoundingMode)>;
+type It2 = Iterator<Item = (Integer, i32, RoundingMode)>;
 
 pub fn exhaustive_inputs_2() -> Box<It2> {
     Box::new(
@@ -124,19 +123,16 @@ pub fn demo_integer_shr_round_i32_ref(gm: GenerationMode, limit: usize) {
 
 pub fn benchmark_integer_shr_assign_i32(gm: GenerationMode, limit: usize, file_name: &str) {
     println!("benchmarking {} Integer >>= i32", gm.name());
-    benchmark_3(BenchmarkOptions3 {
+    benchmark_2(BenchmarkOptions2 {
         xs: select_inputs_1(gm),
         function_f: &(|(mut n, i)| n >>= i),
-        function_g: &(|(mut n, i): (native::Integer, i32)| n >>= i),
-        function_h: &(|(mut n, i): (rugint::Integer, i32)| n >>= i),
+        function_g: &(|(mut n, i): (rugint::Integer, i32)| n >>= i),
         x_cons: &(|p| p.clone()),
-        y_cons: &(|&(ref n, index)| (gmp_integer_to_native(n), index)),
-        z_cons: &(|&(ref n, index)| (gmp_integer_to_rugint(n), index)),
+        y_cons: &(|&(ref n, index)| (integer_to_rugint_integer(n), index)),
         x_param: &(|&(_, index)| index as usize),
         limit,
-        f_name: "malachite-gmp",
-        g_name: "malachite-native",
-        h_name: "rugint",
+        f_name: "malachite",
+        g_name: "rugint",
         title: "Integer >>= i32",
         x_axis_label: "other",
         y_axis_label: "time (ns)",
@@ -146,19 +142,16 @@ pub fn benchmark_integer_shr_assign_i32(gm: GenerationMode, limit: usize, file_n
 
 pub fn benchmark_integer_shr_i32(gm: GenerationMode, limit: usize, file_name: &str) {
     println!("benchmarking {} Integer >> i32", gm.name());
-    benchmark_3(BenchmarkOptions3 {
+    benchmark_2(BenchmarkOptions2 {
         xs: select_inputs_1(gm),
         function_f: &(|(n, i)| n >> i),
-        function_g: &(|(n, i): (native::Integer, i32)| n >> i),
-        function_h: &(|(n, i): (rugint::Integer, i32)| n >> i),
+        function_g: &(|(n, i): (rugint::Integer, i32)| n >> i),
         x_cons: &(|p| p.clone()),
-        y_cons: &(|&(ref n, index)| (gmp_integer_to_native(n), index)),
-        z_cons: &(|&(ref n, index)| (gmp_integer_to_rugint(n), index)),
+        y_cons: &(|&(ref n, index)| (integer_to_rugint_integer(n), index)),
         x_param: &(|&(_, index)| index as usize),
         limit,
-        f_name: "malachite-gmp",
-        g_name: "malachite-native",
-        h_name: "rugint",
+        f_name: "malachite",
+        g_name: "rugint",
         title: "Integer >> i32",
         x_axis_label: "other",
         y_axis_label: "time (ns)",
@@ -168,16 +161,13 @@ pub fn benchmark_integer_shr_i32(gm: GenerationMode, limit: usize, file_name: &s
 
 pub fn benchmark_integer_shr_i32_ref(gm: GenerationMode, limit: usize, file_name: &str) {
     println!("benchmarking {} &Integer >> i32", gm.name());
-    benchmark_2(BenchmarkOptions2 {
+    benchmark_1(BenchmarkOptions1 {
         xs: select_inputs_1(gm),
         function_f: &(|(n, i)| &n >> i),
-        function_g: &(|(n, i): (native::Integer, i32)| &n >> i),
         x_cons: &(|p| p.clone()),
-        y_cons: &(|&(ref n, index)| (gmp_integer_to_native(n), index)),
         x_param: &(|&(_, index)| index as usize),
         limit,
-        f_name: "malachite-gmp",
-        g_name: "malachite-native",
+        f_name: "malachite",
         title: "\\\\&Integer >> i32",
         x_axis_label: "other",
         y_axis_label: "time (ns)",
@@ -190,20 +180,13 @@ pub fn benchmark_integer_shr_round_assign_i32(gm: GenerationMode, limit: usize, 
         "benchmarking {} Integer.shr_round_assign(i32, RoundingMode)",
         gm.name()
     );
-    benchmark_2(BenchmarkOptions2 {
+    benchmark_1(BenchmarkOptions1 {
         xs: select_inputs_2(gm),
-        function_f: &(|(mut n, i, rm): (gmp::Integer, i32, RoundingMode)| {
-            n.shr_round_assign(i, rm)
-        }),
-        function_g: &(|(mut n, i, rm): (native::Integer, i32, RoundingMode)| {
-            n.shr_round_assign(i, rm)
-        }),
+        function_f: &(|(mut n, i, rm): (Integer, i32, RoundingMode)| n.shr_round_assign(i, rm)),
         x_cons: &(|p| p.clone()),
-        y_cons: &(|&(ref n, index, rm)| (gmp_integer_to_native(n), index, rm)),
         x_param: &(|&(_, index, _)| index as usize),
         limit,
-        f_name: "malachite-gmp",
-        g_name: "malachite-native",
+        f_name: "malachite",
         title: "Integer.shr\\\\_round\\\\_assign(i32, RoundingMode)",
         x_axis_label: "other",
         y_axis_label: "time (ns)",
@@ -216,16 +199,13 @@ pub fn benchmark_integer_shr_round_i32(gm: GenerationMode, limit: usize, file_na
         "benchmarking {} Integer.shr_round(i32, RoundingMode)",
         gm.name()
     );
-    benchmark_2(BenchmarkOptions2 {
+    benchmark_1(BenchmarkOptions1 {
         xs: select_inputs_2(gm),
-        function_f: &(|(n, i, rm): (gmp::Integer, i32, RoundingMode)| n.shr_round(i, rm)),
-        function_g: &(|(n, i, rm): (native::Integer, i32, RoundingMode)| n.shr_round(i, rm)),
+        function_f: &(|(n, i, rm): (Integer, i32, RoundingMode)| n.shr_round(i, rm)),
         x_cons: &(|p| p.clone()),
-        y_cons: &(|&(ref n, index, rm)| (gmp_integer_to_native(n), index, rm)),
         x_param: &(|&(_, index, _)| index as usize),
         limit,
-        f_name: "malachite-gmp",
-        g_name: "malachite-native",
+        f_name: "malachite",
         title: "Integer.shr\\\\_round(i32, RoundingMode)",
         x_axis_label: "other",
         y_axis_label: "time (ns)",
@@ -238,16 +218,13 @@ pub fn benchmark_integer_shr_round_i32_ref(gm: GenerationMode, limit: usize, fil
         "benchmarking {} (&Integer).shr_round(i32, RoundingMode)",
         gm.name()
     );
-    benchmark_2(BenchmarkOptions2 {
+    benchmark_1(BenchmarkOptions1 {
         xs: select_inputs_2(gm),
-        function_f: &(|(n, i, rm): (gmp::Integer, i32, RoundingMode)| (&n).shr_round(i, rm)),
-        function_g: &(|(n, i, rm): (native::Integer, i32, RoundingMode)| (&n).shr_round(i, rm)),
+        function_f: &(|(n, i, rm): (Integer, i32, RoundingMode)| (&n).shr_round(i, rm)),
         x_cons: &(|p| p.clone()),
-        y_cons: &(|&(ref n, index, rm)| (gmp_integer_to_native(n), index, rm)),
         x_param: &(|&(_, index, _)| index as usize),
         limit,
-        f_name: "malachite-gmp",
-        g_name: "malachite-native",
+        f_name: "malachite",
         title: "(\\\\&Integer).shr\\\\_round(i32, RoundingMode)",
         x_axis_label: "other",
         y_axis_label: "time (ns)",

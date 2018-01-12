@@ -1,20 +1,14 @@
 use common::LARGE_LIMIT;
 use malachite_base::traits::Assign;
-use malachite_native::integer as native;
-use malachite_gmp::integer as gmp;
-use malachite_test::common::{gmp_integer_to_native, GenerationMode};
+use malachite_nz::integer::Integer;
+use malachite_test::common::GenerationMode;
 use malachite_test::integer::conversion::assign_i64::select_inputs;
 use std::str::FromStr;
 
 #[test]
 fn test_assign_i64() {
     let test = |u, v: i64, out| {
-        let mut x = native::Integer::from_str(u).unwrap();
-        x.assign(v);
-        assert_eq!(x.to_string(), out);
-        assert!(x.is_valid());
-
-        let mut x = gmp::Integer::from_str(u).unwrap();
+        let mut x = Integer::from_str(u).unwrap();
         x.assign(v);
         assert_eq!(x.to_string(), out);
         assert!(x.is_valid());
@@ -29,21 +23,16 @@ fn test_assign_i64() {
 
 #[test]
 fn assign_i64_properties() {
-    // n.assign(i) is equivalent for malachite-gmp and malachite-native.
     // n.assign(i) is valid.
     // n.assign(i); n == u
     // n.assign(Integer::from(i)) is equivalent to n.assign(i)
-    let integer_and_i64 = |mut gmp_n: gmp::Integer, i: i64| {
-        let mut n = gmp_integer_to_native(&gmp_n);
+    let integer_and_i64 = |mut n: Integer, i: i64| {
         let old_n = n.clone();
-        gmp_n.assign(i);
-        assert!(gmp_n.is_valid());
-        assert_eq!(gmp_n, gmp::Integer::from(i));
         n.assign(i);
         assert!(n.is_valid());
-        assert_eq!(n, native::Integer::from(i));
+        assert_eq!(n, Integer::from(i));
         let mut alt_n = old_n.clone();
-        alt_n.assign(native::Integer::from(i));
+        alt_n.assign(Integer::from(i));
         assert_eq!(alt_n, n);
     };
 

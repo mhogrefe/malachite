@@ -1,9 +1,7 @@
 use common::LARGE_LIMIT;
-use malachite_native as native;
-use malachite_gmp as gmp;
-use malachite_test::common::{gmp_integer_to_native, gmp_natural_to_native,
-                             native_integer_to_rugint, native_natural_to_rugint_integer,
-                             GenerationMode};
+use malachite_nz::integer::Integer;
+use malachite_nz::natural::Natural;
+use malachite_test::common::{integer_to_rugint_integer, natural_to_rugint_integer, GenerationMode};
 use malachite_test::integer::comparison::partial_eq_natural::select_inputs_1;
 use rugint;
 use rust_wheels::iterators::common::EXAMPLE_SEED;
@@ -16,24 +14,12 @@ use std::str::FromStr;
 fn test_integer_partial_eq_natural() {
     let test = |u, v, out| {
         assert_eq!(
-            native::integer::Integer::from_str(v).unwrap()
-                == native::natural::Natural::from_str(u).unwrap(),
-            out
-        );
-        assert_eq!(
-            gmp::integer::Integer::from_str(v).unwrap()
-                == gmp::natural::Natural::from_str(u).unwrap(),
+            Integer::from_str(v).unwrap() == Natural::from_str(u).unwrap(),
             out
         );
 
         assert_eq!(
-            native::natural::Natural::from_str(u).unwrap()
-                == native::integer::Integer::from_str(v).unwrap(),
-            out
-        );
-        assert_eq!(
-            gmp::natural::Natural::from_str(u).unwrap()
-                == gmp::integer::Integer::from_str(v).unwrap(),
+            Natural::from_str(u).unwrap() == Integer::from_str(v).unwrap(),
             out
         );
 
@@ -55,29 +41,23 @@ fn test_integer_partial_eq_natural() {
 
 #[test]
 fn partial_eq_natural_properties() {
-    // x == y is equivalent for malachite-gmp, malachite-native, and rugint.
+    // x == y is equivalent for malachite and rugint.
     // x == y.into_integer() is equivalent to x == y.
-    let integer_and_natural = |gmp_x: gmp::integer::Integer, gmp_y: gmp::natural::Natural| {
-        let x = gmp_integer_to_native(&gmp_x);
-        let y = gmp_natural_to_native(&gmp_y);
+    let integer_and_natural = |x: Integer, y: Natural| {
         let eq = x == y;
-        assert_eq!(gmp_x == gmp_y, eq);
         assert_eq!(
-            native_integer_to_rugint(&x) == native_natural_to_rugint_integer(&y),
+            integer_to_rugint_integer(&x) == natural_to_rugint_integer(&y),
             eq
         );
         assert_eq!(x == y.into_integer(), eq)
     };
 
-    // x == y is equivalent for malachite-gmp, malachite-native, and rugint.
+    // x == y is equivalent for malachite and rugint.
     // x.into_integer() == y is equivalent to x == y.
-    let natural_and_integer = |gmp_x: gmp::natural::Natural, gmp_y: gmp::integer::Integer| {
-        let x = gmp_natural_to_native(&gmp_x);
-        let y = gmp_integer_to_native(&gmp_y);
+    let natural_and_integer = |x: Natural, y: Integer| {
         let eq = x == y;
-        assert_eq!(gmp_x == gmp_y, eq);
         assert_eq!(
-            native_natural_to_rugint_integer(&x) == native_integer_to_rugint(&y),
+            natural_to_rugint_integer(&x) == integer_to_rugint_integer(&y),
             eq
         );
         assert_eq!(x.into_integer() == y, eq)

@@ -1,18 +1,13 @@
 use common::LARGE_LIMIT;
-use malachite_native::integer as native;
-use malachite_gmp::integer as gmp;
-use malachite_test::common::{gmp_integer_to_native, GenerationMode};
+use malachite_nz::integer::Integer;
+use malachite_test::common::GenerationMode;
 use malachite_test::integer::logic::from_twos_complement_limbs::select_inputs;
 use std::cmp::Ordering;
 
 #[test]
 fn test_from_from_twos_complement_limbs_le() {
     let test = |limbs: &[u32], out| {
-        let x = native::Integer::from_twos_complement_limbs_le(limbs);
-        assert_eq!(x.to_string(), out);
-        assert!(x.is_valid());
-
-        let x = gmp::Integer::from_twos_complement_limbs_le(limbs);
+        let x = Integer::from_twos_complement_limbs_le(limbs);
         assert_eq!(x.to_string(), out);
         assert!(x.is_valid());
     };
@@ -52,11 +47,7 @@ fn test_from_from_twos_complement_limbs_le() {
 #[test]
 fn test_from_from_twos_complement_limbs_be() {
     let test = |limbs: &[u32], out| {
-        let x = native::Integer::from_twos_complement_limbs_be(limbs);
-        assert_eq!(x.to_string(), out);
-        assert!(x.is_valid());
-
-        let x = gmp::Integer::from_twos_complement_limbs_be(limbs);
+        let x = Integer::from_twos_complement_limbs_be(limbs);
         assert_eq!(x.to_string(), out);
         assert!(x.is_valid());
     };
@@ -121,29 +112,23 @@ fn trim_be_limbs(xs: &mut Vec<u32>) {
 
 #[test]
 fn from_twos_complement_limbs_le_properties() {
-    // Integer::from_twos_complement_limbs_le(limbs) is equivalent for malachite-gmp and
-    //      malachite-native.
     // (Integer::from_twos_complement_limbs_le(limbs) == x) ==
     //      (x.limbs_le() == limbs.rev().trim_be_limbs().rev())
     // Integer::from_twos_complement_limbs_le(limbs.reverse()) ==
     //      Integer::from_twos_complement_limbs_be(limbs)
     // if limbs is canonical, Integer::from_twos_complement_limbs_le(limbs).limbs_le() == x
     let u32_slice = |limbs: &[u32]| {
-        let x = native::Integer::from_twos_complement_limbs_le(limbs);
-        assert_eq!(
-            gmp_integer_to_native(&gmp::Integer::from_twos_complement_limbs_le(limbs)),
-            x
-        );
+        let x = Integer::from_twos_complement_limbs_le(limbs);
         let mut trimmed_limbs: Vec<u32> = limbs.iter().cloned().rev().collect();
         trim_be_limbs(&mut trimmed_limbs);
         trimmed_limbs.reverse();
         assert_eq!(x.twos_complement_limbs_le(), trimmed_limbs);
         assert_eq!(
-            native::Integer::from_twos_complement_limbs_be(&limbs
+            Integer::from_twos_complement_limbs_be(&limbs
                 .iter()
                 .cloned()
                 .rev()
-                .collect::<Vec<u32>>(),),
+                .collect::<Vec<u32>>()),
             x
         );
         if match x.sign() {
@@ -173,28 +158,22 @@ fn from_twos_complement_limbs_le_properties() {
 
 #[test]
 fn from_twos_complement_limbs_be_properties() {
-    // Integer::from_twos_complement_limbs_be(limbs) is equivalent for malachite-gmp and
-    //      malachite-native.
     // (Integer::from_twos_complement_limbs_be(limbs) == x) ==
     //      (x.limbs_le() == limbs.trim_be_limbs())
     // Integer::from_twos_complement_limbs_be(limbs.reverse()) ==
     //      Integer::from_twos_complement_limbs_le(limbs)
     // if limbs is canonical, Integer::from_twos_complement_limbs_be(limbs).limbs_be() == x
     let u32_slice = |limbs: &[u32]| {
-        let x = native::Integer::from_twos_complement_limbs_be(limbs);
-        assert_eq!(
-            gmp_integer_to_native(&gmp::Integer::from_twos_complement_limbs_be(limbs)),
-            x
-        );
+        let x = Integer::from_twos_complement_limbs_be(limbs);
         let mut trimmed_limbs: Vec<u32> = limbs.to_vec();
         trim_be_limbs(&mut trimmed_limbs);
         assert_eq!(x.twos_complement_limbs_be(), trimmed_limbs);
         assert_eq!(
-            native::Integer::from_twos_complement_limbs_le(&limbs
+            Integer::from_twos_complement_limbs_le(&limbs
                 .iter()
                 .cloned()
                 .rev()
-                .collect::<Vec<u32>>(),),
+                .collect::<Vec<u32>>()),
             x
         );
         if match x.sign() {

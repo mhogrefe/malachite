@@ -1,14 +1,13 @@
-use common::{gmp_integer_to_native, GenerationMode};
-use malachite_gmp::integer as gmp;
-use malachite_native::integer as native;
-use rust_wheels::benchmarks::{BenchmarkOptions2, benchmark_2};
+use common::GenerationMode;
+use malachite_nz::integer::Integer;
+use rust_wheels::benchmarks::{BenchmarkOptions1, BenchmarkOptions2, benchmark_1, benchmark_2};
 use rust_wheels::iterators::common::EXAMPLE_SEED;
 use rust_wheels::iterators::integers_geometric::natural_u32s_geometric;
 use rust_wheels::iterators::integers::{exhaustive_integers, random_integers};
 use rust_wheels::iterators::primitive_ints::exhaustive_u;
 use rust_wheels::iterators::tuples::{log_pairs, random_pairs};
 
-type It = Iterator<Item = (gmp::Integer, u32)>;
+type It = Iterator<Item = (Integer, u32)>;
 
 pub fn exhaustive_inputs() -> Box<It> {
     Box::new(log_pairs(exhaustive_integers(), exhaustive_u::<u32>()))
@@ -48,16 +47,13 @@ pub fn benchmark_integer_divisible_by_power_of_2(
         "benchmarking {} Integer.divisible_by_power_of_2(u32)",
         gm.name()
     );
-    benchmark_2(BenchmarkOptions2 {
+    benchmark_1(BenchmarkOptions1 {
         xs: select_inputs(gm),
-        function_f: &(|(n, pow): (gmp::Integer, u32)| n.divisible_by_power_of_2(pow)),
-        function_g: &(|(n, pow): (native::Integer, u32)| n.divisible_by_power_of_2(pow)),
+        function_f: &(|(n, pow): (Integer, u32)| n.divisible_by_power_of_2(pow)),
         x_cons: &(|&(ref n, pow)| (n.clone(), pow)),
-        y_cons: &(|&(ref n, pow)| (gmp_integer_to_native(n), pow)),
         x_param: &(|&(ref n, _)| n.significant_bits() as usize),
         limit,
-        f_name: "malachite-gmp",
-        g_name: "malachite-native",
+        f_name: "malachite",
         title: "Integer.divisible\\\\_by\\\\_power\\\\_of\\\\_2(u32)",
         x_axis_label: "n.significant\\\\_bits()",
         y_axis_label: "time (ns)",
@@ -76,12 +72,12 @@ pub fn benchmark_integer_divisible_by_power_of_2_algorithms(
     );
     benchmark_2(BenchmarkOptions2 {
         xs: select_inputs(gm),
-        function_f: &(|(n, pow): (native::Integer, u32)| n.divisible_by_power_of_2(pow)),
-        function_g: &(|(n, pow): (native::Integer, u32)| {
+        function_f: &(|(n, pow): (Integer, u32)| n.divisible_by_power_of_2(pow)),
+        function_g: &(|(n, pow): (Integer, u32)| {
             n.trailing_zeros().map_or(true, |z| z >= pow.into())
         }),
-        x_cons: &(|&(ref n, pow)| (gmp_integer_to_native(n), pow)),
-        y_cons: &(|&(ref n, pow)| (gmp_integer_to_native(n), pow)),
+        x_cons: &(|p| p.clone()),
+        y_cons: &(|p| p.clone()),
         x_param: &(|&(ref n, _)| n.significant_bits() as usize),
         limit,
         f_name: "Integer.divisible\\\\_by\\\\_power\\\\_of\\\\_2(u32)",

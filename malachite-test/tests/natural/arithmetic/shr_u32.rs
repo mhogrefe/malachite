@@ -1,14 +1,11 @@
 use common::LARGE_LIMIT;
 use malachite_base::round::RoundingMode;
 use malachite_base::traits::{ShrRound, ShrRoundAssign, Zero};
-use malachite_native::natural as native;
-use malachite_gmp::natural as gmp;
-use malachite_test::common::{gmp_natural_to_native, native_natural_to_gmp,
-                             native_natural_to_num_biguint, native_natural_to_rugint_integer,
-                             num_biguint_to_native_natural, rugint_integer_to_native_natural,
-                             GenerationMode};
+use malachite_nz::natural::Natural;
+use malachite_test::common::{biguint_to_natural, natural_to_biguint, natural_to_rugint_integer,
+                             rugint_integer_to_natural, GenerationMode};
 use malachite_test::natural::arithmetic::shr_u32::{select_inputs_1, select_inputs_2};
-use num;
+use num::BigUint;
 use rugint;
 use rust_wheels::iterators::common::EXAMPLE_SEED;
 use rust_wheels::iterators::general::random_x;
@@ -24,12 +21,7 @@ use std::str::FromStr;
 #[test]
 fn test_shr_u32() {
     let test = |u, v: u32, out| {
-        let mut n = native::Natural::from_str(u).unwrap();
-        n >>= v;
-        assert_eq!(n.to_string(), out);
-        assert!(n.is_valid());
-
-        let mut n = gmp::Natural::from_str(u).unwrap();
+        let mut n = Natural::from_str(u).unwrap();
         n >>= v;
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
@@ -38,29 +30,21 @@ fn test_shr_u32() {
         n >>= v;
         assert_eq!(n.to_string(), out);
 
-        let n = native::Natural::from_str(u).unwrap() >> v;
-        assert_eq!(n.to_string(), out);
-        assert!(n.is_valid());
-
-        let n = gmp::Natural::from_str(u).unwrap() >> v;
+        let n = Natural::from_str(u).unwrap() >> v;
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
         let n = rugint::Integer::from_str(u).unwrap() >> v;
         assert_eq!(n.to_string(), out);
 
-        let n = num::BigUint::from_str(u).unwrap() >> v as usize;
+        let n = BigUint::from_str(u).unwrap() >> v as usize;
         assert_eq!(n.to_string(), out);
 
-        let n = &native::Natural::from_str(u).unwrap() >> v;
-        assert_eq!(n.to_string(), out);
-        assert!(n.is_valid());
-
-        let n = &gmp::Natural::from_str(u).unwrap() >> v;
+        let n = &Natural::from_str(u).unwrap() >> v;
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = &num::BigUint::from_str(u).unwrap() >> v as usize;
+        let n = &BigUint::from_str(u).unwrap() >> v as usize;
         assert_eq!(n.to_string(), out);
     };
     test("0", 0, "0");
@@ -108,9 +92,9 @@ fn test_shr_u32() {
 
 #[test]
 fn shr_u32_properties() {
-    // n >>= u is equivalent for malachite-gmp, malachite-native, and rugint.
-    // n >> u is equivalent for malachite-gmp, malachite-native, num, and rugint.
-    // &n >> u is equivalent for malachite-gmp, malachite-native, and num.
+    // n >>= u is equivalent for malachite and rugint.
+    // n >> u is equivalent for malachite, num, and rugint.
+    // &n >> u is equivalent for malachite and num.
     // n >>= u; n is valid.
     // n >> u is valid.
     // &n >> u is valid.
@@ -119,19 +103,14 @@ fn shr_u32_properties() {
     // TODO n >> u == n / (1 << u)
     // n >> u == n.shr_round(u, Floor)
     // if u < 2^31, n >> u == n >> (u as i32) == n << -(u as i32)
-    let natural_and_u32 = |mut gmp_n: gmp::Natural, u: u32| {
-        let mut n = gmp_natural_to_native(&gmp_n);
+    let natural_and_u32 = |mut n: Natural, u: u32| {
         let old_n = n.clone();
-        gmp_n >>= u;
-        assert!(gmp_n.is_valid());
-
         n >>= u;
         assert!(n.is_valid());
-        assert_eq!(gmp_natural_to_native(&gmp_n), n);
 
-        let mut rugint_n = native_natural_to_rugint_integer(&old_n);
+        let mut rugint_n = natural_to_rugint_integer(&old_n);
         rugint_n >>= u;
-        assert_eq!(rugint_integer_to_native_natural(&rugint_n), n);
+        assert_eq!(rugint_integer_to_natural(&rugint_n), n);
 
         let n2 = old_n.clone();
         let result = &n2 >> u;
@@ -141,20 +120,12 @@ fn shr_u32_properties() {
         assert!(result.is_valid());
         assert_eq!(result, n);
 
-        let gmp_n2 = native_natural_to_gmp(&old_n);
-        let result = &gmp_n2 >> u;
-        assert!(result.is_valid());
-        assert_eq!(gmp_natural_to_native(&result), n);
-        let result = gmp_n2 >> u;
-        assert!(result.is_valid());
-        assert_eq!(gmp_natural_to_native(&result), n);
+        let num_n2 = natural_to_biguint(&old_n);
+        assert_eq!(biguint_to_natural(&(&num_n2 >> u as usize)), n);
+        assert_eq!(biguint_to_natural(&(num_n2 >> u as usize)), n);
 
-        let num_n2 = native_natural_to_num_biguint(&old_n);
-        assert_eq!(num_biguint_to_native_natural(&(&num_n2 >> u as usize)), n);
-        assert_eq!(num_biguint_to_native_natural(&(num_n2 >> u as usize)), n);
-
-        let rugint_n2 = native_natural_to_rugint_integer(&old_n);
-        assert_eq!(rugint_integer_to_native_natural(&(rugint_n2 >> u)), n);
+        let rugint_n2 = natural_to_rugint_integer(&old_n);
+        assert_eq!(rugint_integer_to_natural(&(rugint_n2 >> u)), n);
 
         assert!(&old_n >> u <= old_n);
         assert_eq!(&old_n >> u, (&old_n).shr_round(u, RoundingMode::Floor));
@@ -167,25 +138,23 @@ fn shr_u32_properties() {
 
     // if u >= 32, n >> u == 0
     let two_u32s = |u: u32, v: u32| {
-        assert_eq!(native::Natural::from(u) >> (v + 32), 0);
+        assert_eq!(Natural::from(u) >> (v + 32), 0);
     };
 
     // n >> u >> v == n >> (u + v)
-    let natural_and_two_u32s = |gmp_n: gmp::Natural, u: u32, v: u32| {
-        let n = gmp_natural_to_native(&gmp_n);
+    let natural_and_two_u32s = |n: Natural, u: u32, v: u32| {
         assert_eq!(&n >> u >> v, &n >> (u + v));
     };
 
     // n >> 0 == n
     #[allow(unknown_lints, identity_op)]
-    let one_natural = |gmp_n: gmp::Natural| {
-        let n = gmp_natural_to_native(&gmp_n);
+    let one_natural = |n: Natural| {
         assert_eq!(&n >> 0, n);
     };
 
     // 0 >> n == 0
     let one_u32 = |u: u32| {
-        assert_eq!(native::Natural::ZERO >> u, 0);
+        assert_eq!(Natural::ZERO >> u, 0);
     };
 
     for (n, u) in select_inputs_1(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
@@ -247,29 +216,16 @@ fn shr_u32_properties() {
 #[test]
 fn test_shr_round_u32() {
     let test = |u, v: u32, rm: RoundingMode, out| {
-        let mut n = native::Natural::from_str(u).unwrap();
+        let mut n = Natural::from_str(u).unwrap();
         n.shr_round_assign(v, rm);
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let mut n = gmp::Natural::from_str(u).unwrap();
-        n.shr_round_assign(v, rm);
+        let n = Natural::from_str(u).unwrap().shr_round(v, rm);
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = native::Natural::from_str(u).unwrap().shr_round(v, rm);
-        assert_eq!(n.to_string(), out);
-        assert!(n.is_valid());
-
-        let n = gmp::Natural::from_str(u).unwrap().shr_round(v, rm);
-        assert_eq!(n.to_string(), out);
-        assert!(n.is_valid());
-
-        let n = &native::Natural::from_str(u).unwrap().shr_round(v, rm);
-        assert_eq!(n.to_string(), out);
-        assert!(n.is_valid());
-
-        let n = &gmp::Natural::from_str(u).unwrap().shr_round(v, rm);
+        let n = &Natural::from_str(u).unwrap().shr_round(v, rm);
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
     };
@@ -777,169 +733,89 @@ fn test_shr_round_u32() {
 
 #[test]
 #[should_panic(expected = "Right shift is not exact: 123 >>= 1")]
-fn shr_round_assign_u32_fail_native_1() {
-    native::Natural::from(123u32).shr_round_assign(1, RoundingMode::Exact);
+fn shr_round_assign_u32_fail_1() {
+    Natural::from(123u32).shr_round_assign(1, RoundingMode::Exact);
 }
 
 #[test]
 #[should_panic(expected = "Right shift is not exact: 123 >>= 100")]
-fn shr_round_assign_u32_fail_native_2() {
-    native::Natural::from(123u32).shr_round_assign(100, RoundingMode::Exact);
+fn shr_round_assign_u32_fail_2() {
+    Natural::from(123u32).shr_round_assign(100, RoundingMode::Exact);
 }
 
 #[test]
 #[should_panic(expected = "Right shift is not exact: 1000000000001 >>= 1")]
-fn shr_round_assign_u32_fail_native_3() {
-    native::Natural::from_str("1000000000001")
+fn shr_round_assign_u32_fail_3() {
+    Natural::from_str("1000000000001")
         .unwrap()
         .shr_round_assign(1, RoundingMode::Exact);
 }
 
 #[test]
 #[should_panic(expected = "Right shift is not exact: 1000000000001 >>= 100")]
-fn shr_round_assign_u32_fail_native_4() {
-    native::Natural::from_str("1000000000001")
+fn shr_round_assign_u32_fail_4() {
+    Natural::from_str("1000000000001")
         .unwrap()
         .shr_round_assign(100, RoundingMode::Exact);
 }
 
 #[test]
 #[should_panic(expected = "Right shift is not exact: 123 >>= 1")]
-fn shr_round_u32_fail_native_1() {
-    native::Natural::from(123u32).shr_round(1, RoundingMode::Exact);
+fn shr_round_u32_fail_1() {
+    Natural::from(123u32).shr_round(1, RoundingMode::Exact);
 }
 
 #[test]
 #[should_panic(expected = "Right shift is not exact: 123 >>= 100")]
-fn shr_round_u32_fail_native_2() {
-    native::Natural::from(123u32).shr_round(100, RoundingMode::Exact);
+fn shr_round_u32_fail_2() {
+    Natural::from(123u32).shr_round(100, RoundingMode::Exact);
 }
 
 #[test]
 #[should_panic(expected = "Right shift is not exact: 1000000000001 >>= 1")]
-fn shr_round_u32_fail_native_3() {
-    native::Natural::from_str("1000000000001")
+fn shr_round_u32_fail_3() {
+    Natural::from_str("1000000000001")
         .unwrap()
         .shr_round(1, RoundingMode::Exact);
 }
 
 #[test]
 #[should_panic(expected = "Right shift is not exact: 1000000000001 >>= 100")]
-fn shr_round_u32_fail_native_4() {
-    native::Natural::from_str("1000000000001")
+fn shr_round_u32_fail_4() {
+    Natural::from_str("1000000000001")
         .unwrap()
         .shr_round(100, RoundingMode::Exact);
 }
 
 #[test]
 #[should_panic(expected = "Right shift is not exact: 123 >> 1")]
-fn shr_round_u32_ref_fail_native_1() {
-    (&native::Natural::from(123u32)).shr_round(1, RoundingMode::Exact);
+fn shr_round_u32_ref_fail_1() {
+    (&Natural::from(123u32)).shr_round(1, RoundingMode::Exact);
 }
 
 #[test]
 #[should_panic(expected = "Right shift is not exact: 123 >> 100")]
-fn shr_round_u32_ref_fail_native_2() {
-    (&native::Natural::from(123u32)).shr_round(100, RoundingMode::Exact);
+fn shr_round_u32_ref_fail_2() {
+    (&Natural::from(123u32)).shr_round(100, RoundingMode::Exact);
 }
 
 #[test]
 #[should_panic(expected = "Right shift is not exact: 1000000000001 >> 1")]
-fn shr_round_u32_ref_fail_native_3() {
-    (&native::Natural::from_str("1000000000001").unwrap()).shr_round(1, RoundingMode::Exact);
+fn shr_round_u32_ref_fail_3() {
+    (&Natural::from_str("1000000000001").unwrap()).shr_round(1, RoundingMode::Exact);
 }
 
 #[test]
 #[should_panic(expected = "Right shift is not exact: 1000000000001 >> 100")]
-fn shr_round_u32_ref_fail_native_4() {
-    (&native::Natural::from_str("1000000000001").unwrap()).shr_round(100, RoundingMode::Exact);
-}
-
-#[test]
-#[should_panic(expected = "Right shift is not exact: 123 >>= 1")]
-fn shr_round_assign_u32_fail_gmp_1() {
-    gmp::Natural::from(123u32).shr_round_assign(1, RoundingMode::Exact);
-}
-
-#[test]
-#[should_panic(expected = "Right shift is not exact: 123 >>= 100")]
-fn shr_round_assign_u32_fail_gmp_2() {
-    gmp::Natural::from(123u32).shr_round_assign(100, RoundingMode::Exact);
-}
-
-#[test]
-#[should_panic(expected = "Right shift is not exact: 1000000000001 >>= 1")]
-fn shr_round_assign_u32_fail_gmp_3() {
-    gmp::Natural::from_str("1000000000001")
-        .unwrap()
-        .shr_round_assign(1, RoundingMode::Exact);
-}
-
-#[test]
-#[should_panic(expected = "Right shift is not exact: 1000000000001 >>= 100")]
-fn shr_round_assign_u32_fail_gmp_4() {
-    gmp::Natural::from_str("1000000000001")
-        .unwrap()
-        .shr_round_assign(100, RoundingMode::Exact);
-}
-
-#[test]
-#[should_panic(expected = "Right shift is not exact: 123 >>= 1")]
-fn shr_round_u32_fail_gmp_1() {
-    gmp::Natural::from(123u32).shr_round(1, RoundingMode::Exact);
-}
-
-#[test]
-#[should_panic(expected = "Right shift is not exact: 123 >>= 100")]
-fn shr_round_u32_fail_gmp_2() {
-    gmp::Natural::from(123u32).shr_round(100, RoundingMode::Exact);
-}
-
-#[test]
-#[should_panic(expected = "Right shift is not exact: 1000000000001 >>= 1")]
-fn shr_round_u32_fail_gmp_3() {
-    gmp::Natural::from_str("1000000000001")
-        .unwrap()
-        .shr_round(1, RoundingMode::Exact);
-}
-
-#[test]
-#[should_panic(expected = "Right shift is not exact: 1000000000001 >>= 100")]
-fn shr_round_u32_fail_gmp_4() {
-    gmp::Natural::from_str("1000000000001")
-        .unwrap()
-        .shr_round(100, RoundingMode::Exact);
-}
-
-#[test]
-#[should_panic(expected = "Right shift is not exact: 123 >> 1")]
-fn shr_round_u32_ref_fail_gmp_1() {
-    (&gmp::Natural::from(123u32)).shr_round(1, RoundingMode::Exact);
-}
-
-#[test]
-#[should_panic(expected = "Right shift is not exact: 123 >> 100")]
-fn shr_round_u32_ref_fail_gmp_2() {
-    (&gmp::Natural::from(123u32)).shr_round(100, RoundingMode::Exact);
-}
-
-#[test]
-#[should_panic(expected = "Right shift is not exact: 1000000000001 >> 1")]
-fn shr_round_u32_ref_fail_gmp_3() {
-    (&gmp::Natural::from_str("1000000000001").unwrap()).shr_round(1, RoundingMode::Exact);
-}
-
-#[test]
-#[should_panic(expected = "Right shift is not exact: 1000000000001 >> 100")]
-fn shr_round_u32_ref_fail_gmp_4() {
-    (&gmp::Natural::from_str("1000000000001").unwrap()).shr_round(100, RoundingMode::Exact);
+fn shr_round_u32_ref_fail_4() {
+    (&Natural::from_str("1000000000001").unwrap()).shr_round(100, RoundingMode::Exact);
 }
 
 #[test]
 fn shr_round_u32_properties() {
-    // n.shr_round_assign(u, rm) is equivalent for malachite-gmp, malachite-native, and rugint.
-    // n.shr_round(u, rm) is equivalent for malachite-gmp, malachite-native, num, and rugint.
-    // (&n).shr_round(u, rm) is equivalent for malachite-gmp, malachite-native, and num.
+    // n.shr_round_assign(u, rm) is equivalent for malachite and rugint.
+    // n.shr_round(u, rm) is equivalent for malachite and rugint.
+    // (&n).shr_round(u, rm) is equivalent for malachite and num.
     // n.shr_round_assign(u, rm); n is valid.
     // n.shr_round(u, rm) is valid.
     // (&n).shr_round(u, rm) is valid.
@@ -947,15 +823,10 @@ fn shr_round_u32_properties() {
     //      result.
     // n.shr_round(u, rm) <= n
     // TODO n.shr_round(u, rm) == n.div_round(1 << u)
-    let natural_u32_and_rounding_mode = |mut gmp_n: gmp::Natural, u: u32, rm: RoundingMode| {
-        let mut n = gmp_natural_to_native(&gmp_n);
+    let natural_u32_and_rounding_mode = |mut n: Natural, u: u32, rm: RoundingMode| {
         let old_n = n.clone();
-        gmp_n.shr_round_assign(u, rm);
-        assert!(gmp_n.is_valid());
-
         n.shr_round_assign(u, rm);
         assert!(n.is_valid());
-        assert_eq!(gmp_natural_to_native(&gmp_n), n);
 
         let n2 = old_n.clone();
         let result = (&n2).shr_round(u, rm);
@@ -965,20 +836,11 @@ fn shr_round_u32_properties() {
         assert!(result.is_valid());
         assert_eq!(result, n);
 
-        let gmp_n2 = native_natural_to_gmp(&old_n);
-        let result = (&gmp_n2).shr_round(u, rm);
-        assert!(result.is_valid());
-        assert_eq!(gmp_natural_to_native(&result), n);
-        let result = gmp_n2.shr_round(u, rm);
-        assert!(result.is_valid());
-        assert_eq!(gmp_natural_to_native(&result), n);
-
         assert!((&old_n).shr_round(u, rm) <= old_n);
     };
 
     // If n is divisible by 2^u, n.shr_round(u, rm) are equal for all rm.
-    let natural_and_u32 = |gmp_n: gmp::Natural, u: u32| {
-        let n = gmp_natural_to_native(&gmp_n);
+    let natural_and_u32 = |n: Natural, u: u32| {
         let x = &n << u;
         assert_eq!((&x).shr_round(u, RoundingMode::Down), n);
         assert_eq!((&x).shr_round(u, RoundingMode::Up), n);
@@ -992,8 +854,7 @@ fn shr_round_u32_properties() {
     // inexact, rounding using Up yields a value 1 larger than using Down. Using Nearest gives a
     // value that is equal to either that produced by rounding Down or that produced by rounding Up.
     // TODO test using Rationals
-    let natural_and_u32_inexact = |gmp_n: gmp::Natural, u: u32| {
-        let n = gmp_natural_to_native(&gmp_n);
+    let natural_and_u32_inexact = |n: Natural, u: u32| {
         let down = (&n).shr_round(u, RoundingMode::Down);
         let up = &down + 1;
         assert_eq!((&n).shr_round(u, RoundingMode::Up), up);
@@ -1009,38 +870,22 @@ fn shr_round_u32_properties() {
     // if u > 0 and v >= 32, u.shr_round(v, Ceiling) == 1
     // if u > 0 and v >= 33, u.shr_round(v, Nearest) == 0
     let positive_u32_and_u32 = |u: u32, v: u32| {
-        assert_eq!(
-            native::Natural::from(u).shr_round(v + 32, RoundingMode::Down),
-            0
-        );
-        assert_eq!(
-            native::Natural::from(u).shr_round(v + 32, RoundingMode::Floor),
-            0
-        );
-        assert_eq!(
-            native::Natural::from(u).shr_round(v + 32, RoundingMode::Up),
-            1
-        );
-        assert_eq!(
-            native::Natural::from(u).shr_round(v + 32, RoundingMode::Ceiling),
-            1
-        );
-        assert_eq!(
-            native::Natural::from(u).shr_round(v + 33, RoundingMode::Nearest),
-            0
-        );
+        assert_eq!(Natural::from(u).shr_round(v + 32, RoundingMode::Down), 0);
+        assert_eq!(Natural::from(u).shr_round(v + 32, RoundingMode::Floor), 0);
+        assert_eq!(Natural::from(u).shr_round(v + 32, RoundingMode::Up), 1);
+        assert_eq!(Natural::from(u).shr_round(v + 32, RoundingMode::Ceiling), 1);
+        assert_eq!(Natural::from(u).shr_round(v + 33, RoundingMode::Nearest), 0);
     };
 
     // n.shr_round(0, rm) == n
     #[allow(unknown_lints, identity_op)]
-    let natural_and_rounding_mode = |gmp_n: gmp::Natural, rm: RoundingMode| {
-        let n = gmp_natural_to_native(&gmp_n);
+    let natural_and_rounding_mode = |n: Natural, rm: RoundingMode| {
         assert_eq!((&n).shr_round(0, rm), n);
     };
 
     // 0.shr_round(u, rm) == 0
     let u32_and_rounding_mode = |u: u32, rm: RoundingMode| {
-        assert_eq!(native::Natural::ZERO.shr_round(u, rm), 0);
+        assert_eq!(Natural::ZERO.shr_round(u, rm), 0);
     };
 
     for (n, u) in log_pairs(exhaustive_naturals(), exhaustive_u::<u32>()).take(LARGE_LIMIT) {

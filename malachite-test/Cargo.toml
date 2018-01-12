@@ -12,14 +12,9 @@ name = "malachite_test_main"
 path = "src/bin.rs"
 
 [dependencies]
-malachite = { path = "../malachite" }
 malachite-base = { path = "../malachite-base" }
-malachite-gmp = { path = "../malachite-gmp" }
-malachite-native = { path = "../malachite-native" }
+malachite-nz = { path = "../malachite-nz" }
 rust-wheels = { path = "../../rust-wheels" }
 num = "0.1.37"
 rand = "0.3.0"
 rugint = "0.2.0"
-
-[features]
-default = ["malachite/gmp", "rust-wheels/gmp"]

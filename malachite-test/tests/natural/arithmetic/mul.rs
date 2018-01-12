@@ -1,12 +1,10 @@
 use common::LARGE_LIMIT;
 use malachite_base::traits::{One, Zero};
-use malachite_native::natural as native;
-use malachite_gmp::natural as gmp;
-use malachite_test::common::{gmp_natural_to_native, native_natural_to_num_biguint,
-                             native_natural_to_rugint_integer, num_biguint_to_native_natural,
-                             rugint_integer_to_native_natural, GenerationMode};
+use malachite_nz::natural::Natural;
+use malachite_test::common::{biguint_to_natural, natural_to_biguint, natural_to_rugint_integer,
+                             rugint_integer_to_natural, GenerationMode};
 use malachite_test::natural::arithmetic::mul::select_inputs;
-use num;
+use num::BigUint;
 use rugint;
 use rust_wheels::iterators::common::EXAMPLE_SEED;
 use rust_wheels::iterators::general::random_x;
@@ -18,66 +16,39 @@ use std::str::FromStr;
 
 #[test]
 fn test_mul() {
-    #[allow(unknown_lints, cyclomatic_complexity)]
     let test = |u, v, out| {
-        let mut n = native::Natural::from_str(u).unwrap();
-        n *= native::Natural::from_str(v).unwrap();
+        let mut n = Natural::from_str(u).unwrap();
+        n *= Natural::from_str(v).unwrap();
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let mut n = native::Natural::from_str(u).unwrap();
-        n *= &native::Natural::from_str(v).unwrap();
+        let mut n = Natural::from_str(u).unwrap();
+        n *= &Natural::from_str(v).unwrap();
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let mut n = gmp::Natural::from_str(u).unwrap();
-        n *= gmp::Natural::from_str(v).unwrap();
+        let mut n = Natural::from_str(u).unwrap();
+        n._mul_assign_basecase_mem_opt(Natural::from_str(v).unwrap());
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let mut n = native::Natural::from_str(u).unwrap();
-        n._mul_assign_basecase_mem_opt(native::Natural::from_str(v).unwrap());
+        let n = Natural::from_str(u).unwrap() * Natural::from_str(v).unwrap();
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let mut n = gmp::Natural::from_str(u).unwrap();
-        n *= &gmp::Natural::from_str(v).unwrap();
+        let n = &Natural::from_str(u).unwrap() * Natural::from_str(v).unwrap();
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = native::Natural::from_str(u).unwrap() * native::Natural::from_str(v).unwrap();
+        let n = Natural::from_str(u).unwrap() * &Natural::from_str(v).unwrap();
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = &native::Natural::from_str(u).unwrap() * native::Natural::from_str(v).unwrap();
+        let n = &Natural::from_str(u).unwrap() * &Natural::from_str(v).unwrap();
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = native::Natural::from_str(u).unwrap() * &native::Natural::from_str(v).unwrap();
-        assert_eq!(n.to_string(), out);
-        assert!(n.is_valid());
-
-        let n = &native::Natural::from_str(u).unwrap() * &native::Natural::from_str(v).unwrap();
-        assert_eq!(n.to_string(), out);
-        assert!(n.is_valid());
-
-        let n = gmp::Natural::from_str(u).unwrap() * gmp::Natural::from_str(v).unwrap();
-        assert_eq!(n.to_string(), out);
-        assert!(n.is_valid());
-
-        let n = gmp::Natural::from_str(u).unwrap() * &gmp::Natural::from_str(v).unwrap();
-        assert_eq!(n.to_string(), out);
-        assert!(n.is_valid());
-
-        let n = &gmp::Natural::from_str(u).unwrap() * gmp::Natural::from_str(v).unwrap();
-        assert_eq!(n.to_string(), out);
-        assert!(n.is_valid());
-
-        let n = &gmp::Natural::from_str(u).unwrap() * &gmp::Natural::from_str(v).unwrap();
-        assert_eq!(n.to_string(), out);
-        assert!(n.is_valid());
-
-        let n = num::BigUint::from_str(u).unwrap() * num::BigUint::from_str(v).unwrap();
+        let n = BigUint::from_str(u).unwrap() * BigUint::from_str(v).unwrap();
         assert_eq!(n.to_string(), out);
 
         let n = rugint::Integer::from_str(u).unwrap() * rugint::Integer::from_str(v).unwrap();
@@ -138,34 +109,16 @@ fn mul_properties() {
     // x * &y is valid.
     // &x * y is valid.
     // &x * &y is valid.
-    // x * y is equivalent for malachite-gmp, malachite-native, num, and rugint.
+    // x * y is equivalent for malachite, num, and rugint.
     // x *= y, x *= &y, x * y, x * &y, &x * y, and &x * &y give the same result.
     // x * y == y * x
     //TODO x * y / y == x and x * y / x == y
     // if x != 0 and y != 0, x * y >= x and x * y >= y
-    #[allow(unknown_lints, cyclomatic_complexity)]
-    let two_naturals = |gmp_x: gmp::Natural, gmp_y: gmp::Natural| {
-        let x = gmp_natural_to_native(&gmp_x);
-        let y = gmp_natural_to_native(&gmp_y);
-        let raw_gmp_product = gmp_x.clone() * gmp_y.clone();
-        assert!(raw_gmp_product.is_valid());
-        let gmp_product = gmp_natural_to_native(&raw_gmp_product);
-        let num_product = num_biguint_to_native_natural(
-            &(native_natural_to_num_biguint(&x) * native_natural_to_num_biguint(&y)),
+    let two_naturals = |x: Natural, y: Natural| {
+        let num_product = biguint_to_natural(&(natural_to_biguint(&x) * natural_to_biguint(&y)));
+        let rugint_product = rugint_integer_to_natural(
+            &(natural_to_rugint_integer(&x) * natural_to_rugint_integer(&y)),
         );
-        let rugint_product = rugint_integer_to_native_natural(
-            &(native_natural_to_rugint_integer(&x) * native_natural_to_rugint_integer(&y)),
-        );
-
-        let product_val_val = gmp_x.clone() * gmp_y.clone();
-        let product_val_ref = gmp_x.clone() * &gmp_y;
-        let product_ref_val = &gmp_x * gmp_y.clone();
-        assert!(product_val_val.is_valid());
-        assert!(product_val_ref.is_valid());
-        assert!(product_ref_val.is_valid());
-        assert_eq!(product_val_val, raw_gmp_product);
-        assert_eq!(product_val_ref, raw_gmp_product);
-        assert_eq!(product_ref_val, raw_gmp_product);
 
         let product_val_val = x.clone() * y.clone();
         let product_val_ref = x.clone() * &y;
@@ -192,23 +145,13 @@ fn mul_properties() {
         assert!(mut_x.is_valid());
         assert_eq!(mut_x, product, "x: {}, y: {}", x, y);
 
-        let mut mut_x = gmp_x.clone();
-        mut_x *= gmp_y.clone();
-        assert!(mut_x.is_valid());
-        assert_eq!(mut_x, raw_gmp_product);
-        let mut mut_x = gmp_x.clone();
-        mut_x *= &gmp_y;
-        assert_eq!(mut_x, raw_gmp_product);
-        assert!(mut_x.is_valid());
-
-        let mut mut_x = native_natural_to_rugint_integer(&x);
-        mut_x *= native_natural_to_rugint_integer(&y);
-        assert_eq!(rugint_integer_to_native_natural(&mut_x), product);
+        let mut mut_x = natural_to_rugint_integer(&x);
+        mut_x *= natural_to_rugint_integer(&y);
+        assert_eq!(rugint_integer_to_natural(&mut_x), product);
 
         let reverse_product = &y * &x;
         //TODO let inv_1 = (&product / &x).unwrap();
         //TODO let inv_2 = (&product / &y).unwrap();
-        assert_eq!(gmp_product, product);
         assert_eq!(num_product, product);
         assert_eq!(rugint_product, product);
         assert_eq!(reverse_product, product);
@@ -223,11 +166,10 @@ fn mul_properties() {
 
     // x * (y: u32) == x * from(y)
     // (y: u32) * x == x * from(y)
-    let natural_and_u32 = |gmp_x: gmp::Natural, y: u32| {
-        let x = gmp_natural_to_native(&gmp_x);
+    let natural_and_u32 = |x: Natural, y: u32| {
         let primitive_product_1 = &x * y;
         let primitive_product_2 = y * &x;
-        let product = x * native::Natural::from(y);
+        let product = x * Natural::from(y);
         assert_eq!(primitive_product_1, product);
         assert_eq!(primitive_product_2, product);
     };
@@ -238,13 +180,12 @@ fn mul_properties() {
     // 1 * x == x
     //TODO x * x == x ^ 2
     #[allow(unknown_lints, erasing_op)]
-    let one_natural = |gmp_x: gmp::Natural| {
-        let x = gmp_natural_to_native(&gmp_x);
+    let one_natural = |x: Natural| {
         let x_old = x.clone();
-        assert_eq!(&x * native::Natural::ZERO, 0);
-        assert_eq!(native::Natural::ZERO * 0, 0);
-        let id_1 = &x * native::Natural::ONE;
-        let id_2 = native::Natural::ONE * &x;
+        assert_eq!(&x * Natural::ZERO, 0);
+        assert_eq!(Natural::ZERO * 0, 0);
+        let id_1 = &x * Natural::ONE;
+        let id_2 = Natural::ONE * &x;
         //TODO let double = &x * &x;
         assert_eq!(id_1, x_old);
         assert_eq!(id_2, x_old);
@@ -254,10 +195,7 @@ fn mul_properties() {
     // (x * y) * z == x * (y * z)
     // x * (y + z) == x * y + x * z
     // (x + y) * z == x * z + y * z
-    let three_naturals = |gmp_x: gmp::Natural, gmp_y: gmp::Natural, gmp_z: gmp::Natural| {
-        let x = gmp_natural_to_native(&gmp_x);
-        let y = gmp_natural_to_native(&gmp_y);
-        let z = gmp_natural_to_native(&gmp_z);
+    let three_naturals = |x: Natural, y: Natural, z: Natural| {
         assert_eq!((&x * &y) * &z, &x * (&y * &z));
         assert_eq!(&x * (&y + &z), &x * &y + &x * &z);
         assert_eq!((&x + &y) * &z, x * &z + y * z);

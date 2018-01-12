@@ -1,4 +1,4 @@
-use malachite::natural::random::random_natural_from_bits::random_natural_from_bits;
+use malachite_nz::natural::random::random_natural_from_bits;
 use rand::{SeedableRng, StdRng};
 
 #[test]

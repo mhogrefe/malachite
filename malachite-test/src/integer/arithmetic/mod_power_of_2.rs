@@ -1,14 +1,13 @@
-use common::{gmp_integer_to_native, GenerationMode};
-use malachite_gmp::integer as gmp;
-use malachite_native::integer as native;
-use rust_wheels::benchmarks::{BenchmarkOptions2, benchmark_2};
+use common::GenerationMode;
+use malachite_nz::integer::Integer;
+use rust_wheels::benchmarks::{BenchmarkOptions1, benchmark_1};
 use rust_wheels::iterators::common::EXAMPLE_SEED;
 use rust_wheels::iterators::integers_geometric::natural_u32s_geometric;
 use rust_wheels::iterators::integers::{exhaustive_integers, random_integers};
 use rust_wheels::iterators::primitive_ints::exhaustive_u;
 use rust_wheels::iterators::tuples::{log_pairs, random_pairs};
 
-type It = Iterator<Item = (gmp::Integer, u32)>;
+type It = Iterator<Item = (Integer, u32)>;
 
 pub fn exhaustive_inputs() -> Box<It> {
     Box::new(log_pairs(exhaustive_integers(), exhaustive_u::<u32>()))
@@ -120,16 +119,13 @@ pub fn benchmark_integer_mod_power_of_2_assign(gm: GenerationMode, limit: usize,
         "benchmarking {} Integer.mod_power_of_2_assign(u32)",
         gm.name()
     );
-    benchmark_2(BenchmarkOptions2 {
+    benchmark_1(BenchmarkOptions1 {
         xs: select_inputs(gm),
-        function_f: &(|(mut n, u): (gmp::Integer, u32)| n.mod_power_of_2_assign(u)),
-        function_g: &(|(mut n, u): (native::Integer, u32)| n.mod_power_of_2_assign(u)),
+        function_f: &(|(mut n, u): (Integer, u32)| n.mod_power_of_2_assign(u)),
         x_cons: &(|p| p.clone()),
-        y_cons: &(|&(ref n, index)| (gmp_integer_to_native(n), index)),
         x_param: &(|&(_, index)| index as usize),
         limit,
-        f_name: "malachite-gmp",
-        g_name: "malachite-native",
+        f_name: "malachite",
         title: "Integer.mod\\\\_power\\\\_of\\\\_2\\\\_assign(u32)",
         x_axis_label: "other",
         y_axis_label: "time (ns)",
@@ -139,16 +135,13 @@ pub fn benchmark_integer_mod_power_of_2_assign(gm: GenerationMode, limit: usize,
 
 pub fn benchmark_integer_mod_power_of_2(gm: GenerationMode, limit: usize, file_name: &str) {
     println!("benchmarking {} Integer.mod_power_of_2(u32)", gm.name());
-    benchmark_2(BenchmarkOptions2 {
+    benchmark_1(BenchmarkOptions1 {
         xs: select_inputs(gm),
-        function_f: &(|(n, u): (gmp::Integer, u32)| n.mod_power_of_2(u)),
-        function_g: &(|(n, u): (native::Integer, u32)| n.mod_power_of_2(u)),
+        function_f: &(|(n, u): (Integer, u32)| n.mod_power_of_2(u)),
         x_cons: &(|p| p.clone()),
-        y_cons: &(|&(ref n, index)| (gmp_integer_to_native(n), index)),
         x_param: &(|&(_, index)| index as usize),
         limit,
-        f_name: "malachite-gmp",
-        g_name: "malachite-native",
+        f_name: "malachite",
         title: "Integer.mod\\\\_power\\\\_of\\\\_2(u32)",
         x_axis_label: "other",
         y_axis_label: "time (ns)",
@@ -158,16 +151,13 @@ pub fn benchmark_integer_mod_power_of_2(gm: GenerationMode, limit: usize, file_n
 
 pub fn benchmark_integer_mod_power_of_2_ref(gm: GenerationMode, limit: usize, file_name: &str) {
     println!("benchmarking {} Integer.mod_power_of_2_ref(u32)", gm.name());
-    benchmark_2(BenchmarkOptions2 {
+    benchmark_1(BenchmarkOptions1 {
         xs: select_inputs(gm),
-        function_f: &(|(n, u): (gmp::Integer, u32)| n.mod_power_of_2_ref(u)),
-        function_g: &(|(n, u): (native::Integer, u32)| n.mod_power_of_2_ref(u)),
+        function_f: &(|(n, u): (Integer, u32)| n.mod_power_of_2_ref(u)),
         x_cons: &(|p| p.clone()),
-        y_cons: &(|&(ref n, index)| (gmp_integer_to_native(n), index)),
         x_param: &(|&(_, index)| index as usize),
         limit,
-        f_name: "malachite-gmp",
-        g_name: "malachite-native",
+        f_name: "malachite",
         title: "Integer.mod\\\\_power\\\\_of\\\\_2\\\\_ref(u32)",
         x_axis_label: "other",
         y_axis_label: "time (ns)",
@@ -180,16 +170,13 @@ pub fn benchmark_integer_rem_power_of_2_assign(gm: GenerationMode, limit: usize,
         "benchmarking {} Integer.rem_power_of_2_assign(u32)",
         gm.name()
     );
-    benchmark_2(BenchmarkOptions2 {
+    benchmark_1(BenchmarkOptions1 {
         xs: select_inputs(gm),
-        function_f: &(|(mut n, u): (gmp::Integer, u32)| n.rem_power_of_2_assign(u)),
-        function_g: &(|(mut n, u): (native::Integer, u32)| n.rem_power_of_2_assign(u)),
+        function_f: &(|(mut n, u): (Integer, u32)| n.rem_power_of_2_assign(u)),
         x_cons: &(|p| p.clone()),
-        y_cons: &(|&(ref n, index)| (gmp_integer_to_native(n), index)),
         x_param: &(|&(_, index)| index as usize),
         limit,
-        f_name: "malachite-gmp",
-        g_name: "malachite-native",
+        f_name: "malachite",
         title: "Integer.rem\\\\_power\\\\_of\\\\_2\\\\_assign(u32)",
         x_axis_label: "other",
         y_axis_label: "time (ns)",
@@ -199,16 +186,13 @@ pub fn benchmark_integer_rem_power_of_2_assign(gm: GenerationMode, limit: usize,
 
 pub fn benchmark_integer_rem_power_of_2(gm: GenerationMode, limit: usize, file_name: &str) {
     println!("benchmarking {} Integer.rem_power_of_2(u32)", gm.name());
-    benchmark_2(BenchmarkOptions2 {
+    benchmark_1(BenchmarkOptions1 {
         xs: select_inputs(gm),
-        function_f: &(|(n, u): (gmp::Integer, u32)| n.rem_power_of_2(u)),
-        function_g: &(|(n, u): (native::Integer, u32)| n.rem_power_of_2(u)),
+        function_f: &(|(n, u): (Integer, u32)| n.rem_power_of_2(u)),
         x_cons: &(|p| p.clone()),
-        y_cons: &(|&(ref n, index)| (gmp_integer_to_native(n), index)),
         x_param: &(|&(_, index)| index as usize),
         limit,
-        f_name: "malachite-gmp",
-        g_name: "malachite-native",
+        f_name: "malachite",
         title: "Integer.rem\\\\_power\\\\_of\\\\_2(u32)",
         x_axis_label: "other",
         y_axis_label: "time (ns)",
@@ -218,16 +202,13 @@ pub fn benchmark_integer_rem_power_of_2(gm: GenerationMode, limit: usize, file_n
 
 pub fn benchmark_integer_rem_power_of_2_ref(gm: GenerationMode, limit: usize, file_name: &str) {
     println!("benchmarking {} Integer.rem_power_of_2_ref(u32)", gm.name());
-    benchmark_2(BenchmarkOptions2 {
+    benchmark_1(BenchmarkOptions1 {
         xs: select_inputs(gm),
-        function_f: &(|(n, u): (gmp::Integer, u32)| n.rem_power_of_2_ref(u)),
-        function_g: &(|(n, u): (native::Integer, u32)| n.rem_power_of_2_ref(u)),
+        function_f: &(|(n, u): (Integer, u32)| n.rem_power_of_2_ref(u)),
         x_cons: &(|p| p.clone()),
-        y_cons: &(|&(ref n, index)| (gmp_integer_to_native(n), index)),
         x_param: &(|&(_, index)| index as usize),
         limit,
-        f_name: "malachite-gmp",
-        g_name: "malachite-native",
+        f_name: "malachite",
         title: "Integer.rem\\\\_power\\\\_of\\\\_2\\\\_ref(u32)",
         x_axis_label: "other",
         y_axis_label: "time (ns)",
@@ -244,16 +225,13 @@ pub fn benchmark_integer_ceiling_mod_power_of_2_assign(
         "benchmarking {} Integer.ceiling_mod_power_of_2_assign(u32)",
         gm.name()
     );
-    benchmark_2(BenchmarkOptions2 {
+    benchmark_1(BenchmarkOptions1 {
         xs: select_inputs(gm),
-        function_f: &(|(mut n, u): (gmp::Integer, u32)| n.ceiling_mod_power_of_2_assign(u)),
-        function_g: &(|(mut n, u): (native::Integer, u32)| n.ceiling_mod_power_of_2_assign(u)),
+        function_f: &(|(mut n, u): (Integer, u32)| n.ceiling_mod_power_of_2_assign(u)),
         x_cons: &(|p| p.clone()),
-        y_cons: &(|&(ref n, index)| (gmp_integer_to_native(n), index)),
         x_param: &(|&(_, index)| index as usize),
         limit,
-        f_name: "malachite-gmp",
-        g_name: "malachite-native",
+        f_name: "malachite",
         title: "Integer.ceiling\\\\_mod\\\\_power\\\\_of\\\\_2\\\\_assign(u32)",
         x_axis_label: "other",
         y_axis_label: "time (ns)",
@@ -266,16 +244,13 @@ pub fn benchmark_integer_ceiling_mod_power_of_2(gm: GenerationMode, limit: usize
         "benchmarking {} Integer.ceiling_mod_power_of_2(u32)",
         gm.name()
     );
-    benchmark_2(BenchmarkOptions2 {
+    benchmark_1(BenchmarkOptions1 {
         xs: select_inputs(gm),
-        function_f: &(|(n, u): (gmp::Integer, u32)| n.ceiling_mod_power_of_2(u)),
-        function_g: &(|(n, u): (native::Integer, u32)| n.ceiling_mod_power_of_2(u)),
+        function_f: &(|(n, u): (Integer, u32)| n.ceiling_mod_power_of_2(u)),
         x_cons: &(|p| p.clone()),
-        y_cons: &(|&(ref n, index)| (gmp_integer_to_native(n), index)),
         x_param: &(|&(_, index)| index as usize),
         limit,
-        f_name: "malachite-gmp",
-        g_name: "malachite-native",
+        f_name: "malachite",
         title: "Integer.ceiling\\\\_mod\\\\_power\\\\_of\\\\_2(u32)",
         x_axis_label: "other",
         y_axis_label: "time (ns)",
@@ -292,16 +267,13 @@ pub fn benchmark_integer_ceiling_mod_power_of_2_ref(
         "benchmarking {} Integer.ceiling_mod_power_of_2_ref(u32)",
         gm.name()
     );
-    benchmark_2(BenchmarkOptions2 {
+    benchmark_1(BenchmarkOptions1 {
         xs: select_inputs(gm),
-        function_f: &(|(n, u): (gmp::Integer, u32)| n.ceiling_mod_power_of_2_ref(u)),
-        function_g: &(|(n, u): (native::Integer, u32)| n.ceiling_mod_power_of_2_ref(u)),
+        function_f: &(|(n, u): (Integer, u32)| n.ceiling_mod_power_of_2_ref(u)),
         x_cons: &(|p| p.clone()),
-        y_cons: &(|&(ref n, index)| (gmp_integer_to_native(n), index)),
         x_param: &(|&(_, index)| index as usize),
         limit,
-        f_name: "malachite-gmp",
-        g_name: "malachite-native",
+        f_name: "malachite",
         title: "Integer.ceiling\\\\_mod\\\\_power\\\\_of\\\\_2\\\\_ref(u32)",
         x_axis_label: "other",
         y_axis_label: "time (ns)",

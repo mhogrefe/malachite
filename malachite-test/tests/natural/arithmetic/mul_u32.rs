@@ -1,13 +1,10 @@
 use common::LARGE_LIMIT;
 use malachite_base::traits::{One, Zero};
-use malachite_native::natural as native;
-use malachite_gmp::natural as gmp;
-use malachite_test::common::{gmp_natural_to_native, native_natural_to_gmp,
-                             native_natural_to_num_biguint, native_natural_to_rugint_integer,
-                             num_biguint_to_native_natural, rugint_integer_to_native_natural,
-                             GenerationMode};
+use malachite_nz::natural::Natural;
+use malachite_test::common::{biguint_to_natural, natural_to_biguint, natural_to_rugint_integer,
+                             rugint_integer_to_natural, GenerationMode};
 use malachite_test::natural::arithmetic::mul_u32::{num_mul_u32, select_inputs_1};
-use num;
+use num::BigUint;
 use rugint;
 use rust_wheels::iterators::common::EXAMPLE_SEED;
 use rust_wheels::iterators::general::random_x;
@@ -17,14 +14,8 @@ use std::str::FromStr;
 
 #[test]
 fn test_add_u32() {
-    #[allow(unknown_lints, cyclomatic_complexity)]
     let test = |u, v: u32, out| {
-        let mut n = native::Natural::from_str(u).unwrap();
-        n *= v;
-        assert_eq!(n.to_string(), out);
-        assert!(n.is_valid());
-
-        let mut n = gmp::Natural::from_str(u).unwrap();
+        let mut n = Natural::from_str(u).unwrap();
         n *= v;
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
@@ -33,44 +24,28 @@ fn test_add_u32() {
         n *= v;
         assert_eq!(n.to_string(), out);
 
-        let n = native::Natural::from_str(u).unwrap() * v;
+        let n = Natural::from_str(u).unwrap() * v;
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = gmp::Natural::from_str(u).unwrap() * v;
-        assert_eq!(n.to_string(), out);
-        assert!(n.is_valid());
-
-        let n = num_mul_u32(num::BigUint::from_str(u).unwrap(), v);
+        let n = num_mul_u32(BigUint::from_str(u).unwrap(), v);
         assert_eq!(n.to_string(), out);
 
         let n = rugint::Integer::from_str(u).unwrap() * v;
         assert_eq!(n.to_string(), out);
 
-        let n = &native::Natural::from_str(u).unwrap() * v;
+        let n = &Natural::from_str(u).unwrap() * v;
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = &gmp::Natural::from_str(u).unwrap() * v;
-        assert_eq!(n.to_string(), out);
-        assert!(n.is_valid());
-
-        let n = v * native::Natural::from_str(u).unwrap();
-        assert_eq!(n.to_string(), out);
-        assert!(n.is_valid());
-
-        let n = v * gmp::Natural::from_str(u).unwrap();
+        let n = v * Natural::from_str(u).unwrap();
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
         let n = v * rugint::Integer::from_str(u).unwrap();
         assert_eq!(n.to_string(), out);
 
-        let n = v * &native::Natural::from_str(u).unwrap();
-        assert_eq!(n.to_string(), out);
-        assert!(n.is_valid());
-
-        let n = v * &gmp::Natural::from_str(u).unwrap();
+        let n = v * &Natural::from_str(u).unwrap();
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
@@ -92,9 +67,9 @@ fn test_add_u32() {
 
 #[test]
 fn mul_u32_properties() {
-    // n *= u is equivalent for malachite-gmp, malachite-native, and rugint.
-    // n * u is equivalent for malachite-gmp, malachite-native, num, and rugint.
-    // &n * u is equivalent for malachite-gmp, malachite-native, and num.
+    // n *= u is equivalent for malachite and rugint.
+    // n * u is equivalent for malachite, num, and rugint.
+    // &n * u is equivalent for malachite and num.
     // n *= u; n is valid.
     // n * u and u * n are valid.
     // &n * u and u * &n are valid.
@@ -102,20 +77,14 @@ fn mul_u32_properties() {
     // n * u == n * from(u)
     // if n != 0 and u != 0, n * u >= n and n * u >= u
     // TODO n * u / u == n
-    #[allow(unknown_lints, cyclomatic_complexity)]
-    let natural_and_u32 = |mut gmp_n: gmp::Natural, u: u32| {
-        let mut n = gmp_natural_to_native(&gmp_n);
+    let natural_and_u32 = |mut n: Natural, u: u32| {
         let old_n = n.clone();
-        gmp_n *= u;
-        assert!(gmp_n.is_valid());
-
         n *= u;
         assert!(n.is_valid());
-        assert_eq!(gmp_natural_to_native(&gmp_n), n);
 
-        let mut rugint_n = native_natural_to_rugint_integer(&old_n);
+        let mut rugint_n = natural_to_rugint_integer(&old_n);
         rugint_n *= u;
-        assert_eq!(rugint_integer_to_native_natural(&rugint_n), n);
+        assert_eq!(rugint_integer_to_natural(&rugint_n), n);
 
         let n2 = old_n.clone();
         let result = &n2 * u;
@@ -134,33 +103,17 @@ fn mul_u32_properties() {
         assert!(result.is_valid());
 
         let n2 = old_n.clone();
-        let result = n2 * native::Natural::from(u);
+        let result = n2 * Natural::from(u);
         assert_eq!(result, n);
         let n2 = old_n.clone();
-        let result = native::Natural::from(u) * n2;
+        let result = Natural::from(u) * n2;
         assert_eq!(result, n);
 
-        let gmp_n2 = native_natural_to_gmp(&old_n);
-        let result = &gmp_n2 * u;
-        assert!(result.is_valid());
-        assert_eq!(gmp_natural_to_native(&result), n);
-        let result = gmp_n2 * u;
-        assert!(result.is_valid());
-        assert_eq!(gmp_natural_to_native(&result), n);
+        let num_n2 = natural_to_biguint(&old_n);
+        assert_eq!(biguint_to_natural(&num_mul_u32(num_n2, u)), n);
 
-        let gmp_n2 = native_natural_to_gmp(&old_n);
-        let result = u * &gmp_n2;
-        assert!(result.is_valid());
-        assert_eq!(gmp_natural_to_native(&result), n);
-        let result = u * gmp_n2;
-        assert!(result.is_valid());
-        assert_eq!(gmp_natural_to_native(&result), n);
-
-        let num_n2 = native_natural_to_num_biguint(&old_n);
-        assert_eq!(num_biguint_to_native_natural(&num_mul_u32(num_n2, u)), n);
-
-        let rugint_n2 = native_natural_to_rugint_integer(&old_n);
-        assert_eq!(rugint_integer_to_native_natural(&(rugint_n2 * u)), n);
+        let rugint_n2 = natural_to_rugint_integer(&old_n);
+        assert_eq!(rugint_integer_to_natural(&(rugint_n2 * u)), n);
 
         if n != 0 && u != 0 {
             assert!(n >= old_n);
@@ -176,8 +129,7 @@ fn mul_u32_properties() {
     // n * 2 == n << 1
     // 2 * n == n << 1
     #[allow(unknown_lints, erasing_op, identity_op)]
-    let one_natural = |gmp_n: gmp::Natural| {
-        let n = gmp_natural_to_native(&gmp_n);
+    let one_natural = |n: Natural| {
         assert_eq!(&n * 0u32, 0);
         assert_eq!(0u32 * &n, 0);
         assert_eq!(&n * 1u32, n);
@@ -191,10 +143,10 @@ fn mul_u32_properties() {
     // 1 * u == u
     // u * 1 == u
     let one_u32 = |u: u32| {
-        assert_eq!(native::Natural::ZERO * u, 0);
-        assert_eq!(u * native::Natural::ZERO, 0);
-        assert_eq!(native::Natural::ONE * u, u);
-        assert_eq!(u * native::Natural::ONE, u);
+        assert_eq!(Natural::ZERO * u, 0);
+        assert_eq!(u * Natural::ZERO, 0);
+        assert_eq!(Natural::ONE * u, u);
+        assert_eq!(u * Natural::ONE, u);
     };
 
     for (n, u) in select_inputs_1(GenerationMode::Exhaustive).take(LARGE_LIMIT) {

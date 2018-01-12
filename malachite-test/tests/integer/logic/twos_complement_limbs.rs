@@ -1,7 +1,6 @@
 use common::LARGE_LIMIT;
-use malachite_native::integer as native;
-use malachite_gmp::integer as gmp;
-use malachite_test::common::{gmp_integer_to_native, GenerationMode};
+use malachite_nz::integer::Integer;
+use malachite_test::common::GenerationMode;
 use malachite_test::integer::logic::twos_complement_limbs::select_inputs;
 use std::cmp::Ordering;
 use std::str::FromStr;
@@ -10,15 +9,7 @@ use std::str::FromStr;
 fn test_twos_complement_limbs_le() {
     let test = |n, out| {
         assert_eq!(
-            native::Integer::from_str(n)
-                .unwrap()
-                .twos_complement_limbs_le(),
-            out
-        );
-        assert_eq!(
-            gmp::Integer::from_str(n)
-                .unwrap()
-                .twos_complement_limbs_le(),
+            Integer::from_str(n).unwrap().twos_complement_limbs_le(),
             out
         );
     };
@@ -58,15 +49,7 @@ fn test_twos_complement_limbs_le() {
 fn test_twos_complement_limbs_be() {
     let test = |n, out| {
         assert_eq!(
-            native::Integer::from_str(n)
-                .unwrap()
-                .twos_complement_limbs_be(),
-            out
-        );
-        assert_eq!(
-            gmp::Integer::from_str(n)
-                .unwrap()
-                .twos_complement_limbs_be(),
+            Integer::from_str(n).unwrap().twos_complement_limbs_be(),
             out
         );
     };
@@ -104,17 +87,14 @@ fn test_twos_complement_limbs_be() {
 
 #[test]
 fn twos_complement_limbs_le_properties() {
-    // x.twos_complement_limbs_le() is equivalent for malachite-gmp and malachite-native.
     // from_twos_complement_limbs_le(x.twos_complement_limbs_le()) == x
     // x.twos_complement_limbs_le().rev() == x.twos_complement_limbs_be()
     // if x != 0, limbs is empty.
     // if x > 0, limbs.last() == 0 => limbs[limbs.len() - 2].get_bit(31) == true
     // if x < -1, limbs.last() == !0 => limbs[limbs.len() - 2].get_bit(31) == false
-    let one_integer = |gmp_x: gmp::Integer| {
-        let x = gmp_integer_to_native(&gmp_x);
+    let one_integer = |x: Integer| {
         let limbs = x.twos_complement_limbs_le();
-        assert_eq!(gmp_x.twos_complement_limbs_le(), limbs);
-        assert_eq!(native::Integer::from_twos_complement_limbs_le(&limbs), x);
+        assert_eq!(Integer::from_twos_complement_limbs_le(&limbs), x);
         assert_eq!(
             x.twos_complement_limbs_be(),
             limbs.iter().cloned().rev().collect::<Vec<u32>>()
@@ -149,17 +129,14 @@ fn twos_complement_limbs_le_properties() {
 
 #[test]
 fn limbs_be_properties() {
-    // x.twos_complement_limbs_be() is equivalent for malachite-gmp and malachite-native.
     // from_twos_complement_limbs_be(x.twos_complement_limbs_be()) == x
     // x.twos_complement_limbs_be().rev() == x.twos_complement_limbs_le()
     // if x != 0, limbs is empty.
     // if x > 0, limbs[0] == 0 => limbs[1].get_bit(31) == true
     // if x < -1, limbs[0] == !0 => limbs[1].get_bit(31) == false
-    let one_integer = |gmp_x: gmp::Integer| {
-        let x = gmp_integer_to_native(&gmp_x);
+    let one_integer = |x: Integer| {
         let limbs = x.twos_complement_limbs_be();
-        assert_eq!(gmp_x.twos_complement_limbs_be(), limbs);
-        assert_eq!(native::Integer::from_twos_complement_limbs_be(&limbs), x);
+        assert_eq!(Integer::from_twos_complement_limbs_be(&limbs), x);
         assert_eq!(
             x.twos_complement_limbs_le(),
             limbs.iter().cloned().rev().collect::<Vec<u32>>()

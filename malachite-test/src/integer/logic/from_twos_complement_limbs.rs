@@ -1,7 +1,6 @@
 use common::GenerationMode;
-use malachite_gmp::integer as gmp;
-use malachite_native::integer as native;
-use rust_wheels::benchmarks::{BenchmarkOptions2, benchmark_2};
+use malachite_nz::integer::Integer;
+use rust_wheels::benchmarks::{BenchmarkOptions1, benchmark_1};
 use rust_wheels::iterators::common::EXAMPLE_SEED;
 use rust_wheels::iterators::general::random_x;
 use rust_wheels::iterators::primitive_ints::exhaustive_u;
@@ -33,7 +32,7 @@ pub fn demo_integer_from_twos_complement_limbs_le(gm: GenerationMode, limit: usi
         println!(
             "from_twos_complement_limbs_le({:?}) = {:?}",
             xs,
-            gmp::Integer::from_twos_complement_limbs_le(xs.as_slice())
+            Integer::from_twos_complement_limbs_le(xs.as_slice())
         );
     }
 }
@@ -43,7 +42,7 @@ pub fn demo_integer_from_twos_complement_limbs_be(gm: GenerationMode, limit: usi
         println!(
             "from_twos_complement_limbs_be({:?}) = {:?}",
             xs,
-            gmp::Integer::from_twos_complement_limbs_be(xs.as_slice())
+            Integer::from_twos_complement_limbs_be(xs.as_slice())
         );
     }
 }
@@ -57,16 +56,13 @@ pub fn benchmark_integer_from_twos_complement_limbs_le(
         "benchmarking {} Integer::from_twos_complement_limbs_le(&[u32])",
         gm.name()
     );
-    benchmark_2(BenchmarkOptions2 {
+    benchmark_1(BenchmarkOptions1 {
         xs: select_inputs(gm),
-        function_f: &(|xs: Vec<u32>| gmp::Integer::from_twos_complement_limbs_le(xs.as_slice())),
-        function_g: &(|xs: Vec<u32>| native::Integer::from_twos_complement_limbs_le(xs.as_slice())),
+        function_f: &(|xs: Vec<u32>| Integer::from_twos_complement_limbs_le(xs.as_slice())),
         x_cons: &(|xs| xs.clone()),
-        y_cons: &(|xs| xs.clone()),
         x_param: &(|xs| xs.len()),
         limit,
-        f_name: "malachite-gmp",
-        g_name: "malachite-native",
+        f_name: "malachite",
         title: "Integer::from\\\\_twos\\\\_complement\\\\_limbs\\\\_le(\\\\&[u32])",
         x_axis_label: "xs.len()",
         y_axis_label: "time (ns)",
@@ -83,16 +79,13 @@ pub fn benchmark_integer_from_twos_complement_limbs_be(
         "benchmarking {} Integer::from_twos_complement_limbs_be(&[u32])",
         gm.name()
     );
-    benchmark_2(BenchmarkOptions2 {
+    benchmark_1(BenchmarkOptions1 {
         xs: select_inputs(gm),
-        function_f: &(|xs: Vec<u32>| gmp::Integer::from_twos_complement_limbs_be(xs.as_slice())),
-        function_g: &(|xs: Vec<u32>| native::Integer::from_twos_complement_limbs_be(xs.as_slice())),
+        function_f: &(|xs: Vec<u32>| Integer::from_twos_complement_limbs_be(xs.as_slice())),
         x_cons: &(|xs| xs.clone()),
-        y_cons: &(|xs| xs.clone()),
         x_param: &(|xs| xs.len()),
         limit,
-        f_name: "malachite-gmp",
-        g_name: "malachite-native",
+        f_name: "malachite",
         title: "Integer::from\\\\_twos\\\\_complement\\\\_limbs\\\\_le(\\\\&[u32])",
         x_axis_label: "xs.len()",
         y_axis_label: "time (ns)",

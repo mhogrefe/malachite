@@ -1,7 +1,6 @@
 use common::LARGE_LIMIT;
-use malachite_native::integer as native;
-use malachite_gmp::integer as gmp;
-use malachite_test::common::{gmp_integer_to_native, GenerationMode};
+use malachite_nz::integer::Integer;
+use malachite_test::common::GenerationMode;
 use malachite_test::integer::logic::sign_and_limbs::select_inputs;
 use rust_wheels::iterators::common::EXAMPLE_SEED;
 use rust_wheels::iterators::integers::{exhaustive_integers, random_integers};
@@ -11,11 +10,7 @@ use std::str::FromStr;
 #[test]
 fn test_sign_and_limbs_le() {
     let test = |n, out| {
-        assert_eq!(
-            native::Integer::from_str(n).unwrap().sign_and_limbs_le(),
-            out
-        );
-        assert_eq!(gmp::Integer::from_str(n).unwrap().sign_and_limbs_le(), out);
+        assert_eq!(Integer::from_str(n).unwrap().sign_and_limbs_le(), out);
     };
     test("0", (Ordering::Equal, Vec::new()));
     test("123", (Ordering::Greater, vec![123]));
@@ -52,11 +47,7 @@ fn test_sign_and_limbs_le() {
 #[test]
 fn test_sign_and_limbs_be() {
     let test = |n, out| {
-        assert_eq!(
-            native::Integer::from_str(n).unwrap().sign_and_limbs_be(),
-            out
-        );
-        assert_eq!(gmp::Integer::from_str(n).unwrap().sign_and_limbs_be(), out);
+        assert_eq!(Integer::from_str(n).unwrap().sign_and_limbs_be(), out);
     };
     test("0", (Ordering::Equal, Vec::new()));
     test("123", (Ordering::Greater, vec![123]));
@@ -92,18 +83,15 @@ fn test_sign_and_limbs_be() {
 
 #[test]
 fn sign_and_limbs_le_properties() {
-    // x.sign_and_limbs_le() is equivalent for malachite-gmp and malachite-native.
     // (sign, limbs) := x.sign_and_limbs_le(); from_sign_and_limbs_le(sign, limbs) == x
     // (sign, limbs) := x.sign_and_limbs_le(); x.sign_and_limbs_be() == (sign, limbs.rev())
     // (sign, limbs) := x.sign_and_limbs_le();
     //     (sign == Ordering::Equals) == limbs.is_empty() == (x == 0)
     // (sign, limbs) := x.sign_and_limbs_le(); if x != 0, limbs.last() != 0
     // (sign, limbs) := x.sign_and_limbs_le(); (-x).sign_and_limbs_le() == (sign.reverse(), limbs)
-    let one_integer = |gmp_x: gmp::Integer| {
-        let x = gmp_integer_to_native(&gmp_x);
+    let one_integer = |x: Integer| {
         let (sign, limbs) = x.sign_and_limbs_le();
-        assert_eq!(gmp_x.sign_and_limbs_le(), (sign, limbs.clone()));
-        assert_eq!(native::Integer::from_sign_and_limbs_le(sign, &limbs), x);
+        assert_eq!(Integer::from_sign_and_limbs_le(sign, &limbs), x);
         assert_eq!(
             x.sign_and_limbs_be(),
             (sign, limbs.iter().cloned().rev().collect::<Vec<u32>>(),)
@@ -127,18 +115,15 @@ fn sign_and_limbs_le_properties() {
 
 #[test]
 fn sign_and_limbs_be_properties() {
-    // x.sign_and_limbs_be() is equivalent for malachite-gmp and malachite-native.
     // (sign, limbs) := x.sign_and_limbs_be(); from_sign_and_limbs_be(sign, limbs) == x
     // (sign, limbs) := x.sign_and_limbs_be(); x.sign_and_limbs_le() == (sign, limbs.rev())
     // (sign, limbs) := x.sign_and_limbs_be();
     //     (sign == Ordering::Equals) == limbs.is_empty() == (x == 0)
     // (sign, limbs) := x.sign_and_limbs_be(); if x != 0, limbs[0] != 0
     // (sign, limbs) := x.sign_and_limbs_be(); (-x).sign_and_limbs_be() == (sign.reverse(), limbs)
-    let one_integer = |gmp_x: gmp::Integer| {
-        let x = gmp_integer_to_native(&gmp_x);
+    let one_integer = |x: Integer| {
         let (sign, limbs) = x.sign_and_limbs_be();
-        assert_eq!(gmp_x.sign_and_limbs_be(), (sign, limbs.clone()));
-        assert_eq!(native::Integer::from_sign_and_limbs_be(sign, &limbs), x);
+        assert_eq!(Integer::from_sign_and_limbs_be(sign, &limbs), x);
         assert_eq!(
             x.sign_and_limbs_le(),
             (sign, limbs.iter().cloned().rev().collect::<Vec<u32>>(),)

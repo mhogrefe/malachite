@@ -1,10 +1,8 @@
 use common::{test_eq_helper, LARGE_LIMIT};
-use malachite_native::integer as native;
-use malachite_gmp::integer as gmp;
-use malachite_test::common::{gmp_integer_to_native, native_integer_to_num_bigint,
-                             native_integer_to_rugint, GenerationMode};
+use malachite_nz::integer::Integer;
+use malachite_test::common::{integer_to_bigint, integer_to_rugint_integer, GenerationMode};
 use malachite_test::integer::comparison::eq::select_inputs;
-use num;
+use num::BigInt;
 use rugint;
 use rust_wheels::iterators::common::EXAMPLE_SEED;
 use rust_wheels::iterators::integers::{exhaustive_integers, random_integers};
@@ -23,43 +21,32 @@ fn test_eq() {
         "1000000000000",
         "-1000000000000",
     ];
-    test_eq_helper::<native::Integer>(&strings);
-    test_eq_helper::<gmp::Integer>(&strings);
-    test_eq_helper::<num::BigInt>(&strings);
+    test_eq_helper::<Integer>(&strings);
+    test_eq_helper::<BigInt>(&strings);
     test_eq_helper::<rugint::Integer>(&strings);
 }
 
 #[test]
 fn eq_properties() {
-    // x == y is equivalent for malachite-gmp, malachite-native, num, and rugint.
+    // x == y is equivalent for malachite, num, and rugint.
     // (x == y) == (y == x)
-    let two_integers = |gmp_x: gmp::Integer, gmp_y: gmp::Integer| {
-        let x = gmp_integer_to_native(&gmp_x);
-        let y = gmp_integer_to_native(&gmp_y);
+    let two_integers = |x: Integer, y: Integer| {
         let eq = x == y;
-        assert_eq!(gmp_x == gmp_y, eq);
+        assert_eq!(integer_to_bigint(&x) == integer_to_bigint(&y), eq);
         assert_eq!(
-            native_integer_to_num_bigint(&x) == native_integer_to_num_bigint(&y),
-            eq
-        );
-        assert_eq!(
-            native_integer_to_rugint(&x) == native_integer_to_rugint(&y),
+            integer_to_rugint_integer(&x) == integer_to_rugint_integer(&y),
             eq
         );
         assert_eq!(y == x, eq);
     };
 
     // x == x
-    let one_integer = |gmp_x: gmp::Integer| {
-        let x = gmp_integer_to_native(&gmp_x);
+    let one_integer = |x: Integer| {
         assert_eq!(x, x);
     };
 
     // x == y && x == z => x == z
-    let three_integers = |gmp_x: gmp::Integer, gmp_y: gmp::Integer, gmp_z: gmp::Integer| {
-        let x = gmp_integer_to_native(&gmp_x);
-        let y = gmp_integer_to_native(&gmp_y);
-        let z = gmp_integer_to_native(&gmp_z);
+    let three_integers = |x: Integer, y: Integer, z: Integer| {
         if x == y && x == z {
             assert_eq!(x, z);
         }

@@ -1,7 +1,6 @@
 use common::LARGE_LIMIT;
-use malachite_native::integer as native;
-use malachite_gmp::integer as gmp;
-use malachite_test::common::{gmp_integer_to_native, native_integer_to_rugint, GenerationMode};
+use malachite_nz::integer::Integer;
+use malachite_test::common::{integer_to_rugint_integer, GenerationMode};
 use malachite_test::integer::conversion::to_i32::select_inputs;
 use rugint;
 use rust_wheels::iterators::common::EXAMPLE_SEED;
@@ -11,8 +10,7 @@ use std::str::FromStr;
 #[test]
 fn test_to_i32() {
     let test = |n, out| {
-        assert_eq!(native::Integer::from_str(n).unwrap().to_i32(), out);
-        assert_eq!(gmp::Integer::from_str(n).unwrap().to_i32(), out);
+        assert_eq!(Integer::from_str(n).unwrap().to_i32(), out);
         assert_eq!(rugint::Integer::from_str(n).unwrap().to_i32(), out);
     };
     test("0", Some(0));
@@ -29,8 +27,7 @@ fn test_to_i32() {
 #[test]
 fn test_to_i32_wrapping() {
     let test = |n, out| {
-        assert_eq!(native::Integer::from_str(n).unwrap().to_i32_wrapping(), out);
-        assert_eq!(gmp::Integer::from_str(n).unwrap().to_i32_wrapping(), out);
+        assert_eq!(Integer::from_str(n).unwrap().to_i32_wrapping(), out);
         assert_eq!(rugint::Integer::from_str(n).unwrap().to_i32_wrapping(), out);
     };
     test("0", 0);
@@ -46,20 +43,18 @@ fn test_to_i32_wrapping() {
 
 #[test]
 fn to_i32_properties() {
-    // x.to_i32() is equivalent for malachite-gmp, malachite-native, and rugint.
+    // x.to_i32() is equivalent for malachite and rugint.
     // if -2^31 ≤ x < 2^31, from(x.to_i32().unwrap()) == x
     // if -2^31 ≤ x < 2^31, x.to_i32() == Some(x.to_i32_wrapping())
     // if x < -2^31 or x >= 2^31, x.to_i32().is_none()
-    let one_integer = |gmp_x: gmp::Integer| {
-        let x = gmp_integer_to_native(&gmp_x);
-        let native_i32 = x.to_i32();
-        assert_eq!(gmp_x.to_i32(), native_i32);
-        assert_eq!(native_integer_to_rugint(&x).to_i32(), native_i32);
+    let one_integer = |x: Integer| {
+        let result = x.to_i32();
+        assert_eq!(integer_to_rugint_integer(&x).to_i32(), result);
         if x >= i32::min_value() && x <= i32::max_value() {
-            assert_eq!(native::Integer::from(native_i32.unwrap()), x);
-            assert_eq!(native_i32, Some(x.to_i32_wrapping()));
+            assert_eq!(Integer::from(result.unwrap()), x);
+            assert_eq!(result, Some(x.to_i32_wrapping()));
         } else {
-            assert!(native_i32.is_none());
+            assert!(result.is_none());
         }
     };
 
@@ -74,15 +69,13 @@ fn to_i32_properties() {
 
 #[test]
 fn to_i32_wrapping_properties() {
-    // x.to_i32_wrapping() is equivalent for malachite-gmp, malachite-native, and rugint.
+    // x.to_i32_wrapping() is equivalent for malachite and rugint.
     // (-x).to_i32_wrapping() = -(x.to_i32_wrapping())
     // TODO relate with BitAnd
-    let one_integer = |gmp_x: gmp::Integer| {
-        let x = gmp_integer_to_native(&gmp_x);
-        let native_i32 = x.to_i32_wrapping();
-        assert_eq!(gmp_x.to_i32_wrapping(), native_i32);
-        assert_eq!(native_integer_to_rugint(&x).to_i32_wrapping(), native_i32);
-        assert_eq!(-native_i32, (-&x).to_i32_wrapping());
+    let one_integer = |x: Integer| {
+        let result = x.to_i32_wrapping();
+        assert_eq!(integer_to_rugint_integer(&x).to_i32_wrapping(), result);
+        assert_eq!(-result, (-&x).to_i32_wrapping());
     };
 
     for n in select_inputs(GenerationMode::Exhaustive).take(LARGE_LIMIT) {

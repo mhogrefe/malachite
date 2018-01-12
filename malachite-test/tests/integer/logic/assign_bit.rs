@@ -1,8 +1,6 @@
 use common::LARGE_LIMIT;
-use malachite_native::integer as native;
-use malachite_gmp::integer as gmp;
-use malachite_test::common::{gmp_integer_to_native, native_integer_to_rugint,
-                             rugint_integer_to_native, GenerationMode};
+use malachite_nz::integer::Integer;
+use malachite_test::common::{integer_to_rugint_integer, rugint_integer_to_integer, GenerationMode};
 use malachite_test::integer::logic::assign_bit::select_inputs;
 use rugint;
 use std::str::FromStr;
@@ -10,12 +8,7 @@ use std::str::FromStr;
 #[test]
 fn test_assign_bit() {
     let test = |u, index, bit, out| {
-        let mut n = native::Integer::from_str(u).unwrap();
-        n.assign_bit(index, bit);
-        assert_eq!(n.to_string(), out);
-        assert!(n.is_valid());
-
-        let mut n = gmp::Integer::from_str(u).unwrap();
+        let mut n = Integer::from_str(u).unwrap();
         n.assign_bit(index, bit);
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
@@ -51,20 +44,14 @@ fn test_assign_bit() {
 
 #[test]
 fn assign_bit_properties() {
-    // n.assign_bit(index) is equivalent for malachite-gmp and malachite-native.
-    let integer_u64_and_bool = |mut gmp_n: gmp::Integer, index: u64, bit: bool| {
-        let mut n = gmp_integer_to_native(&gmp_n);
+    let integer_u64_and_bool = |mut n: Integer, index: u64, bit: bool| {
         let old_n = n.clone();
-        gmp_n.assign_bit(index, bit);
-        assert!(gmp_n.is_valid());
-
         n.assign_bit(index, bit);
         assert!(n.is_valid());
-        assert_eq!(gmp_integer_to_native(&gmp_n), n);
 
-        let mut rugint_n = native_integer_to_rugint(&old_n);
+        let mut rugint_n = integer_to_rugint_integer(&old_n);
         rugint_n.set_bit(index as u32, bit);
-        assert_eq!(rugint_integer_to_native(&rugint_n), n);
+        assert_eq!(rugint_integer_to_integer(&rugint_n), n);
     };
 
     for (n, index, bit) in select_inputs(GenerationMode::Exhaustive).take(LARGE_LIMIT) {

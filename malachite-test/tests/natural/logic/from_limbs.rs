@@ -1,17 +1,12 @@
 use common::LARGE_LIMIT;
-use malachite_native::natural as native;
-use malachite_gmp::natural as gmp;
-use malachite_test::common::{gmp_natural_to_native, GenerationMode};
+use malachite_nz::natural::Natural;
+use malachite_test::common::GenerationMode;
 use malachite_test::natural::logic::from_limbs::select_inputs;
 
 #[test]
 fn test_from_limbs_le() {
     let test = |limbs: &[u32], out| {
-        let x = native::Natural::from_limbs_le(limbs);
-        assert_eq!(x.to_string(), out);
-        assert!(x.is_valid());
-
-        let x = gmp::Natural::from_limbs_le(limbs);
+        let x = Natural::from_limbs_le(limbs);
         assert_eq!(x.to_string(), out);
         assert!(x.is_valid());
     };
@@ -29,11 +24,7 @@ fn test_from_limbs_le() {
 #[test]
 fn test_from_limbs_be() {
     let test = |limbs: Vec<u32>, out| {
-        let x = native::Natural::from_limbs_be(&limbs);
-        assert_eq!(x.to_string(), out);
-        assert!(x.is_valid());
-
-        let x = gmp::Natural::from_limbs_be(&limbs);
+        let x = Natural::from_limbs_be(&limbs);
         assert_eq!(x.to_string(), out);
         assert!(x.is_valid());
     };
@@ -53,17 +44,12 @@ fn test_from_limbs_be() {
 
 #[test]
 fn from_limbs_le_properties() {
-    // Natural::from_limbs_le(limbs) is equivalent for malachite-gmp and malachite-native.
     // (Natural::from_limbs_le(limbs) == x) ==
     //      (x.limbs_le() == limbs.rev().skip_while(|u| u == 0).rev())
     // Natural::from_limbs_le(limbs.reverse()) == Natural::from_limbs_be(limbs)
     // if !limbs.is_empty() and limbs.last() != 0, Natural::from_limbs_le(limbs).limbs_le() == x
     let u32_slice = |limbs: &[u32]| {
-        let x = native::Natural::from_limbs_le(limbs);
-        assert_eq!(
-            gmp_natural_to_native(&gmp::Natural::from_limbs_le(limbs)),
-            x
-        );
+        let x = Natural::from_limbs_le(limbs);
         let mut trimmed_limbs: Vec<u32> = limbs
             .iter()
             .cloned()
@@ -73,7 +59,7 @@ fn from_limbs_le_properties() {
         trimmed_limbs.reverse();
         assert_eq!(x.to_limbs_le(), trimmed_limbs);
         assert_eq!(
-            native::Natural::from_limbs_be(&limbs.iter().cloned().rev().collect::<Vec<u32>>()),
+            Natural::from_limbs_be(&limbs.iter().cloned().rev().collect::<Vec<u32>>()),
             x
         );
         if !limbs.is_empty() && *limbs.last().unwrap() != 0 {
@@ -92,16 +78,11 @@ fn from_limbs_le_properties() {
 
 #[test]
 fn from_limbs_be_properties() {
-    // Natural::from_limbs_be(limbs) is equivalent for malachite-gmp and malachite-native.
     // (Natural::from_limbs_be(limbs) == x) == (x.limbs_be() == limbs.skip_while(|u| u == 0))
     // Natural::from_limbs_be(limbs.reverse()) == Natural::from_limbs_le(limbs)
     // if !limbs.is_empty() and limbs[0] != 0, Natural::from_limbs_be(limbs).limbs_le() == x
     let u32_slice = |limbs: &[u32]| {
-        let x = native::Natural::from_limbs_be(limbs);
-        assert_eq!(
-            gmp_natural_to_native(&gmp::Natural::from_limbs_be(limbs)),
-            x
-        );
+        let x = Natural::from_limbs_be(limbs);
         assert_eq!(
             x.to_limbs_be(),
             limbs
@@ -111,7 +92,7 @@ fn from_limbs_be_properties() {
                 .collect::<Vec<u32>>()
         );
         assert_eq!(
-            native::Natural::from_limbs_le(&limbs.iter().cloned().rev().collect::<Vec<u32>>()),
+            Natural::from_limbs_le(&limbs.iter().cloned().rev().collect::<Vec<u32>>()),
             x
         );
         if !limbs.is_empty() && limbs[0] != 0 {

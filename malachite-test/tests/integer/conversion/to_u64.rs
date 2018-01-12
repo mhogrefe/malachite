@@ -1,7 +1,6 @@
 use common::LARGE_LIMIT;
-use malachite_native::integer as native;
-use malachite_gmp::integer as gmp;
-use malachite_test::common::{gmp_integer_to_native, GenerationMode};
+use malachite_nz::integer::Integer;
+use malachite_test::common::GenerationMode;
 use malachite_test::integer::conversion::to_u64::select_inputs;
 use rust_wheels::iterators::common::EXAMPLE_SEED;
 use rust_wheels::iterators::integers::{exhaustive_integers, random_integers};
@@ -11,8 +10,7 @@ use std::str::FromStr;
 #[test]
 fn test_to_u64() {
     let test = |n, out| {
-        assert_eq!(native::Integer::from_str(n).unwrap().to_u64(), out);
-        assert_eq!(gmp::Integer::from_str(n).unwrap().to_u64(), out);
+        assert_eq!(Integer::from_str(n).unwrap().to_u64(), out);
     };
     test("0", Some(0));
     test("123", Some(123));
@@ -30,8 +28,7 @@ fn test_to_u64() {
 #[test]
 fn test_to_u64_wrapping() {
     let test = |n, out| {
-        assert_eq!(native::Integer::from_str(n).unwrap().to_u64_wrapping(), out);
-        assert_eq!(gmp::Integer::from_str(n).unwrap().to_u64_wrapping(), out);
+        assert_eq!(Integer::from_str(n).unwrap().to_u64_wrapping(), out);
     };
     test("0", 0);
     test("123", 123);
@@ -52,19 +49,16 @@ fn test_to_u64_wrapping() {
 
 #[test]
 fn to_u64_properties() {
-    // x.to_u64() is equivalent for malachite-gmp and malachite-native.
     // if 0 ≤ x < 2^64, from(x.to_u64().unwrap()) == x
     // if 0 ≤ x < 2^64, x.to_u64() == Some(x.to_u64_wrapping())
     // if x < 0 or x >= 2^64, x.to_u64().is_none()
-    let one_integer = |gmp_x: gmp::Integer| {
-        let x = gmp_integer_to_native(&gmp_x);
-        let native_u64 = x.to_u64();
-        assert_eq!(gmp_x.to_u64(), native_u64);
+    let one_integer = |x: Integer| {
+        let result = x.to_u64();
         if x.sign() != Ordering::Less && x.significant_bits() <= 64 {
-            assert_eq!(native::Integer::from(native_u64.unwrap()), x);
-            assert_eq!(native_u64, Some(x.to_u64_wrapping()));
+            assert_eq!(Integer::from(result.unwrap()), x);
+            assert_eq!(result, Some(x.to_u64_wrapping()));
         } else {
-            assert!(native_u64.is_none());
+            assert!(result.is_none());
         }
     };
 
@@ -79,14 +73,11 @@ fn to_u64_properties() {
 
 #[test]
 fn to_u64_wrapping_properties() {
-    // x.to_u64_wrapping() is equivalent for malachite-gmp and malachite-native.
     // x.to_u64_wrapping() + (-x.to_u64_wrapping()) = 0 mod 2^64
     // TODO relate with BitAnd
-    let one_integer = |gmp_x: gmp::Integer| {
-        let x = gmp_integer_to_native(&gmp_x);
-        let native_u64 = x.to_u64_wrapping();
-        assert_eq!(gmp_x.to_u64_wrapping(), native_u64);
-        assert_eq!(native_u64.wrapping_add((-&x).to_u64_wrapping()), 0);
+    let one_integer = |x: Integer| {
+        let result = x.to_u64_wrapping();
+        assert_eq!(result.wrapping_add((-&x).to_u64_wrapping()), 0);
     };
 
     for n in select_inputs(GenerationMode::Exhaustive).take(LARGE_LIMIT) {

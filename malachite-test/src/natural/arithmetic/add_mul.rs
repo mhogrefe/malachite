@@ -1,16 +1,15 @@
-use common::{gmp_natural_to_native, GenerationMode};
+use common::GenerationMode;
 use malachite_base::traits::{AddMul, AddMulAssign};
-use malachite_gmp::natural as gmp;
-use malachite_native::natural as native;
-use rust_wheels::benchmarks::{BenchmarkOptions2, BenchmarkOptions4, BenchmarkOptions5,
-                              benchmark_2, benchmark_4, benchmark_5};
+use malachite_nz::natural::Natural;
+use rust_wheels::benchmarks::{BenchmarkOptions1, BenchmarkOptions2, BenchmarkOptions4,
+                              BenchmarkOptions5, benchmark_1, benchmark_2, benchmark_4,
+                              benchmark_5};
 use rust_wheels::iterators::common::EXAMPLE_SEED;
 use rust_wheels::iterators::naturals::{exhaustive_naturals, random_naturals};
 use rust_wheels::iterators::tuples::{exhaustive_triples_from_single, random_triples_from_single};
 use std::cmp::max;
 
-type NT = (native::Natural, native::Natural, native::Natural);
-type It = Iterator<Item = (gmp::Natural, gmp::Natural, gmp::Natural)>;
+type It = Iterator<Item = (Natural, Natural, Natural)>;
 
 pub fn exhaustive_inputs() -> Box<It> {
     Box::new(exhaustive_triples_from_single(exhaustive_naturals()))
@@ -148,20 +147,10 @@ pub fn benchmark_natural_add_mul_assign(gm: GenerationMode, limit: usize, file_n
         "benchmarking {} Natural.add_mul_assign(Natural, Natural)",
         gm.name()
     );
-    benchmark_2(BenchmarkOptions2 {
+    benchmark_1(BenchmarkOptions1 {
         xs: select_inputs(gm),
-        function_f: &(|(mut a, b, c): (gmp::Natural, gmp::Natural, gmp::Natural)| {
-            a.add_mul_assign(b, c)
-        }),
-        function_g: &(|(mut a, b, c): NT| a.add_mul_assign(b, c)),
+        function_f: &(|(mut a, b, c): (Natural, Natural, Natural)| a.add_mul_assign(b, c)),
         x_cons: &(|t| t.clone()),
-        y_cons: &(|&(ref a, ref b, ref c)| {
-            (
-                gmp_natural_to_native(a),
-                gmp_natural_to_native(b),
-                gmp_natural_to_native(c),
-            )
-        }),
         x_param: &(|&(ref a, ref b, ref c)| {
             max(
                 max(a.significant_bits(), b.significant_bits()),
@@ -169,8 +158,7 @@ pub fn benchmark_natural_add_mul_assign(gm: GenerationMode, limit: usize, file_n
             ) as usize
         }),
         limit,
-        f_name: "malachite-gmp",
-        g_name: "malachite-native",
+        f_name: "malachite",
         title: "Natural.add\\\\_mul\\\\_assign(Natural, Natural)",
         x_axis_label: X_AXIS_LABEL,
         y_axis_label: "time (ns)",
@@ -189,38 +177,14 @@ pub fn benchmark_natural_add_mul_assign_evaluation_strategy(
     );
     benchmark_4(BenchmarkOptions4 {
         xs: select_inputs(gm),
-        function_f: &(|(mut a, b, c): NT| a.add_mul_assign(b, c)),
-        function_g: &(|(mut a, b, c): NT| a.add_mul_assign(b, &c)),
-        function_h: &(|(mut a, b, c): NT| a.add_mul_assign(&b, c)),
-        function_i: &(|(mut a, b, c): NT| a.add_mul_assign(&b, &c)),
-        x_cons: &(|&(ref a, ref b, ref c)| {
-            (
-                gmp_natural_to_native(a),
-                gmp_natural_to_native(b),
-                gmp_natural_to_native(c),
-            )
-        }),
-        y_cons: &(|&(ref a, ref b, ref c)| {
-            (
-                gmp_natural_to_native(a),
-                gmp_natural_to_native(b),
-                gmp_natural_to_native(c),
-            )
-        }),
-        z_cons: &(|&(ref a, ref b, ref c)| {
-            (
-                gmp_natural_to_native(a),
-                gmp_natural_to_native(b),
-                gmp_natural_to_native(c),
-            )
-        }),
-        w_cons: &(|&(ref a, ref b, ref c)| {
-            (
-                gmp_natural_to_native(a),
-                gmp_natural_to_native(b),
-                gmp_natural_to_native(c),
-            )
-        }),
+        function_f: &(|(mut a, b, c): (Natural, Natural, Natural)| a.add_mul_assign(b, c)),
+        function_g: &(|(mut a, b, c): (Natural, Natural, Natural)| a.add_mul_assign(b, &c)),
+        function_h: &(|(mut a, b, c): (Natural, Natural, Natural)| a.add_mul_assign(&b, c)),
+        function_i: &(|(mut a, b, c): (Natural, Natural, Natural)| a.add_mul_assign(&b, &c)),
+        x_cons: &(|p| p.clone()),
+        y_cons: &(|p| p.clone()),
+        z_cons: &(|p| p.clone()),
+        w_cons: &(|p| p.clone()),
         x_param: &(|&(ref a, ref b, ref c)| {
             max(
                 max(a.significant_bits(), b.significant_bits()),
@@ -250,22 +214,10 @@ pub fn benchmark_natural_add_mul_assign_algorithms(
     );
     benchmark_2(BenchmarkOptions2 {
         xs: select_inputs(gm),
-        function_f: &(|(mut a, b, c): NT| a.add_mul_assign(b, c)),
-        function_g: &(|(mut a, b, c): NT| a += b * c),
-        x_cons: &(|&(ref a, ref b, ref c)| {
-            (
-                gmp_natural_to_native(a),
-                gmp_natural_to_native(b),
-                gmp_natural_to_native(c),
-            )
-        }),
-        y_cons: &(|&(ref a, ref b, ref c)| {
-            (
-                gmp_natural_to_native(a),
-                gmp_natural_to_native(b),
-                gmp_natural_to_native(c),
-            )
-        }),
+        function_f: &(|(mut a, b, c): (Natural, Natural, Natural)| a.add_mul_assign(b, c)),
+        function_g: &(|(mut a, b, c): (Natural, Natural, Natural)| a += b * c),
+        x_cons: &(|t| t.clone()),
+        y_cons: &(|t| t.clone()),
         x_param: &(|&(ref a, ref b, ref c)| {
             max(
                 max(a.significant_bits(), b.significant_bits()),
@@ -293,22 +245,10 @@ pub fn benchmark_natural_add_mul_assign_val_ref_algorithms(
     );
     benchmark_2(BenchmarkOptions2 {
         xs: select_inputs(gm),
-        function_f: &(|(mut a, b, c): NT| a.add_mul_assign(b, &c)),
-        function_g: &(|(mut a, b, c): NT| a += b * &c),
-        x_cons: &(|&(ref a, ref b, ref c)| {
-            (
-                gmp_natural_to_native(a),
-                gmp_natural_to_native(b),
-                gmp_natural_to_native(c),
-            )
-        }),
-        y_cons: &(|&(ref a, ref b, ref c)| {
-            (
-                gmp_natural_to_native(a),
-                gmp_natural_to_native(b),
-                gmp_natural_to_native(c),
-            )
-        }),
+        function_f: &(|(mut a, b, c): (Natural, Natural, Natural)| a.add_mul_assign(b, &c)),
+        function_g: &(|(mut a, b, c): (Natural, Natural, Natural)| a += b * &c),
+        x_cons: &(|t| t.clone()),
+        y_cons: &(|t| t.clone()),
         x_param: &(|&(ref a, ref b, ref c)| {
             max(
                 max(a.significant_bits(), b.significant_bits()),
@@ -336,22 +276,10 @@ pub fn benchmark_natural_add_mul_assign_ref_val_algorithms(
     );
     benchmark_2(BenchmarkOptions2 {
         xs: select_inputs(gm),
-        function_f: &(|(mut a, b, c): NT| a.add_mul_assign(&b, c)),
-        function_g: &(|(mut a, b, c): NT| a += &b * c),
-        x_cons: &(|&(ref a, ref b, ref c)| {
-            (
-                gmp_natural_to_native(a),
-                gmp_natural_to_native(b),
-                gmp_natural_to_native(c),
-            )
-        }),
-        y_cons: &(|&(ref a, ref b, ref c)| {
-            (
-                gmp_natural_to_native(a),
-                gmp_natural_to_native(b),
-                gmp_natural_to_native(c),
-            )
-        }),
+        function_f: &(|(mut a, b, c): (Natural, Natural, Natural)| a.add_mul_assign(&b, c)),
+        function_g: &(|(mut a, b, c): (Natural, Natural, Natural)| a += &b * c),
+        x_cons: &(|t| t.clone()),
+        y_cons: &(|t| t.clone()),
         x_param: &(|&(ref a, ref b, ref c)| {
             max(
                 max(a.significant_bits(), b.significant_bits()),
@@ -379,22 +307,10 @@ pub fn benchmark_natural_add_mul_assign_ref_ref_algorithms(
     );
     benchmark_2(BenchmarkOptions2 {
         xs: select_inputs(gm),
-        function_f: &(|(mut a, b, c): NT| a.add_mul_assign(&b, &c)),
-        function_g: &(|(mut a, b, c): NT| a += &b * &c),
-        x_cons: &(|&(ref a, ref b, ref c)| {
-            (
-                gmp_natural_to_native(a),
-                gmp_natural_to_native(b),
-                gmp_natural_to_native(c),
-            )
-        }),
-        y_cons: &(|&(ref a, ref b, ref c)| {
-            (
-                gmp_natural_to_native(a),
-                gmp_natural_to_native(b),
-                gmp_natural_to_native(c),
-            )
-        }),
+        function_f: &(|(mut a, b, c): (Natural, Natural, Natural)| a.add_mul_assign(&b, &c)),
+        function_g: &(|(mut a, b, c): (Natural, Natural, Natural)| a += &b * &c),
+        x_cons: &(|t| t.clone()),
+        y_cons: &(|t| t.clone()),
         x_param: &(|&(ref a, ref b, ref c)| {
             max(
                 max(a.significant_bits(), b.significant_bits()),
@@ -416,18 +332,10 @@ pub fn benchmark_natural_add_mul(gm: GenerationMode, limit: usize, file_name: &s
         "benchmarking {} Natural.add_mul(Natural, Natural)",
         gm.name()
     );
-    benchmark_2(BenchmarkOptions2 {
+    benchmark_1(BenchmarkOptions1 {
         xs: select_inputs(gm),
-        function_f: &(|(a, b, c): (gmp::Natural, gmp::Natural, gmp::Natural)| a.add_mul(b, c)),
-        function_g: &(|(a, b, c): NT| a.add_mul(b, c)),
+        function_f: &(|(a, b, c): (Natural, Natural, Natural)| a.add_mul(b, c)),
         x_cons: &(|t| t.clone()),
-        y_cons: &(|&(ref a, ref b, ref c)| {
-            (
-                gmp_natural_to_native(a),
-                gmp_natural_to_native(b),
-                gmp_natural_to_native(c),
-            )
-        }),
         x_param: &(|&(ref a, ref b, ref c)| {
             max(
                 max(a.significant_bits(), b.significant_bits()),
@@ -435,8 +343,7 @@ pub fn benchmark_natural_add_mul(gm: GenerationMode, limit: usize, file_name: &s
             ) as usize
         }),
         limit,
-        f_name: "malachite-gmp",
-        g_name: "malachite-native",
+        f_name: "malachite",
         title: "Natural.add\\\\_mul(Natural, Natural)",
         x_axis_label: X_AXIS_LABEL,
         y_axis_label: "time (ns)",
@@ -455,46 +362,16 @@ pub fn benchmark_natural_add_mul_evaluation_strategy(
     );
     benchmark_5(BenchmarkOptions5 {
         xs: select_inputs(gm),
-        function_f: &(|(a, b, c): NT| a.add_mul(b, c)),
-        function_g: &(|(a, b, c): NT| a.add_mul(b, &c)),
-        function_h: &(|(a, b, c): NT| a.add_mul(&b, c)),
-        function_i: &(|(a, b, c): NT| a.add_mul(&b, &c)),
-        function_j: &(|(a, b, c): NT| (&a).add_mul(&b, &c)),
-        x_cons: &(|&(ref a, ref b, ref c)| {
-            (
-                gmp_natural_to_native(a),
-                gmp_natural_to_native(b),
-                gmp_natural_to_native(c),
-            )
-        }),
-        y_cons: &(|&(ref a, ref b, ref c)| {
-            (
-                gmp_natural_to_native(a),
-                gmp_natural_to_native(b),
-                gmp_natural_to_native(c),
-            )
-        }),
-        z_cons: &(|&(ref a, ref b, ref c)| {
-            (
-                gmp_natural_to_native(a),
-                gmp_natural_to_native(b),
-                gmp_natural_to_native(c),
-            )
-        }),
-        w_cons: &(|&(ref a, ref b, ref c)| {
-            (
-                gmp_natural_to_native(a),
-                gmp_natural_to_native(b),
-                gmp_natural_to_native(c),
-            )
-        }),
-        v_cons: &(|&(ref a, ref b, ref c)| {
-            (
-                gmp_natural_to_native(a),
-                gmp_natural_to_native(b),
-                gmp_natural_to_native(c),
-            )
-        }),
+        function_f: &(|(a, b, c): (Natural, Natural, Natural)| a.add_mul(b, c)),
+        function_g: &(|(a, b, c): (Natural, Natural, Natural)| a.add_mul(b, &c)),
+        function_h: &(|(a, b, c): (Natural, Natural, Natural)| a.add_mul(&b, c)),
+        function_i: &(|(a, b, c): (Natural, Natural, Natural)| a.add_mul(&b, &c)),
+        function_j: &(|(a, b, c): (Natural, Natural, Natural)| (&a).add_mul(&b, &c)),
+        x_cons: &(|t| t.clone()),
+        y_cons: &(|t| t.clone()),
+        z_cons: &(|t| t.clone()),
+        w_cons: &(|t| t.clone()),
+        v_cons: &(|t| t.clone()),
         x_param: &(|&(ref a, ref b, ref c)| {
             max(
                 max(a.significant_bits(), b.significant_bits()),
@@ -521,22 +398,10 @@ pub fn benchmark_natural_add_mul_algorithms(gm: GenerationMode, limit: usize, fi
     );
     benchmark_2(BenchmarkOptions2 {
         xs: select_inputs(gm),
-        function_f: &(|(a, b, c): NT| a.add_mul(b, c)),
-        function_g: &(|(a, b, c): NT| a + b * c),
-        x_cons: &(|&(ref a, ref b, ref c)| {
-            (
-                gmp_natural_to_native(a),
-                gmp_natural_to_native(b),
-                gmp_natural_to_native(c),
-            )
-        }),
-        y_cons: &(|&(ref a, ref b, ref c)| {
-            (
-                gmp_natural_to_native(a),
-                gmp_natural_to_native(b),
-                gmp_natural_to_native(c),
-            )
-        }),
+        function_f: &(|(a, b, c): (Natural, Natural, Natural)| a.add_mul(b, c)),
+        function_g: &(|(a, b, c)| a + b * c),
+        x_cons: &(|t| t.clone()),
+        y_cons: &(|t| t.clone()),
         x_param: &(|&(ref a, ref b, ref c)| {
             max(
                 max(a.significant_bits(), b.significant_bits()),
@@ -564,22 +429,10 @@ pub fn benchmark_natural_add_mul_val_val_ref_algorithms(
     );
     benchmark_2(BenchmarkOptions2 {
         xs: select_inputs(gm),
-        function_f: &(|(a, b, c): NT| a.add_mul(b, &c)),
-        function_g: &(|(a, b, c): NT| a + b * &c),
-        x_cons: &(|&(ref a, ref b, ref c)| {
-            (
-                gmp_natural_to_native(a),
-                gmp_natural_to_native(b),
-                gmp_natural_to_native(c),
-            )
-        }),
-        y_cons: &(|&(ref a, ref b, ref c)| {
-            (
-                gmp_natural_to_native(a),
-                gmp_natural_to_native(b),
-                gmp_natural_to_native(c),
-            )
-        }),
+        function_f: &(|(a, b, c): (Natural, Natural, Natural)| a.add_mul(b, &c)),
+        function_g: &(|(a, b, c)| a + b * &c),
+        x_cons: &(|t| t.clone()),
+        y_cons: &(|t| t.clone()),
         x_param: &(|&(ref a, ref b, ref c)| {
             max(
                 max(a.significant_bits(), b.significant_bits()),
@@ -607,22 +460,10 @@ pub fn benchmark_natural_add_mul_val_ref_val_algorithms(
     );
     benchmark_2(BenchmarkOptions2 {
         xs: select_inputs(gm),
-        function_f: &(|(a, b, c): NT| a.add_mul(&b, c)),
-        function_g: &(|(a, b, c): NT| a + &b * c),
-        x_cons: &(|&(ref a, ref b, ref c)| {
-            (
-                gmp_natural_to_native(a),
-                gmp_natural_to_native(b),
-                gmp_natural_to_native(c),
-            )
-        }),
-        y_cons: &(|&(ref a, ref b, ref c)| {
-            (
-                gmp_natural_to_native(a),
-                gmp_natural_to_native(b),
-                gmp_natural_to_native(c),
-            )
-        }),
+        function_f: &(|(a, b, c): (Natural, Natural, Natural)| a.add_mul(&b, c)),
+        function_g: &(|(a, b, c)| a + &b * c),
+        x_cons: &(|t| t.clone()),
+        y_cons: &(|t| t.clone()),
         x_param: &(|&(ref a, ref b, ref c)| {
             max(
                 max(a.significant_bits(), b.significant_bits()),
@@ -650,22 +491,10 @@ pub fn benchmark_natural_add_mul_val_ref_ref_algorithms(
     );
     benchmark_2(BenchmarkOptions2 {
         xs: select_inputs(gm),
-        function_f: &(|(a, b, c): NT| a.add_mul(&b, &c)),
-        function_g: &(|(a, b, c): NT| a + &b * &c),
-        x_cons: &(|&(ref a, ref b, ref c)| {
-            (
-                gmp_natural_to_native(a),
-                gmp_natural_to_native(b),
-                gmp_natural_to_native(c),
-            )
-        }),
-        y_cons: &(|&(ref a, ref b, ref c)| {
-            (
-                gmp_natural_to_native(a),
-                gmp_natural_to_native(b),
-                gmp_natural_to_native(c),
-            )
-        }),
+        function_f: &(|(a, b, c): (Natural, Natural, Natural)| a.add_mul(&b, &c)),
+        function_g: &(|(a, b, c)| a + &b * &c),
+        x_cons: &(|t| t.clone()),
+        y_cons: &(|t| t.clone()),
         x_param: &(|&(ref a, ref b, ref c)| {
             max(
                 max(a.significant_bits(), b.significant_bits()),
@@ -693,22 +522,10 @@ pub fn benchmark_natural_add_mul_ref_ref_ref_algorithms(
     );
     benchmark_2(BenchmarkOptions2 {
         xs: select_inputs(gm),
-        function_f: &(|(a, b, c): NT| (&a).add_mul(&b, &c)),
-        function_g: &(|(a, b, c): NT| &a + &b * &c),
-        x_cons: &(|&(ref a, ref b, ref c)| {
-            (
-                gmp_natural_to_native(a),
-                gmp_natural_to_native(b),
-                gmp_natural_to_native(c),
-            )
-        }),
-        y_cons: &(|&(ref a, ref b, ref c)| {
-            (
-                gmp_natural_to_native(a),
-                gmp_natural_to_native(b),
-                gmp_natural_to_native(c),
-            )
-        }),
+        function_f: &(|(a, b, c): (Natural, Natural, Natural)| (&a).add_mul(&b, &c)),
+        function_g: &(|(a, b, c)| &a + &b * &c),
+        x_cons: &(|t| t.clone()),
+        y_cons: &(|t| t.clone()),
         x_param: &(|&(ref a, ref b, ref c)| {
             max(
                 max(a.significant_bits(), b.significant_bits()),

@@ -1,8 +1,7 @@
 use common::LARGE_LIMIT;
 use malachite_base::traits::Zero;
-use malachite_gmp::integer as gmp;
-use malachite_native::integer as native;
-use malachite_test::common::{gmp_integer_to_native, GenerationMode};
+use malachite_nz::integer::Integer;
+use malachite_test::common::GenerationMode;
 use malachite_test::integer::arithmetic::divisible_by_power_of_2::select_inputs;
 use rust_wheels::iterators::common::EXAMPLE_SEED;
 use rust_wheels::iterators::general::random_x;
@@ -14,15 +13,7 @@ use std::str::FromStr;
 fn test_divisible_by_power_of_2() {
     let test = |n, pow, out| {
         assert_eq!(
-            native::Integer::from_str(n)
-                .unwrap()
-                .divisible_by_power_of_2(pow),
-            out
-        );
-        assert_eq!(
-            gmp::Integer::from_str(n)
-                .unwrap()
-                .divisible_by_power_of_2(pow,),
+            Integer::from_str(n).unwrap().divisible_by_power_of_2(pow),
             out
         );
     };
@@ -63,15 +54,12 @@ fn test_divisible_by_power_of_2() {
 
 #[test]
 fn divisible_by_power_of_2_properties() {
-    // x.divisible_by_power_of_2(pow) is equivalent for malachite-gmp and malachite-native.
     // if x != 0, x.divisible_by_power_of_2(pow) == (x.trailing_zeros().unwrap() >= pow)
     // (-x).divisible_by_power_of_2(pow) == x.divisible_by_power_of_2()
     // (x << pow).divisible_by_power_of_2(pow)
     // x.divisible_by_power_of_2(pow) == (x >> pow << pow == x)
-    let integer_and_u32 = |gmp_x: gmp::Integer, pow: u32| {
-        let x = gmp_integer_to_native(&gmp_x);
+    let integer_and_u32 = |x: Integer, pow: u32| {
         let divisible = x.divisible_by_power_of_2(pow);
-        assert_eq!(gmp_x.divisible_by_power_of_2(pow), divisible);
         if x != 0 {
             assert_eq!(x.trailing_zeros().unwrap() >= pow.into(), divisible);
         }
@@ -81,14 +69,13 @@ fn divisible_by_power_of_2_properties() {
     };
 
     // x.divisible_by_power_of_2(0)
-    let one_integer = |gmp_x: gmp::Integer| {
-        let x = gmp_integer_to_native(&gmp_x);
+    let one_integer = |x: Integer| {
         assert!(x.divisible_by_power_of_2(0));
     };
 
     // 0.divisible_by_power_of_2(pow)
     let one_u32 = |pow: u32| {
-        assert!(native::Integer::ZERO.divisible_by_power_of_2(pow));
+        assert!(Integer::ZERO.divisible_by_power_of_2(pow));
     };
 
     for (x, pow) in select_inputs(GenerationMode::Exhaustive).take(LARGE_LIMIT) {

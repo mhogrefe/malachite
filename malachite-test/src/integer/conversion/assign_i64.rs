@@ -1,20 +1,19 @@
-use common::{gmp_integer_to_native, gmp_integer_to_num_bigint, GenerationMode};
+use common::{integer_to_bigint, GenerationMode};
 use malachite_base::traits::Assign;
-use malachite_gmp::integer as gmp;
-use malachite_native::integer as native;
-use num;
-use rust_wheels::benchmarks::{BenchmarkOptions3, benchmark_3};
+use malachite_nz::integer::Integer;
+use num::BigInt;
+use rust_wheels::benchmarks::{BenchmarkOptions2, benchmark_2};
 use rust_wheels::iterators::common::EXAMPLE_SEED;
 use rust_wheels::iterators::general::random_x;
 use rust_wheels::iterators::integers::{exhaustive_integers, random_integers};
 use rust_wheels::iterators::primitive_ints::exhaustive_i;
 use rust_wheels::iterators::tuples::{exhaustive_pairs, random_pairs};
 
-pub fn num_assign_i64(x: &mut num::BigInt, i: i64) {
-    *x = num::BigInt::from(i);
+pub fn num_assign_i64(x: &mut BigInt, i: i64) {
+    *x = BigInt::from(i);
 }
 
-type It = Iterator<Item = (gmp::Integer, i64)>;
+type It = Iterator<Item = (Integer, i64)>;
 
 pub fn exhaustive_inputs() -> Box<It> {
     Box::new(exhaustive_pairs(exhaustive_integers(), exhaustive_i()))
@@ -45,19 +44,16 @@ pub fn demo_integer_assign_i64(gm: GenerationMode, limit: usize) {
 
 pub fn benchmark_integer_assign_i64(gm: GenerationMode, limit: usize, file_name: &str) {
     println!("benchmarking {} Integer.assign(i64)", gm.name());
-    benchmark_3(BenchmarkOptions3 {
+    benchmark_2(BenchmarkOptions2 {
         xs: select_inputs(gm),
-        function_f: &(|(mut n, i): (gmp::Integer, i64)| n.assign(i)),
-        function_g: &(|(mut n, i): (native::Integer, i64)| n.assign(i)),
-        function_h: &(|(mut n, i): (num::BigInt, i64)| num_assign_i64(&mut n, i)),
+        function_f: &(|(mut n, i): (Integer, i64)| n.assign(i)),
+        function_g: &(|(mut n, i): (BigInt, i64)| num_assign_i64(&mut n, i)),
         x_cons: &(|p| p.clone()),
-        y_cons: &(|&(ref n, i)| (gmp_integer_to_native(n), i)),
-        z_cons: &(|&(ref n, i)| (gmp_integer_to_num_bigint(n), i)),
+        y_cons: &(|&(ref n, i)| (integer_to_bigint(n), i)),
         x_param: &(|&(ref n, _)| n.significant_bits() as usize),
         limit,
-        f_name: "malachite-gmp",
-        g_name: "malachite-native",
-        h_name: "num",
+        f_name: "malachite",
+        g_name: "num",
         title: "Integer.assign(i64)",
         x_axis_label: "n.significant\\\\_bits()",
         y_axis_label: "time (ns)",

@@ -1,12 +1,10 @@
 use common::LARGE_LIMIT;
 use malachite_base::traits::Assign;
-use malachite_native::integer as native;
-use malachite_gmp::integer as gmp;
-use malachite_test::common::{gmp_integer_to_native, native_integer_to_num_bigint,
-                             native_integer_to_rugint, num_bigint_to_native_integer,
-                             rugint_integer_to_native, GenerationMode};
+use malachite_nz::integer::Integer;
+use malachite_test::common::{bigint_to_integer, integer_to_bigint, integer_to_rugint_integer,
+                             rugint_integer_to_integer, GenerationMode};
 use malachite_test::integer::conversion::assign_u32::{select_inputs, num_assign_u32};
-use num;
+use num::BigInt;
 use rugint;
 use rugint::Assign as rugint_assign;
 use std::str::FromStr;
@@ -14,17 +12,12 @@ use std::str::FromStr;
 #[test]
 fn test_assign_u32() {
     let test = |u, v: u32, out| {
-        let mut x = native::Integer::from_str(u).unwrap();
+        let mut x = Integer::from_str(u).unwrap();
         x.assign(v);
         assert_eq!(x.to_string(), out);
         assert!(x.is_valid());
 
-        let mut x = gmp::Integer::from_str(u).unwrap();
-        x.assign(v);
-        assert_eq!(x.to_string(), out);
-        assert!(x.is_valid());
-
-        let mut x = num::BigInt::from_str(u).unwrap();
+        let mut x = BigInt::from_str(u).unwrap();
         num_assign_u32(&mut x, v);
         assert_eq!(x.to_string(), out);
 
@@ -39,30 +32,26 @@ fn test_assign_u32() {
 
 #[test]
 fn assign_u32_properties() {
-    // n.assign(u) is equivalent for malachite-gmp, malachite-native, num, and rugint.
+    // n.assign(u) is equivalent for malachite, num, and rugint.
     // n.assign(u) is valid.
     // n.assign(u); n == u
     // n.assign(Integer::from(u)) is equivalent to n.assign(u)
-    let integer_and_u32 = |mut gmp_n: gmp::Integer, u: u32| {
-        let mut n = gmp_integer_to_native(&gmp_n);
+    let integer_and_u32 = |mut n: Integer, u: u32| {
         let old_n = n.clone();
-        gmp_n.assign(u);
-        assert!(gmp_n.is_valid());
-        assert_eq!(gmp_n, u);
         n.assign(u);
         assert!(n.is_valid());
         assert_eq!(n, u);
         let mut alt_n = old_n.clone();
-        alt_n.assign(native::Integer::from(u));
+        alt_n.assign(Integer::from(u));
         assert_eq!(alt_n, n);
 
-        let mut num_n = native_integer_to_num_bigint(&old_n);
+        let mut num_n = integer_to_bigint(&old_n);
         num_assign_u32(&mut num_n, u);
-        assert_eq!(num_bigint_to_native_integer(&num_n), u);
+        assert_eq!(bigint_to_integer(&num_n), u);
 
-        let mut rugint_n = native_integer_to_rugint(&old_n);
+        let mut rugint_n = integer_to_rugint_integer(&old_n);
         rugint_n.assign(u);
-        assert_eq!(rugint_integer_to_native(&rugint_n), u);
+        assert_eq!(rugint_integer_to_integer(&rugint_n), u);
     };
 
     for (n, u) in select_inputs(GenerationMode::Exhaustive).take(LARGE_LIMIT) {

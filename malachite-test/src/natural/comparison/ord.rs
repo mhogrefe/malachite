@@ -1,16 +1,14 @@
-use common::{gmp_natural_to_native, gmp_natural_to_num_biguint, gmp_natural_to_rugint_integer,
-             GenerationMode};
-use malachite_gmp::natural as gmp;
-use malachite_native::natural as native;
-use num;
+use common::{natural_to_biguint, natural_to_rugint_integer, GenerationMode};
+use malachite_nz::natural::Natural;
+use num::BigUint;
 use rugint;
-use rust_wheels::benchmarks::{BenchmarkOptions4, benchmark_4};
+use rust_wheels::benchmarks::{BenchmarkOptions3, benchmark_3};
 use rust_wheels::iterators::common::EXAMPLE_SEED;
 use rust_wheels::iterators::naturals::{exhaustive_naturals, random_naturals};
 use rust_wheels::iterators::tuples::{exhaustive_pairs_from_single, random_pairs_from_single};
 use std::cmp::{max, Ordering};
 
-type It = Iterator<Item = (gmp::Natural, gmp::Natural)>;
+type It = Iterator<Item = (Natural, Natural)>;
 
 pub fn exhaustive_inputs() -> Box<It> {
     Box::new(exhaustive_pairs_from_single(exhaustive_naturals()))
@@ -42,27 +40,19 @@ pub fn demo_natural_cmp(gm: GenerationMode, limit: usize) {
 
 pub fn benchmark_natural_cmp(gm: GenerationMode, limit: usize, file_name: &str) {
     println!("benchmarking {} Natural.cmp(&Natural)", gm.name());
-    benchmark_4(BenchmarkOptions4 {
+    benchmark_3(BenchmarkOptions3 {
         xs: select_inputs(gm),
-        function_f: &(|(x, y): (gmp::Natural, gmp::Natural)| x.cmp(&y)),
-        function_g: &(|(x, y): (native::Natural, native::Natural)| x.cmp(&y)),
-        function_h: &(|(x, y): (num::BigUint, num::BigUint)| x.cmp(&y)),
-        function_i: &(|(x, y): (rugint::Integer, rugint::Integer)| x.cmp(&y)),
+        function_f: &(|(x, y): (Natural, Natural)| x.cmp(&y)),
+        function_g: &(|(x, y): (BigUint, BigUint)| x.cmp(&y)),
+        function_h: &(|(x, y): (rugint::Integer, rugint::Integer)| x.cmp(&y)),
         x_cons: &(|p| p.clone()),
-        y_cons: &(|&(ref x, ref y)| (gmp_natural_to_native(x), gmp_natural_to_native(y))),
-        z_cons: &(|&(ref x, ref y)| (gmp_natural_to_num_biguint(x), gmp_natural_to_num_biguint(y))),
-        w_cons: &(|&(ref x, ref y)| {
-            (
-                gmp_natural_to_rugint_integer(x),
-                gmp_natural_to_rugint_integer(y),
-            )
-        }),
+        y_cons: &(|&(ref x, ref y)| (natural_to_biguint(x), natural_to_biguint(y))),
+        z_cons: &(|&(ref x, ref y)| (natural_to_rugint_integer(x), natural_to_rugint_integer(y))),
         x_param: &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),
         limit,
-        f_name: "malachite-gmp",
-        g_name: "malachite-native",
-        h_name: "num",
-        i_name: "rugint",
+        f_name: "malachite",
+        g_name: "num",
+        h_name: "rugint",
         title: "Natural.cmp(\\\\&Natural)",
         x_axis_label: "max(x.significant\\\\_bits(), y.significant\\\\_bits())",
         y_axis_label: "time (ns)",

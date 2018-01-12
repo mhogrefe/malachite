@@ -1,13 +1,10 @@
 use common::LARGE_LIMIT;
 use malachite_base::traits::Zero;
-use malachite_native::natural as native;
-use malachite_gmp::natural as gmp;
-use malachite_test::common::{gmp_natural_to_native, native_natural_to_gmp,
-                             native_natural_to_num_biguint, native_natural_to_rugint_integer,
-                             num_biguint_to_native_natural, rugint_integer_to_native_natural,
-                             GenerationMode};
+use malachite_nz::natural::Natural;
+use malachite_test::common::{biguint_to_natural, natural_to_biguint, natural_to_rugint_integer,
+                             rugint_integer_to_natural, GenerationMode};
 use malachite_test::natural::arithmetic::sub::{num_sub, rugint_sub, select_inputs_2};
-use num;
+use num::BigUint;
 use rugint;
 use rust_wheels::iterators::common::EXAMPLE_SEED;
 use rust_wheels::iterators::naturals::{exhaustive_naturals, random_naturals};
@@ -16,13 +13,8 @@ use std::str::FromStr;
 #[test]
 fn test_sub_assign_natural() {
     let test = |u, v, out| {
-        let mut n = native::Natural::from_str(u).unwrap();
-        n -= &native::Natural::from_str(v).unwrap();
-        assert_eq!(n.to_string(), out);
-        assert!(n.is_valid());
-
-        let mut n = gmp::Natural::from_str(u).unwrap();
-        n -= &gmp::Natural::from_str(v).unwrap();
+        let mut n = Natural::from_str(u).unwrap();
+        n -= &Natural::from_str(v).unwrap();
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
     };
@@ -42,41 +34,24 @@ fn test_sub_assign_natural() {
 
 #[test]
 #[should_panic(expected = "Cannot subtract a Natural from a smaller Natural")]
-fn sub_assign_fail_native() {
-    let mut x = native::Natural::from_str("123").unwrap();
-    x -= &native::Natural::from_str("456").unwrap();
-}
-
-#[test]
-#[should_panic(expected = "Cannot subtract a Natural from a smaller Natural")]
-fn sub_assign_fail_gmp() {
-    let mut x = gmp::Natural::from_str("123").unwrap();
-    x -= &gmp::Natural::from_str("456").unwrap();
+fn sub_assign_fail() {
+    let mut x = Natural::from_str("123").unwrap();
+    x -= &Natural::from_str("456").unwrap();
 }
 
 #[test]
 fn test_sub_natural() {
     let test = |u, v, out| {
-        let on = native::Natural::from_str(u).unwrap() - &native::Natural::from_str(v).unwrap();
+        let on = Natural::from_str(u).unwrap() - &Natural::from_str(v).unwrap();
         assert_eq!(format!("{:?}", on), out);
         assert!(on.map_or(true, |n| n.is_valid()));
 
-        let on = gmp::Natural::from_str(u).unwrap() - &gmp::Natural::from_str(v).unwrap();
+        let on = &Natural::from_str(u).unwrap() - &Natural::from_str(v).unwrap();
         assert_eq!(format!("{:?}", on), out);
         assert!(on.map_or(true, |n| n.is_valid()));
 
-        let on = &native::Natural::from_str(u).unwrap() - &native::Natural::from_str(v).unwrap();
-        assert_eq!(format!("{:?}", on), out);
-        assert!(on.map_or(true, |n| n.is_valid()));
-
-        let on = &gmp::Natural::from_str(u).unwrap() - &gmp::Natural::from_str(v).unwrap();
-        assert_eq!(format!("{:?}", on), out);
-        assert!(on.map_or(true, |n| n.is_valid()));
-
-        let on = num_sub(
-            num::BigUint::from_str(u).unwrap(),
-            num::BigUint::from_str(v).unwrap(),
-        ).map(|x| num_biguint_to_native_natural(&x));
+        let on = num_sub(BigUint::from_str(u).unwrap(), BigUint::from_str(v).unwrap())
+            .map(|x| biguint_to_natural(&x));
         assert_eq!(format!("{:?}", on), out);
 
         let on = rugint_sub(
@@ -115,30 +90,24 @@ fn test_sub_natural() {
 
 #[test]
 fn sub_properties() {
-    // x -= y is equivalent for malachite-gmp, malachite-native, and rugint.
-    // x - &y is equivalent for malachite-gmp, malachite-native, num, and rugint.
+    // x -= y is equivalent for malachite and rugint.
+    // x - &y is equivalent for malachite and rugint.
     // x -= y; n is valid.
     // x - &y is valid.
     // &x - &y is valid.
     // x -= y, x - &y, and &x - &y give the same result.
     // if x >= y, x - y <= x
     // if x >= y, (x - y).unwrap() + y == x
-    let two_naturals = |mut gmp_x: gmp::Natural, gmp_y: gmp::Natural| {
-        let mut x = gmp_natural_to_native(&gmp_x);
-        let y = gmp_natural_to_native(&gmp_y);
+    let two_naturals = |mut x: Natural, y: Natural| {
         let old_x = x.clone();
 
         if x >= y {
-            gmp_x -= &gmp_y;
-            assert!(gmp_x.is_valid());
-
             x -= &y;
             assert!(x.is_valid());
-            assert_eq!(gmp_natural_to_native(&gmp_x), x);
 
-            let mut rugint_x = native_natural_to_rugint_integer(&old_x);
-            rugint_x -= native_natural_to_rugint_integer(&y);
-            assert_eq!(rugint_integer_to_native_natural(&rugint_x), x);
+            let mut rugint_x = natural_to_rugint_integer(&old_x);
+            rugint_x -= natural_to_rugint_integer(&y);
+            assert_eq!(rugint_integer_to_natural(&rugint_x), x);
         }
         let ox = if old_x >= y { Some(x) } else { None };
 
@@ -155,30 +124,14 @@ fn sub_properties() {
         assert_eq!(result.is_some(), y == x2 || ox.is_none());
         assert!(result.map_or(true, |x| x.is_valid()));
 
-        let gmp_x2 = native_natural_to_gmp(&old_x);
-        let result = &gmp_x2 - &gmp_y;
-        assert_eq!(result.clone().map(|x| gmp_natural_to_native(&x)), ox);
-        assert!(result.map_or(true, |x| x.is_valid()));
-        let result = gmp_x2 - &gmp_y;
-        assert_eq!(result.clone().map(|x| gmp_natural_to_native(&x)), ox);
-        assert!(result.map_or(true, |x| x.is_valid()));
+        let num_x2 = natural_to_biguint(&old_x);
+        let num_y = natural_to_biguint(&y);
+        assert_eq!(num_sub(num_x2, num_y).map(|x| biguint_to_natural(&x)), ox);
 
-        let gmp_x2 = native_natural_to_gmp(&old_x);
-        let result = &gmp_y - &gmp_x2;
-        assert_eq!(result.is_some(), gmp_y == gmp_x2 || ox.is_none());
-        assert!(result.map_or(true, |x| x.is_valid()));
-
-        let num_x2 = native_natural_to_num_biguint(&old_x);
-        let num_y = native_natural_to_num_biguint(&y);
+        let rugint_x2 = natural_to_rugint_integer(&old_x);
+        let rugint_y = natural_to_rugint_integer(&y);
         assert_eq!(
-            num_sub(num_x2, num_y).map(|x| num_biguint_to_native_natural(&x)),
-            ox
-        );
-
-        let rugint_x2 = native_natural_to_rugint_integer(&old_x);
-        let rugint_y = native_natural_to_rugint_integer(&y);
-        assert_eq!(
-            rugint_sub(rugint_x2, rugint_y).map(|x| rugint_integer_to_native_natural(&x)),
+            rugint_sub(rugint_x2, rugint_y).map(|x| rugint_integer_to_natural(&x)),
             ox
         );
 
@@ -192,10 +145,9 @@ fn sub_properties() {
     // x - x == 0
     // if x != 0, 0 - x == None
     #[allow(unknown_lints, identity_op, eq_op)]
-    let one_natural = |gmp_x: gmp::Natural| {
-        let x = gmp_natural_to_native(&gmp_x);
+    let one_natural = |x: Natural| {
         assert_eq!((&x - 0).unwrap(), x);
-        assert_eq!((&x - &x).unwrap(), native::Natural::ZERO);
+        assert_eq!((&x - &x).unwrap(), Natural::ZERO);
         if x != 0 {
             assert!((0 - &x).is_none());
         }

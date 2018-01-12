@@ -1,15 +1,14 @@
-use common::{gmp_integer_to_native, gmp_integer_to_num_bigint, gmp_integer_to_rugint,
-             GenerationMode};
+use common::{integer_to_bigint, integer_to_rugint_integer, GenerationMode};
 use malachite_base::traits::NegAssign;
-use malachite_gmp::integer as gmp;
-use malachite_native::integer as native;
-use num;
+use malachite_nz::integer::Integer;
+use num::BigInt;
 use rugint;
-use rust_wheels::benchmarks::{BenchmarkOptions2, BenchmarkOptions4, benchmark_2, benchmark_4};
+use rust_wheels::benchmarks::{BenchmarkOptions1, BenchmarkOptions2, BenchmarkOptions3,
+                              benchmark_1, benchmark_2, benchmark_3};
 use rust_wheels::iterators::common::EXAMPLE_SEED;
 use rust_wheels::iterators::integers::{exhaustive_integers, random_integers};
 
-type It = Iterator<Item = gmp::Integer>;
+type It = Iterator<Item = Integer>;
 
 pub fn exhaustive_inputs() -> Box<It> {
     Box::new(exhaustive_integers())
@@ -48,16 +47,13 @@ pub fn demo_integer_neg_ref(gm: GenerationMode, limit: usize) {
 
 pub fn benchmark_integer_neg_assign(gm: GenerationMode, limit: usize, file_name: &str) {
     println!("benchmarking {} Integer.neg_assign()", gm.name());
-    benchmark_2(BenchmarkOptions2 {
+    benchmark_1(BenchmarkOptions1 {
         xs: select_inputs(gm),
-        function_f: &(|mut n: gmp::Integer| n.neg_assign()),
-        function_g: &(|mut n: native::Integer| n.neg_assign()),
+        function_f: &(|mut n: Integer| n.neg_assign()),
         x_cons: &(|x| x.clone()),
-        y_cons: &(|x| gmp_integer_to_native(x)),
         x_param: &(|n| n.significant_bits() as usize),
         limit,
-        f_name: "malachite-gmp",
-        g_name: "malachite-native",
+        f_name: "malachite",
         title: "Integer.neg_assign()",
         x_axis_label: "n.significant\\\\_bits()",
         y_axis_label: "time (ns)",
@@ -67,22 +63,19 @@ pub fn benchmark_integer_neg_assign(gm: GenerationMode, limit: usize, file_name:
 
 pub fn benchmark_integer_neg(gm: GenerationMode, limit: usize, file_name: &str) {
     println!("benchmarking {} -Integer", gm.name());
-    benchmark_4(BenchmarkOptions4 {
+    benchmark_3(BenchmarkOptions3 {
         xs: select_inputs(gm),
-        function_f: &(|n: gmp::Integer| -n),
-        function_g: &(|n: native::Integer| -n),
-        function_h: &(|n: num::BigInt| -n),
-        function_i: &(|n: rugint::Integer| -n),
+        function_f: &(|n: Integer| -n),
+        function_g: &(|n: BigInt| -n),
+        function_h: &(|n: rugint::Integer| -n),
         x_cons: &(|x| x.clone()),
-        y_cons: &(|x| gmp_integer_to_native(x)),
-        z_cons: &(|x| gmp_integer_to_num_bigint(x)),
-        w_cons: &(|x| gmp_integer_to_rugint(x)),
+        y_cons: &(|x| integer_to_bigint(x)),
+        z_cons: &(|x| integer_to_rugint_integer(x)),
         x_param: &(|n| n.significant_bits() as usize),
         limit,
-        f_name: "malachite-gmp",
-        g_name: "malachite-native",
-        h_name: "num",
-        i_name: "rugint",
+        f_name: "malachite",
+        g_name: "num",
+        h_name: "rugint",
         title: "-Integer",
         x_axis_label: "n.significant\\\\_bits()",
         y_axis_label: "time (ns)",
@@ -98,10 +91,10 @@ pub fn benchmark_integer_neg_evaluation_strategy(
     println!("benchmarking {} -Integer evaluation strategy", gm.name());
     benchmark_2(BenchmarkOptions2 {
         xs: select_inputs(gm),
-        function_f: &(|n: native::Integer| -n),
-        function_g: &(|n: native::Integer| -&n),
-        x_cons: &(|x| gmp_integer_to_native(x)),
-        y_cons: &(|x| gmp_integer_to_native(x)),
+        function_f: &(|n: Integer| -n),
+        function_g: &(|n: Integer| -&n),
+        x_cons: &(|p| p.clone()),
+        y_cons: &(|p| p.clone()),
         x_param: &(|n| n.significant_bits() as usize),
         limit,
         f_name: "-Integer",

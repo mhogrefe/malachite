@@ -1,7 +1,6 @@
 use common::GenerationMode;
-use malachite_gmp::natural as gmp;
-use malachite_native::natural as native;
-use rust_wheels::benchmarks::{BenchmarkOptions2, benchmark_2};
+use malachite_nz::natural::Natural;
+use rust_wheels::benchmarks::{BenchmarkOptions1, benchmark_1};
 use rust_wheels::iterators::common::EXAMPLE_SEED;
 use rust_wheels::iterators::general::random_x;
 use rust_wheels::iterators::primitive_ints::exhaustive_u;
@@ -29,7 +28,7 @@ pub fn demo_natural_from_limbs_le(gm: GenerationMode, limit: usize) {
         println!(
             "from_limbs_le({:?}) = {:?}",
             xs,
-            gmp::Natural::from_limbs_le(xs.as_slice())
+            Natural::from_limbs_le(xs.as_slice())
         );
     }
 }
@@ -39,23 +38,20 @@ pub fn demo_natural_from_limbs_be(gm: GenerationMode, limit: usize) {
         println!(
             "from_limbs_be({:?}) = {:?}",
             xs,
-            gmp::Natural::from_limbs_be(xs.as_slice())
+            Natural::from_limbs_be(xs.as_slice())
         );
     }
 }
 
 pub fn benchmark_natural_from_limbs_le(gm: GenerationMode, limit: usize, file_name: &str) {
     println!("benchmarking {} Natural::from_limbs_le(&[u32])", gm.name());
-    benchmark_2(BenchmarkOptions2 {
+    benchmark_1(BenchmarkOptions1 {
         xs: select_inputs(gm),
-        function_f: &(|xs: Vec<u32>| gmp::Natural::from_limbs_le(xs.as_slice())),
-        function_g: &(|xs: Vec<u32>| native::Natural::from_limbs_le(xs.as_slice())),
+        function_f: &(|xs: Vec<u32>| Natural::from_limbs_le(xs.as_slice())),
         x_cons: &(|xs| xs.clone()),
-        y_cons: &(|xs| xs.clone()),
         x_param: &(|xs| xs.len()),
         limit,
-        f_name: "malachite-gmp",
-        g_name: "malachite-native",
+        f_name: "malachite",
         title: "Natural::from\\\\_limbs\\\\_le(\\\\&[u32])",
         x_axis_label: "xs.len()",
         y_axis_label: "time (ns)",
@@ -65,16 +61,13 @@ pub fn benchmark_natural_from_limbs_le(gm: GenerationMode, limit: usize, file_na
 
 pub fn benchmark_natural_from_limbs_be(gm: GenerationMode, limit: usize, file_name: &str) {
     println!("benchmarking {} Natural::from_limbs_be(&[u32])", gm.name());
-    benchmark_2(BenchmarkOptions2 {
+    benchmark_1(BenchmarkOptions1 {
         xs: select_inputs(gm),
-        function_f: &(|xs: Vec<u32>| gmp::Natural::from_limbs_le(xs.as_slice())),
-        function_g: &(|xs: Vec<u32>| native::Natural::from_limbs_be(xs.as_slice())),
+        function_f: &(|xs: Vec<u32>| Natural::from_limbs_be(xs.as_slice())),
         x_cons: &(|xs| xs.clone()),
-        y_cons: &(|xs| xs.clone()),
         x_param: &(|xs| xs.len()),
         limit,
-        f_name: "malachite-gmp",
-        g_name: "malachite-native",
+        f_name: "malachite",
         title: "Natural::from\\\\_limbs\\\\_be(\\\\&[u32])",
         x_axis_label: "xs.len()",
         y_axis_label: "time (ns)",

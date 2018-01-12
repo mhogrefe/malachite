@@ -1,11 +1,10 @@
-use common::{gmp_natural_to_native, GenerationMode};
-use malachite_gmp::natural as gmp;
-use malachite_native::natural as native;
-use rust_wheels::benchmarks::{BenchmarkOptions2, benchmark_2};
+use common::GenerationMode;
+use malachite_nz::natural::Natural;
+use rust_wheels::benchmarks::{BenchmarkOptions1, BenchmarkOptions2, benchmark_1, benchmark_2};
 use rust_wheels::iterators::common::EXAMPLE_SEED;
 use rust_wheels::iterators::naturals::{exhaustive_naturals, random_naturals};
 
-type It = Iterator<Item = gmp::Natural>;
+type It = Iterator<Item = Natural>;
 
 pub fn exhaustive_inputs() -> Box<It> {
     Box::new(exhaustive_naturals())
@@ -36,16 +35,13 @@ pub fn demo_natural_not_ref(gm: GenerationMode, limit: usize) {
 
 pub fn benchmark_natural_not(gm: GenerationMode, limit: usize, file_name: &str) {
     println!("benchmarking {} !Natural", gm.name());
-    benchmark_2(BenchmarkOptions2 {
+    benchmark_1(BenchmarkOptions1 {
         xs: select_inputs(gm),
-        function_f: &(|n: gmp::Natural| !n),
-        function_g: &(|n: native::Natural| !n),
+        function_f: &(|n: Natural| !n),
         x_cons: &(|x| x.clone()),
-        y_cons: &(|x| gmp_natural_to_native(x)),
         x_param: &(|n| n.significant_bits() as usize),
         limit,
-        f_name: "malachite-gmp",
-        g_name: "malachite-native",
+        f_name: "malachite",
         title: "-Natural",
         x_axis_label: "n.significant\\\\_bits()",
         y_axis_label: "time (ns)",
@@ -61,10 +57,10 @@ pub fn benchmark_natural_not_evaluation_strategy(
     println!("benchmarking {} !Natural evaluation strategy", gm.name());
     benchmark_2(BenchmarkOptions2 {
         xs: select_inputs(gm),
-        function_f: &(|n: native::Natural| !n),
-        function_g: &(|n: native::Natural| !&n),
-        x_cons: &(|x| gmp_natural_to_native(x)),
-        y_cons: &(|x| gmp_natural_to_native(x)),
+        function_f: &(|n: Natural| !n),
+        function_g: &(|n: Natural| !&n),
+        x_cons: &(|x| x.clone()),
+        y_cons: &(|x| x.clone()),
         x_param: &(|n| n.significant_bits() as usize),
         limit,
         f_name: "-Natural",

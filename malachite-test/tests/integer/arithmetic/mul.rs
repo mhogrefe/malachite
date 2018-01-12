@@ -1,12 +1,10 @@
 use common::LARGE_LIMIT;
 use malachite_base::traits::{One, Zero};
-use malachite_native::integer as native;
-use malachite_gmp::integer as gmp;
-use malachite_test::common::{gmp_integer_to_native, native_integer_to_num_bigint,
-                             native_integer_to_rugint, num_bigint_to_native_integer,
-                             rugint_integer_to_native, GenerationMode};
+use malachite_nz::integer::Integer;
+use malachite_test::common::{bigint_to_integer, integer_to_bigint, integer_to_rugint_integer,
+                             rugint_integer_to_integer, GenerationMode};
 use malachite_test::integer::arithmetic::mul::select_inputs;
-use num;
+use num::BigInt;
 use rugint;
 use rust_wheels::iterators::common::EXAMPLE_SEED;
 use rust_wheels::iterators::general::random_x;
@@ -18,61 +16,34 @@ use std::str::FromStr;
 
 #[test]
 fn test_mul() {
-    #[allow(unknown_lints, cyclomatic_complexity)]
     let test = |u, v, out| {
-        let mut n = native::Integer::from_str(u).unwrap();
-        n *= native::Integer::from_str(v).unwrap();
+        let mut n = Integer::from_str(u).unwrap();
+        n *= Integer::from_str(v).unwrap();
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let mut n = native::Integer::from_str(u).unwrap();
-        n *= &native::Integer::from_str(v).unwrap();
+        let mut n = Integer::from_str(u).unwrap();
+        n *= &Integer::from_str(v).unwrap();
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let mut n = gmp::Integer::from_str(u).unwrap();
-        n *= gmp::Integer::from_str(v).unwrap();
+        let n = Integer::from_str(u).unwrap() * Integer::from_str(v).unwrap();
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let mut n = gmp::Integer::from_str(u).unwrap();
-        n *= &gmp::Integer::from_str(v).unwrap();
+        let n = &Integer::from_str(u).unwrap() * Integer::from_str(v).unwrap();
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = native::Integer::from_str(u).unwrap() * native::Integer::from_str(v).unwrap();
+        let n = Integer::from_str(u).unwrap() * &Integer::from_str(v).unwrap();
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = &native::Integer::from_str(u).unwrap() * native::Integer::from_str(v).unwrap();
+        let n = &Integer::from_str(u).unwrap() * &Integer::from_str(v).unwrap();
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = native::Integer::from_str(u).unwrap() * &native::Integer::from_str(v).unwrap();
-        assert_eq!(n.to_string(), out);
-        assert!(n.is_valid());
-
-        let n = &native::Integer::from_str(u).unwrap() * &native::Integer::from_str(v).unwrap();
-        assert_eq!(n.to_string(), out);
-        assert!(n.is_valid());
-
-        let n = gmp::Integer::from_str(u).unwrap() * gmp::Integer::from_str(v).unwrap();
-        assert_eq!(n.to_string(), out);
-        assert!(n.is_valid());
-
-        let n = gmp::Integer::from_str(u).unwrap() * &gmp::Integer::from_str(v).unwrap();
-        assert_eq!(n.to_string(), out);
-        assert!(n.is_valid());
-
-        let n = &gmp::Integer::from_str(u).unwrap() * gmp::Integer::from_str(v).unwrap();
-        assert_eq!(n.to_string(), out);
-        assert!(n.is_valid());
-
-        let n = &gmp::Integer::from_str(u).unwrap() * &gmp::Integer::from_str(v).unwrap();
-        assert_eq!(n.to_string(), out);
-        assert!(n.is_valid());
-
-        let n = num::BigInt::from_str(u).unwrap() * num::BigInt::from_str(v).unwrap();
+        let n = BigInt::from_str(u).unwrap() * BigInt::from_str(v).unwrap();
         assert_eq!(n.to_string(), out);
 
         let n = rugint::Integer::from_str(u).unwrap() * rugint::Integer::from_str(v).unwrap();
@@ -135,35 +106,17 @@ fn mul_properties() {
     // x * &y is valid.
     // &x * y is valid.
     // &x * &y is valid.
-    // x * y is equivalent for malachite-gmp, malachite-native, num, and rugint.
+    // x * y is equivalent for malachite, num, and rugint.
     // x *= y, x *= &y, x * y, x * &y, &x * y, and &x * &y give the same result.
     // x * y == y * x
     //TODO x * y / y == x and x * y / x == y
     // (-x) * y == -(x * y)
     // x * (-y) == -(x * y)
-    #[allow(unknown_lints, cyclomatic_complexity)]
-    let two_integers = |gmp_x: gmp::Integer, gmp_y: gmp::Integer| {
-        let x = gmp_integer_to_native(&gmp_x);
-        let y = gmp_integer_to_native(&gmp_y);
-        let raw_gmp_product = gmp_x.clone() * gmp_y.clone();
-        assert!(raw_gmp_product.is_valid());
-        let gmp_product = gmp_integer_to_native(&raw_gmp_product);
-        let num_product = num_bigint_to_native_integer(
-            &(native_integer_to_num_bigint(&x) * native_integer_to_num_bigint(&y)),
+    let two_integers = |x: Integer, y: Integer| {
+        let num_product = bigint_to_integer(&(integer_to_bigint(&x) * integer_to_bigint(&y)));
+        let rugint_product = rugint_integer_to_integer(
+            &(integer_to_rugint_integer(&x) * integer_to_rugint_integer(&y)),
         );
-        let rugint_product = rugint_integer_to_native(
-            &(native_integer_to_rugint(&x) * native_integer_to_rugint(&y)),
-        );
-
-        let product_val_val = gmp_x.clone() * gmp_y.clone();
-        let product_val_ref = gmp_x.clone() * &gmp_y;
-        let product_ref_val = &gmp_x * gmp_y.clone();
-        assert!(product_val_val.is_valid());
-        assert!(product_val_ref.is_valid());
-        assert!(product_ref_val.is_valid());
-        assert_eq!(product_val_val, raw_gmp_product);
-        assert_eq!(product_val_ref, raw_gmp_product);
-        assert_eq!(product_ref_val, raw_gmp_product);
 
         let product_val_val = x.clone() * y.clone();
         let product_val_ref = x.clone() * &y;
@@ -186,23 +139,13 @@ fn mul_properties() {
         assert_eq!(mut_x, product);
         assert!(mut_x.is_valid());
 
-        let mut mut_x = gmp_x.clone();
-        mut_x *= gmp_y.clone();
-        assert!(mut_x.is_valid());
-        assert_eq!(mut_x, raw_gmp_product);
-        let mut mut_x = gmp_x.clone();
-        mut_x *= &gmp_y;
-        assert_eq!(mut_x, raw_gmp_product);
-        assert!(mut_x.is_valid());
-
-        let mut mut_x = native_integer_to_rugint(&x);
-        mut_x *= native_integer_to_rugint(&y);
-        assert_eq!(rugint_integer_to_native(&mut_x), product);
+        let mut mut_x = integer_to_rugint_integer(&x);
+        mut_x *= integer_to_rugint_integer(&y);
+        assert_eq!(rugint_integer_to_integer(&mut_x), product);
 
         let reverse_product = &y * &x;
         //TODO let inv_1 = (&product / &x).unwrap();
         //TODO let inv_2 = (&product / &y).unwrap();
-        assert_eq!(gmp_product, product);
         assert_eq!(num_product, product);
         assert_eq!(rugint_product, product);
         assert_eq!(reverse_product, product);
@@ -215,11 +158,10 @@ fn mul_properties() {
 
     // x * (y: u32) == x * from(y)
     // (y: u32) * x == x * from(y)
-    let integer_and_u32 = |gmp_x: gmp::Integer, y: u32| {
-        let x = gmp_integer_to_native(&gmp_x);
+    let integer_and_u32 = |x: Integer, y: u32| {
         let primitive_product_1 = &x * y;
         let primitive_product_2 = y * &x;
-        let product = x * native::Integer::from(y);
+        let product = x * Integer::from(y);
         assert_eq!(primitive_product_1, product);
         assert_eq!(primitive_product_2, product);
     };
@@ -230,13 +172,12 @@ fn mul_properties() {
     // 1 * x == x
     //TODO x * x == x ^ 2
     #[allow(unknown_lints, erasing_op)]
-    let one_integer = |gmp_x: gmp::Integer| {
-        let x = gmp_integer_to_native(&gmp_x);
+    let one_integer = |x: Integer| {
         let x_old = x.clone();
-        assert_eq!(&x * native::Integer::ZERO, 0);
-        assert_eq!(native::Integer::ZERO * 0, 0);
-        let id_1 = &x * native::Integer::ONE;
-        let id_2 = native::Integer::ONE * &x;
+        assert_eq!(&x * Integer::ZERO, 0);
+        assert_eq!(Integer::ZERO * 0, 0);
+        let id_1 = &x * Integer::ONE;
+        let id_2 = Integer::ONE * &x;
         //TODO let square = &x * &x;
         assert_eq!(id_1, x_old);
         assert_eq!(id_2, x_old);
@@ -246,10 +187,7 @@ fn mul_properties() {
     // (x * y) * z == x * (y * z)
     // x * (y + z) == x * y + x * z
     // (x + y) * z == x * z + y * z
-    let three_integers = |gmp_x: gmp::Integer, gmp_y: gmp::Integer, gmp_z: gmp::Integer| {
-        let x = gmp_integer_to_native(&gmp_x);
-        let y = gmp_integer_to_native(&gmp_y);
-        let z = gmp_integer_to_native(&gmp_z);
+    let three_integers = |x: Integer, y: Integer, z: Integer| {
         assert_eq!((&x * &y) * &z, &x * (&y * &z));
         assert_eq!(&x * (&y + &z), &x * &y + &x * &z);
         assert_eq!((&x + &y) * &z, x * &z + y * z);

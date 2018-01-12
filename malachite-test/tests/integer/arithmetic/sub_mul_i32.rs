@@ -1,8 +1,7 @@
 use common::LARGE_LIMIT;
 use malachite_base::traits::{NegativeOne, One, SubMul, SubMulAssign, Zero};
-use malachite_native::integer as native;
-use malachite_gmp::integer as gmp;
-use malachite_test::common::{gmp_integer_to_native, native_integer_to_gmp, GenerationMode};
+use malachite_nz::integer::Integer;
+use malachite_test::common::GenerationMode;
 use malachite_test::integer::arithmetic::sub_mul_i32::select_inputs;
 use rust_wheels::iterators::common::EXAMPLE_SEED;
 use rust_wheels::iterators::general::random_x;
@@ -14,69 +13,34 @@ use std::str::FromStr;
 
 #[test]
 fn test_sub_mul_i32() {
-    #[allow(unknown_lints, cyclomatic_complexity)]
     let test = |u, v, c: i32, out| {
-        let mut a = native::Integer::from_str(u).unwrap();
-        a.sub_mul_assign(native::Integer::from_str(v).unwrap(), c);
+        let mut a = Integer::from_str(u).unwrap();
+        a.sub_mul_assign(Integer::from_str(v).unwrap(), c);
         assert_eq!(a.to_string(), out);
         assert!(a.is_valid());
 
-        let mut a = gmp::Integer::from_str(u).unwrap();
-        a.sub_mul_assign(gmp::Integer::from_str(v).unwrap(), c);
+        let mut a = Integer::from_str(u).unwrap();
+        a.sub_mul_assign(&Integer::from_str(v).unwrap(), c);
         assert_eq!(a.to_string(), out);
         assert!(a.is_valid());
 
-        let mut a = native::Integer::from_str(u).unwrap();
-        a.sub_mul_assign(&native::Integer::from_str(v).unwrap(), c);
-        assert_eq!(a.to_string(), out);
-        assert!(a.is_valid());
-
-        let mut a = gmp::Integer::from_str(u).unwrap();
-        a.sub_mul_assign(&gmp::Integer::from_str(v).unwrap(), c);
-        assert_eq!(a.to_string(), out);
-        assert!(a.is_valid());
-
-        let a = native::Integer::from_str(u)
+        let a = Integer::from_str(u)
             .unwrap()
-            .sub_mul(native::Integer::from_str(v).unwrap(), c);
+            .sub_mul(Integer::from_str(v).unwrap(), c);
         assert_eq!(a.to_string(), out);
         assert!(a.is_valid());
 
-        let a = gmp::Integer::from_str(u)
+        let a = Integer::from_str(u)
             .unwrap()
-            .sub_mul(gmp::Integer::from_str(v).unwrap(), c);
+            .sub_mul(&Integer::from_str(v).unwrap(), c);
         assert_eq!(a.to_string(), out);
         assert!(a.is_valid());
 
-        let a = native::Integer::from_str(u)
-            .unwrap()
-            .sub_mul(&native::Integer::from_str(v).unwrap(), c);
+        let a = (&Integer::from_str(u).unwrap()).sub_mul(Integer::from_str(v).unwrap(), c);
         assert_eq!(a.to_string(), out);
         assert!(a.is_valid());
 
-        let a = gmp::Integer::from_str(u)
-            .unwrap()
-            .sub_mul(&gmp::Integer::from_str(v).unwrap(), c);
-        assert_eq!(a.to_string(), out);
-        assert!(a.is_valid());
-
-        let a = (&native::Integer::from_str(u).unwrap())
-            .sub_mul(native::Integer::from_str(v).unwrap(), c);
-        assert_eq!(a.to_string(), out);
-        assert!(a.is_valid());
-
-        let a =
-            (&gmp::Integer::from_str(u).unwrap()).sub_mul(gmp::Integer::from_str(v).unwrap(), c);
-        assert_eq!(a.to_string(), out);
-        assert!(a.is_valid());
-
-        let a = (&native::Integer::from_str(u).unwrap())
-            .sub_mul(&native::Integer::from_str(v).unwrap(), c);
-        assert_eq!(a.to_string(), out);
-        assert!(a.is_valid());
-
-        let a =
-            (&gmp::Integer::from_str(u).unwrap()).sub_mul(&gmp::Integer::from_str(v).unwrap(), c);
+        let a = (&Integer::from_str(u).unwrap()).sub_mul(&Integer::from_str(v).unwrap(), c);
         assert_eq!(a.to_string(), out);
         assert!(a.is_valid());
     };
@@ -162,12 +126,6 @@ fn test_sub_mul_i32() {
 
 #[test]
 fn sub_mul_i32_properties() {
-    // a.sub_mul_assign(b, c) is equivalent for malachite-gmp and malachite-native.
-    // a.sub_mul_assign(&b, c) is equivalent for malachite-gmp and malachite-native.
-    // a.sub_mul(b, c) is equivalent for malachite-gmp and malachite-native.
-    // a.sub_mul(&b, c) is equivalent for malachite-gmp and malachite-native.
-    // (&a).sub_mul(b, c) is equivalent for malachite-gmp and malachite-native.
-    // (&a).sub_mul(&b, c) is equivalent for malachite-gmp and malachite-native.
     // a.sub_mul_assign(b, c); a is valid.
     // a.sub_mul_assign(&b, c); a is valid.
     // a.sub_mul(b, c) is valid.
@@ -180,44 +138,15 @@ fn sub_mul_i32_properties() {
     // a.sub_mul(b, c) = a.sub_mul(-b, -c)
     // -(a.sub_mul(b, c)) = (-a).sub_mul(-b, c) = (-a).sub_mul(b, -c)
     // a.sub_mul(&b, c) is equivalent to a.sub_mul(&b, Integer::from(c))
-    #[allow(unknown_lints, cyclomatic_complexity)]
-    let integer_integer_and_i32 = |mut gmp_a: gmp::Integer, gmp_b: gmp::Integer, c: i32| {
-        let mut a = gmp_integer_to_native(&gmp_a);
-        let b = gmp_integer_to_native(&gmp_b);
+    let integer_integer_and_i32 = |mut a: Integer, b: Integer, c: i32| {
         let old_a = a.clone();
-        gmp_a.sub_mul_assign(gmp_b.clone(), c);
-        assert!(gmp_a.is_valid());
-
-        let mut gmp_a_2 = native_integer_to_gmp(&old_a);
-        gmp_a_2.sub_mul_assign(&gmp_b, c);
-        assert!(gmp_a_2.is_valid());
-        assert_eq!(gmp_a_2, gmp_a);
-
         a.sub_mul_assign(b.clone(), c);
         assert!(a.is_valid());
-        assert_eq!(gmp_integer_to_native(&gmp_a), a);
 
         let mut a2 = old_a.clone();
         a2.sub_mul_assign(&b, c);
         assert!(a2.is_valid());
         assert_eq!(a2, a);
-
-        let gmp_a_2 = native_integer_to_gmp(&old_a);
-        let result = (&gmp_a_2).sub_mul(gmp_b.clone(), c);
-        assert!(result.is_valid());
-        assert_eq!(result, gmp_a);
-
-        let result = (&gmp_a_2).sub_mul(&gmp_b, c);
-        assert!(result.is_valid());
-        assert_eq!(result, gmp_a);
-
-        let result = gmp_a_2.clone().sub_mul(gmp_b.clone(), c);
-        assert!(result.is_valid());
-        assert_eq!(result, gmp_a);
-
-        let result = gmp_a_2.sub_mul(&gmp_b, c);
-        assert!(result.is_valid());
-        assert_eq!(result, gmp_a);
 
         let a2 = old_a.clone();
         let result = (&a2).sub_mul(b.clone(), c);
@@ -241,13 +170,12 @@ fn sub_mul_i32_properties() {
         assert_eq!((&old_a).sub_mul(-&b, -c), result);
         assert_eq!((-&old_a).sub_mul(-&b, c), -&result);
         assert_eq!((-&old_a).sub_mul(&b, -c), -&result);
-        assert_eq!(old_a.sub_mul(b, native::Integer::from(c)), result);
+        assert_eq!(old_a.sub_mul(b, Integer::from(c)), result);
     };
 
     // n.sub_mul(n, 1) == 0
     // n.sub_mul(-n, -1) == 0
-    let single_integer = |gmp_n: gmp::Integer| {
-        let n = &gmp_integer_to_native(&gmp_n);
+    let single_integer = |n: &Integer| {
         assert_eq!(n.sub_mul(n, 1), 0);
         assert_eq!(n.sub_mul(-n, -1), 0);
     };
@@ -258,12 +186,11 @@ fn sub_mul_i32_properties() {
     // 0.sub_mul(n, c) == -n * c
     // (n * c).sub_mul(n, c) == 0
     // (n * c).sub_mul(-n, -c) == 0
-    let integer_and_i32 = |gmp_n: gmp::Integer, c: i32| {
-        let n = &gmp_integer_to_native(&gmp_n);
-        assert_eq!(n.sub_mul(&native::Integer::ZERO, c), *n);
-        assert_eq!(n.sub_mul(&native::Integer::ONE, c), n - c);
-        assert_eq!(n.sub_mul(&native::Integer::NEGATIVE_ONE, c), n + c);
-        assert_eq!(native::Integer::ZERO.sub_mul(n, c), -n * c);
+    let integer_and_i32 = |n: &Integer, c: i32| {
+        assert_eq!(n.sub_mul(&Integer::ZERO, c), *n);
+        assert_eq!(n.sub_mul(&Integer::ONE, c), n - c);
+        assert_eq!(n.sub_mul(&Integer::NEGATIVE_ONE, c), n + c);
+        assert_eq!(Integer::ZERO.sub_mul(n, c), -n * c);
         assert_eq!((n * c).sub_mul(n, c), 0);
         assert_eq!((n * c).sub_mul(-n, -c), 0);
     };
@@ -271,9 +198,7 @@ fn sub_mul_i32_properties() {
     // a.sub_mul(b, 0) == a
     // a.sub_mul(b, 1) == a - b
     // a.sub_mul(b, -1) == a + b
-    let two_integers = |gmp_a: gmp::Integer, gmp_b: gmp::Integer| {
-        let a = &gmp_integer_to_native(&gmp_a);
-        let b = &gmp_integer_to_native(&gmp_b);
+    let two_integers = |a: &Integer, b: &Integer| {
         assert_eq!(a.sub_mul(b, 0), *a);
         assert_eq!(a.sub_mul(b, 1), a - b);
         assert_eq!(a.sub_mul(b, -1), a + b);
@@ -288,15 +213,15 @@ fn sub_mul_i32_properties() {
     }
 
     for n in exhaustive_integers().take(LARGE_LIMIT) {
-        single_integer(n);
+        single_integer(&n);
     }
 
     for n in random_integers(&EXAMPLE_SEED, 32).take(LARGE_LIMIT) {
-        single_integer(n);
+        single_integer(&n);
     }
 
     for (n, c) in exhaustive_pairs(exhaustive_integers(), exhaustive_i::<i32>()).take(LARGE_LIMIT) {
-        integer_and_i32(n, c);
+        integer_and_i32(&n, c);
     }
 
     for (n, c) in random_pairs(
@@ -305,14 +230,14 @@ fn sub_mul_i32_properties() {
         &(|seed| random_x(seed)),
     ).take(LARGE_LIMIT)
     {
-        integer_and_i32(n, c);
+        integer_and_i32(&n, c);
     }
 
     for (a, b) in exhaustive_pairs_from_single(exhaustive_integers()).take(LARGE_LIMIT) {
-        two_integers(a, b);
+        two_integers(&a, &b);
     }
 
     for (a, b) in random_pairs_from_single(random_integers(&EXAMPLE_SEED, 32)).take(LARGE_LIMIT) {
-        two_integers(a, b);
+        two_integers(&a, &b);
     }
 }

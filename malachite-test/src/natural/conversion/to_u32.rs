@@ -1,12 +1,11 @@
-use common::{gmp_natural_to_native, gmp_natural_to_rugint_integer, GenerationMode};
-use malachite_gmp::natural as gmp;
-use malachite_native::natural as native;
+use common::{natural_to_rugint_integer, GenerationMode};
+use malachite_nz::natural::Natural;
 use rugint;
-use rust_wheels::benchmarks::{BenchmarkOptions3, benchmark_3};
+use rust_wheels::benchmarks::{BenchmarkOptions2, benchmark_2};
 use rust_wheels::iterators::common::EXAMPLE_SEED;
 use rust_wheels::iterators::naturals::{exhaustive_naturals, random_naturals};
 
-type It = Iterator<Item = gmp::Natural>;
+type It = Iterator<Item = Natural>;
 
 pub fn exhaustive_inputs() -> Box<It> {
     Box::new(exhaustive_naturals())
@@ -37,19 +36,16 @@ pub fn demo_natural_to_u32_wrapping(gm: GenerationMode, limit: usize) {
 
 pub fn benchmark_natural_to_u32(gm: GenerationMode, limit: usize, file_name: &str) {
     println!("benchmarking {} Natural.to_u32()", gm.name());
-    benchmark_3(BenchmarkOptions3 {
+    benchmark_2(BenchmarkOptions2 {
         xs: select_inputs(gm),
-        function_f: &(|n: gmp::Natural| n.to_u32()),
-        function_g: &(|n: native::Natural| n.to_u32()),
-        function_h: &(|n: rugint::Integer| n.to_u32()),
+        function_f: &(|n: Natural| n.to_u32()),
+        function_g: &(|n: rugint::Integer| n.to_u32()),
         x_cons: &(|x| x.clone()),
-        y_cons: &(|x| gmp_natural_to_native(x)),
-        z_cons: &(|x| gmp_natural_to_rugint_integer(x)),
+        y_cons: &(|x| natural_to_rugint_integer(x)),
         x_param: &(|n| n.significant_bits() as usize),
         limit,
-        f_name: "malachite-gmp",
-        g_name: "malachite-native",
-        h_name: "rugint",
+        f_name: "malachite",
+        g_name: "rugint",
         title: "Natural.to\\\\_u32()",
         x_axis_label: "n.significant\\\\_bits()",
         y_axis_label: "time (ns)",
@@ -59,19 +55,16 @@ pub fn benchmark_natural_to_u32(gm: GenerationMode, limit: usize, file_name: &st
 
 pub fn benchmark_natural_to_u32_wrapping(gm: GenerationMode, limit: usize, file_name: &str) {
     println!("benchmarking {} Natural.to_u32_wrapping()", gm.name());
-    benchmark_3(BenchmarkOptions3 {
+    benchmark_2(BenchmarkOptions2 {
         xs: select_inputs(gm),
-        function_f: &(|n: gmp::Natural| n.to_u32_wrapping()),
-        function_g: &(|n: native::Natural| n.to_u32_wrapping()),
-        function_h: &(|n: rugint::Integer| n.to_u32_wrapping()),
+        function_f: &(|n: Natural| n.to_u32_wrapping()),
+        function_g: &(|n: rugint::Integer| n.to_u32_wrapping()),
         x_cons: &(|x| x.clone()),
-        y_cons: &(|x| gmp_natural_to_native(x)),
-        z_cons: &(|x| gmp_natural_to_rugint_integer(x)),
+        y_cons: &(|x| natural_to_rugint_integer(x)),
         x_param: &(|n| n.significant_bits() as usize),
         limit,
-        f_name: "malachite-gmp",
-        g_name: "malachite-native",
-        h_name: "rugint",
+        f_name: "malachite",
+        g_name: "rugint",
         title: "Natural.to\\\\_u32\\\\_wrapping()",
         x_axis_label: "n.significant\\\\_bits()",
         y_axis_label: "time (ns)",

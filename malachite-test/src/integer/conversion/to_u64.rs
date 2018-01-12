@@ -1,11 +1,10 @@
-use common::{gmp_integer_to_native, GenerationMode};
-use malachite_gmp::integer as gmp;
-use malachite_native::integer as native;
-use rust_wheels::benchmarks::{BenchmarkOptions2, benchmark_2};
+use common::GenerationMode;
+use malachite_nz::integer::Integer;
+use rust_wheels::benchmarks::{BenchmarkOptions1, benchmark_1};
 use rust_wheels::iterators::common::EXAMPLE_SEED;
 use rust_wheels::iterators::integers::{exhaustive_integers, random_integers};
 
-type It = Iterator<Item = gmp::Integer>;
+type It = Iterator<Item = Integer>;
 
 pub fn exhaustive_inputs() -> Box<It> {
     Box::new(exhaustive_integers())
@@ -36,16 +35,13 @@ pub fn demo_integer_to_u64_wrapping(gm: GenerationMode, limit: usize) {
 
 pub fn benchmark_integer_to_u64(gm: GenerationMode, limit: usize, file_name: &str) {
     println!("benchmarking {} Integer.to_u64()", gm.name());
-    benchmark_2(BenchmarkOptions2 {
+    benchmark_1(BenchmarkOptions1 {
         xs: select_inputs(gm),
-        function_f: &(|n: gmp::Integer| n.to_u64()),
-        function_g: &(|n: native::Integer| n.to_u64()),
+        function_f: &(|n: Integer| n.to_u64()),
         x_cons: &(|x| x.clone()),
-        y_cons: &(|x| gmp_integer_to_native(x)),
         x_param: &(|n| n.significant_bits() as usize),
         limit,
-        f_name: "malachite-gmp",
-        g_name: "malachite-native",
+        f_name: "malachite",
         title: "Integer.to\\\\_u64()",
         x_axis_label: "n.significant\\\\_bits()",
         y_axis_label: "time (ns)",
@@ -55,16 +51,13 @@ pub fn benchmark_integer_to_u64(gm: GenerationMode, limit: usize, file_name: &st
 
 pub fn benchmark_integer_to_u64_wrapping(gm: GenerationMode, limit: usize, file_name: &str) {
     println!("benchmarking {} Integer.to_u64_wrapping()", gm.name());
-    benchmark_2(BenchmarkOptions2 {
+    benchmark_1(BenchmarkOptions1 {
         xs: select_inputs(gm),
-        function_f: &(|n: gmp::Integer| n.to_u64_wrapping()),
-        function_g: &(|n: native::Integer| n.to_u64_wrapping()),
+        function_f: &(|n: Integer| n.to_u64_wrapping()),
         x_cons: &(|x| x.clone()),
-        y_cons: &(|x| gmp_integer_to_native(x)),
         x_param: &(|n| n.significant_bits() as usize),
         limit,
-        f_name: "malachite-gmp",
-        g_name: "malachite-native",
+        f_name: "malachite",
         title: "Integer.to\\\\_u64\\\\_wrapping()",
         x_axis_label: "n.significant\\\\_bits()",
         y_axis_label: "time (ns)",

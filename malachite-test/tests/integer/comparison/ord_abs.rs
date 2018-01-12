@@ -1,8 +1,7 @@
 use common::{test_custom_cmp_helper, LARGE_LIMIT};
 use malachite_base::traits::{OrdAbs, PartialOrdAbs};
-use malachite_native::integer as native;
-use malachite_gmp::integer as gmp;
-use malachite_test::common::{gmp_integer_to_native, native_integer_to_rugint, GenerationMode};
+use malachite_nz::integer::Integer;
+use malachite_test::common::{integer_to_rugint_integer, GenerationMode};
 use malachite_test::integer::comparison::ord_abs::select_inputs;
 use rugint;
 use rust_wheels::iterators::common::EXAMPLE_SEED;
@@ -22,44 +21,35 @@ fn test_ord_abs() {
         "-1000000000000",
         "1000000000001",
     ];
-    test_custom_cmp_helper::<native::Integer, _>(&strings, |x, y| x.cmp_abs(y));
-    test_custom_cmp_helper::<gmp::Integer, _>(&strings, |x, y| x.cmp_abs(y));
+    test_custom_cmp_helper::<Integer, _>(&strings, |x, y| x.cmp_abs(y));
     test_custom_cmp_helper::<rugint::Integer, _>(&strings, |x, y| x.cmp_abs(y));
 }
 
 #[test]
 fn cmp_properties() {
-    // x.cmp_abs(&y) is equivalent for malachite-gmp, malachite-native, and rugint.
+    // x.cmp_abs(&y) is equivalent for malachite and rugint.
     // x.cmp_abs(&y) == x.abs().cmp(&y.abs())
     // x.cmp_abs(&y) == y.cmp_abs(&x).reverse()
     // x.cmp_abs(&y) == (-x).cmp_abs(-y)
-    let two_integers = |gmp_x: gmp::Integer, gmp_y: gmp::Integer| {
-        let x = gmp_integer_to_native(&gmp_x);
-        let y = gmp_integer_to_native(&gmp_y);
+    let two_integers = |x: Integer, y: Integer| {
         let ord = x.cmp_abs(&y);
-        assert_eq!(gmp_x.cmp_abs(&gmp_y), ord);
         assert_eq!(
-            native_integer_to_rugint(&x).cmp_abs(&native_integer_to_rugint(&y)),
+            integer_to_rugint_integer(&x).cmp_abs(&integer_to_rugint_integer(&y)),
             ord
         );
         assert_eq!(x.abs_ref().cmp(&y.abs_ref()), ord);
-        assert_eq!(y.cmp_abs(&x).reverse(), ord);
         assert_eq!((-x).cmp_abs(&(-y)), ord);
     };
 
     // x == x
     // x == -x
-    let one_integer = |gmp_x: gmp::Integer| {
-        let x = gmp_integer_to_native(&gmp_x);
+    let one_integer = |x: Integer| {
         assert_eq!(x.cmp_abs(&x), Ordering::Equal);
         assert_eq!(x.cmp_abs(&-&x), Ordering::Equal);
     };
 
     // x < y && x < z => x < z, x > y && x > z => x > z
-    let three_integers = |gmp_x: gmp::Integer, gmp_y: gmp::Integer, gmp_z: gmp::Integer| {
-        let x = gmp_integer_to_native(&gmp_x);
-        let y = gmp_integer_to_native(&gmp_y);
-        let z = gmp_integer_to_native(&gmp_z);
+    let three_integers = |x: Integer, y: Integer, z: Integer| {
         if x.lt_abs(&y) && y.lt_abs(&z) {
             assert!(x.lt_abs(&z));
         } else if x.gt_abs(&y) && y.gt_abs(&z) {

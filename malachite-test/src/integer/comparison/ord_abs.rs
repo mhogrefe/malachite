@@ -1,15 +1,14 @@
-use common::{gmp_integer_to_native, gmp_integer_to_rugint, GenerationMode};
+use common::{integer_to_rugint_integer, GenerationMode};
 use malachite_base::traits::OrdAbs;
-use malachite_gmp::integer as gmp;
-use malachite_native::integer as native;
+use malachite_nz::integer::Integer;
 use rugint;
-use rust_wheels::benchmarks::{BenchmarkOptions3, benchmark_3};
+use rust_wheels::benchmarks::{BenchmarkOptions2, benchmark_2};
 use rust_wheels::iterators::common::EXAMPLE_SEED;
 use rust_wheels::iterators::integers::{exhaustive_integers, random_integers};
 use rust_wheels::iterators::tuples::{exhaustive_pairs_from_single, random_pairs_from_single};
 use std::cmp::{max, Ordering};
 
-type It = Iterator<Item = (gmp::Integer, gmp::Integer)>;
+type It = Iterator<Item = (Integer, Integer)>;
 
 pub fn exhaustive_inputs() -> Box<It> {
     Box::new(exhaustive_pairs_from_single(exhaustive_integers()))
@@ -41,19 +40,16 @@ pub fn demo_integer_cmp_abs(gm: GenerationMode, limit: usize) {
 
 pub fn benchmark_integer_cmp_abs(gm: GenerationMode, limit: usize, file_name: &str) {
     println!("benchmarking {} Integer.cmp_abs(&Integer)", gm.name());
-    benchmark_3(BenchmarkOptions3 {
+    benchmark_2(BenchmarkOptions2 {
         xs: select_inputs(gm),
-        function_f: &(|(x, y): (gmp::Integer, gmp::Integer)| x.cmp(&y)),
-        function_g: &(|(x, y): (native::Integer, native::Integer)| x.cmp(&y)),
-        function_h: &(|(x, y): (rugint::Integer, rugint::Integer)| x.cmp(&y)),
+        function_f: &(|(x, y): (Integer, Integer)| x.cmp(&y)),
+        function_g: &(|(x, y): (rugint::Integer, rugint::Integer)| x.cmp(&y)),
         x_cons: &(|p| p.clone()),
-        y_cons: &(|&(ref x, ref y)| (gmp_integer_to_native(x), gmp_integer_to_native(y))),
-        z_cons: &(|&(ref x, ref y)| (gmp_integer_to_rugint(x), gmp_integer_to_rugint(y))),
+        y_cons: &(|&(ref x, ref y)| (integer_to_rugint_integer(x), integer_to_rugint_integer(y))),
         x_param: &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),
         limit,
-        f_name: "malachite-gmp",
-        g_name: "malachite-native",
-        h_name: "rugint",
+        f_name: "malachite",
+        g_name: "rugint",
         title: "Integer.cmp\\\\_abs(\\\\&Integer)",
         x_axis_label: "max(x.significant\\\\_bits(), y.significant\\\\_bits())",
         y_axis_label: "time (ns)",

@@ -1,15 +1,13 @@
 use common::LARGE_LIMIT;
-use malachite_native::integer as native;
-use malachite_gmp::integer as gmp;
-use malachite_test::common::{gmp_integer_to_native, GenerationMode};
+use malachite_nz::integer::Integer;
+use malachite_test::common::GenerationMode;
 use malachite_test::integer::arithmetic::even_odd::select_inputs;
 use std::str::FromStr;
 
 #[test]
 fn test_is_even() {
     let test = |n, out| {
-        assert_eq!(native::Integer::from_str(n).unwrap().is_even(), out);
-        assert_eq!(gmp::Integer::from_str(n).unwrap().is_even(), out);
+        assert_eq!(Integer::from_str(n).unwrap().is_even(), out);
     };
     test("0", true);
     test("1", false);
@@ -29,8 +27,7 @@ fn test_is_even() {
 #[test]
 fn test_is_odd() {
     let test = |n, out| {
-        assert_eq!(native::Integer::from_str(n).unwrap().is_odd(), out);
-        assert_eq!(gmp::Integer::from_str(n).unwrap().is_odd(), out);
+        assert_eq!(Integer::from_str(n).unwrap().is_odd(), out);
     };
     test("0", false);
     test("1", true);
@@ -49,16 +46,13 @@ fn test_is_odd() {
 
 #[test]
 fn is_even_properties() {
-    // x.is_even() is equivalent for malachite-gmp and malachite-native.
     // x.is_even() == !x.is_odd()
     // x.is_even() == (-x).is_even()
     // x.is_even() == (!x).is_even()
     // x.is_even == (x + 1).is_odd()
     // x.is_even == (x - 1).is_odd()
-    let one_integer = |gmp_x: gmp::Integer| {
-        let x = gmp_integer_to_native(&gmp_x);
+    let one_integer = |x: Integer| {
         let is_even = x.is_even();
-        assert_eq!(gmp_x.is_even(), is_even);
         assert_eq!(!x.is_odd(), is_even);
         assert_eq!((&x + 1u32).is_odd(), is_even);
         assert_eq!((x - 1u32).is_odd(), is_even);
@@ -75,16 +69,13 @@ fn is_even_properties() {
 
 #[test]
 fn is_odd_properties() {
-    // x.is_odd() is equivalent for malachite-gmp and malachite-native.
     // x.is_odd() == !x.is_even()
     // x.is_odd() == (-x).is_odd()
     // x.is_odd() == (!x).is_odd()
     // x.is_odd == (x + 1).is_even()
     // x.is_odd == (x - 1).is_even()
-    let one_integer = |gmp_x: gmp::Integer| {
-        let x = gmp_integer_to_native(&gmp_x);
+    let one_integer = |x: Integer| {
         let is_odd = x.is_odd();
-        assert_eq!(gmp_x.is_odd(), is_odd);
         assert_eq!(!x.is_even(), is_odd);
         assert_eq!((&x + 1u32).is_even(), is_odd);
         assert_eq!((x - 1u32).is_even(), is_odd);

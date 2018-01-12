@@ -1,13 +1,10 @@
 use common::LARGE_LIMIT;
 use malachite_base::traits::Zero;
-use malachite_native::integer as native;
-use malachite_gmp::integer as gmp;
-use malachite_test::common::{gmp_integer_to_native, native_integer_to_gmp,
-                             native_integer_to_num_bigint, native_integer_to_rugint,
-                             num_bigint_to_native_integer, rugint_integer_to_native,
-                             GenerationMode};
+use malachite_nz::integer::Integer;
+use malachite_test::common::{bigint_to_integer, integer_to_bigint, integer_to_rugint_integer,
+                             rugint_integer_to_integer, GenerationMode};
 use malachite_test::integer::arithmetic::add_i32::{num_add_i32, select_inputs_1};
-use num;
+use num::BigInt;
 use rugint;
 use rust_wheels::iterators::common::EXAMPLE_SEED;
 use rust_wheels::iterators::general::random_x;
@@ -17,14 +14,8 @@ use std::str::FromStr;
 
 #[test]
 fn test_add_i32() {
-    #[allow(unknown_lints, cyclomatic_complexity)]
     let test = |u, v: i32, out| {
-        let mut n = native::Integer::from_str(u).unwrap();
-        n += v;
-        assert_eq!(n.to_string(), out);
-        assert!(n.is_valid());
-
-        let mut n = gmp::Integer::from_str(u).unwrap();
+        let mut n = Integer::from_str(u).unwrap();
         n += v;
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
@@ -33,44 +24,28 @@ fn test_add_i32() {
         n += v;
         assert_eq!(n.to_string(), out);
 
-        let n = native::Integer::from_str(u).unwrap() + v;
+        let n = Integer::from_str(u).unwrap() + v;
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = gmp::Integer::from_str(u).unwrap() + v;
-        assert_eq!(n.to_string(), out);
-        assert!(n.is_valid());
-
-        let n = num_add_i32(num::BigInt::from_str(u).unwrap(), v);
+        let n = num_add_i32(BigInt::from_str(u).unwrap(), v);
         assert_eq!(n.to_string(), out);
 
         let n = rugint::Integer::from_str(u).unwrap() + v;
         assert_eq!(n.to_string(), out);
 
-        let n = &native::Integer::from_str(u).unwrap() + v;
+        let n = &Integer::from_str(u).unwrap() + v;
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = &gmp::Integer::from_str(u).unwrap() + v;
-        assert_eq!(n.to_string(), out);
-        assert!(n.is_valid());
-
-        let n = v + native::Integer::from_str(u).unwrap();
-        assert_eq!(n.to_string(), out);
-        assert!(n.is_valid());
-
-        let n = v + gmp::Integer::from_str(u).unwrap();
+        let n = v + Integer::from_str(u).unwrap();
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
         let n = v + rugint::Integer::from_str(u).unwrap();
         assert_eq!(n.to_string(), out);
 
-        let n = v + &native::Integer::from_str(u).unwrap();
-        assert_eq!(n.to_string(), out);
-        assert!(n.is_valid());
-
-        let n = v + &gmp::Integer::from_str(u).unwrap();
+        let n = v + &Integer::from_str(u).unwrap();
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
@@ -107,9 +82,9 @@ fn test_add_i32() {
 
 #[test]
 fn add_i32_properties() {
-    // n += i is equivalent for malachite-gmp, malachite-native, and rugint.
-    // n + i is equivalent for malachite-gmp, malachite-native, num, and rugint.
-    // &n + i is equivalent for malachite-gmp, malachite-native, and num.
+    // n += i is equivalent for malachite and rugint.
+    // n + i is equivalent for malachite, num, and rugint.
+    // &n + i is equivalent for malachite and num.
     // n += i; n is valid.
     // n + i and i + n are valid.
     // &n + i and i + &n are valid.
@@ -117,20 +92,14 @@ fn add_i32_properties() {
     // n + i == n + from(u)
     // n + i - i == n
     // n + i - n == i
-    #[allow(unknown_lints, cyclomatic_complexity)]
-    let integer_and_i32 = |mut gmp_n: gmp::Integer, i: i32| {
-        let mut n = gmp_integer_to_native(&gmp_n);
+    let integer_and_i32 = |mut n: Integer, i: i32| {
         let old_n = n.clone();
-        gmp_n += i;
-        assert!(gmp_n.is_valid());
-
         n += i;
         assert!(n.is_valid());
-        assert_eq!(gmp_integer_to_native(&gmp_n), n);
 
-        let mut rugint_n = native_integer_to_rugint(&old_n);
+        let mut rugint_n = integer_to_rugint_integer(&old_n);
         rugint_n += i;
-        assert_eq!(rugint_integer_to_native(&rugint_n), n);
+        assert_eq!(rugint_integer_to_integer(&rugint_n), n);
 
         let n2 = old_n.clone();
         let result = &n2 + i;
@@ -149,33 +118,17 @@ fn add_i32_properties() {
         assert!(result.is_valid());
 
         let n2 = old_n.clone();
-        let result = n2 + native::Integer::from(i);
+        let result = n2 + Integer::from(i);
         assert_eq!(result, n);
         let n2 = old_n.clone();
-        let result = native::Integer::from(i) + n2;
+        let result = Integer::from(i) + n2;
         assert_eq!(result, n);
 
-        let gmp_n2 = native_integer_to_gmp(&old_n);
-        let result = &gmp_n2 + i;
-        assert!(result.is_valid());
-        assert_eq!(gmp_integer_to_native(&result), n);
-        let result = gmp_n2 + i;
-        assert!(result.is_valid());
-        assert_eq!(gmp_integer_to_native(&result), n);
+        let num_n2 = integer_to_bigint(&old_n);
+        assert_eq!(bigint_to_integer(&num_add_i32(num_n2, i)), n);
 
-        let gmp_n2 = native_integer_to_gmp(&old_n);
-        let result = i + &gmp_n2;
-        assert!(result.is_valid());
-        assert_eq!(gmp_integer_to_native(&result), n);
-        let result = i + gmp_n2;
-        assert!(result.is_valid());
-        assert_eq!(gmp_integer_to_native(&result), n);
-
-        let num_n2 = native_integer_to_num_bigint(&old_n);
-        assert_eq!(num_bigint_to_native_integer(&num_add_i32(num_n2, i)), n);
-
-        let rugint_n2 = native_integer_to_rugint(&old_n);
-        assert_eq!(rugint_integer_to_native(&(rugint_n2 + i)), n);
+        let rugint_n2 = integer_to_rugint_integer(&old_n);
+        assert_eq!(rugint_integer_to_integer(&(rugint_n2 + i)), n);
 
         assert_eq!(&n - i, old_n);
         assert_eq!(n - old_n, i);
@@ -184,8 +137,7 @@ fn add_i32_properties() {
     // n + 0 == n
     // 0 + n == n
     #[allow(unknown_lints, identity_op)]
-    let one_integer = |gmp_n: gmp::Integer| {
-        let n = gmp_integer_to_native(&gmp_n);
+    let one_integer = |n: Integer| {
         assert_eq!(&n + 0i32, n);
         assert_eq!(0i32 + &n, n);
     };
@@ -193,8 +145,8 @@ fn add_i32_properties() {
     // 0 + i == i
     // i + 0 == i
     let one_i32 = |i: i32| {
-        assert_eq!(native::Integer::ZERO + i, native::Integer::from(i));
-        assert_eq!(i + native::Integer::ZERO, native::Integer::from(i));
+        assert_eq!(Integer::ZERO + i, Integer::from(i));
+        assert_eq!(i + Integer::ZERO, Integer::from(i));
     };
 
     for (n, i) in select_inputs_1(GenerationMode::Exhaustive).take(LARGE_LIMIT) {

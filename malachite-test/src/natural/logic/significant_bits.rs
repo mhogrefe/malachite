@@ -1,14 +1,12 @@
-use common::{gmp_natural_to_native, gmp_natural_to_num_biguint, gmp_natural_to_rugint_integer,
-             GenerationMode};
-use malachite_gmp::natural as gmp;
-use malachite_native::natural as native;
-use num;
+use common::{natural_to_biguint, natural_to_rugint_integer, GenerationMode};
+use malachite_nz::natural::Natural;
+use num::BigUint;
 use rugint;
-use rust_wheels::benchmarks::{BenchmarkOptions4, benchmark_4};
+use rust_wheels::benchmarks::{BenchmarkOptions3, benchmark_3};
 use rust_wheels::iterators::common::EXAMPLE_SEED;
 use rust_wheels::iterators::naturals::{exhaustive_naturals, random_naturals};
 
-type It = Iterator<Item = gmp::Natural>;
+type It = Iterator<Item = Natural>;
 
 pub fn exhaustive_inputs() -> Box<It> {
     Box::new(exhaustive_naturals())
@@ -33,22 +31,19 @@ pub fn demo_natural_significant_bits(gm: GenerationMode, limit: usize) {
 
 pub fn benchmark_natural_significant_bits(gm: GenerationMode, limit: usize, file_name: &str) {
     println!("benchmarking {} Natural.significant_bits()", gm.name());
-    benchmark_4(BenchmarkOptions4 {
+    benchmark_3(BenchmarkOptions3 {
         xs: select_inputs(gm),
-        function_f: &(|n: gmp::Natural| n.significant_bits()),
-        function_g: &(|n: native::Natural| n.significant_bits()),
-        function_h: &(|n: num::BigUint| n.bits()),
-        function_i: &(|n: rugint::Integer| n.significant_bits()),
+        function_f: &(|n: Natural| n.significant_bits()),
+        function_g: &(|n: BigUint| n.bits()),
+        function_h: &(|n: rugint::Integer| n.significant_bits()),
         x_cons: &(|x| x.clone()),
-        y_cons: &(|x| gmp_natural_to_native(x)),
-        z_cons: &(|x| gmp_natural_to_num_biguint(x)),
-        w_cons: &(|x| gmp_natural_to_rugint_integer(x)),
+        y_cons: &(|x| natural_to_biguint(x)),
+        z_cons: &(|x| natural_to_rugint_integer(x)),
         x_param: &(|n| n.significant_bits() as usize),
         limit,
-        f_name: "malachite-gmp",
-        g_name: "malachite-native",
-        h_name: "num",
-        i_name: "rugint",
+        f_name: "malachite",
+        g_name: "num",
+        h_name: "rugint",
         title: "Natural.significant\\\\_bits()",
         x_axis_label: "n.significant\\\\_bits()",
         y_axis_label: "time (ns)",
