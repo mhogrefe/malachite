@@ -4,11 +4,11 @@ use natural::Natural;
 use std::cmp::Ordering;
 
 impl Integer {
-    /// Converts a sign and a slice of limbs, or base-2^(32) digits, to an `Integer`. The sign is
-    /// `Ordering::Greater` if the `Natural` is positive, `Ordering::Equal` if it is zero (in which
-    /// case the limbs, if any, must all equal 0), and `Ordering::Less` if it is negative. The limbs
-    /// are in little-endian order, so that less significant limbs have lower indices in the input
-    /// slice.
+    /// Converts a sign and a slice of limbs, or base-2<sup>32</sup> digits, to an `Integer`. The
+    /// sign is `Ordering::Greater` if the `Natural` is positive, `Ordering::Equal` if it is zero
+    /// (in which case the limbs, if any, must all equal 0), and `Ordering::Less` if it is negative.
+    /// The limbs are in little-endian order, so that less significant limbs have lower indices in
+    /// the input slice.
     ///
     /// Time: worst case O(n)
     ///
@@ -53,11 +53,11 @@ impl Integer {
         }
     }
 
-    /// Converts a sign and a slice of limbs, or base-2^(32) digits, to an `Integer`. The sign is
-    /// `Ordering::Greater` if the `Natural` is positive, `Ordering::Equal` if it is zero (in which
-    /// case the limbs, if any, must all equal 0), and `Ordering::Less` if it is negative. The limbs
-    /// are in big-endian order, so that less significant limbs have higher indices in the input
-    /// slice.
+    /// Converts a sign and a slice of limbs, or base-2<sup>32</sup> digits, to an `Integer`. The
+    /// sign is `Ordering::Greater` if the `Natural` is positive, `Ordering::Equal` if it is zero
+    /// (in which case the limbs, if any, must all equal 0), and `Ordering::Less` if it is negative.
+    /// The limbs are in big-endian order, so that less significant limbs have higher indices in the
+    /// input slice.
     ///
     /// Time: worst case O(n)
     ///

@@ -90,7 +90,7 @@ pub fn demo_integer_shr_round_assign_i32(gm: GenerationMode, limit: usize) {
         let n_old = n.clone();
         n.shr_round_assign(i, rm);
         println!(
-            "x := {}; x.shr_round_assign({}, {:?}); x = {}",
+            "x := {}; x.shr_round_assign({}, {}); x = {}",
             n_old, i, rm, n
         );
     }
@@ -100,7 +100,7 @@ pub fn demo_integer_shr_round_i32(gm: GenerationMode, limit: usize) {
     for (n, i, rm) in select_inputs_2(gm).take(limit) {
         let n_old = n.clone();
         println!(
-            "{}.shr_round({}, {:?}) = {}",
+            "{}.shr_round({}, {}) = {}",
             n_old,
             i,
             rm,
@@ -112,7 +112,7 @@ pub fn demo_integer_shr_round_i32(gm: GenerationMode, limit: usize) {
 pub fn demo_integer_shr_round_i32_ref(gm: GenerationMode, limit: usize) {
     for (n, i, rm) in select_inputs_2(gm).take(limit) {
         println!(
-            "(&{}).shr_round({}, {:?}) = {}",
+            "(&{}).shr_round({}, {}) = {}",
             n,
             i,
             rm,

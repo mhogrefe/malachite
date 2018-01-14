@@ -27,50 +27,50 @@ fn test_clone() {
 }
 
 #[test]
-fn test_clone_from_assign_and_assign_ref() {
-    let test = |u, v, out| {
+fn test_clone_clone_from_and_assign() {
+    let test = |u, v| {
         // clone_from
         let mut x = Natural::from_str(u).unwrap();
         x.clone_from(&Natural::from_str(v).unwrap());
-        assert_eq!(x.to_string(), out);
+        assert_eq!(x.to_string(), v);
         assert!(x.is_valid());
 
         let mut x = BigUint::from_str(u).unwrap();
         x.clone_from(&BigUint::from_str(v).unwrap());
-        assert_eq!(x.to_string(), out);
+        assert_eq!(x.to_string(), v);
 
         let mut x = rugint::Integer::from_str(u).unwrap();
         x.clone_from(&rugint::Integer::from_str(v).unwrap());
-        assert_eq!(x.to_string(), out);
+        assert_eq!(x.to_string(), v);
 
         // assign Natural by value
         let mut x = Natural::from_str(u).unwrap();
         x.assign(Natural::from_str(v).unwrap());
-        assert_eq!(x.to_string(), out);
+        assert_eq!(x.to_string(), v);
         assert!(x.is_valid());
 
         let mut x = rugint::Integer::from_str(u).unwrap();
         x.assign(rugint::Integer::from_str(v).unwrap());
-        assert_eq!(x.to_string(), out);
+        assert_eq!(x.to_string(), v);
 
         // assign Natural by reference
         let mut x = Natural::from_str(u).unwrap();
         x.assign(&Natural::from_str(v).unwrap());
-        assert_eq!(x.to_string(), out);
+        assert_eq!(x.to_string(), v);
         assert!(x.is_valid());
 
         let mut x = rugint::Integer::from_str(u).unwrap();
         x.assign(&rugint::Integer::from_str(v).unwrap());
-        assert_eq!(x.to_string(), out);
+        assert_eq!(x.to_string(), v);
     };
-    test("123", "456", "456");
-    test("123", "1000000000000", "1000000000000");
-    test("1000000000000", "123", "123");
-    test("1000000000000", "2000000000000", "2000000000000");
+    test("123", "456");
+    test("123", "1000000000000");
+    test("1000000000000", "123");
+    test("1000000000000", "2000000000000");
 }
 
 #[test]
-fn clone_and_assign_properties() {
+fn clone_clone_from_and_assign_properties() {
     // x.clone() is equivalent for malachite, num, and rugint.
     // x.clone() is valid.
     // x.clone() == x

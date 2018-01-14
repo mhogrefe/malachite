@@ -1,10 +1,10 @@
 use integer::Integer;
 
 impl Integer {
-    /// Returns the limbs, or base-2^(32) digits, of an `Integer`, in little-endian order, so that
-    /// less significant limbs have lower indices in the output vector. The limbs are in two's
-    /// complement, and the most significant bit of the limbs indicates the sign; if the bit is
-    /// zero, the `Integer` is positive, and if the bit is one it is negative. There are no
+    /// Returns the limbs, or base-2<sup>32</sup> digits, of an `Integer`, in little-endian order,
+    /// so that less significant limbs have lower indices in the output vector. The limbs are in
+    /// two's complement, and the most significant bit of the limbs indicates the sign; if the bit
+    /// is zero, the `Integer` is positive, and if the bit is one it is negative. There are no
     /// trailing zero limbs if the `Integer` is positive or trailing !0 limbs if `Integer` is
     /// negative, except as necessary to include the correct sign bit. Zero is a special case: it
     /// contains no limbs.
@@ -65,8 +65,8 @@ impl Integer {
         }
     }
 
-    /// Returns the limbs, or base-2^(32) digits, of an `Integer`, in big-endian order, so that less
-    /// significant limbs have higher indices in the output vector. The limbs are in two's
+    /// Returns the limbs, or base-2<sup>32</sup> digits, of an `Integer`, in big-endian order, so
+    /// that less significant limbs have higher indices in the output vector. The limbs are in two's
     /// complement, and the most significant bit of the limbs indicates the sign; if the bit is
     /// zero, the `Integer` is positive, and if the bit is one it is negative. There are no
     /// leading zero limbs if the `Integer` is non-negative or leading !0 limbs if `Integer` is

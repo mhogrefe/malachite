@@ -49,7 +49,7 @@ pub fn select_inputs_2(gm: GenerationMode) -> Box<It2> {
 
 pub fn demo_natural_clone(gm: GenerationMode, limit: usize) {
     for n in select_inputs_1(gm).take(limit) {
-        println!("clone({}) = {:?}", n, n.clone());
+        println!("clone({}) = {}", n, n.clone());
     }
 }
 

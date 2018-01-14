@@ -2,7 +2,7 @@ use integer::Integer;
 use std::cmp::Ordering;
 
 impl Integer {
-    /// Returns the sign and limbs, or base-2^(32) digits, of a `Natural`. The sign is
+    /// Returns the sign and limbs, or base-2<sup>32</sup> digits, of a `Natural`. The sign is
     /// `Ordering::Greater` if the `Natural` is positive, `Ordering::Equal` if it is zero (in which
     /// case the limbs are empty), and `Ordering::Less` if it is negative. The limbs are the limbs
     /// of the `Natural`'s absolute value. They are in little-endian order, so that less significant
@@ -40,7 +40,7 @@ impl Integer {
         (self.sign(), self.abs.to_limbs_le())
     }
 
-    /// Returns the sign and limbs, or base-2^(32) digits, of a `Natural`. The sign is
+    /// Returns the sign and limbs, or base-2<sup>32</sup> digits, of a `Natural`. The sign is
     /// `Ordering::Greater` if the `Natural` is positive, `Ordering::Equal` if it is zero (in which
     /// case the limbs are empty), and `Ordering::Less` if it is negative. The limbs are the limbs
     /// of the `Natural`'s absolute value. They are in big-endian order, so that less significant

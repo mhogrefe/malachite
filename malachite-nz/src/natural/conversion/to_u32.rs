@@ -21,7 +21,7 @@ impl Natural {
         }
     }
 
-    /// Converts a `Natural` to a `u32`, wrapping mod 2^(32).
+    /// Converts a `Natural` to a `u32`, wrapping mod 2<sup>32</sup>.
     ///
     /// Time: worst case O(1)
     ///

@@ -1,5 +1,9 @@
 extern crate malachite_test;
 
+use malachite_test::base::rounding_mode::clone::*;
+use malachite_test::base::rounding_mode::eq::*;
+use malachite_test::base::rounding_mode::hash::*;
+use malachite_test::base::rounding_mode::neg::*;
 use malachite_test::common::GenerationMode;
 use malachite_test::integer::arithmetic::abs::*;
 use malachite_test::integer::arithmetic::add::*;
@@ -213,6 +217,11 @@ macro_rules! demos_and_benchmarks {
 
 demos_and_benchmarks!(
     [
+        demo_rounding_mode_clone,
+        demo_rounding_mode_clone_from,
+        demo_rounding_mode_eq,
+        demo_rounding_mode_hash,
+        demo_rounding_mode_neg,
         demo_integer_abs_assign,
         demo_integer_abs,
         demo_integer_abs_ref,

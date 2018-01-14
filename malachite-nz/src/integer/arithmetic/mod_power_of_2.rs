@@ -3,7 +3,7 @@ use natural::Natural;
 
 impl Integer {
     /// Takes a `Integer` mod a power of 2, taking the `Integer` by value. In other words, returns
-    /// r, where `self` = q * 2^(`other`) + r and 0 <= r < 2^(`other`).
+    /// r, where `self` = q * 2^<sup>`other`</sup> + r and 0 <= r < 2^<sup>`other`</sup>.
     ///
     /// Unlike rem_power_of_2, this function always returns a non-negative number.
     ///

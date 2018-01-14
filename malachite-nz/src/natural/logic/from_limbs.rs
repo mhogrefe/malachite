@@ -1,8 +1,8 @@
 use natural::{Large, Natural, Small};
 
 impl Natural {
-    /// Converts a slice of limbs, or base-2^(32) digits, to a `Natural`, in little-endian order, so
-    /// that less significant limbs have lower indices in the input slice.
+    /// Converts a slice of limbs, or base-2<sup>32</sup> digits, to a `Natural`, in little-endian
+    /// order, so that less significant limbs have lower indices in the input slice.
     ///
     /// Time: worst case O(n)
     ///
@@ -37,8 +37,8 @@ impl Natural {
         }
     }
 
-    /// Converts a slice of limbs, or base-2^(32) digits, to a `Natural`, in big-endian order, so
-    /// that less significant limbs have higher indices in the input slice.
+    /// Converts a slice of limbs, or base-2<sup>32</sup> digits, to a `Natural`, in big-endian
+    /// order, so that less significant limbs have higher indices in the input slice.
     ///
     /// Time: worst case O(n)
     ///

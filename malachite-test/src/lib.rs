@@ -5,6 +5,14 @@ extern crate rugint;
 extern crate rust_wheels;
 
 pub mod common;
+pub mod base {
+    pub mod rounding_mode {
+        pub mod clone;
+        pub mod eq;
+        pub mod hash;
+        pub mod neg;
+    }
+}
 pub mod integer {
     pub mod arithmetic {
         pub mod abs;

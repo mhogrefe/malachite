@@ -65,7 +65,7 @@ impl Natural {
     }
 
     /// Returns true iff `self` is valid. To be valid, `self` can only be Large when it is at least
-    /// 2^(32), and cannot have leading zero limbs. All Naturals must be valid.
+    /// 2<sup>32</sup>, and cannot have leading zero limbs. All Naturals must be valid.
     pub fn is_valid(&self) -> bool {
         match *self {
             Small(_) => true,

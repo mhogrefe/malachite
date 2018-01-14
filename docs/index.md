@@ -10,8 +10,9 @@ established open-source libraries like
 [Arb](http://arblib.org/). Some of its defining features
 are
 * A rich API, aiming to match the features of the three
-  libraries mentioned above (excluding GMP floating-
-  point functions)
+  libraries mentioned above (excluding GMP
+  cryptographically secure functions and floating-point
+  functions)
 * Excellent performance while only using safe Rust code
 * Thorough documentation, including doctests and big-O
   complexities for each function
@@ -27,9 +28,9 @@ are
   * **Non-exact algorithms:** Malachite does not compute
     using floating-point numbers (although conversions
     to and from floating-point numbers are supported).
-    The results of every calculation should be either
-    exact, rounded in a clearly-defined way, or have
-    correct error bounds.
+    The results of every calculation are either exact,
+    rounded in a clearly-defined way, or have correct
+    error bounds.
 * Malachite is released under
   [LGPL-3.0](https://www.gnu.org/licenses/lgpl-3.0.en.html),
   which places some limits on its usage and

@@ -3,11 +3,11 @@ use malachite_base::traits::Zero;
 use natural::Natural;
 
 impl Integer {
-    /// Converts a slice of limbs, or base-2^(32) digits, to an `Integer`, in little-endian order,
-    /// so that less significant limbs have lower indices in the input slice. The limbs are in two's
-    /// complement, and the most significant bit of the limbs indicates the sign; if the bit is
-    /// zero, the `Integer` is non-negative, and if the bit is one it is negative. If `limbs` is
-    /// empty, zero is returned.
+    /// Converts a slice of limbs, or base-2<sup>32</sup> digits, to an `Integer`, in little-endian
+    /// order, so that less significant limbs have lower indices in the input slice. The limbs are
+    /// in two's complement, and the most significant bit of the limbs indicates the sign; if the
+    /// bit is zero, the `Integer` is non-negative, and if the bit is one it is negative. If `limbs`
+    /// is empty, zero is returned.
     ///
     /// This method is more efficient than `from_twos_complement_limbs_be`.
     ///
@@ -56,11 +56,11 @@ impl Integer {
         }
     }
 
-    /// Converts a slice of limbs, or base-2^(32) digits, to an `Integer`, in big-endian order, so
-    /// that less significant limbs have higher indices in the input slice. The limbs are in two's
-    /// complement, and the most significant bit of the limbs indicates the sign; if the bit is
-    /// zero, the `Integer` is non-negative, and if the bit is one it is negative. If `limbs` is
-    /// empty, zero is returned.
+    /// Converts a slice of limbs, or base-2<sup>32</sup> digits, to an `Integer`, in big-endian
+    /// order, so that less significant limbs have higher indices in the input slice. The limbs are
+    /// in two's complement, and the most significant bit of the limbs indicates the sign; if the
+    /// bit is zero, the `Integer` is non-negative, and if the bit is one it is negative. If `limbs`
+    /// is empty, zero is returned.
     ///
     /// This method is less efficient than `from_twos_complement_limbs_le`.
     ///

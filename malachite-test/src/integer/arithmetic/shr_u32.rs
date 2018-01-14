@@ -86,7 +86,7 @@ pub fn demo_integer_shr_round_assign_u32(gm: GenerationMode, limit: usize) {
         let n_old = n.clone();
         n.shr_round_assign(u, rm);
         println!(
-            "x := {}; x.shr_round_assign({}, {:?}); x = {}",
+            "x := {}; x.shr_round_assign({}, {}); x = {}",
             n_old, u, rm, n
         );
     }
@@ -96,7 +96,7 @@ pub fn demo_integer_shr_round_u32(gm: GenerationMode, limit: usize) {
     for (n, u, rm) in select_inputs_2(gm).take(limit) {
         let n_old = n.clone();
         println!(
-            "{}.shr_round({}, {:?}) = {}",
+            "{}.shr_round({}, {}) = {}",
             n_old,
             u,
             rm,
@@ -108,7 +108,7 @@ pub fn demo_integer_shr_round_u32(gm: GenerationMode, limit: usize) {
 pub fn demo_integer_shr_round_u32_ref(gm: GenerationMode, limit: usize) {
     for (n, u, rm) in select_inputs_2(gm).take(limit) {
         println!(
-            "(&{}).shr_round({}, {:?}) = {}",
+            "(&{}).shr_round({}, {}) = {}",
             n,
             u,
             rm,

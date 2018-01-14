@@ -25,7 +25,7 @@ impl Integer {
         }
     }
 
-    /// Converts an `Integer` to a `i32`, wrapping mod 2^(32).
+    /// Converts an `Integer` to a `i32`, wrapping mod 2<sup>32</sup>.
     ///
     /// Time: worst case O(1)
     ///
