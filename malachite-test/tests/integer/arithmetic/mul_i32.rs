@@ -10,6 +10,7 @@ use rust_wheels::iterators::common::EXAMPLE_SEED;
 use rust_wheels::iterators::general::random_x;
 use rust_wheels::iterators::integers::{exhaustive_integers, random_integers};
 use rust_wheels::iterators::primitive_ints::exhaustive_i;
+use std::i32;
 use std::str::FromStr;
 
 #[test]
@@ -145,7 +146,7 @@ fn mul_i32_properties() {
         assert_eq!(rugint_integer_to_integer(&(rugint_n2 * i)), n);
 
         assert_eq!((-&n) * i, -(&n * i));
-        if i != i32::min_value() {
+        if i != i32::MIN {
             assert_eq!(&n * (-i), -(n * i));
         }
         //TODO assert_eq!(n / u, Some(old_n));
@@ -181,7 +182,7 @@ fn mul_i32_properties() {
         assert_eq!(i * Integer::ZERO, 0);
         assert_eq!(Integer::ONE * i, i);
         assert_eq!(i * Integer::ONE, i);
-        if i != i32::min_value() {
+        if i != i32::MIN {
             assert_eq!(Integer::NEGATIVE_ONE * i, -i);
             assert_eq!(i * Integer::NEGATIVE_ONE, -i);
         }

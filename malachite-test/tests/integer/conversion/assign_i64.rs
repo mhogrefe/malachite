@@ -3,6 +3,7 @@ use malachite_base::traits::Assign;
 use malachite_nz::integer::Integer;
 use malachite_test::common::GenerationMode;
 use malachite_test::integer::conversion::assign_i64::select_inputs;
+use std::{i32, i64};
 use std::str::FromStr;
 
 #[test]
@@ -14,10 +15,10 @@ fn test_assign_i64() {
         assert!(x.is_valid());
     };
     test("123", -456, "-456");
-    test("-123", i32::max_value().into(), "2147483647");
-    test("123", i32::min_value().into(), "-2147483648");
-    test("-123", i64::max_value(), "9223372036854775807");
-    test("123", i64::min_value(), "-9223372036854775808");
+    test("-123", i32::MAX.into(), "2147483647");
+    test("123", i32::MIN.into(), "-2147483648");
+    test("-123", i64::MAX, "9223372036854775807");
+    test("123", i64::MIN, "-9223372036854775808");
     test("1000000000000", 123, "123");
 }
 

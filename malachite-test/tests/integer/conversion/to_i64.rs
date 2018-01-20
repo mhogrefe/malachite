@@ -1,4 +1,5 @@
 use common::LARGE_LIMIT;
+use malachite_base::num::SignificantBits;
 use malachite_base::traits::One;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
@@ -6,6 +7,7 @@ use malachite_test::common::GenerationMode;
 use malachite_test::integer::conversion::to_i64::select_inputs;
 use rust_wheels::iterators::common::EXAMPLE_SEED;
 use rust_wheels::iterators::integers::{exhaustive_integers, random_integers};
+use std::{i32, i64};
 use std::str::FromStr;
 
 #[test]
@@ -20,13 +22,13 @@ fn test_to_i64() {
     test("-1000000000000", Some(-1_000_000_000_000));
     test("1000000000000000000000", None);
     test("-1000000000000000000000", None);
-    test("2147483647", Some(i32::max_value().into()));
-    test("2147483648", Some(-i64::from(i32::min_value())));
-    test("-2147483648", Some(i32::min_value().into()));
-    test("-2147483649", Some(i64::from(i32::min_value()) - 1));
-    test("9223372036854775807", Some(i64::max_value()));
+    test("2147483647", Some(i32::MAX.into()));
+    test("2147483648", Some(-i64::from(i32::MIN)));
+    test("-2147483648", Some(i32::MIN.into()));
+    test("-2147483649", Some(i64::from(i32::MIN) - 1));
+    test("9223372036854775807", Some(i64::MAX));
     test("9223372036854775808", None);
-    test("-9223372036854775808", Some(i64::min_value()));
+    test("-9223372036854775808", Some(i64::MIN));
     test("-9223372036854775809", None);
 }
 
@@ -42,14 +44,14 @@ fn test_to_i64_wrapping() {
     test("-1000000000000", -1_000_000_000_000);
     test("1000000000000000000000", 3_875_820_019_684_212_736);
     test("-1000000000000000000000", -3_875_820_019_684_212_736);
-    test("2147483647", i32::max_value().into());
-    test("2147483648", -i64::from(i32::min_value()));
-    test("-2147483648", i32::min_value().into());
-    test("-2147483649", i64::from(i32::min_value()) - 1);
-    test("9223372036854775807", i64::max_value());
-    test("9223372036854775808", i64::min_value());
-    test("-9223372036854775808", i64::min_value());
-    test("-9223372036854775809", i64::max_value());
+    test("2147483647", i32::MAX.into());
+    test("2147483648", -i64::from(i32::MIN));
+    test("-2147483648", i32::MIN.into());
+    test("-2147483649", i64::from(i32::MIN) - 1);
+    test("9223372036854775807", i64::MAX);
+    test("9223372036854775808", i64::MIN);
+    test("-9223372036854775808", i64::MIN);
+    test("-9223372036854775809", i64::MAX);
 }
 
 #[test]

@@ -8,6 +8,7 @@ use num::BigInt;
 use rugint;
 use rugint::Assign as rugint_assign;
 use std::str::FromStr;
+use std::u32;
 
 #[test]
 fn test_assign_u32() {
@@ -26,7 +27,7 @@ fn test_assign_u32() {
         assert_eq!(x.to_string(), out);
     };
     test("-123", 456, "456");
-    test("123", u32::max_value(), "4294967295");
+    test("123", u32::MAX, "4294967295");
     test("1000000000000", 123, "123");
 }
 

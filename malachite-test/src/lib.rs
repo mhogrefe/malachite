@@ -6,6 +6,13 @@ extern crate rust_wheels;
 
 pub mod common;
 pub mod base {
+    pub mod num {
+        pub mod assign_bit;
+        pub mod clear_bit;
+        pub mod flip_bit;
+        pub mod get_bit;
+        pub mod set_bit;
+    }
     pub mod rounding_mode {
         pub mod clone;
         pub mod eq;

@@ -1,4 +1,5 @@
 use common::LARGE_LIMIT;
+use malachite_base::num::{BitAccess, SignificantBits};
 use malachite_nz::integer::Integer;
 use malachite_test::common::{integer_to_rugint_integer, GenerationMode};
 use malachite_test::integer::logic::get_bit::select_inputs;

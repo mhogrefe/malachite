@@ -135,7 +135,7 @@ impl ShrAssign<u32> for Integer {
 ///
 /// # Panics
 /// Panics if `rm` is `RoundingMode::Exact`
-/// but `self` is not divisible by 2^(`other`).
+/// but `self` is not divisible by 2<pow>`other`</pow>.
 ///
 /// # Examples
 /// ```
@@ -177,7 +177,7 @@ impl ShrRound<u32> for Integer {
 /// Additional memory: worst case O(`other`)
 ///
 /// # Panics
-/// Panics if `rm` is `RoundingMode::Exact` but `self` is not divisible by 2^(`other`).
+/// Panics if `rm` is `RoundingMode::Exact` but `self` is not divisible by 2<pow>`other`</pow>.
 ///
 /// # Examples
 /// ```
@@ -242,7 +242,7 @@ impl<'a> ShrRound<u32> for &'a Integer {
 /// Additional memory: worst case O(1)
 ///
 /// # Panics
-/// Panics if `rm` is `RoundingMode::Exact` but `self` is not divisible by 2^(`other`).
+/// Panics if `rm` is `RoundingMode::Exact` but `self` is not divisible by 2<pow>`other`</pow>.
 ///
 /// # Examples
 /// ```

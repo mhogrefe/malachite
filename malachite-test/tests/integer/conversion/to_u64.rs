@@ -1,10 +1,12 @@
 use common::LARGE_LIMIT;
+use malachite_base::num::SignificantBits;
 use malachite_nz::integer::Integer;
 use malachite_test::common::GenerationMode;
 use malachite_test::integer::conversion::to_u64::select_inputs;
 use rust_wheels::iterators::common::EXAMPLE_SEED;
 use rust_wheels::iterators::integers::{exhaustive_integers, random_integers};
 use std::cmp::Ordering;
+use std::{u32, u64};
 use std::str::FromStr;
 
 #[test]
@@ -19,9 +21,9 @@ fn test_to_u64() {
     test("-1000000000000", None);
     test("1000000000000000000000", None);
     test("-1000000000000000000000", None);
-    test("4294967295", Some(u32::max_value().into()));
-    test("4294967296", Some(u64::from(u32::max_value()) + 1));
-    test("18446744073709551615", Some(u64::max_value()));
+    test("4294967295", Some(u32::MAX.into()));
+    test("4294967296", Some(u64::from(u32::MAX) + 1));
+    test("18446744073709551615", Some(u64::MAX));
     test("18446744073709551616", None);
 }
 
@@ -37,8 +39,8 @@ fn test_to_u64_wrapping() {
     test("-1000000000000", 18_446_743_073_709_551_616);
     test("1000000000000000000000", 3_875_820_019_684_212_736);
     test("-1000000000000000000000", 14_570_924_054_025_338_880);
-    test("4294967296", u64::from(u32::max_value()) + 1);
-    test("4294967297", u64::from(u32::max_value()) + 2);
+    test("4294967296", u64::from(u32::MAX) + 1);
+    test("4294967297", u64::from(u32::MAX) + 2);
     test("-4294967296", 18_446_744_069_414_584_320);
     test("-4294967295", 18_446_744_069_414_584_321);
     test("18446744073709551616", 0);

@@ -3,7 +3,7 @@ use natural::Natural;
 
 impl Integer {
     /// Takes a `Integer` mod a power of 2, taking the `Integer` by value. In other words, returns
-    /// r, where `self` = q * 2^<sup>`other`</sup> + r and 0 <= r < 2^<sup>`other`</sup>.
+    /// r, where `self` = q * 2<sup>`other`</sup> + r and 0 <= r < 2<sup>`other`</sup>.
     ///
     /// Unlike rem_power_of_2, this function always returns a non-negative number.
     ///
@@ -26,7 +26,7 @@ impl Integer {
     }
 
     /// Takes a `Integer` mod a power of 2, taking the `Integer` by reference. In other words,
-    /// returns r, where `self` = q * 2^(`other`) + r and 0 <= r < 2^(`other`).
+    /// returns r, where `self` = q * 2<pow>`other`</pow> + r and 0 <= r < 2<pow>`other`</pow>.
     ///
     /// Unlike rem_power_of_2_ref, this function always returns a non-negative number.
     ///
@@ -48,7 +48,7 @@ impl Integer {
     }
 
     /// Takes a `Integer` mod a power of 2 in place. In other words, replaces `self` with r, where
-    /// `self` = q * 2^(`other`) + r and 0 <= r < 2^(`other`).
+    /// `self` = q * 2<pow>`other`</pow> + r and 0 <= r < 2<pow>`other`</pow>.
     ///
     /// Unlike rem_power_of_2_assign, this function always assigns a non-negative number.
     ///
@@ -76,8 +76,8 @@ impl Integer {
     }
 
     /// Takes a `Integer` rem a power of 2, taking the `Integer` by value. In other words, returns
-    /// r, where `self` = q * 2^(`other`) + r, r == 0 or (sgn(r) == sgn(`self`)), and
-    /// 0 <= |r| < 2^(`other`).
+    /// r, where `self` = q * 2<pow>`other`</pow> + r, r == 0 or (sgn(r) == sgn(`self`)), and
+    /// 0 <= |r| < 2<pow>`other`</pow>.
     ///
     /// Unlike `mod_power_of_2`, this function always returns zero or a number with the same sign as
     /// `self`.
@@ -101,8 +101,8 @@ impl Integer {
     }
 
     /// Takes a `Integer` rem a power of 2, taking the `Integer` by reference. In other words,
-    /// returns r, where `self` = q * 2^(`other`) + r, (r == 0 or sgn(r) == sgn(`self`)), and
-    /// 0 <= |r| < 2^(`other`).
+    /// returns r, where `self` = q * 2<pow>`other`</pow> + r, (r == 0 or sgn(r) == sgn(`self`)),
+    /// and 0 <= |r| < 2<pow>`other`</pow>.
     ///
     /// Unlike `mod_power_of_2_ref  , this function always returns zero or a number with the same
     /// sign as `self`.
@@ -125,7 +125,8 @@ impl Integer {
     }
 
     /// Takes a `Integer` rem a power of 2 in place. In other words, replaces `self` with r, where
-    /// `self` = q * 2^(`other`) + r, (r == 0 or sgn(r) == sgn(`self`)), and 0 <= |r| < 2^(`other`).
+    /// `self` = q * 2<pow>`other`</pow> + r, (r == 0 or sgn(r) == sgn(`self`)), and
+    /// 0 <= |r| < 2<pow>`other`</pow>.
     ///
     /// Unlike `mod_power_of_2_assign, this function does never changes the sign of `self`, except
     /// possibly to set `self` to 0.
@@ -152,7 +153,7 @@ impl Integer {
     }
 
     /// Takes a `Integer` ceiling-mod a power of 2, taking the `Integer` by value. In other words,
-    /// returns r, where `self` = q * 2^(`other`) + r and 0 <= -r < 2^(`other`).
+    /// returns r, where `self` = q * 2<pow>`other`</pow> + r and 0 <= -r < 2<pow>`other`</pow>.
     ///
     /// # Examples
     /// ```
@@ -177,7 +178,8 @@ impl Integer {
     }
 
     /// Takes a `Integer` ceiling-mod a power of 2, taking the `Integer` by reference. In other
-    /// words, returns r, where `self` = q * 2^(`other`) + r and 0 <= -r < 2^(`other`).
+    /// words, returns r, where `self` = q * 2<pow>`other`</pow> + r and
+    /// 0 <= -r < 2<pow>`other`</pow>.
     ///
     /// # Examples
     /// ```
@@ -201,7 +203,7 @@ impl Integer {
     }
 
     /// Takes a `Integer` ceiling-mod a power of 2 in place. In other words, replaces `self` with r,
-    /// where `self` = q * 2^(`other`) + r and 0 <= -r < 2^(`other`).
+    /// where `self` = q * 2<pow>`other`</pow> + r and 0 <= -r < 2<pow>`other`</pow>.
     ///
     /// # Examples
     /// ```

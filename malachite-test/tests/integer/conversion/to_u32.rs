@@ -1,4 +1,5 @@
 use common::LARGE_LIMIT;
+use malachite_base::num::SignificantBits;
 use malachite_nz::integer::Integer;
 use malachite_test::common::{integer_to_rugint_integer, GenerationMode};
 use malachite_test::integer::conversion::to_u32::select_inputs;
@@ -6,6 +7,7 @@ use rugint;
 use rust_wheels::iterators::common::EXAMPLE_SEED;
 use rust_wheels::iterators::integers::{exhaustive_integers, random_integers};
 use std::cmp::Ordering;
+use std::u32;
 use std::str::FromStr;
 
 #[test]
@@ -19,7 +21,7 @@ fn test_to_u32() {
     test("-123", None);
     test("1000000000000", None);
     test("-1000000000000", None);
-    test("4294967295", Some(u32::max_value()));
+    test("4294967295", Some(u32::MAX));
     test("4294967296", None);
 }
 

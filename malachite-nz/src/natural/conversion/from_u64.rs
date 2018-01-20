@@ -1,5 +1,6 @@
 use malachite_base::num::{get_lower, get_upper};
 use natural::Natural::{self, Large, Small};
+use std::u32;
 
 /// Converts a `u64` to a `Natural`.
 ///
@@ -15,7 +16,7 @@ use natural::Natural::{self, Large, Small};
 /// ```
 impl From<u64> for Natural {
     fn from(u: u64) -> Natural {
-        if u <= u32::max_value().into() {
+        if u <= u32::MAX.into() {
             Small(u as u32)
         } else {
             Large(vec![get_lower(u), get_upper(u)])

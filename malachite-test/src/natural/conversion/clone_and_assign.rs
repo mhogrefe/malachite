@@ -1,4 +1,5 @@
 use common::{natural_to_biguint, natural_to_rugint_integer, GenerationMode};
+use malachite_base::num::SignificantBits;
 use malachite_base::traits::Assign;
 use malachite_nz::natural::Natural;
 use num::BigUint;

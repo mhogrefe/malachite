@@ -1,4 +1,5 @@
 use common::{natural_to_biguint, GenerationMode};
+use malachite_base::num::SignificantBits;
 use malachite_nz::natural::Natural;
 use num::BigUint;
 use rust_wheels::benchmarks::{BenchmarkOptions2, benchmark_2};

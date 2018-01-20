@@ -1,4 +1,5 @@
 use common::{integer_to_bigint, GenerationMode};
+use malachite_base::num::SignificantBits;
 use malachite_base::traits::Assign;
 use malachite_nz::integer::Integer;
 use num::BigInt;

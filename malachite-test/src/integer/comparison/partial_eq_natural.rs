@@ -1,4 +1,5 @@
 use common::{integer_to_rugint_integer, natural_to_rugint_integer, GenerationMode};
+use malachite_base::num::SignificantBits;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use rust_wheels::benchmarks::{BenchmarkOptions2, benchmark_2};

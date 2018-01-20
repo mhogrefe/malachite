@@ -1,4 +1,5 @@
 use common::LARGE_LIMIT;
+use malachite_base::num::{BitAccess, SignificantBits};
 use malachite_nz::natural::Natural;
 use malachite_test::common::{natural_to_biguint, natural_to_rugint_integer, GenerationMode};
 use malachite_test::natural::logic::get_bit::{num_get_bit, select_inputs};
@@ -31,10 +32,13 @@ pub fn test_get_bit() {
 #[test]
 fn get_bit_properties() {
     // n.get_bit(index) is equivalent for malachite, num, and rugint.
+    // n.get_bit(index) = !(!n).get_bit(index)
     let natural_and_u64 = |n: Natural, index: u64| {
         let bit = n.get_bit(index);
         assert_eq!(num_get_bit(&natural_to_biguint(&n), index), bit);
         assert_eq!(natural_to_rugint_integer(&n).get_bit(index as u32), bit);
+
+        assert_ne!((!n).get_bit(index), bit);
     };
 
     // !n.get_bit(n.significant_bits())

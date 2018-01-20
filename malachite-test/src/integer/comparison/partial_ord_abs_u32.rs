@@ -1,4 +1,5 @@
 use common::GenerationMode;
+use malachite_base::num::SignificantBits;
 use malachite_base::traits::PartialOrdAbs;
 use malachite_nz::integer::Integer;
 use rust_wheels::benchmarks::{BenchmarkOptions1, benchmark_1};

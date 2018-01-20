@@ -1,8 +1,10 @@
 use common::LARGE_LIMIT;
+use malachite_base::num::SignificantBits;
 use malachite_nz::natural::Natural;
 use malachite_test::common::GenerationMode;
 use malachite_test::natural::conversion::to_u64::select_inputs;
 use std::str::FromStr;
+use std::u64;
 
 #[test]
 fn test_to_u64() {
@@ -12,7 +14,7 @@ fn test_to_u64() {
     test("0", Some(0));
     test("123", Some(123));
     test("1000000000000000000000", None);
-    test("18446744073709551615", Some(u64::max_value()));
+    test("18446744073709551615", Some(u64::MAX));
     test("18446744073709551616", None);
 }
 

@@ -1,6 +1,7 @@
 use integer::Integer;
+use malachite_base::num::SignificantBits;
 
-impl Integer {
+impl SignificantBits for Integer {
     /// Returns the smallest number of bits necessary to represent the absolute value of an
     /// `Integer`. 0 has zero significant bits.
     ///
@@ -13,6 +14,7 @@ impl Integer {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
+    /// use malachite_base::num::SignificantBits;
     /// use malachite_base::traits::Zero;
     /// use malachite_nz::integer::Integer;
     ///
@@ -22,7 +24,7 @@ impl Integer {
     ///     assert_eq!(Integer::from(-100).significant_bits(), 7);
     /// }
     /// ```
-    pub fn significant_bits(&self) -> u64 {
+    fn significant_bits(&self) -> u64 {
         self.abs.significant_bits()
     }
 }

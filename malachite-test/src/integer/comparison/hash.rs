@@ -1,4 +1,5 @@
 use common::{integer_to_bigint, GenerationMode};
+use malachite_base::num::SignificantBits;
 use malachite_nz::integer::Integer;
 use rust_wheels::benchmarks::{BenchmarkOptions2, benchmark_2};
 use rust_wheels::iterators::common::EXAMPLE_SEED;

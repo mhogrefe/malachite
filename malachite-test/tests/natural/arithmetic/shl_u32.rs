@@ -11,6 +11,7 @@ use rust_wheels::iterators::integers_geometric::natural_u32s_geometric;
 use rust_wheels::iterators::naturals::{exhaustive_naturals, random_naturals};
 use rust_wheels::iterators::primitive_ints::exhaustive_u;
 use rust_wheels::iterators::tuples::{exhaustive_pairs_from_single, log_pairs, random_triples};
+use std::i32;
 use std::str::FromStr;
 
 #[test]
@@ -106,7 +107,7 @@ fn shl_u32_properties() {
         assert_eq!(&old_n << u, &old_n * (Natural::ONE << u));
         assert_eq!(&old_n << u >> u, old_n);
 
-        if u <= (i32::max_value() as u32) {
+        if u <= (i32::MAX as u32) {
             assert_eq!(&old_n << (u as i32), n);
             assert_eq!(&old_n >> -(u as i32), n);
         }

@@ -4,6 +4,7 @@ use malachite_test::common::{bigint_to_integer, rugint_integer_to_integer, Gener
 use malachite_test::integer::conversion::from_i32::select_inputs;
 use num::BigInt;
 use rugint;
+use std::i32;
 
 #[test]
 fn test_from_i32() {
@@ -19,8 +20,8 @@ fn test_from_i32() {
     test(0, "0");
     test(123, "123");
     test(-123, "-123");
-    test(i32::min_value(), "-2147483648");
-    test(i32::max_value(), "2147483647");
+    test(i32::MIN, "-2147483648");
+    test(i32::MAX, "2147483647");
 }
 
 #[test]

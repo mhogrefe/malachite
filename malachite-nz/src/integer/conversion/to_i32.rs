@@ -1,4 +1,5 @@
 use integer::Integer;
+use std::i32;
 
 impl Integer {
     /// Converts an `Integer` to an `i32`, returning `None` if the `Integer` is outside the range of
@@ -18,7 +19,7 @@ impl Integer {
     /// assert_eq!(format!("{:?}", (-Integer::trillion()).to_i32()), "None");
     /// ```
     pub fn to_i32(&self) -> Option<i32> {
-        if *self >= i32::min_value() && *self <= i32::max_value() {
+        if *self >= i32::MIN && *self <= i32::MAX {
             Some(self.to_i32_wrapping())
         } else {
             None

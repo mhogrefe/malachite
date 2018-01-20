@@ -1,4 +1,5 @@
 use common::LARGE_LIMIT;
+use malachite_base::num::BitAccess;
 use malachite_base::traits::NotAssign;
 use malachite_nz::integer::Integer;
 use malachite_test::common::GenerationMode;

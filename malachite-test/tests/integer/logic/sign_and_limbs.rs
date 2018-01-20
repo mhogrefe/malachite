@@ -5,6 +5,7 @@ use malachite_test::integer::logic::sign_and_limbs::select_inputs;
 use rust_wheels::iterators::common::EXAMPLE_SEED;
 use rust_wheels::iterators::integers::{exhaustive_integers, random_integers};
 use std::cmp::Ordering;
+use std::u32;
 use std::str::FromStr;
 
 #[test]
@@ -28,17 +29,17 @@ fn test_sign_and_limbs_le() {
         "-1701411834921604967429270619762735448065",
         (Ordering::Less, vec![1, 2, 3, 4, 5]),
     );
-    test("4294967295", (Ordering::Greater, vec![u32::max_value()]));
-    test("-4294967295", (Ordering::Less, vec![u32::max_value()]));
+    test("4294967295", (Ordering::Greater, vec![u32::MAX]));
+    test("-4294967295", (Ordering::Less, vec![u32::MAX]));
     test("4294967296", (Ordering::Greater, vec![0, 1]));
     test("-4294967296", (Ordering::Less, vec![0, 1]));
     test(
         "18446744073709551615",
-        (Ordering::Greater, vec![u32::max_value(), u32::max_value()]),
+        (Ordering::Greater, vec![u32::MAX, u32::MAX]),
     );
     test(
         "-18446744073709551615",
-        (Ordering::Less, vec![u32::max_value(), u32::max_value()]),
+        (Ordering::Less, vec![u32::MAX, u32::MAX]),
     );
     test("18446744073709551616", (Ordering::Greater, vec![0, 0, 1]));
     test("-18446744073709551616", (Ordering::Less, vec![0, 0, 1]));
@@ -65,17 +66,17 @@ fn test_sign_and_limbs_be() {
         "-1701411834921604967429270619762735448065",
         (Ordering::Less, vec![5, 4, 3, 2, 1]),
     );
-    test("4294967295", (Ordering::Greater, vec![u32::max_value()]));
-    test("-4294967295", (Ordering::Less, vec![u32::max_value()]));
+    test("4294967295", (Ordering::Greater, vec![u32::MAX]));
+    test("-4294967295", (Ordering::Less, vec![u32::MAX]));
     test("4294967296", (Ordering::Greater, vec![1, 0]));
     test("-4294967296", (Ordering::Less, vec![1, 0]));
     test(
         "18446744073709551615",
-        (Ordering::Greater, vec![u32::max_value(), u32::max_value()]),
+        (Ordering::Greater, vec![u32::MAX, u32::MAX]),
     );
     test(
         "-18446744073709551615",
-        (Ordering::Less, vec![u32::max_value(), u32::max_value()]),
+        (Ordering::Less, vec![u32::MAX, u32::MAX]),
     );
     test("18446744073709551616", (Ordering::Greater, vec![1, 0, 0]));
     test("-18446744073709551616", (Ordering::Less, vec![1, 0, 0]));

@@ -139,7 +139,7 @@ impl ShlAssign<i32> for Integer {
 ///
 /// # Panics
 /// Panics if `other` is positive and `rm` is `RoundingMode::Exact` but `self` is not divisible by
-/// 2^(`other`).
+/// 2<pow>`other`</pow>.
 ///
 /// # Examples
 /// ```
@@ -188,7 +188,7 @@ impl ShlRound<i32> for Integer {
 ///
 /// # Panics
 /// Panics if `other` is positive and `rm` is `RoundingMode::Exact` but `self` is not divisible by
-/// 2^(`other`).
+/// 2<pow>`other`</pow>.
 ///
 /// # Examples
 /// ```
@@ -244,7 +244,7 @@ impl<'a> ShlRound<i32> for &'a Integer {
 ///
 /// # Panics
 /// Panics if `other` is positive and `rm` is `RoundingMode::Exact` but `self` is not divisible by
-/// 2^(`other`).
+/// 2<pow>`other`</pow>.
 ///
 /// # Examples
 /// ```

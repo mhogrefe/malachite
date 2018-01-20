@@ -7,6 +7,7 @@ use malachite_test::integer::conversion::assign_i32::{select_inputs, num_assign_
 use num::BigInt;
 use rugint;
 use rugint::Assign as rugint_assign;
+use std::i32;
 use std::str::FromStr;
 
 #[test]
@@ -26,8 +27,8 @@ fn test_assign_i32() {
         assert_eq!(x.to_string(), out);
     };
     test("123", -456, "-456");
-    test("-123", i32::max_value(), "2147483647");
-    test("123", i32::min_value(), "-2147483648");
+    test("-123", i32::MAX, "2147483647");
+    test("123", i32::MIN, "-2147483648");
     test("1000000000000", 123, "123");
 }
 

@@ -1,6 +1,10 @@
 use round::RoundingMode;
 use std::cmp::Ordering;
 
+pub trait Named {
+    const NAME: &'static str;
+}
+
 pub trait AbsAssign {
     fn abs_assign(&mut self);
 }

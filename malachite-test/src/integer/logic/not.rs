@@ -1,4 +1,5 @@
 use common::{integer_to_rugint_integer, GenerationMode};
+use malachite_base::num::SignificantBits;
 use malachite_base::traits::NotAssign;
 use malachite_nz::integer::Integer;
 use rugint;

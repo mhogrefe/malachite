@@ -10,6 +10,7 @@ use rust_wheels::iterators::common::EXAMPLE_SEED;
 use rust_wheels::iterators::integers_geometric::natural_u32s_geometric;
 use rust_wheels::iterators::integers::{exhaustive_integers, random_integers};
 use rust_wheels::iterators::primitive_ints::exhaustive_u;
+use std::i32;
 use std::str::FromStr;
 
 #[test]
@@ -128,7 +129,7 @@ fn shl_u32_properties() {
         assert_eq!(&old_n << u, &old_n * (Integer::ONE << u));
         assert_eq!(&old_n << u >> u, old_n);
 
-        if u <= (i32::max_value() as u32) {
+        if u <= (i32::MAX as u32) {
             assert_eq!(&old_n << (u as i32), n);
             assert_eq!(&old_n >> -(u as i32), n);
         }

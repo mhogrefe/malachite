@@ -3,6 +3,7 @@ use malachite_nz::integer::Integer;
 use malachite_test::common::{bigint_to_integer, GenerationMode};
 use malachite_test::integer::conversion::from_i64::select_inputs;
 use num::BigInt;
+use std::i64;
 
 #[test]
 fn test_from_i64() {
@@ -18,8 +19,8 @@ fn test_from_i64() {
     test(-123i64, "-123");
     test(1_000_000_000_000i64, "1000000000000");
     test(-1_000_000_000_000i64, "-1000000000000");
-    test(i64::max_value(), "9223372036854775807");
-    test(i64::min_value(), "-9223372036854775808");
+    test(i64::MAX, "9223372036854775807");
+    test(i64::MIN, "-9223372036854775808");
 }
 
 #[test]

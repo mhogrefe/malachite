@@ -30,7 +30,7 @@ impl Integer {
         }
     }
 
-    /// Converts an `Integer` to a `u64`, wrapping mod 2^(64).
+    /// Converts an `Integer` to a `u64`, wrapping mod 2<pow>64</pow>.
     ///
     /// Time: worst case O(1)
     ///

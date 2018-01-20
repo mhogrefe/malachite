@@ -3,6 +3,7 @@ use malachite_nz::integer::Integer;
 use malachite_test::common::{bigint_to_integer, GenerationMode};
 use malachite_test::integer::conversion::from_u64::select_inputs;
 use num::BigInt;
+use std::u64;
 
 #[test]
 fn test_from_u64() {
@@ -16,7 +17,7 @@ fn test_from_u64() {
     test(0u64, "0");
     test(123u64, "123");
     test(1_000_000_000_000u64, "1000000000000");
-    test(u64::max_value(), "18446744073709551615");
+    test(u64::MAX, "18446744073709551615");
 }
 
 #[test]

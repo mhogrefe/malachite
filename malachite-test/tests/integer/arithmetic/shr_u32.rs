@@ -14,6 +14,7 @@ use rust_wheels::iterators::primitive_ints::{exhaustive_negative_i, exhaustive_p
 use rust_wheels::iterators::rounding_modes::{exhaustive_rounding_modes, random_rounding_modes};
 use rust_wheels::iterators::tuples::{exhaustive_pairs_from_single, log_pairs,
                                      log_pairs_from_single, random_pairs, random_triples};
+use std::i32;
 use std::str::FromStr;
 
 #[test]
@@ -159,7 +160,7 @@ fn shr_u32_properties() {
         assert!((&old_n >> u).le_abs(&old_n));
         assert_eq!(&old_n >> u, (&old_n).shr_round(u, RoundingMode::Floor));
 
-        if u <= (i32::max_value() as u32) {
+        if u <= (i32::MAX as u32) {
             assert_eq!(&old_n >> (u as i32), n);
             assert_eq!(&old_n << -(u as i32), n);
         }
@@ -1476,7 +1477,7 @@ fn shr_round_u32_properties() {
     }
 
     for (n, u) in log_pairs(
-        exhaustive_negative_i::<i32>().filter(|&i| i != i32::min_value()),
+        exhaustive_negative_i::<i32>().filter(|&i| i != i32::MIN),
         exhaustive_u::<u32>(),
     ).take(LARGE_LIMIT)
     {
@@ -1485,7 +1486,7 @@ fn shr_round_u32_properties() {
 
     for (n, u) in random_pairs(
         &EXAMPLE_SEED,
-        &(|seed| random_negative_i(seed).filter(|&i| i != i32::min_value())),
+        &(|seed| random_negative_i(seed).filter(|&i| i != i32::MIN)),
         &(|seed| natural_u32s_geometric(seed, 32)),
     ).take(LARGE_LIMIT)
     {

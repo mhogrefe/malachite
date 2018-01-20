@@ -3,6 +3,7 @@ use malachite_nz::natural::Natural;
 use malachite_test::common::GenerationMode;
 use malachite_test::natural::logic::limbs::select_inputs;
 use std::str::FromStr;
+use std::u32;
 
 #[test]
 fn test_to_limbs_le() {
@@ -16,12 +17,9 @@ fn test_to_limbs_le() {
         "1701411834921604967429270619762735448065",
         vec![1, 2, 3, 4, 5],
     );
-    test("4294967295", vec![u32::max_value()]);
+    test("4294967295", vec![u32::MAX]);
     test("4294967296", vec![0, 1]);
-    test(
-        "18446744073709551615",
-        vec![u32::max_value(), u32::max_value()],
-    );
+    test("18446744073709551615", vec![u32::MAX, u32::MAX]);
     test("18446744073709551616", vec![0, 0, 1]);
 }
 
@@ -37,12 +35,9 @@ fn test_to_limbs_be() {
         "1701411834921604967429270619762735448065",
         vec![5, 4, 3, 2, 1],
     );
-    test("4294967295", vec![u32::max_value()]);
+    test("4294967295", vec![u32::MAX]);
     test("4294967296", vec![1, 0]);
-    test(
-        "18446744073709551615",
-        vec![u32::max_value(), u32::max_value()],
-    );
+    test("18446744073709551615", vec![u32::MAX, u32::MAX]);
     test("18446744073709551616", vec![1, 0, 0]);
 }
 

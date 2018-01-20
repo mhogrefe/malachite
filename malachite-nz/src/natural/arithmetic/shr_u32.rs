@@ -1,3 +1,4 @@
+use malachite_base::num::BitAccess;
 use malachite_base::round::RoundingMode;
 use malachite_base::traits::{One, ShrRound, ShrRoundAssign, Zero};
 use natural::{delete_left, mpn_zero_p, LIMB_BITS, LIMB_BITS_MASK, LOG_LIMB_BITS};
@@ -184,7 +185,7 @@ impl ShrAssign<u32> for Natural {
 /// Additional memory: worst case O(1)
 ///
 /// # Panics
-/// Panics if `rm` is `RoundingMode::Exact` but `self` is not divisible by 2^(`other`).
+/// Panics if `rm` is `RoundingMode::Exact` but `self` is not divisible by 2<sup>`other`</sup>.
 ///
 /// # Examples
 /// ```
@@ -226,7 +227,7 @@ impl ShrRound<u32> for Natural {
 /// Additional memory: worst case O(`other`)
 ///
 /// # Panics
-/// Panics if `rm` is `RoundingMode::Exact` but `self` is not divisible by 2^(`other`).
+/// Panics if `rm` is `RoundingMode::Exact` but `self` is not divisible by 2<sup>`other`</sup>.
 ///
 /// # Examples
 /// ```
@@ -449,7 +450,7 @@ impl<'a> ShrRound<u32> for &'a Natural {
 /// Additional memory: worst case O(1)
 ///
 /// # Panics
-/// Panics if `rm` is `RoundingMode::Exact` but `self` is not divisible by 2^(`other`).
+/// Panics if `rm` is `RoundingMode::Exact` but `self` is not divisible by 2<sup>`other`</sup>.
 ///
 /// # Examples
 /// ```

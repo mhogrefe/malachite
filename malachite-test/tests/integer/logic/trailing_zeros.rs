@@ -3,6 +3,7 @@ use malachite_nz::integer::Integer;
 use malachite_test::common::GenerationMode;
 use malachite_test::integer::logic::trailing_zeros::select_inputs;
 use std::str::FromStr;
+use std::u32;
 
 #[test]
 fn test_trailing_zeros() {
@@ -38,7 +39,7 @@ fn trailing_zeros_properties() {
         if x != 0 {
             let trailing_zeros = trailing_zeros.unwrap();
             assert_ne!((!&x).trailing_zeros() == Some(0), trailing_zeros == 0);
-            if trailing_zeros <= u32::max_value().into() {
+            if trailing_zeros <= u32::MAX.into() {
                 let trailing_zeros = trailing_zeros as u32;
                 assert!((&x >> trailing_zeros).is_odd());
                 assert_eq!(&x >> trailing_zeros << trailing_zeros, x);

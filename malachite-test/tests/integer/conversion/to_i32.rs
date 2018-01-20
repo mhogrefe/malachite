@@ -5,6 +5,7 @@ use malachite_test::integer::conversion::to_i32::select_inputs;
 use rugint;
 use rust_wheels::iterators::common::EXAMPLE_SEED;
 use rust_wheels::iterators::integers::{exhaustive_integers, random_integers};
+use std::i32;
 use std::str::FromStr;
 
 #[test]
@@ -18,9 +19,9 @@ fn test_to_i32() {
     test("-123", Some(-123));
     test("1000000000000", None);
     test("-1000000000000", None);
-    test("2147483647", Some(i32::max_value()));
+    test("2147483647", Some(i32::MAX));
     test("2147483648", None);
-    test("-2147483648", Some(i32::min_value()));
+    test("-2147483648", Some(i32::MIN));
     test("-2147483649", None);
 }
 
@@ -35,10 +36,10 @@ fn test_to_i32_wrapping() {
     test("-123", -123);
     test("1000000000000", -727_379_968);
     test("-1000000000000", 727_379_968);
-    test("2147483647", i32::max_value());
-    test("2147483648", i32::min_value());
-    test("-2147483648", i32::min_value());
-    test("-2147483649", i32::max_value());
+    test("2147483647", i32::MAX);
+    test("2147483648", i32::MIN);
+    test("-2147483648", i32::MIN);
+    test("-2147483649", i32::MAX);
 }
 
 #[test]
@@ -50,7 +51,7 @@ fn to_i32_properties() {
     let one_integer = |x: Integer| {
         let result = x.to_i32();
         assert_eq!(integer_to_rugint_integer(&x).to_i32(), result);
-        if x >= i32::min_value() && x <= i32::max_value() {
+        if x >= i32::MIN && x <= i32::MAX {
             assert_eq!(Integer::from(result.unwrap()), x);
             assert_eq!(result, Some(x.to_i32_wrapping()));
         } else {

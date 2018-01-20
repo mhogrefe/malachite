@@ -4,6 +4,7 @@ use malachite_nz::natural::Natural;
 use malachite_test::common::GenerationMode;
 use malachite_test::natural::logic::limb_count::select_inputs;
 use std::str::FromStr;
+use std::u32;
 
 #[test]
 fn test_limb_count() {
@@ -25,7 +26,7 @@ fn limb_count_properties() {
     // if x != 0, (x.limb_count() == n) == (2^(32*(n-1)) <= x < 2^(32*n))
     let one_natural = |x: Natural| {
         let limb_count = x.limb_count();
-        assert_eq!(x <= u32::max_value(), x.limb_count() <= 1);
+        assert_eq!(x <= u32::MAX, x.limb_count() <= 1);
         if x != 0 {
             let n = limb_count as u32;
             assert!(Natural::ONE << ((n - 1) << 5) <= x);

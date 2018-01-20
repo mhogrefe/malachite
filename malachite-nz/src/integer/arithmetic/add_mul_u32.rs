@@ -9,6 +9,7 @@ use natural::logic::not::mpn_com_in_place;
 use natural::mpn_zero_p;
 use natural::Natural::{self, Large, Small};
 use std::cmp::{max, min};
+use std::u32;
 
 /// Adds the product of an `Integer` (b) and a `u32` (c) to an `Integer` (self), taking `self` and b
 /// by value.
@@ -417,7 +418,7 @@ pub(crate) fn mpz_aorsmul_1(
 
             // If cy - 1 == -1 then hold that -1 for latter. mpn_submul_1 never returns
             // cy == MP_LIMB_T_MAX so that value always indicates a -1.
-            let cy2 = if cy == u32::max_value() { 1 } else { 0 };
+            let cy2 = if cy == u32::MAX { 1 } else { 0 };
             cy = cy.wrapping_add(cy2);
             cy = mpn_mul_1c(&mut w[wsize..xsize], &x[wsize..xsize], y, cy);
             w[new_wsize] = cy;

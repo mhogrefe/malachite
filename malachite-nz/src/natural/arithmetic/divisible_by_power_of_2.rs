@@ -2,8 +2,9 @@ use natural::{LIMB_BITS, LIMB_BITS_MASK, LOG_LIMB_BITS};
 use natural::Natural::{self, Large, Small};
 
 impl Natural {
-    /// Returns whether `self` is divisible by 2^(`pow`). If `self` is 0, the result is always true;
-    /// otherwise, it is equivalent to `self.trailing_zeros().unwrap() <= pow`, but more efficient.
+    /// Returns whether `self` is divisible by 2<sup>`pow`</sup>. If `self` is 0, the result is
+    /// always true; otherwise, it is equivalent to `self.trailing_zeros().unwrap() <= pow`, but
+    /// more efficient.
     ///
     /// Time: worst case O(n)
     ///

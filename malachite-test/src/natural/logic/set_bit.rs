@@ -1,4 +1,5 @@
 use common::{natural_to_biguint, natural_to_rugint_integer, GenerationMode};
+use malachite_base::num::BitAccess;
 use malachite_nz::natural::Natural;
 use num::{BigUint, One};
 use rugint;

@@ -1,4 +1,5 @@
 use integer::Integer;
+use malachite_base::num::SignificantBits;
 use malachite_base::traits::One;
 use natural::Natural;
 
@@ -32,7 +33,7 @@ impl Integer {
         }
     }
 
-    /// Converts an `Integer` to a `i64`, wrapping mod 2^(64).
+    /// Converts an `Integer` to a `i64`, wrapping mod 2<pow>64</pow>.
     ///
     /// Time: worst case O(1)
     ///

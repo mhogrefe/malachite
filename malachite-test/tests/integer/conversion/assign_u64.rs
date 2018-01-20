@@ -5,6 +5,7 @@ use malachite_test::common::GenerationMode;
 use malachite_test::integer::conversion::assign_u64::{select_inputs, num_assign_u64};
 use num::BigInt;
 use std::str::FromStr;
+use std::{u32, u64};
 
 #[test]
 fn test_assign_u64() {
@@ -19,8 +20,8 @@ fn test_assign_u64() {
         assert_eq!(x.to_string(), out);
     };
     test("-123", 456, "456");
-    test("123", u32::max_value().into(), "4294967295");
-    test("123", u64::max_value(), "18446744073709551615");
+    test("123", u32::MAX.into(), "4294967295");
+    test("123", u64::MAX, "18446744073709551615");
     test("1000000000000000000000000", 123, "123");
 }
 

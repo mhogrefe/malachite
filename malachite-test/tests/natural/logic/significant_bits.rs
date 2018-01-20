@@ -1,4 +1,5 @@
 use common::LARGE_LIMIT;
+use malachite_base::num::SignificantBits;
 use malachite_base::traits::One;
 use malachite_nz::natural::Natural;
 use malachite_test::common::{natural_to_biguint, natural_to_rugint_integer, GenerationMode};
@@ -6,6 +7,7 @@ use malachite_test::natural::logic::significant_bits::select_inputs;
 use num::BigUint;
 use rugint;
 use std::str::FromStr;
+use std::u32;
 
 #[test]
 fn test_significant_bits() {
@@ -38,7 +40,7 @@ fn significant_bits_properties() {
             u64::from(natural_to_rugint_integer(&x).significant_bits()),
             significant_bits
         );
-        assert_eq!(x <= u32::max_value(), significant_bits <= 32);
+        assert_eq!(x <= u32::MAX, significant_bits <= 32);
         if x != 0 {
             let n = significant_bits as u32;
             assert!(Natural::ONE << (n - 1) <= x);

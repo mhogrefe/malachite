@@ -1,9 +1,10 @@
+use malachite_base::num::{BitAccess, SignificantBits};
 use malachite_base::traits::Zero;
 use natural::Natural;
 use rand::Rng;
 
 /// Returns a random `Natural` with up to `bits` bits; equivalently, returns a random `Natural`
-/// uniformly sampled from [0, 2^(`bits`)).
+/// uniformly sampled from [0, 2<sup>`bits`</sup>).
 ///
 /// # Example
 /// ```
@@ -43,7 +44,7 @@ pub fn random_natural_up_to_bits<R: Rng>(rng: &mut R, bits: u64) -> Natural {
 }
 
 /// Returns random `Natural` with exactly `bits` bits; equivalently, returns a random `Natural`
-/// uniformly sampled from [2^(`bits`-1), 2^(`bits`)).
+/// uniformly sampled from [2<sup>`bits`-1</sup>, 2<sup>`bits`</sup>).
 ///
 /// # Example
 /// ```

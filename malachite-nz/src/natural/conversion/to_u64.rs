@@ -25,7 +25,7 @@ impl Natural {
         }
     }
 
-    /// Converts a `Natural` to a `u64`, wrapping mod 2^(64).
+    /// Converts a `Natural` to a `u64`, wrapping mod 2<sup>64</sup>.
     ///
     /// Time: worst case O(1)
     ///

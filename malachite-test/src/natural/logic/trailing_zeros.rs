@@ -1,4 +1,5 @@
 use common::GenerationMode;
+use malachite_base::num::SignificantBits;
 use malachite_nz::natural::Natural;
 use rust_wheels::benchmarks::{BenchmarkOptions1, benchmark_1};
 use rust_wheels::iterators::common::EXAMPLE_SEED;

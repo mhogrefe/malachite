@@ -16,6 +16,7 @@ use rust_wheels::iterators::primitive_ints::{exhaustive_positive_x, exhaustive_u
 use rust_wheels::iterators::rounding_modes::{exhaustive_rounding_modes, random_rounding_modes};
 use rust_wheels::iterators::tuples::{exhaustive_pairs_from_single, log_pairs,
                                      log_pairs_from_single, random_pairs, random_triples};
+use std::i32;
 use std::str::FromStr;
 
 #[test]
@@ -130,7 +131,7 @@ fn shr_u32_properties() {
         assert!(&old_n >> u <= old_n);
         assert_eq!(&old_n >> u, (&old_n).shr_round(u, RoundingMode::Floor));
 
-        if u <= (i32::max_value() as u32) {
+        if u <= (i32::MAX as u32) {
             assert_eq!(&old_n >> (u as i32), n);
             assert_eq!(&old_n << -(u as i32), n);
         }

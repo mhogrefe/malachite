@@ -5,7 +5,7 @@ use natural::Natural::{self, Large, Small};
 
 impl Natural {
     /// Takes a `Natural` mod a power of 2, taking the `Natural` by value. In other words, returns
-    /// r, where `self` = q * 2^(`other`) + r and 0 <= r < 2^(`other`).
+    /// r, where `self` = q * 2<sup>`other`</sup> + r and 0 <= r < 2<sup>`other`</sup>.
     ///
     /// Time: worst case O(1)
     ///
@@ -27,7 +27,7 @@ impl Natural {
     }
 
     /// Takes a `Natural` mod a power of 2, taking the `Natural` by reference. In other words,
-    /// returns r, where `self` = q * 2^(`other`) + r and 0 <= r < 2^(`other`).
+    /// returns r, where `self` = q * 2<sup>`other`</sup> + r and 0 <= r < 2<sup>`other`</sup>.
     ///
     /// Time: worst case O(`other`)
     ///
@@ -71,7 +71,7 @@ impl Natural {
     }
 
     /// Takes a `Natural` mod a power of 2 in place. In other words, replaces `self` with r, where
-    /// `self` = q * 2^(`other`) + r and 0 <= r < 2^(`other`).
+    /// `self` = q * 2<sup>`other`</sup> + r and 0 <= r < 2<sup>`other`</sup>.
     ///
     /// Time: worst case O(1)
     ///
@@ -124,7 +124,8 @@ impl Natural {
     }
 
     /// Takes the negative of a `Natural` mod a power of 2, taking the `Natural` by value. In other
-    /// words, returns r, where `self` = q * 2^(`other`) - r and 0 <= r < 2^(`other`).
+    /// words, returns r, where `self` = q * 2<sup>`other`</sup> - r and
+    /// 0 <= r < 2<sup>`other`</sup>.
     ///
     /// Time: worst case O(`other`)
     ///
@@ -146,7 +147,8 @@ impl Natural {
     }
 
     /// Takes the negative of a `Natural` mod a power of 2, taking the `Natural` by reference. In
-    /// other words, returns r, where `self` = q * 2^(`other`) - r and 0 <= r < 2^(`other`).
+    /// other words, returns r, where `self` = q * 2<sup>`other`</sup> - r and
+    /// 0 <= r < 2<sup>`other`</sup>.
     ///
     /// Time: worst case O(`other`)
     ///
@@ -191,7 +193,7 @@ impl Natural {
     }
 
     /// Takes the negative of a `Natural` mod a power of 2 in place. In other words, replaces `self`
-    /// with r, where `self` = q * 2^(`other`) - r and 0 <= r < 2^(`other`).
+    /// with r, where `self` = q * 2<sup>`other`</sup> - r and 0 <= r < 2<sup>`other`</sup>.
     ///
     /// Time: worst case O(`other`)
     ///

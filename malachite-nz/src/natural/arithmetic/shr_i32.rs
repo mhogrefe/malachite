@@ -127,7 +127,7 @@ impl ShrAssign<i32> for Natural {
 ///
 /// # Panics
 /// Panics if `other` is positive and `rm` is `RoundingMode::Exact` but `self` is not divisible by
-/// 2^(`other`).
+/// 2<sup>`other`</sup>.
 ///
 /// # Examples
 /// ```
@@ -176,7 +176,7 @@ impl ShrRound<i32> for Natural {
 ///
 /// # Panics
 /// Panics if `other` is positive and `rm` is `RoundingMode::Exact` but `self` is not divisible by
-/// 2^(`other`).
+/// 2<sup>`other`</sup>.
 ///
 /// # Examples
 /// ```
@@ -233,7 +233,7 @@ impl<'a> ShrRound<i32> for &'a Natural {
 ///
 /// # Panics
 /// Panics if `other` is positive and `rm` is `RoundingMode::Exact` but `self` is not divisible by
-/// 2^(`other`).
+/// 2<sup>`other`</sup>.
 ///
 /// # Examples
 /// ```
