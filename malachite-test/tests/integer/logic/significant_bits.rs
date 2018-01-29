@@ -4,7 +4,7 @@ use malachite_base::traits::One;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_test::common::{integer_to_bigint, integer_to_rugint_integer, GenerationMode};
-use malachite_test::integer::logic::significant_bits::select_inputs;
+use malachite_test::inputs::integer::integers;
 use num::BigInt;
 use rugint;
 use std::u32;
@@ -49,11 +49,11 @@ fn significant_bits_properties() {
         }
     };
 
-    for n in select_inputs(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
+    for n in integers(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         one_integer(n);
     }
 
-    for n in select_inputs(GenerationMode::Random(32)).take(LARGE_LIMIT) {
+    for n in integers(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         one_integer(n);
     }
 }

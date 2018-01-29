@@ -3,14 +3,9 @@ use malachite_base::traits::Zero;
 use malachite_nz::integer::Integer;
 use malachite_test::common::{bigint_to_integer, integer_to_bigint, integer_to_rugint_integer,
                              rugint_integer_to_integer, GenerationMode};
-use malachite_test::integer::arithmetic::sub::select_inputs;
+use malachite_test::inputs::integer::{integers, pairs_of_integer_and_signed, pairs_of_integers};
 use num::BigInt;
 use rugint;
-use rust_wheels::iterators::common::EXAMPLE_SEED;
-use rust_wheels::iterators::general::random_x;
-use rust_wheels::iterators::integers::{exhaustive_integers, random_integers};
-use rust_wheels::iterators::primitive_ints::exhaustive_i;
-use rust_wheels::iterators::tuples::{exhaustive_pairs, random_pairs};
 use std::str::FromStr;
 
 #[test]
@@ -138,32 +133,27 @@ fn sub_properties() {
         assert_eq!(&x - &x, 0)
     };
 
-    for (x, y) in select_inputs(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
+    for (x, y) in pairs_of_integers(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         two_integers(x, y);
     }
 
-    for (x, y) in select_inputs(GenerationMode::Random(32)).take(LARGE_LIMIT) {
+    for (x, y) in pairs_of_integers(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         two_integers(x, y);
     }
 
-    for (x, y) in exhaustive_pairs(exhaustive_integers(), exhaustive_i()).take(LARGE_LIMIT) {
+    for (x, y) in pairs_of_integer_and_signed(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         integer_and_i32(x, y);
     }
 
-    for (x, y) in random_pairs(
-        &EXAMPLE_SEED,
-        &(|seed| random_integers(seed, 32)),
-        &(|seed| random_x(seed)),
-    ).take(LARGE_LIMIT)
-    {
+    for (x, y) in pairs_of_integer_and_signed(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         integer_and_i32(x, y);
     }
 
-    for n in exhaustive_integers().take(LARGE_LIMIT) {
+    for n in integers(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         one_integer(n);
     }
 
-    for n in random_integers(&EXAMPLE_SEED, 32).take(LARGE_LIMIT) {
+    for n in integers(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         one_integer(n);
     }
 }

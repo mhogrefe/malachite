@@ -1,35 +1,10 @@
 use common::GenerationMode;
+use inputs::natural::pairs_of_natural_and_small_u32;
 use malachite_nz::natural::Natural;
 use rust_wheels::benchmarks::{BenchmarkOptions1, benchmark_1};
-use rust_wheels::iterators::common::EXAMPLE_SEED;
-use rust_wheels::iterators::integers_geometric::natural_u32s_geometric;
-use rust_wheels::iterators::naturals::{exhaustive_naturals, random_naturals};
-use rust_wheels::iterators::primitive_ints::exhaustive_u;
-use rust_wheels::iterators::tuples::{log_pairs, random_pairs};
-
-type It = Iterator<Item = (Natural, u32)>;
-
-pub fn exhaustive_inputs() -> Box<It> {
-    Box::new(log_pairs(exhaustive_naturals(), exhaustive_u::<u32>()))
-}
-
-pub fn random_inputs(scale: u32) -> Box<It> {
-    Box::new(random_pairs(
-        &EXAMPLE_SEED,
-        &(|seed| random_naturals(seed, scale)),
-        &(|seed| natural_u32s_geometric(seed, scale)),
-    ))
-}
-
-pub fn select_inputs(gm: GenerationMode) -> Box<It> {
-    match gm {
-        GenerationMode::Exhaustive => exhaustive_inputs(),
-        GenerationMode::Random(scale) => random_inputs(scale),
-    }
-}
 
 pub fn demo_natural_mod_power_of_2_assign(gm: GenerationMode, limit: usize) {
-    for (mut n, u) in select_inputs(gm).take(limit) {
+    for (mut n, u) in pairs_of_natural_and_small_u32(gm).take(limit) {
         let n_old = n.clone();
         n.mod_power_of_2_assign(u);
         println!("x := {}; x.mod_power_of_2_assign({}); x = {}", n_old, u, n);
@@ -37,14 +12,14 @@ pub fn demo_natural_mod_power_of_2_assign(gm: GenerationMode, limit: usize) {
 }
 
 pub fn demo_natural_mod_power_of_2(gm: GenerationMode, limit: usize) {
-    for (n, u) in select_inputs(gm).take(limit) {
+    for (n, u) in pairs_of_natural_and_small_u32(gm).take(limit) {
         let n_old = n.clone();
         println!("{}.mod_power_of_2({}) = {}", n_old, u, n.mod_power_of_2(u));
     }
 }
 
 pub fn demo_natural_mod_power_of_2_ref(gm: GenerationMode, limit: usize) {
-    for (n, u) in select_inputs(gm).take(limit) {
+    for (n, u) in pairs_of_natural_and_small_u32(gm).take(limit) {
         println!(
             "{}.mod_power_of_2_ref({}) = {}",
             n,
@@ -55,7 +30,7 @@ pub fn demo_natural_mod_power_of_2_ref(gm: GenerationMode, limit: usize) {
 }
 
 pub fn demo_natural_neg_mod_power_of_2_assign(gm: GenerationMode, limit: usize) {
-    for (mut n, u) in select_inputs(gm).take(limit) {
+    for (mut n, u) in pairs_of_natural_and_small_u32(gm).take(limit) {
         let n_old = n.clone();
         n.neg_mod_power_of_2_assign(u);
         println!(
@@ -66,7 +41,7 @@ pub fn demo_natural_neg_mod_power_of_2_assign(gm: GenerationMode, limit: usize) 
 }
 
 pub fn demo_natural_neg_mod_power_of_2(gm: GenerationMode, limit: usize) {
-    for (n, u) in select_inputs(gm).take(limit) {
+    for (n, u) in pairs_of_natural_and_small_u32(gm).take(limit) {
         let n_old = n.clone();
         println!(
             "{}.neg_mod_power_of_2({}) = {}",
@@ -78,7 +53,7 @@ pub fn demo_natural_neg_mod_power_of_2(gm: GenerationMode, limit: usize) {
 }
 
 pub fn demo_natural_neg_mod_power_of_2_ref(gm: GenerationMode, limit: usize) {
-    for (n, u) in select_inputs(gm).take(limit) {
+    for (n, u) in pairs_of_natural_and_small_u32(gm).take(limit) {
         println!(
             "{}.neg_mod_power_of_2_ref({}) = {}",
             n,
@@ -94,7 +69,7 @@ pub fn benchmark_natural_mod_power_of_2_assign(gm: GenerationMode, limit: usize,
         gm.name()
     );
     benchmark_1(BenchmarkOptions1 {
-        xs: select_inputs(gm),
+        xs: pairs_of_natural_and_small_u32(gm),
         function_f: &(|(mut n, u): (Natural, u32)| n.mod_power_of_2_assign(u)),
         x_cons: &(|p| p.clone()),
         x_param: &(|&(_, index)| index as usize),
@@ -110,7 +85,7 @@ pub fn benchmark_natural_mod_power_of_2_assign(gm: GenerationMode, limit: usize,
 pub fn benchmark_natural_mod_power_of_2(gm: GenerationMode, limit: usize, file_name: &str) {
     println!("benchmarking {} Natural.mod_power_of_2(u32)", gm.name());
     benchmark_1(BenchmarkOptions1 {
-        xs: select_inputs(gm),
+        xs: pairs_of_natural_and_small_u32(gm),
         function_f: &(|(n, u): (Natural, u32)| n.mod_power_of_2(u)),
         x_cons: &(|p| p.clone()),
         x_param: &(|&(_, index)| index as usize),
@@ -126,7 +101,7 @@ pub fn benchmark_natural_mod_power_of_2(gm: GenerationMode, limit: usize, file_n
 pub fn benchmark_natural_mod_power_of_2_ref(gm: GenerationMode, limit: usize, file_name: &str) {
     println!("benchmarking {} Natural.mod_power_of_2_ref(u32)", gm.name());
     benchmark_1(BenchmarkOptions1 {
-        xs: select_inputs(gm),
+        xs: pairs_of_natural_and_small_u32(gm),
         function_f: &(|(n, u): (Natural, u32)| n.mod_power_of_2_ref(u)),
         x_cons: &(|p| p.clone()),
         x_param: &(|&(_, index)| index as usize),
@@ -149,7 +124,7 @@ pub fn benchmark_natural_neg_mod_power_of_2_assign(
         gm.name()
     );
     benchmark_1(BenchmarkOptions1 {
-        xs: select_inputs(gm),
+        xs: pairs_of_natural_and_small_u32(gm),
         function_f: &(|(mut n, u): (Natural, u32)| n.neg_mod_power_of_2_assign(u)),
         x_cons: &(|p| p.clone()),
         x_param: &(|&(_, index)| index as usize),
@@ -165,7 +140,7 @@ pub fn benchmark_natural_neg_mod_power_of_2_assign(
 pub fn benchmark_natural_neg_mod_power_of_2(gm: GenerationMode, limit: usize, file_name: &str) {
     println!("benchmarking {} Natural.neg_mod_power_of_2(u32)", gm.name());
     benchmark_1(BenchmarkOptions1 {
-        xs: select_inputs(gm),
+        xs: pairs_of_natural_and_small_u32(gm),
         function_f: &(|(n, u): (Natural, u32)| n.neg_mod_power_of_2(u)),
         x_cons: &(|p| p.clone()),
         x_param: &(|&(_, index)| index as usize),
@@ -184,7 +159,7 @@ pub fn benchmark_natural_neg_mod_power_of_2_ref(gm: GenerationMode, limit: usize
         gm.name()
     );
     benchmark_1(BenchmarkOptions1 {
-        xs: select_inputs(gm),
+        xs: pairs_of_natural_and_small_u32(gm),
         function_f: &(|(n, u): (Natural, u32)| n.neg_mod_power_of_2_ref(u)),
         x_cons: &(|p| p.clone()),
         x_param: &(|&(_, index)| index as usize),

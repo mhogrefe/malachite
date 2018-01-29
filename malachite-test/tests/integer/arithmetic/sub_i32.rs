@@ -3,13 +3,11 @@ use malachite_base::traits::Zero;
 use malachite_nz::integer::Integer;
 use malachite_test::common::{bigint_to_integer, integer_to_bigint, integer_to_rugint_integer,
                              rugint_integer_to_integer, GenerationMode};
-use malachite_test::integer::arithmetic::sub_i32::{num_sub_i32, select_inputs_1};
+use malachite_test::inputs::base::signeds;
+use malachite_test::inputs::integer::{integers, pairs_of_integer_and_signed};
+use malachite_test::integer::arithmetic::sub_i32::num_sub_i32;
 use num::BigInt;
 use rugint;
-use rust_wheels::iterators::common::EXAMPLE_SEED;
-use rust_wheels::iterators::general::random_x;
-use rust_wheels::iterators::integers::{exhaustive_integers, random_integers};
-use rust_wheels::iterators::primitive_ints::exhaustive_i;
 use std::str::FromStr;
 
 #[test]
@@ -151,27 +149,27 @@ fn sub_i32_properties() {
         assert_eq!(i - Integer::ZERO, i);
     };
 
-    for (n, i) in select_inputs_1(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
+    for (n, i) in pairs_of_integer_and_signed(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         integer_and_i32(n, i);
     }
 
-    for (n, i) in select_inputs_1(GenerationMode::Random(32)).take(LARGE_LIMIT) {
+    for (n, i) in pairs_of_integer_and_signed(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         integer_and_i32(n, i);
     }
 
-    for n in exhaustive_integers().take(LARGE_LIMIT) {
+    for n in integers(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         one_integer(n);
     }
 
-    for n in random_integers(&EXAMPLE_SEED, 32).take(LARGE_LIMIT) {
+    for n in integers(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         one_integer(n);
     }
 
-    for n in exhaustive_i().take(LARGE_LIMIT) {
+    for n in signeds(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         one_i32(n);
     }
 
-    for n in random_x(&EXAMPLE_SEED).take(LARGE_LIMIT) {
+    for n in signeds(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         one_i32(n);
     }
 }

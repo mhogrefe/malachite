@@ -1,7 +1,7 @@
 use common::LARGE_LIMIT;
 use malachite_nz::integer::Integer;
 use malachite_test::common::GenerationMode;
-use malachite_test::integer::arithmetic::even_odd::select_inputs;
+use malachite_test::inputs::integer::integers;
 use std::str::FromStr;
 
 #[test]
@@ -58,11 +58,11 @@ fn is_even_properties() {
         assert_eq!((x - 1u32).is_odd(), is_even);
     };
 
-    for n in select_inputs(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
+    for n in integers(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         one_integer(n);
     }
 
-    for n in select_inputs(GenerationMode::Random(32)).take(LARGE_LIMIT) {
+    for n in integers(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         one_integer(n);
     }
 }
@@ -81,11 +81,11 @@ fn is_odd_properties() {
         assert_eq!((x - 1u32).is_even(), is_odd);
     };
 
-    for n in select_inputs(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
+    for n in integers(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         one_integer(n);
     }
 
-    for n in select_inputs(GenerationMode::Random(32)).take(LARGE_LIMIT) {
+    for n in integers(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         one_integer(n);
     }
 }

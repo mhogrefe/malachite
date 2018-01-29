@@ -1,8 +1,9 @@
 use common::LARGE_LIMIT;
 use malachite_base::num::{BitAccess, PrimitiveInteger, PrimitiveSigned, PrimitiveUnsigned};
 use malachite_base::traits::NegativeOne;
-use malachite_test::base::num::flip_bit::{select_inputs_i, select_inputs_u};
 use malachite_test::common::GenerationMode;
+use malachite_test::inputs::base::{pairs_of_signed_and_u64_width_range,
+                                   pairs_of_unsigned_and_u64_width_range};
 
 fn flip_bit_helper_unsigned<T: PrimitiveInteger>() {
     let test = |n, index, out| {
@@ -100,11 +101,15 @@ fn flip_bit_properties_helper_unsigned<T: 'static + PrimitiveUnsigned>() {
         assert_eq!(n, old_n);
     };
 
-    for (n, index) in select_inputs_u(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
+    for (n, index) in
+        pairs_of_unsigned_and_u64_width_range(GenerationMode::Exhaustive).take(LARGE_LIMIT)
+    {
         unsigned_and_u64(n, index);
     }
 
-    for (n, index) in select_inputs_u(GenerationMode::Random(32)).take(LARGE_LIMIT) {
+    for (n, index) in
+        pairs_of_unsigned_and_u64_width_range(GenerationMode::Random(32)).take(LARGE_LIMIT)
+    {
         unsigned_and_u64(n, index);
     }
 }
@@ -112,7 +117,7 @@ fn flip_bit_properties_helper_unsigned<T: 'static + PrimitiveUnsigned>() {
 fn flip_bit_properties_helper_signed<T: 'static + PrimitiveSigned>() {
     // Flipping a bit once always changes a number.
     // Flipping the same bit twice leaves a number unchanged.
-    let unsigned_and_u64 = |mut n: T, index: u64| {
+    let signed_and_u64 = |mut n: T, index: u64| {
         let old_n = n;
         n.flip_bit(index);
         assert_ne!(n, old_n);
@@ -121,12 +126,16 @@ fn flip_bit_properties_helper_signed<T: 'static + PrimitiveSigned>() {
         assert_eq!(n, old_n);
     };
 
-    for (n, index) in select_inputs_i(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        unsigned_and_u64(n, index);
+    for (n, index) in
+        pairs_of_signed_and_u64_width_range(GenerationMode::Exhaustive).take(LARGE_LIMIT)
+    {
+        signed_and_u64(n, index);
     }
 
-    for (n, index) in select_inputs_i(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        unsigned_and_u64(n, index);
+    for (n, index) in
+        pairs_of_signed_and_u64_width_range(GenerationMode::Random(32)).take(LARGE_LIMIT)
+    {
+        signed_and_u64(n, index);
     }
 }
 

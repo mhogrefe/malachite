@@ -1,7 +1,7 @@
 use common::LARGE_LIMIT;
 use malachite_base::round::RoundingMode;
 use malachite_test::common::GenerationMode;
-use malachite_test::base::rounding_mode::clone::{select_inputs_1, select_inputs_2};
+use malachite_test::inputs::base::{pairs_of_rounding_modes, rounding_modes};
 
 #[test]
 #[allow(unknown_lints, clone_on_copy)]
@@ -42,19 +42,19 @@ fn clone_and_clone_from_properties() {
         assert_eq!(x, y);
     };
 
-    for n in select_inputs_1(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
+    for n in rounding_modes(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         one_rounding_mode(n);
     }
 
-    for n in select_inputs_1(GenerationMode::Random(32)).take(LARGE_LIMIT) {
+    for n in rounding_modes(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         one_rounding_mode(n);
     }
 
-    for (x, y) in select_inputs_2(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
+    for (x, y) in pairs_of_rounding_modes(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         two_rounding_modes(x, y);
     }
 
-    for (x, y) in select_inputs_2(GenerationMode::Random(32)).take(LARGE_LIMIT) {
+    for (x, y) in pairs_of_rounding_modes(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         two_rounding_modes(x, y);
     }
 }

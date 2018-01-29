@@ -3,7 +3,7 @@ use malachite_base::traits::NegAssign;
 use malachite_nz::integer::Integer;
 use malachite_test::common::{bigint_to_integer, integer_to_bigint, integer_to_rugint_integer,
                              rugint_integer_to_integer, GenerationMode};
-use malachite_test::integer::arithmetic::neg::select_inputs;
+use malachite_test::inputs::integer::integers;
 use num::BigInt;
 use rugint;
 use std::str::FromStr;
@@ -66,11 +66,11 @@ fn neg_properties() {
         assert_eq!(-&neg, x);
     };
 
-    for n in select_inputs(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
+    for n in integers(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         one_integer(n);
     }
 
-    for n in select_inputs(GenerationMode::Random(32)).take(LARGE_LIMIT) {
+    for n in integers(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         one_integer(n);
     }
 }

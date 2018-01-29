@@ -1,7 +1,7 @@
 use common::LARGE_LIMIT;
 use malachite_nz::natural::Natural;
 use malachite_test::common::{natural_to_rugint_integer, rugint_integer_to_integer, GenerationMode};
-use malachite_test::natural::logic::not::select_inputs;
+use malachite_test::inputs::natural::naturals;
 use rugint;
 use std::str::FromStr;
 
@@ -55,11 +55,11 @@ fn not_properties() {
         assert_eq!(!&not, x);
     };
 
-    for n in select_inputs(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
+    for n in naturals(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         one_natural(n);
     }
 
-    for n in select_inputs(GenerationMode::Random(32)).take(LARGE_LIMIT) {
+    for n in naturals(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         one_natural(n);
     }
 }

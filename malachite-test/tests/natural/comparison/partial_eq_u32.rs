@@ -1,7 +1,8 @@
 use common::LARGE_LIMIT;
 use malachite_nz::natural::Natural;
 use malachite_test::common::{natural_to_biguint, natural_to_rugint_integer, GenerationMode};
-use malachite_test::natural::comparison::partial_eq_u32::{num_partial_eq_u32, select_inputs_1};
+use malachite_test::inputs::natural::pairs_of_natural_and_unsigned;
+use malachite_test::natural::comparison::partial_eq_u32::num_partial_eq_u32;
 use num::BigUint;
 use rugint;
 use std::str::FromStr;
@@ -43,11 +44,11 @@ fn partial_eq_u32_properties() {
         assert_eq!(Natural::from(u) == n, eq_2);
     };
 
-    for (n, u) in select_inputs_1(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
+    for (n, u) in pairs_of_natural_and_unsigned(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         natural_and_u32(n, u);
     }
 
-    for (n, u) in select_inputs_1(GenerationMode::Random(32)).take(LARGE_LIMIT) {
+    for (n, u) in pairs_of_natural_and_unsigned(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         natural_and_u32(n, u);
     }
 }

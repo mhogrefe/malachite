@@ -1,7 +1,7 @@
 use common::LARGE_LIMIT;
 use malachite_nz::natural::Natural;
 use malachite_test::common::GenerationMode;
-use malachite_test::natural::logic::trailing_zeros::select_inputs;
+use malachite_test::inputs::natural::naturals;
 use std::str::FromStr;
 use std::u32;
 
@@ -37,11 +37,11 @@ fn trailing_zeros_properties() {
         }
     };
 
-    for n in select_inputs(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
+    for n in naturals(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         one_natural(n);
     }
 
-    for n in select_inputs(GenerationMode::Random(32)).take(LARGE_LIMIT) {
+    for n in naturals(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         one_natural(n);
     }
 }

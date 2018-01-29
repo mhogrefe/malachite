@@ -1,7 +1,7 @@
 use common::LARGE_LIMIT;
 use malachite_nz::integer::Integer;
 use malachite_test::common::GenerationMode;
-use malachite_test::integer::logic::twos_complement_limbs::select_inputs;
+use malachite_test::inputs::integer::integers;
 use std::cmp::Ordering;
 use std::str::FromStr;
 use std::u32;
@@ -113,11 +113,11 @@ fn twos_complement_limbs_le_properties() {
         }
     };
 
-    for n in select_inputs(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
+    for n in integers(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         one_integer(n);
     }
 
-    for n in select_inputs(GenerationMode::Random(32)).take(LARGE_LIMIT) {
+    for n in integers(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         one_integer(n);
     }
 }
@@ -155,11 +155,11 @@ fn limbs_be_properties() {
         }
     };
 
-    for n in select_inputs(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
+    for n in integers(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         one_integer(n);
     }
 
-    for n in select_inputs(GenerationMode::Random(32)).take(LARGE_LIMIT) {
+    for n in integers(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         one_integer(n);
     }
 }

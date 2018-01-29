@@ -2,9 +2,7 @@ use common::LARGE_LIMIT;
 use malachite_base::num::SignificantBits;
 use malachite_nz::integer::Integer;
 use malachite_test::common::GenerationMode;
-use malachite_test::integer::conversion::to_u64::select_inputs;
-use rust_wheels::iterators::common::EXAMPLE_SEED;
-use rust_wheels::iterators::integers::{exhaustive_integers, random_integers};
+use malachite_test::inputs::integer::integers;
 use std::cmp::Ordering;
 use std::{u32, u64};
 use std::str::FromStr;
@@ -64,11 +62,11 @@ fn to_u64_properties() {
         }
     };
 
-    for n in exhaustive_integers().take(LARGE_LIMIT) {
+    for n in integers(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         one_integer(n);
     }
 
-    for n in random_integers(&EXAMPLE_SEED, 32).take(LARGE_LIMIT) {
+    for n in integers(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         one_integer(n);
     }
 }
@@ -82,11 +80,11 @@ fn to_u64_wrapping_properties() {
         assert_eq!(result.wrapping_add((-&x).to_u64_wrapping()), 0);
     };
 
-    for n in select_inputs(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
+    for n in integers(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         one_integer(n);
     }
 
-    for n in select_inputs(GenerationMode::Random(32)).take(LARGE_LIMIT) {
+    for n in integers(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         one_integer(n);
     }
 }

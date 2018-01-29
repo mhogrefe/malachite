@@ -3,7 +3,7 @@ use malachite_base::num::SignificantBits;
 use malachite_base::traits::One;
 use malachite_nz::natural::Natural;
 use malachite_test::common::{natural_to_biguint, natural_to_rugint_integer, GenerationMode};
-use malachite_test::natural::logic::significant_bits::select_inputs;
+use malachite_test::inputs::natural::naturals;
 use num::BigUint;
 use rugint;
 use std::str::FromStr;
@@ -48,11 +48,11 @@ fn significant_bits_properties() {
         }
     };
 
-    for n in select_inputs(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
+    for n in naturals(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         one_natural(n);
     }
 
-    for n in select_inputs(GenerationMode::Random(32)).take(LARGE_LIMIT) {
+    for n in naturals(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         one_natural(n);
     }
 }

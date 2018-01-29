@@ -2,7 +2,7 @@ use common::LARGE_LIMIT;
 use malachite_base::num::BitAccess;
 use malachite_nz::integer::Integer;
 use malachite_test::common::{integer_to_rugint_integer, rugint_integer_to_integer, GenerationMode};
-use malachite_test::integer::logic::assign_bit::select_inputs;
+use malachite_test::inputs::integer::triples_of_integer_small_u64_and_bool;
 use rugint;
 use std::str::FromStr;
 
@@ -55,11 +55,15 @@ fn assign_bit_properties() {
         assert_eq!(rugint_integer_to_integer(&rugint_n), n);
     };
 
-    for (n, index, bit) in select_inputs(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
+    for (n, index, bit) in
+        triples_of_integer_small_u64_and_bool(GenerationMode::Exhaustive).take(LARGE_LIMIT)
+    {
         integer_u64_and_bool(n, index, bit);
     }
 
-    for (n, index, bit) in select_inputs(GenerationMode::Random(32)).take(LARGE_LIMIT) {
+    for (n, index, bit) in
+        triples_of_integer_small_u64_and_bool(GenerationMode::Random(32)).take(LARGE_LIMIT)
+    {
         integer_u64_and_bool(n, index, bit);
     }
 }

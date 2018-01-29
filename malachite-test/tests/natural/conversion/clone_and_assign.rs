@@ -3,7 +3,7 @@ use malachite_base::traits::Assign;
 use malachite_nz::natural::Natural;
 use malachite_test::common::{biguint_to_natural, natural_to_biguint, natural_to_rugint_integer,
                              rugint_integer_to_natural, GenerationMode};
-use malachite_test::natural::conversion::clone_and_assign::{select_inputs_1, select_inputs_2};
+use malachite_test::inputs::natural::{naturals, pairs_of_naturals};
 use num::BigUint;
 use rugint;
 use rugint::Assign as rugint_assign;
@@ -127,19 +127,19 @@ fn clone_clone_from_and_assign_properties() {
         assert_eq!(rugint_integer_to_natural(&rugint_x), y);
     };
 
-    for n in select_inputs_1(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
+    for n in naturals(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         one_natural(n);
     }
 
-    for n in select_inputs_1(GenerationMode::Random(32)).take(LARGE_LIMIT) {
+    for n in naturals(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         one_natural(n);
     }
 
-    for (x, y) in select_inputs_2(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
+    for (x, y) in pairs_of_naturals(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         two_naturals(x, y);
     }
 
-    for (x, y) in select_inputs_2(GenerationMode::Random(32)).take(LARGE_LIMIT) {
+    for (x, y) in pairs_of_naturals(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         two_naturals(x, y);
     }
 }

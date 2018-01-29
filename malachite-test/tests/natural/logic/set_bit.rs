@@ -3,7 +3,8 @@ use malachite_base::num::BitAccess;
 use malachite_nz::natural::Natural;
 use malachite_test::common::{biguint_to_natural, natural_to_biguint, natural_to_rugint_integer,
                              rugint_integer_to_natural, GenerationMode};
-use malachite_test::natural::logic::set_bit::{num_set_bit, select_inputs};
+use malachite_test::inputs::natural::pairs_of_natural_and_small_u64;
+use malachite_test::natural::logic::set_bit::num_set_bit;
 use num::BigUint;
 use rugint;
 use std::str::FromStr;
@@ -67,11 +68,11 @@ fn set_bit_properties() {
         }
     };
 
-    for (n, index) in select_inputs(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
+    for (n, index) in pairs_of_natural_and_small_u64(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         natural_and_u64(n, index);
     }
 
-    for (n, index) in select_inputs(GenerationMode::Random(32)).take(LARGE_LIMIT) {
+    for (n, index) in pairs_of_natural_and_small_u64(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         natural_and_u64(n, index);
     }
 }

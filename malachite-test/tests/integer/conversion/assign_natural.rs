@@ -4,7 +4,7 @@ use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_test::common::{integer_to_rugint_integer, natural_to_rugint_integer,
                              rugint_integer_to_integer, GenerationMode};
-use malachite_test::integer::conversion::assign_natural::select_inputs;
+use malachite_test::inputs::integer::pairs_of_integer_and_natural;
 use rugint;
 use rugint::Assign as rugint_assign;
 use std::str::FromStr;
@@ -66,11 +66,11 @@ fn assign_natural_properties() {
         assert_eq!(rugint_integer_to_integer(&rugint_x), y);
     };
 
-    for (x, y) in select_inputs(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
+    for (x, y) in pairs_of_integer_and_natural(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         integer_and_natural(x, y);
     }
 
-    for (x, y) in select_inputs(GenerationMode::Random(32)).take(LARGE_LIMIT) {
+    for (x, y) in pairs_of_integer_and_natural(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         integer_and_natural(x, y);
     }
 }

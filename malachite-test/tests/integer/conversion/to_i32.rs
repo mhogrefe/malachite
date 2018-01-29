@@ -1,10 +1,8 @@
 use common::LARGE_LIMIT;
 use malachite_nz::integer::Integer;
 use malachite_test::common::{integer_to_rugint_integer, GenerationMode};
-use malachite_test::integer::conversion::to_i32::select_inputs;
+use malachite_test::inputs::integer::integers;
 use rugint;
-use rust_wheels::iterators::common::EXAMPLE_SEED;
-use rust_wheels::iterators::integers::{exhaustive_integers, random_integers};
 use std::i32;
 use std::str::FromStr;
 
@@ -59,11 +57,11 @@ fn to_i32_properties() {
         }
     };
 
-    for n in exhaustive_integers().take(LARGE_LIMIT) {
+    for n in integers(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         one_integer(n);
     }
 
-    for n in random_integers(&EXAMPLE_SEED, 32).take(LARGE_LIMIT) {
+    for n in integers(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         one_integer(n);
     }
 }
@@ -79,11 +77,11 @@ fn to_i32_wrapping_properties() {
         assert_eq!(-result, (-&x).to_i32_wrapping());
     };
 
-    for n in select_inputs(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
+    for n in integers(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         one_integer(n);
     }
 
-    for n in select_inputs(GenerationMode::Random(32)).take(LARGE_LIMIT) {
+    for n in integers(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         one_integer(n);
     }
 }

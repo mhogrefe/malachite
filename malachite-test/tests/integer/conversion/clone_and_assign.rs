@@ -3,7 +3,7 @@ use malachite_base::traits::Assign;
 use malachite_nz::integer::Integer;
 use malachite_test::common::{bigint_to_integer, integer_to_bigint, integer_to_rugint_integer,
                              rugint_integer_to_integer, GenerationMode};
-use malachite_test::integer::conversion::clone_and_assign::{select_inputs_1, select_inputs_2};
+use malachite_test::inputs::integer::{integers, pairs_of_integers};
 use num::BigInt;
 use rugint;
 use rugint::Assign as rugint_assign;
@@ -127,19 +127,19 @@ fn clone_clone_from_and_assign_properties() {
         assert_eq!(rugint_integer_to_integer(&rugint_x), y);
     };
 
-    for n in select_inputs_1(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
+    for n in integers(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         one_integer(n);
     }
 
-    for n in select_inputs_1(GenerationMode::Random(32)).take(LARGE_LIMIT) {
+    for n in integers(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         one_integer(n);
     }
 
-    for (x, y) in select_inputs_2(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
+    for (x, y) in pairs_of_integers(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         two_integers(x, y);
     }
 
-    for (x, y) in select_inputs_2(GenerationMode::Random(32)).take(LARGE_LIMIT) {
+    for (x, y) in pairs_of_integers(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         two_integers(x, y);
     }
 }

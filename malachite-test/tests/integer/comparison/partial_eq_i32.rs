@@ -1,7 +1,8 @@
 use common::LARGE_LIMIT;
 use malachite_nz::integer::Integer;
 use malachite_test::common::{integer_to_bigint, integer_to_rugint_integer, GenerationMode};
-use malachite_test::integer::comparison::partial_eq_i32::{num_partial_eq_i32, select_inputs_1};
+use malachite_test::inputs::integer::pairs_of_integer_and_signed;
+use malachite_test::integer::comparison::partial_eq_i32::num_partial_eq_i32;
 use num::BigInt;
 use rugint;
 use std::str::FromStr;
@@ -47,11 +48,11 @@ fn partial_eq_i32_properties() {
         assert_eq!(Integer::from(i) == n, eq_2);
     };
 
-    for (n, i) in select_inputs_1(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
+    for (n, i) in pairs_of_integer_and_signed(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         integer_and_i32(n, i);
     }
 
-    for (n, i) in select_inputs_1(GenerationMode::Random(32)).take(LARGE_LIMIT) {
+    for (n, i) in pairs_of_integer_and_signed(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         integer_and_i32(n, i);
     }
 }

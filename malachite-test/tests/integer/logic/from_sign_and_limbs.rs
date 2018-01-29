@@ -1,7 +1,7 @@
 use common::LARGE_LIMIT;
 use malachite_nz::integer::Integer;
 use malachite_test::common::GenerationMode;
-use malachite_test::integer::logic::from_sign_and_limbs::select_inputs;
+use malachite_test::inputs::base::pairs_of_ordering_and_vec_of_unsigned_var_1;
 use std::cmp::Ordering;
 
 #[test]
@@ -137,7 +137,7 @@ fn from_sign_and_limbs_le_properties() {
         );
     };
 
-    for (sign, limbs) in select_inputs(GenerationMode::Exhaustive)
+    for (sign, limbs) in pairs_of_ordering_and_vec_of_unsigned_var_1(GenerationMode::Exhaustive)
         .filter(|&(sign, ref limbs)| {
             limbs.iter().all(|&limb| limb == 0) == (sign == Ordering::Equal)
         })
@@ -146,7 +146,9 @@ fn from_sign_and_limbs_le_properties() {
         ordering_and_u32_slice(sign, &limbs);
     }
 
-    for (sign, limbs) in select_inputs(GenerationMode::Random(32)).take(LARGE_LIMIT) {
+    for (sign, limbs) in
+        pairs_of_ordering_and_vec_of_unsigned_var_1(GenerationMode::Random(32)).take(LARGE_LIMIT)
+    {
         ordering_and_u32_slice(sign, &limbs);
     }
 }
@@ -178,11 +180,15 @@ fn from_sign_and_limbs_be_properties() {
         );
     };
 
-    for (sign, limbs) in select_inputs(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
+    for (sign, limbs) in
+        pairs_of_ordering_and_vec_of_unsigned_var_1(GenerationMode::Exhaustive).take(LARGE_LIMIT)
+    {
         ordering_and_u32_slice(sign, &limbs);
     }
 
-    for (sign, limbs) in select_inputs(GenerationMode::Random(32)).take(LARGE_LIMIT) {
+    for (sign, limbs) in
+        pairs_of_ordering_and_vec_of_unsigned_var_1(GenerationMode::Random(32)).take(LARGE_LIMIT)
+    {
         ordering_and_u32_slice(sign, &limbs);
     }
 }

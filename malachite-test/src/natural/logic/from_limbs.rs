@@ -1,30 +1,10 @@
 use common::GenerationMode;
+use inputs::base::vecs_of_unsigned;
 use malachite_nz::natural::Natural;
 use rust_wheels::benchmarks::{BenchmarkOptions1, benchmark_1};
-use rust_wheels::iterators::common::EXAMPLE_SEED;
-use rust_wheels::iterators::general::random_x;
-use rust_wheels::iterators::primitive_ints::exhaustive_u;
-use rust_wheels::iterators::vecs::{exhaustive_vecs, random_vecs};
-
-type It = Iterator<Item = Vec<u32>>;
-
-pub fn exhaustive_inputs() -> Box<It> {
-    Box::new(exhaustive_vecs(exhaustive_u()))
-}
-
-pub fn random_inputs(scale: u32) -> Box<It> {
-    Box::new(random_vecs(&EXAMPLE_SEED, scale, &(|seed| random_x(seed))))
-}
-
-pub fn select_inputs(gm: GenerationMode) -> Box<It> {
-    match gm {
-        GenerationMode::Exhaustive => exhaustive_inputs(),
-        GenerationMode::Random(scale) => random_inputs(scale),
-    }
-}
 
 pub fn demo_natural_from_limbs_le(gm: GenerationMode, limit: usize) {
-    for xs in select_inputs(gm).take(limit) {
+    for xs in vecs_of_unsigned(gm).take(limit) {
         println!(
             "from_limbs_le({:?}) = {:?}",
             xs,
@@ -34,7 +14,7 @@ pub fn demo_natural_from_limbs_le(gm: GenerationMode, limit: usize) {
 }
 
 pub fn demo_natural_from_limbs_be(gm: GenerationMode, limit: usize) {
-    for xs in select_inputs(gm).take(limit) {
+    for xs in vecs_of_unsigned(gm).take(limit) {
         println!(
             "from_limbs_be({:?}) = {:?}",
             xs,
@@ -46,7 +26,7 @@ pub fn demo_natural_from_limbs_be(gm: GenerationMode, limit: usize) {
 pub fn benchmark_natural_from_limbs_le(gm: GenerationMode, limit: usize, file_name: &str) {
     println!("benchmarking {} Natural::from_limbs_le(&[u32])", gm.name());
     benchmark_1(BenchmarkOptions1 {
-        xs: select_inputs(gm),
+        xs: vecs_of_unsigned(gm),
         function_f: &(|xs: Vec<u32>| Natural::from_limbs_le(xs.as_slice())),
         x_cons: &(|xs| xs.clone()),
         x_param: &(|xs| xs.len()),
@@ -62,7 +42,7 @@ pub fn benchmark_natural_from_limbs_le(gm: GenerationMode, limit: usize, file_na
 pub fn benchmark_natural_from_limbs_be(gm: GenerationMode, limit: usize, file_name: &str) {
     println!("benchmarking {} Natural::from_limbs_be(&[u32])", gm.name());
     benchmark_1(BenchmarkOptions1 {
-        xs: select_inputs(gm),
+        xs: vecs_of_unsigned(gm),
         function_f: &(|xs: Vec<u32>| Natural::from_limbs_be(xs.as_slice())),
         x_cons: &(|xs| xs.clone()),
         x_param: &(|xs| xs.len()),

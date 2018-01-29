@@ -1,64 +1,11 @@
 use common::{integer_to_rugint_integer, natural_to_rugint_integer, GenerationMode};
+use inputs::integer::{pairs_of_integer_and_natural, pairs_of_natural_and_integer};
 use malachite_base::num::SignificantBits;
-use malachite_nz::integer::Integer;
-use malachite_nz::natural::Natural;
 use rust_wheels::benchmarks::{BenchmarkOptions2, benchmark_2};
-use rust_wheels::iterators::common::EXAMPLE_SEED;
-use rust_wheels::iterators::integers::{exhaustive_integers, random_integers};
-use rust_wheels::iterators::naturals::{exhaustive_naturals, random_naturals};
-use rust_wheels::iterators::tuples::{exhaustive_pairs, random_pairs};
 use std::cmp::max;
 
-type It1 = Iterator<Item = (Integer, Natural)>;
-
-pub fn exhaustive_inputs_1() -> Box<It1> {
-    Box::new(exhaustive_pairs(
-        exhaustive_integers(),
-        exhaustive_naturals(),
-    ))
-}
-
-pub fn random_inputs_1(scale: u32) -> Box<It1> {
-    Box::new(random_pairs(
-        &EXAMPLE_SEED,
-        &(|seed| random_integers(seed, scale)),
-        &(|seed| random_naturals(seed, scale)),
-    ))
-}
-
-pub fn select_inputs_1(gm: GenerationMode) -> Box<It1> {
-    match gm {
-        GenerationMode::Exhaustive => exhaustive_inputs_1(),
-        GenerationMode::Random(scale) => random_inputs_1(scale),
-    }
-}
-
-type It2 = Iterator<Item = (Natural, Integer)>;
-
-pub fn exhaustive_inputs_2() -> Box<It2> {
-    Box::new(exhaustive_pairs(
-        exhaustive_naturals(),
-        exhaustive_integers(),
-    ))
-}
-
-pub fn random_inputs_2(scale: u32) -> Box<It2> {
-    Box::new(random_pairs(
-        &EXAMPLE_SEED,
-        &(|seed| random_naturals(seed, scale)),
-        &(|seed| random_integers(seed, scale)),
-    ))
-}
-
-pub fn select_inputs_2(gm: GenerationMode) -> Box<It2> {
-    match gm {
-        GenerationMode::Exhaustive => exhaustive_inputs_2(),
-        GenerationMode::Random(scale) => random_inputs_2(scale),
-    }
-}
-
 pub fn demo_integer_partial_eq_natural(gm: GenerationMode, limit: usize) {
-    for (x, y) in select_inputs_1(gm).take(limit) {
+    for (x, y) in pairs_of_integer_and_natural(gm).take(limit) {
         if x == y {
             println!("{} = {}", x, y);
         } else {
@@ -68,7 +15,7 @@ pub fn demo_integer_partial_eq_natural(gm: GenerationMode, limit: usize) {
 }
 
 pub fn demo_natural_partial_eq_integer(gm: GenerationMode, limit: usize) {
-    for (x, y) in select_inputs_2(gm).take(limit) {
+    for (x, y) in pairs_of_natural_and_integer(gm).take(limit) {
         if x == y {
             println!("{} = {}", x, y);
         } else {
@@ -80,7 +27,7 @@ pub fn demo_natural_partial_eq_integer(gm: GenerationMode, limit: usize) {
 pub fn benchmark_integer_partial_eq_natural(gm: GenerationMode, limit: usize, file_name: &str) {
     println!("benchmarking {} Integer == Natural", gm.name());
     benchmark_2(BenchmarkOptions2 {
-        xs: select_inputs_1(gm),
+        xs: pairs_of_integer_and_natural(gm),
         function_f: &(|(x, y)| x == y),
         function_g: &(|(x, y)| x == y),
         x_cons: &(|p| p.clone()),
@@ -99,7 +46,7 @@ pub fn benchmark_integer_partial_eq_natural(gm: GenerationMode, limit: usize, fi
 pub fn benchmark_natural_partial_eq_integer(gm: GenerationMode, limit: usize, file_name: &str) {
     println!("benchmarking {} Natural == Integer", gm.name());
     benchmark_2(BenchmarkOptions2 {
-        xs: select_inputs_2(gm),
+        xs: pairs_of_natural_and_integer(gm),
         function_f: &(|(x, y)| x == y),
         function_g: &(|(x, y)| x == y),
         x_cons: &(|p| p.clone()),

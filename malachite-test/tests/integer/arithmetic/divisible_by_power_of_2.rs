@@ -2,11 +2,8 @@ use common::LARGE_LIMIT;
 use malachite_base::traits::Zero;
 use malachite_nz::integer::Integer;
 use malachite_test::common::GenerationMode;
-use malachite_test::integer::arithmetic::divisible_by_power_of_2::select_inputs;
-use rust_wheels::iterators::common::EXAMPLE_SEED;
-use rust_wheels::iterators::general::random_x;
-use rust_wheels::iterators::integers::{exhaustive_integers, random_integers};
-use rust_wheels::iterators::primitive_ints::exhaustive_u;
+use malachite_test::inputs::base::unsigneds;
+use malachite_test::inputs::integer::{integers, pairs_of_integer_and_small_u32};
 use std::str::FromStr;
 
 #[test]
@@ -78,27 +75,27 @@ fn divisible_by_power_of_2_properties() {
         assert!(Integer::ZERO.divisible_by_power_of_2(pow));
     };
 
-    for (x, pow) in select_inputs(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
+    for (x, pow) in pairs_of_integer_and_small_u32(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         integer_and_u32(x, pow);
     }
 
-    for (x, pow) in select_inputs(GenerationMode::Random(32)).take(LARGE_LIMIT) {
+    for (x, pow) in pairs_of_integer_and_small_u32(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         integer_and_u32(x, pow);
     }
 
-    for n in exhaustive_integers().take(LARGE_LIMIT) {
+    for n in integers(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         one_integer(n);
     }
 
-    for n in random_integers(&EXAMPLE_SEED, 32).take(LARGE_LIMIT) {
+    for n in integers(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         one_integer(n);
     }
 
-    for n in exhaustive_u().take(LARGE_LIMIT) {
+    for n in unsigneds(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         one_u32(n);
     }
 
-    for n in random_x(&EXAMPLE_SEED).take(LARGE_LIMIT) {
+    for n in unsigneds(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         one_u32(n);
     }
 }

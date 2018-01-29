@@ -1,8 +1,9 @@
 use common::LARGE_LIMIT;
 use malachite_base::num::{BitAccess, PrimitiveInteger, PrimitiveSigned, PrimitiveUnsigned};
 use malachite_base::traits::NegativeOne;
-use malachite_test::base::num::assign_bit::{select_inputs_i, select_inputs_u};
 use malachite_test::common::GenerationMode;
+use malachite_test::inputs::base::{triples_of_signed_u64_width_range_and_bool_var_1,
+                                   triples_of_unsigned_u64_width_range_and_bool_var_1};
 
 fn assign_bit_helper_unsigned<T: PrimitiveInteger>() {
     let test = |n, index, bit, out| {
@@ -111,11 +112,17 @@ fn assign_bit_properties_helper_unsigned<T: 'static + PrimitiveUnsigned>() {
         n.assign_bit(index, bit);
     };
 
-    for (n, index, bit) in select_inputs_u(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
+    for (n, index, bit) in triples_of_unsigned_u64_width_range_and_bool_var_1(
+        GenerationMode::Exhaustive,
+    ).take(LARGE_LIMIT)
+    {
         unsigned_u64_and_bool(n, index, bit);
     }
 
-    for (n, index, bit) in select_inputs_u(GenerationMode::Random(32)).take(LARGE_LIMIT) {
+    for (n, index, bit) in triples_of_unsigned_u64_width_range_and_bool_var_1(
+        GenerationMode::Random(32),
+    ).take(LARGE_LIMIT)
+    {
         unsigned_u64_and_bool(n, index, bit);
     }
 }
@@ -125,11 +132,17 @@ fn assign_bit_properties_helper_signed<T: 'static + PrimitiveSigned>() {
         n.assign_bit(index, bit);
     };
 
-    for (n, index, bit) in select_inputs_i(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
+    for (n, index, bit) in triples_of_signed_u64_width_range_and_bool_var_1(
+        GenerationMode::Exhaustive,
+    ).take(LARGE_LIMIT)
+    {
         signed_u64_and_bool(n, index, bit);
     }
 
-    for (n, index, bit) in select_inputs_i(GenerationMode::Random(32)).take(LARGE_LIMIT) {
+    for (n, index, bit) in triples_of_signed_u64_width_range_and_bool_var_1(
+        GenerationMode::Random(32),
+    ).take(LARGE_LIMIT)
+    {
         signed_u64_and_bool(n, index, bit);
     }
 }

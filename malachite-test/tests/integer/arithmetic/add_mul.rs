@@ -2,10 +2,7 @@ use common::LARGE_LIMIT;
 use malachite_base::traits::{AddMul, AddMulAssign, NegativeOne, One, Zero};
 use malachite_nz::integer::Integer;
 use malachite_test::common::GenerationMode;
-use malachite_test::integer::arithmetic::add_mul::select_inputs;
-use rust_wheels::iterators::common::EXAMPLE_SEED;
-use rust_wheels::iterators::integers::{exhaustive_integers, random_integers};
-use rust_wheels::iterators::tuples::{exhaustive_pairs_from_single, random_pairs_from_single};
+use malachite_test::inputs::integer::{integers, pairs_of_integers, triples_of_integers};
 use std::str::FromStr;
 
 #[test]
@@ -363,27 +360,27 @@ fn add_mul_properties() {
         assert_eq!((a * b).add_mul(a, -b), 0);
     };
 
-    for (a, b, c) in select_inputs(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
+    for (a, b, c) in triples_of_integers(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         three_integers(a, b, c);
     }
 
-    for (a, b, c) in select_inputs(GenerationMode::Random(32)).take(LARGE_LIMIT) {
+    for (a, b, c) in triples_of_integers(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         three_integers(a, b, c);
     }
 
-    for n in exhaustive_integers().take(LARGE_LIMIT) {
+    for n in integers(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         single_integer(&n);
     }
 
-    for n in random_integers(&EXAMPLE_SEED, 32).take(LARGE_LIMIT) {
+    for n in integers(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         single_integer(&n);
     }
 
-    for (a, b) in exhaustive_pairs_from_single(exhaustive_integers()).take(LARGE_LIMIT) {
+    for (a, b) in pairs_of_integers(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         two_integers(&a, &b);
     }
 
-    for (a, b) in random_pairs_from_single(random_integers(&EXAMPLE_SEED, 32)).take(LARGE_LIMIT) {
+    for (a, b) in pairs_of_integers(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         two_integers(&a, &b);
     }
 }

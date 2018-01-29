@@ -5,6 +5,13 @@ extern crate rugint;
 extern crate rust_wheels;
 
 pub mod common;
+pub mod hash;
+pub mod inputs {
+    pub mod base;
+    pub mod common;
+    pub mod integer;
+    pub mod natural;
+}
 pub mod base {
     pub mod num {
         pub mod assign_bit;

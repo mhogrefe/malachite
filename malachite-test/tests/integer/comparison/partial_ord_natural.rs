@@ -2,11 +2,9 @@ use common::LARGE_LIMIT;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_test::common::{integer_to_rugint_integer, natural_to_rugint_integer, GenerationMode};
-use malachite_test::integer::comparison::partial_ord_natural::select_inputs_2;
-use rust_wheels::iterators::common::EXAMPLE_SEED;
-use rust_wheels::iterators::integers::{exhaustive_integers, random_integers};
-use rust_wheels::iterators::naturals::{exhaustive_naturals, random_naturals};
-use rust_wheels::iterators::tuples::{exhaustive_triples, random_triples};
+use malachite_test::inputs::integer::{pairs_of_natural_and_integer,
+                                      triples_of_integer_natural_and_integer,
+                                      triples_of_natural_integer_and_natural};
 use std::cmp::Ordering;
 use std::str::FromStr;
 
@@ -82,48 +80,34 @@ fn partial_cmp_integer_natural_properties() {
         }
     };
 
-    for (x, y) in select_inputs_2(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
+    for (x, y) in pairs_of_natural_and_integer(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         natural_and_integer(x, y);
     }
 
-    for (x, y) in select_inputs_2(GenerationMode::Random(32)).take(LARGE_LIMIT) {
+    for (x, y) in pairs_of_natural_and_integer(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         natural_and_integer(x, y);
     }
 
-    for (x, y, z) in exhaustive_triples(
-        exhaustive_naturals(),
-        exhaustive_integers(),
-        exhaustive_naturals(),
-    ).take(LARGE_LIMIT)
+    for (x, y, z) in
+        triples_of_natural_integer_and_natural(GenerationMode::Exhaustive).take(LARGE_LIMIT)
     {
         natural_integer_and_natural(x, y, z);
     }
 
-    for (x, y, z) in random_triples(
-        &EXAMPLE_SEED,
-        &(|seed| random_naturals(seed, 32)),
-        &(|seed| random_integers(seed, 32)),
-        &(|seed| random_naturals(seed, 32)),
-    ).take(LARGE_LIMIT)
+    for (x, y, z) in
+        triples_of_natural_integer_and_natural(GenerationMode::Random(32)).take(LARGE_LIMIT)
     {
         natural_integer_and_natural(x, y, z);
     }
 
-    for (x, y, z) in exhaustive_triples(
-        exhaustive_integers(),
-        exhaustive_naturals(),
-        exhaustive_integers(),
-    ).take(LARGE_LIMIT)
+    for (x, y, z) in
+        triples_of_integer_natural_and_integer(GenerationMode::Exhaustive).take(LARGE_LIMIT)
     {
         integer_natural_and_integer(x, y, z);
     }
 
-    for (x, y, z) in random_triples(
-        &EXAMPLE_SEED,
-        &(|seed| random_integers(seed, 32)),
-        &(|seed| random_naturals(seed, 32)),
-        &(|seed| random_integers(seed, 32)),
-    ).take(LARGE_LIMIT)
+    for (x, y, z) in
+        triples_of_integer_natural_and_integer(GenerationMode::Random(32)).take(LARGE_LIMIT)
     {
         integer_natural_and_integer(x, y, z);
     }

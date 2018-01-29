@@ -3,13 +3,11 @@ use malachite_base::traits::Zero;
 use malachite_nz::natural::Natural;
 use malachite_test::common::{biguint_to_natural, natural_to_biguint, natural_to_rugint_integer,
                              rugint_integer_to_natural, GenerationMode};
-use malachite_test::natural::arithmetic::sub_u32::{num_sub_u32, rugint_sub_u32, select_inputs_2};
+use malachite_test::inputs::base::unsigneds;
+use malachite_test::inputs::natural::{naturals, pairs_of_natural_and_unsigned};
+use malachite_test::natural::arithmetic::sub_u32::{num_sub_u32, rugint_sub_u32};
 use num::BigUint;
 use rugint;
-use rust_wheels::iterators::common::EXAMPLE_SEED;
-use rust_wheels::iterators::general::random_x;
-use rust_wheels::iterators::naturals::{exhaustive_naturals, random_naturals};
-use rust_wheels::iterators::primitive_ints::exhaustive_u;
 use std::str::FromStr;
 use std::u32;
 
@@ -162,27 +160,27 @@ fn sub_u32_properties() {
         }
     };
 
-    for (n, u) in select_inputs_2(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
+    for (n, u) in pairs_of_natural_and_unsigned(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         natural_and_u32(n, u);
     }
 
-    for (n, u) in select_inputs_2(GenerationMode::Random(32)).take(LARGE_LIMIT) {
+    for (n, u) in pairs_of_natural_and_unsigned(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         natural_and_u32(n, u);
     }
 
-    for n in exhaustive_naturals().take(LARGE_LIMIT) {
+    for n in naturals(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         one_natural(n);
     }
 
-    for n in random_naturals(&EXAMPLE_SEED, 32).take(LARGE_LIMIT) {
+    for n in naturals(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         one_natural(n);
     }
 
-    for n in exhaustive_u().take(LARGE_LIMIT) {
+    for n in unsigneds(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         one_u32(n);
     }
 
-    for n in random_x(&EXAMPLE_SEED).take(LARGE_LIMIT) {
+    for n in unsigneds(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         one_u32(n);
     }
 }

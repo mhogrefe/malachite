@@ -2,7 +2,7 @@ use common::LARGE_LIMIT;
 use malachite_base::num::BitAccess;
 use malachite_nz::integer::Integer;
 use malachite_test::common::{integer_to_rugint_integer, rugint_integer_to_integer, GenerationMode};
-use malachite_test::integer::logic::flip_bit::select_inputs;
+use malachite_test::inputs::integer::pairs_of_integer_and_small_u64;
 use rugint;
 use std::str::FromStr;
 
@@ -49,11 +49,11 @@ fn flip_bit_properties() {
         assert_eq!(n, old_n);
     };
 
-    for (n, index) in select_inputs(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
+    for (n, index) in pairs_of_integer_and_small_u64(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         integer_and_u64(n, index);
     }
 
-    for (n, index) in select_inputs(GenerationMode::Random(32)).take(LARGE_LIMIT) {
+    for (n, index) in pairs_of_integer_and_small_u64(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         integer_and_u64(n, index);
     }
 }

@@ -3,7 +3,8 @@ use malachite_base::traits::Assign;
 use malachite_nz::natural::Natural;
 use malachite_test::common::{biguint_to_natural, natural_to_biguint, natural_to_rugint_integer,
                              rugint_integer_to_natural, GenerationMode};
-use malachite_test::natural::conversion::assign_u32::{select_inputs, num_assign_u32};
+use malachite_test::inputs::natural::pairs_of_natural_and_unsigned;
+use malachite_test::natural::conversion::assign_u32::num_assign_u32;
 use num::BigUint;
 use rugint;
 use rugint::Assign as rugint_assign;
@@ -55,11 +56,11 @@ fn assign_u32_properties() {
         assert_eq!(rugint_integer_to_natural(&rugint_n), u);
     };
 
-    for (n, u) in select_inputs(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
+    for (n, u) in pairs_of_natural_and_unsigned(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         natural_and_u32(n, u);
     }
 
-    for (n, u) in select_inputs(GenerationMode::Random(32)).take(LARGE_LIMIT) {
+    for (n, u) in pairs_of_natural_and_unsigned(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         natural_and_u32(n, u);
     }
 }

@@ -2,7 +2,7 @@ use common::LARGE_LIMIT;
 use malachite_base::traits::Assign;
 use malachite_nz::integer::Integer;
 use malachite_test::common::GenerationMode;
-use malachite_test::integer::conversion::assign_i64::select_inputs;
+use malachite_test::inputs::integer::pairs_of_integer_and_signed;
 use std::{i32, i64};
 use std::str::FromStr;
 
@@ -37,11 +37,11 @@ fn assign_i64_properties() {
         assert_eq!(alt_n, n);
     };
 
-    for (n, i) in select_inputs(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
+    for (n, i) in pairs_of_integer_and_signed(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         integer_and_i64(n, i);
     }
 
-    for (n, i) in select_inputs(GenerationMode::Random(32)).take(LARGE_LIMIT) {
+    for (n, i) in pairs_of_integer_and_signed(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         integer_and_i64(n, i);
     }
 }

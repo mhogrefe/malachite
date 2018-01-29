@@ -3,13 +3,10 @@ use malachite_base::traits::{One, Zero};
 use malachite_nz::integer::Integer;
 use malachite_test::common::{bigint_to_integer, integer_to_bigint, integer_to_rugint_integer,
                              rugint_integer_to_integer, GenerationMode};
-use malachite_test::integer::arithmetic::shl_u32::select_inputs;
+use malachite_test::inputs::base::small_u32s;
+use malachite_test::inputs::integer::{integers, pairs_of_integer_and_small_u32};
 use num::BigInt;
 use rugint;
-use rust_wheels::iterators::common::EXAMPLE_SEED;
-use rust_wheels::iterators::integers_geometric::natural_u32s_geometric;
-use rust_wheels::iterators::integers::{exhaustive_integers, random_integers};
-use rust_wheels::iterators::primitive_ints::exhaustive_u;
 use std::i32;
 use std::str::FromStr;
 
@@ -148,27 +145,27 @@ fn shl_u32_properties() {
         assert!((Integer::ONE << u).into_natural().unwrap().is_power_of_2());
     };
 
-    for (n, u) in select_inputs(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
+    for (n, u) in pairs_of_integer_and_small_u32(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         integer_and_u32(n, u);
     }
 
-    for (n, u) in select_inputs(GenerationMode::Random(32)).take(LARGE_LIMIT) {
+    for (n, u) in pairs_of_integer_and_small_u32(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         integer_and_u32(n, u);
     }
 
-    for n in exhaustive_integers().take(LARGE_LIMIT) {
+    for n in integers(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         one_integer(n);
     }
 
-    for n in random_integers(&EXAMPLE_SEED, 32).take(LARGE_LIMIT) {
+    for n in integers(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         one_integer(n);
     }
 
-    for n in exhaustive_u().take(LARGE_LIMIT) {
+    for n in small_u32s(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         one_u32(n);
     }
 
-    for n in natural_u32s_geometric(&EXAMPLE_SEED, 32).take(LARGE_LIMIT) {
+    for n in small_u32s(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         one_u32(n);
     }
 }

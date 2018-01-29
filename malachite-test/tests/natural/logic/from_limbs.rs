@@ -1,7 +1,7 @@
 use common::LARGE_LIMIT;
 use malachite_nz::natural::Natural;
 use malachite_test::common::GenerationMode;
-use malachite_test::natural::logic::from_limbs::select_inputs;
+use malachite_test::inputs::base::vecs_of_unsigned;
 
 #[test]
 fn test_from_limbs_le() {
@@ -67,11 +67,11 @@ fn from_limbs_le_properties() {
         }
     };
 
-    for xs in select_inputs(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
+    for xs in vecs_of_unsigned(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         u32_slice(&xs);
     }
 
-    for xs in select_inputs(GenerationMode::Random(32)).take(LARGE_LIMIT) {
+    for xs in vecs_of_unsigned(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         u32_slice(&xs);
     }
 }
@@ -100,11 +100,11 @@ fn from_limbs_be_properties() {
         }
     };
 
-    for xs in select_inputs(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
+    for xs in vecs_of_unsigned(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         u32_slice(&xs);
     }
 
-    for xs in select_inputs(GenerationMode::Random(32)).take(LARGE_LIMIT) {
+    for xs in vecs_of_unsigned(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         u32_slice(&xs);
     }
 }

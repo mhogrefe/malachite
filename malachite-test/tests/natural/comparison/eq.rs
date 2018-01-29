@@ -1,12 +1,9 @@
 use common::{test_eq_helper, LARGE_LIMIT};
 use malachite_nz::natural::Natural;
 use malachite_test::common::{natural_to_biguint, natural_to_rugint_integer, GenerationMode};
-use malachite_test::natural::comparison::eq::select_inputs;
+use malachite_test::inputs::natural::{naturals, pairs_of_naturals, triples_of_naturals};
 use num::BigUint;
 use rugint;
-use rust_wheels::iterators::common::EXAMPLE_SEED;
-use rust_wheels::iterators::naturals::{exhaustive_naturals, random_naturals};
-use rust_wheels::iterators::tuples::{exhaustive_triples_from_single, random_triples_from_single};
 
 #[test]
 fn test_eq() {
@@ -42,29 +39,27 @@ fn eq_properties() {
         }
     };
 
-    for (x, y) in select_inputs(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
+    for (x, y) in pairs_of_naturals(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         two_naturals(x, y);
     }
 
-    for (x, y) in select_inputs(GenerationMode::Random(32)).take(LARGE_LIMIT) {
+    for (x, y) in pairs_of_naturals(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         two_naturals(x, y);
     }
 
-    for n in exhaustive_naturals().take(LARGE_LIMIT) {
+    for n in naturals(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         one_natural(n);
     }
 
-    for n in random_naturals(&EXAMPLE_SEED, 32).take(LARGE_LIMIT) {
+    for n in naturals(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         one_natural(n);
     }
 
-    for (x, y, z) in exhaustive_triples_from_single(exhaustive_naturals()).take(LARGE_LIMIT) {
+    for (x, y, z) in triples_of_naturals(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         three_naturals(x, y, z);
     }
 
-    for (x, y, z) in
-        random_triples_from_single(random_naturals(&EXAMPLE_SEED, 32)).take(LARGE_LIMIT)
-    {
+    for (x, y, z) in triples_of_naturals(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         three_naturals(x, y, z);
     }
 }

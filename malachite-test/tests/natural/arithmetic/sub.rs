@@ -3,11 +3,10 @@ use malachite_base::traits::Zero;
 use malachite_nz::natural::Natural;
 use malachite_test::common::{biguint_to_natural, natural_to_biguint, natural_to_rugint_integer,
                              rugint_integer_to_natural, GenerationMode};
-use malachite_test::natural::arithmetic::sub::{num_sub, rugint_sub, select_inputs_2};
+use malachite_test::inputs::natural::{naturals, pairs_of_naturals};
+use malachite_test::natural::arithmetic::sub::checked_sub;
 use num::BigUint;
 use rugint;
-use rust_wheels::iterators::common::EXAMPLE_SEED;
-use rust_wheels::iterators::naturals::{exhaustive_naturals, random_naturals};
 use std::str::FromStr;
 
 #[test]
@@ -50,11 +49,11 @@ fn test_sub_natural() {
         assert_eq!(format!("{:?}", on), out);
         assert!(on.map_or(true, |n| n.is_valid()));
 
-        let on = num_sub(BigUint::from_str(u).unwrap(), BigUint::from_str(v).unwrap())
+        let on = checked_sub(BigUint::from_str(u).unwrap(), BigUint::from_str(v).unwrap())
             .map(|x| biguint_to_natural(&x));
         assert_eq!(format!("{:?}", on), out);
 
-        let on = rugint_sub(
+        let on = checked_sub(
             rugint::Integer::from_str(u).unwrap(),
             rugint::Integer::from_str(v).unwrap(),
         );
@@ -126,12 +125,15 @@ fn sub_properties() {
 
         let num_x2 = natural_to_biguint(&old_x);
         let num_y = natural_to_biguint(&y);
-        assert_eq!(num_sub(num_x2, num_y).map(|x| biguint_to_natural(&x)), ox);
+        assert_eq!(
+            checked_sub(num_x2, num_y).map(|x| biguint_to_natural(&x)),
+            ox
+        );
 
         let rugint_x2 = natural_to_rugint_integer(&old_x);
         let rugint_y = natural_to_rugint_integer(&y);
         assert_eq!(
-            rugint_sub(rugint_x2, rugint_y).map(|x| rugint_integer_to_natural(&x)),
+            checked_sub(rugint_x2, rugint_y).map(|x| rugint_integer_to_natural(&x)),
             ox
         );
 
@@ -153,19 +155,19 @@ fn sub_properties() {
         }
     };
 
-    for (x, y) in select_inputs_2(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
+    for (x, y) in pairs_of_naturals(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         two_naturals(x, y);
     }
 
-    for (x, y) in select_inputs_2(GenerationMode::Random(32)).take(LARGE_LIMIT) {
+    for (x, y) in pairs_of_naturals(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         two_naturals(x, y);
     }
 
-    for n in exhaustive_naturals().take(LARGE_LIMIT) {
+    for n in naturals(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         one_natural(n);
     }
 
-    for n in random_naturals(&EXAMPLE_SEED, 32).take(LARGE_LIMIT) {
+    for n in naturals(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         one_natural(n);
     }
 }

@@ -3,7 +3,8 @@ use malachite_base::traits::Assign;
 use malachite_nz::integer::Integer;
 use malachite_test::common::{bigint_to_integer, integer_to_bigint, integer_to_rugint_integer,
                              rugint_integer_to_integer, GenerationMode};
-use malachite_test::integer::conversion::assign_i32::{select_inputs, num_assign_i32};
+use malachite_test::inputs::integer::pairs_of_integer_and_signed;
+use malachite_test::integer::conversion::assign_i32::num_assign_i32;
 use num::BigInt;
 use rugint;
 use rugint::Assign as rugint_assign;
@@ -56,11 +57,11 @@ fn assign_i32_properties() {
         assert_eq!(rugint_integer_to_integer(&rugint_n), i);
     };
 
-    for (n, i) in select_inputs(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
+    for (n, i) in pairs_of_integer_and_signed(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         integer_and_i32(n, i);
     }
 
-    for (n, i) in select_inputs(GenerationMode::Random(32)).take(LARGE_LIMIT) {
+    for (n, i) in pairs_of_integer_and_signed(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         integer_and_i32(n, i);
     }
 }

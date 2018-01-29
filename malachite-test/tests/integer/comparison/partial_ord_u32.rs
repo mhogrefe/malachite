@@ -1,14 +1,12 @@
 use common::LARGE_LIMIT;
 use malachite_nz::integer::Integer;
 use malachite_test::common::{integer_to_bigint, integer_to_rugint_integer, GenerationMode};
-use malachite_test::integer::comparison::partial_ord_u32::{num_partial_cmp_u32, select_inputs_1};
+use malachite_test::inputs::integer::{pairs_of_integer_and_unsigned,
+                                      triples_of_integer_unsigned_and_integer,
+                                      triples_of_unsigned_integer_and_unsigned};
+use malachite_test::integer::comparison::partial_ord_u32::num_partial_cmp_u32;
 use num::BigInt;
 use rugint;
-use rust_wheels::iterators::common::EXAMPLE_SEED;
-use rust_wheels::iterators::general::random_x;
-use rust_wheels::iterators::integers::{exhaustive_integers, random_integers};
-use rust_wheels::iterators::primitive_ints::exhaustive_u;
-use rust_wheels::iterators::tuples::{exhaustive_triples, random_triples};
 use std::cmp::Ordering;
 use std::str::FromStr;
 
@@ -81,48 +79,34 @@ fn partial_cmp_u32_properties() {
         }
     };
 
-    for (n, u) in select_inputs_1(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
+    for (n, u) in pairs_of_integer_and_unsigned(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         integer_and_u32(n, u);
     }
 
-    for (n, u) in select_inputs_1(GenerationMode::Random(32)).take(LARGE_LIMIT) {
+    for (n, u) in pairs_of_integer_and_unsigned(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         integer_and_u32(n, u);
     }
 
-    for (n, u, m) in exhaustive_triples(
-        exhaustive_integers(),
-        exhaustive_u::<u32>(),
-        exhaustive_integers(),
-    ).take(LARGE_LIMIT)
+    for (n, u, m) in
+        triples_of_integer_unsigned_and_integer(GenerationMode::Exhaustive).take(LARGE_LIMIT)
     {
         integer_u32_and_integer(n, u, m);
     }
 
-    for (n, u, m) in random_triples(
-        &EXAMPLE_SEED,
-        &(|seed| random_integers(seed, 32)),
-        &(|seed| random_x::<u32>(seed)),
-        &(|seed| random_integers(seed, 32)),
-    ).take(LARGE_LIMIT)
+    for (n, u, m) in
+        triples_of_integer_unsigned_and_integer(GenerationMode::Random(32)).take(LARGE_LIMIT)
     {
         integer_u32_and_integer(n, u, m);
     }
 
-    for (u, n, v) in exhaustive_triples(
-        exhaustive_u::<u32>(),
-        exhaustive_integers(),
-        exhaustive_u::<u32>(),
-    ).take(LARGE_LIMIT)
+    for (u, n, v) in
+        triples_of_unsigned_integer_and_unsigned(GenerationMode::Exhaustive).take(LARGE_LIMIT)
     {
         u32_integer_and_u32(u, n, v);
     }
 
-    for (u, n, v) in random_triples(
-        &EXAMPLE_SEED,
-        &(|seed| random_x::<u32>(seed)),
-        &(|seed| random_integers(seed, 32)),
-        &(|seed| random_x::<u32>(seed)),
-    ).take(LARGE_LIMIT)
+    for (u, n, v) in
+        triples_of_unsigned_integer_and_unsigned(GenerationMode::Random(32)).take(LARGE_LIMIT)
     {
         u32_integer_and_u32(u, n, v);
     }

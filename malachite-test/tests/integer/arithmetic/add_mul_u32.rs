@@ -2,13 +2,8 @@ use common::LARGE_LIMIT;
 use malachite_base::traits::{AddMul, AddMulAssign, NegativeOne, One, Zero};
 use malachite_nz::integer::Integer;
 use malachite_test::common::GenerationMode;
-use malachite_test::integer::arithmetic::add_mul_u32::select_inputs;
-use rust_wheels::iterators::common::EXAMPLE_SEED;
-use rust_wheels::iterators::general::random_x;
-use rust_wheels::iterators::integers::{exhaustive_integers, random_integers};
-use rust_wheels::iterators::primitive_ints::exhaustive_u;
-use rust_wheels::iterators::tuples::{exhaustive_pairs, exhaustive_pairs_from_single, random_pairs,
-                                     random_pairs_from_single};
+use malachite_test::inputs::integer::{integers, pairs_of_integer_and_unsigned, pairs_of_integers,
+                                      triples_of_integer_integer_and_unsigned};
 use std::str::FromStr;
 
 #[test]
@@ -157,40 +152,39 @@ fn add_mul_u32_properties() {
         assert_eq!(a.add_mul(b, 1), a + b);
     };
 
-    for (a, b, c) in select_inputs(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        integer_integer_and_u32(a, b, c);
-    }
-
-    for (a, b, c) in select_inputs(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        integer_integer_and_u32(a, b, c);
-    }
-
-    for n in exhaustive_integers().take(LARGE_LIMIT) {
-        single_integer(&n);
-    }
-
-    for n in random_integers(&EXAMPLE_SEED, 32).take(LARGE_LIMIT) {
-        single_integer(&n);
-    }
-
-    for (n, c) in exhaustive_pairs(exhaustive_integers(), exhaustive_u::<u32>()).take(LARGE_LIMIT) {
-        integer_and_u32(&n, c);
-    }
-
-    for (n, c) in random_pairs(
-        &EXAMPLE_SEED,
-        &(|seed| random_integers(seed, 32)),
-        &(|seed| random_x(seed)),
-    ).take(LARGE_LIMIT)
+    for (a, b, c) in
+        triples_of_integer_integer_and_unsigned(GenerationMode::Exhaustive).take(LARGE_LIMIT)
     {
+        integer_integer_and_u32(a, b, c);
+    }
+
+    for (a, b, c) in
+        triples_of_integer_integer_and_unsigned(GenerationMode::Random(32)).take(LARGE_LIMIT)
+    {
+        integer_integer_and_u32(a, b, c);
+    }
+
+    for n in integers(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
+        single_integer(&n);
+    }
+
+    for n in integers(GenerationMode::Random(32)).take(LARGE_LIMIT) {
+        single_integer(&n);
+    }
+
+    for (n, c) in pairs_of_integer_and_unsigned(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         integer_and_u32(&n, c);
     }
 
-    for (a, b) in exhaustive_pairs_from_single(exhaustive_integers()).take(LARGE_LIMIT) {
+    for (n, c) in pairs_of_integer_and_unsigned(GenerationMode::Random(32)).take(LARGE_LIMIT) {
+        integer_and_u32(&n, c);
+    }
+
+    for (a, b) in pairs_of_integers(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         two_integers(&a, &b);
     }
 
-    for (a, b) in random_pairs_from_single(random_integers(&EXAMPLE_SEED, 32)).take(LARGE_LIMIT) {
+    for (a, b) in pairs_of_integers(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         two_integers(&a, &b);
     }
 }

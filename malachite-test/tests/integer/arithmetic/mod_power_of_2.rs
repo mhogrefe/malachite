@@ -4,13 +4,11 @@ use malachite_base::traits::{One, PartialOrdAbs, ShrRound, Zero};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_test::common::GenerationMode;
-use malachite_test::integer::arithmetic::mod_power_of_2::select_inputs;
-use rust_wheels::iterators::common::EXAMPLE_SEED;
-use rust_wheels::iterators::integers_geometric::natural_u32s_geometric;
-use rust_wheels::iterators::integers::{exhaustive_integers, random_integers};
-use rust_wheels::iterators::primitive_ints::exhaustive_u;
-use rust_wheels::iterators::tuples::{exhaustive_pairs_from_single, log_pairs, random_pairs,
-                                     random_triples};
+use malachite_test::inputs::base::small_u32s;
+use malachite_test::inputs::integer::{integers, pairs_of_integer_and_small_u32,
+                                      pairs_of_integer_and_small_u32_var_1,
+                                      pairs_of_integer_and_small_u32_var_2,
+                                      triples_of_integer_small_u32_and_small_u32};
 use std::cmp::min;
 use std::str::FromStr;
 
@@ -321,84 +319,59 @@ fn mod_power_of_2_properties() {
         assert_eq!(Integer::ZERO.mod_power_of_2(u), 0);
     };
 
-    for (n, u) in select_inputs(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
+    for (n, u) in pairs_of_integer_and_small_u32(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         integer_and_u32(n, u);
     }
 
-    for (n, u) in random_pairs(
-        &EXAMPLE_SEED,
-        &(|seed| random_integers(seed, 32)),
-        &(|seed| natural_u32s_geometric(seed, 32)),
-    ).take(LARGE_LIMIT)
-    {
+    for (n, u) in pairs_of_integer_and_small_u32(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         integer_and_u32(n, u);
     }
 
-    for (n, u) in select_inputs(GenerationMode::Exhaustive)
-        .map(|(n, u)| (n << u, u))
-        .take(LARGE_LIMIT)
+    for (n, u) in pairs_of_integer_and_small_u32_var_1(GenerationMode::Exhaustive).take(LARGE_LIMIT)
     {
         integer_and_u32_divisible(n, u);
     }
 
-    for (n, u) in random_pairs(
-        &EXAMPLE_SEED,
-        &(|seed| random_integers(seed, 32)),
-        &(|seed| natural_u32s_geometric(seed, 32)),
-    ).map(|(n, u)| (n << u, u))
-        .take(LARGE_LIMIT)
+    for (n, u) in pairs_of_integer_and_small_u32_var_1(GenerationMode::Random(32)).take(LARGE_LIMIT)
     {
         integer_and_u32_divisible(n, u);
     }
 
-    for (n, u) in select_inputs(GenerationMode::Exhaustive)
-        .filter(|&(ref n, u)| !n.divisible_by_power_of_2(u))
-        .take(LARGE_LIMIT)
+    for (n, u) in pairs_of_integer_and_small_u32_var_2(GenerationMode::Exhaustive).take(LARGE_LIMIT)
     {
         integer_and_u32_non_divisible(n, u);
     }
 
-    for (n, u) in random_pairs(
-        &EXAMPLE_SEED,
-        &(|seed| random_integers(seed, 32)),
-        &(|seed| natural_u32s_geometric(seed, 32)),
-    ).filter(|&(ref n, u)| !n.divisible_by_power_of_2(u))
-        .take(LARGE_LIMIT)
+    for (n, u) in pairs_of_integer_and_small_u32_var_2(GenerationMode::Random(32)).take(LARGE_LIMIT)
     {
         integer_and_u32_non_divisible(n, u);
     }
 
-    for (n, (u, v)) in log_pairs(
-        exhaustive_integers(),
-        exhaustive_pairs_from_single(exhaustive_u::<u32>()),
-    ).take(LARGE_LIMIT)
+    for (n, u, v) in
+        triples_of_integer_small_u32_and_small_u32(GenerationMode::Exhaustive).take(LARGE_LIMIT)
     {
         integer_and_two_u32s(n, u, v);
     }
 
-    for (n, u, v) in random_triples(
-        &EXAMPLE_SEED,
-        &(|seed| random_integers(seed, 32)),
-        &(|seed| natural_u32s_geometric(seed, 32)),
-        &(|seed| natural_u32s_geometric(seed, 32)),
-    ).take(LARGE_LIMIT)
+    for (n, u, v) in
+        triples_of_integer_small_u32_and_small_u32(GenerationMode::Random(32)).take(LARGE_LIMIT)
     {
         integer_and_two_u32s(n, u, v);
     }
 
-    for n in exhaustive_integers().take(LARGE_LIMIT) {
+    for n in integers(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         one_integer(n);
     }
 
-    for n in random_integers(&EXAMPLE_SEED, 32).take(LARGE_LIMIT) {
+    for n in integers(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         one_integer(n);
     }
 
-    for n in exhaustive_u().take(LARGE_LIMIT) {
+    for n in small_u32s(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         one_u32(n);
     }
 
-    for n in natural_u32s_geometric(&EXAMPLE_SEED, 32).take(LARGE_LIMIT) {
+    for n in small_u32s(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         one_u32(n);
     }
 }
@@ -468,73 +441,59 @@ fn rem_power_of_2_properties() {
         assert_eq!(Integer::ZERO.rem_power_of_2(u), 0);
     };
 
-    for (n, u) in select_inputs(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
+    for (n, u) in pairs_of_integer_and_small_u32(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         integer_and_u32(n, u);
     }
 
-    for (n, u) in select_inputs(GenerationMode::Random(32)).take(LARGE_LIMIT) {
+    for (n, u) in pairs_of_integer_and_small_u32(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         integer_and_u32(n, u);
     }
 
-    for (n, u) in select_inputs(GenerationMode::Exhaustive)
-        .map(|(n, u)| (n << u, u))
-        .take(LARGE_LIMIT)
+    for (n, u) in pairs_of_integer_and_small_u32_var_1(GenerationMode::Exhaustive).take(LARGE_LIMIT)
     {
         integer_and_u32_divisible(n, u);
     }
 
-    for (n, u) in select_inputs(GenerationMode::Random(32))
-        .map(|(n, u)| (n << u, u))
-        .take(LARGE_LIMIT)
+    for (n, u) in pairs_of_integer_and_small_u32_var_1(GenerationMode::Random(32)).take(LARGE_LIMIT)
     {
         integer_and_u32_divisible(n, u);
     }
 
-    for (n, u) in select_inputs(GenerationMode::Exhaustive)
-        .filter(|&(ref n, u)| !n.divisible_by_power_of_2(u))
-        .take(LARGE_LIMIT)
+    for (n, u) in pairs_of_integer_and_small_u32_var_2(GenerationMode::Exhaustive).take(LARGE_LIMIT)
     {
         integer_and_u32_non_divisible(n, u);
     }
 
-    for (n, u) in select_inputs(GenerationMode::Random(32))
-        .filter(|&(ref n, u)| !n.divisible_by_power_of_2(u))
-        .take(LARGE_LIMIT)
+    for (n, u) in pairs_of_integer_and_small_u32_var_2(GenerationMode::Random(32)).take(LARGE_LIMIT)
     {
         integer_and_u32_non_divisible(n, u);
     }
 
-    for (n, (u, v)) in log_pairs(
-        exhaustive_integers(),
-        exhaustive_pairs_from_single(exhaustive_u::<u32>()),
-    ).take(LARGE_LIMIT)
+    for (n, u, v) in
+        triples_of_integer_small_u32_and_small_u32(GenerationMode::Exhaustive).take(LARGE_LIMIT)
     {
         integer_and_two_u32s(n, u, v);
     }
 
-    for (n, u, v) in random_triples(
-        &EXAMPLE_SEED,
-        &(|seed| random_integers(seed, 32)),
-        &(|seed| natural_u32s_geometric(seed, 32)),
-        &(|seed| natural_u32s_geometric(seed, 32)),
-    ).take(LARGE_LIMIT)
+    for (n, u, v) in
+        triples_of_integer_small_u32_and_small_u32(GenerationMode::Random(32)).take(LARGE_LIMIT)
     {
         integer_and_two_u32s(n, u, v);
     }
 
-    for n in exhaustive_integers().take(LARGE_LIMIT) {
+    for n in integers(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         one_integer(n);
     }
 
-    for n in random_integers(&EXAMPLE_SEED, 32).take(LARGE_LIMIT) {
+    for n in integers(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         one_integer(n);
     }
 
-    for n in exhaustive_u().take(LARGE_LIMIT) {
+    for n in small_u32s(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         one_u32(n);
     }
 
-    for n in natural_u32s_geometric(&EXAMPLE_SEED, 32).take(LARGE_LIMIT) {
+    for n in small_u32s(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         one_u32(n);
     }
 }
@@ -593,55 +552,47 @@ fn ceiling_mod_power_of_2_properties() {
         assert_eq!(Integer::ZERO.ceiling_mod_power_of_2(u), 0);
     };
 
-    for (n, u) in select_inputs(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
+    for (n, u) in pairs_of_integer_and_small_u32(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         integer_and_u32(n, u);
     }
 
-    for (n, u) in select_inputs(GenerationMode::Random(32)).take(LARGE_LIMIT) {
+    for (n, u) in pairs_of_integer_and_small_u32(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         integer_and_u32(n, u);
     }
 
-    for (n, u) in select_inputs(GenerationMode::Exhaustive)
-        .map(|(n, u)| (n << u, u))
-        .take(LARGE_LIMIT)
+    for (n, u) in pairs_of_integer_and_small_u32_var_1(GenerationMode::Exhaustive).take(LARGE_LIMIT)
     {
         integer_and_u32_divisible(n, u);
     }
 
-    for (n, u) in select_inputs(GenerationMode::Random(32))
-        .map(|(n, u)| (n << u, u))
-        .take(LARGE_LIMIT)
+    for (n, u) in pairs_of_integer_and_small_u32_var_1(GenerationMode::Random(32)).take(LARGE_LIMIT)
     {
         integer_and_u32_divisible(n, u);
     }
 
-    for (n, u) in select_inputs(GenerationMode::Exhaustive)
-        .filter(|&(ref n, u)| !n.divisible_by_power_of_2(u))
-        .take(LARGE_LIMIT)
+    for (n, u) in pairs_of_integer_and_small_u32_var_2(GenerationMode::Exhaustive).take(LARGE_LIMIT)
     {
         integer_and_u32_non_divisible(n, u);
     }
 
-    for (n, u) in select_inputs(GenerationMode::Random(32))
-        .filter(|&(ref n, u)| !n.divisible_by_power_of_2(u))
-        .take(LARGE_LIMIT)
+    for (n, u) in pairs_of_integer_and_small_u32_var_2(GenerationMode::Random(32)).take(LARGE_LIMIT)
     {
         integer_and_u32_non_divisible(n, u);
     }
 
-    for n in exhaustive_integers().take(LARGE_LIMIT) {
+    for n in integers(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         one_integer(n);
     }
 
-    for n in random_integers(&EXAMPLE_SEED, 32).take(LARGE_LIMIT) {
+    for n in integers(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         one_integer(n);
     }
 
-    for n in exhaustive_u().take(LARGE_LIMIT) {
+    for n in small_u32s(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         one_u32(n);
     }
 
-    for n in natural_u32s_geometric(&EXAMPLE_SEED, 32).take(LARGE_LIMIT) {
+    for n in small_u32s(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         one_u32(n);
     }
 }

@@ -1,7 +1,7 @@
 use common::LARGE_LIMIT;
 use malachite_nz::natural::Natural;
 use malachite_test::common::{biguint_to_natural, GenerationMode};
-use malachite_test::natural::conversion::from_u64::select_inputs;
+use malachite_test::inputs::base::unsigneds;
 use num::BigUint;
 use std::u64;
 
@@ -33,11 +33,11 @@ fn from_u64_properties() {
         assert_eq!(n, num_n);
     };
 
-    for u in select_inputs(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
+    for u in unsigneds(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         one_u64(u);
     }
 
-    for u in select_inputs(GenerationMode::Random(32)).take(LARGE_LIMIT) {
+    for u in unsigneds(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         one_u64(u);
     }
 }

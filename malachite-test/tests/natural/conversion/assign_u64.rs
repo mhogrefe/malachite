@@ -1,8 +1,9 @@
 use common::LARGE_LIMIT;
+use malachite_test::inputs::natural::pairs_of_natural_and_unsigned;
 use malachite_base::traits::Assign;
 use malachite_nz::natural::Natural;
 use malachite_test::common::{biguint_to_natural, natural_to_biguint, GenerationMode};
-use malachite_test::natural::conversion::assign_u64::{select_inputs, num_assign_u64};
+use malachite_test::natural::conversion::assign_u64::num_assign_u64;
 use num::BigUint;
 use std::str::FromStr;
 use std::{u32, u64};
@@ -46,11 +47,11 @@ fn assign_u64_properties() {
         assert_eq!(biguint_to_natural(&num_n), natural_u);
     };
 
-    for (n, u) in select_inputs(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
+    for (n, u) in pairs_of_natural_and_unsigned(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         natural_and_u64(n, u);
     }
 
-    for (n, u) in select_inputs(GenerationMode::Random(32)).take(LARGE_LIMIT) {
+    for (n, u) in pairs_of_natural_and_unsigned(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         natural_and_u64(n, u);
     }
 }

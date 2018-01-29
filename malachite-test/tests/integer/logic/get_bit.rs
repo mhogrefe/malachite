@@ -2,10 +2,8 @@ use common::LARGE_LIMIT;
 use malachite_base::num::{BitAccess, SignificantBits};
 use malachite_nz::integer::Integer;
 use malachite_test::common::{integer_to_rugint_integer, GenerationMode};
-use malachite_test::integer::logic::get_bit::select_inputs;
+use malachite_test::inputs::integer::{natural_integers, pairs_of_integer_and_small_u64};
 use rugint;
-use rust_wheels::iterators::common::EXAMPLE_SEED;
-use rust_wheels::iterators::integers::{exhaustive_natural_integers, random_natural_integers};
 use std::str::FromStr;
 
 #[test]
@@ -67,19 +65,19 @@ fn get_bit_properties() {
         }
     };
 
-    for (n, index) in select_inputs(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
+    for (n, index) in pairs_of_integer_and_small_u64(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         integer_and_u64(n, index);
     }
 
-    for (n, index) in select_inputs(GenerationMode::Random(32)).take(LARGE_LIMIT) {
+    for (n, index) in pairs_of_integer_and_small_u64(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         integer_and_u64(n, index);
     }
 
-    for n in exhaustive_natural_integers().take(LARGE_LIMIT) {
+    for n in natural_integers(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         one_natural_integer(n);
     }
 
-    for n in random_natural_integers(&EXAMPLE_SEED, 32).take(LARGE_LIMIT) {
+    for n in natural_integers(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         one_natural_integer(n);
     }
 }

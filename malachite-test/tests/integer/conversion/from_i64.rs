@@ -1,7 +1,7 @@
 use common::LARGE_LIMIT;
 use malachite_nz::integer::Integer;
 use malachite_test::common::{bigint_to_integer, GenerationMode};
-use malachite_test::integer::conversion::from_i64::select_inputs;
+use malachite_test::inputs::base::signeds;
 use num::BigInt;
 use std::i64;
 
@@ -36,11 +36,11 @@ fn from_i64_properties() {
         assert_eq!(n, num_n);
     };
 
-    for i in select_inputs(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
+    for i in signeds::<i64>(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         one_i64(i);
     }
 
-    for i in select_inputs(GenerationMode::Random(32)).take(LARGE_LIMIT) {
+    for i in signeds::<i64>(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         one_i64(i);
     }
 }

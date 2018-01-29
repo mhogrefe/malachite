@@ -3,10 +3,7 @@ use malachite_base::traits::{One, Zero};
 use malachite_base::traits::{SubMul, SubMulAssign};
 use malachite_nz::natural::Natural;
 use malachite_test::common::GenerationMode;
-use malachite_test::natural::arithmetic::sub_mul::select_inputs_2;
-use rust_wheels::iterators::common::EXAMPLE_SEED;
-use rust_wheels::iterators::naturals::{exhaustive_naturals, random_naturals};
-use rust_wheels::iterators::tuples::{exhaustive_pairs_from_single, random_pairs_from_single};
+use malachite_test::inputs::natural::{pairs_of_naturals, triples_of_naturals};
 use std::str::FromStr;
 
 #[test]
@@ -142,19 +139,19 @@ fn sub_mul_properties() {
         assert_eq!(a.sub_mul(b, &Natural::ONE), a - b);
     };
 
-    for (a, b, c) in select_inputs_2(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
+    for (a, b, c) in triples_of_naturals(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         three_naturals(a, b, c);
     }
 
-    for (a, b, c) in select_inputs_2(GenerationMode::Random(32)).take(LARGE_LIMIT) {
+    for (a, b, c) in triples_of_naturals(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         three_naturals(a, b, c);
     }
 
-    for (a, b) in exhaustive_pairs_from_single(exhaustive_naturals()).take(LARGE_LIMIT) {
+    for (a, b) in pairs_of_naturals(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         two_naturals(&a, &b);
     }
 
-    for (a, b) in random_pairs_from_single(random_naturals(&EXAMPLE_SEED, 32)).take(LARGE_LIMIT) {
+    for (a, b) in pairs_of_naturals(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         two_naturals(&a, &b);
     }
 }

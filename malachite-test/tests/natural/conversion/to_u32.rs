@@ -2,7 +2,7 @@ use common::LARGE_LIMIT;
 use malachite_base::num::SignificantBits;
 use malachite_nz::natural::Natural;
 use malachite_test::common::{natural_to_rugint_integer, GenerationMode};
-use malachite_test::natural::conversion::to_u32::select_inputs;
+use malachite_test::inputs::natural::naturals;
 use rugint;
 use std::str::FromStr;
 use std::u32;
@@ -50,11 +50,11 @@ fn to_u32_properties() {
         }
     };
 
-    for n in select_inputs(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
+    for n in naturals(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         one_natural(n);
     }
 
-    for n in select_inputs(GenerationMode::Random(32)).take(LARGE_LIMIT) {
+    for n in naturals(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         one_natural(n);
     }
 }
@@ -68,11 +68,11 @@ fn to_u32_wrapping_properties() {
         assert_eq!(natural_to_rugint_integer(&x).to_u32_wrapping(), result);
     };
 
-    for n in select_inputs(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
+    for n in naturals(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         one_natural(n);
     }
 
-    for n in select_inputs(GenerationMode::Random(32)).take(LARGE_LIMIT) {
+    for n in naturals(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         one_natural(n);
     }
 }

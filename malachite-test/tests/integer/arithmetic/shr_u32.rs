@@ -4,16 +4,15 @@ use malachite_base::traits::{PartialOrdAbs, ShrRound, ShrRoundAssign, Zero};
 use malachite_nz::integer::Integer;
 use malachite_test::common::{integer_to_rugint_integer, rugint_integer_to_integer, GenerationMode};
 use rugint;
-use malachite_test::integer::arithmetic::shr_u32::{select_inputs_1, select_inputs_2};
-use rust_wheels::iterators::common::EXAMPLE_SEED;
-use rust_wheels::iterators::general::random_x;
-use rust_wheels::iterators::integers_geometric::natural_u32s_geometric;
-use rust_wheels::iterators::integers::{exhaustive_integers, random_integers};
-use rust_wheels::iterators::primitive_ints::{exhaustive_negative_i, exhaustive_positive_x,
-                                             exhaustive_u, random_negative_i, random_positive_i};
-use rust_wheels::iterators::rounding_modes::{exhaustive_rounding_modes, random_rounding_modes};
-use rust_wheels::iterators::tuples::{exhaustive_pairs_from_single, log_pairs,
-                                     log_pairs_from_single, random_pairs, random_triples};
+use malachite_test::inputs::base::{pairs_of_unsigned_and_rounding_mode, unsigneds,
+                                   pairs_of_negative_signed_not_min_and_small_u32s,
+                                   pairs_of_positive_signed_and_small_u32,
+                                   pairs_of_unsigned_and_small_u32};
+use malachite_test::inputs::integer::{integers, pairs_of_integer_and_rounding_mode,
+                                      pairs_of_integer_and_small_u32,
+                                      pairs_of_integer_and_small_u32_var_2,
+                                      triples_of_integer_small_u32_and_rounding_mode_var_1,
+                                      triples_of_integer_small_u32_and_small_u32};
 use std::i32;
 use std::str::FromStr;
 
@@ -187,58 +186,47 @@ fn shr_u32_properties() {
         assert_eq!(Integer::ZERO >> u, 0);
     };
 
-    for (n, u) in select_inputs_1(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
+    for (n, u) in pairs_of_integer_and_small_u32(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         integer_and_u32(n, u);
     }
 
-    for (n, u) in select_inputs_1(GenerationMode::Random(32)).take(LARGE_LIMIT) {
+    for (n, u) in pairs_of_integer_and_small_u32(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         integer_and_u32(n, u);
     }
 
-    for (n, (u, v)) in log_pairs(
-        exhaustive_integers(),
-        exhaustive_pairs_from_single(exhaustive_u::<u32>()),
-    ).take(LARGE_LIMIT)
+    for (n, u, v) in
+        triples_of_integer_small_u32_and_small_u32(GenerationMode::Exhaustive).take(LARGE_LIMIT)
     {
         integer_and_two_u32s(n, u, v);
     }
 
-    for (n, u, v) in random_triples(
-        &EXAMPLE_SEED,
-        &(|seed| random_integers(seed, 32)),
-        &(|seed| natural_u32s_geometric(seed, 32)),
-        &(|seed| natural_u32s_geometric(seed, 32)),
-    ).take(LARGE_LIMIT)
+    for (n, u, v) in
+        triples_of_integer_small_u32_and_small_u32(GenerationMode::Random(32)).take(LARGE_LIMIT)
     {
         integer_and_two_u32s(n, u, v);
     }
 
-    for (n, u) in log_pairs_from_single(exhaustive_u::<u32>()).take(LARGE_LIMIT) {
+    for (n, u) in pairs_of_unsigned_and_small_u32(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         two_u32s(n, u);
     }
 
-    for (n, u) in random_pairs(
-        &EXAMPLE_SEED,
-        &(|seed| random_x(seed)),
-        &(|seed| natural_u32s_geometric(seed, 32)),
-    ).take(LARGE_LIMIT)
-    {
+    for (n, u) in pairs_of_unsigned_and_small_u32(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         two_u32s(n, u);
     }
 
-    for n in exhaustive_integers().take(LARGE_LIMIT) {
+    for n in integers(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         one_integer(n);
     }
 
-    for n in random_integers(&EXAMPLE_SEED, 32).take(LARGE_LIMIT) {
+    for n in integers(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         one_integer(n);
     }
 
-    for n in exhaustive_u().take(LARGE_LIMIT) {
+    for n in unsigneds(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         one_u32(n);
     }
 
-    for n in natural_u32s_geometric(&EXAMPLE_SEED, 32).take(LARGE_LIMIT) {
+    for n in unsigneds(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         one_u32(n);
     }
 }
@@ -1424,97 +1412,78 @@ fn shr_round_u32_properties() {
         assert_eq!(Integer::ZERO.shr_round(u, rm), 0);
     };
 
-    for (n, u) in log_pairs(exhaustive_integers(), exhaustive_u::<u32>()).take(LARGE_LIMIT) {
+    for (n, u) in pairs_of_integer_and_small_u32(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         integer_and_u32(n, u);
     }
 
-    for (n, u) in random_pairs(
-        &EXAMPLE_SEED,
-        &(|seed| random_integers(seed, 32)),
-        &(|seed| natural_u32s_geometric(seed, 32)),
-    ).take(LARGE_LIMIT)
-    {
+    for (n, u) in pairs_of_integer_and_small_u32(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         integer_and_u32(n, u);
     }
 
-    for (n, u) in log_pairs(exhaustive_integers(), exhaustive_u::<u32>())
-        .filter(|&(ref n, u)| !n.divisible_by_power_of_2(u))
-        .take(LARGE_LIMIT)
+    for (n, u) in pairs_of_integer_and_small_u32_var_2(GenerationMode::Exhaustive).take(LARGE_LIMIT)
     {
         integer_and_u32_inexact(n, u);
     }
 
-    for (n, u) in random_pairs(
-        &EXAMPLE_SEED,
-        &(|seed| random_integers(seed, 32)),
-        &(|seed| natural_u32s_geometric(seed, 32)),
-    ).filter(|&(ref n, u)| !n.divisible_by_power_of_2(u))
-        .take(LARGE_LIMIT)
+    for (n, u) in pairs_of_integer_and_small_u32_var_2(GenerationMode::Random(32)).take(LARGE_LIMIT)
     {
         integer_and_u32_inexact(n, u);
     }
 
-    for (n, u, rm) in select_inputs_2(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
+    for (n, u, rm) in triples_of_integer_small_u32_and_rounding_mode_var_1(
+        GenerationMode::Exhaustive,
+    ).take(LARGE_LIMIT)
+    {
         integer_u32_and_rounding_mode(n, u, rm);
     }
 
-    for (n, u, rm) in select_inputs_2(GenerationMode::Random(32)).take(LARGE_LIMIT) {
+    for (n, u, rm) in triples_of_integer_small_u32_and_rounding_mode_var_1(GenerationMode::Random(
+        32,
+    )).take(LARGE_LIMIT)
+    {
         integer_u32_and_rounding_mode(n, u, rm);
     }
 
-    for (n, u) in log_pairs(exhaustive_positive_x::<i32>(), exhaustive_u::<u32>()).take(LARGE_LIMIT)
+    for (n, u) in
+        pairs_of_positive_signed_and_small_u32(GenerationMode::Exhaustive).take(LARGE_LIMIT)
     {
         positive_i32_and_u32(n, u);
     }
 
-    for (n, u) in random_pairs(
-        &EXAMPLE_SEED,
-        &(|seed| random_positive_i(seed)),
-        &(|seed| natural_u32s_geometric(seed, 32)),
-    ).take(LARGE_LIMIT)
+    for (n, u) in
+        pairs_of_positive_signed_and_small_u32(GenerationMode::Random(32)).take(LARGE_LIMIT)
     {
         positive_i32_and_u32(n, u);
     }
 
-    for (n, u) in log_pairs(
-        exhaustive_negative_i::<i32>().filter(|&i| i != i32::MIN),
-        exhaustive_u::<u32>(),
-    ).take(LARGE_LIMIT)
+    for (n, u) in pairs_of_negative_signed_not_min_and_small_u32s(GenerationMode::Exhaustive)
+        .take(LARGE_LIMIT)
     {
         negative_not_min_i32_and_u32(n, u);
     }
 
-    for (n, u) in random_pairs(
-        &EXAMPLE_SEED,
-        &(|seed| random_negative_i(seed).filter(|&i| i != i32::MIN)),
-        &(|seed| natural_u32s_geometric(seed, 32)),
-    ).take(LARGE_LIMIT)
+    for (n, u) in pairs_of_negative_signed_not_min_and_small_u32s(GenerationMode::Random(32))
+        .take(LARGE_LIMIT)
     {
         negative_not_min_i32_and_u32(n, u);
     }
 
-    for (n, rm) in log_pairs(exhaustive_integers(), exhaustive_rounding_modes()).take(LARGE_LIMIT) {
-        integer_and_rounding_mode(n, rm);
-    }
-
-    for (n, rm) in random_pairs(
-        &EXAMPLE_SEED,
-        &(|seed| random_integers(seed, 32)),
-        &(|seed| random_rounding_modes(seed)),
-    ).take(LARGE_LIMIT)
+    for (n, rm) in pairs_of_integer_and_rounding_mode(GenerationMode::Exhaustive).take(LARGE_LIMIT)
     {
         integer_and_rounding_mode(n, rm);
     }
 
-    for (u, rm) in log_pairs(exhaustive_u(), exhaustive_rounding_modes()).take(LARGE_LIMIT) {
+    for (n, rm) in pairs_of_integer_and_rounding_mode(GenerationMode::Random(32)).take(LARGE_LIMIT)
+    {
+        integer_and_rounding_mode(n, rm);
+    }
+
+    for (u, rm) in pairs_of_unsigned_and_rounding_mode(GenerationMode::Exhaustive).take(LARGE_LIMIT)
+    {
         u32_and_rounding_mode(u, rm);
     }
 
-    for (u, rm) in random_pairs(
-        &EXAMPLE_SEED,
-        &(|seed| natural_u32s_geometric(seed, 32)),
-        &(|seed| random_rounding_modes(seed)),
-    ).take(LARGE_LIMIT)
+    for (u, rm) in pairs_of_unsigned_and_rounding_mode(GenerationMode::Random(32)).take(LARGE_LIMIT)
     {
         u32_and_rounding_mode(u, rm);
     }

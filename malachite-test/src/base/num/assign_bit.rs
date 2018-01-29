@@ -1,85 +1,13 @@
 use common::GenerationMode;
-use malachite_base::num::{PrimitiveInteger, PrimitiveSigned, PrimitiveUnsigned};
+use malachite_base::num::{PrimitiveSigned, PrimitiveUnsigned};
+use inputs::base::{triples_of_signed_u64_width_range_and_bool_var_1,
+                   triples_of_unsigned_u64_width_range_and_bool_var_1};
 use rust_wheels::benchmarks::{BenchmarkOptions1, benchmark_1};
-use rust_wheels::iterators::bools::exhaustive_bools;
-use rust_wheels::iterators::common::EXAMPLE_SEED;
-use rust_wheels::iterators::general::random_x;
-use rust_wheels::iterators::integers_geometric::natural_u32s_geometric;
-use rust_wheels::iterators::primitive_ints::{exhaustive_i, exhaustive_u};
-use rust_wheels::iterators::tuples::{lex_pairs, random_triples, sqrt_pairs};
-
-type It<T> = Iterator<Item = (T, u64, bool)>;
-
-pub fn exhaustive_inputs_u<T: 'static + PrimitiveUnsigned>() -> Box<It<T>> {
-    Box::new(
-        lex_pairs(
-            sqrt_pairs(exhaustive_u(), exhaustive_u()),
-            exhaustive_bools(),
-        ).filter(|&((_, index), bit)| !bit || index < u64::from(T::WIDTH))
-            .map(|((n, index), bit)| (n, index, bit)),
-    )
-}
-
-pub fn exhaustive_inputs_i<T: 'static + PrimitiveSigned>() -> Box<It<T>> {
-    Box::new(
-        lex_pairs(
-            sqrt_pairs(exhaustive_i(), exhaustive_u()),
-            exhaustive_bools(),
-        ).filter(|&((n, index), bit)| {
-            if bit {
-                index < u64::from(T::WIDTH) || n < T::ZERO
-            } else {
-                index < u64::from(T::WIDTH) || n >= T::ZERO
-            }
-        })
-            .map(|((n, index), bit)| (n, index, bit)),
-    )
-}
-
-pub fn random_inputs_u<T: 'static + PrimitiveInteger>(scale: u32) -> Box<It<T>> {
-    Box::new(
-        random_triples(
-            &EXAMPLE_SEED,
-            &(|seed| random_x(seed)),
-            &(|seed| natural_u32s_geometric(seed, scale).map(|i| i.into())),
-            &(|seed| random_x(seed)),
-        ).filter(|&(_, index, bit): &(T, u64, bool)| !bit || index < u64::from(T::WIDTH)),
-    )
-}
-
-pub fn random_inputs_i<T: 'static + PrimitiveInteger>(scale: u32) -> Box<It<T>> {
-    Box::new(
-        random_triples(
-            &EXAMPLE_SEED,
-            &(|seed| random_x(seed)),
-            &(|seed| natural_u32s_geometric(seed, scale).map(|i| i.into())),
-            &(|seed| random_x(seed)),
-        ).filter(|&(n, index, bit): &(T, u64, bool)| {
-            if bit {
-                index < u64::from(T::WIDTH) || n < T::ZERO
-            } else {
-                index < u64::from(T::WIDTH) || n >= T::ZERO
-            }
-        }),
-    )
-}
-
-pub fn select_inputs_u<T: 'static + PrimitiveUnsigned>(gm: GenerationMode) -> Box<It<T>> {
-    match gm {
-        GenerationMode::Exhaustive => exhaustive_inputs_u(),
-        GenerationMode::Random(scale) => random_inputs_u(scale),
-    }
-}
-
-pub fn select_inputs_i<T: 'static + PrimitiveSigned>(gm: GenerationMode) -> Box<It<T>> {
-    match gm {
-        GenerationMode::Exhaustive => exhaustive_inputs_i(),
-        GenerationMode::Random(scale) => random_inputs_i(scale),
-    }
-}
 
 fn demo_unsigned_assign_bit<T: 'static + PrimitiveUnsigned>(gm: GenerationMode, limit: usize) {
-    for (mut n, index, bit) in select_inputs_u::<T>(gm).take(limit) {
+    for (mut n, index, bit) in
+        triples_of_unsigned_u64_width_range_and_bool_var_1::<T>(gm).take(limit)
+    {
         let n_old = n;
         n.assign_bit(index, bit);
         println!(
@@ -90,7 +18,8 @@ fn demo_unsigned_assign_bit<T: 'static + PrimitiveUnsigned>(gm: GenerationMode, 
 }
 
 fn demo_signed_assign_bit<T: 'static + PrimitiveSigned>(gm: GenerationMode, limit: usize) {
-    for (mut n, index, bit) in select_inputs_i::<T>(gm).take(limit) {
+    for (mut n, index, bit) in triples_of_signed_u64_width_range_and_bool_var_1::<T>(gm).take(limit)
+    {
         let n_old = n;
         n.assign_bit(index, bit);
         println!(
@@ -107,7 +36,7 @@ fn benchmark_unsigned_assign_bit<T: 'static + PrimitiveUnsigned>(
 ) {
     println!("benchmarking {} {}.assign_bit(u64)", gm.name(), T::NAME);
     benchmark_1(BenchmarkOptions1 {
-        xs: select_inputs_u(gm),
+        xs: triples_of_unsigned_u64_width_range_and_bool_var_1(gm),
         function_f: &(|(mut n, index, bit): (T, u64, bool)| n.assign_bit(index, bit)),
         x_cons: &(|&t| t),
         x_param: &(|&(_, index, _)| index as usize),
@@ -127,7 +56,7 @@ fn benchmark_signed_assign_bit<T: 'static + PrimitiveSigned>(
 ) {
     println!("benchmarking {} {}.assign_bit(u64)", gm.name(), T::NAME);
     benchmark_1(BenchmarkOptions1 {
-        xs: select_inputs_i(gm),
+        xs: triples_of_signed_u64_width_range_and_bool_var_1(gm),
         function_f: &(|(mut n, index, bit): (T, u64, bool)| n.assign_bit(index, bit)),
         x_cons: &(|&t| t),
         x_param: &(|&(_, index, _)| index as usize),

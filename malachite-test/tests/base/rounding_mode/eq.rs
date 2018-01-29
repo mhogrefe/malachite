@@ -1,10 +1,8 @@
 use common::{test_eq_helper, LARGE_LIMIT};
 use malachite_base::round::RoundingMode;
 use malachite_test::common::GenerationMode;
-use malachite_test::base::rounding_mode::eq::select_inputs;
-use rust_wheels::iterators::common::EXAMPLE_SEED;
-use rust_wheels::iterators::rounding_modes::{exhaustive_rounding_modes, random_rounding_modes};
-use rust_wheels::iterators::tuples::{lex_triples, random_triples_from_single};
+use malachite_test::inputs::base::{pairs_of_rounding_modes, rounding_modes,
+                                   triples_of_rounding_modes};
 
 #[test]
 fn test_eq() {
@@ -31,34 +29,27 @@ fn eq_properties() {
         }
     };
 
-    for (x, y) in select_inputs(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
+    for (x, y) in pairs_of_rounding_modes(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         two_rounding_modes(x, y);
     }
 
-    for (x, y) in select_inputs(GenerationMode::Random(32)).take(LARGE_LIMIT) {
+    for (x, y) in pairs_of_rounding_modes(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         two_rounding_modes(x, y);
     }
 
-    for n in exhaustive_rounding_modes().take(LARGE_LIMIT) {
+    for n in rounding_modes(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         one_rounding_mode(n);
     }
 
-    for n in random_rounding_modes(&EXAMPLE_SEED).take(LARGE_LIMIT) {
+    for n in rounding_modes(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         one_rounding_mode(n);
     }
 
-    for (x, y, z) in lex_triples(
-        exhaustive_rounding_modes(),
-        exhaustive_rounding_modes(),
-        exhaustive_rounding_modes(),
-    ).take(LARGE_LIMIT)
-    {
+    for (x, y, z) in triples_of_rounding_modes(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         three_rounding_modes(x, y, z);
     }
 
-    for (x, y, z) in
-        random_triples_from_single(random_rounding_modes(&EXAMPLE_SEED)).take(LARGE_LIMIT)
-    {
+    for (x, y, z) in triples_of_rounding_modes(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         three_rounding_modes(x, y, z);
     }
 }

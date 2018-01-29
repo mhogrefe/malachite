@@ -1,10 +1,8 @@
 use common::LARGE_LIMIT;
 use malachite_base::num::{PrimitiveInteger, PrimitiveSigned, PrimitiveUnsigned};
-use malachite_test::base::num::get_bit::{select_inputs_i, select_inputs_u};
 use malachite_test::common::GenerationMode;
-use rust_wheels::iterators::common::EXAMPLE_SEED;
-use rust_wheels::iterators::general::random_x;
-use rust_wheels::iterators::primitive_ints::exhaustive_u;
+use malachite_test::inputs::base::{unsigneds, pairs_of_signed_and_small_u64,
+                                   pairs_of_unsigned_and_small_u64};
 
 fn get_bit_helper_unsigned<T: PrimitiveInteger>() {
     let test = |n, index, out| {
@@ -81,19 +79,21 @@ fn get_bit_properties_helper_unsigned<T: 'static + PrimitiveUnsigned>() {
         }
     };
 
-    for (n, index) in select_inputs_u(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
+    for (n, index) in pairs_of_unsigned_and_small_u64(GenerationMode::Exhaustive).take(LARGE_LIMIT)
+    {
         unsigned_and_u64(n, index);
     }
 
-    for (n, index) in select_inputs_u(GenerationMode::Random(32)).take(LARGE_LIMIT) {
+    for (n, index) in pairs_of_unsigned_and_small_u64(GenerationMode::Random(32)).take(LARGE_LIMIT)
+    {
         unsigned_and_u64(n, index);
     }
 
-    for n in exhaustive_u().take(LARGE_LIMIT) {
+    for n in unsigneds(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         one_unsigned(n);
     }
 
-    for n in random_x(&EXAMPLE_SEED).take(LARGE_LIMIT) {
+    for n in unsigneds(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         one_unsigned(n);
     }
 }
@@ -110,11 +110,11 @@ fn get_bit_properties_helper_signed<T: 'static + PrimitiveSigned>() {
         }
     };
 
-    for (n, index) in select_inputs_i(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
+    for (n, index) in pairs_of_signed_and_small_u64(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         signed_and_u64(n, index);
     }
 
-    for (n, index) in select_inputs_i(GenerationMode::Random(32)).take(LARGE_LIMIT) {
+    for (n, index) in pairs_of_signed_and_small_u64(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         signed_and_u64(n, index);
     }
 }

@@ -1,30 +1,11 @@
 use common::GenerationMode;
+use inputs::base::unsigneds;
 use malachite_nz::natural::Natural;
 use num::BigUint;
 use rust_wheels::benchmarks::{BenchmarkOptions2, benchmark_2};
-use rust_wheels::iterators::common::EXAMPLE_SEED;
-use rust_wheels::iterators::general::random_x;
-use rust_wheels::iterators::primitive_ints::exhaustive_u;
-
-type It = Iterator<Item = u64>;
-
-pub fn exhaustive_inputs() -> Box<It> {
-    Box::new(exhaustive_u())
-}
-
-pub fn random_inputs() -> Box<It> {
-    Box::new(random_x(&EXAMPLE_SEED))
-}
-
-pub fn select_inputs(gm: GenerationMode) -> Box<It> {
-    match gm {
-        GenerationMode::Exhaustive => exhaustive_inputs(),
-        GenerationMode::Random(_) => random_inputs(),
-    }
-}
 
 pub fn demo_natural_from_u64(gm: GenerationMode, limit: usize) {
-    for u in select_inputs(gm).take(limit) {
+    for u in unsigneds::<u64>(gm).take(limit) {
         println!("from({}) = {}", u, Natural::from(u));
     }
 }
@@ -32,7 +13,7 @@ pub fn demo_natural_from_u64(gm: GenerationMode, limit: usize) {
 pub fn benchmark_natural_from_u64(gm: GenerationMode, limit: usize, file_name: &str) {
     println!("benchmarking {} Natural::from(u64)", gm.name());
     benchmark_2(BenchmarkOptions2 {
-        xs: select_inputs(gm),
+        xs: unsigneds::<u64>(gm),
         function_f: &(|u| Natural::from(u)),
         function_g: &(|u| BigUint::from(u)),
         x_cons: &(|&u| u),

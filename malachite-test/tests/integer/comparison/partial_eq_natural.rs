@@ -2,12 +2,8 @@ use common::LARGE_LIMIT;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_test::common::{integer_to_rugint_integer, natural_to_rugint_integer, GenerationMode};
-use malachite_test::integer::comparison::partial_eq_natural::select_inputs_1;
+use malachite_test::inputs::integer::{pairs_of_integer_and_natural, pairs_of_natural_and_integer};
 use rugint;
-use rust_wheels::iterators::common::EXAMPLE_SEED;
-use rust_wheels::iterators::integers::{exhaustive_integers, random_integers};
-use rust_wheels::iterators::naturals::{exhaustive_naturals, random_naturals};
-use rust_wheels::iterators::tuples::{exhaustive_pairs, random_pairs};
 use std::str::FromStr;
 
 #[test]
@@ -63,24 +59,19 @@ fn partial_eq_natural_properties() {
         assert_eq!(x.into_integer() == y, eq)
     };
 
-    for (x, y) in select_inputs_1(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
+    for (x, y) in pairs_of_integer_and_natural(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         integer_and_natural(x, y);
     }
 
-    for (x, y) in select_inputs_1(GenerationMode::Random(32)).take(LARGE_LIMIT) {
+    for (x, y) in pairs_of_integer_and_natural(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         integer_and_natural(x, y);
     }
 
-    for (x, y) in exhaustive_pairs(exhaustive_naturals(), exhaustive_integers()).take(LARGE_LIMIT) {
+    for (x, y) in pairs_of_natural_and_integer(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         natural_and_integer(x, y);
     }
 
-    for (x, y) in random_pairs(
-        &EXAMPLE_SEED,
-        &(|seed| random_naturals(seed, 32)),
-        &(|seed| random_integers(seed, 32)),
-    ).take(LARGE_LIMIT)
-    {
+    for (x, y) in pairs_of_natural_and_integer(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         natural_and_integer(x, y);
     }
 }

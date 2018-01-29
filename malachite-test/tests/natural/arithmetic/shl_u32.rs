@@ -3,14 +3,11 @@ use malachite_base::traits::{One, Zero};
 use malachite_nz::natural::Natural;
 use malachite_test::common::{biguint_to_natural, natural_to_biguint, natural_to_rugint_integer,
                              rugint_integer_to_natural, GenerationMode};
-use malachite_test::natural::arithmetic::shl_u32::select_inputs;
+use malachite_test::inputs::base::small_u32s;
+use malachite_test::inputs::natural::{naturals, pairs_of_natural_and_small_u32,
+                                      triples_of_natural_small_u32_and_small_u32};
 use num::BigUint;
 use rugint;
-use rust_wheels::iterators::common::EXAMPLE_SEED;
-use rust_wheels::iterators::integers_geometric::natural_u32s_geometric;
-use rust_wheels::iterators::naturals::{exhaustive_naturals, random_naturals};
-use rust_wheels::iterators::primitive_ints::exhaustive_u;
-use rust_wheels::iterators::tuples::{exhaustive_pairs_from_single, log_pairs, random_triples};
 use std::i32;
 use std::str::FromStr;
 
@@ -131,45 +128,39 @@ fn shl_u32_properties() {
         assert!((Natural::ONE << u).is_power_of_2());
     };
 
-    for (n, u) in select_inputs(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
+    for (n, u) in pairs_of_natural_and_small_u32(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         natural_and_u32(n, u);
     }
 
-    for (n, u) in select_inputs(GenerationMode::Random(32)).take(LARGE_LIMIT) {
+    for (n, u) in pairs_of_natural_and_small_u32(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         natural_and_u32(n, u);
     }
 
-    for (n, (u, v)) in log_pairs(
-        exhaustive_naturals(),
-        exhaustive_pairs_from_single(exhaustive_u::<u32>()),
-    ).take(LARGE_LIMIT)
+    for (n, u, v) in
+        triples_of_natural_small_u32_and_small_u32(GenerationMode::Exhaustive).take(LARGE_LIMIT)
     {
         natural_and_two_u32s(n, u, v);
     }
 
-    for (n, u, v) in random_triples(
-        &EXAMPLE_SEED,
-        &(|seed| random_naturals(seed, 32)),
-        &(|seed| natural_u32s_geometric(seed, 32)),
-        &(|seed| natural_u32s_geometric(seed, 32)),
-    ).take(LARGE_LIMIT)
+    for (n, u, v) in
+        triples_of_natural_small_u32_and_small_u32(GenerationMode::Random(32)).take(LARGE_LIMIT)
     {
         natural_and_two_u32s(n, u, v);
     }
 
-    for n in exhaustive_naturals().take(LARGE_LIMIT) {
+    for n in naturals(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         one_natural(n);
     }
 
-    for n in random_naturals(&EXAMPLE_SEED, 32).take(LARGE_LIMIT) {
+    for n in naturals(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         one_natural(n);
     }
 
-    for n in exhaustive_u().take(LARGE_LIMIT) {
+    for n in small_u32s(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         one_u32(n);
     }
 
-    for n in natural_u32s_geometric(&EXAMPLE_SEED, 32).take(LARGE_LIMIT) {
+    for n in small_u32s(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         one_u32(n);
     }
 }

@@ -1,7 +1,7 @@
 use common::LARGE_LIMIT;
 use malachite_nz::natural::Natural;
 use malachite_test::common::{biguint_to_natural, rugint_integer_to_natural, GenerationMode};
-use malachite_test::natural::conversion::from_u32::select_inputs;
+use malachite_test::inputs::base::unsigneds;
 use num::BigUint;
 use rugint;
 use std::u32;
@@ -37,11 +37,11 @@ fn from_u32_properties() {
         assert_eq!(n, rugint_n);
     };
 
-    for u in select_inputs(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
+    for u in unsigneds(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
         one_u32(u);
     }
 
-    for u in select_inputs(GenerationMode::Random(32)).take(LARGE_LIMIT) {
+    for u in unsigneds(GenerationMode::Random(32)).take(LARGE_LIMIT) {
         one_u32(u);
     }
 }
