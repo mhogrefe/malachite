@@ -1,5 +1,9 @@
 extern crate malachite_test;
 
+use malachite_test::base::char::char_to_contiguous_range::*;
+use malachite_test::base::char::contiguous_range_to_char::*;
+use malachite_test::base::char::decrement::*;
+use malachite_test::base::char::increment::*;
 use malachite_test::base::num::assign_bit::*;
 use malachite_test::base::num::clear_bit::*;
 use malachite_test::base::num::flip_bit::*;
@@ -222,6 +226,10 @@ macro_rules! demos_and_benchmarks {
 
 demos_and_benchmarks!(
     [
+        demo_char_to_contiguous_range,
+        demo_contiguous_range_to_char,
+        demo_char_decrement,
+        demo_char_increment,
         demo_u8_assign_bit,
         demo_u16_assign_bit,
         demo_u32_assign_bit,
@@ -585,6 +593,8 @@ demos_and_benchmarks!(
         demo_natural_trailing_zeros,
     ],
     [
+        benchmark_char_to_contiguous_range,
+        benchmark_contiguous_range_to_char,
         benchmark_u8_assign_bit,
         benchmark_u16_assign_bit,
         benchmark_u32_assign_bit,

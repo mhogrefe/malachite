@@ -13,6 +13,12 @@ pub mod inputs {
     pub mod natural;
 }
 pub mod base {
+    pub mod char {
+        pub mod char_to_contiguous_range;
+        pub mod contiguous_range_to_char;
+        pub mod decrement;
+        pub mod increment;
+    }
     pub mod num {
         pub mod assign_bit;
         pub mod clear_bit;

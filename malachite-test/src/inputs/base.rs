@@ -1,8 +1,10 @@
 use common::GenerationMode;
 use inputs::common::{swap_pairs, reshape_2_1_to_3};
+use malachite_base::chars::NUMBER_OF_CHARS;
 use malachite_base::num::{PrimitiveInteger, PrimitiveSigned, PrimitiveUnsigned};
 use malachite_base::round::RoundingMode;
 use rust_wheels::iterators::bools::exhaustive_bools;
+use rust_wheels::iterators::chars::exhaustive_chars;
 use rust_wheels::iterators::common::EXAMPLE_SEED;
 use rust_wheels::iterators::general::{random_x, range_increasing_x};
 use rust_wheels::iterators::integers_geometric::natural_u32s_geometric;
@@ -12,10 +14,11 @@ use rust_wheels::iterators::primitive_ints::{exhaustive_i, exhaustive_negative_i
                                              random_negative_i, random_positive_i,
                                              random_positive_u, random_range};
 use rust_wheels::iterators::rounding_modes::{exhaustive_rounding_modes, random_rounding_modes};
-use rust_wheels::iterators::tuples::{lex_pairs, lex_triples, log_pairs, random_pairs,
-                                     random_pairs_from_single, random_triples,
-                                     random_triples_from_single, sqrt_pairs};
+use rust_wheels::iterators::tuples::{exhaustive_pairs_from_single, lex_pairs, lex_triples,
+                                     log_pairs, random_pairs, random_pairs_from_single,
+                                     random_triples, random_triples_from_single, sqrt_pairs};
 use rust_wheels::iterators::vecs::{exhaustive_vecs, random_vecs};
+use std::char;
 use std::cmp::Ordering;
 
 type It<T> = Box<Iterator<Item = T>>;
@@ -33,6 +36,27 @@ pub fn signeds<T: 'static + PrimitiveSigned>(gm: GenerationMode) -> It<T> {
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_i()),
         GenerationMode::Random(_) => Box::new(random_x(&EXAMPLE_SEED)),
+    }
+}
+
+pub fn u32s_range_1(gm: GenerationMode) -> It<u32> {
+    match gm {
+        GenerationMode::Exhaustive => Box::new(range_increasing_x(0, NUMBER_OF_CHARS - 1)),
+        GenerationMode::Random(_) => Box::new(random_range(&EXAMPLE_SEED, 0, NUMBER_OF_CHARS - 1)),
+    }
+}
+
+pub fn pairs_of_u32s_range_1(gm: GenerationMode) -> Box<Iterator<Item = (u32, u32)>> {
+    match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_pairs_from_single(range_increasing_x(
+            0,
+            NUMBER_OF_CHARS - 1,
+        ))),
+        GenerationMode::Random(_) => Box::new(random_pairs_from_single(random_range(
+            &EXAMPLE_SEED,
+            0,
+            NUMBER_OF_CHARS - 1,
+        ))),
     }
 }
 
@@ -244,6 +268,28 @@ pub fn pairs_of_negative_signed_not_min_and_small_u32s<T: 'static + PrimitiveSig
             &(|seed| random_negative_i(seed).filter(|&i| i != T::MIN)),
             &(|seed| natural_u32s_geometric(seed, scale)),
         )),
+    }
+}
+
+pub fn chars(gm: GenerationMode) -> Box<Iterator<Item = char>> {
+    match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_chars()),
+        GenerationMode::Random(_) => Box::new(random_x(&EXAMPLE_SEED)),
+    }
+}
+
+pub fn chars_var_1(gm: GenerationMode) -> Box<Iterator<Item = char>> {
+    Box::new(chars(gm).filter(|&c| c != '\u{0}'))
+}
+
+pub fn chars_var_2(gm: GenerationMode) -> Box<Iterator<Item = char>> {
+    Box::new(chars(gm).filter(|&c| c != char::MAX))
+}
+
+pub fn pairs_of_chars(gm: GenerationMode) -> Box<Iterator<Item = (char, char)>> {
+    match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_pairs_from_single(exhaustive_chars())),
+        GenerationMode::Random(_) => Box::new(random_pairs_from_single(random_x(&EXAMPLE_SEED))),
     }
 }
 
