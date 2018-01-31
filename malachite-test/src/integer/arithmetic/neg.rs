@@ -1,7 +1,7 @@
 use common::{integer_to_bigint, integer_to_rugint_integer, GenerationMode};
 use inputs::integer::integers;
 use malachite_base::num::SignificantBits;
-use malachite_base::traits::NegAssign;
+use malachite_base::num::NegAssign;
 use malachite_nz::integer::Integer;
 use num::BigInt;
 use rugint;

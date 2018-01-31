@@ -1,5 +1,5 @@
 use integer::Integer;
-use malachite_base::traits::{OrdAbs, PartialOrdAbs};
+use malachite_base::num::{OrdAbs, PartialOrdAbs};
 use std::cmp::Ordering;
 
 /// Compares the absolute value of an `Integer` to the absolute value of another `Integer`.
@@ -15,7 +15,7 @@ use std::cmp::Ordering;
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::traits::PartialOrdAbs;
+/// use malachite_base::num::PartialOrdAbs;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {

@@ -1,5 +1,5 @@
 use integer::Integer;
-use malachite_base::traits::{AddMul, AddMulAssign};
+use malachite_base::num::{AddMul, AddMulAssign};
 use natural::arithmetic::add_mul_u32::mpn_addmul_1;
 use natural::arithmetic::add_u32::mpn_add_1_in_place;
 use natural::arithmetic::mul_u32::{mpn_mul_1, mpn_mul_1c};
@@ -25,7 +25,7 @@ use std::u32;
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::traits::AddMul;
+/// use malachite_base::num::AddMul;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {
@@ -57,7 +57,7 @@ impl AddMul<Integer, u32> for Integer {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::traits::AddMul;
+/// use malachite_base::num::AddMul;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {
@@ -89,7 +89,7 @@ impl<'a> AddMul<&'a Integer, u32> for Integer {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::traits::AddMul;
+/// use malachite_base::num::AddMul;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {
@@ -120,7 +120,7 @@ impl<'a> AddMul<Integer, u32> for &'a Integer {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::traits::AddMul;
+/// use malachite_base::num::AddMul;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {
@@ -178,7 +178,7 @@ impl<'a, 'b> AddMul<&'a Integer, u32> for &'b Integer {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::traits::AddMulAssign;
+/// use malachite_base::num::AddMulAssign;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {
@@ -234,7 +234,7 @@ impl AddMulAssign<Integer, u32> for Integer {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::traits::AddMulAssign;
+/// use malachite_base::num::AddMulAssign;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {

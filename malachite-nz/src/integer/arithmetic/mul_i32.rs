@@ -1,5 +1,5 @@
 use integer::Integer;
-use malachite_base::traits::{Assign, Zero};
+use malachite_base::num::{Assign, Zero};
 use std::ops::{Mul, MulAssign};
 
 /// Multiplies an `Integer` by an `i32`, taking the `Integer` by value.
@@ -15,7 +15,7 @@ use std::ops::{Mul, MulAssign};
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::traits::Zero;
+/// use malachite_base::num::Zero;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {
@@ -47,7 +47,7 @@ impl Mul<i32> for Integer {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::traits::Zero;
+/// use malachite_base::num::Zero;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {
@@ -89,7 +89,7 @@ impl<'a> Mul<i32> for &'a Integer {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::traits::Zero;
+/// use malachite_base::num::Zero;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {
@@ -121,7 +121,7 @@ impl Mul<Integer> for i32 {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::traits::Zero;
+/// use malachite_base::num::Zero;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {
@@ -152,7 +152,7 @@ impl<'a> Mul<&'a Integer> for i32 {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::traits::NegativeOne;
+/// use malachite_base::num::NegativeOne;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {

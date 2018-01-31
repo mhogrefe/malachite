@@ -1,7 +1,7 @@
 use common::{integer_to_rugint_integer, GenerationMode};
 use inputs::integer::pairs_of_integers;
 use malachite_base::num::SignificantBits;
-use malachite_base::traits::OrdAbs;
+use malachite_base::num::OrdAbs;
 use malachite_nz::integer::Integer;
 use rugint;
 use rust_wheels::benchmarks::{BenchmarkOptions2, benchmark_2};

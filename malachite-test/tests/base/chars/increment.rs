@@ -1,6 +1,6 @@
 use common::LARGE_LIMIT;
 use malachite_base::chars::{CHAR_JUST_ABOVE_SURROGATES, CHAR_JUST_BELOW_SURROGATES};
-use malachite_base::num::Walkable;
+use malachite_base::misc::Walkable;
 use malachite_test::common::GenerationMode;
 use malachite_test::inputs::base::chars_var_2;
 use std::char;

@@ -1,7 +1,7 @@
 use common::GenerationMode;
 use inputs::base::chars_var_1;
 use malachite_base::chars::char_to_contiguous_range;
-use malachite_base::num::Walkable;
+use malachite_base::misc::Walkable;
 use rust_wheels::benchmarks::{BenchmarkOptions1, benchmark_1};
 
 pub fn demo_char_decrement(gm: GenerationMode, limit: usize) {

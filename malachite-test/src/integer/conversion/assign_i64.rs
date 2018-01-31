@@ -1,7 +1,7 @@
 use common::{integer_to_bigint, GenerationMode};
 use inputs::integer::pairs_of_integer_and_signed;
 use malachite_base::num::SignificantBits;
-use malachite_base::traits::Assign;
+use malachite_base::num::Assign;
 use malachite_nz::integer::Integer;
 use num::BigInt;
 use rust_wheels::benchmarks::{BenchmarkOptions2, benchmark_2};

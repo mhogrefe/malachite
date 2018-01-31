@@ -1,4 +1,4 @@
-use malachite_base::traits::Zero;
+use malachite_base::num::Zero;
 use natural::arithmetic::sub_u32::{mpn_sub_1, mpn_sub_1_in_place, sub_assign_u32_helper};
 use natural::Natural::{self, Large, Small};
 use std::ops::{Sub, SubAssign};
@@ -142,7 +142,7 @@ fn sub_assign_helper<'a>(x: &mut Natural, y: &'a Natural) -> bool {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::traits::Zero;
+/// use malachite_base::num::Zero;
 /// use malachite_nz::natural::Natural;
 ///
 /// fn main() {
@@ -178,7 +178,7 @@ impl<'a> Sub<&'a Natural> for Natural {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::traits::Zero;
+/// use malachite_base::num::Zero;
 /// use malachite_nz::natural::Natural;
 ///
 /// fn main() {

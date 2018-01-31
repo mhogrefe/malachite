@@ -1,4 +1,4 @@
-use malachite_base::traits::{One, Two, Zero};
+use malachite_base::num::{One, Two, Zero};
 use natural::Natural::*;
 use std::str::FromStr;
 
@@ -91,7 +91,6 @@ impl Natural {
 /// Time: worst case O(1)
 ///
 /// Additional memory: worst case O(1)
-///
 impl Zero for Natural {
     const ZERO: Natural = Small(0);
 }
@@ -101,7 +100,6 @@ impl Zero for Natural {
 /// Time: worst case O(1)
 ///
 /// Additional memory: worst case O(1)
-///
 impl One for Natural {
     const ONE: Natural = Small(1);
 }
@@ -111,7 +109,6 @@ impl One for Natural {
 /// Time: worst case O(1)
 ///
 /// Additional memory: worst case O(1)
-///
 impl Two for Natural {
     const TWO: Natural = Small(2);
 }

@@ -1,7 +1,7 @@
 use common::{natural_to_biguint, GenerationMode};
 use inputs::natural::pairs_of_natural_and_unsigned;
 use malachite_base::num::SignificantBits;
-use malachite_base::traits::Assign;
+use malachite_base::num::Assign;
 use malachite_nz::natural::Natural;
 use num::BigUint;
 use rust_wheels::benchmarks::{BenchmarkOptions2, benchmark_2};

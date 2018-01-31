@@ -1,5 +1,5 @@
 use integer::Integer;
-use malachite_base::traits::Assign;
+use malachite_base::num::Assign;
 use natural::Natural;
 use std::ops::{Add, AddAssign};
 
@@ -15,7 +15,7 @@ use std::ops::{Add, AddAssign};
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::traits::Zero;
+/// use malachite_base::num::Zero;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {
@@ -47,7 +47,7 @@ impl Add<i32> for Integer {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::traits::Zero;
+/// use malachite_base::num::Zero;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {
@@ -97,7 +97,7 @@ impl<'a> Add<i32> for &'a Integer {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::traits::Zero;
+/// use malachite_base::num::Zero;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {
@@ -129,7 +129,7 @@ impl Add<Integer> for i32 {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::traits::Zero;
+/// use malachite_base::num::Zero;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {
@@ -160,7 +160,7 @@ impl<'a> Add<&'a Integer> for i32 {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::traits::Zero;
+/// use malachite_base::num::Zero;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {

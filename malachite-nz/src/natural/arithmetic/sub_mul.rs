@@ -1,4 +1,4 @@
-use malachite_base::traits::{SubMul, SubMulAssign};
+use malachite_base::num::{SubMul, SubMulAssign};
 use natural::arithmetic::add_mul::mpz_aorsmul;
 use natural::arithmetic::sub_mul_u32::sub_mul_assign_u32_helper;
 use natural::Natural::{self, Large, Small};
@@ -22,7 +22,7 @@ use natural::Natural::{self, Large, Small};
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::traits::SubMul;
+/// use malachite_base::num::SubMul;
 /// use malachite_nz::natural::Natural;
 ///
 /// fn main() {
@@ -63,7 +63,7 @@ impl<'a, 'b> SubMul<&'a Natural, &'b Natural> for Natural {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::traits::SubMul;
+/// use malachite_base::num::SubMul;
 /// use malachite_nz::natural::Natural;
 ///
 /// fn main() {
@@ -128,7 +128,7 @@ impl<'a, 'b, 'c> SubMul<&'a Natural, &'b Natural> for &'c Natural {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::traits::SubMulAssign;
+/// use malachite_base::num::SubMulAssign;
 /// use malachite_nz::natural::Natural;
 ///
 /// fn main() {

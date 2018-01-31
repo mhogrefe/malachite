@@ -1,7 +1,7 @@
 use common::{integer_to_rugint_integer, natural_to_rugint_integer, GenerationMode};
 use inputs::integer::{pairs_of_integer_and_natural, pairs_of_natural_and_integer};
 use malachite_base::num::SignificantBits;
-use malachite_base::traits::PartialOrdAbs;
+use malachite_base::num::PartialOrdAbs;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use rugint;

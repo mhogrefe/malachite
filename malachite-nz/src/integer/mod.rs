@@ -1,4 +1,4 @@
-use malachite_base::traits::{NegativeOne, One, Two, Zero};
+use malachite_base::num::{NegativeOne, One, Two, Zero};
 use natural::Natural::{self, Small};
 use std::str::FromStr;
 
@@ -29,7 +29,6 @@ impl Integer {
 /// Time: worst case O(1)
 ///
 /// Additional memory: worst case O(1)
-///
 impl Zero for Integer {
     const ZERO: Integer = Integer {
         sign: true,
@@ -42,7 +41,6 @@ impl Zero for Integer {
 /// Time: worst case O(1)
 ///
 /// Additional memory: worst case O(1)
-///
 impl One for Integer {
     const ONE: Integer = Integer {
         sign: true,
@@ -55,7 +53,6 @@ impl One for Integer {
 /// Time: worst case O(1)
 ///
 /// Additional memory: worst case O(1)
-///
 impl Two for Integer {
     const TWO: Integer = Integer {
         sign: true,
@@ -68,7 +65,6 @@ impl Two for Integer {
 /// Time: worst case O(1)
 ///
 /// Additional memory: worst case O(1)
-///
 impl NegativeOne for Integer {
     const NEGATIVE_ONE: Integer = Integer {
         sign: false,

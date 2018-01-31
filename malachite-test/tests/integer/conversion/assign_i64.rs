@@ -1,5 +1,5 @@
 use common::LARGE_LIMIT;
-use malachite_base::traits::Assign;
+use malachite_base::num::Assign;
 use malachite_nz::integer::Integer;
 use malachite_test::common::GenerationMode;
 use malachite_test::inputs::integer::pairs_of_integer_and_signed;

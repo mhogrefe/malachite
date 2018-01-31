@@ -1,4 +1,4 @@
-use num::Walkable;
+use misc::Walkable;
 use std::char;
 
 // The number of Unicode scalar values, or 2<sup>20</sup> + 2<sup>16</sup> - 2<sup>11</sup>, or
@@ -86,7 +86,7 @@ impl Walkable for char {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::Walkable;
+    /// use malachite_base::misc::Walkable;
     ///
     /// let mut c = '\u{0}';
     /// c.increment();
@@ -112,7 +112,7 @@ impl Walkable for char {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::Walkable;
+    /// use malachite_base::misc::Walkable;
     ///
     /// let mut c = '\u{1}';
     /// c.decrement();

@@ -1,5 +1,5 @@
 use integer::Integer;
-use malachite_base::traits::Assign;
+use malachite_base::num::Assign;
 use natural::Natural;
 use std::cmp::Ordering;
 
@@ -17,7 +17,7 @@ use std::cmp::Ordering;
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::traits::Assign;
+/// use malachite_base::num::Assign;
 /// use malachite_nz::integer::Integer;
 /// use malachite_nz::natural::Natural;
 ///
@@ -55,7 +55,7 @@ impl Assign<Integer> for Natural {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::traits::Assign;
+/// use malachite_base::num::Assign;
 /// use malachite_nz::integer::Integer;
 /// use malachite_nz::natural::Natural;
 ///

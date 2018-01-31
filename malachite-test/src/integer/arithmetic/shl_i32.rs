@@ -2,7 +2,7 @@ use common::{integer_to_rugint_integer, GenerationMode};
 use inputs::integer::{pairs_of_integer_and_small_i32,
                       triples_of_integer_small_i32_and_rounding_mode_var_1};
 use malachite_base::round::RoundingMode;
-use malachite_base::traits::{ShlRound, ShlRoundAssign};
+use malachite_base::num::{ShlRound, ShlRoundAssign};
 use malachite_nz::integer::Integer;
 use rugint;
 use rust_wheels::benchmarks::{BenchmarkOptions1, BenchmarkOptions2, benchmark_1, benchmark_2};

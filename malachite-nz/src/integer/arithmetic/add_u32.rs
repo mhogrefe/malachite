@@ -1,5 +1,5 @@
 use integer::Integer;
-use malachite_base::traits::Assign;
+use malachite_base::num::Assign;
 use std::ops::{Add, AddAssign};
 
 /// Adds a `u32` to an `Integer`, taking the `Integer` by value.
@@ -14,7 +14,7 @@ use std::ops::{Add, AddAssign};
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::traits::Zero;
+/// use malachite_base::num::Zero;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {
@@ -46,7 +46,7 @@ impl Add<u32> for Integer {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::traits::Zero;
+/// use malachite_base::num::Zero;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {
@@ -104,7 +104,7 @@ impl<'a> Add<u32> for &'a Integer {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::traits::Zero;
+/// use malachite_base::num::Zero;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {
@@ -136,7 +136,7 @@ impl Add<Integer> for u32 {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::traits::Zero;
+/// use malachite_base::num::Zero;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {

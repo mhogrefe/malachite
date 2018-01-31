@@ -1,4 +1,4 @@
-use malachite_base::traits::Assign;
+use malachite_base::num::Assign;
 use natural::Natural::{self, Large, Small};
 use std::ops::{Add, AddAssign};
 
@@ -49,7 +49,7 @@ pub fn mpn_add_1_in_place(s1: &mut [u32], mut s2limb: u32) -> bool {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::traits::Zero;
+/// use malachite_base::num::Zero;
 /// use malachite_nz::natural::Natural;
 ///
 /// fn main() {
@@ -80,7 +80,7 @@ impl Add<u32> for Natural {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::traits::Zero;
+/// use malachite_base::num::Zero;
 /// use malachite_nz::natural::Natural;
 ///
 /// fn main() {
@@ -125,7 +125,7 @@ impl<'a> Add<u32> for &'a Natural {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::traits::Zero;
+/// use malachite_base::num::Zero;
 /// use malachite_nz::natural::Natural;
 ///
 /// fn main() {
@@ -156,7 +156,7 @@ impl Add<Natural> for u32 {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::traits::Zero;
+/// use malachite_base::num::Zero;
 /// use malachite_nz::natural::Natural;
 ///
 /// fn main() {
@@ -187,7 +187,7 @@ impl<'a> Add<&'a Natural> for u32 {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::traits::Zero;
+/// use malachite_base::num::Zero;
 /// use malachite_nz::natural::Natural;
 ///
 /// fn main() {

@@ -14,7 +14,7 @@ impl Natural {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::traits::Zero;
+    /// use malachite_base::num::Zero;
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
     ///

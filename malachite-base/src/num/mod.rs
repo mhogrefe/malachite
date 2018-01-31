@@ -1,17 +1,10 @@
+use misc::{Named, Walkable};
 use rand::distributions::range::SampleRange;
 use rand::Rand;
 use std;
 use std::fmt::{Debug, Display};
 use std::hash::Hash;
 use std::ops::*;
-use traits::{Named, NegativeOne, One, Zero};
-
-//TODO docs
-pub trait Walkable: Copy + Eq + Ord {
-    fn increment(&mut self);
-
-    fn decrement(&mut self);
-}
 
 //TODO docs
 pub trait WrappingNeg {
@@ -527,4 +520,227 @@ pub fn get_upper(val: u64) -> u32 {
 
 pub fn make_u64(upper: u32, lower: u32) -> u64 {
     u64::from(upper) << 32 | u64::from(lower)
+}
+
+use round::RoundingMode;
+use std::cmp::Ordering;
+
+pub trait AbsAssign {
+    fn abs_assign(&mut self);
+}
+
+pub trait Assign<Rhs = Self> {
+    fn assign(&mut self, rhs: Rhs);
+}
+
+pub trait NegAssign {
+    fn neg_assign(&mut self);
+}
+
+pub trait NotAssign {
+    fn not_assign(&mut self);
+}
+
+pub trait AddMulAssign<B, C> {
+    // Equivalent to self += b * c
+    fn add_mul_assign(&mut self, b: B, c: C);
+}
+
+pub trait AddMul<B, C> {
+    type Output;
+
+    // Equivalent to self + b * c
+    fn add_mul(self, b: B, c: C) -> Self::Output;
+}
+
+pub trait SubMulAssign<B, C> {
+    // Equivalent to self -= b * c
+    fn sub_mul_assign(&mut self, b: B, c: C);
+}
+
+pub trait SubMul<B, C> {
+    type Output;
+
+    // Equivalent to self - b * c
+    fn sub_mul(self, b: B, c: C) -> Self::Output;
+}
+
+pub trait PartialOrdAbs<Rhs: ?Sized = Self>: PartialEq<Rhs> {
+    fn partial_cmp_abs(&self, other: &Rhs) -> Option<Ordering>;
+
+    fn lt_abs(&self, other: &Rhs) -> bool {
+        match self.partial_cmp_abs(other) {
+            Some(Ordering::Less) => true,
+            _ => false,
+        }
+    }
+
+    fn le_abs(&self, other: &Rhs) -> bool {
+        match self.partial_cmp_abs(other) {
+            Some(Ordering::Less) | Some(Ordering::Equal) => true,
+            _ => false,
+        }
+    }
+
+    fn gt_abs(&self, other: &Rhs) -> bool {
+        match self.partial_cmp_abs(other) {
+            Some(Ordering::Greater) => true,
+            _ => false,
+        }
+    }
+
+    fn ge_abs(&self, other: &Rhs) -> bool {
+        match self.partial_cmp_abs(other) {
+            Some(Ordering::Greater) | Some(Ordering::Equal) => true,
+            _ => false,
+        }
+    }
+}
+
+pub trait OrdAbs: Eq + PartialOrdAbs<Self> {
+    fn cmp_abs(&self, other: &Self) -> Ordering;
+}
+
+/// Provides the constant 0.
+pub trait Zero {
+    const ZERO: Self;
+}
+
+/// Provides the constant 1.
+pub trait One {
+    const ONE: Self;
+}
+
+/// Provides the constant 2.
+pub trait Two {
+    const TWO: Self;
+}
+
+/// Provides the constant -1.
+pub trait NegativeOne {
+    const NEGATIVE_ONE: Self;
+}
+
+/// Implements the constants 0, 1, and 2 for unsigned primitive integers.
+macro_rules! impl01_unsigned {
+    ($t: ty) => {
+        /// The constant 0 for unsigned primitive integers.
+        ///
+        /// Time: worst case O(1)
+        ///
+        /// Additional memory: worst case O(1)
+        impl Zero for $t {
+            const ZERO: $t = 0;
+        }
+
+        /// The constant 1 for unsigned primitive integers.
+        ///
+        /// Time: worst case O(1)
+        ///
+        /// Additional memory: worst case O(1)
+        impl One for $t {
+            const ONE: $t = 1;
+        }
+
+        /// The constant 2 for unsigned primitive integers.
+        ///
+        /// Time: worst case O(1)
+        ///
+        /// Additional memory: worst case O(1)
+        impl Two for $t {
+            const TWO: $t = 2;
+        }
+    }
+}
+
+/// Implements the constants 0, 1, 2, and -1 for signed primitive integers.
+macro_rules! impl01_signed {
+    ($t: ty) => {
+        impl01_unsigned!($t);
+
+        /// The constant -1 for signed primitive integers.
+        ///
+        /// Time: worst case O(1)
+        ///
+        /// Additional memory: worst case O(1)
+        impl NegativeOne for $t {
+            const NEGATIVE_ONE: $t = -1;
+        }
+    }
+}
+
+/// Implements the constants 0, 1, 2, and -1 for primitive floating-point types.
+macro_rules! impl01_float {
+    ($t: ty) => {
+        /// The constant 0.0 for primitive floating-point types.
+        ///
+        /// Time: worst case O(1)
+        ///
+        /// Additional memory: worst case O(1)
+        impl Zero for $t {
+            const ZERO: $t = 0.0;
+        }
+
+        /// The constant 1.0 for primitive floating-point types.
+        ///
+        /// Time: worst case O(1)
+        ///
+        /// Additional memory: worst case O(1)
+        impl One for $t {
+            const ONE: $t = 1.0;
+        }
+
+        /// The constant 2.0 for primitive floating-point types.
+        ///
+        /// Time: worst case O(1)
+        ///
+        /// Additional memory: worst case O(1)
+        impl Two for $t {
+            const TWO: $t = 2.0;
+        }
+
+        /// The constant -1.0 for primitive floating-point types.
+        ///
+        /// Time: worst case O(1)
+        ///
+        /// Additional memory: worst case O(1)
+        impl NegativeOne for $t {
+            const NEGATIVE_ONE: $t = -1.0;
+        }
+    }
+}
+
+impl01_unsigned!(u8);
+impl01_unsigned!(u16);
+impl01_unsigned!(u32);
+impl01_unsigned!(u64);
+impl01_unsigned!(usize);
+
+impl01_signed!(i8);
+impl01_signed!(i16);
+impl01_signed!(i32);
+impl01_signed!(i64);
+impl01_signed!(isize);
+
+impl01_float!(f32);
+impl01_float!(f64);
+
+pub trait ShlRound<RHS> {
+    type Output;
+
+    fn shl_round(self, rhs: RHS, rm: RoundingMode) -> Self::Output;
+}
+
+pub trait ShrRound<RHS> {
+    type Output;
+
+    fn shr_round(self, rhs: RHS, rm: RoundingMode) -> Self::Output;
+}
+
+pub trait ShlRoundAssign<Rhs = Self> {
+    fn shl_round_assign(&mut self, rhs: Rhs, rm: RoundingMode);
+}
+
+pub trait ShrRoundAssign<Rhs = Self> {
+    fn shr_round_assign(&mut self, rhs: Rhs, rm: RoundingMode);
 }

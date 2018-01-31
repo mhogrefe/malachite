@@ -1,5 +1,5 @@
 use integer::Integer;
-use malachite_base::traits::NotAssign;
+use malachite_base::num::NotAssign;
 use std::ops::Not;
 
 /// Returns the bitwise complement of an `Integer`, as if it were represented in two's complement,
@@ -16,7 +16,7 @@ use std::ops::Not;
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::traits::Zero;
+/// use malachite_base::num::Zero;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {
@@ -48,7 +48,7 @@ impl Not for Integer {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::traits::Zero;
+/// use malachite_base::num::Zero;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {
@@ -94,7 +94,7 @@ impl<'a> Not for &'a Integer {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::traits::{NotAssign, Zero};
+/// use malachite_base::num::{NotAssign, Zero};
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {

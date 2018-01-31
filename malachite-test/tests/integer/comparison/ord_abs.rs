@@ -1,5 +1,5 @@
 use common::{test_custom_cmp_helper, LARGE_LIMIT};
-use malachite_base::traits::{OrdAbs, PartialOrdAbs};
+use malachite_base::num::{OrdAbs, PartialOrdAbs};
 use malachite_nz::integer::Integer;
 use malachite_test::common::{integer_to_rugint_integer, GenerationMode};
 use malachite_test::inputs::integer::{integers, pairs_of_integers, triples_of_integers};

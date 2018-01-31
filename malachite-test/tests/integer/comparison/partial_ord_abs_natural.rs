@@ -1,5 +1,5 @@
 use common::LARGE_LIMIT;
-use malachite_base::traits::{OrdAbs, PartialOrdAbs};
+use malachite_base::num::{OrdAbs, PartialOrdAbs};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_test::common::{integer_to_rugint_integer, natural_to_rugint_integer, GenerationMode};

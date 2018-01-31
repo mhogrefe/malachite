@@ -1,4 +1,4 @@
-use malachite_base::traits::{One, Two, Zero};
+use malachite_base::num::{One, Two, Zero};
 use malachite_nz::natural::Natural;
 
 #[test]

@@ -1,5 +1,5 @@
 use common::LARGE_LIMIT;
-use malachite_base::traits::Zero;
+use malachite_base::num::Zero;
 use malachite_nz::natural::Natural;
 use malachite_test::common::GenerationMode;
 use malachite_test::inputs::base::unsigneds;

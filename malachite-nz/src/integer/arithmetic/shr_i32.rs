@@ -1,6 +1,6 @@
 use integer::Integer;
 use malachite_base::round::RoundingMode;
-use malachite_base::traits::{ShrRound, ShrRoundAssign};
+use malachite_base::num::{ShrRound, ShrRoundAssign};
 use std::ops::{Shr, ShrAssign};
 
 /// Shifts an `Integer` right (divides it by a power of 2 and takes the floor or multiplies it by a
@@ -15,7 +15,7 @@ use std::ops::{Shr, ShrAssign};
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::traits::Zero;
+/// use malachite_base::num::Zero;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {
@@ -52,7 +52,7 @@ impl Shr<i32> for Integer {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::traits::Zero;
+/// use malachite_base::num::Zero;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {
@@ -92,7 +92,7 @@ impl<'a> Shr<i32> for &'a Integer {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::traits::{NegativeOne, One};
+/// use malachite_base::num::{NegativeOne, One};
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {
@@ -147,7 +147,7 @@ impl ShrAssign<i32> for Integer {
 /// extern crate malachite_nz;
 ///
 /// use malachite_base::round::RoundingMode;
-/// use malachite_base::traits::{ShrRound, Zero};
+/// use malachite_base::num::{ShrRound, Zero};
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {
@@ -196,7 +196,7 @@ impl ShrRound<i32> for Integer {
 /// extern crate malachite_nz;
 ///
 /// use malachite_base::round::RoundingMode;
-/// use malachite_base::traits::{ShrRound, Zero};
+/// use malachite_base::num::{ShrRound, Zero};
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {
@@ -253,7 +253,7 @@ impl<'a> ShrRound<i32> for &'a Integer {
 /// extern crate malachite_nz;
 ///
 /// use malachite_base::round::RoundingMode;
-/// use malachite_base::traits::{One, ShrRoundAssign};
+/// use malachite_base::num::{One, ShrRoundAssign};
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {

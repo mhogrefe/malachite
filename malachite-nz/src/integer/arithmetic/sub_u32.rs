@@ -1,5 +1,5 @@
 use integer::Integer;
-use malachite_base::traits::{Assign, NegAssign};
+use malachite_base::num::{Assign, NegAssign};
 use natural::Natural;
 use std::ops::{Sub, SubAssign};
 

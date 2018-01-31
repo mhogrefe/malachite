@@ -1,5 +1,5 @@
 use integer::Integer;
-use malachite_base::traits::PartialOrdAbs;
+use malachite_base::num::PartialOrdAbs;
 use natural::Natural;
 use std::cmp::Ordering;
 
@@ -16,7 +16,7 @@ use std::cmp::Ordering;
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::traits::PartialOrdAbs;
+/// use malachite_base::num::PartialOrdAbs;
 /// use malachite_nz::integer::Integer;
 /// use malachite_nz::natural::Natural;
 ///
@@ -48,7 +48,7 @@ impl PartialOrdAbs<Natural> for Integer {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::traits::PartialOrdAbs;
+/// use malachite_base::num::PartialOrdAbs;
 /// use malachite_nz::integer::Integer;
 /// use malachite_nz::natural::Natural;
 ///

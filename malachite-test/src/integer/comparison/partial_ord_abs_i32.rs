@@ -1,7 +1,7 @@
 use common::GenerationMode;
 use inputs::integer::{pairs_of_integer_and_signed, pairs_of_signed_and_integer};
 use malachite_base::num::SignificantBits;
-use malachite_base::traits::PartialOrdAbs;
+use malachite_base::num::PartialOrdAbs;
 use malachite_nz::integer::Integer;
 use rust_wheels::benchmarks::{BenchmarkOptions1, benchmark_1};
 use std::cmp::Ordering;

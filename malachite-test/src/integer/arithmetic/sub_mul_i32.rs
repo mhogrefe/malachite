@@ -1,7 +1,7 @@
 use common::GenerationMode;
 use inputs::integer::triples_of_integer_integer_and_signed;
 use malachite_base::num::SignificantBits;
-use malachite_base::traits::{SubMul, SubMulAssign};
+use malachite_base::num::{SubMul, SubMulAssign};
 use malachite_nz::integer::Integer;
 use rust_wheels::benchmarks::{BenchmarkOptions1, BenchmarkOptions2, BenchmarkOptions4,
                               benchmark_1, benchmark_2, benchmark_4};

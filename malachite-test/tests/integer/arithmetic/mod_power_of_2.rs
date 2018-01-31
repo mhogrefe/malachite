@@ -1,6 +1,6 @@
 use common::LARGE_LIMIT;
 use malachite_base::round::RoundingMode;
-use malachite_base::traits::{One, PartialOrdAbs, ShrRound, Zero};
+use malachite_base::num::{One, PartialOrdAbs, ShrRound, Zero};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_test::common::GenerationMode;

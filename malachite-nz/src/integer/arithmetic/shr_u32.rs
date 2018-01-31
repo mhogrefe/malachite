@@ -1,5 +1,5 @@
 use malachite_base::round::RoundingMode;
-use malachite_base::traits::{ShrRound, ShrRoundAssign, Zero};
+use malachite_base::num::{ShrRound, ShrRoundAssign, Zero};
 use integer::Integer;
 use std::ops::{Shr, ShrAssign};
 
@@ -15,7 +15,7 @@ use std::ops::{Shr, ShrAssign};
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::traits::Zero;
+/// use malachite_base::num::Zero;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {
@@ -46,7 +46,7 @@ impl Shr<u32> for Integer {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::traits::Zero;
+/// use malachite_base::num::Zero;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {
@@ -143,7 +143,7 @@ impl ShrAssign<u32> for Integer {
 /// extern crate malachite_nz;
 ///
 /// use malachite_base::round::RoundingMode;
-/// use malachite_base::traits::ShrRound;
+/// use malachite_base::num::ShrRound;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {
@@ -185,7 +185,7 @@ impl ShrRound<u32> for Integer {
 /// extern crate malachite_nz;
 ///
 /// use malachite_base::round::RoundingMode;
-/// use malachite_base::traits::ShrRound;
+/// use malachite_base::num::ShrRound;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {
@@ -250,7 +250,7 @@ impl<'a> ShrRound<u32> for &'a Integer {
 /// extern crate malachite_nz;
 ///
 /// use malachite_base::round::RoundingMode;
-/// use malachite_base::traits::ShrRoundAssign;
+/// use malachite_base::num::ShrRoundAssign;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {

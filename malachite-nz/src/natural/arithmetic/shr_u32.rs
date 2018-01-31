@@ -1,6 +1,6 @@
 use malachite_base::num::BitAccess;
 use malachite_base::round::RoundingMode;
-use malachite_base::traits::{One, ShrRound, ShrRoundAssign, Zero};
+use malachite_base::num::{One, ShrRound, ShrRoundAssign, Zero};
 use natural::{delete_left, mpn_zero_p, LIMB_BITS, LIMB_BITS_MASK, LOG_LIMB_BITS};
 use natural::Natural::{self, Large, Small};
 use std::ops::{Shr, ShrAssign};
@@ -58,7 +58,7 @@ pub fn mpn_rshift_in_place(u: &mut [u32], bits: u32) -> u32 {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::traits::Zero;
+/// use malachite_base::num::Zero;
 /// use malachite_nz::natural::Natural;
 ///
 /// fn main() {
@@ -88,7 +88,7 @@ impl Shr<u32> for Natural {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::traits::Zero;
+/// use malachite_base::num::Zero;
 /// use malachite_nz::natural::Natural;
 ///
 /// fn main() {
@@ -193,7 +193,7 @@ impl ShrAssign<u32> for Natural {
 /// extern crate malachite_nz;
 ///
 /// use malachite_base::round::RoundingMode;
-/// use malachite_base::traits::ShrRound;
+/// use malachite_base::num::ShrRound;
 /// use malachite_nz::natural::Natural;
 ///
 /// fn main() {
@@ -235,7 +235,7 @@ impl ShrRound<u32> for Natural {
 /// extern crate malachite_nz;
 ///
 /// use malachite_base::round::RoundingMode;
-/// use malachite_base::traits::ShrRound;
+/// use malachite_base::num::ShrRound;
 /// use malachite_nz::natural::Natural;
 ///
 /// fn main() {
@@ -458,7 +458,7 @@ impl<'a> ShrRound<u32> for &'a Natural {
 /// extern crate malachite_nz;
 ///
 /// use malachite_base::round::RoundingMode;
-/// use malachite_base::traits::ShrRoundAssign;
+/// use malachite_base::num::ShrRoundAssign;
 /// use malachite_nz::natural::Natural;
 ///
 /// fn main() {

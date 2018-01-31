@@ -1,6 +1,6 @@
 use integer::Integer;
 use malachite_base::round::RoundingMode;
-use malachite_base::traits::{ShlRound, ShlRoundAssign, ShrRound, ShrRoundAssign};
+use malachite_base::num::{ShlRound, ShlRoundAssign, ShrRound, ShrRoundAssign};
 use std::ops::{Shl, ShlAssign};
 
 /// Shifts an `Integer` left (multiplies it by a power of 2 or divides it by a power of 2 and takes
@@ -15,7 +15,7 @@ use std::ops::{Shl, ShlAssign};
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::traits::Zero;
+/// use malachite_base::num::Zero;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {
@@ -52,7 +52,7 @@ impl Shl<i32> for Integer {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::traits::Zero;
+/// use malachite_base::num::Zero;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {
@@ -92,7 +92,7 @@ impl<'a> Shl<i32> for &'a Integer {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::traits::{NegativeOne, One};
+/// use malachite_base::num::{NegativeOne, One};
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {
@@ -147,7 +147,7 @@ impl ShlAssign<i32> for Integer {
 /// extern crate malachite_nz;
 ///
 /// use malachite_base::round::RoundingMode;
-/// use malachite_base::traits::{ShlRound, Zero};
+/// use malachite_base::num::{ShlRound, Zero};
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {
@@ -196,7 +196,7 @@ impl ShlRound<i32> for Integer {
 /// extern crate malachite_nz;
 ///
 /// use malachite_base::round::RoundingMode;
-/// use malachite_base::traits::{ShlRound, Zero};
+/// use malachite_base::num::{ShlRound, Zero};
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {
@@ -252,7 +252,7 @@ impl<'a> ShlRound<i32> for &'a Integer {
 /// extern crate malachite_nz;
 ///
 /// use malachite_base::round::RoundingMode;
-/// use malachite_base::traits::{One, ShlRoundAssign};
+/// use malachite_base::num::{One, ShlRoundAssign};
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {

@@ -1,6 +1,6 @@
 use integer::Integer;
 use malachite_base::num::SignificantBits;
-use malachite_base::traits::One;
+use malachite_base::num::One;
 use natural::Natural;
 
 impl Integer {

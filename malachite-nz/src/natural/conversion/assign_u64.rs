@@ -1,4 +1,4 @@
-use malachite_base::traits::Assign;
+use malachite_base::num::Assign;
 use natural::Natural;
 
 /// Assigns a `u64` to a `Natural`.
@@ -12,7 +12,7 @@ use natural::Natural;
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::traits::Assign;
+/// use malachite_base::num::Assign;
 /// use malachite_nz::natural::Natural;
 ///
 /// fn main() {

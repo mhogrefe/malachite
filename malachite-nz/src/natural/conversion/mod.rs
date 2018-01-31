@@ -1,5 +1,5 @@
 use error::ParseIntegerError;
-use malachite_base::traits::{Assign, Zero};
+use malachite_base::num::{Assign, Zero};
 use natural::Natural::{self, Small};
 use std::fmt::{self, Debug, Display, Formatter};
 use std::str::FromStr;

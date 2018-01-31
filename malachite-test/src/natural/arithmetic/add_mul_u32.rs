@@ -1,7 +1,7 @@
 use common::GenerationMode;
 use inputs::natural::triples_of_natural_natural_and_unsigned;
 use malachite_base::num::SignificantBits;
-use malachite_base::traits::{AddMul, AddMulAssign};
+use malachite_base::num::{AddMul, AddMulAssign};
 use malachite_nz::natural::Natural;
 use rust_wheels::benchmarks::{BenchmarkOptions1, BenchmarkOptions2, BenchmarkOptions4,
                               benchmark_1, benchmark_2, benchmark_4};

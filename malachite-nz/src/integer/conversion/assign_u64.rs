@@ -1,5 +1,5 @@
 use integer::Integer;
-use malachite_base::traits::Assign;
+use malachite_base::num::Assign;
 
 /// Assigns a `u64` to to an `Integer`.
 ///
@@ -12,7 +12,7 @@ use malachite_base::traits::Assign;
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::traits::Assign;
+/// use malachite_base::num::Assign;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {

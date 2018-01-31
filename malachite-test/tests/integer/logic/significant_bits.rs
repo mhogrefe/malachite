@@ -1,6 +1,6 @@
 use common::LARGE_LIMIT;
 use malachite_base::num::SignificantBits;
-use malachite_base::traits::One;
+use malachite_base::num::One;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_test::common::{integer_to_bigint, integer_to_rugint_integer, GenerationMode};

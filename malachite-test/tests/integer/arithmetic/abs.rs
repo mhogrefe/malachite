@@ -1,5 +1,5 @@
 use common::LARGE_LIMIT;
-use malachite_base::traits::AbsAssign;
+use malachite_base::num::AbsAssign;
 use malachite_nz::integer::Integer;
 use malachite_test::common::{bigint_to_integer, integer_to_bigint, integer_to_rugint_integer,
                              rugint_integer_to_integer, GenerationMode};

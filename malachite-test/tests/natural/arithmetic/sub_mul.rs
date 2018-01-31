@@ -1,6 +1,6 @@
 use common::LARGE_LIMIT;
-use malachite_base::traits::{One, Zero};
-use malachite_base::traits::{SubMul, SubMulAssign};
+use malachite_base::num::{One, Zero};
+use malachite_base::num::{SubMul, SubMulAssign};
 use malachite_nz::natural::Natural;
 use malachite_test::common::GenerationMode;
 use malachite_test::inputs::natural::{pairs_of_naturals, triples_of_naturals};

@@ -1,5 +1,5 @@
 use malachite_base::round::RoundingMode;
-use malachite_base::traits::{ShlRound, ShlRoundAssign, ShrRound, ShrRoundAssign};
+use malachite_base::num::{ShlRound, ShlRoundAssign, ShrRound, ShrRoundAssign};
 use natural::Natural;
 use std::ops::{Shl, ShlAssign};
 
@@ -15,7 +15,7 @@ use std::ops::{Shl, ShlAssign};
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::traits::Zero;
+/// use malachite_base::num::Zero;
 /// use malachite_nz::natural::Natural;
 ///
 /// fn main() {
@@ -49,7 +49,7 @@ impl Shl<i32> for Natural {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::traits::Zero;
+/// use malachite_base::num::Zero;
 /// use malachite_nz::natural::Natural;
 ///
 /// fn main() {
@@ -86,7 +86,7 @@ impl<'a> Shl<i32> for &'a Natural {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::traits::One;
+/// use malachite_base::num::One;
 /// use malachite_nz::natural::Natural;
 ///
 /// fn main() {
@@ -135,7 +135,7 @@ impl ShlAssign<i32> for Natural {
 /// extern crate malachite_nz;
 ///
 /// use malachite_base::round::RoundingMode;
-/// use malachite_base::traits::{ShlRound, Zero};
+/// use malachite_base::num::{ShlRound, Zero};
 /// use malachite_nz::natural::Natural;
 ///
 /// fn main() {
@@ -186,7 +186,7 @@ impl ShlRound<i32> for Natural {
 /// extern crate malachite_nz;
 ///
 /// use malachite_base::round::RoundingMode;
-/// use malachite_base::traits::{ShlRound, Zero};
+/// use malachite_base::num::{ShlRound, Zero};
 /// use malachite_nz::natural::Natural;
 ///
 /// fn main() {
@@ -245,7 +245,7 @@ impl<'a> ShlRound<i32> for &'a Natural {
 /// extern crate malachite_nz;
 ///
 /// use malachite_base::round::RoundingMode;
-/// use malachite_base::traits::{One, ShlRoundAssign};
+/// use malachite_base::num::{One, ShlRoundAssign};
 /// use malachite_nz::natural::Natural;
 ///
 /// fn main() {

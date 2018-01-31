@@ -1,4 +1,4 @@
-use malachite_base::traits::{Assign, Zero};
+use malachite_base::num::{Assign, Zero};
 use natural::arithmetic::neg::mpn_neg_in_place;
 use natural::{LIMB_BITS_MASK, LOG_LIMB_BITS};
 use natural::Natural::{self, Large, Small};

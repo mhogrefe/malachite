@@ -1,6 +1,6 @@
 use common::LARGE_LIMIT;
 use malachite_base::num::{BitAccess, PrimitiveInteger, PrimitiveSigned, PrimitiveUnsigned};
-use malachite_base::traits::NegativeOne;
+use malachite_base::num::NegativeOne;
 use malachite_test::common::GenerationMode;
 use malachite_test::inputs::base::{pairs_of_signed_and_u64_width_range_var_2,
                                    pairs_of_unsigned_and_small_u64};

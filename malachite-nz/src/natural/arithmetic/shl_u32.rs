@@ -49,7 +49,7 @@ pub fn mpn_lshift_in_place(u: &mut [u32], bits: u32) -> u32 {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::traits::Zero;
+/// use malachite_base::num::Zero;
 /// use malachite_nz::natural::Natural;
 ///
 /// fn main() {
@@ -96,7 +96,7 @@ fn shl_helper(limbs: &[u32], other: u32) -> Natural {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::traits::Zero;
+/// use malachite_base::num::Zero;
 /// use malachite_nz::natural::Natural;
 ///
 /// fn main() {
@@ -132,7 +132,7 @@ impl<'a> Shl<u32> for &'a Natural {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::traits::One;
+/// use malachite_base::num::One;
 /// use malachite_nz::natural::Natural;
 ///
 /// fn main() {

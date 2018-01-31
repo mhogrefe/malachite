@@ -2,7 +2,7 @@ use common::{natural_to_biguint, natural_to_rugint_integer, GenerationMode};
 use inputs::natural::{pairs_of_natural_and_small_u32,
                       triples_of_natural_small_u32_and_rounding_mode_var_1};
 use malachite_base::round::RoundingMode;
-use malachite_base::traits::{ShrRound, ShrRoundAssign};
+use malachite_base::num::{ShrRound, ShrRoundAssign};
 use malachite_nz::natural::Natural;
 use num::BigUint;
 use rugint;

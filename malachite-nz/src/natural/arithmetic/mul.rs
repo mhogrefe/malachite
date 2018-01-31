@@ -1075,7 +1075,7 @@ fn mul_basecase_mem_opt_helper(xs: &[u32], ys: &[u32]) -> Vec<u32> {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::traits::{One, Zero};
+/// use malachite_base::num::{One, Zero};
 /// use malachite_nz::natural::Natural;
 /// use std::str::FromStr;
 ///
@@ -1111,7 +1111,7 @@ impl Mul<Natural> for Natural {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::traits::{One, Zero};
+/// use malachite_base::num::{One, Zero};
 /// use malachite_nz::natural::Natural;
 /// use std::str::FromStr;
 ///
@@ -1147,7 +1147,7 @@ impl<'a> Mul<&'a Natural> for Natural {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::traits::{One, Zero};
+/// use malachite_base::num::{One, Zero};
 /// use malachite_nz::natural::Natural;
 /// use std::str::FromStr;
 ///
@@ -1182,7 +1182,7 @@ impl<'a> Mul<Natural> for &'a Natural {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::traits::{One, Zero};
+/// use malachite_base::num::{One, Zero};
 /// use malachite_nz::natural::Natural;
 /// use std::str::FromStr;
 ///
@@ -1229,7 +1229,7 @@ impl<'a, 'b> Mul<&'a Natural> for &'b Natural {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::traits::One;
+/// use malachite_base::num::One;
 /// use malachite_nz::natural::Natural;
 /// use std::str::FromStr;
 ///
@@ -1275,7 +1275,7 @@ impl MulAssign<Natural> for Natural {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::traits::One;
+/// use malachite_base::num::One;
 /// use malachite_nz::natural::Natural;
 /// use std::str::FromStr;
 ///

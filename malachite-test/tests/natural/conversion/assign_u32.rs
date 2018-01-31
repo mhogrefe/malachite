@@ -1,5 +1,5 @@
 use common::LARGE_LIMIT;
-use malachite_base::traits::Assign;
+use malachite_base::num::Assign;
 use malachite_nz::natural::Natural;
 use malachite_test::common::{biguint_to_natural, natural_to_biguint, natural_to_rugint_integer,
                              rugint_integer_to_natural, GenerationMode};

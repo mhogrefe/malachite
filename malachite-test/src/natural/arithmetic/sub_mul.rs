@@ -1,7 +1,7 @@
 use common::GenerationMode;
 use inputs::natural::{triples_of_naturals, triples_of_naturals_var_1};
 use malachite_base::num::SignificantBits;
-use malachite_base::traits::{SubMul, SubMulAssign};
+use malachite_base::num::{SubMul, SubMulAssign};
 use malachite_nz::natural::Natural;
 use rust_wheels::benchmarks::{BenchmarkOptions1, BenchmarkOptions2, benchmark_1, benchmark_2};
 use std::cmp::max;

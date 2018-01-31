@@ -1,5 +1,5 @@
 use integer::arithmetic::add_mul_u32::mpz_aorsmul_1;
-use malachite_base::traits::{AddMul, AddMulAssign};
+use malachite_base::num::{AddMul, AddMulAssign};
 use natural::arithmetic::add::mpn_add_in_place;
 use natural::arithmetic::mul::mpn_mul;
 use natural::arithmetic::sub::{mpn_sub_aba, mpn_sub_in_place};
@@ -24,7 +24,7 @@ use std::cmp::{max, Ordering};
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::traits::AddMul;
+/// use malachite_base::num::AddMul;
 /// use malachite_nz::natural::Natural;
 ///
 /// fn main() {
@@ -58,7 +58,7 @@ impl<'a> AddMul<Natural, Natural> for Natural {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::traits::AddMul;
+/// use malachite_base::num::AddMul;
 /// use malachite_nz::natural::Natural;
 ///
 /// fn main() {
@@ -92,7 +92,7 @@ impl<'a> AddMul<Natural, &'a Natural> for Natural {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::traits::AddMul;
+/// use malachite_base::num::AddMul;
 /// use malachite_nz::natural::Natural;
 ///
 /// fn main() {
@@ -126,7 +126,7 @@ impl<'a> AddMul<&'a Natural, Natural> for Natural {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::traits::AddMul;
+/// use malachite_base::num::AddMul;
 /// use malachite_nz::natural::Natural;
 ///
 /// fn main() {
@@ -160,7 +160,7 @@ impl<'a, 'b> AddMul<&'a Natural, &'b Natural> for Natural {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::traits::AddMul;
+/// use malachite_base::num::AddMul;
 /// use malachite_nz::natural::Natural;
 ///
 /// fn main() {
@@ -221,7 +221,7 @@ impl<'a, 'b, 'c> AddMul<&'a Natural, &'b Natural> for &'c Natural {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::traits::AddMulAssign;
+/// use malachite_base::num::AddMulAssign;
 /// use malachite_nz::natural::Natural;
 ///
 /// fn main() {
@@ -282,7 +282,7 @@ impl AddMulAssign<Natural, Natural> for Natural {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::traits::AddMulAssign;
+/// use malachite_base::num::AddMulAssign;
 /// use malachite_nz::natural::Natural;
 ///
 /// fn main() {
@@ -343,7 +343,7 @@ impl<'a> AddMulAssign<Natural, &'a Natural> for Natural {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::traits::AddMulAssign;
+/// use malachite_base::num::AddMulAssign;
 /// use malachite_nz::natural::Natural;
 ///
 /// fn main() {
@@ -404,7 +404,7 @@ impl<'a> AddMulAssign<&'a Natural, Natural> for Natural {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::traits::AddMulAssign;
+/// use malachite_base::num::AddMulAssign;
 /// use malachite_nz::natural::Natural;
 ///
 /// fn main() {

@@ -1,5 +1,5 @@
 use malachite_base::num::{get_lower, get_upper};
-use malachite_base::traits::{SubMul, SubMulAssign};
+use malachite_base::num::{SubMul, SubMulAssign};
 use natural::arithmetic::sub_u32::{mpn_sub_1_in_place, sub_assign_u32_helper};
 use natural::Natural::{self, Large, Small};
 
@@ -45,7 +45,7 @@ pub fn mpn_submul_1(r: &mut [u32], s1: &[u32], s2limb: u32) -> u32 {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::traits::SubMul;
+/// use malachite_base::num::SubMul;
 /// use malachite_nz::natural::Natural;
 ///
 /// fn main() {
@@ -82,7 +82,7 @@ impl<'a> SubMul<&'a Natural, u32> for Natural {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::traits::SubMul;
+/// use malachite_base::num::SubMul;
 /// use malachite_nz::natural::Natural;
 ///
 /// fn main() {
@@ -149,7 +149,7 @@ impl<'a, 'b> SubMul<&'a Natural, u32> for &'b Natural {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::traits::SubMulAssign;
+/// use malachite_base::num::SubMulAssign;
 /// use malachite_nz::natural::Natural;
 ///
 /// fn main() {

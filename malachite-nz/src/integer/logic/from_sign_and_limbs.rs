@@ -1,5 +1,5 @@
 use integer::Integer;
-use malachite_base::traits::Zero;
+use malachite_base::num::Zero;
 use natural::Natural;
 use std::cmp::Ordering;
 

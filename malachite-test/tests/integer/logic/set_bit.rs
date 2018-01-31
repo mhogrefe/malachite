@@ -1,6 +1,6 @@
 use common::LARGE_LIMIT;
 use malachite_base::num::BitAccess;
-use malachite_base::traits::NotAssign;
+use malachite_base::num::NotAssign;
 use malachite_nz::integer::Integer;
 use malachite_test::common::GenerationMode;
 use malachite_test::inputs::integer::pairs_of_integer_and_small_u64;

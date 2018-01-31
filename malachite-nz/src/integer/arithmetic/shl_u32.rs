@@ -12,7 +12,7 @@ use std::ops::{Shl, ShlAssign};
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::traits::Zero;
+/// use malachite_base::num::Zero;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {
@@ -46,7 +46,7 @@ impl Shl<u32> for Integer {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::traits::Zero;
+/// use malachite_base::num::Zero;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {
@@ -81,7 +81,7 @@ impl<'a> Shl<u32> for &'a Integer {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::traits::{NegativeOne, One};
+/// use malachite_base::num::{NegativeOne, One};
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {

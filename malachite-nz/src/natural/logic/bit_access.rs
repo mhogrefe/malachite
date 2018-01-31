@@ -11,7 +11,7 @@ use natural::Natural::{self, Large, Small};
 /// extern crate malachite_nz;
 ///
 /// use malachite_base::num::BitAccess;
-/// use malachite_base::traits::Zero;
+/// use malachite_base::num::Zero;
 /// use malachite_nz::natural::Natural;
 ///
 /// fn main() {
@@ -81,7 +81,7 @@ impl BitAccess for Natural {
     /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::BitAccess;
-    /// use malachite_base::traits::Zero;
+    /// use malachite_base::num::Zero;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {

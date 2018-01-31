@@ -1,5 +1,5 @@
 use integer::Integer;
-use malachite_base::traits::{AddMul, AddMulAssign, SubMul, SubMulAssign};
+use malachite_base::num::{AddMul, AddMulAssign, SubMul, SubMulAssign};
 
 /// Adds the product of an `Integer` (b) and an `i32` (c) to an `Integer` (self), taking `self` and
 /// b by value.
@@ -9,7 +9,7 @@ use malachite_base::traits::{AddMul, AddMulAssign, SubMul, SubMulAssign};
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::traits::SubMul;
+/// use malachite_base::num::SubMul;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {
@@ -35,7 +35,7 @@ impl SubMul<Integer, i32> for Integer {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::traits::SubMul;
+/// use malachite_base::num::SubMul;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {
@@ -61,7 +61,7 @@ impl<'a> SubMul<&'a Integer, i32> for Integer {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::traits::SubMul;
+/// use malachite_base::num::SubMul;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {
@@ -86,7 +86,7 @@ impl<'a> SubMul<Integer, i32> for &'a Integer {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::traits::SubMul;
+/// use malachite_base::num::SubMul;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {
@@ -115,7 +115,7 @@ impl<'a, 'b> SubMul<&'a Integer, i32> for &'b Integer {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::traits::SubMulAssign;
+/// use malachite_base::num::SubMulAssign;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {
@@ -142,7 +142,7 @@ impl SubMulAssign<Integer, i32> for Integer {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::traits::SubMulAssign;
+/// use malachite_base::num::SubMulAssign;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {
