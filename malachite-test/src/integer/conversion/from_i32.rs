@@ -1,5 +1,6 @@
 use common::GenerationMode;
 use inputs::base::signeds;
+use malachite_base::num::SignificantBits;
 use malachite_nz::integer::Integer;
 use num::BigInt;
 use rugint;
@@ -21,7 +22,7 @@ pub fn benchmark_integer_from_i32(gm: GenerationMode, limit: usize, file_name: &
         x_cons: &(|&i| i),
         y_cons: &(|&i| i),
         z_cons: &(|&i| i),
-        x_param: &(|&i| (32 - i.leading_zeros()) as usize),
+        x_param: &(|&i| i.significant_bits() as usize),
         limit,
         f_name: "malachite",
         g_name: "num",

@@ -7,21 +7,6 @@ use std::hash::Hash;
 use std::ops::*;
 
 //TODO docs
-pub trait WrappingNeg {
-    fn wrapping_neg(&self) -> Self;
-}
-
-//TODO docs
-pub trait LeadingZeros {
-    fn leading_zeros(&self) -> u32;
-}
-
-//TODO docs
-pub trait SignificantBits {
-    fn significant_bits(&self) -> u64;
-}
-
-//TODO docs
 pub trait PrimitiveInteger
     : BitAccess
     + BitAnd<Output = Self>
@@ -40,6 +25,7 @@ pub trait PrimitiveInteger
     + ShlAssign<u32>
     + Shr<u32, Output = Self>
     + ShrAssign<u32>
+    + SignificantBits
     + Add<Output = Self>
     + Sub<Output = Self>
     + Rem<Output = Self>
@@ -67,6 +53,16 @@ pub trait PrimitiveSigned: PrimitiveInteger + NegativeOne {
     fn from_i32(i: i32) -> Self;
 
     fn from_i64(i: i64) -> Self;
+}
+
+//TODO docs
+pub trait WrappingNeg {
+    fn wrapping_neg(&self) -> Self;
+}
+
+//TODO docs
+pub trait LeadingZeros {
+    fn leading_zeros(&self) -> u32;
 }
 
 /// This trait defines functions that access or modify individual bits in a value, indexed by a
@@ -177,8 +173,23 @@ macro_rules! unsigned_traits {
     ($t: ident, $width: expr, $u: ident, $from_u32: expr, $from_u64: expr) => {
         common_traits!($t, $width, $u, $from_u32, $from_u64);
 
-        //TODO docs and tests
         impl SignificantBits for $t {
+            /// Returns the number of significant bits of a primitive unsigned integer; this is the
+            /// integer's width minus the number of leading zeros.
+            ///
+            /// Time: worst case O(1)
+            ///
+            /// Additional memory: worst case O(1)
+            ///
+            /// # Example
+            /// ```
+            /// use malachite_base::num::SignificantBits;
+            ///
+            /// fn main() {
+            ///     assert_eq!(0u8.significant_bits(), 0);
+            ///     assert_eq!(100u64.significant_bits(), 7);
+            /// }
+            /// ```
             fn significant_bits(&self) -> u64 {
                 (Self::WIDTH - self.leading_zeros()).into()
             }
@@ -211,9 +222,9 @@ macro_rules! unsigned_traits {
         /// assert_eq!(x, 0);
         /// ```
         impl BitAccess for $t {
-            /// Determines whether the `index`th bit of a primitive unsigned, or the coefficient of
-            /// 2<pow>`index`</pow> in its binary expansion, is 0 or 1. `false` means 0, `true`
-            /// means 1.
+            /// Determines whether the `index`th bit of a primitive unsigned integer, or the
+            /// coefficient of 2<pow>`index`</pow> in its binary expansion, is 0 or 1. `false`
+            /// means 0, `true` means 1.
             ///
             /// Getting bits beyond the type's width is allowed; those bits are false.
             ///
@@ -325,7 +336,22 @@ macro_rules! signed_traits {
             }
         }
 
-        //TODO docs and tests
+        /// Returns the number of significant bits of a primitive signed integer; this is the
+        /// integer's width minus the number of leading zeros of its absolute value.
+        ///
+        /// Time: worst case O(1)
+        ///
+        /// Additional memory: worst case O(1)
+        ///
+        /// # Example
+        /// ```
+        /// use malachite_base::num::SignificantBits;
+        ///
+        /// fn main() {
+        ///     assert_eq!(0i8.significant_bits(), 0);
+        ///     assert_eq!((-100i64).significant_bits(), 7);
+        /// }
+        /// ```
         impl SignificantBits for $t {
             fn significant_bits(&self) -> u64 {
                 (self.wrapping_abs() as $ut).significant_bits()
@@ -724,6 +750,13 @@ impl01_signed!(isize);
 
 impl01_float!(f32);
 impl01_float!(f64);
+
+/// Provides a function to get the number of significant bits of `self`.
+pub trait SignificantBits {
+    /// The number of bits it takes to represent `self`. This is useful when benchmarking functions;
+    /// the functions' inputs can be bucketed based on their number of significant bits.
+    fn significant_bits(&self) -> u64;
+}
 
 pub trait ShlRound<RHS> {
     type Output;

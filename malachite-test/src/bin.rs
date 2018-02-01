@@ -9,6 +9,7 @@ use malachite_test::base::num::clear_bit::*;
 use malachite_test::base::num::flip_bit::*;
 use malachite_test::base::num::get_bit::*;
 use malachite_test::base::num::set_bit::*;
+use malachite_test::base::num::significant_bits::*;
 use malachite_test::base::rounding_mode::clone::*;
 use malachite_test::base::rounding_mode::eq::*;
 use malachite_test::base::rounding_mode::hash::*;
@@ -270,6 +271,14 @@ demos_and_benchmarks!(
         demo_i16_set_bit,
         demo_i32_set_bit,
         demo_i64_set_bit,
+        demo_u8_significant_bits,
+        demo_u16_significant_bits,
+        demo_u32_significant_bits,
+        demo_u64_significant_bits,
+        demo_i8_significant_bits,
+        demo_i16_significant_bits,
+        demo_i32_significant_bits,
+        demo_i64_significant_bits,
         demo_rounding_mode_clone,
         demo_rounding_mode_clone_from,
         demo_rounding_mode_eq,
@@ -635,6 +644,14 @@ demos_and_benchmarks!(
         benchmark_i16_clear_bit,
         benchmark_i32_clear_bit,
         benchmark_i64_clear_bit,
+        benchmark_u8_significant_bits,
+        benchmark_u16_significant_bits,
+        benchmark_u32_significant_bits,
+        benchmark_u64_significant_bits,
+        benchmark_i8_significant_bits,
+        benchmark_i16_significant_bits,
+        benchmark_i32_significant_bits,
+        benchmark_i64_significant_bits,
         benchmark_integer_from_i32,
         benchmark_integer_from_i64,
         benchmark_integer_from_u32,

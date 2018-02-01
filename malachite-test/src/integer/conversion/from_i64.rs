@@ -1,5 +1,6 @@
 use common::GenerationMode;
 use inputs::base::signeds;
+use malachite_base::num::SignificantBits;
 use malachite_nz::integer::Integer;
 use num::BigInt;
 use rust_wheels::benchmarks::{BenchmarkOptions2, benchmark_2};
@@ -18,7 +19,7 @@ pub fn benchmark_integer_from_i64(gm: GenerationMode, limit: usize, file_name: &
         function_g: &(|i| BigInt::from(i)),
         x_cons: &(|&i| i),
         y_cons: &(|&i| i),
-        x_param: &(|&i| (64 - i.leading_zeros()) as usize),
+        x_param: &(|&i| i.significant_bits() as usize),
         limit,
         f_name: "malachite",
         g_name: "num",

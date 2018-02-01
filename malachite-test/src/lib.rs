@@ -25,6 +25,7 @@ pub mod base {
         pub mod flip_bit;
         pub mod get_bit;
         pub mod set_bit;
+        pub mod significant_bits;
     }
     pub mod rounding_mode {
         pub mod clone;
