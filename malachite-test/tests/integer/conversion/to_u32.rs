@@ -1,9 +1,9 @@
 use common::LARGE_LIMIT;
 use malachite_base::num::SignificantBits;
 use malachite_nz::integer::Integer;
-use malachite_test::common::{integer_to_rugint_integer, GenerationMode};
+use malachite_test::common::{integer_to_rug_integer, GenerationMode};
 use malachite_test::inputs::integer::integers;
-use rugint;
+use rug;
 use std::cmp::Ordering;
 use std::u32;
 use std::str::FromStr;
@@ -12,7 +12,7 @@ use std::str::FromStr;
 fn test_to_u32() {
     let test = |n, out| {
         assert_eq!(Integer::from_str(n).unwrap().to_u32(), out);
-        assert_eq!(rugint::Integer::from_str(n).unwrap().to_u32(), out);
+        assert_eq!(rug::Integer::from_str(n).unwrap().to_u32(), out);
     };
     test("0", Some(0));
     test("123", Some(123));
@@ -27,7 +27,7 @@ fn test_to_u32() {
 fn test_to_u32_wrapping() {
     let test = |n, out| {
         assert_eq!(Integer::from_str(n).unwrap().to_u32_wrapping(), out);
-        assert_eq!(rugint::Integer::from_str(n).unwrap().to_u32_wrapping(), out);
+        assert_eq!(rug::Integer::from_str(n).unwrap().to_u32_wrapping(), out);
     };
     test("0", 0);
     test("123", 123);
@@ -42,13 +42,13 @@ fn test_to_u32_wrapping() {
 
 #[test]
 fn to_u32_properties() {
-    // x.to_u32() is equivalent for malachite and rugint.
+    // x.to_u32() is equivalent for malachite and rug.
     // if 0 ≤ x < 2^32, from(x.to_u32().unwrap()) == x
     // if 0 ≤ x < 2^32, x.to_u32() == Some(x.to_u32_wrapping())
     // if x < 0 or x >= 2^32, x.to_u32().is_none()
     let one_integer = |x: Integer| {
         let result = x.to_u32();
-        assert_eq!(integer_to_rugint_integer(&x).to_u32(), result);
+        assert_eq!(integer_to_rug_integer(&x).to_u32(), result);
         if x.sign() != Ordering::Less && x.significant_bits() <= 32 {
             assert_eq!(Integer::from(result.unwrap()), x);
             assert_eq!(result, Some(x.to_u32_wrapping()));
@@ -68,12 +68,12 @@ fn to_u32_properties() {
 
 #[test]
 fn to_u32_wrapping_properties() {
-    // x.to_u32_wrapping() is equivalent for malachite and rugint.
+    // x.to_u32_wrapping() is equivalent for malachite and rug.
     // x.to_u32_wrapping() + (-x.to_u32_wrapping()) = 0 mod 2^32
     // TODO relate with BitAnd
     let one_integer = |x: Integer| {
         let result = x.to_u32_wrapping();
-        assert_eq!(integer_to_rugint_integer(&x).to_u32_wrapping(), result);
+        assert_eq!(integer_to_rug_integer(&x).to_u32_wrapping(), result);
         assert_eq!(result.wrapping_add((-&x).to_u32_wrapping()), 0);
     };
 

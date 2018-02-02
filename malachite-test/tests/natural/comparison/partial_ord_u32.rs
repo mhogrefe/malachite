@@ -1,12 +1,12 @@
 use common::LARGE_LIMIT;
 use malachite_nz::natural::Natural;
-use malachite_test::common::{natural_to_biguint, natural_to_rugint_integer, GenerationMode};
+use malachite_test::common::{natural_to_biguint, natural_to_rug_integer, GenerationMode};
 use malachite_test::inputs::natural::{pairs_of_natural_and_unsigned,
                                       triples_of_natural_unsigned_and_natural,
                                       triples_of_unsigned_natural_and_unsigned};
 use malachite_test::natural::comparison::partial_ord_u32::num_partial_cmp_u32;
 use num::BigUint;
-use rugint;
+use rug;
 use std::cmp::Ordering;
 use std::str::FromStr;
 
@@ -15,7 +15,7 @@ fn test_partial_ord_u32() {
     let test = |u, v: u32, out| {
         assert_eq!(Natural::from_str(u).unwrap().partial_cmp(&v), out);
         assert_eq!(num_partial_cmp_u32(&BigUint::from_str(u).unwrap(), v), out);
-        assert_eq!(rugint::Integer::from_str(u).unwrap().partial_cmp(&v), out);
+        assert_eq!(rug::Integer::from_str(u).unwrap().partial_cmp(&v), out);
 
         assert_eq!(
             v.partial_cmp(&Natural::from_str(u).unwrap()),
@@ -32,20 +32,20 @@ fn test_partial_ord_u32() {
 
 #[test]
 fn partial_cmp_u32_properties() {
-    // n.partial_cmp(&u) is equivalent for malachite, num, and rugint.
+    // n.partial_cmp(&u) is equivalent for malachite, num, and rug.
     // n.partial_cmp(&Natural::from(u)) is equivalent to n.partial_cmp(&u).
     //
-    // u.partial_cmp(&n) is equivalent for malachite and rugint.
+    // u.partial_cmp(&n) is equivalent for malachite and rug.
     // Natural::from(u).partial_cmp(&n) is equivalent to u.partial_cmp(&n).
     // n < u <=> u > n, n > u <=> u < n, and n == u <=> u == n.
     let natural_and_u32 = |n: Natural, u: u32| {
         let cmp_1 = n.partial_cmp(&u);
         assert_eq!(num_partial_cmp_u32(&natural_to_biguint(&n), u), cmp_1);
-        assert_eq!(natural_to_rugint_integer(&n).partial_cmp(&u), cmp_1);
+        assert_eq!(natural_to_rug_integer(&n).partial_cmp(&u), cmp_1);
         assert_eq!(n.partial_cmp(&Natural::from(u)), cmp_1);
 
         let cmp_2 = u.partial_cmp(&n);
-        assert_eq!(u.partial_cmp(&natural_to_rugint_integer(&n)), cmp_2);
+        assert_eq!(u.partial_cmp(&natural_to_rug_integer(&n)), cmp_2);
         assert_eq!(cmp_2, cmp_1.map(|o| o.reverse()));
         assert_eq!(Natural::from(u).partial_cmp(&n), cmp_2);
     };

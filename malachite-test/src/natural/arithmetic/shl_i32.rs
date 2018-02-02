@@ -1,10 +1,10 @@
-use common::{natural_to_rugint_integer, GenerationMode};
+use common::{natural_to_rug_integer, GenerationMode};
 use inputs::natural::{pairs_of_natural_and_small_i32,
                       triples_of_natural_small_i32_and_rounding_mode_var_1};
 use malachite_base::round::RoundingMode;
 use malachite_base::num::{ShlRound, ShlRoundAssign};
 use malachite_nz::natural::Natural;
-use rugint;
+use rug;
 use rust_wheels::benchmarks::{BenchmarkOptions1, BenchmarkOptions2, benchmark_1, benchmark_2};
 
 pub fn demo_natural_shl_assign_i32(gm: GenerationMode, limit: usize) {
@@ -69,13 +69,13 @@ pub fn benchmark_natural_shl_assign_i32(gm: GenerationMode, limit: usize, file_n
     benchmark_2(BenchmarkOptions2 {
         xs: pairs_of_natural_and_small_i32(gm),
         function_f: &(|(mut n, i)| n <<= i),
-        function_g: &(|(mut n, i): (rugint::Integer, i32)| n <<= i),
+        function_g: &(|(mut n, i): (rug::Integer, i32)| n <<= i),
         x_cons: &(|p| p.clone()),
-        y_cons: &(|&(ref n, index)| (natural_to_rugint_integer(n), index)),
+        y_cons: &(|&(ref n, index)| (natural_to_rug_integer(n), index)),
         x_param: &(|&(_, index)| index as usize),
         limit,
         f_name: "malachite",
-        g_name: "rugint",
+        g_name: "rug",
         title: "Natural <<= i32",
         x_axis_label: "other",
         y_axis_label: "time (ns)",
@@ -88,13 +88,13 @@ pub fn benchmark_natural_shl_i32(gm: GenerationMode, limit: usize, file_name: &s
     benchmark_2(BenchmarkOptions2 {
         xs: pairs_of_natural_and_small_i32(gm),
         function_f: &(|(n, i)| n << i),
-        function_g: &(|(n, i): (rugint::Integer, i32)| n << i),
+        function_g: &(|(n, i): (rug::Integer, i32)| n << i),
         x_cons: &(|p| p.clone()),
-        y_cons: &(|&(ref n, index)| (natural_to_rugint_integer(n), index)),
+        y_cons: &(|&(ref n, index)| (natural_to_rug_integer(n), index)),
         x_param: &(|&(_, index)| index as usize),
         limit,
         f_name: "malachite",
-        g_name: "rugint",
+        g_name: "rug",
         title: "Natural << i32",
         x_axis_label: "other",
         y_axis_label: "time (ns)",

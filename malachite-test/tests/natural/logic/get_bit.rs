@@ -1,11 +1,11 @@
 use common::LARGE_LIMIT;
 use malachite_base::num::{BitAccess, SignificantBits};
 use malachite_nz::natural::Natural;
-use malachite_test::common::{natural_to_biguint, natural_to_rugint_integer, GenerationMode};
+use malachite_test::common::{natural_to_biguint, natural_to_rug_integer, GenerationMode};
 use malachite_test::inputs::natural::{naturals, pairs_of_natural_and_small_u64};
 use malachite_test::natural::logic::get_bit::num_get_bit;
 use num::BigUint;
-use rugint;
+use rug;
 use std::str::FromStr;
 
 #[test]
@@ -14,7 +14,7 @@ pub fn test_get_bit() {
         assert_eq!(Natural::from_str(n).unwrap().get_bit(index), out);
         assert_eq!(num_get_bit(&BigUint::from_str(n).unwrap(), index), out);
         assert_eq!(
-            rugint::Integer::from_str(n).unwrap().get_bit(index as u32),
+            rug::Integer::from_str(n).unwrap().get_bit(index as u32),
             out
         );
     };
@@ -30,12 +30,12 @@ pub fn test_get_bit() {
 
 #[test]
 fn get_bit_properties() {
-    // n.get_bit(index) is equivalent for malachite, num, and rugint.
+    // n.get_bit(index) is equivalent for malachite, num, and rug.
     // n.get_bit(index) = !(!n).get_bit(index)
     let natural_and_u64 = |n: Natural, index: u64| {
         let bit = n.get_bit(index);
         assert_eq!(num_get_bit(&natural_to_biguint(&n), index), bit);
-        assert_eq!(natural_to_rugint_integer(&n).get_bit(index as u32), bit);
+        assert_eq!(natural_to_rug_integer(&n).get_bit(index as u32), bit);
 
         assert_ne!((!n).get_bit(index), bit);
     };

@@ -1,12 +1,12 @@
 use common::LARGE_LIMIT;
 use malachite_base::num::Zero;
 use malachite_nz::natural::Natural;
-use malachite_test::common::{biguint_to_natural, natural_to_biguint, natural_to_rugint_integer,
-                             rugint_integer_to_natural, GenerationMode};
+use malachite_test::common::{biguint_to_natural, natural_to_biguint, natural_to_rug_integer,
+                             rug_integer_to_natural, GenerationMode};
 use malachite_test::inputs::natural::{naturals, pairs_of_natural_and_unsigned, pairs_of_naturals,
                                       triples_of_naturals};
 use num::BigUint;
-use rugint;
+use rug;
 use std::str::FromStr;
 
 #[test]
@@ -41,7 +41,7 @@ fn test_add() {
         let n = BigUint::from_str(u).unwrap() + BigUint::from_str(v).unwrap();
         assert_eq!(n.to_string(), out);
 
-        let n = rugint::Integer::from_str(u).unwrap() + rugint::Integer::from_str(v).unwrap();
+        let n = rug::Integer::from_str(u).unwrap() + rug::Integer::from_str(v).unwrap();
         assert_eq!(n.to_string(), out);
     };
     test("0", "0", "0");
@@ -64,16 +64,15 @@ fn add_properties() {
     // x + &y is valid.
     // &x + y is valid.
     // &x + &y is valid.
-    // x + y is equivalent for malachite, num, and rugint.
+    // x + y is equivalent for malachite, num, and rug.
     // x += y, x += &y, x + y, x + &y, &x + y, and &x + &y give the same result.
     // x + y == y + x
     // x + y - y == x and x + y - x == y
     // x + y >= x and x + y >= y
     let two_naturals = |x: Natural, y: Natural| {
         let num_sum = biguint_to_natural(&(natural_to_biguint(&x) + natural_to_biguint(&y)));
-        let rugint_sum = rugint_integer_to_natural(
-            &(natural_to_rugint_integer(&x) + natural_to_rugint_integer(&y)),
-        );
+        let rug_sum =
+            rug_integer_to_natural(&(natural_to_rug_integer(&x) + natural_to_rug_integer(&y)));
 
         let sum_val_val = x.clone() + y.clone();
         let sum_val_ref = x.clone() + &y;
@@ -96,15 +95,15 @@ fn add_properties() {
         assert_eq!(mut_x, sum);
         assert!(mut_x.is_valid());
 
-        let mut mut_x = natural_to_rugint_integer(&x);
-        mut_x += natural_to_rugint_integer(&y);
-        assert_eq!(rugint_integer_to_natural(&mut_x), sum);
+        let mut mut_x = natural_to_rug_integer(&x);
+        mut_x += natural_to_rug_integer(&y);
+        assert_eq!(rug_integer_to_natural(&mut_x), sum);
 
         let reverse_sum = &y + &x;
         let inv_1 = (&sum - &x).unwrap();
         let inv_2 = (&sum - &y).unwrap();
         assert_eq!(num_sum, sum);
-        assert_eq!(rugint_sum, sum);
+        assert_eq!(rug_sum, sum);
         assert_eq!(reverse_sum, sum);
         assert_eq!(inv_1, y);
         assert_eq!(inv_2, x);

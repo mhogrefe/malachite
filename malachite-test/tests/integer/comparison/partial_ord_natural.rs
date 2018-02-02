@@ -1,7 +1,7 @@
 use common::LARGE_LIMIT;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
-use malachite_test::common::{integer_to_rugint_integer, natural_to_rugint_integer, GenerationMode};
+use malachite_test::common::{integer_to_rug_integer, natural_to_rug_integer, GenerationMode};
 use malachite_test::inputs::integer::{pairs_of_natural_and_integer,
                                       triples_of_integer_natural_and_integer,
                                       triples_of_natural_integer_and_natural};
@@ -40,20 +40,20 @@ fn test_partial_ord_integer_natural() {
 
 #[test]
 fn partial_cmp_integer_natural_properties() {
-    // x.partial_cmp(&y) is equivalent for malachite and rugint.
+    // x.partial_cmp(&y) is equivalent for malachite and rug.
     // x.into_integer().partial_cmp(&y) is equivalent to x.partial_cmp(&y).
     // x < y <=> y > x, x > y <=> y < x, and x == y <=> y == x.
     let natural_and_integer = |x: Natural, y: Integer| {
         let cmp_1 = x.partial_cmp(&y);
         assert_eq!(
-            natural_to_rugint_integer(&x).partial_cmp(&integer_to_rugint_integer(&y)),
+            natural_to_rug_integer(&x).partial_cmp(&integer_to_rug_integer(&y)),
             cmp_1
         );
         assert_eq!(x.to_integer().cmp(&y), cmp_1.unwrap());
 
         let cmp_2 = y.partial_cmp(&x);
         assert_eq!(
-            integer_to_rugint_integer(&y).partial_cmp(&natural_to_rugint_integer(&x)),
+            integer_to_rug_integer(&y).partial_cmp(&natural_to_rug_integer(&x)),
             cmp_2
         );
         assert_eq!(cmp_2, cmp_1.map(|o| o.reverse()));

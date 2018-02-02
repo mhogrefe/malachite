@@ -1,9 +1,9 @@
 use common::LARGE_LIMIT;
 use malachite_base::num::{BitAccess, SignificantBits};
 use malachite_nz::integer::Integer;
-use malachite_test::common::{integer_to_rugint_integer, GenerationMode};
+use malachite_test::common::{integer_to_rug_integer, GenerationMode};
 use malachite_test::inputs::integer::{natural_integers, pairs_of_integer_and_small_u64};
-use rugint;
+use rug;
 use std::str::FromStr;
 
 #[test]
@@ -11,7 +11,7 @@ pub fn test_get_bit() {
     let test = |n, index, out| {
         assert_eq!(Integer::from_str(n).unwrap().get_bit(index), out);
         assert_eq!(
-            rugint::Integer::from_str(n).unwrap().get_bit(index as u32),
+            rug::Integer::from_str(n).unwrap().get_bit(index as u32),
             out
         );
     };
@@ -46,11 +46,11 @@ pub fn test_get_bit() {
 
 #[test]
 fn get_bit_properties() {
-    // n.get_bit(index) is equivalent for malachite, num, and rugint.
+    // n.get_bit(index) is equivalent for malachite, num, and rug.
     // !(!n).get_bit(index) == n.get_bit_index()
     let integer_and_u64 = |n: Integer, index: u64| {
         let bit = n.get_bit(index);
-        assert_eq!(integer_to_rugint_integer(&n).get_bit(index as u32), bit);
+        assert_eq!(integer_to_rug_integer(&n).get_bit(index as u32), bit);
 
         assert_eq!(!(!n).get_bit(index), bit);
     };

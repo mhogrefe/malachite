@@ -1,9 +1,9 @@
 use common::LARGE_LIMIT;
 use malachite_base::num::SignificantBits;
 use malachite_nz::natural::Natural;
-use malachite_test::common::{natural_to_rugint_integer, GenerationMode};
+use malachite_test::common::{natural_to_rug_integer, GenerationMode};
 use malachite_test::inputs::natural::naturals;
-use rugint;
+use rug;
 use std::str::FromStr;
 use std::u32;
 
@@ -11,7 +11,7 @@ use std::u32;
 fn test_to_u32() {
     let test = |n, out| {
         assert_eq!(Natural::from_str(n).unwrap().to_u32(), out);
-        assert_eq!(rugint::Integer::from_str(n).unwrap().to_u32(), out);
+        assert_eq!(rug::Integer::from_str(n).unwrap().to_u32(), out);
     };
     test("0", Some(0));
     test("123", Some(123));
@@ -24,7 +24,7 @@ fn test_to_u32() {
 fn test_to_u32_wrapping() {
     let test = |n, out| {
         assert_eq!(Natural::from_str(n).unwrap().to_u32_wrapping(), out);
-        assert_eq!(rugint::Integer::from_str(n).unwrap().to_u32_wrapping(), out);
+        assert_eq!(rug::Integer::from_str(n).unwrap().to_u32_wrapping(), out);
     };
     test("0", 0);
     test("123", 123);
@@ -35,13 +35,13 @@ fn test_to_u32_wrapping() {
 
 #[test]
 fn to_u32_properties() {
-    // x.to_u32() is equivalent for malachite and rugint.
+    // x.to_u32() is equivalent for malachite and rug.
     // if x < 2^32, from(x.to_u32().unwrap()) == x
     // if x < 2^32, x.to_u32() == Some(x.to_u32_wrapping())
     // if x >= 2^32, x.to_u32().is_none()
     let one_natural = |x: Natural| {
         let result = x.to_u32();
-        assert_eq!(natural_to_rugint_integer(&x).to_u32(), result);
+        assert_eq!(natural_to_rug_integer(&x).to_u32(), result);
         if x.significant_bits() <= 32 {
             assert_eq!(Natural::from(result.unwrap()), x);
             assert_eq!(result, Some(x.to_u32_wrapping()));
@@ -61,11 +61,11 @@ fn to_u32_properties() {
 
 #[test]
 fn to_u32_wrapping_properties() {
-    // x.to_u32_wrapping() is equivalent for malachite and rugint.
+    // x.to_u32_wrapping() is equivalent for malachite and rug.
     // TODO relate with BitAnd
     let one_natural = |x: Natural| {
         let result = x.to_u32_wrapping();
-        assert_eq!(natural_to_rugint_integer(&x).to_u32_wrapping(), result);
+        assert_eq!(natural_to_rug_integer(&x).to_u32_wrapping(), result);
     };
 
     for n in naturals(GenerationMode::Exhaustive).take(LARGE_LIMIT) {

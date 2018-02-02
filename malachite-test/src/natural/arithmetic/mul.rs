@@ -1,8 +1,8 @@
-use common::{natural_to_biguint, natural_to_rugint_integer, GenerationMode};
+use common::{natural_to_biguint, natural_to_rug_integer, GenerationMode};
 use inputs::natural::pairs_of_naturals;
 use malachite_base::num::SignificantBits;
 use malachite_nz::natural::Natural;
-use rugint;
+use rug;
 use rust_wheels::benchmarks::{BenchmarkOptions2, BenchmarkOptions3, BenchmarkOptions4,
                               benchmark_2, benchmark_3, benchmark_4};
 
@@ -55,13 +55,13 @@ pub fn benchmark_natural_mul_assign(gm: GenerationMode, limit: usize, file_name:
     benchmark_2(BenchmarkOptions2 {
         xs: pairs_of_naturals(gm),
         function_f: &(|(mut x, y)| x *= y),
-        function_g: &(|(mut x, y): (rugint::Integer, rugint::Integer)| x *= y),
+        function_g: &(|(mut x, y): (rug::Integer, rug::Integer)| x *= y),
         x_cons: &(|p| p.clone()),
-        y_cons: &(|&(ref x, ref y)| (natural_to_rugint_integer(x), natural_to_rugint_integer(y))),
+        y_cons: &(|&(ref x, ref y)| (natural_to_rug_integer(x), natural_to_rug_integer(y))),
         x_param: &(|&(ref x, ref y)| (x.significant_bits() + y.significant_bits()) as usize),
         limit,
         f_name: "malachite",
-        g_name: "rugint",
+        g_name: "rug",
         title: "Natural *= Natural",
         x_axis_label: "x.significant\\\\_bits() + y.significant\\\\_bits()",
         y_axis_label: "time (ns)",
@@ -123,12 +123,12 @@ pub fn benchmark_natural_mul(gm: GenerationMode, limit: usize, file_name: &str) 
         function_h: &(|(x, y)| x * y),
         x_cons: &(|p| p.clone()),
         y_cons: &(|&(ref x, ref y)| (natural_to_biguint(x), natural_to_biguint(y))),
-        z_cons: &(|&(ref x, ref y)| (natural_to_rugint_integer(x), natural_to_rugint_integer(y))),
+        z_cons: &(|&(ref x, ref y)| (natural_to_rug_integer(x), natural_to_rug_integer(y))),
         x_param: &(|&(ref x, ref y)| (x.significant_bits() + y.significant_bits()) as usize),
         limit,
         f_name: "malachite",
         g_name: "num",
-        h_name: "rugint",
+        h_name: "rug",
         title: "Natural * Natural",
         x_axis_label: "x.significant\\\\_bits() + y.significant\\\\_bits()",
         y_axis_label: "time (ns)",

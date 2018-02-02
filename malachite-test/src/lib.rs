@@ -1,7 +1,7 @@
 extern crate malachite_base;
 extern crate malachite_nz;
 extern crate num;
-extern crate rugint;
+extern crate rug;
 extern crate rust_wheels;
 
 pub mod common;

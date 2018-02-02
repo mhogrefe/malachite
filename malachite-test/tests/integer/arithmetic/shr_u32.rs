@@ -2,8 +2,8 @@ use common::LARGE_LIMIT;
 use malachite_base::round::RoundingMode;
 use malachite_base::num::{PartialOrdAbs, ShrRound, ShrRoundAssign, Zero};
 use malachite_nz::integer::Integer;
-use malachite_test::common::{integer_to_rugint_integer, rugint_integer_to_integer, GenerationMode};
-use rugint;
+use malachite_test::common::{integer_to_rug_integer, rug_integer_to_integer, GenerationMode};
+use rug;
 use malachite_test::inputs::base::{pairs_of_unsigned_and_rounding_mode, unsigneds,
                                    pairs_of_negative_signed_not_min_and_small_u32s,
                                    pairs_of_positive_signed_and_small_u32,
@@ -24,7 +24,7 @@ fn test_shr_u32() {
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let mut n = rugint::Integer::from_str(u).unwrap();
+        let mut n = rug::Integer::from_str(u).unwrap();
         n >>= v;
         assert_eq!(n.to_string(), out);
 
@@ -32,7 +32,7 @@ fn test_shr_u32() {
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = rugint::Integer::from_str(u).unwrap() >> v;
+        let n = rug::Integer::from_str(u).unwrap() >> v;
         assert_eq!(n.to_string(), out);
 
         let n = &Integer::from_str(u).unwrap() >> v;
@@ -125,8 +125,8 @@ fn test_shr_u32() {
 
 #[test]
 fn shr_u32_properties() {
-    // n >>= u is equivalent for malachite and rugint.
-    // n >> u is equivalent for malachite and rugint.
+    // n >>= u is equivalent for malachite and rug.
+    // n >> u is equivalent for malachite and rug.
     // ******* bug in num for n >> i when n < 0, n not divisible by 2^i
     // n >>= u; n is valid.
     // n >> u is valid.
@@ -141,9 +141,9 @@ fn shr_u32_properties() {
         n >>= u;
         assert!(n.is_valid());
 
-        let mut rugint_n = integer_to_rugint_integer(&old_n);
-        rugint_n >>= u;
-        assert_eq!(rugint_integer_to_integer(&rugint_n), n);
+        let mut rug_n = integer_to_rug_integer(&old_n);
+        rug_n >>= u;
+        assert_eq!(rug_integer_to_integer(&rug_n), n);
 
         let n2 = old_n.clone();
         let result = &n2 >> u;
@@ -153,8 +153,8 @@ fn shr_u32_properties() {
         assert!(result.is_valid());
         assert_eq!(result, n);
 
-        let rugint_n2 = integer_to_rugint_integer(&old_n);
-        assert_eq!(rugint_integer_to_integer(&(rugint_n2 >> u)), n);
+        let rug_n2 = integer_to_rug_integer(&old_n);
+        assert_eq!(rug_integer_to_integer(&(rug_n2 >> u)), n);
 
         assert!((&old_n >> u).le_abs(&old_n));
         assert_eq!(&old_n >> u, (&old_n).shr_round(u, RoundingMode::Floor));

@@ -1,10 +1,10 @@
-use common::{integer_to_rugint_integer, natural_to_rugint_integer, GenerationMode};
+use common::{integer_to_rug_integer, natural_to_rug_integer, GenerationMode};
 use inputs::integer::{pairs_of_integer_and_natural, pairs_of_natural_and_integer};
 use malachite_base::num::SignificantBits;
 use malachite_base::num::PartialOrdAbs;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
-use rugint;
+use rug;
 use rust_wheels::benchmarks::{BenchmarkOptions2, benchmark_2};
 use std::cmp::{max, Ordering};
 
@@ -40,13 +40,13 @@ pub fn benchmark_integer_partial_cmp_abs_natural(
     benchmark_2(BenchmarkOptions2 {
         xs: pairs_of_integer_and_natural(gm),
         function_f: &(|(x, y): (Integer, Natural)| x.partial_cmp_abs(&y)),
-        function_g: &(|(x, y): (rugint::Integer, rugint::Integer)| x.cmp_abs(&y)),
+        function_g: &(|(x, y): (rug::Integer, rug::Integer)| x.cmp_abs(&y)),
         x_cons: &(|p| p.clone()),
-        y_cons: &(|&(ref x, ref y)| (integer_to_rugint_integer(x), natural_to_rugint_integer(y))),
+        y_cons: &(|&(ref x, ref y)| (integer_to_rug_integer(x), natural_to_rug_integer(y))),
         x_param: &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),
         limit,
         f_name: "malachite",
-        g_name: "rugint",
+        g_name: "rug",
         title: "Integer.partial\\\\_cmp\\\\_abs(\\\\&Natural)",
         x_axis_label: "max(x.significant\\\\_bits(), y.significant\\\\_bits())",
         y_axis_label: "time (ns)",
@@ -66,13 +66,13 @@ pub fn benchmark_natural_partial_cmp_abs_integer(
     benchmark_2(BenchmarkOptions2 {
         xs: pairs_of_natural_and_integer(gm),
         function_f: &(|(x, y): (Natural, Integer)| x.partial_cmp_abs(&y)),
-        function_g: &(|(x, y): (rugint::Integer, rugint::Integer)| x.cmp_abs(&y)),
+        function_g: &(|(x, y): (rug::Integer, rug::Integer)| x.cmp_abs(&y)),
         x_cons: &(|p| p.clone()),
-        y_cons: &(|&(ref x, ref y)| (natural_to_rugint_integer(x), integer_to_rugint_integer(y))),
+        y_cons: &(|&(ref x, ref y)| (natural_to_rug_integer(x), integer_to_rug_integer(y))),
         x_param: &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),
         limit,
         f_name: "malachite",
-        g_name: "rugint",
+        g_name: "rug",
         title: "Natural.partial\\\\_cmp\\\\_abs(\\\\&Integer)",
         x_axis_label: "max(x.significant\\\\_bits(), y.significant\\\\_bits())",
         y_axis_label: "time (ns)",

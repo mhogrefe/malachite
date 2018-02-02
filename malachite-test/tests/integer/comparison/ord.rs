@@ -1,9 +1,9 @@
 use common::{test_cmp_helper, LARGE_LIMIT};
 use malachite_nz::integer::Integer;
-use malachite_test::common::{integer_to_rugint_integer, GenerationMode};
+use malachite_test::common::{integer_to_rug_integer, GenerationMode};
 use malachite_test::inputs::integer::{integers, pairs_of_integers, triples_of_integers};
 use num::BigInt;
-use rugint;
+use rug;
 use std::cmp::Ordering;
 
 #[test]
@@ -25,18 +25,18 @@ fn test_ord() {
     ];
     test_cmp_helper::<Integer>(&strings);
     test_cmp_helper::<BigInt>(&strings);
-    test_cmp_helper::<rugint::Integer>(&strings);
+    test_cmp_helper::<rug::Integer>(&strings);
 }
 
 #[test]
 fn cmp_properties() {
-    // x.cmp(&y) is equivalent for malachite, num, and rugint.
+    // x.cmp(&y) is equivalent for malachite, num, and rug.
     // x.cmp(&y) == y.cmp(&x).reverse()
     // x.cmp(&y) == (-y).cmp(-x)
     let two_integers = |x: Integer, y: Integer| {
         let ord = x.cmp(&y);
         assert_eq!(
-            integer_to_rugint_integer(&x).cmp(&integer_to_rugint_integer(&y)),
+            integer_to_rug_integer(&x).cmp(&integer_to_rug_integer(&y)),
             ord
         );
         assert_eq!(y.cmp(&x).reverse(), ord);

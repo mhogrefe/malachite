@@ -1,12 +1,12 @@
 use common::LARGE_LIMIT;
 use malachite_base::num::Zero;
 use malachite_nz::natural::Natural;
-use malachite_test::common::{biguint_to_natural, natural_to_biguint, natural_to_rugint_integer,
-                             rugint_integer_to_natural, GenerationMode};
+use malachite_test::common::{biguint_to_natural, natural_to_biguint, natural_to_rug_integer,
+                             rug_integer_to_natural, GenerationMode};
 use malachite_test::inputs::natural::{naturals, pairs_of_naturals};
 use malachite_test::natural::arithmetic::sub::checked_sub;
 use num::BigUint;
-use rugint;
+use rug;
 use std::str::FromStr;
 
 #[test]
@@ -54,8 +54,8 @@ fn test_sub_natural() {
         assert_eq!(format!("{:?}", on), out);
 
         let on = checked_sub(
-            rugint::Integer::from_str(u).unwrap(),
-            rugint::Integer::from_str(v).unwrap(),
+            rug::Integer::from_str(u).unwrap(),
+            rug::Integer::from_str(v).unwrap(),
         );
         assert_eq!(format!("{:?}", on), out);
     };
@@ -89,8 +89,8 @@ fn test_sub_natural() {
 
 #[test]
 fn sub_properties() {
-    // x -= y is equivalent for malachite and rugint.
-    // x - &y is equivalent for malachite and rugint.
+    // x -= y is equivalent for malachite and rug.
+    // x - &y is equivalent for malachite and rug.
     // x -= y; n is valid.
     // x - &y is valid.
     // &x - &y is valid.
@@ -104,9 +104,9 @@ fn sub_properties() {
             x -= &y;
             assert!(x.is_valid());
 
-            let mut rugint_x = natural_to_rugint_integer(&old_x);
-            rugint_x -= natural_to_rugint_integer(&y);
-            assert_eq!(rugint_integer_to_natural(&rugint_x), x);
+            let mut rug_x = natural_to_rug_integer(&old_x);
+            rug_x -= natural_to_rug_integer(&y);
+            assert_eq!(rug_integer_to_natural(&rug_x), x);
         }
         let ox = if old_x >= y { Some(x) } else { None };
 
@@ -130,10 +130,10 @@ fn sub_properties() {
             ox
         );
 
-        let rugint_x2 = natural_to_rugint_integer(&old_x);
-        let rugint_y = natural_to_rugint_integer(&y);
+        let rug_x2 = natural_to_rug_integer(&old_x);
+        let rug_y = natural_to_rug_integer(&y);
         assert_eq!(
-            checked_sub(rugint_x2, rugint_y).map(|x| rugint_integer_to_natural(&x)),
+            checked_sub(rug_x2, rug_y).map(|x| rug_integer_to_natural(&x)),
             ox
         );
 

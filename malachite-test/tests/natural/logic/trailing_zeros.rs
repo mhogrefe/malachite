@@ -29,7 +29,7 @@ fn trailing_zeros_properties() {
         assert_eq!(trailing_zeros.is_none(), x == 0);
         if x != 0 {
             let trailing_zeros = trailing_zeros.unwrap();
-            if trailing_zeros <= u32::MAX.into() {
+            if trailing_zeros <= u64::from(u32::MAX) {
                 let trailing_zeros = trailing_zeros as u32;
                 assert!((&x >> trailing_zeros).is_odd());
                 assert_eq!(&x >> trailing_zeros << trailing_zeros, x);

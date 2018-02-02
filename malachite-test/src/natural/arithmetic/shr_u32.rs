@@ -1,11 +1,11 @@
-use common::{natural_to_biguint, natural_to_rugint_integer, GenerationMode};
+use common::{natural_to_biguint, natural_to_rug_integer, GenerationMode};
 use inputs::natural::{pairs_of_natural_and_small_u32,
                       triples_of_natural_small_u32_and_rounding_mode_var_1};
 use malachite_base::round::RoundingMode;
 use malachite_base::num::{ShrRound, ShrRoundAssign};
 use malachite_nz::natural::Natural;
 use num::BigUint;
-use rugint;
+use rug;
 use rust_wheels::benchmarks::{BenchmarkOptions1, BenchmarkOptions2, BenchmarkOptions3,
                               benchmark_1, benchmark_2, benchmark_3};
 
@@ -71,13 +71,13 @@ pub fn benchmark_natural_shr_assign_u32(gm: GenerationMode, limit: usize, file_n
     benchmark_2(BenchmarkOptions2 {
         xs: pairs_of_natural_and_small_u32(gm),
         function_f: &(|(mut n, u)| n >>= u),
-        function_g: &(|(mut n, u): (rugint::Integer, u32)| n >>= u),
+        function_g: &(|(mut n, u): (rug::Integer, u32)| n >>= u),
         x_cons: &(|p| p.clone()),
-        y_cons: &(|&(ref n, index)| (natural_to_rugint_integer(n), index)),
+        y_cons: &(|&(ref n, index)| (natural_to_rug_integer(n), index)),
         x_param: &(|&(_, index)| index as usize),
         limit,
         f_name: "malachite",
-        g_name: "rugint",
+        g_name: "rug",
         title: "Natural >>= u32",
         x_axis_label: "other",
         y_axis_label: "time (ns)",
@@ -91,15 +91,15 @@ pub fn benchmark_natural_shr_u32(gm: GenerationMode, limit: usize, file_name: &s
         xs: pairs_of_natural_and_small_u32(gm),
         function_f: &(|(n, u)| n >> u),
         function_g: &(|(n, u): (BigUint, u32)| n >> u as usize),
-        function_h: &(|(n, u): (rugint::Integer, u32)| n >> u),
+        function_h: &(|(n, u): (rug::Integer, u32)| n >> u),
         x_cons: &(|p| p.clone()),
         y_cons: &(|&(ref n, index)| (natural_to_biguint(n), index)),
-        z_cons: &(|&(ref n, index)| (natural_to_rugint_integer(n), index)),
+        z_cons: &(|&(ref n, index)| (natural_to_rug_integer(n), index)),
         x_param: &(|&(_, index)| index as usize),
         limit,
         f_name: "malachite",
         g_name: "num",
-        h_name: "rugint",
+        h_name: "rug",
         title: "Natural >> u32",
         x_axis_label: "other",
         y_axis_label: "time (ns)",

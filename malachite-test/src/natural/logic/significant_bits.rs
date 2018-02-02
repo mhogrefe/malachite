@@ -1,9 +1,9 @@
-use common::{natural_to_biguint, natural_to_rugint_integer, GenerationMode};
+use common::{natural_to_biguint, natural_to_rug_integer, GenerationMode};
 use inputs::natural::naturals;
 use malachite_base::num::SignificantBits;
 use malachite_nz::natural::Natural;
 use num::BigUint;
-use rugint;
+use rug;
 use rust_wheels::benchmarks::{BenchmarkOptions3, benchmark_3};
 
 pub fn demo_natural_significant_bits(gm: GenerationMode, limit: usize) {
@@ -18,15 +18,15 @@ pub fn benchmark_natural_significant_bits(gm: GenerationMode, limit: usize, file
         xs: naturals(gm),
         function_f: &(|n: Natural| n.significant_bits()),
         function_g: &(|n: BigUint| n.bits()),
-        function_h: &(|n: rugint::Integer| n.significant_bits()),
+        function_h: &(|n: rug::Integer| n.significant_bits()),
         x_cons: &(|x| x.clone()),
         y_cons: &(|x| natural_to_biguint(x)),
-        z_cons: &(|x| natural_to_rugint_integer(x)),
+        z_cons: &(|x| natural_to_rug_integer(x)),
         x_param: &(|n| n.significant_bits() as usize),
         limit,
         f_name: "malachite",
         g_name: "num",
-        h_name: "rugint",
+        h_name: "rug",
         title: "Natural.significant\\\\_bits()",
         x_axis_label: "n.significant\\\\_bits()",
         y_axis_label: "time (ns)",

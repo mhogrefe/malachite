@@ -1,13 +1,13 @@
 use common::LARGE_LIMIT;
 use malachite_base::num::Zero;
 use malachite_nz::natural::Natural;
-use malachite_test::common::{biguint_to_natural, natural_to_biguint, natural_to_rugint_integer,
-                             rugint_integer_to_natural, GenerationMode};
+use malachite_test::common::{biguint_to_natural, natural_to_biguint, natural_to_rug_integer,
+                             rug_integer_to_natural, GenerationMode};
 use malachite_test::inputs::base::unsigneds;
 use malachite_test::inputs::natural::{naturals, pairs_of_natural_and_unsigned};
-use malachite_test::natural::arithmetic::sub_u32::{num_sub_u32, rugint_sub_u32};
+use malachite_test::natural::arithmetic::sub_u32::{num_sub_u32, rug_sub_u32};
 use num::BigUint;
-use rugint;
+use rug;
 use std::str::FromStr;
 use std::u32;
 
@@ -50,7 +50,7 @@ fn test_sub_u32() {
         let on = num_sub_u32(ux, v).map(|x| biguint_to_natural(&x));
         assert_eq!(format!("{:?}", on), out);
 
-        let on = rugint_sub_u32(rugint::Integer::from_str(u).unwrap(), v);
+        let on = rug_sub_u32(rug::Integer::from_str(u).unwrap(), v);
         assert_eq!(format!("{:?}", on), out);
     };
     test("0", 0, "Some(0)");
@@ -81,8 +81,8 @@ fn test_u32_sub_natural() {
 
 #[test]
 fn sub_u32_properties() {
-    // n -= u is equivalent for malachite and rugint.
-    // n - u is equivalent for malachite, num, and rugint.
+    // n -= u is equivalent for malachite and rug.
+    // n - u is equivalent for malachite, num, and rug.
     // &n - u is equivalent for malachite and num.
     // n -= u; n is valid.
     // n - u is valid.
@@ -98,9 +98,9 @@ fn sub_u32_properties() {
             n -= u;
             assert!(n.is_valid());
 
-            let mut rugint_n = natural_to_rugint_integer(&old_n);
-            rugint_n -= u;
-            assert_eq!(rugint_integer_to_natural(&rugint_n), n);
+            let mut rug_n = natural_to_rug_integer(&old_n);
+            rug_n -= u;
+            assert_eq!(rug_integer_to_natural(&rug_n), n);
         }
         let on = if old_n >= u { Some(n) } else { None };
 
@@ -129,9 +129,9 @@ fn sub_u32_properties() {
         let num_n2 = natural_to_biguint(&old_n);
         assert_eq!(num_sub_u32(num_n2, u).map(|x| biguint_to_natural(&x)), on);
 
-        let rugint_n2 = natural_to_rugint_integer(&old_n);
+        let rug_n2 = natural_to_rug_integer(&old_n);
         assert_eq!(
-            rugint_sub_u32(rugint_n2, u).map(|x| rugint_integer_to_natural(&x)),
+            rug_sub_u32(rug_n2, u).map(|x| rug_integer_to_natural(&x)),
             on
         );
 

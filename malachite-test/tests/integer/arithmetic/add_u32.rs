@@ -1,13 +1,13 @@
 use common::LARGE_LIMIT;
 use malachite_base::num::Zero;
 use malachite_nz::integer::Integer;
-use malachite_test::common::{bigint_to_integer, integer_to_bigint, integer_to_rugint_integer,
-                             rugint_integer_to_integer, GenerationMode};
+use malachite_test::common::{bigint_to_integer, integer_to_bigint, integer_to_rug_integer,
+                             rug_integer_to_integer, GenerationMode};
 use malachite_test::inputs::base::unsigneds;
 use malachite_test::inputs::integer::{integers, pairs_of_integer_and_unsigned};
 use malachite_test::integer::arithmetic::add_u32::num_add_u32;
 use num::BigInt;
-use rugint;
+use rug::{self, Assign};
 use std::str::FromStr;
 
 #[test]
@@ -18,7 +18,7 @@ fn test_add_u32() {
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let mut n = rugint::Integer::from_str(u).unwrap();
+        let mut n = rug::Integer::from_str(u).unwrap();
         n += v;
         assert_eq!(n.to_string(), out);
 
@@ -29,7 +29,7 @@ fn test_add_u32() {
         let n = num_add_u32(BigInt::from_str(u).unwrap(), v);
         assert_eq!(n.to_string(), out);
 
-        let n = rugint::Integer::from_str(u).unwrap() + v;
+        let n = rug::Integer::from_str(u).unwrap() + v;
         assert_eq!(n.to_string(), out);
 
         let n = &Integer::from_str(u).unwrap() + v;
@@ -40,14 +40,15 @@ fn test_add_u32() {
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = v + rugint::Integer::from_str(u).unwrap();
+        let n = v + rug::Integer::from_str(u).unwrap();
         assert_eq!(n.to_string(), out);
 
         let n = v + &Integer::from_str(u).unwrap();
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = v + &rugint::Integer::from_str(u).unwrap();
+        let mut n = rug::Integer::from(0);
+        n.assign(v + &rug::Integer::from_str(u).unwrap());
         assert_eq!(n.to_string(), out);
     };
     test("0", 0, "0");
@@ -68,8 +69,8 @@ fn test_add_u32() {
 
 #[test]
 fn add_u32_properties() {
-    // n += u is equivalent for malachite and rugint.
-    // n + u is equivalent for malachite, num, and rugint.
+    // n += u is equivalent for malachite and rug.
+    // n + u is equivalent for malachite, num, and rug.
     // &n + u is equivalent for malachite and num.
     // n += u; n is valid.
     // n + u and u + n are valid.
@@ -83,9 +84,9 @@ fn add_u32_properties() {
         n += u;
         assert!(n.is_valid());
 
-        let mut rugint_n = integer_to_rugint_integer(&old_n);
-        rugint_n += u;
-        assert_eq!(rugint_integer_to_integer(&rugint_n), n);
+        let mut rug_n = integer_to_rug_integer(&old_n);
+        rug_n += u;
+        assert_eq!(rug_integer_to_integer(&rug_n), n);
 
         let n2 = old_n.clone();
         let result = &n2 + u;
@@ -113,8 +114,8 @@ fn add_u32_properties() {
         let num_n2 = integer_to_bigint(&old_n);
         assert_eq!(bigint_to_integer(&num_add_u32(num_n2, u)), n);
 
-        let rugint_n2 = integer_to_rugint_integer(&old_n);
-        assert_eq!(rugint_integer_to_integer(&(rugint_n2 + u)), n);
+        let rug_n2 = integer_to_rug_integer(&old_n);
+        assert_eq!(rug_integer_to_integer(&(rug_n2 + u)), n);
 
         assert_eq!(&n - u, old_n);
         assert_eq!(n - old_n, u);

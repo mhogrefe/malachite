@@ -1,11 +1,11 @@
-use common::{natural_to_biguint, natural_to_rugint_integer, GenerationMode};
+use common::{natural_to_biguint, natural_to_rug_integer, GenerationMode};
 use inputs::natural::{naturals, pairs_of_naturals};
 use malachite_base::num::SignificantBits;
 use malachite_base::num::Assign;
 use malachite_nz::natural::Natural;
 use num::BigUint;
-use rugint;
-use rugint::Assign as rugint_assign;
+use rug;
+use rug::Assign as rug_assign;
 use rust_wheels::benchmarks::{BenchmarkOptions2, BenchmarkOptions3, benchmark_2, benchmark_3};
 use std::cmp::max;
 
@@ -46,15 +46,15 @@ pub fn benchmark_natural_clone(gm: GenerationMode, limit: usize, file_name: &str
         xs: naturals(gm),
         function_f: &(|n: Natural| n.clone()),
         function_g: &(|n: BigUint| n.clone()),
-        function_h: &(|n: rugint::Integer| n.clone()),
+        function_h: &(|n: rug::Integer| n.clone()),
         x_cons: &(|x| x.clone()),
         y_cons: &(|x| natural_to_biguint(x)),
-        z_cons: &(|x| natural_to_rugint_integer(x)),
+        z_cons: &(|x| natural_to_rug_integer(x)),
         x_param: &(|n| n.significant_bits() as usize),
         limit,
         f_name: "malachite",
         g_name: "num",
-        h_name: "rugint",
+        h_name: "rug",
         title: "Natural.clone()",
         x_axis_label: "n.significant\\\\_bits()",
         y_axis_label: "time (ns)",
@@ -68,15 +68,15 @@ pub fn benchmark_natural_clone_from(gm: GenerationMode, limit: usize, file_name:
         xs: pairs_of_naturals(gm),
         function_f: &(|(mut x, y): (Natural, Natural)| x.clone_from(&y)),
         function_g: &(|(mut x, y): (BigUint, BigUint)| x.clone_from(&y)),
-        function_h: &(|(mut x, y): (rugint::Integer, rugint::Integer)| x.clone_from(&y)),
+        function_h: &(|(mut x, y): (rug::Integer, rug::Integer)| x.clone_from(&y)),
         x_cons: &(|p| p.clone()),
         y_cons: &(|&(ref x, ref y)| (natural_to_biguint(x), natural_to_biguint(y))),
-        z_cons: &(|&(ref x, ref y)| (natural_to_rugint_integer(x), natural_to_rugint_integer(y))),
+        z_cons: &(|&(ref x, ref y)| (natural_to_rug_integer(x), natural_to_rug_integer(y))),
         x_param: &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),
         limit,
         f_name: "malachite",
         g_name: "num",
-        h_name: "rugint",
+        h_name: "rug",
         title: "Natural.clone\\\\_from(Natural)",
         x_axis_label: "max(x.significant\\\\_bits(), y.significant\\\\_bits())",
         y_axis_label: "time (ns)",
@@ -89,13 +89,13 @@ pub fn benchmark_natural_assign(gm: GenerationMode, limit: usize, file_name: &st
     benchmark_2(BenchmarkOptions2 {
         xs: pairs_of_naturals(gm),
         function_f: &(|(mut x, y): (Natural, Natural)| x.assign(y)),
-        function_g: &(|(mut x, y): (rugint::Integer, rugint::Integer)| x.assign(y)),
+        function_g: &(|(mut x, y): (rug::Integer, rug::Integer)| x.assign(y)),
         x_cons: &(|p| p.clone()),
-        y_cons: &(|&(ref x, ref y)| (natural_to_rugint_integer(x), natural_to_rugint_integer(y))),
+        y_cons: &(|&(ref x, ref y)| (natural_to_rug_integer(x), natural_to_rug_integer(y))),
         x_param: &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),
         limit,
         f_name: "malachite",
-        g_name: "rugint",
+        g_name: "rug",
         title: "Natural.assign(Natural)",
         x_axis_label: "max(x.significant\\\\_bits(), y.significant\\\\_bits())",
         y_axis_label: "time (ns)",

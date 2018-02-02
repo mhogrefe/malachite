@@ -1,4 +1,4 @@
-use common::{integer_to_rugint_integer, natural_to_rugint_integer, GenerationMode};
+use common::{integer_to_rug_integer, natural_to_rug_integer, GenerationMode};
 use inputs::integer::{pairs_of_integer_and_natural, pairs_of_natural_and_integer};
 use malachite_base::num::SignificantBits;
 use rust_wheels::benchmarks::{BenchmarkOptions2, benchmark_2};
@@ -31,11 +31,11 @@ pub fn benchmark_integer_partial_eq_natural(gm: GenerationMode, limit: usize, fi
         function_f: &(|(x, y)| x == y),
         function_g: &(|(x, y)| x == y),
         x_cons: &(|p| p.clone()),
-        y_cons: &(|&(ref x, ref y)| (integer_to_rugint_integer(x), natural_to_rugint_integer(y))),
+        y_cons: &(|&(ref x, ref y)| (integer_to_rug_integer(x), natural_to_rug_integer(y))),
         x_param: &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),
         limit,
         f_name: "malachite",
-        g_name: "rugint",
+        g_name: "rug",
         title: "Integer == Natural",
         x_axis_label: "max(x.significant\\\\_bits(), y.significant\\\\_bits())",
         y_axis_label: "time (ns)",
@@ -50,11 +50,11 @@ pub fn benchmark_natural_partial_eq_integer(gm: GenerationMode, limit: usize, fi
         function_f: &(|(x, y)| x == y),
         function_g: &(|(x, y)| x == y),
         x_cons: &(|p| p.clone()),
-        y_cons: &(|&(ref x, ref y)| (natural_to_rugint_integer(x), integer_to_rugint_integer(y))),
+        y_cons: &(|&(ref x, ref y)| (natural_to_rug_integer(x), integer_to_rug_integer(y))),
         x_param: &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),
         limit,
         f_name: "malachite",
-        g_name: "rugint",
+        g_name: "rug",
         title: "Natural == Integer",
         x_axis_label: "max(x.significant\\\\_bits(), y.significant\\\\_bits())",
         y_axis_label: "time (ns)",

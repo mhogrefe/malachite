@@ -1,9 +1,9 @@
 use common::{test_custom_cmp_helper, LARGE_LIMIT};
 use malachite_base::num::{OrdAbs, PartialOrdAbs};
 use malachite_nz::integer::Integer;
-use malachite_test::common::{integer_to_rugint_integer, GenerationMode};
+use malachite_test::common::{integer_to_rug_integer, GenerationMode};
 use malachite_test::inputs::integer::{integers, pairs_of_integers, triples_of_integers};
-use rugint;
+use rug;
 use std::cmp::Ordering;
 
 #[test]
@@ -19,19 +19,19 @@ fn test_ord_abs() {
         "1000000000001",
     ];
     test_custom_cmp_helper::<Integer, _>(&strings, |x, y| x.cmp_abs(y));
-    test_custom_cmp_helper::<rugint::Integer, _>(&strings, |x, y| x.cmp_abs(y));
+    test_custom_cmp_helper::<rug::Integer, _>(&strings, |x, y| x.cmp_abs(y));
 }
 
 #[test]
 fn cmp_properties() {
-    // x.cmp_abs(&y) is equivalent for malachite and rugint.
+    // x.cmp_abs(&y) is equivalent for malachite and rug.
     // x.cmp_abs(&y) == x.abs().cmp(&y.abs())
     // x.cmp_abs(&y) == y.cmp_abs(&x).reverse()
     // x.cmp_abs(&y) == (-x).cmp_abs(-y)
     let two_integers = |x: Integer, y: Integer| {
         let ord = x.cmp_abs(&y);
         assert_eq!(
-            integer_to_rugint_integer(&x).cmp_abs(&integer_to_rugint_integer(&y)),
+            integer_to_rug_integer(&x).cmp_abs(&integer_to_rug_integer(&y)),
             ord
         );
         assert_eq!(x.abs_ref().cmp(&y.abs_ref()), ord);

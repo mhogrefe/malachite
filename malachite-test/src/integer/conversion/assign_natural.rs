@@ -1,11 +1,11 @@
-use common::{integer_to_rugint_integer, natural_to_rugint_integer, GenerationMode};
+use common::{integer_to_rug_integer, natural_to_rug_integer, GenerationMode};
 use inputs::integer::pairs_of_integer_and_natural;
 use malachite_base::num::SignificantBits;
 use malachite_base::num::Assign;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
-use rugint;
-use rugint::Assign as rugint_assign;
+use rug;
+use rug::Assign as rug_assign;
 use rust_wheels::benchmarks::{BenchmarkOptions2, benchmark_2};
 use std::cmp::max;
 
@@ -31,13 +31,13 @@ pub fn benchmark_integer_assign_natural(gm: GenerationMode, limit: usize, file_n
     benchmark_2(BenchmarkOptions2 {
         xs: pairs_of_integer_and_natural(gm),
         function_f: &(|(mut x, y): (Integer, Natural)| x.assign(y)),
-        function_g: &(|(mut x, y): (rugint::Integer, rugint::Integer)| x.assign(y)),
+        function_g: &(|(mut x, y): (rug::Integer, rug::Integer)| x.assign(y)),
         x_cons: &(|p| p.clone()),
-        y_cons: &(|&(ref x, ref y)| (integer_to_rugint_integer(x), natural_to_rugint_integer(y))),
+        y_cons: &(|&(ref x, ref y)| (integer_to_rug_integer(x), natural_to_rug_integer(y))),
         x_param: &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),
         limit,
         f_name: "malachite",
-        g_name: "rugint",
+        g_name: "rug",
         title: "Integer.assign(Natural)",
         x_axis_label: "max(x.significant\\\\_bits(), y.significant\\\\_bits())",
         y_axis_label: "time (ns)",

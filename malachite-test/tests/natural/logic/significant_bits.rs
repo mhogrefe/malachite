@@ -2,10 +2,10 @@ use common::LARGE_LIMIT;
 use malachite_base::num::SignificantBits;
 use malachite_base::num::One;
 use malachite_nz::natural::Natural;
-use malachite_test::common::{natural_to_biguint, natural_to_rugint_integer, GenerationMode};
+use malachite_test::common::{natural_to_biguint, natural_to_rug_integer, GenerationMode};
 use malachite_test::inputs::natural::naturals;
 use num::BigUint;
-use rugint;
+use rug;
 use std::str::FromStr;
 use std::u32;
 
@@ -15,7 +15,7 @@ fn test_significant_bits() {
         assert_eq!(Natural::from_str(n).unwrap().significant_bits(), out);
         assert_eq!(BigUint::from_str(n).unwrap().bits() as u64, out);
         assert_eq!(
-            u64::from(rugint::Integer::from_str(n).unwrap().significant_bits()),
+            u64::from(rug::Integer::from_str(n).unwrap().significant_bits()),
             out
         );
     };
@@ -30,14 +30,14 @@ fn test_significant_bits() {
 
 #[test]
 fn significant_bits_properties() {
-    // x.significant_bits() is equivalent for malachite, num, and rugint.
+    // x.significant_bits() is equivalent for malachite, num, and rug.
     // (x < 2^32) == (x.significant_bits() <= 32)
     // if x != 0, (x.significant_bits() == n) == (2^(n-1) <= x < 2^n)
     let one_natural = |x: Natural| {
         let significant_bits = x.significant_bits();
         assert_eq!(natural_to_biguint(&x).bits() as u64, significant_bits);
         assert_eq!(
-            u64::from(natural_to_rugint_integer(&x).significant_bits()),
+            u64::from(natural_to_rug_integer(&x).significant_bits()),
             significant_bits
         );
         assert_eq!(x <= u32::MAX, significant_bits <= 32);

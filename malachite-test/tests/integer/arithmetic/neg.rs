@@ -1,11 +1,11 @@
 use common::LARGE_LIMIT;
 use malachite_base::num::NegAssign;
 use malachite_nz::integer::Integer;
-use malachite_test::common::{bigint_to_integer, integer_to_bigint, integer_to_rugint_integer,
-                             rugint_integer_to_integer, GenerationMode};
+use malachite_test::common::{bigint_to_integer, integer_to_bigint, integer_to_rug_integer,
+                             rug_integer_to_integer, GenerationMode};
 use malachite_test::inputs::integer::integers;
 use num::BigInt;
-use rugint;
+use rug;
 use std::str::FromStr;
 
 #[test]
@@ -20,7 +20,7 @@ fn test_neg() {
         assert_eq!(neg.to_string(), out);
 
         assert_eq!((-BigInt::from_str(s).unwrap()).to_string(), out);
-        assert_eq!((-rugint::Integer::from_str(s).unwrap()).to_string(), out);
+        assert_eq!((-rug::Integer::from_str(s).unwrap()).to_string(), out);
 
         let mut x = Integer::from_str(s).unwrap();
         x.neg_assign();
@@ -38,10 +38,10 @@ fn test_neg() {
 
 #[test]
 fn neg_properties() {
-    // -x is equivalent for malachite, num, and rugint.
+    // -x is equivalent for malachite, num, and rug.
     // -x is valid.
     //
-    // -&x is equivalent for malachite, num, and rugint.
+    // -&x is equivalent for malachite, num, and rug.
     // -&x is valid.
     // -x and -&x are equivalent.
     //
@@ -54,8 +54,8 @@ fn neg_properties() {
         let num_neg = -integer_to_bigint(&x);
         assert_eq!(bigint_to_integer(&num_neg), neg);
 
-        let rugint_neg = -integer_to_rugint_integer(&x);
-        assert_eq!(rugint_integer_to_integer(&rugint_neg), neg);
+        let rug_neg = -integer_to_rug_integer(&x);
+        assert_eq!(rug_integer_to_integer(&rug_neg), neg);
 
         let neg_2 = -&x;
         assert!(neg_2.is_valid());

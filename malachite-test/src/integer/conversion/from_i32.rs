@@ -3,7 +3,7 @@ use inputs::base::signeds;
 use malachite_base::num::SignificantBits;
 use malachite_nz::integer::Integer;
 use num::BigInt;
-use rugint;
+use rug;
 use rust_wheels::benchmarks::{BenchmarkOptions3, benchmark_3};
 
 pub fn demo_integer_from_i32(gm: GenerationMode, limit: usize) {
@@ -18,7 +18,7 @@ pub fn benchmark_integer_from_i32(gm: GenerationMode, limit: usize, file_name: &
         xs: signeds::<i32>(gm),
         function_f: &(|i| Integer::from(i)),
         function_g: &(|i| BigInt::from(i)),
-        function_h: &(|i| rugint::Integer::from(i)),
+        function_h: &(|i| rug::Integer::from(i)),
         x_cons: &(|&i| i),
         y_cons: &(|&i| i),
         z_cons: &(|&i| i),
@@ -26,7 +26,7 @@ pub fn benchmark_integer_from_i32(gm: GenerationMode, limit: usize, file_name: &
         limit,
         f_name: "malachite",
         g_name: "num",
-        h_name: "rugint",
+        h_name: "rug",
         title: "Integer::from(i32)",
         x_axis_label: "i.significant\\\\_bits()",
         y_axis_label: "time (ns)",

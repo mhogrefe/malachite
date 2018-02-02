@@ -62,7 +62,7 @@ fn get_bit_properties_helper_unsigned<T: 'static + PrimitiveUnsigned>() {
     // if index < T::WIDTH, n.get_bit(index) = !(!n).get_bit(index)
     let unsigned_and_u64 = |n: T, index: u64| {
         let bit = n.get_bit(index);
-        if index >= T::WIDTH.into() {
+        if index >= u64::from(T::WIDTH) {
             assert!(!bit);
         } else {
             assert_eq!(bit, !(!n).get_bit(index));
@@ -103,7 +103,7 @@ fn get_bit_properties_helper_signed<T: 'static + PrimitiveSigned>() {
     // if index < T::WIDTH, n.get_bit(index) = !(!n).get_bit(index)
     let signed_and_u64 = |n: T, index: u64| {
         let bit = n.get_bit(index);
-        if index >= T::WIDTH.into() {
+        if index >= u64::from(T::WIDTH) {
             assert_eq!(bit, n < T::ZERO);
         } else {
             assert_eq!(bit, !(!n).get_bit(index));

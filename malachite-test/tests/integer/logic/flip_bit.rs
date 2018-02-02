@@ -1,9 +1,9 @@
 use common::LARGE_LIMIT;
 use malachite_base::num::BitAccess;
 use malachite_nz::integer::Integer;
-use malachite_test::common::{integer_to_rugint_integer, rugint_integer_to_integer, GenerationMode};
+use malachite_test::common::{integer_to_rug_integer, rug_integer_to_integer, GenerationMode};
 use malachite_test::inputs::integer::pairs_of_integer_and_small_u64;
-use rugint;
+use rug;
 use std::str::FromStr;
 
 #[test]
@@ -14,8 +14,8 @@ fn test_flip_bit() {
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let mut n = rugint::Integer::from_str(u).unwrap();
-        n.invert_bit(index as u32);
+        let mut n = rug::Integer::from_str(u).unwrap();
+        n.toggle_bit(index as u32);
         assert_eq!(n.to_string(), out);
     };
     test("0", 10, "1024");
@@ -32,7 +32,7 @@ fn test_flip_bit() {
 
 #[test]
 fn flip_bit_properties() {
-    // n.flip_bit(index) is equivalent for malachite and rugint.
+    // n.flip_bit(index) is equivalent for malachite and rug.
     // Flipping a bit once always changes a number.
     // Flipping the same bit twice leaves a number unchanged.
     let integer_and_u64 = |mut n: Integer, index: u64| {
@@ -41,9 +41,9 @@ fn flip_bit_properties() {
         assert!(n.is_valid());
         assert_ne!(n, old_n);
 
-        let mut rugint_n = integer_to_rugint_integer(&old_n);
-        rugint_n.invert_bit(index as u32);
-        assert_eq!(rugint_integer_to_integer(&rugint_n), n);
+        let mut rug_n = integer_to_rug_integer(&old_n);
+        rug_n.toggle_bit(index as u32);
+        assert_eq!(rug_integer_to_integer(&rug_n), n);
 
         n.flip_bit(index);
         assert_eq!(n, old_n);

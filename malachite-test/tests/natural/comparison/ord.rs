@@ -1,9 +1,9 @@
 use common::{test_cmp_helper, LARGE_LIMIT};
 use malachite_nz::natural::Natural;
-use malachite_test::common::{natural_to_biguint, natural_to_rugint_integer, GenerationMode};
+use malachite_test::common::{natural_to_biguint, natural_to_rug_integer, GenerationMode};
 use malachite_test::inputs::natural::{naturals, pairs_of_naturals, triples_of_naturals};
 use num::BigUint;
-use rugint;
+use rug;
 use std::cmp::Ordering;
 
 #[test]
@@ -19,19 +19,19 @@ fn test_cmp() {
     ];
     test_cmp_helper::<Natural>(&strings);
     test_cmp_helper::<BigUint>(&strings);
-    test_cmp_helper::<rugint::Integer>(&strings);
+    test_cmp_helper::<rug::Integer>(&strings);
 }
 
 #[test]
 fn cmp_properties() {
-    // x.cmp(&y) is equivalent for malachite, num, and rugint.
+    // x.cmp(&y) is equivalent for malachite, num, and rug.
     // x.cmp(&y) == y.cmp(&x).reverse()
     // x.cmp(&y) == (-y).cmp(-x)
     let two_naturals = |x: Natural, y: Natural| {
         let ord = x.cmp(&y);
         assert_eq!(natural_to_biguint(&x).cmp(&natural_to_biguint(&y)), ord);
         assert_eq!(
-            natural_to_rugint_integer(&x).cmp(&natural_to_rugint_integer(&y)),
+            natural_to_rug_integer(&x).cmp(&natural_to_rug_integer(&y)),
             ord
         );
         assert_eq!(y.cmp(&x).reverse(), ord);

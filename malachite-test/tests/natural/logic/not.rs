@@ -1,8 +1,8 @@
 use common::LARGE_LIMIT;
 use malachite_nz::natural::Natural;
-use malachite_test::common::{natural_to_rugint_integer, rugint_integer_to_integer, GenerationMode};
+use malachite_test::common::{natural_to_rug_integer, rug_integer_to_integer, GenerationMode};
 use malachite_test::inputs::natural::naturals;
-use rugint;
+use rug;
 use std::str::FromStr;
 
 #[test]
@@ -16,7 +16,7 @@ fn test_not() {
         assert!(not.is_valid());
         assert_eq!(not.to_string(), out);
 
-        assert_eq!((!rugint::Integer::from_str(s).unwrap()).to_string(), out);
+        assert_eq!((!rug::Integer::from_str(s).unwrap()).to_string(), out);
     };
     test("0", "-1");
     test("123", "-124");
@@ -26,10 +26,10 @@ fn test_not() {
 
 #[test]
 fn not_properties() {
-    // !x is equivalent for malachite and rugint.
+    // !x is equivalent for malachite and rug.
     // !x is valid.
     //
-    // !&x is equivalent for malachite and rugint.
+    // !&x is equivalent for malachite and rug.
     // !&x is valid.
     // !x and !&x are equivalent.
     //
@@ -41,8 +41,8 @@ fn not_properties() {
         let not = !x.clone();
         assert!(not.is_valid());
 
-        let rugint_not = !natural_to_rugint_integer(&x);
-        assert_eq!(rugint_integer_to_integer(&rugint_not), not);
+        let rug_not = !natural_to_rug_integer(&x);
+        assert_eq!(rug_integer_to_integer(&rug_not), not);
 
         let not_2 = !&x;
         assert!(not_2.is_valid());

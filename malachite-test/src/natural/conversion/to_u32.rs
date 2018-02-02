@@ -1,8 +1,8 @@
-use common::{natural_to_rugint_integer, GenerationMode};
+use common::{natural_to_rug_integer, GenerationMode};
 use inputs::natural::naturals;
 use malachite_base::num::SignificantBits;
 use malachite_nz::natural::Natural;
-use rugint;
+use rug;
 use rust_wheels::benchmarks::{BenchmarkOptions2, benchmark_2};
 
 pub fn demo_natural_to_u32(gm: GenerationMode, limit: usize) {
@@ -22,13 +22,13 @@ pub fn benchmark_natural_to_u32(gm: GenerationMode, limit: usize, file_name: &st
     benchmark_2(BenchmarkOptions2 {
         xs: naturals(gm),
         function_f: &(|n: Natural| n.to_u32()),
-        function_g: &(|n: rugint::Integer| n.to_u32()),
+        function_g: &(|n: rug::Integer| n.to_u32()),
         x_cons: &(|x| x.clone()),
-        y_cons: &(|x| natural_to_rugint_integer(x)),
+        y_cons: &(|x| natural_to_rug_integer(x)),
         x_param: &(|n| n.significant_bits() as usize),
         limit,
         f_name: "malachite",
-        g_name: "rugint",
+        g_name: "rug",
         title: "Natural.to\\\\_u32()",
         x_axis_label: "n.significant\\\\_bits()",
         y_axis_label: "time (ns)",
@@ -41,13 +41,13 @@ pub fn benchmark_natural_to_u32_wrapping(gm: GenerationMode, limit: usize, file_
     benchmark_2(BenchmarkOptions2 {
         xs: naturals(gm),
         function_f: &(|n: Natural| n.to_u32_wrapping()),
-        function_g: &(|n: rugint::Integer| n.to_u32_wrapping()),
+        function_g: &(|n: rug::Integer| n.to_u32_wrapping()),
         x_cons: &(|x| x.clone()),
-        y_cons: &(|x| natural_to_rugint_integer(x)),
+        y_cons: &(|x| natural_to_rug_integer(x)),
         x_param: &(|n| n.significant_bits() as usize),
         limit,
         f_name: "malachite",
-        g_name: "rugint",
+        g_name: "rug",
         title: "Natural.to\\\\_u32\\\\_wrapping()",
         x_axis_label: "n.significant\\\\_bits()",
         y_axis_label: "time (ns)",

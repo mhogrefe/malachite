@@ -1,9 +1,9 @@
 use common::LARGE_LIMIT;
 use malachite_base::num::BitAccess;
 use malachite_nz::natural::Natural;
-use malachite_test::common::{natural_to_rugint_integer, rugint_integer_to_natural, GenerationMode};
+use malachite_test::common::{natural_to_rug_integer, rug_integer_to_natural, GenerationMode};
 use malachite_test::inputs::natural::pairs_of_natural_and_small_u64;
-use rugint;
+use rug;
 use std::str::FromStr;
 
 #[test]
@@ -14,7 +14,7 @@ fn test_clear_bit() {
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let mut n = rugint::Integer::from_str(u).unwrap();
+        let mut n = rug::Integer::from_str(u).unwrap();
         n.set_bit(index as u32, false);
         assert_eq!(n.to_string(), out);
     };
@@ -30,7 +30,7 @@ fn test_clear_bit() {
 
 #[test]
 fn clear_bit_properties() {
-    // n.clear_bit(index) is equivalent for malachite and rugint.
+    // n.clear_bit(index) is equivalent for malachite and rug.
     // n.clear_bit(index) is equivalent to n.assign_bit(index, false).
     // If n.get_bit(index), clearing and then setting at index won't do anything.
     // Setting a bit does not increase n.
@@ -40,9 +40,9 @@ fn clear_bit_properties() {
         n.clear_bit(index);
         assert!(n.is_valid());
 
-        let mut rugint_n = natural_to_rugint_integer(&old_n);
-        rugint_n.set_bit(index as u32, false);
-        assert_eq!(rugint_integer_to_natural(&rugint_n), n);
+        let mut rug_n = natural_to_rug_integer(&old_n);
+        rug_n.set_bit(index as u32, false);
+        assert_eq!(rug_integer_to_natural(&rug_n), n);
 
         let mut n2 = old_n.clone();
         n2.assign_bit(index, false);

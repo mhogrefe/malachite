@@ -2,8 +2,8 @@ use common::LARGE_LIMIT;
 use malachite_base::round::RoundingMode;
 use malachite_base::num::{ShrRound, ShrRoundAssign, Zero};
 use malachite_nz::natural::Natural;
-use malachite_test::common::{biguint_to_natural, natural_to_biguint, natural_to_rugint_integer,
-                             rugint_integer_to_natural, GenerationMode};
+use malachite_test::common::{biguint_to_natural, natural_to_biguint, natural_to_rug_integer,
+                             rug_integer_to_natural, GenerationMode};
 use malachite_test::inputs::base::{pairs_of_unsigned_and_rounding_mode, unsigneds,
                                    pairs_of_positive_unsigned_and_small_u32,
                                    pairs_of_unsigned_and_small_u32};
@@ -13,7 +13,7 @@ use malachite_test::inputs::natural::{naturals, pairs_of_natural_and_rounding_mo
                                       triples_of_natural_small_u32_and_rounding_mode_var_1,
                                       triples_of_natural_small_u32_and_small_u32};
 use num::BigUint;
-use rugint;
+use rug;
 use std::i32;
 use std::str::FromStr;
 
@@ -25,7 +25,7 @@ fn test_shr_u32() {
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let mut n = rugint::Integer::from_str(u).unwrap();
+        let mut n = rug::Integer::from_str(u).unwrap();
         n >>= v;
         assert_eq!(n.to_string(), out);
 
@@ -33,7 +33,7 @@ fn test_shr_u32() {
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = rugint::Integer::from_str(u).unwrap() >> v;
+        let n = rug::Integer::from_str(u).unwrap() >> v;
         assert_eq!(n.to_string(), out);
 
         let n = BigUint::from_str(u).unwrap() >> v as usize;
@@ -91,8 +91,8 @@ fn test_shr_u32() {
 
 #[test]
 fn shr_u32_properties() {
-    // n >>= u is equivalent for malachite and rugint.
-    // n >> u is equivalent for malachite, num, and rugint.
+    // n >>= u is equivalent for malachite and rug.
+    // n >> u is equivalent for malachite, num, and rug.
     // &n >> u is equivalent for malachite and num.
     // n >>= u; n is valid.
     // n >> u is valid.
@@ -107,9 +107,9 @@ fn shr_u32_properties() {
         n >>= u;
         assert!(n.is_valid());
 
-        let mut rugint_n = natural_to_rugint_integer(&old_n);
-        rugint_n >>= u;
-        assert_eq!(rugint_integer_to_natural(&rugint_n), n);
+        let mut rug_n = natural_to_rug_integer(&old_n);
+        rug_n >>= u;
+        assert_eq!(rug_integer_to_natural(&rug_n), n);
 
         let n2 = old_n.clone();
         let result = &n2 >> u;
@@ -123,8 +123,8 @@ fn shr_u32_properties() {
         assert_eq!(biguint_to_natural(&(&num_n2 >> u as usize)), n);
         assert_eq!(biguint_to_natural(&(num_n2 >> u as usize)), n);
 
-        let rugint_n2 = natural_to_rugint_integer(&old_n);
-        assert_eq!(rugint_integer_to_natural(&(rugint_n2 >> u)), n);
+        let rug_n2 = natural_to_rug_integer(&old_n);
+        assert_eq!(rug_integer_to_natural(&(rug_n2 >> u)), n);
 
         assert!(&old_n >> u <= old_n);
         assert_eq!(&old_n >> u, (&old_n).shr_round(u, RoundingMode::Floor));
@@ -801,8 +801,8 @@ fn shr_round_u32_ref_fail_4() {
 
 #[test]
 fn shr_round_u32_properties() {
-    // n.shr_round_assign(u, rm) is equivalent for malachite and rugint.
-    // n.shr_round(u, rm) is equivalent for malachite and rugint.
+    // n.shr_round_assign(u, rm) is equivalent for malachite and rug.
+    // n.shr_round(u, rm) is equivalent for malachite and rug.
     // (&n).shr_round(u, rm) is equivalent for malachite and num.
     // n.shr_round_assign(u, rm); n is valid.
     // n.shr_round(u, rm) is valid.

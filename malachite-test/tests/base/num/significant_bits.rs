@@ -20,7 +20,7 @@ fn significant_bits_helper_common<T: PrimitiveInteger>() {
 fn significant_bits_helper_unsigned<T: PrimitiveUnsigned>(max: u64) {
     significant_bits_helper_common::<T>();
 
-    let test = |n, out| {
+    let test = |n, out: u64| {
         assert_eq!(T::from_u64(n).significant_bits(), out);
     };
 
@@ -30,7 +30,7 @@ fn significant_bits_helper_unsigned<T: PrimitiveUnsigned>(max: u64) {
 fn significant_bits_helper_signed<T: PrimitiveSigned>(max: i64, min: i64) {
     significant_bits_helper_common::<T>();
 
-    let test = |n, out| {
+    let test = |n, out: u64| {
         assert_eq!(T::from_i64(n).significant_bits(), out);
     };
 
@@ -56,7 +56,7 @@ fn significant_bits_properties_helper_unsigned<T: 'static + PrimitiveUnsigned>()
     // n.significant_bits() == 0 iff n == 0
     let unsigned = |n: T| {
         let significant_bits = n.significant_bits();
-        assert!(significant_bits <= T::WIDTH.into());
+        assert!(significant_bits <= u64::from(T::WIDTH));
         assert_eq!(significant_bits == 0, n == T::ZERO);
     };
 
@@ -76,9 +76,9 @@ fn significant_bits_properties_helper_signed<T: 'static + PrimitiveSigned>() {
     // n.significant_bits() == n.wrapping_neg().significant_bits()
     let signed = |n: T| {
         let significant_bits = n.significant_bits();
-        assert!(significant_bits <= T::WIDTH.into());
+        assert!(significant_bits <= u64::from(T::WIDTH));
         assert_eq!(significant_bits == 0, n == T::ZERO);
-        assert_eq!(significant_bits == T::WIDTH.into(), n == T::MIN);
+        assert_eq!(significant_bits == u64::from(T::WIDTH), n == T::MIN);
         assert_eq!(n.wrapping_neg().significant_bits(), significant_bits);
     };
 

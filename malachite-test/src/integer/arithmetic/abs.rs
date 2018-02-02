@@ -1,10 +1,10 @@
-use common::{integer_to_bigint, integer_to_rugint_integer, GenerationMode};
+use common::{integer_to_bigint, integer_to_rug_integer, GenerationMode};
 use inputs::integer::integers;
 use malachite_base::num::SignificantBits;
 use malachite_base::num::AbsAssign;
 use malachite_nz::integer::Integer;
 use num::{BigInt, Signed};
-use rugint;
+use rug;
 use rust_wheels::benchmarks::{BenchmarkOptions1, BenchmarkOptions2, BenchmarkOptions3,
                               benchmark_1, benchmark_2, benchmark_3};
 
@@ -46,15 +46,15 @@ pub fn benchmark_integer_abs_assign(gm: GenerationMode, limit: usize, file_name:
         xs: integers(gm),
         function_f: &(|n: Integer| n.abs()),
         function_g: &(|n: BigInt| n.abs()),
-        function_h: &(|mut n: rugint::Integer| n.abs().sign()),
+        function_h: &(|n: rug::Integer| n.abs().cmp0()),
         x_cons: &(|x| x.clone()),
         y_cons: &(|x| integer_to_bigint(x)),
-        z_cons: &(|x| integer_to_rugint_integer(x)),
+        z_cons: &(|x| integer_to_rug_integer(x)),
         x_param: &(|n| n.significant_bits() as usize),
         limit,
         f_name: "malachite",
         g_name: "num",
-        h_name: "rugint",
+        h_name: "rug",
         title: "Integer.abs\\\\_assign()",
         x_axis_label: "n.significant\\\\_bits()",
         y_axis_label: "time (ns)",

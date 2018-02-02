@@ -35,7 +35,7 @@ fn is_power_of_2_properties() {
         if x != 0 {
             let trailing_zeros = x.trailing_zeros().unwrap();
             assert_eq!(trailing_zeros == x.significant_bits() - 1, is_power_of_2);
-            if trailing_zeros <= u32::MAX.into() {
+            if trailing_zeros <= u64::from(u32::MAX) {
                 let trailing_zeros = trailing_zeros as u32;
                 assert_eq!(x >> trailing_zeros == 1, is_power_of_2);
             }

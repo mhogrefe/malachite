@@ -1,8 +1,8 @@
-use common::{integer_to_rugint_integer, GenerationMode};
+use common::{integer_to_rug_integer, GenerationMode};
 use inputs::integer::pairs_of_integer_and_small_u64;
 use malachite_base::num::{BitAccess, SignificantBits};
 use malachite_nz::integer::Integer;
-use rugint;
+use rug;
 use rust_wheels::benchmarks::{BenchmarkOptions2, benchmark_2};
 use std::cmp::max;
 
@@ -19,15 +19,15 @@ pub fn benchmark_integer_flip_bit(gm: GenerationMode, limit: usize, file_name: &
     benchmark_2(BenchmarkOptions2 {
         xs: pairs_of_integer_and_small_u64(gm),
         function_f: &(|(mut n, index): (Integer, u64)| n.flip_bit(index)),
-        function_g: &(|(mut n, index): (rugint::Integer, u64)| {
-            n.invert_bit(index as u32);
+        function_g: &(|(mut n, index): (rug::Integer, u64)| {
+            n.toggle_bit(index as u32);
         }),
         x_cons: &(|p| p.clone()),
-        y_cons: &(|&(ref n, index)| (integer_to_rugint_integer(n), index)),
+        y_cons: &(|&(ref n, index)| (integer_to_rug_integer(n), index)),
         x_param: &(|&(ref n, index)| max(n.significant_bits(), index) as usize),
         limit,
         f_name: "malachite",
-        g_name: "rugint",
+        g_name: "rug",
         title: "Integer.flip\\\\_bit(u64)",
         x_axis_label: "max(n.significant\\\\_bits(), index)",
         y_axis_label: "time (ns)",

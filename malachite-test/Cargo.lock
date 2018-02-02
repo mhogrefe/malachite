@@ -90,7 +90,7 @@ dependencies = [
  "malachite-nz 0.1.0",
  "num 0.1.41 (registry+https://github.com/rust-lang/crates.io-index)",
  "rand 0.3.20 (registry+https://github.com/rust-lang/crates.io-index)",
- "rugint 0.2.2 (registry+https://github.com/rust-lang/crates.io-index)",
+ "rug 0.9.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "rust-wheels 0.1.0",
 ]
 
@@ -180,12 +180,11 @@ version = "0.1.37"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
-name = "rugint"
-version = "0.2.2"
+name = "rug"
+version = "0.9.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "gmp-mpfr-sys 1.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "rand 0.3.20 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -281,7 +280,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 "checksum num-traits 0.1.42 (registry+https://github.com/rust-lang/crates.io-index)" = "9936036cc70fe4a8b2d338ab665900323290efb03983c86cbe235ae800ad8017"
 "checksum rand 0.3.20 (registry+https://github.com/rust-lang/crates.io-index)" = "512870020642bb8c221bf68baa1b2573da814f6ccfe5c9699b1c303047abe9b1"
 "checksum redox_syscall 0.1.37 (registry+https://github.com/rust-lang/crates.io-index)" = "0d92eecebad22b767915e4d529f89f28ee96dbbf5a4810d2b844373f136417fd"
-"checksum rugint 0.2.2 (registry+https://github.com/rust-lang/crates.io-index)" = "2183682d7d8b18f03c2e419e9b628ef1c6b7751d2d8977fda0715b78f7036e10"
+"checksum rug 0.9.2 (registry+https://github.com/rust-lang/crates.io-index)" = "69bebe0d22b5c407d62c362ffafa20d5967caf2fbb0097e99932e280105e7de1"
 "checksum rustc-serialize 0.3.24 (registry+https://github.com/rust-lang/crates.io-index)" = "dcf128d1287d2ea9d80910b5f1120d0b8eede3fbf1abe91c40d39ea7d51e6fda"
 "checksum sha3 0.4.1 (registry+https://github.com/rust-lang/crates.io-index)" = "47e72786a5f51fbce3ba5485ef4fcbff99eda815d2e0a3c619460cd90e2a660c"
 "checksum streaming-stats 0.1.28 (registry+https://github.com/rust-lang/crates.io-index)" = "f13d0cd680e11a62c5e125d9799debfb39fcfff9a2ef416336ce748f65018b89"

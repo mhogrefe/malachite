@@ -1,10 +1,10 @@
-use common::{natural_to_biguint, natural_to_rugint_integer, GenerationMode};
+use common::{natural_to_biguint, natural_to_rug_integer, GenerationMode};
 use inputs::natural::{pairs_of_natural_and_unsigned, pairs_of_unsigned_and_natural,
                       pairs_of_natural_and_u32_var_1};
 use malachite_base::num::SignificantBits;
 use natural::comparison::partial_ord_u32::num_partial_cmp_u32;
 use num::BigUint;
-use rugint;
+use rug;
 use rust_wheels::benchmarks::{BenchmarkOptions1, BenchmarkOptions2, BenchmarkOptions3,
                               benchmark_1, benchmark_2, benchmark_3};
 use std::cmp::Ordering;
@@ -17,7 +17,7 @@ pub fn num_sub_u32(x: BigUint, u: u32) -> Option<BigUint> {
     }
 }
 
-pub fn rugint_sub_u32(x: rugint::Integer, u: u32) -> Option<rugint::Integer> {
+pub fn rug_sub_u32(x: rug::Integer, u: u32) -> Option<rug::Integer> {
     if x >= u {
         Some(x - u)
     } else {
@@ -58,13 +58,13 @@ pub fn benchmark_natural_sub_assign_u32(gm: GenerationMode, limit: usize, file_n
     benchmark_2(BenchmarkOptions2 {
         xs: pairs_of_natural_and_u32_var_1(gm),
         function_f: &(|(mut n, u)| n -= u),
-        function_g: &(|(mut n, u): (rugint::Integer, u32)| n -= u),
+        function_g: &(|(mut n, u): (rug::Integer, u32)| n -= u),
         x_cons: &(|p| p.clone()),
-        y_cons: &(|&(ref n, u)| (natural_to_rugint_integer(n), u)),
+        y_cons: &(|&(ref n, u)| (natural_to_rug_integer(n), u)),
         x_param: &(|&(ref n, _)| n.significant_bits() as usize),
         limit,
         f_name: "malachite",
-        g_name: "rugint",
+        g_name: "rug",
         title: "Natural -= u32",
         x_axis_label: "other",
         y_axis_label: "time (ns)",
@@ -78,15 +78,15 @@ pub fn benchmark_natural_sub_u32(gm: GenerationMode, limit: usize, file_name: &s
         xs: pairs_of_natural_and_unsigned::<u32>(gm),
         function_f: &(|(n, u)| n - u),
         function_g: &(|(n, u): (BigUint, u32)| num_sub_u32(n, u)),
-        function_h: &(|(n, u): (rugint::Integer, u32)| n - u),
+        function_h: &(|(n, u): (rug::Integer, u32)| n - u),
         x_cons: &(|p| p.clone()),
         y_cons: &(|&(ref n, u)| (natural_to_biguint(n), u)),
-        z_cons: &(|&(ref n, u)| (natural_to_rugint_integer(n), u)),
+        z_cons: &(|&(ref n, u)| (natural_to_rug_integer(n), u)),
         x_param: &(|&(ref n, _)| n.significant_bits() as usize),
         limit,
         f_name: "malachite",
         g_name: "num",
-        h_name: "rugint",
+        h_name: "rug",
         title: "Natural - u32",
         x_axis_label: "other",
         y_axis_label: "time (ns)",
@@ -115,13 +115,13 @@ pub fn benchmark_u32_sub_natural(gm: GenerationMode, limit: usize, file_name: &s
     benchmark_2(BenchmarkOptions2 {
         xs: pairs_of_unsigned_and_natural::<u32>(gm),
         function_f: &(|(u, n)| u - &n),
-        function_g: &(|(u, n): (u32, rugint::Integer)| u - n),
+        function_g: &(|(u, n): (u32, rug::Integer)| u - n),
         x_cons: &(|p| p.clone()),
-        y_cons: &(|&(u, ref n)| (u, natural_to_rugint_integer(n))),
+        y_cons: &(|&(u, ref n)| (u, natural_to_rug_integer(n))),
         x_param: &(|&(_, ref n)| n.significant_bits() as usize),
         limit,
         f_name: "malachite",
-        g_name: "rugint",
+        g_name: "rug",
         title: "u32 - Natural",
         x_axis_label: "other",
         y_axis_label: "time (ns)",

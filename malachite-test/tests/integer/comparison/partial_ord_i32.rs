@@ -1,12 +1,12 @@
 use common::LARGE_LIMIT;
 use malachite_nz::integer::Integer;
-use malachite_test::common::{integer_to_bigint, integer_to_rugint_integer, GenerationMode};
+use malachite_test::common::{integer_to_bigint, integer_to_rug_integer, GenerationMode};
 use malachite_test::inputs::integer::{pairs_of_integer_and_signed,
                                       triples_of_integer_signed_and_integer,
                                       triples_of_signed_integer_and_signed};
 use malachite_test::integer::comparison::partial_ord_i32::num_partial_cmp_i32;
 use num::BigInt;
-use rugint;
+use rug;
 use std::cmp::Ordering;
 use std::str::FromStr;
 
@@ -15,14 +15,14 @@ fn test_partial_ord_i32() {
     let test = |u, v: i32, out| {
         assert_eq!(Integer::from_str(u).unwrap().partial_cmp(&v), out);
         assert_eq!(num_partial_cmp_i32(&BigInt::from_str(u).unwrap(), v), out);
-        assert_eq!(rugint::Integer::from_str(u).unwrap().partial_cmp(&v), out);
+        assert_eq!(rug::Integer::from_str(u).unwrap().partial_cmp(&v), out);
 
         assert_eq!(
             v.partial_cmp(&Integer::from_str(u).unwrap()),
             out.map(|o| o.reverse())
         );
         assert_eq!(
-            v.partial_cmp(&rugint::Integer::from_str(u).unwrap()),
+            v.partial_cmp(&rug::Integer::from_str(u).unwrap()),
             out.map(|o| o.reverse())
         );
     };
@@ -43,20 +43,20 @@ fn test_partial_ord_i32() {
 
 #[test]
 fn partial_cmp_i32_properties() {
-    // n.partial_cmp(&i) is equivalent for malachite, num, and rugint.
+    // n.partial_cmp(&i) is equivalent for malachite, num, and rug.
     // n.partial_cmp(&Integer::from(i)) is equivalent to n.partial_cmp(&u).
     //
-    // i.partial_cmp(&n) is equivalent for malachite and rugint.
+    // i.partial_cmp(&n) is equivalent for malachite and rug.
     // Integer::from(i).partial_cmp(&n) is equivalent to i.partial_cmp(&n).
     // n < i <=> i > n, n > i <=> i < n, and n == i <=> i == n.
     let integer_and_i32 = |n: Integer, i: i32| {
         let cmp_1 = n.partial_cmp(&i);
         assert_eq!(num_partial_cmp_i32(&integer_to_bigint(&n), i), cmp_1);
-        assert_eq!(integer_to_rugint_integer(&n).partial_cmp(&i), cmp_1);
+        assert_eq!(integer_to_rug_integer(&n).partial_cmp(&i), cmp_1);
         assert_eq!(n.partial_cmp(&Integer::from(i)), cmp_1);
 
         let cmp_2 = i.partial_cmp(&n);
-        assert_eq!(i.partial_cmp(&integer_to_rugint_integer(&n)), cmp_2);
+        assert_eq!(i.partial_cmp(&integer_to_rug_integer(&n)), cmp_2);
         assert_eq!(cmp_2, cmp_1.map(|o| o.reverse()));
         assert_eq!(Integer::from(i).partial_cmp(&n), cmp_2);
     };

@@ -2,12 +2,12 @@ use common::LARGE_LIMIT;
 use malachite_base::round::RoundingMode;
 use malachite_base::num::{ShlRound, ShlRoundAssign, Zero};
 use malachite_nz::integer::Integer;
-use malachite_test::common::{integer_to_rugint_integer, rugint_integer_to_integer, GenerationMode};
+use malachite_test::common::{integer_to_rug_integer, rug_integer_to_integer, GenerationMode};
 use malachite_test::inputs::base::{pairs_of_signed_and_rounding_mode, signeds};
 use malachite_test::inputs::integer::{integers, pairs_of_integer_and_rounding_mode,
                                       pairs_of_integer_and_small_i32,
                                       triples_of_integer_small_i32_and_rounding_mode_var_1};
-use rugint;
+use rug;
 use std::str::FromStr;
 
 #[test]
@@ -18,7 +18,7 @@ fn test_shl_i32() {
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let mut n = rugint::Integer::from_str(i).unwrap();
+        let mut n = rug::Integer::from_str(i).unwrap();
         n <<= j;
         assert_eq!(n.to_string(), out);
 
@@ -26,7 +26,7 @@ fn test_shl_i32() {
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = rugint::Integer::from_str(i).unwrap() << j;
+        let n = rug::Integer::from_str(i).unwrap() << j;
         assert_eq!(n.to_string(), out);
 
         let n = &Integer::from_str(i).unwrap() << j;
@@ -155,8 +155,8 @@ fn test_shl_i32() {
 
 #[test]
 fn shl_u32_properties() {
-    // n <<= i is equivalent for malachite and rugint.
-    // n << i is equivalent for malachite and rugint.
+    // n <<= i is equivalent for malachite and rug.
+    // n << i is equivalent for malachite and rug.
     // n <<= i; n is valid.
     // n << i is valid.
     // &n << i is valid.
@@ -167,9 +167,9 @@ fn shl_u32_properties() {
         n <<= i;
         assert!(n.is_valid());
 
-        let mut rugint_n = integer_to_rugint_integer(&old_n);
-        rugint_n <<= i;
-        assert_eq!(rugint_integer_to_integer(&rugint_n), n);
+        let mut rug_n = integer_to_rug_integer(&old_n);
+        rug_n <<= i;
+        assert_eq!(rug_integer_to_integer(&rug_n), n);
 
         let n2 = old_n.clone();
         let result = &n2 << i;
@@ -179,8 +179,8 @@ fn shl_u32_properties() {
         assert!(result.is_valid());
         assert_eq!(result, n);
 
-        let rugint_n2 = integer_to_rugint_integer(&old_n);
-        assert_eq!(rugint_integer_to_integer(&(rugint_n2 << i)), n);
+        let rug_n2 = integer_to_rug_integer(&old_n);
+        assert_eq!(rug_integer_to_integer(&(rug_n2 << i)), n);
 
         assert_eq!(&old_n << i, (&old_n).shl_round(i, RoundingMode::Floor));
     };

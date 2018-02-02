@@ -1,8 +1,8 @@
-use common::{integer_to_rugint_integer, GenerationMode};
+use common::{integer_to_rug_integer, GenerationMode};
 use inputs::integer::pairs_of_integer_and_small_u64;
 use malachite_base::num::BitAccess;
 use malachite_nz::integer::Integer;
-use rugint;
+use rug;
 use rust_wheels::benchmarks::{BenchmarkOptions2, benchmark_2};
 
 pub fn demo_integer_get_bit(gm: GenerationMode, limit: usize) {
@@ -16,13 +16,13 @@ pub fn benchmark_integer_get_bit(gm: GenerationMode, limit: usize, file_name: &s
     benchmark_2(BenchmarkOptions2 {
         xs: pairs_of_integer_and_small_u64(gm),
         function_f: &(|(n, index): (Integer, u64)| n.get_bit(index)),
-        function_g: &(|(n, index): (rugint::Integer, u64)| n.get_bit(index as u32)),
+        function_g: &(|(n, index): (rug::Integer, u64)| n.get_bit(index as u32)),
         x_cons: &(|p| p.clone()),
-        y_cons: &(|&(ref n, index)| (integer_to_rugint_integer(n), index)),
+        y_cons: &(|&(ref n, index)| (integer_to_rug_integer(n), index)),
         x_param: &(|&(_, index)| index as usize),
         limit,
         f_name: "malachite",
-        g_name: "rugint",
+        g_name: "rug",
         title: "Integer.get\\\\_bit(u64)",
         x_axis_label: "index",
         y_axis_label: "time (ns)",

@@ -1,8 +1,8 @@
-use common::{integer_to_bigint, integer_to_rugint_integer, GenerationMode};
+use common::{integer_to_bigint, integer_to_rug_integer, GenerationMode};
 use inputs::integer::{pairs_of_integer_and_unsigned, pairs_of_unsigned_and_integer};
 use malachite_base::num::SignificantBits;
 use num::BigInt;
-use rugint;
+use rug;
 use rust_wheels::benchmarks::{BenchmarkOptions2, BenchmarkOptions3, benchmark_2, benchmark_3};
 
 pub fn num_sub_u32(mut x: BigInt, u: u32) -> BigInt {
@@ -50,13 +50,13 @@ pub fn benchmark_integer_sub_assign_u32(gm: GenerationMode, limit: usize, file_n
     benchmark_2(BenchmarkOptions2 {
         xs: pairs_of_integer_and_unsigned::<u32>(gm),
         function_f: &(|(mut n, u)| n -= u),
-        function_g: &(|(mut n, u): (rugint::Integer, u32)| n -= u),
+        function_g: &(|(mut n, u): (rug::Integer, u32)| n -= u),
         x_cons: &(|p| p.clone()),
-        y_cons: &(|&(ref n, u)| (integer_to_rugint_integer(n), u)),
+        y_cons: &(|&(ref n, u)| (integer_to_rug_integer(n), u)),
         x_param: &(|&(ref n, _)| n.significant_bits() as usize),
         limit,
         f_name: "malachite",
-        g_name: "rugint",
+        g_name: "rug",
         title: "Integer -= u32",
         x_axis_label: "other",
         y_axis_label: "time (ns)",
@@ -70,15 +70,15 @@ pub fn benchmark_integer_sub_u32(gm: GenerationMode, limit: usize, file_name: &s
         xs: pairs_of_integer_and_unsigned::<u32>(gm),
         function_f: &(|(n, u)| n - u),
         function_g: &(|(n, u): (BigInt, u32)| num_sub_u32(n, u)),
-        function_h: &(|(n, u): (rugint::Integer, u32)| n - u),
+        function_h: &(|(n, u): (rug::Integer, u32)| n - u),
         x_cons: &(|p| p.clone()),
         y_cons: &(|&(ref n, u)| (integer_to_bigint(n), u)),
-        z_cons: &(|&(ref n, u)| (integer_to_rugint_integer(n), u)),
+        z_cons: &(|&(ref n, u)| (integer_to_rug_integer(n), u)),
         x_param: &(|&(ref n, _)| n.significant_bits() as usize),
         limit,
         f_name: "malachite",
         g_name: "num",
-        h_name: "rugint",
+        h_name: "rug",
         title: "Integer - u32",
         x_axis_label: "other",
         y_axis_label: "time (ns)",
@@ -117,13 +117,13 @@ pub fn benchmark_u32_sub_integer(gm: GenerationMode, limit: usize, file_name: &s
     benchmark_2(BenchmarkOptions2 {
         xs: pairs_of_unsigned_and_integer::<u32>(gm),
         function_f: &(|(u, n)| u - n),
-        function_g: &(|(u, n): (u32, rugint::Integer)| u - n),
+        function_g: &(|(u, n): (u32, rug::Integer)| u - n),
         x_cons: &(|p| p.clone()),
-        y_cons: &(|&(u, ref n)| (u, integer_to_rugint_integer(n))),
+        y_cons: &(|&(u, ref n)| (u, integer_to_rug_integer(n))),
         x_param: &(|&(_, ref n)| n.significant_bits() as usize),
         limit,
         f_name: "malachite",
-        g_name: "rugint",
+        g_name: "rug",
         title: "u32 - Integer",
         x_axis_label: "other",
         y_axis_label: "time (ns)",

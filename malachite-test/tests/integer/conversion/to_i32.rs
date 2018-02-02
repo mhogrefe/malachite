@@ -1,8 +1,8 @@
 use common::LARGE_LIMIT;
 use malachite_nz::integer::Integer;
-use malachite_test::common::{integer_to_rugint_integer, GenerationMode};
+use malachite_test::common::{integer_to_rug_integer, GenerationMode};
 use malachite_test::inputs::integer::integers;
-use rugint;
+use rug;
 use std::i32;
 use std::str::FromStr;
 
@@ -10,7 +10,7 @@ use std::str::FromStr;
 fn test_to_i32() {
     let test = |n, out| {
         assert_eq!(Integer::from_str(n).unwrap().to_i32(), out);
-        assert_eq!(rugint::Integer::from_str(n).unwrap().to_i32(), out);
+        assert_eq!(rug::Integer::from_str(n).unwrap().to_i32(), out);
     };
     test("0", Some(0));
     test("123", Some(123));
@@ -27,7 +27,7 @@ fn test_to_i32() {
 fn test_to_i32_wrapping() {
     let test = |n, out| {
         assert_eq!(Integer::from_str(n).unwrap().to_i32_wrapping(), out);
-        assert_eq!(rugint::Integer::from_str(n).unwrap().to_i32_wrapping(), out);
+        assert_eq!(rug::Integer::from_str(n).unwrap().to_i32_wrapping(), out);
     };
     test("0", 0);
     test("123", 123);
@@ -42,13 +42,13 @@ fn test_to_i32_wrapping() {
 
 #[test]
 fn to_i32_properties() {
-    // x.to_i32() is equivalent for malachite and rugint.
+    // x.to_i32() is equivalent for malachite and rug.
     // if -2^31 ≤ x < 2^31, from(x.to_i32().unwrap()) == x
     // if -2^31 ≤ x < 2^31, x.to_i32() == Some(x.to_i32_wrapping())
     // if x < -2^31 or x >= 2^31, x.to_i32().is_none()
     let one_integer = |x: Integer| {
         let result = x.to_i32();
-        assert_eq!(integer_to_rugint_integer(&x).to_i32(), result);
+        assert_eq!(integer_to_rug_integer(&x).to_i32(), result);
         if x >= i32::MIN && x <= i32::MAX {
             assert_eq!(Integer::from(result.unwrap()), x);
             assert_eq!(result, Some(x.to_i32_wrapping()));
@@ -68,12 +68,12 @@ fn to_i32_properties() {
 
 #[test]
 fn to_i32_wrapping_properties() {
-    // x.to_i32_wrapping() is equivalent for malachite and rugint.
+    // x.to_i32_wrapping() is equivalent for malachite and rug.
     // (-x).to_i32_wrapping() = -(x.to_i32_wrapping())
     // TODO relate with BitAnd
     let one_integer = |x: Integer| {
         let result = x.to_i32_wrapping();
-        assert_eq!(integer_to_rugint_integer(&x).to_i32_wrapping(), result);
+        assert_eq!(integer_to_rug_integer(&x).to_i32_wrapping(), result);
         assert_eq!(-result, (-&x).to_i32_wrapping());
     };
 

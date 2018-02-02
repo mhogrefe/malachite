@@ -1,9 +1,9 @@
-use common::{integer_to_bigint, integer_to_rugint_integer, GenerationMode};
+use common::{integer_to_bigint, integer_to_rug_integer, GenerationMode};
 use inputs::integer::{pairs_of_integer_and_signed, pairs_of_signed_and_integer};
 use malachite_base::num::SignificantBits;
 use malachite_nz::integer::Integer;
 use num::BigInt;
-use rugint;
+use rug;
 use rust_wheels::benchmarks::{BenchmarkOptions2, BenchmarkOptions3, benchmark_2, benchmark_3};
 use std::cmp::Ordering;
 
@@ -37,15 +37,15 @@ pub fn benchmark_integer_partial_cmp_i32(gm: GenerationMode, limit: usize, file_
         xs: pairs_of_integer_and_signed::<i32>(gm),
         function_f: &(|(n, i): (Integer, i32)| n.partial_cmp(&i)),
         function_g: &(|(n, i): (BigInt, i32)| num_partial_cmp_i32(&n, i)),
-        function_h: &(|(n, i): (rugint::Integer, i32)| n.partial_cmp(&i)),
+        function_h: &(|(n, i): (rug::Integer, i32)| n.partial_cmp(&i)),
         x_cons: &(|p| p.clone()),
         y_cons: &(|&(ref n, i)| (integer_to_bigint(n), i)),
-        z_cons: &(|&(ref n, i)| (integer_to_rugint_integer(n), i)),
+        z_cons: &(|&(ref n, i)| (integer_to_rug_integer(n), i)),
         x_param: &(|&(ref n, _)| n.significant_bits() as usize),
         limit,
         f_name: "malachite",
         g_name: "num",
-        h_name: "rugint",
+        h_name: "rug",
         title: "Integer.partial\\\\_cmp(\\\\&i32)",
         x_axis_label: "n.significant\\\\_bits()",
         y_axis_label: "time (ns)",
@@ -58,13 +58,13 @@ pub fn benchmark_i32_partial_cmp_integer(gm: GenerationMode, limit: usize, file_
     benchmark_2(BenchmarkOptions2 {
         xs: pairs_of_signed_and_integer::<i32>(gm),
         function_f: &(|(i, n): (i32, Integer)| i.partial_cmp(&n)),
-        function_g: &(|(i, n): (i32, rugint::Integer)| i.partial_cmp(&n)),
+        function_g: &(|(i, n): (i32, rug::Integer)| i.partial_cmp(&n)),
         x_cons: &(|p| p.clone()),
-        y_cons: &(|&(i, ref n)| (i, integer_to_rugint_integer(n))),
+        y_cons: &(|&(i, ref n)| (i, integer_to_rug_integer(n))),
         x_param: &(|&(_, ref n)| n.significant_bits() as usize),
         limit,
         f_name: "malachite",
-        g_name: "rugint",
+        g_name: "rug",
         title: "i32.partial\\\\_cmp(\\\\&Integer)",
         x_axis_label: "n.significant\\\\_bits()",
         y_axis_label: "time (ns)",

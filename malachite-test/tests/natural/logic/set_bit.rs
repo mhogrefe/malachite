@@ -1,12 +1,12 @@
 use common::LARGE_LIMIT;
 use malachite_base::num::BitAccess;
 use malachite_nz::natural::Natural;
-use malachite_test::common::{biguint_to_natural, natural_to_biguint, natural_to_rugint_integer,
-                             rugint_integer_to_natural, GenerationMode};
+use malachite_test::common::{biguint_to_natural, natural_to_biguint, natural_to_rug_integer,
+                             rug_integer_to_natural, GenerationMode};
 use malachite_test::inputs::natural::pairs_of_natural_and_small_u64;
 use malachite_test::natural::logic::set_bit::num_set_bit;
 use num::BigUint;
-use rugint;
+use rug;
 use std::str::FromStr;
 
 #[test]
@@ -21,7 +21,7 @@ fn test_set_bit() {
         num_set_bit(&mut n, index);
         assert_eq!(n.to_string(), out);
 
-        let mut n = rugint::Integer::from_str(u).unwrap();
+        let mut n = rug::Integer::from_str(u).unwrap();
         n.set_bit(index as u32, true);
         assert_eq!(n.to_string(), out);
     };
@@ -34,7 +34,7 @@ fn test_set_bit() {
 
 #[test]
 fn set_bit_properties() {
-    // n.set_bit(index) is equivalent for malachite, num, and rugint.
+    // n.set_bit(index) is equivalent for malachite, num, and rug.
     // n.set_bit(index) is equivalent to n.assign_bit(index, true).
     // n.set_bit(index); n != 0
     // Setting a bit does not decrease n.
@@ -53,9 +53,9 @@ fn set_bit_properties() {
         num_set_bit(&mut num_n, index);
         assert_eq!(biguint_to_natural(&num_n), n);
 
-        let mut rugint_n = natural_to_rugint_integer(&old_n);
-        rugint_n.set_bit(index as u32, true);
-        assert_eq!(rugint_integer_to_natural(&rugint_n), n);
+        let mut rug_n = natural_to_rug_integer(&old_n);
+        rug_n.set_bit(index as u32, true);
+        assert_eq!(rug_integer_to_natural(&rug_n), n);
 
         assert_ne!(n, 0);
         assert!(n >= old_n);

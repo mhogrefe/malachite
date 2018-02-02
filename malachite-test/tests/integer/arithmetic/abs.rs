@@ -1,11 +1,11 @@
 use common::LARGE_LIMIT;
 use malachite_base::num::AbsAssign;
 use malachite_nz::integer::Integer;
-use malachite_test::common::{bigint_to_integer, integer_to_bigint, integer_to_rugint_integer,
-                             rugint_integer_to_integer, GenerationMode};
+use malachite_test::common::{bigint_to_integer, integer_to_bigint, integer_to_rug_integer,
+                             rug_integer_to_integer, GenerationMode};
 use malachite_test::inputs::integer::integers;
 use num::{BigInt, Signed};
-use rugint;
+use rug;
 use std::str::FromStr;
 
 #[test]
@@ -16,7 +16,7 @@ fn test_abs() {
         assert_eq!(abs.to_string(), out);
 
         assert_eq!(BigInt::from_str(s).unwrap().abs().to_string(), out);
-        assert_eq!(rugint::Integer::from_str(s).unwrap().abs().to_string(), out);
+        assert_eq!(rug::Integer::from_str(s).unwrap().abs().to_string(), out);
 
         let abs = Integer::from_str(s).unwrap().natural_abs();
         assert!(abs.is_valid());
@@ -39,10 +39,10 @@ fn test_abs() {
 
 #[test]
 fn abs_properties() {
-    // x.abs() is equivalent for malachite, num, and rugint.
+    // x.abs() is equivalent for malachite, num, and rug.
     // x.abs() is valid.
     //
-    // x.abs_ref() is equivalent for malachite, num, and rugint.
+    // x.abs_ref() is equivalent for malachite, num, and rug.
     // x.abs_ref() is valid.
     // x.abs() and x.abs_ref() are equivalent.
     //
@@ -62,9 +62,10 @@ fn abs_properties() {
         let num_abs = integer_to_bigint(&x).abs();
         assert_eq!(bigint_to_integer(&num_abs), abs);
 
-        let mut rugint_x = integer_to_rugint_integer(&x);
-        let rugint_abs = rugint_x.abs();
-        assert_eq!(rugint_integer_to_integer(rugint_abs), abs);
+        assert_eq!(
+            rug_integer_to_integer(&integer_to_rug_integer(&x).abs()),
+            abs
+        );
 
         let abs_2 = x.abs_ref();
         assert!(abs_2.is_valid());

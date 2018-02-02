@@ -1,11 +1,11 @@
-use common::{integer_to_bigint, integer_to_rugint_integer, GenerationMode};
+use common::{integer_to_bigint, integer_to_rug_integer, GenerationMode};
 use inputs::integer::{integers, pairs_of_integers};
 use malachite_base::num::SignificantBits;
 use malachite_base::num::Assign;
 use malachite_nz::integer::Integer;
 use num::BigInt;
-use rugint;
-use rugint::Assign as rugint_assign;
+use rug;
+use rug::Assign as rug_assign;
 use rust_wheels::benchmarks::{BenchmarkOptions2, BenchmarkOptions3, benchmark_2, benchmark_3};
 use std::cmp::max;
 
@@ -46,15 +46,15 @@ pub fn benchmark_integer_clone(gm: GenerationMode, limit: usize, file_name: &str
         xs: integers(gm),
         function_f: &(|n: Integer| n.clone()),
         function_g: &(|n: BigInt| n.clone()),
-        function_h: &(|n: rugint::Integer| n.clone()),
+        function_h: &(|n: rug::Integer| n.clone()),
         x_cons: &(|x| x.clone()),
         y_cons: &(|x| integer_to_bigint(x)),
-        z_cons: &(|x| integer_to_rugint_integer(x)),
+        z_cons: &(|x| integer_to_rug_integer(x)),
         x_param: &(|n| n.significant_bits() as usize),
         limit,
         f_name: "malachite",
         g_name: "num",
-        h_name: "rugint",
+        h_name: "rug",
         title: "Integer.clone()",
         x_axis_label: "n.significant\\\\_bits()",
         y_axis_label: "time (ns)",
@@ -68,15 +68,15 @@ pub fn benchmark_integer_clone_from(gm: GenerationMode, limit: usize, file_name:
         xs: pairs_of_integers(gm),
         function_f: &(|(mut x, y): (Integer, Integer)| x.clone_from(&y)),
         function_g: &(|(mut x, y): (BigInt, BigInt)| x.clone_from(&y)),
-        function_h: &(|(mut x, y): (rugint::Integer, rugint::Integer)| x.clone_from(&y)),
+        function_h: &(|(mut x, y): (rug::Integer, rug::Integer)| x.clone_from(&y)),
         x_cons: &(|p| p.clone()),
         y_cons: &(|&(ref x, ref y)| (integer_to_bigint(x), integer_to_bigint(y))),
-        z_cons: &(|&(ref x, ref y)| (integer_to_rugint_integer(x), integer_to_rugint_integer(y))),
+        z_cons: &(|&(ref x, ref y)| (integer_to_rug_integer(x), integer_to_rug_integer(y))),
         x_param: &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),
         limit,
         f_name: "malachite",
         g_name: "num",
-        h_name: "rugint",
+        h_name: "rug",
         title: "Integer.clone\\\\_from(Integer)",
         x_axis_label: "max(x.significant\\\\_bits(), y.significant\\\\_bits())",
         y_axis_label: "time (ns)",
@@ -89,13 +89,13 @@ pub fn benchmark_integer_assign(gm: GenerationMode, limit: usize, file_name: &st
     benchmark_2(BenchmarkOptions2 {
         xs: pairs_of_integers(gm),
         function_f: &(|(mut x, y): (Integer, Integer)| x.assign(y)),
-        function_g: &(|(mut x, y): (rugint::Integer, rugint::Integer)| x.assign(y)),
+        function_g: &(|(mut x, y): (rug::Integer, rug::Integer)| x.assign(y)),
         x_cons: &(|p| p.clone()),
-        y_cons: &(|&(ref x, ref y)| (integer_to_rugint_integer(x), integer_to_rugint_integer(y))),
+        y_cons: &(|&(ref x, ref y)| (integer_to_rug_integer(x), integer_to_rug_integer(y))),
         x_param: &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),
         limit,
         f_name: "malachite",
-        g_name: "rugint",
+        g_name: "rug",
         title: "Integer.assign(Integer)",
         x_axis_label: "max(x.significant\\\\_bits(), y.significant\\\\_bits())",
         y_axis_label: "time (ns)",

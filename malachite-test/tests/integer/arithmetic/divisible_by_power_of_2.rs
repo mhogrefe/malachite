@@ -58,7 +58,7 @@ fn divisible_by_power_of_2_properties() {
     let integer_and_u32 = |x: Integer, pow: u32| {
         let divisible = x.divisible_by_power_of_2(pow);
         if x != 0 {
-            assert_eq!(x.trailing_zeros().unwrap() >= pow.into(), divisible);
+            assert_eq!(x.trailing_zeros().unwrap() >= u64::from(pow), divisible);
         }
         assert_eq!((-&x).divisible_by_power_of_2(pow), divisible);
         assert!((&x << pow as u32).divisible_by_power_of_2(pow));
