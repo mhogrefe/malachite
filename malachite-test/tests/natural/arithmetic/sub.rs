@@ -1,8 +1,8 @@
-use common::LARGE_LIMIT;
+use common::test_properties;
 use malachite_base::num::Zero;
 use malachite_nz::natural::Natural;
 use malachite_test::common::{biguint_to_natural, natural_to_biguint, natural_to_rug_integer,
-                             rug_integer_to_natural, GenerationMode};
+                             rug_integer_to_natural};
 use malachite_test::inputs::natural::{naturals, pairs_of_naturals};
 use malachite_test::natural::arithmetic::sub::checked_sub;
 use num::BigUint;
@@ -89,85 +89,59 @@ fn test_sub_natural() {
 
 #[test]
 fn sub_properties() {
-    // x -= y is equivalent for malachite and rug.
-    // x - &y is equivalent for malachite and rug.
-    // x -= y; n is valid.
-    // x - &y is valid.
-    // &x - &y is valid.
-    // x -= y, x - &y, and &x - &y give the same result.
-    // if x >= y, x - y <= x
-    // if x >= y, (x - y).unwrap() + y == x
-    let two_naturals = |mut x: Natural, y: Natural| {
-        let old_x = x.clone();
+    test_properties(pairs_of_naturals, |&(ref x, ref y)| {
+        let difference = if *x >= *y {
+            let mut mut_x = x.clone();
+            mut_x -= y;
+            assert!(mut_x.is_valid());
+            let difference = mut_x;
 
-        if x >= y {
-            x -= &y;
-            assert!(x.is_valid());
+            let mut rug_x = natural_to_rug_integer(x);
+            rug_x -= natural_to_rug_integer(y);
+            assert_eq!(rug_integer_to_natural(&rug_x), difference);
+            Some(difference)
+        } else {
+            None
+        };
 
-            let mut rug_x = natural_to_rug_integer(&old_x);
-            rug_x -= natural_to_rug_integer(&y);
-            assert_eq!(rug_integer_to_natural(&rug_x), x);
-        }
-        let ox = if old_x >= y { Some(x) } else { None };
+        let difference_alt = x - y;
+        assert_eq!(difference_alt, difference);
+        assert!(difference.as_ref().map_or(true, |x| x.is_valid()));
 
-        let x2 = old_x.clone();
-        let result = &x2 - &y;
-        assert_eq!(result, ox);
-        assert!(result.map_or(true, |x| x.is_valid()));
-        let result = x2 - &y;
-        assert_eq!(result, ox);
-        assert!(result.map_or(true, |x| x.is_valid()));
+        let difference_alt = x.clone() - y;
+        assert_eq!(difference_alt, difference);
+        assert!(difference.as_ref().map_or(true, |x| x.is_valid()));
 
-        let x2 = old_x.clone();
-        let result = &y - &x2;
-        assert_eq!(result.is_some(), y == x2 || ox.is_none());
-        assert!(result.map_or(true, |x| x.is_valid()));
-
-        let num_x2 = natural_to_biguint(&old_x);
-        let num_y = natural_to_biguint(&y);
+        let reverse_difference = y - x;
         assert_eq!(
-            checked_sub(num_x2, num_y).map(|x| biguint_to_natural(&x)),
-            ox
+            reverse_difference.is_some(),
+            *x == *y || difference.is_none()
+        );
+        assert!(reverse_difference.map_or(true, |x| x.is_valid()));
+
+        assert_eq!(
+            checked_sub(natural_to_biguint(x), natural_to_biguint(y))
+                .map(|x| biguint_to_natural(&x)),
+            difference
+        );
+        assert_eq!(
+            checked_sub(natural_to_rug_integer(x), natural_to_rug_integer(y))
+                .map(|x| rug_integer_to_natural(&x)),
+            difference
         );
 
-        let rug_x2 = natural_to_rug_integer(&old_x);
-        let rug_y = natural_to_rug_integer(&y);
-        assert_eq!(
-            checked_sub(rug_x2, rug_y).map(|x| rug_integer_to_natural(&x)),
-            ox
-        );
-
-        if ox.is_some() {
-            assert!(ox.clone().unwrap() <= old_x);
-            assert_eq!(ox.unwrap() + &y, old_x);
+        if let Some(difference) = difference {
+            assert!(difference <= *x);
+            assert_eq!(difference + y, *x);
         }
-    };
+    });
 
-    // x - 0 == x
-    // x - x == 0
-    // if x != 0, 0 - x == None
     #[allow(unknown_lints, identity_op, eq_op)]
-    let one_natural = |x: Natural| {
-        assert_eq!((&x - 0).unwrap(), x);
-        assert_eq!((&x - &x).unwrap(), Natural::ZERO);
-        if x != 0 {
-            assert!((0 - &x).is_none());
+    test_properties(naturals, |x| {
+        assert_eq!((x - 0).unwrap(), *x);
+        assert_eq!((x - x).unwrap(), Natural::ZERO);
+        if *x != 0 {
+            assert!((0 - x).is_none());
         }
-    };
-
-    for (x, y) in pairs_of_naturals(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        two_naturals(x, y);
-    }
-
-    for (x, y) in pairs_of_naturals(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        two_naturals(x, y);
-    }
-
-    for n in naturals(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        one_natural(n);
-    }
-
-    for n in naturals(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        one_natural(n);
-    }
+    });
 }

@@ -1,6 +1,6 @@
-use common::LARGE_LIMIT;
+use common::test_properties;
 use malachite_nz::integer::Integer;
-use malachite_test::common::{integer_to_bigint, integer_to_rug_integer, GenerationMode};
+use malachite_test::common::{integer_to_bigint, integer_to_rug_integer};
 use malachite_test::inputs::integer::{pairs_of_integer_and_signed,
                                       triples_of_integer_signed_and_integer,
                                       triples_of_signed_integer_and_signed};
@@ -43,73 +43,40 @@ fn test_partial_ord_i32() {
 
 #[test]
 fn partial_cmp_i32_properties() {
-    // n.partial_cmp(&i) is equivalent for malachite, num, and rug.
-    // n.partial_cmp(&Integer::from(i)) is equivalent to n.partial_cmp(&u).
-    //
-    // i.partial_cmp(&n) is equivalent for malachite and rug.
-    // Integer::from(i).partial_cmp(&n) is equivalent to i.partial_cmp(&n).
-    // n < i <=> i > n, n > i <=> i < n, and n == i <=> i == n.
-    let integer_and_i32 = |n: Integer, i: i32| {
-        let cmp_1 = n.partial_cmp(&i);
-        assert_eq!(num_partial_cmp_i32(&integer_to_bigint(&n), i), cmp_1);
-        assert_eq!(integer_to_rug_integer(&n).partial_cmp(&i), cmp_1);
-        assert_eq!(n.partial_cmp(&Integer::from(i)), cmp_1);
+    test_properties(
+        pairs_of_integer_and_signed,
+        |&(ref n, i): &(Integer, i32)| {
+            let cmp = n.partial_cmp(&i);
+            assert_eq!(num_partial_cmp_i32(&integer_to_bigint(n), i), cmp);
+            assert_eq!(integer_to_rug_integer(n).partial_cmp(&i), cmp);
+            assert_eq!(n.partial_cmp(&Integer::from(i)), cmp);
 
-        let cmp_2 = i.partial_cmp(&n);
-        assert_eq!(i.partial_cmp(&integer_to_rug_integer(&n)), cmp_2);
-        assert_eq!(cmp_2, cmp_1.map(|o| o.reverse()));
-        assert_eq!(Integer::from(i).partial_cmp(&n), cmp_2);
-    };
+            let cmp_rev = cmp.map(|o| o.reverse());
+            assert_eq!(i.partial_cmp(n), cmp_rev);
+            assert_eq!(i.partial_cmp(&integer_to_rug_integer(n)), cmp_rev);
+            assert_eq!(Integer::from(i).partial_cmp(n), cmp_rev);
+        },
+    );
 
-    // n < i and i < m => n < m
-    // n > i and i > m => n > m
-    let integer_i32_and_integer = |n: Integer, i: i32, m: Integer| {
-        if n < i && i < m {
-            assert!(n < m);
-        } else if n > i && i > m {
-            assert!(n > m);
-        }
-    };
+    test_properties(
+        triples_of_integer_signed_and_integer,
+        |&(ref n, i, ref m): &(Integer, i32, Integer)| {
+            if *n < i && i < *m {
+                assert!(n < m);
+            } else if *n > i && i > *m {
+                assert!(n > m);
+            }
+        },
+    );
 
-    // i < n and n < v => i < v
-    // i > n and n > v => i > v
-    let i32_integer_and_i32 = |i: i32, n: Integer, j: i32| {
-        if i < n && n < j {
-            assert!(i < j);
-        } else if i > n && n > j {
-            assert!(i > j);
-        }
-    };
-
-    for (n, i) in pairs_of_integer_and_signed(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        integer_and_i32(n, i);
-    }
-
-    for (n, i) in pairs_of_integer_and_signed(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        integer_and_i32(n, i);
-    }
-
-    for (n, i, m) in
-        triples_of_integer_signed_and_integer(GenerationMode::Exhaustive).take(LARGE_LIMIT)
-    {
-        integer_i32_and_integer(n, i, m);
-    }
-
-    for (n, i, m) in
-        triples_of_integer_signed_and_integer(GenerationMode::Random(32)).take(LARGE_LIMIT)
-    {
-        integer_i32_and_integer(n, i, m);
-    }
-
-    for (i, n, j) in
-        triples_of_signed_integer_and_signed(GenerationMode::Exhaustive).take(LARGE_LIMIT)
-    {
-        i32_integer_and_i32(i, n, j);
-    }
-
-    for (i, n, j) in
-        triples_of_signed_integer_and_signed(GenerationMode::Random(32)).take(LARGE_LIMIT)
-    {
-        i32_integer_and_i32(i, n, j);
-    }
+    test_properties(
+        triples_of_signed_integer_and_signed,
+        |&(i, ref n, j): &(i32, Integer, i32)| {
+            if i < *n && *n < j {
+                assert!(i < j);
+            } else if i > *n && *n > j {
+                assert!(i > j);
+            }
+        },
+    );
 }

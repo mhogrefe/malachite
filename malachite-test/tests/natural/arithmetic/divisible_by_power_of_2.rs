@@ -1,7 +1,6 @@
-use common::LARGE_LIMIT;
+use common::test_properties;
 use malachite_base::num::Zero;
 use malachite_nz::natural::Natural;
-use malachite_test::common::GenerationMode;
 use malachite_test::inputs::base::unsigneds;
 use malachite_test::inputs::natural::{naturals, pairs_of_natural_and_small_u32};
 use std::str::FromStr;
@@ -36,51 +35,24 @@ fn test_divisible_by_power_of_2() {
 
 #[test]
 fn divisible_by_power_of_2_properties() {
-    // if x != 0, x.divisible_by_power_of_2(pow) == (x.trailing_zeros().unwrap() >= pow)
-    // (-x).divisible_by_power_of_2(pow) == x.divisible_by_power_of_2()
-    // (x << pow).divisible_by_power_of_2(pow)
-    // x.divisible_by_power_of_2(pow) == (x >> pow << pow == x)
-    let natural_and_u32 = |x: Natural, pow: u32| {
-        let divisible = x.divisible_by_power_of_2(pow);
-        if x != 0 {
-            assert_eq!(x.trailing_zeros().unwrap() >= u64::from(pow), divisible);
-        }
-        assert_eq!((-&x).divisible_by_power_of_2(pow), divisible);
-        assert!((&x << pow as u32).divisible_by_power_of_2(pow));
-        assert_eq!(&x >> pow << pow == x, divisible);
-    };
+    test_properties(
+        pairs_of_natural_and_small_u32,
+        |&(ref x, pow): &(Natural, u32)| {
+            let divisible = x.divisible_by_power_of_2(pow);
+            if *x != 0 {
+                assert_eq!(x.trailing_zeros().unwrap() >= u64::from(pow), divisible);
+            }
+            assert_eq!((-x).divisible_by_power_of_2(pow), divisible);
+            assert!((x << pow as u32).divisible_by_power_of_2(pow));
+            assert_eq!(x >> pow << pow == *x, divisible);
+        },
+    );
 
-    // x.divisible_by_power_of_2(0)
-    let one_natural = |x: Natural| {
+    test_properties(naturals, |x| {
         assert!(x.divisible_by_power_of_2(0));
-    };
+    });
 
-    // 0.divisible_by_power_of_2(pow)
-    let one_u32 = |pow: u32| {
+    test_properties(unsigneds, |&pow: &u32| {
         assert!(Natural::ZERO.divisible_by_power_of_2(pow));
-    };
-
-    for (x, pow) in pairs_of_natural_and_small_u32(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        natural_and_u32(x, pow);
-    }
-
-    for (x, pow) in pairs_of_natural_and_small_u32(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        natural_and_u32(x, pow);
-    }
-
-    for n in naturals(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        one_natural(n);
-    }
-
-    for n in naturals(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        one_natural(n);
-    }
-
-    for n in unsigneds(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        one_u32(n);
-    }
-
-    for n in unsigneds(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        one_u32(n);
-    }
+    });
 }

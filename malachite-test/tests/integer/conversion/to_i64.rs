@@ -1,9 +1,8 @@
-use common::LARGE_LIMIT;
+use common::test_properties;
 use malachite_base::num::SignificantBits;
 use malachite_base::num::One;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
-use malachite_test::common::GenerationMode;
 use malachite_test::inputs::integer::integers;
 use std::{i32, i64};
 use std::str::FromStr;
@@ -54,42 +53,22 @@ fn test_to_i64_wrapping() {
 
 #[test]
 fn to_i64_properties() {
-    // if -2^63 ≤ x < 2^63, from(x.to_i64().unwrap()) == x
-    // if -2^63 ≤ x < 2^63, x.to_i64() == Some(x.to_i64_wrapping())
-    // if x < -2^63 or x >= 2^63, x.to_i64().is_none()
-    let one_integer = |x: Integer| {
+    test_properties(integers, |x| {
         let result = x.to_i64();
-        if x.significant_bits() < 64 || x == -((Natural::ONE << 63u32).into_integer()) {
-            assert_eq!(Integer::from(result.unwrap()), x);
+        if x.significant_bits() < 64 || *x == -((Natural::ONE << 63u32).into_integer()) {
+            assert_eq!(Integer::from(result.unwrap()), *x);
             assert_eq!(result, Some(x.to_i64_wrapping()));
         } else {
             assert!(result.is_none());
         }
-    };
-
-    for n in integers(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        one_integer(n);
-    }
-
-    for n in integers(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        one_integer(n);
-    }
+    });
 }
 
 #[test]
 fn to_i32_wrapping_properties() {
-    // (-x).to_i64_wrapping() = -(x.to_i64_wrapping())
     // TODO relate with BitAnd
-    let one_integer = |x: Integer| {
+    test_properties(integers, |x| {
         let result = x.to_i64_wrapping();
-        assert_eq!(-result, (-&x).to_i64_wrapping());
-    };
-
-    for n in integers(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        one_integer(n);
-    }
-
-    for n in integers(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        one_integer(n);
-    }
+        assert_eq!(-result, (-x).to_i64_wrapping());
+    });
 }

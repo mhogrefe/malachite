@@ -1,7 +1,6 @@
-use common::LARGE_LIMIT;
+use common::test_properties;
 use malachite_base::num::One;
 use malachite_nz::natural::Natural;
-use malachite_test::common::GenerationMode;
 use malachite_test::inputs::natural::naturals;
 use std::str::FromStr;
 use std::u32;
@@ -22,23 +21,13 @@ fn test_limb_count() {
 
 #[test]
 fn limb_count_properties() {
-    // (x < 2^32) == (x.limb_count() <= 1)
-    // if x != 0, (x.limb_count() == n) == (2^(32*(n-1)) <= x < 2^(32*n))
-    let one_natural = |x: Natural| {
+    test_properties(naturals, |x| {
         let limb_count = x.limb_count();
-        assert_eq!(x <= u32::MAX, x.limb_count() <= 1);
-        if x != 0 {
+        assert_eq!(*x <= u32::MAX, x.limb_count() <= 1);
+        if *x != 0 {
             let n = limb_count as u32;
-            assert!(Natural::ONE << ((n - 1) << 5) <= x);
-            assert!(x < Natural::ONE << (n << 5));
+            assert!(Natural::ONE << ((n - 1) << 5) <= *x);
+            assert!(*x < Natural::ONE << (n << 5));
         }
-    };
-
-    for n in naturals(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        one_natural(n);
-    }
-
-    for n in naturals(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        one_natural(n);
-    }
+    });
 }

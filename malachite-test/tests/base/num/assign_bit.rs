@@ -1,7 +1,6 @@
-use common::LARGE_LIMIT;
+use common::test_properties;
 use malachite_base::num::{BitAccess, PrimitiveInteger, PrimitiveSigned, PrimitiveUnsigned};
 use malachite_base::num::NegativeOne;
-use malachite_test::common::GenerationMode;
 use malachite_test::inputs::base::{triples_of_signed_u64_width_range_and_bool_var_1,
                                    triples_of_unsigned_u64_width_range_and_bool_var_1};
 
@@ -108,43 +107,23 @@ assign_bit_fail_helper_signed!(
 );
 
 fn assign_bit_properties_helper_unsigned<T: 'static + PrimitiveUnsigned>() {
-    let unsigned_u64_and_bool = |mut n: T, index: u64, bit: bool| {
-        n.assign_bit(index, bit);
-    };
-
-    for (n, index, bit) in triples_of_unsigned_u64_width_range_and_bool_var_1(
-        GenerationMode::Exhaustive,
-    ).take(LARGE_LIMIT)
-    {
-        unsigned_u64_and_bool(n, index, bit);
-    }
-
-    for (n, index, bit) in triples_of_unsigned_u64_width_range_and_bool_var_1(
-        GenerationMode::Random(32),
-    ).take(LARGE_LIMIT)
-    {
-        unsigned_u64_and_bool(n, index, bit);
-    }
+    test_properties(
+        triples_of_unsigned_u64_width_range_and_bool_var_1,
+        |&(n, index, bit)| {
+            let mut mut_n: T = n;
+            mut_n.assign_bit(index, bit);
+        },
+    );
 }
 
 fn assign_bit_properties_helper_signed<T: 'static + PrimitiveSigned>() {
-    let signed_u64_and_bool = |mut n: T, index: u64, bit: bool| {
-        n.assign_bit(index, bit);
-    };
-
-    for (n, index, bit) in triples_of_signed_u64_width_range_and_bool_var_1(
-        GenerationMode::Exhaustive,
-    ).take(LARGE_LIMIT)
-    {
-        signed_u64_and_bool(n, index, bit);
-    }
-
-    for (n, index, bit) in triples_of_signed_u64_width_range_and_bool_var_1(
-        GenerationMode::Random(32),
-    ).take(LARGE_LIMIT)
-    {
-        signed_u64_and_bool(n, index, bit);
-    }
+    test_properties(
+        triples_of_signed_u64_width_range_and_bool_var_1,
+        |&(n, index, bit)| {
+            let mut mut_n: T = n;
+            mut_n.assign_bit(index, bit);
+        },
+    );
 }
 
 #[test]

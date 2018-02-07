@@ -1,8 +1,8 @@
-use common::LARGE_LIMIT;
+use common::test_properties_custom_scale;
 use malachite_base::num::{One, Zero};
 use malachite_nz::natural::Natural;
 use malachite_test::common::{biguint_to_natural, natural_to_biguint, natural_to_rug_integer,
-                             rug_integer_to_natural, GenerationMode};
+                             rug_integer_to_natural};
 use malachite_test::inputs::natural::{naturals, pairs_of_natural_and_unsigned, pairs_of_naturals,
                                       triples_of_naturals};
 use num::BigUint;
@@ -100,24 +100,11 @@ fn test_mul() {
 
 #[test]
 fn mul_properties() {
-    // x * y is valid.
-    // x * &y is valid.
-    // &x * y is valid.
-    // &x * &y is valid.
-    // x * y is equivalent for malachite, num, and rug.
-    // x *= y, x *= &y, x * y, x * &y, &x * y, and &x * &y give the same result.
-    // x * y == y * x
-    //TODO x * y / y == x and x * y / x == y
-    // if x != 0 and y != 0, x * y >= x and x * y >= y
-    let two_naturals = |x: Natural, y: Natural| {
-        let num_product = biguint_to_natural(&(natural_to_biguint(&x) * natural_to_biguint(&y)));
-        let rug_product =
-            rug_integer_to_natural(&(natural_to_rug_integer(&x) * natural_to_rug_integer(&y)));
-
+    test_properties_custom_scale(2048, pairs_of_naturals, |&(ref x, ref y)| {
         let product_val_val = x.clone() * y.clone();
-        let product_val_ref = x.clone() * &y;
-        let product_ref_val = &x * y.clone();
-        let product = &x * &y;
+        let product_val_ref = x.clone() * y;
+        let product_ref_val = x * y.clone();
+        let product = x * y;
         assert!(product_val_val.is_valid());
         assert!(product_val_ref.is_valid());
         assert!(product_ref_val.is_valid());
@@ -130,100 +117,61 @@ fn mul_properties() {
         mut_x *= y.clone();
         assert!(mut_x.is_valid());
         assert_eq!(mut_x, product);
+
         let mut mut_x = x.clone();
-        mut_x *= &y;
+        mut_x *= y;
         assert_eq!(mut_x, product);
         assert!(mut_x.is_valid());
+
         let mut mut_x = x.clone();
         mut_x._mul_assign_basecase_mem_opt(y.clone());
         assert!(mut_x.is_valid());
-        assert_eq!(mut_x, product, "x: {}, y: {}", x, y);
+        assert_eq!(mut_x, product);
 
-        let mut mut_x = natural_to_rug_integer(&x);
-        mut_x *= natural_to_rug_integer(&y);
+        let mut mut_x = natural_to_rug_integer(x);
+        mut_x *= natural_to_rug_integer(y);
         assert_eq!(rug_integer_to_natural(&mut_x), product);
 
-        let reverse_product = &y * &x;
-        //TODO let inv_1 = (&product / &x).unwrap();
-        //TODO let inv_2 = (&product / &y).unwrap();
-        assert_eq!(num_product, product);
-        assert_eq!(rug_product, product);
-        assert_eq!(reverse_product, product);
-        //TODO assert_eq!(inv_1, y);
-        //TODO assert_eq!(inv_2, x);
+        assert_eq!(
+            biguint_to_natural(&(natural_to_biguint(x) * natural_to_biguint(y))),
+            product
+        );
+        assert_eq!(
+            rug_integer_to_natural(&(natural_to_rug_integer(x) * natural_to_rug_integer(y))),
+            product
+        );
+        assert_eq!(y * x, product);
+        //TODO assert_eq!((product / x).unwrap(), *y);
+        //TODO assert_eq!((product / y).unwrap(), *x);
 
-        if x != 0 && y != 0 {
-            assert!(product >= x);
-            assert!(product >= y);
+        if *x != 0 && *y != 0 {
+            assert!(product >= *x);
+            assert!(product >= *y);
         }
-    };
+    });
 
-    // x * (y: u32) == x * from(y)
-    // (y: u32) * x == x * from(y)
-    let natural_and_u32 = |x: Natural, y: u32| {
-        let primitive_product_1 = &x * y;
-        let primitive_product_2 = y * &x;
-        let product = x * Natural::from(y);
-        assert_eq!(primitive_product_1, product);
-        assert_eq!(primitive_product_2, product);
-    };
+    test_properties_custom_scale(
+        2048,
+        pairs_of_natural_and_unsigned,
+        |&(ref x, y): &(Natural, u32)| {
+            let product = x * Natural::from(y);
+            assert_eq!(x * y, product);
+            assert_eq!(y * x, product);
+        },
+    );
 
-    // x * 0 == 0
-    // 0 * x == 0
-    // x * 1 == x
-    // 1 * x == x
-    //TODO x * x == x ^ 2
     #[allow(unknown_lints, erasing_op)]
-    let one_natural = |x: Natural| {
-        let x_old = x.clone();
-        assert_eq!(&x * Natural::ZERO, 0);
+    test_properties_custom_scale(2048, naturals, |x| {
+        assert_eq!(x * Natural::ZERO, 0);
         assert_eq!(Natural::ZERO * 0, 0);
-        let id_1 = &x * Natural::ONE;
-        let id_2 = Natural::ONE * &x;
-        //TODO let double = &x * &x;
-        assert_eq!(id_1, x_old);
-        assert_eq!(id_2, x_old);
-        //TODO assert_eq!(double, x_old.pow(2));
-    };
+        assert_eq!(x * Natural::ONE, *x);
+        assert_eq!(Natural::ONE * x, *x);
+        //TODO assert_eq!(x * x, x.pow(2));
+    });
 
-    // (x * y) * z == x * (y * z)
-    // x * (y + z) == x * y + x * z
-    // (x + y) * z == x * z + y * z
-    let three_naturals = |x: Natural, y: Natural, z: Natural| {
-        assert_eq!((&x * &y) * &z, &x * (&y * &z));
-        assert_eq!(&x * (&y + &z), &x * &y + &x * &z);
-        assert_eq!((&x + &y) * &z, x * &z + y * z);
-    };
-
-    for (x, y) in pairs_of_naturals(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        two_naturals(x, y);
-    }
-
-    for (x, y) in pairs_of_naturals(GenerationMode::Random(2048)).take(LARGE_LIMIT) {
-        two_naturals(x, y);
-    }
-
-    for (x, y) in pairs_of_natural_and_unsigned(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        natural_and_u32(x, y);
-    }
-
-    for (x, y) in pairs_of_natural_and_unsigned(GenerationMode::Random(2048)).take(LARGE_LIMIT) {
-        natural_and_u32(x, y);
-    }
-
-    for n in naturals(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        one_natural(n);
-    }
-
-    for n in naturals(GenerationMode::Random(2048)).take(LARGE_LIMIT) {
-        one_natural(n);
-    }
-
-    for (x, y, z) in triples_of_naturals(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        three_naturals(x, y, z);
-    }
-
-    for (x, y, z) in triples_of_naturals(GenerationMode::Random(2048)).take(LARGE_LIMIT) {
-        three_naturals(x, y, z);
-    }
+    test_properties_custom_scale(2048, triples_of_naturals, |&(ref x, ref y, ref z)| {
+        assert_eq!((x * y) * z, x * (y * z));
+        assert_eq!(x * (y + z), x * y + x * z);
+        assert_eq!((x + y) * z, x * z + y * z);
+    });
 }

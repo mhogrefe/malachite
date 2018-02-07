@@ -1,7 +1,6 @@
-use common::LARGE_LIMIT;
+use common::test_properties;
 use malachite_base::num::SignificantBits;
 use malachite_nz::integer::Integer;
-use malachite_test::common::GenerationMode;
 use malachite_test::inputs::integer::integers;
 use std::cmp::Ordering;
 use std::{u32, u64};
@@ -49,42 +48,22 @@ fn test_to_u64_wrapping() {
 
 #[test]
 fn to_u64_properties() {
-    // if 0 ≤ x < 2^64, from(x.to_u64().unwrap()) == x
-    // if 0 ≤ x < 2^64, x.to_u64() == Some(x.to_u64_wrapping())
-    // if x < 0 or x >= 2^64, x.to_u64().is_none()
-    let one_integer = |x: Integer| {
+    test_properties(integers, |x| {
         let result = x.to_u64();
         if x.sign() != Ordering::Less && x.significant_bits() <= 64 {
-            assert_eq!(Integer::from(result.unwrap()), x);
+            assert_eq!(Integer::from(result.unwrap()), *x);
             assert_eq!(result, Some(x.to_u64_wrapping()));
         } else {
             assert!(result.is_none());
         }
-    };
-
-    for n in integers(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        one_integer(n);
-    }
-
-    for n in integers(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        one_integer(n);
-    }
+    });
 }
 
 #[test]
 fn to_u64_wrapping_properties() {
-    // x.to_u64_wrapping() + (-x.to_u64_wrapping()) = 0 mod 2^64
     // TODO relate with BitAnd
-    let one_integer = |x: Integer| {
+    test_properties(integers, |x| {
         let result = x.to_u64_wrapping();
-        assert_eq!(result.wrapping_add((-&x).to_u64_wrapping()), 0);
-    };
-
-    for n in integers(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        one_integer(n);
-    }
-
-    for n in integers(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        one_integer(n);
-    }
+        assert_eq!(result.wrapping_add((-x).to_u64_wrapping()), 0);
+    });
 }

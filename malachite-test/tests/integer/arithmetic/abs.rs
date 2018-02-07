@@ -1,8 +1,8 @@
-use common::LARGE_LIMIT;
+use common::test_properties;
 use malachite_base::num::AbsAssign;
 use malachite_nz::integer::Integer;
 use malachite_test::common::{bigint_to_integer, integer_to_bigint, integer_to_rug_integer,
-                             rug_integer_to_integer, GenerationMode};
+                             rug_integer_to_integer};
 use malachite_test::inputs::integer::integers;
 use num::{BigInt, Signed};
 use rug;
@@ -39,56 +39,31 @@ fn test_abs() {
 
 #[test]
 fn abs_properties() {
-    // x.abs() is equivalent for malachite, num, and rug.
-    // x.abs() is valid.
-    //
-    // x.abs_ref() is equivalent for malachite, num, and rug.
-    // x.abs_ref() is valid.
-    // x.abs() and x.abs_ref() are equivalent.
-    //
-    // x.abs() >= 0
-    // x.abs().abs() == x.abs()
-    //
-    // x.natural_abs() is valid.
-    //
-    // x.natural_abs_ref() is valid.
-    // x.natural_abs() and x.natural_abs_ref() are equivalent.
-    //
-    // x.natural_abs_ref() == x.abs_ref().to_natural()
-    let one_integer = |x: Integer| {
+    test_properties(integers, |x| {
         let abs = x.clone().abs();
         assert!(abs.is_valid());
 
-        let num_abs = integer_to_bigint(&x).abs();
-        assert_eq!(bigint_to_integer(&num_abs), abs);
+        assert_eq!(bigint_to_integer(&integer_to_bigint(x).abs()), abs);
 
         assert_eq!(
-            rug_integer_to_integer(&integer_to_rug_integer(&x).abs()),
+            rug_integer_to_integer(&integer_to_rug_integer(x).abs()),
             abs
         );
 
-        let abs_2 = x.abs_ref();
-        assert!(abs_2.is_valid());
-        assert_eq!(abs_2, abs);
+        let abs_alt = x.abs_ref();
+        assert!(abs_alt.is_valid());
+        assert_eq!(abs_alt, abs);
 
         assert!(abs >= 0);
-        assert_eq!(abs == x, x >= 0);
+        assert_eq!(abs == *x, *x >= 0);
         assert_eq!(abs.abs_ref(), abs);
 
-        let abs_3 = x.clone().natural_abs();
-        assert!(abs_3.is_valid());
-        assert_eq!(Some(abs_3), abs.to_natural());
+        let abs_alt = x.clone().natural_abs();
+        assert!(abs_alt.is_valid());
+        assert_eq!(Some(abs_alt), abs.to_natural());
 
-        let abs_4 = x.natural_abs_ref();
-        assert!(abs_4.is_valid());
-        assert_eq!(Some(abs_4), abs.to_natural());
-    };
-
-    for n in integers(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        one_integer(n);
-    }
-
-    for n in integers(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        one_integer(n);
-    }
+        let abs_alt = x.natural_abs_ref();
+        assert!(abs_alt.is_valid());
+        assert_eq!(Some(abs_alt), abs.to_natural());
+    });
 }

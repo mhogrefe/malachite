@@ -1,8 +1,8 @@
-use common::LARGE_LIMIT;
+use common::test_properties;
 use malachite_test::inputs::natural::pairs_of_natural_and_unsigned;
 use malachite_base::num::Assign;
 use malachite_nz::natural::Natural;
-use malachite_test::common::{biguint_to_natural, natural_to_biguint, GenerationMode};
+use malachite_test::common::{biguint_to_natural, natural_to_biguint};
 use malachite_test::natural::conversion::assign_u64::num_assign_u64;
 use num::BigUint;
 use std::str::FromStr;
@@ -28,30 +28,22 @@ fn test_assign_u64() {
 
 #[test]
 fn assign_u64_properties() {
-    // n.assign(u) is equivalent for malachite and num.
-    // n.assign(u) is valid.
-    // n.assign(u); n == u
-    // n.assign(Natural::from(u)) is equivalent to n.assign(u)
-    let natural_and_u64 = |mut n: Natural, u: u64| {
-        let old_n = n.clone();
-        n.assign(u);
-        assert!(n.is_valid());
-        let natural_u = Natural::from(u);
-        assert_eq!(n, natural_u);
-        let mut alt_n = old_n.clone();
-        alt_n.assign(Natural::from(u));
-        assert_eq!(alt_n, n);
+    test_properties(
+        pairs_of_natural_and_unsigned,
+        |&(ref n, u): &(Natural, u64)| {
+            let natural_u = Natural::from(u);
+            let mut mut_n = n.clone();
+            mut_n.assign(u);
+            assert!(mut_n.is_valid());
+            assert_eq!(mut_n, natural_u);
 
-        let mut num_n = natural_to_biguint(&old_n);
-        num_assign_u64(&mut num_n, u);
-        assert_eq!(biguint_to_natural(&num_n), natural_u);
-    };
+            let mut mut_n = n.clone();
+            mut_n.assign(Natural::from(u));
+            assert_eq!(mut_n, natural_u);
 
-    for (n, u) in pairs_of_natural_and_unsigned(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        natural_and_u64(n, u);
-    }
-
-    for (n, u) in pairs_of_natural_and_unsigned(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        natural_and_u64(n, u);
-    }
+            let mut num_n = natural_to_biguint(n);
+            num_assign_u64(&mut num_n, u);
+            assert_eq!(biguint_to_natural(&num_n), natural_u);
+        },
+    );
 }

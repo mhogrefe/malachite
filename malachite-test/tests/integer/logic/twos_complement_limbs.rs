@@ -1,6 +1,6 @@
-use common::LARGE_LIMIT;
+use common::test_properties;
+use malachite_base::num::BitAccess;
 use malachite_nz::integer::Integer;
-use malachite_test::common::GenerationMode;
 use malachite_test::inputs::integer::integers;
 use std::cmp::Ordering;
 use std::str::FromStr;
@@ -82,14 +82,9 @@ fn test_twos_complement_limbs_be() {
 
 #[test]
 fn twos_complement_limbs_le_properties() {
-    // from_twos_complement_limbs_le(x.twos_complement_limbs_le()) == x
-    // x.twos_complement_limbs_le().rev() == x.twos_complement_limbs_be()
-    // if x != 0, limbs is empty.
-    // if x > 0, limbs.last() == 0 => limbs[limbs.len() - 2].get_bit(31) == true
-    // if x < -1, limbs.last() == !0 => limbs[limbs.len() - 2].get_bit(31) == false
-    let one_integer = |x: Integer| {
+    test_properties(integers, |x| {
         let limbs = x.twos_complement_limbs_le();
-        assert_eq!(Integer::from_twos_complement_limbs_le(&limbs), x);
+        assert_eq!(Integer::from_twos_complement_limbs_le(&limbs), *x);
         assert_eq!(
             x.twos_complement_limbs_be(),
             limbs.iter().cloned().rev().collect::<Vec<u32>>()
@@ -98,40 +93,27 @@ fn twos_complement_limbs_le_properties() {
             Ordering::Equal => assert!(limbs.is_empty()),
             Ordering::Greater => {
                 let last = *limbs.last().unwrap();
-                assert_eq!(last & 0x8000_0000, 0);
+                assert!(!last.get_bit(31));
                 if last == 0 {
-                    assert_ne!(limbs[limbs.len() - 2] & 0x8000_0000, 0);
+                    assert!(limbs[limbs.len() - 2].get_bit(31));
                 }
             }
             Ordering::Less => {
                 let last = *limbs.last().unwrap();
-                assert_ne!(last & 0x8000_0000, 0);
+                assert!(last.get_bit(31));
                 if last == !0 && limbs.len() > 1 {
-                    assert_eq!(limbs[limbs.len() - 2] & 0x8000_0000, 0);
+                    assert!(!limbs[limbs.len() - 2].get_bit(31));
                 }
             }
         }
-    };
-
-    for n in integers(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        one_integer(n);
-    }
-
-    for n in integers(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        one_integer(n);
-    }
+    });
 }
 
 #[test]
 fn limbs_be_properties() {
-    // from_twos_complement_limbs_be(x.twos_complement_limbs_be()) == x
-    // x.twos_complement_limbs_be().rev() == x.twos_complement_limbs_le()
-    // if x != 0, limbs is empty.
-    // if x > 0, limbs[0] == 0 => limbs[1].get_bit(31) == true
-    // if x < -1, limbs[0] == !0 => limbs[1].get_bit(31) == false
-    let one_integer = |x: Integer| {
+    test_properties(integers, |x| {
         let limbs = x.twos_complement_limbs_be();
-        assert_eq!(Integer::from_twos_complement_limbs_be(&limbs), x);
+        assert_eq!(Integer::from_twos_complement_limbs_be(&limbs), *x);
         assert_eq!(
             x.twos_complement_limbs_le(),
             limbs.iter().cloned().rev().collect::<Vec<u32>>()
@@ -140,26 +122,18 @@ fn limbs_be_properties() {
             Ordering::Equal => assert!(limbs.is_empty()),
             Ordering::Greater => {
                 let first = limbs[0];
-                assert_eq!(first & 0x8000_0000, 0);
+                assert!(!first.get_bit(31));
                 if first == 0 {
-                    assert_ne!(limbs[1] & 0x8000_0000, 0);
+                    assert!(limbs[1].get_bit(31));
                 }
             }
             Ordering::Less => {
                 let first = limbs[0];
-                assert_ne!(first & 0x8000_0000, 0);
+                assert!(first.get_bit(31));
                 if first == !0 && limbs.len() > 1 {
-                    assert_eq!(limbs[1] & 0x8000_0000, 0);
+                    assert!(!limbs[1].get_bit(31));
                 }
             }
         }
-    };
-
-    for n in integers(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        one_integer(n);
-    }
-
-    for n in integers(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        one_integer(n);
-    }
+    });
 }

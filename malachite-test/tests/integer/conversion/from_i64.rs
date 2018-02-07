@@ -1,6 +1,6 @@
-use common::LARGE_LIMIT;
+use common::test_properties;
 use malachite_nz::integer::Integer;
-use malachite_test::common::{bigint_to_integer, GenerationMode};
+use malachite_test::common::bigint_to_integer;
 use malachite_test::inputs::base::signeds;
 use num::BigInt;
 use std::i64;
@@ -25,22 +25,11 @@ fn test_from_i64() {
 
 #[test]
 fn from_i64_properties() {
-    // from(i: i64) is valid.
-    // from(i: i64) is equivalent for malachite and num.
-    // from(i: i64).to_u64() == Some(i)
-    let one_i64 = |i: i64| {
+    test_properties(signeds, |&i: &i64| {
         let n = Integer::from(i);
-        let num_n = bigint_to_integer(&BigInt::from(i));
         assert!(n.is_valid());
         assert_eq!(n.to_i64(), Some(i));
-        assert_eq!(n, num_n);
-    };
 
-    for i in signeds::<i64>(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        one_i64(i);
-    }
-
-    for i in signeds::<i64>(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        one_i64(i);
-    }
+        assert_eq!(bigint_to_integer(&BigInt::from(i)), n);
+    });
 }

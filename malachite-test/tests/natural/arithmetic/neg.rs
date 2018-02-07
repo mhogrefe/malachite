@@ -1,6 +1,6 @@
-use common::LARGE_LIMIT;
+use common::test_properties;
 use malachite_nz::natural::Natural;
-use malachite_test::common::{natural_to_rug_integer, rug_integer_to_integer, GenerationMode};
+use malachite_test::common::{natural_to_rug_integer, rug_integer_to_integer};
 use malachite_test::inputs::natural::naturals;
 use rug;
 use std::str::FromStr;
@@ -26,38 +26,18 @@ fn test_neg() {
 
 #[test]
 fn neg_properties() {
-    // -x is equivalent for malachite and rug.
-    // -x is valid.
-    //
-    // -&x is equivalent for malachite and rug.
-    // -&x is valid.
-    // -x and -&x are equivalent.
-    //
-    // -x == -(x.to_integer())
-    // (-x == x) == (x == 0)
-    // --x == x
-    let one_natural = |x: Natural| {
-        let neg = -x.clone();
+    test_properties(naturals, |x| {
+        let neg = -(x.clone());
         assert!(neg.is_valid());
 
-        let rug_neg = -natural_to_rug_integer(&x);
-        assert_eq!(rug_integer_to_integer(&rug_neg), neg);
+        let neg_alt = -x;
+        assert!(neg_alt.is_valid());
+        assert_eq!(neg_alt, neg);
 
-        let neg_2 = -&x;
-        assert!(neg_2.is_valid());
-
-        assert_eq!(neg_2, neg);
+        assert_eq!(rug_integer_to_integer(&(-natural_to_rug_integer(x))), neg);
 
         assert_eq!(-x.to_integer(), neg);
-        assert_eq!(neg == x, x == 0);
-        assert_eq!(-&neg, x);
-    };
-
-    for n in naturals(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        one_natural(n);
-    }
-
-    for n in naturals(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        one_natural(n);
-    }
+        assert_eq!(neg == *x, *x == 0);
+        assert_eq!(-neg, *x);
+    });
 }

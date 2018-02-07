@@ -1,6 +1,5 @@
-use common::LARGE_LIMIT;
+use common::test_properties_no_limit_exhaustive;
 use malachite_base::round::RoundingMode;
-use malachite_test::common::GenerationMode;
 use malachite_test::inputs::base::rounding_modes;
 
 #[test]
@@ -18,16 +17,7 @@ fn test_neg() {
 
 #[test]
 fn neg_properties() {
-    // --x == x
-    let one_rounding_mode = |rm: RoundingMode| {
+    test_properties_no_limit_exhaustive(rounding_modes, |&rm| {
         assert_eq!(-(-rm), rm);
-    };
-
-    for n in rounding_modes(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        one_rounding_mode(n);
-    }
-
-    for n in rounding_modes(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        one_rounding_mode(n);
-    }
+    });
 }

@@ -1,6 +1,5 @@
-use common::LARGE_LIMIT;
+use common::test_properties;
 use malachite_nz::integer::Integer;
-use malachite_test::common::GenerationMode;
 use malachite_test::inputs::integer::integers;
 use std::str::FromStr;
 use std::u32;
@@ -27,31 +26,18 @@ fn test_trailing_zeros() {
 
 #[test]
 fn trailing_zeros_properties() {
-    // x.trailing_zeros().is_none() == (x == 0)
-    // (-x).trailing_zeros() == x.trailing_zeros()
-    // if x != 0, ((!x).trailing_zeros() == Some(0)) == (x.trailing_zeros() == Some(0))
-    // if x != 0, x >> x.trailing_zeros() is odd
-    // if x != 0, x >> x.trailing_zeros() << x.trailing_zeros() == x
-    let one_integer = |x: Integer| {
+    test_properties(integers, |x| {
         let trailing_zeros = x.trailing_zeros();
-        assert_eq!(trailing_zeros.is_none(), x == 0);
-        assert_eq!((-&x).trailing_zeros(), trailing_zeros);
-        if x != 0 {
+        assert_eq!(trailing_zeros.is_none(), *x == 0);
+        assert_eq!((-x).trailing_zeros(), trailing_zeros);
+        if *x != 0 {
             let trailing_zeros = trailing_zeros.unwrap();
-            assert_ne!((!&x).trailing_zeros() == Some(0), trailing_zeros == 0);
+            assert_ne!((!x).trailing_zeros() == Some(0), trailing_zeros == 0);
             if trailing_zeros <= u64::from(u32::MAX) {
                 let trailing_zeros = trailing_zeros as u32;
-                assert!((&x >> trailing_zeros).is_odd());
-                assert_eq!(&x >> trailing_zeros << trailing_zeros, x);
+                assert!((x >> trailing_zeros).is_odd());
+                assert_eq!(x >> trailing_zeros << trailing_zeros, *x);
             }
         }
-    };
-
-    for n in integers(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        one_integer(n);
-    }
-
-    for n in integers(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        one_integer(n);
-    }
+    });
 }

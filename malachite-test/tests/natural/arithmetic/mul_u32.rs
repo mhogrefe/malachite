@@ -1,8 +1,8 @@
-use common::LARGE_LIMIT;
+use common::test_properties;
 use malachite_base::num::{One, Zero};
 use malachite_nz::natural::Natural;
 use malachite_test::common::{biguint_to_natural, natural_to_biguint, natural_to_rug_integer,
-                             rug_integer_to_natural, GenerationMode};
+                             rug_integer_to_natural};
 use malachite_test::inputs::base::unsigneds;
 use malachite_test::inputs::natural::{naturals, pairs_of_natural_and_unsigned};
 use malachite_test::natural::arithmetic::mul_u32::num_mul_u32;
@@ -66,109 +66,69 @@ fn test_add_u32() {
 
 #[test]
 fn mul_u32_properties() {
-    // n *= u is equivalent for malachite and rug.
-    // n * u is equivalent for malachite, num, and rug.
-    // &n * u is equivalent for malachite and num.
-    // n *= u; n is valid.
-    // n * u and u * n are valid.
-    // &n * u and u * &n are valid.
-    // n *= u, n * u, u * n, &n * u, and u * &n give the same result.
-    // n * u == n * from(u)
-    // if n != 0 and u != 0, n * u >= n and n * u >= u
-    // TODO n * u / u == n
-    let natural_and_u32 = |mut n: Natural, u: u32| {
-        let old_n = n.clone();
-        n *= u;
-        assert!(n.is_valid());
+    test_properties(
+        pairs_of_natural_and_unsigned,
+        |&(ref n, u): &(Natural, u32)| {
+            let mut mut_n = n.clone();
+            mut_n *= u;
+            assert!(mut_n.is_valid());
+            let product = mut_n;
 
-        let mut rug_n = natural_to_rug_integer(&old_n);
-        rug_n *= u;
-        assert_eq!(rug_integer_to_natural(&rug_n), n);
+            let mut rug_n = natural_to_rug_integer(n);
+            rug_n *= u;
+            assert_eq!(rug_integer_to_natural(&rug_n), product);
 
-        let n2 = old_n.clone();
-        let result = &n2 * u;
-        assert!(result.is_valid());
-        assert_eq!(result, n);
-        let result = n2 * u;
-        assert!(result.is_valid());
-        assert_eq!(result, n);
+            let product_alt = n * u;
+            assert!(product_alt.is_valid());
+            assert_eq!(product_alt, product);
 
-        let n2 = old_n.clone();
-        let result = u * &n2;
-        assert!(result.is_valid());
-        assert_eq!(result, n);
-        let result = u * n2;
-        assert_eq!(result, n);
-        assert!(result.is_valid());
+            let product_alt = n.clone() * u;
+            assert!(product_alt.is_valid());
+            assert_eq!(product_alt, product);
 
-        let n2 = old_n.clone();
-        let result = n2 * Natural::from(u);
-        assert_eq!(result, n);
-        let n2 = old_n.clone();
-        let result = Natural::from(u) * n2;
-        assert_eq!(result, n);
+            let product_alt = u * n;
+            assert!(product_alt.is_valid());
+            assert_eq!(product_alt, product);
 
-        let num_n2 = natural_to_biguint(&old_n);
-        assert_eq!(biguint_to_natural(&num_mul_u32(num_n2, u)), n);
+            let product_alt = u * n.clone();
+            assert!(product_alt.is_valid());
+            assert_eq!(product_alt, product);
 
-        let rug_n2 = natural_to_rug_integer(&old_n);
-        assert_eq!(rug_integer_to_natural(&(rug_n2 * u)), n);
+            assert_eq!(n * Natural::from(u), product);
+            assert_eq!(Natural::from(u) * n, product);
 
-        if n != 0 && u != 0 {
-            assert!(n >= old_n);
-            assert!(n >= u);
-        }
-        //TODO assert_eq!(n / u, Some(old_n));
-    };
+            assert_eq!(
+                biguint_to_natural(&num_mul_u32(natural_to_biguint(n), u)),
+                product
+            );
+            assert_eq!(
+                rug_integer_to_natural(&(natural_to_rug_integer(n) * u)),
+                product
+            );
 
-    // n * 0 == 0
-    // 0 * n == 0
-    // n * 1 == n
-    // 1 * n == n
-    // n * 2 == n << 1
-    // 2 * n == n << 1
+            if *n != 0 && u != 0 {
+                assert!(product >= *n);
+                assert!(product >= u);
+            }
+            //TODO assert_eq!(product / u, n);
+            //TODO assert_eq!(product / n, u);
+        },
+    );
+
     #[allow(unknown_lints, erasing_op, identity_op)]
-    let one_natural = |n: Natural| {
-        assert_eq!(&n * 0u32, 0);
-        assert_eq!(0u32 * &n, 0);
-        assert_eq!(&n * 1u32, n);
-        assert_eq!(1u32 * &n, n);
-        assert_eq!(&n * 2u32, &n << 1);
-        assert_eq!(2u32 * &n, &n << 1);
-    };
+    test_properties(naturals, |n| {
+        assert_eq!(n * 0u32, 0);
+        assert_eq!(0u32 * n, 0);
+        assert_eq!(n * 1u32, *n);
+        assert_eq!(1u32 * n, *n);
+        assert_eq!(n * 2u32, n << 1);
+        assert_eq!(2u32 * n, n << 1);
+    });
 
-    // 0 * u == 0
-    // u * 0 == 0
-    // 1 * u == u
-    // u * 1 == u
-    let one_u32 = |u: u32| {
+    test_properties(unsigneds, |&u: &u32| {
         assert_eq!(Natural::ZERO * u, 0);
         assert_eq!(u * Natural::ZERO, 0);
         assert_eq!(Natural::ONE * u, u);
         assert_eq!(u * Natural::ONE, u);
-    };
-
-    for (n, u) in pairs_of_natural_and_unsigned(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        natural_and_u32(n, u);
-    }
-
-    for (n, u) in pairs_of_natural_and_unsigned(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        natural_and_u32(n, u);
-    }
-
-    for n in naturals(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        one_natural(n);
-    }
-
-    for n in naturals(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        one_natural(n);
-    }
-
-    for u in unsigneds(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        one_u32(u);
-    }
-
-    for u in unsigneds(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        one_u32(u);
-    }
+    });
 }

@@ -1,7 +1,6 @@
-use common::LARGE_LIMIT;
+use common::test_properties;
 use malachite_base::num::{BitAccess, PrimitiveInteger, PrimitiveSigned, PrimitiveUnsigned};
 use malachite_base::num::NegativeOne;
-use malachite_test::common::GenerationMode;
 use malachite_test::inputs::base::{pairs_of_signed_and_u64_width_range_var_2,
                                    pairs_of_unsigned_and_small_u64};
 
@@ -86,85 +85,54 @@ clear_bit_fail_helper!(
 );
 
 fn clear_bit_properties_helper_unsigned<T: 'static + PrimitiveUnsigned>() {
-    // n.clear_bit(index) is equivalent to n.assign_bit(index, false).
-    // If n.get_bit(index), clearing and then setting at index won't do anything.
-    // Setting a bit does not increase n.
-    // If !n.get_bit(index), clearing at index won't do anything.
-    let unsigned_and_u64 = |mut n: T, index: u64| {
-        let old_n = n;
-        n.clear_bit(index);
+    test_properties(pairs_of_unsigned_and_small_u64, |&(n, index)| {
+        let mut mut_n: T = n;
+        mut_n.clear_bit(index);
 
-        let mut n2 = old_n;
-        n2.assign_bit(index, false);
-        assert_eq!(n2, n);
+        let mut mut_n_2 = n;
+        mut_n_2.assign_bit(index, false);
+        assert_eq!(mut_n_2, mut_n);
 
-        assert!(n <= old_n);
-        if old_n.get_bit(index) {
-            assert_ne!(n, old_n);
-            n.set_bit(index);
-            assert_eq!(n, old_n);
+        assert!(mut_n <= n);
+        if n.get_bit(index) {
+            assert_ne!(mut_n, n);
+            mut_n.set_bit(index);
+            assert_eq!(mut_n, n);
         } else {
-            assert_eq!(n, old_n);
+            assert_eq!(mut_n, n);
         }
-    };
-
-    for (n, index) in pairs_of_unsigned_and_small_u64(GenerationMode::Exhaustive).take(LARGE_LIMIT)
-    {
-        unsigned_and_u64(n, index);
-    }
-
-    for (n, index) in pairs_of_unsigned_and_small_u64(GenerationMode::Random(32)).take(LARGE_LIMIT)
-    {
-        unsigned_and_u64(n, index);
-    }
+    });
 }
 
 fn clear_bit_properties_helper_signed<T: 'static + PrimitiveSigned>() {
-    // n.clear_bit(index) is equivalent to n.assign_bit(index, false).
-    // If n.get_bit(index), clearing and then setting at index won't do anything.
-    // Setting a bit does not increase n.
-    // If !n.get_bit(index), clearing at index won't do anything.
-    // { n.clear_bit(index) } is equivalent to { n := !n; n.set_bit(index); n := !n }
-    let signed_and_u64 = |mut n: T, index: u64| {
-        let old_n = n;
-        n.clear_bit(index);
+    test_properties(pairs_of_signed_and_u64_width_range_var_2, |&(n, index)| {
+        let mut mut_n: T = n;
+        mut_n.clear_bit(index);
 
-        let mut n2 = old_n;
-        n2.assign_bit(index, false);
-        assert_eq!(n2, n);
+        let mut mut_n_2 = n;
+        mut_n_2.assign_bit(index, false);
+        assert_eq!(mut_n_2, mut_n);
 
-        if old_n < T::ZERO && index == u64::from(T::WIDTH) - 1 {
-            assert!(n >= T::ZERO);
+        if n < T::ZERO && index == u64::from(T::WIDTH) - 1 {
+            assert!(mut_n >= T::ZERO);
         } else {
-            assert!(n <= old_n);
+            assert!(mut_n <= n);
         }
-        if old_n.get_bit(index) {
-            assert_ne!(n, old_n);
-            n.set_bit(index);
-            assert_eq!(n, old_n);
+        if n.get_bit(index) {
+            assert_ne!(mut_n, n);
+            mut_n.set_bit(index);
+            assert_eq!(mut_n, n);
         } else {
-            assert_eq!(n, old_n);
+            assert_eq!(mut_n, n);
         }
 
-        let mut m = !old_n;
+        let mut m = !n;
         m.set_bit(index);
         m = !m; //TODO use not_assign
-        let mut n = old_n;
-        n.clear_bit(index);
-        assert_eq!(m, n);
-    };
-
-    for (n, index) in
-        pairs_of_signed_and_u64_width_range_var_2(GenerationMode::Exhaustive).take(LARGE_LIMIT)
-    {
-        signed_and_u64(n, index);
-    }
-
-    for (n, index) in
-        pairs_of_signed_and_u64_width_range_var_2(GenerationMode::Random(32)).take(LARGE_LIMIT)
-    {
-        signed_and_u64(n, index);
-    }
+        let mut mut_n = n;
+        mut_n.clear_bit(index);
+        assert_eq!(m, mut_n);
+    });
 }
 
 #[test]

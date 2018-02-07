@@ -1,6 +1,5 @@
-use common::LARGE_LIMIT;
+use common::test_properties;
 use malachite_nz::integer::Integer;
-use malachite_test::common::GenerationMode;
 use malachite_test::inputs::integer::integers;
 use std::str::FromStr;
 
@@ -28,34 +27,18 @@ fn test_into_natural() {
 
 #[test]
 fn to_natural_properties() {
-    // x.into_natural() is valid.
-    // x.into_natural().to_string() == x.to_string()
-    //
-    // x.to_natural() is valid.
-    // x.to_natural() == x.into_natural()
-    //
-    // x.to_natural().is_some() == x >= 0
-    // if x >= 0, x.to_natural().to_integer() == x
-    let one_integer = |x: Integer| {
-        let on = x.clone().into_natural();
-        assert!(on.clone().map_or(true, |n| n.is_valid()));
+    test_properties(integers, |x| {
+        let natural_x = x.clone().into_natural();
+        assert!(natural_x.as_ref().map_or(true, |n| n.is_valid()));
 
-        let on_2 = x.to_natural();
-        assert!(on_2.clone().map_or(true, |n| n.is_valid()));
+        let natural_x = x.to_natural();
+        assert!(natural_x.as_ref().map_or(true, |n| n.is_valid()));
 
-        assert_eq!(on.is_some(), x >= 0);
-        if let Some(n) = on_2 {
+        assert_eq!(natural_x.is_some(), *x >= 0);
+        if let Some(n) = natural_x {
             assert_eq!(n.to_string(), x.to_string());
-            assert_eq!(n.to_integer(), x);
-            assert_eq!(n.into_integer(), x);
+            assert_eq!(n.to_integer(), *x);
+            assert_eq!(n.into_integer(), *x);
         }
-    };
-
-    for n in integers(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        one_integer(n);
-    }
-
-    for n in integers(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        one_integer(n);
-    }
+    });
 }

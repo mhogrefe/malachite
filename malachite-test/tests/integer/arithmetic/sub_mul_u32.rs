@@ -1,7 +1,6 @@
-use common::LARGE_LIMIT;
+use common::test_properties;
 use malachite_base::num::{One, SubMul, SubMulAssign, Zero};
 use malachite_nz::integer::Integer;
-use malachite_test::common::GenerationMode;
 use malachite_test::inputs::integer::{integers, pairs_of_integer_and_unsigned, pairs_of_integers,
                                       triples_of_integer_integer_and_unsigned};
 use std::str::FromStr;
@@ -84,106 +83,57 @@ fn test_sub_mul_u32() {
 
 #[test]
 fn sub_mul_u32_properties() {
-    // a.sub_mul_assign(b, c); a is valid.
-    // a.sub_mul_assign(&b, c); a is valid.
-    // a.sub_mul(b, c) is valid.
-    // a.sub_mul(&b, c) is valid.
-    // (&a).sub_mul(b, c) is valid.
-    // (&a).sub_mul(&b, c) is valid.
-    // a.sub_mul_assign(b, c), a.sub_mul_assign(&b, c), a.sub_mul(b, c), a.sub_mul(&b, c),
-    //      (&a).sub_mul(b, c), and (&a).sub_mul(&b, c) give the same result.
-    // a.sub_mul(&b, c) is equivalent to a - b * c.
-    // -(a.sub_mul(b, c)) = (-a).sub_mul(-b, c)
-    // a.sub_mul(&b, c) is equivalent to a.sub_mul(&b, Integer::from(c))
-    let integer_integer_and_u32 = |mut a: Integer, b: Integer, c: u32| {
-        let old_a = a.clone();
-        a.sub_mul_assign(b.clone(), c);
-        assert!(a.is_valid());
+    test_properties(
+        triples_of_integer_integer_and_unsigned,
+        |&(ref a, ref b, c): &(Integer, Integer, u32)| {
+            let mut mut_a = a.clone();
+            mut_a.sub_mul_assign(b.clone(), c);
+            assert!(mut_a.is_valid());
+            let result = mut_a;
 
-        let mut a2 = old_a.clone();
-        a2.sub_mul_assign(&b, c);
-        assert!(a2.is_valid());
-        assert_eq!(a2, a);
+            let mut mut_a = a.clone();
+            mut_a.sub_mul_assign(b, c);
+            assert!(mut_a.is_valid());
+            assert_eq!(mut_a, result);
 
-        let a2 = old_a.clone();
-        let result = (&a2).sub_mul(b.clone(), c);
-        assert!(result.is_valid());
-        assert_eq!(result, a);
+            let result_alt = a.sub_mul(b.clone(), c);
+            assert!(result_alt.is_valid());
+            assert_eq!(result_alt, result);
 
-        let a2 = old_a.clone();
-        let result = (&a2).sub_mul(&b, c);
-        assert!(result.is_valid());
-        assert_eq!(result, a);
+            let result_alt = a.sub_mul(b, c);
+            assert!(result_alt.is_valid());
+            assert_eq!(result_alt, result);
 
-        let result = a2.clone().sub_mul(b.clone(), c);
-        assert!(result.is_valid());
-        assert_eq!(result, a);
+            let result_alt = a.clone().sub_mul(b.clone(), c);
+            assert!(result_alt.is_valid());
+            assert_eq!(result_alt, result);
 
-        let result = a2.sub_mul(&b, c);
-        assert!(result.is_valid());
-        assert_eq!(result, a);
+            let result_alt = a.clone().sub_mul(b, c);
+            assert!(result_alt.is_valid());
+            assert_eq!(result_alt, result);
 
-        assert_eq!(&old_a - &b * c, result);
-        assert_eq!((-&old_a).sub_mul(-&b, c), -&result);
-        assert_eq!(old_a.sub_mul(b, Integer::from(c)), result);
-    };
+            assert_eq!(a - b * c, result);
+            assert_eq!((-a).sub_mul(-b, c), -&result);
+            assert_eq!(a.sub_mul(b, &Integer::from(c)), result);
+        },
+    );
 
-    // n.sub_mul(n, 1) == 0
-    let single_integer = |n: &Integer| {
+    test_properties(integers, |n| {
         assert_eq!(n.sub_mul(n, 1), 0);
-    };
+    });
 
-    // n.sub_mul(0, c) == n
-    // n.sub_mul(1, c) == n - c
-    // 0.sub_mul(n, c) == -(n * c)
-    // (n * c).sub_mul(n, c) == 0
-    let integer_and_u32 = |n: &Integer, c: u32| {
-        assert_eq!(n.sub_mul(&Integer::ZERO, c), *n);
-        assert_eq!(n.sub_mul(&Integer::ONE, c), n - c);
-        assert_eq!(Integer::ZERO.sub_mul(n, c), -(n * c));
-        assert_eq!((n * c).sub_mul(n, c), 0);
-    };
+    test_properties(
+        pairs_of_integer_and_unsigned,
+        |&(ref n, c): &(Integer, u32)| {
+            assert_eq!(n.sub_mul(&Integer::ZERO, c), *n);
+            assert_eq!(n.sub_mul(&Integer::ONE, c), n - c);
+            assert_eq!(Integer::ZERO.sub_mul(n, c), -(n * c));
+            assert_eq!((n * c).sub_mul(n, c), 0);
+        },
+    );
 
-    // a.sub_mul(b, 0) == a
-    // a.sub_mul(b, 1) == a - b
-    let two_integers = |a: &Integer, b: &Integer| {
+    test_properties(pairs_of_integers, |&(ref a, ref b)| {
         assert_eq!(a.sub_mul(b, 0), *a);
         assert_eq!(a.sub_mul(b, 1), a - b);
-    };
-
-    for (a, b, c) in
-        triples_of_integer_integer_and_unsigned(GenerationMode::Exhaustive).take(LARGE_LIMIT)
-    {
-        integer_integer_and_u32(a, b, c);
-    }
-
-    for (a, b, c) in
-        triples_of_integer_integer_and_unsigned(GenerationMode::Random(32)).take(LARGE_LIMIT)
-    {
-        integer_integer_and_u32(a, b, c);
-    }
-
-    for n in integers(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        single_integer(&n);
-    }
-
-    for n in integers(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        single_integer(&n);
-    }
-
-    for (n, c) in pairs_of_integer_and_unsigned(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        integer_and_u32(&n, c);
-    }
-
-    for (n, c) in pairs_of_integer_and_unsigned(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        integer_and_u32(&n, c);
-    }
-
-    for (a, b) in pairs_of_integers(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        two_integers(&a, &b);
-    }
-
-    for (a, b) in pairs_of_integers(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        two_integers(&a, &b);
-    }
+    });
 }

@@ -1,7 +1,7 @@
-use common::LARGE_LIMIT;
+use common::test_properties;
 use malachite_base::num::{BitAccess, SignificantBits};
 use malachite_nz::integer::Integer;
-use malachite_test::common::{integer_to_rug_integer, GenerationMode};
+use malachite_test::common::integer_to_rug_integer;
 use malachite_test::inputs::integer::{natural_integers, pairs_of_integer_and_small_u64};
 use rug;
 use std::str::FromStr;
@@ -46,38 +46,18 @@ pub fn test_get_bit() {
 
 #[test]
 fn get_bit_properties() {
-    // n.get_bit(index) is equivalent for malachite, num, and rug.
-    // !(!n).get_bit(index) == n.get_bit_index()
-    let integer_and_u64 = |n: Integer, index: u64| {
+    test_properties(pairs_of_integer_and_small_u64, |&(ref n, index)| {
         let bit = n.get_bit(index);
-        assert_eq!(integer_to_rug_integer(&n).get_bit(index as u32), bit);
+        assert_eq!(integer_to_rug_integer(n).get_bit(index as u32), bit);
 
         assert_eq!(!(!n).get_bit(index), bit);
-    };
+    });
 
-    // if n >= 0, !n.get_bit(n.significant_bits())
-    // if n > 0, n.get_bit(n.significant_bits() - 1)
-    let one_natural_integer = |n: Integer| {
+    test_properties(natural_integers, |n| {
         let significant_bits = n.significant_bits();
         assert!(!n.get_bit(significant_bits));
-        if n != 0 {
+        if *n != 0 {
             assert!(n.get_bit(significant_bits - 1));
         }
-    };
-
-    for (n, index) in pairs_of_integer_and_small_u64(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        integer_and_u64(n, index);
-    }
-
-    for (n, index) in pairs_of_integer_and_small_u64(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        integer_and_u64(n, index);
-    }
-
-    for n in natural_integers(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        one_natural_integer(n);
-    }
-
-    for n in natural_integers(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        one_natural_integer(n);
-    }
+    });
 }

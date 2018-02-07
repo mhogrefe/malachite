@@ -1,7 +1,6 @@
-use common::LARGE_LIMIT;
+use common::test_properties;
 use malachite_base::num::SignificantBits;
 use malachite_nz::natural::Natural;
-use malachite_test::common::GenerationMode;
 use malachite_test::inputs::natural::naturals;
 use std::str::FromStr;
 use std::u32;
@@ -28,11 +27,9 @@ fn test_is_power_of_2() {
 
 #[test]
 fn is_power_of_2_properties() {
-    // if x != 0, x.is_power_of_2() == (x.trailing_zeros().unwrap() == x.significant_bits() - 1)
-    // if x != 0, x.is_power_of_2() == (x >> x.trailing_zeros() == 1)
-    let one_natural = |x: Natural| {
+    test_properties(naturals, |x| {
         let is_power_of_2 = x.is_power_of_2();
-        if x != 0 {
+        if *x != 0 {
             let trailing_zeros = x.trailing_zeros().unwrap();
             assert_eq!(trailing_zeros == x.significant_bits() - 1, is_power_of_2);
             if trailing_zeros <= u64::from(u32::MAX) {
@@ -40,13 +37,5 @@ fn is_power_of_2_properties() {
                 assert_eq!(x >> trailing_zeros == 1, is_power_of_2);
             }
         }
-    };
-
-    for n in naturals(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        one_natural(n);
-    }
-
-    for n in naturals(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        one_natural(n);
-    }
+    });
 }

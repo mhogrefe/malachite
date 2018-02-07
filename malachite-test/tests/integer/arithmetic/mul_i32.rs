@@ -1,8 +1,8 @@
-use common::LARGE_LIMIT;
+use common::test_properties;
 use malachite_base::num::{NegativeOne, One, Zero};
 use malachite_nz::integer::Integer;
 use malachite_test::common::{bigint_to_integer, integer_to_bigint, integer_to_rug_integer,
-                             rug_integer_to_integer, GenerationMode};
+                             rug_integer_to_integer};
 use malachite_test::inputs::base::signeds;
 use malachite_test::inputs::integer::{integers, pairs_of_integer_and_signed};
 use malachite_test::integer::arithmetic::mul_i32::num_mul_i32;
@@ -95,88 +95,67 @@ fn test_add_i32() {
 
 #[test]
 fn mul_i32_properties() {
-    // n *= i is equivalent for malachite and rug.
-    // n * i is equivalent for malachite, num, and rug.
-    // &n * i is equivalent for malachite and num.
-    // n *= i; n is valid.
-    // n * i and i * n are valid.
-    // &n * i and i * &n are valid.
-    // n *= i, n * i, i * n, &n * i, and i * &n give the same result.
-    // n * i == n * from(i)
-    // (-n) * i == -(n * i)
-    // if i != -2^31, n * (-i) == -(n * i)
-    // TODO n * i / i == n
-    let integer_and_i32 = |mut n: Integer, i: i32| {
-        let old_n = n.clone();
-        n *= i;
-        assert!(n.is_valid());
+    test_properties(
+        pairs_of_integer_and_signed,
+        |&(ref n, i): &(Integer, i32)| {
+            let mut mut_n = n.clone();
+            mut_n *= i;
+            assert!(mut_n.is_valid());
+            let product = mut_n;
 
-        let mut rug_n = integer_to_rug_integer(&old_n);
-        rug_n *= i;
-        assert_eq!(rug_integer_to_integer(&rug_n), n);
+            let mut rug_n = integer_to_rug_integer(n);
+            rug_n *= i;
+            assert_eq!(rug_integer_to_integer(&rug_n), product);
 
-        let n2 = old_n.clone();
-        let result = &n2 * i;
-        assert!(result.is_valid());
-        assert_eq!(result, n);
-        let result = n2 * i;
-        assert!(result.is_valid());
-        assert_eq!(result, n);
+            let product_alt = n * i;
+            assert!(product_alt.is_valid());
+            assert_eq!(product_alt, product);
+            let product_alt = n.clone() * i;
+            assert!(product_alt.is_valid());
+            assert_eq!(product_alt, product);
 
-        let n2 = old_n.clone();
-        let result = i * &n2;
-        assert!(result.is_valid());
-        assert_eq!(result, n);
-        let result = i * n2;
-        assert_eq!(result, n);
-        assert!(result.is_valid());
+            let product_alt = i * n;
+            assert!(product_alt.is_valid());
+            assert_eq!(product_alt, product);
+            let product_alt = i * n.clone();
+            assert!(product_alt.is_valid());
+            assert_eq!(product_alt, product);
 
-        let n2 = old_n.clone();
-        let result = n2 * Integer::from(i);
-        assert_eq!(result, n);
-        let n2 = old_n.clone();
-        let result = Integer::from(i) * n2;
-        assert_eq!(result, n);
+            let product_alt = n * Integer::from(i);
+            assert_eq!(product_alt, product);
+            let product_alt = Integer::from(i) * n;
+            assert_eq!(product_alt, product);
 
-        let num_n2 = integer_to_bigint(&old_n);
-        assert_eq!(bigint_to_integer(&num_mul_i32(num_n2, i)), n);
+            assert_eq!(
+                bigint_to_integer(&num_mul_i32(integer_to_bigint(n), i)),
+                product
+            );
+            assert_eq!(
+                rug_integer_to_integer(&(integer_to_rug_integer(n) * i)),
+                product
+            );
 
-        let rug_n2 = integer_to_rug_integer(&old_n);
-        assert_eq!(rug_integer_to_integer(&(rug_n2 * i)), n);
+            assert_eq!((-n) * i, -(n * i));
+            if i != i32::MIN {
+                assert_eq!(n * (-i), -(n * i));
+            }
+            //TODO assert_eq!(product / u, Some(n));
+        },
+    );
 
-        assert_eq!((-&n) * i, -(&n * i));
-        if i != i32::MIN {
-            assert_eq!(&n * (-i), -(n * i));
-        }
-        //TODO assert_eq!(n / u, Some(old_n));
-    };
-
-    // n * 0 == 0
-    // 0 * n == 0
-    // n * 1 == n
-    // 1 * n == n
-    // n * 2 == n << 1
-    // 2 * n == n << 1
-    // n * -1 == -n
-    // -1 * n == -n
     #[allow(unknown_lints, erasing_op, identity_op)]
-    let one_integer = |n: Integer| {
-        assert_eq!(&n * 0i32, 0);
-        assert_eq!(0i32 * &n, 0);
-        assert_eq!(&n * 1i32, n);
-        assert_eq!(1i32 * &n, n);
-        assert_eq!(&n * 2i32, &n << 1);
-        assert_eq!(2i32 * &n, &n << 1);
-        assert_eq!(&n * -1i32, -&n);
-        assert_eq!(-1i32 * &n, -n);
-    };
+    test_properties(integers, |n| {
+        assert_eq!(n * 0i32, 0);
+        assert_eq!(0i32 * n, 0);
+        assert_eq!(n * 1i32, *n);
+        assert_eq!(1i32 * n, *n);
+        assert_eq!(n * 2i32, n << 1);
+        assert_eq!(2i32 * n, n << 1);
+        assert_eq!(n * -1i32, -n);
+        assert_eq!(-1i32 * n, -n);
+    });
 
-    // 0 * i == 0
-    // i * 0 == 0
-    // 1 * i == i
-    // i * 1 == i
-    // if i != -2^31, i * -1 == -i and -1 * i == -i
-    let one_i32 = |i: i32| {
+    test_properties(signeds, |&i: &i32| {
         assert_eq!(Integer::ZERO * i, 0);
         assert_eq!(i * Integer::ZERO, 0);
         assert_eq!(Integer::ONE * i, i);
@@ -185,29 +164,5 @@ fn mul_i32_properties() {
             assert_eq!(Integer::NEGATIVE_ONE * i, -i);
             assert_eq!(i * Integer::NEGATIVE_ONE, -i);
         }
-    };
-
-    for (n, i) in pairs_of_integer_and_signed(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        integer_and_i32(n, i);
-    }
-
-    for (n, i) in pairs_of_integer_and_signed(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        integer_and_i32(n, i);
-    }
-
-    for n in integers(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        one_integer(n);
-    }
-
-    for n in integers(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        one_integer(n);
-    }
-
-    for i in signeds(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        one_i32(i);
-    }
-
-    for i in signeds(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        one_i32(i);
-    }
+    });
 }

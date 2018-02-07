@@ -1,6 +1,5 @@
-use common::LARGE_LIMIT;
+use common::test_properties;
 use malachite_nz::natural::Natural;
-use malachite_test::common::GenerationMode;
 use malachite_test::inputs::natural::naturals;
 use std::str::FromStr;
 
@@ -24,31 +23,16 @@ fn test_into_integer() {
 
 #[test]
 fn to_integer_properties() {
-    // x.into_integer() is valid.
-    // x.into_integer().to_string() == x.to_string()
-    //
-    // x.to_integer() is valid.
-    // x.to_integer() == x.into_integer()
-    //
-    // x.to_integer().to_natural() == x
-    let one_natural = |x: Natural| {
-        let result = x.clone().into_integer();
-        assert!(result.is_valid());
-        assert_eq!(result.to_string(), x.to_string());
+    test_properties(naturals, |x| {
+        let integer_x = x.clone().into_integer();
+        assert!(integer_x.is_valid());
+        assert_eq!(integer_x.to_string(), x.to_string());
 
-        let result_2 = x.to_integer();
-        assert!(result_2.is_valid());
-        assert_eq!(result_2, result);
+        let integer_x_alt = x.to_integer();
+        assert!(integer_x_alt.is_valid());
+        assert_eq!(integer_x_alt, integer_x);
 
-        assert_eq!(result_2.to_natural().unwrap(), x);
-        assert_eq!(result_2.into_natural().unwrap(), x);
-    };
-
-    for n in naturals(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        one_natural(n);
-    }
-
-    for n in naturals(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        one_natural(n);
-    }
+        assert_eq!(integer_x.to_natural().as_ref(), Some(x));
+        assert_eq!(integer_x.into_natural().as_ref(), Some(x));
+    });
 }

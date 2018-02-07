@@ -1,8 +1,7 @@
-use common::LARGE_LIMIT;
+use common::test_properties;
 use malachite_base::num::{One, Zero};
 use malachite_base::num::{SubMul, SubMulAssign};
 use malachite_nz::natural::Natural;
-use malachite_test::common::GenerationMode;
 use malachite_test::inputs::natural::{pairs_of_naturals, triples_of_naturals};
 use std::str::FromStr;
 
@@ -105,53 +104,31 @@ fn test_sub_mul() {
 
 #[test]
 fn sub_mul_properties() {
-    // a.sub_mul_assign(&b, c); a is valid.
-    // a.sub_mul(&b, c) is valid.
-    // (&a).sub_mul(&b, c) is valid.
-    // a.sub_mul_assign(&b, c), a.sub_mul(&b, c), and (&a).sub_mul(&b, c) give the same result.
-    // a.sub_mul(&b, c) is equivalent to a - b * c.
-    let three_naturals = |mut a: Natural, b: Natural, c: Natural| {
-        let old_a = a.clone();
-        if a >= &b * &c {
-            a.sub_mul_assign(&b, &c);
-            assert!(a.is_valid());
-        }
-        let oa = if old_a >= &b * &c { Some(a) } else { None };
+    test_properties(triples_of_naturals, |&(ref a, ref b, ref c)| {
+        let result = if *a >= b * c {
+            let mut mut_a = a.clone();
+            mut_a.sub_mul_assign(b, c);
+            assert!(mut_a.is_valid());
+            Some(mut_a)
+        } else {
+            None
+        };
 
-        let a2 = old_a.clone();
-        let result = (&a2).sub_mul(&b, &c);
-        assert!(result.clone().map_or(true, |n| n.is_valid()));
-        assert_eq!(result, oa);
+        let result_alt = a.sub_mul(b, c);
+        assert!(result_alt.as_ref().map_or(true, |n| n.is_valid()));
+        assert_eq!(result_alt, result);
 
-        let result = a2.sub_mul(&b, &c);
-        assert!(result.clone().map_or(true, |n| n.is_valid()));
-        assert_eq!(result, oa);
+        let result_alt = a.clone().sub_mul(b, c);
+        assert!(result_alt.as_ref().map_or(true, |n| n.is_valid()));
+        assert_eq!(result_alt, result);
 
-        assert_eq!(old_a - &(b * c), oa);
-    };
+        assert_eq!(a - &(b * c), result);
+    });
 
-    // a.sub_mul(b, 0) == Some(a)
-    // a.sub_mul(b, 1) == a - b
-    let two_naturals = |a: &Natural, b: &Natural| {
-        assert_eq!(a.sub_mul(&Natural::ZERO, b), Some(a.clone()));
-        assert_eq!(a.sub_mul(b, &Natural::ZERO), Some(a.clone()));
+    test_properties(pairs_of_naturals, |&(ref a, ref b)| {
+        assert_eq!(a.sub_mul(&Natural::ZERO, b).as_ref(), Some(a));
+        assert_eq!(a.sub_mul(b, &Natural::ZERO).as_ref(), Some(a));
         assert_eq!(a.sub_mul(&Natural::ONE, b), a - b);
         assert_eq!(a.sub_mul(b, &Natural::ONE), a - b);
-    };
-
-    for (a, b, c) in triples_of_naturals(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        three_naturals(a, b, c);
-    }
-
-    for (a, b, c) in triples_of_naturals(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        three_naturals(a, b, c);
-    }
-
-    for (a, b) in pairs_of_naturals(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        two_naturals(&a, &b);
-    }
-
-    for (a, b) in pairs_of_naturals(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        two_naturals(&a, &b);
-    }
+    });
 }

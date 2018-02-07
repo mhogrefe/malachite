@@ -1,7 +1,7 @@
-use common::LARGE_LIMIT;
+use common::test_properties;
 use malachite_base::num::BitAccess;
 use malachite_nz::integer::Integer;
-use malachite_test::common::{integer_to_rug_integer, rug_integer_to_integer, GenerationMode};
+use malachite_test::common::{integer_to_rug_integer, rug_integer_to_integer};
 use malachite_test::inputs::integer::triples_of_integer_small_u64_and_bool;
 use rug;
 use std::str::FromStr;
@@ -45,25 +45,17 @@ fn test_assign_bit() {
 
 #[test]
 fn assign_bit_properties() {
-    let integer_u64_and_bool = |mut n: Integer, index: u64, bit: bool| {
-        let old_n = n.clone();
-        n.assign_bit(index, bit);
-        assert!(n.is_valid());
+    test_properties(
+        triples_of_integer_small_u64_and_bool,
+        |&(ref n, index, bit)| {
+            let mut mut_n = n.clone();
+            mut_n.assign_bit(index, bit);
+            assert!(mut_n.is_valid());
+            let result = mut_n;
 
-        let mut rug_n = integer_to_rug_integer(&old_n);
-        rug_n.set_bit(index as u32, bit);
-        assert_eq!(rug_integer_to_integer(&rug_n), n);
-    };
-
-    for (n, index, bit) in
-        triples_of_integer_small_u64_and_bool(GenerationMode::Exhaustive).take(LARGE_LIMIT)
-    {
-        integer_u64_and_bool(n, index, bit);
-    }
-
-    for (n, index, bit) in
-        triples_of_integer_small_u64_and_bool(GenerationMode::Random(32)).take(LARGE_LIMIT)
-    {
-        integer_u64_and_bool(n, index, bit);
-    }
+            let mut rug_n = integer_to_rug_integer(n);
+            rug_n.set_bit(index as u32, bit);
+            assert_eq!(rug_integer_to_integer(&rug_n), result);
+        },
+    );
 }

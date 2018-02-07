@@ -1,6 +1,5 @@
-use common::LARGE_LIMIT;
+use common::test_properties;
 use malachite_nz::natural::Natural;
-use malachite_test::common::GenerationMode;
 use malachite_test::inputs::natural::naturals;
 use std::str::FromStr;
 use std::u32;
@@ -43,52 +42,30 @@ fn test_to_limbs_be() {
 
 #[test]
 fn to_limbs_le_properties() {
-    // from_limbs_le(x.to_limbs_le()) == x
-    // x.to_limbs_le().rev() == x.to_limbs_be()
-    // if x != 0, x.to_limbs_le().last() != 0
-    let one_natural = |x: Natural| {
+    test_properties(naturals, |x| {
         let limbs = x.to_limbs_le();
-        assert_eq!(Natural::from_limbs_le(&limbs), x);
+        assert_eq!(Natural::from_limbs_le(&limbs), *x);
         assert_eq!(
             x.to_limbs_be(),
             limbs.iter().cloned().rev().collect::<Vec<u32>>()
         );
-        if x != 0 {
+        if *x != 0 {
             assert_ne!(*limbs.last().unwrap(), 0);
         }
-    };
-
-    for n in naturals(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        one_natural(n);
-    }
-
-    for n in naturals(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        one_natural(n);
-    }
+    });
 }
 
 #[test]
-fn limbs_be_properties() {
-    // from_limbs_be(x.to_limbs_be()) == x
-    // x.to_limbs_be().rev() == x.to_limbs_le()
-    // if x != 0, x.to_limbs_be().last() != 0
-    let one_natural = |x: Natural| {
+fn to_limbs_be_properties() {
+    test_properties(naturals, |x| {
         let limbs = x.to_limbs_be();
-        assert_eq!(Natural::from_limbs_be(&limbs), x);
+        assert_eq!(Natural::from_limbs_be(&limbs), *x);
         assert_eq!(
             x.to_limbs_le(),
             limbs.iter().cloned().rev().collect::<Vec<u32>>()
         );
-        if x != 0 {
+        if *x != 0 {
             assert_ne!(limbs[0], 0);
         }
-    };
-
-    for n in naturals(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        one_natural(n);
-    }
-
-    for n in naturals(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        one_natural(n);
-    }
+    });
 }

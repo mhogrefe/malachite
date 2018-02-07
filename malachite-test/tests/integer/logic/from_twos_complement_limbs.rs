@@ -1,6 +1,6 @@
-use common::LARGE_LIMIT;
+use common::test_properties;
+use malachite_base::num::BitAccess;
 use malachite_nz::integer::Integer;
-use malachite_test::common::GenerationMode;
 use malachite_test::inputs::base::vecs_of_unsigned;
 use std::cmp::Ordering;
 use std::u32;
@@ -107,12 +107,7 @@ fn trim_be_limbs(xs: &mut Vec<u32>) {
 
 #[test]
 fn from_twos_complement_limbs_le_properties() {
-    // (Integer::from_twos_complement_limbs_le(limbs) == x) ==
-    //      (x.limbs_le() == limbs.rev().trim_be_limbs().rev())
-    // Integer::from_twos_complement_limbs_le(limbs.reverse()) ==
-    //      Integer::from_twos_complement_limbs_be(limbs)
-    // if limbs is canonical, Integer::from_twos_complement_limbs_le(limbs).limbs_le() == x
-    let u32_slice = |limbs: &[u32]| {
+    test_properties(vecs_of_unsigned, |limbs: &Vec<u32>| {
         let x = Integer::from_twos_complement_limbs_le(limbs);
         let mut trimmed_limbs: Vec<u32> = limbs.iter().cloned().rev().collect();
         trim_be_limbs(&mut trimmed_limbs);
@@ -130,36 +125,23 @@ fn from_twos_complement_limbs_le_properties() {
             Ordering::Equal => limbs.is_empty(),
             Ordering::Greater => {
                 let last = *limbs.last().unwrap();
-                last & 0x8000_0000 == 0 && (last != 0 || limbs[limbs.len() - 2] & 0x8000_0000 != 0)
+                !last.get_bit(31) && (last != 0 || limbs[limbs.len() - 2].get_bit(31))
             }
             Ordering::Less => {
                 let last = *limbs.last().unwrap();
-                last & 0x8000_0000 != 0
-                    && (last != !0 || limbs.len() <= 1 || limbs[limbs.len() - 2] & 0x8000_0000 == 0)
+                last.get_bit(31)
+                    && (last != !0 || limbs.len() <= 1 || !limbs[limbs.len() - 2].get_bit(31))
             }
         } {
-            assert_eq!(&x.twos_complement_limbs_le()[..], limbs);
+            assert_eq!(x.twos_complement_limbs_le(), *limbs);
         }
-    };
-
-    for xs in vecs_of_unsigned(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        u32_slice(&xs);
-    }
-
-    for xs in vecs_of_unsigned(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        u32_slice(&xs);
-    }
+    });
 }
 
 #[test]
 fn from_twos_complement_limbs_be_properties() {
-    // (Integer::from_twos_complement_limbs_be(limbs) == x) ==
-    //      (x.limbs_le() == limbs.trim_be_limbs())
-    // Integer::from_twos_complement_limbs_be(limbs.reverse()) ==
-    //      Integer::from_twos_complement_limbs_le(limbs)
-    // if limbs is canonical, Integer::from_twos_complement_limbs_be(limbs).limbs_be() == x
-    let u32_slice = |limbs: &[u32]| {
-        let x = Integer::from_twos_complement_limbs_be(limbs);
+    test_properties(vecs_of_unsigned, |limbs: &Vec<u32>| {
+        let x = Integer::from_twos_complement_limbs_be(limbs.as_slice());
         let mut trimmed_limbs: Vec<u32> = limbs.to_vec();
         trim_be_limbs(&mut trimmed_limbs);
         assert_eq!(x.twos_complement_limbs_be(), trimmed_limbs);
@@ -175,23 +157,14 @@ fn from_twos_complement_limbs_be_properties() {
             Ordering::Equal => limbs.is_empty(),
             Ordering::Greater => {
                 let first = limbs[0];
-                first & 0x8000_0000 == 0 && (first != 0 || limbs[1] & 0x8000_0000 != 0)
+                !first.get_bit(31) && (first != 0 || limbs[1].get_bit(31))
             }
             Ordering::Less => {
                 let first = limbs[0];
-                first & 0x8000_0000 != 0
-                    && (first != !0 || limbs.len() <= 1 || limbs[1] & 0x8000_0000 == 0)
+                first.get_bit(31) && (first != !0 || limbs.len() <= 1 || !limbs[1].get_bit(31))
             }
         } {
-            assert_eq!(&x.twos_complement_limbs_be()[..], limbs);
+            assert_eq!(x.twos_complement_limbs_be(), *limbs);
         }
-    };
-
-    for xs in vecs_of_unsigned(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        u32_slice(&xs);
-    }
-
-    for xs in vecs_of_unsigned(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        u32_slice(&xs);
-    }
+    });
 }

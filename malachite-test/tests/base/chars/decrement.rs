@@ -1,7 +1,6 @@
-use common::LARGE_LIMIT;
+use common::test_properties_no_limit_exhaustive;
 use malachite_base::chars::{CHAR_JUST_ABOVE_SURROGATES, CHAR_JUST_BELOW_SURROGATES};
 use malachite_base::misc::Walkable;
-use malachite_test::common::GenerationMode;
 use malachite_test::inputs::base::chars_var_1;
 use std::char;
 
@@ -27,21 +26,11 @@ fn char_decrement_fail() {
 
 #[test]
 fn char_increment() {
-    // if c != '\u{0}', c.decrement() changes c; c.decrement() followed by c.increment() leaves it
-    // unchanged.
-    let one_char = |mut c: char| {
-        let c_old = c;
-        c.decrement();
-        assert_ne!(c, c_old);
-        c.increment();
-        assert_eq!(c, c_old);
-    };
-
-    for c in chars_var_1(GenerationMode::Exhaustive) {
-        one_char(c);
-    }
-
-    for c in chars_var_1(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        one_char(c);
-    }
+    test_properties_no_limit_exhaustive(chars_var_1, |&c| {
+        let mut c_mut = c;
+        c_mut.decrement();
+        assert_ne!(c_mut, c);
+        c_mut.increment();
+        assert_eq!(c_mut, c);
+    });
 }

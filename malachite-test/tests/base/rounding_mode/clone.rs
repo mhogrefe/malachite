@@ -1,6 +1,5 @@
-use common::LARGE_LIMIT;
+use common::test_properties_no_limit_exhaustive;
 use malachite_base::round::RoundingMode;
-use malachite_test::common::GenerationMode;
 use malachite_test::inputs::base::{pairs_of_rounding_modes, rounding_modes};
 
 #[test]
@@ -31,30 +30,13 @@ fn test_clone_from() {
 #[test]
 #[allow(unknown_lints, clone_on_copy)]
 fn clone_and_clone_from_properties() {
-    // x.clone() == x
-    let one_rounding_mode = |rm: RoundingMode| {
+    test_properties_no_limit_exhaustive(rounding_modes, |&rm| {
         assert_eq!(rm.clone(), rm);
-    };
+    });
 
-    // x.clone_from(y); x == y
-    let two_rounding_modes = |mut x: RoundingMode, y: RoundingMode| {
-        x.clone_from(&y);
-        assert_eq!(x, y);
-    };
-
-    for n in rounding_modes(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        one_rounding_mode(n);
-    }
-
-    for n in rounding_modes(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        one_rounding_mode(n);
-    }
-
-    for (x, y) in pairs_of_rounding_modes(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        two_rounding_modes(x, y);
-    }
-
-    for (x, y) in pairs_of_rounding_modes(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        two_rounding_modes(x, y);
-    }
+    test_properties_no_limit_exhaustive(pairs_of_rounding_modes, |&(x, y)| {
+        let mut mut_x = x;
+        mut_x.clone_from(&y);
+        assert_eq!(mut_x, y);
+    });
 }

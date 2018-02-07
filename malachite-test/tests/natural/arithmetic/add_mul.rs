@@ -1,8 +1,7 @@
-use common::LARGE_LIMIT;
+use common::test_properties;
 use malachite_base::num::{One, Zero};
 use malachite_base::num::{AddMul, AddMulAssign};
 use malachite_nz::natural::Natural;
-use malachite_test::common::GenerationMode;
 use malachite_test::inputs::natural::{pairs_of_naturals, triples_of_naturals};
 use std::str::FromStr;
 
@@ -110,91 +109,56 @@ fn test_add_mul() {
 
 #[test]
 fn add_mul_u32_properties() {
-    // a.add_mul_assign(b, c); a is valid.
-    // a.add_mul_assign(b, &c); a is valid.
-    // a.add_mul_assign(&b, c); a is valid.
-    // a.add_mul_assign(&b, &c); a is valid.
-    // a.add_mul(b, c) is valid.
-    // a.add_mul(b, &c) is valid.
-    // a.add_mul(&b, c) is valid.
-    // a.add_mul(&b, &c) is valid.
-    // (&a).add_mul(&b, &c) is valid.
-    // a.add_mul_assign(b, c), a.add_mul_assign(b, &c), a.add_mul_assign(&b, c),
-    // a.add_mul_assign(&b, &c), a.add_mul(b, c), a.add_mul(b, &c), a.add_mul(&b, c),
-    //      a.add_mul(&b, &c), and (&a).add_mul(&b, &c) give the same result.
-    // a.add_mul(b, c) is equivalent to a + b * c.
-    // a.add_mul(b, c) is equivalent to a.add_mul(c, b).
-    let three_naturals = |mut a: Natural, b: Natural, c: Natural| {
-        let old_a = a.clone();
-        a.add_mul_assign(b.clone(), c.clone());
-        assert!(a.is_valid());
+    test_properties(triples_of_naturals, |&(ref a, ref b, ref c)| {
+        let mut mut_a = a.clone();
+        mut_a.add_mul_assign(b.clone(), c.clone());
+        assert!(mut_a.is_valid());
+        let result = mut_a;
 
-        let mut a2 = old_a.clone();
-        a2.add_mul_assign(b.clone(), &c);
-        assert!(a2.is_valid());
-        assert_eq!(a2, a);
+        let mut mut_a = a.clone();
+        mut_a.add_mul_assign(b.clone(), c);
+        assert!(mut_a.is_valid());
+        assert_eq!(mut_a, result);
 
-        let mut a2 = old_a.clone();
-        a2.add_mul_assign(&b, c.clone());
-        assert!(a2.is_valid());
-        assert_eq!(a2, a);
+        let mut mut_a = a.clone();
+        mut_a.add_mul_assign(b, c.clone());
+        assert!(mut_a.is_valid());
+        assert_eq!(mut_a, result);
 
-        let mut a2 = old_a.clone();
-        a2.add_mul_assign(&b, &c);
-        assert!(a2.is_valid());
-        assert_eq!(a2, a);
+        let mut mut_a = a.clone();
+        mut_a.add_mul_assign(b, c);
+        assert!(mut_a.is_valid());
+        assert_eq!(mut_a, result);
 
-        let a2 = old_a.clone();
-        let result = a2.clone().add_mul(b.clone(), c.clone());
-        assert!(result.is_valid());
-        assert_eq!(result, a);
+        let result_alt = a.clone().add_mul(b.clone(), c.clone());
+        assert!(result_alt.is_valid());
+        assert_eq!(result_alt, result);
 
-        let result = a2.clone().add_mul(b.clone(), &c);
-        assert!(result.is_valid());
-        assert_eq!(result, a);
+        let result_alt = a.clone().add_mul(b.clone(), c);
+        assert!(result_alt.is_valid());
+        assert_eq!(result_alt, result);
 
-        let result = a2.clone().add_mul(&b, c.clone());
-        assert!(result.is_valid());
-        assert_eq!(result, a);
+        let result_alt = a.clone().add_mul(b, c.clone());
+        assert!(result_alt.is_valid());
+        assert_eq!(result_alt, result);
 
-        let result = a2.clone().add_mul(&b, &c);
-        assert!(result.is_valid());
-        assert_eq!(result, a);
+        let result_alt = a.clone().add_mul(b, c);
+        assert!(result_alt.is_valid());
+        assert_eq!(result_alt, result);
 
-        let result = (&a2).add_mul(&b, &c);
-        assert!(result.is_valid());
-        assert_eq!(result, a);
+        let result_alt = a.add_mul(b, c);
+        assert!(result_alt.is_valid());
+        assert_eq!(result_alt, result);
 
-        assert_eq!(&old_a + &b * &c, result);
-        assert_eq!(old_a.add_mul(c, b), result);
-    };
+        assert_eq!(a + b * c, result);
+        assert_eq!(a.add_mul(c, b), result);
+    });
 
-    // a.add_mul(0, b) == a
-    // a.add_mul(1, b) == a + b
-    // 0.add_mul(a, b) == a * b
-    // a.add_mul(b, 0) == a
-    // a.add_mul(b, 1) == a + b
-    let two_naturals = |a: &Natural, b: &Natural| {
+    test_properties(pairs_of_naturals, |&(ref a, ref b)| {
         assert_eq!(a.add_mul(&Natural::ZERO, b), *a);
         assert_eq!(a.add_mul(&Natural::ONE, b), a + b);
         assert_eq!(Natural::ZERO.add_mul(a, b), a * b);
         assert_eq!(a.add_mul(b, &Natural::ZERO), *a);
         assert_eq!(a.add_mul(b, &Natural::ONE), a + b);
-    };
-
-    for (a, b, c) in triples_of_naturals(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        three_naturals(a, b, c);
-    }
-
-    for (a, b, c) in triples_of_naturals(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        three_naturals(a, b, c);
-    }
-
-    for (a, b) in pairs_of_naturals(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        two_naturals(&a, &b);
-    }
-
-    for (a, b) in pairs_of_naturals(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        two_naturals(&a, &b);
-    }
+    });
 }

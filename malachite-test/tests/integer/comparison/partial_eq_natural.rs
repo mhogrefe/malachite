@@ -1,8 +1,8 @@
-use common::LARGE_LIMIT;
+use common::test_properties;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
-use malachite_test::common::{integer_to_rug_integer, natural_to_rug_integer, GenerationMode};
-use malachite_test::inputs::integer::{pairs_of_integer_and_natural, pairs_of_natural_and_integer};
+use malachite_test::common::{integer_to_rug_integer, natural_to_rug_integer};
+use malachite_test::inputs::integer::pairs_of_integer_and_natural;
 use rug;
 use std::str::FromStr;
 
@@ -37,35 +37,10 @@ fn test_integer_partial_eq_natural() {
 
 #[test]
 fn partial_eq_natural_properties() {
-    // x == y is equivalent for malachite and rug.
-    // x == y.into_integer() is equivalent to x == y.
-    let integer_and_natural = |x: Integer, y: Natural| {
+    test_properties(pairs_of_integer_and_natural, |&(ref x, ref y)| {
         let eq = x == y;
-        assert_eq!(integer_to_rug_integer(&x) == natural_to_rug_integer(&y), eq);
-        assert_eq!(x == y.into_integer(), eq)
-    };
-
-    // x == y is equivalent for malachite and rug.
-    // x.into_integer() == y is equivalent to x == y.
-    let natural_and_integer = |x: Natural, y: Integer| {
-        let eq = x == y;
-        assert_eq!(natural_to_rug_integer(&x) == integer_to_rug_integer(&y), eq);
-        assert_eq!(x.into_integer() == y, eq)
-    };
-
-    for (x, y) in pairs_of_integer_and_natural(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        integer_and_natural(x, y);
-    }
-
-    for (x, y) in pairs_of_integer_and_natural(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        integer_and_natural(x, y);
-    }
-
-    for (x, y) in pairs_of_natural_and_integer(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        natural_and_integer(x, y);
-    }
-
-    for (x, y) in pairs_of_natural_and_integer(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        natural_and_integer(x, y);
-    }
+        assert_eq!(y == x, eq);
+        assert_eq!(*x == y.to_integer(), eq);
+        assert_eq!(integer_to_rug_integer(x) == natural_to_rug_integer(y), eq);
+    });
 }

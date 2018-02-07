@@ -1,7 +1,7 @@
-use common::LARGE_LIMIT;
+use common::test_properties;
 use malachite_base::num::NotAssign;
 use malachite_nz::integer::Integer;
-use malachite_test::common::{integer_to_rug_integer, rug_integer_to_integer, GenerationMode};
+use malachite_test::common::{integer_to_rug_integer, rug_integer_to_integer};
 use malachite_test::inputs::integer::integers;
 use rug;
 use std::str::FromStr;
@@ -35,38 +35,20 @@ fn test_not() {
 
 #[test]
 fn not_properties() {
-    // !x is equivalent for malachite and rug.
-    // !x is valid.
-    //
-    // !&x is equivalent for malachite and rug.
-    // !&x is valid.
-    // !x and -!x are equivalent.
-    //
-    // !x != x
-    // !!x == x
-    // (x >= 0) == (!x < 0)
-    let one_integer = |x: Integer| {
+    test_properties(integers, |x| {
         let not = !x.clone();
         assert!(not.is_valid());
 
-        let rug_not = !integer_to_rug_integer(&x);
+        let rug_not = !integer_to_rug_integer(x);
         assert_eq!(rug_integer_to_integer(&rug_not), not);
 
-        let not_2 = !&x;
+        let not_2 = !x;
         assert!(not_2.is_valid());
 
         assert_eq!(not_2, not);
 
-        assert_ne!(not, x);
-        assert_eq!(!&not, x);
-        assert_eq!(x >= 0, not < 0);
-    };
-
-    for n in integers(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        one_integer(n);
-    }
-
-    for n in integers(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        one_integer(n);
-    }
+        assert_ne!(not, *x);
+        assert_eq!(!&not, *x);
+        assert_eq!(*x >= 0, not < 0);
+    });
 }

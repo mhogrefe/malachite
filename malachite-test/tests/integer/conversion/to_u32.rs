@@ -1,7 +1,7 @@
-use common::LARGE_LIMIT;
+use common::test_properties;
 use malachite_base::num::SignificantBits;
 use malachite_nz::integer::Integer;
-use malachite_test::common::{integer_to_rug_integer, GenerationMode};
+use malachite_test::common::integer_to_rug_integer;
 use malachite_test::inputs::integer::integers;
 use rug;
 use std::cmp::Ordering;
@@ -42,46 +42,24 @@ fn test_to_u32_wrapping() {
 
 #[test]
 fn to_u32_properties() {
-    // x.to_u32() is equivalent for malachite and rug.
-    // if 0 ≤ x < 2^32, from(x.to_u32().unwrap()) == x
-    // if 0 ≤ x < 2^32, x.to_u32() == Some(x.to_u32_wrapping())
-    // if x < 0 or x >= 2^32, x.to_u32().is_none()
-    let one_integer = |x: Integer| {
+    test_properties(integers, |x| {
         let result = x.to_u32();
-        assert_eq!(integer_to_rug_integer(&x).to_u32(), result);
+        assert_eq!(integer_to_rug_integer(x).to_u32(), result);
         if x.sign() != Ordering::Less && x.significant_bits() <= 32 {
-            assert_eq!(Integer::from(result.unwrap()), x);
+            assert_eq!(Integer::from(result.unwrap()), *x);
             assert_eq!(result, Some(x.to_u32_wrapping()));
         } else {
             assert!(result.is_none());
         }
-    };
-
-    for n in integers(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        one_integer(n);
-    }
-
-    for n in integers(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        one_integer(n);
-    }
+    });
 }
 
 #[test]
 fn to_u32_wrapping_properties() {
-    // x.to_u32_wrapping() is equivalent for malachite and rug.
-    // x.to_u32_wrapping() + (-x.to_u32_wrapping()) = 0 mod 2^32
     // TODO relate with BitAnd
-    let one_integer = |x: Integer| {
+    test_properties(integers, |x| {
         let result = x.to_u32_wrapping();
-        assert_eq!(integer_to_rug_integer(&x).to_u32_wrapping(), result);
-        assert_eq!(result.wrapping_add((-&x).to_u32_wrapping()), 0);
-    };
-
-    for n in integers(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        one_integer(n);
-    }
-
-    for n in integers(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        one_integer(n);
-    }
+        assert_eq!(integer_to_rug_integer(x).to_u32_wrapping(), result);
+        assert_eq!(result.wrapping_add((-x).to_u32_wrapping()), 0);
+    });
 }

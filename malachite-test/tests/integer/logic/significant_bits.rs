@@ -1,9 +1,9 @@
-use common::LARGE_LIMIT;
+use common::test_properties;
 use malachite_base::num::SignificantBits;
 use malachite_base::num::One;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
-use malachite_test::common::{integer_to_bigint, integer_to_rug_integer, GenerationMode};
+use malachite_test::common::{integer_to_bigint, integer_to_rug_integer};
 use malachite_test::inputs::integer::integers;
 use num::BigInt;
 use rug;
@@ -29,31 +29,20 @@ fn test_significant_bits() {
 
 #[test]
 fn significant_bits_properties() {
-    // x.significant_bits() is equivalent for malachite, num, and rug.
-    // (|x| < 2^32) == (x.significant_bits() <= 32)
-    // if x != 0, (x.significant_bits() == n) == (2^(n-1) <= |x| < 2^n)
-    let one_integer = |x: Integer| {
+    test_properties(integers, |x| {
         let significant_bits = x.significant_bits();
-        assert_eq!(integer_to_bigint(&x).bits() as u64, significant_bits);
+        assert_eq!(integer_to_bigint(x).bits() as u64, significant_bits);
         assert_eq!(
-            u64::from(integer_to_rug_integer(&x).significant_bits()),
+            u64::from(integer_to_rug_integer(x).significant_bits()),
             significant_bits
         );
 
-        let x_abs = x.abs();
+        let x_abs = x.abs_ref();
         assert_eq!(x_abs <= u32::MAX, significant_bits <= 32);
         if x_abs != 0 {
             let n = significant_bits as u32;
             assert!(Natural::ONE << (n - 1) <= x_abs);
             assert!(x_abs < Natural::ONE << n);
         }
-    };
-
-    for n in integers(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        one_integer(n);
-    }
-
-    for n in integers(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        one_integer(n);
-    }
+    });
 }

@@ -1,6 +1,5 @@
-use common::LARGE_LIMIT;
+use common::test_properties;
 use malachite_nz::integer::Integer;
-use malachite_test::common::GenerationMode;
 use malachite_test::inputs::integer::integers;
 use std::str::FromStr;
 
@@ -46,46 +45,20 @@ fn test_is_odd() {
 
 #[test]
 fn is_even_properties() {
-    // x.is_even() == !x.is_odd()
-    // x.is_even() == (-x).is_even()
-    // x.is_even() == (!x).is_even()
-    // x.is_even == (x + 1).is_odd()
-    // x.is_even == (x - 1).is_odd()
-    let one_integer = |x: Integer| {
+    test_properties(integers, |x| {
         let is_even = x.is_even();
         assert_eq!(!x.is_odd(), is_even);
-        assert_eq!((&x + 1u32).is_odd(), is_even);
+        assert_eq!((x + 1u32).is_odd(), is_even);
         assert_eq!((x - 1u32).is_odd(), is_even);
-    };
-
-    for n in integers(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        one_integer(n);
-    }
-
-    for n in integers(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        one_integer(n);
-    }
+    });
 }
 
 #[test]
 fn is_odd_properties() {
-    // x.is_odd() == !x.is_even()
-    // x.is_odd() == (-x).is_odd()
-    // x.is_odd() == (!x).is_odd()
-    // x.is_odd == (x + 1).is_even()
-    // x.is_odd == (x - 1).is_even()
-    let one_integer = |x: Integer| {
+    test_properties(integers, |x| {
         let is_odd = x.is_odd();
         assert_eq!(!x.is_even(), is_odd);
-        assert_eq!((&x + 1u32).is_even(), is_odd);
+        assert_eq!((x + 1u32).is_even(), is_odd);
         assert_eq!((x - 1u32).is_even(), is_odd);
-    };
-
-    for n in integers(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        one_integer(n);
-    }
-
-    for n in integers(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        one_integer(n);
-    }
+    });
 }

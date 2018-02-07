@@ -1,7 +1,7 @@
-use common::LARGE_LIMIT;
+use common::test_properties;
 use malachite_base::num::BitAccess;
 use malachite_nz::integer::Integer;
-use malachite_test::common::{integer_to_rug_integer, rug_integer_to_integer, GenerationMode};
+use malachite_test::common::{integer_to_rug_integer, rug_integer_to_integer};
 use malachite_test::inputs::integer::pairs_of_integer_and_small_u64;
 use rug;
 use std::str::FromStr;
@@ -32,28 +32,20 @@ fn test_flip_bit() {
 
 #[test]
 fn flip_bit_properties() {
-    // n.flip_bit(index) is equivalent for malachite and rug.
-    // Flipping a bit once always changes a number.
-    // Flipping the same bit twice leaves a number unchanged.
-    let integer_and_u64 = |mut n: Integer, index: u64| {
-        let old_n = n.clone();
-        n.flip_bit(index);
-        assert!(n.is_valid());
-        assert_ne!(n, old_n);
+    test_properties(pairs_of_integer_and_small_u64, |&(ref n, index)| {
+        let mut mut_n = n.clone();
+        mut_n.flip_bit(index);
+        assert!(mut_n.is_valid());
+        let result = mut_n;
 
-        let mut rug_n = integer_to_rug_integer(&old_n);
+        assert_ne!(result, *n);
+
+        let mut rug_n = integer_to_rug_integer(n);
         rug_n.toggle_bit(index as u32);
-        assert_eq!(rug_integer_to_integer(&rug_n), n);
+        assert_eq!(rug_integer_to_integer(&rug_n), result);
 
-        n.flip_bit(index);
-        assert_eq!(n, old_n);
-    };
-
-    for (n, index) in pairs_of_integer_and_small_u64(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        integer_and_u64(n, index);
-    }
-
-    for (n, index) in pairs_of_integer_and_small_u64(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        integer_and_u64(n, index);
-    }
+        let mut mut_result = result.clone();
+        mut_result.flip_bit(index);
+        assert_eq!(mut_result, *n);
+    });
 }

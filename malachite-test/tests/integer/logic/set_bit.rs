@@ -1,8 +1,7 @@
-use common::LARGE_LIMIT;
+use common::test_properties;
 use malachite_base::num::BitAccess;
 use malachite_base::num::NotAssign;
 use malachite_nz::integer::Integer;
-use malachite_test::common::GenerationMode;
 use malachite_test::inputs::integer::pairs_of_integer_and_small_u64;
 use std::str::FromStr;
 
@@ -36,44 +35,30 @@ fn test_set_bit() {
 
 #[test]
 fn set_bit_properties() {
-    // n.set_bit(index) is equivalent to n.assign_bit(index, true).
-    // n.set_bit(index); n != 0
-    // Setting a bit does not decrease n.
-    // If n.get_bit(index), setting at index won't do anything.
-    // If !n.get_bit(index), setting and then clearing at index won't do anything.
-    // { n.set_bit(index) } is equivalent to { n := !n; n.clear_bit(index); n := !n }
-    let integer_and_u64 = |mut n: Integer, index: u64| {
-        let old_n = n.clone();
-        n.set_bit(index);
-        assert!(n.is_valid());
+    test_properties(pairs_of_integer_and_small_u64, |&(ref n, index)| {
+        let mut mut_n = n.clone();
+        mut_n.set_bit(index);
+        assert!(mut_n.is_valid());
+        let result = mut_n;
 
-        let mut n2 = old_n.clone();
-        n2.assign_bit(index, true);
-        assert_eq!(n2, n);
+        let mut mut_n = n.clone();
+        mut_n.assign_bit(index, true);
+        assert_eq!(mut_n, result);
 
-        assert_ne!(n, 0);
-        assert!(n >= old_n);
-        if old_n.get_bit(index) {
-            assert_eq!(n, old_n);
+        assert_ne!(result, 0);
+        assert!(result >= *n);
+        if n.get_bit(index) {
+            assert_eq!(result, *n);
         } else {
-            assert_ne!(n, old_n);
-            n.clear_bit(index);
-            assert_eq!(n, old_n);
+            assert_ne!(result, *n);
+            let mut mut_result = result.clone();
+            mut_result.clear_bit(index);
+            assert_eq!(mut_result, *n);
         }
 
-        let mut m = !&old_n;
-        m.clear_bit(index);
-        m.not_assign();
-        let mut n = old_n.clone();
-        n.set_bit(index);
-        assert_eq!(m, n);
-    };
-
-    for (n, index) in pairs_of_integer_and_small_u64(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        integer_and_u64(n, index);
-    }
-
-    for (n, index) in pairs_of_integer_and_small_u64(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        integer_and_u64(n, index);
-    }
+        let mut mut_not_n = !n;
+        mut_not_n.clear_bit(index);
+        mut_not_n.not_assign();
+        assert_eq!(mut_not_n, result);
+    });
 }

@@ -1,7 +1,6 @@
-use common::LARGE_LIMIT;
+use common::test_properties;
 use malachite_base::num::{AddMul, AddMulAssign, NegativeOne, One, Zero};
 use malachite_nz::integer::Integer;
-use malachite_test::common::GenerationMode;
 use malachite_test::inputs::integer::{integers, pairs_of_integer_and_signed, pairs_of_integers,
                                       triples_of_integer_integer_and_signed};
 use std::str::FromStr;
@@ -121,117 +120,63 @@ fn test_add_mul_i32() {
 
 #[test]
 fn add_mul_i32_properties() {
-    // a.add_mul_assign(b, c); a is valid.
-    // a.add_mul_assign(&b, c); a is valid.
-    // a.add_mul(b, c) is valid.
-    // a.add_mul(&b, c) is valid.
-    // (&a).add_mul(b, c) is valid.
-    // (&a).add_mul(&b, c) is valid.
-    // a.add_mul_assign(b, c), a.add_mul_assign(&b, c), a.add_mul(b, c), a.add_mul(&b, c),
-    //      (&a).add_mul(b, c), and (&a).add_mul(&b, c) give the same result.
-    // a.add_mul(b, c) is equivalent to a + b * c.
-    // a.add_mul(b, c) = a.add_mul(-b, -c)
-    // -(a.add_mul(b, c)) = (-a).add_mul(-b, c) = (-a).add_mul(b, -c)
-    // a.add_mul(&b, c) is equivalent to a.add_mul(&b, Integer::from(c))
-    let integer_integer_and_i32 = |mut a: Integer, b: Integer, c: i32| {
-        let old_a = a.clone();
-        a.add_mul_assign(b.clone(), c);
-        assert!(a.is_valid());
+    test_properties(
+        triples_of_integer_integer_and_signed,
+        |&(ref a, ref b, c): &(Integer, Integer, i32)| {
+            let mut mut_a = a.clone();
+            mut_a.add_mul_assign(b.clone(), c);
+            assert!(mut_a.is_valid());
+            let result = mut_a;
 
-        let mut a2 = old_a.clone();
-        a2.add_mul_assign(&b, c);
-        assert!(a2.is_valid());
-        assert_eq!(a2, a);
+            let mut mut_a = a.clone();
+            mut_a.add_mul_assign(b, c);
+            assert!(mut_a.is_valid());
+            assert_eq!(mut_a, result);
 
-        let a2 = old_a.clone();
-        let result = (&a2).add_mul(b.clone(), c);
-        assert!(result.is_valid());
-        assert_eq!(result, a);
+            let result_alt = a.add_mul(b.clone(), c);
+            assert!(result_alt.is_valid());
+            assert_eq!(result_alt, result);
 
-        let a2 = old_a.clone();
-        let result = (&a2).add_mul(&b, c);
-        assert!(result.is_valid());
-        assert_eq!(result, a);
+            let result_alt = a.add_mul(b, c);
+            assert!(result_alt.is_valid());
+            assert_eq!(result_alt, result);
 
-        let result = a2.clone().add_mul(b.clone(), c);
-        assert!(result.is_valid());
-        assert_eq!(result, a);
+            let result_alt = a.clone().add_mul(b.clone(), c);
+            assert!(result_alt.is_valid());
+            assert_eq!(result_alt, result);
 
-        let result = a2.add_mul(&b, c);
-        assert!(result.is_valid());
-        assert_eq!(result, a);
+            let result_alt = a.clone().add_mul(b, c);
+            assert!(result_alt.is_valid());
+            assert_eq!(result_alt, result);
 
-        assert_eq!(&old_a + &b * c, result);
-        assert_eq!((&old_a).add_mul(-&b, -c), result);
-        assert_eq!((-&old_a).add_mul(-&b, c), -&result);
-        assert_eq!((-&old_a).add_mul(&b, -c), -&result);
-        assert_eq!(old_a.add_mul(b, Integer::from(c)), result);
-    };
+            assert_eq!(a + b * c, result);
+            assert_eq!(a.add_mul(-b, -c), result);
+            assert_eq!((-a).add_mul(-b, c), -&result);
+            assert_eq!((-a).add_mul(b, -c), -&result);
+            assert_eq!(a.add_mul(b, &Integer::from(c)), result);
+        },
+    );
 
-    // (n * c).add_mul(-n, c) == 0
-    // (n * c).add_mul(n, -c) == 0
-    let single_integer = |n: &Integer| {
+    test_properties(integers, |n| {
         assert_eq!(n.add_mul(n, -1), 0);
         assert_eq!(n.add_mul(-n, 1), 0);
-    };
+    });
 
-    // n.add_mul(0, c) == n
-    // n.add_mul(1, c) == n + c
-    // n.add_mul(-1, c) == n - c
-    // 0.add_mul(n, c) == n * c
-    // n.add_mul(n, -1) == 0
-    // n.add_mul(-n, 1) == 0
-    let integer_and_i32 = |n: &Integer, c: i32| {
-        assert_eq!(n.add_mul(&Integer::ZERO, c), *n);
-        assert_eq!(n.add_mul(&Integer::ONE, c), n + c);
-        assert_eq!(n.add_mul(&Integer::NEGATIVE_ONE, c), n - c);
-        assert_eq!(Integer::ZERO.add_mul(n, c), n * c);
-        assert_eq!((n * c).add_mul(-n, c), 0);
-        assert_eq!((n * c).add_mul(n, -c), 0);
-    };
+    test_properties(
+        pairs_of_integer_and_signed,
+        |&(ref n, c): &(Integer, i32)| {
+            assert_eq!(n.add_mul(&Integer::ZERO, c), *n);
+            assert_eq!(n.add_mul(&Integer::ONE, c), n + c);
+            assert_eq!(n.add_mul(&Integer::NEGATIVE_ONE, c), n - c);
+            assert_eq!(Integer::ZERO.add_mul(n, c), n * c);
+            assert_eq!((n * c).add_mul(-n, c), 0);
+            assert_eq!((n * c).add_mul(n, -c), 0);
+        },
+    );
 
-    // a.add_mul(b, 0) == a
-    // a.add_mul(b, 1) == a + b
-    // a.add_mul(b, -1) == a - b
-    let two_integers = |a: &Integer, b: &Integer| {
+    test_properties(pairs_of_integers, |&(ref a, ref b)| {
         assert_eq!(a.add_mul(b, 0), *a);
         assert_eq!(a.add_mul(b, 1), a + b);
         assert_eq!(a.add_mul(b, -1), a - b);
-    };
-
-    for (a, b, c) in
-        triples_of_integer_integer_and_signed(GenerationMode::Exhaustive).take(LARGE_LIMIT)
-    {
-        integer_integer_and_i32(a, b, c);
-    }
-
-    for (a, b, c) in
-        triples_of_integer_integer_and_signed(GenerationMode::Random(32)).take(LARGE_LIMIT)
-    {
-        integer_integer_and_i32(a, b, c);
-    }
-
-    for n in integers(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        single_integer(&n);
-    }
-
-    for n in integers(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        single_integer(&n);
-    }
-
-    for (n, c) in pairs_of_integer_and_signed(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        integer_and_i32(&n, c);
-    }
-
-    for (n, c) in pairs_of_integer_and_signed(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        integer_and_i32(&n, c);
-    }
-
-    for (a, b) in pairs_of_integers(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        two_integers(&a, &b);
-    }
-
-    for (a, b) in pairs_of_integers(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        two_integers(&a, &b);
-    }
+    });
 }

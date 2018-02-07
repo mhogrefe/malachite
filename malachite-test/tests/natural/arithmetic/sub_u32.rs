@@ -1,8 +1,8 @@
-use common::LARGE_LIMIT;
+use common::test_properties;
 use malachite_base::num::Zero;
 use malachite_nz::natural::Natural;
 use malachite_test::common::{biguint_to_natural, natural_to_biguint, natural_to_rug_integer,
-                             rug_integer_to_natural, GenerationMode};
+                             rug_integer_to_natural};
 use malachite_test::inputs::base::unsigneds;
 use malachite_test::inputs::natural::{naturals, pairs_of_natural_and_unsigned};
 use malachite_test::natural::arithmetic::sub_u32::{num_sub_u32, rug_sub_u32};
@@ -81,106 +81,72 @@ fn test_u32_sub_natural() {
 
 #[test]
 fn sub_u32_properties() {
-    // n -= u is equivalent for malachite and rug.
-    // n - u is equivalent for malachite, num, and rug.
-    // &n - u is equivalent for malachite and num.
-    // n -= u; n is valid.
-    // n - u is valid.
-    // &n - u and u - &n are valid.
-    // n -= u, n - u, and &n - u give the same result.
-    // n - u == n - from(u)
-    // u - n == from(u) - n
-    // if n >= u, n - u <= n
-    // if n >= u, (n - u).unwrap() + u == n
-    let natural_and_u32 = |mut n: Natural, u: u32| {
-        let old_n = n.clone();
-        if n >= u {
-            n -= u;
-            assert!(n.is_valid());
+    test_properties(
+        pairs_of_natural_and_unsigned,
+        |&(ref n, u): &(Natural, u32)| {
+            let difference = if *n >= u {
+                let mut mut_n = n.clone();
+                mut_n -= u;
+                assert!(mut_n.is_valid());
+                let difference = mut_n;
 
-            let mut rug_n = natural_to_rug_integer(&old_n);
-            rug_n -= u;
-            assert_eq!(rug_integer_to_natural(&rug_n), n);
-        }
-        let on = if old_n >= u { Some(n) } else { None };
+                let mut rug_n = natural_to_rug_integer(n);
+                rug_n -= u;
+                assert_eq!(rug_integer_to_natural(&rug_n), difference);
+                Some(difference)
+            } else {
+                None
+            };
 
-        let n2 = old_n.clone();
-        let result = &n2 - u;
-        assert_eq!(result, on);
-        assert!(result.map_or(true, |n| n.is_valid()));
-        let result = n2 - u;
-        assert_eq!(result, on);
-        assert!(result.map_or(true, |n| n.is_valid()));
+            let difference_alt = n - u;
+            assert!(difference_alt.as_ref().map_or(true, |n| n.is_valid()));
+            assert_eq!(difference_alt, difference);
 
-        let n2 = old_n.clone();
-        let result = u - &n2;
-        assert_eq!(result.is_some(), u == n2 || on.is_none());
-        if result.is_some() {
-            assert_eq!(Natural::from(u) - n2.to_u32().unwrap(), result);
-        }
-        assert!(result.map_or(true, |n| n.is_valid()));
+            let difference_alt = n.clone() - u;
+            assert!(difference_alt.as_ref().map_or(true, |n| n.is_valid()));
+            assert_eq!(difference_alt, difference);
 
-        let n2 = old_n.clone();
-        let result = n2 - &Natural::from(u);
-        assert_eq!(result, on);
-        let n2 = old_n.clone();
-        assert_eq!(u - &n2, Natural::from(u) - &n2);
+            let reverse_difference = u - n;
+            assert_eq!(
+                reverse_difference.is_some(),
+                *n == u || difference.is_none()
+            );
+            if reverse_difference.is_some() {
+                assert_eq!(Natural::from(u) - n.to_u32().unwrap(), reverse_difference);
+            }
+            assert!(reverse_difference.map_or(true, |n| n.is_valid()));
 
-        let num_n2 = natural_to_biguint(&old_n);
-        assert_eq!(num_sub_u32(num_n2, u).map(|x| biguint_to_natural(&x)), on);
+            assert_eq!(n - &Natural::from(u), difference);
+            assert_eq!(u - n, Natural::from(u) - n);
 
-        let rug_n2 = natural_to_rug_integer(&old_n);
-        assert_eq!(
-            rug_sub_u32(rug_n2, u).map(|x| rug_integer_to_natural(&x)),
-            on
-        );
+            assert_eq!(
+                num_sub_u32(natural_to_biguint(n), u).map(|x| biguint_to_natural(&x)),
+                difference
+            );
+            assert_eq!(
+                rug_sub_u32(natural_to_rug_integer(n), u).map(|x| rug_integer_to_natural(&x)),
+                difference
+            );
 
-        if on.is_some() {
-            assert!(on.clone().unwrap() <= old_n);
-            assert_eq!(on.unwrap() + u, old_n);
-        }
-    };
+            if let Some(difference) = difference {
+                assert!(difference <= *n);
+                assert_eq!(difference + u, *n);
+            }
+        },
+    );
 
-    // n - 0 == n
-    // if n != 0, 0 - n == None
     #[allow(unknown_lints, identity_op)]
-    let one_natural = |n: Natural| {
-        assert_eq!((&n - 0).unwrap(), n);
-        if n != 0 {
-            assert!((0 - &n).is_none());
+    test_properties(naturals, |n| {
+        assert_eq!((n - 0).as_ref(), Some(n));
+        if *n != 0 {
+            assert!((0 - n).is_none());
         }
-    };
+    });
 
-    // u - 0 == u
-    // if u != 0, 0 - u == None
-    let one_u32 = |u: u32| {
+    test_properties(unsigneds, |&u: &u32| {
         assert_eq!(u - &Natural::ZERO, Some(Natural::from(u)));
         if u != 0 {
             assert!((Natural::ZERO - u).is_none());
         }
-    };
-
-    for (n, u) in pairs_of_natural_and_unsigned(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        natural_and_u32(n, u);
-    }
-
-    for (n, u) in pairs_of_natural_and_unsigned(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        natural_and_u32(n, u);
-    }
-
-    for n in naturals(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        one_natural(n);
-    }
-
-    for n in naturals(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        one_natural(n);
-    }
-
-    for n in unsigneds(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        one_u32(n);
-    }
-
-    for n in unsigneds(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        one_u32(n);
-    }
+    });
 }

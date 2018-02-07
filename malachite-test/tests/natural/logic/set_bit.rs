@@ -1,8 +1,8 @@
-use common::LARGE_LIMIT;
+use common::test_properties;
 use malachite_base::num::BitAccess;
 use malachite_nz::natural::Natural;
 use malachite_test::common::{biguint_to_natural, natural_to_biguint, natural_to_rug_integer,
-                             rug_integer_to_natural, GenerationMode};
+                             rug_integer_to_natural};
 use malachite_test::inputs::natural::pairs_of_natural_and_small_u64;
 use malachite_test::natural::logic::set_bit::num_set_bit;
 use num::BigUint;
@@ -34,45 +34,33 @@ fn test_set_bit() {
 
 #[test]
 fn set_bit_properties() {
-    // n.set_bit(index) is equivalent for malachite, num, and rug.
-    // n.set_bit(index) is equivalent to n.assign_bit(index, true).
-    // n.set_bit(index); n != 0
-    // Setting a bit does not decrease n.
-    // If n.get_bit(index), setting at index won't do anything.
-    // If !n.get_bit(index), setting and then clearing at index won't do anything.
-    let natural_and_u64 = |mut n: Natural, index: u64| {
-        let old_n = n.clone();
-        n.set_bit(index);
-        assert!(n.is_valid());
+    test_properties(pairs_of_natural_and_small_u64, |&(ref n, index)| {
+        let mut mut_n = n.clone();
+        mut_n.set_bit(index);
+        assert!(mut_n.is_valid());
+        let result = mut_n;
 
-        let mut n2 = old_n.clone();
-        n2.assign_bit(index, true);
-        assert_eq!(n2, n);
+        let mut mut_n = n.clone();
+        mut_n.assign_bit(index, true);
+        assert_eq!(mut_n, result);
 
-        let mut num_n = natural_to_biguint(&old_n);
+        let mut num_n = natural_to_biguint(n);
         num_set_bit(&mut num_n, index);
-        assert_eq!(biguint_to_natural(&num_n), n);
+        assert_eq!(biguint_to_natural(&num_n), result);
 
-        let mut rug_n = natural_to_rug_integer(&old_n);
+        let mut rug_n = natural_to_rug_integer(n);
         rug_n.set_bit(index as u32, true);
-        assert_eq!(rug_integer_to_natural(&rug_n), n);
+        assert_eq!(rug_integer_to_natural(&rug_n), result);
 
-        assert_ne!(n, 0);
-        assert!(n >= old_n);
-        if old_n.get_bit(index) {
-            assert_eq!(n, old_n);
+        assert_ne!(result, 0);
+        assert!(result >= *n);
+        if n.get_bit(index) {
+            assert_eq!(result, *n);
         } else {
-            assert_ne!(n, old_n);
-            n.clear_bit(index);
-            assert_eq!(n, old_n);
+            assert_ne!(result, *n);
+            let mut mut_result = result.clone();
+            mut_result.clear_bit(index);
+            assert_eq!(mut_result, *n);
         }
-    };
-
-    for (n, index) in pairs_of_natural_and_small_u64(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        natural_and_u64(n, index);
-    }
-
-    for (n, index) in pairs_of_natural_and_small_u64(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        natural_and_u64(n, index);
-    }
+    });
 }

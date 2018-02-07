@@ -1,6 +1,5 @@
-use common::LARGE_LIMIT;
+use common::test_properties;
 use malachite_nz::integer::Integer;
-use malachite_test::common::GenerationMode;
 use malachite_test::inputs::integer::integers;
 use malachite_test::integer::comparison::sign::num_sign;
 use num::BigInt;
@@ -24,19 +23,9 @@ fn test_sign() {
 
 #[test]
 fn sign_properties() {
-    // n.sign() == n.partial_cmp(&0)
-    // (-n).sign() == n.sign().reverse()
-    let one_integer = |n: Integer| {
+    test_properties(integers, |n| {
         let sign = n.sign();
         assert_eq!(n.partial_cmp(&0), Some(sign));
         assert_eq!((-n).sign(), sign.reverse());
-    };
-
-    for n in integers(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        one_integer(n);
-    }
-
-    for n in integers(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        one_integer(n);
-    }
+    });
 }

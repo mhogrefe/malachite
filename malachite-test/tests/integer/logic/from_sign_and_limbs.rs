@@ -1,6 +1,5 @@
-use common::LARGE_LIMIT;
+use common::test_properties;
 use malachite_nz::integer::Integer;
-use malachite_test::common::GenerationMode;
 use malachite_test::inputs::base::pairs_of_ordering_and_vec_of_unsigned_var_1;
 use std::cmp::Ordering;
 
@@ -112,83 +111,54 @@ fn from_sign_and_limbs_be_fail_3() {
 
 #[test]
 fn from_sign_and_limbs_le_properties() {
-    // x := Integer::from_sign_and_limbs_le(sign, limbs); x.sign() == sign and
-    //      x.limbs_le() == limbs.rev().skip_while(|u| u == 0).rev()
-    // Integer::from_sign_and-limbs_le(sign, limbs.reverse()) ==
-    //      Integer::from_sign_and_limbs_be(sign, limbs)
-    let ordering_and_u32_slice = |sign: Ordering, limbs: &[u32]| {
-        let x = Integer::from_sign_and_limbs_le(sign, limbs);
-        let mut trimmed_limbs: Vec<u32> = limbs
-            .iter()
-            .cloned()
-            .rev()
-            .skip_while(|&u| u == 0)
-            .collect();
-        trimmed_limbs.reverse();
-        let (sign_2, limbs_2) = x.sign_and_limbs_le();
-        assert_eq!(sign_2, sign);
-        assert_eq!(limbs_2, trimmed_limbs);
-        assert_eq!(
-            Integer::from_sign_and_limbs_be(
-                sign,
-                &limbs.iter().cloned().rev().collect::<Vec<u32>>(),
-            ),
-            x
-        );
-    };
-
-    for (sign, limbs) in pairs_of_ordering_and_vec_of_unsigned_var_1(GenerationMode::Exhaustive)
-        .filter(|&(sign, ref limbs)| {
-            limbs.iter().all(|&limb| limb == 0) == (sign == Ordering::Equal)
-        })
-        .take(LARGE_LIMIT)
-    {
-        ordering_and_u32_slice(sign, &limbs);
-    }
-
-    for (sign, limbs) in
-        pairs_of_ordering_and_vec_of_unsigned_var_1(GenerationMode::Random(32)).take(LARGE_LIMIT)
-    {
-        ordering_and_u32_slice(sign, &limbs);
-    }
+    test_properties(
+        pairs_of_ordering_and_vec_of_unsigned_var_1,
+        |&(sign, ref limbs): &(Ordering, Vec<u32>)| {
+            let x = Integer::from_sign_and_limbs_le(sign, limbs);
+            let mut trimmed_limbs: Vec<u32> = limbs
+                .iter()
+                .cloned()
+                .rev()
+                .skip_while(|&limb| limb == 0)
+                .collect();
+            trimmed_limbs.reverse();
+            let (sign_be, limbs_be) = x.sign_and_limbs_le();
+            assert_eq!(sign_be, sign);
+            assert_eq!(limbs_be, trimmed_limbs);
+            assert_eq!(
+                Integer::from_sign_and_limbs_be(
+                    sign,
+                    &limbs.iter().cloned().rev().collect::<Vec<u32>>(),
+                ),
+                x
+            );
+        },
+    );
 }
 
 #[test]
 fn from_sign_and_limbs_be_properties() {
-    // x := Integer::from_sign_and_limbs_be(sign, limbs); x.sign() == sign and
-    //      x.limbs_le() == limbs.skip_while(|u| u == 0)
-    // Integer::from_sign_and-limbs_be(sign, limbs.reverse()) ==
-    //      Integer::from_sign_and_limbs_le(sign, limbs)
-    let ordering_and_u32_slice = |sign: Ordering, limbs: &[u32]| {
-        let x = Integer::from_sign_and_limbs_be(sign, limbs);
-        let (sign_2, limbs_2) = x.sign_and_limbs_be();
-        assert_eq!(sign_2, sign);
-        assert_eq!(
-            limbs_2,
-            limbs
-                .iter()
-                .cloned()
-                .skip_while(|&u| u == 0)
-                .collect::<Vec<u32>>()
-        );
-        assert_eq!(
-            Integer::from_sign_and_limbs_le(
-                sign,
-                &limbs.iter().cloned().rev().collect::<Vec<u32>>(),
-            ),
-            x
-        );
-    };
-
-    for (sign, limbs) in
-        pairs_of_ordering_and_vec_of_unsigned_var_1(GenerationMode::Exhaustive).take(LARGE_LIMIT)
-    {
-        ordering_and_u32_slice(sign, &limbs);
-    }
-
-    for (sign, limbs) in
-        pairs_of_ordering_and_vec_of_unsigned_var_1(GenerationMode::Random(32)).take(LARGE_LIMIT)
-    {
-        ordering_and_u32_slice(sign, &limbs);
-    }
+    test_properties(
+        pairs_of_ordering_and_vec_of_unsigned_var_1,
+        |&(sign, ref limbs): &(Ordering, Vec<u32>)| {
+            let x = Integer::from_sign_and_limbs_be(sign, limbs);
+            let (sign_le, limbs_le) = x.sign_and_limbs_be();
+            assert_eq!(sign_le, sign);
+            assert_eq!(
+                limbs_le,
+                limbs
+                    .iter()
+                    .cloned()
+                    .skip_while(|&limb| limb == 0)
+                    .collect::<Vec<u32>>()
+            );
+            assert_eq!(
+                Integer::from_sign_and_limbs_le(
+                    sign,
+                    &limbs.iter().cloned().rev().collect::<Vec<u32>>(),
+                ),
+                x
+            );
+        },
+    );
 }

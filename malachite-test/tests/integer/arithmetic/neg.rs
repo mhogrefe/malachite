@@ -1,8 +1,8 @@
-use common::LARGE_LIMIT;
+use common::test_properties;
 use malachite_base::num::NegAssign;
 use malachite_nz::integer::Integer;
 use malachite_test::common::{bigint_to_integer, integer_to_bigint, integer_to_rug_integer,
-                             rug_integer_to_integer, GenerationMode};
+                             rug_integer_to_integer};
 use malachite_test::inputs::integer::integers;
 use num::BigInt;
 use rug;
@@ -38,39 +38,22 @@ fn test_neg() {
 
 #[test]
 fn neg_properties() {
-    // -x is equivalent for malachite, num, and rug.
-    // -x is valid.
-    //
-    // -&x is equivalent for malachite, num, and rug.
-    // -&x is valid.
-    // -x and -&x are equivalent.
-    //
-    // (-x == x) == (x == 0)
-    // --x == x
-    let one_integer = |x: Integer| {
-        let neg = -x.clone();
-        assert!(neg.is_valid());
+    test_properties(integers, |x| {
+        let negative = -x;
+        assert!(negative.is_valid());
+        assert!(negative.is_valid());
 
-        let num_neg = -integer_to_bigint(&x);
-        assert_eq!(bigint_to_integer(&num_neg), neg);
+        let negative_alt = -(x.clone());
+        assert!(negative_alt.is_valid());
+        assert_eq!(negative_alt, negative);
 
-        let rug_neg = -integer_to_rug_integer(&x);
-        assert_eq!(rug_integer_to_integer(&rug_neg), neg);
+        assert_eq!(bigint_to_integer(&(-integer_to_bigint(x))), negative);
+        assert_eq!(
+            rug_integer_to_integer(&(-integer_to_rug_integer(x))),
+            negative
+        );
 
-        let neg_2 = -&x;
-        assert!(neg_2.is_valid());
-
-        assert_eq!(neg_2, neg);
-
-        assert_eq!(neg == x, x == 0);
-        assert_eq!(-&neg, x);
-    };
-
-    for n in integers(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        one_integer(n);
-    }
-
-    for n in integers(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        one_integer(n);
-    }
+        assert_eq!(negative == *x, *x == 0);
+        assert_eq!(-negative, *x);
+    });
 }

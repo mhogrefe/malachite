@@ -1,7 +1,6 @@
-use common::LARGE_LIMIT;
+use common::test_properties;
 use malachite_base::num::PartialOrdAbs;
 use malachite_nz::integer::Integer;
-use malachite_test::common::GenerationMode;
 use malachite_test::inputs::integer::{pairs_of_integer_and_unsigned,
                                       triples_of_integer_unsigned_and_integer,
                                       triples_of_unsigned_integer_and_unsigned};
@@ -33,73 +32,39 @@ fn test_partial_ord_u32_abs() {
 
 #[test]
 fn partial_cmp_u32_properties() {
-    // n.partial_cmp_abs(&Integer::from(u)) is equivalent to n.partial_cmp_abs(&u).
-    // n.partial_cmp_abs(&u) == n.abs().partial_cmp(&u.abs())
-    //
-    // Integer::from(u).partial_cmp_abs(&n) is equivalent to u.partial_cmp_abs(&n).
-    // u.partial_cmp_abs(&n) == u.partial_cmp(&n.abs())
-    //
-    // n.lt_abs(u) <=> u.gt_abs(n) and n.gt_abs(u) <=> u.lt_abs(n).
-    let integer_and_u32 = |n: Integer, u: u32| {
-        let cmp_1 = n.partial_cmp_abs(&u);
-        assert_eq!(n.partial_cmp_abs(&Integer::from(u)), cmp_1);
-        assert_eq!(n.abs_ref().partial_cmp(&u), cmp_1);
+    test_properties(
+        pairs_of_integer_and_unsigned,
+        |&(ref n, u): &(Integer, u32)| {
+            let cmp = n.partial_cmp_abs(&u);
+            assert_eq!(n.partial_cmp_abs(&Integer::from(u)), cmp);
+            assert_eq!(n.abs_ref().partial_cmp(&u), cmp);
 
-        let cmp_2 = PartialOrdAbs::partial_cmp_abs(&u, &n);
-        assert_eq!(Integer::from(u).partial_cmp_abs(&n), cmp_2);
-        assert_eq!(cmp_2, cmp_1.map(|o| o.reverse()));
-        assert_eq!(u.partial_cmp(&n.abs_ref()), cmp_2);
-    };
+            let cmp_rev = cmp.map(|o| o.reverse());
+            assert_eq!(PartialOrdAbs::partial_cmp_abs(&u, n), cmp_rev);
+            assert_eq!(Integer::from(u).partial_cmp_abs(n), cmp_rev);
+            assert_eq!(u.partial_cmp(&n.abs_ref()), cmp_rev);
+        },
+    );
 
-    // n.lt_abs(u) and u.lt_abs(m) => n.lt_abs(m)
-    // n.gt_abs(u) and u.gt_abs(m) => n.gt_abs(m)
-    let integer_u32_and_integer = |n: Integer, u: u32, m: Integer| {
-        if n.lt_abs(&u) && PartialOrdAbs::lt_abs(&u, &m) {
-            assert!(n.lt_abs(&m));
-        } else if n.gt_abs(&u) && PartialOrdAbs::gt_abs(&u, &m) {
-            assert!(n.gt_abs(&m));
-        }
-    };
+    test_properties(
+        triples_of_integer_unsigned_and_integer,
+        |&(ref n, u, ref m): &(Integer, u32, Integer)| {
+            if n.lt_abs(&u) && PartialOrdAbs::lt_abs(&u, m) {
+                assert!(n.lt_abs(m));
+            } else if n.gt_abs(&u) && PartialOrdAbs::gt_abs(&u, m) {
+                assert!(n.gt_abs(m));
+            }
+        },
+    );
 
-    // u.lt_abs(n) and n.lt_abs(v) => u < v
-    // u.gt_abs(n) and n.gt_abs(v) => u > v
-    let u32_integer_and_u32 = |u: u32, n: Integer, v: u32| {
-        if PartialOrdAbs::lt_abs(&u, &n) && n.lt_abs(&v) {
-            assert!(u < v);
-        } else if PartialOrdAbs::gt_abs(&u, &n) && n.gt_abs(&v) {
-            assert!(u > v);
-        }
-    };
-
-    for (n, u) in pairs_of_integer_and_unsigned(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        integer_and_u32(n, u);
-    }
-
-    for (n, u) in pairs_of_integer_and_unsigned(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        integer_and_u32(n, u);
-    }
-
-    for (n, u, m) in
-        triples_of_integer_unsigned_and_integer(GenerationMode::Exhaustive).take(LARGE_LIMIT)
-    {
-        integer_u32_and_integer(n, u, m);
-    }
-
-    for (n, u, m) in
-        triples_of_integer_unsigned_and_integer(GenerationMode::Random(32)).take(LARGE_LIMIT)
-    {
-        integer_u32_and_integer(n, u, m);
-    }
-
-    for (u, n, v) in
-        triples_of_unsigned_integer_and_unsigned(GenerationMode::Exhaustive).take(LARGE_LIMIT)
-    {
-        u32_integer_and_u32(u, n, v);
-    }
-
-    for (u, n, v) in
-        triples_of_unsigned_integer_and_unsigned(GenerationMode::Random(32)).take(LARGE_LIMIT)
-    {
-        u32_integer_and_u32(u, n, v);
-    }
+    test_properties(
+        triples_of_unsigned_integer_and_unsigned,
+        |&(u, ref n, v): &(u32, Integer, u32)| {
+            if PartialOrdAbs::lt_abs(&u, n) && n.lt_abs(&v) {
+                assert!(u < v);
+            } else if PartialOrdAbs::gt_abs(&u, n) && n.gt_abs(&v) {
+                assert!(u > v);
+            }
+        },
+    );
 }

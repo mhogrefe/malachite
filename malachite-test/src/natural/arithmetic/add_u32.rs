@@ -5,10 +5,8 @@ use num::BigUint;
 use rug;
 use rust_wheels::benchmarks::{BenchmarkOptions2, BenchmarkOptions3, benchmark_2, benchmark_3};
 
-#[allow(unknown_lints, assign_op_pattern)]
-pub fn num_add_u32(mut x: BigUint, u: u32) -> BigUint {
-    x = x + BigUint::from(u);
-    x
+pub fn num_add_u32(x: BigUint, u: u32) -> BigUint {
+    x + BigUint::from(u)
 }
 
 pub fn demo_natural_add_assign_u32(gm: GenerationMode, limit: usize) {

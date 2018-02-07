@@ -1,7 +1,6 @@
-use common::LARGE_LIMIT;
-use malachite_base::num::SignificantBits;
+use common::test_properties;
+use malachite_base::num::{PrimitiveInteger, SignificantBits};
 use malachite_nz::natural::Natural;
-use malachite_test::common::GenerationMode;
 use malachite_test::inputs::natural::naturals;
 use std::str::FromStr;
 use std::u64;
@@ -32,40 +31,21 @@ fn test_to_u64_wrapping() {
 
 #[test]
 fn to_u64_properties() {
-    // if x < 2^64, from(x.to_u64().unwrap()) == x
-    // if x < 2^64, x.to_u64() == Some(x.to_u64_wrapping())
-    // if x >= 2^64, x.to_u64().is_none()
-    let one_natural = |x: Natural| {
+    test_properties(naturals, |x| {
         let result = x.to_u64();
-        if x.significant_bits() <= 64 {
-            assert_eq!(Natural::from(result.unwrap()), x);
+        if x.significant_bits() <= u64::from(u64::WIDTH) {
+            assert_eq!(Natural::from(result.unwrap()), *x);
             assert_eq!(result, Some(x.to_u64_wrapping()));
         } else {
             assert!(result.is_none());
         }
-    };
-
-    for n in naturals(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        one_natural(n);
-    }
-
-    for n in naturals(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        one_natural(n);
-    }
+    });
 }
 
 #[test]
 fn to_u64_wrapping_properties() {
     // TODO relate with BitAnd
-    let one_natural = |x: Natural| {
+    test_properties(naturals, |x| {
         x.to_u64_wrapping();
-    };
-
-    for n in naturals(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        one_natural(n);
-    }
-
-    for n in naturals(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        one_natural(n);
-    }
+    });
 }

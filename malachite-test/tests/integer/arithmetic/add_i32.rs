@@ -1,8 +1,8 @@
-use common::LARGE_LIMIT;
+use common::test_properties;
 use malachite_base::num::Zero;
 use malachite_nz::integer::Integer;
 use malachite_test::common::{bigint_to_integer, integer_to_bigint, integer_to_rug_integer,
-                             rug_integer_to_integer, GenerationMode};
+                             rug_integer_to_integer};
 use malachite_test::inputs::base::signeds;
 use malachite_test::inputs::integer::{integers, pairs_of_integer_and_signed};
 use malachite_test::integer::arithmetic::add_i32::num_add_i32;
@@ -81,94 +81,57 @@ fn test_add_i32() {
 
 #[test]
 fn add_i32_properties() {
-    // n += i is equivalent for malachite and rug.
-    // n + i is equivalent for malachite, num, and rug.
-    // &n + i is equivalent for malachite and num.
-    // n += i; n is valid.
-    // n + i and i + n are valid.
-    // &n + i and i + &n are valid.
-    // n += i, n + i, i + n, &n + i, and i + &n give the same result.
-    // n + i == n + from(u)
-    // n + i - i == n
-    // n + i - n == i
-    let integer_and_i32 = |mut n: Integer, i: i32| {
-        let old_n = n.clone();
-        n += i;
-        assert!(n.is_valid());
+    test_properties(
+        pairs_of_integer_and_signed,
+        |&(ref n, i): &(Integer, i32)| {
+            let mut mut_n = n.clone();
+            mut_n += i;
+            let sum = mut_n;
+            assert!(sum.is_valid());
 
-        let mut rug_n = integer_to_rug_integer(&old_n);
-        rug_n += i;
-        assert_eq!(rug_integer_to_integer(&rug_n), n);
+            let mut rug_n = integer_to_rug_integer(n);
+            rug_n += i;
+            assert_eq!(rug_integer_to_integer(&rug_n), sum);
 
-        let n2 = old_n.clone();
-        let result = &n2 + i;
-        assert!(result.is_valid());
-        assert_eq!(result, n);
-        let result = n2 + i;
-        assert!(result.is_valid());
-        assert_eq!(result, n);
+            let result = n + i;
+            assert!(result.is_valid());
+            assert_eq!(result, sum);
+            let result = n.clone() + i;
+            assert!(result.is_valid());
+            assert_eq!(result, sum);
 
-        let n2 = old_n.clone();
-        let result = i + &n2;
-        assert!(result.is_valid());
-        assert_eq!(result, n);
-        let result = i + n2;
-        assert_eq!(result, n);
-        assert!(result.is_valid());
+            let result = i + n;
+            assert!(result.is_valid());
+            assert_eq!(result, sum);
+            let result = i + n.clone();
+            assert_eq!(result, sum);
+            assert!(result.is_valid());
 
-        let n2 = old_n.clone();
-        let result = n2 + Integer::from(i);
-        assert_eq!(result, n);
-        let n2 = old_n.clone();
-        let result = Integer::from(i) + n2;
-        assert_eq!(result, n);
+            assert_eq!(n + Integer::from(i), sum);
+            assert_eq!(Integer::from(i) + n, sum);
 
-        let num_n2 = integer_to_bigint(&old_n);
-        assert_eq!(bigint_to_integer(&num_add_i32(num_n2, i)), n);
+            assert_eq!(
+                bigint_to_integer(&num_add_i32(integer_to_bigint(n), i)),
+                sum
+            );
+            assert_eq!(
+                rug_integer_to_integer(&(integer_to_rug_integer(n) + i)),
+                sum
+            );
 
-        let rug_n2 = integer_to_rug_integer(&old_n);
-        assert_eq!(rug_integer_to_integer(&(rug_n2 + i)), n);
+            assert_eq!(&sum - i, *n);
+            assert_eq!(sum - n, i);
+        },
+    );
 
-        assert_eq!(&n - i, old_n);
-        assert_eq!(n - old_n, i);
-    };
-
-    // n + 0 == n
-    // 0 + n == n
     #[allow(unknown_lints, identity_op)]
-    let one_integer = |n: Integer| {
-        assert_eq!(&n + 0i32, n);
-        assert_eq!(0i32 + &n, n);
-    };
+    test_properties(integers, |n| {
+        assert_eq!(n + 0i32, *n);
+        assert_eq!(0i32 + n, *n);
+    });
 
-    // 0 + i == i
-    // i + 0 == i
-    let one_i32 = |i: i32| {
+    test_properties(signeds, |&i: &i32| {
         assert_eq!(Integer::ZERO + i, Integer::from(i));
         assert_eq!(i + Integer::ZERO, Integer::from(i));
-    };
-
-    for (n, i) in pairs_of_integer_and_signed(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        integer_and_i32(n, i);
-    }
-
-    for (n, i) in pairs_of_integer_and_signed(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        integer_and_i32(n, i);
-    }
-
-    for n in integers(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        one_integer(n);
-    }
-
-    for n in integers(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        one_integer(n);
-    }
-
-    for n in signeds(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        one_i32(n);
-    }
-
-    for n in signeds(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        one_i32(n);
-    }
+    });
 }

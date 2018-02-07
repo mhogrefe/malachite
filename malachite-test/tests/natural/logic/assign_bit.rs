@@ -1,7 +1,7 @@
-use common::LARGE_LIMIT;
+use common::test_properties;
 use malachite_base::num::BitAccess;
 use malachite_nz::natural::Natural;
-use malachite_test::common::{natural_to_rug_integer, rug_integer_to_natural, GenerationMode};
+use malachite_test::common::{natural_to_rug_integer, rug_integer_to_natural};
 use malachite_test::inputs::natural::triples_of_natural_small_u64_and_bool;
 use rug;
 use std::str::FromStr;
@@ -45,26 +45,17 @@ fn test_assign_bit() {
 
 #[test]
 fn assign_bit_properties() {
-    // n.assign_bit(index) is equivalent for malachite and rug.
-    let natural_u64_and_bool = |mut n: Natural, index: u64, bit: bool| {
-        let old_n = n.clone();
-        n.assign_bit(index, bit);
-        assert!(n.is_valid());
+    test_properties(
+        triples_of_natural_small_u64_and_bool,
+        |&(ref n, index, bit)| {
+            let mut mut_n = n.clone();
+            mut_n.assign_bit(index, bit);
+            assert!(mut_n.is_valid());
+            let result = mut_n;
 
-        let mut rug_n = natural_to_rug_integer(&old_n);
-        rug_n.set_bit(index as u32, bit);
-        assert_eq!(rug_integer_to_natural(&rug_n), n);
-    };
-
-    for (n, index, bit) in
-        triples_of_natural_small_u64_and_bool(GenerationMode::Exhaustive).take(LARGE_LIMIT)
-    {
-        natural_u64_and_bool(n, index, bit);
-    }
-
-    for (n, index, bit) in
-        triples_of_natural_small_u64_and_bool(GenerationMode::Random(32)).take(LARGE_LIMIT)
-    {
-        natural_u64_and_bool(n, index, bit);
-    }
+            let mut rug_n = natural_to_rug_integer(n);
+            rug_n.set_bit(index as u32, bit);
+            assert_eq!(rug_integer_to_natural(&rug_n), result);
+        },
+    );
 }

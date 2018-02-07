@@ -1,6 +1,5 @@
-use common::LARGE_LIMIT;
+use common::test_properties;
 use malachite_nz::natural::Natural;
-use malachite_test::common::GenerationMode;
 use malachite_test::inputs::natural::naturals;
 use std::str::FromStr;
 
@@ -34,38 +33,18 @@ fn test_is_odd() {
 
 #[test]
 fn is_even_properties() {
-    // x.is_even() == !x.is_odd()
-    // x.is_even == (x + 1).is_odd()
-    let one_natural = |x: Natural| {
+    test_properties(naturals, |x| {
         let is_even = x.is_even();
         assert_eq!(!x.is_odd(), is_even);
         assert_eq!((x + 1).is_odd(), is_even);
-    };
-
-    for n in naturals(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        one_natural(n);
-    }
-
-    for n in naturals(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        one_natural(n);
-    }
+    });
 }
 
 #[test]
 fn is_odd_properties() {
-    // x.is_odd() == !x.is_even()
-    // x.is_odd == (x + 1).is_even()
-    let one_natural = |x: Natural| {
+    test_properties(naturals, |x| {
         let is_odd = x.is_odd();
         assert_eq!(!x.is_even(), is_odd);
         assert_eq!((x + 1).is_even(), is_odd);
-    };
-
-    for n in naturals(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        one_natural(n);
-    }
-
-    for n in naturals(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        one_natural(n);
-    }
+    });
 }

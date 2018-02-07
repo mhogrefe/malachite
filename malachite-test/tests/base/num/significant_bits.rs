@@ -1,6 +1,5 @@
-use common::LARGE_LIMIT;
+use common::test_properties;
 use malachite_base::num::{PrimitiveInteger, PrimitiveSigned, PrimitiveUnsigned};
-use malachite_test::common::GenerationMode;
 use malachite_test::inputs::base::{signeds, unsigneds};
 
 fn significant_bits_helper_common<T: PrimitiveInteger>() {
@@ -52,43 +51,21 @@ pub fn test_significant_bits() {
 }
 
 fn significant_bits_properties_helper_unsigned<T: 'static + PrimitiveUnsigned>() {
-    // n.significant_bits() <= T::WIDTH
-    // n.significant_bits() == 0 iff n == 0
-    let unsigned = |n: T| {
+    test_properties(unsigneds, |&n: &T| {
         let significant_bits = n.significant_bits();
         assert!(significant_bits <= u64::from(T::WIDTH));
         assert_eq!(significant_bits == 0, n == T::ZERO);
-    };
-
-    for n in unsigneds(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        unsigned(n);
-    }
-
-    for n in unsigneds(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        unsigned(n);
-    }
+    });
 }
 
 fn significant_bits_properties_helper_signed<T: 'static + PrimitiveSigned>() {
-    // n.significant_bits() <= T::WIDTH
-    // n.significant_bits() == 0 iff n == 0
-    // n.significant_bits() == T::WIDTH iff n == T::MIN
-    // n.significant_bits() == n.wrapping_neg().significant_bits()
-    let signed = |n: T| {
+    test_properties(signeds, |&n: &T| {
         let significant_bits = n.significant_bits();
         assert!(significant_bits <= u64::from(T::WIDTH));
         assert_eq!(significant_bits == 0, n == T::ZERO);
         assert_eq!(significant_bits == u64::from(T::WIDTH), n == T::MIN);
         assert_eq!(n.wrapping_neg().significant_bits(), significant_bits);
-    };
-
-    for n in signeds(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        signed(n);
-    }
-
-    for n in signeds(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        signed(n);
-    }
+    });
 }
 
 #[test]

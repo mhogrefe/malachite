@@ -1,6 +1,5 @@
-use common::LARGE_LIMIT;
+use common::test_properties;
 use malachite_nz::integer::Integer;
-use malachite_test::common::GenerationMode;
 use malachite_test::inputs::integer::integers;
 use std::cmp::Ordering;
 use std::u32;
@@ -82,64 +81,36 @@ fn test_sign_and_limbs_be() {
 
 #[test]
 fn sign_and_limbs_le_properties() {
-    // (sign, limbs) := x.sign_and_limbs_le(); from_sign_and_limbs_le(sign, limbs) == x
-    // (sign, limbs) := x.sign_and_limbs_le(); x.sign_and_limbs_be() == (sign, limbs.rev())
-    // (sign, limbs) := x.sign_and_limbs_le();
-    //     (sign == Ordering::Equals) == limbs.is_empty() == (x == 0)
-    // (sign, limbs) := x.sign_and_limbs_le(); if x != 0, limbs.last() != 0
-    // (sign, limbs) := x.sign_and_limbs_le(); (-x).sign_and_limbs_le() == (sign.reverse(), limbs)
-    let one_integer = |x: Integer| {
+    test_properties(integers, |x| {
         let (sign, limbs) = x.sign_and_limbs_le();
-        assert_eq!(Integer::from_sign_and_limbs_le(sign, &limbs), x);
+        assert_eq!(Integer::from_sign_and_limbs_le(sign, &limbs), *x);
         assert_eq!(
             x.sign_and_limbs_be(),
             (sign, limbs.iter().cloned().rev().collect::<Vec<u32>>(),)
         );
         assert_eq!(sign == Ordering::Equal, limbs.is_empty());
-        assert_eq!(sign == Ordering::Equal, x == 0);
-        if x != 0 {
+        assert_eq!(sign == Ordering::Equal, *x == 0);
+        if *x != 0 {
             assert_ne!(*limbs.last().unwrap(), 0);
         }
         assert_eq!((-x).sign_and_limbs_le(), (sign.reverse(), limbs));
-    };
-
-    for n in integers(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        one_integer(n);
-    }
-
-    for n in integers(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        one_integer(n);
-    }
+    });
 }
 
 #[test]
 fn sign_and_limbs_be_properties() {
-    // (sign, limbs) := x.sign_and_limbs_be(); from_sign_and_limbs_be(sign, limbs) == x
-    // (sign, limbs) := x.sign_and_limbs_be(); x.sign_and_limbs_le() == (sign, limbs.rev())
-    // (sign, limbs) := x.sign_and_limbs_be();
-    //     (sign == Ordering::Equals) == limbs.is_empty() == (x == 0)
-    // (sign, limbs) := x.sign_and_limbs_be(); if x != 0, limbs[0] != 0
-    // (sign, limbs) := x.sign_and_limbs_be(); (-x).sign_and_limbs_be() == (sign.reverse(), limbs)
-    let one_integer = |x: Integer| {
+    test_properties(integers, |x| {
         let (sign, limbs) = x.sign_and_limbs_be();
-        assert_eq!(Integer::from_sign_and_limbs_be(sign, &limbs), x);
+        assert_eq!(Integer::from_sign_and_limbs_be(sign, &limbs), *x);
         assert_eq!(
             x.sign_and_limbs_le(),
             (sign, limbs.iter().cloned().rev().collect::<Vec<u32>>(),)
         );
         assert_eq!(sign == Ordering::Equal, limbs.is_empty());
-        assert_eq!(sign == Ordering::Equal, x == 0);
-        if x != 0 {
+        assert_eq!(sign == Ordering::Equal, *x == 0);
+        if *x != 0 {
             assert_ne!(limbs[0], 0);
         }
         assert_eq!((-x).sign_and_limbs_be(), (sign.reverse(), limbs));
-    };
-
-    for n in integers(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        one_integer(n);
-    }
-
-    for n in integers(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        one_integer(n);
-    }
+    });
 }

@@ -1,7 +1,6 @@
-use common::LARGE_LIMIT;
+use common::test_properties;
 use malachite_base::num::Assign;
 use malachite_nz::integer::Integer;
-use malachite_test::common::GenerationMode;
 use malachite_test::inputs::integer::pairs_of_integer_and_signed;
 use std::{i32, i64};
 use std::str::FromStr;
@@ -24,24 +23,13 @@ fn test_assign_i64() {
 
 #[test]
 fn assign_i64_properties() {
-    // n.assign(i) is valid.
-    // n.assign(i); n == u
-    // n.assign(Integer::from(i)) is equivalent to n.assign(i)
-    let integer_and_i64 = |mut n: Integer, i: i64| {
-        let old_n = n.clone();
-        n.assign(i);
-        assert!(n.is_valid());
-        assert_eq!(n, Integer::from(i));
-        let mut alt_n = old_n.clone();
-        alt_n.assign(Integer::from(i));
-        assert_eq!(alt_n, n);
-    };
-
-    for (n, i) in pairs_of_integer_and_signed(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        integer_and_i64(n, i);
-    }
-
-    for (n, i) in pairs_of_integer_and_signed(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        integer_and_i64(n, i);
-    }
+    test_properties(
+        pairs_of_integer_and_signed,
+        |&(ref n, i): &(Integer, i64)| {
+            let mut mut_n = n.clone();
+            mut_n.assign(i);
+            assert!(mut_n.is_valid());
+            assert_eq!(mut_n, Integer::from(i));
+        },
+    );
 }

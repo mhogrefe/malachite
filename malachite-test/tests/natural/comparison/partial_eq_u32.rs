@@ -1,6 +1,6 @@
-use common::LARGE_LIMIT;
+use common::test_properties;
 use malachite_nz::natural::Natural;
-use malachite_test::common::{natural_to_biguint, natural_to_rug_integer, GenerationMode};
+use malachite_test::common::{natural_to_biguint, natural_to_rug_integer};
 use malachite_test::inputs::natural::pairs_of_natural_and_unsigned;
 use malachite_test::natural::comparison::partial_eq_u32::num_partial_eq_u32;
 use num::BigUint;
@@ -26,29 +26,17 @@ fn test_partial_eq_u32() {
 
 #[test]
 fn partial_eq_u32_properties() {
-    // n == u is equivalent for malachite, num, and rug.
-    // n == Natural::from(u) is equivalent to n == u.
-    //
-    // u == n is equivalent for malachite and rug.
-    // Natural::from(u) == n is equivalent to u == n.
-    // n == u is equivalent to u == n.
-    let natural_and_u32 = |n: Natural, u: u32| {
-        let eq_1 = n == u;
-        assert_eq!(num_partial_eq_u32(&natural_to_biguint(&n), u), eq_1);
-        assert_eq!(natural_to_rug_integer(&n) == u, eq_1);
-        assert_eq!(n == Natural::from(u), eq_1);
+    test_properties(
+        pairs_of_natural_and_unsigned,
+        |&(ref n, u): &(Natural, u32)| {
+            let eq = *n == u;
+            assert_eq!(num_partial_eq_u32(&natural_to_biguint(n), u), eq);
+            assert_eq!(natural_to_rug_integer(n) == u, eq);
+            assert_eq!(*n == Natural::from(u), eq);
 
-        let eq_2 = u == n;
-        assert_eq!(u == natural_to_rug_integer(&n), eq_2);
-        assert_eq!(eq_1, eq_2);
-        assert_eq!(Natural::from(u) == n, eq_2);
-    };
-
-    for (n, u) in pairs_of_natural_and_unsigned(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        natural_and_u32(n, u);
-    }
-
-    for (n, u) in pairs_of_natural_and_unsigned(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        natural_and_u32(n, u);
-    }
+            assert_eq!(u == *n, eq);
+            assert_eq!(u == natural_to_rug_integer(n), eq);
+            assert_eq!(Natural::from(u) == *n, eq);
+        },
+    );
 }

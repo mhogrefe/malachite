@@ -1,10 +1,9 @@
-use common::LARGE_LIMIT;
+use common::test_properties;
 use malachite_base::round::RoundingMode;
 use malachite_base::num::{One, PartialOrdAbs, ShrRound, Zero};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
-use malachite_test::common::GenerationMode;
-use malachite_test::inputs::base::small_u32s;
+use malachite_test::inputs::base::unsigneds;
 use malachite_test::inputs::integer::{integers, pairs_of_integer_and_small_u32,
                                       pairs_of_integer_and_small_u32_var_1,
                                       pairs_of_integer_and_small_u32_var_2,
@@ -257,342 +256,141 @@ fn test_ceiling_mod_power_of_2() {
 
 #[test]
 fn mod_power_of_2_properties() {
-    // n.mod_power_of_2_assign(u); n is valid.
-    // n.mod_power_of_2(u) is valid.
-    // n.mod_power_of_2_ref(u) is valid.
-    // n.mod_power_of_2_assign(u), n.mod_power_of_2(u), and n.mod_power_of_2_ref(u) give the same
-    //      result.
-    // (n >> u << u) + n.mod_power_of_2(u) == n
-    // n.mod_power_of_2(u) < (1 << u)
-    // (n.mod_power_of_2(u) == 0) == n.divisible_by_power_of_2(u)
-    // n.mod_power_of_2(u).mod_power_of_2(u) == n.mod_power_of_2(u)
-    let integer_and_u32 = |mut n: Integer, u: u32| {
-        let old_n = n.clone();
+    test_properties(pairs_of_integer_and_small_u32, |&(ref n, u)| {
+        let mut mut_n = n.clone();
+        mut_n.mod_power_of_2_assign(u);
+        assert!(mut_n.is_valid());
+        let result = mut_n;
 
-        n.mod_power_of_2_assign(u);
-        assert!(n.is_valid());
+        let result_alt = n.mod_power_of_2_ref(u);
+        assert!(result_alt.is_valid());
+        assert_eq!(result_alt, result);
+        let result_alt = n.clone().mod_power_of_2(u);
+        assert!(result_alt.is_valid());
+        assert_eq!(result_alt, result);
 
-        let n2 = old_n.clone();
-        let result = n2.mod_power_of_2_ref(u);
-        assert_eq!(result, n);
-        assert!(result.is_valid());
-        let result = n2.mod_power_of_2(u);
-        assert!(result.is_valid());
-        assert_eq!(result, n);
+        assert_eq!((n >> u << u) + &result, *n);
+        assert!(result < (Natural::ONE << u));
+        assert_eq!(result == 0, n.divisible_by_power_of_2(u));
+        assert_eq!(result.mod_power_of_2_ref(u), result);
+    });
 
-        assert_eq!((&old_n >> u << u) + &n, old_n);
-        assert!(n < (Natural::ONE << u));
-        assert_eq!(n == 0, old_n.divisible_by_power_of_2(u));
-        assert_eq!(n.mod_power_of_2_ref(u), n);
-    };
+    test_properties(pairs_of_integer_and_small_u32_var_1, |&(ref n, u)| {
+        assert_eq!(n.mod_power_of_2_ref(u), 0);
+    });
 
-    // If n is divisible by 2^u, n.mod_power_of_2(u) == 0
-    let integer_and_u32_divisible = |n: Integer, u: u32| {
-        assert_eq!(n.mod_power_of_2(u), 0);
-    };
-
-    // If n is not divisible by 2^u, n.mod_power_of_2(u) != 0
-    // If n is not divisible by 2^u, n.mod_power_of_2(u) - n.ceiling_mod_power_of_2(u) == 1 << u
-    let integer_and_u32_non_divisible = |n: Integer, u: u32| {
+    test_properties(pairs_of_integer_and_small_u32_var_2, |&(ref n, u)| {
         assert_ne!(n.mod_power_of_2_ref(u), 0);
         assert_eq!(
-            n.mod_power_of_2_ref(u).into_integer() - n.ceiling_mod_power_of_2(u),
+            n.mod_power_of_2_ref(u).into_integer() - n.ceiling_mod_power_of_2_ref(u),
             Natural::ONE << u
         );
-    };
+    });
 
-    // n.mod_power_of_2(u).mod_power_of_2(v) == n.mod_power_of_2(min(u, v))
-    let integer_and_two_u32s = |n: Integer, u: u32, v: u32| {
-        assert_eq!(
-            n.mod_power_of_2_ref(u).mod_power_of_2(v),
-            n.mod_power_of_2(min(u, v))
-        );
-    };
+    test_properties(
+        triples_of_integer_small_u32_and_small_u32,
+        |&(ref n, u, v)| {
+            assert_eq!(
+                n.mod_power_of_2_ref(u).mod_power_of_2(v),
+                n.mod_power_of_2_ref(min(u, v))
+            );
+        },
+    );
 
-    // n.mod_power_of_2(0) == 0
-    let one_integer = |n: Integer| {
+    test_properties(integers, |n| {
         assert_eq!(n.mod_power_of_2_ref(0), 0);
-    };
+    });
 
-    // 0.mod_power_of_2(n) == 0
-    let one_u32 = |u: u32| {
+    test_properties(unsigneds, |&u: &u32| {
         assert_eq!(Integer::ZERO.mod_power_of_2(u), 0);
-    };
-
-    for (n, u) in pairs_of_integer_and_small_u32(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        integer_and_u32(n, u);
-    }
-
-    for (n, u) in pairs_of_integer_and_small_u32(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        integer_and_u32(n, u);
-    }
-
-    for (n, u) in pairs_of_integer_and_small_u32_var_1(GenerationMode::Exhaustive).take(LARGE_LIMIT)
-    {
-        integer_and_u32_divisible(n, u);
-    }
-
-    for (n, u) in pairs_of_integer_and_small_u32_var_1(GenerationMode::Random(32)).take(LARGE_LIMIT)
-    {
-        integer_and_u32_divisible(n, u);
-    }
-
-    for (n, u) in pairs_of_integer_and_small_u32_var_2(GenerationMode::Exhaustive).take(LARGE_LIMIT)
-    {
-        integer_and_u32_non_divisible(n, u);
-    }
-
-    for (n, u) in pairs_of_integer_and_small_u32_var_2(GenerationMode::Random(32)).take(LARGE_LIMIT)
-    {
-        integer_and_u32_non_divisible(n, u);
-    }
-
-    for (n, u, v) in
-        triples_of_integer_small_u32_and_small_u32(GenerationMode::Exhaustive).take(LARGE_LIMIT)
-    {
-        integer_and_two_u32s(n, u, v);
-    }
-
-    for (n, u, v) in
-        triples_of_integer_small_u32_and_small_u32(GenerationMode::Random(32)).take(LARGE_LIMIT)
-    {
-        integer_and_two_u32s(n, u, v);
-    }
-
-    for n in integers(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        one_integer(n);
-    }
-
-    for n in integers(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        one_integer(n);
-    }
-
-    for n in small_u32s(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        one_u32(n);
-    }
-
-    for n in small_u32s(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        one_u32(n);
-    }
+    });
 }
 
 #[test]
 fn rem_power_of_2_properties() {
-    // n.rem_power_of_2_assign(u); n is valid.
-    // n.rem_power_of_2(u) is valid.
-    // n.rem_power_of_2_ref(u) is valid.
-    // n.rem_power_of_2_assign(u), n.rem_power_of_2(u), and n.rem_power_of_2_ref(u) give the same
-    //      result.
-    // (n.shr_round(u, Down) << u) + n.rem_power_of_2(u) == n
-    // n.rem_power_of_2(u).lt_abs(1 << u)
-    // (n.rem_power_of_2(u) == 0) == n.divisible_by_power_of_2(u)
-    // n.rem_power_of_2(u).rem_power_of_2(u) == n.rem_power_of_2(u)
-    // n.rem_power_of_2(u).abs() == n.abs().mod_power_of_2(u)
-    let integer_and_u32 = |mut n: Integer, u: u32| {
-        let old_n = n.clone();
-        n.rem_power_of_2_assign(u);
-        assert!(n.is_valid());
+    test_properties(pairs_of_integer_and_small_u32, |&(ref n, u)| {
+        let mut mut_n = n.clone();
+        mut_n.rem_power_of_2_assign(u);
+        assert!(mut_n.is_valid());
+        let result = mut_n;
 
-        let n2 = old_n.clone();
-        let result = n2.rem_power_of_2_ref(u);
-        assert_eq!(result, n);
-        assert!(result.is_valid());
-        let result = n2.rem_power_of_2(u);
-        assert!(result.is_valid());
-        assert_eq!(result, n);
+        let result_alt = n.rem_power_of_2_ref(u);
+        assert!(result_alt.is_valid());
+        assert_eq!(result_alt, result);
+        let result_alt = n.clone().rem_power_of_2(u);
+        assert!(result_alt.is_valid());
+        assert_eq!(result_alt, result);
 
-        assert_eq!(
-            (((&old_n).shr_round(u, RoundingMode::Down) << u) + &n),
-            old_n
-        );
-        assert!(n.lt_abs(&(Natural::ONE << u)));
-        assert_eq!(n == 0, old_n.divisible_by_power_of_2(u));
-        assert_eq!(n.rem_power_of_2_ref(u), n);
-        assert_eq!(n.abs_ref(), old_n.abs().mod_power_of_2(u));
-    };
+        assert_eq!(((n.shr_round(u, RoundingMode::Down) << u) + &result), *n);
+        assert!(result.lt_abs(&(Natural::ONE << u)));
+        assert_eq!(result == 0, n.divisible_by_power_of_2(u));
+        assert_eq!(result.rem_power_of_2_ref(u), result);
+        assert_eq!(n.abs_ref().mod_power_of_2(u), result.abs_ref());
+    });
 
-    // If n is divisible by 2^u, n.rem_power_of_2(u) == 0
-    let integer_and_u32_divisible = |n: Integer, u: u32| {
-        assert_eq!(n.rem_power_of_2(u), 0);
-    };
+    test_properties(pairs_of_integer_and_small_u32_var_1, |&(ref n, u)| {
+        assert_eq!(n.rem_power_of_2_ref(u), 0);
+    });
 
-    // If n is not divisible by 2^u, n.rem_power_of_2(u) != 0
-    // If n is not divisible by 2^u, n.rem_power_of_2(u).sign() == n.sign()
-    let integer_and_u32_non_divisible = |n: Integer, u: u32| {
+    test_properties(pairs_of_integer_and_small_u32_var_2, |&(ref n, u)| {
         assert_ne!(n.rem_power_of_2_ref(u), 0);
         assert_eq!(n.rem_power_of_2_ref(u).sign(), n.sign());
-    };
+    });
 
-    // n.rem_power_of_2(u).rem_power_of_2(v) == n.rem_power_of_2(min(u, v))
-    let integer_and_two_u32s = |n: Integer, u: u32, v: u32| {
-        assert_eq!(
-            n.rem_power_of_2_ref(u).rem_power_of_2(v),
-            n.rem_power_of_2(min(u, v))
-        );
-    };
+    test_properties(
+        triples_of_integer_small_u32_and_small_u32,
+        |&(ref n, u, v)| {
+            assert_eq!(
+                n.rem_power_of_2_ref(u).rem_power_of_2(v),
+                n.rem_power_of_2_ref(min(u, v))
+            );
+        },
+    );
 
-    // n.rem_power_of_2(0) == 0
-    let one_integer = |n: Integer| {
+    test_properties(integers, |n| {
         assert_eq!(n.rem_power_of_2_ref(0), 0);
-    };
+    });
 
-    // 0.rem_power_of_2(n) == 0
-    let one_u32 = |u: u32| {
+    test_properties(unsigneds, |&u: &u32| {
         assert_eq!(Integer::ZERO.rem_power_of_2(u), 0);
-    };
-
-    for (n, u) in pairs_of_integer_and_small_u32(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        integer_and_u32(n, u);
-    }
-
-    for (n, u) in pairs_of_integer_and_small_u32(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        integer_and_u32(n, u);
-    }
-
-    for (n, u) in pairs_of_integer_and_small_u32_var_1(GenerationMode::Exhaustive).take(LARGE_LIMIT)
-    {
-        integer_and_u32_divisible(n, u);
-    }
-
-    for (n, u) in pairs_of_integer_and_small_u32_var_1(GenerationMode::Random(32)).take(LARGE_LIMIT)
-    {
-        integer_and_u32_divisible(n, u);
-    }
-
-    for (n, u) in pairs_of_integer_and_small_u32_var_2(GenerationMode::Exhaustive).take(LARGE_LIMIT)
-    {
-        integer_and_u32_non_divisible(n, u);
-    }
-
-    for (n, u) in pairs_of_integer_and_small_u32_var_2(GenerationMode::Random(32)).take(LARGE_LIMIT)
-    {
-        integer_and_u32_non_divisible(n, u);
-    }
-
-    for (n, u, v) in
-        triples_of_integer_small_u32_and_small_u32(GenerationMode::Exhaustive).take(LARGE_LIMIT)
-    {
-        integer_and_two_u32s(n, u, v);
-    }
-
-    for (n, u, v) in
-        triples_of_integer_small_u32_and_small_u32(GenerationMode::Random(32)).take(LARGE_LIMIT)
-    {
-        integer_and_two_u32s(n, u, v);
-    }
-
-    for n in integers(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        one_integer(n);
-    }
-
-    for n in integers(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        one_integer(n);
-    }
-
-    for n in small_u32s(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        one_u32(n);
-    }
-
-    for n in small_u32s(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        one_u32(n);
-    }
+    });
 }
 
 #[test]
 fn ceiling_mod_power_of_2_properties() {
-    // n.ceiling_mod_power_of_2_assign(u); n is valid.
-    // n.ceiling_mod_power_of_2(u) is valid.
-    // n.ceiling_mod_power_of_2_ref(u) is valid.
-    // n.ceiling_mod_power_of_2_assign(u), n.ceiling_mod_power_of_2(u), and
-    //      n.ceiling_mod_power_of_2_ref(u) give the same result.
-    // (n.shr_round(u, Ceiling) << u) + n.ceiling_mod_power_of_2(u) == n
-    // 0 < -(n.ceiling_mod_power_of_2(u)) < 1 << u
-    // (n.ceiling_mod_power_of_2(u) == 0) == n.divisible_by_power_of_2(u)
-    // -(n.ceiling_mod_power_of_2(u)) == (-n).mod_power_of_2(u)
-    let integer_and_u32 = |mut n: Integer, u: u32| {
-        let old_n = n.clone();
-        n.ceiling_mod_power_of_2_assign(u);
-        assert!(n.is_valid());
+    test_properties(pairs_of_integer_and_small_u32, |&(ref n, u)| {
+        let mut mut_n = n.clone();
+        mut_n.ceiling_mod_power_of_2_assign(u);
+        assert!(mut_n.is_valid());
+        let result = mut_n;
 
-        let n2 = old_n.clone();
-        let result = n2.ceiling_mod_power_of_2_ref(u);
-        assert_eq!(result, n);
-        assert!(result.is_valid());
-        let result = n2.ceiling_mod_power_of_2(u);
-        assert!(result.is_valid());
-        assert_eq!(result, n);
+        let result_alt = n.ceiling_mod_power_of_2_ref(u);
+        assert!(result_alt.is_valid());
+        assert_eq!(result_alt, result);
+        let result_alt = n.clone().ceiling_mod_power_of_2(u);
+        assert!(result_alt.is_valid());
+        assert_eq!(result_alt, result);
 
-        assert_eq!(
-            (((&old_n).shr_round(u, RoundingMode::Ceiling) << u) + &n),
-            old_n
-        );
-        assert!(n <= 0);
-        assert!(-&n <= Natural::ONE << u);
-        assert_eq!(n == 0, old_n.divisible_by_power_of_2(u));
-        assert_eq!(-n, (-old_n).mod_power_of_2(u));
-    };
+        assert_eq!(((n.shr_round(u, RoundingMode::Ceiling) << u) + &result), *n);
+        assert!(result <= 0);
+        assert!(-&result <= Natural::ONE << u);
+        assert_eq!(result == 0, n.divisible_by_power_of_2(u));
+        assert_eq!((-n).mod_power_of_2(u), -result);
+    });
 
-    // If n is divisible by 2^u, n.ceiling_mod_power_of_2(u) == 0
-    let integer_and_u32_divisible = |n: Integer, u: u32| {
-        assert_eq!(n.ceiling_mod_power_of_2(u), 0);
-    };
+    test_properties(pairs_of_integer_and_small_u32_var_1, |&(ref n, u)| {
+        assert_eq!(n.ceiling_mod_power_of_2_ref(u), 0);
+    });
 
-    // If n is not divisible by 2^u, n.ceiling_mod_power_of_2(u) != 0
-    let integer_and_u32_non_divisible = |n: Integer, u: u32| {
+    test_properties(pairs_of_integer_and_small_u32_var_2, |&(ref n, u)| {
         assert_ne!(n.ceiling_mod_power_of_2_ref(u), 0);
-    };
+    });
 
-    // n.ceiling_mod_power_of_2(0) == 0
-    let one_integer = |n: Integer| {
+    test_properties(integers, |n| {
         assert_eq!(n.ceiling_mod_power_of_2_ref(0), 0);
-    };
+    });
 
-    // 0.ceiling_mod_power_of_2(n) == 0
-    let one_u32 = |u: u32| {
+    test_properties(unsigneds, |&u: &u32| {
         assert_eq!(Integer::ZERO.ceiling_mod_power_of_2(u), 0);
-    };
-
-    for (n, u) in pairs_of_integer_and_small_u32(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        integer_and_u32(n, u);
-    }
-
-    for (n, u) in pairs_of_integer_and_small_u32(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        integer_and_u32(n, u);
-    }
-
-    for (n, u) in pairs_of_integer_and_small_u32_var_1(GenerationMode::Exhaustive).take(LARGE_LIMIT)
-    {
-        integer_and_u32_divisible(n, u);
-    }
-
-    for (n, u) in pairs_of_integer_and_small_u32_var_1(GenerationMode::Random(32)).take(LARGE_LIMIT)
-    {
-        integer_and_u32_divisible(n, u);
-    }
-
-    for (n, u) in pairs_of_integer_and_small_u32_var_2(GenerationMode::Exhaustive).take(LARGE_LIMIT)
-    {
-        integer_and_u32_non_divisible(n, u);
-    }
-
-    for (n, u) in pairs_of_integer_and_small_u32_var_2(GenerationMode::Random(32)).take(LARGE_LIMIT)
-    {
-        integer_and_u32_non_divisible(n, u);
-    }
-
-    for n in integers(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        one_integer(n);
-    }
-
-    for n in integers(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        one_integer(n);
-    }
-
-    for n in small_u32s(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        one_u32(n);
-    }
-
-    for n in small_u32s(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        one_u32(n);
-    }
+    });
 }

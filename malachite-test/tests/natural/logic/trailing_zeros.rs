@@ -1,6 +1,5 @@
-use common::LARGE_LIMIT;
+use common::test_properties;
 use malachite_nz::natural::Natural;
-use malachite_test::common::GenerationMode;
 use malachite_test::inputs::natural::naturals;
 use std::str::FromStr;
 use std::u32;
@@ -21,27 +20,16 @@ fn test_trailing_zeros() {
 
 #[test]
 fn trailing_zeros_properties() {
-    // x.trailing_zeros().is_none() == (x == 0)
-    // if x != 0, x >> x.trailing_zeros() is odd
-    // if x != 0, x >> x.trailing_zeros() << x.trailing_zeros() == x
-    let one_natural = |x: Natural| {
+    test_properties(naturals, |x| {
         let trailing_zeros = x.trailing_zeros();
-        assert_eq!(trailing_zeros.is_none(), x == 0);
-        if x != 0 {
+        assert_eq!(trailing_zeros.is_none(), *x == 0);
+        if *x != 0 {
             let trailing_zeros = trailing_zeros.unwrap();
             if trailing_zeros <= u64::from(u32::MAX) {
                 let trailing_zeros = trailing_zeros as u32;
-                assert!((&x >> trailing_zeros).is_odd());
-                assert_eq!(&x >> trailing_zeros << trailing_zeros, x);
+                assert!((x >> trailing_zeros).is_odd());
+                assert_eq!(x >> trailing_zeros << trailing_zeros, *x);
             }
         }
-    };
-
-    for n in naturals(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        one_natural(n);
-    }
-
-    for n in naturals(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        one_natural(n);
-    }
+    });
 }

@@ -1,7 +1,7 @@
-use common::{test_custom_cmp_helper, LARGE_LIMIT};
+use common::{test_custom_cmp_helper, test_properties};
 use malachite_base::num::{OrdAbs, PartialOrdAbs};
 use malachite_nz::integer::Integer;
-use malachite_test::common::{integer_to_rug_integer, GenerationMode};
+use malachite_test::common::integer_to_rug_integer;
 use malachite_test::inputs::integer::{integers, pairs_of_integers, triples_of_integers};
 use rug;
 use std::cmp::Ordering;
@@ -24,57 +24,26 @@ fn test_ord_abs() {
 
 #[test]
 fn cmp_properties() {
-    // x.cmp_abs(&y) is equivalent for malachite and rug.
-    // x.cmp_abs(&y) == x.abs().cmp(&y.abs())
-    // x.cmp_abs(&y) == y.cmp_abs(&x).reverse()
-    // x.cmp_abs(&y) == (-x).cmp_abs(-y)
-    let two_integers = |x: Integer, y: Integer| {
-        let ord = x.cmp_abs(&y);
+    test_properties(pairs_of_integers, |&(ref x, ref y)| {
+        let ord = x.cmp_abs(y);
         assert_eq!(
-            integer_to_rug_integer(&x).cmp_abs(&integer_to_rug_integer(&y)),
+            integer_to_rug_integer(x).cmp_abs(&integer_to_rug_integer(y)),
             ord
         );
         assert_eq!(x.abs_ref().cmp(&y.abs_ref()), ord);
         assert_eq!((-x).cmp_abs(&(-y)), ord);
-    };
+    });
 
-    // x == x
-    // x == -x
-    let one_integer = |x: Integer| {
-        assert_eq!(x.cmp_abs(&x), Ordering::Equal);
-        assert_eq!(x.cmp_abs(&-&x), Ordering::Equal);
-    };
+    test_properties(integers, |x| {
+        assert_eq!(x.cmp_abs(x), Ordering::Equal);
+        assert_eq!(x.cmp_abs(&-x), Ordering::Equal);
+    });
 
-    // x < y && x < z => x < z, x > y && x > z => x > z
-    let three_integers = |x: Integer, y: Integer, z: Integer| {
-        if x.lt_abs(&y) && y.lt_abs(&z) {
-            assert!(x.lt_abs(&z));
-        } else if x.gt_abs(&y) && y.gt_abs(&z) {
-            assert!(x.gt_abs(&z));
+    test_properties(triples_of_integers, |&(ref x, ref y, ref z)| {
+        if x.lt_abs(y) && y.lt_abs(z) {
+            assert!(x.lt_abs(z));
+        } else if x.gt_abs(y) && y.gt_abs(z) {
+            assert!(x.gt_abs(z));
         }
-    };
-
-    for (x, y) in pairs_of_integers(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        two_integers(x, y);
-    }
-
-    for (x, y) in pairs_of_integers(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        two_integers(x, y);
-    }
-
-    for n in integers(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        one_integer(n);
-    }
-
-    for n in integers(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        one_integer(n);
-    }
-
-    for (x, y, z) in triples_of_integers(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        three_integers(x, y, z);
-    }
-
-    for (x, y, z) in triples_of_integers(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        three_integers(x, y, z);
-    }
+    });
 }

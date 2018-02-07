@@ -1,8 +1,8 @@
-use common::LARGE_LIMIT;
+use common::test_properties;
 use malachite_base::num::{One, Zero};
 use malachite_nz::natural::Natural;
 use malachite_test::common::{biguint_to_natural, natural_to_biguint, natural_to_rug_integer,
-                             rug_integer_to_natural, GenerationMode};
+                             rug_integer_to_natural};
 use malachite_test::inputs::base::small_u32s;
 use malachite_test::inputs::natural::{naturals, pairs_of_natural_and_small_u32,
                                       triples_of_natural_small_u32_and_small_u32};
@@ -65,102 +65,61 @@ fn test_shl_u32() {
 
 #[test]
 fn shl_u32_properties() {
-    // n <<= u is equivalent for malachite and rug.
-    // n << u is equivalent for malachite, num, and rug.
-    // &n << u is equivalent for malachite and num.
-    // n <<= u; n is valid.
-    // n << u is valid.
-    // &n << u is valid.
-    // n <<= u, n << u, and &n << u give the same result.
-    // n << u >= n
-    // n << u == n * (1 << u)
-    // n << u >> u == n
-    // if u < 2^31, n << u == n << (u as i32) == n >> -(u as i32)
-    let natural_and_u32 = |mut n: Natural, u: u32| {
-        let old_n = n.clone();
-        n <<= u;
-        assert!(n.is_valid());
+    test_properties(pairs_of_natural_and_small_u32, |&(ref n, u)| {
+        let mut mut_n = n.clone();
+        mut_n <<= u;
+        assert!(mut_n.is_valid());
+        let shifted = mut_n;
 
-        let mut rug_n = natural_to_rug_integer(&old_n);
+        let mut rug_n = natural_to_rug_integer(n);
         rug_n <<= u;
-        assert_eq!(rug_integer_to_natural(&rug_n), n);
+        assert_eq!(rug_integer_to_natural(&rug_n), shifted);
 
-        let n2 = old_n.clone();
-        let result = &n2 << u;
-        assert_eq!(result, n);
-        assert!(result.is_valid());
-        let result = n2 << u;
-        assert!(result.is_valid());
-        assert_eq!(result, n);
+        let shifted_alt = n << u;
+        assert!(shifted_alt.is_valid());
+        assert_eq!(shifted_alt, shifted);
 
-        let num_n2 = natural_to_biguint(&old_n);
-        assert_eq!(biguint_to_natural(&(&num_n2 << u as usize)), n);
-        assert_eq!(biguint_to_natural(&(num_n2 << u as usize)), n);
+        let shifted_alt = n.clone() << u;
+        assert!(shifted_alt.is_valid());
+        assert_eq!(shifted_alt, shifted);
 
-        let rug_n2 = natural_to_rug_integer(&old_n);
-        assert_eq!(rug_integer_to_natural(&(rug_n2 << u)), n);
+        assert_eq!(
+            biguint_to_natural(&(&natural_to_biguint(n) << u as usize)),
+            shifted
+        );
+        assert_eq!(
+            biguint_to_natural(&(natural_to_biguint(n) << u as usize)),
+            shifted
+        );
+        assert_eq!(
+            rug_integer_to_natural(&(natural_to_rug_integer(n) << u)),
+            shifted
+        );
 
-        assert!(&old_n << u >= old_n);
-        assert_eq!(&old_n << u, &old_n * (Natural::ONE << u));
-        assert_eq!(&old_n << u >> u, old_n);
+        assert!(shifted >= *n);
+        assert_eq!(shifted, n * (Natural::ONE << u));
+        assert_eq!(&shifted >> u, *n);
 
         if u <= (i32::MAX as u32) {
-            assert_eq!(&old_n << (u as i32), n);
-            assert_eq!(&old_n >> -(u as i32), n);
+            assert_eq!(n << (u as i32), shifted);
+            assert_eq!(n >> -(u as i32), shifted);
         }
-    };
+    });
 
-    // n << u << v == n << (u + v)
-    let natural_and_two_u32s = |n: Natural, u: u32, v: u32| {
-        assert_eq!(&n << u << v, &n << (u + v));
-    };
+    test_properties(
+        triples_of_natural_small_u32_and_small_u32,
+        |&(ref n, u, v)| {
+            assert_eq!(n << u << v, n << (u + v));
+        },
+    );
 
-    // n << 0 == n
     #[allow(unknown_lints, identity_op)]
-    let one_natural = |n: Natural| {
-        assert_eq!(&n << 0, n);
-    };
+    test_properties(naturals, |n| {
+        assert_eq!(n << 0, *n);
+    });
 
-    // 0 << n == 0
-    // 1 << n is a power of 2
-    let one_u32 = |u: u32| {
+    test_properties(small_u32s, |&u: &u32| {
         assert_eq!(Natural::ZERO << u, 0);
         assert!((Natural::ONE << u).is_power_of_2());
-    };
-
-    for (n, u) in pairs_of_natural_and_small_u32(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        natural_and_u32(n, u);
-    }
-
-    for (n, u) in pairs_of_natural_and_small_u32(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        natural_and_u32(n, u);
-    }
-
-    for (n, u, v) in
-        triples_of_natural_small_u32_and_small_u32(GenerationMode::Exhaustive).take(LARGE_LIMIT)
-    {
-        natural_and_two_u32s(n, u, v);
-    }
-
-    for (n, u, v) in
-        triples_of_natural_small_u32_and_small_u32(GenerationMode::Random(32)).take(LARGE_LIMIT)
-    {
-        natural_and_two_u32s(n, u, v);
-    }
-
-    for n in naturals(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        one_natural(n);
-    }
-
-    for n in naturals(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        one_natural(n);
-    }
-
-    for n in small_u32s(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        one_u32(n);
-    }
-
-    for n in small_u32s(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        one_u32(n);
-    }
+    });
 }

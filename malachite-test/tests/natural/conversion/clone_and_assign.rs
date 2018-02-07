@@ -1,8 +1,8 @@
-use common::LARGE_LIMIT;
+use common::test_properties;
 use malachite_base::num::Assign;
 use malachite_nz::natural::Natural;
 use malachite_test::common::{biguint_to_natural, natural_to_biguint, natural_to_rug_integer,
-                             rug_integer_to_natural, GenerationMode};
+                             rug_integer_to_natural};
 use malachite_test::inputs::natural::{naturals, pairs_of_naturals};
 use num::BigUint;
 use rug;
@@ -71,75 +71,46 @@ fn test_clone_clone_from_and_assign() {
 
 #[test]
 fn clone_clone_from_and_assign_properties() {
-    // x.clone() is equivalent for malachite, num, and rug.
-    // x.clone() is valid.
-    // x.clone() == x
-    let one_natural = |x: Natural| {
-        let x_cloned = x.clone();
-        assert!(x_cloned.is_valid());
-        assert_eq!(biguint_to_natural(&natural_to_biguint(&x).clone()), x);
+    test_properties(naturals, |x| {
+        let x_mut = x.clone();
+        assert!(x_mut.is_valid());
+        assert_eq!(x_mut, *x);
+
+        assert_eq!(biguint_to_natural(&natural_to_biguint(x).clone()), *x);
         assert_eq!(
-            rug_integer_to_natural(&natural_to_rug_integer(&x).clone()),
-            x
+            rug_integer_to_natural(&natural_to_rug_integer(x).clone()),
+            *x
         );
-        assert_eq!(x_cloned, x);
-    };
+    });
 
-    // x.clone_from(y) is equivalent for malachite, num, and rug.
-    // x.clone_from(y) is valid.
-    // x.clone_from(y); x == y
-    // x.assign(y) is equivalent for malachite and rug.
-    // x.assign(y) is valid.
-    // x.assign(y); x == y
-    // x.assign(&y) is equivalent for malachite and rug.
-    // x.assign(&y) is valid.
-    // x.assign(&y); x == y
-    let two_naturals = |mut x: Natural, y: Natural| {
-        let old_x = x.clone();
-        x.clone_from(&y);
-        assert!(x.is_valid());
-        assert_eq!(x, y);
-        let mut num_x = natural_to_biguint(&old_x);
-        let num_y = natural_to_biguint(&y);
-        num_x.clone_from(&num_y);
-        assert_eq!(biguint_to_natural(&num_x), y);
-        let mut rug_x = natural_to_rug_integer(&old_x);
-        let rug_y = natural_to_rug_integer(&y);
-        rug_x.clone_from(&rug_y);
-        assert_eq!(rug_integer_to_natural(&rug_x), y);
+    test_properties(pairs_of_naturals, |&(ref x, ref y)| {
+        let mut mut_x = x.clone();
+        mut_x.clone_from(y);
+        assert!(mut_x.is_valid());
+        assert_eq!(mut_x, *y);
 
-        x = old_x.clone();
-        x.assign(y.clone());
-        assert!(x.is_valid());
-        assert_eq!(x, y);
-        let mut rug_x = natural_to_rug_integer(&old_x);
-        let rug_y = natural_to_rug_integer(&y);
-        rug_x.assign(rug_y);
-        assert_eq!(rug_integer_to_natural(&rug_x), y);
+        let mut num_x = natural_to_biguint(x);
+        num_x.clone_from(&natural_to_biguint(y));
+        assert_eq!(biguint_to_natural(&num_x), *y);
 
-        x = old_x.clone();
-        x.assign(&y);
-        assert!(x.is_valid());
-        assert_eq!(x, y);
-        let mut rug_x = natural_to_rug_integer(&old_x);
-        let rug_y = natural_to_rug_integer(&y);
-        rug_x.assign(&rug_y);
-        assert_eq!(rug_integer_to_natural(&rug_x), y);
-    };
+        let mut rug_x = natural_to_rug_integer(x);
+        rug_x.clone_from(&natural_to_rug_integer(y));
+        assert_eq!(rug_integer_to_natural(&rug_x), *y);
 
-    for n in naturals(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        one_natural(n);
-    }
+        let mut mut_x = x.clone();
+        mut_x.assign(y.clone());
+        assert!(mut_x.is_valid());
+        assert_eq!(mut_x, *y);
+        let mut rug_x = natural_to_rug_integer(x);
+        rug_x.assign(natural_to_rug_integer(y));
+        assert_eq!(rug_integer_to_natural(&rug_x), *y);
 
-    for n in naturals(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        one_natural(n);
-    }
-
-    for (x, y) in pairs_of_naturals(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        two_naturals(x, y);
-    }
-
-    for (x, y) in pairs_of_naturals(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        two_naturals(x, y);
-    }
+        let mut mut_x = x.clone();
+        mut_x.assign(y);
+        assert!(mut_x.is_valid());
+        assert_eq!(mut_x, *y);
+        let mut rug_x = natural_to_rug_integer(x);
+        rug_x.assign(&natural_to_rug_integer(y));
+        assert_eq!(rug_integer_to_natural(&rug_x), *y);
+    });
 }

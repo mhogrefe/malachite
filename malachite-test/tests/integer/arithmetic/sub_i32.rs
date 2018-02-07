@@ -1,8 +1,8 @@
-use common::LARGE_LIMIT;
+use common::test_properties;
 use malachite_base::num::Zero;
 use malachite_nz::integer::Integer;
 use malachite_test::common::{bigint_to_integer, integer_to_bigint, integer_to_rug_integer,
-                             rug_integer_to_integer, GenerationMode};
+                             rug_integer_to_integer};
 use malachite_test::inputs::base::signeds;
 use malachite_test::inputs::integer::{integers, pairs_of_integer_and_signed};
 use malachite_test::integer::arithmetic::sub_i32::num_sub_i32;
@@ -81,96 +81,57 @@ fn test_sub_assign_i32() {
 
 #[test]
 fn sub_i32_properties() {
-    // n -= i is equivalent for malachite and rug.
-    // n - i is equivalent for malachite, num, and rug.
-    // &n - i is equivalent for malachite and num.
-    // n -= i; n is valid.
-    // n - i and i - n are valid.
-    // &n - i and i - &n are valid.
-    // n -= i, n - i, and &n - i give the same result.
-    // i - n and i - &n give the same result.
-    // i - n == -(n - i)
-    // n - i == n - from(i)
-    // n - i + i == n
-    // n - (n - i) == i
-    let integer_and_i32 = |mut n: Integer, i: i32| {
-        let old_n = n.clone();
-        n -= i;
-        assert!(n.is_valid());
+    test_properties(
+        pairs_of_integer_and_signed,
+        |&(ref n, i): &(Integer, i32)| {
+            let mut mut_n = n.clone();
+            mut_n -= i;
+            assert!(mut_n.is_valid());
+            let difference = mut_n;
 
-        let mut rug_n = integer_to_rug_integer(&old_n);
-        rug_n -= i;
-        assert_eq!(rug_integer_to_integer(&rug_n), n);
+            let mut rug_n = integer_to_rug_integer(n);
+            rug_n -= i;
+            assert_eq!(rug_integer_to_integer(&rug_n), difference);
 
-        let n2 = old_n.clone();
-        let result = &n2 - i;
-        assert!(result.is_valid());
-        assert_eq!(result, n);
-        let result = n2 - i;
-        assert!(result.is_valid());
-        assert_eq!(result, n);
+            let difference_alt = n - i;
+            assert!(difference_alt.is_valid());
+            assert_eq!(difference_alt, difference);
+            let difference_alt = n.clone() - i;
+            assert!(difference_alt.is_valid());
+            assert_eq!(difference_alt, difference);
 
-        let n2 = old_n.clone();
-        let result = i - &n2;
-        assert!(result.is_valid());
-        assert_eq!(result, -&n);
-        let result = i - n2;
-        assert_eq!(result, -&n);
-        assert!(result.is_valid());
+            let difference_alt = i - n;
+            assert!(difference_alt.is_valid());
+            assert_eq!(difference_alt, -&difference);
+            let difference_alt = i - n.clone();
+            assert!(difference_alt.is_valid());
+            assert_eq!(difference_alt, -&difference);
 
-        let n2 = old_n.clone();
-        let result = n2 - Integer::from(i);
-        assert_eq!(result, n);
-        let n2 = old_n.clone();
-        let result = Integer::from(i) - n2;
-        assert_eq!(result, -&n);
+            assert_eq!(n - Integer::from(i), difference);
+            assert_eq!(Integer::from(i) - n, -&difference);
 
-        let num_n2 = integer_to_bigint(&old_n);
-        assert_eq!(bigint_to_integer(&num_sub_i32(num_n2, i)), n);
+            assert_eq!(
+                bigint_to_integer(&num_sub_i32(integer_to_bigint(n), i)),
+                difference
+            );
+            assert_eq!(
+                rug_integer_to_integer(&(integer_to_rug_integer(n) - i)),
+                difference
+            );
 
-        let rug_n2 = integer_to_rug_integer(&old_n);
-        assert_eq!(rug_integer_to_integer(&(rug_n2 - i)), n);
+            assert_eq!(&difference + i, *n);
+            assert_eq!(n - difference, i);
+        },
+    );
 
-        assert_eq!(&n + i, old_n);
-        assert_eq!(old_n - n, i);
-    };
-
-    // n - 0 == n
-    // 0 - n == -n
     #[allow(unknown_lints, identity_op)]
-    let one_integer = |n: Integer| {
-        assert_eq!(&n + 0i32, n);
-        assert_eq!(0i32 - &n, -n);
-    };
+    test_properties(integers, |n| {
+        assert_eq!(n + 0i32, *n);
+        assert_eq!(0i32 - n, -n);
+    });
 
-    // 0 - i == i
-    // i - 0 == i
-    let one_i32 = |i: i32| {
+    test_properties(signeds, |&i: &i32| {
         assert_eq!(Integer::ZERO - i, -Integer::from(i));
         assert_eq!(i - Integer::ZERO, i);
-    };
-
-    for (n, i) in pairs_of_integer_and_signed(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        integer_and_i32(n, i);
-    }
-
-    for (n, i) in pairs_of_integer_and_signed(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        integer_and_i32(n, i);
-    }
-
-    for n in integers(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        one_integer(n);
-    }
-
-    for n in integers(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        one_integer(n);
-    }
-
-    for n in signeds(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        one_i32(n);
-    }
-
-    for n in signeds(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        one_i32(n);
-    }
+    });
 }

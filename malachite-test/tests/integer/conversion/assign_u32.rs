@@ -1,8 +1,8 @@
-use common::LARGE_LIMIT;
+use common::test_properties;
 use malachite_base::num::Assign;
 use malachite_nz::integer::Integer;
 use malachite_test::common::{bigint_to_integer, integer_to_bigint, integer_to_rug_integer,
-                             rug_integer_to_integer, GenerationMode};
+                             rug_integer_to_integer};
 use malachite_test::inputs::integer::pairs_of_integer_and_unsigned;
 use malachite_test::integer::conversion::assign_u32::num_assign_u32;
 use num::BigInt;
@@ -34,33 +34,21 @@ fn test_assign_u32() {
 
 #[test]
 fn assign_u32_properties() {
-    // n.assign(u) is equivalent for malachite, num, and rug.
-    // n.assign(u) is valid.
-    // n.assign(u); n == u
-    // n.assign(Integer::from(u)) is equivalent to n.assign(u)
-    let integer_and_u32 = |mut n: Integer, u: u32| {
-        let old_n = n.clone();
-        n.assign(u);
-        assert!(n.is_valid());
-        assert_eq!(n, u);
-        let mut alt_n = old_n.clone();
-        alt_n.assign(Integer::from(u));
-        assert_eq!(alt_n, n);
+    test_properties(
+        pairs_of_integer_and_unsigned,
+        |&(ref n, u): &(Integer, u32)| {
+            let mut mut_n = n.clone();
+            mut_n.assign(u);
+            assert!(mut_n.is_valid());
+            assert_eq!(mut_n, u);
 
-        let mut num_n = integer_to_bigint(&old_n);
-        num_assign_u32(&mut num_n, u);
-        assert_eq!(bigint_to_integer(&num_n), u);
+            let mut num_n = integer_to_bigint(n);
+            num_assign_u32(&mut num_n, u);
+            assert_eq!(bigint_to_integer(&num_n), u);
 
-        let mut rug_n = integer_to_rug_integer(&old_n);
-        rug_n.assign(u);
-        assert_eq!(rug_integer_to_integer(&rug_n), u);
-    };
-
-    for (n, u) in pairs_of_integer_and_unsigned(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        integer_and_u32(n, u);
-    }
-
-    for (n, u) in pairs_of_integer_and_unsigned(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        integer_and_u32(n, u);
-    }
+            let mut rug_n = integer_to_rug_integer(n);
+            rug_n.assign(u);
+            assert_eq!(rug_integer_to_integer(&rug_n), u);
+        },
+    );
 }

@@ -1,8 +1,8 @@
-use common::LARGE_LIMIT;
+use common::test_properties;
 use malachite_base::round::RoundingMode;
-use malachite_base::num::{PartialOrdAbs, ShrRound, ShrRoundAssign, Zero};
+use malachite_base::num::{PartialOrdAbs, PrimitiveInteger, ShrRound, ShrRoundAssign, Zero};
 use malachite_nz::integer::Integer;
-use malachite_test::common::{integer_to_rug_integer, rug_integer_to_integer, GenerationMode};
+use malachite_test::common::{integer_to_rug_integer, rug_integer_to_integer};
 use rug;
 use malachite_test::inputs::base::{pairs_of_unsigned_and_rounding_mode, unsigneds,
                                    pairs_of_negative_signed_not_min_and_small_u32s,
@@ -125,110 +125,67 @@ fn test_shr_u32() {
 
 #[test]
 fn shr_u32_properties() {
-    // n >>= u is equivalent for malachite and rug.
-    // n >> u is equivalent for malachite and rug.
-    // ******* bug in num for n >> i when n < 0, n not divisible by 2^i
-    // n >>= u; n is valid.
-    // n >> u is valid.
-    // &n >> u is valid.
-    // n >>= u, n >> u, and &n >> u give the same result.
-    // |n >> u| <= |n|
-    // TODO n >> u == n / (1 << u)
-    // n >> u == n.shr_round(u, Floor)
-    // if u < 2^31, n >> u == n >> (u as i32) == n << -(u as i32)
-    let integer_and_u32 = |mut n: Integer, u: u32| {
-        let old_n = n.clone();
-        n >>= u;
-        assert!(n.is_valid());
+    test_properties(pairs_of_integer_and_small_u32, |&(ref n, u)| {
+        let mut mut_n = n.clone();
+        mut_n >>= u;
+        assert!(mut_n.is_valid());
+        let shifted = mut_n;
 
-        let mut rug_n = integer_to_rug_integer(&old_n);
+        let mut rug_n = integer_to_rug_integer(n);
         rug_n >>= u;
-        assert_eq!(rug_integer_to_integer(&rug_n), n);
+        assert_eq!(rug_integer_to_integer(&rug_n), shifted);
 
-        let n2 = old_n.clone();
-        let result = &n2 >> u;
-        assert_eq!(result, n);
-        assert!(result.is_valid());
-        let result = n2 >> u;
-        assert!(result.is_valid());
-        assert_eq!(result, n);
+        let shifted_alt = n >> u;
+        assert!(shifted_alt.is_valid());
+        assert_eq!(shifted_alt, shifted);
+        let shifted_alt = n.clone() >> u;
+        assert!(shifted_alt.is_valid());
+        assert_eq!(shifted_alt, shifted);
 
-        let rug_n2 = integer_to_rug_integer(&old_n);
-        assert_eq!(rug_integer_to_integer(&(rug_n2 >> u)), n);
+        //TODO this will work once https://github.com/rust-num/num-bigint/pull/8 goes through
+        /*
+        assert_eq!(
+            bigint_to_integer(&(&integer_to_bigint(n) >> u as usize)),
+            shifted
+        );
+        assert_eq!(
+            bigint_to_integer(&(integer_to_bigint(n) >> u as usize)),
+            shifted
+        );*/
 
-        assert!((&old_n >> u).le_abs(&old_n));
-        assert_eq!(&old_n >> u, (&old_n).shr_round(u, RoundingMode::Floor));
+        assert_eq!(
+            rug_integer_to_integer(&(integer_to_rug_integer(n) >> u)),
+            shifted
+        );
+
+        assert!(shifted.le_abs(n));
+        assert_eq!(n.shr_round(u, RoundingMode::Floor), shifted);
 
         if u <= (i32::MAX as u32) {
-            assert_eq!(&old_n >> (u as i32), n);
-            assert_eq!(&old_n << -(u as i32), n);
+            assert_eq!(n >> (u as i32), shifted);
+            assert_eq!(n << -(u as i32), shifted);
         }
-    };
+    });
 
-    // if u >= 32, n >> u == 0
-    let two_u32s = |u: u32, v: u32| {
-        assert_eq!(Integer::from(u) >> (v + 32), 0);
-    };
+    test_properties(pairs_of_unsigned_and_small_u32, |&(u, v): &(u32, u32)| {
+        assert_eq!(Integer::from(u) >> (v + u32::WIDTH), 0);
+    });
 
-    // n >> u >> v == n >> (u + v)
-    let integer_and_two_u32s = |n: Integer, u: u32, v: u32| {
-        assert_eq!(&n >> u >> v, &n >> (u + v));
-    };
+    test_properties(
+        triples_of_integer_small_u32_and_small_u32,
+        |&(ref n, u, v)| {
+            assert_eq!(n >> u >> v, n >> (u + v));
+        },
+    );
 
-    // n >> 0 == n
     #[allow(unknown_lints, identity_op)]
-    let one_integer = |n: Integer| {
-        assert_eq!(&n >> 0u32, n);
-    };
+    test_properties(integers, |n| {
+        assert_eq!(n >> 0u32, *n);
+    });
 
-    // 0 >> n == 0
-    let one_u32 = |u: u32| {
+    test_properties(unsigneds, |&u: &u32| {
         assert_eq!(Integer::ZERO >> u, 0);
-    };
-
-    for (n, u) in pairs_of_integer_and_small_u32(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        integer_and_u32(n, u);
-    }
-
-    for (n, u) in pairs_of_integer_and_small_u32(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        integer_and_u32(n, u);
-    }
-
-    for (n, u, v) in
-        triples_of_integer_small_u32_and_small_u32(GenerationMode::Exhaustive).take(LARGE_LIMIT)
-    {
-        integer_and_two_u32s(n, u, v);
-    }
-
-    for (n, u, v) in
-        triples_of_integer_small_u32_and_small_u32(GenerationMode::Random(32)).take(LARGE_LIMIT)
-    {
-        integer_and_two_u32s(n, u, v);
-    }
-
-    for (n, u) in pairs_of_unsigned_and_small_u32(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        two_u32s(n, u);
-    }
-
-    for (n, u) in pairs_of_unsigned_and_small_u32(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        two_u32s(n, u);
-    }
-
-    for n in integers(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        one_integer(n);
-    }
-
-    for n in integers(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        one_integer(n);
-    }
-
-    for n in unsigneds(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        one_u32(n);
-    }
-
-    for n in unsigneds(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        one_u32(n);
-    }
+    });
 }
 
 #[test]
@@ -1318,173 +1275,114 @@ fn shr_round_ref_u32_fail_4() {
 
 #[test]
 fn shr_round_u32_properties() {
-    // n.shr_round_assign(u, rm); n is valid.
-    // n.shr_round(u, rm) is valid.
-    // (&n).shr_round(u, rm) is valid.
-    // n.shr_round_assign(u, rm), n.shr_round(u, rm), and (&n).shr_round(u, rm) give the same
-    //      result.
-    // |n.shr_round(u, rm)| <= |n|
     // TODO n.shr_round(u, rm) == n.div_round(1 << u)
-    // -(-n).shr_round(u, -rm) == n.shr_round(u, rm)
-    let integer_u32_and_rounding_mode = |mut n: Integer, u: u32, rm: RoundingMode| {
-        let old_n = n.clone();
-        n.shr_round_assign(u, rm);
-        assert!(n.is_valid());
+    test_properties(
+        triples_of_integer_small_u32_and_rounding_mode_var_1,
+        |&(ref n, u, rm)| {
+            let mut mut_n = n.clone();
+            mut_n.shr_round_assign(u, rm);
+            assert!(mut_n.is_valid());
+            let shifted = mut_n;
 
-        let n2 = old_n.clone();
-        let result = (&n2).shr_round(u, rm);
-        assert_eq!(result, n);
-        assert!(result.is_valid());
-        let result = n2.shr_round(u, rm);
-        assert!(result.is_valid());
-        assert_eq!(result, n);
+            let shifted_alt = n.shr_round(u, rm);
+            assert!(shifted_alt.is_valid());
+            assert_eq!(shifted_alt, shifted);
+            let shifted_alt = n.clone().shr_round(u, rm);
+            assert!(shifted_alt.is_valid());
+            assert_eq!(shifted_alt, shifted);
 
-        assert!((&old_n).shr_round(u, rm).le_abs(&old_n));
-        assert_eq!(-(-&old_n).shr_round(u, -rm), n);
-    };
+            assert!(n.shr_round(u, rm).le_abs(n));
+            assert_eq!(-(-n).shr_round(u, -rm), shifted);
+        },
+    );
 
-    // If n is divisible by 2^u, n.shr_round(u, rm) are equal for all rm.
-    let integer_and_u32 = |n: Integer, u: u32| {
-        let x = &n << u;
-        assert_eq!((&x).shr_round(u, RoundingMode::Down), n);
-        assert_eq!((&x).shr_round(u, RoundingMode::Up), n);
-        assert_eq!((&x).shr_round(u, RoundingMode::Floor), n);
-        assert_eq!((&x).shr_round(u, RoundingMode::Ceiling), n);
-        assert_eq!((&x).shr_round(u, RoundingMode::Nearest), n);
-        assert_eq!((&x).shr_round(u, RoundingMode::Exact), n);
-    };
+    test_properties(pairs_of_integer_and_small_u32, |&(ref n, u)| {
+        let left_shifted = n << u;
+        assert_eq!((&left_shifted).shr_round(u, RoundingMode::Down), *n);
+        assert_eq!((&left_shifted).shr_round(u, RoundingMode::Up), *n);
+        assert_eq!((&left_shifted).shr_round(u, RoundingMode::Floor), *n);
+        assert_eq!((&left_shifted).shr_round(u, RoundingMode::Ceiling), *n);
+        assert_eq!((&left_shifted).shr_round(u, RoundingMode::Nearest), *n);
+        assert_eq!((&left_shifted).shr_round(u, RoundingMode::Exact), *n);
+    });
 
-    // Rounding a non-negative number using Down or Floor is equivalent, as is using Up or Ceiling.
-    // Rounding a non-positive number using Down or Ceiling is equivalent, as is using Up or Floor.
-    // When the shift is inexact, rounding using Ceiling yields a value 1 larger than using Floor.
-    // Using Nearest gives a value that is equal to either that produced by rounding Floor or that
-    // produced by rounding Ceiling.
     // TODO test using Rationals
-    let integer_and_u32_inexact = |n: Integer, u: u32| {
-        let floor = (&n).shr_round(u, RoundingMode::Floor);
+    test_properties(pairs_of_integer_and_small_u32_var_2, |&(ref n, u)| {
+        let floor = n.shr_round(u, RoundingMode::Floor);
         let ceiling = &floor + 1;
-        assert_eq!((&n).shr_round(u, RoundingMode::Ceiling), ceiling);
-        if n > 0 {
-            assert_eq!((&n).shr_round(u, RoundingMode::Up), ceiling);
-            assert_eq!((&n).shr_round(u, RoundingMode::Down), floor);
+        assert_eq!(n.shr_round(u, RoundingMode::Ceiling), ceiling);
+        if *n >= 0 {
+            assert_eq!(n.shr_round(u, RoundingMode::Up), ceiling);
+            assert_eq!(n.shr_round(u, RoundingMode::Down), floor);
         } else {
-            assert_eq!((&n).shr_round(u, RoundingMode::Up), floor);
-            assert_eq!((&n).shr_round(u, RoundingMode::Down), ceiling);
+            assert_eq!(n.shr_round(u, RoundingMode::Up), floor);
+            assert_eq!(n.shr_round(u, RoundingMode::Down), ceiling);
         }
-        let nearest = (&n).shr_round(u, RoundingMode::Nearest);
+        let nearest = n.shr_round(u, RoundingMode::Nearest);
         assert!(nearest == floor || nearest == ceiling);
-    };
+    });
 
-    // if i > 0 and j >= 31, i.shr_round(j, Down) == 0
-    // if i > 0 and j >= 31, i.shr_round(j, Floor) == 0
-    // if i > 0 and j >= 31, i.shr_round(j, Up) == 1
-    // if i > 0 and j >= 31, i.shr_round(j, Ceiling) == 1
-    // if i > 0 and j >= 32, i.shr_round(j, Nearest) == 0
-    let positive_i32_and_u32 = |i: i32, j: u32| {
-        assert_eq!(Integer::from(i).shr_round(j + 31, RoundingMode::Down), 0);
-        assert_eq!(Integer::from(i).shr_round(j + 31, RoundingMode::Floor), 0);
-        assert_eq!(Integer::from(i).shr_round(j + 31, RoundingMode::Up), 1);
-        assert_eq!(Integer::from(i).shr_round(j + 31, RoundingMode::Ceiling), 1);
-        assert_eq!(Integer::from(i).shr_round(j + 32, RoundingMode::Nearest), 0);
-    };
+    test_properties(
+        pairs_of_positive_signed_and_small_u32,
+        |&(i, u): &(i32, u32)| {
+            assert_eq!(
+                Integer::from(i).shr_round(u + u32::WIDTH - 1, RoundingMode::Down),
+                0
+            );
+            assert_eq!(
+                Integer::from(i).shr_round(u + u32::WIDTH - 1, RoundingMode::Floor),
+                0
+            );
+            assert_eq!(
+                Integer::from(i).shr_round(u + u32::WIDTH - 1, RoundingMode::Up),
+                1
+            );
+            assert_eq!(
+                Integer::from(i).shr_round(u + u32::WIDTH - 1, RoundingMode::Ceiling),
+                1
+            );
+            assert_eq!(
+                Integer::from(i).shr_round(u + u32::WIDTH, RoundingMode::Nearest),
+                0
+            );
+        },
+    );
 
-    // if -2^31 < i < 0 and j >= 31, i.shr_round(j, Down) == 0
-    // if -2^31 < i < 0 and j >= 31, i.shr_round(j, Floor) == -1
-    // if -2^31 < i < 0 and j >= 31, i.shr_round(j, Up) == -1
-    // if -2^31 < i < 0 and j >= 31, i.shr_round(j, Ceiling) == 0
-    // if -2^31 < i < 0 and j >= 32, i.shr_round(j, Nearest) == 0
-    let negative_not_min_i32_and_u32 = |i: i32, j: u32| {
-        assert_eq!(Integer::from(i).shr_round(j + 31, RoundingMode::Down), 0);
-        assert_eq!(Integer::from(i).shr_round(j + 31, RoundingMode::Floor), -1);
-        assert_eq!(Integer::from(i).shr_round(j + 31, RoundingMode::Up), -1);
-        assert_eq!(Integer::from(i).shr_round(j + 31, RoundingMode::Ceiling), 0);
-        assert_eq!(Integer::from(i).shr_round(j + 32, RoundingMode::Nearest), 0);
-    };
+    test_properties(
+        pairs_of_negative_signed_not_min_and_small_u32s,
+        |&(i, u): &(i32, u32)| {
+            assert_eq!(
+                Integer::from(i).shr_round(u + u32::WIDTH - 1, RoundingMode::Down),
+                0
+            );
+            assert_eq!(
+                Integer::from(i).shr_round(u + u32::WIDTH - 1, RoundingMode::Floor),
+                -1
+            );
+            assert_eq!(
+                Integer::from(i).shr_round(u + u32::WIDTH - 1, RoundingMode::Up),
+                -1
+            );
+            assert_eq!(
+                Integer::from(i).shr_round(u + u32::WIDTH - 1, RoundingMode::Ceiling),
+                0
+            );
+            assert_eq!(
+                Integer::from(i).shr_round(u + u32::WIDTH, RoundingMode::Nearest),
+                0
+            );
+        },
+    );
 
-    // n.shr_round(0, rm) == n
     #[allow(unknown_lints, identity_op)]
-    let integer_and_rounding_mode = |n: Integer, rm: RoundingMode| {
-        assert_eq!((&n).shr_round(0u32, rm), n);
-    };
+    test_properties(pairs_of_integer_and_rounding_mode, |&(ref n, rm)| {
+        assert_eq!(n.shr_round(0u32, rm), *n);
+    });
 
-    // 0.shr_round(u, rm) == 0
-    let u32_and_rounding_mode = |u: u32, rm: RoundingMode| {
-        assert_eq!(Integer::ZERO.shr_round(u, rm), 0);
-    };
-
-    for (n, u) in pairs_of_integer_and_small_u32(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        integer_and_u32(n, u);
-    }
-
-    for (n, u) in pairs_of_integer_and_small_u32(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        integer_and_u32(n, u);
-    }
-
-    for (n, u) in pairs_of_integer_and_small_u32_var_2(GenerationMode::Exhaustive).take(LARGE_LIMIT)
-    {
-        integer_and_u32_inexact(n, u);
-    }
-
-    for (n, u) in pairs_of_integer_and_small_u32_var_2(GenerationMode::Random(32)).take(LARGE_LIMIT)
-    {
-        integer_and_u32_inexact(n, u);
-    }
-
-    for (n, u, rm) in triples_of_integer_small_u32_and_rounding_mode_var_1(
-        GenerationMode::Exhaustive,
-    ).take(LARGE_LIMIT)
-    {
-        integer_u32_and_rounding_mode(n, u, rm);
-    }
-
-    for (n, u, rm) in triples_of_integer_small_u32_and_rounding_mode_var_1(GenerationMode::Random(
-        32,
-    )).take(LARGE_LIMIT)
-    {
-        integer_u32_and_rounding_mode(n, u, rm);
-    }
-
-    for (n, u) in
-        pairs_of_positive_signed_and_small_u32(GenerationMode::Exhaustive).take(LARGE_LIMIT)
-    {
-        positive_i32_and_u32(n, u);
-    }
-
-    for (n, u) in
-        pairs_of_positive_signed_and_small_u32(GenerationMode::Random(32)).take(LARGE_LIMIT)
-    {
-        positive_i32_and_u32(n, u);
-    }
-
-    for (n, u) in pairs_of_negative_signed_not_min_and_small_u32s(GenerationMode::Exhaustive)
-        .take(LARGE_LIMIT)
-    {
-        negative_not_min_i32_and_u32(n, u);
-    }
-
-    for (n, u) in pairs_of_negative_signed_not_min_and_small_u32s(GenerationMode::Random(32))
-        .take(LARGE_LIMIT)
-    {
-        negative_not_min_i32_and_u32(n, u);
-    }
-
-    for (n, rm) in pairs_of_integer_and_rounding_mode(GenerationMode::Exhaustive).take(LARGE_LIMIT)
-    {
-        integer_and_rounding_mode(n, rm);
-    }
-
-    for (n, rm) in pairs_of_integer_and_rounding_mode(GenerationMode::Random(32)).take(LARGE_LIMIT)
-    {
-        integer_and_rounding_mode(n, rm);
-    }
-
-    for (u, rm) in pairs_of_unsigned_and_rounding_mode(GenerationMode::Exhaustive).take(LARGE_LIMIT)
-    {
-        u32_and_rounding_mode(u, rm);
-    }
-
-    for (u, rm) in pairs_of_unsigned_and_rounding_mode(GenerationMode::Random(32)).take(LARGE_LIMIT)
-    {
-        u32_and_rounding_mode(u, rm);
-    }
+    test_properties(
+        pairs_of_unsigned_and_rounding_mode,
+        |&(u, rm): &(u32, RoundingMode)| {
+            assert_eq!(Integer::ZERO.shr_round(u, rm), 0);
+        },
+    );
 }

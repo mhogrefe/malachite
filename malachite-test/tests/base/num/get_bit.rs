@@ -1,6 +1,5 @@
-use common::LARGE_LIMIT;
+use common::test_properties;
 use malachite_base::num::{PrimitiveInteger, PrimitiveSigned, PrimitiveUnsigned};
-use malachite_test::common::GenerationMode;
 use malachite_test::inputs::base::{unsigneds, pairs_of_signed_and_small_u64,
                                    pairs_of_unsigned_and_small_u64};
 
@@ -58,65 +57,33 @@ pub fn test_get_bit() {
 }
 
 fn get_bit_properties_helper_unsigned<T: 'static + PrimitiveUnsigned>() {
-    // if index >= T::WIDTH, !n.get_bit(index)
-    // if index < T::WIDTH, n.get_bit(index) = !(!n).get_bit(index)
-    let unsigned_and_u64 = |n: T, index: u64| {
+    test_properties(pairs_of_unsigned_and_small_u64, |&(n, index): &(T, u64)| {
         let bit = n.get_bit(index);
         if index >= u64::from(T::WIDTH) {
             assert!(!bit);
         } else {
             assert_eq!(bit, !(!n).get_bit(index));
         }
-    };
+    });
 
-    // !n.get_bit(n.significant_bits())
-    // if n != 0, n.get_bit(n.significant_bits() - 1)
-    let one_unsigned = |n: T| {
+    test_properties(unsigneds, |&n: &T| {
         let significant_bits = n.significant_bits();
         assert!(!n.get_bit(significant_bits));
         if n != T::ZERO {
             assert!(n.get_bit(significant_bits - 1));
         }
-    };
-
-    for (n, index) in pairs_of_unsigned_and_small_u64(GenerationMode::Exhaustive).take(LARGE_LIMIT)
-    {
-        unsigned_and_u64(n, index);
-    }
-
-    for (n, index) in pairs_of_unsigned_and_small_u64(GenerationMode::Random(32)).take(LARGE_LIMIT)
-    {
-        unsigned_and_u64(n, index);
-    }
-
-    for n in unsigneds(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        one_unsigned(n);
-    }
-
-    for n in unsigneds(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        one_unsigned(n);
-    }
+    });
 }
 
 fn get_bit_properties_helper_signed<T: 'static + PrimitiveSigned>() {
-    // if index >= T::WIDTH, n.get_bit(index) == (n < 0)
-    // if index < T::WIDTH, n.get_bit(index) = !(!n).get_bit(index)
-    let signed_and_u64 = |n: T, index: u64| {
+    test_properties(pairs_of_signed_and_small_u64, |&(n, index): &(T, u64)| {
         let bit = n.get_bit(index);
         if index >= u64::from(T::WIDTH) {
             assert_eq!(bit, n < T::ZERO);
         } else {
             assert_eq!(bit, !(!n).get_bit(index));
         }
-    };
-
-    for (n, index) in pairs_of_signed_and_small_u64(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        signed_and_u64(n, index);
-    }
-
-    for (n, index) in pairs_of_signed_and_small_u64(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        signed_and_u64(n, index);
-    }
+    });
 }
 
 #[test]

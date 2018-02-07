@@ -1,7 +1,7 @@
-use common::LARGE_LIMIT;
-use malachite_base::num::SignificantBits;
+use common::test_properties;
+use malachite_base::num::{PrimitiveInteger, SignificantBits};
 use malachite_nz::natural::Natural;
-use malachite_test::common::{natural_to_rug_integer, GenerationMode};
+use malachite_test::common::natural_to_rug_integer;
 use malachite_test::inputs::natural::naturals;
 use rug;
 use std::str::FromStr;
@@ -35,44 +35,23 @@ fn test_to_u32_wrapping() {
 
 #[test]
 fn to_u32_properties() {
-    // x.to_u32() is equivalent for malachite and rug.
-    // if x < 2^32, from(x.to_u32().unwrap()) == x
-    // if x < 2^32, x.to_u32() == Some(x.to_u32_wrapping())
-    // if x >= 2^32, x.to_u32().is_none()
-    let one_natural = |x: Natural| {
+    test_properties(naturals, |x| {
         let result = x.to_u32();
-        assert_eq!(natural_to_rug_integer(&x).to_u32(), result);
-        if x.significant_bits() <= 32 {
-            assert_eq!(Natural::from(result.unwrap()), x);
+        assert_eq!(natural_to_rug_integer(x).to_u32(), result);
+        if x.significant_bits() <= u64::from(u32::WIDTH) {
+            assert_eq!(Natural::from(result.unwrap()), *x);
             assert_eq!(result, Some(x.to_u32_wrapping()));
         } else {
             assert!(result.is_none());
         }
-    };
-
-    for n in naturals(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        one_natural(n);
-    }
-
-    for n in naturals(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        one_natural(n);
-    }
+    });
 }
 
 #[test]
 fn to_u32_wrapping_properties() {
-    // x.to_u32_wrapping() is equivalent for malachite and rug.
     // TODO relate with BitAnd
-    let one_natural = |x: Natural| {
+    test_properties(naturals, |x| {
         let result = x.to_u32_wrapping();
-        assert_eq!(natural_to_rug_integer(&x).to_u32_wrapping(), result);
-    };
-
-    for n in naturals(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        one_natural(n);
-    }
-
-    for n in naturals(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        one_natural(n);
-    }
+        assert_eq!(natural_to_rug_integer(x).to_u32_wrapping(), result);
+    });
 }

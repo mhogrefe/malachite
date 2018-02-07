@@ -1,8 +1,7 @@
-use common::LARGE_LIMIT;
+use common::test_properties;
 use malachite_base::num::{One, Zero};
 use malachite_base::num::{SubMul, SubMulAssign};
 use malachite_nz::natural::Natural;
-use malachite_test::common::GenerationMode;
 use malachite_test::inputs::natural::{naturals, pairs_of_natural_and_unsigned, pairs_of_naturals,
                                       triples_of_natural_natural_and_unsigned};
 use std::str::FromStr;
@@ -95,87 +94,46 @@ fn test_sub_mul_u32() {
 
 #[test]
 fn sub_mul_u32_properties() {
-    // a.sub_mul_assign(&b, c); a is valid.
-    // a.sub_mul(&b, c) is valid.
-    // (&a).sub_mul(&b, c) is valid.
-    // a.sub_mul_assign(&b, c), a.sub_mul(&b, c), and (&a).sub_mul(&b, c) give the same result.
-    // a.sub_mul(&b, c) is equivalent to a - b * c.
-    // a.sub_mul(&b, c) is equivalent to a.sub_mul(&b, Natural::from(c))
-    let natural_natural_and_u32 = |mut a: Natural, b: Natural, c: u32| {
-        let old_a = a.clone();
-        if a >= &b * c {
-            a.sub_mul_assign(&b, c);
-            assert!(a.is_valid());
-        }
-        let oa = if old_a >= &b * c { Some(a) } else { None };
+    test_properties(
+        triples_of_natural_natural_and_unsigned,
+        |&(ref a, ref b, c): &(Natural, Natural, u32)| {
+            let result = if *a >= b * c {
+                let mut mut_a = a.clone();
+                mut_a.sub_mul_assign(b, c);
+                assert!(mut_a.is_valid());
+                Some(mut_a)
+            } else {
+                None
+            };
 
-        let a2 = old_a.clone();
-        let result = (&a2).sub_mul(&b, c);
-        assert!(result.clone().map_or(true, |n| n.is_valid()));
-        assert_eq!(result, oa);
+            let result_alt = a.sub_mul(b, c);
+            assert!(result_alt.as_ref().map_or(true, |n| n.is_valid()));
+            assert_eq!(result_alt, result);
 
-        let result = a2.sub_mul(&b, c);
-        assert!(result.clone().map_or(true, |n| n.is_valid()));
-        assert_eq!(result, oa);
+            let result_alt = a.clone().sub_mul(b, c);
+            assert!(result_alt.as_ref().map_or(true, |n| n.is_valid()));
+            assert_eq!(result_alt, result);
 
-        assert_eq!(&old_a - &(&b * c), oa);
-        assert_eq!(old_a.sub_mul(&b, &Natural::from(c)), result);
-    };
+            assert_eq!(a - &(b * c), result);
+            assert_eq!(a.sub_mul(b, &Natural::from(c)), result);
+        },
+    );
 
-    // n.sub_mul(n, 1) == 0
-    let single_natural = |n: &Natural| {
+    test_properties(naturals, |n| {
         assert_eq!(n.sub_mul(n, 1), Some(Natural::ZERO));
-    };
+    });
 
-    // n.sub_mul(0, c) == Some(n)
-    // n.sub_mul(1, c) == n - c
-    // (n * c).sub_mul(n, c) == 0
-    let natural_and_u32 = |n: &Natural, c: u32| {
-        assert_eq!(n.sub_mul(&Natural::ZERO, c), Some(n.clone()));
-        assert_eq!(n.sub_mul(&Natural::ONE, c), n - c);
-        assert_eq!((n * c).sub_mul(n, c), Some(Natural::ZERO));
-    };
+    test_properties(
+        pairs_of_natural_and_unsigned,
+        |&(ref n, c): &(Natural, u32)| {
+            assert_eq!(n.sub_mul(&Natural::ZERO, c).as_ref(), Some(n));
+            assert_eq!(n.sub_mul(&Natural::ONE, c), n - c);
+            assert_eq!((n * c).sub_mul(n, c), Some(Natural::ZERO));
+        },
+    );
 
-    // a.sub_mul(b, 0) == Some(a)
-    // a.sub_mul(b, 1) == a - b
-    let two_naturals = |a: &Natural, b: &Natural| {
-        assert_eq!(a.sub_mul(b, 0), Some(a.clone()));
+    test_properties(pairs_of_naturals, |&(ref a, ref b)| {
+        assert_eq!(a.sub_mul(b, 0).as_ref(), Some(a));
         assert_eq!(a.sub_mul(b, 1), a - b);
-    };
-
-    for (a, b, c) in
-        triples_of_natural_natural_and_unsigned(GenerationMode::Exhaustive).take(LARGE_LIMIT)
-    {
-        natural_natural_and_u32(a, b, c);
-    }
-
-    for (a, b, c) in
-        triples_of_natural_natural_and_unsigned(GenerationMode::Random(32)).take(LARGE_LIMIT)
-    {
-        natural_natural_and_u32(a, b, c);
-    }
-
-    for n in naturals(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        single_natural(&n);
-    }
-
-    for n in naturals(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        single_natural(&n);
-    }
-
-    for (n, c) in pairs_of_natural_and_unsigned(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        natural_and_u32(&n, c);
-    }
-
-    for (n, c) in pairs_of_natural_and_unsigned(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        natural_and_u32(&n, c);
-    }
-
-    for (a, b) in pairs_of_naturals(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        two_naturals(&a, &b);
-    }
-
-    for (a, b) in pairs_of_naturals(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        two_naturals(&a, &b);
-    }
+    });
 }

@@ -1,6 +1,5 @@
-use common::LARGE_LIMIT;
+use common::test_properties;
 use malachite_nz::natural::Natural;
-use malachite_test::common::GenerationMode;
 use malachite_test::inputs::base::vecs_of_unsigned;
 
 #[test]
@@ -44,11 +43,7 @@ fn test_from_limbs_be() {
 
 #[test]
 fn from_limbs_le_properties() {
-    // (Natural::from_limbs_le(limbs) == x) ==
-    //      (x.limbs_le() == limbs.rev().skip_while(|u| u == 0).rev())
-    // Natural::from_limbs_le(limbs.reverse()) == Natural::from_limbs_be(limbs)
-    // if !limbs.is_empty() and limbs.last() != 0, Natural::from_limbs_le(limbs).limbs_le() == x
-    let u32_slice = |limbs: &[u32]| {
+    test_properties(vecs_of_unsigned, |limbs: &Vec<u32>| {
         let x = Natural::from_limbs_le(limbs);
         let mut trimmed_limbs: Vec<u32> = limbs
             .iter()
@@ -63,25 +58,14 @@ fn from_limbs_le_properties() {
             x
         );
         if !limbs.is_empty() && *limbs.last().unwrap() != 0 {
-            assert_eq!(&x.to_limbs_le()[..], limbs);
+            assert_eq!(x.to_limbs_le(), *limbs);
         }
-    };
-
-    for xs in vecs_of_unsigned(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        u32_slice(&xs);
-    }
-
-    for xs in vecs_of_unsigned(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        u32_slice(&xs);
-    }
+    });
 }
 
 #[test]
 fn from_limbs_be_properties() {
-    // (Natural::from_limbs_be(limbs) == x) == (x.limbs_be() == limbs.skip_while(|u| u == 0))
-    // Natural::from_limbs_be(limbs.reverse()) == Natural::from_limbs_le(limbs)
-    // if !limbs.is_empty() and limbs[0] != 0, Natural::from_limbs_be(limbs).limbs_le() == x
-    let u32_slice = |limbs: &[u32]| {
+    test_properties(vecs_of_unsigned, |limbs: &Vec<u32>| {
         let x = Natural::from_limbs_be(limbs);
         assert_eq!(
             x.to_limbs_be(),
@@ -96,15 +80,7 @@ fn from_limbs_be_properties() {
             x
         );
         if !limbs.is_empty() && limbs[0] != 0 {
-            assert_eq!(&x.to_limbs_be()[..], limbs);
+            assert_eq!(x.to_limbs_be(), *limbs);
         }
-    };
-
-    for xs in vecs_of_unsigned(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        u32_slice(&xs);
-    }
-
-    for xs in vecs_of_unsigned(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        u32_slice(&xs);
-    }
+    });
 }

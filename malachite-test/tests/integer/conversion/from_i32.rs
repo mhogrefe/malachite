@@ -1,6 +1,6 @@
-use common::LARGE_LIMIT;
+use common::test_properties;
 use malachite_nz::integer::Integer;
-use malachite_test::common::{bigint_to_integer, rug_integer_to_integer, GenerationMode};
+use malachite_test::common::{bigint_to_integer, rug_integer_to_integer};
 use malachite_test::inputs::base::signeds;
 use num::BigInt;
 use rug;
@@ -26,24 +26,12 @@ fn test_from_i32() {
 
 #[test]
 fn from_i32_properties() {
-    // from(i: i32) is valid.
-    // from(i: i32) is equivalent for malachite, num, and rug.
-    // from(i: i32).to_i32() == Some(i)
-    let one_i32 = |i: i32| {
+    test_properties(signeds, |&i: &i32| {
         let n = Integer::from(i);
-        let num_n = bigint_to_integer(&BigInt::from(i));
-        let rug_n = rug_integer_to_integer(&rug::Integer::from(i));
         assert!(n.is_valid());
         assert_eq!(n.to_i32(), Some(i));
-        assert_eq!(n, num_n);
-        assert_eq!(n, rug_n);
-    };
 
-    for i in signeds::<i32>(GenerationMode::Exhaustive).take(LARGE_LIMIT) {
-        one_i32(i);
-    }
-
-    for i in signeds::<i32>(GenerationMode::Random(32)).take(LARGE_LIMIT) {
-        one_i32(i);
-    }
+        assert_eq!(bigint_to_integer(&BigInt::from(i)), n);
+        assert_eq!(rug_integer_to_integer(&rug::Integer::from(i)), n);
+    });
 }

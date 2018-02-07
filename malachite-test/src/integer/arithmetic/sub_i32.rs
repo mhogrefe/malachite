@@ -5,9 +5,8 @@ use num::BigInt;
 use rug;
 use rust_wheels::benchmarks::{BenchmarkOptions2, BenchmarkOptions3, benchmark_2, benchmark_3};
 
-pub fn num_sub_i32(mut x: BigInt, i: i32) -> BigInt {
-    x = x - BigInt::from(i);
-    x
+pub fn num_sub_i32(x: BigInt, i: i32) -> BigInt {
+    x - BigInt::from(i)
 }
 
 pub fn demo_integer_sub_assign_i32(gm: GenerationMode, limit: usize) {
