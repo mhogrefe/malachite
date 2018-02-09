@@ -1,3 +1,4 @@
+#[allow(unknown_lints, const_static_lifetime)]
 pub trait Named {
     const NAME: &'static str;
 }

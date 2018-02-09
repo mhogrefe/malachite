@@ -1,4 +1,4 @@
-use malachite_base::num::make_u64;
+use malachite_base::num::JoinHalves;
 use natural::Natural::{self, Large, Small};
 
 impl Natural {
@@ -20,7 +20,7 @@ impl Natural {
     pub fn to_u64(&self) -> Option<u64> {
         match *self {
             Small(small) => Some(small.into()),
-            Large(ref limbs) if limbs.len() == 2 => Some(make_u64(limbs[1], limbs[0])),
+            Large(ref limbs) if limbs.len() == 2 => Some(u64::join_halves(limbs[1], limbs[0])),
             Large(_) => None,
         }
     }
@@ -44,7 +44,7 @@ impl Natural {
     pub fn to_u64_wrapping(&self) -> u64 {
         match *self {
             Small(small) => small.into(),
-            Large(ref limbs) => make_u64(limbs[1], limbs[0]),
+            Large(ref limbs) => u64::join_halves(limbs[1], limbs[0]),
         }
     }
 }

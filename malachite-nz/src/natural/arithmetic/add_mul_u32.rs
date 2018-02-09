@@ -1,4 +1,4 @@
-use malachite_base::num::get_lower;
+use malachite_base::num::SplitInHalf;
 use malachite_base::num::{AddMul, AddMulAssign};
 use natural::arithmetic::add_u32::mpn_add_1_in_place;
 use natural::LIMB_BITS;
@@ -14,7 +14,7 @@ pub fn mpn_addmul_1(r: &mut [u32], s1: &[u32], s2limb: u32) -> u32 {
     let s2limb_u64 = u64::from(s2limb);
     for i in 0..s1_len {
         let limb_result = u64::from(r[i]) + u64::from(s1[i]) * s2limb_u64 + carry;
-        r[i] = get_lower(limb_result);
+        r[i] = limb_result.lower_half();
         carry = limb_result >> LIMB_BITS;
     }
     carry as u32

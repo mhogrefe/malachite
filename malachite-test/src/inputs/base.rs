@@ -39,6 +39,15 @@ pub fn signeds<T: 'static + PrimitiveSigned>(gm: GenerationMode) -> It<T> {
     }
 }
 
+pub fn pairs_of_unsigneds<T: 'static + PrimitiveUnsigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (T, T)>> {
+    match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_pairs_from_single(exhaustive_u())),
+        GenerationMode::Random(_) => Box::new(random_pairs_from_single(random_x(&EXAMPLE_SEED))),
+    }
+}
+
 pub fn u32s_range_1(gm: GenerationMode) -> It<u32> {
     match gm {
         GenerationMode::Exhaustive => Box::new(range_increasing_x(0, NUMBER_OF_CHARS - 1)),

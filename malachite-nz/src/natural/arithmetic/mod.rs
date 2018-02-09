@@ -1,4 +1,4 @@
-use malachite_base::num::make_u64;
+use malachite_base::num::JoinHalves;
 use natural::Natural::{self, Small};
 
 impl Natural {
@@ -20,7 +20,7 @@ impl Natural {
             for i_rev in 0..xs_len {
                 let i = xs_len - i_rev - 1;
                 let lower = xs[i];
-                let x = make_u64(upper, lower);
+                let x = u64::join_halves(upper, lower);
                 let op_u64 = u64::from(op);
                 let q = (x / op_u64) as u32;
                 xs[i] = q;

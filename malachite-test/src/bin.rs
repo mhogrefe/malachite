@@ -8,8 +8,12 @@ use malachite_test::base::num::assign_bit::*;
 use malachite_test::base::num::clear_bit::*;
 use malachite_test::base::num::flip_bit::*;
 use malachite_test::base::num::get_bit::*;
+use malachite_test::base::num::join_halves::*;
+use malachite_test::base::num::lower_half::*;
 use malachite_test::base::num::set_bit::*;
 use malachite_test::base::num::significant_bits::*;
+use malachite_test::base::num::split_in_half::*;
+use malachite_test::base::num::upper_half::*;
 use malachite_test::base::rounding_mode::clone::*;
 use malachite_test::base::rounding_mode::eq::*;
 use malachite_test::base::rounding_mode::hash::*;
@@ -263,6 +267,12 @@ demos_and_benchmarks!(
         demo_i16_get_bit,
         demo_i32_get_bit,
         demo_i64_get_bit,
+        demo_u16_join_halves,
+        demo_u32_join_halves,
+        demo_u64_join_halves,
+        demo_u16_lower_half,
+        demo_u32_lower_half,
+        demo_u64_lower_half,
         demo_u8_set_bit,
         demo_u16_set_bit,
         demo_u32_set_bit,
@@ -279,6 +289,12 @@ demos_and_benchmarks!(
         demo_i16_significant_bits,
         demo_i32_significant_bits,
         demo_i64_significant_bits,
+        demo_u16_split_in_half,
+        demo_u32_split_in_half,
+        demo_u64_split_in_half,
+        demo_u16_upper_half,
+        demo_u32_upper_half,
+        demo_u64_upper_half,
         demo_rounding_mode_clone,
         demo_rounding_mode_clone_from,
         demo_rounding_mode_eq,
@@ -628,6 +644,12 @@ demos_and_benchmarks!(
         benchmark_i16_get_bit,
         benchmark_i32_get_bit,
         benchmark_i64_get_bit,
+        benchmark_u16_join_halves,
+        benchmark_u32_join_halves,
+        benchmark_u64_join_halves,
+        benchmark_u16_lower_half,
+        benchmark_u32_lower_half,
+        benchmark_u64_lower_half,
         benchmark_u8_set_bit,
         benchmark_u16_set_bit,
         benchmark_u32_set_bit,
@@ -652,6 +674,12 @@ demos_and_benchmarks!(
         benchmark_i16_significant_bits,
         benchmark_i32_significant_bits,
         benchmark_i64_significant_bits,
+        benchmark_u16_split_in_half,
+        benchmark_u32_split_in_half,
+        benchmark_u64_split_in_half,
+        benchmark_u16_upper_half,
+        benchmark_u32_upper_half,
+        benchmark_u64_upper_half,
         benchmark_integer_from_i32,
         benchmark_integer_from_i64,
         benchmark_integer_from_u32,

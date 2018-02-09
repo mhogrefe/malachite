@@ -1,4 +1,4 @@
-use malachite_base::num::{get_lower, get_upper};
+use malachite_base::num::SplitInHalf;
 use malachite_base::num::{Assign, Zero};
 use natural::Natural::{self, Large, Small};
 use std::ops::{Mul, MulAssign};
@@ -12,8 +12,8 @@ pub fn mpn_mul_1(r: &mut [u32], s1: &[u32], s2limb: u32) -> u32 {
     let s2limb_u64 = u64::from(s2limb);
     for i in 0..s1_len {
         let limb_result = u64::from(s1[i]) * s2limb_u64 + u64::from(carry);
-        r[i] = get_lower(limb_result);
-        carry = get_upper(limb_result);
+        r[i] = limb_result.lower_half();
+        carry = limb_result.upper_half();
     }
     carry
 }
@@ -25,8 +25,8 @@ pub fn mpn_mul_1_in_place(s1: &mut [u32], s2limb: u32) -> u32 {
     let s2limb_u64 = u64::from(s2limb);
     for limb in s1.iter_mut() {
         let limb_result = u64::from(*limb) * s2limb_u64 + u64::from(carry);
-        *limb = get_lower(limb_result);
-        carry = get_upper(limb_result);
+        *limb = limb_result.lower_half();
+        carry = limb_result.upper_half();
     }
     carry
 }
@@ -37,8 +37,8 @@ pub(crate) fn mpn_mul_1c(r: &mut [u32], s1: &[u32], s2limb: u32, mut carry: u32)
     let s2limb_u64 = u64::from(s2limb);
     for i in 0..s1_len {
         let limb_result = u64::from(s1[i]) * s2limb_u64 + u64::from(carry);
-        r[i] = get_lower(limb_result);
-        carry = get_upper(limb_result);
+        r[i] = limb_result.lower_half();
+        carry = limb_result.upper_half();
     }
     carry
 }
@@ -109,8 +109,7 @@ impl<'a> Mul<u32> for &'a Natural {
         match *self {
             Small(small) => {
                 let product = u64::from(small) * u64::from(other);
-                let lower = get_lower(product);
-                let upper = get_upper(product);
+                let (upper, lower) = product.split_in_half();
                 if upper == 0 {
                     Small(lower)
                 } else {

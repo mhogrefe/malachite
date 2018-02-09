@@ -18,9 +18,13 @@ pub mod base {
         pub mod assign_bit;
         pub mod clear_bit;
         pub mod flip_bit;
+        pub mod join_halves;
         pub mod get_bit;
+        pub mod lower_half;
         pub mod set_bit;
         pub mod significant_bits;
+        pub mod split_in_half;
+        pub mod upper_half;
     }
     pub mod rounding_mode {
         pub mod clone;

@@ -1,4 +1,4 @@
-use malachite_base::num::{get_lower, get_upper};
+use malachite_base::num::SplitInHalf;
 use malachite_base::num::{SubMul, SubMulAssign};
 use natural::arithmetic::sub_u32::{mpn_sub_1_in_place, sub_assign_u32_helper};
 use natural::Natural::{self, Large, Small};
@@ -13,8 +13,8 @@ pub fn mpn_submul_1(r: &mut [u32], s1: &[u32], s2limb: u32) -> u32 {
     let s2limb_u64 = u64::from(s2limb);
     for i in 0..s1_len {
         let product = u64::from(s1[i]) * s2limb_u64;
-        let upper = get_upper(product);
-        let mut lower = get_lower(product);
+        let upper = product.upper_half();
+        let mut lower = product.lower_half();
         lower = lower.wrapping_add(borrow);
         if lower < borrow {
             borrow = upper.wrapping_add(1);

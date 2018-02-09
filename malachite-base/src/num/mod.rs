@@ -1,7 +1,9 @@
 use misc::{Named, Walkable};
 use rand::distributions::range::SampleRange;
 use rand::Rand;
+use round::RoundingMode;
 use std;
+use std::cmp::Ordering;
 use std::fmt::{Debug, Display};
 use std::hash::Hash;
 use std::ops::*;
@@ -46,7 +48,9 @@ pub trait PrimitiveInteger
 }
 
 //TODO docs
-pub trait PrimitiveUnsigned: PrimitiveInteger + SignificantBits {}
+pub trait PrimitiveUnsigned: PrimitiveInteger + SignificantBits {
+    fn to_u64(&self) -> u64;
+}
 
 //TODO docs
 pub trait PrimitiveSigned: PrimitiveInteger + NegativeOne {
@@ -194,9 +198,6 @@ macro_rules! unsigned_traits {
                 (Self::WIDTH - self.leading_zeros()).into()
             }
         }
-
-        //TODO docs
-        impl PrimitiveUnsigned for $t {}
 
         /// Provides functions for accessing and modifying the `index`th bit of a primitive unsigned
         /// integer, or the coefficient of 2^<pow>`index`</pow> in its binary expansion.
@@ -527,6 +528,31 @@ macro_rules! signed_traits {
     }
 }
 
+//TODO docs
+impl PrimitiveUnsigned for u8 {
+    fn to_u64(&self) -> u64 {
+        (*self).into()
+    }
+}
+
+impl PrimitiveUnsigned for u16 {
+    fn to_u64(&self) -> u64 {
+        (*self).into()
+    }
+}
+
+impl PrimitiveUnsigned for u32 {
+    fn to_u64(&self) -> u64 {
+        (*self).into()
+    }
+}
+
+impl PrimitiveUnsigned for u64 {
+    fn to_u64(&self) -> u64 {
+        *self
+    }
+}
+
 unsigned_traits!(u8, 8, u, u as u8, u as u8);
 unsigned_traits!(u16, 16, u, u as u16, u as u16);
 unsigned_traits!(u32, 32, u, u, u as u32);
@@ -535,21 +561,6 @@ signed_traits!(i8, u8, 8, u, u as i8, u as i8, i, i as i8, i as i8);
 signed_traits!(i16, u16, 16, u, u as i16, u as i16, i, i as i16, i as i16);
 signed_traits!(i32, u32, 32, u, u as i32, u as i32, i, i, i as i32);
 signed_traits!(i64, u64, 64, u, u.into(), u as i64, i, i.into(), i);
-
-pub fn get_lower(val: u64) -> u32 {
-    val as u32
-}
-
-pub fn get_upper(val: u64) -> u32 {
-    (val >> 32) as u32
-}
-
-pub fn make_u64(upper: u32, lower: u32) -> u64 {
-    u64::from(upper) << 32 | u64::from(lower)
-}
-
-use round::RoundingMode;
-use std::cmp::Ordering;
 
 pub trait AbsAssign {
     fn abs_assign(&mut self);
@@ -757,6 +768,128 @@ pub trait SignificantBits {
     /// the functions' inputs can be bucketed based on their number of significant bits.
     fn significant_bits(&self) -> u64;
 }
+
+/// Associates with `Self` a type that's half `Self`'s size.
+pub trait HasHalf {
+    /// The type that's half the size of `Self`.
+    type Half;
+}
+
+/// Provides a function to join two pieces into a value. For example, two `u32`s may be joined to
+/// form a `u64`.
+pub trait JoinHalves: HasHalf {
+    /// Joins two values into a single value; the upper, or most significant half, comes first.
+    fn join_halves(upper: Self::Half, lower: Self::Half) -> Self;
+}
+
+/// Provides functions to split a value into two pieces. For example, a `u64` may be split into two
+/// `u32`s.
+pub trait SplitInHalf: HasHalf {
+    /// Extracts the lower, or least significant half, of `self`.
+    fn lower_half(&self) -> Self::Half;
+
+    /// Extracts the upper, or most significant half, of `self`.
+    fn upper_half(&self) -> Self::Half;
+
+    /// Extracts both halves of `self`; the upper, or most significant half, comes first.
+    ///
+    /// Time: worst case O(max(f(n), g(n))), where f(n) is the worst-case time complexity of
+    ///     `Self::lower_half` and g(n) is the worst-case time complexity of `Self::upper_half`.
+    ///
+    /// Additional memory: worst case O(max(f(n), g(n))), where f(n) is the worst-case
+    ///     additional-memory complexity of `Self::lower_half` and g(n) is the worst-case
+    ///     additional-memory complexity of `Self::upper_half.
+    ///
+    fn split_in_half(&self) -> (Self::Half, Self::Half) {
+        (self.upper_half(), self.lower_half())
+    }
+}
+
+/// Implements `JoinHalves` and `SplitInHalf` for unsigned primitive integers.
+macro_rules! impl_halves_unsigned {
+    ($t: ident, $ht: ident) => {
+        /// Implements `HasHalf` for unsigned primitive integers.
+        impl HasHalf for $t {
+            /// The primitive integer type whose width is half of `Self`.
+            type Half = $ht;
+        }
+
+        /// Implements `JoinHalves` for unsigned primitive integers.
+        impl JoinHalves for $t {
+            /// Joins two unsigned integers to form an unsigned integer with twice the width.
+            /// `join_halves(upper, lower)`, where `upper` and `lower` are integers with w bits,
+            /// yields an integer with 2w bits whose value is `upper` * 2<sup>w</sup> + `lower`.
+            ///
+            /// Time: worst case O(1)
+            ///
+            /// Additional memory: worst case O(1)
+            ///
+            /// # Examples
+            /// ```
+            /// use malachite_base::num::JoinHalves;
+            ///
+            /// assert_eq!(u16::join_halves(1, 2), 258);
+            /// assert_eq!(u32::join_halves(0xabcd, 0x1234), 0xabcd1234);
+            /// ```
+            fn join_halves(upper: Self::Half, lower: Self::Half) -> Self {
+                $t::from(upper) << $ht::WIDTH | $t::from(lower)
+            }
+        }
+
+        /// Implements `SplitInHalf` for unsigned primitive integers.
+        ///
+        /// # Examples
+        /// ```
+        /// use malachite_base::num::SplitInHalf;
+        ///
+        /// assert_eq!(258u16.split_in_half(), (1, 2));
+        /// assert_eq!(0xabcd1234u32.split_in_half(), (0xabcd, 0x1234));
+        /// ```
+        impl SplitInHalf for $t {
+            /// Extracts the lower, or least significant half, of and unsigned integer.
+            /// `n.lower_half()`, where `n` is an integer with w bits, yields an integer with w/2
+            /// bits whose value is `n` mod 2<sup>w/2</sup>.
+            ///
+            /// Time: worst case O(1)
+            ///
+            /// Additional memory: worst case O(1)
+            ///
+            /// # Examples
+            /// ```
+            /// use malachite_base::num::SplitInHalf;
+            ///
+            /// assert_eq!(258u16.lower_half(), 2);
+            /// assert_eq!(0xabcd1234u32.lower_half(), 0x1234);
+            /// ```
+            fn lower_half(&self) -> Self::Half {
+                *self as $ht
+            }
+
+            /// Extracts the upper, or most significant half, of and unsigned integer.
+            /// `n.upper_half()`, where `n` is an integer with w bits, yields an integer with w/2
+            /// bits whose value is floor(`n` / 2<sup>w/2</sup>).
+            ///
+            /// Time: worst case O(1)
+            ///
+            /// Additional memory: worst case O(1)
+            ///
+            /// # Examples
+            /// ```
+            /// use malachite_base::num::SplitInHalf;
+            ///
+            /// assert_eq!(258u16.upper_half(), 1);
+            /// assert_eq!(0xabcd1234u32.upper_half(), 0xabcd);
+            /// ```
+            fn upper_half(&self) -> Self::Half {
+                (self >> $ht::WIDTH) as $ht
+            }
+        }
+    }
+}
+
+impl_halves_unsigned!(u16, u8);
+impl_halves_unsigned!(u32, u16);
+impl_halves_unsigned!(u64, u32);
 
 pub trait ShlRound<RHS> {
     type Output;

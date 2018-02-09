@@ -1,4 +1,4 @@
-use malachite_base::num::{get_lower, get_upper};
+use malachite_base::num::SplitInHalf;
 use natural::Natural::{self, Large, Small};
 use std::u32;
 
@@ -19,7 +19,7 @@ impl From<u64> for Natural {
         if u <= u32::MAX.into() {
             Small(u as u32)
         } else {
-            Large(vec![get_lower(u), get_upper(u)])
+            Large(vec![u.lower_half(), u.upper_half()])
         }
     }
 }
