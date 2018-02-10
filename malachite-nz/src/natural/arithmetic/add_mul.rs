@@ -1,10 +1,10 @@
 use integer::arithmetic::add_mul_u32::mpz_aorsmul_1;
 use malachite_base::num::{AddMul, AddMulAssign};
+use malachite_base::limbs::limbs_test_zero;
 use natural::arithmetic::add::mpn_add_in_place;
 use natural::arithmetic::mul::mpn_mul;
 use natural::arithmetic::sub::{mpn_sub_aba, mpn_sub_in_place};
 use natural::comparison::ord::mpn_cmp_helper;
-use natural::mpn_zero_p;
 use natural::Natural::{self, Large, Small};
 use std::cmp::{max, Ordering};
 
@@ -526,7 +526,7 @@ pub(crate) fn mpz_aorsmul(
     } else {
         assert!(!mpn_sub_in_place(&mut w[0..wsize], &t[0..tsize]));
     }
-    if mpn_zero_p(w) {
+    if limbs_test_zero(w) {
         *w_sign = false;
     }
 }

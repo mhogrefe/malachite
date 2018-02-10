@@ -1,7 +1,7 @@
-use malachite_base::num::BitAccess;
+use malachite_base::limbs::limbs_test_zero;
+use malachite_base::num::{BitAccess, One, ShrRound, ShrRoundAssign, Zero};
 use malachite_base::round::RoundingMode;
-use malachite_base::num::{One, ShrRound, ShrRoundAssign, Zero};
-use natural::{delete_left, mpn_zero_p, LIMB_BITS, LIMB_BITS_MASK, LOG_LIMB_BITS};
+use natural::{delete_left, LIMB_BITS, LIMB_BITS_MASK, LOG_LIMB_BITS};
 use natural::Natural::{self, Large, Small};
 use std::ops::{Shr, ShrAssign};
 
@@ -329,7 +329,7 @@ impl<'a> ShrRound<u32> for &'a Natural {
                     if limbs_to_delete >= limbs.len() {
                         return Natural::ONE;
                     } else {
-                        let mut exact = mpn_zero_p(&limbs[0..limbs_to_delete]);
+                        let mut exact = limbs_test_zero(&limbs[0..limbs_to_delete]);
                         let small_shift = other & LIMB_BITS_MASK;
                         let mut result = limbs[limbs_to_delete..].to_vec();
                         if small_shift != 0 {
@@ -388,7 +388,7 @@ impl<'a> ShrRound<u32> for &'a Natural {
                                 return if limbs_to_delete >= limbs.len() {
                                     Natural::ONE
                                 } else {
-                                    let mut exact = mpn_zero_p(&limbs[0..limbs_to_delete]);
+                                    let mut exact = limbs_test_zero(&limbs[0..limbs_to_delete]);
                                     let small_shift = other & LIMB_BITS_MASK;
                                     let mut result = limbs[limbs_to_delete..].to_vec();
                                     if small_shift != 0 {

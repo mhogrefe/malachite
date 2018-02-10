@@ -14,6 +14,10 @@ pub mod base {
         pub mod decrement;
         pub mod increment;
     }
+    pub mod limbs {
+        pub mod limbs_set_zero;
+        pub mod limbs_test_zero;
+    }
     pub mod num {
         pub mod assign_bit;
         pub mod clear_bit;

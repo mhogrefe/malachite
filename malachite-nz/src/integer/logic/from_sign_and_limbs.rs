@@ -1,4 +1,5 @@
 use integer::Integer;
+use malachite_base::limbs::limbs_test_zero;
 use malachite_base::num::Zero;
 use natural::Natural;
 use std::cmp::Ordering;
@@ -40,7 +41,7 @@ impl Integer {
     /// ```
     pub fn from_sign_and_limbs_le(sign: Ordering, limbs: &[u32]) -> Integer {
         assert_eq!(
-            limbs.iter().all(|&limb| limb == 0),
+            limbs_test_zero(limbs),
             sign == Ordering::Equal,
             "sign should be Equal iff limbs only contains zeros. sign: {:?}, limbs: {:?}",
             sign,

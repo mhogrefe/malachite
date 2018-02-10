@@ -1,4 +1,5 @@
 use common::test_properties;
+use malachite_base::limbs::limbs_test_zero;
 use malachite_nz::natural::Natural;
 use malachite_test::inputs::base::vecs_of_unsigned;
 
@@ -49,7 +50,7 @@ fn from_limbs_le_properties() {
             .iter()
             .cloned()
             .rev()
-            .skip_while(|&u| u == 0)
+            .skip_while(|&limb| limb == 0)
             .collect();
         trimmed_limbs.reverse();
         assert_eq!(x.to_limbs_le(), trimmed_limbs);
@@ -60,6 +61,7 @@ fn from_limbs_le_properties() {
         if !limbs.is_empty() && *limbs.last().unwrap() != 0 {
             assert_eq!(x.to_limbs_le(), *limbs);
         }
+        assert_eq!(limbs_test_zero(limbs), x == 0);
     });
 }
 
@@ -72,7 +74,7 @@ fn from_limbs_be_properties() {
             limbs
                 .iter()
                 .cloned()
-                .skip_while(|&u| u == 0)
+                .skip_while(|&limb| limb == 0)
                 .collect::<Vec<u32>>()
         );
         assert_eq!(
@@ -82,5 +84,6 @@ fn from_limbs_be_properties() {
         if !limbs.is_empty() && limbs[0] != 0 {
             assert_eq!(x.to_limbs_be(), *limbs);
         }
+        assert_eq!(limbs_test_zero(limbs), x == 0);
     });
 }

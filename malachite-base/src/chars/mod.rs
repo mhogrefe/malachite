@@ -75,7 +75,7 @@ pub fn contiguous_range_to_char(u: u32) -> Option<char> {
 }
 
 impl Walkable for char {
-    /// Increment this `char`, skipping over the surrogate range.
+    /// Increments this `char`, skipping over the surrogate range.
     ///
     /// Time: worst case O(1)
     ///
@@ -101,7 +101,7 @@ impl Walkable for char {
             .unwrap_or_else(|| panic!("Cannot increment char::MAX"))
     }
 
-    /// Decrement this `char`, skipping over the surrogate range.
+    /// Decrements this `char`, skipping over the surrogate range.
     ///
     /// Time: worst case O(1)
     ///

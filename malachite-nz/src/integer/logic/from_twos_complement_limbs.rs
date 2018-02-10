@@ -1,5 +1,5 @@
 use integer::Integer;
-use malachite_base::num::Zero;
+use malachite_base::num::{BitAccess, Zero};
 use natural::Natural;
 
 impl Integer {
@@ -34,7 +34,7 @@ impl Integer {
         if limbs.is_empty() {
             return Integer::ZERO;
         }
-        if limbs.last().unwrap() & 0x8000_0000 == 0 {
+        if !limbs.last().unwrap().get_bit(31) {
             Natural::from_limbs_le(limbs).into_integer()
         } else {
             let mut limbs = limbs.to_vec();

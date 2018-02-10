@@ -1,3 +1,4 @@
+use malachite_base::limbs::{limbs_set_zero, limbs_test_zero};
 use natural::arithmetic::add::{mpn_add, mpn_add_in_place, mpn_add_n, mpn_add_n_in_place};
 use natural::arithmetic::add_u32::{mpn_add_1, mpn_add_1_in_place};
 use natural::arithmetic::add_mul_u32::mpn_addmul_1;
@@ -7,7 +8,7 @@ use natural::arithmetic::shr_u32::mpn_rshift_in_place;
 use natural::arithmetic::sub::{mpn_sub, mpn_sub_n, mpn_sub_n_aba, mpn_sub_n_in_place};
 use natural::arithmetic::sub_u32::mpn_sub_1_in_place;
 use natural::comparison::ord::mpn_cmp;
-use natural::{mpn_zero, mpn_zero_p, LIMB_BITS};
+use natural::LIMB_BITS;
 use natural::Natural::{self, Large, Small};
 use std::cmp::Ordering;
 use std::ops::{Mul, MulAssign};
@@ -215,9 +216,9 @@ fn mpn_toom22_mul(p: &mut [u32], a: &[u32], b: &[u32], scratch: &mut [u32]) {
         } else {
             mpn_sub_n(&mut p[n..], &b[0..n], &b[n..2 * n]);
         }
-    } else if mpn_zero_p(&b[t..n]) && mpn_cmp(&b[0..t], &b[n..n + t]) == Ordering::Less {
+    } else if limbs_test_zero(&b[t..n]) && mpn_cmp(&b[0..t], &b[n..n + t]) == Ordering::Less {
         mpn_sub_n(&mut p[n..], &b[n..n + t], &b[0..t]);
-        mpn_zero(&mut p[n + t..2 * n]);
+        limbs_set_zero(&mut p[n + t..2 * n]);
         vm1_neg = !vm1_neg;
     } else {
         mpn_sub(&mut p[n..], &b[0..n], &b[n..n + t]);
@@ -639,9 +640,9 @@ fn mpn_toom42_mul(p: &mut [u32], a: &[u32], b: &[u32], scratch: &mut [u32]) {
             0
         };
 
-        if mpn_zero_p(&b0[t..n]) && mpn_cmp(&b0[0..t], &b1[0..t]) == Ordering::Less {
+        if limbs_test_zero(&b0[t..n]) && mpn_cmp(&b0[0..t], &b1[0..t]) == Ordering::Less {
             mpn_sub_n(bsm1, &b1[0..t], &b0[0..t]);
-            mpn_zero(&mut bsm1[t..n]);
+            limbs_set_zero(&mut bsm1[t..n]);
             vm1_neg = !vm1_neg;
         } else {
             mpn_sub(bsm1, &b0[0..n], &b1[0..t]);
