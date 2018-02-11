@@ -4,6 +4,8 @@ use malachite_test::base::char::char_to_contiguous_range::*;
 use malachite_test::base::char::contiguous_range_to_char::*;
 use malachite_test::base::char::decrement::*;
 use malachite_test::base::char::increment::*;
+use malachite_test::base::limbs::limbs_delete_left::*;
+use malachite_test::base::limbs::limbs_pad_left::*;
 use malachite_test::base::limbs::limbs_set_zero::*;
 use malachite_test::base::limbs::limbs_test_zero::*;
 use malachite_test::base::num::assign_bit::*;
@@ -237,6 +239,8 @@ demos_and_benchmarks!(
         demo_contiguous_range_to_char,
         demo_char_decrement,
         demo_char_increment,
+        demo_limbs_delete_left,
+        demo_limbs_pad_left,
         demo_limbs_set_zero,
         demo_limbs_test_zero,
         demo_u8_assign_bit,
@@ -704,6 +708,8 @@ demos_and_benchmarks!(
         benchmark_natural_to_u64_wrapping,
     ],
     [
+        benchmark_limbs_delete_left,
+        benchmark_limbs_pad_left,
         benchmark_limbs_set_zero,
         benchmark_limbs_test_zero,
         benchmark_integer_from_sign_and_limbs_le,

@@ -1,7 +1,7 @@
-use malachite_base::limbs::limbs_test_zero;
+use malachite_base::limbs::{limbs_delete_left, limbs_test_zero};
 use malachite_base::num::{BitAccess, One, ShrRound, ShrRoundAssign, Zero};
 use malachite_base::round::RoundingMode;
-use natural::{delete_left, LIMB_BITS, LIMB_BITS_MASK, LOG_LIMB_BITS};
+use natural::{LIMB_BITS, LIMB_BITS_MASK, LOG_LIMB_BITS};
 use natural::Natural::{self, Large, Small};
 use std::ops::{Shr, ShrAssign};
 
@@ -132,7 +132,7 @@ fn shr_helper(limbs: &mut Vec<u32>, other: u32) {
         limbs.clear();
     } else {
         let small_shift = other & LIMB_BITS_MASK;
-        delete_left(limbs, limbs_to_delete);
+        limbs_delete_left(limbs, limbs_to_delete);
         if small_shift != 0 {
             mpn_rshift_in_place(limbs, small_shift);
         }

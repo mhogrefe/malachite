@@ -1,6 +1,7 @@
 use common::GenerationMode;
-use inputs::common::{swap_pairs, reshape_2_1_to_3};
+use inputs::common::{permute_1_3_2, permute_2_1, reshape_2_1_to_3};
 use malachite_base::chars::NUMBER_OF_CHARS;
+use malachite_base::limbs::limbs_test_zero;
 use malachite_base::num::{PrimitiveInteger, PrimitiveSigned, PrimitiveUnsigned};
 use malachite_base::round::RoundingMode;
 use rust_wheels::iterators::bools::exhaustive_bools;
@@ -14,9 +15,10 @@ use rust_wheels::iterators::primitive_ints::{exhaustive_i, exhaustive_negative_i
                                              random_negative_i, random_positive_i,
                                              random_positive_u, random_range};
 use rust_wheels::iterators::rounding_modes::{exhaustive_rounding_modes, random_rounding_modes};
-use rust_wheels::iterators::tuples::{exhaustive_pairs_from_single, lex_pairs, lex_triples,
-                                     log_pairs, random_pairs, random_pairs_from_single,
-                                     random_triples, random_triples_from_single, sqrt_pairs};
+use rust_wheels::iterators::tuples::{exhaustive_pairs, exhaustive_pairs_from_single, lex_pairs,
+                                     lex_triples, log_pairs, random_pairs,
+                                     random_pairs_from_single, random_triples,
+                                     random_triples_from_single, sqrt_pairs};
 use rust_wheels::iterators::vecs::{exhaustive_vecs, random_vecs};
 use std::char;
 use std::cmp::Ordering;
@@ -116,6 +118,22 @@ pub fn pairs_of_unsigned_and_small_u64<T: 'static + PrimitiveUnsigned>(
     match gm {
         GenerationMode::Exhaustive => sqrt_pairs_of_unsigneds(),
         GenerationMode::Random(scale) => random_pairs_of_primitive_and_geometric_u64(scale),
+    }
+}
+
+pub fn pairs_of_small_usize_and_unsigned<T: 'static + PrimitiveUnsigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (usize, T)>> {
+    match gm {
+        GenerationMode::Exhaustive => permute_2_1(Box::new(log_pairs(
+            exhaustive_u(),
+            exhaustive_u::<u32>().map(|u| u as usize),
+        ))),
+        GenerationMode::Random(scale) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| natural_u32s_geometric(seed, scale).map(|u| u as usize)),
+            &(|seed| random_x(seed)),
+        )),
     }
 }
 
@@ -384,7 +402,7 @@ fn pairs_of_ordering_and_vec_of_unsigned<T: 'static + PrimitiveUnsigned>(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (Ordering, Vec<T>)>> {
     match gm {
-        GenerationMode::Exhaustive => swap_pairs(Box::new(lex_pairs(
+        GenerationMode::Exhaustive => permute_2_1(Box::new(lex_pairs(
             exhaustive_vecs(exhaustive_u()),
             exhaustive_orderings(),
         ))),
@@ -396,12 +414,71 @@ fn pairs_of_ordering_and_vec_of_unsigned<T: 'static + PrimitiveUnsigned>(
     }
 }
 
-pub fn pairs_of_ordering_and_vec_of_unsigned_var_1<T: 'static + PrimitiveUnsigned>(
+pub fn pairs_of_ordering_and_vec_of_unsigned_var_1(
     gm: GenerationMode,
-) -> Box<Iterator<Item = (Ordering, Vec<T>)>> {
+) -> Box<Iterator<Item = (Ordering, Vec<u32>)>> {
     Box::new(
-        pairs_of_ordering_and_vec_of_unsigned(gm).filter(|&(sign, ref limbs)| {
-            limbs.iter().all(|&limb| limb == T::ZERO) == (sign == Ordering::Equal)
-        }),
+        pairs_of_ordering_and_vec_of_unsigned(gm)
+            .filter(|&(sign, ref limbs)| limbs_test_zero(limbs) == (sign == Ordering::Equal)),
     )
+}
+
+fn exhaustive_pairs_of_unsigned_vec_and_unsigned<T: 'static + PrimitiveUnsigned>(
+) -> Box<Iterator<Item = (Vec<T>, T)>> {
+    Box::new(exhaustive_pairs(
+        exhaustive_vecs(exhaustive_u()),
+        exhaustive_u(),
+    ))
+}
+
+pub fn triples_of_unsigned_vec_small_usize_and_unsigned<T: 'static + PrimitiveUnsigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (Vec<T>, usize, T)>> {
+    match gm {
+        GenerationMode::Exhaustive => permute_1_3_2(reshape_2_1_to_3(Box::new(log_pairs(
+            exhaustive_pairs_of_unsigned_vec_and_unsigned(),
+            exhaustive_u::<u32>().map(|u| u as usize),
+        )))),
+        GenerationMode::Random(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| random_vecs(seed, scale, &(|seed_2| random_x(seed_2)))),
+            &(|seed| natural_u32s_geometric(seed, scale).map(|u| u as usize)),
+            &(|seed| random_x(seed)),
+        )),
+    }
+}
+
+fn pairs_of_unsigned_vec_and_small_usize<T: 'static + PrimitiveUnsigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (Vec<T>, usize)>> {
+    match gm {
+        GenerationMode::Exhaustive => Box::new(log_pairs(
+            exhaustive_vecs(exhaustive_u()),
+            exhaustive_u::<u32>().map(|u| u as usize),
+        )),
+        GenerationMode::Random(scale) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| random_vecs(seed, scale, &(|seed_2| random_x(seed_2)))),
+            &(|seed| natural_u32s_geometric(seed, scale).map(|u| u as usize)),
+        )),
+    }
+}
+
+pub fn pairs_of_unsigned_vec_and_small_usize_var_1<T: 'static + PrimitiveUnsigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (Vec<T>, usize)>> {
+    Box::new(pairs_of_unsigned_vec_and_small_usize(gm).filter(|&(ref xs, u)| u <= xs.len()))
+}
+
+pub fn pairs_of_unsigned_vec_and_unsigned<T: 'static + PrimitiveUnsigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (Vec<T>, T)>> {
+    match gm {
+        GenerationMode::Exhaustive => exhaustive_pairs_of_unsigned_vec_and_unsigned(),
+        GenerationMode::Random(scale) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| random_vecs(seed, scale, &(|seed_2| random_x(seed_2)))),
+            &(|seed| random_x(seed)),
+        )),
+    }
 }

@@ -1,4 +1,5 @@
-use natural::{pad_left, LIMB_BITS, LIMB_BITS_MASK, LOG_LIMB_BITS};
+use malachite_base::limbs::limbs_pad_left;
+use natural::{LIMB_BITS, LIMB_BITS_MASK, LOG_LIMB_BITS};
 use natural::Natural::{self, Large, Small};
 use std::ops::{Shl, ShlAssign};
 
@@ -73,14 +74,14 @@ fn shl_helper(limbs: &[u32], other: u32) -> Natural {
     Large(if small_shift != 0 {
         let mut shifted_limbs = vec![0; limbs.len()];
         let remaining_bits = mpn_lshift(&mut shifted_limbs, limbs, small_shift);
-        pad_left(&mut shifted_limbs, (other >> LOG_LIMB_BITS) as usize, 0);
+        limbs_pad_left(&mut shifted_limbs, (other >> LOG_LIMB_BITS) as usize, 0);
         if remaining_bits != 0 {
             shifted_limbs.push(remaining_bits);
         }
         shifted_limbs
     } else {
         let mut shifted_limbs = limbs.to_vec();
-        pad_left(&mut shifted_limbs, (other >> LOG_LIMB_BITS) as usize, 0);
+        limbs_pad_left(&mut shifted_limbs, (other >> LOG_LIMB_BITS) as usize, 0);
         shifted_limbs
     })
 }
@@ -167,7 +168,7 @@ impl ShlAssign<u32> for Natural {
                 } else {
                     0
                 };
-                pad_left(limbs, (other >> LOG_LIMB_BITS) as usize, 0);
+                limbs_pad_left(limbs, (other >> LOG_LIMB_BITS) as usize, 0);
                 if remaining_bits != 0 {
                     limbs.push(remaining_bits);
                 }

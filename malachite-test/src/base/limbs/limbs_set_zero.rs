@@ -12,7 +12,7 @@ pub fn demo_limbs_set_zero(gm: GenerationMode, limit: usize) {
 }
 
 pub fn benchmark_limbs_set_zero(gm: GenerationMode, limit: usize, file_name: &str) {
-    println!("benchmarking {} limbs_set_zero(&[u32])", gm.name());
+    println!("benchmarking {} limbs_set_zero(&mut [u32])", gm.name());
     benchmark_1(BenchmarkOptions1 {
         xs: vecs_of_unsigned(gm),
         function_f: &(|mut xs: Vec<u32>| limbs_set_zero(&mut xs)),
@@ -20,7 +20,7 @@ pub fn benchmark_limbs_set_zero(gm: GenerationMode, limit: usize, file_name: &st
         x_param: &(|xs| xs.len()),
         limit,
         f_name: "malachite",
-        title: "limbs\\\\_set\\\\_zero(\\\\&[u32])",
+        title: "limbs\\\\_set\\\\_zero(\\\\&mut [u32])",
         x_axis_label: "xs.len()",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),

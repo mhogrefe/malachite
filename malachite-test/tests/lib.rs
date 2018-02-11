@@ -15,6 +15,8 @@ pub mod base {
         pub mod increment;
     }
     pub mod limbs {
+        pub mod limbs_delete_left;
+        pub mod limbs_pad_left;
         pub mod limbs_set_zero;
         pub mod limbs_test_zero;
     }
