@@ -1,3 +1,4 @@
+use malachite_base::misc::Named;
 use malachite_base::num::{One, Two, Zero};
 use natural::Natural::*;
 use std::str::FromStr;
@@ -100,6 +101,9 @@ impl One for Natural {
 impl Two for Natural {
     const TWO: Natural = Small(2);
 }
+
+/// Implement `Named` for `Natural`.
+impl_named!(Natural);
 
 macro_rules! mutate_with_possible_promotion {
     ($n: ident, $small: ident, $large: ident, $process_small: expr, $process_large: expr) => {

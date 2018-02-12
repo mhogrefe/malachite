@@ -151,10 +151,7 @@ macro_rules! common_traits {
             }
         }
 
-        //TODO docs
-        impl Named for $t {
-            const NAME: &'static str = stringify!($t);
-        }
+        impl_named!($t);
 
         //TODO docs
         impl LeadingZeros for $t {

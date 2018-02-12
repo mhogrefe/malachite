@@ -1,3 +1,4 @@
+use malachite_base::misc::Named;
 use malachite_base::num::{NegativeOne, One, Two, Zero};
 use natural::Natural::{self, Small};
 use std::str::FromStr;
@@ -71,6 +72,9 @@ impl NegativeOne for Integer {
         abs: Small(1),
     };
 }
+
+/// Implement `Named` for `Integer`.
+impl_named!(Integer);
 
 pub mod arithmetic {
     pub mod abs;
