@@ -1,6 +1,7 @@
 use common::test_properties;
 use malachite_base::num::{PrimitiveInteger, PrimitiveSigned, PrimitiveUnsigned};
 use malachite_test::inputs::base::{signeds, unsigneds};
+use std::{i16, i32, i64, i8, u16, u32, u64, u8};
 
 fn significant_bits_helper_common<T: PrimitiveInteger>() {
     let test = |n, out| {

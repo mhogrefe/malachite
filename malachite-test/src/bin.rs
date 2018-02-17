@@ -10,8 +10,10 @@ use malachite_test::base::limbs::limbs_set_zero::*;
 use malachite_test::base::limbs::limbs_test_zero::*;
 use malachite_test::base::num::assign_bit::*;
 use malachite_test::base::num::clear_bit::*;
+use malachite_test::base::num::decrement::*;
 use malachite_test::base::num::flip_bit::*;
 use malachite_test::base::num::get_bit::*;
+use malachite_test::base::num::increment::*;
 use malachite_test::base::num::join_halves::*;
 use malachite_test::base::num::lower_half::*;
 use malachite_test::base::num::set_bit::*;
@@ -47,6 +49,8 @@ use malachite_test::integer::arithmetic::sub_u32::*;
 use malachite_test::integer::arithmetic::sub_mul::*;
 use malachite_test::integer::arithmetic::sub_mul_i32::*;
 use malachite_test::integer::arithmetic::sub_mul_u32::*;
+use malachite_test::integer::basic::decrement::*;
+use malachite_test::integer::basic::increment::*;
 use malachite_test::integer::comparison::eq::*;
 use malachite_test::integer::comparison::hash::*;
 use malachite_test::integer::comparison::ord::*;
@@ -108,6 +112,8 @@ use malachite_test::natural::arithmetic::sub::*;
 use malachite_test::natural::arithmetic::sub_u32::*;
 use malachite_test::natural::arithmetic::sub_mul::*;
 use malachite_test::natural::arithmetic::sub_mul_u32::*;
+use malachite_test::natural::basic::decrement::*;
+use malachite_test::natural::basic::increment::*;
 use malachite_test::natural::comparison::eq::*;
 use malachite_test::natural::comparison::hash::*;
 use malachite_test::natural::comparison::ord::*;
@@ -259,6 +265,14 @@ demos_and_benchmarks!(
         demo_i16_clear_bit,
         demo_i32_clear_bit,
         demo_i64_clear_bit,
+        demo_u8_decrement,
+        demo_u16_decrement,
+        demo_u32_decrement,
+        demo_u64_decrement,
+        demo_i8_decrement,
+        demo_i16_decrement,
+        demo_i32_decrement,
+        demo_i64_decrement,
         demo_u8_flip_bit,
         demo_u16_flip_bit,
         demo_u32_flip_bit,
@@ -275,6 +289,14 @@ demos_and_benchmarks!(
         demo_i16_get_bit,
         demo_i32_get_bit,
         demo_i64_get_bit,
+        demo_u8_increment,
+        demo_u16_increment,
+        demo_u32_increment,
+        demo_u64_increment,
+        demo_i8_increment,
+        demo_i16_increment,
+        demo_i32_increment,
+        demo_i64_increment,
         demo_u16_join_halves,
         demo_u32_join_halves,
         demo_u64_join_halves,
@@ -364,6 +386,7 @@ demos_and_benchmarks!(
         demo_integer_clone_from,
         demo_integer_cmp,
         demo_integer_cmp_abs,
+        demo_integer_decrement,
         demo_integer_divisible_by_power_of_2,
         demo_integer_eq,
         demo_integer_flip_bit,
@@ -377,6 +400,7 @@ demos_and_benchmarks!(
         demo_integer_from_u64,
         demo_integer_get_bit,
         demo_integer_hash,
+        demo_integer_increment,
         demo_integer_is_even,
         demo_integer_is_odd,
         demo_integer_mod_power_of_2_assign,
@@ -538,6 +562,7 @@ demos_and_benchmarks!(
         demo_natural_clone,
         demo_natural_clone_from,
         demo_natural_cmp,
+        demo_natural_decrement,
         demo_natural_divisible_by_power_of_2,
         demo_natural_eq,
         demo_natural_flip_bit,
@@ -547,6 +572,7 @@ demos_and_benchmarks!(
         demo_natural_from_u64,
         demo_natural_get_bit,
         demo_natural_hash,
+        demo_natural_increment,
         demo_natural_is_even,
         demo_natural_is_odd,
         demo_natural_is_power_of_2,
@@ -636,6 +662,14 @@ demos_and_benchmarks!(
         benchmark_i16_assign_bit,
         benchmark_i32_assign_bit,
         benchmark_i64_assign_bit,
+        benchmark_u8_decrement,
+        benchmark_u16_decrement,
+        benchmark_u32_decrement,
+        benchmark_u64_decrement,
+        benchmark_i8_decrement,
+        benchmark_i16_decrement,
+        benchmark_i32_decrement,
+        benchmark_i64_decrement,
         benchmark_u8_flip_bit,
         benchmark_u16_flip_bit,
         benchmark_u32_flip_bit,
@@ -652,6 +686,14 @@ demos_and_benchmarks!(
         benchmark_i16_get_bit,
         benchmark_i32_get_bit,
         benchmark_i64_get_bit,
+        benchmark_u8_increment,
+        benchmark_u16_increment,
+        benchmark_u32_increment,
+        benchmark_u64_increment,
+        benchmark_i8_increment,
+        benchmark_i16_increment,
+        benchmark_i32_increment,
+        benchmark_i64_increment,
         benchmark_u16_join_halves,
         benchmark_u32_join_halves,
         benchmark_u64_join_halves,
@@ -781,8 +823,10 @@ demos_and_benchmarks!(
         benchmark_integer_clear_bit,
         benchmark_integer_clone_from,
         benchmark_integer_cmp_abs,
+        benchmark_integer_decrement,
         benchmark_integer_flip_bit,
         benchmark_integer_get_bit,
+        benchmark_integer_increment,
         benchmark_integer_is_even,
         benchmark_integer_mod_power_of_2_assign,
         benchmark_integer_mod_power_of_2,
@@ -940,10 +984,12 @@ demos_and_benchmarks!(
         benchmark_natural_assign_bit,
         benchmark_natural_clear_bit,
         benchmark_natural_clone_from,
+        benchmark_natural_decrement,
         benchmark_natural_divisible_by_power_of_2,
         benchmark_natural_divisible_by_power_of_2_algorithms,
         benchmark_natural_flip_bit,
         benchmark_natural_get_bit,
+        benchmark_natural_increment,
         benchmark_natural_is_even,
         benchmark_natural_is_power_of_2,
         benchmark_natural_limb_count,

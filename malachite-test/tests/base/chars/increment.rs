@@ -5,7 +5,7 @@ use malachite_test::inputs::base::chars_var_2;
 use std::char;
 
 #[test]
-fn test_increment() {
+fn test_char_increment() {
     let test = |mut c: char, out| {
         c.increment();
         assert_eq!(c, out);
@@ -25,7 +25,7 @@ fn char_increment_fail() {
 }
 
 #[test]
-fn char_increment() {
+fn char_increment_properties() {
     test_properties_no_limit_exhaustive(chars_var_2, |&c| {
         let mut c_mut = c;
         c_mut.increment();

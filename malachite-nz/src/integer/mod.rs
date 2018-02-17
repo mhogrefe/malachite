@@ -1,4 +1,4 @@
-use malachite_base::misc::Named;
+use malachite_base::misc::{Named, Walkable};
 use malachite_base::num::{NegativeOne, One, Two, Zero};
 use natural::Natural::{self, Small};
 use std::str::FromStr;
@@ -75,6 +75,68 @@ impl NegativeOne for Integer {
 
 /// Implement `Named` for `Integer`.
 impl_named!(Integer);
+
+impl Walkable for Integer {
+    /// Increments `self`.
+    ///
+    /// Time: worst case O(n)
+    ///
+    /// Additional memory: worst case O(1)
+    ///
+    /// where n = `self.significant_bits()`
+    ///
+    /// # Example
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::misc::Walkable;
+    /// use malachite_nz::integer::Integer;
+    ///
+    /// fn main() {
+    ///     let mut i = Integer::from(10);
+    ///     i.increment();
+    ///     assert_eq!(i, 11);
+    ///
+    ///     let mut i = Integer::from(-5);
+    ///     i.increment();
+    ///     assert_eq!(i, -4);
+    /// }
+    /// ```
+    fn increment(&mut self) {
+        *self += 1u32;
+    }
+
+    /// Decrements `self`.
+    ///
+    /// Time: worst case O(n)
+    ///
+    /// Additional memory: worst case O(1)
+    ///
+    /// where n = `self.significant_bits()`
+    ///
+    /// # Example
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::misc::Walkable;
+    /// use malachite_nz::integer::Integer;
+    ///
+    /// fn main() {
+    ///     let mut i = Integer::from(10);
+    ///     i.decrement();
+    ///     assert_eq!(i, 9);
+    ///
+    ///     let mut i = Integer::from(-5);
+    ///     i.decrement();
+    ///     assert_eq!(i, -6);
+    /// }
+    /// ```
+    fn decrement(&mut self) {
+        *self -= 1u32;
+    }
+}
 
 pub mod arithmetic {
     pub mod abs;

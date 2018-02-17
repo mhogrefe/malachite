@@ -28,7 +28,9 @@ pub mod base {
     pub mod num {
         pub mod assign_bit;
         pub mod clear_bit;
+        pub mod decrement;
         pub mod flip_bit;
+        pub mod increment;
         pub mod join_halves;
         pub mod lower_half;
         pub mod get_bit;
@@ -70,6 +72,10 @@ pub mod integer {
         pub mod sub_mul;
         pub mod sub_mul_i32;
         pub mod sub_mul_u32;
+    }
+    pub mod basic {
+        pub mod decrement;
+        pub mod increment;
     }
     pub mod comparison {
         pub mod eq;
@@ -141,6 +147,10 @@ pub mod natural {
         pub mod sub_u32;
         pub mod sub_mul;
         pub mod sub_mul_u32;
+    }
+    pub mod basic {
+        pub mod decrement;
+        pub mod increment;
     }
     pub mod comparison {
         pub mod eq;

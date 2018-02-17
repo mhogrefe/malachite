@@ -8,7 +8,7 @@ pub fn demo_char_increment(gm: GenerationMode, limit: usize) {
     for mut c in chars_var_2(gm).take(limit) {
         let c_old = c;
         c.increment();
-        println!("c := {:?}; x.increment(); c = {:?}", c_old, c);
+        println!("c := {:?}; c.increment(); c = {:?}", c_old, c);
     }
 }
 

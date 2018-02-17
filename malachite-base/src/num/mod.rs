@@ -1,4 +1,4 @@
-use misc::{Named, Walkable};
+use misc::{Max, Min, Named, Walkable};
 use rand::distributions::range::SampleRange;
 use rand::Rand;
 use round::RoundingMode;
@@ -20,6 +20,8 @@ pub trait PrimitiveInteger
     + Eq
     + Hash
     + LeadingZeros
+    + Min
+    + Max
     + Named
     + One
     + Ord
@@ -39,8 +41,6 @@ pub trait PrimitiveInteger
     + WrappingNeg
     + Zero {
     const WIDTH: u32;
-    const MIN: Self;
-    const MAX: Self;
 
     fn from_u32(u: u32) -> Self;
 
@@ -126,21 +126,8 @@ pub trait BitAccess {
 macro_rules! common_traits {
     ($t: ident, $width: expr, $u: ident, $from_u32: expr, $from_u64: expr) => {
         //TODO docs
-        impl Walkable for $t {
-            fn increment(&mut self) {
-                *self = self.wrapping_add(1);
-            }
-
-            fn decrement(&mut self) {
-                *self = self.wrapping_sub(1);
-            }
-        }
-
-        //TODO docs
         impl PrimitiveInteger for $t {
             const WIDTH: u32 = $width;
-            const MIN: Self = std::$t::MIN;
-            const MAX: Self = std::$t::MAX;
 
             fn from_u32($u: u32) -> Self {
                 $from_u32
@@ -164,6 +151,72 @@ macro_rules! common_traits {
         impl WrappingNeg for $t {
             fn wrapping_neg(&self) -> Self {
                 $t::wrapping_neg(*self)
+            }
+        }
+
+        /// The minimum value of a primitive integer.
+        impl Min for $t {
+            const MIN: $t = std::$t::MIN;
+        }
+
+        /// The maximum value of a primitive integer.
+        impl Max for $t {
+            const MAX: $t = std::$t::MAX;
+        }
+
+        impl Walkable for $t {
+            /// Increments `self`.
+            ///
+            /// Time: worst case O(1)
+            ///
+            /// Additional memory: worst case O(1)
+            ///
+            /// # Panics
+            /// Panics if `self` == `self::MAX`.
+            ///
+            /// # Example
+            /// ```
+            /// use malachite_base::misc::Walkable;
+            ///
+            /// fn main() {
+            ///     let mut i = 10;
+            ///     i.increment();
+            ///     assert_eq!(i, 11);
+            ///
+            ///     let mut i = -5;
+            ///     i.increment();
+            ///     assert_eq!(i, -4);
+            /// }
+            /// ```
+            fn increment(&mut self) {
+                *self = self.checked_add(1).expect("Cannot increment past the maximum value.");
+            }
+
+            /// Decrements `self`.
+            ///
+            /// Time: worst case O(1)
+            ///
+            /// Additional memory: worst case O(1)
+            ///
+            /// # Panics
+            /// Panics if `self` == `self::MIN`.
+            ///
+            /// # Example
+            /// ```
+            /// use malachite_base::misc::Walkable;
+            ///
+            /// fn main() {
+            ///     let mut i = 10;
+            ///     i.decrement();
+            ///     assert_eq!(i, 9);
+            ///
+            ///     let mut i = -5;
+            ///     i.decrement();
+            ///     assert_eq!(i, -6);
+            /// }
+            /// ```
+            fn decrement(&mut self) {
+                *self = self.checked_sub(1).expect("Cannot decrement past the minimum value.");
             }
         }
     }

@@ -8,7 +8,7 @@ pub fn demo_char_decrement(gm: GenerationMode, limit: usize) {
     for mut c in chars_var_1(gm).take(limit) {
         let c_old = c;
         c.decrement();
-        println!("c := {:?}; x.decrement(); c = {:?}", c_old, c);
+        println!("c := {:?}; c.decrement(); c = {:?}", c_old, c);
     }
 }
 

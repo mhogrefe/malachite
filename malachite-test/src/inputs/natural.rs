@@ -7,7 +7,8 @@ use rust_wheels::iterators::bools::exhaustive_bools;
 use rust_wheels::iterators::common::EXAMPLE_SEED;
 use rust_wheels::iterators::general::random_x;
 use rust_wheels::iterators::integers_geometric::{i32s_geometric, natural_u32s_geometric};
-use rust_wheels::iterators::naturals::{exhaustive_naturals, random_naturals};
+use rust_wheels::iterators::naturals::{exhaustive_naturals, exhaustive_positive_naturals,
+                                       random_naturals, random_positive_naturals};
 use rust_wheels::iterators::primitive_ints::{exhaustive_i, exhaustive_u};
 use rust_wheels::iterators::rounding_modes::{exhaustive_rounding_modes, random_rounding_modes};
 use rust_wheels::iterators::tuples::{exhaustive_pairs, exhaustive_pairs_from_single,
@@ -19,6 +20,13 @@ pub fn naturals(gm: GenerationMode) -> Box<Iterator<Item = Natural>> {
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_naturals()),
         GenerationMode::Random(scale) => Box::new(random_naturals(&EXAMPLE_SEED, scale)),
+    }
+}
+
+pub fn positive_naturals(gm: GenerationMode) -> Box<Iterator<Item = Natural>> {
+    match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_positive_naturals()),
+        GenerationMode::Random(scale) => Box::new(random_positive_naturals(&EXAMPLE_SEED, scale)),
     }
 }
 

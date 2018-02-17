@@ -1,4 +1,4 @@
-use malachite_base::misc::Named;
+use malachite_base::misc::{Min, Named, Walkable};
 use malachite_base::num::{One, Two, Zero};
 use natural::Natural::*;
 use std::str::FromStr;
@@ -102,8 +102,72 @@ impl Two for Natural {
     const TWO: Natural = Small(2);
 }
 
+/// The minimum value of a `Natural`, 0.
+///
+/// Time: worst case O(1)
+///
+/// Additional memory: worst case O(1)
+impl Min for Natural {
+    const MIN: Natural = Small(0);
+}
+
 /// Implement `Named` for `Natural`.
 impl_named!(Natural);
+
+impl Walkable for Natural {
+    /// Increments `self`.
+    ///
+    /// Time: worst case O(n)
+    ///
+    /// Additional memory: worst case O(1)
+    ///
+    /// where n = `self.significant_bits()`
+    ///
+    /// # Example
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::misc::Walkable;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// fn main() {
+    ///     let mut i = Natural::from(10u32);
+    ///     i.increment();
+    ///     assert_eq!(i, 11);
+    /// }
+    /// ```
+    fn increment(&mut self) {
+        *self += 1;
+    }
+
+    /// Decrements `self`.
+    ///
+    /// Time: worst case O(1)
+    ///
+    /// Additional memory: worst case O(1)
+    ///
+    /// # Panics
+    /// Panics if `self` == 0`.
+    ///
+    /// # Example
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::misc::Walkable;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// fn main() {
+    ///     let mut i = Natural::from(10u32);
+    ///     i.decrement();
+    ///     assert_eq!(i, 9);
+    /// }
+    /// ```
+    fn decrement(&mut self) {
+        *self -= 1;
+    }
+}
 
 macro_rules! mutate_with_possible_promotion {
     ($n: ident, $small: ident, $large: ident, $process_small: expr, $process_large: expr) => {

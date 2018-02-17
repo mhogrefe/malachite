@@ -24,8 +24,6 @@ use std::char;
 use std::cmp::Ordering;
 
 type It<T> = Box<Iterator<Item = T>>;
-type ItTU64<T> = Box<Iterator<Item = (T, u64)>>;
-type ItTU64B<T> = Box<Iterator<Item = (T, u64, bool)>>;
 
 pub fn unsigneds<T: 'static + PrimitiveUnsigned>(gm: GenerationMode) -> It<T> {
     match gm {
@@ -39,6 +37,25 @@ pub fn signeds<T: 'static + PrimitiveSigned>(gm: GenerationMode) -> It<T> {
         GenerationMode::Exhaustive => Box::new(exhaustive_i()),
         GenerationMode::Random(_) => Box::new(random_x(&EXAMPLE_SEED)),
     }
+}
+
+pub fn positive_unsigneds<T: 'static + PrimitiveUnsigned>(gm: GenerationMode) -> It<T> {
+    match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_positive_x()),
+        GenerationMode::Random(_) => Box::new(random_positive_u(&EXAMPLE_SEED)),
+    }
+}
+
+pub fn unsigneds_no_max<T: 'static + PrimitiveUnsigned>(gm: GenerationMode) -> It<T> {
+    Box::new(unsigneds(gm).filter(|&u| u != T::MAX))
+}
+
+pub fn signeds_no_max<T: 'static + PrimitiveSigned>(gm: GenerationMode) -> It<T> {
+    Box::new(signeds(gm).filter(|&i| i != T::MAX))
+}
+
+pub fn signeds_no_min<T: 'static + PrimitiveSigned>(gm: GenerationMode) -> It<T> {
+    Box::new(signeds(gm).filter(|&i| i != T::MIN))
 }
 
 pub fn pairs_of_unsigneds<T: 'static + PrimitiveUnsigned>(
@@ -95,7 +112,7 @@ fn random_pairs_of_primitive_and_geometric_u32<T: 'static + PrimitiveInteger>(
 
 fn random_pairs_of_primitive_and_geometric_u64<T: 'static + PrimitiveInteger>(
     scale: u32,
-) -> ItTU64<T> {
+) -> It<(T, u64)> {
     Box::new(random_pairs(
         &EXAMPLE_SEED,
         &(|seed| random_x(seed)),
@@ -114,7 +131,7 @@ pub fn pairs_of_unsigned_and_small_u32<T: 'static + PrimitiveUnsigned>(
 
 pub fn pairs_of_unsigned_and_small_u64<T: 'static + PrimitiveUnsigned>(
     gm: GenerationMode,
-) -> ItTU64<T> {
+) -> It<(T, u64)> {
     match gm {
         GenerationMode::Exhaustive => sqrt_pairs_of_unsigneds(),
         GenerationMode::Random(scale) => random_pairs_of_primitive_and_geometric_u64(scale),
@@ -137,7 +154,7 @@ pub fn pairs_of_small_usize_and_unsigned<T: 'static + PrimitiveUnsigned>(
     }
 }
 
-fn log_pairs_of_primitive_and_unsigned<
+fn log_pairs_of_positive_primitive_and_unsigned<
     T: 'static + PrimitiveInteger,
     U: 'static + PrimitiveUnsigned,
 >() -> Box<Iterator<Item = (T, U)>> {
@@ -148,7 +165,7 @@ pub fn pairs_of_positive_unsigned_and_small_u32<T: 'static + PrimitiveUnsigned>(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (T, u32)>> {
     match gm {
-        GenerationMode::Exhaustive => log_pairs_of_primitive_and_unsigned(),
+        GenerationMode::Exhaustive => log_pairs_of_positive_primitive_and_unsigned(),
         GenerationMode::Random(scale) => Box::new(random_pairs(
             &EXAMPLE_SEED,
             &(|seed| random_positive_u(seed)),
@@ -161,7 +178,7 @@ pub fn pairs_of_positive_signed_and_small_u32<T: 'static + PrimitiveSigned>(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (T, u32)>> {
     match gm {
-        GenerationMode::Exhaustive => log_pairs_of_primitive_and_unsigned(),
+        GenerationMode::Exhaustive => log_pairs_of_positive_primitive_and_unsigned(),
         GenerationMode::Random(scale) => Box::new(random_pairs(
             &EXAMPLE_SEED,
             &(|seed| random_positive_i(seed)),
@@ -179,21 +196,22 @@ fn sqrt_pairs_of_signed_and_unsigned<
 
 pub fn pairs_of_signed_and_small_u64<T: 'static + PrimitiveSigned>(
     gm: GenerationMode,
-) -> ItTU64<T> {
+) -> It<(T, u64)> {
     match gm {
         GenerationMode::Exhaustive => sqrt_pairs_of_signed_and_unsigned(),
         GenerationMode::Random(scale) => random_pairs_of_primitive_and_geometric_u64(scale),
     }
 }
 
-fn exhaustive_pairs_of_unsigned_and_u64_width_range<T: 'static + PrimitiveUnsigned>() -> ItTU64<T> {
+type ItU<T> = It<(T, u64)>;
+fn exhaustive_pairs_of_unsigned_and_u64_width_range<T: 'static + PrimitiveUnsigned>() -> ItU<T> {
     Box::new(lex_pairs(
         exhaustive_u(),
         range_increasing_x(0, u64::from(T::WIDTH) - 1),
     ))
 }
 
-fn random_pairs_of_primitive_and_u64_width_range<T: 'static + PrimitiveInteger>() -> ItTU64<T> {
+fn random_pairs_of_primitive_and_u64_width_range<T: 'static + PrimitiveInteger>() -> It<(T, u64)> {
     Box::new(random_pairs(
         &EXAMPLE_SEED,
         &(|seed| random_x(seed)),
@@ -203,7 +221,7 @@ fn random_pairs_of_primitive_and_u64_width_range<T: 'static + PrimitiveInteger>(
 
 pub fn pairs_of_unsigned_and_u64_width_range<T: 'static + PrimitiveUnsigned>(
     gm: GenerationMode,
-) -> ItTU64<T> {
+) -> It<(T, u64)> {
     match gm {
         GenerationMode::Exhaustive => exhaustive_pairs_of_unsigned_and_u64_width_range(),
         GenerationMode::Random(_) => random_pairs_of_primitive_and_u64_width_range(),
@@ -212,7 +230,7 @@ pub fn pairs_of_unsigned_and_u64_width_range<T: 'static + PrimitiveUnsigned>(
 
 pub fn pairs_of_signed_and_u64_width_range<T: 'static + PrimitiveSigned>(
     gm: GenerationMode,
-) -> ItTU64<T> {
+) -> It<(T, u64)> {
     match gm {
         GenerationMode::Exhaustive => Box::new(lex_pairs(
             exhaustive_i(),
@@ -224,7 +242,7 @@ pub fn pairs_of_signed_and_u64_width_range<T: 'static + PrimitiveSigned>(
 
 pub fn pairs_of_signed_and_u64_width_range_var_1<T: 'static + PrimitiveSigned>(
     gm: GenerationMode,
-) -> ItTU64<T> {
+) -> It<(T, u64)> {
     Box::new(
         pairs_of_signed_and_small_u64(gm)
             .filter(|&(n, index)| n < T::ZERO || index < u64::from(T::WIDTH)),
@@ -233,7 +251,7 @@ pub fn pairs_of_signed_and_u64_width_range_var_1<T: 'static + PrimitiveSigned>(
 
 pub fn pairs_of_signed_and_u64_width_range_var_2<T: 'static + PrimitiveSigned>(
     gm: GenerationMode,
-) -> ItTU64<T> {
+) -> It<(T, u64)> {
     Box::new(
         pairs_of_signed_and_small_u64(gm)
             .filter(|&(n, index)| n >= T::ZERO || index < u64::from(T::WIDTH)),
@@ -242,8 +260,8 @@ pub fn pairs_of_signed_and_u64_width_range_var_2<T: 'static + PrimitiveSigned>(
 
 pub fn triples_of_unsigned_u64_width_range_and_bool_var_1<T: 'static + PrimitiveUnsigned>(
     gm: GenerationMode,
-) -> ItTU64B<T> {
-    let unfiltered: ItTU64B<T> = match gm {
+) -> It<(T, u64, bool)> {
+    let unfiltered: It<(T, u64, bool)> = match gm {
         GenerationMode::Exhaustive => reshape_2_1_to_3(Box::new(lex_pairs(
             sqrt_pairs_of_unsigneds(),
             exhaustive_bools(),
@@ -260,8 +278,8 @@ pub fn triples_of_unsigned_u64_width_range_and_bool_var_1<T: 'static + Primitive
 
 pub fn triples_of_signed_u64_width_range_and_bool_var_1<T: 'static + PrimitiveSigned>(
     gm: GenerationMode,
-) -> ItTU64B<T> {
-    let unfiltered: ItTU64B<T> = match gm {
+) -> It<(T, u64, bool)> {
+    let unfiltered: It<(T, u64, bool)> = match gm {
         GenerationMode::Exhaustive => reshape_2_1_to_3(Box::new(lex_pairs(
             sqrt_pairs_of_signed_and_unsigned(),
             exhaustive_bools(),
