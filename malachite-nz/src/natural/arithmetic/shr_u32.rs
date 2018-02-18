@@ -382,7 +382,7 @@ impl<'a> ShrRound<u32> for &'a Natural {
                             } else {
                                 unreachable!()
                             }
-                        } else if !self.divisible_by_power_of_2(other - 1) {
+                        } else if !self.divisible_by_power_of_two(other - 1) {
                             // round up
                             if let Large(ref limbs) = *self {
                                 return if limbs_to_delete >= limbs.len() {
@@ -556,7 +556,7 @@ impl ShrRoundAssign<u32> for Natural {
         if needs_more_work {
             match rm {
                 RoundingMode::Up | RoundingMode::Ceiling => {
-                    let exact = self.divisible_by_power_of_2(other);
+                    let exact = self.divisible_by_power_of_two(other);
                     if let Large(ref mut limbs) = *self {
                         shr_helper(limbs, other);
                     }
@@ -571,7 +571,7 @@ impl ShrRoundAssign<u32> for Natural {
                         if let Large(ref mut limbs) = *self {
                             shr_helper(limbs, other);
                         }
-                    } else if !self.divisible_by_power_of_2(other - 1) {
+                    } else if !self.divisible_by_power_of_two(other - 1) {
                         // round up
                         if let Large(ref mut limbs) = *self {
                             shr_helper(limbs, other);
@@ -592,7 +592,7 @@ impl ShrRoundAssign<u32> for Natural {
                     }
                 }
                 RoundingMode::Exact => {
-                    if !self.divisible_by_power_of_2(other) {
+                    if !self.divisible_by_power_of_two(other) {
                         panic!("Right shift is not exact: {} >>= {}", self, other);
                     }
                     if let Large(ref mut limbs) = *self {

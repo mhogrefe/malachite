@@ -12,18 +12,18 @@ use std::cmp::min;
 use std::str::FromStr;
 
 #[test]
-fn test_mod_power_of_2() {
+fn test_mod_power_of_two() {
     let test = |u, v: u32, out| {
         let mut n = Integer::from_str(u).unwrap();
-        n.mod_power_of_2_assign(v);
+        n.mod_power_of_two_assign(v);
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = Integer::from_str(u).unwrap().mod_power_of_2(v);
+        let n = Integer::from_str(u).unwrap().mod_power_of_two(v);
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = Integer::from_str(u).unwrap().mod_power_of_2_ref(v);
+        let n = Integer::from_str(u).unwrap().mod_power_of_two_ref(v);
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
     };
@@ -93,18 +93,18 @@ fn test_mod_power_of_2() {
 }
 
 #[test]
-fn test_rem_power_of_2() {
+fn test_rem_power_of_two() {
     let test = |u, v: u32, out| {
         let mut n = Integer::from_str(u).unwrap();
-        n.rem_power_of_2_assign(v);
+        n.rem_power_of_two_assign(v);
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = Integer::from_str(u).unwrap().rem_power_of_2(v);
+        let n = Integer::from_str(u).unwrap().rem_power_of_two(v);
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = Integer::from_str(u).unwrap().rem_power_of_2_ref(v);
+        let n = Integer::from_str(u).unwrap().rem_power_of_two_ref(v);
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
     };
@@ -174,18 +174,20 @@ fn test_rem_power_of_2() {
 }
 
 #[test]
-fn test_ceiling_mod_power_of_2() {
+fn test_ceiling_mod_power_of_two() {
     let test = |u, v: u32, out| {
         let mut n = Integer::from_str(u).unwrap();
-        n.ceiling_mod_power_of_2_assign(v);
+        n.ceiling_mod_power_of_two_assign(v);
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = Integer::from_str(u).unwrap().ceiling_mod_power_of_2(v);
+        let n = Integer::from_str(u).unwrap().ceiling_mod_power_of_two(v);
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = Integer::from_str(u).unwrap().ceiling_mod_power_of_2_ref(v);
+        let n = Integer::from_str(u)
+            .unwrap()
+            .ceiling_mod_power_of_two_ref(v);
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
     };
@@ -255,34 +257,34 @@ fn test_ceiling_mod_power_of_2() {
 }
 
 #[test]
-fn mod_power_of_2_properties() {
+fn mod_power_of_two_properties() {
     test_properties(pairs_of_integer_and_small_u32, |&(ref n, u)| {
         let mut mut_n = n.clone();
-        mut_n.mod_power_of_2_assign(u);
+        mut_n.mod_power_of_two_assign(u);
         assert!(mut_n.is_valid());
         let result = mut_n;
 
-        let result_alt = n.mod_power_of_2_ref(u);
+        let result_alt = n.mod_power_of_two_ref(u);
         assert!(result_alt.is_valid());
         assert_eq!(result_alt, result);
-        let result_alt = n.clone().mod_power_of_2(u);
+        let result_alt = n.clone().mod_power_of_two(u);
         assert!(result_alt.is_valid());
         assert_eq!(result_alt, result);
 
         assert_eq!((n >> u << u) + &result, *n);
         assert!(result < (Natural::ONE << u));
-        assert_eq!(result == 0, n.divisible_by_power_of_2(u));
-        assert_eq!(result.mod_power_of_2_ref(u), result);
+        assert_eq!(result == 0, n.divisible_by_power_of_two(u));
+        assert_eq!(result.mod_power_of_two_ref(u), result);
     });
 
     test_properties(pairs_of_integer_and_small_u32_var_1, |&(ref n, u)| {
-        assert_eq!(n.mod_power_of_2_ref(u), 0);
+        assert_eq!(n.mod_power_of_two_ref(u), 0);
     });
 
     test_properties(pairs_of_integer_and_small_u32_var_2, |&(ref n, u)| {
-        assert_ne!(n.mod_power_of_2_ref(u), 0);
+        assert_ne!(n.mod_power_of_two_ref(u), 0);
         assert_eq!(
-            n.mod_power_of_2_ref(u).into_integer() - n.ceiling_mod_power_of_2_ref(u),
+            n.mod_power_of_two_ref(u).into_integer() - n.ceiling_mod_power_of_two_ref(u),
             Natural::ONE << u
         );
     });
@@ -291,106 +293,106 @@ fn mod_power_of_2_properties() {
         triples_of_integer_small_u32_and_small_u32,
         |&(ref n, u, v)| {
             assert_eq!(
-                n.mod_power_of_2_ref(u).mod_power_of_2(v),
-                n.mod_power_of_2_ref(min(u, v))
+                n.mod_power_of_two_ref(u).mod_power_of_two(v),
+                n.mod_power_of_two_ref(min(u, v))
             );
         },
     );
 
     test_properties(integers, |n| {
-        assert_eq!(n.mod_power_of_2_ref(0), 0);
+        assert_eq!(n.mod_power_of_two_ref(0), 0);
     });
 
     test_properties(unsigneds, |&u: &u32| {
-        assert_eq!(Integer::ZERO.mod_power_of_2(u), 0);
+        assert_eq!(Integer::ZERO.mod_power_of_two(u), 0);
     });
 }
 
 #[test]
-fn rem_power_of_2_properties() {
+fn rem_power_of_two_properties() {
     test_properties(pairs_of_integer_and_small_u32, |&(ref n, u)| {
         let mut mut_n = n.clone();
-        mut_n.rem_power_of_2_assign(u);
+        mut_n.rem_power_of_two_assign(u);
         assert!(mut_n.is_valid());
         let result = mut_n;
 
-        let result_alt = n.rem_power_of_2_ref(u);
+        let result_alt = n.rem_power_of_two_ref(u);
         assert!(result_alt.is_valid());
         assert_eq!(result_alt, result);
-        let result_alt = n.clone().rem_power_of_2(u);
+        let result_alt = n.clone().rem_power_of_two(u);
         assert!(result_alt.is_valid());
         assert_eq!(result_alt, result);
 
         assert_eq!(((n.shr_round(u, RoundingMode::Down) << u) + &result), *n);
         assert!(result.lt_abs(&(Natural::ONE << u)));
-        assert_eq!(result == 0, n.divisible_by_power_of_2(u));
-        assert_eq!(result.rem_power_of_2_ref(u), result);
-        assert_eq!(n.abs_ref().mod_power_of_2(u), result.abs_ref());
+        assert_eq!(result == 0, n.divisible_by_power_of_two(u));
+        assert_eq!(result.rem_power_of_two_ref(u), result);
+        assert_eq!(n.abs_ref().mod_power_of_two(u), result.abs_ref());
     });
 
     test_properties(pairs_of_integer_and_small_u32_var_1, |&(ref n, u)| {
-        assert_eq!(n.rem_power_of_2_ref(u), 0);
+        assert_eq!(n.rem_power_of_two_ref(u), 0);
     });
 
     test_properties(pairs_of_integer_and_small_u32_var_2, |&(ref n, u)| {
-        assert_ne!(n.rem_power_of_2_ref(u), 0);
-        assert_eq!(n.rem_power_of_2_ref(u).sign(), n.sign());
+        assert_ne!(n.rem_power_of_two_ref(u), 0);
+        assert_eq!(n.rem_power_of_two_ref(u).sign(), n.sign());
     });
 
     test_properties(
         triples_of_integer_small_u32_and_small_u32,
         |&(ref n, u, v)| {
             assert_eq!(
-                n.rem_power_of_2_ref(u).rem_power_of_2(v),
-                n.rem_power_of_2_ref(min(u, v))
+                n.rem_power_of_two_ref(u).rem_power_of_two(v),
+                n.rem_power_of_two_ref(min(u, v))
             );
         },
     );
 
     test_properties(integers, |n| {
-        assert_eq!(n.rem_power_of_2_ref(0), 0);
+        assert_eq!(n.rem_power_of_two_ref(0), 0);
     });
 
     test_properties(unsigneds, |&u: &u32| {
-        assert_eq!(Integer::ZERO.rem_power_of_2(u), 0);
+        assert_eq!(Integer::ZERO.rem_power_of_two(u), 0);
     });
 }
 
 #[test]
-fn ceiling_mod_power_of_2_properties() {
+fn ceiling_mod_power_of_two_properties() {
     test_properties(pairs_of_integer_and_small_u32, |&(ref n, u)| {
         let mut mut_n = n.clone();
-        mut_n.ceiling_mod_power_of_2_assign(u);
+        mut_n.ceiling_mod_power_of_two_assign(u);
         assert!(mut_n.is_valid());
         let result = mut_n;
 
-        let result_alt = n.ceiling_mod_power_of_2_ref(u);
+        let result_alt = n.ceiling_mod_power_of_two_ref(u);
         assert!(result_alt.is_valid());
         assert_eq!(result_alt, result);
-        let result_alt = n.clone().ceiling_mod_power_of_2(u);
+        let result_alt = n.clone().ceiling_mod_power_of_two(u);
         assert!(result_alt.is_valid());
         assert_eq!(result_alt, result);
 
         assert_eq!(((n.shr_round(u, RoundingMode::Ceiling) << u) + &result), *n);
         assert!(result <= 0);
         assert!(-&result <= Natural::ONE << u);
-        assert_eq!(result == 0, n.divisible_by_power_of_2(u));
-        assert_eq!((-n).mod_power_of_2(u), -result);
+        assert_eq!(result == 0, n.divisible_by_power_of_two(u));
+        assert_eq!((-n).mod_power_of_two(u), -result);
     });
 
     test_properties(pairs_of_integer_and_small_u32_var_1, |&(ref n, u)| {
-        assert_eq!(n.ceiling_mod_power_of_2_ref(u), 0);
+        assert_eq!(n.ceiling_mod_power_of_two_ref(u), 0);
     });
 
     test_properties(pairs_of_integer_and_small_u32_var_2, |&(ref n, u)| {
-        assert_ne!(n.ceiling_mod_power_of_2_ref(u), 0);
+        assert_ne!(n.ceiling_mod_power_of_two_ref(u), 0);
     });
 
     test_properties(integers, |n| {
-        assert_eq!(n.ceiling_mod_power_of_2_ref(0), 0);
+        assert_eq!(n.ceiling_mod_power_of_two_ref(0), 0);
     });
 
     test_properties(unsigneds, |&u: &u32| {
-        assert_eq!(Integer::ZERO.ceiling_mod_power_of_2(u), 0);
+        assert_eq!(Integer::ZERO.ceiling_mod_power_of_two(u), 0);
     });
 }

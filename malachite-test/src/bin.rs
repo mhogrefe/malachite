@@ -32,9 +32,9 @@ use malachite_test::integer::arithmetic::add_u32::*;
 use malachite_test::integer::arithmetic::add_mul::*;
 use malachite_test::integer::arithmetic::add_mul_i32::*;
 use malachite_test::integer::arithmetic::add_mul_u32::*;
-use malachite_test::integer::arithmetic::divisible_by_power_of_2::*;
+use malachite_test::integer::arithmetic::divisible_by_power_of_two::*;
 use malachite_test::integer::arithmetic::even_odd::*;
-use malachite_test::integer::arithmetic::mod_power_of_2::*;
+use malachite_test::integer::arithmetic::mod_power_of_two::*;
 use malachite_test::integer::arithmetic::mul::*;
 use malachite_test::integer::arithmetic::mul_i32::*;
 use malachite_test::integer::arithmetic::mul_u32::*;
@@ -97,10 +97,10 @@ use malachite_test::natural::arithmetic::add::*;
 use malachite_test::natural::arithmetic::add_u32::*;
 use malachite_test::natural::arithmetic::add_mul::*;
 use malachite_test::natural::arithmetic::add_mul_u32::*;
-use malachite_test::natural::arithmetic::divisible_by_power_of_2::*;
+use malachite_test::natural::arithmetic::divisible_by_power_of_two::*;
 use malachite_test::natural::arithmetic::even_odd::*;
-use malachite_test::natural::arithmetic::is_power_of_2::*;
-use malachite_test::natural::arithmetic::mod_power_of_2::*;
+use malachite_test::natural::arithmetic::is_power_of_two::*;
+use malachite_test::natural::arithmetic::mod_power_of_two::*;
 use malachite_test::natural::arithmetic::mul::*;
 use malachite_test::natural::arithmetic::mul_u32::*;
 use malachite_test::natural::arithmetic::neg::*;
@@ -387,7 +387,7 @@ demos_and_benchmarks!(
         demo_integer_cmp,
         demo_integer_cmp_abs,
         demo_integer_decrement,
-        demo_integer_divisible_by_power_of_2,
+        demo_integer_divisible_by_power_of_two,
         demo_integer_eq,
         demo_integer_flip_bit,
         demo_integer_from_i32,
@@ -403,15 +403,15 @@ demos_and_benchmarks!(
         demo_integer_increment,
         demo_integer_is_even,
         demo_integer_is_odd,
-        demo_integer_mod_power_of_2_assign,
-        demo_integer_mod_power_of_2,
-        demo_integer_mod_power_of_2_ref,
-        demo_integer_rem_power_of_2_assign,
-        demo_integer_rem_power_of_2,
-        demo_integer_rem_power_of_2_ref,
-        demo_integer_ceiling_mod_power_of_2_assign,
-        demo_integer_ceiling_mod_power_of_2,
-        demo_integer_ceiling_mod_power_of_2_ref,
+        demo_integer_mod_power_of_two_assign,
+        demo_integer_mod_power_of_two,
+        demo_integer_mod_power_of_two_ref,
+        demo_integer_rem_power_of_two_assign,
+        demo_integer_rem_power_of_two,
+        demo_integer_rem_power_of_two_ref,
+        demo_integer_ceiling_mod_power_of_two_assign,
+        demo_integer_ceiling_mod_power_of_two,
+        demo_integer_ceiling_mod_power_of_two_ref,
         demo_integer_mul_assign,
         demo_integer_mul_assign_ref,
         demo_integer_mul,
@@ -563,7 +563,7 @@ demos_and_benchmarks!(
         demo_natural_clone_from,
         demo_natural_cmp,
         demo_natural_decrement,
-        demo_natural_divisible_by_power_of_2,
+        demo_natural_divisible_by_power_of_two,
         demo_natural_eq,
         demo_natural_flip_bit,
         demo_natural_from_limbs_le,
@@ -575,16 +575,16 @@ demos_and_benchmarks!(
         demo_natural_increment,
         demo_natural_is_even,
         demo_natural_is_odd,
-        demo_natural_is_power_of_2,
+        demo_natural_is_power_of_two,
         demo_natural_limb_count,
         demo_natural_to_limbs_le,
         demo_natural_to_limbs_be,
-        demo_natural_mod_power_of_2_assign,
-        demo_natural_mod_power_of_2,
-        demo_natural_mod_power_of_2_ref,
-        demo_natural_neg_mod_power_of_2_assign,
-        demo_natural_neg_mod_power_of_2,
-        demo_natural_neg_mod_power_of_2_ref,
+        demo_natural_mod_power_of_two_assign,
+        demo_natural_mod_power_of_two,
+        demo_natural_mod_power_of_two_ref,
+        demo_natural_neg_mod_power_of_two_assign,
+        demo_natural_neg_mod_power_of_two,
+        demo_natural_neg_mod_power_of_two_ref,
         demo_natural_mul_assign,
         demo_natural_mul_assign_ref,
         demo_natural_mul,
@@ -828,15 +828,15 @@ demos_and_benchmarks!(
         benchmark_integer_get_bit,
         benchmark_integer_increment,
         benchmark_integer_is_even,
-        benchmark_integer_mod_power_of_2_assign,
-        benchmark_integer_mod_power_of_2,
-        benchmark_integer_mod_power_of_2_ref,
-        benchmark_integer_rem_power_of_2_assign,
-        benchmark_integer_rem_power_of_2,
-        benchmark_integer_rem_power_of_2_ref,
-        benchmark_integer_ceiling_mod_power_of_2_assign,
-        benchmark_integer_ceiling_mod_power_of_2,
-        benchmark_integer_ceiling_mod_power_of_2_ref,
+        benchmark_integer_mod_power_of_two_assign,
+        benchmark_integer_mod_power_of_two,
+        benchmark_integer_mod_power_of_two_ref,
+        benchmark_integer_rem_power_of_two_assign,
+        benchmark_integer_rem_power_of_two,
+        benchmark_integer_rem_power_of_two_ref,
+        benchmark_integer_ceiling_mod_power_of_two_assign,
+        benchmark_integer_ceiling_mod_power_of_two,
+        benchmark_integer_ceiling_mod_power_of_two_ref,
         benchmark_integer_mul_assign,
         benchmark_integer_mul_assign_evaluation_strategy,
         benchmark_integer_mul_evaluation_strategy,
@@ -985,22 +985,22 @@ demos_and_benchmarks!(
         benchmark_natural_clear_bit,
         benchmark_natural_clone_from,
         benchmark_natural_decrement,
-        benchmark_natural_divisible_by_power_of_2,
-        benchmark_natural_divisible_by_power_of_2_algorithms,
+        benchmark_natural_divisible_by_power_of_two,
+        benchmark_natural_divisible_by_power_of_two_algorithms,
         benchmark_natural_flip_bit,
         benchmark_natural_get_bit,
         benchmark_natural_increment,
         benchmark_natural_is_even,
-        benchmark_natural_is_power_of_2,
+        benchmark_natural_is_power_of_two,
         benchmark_natural_limb_count,
         benchmark_natural_to_limbs_le,
         benchmark_natural_to_limbs_be,
-        benchmark_natural_mod_power_of_2_assign,
-        benchmark_natural_mod_power_of_2,
-        benchmark_natural_mod_power_of_2_ref,
-        benchmark_natural_neg_mod_power_of_2_assign,
-        benchmark_natural_neg_mod_power_of_2,
-        benchmark_natural_neg_mod_power_of_2_ref,
+        benchmark_natural_mod_power_of_two_assign,
+        benchmark_natural_mod_power_of_two,
+        benchmark_natural_mod_power_of_two_ref,
+        benchmark_natural_neg_mod_power_of_two_assign,
+        benchmark_natural_neg_mod_power_of_two,
+        benchmark_natural_neg_mod_power_of_two_ref,
         benchmark_natural_mul_assign,
         benchmark_natural_mul_assign_evaluation_strategy,
         benchmark_natural_mul_assign_algorithms,

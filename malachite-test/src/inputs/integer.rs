@@ -182,7 +182,9 @@ pub fn pairs_of_integer_and_small_u32_var_1(
 pub fn pairs_of_integer_and_small_u32_var_2(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (Integer, u32)>> {
-    Box::new(pairs_of_integer_and_small_u32(gm).filter(|&(ref n, u)| !n.divisible_by_power_of_2(u)))
+    Box::new(
+        pairs_of_integer_and_small_u32(gm).filter(|&(ref n, u)| !n.divisible_by_power_of_two(u)),
+    )
 }
 
 pub fn pairs_of_integer_and_small_u64(gm: GenerationMode) -> Box<Iterator<Item = (Integer, u64)>> {
@@ -443,7 +445,7 @@ pub fn triples_of_integer_small_i32_and_rounding_mode_var_1(
     Box::new(
         triples_of_integer_small_i32_and_rounding_mode(gm).filter(|&(ref n, i, rm)| {
             i >= 0 || rm != RoundingMode::Exact
-                || n.divisible_by_power_of_2(i.wrapping_neg() as u32)
+                || n.divisible_by_power_of_two(i.wrapping_neg() as u32)
         }),
     )
 }
@@ -453,7 +455,7 @@ pub fn triples_of_integer_small_i32_and_rounding_mode_var_2(
 ) -> Box<Iterator<Item = (Integer, i32, RoundingMode)>> {
     Box::new(
         triples_of_integer_small_i32_and_rounding_mode(gm).filter(|&(ref n, i, rm)| {
-            i <= 0 || rm != RoundingMode::Exact || n.divisible_by_power_of_2(i as u32)
+            i <= 0 || rm != RoundingMode::Exact || n.divisible_by_power_of_two(i as u32)
         }),
     )
 }
@@ -480,6 +482,6 @@ pub fn triples_of_integer_small_u32_and_rounding_mode_var_1(
 ) -> Box<Iterator<Item = (Integer, u32, RoundingMode)>> {
     Box::new(
         triples_of_integer_small_u32_and_rounding_mode(gm)
-            .filter(|&(ref n, u, rm)| rm != RoundingMode::Exact || n.divisible_by_power_of_2(u)),
+            .filter(|&(ref n, u, rm)| rm != RoundingMode::Exact || n.divisible_by_power_of_two(u)),
     )
 }

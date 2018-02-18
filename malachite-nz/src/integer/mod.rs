@@ -146,9 +146,9 @@ pub mod arithmetic {
     pub mod add_mul;
     pub mod add_mul_i32;
     pub mod add_mul_u32;
-    pub mod divisible_by_power_of_2;
+    pub mod divisible_by_power_of_two;
     pub mod even_odd;
-    pub mod mod_power_of_2;
+    pub mod mod_power_of_two;
     pub mod mul;
     pub mod mul_i32;
     pub mod mul_u32;

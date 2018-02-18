@@ -1,14 +1,14 @@
 use common::test_properties;
-use malachite_base::num::SignificantBits;
+use malachite_base::num::{IsPowerOfTwo, SignificantBits};
 use malachite_nz::natural::Natural;
 use malachite_test::inputs::natural::naturals;
 use std::str::FromStr;
 use std::u32;
 
 #[test]
-fn test_is_power_of_2() {
+fn test_is_power_of_two() {
     let test = |n, out| {
-        assert_eq!(Natural::from_str(n).unwrap().is_power_of_2(), out);
+        assert_eq!(Natural::from_str(n).unwrap().is_power_of_two(), out);
     };
     test("0", false);
     test("1", true);
@@ -26,15 +26,15 @@ fn test_is_power_of_2() {
 }
 
 #[test]
-fn is_power_of_2_properties() {
+fn is_power_of_two_properties() {
     test_properties(naturals, |x| {
-        let is_power_of_2 = x.is_power_of_2();
+        let is_power_of_two = x.is_power_of_two();
         if *x != 0 {
             let trailing_zeros = x.trailing_zeros().unwrap();
-            assert_eq!(trailing_zeros == x.significant_bits() - 1, is_power_of_2);
+            assert_eq!(trailing_zeros == x.significant_bits() - 1, is_power_of_two);
             if trailing_zeros <= u64::from(u32::MAX) {
                 let trailing_zeros = trailing_zeros as u32;
-                assert_eq!(x >> trailing_zeros == 1, is_power_of_2);
+                assert_eq!(x >> trailing_zeros == 1, is_power_of_two);
             }
         }
     });

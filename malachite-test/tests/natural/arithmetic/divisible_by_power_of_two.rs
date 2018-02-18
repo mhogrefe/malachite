@@ -6,10 +6,10 @@ use malachite_test::inputs::natural::{naturals, pairs_of_natural_and_small_u32};
 use std::str::FromStr;
 
 #[test]
-fn test_divisible_by_power_of_2() {
+fn test_divisible_by_power_of_two() {
     let test = |n, pow, out| {
         assert_eq!(
-            Natural::from_str(n).unwrap().divisible_by_power_of_2(pow),
+            Natural::from_str(n).unwrap().divisible_by_power_of_two(pow),
             out
         );
     };
@@ -34,25 +34,25 @@ fn test_divisible_by_power_of_2() {
 }
 
 #[test]
-fn divisible_by_power_of_2_properties() {
+fn divisible_by_power_of_two_properties() {
     test_properties(
         pairs_of_natural_and_small_u32,
         |&(ref x, pow): &(Natural, u32)| {
-            let divisible = x.divisible_by_power_of_2(pow);
+            let divisible = x.divisible_by_power_of_two(pow);
             if *x != 0 {
                 assert_eq!(x.trailing_zeros().unwrap() >= u64::from(pow), divisible);
             }
-            assert_eq!((-x).divisible_by_power_of_2(pow), divisible);
-            assert!((x << pow as u32).divisible_by_power_of_2(pow));
+            assert_eq!((-x).divisible_by_power_of_two(pow), divisible);
+            assert!((x << pow as u32).divisible_by_power_of_two(pow));
             assert_eq!(x >> pow << pow == *x, divisible);
         },
     );
 
     test_properties(naturals, |x| {
-        assert!(x.divisible_by_power_of_2(0));
+        assert!(x.divisible_by_power_of_two(0));
     });
 
     test_properties(unsigneds, |&pow: &u32| {
-        assert!(Natural::ZERO.divisible_by_power_of_2(pow));
+        assert!(Natural::ZERO.divisible_by_power_of_two(pow));
     });
 }

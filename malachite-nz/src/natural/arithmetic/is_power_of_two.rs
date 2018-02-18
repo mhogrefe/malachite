@@ -1,6 +1,7 @@
+use malachite_base::num::IsPowerOfTwo;
 use natural::Natural::{self, Large, Small};
 
-impl Natural {
+impl IsPowerOfTwo for Natural {
     /// Determines whether a `Natural` is an integer power of 2.
     ///
     /// Time: worst case O(n)
@@ -14,19 +15,19 @@ impl Natural {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::Zero;
+    /// use malachite_base::num::{IsPowerOfTwo, Zero};
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
     ///
     /// fn main() {
-    ///     assert_eq!(Natural::ZERO.is_power_of_2(), false);
-    ///     assert_eq!(Natural::from(123u32).is_power_of_2(), false);
-    ///     assert_eq!(Natural::from(0x80u32).is_power_of_2(), true);
-    ///     assert_eq!(Natural::trillion().is_power_of_2(), false);
-    ///     assert_eq!(Natural::from_str("1099511627776").unwrap().is_power_of_2(), true);
+    ///     assert_eq!(Natural::ZERO.is_power_of_two(), false);
+    ///     assert_eq!(Natural::from(123u32).is_power_of_two(), false);
+    ///     assert_eq!(Natural::from(0x80u32).is_power_of_two(), true);
+    ///     assert_eq!(Natural::trillion().is_power_of_two(), false);
+    ///     assert_eq!(Natural::from_str("1099511627776").unwrap().is_power_of_two(), true);
     /// }
     /// ```
-    pub fn is_power_of_2(&self) -> bool {
+    fn is_power_of_two(&self) -> bool {
         match *self {
             Small(small) => small != 0 && small & (small - 1) == 0,
             Large(ref limbs) => {

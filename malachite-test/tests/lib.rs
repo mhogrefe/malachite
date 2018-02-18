@@ -50,9 +50,9 @@ pub mod integer {
         pub mod add_mul;
         pub mod add_mul_i32;
         pub mod add_mul_u32;
-        pub mod divisible_by_power_of_2;
+        pub mod divisible_by_power_of_two;
         pub mod even_odd;
-        pub mod mod_power_of_2;
+        pub mod mod_power_of_two;
         pub mod mul;
         pub mod mul_i32;
         pub mod mul_u32;
@@ -128,9 +128,9 @@ pub mod natural {
         pub mod add_u32;
         pub mod add_mul;
         pub mod add_mul_u32;
-        pub mod divisible_by_power_of_2;
+        pub mod divisible_by_power_of_two;
         pub mod even_odd;
-        pub mod mod_power_of_2;
+        pub mod mod_power_of_two;
         pub mod mul;
         pub mod mul_u32;
         pub mod neg;
@@ -142,7 +142,7 @@ pub mod natural {
         pub mod sub_u32;
         pub mod sub_mul;
         pub mod sub_mul_u32;
-        pub mod is_power_of_2;
+        pub mod is_power_of_two;
     }
     pub mod basic {
         pub mod constants;

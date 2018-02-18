@@ -20,14 +20,14 @@ impl Integer {
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {
-    ///     assert_eq!(Integer::ZERO.divisible_by_power_of_2(100), true);
-    ///     assert_eq!(Integer::from(-100).divisible_by_power_of_2(2), true);
-    ///     assert_eq!(Integer::from(100u32).divisible_by_power_of_2(3), false);
-    ///     assert_eq!((-Integer::trillion()).divisible_by_power_of_2(12), true);
-    ///     assert_eq!(Integer::trillion().divisible_by_power_of_2(13), false);
+    ///     assert_eq!(Integer::ZERO.divisible_by_power_of_two(100), true);
+    ///     assert_eq!(Integer::from(-100).divisible_by_power_of_two(2), true);
+    ///     assert_eq!(Integer::from(100u32).divisible_by_power_of_two(3), false);
+    ///     assert_eq!((-Integer::trillion()).divisible_by_power_of_two(12), true);
+    ///     assert_eq!(Integer::trillion().divisible_by_power_of_two(13), false);
     /// }
     /// ```
-    pub fn divisible_by_power_of_2(&self, pow: u32) -> bool {
-        self.abs.divisible_by_power_of_2(pow)
+    pub fn divisible_by_power_of_two(&self, pow: u32) -> bool {
+        self.abs.divisible_by_power_of_two(pow)
     }
 }

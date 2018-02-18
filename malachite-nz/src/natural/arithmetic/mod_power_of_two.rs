@@ -16,13 +16,13 @@ impl Natural {
     /// use malachite_nz::natural::Natural;
     ///
     /// // 1 * 2^8 + 4 = 260
-    /// assert_eq!(Natural::from(260u32).mod_power_of_2(8).to_string(), "4");
+    /// assert_eq!(Natural::from(260u32).mod_power_of_two(8).to_string(), "4");
     ///
     /// // 100 * 2^4 + 11 = 1611
-    /// assert_eq!(Natural::from(1611u32).mod_power_of_2(4).to_string(), "11");
+    /// assert_eq!(Natural::from(1611u32).mod_power_of_two(4).to_string(), "11");
     /// ```
-    pub fn mod_power_of_2(mut self, other: u32) -> Natural {
-        self.mod_power_of_2_assign(other);
+    pub fn mod_power_of_two(mut self, other: u32) -> Natural {
+        self.mod_power_of_two_assign(other);
         self
     }
 
@@ -38,11 +38,11 @@ impl Natural {
     /// use malachite_nz::natural::Natural;
     ///
     /// // 1 * 2^8 + 4 = 260
-    /// assert_eq!(Natural::from(260u32).mod_power_of_2_ref(8).to_string(), "4");
+    /// assert_eq!(Natural::from(260u32).mod_power_of_two_ref(8).to_string(), "4");
     /// // 100 * 2^4 + 11 = 1611
-    /// assert_eq!(Natural::from(1611u32).mod_power_of_2_ref(4).to_string(), "11");
+    /// assert_eq!(Natural::from(1611u32).mod_power_of_two_ref(4).to_string(), "11");
     /// ```
-    pub fn mod_power_of_2_ref(&self, other: u32) -> Natural {
+    pub fn mod_power_of_two_ref(&self, other: u32) -> Natural {
         if other == 0 {
             Natural::ZERO
         } else if *self == 0 {
@@ -83,15 +83,15 @@ impl Natural {
     ///
     /// // 1 * 2^8 + 4 = 260
     /// let mut x = Natural::from(260u32);
-    /// x.mod_power_of_2_assign(8);
+    /// x.mod_power_of_two_assign(8);
     /// assert_eq!(x.to_string(), "4");
     ///
     /// // 100 * 2^4 + 11 = 1611
     /// let mut x = Natural::from(1611u32);
-    /// x.mod_power_of_2_assign(4);
+    /// x.mod_power_of_two_assign(4);
     /// assert_eq!(x.to_string(), "11");
     /// ```
-    pub fn mod_power_of_2_assign(&mut self, other: u32) {
+    pub fn mod_power_of_two_assign(&mut self, other: u32) {
         if other == 0 {
             self.assign(0u32);
         } else if *self == 0 {
@@ -136,13 +136,13 @@ impl Natural {
     /// use malachite_nz::natural::Natural;
     ///
     /// // 2 * 2^8 - 252 = 260
-    /// assert_eq!(Natural::from(260u32).neg_mod_power_of_2(8).to_string(), "252");
+    /// assert_eq!(Natural::from(260u32).neg_mod_power_of_two(8).to_string(), "252");
     ///
     /// // 101 * 2^4 - 5 = 1611
-    /// assert_eq!(Natural::from(1611u32).neg_mod_power_of_2(4).to_string(), "5");
+    /// assert_eq!(Natural::from(1611u32).neg_mod_power_of_two(4).to_string(), "5");
     /// ```
-    pub fn neg_mod_power_of_2(mut self, other: u32) -> Natural {
-        self.neg_mod_power_of_2_assign(other);
+    pub fn neg_mod_power_of_two(mut self, other: u32) -> Natural {
+        self.neg_mod_power_of_two_assign(other);
         self
     }
 
@@ -159,11 +159,11 @@ impl Natural {
     /// use malachite_nz::natural::Natural;
     ///
     /// // 2 * 2^8 - 252 = 260
-    /// assert_eq!(Natural::from(260u32).neg_mod_power_of_2_ref(8).to_string(), "252");
+    /// assert_eq!(Natural::from(260u32).neg_mod_power_of_two_ref(8).to_string(), "252");
     /// // 101 * 2^4 - 5 = 1611
-    /// assert_eq!(Natural::from(1611u32).neg_mod_power_of_2_ref(4).to_string(), "5");
+    /// assert_eq!(Natural::from(1611u32).neg_mod_power_of_two_ref(4).to_string(), "5");
     /// ```
-    pub fn neg_mod_power_of_2_ref(&self, other: u32) -> Natural {
+    pub fn neg_mod_power_of_two_ref(&self, other: u32) -> Natural {
         if other == 0 {
             Natural::ZERO
         } else if *self == 0 {
@@ -205,15 +205,15 @@ impl Natural {
     ///
     /// // 2 * 2^8 - 252 = 260
     /// let mut x = Natural::from(260u32);
-    /// x.neg_mod_power_of_2_assign(8);
+    /// x.neg_mod_power_of_two_assign(8);
     /// assert_eq!(x.to_string(), "252");
     ///
     /// // 101 * 2^4 - 5 = 1611
     /// let mut x = Natural::from(1611u32);
-    /// x.neg_mod_power_of_2_assign(4);
+    /// x.neg_mod_power_of_two_assign(4);
     /// assert_eq!(x.to_string(), "5");
     /// ```
-    pub fn neg_mod_power_of_2_assign(&mut self, other: u32) {
+    pub fn neg_mod_power_of_two_assign(&mut self, other: u32) {
         if other == 0 {
             self.assign(0u32);
         } else if *self == 0 {

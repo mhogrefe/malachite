@@ -2,7 +2,7 @@ use malachite_base::num::SignificantBits;
 use natural::LOG_LIMB_BITS;
 use natural::Natural::{self, Large, Small};
 
-impl SignificantBits for Natural {
+impl<'a> SignificantBits for &'a Natural {
     /// Returns the smallest number of bits necessary to represent a `Natural`. 0 has zero
     /// significant bits.
     ///
@@ -24,7 +24,7 @@ impl SignificantBits for Natural {
     ///     assert_eq!(Natural::from(100u32).significant_bits(), 7);
     /// }
     /// ```
-    fn significant_bits(&self) -> u64 {
+    fn significant_bits(self) -> u64 {
         match *self {
             Small(small) => small.significant_bits(),
             Large(ref limbs) => {

@@ -1,5 +1,5 @@
 use common::test_properties;
-use malachite_base::num::{One, Zero};
+use malachite_base::num::{IsPowerOfTwo, One, Zero};
 use malachite_nz::natural::Natural;
 use malachite_test::common::{biguint_to_natural, natural_to_biguint, natural_to_rug_integer,
                              rug_integer_to_natural};
@@ -120,6 +120,6 @@ fn shl_u32_properties() {
 
     test_properties(small_u32s, |&u: &u32| {
         assert_eq!(Natural::ZERO << u, 0);
-        assert!((Natural::ONE << u).is_power_of_2());
+        assert!((Natural::ONE << u).is_power_of_two());
     });
 }

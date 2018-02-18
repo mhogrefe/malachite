@@ -1,4 +1,4 @@
-use malachite_base::num::{BitAccess, SignificantBits};
+use malachite_base::num::{BitAccess, IsPowerOfTwo, SignificantBits};
 use malachite_base::num::Zero;
 use natural::Natural;
 use rand::Rng;
@@ -94,7 +94,7 @@ pub fn random_natural_from_bits<R: Rng>(rng: &mut R, bits: u64) -> Natural {
 /// ```
 pub fn random_natural_below<R: Rng>(rng: &mut R, n: &Natural) -> Natural {
     assert_ne!(*n, 0, "Cannot generate a Natural below 0");
-    if n.is_power_of_2() {
+    if n.is_power_of_two() {
         random_natural_up_to_bits(rng, n.significant_bits() - 1)
     } else {
         let bits = n.significant_bits();
