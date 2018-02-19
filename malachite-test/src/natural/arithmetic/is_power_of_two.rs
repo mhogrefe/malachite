@@ -18,7 +18,7 @@ pub fn benchmark_natural_is_power_of_two(gm: GenerationMode, limit: usize, file_
     println!("benchmarking {} Natural.is_power_of_two()", gm.name());
     benchmark_1(BenchmarkOptions1 {
         xs: naturals(gm),
-        function_f: &(|n: Natural| n.is_power_of_two()),
+        function_f: &mut (|n: Natural| n.is_power_of_two()),
         x_cons: &(|x| x.clone()),
         x_param: &(|n| n.significant_bits() as usize),
         limit,

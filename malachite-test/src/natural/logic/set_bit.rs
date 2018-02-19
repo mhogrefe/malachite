@@ -22,9 +22,9 @@ pub fn benchmark_natural_set_bit(gm: GenerationMode, limit: usize, file_name: &s
     println!("benchmarking {} Natural.set_bit(u64)", gm.name());
     benchmark_3(BenchmarkOptions3 {
         xs: pairs_of_natural_and_small_u64(gm),
-        function_f: &(|(mut n, index): (Natural, u64)| n.set_bit(index)),
-        function_g: &(|(mut n, index): (BigUint, u64)| num_set_bit(&mut n, index)),
-        function_h: &(|(mut n, index): (rug::Integer, u64)| {
+        function_f: &mut (|(mut n, index): (Natural, u64)| n.set_bit(index)),
+        function_g: &mut (|(mut n, index): (BigUint, u64)| num_set_bit(&mut n, index)),
+        function_h: &mut (|(mut n, index): (rug::Integer, u64)| {
             n.set_bit(index as u32, true);
         }),
         x_cons: &(|p| p.clone()),

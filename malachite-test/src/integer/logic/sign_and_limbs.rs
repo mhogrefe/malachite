@@ -20,7 +20,7 @@ pub fn benchmark_integer_sign_and_limbs_le(gm: GenerationMode, limit: usize, fil
     println!("benchmarking {} Integer.sign_and_limbs_le()", gm.name());
     benchmark_1(BenchmarkOptions1 {
         xs: integers(gm),
-        function_f: &(|n: Integer| n.sign_and_limbs_le()),
+        function_f: &mut (|n: Integer| n.sign_and_limbs_le()),
         x_cons: &(|x| x.clone()),
         x_param: &(|n| n.significant_bits() as usize),
         limit,
@@ -36,7 +36,7 @@ pub fn benchmark_integer_sign_and_limbs_be(gm: GenerationMode, limit: usize, fil
     println!("benchmarking {} Integer.sign_and_limbs_be()", gm.name());
     benchmark_1(BenchmarkOptions1 {
         xs: integers(gm),
-        function_f: &(|n: Integer| n.sign_and_limbs_be()),
+        function_f: &mut (|n: Integer| n.sign_and_limbs_be()),
         x_cons: &(|x| x.clone()),
         x_param: &(|n| n.significant_bits() as usize),
         limit,

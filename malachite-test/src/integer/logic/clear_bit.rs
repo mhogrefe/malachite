@@ -16,7 +16,7 @@ pub fn benchmark_integer_clear_bit(gm: GenerationMode, limit: usize, file_name: 
     println!("benchmarking {} Integer.clear_bit(u64)", gm.name());
     benchmark_1(BenchmarkOptions1 {
         xs: pairs_of_integer_and_small_u64(gm),
-        function_f: &(|(mut n, index): (Integer, u64)| n.clear_bit(index)),
+        function_f: &mut (|(mut n, index): (Integer, u64)| n.clear_bit(index)),
         x_cons: &(|p| p.clone()),
         x_param: &(|&(ref n, _)| n.significant_bits() as usize),
         limit,

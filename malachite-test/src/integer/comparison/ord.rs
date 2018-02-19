@@ -21,9 +21,9 @@ pub fn benchmark_integer_cmp(gm: GenerationMode, limit: usize, file_name: &str) 
     println!("benchmarking {} Integer.cmp(&Integer)", gm.name());
     benchmark_3(BenchmarkOptions3 {
         xs: pairs_of_integers(gm),
-        function_f: &(|(x, y): (Integer, Integer)| x.cmp(&y)),
-        function_g: &(|(x, y): (BigInt, BigInt)| x.cmp(&y)),
-        function_h: &(|(x, y): (rug::Integer, rug::Integer)| x.cmp(&y)),
+        function_f: &mut (|(x, y): (Integer, Integer)| x.cmp(&y)),
+        function_g: &mut (|(x, y): (BigInt, BigInt)| x.cmp(&y)),
+        function_h: &mut (|(x, y): (rug::Integer, rug::Integer)| x.cmp(&y)),
         x_cons: &(|p| p.clone()),
         y_cons: &(|&(ref x, ref y)| (integer_to_bigint(x), integer_to_bigint(y))),
         z_cons: &(|&(ref x, ref y)| (integer_to_rug_integer(x), integer_to_rug_integer(y))),

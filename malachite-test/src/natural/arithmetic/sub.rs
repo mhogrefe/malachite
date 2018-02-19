@@ -39,8 +39,8 @@ pub fn benchmark_natural_sub_assign(gm: GenerationMode, limit: usize, file_name:
     println!("benchmarking {} Natural -= &Natural", gm.name());
     benchmark_2(BenchmarkOptions2 {
         xs: pairs_of_naturals_var_1(gm),
-        function_f: &(|(mut x, y)| x -= &y),
-        function_g: &(|(mut x, y): (rug::Integer, rug::Integer)| x -= &y),
+        function_f: &mut (|(mut x, y)| x -= &y),
+        function_g: &mut (|(mut x, y): (rug::Integer, rug::Integer)| x -= &y),
         x_cons: &(|p| p.clone()),
         y_cons: &(|&(ref x, ref y)| (natural_to_rug_integer(x), natural_to_rug_integer(y))),
         x_param: &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),
@@ -58,9 +58,9 @@ pub fn benchmark_natural_sub(gm: GenerationMode, limit: usize, file_name: &str) 
     println!("benchmarking {} Natural - &Natural", gm.name());
     benchmark_3(BenchmarkOptions3 {
         xs: pairs_of_naturals(gm),
-        function_f: &(|(x, y)| x - &y),
-        function_g: &(|(x, y)| checked_sub(x, y)),
-        function_h: &(|(x, y)| checked_sub(x, y)),
+        function_f: &mut (|(x, y)| x - &y),
+        function_g: &mut (|(x, y)| checked_sub(x, y)),
+        function_h: &mut (|(x, y)| checked_sub(x, y)),
         x_cons: &(|p| p.clone()),
         y_cons: &(|&(ref x, ref y)| (natural_to_biguint(x), natural_to_biguint(y))),
         z_cons: &(|&(ref x, ref y)| (natural_to_rug_integer(x), natural_to_rug_integer(y))),
@@ -87,8 +87,8 @@ pub fn benchmark_natural_sub_evaluation_strategy(
     );
     benchmark_2(BenchmarkOptions2 {
         xs: pairs_of_naturals(gm),
-        function_f: &(|(x, y)| x - &y),
-        function_g: &(|(x, y)| &x - &y),
+        function_f: &mut (|(x, y)| x - &y),
+        function_g: &mut (|(x, y)| &x - &y),
         x_cons: &(|p| p.clone()),
         y_cons: &(|p| p.clone()),
         x_param: &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),

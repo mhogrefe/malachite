@@ -17,7 +17,7 @@ pub fn benchmark_integer_increment(gm: GenerationMode, limit: usize, file_name: 
     println!("benchmarking {} Integer.increment()", gm.name());
     benchmark_1(BenchmarkOptions1 {
         xs: integers(gm),
-        function_f: &(|mut n: Integer| n.increment()),
+        function_f: &mut (|mut n: Integer| n.increment()),
         x_cons: &(|n| n.clone()),
         x_param: &(|n| n.significant_bits() as usize),
         limit,

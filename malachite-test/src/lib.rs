@@ -1,6 +1,7 @@
 extern crate malachite_base;
 extern crate malachite_nz;
 extern crate num;
+extern crate rand;
 extern crate rug;
 extern crate rust_wheels;
 
@@ -181,5 +182,10 @@ pub mod natural {
         pub mod set_bit;
         pub mod significant_bits;
         pub mod trailing_zeros;
+    }
+    pub mod random {
+        pub mod random_natural_below;
+        pub mod random_natural_up_to_bits;
+        pub mod random_natural_with_bits;
     }
 }

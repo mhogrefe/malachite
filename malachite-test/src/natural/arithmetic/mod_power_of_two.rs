@@ -82,7 +82,7 @@ pub fn benchmark_natural_mod_power_of_two_assign(
     );
     benchmark_1(BenchmarkOptions1 {
         xs: pairs_of_natural_and_small_u32(gm),
-        function_f: &(|(mut n, u): (Natural, u32)| n.mod_power_of_two_assign(u)),
+        function_f: &mut (|(mut n, u): (Natural, u32)| n.mod_power_of_two_assign(u)),
         x_cons: &(|p| p.clone()),
         x_param: &(|&(_, index)| index as usize),
         limit,
@@ -98,7 +98,7 @@ pub fn benchmark_natural_mod_power_of_two(gm: GenerationMode, limit: usize, file
     println!("benchmarking {} Natural.mod_power_of_two(u32)", gm.name());
     benchmark_1(BenchmarkOptions1 {
         xs: pairs_of_natural_and_small_u32(gm),
-        function_f: &(|(n, u): (Natural, u32)| n.mod_power_of_two(u)),
+        function_f: &mut (|(n, u): (Natural, u32)| n.mod_power_of_two(u)),
         x_cons: &(|p| p.clone()),
         x_param: &(|&(_, index)| index as usize),
         limit,
@@ -117,7 +117,7 @@ pub fn benchmark_natural_mod_power_of_two_ref(gm: GenerationMode, limit: usize, 
     );
     benchmark_1(BenchmarkOptions1 {
         xs: pairs_of_natural_and_small_u32(gm),
-        function_f: &(|(n, u): (Natural, u32)| n.mod_power_of_two_ref(u)),
+        function_f: &mut (|(n, u): (Natural, u32)| n.mod_power_of_two_ref(u)),
         x_cons: &(|p| p.clone()),
         x_param: &(|&(_, index)| index as usize),
         limit,
@@ -140,7 +140,7 @@ pub fn benchmark_natural_neg_mod_power_of_two_assign(
     );
     benchmark_1(BenchmarkOptions1 {
         xs: pairs_of_natural_and_small_u32(gm),
-        function_f: &(|(mut n, u): (Natural, u32)| n.neg_mod_power_of_two_assign(u)),
+        function_f: &mut (|(mut n, u): (Natural, u32)| n.neg_mod_power_of_two_assign(u)),
         x_cons: &(|p| p.clone()),
         x_param: &(|&(_, index)| index as usize),
         limit,
@@ -159,7 +159,7 @@ pub fn benchmark_natural_neg_mod_power_of_two(gm: GenerationMode, limit: usize, 
     );
     benchmark_1(BenchmarkOptions1 {
         xs: pairs_of_natural_and_small_u32(gm),
-        function_f: &(|(n, u): (Natural, u32)| n.neg_mod_power_of_two(u)),
+        function_f: &mut (|(n, u): (Natural, u32)| n.neg_mod_power_of_two(u)),
         x_cons: &(|p| p.clone()),
         x_param: &(|&(_, index)| index as usize),
         limit,
@@ -182,7 +182,7 @@ pub fn benchmark_natural_neg_mod_power_of_two_ref(
     );
     benchmark_1(BenchmarkOptions1 {
         xs: pairs_of_natural_and_small_u32(gm),
-        function_f: &(|(n, u): (Natural, u32)| n.neg_mod_power_of_two_ref(u)),
+        function_f: &mut (|(n, u): (Natural, u32)| n.neg_mod_power_of_two_ref(u)),
         x_cons: &(|p| p.clone()),
         x_param: &(|&(_, index)| index as usize),
         limit,

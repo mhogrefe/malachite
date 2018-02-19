@@ -24,7 +24,7 @@ fn benchmark_unsigned_upper_half<T: 'static + PrimitiveUnsigned + SplitInHalf>(
     println!("benchmarking {} {}.upper_half()", gm.name(), T::NAME,);
     benchmark_1(BenchmarkOptions1 {
         xs: unsigneds(gm),
-        function_f: &(|u: T| u.upper_half()),
+        function_f: &mut (|u: T| u.upper_half()),
         x_cons: &(|&u| u),
         x_param: &(|&u| u.significant_bits() as usize),
         limit,

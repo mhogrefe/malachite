@@ -20,7 +20,7 @@ pub fn benchmark_natural_neg(gm: GenerationMode, limit: usize, file_name: &str) 
     println!("benchmarking {} -Natural", gm.name());
     benchmark_1(BenchmarkOptions1 {
         xs: naturals(gm),
-        function_f: &(|n: Natural| -n),
+        function_f: &mut (|n: Natural| -n),
         x_cons: &(|x| x.clone()),
         x_param: &(|n| n.significant_bits() as usize),
         limit,
@@ -40,8 +40,8 @@ pub fn benchmark_natural_neg_evaluation_strategy(
     println!("benchmarking {} -Natural evaluation strategy", gm.name());
     benchmark_2(BenchmarkOptions2 {
         xs: naturals(gm),
-        function_f: &(|n: Natural| -n),
-        function_g: &(|n| -&n),
+        function_f: &mut (|n: Natural| -n),
+        function_g: &mut (|n| -&n),
         x_cons: &(|n| n.clone()),
         y_cons: &(|n| n.clone()),
         x_param: &(|n| n.significant_bits() as usize),

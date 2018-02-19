@@ -48,8 +48,8 @@ pub fn benchmark_natural_mul_assign_u32(gm: GenerationMode, limit: usize, file_n
     println!("benchmarking {} Natural *= u32", gm.name());
     benchmark_2(BenchmarkOptions2 {
         xs: pairs_of_natural_and_unsigned::<u32>(gm),
-        function_f: &(|(mut n, u)| n *= u),
-        function_g: &(|(mut n, u): (rug::Integer, u32)| n *= u),
+        function_f: &mut (|(mut n, u)| n *= u),
+        function_g: &mut (|(mut n, u): (rug::Integer, u32)| n *= u),
         x_cons: &(|p| p.clone()),
         y_cons: &(|&(ref n, u)| (natural_to_rug_integer(n), u)),
         x_param: &(|&(ref n, _)| n.significant_bits() as usize),
@@ -67,9 +67,9 @@ pub fn benchmark_natural_mul_u32(gm: GenerationMode, limit: usize, file_name: &s
     println!("benchmarking {} Natural * u32", gm.name());
     benchmark_3(BenchmarkOptions3 {
         xs: pairs_of_natural_and_unsigned::<u32>(gm),
-        function_f: &(|(n, u)| n * u),
-        function_g: &(|(n, u): (BigUint, u32)| num_mul_u32(n, u)),
-        function_h: &(|(n, u): (rug::Integer, u32)| n * u),
+        function_f: &mut (|(n, u)| n * u),
+        function_g: &mut (|(n, u): (BigUint, u32)| num_mul_u32(n, u)),
+        function_h: &mut (|(n, u): (rug::Integer, u32)| n * u),
         x_cons: &(|p| p.clone()),
         y_cons: &(|&(ref n, u)| (natural_to_biguint(n), u)),
         z_cons: &(|&(ref n, u)| (natural_to_rug_integer(n), u)),
@@ -96,8 +96,8 @@ pub fn benchmark_natural_mul_u32_evaluation_strategy(
     );
     benchmark_2(BenchmarkOptions2 {
         xs: pairs_of_natural_and_unsigned::<u32>(gm),
-        function_f: &(|(n, u)| n * u),
-        function_g: &(|(n, u)| &n * u),
+        function_f: &mut (|(n, u)| n * u),
+        function_g: &mut (|(n, u)| &n * u),
         x_cons: &(|p| p.clone()),
         y_cons: &(|p| p.clone()),
         x_param: &(|&(ref n, _)| n.significant_bits() as usize),
@@ -115,8 +115,8 @@ pub fn benchmark_u32_mul_natural(gm: GenerationMode, limit: usize, file_name: &s
     println!("benchmarking {} u32 * Natural", gm.name());
     benchmark_2(BenchmarkOptions2 {
         xs: pairs_of_unsigned_and_natural::<u32>(gm),
-        function_f: &(|(u, n)| u * n),
-        function_g: &(|(u, n): (u32, rug::Integer)| u * n),
+        function_f: &mut (|(u, n)| u * n),
+        function_g: &mut (|(u, n): (u32, rug::Integer)| u * n),
         x_cons: &(|p| p.clone()),
         y_cons: &(|&(u, ref n)| (u, natural_to_rug_integer(n))),
         x_param: &(|&(_, ref n)| n.significant_bits() as usize),
@@ -141,8 +141,8 @@ pub fn benchmark_u32_mul_natural_evaluation_strategy(
     );
     benchmark_2(BenchmarkOptions2 {
         xs: pairs_of_unsigned_and_natural::<u32>(gm),
-        function_f: &(|(u, n)| u * n),
-        function_g: &(|(u, n)| u * &n),
+        function_f: &mut (|(u, n)| u * n),
+        function_g: &mut (|(u, n)| u * &n),
         x_cons: &(|p| p.clone()),
         y_cons: &(|p| p.clone()),
         x_param: &(|&(_, ref n)| n.significant_bits() as usize),

@@ -33,7 +33,7 @@ pub fn benchmark_integer_from_sign_and_limbs_le(gm: GenerationMode, limit: usize
     );
     benchmark_1(BenchmarkOptions1 {
         xs: pairs_of_ordering_and_vec_of_unsigned_var_1(gm),
-        function_f: &(|(sign, limbs): (Ordering, Vec<u32>)| {
+        function_f: &mut (|(sign, limbs): (Ordering, Vec<u32>)| {
             Integer::from_sign_and_limbs_le(sign, limbs.as_slice())
         }),
         x_cons: &(|p| p.clone()),
@@ -54,7 +54,7 @@ pub fn benchmark_integer_from_sign_and_limbs_be(gm: GenerationMode, limit: usize
     );
     benchmark_1(BenchmarkOptions1 {
         xs: pairs_of_ordering_and_vec_of_unsigned_var_1(gm),
-        function_f: &(|(sign, limbs): (Ordering, Vec<u32>)| {
+        function_f: &mut (|(sign, limbs): (Ordering, Vec<u32>)| {
             Integer::from_sign_and_limbs_be(sign, limbs.as_slice())
         }),
         x_cons: &(|p| p.clone()),

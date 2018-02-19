@@ -14,7 +14,7 @@ pub fn benchmark_natural_trailing_zeros(gm: GenerationMode, limit: usize, file_n
     println!("benchmarking {} Natural.trailing_zeros()", gm.name());
     benchmark_1(BenchmarkOptions1 {
         xs: naturals(gm),
-        function_f: &(|n: Natural| n.trailing_zeros()),
+        function_f: &mut (|n: Natural| n.trailing_zeros()),
         x_cons: &(|x| x.clone()),
         x_param: &(|n| n.significant_bits() as usize),
         limit,

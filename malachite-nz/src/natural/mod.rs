@@ -202,4 +202,8 @@ pub mod logic {
     pub mod significant_bits;
     pub mod trailing_zeros;
 }
-pub mod random;
+pub mod random {
+    pub mod random_natural_below;
+    pub mod random_natural_up_to_bits;
+    pub mod random_natural_with_bits;
+}

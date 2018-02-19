@@ -26,7 +26,7 @@ fn benchmark_unsigned_significant_bits<T: 'static + PrimitiveUnsigned>(
     println!("benchmarking {} {}.significant_bits()", gm.name(), T::NAME);
     benchmark_1(BenchmarkOptions1 {
         xs: unsigneds(gm),
-        function_f: &(|n: T| n.significant_bits()),
+        function_f: &mut (|n: T| n.significant_bits()),
         x_cons: &(|&n| n),
         x_param: &(|&n| n.significant_bits() as usize),
         limit,
@@ -46,7 +46,7 @@ fn benchmark_signed_significant_bits<T: 'static + PrimitiveSigned>(
     println!("benchmarking {} {}.significant_bits()", gm.name(), T::NAME);
     benchmark_1(BenchmarkOptions1 {
         xs: signeds(gm),
-        function_f: &(|n: T| n.significant_bits()),
+        function_f: &mut (|n: T| n.significant_bits()),
         x_cons: &(|&n| n),
         x_param: &(|&n| n.significant_bits() as usize),
         limit,

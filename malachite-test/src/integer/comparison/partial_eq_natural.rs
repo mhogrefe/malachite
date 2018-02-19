@@ -28,8 +28,8 @@ pub fn benchmark_integer_partial_eq_natural(gm: GenerationMode, limit: usize, fi
     println!("benchmarking {} Integer == Natural", gm.name());
     benchmark_2(BenchmarkOptions2 {
         xs: pairs_of_integer_and_natural(gm),
-        function_f: &(|(x, y)| x == y),
-        function_g: &(|(x, y)| x == y),
+        function_f: &mut (|(x, y)| x == y),
+        function_g: &mut (|(x, y)| x == y),
         x_cons: &(|p| p.clone()),
         y_cons: &(|&(ref x, ref y)| (integer_to_rug_integer(x), natural_to_rug_integer(y))),
         x_param: &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),
@@ -47,8 +47,8 @@ pub fn benchmark_natural_partial_eq_integer(gm: GenerationMode, limit: usize, fi
     println!("benchmarking {} Natural == Integer", gm.name());
     benchmark_2(BenchmarkOptions2 {
         xs: pairs_of_natural_and_integer(gm),
-        function_f: &(|(x, y)| x == y),
-        function_g: &(|(x, y)| x == y),
+        function_f: &mut (|(x, y)| x == y),
+        function_g: &mut (|(x, y)| x == y),
         x_cons: &(|p| p.clone()),
         y_cons: &(|&(ref x, ref y)| (natural_to_rug_integer(x), integer_to_rug_integer(y))),
         x_param: &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),

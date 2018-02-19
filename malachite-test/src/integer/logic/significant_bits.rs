@@ -16,9 +16,9 @@ pub fn benchmark_integer_significant_bits(gm: GenerationMode, limit: usize, file
     println!("benchmarking {} Integer.significant_bits()", gm.name());
     benchmark_3(BenchmarkOptions3 {
         xs: integers(gm),
-        function_f: &(|n: Integer| n.significant_bits()),
-        function_g: &(|n: BigInt| n.bits()),
-        function_h: &(|n: rug::Integer| n.significant_bits()),
+        function_f: &mut (|n: Integer| n.significant_bits()),
+        function_g: &mut (|n: BigInt| n.bits()),
+        function_h: &mut (|n: rug::Integer| n.significant_bits()),
         x_cons: &(|x| x.clone()),
         y_cons: &(|x| integer_to_bigint(x)),
         z_cons: &(|x| integer_to_rug_integer(x)),

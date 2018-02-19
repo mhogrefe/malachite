@@ -39,8 +39,8 @@ pub fn benchmark_integer_partial_cmp_abs_natural(
     );
     benchmark_2(BenchmarkOptions2 {
         xs: pairs_of_integer_and_natural(gm),
-        function_f: &(|(x, y): (Integer, Natural)| x.partial_cmp_abs(&y)),
-        function_g: &(|(x, y): (rug::Integer, rug::Integer)| x.cmp_abs(&y)),
+        function_f: &mut (|(x, y): (Integer, Natural)| x.partial_cmp_abs(&y)),
+        function_g: &mut (|(x, y): (rug::Integer, rug::Integer)| x.cmp_abs(&y)),
         x_cons: &(|p| p.clone()),
         y_cons: &(|&(ref x, ref y)| (integer_to_rug_integer(x), natural_to_rug_integer(y))),
         x_param: &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),
@@ -65,8 +65,8 @@ pub fn benchmark_natural_partial_cmp_abs_integer(
     );
     benchmark_2(BenchmarkOptions2 {
         xs: pairs_of_natural_and_integer(gm),
-        function_f: &(|(x, y): (Natural, Integer)| x.partial_cmp_abs(&y)),
-        function_g: &(|(x, y): (rug::Integer, rug::Integer)| x.cmp_abs(&y)),
+        function_f: &mut (|(x, y): (Natural, Integer)| x.partial_cmp_abs(&y)),
+        function_g: &mut (|(x, y): (rug::Integer, rug::Integer)| x.cmp_abs(&y)),
         x_cons: &(|p| p.clone()),
         y_cons: &(|&(ref x, ref y)| (natural_to_rug_integer(x), integer_to_rug_integer(y))),
         x_param: &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),

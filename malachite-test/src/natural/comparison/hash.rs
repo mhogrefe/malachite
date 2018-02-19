@@ -15,8 +15,8 @@ pub fn benchmark_natural_hash(gm: GenerationMode, limit: usize, file_name: &str)
     println!("benchmarking {} Natural hash", gm.name());
     benchmark_2(BenchmarkOptions2 {
         xs: naturals(gm),
-        function_f: &(|n| hash(&n)),
-        function_g: &(|n: BigUint| hash(&n)),
+        function_f: &mut (|n| hash(&n)),
+        function_g: &mut (|n: BigUint| hash(&n)),
         x_cons: &(|x| x.clone()),
         y_cons: &(|x| natural_to_biguint(x)),
         x_param: &(|n| n.significant_bits() as usize),

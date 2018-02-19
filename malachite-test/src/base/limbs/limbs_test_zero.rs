@@ -17,7 +17,7 @@ pub fn benchmark_limbs_test_zero(gm: GenerationMode, limit: usize, file_name: &s
     println!("benchmarking {} limbs_test_zero(&[u32])", gm.name());
     benchmark_1(BenchmarkOptions1 {
         xs: vecs_of_unsigned(gm),
-        function_f: &(|xs: Vec<u32>| limbs_test_zero(xs.as_slice())),
+        function_f: &mut (|xs: Vec<u32>| limbs_test_zero(xs.as_slice())),
         x_cons: &(|xs| xs.clone()),
         x_param: &(|xs| xs.len()),
         limit,

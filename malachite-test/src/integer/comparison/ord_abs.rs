@@ -21,8 +21,8 @@ pub fn benchmark_integer_cmp_abs(gm: GenerationMode, limit: usize, file_name: &s
     println!("benchmarking {} Integer.cmp_abs(&Integer)", gm.name());
     benchmark_2(BenchmarkOptions2 {
         xs: pairs_of_integers(gm),
-        function_f: &(|(x, y): (Integer, Integer)| x.cmp(&y)),
-        function_g: &(|(x, y): (rug::Integer, rug::Integer)| x.cmp(&y)),
+        function_f: &mut (|(x, y): (Integer, Integer)| x.cmp(&y)),
+        function_g: &mut (|(x, y): (rug::Integer, rug::Integer)| x.cmp(&y)),
         x_cons: &(|p| p.clone()),
         y_cons: &(|&(ref x, ref y)| (integer_to_rug_integer(x), integer_to_rug_integer(y))),
         x_param: &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),

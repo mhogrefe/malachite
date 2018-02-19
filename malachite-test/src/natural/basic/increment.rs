@@ -17,7 +17,7 @@ pub fn benchmark_natural_increment(gm: GenerationMode, limit: usize, file_name: 
     println!("benchmarking {} Natural.increment()", gm.name());
     benchmark_1(BenchmarkOptions1 {
         xs: naturals(gm),
-        function_f: &(|mut n: Natural| n.increment()),
+        function_f: &mut (|mut n: Natural| n.increment()),
         x_cons: &(|n| n.clone()),
         x_param: &(|n| n.significant_bits() as usize),
         limit,

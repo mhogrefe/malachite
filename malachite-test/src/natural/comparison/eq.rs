@@ -18,9 +18,9 @@ pub fn benchmark_natural_eq(gm: GenerationMode, limit: usize, file_name: &str) {
     println!("benchmarking {} Natural == Natural", gm.name());
     benchmark_3(BenchmarkOptions3 {
         xs: pairs_of_naturals(gm),
-        function_f: &(|(x, y)| x == y),
-        function_g: &(|(x, y)| x == y),
-        function_h: &(|(x, y)| x == y),
+        function_f: &mut (|(x, y)| x == y),
+        function_g: &mut (|(x, y)| x == y),
+        function_h: &mut (|(x, y)| x == y),
         x_cons: &(|p| p.clone()),
         y_cons: &(|&(ref x, ref y)| (natural_to_biguint(x), natural_to_biguint(y))),
         z_cons: &(|&(ref x, ref y)| (natural_to_rug_integer(x), natural_to_rug_integer(y))),

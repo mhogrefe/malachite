@@ -27,7 +27,7 @@ fn benchmark_unsigned_clear_bit<T: 'static + PrimitiveUnsigned>(
     println!("benchmarking {} {}.clear_bit(u64)", gm.name(), T::NAME);
     benchmark_1(BenchmarkOptions1 {
         xs: pairs_of_unsigned_and_small_u64(gm),
-        function_f: &(|(mut n, index): (T, u64)| n.clear_bit(index)),
+        function_f: &mut (|(mut n, index): (T, u64)| n.clear_bit(index)),
         x_cons: &(|&p| p),
         x_param: &(|&(_, index)| index as usize),
         limit,
@@ -47,7 +47,7 @@ fn benchmark_signed_clear_bit<T: 'static + PrimitiveSigned>(
     println!("benchmarking {} {}.set_bit(u64)", gm.name(), T::NAME);
     benchmark_1(BenchmarkOptions1 {
         xs: pairs_of_signed_and_u64_width_range_var_2(gm),
-        function_f: &(|(mut n, index): (T, u64)| n.clear_bit(index)),
+        function_f: &mut (|(mut n, index): (T, u64)| n.clear_bit(index)),
         x_cons: &(|&p| p),
         x_param: &(|&(_, index)| index as usize),
         limit,

@@ -21,8 +21,8 @@ pub fn benchmark_natural_to_u32(gm: GenerationMode, limit: usize, file_name: &st
     println!("benchmarking {} Natural.to_u32()", gm.name());
     benchmark_2(BenchmarkOptions2 {
         xs: naturals(gm),
-        function_f: &(|n: Natural| n.to_u32()),
-        function_g: &(|n: rug::Integer| n.to_u32()),
+        function_f: &mut (|n: Natural| n.to_u32()),
+        function_g: &mut (|n: rug::Integer| n.to_u32()),
         x_cons: &(|x| x.clone()),
         y_cons: &(|x| natural_to_rug_integer(x)),
         x_param: &(|n| n.significant_bits() as usize),
@@ -40,8 +40,8 @@ pub fn benchmark_natural_to_u32_wrapping(gm: GenerationMode, limit: usize, file_
     println!("benchmarking {} Natural.to_u32_wrapping()", gm.name());
     benchmark_2(BenchmarkOptions2 {
         xs: naturals(gm),
-        function_f: &(|n: Natural| n.to_u32_wrapping()),
-        function_g: &(|n: rug::Integer| n.to_u32_wrapping()),
+        function_f: &mut (|n: Natural| n.to_u32_wrapping()),
+        function_g: &mut (|n: rug::Integer| n.to_u32_wrapping()),
         x_cons: &(|x| x.clone()),
         y_cons: &(|x| natural_to_rug_integer(x)),
         x_param: &(|n| n.significant_bits() as usize),

@@ -50,7 +50,7 @@ pub fn benchmark_natural_sub_mul_assign(gm: GenerationMode, limit: usize, file_n
     );
     benchmark_1(BenchmarkOptions1 {
         xs: triples_of_naturals_var_1(gm),
-        function_f: &(|(mut a, b, c): (Natural, Natural, Natural)| a.sub_mul_assign(&b, &c)),
+        function_f: &mut (|(mut a, b, c): (Natural, Natural, Natural)| a.sub_mul_assign(&b, &c)),
         x_cons: &(|t| t.clone()),
         x_param: &(|&(ref a, ref b, ref c)| {
             max(
@@ -78,8 +78,8 @@ pub fn benchmark_natural_sub_mul_assign_algorithms(
     );
     benchmark_2(BenchmarkOptions2 {
         xs: triples_of_naturals_var_1(gm),
-        function_f: &(|(mut a, b, c): (Natural, Natural, Natural)| a.sub_mul_assign(&b, &c)),
-        function_g: &(|(mut a, b, c): (Natural, Natural, Natural)| a -= &(&b * &c)),
+        function_f: &mut (|(mut a, b, c): (Natural, Natural, Natural)| a.sub_mul_assign(&b, &c)),
+        function_g: &mut (|(mut a, b, c): (Natural, Natural, Natural)| a -= &(&b * &c)),
         x_cons: &(|t| t.clone()),
         y_cons: &(|t| t.clone()),
         x_param: &(|&(ref a, ref b, ref c)| {
@@ -105,7 +105,7 @@ pub fn benchmark_natural_sub_mul(gm: GenerationMode, limit: usize, file_name: &s
     );
     benchmark_1(BenchmarkOptions1 {
         xs: triples_of_naturals(gm),
-        function_f: &(|(a, b, c): (Natural, Natural, Natural)| a.sub_mul(&b, &c)),
+        function_f: &mut (|(a, b, c): (Natural, Natural, Natural)| a.sub_mul(&b, &c)),
         x_cons: &(|t| t.clone()),
         x_param: &(|&(ref a, ref b, ref c)| {
             max(
@@ -133,8 +133,8 @@ pub fn benchmark_natural_sub_mul_evaluation_strategy(
     );
     benchmark_2(BenchmarkOptions2 {
         xs: triples_of_naturals(gm),
-        function_f: &(|(a, b, c): (Natural, Natural, Natural)| a.sub_mul(&b, &c)),
-        function_g: &(|(a, b, c): (Natural, Natural, Natural)| (&a).sub_mul(&b, &c)),
+        function_f: &mut (|(a, b, c): (Natural, Natural, Natural)| a.sub_mul(&b, &c)),
+        function_g: &mut (|(a, b, c): (Natural, Natural, Natural)| (&a).sub_mul(&b, &c)),
         x_cons: &(|t| t.clone()),
         y_cons: &(|t| t.clone()),
         x_param: &(|&(ref a, ref b, ref c)| {
@@ -160,8 +160,8 @@ pub fn benchmark_natural_sub_mul_algorithms(gm: GenerationMode, limit: usize, fi
     );
     benchmark_2(BenchmarkOptions2 {
         xs: triples_of_naturals(gm),
-        function_f: &(|(a, b, c): (Natural, Natural, Natural)| a.sub_mul(&b, &c)),
-        function_g: &(|(a, b, c): (Natural, Natural, Natural)| a - &(&b * &c)),
+        function_f: &mut (|(a, b, c): (Natural, Natural, Natural)| a.sub_mul(&b, &c)),
+        function_g: &mut (|(a, b, c): (Natural, Natural, Natural)| a - &(&b * &c)),
         x_cons: &(|t| t.clone()),
         y_cons: &(|t| t.clone()),
         x_param: &(|&(ref a, ref b, ref c)| {
@@ -187,8 +187,8 @@ pub fn benchmark_natural_sub_mul_ref_algorithms(gm: GenerationMode, limit: usize
     );
     benchmark_2(BenchmarkOptions2 {
         xs: triples_of_naturals(gm),
-        function_f: &(|(a, b, c): (Natural, Natural, Natural)| (&a).sub_mul(&b, &c)),
-        function_g: &(|(a, b, c): (Natural, Natural, Natural)| &a - &(&b * &c)),
+        function_f: &mut (|(a, b, c): (Natural, Natural, Natural)| (&a).sub_mul(&b, &c)),
+        function_g: &mut (|(a, b, c): (Natural, Natural, Natural)| &a - &(&b * &c)),
         x_cons: &(|t| t.clone()),
         y_cons: &(|t| t.clone()),
         x_param: &(|&(ref a, ref b, ref c)| {

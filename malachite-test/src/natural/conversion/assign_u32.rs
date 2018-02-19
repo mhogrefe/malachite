@@ -24,9 +24,9 @@ pub fn benchmark_natural_assign_u32(gm: GenerationMode, limit: usize, file_name:
     println!("benchmarking {} Natural.assign(u32)", gm.name());
     benchmark_3(BenchmarkOptions3 {
         xs: pairs_of_natural_and_unsigned::<u32>(gm),
-        function_f: &(|(mut n, u): (Natural, u32)| n.assign(u)),
-        function_g: &(|(mut n, u): (BigUint, u32)| num_assign_u32(&mut n, u)),
-        function_h: &(|(mut n, u): (rug::Integer, u32)| n.assign(u)),
+        function_f: &mut (|(mut n, u): (Natural, u32)| n.assign(u)),
+        function_g: &mut (|(mut n, u): (BigUint, u32)| num_assign_u32(&mut n, u)),
+        function_h: &mut (|(mut n, u): (rug::Integer, u32)| n.assign(u)),
         x_cons: &(|p| p.clone()),
         y_cons: &(|&(ref n, u)| (natural_to_biguint(n), u)),
         z_cons: &(|&(ref n, u)| (natural_to_rug_integer(n), u)),

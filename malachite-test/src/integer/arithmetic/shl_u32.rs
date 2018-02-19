@@ -29,8 +29,8 @@ pub fn benchmark_integer_shl_assign_u32(gm: GenerationMode, limit: usize, file_n
     println!("benchmarking {} Integer <<= u32", gm.name());
     benchmark_2(BenchmarkOptions2 {
         xs: pairs_of_integer_and_small_u32(gm),
-        function_f: &(|(mut n, u)| n <<= u),
-        function_g: &(|(mut n, u): (rug::Integer, u32)| n <<= u),
+        function_f: &mut (|(mut n, u)| n <<= u),
+        function_g: &mut (|(mut n, u): (rug::Integer, u32)| n <<= u),
         x_cons: &(|p| p.clone()),
         y_cons: &(|&(ref n, index)| (integer_to_rug_integer(n), index)),
         x_param: &(|&(_, index)| index as usize),
@@ -48,9 +48,9 @@ pub fn benchmark_integer_shl_u32(gm: GenerationMode, limit: usize, file_name: &s
     println!("benchmarking {} Integer << u32", gm.name());
     benchmark_3(BenchmarkOptions3 {
         xs: pairs_of_integer_and_small_u32(gm),
-        function_f: &(|(n, u)| n << u),
-        function_g: &(|(n, u): (BigInt, u32)| n << u as usize),
-        function_h: &(|(n, u): (rug::Integer, u32)| n << u),
+        function_f: &mut (|(n, u)| n << u),
+        function_g: &mut (|(n, u): (BigInt, u32)| n << u as usize),
+        function_h: &mut (|(n, u): (rug::Integer, u32)| n << u),
         x_cons: &(|p| p.clone()),
         y_cons: &(|&(ref n, index)| (integer_to_bigint(n), index)),
         z_cons: &(|&(ref n, index)| (integer_to_rug_integer(n), index)),
@@ -70,8 +70,8 @@ pub fn benchmark_integer_shl_u32_ref(gm: GenerationMode, limit: usize, file_name
     println!("benchmarking {} &Integer << u32", gm.name());
     benchmark_2(BenchmarkOptions2 {
         xs: pairs_of_integer_and_small_u32(gm),
-        function_f: &(|(n, u)| &n << u),
-        function_g: &(|(n, u): (BigInt, u32)| &n << u as usize),
+        function_f: &mut (|(n, u)| &n << u),
+        function_g: &mut (|(n, u): (BigInt, u32)| &n << u as usize),
         x_cons: &(|p| p.clone()),
         y_cons: &(|&(ref n, index)| (integer_to_bigint(n), index)),
         x_param: &(|&(_, index)| index as usize),

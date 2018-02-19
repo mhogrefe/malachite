@@ -27,7 +27,7 @@ fn benchmark_unsigned_decrement<T: 'static + PrimitiveUnsigned>(
     println!("benchmarking {} {}.decrement()", gm.name(), T::NAME);
     benchmark_1(BenchmarkOptions1 {
         xs: positive_unsigneds(gm),
-        function_f: &(|mut n: T| n.decrement()),
+        function_f: &mut (|mut n: T| n.decrement()),
         x_cons: &(|&n| n),
         x_param: &(|&n| n.significant_bits() as usize),
         limit,
@@ -47,7 +47,7 @@ fn benchmark_signed_decrement<T: 'static + PrimitiveSigned>(
     println!("benchmarking {} {}.decrement()", gm.name(), T::NAME);
     benchmark_1(BenchmarkOptions1 {
         xs: signeds_no_min(gm),
-        function_f: &(|mut n: T| n.decrement()),
+        function_f: &mut (|mut n: T| n.decrement()),
         x_cons: &(|&n| n),
         x_param: &(|&n| n.significant_bits() as usize),
         limit,

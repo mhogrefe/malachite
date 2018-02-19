@@ -15,8 +15,8 @@ pub fn benchmark_integer_from_i64(gm: GenerationMode, limit: usize, file_name: &
     println!("benchmarking {} Integer::from(i64)", gm.name());
     benchmark_2(BenchmarkOptions2 {
         xs: signeds::<i64>(gm),
-        function_f: &(|i| Integer::from(i)),
-        function_g: &(|i| BigInt::from(i)),
+        function_f: &mut (|i| Integer::from(i)),
+        function_g: &mut (|i| BigInt::from(i)),
         x_cons: &(|&i| i),
         y_cons: &(|&i| i),
         x_param: &(|&i| i.significant_bits() as usize),

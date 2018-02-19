@@ -27,7 +27,7 @@ fn benchmark_unsigned_increment<T: 'static + PrimitiveUnsigned>(
     println!("benchmarking {} {}.increment()", gm.name(), T::NAME);
     benchmark_1(BenchmarkOptions1 {
         xs: unsigneds_no_max(gm),
-        function_f: &(|mut n: T| n.increment()),
+        function_f: &mut (|mut n: T| n.increment()),
         x_cons: &(|&n| n),
         x_param: &(|&n| n.significant_bits() as usize),
         limit,
@@ -47,7 +47,7 @@ fn benchmark_signed_increment<T: 'static + PrimitiveSigned>(
     println!("benchmarking {} {}.increment()", gm.name(), T::NAME);
     benchmark_1(BenchmarkOptions1 {
         xs: signeds_no_max(gm),
-        function_f: &(|mut n: T| n.increment()),
+        function_f: &mut (|mut n: T| n.increment()),
         x_cons: &(|&n| n),
         x_param: &(|&n| n.significant_bits() as usize),
         limit,

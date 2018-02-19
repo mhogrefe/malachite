@@ -21,8 +21,8 @@ pub fn benchmark_natural_assign_bit(gm: GenerationMode, limit: usize, file_name:
     println!("benchmarking {} Natural.assign_bit(u64)", gm.name());
     benchmark_2(BenchmarkOptions2 {
         xs: triples_of_natural_small_u64_and_bool(gm),
-        function_f: &(|(mut n, index, bit): (Natural, u64, bool)| n.assign_bit(index, bit)),
-        function_g: &(|(mut n, index, bit): (rug::Integer, u64, bool)| {
+        function_f: &mut (|(mut n, index, bit): (Natural, u64, bool)| n.assign_bit(index, bit)),
+        function_g: &mut (|(mut n, index, bit): (rug::Integer, u64, bool)| {
             n.set_bit(index as u32, bit);
         }),
         x_cons: &(|p| p.clone()),

@@ -33,9 +33,9 @@ pub fn benchmark_integer_partial_eq_u32(gm: GenerationMode, limit: usize, file_n
     println!("benchmarking {} Integer == u32", gm.name());
     benchmark_3(BenchmarkOptions3 {
         xs: pairs_of_integer_and_unsigned::<u32>(gm),
-        function_f: &(|(n, u)| n == u),
-        function_g: &(|(n, u): (BigInt, u32)| num_partial_eq_u32(&n, u)),
-        function_h: &(|(n, u): (rug::Integer, u32)| n == u),
+        function_f: &mut (|(n, u)| n == u),
+        function_g: &mut (|(n, u): (BigInt, u32)| num_partial_eq_u32(&n, u)),
+        function_h: &mut (|(n, u): (rug::Integer, u32)| n == u),
         x_cons: &(|p| p.clone()),
         y_cons: &(|&(ref n, u)| (integer_to_bigint(n), u)),
         z_cons: &(|&(ref n, u)| (integer_to_rug_integer(n), u)),
@@ -55,8 +55,8 @@ pub fn benchmark_u32_partial_eq_integer(gm: GenerationMode, limit: usize, file_n
     println!("benchmarking {} u32 == Integer", gm.name());
     benchmark_2(BenchmarkOptions2 {
         xs: pairs_of_unsigned_and_integer::<u32>(gm),
-        function_f: &(|(u, n)| u == n),
-        function_g: &(|(u, n): (u32, rug::Integer)| u == n),
+        function_f: &mut (|(u, n)| u == n),
+        function_g: &mut (|(u, n): (u32, rug::Integer)| u == n),
         x_cons: &(|p| p.clone()),
         y_cons: &(|&(u, ref n)| (u, integer_to_rug_integer(n))),
         x_param: &(|&(_, ref n)| n.significant_bits() as usize),

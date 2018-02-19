@@ -20,7 +20,7 @@ pub fn benchmark_integer_to_u64(gm: GenerationMode, limit: usize, file_name: &st
     println!("benchmarking {} Integer.to_u64()", gm.name());
     benchmark_1(BenchmarkOptions1 {
         xs: integers(gm),
-        function_f: &(|n: Integer| n.to_u64()),
+        function_f: &mut (|n: Integer| n.to_u64()),
         x_cons: &(|x| x.clone()),
         x_param: &(|n| n.significant_bits() as usize),
         limit,
@@ -36,7 +36,7 @@ pub fn benchmark_integer_to_u64_wrapping(gm: GenerationMode, limit: usize, file_
     println!("benchmarking {} Integer.to_u64_wrapping()", gm.name());
     benchmark_1(BenchmarkOptions1 {
         xs: integers(gm),
-        function_f: &(|n: Integer| n.to_u64_wrapping()),
+        function_f: &mut (|n: Integer| n.to_u64_wrapping()),
         x_cons: &(|x| x.clone()),
         x_param: &(|n| n.significant_bits() as usize),
         limit,

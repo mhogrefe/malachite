@@ -16,9 +16,9 @@ pub fn benchmark_natural_significant_bits(gm: GenerationMode, limit: usize, file
     println!("benchmarking {} Natural.significant_bits()", gm.name());
     benchmark_3(BenchmarkOptions3 {
         xs: naturals(gm),
-        function_f: &(|n: Natural| n.significant_bits()),
-        function_g: &(|n: BigUint| n.bits()),
-        function_h: &(|n: rug::Integer| n.significant_bits()),
+        function_f: &mut (|n: Natural| n.significant_bits()),
+        function_g: &mut (|n: BigUint| n.bits()),
+        function_h: &mut (|n: rug::Integer| n.significant_bits()),
         x_cons: &(|x| x.clone()),
         y_cons: &(|x| natural_to_biguint(x)),
         z_cons: &(|x| natural_to_rug_integer(x)),

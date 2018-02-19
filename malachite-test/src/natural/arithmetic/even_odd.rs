@@ -28,7 +28,7 @@ pub fn benchmark_natural_is_even(gm: GenerationMode, limit: usize, file_name: &s
     println!("benchmarking {} Natural.is_even()", gm.name());
     benchmark_1(BenchmarkOptions1 {
         xs: naturals(gm),
-        function_f: &(|n: Natural| n.is_even()),
+        function_f: &mut (|n: Natural| n.is_even()),
         x_cons: &(|x| x.clone()),
         x_param: &(|n| n.significant_bits() as usize),
         limit,
@@ -44,7 +44,7 @@ pub fn benchmark_natural_is_odd(gm: GenerationMode, limit: usize, file_name: &st
     println!("benchmarking {} Natural.is_odd()", gm.name());
     benchmark_1(BenchmarkOptions1 {
         xs: naturals(gm),
-        function_f: &(|n: Natural| n.is_odd()),
+        function_f: &mut (|n: Natural| n.is_odd()),
         x_cons: &(|x| x.clone()),
         x_param: &(|n| n.significant_bits() as usize),
         limit,

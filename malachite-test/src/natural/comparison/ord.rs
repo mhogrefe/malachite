@@ -21,9 +21,9 @@ pub fn benchmark_natural_cmp(gm: GenerationMode, limit: usize, file_name: &str) 
     println!("benchmarking {} Natural.cmp(&Natural)", gm.name());
     benchmark_3(BenchmarkOptions3 {
         xs: pairs_of_naturals(gm),
-        function_f: &(|(x, y): (Natural, Natural)| x.cmp(&y)),
-        function_g: &(|(x, y): (BigUint, BigUint)| x.cmp(&y)),
-        function_h: &(|(x, y): (rug::Integer, rug::Integer)| x.cmp(&y)),
+        function_f: &mut (|(x, y): (Natural, Natural)| x.cmp(&y)),
+        function_g: &mut (|(x, y): (BigUint, BigUint)| x.cmp(&y)),
+        function_h: &mut (|(x, y): (rug::Integer, rug::Integer)| x.cmp(&y)),
         x_cons: &(|p| p.clone()),
         y_cons: &(|&(ref x, ref y)| (natural_to_biguint(x), natural_to_biguint(y))),
         z_cons: &(|&(ref x, ref y)| (natural_to_rug_integer(x), natural_to_rug_integer(y))),

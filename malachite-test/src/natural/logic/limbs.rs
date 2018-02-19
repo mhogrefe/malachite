@@ -20,7 +20,7 @@ pub fn benchmark_natural_to_limbs_le(gm: GenerationMode, limit: usize, file_name
     println!("benchmarking {} Natural.to_limbs_le()", gm.name());
     benchmark_1(BenchmarkOptions1 {
         xs: naturals(gm),
-        function_f: &(|n: Natural| n.to_limbs_le()),
+        function_f: &mut (|n: Natural| n.to_limbs_le()),
         x_cons: &(|x| x.clone()),
         x_param: &(|n| n.significant_bits() as usize),
         limit,
@@ -36,7 +36,7 @@ pub fn benchmark_natural_to_limbs_be(gm: GenerationMode, limit: usize, file_name
     println!("benchmarking {} Natural.to_limbs_be()", gm.name());
     benchmark_1(BenchmarkOptions1 {
         xs: naturals(gm),
-        function_f: &(|n: Natural| n.to_limbs_be()),
+        function_f: &mut (|n: Natural| n.to_limbs_be()),
         x_cons: &(|x| x.clone()),
         x_param: &(|n| n.significant_bits() as usize),
         limit,

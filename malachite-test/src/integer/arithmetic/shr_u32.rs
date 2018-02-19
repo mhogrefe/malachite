@@ -68,8 +68,8 @@ pub fn benchmark_integer_shr_assign_u32(gm: GenerationMode, limit: usize, file_n
     println!("benchmarking {} Integer >>= u32", gm.name());
     benchmark_2(BenchmarkOptions2 {
         xs: pairs_of_integer_and_small_u32(gm),
-        function_f: &(|(mut n, u)| n >>= u),
-        function_g: &(|(mut n, u): (rug::Integer, u32)| n >>= u),
+        function_f: &mut (|(mut n, u)| n >>= u),
+        function_g: &mut (|(mut n, u): (rug::Integer, u32)| n >>= u),
         x_cons: &(|p| p.clone()),
         y_cons: &(|&(ref n, index)| (integer_to_rug_integer(n), index)),
         x_param: &(|&(_, index)| index as usize),
@@ -87,8 +87,8 @@ pub fn benchmark_integer_shr_u32(gm: GenerationMode, limit: usize, file_name: &s
     println!("benchmarking {} Integer >> u32", gm.name());
     benchmark_2(BenchmarkOptions2 {
         xs: pairs_of_integer_and_small_u32(gm),
-        function_f: &(|(n, u)| n >> u),
-        function_g: &(|(n, u): (rug::Integer, u32)| n >> u),
+        function_f: &mut (|(n, u)| n >> u),
+        function_g: &mut (|(n, u): (rug::Integer, u32)| n >> u),
         x_cons: &(|p| p.clone()),
         y_cons: &(|&(ref n, index)| (integer_to_rug_integer(n), index)),
         x_param: &(|&(_, index)| index as usize),
@@ -106,7 +106,7 @@ pub fn benchmark_integer_shr_u32_ref(gm: GenerationMode, limit: usize, file_name
     println!("benchmarking {} &Integer >> u32", gm.name());
     benchmark_1(BenchmarkOptions1 {
         xs: pairs_of_integer_and_small_u32(gm),
-        function_f: &(|(n, u)| &n >> u),
+        function_f: &mut (|(n, u)| &n >> u),
         x_cons: &(|p| p.clone()),
         x_param: &(|&(_, index)| index as usize),
         limit,
@@ -125,7 +125,7 @@ pub fn benchmark_integer_shr_round_assign_u32(gm: GenerationMode, limit: usize, 
     );
     benchmark_1(BenchmarkOptions1 {
         xs: triples_of_integer_small_u32_and_rounding_mode_var_1(gm),
-        function_f: &(|(mut n, u, rm): (Integer, u32, RoundingMode)| n.shr_round_assign(u, rm)),
+        function_f: &mut (|(mut n, u, rm): (Integer, u32, RoundingMode)| n.shr_round_assign(u, rm)),
         x_cons: &(|p| p.clone()),
         x_param: &(|&(_, index, _)| index as usize),
         limit,
@@ -144,7 +144,7 @@ pub fn benchmark_integer_shr_round_u32(gm: GenerationMode, limit: usize, file_na
     );
     benchmark_1(BenchmarkOptions1 {
         xs: triples_of_integer_small_u32_and_rounding_mode_var_1(gm),
-        function_f: &(|(n, u, rm): (Integer, u32, RoundingMode)| n.shr_round(u, rm)),
+        function_f: &mut (|(n, u, rm): (Integer, u32, RoundingMode)| n.shr_round(u, rm)),
         x_cons: &(|p| p.clone()),
         x_param: &(|&(_, index, _)| index as usize),
         limit,
@@ -163,7 +163,7 @@ pub fn benchmark_integer_shr_round_u32_ref(gm: GenerationMode, limit: usize, fil
     );
     benchmark_1(BenchmarkOptions1 {
         xs: triples_of_integer_small_u32_and_rounding_mode_var_1(gm),
-        function_f: &(|(n, u, rm): (Integer, u32, RoundingMode)| (&n).shr_round(u, rm)),
+        function_f: &mut (|(n, u, rm): (Integer, u32, RoundingMode)| (&n).shr_round(u, rm)),
         x_cons: &(|p| p.clone()),
         x_param: &(|&(_, index, _)| index as usize),
         limit,

@@ -44,9 +44,9 @@ pub fn benchmark_integer_clone(gm: GenerationMode, limit: usize, file_name: &str
     println!("benchmarking {} Integer.clone()", gm.name());
     benchmark_3(BenchmarkOptions3 {
         xs: integers(gm),
-        function_f: &(|n: Integer| n.clone()),
-        function_g: &(|n: BigInt| n.clone()),
-        function_h: &(|n: rug::Integer| n.clone()),
+        function_f: &mut (|n: Integer| n.clone()),
+        function_g: &mut (|n: BigInt| n.clone()),
+        function_h: &mut (|n: rug::Integer| n.clone()),
         x_cons: &(|x| x.clone()),
         y_cons: &(|x| integer_to_bigint(x)),
         z_cons: &(|x| integer_to_rug_integer(x)),
@@ -66,9 +66,9 @@ pub fn benchmark_integer_clone_from(gm: GenerationMode, limit: usize, file_name:
     println!("benchmarking {} Integer.clone_from(Integer)", gm.name());
     benchmark_3(BenchmarkOptions3 {
         xs: pairs_of_integers(gm),
-        function_f: &(|(mut x, y): (Integer, Integer)| x.clone_from(&y)),
-        function_g: &(|(mut x, y): (BigInt, BigInt)| x.clone_from(&y)),
-        function_h: &(|(mut x, y): (rug::Integer, rug::Integer)| x.clone_from(&y)),
+        function_f: &mut (|(mut x, y): (Integer, Integer)| x.clone_from(&y)),
+        function_g: &mut (|(mut x, y): (BigInt, BigInt)| x.clone_from(&y)),
+        function_h: &mut (|(mut x, y): (rug::Integer, rug::Integer)| x.clone_from(&y)),
         x_cons: &(|p| p.clone()),
         y_cons: &(|&(ref x, ref y)| (integer_to_bigint(x), integer_to_bigint(y))),
         z_cons: &(|&(ref x, ref y)| (integer_to_rug_integer(x), integer_to_rug_integer(y))),
@@ -88,8 +88,8 @@ pub fn benchmark_integer_assign(gm: GenerationMode, limit: usize, file_name: &st
     println!("benchmarking {} Integer.assign(Integer)", gm.name());
     benchmark_2(BenchmarkOptions2 {
         xs: pairs_of_integers(gm),
-        function_f: &(|(mut x, y): (Integer, Integer)| x.assign(y)),
-        function_g: &(|(mut x, y): (rug::Integer, rug::Integer)| x.assign(y)),
+        function_f: &mut (|(mut x, y): (Integer, Integer)| x.assign(y)),
+        function_g: &mut (|(mut x, y): (rug::Integer, rug::Integer)| x.assign(y)),
         x_cons: &(|p| p.clone()),
         y_cons: &(|&(ref x, ref y)| (integer_to_rug_integer(x), integer_to_rug_integer(y))),
         x_param: &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),
@@ -114,8 +114,8 @@ pub fn benchmark_integer_assign_evaluation_strategy(
     );
     benchmark_2(BenchmarkOptions2 {
         xs: pairs_of_integers(gm),
-        function_f: &(|(mut x, y): (Integer, Integer)| x.assign(y)),
-        function_g: &(|(mut x, y): (Integer, Integer)| x.assign(&y)),
+        function_f: &mut (|(mut x, y): (Integer, Integer)| x.assign(y)),
+        function_g: &mut (|(mut x, y): (Integer, Integer)| x.assign(&y)),
         x_cons: &(|p| p.clone()),
         y_cons: &(|p| p.clone()),
         x_param: &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),

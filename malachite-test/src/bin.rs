@@ -138,6 +138,9 @@ use malachite_test::natural::logic::not::*;
 use malachite_test::natural::logic::set_bit::*;
 use malachite_test::natural::logic::significant_bits::*;
 use malachite_test::natural::logic::trailing_zeros::*;
+use malachite_test::natural::random::random_natural_below::*;
+use malachite_test::natural::random::random_natural_up_to_bits::*;
+use malachite_test::natural::random::random_natural_with_bits::*;
 use std::env;
 
 macro_rules! demos_and_benchmarks {
@@ -607,6 +610,9 @@ demos_and_benchmarks!(
         demo_natural_partial_cmp_integer,
         demo_natural_partial_cmp_u32,
         demo_u32_partial_cmp_natural,
+        demo_natural_random_natural_below,
+        demo_natural_random_natural_up_to_bits,
+        demo_natural_random_natural_with_bits,
         demo_natural_set_bit,
         demo_natural_shl_assign_i32,
         demo_natural_shl_i32,
@@ -1019,6 +1025,9 @@ demos_and_benchmarks!(
         benchmark_natural_partial_eq_u32,
         benchmark_u32_partial_eq_natural,
         benchmark_natural_partial_eq_integer,
+        benchmark_natural_random_natural_below,
+        benchmark_natural_random_natural_up_to_bits,
+        benchmark_natural_random_natural_with_bits,
         benchmark_natural_set_bit,
         benchmark_natural_shl_assign_i32,
         benchmark_natural_shl_i32,

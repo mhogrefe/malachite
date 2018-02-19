@@ -30,8 +30,8 @@ pub fn benchmark_natural_assign_integer(gm: GenerationMode, limit: usize, file_n
     println!("benchmarking {} Natural.assign(Integer)", gm.name());
     benchmark_2(BenchmarkOptions2 {
         xs: pairs_of_natural_and_natural_integer(gm),
-        function_f: &(|(mut x, y): (Natural, Integer)| x.assign(y)),
-        function_g: &(|(mut x, y): (rug::Integer, rug::Integer)| x.assign(y)),
+        function_f: &mut (|(mut x, y): (Natural, Integer)| x.assign(y)),
+        function_g: &mut (|(mut x, y): (rug::Integer, rug::Integer)| x.assign(y)),
         x_cons: &(|p| p.clone()),
         y_cons: &(|&(ref x, ref y)| (natural_to_rug_integer(x), integer_to_rug_integer(y))),
         x_param: &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),
@@ -56,8 +56,8 @@ pub fn benchmark_natural_assign_integer_evaluation_strategy(
     );
     benchmark_2(BenchmarkOptions2 {
         xs: pairs_of_natural_and_natural_integer(gm),
-        function_f: &(|(mut x, y): (Natural, Integer)| x.assign(y)),
-        function_g: &(|(mut x, y): (Natural, Integer)| x.assign(&y)),
+        function_f: &mut (|(mut x, y): (Natural, Integer)| x.assign(y)),
+        function_g: &mut (|(mut x, y): (Natural, Integer)| x.assign(&y)),
         x_cons: &(|p| p.clone()),
         y_cons: &(|p| p.clone()),
         x_param: &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),

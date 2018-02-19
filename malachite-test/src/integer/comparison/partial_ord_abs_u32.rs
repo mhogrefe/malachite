@@ -30,7 +30,7 @@ pub fn benchmark_integer_partial_cmp_abs_u32(gm: GenerationMode, limit: usize, f
     println!("benchmarking {} Integer.partial_cmp_abs(&u32)", gm.name());
     benchmark_1(BenchmarkOptions1 {
         xs: pairs_of_integer_and_unsigned::<u32>(gm),
-        function_f: &(|(n, u): (Integer, u32)| n.partial_cmp_abs(&u)),
+        function_f: &mut (|(n, u): (Integer, u32)| n.partial_cmp_abs(&u)),
         x_cons: &(|p| p.clone()),
         x_param: &(|&(ref n, _)| n.significant_bits() as usize),
         limit,
@@ -46,7 +46,7 @@ pub fn benchmark_u32_partial_cmp_abs_integer(gm: GenerationMode, limit: usize, f
     println!("benchmarking {} u32.partial_cmp_abs(&Integer)", gm.name());
     benchmark_1(BenchmarkOptions1 {
         xs: pairs_of_unsigned_and_integer::<u32>(gm),
-        function_f: &(|(u, n): (u32, Integer)| PartialOrdAbs::partial_cmp_abs(&u, &n)),
+        function_f: &mut (|(u, n): (u32, Integer)| PartialOrdAbs::partial_cmp_abs(&u, &n)),
         x_cons: &(|p| p.clone()),
         x_param: &(|&(_, ref n)| n.significant_bits() as usize),
         limit,

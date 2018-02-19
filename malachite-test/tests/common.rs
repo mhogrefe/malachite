@@ -49,9 +49,9 @@ pub fn test_custom_cmp_helper<T: Debug + FromStr + Ord, F: FnMut(&T, &T) -> Orde
     }
 }
 
-pub fn test_properties<T, G: Fn(GenerationMode) -> Box<Iterator<Item = T>>, F: Fn(&T)>(
+pub fn test_properties<T, G: Fn(GenerationMode) -> Box<Iterator<Item = T>>, F: FnMut(&T)>(
     gen: G,
-    test: F,
+    mut test: F,
 ) {
     for &gm in &[GenerationMode::Exhaustive, GenerationMode::Random(32)] {
         for x in gen(gm).take(LARGE_LIMIT) {
@@ -63,11 +63,11 @@ pub fn test_properties<T, G: Fn(GenerationMode) -> Box<Iterator<Item = T>>, F: F
 pub fn test_properties_custom_scale<
     T,
     G: Fn(GenerationMode) -> Box<Iterator<Item = T>>,
-    F: Fn(&T),
+    F: FnMut(&T),
 >(
     scale: u32,
     gen: G,
-    test: F,
+    mut test: F,
 ) {
     for &gm in &[GenerationMode::Exhaustive, GenerationMode::Random(scale)] {
         for x in gen(gm).take(LARGE_LIMIT) {
@@ -79,10 +79,10 @@ pub fn test_properties_custom_scale<
 pub fn test_properties_no_limit_exhaustive<
     T,
     G: Fn(GenerationMode) -> Box<Iterator<Item = T>>,
-    F: Fn(&T),
+    F: FnMut(&T),
 >(
     gen: G,
-    test: F,
+    mut test: F,
 ) {
     for x in gen(GenerationMode::Exhaustive) {
         test(&x);

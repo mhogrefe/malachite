@@ -35,9 +35,9 @@ pub fn benchmark_integer_partial_cmp_i32(gm: GenerationMode, limit: usize, file_
     println!("benchmarking {} Integer.partial_cmp(&i32)", gm.name());
     benchmark_3(BenchmarkOptions3 {
         xs: pairs_of_integer_and_signed::<i32>(gm),
-        function_f: &(|(n, i): (Integer, i32)| n.partial_cmp(&i)),
-        function_g: &(|(n, i): (BigInt, i32)| num_partial_cmp_i32(&n, i)),
-        function_h: &(|(n, i): (rug::Integer, i32)| n.partial_cmp(&i)),
+        function_f: &mut (|(n, i): (Integer, i32)| n.partial_cmp(&i)),
+        function_g: &mut (|(n, i): (BigInt, i32)| num_partial_cmp_i32(&n, i)),
+        function_h: &mut (|(n, i): (rug::Integer, i32)| n.partial_cmp(&i)),
         x_cons: &(|p| p.clone()),
         y_cons: &(|&(ref n, i)| (integer_to_bigint(n), i)),
         z_cons: &(|&(ref n, i)| (integer_to_rug_integer(n), i)),
@@ -57,8 +57,8 @@ pub fn benchmark_i32_partial_cmp_integer(gm: GenerationMode, limit: usize, file_
     println!("benchmarking {} i32.partial_cmp(&Integer)", gm.name());
     benchmark_2(BenchmarkOptions2 {
         xs: pairs_of_signed_and_integer::<i32>(gm),
-        function_f: &(|(i, n): (i32, Integer)| i.partial_cmp(&n)),
-        function_g: &(|(i, n): (i32, rug::Integer)| i.partial_cmp(&n)),
+        function_f: &mut (|(i, n): (i32, Integer)| i.partial_cmp(&n)),
+        function_g: &mut (|(i, n): (i32, rug::Integer)| i.partial_cmp(&n)),
         x_cons: &(|p| p.clone()),
         y_cons: &(|&(i, ref n)| (i, integer_to_rug_integer(n))),
         x_param: &(|&(_, ref n)| n.significant_bits() as usize),

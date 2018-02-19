@@ -32,7 +32,7 @@ pub fn benchmark_integer_neg_assign(gm: GenerationMode, limit: usize, file_name:
     println!("benchmarking {} Integer.neg_assign()", gm.name());
     benchmark_1(BenchmarkOptions1 {
         xs: integers(gm),
-        function_f: &(|mut n: Integer| n.neg_assign()),
+        function_f: &mut (|mut n: Integer| n.neg_assign()),
         x_cons: &(|x| x.clone()),
         x_param: &(|n| n.significant_bits() as usize),
         limit,
@@ -48,9 +48,9 @@ pub fn benchmark_integer_neg(gm: GenerationMode, limit: usize, file_name: &str) 
     println!("benchmarking {} -Integer", gm.name());
     benchmark_3(BenchmarkOptions3 {
         xs: integers(gm),
-        function_f: &(|n: Integer| -n),
-        function_g: &(|n: BigInt| -n),
-        function_h: &(|n: rug::Integer| -n),
+        function_f: &mut (|n: Integer| -n),
+        function_g: &mut (|n: BigInt| -n),
+        function_h: &mut (|n: rug::Integer| -n),
         x_cons: &(|x| x.clone()),
         y_cons: &(|x| integer_to_bigint(x)),
         z_cons: &(|x| integer_to_rug_integer(x)),
@@ -74,8 +74,8 @@ pub fn benchmark_integer_neg_evaluation_strategy(
     println!("benchmarking {} -Integer evaluation strategy", gm.name());
     benchmark_2(BenchmarkOptions2 {
         xs: integers(gm),
-        function_f: &(|n: Integer| -n),
-        function_g: &(|n: Integer| -&n),
+        function_f: &mut (|n: Integer| -n),
+        function_g: &mut (|n: Integer| -&n),
         x_cons: &(|p| p.clone()),
         y_cons: &(|p| p.clone()),
         x_param: &(|n| n.significant_bits() as usize),

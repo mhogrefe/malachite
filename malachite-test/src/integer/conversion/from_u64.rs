@@ -15,8 +15,8 @@ pub fn benchmark_integer_from_u64(gm: GenerationMode, limit: usize, file_name: &
     println!("benchmarking {} Integer::from(u64)", gm.name());
     benchmark_2(BenchmarkOptions2 {
         xs: unsigneds::<u64>(gm),
-        function_f: &(|u| Integer::from(u)),
-        function_g: &(|u| BigUint::from(u)),
+        function_f: &mut (|u| Integer::from(u)),
+        function_g: &mut (|u| BigUint::from(u)),
         x_cons: &(|&u| u),
         y_cons: &(|&u| u),
         x_param: &(|&u| u.significant_bits() as usize),

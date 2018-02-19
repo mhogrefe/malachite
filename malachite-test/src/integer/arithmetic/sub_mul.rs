@@ -128,7 +128,7 @@ pub fn benchmark_integer_sub_mul_assign(gm: GenerationMode, limit: usize, file_n
     );
     benchmark_1(BenchmarkOptions1 {
         xs: triples_of_integers(gm),
-        function_f: &(|(mut a, b, c): (Integer, Integer, Integer)| a.sub_mul_assign(b, c)),
+        function_f: &mut (|(mut a, b, c): (Integer, Integer, Integer)| a.sub_mul_assign(b, c)),
         x_cons: &(|t| t.clone()),
         x_param: &(|&(ref a, ref b, ref c)| {
             max(
@@ -156,10 +156,10 @@ pub fn benchmark_integer_sub_mul_assign_evaluation_strategy(
     );
     benchmark_4(BenchmarkOptions4 {
         xs: triples_of_integers(gm),
-        function_f: &(|(mut a, b, c): (Integer, Integer, Integer)| a.sub_mul_assign(b, c)),
-        function_g: &(|(mut a, b, c): (Integer, Integer, Integer)| a.sub_mul_assign(b, &c)),
-        function_h: &(|(mut a, b, c): (Integer, Integer, Integer)| a.sub_mul_assign(&b, c)),
-        function_i: &(|(mut a, b, c): (Integer, Integer, Integer)| a.sub_mul_assign(&b, &c)),
+        function_f: &mut (|(mut a, b, c): (Integer, Integer, Integer)| a.sub_mul_assign(b, c)),
+        function_g: &mut (|(mut a, b, c): (Integer, Integer, Integer)| a.sub_mul_assign(b, &c)),
+        function_h: &mut (|(mut a, b, c): (Integer, Integer, Integer)| a.sub_mul_assign(&b, c)),
+        function_i: &mut (|(mut a, b, c): (Integer, Integer, Integer)| a.sub_mul_assign(&b, &c)),
         x_cons: &(|t| t.clone()),
         y_cons: &(|t| t.clone()),
         z_cons: &(|t| t.clone()),
@@ -193,8 +193,8 @@ pub fn benchmark_integer_sub_mul_assign_algorithms(
     );
     benchmark_2(BenchmarkOptions2 {
         xs: triples_of_integers(gm),
-        function_f: &(|(mut a, b, c): (Integer, Integer, Integer)| a.sub_mul_assign(b, c)),
-        function_g: &(|(mut a, b, c): (Integer, Integer, Integer)| a -= b * c),
+        function_f: &mut (|(mut a, b, c): (Integer, Integer, Integer)| a.sub_mul_assign(b, c)),
+        function_g: &mut (|(mut a, b, c): (Integer, Integer, Integer)| a -= b * c),
         x_cons: &(|t| t.clone()),
         y_cons: &(|t| t.clone()),
         x_param: &(|&(ref a, ref b, ref c)| {
@@ -224,8 +224,8 @@ pub fn benchmark_integer_sub_mul_assign_val_ref_algorithms(
     );
     benchmark_2(BenchmarkOptions2 {
         xs: triples_of_integers(gm),
-        function_f: &(|(mut a, b, c): (Integer, Integer, Integer)| a.sub_mul_assign(b, &c)),
-        function_g: &(|(mut a, b, c): (Integer, Integer, Integer)| a -= b * &c),
+        function_f: &mut (|(mut a, b, c): (Integer, Integer, Integer)| a.sub_mul_assign(b, &c)),
+        function_g: &mut (|(mut a, b, c): (Integer, Integer, Integer)| a -= b * &c),
         x_cons: &(|t| t.clone()),
         y_cons: &(|t| t.clone()),
         x_param: &(|&(ref a, ref b, ref c)| {
@@ -255,8 +255,8 @@ pub fn benchmark_integer_sub_mul_assign_ref_val_algorithms(
     );
     benchmark_2(BenchmarkOptions2 {
         xs: triples_of_integers(gm),
-        function_f: &(|(mut a, b, c): (Integer, Integer, Integer)| a.sub_mul_assign(&b, c)),
-        function_g: &(|(mut a, b, c): (Integer, Integer, Integer)| a -= &b * c),
+        function_f: &mut (|(mut a, b, c): (Integer, Integer, Integer)| a.sub_mul_assign(&b, c)),
+        function_g: &mut (|(mut a, b, c): (Integer, Integer, Integer)| a -= &b * c),
         x_cons: &(|t| t.clone()),
         y_cons: &(|t| t.clone()),
         x_param: &(|&(ref a, ref b, ref c)| {
@@ -286,8 +286,8 @@ pub fn benchmark_integer_sub_mul_assign_ref_ref_algorithms(
     );
     benchmark_2(BenchmarkOptions2 {
         xs: triples_of_integers(gm),
-        function_f: &(|(mut a, b, c): (Integer, Integer, Integer)| a.sub_mul_assign(&b, &c)),
-        function_g: &(|(mut a, b, c): (Integer, Integer, Integer)| a -= &b * &c),
+        function_f: &mut (|(mut a, b, c): (Integer, Integer, Integer)| a.sub_mul_assign(&b, &c)),
+        function_g: &mut (|(mut a, b, c): (Integer, Integer, Integer)| a -= &b * &c),
         x_cons: &(|t| t.clone()),
         y_cons: &(|t| t.clone()),
         x_param: &(|&(ref a, ref b, ref c)| {
@@ -313,7 +313,7 @@ pub fn benchmark_integer_sub_mul(gm: GenerationMode, limit: usize, file_name: &s
     );
     benchmark_1(BenchmarkOptions1 {
         xs: triples_of_integers(gm),
-        function_f: &(|(a, b, c): (Integer, Integer, Integer)| a.sub_mul(b, c)),
+        function_f: &mut (|(a, b, c): (Integer, Integer, Integer)| a.sub_mul(b, c)),
         x_cons: &(|t| t.clone()),
         x_param: &(|&(ref a, ref b, ref c)| {
             max(
@@ -341,11 +341,11 @@ pub fn benchmark_integer_sub_mul_evaluation_strategy(
     );
     benchmark_5(BenchmarkOptions5 {
         xs: triples_of_integers(gm),
-        function_f: &(|(a, b, c): (Integer, Integer, Integer)| a.sub_mul(b, c)),
-        function_g: &(|(a, b, c): (Integer, Integer, Integer)| a.sub_mul(b, &c)),
-        function_h: &(|(a, b, c): (Integer, Integer, Integer)| a.sub_mul(&b, c)),
-        function_i: &(|(a, b, c): (Integer, Integer, Integer)| a.sub_mul(&b, &c)),
-        function_j: &(|(a, b, c): (Integer, Integer, Integer)| (&a).sub_mul(&b, &c)),
+        function_f: &mut (|(a, b, c): (Integer, Integer, Integer)| a.sub_mul(b, c)),
+        function_g: &mut (|(a, b, c): (Integer, Integer, Integer)| a.sub_mul(b, &c)),
+        function_h: &mut (|(a, b, c): (Integer, Integer, Integer)| a.sub_mul(&b, c)),
+        function_i: &mut (|(a, b, c): (Integer, Integer, Integer)| a.sub_mul(&b, &c)),
+        function_j: &mut (|(a, b, c): (Integer, Integer, Integer)| (&a).sub_mul(&b, &c)),
         x_cons: &(|t| t.clone()),
         y_cons: &(|t| t.clone()),
         z_cons: &(|t| t.clone()),
@@ -377,8 +377,8 @@ pub fn benchmark_integer_sub_mul_algorithms(gm: GenerationMode, limit: usize, fi
     );
     benchmark_2(BenchmarkOptions2 {
         xs: triples_of_integers(gm),
-        function_f: &(|(a, b, c): (Integer, Integer, Integer)| a.sub_mul(b, c)),
-        function_g: &(|(a, b, c): (Integer, Integer, Integer)| a - b * c),
+        function_f: &mut (|(a, b, c): (Integer, Integer, Integer)| a.sub_mul(b, c)),
+        function_g: &mut (|(a, b, c): (Integer, Integer, Integer)| a - b * c),
         x_cons: &(|t| t.clone()),
         y_cons: &(|t| t.clone()),
         x_param: &(|&(ref a, ref b, ref c)| {
@@ -408,8 +408,8 @@ pub fn benchmark_integer_sub_mul_val_val_ref_algorithms(
     );
     benchmark_2(BenchmarkOptions2 {
         xs: triples_of_integers(gm),
-        function_f: &(|(a, b, c): (Integer, Integer, Integer)| a.sub_mul(b, &c)),
-        function_g: &(|(a, b, c): (Integer, Integer, Integer)| a - b * &c),
+        function_f: &mut (|(a, b, c): (Integer, Integer, Integer)| a.sub_mul(b, &c)),
+        function_g: &mut (|(a, b, c): (Integer, Integer, Integer)| a - b * &c),
         x_cons: &(|t| t.clone()),
         y_cons: &(|t| t.clone()),
         x_param: &(|&(ref a, ref b, ref c)| {
@@ -439,8 +439,8 @@ pub fn benchmark_integer_sub_mul_val_ref_val_algorithms(
     );
     benchmark_2(BenchmarkOptions2 {
         xs: triples_of_integers(gm),
-        function_f: &(|(a, b, c): (Integer, Integer, Integer)| a.sub_mul(&b, c)),
-        function_g: &(|(a, b, c): (Integer, Integer, Integer)| a - &b * c),
+        function_f: &mut (|(a, b, c): (Integer, Integer, Integer)| a.sub_mul(&b, c)),
+        function_g: &mut (|(a, b, c): (Integer, Integer, Integer)| a - &b * c),
         x_cons: &(|t| t.clone()),
         y_cons: &(|t| t.clone()),
         x_param: &(|&(ref a, ref b, ref c)| {
@@ -470,8 +470,8 @@ pub fn benchmark_integer_sub_mul_val_ref_ref_algorithms(
     );
     benchmark_2(BenchmarkOptions2 {
         xs: triples_of_integers(gm),
-        function_f: &(|(a, b, c): (Integer, Integer, Integer)| a.sub_mul(&b, &c)),
-        function_g: &(|(a, b, c): (Integer, Integer, Integer)| a - &b * &c),
+        function_f: &mut (|(a, b, c): (Integer, Integer, Integer)| a.sub_mul(&b, &c)),
+        function_g: &mut (|(a, b, c): (Integer, Integer, Integer)| a - &b * &c),
         x_cons: &(|t| t.clone()),
         y_cons: &(|t| t.clone()),
         x_param: &(|&(ref a, ref b, ref c)| {
@@ -501,8 +501,8 @@ pub fn benchmark_integer_sub_mul_ref_ref_ref_algorithms(
     );
     benchmark_2(BenchmarkOptions2 {
         xs: triples_of_integers(gm),
-        function_f: &(|(a, b, c): (Integer, Integer, Integer)| (&a).sub_mul(&b, &c)),
-        function_g: &(|(a, b, c): (Integer, Integer, Integer)| &a - &b * &c),
+        function_f: &mut (|(a, b, c): (Integer, Integer, Integer)| (&a).sub_mul(&b, &c)),
+        function_g: &mut (|(a, b, c): (Integer, Integer, Integer)| &a - &b * &c),
         x_cons: &(|t| t.clone()),
         y_cons: &(|t| t.clone()),
         x_param: &(|&(ref a, ref b, ref c)| {

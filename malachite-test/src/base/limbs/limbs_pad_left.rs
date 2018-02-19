@@ -23,7 +23,7 @@ pub fn benchmark_limbs_pad_left(gm: GenerationMode, limit: usize, file_name: &st
     );
     benchmark_1(BenchmarkOptions1 {
         xs: triples_of_unsigned_vec_small_usize_and_unsigned(gm),
-        function_f: &(|(mut limbs, pad_size, pad_limb): (Vec<u32>, usize, u32)| {
+        function_f: &mut (|(mut limbs, pad_size, pad_limb): (Vec<u32>, usize, u32)| {
             limbs_pad_left(&mut limbs, pad_size, pad_limb)
         }),
         x_cons: &(|ts| ts.clone()),

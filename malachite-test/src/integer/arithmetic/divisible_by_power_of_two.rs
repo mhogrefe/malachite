@@ -25,7 +25,7 @@ pub fn benchmark_integer_divisible_by_power_of_two(
     );
     benchmark_1(BenchmarkOptions1 {
         xs: pairs_of_integer_and_small_u32(gm),
-        function_f: &(|(n, pow): (Integer, u32)| n.divisible_by_power_of_two(pow)),
+        function_f: &mut (|(n, pow): (Integer, u32)| n.divisible_by_power_of_two(pow)),
         x_cons: &(|&(ref n, pow)| (n.clone(), pow)),
         x_param: &(|&(ref n, _)| n.significant_bits() as usize),
         limit,
@@ -48,8 +48,8 @@ pub fn benchmark_integer_divisible_by_power_of_two_algorithms(
     );
     benchmark_2(BenchmarkOptions2 {
         xs: pairs_of_integer_and_small_u32(gm),
-        function_f: &(|(n, pow): (Integer, u32)| n.divisible_by_power_of_two(pow)),
-        function_g: &(|(n, pow): (Integer, u32)| {
+        function_f: &mut (|(n, pow): (Integer, u32)| n.divisible_by_power_of_two(pow)),
+        function_g: &mut (|(n, pow): (Integer, u32)| {
             n.trailing_zeros().map_or(true, |z| z >= u64::from(pow))
         }),
         x_cons: &(|p| p.clone()),

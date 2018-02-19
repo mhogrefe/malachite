@@ -31,8 +31,8 @@ pub fn benchmark_integer_partial_cmp_natural(gm: GenerationMode, limit: usize, f
     println!("benchmarking {} Integer.partial_cmp(&Natural)", gm.name());
     benchmark_2(BenchmarkOptions2 {
         xs: pairs_of_integer_and_natural(gm),
-        function_f: &(|(x, y): (Integer, Natural)| x.partial_cmp(&y)),
-        function_g: &(|(x, y): (rug::Integer, rug::Integer)| x.partial_cmp(&y)),
+        function_f: &mut (|(x, y): (Integer, Natural)| x.partial_cmp(&y)),
+        function_g: &mut (|(x, y): (rug::Integer, rug::Integer)| x.partial_cmp(&y)),
         x_cons: &(|p| p.clone()),
         y_cons: &(|&(ref x, ref y)| (integer_to_rug_integer(x), natural_to_rug_integer(y))),
         x_param: &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),
@@ -50,8 +50,8 @@ pub fn benchmark_natural_partial_cmp_integer(gm: GenerationMode, limit: usize, f
     println!("benchmarking {} Natural.partial_cmp(&Integer)", gm.name());
     benchmark_2(BenchmarkOptions2 {
         xs: pairs_of_natural_and_integer(gm),
-        function_f: &(|(x, y): (Natural, Integer)| x.partial_cmp(&y)),
-        function_g: &(|(x, y): (rug::Integer, rug::Integer)| x.partial_cmp(&y)),
+        function_f: &mut (|(x, y): (Natural, Integer)| x.partial_cmp(&y)),
+        function_g: &mut (|(x, y): (rug::Integer, rug::Integer)| x.partial_cmp(&y)),
         x_cons: &(|p| p.clone()),
         y_cons: &(|&(ref x, ref y)| (natural_to_rug_integer(x), integer_to_rug_integer(y))),
         x_param: &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),

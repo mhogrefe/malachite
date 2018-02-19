@@ -16,7 +16,7 @@ pub fn benchmark_char_decrement(gm: GenerationMode, limit: usize, file_name: &st
     println!("benchmarking {} char.decrement()", gm.name());
     benchmark_1(BenchmarkOptions1 {
         xs: chars_var_1(gm),
-        function_f: &(|mut c: char| c.decrement()),
+        function_f: &mut (|mut c: char| c.decrement()),
         x_cons: &(|&c| c),
         x_param: &(|&c| char_to_contiguous_range(c) as usize),
         limit,

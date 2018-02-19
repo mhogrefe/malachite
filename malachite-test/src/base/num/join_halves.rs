@@ -38,7 +38,7 @@ fn benchmark_unsigned_join_halves<T: 'static + JoinHalves + PrimitiveUnsigned>(
     );
     benchmark_1(BenchmarkOptions1 {
         xs: pairs_of_unsigneds(gm),
-        function_f: &(|(x, y): (T::Half, T::Half)| T::join_halves(x, y)),
+        function_f: &mut (|(x, y): (T::Half, T::Half)| T::join_halves(x, y)),
         x_cons: &(|&p| p),
         x_param: &(|&(x, y)| max(x.significant_bits(), y.significant_bits()) as usize),
         limit,

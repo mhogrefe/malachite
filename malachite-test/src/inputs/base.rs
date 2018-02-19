@@ -95,6 +95,15 @@ pub fn small_u32s(gm: GenerationMode) -> Box<Iterator<Item = u32>> {
     }
 }
 
+pub fn small_u64s(gm: GenerationMode) -> Box<Iterator<Item = u64>> {
+    match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_u()),
+        GenerationMode::Random(scale) => {
+            Box::new(natural_u32s_geometric(&EXAMPLE_SEED, scale).map(|i| i.into()))
+        }
+    }
+}
+
 fn sqrt_pairs_of_unsigneds<T: 'static + PrimitiveUnsigned, U: 'static + PrimitiveUnsigned>(
 ) -> Box<Iterator<Item = (T, U)>> {
     Box::new(sqrt_pairs(exhaustive_u(), exhaustive_u()))

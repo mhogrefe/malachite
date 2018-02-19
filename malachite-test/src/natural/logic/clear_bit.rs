@@ -17,8 +17,8 @@ pub fn benchmark_natural_clear_bit(gm: GenerationMode, limit: usize, file_name: 
     println!("benchmarking {} Natural.clear_bit(u64)", gm.name());
     benchmark_2(BenchmarkOptions2 {
         xs: pairs_of_natural_and_small_u64(gm),
-        function_f: &(|(mut n, index): (Natural, u64)| n.clear_bit(index)),
-        function_g: &(|(mut n, index): (rug::Integer, u64)| {
+        function_f: &mut (|(mut n, index): (Natural, u64)| n.clear_bit(index)),
+        function_g: &mut (|(mut n, index): (rug::Integer, u64)| {
             n.set_bit(index as u32, false);
         }),
         x_cons: &(|p| p.clone()),

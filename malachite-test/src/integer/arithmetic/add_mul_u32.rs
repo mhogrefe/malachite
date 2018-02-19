@@ -76,7 +76,7 @@ pub fn benchmark_integer_add_mul_assign_u32(gm: GenerationMode, limit: usize, fi
     );
     benchmark_1(BenchmarkOptions1 {
         xs: triples_of_integer_integer_and_unsigned::<u32>(gm),
-        function_f: &(|(mut a, b, c): (Integer, Integer, u32)| a.add_mul_assign(b, c)),
+        function_f: &mut (|(mut a, b, c): (Integer, Integer, u32)| a.add_mul_assign(b, c)),
         x_cons: &(|t| t.clone()),
         x_param: &(|&(ref a, ref b, _)| max(a.significant_bits(), b.significant_bits()) as usize),
         limit,
@@ -99,8 +99,8 @@ pub fn benchmark_integer_add_mul_assign_u32_evaluation_strategy(
     );
     benchmark_2(BenchmarkOptions2 {
         xs: triples_of_integer_integer_and_unsigned::<u32>(gm),
-        function_f: &(|(mut a, b, c): (Integer, Integer, u32)| a.add_mul_assign(b, c)),
-        function_g: &(|(mut a, b, c): (Integer, Integer, u32)| a.add_mul_assign(&b, c)),
+        function_f: &mut (|(mut a, b, c): (Integer, Integer, u32)| a.add_mul_assign(b, c)),
+        function_g: &mut (|(mut a, b, c): (Integer, Integer, u32)| a.add_mul_assign(&b, c)),
         x_cons: &(|t| t.clone()),
         y_cons: &(|t| t.clone()),
         x_param: &(|&(ref a, ref b, _)| max(a.significant_bits(), b.significant_bits()) as usize),
@@ -125,8 +125,8 @@ pub fn benchmark_integer_add_mul_assign_u32_algorithms(
     );
     benchmark_2(BenchmarkOptions2 {
         xs: triples_of_integer_integer_and_unsigned::<u32>(gm),
-        function_f: &(|(mut a, b, c): (Integer, Integer, u32)| a.add_mul_assign(b, c)),
-        function_g: &(|(mut a, b, c): (Integer, Integer, u32)| a += b * c),
+        function_f: &mut (|(mut a, b, c): (Integer, Integer, u32)| a.add_mul_assign(b, c)),
+        function_g: &mut (|(mut a, b, c): (Integer, Integer, u32)| a += b * c),
         x_cons: &(|t| t.clone()),
         y_cons: &(|t| t.clone()),
         x_param: &(|&(ref a, ref b, _)| max(a.significant_bits(), b.significant_bits()) as usize),
@@ -151,8 +151,8 @@ pub fn benchmark_integer_add_mul_assign_u32_ref_algorithms(
     );
     benchmark_2(BenchmarkOptions2 {
         xs: triples_of_integer_integer_and_unsigned::<u32>(gm),
-        function_f: &(|(mut a, b, c): (Integer, Integer, u32)| a.add_mul_assign(&b, c)),
-        function_g: &(|(mut a, b, c): (Integer, Integer, u32)| a += &b * c),
+        function_f: &mut (|(mut a, b, c): (Integer, Integer, u32)| a.add_mul_assign(&b, c)),
+        function_g: &mut (|(mut a, b, c): (Integer, Integer, u32)| a += &b * c),
         x_cons: &(|t| t.clone()),
         y_cons: &(|t| t.clone()),
         x_param: &(|&(ref a, ref b, _)| max(a.significant_bits(), b.significant_bits()) as usize),
@@ -170,7 +170,7 @@ pub fn benchmark_integer_add_mul_u32(gm: GenerationMode, limit: usize, file_name
     println!("benchmarking {} Integer.add_mul(Integer, u32)", gm.name());
     benchmark_1(BenchmarkOptions1 {
         xs: triples_of_integer_integer_and_unsigned::<u32>(gm),
-        function_f: &(|(a, b, c): (Integer, Integer, u32)| a.add_mul(b, c)),
+        function_f: &mut (|(a, b, c): (Integer, Integer, u32)| a.add_mul(b, c)),
         x_cons: &(|t| t.clone()),
         x_param: &(|&(ref a, ref b, _)| max(a.significant_bits(), b.significant_bits()) as usize),
         limit,
@@ -193,10 +193,10 @@ pub fn benchmark_integer_add_mul_u32_evaluation_strategy(
     );
     benchmark_4(BenchmarkOptions4 {
         xs: triples_of_integer_integer_and_unsigned::<u32>(gm),
-        function_f: &(|(a, b, c): (Integer, Integer, u32)| a.add_mul(b, c)),
-        function_g: &(|(a, b, c): (Integer, Integer, u32)| a.add_mul(&b, c)),
-        function_h: &(|(a, b, c): (Integer, Integer, u32)| (&a).add_mul(b, c)),
-        function_i: &(|(a, b, c): (Integer, Integer, u32)| (&a).add_mul(&b, c)),
+        function_f: &mut (|(a, b, c): (Integer, Integer, u32)| a.add_mul(b, c)),
+        function_g: &mut (|(a, b, c): (Integer, Integer, u32)| a.add_mul(&b, c)),
+        function_h: &mut (|(a, b, c): (Integer, Integer, u32)| (&a).add_mul(b, c)),
+        function_i: &mut (|(a, b, c): (Integer, Integer, u32)| (&a).add_mul(&b, c)),
         x_cons: &(|t| t.clone()),
         y_cons: &(|t| t.clone()),
         z_cons: &(|t| t.clone()),
@@ -221,8 +221,8 @@ pub fn benchmark_integer_add_mul_u32_algorithms(gm: GenerationMode, limit: usize
     );
     benchmark_2(BenchmarkOptions2 {
         xs: triples_of_integer_integer_and_unsigned::<u32>(gm),
-        function_f: &(|(a, b, c): (Integer, Integer, u32)| a.add_mul(b, c)),
-        function_g: &(|(a, b, c): (Integer, Integer, u32)| a + b * c),
+        function_f: &mut (|(a, b, c): (Integer, Integer, u32)| a.add_mul(b, c)),
+        function_g: &mut (|(a, b, c): (Integer, Integer, u32)| a + b * c),
         x_cons: &(|t| t.clone()),
         y_cons: &(|t| t.clone()),
         x_param: &(|&(ref a, ref b, _)| max(a.significant_bits(), b.significant_bits()) as usize),
@@ -247,8 +247,8 @@ pub fn benchmark_integer_add_mul_u32_val_ref_algorithms(
     );
     benchmark_2(BenchmarkOptions2 {
         xs: triples_of_integer_integer_and_unsigned::<u32>(gm),
-        function_f: &(|(a, b, c): (Integer, Integer, u32)| a.add_mul(&b, c)),
-        function_g: &(|(a, b, c): (Integer, Integer, u32)| a + &b * c),
+        function_f: &mut (|(a, b, c): (Integer, Integer, u32)| a.add_mul(&b, c)),
+        function_g: &mut (|(a, b, c): (Integer, Integer, u32)| a + &b * c),
         x_cons: &(|t| t.clone()),
         y_cons: &(|t| t.clone()),
         x_param: &(|&(ref a, ref b, _)| max(a.significant_bits(), b.significant_bits()) as usize),
@@ -273,8 +273,8 @@ pub fn benchmark_integer_add_mul_u32_ref_val_algorithms(
     );
     benchmark_2(BenchmarkOptions2 {
         xs: triples_of_integer_integer_and_unsigned::<u32>(gm),
-        function_f: &(|(a, b, c): (Integer, Integer, u32)| (&a).add_mul(b, c)),
-        function_g: &(|(a, b, c): (Integer, Integer, u32)| &a + b * c),
+        function_f: &mut (|(a, b, c): (Integer, Integer, u32)| (&a).add_mul(b, c)),
+        function_g: &mut (|(a, b, c): (Integer, Integer, u32)| &a + b * c),
         x_cons: &(|t| t.clone()),
         y_cons: &(|t| t.clone()),
         x_param: &(|&(ref a, ref b, _)| max(a.significant_bits(), b.significant_bits()) as usize),
@@ -299,8 +299,8 @@ pub fn benchmark_integer_add_mul_u32_ref_ref_algorithms(
     );
     benchmark_2(BenchmarkOptions2 {
         xs: triples_of_integer_integer_and_unsigned::<u32>(gm),
-        function_f: &(|(a, b, c): (Integer, Integer, u32)| (&a).add_mul(&b, c)),
-        function_g: &(|(a, b, c): (Integer, Integer, u32)| &a + &b * c),
+        function_f: &mut (|(a, b, c): (Integer, Integer, u32)| (&a).add_mul(&b, c)),
+        function_g: &mut (|(a, b, c): (Integer, Integer, u32)| &a + &b * c),
         x_cons: &(|t| t.clone()),
         y_cons: &(|t| t.clone()),
         x_param: &(|&(ref a, ref b, _)| max(a.significant_bits(), b.significant_bits()) as usize),

@@ -15,8 +15,8 @@ pub fn benchmark_integer_get_bit(gm: GenerationMode, limit: usize, file_name: &s
     println!("benchmarking {} Integer.get_bit(u64)", gm.name());
     benchmark_2(BenchmarkOptions2 {
         xs: pairs_of_integer_and_small_u64(gm),
-        function_f: &(|(n, index): (Integer, u64)| n.get_bit(index)),
-        function_g: &(|(n, index): (rug::Integer, u64)| n.get_bit(index as u32)),
+        function_f: &mut (|(n, index): (Integer, u64)| n.get_bit(index)),
+        function_g: &mut (|(n, index): (rug::Integer, u64)| n.get_bit(index as u32)),
         x_cons: &(|p| p.clone()),
         y_cons: &(|&(ref n, index)| (integer_to_rug_integer(n), index)),
         x_param: &(|&(_, index)| index as usize),

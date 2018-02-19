@@ -27,7 +27,7 @@ pub fn benchmark_natural_from_limbs_le(gm: GenerationMode, limit: usize, file_na
     println!("benchmarking {} Natural::from_limbs_le(&[u32])", gm.name());
     benchmark_1(BenchmarkOptions1 {
         xs: vecs_of_unsigned(gm),
-        function_f: &(|xs: Vec<u32>| Natural::from_limbs_le(xs.as_slice())),
+        function_f: &mut (|xs: Vec<u32>| Natural::from_limbs_le(xs.as_slice())),
         x_cons: &(|xs| xs.clone()),
         x_param: &(|xs| xs.len()),
         limit,
@@ -43,7 +43,7 @@ pub fn benchmark_natural_from_limbs_be(gm: GenerationMode, limit: usize, file_na
     println!("benchmarking {} Natural::from_limbs_be(&[u32])", gm.name());
     benchmark_1(BenchmarkOptions1 {
         xs: vecs_of_unsigned(gm),
-        function_f: &(|xs: Vec<u32>| Natural::from_limbs_be(xs.as_slice())),
+        function_f: &mut (|xs: Vec<u32>| Natural::from_limbs_be(xs.as_slice())),
         x_cons: &(|xs| xs.clone()),
         x_param: &(|xs| xs.len()),
         limit,

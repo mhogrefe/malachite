@@ -28,7 +28,7 @@ pub fn benchmark_integer_is_even(gm: GenerationMode, limit: usize, file_name: &s
     println!("benchmarking {} Integer.is_even()", gm.name());
     benchmark_1(BenchmarkOptions1 {
         xs: integers(gm),
-        function_f: &(|n: Integer| n.is_even()),
+        function_f: &mut (|n: Integer| n.is_even()),
         x_cons: &(|x| x.clone()),
         x_param: &(|n| n.significant_bits() as usize),
         limit,
@@ -44,7 +44,7 @@ pub fn benchmark_integer_is_odd(gm: GenerationMode, limit: usize, file_name: &st
     println!("benchmarking {} Integer.is_odd()", gm.name());
     benchmark_1(BenchmarkOptions1 {
         xs: integers(gm),
-        function_f: &(|n: Integer| n.is_odd()),
+        function_f: &mut (|n: Integer| n.is_odd()),
         x_cons: &(|x| x.clone()),
         x_param: &(|n| n.significant_bits() as usize),
         limit,

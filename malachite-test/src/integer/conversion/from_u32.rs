@@ -16,9 +16,9 @@ pub fn benchmark_integer_from_u32(gm: GenerationMode, limit: usize, file_name: &
     println!("benchmarking {} Integer::from(u32)", gm.name());
     benchmark_3(BenchmarkOptions3 {
         xs: unsigneds::<u32>(gm),
-        function_f: &(|u| Integer::from(u)),
-        function_g: &(|u| BigUint::from(u)),
-        function_h: &(|u| rug::Integer::from(u)),
+        function_f: &mut (|u| Integer::from(u)),
+        function_g: &mut (|u| BigUint::from(u)),
+        function_h: &mut (|u| rug::Integer::from(u)),
         x_cons: &(|&u| u),
         y_cons: &(|&u| u),
         z_cons: &(|&u| u),

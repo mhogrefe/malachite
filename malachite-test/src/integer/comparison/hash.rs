@@ -14,8 +14,8 @@ pub fn benchmark_integer_hash(gm: GenerationMode, limit: usize, file_name: &str)
     println!("benchmarking {} Integer hash", gm.name());
     benchmark_2(BenchmarkOptions2 {
         xs: integers(gm),
-        function_f: &(|n| hash(&n)),
-        function_g: &(|n| hash(&n)),
+        function_f: &mut (|n| hash(&n)),
+        function_g: &mut (|n| hash(&n)),
         x_cons: &(|x| x.clone()),
         y_cons: &(|x| integer_to_bigint(x)),
         x_param: &(|n| n.significant_bits() as usize),

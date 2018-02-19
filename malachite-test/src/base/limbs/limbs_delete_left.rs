@@ -21,7 +21,7 @@ pub fn benchmark_limbs_delete_left(gm: GenerationMode, limit: usize, file_name: 
     );
     benchmark_1(BenchmarkOptions1 {
         xs: pairs_of_unsigned_vec_and_small_usize_var_1(gm),
-        function_f: &(|(mut limbs, delete_size): (Vec<u32>, usize)| {
+        function_f: &mut (|(mut limbs, delete_size): (Vec<u32>, usize)| {
             limbs_delete_left(&mut limbs, delete_size)
         }),
         x_cons: &(|ps| ps.clone()),

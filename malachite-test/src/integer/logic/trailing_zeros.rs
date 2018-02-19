@@ -14,7 +14,7 @@ pub fn benchmark_integer_trailing_zeros(gm: GenerationMode, limit: usize, file_n
     println!("benchmarking {} Integer.trailing_zeros()", gm.name());
     benchmark_1(BenchmarkOptions1 {
         xs: integers(gm),
-        function_f: &(|n: Integer| n.trailing_zeros()),
+        function_f: &mut (|n: Integer| n.trailing_zeros()),
         x_cons: &(|x| x.clone()),
         x_param: &(|n| n.significant_bits() as usize),
         limit,

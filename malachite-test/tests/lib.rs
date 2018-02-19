@@ -180,7 +180,7 @@ pub mod natural {
         pub mod trailing_zeros;
     }
     pub mod random {
-        pub mod random_natural_from_bits;
+        pub mod random_natural_with_bits;
         pub mod random_natural_up_to_bits;
         pub mod random_natural_below;
     }

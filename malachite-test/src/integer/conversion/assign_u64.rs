@@ -22,8 +22,8 @@ pub fn benchmark_integer_assign_u64(gm: GenerationMode, limit: usize, file_name:
     println!("benchmarking {} Integer.assign(u64)", gm.name());
     benchmark_2(BenchmarkOptions2 {
         xs: pairs_of_integer_and_unsigned::<u64>(gm),
-        function_f: &(|(mut n, u): (Integer, u64)| n.assign(u)),
-        function_g: &(|(mut n, u): (BigInt, u64)| num_assign_u64(&mut n, u)),
+        function_f: &mut (|(mut n, u): (Integer, u64)| n.assign(u)),
+        function_g: &mut (|(mut n, u): (BigInt, u64)| num_assign_u64(&mut n, u)),
         x_cons: &(|p| p.clone()),
         y_cons: &(|&(ref n, u)| (integer_to_bigint(n), u)),
         x_param: &(|&(ref n, _)| n.significant_bits() as usize),

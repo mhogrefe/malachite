@@ -21,7 +21,7 @@ pub fn benchmark_natural_to_integer(gm: GenerationMode, limit: usize, file_name:
     println!("benchmarking {} Natural.to_integer()", gm.name());
     benchmark_1(BenchmarkOptions1 {
         xs: naturals(gm),
-        function_f: &(|n: Natural| n.into_integer()),
+        function_f: &mut (|n: Natural| n.into_integer()),
         x_cons: &(|x| x.clone()),
         x_param: &(|n| n.significant_bits() as usize),
         limit,
@@ -44,8 +44,8 @@ pub fn benchmark_natural_to_integer_evaluation_strategy(
     );
     benchmark_2(BenchmarkOptions2 {
         xs: naturals(gm),
-        function_f: &(|n: Natural| n.into_integer()),
-        function_g: &(|n: Natural| n.to_integer()),
+        function_f: &mut (|n: Natural| n.into_integer()),
+        function_g: &mut (|n: Natural| n.to_integer()),
         x_cons: &(|x| x.clone()),
         y_cons: &(|x| x.clone()),
         x_param: &(|n| n.significant_bits() as usize),

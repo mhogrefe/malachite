@@ -16,7 +16,7 @@ pub fn benchmark_integer_set_bit(gm: GenerationMode, limit: usize, file_name: &s
     println!("benchmarking {} Integer.set_bit(u64)", gm.name());
     benchmark_1(BenchmarkOptions1 {
         xs: pairs_of_integer_and_small_u64(gm),
-        function_f: &(|(mut n, index): (Integer, u64)| n.set_bit(index)),
+        function_f: &mut (|(mut n, index): (Integer, u64)| n.set_bit(index)),
         x_cons: &(|p| p.clone()),
         x_param: &(|&(_, index)| index as usize),
         limit,

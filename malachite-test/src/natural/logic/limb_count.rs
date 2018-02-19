@@ -14,7 +14,7 @@ pub fn benchmark_natural_limb_count(gm: GenerationMode, limit: usize, file_name:
     println!("benchmarking {} Natural.limb_count()", gm.name());
     benchmark_1(BenchmarkOptions1 {
         xs: naturals(gm),
-        function_f: &(|n: Natural| n.limb_count()),
+        function_f: &mut (|n: Natural| n.limb_count()),
         x_cons: &(|x| x.clone()),
         x_param: &(|n| n.significant_bits() as usize),
         limit,

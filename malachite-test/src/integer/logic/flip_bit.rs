@@ -18,8 +18,8 @@ pub fn benchmark_integer_flip_bit(gm: GenerationMode, limit: usize, file_name: &
     println!("benchmarking {} Integer.flip_bit(u64)", gm.name());
     benchmark_2(BenchmarkOptions2 {
         xs: pairs_of_integer_and_small_u64(gm),
-        function_f: &(|(mut n, index): (Integer, u64)| n.flip_bit(index)),
-        function_g: &(|(mut n, index): (rug::Integer, u64)| {
+        function_f: &mut (|(mut n, index): (Integer, u64)| n.flip_bit(index)),
+        function_g: &mut (|(mut n, index): (rug::Integer, u64)| {
             n.toggle_bit(index as u32);
         }),
         x_cons: &(|p| p.clone()),

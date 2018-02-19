@@ -20,7 +20,7 @@ pub fn benchmark_natural_to_u64(gm: GenerationMode, limit: usize, file_name: &st
     println!("benchmarking {} Natural.to_u64()", gm.name());
     benchmark_1(BenchmarkOptions1 {
         xs: naturals(gm),
-        function_f: &(|n: Natural| n.to_u64()),
+        function_f: &mut (|n: Natural| n.to_u64()),
         x_cons: &(|x| x.clone()),
         x_param: &(|n| n.significant_bits() as usize),
         limit,
@@ -36,7 +36,7 @@ pub fn benchmark_natural_to_u64_wrapping(gm: GenerationMode, limit: usize, file_
     println!("benchmarking {} Natural.to_u64_wrapping()", gm.name());
     benchmark_1(BenchmarkOptions1 {
         xs: naturals(gm),
-        function_f: &(|n: Natural| n.to_u64_wrapping()),
+        function_f: &mut (|n: Natural| n.to_u64_wrapping()),
         x_cons: &(|x| x.clone()),
         x_param: &(|n| n.significant_bits() as usize),
         limit,

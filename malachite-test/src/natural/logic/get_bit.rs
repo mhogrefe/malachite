@@ -20,9 +20,9 @@ pub fn benchmark_natural_get_bit(gm: GenerationMode, limit: usize, file_name: &s
     println!("benchmarking {} Natural.get_bit(u64)", gm.name());
     benchmark_3(BenchmarkOptions3 {
         xs: pairs_of_natural_and_small_u64(gm),
-        function_f: &(|(n, index): (Natural, u64)| n.get_bit(index)),
-        function_g: &(|(n, index): (BigUint, u64)| num_get_bit(&n, index)),
-        function_h: &(|(n, index): (rug::Integer, u64)| n.get_bit(index as u32)),
+        function_f: &mut (|(n, index): (Natural, u64)| n.get_bit(index)),
+        function_g: &mut (|(n, index): (BigUint, u64)| num_get_bit(&n, index)),
+        function_h: &mut (|(n, index): (rug::Integer, u64)| n.get_bit(index as u32)),
         x_cons: &(|p| p.clone()),
         y_cons: &(|&(ref n, index)| (natural_to_biguint(n), index)),
         z_cons: &(|&(ref n, index)| (natural_to_rug_integer(n), index)),

@@ -16,7 +16,7 @@ pub fn benchmark_char_increment(gm: GenerationMode, limit: usize, file_name: &st
     println!("benchmarking {} char.increment()", gm.name());
     benchmark_1(BenchmarkOptions1 {
         xs: chars_var_2(gm),
-        function_f: &(|mut c: char| c.increment()),
+        function_f: &mut (|mut c: char| c.increment()),
         x_cons: &(|&c| c),
         x_param: &(|&c| char_to_contiguous_range(c) as usize),
         limit,

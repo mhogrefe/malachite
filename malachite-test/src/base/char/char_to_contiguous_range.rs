@@ -17,7 +17,7 @@ pub fn benchmark_char_to_contiguous_range(gm: GenerationMode, limit: usize, file
     println!("benchmarking {} char_to_contiguous_range(char)", gm.name());
     benchmark_1(BenchmarkOptions1 {
         xs: chars(gm),
-        function_f: &(|c| char_to_contiguous_range(c)),
+        function_f: &mut (|c| char_to_contiguous_range(c)),
         x_cons: &(|&c| c),
         x_param: &(|&c| char_to_contiguous_range(c) as usize),
         limit,

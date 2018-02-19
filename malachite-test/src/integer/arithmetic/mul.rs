@@ -53,8 +53,8 @@ pub fn benchmark_integer_mul_assign(gm: GenerationMode, limit: usize, file_name:
     println!("benchmarking {} Integer *= Integer", gm.name());
     benchmark_2(BenchmarkOptions2 {
         xs: pairs_of_integers(gm),
-        function_f: &(|(mut x, y)| x *= y),
-        function_g: &(|(mut x, y): (rug::Integer, rug::Integer)| x *= y),
+        function_f: &mut (|(mut x, y)| x *= y),
+        function_g: &mut (|(mut x, y): (rug::Integer, rug::Integer)| x *= y),
         x_cons: &(|p| p.clone()),
         y_cons: &(|&(ref x, ref y)| (integer_to_rug_integer(x), integer_to_rug_integer(y))),
         x_param: &(|&(ref x, ref y)| (x.significant_bits() + y.significant_bits()) as usize),
@@ -79,8 +79,8 @@ pub fn benchmark_integer_mul_assign_evaluation_strategy(
     );
     benchmark_2(BenchmarkOptions2 {
         xs: pairs_of_integers(gm),
-        function_f: &(|(mut x, y)| x *= y),
-        function_g: &(|(mut x, y)| x *= &y),
+        function_f: &mut (|(mut x, y)| x *= y),
+        function_g: &mut (|(mut x, y)| x *= &y),
         x_cons: &(|p| p.clone()),
         y_cons: &(|p| p.clone()),
         x_param: &(|&(ref x, ref y)| (x.significant_bits() + y.significant_bits()) as usize),
@@ -98,9 +98,9 @@ pub fn benchmark_integer_mul(gm: GenerationMode, limit: usize, file_name: &str) 
     println!("benchmarking {} Integer * Integer", gm.name());
     benchmark_3(BenchmarkOptions3 {
         xs: pairs_of_integers(gm),
-        function_f: &(|(x, y)| x * y),
-        function_g: &(|(x, y)| x * y),
-        function_h: &(|(x, y)| x * y),
+        function_f: &mut (|(x, y)| x * y),
+        function_g: &mut (|(x, y)| x * y),
+        function_h: &mut (|(x, y)| x * y),
         x_cons: &(|p| p.clone()),
         y_cons: &(|&(ref x, ref y)| (integer_to_bigint(x), integer_to_bigint(y))),
         z_cons: &(|&(ref x, ref y)| (integer_to_rug_integer(x), integer_to_rug_integer(y))),
@@ -127,10 +127,10 @@ pub fn benchmark_integer_mul_evaluation_strategy(
     );
     benchmark_4(BenchmarkOptions4 {
         xs: pairs_of_integers(gm),
-        function_f: &(|(x, y)| x * y),
-        function_g: &(|(x, y)| x * &y),
-        function_h: &(|(x, y)| &x * y),
-        function_i: &(|(x, y)| &x * &y),
+        function_f: &mut (|(x, y)| x * y),
+        function_g: &mut (|(x, y)| x * &y),
+        function_h: &mut (|(x, y)| &x * y),
+        function_i: &mut (|(x, y)| &x * &y),
         x_cons: &(|p| p.clone()),
         y_cons: &(|p| p.clone()),
         z_cons: &(|p| p.clone()),

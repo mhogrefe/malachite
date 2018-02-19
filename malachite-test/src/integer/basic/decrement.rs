@@ -17,7 +17,7 @@ pub fn benchmark_integer_decrement(gm: GenerationMode, limit: usize, file_name: 
     println!("benchmarking {} Integer.decrement()", gm.name());
     benchmark_1(BenchmarkOptions1 {
         xs: integers(gm),
-        function_f: &(|mut n: Integer| n.decrement()),
+        function_f: &mut (|mut n: Integer| n.decrement()),
         x_cons: &(|n| n.clone()),
         x_param: &(|n| n.significant_bits() as usize),
         limit,

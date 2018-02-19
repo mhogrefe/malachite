@@ -116,7 +116,7 @@ pub fn benchmark_integer_mod_power_of_two_assign(
     );
     benchmark_1(BenchmarkOptions1 {
         xs: pairs_of_integer_and_small_u32(gm),
-        function_f: &(|(mut n, u): (Integer, u32)| n.mod_power_of_two_assign(u)),
+        function_f: &mut (|(mut n, u): (Integer, u32)| n.mod_power_of_two_assign(u)),
         x_cons: &(|p| p.clone()),
         x_param: &(|&(_, index)| index as usize),
         limit,
@@ -132,7 +132,7 @@ pub fn benchmark_integer_mod_power_of_two(gm: GenerationMode, limit: usize, file
     println!("benchmarking {} Integer.mod_power_of_two(u32)", gm.name());
     benchmark_1(BenchmarkOptions1 {
         xs: pairs_of_integer_and_small_u32(gm),
-        function_f: &(|(n, u): (Integer, u32)| n.mod_power_of_two(u)),
+        function_f: &mut (|(n, u): (Integer, u32)| n.mod_power_of_two(u)),
         x_cons: &(|p| p.clone()),
         x_param: &(|&(_, index)| index as usize),
         limit,
@@ -151,7 +151,7 @@ pub fn benchmark_integer_mod_power_of_two_ref(gm: GenerationMode, limit: usize, 
     );
     benchmark_1(BenchmarkOptions1 {
         xs: pairs_of_integer_and_small_u32(gm),
-        function_f: &(|(n, u): (Integer, u32)| n.mod_power_of_two_ref(u)),
+        function_f: &mut (|(n, u): (Integer, u32)| n.mod_power_of_two_ref(u)),
         x_cons: &(|p| p.clone()),
         x_param: &(|&(_, index)| index as usize),
         limit,
@@ -174,7 +174,7 @@ pub fn benchmark_integer_rem_power_of_two_assign(
     );
     benchmark_1(BenchmarkOptions1 {
         xs: pairs_of_integer_and_small_u32(gm),
-        function_f: &(|(mut n, u): (Integer, u32)| n.rem_power_of_two_assign(u)),
+        function_f: &mut (|(mut n, u): (Integer, u32)| n.rem_power_of_two_assign(u)),
         x_cons: &(|p| p.clone()),
         x_param: &(|&(_, index)| index as usize),
         limit,
@@ -190,7 +190,7 @@ pub fn benchmark_integer_rem_power_of_two(gm: GenerationMode, limit: usize, file
     println!("benchmarking {} Integer.rem_power_of_two(u32)", gm.name());
     benchmark_1(BenchmarkOptions1 {
         xs: pairs_of_integer_and_small_u32(gm),
-        function_f: &(|(n, u): (Integer, u32)| n.rem_power_of_two(u)),
+        function_f: &mut (|(n, u): (Integer, u32)| n.rem_power_of_two(u)),
         x_cons: &(|p| p.clone()),
         x_param: &(|&(_, index)| index as usize),
         limit,
@@ -209,7 +209,7 @@ pub fn benchmark_integer_rem_power_of_two_ref(gm: GenerationMode, limit: usize, 
     );
     benchmark_1(BenchmarkOptions1 {
         xs: pairs_of_integer_and_small_u32(gm),
-        function_f: &(|(n, u): (Integer, u32)| n.rem_power_of_two_ref(u)),
+        function_f: &mut (|(n, u): (Integer, u32)| n.rem_power_of_two_ref(u)),
         x_cons: &(|p| p.clone()),
         x_param: &(|&(_, index)| index as usize),
         limit,
@@ -232,7 +232,7 @@ pub fn benchmark_integer_ceiling_mod_power_of_two_assign(
     );
     benchmark_1(BenchmarkOptions1 {
         xs: pairs_of_integer_and_small_u32(gm),
-        function_f: &(|(mut n, u): (Integer, u32)| n.ceiling_mod_power_of_two_assign(u)),
+        function_f: &mut (|(mut n, u): (Integer, u32)| n.ceiling_mod_power_of_two_assign(u)),
         x_cons: &(|p| p.clone()),
         x_param: &(|&(_, index)| index as usize),
         limit,
@@ -255,7 +255,7 @@ pub fn benchmark_integer_ceiling_mod_power_of_two(
     );
     benchmark_1(BenchmarkOptions1 {
         xs: pairs_of_integer_and_small_u32(gm),
-        function_f: &(|(n, u): (Integer, u32)| n.ceiling_mod_power_of_two(u)),
+        function_f: &mut (|(n, u): (Integer, u32)| n.ceiling_mod_power_of_two(u)),
         x_cons: &(|p| p.clone()),
         x_param: &(|&(_, index)| index as usize),
         limit,
@@ -278,7 +278,7 @@ pub fn benchmark_integer_ceiling_mod_power_of_two_ref(
     );
     benchmark_1(BenchmarkOptions1 {
         xs: pairs_of_integer_and_small_u32(gm),
-        function_f: &(|(n, u): (Integer, u32)| n.ceiling_mod_power_of_two_ref(u)),
+        function_f: &mut (|(n, u): (Integer, u32)| n.ceiling_mod_power_of_two_ref(u)),
         x_cons: &(|p| p.clone()),
         x_param: &(|&(_, index)| index as usize),
         limit,

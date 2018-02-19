@@ -30,9 +30,9 @@ pub fn benchmark_integer_sign(gm: GenerationMode, limit: usize, file_name: &str)
     println!("benchmarking {} Integer.sign()", gm.name());
     benchmark_3(BenchmarkOptions3 {
         xs: integers(gm),
-        function_f: &(|n: Integer| n.sign()),
-        function_g: &(|n: BigInt| num_sign(&n)),
-        function_h: &(|n: rug::Integer| n.cmp0()),
+        function_f: &mut (|n: Integer| n.sign()),
+        function_g: &mut (|n: BigInt| num_sign(&n)),
+        function_h: &mut (|n: rug::Integer| n.cmp0()),
         x_cons: &(|x| x.clone()),
         y_cons: &(|x| integer_to_bigint(x)),
         z_cons: &(|x| integer_to_rug_integer(x)),

@@ -24,9 +24,9 @@ pub fn benchmark_integer_assign_i32(gm: GenerationMode, limit: usize, file_name:
     println!("benchmarking {} Integer.assign(i32)", gm.name());
     benchmark_3(BenchmarkOptions3 {
         xs: pairs_of_integer_and_signed::<i32>(gm),
-        function_f: &(|(mut n, i): (Integer, i32)| n.assign(i)),
-        function_g: &(|(mut n, i): (BigInt, i32)| num_assign_i32(&mut n, i)),
-        function_h: &(|(mut n, i): (rug::Integer, i32)| n.assign(i)),
+        function_f: &mut (|(mut n, i): (Integer, i32)| n.assign(i)),
+        function_g: &mut (|(mut n, i): (BigInt, i32)| num_assign_i32(&mut n, i)),
+        function_h: &mut (|(mut n, i): (rug::Integer, i32)| n.assign(i)),
         x_cons: &(|p| p.clone()),
         y_cons: &(|&(ref n, i)| (integer_to_bigint(n), i)),
         z_cons: &(|&(ref n, i)| (integer_to_rug_integer(n), i)),

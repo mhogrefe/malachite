@@ -35,7 +35,7 @@ pub fn benchmark_integer_twos_complement_limbs_le(
     );
     benchmark_1(BenchmarkOptions1 {
         xs: integers(gm),
-        function_f: &(|n: Integer| n.twos_complement_limbs_le()),
+        function_f: &mut (|n: Integer| n.twos_complement_limbs_le()),
         x_cons: &(|x| x.clone()),
         x_param: &(|n| n.significant_bits() as usize),
         limit,
@@ -58,7 +58,7 @@ pub fn benchmark_integer_twos_complement_limbs_be(
     );
     benchmark_1(BenchmarkOptions1 {
         xs: integers(gm),
-        function_f: &(|n: Integer| n.twos_complement_limbs_be()),
+        function_f: &mut (|n: Integer| n.twos_complement_limbs_be()),
         x_cons: &(|x| x.clone()),
         x_param: &(|n| n.significant_bits() as usize),
         limit,

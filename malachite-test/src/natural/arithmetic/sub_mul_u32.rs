@@ -42,7 +42,7 @@ pub fn benchmark_natural_sub_mul_assign_u32(gm: GenerationMode, limit: usize, fi
     );
     benchmark_1(BenchmarkOptions1 {
         xs: triples_of_natural_natural_and_u32_var_1(gm),
-        function_f: &(|(mut a, b, c): (Natural, Natural, u32)| a.sub_mul_assign(&b, c)),
+        function_f: &mut (|(mut a, b, c): (Natural, Natural, u32)| a.sub_mul_assign(&b, c)),
         x_cons: &(|t| t.clone()),
         x_param: &(|&(ref a, ref b, _)| max(a.significant_bits(), b.significant_bits()) as usize),
         limit,
@@ -65,8 +65,8 @@ pub fn benchmark_natural_sub_mul_assign_u32_algorithms(
     );
     benchmark_2(BenchmarkOptions2 {
         xs: triples_of_natural_natural_and_u32_var_1(gm),
-        function_f: &(|(mut a, b, c): (Natural, Natural, u32)| a.sub_mul_assign(&b, c)),
-        function_g: &(|(mut a, b, c): (Natural, Natural, u32)| a -= &(&b * c)),
+        function_f: &mut (|(mut a, b, c): (Natural, Natural, u32)| a.sub_mul_assign(&b, c)),
+        function_g: &mut (|(mut a, b, c): (Natural, Natural, u32)| a -= &(&b * c)),
         x_cons: &(|t| t.clone()),
         y_cons: &(|t| t.clone()),
         x_param: &(|&(ref a, ref b, _)| max(a.significant_bits(), b.significant_bits()) as usize),
@@ -84,7 +84,7 @@ pub fn benchmark_natural_sub_mul_u32(gm: GenerationMode, limit: usize, file_name
     println!("benchmarking {} Natural.sub_mul(&Natural, u32)", gm.name());
     benchmark_1(BenchmarkOptions1 {
         xs: triples_of_natural_natural_and_unsigned::<u32>(gm),
-        function_f: &(|(a, b, c): (Natural, Natural, u32)| a.sub_mul(&b, c)),
+        function_f: &mut (|(a, b, c): (Natural, Natural, u32)| a.sub_mul(&b, c)),
         x_cons: &(|t| t.clone()),
         x_param: &(|&(ref a, ref b, _)| max(a.significant_bits(), b.significant_bits()) as usize),
         limit,
@@ -107,8 +107,8 @@ pub fn benchmark_natural_sub_mul_u32_evaluation_strategy(
     );
     benchmark_2(BenchmarkOptions2 {
         xs: triples_of_natural_natural_and_unsigned::<u32>(gm),
-        function_f: &(|(a, b, c): (Natural, Natural, u32)| a.sub_mul(&b, c)),
-        function_g: &(|(a, b, c): (Natural, Natural, u32)| (&a).sub_mul(&b, c)),
+        function_f: &mut (|(a, b, c): (Natural, Natural, u32)| a.sub_mul(&b, c)),
+        function_g: &mut (|(a, b, c): (Natural, Natural, u32)| (&a).sub_mul(&b, c)),
         x_cons: &(|t| t.clone()),
         y_cons: &(|t| t.clone()),
         x_param: &(|&(ref a, ref b, _)| max(a.significant_bits(), b.significant_bits()) as usize),
@@ -129,8 +129,8 @@ pub fn benchmark_natural_sub_mul_u32_algorithms(gm: GenerationMode, limit: usize
     );
     benchmark_2(BenchmarkOptions2 {
         xs: triples_of_natural_natural_and_unsigned::<u32>(gm),
-        function_f: &(|(a, b, c): (Natural, Natural, u32)| a.sub_mul(&b, c)),
-        function_g: &(|(a, b, c): (Natural, Natural, u32)| a - &(&b * c)),
+        function_f: &mut (|(a, b, c): (Natural, Natural, u32)| a.sub_mul(&b, c)),
+        function_g: &mut (|(a, b, c): (Natural, Natural, u32)| a - &(&b * c)),
         x_cons: &(|t| t.clone()),
         y_cons: &(|t| t.clone()),
         x_param: &(|&(ref a, ref b, _)| max(a.significant_bits(), b.significant_bits()) as usize),
@@ -155,8 +155,8 @@ pub fn benchmark_natural_sub_mul_u32_ref_algorithms(
     );
     benchmark_2(BenchmarkOptions2 {
         xs: triples_of_natural_natural_and_unsigned::<u32>(gm),
-        function_f: &(|(a, b, c): (Natural, Natural, u32)| (&a).sub_mul(&b, c)),
-        function_g: &(|(a, b, c): (Natural, Natural, u32)| &a - &(&b * c)),
+        function_f: &mut (|(a, b, c): (Natural, Natural, u32)| (&a).sub_mul(&b, c)),
+        function_g: &mut (|(a, b, c): (Natural, Natural, u32)| &a - &(&b * c)),
         x_cons: &(|t| t.clone()),
         y_cons: &(|t| t.clone()),
         x_param: &(|&(ref a, ref b, _)| max(a.significant_bits(), b.significant_bits()) as usize),
