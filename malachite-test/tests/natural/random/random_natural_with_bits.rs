@@ -30,6 +30,6 @@ fn random_natural_with_bits_properties() {
     test_properties(small_u64s, |&bits| {
         let n = random_natural_with_bits(&mut rng, bits);
         assert!(n.is_valid());
-        assert!(n.significant_bits() == bits);
+        assert_eq!(n.significant_bits(), bits);
     });
 }

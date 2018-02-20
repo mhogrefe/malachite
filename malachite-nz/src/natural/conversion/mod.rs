@@ -1,6 +1,6 @@
 use error::ParseIntegerError;
 use malachite_base::num::{Assign, Zero};
-use natural::Natural::{self, Small};
+use natural::Natural::{self, Large, Small};
 use std::fmt::{self, Debug, Display, Formatter};
 use std::str::FromStr;
 
@@ -84,6 +84,25 @@ impl FromStr for Natural {
         let mut i = Natural::ZERO;
         i.assign_str(src)?;
         Ok(i)
+    }
+}
+
+impl fmt::Binary for Natural {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match *self {
+            Small(small) => write!(f, "{:b}", small),
+            Large(ref limbs) => {
+                write!(f, "{:b}", limbs.last().unwrap())?;
+                let mut i = limbs.len() - 2;
+                loop {
+                    let result = write!(f, "{:032b}", limbs[i]);
+                    if i == 0 {
+                        return result;
+                    }
+                    i -= 1;
+                }
+            }
+        }
     }
 }
 

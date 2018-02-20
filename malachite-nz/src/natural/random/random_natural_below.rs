@@ -22,7 +22,7 @@ use rand::Rng;
 ///     let mut rng: StdRng = SeedableRng::from_seed(seed);
 ///     assert_eq!(random_natural_below(&mut rng, &Natural::from(10u32)).to_string(), "2");
 ///     assert_eq!(random_natural_below(&mut rng,
-///         &Natural::from(1000000u32)).to_string(), "293069");
+///         &Natural::from(1_000_000u32)).to_string(), "293069");
 ///     assert_eq!(random_natural_below(&mut rng, &Natural::trillion()).to_string(),
 ///         "525916362607");
 /// }

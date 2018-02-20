@@ -3,7 +3,7 @@ use natural::Natural;
 use natural::random::random_natural_up_to_bits::random_natural_up_to_bits;
 use rand::Rng;
 
-/// Returns random `Natural` with exactly `bits` bits; equivalently, returns a random `Natural`
+/// Returns a random `Natural` with exactly `bits` bits; equivalently, returns a random `Natural`
 /// uniformly sampled from [2<sup>`bits`-1</sup>, 2<sup>`bits`</sup>).
 ///
 /// # Example

@@ -141,6 +141,9 @@ use malachite_test::natural::logic::trailing_zeros::*;
 use malachite_test::natural::random::random_natural_below::*;
 use malachite_test::natural::random::random_natural_up_to_bits::*;
 use malachite_test::natural::random::random_natural_with_bits::*;
+use malachite_test::natural::random::special_random_natural_below::*;
+use malachite_test::natural::random::special_random_natural_up_to_bits::*;
+use malachite_test::natural::random::special_random_natural_with_bits::*;
 use std::env;
 
 macro_rules! demos_and_benchmarks {
@@ -636,6 +639,9 @@ demos_and_benchmarks!(
         demo_natural_shr_round_u32,
         demo_natural_shr_round_u32_ref,
         demo_natural_significant_bits,
+        demo_natural_special_random_natural_below,
+        demo_natural_special_random_natural_up_to_bits,
+        demo_natural_special_random_natural_with_bits,
         demo_natural_sub_assign,
         demo_natural_sub,
         demo_natural_sub_ref_ref,
@@ -1051,6 +1057,9 @@ demos_and_benchmarks!(
         benchmark_natural_shr_round_u32,
         benchmark_natural_shr_round_u32_ref,
         benchmark_natural_significant_bits,
+        benchmark_natural_special_random_natural_below,
+        benchmark_natural_special_random_natural_up_to_bits,
+        benchmark_natural_special_random_natural_with_bits,
         benchmark_natural_sub_assign,
         benchmark_natural_sub_evaluation_strategy,
         benchmark_natural_sub_assign_u32,
