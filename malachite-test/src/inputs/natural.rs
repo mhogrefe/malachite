@@ -6,7 +6,7 @@ use malachite_nz::natural::Natural;
 use rust_wheels::iterators::bools::exhaustive_bools;
 use rust_wheels::iterators::common::EXAMPLE_SEED;
 use rust_wheels::iterators::general::random_x;
-use rust_wheels::iterators::integers_geometric::{i32s_geometric, natural_u32s_geometric};
+use rust_wheels::iterators::integers_geometric::{i32s_geometric, u32s_geometric};
 use rust_wheels::iterators::naturals::{exhaustive_naturals, exhaustive_positive_naturals,
                                        random_naturals, random_positive_naturals};
 use rust_wheels::iterators::primitive_ints::{exhaustive_i, exhaustive_u};
@@ -152,7 +152,7 @@ pub fn pairs_of_natural_and_small_u32(gm: GenerationMode) -> Box<Iterator<Item =
         GenerationMode::Random(scale) => Box::new(random_pairs(
             &EXAMPLE_SEED,
             &(|seed| random_naturals(seed, scale)),
-            &(|seed| natural_u32s_geometric(seed, scale)),
+            &(|seed| u32s_geometric(seed, scale)),
         )),
     }
 }
@@ -193,7 +193,7 @@ pub fn pairs_of_natural_and_small_u64(gm: GenerationMode) -> Box<Iterator<Item =
         GenerationMode::Random(scale) => Box::new(random_pairs(
             &EXAMPLE_SEED,
             &(|seed| random_naturals(seed, scale)),
-            &(|seed| natural_u32s_geometric(seed, scale).map(|i| i.into())),
+            &(|seed| u32s_geometric(seed, scale).map(|i| i.into())),
         )),
     }
 }
@@ -209,8 +209,8 @@ pub fn triples_of_natural_small_u32_and_small_u32(
         GenerationMode::Random(scale) => Box::new(random_triples(
             &EXAMPLE_SEED,
             &(|seed| random_naturals(seed, scale)),
-            &(|seed| natural_u32s_geometric(seed, scale)),
-            &(|seed| natural_u32s_geometric(seed, scale)),
+            &(|seed| u32s_geometric(seed, scale)),
+            &(|seed| u32s_geometric(seed, scale)),
         )),
     }
 }
@@ -274,7 +274,7 @@ pub fn triples_of_natural_small_u64_and_bool(
         GenerationMode::Random(scale) => Box::new(random_triples(
             &EXAMPLE_SEED,
             &(|seed| random_naturals(seed, scale)),
-            &(|seed| natural_u32s_geometric(seed, scale).map(|i| i.into())),
+            &(|seed| u32s_geometric(seed, scale).map(|i| i.into())),
             &(|seed| random_x(seed)),
         )),
     }
@@ -345,7 +345,7 @@ fn triples_of_natural_small_u32_and_rounding_mode(
         GenerationMode::Random(scale) => Box::new(random_triples(
             &EXAMPLE_SEED,
             &(|seed| random_naturals(seed, scale)),
-            &(|seed| natural_u32s_geometric(seed, scale)),
+            &(|seed| u32s_geometric(seed, scale)),
             &(|seed| random_rounding_modes(seed)),
         )),
     }

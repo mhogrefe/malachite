@@ -8,7 +8,7 @@ use rust_wheels::iterators::bools::exhaustive_bools;
 use rust_wheels::iterators::chars::exhaustive_chars;
 use rust_wheels::iterators::common::EXAMPLE_SEED;
 use rust_wheels::iterators::general::{random_x, range_increasing_x};
-use rust_wheels::iterators::integers_geometric::natural_u32s_geometric;
+use rust_wheels::iterators::integers_geometric::u32s_geometric;
 use rust_wheels::iterators::orderings::{exhaustive_orderings, random_orderings};
 use rust_wheels::iterators::primitive_ints::{exhaustive_i, exhaustive_negative_i,
                                              exhaustive_positive_x, exhaustive_u,
@@ -91,7 +91,7 @@ pub fn pairs_of_u32s_range_1(gm: GenerationMode) -> Box<Iterator<Item = (u32, u3
 pub fn small_u32s(gm: GenerationMode) -> Box<Iterator<Item = u32>> {
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_u()),
-        GenerationMode::Random(scale) => Box::new(natural_u32s_geometric(&EXAMPLE_SEED, scale)),
+        GenerationMode::Random(scale) => Box::new(u32s_geometric(&EXAMPLE_SEED, scale)),
     }
 }
 
@@ -99,7 +99,7 @@ pub fn small_u64s(gm: GenerationMode) -> Box<Iterator<Item = u64>> {
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_u()),
         GenerationMode::Random(scale) => {
-            Box::new(natural_u32s_geometric(&EXAMPLE_SEED, scale).map(|i| i.into()))
+            Box::new(u32s_geometric(&EXAMPLE_SEED, scale).map(|i| i.into()))
         }
     }
 }
@@ -115,7 +115,7 @@ fn random_pairs_of_primitive_and_geometric_u32<T: 'static + PrimitiveInteger>(
     Box::new(random_pairs(
         &EXAMPLE_SEED,
         &(|seed| random_x(seed)),
-        &(|seed| natural_u32s_geometric(seed, scale)),
+        &(|seed| u32s_geometric(seed, scale)),
     ))
 }
 
@@ -125,7 +125,7 @@ fn random_pairs_of_primitive_and_geometric_u64<T: 'static + PrimitiveInteger>(
     Box::new(random_pairs(
         &EXAMPLE_SEED,
         &(|seed| random_x(seed)),
-        &(|seed| natural_u32s_geometric(seed, scale).map(|i| i.into())),
+        &(|seed| u32s_geometric(seed, scale).map(|i| i.into())),
     ))
 }
 
@@ -157,7 +157,7 @@ pub fn pairs_of_small_usize_and_unsigned<T: 'static + PrimitiveUnsigned>(
         ))),
         GenerationMode::Random(scale) => Box::new(random_pairs(
             &EXAMPLE_SEED,
-            &(|seed| natural_u32s_geometric(seed, scale).map(|u| u as usize)),
+            &(|seed| u32s_geometric(seed, scale).map(|u| u as usize)),
             &(|seed| random_x(seed)),
         )),
     }
@@ -178,7 +178,7 @@ pub fn pairs_of_positive_unsigned_and_small_u32<T: 'static + PrimitiveUnsigned>(
         GenerationMode::Random(scale) => Box::new(random_pairs(
             &EXAMPLE_SEED,
             &(|seed| random_positive_u(seed)),
-            &(|seed| natural_u32s_geometric(seed, scale)),
+            &(|seed| u32s_geometric(seed, scale)),
         )),
     }
 }
@@ -191,7 +191,7 @@ pub fn pairs_of_positive_signed_and_small_u32<T: 'static + PrimitiveSigned>(
         GenerationMode::Random(scale) => Box::new(random_pairs(
             &EXAMPLE_SEED,
             &(|seed| random_positive_i(seed)),
-            &(|seed| natural_u32s_geometric(seed, scale)),
+            &(|seed| u32s_geometric(seed, scale)),
         )),
     }
 }
@@ -278,7 +278,7 @@ pub fn triples_of_unsigned_u64_width_range_and_bool_var_1<T: 'static + Primitive
         GenerationMode::Random(scale) => Box::new(random_triples(
             &EXAMPLE_SEED,
             &(|seed| random_x(seed)),
-            &(|seed| natural_u32s_geometric(seed, scale).map(|i| i.into())),
+            &(|seed| u32s_geometric(seed, scale).map(|i| i.into())),
             &(|seed| random_x(seed)),
         )),
     };
@@ -296,7 +296,7 @@ pub fn triples_of_signed_u64_width_range_and_bool_var_1<T: 'static + PrimitiveSi
         GenerationMode::Random(scale) => Box::new(random_triples(
             &EXAMPLE_SEED,
             &(|seed| random_x(seed)),
-            &(|seed| natural_u32s_geometric(seed, scale).map(|i| i.into())),
+            &(|seed| u32s_geometric(seed, scale).map(|i| i.into())),
             &(|seed| random_x(seed)),
         )),
     };
@@ -320,7 +320,7 @@ pub fn pairs_of_negative_signed_not_min_and_small_u32s<T: 'static + PrimitiveSig
         GenerationMode::Random(scale) => Box::new(random_pairs(
             &EXAMPLE_SEED,
             &(|seed| random_negative_i(seed).filter(|&i| i != T::MIN)),
-            &(|seed| natural_u32s_geometric(seed, scale)),
+            &(|seed| u32s_geometric(seed, scale)),
         )),
     }
 }
@@ -469,7 +469,7 @@ pub fn triples_of_unsigned_vec_small_usize_and_unsigned<T: 'static + PrimitiveUn
         GenerationMode::Random(scale) => Box::new(random_triples(
             &EXAMPLE_SEED,
             &(|seed| random_vecs(seed, scale, &(|seed_2| random_x(seed_2)))),
-            &(|seed| natural_u32s_geometric(seed, scale).map(|u| u as usize)),
+            &(|seed| u32s_geometric(seed, scale).map(|u| u as usize)),
             &(|seed| random_x(seed)),
         )),
     }
@@ -486,7 +486,7 @@ fn pairs_of_unsigned_vec_and_small_usize<T: 'static + PrimitiveUnsigned>(
         GenerationMode::Random(scale) => Box::new(random_pairs(
             &EXAMPLE_SEED,
             &(|seed| random_vecs(seed, scale, &(|seed_2| random_x(seed_2)))),
-            &(|seed| natural_u32s_geometric(seed, scale).map(|u| u as usize)),
+            &(|seed| u32s_geometric(seed, scale).map(|u| u as usize)),
         )),
     }
 }

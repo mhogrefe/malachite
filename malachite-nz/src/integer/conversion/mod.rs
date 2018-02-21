@@ -1,7 +1,7 @@
 use error::ParseIntegerError;
 use integer::Integer;
 use malachite_base::num::Zero;
-use std::fmt::{self, Debug, Display, Formatter, Write};
+use std::fmt::{self, Binary, Debug, Display, Formatter, Write};
 use std::str::FromStr;
 
 impl Integer {
@@ -48,6 +48,16 @@ impl Debug for Integer {
             f.write_char('-').unwrap();
         }
         Debug::fmt(&self.abs, f)
+    }
+}
+
+//TODO test
+impl Binary for Integer {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        if !self.sign {
+            f.write_char('-').unwrap();
+        }
+        Binary::fmt(&self.abs, f)
     }
 }
 
