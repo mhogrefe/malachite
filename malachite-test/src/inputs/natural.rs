@@ -5,11 +5,11 @@ use malachite_base::round::RoundingMode;
 use malachite_nz::natural::Natural;
 use rust_wheels::iterators::bools::exhaustive_bools;
 use rust_wheels::iterators::common::EXAMPLE_SEED;
-use rust_wheels::iterators::general::random_x;
+use rust_wheels::iterators::general::random;
 use rust_wheels::iterators::integers_geometric::{i32s_geometric, u32s_geometric};
 use rust_wheels::iterators::naturals::{exhaustive_naturals, exhaustive_positive_naturals,
                                        random_naturals, random_positive_naturals};
-use rust_wheels::iterators::primitive_ints::{exhaustive_i, exhaustive_u};
+use rust_wheels::iterators::primitive_ints::{exhaustive_signed, exhaustive_unsigned};
 use rust_wheels::iterators::rounding_modes::{exhaustive_rounding_modes, random_rounding_modes};
 use rust_wheels::iterators::tuples::{exhaustive_pairs, exhaustive_pairs_from_single,
                                      exhaustive_triples, exhaustive_triples_from_single,
@@ -71,7 +71,7 @@ fn random_pairs_of_natural_and_primitive<T: 'static + PrimitiveInteger>(
     Box::new(random_pairs(
         &EXAMPLE_SEED,
         &(|seed| random_naturals(seed, scale)),
-        &(|seed| random_x(seed)),
+        &(|seed| random(seed)),
     ))
 }
 
@@ -80,7 +80,7 @@ fn random_pairs_of_primitive_and_natural<T: 'static + PrimitiveInteger>(
 ) -> Box<Iterator<Item = (T, Natural)>> {
     Box::new(random_pairs(
         &EXAMPLE_SEED,
-        &(|seed| random_x(seed)),
+        &(|seed| random(seed)),
         &(|seed| random_naturals(seed, scale)),
     ))
 }
@@ -89,9 +89,10 @@ pub fn pairs_of_natural_and_unsigned<T: 'static + PrimitiveUnsigned>(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (Natural, T)>> {
     match gm {
-        GenerationMode::Exhaustive => {
-            Box::new(exhaustive_pairs(exhaustive_naturals(), exhaustive_u()))
-        }
+        GenerationMode::Exhaustive => Box::new(exhaustive_pairs(
+            exhaustive_naturals(),
+            exhaustive_unsigned(),
+        )),
         GenerationMode::Random(scale) => random_pairs_of_natural_and_primitive(scale),
     }
 }
@@ -104,9 +105,10 @@ pub fn pairs_of_unsigned_and_natural<T: 'static + PrimitiveUnsigned>(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (T, Natural)>> {
     match gm {
-        GenerationMode::Exhaustive => {
-            Box::new(exhaustive_pairs(exhaustive_u(), exhaustive_naturals()))
-        }
+        GenerationMode::Exhaustive => Box::new(exhaustive_pairs(
+            exhaustive_unsigned(),
+            exhaustive_naturals(),
+        )),
         GenerationMode::Random(scale) => random_pairs_of_primitive_and_natural(scale),
     }
 }
@@ -118,7 +120,7 @@ fn random_triples_of_natural_natural_and_primitive<T: 'static + PrimitiveInteger
         &EXAMPLE_SEED,
         &(|seed| random_naturals(seed, scale)),
         &(|seed| random_naturals(seed, scale)),
-        &(|seed| random_x(seed)),
+        &(|seed| random(seed)),
     ))
 }
 
@@ -129,7 +131,7 @@ pub fn triples_of_natural_natural_and_unsigned<T: 'static + PrimitiveUnsigned>(
         GenerationMode::Exhaustive => Box::new(exhaustive_triples(
             exhaustive_naturals(),
             exhaustive_naturals(),
-            exhaustive_u(),
+            exhaustive_unsigned(),
         )),
         GenerationMode::Random(scale) => random_triples_of_natural_natural_and_primitive(scale),
     }
@@ -143,7 +145,7 @@ pub fn triples_of_natural_natural_and_u32_var_1(
 
 fn log_pairs_of_natural_and_unsigned<T: 'static + PrimitiveUnsigned>(
 ) -> Box<Iterator<Item = (Natural, T)>> {
-    Box::new(log_pairs(exhaustive_naturals(), exhaustive_u()))
+    Box::new(log_pairs(exhaustive_naturals(), exhaustive_unsigned()))
 }
 
 pub fn pairs_of_natural_and_small_u32(gm: GenerationMode) -> Box<Iterator<Item = (Natural, u32)>> {
@@ -173,7 +175,7 @@ pub fn pairs_of_natural_and_small_u32_var_2(
 
 fn log_pairs_of_natural_and_signed<T: 'static + PrimitiveSigned>(
 ) -> Box<Iterator<Item = (Natural, T)>> {
-    Box::new(log_pairs(exhaustive_naturals(), exhaustive_i()))
+    Box::new(log_pairs(exhaustive_naturals(), exhaustive_signed()))
 }
 
 pub fn pairs_of_natural_and_small_i32(gm: GenerationMode) -> Box<Iterator<Item = (Natural, i32)>> {
@@ -204,7 +206,7 @@ pub fn triples_of_natural_small_u32_and_small_u32(
     match gm {
         GenerationMode::Exhaustive => reshape_1_2_to_3(Box::new(log_pairs(
             exhaustive_naturals(),
-            exhaustive_pairs_from_single(exhaustive_u()),
+            exhaustive_pairs_from_single(exhaustive_unsigned()),
         ))),
         GenerationMode::Random(scale) => Box::new(random_triples(
             &EXAMPLE_SEED,
@@ -221,7 +223,7 @@ fn random_triples_of_natural_primitive_and_natural<T: 'static + PrimitiveInteger
     Box::new(random_triples(
         &EXAMPLE_SEED,
         &(|seed| random_naturals(seed, scale)),
-        &(|seed| random_x(seed)),
+        &(|seed| random(seed)),
         &(|seed| random_naturals(seed, scale)),
     ))
 }
@@ -231,9 +233,9 @@ fn random_triples_of_primitive_natural_and_primitive<T: 'static + PrimitiveInteg
 ) -> Box<Iterator<Item = (T, Natural, T)>> {
     Box::new(random_triples(
         &EXAMPLE_SEED,
-        &(|seed| random_x(seed)),
+        &(|seed| random(seed)),
         &(|seed| random_naturals(seed, scale)),
-        &(|seed| random_x(seed)),
+        &(|seed| random(seed)),
     ))
 }
 
@@ -243,7 +245,7 @@ pub fn triples_of_natural_unsigned_and_natural<T: 'static + PrimitiveUnsigned>(
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_triples(
             exhaustive_naturals(),
-            exhaustive_u(),
+            exhaustive_unsigned(),
             exhaustive_naturals(),
         )),
         GenerationMode::Random(scale) => random_triples_of_natural_primitive_and_natural(scale),
@@ -255,9 +257,9 @@ pub fn triples_of_unsigned_natural_and_unsigned<T: 'static + PrimitiveUnsigned>(
 ) -> Box<Iterator<Item = (T, Natural, T)>> {
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_triples(
-            exhaustive_u(),
+            exhaustive_unsigned(),
             exhaustive_naturals(),
-            exhaustive_u(),
+            exhaustive_unsigned(),
         )),
         GenerationMode::Random(scale) => random_triples_of_primitive_natural_and_primitive(scale),
     }
@@ -268,14 +270,14 @@ pub fn triples_of_natural_small_u64_and_bool(
 ) -> Box<Iterator<Item = (Natural, u64, bool)>> {
     match gm {
         GenerationMode::Exhaustive => reshape_2_1_to_3(Box::new(lex_pairs(
-            exhaustive_pairs(exhaustive_naturals(), exhaustive_u()),
+            exhaustive_pairs(exhaustive_naturals(), exhaustive_unsigned()),
             exhaustive_bools(),
         ))),
         GenerationMode::Random(scale) => Box::new(random_triples(
             &EXAMPLE_SEED,
             &(|seed| random_naturals(seed, scale)),
             &(|seed| u32s_geometric(seed, scale).map(|i| i.into())),
-            &(|seed| random_x(seed)),
+            &(|seed| random(seed)),
         )),
     }
 }

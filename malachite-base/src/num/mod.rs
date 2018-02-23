@@ -458,10 +458,15 @@ pub trait PrimitiveInteger
 
 //TODO docs
 pub trait PrimitiveUnsigned
-    : CheckedNextPowerOfTwo + IsPowerOfTwo + NextPowerOfTwo + PrimitiveInteger {
-    type SignedOfEqualWidth;
+    : CheckedNextPowerOfTwo + FromU32Slice + IsPowerOfTwo + NextPowerOfTwo + PrimitiveInteger
+    {
+    type SignedOfEqualWidth: PrimitiveSigned;
 
     fn to_u64(&self) -> u64;
+
+    fn to_signed_bitwise(self) -> Self::SignedOfEqualWidth;
+
+    fn from_signed_bitwise(i: Self::SignedOfEqualWidth) -> Self;
 }
 
 //TODO docs
@@ -474,11 +479,15 @@ pub trait PrimitiveSigned
     + OverflowingAbs<Output = Self>
     + PrimitiveInteger
     + WrappingAbs<Output = Self> {
-    type UnsignedOfEqualWidth;
+    type UnsignedOfEqualWidth: PrimitiveUnsigned;
 
     fn from_i32(i: i32) -> Self;
 
     fn from_i64(i: i64) -> Self;
+
+    fn to_unsigned_bitwise(self) -> Self::UnsignedOfEqualWidth;
+
+    fn from_unsigned_bitwise(u: Self::UnsignedOfEqualWidth) -> Self;
 }
 
 //TODO docs
@@ -514,7 +523,7 @@ pub trait FloatingPoint
     + Sum<Self>
     + UpperExp
     + Zero {
-    type UnsignedOfEqualWidth;
+    type UnsignedOfEqualWidth: PrimitiveUnsigned;
 
     const EXPONENT_WIDTH: u32;
     const MANTISSA_WIDTH: u32;
@@ -1128,6 +1137,14 @@ macro_rules! signed_traits {
             fn from_i64($i: i64) -> Self {
                 $from_i64
             }
+
+            fn to_unsigned_bitwise(self) -> Self::UnsignedOfEqualWidth {
+                self as $ut
+            }
+
+            fn from_unsigned_bitwise(u: Self::UnsignedOfEqualWidth) -> Self {
+                u as $t
+            }
         }
 
         impl Abs for $t {
@@ -1383,6 +1400,14 @@ impl PrimitiveUnsigned for u8 {
     fn to_u64(&self) -> u64 {
         (*self).into()
     }
+
+    fn to_signed_bitwise(self) -> i8 {
+        self as i8
+    }
+
+    fn from_signed_bitwise(i: i8) -> u8 {
+        i as u8
+    }
 }
 
 impl PrimitiveUnsigned for u16 {
@@ -1390,6 +1415,14 @@ impl PrimitiveUnsigned for u16 {
 
     fn to_u64(&self) -> u64 {
         (*self).into()
+    }
+
+    fn to_signed_bitwise(self) -> i16 {
+        self as i16
+    }
+
+    fn from_signed_bitwise(i: i16) -> u16 {
+        i as u16
     }
 }
 
@@ -1399,6 +1432,14 @@ impl PrimitiveUnsigned for u32 {
     fn to_u64(&self) -> u64 {
         (*self).into()
     }
+
+    fn to_signed_bitwise(self) -> i32 {
+        self as i32
+    }
+
+    fn from_signed_bitwise(i: i32) -> u32 {
+        i as u32
+    }
 }
 
 impl PrimitiveUnsigned for u64 {
@@ -1406,6 +1447,14 @@ impl PrimitiveUnsigned for u64 {
 
     fn to_u64(&self) -> u64 {
         *self
+    }
+
+    fn to_signed_bitwise(self) -> i64 {
+        self as i64
+    }
+
+    fn from_signed_bitwise(i: i64) -> u64 {
+        i as u64
     }
 }
 
@@ -1769,4 +1818,87 @@ pub trait ShlRoundAssign<Rhs = Self> {
 
 pub trait ShrRoundAssign<Rhs = Self> {
     fn shr_round_assign(&mut self, rhs: Rhs, rm: RoundingMode);
+}
+
+//TODO doc and test
+pub trait FromU32Slice: Sized {
+    fn from_u32_slice(slice: &[u32]) -> Self;
+
+    fn copy_from_u32_slice(out_slice: &mut [Self], in_slice: &[u32]);
+}
+
+//TODO doc and test
+impl FromU32Slice for u32 {
+    fn from_u32_slice(slice: &[u32]) -> Self {
+        assert!(!slice.is_empty());
+        slice[0]
+    }
+
+    fn copy_from_u32_slice(out_slice: &mut [u32], in_slice: &[u32]) {
+        let out_len = out_slice.len();
+        assert!(out_len >= in_slice.len());
+        out_slice.copy_from_slice(&in_slice[0..out_len]);
+    }
+}
+
+//TODO doc and test
+impl FromU32Slice for u8 {
+    fn from_u32_slice(slice: &[u32]) -> Self {
+        assert!(!slice.is_empty());
+        slice[0] as u8
+    }
+
+    fn copy_from_u32_slice(out_slice: &mut [u8], in_slice: &[u32]) {
+        let out_len = out_slice.len();
+        assert!(out_len >= in_slice.len() << 2);
+        let mut i = 0;
+        for u in in_slice {
+            let (upper, lower) = u.split_in_half();
+            let (upper_upper, lower_upper) = upper.split_in_half();
+            let (upper_lower, lower_lower) = lower.split_in_half();
+            out_slice[i] = lower_lower;
+            out_slice[i + 1] = upper_lower;
+            out_slice[i + 2] = lower_upper;
+            out_slice[i + 3] = upper_upper;
+            i += 4;
+        }
+    }
+}
+
+//TODO doc and test
+impl FromU32Slice for u16 {
+    fn from_u32_slice(slice: &[u32]) -> Self {
+        assert!(!slice.is_empty());
+        slice[0] as u16
+    }
+
+    fn copy_from_u32_slice(out_slice: &mut [u16], in_slice: &[u32]) {
+        let out_len = out_slice.len();
+        assert!(out_len >= in_slice.len() << 1);
+        let mut i = 0;
+        for u in in_slice {
+            let (upper, lower) = u.split_in_half();
+            out_slice[i] = lower;
+            out_slice[i + 1] = upper;
+            i += 2;
+        }
+    }
+}
+
+//TODO doc and test
+impl FromU32Slice for u64 {
+    fn from_u32_slice(slice: &[u32]) -> Self {
+        assert!(slice.len() >= 2);
+        u64::join_halves(slice[1], slice[0])
+    }
+
+    fn copy_from_u32_slice(out_slice: &mut [u64], in_slice: &[u32]) {
+        let out_len = out_slice.len();
+        assert!(out_len >= in_slice.len() >> 1);
+        let mut i = 0;
+        for out in out_slice.iter_mut() {
+            *out = u64::join_halves(in_slice[i + 1], in_slice[i]);
+            i += 2;
+        }
+    }
 }

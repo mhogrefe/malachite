@@ -6,12 +6,12 @@ use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use rust_wheels::iterators::bools::exhaustive_bools;
 use rust_wheels::iterators::common::EXAMPLE_SEED;
-use rust_wheels::iterators::general::random_x;
+use rust_wheels::iterators::general::random;
 use rust_wheels::iterators::integers::{exhaustive_integers, exhaustive_natural_integers,
                                        random_integers, random_natural_integers};
 use rust_wheels::iterators::integers_geometric::{i32s_geometric, u32s_geometric};
 use rust_wheels::iterators::naturals::{exhaustive_naturals, random_naturals};
-use rust_wheels::iterators::primitive_ints::{exhaustive_i, exhaustive_u};
+use rust_wheels::iterators::primitive_ints::{exhaustive_signed, exhaustive_unsigned};
 use rust_wheels::iterators::rounding_modes::{exhaustive_rounding_modes, random_rounding_modes};
 use rust_wheels::iterators::tuples::{exhaustive_pairs, exhaustive_pairs_from_single,
                                      exhaustive_triples, exhaustive_triples_from_single,
@@ -62,7 +62,7 @@ fn random_pairs_of_integer_and_primitive<T: 'static + PrimitiveInteger>(
     Box::new(random_pairs(
         &EXAMPLE_SEED,
         &(|seed| random_integers(seed, scale)),
-        &(|seed| random_x(seed)),
+        &(|seed| random(seed)),
     ))
 }
 
@@ -71,7 +71,7 @@ fn random_pairs_of_primitive_and_integer<T: 'static + PrimitiveInteger>(
 ) -> Box<Iterator<Item = (T, Integer)>> {
     Box::new(random_pairs(
         &EXAMPLE_SEED,
-        &(|seed| random_x(seed)),
+        &(|seed| random(seed)),
         &(|seed| random_integers(seed, scale)),
     ))
 }
@@ -81,7 +81,7 @@ pub fn pairs_of_integer_and_signed<T: 'static + PrimitiveSigned>(
 ) -> Box<Iterator<Item = (Integer, T)>> {
     match gm {
         GenerationMode::Exhaustive => {
-            Box::new(exhaustive_pairs(exhaustive_integers(), exhaustive_i()))
+            Box::new(exhaustive_pairs(exhaustive_integers(), exhaustive_signed()))
         }
         GenerationMode::Random(scale) => random_pairs_of_integer_and_primitive(scale),
     }
@@ -92,7 +92,7 @@ pub fn pairs_of_signed_and_integer<T: 'static + PrimitiveSigned>(
 ) -> Box<Iterator<Item = (T, Integer)>> {
     match gm {
         GenerationMode::Exhaustive => {
-            Box::new(exhaustive_pairs(exhaustive_i(), exhaustive_integers()))
+            Box::new(exhaustive_pairs(exhaustive_signed(), exhaustive_integers()))
         }
         GenerationMode::Random(scale) => random_pairs_of_primitive_and_integer(scale),
     }
@@ -102,9 +102,10 @@ pub fn pairs_of_integer_and_unsigned<T: 'static + PrimitiveUnsigned>(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (Integer, T)>> {
     match gm {
-        GenerationMode::Exhaustive => {
-            Box::new(exhaustive_pairs(exhaustive_integers(), exhaustive_u()))
-        }
+        GenerationMode::Exhaustive => Box::new(exhaustive_pairs(
+            exhaustive_integers(),
+            exhaustive_unsigned(),
+        )),
         GenerationMode::Random(scale) => random_pairs_of_integer_and_primitive(scale),
     }
 }
@@ -113,9 +114,10 @@ pub fn pairs_of_unsigned_and_integer<T: 'static + PrimitiveUnsigned>(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (T, Integer)>> {
     match gm {
-        GenerationMode::Exhaustive => {
-            Box::new(exhaustive_pairs(exhaustive_u(), exhaustive_integers()))
-        }
+        GenerationMode::Exhaustive => Box::new(exhaustive_pairs(
+            exhaustive_unsigned(),
+            exhaustive_integers(),
+        )),
         GenerationMode::Random(scale) => random_pairs_of_primitive_and_integer(scale),
     }
 }
@@ -127,7 +129,7 @@ fn random_triples_of_integer_integer_and_primitive<T: 'static + PrimitiveInteger
         &EXAMPLE_SEED,
         &(|seed| random_integers(seed, scale)),
         &(|seed| random_integers(seed, scale)),
-        &(|seed| random_x(seed)),
+        &(|seed| random(seed)),
     ))
 }
 
@@ -138,7 +140,7 @@ pub fn triples_of_integer_integer_and_signed<T: 'static + PrimitiveSigned>(
         GenerationMode::Exhaustive => Box::new(exhaustive_triples(
             exhaustive_integers(),
             exhaustive_integers(),
-            exhaustive_i(),
+            exhaustive_signed(),
         )),
         GenerationMode::Random(scale) => random_triples_of_integer_integer_and_primitive(scale),
     }
@@ -151,7 +153,7 @@ pub fn triples_of_integer_integer_and_unsigned<T: 'static + PrimitiveUnsigned>(
         GenerationMode::Exhaustive => Box::new(exhaustive_triples(
             exhaustive_integers(),
             exhaustive_integers(),
-            exhaustive_u(),
+            exhaustive_unsigned(),
         )),
         GenerationMode::Random(scale) => random_triples_of_integer_integer_and_primitive(scale),
     }
@@ -159,7 +161,7 @@ pub fn triples_of_integer_integer_and_unsigned<T: 'static + PrimitiveUnsigned>(
 
 fn log_pairs_of_integer_and_unsigned<T: 'static + PrimitiveUnsigned>(
 ) -> Box<Iterator<Item = (Integer, T)>> {
-    Box::new(log_pairs(exhaustive_integers(), exhaustive_u()))
+    Box::new(log_pairs(exhaustive_integers(), exhaustive_unsigned()))
 }
 
 pub fn pairs_of_integer_and_small_u32(gm: GenerationMode) -> Box<Iterator<Item = (Integer, u32)>> {
@@ -204,7 +206,7 @@ pub fn triples_of_integer_small_u32_and_small_u32(
     match gm {
         GenerationMode::Exhaustive => reshape_1_2_to_3(Box::new(log_pairs(
             exhaustive_integers(),
-            exhaustive_pairs_from_single(exhaustive_u()),
+            exhaustive_pairs_from_single(exhaustive_unsigned()),
         ))),
         GenerationMode::Random(scale) => Box::new(random_triples(
             &EXAMPLE_SEED,
@@ -217,7 +219,7 @@ pub fn triples_of_integer_small_u32_and_small_u32(
 
 fn log_pairs_of_integer_and_signed<T: 'static + PrimitiveSigned>(
 ) -> Box<Iterator<Item = (Integer, T)>> {
-    Box::new(log_pairs(exhaustive_integers(), exhaustive_i()))
+    Box::new(log_pairs(exhaustive_integers(), exhaustive_signed()))
 }
 
 pub fn pairs_of_integer_and_small_i32(gm: GenerationMode) -> Box<Iterator<Item = (Integer, i32)>> {
@@ -237,7 +239,7 @@ fn random_triples_of_integer_primitive_and_integer<T: 'static + PrimitiveInteger
     Box::new(random_triples(
         &EXAMPLE_SEED,
         &(|seed| random_integers(seed, scale)),
-        &(|seed| random_x(seed)),
+        &(|seed| random(seed)),
         &(|seed| random_integers(seed, scale)),
     ))
 }
@@ -247,9 +249,9 @@ fn random_triples_of_primitive_integer_and_primitive<T: 'static + PrimitiveInteg
 ) -> Box<Iterator<Item = (T, Integer, T)>> {
     Box::new(random_triples(
         &EXAMPLE_SEED,
-        &(|seed| random_x(seed)),
+        &(|seed| random(seed)),
         &(|seed| random_integers(seed, scale)),
-        &(|seed| random_x(seed)),
+        &(|seed| random(seed)),
     ))
 }
 
@@ -259,7 +261,7 @@ pub fn triples_of_integer_unsigned_and_integer<T: 'static + PrimitiveUnsigned>(
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_triples(
             exhaustive_integers(),
-            exhaustive_u(),
+            exhaustive_unsigned(),
             exhaustive_integers(),
         )),
         GenerationMode::Random(scale) => random_triples_of_integer_primitive_and_integer(scale),
@@ -271,9 +273,9 @@ pub fn triples_of_unsigned_integer_and_unsigned<T: 'static + PrimitiveUnsigned>(
 ) -> Box<Iterator<Item = (T, Integer, T)>> {
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_triples(
-            exhaustive_u(),
+            exhaustive_unsigned(),
             exhaustive_integers(),
-            exhaustive_u(),
+            exhaustive_unsigned(),
         )),
         GenerationMode::Random(scale) => random_triples_of_primitive_integer_and_primitive(scale),
     }
@@ -285,7 +287,7 @@ pub fn triples_of_integer_signed_and_integer<T: 'static + PrimitiveSigned>(
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_triples(
             exhaustive_integers(),
-            exhaustive_i(),
+            exhaustive_signed(),
             exhaustive_integers(),
         )),
         GenerationMode::Random(scale) => random_triples_of_integer_primitive_and_integer(scale),
@@ -297,9 +299,9 @@ pub fn triples_of_signed_integer_and_signed<T: 'static + PrimitiveSigned>(
 ) -> Box<Iterator<Item = (T, Integer, T)>> {
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_triples(
-            exhaustive_i(),
+            exhaustive_signed(),
             exhaustive_integers(),
-            exhaustive_i(),
+            exhaustive_signed(),
         )),
         GenerationMode::Random(scale) => random_triples_of_primitive_integer_and_primitive(scale),
     }
@@ -394,14 +396,14 @@ pub fn triples_of_integer_small_u64_and_bool(
 ) -> Box<Iterator<Item = (Integer, u64, bool)>> {
     match gm {
         GenerationMode::Exhaustive => reshape_2_1_to_3(Box::new(lex_pairs(
-            exhaustive_pairs(exhaustive_integers(), exhaustive_u()),
+            exhaustive_pairs(exhaustive_integers(), exhaustive_unsigned()),
             exhaustive_bools(),
         ))),
         GenerationMode::Random(scale) => Box::new(random_triples(
             &EXAMPLE_SEED,
             &(|seed| random_integers(seed, scale)),
             &(|seed| u32s_geometric(seed, scale).map(|i| i.into())),
-            &(|seed| random_x(seed)),
+            &(|seed| random(seed)),
         )),
     }
 }
