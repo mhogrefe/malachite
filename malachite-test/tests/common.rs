@@ -1,6 +1,6 @@
 extern crate malachite_test; // TODO why is this needed?
 
-use malachite_test::common::GenerationMode;
+use malachite_test::common::{GenerationMode, NoSpecialGenerationMode};
 use std::cmp::Ordering;
 use std::fmt::Debug;
 use std::str::FromStr;
@@ -53,7 +53,29 @@ pub fn test_properties<T, G: Fn(GenerationMode) -> Box<Iterator<Item = T>>, F: F
     gen: G,
     mut test: F,
 ) {
-    for &gm in &[GenerationMode::Exhaustive, GenerationMode::Random(32)] {
+    for &gm in &[
+        GenerationMode::Exhaustive,
+        GenerationMode::Random(32),
+        GenerationMode::SpecialRandom(32),
+    ] {
+        for x in gen(gm).take(LARGE_LIMIT) {
+            test(&x);
+        }
+    }
+}
+
+pub fn test_properties_no_special<
+    T,
+    G: Fn(NoSpecialGenerationMode) -> Box<Iterator<Item = T>>,
+    F: FnMut(&T),
+>(
+    gen: G,
+    mut test: F,
+) {
+    for &gm in &[
+        NoSpecialGenerationMode::Exhaustive,
+        NoSpecialGenerationMode::Random(32),
+    ] {
         for x in gen(gm).take(LARGE_LIMIT) {
             test(&x);
         }
@@ -69,26 +91,30 @@ pub fn test_properties_custom_scale<
     gen: G,
     mut test: F,
 ) {
-    for &gm in &[GenerationMode::Exhaustive, GenerationMode::Random(scale)] {
+    for &gm in &[
+        GenerationMode::Exhaustive,
+        GenerationMode::Random(scale),
+        GenerationMode::SpecialRandom(scale),
+    ] {
         for x in gen(gm).take(LARGE_LIMIT) {
             test(&x);
         }
     }
 }
 
-pub fn test_properties_no_limit_exhaustive<
+pub fn test_properties_no_limit_exhaustive_no_special<
     T,
-    G: Fn(GenerationMode) -> Box<Iterator<Item = T>>,
+    G: Fn(NoSpecialGenerationMode) -> Box<Iterator<Item = T>>,
     F: FnMut(&T),
 >(
     gen: G,
     mut test: F,
 ) {
-    for x in gen(GenerationMode::Exhaustive) {
+    for x in gen(NoSpecialGenerationMode::Exhaustive) {
         test(&x);
     }
 
-    for x in gen(GenerationMode::Random(32)).take(LARGE_LIMIT) {
+    for x in gen(NoSpecialGenerationMode::Random(32)).take(LARGE_LIMIT) {
         test(&x);
     }
 }

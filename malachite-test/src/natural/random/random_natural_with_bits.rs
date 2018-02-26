@@ -1,4 +1,4 @@
-use common::GenerationMode;
+use common::NoSpecialGenerationMode;
 use inputs::base::small_u64s;
 use malachite_base::num::SignificantBits;
 use malachite_nz::natural::random::random_natural_with_bits::random_natural_with_bits;
@@ -7,7 +7,7 @@ use rust_wheels::benchmarks::{BenchmarkOptions1, benchmark_1};
 use rust_wheels::iterators::adaptors::{generate_from_function, to_limited_string};
 use rust_wheels::iterators::common::EXAMPLE_SEED;
 
-pub fn demo_natural_random_natural_with_bits(gm: GenerationMode, limit: usize) {
+pub fn demo_natural_random_natural_with_bits(gm: NoSpecialGenerationMode, limit: usize) {
     for bits in small_u64s(gm).take(limit) {
         let mut rng = IsaacRng::from_seed(&EXAMPLE_SEED);
         let mut xs = generate_from_function(|| random_natural_with_bits(&mut rng, bits));
@@ -20,7 +20,7 @@ pub fn demo_natural_random_natural_with_bits(gm: GenerationMode, limit: usize) {
 }
 
 pub fn benchmark_natural_random_natural_with_bits(
-    gm: GenerationMode,
+    gm: NoSpecialGenerationMode,
     limit: usize,
     file_name: &str,
 ) {

@@ -1,4 +1,4 @@
-use common::test_properties;
+use common::test_properties_no_special;
 use malachite_base::num::SignificantBits;
 use malachite_nz::natural::random::special_random_natural_with_bits::*;
 use malachite_test::inputs::base::small_u64s;
@@ -23,15 +23,15 @@ fn test_special_random_natural_with_bits() {
     test(32, "11111111111111111110000011100000");
     test(
         100,
-        "111111111000000000000000000000000001111111111000000000110000000000000000000000000000\
-         1111111111111111",
+        "111111111000000000000000000000000001111111111000000000110000000000000000000000000000111111\
+        1111111111",
     );
 }
 
 #[test]
 fn special_random_natural_with_bits_properties() {
     let mut rng = IsaacRng::from_seed(&EXAMPLE_SEED);
-    test_properties(small_u64s, |&bits| {
+    test_properties_no_special(small_u64s, |&bits| {
         let n = special_random_natural_with_bits(&mut rng, bits);
         assert!(n.is_valid());
         assert_eq!(n.significant_bits(), bits);

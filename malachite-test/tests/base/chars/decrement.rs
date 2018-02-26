@@ -1,4 +1,4 @@
-use common::test_properties_no_limit_exhaustive;
+use common::test_properties_no_limit_exhaustive_no_special;
 use malachite_base::chars::{CHAR_JUST_ABOVE_SURROGATES, CHAR_JUST_BELOW_SURROGATES};
 use malachite_base::misc::Walkable;
 use malachite_test::inputs::base::chars_var_1;
@@ -26,7 +26,7 @@ fn char_decrement_fail() {
 
 #[test]
 fn char_increment_properties() {
-    test_properties_no_limit_exhaustive(chars_var_1, |&c| {
+    test_properties_no_limit_exhaustive_no_special(chars_var_1, |&c| {
         let mut c_mut = c;
         c_mut.decrement();
         assert_ne!(c_mut, c);

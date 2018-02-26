@@ -1,0 +1,10 @@
+[package]
+name = "src"
+version = "0.1.0"
+authors = ["Mikhail Hogrefe <mikhailhogrefe@gmail.com>"]
+
+[dependencies]
+
+[lib]
+name = "src"
+path = "lib.rs"

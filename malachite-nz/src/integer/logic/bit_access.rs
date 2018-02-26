@@ -260,7 +260,7 @@ impl Natural {
                 if index < LIMB_BITS.into() {
                     *small -= 1;
                     small.set_bit(index);
-                    Some(small.wrapping_add(1))
+                    small.checked_add(1)
                 } else {
                     None
                 }

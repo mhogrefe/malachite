@@ -24,7 +24,7 @@ use malachite_test::base::rounding_mode::clone::*;
 use malachite_test::base::rounding_mode::eq::*;
 use malachite_test::base::rounding_mode::hash::*;
 use malachite_test::base::rounding_mode::neg::*;
-use malachite_test::common::GenerationMode;
+use malachite_test::common::{GenerationMode, NoSpecialGenerationMode};
 use malachite_test::integer::arithmetic::abs::*;
 use malachite_test::integer::arithmetic::add::*;
 use malachite_test::integer::arithmetic::add_i32::*;
@@ -149,33 +149,55 @@ use std::env;
 macro_rules! demos_and_benchmarks {
     (
         [$($demo_fn: ident,)*],
+        [$($special_demo_fn: ident,)*],
         [$($no_scale_bench_fn: ident,)*],
+        [$($special_no_scale_bench_fn: ident,)*],
         [$($small_scale_bench_fn: ident,)*],
-        [$($large_scale_bench_fn: ident,)*]
+        [$($special_small_scale_bench_fn: ident,)*],
+        [$($large_scale_bench_fn: ident,)*],
+        [$($special_large_scale_bench_fn: ident,)*]
     ) => {
         fn main() {
             let args: Vec<String> = env::args().collect();
             if args.len() != 3 && args.len() != 4 {
-                panic!("Usage: [exhaustive|random] [limit] [demo/bench name]");
+                panic!("Usage: [exhaustive|random|special_random] [limit] [demo/bench name]");
             }
             let generation_mode = &args[1];
             assert!(
-                generation_mode == "exhaustive" || generation_mode == "random",
+                generation_mode == "exhaustive" || generation_mode == "random" || generation_mode == "special_random",
                 "Bad generation mode"
             );
             let gm_demo = match generation_mode.as_ref() {
-                "exhaustive" => GenerationMode::Exhaustive,
-                "random" => GenerationMode::Random(32),
+                "exhaustive" => NoSpecialGenerationMode::Exhaustive,
+                "random" | "special_random" => NoSpecialGenerationMode::Random(32),
                 _ => unreachable!(),
             };
             let gm_small = match generation_mode.as_ref() {
-                "exhaustive" => GenerationMode::Exhaustive,
-                "random" => GenerationMode::Random(128),
+                "exhaustive" => NoSpecialGenerationMode::Exhaustive,
+                "random" | "special_random" => NoSpecialGenerationMode::Random(128),
                 _ => unreachable!(),
             };
             let gm_large = match generation_mode.as_ref() {
+                "exhaustive" => NoSpecialGenerationMode::Exhaustive,
+                "random" | "special_random" => NoSpecialGenerationMode::Random(2048),
+                _ => unreachable!(),
+            };
+            let sgm_demo = match generation_mode.as_ref() {
+                "exhaustive" => GenerationMode::Exhaustive,
+                "random" => GenerationMode::Random(32),
+                "special_random" => GenerationMode::SpecialRandom(32),
+                _ => unreachable!(),
+            };
+            let sgm_small = match generation_mode.as_ref() {
+                "exhaustive" => GenerationMode::Exhaustive,
+                "random" => GenerationMode::Random(128),
+                "special_random" => GenerationMode::SpecialRandom(128),
+                _ => unreachable!(),
+            };
+            let sgm_large = match generation_mode.as_ref() {
                 "exhaustive" => GenerationMode::Exhaustive,
                 "random" => GenerationMode::Random(2048),
+                "special_random" => GenerationMode::SpecialRandom(2048),
                 _ => unreachable!(),
             };
             let limit = if args.len() == 4 {
@@ -186,56 +208,123 @@ macro_rules! demos_and_benchmarks {
             let item_name = &*args.last().unwrap();
             match item_name.as_ref() {
                 $(stringify!($demo_fn) => $demo_fn(gm_demo, limit)),*,
+                $(stringify!($special_demo_fn) => $special_demo_fn(sgm_demo, limit)),*,
                 $(
                     stringify!($no_scale_bench_fn) => {
                         $no_scale_bench_fn(gm_small, limit, "temp.gp")
                     }
                 ),*,
                 $(
+                    stringify!($special_no_scale_bench_fn) => {
+                        $special_no_scale_bench_fn(sgm_small, limit, "temp.gp")
+                    }
+                ),*,
+                $(
                     stringify!($small_scale_bench_fn) => {
                         $small_scale_bench_fn(gm_small, limit, "temp.gp")
                     }
-                ),*,
+                ),*
+                $(
+                    stringify!($special_small_scale_bench_fn) => {
+                        $special_small_scale_bench_fn(sgm_small, limit, "temp.gp")
+                    }
+                ),*
                 $(
                     stringify!($large_scale_bench_fn) => {
                         $large_scale_bench_fn(gm_large, limit, "temp.gp")
                     }
                 ),*,
+                $(
+                    stringify!($special_large_scale_bench_fn) => {
+                        $special_large_scale_bench_fn(sgm_large, limit, "temp.gp")
+                    }
+                ),*
                 "all" => {
                     $(
                         $no_scale_bench_fn(
-                            GenerationMode::Exhaustive,
+                            NoSpecialGenerationMode::Exhaustive,
                             limit,
                             &format!("exhaustive_{}.gp", stringify!($no_scale_bench_fn))
                         );
                         $no_scale_bench_fn(
-                            GenerationMode::Random(32),
+                            NoSpecialGenerationMode::Random(32),
                             limit,
                             &format!("random_{}.gp", stringify!($no_scale_bench_fn))
                         );
                     )*
                     $(
-                        $small_scale_bench_fn(
+                        $special_no_scale_bench_fn(
                             GenerationMode::Exhaustive,
+                            limit,
+                            &format!("exhaustive_{}.gp", stringify!($special_no_scale_bench_fn))
+                        );
+                        $special_no_scale_bench_fn(
+                            GenerationMode::Random(32),
+                            limit,
+                            &format!("random_{}.gp", stringify!($special_no_scale_bench_fn))
+                        );
+                        $special_no_scale_bench_fn(
+                            GenerationMode::SpecialRandom(32),
+                            limit,
+                            &format!("special_random_{}.gp", stringify!($special_no_scale_bench_fn))
+                        );
+                    )*
+                    $(
+                        $small_scale_bench_fn(
+                            NoSpecialGenerationMode::Exhaustive,
                             limit,
                             &format!("exhaustive_{}.gp", stringify!($small_scale_bench_fn))
                         );
                         $small_scale_bench_fn(
-                            GenerationMode::Random(128),
+                            NoSpecialGenerationMode::Random(128),
                             limit,
                             &format!("random_{}.gp", stringify!($small_scale_bench_fn))
                         );
                     )*
                     $(
-                        $large_scale_bench_fn(
+                        $special_small_scale_bench_fn(
                             GenerationMode::Exhaustive,
+                            limit,
+                            &format!("exhaustive_{}.gp", stringify!($special_small_scale_bench_fn))
+                        );
+                        $special_small_scale_bench_fn(
+                            GenerationMode::Random(128),
+                            limit,
+                            &format!("random_{}.gp", stringify!($special_small_scale_bench_fn))
+                        );
+                        $special_small_scale_bench_fn(
+                            GenerationMode::SpecialRandom(128),
+                            limit,
+                            &format!("special_random_{}.gp", stringify!($special_small_scale_bench_fn))
+                        );
+                    )*
+                    $(
+                        $large_scale_bench_fn(
+                            NoSpecialGenerationMode::Exhaustive,
                             limit,
                             &format!("exhaustive_{}.gp", stringify!($large_scale_bench_fn))
                         );
                         $large_scale_bench_fn(
-                            GenerationMode::Random(1024),
+                            NoSpecialGenerationMode::Random(2048),
                             limit,
                             &format!("random_{}.gp", stringify!($large_scale_bench_fn))
+                        );
+                    )*
+                    $(
+                        $special_large_scale_bench_fn(
+                            GenerationMode::Exhaustive,
+                            limit,
+                            &format!("exhaustive_{}.gp", stringify!($special_large_scale_bench_fn))
+                        );
+                        $special_large_scale_bench_fn(
+                            GenerationMode::Random(2048),
+                            limit,
+                            &format!("random_{}.gp", stringify!($special_large_scale_bench_fn))
+                        );
+                        $special_large_scale_bench_fn(
+                            GenerationMode::SpecialRandom(2048),
+                            limit,
+                            &format!("special_random_{}.gp", stringify!($special_large_scale_bench_fn))
                         );
                     )*
                 }
@@ -248,9 +337,20 @@ macro_rules! demos_and_benchmarks {
 demos_and_benchmarks!(
     [
         demo_char_to_contiguous_range,
-        demo_contiguous_range_to_char,
         demo_char_decrement,
         demo_char_increment,
+        demo_rounding_mode_clone,
+        demo_rounding_mode_clone_from,
+        demo_rounding_mode_eq,
+        demo_rounding_mode_hash,
+        demo_rounding_mode_neg,
+        demo_natural_random_natural_up_to_bits,
+        demo_natural_random_natural_with_bits,
+        demo_natural_special_random_natural_up_to_bits,
+        demo_natural_special_random_natural_with_bits,
+    ],
+    [
+        demo_contiguous_range_to_char,
         demo_limbs_delete_left,
         demo_limbs_pad_left,
         demo_limbs_set_zero,
@@ -331,11 +431,6 @@ demos_and_benchmarks!(
         demo_u16_upper_half,
         demo_u32_upper_half,
         demo_u64_upper_half,
-        demo_rounding_mode_clone,
-        demo_rounding_mode_clone_from,
-        demo_rounding_mode_eq,
-        demo_rounding_mode_hash,
-        demo_rounding_mode_neg,
         demo_integer_abs_assign,
         demo_integer_abs,
         demo_integer_abs_ref,
@@ -398,12 +493,12 @@ demos_and_benchmarks!(
         demo_integer_flip_bit,
         demo_integer_from_i32,
         demo_integer_from_i64,
+        demo_integer_from_u32,
+        demo_integer_from_u64,
         demo_integer_from_sign_and_limbs_le,
         demo_integer_from_sign_and_limbs_be,
         demo_integer_from_twos_complement_limbs_le,
         demo_integer_from_twos_complement_limbs_be,
-        demo_integer_from_u32,
-        demo_integer_from_u64,
         demo_integer_get_bit,
         demo_integer_hash,
         demo_integer_increment,
@@ -614,8 +709,6 @@ demos_and_benchmarks!(
         demo_natural_partial_cmp_u32,
         demo_u32_partial_cmp_natural,
         demo_natural_random_natural_below,
-        demo_natural_random_natural_up_to_bits,
-        demo_natural_random_natural_with_bits,
         demo_natural_set_bit,
         demo_natural_shl_assign_i32,
         demo_natural_shl_i32,
@@ -640,8 +733,6 @@ demos_and_benchmarks!(
         demo_natural_shr_round_u32_ref,
         demo_natural_significant_bits,
         demo_natural_special_random_natural_below,
-        demo_natural_special_random_natural_up_to_bits,
-        demo_natural_special_random_natural_with_bits,
         demo_natural_sub_assign,
         demo_natural_sub,
         demo_natural_sub_ref_ref,
@@ -663,8 +754,8 @@ demos_and_benchmarks!(
         demo_natural_to_u64_wrapping,
         demo_natural_trailing_zeros,
     ],
+    [benchmark_char_to_contiguous_range,],
     [
-        benchmark_char_to_contiguous_range,
         benchmark_contiguous_range_to_char,
         benchmark_u8_assign_bit,
         benchmark_u16_assign_bit,
@@ -709,9 +800,6 @@ demos_and_benchmarks!(
         benchmark_u16_join_halves,
         benchmark_u32_join_halves,
         benchmark_u64_join_halves,
-        benchmark_u16_lower_half,
-        benchmark_u32_lower_half,
-        benchmark_u64_lower_half,
         benchmark_u8_set_bit,
         benchmark_u16_set_bit,
         benchmark_u32_set_bit,
@@ -728,6 +816,9 @@ demos_and_benchmarks!(
         benchmark_i16_clear_bit,
         benchmark_i32_clear_bit,
         benchmark_i64_clear_bit,
+        benchmark_u16_lower_half,
+        benchmark_u32_lower_half,
+        benchmark_u64_lower_half,
         benchmark_u8_significant_bits,
         benchmark_u16_significant_bits,
         benchmark_u32_significant_bits,
@@ -761,6 +852,7 @@ demos_and_benchmarks!(
         benchmark_natural_to_u64,
         benchmark_natural_to_u64_wrapping,
     ],
+    [],
     [
         benchmark_limbs_delete_left,
         benchmark_limbs_pad_left,
@@ -772,6 +864,12 @@ demos_and_benchmarks!(
         benchmark_integer_from_twos_complement_limbs_be,
         benchmark_natural_from_limbs_le,
         benchmark_natural_from_limbs_be,
+    ],
+    [
+        benchmark_natural_random_natural_up_to_bits,
+        benchmark_natural_random_natural_with_bits,
+        benchmark_natural_special_random_natural_up_to_bits,
+        benchmark_natural_special_random_natural_with_bits,
     ],
     [
         benchmark_integer_abs_assign,
@@ -1032,8 +1130,6 @@ demos_and_benchmarks!(
         benchmark_u32_partial_eq_natural,
         benchmark_natural_partial_eq_integer,
         benchmark_natural_random_natural_below,
-        benchmark_natural_random_natural_up_to_bits,
-        benchmark_natural_random_natural_with_bits,
         benchmark_natural_set_bit,
         benchmark_natural_shl_assign_i32,
         benchmark_natural_shl_i32,
@@ -1058,8 +1154,6 @@ demos_and_benchmarks!(
         benchmark_natural_shr_round_u32_ref,
         benchmark_natural_significant_bits,
         benchmark_natural_special_random_natural_below,
-        benchmark_natural_special_random_natural_up_to_bits,
-        benchmark_natural_special_random_natural_with_bits,
         benchmark_natural_sub_assign,
         benchmark_natural_sub_evaluation_strategy,
         benchmark_natural_sub_assign_u32,

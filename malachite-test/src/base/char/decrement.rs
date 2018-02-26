@@ -1,10 +1,10 @@
-use common::GenerationMode;
+use common::NoSpecialGenerationMode;
 use inputs::base::chars_var_1;
 use malachite_base::chars::char_to_contiguous_range;
 use malachite_base::misc::Walkable;
 use rust_wheels::benchmarks::{BenchmarkOptions1, benchmark_1};
 
-pub fn demo_char_decrement(gm: GenerationMode, limit: usize) {
+pub fn demo_char_decrement(gm: NoSpecialGenerationMode, limit: usize) {
     for mut c in chars_var_1(gm).take(limit) {
         let c_old = c;
         c.decrement();
@@ -12,7 +12,7 @@ pub fn demo_char_decrement(gm: GenerationMode, limit: usize) {
     }
 }
 
-pub fn benchmark_char_decrement(gm: GenerationMode, limit: usize, file_name: &str) {
+pub fn benchmark_char_decrement(gm: NoSpecialGenerationMode, limit: usize, file_name: &str) {
     println!("benchmarking {} char.decrement()", gm.name());
     benchmark_1(BenchmarkOptions1 {
         xs: chars_var_1(gm),

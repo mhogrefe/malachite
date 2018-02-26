@@ -449,7 +449,8 @@ pub trait PrimitiveInteger
     + WrappingShr<Output = Self>
     + WrappingSub<Output = Self>
     + Zero {
-    const WIDTH: u32;
+    const LOG_WIDTH: u32;
+    const WIDTH: u32 = 1 << Self::LOG_WIDTH;
 
     fn from_u32(u: u32) -> Self;
 
@@ -584,10 +585,10 @@ pub trait BitAccess {
 
 //TODO docs
 macro_rules! integer_traits {
-    ($t: ident, $width: expr, $u: ident, $from_u32: expr, $from_u64: expr) => {
+    ($t: ident, $log_width: expr, $u: ident, $from_u32: expr, $from_u64: expr) => {
         //TODO docs
         impl PrimitiveInteger for $t {
-            const WIDTH: u32 = $width;
+            const LOG_WIDTH: u32 = $log_width;
 
             fn from_u32($u: u32) -> Self {
                 $from_u32
@@ -956,8 +957,8 @@ macro_rules! integer_traits {
 
 //TODO docs
 macro_rules! unsigned_traits {
-    ($t: ident, $width: expr, $u: ident, $from_u32: expr, $from_u64: expr) => {
-        integer_traits!($t, $width, $u, $from_u32, $from_u64);
+    ($t: ident, $log_width: expr, $u: ident, $from_u32: expr, $from_u64: expr) => {
+        integer_traits!($t, $log_width, $u, $from_u32, $from_u64);
 
         impl IsPowerOfTwo for $t {
             fn is_power_of_two(&self) -> bool {
@@ -1116,7 +1117,7 @@ macro_rules! signed_traits {
     (
         $t: ident,
         $ut: ident,
-        $width: expr,
+        $log_width: expr,
         $u: ident,
         $from_u32: expr,
         $from_u64: expr,
@@ -1124,7 +1125,7 @@ macro_rules! signed_traits {
         $from_i32: expr,
         $from_i64: expr
     ) => {
-        integer_traits!($t, $width, $u, $from_u32, $from_u64);
+        integer_traits!($t, $log_width, $u, $from_u32, $from_u64);
 
         //TODO docs
         impl PrimitiveSigned for $t {
@@ -1458,15 +1459,15 @@ impl PrimitiveUnsigned for u64 {
     }
 }
 
-unsigned_traits!(u8, 8, u, u as u8, u as u8);
-unsigned_traits!(u16, 16, u, u as u16, u as u16);
-unsigned_traits!(u32, 32, u, u, u as u32);
-unsigned_traits!(u64, 64, u, u.into(), u);
+unsigned_traits!(u8, 3, u, u as u8, u as u8);
+unsigned_traits!(u16, 4, u, u as u16, u as u16);
+unsigned_traits!(u32, 5, u, u, u as u32);
+unsigned_traits!(u64, 6, u, u.into(), u);
 
-signed_traits!(i8, u8, 8, u, u as i8, u as i8, i, i as i8, i as i8);
-signed_traits!(i16, u16, 16, u, u as i16, u as i16, i, i as i16, i as i16);
-signed_traits!(i32, u32, 32, u, u as i32, u as i32, i, i, i as i32);
-signed_traits!(i64, u64, 64, u, u.into(), u as i64, i, i.into(), i);
+signed_traits!(i8, u8, 3, u, u as i8, u as i8, i, i as i8, i as i8);
+signed_traits!(i16, u16, 4, u, u as i16, u as i16, i, i as i16, i as i16);
+signed_traits!(i32, u32, 5, u, u as i32, u as i32, i, i, i as i32);
+signed_traits!(i64, u64, 6, u, u.into(), u as i64, i, i.into(), i);
 
 floating_point_traits!(f32, u32, 8, 23);
 floating_point_traits!(f64, u64, 11, 52);

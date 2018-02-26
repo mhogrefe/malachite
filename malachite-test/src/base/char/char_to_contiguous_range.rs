@@ -1,9 +1,9 @@
-use common::GenerationMode;
+use common::NoSpecialGenerationMode;
 use inputs::base::chars;
 use malachite_base::chars::char_to_contiguous_range;
 use rust_wheels::benchmarks::{BenchmarkOptions1, benchmark_1};
 
-pub fn demo_char_to_contiguous_range(gm: GenerationMode, limit: usize) {
+pub fn demo_char_to_contiguous_range(gm: NoSpecialGenerationMode, limit: usize) {
     for c in chars(gm).take(limit) {
         println!(
             "char_to_contiguous_range({:?}) = {}",
@@ -13,7 +13,11 @@ pub fn demo_char_to_contiguous_range(gm: GenerationMode, limit: usize) {
     }
 }
 
-pub fn benchmark_char_to_contiguous_range(gm: GenerationMode, limit: usize, file_name: &str) {
+pub fn benchmark_char_to_contiguous_range(
+    gm: NoSpecialGenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
     println!("benchmarking {} char_to_contiguous_range(char)", gm.name());
     benchmark_1(BenchmarkOptions1 {
         xs: chars(gm),

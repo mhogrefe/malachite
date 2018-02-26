@@ -1,4 +1,4 @@
-use common::test_properties_no_limit_exhaustive;
+use common::test_properties_no_limit_exhaustive_no_special;
 use malachite_base::round::RoundingMode;
 use malachite_test::inputs::base::{pairs_of_rounding_modes, rounding_modes};
 
@@ -30,11 +30,11 @@ fn test_clone_from() {
 #[test]
 #[allow(unknown_lints, clone_on_copy)]
 fn clone_and_clone_from_properties() {
-    test_properties_no_limit_exhaustive(rounding_modes, |&rm| {
+    test_properties_no_limit_exhaustive_no_special(rounding_modes, |&rm| {
         assert_eq!(rm.clone(), rm);
     });
 
-    test_properties_no_limit_exhaustive(pairs_of_rounding_modes, |&(x, y)| {
+    test_properties_no_limit_exhaustive_no_special(pairs_of_rounding_modes, |&(x, y)| {
         let mut mut_x = x;
         mut_x.clone_from(&y);
         assert_eq!(mut_x, y);

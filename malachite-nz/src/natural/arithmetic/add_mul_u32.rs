@@ -134,7 +134,9 @@ impl<'a> AddMul<Natural, u32> for &'a Natural {
         };
         if carry != 0 {
             if a_len > b_len {
-                mpn_add_1_in_place(&mut result_limbs[b_len..], carry);
+                if mpn_add_1_in_place(&mut result_limbs[b_len..], carry) {
+                    result_limbs.push(1);
+                }
             } else {
                 result_limbs.push(carry);
             }
@@ -193,7 +195,9 @@ impl<'a, 'b> AddMul<&'a Natural, u32> for &'b Natural {
         };
         if carry != 0 {
             if a_len > b_len {
-                mpn_add_1_in_place(&mut result_limbs[b_len..], carry);
+                if mpn_add_1_in_place(&mut result_limbs[b_len..], carry) {
+                    result_limbs.push(1);
+                }
             } else {
                 result_limbs.push(carry);
             }
@@ -257,7 +261,9 @@ impl AddMulAssign<Natural, u32> for Natural {
             };
             if carry != 0 {
                 if a_len > b_len {
-                    mpn_add_1_in_place(&mut self_limbs[b_len..], carry);
+                    if mpn_add_1_in_place(&mut self_limbs[b_len..], carry) {
+                        self_limbs.push(1);
+                    }
                 } else {
                     self_limbs.push(carry);
                 }
@@ -321,7 +327,9 @@ impl<'a> AddMulAssign<&'a Natural, u32> for Natural {
             };
             if carry != 0 {
                 if a_len > b_len {
-                    mpn_add_1_in_place(&mut self_limbs[b_len..], carry);
+                    if mpn_add_1_in_place(&mut self_limbs[b_len..], carry) {
+                        self_limbs.push(1);
+                    }
                 } else {
                     self_limbs.push(carry);
                 }

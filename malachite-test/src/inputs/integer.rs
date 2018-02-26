@@ -8,10 +8,13 @@ use rust_wheels::iterators::bools::exhaustive_bools;
 use rust_wheels::iterators::common::EXAMPLE_SEED;
 use rust_wheels::iterators::general::random;
 use rust_wheels::iterators::integers::{exhaustive_integers, exhaustive_natural_integers,
-                                       random_integers, random_natural_integers};
+                                       random_integers, random_natural_integers,
+                                       special_random_integers, special_random_natural_integers};
 use rust_wheels::iterators::integers_geometric::{i32s_geometric, u32s_geometric};
-use rust_wheels::iterators::naturals::{exhaustive_naturals, random_naturals};
-use rust_wheels::iterators::primitive_ints::{exhaustive_signed, exhaustive_unsigned};
+use rust_wheels::iterators::naturals::{exhaustive_naturals, random_naturals,
+                                       special_random_naturals};
+use rust_wheels::iterators::primitive_ints::{exhaustive_signed, exhaustive_unsigned,
+                                             special_random_signed, special_random_unsigned};
 use rust_wheels::iterators::rounding_modes::{exhaustive_rounding_modes, random_rounding_modes};
 use rust_wheels::iterators::tuples::{exhaustive_pairs, exhaustive_pairs_from_single,
                                      exhaustive_triples, exhaustive_triples_from_single,
@@ -22,6 +25,9 @@ pub fn integers(gm: GenerationMode) -> Box<Iterator<Item = Integer>> {
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_integers()),
         GenerationMode::Random(scale) => Box::new(random_integers(&EXAMPLE_SEED, scale)),
+        GenerationMode::SpecialRandom(scale) => {
+            Box::new(special_random_integers(&EXAMPLE_SEED, scale))
+        }
     }
 }
 
@@ -32,6 +38,9 @@ pub fn pairs_of_integers(gm: GenerationMode) -> Box<Iterator<Item = (Integer, In
             &EXAMPLE_SEED,
             scale,
         ))),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_pairs_from_single(
+            special_random_integers(&EXAMPLE_SEED, scale),
+        )),
     }
 }
 
@@ -46,6 +55,9 @@ pub fn triples_of_integers(
             &EXAMPLE_SEED,
             scale,
         ))),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_triples_from_single(
+            special_random_integers(&EXAMPLE_SEED, scale),
+        )),
     }
 }
 
@@ -53,6 +65,9 @@ pub fn natural_integers(gm: GenerationMode) -> Box<Iterator<Item = Integer>> {
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_natural_integers()),
         GenerationMode::Random(scale) => Box::new(random_natural_integers(&EXAMPLE_SEED, scale)),
+        GenerationMode::SpecialRandom(scale) => {
+            Box::new(special_random_natural_integers(&EXAMPLE_SEED, scale))
+        }
     }
 }
 
@@ -84,6 +99,11 @@ pub fn pairs_of_integer_and_signed<T: 'static + PrimitiveSigned>(
             Box::new(exhaustive_pairs(exhaustive_integers(), exhaustive_signed()))
         }
         GenerationMode::Random(scale) => random_pairs_of_integer_and_primitive(scale),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_integers(seed, scale)),
+            &(|seed| special_random_signed(seed)),
+        )),
     }
 }
 
@@ -95,6 +115,11 @@ pub fn pairs_of_signed_and_integer<T: 'static + PrimitiveSigned>(
             Box::new(exhaustive_pairs(exhaustive_signed(), exhaustive_integers()))
         }
         GenerationMode::Random(scale) => random_pairs_of_primitive_and_integer(scale),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_signed(seed)),
+            &(|seed| special_random_integers(seed, scale)),
+        )),
     }
 }
 
@@ -107,6 +132,11 @@ pub fn pairs_of_integer_and_unsigned<T: 'static + PrimitiveUnsigned>(
             exhaustive_unsigned(),
         )),
         GenerationMode::Random(scale) => random_pairs_of_integer_and_primitive(scale),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_integers(seed, scale)),
+            &(|seed| special_random_unsigned(seed)),
+        )),
     }
 }
 
@@ -119,6 +149,11 @@ pub fn pairs_of_unsigned_and_integer<T: 'static + PrimitiveUnsigned>(
             exhaustive_integers(),
         )),
         GenerationMode::Random(scale) => random_pairs_of_primitive_and_integer(scale),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_unsigned(seed)),
+            &(|seed| special_random_integers(seed, scale)),
+        )),
     }
 }
 
@@ -143,6 +178,12 @@ pub fn triples_of_integer_integer_and_signed<T: 'static + PrimitiveSigned>(
             exhaustive_signed(),
         )),
         GenerationMode::Random(scale) => random_triples_of_integer_integer_and_primitive(scale),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_integers(seed, scale)),
+            &(|seed| special_random_integers(seed, scale)),
+            &(|seed| special_random_signed(seed)),
+        )),
     }
 }
 
@@ -156,6 +197,12 @@ pub fn triples_of_integer_integer_and_unsigned<T: 'static + PrimitiveUnsigned>(
             exhaustive_unsigned(),
         )),
         GenerationMode::Random(scale) => random_triples_of_integer_integer_and_primitive(scale),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_integers(seed, scale)),
+            &(|seed| special_random_integers(seed, scale)),
+            &(|seed| special_random_unsigned(seed)),
+        )),
     }
 }
 
@@ -170,6 +217,11 @@ pub fn pairs_of_integer_and_small_u32(gm: GenerationMode) -> Box<Iterator<Item =
         GenerationMode::Random(scale) => Box::new(random_pairs(
             &EXAMPLE_SEED,
             &(|seed| random_integers(seed, scale)),
+            &(|seed| u32s_geometric(seed, scale)),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_integers(seed, scale)),
             &(|seed| u32s_geometric(seed, scale)),
         )),
     }
@@ -197,6 +249,11 @@ pub fn pairs_of_integer_and_small_u64(gm: GenerationMode) -> Box<Iterator<Item =
             &(|seed| random_integers(seed, scale)),
             &(|seed| u32s_geometric(seed, scale).map(|i| i.into())),
         )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_integers(seed, scale)),
+            &(|seed| u32s_geometric(seed, scale).map(|i| i.into())),
+        )),
     }
 }
 
@@ -214,6 +271,12 @@ pub fn triples_of_integer_small_u32_and_small_u32(
             &(|seed| u32s_geometric(seed, scale)),
             &(|seed| u32s_geometric(seed, scale)),
         )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_integers(seed, scale)),
+            &(|seed| u32s_geometric(seed, scale)),
+            &(|seed| u32s_geometric(seed, scale)),
+        )),
     }
 }
 
@@ -228,6 +291,11 @@ pub fn pairs_of_integer_and_small_i32(gm: GenerationMode) -> Box<Iterator<Item =
         GenerationMode::Random(scale) => Box::new(random_pairs(
             &EXAMPLE_SEED,
             &(|seed| random_integers(seed, scale)),
+            &(|seed| i32s_geometric(seed, scale)),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_integers(seed, scale)),
             &(|seed| i32s_geometric(seed, scale)),
         )),
     }
@@ -265,6 +333,12 @@ pub fn triples_of_integer_unsigned_and_integer<T: 'static + PrimitiveUnsigned>(
             exhaustive_integers(),
         )),
         GenerationMode::Random(scale) => random_triples_of_integer_primitive_and_integer(scale),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_integers(seed, scale)),
+            &(|seed| special_random_unsigned(seed)),
+            &(|seed| special_random_integers(seed, scale)),
+        )),
     }
 }
 
@@ -278,6 +352,12 @@ pub fn triples_of_unsigned_integer_and_unsigned<T: 'static + PrimitiveUnsigned>(
             exhaustive_unsigned(),
         )),
         GenerationMode::Random(scale) => random_triples_of_primitive_integer_and_primitive(scale),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_unsigned(seed)),
+            &(|seed| special_random_integers(seed, scale)),
+            &(|seed| special_random_unsigned(seed)),
+        )),
     }
 }
 
@@ -291,6 +371,12 @@ pub fn triples_of_integer_signed_and_integer<T: 'static + PrimitiveSigned>(
             exhaustive_integers(),
         )),
         GenerationMode::Random(scale) => random_triples_of_integer_primitive_and_integer(scale),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_integers(seed, scale)),
+            &(|seed| special_random_signed(seed)),
+            &(|seed| special_random_integers(seed, scale)),
+        )),
     }
 }
 
@@ -304,6 +390,12 @@ pub fn triples_of_signed_integer_and_signed<T: 'static + PrimitiveSigned>(
             exhaustive_signed(),
         )),
         GenerationMode::Random(scale) => random_triples_of_primitive_integer_and_primitive(scale),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_signed(seed)),
+            &(|seed| special_random_integers(seed, scale)),
+            &(|seed| special_random_signed(seed)),
+        )),
     }
 }
 
@@ -319,6 +411,11 @@ pub fn pairs_of_integer_and_natural(
             &EXAMPLE_SEED,
             &(|seed| random_integers(seed, scale)),
             &(|seed| random_naturals(seed, scale)),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_integers(seed, scale)),
+            &(|seed| special_random_naturals(seed, scale)),
         )),
     }
 }
@@ -336,6 +433,11 @@ pub fn pairs_of_natural_and_integer(
             &(|seed| random_naturals(seed, scale)),
             &(|seed| random_integers(seed, scale)),
         )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_naturals(seed, scale)),
+            &(|seed| special_random_integers(seed, scale)),
+        )),
     }
 }
 
@@ -351,6 +453,11 @@ pub fn pairs_of_natural_and_natural_integer(
             &EXAMPLE_SEED,
             &(|seed| random_naturals(seed, scale)),
             &(|seed| random_natural_integers(seed, scale)),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_naturals(seed, scale)),
+            &(|seed| special_random_natural_integers(seed, scale)),
         )),
     }
 }
@@ -370,6 +477,12 @@ pub fn triples_of_integer_natural_and_integer(
             &(|seed| random_naturals(seed, scale)),
             &(|seed| random_integers(seed, scale)),
         )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_integers(seed, scale)),
+            &(|seed| special_random_naturals(seed, scale)),
+            &(|seed| special_random_integers(seed, scale)),
+        )),
     }
 }
 
@@ -388,6 +501,12 @@ pub fn triples_of_natural_integer_and_natural(
             &(|seed| random_integers(seed, scale)),
             &(|seed| random_naturals(seed, scale)),
         )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_naturals(seed, scale)),
+            &(|seed| special_random_integers(seed, scale)),
+            &(|seed| special_random_naturals(seed, scale)),
+        )),
     }
 }
 
@@ -402,6 +521,12 @@ pub fn triples_of_integer_small_u64_and_bool(
         GenerationMode::Random(scale) => Box::new(random_triples(
             &EXAMPLE_SEED,
             &(|seed| random_integers(seed, scale)),
+            &(|seed| u32s_geometric(seed, scale).map(|i| i.into())),
+            &(|seed| random(seed)),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_integers(seed, scale)),
             &(|seed| u32s_geometric(seed, scale).map(|i| i.into())),
             &(|seed| random(seed)),
         )),
@@ -421,6 +546,11 @@ pub fn pairs_of_integer_and_rounding_mode(
             &(|seed| random_integers(seed, scale)),
             &(|seed| random_rounding_modes(seed)),
         )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_integers(seed, scale)),
+            &(|seed| random_rounding_modes(seed)),
+        )),
     }
 }
 
@@ -435,6 +565,12 @@ fn triples_of_integer_small_i32_and_rounding_mode(
         GenerationMode::Random(scale) => Box::new(random_triples(
             &EXAMPLE_SEED,
             &(|seed| random_integers(seed, scale)),
+            &(|seed| i32s_geometric(seed, scale)),
+            &(|seed| random_rounding_modes(seed)),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_integers(seed, scale)),
             &(|seed| i32s_geometric(seed, scale)),
             &(|seed| random_rounding_modes(seed)),
         )),
@@ -473,6 +609,12 @@ fn triples_of_integer_small_u32_and_rounding_mode(
         GenerationMode::Random(scale) => Box::new(random_triples(
             &EXAMPLE_SEED,
             &(|seed| random_integers(seed, scale)),
+            &(|seed| u32s_geometric(seed, scale)),
+            &(|seed| random_rounding_modes(seed)),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_integers(seed, scale)),
             &(|seed| u32s_geometric(seed, scale)),
             &(|seed| random_rounding_modes(seed)),
         )),

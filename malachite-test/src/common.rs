@@ -37,9 +37,25 @@ pub fn integer_to_rug_integer(n: &Integer) -> rug::Integer {
 }
 
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
+pub enum NoSpecialGenerationMode {
+    Exhaustive,
+    Random(u32),
+}
+
+impl NoSpecialGenerationMode {
+    pub fn name(&self) -> &str {
+        match *self {
+            NoSpecialGenerationMode::Exhaustive => "exhaustive",
+            NoSpecialGenerationMode::Random(_) => "random",
+        }
+    }
+}
+
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub enum GenerationMode {
     Exhaustive,
     Random(u32),
+    SpecialRandom(u32),
 }
 
 impl GenerationMode {
@@ -47,6 +63,7 @@ impl GenerationMode {
         match *self {
             GenerationMode::Exhaustive => "exhaustive",
             GenerationMode::Random(_) => "random",
+            GenerationMode::SpecialRandom(_) => "special_random",
         }
     }
 }
