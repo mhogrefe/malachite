@@ -52,7 +52,7 @@ impl Integer {
             }
             // At this point borrow must be false, because limbs has some nonzero elements in this
             // branch
-            -Natural::from_limbs_le(&limbs[..])
+            -Natural::from_limbs_le(&limbs)
         }
     }
 

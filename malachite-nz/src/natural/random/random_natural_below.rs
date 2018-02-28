@@ -33,6 +33,7 @@ pub fn random_natural_below<R: Rng>(rng: &mut R, n: &Natural) -> Natural {
         random_natural_up_to_bits(rng, n.significant_bits() - 1)
     } else {
         let bits = n.significant_bits();
+        // Loop loops <= 2 times on average.
         loop {
             let m = random_natural_up_to_bits(rng, bits);
             if m < *n {

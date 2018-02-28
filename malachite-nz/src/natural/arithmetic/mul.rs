@@ -568,11 +568,11 @@ fn mpn_toom42_mul(p: &mut [u32], a: &[u32], b: &[u32], scratch: &mut [u32]) {
     } else {
         (bn + 1) >> 1
     };
-    let a0 = &a[..];
+    let a0 = &a;
     let a1 = &a[n..];
     let a2 = &a[2 * n..];
     let a3 = &a[3 * n..];
-    let b0 = &b[..];
+    let b0 = &b;
     let b1 = &b[n..];
 
     let s = an - 3 * n;
