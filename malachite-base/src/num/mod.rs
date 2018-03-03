@@ -7,7 +7,7 @@ use std::cmp::Ordering;
 use std::fmt::{Binary, Debug, Display, LowerExp, LowerHex, Octal, UpperExp, UpperHex};
 use std::hash::Hash;
 use std::iter::{Product, Sum};
-use std::num::ParseIntError;
+use std::num::{FpCategory, ParseIntError};
 use std::ops::*;
 use std::str::FromStr;
 
@@ -463,9 +463,13 @@ pub trait PrimitiveUnsigned
     {
     type SignedOfEqualWidth: PrimitiveSigned;
 
-    fn to_u64(&self) -> u64;
+    fn to_u32(self) -> u32;
+
+    fn to_u64(self) -> u64;
 
     fn to_signed_bitwise(self) -> Self::SignedOfEqualWidth;
+
+    fn to_signed_checked(self) -> Option<Self::SignedOfEqualWidth>;
 
     fn from_signed_bitwise(i: Self::SignedOfEqualWidth) -> Self;
 }
@@ -492,7 +496,7 @@ pub trait PrimitiveSigned
 }
 
 //TODO docs
-pub trait FloatingPoint
+pub trait Float
     : Add<Output = Self>
     + AddAssign<Self>
     + Copy
@@ -525,9 +529,56 @@ pub trait FloatingPoint
     + UpperExp
     + Zero {
     type UnsignedOfEqualWidth: PrimitiveUnsigned;
+    type SignedOfEqualWidth: PrimitiveSigned;
 
-    const EXPONENT_WIDTH: u32;
+    const WIDTH: u32 = Self::UnsignedOfEqualWidth::WIDTH;
+    const EXPONENT_WIDTH: u32 = Self::WIDTH - Self::MANTISSA_WIDTH - 1;
     const MANTISSA_WIDTH: u32;
+    const MIN_NORMAL_EXPONENT: i32 = -((1 << (Self::EXPONENT_WIDTH - 1)) - 2);
+    const MIN_EXPONENT: i32 = Self::MIN_NORMAL_EXPONENT - (Self::MANTISSA_WIDTH as i32);
+    const MAX_EXPONENT: u32 = (1 << (Self::EXPONENT_WIDTH - 1)) - 1;
+
+    const INFINITY: Self;
+    const NEG_INFINITY: Self;
+    const NEG_ZERO: Self;
+    const NAN: Self;
+    const MAX_FINITE: Self;
+    const MIN_FINITE: Self;
+
+    fn is_nan(self) -> bool;
+
+    fn is_infinite(self) -> bool;
+
+    fn is_finite(self) -> bool;
+
+    fn is_normal(self) -> bool;
+
+    fn classify(self) -> FpCategory;
+
+    fn is_sign_positive(self) -> bool;
+
+    fn is_sign_negative(self) -> bool;
+
+    fn to_bits(self) -> Self::UnsignedOfEqualWidth;
+
+    fn from_bits(v: Self::UnsignedOfEqualWidth) -> Self;
+
+    fn to_adjusted_mantissa_and_exponent(self) -> (Self::UnsignedOfEqualWidth, u32) {
+        let bits = self.to_bits();
+        let one = Self::UnsignedOfEqualWidth::ONE;
+        let mantissa = bits & ((one << Self::MANTISSA_WIDTH) - one);
+        let exponent = (bits >> Self::MANTISSA_WIDTH).to_u32() & ((1 << Self::EXPONENT_WIDTH) - 1);
+        (mantissa, exponent)
+    }
+
+    fn from_adjusted_mantissa_and_exponent(
+        mantissa: Self::UnsignedOfEqualWidth,
+        exponent: u32,
+    ) -> Self {
+        Self::from_bits(
+            (Self::UnsignedOfEqualWidth::from_u32(exponent) << Self::MANTISSA_WIDTH) + mantissa,
+        )
+    }
 }
 
 /// This trait defines functions that access or modify individual bits in a value, indexed by a
@@ -1372,24 +1423,66 @@ macro_rules! signed_traits {
 }
 
 //TODO docs
-macro_rules! floating_point_traits {
-    ($t: ident, $ut: ident, $exponent_width: expr, $mantissa_width: expr) => {
+macro_rules! float_traits {
+    ($t: ident, $ut: ident) => {
         //TODO docs
-        impl FloatingPoint for $t {
+        impl Float for $t {
             type UnsignedOfEqualWidth = $ut;
+            type SignedOfEqualWidth = <$ut as PrimitiveUnsigned>::SignedOfEqualWidth;
+            const MANTISSA_WIDTH: u32 = std::$t::MANTISSA_DIGITS - 1;
 
-            const EXPONENT_WIDTH: u32 = $exponent_width;
-            const MANTISSA_WIDTH: u32 = $mantissa_width;
+            const INFINITY: Self = std::$t::INFINITY;
+            const NEG_INFINITY: Self = std::$t::NEG_INFINITY;
+            const NEG_ZERO: Self = -0.0;
+            const NAN: Self = std::$t::NAN;
+            const MAX_FINITE: Self = std::$t::MAX;
+            const MIN_FINITE: Self = std::$t::MIN;
+
+            fn is_nan(self) -> bool {
+                $t::is_nan(self)
+            }
+
+            fn is_infinite(self) -> bool {
+                $t::is_infinite(self)
+            }
+
+            fn is_finite(self) -> bool {
+                $t::is_finite(self)
+            }
+
+            fn is_normal(self) -> bool {
+                $t::is_normal(self)
+            }
+
+            fn classify(self) -> FpCategory {
+                $t::classify(self)
+            }
+
+            fn is_sign_positive(self) -> bool {
+                $t::is_sign_positive(self)
+            }
+
+            fn is_sign_negative(self) -> bool {
+                $t::is_sign_negative(self)
+            }
+
+            fn to_bits(self) -> $ut {
+                $t::to_bits(self)
+            }
+
+            fn from_bits(v: $ut) -> $t {
+                $t::from_bits(v)
+            }
         }
 
         impl_named!($t);
 
         impl Min for $t {
-            const MIN: $t = std::$t::MIN;
+            const MIN: $t = $t::NEG_INFINITY;
         }
 
         impl Max for $t {
-            const MAX: $t = std::$t::MAX;
+            const MAX: $t = $t::INFINITY;
         }
     }
 }
@@ -1398,12 +1491,24 @@ macro_rules! floating_point_traits {
 impl PrimitiveUnsigned for u8 {
     type SignedOfEqualWidth = i8;
 
-    fn to_u64(&self) -> u64 {
-        (*self).into()
+    fn to_u32(self) -> u32 {
+        self.into()
+    }
+
+    fn to_u64(self) -> u64 {
+        self.into()
     }
 
     fn to_signed_bitwise(self) -> i8 {
         self as i8
+    }
+
+    fn to_signed_checked(self) -> Option<i8> {
+        if self <= i8::MAX as u8 {
+            Some(self as i8)
+        } else {
+            None
+        }
     }
 
     fn from_signed_bitwise(i: i8) -> u8 {
@@ -1414,12 +1519,24 @@ impl PrimitiveUnsigned for u8 {
 impl PrimitiveUnsigned for u16 {
     type SignedOfEqualWidth = i16;
 
-    fn to_u64(&self) -> u64 {
-        (*self).into()
+    fn to_u32(self) -> u32 {
+        self.into()
+    }
+
+    fn to_u64(self) -> u64 {
+        self.into()
     }
 
     fn to_signed_bitwise(self) -> i16 {
         self as i16
+    }
+
+    fn to_signed_checked(self) -> Option<i16> {
+        if self <= i16::MAX as u16 {
+            Some(self as i16)
+        } else {
+            None
+        }
     }
 
     fn from_signed_bitwise(i: i16) -> u16 {
@@ -1430,12 +1547,24 @@ impl PrimitiveUnsigned for u16 {
 impl PrimitiveUnsigned for u32 {
     type SignedOfEqualWidth = i32;
 
-    fn to_u64(&self) -> u64 {
-        (*self).into()
+    fn to_u32(self) -> u32 {
+        self
+    }
+
+    fn to_u64(self) -> u64 {
+        self.into()
     }
 
     fn to_signed_bitwise(self) -> i32 {
         self as i32
+    }
+
+    fn to_signed_checked(self) -> Option<i32> {
+        if self <= i32::MAX as u32 {
+            Some(self as i32)
+        } else {
+            None
+        }
     }
 
     fn from_signed_bitwise(i: i32) -> u32 {
@@ -1446,12 +1575,24 @@ impl PrimitiveUnsigned for u32 {
 impl PrimitiveUnsigned for u64 {
     type SignedOfEqualWidth = i64;
 
-    fn to_u64(&self) -> u64 {
-        *self
+    fn to_u32(self) -> u32 {
+        self as u32
+    }
+
+    fn to_u64(self) -> u64 {
+        self
     }
 
     fn to_signed_bitwise(self) -> i64 {
         self as i64
+    }
+
+    fn to_signed_checked(self) -> Option<i64> {
+        if self <= i64::MAX as u64 {
+            Some(self as i64)
+        } else {
+            None
+        }
     }
 
     fn from_signed_bitwise(i: i64) -> u64 {
@@ -1469,8 +1610,8 @@ signed_traits!(i16, u16, 4, u, u as i16, u as i16, i, i as i16, i as i16);
 signed_traits!(i32, u32, 5, u, u as i32, u as i32, i, i, i as i32);
 signed_traits!(i64, u64, 6, u, u.into(), u as i64, i, i.into(), i);
 
-floating_point_traits!(f32, u32, 8, 23);
-floating_point_traits!(f64, u64, 11, 52);
+float_traits!(f32, u32);
+float_traits!(f64, u64);
 
 pub trait AbsAssign {
     fn abs_assign(&mut self);
