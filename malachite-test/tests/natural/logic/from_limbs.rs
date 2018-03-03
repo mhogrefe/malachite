@@ -4,9 +4,9 @@ use malachite_nz::natural::Natural;
 use malachite_test::inputs::base::vecs_of_unsigned;
 
 #[test]
-fn test_from_limbs_le() {
+fn test_from_limbs_asc() {
     let test = |limbs: &[u32], out| {
-        let x = Natural::from_limbs_le(limbs);
+        let x = Natural::from_limbs_asc(limbs);
         assert_eq!(x.to_string(), out);
         assert!(x.is_valid());
     };
@@ -22,9 +22,9 @@ fn test_from_limbs_le() {
 }
 
 #[test]
-fn test_from_limbs_be() {
+fn test_from_limbs_desc() {
     let test = |limbs: Vec<u32>, out| {
-        let x = Natural::from_limbs_be(&limbs);
+        let x = Natural::from_limbs_desc(&limbs);
         assert_eq!(x.to_string(), out);
         assert!(x.is_valid());
     };
@@ -43,9 +43,9 @@ fn test_from_limbs_be() {
 }
 
 #[test]
-fn from_limbs_le_properties() {
+fn from_limbs_asc_properties() {
     test_properties(vecs_of_unsigned, |limbs: &Vec<u32>| {
-        let x = Natural::from_limbs_le(limbs);
+        let x = Natural::from_limbs_asc(limbs);
         let mut trimmed_limbs: Vec<u32> = limbs
             .iter()
             .cloned()
@@ -53,24 +53,24 @@ fn from_limbs_le_properties() {
             .skip_while(|&limb| limb == 0)
             .collect();
         trimmed_limbs.reverse();
-        assert_eq!(x.to_limbs_le(), trimmed_limbs);
+        assert_eq!(x.to_limbs_asc(), trimmed_limbs);
         assert_eq!(
-            Natural::from_limbs_be(&limbs.iter().cloned().rev().collect::<Vec<u32>>()),
+            Natural::from_limbs_desc(&limbs.iter().cloned().rev().collect::<Vec<u32>>()),
             x
         );
         if !limbs.is_empty() && *limbs.last().unwrap() != 0 {
-            assert_eq!(x.to_limbs_le(), *limbs);
+            assert_eq!(x.to_limbs_asc(), *limbs);
         }
         assert_eq!(limbs_test_zero(limbs), x == 0);
     });
 }
 
 #[test]
-fn from_limbs_be_properties() {
+fn from_limbs_desc_properties() {
     test_properties(vecs_of_unsigned, |limbs: &Vec<u32>| {
-        let x = Natural::from_limbs_be(limbs);
+        let x = Natural::from_limbs_desc(limbs);
         assert_eq!(
-            x.to_limbs_be(),
+            x.to_limbs_desc(),
             limbs
                 .iter()
                 .cloned()
@@ -78,11 +78,11 @@ fn from_limbs_be_properties() {
                 .collect::<Vec<u32>>()
         );
         assert_eq!(
-            Natural::from_limbs_le(&limbs.iter().cloned().rev().collect::<Vec<u32>>()),
+            Natural::from_limbs_asc(&limbs.iter().cloned().rev().collect::<Vec<u32>>()),
             x
         );
         if !limbs.is_empty() && limbs[0] != 0 {
-            assert_eq!(x.to_limbs_be(), *limbs);
+            assert_eq!(x.to_limbs_desc(), *limbs);
         }
         assert_eq!(limbs_test_zero(limbs), x == 0);
     });

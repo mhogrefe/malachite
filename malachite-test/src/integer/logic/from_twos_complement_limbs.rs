@@ -3,38 +3,38 @@ use inputs::base::vecs_of_unsigned;
 use malachite_nz::integer::Integer;
 use rust_wheels::benchmarks::{BenchmarkOptions1, benchmark_1};
 
-pub fn demo_integer_from_twos_complement_limbs_le(gm: GenerationMode, limit: usize) {
+pub fn demo_integer_from_twos_complement_limbs_asc(gm: GenerationMode, limit: usize) {
     for xs in vecs_of_unsigned(gm).take(limit) {
         println!(
-            "from_twos_complement_limbs_le({:?}) = {:?}",
+            "from_twos_complement_limbs_asc({:?}) = {:?}",
             xs,
-            Integer::from_twos_complement_limbs_le(xs.as_slice())
+            Integer::from_twos_complement_limbs_asc(xs.as_slice())
         );
     }
 }
 
-pub fn demo_integer_from_twos_complement_limbs_be(gm: GenerationMode, limit: usize) {
+pub fn demo_integer_from_twos_complement_limbs_desc(gm: GenerationMode, limit: usize) {
     for xs in vecs_of_unsigned(gm).take(limit) {
         println!(
-            "from_twos_complement_limbs_be({:?}) = {:?}",
+            "from_twos_complement_limbs_desc({:?}) = {:?}",
             xs,
-            Integer::from_twos_complement_limbs_be(xs.as_slice())
+            Integer::from_twos_complement_limbs_desc(xs.as_slice())
         );
     }
 }
 
-pub fn benchmark_integer_from_twos_complement_limbs_le(
+pub fn benchmark_integer_from_twos_complement_limbs_asc(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,
 ) {
     println!(
-        "benchmarking {} Integer::from_twos_complement_limbs_le(&[u32])",
+        "benchmarking {} Integer::from_twos_complement_limbs_asc(&[u32])",
         gm.name()
     );
     benchmark_1(BenchmarkOptions1 {
         xs: vecs_of_unsigned(gm),
-        function_f: &mut (|xs: Vec<u32>| Integer::from_twos_complement_limbs_le(xs.as_slice())),
+        function_f: &mut (|xs: Vec<u32>| Integer::from_twos_complement_limbs_asc(xs.as_slice())),
         x_cons: &(|xs| xs.clone()),
         x_param: &(|xs| xs.len()),
         limit,
@@ -46,18 +46,18 @@ pub fn benchmark_integer_from_twos_complement_limbs_le(
     });
 }
 
-pub fn benchmark_integer_from_twos_complement_limbs_be(
+pub fn benchmark_integer_from_twos_complement_limbs_desc(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,
 ) {
     println!(
-        "benchmarking {} Integer::from_twos_complement_limbs_be(&[u32])",
+        "benchmarking {} Integer::from_twos_complement_limbs_desc(&[u32])",
         gm.name()
     );
     benchmark_1(BenchmarkOptions1 {
         xs: vecs_of_unsigned(gm),
-        function_f: &mut (|xs: Vec<u32>| Integer::from_twos_complement_limbs_be(xs.as_slice())),
+        function_f: &mut (|xs: Vec<u32>| Integer::from_twos_complement_limbs_desc(xs.as_slice())),
         x_cons: &(|xs| xs.clone()),
         x_param: &(|xs| xs.len()),
         limit,

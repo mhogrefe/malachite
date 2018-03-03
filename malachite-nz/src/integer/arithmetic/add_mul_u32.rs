@@ -303,7 +303,7 @@ pub(crate) fn large_aorsmul_ref(
     add: bool,
 ) -> Integer {
     let mut result_sign = a_sign;
-    let mut result_limbs = a_abs.to_limbs_le();
+    let mut result_limbs = a_abs.to_limbs_asc();
     match *b_abs {
         Small(small_b) => mpz_aorsmul_1(
             &mut result_sign,

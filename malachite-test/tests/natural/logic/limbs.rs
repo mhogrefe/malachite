@@ -5,9 +5,9 @@ use std::str::FromStr;
 use std::u32;
 
 #[test]
-fn test_to_limbs_le() {
+fn test_to_limbs_asc() {
     let test = |n, out| {
-        assert_eq!(Natural::from_str(n).unwrap().to_limbs_le(), out);
+        assert_eq!(Natural::from_str(n).unwrap().to_limbs_asc(), out);
     };
     test("0", vec![]);
     test("123", vec![123]);
@@ -23,9 +23,9 @@ fn test_to_limbs_le() {
 }
 
 #[test]
-fn test_to_limbs_be() {
+fn test_to_limbs_desc() {
     let test = |n, out| {
-        assert_eq!(Natural::from_str(n).unwrap().to_limbs_be(), out);
+        assert_eq!(Natural::from_str(n).unwrap().to_limbs_desc(), out);
     };
     test("0", vec![]);
     test("123", vec![123]);
@@ -41,12 +41,12 @@ fn test_to_limbs_be() {
 }
 
 #[test]
-fn to_limbs_le_properties() {
+fn to_limbs_asc_properties() {
     test_properties(naturals, |x| {
-        let limbs = x.to_limbs_le();
-        assert_eq!(Natural::from_limbs_le(&limbs), *x);
+        let limbs = x.to_limbs_asc();
+        assert_eq!(Natural::from_limbs_asc(&limbs), *x);
         assert_eq!(
-            x.to_limbs_be(),
+            x.to_limbs_desc(),
             limbs.iter().cloned().rev().collect::<Vec<u32>>()
         );
         if *x != 0 {
@@ -56,12 +56,12 @@ fn to_limbs_le_properties() {
 }
 
 #[test]
-fn to_limbs_be_properties() {
+fn to_limbs_desc_properties() {
     test_properties(naturals, |x| {
-        let limbs = x.to_limbs_be();
-        assert_eq!(Natural::from_limbs_be(&limbs), *x);
+        let limbs = x.to_limbs_desc();
+        assert_eq!(Natural::from_limbs_desc(&limbs), *x);
         assert_eq!(
-            x.to_limbs_le(),
+            x.to_limbs_asc(),
             limbs.iter().cloned().rev().collect::<Vec<u32>>()
         );
         if *x != 0 {

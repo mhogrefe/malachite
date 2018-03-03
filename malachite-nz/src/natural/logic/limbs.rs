@@ -1,7 +1,7 @@
 use natural::Natural::{self, Large, Small};
 
 impl Natural {
-    /// Returns the limbs, or base-2<sup>32</sup> digits, of a `Natural`, in little-endian order, so
+    /// Returns the limbs, or base-2<sup>32</sup> digits, of a `Natural`, in ascending order, so
     /// that less significant limbs have lower indices in the output vector. There are no trailing
     /// zero limbs.
     ///
@@ -11,7 +11,7 @@ impl Natural {
     ///
     /// where n = `self.significant_bits()`
     ///
-    /// This method is more efficient than `Natural::limbs_be`.
+    /// This method is more efficient than `Natural::limbs_desc`.
     ///
     /// # Example
     /// ```
@@ -22,13 +22,13 @@ impl Natural {
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
-    ///     assert!(Natural::ZERO.to_limbs_le().is_empty());
-    ///     assert_eq!(Natural::from(123u32).to_limbs_le(), vec![123]);
+    ///     assert!(Natural::ZERO.to_limbs_asc().is_empty());
+    ///     assert_eq!(Natural::from(123u32).to_limbs_asc(), vec![123]);
     ///     // 10^12 = 232 * 2^32 + 3567587328
-    ///     assert_eq!(Natural::trillion().to_limbs_le(), vec![3567587328, 232]);
+    ///     assert_eq!(Natural::trillion().to_limbs_asc(), vec![3567587328, 232]);
     /// }
     /// ```
-    pub fn to_limbs_le(&self) -> Vec<u32> {
+    pub fn to_limbs_asc(&self) -> Vec<u32> {
         match *self {
             Small(0) => Vec::new(),
             Small(small) => vec![small],
@@ -36,7 +36,7 @@ impl Natural {
         }
     }
 
-    /// Returns the limbs, or base-2<sup>32</sup> digits, of a `Natural`, in big-endian order, so
+    /// Returns the limbs, or base-2<sup>32</sup> digits, of a `Natural`, in descending order, so
     /// that less significant limbs have higher indices in the output vector. There are no leading
     /// zero limbs.
     ///
@@ -46,7 +46,7 @@ impl Natural {
     ///
     /// where n = `self.significant_bits()`
     ///
-    /// This method is less efficient than `Natural::limbs_le`.
+    /// This method is less efficient than `Natural::limbs_asc`.
     ///
     /// # Example
     /// ```
@@ -57,18 +57,18 @@ impl Natural {
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
-    ///     assert!(Natural::ZERO.to_limbs_be().is_empty());
-    ///     assert_eq!(Natural::from(123u32).to_limbs_be(), vec![123]);
+    ///     assert!(Natural::ZERO.to_limbs_desc().is_empty());
+    ///     assert_eq!(Natural::from(123u32).to_limbs_desc(), vec![123]);
     ///     // 10^12 = 232 * 2^32 + 3567587328
-    ///     assert_eq!(Natural::trillion().to_limbs_be(), vec![232, 3567587328]);
+    ///     assert_eq!(Natural::trillion().to_limbs_desc(), vec![232, 3567587328]);
     /// }
     /// ```
-    pub fn to_limbs_be(&self) -> Vec<u32> {
-        self.to_limbs_le().into_iter().rev().collect()
+    pub fn to_limbs_desc(&self) -> Vec<u32> {
+        self.to_limbs_asc().into_iter().rev().collect()
     }
 
     //TODO doc and test
-    pub fn into_limbs_le(self) -> Vec<u32> {
+    pub fn into_limbs_asc(self) -> Vec<u32> {
         match self {
             Small(0) => Vec::new(),
             Small(small) => vec![small],
@@ -77,8 +77,8 @@ impl Natural {
     }
 
     //TODO doc and test
-    pub fn into_limbs_be(self) -> Vec<u32> {
-        let mut limbs = self.into_limbs_le();
+    pub fn into_limbs_desc(self) -> Vec<u32> {
+        let mut limbs = self.into_limbs_asc();
         limbs.reverse();
         limbs
     }

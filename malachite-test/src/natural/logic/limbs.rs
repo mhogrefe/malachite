@@ -4,23 +4,23 @@ use malachite_base::num::SignificantBits;
 use malachite_nz::natural::Natural;
 use rust_wheels::benchmarks::{BenchmarkOptions1, benchmark_1};
 
-pub fn demo_natural_to_limbs_le(gm: GenerationMode, limit: usize) {
+pub fn demo_natural_to_limbs_asc(gm: GenerationMode, limit: usize) {
     for n in naturals(gm).take(limit) {
-        println!("to_limbs_le({}) = {:?}", n, n.to_limbs_le());
+        println!("to_limbs_asc({}) = {:?}", n, n.to_limbs_asc());
     }
 }
 
-pub fn demo_natural_to_limbs_be(gm: GenerationMode, limit: usize) {
+pub fn demo_natural_to_limbs_desc(gm: GenerationMode, limit: usize) {
     for n in naturals(gm).take(limit) {
-        println!("to_limbs_be({}) = {:?}", n, n.to_limbs_be());
+        println!("to_limbs_desc({}) = {:?}", n, n.to_limbs_desc());
     }
 }
 
-pub fn benchmark_natural_to_limbs_le(gm: GenerationMode, limit: usize, file_name: &str) {
-    println!("benchmarking {} Natural.to_limbs_le()", gm.name());
+pub fn benchmark_natural_to_limbs_asc(gm: GenerationMode, limit: usize, file_name: &str) {
+    println!("benchmarking {} Natural.to_limbs_asc()", gm.name());
     benchmark_1(BenchmarkOptions1 {
         xs: naturals(gm),
-        function_f: &mut (|n: Natural| n.to_limbs_le()),
+        function_f: &mut (|n: Natural| n.to_limbs_asc()),
         x_cons: &(|x| x.clone()),
         x_param: &(|n| n.significant_bits() as usize),
         limit,
@@ -32,11 +32,11 @@ pub fn benchmark_natural_to_limbs_le(gm: GenerationMode, limit: usize, file_name
     });
 }
 
-pub fn benchmark_natural_to_limbs_be(gm: GenerationMode, limit: usize, file_name: &str) {
-    println!("benchmarking {} Natural.to_limbs_be()", gm.name());
+pub fn benchmark_natural_to_limbs_desc(gm: GenerationMode, limit: usize, file_name: &str) {
+    println!("benchmarking {} Natural.to_limbs_desc()", gm.name());
     benchmark_1(BenchmarkOptions1 {
         xs: naturals(gm),
-        function_f: &mut (|n: Natural| n.to_limbs_be()),
+        function_f: &mut (|n: Natural| n.to_limbs_desc()),
         x_cons: &(|x| x.clone()),
         x_param: &(|n| n.significant_bits() as usize),
         limit,

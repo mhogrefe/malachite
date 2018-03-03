@@ -122,7 +122,7 @@ impl<'a> AddMul<Natural, u32> for &'a Natural {
                 return self + product;
             }
         }
-        let mut result_limbs = self.to_limbs_le();
+        let mut result_limbs = self.to_limbs_asc();
         let a_len = result_limbs.len();
         let b_len = b.limb_count() as usize;
         if a_len < b_len {
@@ -183,7 +183,7 @@ impl<'a, 'b> AddMul<&'a Natural, u32> for &'b Natural {
                 return self + product;
             }
         }
-        let mut result_limbs = self.to_limbs_le();
+        let mut result_limbs = self.to_limbs_asc();
         let a_len = result_limbs.len();
         let b_len = b.limb_count() as usize;
         if a_len < b_len {

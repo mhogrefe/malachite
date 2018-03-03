@@ -7,10 +7,10 @@ use std::str::FromStr;
 use std::u32;
 
 #[test]
-fn test_twos_complement_limbs_le() {
+fn test_twos_complement_limbs_asc() {
     let test = |n, out| {
         assert_eq!(
-            Integer::from_str(n).unwrap().twos_complement_limbs_le(),
+            Integer::from_str(n).unwrap().twos_complement_limbs_asc(),
             out
         );
     };
@@ -44,10 +44,10 @@ fn test_twos_complement_limbs_le() {
 }
 
 #[test]
-fn test_twos_complement_limbs_be() {
+fn test_twos_complement_limbs_desc() {
     let test = |n, out| {
         assert_eq!(
-            Integer::from_str(n).unwrap().twos_complement_limbs_be(),
+            Integer::from_str(n).unwrap().twos_complement_limbs_desc(),
             out
         );
     };
@@ -81,12 +81,12 @@ fn test_twos_complement_limbs_be() {
 }
 
 #[test]
-fn twos_complement_limbs_le_properties() {
+fn twos_complement_limbs_asc_properties() {
     test_properties(integers, |x| {
-        let limbs = x.twos_complement_limbs_le();
-        assert_eq!(Integer::from_twos_complement_limbs_le(&limbs), *x);
+        let limbs = x.twos_complement_limbs_asc();
+        assert_eq!(Integer::from_twos_complement_limbs_asc(&limbs), *x);
         assert_eq!(
-            x.twos_complement_limbs_be(),
+            x.twos_complement_limbs_desc(),
             limbs.iter().cloned().rev().collect::<Vec<u32>>()
         );
         match x.sign() {
@@ -110,12 +110,12 @@ fn twos_complement_limbs_le_properties() {
 }
 
 #[test]
-fn limbs_be_properties() {
+fn limbs_desc_properties() {
     test_properties(integers, |x| {
-        let limbs = x.twos_complement_limbs_be();
-        assert_eq!(Integer::from_twos_complement_limbs_be(&limbs), *x);
+        let limbs = x.twos_complement_limbs_desc();
+        assert_eq!(Integer::from_twos_complement_limbs_desc(&limbs), *x);
         assert_eq!(
-            x.twos_complement_limbs_le(),
+            x.twos_complement_limbs_asc(),
             limbs.iter().cloned().rev().collect::<Vec<u32>>()
         );
         match x.sign() {

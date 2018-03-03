@@ -174,7 +174,7 @@ impl Natural {
                     return Small(small.wrapping_neg() & ((1 << other) - 1));
                 }
             }
-            let mut limbs = self.to_limbs_le();
+            let mut limbs = self.to_limbs_asc();
             let mut new_limb_count = other >> LOG_LIMB_BITS;
             let leftover_bits = other & LIMB_BITS_MASK;
             if leftover_bits != 0 {

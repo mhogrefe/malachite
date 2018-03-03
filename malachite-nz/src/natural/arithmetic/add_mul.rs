@@ -181,7 +181,7 @@ impl<'a, 'b, 'c> AddMul<&'a Natural, &'b Natural> for &'c Natural {
             b * c
         } else {
             let mut result = {
-                let mut result_limbs = self.to_limbs_le();
+                let mut result_limbs = self.to_limbs_asc();
                 if let Large(ref c_limbs) = *c {
                     let mut self_sign = false;
                     if let Large(ref b_limbs) = *b {

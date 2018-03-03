@@ -3,13 +3,13 @@ use malachite_base::num::{BitAccess, Zero};
 use natural::Natural;
 
 impl Integer {
-    /// Converts a slice of limbs, or base-2<sup>32</sup> digits, to an `Integer`, in little-endian
+    /// Converts a slice of limbs, or base-2<sup>32</sup> digits, to an `Integer`, in ascending
     /// order, so that less significant limbs have lower indices in the input slice. The limbs are
     /// in two's complement, and the most significant bit of the limbs indicates the sign; if the
     /// bit is zero, the `Integer` is non-negative, and if the bit is one it is negative. If `limbs`
     /// is empty, zero is returned.
     ///
-    /// This method is more efficient than `from_twos_complement_limbs_be`.
+    /// This method is more efficient than `from_twos_complement_limbs_desc`.
     ///
     /// Time: worst case O(n)
     ///
@@ -21,21 +21,21 @@ impl Integer {
     /// ```
     /// use malachite_nz::integer::Integer;
     ///
-    /// assert_eq!(Integer::from_twos_complement_limbs_le(&[]).to_string(), "0");
-    /// assert_eq!(Integer::from_twos_complement_limbs_le(&[123]).to_string(), "123");
-    /// assert_eq!(Integer::from_twos_complement_limbs_le(&[4294967173]).to_string(), "-123");
+    /// assert_eq!(Integer::from_twos_complement_limbs_asc(&[]).to_string(), "0");
+    /// assert_eq!(Integer::from_twos_complement_limbs_asc(&[123]).to_string(), "123");
+    /// assert_eq!(Integer::from_twos_complement_limbs_asc(&[4294967173]).to_string(), "-123");
     /// // 10^12 = 232 * 2^32 + 3567587328
-    /// assert_eq!(Integer::from_twos_complement_limbs_le(&[3567587328, 232]).to_string(),
+    /// assert_eq!(Integer::from_twos_complement_limbs_asc(&[3567587328, 232]).to_string(),
     ///     "1000000000000");
-    /// assert_eq!(Integer::from_twos_complement_limbs_le(&[727379968, 4294967063]).to_string(),
+    /// assert_eq!(Integer::from_twos_complement_limbs_asc(&[727379968, 4294967063]).to_string(),
     ///     "-1000000000000");
     /// ```
-    pub fn from_twos_complement_limbs_le(limbs: &[u32]) -> Integer {
+    pub fn from_twos_complement_limbs_asc(limbs: &[u32]) -> Integer {
         if limbs.is_empty() {
             return Integer::ZERO;
         }
         if !limbs.last().unwrap().get_bit(31) {
-            Natural::from_limbs_le(limbs).into_integer()
+            Natural::from_limbs_asc(limbs).into_integer()
         } else {
             let mut limbs = limbs.to_vec();
             let mut borrow = true;
@@ -52,17 +52,17 @@ impl Integer {
             }
             // At this point borrow must be false, because limbs has some nonzero elements in this
             // branch
-            -Natural::from_limbs_le(&limbs)
+            -Natural::from_limbs_asc(&limbs)
         }
     }
 
-    /// Converts a slice of limbs, or base-2<sup>32</sup> digits, to an `Integer`, in big-endian
+    /// Converts a slice of limbs, or base-2<sup>32</sup> digits, to an `Integer`, in descending
     /// order, so that less significant limbs have higher indices in the input slice. The limbs are
     /// in two's complement, and the most significant bit of the limbs indicates the sign; if the
     /// bit is zero, the `Integer` is non-negative, and if the bit is one it is negative. If `limbs`
     /// is empty, zero is returned.
     ///
-    /// This method is less efficient than `from_twos_complement_limbs_le`.
+    /// This method is less efficient than `from_twos_complement_limbs_asc`.
     ///
     /// Time: worst case O(n)
     ///
@@ -74,16 +74,16 @@ impl Integer {
     /// ```
     /// use malachite_nz::integer::Integer;
     ///
-    /// assert_eq!(Integer::from_twos_complement_limbs_be(&[]).to_string(), "0");
-    /// assert_eq!(Integer::from_twos_complement_limbs_be(&[123]).to_string(), "123");
-    /// assert_eq!(Integer::from_twos_complement_limbs_be(&[4294967173]).to_string(), "-123");
+    /// assert_eq!(Integer::from_twos_complement_limbs_desc(&[]).to_string(), "0");
+    /// assert_eq!(Integer::from_twos_complement_limbs_desc(&[123]).to_string(), "123");
+    /// assert_eq!(Integer::from_twos_complement_limbs_desc(&[4294967173]).to_string(), "-123");
     /// // 10^12 = 232 * 2^32 + 3567587328
-    /// assert_eq!(Integer::from_twos_complement_limbs_be(&[232, 3567587328]).to_string(),
+    /// assert_eq!(Integer::from_twos_complement_limbs_desc(&[232, 3567587328]).to_string(),
     ///     "1000000000000");
-    /// assert_eq!(Integer::from_twos_complement_limbs_be(&[4294967063, 727379968]).to_string(),
+    /// assert_eq!(Integer::from_twos_complement_limbs_desc(&[4294967063, 727379968]).to_string(),
     ///     "-1000000000000");
     /// ```
-    pub fn from_twos_complement_limbs_be(limbs: &[u32]) -> Integer {
-        Integer::from_twos_complement_limbs_le(&limbs.iter().cloned().rev().collect::<Vec<u32>>())
+    pub fn from_twos_complement_limbs_desc(limbs: &[u32]) -> Integer {
+        Integer::from_twos_complement_limbs_asc(&limbs.iter().cloned().rev().collect::<Vec<u32>>())
     }
 }

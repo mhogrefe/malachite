@@ -224,7 +224,7 @@ impl<'a, 'b, 'c> SubMul<&'a Integer, &'b Integer> for &'c Integer {
                 },
             ) => {
                 let mut result_sign = !a_sign;
-                let mut result_limbs = a_abs.to_limbs_le();
+                let mut result_limbs = a_abs.to_limbs_asc();
                 mpz_aorsmul(
                     &mut result_sign,
                     &mut result_limbs,

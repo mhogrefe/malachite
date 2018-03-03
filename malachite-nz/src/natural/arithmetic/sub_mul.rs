@@ -87,7 +87,7 @@ impl<'a, 'b, 'c> SubMul<&'a Natural, &'b Natural> for &'c Natural {
         } else if self.limb_count() < b.limb_count() + c.limb_count() - 1 {
             None
         } else {
-            let mut self_limbs = self.to_limbs_le();
+            let mut self_limbs = self.to_limbs_asc();
             if let Large(ref c_limbs) = *c {
                 let mut self_sign = false;
                 if let Large(ref b_limbs) = *b {

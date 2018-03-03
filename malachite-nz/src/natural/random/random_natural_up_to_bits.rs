@@ -39,5 +39,5 @@ pub fn random_natural_up_to_bits<R: Rng>(rng: &mut R, bits: u64) -> Natural {
     if remainder_bits != 0 {
         *limbs.last_mut().unwrap() &= (1 << remainder_bits) - 1;
     }
-    Natural::from_limbs_le(&limbs)
+    Natural::from_limbs_asc(&limbs)
 }

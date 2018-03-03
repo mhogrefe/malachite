@@ -6,9 +6,9 @@ use std::u32;
 use std::str::FromStr;
 
 #[test]
-fn test_sign_and_limbs_le() {
+fn test_sign_and_limbs_asc() {
     let test = |n, out| {
-        assert_eq!(Integer::from_str(n).unwrap().sign_and_limbs_le(), out);
+        assert_eq!(Integer::from_str(n).unwrap().sign_and_limbs_asc(), out);
     };
     test("0", (Ordering::Equal, Vec::new()));
     test("123", (Ordering::Greater, vec![123]));
@@ -43,9 +43,9 @@ fn test_sign_and_limbs_le() {
 }
 
 #[test]
-fn test_sign_and_limbs_be() {
+fn test_sign_and_limbs_desc() {
     let test = |n, out| {
-        assert_eq!(Integer::from_str(n).unwrap().sign_and_limbs_be(), out);
+        assert_eq!(Integer::from_str(n).unwrap().sign_and_limbs_desc(), out);
     };
     test("0", (Ordering::Equal, Vec::new()));
     test("123", (Ordering::Greater, vec![123]));
@@ -80,12 +80,12 @@ fn test_sign_and_limbs_be() {
 }
 
 #[test]
-fn sign_and_limbs_le_properties() {
+fn sign_and_limbs_asc_properties() {
     test_properties(integers, |x| {
-        let (sign, limbs) = x.sign_and_limbs_le();
-        assert_eq!(Integer::from_sign_and_limbs_le(sign, &limbs), *x);
+        let (sign, limbs) = x.sign_and_limbs_asc();
+        assert_eq!(Integer::from_sign_and_limbs_asc(sign, &limbs), *x);
         assert_eq!(
-            x.sign_and_limbs_be(),
+            x.sign_and_limbs_desc(),
             (sign, limbs.iter().cloned().rev().collect::<Vec<u32>>(),)
         );
         assert_eq!(sign == Ordering::Equal, limbs.is_empty());
@@ -93,17 +93,17 @@ fn sign_and_limbs_le_properties() {
         if *x != 0 {
             assert_ne!(*limbs.last().unwrap(), 0);
         }
-        assert_eq!((-x).sign_and_limbs_le(), (sign.reverse(), limbs));
+        assert_eq!((-x).sign_and_limbs_asc(), (sign.reverse(), limbs));
     });
 }
 
 #[test]
-fn sign_and_limbs_be_properties() {
+fn sign_and_limbs_desc_properties() {
     test_properties(integers, |x| {
-        let (sign, limbs) = x.sign_and_limbs_be();
-        assert_eq!(Integer::from_sign_and_limbs_be(sign, &limbs), *x);
+        let (sign, limbs) = x.sign_and_limbs_desc();
+        assert_eq!(Integer::from_sign_and_limbs_desc(sign, &limbs), *x);
         assert_eq!(
-            x.sign_and_limbs_le(),
+            x.sign_and_limbs_asc(),
             (sign, limbs.iter().cloned().rev().collect::<Vec<u32>>(),)
         );
         assert_eq!(sign == Ordering::Equal, limbs.is_empty());
@@ -111,6 +111,6 @@ fn sign_and_limbs_be_properties() {
         if *x != 0 {
             assert_ne!(limbs[0], 0);
         }
-        assert_eq!((-x).sign_and_limbs_be(), (sign.reverse(), limbs));
+        assert_eq!((-x).sign_and_limbs_desc(), (sign.reverse(), limbs));
     });
 }

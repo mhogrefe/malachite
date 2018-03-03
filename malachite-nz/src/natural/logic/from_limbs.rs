@@ -1,7 +1,7 @@
 use natural::{Large, Natural, Small};
 
 impl Natural {
-    /// Converts a slice of limbs, or base-2<sup>32</sup> digits, to a `Natural`, in little-endian
+    /// Converts a slice of limbs, or base-2<sup>32</sup> digits, to a `Natural`, in ascending
     /// order, so that less significant limbs have lower indices in the input slice.
     ///
     /// Time: worst case O(n)
@@ -10,18 +10,18 @@ impl Natural {
     ///
     /// where n = `limbs.len()`
     ///
-    /// This method is more efficient than `Natural::from_limbs_be`.
+    /// This method is more efficient than `Natural::from_limbs_desc`.
     ///
     /// # Example
     /// ```
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!(Natural::from_limbs_le(&[]).to_string(), "0");
-    /// assert_eq!(Natural::from_limbs_le(&[123]).to_string(), "123");
+    /// assert_eq!(Natural::from_limbs_asc(&[]).to_string(), "0");
+    /// assert_eq!(Natural::from_limbs_asc(&[123]).to_string(), "123");
     /// // 10^12 = 232 * 2^32 + 3567587328
-    /// assert_eq!(Natural::from_limbs_le(&[3567587328, 232]).to_string(), "1000000000000");
+    /// assert_eq!(Natural::from_limbs_asc(&[3567587328, 232]).to_string(), "1000000000000");
     /// ```
-    pub fn from_limbs_le(limbs: &[u32]) -> Natural {
+    pub fn from_limbs_asc(limbs: &[u32]) -> Natural {
         let mut sig_size = 0;
         for (i, limb) in limbs.iter().enumerate().rev() {
             if *limb != 0 {
@@ -37,7 +37,7 @@ impl Natural {
         }
     }
 
-    /// Converts a slice of limbs, or base-2<sup>32</sup> digits, to a `Natural`, in big-endian
+    /// Converts a slice of limbs, or base-2<sup>32</sup> digits, to a `Natural`, in descending
     /// order, so that less significant limbs have higher indices in the input slice.
     ///
     /// Time: worst case O(n)
@@ -46,18 +46,18 @@ impl Natural {
     ///
     /// where n = `limbs.len()`
     ///
-    /// This method is less efficient than `Natural::from_limbs_le`.
+    /// This method is less efficient than `Natural::from_limbs_asc`.
     ///
     /// # Example
     /// ```
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!(Natural::from_limbs_be(&[]).to_string(), "0");
-    /// assert_eq!(Natural::from_limbs_be(&[123]).to_string(), "123");
+    /// assert_eq!(Natural::from_limbs_desc(&[]).to_string(), "0");
+    /// assert_eq!(Natural::from_limbs_desc(&[123]).to_string(), "123");
     /// // 10^12 = 232 * 2^32 + 3567587328
-    /// assert_eq!(Natural::from_limbs_be(&[232, 3567587328]).to_string(), "1000000000000");
+    /// assert_eq!(Natural::from_limbs_desc(&[232, 3567587328]).to_string(), "1000000000000");
     /// ```
-    pub fn from_limbs_be(limbs: &[u32]) -> Natural {
-        Natural::from_limbs_le(&limbs.iter().cloned().rev().collect::<Vec<u32>>())
+    pub fn from_limbs_desc(limbs: &[u32]) -> Natural {
+        Natural::from_limbs_asc(&limbs.iter().cloned().rev().collect::<Vec<u32>>())
     }
 }

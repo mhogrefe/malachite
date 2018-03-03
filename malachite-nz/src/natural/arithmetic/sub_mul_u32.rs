@@ -110,7 +110,7 @@ impl<'a, 'b> SubMul<&'a Natural, u32> for &'b Natural {
                 return self - product;
             }
         }
-        let mut a_limbs = self.to_limbs_le();
+        let mut a_limbs = self.to_limbs_asc();
         let borrow = match *b {
             Small(small_b) => mpn_submul_1(&mut a_limbs[..], &[small_b], c),
             Large(ref b_limbs) => mpn_submul_1(&mut a_limbs[..], b_limbs, c),

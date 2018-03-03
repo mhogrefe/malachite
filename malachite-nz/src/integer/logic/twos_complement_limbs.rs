@@ -1,7 +1,7 @@
 use integer::Integer;
 
 impl Integer {
-    /// Returns the limbs, or base-2<sup>32</sup> digits, of an `Integer`, in little-endian order,
+    /// Returns the limbs, or base-2<sup>32</sup> digits, of an `Integer`, in ascending order,
     /// so that less significant limbs have lower indices in the output vector. The limbs are in
     /// two's complement, and the most significant bit of the limbs indicates the sign; if the bit
     /// is zero, the `Integer` is positive, and if the bit is one it is negative. There are no
@@ -9,7 +9,7 @@ impl Integer {
     /// negative, except as necessary to include the correct sign bit. Zero is a special case: it
     /// contains no limbs.
     ///
-    /// This method is more efficient than `twos_complement_limbs_be`.
+    /// This method is more efficient than `twos_complement_limbs_desc`.
     ///
     /// Time: worst case O(n)
     ///
@@ -26,17 +26,17 @@ impl Integer {
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {
-    ///     assert!(Integer::ZERO.twos_complement_limbs_le().is_empty());
-    ///     assert_eq!(Integer::from(123).twos_complement_limbs_le(), vec![123]);
-    ///     assert_eq!(Integer::from(-123).twos_complement_limbs_le(), vec![4294967173]);
+    ///     assert!(Integer::ZERO.twos_complement_limbs_asc().is_empty());
+    ///     assert_eq!(Integer::from(123).twos_complement_limbs_asc(), vec![123]);
+    ///     assert_eq!(Integer::from(-123).twos_complement_limbs_asc(), vec![4294967173]);
     ///     // 10^12 = 232 * 2^32 + 3567587328
-    ///     assert_eq!(Integer::trillion().twos_complement_limbs_le(), vec![3567587328, 232]);
-    ///     assert_eq!((-Integer::trillion()).twos_complement_limbs_le(),
+    ///     assert_eq!(Integer::trillion().twos_complement_limbs_asc(), vec![3567587328, 232]);
+    ///     assert_eq!((-Integer::trillion()).twos_complement_limbs_asc(),
     ///         vec![727379968, 4294967063]);
     /// }
     /// ```
-    pub fn twos_complement_limbs_le(&self) -> Vec<u32> {
-        let mut limbs = self.natural_abs_ref().into_limbs_le();
+    pub fn twos_complement_limbs_asc(&self) -> Vec<u32> {
+        let mut limbs = self.natural_abs_ref().into_limbs_asc();
         if *self >= 0 {
             if !limbs.is_empty() && limbs.last().unwrap() & 0x8000_0000 != 0 {
                 // Sign-extend with an extra 0 limb to indicate a positive Integer
@@ -65,7 +65,7 @@ impl Integer {
         }
     }
 
-    /// Returns the limbs, or base-2<sup>32</sup> digits, of an `Integer`, in big-endian order, so
+    /// Returns the limbs, or base-2<sup>32</sup> digits, of an `Integer`, in descending order, so
     /// that less significant limbs have higher indices in the output vector. The limbs are in two's
     /// complement, and the most significant bit of the limbs indicates the sign; if the bit is
     /// zero, the `Integer` is positive, and if the bit is one it is negative. There are no
@@ -75,7 +75,7 @@ impl Integer {
     ///
     /// This is similar to how BigIntegers in Java are represented.
     ///
-    /// This method is less efficient than `twos_complement_limbs_le`.
+    /// This method is less efficient than `twos_complement_limbs_asc`.
     ///
     /// Time: worst case O(n)
     ///
@@ -92,15 +92,15 @@ impl Integer {
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {
-    ///     assert!(Integer::ZERO.twos_complement_limbs_be().is_empty());
-    ///     assert_eq!(Integer::from(123).twos_complement_limbs_be(), vec![123]);
-    ///     assert_eq!(Integer::from(-123).twos_complement_limbs_be(), vec![4294967173]);
+    ///     assert!(Integer::ZERO.twos_complement_limbs_desc().is_empty());
+    ///     assert_eq!(Integer::from(123).twos_complement_limbs_desc(), vec![123]);
+    ///     assert_eq!(Integer::from(-123).twos_complement_limbs_desc(), vec![4294967173]);
     ///     // 10^12 = 232 * 2^32 + 3567587328
-    ///     assert_eq!(Integer::trillion().twos_complement_limbs_be(), vec![232, 3567587328]);
-    ///     assert_eq!((-Integer::trillion()).twos_complement_limbs_be(),
+    ///     assert_eq!(Integer::trillion().twos_complement_limbs_desc(), vec![232, 3567587328]);
+    ///     assert_eq!((-Integer::trillion()).twos_complement_limbs_desc(),
     ///         vec![4294967063, 727379968]);
     /// }
-    pub fn twos_complement_limbs_be(&self) -> Vec<u32> {
-        self.twos_complement_limbs_le().into_iter().rev().collect()
+    pub fn twos_complement_limbs_desc(&self) -> Vec<u32> {
+        self.twos_complement_limbs_asc().into_iter().rev().collect()
     }
 }
