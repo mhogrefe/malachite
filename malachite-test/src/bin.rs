@@ -15,6 +15,7 @@ use malachite_test::base::num::flip_bit::*;
 use malachite_test::base::num::get_bit::*;
 use malachite_test::base::num::increment::*;
 use malachite_test::base::num::join_halves::*;
+use malachite_test::base::num::log_two::*;
 use malachite_test::base::num::lower_half::*;
 use malachite_test::base::num::set_bit::*;
 use malachite_test::base::num::significant_bits::*;
@@ -100,6 +101,7 @@ use malachite_test::natural::arithmetic::add_mul_u32::*;
 use malachite_test::natural::arithmetic::divisible_by_power_of_two::*;
 use malachite_test::natural::arithmetic::even_odd::*;
 use malachite_test::natural::arithmetic::is_power_of_two::*;
+use malachite_test::natural::arithmetic::log_two::*;
 use malachite_test::natural::arithmetic::mod_power_of_two::*;
 use malachite_test::natural::arithmetic::mul::*;
 use malachite_test::natural::arithmetic::mul_u32::*;
@@ -351,9 +353,12 @@ demos_and_benchmarks!(
     ],
     [
         demo_contiguous_range_to_char,
+        demo_limbs_ceiling_log_two,
         demo_limbs_delete_left,
+        demo_limbs_floor_log_two,
         demo_limbs_pad_left,
         demo_limbs_set_zero,
+        demo_limbs_significant_bits,
         demo_limbs_test_zero,
         demo_u8_assign_bit,
         demo_u16_assign_bit,
@@ -363,6 +368,10 @@ demos_and_benchmarks!(
         demo_i16_assign_bit,
         demo_i32_assign_bit,
         demo_i64_assign_bit,
+        demo_u8_ceiling_log_two,
+        demo_u16_ceiling_log_two,
+        demo_u32_ceiling_log_two,
+        demo_u64_ceiling_log_two,
         demo_u8_clear_bit,
         demo_u16_clear_bit,
         demo_u32_clear_bit,
@@ -387,6 +396,10 @@ demos_and_benchmarks!(
         demo_i16_flip_bit,
         demo_i32_flip_bit,
         demo_i64_flip_bit,
+        demo_u8_floor_log_two,
+        demo_u16_floor_log_two,
+        demo_u32_floor_log_two,
+        demo_u64_floor_log_two,
         demo_u8_get_bit,
         demo_u16_get_bit,
         demo_u32_get_bit,
@@ -659,6 +672,7 @@ demos_and_benchmarks!(
         demo_natural_assign_u32,
         demo_natural_assign_u64,
         demo_natural_assign_bit,
+        demo_natural_ceiling_log_two,
         demo_natural_clear_bit,
         demo_natural_clone,
         demo_natural_clone_from,
@@ -667,6 +681,7 @@ demos_and_benchmarks!(
         demo_natural_divisible_by_power_of_two,
         demo_natural_eq,
         demo_natural_flip_bit,
+        demo_natural_floor_log_two,
         demo_natural_from_limbs_asc,
         demo_natural_from_limbs_desc,
         demo_natural_from_u32,
@@ -765,6 +780,10 @@ demos_and_benchmarks!(
         benchmark_i16_assign_bit,
         benchmark_i32_assign_bit,
         benchmark_i64_assign_bit,
+        benchmark_u8_ceiling_log_two,
+        benchmark_u16_ceiling_log_two,
+        benchmark_u32_ceiling_log_two,
+        benchmark_u64_ceiling_log_two,
         benchmark_u8_decrement,
         benchmark_u16_decrement,
         benchmark_u32_decrement,
@@ -781,6 +800,10 @@ demos_and_benchmarks!(
         benchmark_i16_flip_bit,
         benchmark_i32_flip_bit,
         benchmark_i64_flip_bit,
+        benchmark_u8_floor_log_two,
+        benchmark_u16_floor_log_two,
+        benchmark_u32_floor_log_two,
+        benchmark_u64_floor_log_two,
         benchmark_u8_get_bit,
         benchmark_u16_get_bit,
         benchmark_u32_get_bit,
@@ -854,9 +877,12 @@ demos_and_benchmarks!(
     ],
     [],
     [
+        benchmark_limbs_ceiling_log_two,
         benchmark_limbs_delete_left,
+        benchmark_limbs_floor_log_two,
         benchmark_limbs_pad_left,
         benchmark_limbs_set_zero,
+        benchmark_limbs_significant_bits,
         benchmark_limbs_test_zero,
         benchmark_integer_from_sign_and_limbs_asc,
         benchmark_integer_from_sign_and_limbs_desc,
@@ -1092,12 +1118,14 @@ demos_and_benchmarks!(
         benchmark_natural_assign_u32,
         benchmark_natural_assign_u64,
         benchmark_natural_assign_bit,
+        benchmark_natural_ceiling_log_two,
         benchmark_natural_clear_bit,
         benchmark_natural_clone_from,
         benchmark_natural_decrement,
         benchmark_natural_divisible_by_power_of_two,
         benchmark_natural_divisible_by_power_of_two_algorithms,
         benchmark_natural_flip_bit,
+        benchmark_natural_floor_log_two,
         benchmark_natural_get_bit,
         benchmark_natural_increment,
         benchmark_natural_is_even,

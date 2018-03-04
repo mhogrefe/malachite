@@ -459,8 +459,13 @@ pub trait PrimitiveInteger
 
 //TODO docs
 pub trait PrimitiveUnsigned
-    : CheckedNextPowerOfTwo + FromU32Slice + IsPowerOfTwo + NextPowerOfTwo + PrimitiveInteger
-    {
+    : CeilingLogTwo
+    + CheckedNextPowerOfTwo
+    + FloorLogTwo
+    + FromU32Slice
+    + IsPowerOfTwo
+    + NextPowerOfTwo
+    + PrimitiveInteger {
     type SignedOfEqualWidth: PrimitiveSigned;
 
     fn to_u32(self) -> u32;
@@ -1048,6 +1053,63 @@ macro_rules! unsigned_traits {
             /// ```
             fn significant_bits(self) -> u64 {
                 (Self::WIDTH - self.leading_zeros()).into()
+            }
+        }
+
+        impl FloorLogTwo for $t {
+            /// Returns the floor of the base-2 logarithm of a positive primitive unsigned integer.
+            ///
+            /// Time: worst case O(1)
+            ///
+            /// Additional memory: worst case O(1)
+            ///
+            /// # Panics
+            /// Panics if `self` is 0.
+            ///
+            /// # Example
+            /// ```
+            /// use malachite_base::num::FloorLogTwo;
+            ///
+            /// fn main() {
+            ///     assert_eq!(1u8.floor_log_two(), 0);
+            ///     assert_eq!(100u64.floor_log_two(), 6);
+            /// }
+            /// ```
+            fn floor_log_two(self) -> u64 {
+                if self == 0 {
+                    panic!("Cannot take the base-2 logarithm of 0.");
+                }
+                self.significant_bits() - 1
+            }
+        }
+
+        impl CeilingLogTwo for $t {
+            /// Returns the ceiling of the base-2 logarithm of a positive primitive unsigned
+            /// integer.
+            ///
+            /// Time: worst case O(1)
+            ///
+            /// Additional memory: worst case O(1)
+            ///
+            /// # Panics
+            /// Panics if `self` is 0.
+            ///
+            /// # Example
+            /// ```
+            /// use malachite_base::num::CeilingLogTwo;
+            ///
+            /// fn main() {
+            ///     assert_eq!(1u8.ceiling_log_two(), 0);
+            ///     assert_eq!(100u64.ceiling_log_two(), 7);
+            /// }
+            /// ```
+            fn ceiling_log_two(self) -> u64 {
+                let floor_log_two = self.floor_log_two();
+                if self.is_power_of_two() {
+                    floor_log_two
+                } else {
+                    floor_log_two + 1
+                }
             }
         }
 
@@ -1818,6 +1880,18 @@ pub trait SignificantBits {
     /// The number of bits it takes to represent `self`. This is useful when benchmarking functions;
     /// the functions' inputs can be bucketed based on their number of significant bits.
     fn significant_bits(self) -> u64;
+}
+
+/// Provides a function to get the floor of the base-2 logarithm of `self`.
+pub trait FloorLogTwo {
+    /// floor(log<sub>2</sub>(`self`))
+    fn floor_log_two(self) -> u64;
+}
+
+/// Provides a function to get the ceiling of the base-2 logarithm of `self`.
+pub trait CeilingLogTwo {
+    /// ceiling(log<sub>2</sub>(`self`))
+    fn ceiling_log_two(self) -> u64;
 }
 
 /// Associates with `Self` a type that's half `Self`'s size.

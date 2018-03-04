@@ -79,6 +79,7 @@ pub fn pairs_of_unsigneds<T: 'static + PrimitiveUnsigned>(
     }
 }
 
+// All `u32`s smaller than `NUMBER_OF_CHARS`.
 pub fn u32s_range_1(gm: NoSpecialGenerationMode) -> It<u32> {
     match gm {
         NoSpecialGenerationMode::Exhaustive => Box::new(range_increasing(0, NUMBER_OF_CHARS - 1)),
@@ -88,6 +89,7 @@ pub fn u32s_range_1(gm: NoSpecialGenerationMode) -> It<u32> {
     }
 }
 
+// All pairs of `u32`s smaller than `NUMBER_OF_CHARS`.
 pub fn pairs_of_u32s_range_1(gm: NoSpecialGenerationMode) -> Box<Iterator<Item = (u32, u32)>> {
     match gm {
         NoSpecialGenerationMode::Exhaustive => Box::new(exhaustive_pairs_from_single(
@@ -271,6 +273,7 @@ fn random_pairs_of_primitive_and_u64_width_range<T: 'static + PrimitiveInteger>(
     ))
 }
 
+// All pairs of unsigned `T` and `u64`, where the `u64` is smaller that `T::WIDTH`.
 pub fn pairs_of_unsigned_and_u64_width_range<T: 'static + PrimitiveUnsigned>(
     gm: GenerationMode,
 ) -> It<(T, u64)> {
@@ -285,6 +288,7 @@ pub fn pairs_of_unsigned_and_u64_width_range<T: 'static + PrimitiveUnsigned>(
     }
 }
 
+// All pairs of signed `T` and `u64`, where the `u64` is smaller that `T::WIDTH`.
 pub fn pairs_of_signed_and_u64_width_range<T: 'static + PrimitiveSigned>(
     gm: GenerationMode,
 ) -> It<(T, u64)> {
@@ -302,6 +306,8 @@ pub fn pairs_of_signed_and_u64_width_range<T: 'static + PrimitiveSigned>(
     }
 }
 
+// All pairs of signed `T` and `u64`, where the signed `T` i s negative or the `u64` is smaller than
+// `T::WIDTH`.
 pub fn pairs_of_signed_and_u64_width_range_var_1<T: 'static + PrimitiveSigned>(
     gm: GenerationMode,
 ) -> It<(T, u64)> {
@@ -311,6 +317,8 @@ pub fn pairs_of_signed_and_u64_width_range_var_1<T: 'static + PrimitiveSigned>(
     )
 }
 
+// All pairs of signed `T` and `u64`, where the signed `T` i s non-negative or the `u64` is smaller
+// than `T::WIDTH`.
 pub fn pairs_of_signed_and_u64_width_range_var_2<T: 'static + PrimitiveSigned>(
     gm: GenerationMode,
 ) -> It<(T, u64)> {
@@ -320,6 +328,8 @@ pub fn pairs_of_signed_and_u64_width_range_var_2<T: 'static + PrimitiveSigned>(
     )
 }
 
+// All triples of unsigned `T`, `u64`, and `bool`, where the `bool` is false or the `u64` is smaller
+// than `T::WIDTH`.
 pub fn triples_of_unsigned_u64_width_range_and_bool_var_1<T: 'static + PrimitiveUnsigned>(
     gm: GenerationMode,
 ) -> It<(T, u64, bool)> {
@@ -344,6 +354,8 @@ pub fn triples_of_unsigned_u64_width_range_and_bool_var_1<T: 'static + Primitive
     Box::new(unfiltered.filter(|&(_, index, bit)| !bit || index < u64::from(T::WIDTH)))
 }
 
+// All triples of signed `T`, `u64`, and `bool`, where the `u64` is smaller than `T::WIDTH` or the
+// `bool` is equal to whether the `T` is negative.
 pub fn triples_of_signed_u64_width_range_and_bool_var_1<T: 'static + PrimitiveSigned>(
     gm: GenerationMode,
 ) -> It<(T, u64, bool)> {
@@ -365,13 +377,9 @@ pub fn triples_of_signed_u64_width_range_and_bool_var_1<T: 'static + PrimitiveSi
             &(|seed| random(seed)),
         )),
     };
-    Box::new(unfiltered.filter(|&(n, index, bit)| {
-        if bit {
-            index < u64::from(T::WIDTH) || n < T::ZERO
-        } else {
-            index < u64::from(T::WIDTH) || n >= T::ZERO
-        }
-    }))
+    Box::new(
+        unfiltered.filter(|&(n, index, bit)| index < u64::from(T::WIDTH) || bit == (n < T::ZERO)),
+    )
 }
 
 pub fn pairs_of_negative_signed_not_min_and_small_u32s<T: 'static + PrimitiveSigned>(
@@ -402,11 +410,11 @@ pub fn chars(gm: NoSpecialGenerationMode) -> Box<Iterator<Item = char>> {
     }
 }
 
-pub fn chars_var_1(gm: NoSpecialGenerationMode) -> Box<Iterator<Item = char>> {
+pub fn chars_not_min(gm: NoSpecialGenerationMode) -> Box<Iterator<Item = char>> {
     Box::new(chars(gm).filter(|&c| c != '\u{0}'))
 }
 
-pub fn chars_var_2(gm: NoSpecialGenerationMode) -> Box<Iterator<Item = char>> {
+pub fn chars_not_max(gm: NoSpecialGenerationMode) -> Box<Iterator<Item = char>> {
     Box::new(chars(gm).filter(|&c| c != char::MAX))
 }
 
@@ -513,6 +521,15 @@ pub fn vecs_of_unsigned<T: 'static + PrimitiveUnsigned>(
     }
 }
 
+// All `Vec<T>`, where `T` is unsigned, the `Vec` is nonempty, and its last `T` is nonzero.
+pub fn vecs_of_unsigned_var_1<T: 'static + PrimitiveUnsigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = Vec<T>>> {
+    Box::new(
+        vecs_of_unsigned(gm).filter(|limbs| !limbs.is_empty() && *limbs.last().unwrap() != T::ZERO),
+    )
+}
+
 fn pairs_of_ordering_and_vec_of_unsigned<T: 'static + PrimitiveUnsigned>(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (Ordering, Vec<T>)>> {
@@ -534,6 +551,8 @@ fn pairs_of_ordering_and_vec_of_unsigned<T: 'static + PrimitiveUnsigned>(
     }
 }
 
+// All pairs of `Ordering` and `Vec<T>` where `T` is unsigned, such that the `Ordering` is
+// `Ordering::Equal` iff all `T`s in the `Vec` are zero.
 pub fn pairs_of_ordering_and_vec_of_unsigned_var_1(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (Ordering, Vec<u32>)>> {
@@ -595,6 +614,8 @@ fn pairs_of_unsigned_vec_and_small_usize<T: 'static + PrimitiveUnsigned>(
     }
 }
 
+// All pairs of `Vec<T>`, where `T` is unsigned, and `usize, where the `usize` is no larger than the
+// length of the `Vec`.
 pub fn pairs_of_unsigned_vec_and_small_usize_var_1<T: 'static + PrimitiveUnsigned>(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (Vec<T>, usize)>> {

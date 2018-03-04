@@ -8,13 +8,13 @@ fn demo_unsigned_significant_bits<T: 'static + PrimitiveUnsigned>(
     limit: usize,
 ) {
     for n in unsigneds::<T>(gm).take(limit) {
-        println!("n.significant_bits({}) = {}", n, n.significant_bits());
+        println!("{}.significant_bits() = {}", n, n.significant_bits());
     }
 }
 
 fn demo_signed_significant_bits<T: 'static + PrimitiveSigned>(gm: GenerationMode, limit: usize) {
     for n in signeds::<T>(gm).take(limit) {
-        println!("n.significant_bits({}) = {}", n, n.significant_bits());
+        println!("{}.significant_bits() = {}", n, n.significant_bits());
     }
 }
 

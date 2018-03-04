@@ -33,6 +33,7 @@ pub mod base {
         pub mod flip_bit;
         pub mod increment;
         pub mod join_halves;
+        pub mod log_two;
         pub mod lower_half;
         pub mod get_bit;
         pub mod set_bit;
@@ -136,6 +137,7 @@ pub mod natural {
         pub mod divisible_by_power_of_two;
         pub mod even_odd;
         pub mod is_power_of_two;
+        pub mod log_two;
         pub mod mod_power_of_two;
         pub mod mul;
         pub mod mul_u32;

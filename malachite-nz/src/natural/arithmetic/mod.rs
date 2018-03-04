@@ -39,6 +39,7 @@ pub mod add_mul_u32;
 pub mod divisible_by_power_of_two;
 pub mod even_odd;
 pub mod is_power_of_two;
+pub mod log_two;
 pub mod mod_power_of_two;
 pub mod mul;
 pub mod mul_u32;

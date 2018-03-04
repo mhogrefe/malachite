@@ -52,6 +52,7 @@ pub fn pairs_of_naturals(gm: GenerationMode) -> Box<Iterator<Item = (Natural, Na
 }
 
 //TODO use subset_pairs
+// All pairs of `Natural`s where the first is greater than or equal to the second.
 pub fn pairs_of_naturals_var_1(gm: GenerationMode) -> Box<Iterator<Item = (Natural, Natural)>> {
     Box::new(pairs_of_naturals(gm).filter(|&(ref x, ref y)| x >= y))
 }
@@ -73,6 +74,8 @@ pub fn triples_of_naturals(
     }
 }
 
+// All triples of `Natural`s where the first is greater than or equal to the product of the second
+// and third.
 pub fn triples_of_naturals_var_1(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (Natural, Natural, Natural)>> {
@@ -116,6 +119,7 @@ pub fn pairs_of_natural_and_unsigned<T: 'static + PrimitiveUnsigned>(
     }
 }
 
+// All pairs of `Natural` and `u32` where the `Natural` is greater than or equal to the `u32`.
 pub fn pairs_of_natural_and_u32_var_1(gm: GenerationMode) -> Box<Iterator<Item = (Natural, u32)>> {
     Box::new(pairs_of_natural_and_unsigned(gm).filter(|&(ref n, u)| *n >= u))
 }
@@ -167,6 +171,8 @@ pub fn triples_of_natural_natural_and_unsigned<T: 'static + PrimitiveUnsigned>(
     }
 }
 
+// All triples of `Natural`, `Natural`, and `u32`, where the first `Natural` is greater than or
+// equal to the product of the second `Natural` and the `u32`.
 pub fn triples_of_natural_natural_and_u32_var_1(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (Natural, Natural, u32)>> {
@@ -194,12 +200,15 @@ pub fn pairs_of_natural_and_small_u32(gm: GenerationMode) -> Box<Iterator<Item =
     }
 }
 
+// All pairs of `Natural` and `u32` where the `Natural` is divisible by 2 to the power of the `u32`.
 pub fn pairs_of_natural_and_small_u32_var_1(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (Natural, u32)>> {
     Box::new(pairs_of_natural_and_small_u32(gm).map(|(n, u)| (n << u, u)))
 }
 
+// All pairs of `Natural` and `u32` where the `Natural` is not divisible by 2 to the power of the
+// `u32`.
 pub fn pairs_of_natural_and_small_u32_var_2(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (Natural, u32)>> {
@@ -395,6 +404,9 @@ fn triples_of_natural_small_i32_and_rounding_mode(
     }
 }
 
+// All triples of `Natural`, `i32`, and `RoundingMode`, such that if the `i32` is negative and the
+// `RoundingMode` is `RoundingMode::Exact`, the `Natural` is divisible by 2 to the power of the
+// negative of the `i32`.
 pub fn triples_of_natural_small_i32_and_rounding_mode_var_1(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (Natural, i32, RoundingMode)>> {
@@ -406,6 +418,9 @@ pub fn triples_of_natural_small_i32_and_rounding_mode_var_1(
     )
 }
 
+// All triples of `Natural`, `i32`, and `RoundingMode`, such that if the `i32` is positive and the
+// `RoundingMode` is `RoundingMode::Exact`, the `Natural` is divisible by 2 to the power of the
+// `i32`.
 pub fn triples_of_natural_small_i32_and_rounding_mode_var_2(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (Natural, i32, RoundingMode)>> {
@@ -439,6 +454,8 @@ fn triples_of_natural_small_u32_and_rounding_mode(
     }
 }
 
+// All triples of `Natural`, `u32`, and `RoundingMode`, where if the `RoundingMode` is
+// `RoundingMode::Exact`, the `Natural` is divisible by 2 to the power of the `u32`.
 pub fn triples_of_natural_small_u32_and_rounding_mode_var_1(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (Natural, u32, RoundingMode)>> {

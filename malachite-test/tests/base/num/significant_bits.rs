@@ -15,6 +15,7 @@ fn significant_bits_helper_common<T: PrimitiveInteger>() {
     test(4, 3);
     test(5, 3);
     test(100, 7);
+    test(128, 8);
 }
 
 fn significant_bits_helper_unsigned<T: PrimitiveUnsigned>(max: u64) {
@@ -56,6 +57,9 @@ fn significant_bits_properties_helper_unsigned<T: 'static + PrimitiveUnsigned>()
         let significant_bits = n.significant_bits();
         assert!(significant_bits <= u64::from(T::WIDTH));
         assert_eq!(significant_bits == 0, n == T::ZERO);
+        if n != T::ZERO {
+            assert_eq!(significant_bits, n.floor_log_two() + 1)
+        }
     });
 }
 

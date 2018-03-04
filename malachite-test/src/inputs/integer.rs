@@ -227,12 +227,15 @@ pub fn pairs_of_integer_and_small_u32(gm: GenerationMode) -> Box<Iterator<Item =
     }
 }
 
+// All pairs of `Integer` and `u32` where the `Integer` is divisible by 2 to the power of the `u32`.
 pub fn pairs_of_integer_and_small_u32_var_1(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (Integer, u32)>> {
     Box::new(pairs_of_integer_and_small_u32(gm).map(|(n, u)| (n << u, u)))
 }
 
+// All pairs of `Natural` and `u32` where the `Natural` is not divisible by 2 to the power of the
+// `u32`.
 pub fn pairs_of_integer_and_small_u32_var_2(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (Integer, u32)>> {
@@ -577,6 +580,9 @@ fn triples_of_integer_small_i32_and_rounding_mode(
     }
 }
 
+// All triples of `Integer`, `i32`, and `RoundingMode`, such that if the `i32` is negative and the
+// `RoundingMode` is `RoundingMode::Exact`, the `Integer` is divisible by 2 to the power of the
+// negative of the `i32`.
 pub fn triples_of_integer_small_i32_and_rounding_mode_var_1(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (Integer, i32, RoundingMode)>> {
@@ -588,6 +594,9 @@ pub fn triples_of_integer_small_i32_and_rounding_mode_var_1(
     )
 }
 
+// All triples of `Integer`, `i32`, and `RoundingMode`, such that if the `i32` is positive and the
+// `RoundingMode` is `RoundingMode::Exact`, the `Integer` is divisible by 2 to the power of the
+// `i32`.
 pub fn triples_of_integer_small_i32_and_rounding_mode_var_2(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (Integer, i32, RoundingMode)>> {
@@ -621,6 +630,8 @@ fn triples_of_integer_small_u32_and_rounding_mode(
     }
 }
 
+// All triples of `Integer`, `u32`, and `RoundingMode`, where if the `RoundingMode` is
+// `RoundingMode::Exact`, the `Integer` is divisible by 2 to the power of the `u32`.
 pub fn triples_of_integer_small_u32_and_rounding_mode_var_1(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (Integer, u32, RoundingMode)>> {
