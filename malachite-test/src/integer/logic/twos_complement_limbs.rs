@@ -40,8 +40,8 @@ pub fn benchmark_integer_twos_complement_limbs_asc(
         x_param: &(|n| n.significant_bits() as usize),
         limit,
         f_name: "malachite",
-        title: "Integer.twos\\\\_complement\\\\_limbs\\\\_le()",
-        x_axis_label: "n.significant\\\\_bits()",
+        title: "Integer.twos_complement_limbs_le()",
+        x_axis_label: "n.significant_bits()",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),
     });
@@ -63,8 +63,8 @@ pub fn benchmark_integer_twos_complement_limbs_desc(
         x_param: &(|n| n.significant_bits() as usize),
         limit,
         f_name: "malachite",
-        title: "Integer.twos\\\\_complement\\\\_limbs\\\\_be()",
-        x_axis_label: "n.significant\\\\_bits()",
+        title: "Integer.twos_complement_limbs_be()",
+        x_axis_label: "n.significant_bits()",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),
     });

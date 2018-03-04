@@ -56,7 +56,7 @@ pub fn benchmark_natural_clone(gm: GenerationMode, limit: usize, file_name: &str
         g_name: "num",
         h_name: "rug",
         title: "Natural.clone()",
-        x_axis_label: "n.significant\\\\_bits()",
+        x_axis_label: "n.significant_bits()",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),
     });
@@ -77,8 +77,8 @@ pub fn benchmark_natural_clone_from(gm: GenerationMode, limit: usize, file_name:
         f_name: "malachite",
         g_name: "num",
         h_name: "rug",
-        title: "Natural.clone\\\\_from(Natural)",
-        x_axis_label: "max(x.significant\\\\_bits(), y.significant\\\\_bits())",
+        title: "Natural.clone_from(Natural)",
+        x_axis_label: "max(x.significant_bits(), y.significant_bits())",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),
     });
@@ -97,7 +97,7 @@ pub fn benchmark_natural_assign(gm: GenerationMode, limit: usize, file_name: &st
         f_name: "malachite",
         g_name: "rug",
         title: "Natural.assign(Natural)",
-        x_axis_label: "max(x.significant\\\\_bits(), y.significant\\\\_bits())",
+        x_axis_label: "max(x.significant_bits(), y.significant_bits())",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),
     });
@@ -121,9 +121,9 @@ pub fn benchmark_natural_assign_evaluation_strategy(
         x_param: &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),
         limit,
         f_name: "Natural.assign(Integer)",
-        g_name: "Natural.assign(\\\\&Natural)",
+        g_name: "Natural.assign(&Natural)",
         title: "Natural.assign(Natural) evaluation strategy",
-        x_axis_label: "max(x.significant\\\\_bits(), y.significant\\\\_bits())",
+        x_axis_label: "max(x.significant_bits(), y.significant_bits())",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),
     });

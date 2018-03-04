@@ -30,7 +30,7 @@ pub fn benchmark_integer_eq(gm: GenerationMode, limit: usize, file_name: &str) {
         g_name: "num",
         h_name: "rug",
         title: "Integer == Integer",
-        x_axis_label: "max(x.significant\\\\_bits(), y.significant\\\\_bits())",
+        x_axis_label: "max(x.significant_bits(), y.significant_bits())",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),
     });

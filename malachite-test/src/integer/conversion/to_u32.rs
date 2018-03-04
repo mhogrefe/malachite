@@ -29,8 +29,8 @@ pub fn benchmark_integer_to_u32(gm: GenerationMode, limit: usize, file_name: &st
         limit,
         f_name: "malachite",
         g_name: "rug",
-        title: "Integer.to\\\\_u32()",
-        x_axis_label: "n.significant\\\\_bits()",
+        title: "Integer.to_u32()",
+        x_axis_label: "n.significant_bits()",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),
     });
@@ -48,8 +48,8 @@ pub fn benchmark_integer_to_u32_wrapping(gm: GenerationMode, limit: usize, file_
         limit,
         f_name: "malachite",
         g_name: "rug",
-        title: "Integer.to\\\\_u32\\\\_wrapping()",
-        x_axis_label: "n.significant\\\\_bits()",
+        title: "Integer.to_u32_wrapping()",
+        x_axis_label: "n.significant_bits()",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),
     });

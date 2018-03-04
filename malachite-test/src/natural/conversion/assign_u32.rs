@@ -36,7 +36,7 @@ pub fn benchmark_natural_assign_u32(gm: GenerationMode, limit: usize, file_name:
         g_name: "num",
         h_name: "rug",
         title: "Natural.assign(u32)",
-        x_axis_label: "n.significant\\\\_bits()",
+        x_axis_label: "n.significant_bits()",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),
     });

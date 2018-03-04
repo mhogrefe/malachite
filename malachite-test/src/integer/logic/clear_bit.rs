@@ -21,8 +21,8 @@ pub fn benchmark_integer_clear_bit(gm: GenerationMode, limit: usize, file_name: 
         x_param: &(|&(ref n, _)| n.significant_bits() as usize),
         limit,
         f_name: "malachite",
-        title: "Integer.clear\\\\_bit(u64)",
-        x_axis_label: "n.significant\\\\_bits()",
+        title: "Integer.clear_bit(u64)",
+        x_axis_label: "n.significant_bits()",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),
     });

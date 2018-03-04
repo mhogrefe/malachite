@@ -35,8 +35,8 @@ pub fn benchmark_integer_partial_cmp_abs_i32(gm: GenerationMode, limit: usize, f
         x_param: &(|&(ref n, _)| n.significant_bits() as usize),
         limit,
         f_name: "malachite",
-        title: "Integer.partial\\\\_cmp\\\\_abs(\\\\&i32)",
-        x_axis_label: "n.significant\\\\_bits()",
+        title: "Integer.partial_cmp_abs(&i32)",
+        x_axis_label: "n.significant_bits()",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),
     });
@@ -51,8 +51,8 @@ pub fn benchmark_i32_partial_cmp_abs_integer(gm: GenerationMode, limit: usize, f
         x_param: &(|&(_, ref n)| n.significant_bits() as usize),
         limit,
         f_name: "malachite",
-        title: "i32.partial\\\\_cmp\\\\_abs(\\\\&Integer)",
-        x_axis_label: "n.significant\\\\_bits()",
+        title: "i32.partial_cmp_abs(&Integer)",
+        x_axis_label: "n.significant_bits()",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),
     });

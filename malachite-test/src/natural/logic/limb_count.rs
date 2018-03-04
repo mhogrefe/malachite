@@ -19,8 +19,8 @@ pub fn benchmark_natural_limb_count(gm: GenerationMode, limit: usize, file_name:
         x_param: &(|n| n.significant_bits() as usize),
         limit,
         f_name: "malachite",
-        title: "Natural.limb\\\\_count()",
-        x_axis_label: "n.significant\\\\_bits()",
+        title: "Natural.limb_count()",
+        x_axis_label: "n.significant_bits()",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),
     });

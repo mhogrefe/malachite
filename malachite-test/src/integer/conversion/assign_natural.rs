@@ -39,7 +39,7 @@ pub fn benchmark_integer_assign_natural(gm: GenerationMode, limit: usize, file_n
         f_name: "malachite",
         g_name: "rug",
         title: "Integer.assign(Natural)",
-        x_axis_label: "max(x.significant\\\\_bits(), y.significant\\\\_bits())",
+        x_axis_label: "max(x.significant_bits(), y.significant_bits())",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),
     });
@@ -63,9 +63,9 @@ pub fn benchmark_integer_assign_natural_evaluation_strategy(
         x_param: &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),
         limit,
         f_name: "Integer.assign(Natural)",
-        g_name: "Integer.assign(\\\\&Natural)",
+        g_name: "Integer.assign(&Natural)",
         title: "Integer.assign(Natural) evaluation strategy",
-        x_axis_label: "max(x.significant\\\\_bits(), y.significant\\\\_bits())",
+        x_axis_label: "max(x.significant_bits(), y.significant_bits())",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),
     });

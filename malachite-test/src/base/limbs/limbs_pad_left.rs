@@ -30,7 +30,7 @@ pub fn benchmark_limbs_pad_left(gm: GenerationMode, limit: usize, file_name: &st
         x_param: &(|&(ref limbs, _, _)| limbs.len()),
         limit,
         f_name: "malachite",
-        title: "limbs\\\\_pad\\\\_left(\\\\&mut Vec<u32>, usize, u32)",
+        title: "limbs_pad_left(&mut Vec<u32>, usize, u32)",
         x_axis_label: "limbs.len()",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),

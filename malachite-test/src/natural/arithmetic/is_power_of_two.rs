@@ -23,8 +23,8 @@ pub fn benchmark_natural_is_power_of_two(gm: GenerationMode, limit: usize, file_
         x_param: &(|n| n.significant_bits() as usize),
         limit,
         f_name: "malachite",
-        title: "Natural.is\\\\_power\\\\_of\\\\_two()",
-        x_axis_label: "n.significant\\\\_bits()",
+        title: "Natural.is_power_of_two()",
+        x_axis_label: "n.significant_bits()",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),
     });

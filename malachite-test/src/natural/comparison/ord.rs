@@ -32,8 +32,8 @@ pub fn benchmark_natural_cmp(gm: GenerationMode, limit: usize, file_name: &str) 
         f_name: "malachite",
         g_name: "num",
         h_name: "rug",
-        title: "Natural.cmp(\\\\&Natural)",
-        x_axis_label: "max(x.significant\\\\_bits(), y.significant\\\\_bits())",
+        title: "Natural.cmp(&Natural)",
+        x_axis_label: "max(x.significant_bits(), y.significant_bits())",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),
     });

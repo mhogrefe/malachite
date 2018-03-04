@@ -23,7 +23,7 @@ pub fn benchmark_natural_increment(gm: GenerationMode, limit: usize, file_name: 
         limit,
         f_name: "malachite",
         title: "Natural.increment()",
-        x_axis_label: "n.significant\\\\_bits()",
+        x_axis_label: "n.significant_bits()",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),
     });

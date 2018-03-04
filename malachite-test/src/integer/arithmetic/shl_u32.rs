@@ -78,7 +78,7 @@ pub fn benchmark_integer_shl_u32_ref(gm: GenerationMode, limit: usize, file_name
         limit,
         f_name: "malachite",
         g_name: "num",
-        title: "\\\\&Integer << u32",
+        title: "&Integer << u32",
         x_axis_label: "other",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),

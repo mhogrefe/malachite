@@ -25,8 +25,8 @@ pub fn benchmark_integer_sign_and_limbs_asc(gm: GenerationMode, limit: usize, fi
         x_param: &(|n| n.significant_bits() as usize),
         limit,
         f_name: "malachite",
-        title: "Integer.sign\\\\_and\\\\_limbs\\\\_le()",
-        x_axis_label: "n.significant\\\\_bits()",
+        title: "Integer.sign_and_limbs_le()",
+        x_axis_label: "n.significant_bits()",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),
     });
@@ -41,8 +41,8 @@ pub fn benchmark_integer_sign_and_limbs_desc(gm: GenerationMode, limit: usize, f
         x_param: &(|n| n.significant_bits() as usize),
         limit,
         f_name: "malachite",
-        title: "Integer.sign\\\\_and\\\\_limbs\\\\_be()",
-        x_axis_label: "n.significant\\\\_bits()",
+        title: "Integer.sign_and_limbs_be()",
+        x_axis_label: "n.significant_bits()",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),
     });

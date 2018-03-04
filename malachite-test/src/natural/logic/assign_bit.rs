@@ -31,8 +31,8 @@ pub fn benchmark_natural_assign_bit(gm: GenerationMode, limit: usize, file_name:
         limit,
         f_name: "malachite",
         g_name: "rug",
-        title: "Natural.assign\\\\_bit(u64, bool)",
-        x_axis_label: "max(n.significant\\\\_bits(), index)",
+        title: "Natural.assign_bit(u64, bool)",
+        x_axis_label: "max(n.significant_bits(), index)",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),
     });

@@ -55,8 +55,8 @@ pub fn benchmark_integer_abs_assign(gm: GenerationMode, limit: usize, file_name:
         f_name: "malachite",
         g_name: "num",
         h_name: "rug",
-        title: "Integer.abs\\\\_assign()",
-        x_axis_label: "n.significant\\\\_bits()",
+        title: "Integer.abs_assign()",
+        x_axis_label: "n.significant_bits()",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),
     });
@@ -72,7 +72,7 @@ pub fn benchmark_integer_abs(gm: GenerationMode, limit: usize, file_name: &str) 
         limit,
         f_name: "malachite",
         title: "Integer.abs()",
-        x_axis_label: "n.significant\\\\_bits()",
+        x_axis_label: "n.significant_bits()",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),
     });
@@ -98,7 +98,7 @@ pub fn benchmark_integer_abs_evaluation_strategy(
         f_name: "Integer.abs()",
         g_name: "Integer.abs_ref()",
         title: "Integer.abs() evaluation strategy",
-        x_axis_label: "n.significant\\\\_bits()",
+        x_axis_label: "n.significant_bits()",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),
     });
@@ -113,8 +113,8 @@ pub fn benchmark_integer_natural_abs(gm: GenerationMode, limit: usize, file_name
         x_param: &(|n| n.significant_bits() as usize),
         limit,
         f_name: "malachite",
-        title: "Integer.natural\\\\_abs()",
-        x_axis_label: "n.significant\\\\_bits()",
+        title: "Integer.natural_abs()",
+        x_axis_label: "n.significant_bits()",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),
     });
@@ -139,8 +139,8 @@ pub fn benchmark_integer_natural_abs_evaluation_strategy(
         limit,
         f_name: "Integer.natural_abs()",
         g_name: "Integer.natural_abs_ref()",
-        title: "Integer.natural\\\\_abs() evaluation strategy",
-        x_axis_label: "n.significant\\\\_bits()",
+        title: "Integer.natural_abs() evaluation strategy",
+        x_axis_label: "n.significant_bits()",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),
     });

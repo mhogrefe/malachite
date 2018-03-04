@@ -45,7 +45,7 @@ pub fn benchmark_integer_partial_eq_i32(gm: GenerationMode, limit: usize, file_n
         g_name: "num",
         h_name: "rug",
         title: "Integer == i32",
-        x_axis_label: "n.significant\\\\_bits()",
+        x_axis_label: "n.significant_bits()",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),
     });
@@ -64,7 +64,7 @@ pub fn benchmark_i32_partial_eq_integer(gm: GenerationMode, limit: usize, file_n
         f_name: "malachite",
         g_name: "rug",
         title: "i32 == Integer",
-        x_axis_label: "n.significant\\\\_bits()",
+        x_axis_label: "n.significant_bits()",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),
     });

@@ -37,7 +37,7 @@ pub fn benchmark_integer_partial_eq_natural(gm: GenerationMode, limit: usize, fi
         f_name: "malachite",
         g_name: "rug",
         title: "Integer == Natural",
-        x_axis_label: "max(x.significant\\\\_bits(), y.significant\\\\_bits())",
+        x_axis_label: "max(x.significant_bits(), y.significant_bits())",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),
     });
@@ -56,7 +56,7 @@ pub fn benchmark_natural_partial_eq_integer(gm: GenerationMode, limit: usize, fi
         f_name: "malachite",
         g_name: "rug",
         title: "Natural == Integer",
-        x_axis_label: "max(x.significant\\\\_bits(), y.significant\\\\_bits())",
+        x_axis_label: "max(x.significant_bits(), y.significant_bits())",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),
     });

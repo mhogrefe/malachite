@@ -36,8 +36,8 @@ pub fn benchmark_natural_random_natural_up_to_bits(
         x_param: &(|&bits| bits.significant_bits() as usize),
         limit,
         f_name: "malachite",
-        title: "Natural::random\\\\_natural\\\\_up\\\\_to\\\\_bits(\\\\&mut Rng, u64)",
-        x_axis_label: "bits.significant\\\\_bits()",
+        title: "Natural::random_natural_up_to_bits(&mut Rng, u64)",
+        x_axis_label: "bits.significant_bits()",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),
     });

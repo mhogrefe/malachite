@@ -24,7 +24,7 @@ pub fn benchmark_integer_from_i64(gm: GenerationMode, limit: usize, file_name: &
         f_name: "malachite",
         g_name: "num",
         title: "Integer::from(i64)",
-        x_axis_label: "i.significant\\\\_bits()",
+        x_axis_label: "i.significant_bits()",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),
     });

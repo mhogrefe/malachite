@@ -33,8 +33,8 @@ pub fn benchmark_natural_is_even(gm: GenerationMode, limit: usize, file_name: &s
         x_param: &(|n| n.significant_bits() as usize),
         limit,
         f_name: "malachite",
-        title: "Natural.is\\\\_even()",
-        x_axis_label: "n.significant\\\\_bits()",
+        title: "Natural.is_even()",
+        x_axis_label: "n.significant_bits()",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),
     });
@@ -49,8 +49,8 @@ pub fn benchmark_natural_is_odd(gm: GenerationMode, limit: usize, file_name: &st
         x_param: &(|n| n.significant_bits() as usize),
         limit,
         f_name: "malachite",
-        title: "Natural.is\\\\_odd()",
-        x_axis_label: "n.significant\\\\_bits()",
+        title: "Natural.is_odd()",
+        x_axis_label: "n.significant_bits()",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),
     });

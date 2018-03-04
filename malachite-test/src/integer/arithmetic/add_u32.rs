@@ -103,9 +103,9 @@ pub fn benchmark_integer_add_u32_evaluation_strategy(
         x_param: &(|&(ref n, _)| n.significant_bits() as usize),
         limit,
         f_name: "Integer + u32",
-        g_name: "\\\\&Integer + u32",
+        g_name: "&Integer + u32",
         title: "Integer + u32 evaluation strategy",
-        x_axis_label: "n.significant\\\\_bits()",
+        x_axis_label: "n.significant_bits()",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),
     });
@@ -148,9 +148,9 @@ pub fn benchmark_u32_add_integer_evaluation_strategy(
         x_param: &(|&(_, ref n)| n.significant_bits() as usize),
         limit,
         f_name: "u32 + Integer",
-        g_name: "u32 + \\\\&Integer",
+        g_name: "u32 + &Integer",
         title: "u32 + Integer evaluation strategy",
-        x_axis_label: "n.significant\\\\_bits()",
+        x_axis_label: "n.significant_bits()",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),
     });

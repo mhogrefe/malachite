@@ -35,7 +35,7 @@ pub fn benchmark_natural_set_bit(gm: GenerationMode, limit: usize, file_name: &s
         f_name: "malachite",
         g_name: "num",
         h_name: "rug",
-        title: "Natural.set\\\\_bit(u64)",
+        title: "Natural.set_bit(u64)",
         x_axis_label: "index",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),

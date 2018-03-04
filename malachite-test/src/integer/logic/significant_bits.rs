@@ -27,8 +27,8 @@ pub fn benchmark_integer_significant_bits(gm: GenerationMode, limit: usize, file
         f_name: "malachite",
         g_name: "num",
         h_name: "rug",
-        title: "Integer.significant\\\\_bits()",
-        x_axis_label: "n.significant\\\\_bits()",
+        title: "Integer.significant_bits()",
+        x_axis_label: "n.significant_bits()",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),
     });

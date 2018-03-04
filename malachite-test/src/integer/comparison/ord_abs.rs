@@ -29,8 +29,8 @@ pub fn benchmark_integer_cmp_abs(gm: GenerationMode, limit: usize, file_name: &s
         limit,
         f_name: "malachite",
         g_name: "rug",
-        title: "Integer.cmp\\\\_abs(\\\\&Integer)",
-        x_axis_label: "max(x.significant\\\\_bits(), y.significant\\\\_bits())",
+        title: "Integer.cmp_abs(&Integer)",
+        x_axis_label: "max(x.significant_bits(), y.significant_bits())",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),
     });

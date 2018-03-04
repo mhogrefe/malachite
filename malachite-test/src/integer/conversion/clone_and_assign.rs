@@ -56,7 +56,7 @@ pub fn benchmark_integer_clone(gm: GenerationMode, limit: usize, file_name: &str
         g_name: "num",
         h_name: "rug",
         title: "Integer.clone()",
-        x_axis_label: "n.significant\\\\_bits()",
+        x_axis_label: "n.significant_bits()",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),
     });
@@ -77,8 +77,8 @@ pub fn benchmark_integer_clone_from(gm: GenerationMode, limit: usize, file_name:
         f_name: "malachite",
         g_name: "num",
         h_name: "rug",
-        title: "Integer.clone\\\\_from(Integer)",
-        x_axis_label: "max(x.significant\\\\_bits(), y.significant\\\\_bits())",
+        title: "Integer.clone_from(Integer)",
+        x_axis_label: "max(x.significant_bits(), y.significant_bits())",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),
     });
@@ -97,7 +97,7 @@ pub fn benchmark_integer_assign(gm: GenerationMode, limit: usize, file_name: &st
         f_name: "malachite",
         g_name: "rug",
         title: "Integer.assign(Integer)",
-        x_axis_label: "max(x.significant\\\\_bits(), y.significant\\\\_bits())",
+        x_axis_label: "max(x.significant_bits(), y.significant_bits())",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),
     });
@@ -121,9 +121,9 @@ pub fn benchmark_integer_assign_evaluation_strategy(
         x_param: &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),
         limit,
         f_name: "Integer.assign(Integer)",
-        g_name: "Integer.assign(\\\\&Integer)",
+        g_name: "Integer.assign(&Integer)",
         title: "Integer.assign(Integer) evaluation strategy",
-        x_axis_label: "max(x.significant\\\\_bits(), y.significant\\\\_bits())",
+        x_axis_label: "max(x.significant_bits(), y.significant_bits())",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),
     });

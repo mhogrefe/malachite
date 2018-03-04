@@ -60,8 +60,8 @@ pub fn benchmark_natural_sub_mul_assign(gm: GenerationMode, limit: usize, file_n
         }),
         limit,
         f_name: "malachite",
-        title: "Natural.sub\\\\_mul\\\\_assign(\\\\&Natural, \\\\&Natural)",
-        x_axis_label: "max(a.significant\\\\_bits(), b.significant\\\\_bits())",
+        title: "Natural.sub_mul_assign(&Natural, &Natural)",
+        x_axis_label: "max(a.significant_bits(), b.significant_bits())",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),
     });
@@ -89,10 +89,10 @@ pub fn benchmark_natural_sub_mul_assign_algorithms(
             ) as usize
         }),
         limit,
-        f_name: "Natural.sub\\\\_mul\\\\_assign(\\\\&Natural, \\\\&Natural)",
-        g_name: "Natural -= \\\\&Natural * \\\\&Natural",
-        title: "Natural.sub\\\\_mul\\\\_assign(\\\\&Natural, \\\\&Natural) algorithms",
-        x_axis_label: "max(a.significant\\\\_bits(), b.significant\\\\_bits())",
+        f_name: "Natural.sub_mul_assign(&Natural, &Natural)",
+        g_name: "Natural -= &Natural * &Natural",
+        title: "Natural.sub_mul_assign(&Natural, &Natural) algorithms",
+        x_axis_label: "max(a.significant_bits(), b.significant_bits())",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),
     });
@@ -115,8 +115,8 @@ pub fn benchmark_natural_sub_mul(gm: GenerationMode, limit: usize, file_name: &s
         }),
         limit,
         f_name: "malachite",
-        title: "Natural.sub\\\\_mul(\\\\&Natural, \\\\&Natural)",
-        x_axis_label: "max(a.significant\\\\_bits(), b.significant\\\\_bits())",
+        title: "Natural.sub_mul(&Natural, &Natural)",
+        x_axis_label: "max(a.significant_bits(), b.significant_bits())",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),
     });
@@ -144,10 +144,10 @@ pub fn benchmark_natural_sub_mul_evaluation_strategy(
             ) as usize
         }),
         limit,
-        f_name: "Natural.sub\\\\_mul(\\\\&Natural, \\\\&Natural)",
-        g_name: "(\\\\&Natural).sub\\\\_mul(\\\\&Natural, \\\\&Natural)",
-        title: "Natural.sub\\\\_mul(\\\\&Natural, \\\\&Natural) evaluation strategy",
-        x_axis_label: "max(a.significant\\\\_bits(), b.significant\\\\_bits())",
+        f_name: "Natural.sub_mul(&Natural, &Natural)",
+        g_name: "(&Natural).sub_mul(&Natural, &Natural)",
+        title: "Natural.sub_mul(&Natural, &Natural) evaluation strategy",
+        x_axis_label: "max(a.significant_bits(), b.significant_bits())",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),
     });
@@ -171,10 +171,10 @@ pub fn benchmark_natural_sub_mul_algorithms(gm: GenerationMode, limit: usize, fi
             ) as usize
         }),
         limit,
-        f_name: "Natural.sub\\\\_mul(\\\\&Natural, \\\\&Natural)",
-        g_name: "Natural - \\\\&Natural * \\\\&Natural",
-        title: "Natural.sub\\\\_mul(\\\\&Natural, \\\\&Natural) algorithms",
-        x_axis_label: "max(a.significant\\\\_bits(), b.significant\\\\_bits())",
+        f_name: "Natural.sub_mul(&Natural, &Natural)",
+        g_name: "Natural - &Natural * &Natural",
+        title: "Natural.sub_mul(&Natural, &Natural) algorithms",
+        x_axis_label: "max(a.significant_bits(), b.significant_bits())",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),
     });
@@ -198,10 +198,10 @@ pub fn benchmark_natural_sub_mul_ref_algorithms(gm: GenerationMode, limit: usize
             ) as usize
         }),
         limit,
-        f_name: "(\\\\&Natural).sub\\\\_mul(\\\\&Natural, \\\\&Natural)",
-        g_name: "(\\\\&Natural) - \\\\&Natural * \\\\&Natural",
-        title: "(\\\\&Natural).sub\\\\_mul(\\\\&Natural, \\\\&Natural) algorithms",
-        x_axis_label: "max(a.significant\\\\_bits(), b.significant\\\\_bits())",
+        f_name: "(&Natural).sub_mul(&Natural, &Natural)",
+        g_name: "(&Natural) - &Natural * &Natural",
+        title: "(&Natural).sub_mul(&Natural, &Natural) algorithms",
+        x_axis_label: "max(a.significant_bits(), b.significant_bits())",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),
     });

@@ -19,8 +19,8 @@ pub fn benchmark_integer_trailing_zeros(gm: GenerationMode, limit: usize, file_n
         x_param: &(|n| n.significant_bits() as usize),
         limit,
         f_name: "malachite",
-        title: "Integer.trailing\\\\_zeros()",
-        x_axis_label: "n.significant\\\\_bits()",
+        title: "Integer.trailing_zeros()",
+        x_axis_label: "n.significant_bits()",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),
     });

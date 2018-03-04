@@ -24,7 +24,7 @@ pub fn benchmark_natural_hash(gm: GenerationMode, limit: usize, file_name: &str)
         f_name: "malachite",
         g_name: "num",
         title: "Natural hash",
-        x_axis_label: "n.significant\\\\_bits()",
+        x_axis_label: "n.significant_bits()",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),
     });

@@ -28,7 +28,7 @@ pub fn benchmark_limbs_delete_left(gm: GenerationMode, limit: usize, file_name: 
         x_param: &(|&(ref limbs, _)| limbs.len()),
         limit,
         f_name: "malachite",
-        title: "limbs\\\\_delete\\\\_left(\\\\&mut Vec<u32>, usize)",
+        title: "limbs_delete_left(&mut Vec<u32>, usize)",
         x_axis_label: "limbs.len()",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),

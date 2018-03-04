@@ -25,8 +25,8 @@ pub fn benchmark_natural_to_u64(gm: GenerationMode, limit: usize, file_name: &st
         x_param: &(|n| n.significant_bits() as usize),
         limit,
         f_name: "malachite",
-        title: "Natural.to\\\\_u64()",
-        x_axis_label: "n.significant\\\\_bits()",
+        title: "Natural.to_u64()",
+        x_axis_label: "n.significant_bits()",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),
     });
@@ -41,8 +41,8 @@ pub fn benchmark_natural_to_u64_wrapping(gm: GenerationMode, limit: usize, file_
         x_param: &(|n| n.significant_bits() as usize),
         limit,
         f_name: "malachite",
-        title: "Natural.to\\\\_u64\\\\_wrapping()",
-        x_axis_label: "n.significant\\\\_bits()",
+        title: "Natural.to_u64_wrapping()",
+        x_axis_label: "n.significant_bits()",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),
     });

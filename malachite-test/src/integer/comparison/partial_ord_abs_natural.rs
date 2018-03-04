@@ -47,8 +47,8 @@ pub fn benchmark_integer_partial_cmp_abs_natural(
         limit,
         f_name: "malachite",
         g_name: "rug",
-        title: "Integer.partial\\\\_cmp\\\\_abs(\\\\&Natural)",
-        x_axis_label: "max(x.significant\\\\_bits(), y.significant\\\\_bits())",
+        title: "Integer.partial_cmp_abs(&Natural)",
+        x_axis_label: "max(x.significant_bits(), y.significant_bits())",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),
     });
@@ -73,8 +73,8 @@ pub fn benchmark_natural_partial_cmp_abs_integer(
         limit,
         f_name: "malachite",
         g_name: "rug",
-        title: "Natural.partial\\\\_cmp\\\\_abs(\\\\&Integer)",
-        x_axis_label: "max(x.significant\\\\_bits(), y.significant\\\\_bits())",
+        title: "Natural.partial_cmp_abs(&Integer)",
+        x_axis_label: "max(x.significant_bits(), y.significant_bits())",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),
     });

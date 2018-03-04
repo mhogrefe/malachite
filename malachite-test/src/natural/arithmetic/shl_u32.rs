@@ -78,7 +78,7 @@ pub fn benchmark_natural_shl_u32_ref(gm: GenerationMode, limit: usize, file_name
         limit,
         f_name: "malachite",
         g_name: "num",
-        title: "\\\\&Natural << u32",
+        title: "&Natural << u32",
         x_axis_label: "other",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),

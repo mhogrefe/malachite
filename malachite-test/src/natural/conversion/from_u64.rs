@@ -24,7 +24,7 @@ pub fn benchmark_natural_from_u64(gm: GenerationMode, limit: usize, file_name: &
         f_name: "malachite",
         g_name: "num",
         title: "Natural::from(u64)",
-        x_axis_label: "u.significant\\\\_bits()",
+        x_axis_label: "u.significant_bits()",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),
     });

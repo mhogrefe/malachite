@@ -38,7 +38,7 @@ pub fn benchmark_integer_neg_assign(gm: GenerationMode, limit: usize, file_name:
         limit,
         f_name: "malachite",
         title: "Integer.neg_assign()",
-        x_axis_label: "n.significant\\\\_bits()",
+        x_axis_label: "n.significant_bits()",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),
     });
@@ -60,7 +60,7 @@ pub fn benchmark_integer_neg(gm: GenerationMode, limit: usize, file_name: &str) 
         g_name: "num",
         h_name: "rug",
         title: "-Integer",
-        x_axis_label: "n.significant\\\\_bits()",
+        x_axis_label: "n.significant_bits()",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),
     });
@@ -81,9 +81,9 @@ pub fn benchmark_integer_neg_evaluation_strategy(
         x_param: &(|n| n.significant_bits() as usize),
         limit,
         f_name: "-Integer",
-        g_name: "-\\\\&Integer",
+        g_name: "-&Integer",
         title: "-Integer evaluation strategy",
-        x_axis_label: "n.significant\\\\_bits()",
+        x_axis_label: "n.significant_bits()",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),
     });

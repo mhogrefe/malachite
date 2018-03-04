@@ -46,8 +46,8 @@ pub fn benchmark_natural_partial_cmp_u32(gm: GenerationMode, limit: usize, file_
         f_name: "malachite",
         g_name: "num",
         h_name: "rug",
-        title: "Natural.partial\\\\_cmp(\\\\&u32)",
-        x_axis_label: "n.significant\\\\_bits()",
+        title: "Natural.partial_cmp(&u32)",
+        x_axis_label: "n.significant_bits()",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),
     });
@@ -65,8 +65,8 @@ pub fn benchmark_u32_partial_cmp_natural(gm: GenerationMode, limit: usize, file_
         limit,
         f_name: "malachite",
         g_name: "rug",
-        title: "u32.partial\\\\_cmp(\\\\&Natural)",
-        x_axis_label: "n.significant\\\\_bits()",
+        title: "u32.partial_cmp(&Natural)",
+        x_axis_label: "n.significant_bits()",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),
     });

@@ -23,7 +23,7 @@ pub fn benchmark_integer_get_bit(gm: GenerationMode, limit: usize, file_name: &s
         limit,
         f_name: "malachite",
         g_name: "rug",
-        title: "Integer.get\\\\_bit(u64)",
+        title: "Integer.get_bit(u64)",
         x_axis_label: "index",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),

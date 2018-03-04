@@ -26,7 +26,7 @@ pub fn benchmark_natural_neg(gm: GenerationMode, limit: usize, file_name: &str) 
         limit,
         f_name: "malachite",
         title: "-Natural",
-        x_axis_label: "n.significant\\\\_bits()",
+        x_axis_label: "n.significant_bits()",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),
     });
@@ -47,9 +47,9 @@ pub fn benchmark_natural_neg_evaluation_strategy(
         x_param: &(|n| n.significant_bits() as usize),
         limit,
         f_name: "-Natural",
-        g_name: "-\\\\&Natural",
+        g_name: "-&Natural",
         title: "-Natural evaluation strategy",
-        x_axis_label: "n.significant\\\\_bits()",
+        x_axis_label: "n.significant_bits()",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),
     });

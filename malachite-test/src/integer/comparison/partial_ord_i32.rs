@@ -46,8 +46,8 @@ pub fn benchmark_integer_partial_cmp_i32(gm: GenerationMode, limit: usize, file_
         f_name: "malachite",
         g_name: "num",
         h_name: "rug",
-        title: "Integer.partial\\\\_cmp(\\\\&i32)",
-        x_axis_label: "n.significant\\\\_bits()",
+        title: "Integer.partial_cmp(&i32)",
+        x_axis_label: "n.significant_bits()",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),
     });
@@ -65,8 +65,8 @@ pub fn benchmark_i32_partial_cmp_integer(gm: GenerationMode, limit: usize, file_
         limit,
         f_name: "malachite",
         g_name: "rug",
-        title: "i32.partial\\\\_cmp(\\\\&Integer)",
-        x_axis_label: "n.significant\\\\_bits()",
+        title: "i32.partial_cmp(&Integer)",
+        x_axis_label: "n.significant_bits()",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),
     });

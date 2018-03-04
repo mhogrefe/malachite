@@ -28,7 +28,7 @@ pub fn benchmark_integer_from_i32(gm: GenerationMode, limit: usize, file_name: &
         g_name: "num",
         h_name: "rug",
         title: "Integer::from(i32)",
-        x_axis_label: "i.significant\\\\_bits()",
+        x_axis_label: "i.significant_bits()",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),
     });

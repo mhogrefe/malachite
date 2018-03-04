@@ -22,7 +22,7 @@ pub fn benchmark_limbs_test_zero(gm: GenerationMode, limit: usize, file_name: &s
         x_param: &(|xs| xs.len()),
         limit,
         f_name: "malachite",
-        title: "limbs\\\\_test\\\\_zero(\\\\&[u32])",
+        title: "limbs_test_zero(&[u32])",
         x_axis_label: "xs.len()",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),

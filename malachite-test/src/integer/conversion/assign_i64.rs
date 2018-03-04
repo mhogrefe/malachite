@@ -31,7 +31,7 @@ pub fn benchmark_integer_assign_i64(gm: GenerationMode, limit: usize, file_name:
         f_name: "malachite",
         g_name: "num",
         title: "Integer.assign(i64)",
-        x_axis_label: "n.significant\\\\_bits()",
+        x_axis_label: "n.significant_bits()",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),
     });

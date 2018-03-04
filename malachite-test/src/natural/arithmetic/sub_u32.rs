@@ -103,7 +103,7 @@ pub fn benchmark_natural_sub_u32_ref(gm: GenerationMode, limit: usize, file_name
         x_param: &(|&(ref n, _)| n.significant_bits() as usize),
         limit,
         f_name: "malachite",
-        title: "\\\\&Natural - u32",
+        title: "&Natural - u32",
         x_axis_label: "other",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),

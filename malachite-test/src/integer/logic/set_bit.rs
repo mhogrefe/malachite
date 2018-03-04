@@ -21,7 +21,7 @@ pub fn benchmark_integer_set_bit(gm: GenerationMode, limit: usize, file_name: &s
         x_param: &(|&(_, index)| index as usize),
         limit,
         f_name: "malachite",
-        title: "Integer.set\\\\_bit(u64)",
+        title: "Integer.set_bit(u64)",
         x_axis_label: "index",
         y_axis_label: "time (ns)",
         file_name: &format!("benchmarks/{}", file_name),
