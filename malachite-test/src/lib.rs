@@ -104,12 +104,14 @@ pub mod integer {
         pub mod clone_and_assign;
         pub mod from_i32;
         pub mod from_i64;
+        pub mod from_sign_and_limbs;
         pub mod from_u32;
         pub mod from_u64;
         pub mod natural_assign_integer;
         pub mod to_i32;
         pub mod to_i64;
         pub mod to_natural;
+        pub mod to_sign_and_limbs;
         pub mod to_u32;
         pub mod to_u64;
     }
@@ -117,12 +119,10 @@ pub mod integer {
         pub mod assign_bit;
         pub mod clear_bit;
         pub mod flip_bit;
-        pub mod from_sign_and_limbs;
         pub mod from_twos_complement_limbs;
         pub mod get_bit;
         pub mod not;
         pub mod set_bit;
-        pub mod sign_and_limbs;
         pub mod significant_bits;
         pub mod trailing_zeros;
         pub mod twos_complement_limbs;
@@ -166,9 +166,11 @@ pub mod natural {
         pub mod assign_u32;
         pub mod assign_u64;
         pub mod clone_and_assign;
+        pub mod from_limbs;
         pub mod from_u32;
         pub mod from_u64;
         pub mod to_integer;
+        pub mod to_limbs;
         pub mod to_u32;
         pub mod to_u64;
     }
@@ -176,10 +178,8 @@ pub mod natural {
         pub mod assign_bit;
         pub mod clear_bit;
         pub mod flip_bit;
-        pub mod from_limbs;
         pub mod get_bit;
         pub mod limb_count;
-        pub mod limbs;
         pub mod not;
         pub mod set_bit;
         pub mod significant_bits;

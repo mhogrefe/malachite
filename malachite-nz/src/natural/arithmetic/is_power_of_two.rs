@@ -1,3 +1,4 @@
+use malachite_base::limbs::limbs_test_zero;
 use malachite_base::num::IsPowerOfTwo;
 use natural::Natural::{self, Large, Small};
 
@@ -25,10 +26,7 @@ use natural::Natural::{self, Large, Small};
 /// assert_eq!(limbs_is_power_of_two(&[0, 0b1010]), false);
 /// ```
 pub fn limbs_is_power_of_two(limbs: &[u32]) -> bool {
-    limbs
-        .into_iter()
-        .take(limbs.len() - 1)
-        .all(|&limb| limb == 0) && limbs.last().unwrap().is_power_of_two()
+    limbs_test_zero(&limbs[0..limbs.len() - 1]) && limbs.last().unwrap().is_power_of_two()
 }
 
 impl IsPowerOfTwo for Natural {

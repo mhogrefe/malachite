@@ -70,5 +70,5 @@ pub fn limbs_special_random_up_to_bits<R: Rng>(rng: &mut R, bits: u64) -> Vec<u3
 /// }
 /// ```
 pub fn special_random_natural_up_to_bits<R: Rng>(rng: &mut R, bits: u64) -> Natural {
-    Natural::from_limbs_asc(&limbs_special_random_up_to_bits(rng, bits))
+    Natural::from_owned_limbs_asc(limbs_special_random_up_to_bits(rng, bits))
 }

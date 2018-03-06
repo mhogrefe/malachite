@@ -6,9 +6,11 @@ use std::u32;
 use std::str::FromStr;
 
 #[test]
-fn test_sign_and_limbs_asc() {
+fn test_to_sign_and_limbs_asc() {
     let test = |n, out| {
-        assert_eq!(Integer::from_str(n).unwrap().sign_and_limbs_asc(), out);
+        let n = Integer::from_str(n).unwrap();
+        assert_eq!(n.to_sign_and_limbs_asc(), out);
+        assert_eq!(n.into_sign_and_limbs_asc(), out);
     };
     test("0", (Ordering::Equal, Vec::new()));
     test("123", (Ordering::Greater, vec![123]));
@@ -43,9 +45,11 @@ fn test_sign_and_limbs_asc() {
 }
 
 #[test]
-fn test_sign_and_limbs_desc() {
+fn test_to_sign_and_limbs_desc() {
     let test = |n, out| {
-        assert_eq!(Integer::from_str(n).unwrap().sign_and_limbs_desc(), out);
+        let n = Integer::from_str(n).unwrap();
+        assert_eq!(n.to_sign_and_limbs_desc(), out);
+        assert_eq!(n.into_sign_and_limbs_desc(), out);
     };
     test("0", (Ordering::Equal, Vec::new()));
     test("123", (Ordering::Greater, vec![123]));
@@ -80,12 +84,13 @@ fn test_sign_and_limbs_desc() {
 }
 
 #[test]
-fn sign_and_limbs_asc_properties() {
+fn to_sign_and_limbs_asc_properties() {
     test_properties(integers, |x| {
-        let (sign, limbs) = x.sign_and_limbs_asc();
+        let (sign, limbs) = x.to_sign_and_limbs_asc();
+        assert_eq!(x.clone().into_sign_and_limbs_asc(), (sign, limbs.clone()));
         assert_eq!(Integer::from_sign_and_limbs_asc(sign, &limbs), *x);
         assert_eq!(
-            x.sign_and_limbs_desc(),
+            x.to_sign_and_limbs_desc(),
             (sign, limbs.iter().cloned().rev().collect::<Vec<u32>>(),)
         );
         assert_eq!(sign == Ordering::Equal, limbs.is_empty());
@@ -93,17 +98,18 @@ fn sign_and_limbs_asc_properties() {
         if *x != 0 {
             assert_ne!(*limbs.last().unwrap(), 0);
         }
-        assert_eq!((-x).sign_and_limbs_asc(), (sign.reverse(), limbs));
+        assert_eq!((-x).to_sign_and_limbs_asc(), (sign.reverse(), limbs));
     });
 }
 
 #[test]
-fn sign_and_limbs_desc_properties() {
+fn to_sign_and_limbs_desc_properties() {
     test_properties(integers, |x| {
-        let (sign, limbs) = x.sign_and_limbs_desc();
+        let (sign, limbs) = x.to_sign_and_limbs_desc();
+        assert_eq!(x.clone().into_sign_and_limbs_desc(), (sign, limbs.clone()));
         assert_eq!(Integer::from_sign_and_limbs_desc(sign, &limbs), *x);
         assert_eq!(
-            x.sign_and_limbs_asc(),
+            x.to_sign_and_limbs_asc(),
             (sign, limbs.iter().cloned().rev().collect::<Vec<u32>>(),)
         );
         assert_eq!(sign == Ordering::Equal, limbs.is_empty());
@@ -111,6 +117,6 @@ fn sign_and_limbs_desc_properties() {
         if *x != 0 {
             assert_ne!(limbs[0], 0);
         }
-        assert_eq!((-x).sign_and_limbs_desc(), (sign.reverse(), limbs));
+        assert_eq!((-x).to_sign_and_limbs_desc(), (sign.reverse(), limbs));
     });
 }

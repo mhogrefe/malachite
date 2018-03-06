@@ -109,8 +109,11 @@ impl fmt::Binary for Natural {
 pub mod assign;
 pub mod assign_u32;
 pub mod assign_u64;
+pub mod from_limbs;
 pub mod from_u32;
 pub mod from_u64;
+pub mod limb_count;
 pub mod to_integer;
+pub mod to_limbs;
 pub mod to_u32;
 pub mod to_u64;

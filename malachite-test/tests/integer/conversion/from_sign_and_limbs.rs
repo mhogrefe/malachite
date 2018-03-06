@@ -9,6 +9,10 @@ fn test_from_sign_and_limbs_asc() {
         let x = Integer::from_sign_and_limbs_asc(sign, limbs);
         assert_eq!(x.to_string(), out);
         assert!(x.is_valid());
+
+        let x = Integer::from_sign_and_owned_limbs_asc(sign, limbs.to_vec());
+        assert_eq!(x.to_string(), out);
+        assert!(x.is_valid());
     };
     test(Ordering::Equal, &[], "0");
     test(Ordering::Equal, &[0], "0");
@@ -57,9 +61,34 @@ fn from_sign_and_limbs_asc_fail_3() {
 }
 
 #[test]
+#[should_panic(expected = "sign should be Equal iff limbs only contains zeros. sign: Equal, \
+                           limbs: [1]")]
+fn from_sign_and_owned_limbs_asc_fail_1() {
+    Integer::from_sign_and_owned_limbs_asc(Ordering::Equal, vec![1]);
+}
+
+#[test]
+#[should_panic(expected = "sign should be Equal iff limbs only contains zeros. sign: Greater, \
+                           limbs: []")]
+fn from_sign_and_owned_limbs_asc_fail_2() {
+    Integer::from_sign_and_owned_limbs_asc(Ordering::Greater, vec![]);
+}
+
+#[test]
+#[should_panic(expected = "sign should be Equal iff limbs only contains zeros. sign: Greater, \
+                           limbs: [0, 0, 0]")]
+fn from_sign_and_owned_limbs_asc_fail_3() {
+    Integer::from_sign_and_owned_limbs_asc(Ordering::Greater, vec![0, 0, 0]);
+}
+
+#[test]
 fn test_from_sign_and_limbs_desc() {
     let test = |sign: Ordering, limbs: &[u32], out| {
         let x = Integer::from_sign_and_limbs_desc(sign, limbs);
+        assert_eq!(x.to_string(), out);
+        assert!(x.is_valid());
+
+        let x = Integer::from_sign_and_owned_limbs_desc(sign, limbs.to_vec());
         assert_eq!(x.to_string(), out);
         assert!(x.is_valid());
     };
@@ -110,11 +139,37 @@ fn from_sign_and_limbs_desc_fail_3() {
 }
 
 #[test]
+#[should_panic(expected = "sign should be Equal iff limbs only contains zeros. sign: Equal, \
+                           limbs: [1]")]
+fn from_sign_and_owned_limbs_desc_fail_1() {
+    Integer::from_sign_and_owned_limbs_desc(Ordering::Equal, vec![1]);
+}
+
+#[test]
+#[should_panic(expected = "sign should be Equal iff limbs only contains zeros. sign: Greater, \
+                           limbs: []")]
+fn from_sign_and_owned_limbs_desc_fail_2() {
+    Integer::from_sign_and_owned_limbs_desc(Ordering::Greater, vec![]);
+}
+
+#[test]
+#[should_panic(expected = "sign should be Equal iff limbs only contains zeros. sign: Greater, \
+                           limbs: [0, 0, 0]")]
+fn from_sign_and_owned_limbs_desc_fail_3() {
+    Integer::from_sign_and_owned_limbs_desc(Ordering::Greater, vec![0, 0, 0]);
+}
+
+#[test]
 fn from_sign_and_limbs_asc_properties() {
     test_properties(
         pairs_of_ordering_and_vec_of_unsigned_var_1,
         |&(sign, ref limbs): &(Ordering, Vec<u32>)| {
             let x = Integer::from_sign_and_limbs_asc(sign, limbs);
+            assert!(x.is_valid());
+            assert_eq!(
+                Integer::from_sign_and_owned_limbs_asc(sign, limbs.clone()),
+                x
+            );
             let mut trimmed_limbs: Vec<u32> = limbs
                 .iter()
                 .cloned()
@@ -122,7 +177,7 @@ fn from_sign_and_limbs_asc_properties() {
                 .skip_while(|&limb| limb == 0)
                 .collect();
             trimmed_limbs.reverse();
-            let (sign_be, limbs_desc) = x.sign_and_limbs_asc();
+            let (sign_be, limbs_desc) = x.to_sign_and_limbs_asc();
             assert_eq!(sign_be, sign);
             assert_eq!(limbs_desc, trimmed_limbs);
             assert_eq!(
@@ -142,7 +197,12 @@ fn from_sign_and_limbs_desc_properties() {
         pairs_of_ordering_and_vec_of_unsigned_var_1,
         |&(sign, ref limbs): &(Ordering, Vec<u32>)| {
             let x = Integer::from_sign_and_limbs_desc(sign, limbs);
-            let (sign_le, limbs_asc) = x.sign_and_limbs_desc();
+            assert!(x.is_valid());
+            assert_eq!(
+                Integer::from_sign_and_owned_limbs_desc(sign, limbs.clone()),
+                x
+            );
+            let (sign_le, limbs_asc) = x.to_sign_and_limbs_desc();
             assert_eq!(sign_le, sign);
             assert_eq!(
                 limbs_asc,

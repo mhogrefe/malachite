@@ -9,6 +9,10 @@ fn test_from_limbs_asc() {
         let x = Natural::from_limbs_asc(limbs);
         assert_eq!(x.to_string(), out);
         assert!(x.is_valid());
+
+        let x = Natural::from_owned_limbs_asc(limbs.to_vec());
+        assert_eq!(x.to_string(), out);
+        assert!(x.is_valid());
     };
     test(&[], "0");
     test(&[0], "0");
@@ -25,6 +29,10 @@ fn test_from_limbs_asc() {
 fn test_from_limbs_desc() {
     let test = |limbs: Vec<u32>, out| {
         let x = Natural::from_limbs_desc(&limbs);
+        assert_eq!(x.to_string(), out);
+        assert!(x.is_valid());
+
+        let x = Natural::from_owned_limbs_desc(limbs.to_vec());
         assert_eq!(x.to_string(), out);
         assert!(x.is_valid());
     };
@@ -46,6 +54,8 @@ fn test_from_limbs_desc() {
 fn from_limbs_asc_properties() {
     test_properties(vecs_of_unsigned, |limbs: &Vec<u32>| {
         let x = Natural::from_limbs_asc(limbs);
+        assert!(x.is_valid());
+        assert_eq!(Natural::from_owned_limbs_asc(limbs.clone()), x);
         let mut trimmed_limbs: Vec<u32> = limbs
             .iter()
             .cloned()
@@ -69,6 +79,8 @@ fn from_limbs_asc_properties() {
 fn from_limbs_desc_properties() {
     test_properties(vecs_of_unsigned, |limbs: &Vec<u32>| {
         let x = Natural::from_limbs_desc(limbs);
+        assert!(x.is_valid());
+        assert_eq!(Natural::from_owned_limbs_desc(limbs.clone()), x);
         assert_eq!(
             x.to_limbs_desc(),
             limbs

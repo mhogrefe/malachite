@@ -195,9 +195,6 @@ pub mod comparison {
 }
 pub mod logic {
     pub mod bit_access;
-    pub mod from_limbs;
-    pub mod limb_count;
-    pub mod limbs;
     pub mod not;
     pub mod significant_bits;
     pub mod trailing_zeros;

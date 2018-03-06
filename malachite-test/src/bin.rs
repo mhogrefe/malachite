@@ -74,23 +74,23 @@ use malachite_test::integer::conversion::assign_u64::*;
 use malachite_test::integer::conversion::clone_and_assign::*;
 use malachite_test::integer::conversion::from_i32::*;
 use malachite_test::integer::conversion::from_i64::*;
+use malachite_test::integer::conversion::from_sign_and_limbs::*;
 use malachite_test::integer::conversion::from_u32::*;
 use malachite_test::integer::conversion::from_u64::*;
 use malachite_test::integer::conversion::natural_assign_integer::*;
 use malachite_test::integer::conversion::to_i32::*;
 use malachite_test::integer::conversion::to_i64::*;
 use malachite_test::integer::conversion::to_natural::*;
+use malachite_test::integer::conversion::to_sign_and_limbs::*;
 use malachite_test::integer::conversion::to_u32::*;
 use malachite_test::integer::conversion::to_u64::*;
 use malachite_test::integer::logic::assign_bit::*;
 use malachite_test::integer::logic::clear_bit::*;
 use malachite_test::integer::logic::flip_bit::*;
-use malachite_test::integer::logic::from_sign_and_limbs::*;
 use malachite_test::integer::logic::from_twos_complement_limbs::*;
 use malachite_test::integer::logic::get_bit::*;
 use malachite_test::integer::logic::not::*;
 use malachite_test::integer::logic::set_bit::*;
-use malachite_test::integer::logic::sign_and_limbs::*;
 use malachite_test::integer::logic::significant_bits::*;
 use malachite_test::integer::logic::trailing_zeros::*;
 use malachite_test::integer::logic::twos_complement_limbs::*;
@@ -124,18 +124,18 @@ use malachite_test::natural::comparison::partial_ord_u32::*;
 use malachite_test::natural::conversion::assign_u32::*;
 use malachite_test::natural::conversion::assign_u64::*;
 use malachite_test::natural::conversion::clone_and_assign::*;
+use malachite_test::natural::conversion::from_limbs::*;
 use malachite_test::natural::conversion::from_u32::*;
 use malachite_test::natural::conversion::from_u64::*;
 use malachite_test::natural::conversion::to_integer::*;
+use malachite_test::natural::conversion::to_limbs::*;
 use malachite_test::natural::conversion::to_u32::*;
 use malachite_test::natural::conversion::to_u64::*;
 use malachite_test::natural::logic::assign_bit::*;
 use malachite_test::natural::logic::clear_bit::*;
 use malachite_test::natural::logic::flip_bit::*;
-use malachite_test::natural::logic::from_limbs::*;
 use malachite_test::natural::logic::get_bit::*;
 use malachite_test::natural::logic::limb_count::*;
-use malachite_test::natural::logic::limbs::*;
 use malachite_test::natural::logic::not::*;
 use malachite_test::natural::logic::set_bit::*;
 use malachite_test::natural::logic::significant_bits::*;
@@ -510,11 +510,15 @@ demos_and_benchmarks!(
         demo_integer_from_u64,
         demo_integer_from_sign_and_limbs_asc,
         demo_integer_from_sign_and_limbs_desc,
+        demo_integer_from_sign_and_owned_limbs_asc,
+        demo_integer_from_sign_and_owned_limbs_desc,
         demo_integer_from_twos_complement_limbs_asc,
         demo_integer_from_twos_complement_limbs_desc,
         demo_integer_get_bit,
         demo_integer_hash,
         demo_integer_increment,
+        demo_integer_into_sign_and_limbs_asc,
+        demo_integer_into_sign_and_limbs_desc,
         demo_integer_is_even,
         demo_integer_is_odd,
         demo_integer_mod_power_of_two_assign,
@@ -586,8 +590,6 @@ demos_and_benchmarks!(
         demo_integer_shr_round_u32,
         demo_integer_shr_round_u32_ref,
         demo_integer_sign,
-        demo_integer_sign_and_limbs_asc,
-        demo_integer_sign_and_limbs_desc,
         demo_integer_significant_bits,
         demo_integer_sub_assign,
         demo_integer_sub_assign_ref,
@@ -632,6 +634,8 @@ demos_and_benchmarks!(
         demo_integer_to_i64_wrapping,
         demo_integer_into_natural,
         demo_integer_to_natural,
+        demo_integer_to_sign_and_limbs_asc,
+        demo_integer_to_sign_and_limbs_desc,
         demo_integer_to_u32,
         demo_integer_to_u32_wrapping,
         demo_integer_to_u64,
@@ -684,17 +688,21 @@ demos_and_benchmarks!(
         demo_natural_floor_log_two,
         demo_natural_from_limbs_asc,
         demo_natural_from_limbs_desc,
+        demo_natural_from_owned_limbs_asc,
+        demo_natural_from_owned_limbs_desc,
         demo_natural_from_u32,
         demo_natural_from_u64,
         demo_natural_get_bit,
         demo_natural_hash,
         demo_natural_increment,
+        demo_natural_into_limbs_asc,
+        demo_natural_into_limbs_desc,
         demo_natural_is_even,
         demo_natural_is_odd,
         demo_natural_is_power_of_two,
         demo_natural_limb_count,
-        demo_natural_to_limbs_asc,
-        demo_natural_to_limbs_desc,
+        demo_natural_limbs_asc,
+        demo_natural_limbs_desc,
         demo_natural_mod_power_of_two_assign,
         demo_natural_mod_power_of_two,
         demo_natural_mod_power_of_two_ref,
@@ -763,6 +771,8 @@ demos_and_benchmarks!(
         demo_natural_sub_mul_u32_ref,
         demo_natural_into_integer,
         demo_natural_to_integer,
+        demo_natural_to_limbs_asc,
+        demo_natural_to_limbs_desc,
         demo_natural_to_u32,
         demo_natural_to_u32_wrapping,
         demo_natural_to_u64,
@@ -884,12 +894,12 @@ demos_and_benchmarks!(
         benchmark_limbs_set_zero,
         benchmark_limbs_significant_bits,
         benchmark_limbs_test_zero,
-        benchmark_integer_from_sign_and_limbs_asc,
-        benchmark_integer_from_sign_and_limbs_desc,
+        benchmark_integer_from_sign_and_limbs_asc_evaluation_strategy,
+        benchmark_integer_from_sign_and_limbs_desc_evaluation_strategy,
         benchmark_integer_from_twos_complement_limbs_asc,
         benchmark_integer_from_twos_complement_limbs_desc,
-        benchmark_natural_from_limbs_asc,
-        benchmark_natural_from_limbs_desc,
+        benchmark_natural_from_limbs_asc_evaluation_strategy,
+        benchmark_natural_from_limbs_desc_evaluation_strategy,
     ],
     [
         benchmark_natural_random_natural_up_to_bits,
@@ -1027,8 +1037,6 @@ demos_and_benchmarks!(
         benchmark_integer_shr_round_assign_u32,
         benchmark_integer_shr_round_u32,
         benchmark_integer_shr_round_u32_ref,
-        benchmark_integer_sign_and_limbs_asc,
-        benchmark_integer_sign_and_limbs_desc,
         benchmark_integer_significant_bits,
         benchmark_integer_sub_assign,
         benchmark_integer_sub_assign_evaluation_strategy,
@@ -1078,6 +1086,8 @@ demos_and_benchmarks!(
         benchmark_integer_sub_mul_u32_ref_ref_algorithms,
         benchmark_integer_to_natural,
         benchmark_integer_to_natural_evaluation_strategy,
+        benchmark_integer_to_sign_and_limbs_asc_evaluation_strategy,
+        benchmark_integer_to_sign_and_limbs_desc_evaluation_strategy,
         benchmark_integer_trailing_zeros,
         benchmark_integer_twos_complement_limbs_asc,
         benchmark_integer_twos_complement_limbs_desc,
@@ -1131,8 +1141,8 @@ demos_and_benchmarks!(
         benchmark_natural_is_even,
         benchmark_natural_is_power_of_two,
         benchmark_natural_limb_count,
-        benchmark_natural_to_limbs_asc,
-        benchmark_natural_to_limbs_desc,
+        benchmark_natural_limbs_asc_evaluation_strategy,
+        benchmark_natural_limbs_desc_evaluation_strategy,
         benchmark_natural_mod_power_of_two_assign,
         benchmark_natural_mod_power_of_two,
         benchmark_natural_mod_power_of_two_ref,
