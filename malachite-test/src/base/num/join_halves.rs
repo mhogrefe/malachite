@@ -1,8 +1,7 @@
-use common::GenerationMode;
+use common::{m_run_benchmark, BenchmarkType, GenerationMode};
 use inputs::base::pairs_of_unsigneds;
 use malachite_base::misc::Named;
 use malachite_base::num::{JoinHalves, PrimitiveUnsigned, SignificantBits};
-use rust_wheels::benchmarks::{BenchmarkOptions1, benchmark_1};
 use std::cmp::max;
 
 fn demo_unsigned_join_halves<T: 'static + JoinHalves + PrimitiveUnsigned>(
@@ -29,30 +28,22 @@ fn benchmark_unsigned_join_halves<T: 'static + JoinHalves + PrimitiveUnsigned>(
 ) where
     T::Half: PrimitiveUnsigned,
 {
-    println!(
-        "benchmarking {} {}::join_halves({}, {})",
-        gm.name(),
-        T::NAME,
-        T::Half::NAME,
-        T::Half::NAME
-    );
-    benchmark_1(BenchmarkOptions1 {
-        xs: pairs_of_unsigneds(gm),
-        function_f: &mut (|(x, y): (T::Half, T::Half)| T::join_halves(x, y)),
-        x_cons: &(|&p| p),
-        x_param: &(|&(x, y)| max(x.significant_bits(), y.significant_bits()) as usize),
-        limit,
-        f_name: "malachite",
-        title: &format!(
+    m_run_benchmark(
+        &format!(
             "{}::join_halves({}, {})",
             T::NAME,
             T::Half::NAME,
             T::Half::NAME
         ),
-        x_axis_label: "max(x.significant_bits(), y.significant_bits())",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+        BenchmarkType::Ordinary,
+        pairs_of_unsigneds::<T::Half>(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(x, y)| max(x.significant_bits(), y.significant_bits()) as usize),
+        "max(x.significant_bits(), y.significant_bits())",
+        &[("malachite", &mut (|(x, y)| no_out!(T::join_halves(x, y))))],
+    );
 }
 
 macro_rules! unsigned {

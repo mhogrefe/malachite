@@ -1,7 +1,6 @@
-use common::GenerationMode;
+use common::{m_run_benchmark, BenchmarkType, GenerationMode};
 use malachite_base::num::{PrimitiveSigned, PrimitiveUnsigned};
 use inputs::base::{positive_unsigneds, signeds_no_min};
-use rust_wheels::benchmarks::{BenchmarkOptions1, benchmark_1};
 
 fn demo_unsigned_decrement<T: 'static + PrimitiveUnsigned>(gm: GenerationMode, limit: usize) {
     for mut n in positive_unsigneds::<T>(gm).take(limit) {
@@ -24,19 +23,17 @@ fn benchmark_unsigned_decrement<T: 'static + PrimitiveUnsigned>(
     limit: usize,
     file_name: &str,
 ) {
-    println!("benchmarking {} {}.decrement()", gm.name(), T::NAME);
-    benchmark_1(BenchmarkOptions1 {
-        xs: positive_unsigneds(gm),
-        function_f: &mut (|mut n: T| n.decrement()),
-        x_cons: &(|&n| n),
-        x_param: &(|&n| n.significant_bits() as usize),
+    m_run_benchmark(
+        &format!("{}.decrement()", T::NAME),
+        BenchmarkType::Ordinary,
+        positive_unsigneds::<T>(gm),
+        gm.name(),
         limit,
-        f_name: "malachite",
-        title: &format!("{}.decrement()", T::NAME),
-        x_axis_label: "index",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+        file_name,
+        &(|&n| n.significant_bits() as usize),
+        "index",
+        &[("malachite", &mut (|mut n| n.decrement()))],
+    );
 }
 
 fn benchmark_signed_decrement<T: 'static + PrimitiveSigned>(
@@ -44,19 +41,17 @@ fn benchmark_signed_decrement<T: 'static + PrimitiveSigned>(
     limit: usize,
     file_name: &str,
 ) {
-    println!("benchmarking {} {}.decrement()", gm.name(), T::NAME);
-    benchmark_1(BenchmarkOptions1 {
-        xs: signeds_no_min(gm),
-        function_f: &mut (|mut n: T| n.decrement()),
-        x_cons: &(|&n| n),
-        x_param: &(|&n| n.significant_bits() as usize),
+    m_run_benchmark(
+        &format!("{}.decrement()", T::NAME),
+        BenchmarkType::Ordinary,
+        signeds_no_min::<T>(gm),
+        gm.name(),
         limit,
-        f_name: "malachite",
-        title: &format!("{}.decrement()", T::NAME),
-        x_axis_label: "index",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+        file_name,
+        &(|&n| n.significant_bits() as usize),
+        "index",
+        &[("malachite", &mut (|mut n| n.decrement()))],
+    );
 }
 
 macro_rules! unsigned {

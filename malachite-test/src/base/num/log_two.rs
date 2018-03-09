@@ -1,7 +1,6 @@
-use common::GenerationMode;
+use common::{m_run_benchmark, BenchmarkType, GenerationMode};
 use malachite_base::num::PrimitiveUnsigned;
 use inputs::base::positive_unsigneds;
-use rust_wheels::benchmarks::{BenchmarkOptions1, benchmark_1};
 
 fn demo_unsigned_floor_log_two<T: 'static + PrimitiveUnsigned>(gm: GenerationMode, limit: usize) {
     for n in positive_unsigneds::<T>(gm).take(limit) {
@@ -20,19 +19,17 @@ fn benchmark_unsigned_floor_log_two<T: 'static + PrimitiveUnsigned>(
     limit: usize,
     file_name: &str,
 ) {
-    println!("benchmarking {} {}.floor_log_two()", gm.name(), T::NAME);
-    benchmark_1(BenchmarkOptions1 {
-        xs: positive_unsigneds(gm),
-        function_f: &mut (|n: T| n.floor_log_two()),
-        x_cons: &(|&n| n),
-        x_param: &(|&n| n.significant_bits() as usize),
+    m_run_benchmark(
+        &format!("{}.floor_log_two()", T::NAME),
+        BenchmarkType::Ordinary,
+        positive_unsigneds::<T>(gm),
+        gm.name(),
         limit,
-        f_name: "malachite",
-        title: &format!("{}.floor_log_two()", T::NAME),
-        x_axis_label: "index",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+        file_name,
+        &(|&n| n.significant_bits() as usize),
+        "index",
+        &[("malachite", &mut (|n| no_out!(n.floor_log_two())))],
+    );
 }
 
 fn benchmark_unsigned_ceiling_log_two<T: 'static + PrimitiveUnsigned>(
@@ -40,19 +37,17 @@ fn benchmark_unsigned_ceiling_log_two<T: 'static + PrimitiveUnsigned>(
     limit: usize,
     file_name: &str,
 ) {
-    println!("benchmarking {} {}.ceiling_log_two()", gm.name(), T::NAME);
-    benchmark_1(BenchmarkOptions1 {
-        xs: positive_unsigneds(gm),
-        function_f: &mut (|n: T| n.ceiling_log_two()),
-        x_cons: &(|&n| n),
-        x_param: &(|&n| n.significant_bits() as usize),
+    m_run_benchmark(
+        &format!("{}.ceiling_log_two()", T::NAME),
+        BenchmarkType::Ordinary,
+        positive_unsigneds::<T>(gm),
+        gm.name(),
         limit,
-        f_name: "malachite",
-        title: &format!("{}.ceiling_log_two()", T::NAME),
-        x_axis_label: "index",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+        file_name,
+        &(|&n| n.significant_bits() as usize),
+        "index",
+        &[("malachite", &mut (|n| no_out!(n.ceiling_log_two())))],
+    );
 }
 
 macro_rules! unsigned {

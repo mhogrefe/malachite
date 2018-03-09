@@ -1,10 +1,6 @@
-use common::{natural_to_biguint, natural_to_rug_integer, GenerationMode};
-use inputs::natural::pairs_of_naturals;
+use common::{m_run_benchmark, BenchmarkType, GenerationMode};
+use inputs::natural::{nrm_pairs_of_naturals, pairs_of_naturals, rm_pairs_of_naturals};
 use malachite_base::num::SignificantBits;
-use malachite_nz::natural::Natural;
-use rug;
-use rust_wheels::benchmarks::{BenchmarkOptions2, BenchmarkOptions3, BenchmarkOptions4,
-                              benchmark_2, benchmark_3, benchmark_4};
 use std::cmp::max;
 
 pub fn demo_natural_add_assign(gm: GenerationMode, limit: usize) {
@@ -52,22 +48,20 @@ pub fn demo_natural_add_ref_ref(gm: GenerationMode, limit: usize) {
 }
 
 pub fn benchmark_natural_add_assign(gm: GenerationMode, limit: usize, file_name: &str) {
-    println!("benchmarking {} Natural += Natural", gm.name());
-    benchmark_2(BenchmarkOptions2 {
-        xs: pairs_of_naturals(gm),
-        function_f: &mut (|(mut x, y)| x += y),
-        function_g: &mut (|(mut x, y): (rug::Integer, rug::Integer)| x += y),
-        x_cons: &(|p| p.clone()),
-        y_cons: &(|&(ref x, ref y)| (natural_to_rug_integer(x), natural_to_rug_integer(y))),
-        x_param: &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),
+    m_run_benchmark(
+        "Natural += Natural",
+        BenchmarkType::Ordinary,
+        rm_pairs_of_naturals(gm),
+        gm.name(),
         limit,
-        f_name: "malachite",
-        g_name: "rug",
-        title: "Natural += Natural",
-        x_axis_label: "max(x.significant_bits(), y.significant_bits())",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+        file_name,
+        &(|&(_, (ref x, ref y))| max(x.significant_bits(), y.significant_bits()) as usize),
+        "max(x.significant_bits(), y.significant_bits())",
+        &[
+            ("malachite", &mut (|(_, (mut x, y))| x += y)),
+            ("rug", &mut (|((mut x, y), _)| x += y)),
+        ],
+    );
 }
 
 pub fn benchmark_natural_add_assign_evaluation_strategy(
@@ -75,47 +69,38 @@ pub fn benchmark_natural_add_assign_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    println!(
-        "benchmarking {} Natural += Natural evaluation strategy",
-        gm.name()
-    );
-    benchmark_2(BenchmarkOptions2 {
-        xs: pairs_of_naturals(gm),
-        function_f: &mut (|(mut x, y)| x += y),
-        function_g: &mut (|(mut x, y): (Natural, Natural)| x += &y),
-        x_cons: &(|p| p.clone()),
-        y_cons: &(|p| p.clone()),
-        x_param: &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),
+    m_run_benchmark(
+        "Natural += Natural",
+        BenchmarkType::EvaluationStrategy,
+        pairs_of_naturals(gm),
+        gm.name(),
         limit,
-        f_name: "Natural += Natural",
-        g_name: "Natural += &Natural",
-        title: "Natural += Natural evaluation strategy",
-        x_axis_label: "max(x.significant_bits(), y.significant_bits())",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+        file_name,
+        &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),
+        "max(x.significant_bits(), y.significant_bits())",
+        &[
+            ("Natural += Natural", &mut (|(mut x, y)| no_out!(x += y))),
+            ("Natural += &Natural", &mut (|(mut x, y)| no_out!(x += &y))),
+        ],
+    );
 }
 
 pub fn benchmark_natural_add(gm: GenerationMode, limit: usize, file_name: &str) {
-    println!("benchmarking {} Natural + Natural", gm.name());
-    benchmark_3(BenchmarkOptions3 {
-        xs: pairs_of_naturals(gm),
-        function_f: &mut (|(x, y)| x + y),
-        function_g: &mut (|(x, y)| x + y),
-        function_h: &mut (|(x, y)| x + y),
-        x_cons: &(|p| p.clone()),
-        y_cons: &(|&(ref x, ref y)| (natural_to_biguint(x), natural_to_biguint(y))),
-        z_cons: &(|&(ref x, ref y)| (natural_to_rug_integer(x), natural_to_rug_integer(y))),
-        x_param: &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),
+    m_run_benchmark(
+        "Natural + Natural",
+        BenchmarkType::Ordinary,
+        nrm_pairs_of_naturals(gm),
+        gm.name(),
         limit,
-        f_name: "malachite",
-        g_name: "num",
-        h_name: "rug",
-        title: "Natural + Natural",
-        x_axis_label: "max(x.significant_bits(), y.significant_bits())",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+        file_name,
+        &(|&(_, _, (ref x, ref y))| max(x.significant_bits(), y.significant_bits()) as usize),
+        "max(x.significant_bits(), y.significant_bits())",
+        &[
+            ("malachite", &mut (|(_, _, (x, y))| no_out!(x + y))),
+            ("num", &mut (|((x, y), _, _)| no_out!(x + y))),
+            ("rug", &mut (|(_, (x, y), _)| no_out!(x + y))),
+        ],
+    );
 }
 
 pub fn benchmark_natural_add_evaluation_strategy(
@@ -123,29 +108,20 @@ pub fn benchmark_natural_add_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    println!(
-        "benchmarking {} Natural + Natural evaluation strategy",
-        gm.name()
-    );
-    benchmark_4(BenchmarkOptions4 {
-        xs: pairs_of_naturals(gm),
-        function_f: &mut (|(x, y)| x + y),
-        function_g: &mut (|(x, y)| x + &y),
-        function_h: &mut (|(x, y)| &x + y),
-        function_i: &mut (|(x, y)| &x + &y),
-        x_cons: &(|p| p.clone()),
-        y_cons: &(|p| p.clone()),
-        z_cons: &(|p| p.clone()),
-        w_cons: &(|p| p.clone()),
-        x_param: &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),
+    m_run_benchmark(
+        "Natural + Natural",
+        BenchmarkType::EvaluationStrategy,
+        pairs_of_naturals(gm),
+        gm.name(),
         limit,
-        f_name: "Natural + Natural",
-        g_name: "Natural + &Natural",
-        h_name: "&Natural + Natural",
-        i_name: "&Natural + &Natural",
-        title: "Natural + Natural evaluation strategy",
-        x_axis_label: "max(x.significant_bits(), y.significant_bits())",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+        file_name,
+        &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),
+        "max(x.significant_bits(), y.significant_bits())",
+        &[
+            ("Natural + Natural", &mut (|(x, y)| no_out!(x + y))),
+            ("Natural + &Natural", &mut (|(x, y)| no_out!(x + &y))),
+            ("&Natural + Natural", &mut (|(x, y)| no_out!(&x + y))),
+            ("&Natural + &Natural", &mut (|(x, y)| no_out!(&x + &y))),
+        ],
+    );
 }

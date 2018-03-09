@@ -1,8 +1,7 @@
-use common::NoSpecialGenerationMode;
+use common::{m_run_benchmark, BenchmarkType, NoSpecialGenerationMode};
 use inputs::base::chars_not_max;
 use malachite_base::chars::char_to_contiguous_range;
 use malachite_base::misc::Walkable;
-use rust_wheels::benchmarks::{BenchmarkOptions1, benchmark_1};
 
 pub fn demo_char_increment(gm: NoSpecialGenerationMode, limit: usize) {
     for mut c in chars_not_max(gm).take(limit) {
@@ -13,17 +12,15 @@ pub fn demo_char_increment(gm: NoSpecialGenerationMode, limit: usize) {
 }
 
 pub fn benchmark_char_increment(gm: NoSpecialGenerationMode, limit: usize, file_name: &str) {
-    println!("benchmarking {} char.increment()", gm.name());
-    benchmark_1(BenchmarkOptions1 {
-        xs: chars_not_max(gm),
-        function_f: &mut (|mut c: char| c.increment()),
-        x_cons: &(|&c| c),
-        x_param: &(|&c| char_to_contiguous_range(c) as usize),
+    m_run_benchmark(
+        "char.increment()",
+        BenchmarkType::Ordinary,
+        chars_not_max(gm),
+        gm.name(),
         limit,
-        f_name: "malachite",
-        title: "char.increment()",
-        x_axis_label: "char_to_contiguous_range(char)",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+        file_name,
+        &(|&c| char_to_contiguous_range(c) as usize),
+        "char_to_contiguous_range(char)",
+        &[("malachite", &mut (|mut c| c.increment()))],
+    );
 }

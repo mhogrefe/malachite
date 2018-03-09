@@ -1,7 +1,6 @@
-use common::GenerationMode;
+use common::{m_run_benchmark, BenchmarkType, GenerationMode};
 use inputs::base::{pairs_of_signed_and_u64_width_range_var_2, pairs_of_unsigned_and_small_u64};
 use malachite_base::num::{PrimitiveSigned, PrimitiveUnsigned};
-use rust_wheels::benchmarks::{BenchmarkOptions1, benchmark_1};
 
 fn demo_unsigned_clear_bit<T: 'static + PrimitiveUnsigned>(gm: GenerationMode, limit: usize) {
     for (mut n, index) in pairs_of_unsigned_and_small_u64::<T>(gm).take(limit) {
@@ -24,19 +23,17 @@ fn benchmark_unsigned_clear_bit<T: 'static + PrimitiveUnsigned>(
     limit: usize,
     file_name: &str,
 ) {
-    println!("benchmarking {} {}.clear_bit(u64)", gm.name(), T::NAME);
-    benchmark_1(BenchmarkOptions1 {
-        xs: pairs_of_unsigned_and_small_u64(gm),
-        function_f: &mut (|(mut n, index): (T, u64)| n.clear_bit(index)),
-        x_cons: &(|&p| p),
-        x_param: &(|&(_, index)| index as usize),
+    m_run_benchmark(
+        &format!("{}.clear_bit(u64)", T::NAME),
+        BenchmarkType::Ordinary,
+        pairs_of_unsigned_and_small_u64::<T>(gm),
+        gm.name(),
         limit,
-        f_name: "malachite",
-        title: &format!("{}.clear_bit(u64)", T::NAME),
-        x_axis_label: "index",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+        file_name,
+        &(|&(_, index)| index as usize),
+        "index",
+        &[("malachite", &mut (|(mut n, index)| n.clear_bit(index)))],
+    );
 }
 
 fn benchmark_signed_clear_bit<T: 'static + PrimitiveSigned>(
@@ -44,19 +41,17 @@ fn benchmark_signed_clear_bit<T: 'static + PrimitiveSigned>(
     limit: usize,
     file_name: &str,
 ) {
-    println!("benchmarking {} {}.set_bit(u64)", gm.name(), T::NAME);
-    benchmark_1(BenchmarkOptions1 {
-        xs: pairs_of_signed_and_u64_width_range_var_2(gm),
-        function_f: &mut (|(mut n, index): (T, u64)| n.clear_bit(index)),
-        x_cons: &(|&p| p),
-        x_param: &(|&(_, index)| index as usize),
+    m_run_benchmark(
+        &format!("{}.clear_bit(u64)", T::NAME),
+        BenchmarkType::Ordinary,
+        pairs_of_signed_and_u64_width_range_var_2::<T>(gm),
+        gm.name(),
         limit,
-        f_name: "malachite",
-        title: &format!("{}.clear_bit(u64)", T::NAME),
-        x_axis_label: "index",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+        file_name,
+        &(|&(_, index)| index as usize),
+        "index",
+        &[("malachite", &mut (|(mut n, index)| n.clear_bit(index)))],
+    );
 }
 
 macro_rules! unsigned {

@@ -1,7 +1,6 @@
-use common::GenerationMode;
+use common::{m_run_benchmark, BenchmarkType, GenerationMode};
 use malachite_base::num::{PrimitiveSigned, PrimitiveUnsigned};
 use inputs::base::{signeds, unsigneds};
-use rust_wheels::benchmarks::{BenchmarkOptions1, benchmark_1};
 
 fn demo_unsigned_significant_bits<T: 'static + PrimitiveUnsigned>(
     gm: GenerationMode,
@@ -23,19 +22,17 @@ fn benchmark_unsigned_significant_bits<T: 'static + PrimitiveUnsigned>(
     limit: usize,
     file_name: &str,
 ) {
-    println!("benchmarking {} {}.significant_bits()", gm.name(), T::NAME);
-    benchmark_1(BenchmarkOptions1 {
-        xs: unsigneds(gm),
-        function_f: &mut (|n: T| n.significant_bits()),
-        x_cons: &(|&n| n),
-        x_param: &(|&n| n.significant_bits() as usize),
+    m_run_benchmark(
+        &format!("{}.significant_bits()", T::NAME),
+        BenchmarkType::Ordinary,
+        unsigneds::<T>(gm),
+        gm.name(),
         limit,
-        f_name: "malachite",
-        title: &format!("{}.significant_bits()", T::NAME),
-        x_axis_label: "index",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+        file_name,
+        &(|&n| n.significant_bits() as usize),
+        "index",
+        &[("malachite", &mut (|n| no_out!(n.significant_bits())))],
+    );
 }
 
 fn benchmark_signed_significant_bits<T: 'static + PrimitiveSigned>(
@@ -43,19 +40,17 @@ fn benchmark_signed_significant_bits<T: 'static + PrimitiveSigned>(
     limit: usize,
     file_name: &str,
 ) {
-    println!("benchmarking {} {}.significant_bits()", gm.name(), T::NAME);
-    benchmark_1(BenchmarkOptions1 {
-        xs: signeds(gm),
-        function_f: &mut (|n: T| n.significant_bits()),
-        x_cons: &(|&n| n),
-        x_param: &(|&n| n.significant_bits() as usize),
+    m_run_benchmark(
+        &format!("{}.significant_bits()", T::NAME),
+        BenchmarkType::Ordinary,
+        signeds::<T>(gm),
+        gm.name(),
         limit,
-        f_name: "malachite",
-        title: &format!("{}.significant_bits()", T::NAME),
-        x_axis_label: "index",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+        file_name,
+        &(|&n| n.significant_bits() as usize),
+        "index",
+        &[("malachite", &mut (|n| no_out!(n.significant_bits())))],
+    );
 }
 
 macro_rules! unsigned {

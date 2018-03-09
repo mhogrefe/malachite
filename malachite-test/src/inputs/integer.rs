@@ -1,9 +1,11 @@
-use common::GenerationMode;
+use common::{integer_to_bigint, integer_to_rug_integer, GenerationMode};
 use inputs::common::{reshape_1_2_to_3, reshape_2_1_to_3};
 use malachite_base::num::{PrimitiveInteger, PrimitiveSigned, PrimitiveUnsigned};
 use malachite_base::round::RoundingMode;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
+use num::BigInt;
+use rug;
 use rust_wheels::iterators::bools::exhaustive_bools;
 use rust_wheels::iterators::common::EXAMPLE_SEED;
 use rust_wheels::iterators::general::random;
@@ -31,6 +33,10 @@ pub fn integers(gm: GenerationMode) -> Box<Iterator<Item = Integer>> {
     }
 }
 
+pub fn nrm_integers(gm: GenerationMode) -> Box<Iterator<Item = (BigInt, rug::Integer, Integer)>> {
+    Box::new(integers(gm).map(|n| (integer_to_bigint(&n), integer_to_rug_integer(&n), n)))
+}
+
 pub fn pairs_of_integers(gm: GenerationMode) -> Box<Iterator<Item = (Integer, Integer)>> {
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_pairs_from_single(exhaustive_integers())),
@@ -42,6 +48,37 @@ pub fn pairs_of_integers(gm: GenerationMode) -> Box<Iterator<Item = (Integer, In
             special_random_integers(&EXAMPLE_SEED, scale),
         )),
     }
+}
+
+pub fn rm_pairs_of_integers(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = ((rug::Integer, rug::Integer), (Integer, Integer))>> {
+    Box::new(pairs_of_integers(gm).map(|(x, y)| {
+        (
+            (integer_to_rug_integer(&x), integer_to_rug_integer(&y)),
+            (x, y),
+        )
+    }))
+}
+
+pub fn nrm_pairs_of_integers(
+    gm: GenerationMode,
+) -> Box<
+    Iterator<
+        Item = (
+            (BigInt, BigInt),
+            (rug::Integer, rug::Integer),
+            (Integer, Integer),
+        ),
+    >,
+> {
+    Box::new(pairs_of_integers(gm).map(|(x, y)| {
+        (
+            (integer_to_bigint(&x), integer_to_bigint(&y)),
+            (integer_to_rug_integer(&x), integer_to_rug_integer(&y)),
+            (x, y),
+        )
+    }))
 }
 
 pub fn triples_of_integers(
@@ -107,6 +144,26 @@ pub fn pairs_of_integer_and_signed<T: 'static + PrimitiveSigned>(
     }
 }
 
+pub fn nrm_pairs_of_integer_and_signed<T: 'static + PrimitiveSigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = ((BigInt, T), (rug::Integer, T), (Integer, T))>> {
+    Box::new(pairs_of_integer_and_signed(gm).map(|(x, y)| {
+        (
+            (integer_to_bigint(&x), y),
+            (integer_to_rug_integer(&x), y),
+            (x, y),
+        )
+    }))
+}
+
+pub fn rm_pairs_of_integer_and_signed<T: 'static + PrimitiveSigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = ((rug::Integer, T), (Integer, T))>> {
+    Box::new(
+        pairs_of_integer_and_signed(gm).map(|(x, y)| ((integer_to_rug_integer(&x), y), (x, y))),
+    )
+}
+
 pub fn pairs_of_signed_and_integer<T: 'static + PrimitiveSigned>(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (T, Integer)>> {
@@ -121,6 +178,14 @@ pub fn pairs_of_signed_and_integer<T: 'static + PrimitiveSigned>(
             &(|seed| special_random_integers(seed, scale)),
         )),
     }
+}
+
+pub fn rm_pairs_of_signed_and_integer<T: 'static + PrimitiveSigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = ((T, rug::Integer), (T, Integer))>> {
+    Box::new(
+        pairs_of_signed_and_integer(gm).map(|(x, y)| ((x, integer_to_rug_integer(&y)), (x, y))),
+    )
 }
 
 pub fn pairs_of_integer_and_unsigned<T: 'static + PrimitiveUnsigned>(
@@ -140,6 +205,26 @@ pub fn pairs_of_integer_and_unsigned<T: 'static + PrimitiveUnsigned>(
     }
 }
 
+pub fn rm_pairs_of_integer_and_unsigned<T: 'static + PrimitiveUnsigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = ((rug::Integer, T), (Integer, T))>> {
+    Box::new(
+        pairs_of_integer_and_unsigned(gm).map(|(x, y)| ((integer_to_rug_integer(&x), y), (x, y))),
+    )
+}
+
+pub fn nrm_pairs_of_integer_and_unsigned<T: 'static + PrimitiveUnsigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = ((BigInt, T), (rug::Integer, T), (Integer, T))>> {
+    Box::new(pairs_of_integer_and_unsigned(gm).map(|(x, y)| {
+        (
+            (integer_to_bigint(&x), y),
+            (integer_to_rug_integer(&x), y),
+            (x, y),
+        )
+    }))
+}
+
 pub fn pairs_of_unsigned_and_integer<T: 'static + PrimitiveUnsigned>(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (T, Integer)>> {
@@ -155,6 +240,14 @@ pub fn pairs_of_unsigned_and_integer<T: 'static + PrimitiveUnsigned>(
             &(|seed| special_random_integers(seed, scale)),
         )),
     }
+}
+
+pub fn rm_pairs_of_unsigned_and_integer<T: 'static + PrimitiveUnsigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = ((T, rug::Integer), (T, Integer))>> {
+    Box::new(
+        pairs_of_unsigned_and_integer(gm).map(|(x, y)| ((x, integer_to_rug_integer(&y)), (x, y))),
+    )
 }
 
 fn random_triples_of_integer_integer_and_primitive<T: 'static + PrimitiveInteger>(

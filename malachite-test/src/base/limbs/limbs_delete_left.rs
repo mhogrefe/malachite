@@ -1,7 +1,6 @@
-use common::GenerationMode;
+use common::{m_run_benchmark, BenchmarkType, GenerationMode};
 use inputs::base::pairs_of_unsigned_vec_and_small_usize_var_1;
 use malachite_base::limbs::limbs_delete_left;
-use rust_wheels::benchmarks::{BenchmarkOptions1, benchmark_1};
 
 pub fn demo_limbs_delete_left(gm: GenerationMode, limit: usize) {
     for (limbs, delete_size) in pairs_of_unsigned_vec_and_small_usize_var_1(gm).take(limit) {
@@ -15,22 +14,20 @@ pub fn demo_limbs_delete_left(gm: GenerationMode, limit: usize) {
 }
 
 pub fn benchmark_limbs_delete_left(gm: GenerationMode, limit: usize, file_name: &str) {
-    println!(
-        "benchmarking {} limbs_delete_left(&mut Vec<u32>, usize)",
-        gm.name()
-    );
-    benchmark_1(BenchmarkOptions1 {
-        xs: pairs_of_unsigned_vec_and_small_usize_var_1(gm),
-        function_f: &mut (|(mut limbs, delete_size): (Vec<u32>, usize)| {
-            limbs_delete_left(&mut limbs, delete_size)
-        }),
-        x_cons: &(|ps| ps.clone()),
-        x_param: &(|&(ref limbs, _)| limbs.len()),
+    m_run_benchmark(
+        "limbs_delete_left(&mut Vec<u32>, usize)",
+        BenchmarkType::Ordinary,
+        pairs_of_unsigned_vec_and_small_usize_var_1(gm),
+        gm.name(),
         limit,
-        f_name: "malachite",
-        title: "limbs_delete_left(&mut Vec<u32>, usize)",
-        x_axis_label: "limbs.len()",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+        file_name,
+        &(|&(ref limbs, _)| limbs.len()),
+        "limbs.len()",
+        &[
+            (
+                "malachite",
+                &mut (|(mut limbs, delete_size)| limbs_delete_left(&mut limbs, delete_size)),
+            ),
+        ],
+    );
 }

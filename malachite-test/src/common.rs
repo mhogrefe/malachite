@@ -2,6 +2,7 @@ use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use num::{BigInt, BigUint};
 use rug;
+use rust_wheels::benchmarks::{run_benchmark, BenchmarkOptions, BenchmarkSeriesOptions};
 use std::str::FromStr;
 
 pub fn biguint_to_natural(n: &BigUint) -> Natural {
@@ -65,5 +66,63 @@ impl GenerationMode {
             GenerationMode::Random(_) => "random",
             GenerationMode::SpecialRandom(_) => "special_random",
         }
+    }
+}
+
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
+pub enum BenchmarkType {
+    Ordinary,
+    EvaluationStrategy,
+    Algorithms,
+}
+
+#[allow(too_many_arguments)]
+pub fn m_run_benchmark<'a, I: Iterator>(
+    title: &'a str,
+    benchmark_type: BenchmarkType,
+    generator: I,
+    generation_mode_name: &'a str,
+    limit: usize,
+    file_name: &'a str,
+    bucketing_function: &'a Fn(&I::Item) -> usize,
+    bucketing_label: &'a str,
+    series: &[(&'a str, &'a Fn(I::Item))],
+) where
+    I::Item: Clone,
+{
+    let title = match benchmark_type {
+        BenchmarkType::Ordinary => title.to_owned(),
+        BenchmarkType::EvaluationStrategy => format!("{} evaluation strategy", title),
+        BenchmarkType::Algorithms => format!("{} algorithms", title),
+    };
+    println!("benchmarking {} {}", generation_mode_name, title);
+    let colors = vec!["green", "blue", "red", "black", "orange"];
+    if series.len() > colors.len() {
+        panic!("not enough available colors");
+    }
+    let mut series_options = Vec::new();
+    for (&(label, function), color) in series.iter().zip(colors.iter()) {
+        series_options.push(BenchmarkSeriesOptions {
+            name: label,
+            function,
+            color,
+        });
+    }
+    let options = BenchmarkOptions {
+        generator,
+        title: &title,
+        limit,
+        bucketing_function,
+        x_axis_label: bucketing_label,
+        y_axis_label: "time (ns)",
+        file_name: &format!("benchmarks/{}", file_name),
+        series_options,
+    };
+    run_benchmark(options);
+}
+
+macro_rules! no_out {
+    ($e: expr) => {
+        {$e;}
     }
 }

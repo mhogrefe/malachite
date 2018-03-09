@@ -1,3 +1,5 @@
+#![allow(unknown_lints, no_effect, type_complexity, unnecessary_operation)]
+
 extern crate malachite_base;
 extern crate malachite_nz;
 extern crate num;
@@ -5,6 +7,7 @@ extern crate rand;
 extern crate rug;
 extern crate rust_wheels;
 
+#[macro_use]
 pub mod common;
 pub mod hash;
 pub mod inputs {

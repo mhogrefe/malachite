@@ -1091,6 +1091,7 @@ demos_and_benchmarks!(
         benchmark_integer_trailing_zeros,
         benchmark_integer_twos_complement_limbs_asc,
         benchmark_integer_twos_complement_limbs_desc,
+        benchmark_natural_add,
         benchmark_natural_add_assign,
         benchmark_natural_add_assign_evaluation_strategy,
         benchmark_natural_add_evaluation_strategy,

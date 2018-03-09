@@ -1,7 +1,6 @@
-use common::GenerationMode;
+use common::{m_run_benchmark, BenchmarkType, GenerationMode};
 use inputs::base::unsigneds;
 use malachite_base::chars::contiguous_range_to_char;
-use rust_wheels::benchmarks::{BenchmarkOptions1, benchmark_1};
 
 pub fn demo_contiguous_range_to_char(gm: GenerationMode, limit: usize) {
     for i in unsigneds(gm).take(limit) {
@@ -14,17 +13,17 @@ pub fn demo_contiguous_range_to_char(gm: GenerationMode, limit: usize) {
 }
 
 pub fn benchmark_contiguous_range_to_char(gm: GenerationMode, limit: usize, file_name: &str) {
-    println!("benchmarking {} contiguous_range_to_char(char)", gm.name());
-    benchmark_1(BenchmarkOptions1 {
-        xs: unsigneds(gm),
-        function_f: &mut (|i| contiguous_range_to_char(i)),
-        x_cons: &(|&i| i),
-        x_param: &(|&i| i as usize),
+    m_run_benchmark(
+        "contiguous_range_to_char(char)",
+        BenchmarkType::Ordinary,
+        unsigneds(gm),
+        gm.name(),
         limit,
-        f_name: "malachite",
-        title: "contiguous_range_to_char(char)",
-        x_axis_label: "i",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+        file_name,
+        &(|&i| i as usize),
+        "i",
+        &[
+            ("malachite", &mut (|i| no_out!(contiguous_range_to_char(i)))),
+        ],
+    );
 }

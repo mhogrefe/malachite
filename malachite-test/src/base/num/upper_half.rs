@@ -1,7 +1,6 @@
-use common::GenerationMode;
+use common::{m_run_benchmark, BenchmarkType, GenerationMode};
 use inputs::base::unsigneds;
 use malachite_base::num::{PrimitiveUnsigned, SplitInHalf};
-use rust_wheels::benchmarks::{BenchmarkOptions1, benchmark_1};
 
 fn demo_unsigned_upper_half<T: 'static + PrimitiveUnsigned + SplitInHalf>(
     gm: GenerationMode,
@@ -21,19 +20,17 @@ fn benchmark_unsigned_upper_half<T: 'static + PrimitiveUnsigned + SplitInHalf>(
 ) where
     T::Half: PrimitiveUnsigned,
 {
-    println!("benchmarking {} {}.upper_half()", gm.name(), T::NAME,);
-    benchmark_1(BenchmarkOptions1 {
-        xs: unsigneds(gm),
-        function_f: &mut (|u: T| u.upper_half()),
-        x_cons: &(|&u| u),
-        x_param: &(|&u| u.significant_bits() as usize),
+    m_run_benchmark(
+        &format!("{}.upper_half()", T::NAME),
+        BenchmarkType::Ordinary,
+        unsigneds::<T>(gm),
+        gm.name(),
         limit,
-        f_name: "malachite",
-        title: &format!("{}.upper_half()", T::NAME,),
-        x_axis_label: "u.significant_bits()",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+        file_name,
+        &(|&n| n.significant_bits() as usize),
+        "n.significant_bits()",
+        &[("malachite", &mut (|n| no_out!(n.upper_half())))],
+    );
 }
 
 macro_rules! unsigned {

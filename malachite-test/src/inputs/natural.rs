@@ -1,8 +1,10 @@
-use common::GenerationMode;
+use common::{natural_to_biguint, natural_to_rug_integer, GenerationMode};
 use inputs::common::{reshape_1_2_to_3, reshape_2_1_to_3};
 use malachite_base::num::{PrimitiveInteger, PrimitiveSigned, PrimitiveUnsigned};
 use malachite_base::round::RoundingMode;
 use malachite_nz::natural::Natural;
+use num::BigUint;
+use rug;
 use rust_wheels::iterators::bools::exhaustive_bools;
 use rust_wheels::iterators::common::EXAMPLE_SEED;
 use rust_wheels::iterators::general::random;
@@ -49,6 +51,37 @@ pub fn pairs_of_naturals(gm: GenerationMode) -> Box<Iterator<Item = (Natural, Na
             special_random_naturals(&EXAMPLE_SEED, scale),
         )),
     }
+}
+
+pub fn nrm_pairs_of_naturals(
+    gm: GenerationMode,
+) -> Box<
+    Iterator<
+        Item = (
+            (BigUint, BigUint),
+            (rug::Integer, rug::Integer),
+            (Natural, Natural),
+        ),
+    >,
+> {
+    Box::new(pairs_of_naturals(gm).map(|(x, y)| {
+        (
+            (natural_to_biguint(&x), natural_to_biguint(&y)),
+            (natural_to_rug_integer(&x), natural_to_rug_integer(&y)),
+            (x, y),
+        )
+    }))
+}
+
+pub fn rm_pairs_of_naturals(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = ((rug::Integer, rug::Integer), (Natural, Natural))>> {
+    Box::new(pairs_of_naturals(gm).map(|(x, y)| {
+        (
+            (natural_to_rug_integer(&x), natural_to_rug_integer(&y)),
+            (x, y),
+        )
+    }))
 }
 
 //TODO use subset_pairs

@@ -1,7 +1,6 @@
-use common::GenerationMode;
+use common::{m_run_benchmark, BenchmarkType, GenerationMode};
 use inputs::base::vecs_of_unsigned;
 use malachite_base::limbs::limbs_test_zero;
-use rust_wheels::benchmarks::{BenchmarkOptions1, benchmark_1};
 
 pub fn demo_limbs_test_zero(gm: GenerationMode, limit: usize) {
     for xs in vecs_of_unsigned(gm).take(limit) {
@@ -14,17 +13,20 @@ pub fn demo_limbs_test_zero(gm: GenerationMode, limit: usize) {
 }
 
 pub fn benchmark_limbs_test_zero(gm: GenerationMode, limit: usize, file_name: &str) {
-    println!("benchmarking {} limbs_test_zero(&[u32])", gm.name());
-    benchmark_1(BenchmarkOptions1 {
-        xs: vecs_of_unsigned(gm),
-        function_f: &mut (|xs: Vec<u32>| limbs_test_zero(xs.as_slice())),
-        x_cons: &(|xs| xs.clone()),
-        x_param: &(|xs| xs.len()),
+    m_run_benchmark(
+        "limbs_test_zero(&[u32])",
+        BenchmarkType::Ordinary,
+        vecs_of_unsigned(gm),
+        gm.name(),
         limit,
-        f_name: "malachite",
-        title: "limbs_test_zero(&[u32])",
-        x_axis_label: "xs.len()",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+        file_name,
+        &(|limbs| limbs.len()),
+        "limbs.len()",
+        &[
+            (
+                "malachite",
+                &mut (|limbs| no_out!(limbs_test_zero(limbs.as_slice()))),
+            ),
+        ],
+    );
 }
