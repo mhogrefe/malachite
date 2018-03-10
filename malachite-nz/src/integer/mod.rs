@@ -7,7 +7,8 @@ use std::str::FromStr;
 ///
 /// Any `Integer` whose absolute value is small enough to fit into an `u32` is represented inline.
 /// Only integers outside this range incur the costs of heap-allocation.
-#[derive(Clone, PartialEq, Eq, Hash)]
+#[derive(Clone, Hash, Eq, PartialEq)]
+#[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
 pub struct Integer {
     pub(crate) sign: bool, // must be true if abs is zero
     pub(crate) abs: Natural,

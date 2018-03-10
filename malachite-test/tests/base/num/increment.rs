@@ -47,7 +47,7 @@ macro_rules! increment_fail {
             let mut n = $t::MAX;
             n.increment();
         }
-    }
+    };
 }
 
 increment_fail!(u8, increment_u8_fail);

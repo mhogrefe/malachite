@@ -55,7 +55,7 @@ macro_rules! unsigned {
         pub fn $bench_name(gm: GenerationMode, limit: usize, file_name: &str) {
             benchmark_unsigned_join_halves::<$t>(gm, limit, file_name);
         }
-    }
+    };
 }
 
 unsigned!(u16, demo_u16_join_halves, benchmark_u16_join_halves);

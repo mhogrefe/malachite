@@ -78,6 +78,7 @@ use malachite_test::integer::conversion::from_sign_and_limbs::*;
 use malachite_test::integer::conversion::from_u32::*;
 use malachite_test::integer::conversion::from_u64::*;
 use malachite_test::integer::conversion::natural_assign_integer::*;
+use malachite_test::integer::conversion::serde::*;
 use malachite_test::integer::conversion::to_i32::*;
 use malachite_test::integer::conversion::to_i64::*;
 use malachite_test::integer::conversion::to_natural::*;
@@ -127,6 +128,7 @@ use malachite_test::natural::conversion::clone_and_assign::*;
 use malachite_test::natural::conversion::from_limbs::*;
 use malachite_test::natural::conversion::from_u32::*;
 use malachite_test::natural::conversion::from_u64::*;
+use malachite_test::natural::conversion::serde::*;
 use malachite_test::natural::conversion::to_integer::*;
 use malachite_test::natural::conversion::to_limbs::*;
 use malachite_test::natural::conversion::to_u32::*;
@@ -567,6 +569,7 @@ demos_and_benchmarks!(
         demo_integer_partial_eq_u32,
         demo_u32_partial_eq_integer,
         demo_integer_partial_eq_natural,
+        demo_integer_serialize,
         demo_integer_set_bit,
         demo_integer_shl_assign_i32,
         demo_integer_shl_i32,
@@ -732,6 +735,7 @@ demos_and_benchmarks!(
         demo_natural_partial_cmp_u32,
         demo_u32_partial_cmp_natural,
         demo_natural_random_natural_below,
+        demo_natural_serialize,
         demo_natural_set_bit,
         demo_natural_shl_assign_i32,
         demo_natural_shl_i32,
@@ -1015,6 +1019,7 @@ demos_and_benchmarks!(
         benchmark_integer_partial_eq_u32,
         benchmark_u32_partial_eq_integer,
         benchmark_integer_partial_eq_natural,
+        benchmark_integer_serialize,
         benchmark_integer_set_bit,
         benchmark_integer_shl_assign_i32,
         benchmark_integer_shl_i32,
@@ -1169,6 +1174,7 @@ demos_and_benchmarks!(
         benchmark_u32_partial_eq_natural,
         benchmark_natural_partial_eq_integer,
         benchmark_natural_random_natural_below,
+        benchmark_natural_serialize,
         benchmark_natural_set_bit,
         benchmark_natural_shl_assign_i32,
         benchmark_natural_shl_i32,

@@ -63,7 +63,7 @@ macro_rules! flip_bit_fail_helper_unsigned {
             let mut n = $t::from_u64(5);
             n.flip_bit(100);
         }
-    }
+    };
 }
 
 macro_rules! flip_bit_fail_helper_signed {
@@ -76,7 +76,7 @@ macro_rules! flip_bit_fail_helper_signed {
             let mut n = $t::NEGATIVE_ONE;
             n.flip_bit(100);
         }
-    }
+    };
 }
 
 flip_bit_fail_helper_unsigned!(u8, flip_bit_u8_fail_helper);

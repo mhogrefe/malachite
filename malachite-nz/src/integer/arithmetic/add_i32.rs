@@ -68,12 +68,12 @@ impl<'a> Add<i32> for &'a Integer {
         match *self {
             // e.g. 10 + 5 or -10 + -5; sign of self is unchanged
             Integer { sign, ref abs } if sign == (other > 0) => Integer {
-                sign: sign,
+                sign,
                 abs: abs + abs_other,
             },
             // e.g. 10 + -5, -10 + 5, or 5 + -5; sign of self is unchanged
             Integer { sign, ref abs } if sign && *abs == abs_other || *abs > abs_other => Integer {
-                sign: sign,
+                sign,
                 abs: (abs - abs_other).unwrap(),
             },
             // e.g. 5 + -10, -5 + 10, or -5 + 5; sign of self is flipped

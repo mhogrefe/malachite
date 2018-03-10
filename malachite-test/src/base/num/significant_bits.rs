@@ -62,7 +62,7 @@ macro_rules! unsigned {
         pub fn $bench_name(gm: GenerationMode, limit: usize, file_name: &str) {
             benchmark_unsigned_significant_bits::<$t>(gm, limit, file_name);
         }
-    }
+    };
 }
 
 macro_rules! signed {
@@ -74,7 +74,7 @@ macro_rules! signed {
         pub fn $bench_name(gm: GenerationMode, limit: usize, file_name: &str) {
             benchmark_signed_significant_bits::<$t>(gm, limit, file_name);
         }
-    }
+    };
 }
 
 unsigned!(u8, demo_u8_significant_bits, benchmark_u8_significant_bits);

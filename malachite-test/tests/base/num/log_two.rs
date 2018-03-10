@@ -33,7 +33,7 @@ macro_rules! floor_log_two_fail {
         fn $floor_log_two_fail() {
             $t::ZERO.floor_log_two();
         }
-    }
+    };
 }
 
 floor_log_two_fail!(u8, floor_log_two_u8_fail);
@@ -71,7 +71,7 @@ macro_rules! ceiling_log_two_fail {
         fn $ceiling_log_two_fail() {
             $t::ZERO.ceiling_log_two();
         }
-    }
+    };
 }
 
 ceiling_log_two_fail!(u8, ceiling_log_two_u8_fail);

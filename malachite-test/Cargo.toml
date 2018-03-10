@@ -13,10 +13,12 @@ path = "src/bin.rs"
 
 [dependencies]
 malachite-base = { path = "../malachite-base" }
-malachite-nz = { path = "../malachite-nz" }
+malachite-nz = { path = "../malachite-nz", features = ["serde"] }
 rust-wheels = { path = "../../rust-wheels" }
 num = "0.1.37"
 rand = "0.3.0"
+serde = "1.0"
+serde_json = "1.0"
 
 [dependencies.rug]
 version = "0.9.2"

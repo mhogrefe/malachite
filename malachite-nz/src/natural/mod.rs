@@ -11,7 +11,8 @@ pub const LIMB_BITS_MASK: u32 = LIMB_BITS - 1;
 ///
 /// Any `Natural` small enough to fit into an `u32` is represented inline. Only naturals outside
 /// this range incur the costs of heap-allocation.
-#[derive(Clone, PartialEq, Eq, Hash)]
+#[derive(Clone, Eq, Hash, PartialEq)]
+#[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
 pub enum Natural {
     Small(u32),
     Large(Vec<u32>),

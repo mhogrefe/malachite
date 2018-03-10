@@ -42,7 +42,7 @@ macro_rules! unsigned {
         pub fn $bench_name(gm: GenerationMode, limit: usize, file_name: &str) {
             benchmark_unsigned_upper_half::<$t>(gm, limit, file_name);
         }
-    }
+    };
 }
 
 unsigned!(u16, demo_u16_upper_half, benchmark_u16_upper_half);

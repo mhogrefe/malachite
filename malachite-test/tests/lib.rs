@@ -104,6 +104,7 @@ pub mod integer {
         pub mod from_u64;
         pub mod to_natural;
         pub mod natural_assign_integer;
+        pub mod serde;
         pub mod to_i32;
         pub mod to_i64;
         pub mod to_sign_and_limbs;
@@ -165,6 +166,7 @@ pub mod natural {
         pub mod from_limbs;
         pub mod from_u32;
         pub mod from_u64;
+        pub mod serde;
         pub mod to_integer;
         pub mod to_limbs;
         pub mod to_u32;

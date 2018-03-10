@@ -59,7 +59,7 @@ macro_rules! set_bit_fail_helper {
             let mut n = $t::from_u64(5);
             n.set_bit(100);
         }
-    }
+    };
 }
 
 set_bit_fail_helper!(

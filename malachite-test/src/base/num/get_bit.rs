@@ -59,7 +59,7 @@ macro_rules! unsigned {
         pub fn $bench_name(gm: GenerationMode, limit: usize, file_name: &str) {
             benchmark_unsigned_get_bit::<$t>(gm, limit, file_name);
         }
-    }
+    };
 }
 
 macro_rules! signed {
@@ -71,7 +71,7 @@ macro_rules! signed {
         pub fn $bench_name(gm: GenerationMode, limit: usize, file_name: &str) {
             benchmark_signed_get_bit::<$t>(gm, limit, file_name);
         }
-    }
+    };
 }
 
 unsigned!(u8, demo_u8_get_bit, benchmark_u8_get_bit);

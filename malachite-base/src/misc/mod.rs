@@ -43,7 +43,7 @@ macro_rules! impl_named {
             /// ```
             const NAME: &'static str = stringify!($t);
         }
-    }
+    };
 }
 
 /// This trait defines two functions, `increment` and `decrement`, that undo each other's effect,

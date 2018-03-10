@@ -978,7 +978,8 @@ macro_rules! integer_traits {
             /// }
             /// ```
             fn increment(&mut self) {
-                *self = self.checked_add(1).expect("Cannot increment past the maximum value.");
+                *self = self.checked_add(1)
+                    .expect("Cannot increment past the maximum value.");
             }
 
             /// Decrements `self`.
@@ -1005,10 +1006,11 @@ macro_rules! integer_traits {
             /// }
             /// ```
             fn decrement(&mut self) {
-                *self = self.checked_sub(1).expect("Cannot decrement past the minimum value.");
+                *self = self.checked_sub(1)
+                    .expect("Cannot decrement past the minimum value.");
             }
         }
-    }
+    };
 }
 
 //TODO docs
@@ -1222,7 +1224,7 @@ macro_rules! unsigned_traits {
                 }
             }
         }
-    }
+    };
 }
 
 //TODO docs
@@ -1546,7 +1548,7 @@ macro_rules! float_traits {
         impl Max for $t {
             const MAX: $t = $t::INFINITY;
         }
-    }
+    };
 }
 
 //TODO docs
@@ -1800,7 +1802,7 @@ macro_rules! impl01_unsigned {
         impl Two for $t {
             const TWO: $t = 2;
         }
-    }
+    };
 }
 
 /// Implements the constants 0, 1, 2, and -1 for signed primitive integers.
@@ -1816,7 +1818,7 @@ macro_rules! impl01_signed {
         impl NegativeOne for $t {
             const NEGATIVE_ONE: $t = -1;
         }
-    }
+    };
 }
 
 /// Implements the constants 0, 1, 2, and -1 for primitive floating-point types.
@@ -1857,7 +1859,7 @@ macro_rules! impl01_float {
         impl NegativeOne for $t {
             const NEGATIVE_ONE: $t = -1.0;
         }
-    }
+    };
 }
 
 impl01_unsigned!(u8);
@@ -2009,7 +2011,7 @@ macro_rules! impl_halves_unsigned {
                 (self >> $ht::WIDTH) as $ht
             }
         }
-    }
+    };
 }
 
 impl_halves_unsigned!(u16, u8);

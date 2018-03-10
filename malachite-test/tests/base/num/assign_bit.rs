@@ -69,7 +69,7 @@ macro_rules! assign_bit_fail_helper_unsigned {
             let mut n = $t::from_u64(5);
             n.assign_bit(100, true);
         }
-    }
+    };
 }
 
 macro_rules! assign_bit_fail_helper_signed {
@@ -82,7 +82,7 @@ macro_rules! assign_bit_fail_helper_signed {
             let mut n = $t::NEGATIVE_ONE;
             n.assign_bit(100, false);
         }
-    }
+    };
 }
 
 assign_bit_fail_helper_unsigned!(u8, assign_bit_u8_fail_helper);

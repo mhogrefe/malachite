@@ -60,7 +60,7 @@ macro_rules! clear_bit_fail_helper {
             let mut n = $t::NEGATIVE_ONE;
             n.clear_bit(100);
         }
-    }
+    };
 }
 
 clear_bit_fail_helper!(

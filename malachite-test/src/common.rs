@@ -122,7 +122,7 @@ pub fn m_run_benchmark<'a, I: Iterator>(
 }
 
 macro_rules! no_out {
-    ($e: expr) => {
-        {$e;}
-    }
+    ($e: expr) => {{
+        $e;
+    }};
 }

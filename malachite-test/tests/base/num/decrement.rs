@@ -47,7 +47,7 @@ macro_rules! decrement_fail {
             let mut n = $t::MIN;
             n.decrement();
         }
-    }
+    };
 }
 
 decrement_fail!(u8, decrement_u8_fail);
