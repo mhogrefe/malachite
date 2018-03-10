@@ -320,6 +320,14 @@ pub fn pairs_of_integer_and_small_u32(gm: GenerationMode) -> Box<Iterator<Item =
     }
 }
 
+pub fn rm_pairs_of_integer_and_small_u32(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = ((rug::Integer, u32), (Integer, u32))>> {
+    Box::new(
+        pairs_of_integer_and_small_u32(gm).map(|(x, y)| ((integer_to_rug_integer(&x), y), (x, y))),
+    )
+}
+
 // All pairs of `Integer` and `u32` where the `Integer` is divisible by 2 to the power of the `u32`.
 pub fn pairs_of_integer_and_small_u32_var_1(
     gm: GenerationMode,
@@ -395,6 +403,14 @@ pub fn pairs_of_integer_and_small_i32(gm: GenerationMode) -> Box<Iterator<Item =
             &(|seed| i32s_geometric(seed, scale)),
         )),
     }
+}
+
+pub fn rm_pairs_of_integer_and_small_i32(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = ((rug::Integer, i32), (Integer, i32))>> {
+    Box::new(
+        pairs_of_integer_and_small_i32(gm).map(|(x, y)| ((integer_to_rug_integer(&x), y), (x, y))),
+    )
 }
 
 fn random_triples_of_integer_primitive_and_integer<T: 'static + PrimitiveInteger>(

@@ -1,9 +1,9 @@
-use common::{integer_to_bigint, integer_to_rug_integer, GenerationMode};
-use inputs::integer::{pairs_of_integer_and_unsigned, pairs_of_unsigned_and_integer};
+use common::{m_run_benchmark, BenchmarkType, GenerationMode};
+use inputs::integer::{nrm_pairs_of_integer_and_unsigned, pairs_of_integer_and_unsigned,
+                      pairs_of_unsigned_and_integer, rm_pairs_of_integer_and_unsigned,
+                      rm_pairs_of_unsigned_and_integer};
 use malachite_base::num::SignificantBits;
 use num::BigInt;
-use rug;
-use rust_wheels::benchmarks::{BenchmarkOptions2, BenchmarkOptions3, benchmark_2, benchmark_3};
 
 pub fn num_mul_u32(x: BigInt, u: u32) -> BigInt {
     x * BigInt::from(u)
@@ -45,44 +45,38 @@ pub fn demo_u32_mul_integer_ref(gm: GenerationMode, limit: usize) {
 }
 
 pub fn benchmark_integer_mul_assign_u32(gm: GenerationMode, limit: usize, file_name: &str) {
-    println!("benchmarking {} Integer *= u32", gm.name());
-    benchmark_2(BenchmarkOptions2 {
-        xs: pairs_of_integer_and_unsigned::<u32>(gm),
-        function_f: &mut (|(mut n, u)| n *= u),
-        function_g: &mut (|(mut n, u): (rug::Integer, u32)| n *= u),
-        x_cons: &(|p| p.clone()),
-        y_cons: &(|&(ref n, u)| (integer_to_rug_integer(n), u)),
-        x_param: &(|&(ref n, _)| n.significant_bits() as usize),
+    m_run_benchmark(
+        "Integer *= u32",
+        BenchmarkType::Ordinary,
+        rm_pairs_of_integer_and_unsigned::<u32>(gm),
+        gm.name(),
         limit,
-        f_name: "malachite",
-        g_name: "rug",
-        title: "Integer *= u32",
-        x_axis_label: "other",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+        file_name,
+        &(|&(_, (ref n, _))| n.significant_bits() as usize),
+        "n.significant_bits()",
+        &[
+            ("malachite", &mut (|(_, (mut x, y))| x *= y)),
+            ("rug", &mut (|((mut x, y), _)| x *= y)),
+        ],
+    );
 }
 
 pub fn benchmark_integer_mul_u32(gm: GenerationMode, limit: usize, file_name: &str) {
-    println!("benchmarking {} Integer * u32", gm.name());
-    benchmark_3(BenchmarkOptions3 {
-        xs: pairs_of_integer_and_unsigned::<u32>(gm),
-        function_f: &mut (|(n, u)| n * u),
-        function_g: &mut (|(n, u): (BigInt, u32)| num_mul_u32(n, u)),
-        function_h: &mut (|(n, u): (rug::Integer, u32)| n * u),
-        x_cons: &(|p| p.clone()),
-        y_cons: &(|&(ref n, u)| (integer_to_bigint(n), u)),
-        z_cons: &(|&(ref n, u)| (integer_to_rug_integer(n), u)),
-        x_param: &(|&(ref n, _)| n.significant_bits() as usize),
+    m_run_benchmark(
+        "Integer * u32",
+        BenchmarkType::Ordinary,
+        nrm_pairs_of_integer_and_unsigned(gm),
+        gm.name(),
         limit,
-        f_name: "malachite",
-        g_name: "num",
-        h_name: "rug",
-        title: "Integer * u32",
-        x_axis_label: "other",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+        file_name,
+        &(|&(_, _, (ref n, _))| n.significant_bits() as usize),
+        "n.significant_bits()",
+        &[
+            ("malachite", &mut (|(_, _, (x, y))| no_out!(x * y))),
+            ("num", &mut (|((x, y), _, _)| no_out!(num_mul_u32(x, y)))),
+            ("rug", &mut (|(_, (x, y), _)| no_out!(x * y))),
+        ],
+    );
 }
 
 pub fn benchmark_integer_mul_u32_evaluation_strategy(
@@ -90,44 +84,37 @@ pub fn benchmark_integer_mul_u32_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    println!(
-        "benchmarking {} Integer * u32 evaluation strategy",
-        gm.name()
-    );
-    benchmark_2(BenchmarkOptions2 {
-        xs: pairs_of_integer_and_unsigned::<u32>(gm),
-        function_f: &mut (|(n, u)| n * u),
-        function_g: &mut (|(n, u)| &n * u),
-        x_cons: &(|p| p.clone()),
-        y_cons: &(|p| p.clone()),
-        x_param: &(|&(ref n, _)| n.significant_bits() as usize),
+    m_run_benchmark(
+        "Integer * u32",
+        BenchmarkType::EvaluationStrategy,
+        pairs_of_integer_and_unsigned::<u32>(gm),
+        gm.name(),
         limit,
-        f_name: "Integer * u32",
-        g_name: "&Integer * u32",
-        title: "Integer * u32 evaluation strategy",
-        x_axis_label: "n.significant_bits()",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+        file_name,
+        &(|&(ref n, _)| n.significant_bits() as usize),
+        "n.significant_bits()",
+        &[
+            ("Integer * u32", &mut (|(x, y)| no_out!(x * y))),
+            ("&Integer * u32", &mut (|(x, y)| no_out!(&x * y))),
+        ],
+    );
 }
 
 pub fn benchmark_u32_mul_integer(gm: GenerationMode, limit: usize, file_name: &str) {
-    println!("benchmarking {} u32 * Integer", gm.name());
-    benchmark_2(BenchmarkOptions2 {
-        xs: pairs_of_unsigned_and_integer::<u32>(gm),
-        function_f: &mut (|(u, n)| u * n),
-        function_g: &mut (|(u, n): (u32, rug::Integer)| u * n),
-        x_cons: &(|p| p.clone()),
-        y_cons: &(|&(u, ref n)| (u, integer_to_rug_integer(n))),
-        x_param: &(|&(_, ref n)| n.significant_bits() as usize),
+    m_run_benchmark(
+        "u32 * Integer",
+        BenchmarkType::Ordinary,
+        rm_pairs_of_unsigned_and_integer::<u32>(gm),
+        gm.name(),
         limit,
-        f_name: "malachite",
-        g_name: "rug",
-        title: "u32 * Integer",
-        x_axis_label: "other",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+        file_name,
+        &(|&(_, (_, ref n))| n.significant_bits() as usize),
+        "n.significant_bits()",
+        &[
+            ("malachite", &mut (|(_, (x, y))| no_out!(x * y))),
+            ("rug", &mut (|((x, y), _)| no_out!(x * y))),
+        ],
+    );
 }
 
 pub fn benchmark_u32_mul_integer_evaluation_strategy(
@@ -135,23 +122,18 @@ pub fn benchmark_u32_mul_integer_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    println!(
-        "benchmarking {} u32 * Integer evaluation strategy",
-        gm.name()
-    );
-    benchmark_2(BenchmarkOptions2 {
-        xs: pairs_of_unsigned_and_integer::<u32>(gm),
-        function_f: &mut (|(u, n)| u * n),
-        function_g: &mut (|(u, n)| u * &n),
-        x_cons: &(|p| p.clone()),
-        y_cons: &(|p| p.clone()),
-        x_param: &(|&(_, ref n)| n.significant_bits() as usize),
+    m_run_benchmark(
+        "u32 * Integer",
+        BenchmarkType::EvaluationStrategy,
+        pairs_of_unsigned_and_integer::<u32>(gm),
+        gm.name(),
         limit,
-        f_name: "u32 * Integer",
-        g_name: "u32 * &Integer",
-        title: "u32 * Integer evaluation strategy",
-        x_axis_label: "n.significant_bits()",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+        file_name,
+        &(|&(_, ref n)| n.significant_bits() as usize),
+        "n.significant_bits()",
+        &[
+            ("u32 * Integer", &mut (|(x, y)| no_out!(x * y))),
+            ("u32 * &Integer", &mut (|(x, y)| no_out!(x * &y))),
+        ],
+    );
 }

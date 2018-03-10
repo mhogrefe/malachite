@@ -1,7 +1,5 @@
-use common::GenerationMode;
+use common::{m_run_benchmark, BenchmarkType, GenerationMode};
 use inputs::integer::pairs_of_integer_and_small_u32;
-use malachite_nz::integer::Integer;
-use rust_wheels::benchmarks::{BenchmarkOptions1, benchmark_1};
 
 pub fn demo_integer_mod_power_of_two_assign(gm: GenerationMode, limit: usize) {
     for (mut n, u) in pairs_of_integer_and_small_u32(gm).take(limit) {
@@ -110,57 +108,57 @@ pub fn benchmark_integer_mod_power_of_two_assign(
     limit: usize,
     file_name: &str,
 ) {
-    println!(
-        "benchmarking {} Integer.mod_power_of_two_assign(u32)",
-        gm.name()
-    );
-    benchmark_1(BenchmarkOptions1 {
-        xs: pairs_of_integer_and_small_u32(gm),
-        function_f: &mut (|(mut n, u): (Integer, u32)| n.mod_power_of_two_assign(u)),
-        x_cons: &(|p| p.clone()),
-        x_param: &(|&(_, index)| index as usize),
+    m_run_benchmark(
+        "Integer.mod_power_of_two_assign(u32)",
+        BenchmarkType::Ordinary,
+        pairs_of_integer_and_small_u32(gm),
+        gm.name(),
         limit,
-        f_name: "malachite",
-        title: "Integer.mod_power_of_2_assign(u32)",
-        x_axis_label: "other",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+        file_name,
+        &(|&(_, index)| index as usize),
+        "index",
+        &[
+            (
+                "malachite",
+                &mut (|(mut n, u)| n.mod_power_of_two_assign(u)),
+            ),
+        ],
+    );
 }
 
 pub fn benchmark_integer_mod_power_of_two(gm: GenerationMode, limit: usize, file_name: &str) {
-    println!("benchmarking {} Integer.mod_power_of_two(u32)", gm.name());
-    benchmark_1(BenchmarkOptions1 {
-        xs: pairs_of_integer_and_small_u32(gm),
-        function_f: &mut (|(n, u): (Integer, u32)| n.mod_power_of_two(u)),
-        x_cons: &(|p| p.clone()),
-        x_param: &(|&(_, index)| index as usize),
+    m_run_benchmark(
+        "Integer.mod_power_of_two(u32)",
+        BenchmarkType::Ordinary,
+        pairs_of_integer_and_small_u32(gm),
+        gm.name(),
         limit,
-        f_name: "malachite",
-        title: "Integer.mod_power_of_2(u32)",
-        x_axis_label: "other",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+        file_name,
+        &(|&(_, index)| index as usize),
+        "index",
+        &[
+            ("malachite", &mut (|(n, u)| no_out!(n.mod_power_of_two(u)))),
+        ],
+    );
 }
 
 pub fn benchmark_integer_mod_power_of_two_ref(gm: GenerationMode, limit: usize, file_name: &str) {
-    println!(
-        "benchmarking {} Integer.mod_power_of_two_ref(u32)",
-        gm.name()
-    );
-    benchmark_1(BenchmarkOptions1 {
-        xs: pairs_of_integer_and_small_u32(gm),
-        function_f: &mut (|(n, u): (Integer, u32)| n.mod_power_of_two_ref(u)),
-        x_cons: &(|p| p.clone()),
-        x_param: &(|&(_, index)| index as usize),
+    m_run_benchmark(
+        "Integer.mod_power_of_two_ref(u32)",
+        BenchmarkType::Ordinary,
+        pairs_of_integer_and_small_u32(gm),
+        gm.name(),
         limit,
-        f_name: "malachite",
-        title: "Integer.mod_power_of_2_ref(u32)",
-        x_axis_label: "other",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+        file_name,
+        &(|&(_, index)| index as usize),
+        "index",
+        &[
+            (
+                "malachite",
+                &mut (|(n, u)| no_out!(n.mod_power_of_two_ref(u))),
+            ),
+        ],
+    );
 }
 
 pub fn benchmark_integer_rem_power_of_two_assign(
@@ -168,57 +166,57 @@ pub fn benchmark_integer_rem_power_of_two_assign(
     limit: usize,
     file_name: &str,
 ) {
-    println!(
-        "benchmarking {} Integer.rem_power_of_two_assign(u32)",
-        gm.name()
-    );
-    benchmark_1(BenchmarkOptions1 {
-        xs: pairs_of_integer_and_small_u32(gm),
-        function_f: &mut (|(mut n, u): (Integer, u32)| n.rem_power_of_two_assign(u)),
-        x_cons: &(|p| p.clone()),
-        x_param: &(|&(_, index)| index as usize),
+    m_run_benchmark(
+        "Integer.rem_power_of_two_assign(u32)",
+        BenchmarkType::Ordinary,
+        pairs_of_integer_and_small_u32(gm),
+        gm.name(),
         limit,
-        f_name: "malachite",
-        title: "Integer.rem_power_of_2_assign(u32)",
-        x_axis_label: "other",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+        file_name,
+        &(|&(_, index)| index as usize),
+        "index",
+        &[
+            (
+                "malachite",
+                &mut (|(mut n, u)| n.rem_power_of_two_assign(u)),
+            ),
+        ],
+    );
 }
 
 pub fn benchmark_integer_rem_power_of_two(gm: GenerationMode, limit: usize, file_name: &str) {
-    println!("benchmarking {} Integer.rem_power_of_two(u32)", gm.name());
-    benchmark_1(BenchmarkOptions1 {
-        xs: pairs_of_integer_and_small_u32(gm),
-        function_f: &mut (|(n, u): (Integer, u32)| n.rem_power_of_two(u)),
-        x_cons: &(|p| p.clone()),
-        x_param: &(|&(_, index)| index as usize),
+    m_run_benchmark(
+        "Integer.rem_power_of_two(u32)",
+        BenchmarkType::Ordinary,
+        pairs_of_integer_and_small_u32(gm),
+        gm.name(),
         limit,
-        f_name: "malachite",
-        title: "Integer.rem_power_of_2(u32)",
-        x_axis_label: "other",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+        file_name,
+        &(|&(_, index)| index as usize),
+        "index",
+        &[
+            ("malachite", &mut (|(n, u)| no_out!(n.rem_power_of_two(u)))),
+        ],
+    );
 }
 
 pub fn benchmark_integer_rem_power_of_two_ref(gm: GenerationMode, limit: usize, file_name: &str) {
-    println!(
-        "benchmarking {} Integer.rem_power_of_two_ref(u32)",
-        gm.name()
-    );
-    benchmark_1(BenchmarkOptions1 {
-        xs: pairs_of_integer_and_small_u32(gm),
-        function_f: &mut (|(n, u): (Integer, u32)| n.rem_power_of_two_ref(u)),
-        x_cons: &(|p| p.clone()),
-        x_param: &(|&(_, index)| index as usize),
+    m_run_benchmark(
+        "Integer.rem_power_of_two_ref(u32)",
+        BenchmarkType::Ordinary,
+        pairs_of_integer_and_small_u32(gm),
+        gm.name(),
         limit,
-        f_name: "malachite",
-        title: "Integer.rem_power_of_2_ref(u32)",
-        x_axis_label: "other",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+        file_name,
+        &(|&(_, index)| index as usize),
+        "index",
+        &[
+            (
+                "malachite",
+                &mut (|(n, u)| no_out!(n.rem_power_of_two_ref(u))),
+            ),
+        ],
+    );
 }
 
 pub fn benchmark_integer_ceiling_mod_power_of_two_assign(
@@ -226,22 +224,22 @@ pub fn benchmark_integer_ceiling_mod_power_of_two_assign(
     limit: usize,
     file_name: &str,
 ) {
-    println!(
-        "benchmarking {} Integer.ceiling_mod_power_of_two_assign(u32)",
-        gm.name()
-    );
-    benchmark_1(BenchmarkOptions1 {
-        xs: pairs_of_integer_and_small_u32(gm),
-        function_f: &mut (|(mut n, u): (Integer, u32)| n.ceiling_mod_power_of_two_assign(u)),
-        x_cons: &(|p| p.clone()),
-        x_param: &(|&(_, index)| index as usize),
+    m_run_benchmark(
+        "Integer.ceiling_ceiling_mod_power_of_two_assign(u32)",
+        BenchmarkType::Ordinary,
+        pairs_of_integer_and_small_u32(gm),
+        gm.name(),
         limit,
-        f_name: "malachite",
-        title: "Integer.ceiling_mod_power_of_2_assign(u32)",
-        x_axis_label: "other",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+        file_name,
+        &(|&(_, index)| index as usize),
+        "index",
+        &[
+            (
+                "malachite",
+                &mut (|(mut n, u)| n.ceiling_mod_power_of_two_assign(u)),
+            ),
+        ],
+    );
 }
 
 pub fn benchmark_integer_ceiling_mod_power_of_two(
@@ -249,22 +247,22 @@ pub fn benchmark_integer_ceiling_mod_power_of_two(
     limit: usize,
     file_name: &str,
 ) {
-    println!(
-        "benchmarking {} Integer.ceiling_mod_power_of_two(u32)",
-        gm.name()
-    );
-    benchmark_1(BenchmarkOptions1 {
-        xs: pairs_of_integer_and_small_u32(gm),
-        function_f: &mut (|(n, u): (Integer, u32)| n.ceiling_mod_power_of_two(u)),
-        x_cons: &(|p| p.clone()),
-        x_param: &(|&(_, index)| index as usize),
+    m_run_benchmark(
+        "Integer.ceiling_mod_power_of_two(u32)",
+        BenchmarkType::Ordinary,
+        pairs_of_integer_and_small_u32(gm),
+        gm.name(),
         limit,
-        f_name: "malachite",
-        title: "Integer.ceiling_mod_power_of_2(u32)",
-        x_axis_label: "other",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+        file_name,
+        &(|&(_, index)| index as usize),
+        "index",
+        &[
+            (
+                "malachite",
+                &mut (|(n, u)| no_out!(n.ceiling_mod_power_of_two(u))),
+            ),
+        ],
+    );
 }
 
 pub fn benchmark_integer_ceiling_mod_power_of_two_ref(
@@ -272,20 +270,20 @@ pub fn benchmark_integer_ceiling_mod_power_of_two_ref(
     limit: usize,
     file_name: &str,
 ) {
-    println!(
-        "benchmarking {} Integer.ceiling_mod_power_of_two_ref(u32)",
-        gm.name()
-    );
-    benchmark_1(BenchmarkOptions1 {
-        xs: pairs_of_integer_and_small_u32(gm),
-        function_f: &mut (|(n, u): (Integer, u32)| n.ceiling_mod_power_of_two_ref(u)),
-        x_cons: &(|p| p.clone()),
-        x_param: &(|&(_, index)| index as usize),
+    m_run_benchmark(
+        "Integer.ceiling_mod_power_of_two_ref(u32)",
+        BenchmarkType::Ordinary,
+        pairs_of_integer_and_small_u32(gm),
+        gm.name(),
         limit,
-        f_name: "malachite",
-        title: "Integer.ceiling_mod_power_of_2_ref(u32)",
-        x_axis_label: "other",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+        file_name,
+        &(|&(_, index)| index as usize),
+        "index",
+        &[
+            (
+                "malachite",
+                &mut (|(n, u)| no_out!(n.ceiling_mod_power_of_two_ref(u))),
+            ),
+        ],
+    );
 }

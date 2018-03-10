@@ -1,8 +1,6 @@
-use common::GenerationMode;
+use common::{m_run_benchmark, BenchmarkType, GenerationMode};
 use inputs::integer::pairs_of_integer_and_small_u32;
 use malachite_base::num::SignificantBits;
-use malachite_nz::integer::Integer;
-use rust_wheels::benchmarks::{BenchmarkOptions1, BenchmarkOptions2, benchmark_1, benchmark_2};
 
 pub fn demo_integer_divisible_by_power_of_two(gm: GenerationMode, limit: usize) {
     for (n, pow) in pairs_of_integer_and_small_u32(gm).take(limit) {
@@ -19,22 +17,22 @@ pub fn benchmark_integer_divisible_by_power_of_two(
     limit: usize,
     file_name: &str,
 ) {
-    println!(
-        "benchmarking {} Integer.divisible_by_power_of_two(u32)",
-        gm.name()
-    );
-    benchmark_1(BenchmarkOptions1 {
-        xs: pairs_of_integer_and_small_u32(gm),
-        function_f: &mut (|(n, pow): (Integer, u32)| n.divisible_by_power_of_two(pow)),
-        x_cons: &(|&(ref n, pow)| (n.clone(), pow)),
-        x_param: &(|&(ref n, _)| n.significant_bits() as usize),
+    m_run_benchmark(
+        "Integer.divisible_by_power_of_two(u32)",
+        BenchmarkType::Ordinary,
+        pairs_of_integer_and_small_u32(gm),
+        gm.name(),
         limit,
-        f_name: "malachite",
-        title: "Integer.divisible_by_power_of_2(u32)",
-        x_axis_label: "n.significant_bits()",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+        file_name,
+        &(|&(ref n, _)| n.significant_bits() as usize),
+        "n.significant_bits()",
+        &[
+            (
+                "malachite",
+                &mut (|(n, pow)| no_out!(n.divisible_by_power_of_two(pow))),
+            ),
+        ],
+    );
 }
 
 pub fn benchmark_integer_divisible_by_power_of_two_algorithms(
@@ -42,25 +40,24 @@ pub fn benchmark_integer_divisible_by_power_of_two_algorithms(
     limit: usize,
     file_name: &str,
 ) {
-    println!(
-        "benchmarking {} Integer.divisible_by_power_of_two(u32)",
-        gm.name()
-    );
-    benchmark_2(BenchmarkOptions2 {
-        xs: pairs_of_integer_and_small_u32(gm),
-        function_f: &mut (|(n, pow): (Integer, u32)| n.divisible_by_power_of_two(pow)),
-        function_g: &mut (|(n, pow): (Integer, u32)| {
-            n.trailing_zeros().map_or(true, |z| z >= u64::from(pow))
-        }),
-        x_cons: &(|p| p.clone()),
-        y_cons: &(|p| p.clone()),
-        x_param: &(|&(ref n, _)| n.significant_bits() as usize),
+    m_run_benchmark(
+        "Integer.divisible_by_power_of_two(u32)",
+        BenchmarkType::Algorithms,
+        pairs_of_integer_and_small_u32(gm),
+        gm.name(),
         limit,
-        f_name: "Integer.divisible_by_power_of_2(u32)",
-        g_name: "Integer.trailing_zeros().map_or(true, |z| z >= u32)",
-        title: "Integer.divisible_by_power_of_2(u32)",
-        x_axis_label: "n.significant_bits()",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+        file_name,
+        &(|&(ref n, _)| n.significant_bits() as usize),
+        "n.significant_bits()",
+        &[
+            (
+                "Integer.divisible_by_power_of_2(u32)",
+                &mut (|(n, pow)| no_out!(n.divisible_by_power_of_two(pow))),
+            ),
+            (
+                "Integer.trailing_zeros().map_or(true, |z| z >= u32)",
+                &mut (|(n, pow)| no_out!(n.trailing_zeros().map_or(true, |z| z >= u64::from(pow)))),
+            ),
+        ],
+    );
 }

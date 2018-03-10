@@ -1,12 +1,7 @@
-use common::{integer_to_bigint, integer_to_rug_integer, GenerationMode};
-use inputs::integer::integers;
+use common::{m_run_benchmark, BenchmarkType, GenerationMode};
+use inputs::integer::{integers, nrm_integers};
 use malachite_base::num::SignificantBits;
 use malachite_base::num::NegAssign;
-use malachite_nz::integer::Integer;
-use num::BigInt;
-use rug;
-use rust_wheels::benchmarks::{BenchmarkOptions1, BenchmarkOptions2, BenchmarkOptions3,
-                              benchmark_1, benchmark_2, benchmark_3};
 
 pub fn demo_integer_neg_assign(gm: GenerationMode, limit: usize) {
     for mut n in integers(gm).take(limit) {
@@ -29,41 +24,35 @@ pub fn demo_integer_neg_ref(gm: GenerationMode, limit: usize) {
 }
 
 pub fn benchmark_integer_neg_assign(gm: GenerationMode, limit: usize, file_name: &str) {
-    println!("benchmarking {} Integer.neg_assign()", gm.name());
-    benchmark_1(BenchmarkOptions1 {
-        xs: integers(gm),
-        function_f: &mut (|mut n: Integer| n.neg_assign()),
-        x_cons: &(|x| x.clone()),
-        x_param: &(|n| n.significant_bits() as usize),
+    m_run_benchmark(
+        "Integer.neg_assign()",
+        BenchmarkType::Ordinary,
+        integers(gm),
+        gm.name(),
         limit,
-        f_name: "malachite",
-        title: "Integer.neg_assign()",
-        x_axis_label: "n.significant_bits()",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+        file_name,
+        &(|n| n.significant_bits() as usize),
+        "n.significant_bits()",
+        &[("malachite", &mut (|mut n| n.neg_assign()))],
+    );
 }
 
 pub fn benchmark_integer_neg(gm: GenerationMode, limit: usize, file_name: &str) {
-    println!("benchmarking {} -Integer", gm.name());
-    benchmark_3(BenchmarkOptions3 {
-        xs: integers(gm),
-        function_f: &mut (|n: Integer| -n),
-        function_g: &mut (|n: BigInt| -n),
-        function_h: &mut (|n: rug::Integer| -n),
-        x_cons: &(|x| x.clone()),
-        y_cons: &(|x| integer_to_bigint(x)),
-        z_cons: &(|x| integer_to_rug_integer(x)),
-        x_param: &(|n| n.significant_bits() as usize),
+    m_run_benchmark(
+        "Integer.abs()",
+        BenchmarkType::Ordinary,
+        nrm_integers(gm),
+        gm.name(),
         limit,
-        f_name: "malachite",
-        g_name: "num",
-        h_name: "rug",
-        title: "-Integer",
-        x_axis_label: "n.significant_bits()",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+        file_name,
+        &(|&(_, _, ref n)| n.significant_bits() as usize),
+        "n.significant_bits()",
+        &[
+            ("malachite", &mut (|(_, _, n)| no_out!(-n))),
+            ("num", &mut (|(n, _, _)| no_out!(-n))),
+            ("rug", &mut (|(_, n, _)| no_out!(-n))),
+        ],
+    );
 }
 
 pub fn benchmark_integer_neg_evaluation_strategy(
@@ -71,20 +60,18 @@ pub fn benchmark_integer_neg_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    println!("benchmarking {} -Integer evaluation strategy", gm.name());
-    benchmark_2(BenchmarkOptions2 {
-        xs: integers(gm),
-        function_f: &mut (|n: Integer| -n),
-        function_g: &mut (|n: Integer| -&n),
-        x_cons: &(|p| p.clone()),
-        y_cons: &(|p| p.clone()),
-        x_param: &(|n| n.significant_bits() as usize),
+    m_run_benchmark(
+        "Integer.abs()",
+        BenchmarkType::EvaluationStrategy,
+        integers(gm),
+        gm.name(),
         limit,
-        f_name: "-Integer",
-        g_name: "-&Integer",
-        title: "-Integer evaluation strategy",
-        x_axis_label: "n.significant_bits()",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+        file_name,
+        &(|n| n.significant_bits() as usize),
+        "n.significant_bits()",
+        &[
+            ("-Integer", &mut (|n| no_out!(-n))),
+            ("-&Integer", &mut (|n| no_out!(-&n))),
+        ],
+    );
 }

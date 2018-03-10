@@ -1,11 +1,7 @@
-use common::{integer_to_rug_integer, GenerationMode};
-use inputs::integer::{pairs_of_integer_and_small_i32,
+use common::{m_run_benchmark, BenchmarkType, GenerationMode};
+use inputs::integer::{pairs_of_integer_and_small_i32, rm_pairs_of_integer_and_small_i32,
                       triples_of_integer_small_i32_and_rounding_mode_var_2};
-use malachite_base::round::RoundingMode;
 use malachite_base::num::{ShrRound, ShrRoundAssign};
-use malachite_nz::integer::Integer;
-use rug;
-use rust_wheels::benchmarks::{BenchmarkOptions1, BenchmarkOptions2, benchmark_1, benchmark_2};
 
 pub fn demo_integer_shr_assign_i32(gm: GenerationMode, limit: usize) {
     for (mut n, i) in pairs_of_integer_and_small_i32(gm).take(limit) {
@@ -65,112 +61,118 @@ pub fn demo_integer_shr_round_i32_ref(gm: GenerationMode, limit: usize) {
 }
 
 pub fn benchmark_integer_shr_assign_i32(gm: GenerationMode, limit: usize, file_name: &str) {
-    println!("benchmarking {} Integer >>= i32", gm.name());
-    benchmark_2(BenchmarkOptions2 {
-        xs: pairs_of_integer_and_small_i32(gm),
-        function_f: &mut (|(mut n, i)| n >>= i),
-        function_g: &mut (|(mut n, i): (rug::Integer, i32)| n >>= i),
-        x_cons: &(|p| p.clone()),
-        y_cons: &(|&(ref n, index)| (integer_to_rug_integer(n), index)),
-        x_param: &(|&(_, index)| index as usize),
+    m_run_benchmark(
+        "Integer >>= i32",
+        BenchmarkType::Ordinary,
+        rm_pairs_of_integer_and_small_i32(gm),
+        gm.name(),
         limit,
-        f_name: "malachite",
-        g_name: "rug",
-        title: "Integer >>= i32",
-        x_axis_label: "other",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+        file_name,
+        &(|&(_, (_, other))| other as usize),
+        "other",
+        &[
+            ("malachite", &mut (|(_, (mut x, y))| x >>= y)),
+            ("rug", &mut (|((mut x, y), _)| x >>= y)),
+        ],
+    );
 }
 
 pub fn benchmark_integer_shr_i32(gm: GenerationMode, limit: usize, file_name: &str) {
-    println!("benchmarking {} Integer >> i32", gm.name());
-    benchmark_2(BenchmarkOptions2 {
-        xs: pairs_of_integer_and_small_i32(gm),
-        function_f: &mut (|(n, i)| n >> i),
-        function_g: &mut (|(n, i): (rug::Integer, i32)| n >> i),
-        x_cons: &(|p| p.clone()),
-        y_cons: &(|&(ref n, index)| (integer_to_rug_integer(n), index)),
-        x_param: &(|&(_, index)| index as usize),
+    m_run_benchmark(
+        "Integer >> i32",
+        BenchmarkType::Ordinary,
+        rm_pairs_of_integer_and_small_i32(gm),
+        gm.name(),
         limit,
-        f_name: "malachite",
-        g_name: "rug",
-        title: "Integer >> i32",
-        x_axis_label: "other",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+        file_name,
+        &(|&(_, (_, other))| other as usize),
+        "other",
+        &[
+            ("malachite", &mut (|(_, (x, y))| no_out!(x >> y))),
+            ("rug", &mut (|((x, y), _)| no_out!(x >> y))),
+        ],
+    );
 }
 
-pub fn benchmark_integer_shr_i32_ref(gm: GenerationMode, limit: usize, file_name: &str) {
-    println!("benchmarking {} &Integer >> i32", gm.name());
-    benchmark_1(BenchmarkOptions1 {
-        xs: pairs_of_integer_and_small_i32(gm),
-        function_f: &mut (|(n, i)| &n >> i),
-        x_cons: &(|p| p.clone()),
-        x_param: &(|&(_, index)| index as usize),
+pub fn benchmark_integer_shr_i32_evaluation_strategy(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "Integer >> i32",
+        BenchmarkType::EvaluationStrategy,
+        pairs_of_integer_and_small_i32(gm),
+        gm.name(),
         limit,
-        f_name: "malachite",
-        title: "&Integer >> i32",
-        x_axis_label: "other",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+        file_name,
+        &(|&(_, other)| other as usize),
+        "other",
+        &[
+            ("Integer >> i32", &mut (|(x, y)| no_out!(x >> y))),
+            ("&Integer >> i32", &mut (|(x, y)| no_out!(&x >> y))),
+        ],
+    );
 }
 
 pub fn benchmark_integer_shr_round_assign_i32(gm: GenerationMode, limit: usize, file_name: &str) {
-    println!(
-        "benchmarking {} Integer.shr_round_assign(i32, RoundingMode)",
-        gm.name()
-    );
-    benchmark_1(BenchmarkOptions1 {
-        xs: triples_of_integer_small_i32_and_rounding_mode_var_2(gm),
-        function_f: &mut (|(mut n, i, rm): (Integer, i32, RoundingMode)| n.shr_round_assign(i, rm)),
-        x_cons: &(|p| p.clone()),
-        x_param: &(|&(_, index, _)| index as usize),
+    m_run_benchmark(
+        "Integer.shr_round_assign(i32, RoundingMode)",
+        BenchmarkType::Ordinary,
+        triples_of_integer_small_i32_and_rounding_mode_var_2(gm),
+        gm.name(),
         limit,
-        f_name: "malachite",
-        title: "Integer.shr_round_assign(i32, RoundingMode)",
-        x_axis_label: "other",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+        file_name,
+        &(|&(_, other, _)| other as usize),
+        "other",
+        &[
+            (
+                "malachite",
+                &mut (|(mut x, y, rm)| x.shr_round_assign(y, rm)),
+            ),
+        ],
+    );
 }
 
 pub fn benchmark_integer_shr_round_i32(gm: GenerationMode, limit: usize, file_name: &str) {
-    println!(
-        "benchmarking {} Integer.shr_round(i32, RoundingMode)",
-        gm.name()
-    );
-    benchmark_1(BenchmarkOptions1 {
-        xs: triples_of_integer_small_i32_and_rounding_mode_var_2(gm),
-        function_f: &mut (|(n, i, rm): (Integer, i32, RoundingMode)| n.shr_round(i, rm)),
-        x_cons: &(|p| p.clone()),
-        x_param: &(|&(_, index, _)| index as usize),
+    m_run_benchmark(
+        "Integer.shr_round(i32, RoundingMode)",
+        BenchmarkType::Ordinary,
+        triples_of_integer_small_i32_and_rounding_mode_var_2(gm),
+        gm.name(),
         limit,
-        f_name: "malachite",
-        title: "Integer.shr_round(i32, RoundingMode)",
-        x_axis_label: "other",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+        file_name,
+        &(|&(_, other, _)| other as usize),
+        "other",
+        &[
+            ("malachite", &mut (|(x, y, rm)| no_out!(x.shr_round(y, rm)))),
+        ],
+    );
 }
 
-pub fn benchmark_integer_shr_round_i32_ref(gm: GenerationMode, limit: usize, file_name: &str) {
-    println!(
-        "benchmarking {} (&Integer).shr_round(i32, RoundingMode)",
-        gm.name()
-    );
-    benchmark_1(BenchmarkOptions1 {
-        xs: triples_of_integer_small_i32_and_rounding_mode_var_2(gm),
-        function_f: &mut (|(n, i, rm): (Integer, i32, RoundingMode)| (&n).shr_round(i, rm)),
-        x_cons: &(|p| p.clone()),
-        x_param: &(|&(_, index, _)| index as usize),
+pub fn benchmark_integer_shr_round_i32_evaluation_strategy(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "Integer.shr_round(i32, RoundingMode)",
+        BenchmarkType::EvaluationStrategy,
+        triples_of_integer_small_i32_and_rounding_mode_var_2(gm),
+        gm.name(),
         limit,
-        f_name: "malachite",
-        title: "(&Integer).shr_round(i32, RoundingMode)",
-        x_axis_label: "other",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+        file_name,
+        &(|&(_, other, _)| other as usize),
+        "other",
+        &[
+            (
+                "Integer.shr_round(i32, RoundingMode)",
+                &mut (|(x, y, rm)| no_out!(x.shr_round(y, rm))),
+            ),
+            (
+                "(&Integer).shr_round(i32, RoundingMode)",
+                &mut (|(x, y, rm)| no_out!((&x).shr_round(y, rm))),
+            ),
+        ],
+    );
 }

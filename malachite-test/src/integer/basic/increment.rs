@@ -1,9 +1,7 @@
-use common::GenerationMode;
+use common::{m_run_benchmark, BenchmarkType, GenerationMode};
 use inputs::integer::integers;
 use malachite_base::misc::Walkable;
 use malachite_base::num::SignificantBits;
-use malachite_nz::integer::Integer;
-use rust_wheels::benchmarks::{BenchmarkOptions1, benchmark_1};
 
 pub fn demo_integer_increment(gm: GenerationMode, limit: usize) {
     for mut n in integers(gm).take(limit) {
@@ -14,17 +12,15 @@ pub fn demo_integer_increment(gm: GenerationMode, limit: usize) {
 }
 
 pub fn benchmark_integer_increment(gm: GenerationMode, limit: usize, file_name: &str) {
-    println!("benchmarking {} Integer.increment()", gm.name());
-    benchmark_1(BenchmarkOptions1 {
-        xs: integers(gm),
-        function_f: &mut (|mut n: Integer| n.increment()),
-        x_cons: &(|n| n.clone()),
-        x_param: &(|n| n.significant_bits() as usize),
+    m_run_benchmark(
+        "Integer.increment()",
+        BenchmarkType::Ordinary,
+        integers(gm),
+        gm.name(),
         limit,
-        f_name: "malachite",
-        title: "Integer.increment()",
-        x_axis_label: "n.significant_bits()",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+        file_name,
+        &(|n| n.significant_bits() as usize),
+        "n.significant_bits()",
+        &[("malachite", &mut (|mut n| n.increment()))],
+    );
 }
