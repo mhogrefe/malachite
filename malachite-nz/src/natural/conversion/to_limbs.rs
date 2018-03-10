@@ -1,40 +1,15 @@
 use natural::Natural::{self, Large, Small};
 
-/// An iterator over the limbs of a `Natural` in ascending order (least-significant first).
-pub struct LimbIteratorAsc<'a> {
-    n: &'a Natural,
-    limb_count: u64,
-    i: u64,
-}
-
-impl<'a> Iterator for LimbIteratorAsc<'a> {
-    type Item = u32;
-
-    /// Time: worst case O(1)
-    ///
-    /// Additional memory: worst case O(1)
-    fn next(&mut self) -> Option<u32> {
-        if self.i < self.limb_count {
-            let limb = match *self.n {
-                Small(small) => small,
-                Large(ref limbs) => limbs[self.i as usize],
-            };
-            self.i += 1;
-            Some(limb)
-        } else {
-            None
-        }
-    }
-}
-
-/// An iterator over the limbs of a `Natural` in descending order (most-significant first).
-pub struct LimbIteratorDesc<'a> {
+/// A double-ended iterator over the limbs of a `Natural`. The forward order is ascending (least-
+/// significant first).
+pub struct LimbIterator<'a> {
     n: &'a Natural,
     some_remaining: bool,
     i: u64,
+    j: u64,
 }
 
-impl<'a> Iterator for LimbIteratorDesc<'a> {
+impl<'a> Iterator for LimbIterator<'a> {
     type Item = u32;
 
     /// Time: worst case O(1)
@@ -46,10 +21,32 @@ impl<'a> Iterator for LimbIteratorDesc<'a> {
                 Small(small) => small,
                 Large(ref limbs) => limbs[self.i as usize],
             };
-            if self.i == 0 {
+            if self.i == self.j {
                 self.some_remaining = false;
             } else {
-                self.i -= 1;
+                self.i += 1;
+            }
+            Some(limb)
+        } else {
+            None
+        }
+    }
+}
+
+impl<'a> DoubleEndedIterator for LimbIterator<'a> {
+    /// Time: worst case O(1)
+    ///
+    /// Additional memory: worst case O(1)
+    fn next_back(&mut self) -> Option<u32> {
+        if self.some_remaining {
+            let limb = match *self.n {
+                Small(small) => small,
+                Large(ref limbs) => limbs[self.j as usize],
+            };
+            if self.j == self.i {
+                self.some_remaining = false;
+            } else {
+                self.j -= 1;
             }
             Some(limb)
         } else {
@@ -212,11 +209,12 @@ impl Natural {
         }
     }
 
-    /// Returns an iterator the limbs, or base-2<sup>32</sup> digits, of a `Natural`, in ascending
-    /// order, so that less significant limbs appear first. There are no trailing zero limbs.
+    /// Returns a double-ended iterator over the limbs, or base-2<sup>32</sup> digits, of a
+    /// `Natural`. The forward order is ascending, so that less significant limbs appear first.
+    /// There are no trailing zero limbs going forward, or leading zeros going backward.
     ///
-    /// If it's necessary to get a `Vec` of all the limbs, consider using `to_limbs_asc` or
-    /// `into_limbs_asc` instead.
+    /// If it's necessary to get a `Vec` of all the limbs, consider using `to_limbs_asc`,
+    /// `to_limbs_desc`, `into_limbs_asc`, or `into_limbs_asc` instead.
     ///
     /// Time: worst case O(1)
     ///
@@ -231,53 +229,26 @@ impl Natural {
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
-    ///     assert!(Natural::ZERO.limbs_asc().next().is_none());
-    ///     assert_eq!(Natural::from(123u32).limbs_asc().collect::<Vec<u32>>(), vec![123]);
+    ///     assert!(Natural::ZERO.limbs().next().is_none());
+    ///     assert_eq!(Natural::from(123u32).limbs().collect::<Vec<u32>>(), vec![123]);
     ///     // 10^12 = 232 * 2^32 + 3567587328
-    ///     assert_eq!(Natural::trillion().limbs_asc().collect::<Vec<u32>>(),
+    ///     assert_eq!(Natural::trillion().limbs().collect::<Vec<u32>>(),
     ///         vec![3567587328, 232]);
-    /// }
-    /// ```
-    pub fn limbs_asc(&self) -> LimbIteratorAsc {
-        LimbIteratorAsc {
-            n: self,
-            limb_count: self.limb_count(),
-            i: 0,
-        }
-    }
-
-    /// Returns an iterator the limbs, or base-2<sup>32</sup> digits, of a `Natural`, in descending
-    /// order, so that more significant limbs appear first. There are no leading zero limbs.
     ///
-    /// If it's necessary to get a `Vec` of all the limbs, consider using `to_limbs_desc` or
-    /// `into_limbs_desc` instead.
-    ///
-    /// Time: worst case O(1)
-    ///
-    /// Additional memory: worst case O(1)
-    ///
-    /// # Example
-    /// ```
-    /// extern crate malachite_base;
-    /// extern crate malachite_nz;
-    ///
-    /// use malachite_base::num::Zero;
-    /// use malachite_nz::natural::Natural;
-    ///
-    /// fn main() {
-    ///     assert!(Natural::ZERO.limbs_desc().next().is_none());
-    ///     assert_eq!(Natural::from(123u32).limbs_desc().collect::<Vec<u32>>(), vec![123]);
+    ///     assert!(Natural::ZERO.limbs().rev().next().is_none());
+    ///     assert_eq!(Natural::from(123u32).limbs().rev().collect::<Vec<u32>>(), vec![123]);
     ///     // 10^12 = 232 * 2^32 + 3567587328
-    ///     assert_eq!(Natural::trillion().limbs_desc().collect::<Vec<u32>>(),
+    ///     assert_eq!(Natural::trillion().limbs().rev().collect::<Vec<u32>>(),
     ///         vec![232, 3567587328]);
     /// }
     /// ```
-    pub fn limbs_desc(&self) -> LimbIteratorDesc {
+    pub fn limbs(&self) -> LimbIterator {
         let limb_count = self.limb_count();
-        LimbIteratorDesc {
+        LimbIterator {
             n: self,
             some_remaining: limb_count != 0,
-            i: limb_count - 1,
+            i: 0,
+            j: limb_count - 1,
         }
     }
 }

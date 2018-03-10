@@ -8,7 +8,7 @@ use std::u32;
 fn test_to_limbs_asc() {
     let test = |n, out| {
         let n = Natural::from_str(n).unwrap();
-        assert_eq!(n.limbs_asc().collect::<Vec<u32>>(), out);
+        assert_eq!(n.limbs().collect::<Vec<u32>>(), out);
         assert_eq!(n.to_limbs_asc(), out);
         assert_eq!(n.into_limbs_asc(), out);
     };
@@ -23,13 +23,32 @@ fn test_to_limbs_asc() {
     test("4294967296", vec![0, 1]);
     test("18446744073709551615", vec![u32::MAX, u32::MAX]);
     test("18446744073709551616", vec![0, 0, 1]);
+
+    let n = Natural::from_str("1701411834921604967429270619762735448065").unwrap();
+    let mut limbs = n.limbs();
+    assert_eq!(Some(1), limbs.next());
+    assert_eq!(Some(5), limbs.next_back());
+    assert_eq!(Some(4), limbs.next_back());
+    assert_eq!(Some(2), limbs.next());
+    assert_eq!(Some(3), limbs.next());
+    assert_eq!(None, limbs.next());
+    assert_eq!(None, limbs.next_back());
+
+    let mut limbs = n.limbs();
+    assert_eq!(Some(1), limbs.next());
+    assert_eq!(Some(2), limbs.next());
+    assert_eq!(Some(3), limbs.next());
+    assert_eq!(Some(5), limbs.next_back());
+    assert_eq!(Some(4), limbs.next_back());
+    assert_eq!(None, limbs.next());
+    assert_eq!(None, limbs.next_back());
 }
 
 #[test]
 fn test_to_limbs_desc() {
     let test = |n, out| {
         let n = Natural::from_str(n).unwrap();
-        assert_eq!(n.limbs_desc().collect::<Vec<u32>>(), out);
+        assert_eq!(n.limbs().rev().collect::<Vec<u32>>(), out);
         assert_eq!(n.to_limbs_desc(), out);
         assert_eq!(n.into_limbs_desc(), out);
     };
@@ -51,7 +70,7 @@ fn to_limbs_asc_properties() {
     test_properties(naturals, |x| {
         let limbs = x.to_limbs_asc();
         assert_eq!(x.clone().into_limbs_asc(), limbs);
-        assert_eq!(x.limbs_asc().collect::<Vec<u32>>(), limbs);
+        assert_eq!(x.limbs().collect::<Vec<u32>>(), limbs);
         assert_eq!(Natural::from_limbs_asc(&limbs), *x);
         assert_eq!(
             x.to_limbs_desc(),
@@ -68,7 +87,7 @@ fn to_limbs_desc_properties() {
     test_properties(naturals, |x| {
         let limbs = x.to_limbs_desc();
         assert_eq!(x.clone().into_limbs_desc(), limbs);
-        assert_eq!(x.limbs_desc().collect::<Vec<u32>>(), limbs);
+        assert_eq!(x.limbs().rev().collect::<Vec<u32>>(), limbs);
         assert_eq!(Natural::from_limbs_desc(&limbs), *x);
         assert_eq!(
             x.to_limbs_asc(),
