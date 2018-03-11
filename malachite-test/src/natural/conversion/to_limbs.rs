@@ -65,7 +65,7 @@ pub fn benchmark_natural_limbs_evaluation_strategy(
         limit,
         f_name: "Natural.to_limbs_asc()",
         g_name: "Natural.into_limbs_asc()",
-        h_name: "Natural.limbs.collect::<Vec<u32>>()",
+        h_name: "Natural.limbs().collect::<Vec<u32>>()",
         title: "Natural.limbs_asc() evaluation strategy",
         x_axis_label: "n.significant_bits()",
         y_axis_label: "time (ns)",

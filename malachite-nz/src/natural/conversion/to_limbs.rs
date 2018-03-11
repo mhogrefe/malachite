@@ -1,9 +1,11 @@
 use natural::Natural::{self, Large, Small};
+use std::ops::Index;
 
 /// A double-ended iterator over the limbs of a `Natural`. The forward order is ascending (least-
 /// significant first).
 pub struct LimbIterator<'a> {
     n: &'a Natural,
+    limb_count: usize,
     some_remaining: bool,
     i: u64,
     j: u64,
@@ -31,6 +33,13 @@ impl<'a> Iterator for LimbIterator<'a> {
             None
         }
     }
+
+    /// Time: worst case O(1)
+    ///
+    /// Additional memory: worst case O(1)
+    fn size_hint(&self) -> (usize, Option<usize>) {
+        (self.limb_count, Some(self.limb_count))
+    }
 }
 
 impl<'a> DoubleEndedIterator for LimbIterator<'a> {
@@ -51,6 +60,22 @@ impl<'a> DoubleEndedIterator for LimbIterator<'a> {
             Some(limb)
         } else {
             None
+        }
+    }
+}
+
+impl<'a> ExactSizeIterator for LimbIterator<'a> {}
+
+impl<'a> Index<usize> for LimbIterator<'a> {
+    type Output = u32;
+
+    fn index(&self, index: usize) -> &u32 {
+        if index >= self.limb_count {
+            panic!("No limb at index {} in {}", index, self.n);
+        }
+        match *self.n {
+            Small(ref small) => small,
+            Large(ref limbs) => limbs.index(index),
         }
     }
 }
@@ -246,6 +271,7 @@ impl Natural {
         let limb_count = self.limb_count();
         LimbIterator {
             n: self,
+            limb_count: limb_count as usize,
             some_remaining: limb_count != 0,
             i: 0,
             j: limb_count - 1,
