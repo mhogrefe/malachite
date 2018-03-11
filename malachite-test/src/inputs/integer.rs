@@ -1,4 +1,4 @@
-use common::{integer_to_bigint, integer_to_rug_integer, GenerationMode};
+use common::{integer_to_bigint, integer_to_rug_integer, natural_to_rug_integer, GenerationMode};
 use inputs::common::{reshape_1_2_to_3, reshape_2_1_to_3};
 use malachite_base::num::{PrimitiveInteger, PrimitiveSigned, PrimitiveUnsigned};
 use malachite_base::round::RoundingMode;
@@ -31,6 +31,10 @@ pub fn integers(gm: GenerationMode) -> Box<Iterator<Item = Integer>> {
             Box::new(special_random_integers(&EXAMPLE_SEED, scale))
         }
     }
+}
+
+pub fn nm_integers(gm: GenerationMode) -> Box<Iterator<Item = (BigInt, Integer)>> {
+    Box::new(integers(gm).map(|n| (integer_to_bigint(&n), n)))
 }
 
 pub fn nrm_integers(gm: GenerationMode) -> Box<Iterator<Item = (BigInt, rug::Integer, Integer)>> {
@@ -240,6 +244,18 @@ pub fn pairs_of_unsigned_and_integer<T: 'static + PrimitiveUnsigned>(
             &(|seed| special_random_integers(seed, scale)),
         )),
     }
+}
+
+pub fn nrm_pairs_of_unsigned_and_integer<T: 'static + PrimitiveUnsigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = ((T, BigInt), (T, rug::Integer), (T, Integer))>> {
+    Box::new(pairs_of_unsigned_and_integer(gm).map(|(x, y)| {
+        (
+            (x, integer_to_bigint(&y)),
+            (x, integer_to_rug_integer(&y)),
+            (x, y),
+        )
+    }))
 }
 
 pub fn rm_pairs_of_unsigned_and_integer<T: 'static + PrimitiveUnsigned>(
@@ -532,6 +548,17 @@ pub fn pairs_of_integer_and_natural(
     }
 }
 
+pub fn rm_pairs_of_integer_and_natural(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = ((rug::Integer, rug::Integer), (Integer, Natural))>> {
+    Box::new(pairs_of_integer_and_natural(gm).map(|(x, y)| {
+        (
+            (integer_to_rug_integer(&x), natural_to_rug_integer(&y)),
+            (x, y),
+        )
+    }))
+}
+
 pub fn pairs_of_natural_and_integer(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (Natural, Integer)>> {
@@ -551,6 +578,17 @@ pub fn pairs_of_natural_and_integer(
             &(|seed| special_random_integers(seed, scale)),
         )),
     }
+}
+
+pub fn rm_pairs_of_natural_and_integer(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = ((rug::Integer, rug::Integer), (Natural, Integer))>> {
+    Box::new(pairs_of_natural_and_integer(gm).map(|(x, y)| {
+        (
+            (natural_to_rug_integer(&x), integer_to_rug_integer(&y)),
+            (x, y),
+        )
+    }))
 }
 
 pub fn pairs_of_natural_and_natural_integer(

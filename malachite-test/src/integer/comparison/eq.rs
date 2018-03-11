@@ -1,7 +1,6 @@
-use common::{integer_to_bigint, integer_to_rug_integer, GenerationMode};
-use inputs::integer::pairs_of_integers;
+use common::{m_run_benchmark, BenchmarkType, GenerationMode};
+use inputs::integer::{nrm_pairs_of_integers, pairs_of_integers};
 use malachite_base::num::SignificantBits;
-use rust_wheels::benchmarks::{BenchmarkOptions3, benchmark_3};
 use std::cmp::max;
 
 pub fn demo_integer_eq(gm: GenerationMode, limit: usize) {
@@ -15,23 +14,19 @@ pub fn demo_integer_eq(gm: GenerationMode, limit: usize) {
 }
 
 pub fn benchmark_integer_eq(gm: GenerationMode, limit: usize, file_name: &str) {
-    println!("benchmarking {} Integer == Integer", gm.name());
-    benchmark_3(BenchmarkOptions3 {
-        xs: pairs_of_integers(gm),
-        function_f: &mut (|(x, y)| x == y),
-        function_g: &mut (|(x, y)| x == y),
-        function_h: &mut (|(x, y)| x == y),
-        x_cons: &(|p| p.clone()),
-        y_cons: &(|&(ref x, ref y)| (integer_to_bigint(x), integer_to_bigint(y))),
-        z_cons: &(|&(ref x, ref y)| (integer_to_rug_integer(x), integer_to_rug_integer(y))),
-        x_param: &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),
+    m_run_benchmark(
+        "Integer == Integer",
+        BenchmarkType::Ordinary,
+        nrm_pairs_of_integers(gm),
+        gm.name(),
         limit,
-        f_name: "malachite",
-        g_name: "num",
-        h_name: "rug",
-        title: "Integer == Integer",
-        x_axis_label: "max(x.significant_bits(), y.significant_bits())",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+        file_name,
+        &(|&(_, _, (ref x, ref y))| max(x.significant_bits(), y.significant_bits()) as usize),
+        "max(x.significant_bits(), y.significant_bits())",
+        &[
+            ("malachite", &mut (|(_, _, (x, y))| no_out!(x == y))),
+            ("num", &mut (|((x, y), _, _)| no_out!(x == y))),
+            ("rug", &mut (|(_, (x, y), _)| no_out!(x == y))),
+        ],
+    );
 }

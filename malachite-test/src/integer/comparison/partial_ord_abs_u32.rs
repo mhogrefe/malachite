@@ -1,9 +1,7 @@
-use common::GenerationMode;
+use common::{m_run_benchmark, BenchmarkType, GenerationMode};
 use inputs::integer::{pairs_of_integer_and_unsigned, pairs_of_unsigned_and_integer};
 use malachite_base::num::SignificantBits;
 use malachite_base::num::PartialOrdAbs;
-use malachite_nz::integer::Integer;
-use rust_wheels::benchmarks::{BenchmarkOptions1, benchmark_1};
 use std::cmp::Ordering;
 
 pub fn demo_integer_partial_cmp_abs_u32(gm: GenerationMode, limit: usize) {
@@ -27,33 +25,33 @@ pub fn demo_u32_partial_cmp_abs_integer(gm: GenerationMode, limit: usize) {
 }
 
 pub fn benchmark_integer_partial_cmp_abs_u32(gm: GenerationMode, limit: usize, file_name: &str) {
-    println!("benchmarking {} Integer.partial_cmp_abs(&u32)", gm.name());
-    benchmark_1(BenchmarkOptions1 {
-        xs: pairs_of_integer_and_unsigned::<u32>(gm),
-        function_f: &mut (|(n, u): (Integer, u32)| n.partial_cmp_abs(&u)),
-        x_cons: &(|p| p.clone()),
-        x_param: &(|&(ref n, _)| n.significant_bits() as usize),
+    m_run_benchmark(
+        "Integer.partial_cmp_abs(&u32)",
+        BenchmarkType::Ordinary,
+        pairs_of_integer_and_unsigned::<u32>(gm),
+        gm.name(),
         limit,
-        f_name: "malachite",
-        title: "Integer.partial_cmp_abs(&u32)",
-        x_axis_label: "n.significant_bits()",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+        file_name,
+        &(|&(ref n, _)| n.significant_bits() as usize),
+        "n.significant_bits()",
+        &[
+            ("malachite", &mut (|(x, y)| no_out!(x.partial_cmp_abs(&y)))),
+        ],
+    );
 }
 
 pub fn benchmark_u32_partial_cmp_abs_integer(gm: GenerationMode, limit: usize, file_name: &str) {
-    println!("benchmarking {} u32.partial_cmp_abs(&Integer)", gm.name());
-    benchmark_1(BenchmarkOptions1 {
-        xs: pairs_of_unsigned_and_integer::<u32>(gm),
-        function_f: &mut (|(u, n): (u32, Integer)| PartialOrdAbs::partial_cmp_abs(&u, &n)),
-        x_cons: &(|p| p.clone()),
-        x_param: &(|&(_, ref n)| n.significant_bits() as usize),
+    m_run_benchmark(
+        "u32.partial_cmp_abs(&Integer)",
+        BenchmarkType::Ordinary,
+        pairs_of_unsigned_and_integer::<u32>(gm),
+        gm.name(),
         limit,
-        f_name: "malachite",
-        title: "u32.partial_cmp_abs(&Integer)",
-        x_axis_label: "n.significant_bits()",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+        file_name,
+        &(|&(_, ref n)| n.significant_bits() as usize),
+        "n.significant_bits()",
+        &[
+            ("malachite", &mut (|(x, y)| no_out!(x.partial_cmp_abs(&y)))),
+        ],
+    );
 }

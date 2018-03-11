@@ -1,10 +1,8 @@
-use common::{integer_to_bigint, integer_to_rug_integer, GenerationMode};
-use inputs::integer::{pairs_of_integer_and_unsigned, pairs_of_unsigned_and_integer};
+use common::{m_run_benchmark, BenchmarkType, GenerationMode};
+use inputs::integer::{nrm_pairs_of_integer_and_unsigned, pairs_of_integer_and_unsigned,
+                      pairs_of_unsigned_and_integer, rm_pairs_of_unsigned_and_integer};
 use malachite_base::num::SignificantBits;
-use malachite_nz::integer::Integer;
 use num::BigInt;
-use rug;
-use rust_wheels::benchmarks::{BenchmarkOptions2, BenchmarkOptions3, benchmark_2, benchmark_3};
 use std::cmp::Ordering;
 
 pub fn num_partial_cmp_u32(x: &BigInt, u: u32) -> Option<Ordering> {
@@ -32,42 +30,42 @@ pub fn demo_u32_partial_cmp_integer(gm: GenerationMode, limit: usize) {
 }
 
 pub fn benchmark_integer_partial_cmp_u32(gm: GenerationMode, limit: usize, file_name: &str) {
-    println!("benchmarking {} Integer.partial_cmp(&u32)", gm.name());
-    benchmark_3(BenchmarkOptions3 {
-        xs: pairs_of_integer_and_unsigned::<u32>(gm),
-        function_f: &mut (|(n, u): (Integer, u32)| n.partial_cmp(&u)),
-        function_g: &mut (|(n, u): (BigInt, u32)| num_partial_cmp_u32(&n, u)),
-        function_h: &mut (|(n, u): (rug::Integer, u32)| n.partial_cmp(&u)),
-        x_cons: &(|p| p.clone()),
-        y_cons: &(|&(ref n, u)| (integer_to_bigint(n), u)),
-        z_cons: &(|&(ref n, u)| (integer_to_rug_integer(n), u)),
-        x_param: &(|&(ref n, _)| n.significant_bits() as usize),
+    m_run_benchmark(
+        "Integer.partial_cmp(&u32)",
+        BenchmarkType::Ordinary,
+        nrm_pairs_of_integer_and_unsigned(gm),
+        gm.name(),
         limit,
-        f_name: "malachite",
-        g_name: "num",
-        h_name: "rug",
-        title: "Integer.partial_cmp(&u32)",
-        x_axis_label: "n.significant_bits()",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+        file_name,
+        &(|&(_, _, (ref n, _))| n.significant_bits() as usize),
+        "n.significant_bits()",
+        &[
+            (
+                "malachite",
+                &mut (|(_, _, (x, y))| no_out!(x.partial_cmp(&y))),
+            ),
+            (
+                "num",
+                &mut (|((x, y), _, _)| no_out!(num_partial_cmp_u32(&x, y))),
+            ),
+            ("rug", &mut (|(_, (x, y), _)| no_out!(x.partial_cmp(&y)))),
+        ],
+    );
 }
 
 pub fn benchmark_u32_partial_cmp_integer(gm: GenerationMode, limit: usize, file_name: &str) {
-    println!("benchmarking {} u32.partial_cmp(&Integer)", gm.name());
-    benchmark_2(BenchmarkOptions2 {
-        xs: pairs_of_unsigned_and_integer::<u32>(gm),
-        function_f: &mut (|(u, n): (u32, Integer)| u.partial_cmp(&n)),
-        function_g: &mut (|(u, n): (u32, rug::Integer)| u.partial_cmp(&n)),
-        x_cons: &(|p| p.clone()),
-        y_cons: &(|&(u, ref n)| (u, integer_to_rug_integer(n))),
-        x_param: &(|&(_, ref n)| n.significant_bits() as usize),
+    m_run_benchmark(
+        "u32.partial_cmp(&Integer)",
+        BenchmarkType::Ordinary,
+        rm_pairs_of_unsigned_and_integer::<u32>(gm),
+        gm.name(),
         limit,
-        f_name: "malachite",
-        g_name: "rug",
-        title: "u32.partial_cmp(&Integer)",
-        x_axis_label: "n.significant_bits()",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+        file_name,
+        &(|&(_, (_, ref n))| n.significant_bits() as usize),
+        "n.significant_bits()",
+        &[
+            ("malachite", &mut (|(_, (x, y))| no_out!(x.partial_cmp(&y)))),
+            ("rug", &mut (|((x, y), _)| no_out!(x.partial_cmp(&y)))),
+        ],
+    );
 }

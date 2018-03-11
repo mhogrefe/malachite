@@ -1,11 +1,8 @@
-use common::{integer_to_bigint, integer_to_rug_integer, GenerationMode};
-use inputs::integer::integers;
+use common::{m_run_benchmark, BenchmarkType, GenerationMode};
+use inputs::integer::{integers, nrm_integers};
 use malachite_base::num::SignificantBits;
-use malachite_nz::integer::Integer;
 use num::BigInt;
 use num::bigint::Sign;
-use rug;
-use rust_wheels::benchmarks::{BenchmarkOptions3, benchmark_3};
 use std::cmp::Ordering;
 
 pub fn num_sign(x: &BigInt) -> Ordering {
@@ -27,23 +24,19 @@ pub fn demo_integer_sign(gm: GenerationMode, limit: usize) {
 }
 
 pub fn benchmark_integer_sign(gm: GenerationMode, limit: usize, file_name: &str) {
-    println!("benchmarking {} Integer.sign()", gm.name());
-    benchmark_3(BenchmarkOptions3 {
-        xs: integers(gm),
-        function_f: &mut (|n: Integer| n.sign()),
-        function_g: &mut (|n: BigInt| num_sign(&n)),
-        function_h: &mut (|n: rug::Integer| n.cmp0()),
-        x_cons: &(|x| x.clone()),
-        y_cons: &(|x| integer_to_bigint(x)),
-        z_cons: &(|x| integer_to_rug_integer(x)),
-        x_param: &(|n| n.significant_bits() as usize),
+    m_run_benchmark(
+        "Integer.sign()",
+        BenchmarkType::Ordinary,
+        nrm_integers(gm),
+        gm.name(),
         limit,
-        f_name: "malachite",
-        g_name: "num",
-        h_name: "rug",
-        title: "Integer.sign()",
-        x_axis_label: "n.significant_bits()",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+        file_name,
+        &(|&(_, _, ref n)| n.significant_bits() as usize),
+        "n.significant_bits()",
+        &[
+            ("malachite", &mut (|(_, _, n)| no_out!(n.sign()))),
+            ("num", &mut (|(n, _, _)| no_out!(num_sign(&n)))),
+            ("rug", &mut (|(_, n, _)| no_out!(n.cmp0()))),
+        ],
+    );
 }

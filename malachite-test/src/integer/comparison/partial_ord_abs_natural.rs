@@ -1,11 +1,8 @@
-use common::{integer_to_rug_integer, natural_to_rug_integer, GenerationMode};
-use inputs::integer::{pairs_of_integer_and_natural, pairs_of_natural_and_integer};
+use common::{m_run_benchmark, BenchmarkType, GenerationMode};
+use inputs::integer::{pairs_of_integer_and_natural, pairs_of_natural_and_integer,
+                      rm_pairs_of_integer_and_natural, rm_pairs_of_natural_and_integer};
 use malachite_base::num::SignificantBits;
 use malachite_base::num::PartialOrdAbs;
-use malachite_nz::integer::Integer;
-use malachite_nz::natural::Natural;
-use rug;
-use rust_wheels::benchmarks::{BenchmarkOptions2, benchmark_2};
 use std::cmp::{max, Ordering};
 
 pub fn demo_integer_partial_cmp_abs_natural(gm: GenerationMode, limit: usize) {
@@ -33,25 +30,23 @@ pub fn benchmark_integer_partial_cmp_abs_natural(
     limit: usize,
     file_name: &str,
 ) {
-    println!(
-        "benchmarking {} Integer.partial_cmp_abs(&Natural)",
-        gm.name()
-    );
-    benchmark_2(BenchmarkOptions2 {
-        xs: pairs_of_integer_and_natural(gm),
-        function_f: &mut (|(x, y): (Integer, Natural)| x.partial_cmp_abs(&y)),
-        function_g: &mut (|(x, y): (rug::Integer, rug::Integer)| x.cmp_abs(&y)),
-        x_cons: &(|p| p.clone()),
-        y_cons: &(|&(ref x, ref y)| (integer_to_rug_integer(x), natural_to_rug_integer(y))),
-        x_param: &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),
+    m_run_benchmark(
+        "Integer.partial_cmp_abs(&Natural)",
+        BenchmarkType::Ordinary,
+        rm_pairs_of_integer_and_natural(gm),
+        gm.name(),
         limit,
-        f_name: "malachite",
-        g_name: "rug",
-        title: "Integer.partial_cmp_abs(&Natural)",
-        x_axis_label: "max(x.significant_bits(), y.significant_bits())",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+        file_name,
+        &(|&(_, (ref x, ref y))| max(x.significant_bits(), y.significant_bits()) as usize),
+        "max(x.significant_bits(), y.significant_bits())",
+        &[
+            (
+                "malachite",
+                &mut (|(_, (x, y))| no_out!(x.partial_cmp_abs(&y))),
+            ),
+            ("rug", &mut (|((x, y), _)| no_out!(x.cmp_abs(&y)))),
+        ],
+    );
 }
 
 pub fn benchmark_natural_partial_cmp_abs_integer(
@@ -59,23 +54,21 @@ pub fn benchmark_natural_partial_cmp_abs_integer(
     limit: usize,
     file_name: &str,
 ) {
-    println!(
-        "benchmarking {} Natural.partial_cmp_abs(&Integer)",
-        gm.name()
-    );
-    benchmark_2(BenchmarkOptions2 {
-        xs: pairs_of_natural_and_integer(gm),
-        function_f: &mut (|(x, y): (Natural, Integer)| x.partial_cmp_abs(&y)),
-        function_g: &mut (|(x, y): (rug::Integer, rug::Integer)| x.cmp_abs(&y)),
-        x_cons: &(|p| p.clone()),
-        y_cons: &(|&(ref x, ref y)| (natural_to_rug_integer(x), integer_to_rug_integer(y))),
-        x_param: &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),
+    m_run_benchmark(
+        "Natural.partial_cmp_abs(&Integer)",
+        BenchmarkType::Ordinary,
+        rm_pairs_of_natural_and_integer(gm),
+        gm.name(),
         limit,
-        f_name: "malachite",
-        g_name: "rug",
-        title: "Natural.partial_cmp_abs(&Integer)",
-        x_axis_label: "max(x.significant_bits(), y.significant_bits())",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+        file_name,
+        &(|&(_, (ref x, ref y))| max(x.significant_bits(), y.significant_bits()) as usize),
+        "max(x.significant_bits(), y.significant_bits())",
+        &[
+            (
+                "malachite",
+                &mut (|(_, (x, y))| no_out!(x.partial_cmp_abs(&y))),
+            ),
+            ("rug", &mut (|((x, y), _)| no_out!(x.cmp_abs(&y)))),
+        ],
+    );
 }
