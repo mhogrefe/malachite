@@ -19,7 +19,7 @@ pub fn benchmark_char_to_contiguous_range(
 ) {
     m_run_benchmark(
         "char_to_contiguous_range(char)",
-        BenchmarkType::Ordinary,
+        BenchmarkType::Single,
         chars(gm),
         gm.name(),
         limit,

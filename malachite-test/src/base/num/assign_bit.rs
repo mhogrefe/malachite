@@ -35,7 +35,7 @@ fn benchmark_unsigned_assign_bit<T: 'static + PrimitiveUnsigned>(
 ) {
     m_run_benchmark(
         &format!("{}.assign_bit(u64)", T::NAME),
-        BenchmarkType::Ordinary,
+        BenchmarkType::Single,
         triples_of_unsigned_u64_width_range_and_bool_var_1::<T>(gm),
         gm.name(),
         limit,
@@ -58,7 +58,7 @@ fn benchmark_signed_assign_bit<T: 'static + PrimitiveSigned>(
 ) {
     m_run_benchmark(
         &format!("{}.assign_bit(u64)", T::NAME),
-        BenchmarkType::Ordinary,
+        BenchmarkType::Single,
         triples_of_signed_u64_width_range_and_bool_var_1::<T>(gm),
         gm.name(),
         limit,

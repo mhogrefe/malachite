@@ -44,10 +44,14 @@ pub fn demo_u32_mul_integer_ref(gm: GenerationMode, limit: usize) {
     }
 }
 
-pub fn benchmark_integer_mul_assign_u32(gm: GenerationMode, limit: usize, file_name: &str) {
+pub fn benchmark_integer_mul_assign_u32_library_comparison(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
     m_run_benchmark(
         "Integer *= u32",
-        BenchmarkType::Ordinary,
+        BenchmarkType::LibraryComparison,
         rm_pairs_of_integer_and_unsigned::<u32>(gm),
         gm.name(),
         limit,
@@ -61,10 +65,14 @@ pub fn benchmark_integer_mul_assign_u32(gm: GenerationMode, limit: usize, file_n
     );
 }
 
-pub fn benchmark_integer_mul_u32(gm: GenerationMode, limit: usize, file_name: &str) {
+pub fn benchmark_integer_mul_u32_library_comparison(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
     m_run_benchmark(
         "Integer * u32",
-        BenchmarkType::Ordinary,
+        BenchmarkType::LibraryComparison,
         nrm_pairs_of_integer_and_unsigned(gm),
         gm.name(),
         limit,
@@ -100,10 +108,14 @@ pub fn benchmark_integer_mul_u32_evaluation_strategy(
     );
 }
 
-pub fn benchmark_u32_mul_integer(gm: GenerationMode, limit: usize, file_name: &str) {
+pub fn benchmark_u32_mul_integer_library_comparison(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
     m_run_benchmark(
         "u32 * Integer",
-        BenchmarkType::Ordinary,
+        BenchmarkType::LibraryComparison,
         rm_pairs_of_unsigned_and_integer::<u32>(gm),
         gm.name(),
         limit,

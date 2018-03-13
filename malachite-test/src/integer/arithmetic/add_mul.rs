@@ -125,20 +125,6 @@ fn bucketing_function(t: &(Integer, Integer, Integer)) -> usize {
 const BUCKETING_LABEL: &str = "max(a.significant_bits(), b.significant_bits(), \
                                c.significant_bits())";
 
-pub fn benchmark_integer_add_mul_assign(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
-        "Integer.add_mul_assign(Integer, Integer)",
-        BenchmarkType::Ordinary,
-        triples_of_integers(gm),
-        gm.name(),
-        limit,
-        file_name,
-        &bucketing_function,
-        BUCKETING_LABEL,
-        &[("malachite", &mut (|(mut a, b, c)| a.add_mul_assign(b, c)))],
-    );
-}
-
 pub fn benchmark_integer_add_mul_assign_evaluation_strategy(
     gm: GenerationMode,
     limit: usize,
@@ -279,20 +265,6 @@ pub fn benchmark_integer_add_mul_assign_ref_ref_algorithms(
                 &mut (|(mut a, b, c)| a += &b * &c),
             ),
         ],
-    );
-}
-
-pub fn benchmark_integer_add_mul(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
-        "Integer.add_mul(Integer, Integer)",
-        BenchmarkType::Ordinary,
-        triples_of_integers(gm),
-        gm.name(),
-        limit,
-        file_name,
-        &bucketing_function,
-        BUCKETING_LABEL,
-        &[("malachite", &mut (|(a, b, c)| no_out!(a.add_mul(b, c))))],
     );
 }
 

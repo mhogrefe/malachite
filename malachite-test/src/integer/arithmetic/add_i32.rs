@@ -44,10 +44,14 @@ pub fn demo_i32_add_integer_ref(gm: GenerationMode, limit: usize) {
     }
 }
 
-pub fn benchmark_integer_add_assign_i32(gm: GenerationMode, limit: usize, file_name: &str) {
+pub fn benchmark_integer_add_assign_i32_library_comparison(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
     m_run_benchmark(
         "Integer += i32",
-        BenchmarkType::Ordinary,
+        BenchmarkType::LibraryComparison,
         rm_pairs_of_integer_and_signed::<i32>(gm),
         gm.name(),
         limit,
@@ -61,10 +65,14 @@ pub fn benchmark_integer_add_assign_i32(gm: GenerationMode, limit: usize, file_n
     );
 }
 
-pub fn benchmark_integer_add_i32(gm: GenerationMode, limit: usize, file_name: &str) {
+pub fn benchmark_integer_add_i32_library_comparison(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
     m_run_benchmark(
         "Integer + i32",
-        BenchmarkType::Ordinary,
+        BenchmarkType::LibraryComparison,
         nrm_pairs_of_integer_and_signed(gm),
         gm.name(),
         limit,
@@ -100,10 +108,14 @@ pub fn benchmark_integer_add_i32_evaluation_strategy(
     );
 }
 
-pub fn benchmark_i32_add_integer(gm: GenerationMode, limit: usize, file_name: &str) {
+pub fn benchmark_i32_add_integer_library_comparison(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
     m_run_benchmark(
         "i32 + Integer",
-        BenchmarkType::Ordinary,
+        BenchmarkType::LibraryComparison,
         rm_pairs_of_signed_and_integer::<i32>(gm),
         gm.name(),
         limit,

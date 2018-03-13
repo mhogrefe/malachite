@@ -15,7 +15,7 @@ pub fn demo_limbs_test_zero(gm: GenerationMode, limit: usize) {
 pub fn benchmark_limbs_test_zero(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "limbs_test_zero(&[u32])",
-        BenchmarkType::Ordinary,
+        BenchmarkType::Single,
         vecs_of_unsigned(gm),
         gm.name(),
         limit,

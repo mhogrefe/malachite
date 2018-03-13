@@ -14,7 +14,7 @@ pub fn demo_char_decrement(gm: NoSpecialGenerationMode, limit: usize) {
 pub fn benchmark_char_decrement(gm: NoSpecialGenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "char.decrement()",
-        BenchmarkType::Ordinary,
+        BenchmarkType::Single,
         chars_not_min(gm),
         gm.name(),
         limit,

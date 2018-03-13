@@ -13,7 +13,7 @@ pub fn demo_limbs_set_zero(gm: GenerationMode, limit: usize) {
 pub fn benchmark_limbs_set_zero(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "limbs_set_zero(&mut [u32])",
-        BenchmarkType::Ordinary,
+        BenchmarkType::Single,
         vecs_of_unsigned(gm),
         gm.name(),
         limit,

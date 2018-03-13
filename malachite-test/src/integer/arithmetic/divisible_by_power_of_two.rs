@@ -12,29 +12,6 @@ pub fn demo_integer_divisible_by_power_of_two(gm: GenerationMode, limit: usize) 
     }
 }
 
-pub fn benchmark_integer_divisible_by_power_of_two(
-    gm: GenerationMode,
-    limit: usize,
-    file_name: &str,
-) {
-    m_run_benchmark(
-        "Integer.divisible_by_power_of_two(u32)",
-        BenchmarkType::Ordinary,
-        pairs_of_integer_and_small_u32(gm),
-        gm.name(),
-        limit,
-        file_name,
-        &(|&(ref n, _)| n.significant_bits() as usize),
-        "n.significant_bits()",
-        &[
-            (
-                "malachite",
-                &mut (|(n, pow)| no_out!(n.divisible_by_power_of_two(pow))),
-            ),
-        ],
-    );
-}
-
 pub fn benchmark_integer_divisible_by_power_of_two_algorithms(
     gm: GenerationMode,
     limit: usize,

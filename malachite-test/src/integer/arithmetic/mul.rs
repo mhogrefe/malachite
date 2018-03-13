@@ -46,10 +46,14 @@ pub fn demo_integer_mul_ref_ref(gm: GenerationMode, limit: usize) {
     }
 }
 
-pub fn benchmark_integer_mul_assign(gm: GenerationMode, limit: usize, file_name: &str) {
+pub fn benchmark_integer_mul_assign_library_comparison(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
     m_run_benchmark(
         "Integer *= Integer",
-        BenchmarkType::Ordinary,
+        BenchmarkType::LibraryComparison,
         rm_pairs_of_integers(gm),
         gm.name(),
         limit,
@@ -84,10 +88,10 @@ pub fn benchmark_integer_mul_assign_evaluation_strategy(
     );
 }
 
-pub fn benchmark_integer_mul(gm: GenerationMode, limit: usize, file_name: &str) {
+pub fn benchmark_integer_mul_library_comparison(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "Integer * Integer",
-        BenchmarkType::Ordinary,
+        BenchmarkType::LibraryComparison,
         nrm_pairs_of_integers(gm),
         gm.name(),
         limit,

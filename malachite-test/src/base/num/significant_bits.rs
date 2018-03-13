@@ -24,7 +24,7 @@ fn benchmark_unsigned_significant_bits<T: 'static + PrimitiveUnsigned>(
 ) {
     m_run_benchmark(
         &format!("{}.significant_bits()", T::NAME),
-        BenchmarkType::Ordinary,
+        BenchmarkType::Single,
         unsigneds::<T>(gm),
         gm.name(),
         limit,
@@ -42,7 +42,7 @@ fn benchmark_signed_significant_bits<T: 'static + PrimitiveSigned>(
 ) {
     m_run_benchmark(
         &format!("{}.significant_bits()", T::NAME),
-        BenchmarkType::Ordinary,
+        BenchmarkType::Single,
         signeds::<T>(gm),
         gm.name(),
         limit,

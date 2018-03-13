@@ -27,7 +27,7 @@ pub fn demo_i32_partial_cmp_abs_integer(gm: GenerationMode, limit: usize) {
 pub fn benchmark_integer_partial_cmp_abs_i32(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "Integer.partial_cmp_abs(&i32)",
-        BenchmarkType::Ordinary,
+        BenchmarkType::Single,
         pairs_of_integer_and_signed::<i32>(gm),
         gm.name(),
         limit,
@@ -43,7 +43,7 @@ pub fn benchmark_integer_partial_cmp_abs_i32(gm: GenerationMode, limit: usize, f
 pub fn benchmark_i32_partial_cmp_abs_integer(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "i32.partial_cmp_abs(&Integer)",
-        BenchmarkType::Ordinary,
+        BenchmarkType::Single,
         pairs_of_signed_and_integer::<i32>(gm),
         gm.name(),
         limit,

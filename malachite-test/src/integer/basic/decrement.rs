@@ -14,7 +14,7 @@ pub fn demo_integer_decrement(gm: GenerationMode, limit: usize) {
 pub fn benchmark_integer_decrement(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "Integer.decrement()",
-        BenchmarkType::Ordinary,
+        BenchmarkType::Single,
         integers(gm),
         gm.name(),
         limit,

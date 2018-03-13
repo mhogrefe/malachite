@@ -25,7 +25,7 @@ fn benchmark_unsigned_decrement<T: 'static + PrimitiveUnsigned>(
 ) {
     m_run_benchmark(
         &format!("{}.decrement()", T::NAME),
-        BenchmarkType::Ordinary,
+        BenchmarkType::Single,
         positive_unsigneds::<T>(gm),
         gm.name(),
         limit,
@@ -43,7 +43,7 @@ fn benchmark_signed_decrement<T: 'static + PrimitiveSigned>(
 ) {
     m_run_benchmark(
         &format!("{}.decrement()", T::NAME),
-        BenchmarkType::Ordinary,
+        BenchmarkType::Single,
         signeds_no_min::<T>(gm),
         gm.name(),
         limit,

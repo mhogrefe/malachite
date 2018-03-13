@@ -15,7 +15,7 @@ pub fn demo_contiguous_range_to_char(gm: GenerationMode, limit: usize) {
 pub fn benchmark_contiguous_range_to_char(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "contiguous_range_to_char(char)",
-        BenchmarkType::Ordinary,
+        BenchmarkType::Single,
         unsigneds(gm),
         gm.name(),
         limit,

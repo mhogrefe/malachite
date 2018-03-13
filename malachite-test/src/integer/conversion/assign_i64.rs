@@ -1,10 +1,8 @@
-use common::{integer_to_bigint, GenerationMode};
-use inputs::integer::pairs_of_integer_and_signed;
+use common::{m_run_benchmark, BenchmarkType, GenerationMode};
+use inputs::integer::{nm_pairs_of_integer_and_signed, pairs_of_integer_and_signed};
 use malachite_base::num::SignificantBits;
 use malachite_base::num::Assign;
-use malachite_nz::integer::Integer;
 use num::BigInt;
-use rust_wheels::benchmarks::{BenchmarkOptions2, benchmark_2};
 
 pub fn num_assign_i64(x: &mut BigInt, i: i64) {
     *x = BigInt::from(i);
@@ -18,21 +16,23 @@ pub fn demo_integer_assign_i64(gm: GenerationMode, limit: usize) {
     }
 }
 
-pub fn benchmark_integer_assign_i64(gm: GenerationMode, limit: usize, file_name: &str) {
-    println!("benchmarking {} Integer.assign(i64)", gm.name());
-    benchmark_2(BenchmarkOptions2 {
-        xs: pairs_of_integer_and_signed::<i64>(gm),
-        function_f: &mut (|(mut n, i): (Integer, i64)| n.assign(i)),
-        function_g: &mut (|(mut n, i): (BigInt, i64)| num_assign_i64(&mut n, i)),
-        x_cons: &(|p| p.clone()),
-        y_cons: &(|&(ref n, i)| (integer_to_bigint(n), i)),
-        x_param: &(|&(ref n, _)| n.significant_bits() as usize),
+pub fn benchmark_integer_assign_i64_library_comparison(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "Integer.assign(i64)",
+        BenchmarkType::LibraryComparison,
+        nm_pairs_of_integer_and_signed(gm),
+        gm.name(),
         limit,
-        f_name: "malachite",
-        g_name: "num",
-        title: "Integer.assign(i64)",
-        x_axis_label: "n.significant_bits()",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+        file_name,
+        &(|&(_, (ref n, _))| n.significant_bits() as usize),
+        "n.significant_bits()",
+        &[
+            ("malachite", &mut (|(_, (mut x, y))| x.assign(y))),
+            ("num", &mut (|((mut x, y), _)| num_assign_i64(&mut x, y))),
+        ],
+    );
 }

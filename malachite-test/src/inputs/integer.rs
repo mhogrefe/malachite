@@ -148,6 +148,20 @@ pub fn pairs_of_integer_and_signed<T: 'static + PrimitiveSigned>(
     }
 }
 
+pub fn nm_pairs_of_integer_and_signed<T: 'static + PrimitiveSigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = ((BigInt, T), (Integer, T))>> {
+    Box::new(pairs_of_integer_and_signed(gm).map(|(x, y)| ((integer_to_bigint(&x), y), (x, y))))
+}
+
+pub fn rm_pairs_of_integer_and_signed<T: 'static + PrimitiveSigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = ((rug::Integer, T), (Integer, T))>> {
+    Box::new(
+        pairs_of_integer_and_signed(gm).map(|(x, y)| ((integer_to_rug_integer(&x), y), (x, y))),
+    )
+}
+
 pub fn nrm_pairs_of_integer_and_signed<T: 'static + PrimitiveSigned>(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = ((BigInt, T), (rug::Integer, T), (Integer, T))>> {
@@ -158,14 +172,6 @@ pub fn nrm_pairs_of_integer_and_signed<T: 'static + PrimitiveSigned>(
             (x, y),
         )
     }))
-}
-
-pub fn rm_pairs_of_integer_and_signed<T: 'static + PrimitiveSigned>(
-    gm: GenerationMode,
-) -> Box<Iterator<Item = ((rug::Integer, T), (Integer, T))>> {
-    Box::new(
-        pairs_of_integer_and_signed(gm).map(|(x, y)| ((integer_to_rug_integer(&x), y), (x, y))),
-    )
 }
 
 pub fn pairs_of_signed_and_integer<T: 'static + PrimitiveSigned>(
@@ -215,6 +221,12 @@ pub fn rm_pairs_of_integer_and_unsigned<T: 'static + PrimitiveUnsigned>(
     Box::new(
         pairs_of_integer_and_unsigned(gm).map(|(x, y)| ((integer_to_rug_integer(&x), y), (x, y))),
     )
+}
+
+pub fn nm_pairs_of_integer_and_unsigned<T: 'static + PrimitiveUnsigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = ((BigInt, T), (Integer, T))>> {
+    Box::new(pairs_of_integer_and_unsigned(gm).map(|(x, y)| ((integer_to_bigint(&x), y), (x, y))))
 }
 
 pub fn nrm_pairs_of_integer_and_unsigned<T: 'static + PrimitiveUnsigned>(

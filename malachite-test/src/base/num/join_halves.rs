@@ -35,7 +35,7 @@ fn benchmark_unsigned_join_halves<T: 'static + JoinHalves + PrimitiveUnsigned>(
             T::Half::NAME,
             T::Half::NAME
         ),
-        BenchmarkType::Ordinary,
+        BenchmarkType::Single,
         pairs_of_unsigneds::<T::Half>(gm),
         gm.name(),
         limit,

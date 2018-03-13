@@ -28,10 +28,14 @@ pub fn demo_u32_partial_eq_integer(gm: GenerationMode, limit: usize) {
     }
 }
 
-pub fn benchmark_integer_partial_eq_u32(gm: GenerationMode, limit: usize, file_name: &str) {
+pub fn benchmark_integer_partial_eq_u32_library_comparison(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
     m_run_benchmark(
         "Integer == u32",
-        BenchmarkType::Ordinary,
+        BenchmarkType::LibraryComparison,
         nrm_pairs_of_integer_and_unsigned(gm),
         gm.name(),
         limit,
@@ -49,10 +53,14 @@ pub fn benchmark_integer_partial_eq_u32(gm: GenerationMode, limit: usize, file_n
     );
 }
 
-pub fn benchmark_u32_partial_eq_integer(gm: GenerationMode, limit: usize, file_name: &str) {
+pub fn benchmark_u32_partial_eq_integer_library_comparison(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
     m_run_benchmark(
         "u32 == Integer",
-        BenchmarkType::Ordinary,
+        BenchmarkType::LibraryComparison,
         rm_pairs_of_unsigned_and_integer::<u32>(gm),
         gm.name(),
         limit,

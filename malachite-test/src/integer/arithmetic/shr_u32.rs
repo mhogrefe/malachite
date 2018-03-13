@@ -63,7 +63,7 @@ pub fn demo_integer_shr_round_u32_ref(gm: GenerationMode, limit: usize) {
 pub fn benchmark_integer_shr_assign_u32(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "Integer >>= u32",
-        BenchmarkType::Ordinary,
+        BenchmarkType::Single,
         rm_pairs_of_integer_and_small_u32(gm),
         gm.name(),
         limit,
@@ -77,10 +77,14 @@ pub fn benchmark_integer_shr_assign_u32(gm: GenerationMode, limit: usize, file_n
     );
 }
 
-pub fn benchmark_integer_shr_u32(gm: GenerationMode, limit: usize, file_name: &str) {
+pub fn benchmark_integer_shr_u32_library_comparison(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
     m_run_benchmark(
         "Integer >> u32",
-        BenchmarkType::Ordinary,
+        BenchmarkType::LibraryComparison,
         rm_pairs_of_integer_and_small_u32(gm),
         gm.name(),
         limit,
@@ -118,7 +122,7 @@ pub fn benchmark_integer_shr_u32_evaluation_strategy(
 pub fn benchmark_integer_shr_round_assign_u32(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "Integer.shr_round_assign(u32, RoundingMode)",
-        BenchmarkType::Ordinary,
+        BenchmarkType::Single,
         triples_of_integer_small_u32_and_rounding_mode_var_1(gm),
         gm.name(),
         limit,
@@ -130,22 +134,6 @@ pub fn benchmark_integer_shr_round_assign_u32(gm: GenerationMode, limit: usize, 
                 "malachite",
                 &mut (|(mut x, y, rm)| x.shr_round_assign(y, rm)),
             ),
-        ],
-    );
-}
-
-pub fn benchmark_integer_shr_round_u32(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
-        "Integer.shr_round(u32, RoundingMode)",
-        BenchmarkType::Ordinary,
-        triples_of_integer_small_u32_and_rounding_mode_var_1(gm),
-        gm.name(),
-        limit,
-        file_name,
-        &(|&(_, other, _)| other as usize),
-        "other",
-        &[
-            ("malachite", &mut (|(x, y, rm)| no_out!(x.shr_round(y, rm)))),
         ],
     );
 }

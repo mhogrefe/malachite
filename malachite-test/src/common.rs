@@ -71,7 +71,8 @@ impl GenerationMode {
 
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub enum BenchmarkType {
-    Ordinary,
+    Single,
+    LibraryComparison,
     EvaluationStrategy,
     Algorithms,
 }
@@ -91,7 +92,8 @@ pub fn m_run_benchmark<'a, I: Iterator>(
     I::Item: Clone,
 {
     let title = match benchmark_type {
-        BenchmarkType::Ordinary => title.to_owned(),
+        BenchmarkType::Single => title.to_owned(),
+        BenchmarkType::LibraryComparison => format!("{} library comparison", title),
         BenchmarkType::EvaluationStrategy => format!("{} evaluation strategy", title),
         BenchmarkType::Algorithms => format!("{} algorithms", title),
     };
@@ -99,6 +101,9 @@ pub fn m_run_benchmark<'a, I: Iterator>(
     let colors = vec!["green", "blue", "red", "black", "orange"];
     if series.len() > colors.len() {
         panic!("not enough available colors");
+    }
+    if (benchmark_type == BenchmarkType::Single) != (series.len() == 1) {
+        panic!("Benchmarks have type Single iff they have only one series");
     }
     let mut series_options = Vec::new();
     for (&(label, function), color) in series.iter().zip(colors.iter()) {

@@ -60,10 +60,14 @@ pub fn demo_integer_shr_round_i32_ref(gm: GenerationMode, limit: usize) {
     }
 }
 
-pub fn benchmark_integer_shr_assign_i32(gm: GenerationMode, limit: usize, file_name: &str) {
+pub fn benchmark_integer_shr_assign_i32_library_comparison(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
     m_run_benchmark(
         "Integer >>= i32",
-        BenchmarkType::Ordinary,
+        BenchmarkType::LibraryComparison,
         rm_pairs_of_integer_and_small_i32(gm),
         gm.name(),
         limit,
@@ -77,10 +81,14 @@ pub fn benchmark_integer_shr_assign_i32(gm: GenerationMode, limit: usize, file_n
     );
 }
 
-pub fn benchmark_integer_shr_i32(gm: GenerationMode, limit: usize, file_name: &str) {
+pub fn benchmark_integer_shr_i32_library_comparison(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
     m_run_benchmark(
         "Integer >> i32",
-        BenchmarkType::Ordinary,
+        BenchmarkType::LibraryComparison,
         rm_pairs_of_integer_and_small_i32(gm),
         gm.name(),
         limit,
@@ -118,7 +126,7 @@ pub fn benchmark_integer_shr_i32_evaluation_strategy(
 pub fn benchmark_integer_shr_round_assign_i32(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "Integer.shr_round_assign(i32, RoundingMode)",
-        BenchmarkType::Ordinary,
+        BenchmarkType::Single,
         triples_of_integer_small_i32_and_rounding_mode_var_2(gm),
         gm.name(),
         limit,
@@ -130,22 +138,6 @@ pub fn benchmark_integer_shr_round_assign_i32(gm: GenerationMode, limit: usize, 
                 "malachite",
                 &mut (|(mut x, y, rm)| x.shr_round_assign(y, rm)),
             ),
-        ],
-    );
-}
-
-pub fn benchmark_integer_shr_round_i32(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
-        "Integer.shr_round(i32, RoundingMode)",
-        BenchmarkType::Ordinary,
-        triples_of_integer_small_i32_and_rounding_mode_var_2(gm),
-        gm.name(),
-        limit,
-        file_name,
-        &(|&(_, other, _)| other as usize),
-        "other",
-        &[
-            ("malachite", &mut (|(x, y, rm)| no_out!(x.shr_round(y, rm)))),
         ],
     );
 }

@@ -1,9 +1,8 @@
-use common::GenerationMode;
+use common::{m_run_benchmark, BenchmarkType, GenerationMode};
 use inputs::base::unsigneds;
 use malachite_base::num::SignificantBits;
 use malachite_nz::integer::Integer;
-use num::BigUint;
-use rust_wheels::benchmarks::{BenchmarkOptions2, benchmark_2};
+use num::BigInt;
 
 pub fn demo_integer_from_u64(gm: GenerationMode, limit: usize) {
     for u in unsigneds::<u64>(gm).take(limit) {
@@ -11,21 +10,23 @@ pub fn demo_integer_from_u64(gm: GenerationMode, limit: usize) {
     }
 }
 
-pub fn benchmark_integer_from_u64(gm: GenerationMode, limit: usize, file_name: &str) {
-    println!("benchmarking {} Integer::from(u64)", gm.name());
-    benchmark_2(BenchmarkOptions2 {
-        xs: unsigneds::<u64>(gm),
-        function_f: &mut (|u| Integer::from(u)),
-        function_g: &mut (|u| BigUint::from(u)),
-        x_cons: &(|&u| u),
-        y_cons: &(|&u| u),
-        x_param: &(|&u| u.significant_bits() as usize),
+pub fn benchmark_integer_from_u64_library_comparison(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "Integer::from(u64)",
+        BenchmarkType::LibraryComparison,
+        unsigneds::<u64>(gm),
+        gm.name(),
         limit,
-        f_name: "malachite",
-        g_name: "num",
-        title: "Integer::from(u64)",
-        x_axis_label: "u.significant_bits()",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+        file_name,
+        &(|&u| u.significant_bits() as usize),
+        "u.significant_bits()",
+        &[
+            ("malachite", &mut (|u| no_out!(Integer::from(u)))),
+            ("num", &mut (|u| no_out!(BigInt::from(u)))),
+        ],
+    );
 }

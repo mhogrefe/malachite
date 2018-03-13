@@ -9,10 +9,14 @@ pub fn demo_integer_hash(gm: GenerationMode, limit: usize) {
     }
 }
 
-pub fn benchmark_integer_hash(gm: GenerationMode, limit: usize, file_name: &str) {
+pub fn benchmark_integer_hash_library_comparison(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
     m_run_benchmark(
         "Integer hash",
-        BenchmarkType::Ordinary,
+        BenchmarkType::LibraryComparison,
         nm_integers(gm),
         gm.name(),
         limit,

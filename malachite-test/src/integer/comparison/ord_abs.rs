@@ -14,10 +14,14 @@ pub fn demo_integer_cmp_abs(gm: GenerationMode, limit: usize) {
     }
 }
 
-pub fn benchmark_integer_cmp_abs(gm: GenerationMode, limit: usize, file_name: &str) {
+pub fn benchmark_integer_cmp_abs_library_comparison(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
     m_run_benchmark(
         "Integer.cmp_abs(&Integer)",
-        BenchmarkType::Ordinary,
+        BenchmarkType::LibraryComparison,
         rm_pairs_of_integers(gm),
         gm.name(),
         limit,

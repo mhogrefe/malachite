@@ -39,7 +39,7 @@ pub fn demo_integer_natural_abs_ref(gm: GenerationMode, limit: usize) {
 pub fn benchmark_integer_abs_assign(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "Integer.abs_assign()",
-        BenchmarkType::Ordinary,
+        BenchmarkType::Single,
         integers(gm),
         gm.name(),
         limit,
@@ -50,10 +50,10 @@ pub fn benchmark_integer_abs_assign(gm: GenerationMode, limit: usize, file_name:
     );
 }
 
-pub fn benchmark_integer_abs(gm: GenerationMode, limit: usize, file_name: &str) {
+pub fn benchmark_integer_abs_library_comparison(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "Integer.abs()",
-        BenchmarkType::Ordinary,
+        BenchmarkType::LibraryComparison,
         nrm_integers(gm),
         gm.name(),
         limit,
@@ -92,7 +92,7 @@ pub fn benchmark_integer_abs_evaluation_strategy(
 pub fn benchmark_integer_natural_abs(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "Integer.natural_abs()",
-        BenchmarkType::Ordinary,
+        BenchmarkType::Single,
         integers(gm),
         gm.name(),
         limit,

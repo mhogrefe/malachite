@@ -14,7 +14,7 @@ pub fn demo_char_increment(gm: NoSpecialGenerationMode, limit: usize) {
 pub fn benchmark_char_increment(gm: NoSpecialGenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "char.increment()",
-        BenchmarkType::Ordinary,
+        BenchmarkType::Single,
         chars_not_max(gm),
         gm.name(),
         limit,

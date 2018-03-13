@@ -1,12 +1,9 @@
-use common::{integer_to_bigint, integer_to_rug_integer, GenerationMode};
-use inputs::integer::{integers, pairs_of_integers};
+use common::{m_run_benchmark, BenchmarkType, GenerationMode};
+use inputs::integer::{integers, nrm_integers, nrm_pairs_of_integers, pairs_of_integers,
+                      rm_pairs_of_integers};
 use malachite_base::num::SignificantBits;
 use malachite_base::num::Assign;
-use malachite_nz::integer::Integer;
-use num::BigInt;
-use rug;
 use rug::Assign as rug_assign;
-use rust_wheels::benchmarks::{BenchmarkOptions2, BenchmarkOptions3, benchmark_2, benchmark_3};
 use std::cmp::max;
 
 pub fn demo_integer_clone(gm: GenerationMode, limit: usize) {
@@ -40,67 +37,69 @@ pub fn demo_integer_assign_ref(gm: GenerationMode, limit: usize) {
     }
 }
 
-pub fn benchmark_integer_clone(gm: GenerationMode, limit: usize, file_name: &str) {
-    println!("benchmarking {} Integer.clone()", gm.name());
-    benchmark_3(BenchmarkOptions3 {
-        xs: integers(gm),
-        function_f: &mut (|n: Integer| n.clone()),
-        function_g: &mut (|n: BigInt| n.clone()),
-        function_h: &mut (|n: rug::Integer| n.clone()),
-        x_cons: &(|x| x.clone()),
-        y_cons: &(|x| integer_to_bigint(x)),
-        z_cons: &(|x| integer_to_rug_integer(x)),
-        x_param: &(|n| n.significant_bits() as usize),
+pub fn benchmark_integer_clone_library_comparison(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "Integer.clone()",
+        BenchmarkType::LibraryComparison,
+        nrm_integers(gm),
+        gm.name(),
         limit,
-        f_name: "malachite",
-        g_name: "num",
-        h_name: "rug",
-        title: "Integer.clone()",
-        x_axis_label: "n.significant_bits()",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+        file_name,
+        &(|&(_, _, ref n)| n.significant_bits() as usize),
+        "n.significant_bits()",
+        &[
+            ("malachite", &mut (|(_, _, n)| no_out!(n.clone()))),
+            ("num", &mut (|(n, _, _)| no_out!(n.clone()))),
+            ("rug", &mut (|(_, n, _)| no_out!(n.clone()))),
+        ],
+    );
 }
 
-pub fn benchmark_integer_clone_from(gm: GenerationMode, limit: usize, file_name: &str) {
-    println!("benchmarking {} Integer.clone_from(Integer)", gm.name());
-    benchmark_3(BenchmarkOptions3 {
-        xs: pairs_of_integers(gm),
-        function_f: &mut (|(mut x, y): (Integer, Integer)| x.clone_from(&y)),
-        function_g: &mut (|(mut x, y): (BigInt, BigInt)| x.clone_from(&y)),
-        function_h: &mut (|(mut x, y): (rug::Integer, rug::Integer)| x.clone_from(&y)),
-        x_cons: &(|p| p.clone()),
-        y_cons: &(|&(ref x, ref y)| (integer_to_bigint(x), integer_to_bigint(y))),
-        z_cons: &(|&(ref x, ref y)| (integer_to_rug_integer(x), integer_to_rug_integer(y))),
-        x_param: &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),
+pub fn benchmark_integer_clone_from_library_comparison(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "Integer.clone_from(Integer)",
+        BenchmarkType::LibraryComparison,
+        nrm_pairs_of_integers(gm),
+        gm.name(),
         limit,
-        f_name: "malachite",
-        g_name: "num",
-        h_name: "rug",
-        title: "Integer.clone_from(Integer)",
-        x_axis_label: "max(x.significant_bits(), y.significant_bits())",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+        file_name,
+        &(|&(_, _, (ref x, ref y))| max(x.significant_bits(), y.significant_bits()) as usize),
+        "max(x.significant_bits(), y.significant_bits())",
+        &[
+            ("malachite", &mut (|(_, _, (mut x, y))| x.clone_from(&y))),
+            ("num", &mut (|((mut x, y), _, _)| x.clone_from(&y))),
+            ("rug", &mut (|(_, (mut x, y), _)| x.clone_from(&y))),
+        ],
+    );
 }
 
-pub fn benchmark_integer_assign(gm: GenerationMode, limit: usize, file_name: &str) {
-    println!("benchmarking {} Integer.assign(Integer)", gm.name());
-    benchmark_2(BenchmarkOptions2 {
-        xs: pairs_of_integers(gm),
-        function_f: &mut (|(mut x, y): (Integer, Integer)| x.assign(y)),
-        function_g: &mut (|(mut x, y): (rug::Integer, rug::Integer)| x.assign(y)),
-        x_cons: &(|p| p.clone()),
-        y_cons: &(|&(ref x, ref y)| (integer_to_rug_integer(x), integer_to_rug_integer(y))),
-        x_param: &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),
+pub fn benchmark_integer_assign_library_comparison(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "Integer.clone_from(Integer)",
+        BenchmarkType::LibraryComparison,
+        rm_pairs_of_integers(gm),
+        gm.name(),
         limit,
-        f_name: "malachite",
-        g_name: "rug",
-        title: "Integer.assign(Integer)",
-        x_axis_label: "max(x.significant_bits(), y.significant_bits())",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+        file_name,
+        &(|&(_, (ref x, ref y))| max(x.significant_bits(), y.significant_bits()) as usize),
+        "max(x.significant_bits(), y.significant_bits())",
+        &[
+            ("malachite", &mut (|(_, (mut x, y))| x.assign(y))),
+            ("rug", &mut (|((mut x, y), _)| x.assign(y))),
+        ],
+    );
 }
 
 pub fn benchmark_integer_assign_evaluation_strategy(
@@ -108,23 +107,18 @@ pub fn benchmark_integer_assign_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    println!(
-        "benchmarking {} Integer.assign(Integer) evaluation strategy",
-        gm.name()
-    );
-    benchmark_2(BenchmarkOptions2 {
-        xs: pairs_of_integers(gm),
-        function_f: &mut (|(mut x, y): (Integer, Integer)| x.assign(y)),
-        function_g: &mut (|(mut x, y): (Integer, Integer)| x.assign(&y)),
-        x_cons: &(|p| p.clone()),
-        y_cons: &(|p| p.clone()),
-        x_param: &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),
+    m_run_benchmark(
+        "Integer.assign(Integer)",
+        BenchmarkType::EvaluationStrategy,
+        pairs_of_integers(gm),
+        gm.name(),
         limit,
-        f_name: "Integer.assign(Integer)",
-        g_name: "Integer.assign(&Integer)",
-        title: "Integer.assign(Integer) evaluation strategy",
-        x_axis_label: "max(x.significant_bits(), y.significant_bits())",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+        file_name,
+        &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),
+        "max(x.significant_bits(), y.significant_bits())",
+        &[
+            ("Integer.assign(Integer)", &mut (|(mut x, y)| x.assign(y))),
+            ("Integer.assign(&Integer)", &mut (|(mut x, y)| x.assign(&y))),
+        ],
+    );
 }

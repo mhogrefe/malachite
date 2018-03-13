@@ -25,7 +25,7 @@ fn benchmark_unsigned_increment<T: 'static + PrimitiveUnsigned>(
 ) {
     m_run_benchmark(
         &format!("{}.increment()", T::NAME),
-        BenchmarkType::Ordinary,
+        BenchmarkType::Single,
         unsigneds_no_max::<T>(gm),
         gm.name(),
         limit,
@@ -43,7 +43,7 @@ fn benchmark_signed_increment<T: 'static + PrimitiveSigned>(
 ) {
     m_run_benchmark(
         &format!("{}.increment()", T::NAME),
-        BenchmarkType::Ordinary,
+        BenchmarkType::Single,
         signeds_no_max::<T>(gm),
         gm.name(),
         limit,

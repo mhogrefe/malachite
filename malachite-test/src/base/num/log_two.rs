@@ -21,7 +21,7 @@ fn benchmark_unsigned_floor_log_two<T: 'static + PrimitiveUnsigned>(
 ) {
     m_run_benchmark(
         &format!("{}.floor_log_two()", T::NAME),
-        BenchmarkType::Ordinary,
+        BenchmarkType::Single,
         positive_unsigneds::<T>(gm),
         gm.name(),
         limit,
@@ -39,7 +39,7 @@ fn benchmark_unsigned_ceiling_log_two<T: 'static + PrimitiveUnsigned>(
 ) {
     m_run_benchmark(
         &format!("{}.ceiling_log_two()", T::NAME),
-        BenchmarkType::Ordinary,
+        BenchmarkType::Single,
         positive_unsigneds::<T>(gm),
         gm.name(),
         limit,

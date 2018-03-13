@@ -24,10 +24,14 @@ pub fn demo_natural_partial_cmp_integer(gm: GenerationMode, limit: usize) {
     }
 }
 
-pub fn benchmark_integer_partial_cmp_natural(gm: GenerationMode, limit: usize, file_name: &str) {
+pub fn benchmark_integer_partial_cmp_natural_library_comparison(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
     m_run_benchmark(
         "Integer.partial_cmp(&Natural)",
-        BenchmarkType::Ordinary,
+        BenchmarkType::LibraryComparison,
         rm_pairs_of_integer_and_natural(gm),
         gm.name(),
         limit,
@@ -41,10 +45,14 @@ pub fn benchmark_integer_partial_cmp_natural(gm: GenerationMode, limit: usize, f
     );
 }
 
-pub fn benchmark_natural_partial_cmp_integer(gm: GenerationMode, limit: usize, file_name: &str) {
+pub fn benchmark_natural_partial_cmp_integer_library_comparison(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
     m_run_benchmark(
         "Natural.partial_cmp(&Integer)",
-        BenchmarkType::Ordinary,
+        BenchmarkType::LibraryComparison,
         rm_pairs_of_natural_and_integer(gm),
         gm.name(),
         limit,

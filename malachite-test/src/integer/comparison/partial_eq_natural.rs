@@ -24,10 +24,14 @@ pub fn demo_natural_partial_eq_integer(gm: GenerationMode, limit: usize) {
     }
 }
 
-pub fn benchmark_integer_partial_eq_natural(gm: GenerationMode, limit: usize, file_name: &str) {
+pub fn benchmark_integer_partial_eq_natural_library_comparison(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
     m_run_benchmark(
         "Integer == Natural",
-        BenchmarkType::Ordinary,
+        BenchmarkType::LibraryComparison,
         rm_pairs_of_integer_and_natural(gm),
         gm.name(),
         limit,
@@ -41,10 +45,14 @@ pub fn benchmark_integer_partial_eq_natural(gm: GenerationMode, limit: usize, fi
     );
 }
 
-pub fn benchmark_natural_partial_eq_integer(gm: GenerationMode, limit: usize, file_name: &str) {
+pub fn benchmark_natural_partial_eq_integer_library_comparison(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
     m_run_benchmark(
         "Natural == Integer",
-        BenchmarkType::Ordinary,
+        BenchmarkType::LibraryComparison,
         rm_pairs_of_natural_and_integer(gm),
         gm.name(),
         limit,

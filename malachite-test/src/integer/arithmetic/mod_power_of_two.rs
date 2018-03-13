@@ -110,7 +110,7 @@ pub fn benchmark_integer_mod_power_of_two_assign(
 ) {
     m_run_benchmark(
         "Integer.mod_power_of_two_assign(u32)",
-        BenchmarkType::Ordinary,
+        BenchmarkType::Single,
         pairs_of_integer_and_small_u32(gm),
         gm.name(),
         limit,
@@ -126,26 +126,14 @@ pub fn benchmark_integer_mod_power_of_two_assign(
     );
 }
 
-pub fn benchmark_integer_mod_power_of_two(gm: GenerationMode, limit: usize, file_name: &str) {
+pub fn benchmark_integer_mod_power_of_two_evaluation_strategy(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
     m_run_benchmark(
         "Integer.mod_power_of_two(u32)",
-        BenchmarkType::Ordinary,
-        pairs_of_integer_and_small_u32(gm),
-        gm.name(),
-        limit,
-        file_name,
-        &(|&(_, index)| index as usize),
-        "index",
-        &[
-            ("malachite", &mut (|(n, u)| no_out!(n.mod_power_of_two(u)))),
-        ],
-    );
-}
-
-pub fn benchmark_integer_mod_power_of_two_ref(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
-        "Integer.mod_power_of_two_ref(u32)",
-        BenchmarkType::Ordinary,
+        BenchmarkType::EvaluationStrategy,
         pairs_of_integer_and_small_u32(gm),
         gm.name(),
         limit,
@@ -154,7 +142,11 @@ pub fn benchmark_integer_mod_power_of_two_ref(gm: GenerationMode, limit: usize, 
         "index",
         &[
             (
-                "malachite",
+                "Integer.mod_power_of_two(u32)",
+                &mut (|(n, u)| no_out!(n.mod_power_of_two(u))),
+            ),
+            (
+                "Integer.mod_power_of_two_ref(u32)",
                 &mut (|(n, u)| no_out!(n.mod_power_of_two_ref(u))),
             ),
         ],
@@ -168,7 +160,7 @@ pub fn benchmark_integer_rem_power_of_two_assign(
 ) {
     m_run_benchmark(
         "Integer.rem_power_of_two_assign(u32)",
-        BenchmarkType::Ordinary,
+        BenchmarkType::Single,
         pairs_of_integer_and_small_u32(gm),
         gm.name(),
         limit,
@@ -184,26 +176,14 @@ pub fn benchmark_integer_rem_power_of_two_assign(
     );
 }
 
-pub fn benchmark_integer_rem_power_of_two(gm: GenerationMode, limit: usize, file_name: &str) {
+pub fn benchmark_integer_rem_power_of_two_evaluation_strategy(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
     m_run_benchmark(
         "Integer.rem_power_of_two(u32)",
-        BenchmarkType::Ordinary,
-        pairs_of_integer_and_small_u32(gm),
-        gm.name(),
-        limit,
-        file_name,
-        &(|&(_, index)| index as usize),
-        "index",
-        &[
-            ("malachite", &mut (|(n, u)| no_out!(n.rem_power_of_two(u)))),
-        ],
-    );
-}
-
-pub fn benchmark_integer_rem_power_of_two_ref(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
-        "Integer.rem_power_of_two_ref(u32)",
-        BenchmarkType::Ordinary,
+        BenchmarkType::EvaluationStrategy,
         pairs_of_integer_and_small_u32(gm),
         gm.name(),
         limit,
@@ -212,7 +192,11 @@ pub fn benchmark_integer_rem_power_of_two_ref(gm: GenerationMode, limit: usize, 
         "index",
         &[
             (
-                "malachite",
+                "Integer.rem_power_of_two(u32)",
+                &mut (|(n, u)| no_out!(n.rem_power_of_two(u))),
+            ),
+            (
+                "Integer.rem_power_of_two_ref(u32)",
                 &mut (|(n, u)| no_out!(n.rem_power_of_two_ref(u))),
             ),
         ],
@@ -226,7 +210,7 @@ pub fn benchmark_integer_ceiling_mod_power_of_two_assign(
 ) {
     m_run_benchmark(
         "Integer.ceiling_ceiling_mod_power_of_two_assign(u32)",
-        BenchmarkType::Ordinary,
+        BenchmarkType::Single,
         pairs_of_integer_and_small_u32(gm),
         gm.name(),
         limit,
@@ -242,14 +226,14 @@ pub fn benchmark_integer_ceiling_mod_power_of_two_assign(
     );
 }
 
-pub fn benchmark_integer_ceiling_mod_power_of_two(
+pub fn benchmark_integer_ceiling_mod_power_of_two_evaluation_strategy(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,
 ) {
     m_run_benchmark(
         "Integer.ceiling_mod_power_of_two(u32)",
-        BenchmarkType::Ordinary,
+        BenchmarkType::EvaluationStrategy,
         pairs_of_integer_and_small_u32(gm),
         gm.name(),
         limit,
@@ -258,30 +242,11 @@ pub fn benchmark_integer_ceiling_mod_power_of_two(
         "index",
         &[
             (
-                "malachite",
+                "Integer.ceiling_mod_power_of_two(u32)",
                 &mut (|(n, u)| no_out!(n.ceiling_mod_power_of_two(u))),
             ),
-        ],
-    );
-}
-
-pub fn benchmark_integer_ceiling_mod_power_of_two_ref(
-    gm: GenerationMode,
-    limit: usize,
-    file_name: &str,
-) {
-    m_run_benchmark(
-        "Integer.ceiling_mod_power_of_two_ref(u32)",
-        BenchmarkType::Ordinary,
-        pairs_of_integer_and_small_u32(gm),
-        gm.name(),
-        limit,
-        file_name,
-        &(|&(_, index)| index as usize),
-        "index",
-        &[
             (
-                "malachite",
+                "Integer.ceiling_mod_power_of_two_ref(u32)",
                 &mut (|(n, u)| no_out!(n.ceiling_mod_power_of_two_ref(u))),
             ),
         ],

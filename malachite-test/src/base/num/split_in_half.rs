@@ -22,7 +22,7 @@ fn benchmark_unsigned_split_in_half<T: 'static + PrimitiveUnsigned + SplitInHalf
 {
     m_run_benchmark(
         &format!("{}.split_in_half()", T::NAME),
-        BenchmarkType::Ordinary,
+        BenchmarkType::Single,
         unsigneds::<T>(gm),
         gm.name(),
         limit,

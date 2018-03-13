@@ -25,7 +25,7 @@ pub fn demo_integer_is_odd(gm: GenerationMode, limit: usize) {
 pub fn benchmark_integer_is_even(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "Integer.is_even()",
-        BenchmarkType::Ordinary,
+        BenchmarkType::Single,
         integers(gm),
         gm.name(),
         limit,
@@ -39,7 +39,7 @@ pub fn benchmark_integer_is_even(gm: GenerationMode, limit: usize, file_name: &s
 pub fn benchmark_integer_is_odd(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "Integer.is_odd()",
-        BenchmarkType::Ordinary,
+        BenchmarkType::Single,
         integers(gm),
         gm.name(),
         limit,

@@ -21,7 +21,7 @@ fn benchmark_unsigned_get_bit<T: 'static + PrimitiveUnsigned>(
 ) {
     m_run_benchmark(
         &format!("{}.get_bit(u64)", T::NAME),
-        BenchmarkType::Ordinary,
+        BenchmarkType::Single,
         pairs_of_unsigned_and_small_u64::<T>(gm),
         gm.name(),
         limit,
@@ -39,7 +39,7 @@ fn benchmark_signed_get_bit<T: 'static + PrimitiveSigned>(
 ) {
     m_run_benchmark(
         &format!("{}.get_bit(u64)", T::NAME),
-        BenchmarkType::Ordinary,
+        BenchmarkType::Single,
         pairs_of_signed_and_small_u64::<T>(gm),
         gm.name(),
         limit,

@@ -25,7 +25,7 @@ fn benchmark_unsigned_clear_bit<T: 'static + PrimitiveUnsigned>(
 ) {
     m_run_benchmark(
         &format!("{}.clear_bit(u64)", T::NAME),
-        BenchmarkType::Ordinary,
+        BenchmarkType::Single,
         pairs_of_unsigned_and_small_u64::<T>(gm),
         gm.name(),
         limit,
@@ -43,7 +43,7 @@ fn benchmark_signed_clear_bit<T: 'static + PrimitiveSigned>(
 ) {
     m_run_benchmark(
         &format!("{}.clear_bit(u64)", T::NAME),
-        BenchmarkType::Ordinary,
+        BenchmarkType::Single,
         pairs_of_signed_and_u64_width_range_var_2::<T>(gm),
         gm.name(),
         limit,

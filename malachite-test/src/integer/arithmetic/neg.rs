@@ -26,7 +26,7 @@ pub fn demo_integer_neg_ref(gm: GenerationMode, limit: usize) {
 pub fn benchmark_integer_neg_assign(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "Integer.neg_assign()",
-        BenchmarkType::Ordinary,
+        BenchmarkType::Single,
         integers(gm),
         gm.name(),
         limit,
@@ -37,10 +37,10 @@ pub fn benchmark_integer_neg_assign(gm: GenerationMode, limit: usize, file_name:
     );
 }
 
-pub fn benchmark_integer_neg(gm: GenerationMode, limit: usize, file_name: &str) {
+pub fn benchmark_integer_neg_library_comparison(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "Integer.abs()",
-        BenchmarkType::Ordinary,
+        BenchmarkType::LibraryComparison,
         nrm_integers(gm),
         gm.name(),
         limit,

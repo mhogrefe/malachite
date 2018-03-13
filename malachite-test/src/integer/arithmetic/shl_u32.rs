@@ -22,10 +22,14 @@ pub fn demo_integer_shl_u32_ref(gm: GenerationMode, limit: usize) {
     }
 }
 
-pub fn benchmark_integer_shl_assign_u32(gm: GenerationMode, limit: usize, file_name: &str) {
+pub fn benchmark_integer_shl_assign_u32_library_comparison(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
     m_run_benchmark(
         "Integer <<= u32",
-        BenchmarkType::Ordinary,
+        BenchmarkType::LibraryComparison,
         rm_pairs_of_integer_and_small_u32(gm),
         gm.name(),
         limit,
@@ -39,10 +43,14 @@ pub fn benchmark_integer_shl_assign_u32(gm: GenerationMode, limit: usize, file_n
     );
 }
 
-pub fn benchmark_integer_shl_u32(gm: GenerationMode, limit: usize, file_name: &str) {
+pub fn benchmark_integer_shl_u32_library_comparison(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
     m_run_benchmark(
         "Integer << u32",
-        BenchmarkType::Ordinary,
+        BenchmarkType::LibraryComparison,
         rm_pairs_of_integer_and_small_u32(gm),
         gm.name(),
         limit,

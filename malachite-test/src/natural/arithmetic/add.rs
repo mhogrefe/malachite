@@ -47,10 +47,14 @@ pub fn demo_natural_add_ref_ref(gm: GenerationMode, limit: usize) {
     }
 }
 
-pub fn benchmark_natural_add_assign(gm: GenerationMode, limit: usize, file_name: &str) {
+pub fn benchmark_natural_add_assign_library_comparison(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
     m_run_benchmark(
         "Natural += Natural",
-        BenchmarkType::Ordinary,
+        BenchmarkType::LibraryComparison,
         rm_pairs_of_naturals(gm),
         gm.name(),
         limit,
@@ -85,10 +89,10 @@ pub fn benchmark_natural_add_assign_evaluation_strategy(
     );
 }
 
-pub fn benchmark_natural_add(gm: GenerationMode, limit: usize, file_name: &str) {
+pub fn benchmark_natural_add_library_comparison(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "Natural + Natural",
-        BenchmarkType::Ordinary,
+        BenchmarkType::LibraryComparison,
         nrm_pairs_of_naturals(gm),
         gm.name(),
         limit,

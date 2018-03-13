@@ -1,12 +1,8 @@
-use common::{integer_to_rug_integer, natural_to_rug_integer, GenerationMode};
-use inputs::integer::pairs_of_integer_and_natural;
+use common::{m_run_benchmark, BenchmarkType, GenerationMode};
+use inputs::integer::{pairs_of_integer_and_natural, rm_pairs_of_integer_and_natural};
 use malachite_base::num::SignificantBits;
 use malachite_base::num::Assign;
-use malachite_nz::integer::Integer;
-use malachite_nz::natural::Natural;
-use rug;
 use rug::Assign as rug_assign;
-use rust_wheels::benchmarks::{BenchmarkOptions2, benchmark_2};
 use std::cmp::max;
 
 pub fn demo_integer_assign_natural(gm: GenerationMode, limit: usize) {
@@ -26,23 +22,25 @@ pub fn demo_integer_assign_natural_ref(gm: GenerationMode, limit: usize) {
     }
 }
 
-pub fn benchmark_integer_assign_natural(gm: GenerationMode, limit: usize, file_name: &str) {
-    println!("benchmarking {} Integer.assign(Natural)", gm.name());
-    benchmark_2(BenchmarkOptions2 {
-        xs: pairs_of_integer_and_natural(gm),
-        function_f: &mut (|(mut x, y): (Integer, Natural)| x.assign(y)),
-        function_g: &mut (|(mut x, y): (rug::Integer, rug::Integer)| x.assign(y)),
-        x_cons: &(|p| p.clone()),
-        y_cons: &(|&(ref x, ref y)| (integer_to_rug_integer(x), natural_to_rug_integer(y))),
-        x_param: &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),
+pub fn benchmark_integer_assign_natural_library_comparison(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "Integer.assign(Natural)",
+        BenchmarkType::LibraryComparison,
+        rm_pairs_of_integer_and_natural(gm),
+        gm.name(),
         limit,
-        f_name: "malachite",
-        g_name: "rug",
-        title: "Integer.assign(Natural)",
-        x_axis_label: "max(x.significant_bits(), y.significant_bits())",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+        file_name,
+        &(|&(_, (ref x, ref y))| max(x.significant_bits(), y.significant_bits()) as usize),
+        "max(x.significant_bits(), y.significant_bits())",
+        &[
+            ("malachite", &mut (|(_, (mut x, y))| x.assign(y))),
+            ("rug", &mut (|((mut x, y), _)| x.assign(y))),
+        ],
+    );
 }
 
 pub fn benchmark_integer_assign_natural_evaluation_strategy(
@@ -50,23 +48,18 @@ pub fn benchmark_integer_assign_natural_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    println!(
-        "benchmarking {} Integer.assign(Natural) evaluation strategy",
-        gm.name()
-    );
-    benchmark_2(BenchmarkOptions2 {
-        xs: pairs_of_integer_and_natural(gm),
-        function_f: &mut (|(mut x, y): (Integer, Natural)| x.assign(y)),
-        function_g: &mut (|(mut x, y): (Integer, Natural)| x.assign(&y)),
-        x_cons: &(|p| p.clone()),
-        y_cons: &(|p| p.clone()),
-        x_param: &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),
+    m_run_benchmark(
+        "Integer.assign(Natural)",
+        BenchmarkType::EvaluationStrategy,
+        pairs_of_integer_and_natural(gm),
+        gm.name(),
         limit,
-        f_name: "Integer.assign(Natural)",
-        g_name: "Integer.assign(&Natural)",
-        title: "Integer.assign(Natural) evaluation strategy",
-        x_axis_label: "max(x.significant_bits(), y.significant_bits())",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+        file_name,
+        &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),
+        "max(x.significant_bits(), y.significant_bits())",
+        &[
+            ("Integer.assign(Natural)", &mut (|(mut x, y)| x.assign(y))),
+            ("Integer.assign(&Natural)", &mut (|(mut x, y)| x.assign(&y))),
+        ],
+    );
 }

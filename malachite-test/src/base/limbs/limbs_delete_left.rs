@@ -16,7 +16,7 @@ pub fn demo_limbs_delete_left(gm: GenerationMode, limit: usize) {
 pub fn benchmark_limbs_delete_left(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "limbs_delete_left(&mut Vec<u32>, usize)",
-        BenchmarkType::Ordinary,
+        BenchmarkType::Single,
         pairs_of_unsigned_vec_and_small_usize_var_1(gm),
         gm.name(),
         limit,

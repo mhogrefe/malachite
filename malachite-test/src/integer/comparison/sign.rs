@@ -23,10 +23,14 @@ pub fn demo_integer_sign(gm: GenerationMode, limit: usize) {
     }
 }
 
-pub fn benchmark_integer_sign(gm: GenerationMode, limit: usize, file_name: &str) {
+pub fn benchmark_integer_sign_library_comparison(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
     m_run_benchmark(
         "Integer.sign()",
-        BenchmarkType::Ordinary,
+        BenchmarkType::LibraryComparison,
         nrm_integers(gm),
         gm.name(),
         limit,
