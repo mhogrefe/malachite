@@ -1,7 +1,9 @@
-use common::test_properties;
+use common::{test_properties, test_properties_no_special};
 use malachite_base::num::Zero;
 use malachite_nz::natural::Natural;
-use malachite_test::inputs::natural::naturals;
+use malachite_test::inputs::base::small_usizes;
+use malachite_test::inputs::natural::{naturals, pairs_of_natural_and_small_usize,
+                                      pairs_of_natural_and_vec_of_bool_var};
 use std::str::FromStr;
 use std::u32;
 
@@ -40,6 +42,7 @@ fn test_to_limbs_asc() {
     assert_eq!(limbs[2], 3);
     assert_eq!(limbs[3], 4);
     assert_eq!(limbs[4], 5);
+    assert_eq!(limbs[5], 0);
 
     let mut limbs = n.limbs();
     assert_eq!(Some(1), limbs.next());
@@ -49,22 +52,6 @@ fn test_to_limbs_asc() {
     assert_eq!(Some(4), limbs.next_back());
     assert_eq!(None, limbs.next());
     assert_eq!(None, limbs.next_back());
-}
-
-#[test]
-#[should_panic(expected = "No limb at index 0 in 0")]
-#[allow(unknown_lints, unnecessary_operation)]
-fn limbs_index_fail_1() {
-    Natural::ZERO.limbs()[0];
-}
-
-#[test]
-#[should_panic(expected = "No limb at index 5 in 1701411834921604967429270619762735448065")]
-#[allow(unknown_lints, unnecessary_operation)]
-fn limbs_index_fail_2() {
-    Natural::from_str("1701411834921604967429270619762735448065")
-        .unwrap()
-        .limbs()[5];
 }
 
 #[test]
@@ -119,5 +106,38 @@ fn to_limbs_desc_properties() {
         if *x != 0 {
             assert_ne!(limbs[0], 0);
         }
+    });
+}
+
+#[test]
+fn limbs_properties() {
+    test_properties(naturals, |n| {
+        let limb_count = n.limb_count() as usize;
+        assert_eq!(n.limbs().size_hint(), (limb_count, Some(limb_count)));
+    });
+
+    test_properties(pairs_of_natural_and_vec_of_bool_var, |&(ref n, ref bs)| {
+        let mut limbs = n.limbs();
+        for &b in bs {
+            if b {
+                assert!(limbs.next().is_some());
+            } else {
+                assert!(limbs.next_back().is_some());
+            }
+        }
+        assert!(limbs.next().is_none());
+        assert!(limbs.next_back().is_none());
+    });
+
+    test_properties(pairs_of_natural_and_small_usize, |&(ref n, u)| {
+        if u < n.limb_count() as usize {
+            assert_eq!(n.limbs()[u], n.to_limbs_asc()[u]);
+        } else {
+            assert_eq!(n.limbs()[u], 0);
+        }
+    });
+
+    test_properties_no_special(small_usizes, |&u| {
+        assert_eq!(Natural::ZERO.limbs()[u], 0);
     });
 }

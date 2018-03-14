@@ -119,6 +119,10 @@ pub fn small_u64s(gm: NoSpecialGenerationMode) -> Box<Iterator<Item = u64>> {
     }
 }
 
+pub fn small_usizes(gm: NoSpecialGenerationMode) -> Box<Iterator<Item = usize>> {
+    Box::new(small_u32s(gm).map(|u| u as usize))
+}
+
 fn sqrt_pairs_of_unsigneds<T: 'static + PrimitiveUnsigned, U: 'static + PrimitiveUnsigned>(
 ) -> Box<Iterator<Item = (T, U)>> {
     Box::new(sqrt_pairs(exhaustive_unsigned(), exhaustive_unsigned()))

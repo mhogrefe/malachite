@@ -2,21 +2,52 @@ use natural::Natural::{self, Large, Small};
 use std::ops::Index;
 
 /// A double-ended iterator over the limbs of a `Natural`. The forward order is ascending (least-
-/// significant first).
+/// significant first). The iterator does not iterate over the implicit leading zero limbs.
+///
+/// This struct also supports retrieving limbs by index. This functionality is completely
+/// independent of the iterator's state. Indexing the implicit leading zero limbs is allowed.
 pub struct LimbIterator<'a> {
     n: &'a Natural,
     limb_count: usize,
+    // This is true iff `n` is nonzero and `i` and `j` are not yet equal. The iterator returns `Some
     some_remaining: bool,
+    // If `n` is nonzero, this index initially points to the least-significant limb, and is
+    // incremented by next().
     i: u64,
+    // If `n` is nonzero, this index initially points to the most-significant limb, and is
+    // decremented by next_back().
     j: u64,
 }
 
 impl<'a> Iterator for LimbIterator<'a> {
     type Item = u32;
 
+    /// A function to iterate through the limbs of a `Natural` in ascending order (least-significant
+    /// first).
+    ///
     /// Time: worst case O(1)
     ///
     /// Additional memory: worst case O(1)
+    ///
+    /// # Example
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::Zero;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// fn main() {
+    ///     assert_eq!(Natural::ZERO.limbs().next(), None);
+    ///
+    ///     // 10^12 = 232 * 2^32 + 3567587328
+    ///     let trillion = Natural::trillion();
+    ///     let mut limbs = trillion.limbs();
+    ///     assert_eq!(limbs.next(), Some(3567587328));
+    ///     assert_eq!(limbs.next(), Some(232));
+    ///     assert_eq!(limbs.next(), None);
+    /// }
+    /// ```
     fn next(&mut self) -> Option<u32> {
         if self.some_remaining {
             let limb = match *self.n {
@@ -34,18 +65,59 @@ impl<'a> Iterator for LimbIterator<'a> {
         }
     }
 
+    /// A function that returns the length of the limbs iterator; that is, the `Natural`'s limb
+    /// count. The format is (lower bound, Option<upper bound>), but in this case it's trivial to
+    /// always have an exact bound.
+    ///
     /// Time: worst case O(1)
     ///
     /// Additional memory: worst case O(1)
+    ///
+    /// # Example
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::Zero;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// fn main() {
+    ///     assert_eq!(Natural::ZERO.limbs().size_hint(), (0, Some(0)));
+    ///     assert_eq!(Natural::trillion().limbs().size_hint(), (2, Some(2)));
+    /// }
+    /// ```
     fn size_hint(&self) -> (usize, Option<usize>) {
         (self.limb_count, Some(self.limb_count))
     }
 }
 
 impl<'a> DoubleEndedIterator for LimbIterator<'a> {
+    /// A function to iterate through the limbs of a `Natural` in descending order (most-significant
+    /// first).
+    ///
     /// Time: worst case O(1)
     ///
     /// Additional memory: worst case O(1)
+    ///
+    /// # Example
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::Zero;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// fn main() {
+    ///     assert_eq!(Natural::ZERO.limbs().next_back(), None);
+    ///
+    ///     // 10^12 = 232 * 2^32 + 3567587328
+    ///     let trillion = Natural::trillion();
+    ///     let mut limbs = trillion.limbs();
+    ///     assert_eq!(limbs.next_back(), Some(232));
+    ///     assert_eq!(limbs.next_back(), Some(3567587328));
+    ///     assert_eq!(limbs.next_back(), None);
+    /// }
+    /// ```
     fn next_back(&mut self) -> Option<u32> {
         if self.some_remaining {
             let limb = match *self.n {
@@ -64,18 +136,47 @@ impl<'a> DoubleEndedIterator for LimbIterator<'a> {
     }
 }
 
+/// This allows for some optimizations, e.g. when collecting into a `Vec`.
 impl<'a> ExactSizeIterator for LimbIterator<'a> {}
 
 impl<'a> Index<usize> for LimbIterator<'a> {
     type Output = u32;
 
+    /// A function to retrieve limbs by index. The index is the power of 2<sup>32</sub> of which the
+    /// limbs is a coefficient. Indexing at or above the limb count returns zero limbs.
+    ///
+    /// Time: worst case O(1)
+    ///
+    /// Additional memory: worst case O(1)
+    ///
+    /// # Example
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::Zero;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// fn main() {
+    ///     assert_eq!(Natural::ZERO.limbs()[0], 0);
+    ///
+    ///     // 10^12 = 232 * 2^32 + 3567587328
+    ///     let trillion = Natural::trillion();
+    ///     let limbs = trillion.limbs();
+    ///     assert_eq!(limbs[0], 3567587328);
+    ///     assert_eq!(limbs[1], 232);
+    ///     assert_eq!(limbs[2], 0);
+    ///     assert_eq!(limbs[100], 0);
+    /// }
+    /// ```
     fn index(&self, index: usize) -> &u32 {
         if index >= self.limb_count {
-            panic!("No limb at index {} in {}", index, self.n);
-        }
-        match *self.n {
-            Small(ref small) => small,
-            Large(ref limbs) => limbs.index(index),
+            &0
+        } else {
+            match *self.n {
+                Small(ref small) => small,
+                Large(ref limbs) => limbs.index(index),
+            }
         }
     }
 }

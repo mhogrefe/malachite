@@ -1,8 +1,6 @@
-use common::GenerationMode;
-use inputs::natural::naturals;
+use common::{m_run_benchmark, BenchmarkType, GenerationMode};
+use inputs::natural::{naturals, pairs_of_natural_and_small_usize};
 use malachite_base::num::SignificantBits;
-use malachite_nz::natural::Natural;
-use rust_wheels::benchmarks::{BenchmarkOptions3, benchmark_3};
 
 pub fn demo_natural_to_limbs_asc(gm: GenerationMode, limit: usize) {
     for n in naturals(gm).take(limit) {
@@ -44,60 +42,124 @@ pub fn demo_natural_limbs_rev(gm: GenerationMode, limit: usize) {
     }
 }
 
+pub fn demo_natural_limbs_size_hint(gm: GenerationMode, limit: usize) {
+    for n in naturals(gm).take(limit) {
+        println!("limbs({}).size_hint() = {:?}", n, n.limbs().size_hint());
+    }
+}
+
+pub fn demo_natural_limbs_index(gm: GenerationMode, limit: usize) {
+    for (n, i) in pairs_of_natural_and_small_usize(gm).take(limit) {
+        println!("limbs({})[{}] = {:?}", n, i, n.limbs()[i]);
+    }
+}
+
+#[allow(unknown_lints, unused_collect)]
 pub fn benchmark_natural_limbs_evaluation_strategy(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,
 ) {
-    println!(
-        "benchmarking {} Natural.limbs() evaluation strategy",
-        gm.name()
-    );
-    benchmark_3(BenchmarkOptions3 {
-        xs: naturals(gm),
-        function_f: &mut (|n: Natural| n.to_limbs_asc()),
-        function_g: &mut (|n: Natural| n.into_limbs_asc()),
-        function_h: &mut (|n: Natural| n.limbs().collect::<Vec<u32>>()),
-        x_cons: &(|n| n.clone()),
-        y_cons: &(|n| n.clone()),
-        z_cons: &(|n| n.clone()),
-        x_param: &(|n| n.significant_bits() as usize),
+    m_run_benchmark(
+        "Natural.limbs()",
+        BenchmarkType::EvaluationStrategy,
+        naturals(gm),
+        gm.name(),
         limit,
-        f_name: "Natural.to_limbs_asc()",
-        g_name: "Natural.into_limbs_asc()",
-        h_name: "Natural.limbs().collect::<Vec<u32>>()",
-        title: "Natural.limbs_asc() evaluation strategy",
-        x_axis_label: "n.significant_bits()",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+        file_name,
+        &(|n| n.significant_bits() as usize),
+        "n.significant_bits()",
+        &[
+            (
+                "Natural.to_limbs_asc()",
+                &mut (|n| no_out!(n.to_limbs_asc())),
+            ),
+            (
+                "Natural.into_limbs_asc()",
+                &mut (|n| no_out!(n.into_limbs_asc())),
+            ),
+            (
+                "Natural.limbs().collect::<Vec<u32>>()",
+                &mut (|n| no_out!(n.limbs().collect::<Vec<u32>>())),
+            ),
+        ],
+    );
 }
 
+#[allow(unknown_lints, unused_collect)]
 pub fn benchmark_natural_limbs_rev_evaluation_strategy(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,
 ) {
-    println!(
-        "benchmarking {} Natural.limbs().rev() evaluation strategy",
-        gm.name()
-    );
-    benchmark_3(BenchmarkOptions3 {
-        xs: naturals(gm),
-        function_f: &mut (|n: Natural| n.to_limbs_desc()),
-        function_g: &mut (|n: Natural| n.into_limbs_desc()),
-        function_h: &mut (|n: Natural| n.limbs().rev().collect::<Vec<u32>>()),
-        x_cons: &(|n| n.clone()),
-        y_cons: &(|n| n.clone()),
-        z_cons: &(|n| n.clone()),
-        x_param: &(|n| n.significant_bits() as usize),
+    m_run_benchmark(
+        "Natural.limbs().rev()",
+        BenchmarkType::EvaluationStrategy,
+        naturals(gm),
+        gm.name(),
         limit,
-        f_name: "Natural.to_limbs_desc()",
-        g_name: "Natural.into_limbs_desc()",
-        h_name: "Natural.limbs().rev().collect::<Vec<u32>>()",
-        title: "Natural.limbs_desc() evaluation strategy",
-        x_axis_label: "n.significant_bits()",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+        file_name,
+        &(|n| n.significant_bits() as usize),
+        "n.significant_bits()",
+        &[
+            (
+                "Natural.to_limbs_desc()",
+                &mut (|n| no_out!(n.to_limbs_desc())),
+            ),
+            (
+                "Natural.into_limbs_desc()",
+                &mut (|n| no_out!(n.into_limbs_desc())),
+            ),
+            (
+                "Natural.limbs().rev().collect::<Vec<u32>>()",
+                &mut (|n| no_out!(n.limbs().rev().collect::<Vec<u32>>())),
+            ),
+        ],
+    );
+}
+
+pub fn benchmark_natural_limbs_size_hint(gm: GenerationMode, limit: usize, file_name: &str) {
+    m_run_benchmark(
+        "Natural.limbs().size_hint()",
+        BenchmarkType::Single,
+        naturals(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|n| n.significant_bits() as usize),
+        "n.significant_bits()",
+        &[
+            (
+                "Natural.limbs().size_hint()",
+                &mut (|n| no_out!(n.limbs().size_hint())),
+            ),
+        ],
+    );
+}
+
+pub fn benchmark_natural_limbs_index_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
+    m_run_benchmark(
+        "Natural.limbs().index()",
+        BenchmarkType::Algorithms,
+        pairs_of_natural_and_small_usize(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(ref n, _)| n.significant_bits() as usize),
+        "n.significant_bits()",
+        &[
+            ("Natural.limbs()[u]", &mut (|(n, u)| no_out!(n.limbs()[u]))),
+            (
+                "Natural.into_limbs_asc()[u]",
+                &mut (|(n, u)| {
+                    let limbs = n.into_limbs_asc();
+                    if u >= limbs.len() {
+                        0
+                    } else {
+                        limbs[u]
+                    };
+                }),
+            ),
+        ],
+    );
 }

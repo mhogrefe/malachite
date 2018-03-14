@@ -4,9 +4,11 @@ use malachite_base::num::{PrimitiveInteger, PrimitiveSigned, PrimitiveUnsigned};
 use malachite_base::round::RoundingMode;
 use malachite_nz::natural::Natural;
 use num::BigUint;
+use rand::{IsaacRng, Rng, SeedableRng};
 use rug;
 use rust_wheels::iterators::bools::exhaustive_bools;
-use rust_wheels::iterators::common::EXAMPLE_SEED;
+use rust_wheels::iterators::common::{scramble, EXAMPLE_SEED};
+use rust_wheels::iterators::dependent_pairs::dependent_pairs;
 use rust_wheels::iterators::general::random;
 use rust_wheels::iterators::integers_geometric::{i32s_geometric, u32s_geometric};
 use rust_wheels::iterators::naturals::{exhaustive_naturals, exhaustive_positive_naturals,
@@ -19,6 +21,7 @@ use rust_wheels::iterators::tuples::{exhaustive_pairs, exhaustive_pairs_from_sin
                                      exhaustive_triples, exhaustive_triples_from_single,
                                      lex_pairs, log_pairs, random_pairs, random_pairs_from_single,
                                      random_triples, random_triples_from_single};
+use rust_wheels::iterators::vecs::exhaustive_fixed_size_vecs_from_single;
 
 pub fn naturals(gm: GenerationMode) -> Box<Iterator<Item = Natural>> {
     match gm {
@@ -287,6 +290,12 @@ pub fn pairs_of_natural_and_small_u64(gm: GenerationMode) -> Box<Iterator<Item =
     }
 }
 
+pub fn pairs_of_natural_and_small_usize(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (Natural, usize)>> {
+    Box::new(pairs_of_natural_and_small_u32(gm).map(|(n, u)| (n, u as usize)))
+}
+
 pub fn triples_of_natural_small_u32_and_small_u32(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (Natural, u32, u32)>> {
@@ -496,4 +505,64 @@ pub fn triples_of_natural_small_u32_and_rounding_mode_var_1(
         triples_of_natural_small_u32_and_rounding_mode(gm)
             .filter(|&(ref n, u, rm)| rm != RoundingMode::Exact || n.divisible_by_power_of_two(u)),
     )
+}
+
+struct RandomNaturalAndVecOfBoolVar {
+    naturals: Box<Iterator<Item = Natural>>,
+    rng: Box<IsaacRng>,
+}
+
+impl Iterator for RandomNaturalAndVecOfBoolVar {
+    type Item = (Natural, Vec<bool>);
+
+    fn next(&mut self) -> Option<(Natural, Vec<bool>)> {
+        let n = self.naturals.next().unwrap();
+        let mut bools = Vec::new();
+        for _ in 0..n.limb_count() {
+            bools.push(self.rng.gen::<bool>());
+        }
+        Some((n, bools))
+    }
+}
+
+fn random_pairs_of_natural_and_vec_of_bool_var(
+    seed: &[u32],
+    scale: u32,
+) -> RandomNaturalAndVecOfBoolVar {
+    RandomNaturalAndVecOfBoolVar {
+        naturals: Box::new(random_naturals(&scramble(seed, "naturals"), scale)),
+        rng: Box::new(IsaacRng::from_seed(&scramble(seed, "bools"))),
+    }
+}
+
+fn special_random_pairs_of_natural_and_vec_of_bool_var(
+    seed: &[u32],
+    scale: u32,
+) -> RandomNaturalAndVecOfBoolVar {
+    RandomNaturalAndVecOfBoolVar {
+        naturals: Box::new(special_random_naturals(&scramble(seed, "naturals"), scale)),
+        rng: Box::new(IsaacRng::from_seed(&scramble(seed, "bools"))),
+    }
+}
+
+// All pairs of `Natural` and `Vec<bool>` where the length of the `Vec` is equal to the limb count
+// of the natural.
+pub fn pairs_of_natural_and_vec_of_bool_var(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (Natural, Vec<bool>)>> {
+    match gm {
+        GenerationMode::Exhaustive => {
+            let f = move |n: &Natural| {
+                exhaustive_fixed_size_vecs_from_single(n.limb_count(), exhaustive_bools())
+            };
+            Box::new(dependent_pairs(exhaustive_naturals(), f))
+        }
+        GenerationMode::Random(scale) => Box::new(random_pairs_of_natural_and_vec_of_bool_var(
+            &EXAMPLE_SEED,
+            scale,
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(
+            special_random_pairs_of_natural_and_vec_of_bool_var(&EXAMPLE_SEED, scale),
+        ),
+    }
 }
