@@ -1,9 +1,7 @@
-use common::{integer_to_rug_integer, GenerationMode};
-use inputs::integer::triples_of_integer_small_u64_and_bool;
+use common::{m_run_benchmark, BenchmarkType, GenerationMode};
+use inputs::integer::{rm_triples_of_integer_small_u64_and_bool,
+                      triples_of_integer_small_u64_and_bool};
 use malachite_base::num::{BitAccess, SignificantBits};
-use malachite_nz::integer::Integer;
-use rug;
-use rust_wheels::benchmarks::{BenchmarkOptions2, benchmark_2};
 use std::cmp::max;
 
 pub fn demo_integer_assign_bit(gm: GenerationMode, limit: usize) {
@@ -17,23 +15,29 @@ pub fn demo_integer_assign_bit(gm: GenerationMode, limit: usize) {
     }
 }
 
-pub fn benchmark_integer_assign_bit(gm: GenerationMode, limit: usize, file_name: &str) {
-    println!("benchmarking {} Integer.assign_bit(u64)", gm.name());
-    benchmark_2(BenchmarkOptions2 {
-        xs: triples_of_integer_small_u64_and_bool(gm),
-        function_f: &mut (|(mut n, index, bit): (Integer, u64, bool)| n.assign_bit(index, bit)),
-        function_g: &mut (|(mut n, index, bit): (rug::Integer, u64, bool)| {
-            n.set_bit(index as u32, bit);
-        }),
-        x_cons: &(|p| p.clone()),
-        y_cons: &(|&(ref n, index, bit)| (integer_to_rug_integer(n), index, bit)),
-        x_param: &(|&(ref n, index, _)| max(n.significant_bits(), index) as usize),
+pub fn benchmark_integer_assign_bit_library_comparison(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "Integer.assign_bit(u64, bool)",
+        BenchmarkType::LibraryComparison,
+        rm_triples_of_integer_small_u64_and_bool(gm),
+        gm.name(),
         limit,
-        f_name: "malachite",
-        g_name: "rug",
-        title: "Integer.assign_bit(u64, bool)",
-        x_axis_label: "max(n.significant_bits(), index)",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+        file_name,
+        &(|&(_, (ref n, index, _))| max(n.significant_bits(), index) as usize),
+        "max(n.significant_bits(), index)",
+        &[
+            (
+                "malachite",
+                &mut (|(_, (mut n, index, bit))| n.assign_bit(index, bit)),
+            ),
+            (
+                "rug",
+                &mut (|((mut n, index, bit), _)| no_out!(n.set_bit(index as u32, bit))),
+            ),
+        ],
+    );
 }

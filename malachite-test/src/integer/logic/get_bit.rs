@@ -1,9 +1,6 @@
-use common::{integer_to_rug_integer, GenerationMode};
-use inputs::integer::pairs_of_integer_and_small_u64;
+use common::{m_run_benchmark, BenchmarkType, GenerationMode};
+use inputs::integer::{pairs_of_integer_and_small_u64, rm_pairs_of_integer_and_small_u64};
 use malachite_base::num::BitAccess;
-use malachite_nz::integer::Integer;
-use rug;
-use rust_wheels::benchmarks::{BenchmarkOptions2, benchmark_2};
 
 pub fn demo_integer_get_bit(gm: GenerationMode, limit: usize) {
     for (n, index) in pairs_of_integer_and_small_u64(gm).take(limit) {
@@ -11,21 +8,29 @@ pub fn demo_integer_get_bit(gm: GenerationMode, limit: usize) {
     }
 }
 
-pub fn benchmark_integer_get_bit(gm: GenerationMode, limit: usize, file_name: &str) {
-    println!("benchmarking {} Integer.get_bit(u64)", gm.name());
-    benchmark_2(BenchmarkOptions2 {
-        xs: pairs_of_integer_and_small_u64(gm),
-        function_f: &mut (|(n, index): (Integer, u64)| n.get_bit(index)),
-        function_g: &mut (|(n, index): (rug::Integer, u64)| n.get_bit(index as u32)),
-        x_cons: &(|p| p.clone()),
-        y_cons: &(|&(ref n, index)| (integer_to_rug_integer(n), index)),
-        x_param: &(|&(_, index)| index as usize),
+pub fn benchmark_integer_get_bit_library_comparison(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "Integer.get_bit(u64)",
+        BenchmarkType::LibraryComparison,
+        rm_pairs_of_integer_and_small_u64(gm),
+        gm.name(),
         limit,
-        f_name: "malachite",
-        g_name: "rug",
-        title: "Integer.get_bit(u64)",
-        x_axis_label: "index",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+        file_name,
+        &(|&(_, (_, index))| index as usize),
+        "index",
+        &[
+            (
+                "malachite",
+                &mut (|(_, (n, index))| no_out!(n.get_bit(index))),
+            ),
+            (
+                "rug",
+                &mut (|((n, index), _)| no_out!(n.get_bit(index as u32))),
+            ),
+        ],
+    );
 }

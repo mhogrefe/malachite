@@ -33,6 +33,10 @@ pub fn integers(gm: GenerationMode) -> Box<Iterator<Item = Integer>> {
     }
 }
 
+pub fn rm_integers(gm: GenerationMode) -> Box<Iterator<Item = (rug::Integer, Integer)>> {
+    Box::new(integers(gm).map(|n| (integer_to_rug_integer(&n), n)))
+}
+
 pub fn nm_integers(gm: GenerationMode) -> Box<Iterator<Item = (BigInt, Integer)>> {
     Box::new(integers(gm).map(|n| (integer_to_bigint(&n), n)))
 }
@@ -389,6 +393,14 @@ pub fn pairs_of_integer_and_small_u64(gm: GenerationMode) -> Box<Iterator<Item =
     }
 }
 
+pub fn rm_pairs_of_integer_and_small_u64(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = ((rug::Integer, u64), (Integer, u64))>> {
+    Box::new(
+        pairs_of_integer_and_small_u64(gm).map(|(x, y)| ((integer_to_rug_integer(&x), y), (x, y))),
+    )
+}
+
 pub fn triples_of_integer_small_u32_and_small_u32(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (Integer, u32, u32)>> {
@@ -624,6 +636,17 @@ pub fn pairs_of_natural_and_natural_integer(
     }
 }
 
+pub fn rm_pairs_of_natural_and_natural_integer(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = ((rug::Integer, rug::Integer), (Natural, Integer))>> {
+    Box::new(pairs_of_natural_and_natural_integer(gm).map(|(x, y)| {
+        (
+            (natural_to_rug_integer(&x), integer_to_rug_integer(&y)),
+            (x, y),
+        )
+    }))
+}
+
 pub fn triples_of_integer_natural_and_integer(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (Integer, Natural, Integer)>> {
@@ -693,6 +716,15 @@ pub fn triples_of_integer_small_u64_and_bool(
             &(|seed| random(seed)),
         )),
     }
+}
+
+pub fn rm_triples_of_integer_small_u64_and_bool(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = ((rug::Integer, u64, bool), (Integer, u64, bool))>> {
+    Box::new(
+        triples_of_integer_small_u64_and_bool(gm)
+            .map(|(x, y, z)| ((integer_to_rug_integer(&x), y, z), (x, y, z))),
+    )
 }
 
 pub fn pairs_of_integer_and_rounding_mode(

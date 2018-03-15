@@ -39,7 +39,7 @@ pub fn benchmark_integer_neg_assign(gm: GenerationMode, limit: usize, file_name:
 
 pub fn benchmark_integer_neg_library_comparison(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
-        "Integer.abs()",
+        "-Integer",
         BenchmarkType::LibraryComparison,
         nrm_integers(gm),
         gm.name(),
@@ -61,7 +61,7 @@ pub fn benchmark_integer_neg_evaluation_strategy(
     file_name: &str,
 ) {
     m_run_benchmark(
-        "Integer.abs()",
+        "-Integer",
         BenchmarkType::EvaluationStrategy,
         integers(gm),
         gm.name(),

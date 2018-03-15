@@ -59,7 +59,7 @@ pub fn benchmark_integer_from_sign_and_limbs_asc_evaluation_strategy(
         limit,
         file_name,
         &(|&(_, ref limbs)| limbs.len()),
-        "max(x.significant_bits(), y.significant_bits())",
+        "limbs.len()",
         &[
             (
                 "Integer::from_sign_and_limbs_asc(&[u32])",
@@ -86,7 +86,7 @@ pub fn benchmark_integer_from_sign_and_limbs_desc_evaluation_strategy(
         limit,
         file_name,
         &(|&(_, ref limbs)| limbs.len()),
-        "max(x.significant_bits(), y.significant_bits())",
+        "limbs.len()",
         &[
             (
                 "Integer::from_sign_and_limbs_desc(&[u32])",

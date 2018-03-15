@@ -1,8 +1,7 @@
-use common::GenerationMode;
+use common::{m_run_benchmark, BenchmarkType, GenerationMode};
 use inputs::integer::pairs_of_integer_and_small_u64;
 use malachite_base::num::{BitAccess, SignificantBits};
-use malachite_nz::integer::Integer;
-use rust_wheels::benchmarks::{BenchmarkOptions1, benchmark_1};
+use std::cmp::max;
 
 pub fn demo_integer_clear_bit(gm: GenerationMode, limit: usize) {
     for (mut n, index) in pairs_of_integer_and_small_u64(gm).take(limit) {
@@ -13,17 +12,15 @@ pub fn demo_integer_clear_bit(gm: GenerationMode, limit: usize) {
 }
 
 pub fn benchmark_integer_clear_bit(gm: GenerationMode, limit: usize, file_name: &str) {
-    println!("benchmarking {} Integer.clear_bit(u64)", gm.name());
-    benchmark_1(BenchmarkOptions1 {
-        xs: pairs_of_integer_and_small_u64(gm),
-        function_f: &mut (|(mut n, index): (Integer, u64)| n.clear_bit(index)),
-        x_cons: &(|p| p.clone()),
-        x_param: &(|&(ref n, _)| n.significant_bits() as usize),
+    m_run_benchmark(
+        "Integer.clear_bit(u64)",
+        BenchmarkType::Single,
+        pairs_of_integer_and_small_u64(gm),
+        gm.name(),
         limit,
-        f_name: "malachite",
-        title: "Integer.clear_bit(u64)",
-        x_axis_label: "n.significant_bits()",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+        file_name,
+        &(|&(ref n, index)| max(n.significant_bits(), index) as usize),
+        "max(n.significant_bits(), index)",
+        &[("malachite", &mut (|(mut n, index)| n.clear_bit(index)))],
+    );
 }

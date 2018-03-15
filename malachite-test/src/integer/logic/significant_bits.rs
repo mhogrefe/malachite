@@ -1,10 +1,6 @@
-use common::{integer_to_bigint, integer_to_rug_integer, GenerationMode};
-use inputs::integer::integers;
+use common::{m_run_benchmark, BenchmarkType, GenerationMode};
+use inputs::integer::{integers, nrm_integers};
 use malachite_base::num::SignificantBits;
-use malachite_nz::integer::Integer;
-use num::BigInt;
-use rug;
-use rust_wheels::benchmarks::{BenchmarkOptions3, benchmark_3};
 
 pub fn demo_integer_significant_bits(gm: GenerationMode, limit: usize) {
     for n in integers(gm).take(limit) {
@@ -13,23 +9,22 @@ pub fn demo_integer_significant_bits(gm: GenerationMode, limit: usize) {
 }
 
 pub fn benchmark_integer_significant_bits(gm: GenerationMode, limit: usize, file_name: &str) {
-    println!("benchmarking {} Integer.significant_bits()", gm.name());
-    benchmark_3(BenchmarkOptions3 {
-        xs: integers(gm),
-        function_f: &mut (|n: Integer| n.significant_bits()),
-        function_g: &mut (|n: BigInt| n.bits()),
-        function_h: &mut (|n: rug::Integer| n.significant_bits()),
-        x_cons: &(|x| x.clone()),
-        y_cons: &(|x| integer_to_bigint(x)),
-        z_cons: &(|x| integer_to_rug_integer(x)),
-        x_param: &(|n| n.significant_bits() as usize),
+    m_run_benchmark(
+        "Integer.significant_bits()",
+        BenchmarkType::LibraryComparison,
+        nrm_integers(gm),
+        gm.name(),
         limit,
-        f_name: "malachite",
-        g_name: "num",
-        h_name: "rug",
-        title: "Integer.significant_bits()",
-        x_axis_label: "n.significant_bits()",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+        file_name,
+        &(|&(_, _, ref n)| n.significant_bits() as usize),
+        "n.significant_bits()",
+        &[
+            (
+                "malachite",
+                &mut (|(_, _, n)| no_out!(n.significant_bits())),
+            ),
+            ("num", &mut (|(n, _, _)| no_out!(n.bits()))),
+            ("rug", &mut (|(_, n, _)| no_out!(n.significant_bits()))),
+        ],
+    );
 }

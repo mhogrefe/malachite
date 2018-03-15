@@ -1,8 +1,6 @@
-use common::GenerationMode;
+use common::{m_run_benchmark, BenchmarkType, GenerationMode};
 use inputs::integer::integers;
 use malachite_base::num::SignificantBits;
-use malachite_nz::integer::Integer;
-use rust_wheels::benchmarks::{BenchmarkOptions1, benchmark_1};
 
 pub fn demo_integer_twos_complement_limbs_asc(gm: GenerationMode, limit: usize) {
     for n in integers(gm).take(limit) {
@@ -29,22 +27,22 @@ pub fn benchmark_integer_twos_complement_limbs_asc(
     limit: usize,
     file_name: &str,
 ) {
-    println!(
-        "benchmarking {} Integer.twos_complement_limbs_asc()",
-        gm.name()
-    );
-    benchmark_1(BenchmarkOptions1 {
-        xs: integers(gm),
-        function_f: &mut (|n: Integer| n.twos_complement_limbs_asc()),
-        x_cons: &(|x| x.clone()),
-        x_param: &(|n| n.significant_bits() as usize),
+    m_run_benchmark(
+        "Integer.twos_complement_limbs_asc()",
+        BenchmarkType::Single,
+        integers(gm),
+        gm.name(),
         limit,
-        f_name: "malachite",
-        title: "Integer.twos_complement_limbs_le()",
-        x_axis_label: "n.significant_bits()",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+        file_name,
+        &(|n| n.significant_bits() as usize),
+        "n.significant_bits()",
+        &[
+            (
+                "malachite",
+                &mut (|n| no_out!(n.twos_complement_limbs_asc())),
+            ),
+        ],
+    );
 }
 
 pub fn benchmark_integer_twos_complement_limbs_desc(
@@ -52,20 +50,20 @@ pub fn benchmark_integer_twos_complement_limbs_desc(
     limit: usize,
     file_name: &str,
 ) {
-    println!(
-        "benchmarking {} Integer.twos_complement_limbs_desc()",
-        gm.name()
-    );
-    benchmark_1(BenchmarkOptions1 {
-        xs: integers(gm),
-        function_f: &mut (|n: Integer| n.twos_complement_limbs_desc()),
-        x_cons: &(|x| x.clone()),
-        x_param: &(|n| n.significant_bits() as usize),
+    m_run_benchmark(
+        "Integer.twos_complement_limbs_desc()",
+        BenchmarkType::Single,
+        integers(gm),
+        gm.name(),
         limit,
-        f_name: "malachite",
-        title: "Integer.twos_complement_limbs_be()",
-        x_axis_label: "n.significant_bits()",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+        file_name,
+        &(|n| n.significant_bits() as usize),
+        "n.significant_bits()",
+        &[
+            (
+                "malachite",
+                &mut (|n| no_out!(n.twos_complement_limbs_desc())),
+            ),
+        ],
+    );
 }

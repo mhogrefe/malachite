@@ -1,9 +1,6 @@
-use common::{integer_to_rug_integer, GenerationMode};
-use inputs::integer::pairs_of_integer_and_small_u64;
+use common::{m_run_benchmark, BenchmarkType, GenerationMode};
+use inputs::integer::{pairs_of_integer_and_small_u64, rm_pairs_of_integer_and_small_u64};
 use malachite_base::num::{BitAccess, SignificantBits};
-use malachite_nz::integer::Integer;
-use rug;
-use rust_wheels::benchmarks::{BenchmarkOptions2, benchmark_2};
 use std::cmp::max;
 
 pub fn demo_integer_flip_bit(gm: GenerationMode, limit: usize) {
@@ -14,23 +11,26 @@ pub fn demo_integer_flip_bit(gm: GenerationMode, limit: usize) {
     }
 }
 
-pub fn benchmark_integer_flip_bit(gm: GenerationMode, limit: usize, file_name: &str) {
-    println!("benchmarking {} Integer.flip_bit(u64)", gm.name());
-    benchmark_2(BenchmarkOptions2 {
-        xs: pairs_of_integer_and_small_u64(gm),
-        function_f: &mut (|(mut n, index): (Integer, u64)| n.flip_bit(index)),
-        function_g: &mut (|(mut n, index): (rug::Integer, u64)| {
-            n.toggle_bit(index as u32);
-        }),
-        x_cons: &(|p| p.clone()),
-        y_cons: &(|&(ref n, index)| (integer_to_rug_integer(n), index)),
-        x_param: &(|&(ref n, index)| max(n.significant_bits(), index) as usize),
+pub fn benchmark_integer_flip_bit_library_comparison(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "Integer.flip_bit(u64)",
+        BenchmarkType::LibraryComparison,
+        rm_pairs_of_integer_and_small_u64(gm),
+        gm.name(),
         limit,
-        f_name: "malachite",
-        g_name: "rug",
-        title: "Integer.flip_bit(u64)",
-        x_axis_label: "max(n.significant_bits(), index)",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+        file_name,
+        &(|&(_, (ref n, index))| max(n.significant_bits(), index) as usize),
+        "max(n.significant_bits(), index)",
+        &[
+            ("malachite", &mut (|(_, (mut n, index))| n.flip_bit(index))),
+            (
+                "rug",
+                &mut (|((mut n, index), _)| no_out!(n.toggle_bit(index as u32))),
+            ),
+        ],
+    );
 }
