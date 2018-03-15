@@ -1,11 +1,8 @@
-use common::GenerationMode;
+use common::{m_run_benchmark, BenchmarkType, GenerationMode};
 use inputs::natural::triples_of_naturals;
 use malachite_base::num::SignificantBits;
 use malachite_base::num::{AddMul, AddMulAssign};
 use malachite_nz::natural::Natural;
-use rust_wheels::benchmarks::{BenchmarkOptions1, BenchmarkOptions2, BenchmarkOptions4,
-                              BenchmarkOptions5, benchmark_1, benchmark_2, benchmark_4,
-                              benchmark_5};
 use std::cmp::max;
 
 pub fn demo_natural_add_mul_assign(gm: GenerationMode, limit: usize) {
@@ -118,68 +115,49 @@ pub fn demo_natural_add_mul_ref_ref_ref(gm: GenerationMode, limit: usize) {
     }
 }
 
-const X_AXIS_LABEL: &str = "max(a.significant_bits(), b.significant_bits(), \
-                            c.significant_bits())";
-
-pub fn benchmark_natural_add_mul_assign(gm: GenerationMode, limit: usize, file_name: &str) {
-    println!(
-        "benchmarking {} Natural.add_mul_assign(Natural, Natural)",
-        gm.name()
-    );
-    benchmark_1(BenchmarkOptions1 {
-        xs: triples_of_naturals(gm),
-        function_f: &mut (|(mut a, b, c): (Natural, Natural, Natural)| a.add_mul_assign(b, c)),
-        x_cons: &(|t| t.clone()),
-        x_param: &(|&(ref a, ref b, ref c)| {
-            max(
-                max(a.significant_bits(), b.significant_bits()),
-                c.significant_bits(),
-            ) as usize
-        }),
-        limit,
-        f_name: "malachite",
-        title: "Natural.add_mul_assign(Natural, Natural)",
-        x_axis_label: X_AXIS_LABEL,
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+fn bucketing_function(t: &(Natural, Natural, Natural)) -> usize {
+    max(
+        max(t.0.significant_bits(), t.1.significant_bits()),
+        t.2.significant_bits(),
+    ) as usize
 }
+
+const BUCKETING_LABEL: &str = "max(a.significant_bits(), b.significant_bits(), \
+                               c.significant_bits())";
 
 pub fn benchmark_natural_add_mul_assign_evaluation_strategy(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,
 ) {
-    println!(
-        "benchmarking {} Natural.add_mul_assign(Natural, Natural) evaluation strategy",
-        gm.name()
-    );
-    benchmark_4(BenchmarkOptions4 {
-        xs: triples_of_naturals(gm),
-        function_f: &mut (|(mut a, b, c): (Natural, Natural, Natural)| a.add_mul_assign(b, c)),
-        function_g: &mut (|(mut a, b, c): (Natural, Natural, Natural)| a.add_mul_assign(b, &c)),
-        function_h: &mut (|(mut a, b, c): (Natural, Natural, Natural)| a.add_mul_assign(&b, c)),
-        function_i: &mut (|(mut a, b, c): (Natural, Natural, Natural)| a.add_mul_assign(&b, &c)),
-        x_cons: &(|p| p.clone()),
-        y_cons: &(|p| p.clone()),
-        z_cons: &(|p| p.clone()),
-        w_cons: &(|p| p.clone()),
-        x_param: &(|&(ref a, ref b, ref c)| {
-            max(
-                max(a.significant_bits(), b.significant_bits()),
-                c.significant_bits(),
-            ) as usize
-        }),
+    m_run_benchmark(
+        "Natural.add_mul_assign(Natural, Natural)",
+        BenchmarkType::EvaluationStrategy,
+        triples_of_naturals(gm),
+        gm.name(),
         limit,
-        f_name: "Natural.add_mul_assign(Natural, Natural)",
-        g_name: "Natural.add_mul_assign(Natural, &Natural)",
-        h_name: "Natural.add_mul_assign(&Natural, Natural)",
-        i_name: "Natural.add_mul_assign(&Natural, &Natural)",
-        title: "Natural.add_mul_assign(Natural, Natural) evaluation strategy",
-        x_axis_label: X_AXIS_LABEL,
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+        file_name,
+        &bucketing_function,
+        BUCKETING_LABEL,
+        &[
+            (
+                "Natural.add_mul_assign(Natural, Natural)",
+                &mut (|(mut a, b, c)| a.add_mul_assign(b, c)),
+            ),
+            (
+                "Natural.add_mul_assign(Natural, &Natural)",
+                &mut (|(mut a, b, c)| a.add_mul_assign(b, &c)),
+            ),
+            (
+                "Natural.add_mul_assign(&Natural, Natural)",
+                &mut (|(mut a, b, c)| a.add_mul_assign(&b, c)),
+            ),
+            (
+                "Natural.add_mul_assign(&Natural, &Natural)",
+                &mut (|(mut a, b, c)| a.add_mul_assign(&b, &c)),
+            ),
+        ],
+    );
 }
 
 pub fn benchmark_natural_add_mul_assign_algorithms(
@@ -187,30 +165,26 @@ pub fn benchmark_natural_add_mul_assign_algorithms(
     limit: usize,
     file_name: &str,
 ) {
-    println!(
-        "benchmarking {} Natural.add_mul_assign(Natural, Natural) algorithms",
-        gm.name()
-    );
-    benchmark_2(BenchmarkOptions2 {
-        xs: triples_of_naturals(gm),
-        function_f: &mut (|(mut a, b, c): (Natural, Natural, Natural)| a.add_mul_assign(b, c)),
-        function_g: &mut (|(mut a, b, c): (Natural, Natural, Natural)| a += b * c),
-        x_cons: &(|t| t.clone()),
-        y_cons: &(|t| t.clone()),
-        x_param: &(|&(ref a, ref b, ref c)| {
-            max(
-                max(a.significant_bits(), b.significant_bits()),
-                c.significant_bits(),
-            ) as usize
-        }),
+    m_run_benchmark(
+        "Natural.add_mul_assign(Natural, Natural)",
+        BenchmarkType::Algorithms,
+        triples_of_naturals(gm),
+        gm.name(),
         limit,
-        f_name: "Natural.add_mul_assign(Natural, Natural)",
-        g_name: "Natural += Natural * Natural",
-        title: "Natural.add_mul_assign(Natural, Natural) algorithms",
-        x_axis_label: X_AXIS_LABEL,
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+        file_name,
+        &bucketing_function,
+        BUCKETING_LABEL,
+        &[
+            (
+                "Natural.add_mul_assign(Natural, Natural)",
+                &mut (|(mut a, b, c)| a.add_mul_assign(b, c)),
+            ),
+            (
+                "Natural += Natural * Natural",
+                &mut (|(mut a, b, c)| a += b * c),
+            ),
+        ],
+    );
 }
 
 pub fn benchmark_natural_add_mul_assign_val_ref_algorithms(
@@ -218,30 +192,26 @@ pub fn benchmark_natural_add_mul_assign_val_ref_algorithms(
     limit: usize,
     file_name: &str,
 ) {
-    println!(
-        "benchmarking {} Natural.add_mul_assign(Natural, &Natural) algorithms",
-        gm.name()
-    );
-    benchmark_2(BenchmarkOptions2 {
-        xs: triples_of_naturals(gm),
-        function_f: &mut (|(mut a, b, c): (Natural, Natural, Natural)| a.add_mul_assign(b, &c)),
-        function_g: &mut (|(mut a, b, c): (Natural, Natural, Natural)| a += b * &c),
-        x_cons: &(|t| t.clone()),
-        y_cons: &(|t| t.clone()),
-        x_param: &(|&(ref a, ref b, ref c)| {
-            max(
-                max(a.significant_bits(), b.significant_bits()),
-                c.significant_bits(),
-            ) as usize
-        }),
+    m_run_benchmark(
+        "Natural.add_mul_assign(Natural, &Natural)",
+        BenchmarkType::Algorithms,
+        triples_of_naturals(gm),
+        gm.name(),
         limit,
-        f_name: "Natural.add_mul_assign(Natural, &Natural)",
-        g_name: "Natural += Natural * &Natural",
-        title: "Natural.add_mul_assign(Natural, &Natural) algorithms",
-        x_axis_label: X_AXIS_LABEL,
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+        file_name,
+        &bucketing_function,
+        BUCKETING_LABEL,
+        &[
+            (
+                "Natural.add_mul_assign(Natural, &Natural)",
+                &mut (|(mut a, b, c)| a.add_mul_assign(b, &c)),
+            ),
+            (
+                "Natural += Natural * &Natural",
+                &mut (|(mut a, b, c)| a += b * &c),
+            ),
+        ],
+    );
 }
 
 pub fn benchmark_natural_add_mul_assign_ref_val_algorithms(
@@ -249,30 +219,26 @@ pub fn benchmark_natural_add_mul_assign_ref_val_algorithms(
     limit: usize,
     file_name: &str,
 ) {
-    println!(
-        "benchmarking {} Natural.add_mul_assign(&Natural, Natural) algorithms",
-        gm.name()
-    );
-    benchmark_2(BenchmarkOptions2 {
-        xs: triples_of_naturals(gm),
-        function_f: &mut (|(mut a, b, c): (Natural, Natural, Natural)| a.add_mul_assign(&b, c)),
-        function_g: &mut (|(mut a, b, c): (Natural, Natural, Natural)| a += &b * c),
-        x_cons: &(|t| t.clone()),
-        y_cons: &(|t| t.clone()),
-        x_param: &(|&(ref a, ref b, ref c)| {
-            max(
-                max(a.significant_bits(), b.significant_bits()),
-                c.significant_bits(),
-            ) as usize
-        }),
+    m_run_benchmark(
+        "Natural.add_mul_assign(&Natural, Natural)",
+        BenchmarkType::Algorithms,
+        triples_of_naturals(gm),
+        gm.name(),
         limit,
-        f_name: "Natural.add_mul_assign(&Natural, Natural)",
-        g_name: "Natural += &Natural * Natural",
-        title: "Natural.add_mul_assign(&Natural, Natural) algorithms",
-        x_axis_label: X_AXIS_LABEL,
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+        file_name,
+        &bucketing_function,
+        BUCKETING_LABEL,
+        &[
+            (
+                "Natural.add_mul_assign(&Natural, Natural)",
+                &mut (|(mut a, b, c)| a.add_mul_assign(&b, c)),
+            ),
+            (
+                "Natural += &Natural * Natural",
+                &mut (|(mut a, b, c)| a += &b * c),
+            ),
+        ],
+    );
 }
 
 pub fn benchmark_natural_add_mul_assign_ref_ref_algorithms(
@@ -280,54 +246,26 @@ pub fn benchmark_natural_add_mul_assign_ref_ref_algorithms(
     limit: usize,
     file_name: &str,
 ) {
-    println!(
-        "benchmarking {} Natural.add_mul_assign(&Natural, &Natural) algorithms",
-        gm.name()
-    );
-    benchmark_2(BenchmarkOptions2 {
-        xs: triples_of_naturals(gm),
-        function_f: &mut (|(mut a, b, c): (Natural, Natural, Natural)| a.add_mul_assign(&b, &c)),
-        function_g: &mut (|(mut a, b, c): (Natural, Natural, Natural)| a += &b * &c),
-        x_cons: &(|t| t.clone()),
-        y_cons: &(|t| t.clone()),
-        x_param: &(|&(ref a, ref b, ref c)| {
-            max(
-                max(a.significant_bits(), b.significant_bits()),
-                c.significant_bits(),
-            ) as usize
-        }),
+    m_run_benchmark(
+        "Natural.add_mul_assign(&Natural, &Natural)",
+        BenchmarkType::Algorithms,
+        triples_of_naturals(gm),
+        gm.name(),
         limit,
-        f_name: "Natural.add_mul_assign(&Natural, &Natural)",
-        g_name: "Natural += &Natural * &Natural",
-        title: "Natural.add_mul_assign(&Natural, &Natural) algorithms",
-        x_axis_label: X_AXIS_LABEL,
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
-}
-
-pub fn benchmark_natural_add_mul(gm: GenerationMode, limit: usize, file_name: &str) {
-    println!(
-        "benchmarking {} Natural.add_mul(Natural, Natural)",
-        gm.name()
+        file_name,
+        &bucketing_function,
+        BUCKETING_LABEL,
+        &[
+            (
+                "Natural.add_mul_assign(&Natural, &Natural)",
+                &mut (|(mut a, b, c)| a.add_mul_assign(&b, &c)),
+            ),
+            (
+                "Natural += &Natural * &Natural",
+                &mut (|(mut a, b, c)| a += &b * &c),
+            ),
+        ],
     );
-    benchmark_1(BenchmarkOptions1 {
-        xs: triples_of_naturals(gm),
-        function_f: &mut (|(a, b, c): (Natural, Natural, Natural)| a.add_mul(b, c)),
-        x_cons: &(|t| t.clone()),
-        x_param: &(|&(ref a, ref b, ref c)| {
-            max(
-                max(a.significant_bits(), b.significant_bits()),
-                c.significant_bits(),
-            ) as usize
-        }),
-        limit,
-        f_name: "malachite",
-        title: "Natural.add_mul(Natural, Natural)",
-        x_axis_label: X_AXIS_LABEL,
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
 }
 
 pub fn benchmark_natural_add_mul_evaluation_strategy(
@@ -335,66 +273,61 @@ pub fn benchmark_natural_add_mul_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    println!(
-        "benchmarking {} Natural.add_mul(Natural, Natural) evaluation strategy",
-        gm.name()
-    );
-    benchmark_5(BenchmarkOptions5 {
-        xs: triples_of_naturals(gm),
-        function_f: &mut (|(a, b, c): (Natural, Natural, Natural)| a.add_mul(b, c)),
-        function_g: &mut (|(a, b, c): (Natural, Natural, Natural)| a.add_mul(b, &c)),
-        function_h: &mut (|(a, b, c): (Natural, Natural, Natural)| a.add_mul(&b, c)),
-        function_i: &mut (|(a, b, c): (Natural, Natural, Natural)| a.add_mul(&b, &c)),
-        function_j: &mut (|(a, b, c): (Natural, Natural, Natural)| (&a).add_mul(&b, &c)),
-        x_cons: &(|t| t.clone()),
-        y_cons: &(|t| t.clone()),
-        z_cons: &(|t| t.clone()),
-        w_cons: &(|t| t.clone()),
-        v_cons: &(|t| t.clone()),
-        x_param: &(|&(ref a, ref b, ref c)| {
-            max(
-                max(a.significant_bits(), b.significant_bits()),
-                c.significant_bits(),
-            ) as usize
-        }),
+    m_run_benchmark(
+        "Natural.add_mul(Natural, Natural)",
+        BenchmarkType::EvaluationStrategy,
+        triples_of_naturals(gm),
+        gm.name(),
         limit,
-        f_name: "Natural.add_mul(Natural, Natural)",
-        g_name: "Natural.add_mul(Natural, &Natural)",
-        h_name: "Natural.add_mul(&Natural, Natural)",
-        i_name: "Natural.add_mul(&Natural, &Natural)",
-        j_name: "(&Natural).add_mul(&Natural, &Natural)",
-        title: "Natural.add_mul(Natural, Natural) evaluation strategy",
-        x_axis_label: X_AXIS_LABEL,
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+        file_name,
+        &bucketing_function,
+        BUCKETING_LABEL,
+        &[
+            (
+                "Natural.add_mul(Natural, Natural)",
+                &mut (|(a, b, c)| no_out!(a.add_mul(b, c))),
+            ),
+            (
+                "Natural.add_mul(Natural, &Natural)",
+                &mut (|(a, b, c)| no_out!(a.add_mul(b, &c))),
+            ),
+            (
+                "Natural.add_mul(&Natural, Natural)",
+                &mut (|(a, b, c)| no_out!(a.add_mul(&b, c))),
+            ),
+            (
+                "Natural.add_mul(&Natural, &Natural)",
+                &mut (|(a, b, c)| no_out!(a.add_mul(&b, &c))),
+            ),
+            (
+                "(&Natural).add_mul(&Natural, &Natural)",
+                &mut (|(a, b, c)| no_out!((&a).add_mul(&b, &c))),
+            ),
+        ],
+    );
 }
 
 pub fn benchmark_natural_add_mul_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
-    println!(
-        "benchmarking {} Natural.add_mul(Natural, Natural) algorithms",
-        gm.name()
-    );
-    benchmark_2(BenchmarkOptions2 {
-        xs: triples_of_naturals(gm),
-        function_f: &mut (|(a, b, c): (Natural, Natural, Natural)| a.add_mul(b, c)),
-        function_g: &mut (|(a, b, c)| a + b * c),
-        x_cons: &(|t| t.clone()),
-        y_cons: &(|t| t.clone()),
-        x_param: &(|&(ref a, ref b, ref c)| {
-            max(
-                max(a.significant_bits(), b.significant_bits()),
-                c.significant_bits(),
-            ) as usize
-        }),
+    m_run_benchmark(
+        "Natural.add_mul(Natural, Natural)",
+        BenchmarkType::Algorithms,
+        triples_of_naturals(gm),
+        gm.name(),
         limit,
-        f_name: "Natural.add_mul(Natural, Natural)",
-        g_name: "Natural + Natural * Natural",
-        title: "Natural.add_mul(Natural, Natural) algorithms",
-        x_axis_label: X_AXIS_LABEL,
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+        file_name,
+        &bucketing_function,
+        BUCKETING_LABEL,
+        &[
+            (
+                "Natural.add_mul(Natural, Natural)",
+                &mut (|(a, b, c)| no_out!(a.add_mul(b, c))),
+            ),
+            (
+                "Natural + Natural * Natural",
+                &mut (|(a, b, c)| no_out!(a + b * c)),
+            ),
+        ],
+    );
 }
 
 pub fn benchmark_natural_add_mul_val_val_ref_algorithms(
@@ -402,30 +335,26 @@ pub fn benchmark_natural_add_mul_val_val_ref_algorithms(
     limit: usize,
     file_name: &str,
 ) {
-    println!(
-        "benchmarking {} Natural.add_mul(Natural, &Natural) algorithms",
-        gm.name()
-    );
-    benchmark_2(BenchmarkOptions2 {
-        xs: triples_of_naturals(gm),
-        function_f: &mut (|(a, b, c): (Natural, Natural, Natural)| a.add_mul(b, &c)),
-        function_g: &mut (|(a, b, c)| a + b * &c),
-        x_cons: &(|t| t.clone()),
-        y_cons: &(|t| t.clone()),
-        x_param: &(|&(ref a, ref b, ref c)| {
-            max(
-                max(a.significant_bits(), b.significant_bits()),
-                c.significant_bits(),
-            ) as usize
-        }),
+    m_run_benchmark(
+        "Natural.add_mul(Natural, &Natural)",
+        BenchmarkType::Algorithms,
+        triples_of_naturals(gm),
+        gm.name(),
         limit,
-        f_name: "Natural.add_mul(Natural, &Natural)",
-        g_name: "Natural + Natural * &Natural",
-        title: "Natural.add_mul(Natural, &Natural) algorithms",
-        x_axis_label: X_AXIS_LABEL,
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+        file_name,
+        &bucketing_function,
+        BUCKETING_LABEL,
+        &[
+            (
+                "Natural.add_mul(Natural, &Natural)",
+                &mut (|(a, b, c)| no_out!(a.add_mul(b, &c))),
+            ),
+            (
+                "Natural + Natural * &Natural",
+                &mut (|(a, b, c)| no_out!(a + b * &c)),
+            ),
+        ],
+    );
 }
 
 pub fn benchmark_natural_add_mul_val_ref_val_algorithms(
@@ -433,30 +362,26 @@ pub fn benchmark_natural_add_mul_val_ref_val_algorithms(
     limit: usize,
     file_name: &str,
 ) {
-    println!(
-        "benchmarking {} Natural.add_mul(&Natural, Natural) algorithms",
-        gm.name()
-    );
-    benchmark_2(BenchmarkOptions2 {
-        xs: triples_of_naturals(gm),
-        function_f: &mut (|(a, b, c): (Natural, Natural, Natural)| a.add_mul(&b, c)),
-        function_g: &mut (|(a, b, c)| a + &b * c),
-        x_cons: &(|t| t.clone()),
-        y_cons: &(|t| t.clone()),
-        x_param: &(|&(ref a, ref b, ref c)| {
-            max(
-                max(a.significant_bits(), b.significant_bits()),
-                c.significant_bits(),
-            ) as usize
-        }),
+    m_run_benchmark(
+        "Natural.add_mul(&Natural, Natural)",
+        BenchmarkType::Algorithms,
+        triples_of_naturals(gm),
+        gm.name(),
         limit,
-        f_name: "Natural.add_mul(&Natural, Natural)",
-        g_name: "Natural + &Natural * Natural",
-        title: "Natural.add_mul(&Natural, Natural) algorithms",
-        x_axis_label: X_AXIS_LABEL,
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+        file_name,
+        &bucketing_function,
+        BUCKETING_LABEL,
+        &[
+            (
+                "Natural.add_mul(&Natural, Natural)",
+                &mut (|(a, b, c)| no_out!(a.add_mul(&b, c))),
+            ),
+            (
+                "Natural + &Natural * Natural",
+                &mut (|(a, b, c)| no_out!(a + &b * c)),
+            ),
+        ],
+    );
 }
 
 pub fn benchmark_natural_add_mul_val_ref_ref_algorithms(
@@ -464,30 +389,26 @@ pub fn benchmark_natural_add_mul_val_ref_ref_algorithms(
     limit: usize,
     file_name: &str,
 ) {
-    println!(
-        "benchmarking {} Natural.add_mul(&Natural, &Natural) algorithms",
-        gm.name()
-    );
-    benchmark_2(BenchmarkOptions2 {
-        xs: triples_of_naturals(gm),
-        function_f: &mut (|(a, b, c): (Natural, Natural, Natural)| a.add_mul(&b, &c)),
-        function_g: &mut (|(a, b, c)| a + &b * &c),
-        x_cons: &(|t| t.clone()),
-        y_cons: &(|t| t.clone()),
-        x_param: &(|&(ref a, ref b, ref c)| {
-            max(
-                max(a.significant_bits(), b.significant_bits()),
-                c.significant_bits(),
-            ) as usize
-        }),
+    m_run_benchmark(
+        "Natural.add_mul(Natural, Natural)",
+        BenchmarkType::Algorithms,
+        triples_of_naturals(gm),
+        gm.name(),
         limit,
-        f_name: "Natural.add_mul(&Natural, &Natural)",
-        g_name: "Natural + &Natural * &Natural",
-        title: "Natural.add_mul(&Natural, &Natural) algorithms",
-        x_axis_label: X_AXIS_LABEL,
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+        file_name,
+        &bucketing_function,
+        BUCKETING_LABEL,
+        &[
+            (
+                "Natural.add_mul(&Natural, &Natural)",
+                &mut (|(a, b, c)| no_out!(a.add_mul(&b, &c))),
+            ),
+            (
+                "Natural + &Natural * &Natural",
+                &mut (|(a, b, c)| no_out!(a + &b * &c)),
+            ),
+        ],
+    );
 }
 
 pub fn benchmark_natural_add_mul_ref_ref_ref_algorithms(
@@ -495,28 +416,24 @@ pub fn benchmark_natural_add_mul_ref_ref_ref_algorithms(
     limit: usize,
     file_name: &str,
 ) {
-    println!(
-        "benchmarking {} (&Natural).add_mul(&Natural, &Natural) algorithms",
-        gm.name()
-    );
-    benchmark_2(BenchmarkOptions2 {
-        xs: triples_of_naturals(gm),
-        function_f: &mut (|(a, b, c): (Natural, Natural, Natural)| (&a).add_mul(&b, &c)),
-        function_g: &mut (|(a, b, c)| &a + &b * &c),
-        x_cons: &(|t| t.clone()),
-        y_cons: &(|t| t.clone()),
-        x_param: &(|&(ref a, ref b, ref c)| {
-            max(
-                max(a.significant_bits(), b.significant_bits()),
-                c.significant_bits(),
-            ) as usize
-        }),
+    m_run_benchmark(
+        "(&Natural).add_mul(&Natural, &Natural)",
+        BenchmarkType::Algorithms,
+        triples_of_naturals(gm),
+        gm.name(),
         limit,
-        f_name: "(&Natural).add_mul(&Natural, &Natural)",
-        g_name: "&Natural + &Natural * &Natural",
-        title: "(&Natural).add_mul(&Natural, &Natural) algorithms",
-        x_axis_label: X_AXIS_LABEL,
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+        file_name,
+        &bucketing_function,
+        BUCKETING_LABEL,
+        &[
+            (
+                "(&Natural).add_mul(&Natural, &Natural)",
+                &mut (|(a, b, c)| no_out!((&a).add_mul(&b, &c))),
+            ),
+            (
+                "(&Natural) + &Natural * &Natural",
+                &mut (|(a, b, c)| no_out!((&a) + &b * &c)),
+            ),
+        ],
+    );
 }

@@ -1,7 +1,5 @@
-use common::GenerationMode;
+use common::{m_run_benchmark, BenchmarkType, GenerationMode};
 use inputs::natural::pairs_of_natural_and_small_u32;
-use malachite_nz::natural::Natural;
-use rust_wheels::benchmarks::{BenchmarkOptions1, benchmark_1};
 
 pub fn demo_natural_mod_power_of_two_assign(gm: GenerationMode, limit: usize) {
     for (mut n, u) in pairs_of_natural_and_small_u32(gm).take(limit) {
@@ -76,57 +74,49 @@ pub fn benchmark_natural_mod_power_of_two_assign(
     limit: usize,
     file_name: &str,
 ) {
-    println!(
-        "benchmarking {} Natural.mod_power_of_two_assign(u32)",
-        gm.name()
-    );
-    benchmark_1(BenchmarkOptions1 {
-        xs: pairs_of_natural_and_small_u32(gm),
-        function_f: &mut (|(mut n, u): (Natural, u32)| n.mod_power_of_two_assign(u)),
-        x_cons: &(|p| p.clone()),
-        x_param: &(|&(_, index)| index as usize),
+    m_run_benchmark(
+        "Natural.mod_power_of_two_assign(u32)",
+        BenchmarkType::Single,
+        pairs_of_natural_and_small_u32(gm),
+        gm.name(),
         limit,
-        f_name: "malachite",
-        title: "Natural.mod_power_of_2_assign(u32)",
-        x_axis_label: "other",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+        file_name,
+        &(|&(_, index)| index as usize),
+        "other",
+        &[
+            (
+                "malachite",
+                &mut (|(mut n, u)| n.mod_power_of_two_assign(u)),
+            ),
+        ],
+    );
 }
 
-pub fn benchmark_natural_mod_power_of_two(gm: GenerationMode, limit: usize, file_name: &str) {
-    println!("benchmarking {} Natural.mod_power_of_two(u32)", gm.name());
-    benchmark_1(BenchmarkOptions1 {
-        xs: pairs_of_natural_and_small_u32(gm),
-        function_f: &mut (|(n, u): (Natural, u32)| n.mod_power_of_two(u)),
-        x_cons: &(|p| p.clone()),
-        x_param: &(|&(_, index)| index as usize),
+pub fn benchmark_natural_mod_power_of_two_evaluation_strategy(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "Natural.mod_power_of_two(u32)",
+        BenchmarkType::EvaluationStrategy,
+        pairs_of_natural_and_small_u32(gm),
+        gm.name(),
         limit,
-        f_name: "malachite",
-        title: "Natural.mod_power_of_2(u32)",
-        x_axis_label: "other",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
-}
-
-pub fn benchmark_natural_mod_power_of_two_ref(gm: GenerationMode, limit: usize, file_name: &str) {
-    println!(
-        "benchmarking {} Natural.mod_power_of_two_ref(u32)",
-        gm.name()
+        file_name,
+        &(|&(_, index)| index as usize),
+        "other",
+        &[
+            (
+                "Natural.mod_power_of_two(u32)",
+                &mut (|(n, u)| no_out!(n.mod_power_of_two(u))),
+            ),
+            (
+                "Natural.mod_power_of_two_ref(u32)",
+                &mut (|(n, u)| no_out!(n.mod_power_of_two_ref(u))),
+            ),
+        ],
     );
-    benchmark_1(BenchmarkOptions1 {
-        xs: pairs_of_natural_and_small_u32(gm),
-        function_f: &mut (|(n, u): (Natural, u32)| n.mod_power_of_two_ref(u)),
-        x_cons: &(|p| p.clone()),
-        x_param: &(|&(_, index)| index as usize),
-        limit,
-        f_name: "malachite",
-        title: "Natural.mod_power_of_2_ref(u32)",
-        x_axis_label: "other",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
 }
 
 pub fn benchmark_natural_neg_mod_power_of_two_assign(
@@ -134,62 +124,47 @@ pub fn benchmark_natural_neg_mod_power_of_two_assign(
     limit: usize,
     file_name: &str,
 ) {
-    println!(
-        "benchmarking {} Natural.neg_mod_power_of_two_assign(u32)",
-        gm.name()
-    );
-    benchmark_1(BenchmarkOptions1 {
-        xs: pairs_of_natural_and_small_u32(gm),
-        function_f: &mut (|(mut n, u): (Natural, u32)| n.neg_mod_power_of_two_assign(u)),
-        x_cons: &(|p| p.clone()),
-        x_param: &(|&(_, index)| index as usize),
+    m_run_benchmark(
+        "Natural.neg_mod_power_of_two_assign(u32)",
+        BenchmarkType::Single,
+        pairs_of_natural_and_small_u32(gm),
+        gm.name(),
         limit,
-        f_name: "malachite",
-        title: "Natural.neg_mod_power_of_2_assign(u32)",
-        x_axis_label: "other",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+        file_name,
+        &(|&(_, index)| index as usize),
+        "other",
+        &[
+            (
+                "malachite",
+                &mut (|(mut n, u)| n.neg_mod_power_of_two_assign(u)),
+            ),
+        ],
+    );
 }
 
-pub fn benchmark_natural_neg_mod_power_of_two(gm: GenerationMode, limit: usize, file_name: &str) {
-    println!(
-        "benchmarking {} Natural.neg_mod_power_of_two(u32)",
-        gm.name()
-    );
-    benchmark_1(BenchmarkOptions1 {
-        xs: pairs_of_natural_and_small_u32(gm),
-        function_f: &mut (|(n, u): (Natural, u32)| n.neg_mod_power_of_two(u)),
-        x_cons: &(|p| p.clone()),
-        x_param: &(|&(_, index)| index as usize),
-        limit,
-        f_name: "malachite",
-        title: "Natural.neg_mod_power_of_2(u32)",
-        x_axis_label: "other",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
-}
-
-pub fn benchmark_natural_neg_mod_power_of_two_ref(
+pub fn benchmark_natural_neg_mod_power_of_two_evaluation_strategy(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,
 ) {
-    println!(
-        "benchmarking {} Natural.neg_mod_power_of_two_ref(u32)",
-        gm.name()
-    );
-    benchmark_1(BenchmarkOptions1 {
-        xs: pairs_of_natural_and_small_u32(gm),
-        function_f: &mut (|(n, u): (Natural, u32)| n.neg_mod_power_of_two_ref(u)),
-        x_cons: &(|p| p.clone()),
-        x_param: &(|&(_, index)| index as usize),
+    m_run_benchmark(
+        "Natural.neg_mod_power_of_two(u32)",
+        BenchmarkType::EvaluationStrategy,
+        pairs_of_natural_and_small_u32(gm),
+        gm.name(),
         limit,
-        f_name: "malachite",
-        title: "Natural.neg_mod_power_of_2_ref(u32)",
-        x_axis_label: "other",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+        file_name,
+        &(|&(_, index)| index as usize),
+        "other",
+        &[
+            (
+                "Natural.mod_power_of_two(u32)",
+                &mut (|(n, u)| no_out!(n.neg_mod_power_of_two(u))),
+            ),
+            (
+                "Natural.mod_power_of_two_ref(u32)",
+                &mut (|(n, u)| no_out!(n.neg_mod_power_of_two_ref(u))),
+            ),
+        ],
+    );
 }

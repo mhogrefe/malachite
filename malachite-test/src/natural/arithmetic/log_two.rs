@@ -1,10 +1,8 @@
-use common::GenerationMode;
+use common::{m_run_benchmark, BenchmarkType, GenerationMode};
 use inputs::base::vecs_of_unsigned_var_1;
 use inputs::natural::positive_naturals;
-use malachite_base::num::{CeilingLogTwo, FloorLogTwo};
+use malachite_base::num::{CeilingLogTwo, FloorLogTwo, SignificantBits};
 use malachite_nz::natural::arithmetic::log_two::{limbs_ceiling_log_two, limbs_floor_log_two};
-use malachite_nz::natural::Natural;
-use rust_wheels::benchmarks::{BenchmarkOptions1, benchmark_1};
 
 pub fn demo_limbs_floor_log_two(gm: GenerationMode, limit: usize) {
     for limbs in vecs_of_unsigned_var_1(gm).take(limit) {
@@ -39,65 +37,67 @@ pub fn demo_natural_ceiling_log_two(gm: GenerationMode, limit: usize) {
 }
 
 pub fn benchmark_limbs_floor_log_two(gm: GenerationMode, limit: usize, file_name: &str) {
-    println!("benchmarking {} limbs_floor_log_two(&[u32])", gm.name());
-    benchmark_1(BenchmarkOptions1 {
-        xs: vecs_of_unsigned_var_1(gm),
-        function_f: &mut (|ref limbs: Vec<u32>| limbs_floor_log_two(limbs)),
-        x_cons: &(|x| x.clone()),
-        x_param: &(|limbs| limbs.len()),
+    m_run_benchmark(
+        "limbs_floor_log_two(&[u32])",
+        BenchmarkType::Single,
+        vecs_of_unsigned_var_1(gm),
+        gm.name(),
         limit,
-        f_name: "malachite",
-        title: "limbs_floor_log_two(&[u32])",
-        x_axis_label: "limbs.len()",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+        file_name,
+        &(|limbs| limbs.len()),
+        "limbs.len()",
+        &[
+            (
+                "malachite",
+                &mut (|ref limbs| no_out!(limbs_floor_log_two(limbs))),
+            ),
+        ],
+    );
 }
 
 pub fn benchmark_limbs_ceiling_log_two(gm: GenerationMode, limit: usize, file_name: &str) {
-    println!("benchmarking {} limbs_ceiling_log_two(&[u32])", gm.name());
-    benchmark_1(BenchmarkOptions1 {
-        xs: vecs_of_unsigned_var_1(gm),
-        function_f: &mut (|ref limbs: Vec<u32>| limbs_ceiling_log_two(limbs)),
-        x_cons: &(|x| x.clone()),
-        x_param: &(|limbs| limbs.len()),
+    m_run_benchmark(
+        "limbs_ceiling_log_two(&[u32])",
+        BenchmarkType::Single,
+        vecs_of_unsigned_var_1(gm),
+        gm.name(),
         limit,
-        f_name: "malachite",
-        title: "limbs_ceiling_log_two(&[u32])",
-        x_axis_label: "limbs.len()",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+        file_name,
+        &(|limbs| limbs.len()),
+        "limbs.len()",
+        &[
+            (
+                "malachite",
+                &mut (|ref limbs| no_out!(limbs_ceiling_log_two(limbs))),
+            ),
+        ],
+    );
 }
 
 pub fn benchmark_natural_floor_log_two(gm: GenerationMode, limit: usize, file_name: &str) {
-    println!("benchmarking {} Natural.floor_log_two()", gm.name());
-    benchmark_1(BenchmarkOptions1 {
-        xs: positive_naturals(gm),
-        function_f: &mut (|n: Natural| n.floor_log_two()),
-        x_cons: &(|x| x.clone()),
-        x_param: &(|n| n.floor_log_two() as usize),
+    m_run_benchmark(
+        "Natural.floor_log_two()",
+        BenchmarkType::Single,
+        positive_naturals(gm),
+        gm.name(),
         limit,
-        f_name: "malachite",
-        title: "Natural.floor_log_two()",
-        x_axis_label: "n.significant_bits()",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+        file_name,
+        &(|n| n.significant_bits() as usize),
+        "n.significant_bits()",
+        &[("malachite", &mut (|n| no_out!(n.floor_log_two())))],
+    );
 }
 
 pub fn benchmark_natural_ceiling_log_two(gm: GenerationMode, limit: usize, file_name: &str) {
-    println!("benchmarking {} Natural.ceiling_log_two()", gm.name());
-    benchmark_1(BenchmarkOptions1 {
-        xs: positive_naturals(gm),
-        function_f: &mut (|n: Natural| n.ceiling_log_two()),
-        x_cons: &(|x| x.clone()),
-        x_param: &(|n| n.floor_log_two() as usize),
+    m_run_benchmark(
+        "Natural.ceiling_log_two()",
+        BenchmarkType::Single,
+        positive_naturals(gm),
+        gm.name(),
         limit,
-        f_name: "malachite",
-        title: "Natural.ceiling_log_two()",
-        x_axis_label: "n.significant_bits()",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+        file_name,
+        &(|n| n.significant_bits() as usize),
+        "n.significant_bits()",
+        &[("malachite", &mut (|n| no_out!(n.ceiling_log_two())))],
+    );
 }

@@ -155,6 +155,26 @@ pub fn pairs_of_natural_and_unsigned<T: 'static + PrimitiveUnsigned>(
     }
 }
 
+pub fn rm_pairs_of_natural_and_unsigned<T: 'static + PrimitiveUnsigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = ((rug::Integer, T), (Natural, T))>> {
+    Box::new(
+        pairs_of_natural_and_unsigned(gm).map(|(x, y)| ((natural_to_rug_integer(&x), y), (x, y))),
+    )
+}
+
+pub fn nrm_pairs_of_natural_and_unsigned<T: 'static + PrimitiveUnsigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = ((BigUint, T), (rug::Integer, T), (Natural, T))>> {
+    Box::new(pairs_of_natural_and_unsigned(gm).map(|(x, y)| {
+        (
+            (natural_to_biguint(&x), y),
+            (natural_to_rug_integer(&x), y),
+            (x, y),
+        )
+    }))
+}
+
 // All pairs of `Natural` and `u32` where the `Natural` is greater than or equal to the `u32`.
 pub fn pairs_of_natural_and_u32_var_1(gm: GenerationMode) -> Box<Iterator<Item = (Natural, u32)>> {
     Box::new(pairs_of_natural_and_unsigned(gm).filter(|&(ref n, u)| *n >= u))
@@ -175,6 +195,14 @@ pub fn pairs_of_unsigned_and_natural<T: 'static + PrimitiveUnsigned>(
             &(|seed| special_random_naturals(seed, scale)),
         )),
     }
+}
+
+pub fn rm_pairs_of_unsigned_and_natural<T: 'static + PrimitiveUnsigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = ((T, rug::Integer), (T, Natural))>> {
+    Box::new(
+        pairs_of_unsigned_and_natural(gm).map(|(x, y)| ((x, natural_to_rug_integer(&y)), (x, y))),
+    )
 }
 
 fn random_triples_of_natural_natural_and_primitive<T: 'static + PrimitiveInteger>(
