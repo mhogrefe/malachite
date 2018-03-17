@@ -33,6 +33,10 @@ pub fn naturals(gm: GenerationMode) -> Box<Iterator<Item = Natural>> {
     }
 }
 
+pub fn nrm_naturals(gm: GenerationMode) -> Box<Iterator<Item = (BigUint, rug::Integer, Natural)>> {
+    Box::new(naturals(gm).map(|n| (natural_to_biguint(&n), natural_to_rug_integer(&n), n)))
+}
+
 pub fn positive_naturals(gm: GenerationMode) -> Box<Iterator<Item = Natural>> {
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_positive_naturals()),
@@ -91,6 +95,18 @@ pub fn rm_pairs_of_naturals(
 // All pairs of `Natural`s where the first is greater than or equal to the second.
 pub fn pairs_of_naturals_var_1(gm: GenerationMode) -> Box<Iterator<Item = (Natural, Natural)>> {
     Box::new(pairs_of_naturals(gm).filter(|&(ref x, ref y)| x >= y))
+}
+
+//TODO use subset_pairs
+pub fn rm_pairs_of_naturals_var_1(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = ((rug::Integer, rug::Integer), (Natural, Natural))>> {
+    Box::new(pairs_of_naturals_var_1(gm).map(|(x, y)| {
+        (
+            (natural_to_rug_integer(&x), natural_to_rug_integer(&y)),
+            (x, y),
+        )
+    }))
 }
 
 pub fn triples_of_naturals(
@@ -180,6 +196,14 @@ pub fn pairs_of_natural_and_u32_var_1(gm: GenerationMode) -> Box<Iterator<Item =
     Box::new(pairs_of_natural_and_unsigned(gm).filter(|&(ref n, u)| *n >= u))
 }
 
+pub fn rm_pairs_of_natural_and_u32_var_1(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = ((rug::Integer, u32), (Natural, u32))>> {
+    Box::new(
+        pairs_of_natural_and_u32_var_1(gm).map(|(x, y)| ((natural_to_rug_integer(&x), y), (x, y))),
+    )
+}
+
 pub fn pairs_of_unsigned_and_natural<T: 'static + PrimitiveUnsigned>(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (T, Natural)>> {
@@ -264,6 +288,14 @@ pub fn pairs_of_natural_and_small_u32(gm: GenerationMode) -> Box<Iterator<Item =
     }
 }
 
+pub fn rm_pairs_of_natural_and_small_u32(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = ((rug::Integer, u32), (Natural, u32))>> {
+    Box::new(
+        pairs_of_natural_and_small_u32(gm).map(|(x, y)| ((natural_to_rug_integer(&x), y), (x, y))),
+    )
+}
+
 // All pairs of `Natural` and `u32` where the `Natural` is divisible by 2 to the power of the `u32`.
 pub fn pairs_of_natural_and_small_u32_var_1(
     gm: GenerationMode,
@@ -300,6 +332,14 @@ pub fn pairs_of_natural_and_small_i32(gm: GenerationMode) -> Box<Iterator<Item =
             &(|seed| i32s_geometric(seed, scale)),
         )),
     }
+}
+
+pub fn rm_pairs_of_natural_and_small_i32(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = ((rug::Integer, i32), (Natural, i32))>> {
+    Box::new(
+        pairs_of_natural_and_small_i32(gm).map(|(x, y)| ((natural_to_rug_integer(&x), y), (x, y))),
+    )
 }
 
 pub fn pairs_of_natural_and_small_u64(gm: GenerationMode) -> Box<Iterator<Item = (Natural, u64)>> {

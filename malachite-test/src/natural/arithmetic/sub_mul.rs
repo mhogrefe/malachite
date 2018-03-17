@@ -1,9 +1,8 @@
-use common::GenerationMode;
+use common::{m_run_benchmark, BenchmarkType, GenerationMode};
 use inputs::natural::{triples_of_naturals, triples_of_naturals_var_1};
 use malachite_base::num::SignificantBits;
 use malachite_base::num::{SubMul, SubMulAssign};
 use malachite_nz::natural::Natural;
-use rust_wheels::benchmarks::{BenchmarkOptions1, BenchmarkOptions2, benchmark_1, benchmark_2};
 use std::cmp::max;
 
 pub fn demo_natural_sub_mul_assign(gm: GenerationMode, limit: usize) {
@@ -43,28 +42,33 @@ pub fn demo_natural_sub_mul_ref(gm: GenerationMode, limit: usize) {
     }
 }
 
+fn bucketing_function(t: &(Natural, Natural, Natural)) -> usize {
+    max(
+        max(t.0.significant_bits(), t.1.significant_bits()),
+        t.2.significant_bits(),
+    ) as usize
+}
+
+const BUCKETING_LABEL: &str = "max(a.significant_bits(), b.significant_bits(), \
+                               c.significant_bits())";
+
 pub fn benchmark_natural_sub_mul_assign(gm: GenerationMode, limit: usize, file_name: &str) {
-    println!(
-        "benchmarking {} Natural.sub_mul_assign(&Natural, &Natural)",
-        gm.name()
-    );
-    benchmark_1(BenchmarkOptions1 {
-        xs: triples_of_naturals_var_1(gm),
-        function_f: &mut (|(mut a, b, c): (Natural, Natural, Natural)| a.sub_mul_assign(&b, &c)),
-        x_cons: &(|t| t.clone()),
-        x_param: &(|&(ref a, ref b, ref c)| {
-            max(
-                max(a.significant_bits(), b.significant_bits()),
-                c.significant_bits(),
-            ) as usize
-        }),
+    m_run_benchmark(
+        "Natural.sub_mul_assign(&Natural, &Natural)",
+        BenchmarkType::Single,
+        triples_of_naturals_var_1(gm),
+        gm.name(),
         limit,
-        f_name: "malachite",
-        title: "Natural.sub_mul_assign(&Natural, &Natural)",
-        x_axis_label: "max(a.significant_bits(), b.significant_bits())",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+        file_name,
+        &bucketing_function,
+        BUCKETING_LABEL,
+        &[
+            (
+                "Natural.sub_mul_assign(&Natural, &Natural)",
+                &mut (|(mut a, b, c)| a.sub_mul_assign(&b, &c)),
+            ),
+        ],
+    );
 }
 
 pub fn benchmark_natural_sub_mul_assign_algorithms(
@@ -72,54 +76,26 @@ pub fn benchmark_natural_sub_mul_assign_algorithms(
     limit: usize,
     file_name: &str,
 ) {
-    println!(
-        "benchmarking {} Natural.sub_mul_assign(&Natural, &Natural) algorithms",
-        gm.name()
-    );
-    benchmark_2(BenchmarkOptions2 {
-        xs: triples_of_naturals_var_1(gm),
-        function_f: &mut (|(mut a, b, c): (Natural, Natural, Natural)| a.sub_mul_assign(&b, &c)),
-        function_g: &mut (|(mut a, b, c): (Natural, Natural, Natural)| a -= &(&b * &c)),
-        x_cons: &(|t| t.clone()),
-        y_cons: &(|t| t.clone()),
-        x_param: &(|&(ref a, ref b, ref c)| {
-            max(
-                max(a.significant_bits(), b.significant_bits()),
-                c.significant_bits(),
-            ) as usize
-        }),
+    m_run_benchmark(
+        "Natural.sub_mul_assign(&Natural, &Natural)",
+        BenchmarkType::Algorithms,
+        triples_of_naturals_var_1(gm),
+        gm.name(),
         limit,
-        f_name: "Natural.sub_mul_assign(&Natural, &Natural)",
-        g_name: "Natural -= &Natural * &Natural",
-        title: "Natural.sub_mul_assign(&Natural, &Natural) algorithms",
-        x_axis_label: "max(a.significant_bits(), b.significant_bits())",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
-}
-
-pub fn benchmark_natural_sub_mul(gm: GenerationMode, limit: usize, file_name: &str) {
-    println!(
-        "benchmarking {} Natural.sub_mul(&Natural, &Natural)",
-        gm.name()
+        file_name,
+        &bucketing_function,
+        BUCKETING_LABEL,
+        &[
+            (
+                "Natural.sub_mul_assign(&Natural, &Natural)",
+                &mut (|(mut a, b, c)| a.sub_mul_assign(&b, &c)),
+            ),
+            (
+                "Natural -= &(&Natural * &Natural)",
+                &mut (|(mut a, b, c)| a -= &(&b * &c)),
+            ),
+        ],
     );
-    benchmark_1(BenchmarkOptions1 {
-        xs: triples_of_naturals(gm),
-        function_f: &mut (|(a, b, c): (Natural, Natural, Natural)| a.sub_mul(&b, &c)),
-        x_cons: &(|t| t.clone()),
-        x_param: &(|&(ref a, ref b, ref c)| {
-            max(
-                max(a.significant_bits(), b.significant_bits()),
-                c.significant_bits(),
-            ) as usize
-        }),
-        limit,
-        f_name: "malachite",
-        title: "Natural.sub_mul(&Natural, &Natural)",
-        x_axis_label: "max(a.significant_bits(), b.significant_bits())",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
 }
 
 pub fn benchmark_natural_sub_mul_evaluation_strategy(
@@ -127,82 +103,70 @@ pub fn benchmark_natural_sub_mul_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    println!(
-        "benchmarking {} Natural.sub_mul(&Natural, &Natural) evaluation strategy",
-        gm.name()
-    );
-    benchmark_2(BenchmarkOptions2 {
-        xs: triples_of_naturals(gm),
-        function_f: &mut (|(a, b, c): (Natural, Natural, Natural)| a.sub_mul(&b, &c)),
-        function_g: &mut (|(a, b, c): (Natural, Natural, Natural)| (&a).sub_mul(&b, &c)),
-        x_cons: &(|t| t.clone()),
-        y_cons: &(|t| t.clone()),
-        x_param: &(|&(ref a, ref b, ref c)| {
-            max(
-                max(a.significant_bits(), b.significant_bits()),
-                c.significant_bits(),
-            ) as usize
-        }),
+    m_run_benchmark(
+        "Natural.sub_mul(Natural, Natural)",
+        BenchmarkType::EvaluationStrategy,
+        triples_of_naturals(gm),
+        gm.name(),
         limit,
-        f_name: "Natural.sub_mul(&Natural, &Natural)",
-        g_name: "(&Natural).sub_mul(&Natural, &Natural)",
-        title: "Natural.sub_mul(&Natural, &Natural) evaluation strategy",
-        x_axis_label: "max(a.significant_bits(), b.significant_bits())",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+        file_name,
+        &bucketing_function,
+        BUCKETING_LABEL,
+        &[
+            (
+                "Natural.sub_mul(&Natural, &Natural)",
+                &mut (|(a, b, c)| no_out!(a.sub_mul(&b, &c))),
+            ),
+            (
+                "(&Natural).sub_mul(&Natural, &Natural)",
+                &mut (|(a, b, c)| no_out!((&a).sub_mul(&b, &c))),
+            ),
+        ],
+    );
 }
 
 pub fn benchmark_natural_sub_mul_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
-    println!(
-        "benchmarking {} Natural.sub_mul(&Natural, &Natural) algorithms",
-        gm.name()
-    );
-    benchmark_2(BenchmarkOptions2 {
-        xs: triples_of_naturals(gm),
-        function_f: &mut (|(a, b, c): (Natural, Natural, Natural)| a.sub_mul(&b, &c)),
-        function_g: &mut (|(a, b, c): (Natural, Natural, Natural)| a - &(&b * &c)),
-        x_cons: &(|t| t.clone()),
-        y_cons: &(|t| t.clone()),
-        x_param: &(|&(ref a, ref b, ref c)| {
-            max(
-                max(a.significant_bits(), b.significant_bits()),
-                c.significant_bits(),
-            ) as usize
-        }),
+    m_run_benchmark(
+        "Natural.sub_mul(Natural, Natural)",
+        BenchmarkType::Algorithms,
+        triples_of_naturals(gm),
+        gm.name(),
         limit,
-        f_name: "Natural.sub_mul(&Natural, &Natural)",
-        g_name: "Natural - &Natural * &Natural",
-        title: "Natural.sub_mul(&Natural, &Natural) algorithms",
-        x_axis_label: "max(a.significant_bits(), b.significant_bits())",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+        file_name,
+        &bucketing_function,
+        BUCKETING_LABEL,
+        &[
+            (
+                "Natural.sub_mul(&Natural, &Natural)",
+                &mut (|(a, b, c)| no_out!(a.sub_mul(&b, &c))),
+            ),
+            (
+                "Natural - &(&Natural * &Natural)",
+                &mut (|(a, b, c)| no_out!(a - &(&b * &c))),
+            ),
+        ],
+    );
 }
 
 pub fn benchmark_natural_sub_mul_ref_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
-    println!(
-        "benchmarking {} (&Natural).sub_mul(&Natural, &Natural) algorithms",
-        gm.name()
-    );
-    benchmark_2(BenchmarkOptions2 {
-        xs: triples_of_naturals(gm),
-        function_f: &mut (|(a, b, c): (Natural, Natural, Natural)| (&a).sub_mul(&b, &c)),
-        function_g: &mut (|(a, b, c): (Natural, Natural, Natural)| &a - &(&b * &c)),
-        x_cons: &(|t| t.clone()),
-        y_cons: &(|t| t.clone()),
-        x_param: &(|&(ref a, ref b, ref c)| {
-            max(
-                max(a.significant_bits(), b.significant_bits()),
-                c.significant_bits(),
-            ) as usize
-        }),
+    m_run_benchmark(
+        "(&Natural).sub_mul(&Natural, &Natural)",
+        BenchmarkType::Algorithms,
+        triples_of_naturals(gm),
+        gm.name(),
         limit,
-        f_name: "(&Natural).sub_mul(&Natural, &Natural)",
-        g_name: "(&Natural) - &Natural * &Natural",
-        title: "(&Natural).sub_mul(&Natural, &Natural) algorithms",
-        x_axis_label: "max(a.significant_bits(), b.significant_bits())",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+        file_name,
+        &bucketing_function,
+        BUCKETING_LABEL,
+        &[
+            (
+                "(&Natural).sub_mul(&Natural, &Natural)",
+                &mut (|(a, b, c)| no_out!((&a).sub_mul(&b, &c))),
+            ),
+            (
+                "(&Natural) - &(&Natural * &Natural)",
+                &mut (|(a, b, c)| no_out!((&a) - &(&b * &c))),
+            ),
+        ],
+    );
 }

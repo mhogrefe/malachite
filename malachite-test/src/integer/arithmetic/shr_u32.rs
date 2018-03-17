@@ -60,7 +60,11 @@ pub fn demo_integer_shr_round_u32_ref(gm: GenerationMode, limit: usize) {
     }
 }
 
-pub fn benchmark_integer_shr_assign_u32(gm: GenerationMode, limit: usize, file_name: &str) {
+pub fn benchmark_integer_shr_assign_u32_library_comparison(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
     m_run_benchmark(
         "Integer >>= u32",
         BenchmarkType::Single,

@@ -1,10 +1,8 @@
-use common::GenerationMode;
+use common::{m_run_benchmark, BenchmarkType, GenerationMode};
 use inputs::natural::{triples_of_natural_natural_and_unsigned,
                       triples_of_natural_natural_and_u32_var_1};
 use malachite_base::num::SignificantBits;
 use malachite_base::num::{SubMul, SubMulAssign};
-use malachite_nz::natural::Natural;
-use rust_wheels::benchmarks::{BenchmarkOptions1, BenchmarkOptions2, benchmark_1, benchmark_2};
 use std::cmp::max;
 
 pub fn demo_natural_sub_mul_assign_u32(gm: GenerationMode, limit: usize) {
@@ -36,22 +34,22 @@ pub fn demo_natural_sub_mul_u32_ref(gm: GenerationMode, limit: usize) {
 }
 
 pub fn benchmark_natural_sub_mul_assign_u32(gm: GenerationMode, limit: usize, file_name: &str) {
-    println!(
-        "benchmarking {} Natural.sub_mul_assign(&Natural, u32)",
-        gm.name()
-    );
-    benchmark_1(BenchmarkOptions1 {
-        xs: triples_of_natural_natural_and_u32_var_1(gm),
-        function_f: &mut (|(mut a, b, c): (Natural, Natural, u32)| a.sub_mul_assign(&b, c)),
-        x_cons: &(|t| t.clone()),
-        x_param: &(|&(ref a, ref b, _)| max(a.significant_bits(), b.significant_bits()) as usize),
+    m_run_benchmark(
+        "Natural.sub_mul_assign(&Natural, u32)",
+        BenchmarkType::Single,
+        triples_of_natural_natural_and_u32_var_1(gm),
+        gm.name(),
         limit,
-        f_name: "malachite",
-        title: "Natural.sub_mul_assign(&Natural, u32)",
-        x_axis_label: "max(a.significant_bits(), b.significant_bits())",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+        file_name,
+        &(|&(ref a, ref b, _)| max(a.significant_bits(), b.significant_bits()) as usize),
+        "max(a.significant_bits(), b.significant_bits())",
+        &[
+            (
+                "Natural.sub_mul_assign(&Natural, u32)",
+                &mut (|(mut a, b, c)| a.sub_mul_assign(&b, c)),
+            ),
+        ],
+    );
 }
 
 pub fn benchmark_natural_sub_mul_assign_u32_algorithms(
@@ -59,41 +57,26 @@ pub fn benchmark_natural_sub_mul_assign_u32_algorithms(
     limit: usize,
     file_name: &str,
 ) {
-    println!(
-        "benchmarking {} Natural.sub_mul_assign(&Natural, u32) algorithms",
-        gm.name()
+    m_run_benchmark(
+        "Natural.sub_mul_assign(&Natural, u32)",
+        BenchmarkType::Algorithms,
+        triples_of_natural_natural_and_u32_var_1(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(ref a, ref b, _)| max(a.significant_bits(), b.significant_bits()) as usize),
+        "max(a.significant_bits(), b.significant_bits())",
+        &[
+            (
+                "Natural.sub_mul_assign(&Natural, u32)",
+                &mut (|(mut a, b, c)| a.sub_mul_assign(&b, c)),
+            ),
+            (
+                "Natural -= &(&Natural * u32)",
+                &mut (|(mut a, b, c)| a -= &(&b * c)),
+            ),
+        ],
     );
-    benchmark_2(BenchmarkOptions2 {
-        xs: triples_of_natural_natural_and_u32_var_1(gm),
-        function_f: &mut (|(mut a, b, c): (Natural, Natural, u32)| a.sub_mul_assign(&b, c)),
-        function_g: &mut (|(mut a, b, c): (Natural, Natural, u32)| a -= &(&b * c)),
-        x_cons: &(|t| t.clone()),
-        y_cons: &(|t| t.clone()),
-        x_param: &(|&(ref a, ref b, _)| max(a.significant_bits(), b.significant_bits()) as usize),
-        limit,
-        f_name: "Natural.sub_mul_assign(&Natural, u32)",
-        g_name: "Natural -= &Natural * u32",
-        title: "Natural.sub_mul_assign(&Natural, u32) algorithms",
-        x_axis_label: "max(a.significant_bits(), b.significant_bits())",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
-}
-
-pub fn benchmark_natural_sub_mul_u32(gm: GenerationMode, limit: usize, file_name: &str) {
-    println!("benchmarking {} Natural.sub_mul(&Natural, u32)", gm.name());
-    benchmark_1(BenchmarkOptions1 {
-        xs: triples_of_natural_natural_and_unsigned::<u32>(gm),
-        function_f: &mut (|(a, b, c): (Natural, Natural, u32)| a.sub_mul(&b, c)),
-        x_cons: &(|t| t.clone()),
-        x_param: &(|&(ref a, ref b, _)| max(a.significant_bits(), b.significant_bits()) as usize),
-        limit,
-        f_name: "malachite",
-        title: "Natural.sub_mul(&Natural, u32)",
-        x_axis_label: "max(a.significant_bits(), b.significant_bits())",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
 }
 
 pub fn benchmark_natural_sub_mul_u32_evaluation_strategy(
@@ -101,47 +84,49 @@ pub fn benchmark_natural_sub_mul_u32_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    println!(
-        "benchmarking {} Natural.sub_mul(&Natural, u32) evaluation strategy",
-        gm.name()
-    );
-    benchmark_2(BenchmarkOptions2 {
-        xs: triples_of_natural_natural_and_unsigned::<u32>(gm),
-        function_f: &mut (|(a, b, c): (Natural, Natural, u32)| a.sub_mul(&b, c)),
-        function_g: &mut (|(a, b, c): (Natural, Natural, u32)| (&a).sub_mul(&b, c)),
-        x_cons: &(|t| t.clone()),
-        y_cons: &(|t| t.clone()),
-        x_param: &(|&(ref a, ref b, _)| max(a.significant_bits(), b.significant_bits()) as usize),
+    m_run_benchmark(
+        "Natural.sub_mul(&Natural, u32)",
+        BenchmarkType::EvaluationStrategy,
+        triples_of_natural_natural_and_unsigned::<u32>(gm),
+        gm.name(),
         limit,
-        f_name: "Natural.sub_mul(&Natural, u32)",
-        g_name: "(&Natural).sub_mul(&Natural, u32)",
-        title: "Natural.sub_mul(&Natural, u32) evaluation strategy",
-        x_axis_label: "max(a.significant_bits(), b.significant_bits())",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+        file_name,
+        &(|&(ref a, ref b, _)| max(a.significant_bits(), b.significant_bits()) as usize),
+        "max(a.significant_bits(), b.significant_bits())",
+        &[
+            (
+                "Natural.sub_mul(&Natural, u32)",
+                &mut (|(a, b, c)| no_out!(a.sub_mul(&b, c))),
+            ),
+            (
+                "(&Natural).sub_mul(&Natural, u32)",
+                &mut (|(a, b, c)| no_out!((&a).sub_mul(&b, c))),
+            ),
+        ],
+    );
 }
 
 pub fn benchmark_natural_sub_mul_u32_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
-    println!(
-        "benchmarking {} Natural.sub_mul(&Natural, u32) algorithms",
-        gm.name()
-    );
-    benchmark_2(BenchmarkOptions2 {
-        xs: triples_of_natural_natural_and_unsigned::<u32>(gm),
-        function_f: &mut (|(a, b, c): (Natural, Natural, u32)| a.sub_mul(&b, c)),
-        function_g: &mut (|(a, b, c): (Natural, Natural, u32)| a - &(&b * c)),
-        x_cons: &(|t| t.clone()),
-        y_cons: &(|t| t.clone()),
-        x_param: &(|&(ref a, ref b, _)| max(a.significant_bits(), b.significant_bits()) as usize),
+    m_run_benchmark(
+        "Natural.sub_mul(&Natural, u32)",
+        BenchmarkType::Algorithms,
+        triples_of_natural_natural_and_unsigned::<u32>(gm),
+        gm.name(),
         limit,
-        f_name: "Natural.sub_mul(&Natural, u32)",
-        g_name: "Natural - &Natural * u32",
-        title: "Natural.sub_mul(&Natural, u32) algorithms",
-        x_axis_label: "max(a.significant_bits(), b.significant_bits())",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+        file_name,
+        &(|&(ref a, ref b, _)| max(a.significant_bits(), b.significant_bits()) as usize),
+        "max(a.significant_bits(), b.significant_bits())",
+        &[
+            (
+                "Natural.sub_mul(&Natural, u32)",
+                &mut (|(a, b, c)| no_out!(a.sub_mul(&b, c))),
+            ),
+            (
+                "Natural - &(&Natural * u32)",
+                &mut (|(a, b, c)| no_out!(a - &(&b * c))),
+            ),
+        ],
+    );
 }
 
 pub fn benchmark_natural_sub_mul_u32_ref_algorithms(
@@ -149,23 +134,24 @@ pub fn benchmark_natural_sub_mul_u32_ref_algorithms(
     limit: usize,
     file_name: &str,
 ) {
-    println!(
-        "benchmarking {} (&Natural).sub_mul(&Natural, u32) algorithms",
-        gm.name()
-    );
-    benchmark_2(BenchmarkOptions2 {
-        xs: triples_of_natural_natural_and_unsigned::<u32>(gm),
-        function_f: &mut (|(a, b, c): (Natural, Natural, u32)| (&a).sub_mul(&b, c)),
-        function_g: &mut (|(a, b, c): (Natural, Natural, u32)| &a - &(&b * c)),
-        x_cons: &(|t| t.clone()),
-        y_cons: &(|t| t.clone()),
-        x_param: &(|&(ref a, ref b, _)| max(a.significant_bits(), b.significant_bits()) as usize),
+    m_run_benchmark(
+        "(&Natural).sub_mul(&Natural, u32)",
+        BenchmarkType::Algorithms,
+        triples_of_natural_natural_and_unsigned::<u32>(gm),
+        gm.name(),
         limit,
-        f_name: "(&Natural).sub_mul(&Natural, u32)",
-        g_name: "(&Natural) - &Natural * u32",
-        title: "(&Natural).sub_mul(&Natural, u32) algorithms",
-        x_axis_label: "max(a.significant_bits(), b.significant_bits())",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+        file_name,
+        &(|&(ref a, ref b, _)| max(a.significant_bits(), b.significant_bits()) as usize),
+        "max(a.significant_bits(), b.significant_bits())",
+        &[
+            (
+                "(&Natural).sub_mul(&Natural, u32)",
+                &mut (|(a, b, c)| no_out!((&a).sub_mul(&b, c))),
+            ),
+            (
+                "&Natural - &(&Natural * u32)",
+                &mut (|(a, b, c)| no_out!(&a - &(&b * c))),
+            ),
+        ],
+    );
 }
