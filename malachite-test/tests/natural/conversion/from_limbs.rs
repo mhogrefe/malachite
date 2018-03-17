@@ -52,7 +52,7 @@ fn test_from_limbs_desc() {
 
 #[test]
 fn from_limbs_asc_properties() {
-    test_properties(vecs_of_unsigned, |limbs: &Vec<u32>| {
+    test_properties(vecs_of_unsigned, |limbs| {
         let x = Natural::from_limbs_asc(limbs);
         assert!(x.is_valid());
         assert_eq!(Natural::from_owned_limbs_asc(limbs.clone()), x);
@@ -77,7 +77,7 @@ fn from_limbs_asc_properties() {
 
 #[test]
 fn from_limbs_desc_properties() {
-    test_properties(vecs_of_unsigned, |limbs: &Vec<u32>| {
+    test_properties(vecs_of_unsigned, |limbs| {
         let x = Natural::from_limbs_desc(limbs);
         assert!(x.is_valid());
         assert_eq!(Natural::from_owned_limbs_desc(limbs.clone()), x);

@@ -3,7 +3,7 @@ use malachite_base::num::Zero;
 use malachite_nz::natural::Natural;
 use malachite_test::inputs::base::small_usizes;
 use malachite_test::inputs::natural::{naturals, pairs_of_natural_and_small_usize,
-                                      pairs_of_natural_and_vec_of_bool_var};
+                                      pairs_of_natural_and_vec_of_bool_var_1};
 use std::str::FromStr;
 use std::u32;
 
@@ -82,10 +82,6 @@ fn to_limbs_asc_properties() {
         assert_eq!(x.clone().into_limbs_asc(), limbs);
         assert_eq!(x.limbs().collect::<Vec<u32>>(), limbs);
         assert_eq!(Natural::from_limbs_asc(&limbs), *x);
-        assert_eq!(
-            x.to_limbs_desc(),
-            limbs.iter().cloned().rev().collect::<Vec<u32>>()
-        );
         if *x != 0 {
             assert_ne!(*limbs.last().unwrap(), 0);
         }
@@ -99,10 +95,6 @@ fn to_limbs_desc_properties() {
         assert_eq!(x.clone().into_limbs_desc(), limbs);
         assert_eq!(x.limbs().rev().collect::<Vec<u32>>(), limbs);
         assert_eq!(Natural::from_limbs_desc(&limbs), *x);
-        assert_eq!(
-            x.to_limbs_asc(),
-            limbs.iter().cloned().rev().collect::<Vec<u32>>()
-        );
         if *x != 0 {
             assert_ne!(limbs[0], 0);
         }
@@ -116,18 +108,25 @@ fn limbs_properties() {
         assert_eq!(n.limbs().size_hint(), (limb_count, Some(limb_count)));
     });
 
-    test_properties(pairs_of_natural_and_vec_of_bool_var, |&(ref n, ref bs)| {
-        let mut limbs = n.limbs();
-        for &b in bs {
-            if b {
-                assert!(limbs.next().is_some());
-            } else {
-                assert!(limbs.next_back().is_some());
+    test_properties(
+        pairs_of_natural_and_vec_of_bool_var_1,
+        |&(ref n, ref bs)| {
+            let mut limbs = n.limbs();
+            let mut limb_vec = Vec::new();
+            let mut i = 0;
+            for &b in bs {
+                if b {
+                    limb_vec.insert(i, limbs.next().unwrap());
+                    i += 1;
+                } else {
+                    limb_vec.insert(i, limbs.next_back().unwrap())
+                }
             }
-        }
-        assert!(limbs.next().is_none());
-        assert!(limbs.next_back().is_none());
-    });
+            assert!(limbs.next().is_none());
+            assert!(limbs.next_back().is_none());
+            assert_eq!(n.to_limbs_asc(), limb_vec);
+        },
+    );
 
     test_properties(pairs_of_natural_and_small_usize, |&(ref n, u)| {
         if u < n.limb_count() as usize {

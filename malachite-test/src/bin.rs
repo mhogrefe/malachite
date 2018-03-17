@@ -125,10 +125,12 @@ use malachite_test::natural::comparison::partial_ord_u32::*;
 use malachite_test::natural::conversion::assign_u32::*;
 use malachite_test::natural::conversion::assign_u64::*;
 use malachite_test::natural::conversion::clone_and_assign::*;
+use malachite_test::natural::conversion::from_bits::*;
 use malachite_test::natural::conversion::from_limbs::*;
 use malachite_test::natural::conversion::from_u32::*;
 use malachite_test::natural::conversion::from_u64::*;
 use malachite_test::natural::conversion::serde::*;
+use malachite_test::natural::conversion::to_bits::*;
 use malachite_test::natural::conversion::to_integer::*;
 use malachite_test::natural::conversion::to_limbs::*;
 use malachite_test::natural::conversion::to_u32::*;
@@ -355,6 +357,8 @@ demos_and_benchmarks!(
     ],
     [
         demo_contiguous_range_to_char,
+        demo_limbs_asc_from_bits_asc,
+        demo_limbs_asc_from_bits_desc,
         demo_limbs_ceiling_log_two,
         demo_limbs_delete_left,
         demo_limbs_floor_log_two,
@@ -679,6 +683,9 @@ demos_and_benchmarks!(
         demo_natural_assign_u32,
         demo_natural_assign_u64,
         demo_natural_assign_bit,
+        demo_natural_bits,
+        demo_natural_bits_rev,
+        demo_natural_bits_size_hint,
         demo_natural_ceiling_log_two,
         demo_natural_clear_bit,
         demo_natural_clone,
@@ -689,6 +696,8 @@ demos_and_benchmarks!(
         demo_natural_eq,
         demo_natural_flip_bit,
         demo_natural_floor_log_two,
+        demo_natural_from_bits_asc,
+        demo_natural_from_bits_desc,
         demo_natural_from_limbs_asc,
         demo_natural_from_limbs_desc,
         demo_natural_from_owned_limbs_asc,
@@ -776,6 +785,8 @@ demos_and_benchmarks!(
         demo_natural_sub_mul_u32,
         demo_natural_sub_mul_u32_ref,
         demo_natural_into_integer,
+        demo_natural_to_bits_asc,
+        demo_natural_to_bits_desc,
         demo_natural_to_integer,
         demo_natural_to_limbs_asc,
         demo_natural_to_limbs_desc,
@@ -893,6 +904,8 @@ demos_and_benchmarks!(
     ],
     [],
     [
+        benchmark_limbs_asc_from_bits_asc,
+        benchmark_limbs_asc_from_bits_desc,
         benchmark_limbs_ceiling_log_two,
         benchmark_limbs_delete_left,
         benchmark_limbs_floor_log_two,
@@ -1125,6 +1138,9 @@ demos_and_benchmarks!(
         benchmark_natural_assign_u32,
         benchmark_natural_assign_u64,
         benchmark_natural_assign_bit,
+        benchmark_natural_bits_evaluation_strategy,
+        benchmark_natural_bits_rev_evaluation_strategy,
+        benchmark_natural_bits_size_hint,
         benchmark_natural_ceiling_log_two,
         benchmark_natural_clear_bit,
         benchmark_natural_clone_from,
@@ -1132,6 +1148,8 @@ demos_and_benchmarks!(
         benchmark_natural_divisible_by_power_of_two_algorithms,
         benchmark_natural_flip_bit,
         benchmark_natural_floor_log_two,
+        benchmark_natural_from_bits_asc,
+        benchmark_natural_from_bits_desc,
         benchmark_natural_get_bit,
         benchmark_natural_increment,
         benchmark_natural_is_even,

@@ -23,7 +23,8 @@ use rust_wheels::iterators::tuples::{exhaustive_pairs, exhaustive_pairs_from_sin
                                      lex_triples, log_pairs, random_pairs,
                                      random_pairs_from_single, random_triples,
                                      random_triples_from_single, sqrt_pairs};
-use rust_wheels::iterators::vecs::{exhaustive_vecs, random_vecs, special_random_unsigned_vecs};
+use rust_wheels::iterators::vecs::{exhaustive_vecs, random_vecs, special_random_bool_vecs,
+                                   special_random_unsigned_vecs};
 use std::char;
 use std::cmp::Ordering;
 
@@ -641,5 +642,18 @@ pub fn pairs_of_unsigned_vec_and_unsigned<T: 'static + PrimitiveUnsigned>(
             &(|seed| special_random_unsigned_vecs(seed, scale)),
             &(|seed| special_random_unsigned(seed)),
         )),
+    }
+}
+
+pub fn vecs_of_bool(gm: GenerationMode) -> Box<Iterator<Item = Vec<bool>>> {
+    match gm {
+        //TODO shortlex would be better
+        GenerationMode::Exhaustive => Box::new(exhaustive_vecs(exhaustive_bools())),
+        GenerationMode::Random(scale) => {
+            Box::new(random_vecs(&EXAMPLE_SEED, scale, &(|seed| random(seed))))
+        }
+        GenerationMode::SpecialRandom(scale) => {
+            Box::new(special_random_bool_vecs(&EXAMPLE_SEED, scale))
+        }
     }
 }

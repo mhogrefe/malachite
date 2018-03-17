@@ -1,6 +1,6 @@
 use common::{natural_to_biguint, natural_to_rug_integer, GenerationMode};
 use inputs::common::{reshape_1_2_to_3, reshape_2_1_to_3};
-use malachite_base::num::{PrimitiveInteger, PrimitiveSigned, PrimitiveUnsigned};
+use malachite_base::num::{PrimitiveInteger, PrimitiveSigned, PrimitiveUnsigned, SignificantBits};
 use malachite_base::round::RoundingMode;
 use malachite_nz::natural::Natural;
 use num::BigUint;
@@ -535,12 +535,12 @@ pub fn triples_of_natural_small_u32_and_rounding_mode_var_1(
     )
 }
 
-struct RandomNaturalAndVecOfBoolVar {
+struct RandomNaturalAndVecOfBoolVar1 {
     naturals: Box<Iterator<Item = Natural>>,
     rng: Box<IsaacRng>,
 }
 
-impl Iterator for RandomNaturalAndVecOfBoolVar {
+impl Iterator for RandomNaturalAndVecOfBoolVar1 {
     type Item = (Natural, Vec<bool>);
 
     fn next(&mut self) -> Option<(Natural, Vec<bool>)> {
@@ -553,29 +553,29 @@ impl Iterator for RandomNaturalAndVecOfBoolVar {
     }
 }
 
-fn random_pairs_of_natural_and_vec_of_bool_var(
+fn random_pairs_of_natural_and_vec_of_bool_var_1(
     seed: &[u32],
     scale: u32,
-) -> RandomNaturalAndVecOfBoolVar {
-    RandomNaturalAndVecOfBoolVar {
+) -> RandomNaturalAndVecOfBoolVar1 {
+    RandomNaturalAndVecOfBoolVar1 {
         naturals: Box::new(random_naturals(&scramble(seed, "naturals"), scale)),
         rng: Box::new(IsaacRng::from_seed(&scramble(seed, "bools"))),
     }
 }
 
-fn special_random_pairs_of_natural_and_vec_of_bool_var(
+fn special_random_pairs_of_natural_and_vec_of_bool_var_1(
     seed: &[u32],
     scale: u32,
-) -> RandomNaturalAndVecOfBoolVar {
-    RandomNaturalAndVecOfBoolVar {
+) -> RandomNaturalAndVecOfBoolVar1 {
+    RandomNaturalAndVecOfBoolVar1 {
         naturals: Box::new(special_random_naturals(&scramble(seed, "naturals"), scale)),
         rng: Box::new(IsaacRng::from_seed(&scramble(seed, "bools"))),
     }
 }
 
 // All pairs of `Natural` and `Vec<bool>` where the length of the `Vec` is equal to the limb count
-// of the natural.
-pub fn pairs_of_natural_and_vec_of_bool_var(
+// of the `Natural`.
+pub fn pairs_of_natural_and_vec_of_bool_var_1(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (Natural, Vec<bool>)>> {
     match gm {
@@ -585,12 +585,72 @@ pub fn pairs_of_natural_and_vec_of_bool_var(
             };
             Box::new(dependent_pairs(exhaustive_naturals(), f))
         }
-        GenerationMode::Random(scale) => Box::new(random_pairs_of_natural_and_vec_of_bool_var(
+        GenerationMode::Random(scale) => Box::new(random_pairs_of_natural_and_vec_of_bool_var_1(
             &EXAMPLE_SEED,
             scale,
         )),
         GenerationMode::SpecialRandom(scale) => Box::new(
-            special_random_pairs_of_natural_and_vec_of_bool_var(&EXAMPLE_SEED, scale),
+            special_random_pairs_of_natural_and_vec_of_bool_var_1(&EXAMPLE_SEED, scale),
+        ),
+    }
+}
+
+struct RandomNaturalAndVecOfBoolVar2 {
+    naturals: Box<Iterator<Item = Natural>>,
+    rng: Box<IsaacRng>,
+}
+
+impl Iterator for RandomNaturalAndVecOfBoolVar2 {
+    type Item = (Natural, Vec<bool>);
+
+    fn next(&mut self) -> Option<(Natural, Vec<bool>)> {
+        let n = self.naturals.next().unwrap();
+        let mut bools = Vec::new();
+        for _ in 0..n.significant_bits() {
+            bools.push(self.rng.gen::<bool>());
+        }
+        Some((n, bools))
+    }
+}
+
+fn random_pairs_of_natural_and_vec_of_bool_var_2(
+    seed: &[u32],
+    scale: u32,
+) -> RandomNaturalAndVecOfBoolVar2 {
+    RandomNaturalAndVecOfBoolVar2 {
+        naturals: Box::new(random_naturals(&scramble(seed, "naturals"), scale)),
+        rng: Box::new(IsaacRng::from_seed(&scramble(seed, "bools"))),
+    }
+}
+
+fn special_random_pairs_of_natural_and_vec_of_bool_var_2(
+    seed: &[u32],
+    scale: u32,
+) -> RandomNaturalAndVecOfBoolVar2 {
+    RandomNaturalAndVecOfBoolVar2 {
+        naturals: Box::new(special_random_naturals(&scramble(seed, "naturals"), scale)),
+        rng: Box::new(IsaacRng::from_seed(&scramble(seed, "bools"))),
+    }
+}
+
+// All pairs of `Natural` and `Vec<bool>` where the length of the `Vec` is equal to the significant
+// bit count of the `Natural`.
+pub fn pairs_of_natural_and_vec_of_bool_var_2(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (Natural, Vec<bool>)>> {
+    match gm {
+        GenerationMode::Exhaustive => {
+            let f = move |n: &Natural| {
+                exhaustive_fixed_size_vecs_from_single(n.significant_bits(), exhaustive_bools())
+            };
+            Box::new(dependent_pairs(exhaustive_naturals(), f))
+        }
+        GenerationMode::Random(scale) => Box::new(random_pairs_of_natural_and_vec_of_bool_var_2(
+            &EXAMPLE_SEED,
+            scale,
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(
+            special_random_pairs_of_natural_and_vec_of_bool_var_2(&EXAMPLE_SEED, scale),
         ),
     }
 }

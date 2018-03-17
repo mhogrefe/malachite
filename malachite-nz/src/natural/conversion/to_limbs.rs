@@ -7,16 +7,17 @@ use std::ops::Index;
 /// This struct also supports retrieving limbs by index. This functionality is completely
 /// independent of the iterator's state. Indexing the implicit leading zero limbs is allowed.
 pub struct LimbIterator<'a> {
-    n: &'a Natural,
+    pub(crate) n: &'a Natural,
     limb_count: usize,
-    // This is true iff `n` is nonzero and `i` and `j` are not yet equal. The iterator returns `Some
+    // This is true iff `n` is nonzero and `i` and `j` are not yet equal. The iterator returns
+    // `Some` iff this is true.
     some_remaining: bool,
     // If `n` is nonzero, this index initially points to the least-significant limb, and is
     // incremented by next().
-    i: u64,
+    pub(crate) i: u64,
     // If `n` is nonzero, this index initially points to the most-significant limb, and is
     // decremented by next_back().
-    j: u64,
+    pub(crate) j: u64,
 }
 
 impl<'a> Iterator for LimbIterator<'a> {
@@ -340,7 +341,7 @@ impl Natural {
     /// There are no trailing zero limbs going forward, or leading zeros going backward.
     ///
     /// If it's necessary to get a `Vec` of all the limbs, consider using `to_limbs_asc`,
-    /// `to_limbs_desc`, `into_limbs_asc`, or `into_limbs_asc` instead.
+    /// `to_limbs_desc`, `into_limbs_asc`, or `into_limbs_desc` instead.
     ///
     /// Time: worst case O(1)
     ///
