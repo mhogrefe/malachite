@@ -33,7 +33,7 @@ pub fn benchmark_integer_not_assign(gm: GenerationMode, limit: usize, file_name:
         file_name,
         &(|n| n.significant_bits() as usize),
         "n.significant_bits()",
-        &[("malachite", &mut (|mut n| n.not_assign()))],
+        &mut [("malachite", &mut (|mut n| n.not_assign()))],
     );
 }
 
@@ -47,7 +47,7 @@ pub fn benchmark_integer_not_library_comparison(gm: GenerationMode, limit: usize
         file_name,
         &(|&(_, ref n)| n.significant_bits() as usize),
         "n.significant_bits()",
-        &[
+        &mut [
             ("malachite", &mut (|(_, n)| no_out!(!n))),
             ("rug", &mut (|(n, _)| no_out!(!n))),
         ],
@@ -68,7 +68,7 @@ pub fn benchmark_integer_not_evaluation_strategy(
         file_name,
         &(|n| n.significant_bits() as usize),
         "n.significant_bits()",
-        &[
+        &mut [
             ("!Integer", &mut (|n| no_out!(!n))),
             ("!&Integer", &mut (|n| no_out!(!&n))),
         ],

@@ -66,7 +66,7 @@ pub fn benchmark_natural_sub_assign_u32_library_comparison(
         file_name,
         &(|&(_, (ref n, _))| n.significant_bits() as usize),
         "n.significant_bits()",
-        &[
+        &mut [
             ("malachite", &mut (|(_, (mut x, y))| x -= y)),
             ("rug", &mut (|((mut x, y), _)| x -= y)),
         ],
@@ -87,7 +87,7 @@ pub fn benchmark_natural_sub_u32_library_comparison(
         file_name,
         &(|&(_, _, (ref n, _))| n.significant_bits() as usize),
         "n.significant_bits()",
-        &[
+        &mut [
             ("malachite", &mut (|(_, _, (x, y))| no_out!(x - y))),
             ("num", &mut (|((x, y), _, _)| no_out!(num_sub_u32(x, y)))),
             ("rug", &mut (|(_, (x, y), _)| no_out!(x - y))),
@@ -109,7 +109,7 @@ pub fn benchmark_natural_sub_u32_evaluation_strategy(
         file_name,
         &(|&(ref n, _)| n.significant_bits() as usize),
         "n.significant_bits()",
-        &[
+        &mut [
             ("Integer - u32", &mut (|(x, y)| no_out!(x - y))),
             ("&Integer - u32", &mut (|(x, y)| no_out!(&x - y))),
         ],
@@ -130,7 +130,7 @@ pub fn benchmark_u32_sub_natural_library_comparison(
         file_name,
         &(|&(_, (_, ref n))| n.significant_bits() as usize),
         "n.significant_bits()",
-        &[
+        &mut [
             ("malachite", &mut (|(_, (x, y))| no_out!(x - &y))),
             ("rug", &mut (|((x, y), _)| no_out!(x - y))),
         ],

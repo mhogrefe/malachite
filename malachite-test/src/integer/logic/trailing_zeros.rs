@@ -18,6 +18,6 @@ pub fn benchmark_integer_trailing_zeros(gm: GenerationMode, limit: usize, file_n
         file_name,
         &(|n| n.significant_bits() as usize),
         "n.significant_bits()",
-        &[("malachite", &mut (|n| no_out!(n.trailing_zeros())))],
+        &mut [("malachite", &mut (|n| no_out!(n.trailing_zeros())))],
     );
 }

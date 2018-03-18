@@ -117,7 +117,7 @@ pub fn benchmark_integer_mod_power_of_two_assign(
         file_name,
         &(|&(_, index)| index as usize),
         "index",
-        &[
+        &mut [
             (
                 "malachite",
                 &mut (|(mut n, u)| n.mod_power_of_two_assign(u)),
@@ -140,7 +140,7 @@ pub fn benchmark_integer_mod_power_of_two_evaluation_strategy(
         file_name,
         &(|&(_, index)| index as usize),
         "index",
-        &[
+        &mut [
             (
                 "Integer.mod_power_of_two(u32)",
                 &mut (|(n, u)| no_out!(n.mod_power_of_two(u))),
@@ -167,7 +167,7 @@ pub fn benchmark_integer_rem_power_of_two_assign(
         file_name,
         &(|&(_, index)| index as usize),
         "index",
-        &[
+        &mut [
             (
                 "malachite",
                 &mut (|(mut n, u)| n.rem_power_of_two_assign(u)),
@@ -190,7 +190,7 @@ pub fn benchmark_integer_rem_power_of_two_evaluation_strategy(
         file_name,
         &(|&(_, index)| index as usize),
         "index",
-        &[
+        &mut [
             (
                 "Integer.rem_power_of_two(u32)",
                 &mut (|(n, u)| no_out!(n.rem_power_of_two(u))),
@@ -217,7 +217,7 @@ pub fn benchmark_integer_ceiling_mod_power_of_two_assign(
         file_name,
         &(|&(_, index)| index as usize),
         "index",
-        &[
+        &mut [
             (
                 "malachite",
                 &mut (|(mut n, u)| n.ceiling_mod_power_of_two_assign(u)),
@@ -240,7 +240,7 @@ pub fn benchmark_integer_ceiling_mod_power_of_two_evaluation_strategy(
         file_name,
         &(|&(_, index)| index as usize),
         "index",
-        &[
+        &mut [
             (
                 "Integer.ceiling_mod_power_of_two(u32)",
                 &mut (|(n, u)| no_out!(n.ceiling_mod_power_of_two(u))),

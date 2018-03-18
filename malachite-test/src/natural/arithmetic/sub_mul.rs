@@ -62,7 +62,7 @@ pub fn benchmark_natural_sub_mul_assign(gm: GenerationMode, limit: usize, file_n
         file_name,
         &bucketing_function,
         BUCKETING_LABEL,
-        &[
+        &mut [
             (
                 "Natural.sub_mul_assign(&Natural, &Natural)",
                 &mut (|(mut a, b, c)| a.sub_mul_assign(&b, &c)),
@@ -85,7 +85,7 @@ pub fn benchmark_natural_sub_mul_assign_algorithms(
         file_name,
         &bucketing_function,
         BUCKETING_LABEL,
-        &[
+        &mut [
             (
                 "Natural.sub_mul_assign(&Natural, &Natural)",
                 &mut (|(mut a, b, c)| a.sub_mul_assign(&b, &c)),
@@ -112,7 +112,7 @@ pub fn benchmark_natural_sub_mul_evaluation_strategy(
         file_name,
         &bucketing_function,
         BUCKETING_LABEL,
-        &[
+        &mut [
             (
                 "Natural.sub_mul(&Natural, &Natural)",
                 &mut (|(a, b, c)| no_out!(a.sub_mul(&b, &c))),
@@ -135,7 +135,7 @@ pub fn benchmark_natural_sub_mul_algorithms(gm: GenerationMode, limit: usize, fi
         file_name,
         &bucketing_function,
         BUCKETING_LABEL,
-        &[
+        &mut [
             (
                 "Natural.sub_mul(&Natural, &Natural)",
                 &mut (|(a, b, c)| no_out!(a.sub_mul(&b, &c))),
@@ -158,7 +158,7 @@ pub fn benchmark_natural_sub_mul_ref_algorithms(gm: GenerationMode, limit: usize
         file_name,
         &bucketing_function,
         BUCKETING_LABEL,
-        &[
+        &mut [
             (
                 "(&Natural).sub_mul(&Natural, &Natural)",
                 &mut (|(a, b, c)| no_out!((&a).sub_mul(&b, &c))),

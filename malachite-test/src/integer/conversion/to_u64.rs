@@ -24,7 +24,7 @@ pub fn benchmark_integer_to_u64(gm: GenerationMode, limit: usize, file_name: &st
         file_name,
         &(|n| n.significant_bits() as usize),
         "n.significant_bits()",
-        &[("malachite", &mut (|n| no_out!(n.to_u64())))],
+        &mut [("malachite", &mut (|n| no_out!(n.to_u64())))],
     );
 }
 
@@ -38,6 +38,6 @@ pub fn benchmark_integer_to_u64_wrapping(gm: GenerationMode, limit: usize, file_
         file_name,
         &(|n| n.significant_bits() as usize),
         "n.significant_bits()",
-        &[("malachite", &mut (|n| no_out!(n.to_u64_wrapping())))],
+        &mut [("malachite", &mut (|n| no_out!(n.to_u64_wrapping())))],
     );
 }

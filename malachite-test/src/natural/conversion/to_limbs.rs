@@ -69,7 +69,7 @@ pub fn benchmark_natural_limbs_evaluation_strategy(
         file_name,
         &(|n| n.significant_bits() as usize),
         "n.significant_bits()",
-        &[
+        &mut [
             (
                 "Natural.to_limbs_asc()",
                 &mut (|n| no_out!(n.to_limbs_asc())),
@@ -101,7 +101,7 @@ pub fn benchmark_natural_limbs_rev_evaluation_strategy(
         file_name,
         &(|n| n.significant_bits() as usize),
         "n.significant_bits()",
-        &[
+        &mut [
             (
                 "Natural.to_limbs_desc()",
                 &mut (|n| no_out!(n.to_limbs_desc())),
@@ -128,7 +128,7 @@ pub fn benchmark_natural_limbs_size_hint(gm: GenerationMode, limit: usize, file_
         file_name,
         &(|n| n.significant_bits() as usize),
         "n.significant_bits()",
-        &[
+        &mut [
             (
                 "Natural.limbs().size_hint()",
                 &mut (|n| no_out!(n.limbs().size_hint())),
@@ -147,7 +147,7 @@ pub fn benchmark_natural_limbs_index_algorithms(gm: GenerationMode, limit: usize
         file_name,
         &(|&(ref n, _)| n.significant_bits() as usize),
         "n.significant_bits()",
-        &[
+        &mut [
             ("Natural.limbs()[u]", &mut (|(n, u)| no_out!(n.limbs()[u]))),
             (
                 "Natural.into_limbs_asc()[u]",

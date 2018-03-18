@@ -36,7 +36,7 @@ pub fn benchmark_integer_from_twos_complement_limbs_asc(
         file_name,
         &(|xs| xs.len()),
         "limbs.len()",
-        &[
+        &mut [
             (
                 "malachite",
                 &mut (|ref limbs| no_out!(Integer::from_twos_complement_limbs_asc(limbs))),
@@ -59,7 +59,7 @@ pub fn benchmark_integer_from_twos_complement_limbs_desc(
         file_name,
         &(|xs| xs.len()),
         "limbs.len()",
-        &[
+        &mut [
             (
                 "malachite",
                 &mut (|ref limbs| no_out!(Integer::from_twos_complement_limbs_desc(limbs))),

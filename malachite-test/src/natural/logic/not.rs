@@ -1,8 +1,6 @@
-use common::GenerationMode;
-use inputs::natural::naturals;
+use common::{m_run_benchmark, BenchmarkType, GenerationMode};
+use inputs::natural::{naturals, rm_naturals};
 use malachite_base::num::SignificantBits;
-use malachite_nz::natural::Natural;
-use rust_wheels::benchmarks::{BenchmarkOptions1, BenchmarkOptions2, benchmark_1, benchmark_2};
 
 pub fn demo_natural_not(gm: GenerationMode, limit: usize) {
     for n in naturals(gm).take(limit) {
@@ -16,20 +14,21 @@ pub fn demo_natural_not_ref(gm: GenerationMode, limit: usize) {
     }
 }
 
-pub fn benchmark_natural_not(gm: GenerationMode, limit: usize, file_name: &str) {
-    println!("benchmarking {} !Natural", gm.name());
-    benchmark_1(BenchmarkOptions1 {
-        xs: naturals(gm),
-        function_f: &mut (|n: Natural| !n),
-        x_cons: &(|x| x.clone()),
-        x_param: &(|n| n.significant_bits() as usize),
+pub fn benchmark_natural_not_library_comparison(gm: GenerationMode, limit: usize, file_name: &str) {
+    m_run_benchmark(
+        "!Natural",
+        BenchmarkType::LibraryComparison,
+        rm_naturals(gm),
+        gm.name(),
         limit,
-        f_name: "malachite",
-        title: "-Natural",
-        x_axis_label: "n.significant_bits()",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+        file_name,
+        &(|&(_, ref n)| n.significant_bits() as usize),
+        "n.significant_bits()",
+        &mut [
+            ("malachite", &mut (|(_, n)| no_out!(!n))),
+            ("rug", &mut (|(n, _)| no_out!(!n))),
+        ],
+    );
 }
 
 pub fn benchmark_natural_not_evaluation_strategy(
@@ -37,20 +36,18 @@ pub fn benchmark_natural_not_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    println!("benchmarking {} !Natural evaluation strategy", gm.name());
-    benchmark_2(BenchmarkOptions2 {
-        xs: naturals(gm),
-        function_f: &mut (|n: Natural| !n),
-        function_g: &mut (|n: Natural| !&n),
-        x_cons: &(|x| x.clone()),
-        y_cons: &(|x| x.clone()),
-        x_param: &(|n| n.significant_bits() as usize),
+    m_run_benchmark(
+        "!Natural",
+        BenchmarkType::EvaluationStrategy,
+        naturals(gm),
+        gm.name(),
         limit,
-        f_name: "-Natural",
-        g_name: "-&Natural",
-        title: "-Natural evaluation strategy",
-        x_axis_label: "n.significant_bits()",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+        file_name,
+        &(|n| n.significant_bits() as usize),
+        "n.significant_bits()",
+        &mut [
+            ("-Natural", &mut (|n| no_out!(!n))),
+            ("-&Natural", &mut (|n| no_out!(!&n))),
+        ],
+    );
 }

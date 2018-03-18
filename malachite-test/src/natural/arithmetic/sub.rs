@@ -48,7 +48,7 @@ pub fn benchmark_natural_sub_assign_library_comparison(
         file_name,
         &(|&(_, (ref x, ref y))| max(x.significant_bits(), y.significant_bits()) as usize),
         "max(x.significant_bits(), y.significant_bits())",
-        &[
+        &mut [
             ("malachite", &mut (|(_, (mut x, y))| x -= &y)),
             ("rug", &mut (|((mut x, y), _)| x -= &y)),
         ],
@@ -65,7 +65,7 @@ pub fn benchmark_natural_sub_library_comparison(gm: GenerationMode, limit: usize
         file_name,
         &(|&(_, _, (ref x, ref y))| max(x.significant_bits(), y.significant_bits()) as usize),
         "max(x.significant_bits(), y.significant_bits())",
-        &[
+        &mut [
             ("malachite", &mut (|(_, _, (x, y))| no_out!(x - &y))),
             ("num", &mut (|((x, y), _, _)| no_out!(checked_sub(x, y)))),
             ("rug", &mut (|(_, (x, y), _)| no_out!(checked_sub(x, y)))),
@@ -87,7 +87,7 @@ pub fn benchmark_natural_sub_evaluation_strategy(
         file_name,
         &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),
         "max(x.significant_bits(), y.significant_bits())",
-        &[
+        &mut [
             ("Natural - &Natural", &mut (|(x, y)| no_out!(x - &y))),
             ("&Natural - &Natural", &mut (|(x, y)| no_out!(&x - &y))),
         ],

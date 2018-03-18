@@ -1,9 +1,6 @@
-use common::{natural_to_rug_integer, GenerationMode};
-use inputs::natural::naturals;
+use common::{m_run_benchmark, BenchmarkType, GenerationMode};
+use inputs::natural::{naturals, rm_naturals};
 use malachite_base::num::SignificantBits;
-use malachite_nz::natural::Natural;
-use rug;
-use rust_wheels::benchmarks::{BenchmarkOptions2, benchmark_2};
 
 pub fn demo_natural_to_u32(gm: GenerationMode, limit: usize) {
     for n in naturals(gm).take(limit) {
@@ -18,39 +15,35 @@ pub fn demo_natural_to_u32_wrapping(gm: GenerationMode, limit: usize) {
 }
 
 pub fn benchmark_natural_to_u32(gm: GenerationMode, limit: usize, file_name: &str) {
-    println!("benchmarking {} Natural.to_u32()", gm.name());
-    benchmark_2(BenchmarkOptions2 {
-        xs: naturals(gm),
-        function_f: &mut (|n: Natural| n.to_u32()),
-        function_g: &mut (|n: rug::Integer| n.to_u32()),
-        x_cons: &(|x| x.clone()),
-        y_cons: &(|x| natural_to_rug_integer(x)),
-        x_param: &(|n| n.significant_bits() as usize),
+    m_run_benchmark(
+        "Natural.to_u32()",
+        BenchmarkType::LibraryComparison,
+        rm_naturals(gm),
+        gm.name(),
         limit,
-        f_name: "malachite",
-        g_name: "rug",
-        title: "Natural.to_u32()",
-        x_axis_label: "n.significant_bits()",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+        file_name,
+        &(|&(_, ref n)| n.significant_bits() as usize),
+        "n.significant_bits()",
+        &mut [
+            ("malachite", &mut (|(_, n)| no_out!(n.to_u32()))),
+            ("rug", &mut (|(n, _)| no_out!(n.to_u32()))),
+        ],
+    );
 }
 
 pub fn benchmark_natural_to_u32_wrapping(gm: GenerationMode, limit: usize, file_name: &str) {
-    println!("benchmarking {} Natural.to_u32_wrapping()", gm.name());
-    benchmark_2(BenchmarkOptions2 {
-        xs: naturals(gm),
-        function_f: &mut (|n: Natural| n.to_u32_wrapping()),
-        function_g: &mut (|n: rug::Integer| n.to_u32_wrapping()),
-        x_cons: &(|x| x.clone()),
-        y_cons: &(|x| natural_to_rug_integer(x)),
-        x_param: &(|n| n.significant_bits() as usize),
+    m_run_benchmark(
+        "Natural.to_u32_wrapping()",
+        BenchmarkType::LibraryComparison,
+        rm_naturals(gm),
+        gm.name(),
         limit,
-        f_name: "malachite",
-        g_name: "rug",
-        title: "Natural.to_u32_wrapping()",
-        x_axis_label: "n.significant_bits()",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+        file_name,
+        &(|&(_, ref n)| n.significant_bits() as usize),
+        "n.significant_bits()",
+        &mut [
+            ("malachite", &mut (|(_, n)| no_out!(n.to_u32_wrapping()))),
+            ("rug", &mut (|(n, _)| no_out!(n.to_u32_wrapping()))),
+        ],
+    );
 }

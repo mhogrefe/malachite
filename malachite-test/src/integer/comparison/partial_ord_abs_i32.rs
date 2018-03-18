@@ -34,7 +34,7 @@ pub fn benchmark_integer_partial_cmp_abs_i32(gm: GenerationMode, limit: usize, f
         file_name,
         &(|&(ref n, _)| n.significant_bits() as usize),
         "n.significant_bits()",
-        &[
+        &mut [
             ("malachite", &mut (|(x, y)| no_out!(x.partial_cmp_abs(&y)))),
         ],
     );
@@ -50,7 +50,7 @@ pub fn benchmark_i32_partial_cmp_abs_integer(gm: GenerationMode, limit: usize, f
         file_name,
         &(|&(_, ref n)| n.significant_bits() as usize),
         "n.significant_bits()",
-        &[
+        &mut [
             ("malachite", &mut (|(x, y)| no_out!(x.partial_cmp_abs(&y)))),
         ],
     );

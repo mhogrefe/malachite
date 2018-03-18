@@ -36,7 +36,7 @@ pub fn benchmark_integer_assign_natural_library_comparison(
         file_name,
         &(|&(_, (ref x, ref y))| max(x.significant_bits(), y.significant_bits()) as usize),
         "max(x.significant_bits(), y.significant_bits())",
-        &[
+        &mut [
             ("malachite", &mut (|(_, (mut x, y))| x.assign(y))),
             ("rug", &mut (|((mut x, y), _)| x.assign(y))),
         ],
@@ -57,7 +57,7 @@ pub fn benchmark_integer_assign_natural_evaluation_strategy(
         file_name,
         &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),
         "max(x.significant_bits(), y.significant_bits())",
-        &[
+        &mut [
             ("Integer.assign(Natural)", &mut (|(mut x, y)| x.assign(y))),
             ("Integer.assign(&Natural)", &mut (|(mut x, y)| x.assign(&y))),
         ],

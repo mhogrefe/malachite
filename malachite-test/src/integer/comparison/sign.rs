@@ -37,7 +37,7 @@ pub fn benchmark_integer_sign_library_comparison(
         file_name,
         &(|&(_, _, ref n)| n.significant_bits() as usize),
         "n.significant_bits()",
-        &[
+        &mut [
             ("malachite", &mut (|(_, _, n)| no_out!(n.sign()))),
             ("num", &mut (|(n, _, _)| no_out!(num_sign(&n)))),
             ("rug", &mut (|(_, n, _)| no_out!(n.cmp0()))),

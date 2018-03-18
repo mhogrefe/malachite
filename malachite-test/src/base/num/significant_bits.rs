@@ -31,7 +31,7 @@ fn benchmark_unsigned_significant_bits<T: 'static + PrimitiveUnsigned>(
         file_name,
         &(|&n| n.significant_bits() as usize),
         "index",
-        &[("malachite", &mut (|n| no_out!(n.significant_bits())))],
+        &mut [("malachite", &mut (|n| no_out!(n.significant_bits())))],
     );
 }
 
@@ -49,7 +49,7 @@ fn benchmark_signed_significant_bits<T: 'static + PrimitiveSigned>(
         file_name,
         &(|&n| n.significant_bits() as usize),
         "index",
-        &[("malachite", &mut (|n| no_out!(n.significant_bits())))],
+        &mut [("malachite", &mut (|n| no_out!(n.significant_bits())))],
     );
 }
 

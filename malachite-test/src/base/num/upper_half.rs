@@ -29,7 +29,7 @@ fn benchmark_unsigned_upper_half<T: 'static + PrimitiveUnsigned + SplitInHalf>(
         file_name,
         &(|&n| n.significant_bits() as usize),
         "n.significant_bits()",
-        &[("malachite", &mut (|n| no_out!(n.upper_half())))],
+        &mut [("malachite", &mut (|n| no_out!(n.upper_half())))],
     );
 }
 

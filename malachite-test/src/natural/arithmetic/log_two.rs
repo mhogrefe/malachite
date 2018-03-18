@@ -46,7 +46,7 @@ pub fn benchmark_limbs_floor_log_two(gm: GenerationMode, limit: usize, file_name
         file_name,
         &(|limbs| limbs.len()),
         "limbs.len()",
-        &[
+        &mut [
             (
                 "malachite",
                 &mut (|ref limbs| no_out!(limbs_floor_log_two(limbs))),
@@ -65,7 +65,7 @@ pub fn benchmark_limbs_ceiling_log_two(gm: GenerationMode, limit: usize, file_na
         file_name,
         &(|limbs| limbs.len()),
         "limbs.len()",
-        &[
+        &mut [
             (
                 "malachite",
                 &mut (|ref limbs| no_out!(limbs_ceiling_log_two(limbs))),
@@ -84,7 +84,7 @@ pub fn benchmark_natural_floor_log_two(gm: GenerationMode, limit: usize, file_na
         file_name,
         &(|n| n.significant_bits() as usize),
         "n.significant_bits()",
-        &[("malachite", &mut (|n| no_out!(n.floor_log_two())))],
+        &mut [("malachite", &mut (|n| no_out!(n.floor_log_two())))],
     );
 }
 
@@ -98,6 +98,6 @@ pub fn benchmark_natural_ceiling_log_two(gm: GenerationMode, limit: usize, file_
         file_name,
         &(|n| n.significant_bits() as usize),
         "n.significant_bits()",
-        &[("malachite", &mut (|n| no_out!(n.ceiling_log_two())))],
+        &mut [("malachite", &mut (|n| no_out!(n.ceiling_log_two())))],
     );
 }

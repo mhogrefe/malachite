@@ -21,6 +21,6 @@ pub fn benchmark_integer_increment(gm: GenerationMode, limit: usize, file_name: 
         file_name,
         &(|n| n.significant_bits() as usize),
         "n.significant_bits()",
-        &[("malachite", &mut (|mut n| n.increment()))],
+        &mut [("malachite", &mut (|mut n| n.increment()))],
     );
 }

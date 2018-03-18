@@ -32,7 +32,7 @@ fn benchmark_unsigned_flip_bit<T: 'static + PrimitiveUnsigned>(
         file_name,
         &(|&(_, index)| index as usize),
         "index",
-        &[("malachite", &mut (|(mut n, index)| n.flip_bit(index)))],
+        &mut [("malachite", &mut (|(mut n, index)| n.flip_bit(index)))],
     );
 }
 
@@ -50,7 +50,7 @@ fn benchmark_signed_flip_bit<T: 'static + PrimitiveSigned>(
         file_name,
         &(|&(_, index)| index as usize),
         "index",
-        &[("malachite", &mut (|(mut n, index)| n.flip_bit(index)))],
+        &mut [("malachite", &mut (|(mut n, index)| n.flip_bit(index)))],
     );
 }
 

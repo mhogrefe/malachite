@@ -80,7 +80,7 @@ pub fn benchmark_integer_add_mul_assign_i32_evaluation_strategy(
         file_name,
         &(|&(ref a, ref b, _)| max(a.significant_bits(), b.significant_bits()) as usize),
         "max(a.significant_bits(), b.significant_bits())",
-        &[
+        &mut [
             (
                 "Integer.add_mul_assign(Integer, i32)",
                 &mut (|(mut a, b, c)| a.add_mul_assign(b, c)),
@@ -107,7 +107,7 @@ pub fn benchmark_integer_add_mul_assign_i32_algorithms(
         file_name,
         &(|&(ref a, ref b, _)| max(a.significant_bits(), b.significant_bits()) as usize),
         "max(a.significant_bits(), b.significant_bits())",
-        &[
+        &mut [
             (
                 "Integer.add_mul_assign(Integer, i32)",
                 &mut (|(mut a, b, c)| a.add_mul_assign(b, c)),
@@ -134,7 +134,7 @@ pub fn benchmark_integer_add_mul_assign_i32_ref_algorithms(
         file_name,
         &(|&(ref a, ref b, _)| max(a.significant_bits(), b.significant_bits()) as usize),
         "max(a.significant_bits(), b.significant_bits())",
-        &[
+        &mut [
             (
                 "Integer.add_mul_assign(&Integer, i32)",
                 &mut (|(mut a, b, c)| a.add_mul_assign(&b, c)),
@@ -161,7 +161,7 @@ pub fn benchmark_integer_add_mul_i32_evaluation_strategy(
         file_name,
         &(|&(ref a, ref b, _)| max(a.significant_bits(), b.significant_bits()) as usize),
         "max(a.significant_bits(), b.significant_bits())",
-        &[
+        &mut [
             (
                 "Integer.add_mul(Integer, i32)",
                 &mut (|(a, b, c)| no_out!(a.add_mul(b, c))),
@@ -192,7 +192,7 @@ pub fn benchmark_integer_add_mul_i32_algorithms(gm: GenerationMode, limit: usize
         file_name,
         &(|&(ref a, ref b, _)| max(a.significant_bits(), b.significant_bits()) as usize),
         "max(a.significant_bits(), b.significant_bits())",
-        &[
+        &mut [
             (
                 "Integer.add_mul(Integer, i32)",
                 &mut (|(a, b, c)| no_out!(a.add_mul(b, c))),
@@ -219,7 +219,7 @@ pub fn benchmark_integer_add_mul_i32_val_ref_algorithms(
         file_name,
         &(|&(ref a, ref b, _)| max(a.significant_bits(), b.significant_bits()) as usize),
         "max(a.significant_bits(), b.significant_bits())",
-        &[
+        &mut [
             (
                 "Integer.add_mul(&Integer, i32)",
                 &mut (|(a, b, c)| no_out!(a.add_mul(&b, c))),
@@ -246,7 +246,7 @@ pub fn benchmark_integer_add_mul_i32_ref_val_algorithms(
         file_name,
         &(|&(ref a, ref b, _)| max(a.significant_bits(), b.significant_bits()) as usize),
         "max(a.significant_bits(), b.significant_bits())",
-        &[
+        &mut [
             (
                 "(&Integer).add_mul(Integer, i32)",
                 &mut (|(a, b, c)| no_out!((&a).add_mul(b, c))),
@@ -273,7 +273,7 @@ pub fn benchmark_integer_add_mul_i32_ref_ref_algorithms(
         file_name,
         &(|&(ref a, ref b, _)| max(a.significant_bits(), b.significant_bits()) as usize),
         "max(a.significant_bits(), b.significant_bits())",
-        &[
+        &mut [
             (
                 "(&Integer).add_mul(&Integer, i32)",
                 &mut (|(a, b, c)| no_out!((&a).add_mul(&b, c))),

@@ -60,7 +60,7 @@ pub fn benchmark_integer_from_sign_and_limbs_asc_evaluation_strategy(
         file_name,
         &(|&(_, ref limbs)| limbs.len()),
         "limbs.len()",
-        &[
+        &mut [
             (
                 "Integer::from_sign_and_limbs_asc(&[u32])",
                 &mut (|(sign, ref limbs)| no_out!(Integer::from_sign_and_limbs_asc(sign, limbs))),
@@ -87,7 +87,7 @@ pub fn benchmark_integer_from_sign_and_limbs_desc_evaluation_strategy(
         file_name,
         &(|&(_, ref limbs)| limbs.len()),
         "limbs.len()",
-        &[
+        &mut [
             (
                 "Integer::from_sign_and_limbs_desc(&[u32])",
                 &mut (|(sign, ref limbs)| no_out!(Integer::from_sign_and_limbs_desc(sign, limbs))),

@@ -25,7 +25,7 @@ pub fn benchmark_integer_flip_bit_library_comparison(
         file_name,
         &(|&(_, (ref n, index))| max(n.significant_bits(), index) as usize),
         "max(n.significant_bits(), index)",
-        &[
+        &mut [
             ("malachite", &mut (|(_, (mut n, index))| n.flip_bit(index))),
             (
                 "rug",

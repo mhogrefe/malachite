@@ -33,6 +33,10 @@ pub fn naturals(gm: GenerationMode) -> Box<Iterator<Item = Natural>> {
     }
 }
 
+pub fn rm_naturals(gm: GenerationMode) -> Box<Iterator<Item = (rug::Integer, Natural)>> {
+    Box::new(naturals(gm).map(|n| (natural_to_rug_integer(&n), n)))
+}
+
 pub fn nrm_naturals(gm: GenerationMode) -> Box<Iterator<Item = (BigUint, rug::Integer, Natural)>> {
     Box::new(naturals(gm).map(|n| (natural_to_biguint(&n), natural_to_rug_integer(&n), n)))
 }
@@ -128,6 +132,7 @@ pub fn triples_of_naturals(
 
 // All triples of `Natural`s where the first is greater than or equal to the product of the second
 // and third.
+#[allow(op_ref)]
 pub fn triples_of_naturals_var_1(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (Natural, Natural, Natural)>> {
@@ -177,6 +182,12 @@ pub fn rm_pairs_of_natural_and_unsigned<T: 'static + PrimitiveUnsigned>(
     Box::new(
         pairs_of_natural_and_unsigned(gm).map(|(x, y)| ((natural_to_rug_integer(&x), y), (x, y))),
     )
+}
+
+pub fn nm_pairs_of_natural_and_unsigned<T: 'static + PrimitiveUnsigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = ((BigUint, T), (Natural, T))>> {
+    Box::new(pairs_of_natural_and_unsigned(gm).map(|(x, y)| ((natural_to_biguint(&x), y), (x, y))))
 }
 
 pub fn nrm_pairs_of_natural_and_unsigned<T: 'static + PrimitiveUnsigned>(
@@ -261,6 +272,7 @@ pub fn triples_of_natural_natural_and_unsigned<T: 'static + PrimitiveUnsigned>(
 
 // All triples of `Natural`, `Natural`, and `u32`, where the first `Natural` is greater than or
 // equal to the product of the second `Natural` and the `u32`.
+#[allow(op_ref)]
 pub fn triples_of_natural_natural_and_u32_var_1(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (Natural, Natural, u32)>> {
@@ -356,6 +368,32 @@ pub fn pairs_of_natural_and_small_u64(gm: GenerationMode) -> Box<Iterator<Item =
             &(|seed| u32s_geometric(seed, scale).map(|i| i.into())),
         )),
     }
+}
+
+pub fn rm_pairs_of_natural_and_small_u64(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = ((rug::Integer, u64), (Natural, u64))>> {
+    Box::new(
+        pairs_of_natural_and_small_u64(gm).map(|(x, y)| ((natural_to_rug_integer(&x), y), (x, y))),
+    )
+}
+
+pub fn nm_pairs_of_natural_and_small_u64(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = ((BigUint, u64), (Natural, u64))>> {
+    Box::new(pairs_of_natural_and_small_u64(gm).map(|(x, y)| ((natural_to_biguint(&x), y), (x, y))))
+}
+
+pub fn nrm_pairs_of_natural_and_small_u64(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = ((BigUint, u64), (rug::Integer, u64), (Natural, u64))>> {
+    Box::new(pairs_of_natural_and_small_u64(gm).map(|(x, y)| {
+        (
+            (natural_to_biguint(&x), y),
+            (natural_to_rug_integer(&x), y),
+            (x, y),
+        )
+    }))
 }
 
 pub fn pairs_of_natural_and_small_usize(
@@ -468,6 +506,15 @@ pub fn triples_of_natural_small_u64_and_bool(
             &(|seed| random(seed)),
         )),
     }
+}
+
+pub fn rm_triples_of_natural_small_u64_and_bool(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = ((rug::Integer, u64, bool), (Natural, u64, bool))>> {
+    Box::new(
+        triples_of_natural_small_u64_and_bool(gm)
+            .map(|(x, y, z)| ((natural_to_rug_integer(&x), y, z), (x, y, z))),
+    )
 }
 
 pub fn pairs_of_natural_and_rounding_mode(

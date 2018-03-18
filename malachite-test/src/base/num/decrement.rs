@@ -32,7 +32,7 @@ fn benchmark_unsigned_decrement<T: 'static + PrimitiveUnsigned>(
         file_name,
         &(|&n| n.significant_bits() as usize),
         "index",
-        &[("malachite", &mut (|mut n| n.decrement()))],
+        &mut [("malachite", &mut (|mut n| n.decrement()))],
     );
 }
 
@@ -50,7 +50,7 @@ fn benchmark_signed_decrement<T: 'static + PrimitiveSigned>(
         file_name,
         &(|&n| n.significant_bits() as usize),
         "index",
-        &[("malachite", &mut (|mut n| n.decrement()))],
+        &mut [("malachite", &mut (|mut n| n.decrement()))],
     );
 }
 

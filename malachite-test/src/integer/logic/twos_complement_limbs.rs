@@ -36,7 +36,7 @@ pub fn benchmark_integer_twos_complement_limbs_asc(
         file_name,
         &(|n| n.significant_bits() as usize),
         "n.significant_bits()",
-        &[
+        &mut [
             (
                 "malachite",
                 &mut (|n| no_out!(n.twos_complement_limbs_asc())),
@@ -59,7 +59,7 @@ pub fn benchmark_integer_twos_complement_limbs_desc(
         file_name,
         &(|n| n.significant_bits() as usize),
         "n.significant_bits()",
-        &[
+        &mut [
             (
                 "malachite",
                 &mut (|n| no_out!(n.twos_complement_limbs_desc())),

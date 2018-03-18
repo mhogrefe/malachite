@@ -22,7 +22,7 @@ pub fn benchmark_integer_get_bit_library_comparison(
         file_name,
         &(|&(_, (_, index))| index as usize),
         "index",
-        &[
+        &mut [
             (
                 "malachite",
                 &mut (|(_, (n, index))| no_out!(n.get_bit(index))),

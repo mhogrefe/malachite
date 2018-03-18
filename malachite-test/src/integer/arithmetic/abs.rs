@@ -46,7 +46,7 @@ pub fn benchmark_integer_abs_assign(gm: GenerationMode, limit: usize, file_name:
         file_name,
         &(|n| n.significant_bits() as usize),
         "n.significant_bits()",
-        &[("malachite", &mut (|mut n| n.abs_assign()))],
+        &mut [("malachite", &mut (|mut n| n.abs_assign()))],
     );
 }
 
@@ -60,7 +60,7 @@ pub fn benchmark_integer_abs_library_comparison(gm: GenerationMode, limit: usize
         file_name,
         &(|&(_, _, ref n)| n.significant_bits() as usize),
         "n.significant_bits()",
-        &[
+        &mut [
             ("malachite", &mut (|(_, _, n)| no_out!(n.abs()))),
             ("num", &mut (|(n, _, _)| no_out!(n.abs()))),
             ("rug", &mut (|(_, n, _)| no_out!(n.abs().cmp0()))),
@@ -82,7 +82,7 @@ pub fn benchmark_integer_abs_evaluation_strategy(
         file_name,
         &(|n| n.significant_bits() as usize),
         "n.significant_bits()",
-        &[
+        &mut [
             ("Integer.abs()", &mut (|n| no_out!(n.abs()))),
             ("Integer.abs_ref()", &mut (|n| no_out!(n.abs_ref()))),
         ],
@@ -99,7 +99,7 @@ pub fn benchmark_integer_natural_abs(gm: GenerationMode, limit: usize, file_name
         file_name,
         &(|n| n.significant_bits() as usize),
         "n.significant_bits()",
-        &[("malachite", &mut (|n| no_out!(n.natural_abs())))],
+        &mut [("malachite", &mut (|n| no_out!(n.natural_abs())))],
     );
 }
 
@@ -117,7 +117,7 @@ pub fn benchmark_integer_natural_abs_evaluation_strategy(
         file_name,
         &(|n| n.significant_bits() as usize),
         "n.significant_bits()",
-        &[
+        &mut [
             ("Integer.natural_abs()", &mut (|n| no_out!(n.natural_abs()))),
             (
                 "Integer.natural_abs_ref()",

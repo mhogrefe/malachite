@@ -401,6 +401,24 @@ pub fn rm_pairs_of_integer_and_small_u64(
     )
 }
 
+pub fn nm_pairs_of_integer_and_small_u64(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = ((BigInt, u64), (Integer, u64))>> {
+    Box::new(pairs_of_integer_and_small_u64(gm).map(|(x, y)| ((integer_to_bigint(&x), y), (x, y))))
+}
+
+pub fn nrm_pairs_of_integer_and_small_u64(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = ((BigInt, u64), (rug::Integer, u64), (Integer, u64))>> {
+    Box::new(pairs_of_integer_and_small_u64(gm).map(|(x, y)| {
+        (
+            (integer_to_bigint(&x), y),
+            (integer_to_rug_integer(&x), y),
+            (x, y),
+        )
+    }))
+}
+
 pub fn triples_of_integer_small_u32_and_small_u32(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (Integer, u32, u32)>> {

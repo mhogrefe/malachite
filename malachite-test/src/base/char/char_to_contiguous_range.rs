@@ -26,7 +26,7 @@ pub fn benchmark_char_to_contiguous_range(
         file_name,
         &(|&c| char_to_contiguous_range(c) as usize),
         "char_to_contiguous_range(char)",
-        &[
+        &mut [
             ("malachite", &mut (|c| no_out!(char_to_contiguous_range(c)))),
         ],
     );

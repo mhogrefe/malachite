@@ -20,6 +20,6 @@ pub fn benchmark_limbs_set_zero(gm: GenerationMode, limit: usize, file_name: &st
         file_name,
         &(|limbs| limbs.len()),
         "limbs.len()",
-        &[("malachite", &mut (|mut limbs| limbs_set_zero(&mut limbs)))],
+        &mut [("malachite", &mut (|mut limbs| limbs_set_zero(&mut limbs)))],
     );
 }

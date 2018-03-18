@@ -23,7 +23,7 @@ pub fn benchmark_limbs_delete_left(gm: GenerationMode, limit: usize, file_name: 
         file_name,
         &(|&(ref limbs, _)| limbs.len()),
         "limbs.len()",
-        &[
+        &mut [
             (
                 "malachite",
                 &mut (|(mut limbs, delete_size)| limbs_delete_left(&mut limbs, delete_size)),

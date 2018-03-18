@@ -36,7 +36,7 @@ pub fn benchmark_natural_shl_assign_u32_library_comparison(
         file_name,
         &(|&(_, (_, other))| other as usize),
         "other",
-        &[
+        &mut [
             ("malachite", &mut (|(_, (mut x, y))| x <<= y)),
             ("rug", &mut (|((mut x, y), _)| x <<= y)),
         ],
@@ -57,7 +57,7 @@ pub fn benchmark_natural_shl_u32_library_comparison(
         file_name,
         &(|&(_, (_, other))| other as usize),
         "other",
-        &[
+        &mut [
             ("malachite", &mut (|(_, (x, y))| no_out!(x << y))),
             ("rug", &mut (|((x, y), _)| no_out!(x << y))),
         ],
@@ -78,7 +78,7 @@ pub fn benchmark_natural_shl_u32_evaluation_strategy(
         file_name,
         &(|&(_, other)| other as usize),
         "other",
-        &[
+        &mut [
             ("Natural << u32", &mut (|(x, y)| no_out!(x << y))),
             ("&Natural << u32", &mut (|(x, y)| no_out!(&x << y))),
         ],

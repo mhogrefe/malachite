@@ -25,7 +25,7 @@ pub fn benchmark_integer_from_u32_library_comparison(
         file_name,
         &(|&u| u.significant_bits() as usize),
         "u.significant_bits()",
-        &[
+        &mut [
             ("malachite", &mut (|u| no_out!(Integer::from(u)))),
             ("num", &mut (|u| no_out!(BigInt::from(u)))),
             ("rug", &mut (|u| no_out!(rug::Integer::from(u)))),

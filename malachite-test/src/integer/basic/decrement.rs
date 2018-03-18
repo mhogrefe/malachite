@@ -21,6 +21,6 @@ pub fn benchmark_integer_decrement(gm: GenerationMode, limit: usize, file_name: 
         file_name,
         &(|n| n.significant_bits() as usize),
         "n.significant_bits()",
-        &[("malachite", &mut (|mut n| n.decrement()))],
+        &mut [("malachite", &mut (|mut n| n.decrement()))],
     );
 }

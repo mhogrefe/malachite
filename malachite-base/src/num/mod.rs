@@ -365,8 +365,8 @@ pub trait OverflowingAbs {
 //TODO is_positive, is_negative, sign
 
 //TODO docs
-pub trait PrimitiveInteger
-    : Add<Output = Self>
+pub trait PrimitiveInteger:
+    Add<Output = Self>
     + AddAssign<Self>
     + Binary
     + BitAccess
@@ -448,7 +448,8 @@ pub trait PrimitiveInteger
     + WrappingShl<Output = Self>
     + WrappingShr<Output = Self>
     + WrappingSub<Output = Self>
-    + Zero {
+    + Zero
+{
     const LOG_WIDTH: u32;
     const WIDTH: u32 = 1 << Self::LOG_WIDTH;
 
@@ -458,14 +459,15 @@ pub trait PrimitiveInteger
 }
 
 //TODO docs
-pub trait PrimitiveUnsigned
-    : CeilingLogTwo
+pub trait PrimitiveUnsigned:
+    CeilingLogTwo
     + CheckedNextPowerOfTwo
     + FloorLogTwo
     + FromU32Slice
     + IsPowerOfTwo
     + NextPowerOfTwo
-    + PrimitiveInteger {
+    + PrimitiveInteger
+{
     type SignedOfEqualWidth: PrimitiveSigned;
 
     fn to_u32(self) -> u32;
@@ -480,15 +482,16 @@ pub trait PrimitiveUnsigned
 }
 
 //TODO docs
-pub trait PrimitiveSigned
-    : Abs<Output = Self>
+pub trait PrimitiveSigned:
+    Abs<Output = Self>
     + CheckedAbs<Output = Self>
     + Neg<Output = Self>
     + NegativeOne
     + Not<Output = Self>
     + OverflowingAbs<Output = Self>
     + PrimitiveInteger
-    + WrappingAbs<Output = Self> {
+    + WrappingAbs<Output = Self>
+{
     type UnsignedOfEqualWidth: PrimitiveUnsigned;
 
     fn from_i32(i: i32) -> Self;
@@ -501,8 +504,8 @@ pub trait PrimitiveSigned
 }
 
 //TODO docs
-pub trait Float
-    : Add<Output = Self>
+pub trait Float:
+    Add<Output = Self>
     + AddAssign<Self>
     + Copy
     + Debug
@@ -532,7 +535,8 @@ pub trait Float
     + SubAssign<Self>
     + Sum<Self>
     + UpperExp
-    + Zero {
+    + Zero
+{
     type UnsignedOfEqualWidth: PrimitiveUnsigned;
     type SignedOfEqualWidth: PrimitiveSigned;
 

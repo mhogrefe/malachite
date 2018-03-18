@@ -51,7 +51,7 @@ pub fn benchmark_integer_clone_library_comparison(
         file_name,
         &(|&(_, _, ref n)| n.significant_bits() as usize),
         "n.significant_bits()",
-        &[
+        &mut [
             ("malachite", &mut (|(_, _, n)| no_out!(n.clone()))),
             ("num", &mut (|(n, _, _)| no_out!(n.clone()))),
             ("rug", &mut (|(_, n, _)| no_out!(n.clone()))),
@@ -73,7 +73,7 @@ pub fn benchmark_integer_clone_from_library_comparison(
         file_name,
         &(|&(_, _, (ref x, ref y))| max(x.significant_bits(), y.significant_bits()) as usize),
         "max(x.significant_bits(), y.significant_bits())",
-        &[
+        &mut [
             ("malachite", &mut (|(_, _, (mut x, y))| x.clone_from(&y))),
             ("num", &mut (|((mut x, y), _, _)| x.clone_from(&y))),
             ("rug", &mut (|(_, (mut x, y), _)| x.clone_from(&y))),
@@ -87,7 +87,7 @@ pub fn benchmark_integer_assign_library_comparison(
     file_name: &str,
 ) {
     m_run_benchmark(
-        "Integer.clone_from(Integer)",
+        "Integer.assign(Integer)",
         BenchmarkType::LibraryComparison,
         rm_pairs_of_integers(gm),
         gm.name(),
@@ -95,7 +95,7 @@ pub fn benchmark_integer_assign_library_comparison(
         file_name,
         &(|&(_, (ref x, ref y))| max(x.significant_bits(), y.significant_bits()) as usize),
         "max(x.significant_bits(), y.significant_bits())",
-        &[
+        &mut [
             ("malachite", &mut (|(_, (mut x, y))| x.assign(y))),
             ("rug", &mut (|((mut x, y), _)| x.assign(y))),
         ],
@@ -116,7 +116,7 @@ pub fn benchmark_integer_assign_evaluation_strategy(
         file_name,
         &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),
         "max(x.significant_bits(), y.significant_bits())",
-        &[
+        &mut [
             ("Integer.assign(Integer)", &mut (|(mut x, y)| x.assign(y))),
             ("Integer.assign(&Integer)", &mut (|(mut x, y)| x.assign(&y))),
         ],

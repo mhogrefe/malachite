@@ -24,7 +24,7 @@ pub fn benchmark_natural_neg_library_comparison(gm: GenerationMode, limit: usize
         file_name,
         &(|&(_, _, ref n)| n.significant_bits() as usize),
         "n.significant_bits()",
-        &[
+        &mut [
             ("malachite", &mut (|(_, _, n)| no_out!(-n))),
             ("num", &mut (|(n, _, _)| no_out!(-n))),
             ("rug", &mut (|(_, n, _)| no_out!(-n))),
@@ -46,7 +46,7 @@ pub fn benchmark_natural_neg_evaluation_strategy(
         file_name,
         &(|n| n.significant_bits() as usize),
         "n.significant_bits()",
-        &[
+        &mut [
             ("-Natural", &mut (|n| no_out!(-n))),
             ("-&Natural", &mut (|n| no_out!(-&n))),
         ],

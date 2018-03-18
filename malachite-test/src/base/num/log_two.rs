@@ -28,7 +28,7 @@ fn benchmark_unsigned_floor_log_two<T: 'static + PrimitiveUnsigned>(
         file_name,
         &(|&n| n.significant_bits() as usize),
         "index",
-        &[("malachite", &mut (|n| no_out!(n.floor_log_two())))],
+        &mut [("malachite", &mut (|n| no_out!(n.floor_log_two())))],
     );
 }
 
@@ -46,7 +46,7 @@ fn benchmark_unsigned_ceiling_log_two<T: 'static + PrimitiveUnsigned>(
         file_name,
         &(|&n| n.significant_bits() as usize),
         "index",
-        &[("malachite", &mut (|n| no_out!(n.ceiling_log_two())))],
+        &mut [("malachite", &mut (|n| no_out!(n.ceiling_log_two())))],
     );
 }
 

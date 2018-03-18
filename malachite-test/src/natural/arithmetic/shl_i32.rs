@@ -74,7 +74,7 @@ pub fn benchmark_natural_shl_assign_i32_library_comparison(
         file_name,
         &(|&(_, (_, other))| other as usize),
         "other",
-        &[
+        &mut [
             ("malachite", &mut (|(_, (mut x, y))| x <<= y)),
             ("rug", &mut (|((mut x, y), _)| x <<= y)),
         ],
@@ -91,7 +91,7 @@ pub fn benchmark_natural_shl_i32(gm: GenerationMode, limit: usize, file_name: &s
         file_name,
         &(|&(_, (_, other))| other as usize),
         "other",
-        &[
+        &mut [
             ("malachite", &mut (|(_, (x, y))| no_out!(x << y))),
             ("rug", &mut (|((x, y), _)| no_out!(x << y))),
         ],
@@ -112,7 +112,7 @@ pub fn benchmark_natural_shl_i32_evaluation_strategy(
         file_name,
         &(|&(_, other)| other as usize),
         "other",
-        &[
+        &mut [
             ("Natural << i32", &mut (|(x, y)| no_out!(x << y))),
             ("&Natural << i32", &mut (|(x, y)| no_out!(&x << y))),
         ],
@@ -129,7 +129,7 @@ pub fn benchmark_natural_shl_round_assign_i32(gm: GenerationMode, limit: usize, 
         file_name,
         &(|&(_, other, _)| other as usize),
         "other",
-        &[
+        &mut [
             (
                 "malachite",
                 &mut (|(mut x, y, rm)| x.shl_round_assign(y, rm)),
@@ -152,7 +152,7 @@ pub fn benchmark_natural_shl_round_i32_evaluation_strategy(
         file_name,
         &(|&(_, other, _)| other as usize),
         "other",
-        &[
+        &mut [
             (
                 "Natural.shl_round(i32, RoundingMode)",
                 &mut (|(x, y, rm)| no_out!(x.shl_round(y, rm))),

@@ -87,7 +87,7 @@ pub fn m_run_benchmark<'a, I: Iterator>(
     file_name: &'a str,
     bucketing_function: &'a Fn(&I::Item) -> usize,
     bucketing_label: &'a str,
-    series: &[(&'a str, &'a Fn(I::Item))],
+    series: &mut [(&'a str, &'a mut FnMut(I::Item))],
 ) where
     I::Item: Clone,
 {
@@ -106,7 +106,7 @@ pub fn m_run_benchmark<'a, I: Iterator>(
         panic!("Benchmarks have type Single iff they have only one series");
     }
     let mut series_options = Vec::new();
-    for (&(label, function), color) in series.iter().zip(colors.iter()) {
+    for (&mut (label, ref mut function), color) in series.iter_mut().zip(colors.iter()) {
         series_options.push(BenchmarkSeriesOptions {
             name: label,
             function,
@@ -120,7 +120,7 @@ pub fn m_run_benchmark<'a, I: Iterator>(
         bucketing_function,
         x_axis_label: bucketing_label,
         y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
+        file_name: format!("benchmarks/{}", file_name),
         series_options,
     };
     run_benchmark(options);

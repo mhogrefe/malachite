@@ -29,7 +29,7 @@ pub fn benchmark_integer_assign_bit_library_comparison(
         file_name,
         &(|&(_, (ref n, index, _))| max(n.significant_bits(), index) as usize),
         "max(n.significant_bits(), index)",
-        &[
+        &mut [
             (
                 "malachite",
                 &mut (|(_, (mut n, index, bit))| n.assign_bit(index, bit)),

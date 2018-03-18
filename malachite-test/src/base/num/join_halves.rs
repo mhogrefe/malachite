@@ -42,7 +42,7 @@ fn benchmark_unsigned_join_halves<T: 'static + JoinHalves + PrimitiveUnsigned>(
         file_name,
         &(|&(x, y)| max(x.significant_bits(), y.significant_bits()) as usize),
         "max(x.significant_bits(), y.significant_bits())",
-        &[("malachite", &mut (|(x, y)| no_out!(T::join_halves(x, y))))],
+        &mut [("malachite", &mut (|(x, y)| no_out!(T::join_halves(x, y))))],
     );
 }
 

@@ -1,10 +1,7 @@
-use common::{natural_to_rug_integer, GenerationMode};
-use inputs::natural::triples_of_natural_small_u64_and_bool;
-use malachite_base::num::{BitAccess, SignificantBits};
-use malachite_nz::natural::Natural;
-use rug;
-use rust_wheels::benchmarks::{BenchmarkOptions2, benchmark_2};
-use std::cmp::max;
+use common::{m_run_benchmark, BenchmarkType, GenerationMode};
+use inputs::natural::{rm_triples_of_natural_small_u64_and_bool,
+                      triples_of_natural_small_u64_and_bool};
+use malachite_base::num::BitAccess;
 
 pub fn demo_natural_assign_bit(gm: GenerationMode, limit: usize) {
     for (mut n, index, bit) in triples_of_natural_small_u64_and_bool(gm).take(limit) {
@@ -17,23 +14,29 @@ pub fn demo_natural_assign_bit(gm: GenerationMode, limit: usize) {
     }
 }
 
-pub fn benchmark_natural_assign_bit(gm: GenerationMode, limit: usize, file_name: &str) {
-    println!("benchmarking {} Natural.assign_bit(u64)", gm.name());
-    benchmark_2(BenchmarkOptions2 {
-        xs: triples_of_natural_small_u64_and_bool(gm),
-        function_f: &mut (|(mut n, index, bit): (Natural, u64, bool)| n.assign_bit(index, bit)),
-        function_g: &mut (|(mut n, index, bit): (rug::Integer, u64, bool)| {
-            n.set_bit(index as u32, bit);
-        }),
-        x_cons: &(|p| p.clone()),
-        y_cons: &(|&(ref n, index, bit)| (natural_to_rug_integer(n), index, bit)),
-        x_param: &(|&(ref n, index, _)| max(n.significant_bits(), index) as usize),
+pub fn benchmark_natural_assign_bit_library_comparison(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "Natural.assign_bit(u64, bool)",
+        BenchmarkType::LibraryComparison,
+        rm_triples_of_natural_small_u64_and_bool(gm),
+        gm.name(),
         limit,
-        f_name: "malachite",
-        g_name: "rug",
-        title: "Natural.assign_bit(u64, bool)",
-        x_axis_label: "max(n.significant_bits(), index)",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+        file_name,
+        &(|&(_, (_, index, _))| index as usize),
+        "index",
+        &mut [
+            (
+                "malachite",
+                &mut (|(_, (mut n, index, bit))| n.assign_bit(index, bit)),
+            ),
+            (
+                "rug",
+                &mut (|((mut n, index, bit), _)| no_out!(n.set_bit(index as u32, bit))),
+            ),
+        ],
+    );
 }

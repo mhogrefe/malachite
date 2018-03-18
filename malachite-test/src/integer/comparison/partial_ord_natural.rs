@@ -38,7 +38,7 @@ pub fn benchmark_integer_partial_cmp_natural_library_comparison(
         file_name,
         &(|&(_, (ref x, ref y))| max(x.significant_bits(), y.significant_bits()) as usize),
         "max(x.significant_bits(), y.significant_bits())",
-        &[
+        &mut [
             ("malachite", &mut (|(_, (x, y))| no_out!(x.partial_cmp(&y)))),
             ("rug", &mut (|((x, y), _)| no_out!(x.partial_cmp(&y)))),
         ],
@@ -59,7 +59,7 @@ pub fn benchmark_natural_partial_cmp_integer_library_comparison(
         file_name,
         &(|&(_, (ref x, ref y))| max(x.significant_bits(), y.significant_bits()) as usize),
         "max(x.significant_bits(), y.significant_bits())",
-        &[
+        &mut [
             ("malachite", &mut (|(_, (x, y))| no_out!(x.partial_cmp(&y)))),
             ("rug", &mut (|((x, y), _)| no_out!(x.partial_cmp(&y)))),
         ],

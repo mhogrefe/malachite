@@ -43,7 +43,7 @@ pub fn benchmark_integer_partial_cmp_u32_library_comparison(
         file_name,
         &(|&(_, _, (ref n, _))| n.significant_bits() as usize),
         "n.significant_bits()",
-        &[
+        &mut [
             (
                 "malachite",
                 &mut (|(_, _, (x, y))| no_out!(x.partial_cmp(&y))),
@@ -71,7 +71,7 @@ pub fn benchmark_u32_partial_cmp_integer_library_comparison(
         file_name,
         &(|&(_, (_, ref n))| n.significant_bits() as usize),
         "n.significant_bits()",
-        &[
+        &mut [
             ("malachite", &mut (|(_, (x, y))| no_out!(x.partial_cmp(&y)))),
             ("rug", &mut (|((x, y), _)| no_out!(x.partial_cmp(&y)))),
         ],

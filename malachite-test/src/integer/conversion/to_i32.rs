@@ -28,7 +28,7 @@ pub fn benchmark_integer_to_i32_library_comparison(
         file_name,
         &(|&(_, ref n)| n.significant_bits() as usize),
         "n.significant_bits()",
-        &[
+        &mut [
             ("malachite", &mut (|(_, n)| no_out!(n.to_i32()))),
             ("rug", &mut (|(n, _)| no_out!(n.to_i32()))),
         ],
@@ -49,7 +49,7 @@ pub fn benchmark_integer_to_i32_wrapping_library_comparison(
         file_name,
         &(|&(_, ref n)| n.significant_bits() as usize),
         "n.significant_bits()",
-        &[
+        &mut [
             ("malachite", &mut (|(_, n)| no_out!(n.to_i32_wrapping()))),
             ("rug", &mut (|(n, _)| no_out!(n.to_i32_wrapping()))),
         ],

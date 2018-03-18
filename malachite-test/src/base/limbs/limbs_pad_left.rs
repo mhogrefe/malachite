@@ -25,7 +25,7 @@ pub fn benchmark_limbs_pad_left(gm: GenerationMode, limit: usize, file_name: &st
         file_name,
         &(|&(ref limbs, _, _)| limbs.len()),
         "limbs.len()",
-        &[
+        &mut [
             (
                 "malachite",
                 &mut (|(mut limbs, pad_size, pad_limb)| {

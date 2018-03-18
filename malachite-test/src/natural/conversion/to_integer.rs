@@ -1,8 +1,6 @@
-use common::GenerationMode;
+use common::{m_run_benchmark, BenchmarkType, GenerationMode};
 use inputs::natural::naturals;
 use malachite_base::num::SignificantBits;
-use malachite_nz::natural::Natural;
-use rust_wheels::benchmarks::{BenchmarkOptions1, BenchmarkOptions2, benchmark_1, benchmark_2};
 
 pub fn demo_natural_into_integer(gm: GenerationMode, limit: usize) {
     for n in naturals(gm).take(limit) {
@@ -17,44 +15,26 @@ pub fn demo_natural_to_integer(gm: GenerationMode, limit: usize) {
     }
 }
 
-pub fn benchmark_natural_to_integer(gm: GenerationMode, limit: usize, file_name: &str) {
-    println!("benchmarking {} Natural.to_integer()", gm.name());
-    benchmark_1(BenchmarkOptions1 {
-        xs: naturals(gm),
-        function_f: &mut (|n: Natural| n.into_integer()),
-        x_cons: &(|x| x.clone()),
-        x_param: &(|n| n.significant_bits() as usize),
-        limit,
-        f_name: "malachite",
-        title: "Natural.to_integer()",
-        x_axis_label: "n.significant_bits()",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
-}
-
 pub fn benchmark_natural_to_integer_evaluation_strategy(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,
 ) {
-    println!(
-        "benchmarking {} Natural.to_integer() evaluation strategy",
-        gm.name()
-    );
-    benchmark_2(BenchmarkOptions2 {
-        xs: naturals(gm),
-        function_f: &mut (|n: Natural| n.into_integer()),
-        function_g: &mut (|n: Natural| n.to_integer()),
-        x_cons: &(|x| x.clone()),
-        y_cons: &(|x| x.clone()),
-        x_param: &(|n| n.significant_bits() as usize),
+    m_run_benchmark(
+        "Natural.to_integer()",
+        BenchmarkType::EvaluationStrategy,
+        naturals(gm),
+        gm.name(),
         limit,
-        f_name: "into_integer (by value)",
-        g_name: "to_integer (by reference)",
-        title: "Natural.to_integer()",
-        x_axis_label: "n.significant_bits()",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+        file_name,
+        &(|n| n.significant_bits() as usize),
+        "n.significant_bits()",
+        &mut [
+            ("Natural.to_integer()", &mut (|n| no_out!(n.to_integer()))),
+            (
+                "Natural.into_integer()",
+                &mut (|n| no_out!(n.into_integer())),
+            ),
+        ],
+    );
 }

@@ -29,7 +29,7 @@ fn benchmark_unsigned_split_in_half<T: 'static + PrimitiveUnsigned + SplitInHalf
         file_name,
         &(|&n| n.significant_bits() as usize),
         "index",
-        &[("malachite", &mut (|n| no_out!(n.split_in_half())))],
+        &mut [("malachite", &mut (|n| no_out!(n.split_in_half())))],
     );
 }
 

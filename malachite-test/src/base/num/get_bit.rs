@@ -28,7 +28,7 @@ fn benchmark_unsigned_get_bit<T: 'static + PrimitiveUnsigned>(
         file_name,
         &(|&(_, index)| index as usize),
         "index",
-        &[("malachite", &mut (|(n, index)| no_out!(n.get_bit(index))))],
+        &mut [("malachite", &mut (|(n, index)| no_out!(n.get_bit(index))))],
     );
 }
 
@@ -46,7 +46,7 @@ fn benchmark_signed_get_bit<T: 'static + PrimitiveSigned>(
         file_name,
         &(|&(_, index)| index as usize),
         "index",
-        &[("malachite", &mut (|(n, index)| no_out!(n.get_bit(index))))],
+        &mut [("malachite", &mut (|(n, index)| no_out!(n.get_bit(index))))],
     );
 }
 

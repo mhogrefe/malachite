@@ -30,7 +30,7 @@ pub fn benchmark_integer_assign_i64_library_comparison(
         file_name,
         &(|&(_, (ref n, _))| n.significant_bits() as usize),
         "n.significant_bits()",
-        &[
+        &mut [
             ("malachite", &mut (|(_, (mut x, y))| x.assign(y))),
             ("num", &mut (|((mut x, y), _)| num_assign_i64(&mut x, y))),
         ],

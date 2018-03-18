@@ -1,6 +1,6 @@
 use common::{m_run_benchmark, BenchmarkType, GenerationMode};
 use hash::hash;
-use inputs::integer::{integers, nm_integers};
+use inputs::integer::{integers, nrm_integers};
 use malachite_base::num::SignificantBits;
 
 pub fn demo_integer_hash(gm: GenerationMode, limit: usize) {
@@ -17,15 +17,16 @@ pub fn benchmark_integer_hash_library_comparison(
     m_run_benchmark(
         "Integer hash",
         BenchmarkType::LibraryComparison,
-        nm_integers(gm),
+        nrm_integers(gm),
         gm.name(),
         limit,
         file_name,
-        &(|&(_, ref n)| n.significant_bits() as usize),
+        &(|&(_, _, ref n)| n.significant_bits() as usize),
         "n.significant_bits()",
-        &[
-            ("malachite", &mut (|(_, n)| no_out!(hash(&n)))),
-            ("rug", &mut (|(n, _)| no_out!(hash(&n)))),
+        &mut [
+            ("malachite", &mut (|(_, _, n)| no_out!(hash(&n)))),
+            ("num", &mut (|(_, n, _)| no_out!(hash(&n)))),
+            ("rug", &mut (|(n, _, _)| no_out!(hash(&n)))),
         ],
     );
 }

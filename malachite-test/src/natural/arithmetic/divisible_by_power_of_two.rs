@@ -26,7 +26,7 @@ pub fn benchmark_natural_divisible_by_power_of_two_algorithms(
         file_name,
         &(|&(ref n, _)| n.significant_bits() as usize),
         "n.significant_bits()",
-        &[
+        &mut [
             (
                 "Natural.divisible_by_power_of_2(u32)",
                 &mut (|(n, pow)| no_out!(n.divisible_by_power_of_two(pow))),

@@ -42,7 +42,7 @@ pub fn benchmark_integer_partial_eq_u32_library_comparison(
         file_name,
         &(|&(_, _, (ref n, _))| n.significant_bits() as usize),
         "n.significant_bits()",
-        &[
+        &mut [
             ("malachite", &mut (|(_, _, (x, y))| no_out!(x == y))),
             (
                 "num",
@@ -67,7 +67,7 @@ pub fn benchmark_u32_partial_eq_integer_library_comparison(
         file_name,
         &(|&(_, (_, ref n))| n.significant_bits() as usize),
         "n.significant_bits()",
-        &[
+        &mut [
             ("malachite", &mut (|(_, (x, y))| no_out!(x == y))),
             ("rug", &mut (|((x, y), _)| no_out!(x == y))),
         ],

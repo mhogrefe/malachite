@@ -28,7 +28,7 @@ pub fn benchmark_integer_cmp_abs_library_comparison(
         file_name,
         &(|&(_, (ref x, ref y))| max(x.significant_bits(), y.significant_bits()) as usize),
         "max(x.significant_bits(), y.significant_bits())",
-        &[
+        &mut [
             ("malachite", &mut (|(_, (x, y))| no_out!(x.cmp_abs(&y)))),
             ("rug", &mut (|((x, y), _)| no_out!(x.cmp_abs(&y)))),
         ],

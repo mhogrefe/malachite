@@ -139,7 +139,7 @@ pub fn benchmark_integer_add_mul_assign_evaluation_strategy(
         file_name,
         &bucketing_function,
         BUCKETING_LABEL,
-        &[
+        &mut [
             (
                 "Integer.add_mul_assign(Integer, Integer)",
                 &mut (|(mut a, b, c)| a.add_mul_assign(b, c)),
@@ -174,7 +174,7 @@ pub fn benchmark_integer_add_mul_assign_algorithms(
         file_name,
         &bucketing_function,
         BUCKETING_LABEL,
-        &[
+        &mut [
             (
                 "Integer.add_mul_assign(Integer, Integer)",
                 &mut (|(mut a, b, c)| a.add_mul_assign(b, c)),
@@ -201,7 +201,7 @@ pub fn benchmark_integer_add_mul_assign_val_ref_algorithms(
         file_name,
         &bucketing_function,
         BUCKETING_LABEL,
-        &[
+        &mut [
             (
                 "Integer.add_mul_assign(Integer, &Integer)",
                 &mut (|(mut a, b, c)| a.add_mul_assign(b, &c)),
@@ -228,7 +228,7 @@ pub fn benchmark_integer_add_mul_assign_ref_val_algorithms(
         file_name,
         &bucketing_function,
         BUCKETING_LABEL,
-        &[
+        &mut [
             (
                 "Integer.add_mul_assign(&Integer, Integer)",
                 &mut (|(mut a, b, c)| a.add_mul_assign(&b, c)),
@@ -255,7 +255,7 @@ pub fn benchmark_integer_add_mul_assign_ref_ref_algorithms(
         file_name,
         &bucketing_function,
         BUCKETING_LABEL,
-        &[
+        &mut [
             (
                 "Integer.add_mul_assign(&Integer, &Integer)",
                 &mut (|(mut a, b, c)| a.add_mul_assign(&b, &c)),
@@ -282,7 +282,7 @@ pub fn benchmark_integer_add_mul_evaluation_strategy(
         file_name,
         &bucketing_function,
         BUCKETING_LABEL,
-        &[
+        &mut [
             (
                 "Integer.add_mul(Integer, Integer)",
                 &mut (|(a, b, c)| no_out!(a.add_mul(b, c))),
@@ -317,7 +317,7 @@ pub fn benchmark_integer_add_mul_algorithms(gm: GenerationMode, limit: usize, fi
         file_name,
         &bucketing_function,
         BUCKETING_LABEL,
-        &[
+        &mut [
             (
                 "Integer.add_mul(Integer, Integer)",
                 &mut (|(a, b, c)| no_out!(a.add_mul(b, c))),
@@ -344,7 +344,7 @@ pub fn benchmark_integer_add_mul_val_val_ref_algorithms(
         file_name,
         &bucketing_function,
         BUCKETING_LABEL,
-        &[
+        &mut [
             (
                 "Integer.add_mul(Integer, &Integer)",
                 &mut (|(a, b, c)| no_out!(a.add_mul(b, &c))),
@@ -371,7 +371,7 @@ pub fn benchmark_integer_add_mul_val_ref_val_algorithms(
         file_name,
         &bucketing_function,
         BUCKETING_LABEL,
-        &[
+        &mut [
             (
                 "Integer.add_mul(&Integer, Integer)",
                 &mut (|(a, b, c)| no_out!(a.add_mul(&b, c))),
@@ -398,7 +398,7 @@ pub fn benchmark_integer_add_mul_val_ref_ref_algorithms(
         file_name,
         &bucketing_function,
         BUCKETING_LABEL,
-        &[
+        &mut [
             (
                 "Integer.add_mul(&Integer, &Integer)",
                 &mut (|(a, b, c)| no_out!(a.add_mul(&b, &c))),
@@ -425,7 +425,7 @@ pub fn benchmark_integer_add_mul_ref_ref_ref_algorithms(
         file_name,
         &bucketing_function,
         BUCKETING_LABEL,
-        &[
+        &mut [
             (
                 "(&Integer).add_mul(&Integer, &Integer)",
                 &mut (|(a, b, c)| no_out!((&a).add_mul(&b, &c))),

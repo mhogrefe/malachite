@@ -54,7 +54,7 @@ pub fn benchmark_limbs_asc_from_bits_asc(gm: GenerationMode, limit: usize, file_
         file_name,
         &(|bits| bits.len()),
         "bits.len()",
-        &[
+        &mut [
             (
                 "limbs_asc_from_bits_asc(&[bool])",
                 &mut (|ref bits| no_out!(limbs_asc_from_bits_asc(bits))),
@@ -73,7 +73,7 @@ pub fn benchmark_limbs_asc_from_bits_desc(gm: GenerationMode, limit: usize, file
         file_name,
         &(|bits| bits.len()),
         "bits.len()",
-        &[
+        &mut [
             (
                 "limbs_asc_from_bits_desc(&[bool])",
                 &mut (|ref bits| no_out!(limbs_asc_from_bits_desc(bits))),
@@ -92,7 +92,7 @@ pub fn benchmark_natural_from_bits_asc(gm: GenerationMode, limit: usize, file_na
         file_name,
         &(|bits| bits.len()),
         "bits.len()",
-        &[
+        &mut [
             (
                 "Natural::from_bits_asc(&[bool])",
                 &mut (|ref bits| no_out!(Natural::from_bits_asc(bits))),
@@ -111,7 +111,7 @@ pub fn benchmark_natural_from_bits_desc(gm: GenerationMode, limit: usize, file_n
         file_name,
         &(|bits| bits.len()),
         "bits.len()",
-        &[
+        &mut [
             (
                 "Natural::from_bits_desc(&[bool])",
                 &mut (|ref bits| no_out!(Natural::from_bits_desc(bits))),

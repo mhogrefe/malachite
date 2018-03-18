@@ -56,7 +56,7 @@ pub fn benchmark_natural_from_limbs_asc_evaluation_strategy(
         file_name,
         &(|limbs| limbs.len()),
         "limbs.len()",
-        &[
+        &mut [
             (
                 "Natural::from_limbs_asc(&[u32])",
                 &mut (|ref limbs| no_out!(Natural::from_limbs_asc(limbs))),
@@ -83,7 +83,7 @@ pub fn benchmark_natural_from_limbs_desc_evaluation_strategy(
         file_name,
         &(|limbs| limbs.len()),
         "limbs.len()",
-        &[
+        &mut [
             (
                 "Natural::from_limbs_desc(&[u32])",
                 &mut (|ref limbs| no_out!(Natural::from_limbs_asc(limbs))),

@@ -42,7 +42,7 @@ fn benchmark_unsigned_assign_bit<T: 'static + PrimitiveUnsigned>(
         file_name,
         &(|&(_, index, _)| index as usize),
         "index",
-        &[
+        &mut [
             (
                 "malachite",
                 &mut (|(mut n, index, bit)| n.assign_bit(index, bit)),
@@ -65,7 +65,7 @@ fn benchmark_signed_assign_bit<T: 'static + PrimitiveSigned>(
         file_name,
         &(|&(_, index, _)| index as usize),
         "index",
-        &[
+        &mut [
             (
                 "malachite",
                 &mut (|(mut n, index, bit)| n.assign_bit(index, bit)),

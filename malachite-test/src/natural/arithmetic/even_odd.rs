@@ -32,7 +32,7 @@ pub fn benchmark_natural_is_even(gm: GenerationMode, limit: usize, file_name: &s
         file_name,
         &(|n| n.significant_bits() as usize),
         "n.significant_bits()",
-        &[("malachite", &mut (|n| no_out!(n.is_even())))],
+        &mut [("malachite", &mut (|n| no_out!(n.is_even())))],
     );
 }
 
@@ -46,6 +46,6 @@ pub fn benchmark_natural_is_odd(gm: GenerationMode, limit: usize, file_name: &st
         file_name,
         &(|n| n.significant_bits() as usize),
         "n.significant_bits()",
-        &[("malachite", &mut (|n| no_out!(n.is_odd())))],
+        &mut [("malachite", &mut (|n| no_out!(n.is_odd())))],
     );
 }

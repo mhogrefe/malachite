@@ -21,6 +21,6 @@ pub fn benchmark_char_increment(gm: NoSpecialGenerationMode, limit: usize, file_
         file_name,
         &(|&c| char_to_contiguous_range(c) as usize),
         "char_to_contiguous_range(char)",
-        &[("malachite", &mut (|mut c| c.increment()))],
+        &mut [("malachite", &mut (|mut c| c.increment()))],
     );
 }

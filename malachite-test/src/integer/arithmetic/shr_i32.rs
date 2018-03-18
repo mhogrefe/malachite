@@ -74,7 +74,7 @@ pub fn benchmark_integer_shr_assign_i32_library_comparison(
         file_name,
         &(|&(_, (_, other))| other as usize),
         "other",
-        &[
+        &mut [
             ("malachite", &mut (|(_, (mut x, y))| x >>= y)),
             ("rug", &mut (|((mut x, y), _)| x >>= y)),
         ],
@@ -95,7 +95,7 @@ pub fn benchmark_integer_shr_i32_library_comparison(
         file_name,
         &(|&(_, (_, other))| other as usize),
         "other",
-        &[
+        &mut [
             ("malachite", &mut (|(_, (x, y))| no_out!(x >> y))),
             ("rug", &mut (|((x, y), _)| no_out!(x >> y))),
         ],
@@ -116,7 +116,7 @@ pub fn benchmark_integer_shr_i32_evaluation_strategy(
         file_name,
         &(|&(_, other)| other as usize),
         "other",
-        &[
+        &mut [
             ("Integer >> i32", &mut (|(x, y)| no_out!(x >> y))),
             ("&Integer >> i32", &mut (|(x, y)| no_out!(&x >> y))),
         ],
@@ -133,7 +133,7 @@ pub fn benchmark_integer_shr_round_assign_i32(gm: GenerationMode, limit: usize, 
         file_name,
         &(|&(_, other, _)| other as usize),
         "other",
-        &[
+        &mut [
             (
                 "malachite",
                 &mut (|(mut x, y, rm)| x.shr_round_assign(y, rm)),
@@ -156,7 +156,7 @@ pub fn benchmark_integer_shr_round_i32_evaluation_strategy(
         file_name,
         &(|&(_, other, _)| other as usize),
         "other",
-        &[
+        &mut [
             (
                 "Integer.shr_round(i32, RoundingMode)",
                 &mut (|(x, y, rm)| no_out!(x.shr_round(y, rm))),

@@ -80,7 +80,7 @@ pub fn benchmark_natural_add_mul_assign_u32_evaluation_strategy(
         file_name,
         &(|&(ref a, ref b, _)| max(a.significant_bits(), b.significant_bits()) as usize),
         "max(a.significant_bits(), b.significant_bits())",
-        &[
+        &mut [
             (
                 "Natural.add_mul_assign(Natural, u32)",
                 &mut (|(mut a, b, c)| a.add_mul_assign(b, c)),
@@ -107,7 +107,7 @@ pub fn benchmark_natural_add_mul_assign_u32_algorithms(
         file_name,
         &(|&(ref a, ref b, _)| max(a.significant_bits(), b.significant_bits()) as usize),
         "max(a.significant_bits(), b.significant_bits())",
-        &[
+        &mut [
             (
                 "Natural.add_mul_assign(Natural, u32)",
                 &mut (|(mut a, b, c)| a.add_mul_assign(b, c)),
@@ -134,7 +134,7 @@ pub fn benchmark_natural_add_mul_assign_u32_ref_algorithms(
         file_name,
         &(|&(ref a, ref b, _)| max(a.significant_bits(), b.significant_bits()) as usize),
         "max(a.significant_bits(), b.significant_bits())",
-        &[
+        &mut [
             (
                 "Natural.add_mul_assign(&Natural, u32)",
                 &mut (|(mut a, b, c)| a.add_mul_assign(&b, c)),
@@ -161,7 +161,7 @@ pub fn benchmark_natural_add_mul_u32_evaluation_strategy(
         file_name,
         &(|&(ref a, ref b, _)| max(a.significant_bits(), b.significant_bits()) as usize),
         "max(a.significant_bits(), b.significant_bits())",
-        &[
+        &mut [
             (
                 "Natural.add_mul(Natural, u32)",
                 &mut (|(a, b, c)| no_out!(a.add_mul(b, c))),
@@ -192,7 +192,7 @@ pub fn benchmark_natural_add_mul_u32_algorithms(gm: GenerationMode, limit: usize
         file_name,
         &(|&(ref a, ref b, _)| max(a.significant_bits(), b.significant_bits()) as usize),
         "max(a.significant_bits(), b.significant_bits())",
-        &[
+        &mut [
             (
                 "Natural.add_mul(Natural, u32)",
                 &mut (|(a, b, c)| no_out!(a.add_mul(b, c))),
@@ -219,7 +219,7 @@ pub fn benchmark_natural_add_mul_u32_val_ref_algorithms(
         file_name,
         &(|&(ref a, ref b, _)| max(a.significant_bits(), b.significant_bits()) as usize),
         "max(a.significant_bits(), b.significant_bits())",
-        &[
+        &mut [
             (
                 "Natural.add_mul(&Natural, u32)",
                 &mut (|(a, b, c)| no_out!(a.add_mul(&b, c))),
@@ -246,7 +246,7 @@ pub fn benchmark_natural_add_mul_u32_ref_val_algorithms(
         file_name,
         &(|&(ref a, ref b, _)| max(a.significant_bits(), b.significant_bits()) as usize),
         "max(a.significant_bits(), b.significant_bits())",
-        &[
+        &mut [
             (
                 "(&Natural).add_mul(Natural, u32)",
                 &mut (|(a, b, c)| no_out!((&a).add_mul(b, c))),
@@ -273,7 +273,7 @@ pub fn benchmark_natural_add_mul_u32_ref_ref_algorithms(
         file_name,
         &(|&(ref a, ref b, _)| max(a.significant_bits(), b.significant_bits()) as usize),
         "max(a.significant_bits(), b.significant_bits())",
-        &[
+        &mut [
             (
                 "(&Natural).add_mul(&Natural, u32)",
                 &mut (|(a, b, c)| no_out!((&a).add_mul(&b, c))),

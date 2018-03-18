@@ -119,9 +119,11 @@ impl BitAccess for Natural {
     /// Sets the `index`th bit of a `Natural`, or the coefficient of 2<sup>`index`</sup> in its
     /// binary expansion, to 0.
     ///
-    /// Time: worst case O(1)
+    /// Time: worst case O(n)
     ///
     /// Additional memory: worst case O(1)
+    ///
+    /// where n = `index`
     ///
     /// # Examples
     /// ```

@@ -18,7 +18,7 @@ pub fn benchmark_integer_significant_bits(gm: GenerationMode, limit: usize, file
         file_name,
         &(|&(_, _, ref n)| n.significant_bits() as usize),
         "n.significant_bits()",
-        &[
+        &mut [
             (
                 "malachite",
                 &mut (|(_, _, n)| no_out!(n.significant_bits())),

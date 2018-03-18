@@ -21,6 +21,6 @@ pub fn benchmark_integer_set_bit(gm: GenerationMode, limit: usize, file_name: &s
         file_name,
         &(|&(ref n, index)| max(n.significant_bits(), index) as usize),
         "max(n.significant_bits(), index)",
-        &[("malachite", &mut (|(mut n, index)| n.set_bit(index)))],
+        &mut [("malachite", &mut (|(mut n, index)| n.set_bit(index)))],
     );
 }

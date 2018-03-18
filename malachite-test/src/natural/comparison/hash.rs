@@ -1,9 +1,7 @@
-use common::{natural_to_biguint, GenerationMode};
+use common::{m_run_benchmark, BenchmarkType, GenerationMode};
 use hash::hash;
-use inputs::natural::naturals;
+use inputs::natural::{naturals, nrm_naturals};
 use malachite_base::num::SignificantBits;
-use num::BigUint;
-use rust_wheels::benchmarks::{BenchmarkOptions2, benchmark_2};
 
 pub fn demo_natural_hash(gm: GenerationMode, limit: usize) {
     for n in naturals(gm).take(limit) {
@@ -12,20 +10,19 @@ pub fn demo_natural_hash(gm: GenerationMode, limit: usize) {
 }
 
 pub fn benchmark_natural_hash(gm: GenerationMode, limit: usize, file_name: &str) {
-    println!("benchmarking {} Natural hash", gm.name());
-    benchmark_2(BenchmarkOptions2 {
-        xs: naturals(gm),
-        function_f: &mut (|n| hash(&n)),
-        function_g: &mut (|n: BigUint| hash(&n)),
-        x_cons: &(|x| x.clone()),
-        y_cons: &(|x| natural_to_biguint(x)),
-        x_param: &(|n| n.significant_bits() as usize),
+    m_run_benchmark(
+        "Natural hash",
+        BenchmarkType::LibraryComparison,
+        nrm_naturals(gm),
+        gm.name(),
         limit,
-        f_name: "malachite",
-        g_name: "num",
-        title: "Natural hash",
-        x_axis_label: "n.significant_bits()",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+        file_name,
+        &(|&(_, _, ref n)| n.significant_bits() as usize),
+        "n.significant_bits()",
+        &mut [
+            ("malachite", &mut (|(_, _, n)| no_out!(hash(&n)))),
+            ("num", &mut (|(_, n, _)| no_out!(hash(&n)))),
+            ("rug", &mut (|(n, _, _)| no_out!(hash(&n)))),
+        ],
+    );
 }

@@ -1,10 +1,7 @@
-use common::{natural_to_biguint, natural_to_rug_integer, GenerationMode};
-use inputs::natural::pairs_of_natural_and_small_u64;
+use common::{m_run_benchmark, BenchmarkType, GenerationMode};
+use inputs::natural::{nrm_pairs_of_natural_and_small_u64, pairs_of_natural_and_small_u64};
 use malachite_base::num::BitAccess;
-use malachite_nz::natural::Natural;
 use num::{BigUint, One, Zero};
-use rug;
-use rust_wheels::benchmarks::{BenchmarkOptions3, benchmark_3};
 
 pub fn num_get_bit(x: &BigUint, index: u64) -> bool {
     x & (BigUint::one() << index as usize) != BigUint::zero()
@@ -16,24 +13,33 @@ pub fn demo_natural_get_bit(gm: GenerationMode, limit: usize) {
     }
 }
 
-pub fn benchmark_natural_get_bit(gm: GenerationMode, limit: usize, file_name: &str) {
-    println!("benchmarking {} Natural.get_bit(u64)", gm.name());
-    benchmark_3(BenchmarkOptions3 {
-        xs: pairs_of_natural_and_small_u64(gm),
-        function_f: &mut (|(n, index): (Natural, u64)| n.get_bit(index)),
-        function_g: &mut (|(n, index): (BigUint, u64)| num_get_bit(&n, index)),
-        function_h: &mut (|(n, index): (rug::Integer, u64)| n.get_bit(index as u32)),
-        x_cons: &(|p| p.clone()),
-        y_cons: &(|&(ref n, index)| (natural_to_biguint(n), index)),
-        z_cons: &(|&(ref n, index)| (natural_to_rug_integer(n), index)),
-        x_param: &(|&(_, index)| index as usize),
+pub fn benchmark_natural_get_bit_library_comparison(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "Natural.get_bit(u64)",
+        BenchmarkType::LibraryComparison,
+        nrm_pairs_of_natural_and_small_u64(gm),
+        gm.name(),
         limit,
-        f_name: "malachite",
-        g_name: "num",
-        h_name: "rug",
-        title: "Natural.get_bit(u64)",
-        x_axis_label: "index",
-        y_axis_label: "time (ns)",
-        file_name: &format!("benchmarks/{}", file_name),
-    });
+        file_name,
+        &(|&(_, _, (_, index))| index as usize),
+        "index",
+        &mut [
+            (
+                "malachite",
+                &mut (|(_, _, (n, index))| no_out!(n.get_bit(index))),
+            ),
+            (
+                "num",
+                &mut (|((n, index), _, _)| no_out!(num_get_bit(&n, index))),
+            ),
+            (
+                "rug",
+                &mut (|(_, (n, index), _)| no_out!(n.get_bit(index as u32))),
+            ),
+        ],
+    );
 }

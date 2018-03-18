@@ -51,7 +51,7 @@ pub fn benchmark_natural_bits_evaluation_strategy(
         file_name,
         &(|n| n.significant_bits() as usize),
         "n.significant_bits()",
-        &[
+        &mut [
             ("Natural.to_bits_asc()", &mut (|n| no_out!(n.to_bits_asc()))),
             (
                 "Natural.bits().collect::<Vec<bool>>()",
@@ -76,7 +76,7 @@ pub fn benchmark_natural_bits_rev_evaluation_strategy(
         file_name,
         &(|n| n.significant_bits() as usize),
         "n.significant_bits()",
-        &[
+        &mut [
             (
                 "Natural.to_bits_desc()",
                 &mut (|n| no_out!(n.to_bits_desc())),
@@ -99,7 +99,7 @@ pub fn benchmark_natural_bits_size_hint(gm: GenerationMode, limit: usize, file_n
         file_name,
         &(|n| n.significant_bits() as usize),
         "n.significant_bits()",
-        &[
+        &mut [
             (
                 "Natural.bits().size_hint()",
                 &mut (|n| no_out!(n.bits().size_hint())),

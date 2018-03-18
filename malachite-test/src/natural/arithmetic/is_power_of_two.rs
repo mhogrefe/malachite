@@ -22,6 +22,6 @@ pub fn benchmark_natural_is_power_of_two(gm: GenerationMode, limit: usize, file_
         file_name,
         &(|n| n.significant_bits() as usize),
         "n.significant_bits()",
-        &[("malachite", &mut (|n| no_out!(n.is_power_of_two())))],
+        &mut [("malachite", &mut (|n| no_out!(n.is_power_of_two())))],
     );
 }

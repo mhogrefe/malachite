@@ -22,7 +22,7 @@ pub fn benchmark_contiguous_range_to_char(gm: GenerationMode, limit: usize, file
         file_name,
         &(|&i| i as usize),
         "i",
-        &[
+        &mut [
             ("malachite", &mut (|i| no_out!(contiguous_range_to_char(i)))),
         ],
     );

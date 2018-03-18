@@ -29,7 +29,7 @@ pub fn benchmark_integer_to_natural_evaluation_strategy(
         file_name,
         &(|n| n.significant_bits() as usize),
         "n.significant_bits()",
-        &[
+        &mut [
             ("Integer.to_natural()", &mut (|n| no_out!(n.to_natural()))),
             (
                 "Integer.into_natural()",

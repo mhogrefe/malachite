@@ -31,7 +31,7 @@ pub fn benchmark_integer_assign_u32_library_comparison(
         file_name,
         &(|&(_, _, (ref n, _))| n.significant_bits() as usize),
         "n.significant_bits()",
-        &[
+        &mut [
             ("malachite", &mut (|(_, _, (mut x, y))| x.assign(y))),
             ("num", &mut (|((mut x, y), _, _)| num_assign_u32(&mut x, y))),
             ("rug", &mut (|(_, (mut x, y), _)| x.assign(y))),
