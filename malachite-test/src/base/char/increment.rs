@@ -1,9 +1,14 @@
-use common::{m_run_benchmark, BenchmarkType, NoSpecialGenerationMode};
+use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, NoSpecialGenerationMode, ScaleType};
 use inputs::base::chars_not_max;
 use malachite_base::chars::char_to_contiguous_range;
 use malachite_base::misc::Walkable;
 
-pub fn demo_char_increment(gm: NoSpecialGenerationMode, limit: usize) {
+pub fn register(registry: &mut DemoBenchRegistry) {
+    register_ns_demo!(registry, demo_char_increment);
+    register_ns_bench!(registry, None, benchmark_char_increment);
+}
+
+fn demo_char_increment(gm: NoSpecialGenerationMode, limit: usize) {
     for mut c in chars_not_max(gm).take(limit) {
         let c_old = c;
         c.increment();
@@ -11,7 +16,7 @@ pub fn demo_char_increment(gm: NoSpecialGenerationMode, limit: usize) {
     }
 }
 
-pub fn benchmark_char_increment(gm: NoSpecialGenerationMode, limit: usize, file_name: &str) {
+fn benchmark_char_increment(gm: NoSpecialGenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "char.increment()",
         BenchmarkType::Single,

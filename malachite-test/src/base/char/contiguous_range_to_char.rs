@@ -1,8 +1,13 @@
-use common::{m_run_benchmark, BenchmarkType, GenerationMode};
+use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::unsigneds;
 use malachite_base::chars::contiguous_range_to_char;
 
-pub fn demo_contiguous_range_to_char(gm: GenerationMode, limit: usize) {
+pub fn register(registry: &mut DemoBenchRegistry) {
+    register_demo!(registry, demo_contiguous_range_to_char);
+    register_bench!(registry, None, benchmark_contiguous_range_to_char);
+}
+
+fn demo_contiguous_range_to_char(gm: GenerationMode, limit: usize) {
     for i in unsigneds(gm).take(limit) {
         println!(
             "contiguous_range_to_char({}) = {:?}",
@@ -12,7 +17,7 @@ pub fn demo_contiguous_range_to_char(gm: GenerationMode, limit: usize) {
     }
 }
 
-pub fn benchmark_contiguous_range_to_char(gm: GenerationMode, limit: usize, file_name: &str) {
+fn benchmark_contiguous_range_to_char(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "contiguous_range_to_char(char)",
         BenchmarkType::Single,

@@ -3,6 +3,7 @@ use malachite_nz::natural::Natural;
 use num::{BigInt, BigUint};
 use rug;
 use rust_wheels::benchmarks::{run_benchmark, BenchmarkOptions, BenchmarkSeriesOptions};
+use std::collections::BTreeMap;
 use std::str::FromStr;
 
 pub fn biguint_to_natural(n: &BigUint) -> Natural {
@@ -35,6 +36,116 @@ pub fn rug_integer_to_integer(n: &rug::Integer) -> Integer {
 
 pub fn integer_to_rug_integer(n: &Integer) -> rug::Integer {
     rug::Integer::from_str(n.to_string().as_ref()).unwrap()
+}
+
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
+pub enum ScaleType {
+    None,
+    Small,
+    Large,
+}
+
+pub fn get_gm(gm_string: &str, scale_type: ScaleType) -> GenerationMode {
+    let scale = match scale_type {
+        ScaleType::None => 0,
+        ScaleType::Small => 128,
+        ScaleType::Large => 1024,
+    };
+    match gm_string {
+        "exhaustive" => GenerationMode::Exhaustive,
+        "random" => GenerationMode::Random(scale),
+        "special_random" => GenerationMode::SpecialRandom(scale),
+        _ => panic!(),
+    }
+}
+
+pub fn get_no_special_gm(gm_string: &str, scale_type: ScaleType) -> NoSpecialGenerationMode {
+    let scale = match scale_type {
+        ScaleType::None => 0,
+        ScaleType::Small => 128,
+        ScaleType::Large => 1024,
+    };
+    match gm_string {
+        "exhaustive" => NoSpecialGenerationMode::Exhaustive,
+        "random" => NoSpecialGenerationMode::Random(scale),
+        _ => panic!(),
+    }
+}
+
+type DemoFn = &'static Fn(GenerationMode, usize) -> ();
+type BenchFn = &'static Fn(GenerationMode, usize, &'static str) -> ();
+type NoSpecialDemoFn = &'static Fn(NoSpecialGenerationMode, usize) -> ();
+type NoSpecialBenchFn = &'static Fn(NoSpecialGenerationMode, usize, &'static str) -> ();
+
+#[derive(Default)]
+pub struct DemoBenchRegistry {
+    demo_map: BTreeMap<&'static str, DemoFn>,
+    bench_map: BTreeMap<&'static str, (ScaleType, BenchFn)>,
+    no_special_demo_map: BTreeMap<&'static str, NoSpecialDemoFn>,
+    no_special_bench_map: BTreeMap<&'static str, (ScaleType, NoSpecialBenchFn)>,
+}
+
+impl DemoBenchRegistry {
+    pub fn register_demo(&mut self, name: &'static str, f: DemoFn) {
+        self.demo_map.insert(name, f);
+    }
+
+    pub fn lookup_demo(&self, name: &str) -> Option<&DemoFn> {
+        self.demo_map.get(name)
+    }
+
+    pub fn register_bench(&mut self, scale_type: ScaleType, name: &'static str, f: BenchFn) {
+        self.bench_map.insert(name, (scale_type, f));
+    }
+
+    pub fn lookup_bench(&self, name: &str) -> Option<&(ScaleType, BenchFn)> {
+        self.bench_map.get(name)
+    }
+
+    pub fn register_no_special_demo(&mut self, name: &'static str, f: NoSpecialDemoFn) {
+        self.no_special_demo_map.insert(name, f);
+    }
+
+    pub fn lookup_no_special_demo(&self, name: &str) -> Option<&NoSpecialDemoFn> {
+        self.no_special_demo_map.get(name)
+    }
+
+    pub fn register_no_special_bench(
+        &mut self,
+        scale_type: ScaleType,
+        name: &'static str,
+        f: NoSpecialBenchFn,
+    ) {
+        self.no_special_bench_map.insert(name, (scale_type, f));
+    }
+
+    pub fn lookup_no_special_bench(&self, name: &str) -> Option<&(ScaleType, NoSpecialBenchFn)> {
+        self.no_special_bench_map.get(name)
+    }
+}
+
+macro_rules! register_demo {
+    ($registry: ident, $f: ident) => {{
+        $registry.register_demo(stringify!($f), &$f);
+    }};
+}
+
+macro_rules! register_ns_demo {
+    ($registry: ident, $f: ident) => {{
+        $registry.register_no_special_demo(stringify!($f), &$f);
+    }};
+}
+
+macro_rules! register_bench {
+    ($registry: ident, $st: ident, $f: ident) => {{
+        $registry.register_bench(ScaleType::$st, stringify!($f), &$f);
+    }};
+}
+
+macro_rules! register_ns_bench {
+    ($registry: ident, $st: ident, $f: ident) => {{
+        $registry.register_no_special_bench(ScaleType::$st, stringify!($f), &$f);
+    }};
 }
 
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
