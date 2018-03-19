@@ -1,6 +1,25 @@
-use common::{m_run_benchmark, BenchmarkType, GenerationMode};
+use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_base::num::{PrimitiveSigned, PrimitiveUnsigned};
 use inputs::base::{positive_unsigneds, signeds_no_min};
+
+pub fn register(registry: &mut DemoBenchRegistry) {
+    register_demo!(registry, demo_u8_decrement);
+    register_demo!(registry, demo_u16_decrement);
+    register_demo!(registry, demo_u32_decrement);
+    register_demo!(registry, demo_u64_decrement);
+    register_demo!(registry, demo_i8_decrement);
+    register_demo!(registry, demo_i16_decrement);
+    register_demo!(registry, demo_i32_decrement);
+    register_demo!(registry, demo_i64_decrement);
+    register_bench!(registry, None, benchmark_u8_decrement);
+    register_bench!(registry, None, benchmark_u16_decrement);
+    register_bench!(registry, None, benchmark_u32_decrement);
+    register_bench!(registry, None, benchmark_u64_decrement);
+    register_bench!(registry, None, benchmark_i8_decrement);
+    register_bench!(registry, None, benchmark_i16_decrement);
+    register_bench!(registry, None, benchmark_i32_decrement);
+    register_bench!(registry, None, benchmark_i64_decrement);
+}
 
 fn demo_unsigned_decrement<T: 'static + PrimitiveUnsigned>(gm: GenerationMode, limit: usize) {
     for mut n in positive_unsigneds::<T>(gm).take(limit) {
@@ -56,11 +75,11 @@ fn benchmark_signed_decrement<T: 'static + PrimitiveSigned>(
 
 macro_rules! unsigned {
     ($t: ident, $demo_name: ident, $bench_name: ident) => {
-        pub fn $demo_name(gm: GenerationMode, limit: usize) {
+        fn $demo_name(gm: GenerationMode, limit: usize) {
             demo_unsigned_decrement::<$t>(gm, limit);
         }
 
-        pub fn $bench_name(gm: GenerationMode, limit: usize, file_name: &str) {
+        fn $bench_name(gm: GenerationMode, limit: usize, file_name: &str) {
             benchmark_unsigned_decrement::<$t>(gm, limit, file_name);
         }
     };
@@ -68,11 +87,11 @@ macro_rules! unsigned {
 
 macro_rules! signed {
     ($t: ident, $demo_name: ident, $bench_name: ident) => {
-        pub fn $demo_name(gm: GenerationMode, limit: usize) {
+        fn $demo_name(gm: GenerationMode, limit: usize) {
             demo_signed_decrement::<$t>(gm, limit);
         }
 
-        pub fn $bench_name(gm: GenerationMode, limit: usize, file_name: &str) {
+        fn $bench_name(gm: GenerationMode, limit: usize, file_name: &str) {
             benchmark_signed_decrement::<$t>(gm, limit, file_name);
         }
     };

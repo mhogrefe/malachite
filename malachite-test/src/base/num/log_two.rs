@@ -1,6 +1,25 @@
-use common::{m_run_benchmark, BenchmarkType, GenerationMode};
+use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_base::num::PrimitiveUnsigned;
 use inputs::base::positive_unsigneds;
+
+pub fn register(registry: &mut DemoBenchRegistry) {
+    register_demo!(registry, demo_u8_floor_log_two);
+    register_demo!(registry, demo_u16_floor_log_two);
+    register_demo!(registry, demo_u32_floor_log_two);
+    register_demo!(registry, demo_u64_floor_log_two);
+    register_demo!(registry, demo_u8_ceiling_log_two);
+    register_demo!(registry, demo_u16_ceiling_log_two);
+    register_demo!(registry, demo_u32_ceiling_log_two);
+    register_demo!(registry, demo_u64_ceiling_log_two);
+    register_bench!(registry, None, benchmark_u8_floor_log_two);
+    register_bench!(registry, None, benchmark_u16_floor_log_two);
+    register_bench!(registry, None, benchmark_u32_floor_log_two);
+    register_bench!(registry, None, benchmark_u64_floor_log_two);
+    register_bench!(registry, None, benchmark_u8_ceiling_log_two);
+    register_bench!(registry, None, benchmark_u16_ceiling_log_two);
+    register_bench!(registry, None, benchmark_u32_ceiling_log_two);
+    register_bench!(registry, None, benchmark_u64_ceiling_log_two);
+}
 
 fn demo_unsigned_floor_log_two<T: 'static + PrimitiveUnsigned>(gm: GenerationMode, limit: usize) {
     for n in positive_unsigneds::<T>(gm).take(limit) {
@@ -58,19 +77,19 @@ macro_rules! unsigned {
         $bench_name_floor: ident,
         $bench_name_ceiling: ident
     ) => {
-        pub fn $demo_name_floor(gm: GenerationMode, limit: usize) {
+        fn $demo_name_floor(gm: GenerationMode, limit: usize) {
             demo_unsigned_floor_log_two::<$t>(gm, limit);
         }
 
-        pub fn $demo_name_ceiling(gm: GenerationMode, limit: usize) {
+        fn $demo_name_ceiling(gm: GenerationMode, limit: usize) {
             demo_unsigned_ceiling_log_two::<$t>(gm, limit);
         }
 
-        pub fn $bench_name_floor(gm: GenerationMode, limit: usize, file_name: &str) {
+        fn $bench_name_floor(gm: GenerationMode, limit: usize, file_name: &str) {
             benchmark_unsigned_floor_log_two::<$t>(gm, limit, file_name);
         }
 
-        pub fn $bench_name_ceiling(gm: GenerationMode, limit: usize, file_name: &str) {
+        fn $bench_name_ceiling(gm: GenerationMode, limit: usize, file_name: &str) {
             benchmark_unsigned_ceiling_log_two::<$t>(gm, limit, file_name);
         }
     }

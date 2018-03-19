@@ -1,28 +1,7 @@
 extern crate malachite_test;
 
-use malachite_test::base::limbs::limbs_delete_left::*;
-use malachite_test::base::limbs::limbs_pad_left::*;
-use malachite_test::base::limbs::limbs_set_zero::*;
-use malachite_test::base::limbs::limbs_test_zero::*;
-use malachite_test::base::num::assign_bit::*;
-use malachite_test::base::num::clear_bit::*;
-use malachite_test::base::num::decrement::*;
-use malachite_test::base::num::flip_bit::*;
-use malachite_test::base::num::get_bit::*;
-use malachite_test::base::num::increment::*;
-use malachite_test::base::num::join_halves::*;
-use malachite_test::base::num::log_two::*;
-use malachite_test::base::num::lower_half::*;
-use malachite_test::base::num::set_bit::*;
-use malachite_test::base::num::significant_bits::*;
-use malachite_test::base::num::split_in_half::*;
-use malachite_test::base::num::upper_half::*;
-use malachite_test::base::rounding_mode::clone::*;
-use malachite_test::base::rounding_mode::eq::*;
-use malachite_test::base::rounding_mode::hash::*;
-use malachite_test::base::rounding_mode::neg::*;
 use malachite_test::common::{get_gm, get_no_special_gm, DemoBenchRegistry, GenerationMode,
-                             NoSpecialGenerationMode, ScaleType};
+                             ScaleType};
 use malachite_test::integer::arithmetic::abs::*;
 use malachite_test::integer::arithmetic::add::*;
 use malachite_test::integer::arithmetic::add_i32::*;
@@ -141,12 +120,6 @@ use malachite_test::natural::logic::not::*;
 use malachite_test::natural::logic::set_bit::*;
 use malachite_test::natural::logic::significant_bits::*;
 use malachite_test::natural::logic::trailing_zeros::*;
-use malachite_test::natural::random::random_natural_below::*;
-use malachite_test::natural::random::random_natural_up_to_bits::*;
-use malachite_test::natural::random::random_natural_with_bits::*;
-use malachite_test::natural::random::special_random_natural_below::*;
-use malachite_test::natural::random::special_random_natural_up_to_bits::*;
-use malachite_test::natural::random::special_random_natural_with_bits::*;
 use std::env;
 
 pub fn main_2() {
@@ -169,6 +142,7 @@ pub fn main_2() {
 
     let mut registry = DemoBenchRegistry::default();
     malachite_test::base::register(&mut registry);
+    malachite_test::natural::register(&mut registry);
 
     if let Some(f) = registry.lookup_demo(item_name) {
         f(get_gm(generation_mode, ScaleType::None), limit);
@@ -194,11 +168,9 @@ pub fn main_2() {
 
 macro_rules! demos_and_benchmarks {
     (
-        [$($demo_fn: ident,)*],
         [$($special_demo_fn: ident,)*],
         [$($special_no_scale_bench_fn: ident,)*],
         [$($special_small_scale_bench_fn: ident,)*],
-        [$($large_scale_bench_fn: ident,)*],
         [$($special_large_scale_bench_fn: ident,)*]
     ) => {
         fn main() {
@@ -212,16 +184,6 @@ macro_rules! demos_and_benchmarks {
                 generation_mode == "exhaustive" || generation_mode == "random" || generation_mode == "special_random",
                 "Bad generation mode"
             );
-            let gm_demo = match generation_mode.as_ref() {
-                "exhaustive" => NoSpecialGenerationMode::Exhaustive,
-                "random" | "special_random" => NoSpecialGenerationMode::Random(32),
-                _ => unreachable!(),
-            };
-            let gm_large = match generation_mode.as_ref() {
-                "exhaustive" => NoSpecialGenerationMode::Exhaustive,
-                "random" | "special_random" => NoSpecialGenerationMode::Random(2048),
-                _ => unreachable!(),
-            };
             let sgm_demo = match generation_mode.as_ref() {
                 "exhaustive" => GenerationMode::Exhaustive,
                 "random" => GenerationMode::Random(32),
@@ -247,7 +209,6 @@ macro_rules! demos_and_benchmarks {
             };
             let item_name = &*args.last().unwrap();
             match item_name.as_ref() {
-                $(stringify!($demo_fn) => $demo_fn(gm_demo, limit)),*,
                 $(stringify!($special_demo_fn) => $special_demo_fn(sgm_demo, limit)),*,
                 $(
                     stringify!($special_no_scale_bench_fn) => {
@@ -259,11 +220,6 @@ macro_rules! demos_and_benchmarks {
                         $special_small_scale_bench_fn(sgm_small, limit, "temp.gp")
                     }
                 ),*
-                $(
-                    stringify!($large_scale_bench_fn) => {
-                        $large_scale_bench_fn(gm_large, limit, "temp.gp")
-                    }
-                ),*,
                 $(
                     stringify!($special_large_scale_bench_fn) => {
                         $special_large_scale_bench_fn(sgm_large, limit, "temp.gp")
@@ -305,18 +261,6 @@ macro_rules! demos_and_benchmarks {
                         );
                     )*
                     $(
-                        $large_scale_bench_fn(
-                            NoSpecialGenerationMode::Exhaustive,
-                            limit,
-                            &format!("exhaustive_{}.gp", stringify!($large_scale_bench_fn))
-                        );
-                        $large_scale_bench_fn(
-                            NoSpecialGenerationMode::Random(2048),
-                            limit,
-                            &format!("random_{}.gp", stringify!($large_scale_bench_fn))
-                        );
-                    )*
-                    $(
                         $special_large_scale_bench_fn(
                             GenerationMode::Exhaustive,
                             limit,
@@ -341,113 +285,13 @@ macro_rules! demos_and_benchmarks {
 }
 
 demos_and_benchmarks!(
-    // demo_fn
-    [
-        demo_rounding_mode_clone,
-        demo_rounding_mode_clone_from,
-        demo_rounding_mode_eq,
-        demo_rounding_mode_hash,
-        demo_rounding_mode_neg,
-        demo_natural_random_natural_up_to_bits,
-        demo_natural_random_natural_with_bits,
-        demo_natural_special_random_natural_up_to_bits,
-        demo_natural_special_random_natural_with_bits,
-    ],
     // special_demo_fn
     [
         demo_limbs_asc_from_bits_asc,
         demo_limbs_asc_from_bits_desc,
         demo_limbs_ceiling_log_two,
-        demo_limbs_delete_left,
         demo_limbs_floor_log_two,
-        demo_limbs_pad_left,
-        demo_limbs_set_zero,
         demo_limbs_significant_bits,
-        demo_limbs_test_zero,
-        demo_u8_assign_bit,
-        demo_u16_assign_bit,
-        demo_u32_assign_bit,
-        demo_u64_assign_bit,
-        demo_i8_assign_bit,
-        demo_i16_assign_bit,
-        demo_i32_assign_bit,
-        demo_i64_assign_bit,
-        demo_u8_ceiling_log_two,
-        demo_u16_ceiling_log_two,
-        demo_u32_ceiling_log_two,
-        demo_u64_ceiling_log_two,
-        demo_u8_clear_bit,
-        demo_u16_clear_bit,
-        demo_u32_clear_bit,
-        demo_u64_clear_bit,
-        demo_i8_clear_bit,
-        demo_i16_clear_bit,
-        demo_i32_clear_bit,
-        demo_i64_clear_bit,
-        demo_u8_decrement,
-        demo_u16_decrement,
-        demo_u32_decrement,
-        demo_u64_decrement,
-        demo_i8_decrement,
-        demo_i16_decrement,
-        demo_i32_decrement,
-        demo_i64_decrement,
-        demo_u8_flip_bit,
-        demo_u16_flip_bit,
-        demo_u32_flip_bit,
-        demo_u64_flip_bit,
-        demo_i8_flip_bit,
-        demo_i16_flip_bit,
-        demo_i32_flip_bit,
-        demo_i64_flip_bit,
-        demo_u8_floor_log_two,
-        demo_u16_floor_log_two,
-        demo_u32_floor_log_two,
-        demo_u64_floor_log_two,
-        demo_u8_get_bit,
-        demo_u16_get_bit,
-        demo_u32_get_bit,
-        demo_u64_get_bit,
-        demo_i8_get_bit,
-        demo_i16_get_bit,
-        demo_i32_get_bit,
-        demo_i64_get_bit,
-        demo_u8_increment,
-        demo_u16_increment,
-        demo_u32_increment,
-        demo_u64_increment,
-        demo_i8_increment,
-        demo_i16_increment,
-        demo_i32_increment,
-        demo_i64_increment,
-        demo_u16_join_halves,
-        demo_u32_join_halves,
-        demo_u64_join_halves,
-        demo_u16_lower_half,
-        demo_u32_lower_half,
-        demo_u64_lower_half,
-        demo_u8_set_bit,
-        demo_u16_set_bit,
-        demo_u32_set_bit,
-        demo_u64_set_bit,
-        demo_i8_set_bit,
-        demo_i16_set_bit,
-        demo_i32_set_bit,
-        demo_i64_set_bit,
-        demo_u8_significant_bits,
-        demo_u16_significant_bits,
-        demo_u32_significant_bits,
-        demo_u64_significant_bits,
-        demo_i8_significant_bits,
-        demo_i16_significant_bits,
-        demo_i32_significant_bits,
-        demo_i64_significant_bits,
-        demo_u16_split_in_half,
-        demo_u32_split_in_half,
-        demo_u64_split_in_half,
-        demo_u16_upper_half,
-        demo_u32_upper_half,
-        demo_u64_upper_half,
         demo_integer_abs_assign,
         demo_integer_abs,
         demo_integer_abs_ref,
@@ -743,7 +587,6 @@ demos_and_benchmarks!(
         demo_natural_partial_cmp_integer,
         demo_natural_partial_cmp_u32,
         demo_u32_partial_cmp_natural,
-        demo_natural_random_natural_below,
         demo_natural_serialize,
         demo_natural_set_bit,
         demo_natural_shl_assign_i32,
@@ -768,7 +611,6 @@ demos_and_benchmarks!(
         demo_natural_shr_round_u32,
         demo_natural_shr_round_u32_ref,
         demo_natural_significant_bits,
-        demo_natural_special_random_natural_below,
         demo_natural_sub_assign,
         demo_natural_sub,
         demo_natural_sub_ref_ref,
@@ -796,90 +638,6 @@ demos_and_benchmarks!(
     ],
     // special_no_scale_bench_fn
     [
-        benchmark_u8_assign_bit,
-        benchmark_u16_assign_bit,
-        benchmark_u32_assign_bit,
-        benchmark_u64_assign_bit,
-        benchmark_i8_assign_bit,
-        benchmark_i16_assign_bit,
-        benchmark_i32_assign_bit,
-        benchmark_i64_assign_bit,
-        benchmark_u8_ceiling_log_two,
-        benchmark_u16_ceiling_log_two,
-        benchmark_u32_ceiling_log_two,
-        benchmark_u64_ceiling_log_two,
-        benchmark_u8_decrement,
-        benchmark_u16_decrement,
-        benchmark_u32_decrement,
-        benchmark_u64_decrement,
-        benchmark_i8_decrement,
-        benchmark_i16_decrement,
-        benchmark_i32_decrement,
-        benchmark_i64_decrement,
-        benchmark_u8_flip_bit,
-        benchmark_u16_flip_bit,
-        benchmark_u32_flip_bit,
-        benchmark_u64_flip_bit,
-        benchmark_i8_flip_bit,
-        benchmark_i16_flip_bit,
-        benchmark_i32_flip_bit,
-        benchmark_i64_flip_bit,
-        benchmark_u8_floor_log_two,
-        benchmark_u16_floor_log_two,
-        benchmark_u32_floor_log_two,
-        benchmark_u64_floor_log_two,
-        benchmark_u8_get_bit,
-        benchmark_u16_get_bit,
-        benchmark_u32_get_bit,
-        benchmark_u64_get_bit,
-        benchmark_i8_get_bit,
-        benchmark_i16_get_bit,
-        benchmark_i32_get_bit,
-        benchmark_i64_get_bit,
-        benchmark_u8_increment,
-        benchmark_u16_increment,
-        benchmark_u32_increment,
-        benchmark_u64_increment,
-        benchmark_i8_increment,
-        benchmark_i16_increment,
-        benchmark_i32_increment,
-        benchmark_i64_increment,
-        benchmark_u16_join_halves,
-        benchmark_u32_join_halves,
-        benchmark_u64_join_halves,
-        benchmark_u8_set_bit,
-        benchmark_u16_set_bit,
-        benchmark_u32_set_bit,
-        benchmark_u64_set_bit,
-        benchmark_i8_set_bit,
-        benchmark_i16_set_bit,
-        benchmark_i32_set_bit,
-        benchmark_i64_set_bit,
-        benchmark_u8_clear_bit,
-        benchmark_u16_clear_bit,
-        benchmark_u32_clear_bit,
-        benchmark_u64_clear_bit,
-        benchmark_i8_clear_bit,
-        benchmark_i16_clear_bit,
-        benchmark_i32_clear_bit,
-        benchmark_i64_clear_bit,
-        benchmark_u16_lower_half,
-        benchmark_u32_lower_half,
-        benchmark_u64_lower_half,
-        benchmark_u8_significant_bits,
-        benchmark_u16_significant_bits,
-        benchmark_u32_significant_bits,
-        benchmark_u64_significant_bits,
-        benchmark_i8_significant_bits,
-        benchmark_i16_significant_bits,
-        benchmark_i32_significant_bits,
-        benchmark_i64_significant_bits,
-        benchmark_u16_split_in_half,
-        benchmark_u32_split_in_half,
-        benchmark_u64_split_in_half,
-        benchmark_u16_upper_half,
-        benchmark_u32_upper_half,
-        benchmark_u64_upper_half,
         benchmark_integer_from_i32_library_comparison,
         benchmark_integer_from_i64_library_comparison,
         benchmark_integer_from_u32_library_comparison,
@@ -904,25 +662,14 @@ demos_and_benchmarks!(
         benchmark_limbs_asc_from_bits_asc,
         benchmark_limbs_asc_from_bits_desc,
         benchmark_limbs_ceiling_log_two,
-        benchmark_limbs_delete_left,
         benchmark_limbs_floor_log_two,
-        benchmark_limbs_pad_left,
-        benchmark_limbs_set_zero,
         benchmark_limbs_significant_bits,
-        benchmark_limbs_test_zero,
         benchmark_integer_from_sign_and_limbs_asc_evaluation_strategy,
         benchmark_integer_from_sign_and_limbs_desc_evaluation_strategy,
         benchmark_integer_from_twos_complement_limbs_asc,
         benchmark_integer_from_twos_complement_limbs_desc,
         benchmark_natural_from_limbs_asc_evaluation_strategy,
         benchmark_natural_from_limbs_desc_evaluation_strategy,
-    ],
-    // large_scale_bench_fn
-    [
-        benchmark_natural_random_natural_up_to_bits,
-        benchmark_natural_random_natural_with_bits,
-        benchmark_natural_special_random_natural_up_to_bits,
-        benchmark_natural_special_random_natural_with_bits,
     ],
     // special_large_scale_bench_fn
     [
@@ -1188,7 +935,6 @@ demos_and_benchmarks!(
         benchmark_natural_partial_eq_u32_library_comparison,
         benchmark_u32_partial_eq_natural_library_comparison,
         benchmark_natural_partial_eq_integer_library_comparison,
-        benchmark_natural_random_natural_below,
         benchmark_natural_serialize,
         benchmark_natural_set_bit_library_comparison,
         benchmark_natural_shl_assign_i32_library_comparison,
@@ -1206,7 +952,6 @@ demos_and_benchmarks!(
         benchmark_natural_shr_round_assign_u32,
         benchmark_natural_shr_round_u32_evaluation_strategy,
         benchmark_natural_significant_bits,
-        benchmark_natural_special_random_natural_below,
         benchmark_natural_sub_assign_library_comparison,
         benchmark_natural_sub_evaluation_strategy,
         benchmark_natural_sub_library_comparison,

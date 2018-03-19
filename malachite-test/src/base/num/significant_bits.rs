@@ -1,6 +1,25 @@
-use common::{m_run_benchmark, BenchmarkType, GenerationMode};
+use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_base::num::{PrimitiveSigned, PrimitiveUnsigned};
 use inputs::base::{signeds, unsigneds};
+
+pub fn register(registry: &mut DemoBenchRegistry) {
+    register_demo!(registry, demo_u8_significant_bits);
+    register_demo!(registry, demo_u16_significant_bits);
+    register_demo!(registry, demo_u32_significant_bits);
+    register_demo!(registry, demo_u64_significant_bits);
+    register_demo!(registry, demo_i8_significant_bits);
+    register_demo!(registry, demo_i16_significant_bits);
+    register_demo!(registry, demo_i32_significant_bits);
+    register_demo!(registry, demo_i64_significant_bits);
+    register_bench!(registry, None, benchmark_u8_significant_bits);
+    register_bench!(registry, None, benchmark_u16_significant_bits);
+    register_bench!(registry, None, benchmark_u32_significant_bits);
+    register_bench!(registry, None, benchmark_u64_significant_bits);
+    register_bench!(registry, None, benchmark_i8_significant_bits);
+    register_bench!(registry, None, benchmark_i16_significant_bits);
+    register_bench!(registry, None, benchmark_i32_significant_bits);
+    register_bench!(registry, None, benchmark_i64_significant_bits);
+}
 
 fn demo_unsigned_significant_bits<T: 'static + PrimitiveUnsigned>(
     gm: GenerationMode,
@@ -55,11 +74,11 @@ fn benchmark_signed_significant_bits<T: 'static + PrimitiveSigned>(
 
 macro_rules! unsigned {
     ($t: ident, $demo_name: ident, $bench_name: ident) => {
-        pub fn $demo_name(gm: GenerationMode, limit: usize) {
+        fn $demo_name(gm: GenerationMode, limit: usize) {
             demo_unsigned_significant_bits::<$t>(gm, limit);
         }
 
-        pub fn $bench_name(gm: GenerationMode, limit: usize, file_name: &str) {
+        fn $bench_name(gm: GenerationMode, limit: usize, file_name: &str) {
             benchmark_unsigned_significant_bits::<$t>(gm, limit, file_name);
         }
     };
@@ -67,11 +86,11 @@ macro_rules! unsigned {
 
 macro_rules! signed {
     ($t: ident, $demo_name: ident, $bench_name: ident) => {
-        pub fn $demo_name(gm: GenerationMode, limit: usize) {
+        fn $demo_name(gm: GenerationMode, limit: usize) {
             demo_signed_significant_bits::<$t>(gm, limit);
         }
 
-        pub fn $bench_name(gm: GenerationMode, limit: usize, file_name: &str) {
+        fn $bench_name(gm: GenerationMode, limit: usize, file_name: &str) {
             benchmark_signed_significant_bits::<$t>(gm, limit, file_name);
         }
     };

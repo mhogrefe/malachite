@@ -1,8 +1,17 @@
-use common::{m_run_benchmark, BenchmarkType, GenerationMode};
+use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::pairs_of_unsigneds;
 use malachite_base::misc::Named;
 use malachite_base::num::{JoinHalves, PrimitiveUnsigned, SignificantBits};
 use std::cmp::max;
+
+pub fn register(registry: &mut DemoBenchRegistry) {
+    register_demo!(registry, demo_u16_join_halves);
+    register_demo!(registry, demo_u32_join_halves);
+    register_demo!(registry, demo_u64_join_halves);
+    register_bench!(registry, None, benchmark_u16_join_halves);
+    register_bench!(registry, None, benchmark_u32_join_halves);
+    register_bench!(registry, None, benchmark_u64_join_halves);
+}
 
 fn demo_unsigned_join_halves<T: 'static + JoinHalves + PrimitiveUnsigned>(
     gm: GenerationMode,
@@ -48,11 +57,11 @@ fn benchmark_unsigned_join_halves<T: 'static + JoinHalves + PrimitiveUnsigned>(
 
 macro_rules! unsigned {
     ($t: ident, $demo_name: ident, $bench_name: ident) => {
-        pub fn $demo_name(gm: GenerationMode, limit: usize) {
+        fn $demo_name(gm: GenerationMode, limit: usize) {
             demo_unsigned_join_halves::<$t>(gm, limit);
         }
 
-        pub fn $bench_name(gm: GenerationMode, limit: usize, file_name: &str) {
+        fn $bench_name(gm: GenerationMode, limit: usize, file_name: &str) {
             benchmark_unsigned_join_halves::<$t>(gm, limit, file_name);
         }
     };

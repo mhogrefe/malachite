@@ -1,8 +1,13 @@
-use common::{m_run_benchmark, BenchmarkType, GenerationMode};
+use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::vecs_of_unsigned;
 use malachite_base::limbs::limbs_set_zero;
 
-pub fn demo_limbs_set_zero(gm: GenerationMode, limit: usize) {
+pub fn register(registry: &mut DemoBenchRegistry) {
+    register_demo!(registry, demo_limbs_set_zero);
+    register_bench!(registry, Small, benchmark_limbs_set_zero);
+}
+
+fn demo_limbs_set_zero(gm: GenerationMode, limit: usize) {
     for xs in vecs_of_unsigned(gm).take(limit) {
         let mut mut_xs = xs.clone();
         limbs_set_zero(&mut mut_xs);
@@ -10,7 +15,7 @@ pub fn demo_limbs_set_zero(gm: GenerationMode, limit: usize) {
     }
 }
 
-pub fn benchmark_limbs_set_zero(gm: GenerationMode, limit: usize, file_name: &str) {
+fn benchmark_limbs_set_zero(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "limbs_set_zero(&mut [u32])",
         BenchmarkType::Single,

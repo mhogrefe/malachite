@@ -1,6 +1,25 @@
-use common::{m_run_benchmark, BenchmarkType, GenerationMode};
+use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_base::num::{PrimitiveSigned, PrimitiveUnsigned};
 use inputs::base::{signeds_no_max, unsigneds_no_max};
+
+pub fn register(registry: &mut DemoBenchRegistry) {
+    register_demo!(registry, demo_u8_increment);
+    register_demo!(registry, demo_u16_increment);
+    register_demo!(registry, demo_u32_increment);
+    register_demo!(registry, demo_u64_increment);
+    register_demo!(registry, demo_i8_increment);
+    register_demo!(registry, demo_i16_increment);
+    register_demo!(registry, demo_i32_increment);
+    register_demo!(registry, demo_i64_increment);
+    register_bench!(registry, None, benchmark_u8_increment);
+    register_bench!(registry, None, benchmark_u16_increment);
+    register_bench!(registry, None, benchmark_u32_increment);
+    register_bench!(registry, None, benchmark_u64_increment);
+    register_bench!(registry, None, benchmark_i8_increment);
+    register_bench!(registry, None, benchmark_i16_increment);
+    register_bench!(registry, None, benchmark_i32_increment);
+    register_bench!(registry, None, benchmark_i64_increment);
+}
 
 fn demo_unsigned_increment<T: 'static + PrimitiveUnsigned>(gm: GenerationMode, limit: usize) {
     for mut n in unsigneds_no_max::<T>(gm).take(limit) {
@@ -56,11 +75,11 @@ fn benchmark_signed_increment<T: 'static + PrimitiveSigned>(
 
 macro_rules! unsigned {
     ($t: ident, $demo_name: ident, $bench_name: ident) => {
-        pub fn $demo_name(gm: GenerationMode, limit: usize) {
+        fn $demo_name(gm: GenerationMode, limit: usize) {
             demo_unsigned_increment::<$t>(gm, limit);
         }
 
-        pub fn $bench_name(gm: GenerationMode, limit: usize, file_name: &str) {
+        fn $bench_name(gm: GenerationMode, limit: usize, file_name: &str) {
             benchmark_unsigned_increment::<$t>(gm, limit, file_name);
         }
     };
@@ -68,11 +87,11 @@ macro_rules! unsigned {
 
 macro_rules! signed {
     ($t: ident, $demo_name: ident, $bench_name: ident) => {
-        pub fn $demo_name(gm: GenerationMode, limit: usize) {
+        fn $demo_name(gm: GenerationMode, limit: usize) {
             demo_signed_increment::<$t>(gm, limit);
         }
 
-        pub fn $bench_name(gm: GenerationMode, limit: usize, file_name: &str) {
+        fn $bench_name(gm: GenerationMode, limit: usize, file_name: &str) {
             benchmark_signed_increment::<$t>(gm, limit, file_name);
         }
     };

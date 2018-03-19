@@ -1,6 +1,15 @@
-use common::{m_run_benchmark, BenchmarkType, GenerationMode};
+use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::unsigneds;
 use malachite_base::num::{PrimitiveUnsigned, SplitInHalf};
+
+pub fn register(registry: &mut DemoBenchRegistry) {
+    register_demo!(registry, demo_u16_split_in_half);
+    register_demo!(registry, demo_u32_split_in_half);
+    register_demo!(registry, demo_u64_split_in_half);
+    register_bench!(registry, None, benchmark_u16_split_in_half);
+    register_bench!(registry, None, benchmark_u32_split_in_half);
+    register_bench!(registry, None, benchmark_u64_split_in_half);
+}
 
 fn demo_unsigned_split_in_half<T: 'static + PrimitiveUnsigned + SplitInHalf>(
     gm: GenerationMode,
@@ -35,11 +44,11 @@ fn benchmark_unsigned_split_in_half<T: 'static + PrimitiveUnsigned + SplitInHalf
 
 macro_rules! unsigned {
     ($t: ident, $demo_name: ident, $bench_name: ident) => {
-        pub fn $demo_name(gm: GenerationMode, limit: usize) {
+        fn $demo_name(gm: GenerationMode, limit: usize) {
             demo_unsigned_split_in_half::<$t>(gm, limit);
         }
 
-        pub fn $bench_name(gm: GenerationMode, limit: usize, file_name: &str) {
+        fn $bench_name(gm: GenerationMode, limit: usize, file_name: &str) {
             benchmark_unsigned_split_in_half::<$t>(gm, limit, file_name);
         }
     };
