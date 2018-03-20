@@ -504,7 +504,7 @@ pub trait PrimitiveSigned:
 }
 
 //TODO docs
-pub trait Float:
+pub trait PrimitiveFloat:
     Add<Output = Self>
     + AddAssign<Self>
     + Copy
@@ -1494,7 +1494,7 @@ macro_rules! signed_traits {
 macro_rules! float_traits {
     ($t: ident, $ut: ident) => {
         //TODO docs
-        impl Float for $t {
+        impl PrimitiveFloat for $t {
             type UnsignedOfEqualWidth = $ut;
             type SignedOfEqualWidth = <$ut as PrimitiveUnsigned>::SignedOfEqualWidth;
             const MANTISSA_WIDTH: u32 = std::$t::MANTISSA_DIGITS - 1;
