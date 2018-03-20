@@ -14,7 +14,7 @@ pub mod significant_bits;
 pub mod split_in_half;
 pub mod upper_half;
 
-pub fn register(registry: &mut DemoBenchRegistry) {
+pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     assign_bit::register(registry);
     clear_bit::register(registry);
     decrement::register(registry);

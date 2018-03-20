@@ -1,7 +1,41 @@
-use common::{m_run_benchmark, BenchmarkType, GenerationMode};
+use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::integer::pairs_of_integer_and_small_u32;
 
-pub fn demo_integer_mod_power_of_two_assign(gm: GenerationMode, limit: usize) {
+pub(crate) fn register(registry: &mut DemoBenchRegistry) {
+    register_demo!(registry, demo_integer_mod_power_of_two_assign);
+    register_demo!(registry, demo_integer_mod_power_of_two);
+    register_demo!(registry, demo_integer_mod_power_of_two_ref);
+    register_demo!(registry, demo_integer_rem_power_of_two_assign);
+    register_demo!(registry, demo_integer_rem_power_of_two);
+    register_demo!(registry, demo_integer_rem_power_of_two_ref);
+    register_demo!(registry, demo_integer_ceiling_mod_power_of_two_assign);
+    register_demo!(registry, demo_integer_ceiling_mod_power_of_two);
+    register_demo!(registry, demo_integer_ceiling_mod_power_of_two_ref);
+    register_bench!(registry, Large, benchmark_integer_mod_power_of_two_assign);
+    register_bench!(
+        registry,
+        Large,
+        benchmark_integer_mod_power_of_two_evaluation_strategy
+    );
+    register_bench!(registry, Large, benchmark_integer_rem_power_of_two_assign);
+    register_bench!(
+        registry,
+        Large,
+        benchmark_integer_rem_power_of_two_evaluation_strategy
+    );
+    register_bench!(
+        registry,
+        Large,
+        benchmark_integer_ceiling_mod_power_of_two_assign
+    );
+    register_bench!(
+        registry,
+        Large,
+        benchmark_integer_ceiling_mod_power_of_two_evaluation_strategy
+    );
+}
+
+fn demo_integer_mod_power_of_two_assign(gm: GenerationMode, limit: usize) {
     for (mut n, u) in pairs_of_integer_and_small_u32(gm).take(limit) {
         let n_old = n.clone();
         n.mod_power_of_two_assign(u);
@@ -12,7 +46,7 @@ pub fn demo_integer_mod_power_of_two_assign(gm: GenerationMode, limit: usize) {
     }
 }
 
-pub fn demo_integer_mod_power_of_two(gm: GenerationMode, limit: usize) {
+fn demo_integer_mod_power_of_two(gm: GenerationMode, limit: usize) {
     for (n, u) in pairs_of_integer_and_small_u32(gm).take(limit) {
         let n_old = n.clone();
         println!(
@@ -24,7 +58,7 @@ pub fn demo_integer_mod_power_of_two(gm: GenerationMode, limit: usize) {
     }
 }
 
-pub fn demo_integer_mod_power_of_two_ref(gm: GenerationMode, limit: usize) {
+fn demo_integer_mod_power_of_two_ref(gm: GenerationMode, limit: usize) {
     for (n, u) in pairs_of_integer_and_small_u32(gm).take(limit) {
         println!(
             "{}.mod_power_of_two_ref({}) = {}",
@@ -35,7 +69,7 @@ pub fn demo_integer_mod_power_of_two_ref(gm: GenerationMode, limit: usize) {
     }
 }
 
-pub fn demo_integer_rem_power_of_two_assign(gm: GenerationMode, limit: usize) {
+fn demo_integer_rem_power_of_two_assign(gm: GenerationMode, limit: usize) {
     for (mut n, u) in pairs_of_integer_and_small_u32(gm).take(limit) {
         let n_old = n.clone();
         n.rem_power_of_two_assign(u);
@@ -46,7 +80,7 @@ pub fn demo_integer_rem_power_of_two_assign(gm: GenerationMode, limit: usize) {
     }
 }
 
-pub fn demo_integer_rem_power_of_two(gm: GenerationMode, limit: usize) {
+fn demo_integer_rem_power_of_two(gm: GenerationMode, limit: usize) {
     for (n, u) in pairs_of_integer_and_small_u32(gm).take(limit) {
         let n_old = n.clone();
         println!(
@@ -58,7 +92,7 @@ pub fn demo_integer_rem_power_of_two(gm: GenerationMode, limit: usize) {
     }
 }
 
-pub fn demo_integer_rem_power_of_two_ref(gm: GenerationMode, limit: usize) {
+fn demo_integer_rem_power_of_two_ref(gm: GenerationMode, limit: usize) {
     for (n, u) in pairs_of_integer_and_small_u32(gm).take(limit) {
         println!(
             "{}.rem_power_of_two_ref({}) = {}",
@@ -69,7 +103,7 @@ pub fn demo_integer_rem_power_of_two_ref(gm: GenerationMode, limit: usize) {
     }
 }
 
-pub fn demo_integer_ceiling_mod_power_of_two_assign(gm: GenerationMode, limit: usize) {
+fn demo_integer_ceiling_mod_power_of_two_assign(gm: GenerationMode, limit: usize) {
     for (mut n, u) in pairs_of_integer_and_small_u32(gm).take(limit) {
         let n_old = n.clone();
         n.ceiling_mod_power_of_two_assign(u);
@@ -80,7 +114,7 @@ pub fn demo_integer_ceiling_mod_power_of_two_assign(gm: GenerationMode, limit: u
     }
 }
 
-pub fn demo_integer_ceiling_mod_power_of_two(gm: GenerationMode, limit: usize) {
+fn demo_integer_ceiling_mod_power_of_two(gm: GenerationMode, limit: usize) {
     for (n, u) in pairs_of_integer_and_small_u32(gm).take(limit) {
         let n_old = n.clone();
         println!(
@@ -92,7 +126,7 @@ pub fn demo_integer_ceiling_mod_power_of_two(gm: GenerationMode, limit: usize) {
     }
 }
 
-pub fn demo_integer_ceiling_mod_power_of_two_ref(gm: GenerationMode, limit: usize) {
+fn demo_integer_ceiling_mod_power_of_two_ref(gm: GenerationMode, limit: usize) {
     for (n, u) in pairs_of_integer_and_small_u32(gm).take(limit) {
         println!(
             "{}.ceiling_mod_power_of_two_ref({}) = {}",
@@ -103,11 +137,7 @@ pub fn demo_integer_ceiling_mod_power_of_two_ref(gm: GenerationMode, limit: usiz
     }
 }
 
-pub fn benchmark_integer_mod_power_of_two_assign(
-    gm: GenerationMode,
-    limit: usize,
-    file_name: &str,
-) {
+fn benchmark_integer_mod_power_of_two_assign(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "Integer.mod_power_of_two_assign(u32)",
         BenchmarkType::Single,
@@ -126,7 +156,7 @@ pub fn benchmark_integer_mod_power_of_two_assign(
     );
 }
 
-pub fn benchmark_integer_mod_power_of_two_evaluation_strategy(
+fn benchmark_integer_mod_power_of_two_evaluation_strategy(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,
@@ -153,11 +183,7 @@ pub fn benchmark_integer_mod_power_of_two_evaluation_strategy(
     );
 }
 
-pub fn benchmark_integer_rem_power_of_two_assign(
-    gm: GenerationMode,
-    limit: usize,
-    file_name: &str,
-) {
+fn benchmark_integer_rem_power_of_two_assign(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "Integer.rem_power_of_two_assign(u32)",
         BenchmarkType::Single,
@@ -176,7 +202,7 @@ pub fn benchmark_integer_rem_power_of_two_assign(
     );
 }
 
-pub fn benchmark_integer_rem_power_of_two_evaluation_strategy(
+fn benchmark_integer_rem_power_of_two_evaluation_strategy(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,
@@ -203,7 +229,7 @@ pub fn benchmark_integer_rem_power_of_two_evaluation_strategy(
     );
 }
 
-pub fn benchmark_integer_ceiling_mod_power_of_two_assign(
+fn benchmark_integer_ceiling_mod_power_of_two_assign(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,
@@ -226,7 +252,7 @@ pub fn benchmark_integer_ceiling_mod_power_of_two_assign(
     );
 }
 
-pub fn benchmark_integer_ceiling_mod_power_of_two_evaluation_strategy(
+fn benchmark_integer_ceiling_mod_power_of_two_evaluation_strategy(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,

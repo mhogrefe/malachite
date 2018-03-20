@@ -3,7 +3,7 @@ use inputs::base::chars_not_min;
 use malachite_base::chars::char_to_contiguous_range;
 use malachite_base::misc::Walkable;
 
-pub fn register(registry: &mut DemoBenchRegistry) {
+pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_ns_demo!(registry, demo_char_decrement);
     register_ns_bench!(registry, None, benchmark_char_decrement);
 }

@@ -1,9 +1,30 @@
-use common::{m_run_benchmark, BenchmarkType, GenerationMode};
+use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::integer::{nrm_pairs_of_integers, pairs_of_integers, rm_pairs_of_integers};
 use malachite_base::num::SignificantBits;
 use std::cmp::max;
 
-pub fn demo_integer_sub_assign(gm: GenerationMode, limit: usize) {
+pub(crate) fn register(registry: &mut DemoBenchRegistry) {
+    register_demo!(registry, demo_integer_sub_assign);
+    register_demo!(registry, demo_integer_sub_assign_ref);
+    register_demo!(registry, demo_integer_sub);
+    register_demo!(registry, demo_integer_sub_val_ref);
+    register_demo!(registry, demo_integer_sub_ref_val);
+    register_demo!(registry, demo_integer_sub_ref_ref);
+    register_bench!(
+        registry,
+        Large,
+        benchmark_integer_sub_assign_library_comparison
+    );
+    register_bench!(
+        registry,
+        Large,
+        benchmark_integer_sub_assign_evaluation_strategy
+    );
+    register_bench!(registry, Large, benchmark_integer_sub_library_comparison);
+    register_bench!(registry, Large, benchmark_integer_sub_evaluation_strategy);
+}
+
+fn demo_integer_sub_assign(gm: GenerationMode, limit: usize) {
     for (mut x, y) in pairs_of_integers(gm).take(limit) {
         let x_old = x.clone();
         x -= y.clone();
@@ -11,7 +32,7 @@ pub fn demo_integer_sub_assign(gm: GenerationMode, limit: usize) {
     }
 }
 
-pub fn demo_integer_sub_assign_ref(gm: GenerationMode, limit: usize) {
+fn demo_integer_sub_assign_ref(gm: GenerationMode, limit: usize) {
     for (mut x, y) in pairs_of_integers(gm).take(limit) {
         let x_old = x.clone();
         x -= &y;
@@ -19,7 +40,7 @@ pub fn demo_integer_sub_assign_ref(gm: GenerationMode, limit: usize) {
     }
 }
 
-pub fn demo_integer_sub(gm: GenerationMode, limit: usize) {
+fn demo_integer_sub(gm: GenerationMode, limit: usize) {
     for (x, y) in pairs_of_integers(gm).take(limit) {
         let x_old = x.clone();
         let y_old = y.clone();
@@ -27,27 +48,27 @@ pub fn demo_integer_sub(gm: GenerationMode, limit: usize) {
     }
 }
 
-pub fn demo_integer_sub_val_ref(gm: GenerationMode, limit: usize) {
+fn demo_integer_sub_val_ref(gm: GenerationMode, limit: usize) {
     for (x, y) in pairs_of_integers(gm).take(limit) {
         let x_old = x.clone();
         println!("{} - &{} = {}", x_old, y, x - &y);
     }
 }
 
-pub fn demo_integer_sub_ref_val(gm: GenerationMode, limit: usize) {
+fn demo_integer_sub_ref_val(gm: GenerationMode, limit: usize) {
     for (x, y) in pairs_of_integers(gm).take(limit) {
         let y_old = y.clone();
         println!("&{} - {} = {}", x, y_old, &x - y);
     }
 }
 
-pub fn demo_integer_sub_ref_ref(gm: GenerationMode, limit: usize) {
+fn demo_integer_sub_ref_ref(gm: GenerationMode, limit: usize) {
     for (x, y) in pairs_of_integers(gm).take(limit) {
         println!("&{} - &{} = {}", x, y, &x - &y);
     }
 }
 
-pub fn benchmark_integer_sub_assign_library_comparison(
+fn benchmark_integer_sub_assign_library_comparison(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,
@@ -68,7 +89,7 @@ pub fn benchmark_integer_sub_assign_library_comparison(
     );
 }
 
-pub fn benchmark_integer_sub_assign_evaluation_strategy(
+fn benchmark_integer_sub_assign_evaluation_strategy(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,
@@ -89,7 +110,7 @@ pub fn benchmark_integer_sub_assign_evaluation_strategy(
     );
 }
 
-pub fn benchmark_integer_sub_library_comparison(gm: GenerationMode, limit: usize, file_name: &str) {
+fn benchmark_integer_sub_library_comparison(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "Integer - Integer",
         BenchmarkType::LibraryComparison,
@@ -107,11 +128,7 @@ pub fn benchmark_integer_sub_library_comparison(gm: GenerationMode, limit: usize
     );
 }
 
-pub fn benchmark_integer_sub_evaluation_strategy(
-    gm: GenerationMode,
-    limit: usize,
-    file_name: &str,
-) {
+fn benchmark_integer_sub_evaluation_strategy(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "Integer - Integer",
         BenchmarkType::EvaluationStrategy,

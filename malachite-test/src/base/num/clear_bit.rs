@@ -2,7 +2,7 @@ use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, 
 use inputs::base::{pairs_of_signed_and_u64_width_range_var_2, pairs_of_unsigned_and_small_u64};
 use malachite_base::num::{PrimitiveSigned, PrimitiveUnsigned};
 
-pub fn register(registry: &mut DemoBenchRegistry) {
+pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_u8_clear_bit);
     register_demo!(registry, demo_u16_clear_bit);
     register_demo!(registry, demo_u32_clear_bit);

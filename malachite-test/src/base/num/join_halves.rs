@@ -4,7 +4,7 @@ use malachite_base::misc::Named;
 use malachite_base::num::{JoinHalves, PrimitiveUnsigned, SignificantBits};
 use std::cmp::max;
 
-pub fn register(registry: &mut DemoBenchRegistry) {
+pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_u16_join_halves);
     register_demo!(registry, demo_u32_join_halves);
     register_demo!(registry, demo_u64_join_halves);

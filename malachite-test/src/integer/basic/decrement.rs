@@ -1,9 +1,14 @@
-use common::{m_run_benchmark, BenchmarkType, GenerationMode};
+use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::integer::integers;
 use malachite_base::misc::Walkable;
 use malachite_base::num::SignificantBits;
 
-pub fn demo_integer_decrement(gm: GenerationMode, limit: usize) {
+pub(crate) fn register(registry: &mut DemoBenchRegistry) {
+    register_demo!(registry, demo_integer_decrement);
+    register_bench!(registry, Large, benchmark_integer_decrement);
+}
+
+fn demo_integer_decrement(gm: GenerationMode, limit: usize) {
     for mut n in integers(gm).take(limit) {
         let n_old = n.clone();
         n.decrement();
@@ -11,7 +16,7 @@ pub fn demo_integer_decrement(gm: GenerationMode, limit: usize) {
     }
 }
 
-pub fn benchmark_integer_decrement(gm: GenerationMode, limit: usize, file_name: &str) {
+fn benchmark_integer_decrement(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "Integer.decrement()",
         BenchmarkType::Single,

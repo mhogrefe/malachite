@@ -1,9 +1,39 @@
-use common::{m_run_benchmark, BenchmarkType, GenerationMode};
+use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::integer::{pairs_of_integer_and_small_u32, rm_pairs_of_integer_and_small_u32,
                       triples_of_integer_small_u32_and_rounding_mode_var_1};
 use malachite_base::num::{ShrRound, ShrRoundAssign};
 
-pub fn demo_integer_shr_assign_u32(gm: GenerationMode, limit: usize) {
+pub(crate) fn register(registry: &mut DemoBenchRegistry) {
+    register_demo!(registry, demo_integer_shr_assign_u32);
+    register_demo!(registry, demo_integer_shr_u32);
+    register_demo!(registry, demo_integer_shr_u32_ref);
+    register_demo!(registry, demo_integer_shr_round_assign_u32);
+    register_demo!(registry, demo_integer_shr_round_u32);
+    register_demo!(registry, demo_integer_shr_round_u32_ref);
+    register_bench!(
+        registry,
+        Large,
+        benchmark_integer_shr_assign_u32_library_comparison
+    );
+    register_bench!(
+        registry,
+        Large,
+        benchmark_integer_shr_u32_library_comparison
+    );
+    register_bench!(
+        registry,
+        Large,
+        benchmark_integer_shr_u32_evaluation_strategy
+    );
+    register_bench!(registry, Large, benchmark_integer_shr_round_assign_u32);
+    register_bench!(
+        registry,
+        Large,
+        benchmark_integer_shr_round_u32_evaluation_strategy
+    );
+}
+
+fn demo_integer_shr_assign_u32(gm: GenerationMode, limit: usize) {
     for (mut n, u) in pairs_of_integer_and_small_u32(gm).take(limit) {
         let n_old = n.clone();
         n >>= u;
@@ -11,20 +41,20 @@ pub fn demo_integer_shr_assign_u32(gm: GenerationMode, limit: usize) {
     }
 }
 
-pub fn demo_integer_shr_u32(gm: GenerationMode, limit: usize) {
+fn demo_integer_shr_u32(gm: GenerationMode, limit: usize) {
     for (n, u) in pairs_of_integer_and_small_u32(gm).take(limit) {
         let n_old = n.clone();
         println!("{} >> {} = {}", n_old, u, n >> u);
     }
 }
 
-pub fn demo_integer_shr_u32_ref(gm: GenerationMode, limit: usize) {
+fn demo_integer_shr_u32_ref(gm: GenerationMode, limit: usize) {
     for (n, u) in pairs_of_integer_and_small_u32(gm).take(limit) {
         println!("&{} >> {} = {}", n, u, &n >> u);
     }
 }
 
-pub fn demo_integer_shr_round_assign_u32(gm: GenerationMode, limit: usize) {
+fn demo_integer_shr_round_assign_u32(gm: GenerationMode, limit: usize) {
     for (mut n, u, rm) in triples_of_integer_small_u32_and_rounding_mode_var_1(gm).take(limit) {
         let n_old = n.clone();
         n.shr_round_assign(u, rm);
@@ -35,7 +65,7 @@ pub fn demo_integer_shr_round_assign_u32(gm: GenerationMode, limit: usize) {
     }
 }
 
-pub fn demo_integer_shr_round_u32(gm: GenerationMode, limit: usize) {
+fn demo_integer_shr_round_u32(gm: GenerationMode, limit: usize) {
     for (n, u, rm) in triples_of_integer_small_u32_and_rounding_mode_var_1(gm).take(limit) {
         let n_old = n.clone();
         println!(
@@ -48,7 +78,7 @@ pub fn demo_integer_shr_round_u32(gm: GenerationMode, limit: usize) {
     }
 }
 
-pub fn demo_integer_shr_round_u32_ref(gm: GenerationMode, limit: usize) {
+fn demo_integer_shr_round_u32_ref(gm: GenerationMode, limit: usize) {
     for (n, u, rm) in triples_of_integer_small_u32_and_rounding_mode_var_1(gm).take(limit) {
         println!(
             "(&{}).shr_round({}, {}) = {}",
@@ -60,7 +90,7 @@ pub fn demo_integer_shr_round_u32_ref(gm: GenerationMode, limit: usize) {
     }
 }
 
-pub fn benchmark_integer_shr_assign_u32_library_comparison(
+fn benchmark_integer_shr_assign_u32_library_comparison(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,
@@ -81,11 +111,7 @@ pub fn benchmark_integer_shr_assign_u32_library_comparison(
     );
 }
 
-pub fn benchmark_integer_shr_u32_library_comparison(
-    gm: GenerationMode,
-    limit: usize,
-    file_name: &str,
-) {
+fn benchmark_integer_shr_u32_library_comparison(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "Integer >> u32",
         BenchmarkType::LibraryComparison,
@@ -102,7 +128,7 @@ pub fn benchmark_integer_shr_u32_library_comparison(
     );
 }
 
-pub fn benchmark_integer_shr_u32_evaluation_strategy(
+fn benchmark_integer_shr_u32_evaluation_strategy(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,
@@ -123,7 +149,7 @@ pub fn benchmark_integer_shr_u32_evaluation_strategy(
     );
 }
 
-pub fn benchmark_integer_shr_round_assign_u32(gm: GenerationMode, limit: usize, file_name: &str) {
+fn benchmark_integer_shr_round_assign_u32(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "Integer.shr_round_assign(u32, RoundingMode)",
         BenchmarkType::Single,
@@ -142,7 +168,7 @@ pub fn benchmark_integer_shr_round_assign_u32(gm: GenerationMode, limit: usize, 
     );
 }
 
-pub fn benchmark_integer_shr_round_u32_evaluation_strategy(
+fn benchmark_integer_shr_round_u32_evaluation_strategy(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,

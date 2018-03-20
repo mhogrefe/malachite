@@ -6,7 +6,7 @@ use rand::{IsaacRng, SeedableRng};
 use rust_wheels::iterators::adaptors::{generate_from_function, to_limited_string};
 use rust_wheels::iterators::common::EXAMPLE_SEED;
 
-pub fn register(registry: &mut DemoBenchRegistry) {
+pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_natural_random_natural_below);
     register_bench!(registry, Large, benchmark_natural_random_natural_below);
 }

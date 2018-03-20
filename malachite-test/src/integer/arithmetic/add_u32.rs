@@ -1,15 +1,48 @@
-use common::{m_run_benchmark, BenchmarkType, GenerationMode};
+use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::integer::{nrm_pairs_of_integer_and_unsigned, pairs_of_integer_and_unsigned,
                       pairs_of_unsigned_and_integer, rm_pairs_of_integer_and_unsigned,
                       rm_pairs_of_unsigned_and_integer};
 use malachite_base::num::SignificantBits;
 use num::BigInt;
 
+pub(crate) fn register(registry: &mut DemoBenchRegistry) {
+    register_demo!(registry, demo_integer_add_assign_u32);
+    register_demo!(registry, demo_integer_add_u32);
+    register_demo!(registry, demo_integer_add_u32_ref);
+    register_demo!(registry, demo_u32_add_integer);
+    register_demo!(registry, demo_u32_add_integer_ref);
+    register_bench!(
+        registry,
+        Large,
+        benchmark_integer_add_assign_u32_library_comparison
+    );
+    register_bench!(
+        registry,
+        Large,
+        benchmark_integer_add_u32_library_comparison
+    );
+    register_bench!(
+        registry,
+        Large,
+        benchmark_integer_add_u32_evaluation_strategy
+    );
+    register_bench!(
+        registry,
+        Large,
+        benchmark_u32_add_integer_library_comparison
+    );
+    register_bench!(
+        registry,
+        Large,
+        benchmark_u32_add_integer_evaluation_strategy
+    );
+}
+
 pub fn num_add_u32(x: BigInt, u: u32) -> BigInt {
     x + BigInt::from(u)
 }
 
-pub fn demo_integer_add_assign_u32(gm: GenerationMode, limit: usize) {
+fn demo_integer_add_assign_u32(gm: GenerationMode, limit: usize) {
     for (mut n, u) in pairs_of_integer_and_unsigned::<u32>(gm).take(limit) {
         let n_old = n.clone();
         n += u;
@@ -17,34 +50,34 @@ pub fn demo_integer_add_assign_u32(gm: GenerationMode, limit: usize) {
     }
 }
 
-pub fn demo_integer_add_u32(gm: GenerationMode, limit: usize) {
+fn demo_integer_add_u32(gm: GenerationMode, limit: usize) {
     for (n, u) in pairs_of_integer_and_unsigned::<u32>(gm).take(limit) {
         let n_old = n.clone();
         println!("{} + {} = {}", n_old, u, n + u);
     }
 }
 
-pub fn demo_integer_add_u32_ref(gm: GenerationMode, limit: usize) {
+fn demo_integer_add_u32_ref(gm: GenerationMode, limit: usize) {
     for (n, u) in pairs_of_integer_and_unsigned::<u32>(gm).take(limit) {
         println!("&{} + {} = {}", n, u, &n + u);
     }
 }
 
-pub fn demo_u32_add_integer(gm: GenerationMode, limit: usize) {
+fn demo_u32_add_integer(gm: GenerationMode, limit: usize) {
     for (u, n) in pairs_of_unsigned_and_integer::<u32>(gm).take(limit) {
         let n_old = n.clone();
         println!("{} + {} = {}", u, n_old, u + n);
     }
 }
 
-pub fn demo_u32_add_integer_ref(gm: GenerationMode, limit: usize) {
+fn demo_u32_add_integer_ref(gm: GenerationMode, limit: usize) {
     for (u, n) in pairs_of_unsigned_and_integer::<u32>(gm).take(limit) {
         let n_old = n.clone();
         println!("{} + &{} = {}", u, n_old, u + &n);
     }
 }
 
-pub fn benchmark_integer_add_assign_u32_library_comparison(
+fn benchmark_integer_add_assign_u32_library_comparison(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,
@@ -65,11 +98,7 @@ pub fn benchmark_integer_add_assign_u32_library_comparison(
     );
 }
 
-pub fn benchmark_integer_add_u32_library_comparison(
-    gm: GenerationMode,
-    limit: usize,
-    file_name: &str,
-) {
+fn benchmark_integer_add_u32_library_comparison(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "Integer + u32",
         BenchmarkType::LibraryComparison,
@@ -87,7 +116,7 @@ pub fn benchmark_integer_add_u32_library_comparison(
     );
 }
 
-pub fn benchmark_integer_add_u32_evaluation_strategy(
+fn benchmark_integer_add_u32_evaluation_strategy(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,
@@ -108,11 +137,7 @@ pub fn benchmark_integer_add_u32_evaluation_strategy(
     );
 }
 
-pub fn benchmark_u32_add_integer_library_comparison(
-    gm: GenerationMode,
-    limit: usize,
-    file_name: &str,
-) {
+fn benchmark_u32_add_integer_library_comparison(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "u32 + Integer",
         BenchmarkType::LibraryComparison,
@@ -129,7 +154,7 @@ pub fn benchmark_u32_add_integer_library_comparison(
     );
 }
 
-pub fn benchmark_u32_add_integer_evaluation_strategy(
+fn benchmark_u32_add_integer_evaluation_strategy(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,

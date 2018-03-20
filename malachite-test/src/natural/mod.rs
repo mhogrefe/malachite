@@ -61,6 +61,6 @@ pub mod logic {
 }
 pub mod random;
 
-pub fn register(registry: &mut DemoBenchRegistry) {
+pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     random::register(registry);
 }

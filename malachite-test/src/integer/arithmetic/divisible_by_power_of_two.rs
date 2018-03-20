@@ -1,8 +1,17 @@
-use common::{m_run_benchmark, BenchmarkType, GenerationMode};
+use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::integer::pairs_of_integer_and_small_u32;
 use malachite_base::num::SignificantBits;
 
-pub fn demo_integer_divisible_by_power_of_two(gm: GenerationMode, limit: usize) {
+pub(crate) fn register(registry: &mut DemoBenchRegistry) {
+    register_demo!(registry, demo_integer_divisible_by_power_of_two);
+    register_bench!(
+        registry,
+        Large,
+        benchmark_integer_divisible_by_power_of_two_algorithms
+    );
+}
+
+fn demo_integer_divisible_by_power_of_two(gm: GenerationMode, limit: usize) {
     for (n, pow) in pairs_of_integer_and_small_u32(gm).take(limit) {
         if n.divisible_by_power_of_two(pow) {
             println!("{} is divisible by 2^{}", n, pow);
@@ -12,7 +21,7 @@ pub fn demo_integer_divisible_by_power_of_two(gm: GenerationMode, limit: usize) 
     }
 }
 
-pub fn benchmark_integer_divisible_by_power_of_two_algorithms(
+fn benchmark_integer_divisible_by_power_of_two_algorithms(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,

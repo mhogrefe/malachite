@@ -2,7 +2,7 @@ use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, 
 use inputs::base::pairs_of_unsigned_vec_and_small_usize_var_1;
 use malachite_base::limbs::limbs_delete_left;
 
-pub fn register(registry: &mut DemoBenchRegistry) {
+pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limbs_delete_left);
     register_bench!(registry, Small, benchmark_limbs_delete_left);
 }

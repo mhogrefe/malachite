@@ -3,7 +3,7 @@ use malachite_base::num::{PrimitiveSigned, PrimitiveUnsigned};
 use inputs::base::{pairs_of_signed_and_u64_width_range_var_1,
                    pairs_of_unsigned_and_u64_width_range};
 
-pub fn register(registry: &mut DemoBenchRegistry) {
+pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_u8_set_bit);
     register_demo!(registry, demo_u16_set_bit);
     register_demo!(registry, demo_u32_set_bit);

@@ -1,7 +1,7 @@
 use common::{DemoBenchRegistry, NoSpecialGenerationMode};
 use inputs::base::rounding_modes;
 
-pub fn register(registry: &mut DemoBenchRegistry) {
+pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_ns_demo!(registry, demo_rounding_mode_neg);
 }
 

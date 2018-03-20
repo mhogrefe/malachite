@@ -1,10 +1,27 @@
-use common::{m_run_benchmark, BenchmarkType, GenerationMode};
+use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::integer::{integers, nrm_integers};
 use malachite_base::num::SignificantBits;
 use malachite_base::num::AbsAssign;
 use num::Signed;
 
-pub fn demo_integer_abs_assign(gm: GenerationMode, limit: usize) {
+pub(crate) fn register(registry: &mut DemoBenchRegistry) {
+    register_demo!(registry, demo_integer_abs_assign);
+    register_demo!(registry, demo_integer_abs);
+    register_demo!(registry, demo_integer_abs_ref);
+    register_demo!(registry, demo_integer_natural_abs);
+    register_demo!(registry, demo_integer_natural_abs_ref);
+    register_bench!(registry, Large, benchmark_integer_abs_assign);
+    register_bench!(registry, Large, benchmark_integer_abs_library_comparison);
+    register_bench!(registry, Large, benchmark_integer_abs_evaluation_strategy);
+    register_bench!(registry, Large, benchmark_integer_natural_abs);
+    register_bench!(
+        registry,
+        Large,
+        benchmark_integer_natural_abs_evaluation_strategy
+    );
+}
+
+fn demo_integer_abs_assign(gm: GenerationMode, limit: usize) {
     for mut n in integers(gm).take(limit) {
         let n_old = n.clone();
         n.abs_assign();
@@ -12,31 +29,31 @@ pub fn demo_integer_abs_assign(gm: GenerationMode, limit: usize) {
     }
 }
 
-pub fn demo_integer_abs(gm: GenerationMode, limit: usize) {
+fn demo_integer_abs(gm: GenerationMode, limit: usize) {
     for n in integers(gm).take(limit) {
         println!("abs({}) = {}", n.clone(), n.abs());
     }
 }
 
-pub fn demo_integer_abs_ref(gm: GenerationMode, limit: usize) {
+fn demo_integer_abs_ref(gm: GenerationMode, limit: usize) {
     for n in integers(gm).take(limit) {
         println!("abs_ref(&{}) = {}", n, n.abs_ref());
     }
 }
 
-pub fn demo_integer_natural_abs(gm: GenerationMode, limit: usize) {
+fn demo_integer_natural_abs(gm: GenerationMode, limit: usize) {
     for n in integers(gm).take(limit) {
         println!("natural_abs({}) = {}", n.clone(), n.natural_abs());
     }
 }
 
-pub fn demo_integer_natural_abs_ref(gm: GenerationMode, limit: usize) {
+fn demo_integer_natural_abs_ref(gm: GenerationMode, limit: usize) {
     for n in integers(gm).take(limit) {
         println!("natural_abs_ref(&{}) = {}", n, n.natural_abs_ref());
     }
 }
 
-pub fn benchmark_integer_abs_assign(gm: GenerationMode, limit: usize, file_name: &str) {
+fn benchmark_integer_abs_assign(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "Integer.abs_assign()",
         BenchmarkType::Single,
@@ -50,7 +67,7 @@ pub fn benchmark_integer_abs_assign(gm: GenerationMode, limit: usize, file_name:
     );
 }
 
-pub fn benchmark_integer_abs_library_comparison(gm: GenerationMode, limit: usize, file_name: &str) {
+fn benchmark_integer_abs_library_comparison(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "Integer.abs()",
         BenchmarkType::LibraryComparison,
@@ -68,11 +85,7 @@ pub fn benchmark_integer_abs_library_comparison(gm: GenerationMode, limit: usize
     );
 }
 
-pub fn benchmark_integer_abs_evaluation_strategy(
-    gm: GenerationMode,
-    limit: usize,
-    file_name: &str,
-) {
+fn benchmark_integer_abs_evaluation_strategy(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "Integer.abs()",
         BenchmarkType::EvaluationStrategy,
@@ -89,7 +102,7 @@ pub fn benchmark_integer_abs_evaluation_strategy(
     );
 }
 
-pub fn benchmark_integer_natural_abs(gm: GenerationMode, limit: usize, file_name: &str) {
+fn benchmark_integer_natural_abs(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "Integer.natural_abs()",
         BenchmarkType::Single,
@@ -103,7 +116,7 @@ pub fn benchmark_integer_natural_abs(gm: GenerationMode, limit: usize, file_name
     );
 }
 
-pub fn benchmark_integer_natural_abs_evaluation_strategy(
+fn benchmark_integer_natural_abs_evaluation_strategy(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,

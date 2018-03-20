@@ -1,10 +1,55 @@
-use common::{m_run_benchmark, BenchmarkType, GenerationMode};
+use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::integer::triples_of_integer_integer_and_signed;
 use malachite_base::num::SignificantBits;
 use malachite_base::num::{SubMul, SubMulAssign};
 use std::cmp::max;
 
-pub fn demo_integer_sub_mul_assign_i32(gm: GenerationMode, limit: usize) {
+pub(crate) fn register(registry: &mut DemoBenchRegistry) {
+    register_demo!(registry, demo_integer_sub_mul_assign_i32);
+    register_demo!(registry, demo_integer_sub_mul_assign_i32_ref);
+    register_demo!(registry, demo_integer_sub_mul_i32);
+    register_demo!(registry, demo_integer_sub_mul_i32_val_ref);
+    register_demo!(registry, demo_integer_sub_mul_i32_ref_val);
+    register_demo!(registry, demo_integer_sub_mul_i32_ref_ref);
+    register_bench!(
+        registry,
+        Large,
+        benchmark_integer_sub_mul_assign_i32_evaluation_strategy
+    );
+    register_bench!(
+        registry,
+        Large,
+        benchmark_integer_sub_mul_assign_i32_algorithms
+    );
+    register_bench!(
+        registry,
+        Large,
+        benchmark_integer_sub_mul_assign_i32_ref_algorithms
+    );
+    register_bench!(
+        registry,
+        Large,
+        benchmark_integer_sub_mul_i32_evaluation_strategy
+    );
+    register_bench!(registry, Large, benchmark_integer_sub_mul_i32_algorithms);
+    register_bench!(
+        registry,
+        Large,
+        benchmark_integer_sub_mul_i32_val_ref_algorithms
+    );
+    register_bench!(
+        registry,
+        Large,
+        benchmark_integer_sub_mul_i32_ref_val_algorithms
+    );
+    register_bench!(
+        registry,
+        Large,
+        benchmark_integer_sub_mul_i32_ref_ref_algorithms
+    );
+}
+
+fn demo_integer_sub_mul_assign_i32(gm: GenerationMode, limit: usize) {
     for (mut a, b, c) in triples_of_integer_integer_and_signed::<i32>(gm).take(limit) {
         let a_old = a.clone();
         let b_old = b.clone();
@@ -16,7 +61,7 @@ pub fn demo_integer_sub_mul_assign_i32(gm: GenerationMode, limit: usize) {
     }
 }
 
-pub fn demo_integer_sub_mul_assign_i32_ref(gm: GenerationMode, limit: usize) {
+fn demo_integer_sub_mul_assign_i32_ref(gm: GenerationMode, limit: usize) {
     for (mut a, b, c) in triples_of_integer_integer_and_signed::<i32>(gm).take(limit) {
         let a_old = a.clone();
         a.sub_mul_assign(&b, c);
@@ -24,7 +69,7 @@ pub fn demo_integer_sub_mul_assign_i32_ref(gm: GenerationMode, limit: usize) {
     }
 }
 
-pub fn demo_integer_sub_mul_i32(gm: GenerationMode, limit: usize) {
+fn demo_integer_sub_mul_i32(gm: GenerationMode, limit: usize) {
     for (a, b, c) in triples_of_integer_integer_and_signed::<i32>(gm).take(limit) {
         let a_old = a.clone();
         let b_old = b.clone();
@@ -32,14 +77,14 @@ pub fn demo_integer_sub_mul_i32(gm: GenerationMode, limit: usize) {
     }
 }
 
-pub fn demo_integer_sub_mul_i32_val_ref(gm: GenerationMode, limit: usize) {
+fn demo_integer_sub_mul_i32_val_ref(gm: GenerationMode, limit: usize) {
     for (a, b, c) in triples_of_integer_integer_and_signed::<i32>(gm).take(limit) {
         let a_old = a.clone();
         println!("{}.sub_mul(&{}, {}) = {}", a_old, b, c, a.sub_mul(&b, c));
     }
 }
 
-pub fn demo_integer_sub_mul_i32_ref_val(gm: GenerationMode, limit: usize) {
+fn demo_integer_sub_mul_i32_ref_val(gm: GenerationMode, limit: usize) {
     for (a, b, c) in triples_of_integer_integer_and_signed::<i32>(gm).take(limit) {
         let a_old = a.clone();
         let b_old = b.clone();
@@ -53,7 +98,7 @@ pub fn demo_integer_sub_mul_i32_ref_val(gm: GenerationMode, limit: usize) {
     }
 }
 
-pub fn demo_integer_sub_mul_i32_ref_ref(gm: GenerationMode, limit: usize) {
+fn demo_integer_sub_mul_i32_ref_ref(gm: GenerationMode, limit: usize) {
     for (a, b, c) in triples_of_integer_integer_and_signed::<i32>(gm).take(limit) {
         let a_old = a.clone();
         println!(
@@ -66,7 +111,7 @@ pub fn demo_integer_sub_mul_i32_ref_ref(gm: GenerationMode, limit: usize) {
     }
 }
 
-pub fn benchmark_integer_sub_mul_assign_i32_evaluation_strategy(
+fn benchmark_integer_sub_mul_assign_i32_evaluation_strategy(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,
@@ -93,7 +138,7 @@ pub fn benchmark_integer_sub_mul_assign_i32_evaluation_strategy(
     );
 }
 
-pub fn benchmark_integer_sub_mul_assign_i32_algorithms(
+fn benchmark_integer_sub_mul_assign_i32_algorithms(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,
@@ -120,7 +165,7 @@ pub fn benchmark_integer_sub_mul_assign_i32_algorithms(
     );
 }
 
-pub fn benchmark_integer_sub_mul_assign_i32_ref_algorithms(
+fn benchmark_integer_sub_mul_assign_i32_ref_algorithms(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,
@@ -147,7 +192,7 @@ pub fn benchmark_integer_sub_mul_assign_i32_ref_algorithms(
     );
 }
 
-pub fn benchmark_integer_sub_mul_i32_evaluation_strategy(
+fn benchmark_integer_sub_mul_i32_evaluation_strategy(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,
@@ -182,7 +227,7 @@ pub fn benchmark_integer_sub_mul_i32_evaluation_strategy(
     );
 }
 
-pub fn benchmark_integer_sub_mul_i32_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
+fn benchmark_integer_sub_mul_i32_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "Integer.sub_mul(Integer, i32)",
         BenchmarkType::Algorithms,
@@ -205,7 +250,7 @@ pub fn benchmark_integer_sub_mul_i32_algorithms(gm: GenerationMode, limit: usize
     );
 }
 
-pub fn benchmark_integer_sub_mul_i32_val_ref_algorithms(
+fn benchmark_integer_sub_mul_i32_val_ref_algorithms(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,
@@ -232,7 +277,7 @@ pub fn benchmark_integer_sub_mul_i32_val_ref_algorithms(
     );
 }
 
-pub fn benchmark_integer_sub_mul_i32_ref_val_algorithms(
+fn benchmark_integer_sub_mul_i32_ref_val_algorithms(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,
@@ -259,7 +304,7 @@ pub fn benchmark_integer_sub_mul_i32_ref_val_algorithms(
     );
 }
 
-pub fn benchmark_integer_sub_mul_i32_ref_ref_algorithms(
+fn benchmark_integer_sub_mul_i32_ref_ref_algorithms(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,

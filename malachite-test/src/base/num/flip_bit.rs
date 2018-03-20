@@ -2,7 +2,7 @@ use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, 
 use inputs::base::{pairs_of_signed_and_u64_width_range, pairs_of_unsigned_and_u64_width_range};
 use malachite_base::num::{PrimitiveSigned, PrimitiveUnsigned};
 
-pub fn register(registry: &mut DemoBenchRegistry) {
+pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_u8_flip_bit);
     register_demo!(registry, demo_u16_flip_bit);
     register_demo!(registry, demo_u32_flip_bit);
@@ -75,11 +75,11 @@ fn benchmark_signed_flip_bit<T: 'static + PrimitiveSigned>(
 
 macro_rules! unsigned {
     ($t: ident, $demo_name: ident, $bench_name: ident) => {
-        pub fn $demo_name(gm: GenerationMode, limit: usize) {
+        pub(crate) fn $demo_name(gm: GenerationMode, limit: usize) {
             demo_unsigned_flip_bit::<$t>(gm, limit);
         }
 
-        pub fn $bench_name(gm: GenerationMode, limit: usize, file_name: &str) {
+        pub(crate) fn $bench_name(gm: GenerationMode, limit: usize, file_name: &str) {
             benchmark_unsigned_flip_bit::<$t>(gm, limit, file_name);
         }
     };
