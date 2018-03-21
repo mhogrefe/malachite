@@ -1,10 +1,17 @@
-use common::{m_run_benchmark, BenchmarkType, GenerationMode};
+use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::integer::{pairs_of_integer_and_unsigned, pairs_of_unsigned_and_integer};
 use malachite_base::num::SignificantBits;
 use malachite_base::num::PartialOrdAbs;
 use std::cmp::Ordering;
 
-pub fn demo_integer_partial_cmp_abs_u32(gm: GenerationMode, limit: usize) {
+pub(crate) fn register(registry: &mut DemoBenchRegistry) {
+    register_demo!(registry, demo_integer_partial_cmp_abs_u32);
+    register_demo!(registry, demo_u32_partial_cmp_abs_integer);
+    register_bench!(registry, Large, benchmark_integer_partial_cmp_abs_u32);
+    register_bench!(registry, Large, benchmark_u32_partial_cmp_abs_integer);
+}
+
+fn demo_integer_partial_cmp_abs_u32(gm: GenerationMode, limit: usize) {
     for (n, u) in pairs_of_integer_and_unsigned::<u32>(gm).take(limit) {
         match n.partial_cmp_abs(&u).unwrap() {
             Ordering::Less => println!("|{}| < |{}|", n, u),
@@ -14,7 +21,7 @@ pub fn demo_integer_partial_cmp_abs_u32(gm: GenerationMode, limit: usize) {
     }
 }
 
-pub fn demo_u32_partial_cmp_abs_integer(gm: GenerationMode, limit: usize) {
+fn demo_u32_partial_cmp_abs_integer(gm: GenerationMode, limit: usize) {
     for (u, n) in pairs_of_unsigned_and_integer::<u32>(gm).take(limit) {
         match PartialOrdAbs::partial_cmp_abs(&u, &n).unwrap() {
             Ordering::Less => println!("|{}| < |{}|", u, n),
@@ -24,7 +31,7 @@ pub fn demo_u32_partial_cmp_abs_integer(gm: GenerationMode, limit: usize) {
     }
 }
 
-pub fn benchmark_integer_partial_cmp_abs_u32(gm: GenerationMode, limit: usize, file_name: &str) {
+fn benchmark_integer_partial_cmp_abs_u32(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "Integer.partial_cmp_abs(&u32)",
         BenchmarkType::Single,
@@ -40,7 +47,7 @@ pub fn benchmark_integer_partial_cmp_abs_u32(gm: GenerationMode, limit: usize, f
     );
 }
 
-pub fn benchmark_u32_partial_cmp_abs_integer(gm: GenerationMode, limit: usize, file_name: &str) {
+fn benchmark_u32_partial_cmp_abs_integer(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "u32.partial_cmp_abs(&Integer)",
         BenchmarkType::Single,

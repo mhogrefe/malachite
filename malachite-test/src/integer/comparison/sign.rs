@@ -1,9 +1,14 @@
-use common::{m_run_benchmark, BenchmarkType, GenerationMode};
+use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::integer::{integers, nrm_integers};
 use malachite_base::num::SignificantBits;
 use num::BigInt;
 use num::bigint::Sign;
 use std::cmp::Ordering;
+
+pub(crate) fn register(registry: &mut DemoBenchRegistry) {
+    register_demo!(registry, demo_integer_sign);
+    register_bench!(registry, Large, benchmark_integer_sign_library_comparison);
+}
 
 pub fn num_sign(x: &BigInt) -> Ordering {
     match x.sign() {
@@ -13,7 +18,7 @@ pub fn num_sign(x: &BigInt) -> Ordering {
     }
 }
 
-pub fn demo_integer_sign(gm: GenerationMode, limit: usize) {
+fn demo_integer_sign(gm: GenerationMode, limit: usize) {
     for n in integers(gm).take(limit) {
         match n.sign() {
             Ordering::Less => println!("{} is negative", n),
@@ -23,11 +28,7 @@ pub fn demo_integer_sign(gm: GenerationMode, limit: usize) {
     }
 }
 
-pub fn benchmark_integer_sign_library_comparison(
-    gm: GenerationMode,
-    limit: usize,
-    file_name: &str,
-) {
+fn benchmark_integer_sign_library_comparison(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "Integer.sign()",
         BenchmarkType::LibraryComparison,

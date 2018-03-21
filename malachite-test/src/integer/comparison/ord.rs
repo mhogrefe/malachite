@@ -1,9 +1,14 @@
-use common::{m_run_benchmark, BenchmarkType, GenerationMode};
+use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::integer::{nrm_pairs_of_integers, pairs_of_integers};
 use malachite_base::num::SignificantBits;
 use std::cmp::{max, Ordering};
 
-pub fn demo_integer_cmp(gm: GenerationMode, limit: usize) {
+pub(crate) fn register(registry: &mut DemoBenchRegistry) {
+    register_demo!(registry, demo_integer_cmp);
+    register_bench!(registry, Large, benchmark_integer_cmp_library_comparison);
+}
+
+fn demo_integer_cmp(gm: GenerationMode, limit: usize) {
     for (x, y) in pairs_of_integers(gm).take(limit) {
         match x.cmp(&y) {
             Ordering::Less => println!("{} < {}", x, y),
@@ -13,7 +18,7 @@ pub fn demo_integer_cmp(gm: GenerationMode, limit: usize) {
     }
 }
 
-pub fn benchmark_integer_cmp_library_comparison(gm: GenerationMode, limit: usize, file_name: &str) {
+fn benchmark_integer_cmp_library_comparison(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "Integer.cmp(&Integer)",
         BenchmarkType::LibraryComparison,

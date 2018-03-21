@@ -1,10 +1,19 @@
-use common::{m_run_benchmark, BenchmarkType, GenerationMode};
+use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::integer::{rm_triples_of_integer_small_u64_and_bool,
                       triples_of_integer_small_u64_and_bool};
 use malachite_base::num::{BitAccess, SignificantBits};
 use std::cmp::max;
 
-pub fn demo_integer_assign_bit(gm: GenerationMode, limit: usize) {
+pub(crate) fn register(registry: &mut DemoBenchRegistry) {
+    register_demo!(registry, demo_integer_assign_bit);
+    register_bench!(
+        registry,
+        Large,
+        benchmark_integer_assign_bit_library_comparison
+    );
+}
+
+fn demo_integer_assign_bit(gm: GenerationMode, limit: usize) {
     for (mut n, index, bit) in triples_of_integer_small_u64_and_bool(gm).take(limit) {
         let n_old = n.clone();
         n.assign_bit(index, bit);
@@ -15,7 +24,7 @@ pub fn demo_integer_assign_bit(gm: GenerationMode, limit: usize) {
     }
 }
 
-pub fn benchmark_integer_assign_bit_library_comparison(
+fn benchmark_integer_assign_bit_library_comparison(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,

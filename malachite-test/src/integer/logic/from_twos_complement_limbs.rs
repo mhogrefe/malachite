@@ -1,8 +1,23 @@
-use common::{m_run_benchmark, BenchmarkType, GenerationMode};
+use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::vecs_of_unsigned;
 use malachite_nz::integer::Integer;
 
-pub fn demo_integer_from_twos_complement_limbs_asc(gm: GenerationMode, limit: usize) {
+pub(crate) fn register(registry: &mut DemoBenchRegistry) {
+    register_demo!(registry, demo_integer_from_twos_complement_limbs_asc);
+    register_demo!(registry, demo_integer_from_twos_complement_limbs_desc);
+    register_bench!(
+        registry,
+        Small,
+        benchmark_integer_from_twos_complement_limbs_asc
+    );
+    register_bench!(
+        registry,
+        Small,
+        benchmark_integer_from_twos_complement_limbs_desc
+    );
+}
+
+fn demo_integer_from_twos_complement_limbs_asc(gm: GenerationMode, limit: usize) {
     for xs in vecs_of_unsigned(gm).take(limit) {
         println!(
             "from_twos_complement_limbs_asc({:?}) = {:?}",
@@ -12,7 +27,7 @@ pub fn demo_integer_from_twos_complement_limbs_asc(gm: GenerationMode, limit: us
     }
 }
 
-pub fn demo_integer_from_twos_complement_limbs_desc(gm: GenerationMode, limit: usize) {
+fn demo_integer_from_twos_complement_limbs_desc(gm: GenerationMode, limit: usize) {
     for xs in vecs_of_unsigned(gm).take(limit) {
         println!(
             "from_twos_complement_limbs_desc({:?}) = {:?}",
@@ -22,7 +37,7 @@ pub fn demo_integer_from_twos_complement_limbs_desc(gm: GenerationMode, limit: u
     }
 }
 
-pub fn benchmark_integer_from_twos_complement_limbs_asc(
+fn benchmark_integer_from_twos_complement_limbs_asc(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,
@@ -45,7 +60,7 @@ pub fn benchmark_integer_from_twos_complement_limbs_asc(
     );
 }
 
-pub fn benchmark_integer_from_twos_complement_limbs_desc(
+fn benchmark_integer_from_twos_complement_limbs_desc(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,

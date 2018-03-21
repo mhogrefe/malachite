@@ -1,12 +1,17 @@
 extern crate serde;
 extern crate serde_json;
 
-use common::{m_run_benchmark, BenchmarkType, GenerationMode};
+use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::integer::integers;
 use malachite_base::num::SignificantBits;
 
+pub(crate) fn register(registry: &mut DemoBenchRegistry) {
+    register_demo!(registry, demo_integer_serialize_json);
+    register_bench!(registry, Large, benchmark_integer_serialize_json);
+}
+
 //TODO demo and bench deserialization
-pub fn demo_integer_serialize(gm: GenerationMode, limit: usize) {
+fn demo_integer_serialize_json(gm: GenerationMode, limit: usize) {
     for n in integers(gm).take(limit) {
         println!(
             "serde_json::to_string({}) = {}",
@@ -16,7 +21,7 @@ pub fn demo_integer_serialize(gm: GenerationMode, limit: usize) {
     }
 }
 
-pub fn benchmark_integer_serialize(gm: GenerationMode, limit: usize, file_name: &str) {
+fn benchmark_integer_serialize_json(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "serde_json::to_string(&Natural)",
         BenchmarkType::Single,

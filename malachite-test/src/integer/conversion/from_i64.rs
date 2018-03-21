@@ -1,16 +1,25 @@
-use common::{m_run_benchmark, BenchmarkType, GenerationMode};
+use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::signeds;
 use malachite_base::num::SignificantBits;
 use malachite_nz::integer::Integer;
 use num::BigInt;
 
-pub fn demo_integer_from_i64(gm: GenerationMode, limit: usize) {
+pub(crate) fn register(registry: &mut DemoBenchRegistry) {
+    register_demo!(registry, demo_integer_from_i64);
+    register_bench!(
+        registry,
+        None,
+        benchmark_integer_from_i64_library_comparison
+    );
+}
+
+fn demo_integer_from_i64(gm: GenerationMode, limit: usize) {
     for i in signeds::<i64>(gm).take(limit) {
         println!("from({}) = {}", i, Integer::from(i));
     }
 }
 
-pub fn benchmark_integer_from_i64_library_comparison(
+fn benchmark_integer_from_i64_library_comparison(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,

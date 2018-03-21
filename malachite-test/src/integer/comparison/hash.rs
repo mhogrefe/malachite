@@ -1,19 +1,20 @@
-use common::{m_run_benchmark, BenchmarkType, GenerationMode};
+use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use hash::hash;
 use inputs::integer::{integers, nrm_integers};
 use malachite_base::num::SignificantBits;
 
-pub fn demo_integer_hash(gm: GenerationMode, limit: usize) {
+pub(crate) fn register(registry: &mut DemoBenchRegistry) {
+    register_demo!(registry, demo_integer_hash);
+    register_bench!(registry, Large, benchmark_integer_hash_library_comparison);
+}
+
+fn demo_integer_hash(gm: GenerationMode, limit: usize) {
     for n in integers(gm).take(limit) {
         println!("hash({}) = {}", n, hash(&n));
     }
 }
 
-pub fn benchmark_integer_hash_library_comparison(
-    gm: GenerationMode,
-    limit: usize,
-    file_name: &str,
-) {
+fn benchmark_integer_hash_library_comparison(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "Integer hash",
         BenchmarkType::LibraryComparison,

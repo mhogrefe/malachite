@@ -2,49 +2,6 @@ extern crate malachite_test;
 
 use malachite_test::common::{get_gm, get_no_special_gm, DemoBenchRegistry, GenerationMode,
                              ScaleType};
-use malachite_test::integer::comparison::eq::*;
-use malachite_test::integer::comparison::hash::*;
-use malachite_test::integer::comparison::ord::*;
-use malachite_test::integer::comparison::ord_abs::*;
-use malachite_test::integer::comparison::partial_ord_abs_i32::*;
-use malachite_test::integer::comparison::partial_ord_abs_natural::*;
-use malachite_test::integer::comparison::partial_ord_abs_u32::*;
-use malachite_test::integer::comparison::partial_ord_i32::*;
-use malachite_test::integer::comparison::partial_ord_natural::*;
-use malachite_test::integer::comparison::partial_ord_u32::*;
-use malachite_test::integer::comparison::partial_eq_i32::*;
-use malachite_test::integer::comparison::partial_eq_natural::*;
-use malachite_test::integer::comparison::partial_eq_u32::*;
-use malachite_test::integer::comparison::sign::*;
-use malachite_test::integer::conversion::assign_i32::*;
-use malachite_test::integer::conversion::assign_i64::*;
-use malachite_test::integer::conversion::assign_natural::*;
-use malachite_test::integer::conversion::assign_u32::*;
-use malachite_test::integer::conversion::assign_u64::*;
-use malachite_test::integer::conversion::clone_and_assign::*;
-use malachite_test::integer::conversion::from_i32::*;
-use malachite_test::integer::conversion::from_i64::*;
-use malachite_test::integer::conversion::from_sign_and_limbs::*;
-use malachite_test::integer::conversion::from_u32::*;
-use malachite_test::integer::conversion::from_u64::*;
-use malachite_test::integer::conversion::natural_assign_integer::*;
-use malachite_test::integer::conversion::serde::*;
-use malachite_test::integer::conversion::to_i32::*;
-use malachite_test::integer::conversion::to_i64::*;
-use malachite_test::integer::conversion::to_natural::*;
-use malachite_test::integer::conversion::to_sign_and_limbs::*;
-use malachite_test::integer::conversion::to_u32::*;
-use malachite_test::integer::conversion::to_u64::*;
-use malachite_test::integer::logic::assign_bit::*;
-use malachite_test::integer::logic::clear_bit::*;
-use malachite_test::integer::logic::flip_bit::*;
-use malachite_test::integer::logic::from_twos_complement_limbs::*;
-use malachite_test::integer::logic::get_bit::*;
-use malachite_test::integer::logic::not::*;
-use malachite_test::integer::logic::set_bit::*;
-use malachite_test::integer::logic::significant_bits::*;
-use malachite_test::integer::logic::trailing_zeros::*;
-use malachite_test::integer::logic::twos_complement_limbs::*;
 use malachite_test::natural::arithmetic::add::*;
 use malachite_test::natural::arithmetic::add_u32::*;
 use malachite_test::natural::arithmetic::add_mul::*;
@@ -265,73 +222,6 @@ demos_and_benchmarks!(
         demo_limbs_ceiling_log_two,
         demo_limbs_floor_log_two,
         demo_limbs_significant_bits,
-        demo_integer_assign,
-        demo_integer_assign_ref,
-        demo_integer_assign_i32,
-        demo_integer_assign_i64,
-        demo_integer_assign_natural,
-        demo_integer_assign_natural_ref,
-        demo_integer_assign_u32,
-        demo_integer_assign_u64,
-        demo_integer_assign_bit,
-        demo_integer_clear_bit,
-        demo_integer_clone,
-        demo_integer_clone_from,
-        demo_integer_cmp,
-        demo_integer_cmp_abs,
-        demo_integer_eq,
-        demo_integer_flip_bit,
-        demo_integer_from_i32,
-        demo_integer_from_i64,
-        demo_integer_from_u32,
-        demo_integer_from_u64,
-        demo_integer_from_sign_and_limbs_asc,
-        demo_integer_from_sign_and_limbs_desc,
-        demo_integer_from_sign_and_owned_limbs_asc,
-        demo_integer_from_sign_and_owned_limbs_desc,
-        demo_integer_from_twos_complement_limbs_asc,
-        demo_integer_from_twos_complement_limbs_desc,
-        demo_integer_get_bit,
-        demo_integer_hash,
-        demo_integer_into_sign_and_limbs_asc,
-        demo_integer_into_sign_and_limbs_desc,
-        demo_integer_not_assign,
-        demo_integer_not,
-        demo_integer_not_ref,
-        demo_integer_partial_cmp_abs_i32,
-        demo_i32_partial_cmp_abs_integer,
-        demo_integer_partial_cmp_abs_u32,
-        demo_u32_partial_cmp_abs_integer,
-        demo_integer_partial_cmp_abs_natural,
-        demo_integer_partial_cmp_i32,
-        demo_i32_partial_cmp_integer,
-        demo_integer_partial_cmp_u32,
-        demo_u32_partial_cmp_integer,
-        demo_integer_partial_cmp_natural,
-        demo_integer_partial_eq_i32,
-        demo_i32_partial_eq_integer,
-        demo_integer_partial_eq_u32,
-        demo_u32_partial_eq_integer,
-        demo_integer_partial_eq_natural,
-        demo_integer_serialize,
-        demo_integer_set_bit,
-        demo_integer_sign,
-        demo_integer_significant_bits,
-        demo_integer_to_i32,
-        demo_integer_to_i32_wrapping,
-        demo_integer_to_i64,
-        demo_integer_to_i64_wrapping,
-        demo_integer_into_natural,
-        demo_integer_to_natural,
-        demo_integer_to_sign_and_limbs_asc,
-        demo_integer_to_sign_and_limbs_desc,
-        demo_integer_to_u32,
-        demo_integer_to_u32_wrapping,
-        demo_integer_to_u64,
-        demo_integer_to_u64_wrapping,
-        demo_integer_trailing_zeros,
-        demo_integer_twos_complement_limbs_asc,
-        demo_integer_twos_complement_limbs_desc,
         demo_natural_add_assign,
         demo_natural_add_assign_ref,
         demo_natural_add,
@@ -360,8 +250,6 @@ demos_and_benchmarks!(
         demo_natural_add_mul_u32_ref_ref,
         demo_natural_assign,
         demo_natural_assign_ref,
-        demo_natural_assign_integer,
-        demo_natural_assign_integer_ref,
         demo_natural_assign_u32,
         demo_natural_assign_u64,
         demo_natural_assign_bit,
@@ -422,9 +310,6 @@ demos_and_benchmarks!(
         demo_natural_not_ref,
         demo_natural_partial_eq_u32,
         demo_u32_partial_eq_natural,
-        demo_natural_partial_eq_integer,
-        demo_natural_partial_cmp_abs_integer,
-        demo_natural_partial_cmp_integer,
         demo_natural_partial_cmp_u32,
         demo_u32_partial_cmp_natural,
         demo_natural_serialize,
@@ -478,18 +363,6 @@ demos_and_benchmarks!(
     ],
     // special_no_scale_bench_fn
     [
-        benchmark_integer_from_i32_library_comparison,
-        benchmark_integer_from_i64_library_comparison,
-        benchmark_integer_from_u32_library_comparison,
-        benchmark_integer_from_u64_library_comparison,
-        benchmark_integer_to_i32_library_comparison,
-        benchmark_integer_to_i32_wrapping_library_comparison,
-        benchmark_integer_to_i64,
-        benchmark_integer_to_i64_wrapping,
-        benchmark_integer_to_u32_library_comparison,
-        benchmark_integer_to_u32_wrapping_library_comparison,
-        benchmark_integer_to_u64,
-        benchmark_integer_to_u64_wrapping,
         benchmark_natural_from_u32_library_comparison,
         benchmark_natural_from_u64_library_comparison,
         benchmark_natural_to_u32,
@@ -504,61 +377,11 @@ demos_and_benchmarks!(
         benchmark_limbs_ceiling_log_two,
         benchmark_limbs_floor_log_two,
         benchmark_limbs_significant_bits,
-        benchmark_integer_from_sign_and_limbs_asc_evaluation_strategy,
-        benchmark_integer_from_sign_and_limbs_desc_evaluation_strategy,
-        benchmark_integer_from_twos_complement_limbs_asc,
-        benchmark_integer_from_twos_complement_limbs_desc,
         benchmark_natural_from_limbs_asc_evaluation_strategy,
         benchmark_natural_from_limbs_desc_evaluation_strategy,
     ],
     // special_large_scale_bench_fn
     [
-        benchmark_integer_assign_library_comparison,
-        benchmark_integer_assign_evaluation_strategy,
-        benchmark_integer_assign_i32_library_comparison,
-        benchmark_integer_assign_i64_library_comparison,
-        benchmark_integer_assign_natural_library_comparison,
-        benchmark_integer_assign_natural_evaluation_strategy,
-        benchmark_integer_assign_u32_library_comparison,
-        benchmark_integer_assign_u64_library_comparison,
-        benchmark_integer_assign_bit_library_comparison,
-        benchmark_integer_clear_bit,
-        benchmark_integer_clone_library_comparison,
-        benchmark_integer_clone_from_library_comparison,
-        benchmark_integer_cmp_library_comparison,
-        benchmark_integer_cmp_abs_library_comparison,
-        benchmark_integer_eq_library_comparison,
-        benchmark_integer_flip_bit_library_comparison,
-        benchmark_integer_get_bit_library_comparison,
-        benchmark_integer_hash_library_comparison,
-        benchmark_integer_not_library_comparison,
-        benchmark_integer_not_assign,
-        benchmark_integer_not_evaluation_strategy,
-        benchmark_integer_partial_cmp_abs_i32,
-        benchmark_i32_partial_cmp_abs_integer,
-        benchmark_integer_partial_cmp_abs_u32,
-        benchmark_u32_partial_cmp_abs_integer,
-        benchmark_integer_partial_cmp_abs_natural_library_comparison,
-        benchmark_integer_partial_cmp_i32_library_comparison,
-        benchmark_i32_partial_cmp_integer_library_comparison,
-        benchmark_integer_partial_cmp_u32_library_comparison,
-        benchmark_u32_partial_cmp_integer_library_comparison,
-        benchmark_integer_partial_cmp_natural_library_comparison,
-        benchmark_integer_partial_eq_i32_library_comparison,
-        benchmark_i32_partial_eq_integer_library_comparison,
-        benchmark_integer_partial_eq_u32_library_comparison,
-        benchmark_u32_partial_eq_integer_library_comparison,
-        benchmark_integer_partial_eq_natural_library_comparison,
-        benchmark_integer_serialize,
-        benchmark_integer_set_bit,
-        benchmark_integer_sign_library_comparison,
-        benchmark_integer_significant_bits,
-        benchmark_integer_to_natural_evaluation_strategy,
-        benchmark_integer_to_sign_and_limbs_asc_evaluation_strategy,
-        benchmark_integer_to_sign_and_limbs_desc_evaluation_strategy,
-        benchmark_integer_trailing_zeros,
-        benchmark_integer_twos_complement_limbs_asc,
-        benchmark_integer_twos_complement_limbs_desc,
         benchmark_natural_add_library_comparison,
         benchmark_natural_add_assign_library_comparison,
         benchmark_natural_add_assign_evaluation_strategy,
@@ -589,8 +412,6 @@ demos_and_benchmarks!(
         benchmark_natural_add_mul_u32_ref_ref_algorithms,
         benchmark_natural_assign_library_comparison,
         benchmark_natural_assign_evaluation_strategy,
-        benchmark_natural_assign_integer_library_comparison,
-        benchmark_natural_assign_integer_evaluation_strategy,
         benchmark_natural_assign_u32_library_comparison,
         benchmark_natural_assign_u64_library_comparison,
         benchmark_natural_assign_bit_library_comparison,
@@ -637,13 +458,10 @@ demos_and_benchmarks!(
         benchmark_natural_neg_evaluation_strategy,
         benchmark_natural_not_library_comparison,
         benchmark_natural_not_evaluation_strategy,
-        benchmark_natural_partial_cmp_abs_integer_library_comparison,
-        benchmark_natural_partial_cmp_integer_library_comparison,
         benchmark_natural_partial_cmp_u32_library_comparison,
         benchmark_u32_partial_cmp_natural_library_comparison,
         benchmark_natural_partial_eq_u32_library_comparison,
         benchmark_u32_partial_eq_natural_library_comparison,
-        benchmark_natural_partial_eq_integer_library_comparison,
         benchmark_natural_serialize,
         benchmark_natural_set_bit_library_comparison,
         benchmark_natural_shl_assign_i32_library_comparison,

@@ -1,14 +1,23 @@
-use common::{m_run_benchmark, BenchmarkType, GenerationMode};
+use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::integer::{nm_pairs_of_integer_and_signed, pairs_of_integer_and_signed};
 use malachite_base::num::SignificantBits;
 use malachite_base::num::Assign;
 use num::BigInt;
 
+pub(crate) fn register(registry: &mut DemoBenchRegistry) {
+    register_demo!(registry, demo_integer_assign_i64);
+    register_bench!(
+        registry,
+        Large,
+        benchmark_integer_assign_i64_library_comparison
+    );
+}
+
 pub fn num_assign_i64(x: &mut BigInt, i: i64) {
     *x = BigInt::from(i);
 }
 
-pub fn demo_integer_assign_i64(gm: GenerationMode, limit: usize) {
+fn demo_integer_assign_i64(gm: GenerationMode, limit: usize) {
     for (mut n, i) in pairs_of_integer_and_signed::<i64>(gm).take(limit) {
         let n_old = n.clone();
         n.assign(i);
@@ -16,7 +25,7 @@ pub fn demo_integer_assign_i64(gm: GenerationMode, limit: usize) {
     }
 }
 
-pub fn benchmark_integer_assign_i64_library_comparison(
+fn benchmark_integer_assign_i64_library_comparison(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,

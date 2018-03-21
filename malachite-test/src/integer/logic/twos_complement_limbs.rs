@@ -1,8 +1,19 @@
-use common::{m_run_benchmark, BenchmarkType, GenerationMode};
+use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::integer::integers;
 use malachite_base::num::SignificantBits;
 
-pub fn demo_integer_twos_complement_limbs_asc(gm: GenerationMode, limit: usize) {
+pub(crate) fn register(registry: &mut DemoBenchRegistry) {
+    register_demo!(registry, demo_integer_twos_complement_limbs_asc);
+    register_demo!(registry, demo_integer_twos_complement_limbs_desc);
+    register_bench!(registry, Large, benchmark_integer_twos_complement_limbs_asc);
+    register_bench!(
+        registry,
+        Large,
+        benchmark_integer_twos_complement_limbs_desc
+    );
+}
+
+fn demo_integer_twos_complement_limbs_asc(gm: GenerationMode, limit: usize) {
     for n in integers(gm).take(limit) {
         println!(
             "twos_complement_limbs_asc({}) = {:?}",
@@ -12,7 +23,7 @@ pub fn demo_integer_twos_complement_limbs_asc(gm: GenerationMode, limit: usize) 
     }
 }
 
-pub fn demo_integer_twos_complement_limbs_desc(gm: GenerationMode, limit: usize) {
+fn demo_integer_twos_complement_limbs_desc(gm: GenerationMode, limit: usize) {
     for n in integers(gm).take(limit) {
         println!(
             "twos_complement_limbs_desc({}) = {:?}",
@@ -22,11 +33,7 @@ pub fn demo_integer_twos_complement_limbs_desc(gm: GenerationMode, limit: usize)
     }
 }
 
-pub fn benchmark_integer_twos_complement_limbs_asc(
-    gm: GenerationMode,
-    limit: usize,
-    file_name: &str,
-) {
+fn benchmark_integer_twos_complement_limbs_asc(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "Integer.twos_complement_limbs_asc()",
         BenchmarkType::Single,
@@ -45,11 +52,7 @@ pub fn benchmark_integer_twos_complement_limbs_asc(
     );
 }
 
-pub fn benchmark_integer_twos_complement_limbs_desc(
-    gm: GenerationMode,
-    limit: usize,
-    file_name: &str,
-) {
+fn benchmark_integer_twos_complement_limbs_desc(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "Integer.twos_complement_limbs_desc()",
         BenchmarkType::Single,

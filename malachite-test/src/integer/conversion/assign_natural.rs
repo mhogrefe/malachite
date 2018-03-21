@@ -1,11 +1,26 @@
-use common::{m_run_benchmark, BenchmarkType, GenerationMode};
+use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::integer::{pairs_of_integer_and_natural, rm_pairs_of_integer_and_natural};
 use malachite_base::num::SignificantBits;
 use malachite_base::num::Assign;
 use rug::Assign as rug_assign;
 use std::cmp::max;
 
-pub fn demo_integer_assign_natural(gm: GenerationMode, limit: usize) {
+pub(crate) fn register(registry: &mut DemoBenchRegistry) {
+    register_demo!(registry, demo_integer_assign_natural);
+    register_demo!(registry, demo_integer_assign_natural_ref);
+    register_bench!(
+        registry,
+        Large,
+        benchmark_integer_assign_natural_library_comparison
+    );
+    register_bench!(
+        registry,
+        Large,
+        benchmark_integer_assign_natural_evaluation_strategy
+    );
+}
+
+fn demo_integer_assign_natural(gm: GenerationMode, limit: usize) {
     for (mut x, y) in pairs_of_integer_and_natural(gm).take(limit) {
         let x_old = x.clone();
         let y_old = y.clone();
@@ -14,7 +29,7 @@ pub fn demo_integer_assign_natural(gm: GenerationMode, limit: usize) {
     }
 }
 
-pub fn demo_integer_assign_natural_ref(gm: GenerationMode, limit: usize) {
+fn demo_integer_assign_natural_ref(gm: GenerationMode, limit: usize) {
     for (mut x, y) in pairs_of_integer_and_natural(gm).take(limit) {
         let x_old = x.clone();
         x.assign(&y);
@@ -22,7 +37,7 @@ pub fn demo_integer_assign_natural_ref(gm: GenerationMode, limit: usize) {
     }
 }
 
-pub fn benchmark_integer_assign_natural_library_comparison(
+fn benchmark_integer_assign_natural_library_comparison(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,
@@ -43,7 +58,7 @@ pub fn benchmark_integer_assign_natural_library_comparison(
     );
 }
 
-pub fn benchmark_integer_assign_natural_evaluation_strategy(
+fn benchmark_integer_assign_natural_evaluation_strategy(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,
