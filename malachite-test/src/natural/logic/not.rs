@@ -1,20 +1,27 @@
-use common::{m_run_benchmark, BenchmarkType, GenerationMode};
+use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::natural::{naturals, rm_naturals};
 use malachite_base::num::SignificantBits;
 
-pub fn demo_natural_not(gm: GenerationMode, limit: usize) {
+pub(crate) fn register(registry: &mut DemoBenchRegistry) {
+    register_demo!(registry, demo_natural_not);
+    register_demo!(registry, demo_natural_not_ref);
+    register_bench!(registry, Large, benchmark_natural_not_library_comparison);
+    register_bench!(registry, Large, benchmark_natural_not_evaluation_strategy);
+}
+
+fn demo_natural_not(gm: GenerationMode, limit: usize) {
     for n in naturals(gm).take(limit) {
         println!("!({}) = {}", n.clone(), !n);
     }
 }
 
-pub fn demo_natural_not_ref(gm: GenerationMode, limit: usize) {
+fn demo_natural_not_ref(gm: GenerationMode, limit: usize) {
     for n in naturals(gm).take(limit) {
         println!("!(&{}) = {}", n, !&n);
     }
 }
 
-pub fn benchmark_natural_not_library_comparison(gm: GenerationMode, limit: usize, file_name: &str) {
+fn benchmark_natural_not_library_comparison(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "!Natural",
         BenchmarkType::LibraryComparison,
@@ -31,11 +38,7 @@ pub fn benchmark_natural_not_library_comparison(gm: GenerationMode, limit: usize
     );
 }
 
-pub fn benchmark_natural_not_evaluation_strategy(
-    gm: GenerationMode,
-    limit: usize,
-    file_name: &str,
-) {
+fn benchmark_natural_not_evaluation_strategy(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "!Natural",
         BenchmarkType::EvaluationStrategy,

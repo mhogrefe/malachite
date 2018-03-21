@@ -1,20 +1,31 @@
-use common::{m_run_benchmark, BenchmarkType, GenerationMode};
+use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::natural::{naturals, rm_naturals};
 use malachite_base::num::SignificantBits;
 
-pub fn demo_natural_to_u32(gm: GenerationMode, limit: usize) {
+pub(crate) fn register(registry: &mut DemoBenchRegistry) {
+    register_demo!(registry, demo_natural_to_u32);
+    register_demo!(registry, demo_natural_to_u32_wrapping);
+    register_bench!(registry, Large, benchmark_natural_to_u32_library_comparison);
+    register_bench!(
+        registry,
+        Large,
+        benchmark_natural_to_u32_wrapping_library_comparison
+    );
+}
+
+fn demo_natural_to_u32(gm: GenerationMode, limit: usize) {
     for n in naturals(gm).take(limit) {
         println!("to_u32({}) = {:?}", n, n.to_u32());
     }
 }
 
-pub fn demo_natural_to_u32_wrapping(gm: GenerationMode, limit: usize) {
+fn demo_natural_to_u32_wrapping(gm: GenerationMode, limit: usize) {
     for n in naturals(gm).take(limit) {
         println!("to_u32({}) = {:?}", n, n.to_u32_wrapping());
     }
 }
 
-pub fn benchmark_natural_to_u32(gm: GenerationMode, limit: usize, file_name: &str) {
+fn benchmark_natural_to_u32_library_comparison(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "Natural.to_u32()",
         BenchmarkType::LibraryComparison,
@@ -31,7 +42,11 @@ pub fn benchmark_natural_to_u32(gm: GenerationMode, limit: usize, file_name: &st
     );
 }
 
-pub fn benchmark_natural_to_u32_wrapping(gm: GenerationMode, limit: usize, file_name: &str) {
+fn benchmark_natural_to_u32_wrapping_library_comparison(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
     m_run_benchmark(
         "Natural.to_u32_wrapping()",
         BenchmarkType::LibraryComparison,

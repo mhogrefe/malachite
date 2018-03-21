@@ -1,7 +1,32 @@
-use common::{m_run_benchmark, BenchmarkType, GenerationMode};
+use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::natural::pairs_of_natural_and_small_u32;
 
-pub fn demo_natural_mod_power_of_two_assign(gm: GenerationMode, limit: usize) {
+pub(crate) fn register(registry: &mut DemoBenchRegistry) {
+    register_demo!(registry, demo_natural_mod_power_of_two_assign);
+    register_demo!(registry, demo_natural_mod_power_of_two);
+    register_demo!(registry, demo_natural_mod_power_of_two_ref);
+    register_demo!(registry, demo_natural_neg_mod_power_of_two_assign);
+    register_demo!(registry, demo_natural_neg_mod_power_of_two);
+    register_demo!(registry, demo_natural_neg_mod_power_of_two_ref);
+    register_bench!(registry, Large, benchmark_natural_mod_power_of_two_assign);
+    register_bench!(
+        registry,
+        Large,
+        benchmark_natural_mod_power_of_two_evaluation_strategy
+    );
+    register_bench!(
+        registry,
+        Large,
+        benchmark_natural_neg_mod_power_of_two_assign
+    );
+    register_bench!(
+        registry,
+        Large,
+        benchmark_natural_neg_mod_power_of_two_evaluation_strategy
+    );
+}
+
+fn demo_natural_mod_power_of_two_assign(gm: GenerationMode, limit: usize) {
     for (mut n, u) in pairs_of_natural_and_small_u32(gm).take(limit) {
         let n_old = n.clone();
         n.mod_power_of_two_assign(u);
@@ -12,7 +37,7 @@ pub fn demo_natural_mod_power_of_two_assign(gm: GenerationMode, limit: usize) {
     }
 }
 
-pub fn demo_natural_mod_power_of_two(gm: GenerationMode, limit: usize) {
+fn demo_natural_mod_power_of_two(gm: GenerationMode, limit: usize) {
     for (n, u) in pairs_of_natural_and_small_u32(gm).take(limit) {
         let n_old = n.clone();
         println!(
@@ -24,7 +49,7 @@ pub fn demo_natural_mod_power_of_two(gm: GenerationMode, limit: usize) {
     }
 }
 
-pub fn demo_natural_mod_power_of_two_ref(gm: GenerationMode, limit: usize) {
+fn demo_natural_mod_power_of_two_ref(gm: GenerationMode, limit: usize) {
     for (n, u) in pairs_of_natural_and_small_u32(gm).take(limit) {
         println!(
             "{}.mod_power_of_two_ref({}) = {}",
@@ -35,7 +60,7 @@ pub fn demo_natural_mod_power_of_two_ref(gm: GenerationMode, limit: usize) {
     }
 }
 
-pub fn demo_natural_neg_mod_power_of_two_assign(gm: GenerationMode, limit: usize) {
+fn demo_natural_neg_mod_power_of_two_assign(gm: GenerationMode, limit: usize) {
     for (mut n, u) in pairs_of_natural_and_small_u32(gm).take(limit) {
         let n_old = n.clone();
         n.neg_mod_power_of_two_assign(u);
@@ -46,7 +71,7 @@ pub fn demo_natural_neg_mod_power_of_two_assign(gm: GenerationMode, limit: usize
     }
 }
 
-pub fn demo_natural_neg_mod_power_of_two(gm: GenerationMode, limit: usize) {
+fn demo_natural_neg_mod_power_of_two(gm: GenerationMode, limit: usize) {
     for (n, u) in pairs_of_natural_and_small_u32(gm).take(limit) {
         let n_old = n.clone();
         println!(
@@ -58,7 +83,7 @@ pub fn demo_natural_neg_mod_power_of_two(gm: GenerationMode, limit: usize) {
     }
 }
 
-pub fn demo_natural_neg_mod_power_of_two_ref(gm: GenerationMode, limit: usize) {
+fn demo_natural_neg_mod_power_of_two_ref(gm: GenerationMode, limit: usize) {
     for (n, u) in pairs_of_natural_and_small_u32(gm).take(limit) {
         println!(
             "{}.neg_mod_power_of_two_ref({}) = {}",
@@ -69,11 +94,7 @@ pub fn demo_natural_neg_mod_power_of_two_ref(gm: GenerationMode, limit: usize) {
     }
 }
 
-pub fn benchmark_natural_mod_power_of_two_assign(
-    gm: GenerationMode,
-    limit: usize,
-    file_name: &str,
-) {
+fn benchmark_natural_mod_power_of_two_assign(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "Natural.mod_power_of_two_assign(u32)",
         BenchmarkType::Single,
@@ -92,7 +113,7 @@ pub fn benchmark_natural_mod_power_of_two_assign(
     );
 }
 
-pub fn benchmark_natural_mod_power_of_two_evaluation_strategy(
+fn benchmark_natural_mod_power_of_two_evaluation_strategy(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,
@@ -119,7 +140,7 @@ pub fn benchmark_natural_mod_power_of_two_evaluation_strategy(
     );
 }
 
-pub fn benchmark_natural_neg_mod_power_of_two_assign(
+fn benchmark_natural_neg_mod_power_of_two_assign(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,
@@ -142,7 +163,7 @@ pub fn benchmark_natural_neg_mod_power_of_two_assign(
     );
 }
 
-pub fn benchmark_natural_neg_mod_power_of_two_evaluation_strategy(
+fn benchmark_natural_neg_mod_power_of_two_evaluation_strategy(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,

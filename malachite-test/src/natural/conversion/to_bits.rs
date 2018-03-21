@@ -1,26 +1,41 @@
-use common::{m_run_benchmark, BenchmarkType, GenerationMode};
+use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::natural::naturals;
 use malachite_base::num::SignificantBits;
 
-pub fn demo_natural_to_bits_asc(gm: GenerationMode, limit: usize) {
+pub(crate) fn register(registry: &mut DemoBenchRegistry) {
+    register_demo!(registry, demo_natural_to_bits_asc);
+    register_demo!(registry, demo_natural_to_bits_desc);
+    register_demo!(registry, demo_natural_bits);
+    register_demo!(registry, demo_natural_bits_rev);
+    register_demo!(registry, demo_natural_bits_size_hint);
+    register_bench!(registry, Large, benchmark_natural_bits_evaluation_strategy);
+    register_bench!(
+        registry,
+        Large,
+        benchmark_natural_bits_rev_evaluation_strategy
+    );
+    register_bench!(registry, Large, benchmark_natural_bits_size_hint);
+}
+
+fn demo_natural_to_bits_asc(gm: GenerationMode, limit: usize) {
     for n in naturals(gm).take(limit) {
         println!("to_bits_asc({}) = {:?}", n, n.to_bits_asc());
     }
 }
 
-pub fn demo_natural_to_bits_desc(gm: GenerationMode, limit: usize) {
+fn demo_natural_to_bits_desc(gm: GenerationMode, limit: usize) {
     for n in naturals(gm).take(limit) {
         println!("to_bits_desc({}) = {:?}", n, n.to_bits_desc());
     }
 }
 
-pub fn demo_natural_bits(gm: GenerationMode, limit: usize) {
+fn demo_natural_bits(gm: GenerationMode, limit: usize) {
     for n in naturals(gm).take(limit) {
         println!("bits({}) = {:?}", n, n.bits().collect::<Vec<bool>>());
     }
 }
 
-pub fn demo_natural_bits_rev(gm: GenerationMode, limit: usize) {
+fn demo_natural_bits_rev(gm: GenerationMode, limit: usize) {
     for n in naturals(gm).take(limit) {
         println!(
             "bits({}).rev() = {:?}",
@@ -30,18 +45,14 @@ pub fn demo_natural_bits_rev(gm: GenerationMode, limit: usize) {
     }
 }
 
-pub fn demo_natural_bits_size_hint(gm: GenerationMode, limit: usize) {
+fn demo_natural_bits_size_hint(gm: GenerationMode, limit: usize) {
     for n in naturals(gm).take(limit) {
         println!("bits({}).size_hint() = {:?}", n, n.bits().size_hint());
     }
 }
 
 #[allow(unknown_lints, unused_collect)]
-pub fn benchmark_natural_bits_evaluation_strategy(
-    gm: GenerationMode,
-    limit: usize,
-    file_name: &str,
-) {
+fn benchmark_natural_bits_evaluation_strategy(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "Natural.bits()",
         BenchmarkType::EvaluationStrategy,
@@ -62,7 +73,7 @@ pub fn benchmark_natural_bits_evaluation_strategy(
 }
 
 #[allow(unknown_lints, unused_collect)]
-pub fn benchmark_natural_bits_rev_evaluation_strategy(
+fn benchmark_natural_bits_rev_evaluation_strategy(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,
@@ -89,7 +100,7 @@ pub fn benchmark_natural_bits_rev_evaluation_strategy(
     );
 }
 
-pub fn benchmark_natural_bits_size_hint(gm: GenerationMode, limit: usize, file_name: &str) {
+fn benchmark_natural_bits_size_hint(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "Natural.bits().size_hint()",
         BenchmarkType::Single,

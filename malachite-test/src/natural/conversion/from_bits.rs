@@ -1,10 +1,21 @@
-use common::{m_run_benchmark, BenchmarkType, GenerationMode};
+use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::vecs_of_bool;
 use malachite_nz::natural::conversion::from_bits::{limbs_asc_from_bits_asc,
                                                    limbs_asc_from_bits_desc};
 use malachite_nz::natural::Natural;
 
-pub fn demo_limbs_asc_from_bits_asc(gm: GenerationMode, limit: usize) {
+pub(crate) fn register(registry: &mut DemoBenchRegistry) {
+    register_demo!(registry, demo_limbs_asc_from_bits_asc);
+    register_demo!(registry, demo_limbs_asc_from_bits_desc);
+    register_demo!(registry, demo_natural_from_bits_asc);
+    register_demo!(registry, demo_natural_from_bits_desc);
+    register_bench!(registry, Large, benchmark_limbs_asc_from_bits_asc);
+    register_bench!(registry, Large, benchmark_limbs_asc_from_bits_desc);
+    register_bench!(registry, Large, benchmark_natural_from_bits_asc);
+    register_bench!(registry, Large, benchmark_natural_from_bits_desc);
+}
+
+fn demo_limbs_asc_from_bits_asc(gm: GenerationMode, limit: usize) {
     for bits in vecs_of_bool(gm).take(limit) {
         println!(
             "limbs_asc_from_bits_asc({:?}) = {:?}",
@@ -14,7 +25,7 @@ pub fn demo_limbs_asc_from_bits_asc(gm: GenerationMode, limit: usize) {
     }
 }
 
-pub fn demo_limbs_asc_from_bits_desc(gm: GenerationMode, limit: usize) {
+fn demo_limbs_asc_from_bits_desc(gm: GenerationMode, limit: usize) {
     for bits in vecs_of_bool(gm).take(limit) {
         println!(
             "limbs_asc_from_bits_desc({:?}) = {:?}",
@@ -24,7 +35,7 @@ pub fn demo_limbs_asc_from_bits_desc(gm: GenerationMode, limit: usize) {
     }
 }
 
-pub fn demo_natural_from_bits_asc(gm: GenerationMode, limit: usize) {
+fn demo_natural_from_bits_asc(gm: GenerationMode, limit: usize) {
     for bits in vecs_of_bool(gm).take(limit) {
         println!(
             "from_bits_asc({:?}) = {:?}",
@@ -34,7 +45,7 @@ pub fn demo_natural_from_bits_asc(gm: GenerationMode, limit: usize) {
     }
 }
 
-pub fn demo_natural_from_bits_desc(gm: GenerationMode, limit: usize) {
+fn demo_natural_from_bits_desc(gm: GenerationMode, limit: usize) {
     for bits in vecs_of_bool(gm).take(limit) {
         println!(
             "from_bits_desc({:?}) = {:?}",
@@ -44,7 +55,7 @@ pub fn demo_natural_from_bits_desc(gm: GenerationMode, limit: usize) {
     }
 }
 
-pub fn benchmark_limbs_asc_from_bits_asc(gm: GenerationMode, limit: usize, file_name: &str) {
+fn benchmark_limbs_asc_from_bits_asc(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "limbs_asc_from_bits_asc(&[bool])",
         BenchmarkType::Single,
@@ -63,7 +74,7 @@ pub fn benchmark_limbs_asc_from_bits_asc(gm: GenerationMode, limit: usize, file_
     );
 }
 
-pub fn benchmark_limbs_asc_from_bits_desc(gm: GenerationMode, limit: usize, file_name: &str) {
+fn benchmark_limbs_asc_from_bits_desc(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "limbs_asc_from_bits_desc(&[bool])",
         BenchmarkType::Single,
@@ -82,7 +93,7 @@ pub fn benchmark_limbs_asc_from_bits_desc(gm: GenerationMode, limit: usize, file
     );
 }
 
-pub fn benchmark_natural_from_bits_asc(gm: GenerationMode, limit: usize, file_name: &str) {
+fn benchmark_natural_from_bits_asc(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "Natural::from_bits_asc(&[bool])",
         BenchmarkType::Single,
@@ -101,7 +112,7 @@ pub fn benchmark_natural_from_bits_asc(gm: GenerationMode, limit: usize, file_na
     );
 }
 
-pub fn benchmark_natural_from_bits_desc(gm: GenerationMode, limit: usize, file_name: &str) {
+fn benchmark_natural_from_bits_desc(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "Natural::from_bits_desc(&[bool])",
         BenchmarkType::Single,

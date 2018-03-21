@@ -1,10 +1,17 @@
-use common::{m_run_benchmark, BenchmarkType, GenerationMode};
+use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::vecs_of_unsigned_var_1;
 use inputs::natural::{naturals, nrm_naturals};
 use malachite_base::num::SignificantBits;
 use malachite_nz::natural::logic::significant_bits::limbs_significant_bits;
 
-pub fn demo_limbs_significant_bits(gm: GenerationMode, limit: usize) {
+pub(crate) fn register(registry: &mut DemoBenchRegistry) {
+    register_demo!(registry, demo_limbs_significant_bits);
+    register_demo!(registry, demo_natural_significant_bits);
+    register_bench!(registry, Large, benchmark_natural_significant_bits);
+    register_bench!(registry, Small, benchmark_limbs_significant_bits);
+}
+
+fn demo_limbs_significant_bits(gm: GenerationMode, limit: usize) {
     for limbs in vecs_of_unsigned_var_1(gm).take(limit) {
         println!(
             "limbs_significant_bits({:?}) = {}",
@@ -14,13 +21,13 @@ pub fn demo_limbs_significant_bits(gm: GenerationMode, limit: usize) {
     }
 }
 
-pub fn demo_natural_significant_bits(gm: GenerationMode, limit: usize) {
+fn demo_natural_significant_bits(gm: GenerationMode, limit: usize) {
     for n in naturals(gm).take(limit) {
         println!("significant_bits({}) = {}", n, n.significant_bits());
     }
 }
 
-pub fn benchmark_limbs_significant_bits(gm: GenerationMode, limit: usize, file_name: &str) {
+fn benchmark_limbs_significant_bits(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "limbs_significant_bits(&[u32])",
         BenchmarkType::Single,
@@ -39,7 +46,7 @@ pub fn benchmark_limbs_significant_bits(gm: GenerationMode, limit: usize, file_n
     );
 }
 
-pub fn benchmark_natural_significant_bits(gm: GenerationMode, limit: usize, file_name: &str) {
+fn benchmark_natural_significant_bits(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "Natural.significant_bits()",
         BenchmarkType::LibraryComparison,

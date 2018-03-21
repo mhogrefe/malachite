@@ -1,9 +1,22 @@
-use common::{m_run_benchmark, BenchmarkType, GenerationMode};
+use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::natural::{nrm_pairs_of_naturals, pairs_of_naturals, pairs_of_naturals_var_1,
                       rm_pairs_of_naturals_var_1};
 use malachite_base::num::SignificantBits;
 use std::cmp::max;
 use std::ops::Sub;
+
+pub(crate) fn register(registry: &mut DemoBenchRegistry) {
+    register_demo!(registry, demo_natural_sub_assign);
+    register_demo!(registry, demo_natural_sub);
+    register_demo!(registry, demo_natural_sub_ref_ref);
+    register_bench!(
+        registry,
+        Large,
+        benchmark_natural_sub_assign_library_comparison
+    );
+    register_bench!(registry, Large, benchmark_natural_sub_library_comparison);
+    register_bench!(registry, Large, benchmark_natural_sub_evaluation_strategy);
+}
 
 pub fn checked_sub<T: Ord + Sub>(x: T, y: T) -> Option<<T as Sub>::Output> {
     if x >= y {
@@ -13,7 +26,7 @@ pub fn checked_sub<T: Ord + Sub>(x: T, y: T) -> Option<<T as Sub>::Output> {
     }
 }
 
-pub fn demo_natural_sub_assign(gm: GenerationMode, limit: usize) {
+fn demo_natural_sub_assign(gm: GenerationMode, limit: usize) {
     for (mut x, y) in pairs_of_naturals_var_1(gm).take(limit) {
         let x_old = x.clone();
         x -= &y;
@@ -21,20 +34,20 @@ pub fn demo_natural_sub_assign(gm: GenerationMode, limit: usize) {
     }
 }
 
-pub fn demo_natural_sub(gm: GenerationMode, limit: usize) {
+fn demo_natural_sub(gm: GenerationMode, limit: usize) {
     for (x, y) in pairs_of_naturals(gm).take(limit) {
         let x_old = x.clone();
         println!("{} - &{} = {:?}", x_old, y, x - &y);
     }
 }
 
-pub fn demo_natural_sub_ref_ref(gm: GenerationMode, limit: usize) {
+fn demo_natural_sub_ref_ref(gm: GenerationMode, limit: usize) {
     for (x, y) in pairs_of_naturals(gm).take(limit) {
         println!("&{} - &{} = {:?}", x, y, &x - &y);
     }
 }
 
-pub fn benchmark_natural_sub_assign_library_comparison(
+fn benchmark_natural_sub_assign_library_comparison(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,
@@ -55,7 +68,7 @@ pub fn benchmark_natural_sub_assign_library_comparison(
     );
 }
 
-pub fn benchmark_natural_sub_library_comparison(gm: GenerationMode, limit: usize, file_name: &str) {
+fn benchmark_natural_sub_library_comparison(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "Natural - Natural",
         BenchmarkType::LibraryComparison,
@@ -73,11 +86,7 @@ pub fn benchmark_natural_sub_library_comparison(gm: GenerationMode, limit: usize
     );
 }
 
-pub fn benchmark_natural_sub_evaluation_strategy(
-    gm: GenerationMode,
-    limit: usize,
-    file_name: &str,
-) {
+fn benchmark_natural_sub_evaluation_strategy(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "Natural - Natural",
         BenchmarkType::EvaluationStrategy,

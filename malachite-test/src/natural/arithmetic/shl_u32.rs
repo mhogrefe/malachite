@@ -1,7 +1,28 @@
-use common::{m_run_benchmark, BenchmarkType, GenerationMode};
+use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::natural::{pairs_of_natural_and_small_u32, rm_pairs_of_natural_and_small_u32};
 
-pub fn demo_natural_shl_assign_u32(gm: GenerationMode, limit: usize) {
+pub(crate) fn register(registry: &mut DemoBenchRegistry) {
+    register_demo!(registry, demo_natural_shl_assign_u32);
+    register_demo!(registry, demo_natural_shl_u32);
+    register_demo!(registry, demo_natural_shl_u32_ref);
+    register_bench!(
+        registry,
+        Large,
+        benchmark_natural_shl_assign_u32_library_comparison
+    );
+    register_bench!(
+        registry,
+        Large,
+        benchmark_natural_shl_u32_library_comparison
+    );
+    register_bench!(
+        registry,
+        Large,
+        benchmark_natural_shl_u32_evaluation_strategy
+    );
+}
+
+fn demo_natural_shl_assign_u32(gm: GenerationMode, limit: usize) {
     for (mut n, u) in pairs_of_natural_and_small_u32(gm).take(limit) {
         let n_old = n.clone();
         n <<= u;
@@ -9,20 +30,20 @@ pub fn demo_natural_shl_assign_u32(gm: GenerationMode, limit: usize) {
     }
 }
 
-pub fn demo_natural_shl_u32(gm: GenerationMode, limit: usize) {
+fn demo_natural_shl_u32(gm: GenerationMode, limit: usize) {
     for (n, u) in pairs_of_natural_and_small_u32(gm).take(limit) {
         let n_old = n.clone();
         println!("{} << {} = {}", n_old, u, n << u);
     }
 }
 
-pub fn demo_natural_shl_u32_ref(gm: GenerationMode, limit: usize) {
+fn demo_natural_shl_u32_ref(gm: GenerationMode, limit: usize) {
     for (n, u) in pairs_of_natural_and_small_u32(gm).take(limit) {
         println!("&{} << {} = {}", n, u, &n << u);
     }
 }
 
-pub fn benchmark_natural_shl_assign_u32_library_comparison(
+fn benchmark_natural_shl_assign_u32_library_comparison(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,
@@ -43,11 +64,7 @@ pub fn benchmark_natural_shl_assign_u32_library_comparison(
     );
 }
 
-pub fn benchmark_natural_shl_u32_library_comparison(
-    gm: GenerationMode,
-    limit: usize,
-    file_name: &str,
-) {
+fn benchmark_natural_shl_u32_library_comparison(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "Natural << u32",
         BenchmarkType::LibraryComparison,
@@ -64,7 +81,7 @@ pub fn benchmark_natural_shl_u32_library_comparison(
     );
 }
 
-pub fn benchmark_natural_shl_u32_evaluation_strategy(
+fn benchmark_natural_shl_u32_evaluation_strategy(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,

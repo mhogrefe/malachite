@@ -1,14 +1,19 @@
-use common::{m_run_benchmark, BenchmarkType, GenerationMode};
+use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::natural::naturals;
 use malachite_base::num::SignificantBits;
 
-pub fn demo_natural_limb_count(gm: GenerationMode, limit: usize) {
+pub(crate) fn register(registry: &mut DemoBenchRegistry) {
+    register_demo!(registry, demo_natural_limb_count);
+    register_bench!(registry, Large, benchmark_natural_limb_count);
+}
+
+fn demo_natural_limb_count(gm: GenerationMode, limit: usize) {
     for n in naturals(gm).take(limit) {
         println!("limb_count({}) = {}", n, n.limb_count());
     }
 }
 
-pub fn benchmark_natural_limb_count(gm: GenerationMode, limit: usize, file_name: &str) {
+fn benchmark_natural_limb_count(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "Natural.limb_count()",
         BenchmarkType::Single,

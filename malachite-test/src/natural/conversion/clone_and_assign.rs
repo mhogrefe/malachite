@@ -1,4 +1,4 @@
-use common::{m_run_benchmark, BenchmarkType, GenerationMode};
+use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::natural::{naturals, nrm_naturals, nrm_pairs_of_naturals, pairs_of_naturals,
                       rm_pairs_of_naturals};
 use malachite_base::num::SignificantBits;
@@ -6,13 +6,32 @@ use malachite_base::num::Assign;
 use rug::Assign as rug_assign;
 use std::cmp::max;
 
-pub fn demo_natural_clone(gm: GenerationMode, limit: usize) {
+pub(crate) fn register(registry: &mut DemoBenchRegistry) {
+    register_demo!(registry, demo_natural_clone);
+    register_demo!(registry, demo_natural_clone_from);
+    register_demo!(registry, demo_natural_assign);
+    register_demo!(registry, demo_natural_assign_ref);
+    register_bench!(registry, Large, benchmark_natural_clone_library_comparison);
+    register_bench!(
+        registry,
+        Large,
+        benchmark_natural_clone_from_library_comparison
+    );
+    register_bench!(registry, Large, benchmark_natural_assign_library_comparison);
+    register_bench!(
+        registry,
+        Large,
+        benchmark_natural_assign_evaluation_strategy
+    );
+}
+
+fn demo_natural_clone(gm: GenerationMode, limit: usize) {
     for n in naturals(gm).take(limit) {
         println!("clone({}) = {}", n, n.clone());
     }
 }
 
-pub fn demo_natural_clone_from(gm: GenerationMode, limit: usize) {
+fn demo_natural_clone_from(gm: GenerationMode, limit: usize) {
     for (mut x, y) in pairs_of_naturals(gm).take(limit) {
         let x_old = x.clone();
         x.clone_from(&y);
@@ -20,7 +39,7 @@ pub fn demo_natural_clone_from(gm: GenerationMode, limit: usize) {
     }
 }
 
-pub fn demo_natural_assign(gm: GenerationMode, limit: usize) {
+fn demo_natural_assign(gm: GenerationMode, limit: usize) {
     for (mut x, y) in pairs_of_naturals(gm).take(limit) {
         let x_old = x.clone();
         let y_old = y.clone();
@@ -29,7 +48,7 @@ pub fn demo_natural_assign(gm: GenerationMode, limit: usize) {
     }
 }
 
-pub fn demo_natural_assign_ref(gm: GenerationMode, limit: usize) {
+fn demo_natural_assign_ref(gm: GenerationMode, limit: usize) {
     for (mut x, y) in pairs_of_naturals(gm).take(limit) {
         let x_old = x.clone();
         x.assign(&y);
@@ -37,11 +56,7 @@ pub fn demo_natural_assign_ref(gm: GenerationMode, limit: usize) {
     }
 }
 
-pub fn benchmark_natural_clone_library_comparison(
-    gm: GenerationMode,
-    limit: usize,
-    file_name: &str,
-) {
+fn benchmark_natural_clone_library_comparison(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "Natural.clone()",
         BenchmarkType::LibraryComparison,
@@ -59,7 +74,7 @@ pub fn benchmark_natural_clone_library_comparison(
     );
 }
 
-pub fn benchmark_natural_clone_from_library_comparison(
+fn benchmark_natural_clone_from_library_comparison(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,
@@ -81,11 +96,7 @@ pub fn benchmark_natural_clone_from_library_comparison(
     );
 }
 
-pub fn benchmark_natural_assign_library_comparison(
-    gm: GenerationMode,
-    limit: usize,
-    file_name: &str,
-) {
+fn benchmark_natural_assign_library_comparison(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "Natural.assign(Natural)",
         BenchmarkType::LibraryComparison,
@@ -102,11 +113,7 @@ pub fn benchmark_natural_assign_library_comparison(
     );
 }
 
-pub fn benchmark_natural_assign_evaluation_strategy(
-    gm: GenerationMode,
-    limit: usize,
-    file_name: &str,
-) {
+fn benchmark_natural_assign_evaluation_strategy(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "Natural.assign(Natural)",
         BenchmarkType::EvaluationStrategy,

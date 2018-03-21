@@ -1,13 +1,22 @@
-use common::{m_run_benchmark, BenchmarkType, GenerationMode};
+use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::natural::{nm_pairs_of_natural_and_small_u64, pairs_of_natural_and_small_u64};
 use malachite_base::num::BitAccess;
 use num::{BigUint, One};
+
+pub(crate) fn register(registry: &mut DemoBenchRegistry) {
+    register_demo!(registry, demo_natural_set_bit);
+    register_bench!(
+        registry,
+        Large,
+        benchmark_natural_set_bit_library_comparison
+    );
+}
 
 pub fn num_set_bit(x: &mut BigUint, index: u64) {
     *x = x.clone() | (BigUint::one() << index as usize);
 }
 
-pub fn demo_natural_set_bit(gm: GenerationMode, limit: usize) {
+fn demo_natural_set_bit(gm: GenerationMode, limit: usize) {
     for (mut n, index) in pairs_of_natural_and_small_u64(gm).take(limit) {
         let n_old = n.clone();
         n.set_bit(index);
@@ -15,11 +24,7 @@ pub fn demo_natural_set_bit(gm: GenerationMode, limit: usize) {
     }
 }
 
-pub fn benchmark_natural_set_bit_library_comparison(
-    gm: GenerationMode,
-    limit: usize,
-    file_name: &str,
-) {
+fn benchmark_natural_set_bit_library_comparison(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "Natural.set_bit(u64)",
         BenchmarkType::LibraryComparison,

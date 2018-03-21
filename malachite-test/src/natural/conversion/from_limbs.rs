@@ -1,8 +1,25 @@
-use common::{m_run_benchmark, BenchmarkType, GenerationMode};
+use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::vecs_of_unsigned;
 use malachite_nz::natural::Natural;
 
-pub fn demo_natural_from_limbs_asc(gm: GenerationMode, limit: usize) {
+pub(crate) fn register(registry: &mut DemoBenchRegistry) {
+    register_demo!(registry, demo_natural_from_limbs_asc);
+    register_demo!(registry, demo_natural_from_limbs_desc);
+    register_demo!(registry, demo_natural_from_owned_limbs_asc);
+    register_demo!(registry, demo_natural_from_owned_limbs_desc);
+    register_bench!(
+        registry,
+        Small,
+        benchmark_natural_from_limbs_asc_evaluation_strategy
+    );
+    register_bench!(
+        registry,
+        Small,
+        benchmark_natural_from_limbs_desc_evaluation_strategy
+    );
+}
+
+fn demo_natural_from_limbs_asc(gm: GenerationMode, limit: usize) {
     for limbs in vecs_of_unsigned(gm).take(limit) {
         println!(
             "from_limbs_asc({:?}) = {:?}",
@@ -12,7 +29,7 @@ pub fn demo_natural_from_limbs_asc(gm: GenerationMode, limit: usize) {
     }
 }
 
-pub fn demo_natural_from_limbs_desc(gm: GenerationMode, limit: usize) {
+fn demo_natural_from_limbs_desc(gm: GenerationMode, limit: usize) {
     for limbs in vecs_of_unsigned(gm).take(limit) {
         println!(
             "from_limbs_desc({:?}) = {:?}",
@@ -22,7 +39,7 @@ pub fn demo_natural_from_limbs_desc(gm: GenerationMode, limit: usize) {
     }
 }
 
-pub fn demo_natural_from_owned_limbs_asc(gm: GenerationMode, limit: usize) {
+fn demo_natural_from_owned_limbs_asc(gm: GenerationMode, limit: usize) {
     for limbs in vecs_of_unsigned(gm).take(limit) {
         println!(
             "from_owned_limbs_asc({:?}) = {:?}",
@@ -32,7 +49,7 @@ pub fn demo_natural_from_owned_limbs_asc(gm: GenerationMode, limit: usize) {
     }
 }
 
-pub fn demo_natural_from_owned_limbs_desc(gm: GenerationMode, limit: usize) {
+fn demo_natural_from_owned_limbs_desc(gm: GenerationMode, limit: usize) {
     for limbs in vecs_of_unsigned(gm).take(limit) {
         println!(
             "from_owned_limbs_desc({:?}) = {:?}",
@@ -42,7 +59,7 @@ pub fn demo_natural_from_owned_limbs_desc(gm: GenerationMode, limit: usize) {
     }
 }
 
-pub fn benchmark_natural_from_limbs_asc_evaluation_strategy(
+fn benchmark_natural_from_limbs_asc_evaluation_strategy(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,
@@ -69,7 +86,7 @@ pub fn benchmark_natural_from_limbs_asc_evaluation_strategy(
     );
 }
 
-pub fn benchmark_natural_from_limbs_desc_evaluation_strategy(
+fn benchmark_natural_from_limbs_desc_evaluation_strategy(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,

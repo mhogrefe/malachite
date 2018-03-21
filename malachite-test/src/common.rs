@@ -73,9 +73,9 @@ pub fn get_no_special_gm(gm_string: &str, scale_type: ScaleType) -> NoSpecialGen
 }
 
 type DemoFn = &'static Fn(GenerationMode, usize) -> ();
-type BenchFn = &'static Fn(GenerationMode, usize, &'static str) -> ();
+type BenchFn = &'static Fn(GenerationMode, usize, &str) -> ();
 type NoSpecialDemoFn = &'static Fn(NoSpecialGenerationMode, usize) -> ();
-type NoSpecialBenchFn = &'static Fn(NoSpecialGenerationMode, usize, &'static str) -> ();
+type NoSpecialBenchFn = &'static Fn(NoSpecialGenerationMode, usize, &str) -> ();
 
 #[derive(Default)]
 pub struct DemoBenchRegistry {
@@ -121,6 +121,21 @@ impl DemoBenchRegistry {
 
     pub fn lookup_no_special_bench(&self, name: &str) -> Option<&(ScaleType, NoSpecialBenchFn)> {
         self.no_special_bench_map.get(name)
+    }
+
+    pub fn benchmark_all(&self, limit: usize) {
+        for (name, &(st, f)) in &self.no_special_bench_map {
+            for gm_string in &["exhaustive", "random"] {
+                let gm = get_no_special_gm(gm_string, st);
+                f(gm, limit, &format!("{}_{}.gp", gm_string, name));
+            }
+        }
+        for (name, &(st, f)) in &self.bench_map {
+            for gm_string in &["exhaustive", "random", "special_random"] {
+                let gm = get_gm(gm_string, st);
+                f(gm, limit, &format!("{}_{}.gp", gm_string, name));
+            }
+        }
     }
 }
 

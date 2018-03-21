@@ -1,11 +1,26 @@
-use common::{m_run_benchmark, BenchmarkType, GenerationMode};
+use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::natural::{triples_of_naturals, triples_of_naturals_var_1};
 use malachite_base::num::SignificantBits;
 use malachite_base::num::{SubMul, SubMulAssign};
 use malachite_nz::natural::Natural;
 use std::cmp::max;
 
-pub fn demo_natural_sub_mul_assign(gm: GenerationMode, limit: usize) {
+pub(crate) fn register(registry: &mut DemoBenchRegistry) {
+    register_demo!(registry, demo_natural_sub_mul_assign);
+    register_demo!(registry, demo_natural_sub_mul);
+    register_demo!(registry, demo_natural_sub_mul_ref);
+    register_bench!(registry, Large, benchmark_natural_sub_mul_assign);
+    register_bench!(registry, Large, benchmark_natural_sub_mul_assign_algorithms);
+    register_bench!(
+        registry,
+        Large,
+        benchmark_natural_sub_mul_evaluation_strategy
+    );
+    register_bench!(registry, Large, benchmark_natural_sub_mul_algorithms);
+    register_bench!(registry, Large, benchmark_natural_sub_mul_ref_algorithms);
+}
+
+fn demo_natural_sub_mul_assign(gm: GenerationMode, limit: usize) {
     for (mut a, b, c) in triples_of_naturals_var_1(gm).take(limit) {
         let a_old = a.clone();
         a.sub_mul_assign(&b, &c);
@@ -16,7 +31,7 @@ pub fn demo_natural_sub_mul_assign(gm: GenerationMode, limit: usize) {
     }
 }
 
-pub fn demo_natural_sub_mul(gm: GenerationMode, limit: usize) {
+fn demo_natural_sub_mul(gm: GenerationMode, limit: usize) {
     for (a, b, c) in triples_of_naturals(gm).take(limit) {
         let a_old = a.clone();
         println!(
@@ -29,7 +44,7 @@ pub fn demo_natural_sub_mul(gm: GenerationMode, limit: usize) {
     }
 }
 
-pub fn demo_natural_sub_mul_ref(gm: GenerationMode, limit: usize) {
+fn demo_natural_sub_mul_ref(gm: GenerationMode, limit: usize) {
     for (a, b, c) in triples_of_naturals(gm).take(limit) {
         let a_old = a.clone();
         println!(
@@ -52,7 +67,7 @@ fn bucketing_function(t: &(Natural, Natural, Natural)) -> usize {
 const BUCKETING_LABEL: &str = "max(a.significant_bits(), b.significant_bits(), \
                                c.significant_bits())";
 
-pub fn benchmark_natural_sub_mul_assign(gm: GenerationMode, limit: usize, file_name: &str) {
+fn benchmark_natural_sub_mul_assign(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "Natural.sub_mul_assign(&Natural, &Natural)",
         BenchmarkType::Single,
@@ -71,11 +86,7 @@ pub fn benchmark_natural_sub_mul_assign(gm: GenerationMode, limit: usize, file_n
     );
 }
 
-pub fn benchmark_natural_sub_mul_assign_algorithms(
-    gm: GenerationMode,
-    limit: usize,
-    file_name: &str,
-) {
+fn benchmark_natural_sub_mul_assign_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "Natural.sub_mul_assign(&Natural, &Natural)",
         BenchmarkType::Algorithms,
@@ -98,7 +109,7 @@ pub fn benchmark_natural_sub_mul_assign_algorithms(
     );
 }
 
-pub fn benchmark_natural_sub_mul_evaluation_strategy(
+fn benchmark_natural_sub_mul_evaluation_strategy(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,
@@ -125,7 +136,7 @@ pub fn benchmark_natural_sub_mul_evaluation_strategy(
     );
 }
 
-pub fn benchmark_natural_sub_mul_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
+fn benchmark_natural_sub_mul_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "Natural.sub_mul(Natural, Natural)",
         BenchmarkType::Algorithms,
@@ -148,7 +159,7 @@ pub fn benchmark_natural_sub_mul_algorithms(gm: GenerationMode, limit: usize, fi
     );
 }
 
-pub fn benchmark_natural_sub_mul_ref_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
+fn benchmark_natural_sub_mul_ref_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "(&Natural).sub_mul(&Natural, &Natural)",
         BenchmarkType::Algorithms,

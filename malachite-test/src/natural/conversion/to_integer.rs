@@ -1,21 +1,31 @@
-use common::{m_run_benchmark, BenchmarkType, GenerationMode};
+use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::natural::naturals;
 use malachite_base::num::SignificantBits;
 
-pub fn demo_natural_into_integer(gm: GenerationMode, limit: usize) {
+pub(crate) fn register(registry: &mut DemoBenchRegistry) {
+    register_demo!(registry, demo_natural_into_integer);
+    register_demo!(registry, demo_natural_to_integer);
+    register_bench!(
+        registry,
+        Large,
+        benchmark_natural_to_integer_evaluation_strategy
+    );
+}
+
+fn demo_natural_into_integer(gm: GenerationMode, limit: usize) {
     for n in naturals(gm).take(limit) {
         let n_clone = n.clone();
         println!("into_integer({}) = {}", n_clone, n.into_integer());
     }
 }
 
-pub fn demo_natural_to_integer(gm: GenerationMode, limit: usize) {
+fn demo_natural_to_integer(gm: GenerationMode, limit: usize) {
     for n in naturals(gm).take(limit) {
         println!("to_integer(&{}) = {}", n, n.to_integer());
     }
 }
 
-pub fn benchmark_natural_to_integer_evaluation_strategy(
+fn benchmark_natural_to_integer_evaluation_strategy(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,
