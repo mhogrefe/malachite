@@ -19,10 +19,10 @@ use rust_wheels::iterators::primitive_ints::{exhaustive_negative_signed, exhaust
                                              special_random_positive_unsigned,
                                              special_random_signed, special_random_unsigned};
 use rust_wheels::iterators::rounding_modes::{exhaustive_rounding_modes, random_rounding_modes};
-use rust_wheels::iterators::tuples::{exhaustive_pairs, exhaustive_pairs_from_single, lex_pairs,
-                                     lex_triples, log_pairs, random_pairs,
-                                     random_pairs_from_single, random_triples,
-                                     random_triples_from_single, sqrt_pairs};
+use rust_wheels::iterators::tuples::{exhaustive_pairs, exhaustive_pairs_from_single,
+                                     exhaustive_triples_from_single, lex_pairs, lex_triples,
+                                     log_pairs, random_pairs, random_pairs_from_single,
+                                     random_triples, random_triples_from_single, sqrt_pairs};
 use rust_wheels::iterators::vecs::{exhaustive_vecs, random_vecs, special_random_bool_vecs,
                                    special_random_unsigned_vecs};
 use std::char;
@@ -533,6 +533,112 @@ pub fn vecs_of_unsigned_var_1<T: 'static + PrimitiveUnsigned>(
     Box::new(
         vecs_of_unsigned(gm).filter(|limbs| !limbs.is_empty() && *limbs.last().unwrap() != T::ZERO),
     )
+}
+
+// All `Vec<T>`, where `T` is unsigned and either the `Vec` is empty, or its last `T` is nonzero.
+pub fn vecs_of_unsigned_var_2<T: 'static + PrimitiveUnsigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = Vec<T>>> {
+    Box::new(
+        vecs_of_unsigned(gm).filter(|limbs| limbs.is_empty() || *limbs.last().unwrap() != T::ZERO),
+    )
+}
+
+pub fn pairs_of_unsigned_vec<T: 'static + PrimitiveUnsigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (Vec<T>, Vec<T>)>> {
+    match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_pairs_from_single(exhaustive_vecs(
+            exhaustive_unsigned(),
+        ))),
+        GenerationMode::Random(scale) => Box::new(random_pairs_from_single(random_vecs(
+            &EXAMPLE_SEED,
+            scale,
+            &(|seed| random(seed)),
+        ))),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_pairs_from_single(
+            special_random_unsigned_vecs(&EXAMPLE_SEED, scale),
+        )),
+    }
+}
+
+// All pairs of `Vec<T>`, T being unsigned, where the two components of the pair have the same
+// length.
+pub fn pairs_of_unsigned_vec_var_1<T: 'static + PrimitiveUnsigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (Vec<T>, Vec<T>)>> {
+    Box::new(
+        vecs_of_unsigned(gm)
+            .filter(|xs| (xs.len() & 1) == 0)
+            .map(|xs| {
+                let half_length = xs.len() >> 1;
+                (xs[0..half_length].to_vec(), xs[half_length..].to_vec())
+            }),
+    )
+}
+
+// All pairs of `Vec<T>`, where `T` is unsigned and the last `T`s of both `Vec`s are nonzero.
+pub fn pairs_of_unsigned_vec_var_2<T: 'static + PrimitiveUnsigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (Vec<T>, Vec<T>)>> {
+    match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_pairs_from_single(
+            exhaustive_vecs(exhaustive_unsigned())
+                .filter(|limbs| limbs.is_empty() || *limbs.last().unwrap() != T::ZERO),
+        )),
+        _ => Box::new(random_pairs_from_single(vecs_of_unsigned_var_2(gm))),
+    }
+}
+
+pub fn triples_of_unsigned_vec<T: 'static + PrimitiveUnsigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (Vec<T>, Vec<T>, Vec<T>)>> {
+    match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_triples_from_single(exhaustive_vecs(
+            exhaustive_unsigned(),
+        ))),
+        GenerationMode::Random(scale) => Box::new(random_triples_from_single(random_vecs(
+            &EXAMPLE_SEED,
+            scale,
+            &(|seed| random(seed)),
+        ))),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_triples_from_single(
+            special_random_unsigned_vecs(&EXAMPLE_SEED, scale),
+        )),
+    }
+}
+
+// All triples of `Vec<T>`, T being unsigned, where the three components of the triple have the same
+// length.
+pub fn triples_of_unsigned_vec_var_1<T: 'static + PrimitiveUnsigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (Vec<T>, Vec<T>, Vec<T>)>> {
+    Box::new(
+        vecs_of_unsigned(gm)
+            .filter(|xs| xs.len() % 3 == 0)
+            .map(|xs| {
+                let third_length = xs.len() / 3;
+                let two_thirds_length = third_length << 1;
+                (
+                    xs[0..third_length].to_vec(),
+                    xs[third_length..two_thirds_length].to_vec(),
+                    xs[two_thirds_length..].to_vec(),
+                )
+            }),
+    )
+}
+
+// All triples of `Vec<T>`, where `T` is unsigned and the last `T`s of all `Vec`s are nonzero.
+pub fn triples_of_unsigned_vec_var_2<T: 'static + PrimitiveUnsigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (Vec<T>, Vec<T>, Vec<T>)>> {
+    match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_triples_from_single(
+            exhaustive_vecs(exhaustive_unsigned())
+                .filter(|limbs| limbs.is_empty() || *limbs.last().unwrap() != T::ZERO),
+        )),
+        _ => Box::new(random_triples_from_single(vecs_of_unsigned_var_2(gm))),
+    }
 }
 
 fn pairs_of_ordering_and_vec_of_unsigned<T: 'static + PrimitiveUnsigned>(

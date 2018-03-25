@@ -1,17 +1,62 @@
 use natural::Natural::{self, Large, Small};
 use std::cmp::Ordering;
 
-// Compare s1 and s2, which must have the same length.
-pub fn mpn_cmp(s1: &[u32], s2: &[u32]) -> Ordering {
-    assert_eq!(s1.len(), s2.len());
-    s1.into_iter().rev().cmp(s2.into_iter().rev())
+fn limbs_cmp_same_length_no_check(xs: &[u32], ys: &[u32]) -> Ordering {
+    xs.into_iter().rev().cmp(ys.into_iter().rev())
 }
 
-// Compare s1 and s2.
-pub(crate) fn mpn_cmp_helper(s1: &[u32], s2: &[u32]) -> Ordering {
-    s1.len()
-        .cmp(&s2.len())
-        .then_with(|| s1.into_iter().rev().cmp(s2.into_iter().rev()))
+/// Interpreting two equal-length slices of `u32`s as the limbs (in ascending order) of two
+/// `Natural`s, compares the two `Natural`s.
+///
+/// Equivalent to GMP's `mpn_cmp`.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = `xs.len()` = `ys.len()`
+///
+/// # Panics
+/// Panics if `xs` and `ys` have different lengths.
+///
+/// # Example
+/// ```
+/// use malachite_nz::natural::comparison::ord::limbs_cmp_same_length;
+/// use std::cmp::Ordering;
+///
+/// assert_eq!(limbs_cmp_same_length(&[3], &[5]), Ordering::Less);
+/// assert_eq!(limbs_cmp_same_length(&[3, 0], &[5, 0]), Ordering::Less);
+/// assert_eq!(limbs_cmp_same_length(&[1, 2], &[2, 1]), Ordering::Greater);
+/// assert_eq!(limbs_cmp_same_length(&[1, 2, 3], &[1, 2, 3]), Ordering::Equal);
+/// ```
+pub fn limbs_cmp_same_length(xs: &[u32], ys: &[u32]) -> Ordering {
+    assert_eq!(xs.len(), ys.len());
+    limbs_cmp_same_length_no_check(xs, ys)
+}
+
+/// Interpreting two slices of `u32`s as the limbs (in ascending order) of two `Natural`s, compares
+/// the two `Natural`s. It is assumed that neither limb slice contains trailing zeros.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = min(`xs.len`, `ys.len`)
+///
+/// # Example
+/// ```
+/// use malachite_nz::natural::comparison::ord::limbs_cmp;
+/// use std::cmp::Ordering;
+///
+/// assert_eq!(limbs_cmp(&[3], &[5]), Ordering::Less);
+/// assert_eq!(limbs_cmp(&[3, 1], &[5]), Ordering::Greater);
+/// assert_eq!(limbs_cmp(&[1, 2], &[2, 1, 3]), Ordering::Less);
+/// assert_eq!(limbs_cmp(&[1, 2, 3], &[1, 2, 3]), Ordering::Equal);
+/// ```
+pub fn limbs_cmp(xs: &[u32], ys: &[u32]) -> Ordering {
+    xs.len()
+        .cmp(&ys.len())
+        .then_with(|| limbs_cmp_same_length_no_check(xs, ys))
 }
 
 /// Compares a `Natural` to another `Natural`.
@@ -20,7 +65,7 @@ pub(crate) fn mpn_cmp_helper(s1: &[u32], s2: &[u32]) -> Ordering {
 ///
 /// Additional memory: worst case O(1)
 ///
-/// where n = min(`self.significant_bits(), other.significant_bits()`)
+/// where n = min(`self.significant_bits()`, `other.significant_bits()`)
 ///
 /// # Examples
 /// ```
@@ -47,7 +92,7 @@ impl Ord for Natural {
             (&Small(ref x), &Small(ref y)) => x.cmp(y),
             (&Small(_), &Large(_)) => Ordering::Less,
             (&Large(_), &Small(_)) => Ordering::Greater,
-            (&Large(ref xs), &Large(ref ys)) => mpn_cmp_helper(xs, ys),
+            (&Large(ref xs), &Large(ref ys)) => limbs_cmp(xs, ys),
         }
     }
 }

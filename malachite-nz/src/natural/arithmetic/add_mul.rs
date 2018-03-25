@@ -4,7 +4,7 @@ use malachite_base::limbs::limbs_test_zero;
 use natural::arithmetic::add::mpn_add_in_place;
 use natural::arithmetic::mul::mpn_mul;
 use natural::arithmetic::sub::{mpn_sub_aba, mpn_sub_in_place};
-use natural::comparison::ord::mpn_cmp_helper;
+use natural::comparison::ord::limbs_cmp;
 use natural::Natural::{self, Large, Small};
 use std::cmp::{max, Ordering};
 
@@ -451,7 +451,7 @@ impl<'a, 'b> AddMulAssign<&'a Natural, &'b Natural> for Natural {
 
 // expecting x and y both with non-zero high limbs
 fn mpn_cmp_twosizes_lt(x: &[u32], y: &[u32]) -> bool {
-    mpn_cmp_helper(x, y) == Ordering::Less
+    limbs_cmp(x, y) == Ordering::Less
 }
 
 #[allow(unknown_lints, many_single_char_names)]

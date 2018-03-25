@@ -1,10 +1,42 @@
 use common::{test_cmp_helper, test_properties};
+use malachite_nz::natural::comparison::ord::{limbs_cmp, limbs_cmp_same_length};
 use malachite_nz::natural::Natural;
 use malachite_test::common::{natural_to_biguint, natural_to_rug_integer};
+use malachite_test::inputs::base::{pairs_of_unsigned_vec_var_1, pairs_of_unsigned_vec_var_2,
+                                   triples_of_unsigned_vec_var_1, triples_of_unsigned_vec_var_2,
+                                   vecs_of_unsigned_var_1, vecs_of_unsigned_var_2};
 use malachite_test::inputs::natural::{naturals, pairs_of_naturals, triples_of_naturals};
 use num::BigUint;
 use rug;
 use std::cmp::Ordering;
+
+#[test]
+fn test_limbs_cmp_same_length() {
+    let test = |xs: &[u32], ys: &[u32], out| {
+        assert_eq!(limbs_cmp_same_length(xs, ys), out);
+    };
+    test(&[3], &[5], Ordering::Less);
+    test(&[3, 0], &[5, 0], Ordering::Less);
+    test(&[1, 2], &[2, 1], Ordering::Greater);
+    test(&[1, 2, 3], &[1, 2, 3], Ordering::Equal);
+}
+
+#[test]
+#[should_panic(expected = "assertion failed: `(left == right)`")]
+fn limbs_cmp_same_length_fail() {
+    limbs_cmp_same_length(&[1], &[2, 3]);
+}
+
+#[test]
+fn test_limbs_cmp() {
+    let test = |xs: &[u32], ys: &[u32], out| {
+        assert_eq!(limbs_cmp(xs, ys), out);
+    };
+    test(&[3], &[5], Ordering::Less);
+    test(&[3, 1], &[5], Ordering::Greater);
+    test(&[1, 2], &[2, 1, 3], Ordering::Less);
+    test(&[1, 2, 3], &[1, 2, 3], Ordering::Equal);
+}
 
 #[test]
 fn test_cmp() {
@@ -20,6 +52,66 @@ fn test_cmp() {
     test_cmp_helper::<Natural>(&strings);
     test_cmp_helper::<BigUint>(&strings);
     test_cmp_helper::<rug::Integer>(&strings);
+}
+
+#[test]
+fn limbs_cmp_same_length_properties() {
+    test_properties(pairs_of_unsigned_vec_var_1, |&(ref xs, ref ys)| {
+        let ord = limbs_cmp_same_length(xs, ys);
+        assert_eq!(
+            Natural::from_limbs_asc(xs).cmp(&Natural::from_limbs_asc(ys)),
+            ord
+        );
+        assert_eq!(limbs_cmp_same_length(ys, xs).reverse(), ord);
+    });
+
+    test_properties(vecs_of_unsigned_var_1, |xs| {
+        assert_eq!(limbs_cmp_same_length(xs, xs), Ordering::Equal);
+    });
+
+    test_properties(
+        triples_of_unsigned_vec_var_1,
+        |&(ref xs, ref ys, ref zs)| {
+            if limbs_cmp_same_length(xs, ys) == Ordering::Less
+                && limbs_cmp_same_length(ys, zs) == Ordering::Less
+            {
+                assert_eq!(limbs_cmp_same_length(xs, zs), Ordering::Less);
+            } else if limbs_cmp_same_length(xs, ys) == Ordering::Greater
+                && limbs_cmp_same_length(ys, zs) == Ordering::Greater
+            {
+                assert_eq!(limbs_cmp_same_length(xs, zs), Ordering::Greater);
+            }
+        },
+    );
+}
+
+#[test]
+fn limbs_cmp_properties() {
+    test_properties(pairs_of_unsigned_vec_var_2, |&(ref xs, ref ys)| {
+        let ord = limbs_cmp(xs, ys);
+        assert_eq!(
+            Natural::from_limbs_asc(xs).cmp(&Natural::from_limbs_asc(ys)),
+            ord
+        );
+        assert_eq!(limbs_cmp(ys, xs).reverse(), ord);
+    });
+
+    test_properties(vecs_of_unsigned_var_2, |xs| {
+        assert_eq!(limbs_cmp(xs, xs), Ordering::Equal);
+    });
+
+    test_properties(
+        triples_of_unsigned_vec_var_2,
+        |&(ref xs, ref ys, ref zs)| {
+            if limbs_cmp(xs, ys) == Ordering::Less && limbs_cmp(ys, zs) == Ordering::Less {
+                assert_eq!(limbs_cmp(xs, zs), Ordering::Less);
+            } else if limbs_cmp(xs, ys) == Ordering::Greater
+                && limbs_cmp(ys, zs) == Ordering::Greater
+            {
+                assert_eq!(limbs_cmp(xs, zs), Ordering::Greater);
+            }
+        },
+    );
 }
 
 #[test]

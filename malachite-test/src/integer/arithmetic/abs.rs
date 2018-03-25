@@ -9,6 +9,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_integer_abs_ref);
     register_demo!(registry, demo_integer_unsigned_abs);
     register_demo!(registry, demo_integer_unsigned_abs_ref);
+    register_demo!(registry, demo_integer_unsigned_abs_ref_out);
     register_bench!(registry, Large, benchmark_integer_abs_assign);
     register_bench!(registry, Large, benchmark_integer_abs_library_comparison);
     register_bench!(registry, Large, benchmark_integer_abs_evaluation_strategy);
@@ -30,13 +31,13 @@ fn demo_integer_abs_assign(gm: GenerationMode, limit: usize) {
 
 fn demo_integer_abs(gm: GenerationMode, limit: usize) {
     for n in integers(gm).take(limit) {
-        println!("abs({}) = {}", n.clone(), n.abs());
+        println!("|{}| = {}", n.clone(), n.abs());
     }
 }
 
 fn demo_integer_abs_ref(gm: GenerationMode, limit: usize) {
     for n in integers(gm).take(limit) {
-        println!("abs(&{}) = {}", n, (&n).abs());
+        println!("|&{}| = {}", n, (&n).abs());
     }
 }
 
@@ -49,6 +50,12 @@ fn demo_integer_unsigned_abs(gm: GenerationMode, limit: usize) {
 fn demo_integer_unsigned_abs_ref(gm: GenerationMode, limit: usize) {
     for n in integers(gm).take(limit) {
         println!("unsigned_abs(&{}) = {}", n, (&n).unsigned_abs());
+    }
+}
+
+fn demo_integer_unsigned_abs_ref_out(gm: GenerationMode, limit: usize) {
+    for n in integers(gm).take(limit) {
+        println!("{}.unsigned_abs_ref() = {}", n, n.unsigned_abs_ref());
     }
 }
 
@@ -137,6 +144,10 @@ fn benchmark_integer_unsigned_abs_evaluation_strategy(
             (
                 "(&Integer).unsigned_abs()",
                 &mut (|n| no_out!((&n).unsigned_abs())),
+            ),
+            (
+                "Integer.unsigned_abs_ref()",
+                &mut (|n| no_out!(n.unsigned_abs_ref())),
             ),
         ],
     );

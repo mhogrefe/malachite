@@ -1,11 +1,39 @@
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
+use inputs::base::{pairs_of_unsigned_vec_var_1, pairs_of_unsigned_vec_var_2};
 use inputs::natural::{nrm_pairs_of_naturals, pairs_of_naturals};
 use malachite_base::num::SignificantBits;
-use std::cmp::{max, Ordering};
+use malachite_nz::natural::comparison::ord::{limbs_cmp, limbs_cmp_same_length};
+use std::cmp::{min, Ordering};
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
+    register_demo!(registry, demo_limbs_cmp_same_length);
+    register_demo!(registry, demo_limbs_cmp);
     register_demo!(registry, demo_natural_cmp);
+    register_bench!(registry, Small, benchmark_limbs_cmp_same_length);
+    register_bench!(registry, Small, benchmark_limbs_cmp);
     register_bench!(registry, Large, benchmark_natural_cmp_library_comparison);
+}
+
+fn demo_limbs_cmp_same_length(gm: GenerationMode, limit: usize) {
+    for (xs, ys) in pairs_of_unsigned_vec_var_1(gm).take(limit) {
+        println!(
+            "limbs_cmp_same_length({:?}, {:?}) = {:?}",
+            xs,
+            ys,
+            limbs_cmp_same_length(xs.as_slice(), ys.as_slice())
+        );
+    }
+}
+
+fn demo_limbs_cmp(gm: GenerationMode, limit: usize) {
+    for (xs, ys) in pairs_of_unsigned_vec_var_2(gm).take(limit) {
+        println!(
+            "limbs_cmp({:?}, {:?}) = {:?}",
+            xs,
+            ys,
+            limbs_cmp(xs.as_slice(), ys.as_slice())
+        );
+    }
 }
 
 fn demo_natural_cmp(gm: GenerationMode, limit: usize) {
@@ -18,6 +46,44 @@ fn demo_natural_cmp(gm: GenerationMode, limit: usize) {
     }
 }
 
+fn benchmark_limbs_cmp_same_length(gm: GenerationMode, limit: usize, file_name: &str) {
+    m_run_benchmark(
+        "limbs_cmp_same_length(&[u32], &[u32])",
+        BenchmarkType::Single,
+        pairs_of_unsigned_vec_var_1(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(ref xs, _)| xs.len()),
+        "xs.len() = ys.len()",
+        &mut [
+            (
+                "malachite",
+                &mut (|(xs, ys)| no_out!(limbs_cmp_same_length(xs.as_slice(), ys.as_slice()))),
+            ),
+        ],
+    );
+}
+
+fn benchmark_limbs_cmp(gm: GenerationMode, limit: usize, file_name: &str) {
+    m_run_benchmark(
+        "limbs_cmp(&[u32], &[u32])",
+        BenchmarkType::Single,
+        pairs_of_unsigned_vec_var_2(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(ref xs, ref ys)| min(xs.len(), ys.len())),
+        "min(xs.len(), ys.len())",
+        &mut [
+            (
+                "malachite",
+                &mut (|(xs, ys)| no_out!(limbs_cmp(xs.as_slice(), ys.as_slice()))),
+            ),
+        ],
+    );
+}
+
 fn benchmark_natural_cmp_library_comparison(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "Natural.cmp(&Natural)",
@@ -26,8 +92,8 @@ fn benchmark_natural_cmp_library_comparison(gm: GenerationMode, limit: usize, fi
         gm.name(),
         limit,
         file_name,
-        &(|&(_, _, (ref x, ref y))| max(x.significant_bits(), y.significant_bits()) as usize),
-        "max(x.significant_bits(), y.significant_bits())",
+        &(|&(_, _, (ref x, ref y))| min(x.significant_bits(), y.significant_bits()) as usize),
+        "min(x.significant_bits(), y.significant_bits())",
         &mut [
             ("malachite", &mut (|(_, _, (x, y))| no_out!(x.cmp(&y)))),
             ("num", &mut (|((x, y), _, _)| no_out!(x.cmp(&y)))),

@@ -31,6 +31,11 @@ fn test_abs() {
         assert!(abs.is_valid());
         assert_eq!(abs.to_string(), out);
 
+        let x = Integer::from_str(s).unwrap();
+        let abs = x.unsigned_abs_ref();
+        assert!(abs.is_valid());
+        assert_eq!(abs.to_string(), out);
+
         let mut x = Integer::from_str(s).unwrap();
         x.abs_assign();
         assert!(abs.is_valid());
@@ -73,6 +78,10 @@ fn abs_properties() {
 
         let abs_alt = x.unsigned_abs();
         assert!(abs_alt.is_valid());
-        assert_eq!(Some(abs_alt), abs.checked_into());
+        assert_eq!(Some(&abs_alt), abs.checked_into().as_ref());
+
+        let internal_abs = x.unsigned_abs_ref();
+        assert!(internal_abs.is_valid());
+        assert_eq!(*internal_abs, abs_alt);
     });
 }

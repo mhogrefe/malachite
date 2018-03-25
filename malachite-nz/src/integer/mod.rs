@@ -15,7 +15,7 @@ pub struct Integer {
 }
 
 impl Integer {
-    /// Returns true iff `self` is valid. To be valid, can only be Large when its absolute value
+    /// Returns true iff `self` is valid. To be valid, it can only be Large when its absolute value
     /// is at least 2<sup>31</sup>. All Integers must be valid.
     pub fn is_valid(&self) -> bool {
         self.abs.is_valid() && (self.sign || self.abs != 0)

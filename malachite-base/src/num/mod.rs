@@ -546,6 +546,7 @@ pub trait PrimitiveInteger:
     + Octal
     + One
     + Ord
+    + OrdAbs
     + OverflowingAdd<Output = Self>
     + OverflowingDiv<Output = Self>
     + OverflowingMul<Output = Self>
@@ -556,6 +557,7 @@ pub trait PrimitiveInteger:
     + OverflowingSub<Output = Self>
     + PartialEq<Self>
     + PartialOrd<Self>
+    + PartialOrdAbs<Self>
     + Pow<u32>
     + Product
     + Rand
@@ -802,6 +804,12 @@ macro_rules! integer_traits {
         }
 
         impl_named!($t);
+
+        impl PartialOrdAbs<$t> for $t {
+            fn partial_cmp_abs(&self, other: &$t) -> Option<Ordering> {
+                Some(self.cmp_abs(other))
+            }
+        }
 
         impl FromStrRadix for $t {
             fn from_str_radix(src: &str, radix: u32) -> Result<Self, ParseIntError> {
@@ -1164,6 +1172,12 @@ macro_rules! unsigned_traits {
     ($t: ident, $log_width: expr, $u: ident, $from_u32: expr, $from_u64: expr) => {
         integer_traits!($t, $log_width, $u, $from_u32, $from_u64);
 
+        impl OrdAbs for $t {
+            fn cmp_abs(&self, other: &Self) -> Ordering {
+                self.cmp(other)
+            }
+        }
+
         impl IsPowerOfTwo for $t {
             fn is_power_of_two(&self) -> bool {
                 $t::is_power_of_two(*self)
@@ -1398,6 +1412,12 @@ macro_rules! signed_traits {
 
             fn from_unsigned_bitwise(u: Self::UnsignedOfEqualWidth) -> Self {
                 u as $t
+            }
+        }
+
+        impl OrdAbs for $t {
+            fn cmp_abs(&self, other: &Self) -> Ordering {
+                self.unsigned_abs().cmp(&other.unsigned_abs())
             }
         }
 

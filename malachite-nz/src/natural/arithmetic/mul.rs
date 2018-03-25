@@ -7,7 +7,7 @@ use natural::arithmetic::shl_u32::{mpn_lshift, mpn_lshift_in_place};
 use natural::arithmetic::shr_u32::mpn_rshift_in_place;
 use natural::arithmetic::sub::{mpn_sub, mpn_sub_n, mpn_sub_n_aba, mpn_sub_n_in_place};
 use natural::arithmetic::sub_u32::mpn_sub_1_in_place;
-use natural::comparison::ord::mpn_cmp;
+use natural::comparison::ord::limbs_cmp_same_length;
 use natural::LIMB_BITS;
 use natural::Natural::{self, Large, Small};
 use std::cmp::Ordering;
@@ -189,13 +189,13 @@ fn mpn_toom22_mul(p: &mut [u32], a: &[u32], b: &[u32], scratch: &mut [u32]) {
 
     // Compute asm1.
     if s == n {
-        if mpn_cmp(&a[0..n], &a[n..2 * n]) == Ordering::Less {
+        if limbs_cmp_same_length(&a[0..n], &a[n..2 * n]) == Ordering::Less {
             mpn_sub_n(&mut p[..], &a[n..2 * n], &a[0..n]);
             vm1_neg = true;
         } else {
             mpn_sub_n(&mut p[..], &a[0..n], &a[n..2 * n]);
         }
-    } else if a[s] == 0 && mpn_cmp(&a[0..s], &a[n..n + s]) == Ordering::Less {
+    } else if a[s] == 0 && limbs_cmp_same_length(&a[0..s], &a[n..n + s]) == Ordering::Less {
         // n - s == 1
         mpn_sub_n(&mut p[..], &a[n..n + s], &a[0..s]);
         p[s] = 0;
@@ -210,13 +210,15 @@ fn mpn_toom22_mul(p: &mut [u32], a: &[u32], b: &[u32], scratch: &mut [u32]) {
 
     // Compute bsm1.
     if t == n {
-        if mpn_cmp(&b[0..n], &b[n..2 * n]) == Ordering::Less {
+        if limbs_cmp_same_length(&b[0..n], &b[n..2 * n]) == Ordering::Less {
             mpn_sub_n(&mut p[n..], &b[n..2 * n], &b[0..n]);
             vm1_neg = !vm1_neg;
         } else {
             mpn_sub_n(&mut p[n..], &b[0..n], &b[n..2 * n]);
         }
-    } else if limbs_test_zero(&b[t..n]) && mpn_cmp(&b[0..t], &b[n..n + t]) == Ordering::Less {
+    } else if limbs_test_zero(&b[t..n])
+        && limbs_cmp_same_length(&b[0..t], &b[n..n + t]) == Ordering::Less
+    {
         mpn_sub_n(&mut p[n..], &b[n..n + t], &b[0..t]);
         limbs_set_zero(&mut p[n + t..2 * n]);
         vm1_neg = !vm1_neg;
@@ -350,7 +352,7 @@ fn mpn_toom_eval_dgr3_pm1(
         0
     };
 
-    let neg = mpn_cmp(&xp1[0..n + 1], &t[0..n + 1]) == Ordering::Less;
+    let neg = limbs_cmp_same_length(&xp1[0..n + 1], &t[0..n + 1]) == Ordering::Less;
 
     if neg {
         mpn_sub_n(xm1, &t[0..n + 1], &xp1[0..n + 1]);
@@ -627,7 +629,7 @@ fn mpn_toom42_mul(p: &mut [u32], a: &[u32], b: &[u32], scratch: &mut [u32]) {
             0
         };
 
-        if mpn_cmp(&b0[0..n], &b1[0..n]) == Ordering::Less {
+        if limbs_cmp_same_length(&b0[0..n], &b1[0..n]) == Ordering::Less {
             mpn_sub_n(bsm1, &b1[0..n], &b0[0..n]);
             vm1_neg = !vm1_neg;
         } else {
@@ -640,7 +642,9 @@ fn mpn_toom42_mul(p: &mut [u32], a: &[u32], b: &[u32], scratch: &mut [u32]) {
             0
         };
 
-        if limbs_test_zero(&b0[t..n]) && mpn_cmp(&b0[0..t], &b1[0..t]) == Ordering::Less {
+        if limbs_test_zero(&b0[t..n])
+            && limbs_cmp_same_length(&b0[0..t], &b1[0..t]) == Ordering::Less
+        {
             mpn_sub_n(bsm1, &b1[0..t], &b0[0..t]);
             limbs_set_zero(&mut bsm1[t..n]);
             vm1_neg = !vm1_neg;

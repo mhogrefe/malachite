@@ -7,7 +7,7 @@ use natural::Natural;
 ///
 /// Additional memory: worst case O(1)
 ///
-/// where n = min(`self.significant_bits(), other.significant_bits()`)
+/// where n = min(`self.significant_bits()`, `other.significant_bits()`)
 ///
 /// # Example
 /// ```
@@ -19,16 +19,7 @@ use natural::Natural;
 /// ```
 impl PartialEq<Natural> for Integer {
     fn eq(&self, other: &Natural) -> bool {
-        match *self {
-            Integer {
-                sign: true,
-                ref abs,
-            } if abs == other =>
-            {
-                true
-            }
-            _ => false,
-        }
+        self.sign && self.abs == *other
     }
 }
 
@@ -38,7 +29,7 @@ impl PartialEq<Natural> for Integer {
 ///
 /// Additional memory: worst case O(1)
 ///
-/// where n = min(`self.significant_bits(), other.significant_bits()`)
+/// where n = min(`self.significant_bits()`, `other.significant_bits()`)
 ///
 /// # Example
 /// ```
@@ -50,15 +41,6 @@ impl PartialEq<Natural> for Integer {
 /// ```
 impl PartialEq<Integer> for Natural {
     fn eq(&self, other: &Integer) -> bool {
-        match *other {
-            Integer {
-                sign: true,
-                ref abs,
-            } if self == abs =>
-            {
-                true
-            }
-            _ => false,
-        }
+        other.sign && *self == other.abs
     }
 }
