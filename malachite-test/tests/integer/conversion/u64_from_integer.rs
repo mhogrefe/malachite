@@ -1,5 +1,6 @@
 use common::test_properties;
-use malachite_base::num::SignificantBits;
+use malachite_base::misc::{CheckedFrom, WrappingFrom};
+use malachite_base::num::{PrimitiveInteger, SignificantBits};
 use malachite_nz::integer::Integer;
 use malachite_test::inputs::integer::integers;
 use std::cmp::Ordering;
@@ -7,9 +8,9 @@ use std::{u32, u64};
 use std::str::FromStr;
 
 #[test]
-fn test_to_u64() {
+fn test_u64_checked_from_integer() {
     let test = |n, out| {
-        assert_eq!(Integer::from_str(n).unwrap().to_u64(), out);
+        assert_eq!(u64::checked_from(&Integer::from_str(n).unwrap()), out);
     };
     test("0", Some(0));
     test("123", Some(123));
@@ -25,9 +26,9 @@ fn test_to_u64() {
 }
 
 #[test]
-fn test_to_u64_wrapping() {
+fn test_u64_wrapping_from_integer() {
     let test = |n, out| {
-        assert_eq!(Integer::from_str(n).unwrap().to_u64_wrapping(), out);
+        assert_eq!(u64::wrapping_from(&Integer::from_str(n).unwrap()), out);
     };
     test("0", 0);
     test("123", 123);
@@ -47,12 +48,12 @@ fn test_to_u64_wrapping() {
 }
 
 #[test]
-fn to_u64_properties() {
+fn u64_checked_from_integer_properties() {
     test_properties(integers, |x| {
-        let result = x.to_u64();
+        let result = u64::checked_from(x);
         if x.sign() != Ordering::Less && x.significant_bits() <= 64 {
             assert_eq!(Integer::from(result.unwrap()), *x);
-            assert_eq!(result, Some(x.to_u64_wrapping()));
+            assert_eq!(result, Some(u64::wrapping_from(x)));
         } else {
             assert!(result.is_none());
         }
@@ -60,10 +61,14 @@ fn to_u64_properties() {
 }
 
 #[test]
-fn to_u64_wrapping_properties() {
+fn u64_wrapping_from_integer_properties() {
     // TODO relate with BitAnd
     test_properties(integers, |x| {
-        let result = x.to_u64_wrapping();
-        assert_eq!(result.wrapping_add((-x).to_u64_wrapping()), 0);
+        let result = u64::wrapping_from(x);
+        assert_eq!(result.wrapping_add(u64::wrapping_from(-x)), 0);
+        assert_eq!(
+            result,
+            u64::checked_from(&x.mod_power_of_two_ref(u64::WIDTH)).unwrap()
+        );
     });
 }

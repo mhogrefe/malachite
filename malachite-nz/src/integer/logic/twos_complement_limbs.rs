@@ -1,4 +1,5 @@
 use integer::Integer;
+use malachite_base::num::UnsignedAbs;
 
 //TODO clean
 impl Integer {
@@ -37,7 +38,7 @@ impl Integer {
     /// }
     /// ```
     pub fn twos_complement_limbs_asc(&self) -> Vec<u32> {
-        let mut limbs = self.natural_abs_ref().into_limbs_asc();
+        let mut limbs = self.unsigned_abs().into_limbs_asc();
         if *self >= 0 {
             if !limbs.is_empty() && limbs.last().unwrap() & 0x8000_0000 != 0 {
                 // Sign-extend with an extra 0 limb to indicate a positive Integer

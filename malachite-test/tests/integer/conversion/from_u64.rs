@@ -1,4 +1,5 @@
 use common::test_properties;
+use malachite_base::misc::CheckedFrom;
 use malachite_nz::integer::Integer;
 use malachite_test::common::bigint_to_integer;
 use malachite_test::inputs::base::unsigneds;
@@ -25,7 +26,7 @@ fn from_u64_properties() {
     test_properties(unsigneds, |&u: &u64| {
         let n = Integer::from(u);
         assert!(n.is_valid());
-        assert_eq!(n.to_u64(), Some(u));
+        assert_eq!(u64::checked_from(&n), Some(u));
 
         assert_eq!(bigint_to_integer(&BigInt::from(u)), n);
     });

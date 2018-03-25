@@ -1,4 +1,5 @@
 use common::test_properties;
+use malachite_base::misc::CheckedFrom;
 use malachite_nz::integer::Integer;
 use malachite_test::common::{bigint_to_integer, rug_integer_to_integer};
 use malachite_test::inputs::base::signeds;
@@ -29,7 +30,7 @@ fn from_i32_properties() {
     test_properties(signeds, |&i: &i32| {
         let n = Integer::from(i);
         assert!(n.is_valid());
-        assert_eq!(n.to_i32(), Some(i));
+        assert_eq!(i32::checked_from(&n), Some(i));
 
         assert_eq!(bigint_to_integer(&BigInt::from(i)), n);
         assert_eq!(rug_integer_to_integer(&rug::Integer::from(i)), n);

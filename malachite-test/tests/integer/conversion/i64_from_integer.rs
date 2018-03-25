@@ -1,6 +1,6 @@
 use common::test_properties;
-use malachite_base::num::SignificantBits;
-use malachite_base::num::One;
+use malachite_base::misc::{CheckedFrom, WrappingFrom};
+use malachite_base::num::{One, SignificantBits};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_test::inputs::integer::integers;
@@ -8,9 +8,9 @@ use std::{i32, i64};
 use std::str::FromStr;
 
 #[test]
-fn test_to_i64() {
+fn test_i64_checked_from_integer() {
     let test = |n, out| {
-        assert_eq!(Integer::from_str(n).unwrap().to_i64(), out);
+        assert_eq!(i64::checked_from(&Integer::from_str(n).unwrap()), out);
     };
     test("0", Some(0));
     test("123", Some(123));
@@ -30,9 +30,9 @@ fn test_to_i64() {
 }
 
 #[test]
-fn test_to_i64_wrapping() {
+fn test_i64_wrapping_from_integer() {
     let test = |n, out| {
-        assert_eq!(Integer::from_str(n).unwrap().to_i64_wrapping(), out);
+        assert_eq!(i64::wrapping_from(&Integer::from_str(n).unwrap()), out);
     };
     test("0", 0);
     test("123", 123);
@@ -52,12 +52,12 @@ fn test_to_i64_wrapping() {
 }
 
 #[test]
-fn to_i64_properties() {
+fn i64_checked_from_integer_properties() {
     test_properties(integers, |x| {
-        let result = x.to_i64();
+        let result = i64::checked_from(x);
         if x.significant_bits() < 64 || *x == -((Natural::ONE << 63u32).into_integer()) {
             assert_eq!(Integer::from(result.unwrap()), *x);
-            assert_eq!(result, Some(x.to_i64_wrapping()));
+            assert_eq!(result, Some(i64::wrapping_from(x)));
         } else {
             assert!(result.is_none());
         }
@@ -65,10 +65,10 @@ fn to_i64_properties() {
 }
 
 #[test]
-fn to_i32_wrapping_properties() {
+fn i64_wrapping_from_integer_properties() {
     // TODO relate with BitAnd
     test_properties(integers, |x| {
-        let result = x.to_i64_wrapping();
-        assert_eq!(-result, (-x).to_i64_wrapping());
+        let result = i64::wrapping_from(x);
+        assert_eq!(-result, i64::wrapping_from(-x));
     });
 }

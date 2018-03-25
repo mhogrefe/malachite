@@ -1,14 +1,14 @@
 use common::test_properties;
-use malachite_base::num::{BitAccess, PrimitiveInteger, PrimitiveSigned, PrimitiveUnsigned};
-use malachite_base::num::NegativeOne;
+use malachite_base::num::{BitAccess, NegativeOne, PrimitiveInteger, PrimitiveSigned,
+                          PrimitiveUnsigned};
 use malachite_test::inputs::base::{pairs_of_signed_and_u64_width_range,
                                    pairs_of_unsigned_and_u64_width_range};
 
 fn flip_bit_helper_unsigned<T: PrimitiveInteger>() {
-    let test = |n, index, out| {
-        let mut n = T::from_u64(n);
+    let test = |n: u64, index, out: u64| {
+        let mut n = T::checked_from(n).unwrap();
         n.flip_bit(index);
-        assert_eq!(n, T::from_u64(out));
+        assert_eq!(n, T::checked_from(out).unwrap());
     };
 
     test(100, 0, 101);
@@ -26,10 +26,10 @@ fn flip_bit_helper_unsigned<T: PrimitiveInteger>() {
 fn flip_bit_helper_signed<T: PrimitiveSigned>() {
     flip_bit_helper_unsigned::<T>();
 
-    let test = |n, index, out| {
-        let mut n = T::from_i64(n);
+    let test = |n: i64, index, out: i64| {
+        let mut n = T::checked_from(n).unwrap();
         n.flip_bit(index);
-        assert_eq!(n, T::from_i64(out));
+        assert_eq!(n, T::checked_from(out).unwrap());
     };
 
     test(-1, 5, -33);
@@ -60,7 +60,7 @@ macro_rules! flip_bit_fail_helper_unsigned {
         #[test]
         #[should_panic(expected = "")]
         fn $fail() {
-            let mut n = $t::from_u64(5);
+            let mut n = $t::from(5u8);
             n.flip_bit(100);
         }
     };
@@ -68,7 +68,12 @@ macro_rules! flip_bit_fail_helper_unsigned {
 
 macro_rules! flip_bit_fail_helper_signed {
     ($t: ident, $fail_1: ident, $fail_2: ident) => {
-        flip_bit_fail_helper_unsigned!($t, $fail_1);
+        #[test]
+        #[should_panic(expected = "")]
+        fn $fail_1() {
+            let mut n = $t::from(5i8);
+            n.flip_bit(100);
+        }
 
         #[test]
         #[should_panic(expected = "")]

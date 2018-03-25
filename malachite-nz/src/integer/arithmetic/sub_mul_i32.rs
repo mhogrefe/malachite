@@ -1,5 +1,5 @@
 use integer::Integer;
-use malachite_base::num::{AddMul, AddMulAssign, SubMul, SubMulAssign};
+use malachite_base::num::{AddMul, AddMulAssign, SubMul, SubMulAssign, UnsignedAbs};
 
 /// Adds the product of an `Integer` (b) and an `i32` (c) to an `Integer` (self), taking `self` and
 /// b by value.
@@ -102,7 +102,7 @@ impl<'a, 'b> SubMul<&'a Integer, i32> for &'b Integer {
         if c >= 0 {
             self.sub_mul(b, c as u32)
         } else {
-            self.add_mul(b, c.wrapping_neg() as u32)
+            self.add_mul(b, c.unsigned_abs())
         }
     }
 }
@@ -160,7 +160,7 @@ impl<'a> SubMulAssign<&'a Integer, i32> for Integer {
         if c >= 0 {
             self.sub_mul_assign(b, c as u32);
         } else {
-            self.add_mul_assign(b, c.wrapping_neg() as u32)
+            self.add_mul_assign(b, c.unsigned_abs())
         }
     }
 }

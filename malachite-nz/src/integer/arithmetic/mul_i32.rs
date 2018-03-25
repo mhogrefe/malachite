@@ -1,5 +1,5 @@
 use integer::Integer;
-use malachite_base::num::{Assign, Zero};
+use malachite_base::num::{Assign, UnsignedAbs, Zero};
 use std::ops::{Mul, MulAssign};
 
 /// Multiplies an `Integer` by an `i32`, taking the `Integer` by value.
@@ -70,7 +70,7 @@ impl<'a> Mul<i32> for &'a Integer {
                 } else {
                     !self.sign
                 },
-                abs: &self.abs * (other.wrapping_abs() as u32),
+                abs: &self.abs * other.unsigned_abs(),
             }
         }
     }
@@ -169,7 +169,7 @@ impl MulAssign<i32> for Integer {
         if *self == 0 || other == 0 {
             self.assign(0i32);
         } else {
-            self.abs *= other.wrapping_abs() as u32;
+            self.abs *= other.unsigned_abs();
             if other < 0 {
                 self.sign = !self.sign;
             }

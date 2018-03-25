@@ -1,4 +1,5 @@
 use common::test_properties;
+use malachite_base::misc::CheckedFrom;
 use malachite_base::num::Zero;
 use malachite_nz::natural::Natural;
 use malachite_test::common::{biguint_to_natural, natural_to_biguint, natural_to_rug_integer,
@@ -112,7 +113,10 @@ fn sub_u32_properties() {
                 *n == u || difference.is_none()
             );
             if reverse_difference.is_some() {
-                assert_eq!(Natural::from(u) - n.to_u32().unwrap(), reverse_difference);
+                assert_eq!(
+                    Natural::from(u) - u32::checked_from(n).unwrap(),
+                    reverse_difference
+                );
             }
             assert!(reverse_difference.map_or(true, |n| n.is_valid()));
 

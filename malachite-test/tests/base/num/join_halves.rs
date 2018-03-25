@@ -25,15 +25,15 @@ where
     test_properties(pairs_of_unsigneds, |&(x, y): &(T::Half, T::Half)| {
         let joined = T::join_halves(x, y);
         assert_eq!(
-            x.to_u64() * (1 << (u64::from(T::WIDTH) >> 1)) + y.to_u64(),
-            joined.to_u64()
+            x.into() * (1 << (u64::from(T::WIDTH) >> 1)) + y.into(),
+            joined.into()
         );
         assert_eq!(joined.upper_half(), x);
         assert_eq!(joined.lower_half(), y);
     });
 
     test_properties(unsigneds, |&x: &T::Half| {
-        assert_eq!(T::join_halves(T::Half::ZERO, x).to_u64(), x.to_u64());
+        assert_eq!(T::join_halves(T::Half::ZERO, x).into(), x.into());
     });
 }
 

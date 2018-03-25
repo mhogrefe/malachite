@@ -1,3 +1,4 @@
+use malachite_base::misc::CheckedFrom;
 use natural::Natural::{self, Large, Small};
 use std::ops::{Sub, SubAssign};
 
@@ -156,8 +157,7 @@ impl<'a> Sub<&'a Natural> for u32 {
     type Output = Option<Natural>;
 
     fn sub(self, other: &'a Natural) -> Option<Natural> {
-        other
-            .to_u32()
+        u32::checked_from(other)
             .and_then(|x| self.checked_sub(x))
             .map(Natural::from)
     }

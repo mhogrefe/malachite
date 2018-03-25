@@ -1,4 +1,5 @@
 use integer::Integer;
+use malachite_base::num::UnsignedAbs;
 use natural::Natural;
 
 /// Converts an `i32` to an `Integer`.
@@ -18,7 +19,7 @@ impl From<i32> for Integer {
     fn from(i: i32) -> Integer {
         Integer {
             sign: i >= 0,
-            abs: Natural::from(i.wrapping_abs() as u32),
+            abs: Natural::from(i.unsigned_abs()),
         }
     }
 }

@@ -1,5 +1,6 @@
 use common::test_properties;
 use malachite_nz::integer::Integer;
+use malachite_base::misc::{CheckedFrom, WrappingFrom};
 use malachite_test::common::integer_to_rug_integer;
 use malachite_test::inputs::integer::integers;
 use rug;
@@ -7,9 +8,9 @@ use std::i32;
 use std::str::FromStr;
 
 #[test]
-fn test_to_i32() {
+fn test_i32_checked_from_integer() {
     let test = |n, out| {
-        assert_eq!(Integer::from_str(n).unwrap().to_i32(), out);
+        assert_eq!(i32::checked_from(&Integer::from_str(n).unwrap()), out);
         assert_eq!(rug::Integer::from_str(n).unwrap().to_i32(), out);
     };
     test("0", Some(0));
@@ -24,9 +25,9 @@ fn test_to_i32() {
 }
 
 #[test]
-fn test_to_i32_wrapping() {
+fn test_i32_wrapping_from_integer() {
     let test = |n, out| {
-        assert_eq!(Integer::from_str(n).unwrap().to_i32_wrapping(), out);
+        assert_eq!(i32::wrapping_from(&Integer::from_str(n).unwrap()), out);
         assert_eq!(rug::Integer::from_str(n).unwrap().to_i32_wrapping(), out);
     };
     test("0", 0);
@@ -41,13 +42,13 @@ fn test_to_i32_wrapping() {
 }
 
 #[test]
-fn to_i32_properties() {
+fn i32_checked_from_integer_properties() {
     test_properties(integers, |x| {
-        let result = x.to_i32();
+        let result = i32::checked_from(x);
         assert_eq!(integer_to_rug_integer(x).to_i32(), result);
         if *x >= i32::MIN && *x <= i32::MAX {
             assert_eq!(Integer::from(result.unwrap()), *x);
-            assert_eq!(result, Some(x.to_i32_wrapping()));
+            assert_eq!(result, Some(i32::wrapping_from(x)));
         } else {
             assert!(result.is_none());
         }
@@ -55,11 +56,11 @@ fn to_i32_properties() {
 }
 
 #[test]
-fn to_i32_wrapping_properties() {
+fn i32_wrapping_from_integer_properties() {
     // TODO relate with BitAnd
     test_properties(integers, |x| {
-        let result = x.to_i32_wrapping();
+        let result = i32::wrapping_from(x);
         assert_eq!(integer_to_rug_integer(x).to_i32_wrapping(), result);
-        assert_eq!(-result, (-x).to_i32_wrapping());
+        assert_eq!(-result, i32::wrapping_from(-x));
     });
 }

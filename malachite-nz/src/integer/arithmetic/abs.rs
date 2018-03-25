@@ -1,8 +1,10 @@
 use integer::Integer;
-use malachite_base::num::AbsAssign;
+use malachite_base::num::{Abs, AbsAssign, UnsignedAbs};
 use natural::Natural;
 
-impl Integer {
+impl Abs for Integer {
+    type Output = Integer;
+
     /// Finds the absolute value of an `Integer`, taking the `Integer` by value.
     ///
     /// Time: worst case O(1)
@@ -14,7 +16,7 @@ impl Integer {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::Zero;
+    /// use malachite_base::num::{Abs, Zero};
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {
@@ -23,10 +25,14 @@ impl Integer {
     ///     assert_eq!(Integer::from(-123).abs().to_string(), "123");
     /// }
     /// ```
-    pub fn abs(mut self) -> Integer {
+    fn abs(mut self) -> Integer {
         self.sign = true;
         self
     }
+}
+
+impl<'a> Abs for &'a Integer {
+    type Output = Integer;
 
     /// Finds the absolute value of an `Integer`, taking the `Integer` by reference.
     ///
@@ -41,21 +47,25 @@ impl Integer {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::Zero;
+    /// use malachite_base::num::{Abs, Zero};
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {
-    ///     assert_eq!(Integer::ZERO.abs_ref().to_string(), "0");
-    ///     assert_eq!(Integer::from(123).abs_ref().to_string(), "123");
-    ///     assert_eq!(Integer::from(-123).abs_ref().to_string(), "123");
+    ///     assert_eq!((&Integer::ZERO).abs().to_string(), "0");
+    ///     assert_eq!((&Integer::from(123)).abs().to_string(), "123");
+    ///     assert_eq!((&Integer::from(-123)).abs().to_string(), "123");
     /// }
     /// ```
-    pub fn abs_ref(&self) -> Integer {
+    fn abs(self) -> Integer {
         Integer {
             sign: true,
             abs: self.abs.clone(),
         }
     }
+}
+
+impl UnsignedAbs for Integer {
+    type Output = Natural;
 
     /// Finds the absolute value of an `Integer`, taking the `Integer` by value and converting the
     /// result to a `Natural`.
@@ -69,18 +79,22 @@ impl Integer {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::Zero;
+    /// use malachite_base::num::{UnsignedAbs, Zero};
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {
-    ///     assert_eq!(Integer::ZERO.natural_abs().to_string(), "0");
-    ///     assert_eq!(Integer::from(123).natural_abs().to_string(), "123");
-    ///     assert_eq!(Integer::from(-123).natural_abs().to_string(), "123");
+    ///     assert_eq!(Integer::ZERO.unsigned_abs().to_string(), "0");
+    ///     assert_eq!(Integer::from(123).unsigned_abs().to_string(), "123");
+    ///     assert_eq!(Integer::from(-123).unsigned_abs().to_string(), "123");
     /// }
     /// ```
-    pub fn natural_abs(self) -> Natural {
+    fn unsigned_abs(self) -> Natural {
         self.abs
     }
+}
+
+impl<'a> UnsignedAbs for &'a Integer {
+    type Output = Natural;
 
     /// Finds the absolute value of an `Integer`, taking the `Integer` by reference and converting
     /// the result to a `Natural`.
@@ -96,16 +110,16 @@ impl Integer {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::Zero;
+    /// use malachite_base::num::{UnsignedAbs, Zero};
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {
-    ///     assert_eq!(Integer::ZERO.natural_abs_ref().to_string(), "0");
-    ///     assert_eq!(Integer::from(123).natural_abs_ref().to_string(), "123");
-    ///     assert_eq!(Integer::from(-123).natural_abs_ref().to_string(), "123");
+    ///     assert_eq!((&Integer::ZERO).unsigned_abs().to_string(), "0");
+    ///     assert_eq!((&Integer::from(123)).unsigned_abs().to_string(), "123");
+    ///     assert_eq!((&Integer::from(-123)).unsigned_abs().to_string(), "123");
     /// }
     /// ```
-    pub fn natural_abs_ref(&self) -> Natural {
+    fn unsigned_abs(self) -> Natural {
         self.abs.clone()
     }
 }

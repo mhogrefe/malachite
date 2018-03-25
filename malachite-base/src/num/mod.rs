@@ -1,4 +1,4 @@
-use misc::{Max, Min, Named, Walkable};
+use misc::{CheckedFrom, CheckedInto, Max, Min, Named, Walkable, WrappingFrom, WrappingInto};
 use rand::distributions::range::SampleRange;
 use rand::Rand;
 use round::RoundingMode;
@@ -364,6 +364,129 @@ pub trait OverflowingAbs {
 
 //TODO is_positive, is_negative, sign
 
+macro_rules! lossless_checked_from_impl {
+    ($from: ty, $to: ty) => {
+        impl CheckedFrom<$from> for $to {
+            fn checked_from(value: $from) -> Option<$to> {
+                Some(value.into())
+            }
+        }
+    };
+}
+
+macro_rules! lossy_checked_from_impl {
+    ($from: ty, $to: ty) => {
+        impl CheckedFrom<$from> for $to {
+            #[allow(unused_comparisons)]
+            fn checked_from(value: $from) -> Option<$to> {
+                let result = value as $to;
+                if (result < 0) == (value < 0) && result as $from == value {
+                    Some(result)
+                } else {
+                    None
+                }
+            }
+        }
+    };
+}
+
+lossless_checked_from_impl!(u8, u8);
+lossless_checked_from_impl!(u8, u16);
+lossless_checked_from_impl!(u8, u32);
+lossless_checked_from_impl!(u8, u64);
+lossy_checked_from_impl!(u8, i8);
+lossless_checked_from_impl!(u8, i16);
+lossless_checked_from_impl!(u8, i32);
+lossless_checked_from_impl!(u8, i64);
+lossy_checked_from_impl!(u16, u8);
+lossless_checked_from_impl!(u16, u16);
+lossless_checked_from_impl!(u16, u32);
+lossless_checked_from_impl!(u16, u64);
+lossy_checked_from_impl!(u16, i8);
+lossy_checked_from_impl!(u16, i16);
+lossless_checked_from_impl!(u16, i32);
+lossless_checked_from_impl!(u16, i64);
+lossy_checked_from_impl!(u32, u8);
+lossy_checked_from_impl!(u32, u16);
+lossless_checked_from_impl!(u32, u32);
+lossless_checked_from_impl!(u32, u64);
+lossy_checked_from_impl!(u32, i8);
+lossy_checked_from_impl!(u32, i16);
+lossy_checked_from_impl!(u32, i32);
+lossless_checked_from_impl!(u32, i64);
+lossy_checked_from_impl!(u64, u8);
+lossy_checked_from_impl!(u64, u16);
+lossy_checked_from_impl!(u64, u32);
+lossless_checked_from_impl!(u64, u64);
+lossy_checked_from_impl!(u64, i8);
+lossy_checked_from_impl!(u64, i16);
+lossy_checked_from_impl!(u64, i32);
+lossy_checked_from_impl!(u64, i64);
+lossy_checked_from_impl!(i8, u8);
+lossy_checked_from_impl!(i8, u16);
+lossy_checked_from_impl!(i8, u32);
+lossy_checked_from_impl!(i8, u64);
+lossless_checked_from_impl!(i8, i8);
+lossless_checked_from_impl!(i8, i16);
+lossless_checked_from_impl!(i8, i32);
+lossless_checked_from_impl!(i8, i64);
+lossy_checked_from_impl!(i16, u8);
+lossy_checked_from_impl!(i16, u16);
+lossy_checked_from_impl!(i16, u32);
+lossy_checked_from_impl!(i16, u64);
+lossy_checked_from_impl!(i16, i8);
+lossless_checked_from_impl!(i16, i16);
+lossless_checked_from_impl!(i16, i32);
+lossless_checked_from_impl!(i16, i64);
+lossy_checked_from_impl!(i32, u8);
+lossy_checked_from_impl!(i32, u16);
+lossy_checked_from_impl!(i32, u32);
+lossy_checked_from_impl!(i32, u64);
+lossy_checked_from_impl!(i32, i8);
+lossy_checked_from_impl!(i32, i16);
+lossless_checked_from_impl!(i32, i32);
+lossless_checked_from_impl!(i32, i64);
+lossy_checked_from_impl!(i64, u8);
+lossy_checked_from_impl!(i64, u16);
+lossy_checked_from_impl!(i64, u32);
+lossy_checked_from_impl!(i64, u64);
+lossy_checked_from_impl!(i64, i8);
+lossy_checked_from_impl!(i64, i16);
+lossy_checked_from_impl!(i64, i32);
+lossless_checked_from_impl!(i64, i64);
+
+macro_rules! wrapping_impl_inner {
+    ($from: ty, $to: ty) => {
+        impl WrappingFrom<$from> for $to {
+            fn wrapping_from(value: $from) -> $to {
+                value as $to
+            }
+        }
+    };
+}
+
+macro_rules! wrapping_impl {
+    ($from: ty) => {
+        wrapping_impl_inner!($from, u8);
+        wrapping_impl_inner!($from, u16);
+        wrapping_impl_inner!($from, u32);
+        wrapping_impl_inner!($from, u64);
+        wrapping_impl_inner!($from, i8);
+        wrapping_impl_inner!($from, i16);
+        wrapping_impl_inner!($from, i32);
+        wrapping_impl_inner!($from, i64);
+    };
+}
+
+wrapping_impl!(u8);
+wrapping_impl!(u16);
+wrapping_impl!(u32);
+wrapping_impl!(u64);
+wrapping_impl!(i8);
+wrapping_impl!(i16);
+wrapping_impl!(i32);
+wrapping_impl!(i64);
+
 //TODO docs
 pub trait PrimitiveInteger:
     Add<Output = Self>
@@ -378,6 +501,22 @@ pub trait PrimitiveInteger:
     + BitXorAssign<Self>
     + CheckedAdd<Output = Self>
     + CheckedDiv<Output = Self>
+    + CheckedFrom<u8>
+    + CheckedFrom<u16>
+    + CheckedFrom<u32>
+    + CheckedFrom<u64>
+    + CheckedFrom<i8>
+    + CheckedFrom<i16>
+    + CheckedFrom<i32>
+    + CheckedFrom<i64>
+    + CheckedInto<u8>
+    + CheckedInto<u16>
+    + CheckedInto<u32>
+    + CheckedInto<u64>
+    + CheckedInto<i8>
+    + CheckedInto<i16>
+    + CheckedInto<i32>
+    + CheckedInto<i64>
     + CheckedMul<Output = Self>
     + CheckedNeg<Output = Self>
     + CheckedRem<Output = Self>
@@ -442,6 +581,22 @@ pub trait PrimitiveInteger:
     + Walkable
     + WrappingAdd<Output = Self>
     + WrappingDiv<Output = Self>
+    + WrappingFrom<u8>
+    + WrappingFrom<u16>
+    + WrappingFrom<u32>
+    + WrappingFrom<u64>
+    + WrappingFrom<i8>
+    + WrappingFrom<i16>
+    + WrappingFrom<i32>
+    + WrappingFrom<i64>
+    + WrappingInto<u8>
+    + WrappingInto<u16>
+    + WrappingInto<u32>
+    + WrappingInto<u64>
+    + WrappingInto<i8>
+    + WrappingInto<i16>
+    + WrappingInto<i32>
+    + WrappingInto<i64>
     + WrappingMul<Output = Self>
     + WrappingNeg<Output = Self>
     + WrappingRem<Output = Self>
@@ -452,10 +607,6 @@ pub trait PrimitiveInteger:
 {
     const LOG_WIDTH: u32;
     const WIDTH: u32 = 1 << Self::LOG_WIDTH;
-
-    fn from_u32(u: u32) -> Self;
-
-    fn from_u64(u: u64) -> Self;
 }
 
 //TODO docs
@@ -463,16 +614,14 @@ pub trait PrimitiveUnsigned:
     CeilingLogTwo
     + CheckedNextPowerOfTwo
     + FloorLogTwo
+    + From<u8>
     + FromU32Slice
+    + Into<u64>
     + IsPowerOfTwo
     + NextPowerOfTwo
     + PrimitiveInteger
 {
     type SignedOfEqualWidth: PrimitiveSigned;
-
-    fn to_u32(self) -> u32;
-
-    fn to_u64(self) -> u64;
 
     fn to_signed_bitwise(self) -> Self::SignedOfEqualWidth;
 
@@ -485,18 +634,17 @@ pub trait PrimitiveUnsigned:
 pub trait PrimitiveSigned:
     Abs<Output = Self>
     + CheckedAbs<Output = Self>
+    + From<i8>
+    + Into<i64>
     + Neg<Output = Self>
     + NegativeOne
     + Not<Output = Self>
     + OverflowingAbs<Output = Self>
     + PrimitiveInteger
+    + UnsignedAbs
     + WrappingAbs<Output = Self>
 {
     type UnsignedOfEqualWidth: PrimitiveUnsigned;
-
-    fn from_i32(i: i32) -> Self;
-
-    fn from_i64(i: i64) -> Self;
 
     fn to_unsigned_bitwise(self) -> Self::UnsignedOfEqualWidth;
 
@@ -576,7 +724,8 @@ pub trait PrimitiveFloat:
         let bits = self.to_bits();
         let one = Self::UnsignedOfEqualWidth::ONE;
         let mantissa = bits & ((one << Self::MANTISSA_WIDTH) - one);
-        let exponent = (bits >> Self::MANTISSA_WIDTH).to_u32() & ((1 << Self::EXPONENT_WIDTH) - 1);
+        let exponent: u32 = (bits >> Self::MANTISSA_WIDTH).checked_into().unwrap();
+        let exponent = exponent & ((1 << Self::EXPONENT_WIDTH) - 1);
         (mantissa, exponent)
     }
 
@@ -585,7 +734,8 @@ pub trait PrimitiveFloat:
         exponent: u32,
     ) -> Self {
         Self::from_bits(
-            (Self::UnsignedOfEqualWidth::from_u32(exponent) << Self::MANTISSA_WIDTH) + mantissa,
+            (Self::UnsignedOfEqualWidth::checked_from(exponent).unwrap() << Self::MANTISSA_WIDTH)
+                + mantissa,
         )
     }
 }
@@ -649,14 +799,6 @@ macro_rules! integer_traits {
         //TODO docs
         impl PrimitiveInteger for $t {
             const LOG_WIDTH: u32 = $log_width;
-
-            fn from_u32($u: u32) -> Self {
-                $from_u32
-            }
-
-            fn from_u64($u: u64) -> Self {
-                $from_u64
-            }
         }
 
         impl_named!($t);
@@ -1250,14 +1392,6 @@ macro_rules! signed_traits {
         impl PrimitiveSigned for $t {
             type UnsignedOfEqualWidth = $ut;
 
-            fn from_i32($i: i32) -> Self {
-                $from_i32
-            }
-
-            fn from_i64($i: i64) -> Self {
-                $from_i64
-            }
-
             fn to_unsigned_bitwise(self) -> Self::UnsignedOfEqualWidth {
                 self as $ut
             }
@@ -1272,6 +1406,14 @@ macro_rules! signed_traits {
 
             fn abs(self) -> $t {
                 $t::abs(self)
+            }
+        }
+
+        impl UnsignedAbs for $t {
+            type Output = $ut;
+
+            fn unsigned_abs(self) -> $ut {
+                $t::wrapping_abs(self) as $ut
             }
         }
 
@@ -1317,7 +1459,7 @@ macro_rules! signed_traits {
         /// ```
         impl SignificantBits for $t {
             fn significant_bits(self) -> u64 {
-                (self.wrapping_abs() as $ut).significant_bits()
+                self.unsigned_abs().significant_bits()
             }
         }
 
@@ -1559,14 +1701,6 @@ macro_rules! float_traits {
 impl PrimitiveUnsigned for u8 {
     type SignedOfEqualWidth = i8;
 
-    fn to_u32(self) -> u32 {
-        self.into()
-    }
-
-    fn to_u64(self) -> u64 {
-        self.into()
-    }
-
     fn to_signed_bitwise(self) -> i8 {
         self as i8
     }
@@ -1586,14 +1720,6 @@ impl PrimitiveUnsigned for u8 {
 
 impl PrimitiveUnsigned for u16 {
     type SignedOfEqualWidth = i16;
-
-    fn to_u32(self) -> u32 {
-        self.into()
-    }
-
-    fn to_u64(self) -> u64 {
-        self.into()
-    }
 
     fn to_signed_bitwise(self) -> i16 {
         self as i16
@@ -1615,14 +1741,6 @@ impl PrimitiveUnsigned for u16 {
 impl PrimitiveUnsigned for u32 {
     type SignedOfEqualWidth = i32;
 
-    fn to_u32(self) -> u32 {
-        self
-    }
-
-    fn to_u64(self) -> u64 {
-        self.into()
-    }
-
     fn to_signed_bitwise(self) -> i32 {
         self as i32
     }
@@ -1642,14 +1760,6 @@ impl PrimitiveUnsigned for u32 {
 
 impl PrimitiveUnsigned for u64 {
     type SignedOfEqualWidth = i64;
-
-    fn to_u32(self) -> u32 {
-        self as u32
-    }
-
-    fn to_u64(self) -> u64 {
-        self
-    }
 
     fn to_signed_bitwise(self) -> i64 {
         self as i64
@@ -2021,6 +2131,13 @@ macro_rules! impl_halves_unsigned {
 impl_halves_unsigned!(u16, u8);
 impl_halves_unsigned!(u32, u16);
 impl_halves_unsigned!(u64, u32);
+
+/// Computes the absolute value of `self` and converts to the unsigned equivalent.
+pub trait UnsignedAbs {
+    type Output;
+
+    fn unsigned_abs(self) -> Self::Output;
+}
 
 pub trait ShlRound<RHS> {
     type Output;

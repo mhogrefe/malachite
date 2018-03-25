@@ -1,5 +1,5 @@
 use common::{test_properties, test_properties_no_special};
-use malachite_base::num::{IsPowerOfTwo, One, Zero};
+use malachite_base::num::{Abs, IsPowerOfTwo, One, Zero};
 use malachite_nz::integer::Integer;
 use malachite_test::common::{bigint_to_integer, integer_to_bigint, integer_to_rug_integer,
                              rug_integer_to_integer};
@@ -116,7 +116,7 @@ fn shl_u32_properties() {
             shifted
         );
 
-        assert!((n << u).abs() >= n.abs_ref());
+        assert!((n << u).abs() >= n.abs());
         assert_eq!(-n << u, -(n << u));
 
         assert_eq!(n << u, n * (Integer::ONE << u));

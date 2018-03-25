@@ -1,5 +1,5 @@
 use common::test_properties;
-use malachite_base::num::PartialOrdAbs;
+use malachite_base::num::{Abs, PartialOrdAbs};
 use malachite_nz::integer::Integer;
 use malachite_test::inputs::integer::{pairs_of_integer_and_unsigned,
                                       triples_of_integer_unsigned_and_integer,
@@ -37,12 +37,12 @@ fn partial_cmp_u32_properties() {
         |&(ref n, u): &(Integer, u32)| {
             let cmp = n.partial_cmp_abs(&u);
             assert_eq!(n.partial_cmp_abs(&Integer::from(u)), cmp);
-            assert_eq!(n.abs_ref().partial_cmp(&u), cmp);
+            assert_eq!(n.abs().partial_cmp(&u), cmp);
 
             let cmp_rev = cmp.map(|o| o.reverse());
             assert_eq!(PartialOrdAbs::partial_cmp_abs(&u, n), cmp_rev);
             assert_eq!(Integer::from(u).partial_cmp_abs(n), cmp_rev);
-            assert_eq!(u.partial_cmp(&n.abs_ref()), cmp_rev);
+            assert_eq!(u.partial_cmp(&n.abs()), cmp_rev);
         },
     );
 

@@ -1,4 +1,5 @@
 use integer::Integer;
+use malachite_base::num::UnsignedAbs;
 use std::cmp::Ordering;
 
 /// Compares `self` to an `i32`.
@@ -31,7 +32,7 @@ impl PartialOrd<i32> for Integer {
         } else if *other >= 0 {
             Some(Ordering::Less)
         } else {
-            (other.wrapping_abs() as u32).partial_cmp(&self.abs)
+            other.unsigned_abs().partial_cmp(&self.abs)
         }
     }
 }
@@ -66,7 +67,7 @@ impl PartialOrd<Integer> for i32 {
         } else if *self >= 0 {
             Some(Ordering::Greater)
         } else {
-            other.abs.partial_cmp(&(self.wrapping_abs() as u32))
+            other.abs.partial_cmp(&self.unsigned_abs())
         }
     }
 }

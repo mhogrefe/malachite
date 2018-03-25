@@ -1,5 +1,6 @@
 use integer::Integer;
-use malachite_base::num::Assign;
+use malachite_base::misc::CheckedFrom;
+use malachite_base::num::{Assign, UnsignedAbs};
 use natural::Natural;
 use std::ops::{Add, AddAssign};
 
@@ -64,7 +65,7 @@ impl<'a> Add<i32> for &'a Integer {
         if other == 0 {
             return self.clone();
         }
-        let abs_other = other.wrapping_abs() as u32;
+        let abs_other = other.unsigned_abs();
         match *self {
             // e.g. 10 + 5 or -10 + -5; sign of self is unchanged
             Integer { sign, ref abs } if sign == (other > 0) => Integer {
@@ -79,7 +80,7 @@ impl<'a> Add<i32> for &'a Integer {
             // e.g. 5 + -10, -5 + 10, or -5 + 5; sign of self is flipped
             Integer { ref sign, ref abs } => Integer {
                 sign: !sign,
-                abs: Natural::from(abs_other - abs.to_u32().unwrap()),
+                abs: Natural::from(abs_other - u32::checked_from(abs).unwrap()),
             },
         }
     }
@@ -177,7 +178,7 @@ impl AddAssign<i32> for Integer {
         if other == 0 {
             return;
         }
-        let abs_other = other.wrapping_abs() as u32;
+        let abs_other = other.unsigned_abs();
         match *self {
             // e.g. 10 + 5 or -10 + -5; sign of self is unchanged
             Integer { sign, ref mut abs } if sign == (other > 0) => *abs += abs_other,
@@ -191,7 +192,7 @@ impl AddAssign<i32> for Integer {
                 ref mut abs,
             } => {
                 *sign = !*sign;
-                let small_abs = abs.to_u32().unwrap();
+                let small_abs = u32::checked_from(&*abs).unwrap();
                 abs.assign(abs_other - small_abs);
             }
         }

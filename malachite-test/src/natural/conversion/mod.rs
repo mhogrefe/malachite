@@ -11,8 +11,8 @@ pub mod serde;
 pub mod to_bits;
 pub mod to_integer;
 pub mod to_limbs;
-pub mod to_u32;
-pub mod to_u64;
+pub mod u32_from_natural;
+pub mod u64_from_natural;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     assign_u32::register(registry);
@@ -26,6 +26,6 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     to_bits::register(registry);
     to_integer::register(registry);
     to_limbs::register(registry);
-    to_u32::register(registry);
-    to_u64::register(registry);
+    u32_from_natural::register(registry);
+    u64_from_natural::register(registry);
 }

@@ -1,5 +1,5 @@
 use integer::Integer;
-use malachite_base::num::PartialOrdAbs;
+use malachite_base::num::{PartialOrdAbs, UnsignedAbs};
 use std::cmp::Ordering;
 
 /// Compares the absolute value of an `Integer` to the absolute value of an `i32`.
@@ -29,7 +29,7 @@ use std::cmp::Ordering;
 /// ```
 impl PartialOrdAbs<i32> for Integer {
     fn partial_cmp_abs(&self, other: &i32) -> Option<Ordering> {
-        self.abs.partial_cmp(&(other.wrapping_abs() as u32))
+        self.abs.partial_cmp(&other.unsigned_abs())
     }
 }
 
@@ -60,6 +60,6 @@ impl PartialOrdAbs<i32> for Integer {
 /// ```
 impl PartialOrdAbs<Integer> for i32 {
     fn partial_cmp_abs(&self, other: &Integer) -> Option<Ordering> {
-        (self.wrapping_abs() as u32).partial_cmp(&other.abs)
+        self.unsigned_abs().partial_cmp(&other.abs)
     }
 }

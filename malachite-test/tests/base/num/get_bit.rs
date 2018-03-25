@@ -5,8 +5,8 @@ use malachite_test::inputs::base::{unsigneds, pairs_of_signed_and_small_u64,
 use std::u32;
 
 fn get_bit_helper_unsigned<T: PrimitiveInteger>() {
-    let test = |n, index, out| {
-        assert_eq!(T::from_u64(n).get_bit(index), out);
+    let test = |n: u64, index, out| {
+        assert_eq!(T::checked_from(n).unwrap().get_bit(index), out);
     };
 
     test(0, 0, false);
@@ -23,8 +23,8 @@ fn get_bit_helper_unsigned<T: PrimitiveInteger>() {
 fn get_bit_helper_signed<T: PrimitiveSigned>() {
     get_bit_helper_unsigned::<T>();
 
-    let test = |n, index, out| {
-        assert_eq!(T::from_i64(n).get_bit(index), out);
+    let test = |n: i64, index, out| {
+        assert_eq!(T::checked_from(n).unwrap().get_bit(index), out);
     };
 
     test(-123, 0, true);

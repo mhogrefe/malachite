@@ -1,14 +1,15 @@
 use common::test_properties;
-use malachite_base::num::{BitAccess, PrimitiveInteger, PrimitiveSigned, PrimitiveUnsigned};
-use malachite_base::num::NegativeOne;
+use malachite_base::misc::CheckedFrom;
+use malachite_base::num::{BitAccess, NegativeOne, PrimitiveInteger, PrimitiveSigned,
+                          PrimitiveUnsigned};
 use malachite_test::inputs::base::{triples_of_signed_u64_width_range_and_bool_var_1,
                                    triples_of_unsigned_u64_width_range_and_bool_var_1};
 
 fn assign_bit_helper_unsigned<T: PrimitiveInteger>() {
-    let test = |n, index, bit, out| {
-        let mut n = T::from_u64(n);
+    let test = |n: u64, index, bit, out: u64| {
+        let mut n = T::checked_from(n).unwrap();
         n.assign_bit(index, bit);
-        assert_eq!(n, T::from_u64(out));
+        assert_eq!(n, T::checked_from(out).unwrap());
     };
 
     test(100, 0, true, 101);
@@ -29,10 +30,10 @@ fn assign_bit_helper_unsigned<T: PrimitiveInteger>() {
 fn assign_bit_helper_signed<T: PrimitiveSigned>() {
     assign_bit_helper_unsigned::<T>();
 
-    let test = |n, index, bit, out| {
-        let mut n = T::from_i64(n);
+    let test = |n: i64, index, bit, out: i64| {
+        let mut n = T::checked_from(n).unwrap();
         n.assign_bit(index, bit);
-        assert_eq!(n, T::from_i64(out));
+        assert_eq!(n, T::checked_from(out).unwrap());
     };
 
     test(-1, 5, true, -1);
@@ -66,7 +67,7 @@ macro_rules! assign_bit_fail_helper_unsigned {
         #[test]
         #[should_panic(expected = "")]
         fn $fail() {
-            let mut n = $t::from_u64(5);
+            let mut n = $t::checked_from(5).unwrap();
             n.assign_bit(100, true);
         }
     };

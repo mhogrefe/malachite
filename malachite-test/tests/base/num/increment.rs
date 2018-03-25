@@ -1,12 +1,13 @@
 use common::test_properties;
 use malachite_base::misc::{Max, Walkable};
-use malachite_base::num::{PrimitiveInteger, PrimitiveSigned, PrimitiveUnsigned};
+use malachite_base::num::{PrimitiveSigned, PrimitiveUnsigned};
 use malachite_test::inputs::base::{signeds_no_max, unsigneds_no_max};
 
-fn increment_helper_unsigned<T: PrimitiveInteger>() {
-    let test = |mut n: u64, out| {
+fn increment_helper_unsigned<T: PrimitiveUnsigned>() {
+    let test = |n, out| {
+        let mut n = T::from(n);
         n.increment();
-        assert_eq!(T::from_u64(n), T::from_u64(out));
+        assert_eq!(n, T::from(out));
     };
 
     test(0, 1);
@@ -15,13 +16,15 @@ fn increment_helper_unsigned<T: PrimitiveInteger>() {
 }
 
 fn increment_helper_signed<T: PrimitiveSigned>() {
-    increment_helper_unsigned::<T>();
-
-    let test = |mut n: i64, out| {
+    let test = |n, out| {
+        let mut n = T::from(n);
         n.increment();
-        assert_eq!(T::from_i64(n), T::from_i64(out));
+        assert_eq!(n, T::from(out));
     };
 
+    test(0, 1);
+    test(1, 2);
+    test(100, 101);
     test(-1, 0);
     test(-2, -1);
     test(-100, -99);

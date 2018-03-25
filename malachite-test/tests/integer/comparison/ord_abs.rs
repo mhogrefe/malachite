@@ -1,5 +1,5 @@
 use common::{test_custom_cmp_helper, test_properties};
-use malachite_base::num::{OrdAbs, PartialOrdAbs};
+use malachite_base::num::{Abs, OrdAbs, PartialOrdAbs};
 use malachite_nz::integer::Integer;
 use malachite_test::common::integer_to_rug_integer;
 use malachite_test::inputs::integer::{integers, pairs_of_integers, triples_of_integers};
@@ -30,7 +30,7 @@ fn cmp_properties() {
             integer_to_rug_integer(x).cmp_abs(&integer_to_rug_integer(y)),
             ord
         );
-        assert_eq!(x.abs_ref().cmp(&y.abs_ref()), ord);
+        assert_eq!(x.abs().cmp(&y.abs()), ord);
         assert_eq!((-x).cmp_abs(&(-y)), ord);
     });
 

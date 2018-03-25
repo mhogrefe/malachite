@@ -1,6 +1,6 @@
 use integer::Integer;
 use malachite_base::round::RoundingMode;
-use malachite_base::num::{ShrRound, ShrRoundAssign};
+use malachite_base::num::{ShrRound, ShrRoundAssign, UnsignedAbs};
 use std::ops::{Shr, ShrAssign};
 
 /// Shifts an `Integer` right (divides it by a power of 2 and takes the floor or multiplies it by a
@@ -75,7 +75,7 @@ impl<'a> Shr<i32> for &'a Integer {
         if other >= 0 {
             self >> (other as u32)
         } else {
-            self << (other.wrapping_abs() as u32)
+            self << other.unsigned_abs()
         }
     }
 }
@@ -122,7 +122,7 @@ impl ShrAssign<i32> for Integer {
         if other >= 0 {
             *self >>= other as u32;
         } else {
-            *self <<= other.wrapping_abs() as u32;
+            *self <<= other.unsigned_abs();
         }
     }
 }
@@ -228,7 +228,7 @@ impl<'a> ShrRound<i32> for &'a Integer {
         if other >= 0 {
             self.shr_round(other as u32, rm)
         } else {
-            self << (other.wrapping_abs() as u32)
+            self << other.unsigned_abs()
         }
     }
 }
@@ -301,7 +301,7 @@ impl ShrRoundAssign<i32> for Integer {
         if other >= 0 {
             self.shr_round_assign(other as u32, rm);
         } else {
-            *self <<= other.wrapping_abs() as u32;
+            *self <<= other.unsigned_abs();
         }
     }
 }

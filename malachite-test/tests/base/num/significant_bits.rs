@@ -5,7 +5,7 @@ use std::{i16, i32, i64, i8, u16, u32, u64, u8};
 
 fn significant_bits_helper_common<T: PrimitiveInteger>() {
     let test = |n, out| {
-        assert_eq!(T::from_u64(n).significant_bits(), out);
+        assert_eq!(T::checked_from(n).unwrap().significant_bits(), out);
     };
 
     test(0, 0);
@@ -15,14 +15,15 @@ fn significant_bits_helper_common<T: PrimitiveInteger>() {
     test(4, 3);
     test(5, 3);
     test(100, 7);
-    test(128, 8);
+    test(63, 6);
+    test(64, 7);
 }
 
 fn significant_bits_helper_unsigned<T: PrimitiveUnsigned>(max: u64) {
     significant_bits_helper_common::<T>();
 
     let test = |n, out: u64| {
-        assert_eq!(T::from_u64(n).significant_bits(), out);
+        assert_eq!(T::checked_from(n).unwrap().significant_bits(), out);
     };
 
     test(max, T::WIDTH.into());
@@ -32,7 +33,7 @@ fn significant_bits_helper_signed<T: PrimitiveSigned>(max: i64, min: i64) {
     significant_bits_helper_common::<T>();
 
     let test = |n, out: u64| {
-        assert_eq!(T::from_i64(n).significant_bits(), out);
+        assert_eq!(T::checked_from(n).unwrap().significant_bits(), out);
     };
 
     let width = T::WIDTH.into();

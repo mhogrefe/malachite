@@ -1,4 +1,5 @@
 use common::test_properties;
+use malachite_base::misc::{CheckedFrom, WrappingFrom};
 use malachite_base::num::{PrimitiveInteger, SignificantBits};
 use malachite_nz::natural::Natural;
 use malachite_test::inputs::natural::naturals;
@@ -6,9 +7,9 @@ use std::str::FromStr;
 use std::u64;
 
 #[test]
-fn test_to_u64() {
+fn test_u64_checked_from_natural() {
     let test = |n, out| {
-        assert_eq!(Natural::from_str(n).unwrap().to_u64(), out);
+        assert_eq!(u64::checked_from(&Natural::from_str(n).unwrap()), out);
     };
     test("0", Some(0));
     test("123", Some(123));
@@ -18,9 +19,9 @@ fn test_to_u64() {
 }
 
 #[test]
-fn test_to_u64_wrapping() {
+fn test_u64_wrapping_from_natural() {
     let test = |n, out| {
-        assert_eq!(Natural::from_str(n).unwrap().to_u64_wrapping(), out);
+        assert_eq!(u64::wrapping_from(&Natural::from_str(n).unwrap()), out);
     };
     test("0", 0);
     test("123", 123);
@@ -30,12 +31,12 @@ fn test_to_u64_wrapping() {
 }
 
 #[test]
-fn to_u64_properties() {
+fn u64_checked_from_natural_properties() {
     test_properties(naturals, |x| {
-        let result = x.to_u64();
+        let result = u64::checked_from(x);
         if x.significant_bits() <= u64::from(u64::WIDTH) {
             assert_eq!(Natural::from(result.unwrap()), *x);
-            assert_eq!(result, Some(x.to_u64_wrapping()));
+            assert_eq!(result, Some(u64::wrapping_from(x)));
         } else {
             assert!(result.is_none());
         }
@@ -43,9 +44,12 @@ fn to_u64_properties() {
 }
 
 #[test]
-fn to_u64_wrapping_properties() {
+fn u64_wrapping_from_natural_properties() {
     // TODO relate with BitAnd
     test_properties(naturals, |x| {
-        x.to_u64_wrapping();
+        assert_eq!(
+            u64::wrapping_from(x),
+            u64::checked_from(&x.mod_power_of_two_ref(u64::WIDTH)).unwrap()
+        );
     });
 }

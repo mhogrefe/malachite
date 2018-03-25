@@ -1,6 +1,5 @@
 use common::test_properties;
-use malachite_base::num::SignificantBits;
-use malachite_base::num::One;
+use malachite_base::num::{Abs, One, SignificantBits};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_test::common::{integer_to_bigint, integer_to_rug_integer};
@@ -37,7 +36,7 @@ fn significant_bits_properties() {
             significant_bits
         );
 
-        let x_abs = x.abs_ref();
+        let x_abs = x.abs();
         assert_eq!(x_abs <= u32::MAX, significant_bits <= 32);
         if x_abs != 0 {
             let n = significant_bits as u32;

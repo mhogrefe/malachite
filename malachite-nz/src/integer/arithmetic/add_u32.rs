@@ -1,4 +1,5 @@
 use integer::Integer;
+use malachite_base::misc::CheckedFrom;
 use malachite_base::num::Assign;
 use std::ops::{Add, AddAssign};
 
@@ -87,7 +88,7 @@ impl<'a> Add<u32> for &'a Integer {
                 }
             }
             // e.g. -5 + 10 or -5 + 5; self becomes non-negative
-            Integer { ref abs, .. } => Integer::from(other - abs.to_u32().unwrap()),
+            Integer { ref abs, .. } => Integer::from(other - u32::checked_from(abs).unwrap()),
         }
     }
 }
@@ -202,7 +203,7 @@ impl AddAssign<u32> for Integer {
                 ref mut abs,
             } => {
                 *sign = true;
-                let small_abs = abs.to_u32().unwrap();
+                let small_abs = u32::checked_from(&*abs).unwrap();
                 abs.assign(other - small_abs);
             }
         }

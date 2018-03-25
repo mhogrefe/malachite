@@ -1,6 +1,6 @@
 use common::test_properties;
 use malachite_base::round::RoundingMode;
-use malachite_base::num::{One, PartialOrdAbs, ShrRound, Zero};
+use malachite_base::num::{Abs, One, PartialOrdAbs, ShrRound, Zero};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_test::inputs::base::unsigneds;
@@ -327,7 +327,7 @@ fn rem_power_of_two_properties() {
         assert!(result.lt_abs(&(Natural::ONE << u)));
         assert_eq!(result == 0, n.divisible_by_power_of_two(u));
         assert_eq!(result.rem_power_of_two_ref(u), result);
-        assert_eq!(n.abs_ref().mod_power_of_two(u), result.abs_ref());
+        assert_eq!(n.abs().mod_power_of_two(u), result.abs());
     });
 
     test_properties(pairs_of_integer_and_small_u32_var_1, |&(ref n, u)| {

@@ -1,5 +1,5 @@
 use common::test_properties;
-use malachite_base::num::AbsAssign;
+use malachite_base::num::{Abs, AbsAssign, UnsignedAbs};
 use malachite_nz::integer::Integer;
 use malachite_test::common::{bigint_to_integer, integer_to_bigint, integer_to_rug_integer,
                              rug_integer_to_integer};
@@ -15,10 +15,18 @@ fn test_abs() {
         assert!(abs.is_valid());
         assert_eq!(abs.to_string(), out);
 
+        let abs = (&Integer::from_str(s).unwrap()).abs();
+        assert!(abs.is_valid());
+        assert_eq!(abs.to_string(), out);
+
         assert_eq!(BigInt::from_str(s).unwrap().abs().to_string(), out);
         assert_eq!(rug::Integer::from_str(s).unwrap().abs().to_string(), out);
 
-        let abs = Integer::from_str(s).unwrap().natural_abs();
+        let abs = Integer::from_str(s).unwrap().unsigned_abs();
+        assert!(abs.is_valid());
+        assert_eq!(abs.to_string(), out);
+
+        let abs = (&Integer::from_str(s).unwrap()).unsigned_abs();
         assert!(abs.is_valid());
         assert_eq!(abs.to_string(), out);
 
@@ -50,19 +58,19 @@ fn abs_properties() {
             abs
         );
 
-        let abs_alt = x.abs_ref();
+        let abs_alt = x.abs();
         assert!(abs_alt.is_valid());
         assert_eq!(abs_alt, abs);
 
         assert!(abs >= 0);
         assert_eq!(abs == *x, *x >= 0);
-        assert_eq!(abs.abs_ref(), abs);
+        assert_eq!((&abs).abs(), abs);
 
-        let abs_alt = x.clone().natural_abs();
+        let abs_alt = x.clone().unsigned_abs();
         assert!(abs_alt.is_valid());
         assert_eq!(Some(abs_alt), abs.to_natural());
 
-        let abs_alt = x.natural_abs_ref();
+        let abs_alt = x.unsigned_abs();
         assert!(abs_alt.is_valid());
         assert_eq!(Some(abs_alt), abs.to_natural());
     });

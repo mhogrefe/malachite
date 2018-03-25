@@ -1,5 +1,6 @@
 use integer::Integer;
-use malachite_base::num::{Assign, NegAssign};
+use malachite_base::misc::CheckedFrom;
+use malachite_base::num::{Assign, NegAssign, UnsignedAbs};
 use natural::Natural;
 use std::ops::{Sub, SubAssign};
 
@@ -67,7 +68,7 @@ impl<'a> Sub<i32> for &'a Integer {
         if *self == 0 {
             return -Integer::from(other);
         }
-        let abs_other = other.wrapping_abs() as u32;
+        let abs_other = other.unsigned_abs();
         match *self {
             // e.g. 10 - -5 or -10 - 5; sign of self is unchanged
             Integer { sign, ref abs } if sign == (other < 0) => Integer {
@@ -82,7 +83,7 @@ impl<'a> Sub<i32> for &'a Integer {
             // e.g. 5 - 10, -5 - -10, or -5 - -5; sign of self is flipped
             Integer { ref sign, ref abs } => Integer {
                 sign: !sign,
-                abs: Natural::from(abs_other - abs.to_u32().unwrap()),
+                abs: Natural::from(abs_other - u32::checked_from(abs).unwrap()),
             },
         }
     }
@@ -185,7 +186,7 @@ impl SubAssign<i32> for Integer {
             self.neg_assign();
             return;
         }
-        let abs_other = other.wrapping_abs() as u32;
+        let abs_other = other.unsigned_abs();
         match *self {
             // e.g. 10 - -5 or -10 - 5; sign of self is unchanged
             Integer { sign, ref mut abs } if sign == (other < 0) => *abs += abs_other,
@@ -199,7 +200,7 @@ impl SubAssign<i32> for Integer {
                 ref mut abs,
             } => {
                 *sign = !*sign;
-                let small_abs = abs.to_u32().unwrap();
+                let small_abs = u32::checked_from(&*abs).unwrap();
                 abs.assign(abs_other - small_abs);
             }
         }

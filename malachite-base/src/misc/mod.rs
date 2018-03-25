@@ -1,3 +1,57 @@
+pub trait CheckedFrom<T>: Sized {
+    fn checked_from(value: T) -> Option<Self>;
+}
+
+pub trait CheckedInto<T> {
+    /// Performs the conversion.
+    fn checked_into(self) -> Option<T>;
+}
+
+impl<T, U> CheckedInto<U> for T
+where
+    U: CheckedFrom<T>,
+{
+    fn checked_into(self) -> Option<U> {
+        U::checked_from(self)
+    }
+}
+
+pub trait WrappingFrom<T>: Sized {
+    fn wrapping_from(value: T) -> Self;
+}
+
+pub trait WrappingInto<T>: Sized {
+    /// Performs the conversion.
+    fn wrapping_into(self) -> T;
+}
+
+impl<T, U> WrappingInto<U> for T
+where
+    U: WrappingFrom<T>,
+{
+    fn wrapping_into(self) -> U {
+        U::wrapping_from(self)
+    }
+}
+
+pub trait BitwiseFrom<T>: Sized {
+    fn bitwise_from(value: T) -> Self;
+}
+
+pub trait BitwiseInto<T>: Sized {
+    /// Performs the conversion.
+    fn bitwise_into(self) -> T;
+}
+
+impl<T, U> BitwiseInto<U> for T
+where
+    U: BitwiseFrom<T>,
+{
+    fn bitwise_into(self) -> U {
+        U::bitwise_from(self)
+    }
+}
+
 /// This trait defines the minimum value of a type.
 pub trait Min {
     /// The minimum value of `Self`.

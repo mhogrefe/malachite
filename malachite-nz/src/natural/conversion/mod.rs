@@ -117,5 +117,5 @@ pub mod limb_count;
 pub mod to_bits;
 pub mod to_integer;
 pub mod to_limbs;
-pub mod to_u32;
-pub mod to_u64;
+pub mod u32_from_natural;
+pub mod u64_from_natural;
