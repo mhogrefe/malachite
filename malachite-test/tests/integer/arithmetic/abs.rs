@@ -1,4 +1,5 @@
 use common::test_properties;
+use malachite_base::misc::CheckedInto;
 use malachite_base::num::{Abs, AbsAssign, UnsignedAbs};
 use malachite_nz::integer::Integer;
 use malachite_test::common::{bigint_to_integer, integer_to_bigint, integer_to_rug_integer,
@@ -68,10 +69,10 @@ fn abs_properties() {
 
         let abs_alt = x.clone().unsigned_abs();
         assert!(abs_alt.is_valid());
-        assert_eq!(Some(abs_alt), abs.to_natural());
+        assert_eq!(Some(abs_alt), (&abs).checked_into());
 
         let abs_alt = x.unsigned_abs();
         assert!(abs_alt.is_valid());
-        assert_eq!(Some(abs_alt), abs.to_natural());
+        assert_eq!(Some(abs_alt), abs.checked_into());
     });
 }

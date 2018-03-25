@@ -284,7 +284,7 @@ fn mod_power_of_two_properties() {
     test_properties(pairs_of_integer_and_small_u32_var_2, |&(ref n, u)| {
         assert_ne!(n.mod_power_of_two_ref(u), 0);
         assert_eq!(
-            n.mod_power_of_two_ref(u).into_integer() - n.ceiling_mod_power_of_two_ref(u),
+            Integer::from(n.mod_power_of_two_ref(u)) - n.ceiling_mod_power_of_two_ref(u),
             Natural::ONE << u
         );
     });

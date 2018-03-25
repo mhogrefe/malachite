@@ -35,7 +35,7 @@ impl Integer {
             return Integer::ZERO;
         }
         if !limbs.last().unwrap().get_bit(31) {
-            Natural::from_limbs_asc(limbs).into_integer()
+            Natural::from_limbs_asc(limbs).into()
         } else {
             let mut limbs = limbs.to_vec();
             let mut borrow = true;

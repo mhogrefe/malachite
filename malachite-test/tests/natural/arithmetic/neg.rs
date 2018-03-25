@@ -1,4 +1,5 @@
 use common::test_properties;
+use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_test::common::{natural_to_rug_integer, rug_integer_to_integer};
 use malachite_test::inputs::natural::naturals;
@@ -36,7 +37,7 @@ fn neg_properties() {
 
         assert_eq!(rug_integer_to_integer(&(-natural_to_rug_integer(x))), neg);
 
-        assert_eq!(-x.to_integer(), neg);
+        assert_eq!(-Integer::from(x), neg);
         assert_eq!(neg == *x, *x == 0);
         assert_eq!(-neg, *x);
     });

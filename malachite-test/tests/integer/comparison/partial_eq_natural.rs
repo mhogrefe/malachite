@@ -40,7 +40,7 @@ fn partial_eq_natural_properties() {
     test_properties(pairs_of_integer_and_natural, |&(ref x, ref y)| {
         let eq = x == y;
         assert_eq!(y == x, eq);
-        assert_eq!(*x == y.to_integer(), eq);
+        assert_eq!(*x == Integer::from(y), eq);
         assert_eq!(integer_to_rug_integer(x) == natural_to_rug_integer(y), eq);
     });
 }

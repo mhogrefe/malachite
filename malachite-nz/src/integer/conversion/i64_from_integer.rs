@@ -33,7 +33,7 @@ impl<'a> CheckedFrom<&'a Integer> for i64 {
     /// }
     /// ```
     fn checked_from(value: &Integer) -> Option<i64> {
-        if value.significant_bits() < 64 || *value == -((Natural::ONE << 63u32).into_integer()) {
+        if value.significant_bits() < 64 || *value == Integer::from(-(Natural::ONE << 63u32)) {
             Some(i64::wrapping_from(value))
         } else {
             None

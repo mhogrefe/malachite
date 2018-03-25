@@ -55,7 +55,7 @@ fn test_i64_wrapping_from_integer() {
 fn i64_checked_from_integer_properties() {
     test_properties(integers, |x| {
         let result = i64::checked_from(x);
-        if x.significant_bits() < 64 || *x == -((Natural::ONE << 63u32).into_integer()) {
+        if x.significant_bits() < 64 || *x == -(Natural::ONE << 63u32) {
             assert_eq!(Integer::from(result.unwrap()), *x);
             assert_eq!(result, Some(i64::wrapping_from(x)));
         } else {

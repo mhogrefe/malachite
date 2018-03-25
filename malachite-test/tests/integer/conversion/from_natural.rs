@@ -1,16 +1,18 @@
 use common::test_properties;
+use malachite_base::misc::CheckedFrom;
+use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_test::inputs::natural::naturals;
 use std::str::FromStr;
 
 #[test]
-fn test_into_integer() {
+fn test_from_natural() {
     let test = |s| {
-        let x = Natural::from_str(s).unwrap().into_integer();
+        let x = Integer::from(Natural::from_str(s).unwrap());
         assert!(x.is_valid());
         assert_eq!(x.to_string(), s);
 
-        let x = Natural::from_str(s).unwrap().to_integer();
+        let x = Integer::from(&Natural::from_str(s).unwrap());
         assert!(x.is_valid());
         assert_eq!(x.to_string(), s);
     };
@@ -22,17 +24,17 @@ fn test_into_integer() {
 }
 
 #[test]
-fn to_integer_properties() {
+fn from_natural_properties() {
     test_properties(naturals, |x| {
-        let integer_x = x.clone().into_integer();
+        let integer_x = Integer::from(x.clone());
         assert!(integer_x.is_valid());
         assert_eq!(integer_x.to_string(), x.to_string());
 
-        let integer_x_alt = x.to_integer();
+        let integer_x_alt = Integer::from(x);
         assert!(integer_x_alt.is_valid());
         assert_eq!(integer_x_alt, integer_x);
 
-        assert_eq!(integer_x.to_natural().as_ref(), Some(x));
-        assert_eq!(integer_x.into_natural().as_ref(), Some(x));
+        assert_eq!(Natural::checked_from(&integer_x).as_ref(), Some(x));
+        assert_eq!(Natural::checked_from(integer_x).as_ref(), Some(x));
     });
 }

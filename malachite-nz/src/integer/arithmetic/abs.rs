@@ -2,6 +2,40 @@ use integer::Integer;
 use malachite_base::num::{Abs, AbsAssign, UnsignedAbs};
 use natural::Natural;
 
+/// Replaces an `Integer` with its absolute value.
+///
+/// Time: worst case O(1)
+///
+/// Additional memory: worst case O(1)
+///
+/// # Examples
+/// ```
+/// extern crate malachite_base;
+/// extern crate malachite_nz;
+///
+/// use malachite_base::num::{AbsAssign, Zero};
+/// use malachite_nz::integer::Integer;
+///
+/// fn main() {
+///     let mut x = Integer::ZERO;
+///     x.abs_assign();
+///     assert_eq!(x.to_string(), "0");
+///
+///     let mut x = Integer::from(123);
+///     x.abs_assign();
+///     assert_eq!(x.to_string(), "123");
+///
+///     let mut x = Integer::from(-123);
+///     x.abs_assign();
+///     assert_eq!(x.to_string(), "123");
+/// }
+/// ```
+impl AbsAssign for Integer {
+    fn abs_assign(&mut self) {
+        self.sign = true;
+    }
+}
+
 impl Abs for Integer {
     type Output = Integer;
 
@@ -124,7 +158,8 @@ impl<'a> UnsignedAbs for &'a Integer {
     }
 }
 
-/// Replaces an `Integer` with its absolute value.
+/// Finds the absolute value of an `Integer`, taking the `Integer` by reference and returning a
+/// reference to the internal `Natural` absolute value.
 ///
 /// Time: worst case O(1)
 ///
@@ -135,25 +170,17 @@ impl<'a> UnsignedAbs for &'a Integer {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::{AbsAssign, Zero};
+/// use malachite_base::num::Zero;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {
-///     let mut x = Integer::ZERO;
-///     x.abs_assign();
-///     assert_eq!(x.to_string(), "0");
-///
-///     let mut x = Integer::from(123);
-///     x.abs_assign();
-///     assert_eq!(x.to_string(), "123");
-///
-///     let mut x = Integer::from(-123);
-///     x.abs_assign();
-///     assert_eq!(x.to_string(), "123");
+///     assert_eq!(Integer::ZERO.unsigned_abs_ref().to_string(), "0");
+///     assert_eq!(Integer::from(123).unsigned_abs_ref().to_string(), "123");
+///     assert_eq!(Integer::from(-123).unsigned_abs_ref().to_string(), "123");
 /// }
 /// ```
-impl AbsAssign for Integer {
-    fn abs_assign(&mut self) {
-        self.sign = true;
+impl Integer {
+    pub fn unsigned_abs_ref(&self) -> &Natural {
+        &self.abs
     }
 }

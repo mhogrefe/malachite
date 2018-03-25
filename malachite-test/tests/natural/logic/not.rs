@@ -1,4 +1,5 @@
 use common::test_properties;
+use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_test::common::{natural_to_rug_integer, rug_integer_to_integer};
 use malachite_test::inputs::natural::naturals;
@@ -38,7 +39,7 @@ fn not_properties() {
         assert_eq!(not_alt, not);
 
         assert!(not < 0);
-        assert_eq!(!x.to_integer(), not);
+        assert_eq!(!Integer::from(x), not);
         assert_ne!(not, *x);
         assert_eq!(!&not, *x);
     });

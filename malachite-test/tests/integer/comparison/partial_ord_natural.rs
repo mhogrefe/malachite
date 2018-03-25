@@ -42,7 +42,7 @@ fn test_partial_ord_integer_natural() {
 fn partial_cmp_integer_natural_properties() {
     test_properties(pairs_of_integer_and_natural, |&(ref x, ref y)| {
         let cmp = x.partial_cmp(y);
-        assert_eq!(x.cmp(&y.to_integer()), cmp.unwrap());
+        assert_eq!(x.cmp(&y.into()), cmp.unwrap());
         assert_eq!(
             integer_to_rug_integer(x).partial_cmp(&natural_to_rug_integer(y)),
             cmp

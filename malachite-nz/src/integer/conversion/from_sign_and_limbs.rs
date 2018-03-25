@@ -52,7 +52,7 @@ impl Integer {
         );
         match sign {
             Ordering::Equal => Integer::ZERO,
-            Ordering::Greater => Natural::from_limbs_asc(limbs).into_integer(),
+            Ordering::Greater => Natural::from_limbs_asc(limbs).into(),
             Ordering::Less => -Natural::from_limbs_asc(limbs),
         }
     }
@@ -104,7 +104,7 @@ impl Integer {
         );
         match sign {
             Ordering::Equal => Integer::ZERO,
-            Ordering::Greater => Natural::from_limbs_desc(limbs).into_integer(),
+            Ordering::Greater => Natural::from_limbs_desc(limbs).into(),
             Ordering::Less => -Natural::from_limbs_desc(limbs),
         }
     }
@@ -159,7 +159,7 @@ impl Integer {
         );
         match sign {
             Ordering::Equal => Integer::ZERO,
-            Ordering::Greater => Natural::from_owned_limbs_asc(limbs).into_integer(),
+            Ordering::Greater => Natural::from_owned_limbs_asc(limbs).into(),
             Ordering::Less => -Natural::from_owned_limbs_asc(limbs),
         }
     }
@@ -214,7 +214,7 @@ impl Integer {
         );
         match sign {
             Ordering::Equal => Integer::ZERO,
-            Ordering::Greater => Natural::from_owned_limbs_desc(limbs).into_integer(),
+            Ordering::Greater => Natural::from_owned_limbs_desc(limbs).into(),
             Ordering::Less => -Natural::from_owned_limbs_desc(limbs),
         }
     }

@@ -1,16 +1,18 @@
 use common::test_properties;
+use malachite_base::misc::CheckedFrom;
 use malachite_nz::integer::Integer;
+use malachite_nz::natural::Natural;
 use malachite_test::inputs::integer::integers;
 use std::str::FromStr;
 
 #[test]
-fn test_into_natural() {
+fn test_from_integer() {
     let test = |n, out| {
-        let on = Integer::from_str(n).unwrap().into_natural();
+        let on = Natural::checked_from(Integer::from_str(n).unwrap());
         assert_eq!(format!("{:?}", on), out);
         assert!(on.map_or(true, |n| n.is_valid()));
 
-        let on = Integer::from_str(n).unwrap().to_natural();
+        let on = Natural::checked_from(&Integer::from_str(n).unwrap());
         assert_eq!(format!("{:?}", on), out);
         assert!(on.map_or(true, |n| n.is_valid()));
     };
@@ -26,19 +28,19 @@ fn test_into_natural() {
 }
 
 #[test]
-fn to_natural_properties() {
+fn from_integer_properties() {
     test_properties(integers, |x| {
-        let natural_x = x.clone().into_natural();
+        let natural_x = Natural::checked_from(x.clone());
         assert!(natural_x.as_ref().map_or(true, |n| n.is_valid()));
 
-        let natural_x = x.to_natural();
+        let natural_x = Natural::checked_from(x);
         assert!(natural_x.as_ref().map_or(true, |n| n.is_valid()));
 
         assert_eq!(natural_x.is_some(), *x >= 0);
         if let Some(n) = natural_x {
             assert_eq!(n.to_string(), x.to_string());
-            assert_eq!(n.to_integer(), *x);
-            assert_eq!(n.into_integer(), *x);
+            assert_eq!(Integer::from(&n), *x);
+            assert_eq!(Integer::from(n), *x);
         }
     });
 }
