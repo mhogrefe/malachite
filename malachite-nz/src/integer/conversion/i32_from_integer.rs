@@ -2,20 +2,6 @@ use integer::Integer;
 use malachite_base::misc::{CheckedFrom, WrappingFrom};
 use std::i32;
 
-//TODO is this necessary?
-impl CheckedFrom<Integer> for i32 {
-    fn checked_from(value: Integer) -> Option<i32> {
-        i32::checked_from(&value)
-    }
-}
-
-//TODO is this necessary?
-impl WrappingFrom<Integer> for i32 {
-    fn wrapping_from(value: Integer) -> i32 {
-        i32::wrapping_from(&value)
-    }
-}
-
 impl<'a> CheckedFrom<&'a Integer> for i32 {
     /// an `i32`.
     ///

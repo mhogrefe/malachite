@@ -2,20 +2,6 @@ use malachite_base::misc::{CheckedFrom, WrappingFrom};
 use malachite_base::num::JoinHalves;
 use natural::Natural::{self, Large, Small};
 
-//TODO is this necessary?
-impl CheckedFrom<Natural> for u64 {
-    fn checked_from(value: Natural) -> Option<u64> {
-        u64::checked_from(&value)
-    }
-}
-
-//TODO is this necessary?
-impl WrappingFrom<Natural> for u64 {
-    fn wrapping_from(value: Natural) -> u64 {
-        u64::wrapping_from(&value)
-    }
-}
-
 impl<'a> CheckedFrom<&'a Natural> for u64 {
     /// Converts a `Natural` to a `u64`, returning `None` if the `Natural` is too large.
     ///

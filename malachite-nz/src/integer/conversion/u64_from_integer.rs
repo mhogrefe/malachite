@@ -1,20 +1,6 @@
 use integer::Integer;
 use malachite_base::misc::{CheckedFrom, WrappingFrom};
 
-//TODO is this necessary?
-impl CheckedFrom<Integer> for u64 {
-    fn checked_from(value: Integer) -> Option<u64> {
-        u64::checked_from(&value)
-    }
-}
-
-//TODO is this necessary?
-impl WrappingFrom<Integer> for u64 {
-    fn wrapping_from(value: Integer) -> u64 {
-        u64::wrapping_from(&value)
-    }
-}
-
 impl<'a> CheckedFrom<&'a Integer> for u64 {
     /// Converts an `Integer` to a `u64`, returning `None` if the `Integer` is negative or too
     /// large.

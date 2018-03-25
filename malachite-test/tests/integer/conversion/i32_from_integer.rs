@@ -61,6 +61,6 @@ fn i32_wrapping_from_integer_properties() {
     test_properties(integers, |x| {
         let result = i32::wrapping_from(x);
         assert_eq!(integer_to_rug_integer(x).to_i32_wrapping(), result);
-        assert_eq!(-result, i32::wrapping_from(-x));
+        assert_eq!(-result, i32::wrapping_from(&-x));
     });
 }

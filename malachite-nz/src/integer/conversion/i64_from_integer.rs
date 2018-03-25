@@ -3,20 +3,6 @@ use malachite_base::misc::{CheckedFrom, WrappingFrom};
 use malachite_base::num::{One, SignificantBits};
 use natural::Natural;
 
-//TODO is this necessary?
-impl CheckedFrom<Integer> for i64 {
-    fn checked_from(value: Integer) -> Option<i64> {
-        i64::checked_from(&value)
-    }
-}
-
-//TODO is this necessary?
-impl WrappingFrom<Integer> for i64 {
-    fn wrapping_from(value: Integer) -> i64 {
-        i64::wrapping_from(&value)
-    }
-}
-
 impl<'a> CheckedFrom<&'a Integer> for i64 {
     /// Converts an `Integer` to an `i64`, returning `None` if the `Integer` is outside the range of
     /// an `i64`.

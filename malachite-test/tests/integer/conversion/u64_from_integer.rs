@@ -65,7 +65,7 @@ fn u64_wrapping_from_integer_properties() {
     // TODO relate with BitAnd
     test_properties(integers, |x| {
         let result = u64::wrapping_from(x);
-        assert_eq!(result.wrapping_add(u64::wrapping_from(-x)), 0);
+        assert_eq!(result.wrapping_add(u64::wrapping_from(&-x)), 0);
         assert_eq!(
             result,
             u64::checked_from(&x.mod_power_of_two_ref(u64::WIDTH)).unwrap()

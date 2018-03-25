@@ -61,7 +61,7 @@ fn u32_wrapping_from_integer_properties() {
     test_properties(integers, |x| {
         let result = u32::wrapping_from(x);
         assert_eq!(integer_to_rug_integer(x).to_u32_wrapping(), result);
-        assert_eq!(result.wrapping_add(u32::wrapping_from(-x)), 0);
+        assert_eq!(result.wrapping_add(u32::wrapping_from(&-x)), 0);
         assert_eq!(
             result,
             u32::checked_from(&x.mod_power_of_two_ref(u32::WIDTH)).unwrap()

@@ -69,6 +69,6 @@ fn i64_wrapping_from_integer_properties() {
     // TODO relate with BitAnd
     test_properties(integers, |x| {
         let result = i64::wrapping_from(x);
-        assert_eq!(-result, i64::wrapping_from(-x));
+        assert_eq!(-result, i64::wrapping_from(&-x));
     });
 }
