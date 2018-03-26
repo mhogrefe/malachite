@@ -1,5 +1,5 @@
 use malachite_base::num::{BitAccess, PrimitiveInteger};
-use natural::{Natural, LIMB_BITS_MASK};
+use natural::Natural;
 
 /// Converts a slice of bits in ascending order to a `Vec` of limbs in ascending order. There may be
 /// trailing zero limbs.
@@ -29,7 +29,7 @@ pub fn limbs_asc_from_bits_asc(bits: &[bool]) -> Vec<u32> {
         return Vec::new();
     }
     let mut limb_count = bits.len() >> u32::LOG_WIDTH;
-    let remainder = bits.len() & (LIMB_BITS_MASK as usize);
+    let remainder = bits.len() & (u32::WIDTH_MASK as usize);
     if remainder != 0 {
         limb_count += 1;
     }
@@ -78,7 +78,7 @@ pub fn limbs_asc_from_bits_desc(bits: &[bool]) -> Vec<u32> {
         return Vec::new();
     }
     let mut limb_count = bits.len() >> u32::LOG_WIDTH;
-    let remainder = bits.len() & (LIMB_BITS_MASK as usize);
+    let remainder = bits.len() & (u32::WIDTH_MASK as usize);
     if remainder != 0 {
         limb_count += 1;
     }

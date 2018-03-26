@@ -1,19 +1,18 @@
 use malachite_base::limbs::{limbs_delete_left, limbs_test_zero};
-use malachite_base::num::{BitAccess, One, ShrRound, ShrRoundAssign, Zero};
+use malachite_base::num::{BitAccess, One, PrimitiveInteger, ShrRound, ShrRoundAssign, Zero};
 use malachite_base::round::RoundingMode;
-use natural::{LIMB_BITS, LIMB_BITS_MASK, LOG_LIMB_BITS};
 use natural::Natural::{self, Large, Small};
 use std::ops::{Shr, ShrAssign};
 
 // Shift u right by bits, and write the result to r. The bits shifted out at the right are returned
 // in the most significant bits of the return value (the rest of the return value is zero).
-// u.len() > 0, r.len() >= u.len(), 1 <= bits < LIMB_BITS
+// u.len() > 0, r.len() >= u.len(), 1 <= bits < u32::WIDTH
 pub fn mpn_rshift(r: &mut [u32], u: &[u32], bits: u32) -> u32 {
     let u_len = u.len();
     assert!(u_len > 0);
     assert!(bits > 0);
-    assert!(bits < LIMB_BITS);
-    let cobits = LIMB_BITS - bits;
+    assert!(bits < u32::WIDTH);
+    let cobits = u32::WIDTH - bits;
     let mut high_limb = u[0];
     let remaining_bits = high_limb << cobits;
     let mut low_limb = high_limb >> bits;
@@ -28,12 +27,12 @@ pub fn mpn_rshift(r: &mut [u32], u: &[u32], bits: u32) -> u32 {
 
 // Shift u right by bits, and write the result to u. The bits shifted out at the right are returned
 // in the most significant bits of the return value (the rest of the return value is zero).
-// u.len() > 0, 1 <= bits < LIMB_BITS
+// u.len() > 0, 1 <= bits < u32::WIDTH
 pub fn mpn_rshift_in_place(u: &mut [u32], bits: u32) -> u32 {
     assert!(!u.is_empty());
     assert!(bits > 0);
-    assert!(bits < LIMB_BITS);
-    let cobits = LIMB_BITS - bits;
+    assert!(bits < u32::WIDTH);
+    let cobits = u32::WIDTH - bits;
     let mut high_limb = u[0];
     let remaining_bits = high_limb << cobits;
     let mut low_limb = high_limb >> bits;
@@ -105,14 +104,14 @@ impl<'a> Shr<u32> for &'a Natural {
             return self.clone();
         }
         match *self {
-            Small(_) if other >= 32 => Natural::ZERO,
+            Small(_) if other >= u32::WIDTH => Natural::ZERO,
             Small(small) => Small(small >> other),
             Large(ref limbs) => {
-                let limbs_to_delete = (other >> LOG_LIMB_BITS) as usize;
+                let limbs_to_delete = (other >> u32::LOG_WIDTH) as usize;
                 if limbs_to_delete >= limbs.len() {
                     Natural::ZERO
                 } else {
-                    let small_shift = other & LIMB_BITS_MASK;
+                    let small_shift = other & u32::WIDTH_MASK;
                     let mut result = limbs[limbs_to_delete..].to_vec();
                     if small_shift != 0 {
                         mpn_rshift_in_place(&mut result, small_shift);
@@ -127,11 +126,11 @@ impl<'a> Shr<u32> for &'a Natural {
 }
 
 fn shr_helper(limbs: &mut Vec<u32>, other: u32) {
-    let limbs_to_delete = (other >> LOG_LIMB_BITS) as usize;
+    let limbs_to_delete = (other >> u32::LOG_WIDTH) as usize;
     if limbs_to_delete >= limbs.len() {
         limbs.clear();
     } else {
-        let small_shift = other & LIMB_BITS_MASK;
+        let small_shift = other & u32::WIDTH_MASK;
         limbs_delete_left(limbs, limbs_to_delete);
         if small_shift != 0 {
             mpn_rshift_in_place(limbs, small_shift);
@@ -162,7 +161,7 @@ impl ShrAssign<u32> for Natural {
             return;
         }
         match *self {
-            Small(ref mut small) if other >= 32 => *small = 0,
+            Small(ref mut small) if other >= u32::WIDTH => *small = 0,
             Small(ref mut small) => {
                 *small >>= other;
                 return;
@@ -266,9 +265,9 @@ impl<'a> ShrRound<u32> for &'a Natural {
         let opt_result = match *self {
             Small(ref small) => {
                 return Small(match rm {
-                    RoundingMode::Down | RoundingMode::Floor if other >= 32 => 0,
+                    RoundingMode::Down | RoundingMode::Floor if other >= u32::WIDTH => 0,
                     RoundingMode::Down | RoundingMode::Floor => *small >> other,
-                    RoundingMode::Up | RoundingMode::Ceiling if other >= 32 => 1,
+                    RoundingMode::Up | RoundingMode::Ceiling if other >= u32::WIDTH => 1,
                     RoundingMode::Up | RoundingMode::Ceiling => {
                         let shifted = *small >> other;
                         if shifted << other == *small {
@@ -277,8 +276,12 @@ impl<'a> ShrRound<u32> for &'a Natural {
                             shifted + 1
                         }
                     }
-                    RoundingMode::Nearest if other == 32 && *small > (1u32 << 31) => 1,
-                    RoundingMode::Nearest if other >= 32 => 0,
+                    RoundingMode::Nearest
+                        if other == u32::WIDTH && *small > (1u32 << (u32::WIDTH - 1)) =>
+                    {
+                        1
+                    }
+                    RoundingMode::Nearest if other >= u32::WIDTH => 0,
                     RoundingMode::Nearest => {
                         let mostly_shifted = small >> (other - 1);
                         if (mostly_shifted & 1) == 0 {
@@ -297,7 +300,7 @@ impl<'a> ShrRound<u32> for &'a Natural {
                             }
                         }
                     }
-                    RoundingMode::Exact if other >= 32 => {
+                    RoundingMode::Exact if other >= u32::WIDTH => {
                         panic!("Right shift is not exact: {} >> {}", *small, other);
                     }
                     RoundingMode::Exact => {
@@ -311,11 +314,11 @@ impl<'a> ShrRound<u32> for &'a Natural {
             }
             Large(ref limbs) => match rm {
                 RoundingMode::Down | RoundingMode::Floor => {
-                    let limbs_to_delete = (other >> LOG_LIMB_BITS) as usize;
+                    let limbs_to_delete = (other >> u32::LOG_WIDTH) as usize;
                     let result = if limbs_to_delete >= limbs.len() {
                         return Natural::ZERO;
                     } else {
-                        let small_shift = other & LIMB_BITS_MASK;
+                        let small_shift = other & u32::WIDTH_MASK;
                         let mut result = limbs[limbs_to_delete..].to_vec();
                         if small_shift != 0 {
                             mpn_rshift_in_place(&mut result, small_shift);
@@ -325,12 +328,12 @@ impl<'a> ShrRound<u32> for &'a Natural {
                     Some(result)
                 }
                 RoundingMode::Up | RoundingMode::Ceiling => {
-                    let limbs_to_delete = (other >> LOG_LIMB_BITS) as usize;
+                    let limbs_to_delete = (other >> u32::LOG_WIDTH) as usize;
                     if limbs_to_delete >= limbs.len() {
                         return Natural::ONE;
                     } else {
                         let mut exact = limbs_test_zero(&limbs[0..limbs_to_delete]);
-                        let small_shift = other & LIMB_BITS_MASK;
+                        let small_shift = other & u32::WIDTH_MASK;
                         let mut result = limbs[limbs_to_delete..].to_vec();
                         if small_shift != 0 {
                             let remaining_bits = mpn_rshift_in_place(&mut result, small_shift);
@@ -345,11 +348,11 @@ impl<'a> ShrRound<u32> for &'a Natural {
                     }
                 }
                 RoundingMode::Exact => {
-                    let limbs_to_delete = (other >> LOG_LIMB_BITS) as usize;
+                    let limbs_to_delete = (other >> u32::LOG_WIDTH) as usize;
                     if limbs_to_delete >= limbs.len() {
                         panic!("Right shift is not exact: {} >> {}", self, other);
                     } else {
-                        let small_shift = other & LIMB_BITS_MASK;
+                        let small_shift = other & u32::WIDTH_MASK;
                         let mut result = limbs[limbs_to_delete..].to_vec();
                         if small_shift != 0 && mpn_rshift_in_place(&mut result, small_shift) != 0 {
                             panic!("Right shift is not exact: {} >> {}", self, other);
@@ -365,14 +368,14 @@ impl<'a> ShrRound<u32> for &'a Natural {
             None => {
                 match rm {
                     RoundingMode::Nearest => {
-                        let limbs_to_delete = (other >> LOG_LIMB_BITS) as usize;
+                        let limbs_to_delete = (other >> u32::LOG_WIDTH) as usize;
                         if !self.get_bit((other - 1).into()) {
                             // round down
                             if let Large(ref limbs) = *self {
                                 if limbs_to_delete >= limbs.len() {
                                     return Natural::ZERO;
                                 } else {
-                                    let small_shift = other & LIMB_BITS_MASK;
+                                    let small_shift = other & u32::WIDTH_MASK;
                                     let mut result = limbs[limbs_to_delete..].to_vec();
                                     if small_shift != 0 {
                                         mpn_rshift_in_place(&mut result, small_shift);
@@ -389,7 +392,7 @@ impl<'a> ShrRound<u32> for &'a Natural {
                                     Natural::ONE
                                 } else {
                                     let mut exact = limbs_test_zero(&limbs[0..limbs_to_delete]);
-                                    let small_shift = other & LIMB_BITS_MASK;
+                                    let small_shift = other & u32::WIDTH_MASK;
                                     let mut result = limbs[limbs_to_delete..].to_vec();
                                     if small_shift != 0 {
                                         let remaining_bits =
@@ -412,7 +415,7 @@ impl<'a> ShrRound<u32> for &'a Natural {
                                 if limbs_to_delete >= limbs.len() {
                                     return Natural::ZERO;
                                 } else {
-                                    let small_shift = other & LIMB_BITS_MASK;
+                                    let small_shift = other & u32::WIDTH_MASK;
                                     let mut result = limbs[limbs_to_delete..].to_vec();
                                     if small_shift != 0 {
                                         mpn_rshift_in_place(&mut result, small_shift);
@@ -502,9 +505,9 @@ impl ShrRoundAssign<u32> for Natural {
         let needs_more_work = match *self {
             Small(ref mut small) => {
                 match rm {
-                    RoundingMode::Down | RoundingMode::Floor if other >= 32 => *small = 0,
+                    RoundingMode::Down | RoundingMode::Floor if other >= u32::WIDTH => *small = 0,
                     RoundingMode::Down | RoundingMode::Floor => *small >>= other,
-                    RoundingMode::Up | RoundingMode::Ceiling if other >= 32 => *small = 1,
+                    RoundingMode::Up | RoundingMode::Ceiling if other >= u32::WIDTH => *small = 1,
                     RoundingMode::Up | RoundingMode::Ceiling => {
                         let original = *small;
                         *small >>= other;
@@ -512,8 +515,10 @@ impl ShrRoundAssign<u32> for Natural {
                             *small += 1
                         }
                     }
-                    RoundingMode::Nearest if other == 32 && *small > (1u32 << 31) => *small = 1,
-                    RoundingMode::Nearest if other >= 32 => *small = 0,
+                    RoundingMode::Nearest if other == u32::WIDTH && *small > (1u32 << 31) => {
+                        *small = 1
+                    }
+                    RoundingMode::Nearest if other >= u32::WIDTH => *small = 0,
                     RoundingMode::Nearest => {
                         let original = *small;
                         *small >>= other - 1;
@@ -532,7 +537,7 @@ impl ShrRoundAssign<u32> for Natural {
                             }
                         }
                     }
-                    RoundingMode::Exact if other >= 32 => {
+                    RoundingMode::Exact if other >= u32::WIDTH => {
                         panic!("Right shift is not exact: {} >>= {}", *small, other);
                     }
                     RoundingMode::Exact => {

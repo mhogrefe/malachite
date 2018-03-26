@@ -1,4 +1,4 @@
-use natural::LOG_LIMB_BITS;
+use malachite_base::num::PrimitiveInteger;
 use natural::Natural::{self, Large, Small};
 
 impl Natural {
@@ -34,7 +34,7 @@ impl Natural {
             Large(ref limbs) => {
                 let zero_limbs = limbs.iter().take_while(|&&limb| limb == 0).count();
                 let remaining_zeros = u64::from(limbs[zero_limbs].trailing_zeros());
-                Some(((zero_limbs as u64) << LOG_LIMB_BITS) + remaining_zeros)
+                Some(((zero_limbs as u64) << u32::LOG_WIDTH) + remaining_zeros)
             }
         }
     }

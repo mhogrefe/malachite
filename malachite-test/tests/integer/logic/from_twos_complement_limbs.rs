@@ -1,5 +1,5 @@
 use common::test_properties;
-use malachite_base::num::BitAccess;
+use malachite_base::num::{BitAccess, PrimitiveInteger};
 use malachite_nz::integer::Integer;
 use malachite_test::inputs::base::vecs_of_unsigned;
 use std::cmp::Ordering;
@@ -105,6 +105,8 @@ fn trim_be_limbs(xs: &mut Vec<u32>) {
     }
 }
 
+const LAST_INDEX: u64 = u32::WIDTH as u64 - 1;
+
 #[test]
 fn from_twos_complement_limbs_asc_properties() {
     test_properties(vecs_of_unsigned, |limbs: &Vec<u32>| {
@@ -125,12 +127,14 @@ fn from_twos_complement_limbs_asc_properties() {
             Ordering::Equal => limbs.is_empty(),
             Ordering::Greater => {
                 let last = *limbs.last().unwrap();
-                !last.get_bit(31) && (last != 0 || limbs[limbs.len() - 2].get_bit(31))
+                !last.get_bit(LAST_INDEX)
+                    && (last != 0 || limbs[limbs.len() - 2].get_bit(LAST_INDEX))
             }
             Ordering::Less => {
                 let last = *limbs.last().unwrap();
-                last.get_bit(31)
-                    && (last != !0 || limbs.len() <= 1 || !limbs[limbs.len() - 2].get_bit(31))
+                last.get_bit(LAST_INDEX)
+                    && (last != !0 || limbs.len() <= 1
+                        || !limbs[limbs.len() - 2].get_bit(LAST_INDEX))
             }
         } {
             assert_eq!(x.twos_complement_limbs_asc(), *limbs);
@@ -157,11 +161,12 @@ fn from_twos_complement_limbs_desc_properties() {
             Ordering::Equal => limbs.is_empty(),
             Ordering::Greater => {
                 let first = limbs[0];
-                !first.get_bit(31) && (first != 0 || limbs[1].get_bit(31))
+                !first.get_bit(LAST_INDEX) && (first != 0 || limbs[1].get_bit(LAST_INDEX))
             }
             Ordering::Less => {
                 let first = limbs[0];
-                first.get_bit(31) && (first != !0 || limbs.len() <= 1 || !limbs[1].get_bit(31))
+                first.get_bit(LAST_INDEX)
+                    && (first != !0 || limbs.len() <= 1 || !limbs[1].get_bit(LAST_INDEX))
             }
         } {
             assert_eq!(x.twos_complement_limbs_desc(), *limbs);

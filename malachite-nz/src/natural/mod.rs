@@ -3,10 +3,6 @@ use malachite_base::num::{One, Two, Zero};
 use natural::Natural::*;
 use std::str::FromStr;
 
-pub const LOG_LIMB_BITS: u32 = 5;
-pub const LIMB_BITS: u32 = 1 << LOG_LIMB_BITS;
-pub const LIMB_BITS_MASK: u32 = LIMB_BITS - 1;
-
 /// A natural (non-negative) integer.
 ///
 /// Any `Natural` small enough to fit into an `u32` is represented inline. Only naturals outside

@@ -1,6 +1,6 @@
 use malachite_base::num::{BitAccess, PrimitiveInteger, SignificantBits};
 use natural::conversion::to_limbs::LimbIterator;
-use natural::{Natural, LIMB_BITS_MASK};
+use natural::Natural;
 use std::ops::Index;
 
 /// A double-ended iterator over the bits of a `Natural`. The forward order is ascending (least-
@@ -359,7 +359,7 @@ impl Natural {
         } else {
             bits.current_limb_back = bits.current_limb_forward;
         }
-        let remainder = significant_bits & u64::from(LIMB_BITS_MASK);
+        let remainder = significant_bits & u64::from(u32::WIDTH_MASK);
         if remainder != 0 {
             bits.j = remainder - 1;
         } else {

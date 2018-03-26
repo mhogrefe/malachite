@@ -1,6 +1,5 @@
 use integer::Integer;
-use malachite_base::num::BitAccess;
-use natural::{LIMB_BITS, LIMB_BITS_MASK, LOG_LIMB_BITS};
+use malachite_base::num::{BitAccess, PrimitiveInteger};
 use natural::arithmetic::add_u32::mpn_add_1_in_place;
 use natural::arithmetic::sub_u32::mpn_sub_1_in_place;
 use natural::Natural::{self, Large, Small};
@@ -193,9 +192,9 @@ impl BitAccess for Integer {
 impl Natural {
     fn get_bit_neg(&self, index: u64) -> bool {
         match *self {
-            Small(small) => index >= LIMB_BITS.into() || (!small).wrapping_add(1).get_bit(index),
+            Small(small) => index >= u32::WIDTH.into() || (!small).wrapping_add(1).get_bit(index),
             Large(ref xs) => {
-                let limb_index = (index >> LOG_LIMB_BITS) as usize;
+                let limb_index = (index >> u32::LOG_WIDTH) as usize;
                 if limb_index >= xs.len() {
                     // We're indexing into the infinite suffix of 1s
                     return true;
@@ -207,7 +206,7 @@ impl Natural {
                 } else {
                     !xs[limb_index]
                 };
-                limb.get_bit(index & u64::from(LIMB_BITS_MASK))
+                limb.get_bit(index & u64::from(u32::WIDTH_MASK))
             }
         }
     }
@@ -216,7 +215,7 @@ impl Natural {
     fn set_bit_neg(&mut self, index: u64) {
         match *self {
             Small(ref mut small) => {
-                if index < LIMB_BITS.into() {
+                if index < u32::WIDTH.into() {
                     *small -= 1;
                     small.clear_bit(index);
                     *small += 1;
@@ -224,11 +223,11 @@ impl Natural {
                 return;
             }
             Large(ref mut limbs) => {
-                let limb_index = (index >> LOG_LIMB_BITS) as usize;
+                let limb_index = (index >> u32::LOG_WIDTH) as usize;
                 if limb_index >= limbs.len() {
                     return;
                 }
-                let reduced_index = index & u64::from(LIMB_BITS_MASK);
+                let reduced_index = index & u64::from(u32::WIDTH_MASK);
                 let mut zero_bound = 0;
                 // No index upper bound on this loop; we're sure there's a nonzero limb sooner or
                 // later.
@@ -257,7 +256,7 @@ impl Natural {
             small,
             limbs,
             {
-                if index < LIMB_BITS.into() {
+                if index < u32::WIDTH.into() {
                     *small -= 1;
                     small.set_bit(index);
                     small.checked_add(1)
@@ -266,8 +265,8 @@ impl Natural {
                 }
             },
             {
-                let limb_index = (index >> LOG_LIMB_BITS) as usize;
-                let reduced_index = index & u64::from(LIMB_BITS_MASK);
+                let limb_index = (index >> u32::LOG_WIDTH) as usize;
+                let reduced_index = index & u64::from(u32::WIDTH_MASK);
                 if limb_index < limbs.len() {
                     let mut zero_bound = 0;
                     // No index upper bound on this loop; we're sure there's a nonzero limb sooner

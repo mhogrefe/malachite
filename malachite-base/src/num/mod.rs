@@ -609,6 +609,7 @@ pub trait PrimitiveInteger:
 {
     const LOG_WIDTH: u32;
     const WIDTH: u32 = 1 << Self::LOG_WIDTH;
+    const WIDTH_MASK: u32 = Self::WIDTH - 1;
 }
 
 //TODO docs

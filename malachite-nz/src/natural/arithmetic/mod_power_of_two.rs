@@ -1,6 +1,5 @@
-use malachite_base::num::{Assign, Zero};
+use malachite_base::num::{Assign, PrimitiveInteger, Zero};
 use natural::arithmetic::neg::mpn_neg_in_place;
-use natural::{LIMB_BITS_MASK, LOG_LIMB_BITS};
 use natural::Natural::{self, Large, Small};
 
 impl Natural {
@@ -49,11 +48,11 @@ impl Natural {
             self.clone()
         } else {
             match *self {
-                Small(_) if other >= 32 => self.clone(),
+                Small(_) if other >= u32::WIDTH => self.clone(),
                 Small(ref small) => Small(small & ((1 << other) - 1)),
                 Large(ref limbs) => {
-                    let result_limb_count = other >> LOG_LIMB_BITS;
-                    let leftover_bits = other & LIMB_BITS_MASK;
+                    let result_limb_count = other >> u32::LOG_WIDTH;
+                    let leftover_bits = other & u32::WIDTH_MASK;
                     let result_limb_count = result_limb_count as usize;
                     if result_limb_count >= limbs.len() {
                         return self.clone();
@@ -98,14 +97,14 @@ impl Natural {
             return;
         } else {
             match *self {
-                Small(_) if other >= 32 => return,
+                Small(_) if other >= u32::WIDTH => return,
                 Small(ref mut small) => {
                     *small &= (1 << other) - 1;
                     return;
                 }
                 Large(ref mut limbs) => {
-                    let mut new_limb_count = other >> LOG_LIMB_BITS;
-                    let leftover_bits = other & LIMB_BITS_MASK;
+                    let mut new_limb_count = other >> u32::LOG_WIDTH;
+                    let leftover_bits = other & u32::WIDTH_MASK;
                     if leftover_bits != 0 {
                         new_limb_count += 1;
                     }
@@ -170,13 +169,13 @@ impl Natural {
             self.clone()
         } else {
             if let Small(ref small) = *self {
-                if other < 32 {
+                if other < u32::WIDTH {
                     return Small(small.wrapping_neg() & ((1 << other) - 1));
                 }
             }
             let mut limbs = self.to_limbs_asc();
-            let mut new_limb_count = other >> LOG_LIMB_BITS;
-            let leftover_bits = other & LIMB_BITS_MASK;
+            let mut new_limb_count = other >> u32::LOG_WIDTH;
+            let leftover_bits = other & u32::WIDTH_MASK;
             if leftover_bits != 0 {
                 new_limb_count += 1;
             }
@@ -220,15 +219,15 @@ impl Natural {
             return;
         } else {
             if let Small(ref mut small) = *self {
-                if other < 32 {
+                if other < u32::WIDTH {
                     *small = small.wrapping_neg() & ((1 << other) - 1);
                     return;
                 }
             }
             {
                 let limbs = self.promote_in_place();
-                let mut new_limb_count = other >> LOG_LIMB_BITS;
-                let leftover_bits = other & LIMB_BITS_MASK;
+                let mut new_limb_count = other >> u32::LOG_WIDTH;
+                let leftover_bits = other & u32::WIDTH_MASK;
                 if leftover_bits != 0 {
                     new_limb_count += 1;
                 }

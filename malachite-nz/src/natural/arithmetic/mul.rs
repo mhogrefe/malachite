@@ -1,4 +1,5 @@
 use malachite_base::limbs::{limbs_set_zero, limbs_test_zero};
+use malachite_base::num::PrimitiveInteger;
 use natural::arithmetic::add::{mpn_add, mpn_add_in_place, mpn_add_n, mpn_add_n_in_place};
 use natural::arithmetic::add_u32::{mpn_add_1, mpn_add_1_in_place};
 use natural::arithmetic::add_mul_u32::mpn_addmul_1;
@@ -8,7 +9,6 @@ use natural::arithmetic::shr_u32::mpn_rshift_in_place;
 use natural::arithmetic::sub::{mpn_sub, mpn_sub_n, mpn_sub_n_aba, mpn_sub_n_in_place};
 use natural::arithmetic::sub_u32::mpn_sub_1_in_place;
 use natural::comparison::ord::limbs_cmp_same_length;
-use natural::LIMB_BITS;
 use natural::Natural::{self, Large, Small};
 use std::cmp::Ordering;
 use std::ops::{Mul, MulAssign};
@@ -32,11 +32,11 @@ fn toom44_ok(an: usize, bn: usize) -> bool {
 }
 
 fn mpn_toom22_mul_itch(an: usize) -> usize {
-    2 * (an + LIMB_BITS as usize)
+    2 * (an + u32::WIDTH as usize)
 }
 
 fn mpn_toom33_mul_itch(an: usize) -> usize {
-    3 * an + LIMB_BITS as usize
+    3 * an + u32::WIDTH as usize
 }
 
 fn mpn_toom32_mul_itch(an: usize, bn: usize) -> usize {
@@ -67,7 +67,7 @@ fn mpn_toom43_mul_itch(an: usize, bn: usize) -> usize {
 }
 
 fn mpn_toom44_mul_itch(an: usize) -> usize {
-    3 * an + LIMB_BITS as usize
+    3 * an + u32::WIDTH as usize
 }
 
 fn mpn_toom53_mul_itch(an: usize, bn: usize) -> usize {
@@ -861,7 +861,7 @@ pub fn mpn_mul_unfinished(prod: &mut [u32], u: &[u32], v: &[u32]) -> u32 {
     } else if vn < MUL_TOOM33_THRESHOLD {
         // Use ToomX2 variants
 
-        let itch_toomx2 = 9 * vn / 2 + LIMB_BITS as usize * 2;
+        let itch_toomx2 = 9 * vn / 2 + u32::WIDTH as usize * 2;
         let mut scratch = vec![0; itch_toomx2];
         assert!(mpn_toom22_mul_itch((5 * vn - 1) / 4) <= itch_toomx2); // 5vn/2+
         assert!(mpn_toom32_mul_itch((7 * vn - 1) / 4, vn) <= itch_toomx2); // 7vn/6+
@@ -940,7 +940,7 @@ pub fn mpn_mul_unfinished(prod: &mut [u32], u: &[u32], v: &[u32]) -> u32 {
     } else if vn < MUL_TOOM44_THRESHOLD || !toom44_ok(un, vn) {
         // Use ToomX3 variants
 
-        let itch_toomx3 = 4 * vn + LIMB_BITS as usize;
+        let itch_toomx3 = 4 * vn + u32::WIDTH as usize;
         let mut scratch = vec![0; itch_toomx3];
         assert!(mpn_toom33_mul_itch((7 * vn - 1) / 6) <= itch_toomx3); // 7vn/2+
         assert!(mpn_toom43_mul_itch((3 * vn - 1) / 2, vn) <= itch_toomx3); // 9vn/4+

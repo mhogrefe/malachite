@@ -1,18 +1,18 @@
 use malachite_base::limbs::limbs_pad_left;
-use natural::{LIMB_BITS, LIMB_BITS_MASK, LOG_LIMB_BITS};
+use malachite_base::num::PrimitiveInteger;
 use natural::Natural::{self, Large, Small};
 use std::ops::{Shl, ShlAssign};
 
 // Shift u left by bits, and write the result to r. The bits shifted out at the left are returned in
 // the least significant bits of the return value (the rest of the return value is zero).
-// u.len() > 0, r.len() >= u.len(), 1 <= bits < LIMB_BITS
+// u.len() > 0, r.len() >= u.len(), 1 <= bits < u32::WIDTH
 pub fn mpn_lshift(r: &mut [u32], u: &[u32], bits: u32) -> u32 {
     let u_len = u.len();
     assert!(u_len > 0);
     assert!(r.len() >= u_len);
     assert!(bits > 0);
-    assert!(bits < LIMB_BITS);
-    let cobits = LIMB_BITS - bits;
+    assert!(bits < u32::WIDTH);
+    let cobits = u32::WIDTH - bits;
     let mut remaining_bits = 0;
     for i in 0..u_len {
         let limb = u[i];
@@ -24,12 +24,12 @@ pub fn mpn_lshift(r: &mut [u32], u: &[u32], bits: u32) -> u32 {
 
 // Shift u left by bits, and write the result to u. The bits shifted out at the left are returned in
 // the least significant bits of the return value (the rest of the return value is zero).
-// u.len() > 0, 1 <= bits < LIMB_BITS
+// u.len() > 0, 1 <= bits < u32::WIDTH
 pub fn mpn_lshift_in_place(u: &mut [u32], bits: u32) -> u32 {
     assert!(!u.is_empty());
     assert!(bits > 0);
-    assert!(bits < LIMB_BITS);
-    let cobits = LIMB_BITS - bits;
+    assert!(bits < u32::WIDTH);
+    let cobits = u32::WIDTH - bits;
     let mut remaining_bits = 0;
     for limb in u.iter_mut() {
         let old_limb = *limb;
@@ -70,18 +70,18 @@ impl Shl<u32> for Natural {
 }
 
 fn shl_helper(limbs: &[u32], other: u32) -> Natural {
-    let small_shift = other & LIMB_BITS_MASK;
+    let small_shift = other & u32::WIDTH_MASK;
     Large(if small_shift != 0 {
         let mut shifted_limbs = vec![0; limbs.len()];
         let remaining_bits = mpn_lshift(&mut shifted_limbs, limbs, small_shift);
-        limbs_pad_left(&mut shifted_limbs, (other >> LOG_LIMB_BITS) as usize, 0);
+        limbs_pad_left(&mut shifted_limbs, (other >> u32::LOG_WIDTH) as usize, 0);
         if remaining_bits != 0 {
             shifted_limbs.push(remaining_bits);
         }
         shifted_limbs
     } else {
         let mut shifted_limbs = limbs.to_vec();
-        limbs_pad_left(&mut shifted_limbs, (other >> LOG_LIMB_BITS) as usize, 0);
+        limbs_pad_left(&mut shifted_limbs, (other >> u32::LOG_WIDTH) as usize, 0);
         shifted_limbs
     })
 }
@@ -162,13 +162,13 @@ impl ShlAssign<u32> for Natural {
                 }
             },
             {
-                let small_shift = other & LIMB_BITS_MASK;
+                let small_shift = other & u32::WIDTH_MASK;
                 let remaining_bits = if small_shift != 0 {
                     mpn_lshift_in_place(limbs, small_shift)
                 } else {
                     0
                 };
-                limbs_pad_left(limbs, (other >> LOG_LIMB_BITS) as usize, 0);
+                limbs_pad_left(limbs, (other >> u32::LOG_WIDTH) as usize, 0);
                 if remaining_bits != 0 {
                     limbs.push(remaining_bits);
                 }

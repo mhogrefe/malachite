@@ -1,5 +1,4 @@
-use malachite_base::num::BitAccess;
-use natural::{LIMB_BITS, LIMB_BITS_MASK, LOG_LIMB_BITS};
+use malachite_base::num::{BitAccess, PrimitiveInteger};
 use natural::Natural::{self, Large, Small};
 
 /// Provides functions for accessing and modifying the `index`th bit of a `Natural`, or the
@@ -60,9 +59,9 @@ impl BitAccess for Natural {
         match *self {
             Small(small) => small.get_bit(index),
             Large(ref limbs) => {
-                let limb_index = (index >> LOG_LIMB_BITS) as usize;
+                let limb_index = (index >> u32::LOG_WIDTH) as usize;
                 limbs.get(limb_index).map_or(false, |limb| {
-                    limb.get_bit(index & u64::from(LIMB_BITS_MASK))
+                    limb.get_bit(index & u64::from(u32::WIDTH_MASK))
                 })
             }
         }
@@ -98,7 +97,7 @@ impl BitAccess for Natural {
             small,
             limbs,
             {
-                if index < LIMB_BITS.into() {
+                if index < u32::WIDTH.into() {
                     let mut modified = *small;
                     modified.set_bit(index);
                     Some(modified)
@@ -107,11 +106,11 @@ impl BitAccess for Natural {
                 }
             },
             {
-                let limb_index = (index >> LOG_LIMB_BITS) as usize;
+                let limb_index = (index >> u32::LOG_WIDTH) as usize;
                 if limb_index >= limbs.len() {
                     limbs.resize(limb_index + 1, 0);
                 }
-                limbs[limb_index].set_bit(index & u64::from(LIMB_BITS_MASK));
+                limbs[limb_index].set_bit(index & u64::from(u32::WIDTH_MASK));
             }
         );
     }
@@ -148,9 +147,9 @@ impl BitAccess for Natural {
                 small.clear_bit(index);
             }
             Large(ref mut limbs) => {
-                let limb_index = (index >> LOG_LIMB_BITS) as usize;
+                let limb_index = (index >> u32::LOG_WIDTH) as usize;
                 if limb_index < limbs.len() {
-                    limbs[limb_index].clear_bit(index & u64::from(LIMB_BITS_MASK));
+                    limbs[limb_index].clear_bit(index & u64::from(u32::WIDTH_MASK));
                 } else {
                     return;
                 }

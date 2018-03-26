@@ -51,7 +51,7 @@ fn test_u64_wrapping_from_integer() {
 fn u64_checked_from_integer_properties() {
     test_properties(integers, |x| {
         let result = u64::checked_from(x);
-        if x.sign() != Ordering::Less && x.significant_bits() <= 64 {
+        if x.sign() != Ordering::Less && x.significant_bits() <= u64::from(u64::WIDTH) {
             assert_eq!(Integer::from(result.unwrap()), *x);
             assert_eq!(result, Some(u64::wrapping_from(x)));
         } else {

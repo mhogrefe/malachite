@@ -46,7 +46,7 @@ fn u32_checked_from_integer_properties() {
     test_properties(integers, |x| {
         let result = u32::checked_from(x);
         assert_eq!(integer_to_rug_integer(x).to_u32(), result);
-        if x.sign() != Ordering::Less && x.significant_bits() <= 32 {
+        if x.sign() != Ordering::Less && x.significant_bits() <= u64::from(u32::WIDTH) {
             assert_eq!(Integer::from(result.unwrap()), *x);
             assert_eq!(result, Some(u32::wrapping_from(x)));
         } else {

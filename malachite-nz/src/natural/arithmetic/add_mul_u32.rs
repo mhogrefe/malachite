@@ -1,7 +1,5 @@
-use malachite_base::num::SplitInHalf;
-use malachite_base::num::{AddMul, AddMulAssign};
+use malachite_base::num::{AddMul, AddMulAssign, PrimitiveInteger, SplitInHalf};
 use natural::arithmetic::add_u32::mpn_add_1_in_place;
-use natural::LIMB_BITS;
 use natural::Natural::{self, Large, Small};
 
 // Multiply s1 and s2limb, and add the s1.len() least significant limbs of the product to r and
@@ -15,7 +13,7 @@ pub fn mpn_addmul_1(r: &mut [u32], s1: &[u32], s2limb: u32) -> u32 {
     for i in 0..s1_len {
         let limb_result = u64::from(r[i]) + u64::from(s1[i]) * s2limb_u64 + carry;
         r[i] = limb_result.lower_half();
-        carry = limb_result >> LIMB_BITS;
+        carry = limb_result >> u32::WIDTH;
     }
     carry as u32
 }

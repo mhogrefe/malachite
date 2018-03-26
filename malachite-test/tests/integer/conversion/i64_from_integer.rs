@@ -1,6 +1,6 @@
 use common::test_properties;
 use malachite_base::misc::{CheckedFrom, WrappingFrom};
-use malachite_base::num::{One, SignificantBits};
+use malachite_base::num::{One, PrimitiveInteger, SignificantBits};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_test::inputs::integer::integers;
@@ -55,7 +55,8 @@ fn test_i64_wrapping_from_integer() {
 fn i64_checked_from_integer_properties() {
     test_properties(integers, |x| {
         let result = i64::checked_from(x);
-        if x.significant_bits() < 64 || *x == -(Natural::ONE << 63u32) {
+        if x.significant_bits() < u64::from(i64::WIDTH) || *x == -(Natural::ONE << (i64::WIDTH - 1))
+        {
             assert_eq!(Integer::from(result.unwrap()), *x);
             assert_eq!(result, Some(i64::wrapping_from(x)));
         } else {

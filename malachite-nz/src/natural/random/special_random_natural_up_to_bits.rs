@@ -1,6 +1,6 @@
-use malachite_base::num::BitAccess;
+use malachite_base::num::{BitAccess, PrimitiveInteger};
 use natural::arithmetic::add_u32::mpn_add_1_in_place;
-use natural::{Natural, LIMB_BITS, LIMB_BITS_MASK, LOG_LIMB_BITS};
+use natural::Natural;
 use rand::distributions::{IndependentSample, Range};
 use rand::Rng;
 use std::cmp::max;
@@ -11,11 +11,11 @@ pub fn limbs_special_random_up_to_bits<R: Rng>(rng: &mut R, bits: u64) -> Vec<u3
     if bits == 0 {
         return Vec::new();
     }
-    let remainder_bits = (bits & u64::from(LIMB_BITS_MASK)) as u32;
+    let remainder_bits = (bits & u64::from(u32::WIDTH_MASK)) as u32;
     let limb_count = if remainder_bits == 0 {
-        bits >> LOG_LIMB_BITS
+        bits >> u32::LOG_WIDTH
     } else {
-        (bits >> LOG_LIMB_BITS) + 1
+        (bits >> u32::LOG_WIDTH) + 1
     };
     // Initialize the value to all binary 1s; later we'll remove chunks to create blocks of 0s.
     let mut limbs = vec![u32::MAX; limb_count as usize];
@@ -24,19 +24,19 @@ pub fn limbs_special_random_up_to_bits<R: Rng>(rng: &mut R, bits: u64) -> Vec<u3
     let max_chunk_size = max(1, (bits / (rng.gen_range(0, 4) + 1)) as u32);
     let chunk_size_range = Range::new(1, max_chunk_size + 1);
     // Start i at a random position in the highest limb.
-    let mut i = ((limb_count as u32) << LOG_LIMB_BITS) - rng.gen_range(0, LIMB_BITS);
+    let mut i = ((limb_count as u32) << u32::LOG_WIDTH) - rng.gen_range(0, u32::WIDTH);
     loop {
         let mut chunk_size = chunk_size_range.ind_sample(rng);
         i = if i < chunk_size { 0 } else { i - chunk_size };
         if i == 0 {
             break;
         }
-        limbs[(i >> LOG_LIMB_BITS) as usize].clear_bit(u64::from(i & LIMB_BITS_MASK));
+        limbs[(i >> u32::LOG_WIDTH) as usize].clear_bit(u64::from(i & u32::WIDTH_MASK));
         chunk_size = chunk_size_range.ind_sample(rng);
         i = if i < chunk_size { 0 } else { i - chunk_size };
         mpn_add_1_in_place(
-            &mut limbs[(i >> LOG_LIMB_BITS) as usize..],
-            1 << (i & LIMB_BITS_MASK),
+            &mut limbs[(i >> u32::LOG_WIDTH) as usize..],
+            1 << (i & u32::WIDTH_MASK),
         );
         if i == 0 {
             break;

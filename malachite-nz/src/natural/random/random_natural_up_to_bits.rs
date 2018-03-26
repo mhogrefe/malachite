@@ -1,5 +1,5 @@
-use malachite_base::num::Zero;
-use natural::{Natural, LIMB_BITS_MASK, LOG_LIMB_BITS};
+use malachite_base::num::{PrimitiveInteger, Zero};
+use natural::Natural;
 use rand::Rng;
 
 /// Returns a random `Natural` with up to `bits` bits; equivalently, returns a random `Natural`
@@ -26,11 +26,11 @@ pub fn random_natural_up_to_bits<R: Rng>(rng: &mut R, bits: u64) -> Natural {
     if bits == 0 {
         return Natural::ZERO;
     }
-    let remainder_bits = (bits & u64::from(LIMB_BITS_MASK)) as u32;
+    let remainder_bits = (bits & u64::from(u32::WIDTH_MASK)) as u32;
     let limb_count = if remainder_bits == 0 {
-        bits >> LOG_LIMB_BITS
+        bits >> u32::LOG_WIDTH
     } else {
-        (bits >> LOG_LIMB_BITS) + 1
+        (bits >> u32::LOG_WIDTH) + 1
     };
     let mut limbs = Vec::with_capacity(limb_count as usize);
     for _ in 0..limb_count {

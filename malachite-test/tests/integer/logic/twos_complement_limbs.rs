@@ -1,5 +1,5 @@
 use common::test_properties;
-use malachite_base::num::BitAccess;
+use malachite_base::num::{BitAccess, PrimitiveInteger};
 use malachite_nz::integer::Integer;
 use malachite_test::inputs::integer::integers;
 use std::cmp::Ordering;
@@ -80,6 +80,8 @@ fn test_twos_complement_limbs_desc() {
     test("-18446744073709551616", vec![u32::MAX, 0, 0]);
 }
 
+const LAST_INDEX: u64 = u32::WIDTH as u64 - 1;
+
 #[test]
 fn twos_complement_limbs_asc_properties() {
     test_properties(integers, |x| {
@@ -93,16 +95,16 @@ fn twos_complement_limbs_asc_properties() {
             Ordering::Equal => assert!(limbs.is_empty()),
             Ordering::Greater => {
                 let last = *limbs.last().unwrap();
-                assert!(!last.get_bit(31));
+                assert!(!last.get_bit(LAST_INDEX));
                 if last == 0 {
-                    assert!(limbs[limbs.len() - 2].get_bit(31));
+                    assert!(limbs[limbs.len() - 2].get_bit(LAST_INDEX));
                 }
             }
             Ordering::Less => {
                 let last = *limbs.last().unwrap();
-                assert!(last.get_bit(31));
+                assert!(last.get_bit(LAST_INDEX));
                 if last == !0 && limbs.len() > 1 {
-                    assert!(!limbs[limbs.len() - 2].get_bit(31));
+                    assert!(!limbs[limbs.len() - 2].get_bit(LAST_INDEX));
                 }
             }
         }
@@ -122,16 +124,16 @@ fn limbs_desc_properties() {
             Ordering::Equal => assert!(limbs.is_empty()),
             Ordering::Greater => {
                 let first = limbs[0];
-                assert!(!first.get_bit(31));
+                assert!(!first.get_bit(LAST_INDEX));
                 if first == 0 {
-                    assert!(limbs[1].get_bit(31));
+                    assert!(limbs[1].get_bit(LAST_INDEX));
                 }
             }
             Ordering::Less => {
                 let first = limbs[0];
-                assert!(first.get_bit(31));
+                assert!(first.get_bit(LAST_INDEX));
                 if first == !0 && limbs.len() > 1 {
-                    assert!(!limbs[1].get_bit(31));
+                    assert!(!limbs[1].get_bit(LAST_INDEX));
                 }
             }
         }
