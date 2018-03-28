@@ -1,6 +1,35 @@
 use malachite_base::num::{BitAccess, PrimitiveInteger};
 use natural::Natural::{self, Large, Small};
 
+/// Interpreting a slice of `u32`s as the limbs (in ascending order) of a `Natural`, gets a bit of
+/// the `Natural` at a specified index. Sufficiently high indices will return `false`.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = `limbs.len()`
+///
+/// # Example
+/// ```
+/// use malachite_nz::natural::logic::bit_access::limbs_get_bit;
+/// use std::cmp::Ordering;
+///
+/// assert_eq!(limbs_get_bit(&[0, 0b1011], 0), false);
+/// assert_eq!(limbs_get_bit(&[0, 0b1011], 32), true);
+/// assert_eq!(limbs_get_bit(&[0, 0b1011], 33), true);
+/// assert_eq!(limbs_get_bit(&[0, 0b1011], 34), false);
+/// assert_eq!(limbs_get_bit(&[0, 0b1011], 35), true);
+/// assert_eq!(limbs_get_bit(&[0, 0b1011], 100), false);
+/// ```
+pub fn limbs_get_bit(limbs: &[u32], index: u64) -> bool {
+    limbs
+        .get((index >> u32::LOG_WIDTH) as usize)
+        .map_or(false, |limb| {
+            limb.get_bit(index & u64::from(u32::WIDTH_MASK))
+        })
+}
+
 /// Provides functions for accessing and modifying the `index`th bit of a `Natural`, or the
 /// coefficient of 2^<pow>`index`</pow> in its binary expansion.
 ///
@@ -58,12 +87,7 @@ impl BitAccess for Natural {
     fn get_bit(&self, index: u64) -> bool {
         match *self {
             Small(small) => small.get_bit(index),
-            Large(ref limbs) => {
-                let limb_index = (index >> u32::LOG_WIDTH) as usize;
-                limbs.get(limb_index).map_or(false, |limb| {
-                    limb.get_bit(index & u64::from(u32::WIDTH_MASK))
-                })
-            }
+            Large(ref limbs) => limbs_get_bit(limbs, index),
         }
     }
 

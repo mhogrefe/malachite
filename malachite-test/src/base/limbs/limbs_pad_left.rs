@@ -14,7 +14,7 @@ fn demo_limbs_pad_left(gm: GenerationMode, limit: usize) {
         let mut mut_limbs = limbs.clone();
         limbs_pad_left(&mut mut_limbs, pad_size, pad_limb);
         println!(
-            "limbs := {:?}; limbs_pad_left(&mut limbs, {}, {}); x = {:?}",
+            "limbs := {:?}; limbs_pad_left(&mut limbs, {}, {}); limbs = {:?}",
             limbs, pad_size, pad_limb, mut_limbs
         );
     }

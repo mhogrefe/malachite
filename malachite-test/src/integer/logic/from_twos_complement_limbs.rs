@@ -22,7 +22,7 @@ fn demo_integer_from_twos_complement_limbs_asc(gm: GenerationMode, limit: usize)
         println!(
             "from_twos_complement_limbs_asc({:?}) = {:?}",
             xs,
-            Integer::from_twos_complement_limbs_asc(xs.as_slice())
+            Integer::from_twos_complement_limbs_asc(&xs)
         );
     }
 }
@@ -32,7 +32,7 @@ fn demo_integer_from_twos_complement_limbs_desc(gm: GenerationMode, limit: usize
         println!(
             "from_twos_complement_limbs_desc({:?}) = {:?}",
             xs,
-            Integer::from_twos_complement_limbs_desc(xs.as_slice())
+            Integer::from_twos_complement_limbs_desc(&xs)
         );
     }
 }

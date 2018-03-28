@@ -20,19 +20,14 @@ fn demo_limbs_cmp_same_length(gm: GenerationMode, limit: usize) {
             "limbs_cmp_same_length({:?}, {:?}) = {:?}",
             xs,
             ys,
-            limbs_cmp_same_length(xs.as_slice(), ys.as_slice())
+            limbs_cmp_same_length(&xs, &ys),
         );
     }
 }
 
 fn demo_limbs_cmp(gm: GenerationMode, limit: usize) {
     for (xs, ys) in pairs_of_unsigned_vec_var_2(gm).take(limit) {
-        println!(
-            "limbs_cmp({:?}, {:?}) = {:?}",
-            xs,
-            ys,
-            limbs_cmp(xs.as_slice(), ys.as_slice())
-        );
+        println!("limbs_cmp({:?}, {:?}) = {:?}", xs, ys, limbs_cmp(&xs, &ys));
     }
 }
 
@@ -59,7 +54,7 @@ fn benchmark_limbs_cmp_same_length(gm: GenerationMode, limit: usize, file_name: 
         &mut [
             (
                 "malachite",
-                &mut (|(xs, ys)| no_out!(limbs_cmp_same_length(xs.as_slice(), ys.as_slice()))),
+                &mut (|(xs, ys)| no_out!(limbs_cmp_same_length(&xs, &ys))),
             ),
         ],
     );
@@ -76,10 +71,7 @@ fn benchmark_limbs_cmp(gm: GenerationMode, limit: usize, file_name: &str) {
         &(|&(ref xs, ref ys)| min(xs.len(), ys.len())),
         "min(xs.len(), ys.len())",
         &mut [
-            (
-                "malachite",
-                &mut (|(xs, ys)| no_out!(limbs_cmp(xs.as_slice(), ys.as_slice()))),
-            ),
+            ("malachite", &mut (|(xs, ys)| no_out!(limbs_cmp(&xs, &ys)))),
         ],
     );
 }

@@ -9,11 +9,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
 
 fn demo_limbs_test_zero(gm: GenerationMode, limit: usize) {
     for xs in vecs_of_unsigned(gm).take(limit) {
-        println!(
-            "limbs_test_zero({:?}) = {:?}",
-            xs,
-            limbs_test_zero(xs.as_slice())
-        );
+        println!("limbs_test_zero({:?}) = {:?}", xs, limbs_test_zero(&xs));
     }
 }
 
@@ -28,10 +24,7 @@ fn benchmark_limbs_test_zero(gm: GenerationMode, limit: usize, file_name: &str) 
         &(|limbs| limbs.len()),
         "limbs.len()",
         &mut [
-            (
-                "malachite",
-                &mut (|limbs| no_out!(limbs_test_zero(limbs.as_slice()))),
-            ),
+            ("malachite", &mut (|limbs| no_out!(limbs_test_zero(&limbs)))),
         ],
     );
 }

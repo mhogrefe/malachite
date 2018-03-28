@@ -24,7 +24,7 @@ fn demo_natural_from_limbs_asc(gm: GenerationMode, limit: usize) {
         println!(
             "from_limbs_asc({:?}) = {:?}",
             limbs,
-            Natural::from_limbs_asc(limbs.as_slice())
+            Natural::from_limbs_asc(&limbs)
         );
     }
 }
@@ -34,7 +34,7 @@ fn demo_natural_from_limbs_desc(gm: GenerationMode, limit: usize) {
         println!(
             "from_limbs_desc({:?}) = {:?}",
             limbs,
-            Natural::from_limbs_desc(limbs.as_slice())
+            Natural::from_limbs_desc(&limbs)
         );
     }
 }

@@ -12,7 +12,7 @@ fn demo_limbs_delete_left(gm: GenerationMode, limit: usize) {
         let mut mut_limbs = limbs.clone();
         limbs_delete_left(&mut mut_limbs, delete_size);
         println!(
-            "limbs := {:?}; limbs_delete_left(&mut limbs, {}); x = {:?}",
+            "limbs := {:?}; limbs_delete_left(&mut limbs, {}); limbs = {:?}",
             limbs, delete_size, mut_limbs
         );
     }

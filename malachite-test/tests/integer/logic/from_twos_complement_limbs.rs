@@ -145,7 +145,7 @@ fn from_twos_complement_limbs_asc_properties() {
 #[test]
 fn from_twos_complement_limbs_desc_properties() {
     test_properties(vecs_of_unsigned, |limbs: &Vec<u32>| {
-        let x = Integer::from_twos_complement_limbs_desc(limbs.as_slice());
+        let x = Integer::from_twos_complement_limbs_desc(limbs);
         let mut trimmed_limbs: Vec<u32> = limbs.to_vec();
         trim_be_limbs(&mut trimmed_limbs);
         assert_eq!(x.twos_complement_limbs_desc(), trimmed_limbs);

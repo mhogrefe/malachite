@@ -8,10 +8,13 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
 }
 
 fn demo_limbs_set_zero(gm: GenerationMode, limit: usize) {
-    for xs in vecs_of_unsigned(gm).take(limit) {
-        let mut mut_xs = xs.clone();
-        limbs_set_zero(&mut mut_xs);
-        println!("xs := {:?}; limbs_set_zero(&mut xs); x = {:?}", xs, mut_xs);
+    for limbs in vecs_of_unsigned(gm).take(limit) {
+        let mut mut_limbs = limbs.clone();
+        limbs_set_zero(&mut mut_limbs);
+        println!(
+            "limbs := {:?}; limbs_set_zero(&mut limbs); limbs = {:?}",
+            limbs, mut_limbs
+        );
     }
 }
 

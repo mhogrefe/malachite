@@ -25,7 +25,7 @@ fn demo_integer_from_sign_and_limbs_asc(gm: GenerationMode, limit: usize) {
             "from_sign_and_limbs_asc({:?}, {:?}) = {:?}",
             sign,
             limbs,
-            Integer::from_sign_and_limbs_asc(sign, limbs.as_slice())
+            Integer::from_sign_and_limbs_asc(sign, &limbs)
         );
     }
 }
@@ -36,7 +36,7 @@ fn demo_integer_from_sign_and_limbs_desc(gm: GenerationMode, limit: usize) {
             "from_sign_and_limbs_desc({:?}, {:?}) = {:?}",
             sign,
             limbs,
-            Integer::from_sign_and_limbs_desc(sign, limbs.as_slice())
+            Integer::from_sign_and_limbs_desc(sign, &limbs)
         );
     }
 }

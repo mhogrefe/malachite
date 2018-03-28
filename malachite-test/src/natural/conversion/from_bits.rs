@@ -40,7 +40,7 @@ fn demo_natural_from_bits_asc(gm: GenerationMode, limit: usize) {
         println!(
             "from_bits_asc({:?}) = {:?}",
             bits,
-            Natural::from_bits_asc(bits.as_slice())
+            Natural::from_bits_asc(&bits)
         );
     }
 }
@@ -50,7 +50,7 @@ fn demo_natural_from_bits_desc(gm: GenerationMode, limit: usize) {
         println!(
             "from_bits_desc({:?}) = {:?}",
             bits,
-            Natural::from_bits_desc(bits.as_slice())
+            Natural::from_bits_desc(&bits)
         );
     }
 }

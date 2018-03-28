@@ -6,7 +6,7 @@ use natural::arithmetic::add_u32::mpn_add_1_in_place;
 use natural::arithmetic::mul_u32::{mpn_mul_1, mpn_mul_1c};
 use natural::arithmetic::sub_mul_u32::mpn_submul_1;
 use natural::arithmetic::sub_u32::mpn_sub_1_in_place;
-use natural::logic::not::mpn_com_in_place;
+use natural::logic::not::limbs_not_in_place;
 use natural::Natural::{self, Large, Small};
 use std::cmp::{max, min};
 use std::u32;
@@ -397,7 +397,7 @@ pub(crate) fn mpz_aorsmul_1(
                 // Borrow out of w, take twos complement negative to get absolute value, flip sign
                 // of w.
                 w[new_wsize] = !(!cy).wrapping_add(1); // extra limb is 0 - cy
-                mpn_com_in_place(&mut w[0..new_wsize]);
+                limbs_not_in_place(&mut w[0..new_wsize]);
                 new_wsize += 1;
                 mpn_add_1_in_place(&mut w[0..new_wsize], 1);
                 if new_wsize != 0 {
@@ -411,7 +411,7 @@ pub(crate) fn mpz_aorsmul_1(
             // use an mpn_mul_1 for the rest.
 
             // -(-cy*b^n + w-x*y) = (cy-1)*b^n + ~(w-x*y) + 1
-            mpn_com_in_place(&mut w[0..wsize]);
+            limbs_not_in_place(&mut w[0..wsize]);
             if !mpn_add_1_in_place(&mut w[0..wsize], 1) {
                 cy = cy.wrapping_sub(1);
             }

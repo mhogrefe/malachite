@@ -1,8 +1,49 @@
 use integer::Integer;
+use malachite_base::limbs::limbs_test_zero;
 use malachite_base::num::{BitAccess, PrimitiveInteger};
 use natural::arithmetic::add_u32::mpn_add_1_in_place;
 use natural::arithmetic::sub_u32::mpn_sub_1_in_place;
 use natural::Natural::{self, Large, Small};
+
+/// Interpreting a slice of `u32`s as the limbs (in ascending order) of a `Natural`, gets a bit of
+/// the negative of that `Natural` (two's complement) at a specified index. Sufficiently high
+/// indices will return `true`, unless `limbs` is empty.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = `limbs.len()`
+///
+/// # Example
+/// ```
+/// use malachite_nz::integer::logic::bit_access::limbs_get_bit_neg;
+/// use std::cmp::Ordering;
+///
+/// assert_eq!(limbs_get_bit_neg(&[0, 0b1011], 0), false);
+/// assert_eq!(limbs_get_bit_neg(&[0, 0b1011], 32), true);
+/// assert_eq!(limbs_get_bit_neg(&[0, 0b1011], 33), false);
+/// assert_eq!(limbs_get_bit_neg(&[0, 0b1011], 34), true);
+/// assert_eq!(limbs_get_bit_neg(&[0, 0b1011], 35), false);
+/// assert_eq!(limbs_get_bit_neg(&[0, 0b1011], 100), true);
+/// ```
+pub fn limbs_get_bit_neg(limbs: &[u32], index: u64) -> bool {
+    if limbs.is_empty() {
+        return false;
+    }
+    let limb_index = (index >> u32::LOG_WIDTH) as usize;
+    if limb_index >= limbs.len() {
+        // We're indexing into the infinite suffix of 1s
+        true
+    } else {
+        let limb = if limbs_test_zero(&limbs[0..limb_index]) {
+            limbs[limb_index].wrapping_neg()
+        } else {
+            !limbs[limb_index]
+        };
+        limb.get_bit(index & u64::from(u32::WIDTH_MASK))
+    }
+}
 
 /// Provides functions for accessing and modifying the `index`th bit of a `Natural`, or the
 /// coefficient of 2^<pow>`index`</pow> in its binary expansion.
@@ -192,22 +233,8 @@ impl BitAccess for Integer {
 impl Natural {
     fn get_bit_neg(&self, index: u64) -> bool {
         match *self {
-            Small(small) => index >= u32::WIDTH.into() || (!small).wrapping_add(1).get_bit(index),
-            Large(ref xs) => {
-                let limb_index = (index >> u32::LOG_WIDTH) as usize;
-                if limb_index >= xs.len() {
-                    // We're indexing into the infinite suffix of 1s
-                    return true;
-                }
-                let limb = if xs.into_iter().take(limb_index).all(|&x| x == 0) {
-                    // All limbs below `limb_index` are zero, so we have a carry bit when we take
-                    // the two's complement
-                    (!xs[limb_index]).wrapping_add(1)
-                } else {
-                    !xs[limb_index]
-                };
-                limb.get_bit(index & u64::from(u32::WIDTH_MASK))
-            }
+            Small(small) => index >= u32::WIDTH.into() || small.wrapping_neg().get_bit(index),
+            Large(ref limbs) => limbs_get_bit_neg(limbs, index),
         }
     }
 
