@@ -4,7 +4,7 @@ use malachite_nz::integer::Integer;
 use malachite_nz::integer::logic::bit_access::limbs_get_bit_neg;
 use malachite_nz::natural::Natural;
 use malachite_test::common::integer_to_rug_integer;
-use malachite_test::inputs::base::pairs_of_unsigned_vec_and_small_u64;
+use malachite_test::inputs::base::pairs_of_u32_vec_and_small_u64_var_1;
 use malachite_test::inputs::integer::{natural_integers, pairs_of_integer_and_small_u64};
 use rug;
 use std::str::FromStr;
@@ -14,8 +14,6 @@ pub fn test_limbs_get_bit_neg() {
     let test = |limbs: &[u32], index: u64, out: bool| {
         assert_eq!(limbs_get_bit_neg(limbs, index), out);
     };
-    test(&[], 0, false);
-    test(&[], 100, false);
     test(&[1], 0, true);
     test(&[1], 100, true);
     test(&[123], 2, true);
@@ -27,6 +25,12 @@ pub fn test_limbs_get_bit_neg() {
     test(&[0, 0b1011], 34, true);
     test(&[0, 0b1011], 35, false);
     test(&[0, 0b1011], 100, true);
+    test(&[1, 0b1011], 0, true);
+    test(&[1, 0b1011], 32, false);
+    test(&[1, 0b1011], 33, false);
+    test(&[1, 0b1011], 34, true);
+    test(&[1, 0b1011], 35, false);
+    test(&[1, 0b1011], 100, true);
 }
 
 #[test]
@@ -70,7 +74,7 @@ pub fn test_get_bit() {
 #[test]
 fn limbs_get_bit_neg_properties() {
     test_properties(
-        pairs_of_unsigned_vec_and_small_u64,
+        pairs_of_u32_vec_and_small_u64_var_1,
         |&(ref limbs, index)| {
             assert_eq!(
                 (-Natural::from_limbs_asc(limbs)).get_bit(index),

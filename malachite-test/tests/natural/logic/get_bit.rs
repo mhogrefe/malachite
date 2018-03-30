@@ -11,6 +11,24 @@ use rug;
 use std::str::FromStr;
 
 #[test]
+pub fn test_limbs_get_bit() {
+    let test = |limbs: &[u32], index: u64, out: bool| {
+        assert_eq!(limbs_get_bit(limbs, index), out);
+    };
+    test(&[1], 0, true);
+    test(&[1], 100, false);
+    test(&[123], 2, false);
+    test(&[123], 3, true);
+    test(&[123], 100, false);
+    test(&[0, 0b1011], 0, false);
+    test(&[0, 0b1011], 32, true);
+    test(&[0, 0b1011], 33, true);
+    test(&[0, 0b1011], 34, false);
+    test(&[0, 0b1011], 35, true);
+    test(&[0, 0b1011], 100, false);
+}
+
+#[test]
 pub fn test_get_bit() {
     let test = |n, index, out| {
         assert_eq!(Natural::from_str(n).unwrap().get_bit(index), out);

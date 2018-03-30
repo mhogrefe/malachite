@@ -2,8 +2,26 @@ use common::test_properties;
 use malachite_base::num::BitAccess;
 use malachite_base::num::NotAssign;
 use malachite_nz::integer::Integer;
+use malachite_nz::integer::logic::bit_access::limbs_set_bit_neg;
+use malachite_nz::natural::Natural;
+use malachite_test::inputs::base::pairs_of_u32_vec_and_small_u64_var_1;
 use malachite_test::inputs::integer::pairs_of_integer_and_small_u64;
 use std::str::FromStr;
+use std::u32;
+
+#[test]
+pub fn test_limbs_set_bit_neg() {
+    let test = |limbs: &[u32], index: u64, out_limbs: &[u32]| {
+        let mut mut_limbs = limbs.to_vec();
+        limbs_set_bit_neg(&mut mut_limbs, index);
+        assert_eq!(mut_limbs, out_limbs);
+    };
+    test(&[3, 2, 1], 100, &[3, 2, 1]);
+    test(&[0, 0, 0b1101, 0b11], 96, &[0, 0, 0b1101, 0b10]);
+    test(&[0, 0, 0b1101, 0b11], 66, &[0, 0, 0b1001, 0b11]);
+    test(&[0, 0, 0b1100, 0b11], 64, &[0, 0, 0b1011, 0b11]);
+    test(&[0, 0, 0b1101, 0b11], 32, &[0, u32::MAX, 0b1100, 0b11]);
+}
 
 #[test]
 fn test_set_bit() {
@@ -32,6 +50,20 @@ fn test_set_bit() {
     test("-18446744078004518912", 64, "-4294967296");
     test("-18446744078004518912", 65, "-18446744078004518912");
     test("-4294967296", 0, "-4294967295");
+}
+
+#[test]
+fn limbs_set_bit_neg_properties() {
+    test_properties(
+        pairs_of_u32_vec_and_small_u64_var_1,
+        |&(ref limbs, index)| {
+            let mut mut_limbs = limbs.clone();
+            let mut n = -Natural::from_limbs_asc(limbs);
+            limbs_set_bit_neg(&mut mut_limbs, index);
+            n.set_bit(index);
+            assert_eq!(-Natural::from_limbs_asc(&mut_limbs), n);
+        },
+    );
 }
 
 #[test]

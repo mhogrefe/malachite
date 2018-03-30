@@ -1,5 +1,5 @@
 use integer::Integer;
-use malachite_base::num::UnsignedAbs;
+use malachite_base::num::{BitAccess, PrimitiveInteger};
 
 //TODO clean
 impl Integer {
@@ -38,9 +38,9 @@ impl Integer {
     /// }
     /// ```
     pub fn twos_complement_limbs_asc(&self) -> Vec<u32> {
-        let mut limbs = self.unsigned_abs().into_limbs_asc();
+        let mut limbs = self.abs.to_limbs_asc();
         if *self >= 0 {
-            if !limbs.is_empty() && limbs.last().unwrap() & 0x8000_0000 != 0 {
+            if !limbs.is_empty() && limbs.last().unwrap().get_bit(u64::from(u32::WIDTH) - 1) {
                 // Sign-extend with an extra 0 limb to indicate a positive Integer
                 limbs.push(0);
             }
@@ -59,7 +59,7 @@ impl Integer {
                 }
             }
             // At this point carry must be false, because self is nonzero in this branch
-            if limbs.last().unwrap() & 0x8000_0000 == 0 {
+            if !limbs.last().unwrap().get_bit(u64::from(u32::WIDTH) - 1) {
                 // Sign-extend with an extra !0 limb to indicate a negative Integer
                 limbs.push(!0);
             }
@@ -103,6 +103,8 @@ impl Integer {
     ///         vec![4294967063, 727379968]);
     /// }
     pub fn twos_complement_limbs_desc(&self) -> Vec<u32> {
-        self.twos_complement_limbs_asc().into_iter().rev().collect()
+        let mut limbs = self.twos_complement_limbs_asc();
+        limbs.reverse();
+        limbs
     }
 }

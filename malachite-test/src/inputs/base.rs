@@ -544,6 +544,11 @@ pub fn vecs_of_unsigned_var_2<T: 'static + PrimitiveUnsigned>(
     )
 }
 
+// All `Vec<u32>` that are nonempty and don't only contain zeros.
+pub fn vecs_of_u32_var_1(gm: GenerationMode) -> Box<Iterator<Item = Vec<u32>>> {
+    Box::new(vecs_of_unsigned(gm).filter(|limbs| !limbs_test_zero(limbs)))
+}
+
 fn pairs_of_unsigned_vec<T: 'static + PrimitiveUnsigned>(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (Vec<T>, Vec<T>)>> {
@@ -777,6 +782,26 @@ pub fn pairs_of_unsigned_vec_and_small_u64<T: 'static + PrimitiveUnsigned>(
             &(|seed| u32s_geometric(seed, scale).map(|u| u.into())),
         )),
     }
+}
+
+// All pairs of `Vec<u32>` and small `u64` where the `Vec<u32>` are nonempty and don't only contain
+// zeros.
+pub fn pairs_of_u32_vec_and_small_u64_var_1(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (Vec<u32>, u64)>> {
+    Box::new(
+        pairs_of_unsigned_vec_and_small_u64(gm).filter(|&(ref limbs, _)| !limbs_test_zero(limbs)),
+    )
+}
+
+// All pairs of `Vec<u32>` and small `u64` where the u64 is less than 32 * the length of the `Vec`.
+pub fn pairs_of_u32_vec_and_small_u64_var_2(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (Vec<u32>, u64)>> {
+    Box::new(
+        pairs_of_unsigned_vec_and_small_u64(gm)
+            .filter(|&(ref limbs, index)| index < (limbs.len() as u64) << u32::LOG_WIDTH),
+    )
 }
 
 pub fn vecs_of_bool(gm: GenerationMode) -> Box<Iterator<Item = Vec<bool>>> {

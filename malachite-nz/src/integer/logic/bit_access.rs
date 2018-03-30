@@ -7,7 +7,7 @@ use natural::Natural::{self, Large, Small};
 
 /// Interpreting a slice of `u32`s as the limbs (in ascending order) of a `Natural`, gets a bit of
 /// the negative of that `Natural` (two's complement) at a specified index. Sufficiently high
-/// indices will return `true`, unless `limbs` is empty.
+/// indices will return `true`. The slice cannot be empty or contain only zeros.
 ///
 /// Time: worst case O(n)
 ///
@@ -28,9 +28,6 @@ use natural::Natural::{self, Large, Small};
 /// assert_eq!(limbs_get_bit_neg(&[0, 0b1011], 100), true);
 /// ```
 pub fn limbs_get_bit_neg(limbs: &[u32], index: u64) -> bool {
-    if limbs.is_empty() {
-        return false;
-    }
     let limb_index = (index >> u32::LOG_WIDTH) as usize;
     if limb_index >= limbs.len() {
         // We're indexing into the infinite suffix of 1s
@@ -42,6 +39,53 @@ pub fn limbs_get_bit_neg(limbs: &[u32], index: u64) -> bool {
             !limbs[limb_index]
         };
         limb.get_bit(index & u64::from(u32::WIDTH_MASK))
+    }
+}
+
+/// Interpreting a slice of `u32`s as the limbs (in ascending order) of a `Natural`, performs an
+/// action equivalent to setting a bit in the negative of that `Natural` (two's complement) at a
+/// specified index to `true`. Indices that are outside the bounds of the slice will result in no
+/// action being taken, since negative numbers in two's complement have infinitely many leading 1s.
+/// The slice cannot be empty or contain only zeros.
+///
+/// Time: worst case O(1)
+///
+/// Additional memory: worst case O(1)
+///
+/// # Panics
+/// If the slice contains only zeros a panic may occur.
+///
+/// # Example
+/// ```
+/// use malachite_nz::integer::logic::bit_access::limbs_set_bit_neg;
+/// use std::cmp::Ordering;
+///
+/// let mut limbs = &mut [3, 2, 1];
+/// limbs_set_bit_neg(limbs, 1);
+/// assert_eq!(limbs, &[1, 2, 1]);
+/// ```
+pub fn limbs_set_bit_neg(limbs: &mut [u32], index: u64) {
+    let limb_index = (index >> u32::LOG_WIDTH) as usize;
+    if limb_index >= limbs.len() {
+        return;
+    }
+    let reduced_index = index & u64::from(u32::WIDTH_MASK);
+    let mut zero_bound = 0;
+    // No index upper bound on this loop; we're sure there's a nonzero limb sooner or later.
+    while limbs[zero_bound] == 0 {
+        zero_bound += 1;
+    }
+    if limb_index > zero_bound {
+        limbs[limb_index].clear_bit(reduced_index);
+    } else if limb_index == zero_bound {
+        let boundary_limb = &mut limbs[limb_index];
+        // boundary limb != 0 here
+        *boundary_limb -= 1;
+        boundary_limb.clear_bit(reduced_index);
+        // boundary limb != u32::MAX here
+        *boundary_limb += 1;
+    } else {
+        mpn_sub_1_in_place(&mut limbs[limb_index..], 1 << reduced_index);
     }
 }
 
@@ -231,6 +275,7 @@ impl BitAccess for Integer {
 }
 
 impl Natural {
+    // self cannot be zero
     fn get_bit_neg(&self, index: u64) -> bool {
         match *self {
             Small(small) => index >= u32::WIDTH.into() || small.wrapping_neg().get_bit(index),
@@ -249,29 +294,7 @@ impl Natural {
                 }
                 return;
             }
-            Large(ref mut limbs) => {
-                let limb_index = (index >> u32::LOG_WIDTH) as usize;
-                if limb_index >= limbs.len() {
-                    return;
-                }
-                let reduced_index = index & u64::from(u32::WIDTH_MASK);
-                let mut zero_bound = 0;
-                // No index upper bound on this loop; we're sure there's a nonzero limb sooner or
-                // later.
-                while limbs[zero_bound] == 0 {
-                    zero_bound += 1;
-                }
-                if limb_index > zero_bound {
-                    limbs[limb_index].clear_bit(reduced_index);
-                } else if limb_index == zero_bound {
-                    let limb_ref = &mut limbs[limb_index];
-                    *limb_ref -= 1;
-                    limb_ref.clear_bit(reduced_index);
-                    *limb_ref += 1;
-                } else {
-                    mpn_sub_1_in_place(&mut limbs[limb_index..], 1 << (reduced_index as u32));
-                }
-            }
+            Large(ref mut limbs) => limbs_set_bit_neg(limbs, index),
         }
         self.trim();
     }
@@ -314,7 +337,7 @@ impl Natural {
                     }
                 } else {
                     limbs.resize(limb_index, 0);
-                    limbs.push(1 << (reduced_index as u32));
+                    limbs.push(1 << reduced_index);
                 }
             }
         );

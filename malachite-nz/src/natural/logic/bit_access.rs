@@ -4,11 +4,9 @@ use natural::Natural::{self, Large, Small};
 /// Interpreting a slice of `u32`s as the limbs (in ascending order) of a `Natural`, gets a bit of
 /// the `Natural` at a specified index. Sufficiently high indices will return `false`.
 ///
-/// Time: worst case O(n)
+/// Time: worst case O(1)
 ///
 /// Additional memory: worst case O(1)
-///
-/// where n = `limbs.len()`
 ///
 /// # Example
 /// ```
@@ -28,6 +26,69 @@ pub fn limbs_get_bit(limbs: &[u32], index: u64) -> bool {
         .map_or(false, |limb| {
             limb.get_bit(index & u64::from(u32::WIDTH_MASK))
         })
+}
+
+fn limbs_set_bit_helper(limbs: &mut [u32], index: u64, limb_index: usize) {
+    limbs[limb_index].set_bit(index & u64::from(u32::WIDTH_MASK));
+}
+
+/// Interpreting a slice of `u32`s as the limbs (in ascending order) of a `Natural`, sets a bit of
+/// the `Natural` at a specified index to `true`. Indices that are outside the bounds of the slice
+/// will cause a panic.
+///
+/// Time: worst case O(1)
+///
+/// Additional memory: worst case O(1)
+///
+/// # Panics
+/// Panics if `index` >= `limbs.len()` * 32.
+///
+/// # Example
+/// ```
+/// use malachite_nz::natural::logic::bit_access::limbs_slice_set_bit;
+/// use std::cmp::Ordering;
+///
+/// let mut limbs = &mut [0, 1];
+/// limbs_slice_set_bit(limbs, 0);
+/// assert_eq!(limbs, &[1, 1]);
+/// limbs_slice_set_bit(limbs, 1);
+/// assert_eq!(limbs, &[3, 1]);
+/// limbs_slice_set_bit(limbs, 33);
+/// assert_eq!(limbs, &[3, 3]);
+/// ```
+pub fn limbs_slice_set_bit(limbs: &mut [u32], index: u64) {
+    limbs_set_bit_helper(limbs, index, (index >> u32::LOG_WIDTH) as usize);
+}
+
+/// Interpreting a `Vec` of `u32`s as the limbs (in ascending order) of a `Natural`, sets a bit of
+/// the `Natural` at a specified index to `true`. Sufficiently high indices will increase the length
+/// of the limbs vector.
+///
+/// Time: worst case O(`index`)
+///
+/// Additional memory: worst case O(`index`)
+///
+/// # Example
+/// ```
+/// use malachite_nz::natural::logic::bit_access::limbs_vec_set_bit;
+/// use std::cmp::Ordering;
+///
+/// let mut limbs = vec![0, 1];
+/// limbs_vec_set_bit(&mut limbs, 0);
+/// assert_eq!(limbs, &[1, 1]);
+/// limbs_vec_set_bit(&mut limbs, 1);
+/// assert_eq!(limbs, &[3, 1]);
+/// limbs_vec_set_bit(&mut limbs, 33);
+/// assert_eq!(limbs, &[3, 3]);
+/// limbs_vec_set_bit(&mut limbs, 128);
+/// assert_eq!(limbs, &[3, 3, 0, 0, 1]);
+/// ```
+pub fn limbs_vec_set_bit(limbs: &mut Vec<u32>, index: u64) {
+    let limb_index = (index >> u32::LOG_WIDTH) as usize;
+    if limb_index >= limbs.len() {
+        limbs.resize(limb_index + 1, 0);
+    }
+    limbs_set_bit_helper(limbs, index, limb_index);
 }
 
 /// Provides functions for accessing and modifying the `index`th bit of a `Natural`, or the
@@ -129,13 +190,7 @@ impl BitAccess for Natural {
                     None
                 }
             },
-            {
-                let limb_index = (index >> u32::LOG_WIDTH) as usize;
-                if limb_index >= limbs.len() {
-                    limbs.resize(limb_index + 1, 0);
-                }
-                limbs[limb_index].set_bit(index & u64::from(u32::WIDTH_MASK));
-            }
+            limbs_vec_set_bit(limbs, index)
         );
     }
 
