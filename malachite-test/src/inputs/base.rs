@@ -4,6 +4,7 @@ use malachite_base::chars::NUMBER_OF_CHARS;
 use malachite_base::limbs::limbs_test_zero;
 use malachite_base::num::{PrimitiveInteger, PrimitiveSigned, PrimitiveUnsigned};
 use malachite_base::round::RoundingMode;
+use malachite_nz::integer::logic::bit_access::limbs_vec_clear_bit_neg;
 use rust_wheels::iterators::bools::exhaustive_bools;
 use rust_wheels::iterators::chars::exhaustive_chars;
 use rust_wheels::iterators::common::EXAMPLE_SEED;
@@ -801,6 +802,20 @@ pub fn pairs_of_u32_vec_and_small_u64_var_2(
     Box::new(
         pairs_of_unsigned_vec_and_small_u64(gm)
             .filter(|&(ref limbs, index)| index < (limbs.len() as u64) << u32::LOG_WIDTH),
+    )
+}
+
+// All pairs of `Vec<u32>` and small `u64` where `limbs_slice_clear_bit_neg` applied to the `Vec`
+// and `u64` doesn't panic.
+pub fn pairs_of_u32_vec_and_small_u64_var_3(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (Vec<u32>, u64)>> {
+    Box::new(
+        pairs_of_u32_vec_and_small_u64_var_1(gm).filter(|&(ref limbs, index)| {
+            let mut mut_limbs = limbs.clone();
+            limbs_vec_clear_bit_neg(&mut mut_limbs, index);
+            mut_limbs.len() == limbs.len()
+        }),
     )
 }
 

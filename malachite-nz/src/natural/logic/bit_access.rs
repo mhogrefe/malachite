@@ -91,6 +91,34 @@ pub fn limbs_vec_set_bit(limbs: &mut Vec<u32>, index: u64) {
     limbs_set_bit_helper(limbs, index, limb_index);
 }
 
+/// Interpreting a slice of `u32`s as the limbs (in ascending order) of a `Natural`, sets a bit of
+/// the `Natural` at a specified index to `false`. Indices that are outside the bounds of the slice
+/// will result in no action being taken, since there are infinitely many leading zeros.
+///
+/// Time: worst case O(1)
+///
+/// Additional memory: worst case O(1)
+///
+/// # Example
+/// ```
+/// use malachite_nz::natural::logic::bit_access::limbs_clear_bit;
+/// use std::cmp::Ordering;
+///
+/// let mut limbs = &mut [3, 3];
+/// limbs_clear_bit(limbs, 33);
+/// assert_eq!(limbs, &[3, 1]);
+/// limbs_clear_bit(limbs, 1);
+/// assert_eq!(limbs, &[1, 1]);
+/// ```
+pub fn limbs_clear_bit(limbs: &mut [u32], index: u64) {
+    let limb_index = (index >> u32::LOG_WIDTH) as usize;
+    if limb_index < limbs.len() {
+        limbs[limb_index].clear_bit(index & u64::from(u32::WIDTH_MASK));
+    } else {
+        return;
+    }
+}
+
 /// Provides functions for accessing and modifying the `index`th bit of a `Natural`, or the
 /// coefficient of 2^<pow>`index`</pow> in its binary expansion.
 ///
@@ -224,15 +252,9 @@ impl BitAccess for Natural {
         match *self {
             Small(ref mut small) => {
                 small.clear_bit(index);
+                return;
             }
-            Large(ref mut limbs) => {
-                let limb_index = (index >> u32::LOG_WIDTH) as usize;
-                if limb_index < limbs.len() {
-                    limbs[limb_index].clear_bit(index & u64::from(u32::WIDTH_MASK));
-                } else {
-                    return;
-                }
-            }
+            Large(ref mut limbs) => limbs_clear_bit(limbs, index),
         }
         self.trim();
     }

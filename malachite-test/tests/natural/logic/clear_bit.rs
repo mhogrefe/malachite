@@ -1,10 +1,24 @@
 use common::test_properties;
 use malachite_base::num::BitAccess;
+use malachite_nz::natural::logic::bit_access::limbs_clear_bit;
 use malachite_nz::natural::Natural;
 use malachite_test::common::{natural_to_rug_integer, rug_integer_to_natural};
+use malachite_test::inputs::base::pairs_of_unsigned_vec_and_small_u64;
 use malachite_test::inputs::natural::pairs_of_natural_and_small_u64;
 use rug;
 use std::str::FromStr;
+
+#[test]
+pub fn test_limbs_clear_bit() {
+    let test = |limbs: &[u32], index: u64, out_limbs: &[u32]| {
+        let mut mut_limbs = limbs.to_vec();
+        limbs_clear_bit(&mut mut_limbs, index);
+        assert_eq!(mut_limbs, out_limbs);
+    };
+    test(&[3, 3], 33, &[3, 1]);
+    test(&[3, 1], 1, &[1, 1]);
+    test(&[3, 3], 100, &[3, 3]);
+}
 
 #[test]
 fn test_clear_bit() {
@@ -26,6 +40,20 @@ fn test_clear_bit() {
     test("1000000001024", 100, "1000000001024");
     test("1267650600228229402496703205376", 100, "1000000000000");
     test("1267650600228229401496703205381", 100, "5");
+}
+
+#[test]
+fn limbs_clear_bit_properties() {
+    test_properties(
+        pairs_of_unsigned_vec_and_small_u64,
+        |&(ref limbs, index)| {
+            let mut mut_limbs = limbs.clone();
+            let mut n = Natural::from_limbs_asc(limbs);
+            limbs_clear_bit(&mut mut_limbs, index);
+            n.clear_bit(index);
+            assert_eq!(Natural::from_limbs_asc(&mut_limbs), n);
+        },
+    );
 }
 
 #[test]

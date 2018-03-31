@@ -1,9 +1,57 @@
 use common::test_properties;
-use malachite_base::num::BitAccess;
-use malachite_base::num::NotAssign;
+use malachite_base::num::{BitAccess, NotAssign};
 use malachite_nz::integer::Integer;
+use malachite_nz::integer::logic::bit_access::{limbs_slice_clear_bit_neg, limbs_vec_clear_bit_neg};
+use malachite_nz::natural::Natural;
+use malachite_test::inputs::base::{pairs_of_u32_vec_and_small_u64_var_1,
+                                   pairs_of_u32_vec_and_small_u64_var_3};
 use malachite_test::inputs::integer::pairs_of_integer_and_small_u64;
 use std::str::FromStr;
+
+#[test]
+pub fn test_limbs_slice_clear_bit_neg() {
+    let test = |limbs: &[u32], index: u64, out_limbs: &[u32]| {
+        let mut mut_limbs = limbs.to_vec();
+        limbs_slice_clear_bit_neg(&mut mut_limbs, index);
+        assert_eq!(mut_limbs, out_limbs);
+    };
+    test(&[3, 2, 1], 0, &[4, 2, 1]);
+    test(&[0, 0, 3], 32, &[0, 0, 3]);
+    test(&[0, 3, 2, 1], 64, &[0, 3, 3, 1]);
+    test(&[0, 0, 0xffff_fffd], 64, &[0, 0, 0xffff_fffe]);
+    test(&[0xffff_fff7], 3, &[0xffff_ffff]);
+}
+
+#[test]
+#[should_panic(expected = "Setting bit cannot be done within existing slice")]
+fn limbs_slice_clear_bit_fail_1() {
+    let mut mut_limbs = vec![0, 0, 0xffff_ffff];
+    limbs_slice_clear_bit_neg(&mut mut_limbs, 64);
+}
+
+#[test]
+#[should_panic(expected = "Setting bit cannot be done within existing slice")]
+fn limbs_slice_clear_bit_fail_2() {
+    let mut mut_limbs = vec![3, 2, 1];
+    limbs_slice_clear_bit_neg(&mut mut_limbs, 100);
+}
+
+#[test]
+pub fn test_limbs_vec_clear_bit_neg() {
+    let test = |limbs: &[u32], index: u64, out_limbs: &[u32]| {
+        let mut mut_limbs = limbs.to_vec();
+        limbs_vec_clear_bit_neg(&mut mut_limbs, index);
+        assert_eq!(mut_limbs, out_limbs);
+    };
+    test(&[3, 2, 1], 0, &[4, 2, 1]);
+    test(&[0, 0, 3], 32, &[0, 0, 3]);
+    test(&[0, 3, 2, 1], 64, &[0, 3, 3, 1]);
+    test(&[0, 0, 0xffff_fffd], 64, &[0, 0, 0xffff_fffe]);
+    test(&[0, 0, 0xffff_ffff], 64, &[0, 0, 0, 1]);
+    test(&[3, 2, 1], 100, &[3, 2, 1, 16]);
+    test(&[0xffff_fff7], 3, &[0xffff_ffff]);
+    test(&[0xffff_fff8], 3, &[0, 1]);
+}
 
 #[test]
 fn test_clear_bit() {
@@ -33,6 +81,42 @@ fn test_clear_bit() {
     test("-18446744078004518912", 65, "-55340232225423622144");
     test("-36893488143124135936", 32, "-36893488147419103232");
     test("-4294967295", 0, "-4294967296");
+    test("-4294967287", 3, "-4294967295");
+    test("-4294967288", 3, "-4294967296");
+}
+
+#[test]
+fn limbs_slice_clear_bit_neg_properties() {
+    test_properties(
+        pairs_of_u32_vec_and_small_u64_var_3,
+        |&(ref limbs, index)| {
+            let mut mut_limbs = limbs.clone();
+            let mut n = -Natural::from_limbs_asc(limbs);
+            limbs_slice_clear_bit_neg(&mut mut_limbs, index);
+            n.clear_bit(index);
+            assert_eq!(-Natural::from_limbs_asc(&mut_limbs), n);
+        },
+    );
+}
+
+#[test]
+fn limbs_vec_clear_bit_neg_properties() {
+    test_properties(
+        pairs_of_u32_vec_and_small_u64_var_1,
+        |&(ref limbs, index)| {
+            let mut mut_limbs = limbs.clone();
+            let mut n = -Natural::from_limbs_asc(limbs);
+            limbs_vec_clear_bit_neg(&mut mut_limbs, index);
+            n.clear_bit(index);
+            assert_eq!(
+                -Natural::from_limbs_asc(&mut_limbs),
+                n,
+                "{:?} {}",
+                limbs,
+                index
+            );
+        },
+    );
 }
 
 #[test]
