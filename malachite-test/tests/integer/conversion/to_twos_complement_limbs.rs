@@ -1,16 +1,71 @@
 use common::test_properties;
 use malachite_base::num::{BitAccess, PrimitiveInteger};
+use malachite_nz::integer::conversion::to_twos_complement_limbs::*;
 use malachite_nz::integer::Integer;
+use malachite_nz::natural::Natural;
+use malachite_test::inputs::base::{vecs_of_unsigned, vecs_of_u32_var_1};
 use malachite_test::inputs::integer::integers;
 use std::cmp::Ordering;
 use std::str::FromStr;
 use std::u32;
 
 #[test]
+pub fn test_limbs_to_twos_complement_limbs_non_negative() {
+    let test = |limbs: &[u32], out_limbs: &[u32]| {
+        let mut mut_limbs = limbs.to_vec();
+        limbs_to_twos_complement_limbs_non_negative(&mut mut_limbs);
+        assert_eq!(mut_limbs, out_limbs);
+    };
+    test(&[], &[]);
+    test(&[1, 2, 3], &[1, 2, 3]);
+    test(&[1, 2, 0xffff_ffff], &[1, 2, 0xffff_ffff, 0]);
+}
+
+#[test]
+pub fn test_limbs_slice_to_twos_complement_limbs_negative() {
+    let test = |limbs: &[u32], out_limbs: &[u32], carry: bool| {
+        let mut mut_limbs = limbs.to_vec();
+        assert_eq!(
+            limbs_slice_to_twos_complement_limbs_negative(&mut mut_limbs),
+            carry
+        );
+        assert_eq!(mut_limbs, out_limbs);
+    };
+    test(&[], &[], true);
+    test(&[1, 2, 3], &[0xffff_ffff, 0xffff_fffd, 0xffff_fffc], false);
+    test(&[0, 0, 0], &[0, 0, 0], true);
+}
+
+#[test]
+pub fn test_limbs_vec_to_twos_complement_limbs_negative() {
+    let test = |limbs: &[u32], out_limbs: &[u32]| {
+        let mut mut_limbs = limbs.to_vec();
+        limbs_vec_to_twos_complement_limbs_negative(&mut mut_limbs);
+        assert_eq!(mut_limbs, out_limbs);
+    };
+    test(&[1, 2, 3], &[0xffff_ffff, 0xffff_fffd, 0xffff_fffc]);
+    test(&[0, 0xffff_ffff], &[0, 1, 0xffff_ffff]);
+}
+
+#[test]
+#[should_panic(expected = "assertion failed: !limbs_slice_to_twos_complement_limbs_negative\
+                           (limbs)")]
+fn limbs_slice_clear_bit_fail() {
+    let mut mut_limbs = vec![0, 0, 0];
+    limbs_vec_to_twos_complement_limbs_negative(&mut mut_limbs);
+}
+
+#[test]
 fn test_twos_complement_limbs_asc() {
     let test = |n, out| {
         assert_eq!(
-            Integer::from_str(n).unwrap().twos_complement_limbs_asc(),
+            Integer::from_str(n).unwrap().to_twos_complement_limbs_asc(),
+            out
+        );
+        assert_eq!(
+            Integer::from_str(n)
+                .unwrap()
+                .into_twos_complement_limbs_asc(),
             out
         );
     };
@@ -47,7 +102,15 @@ fn test_twos_complement_limbs_asc() {
 fn test_twos_complement_limbs_desc() {
     let test = |n, out| {
         assert_eq!(
-            Integer::from_str(n).unwrap().twos_complement_limbs_desc(),
+            Integer::from_str(n)
+                .unwrap()
+                .to_twos_complement_limbs_desc(),
+            out
+        );
+        assert_eq!(
+            Integer::from_str(n)
+                .unwrap()
+                .into_twos_complement_limbs_desc(),
             out
         );
     };
@@ -83,12 +146,51 @@ fn test_twos_complement_limbs_desc() {
 const LAST_INDEX: u64 = u32::WIDTH as u64 - 1;
 
 #[test]
+fn limbs_to_twos_complement_limbs_non_negative_properties() {
+    test_properties(vecs_of_unsigned, |limbs| {
+        let mut mut_limbs = limbs.clone();
+        limbs_to_twos_complement_limbs_non_negative(&mut mut_limbs);
+        if !limbs.is_empty() && *limbs.last().unwrap() != 0 {
+            let n = Integer::from(Natural::from_limbs_asc(limbs));
+            assert_eq!(n.to_twos_complement_limbs_asc(), mut_limbs);
+        }
+    });
+}
+
+#[test]
+fn limbs_slice_to_twos_complement_limbs_negative_properties() {
+    test_properties(vecs_of_unsigned, |limbs| {
+        let mut mut_limbs = limbs.clone();
+        limbs_slice_to_twos_complement_limbs_negative(&mut mut_limbs);
+        if !limbs.is_empty() && *limbs.last().unwrap() != 0
+            && mut_limbs.last().unwrap().get_bit(LAST_INDEX)
+        {
+            let n = -Natural::from_limbs_asc(limbs);
+            assert_eq!(n.to_twos_complement_limbs_asc(), mut_limbs);
+        }
+    });
+}
+
+#[test]
+fn limbs_vec_to_twos_complement_limbs_negative_properties() {
+    test_properties(vecs_of_u32_var_1, |limbs| {
+        let mut mut_limbs = limbs.clone();
+        limbs_vec_to_twos_complement_limbs_negative(&mut mut_limbs);
+        if !limbs.is_empty() && *limbs.last().unwrap() != 0 {
+            let n = -Natural::from_limbs_asc(limbs);
+            assert_eq!(n.to_twos_complement_limbs_asc(), mut_limbs);
+        }
+    });
+}
+
+#[test]
 fn twos_complement_limbs_asc_properties() {
     test_properties(integers, |x| {
-        let limbs = x.twos_complement_limbs_asc();
+        let limbs = x.to_twos_complement_limbs_asc();
+        assert_eq!(x.clone().into_twos_complement_limbs_asc(), limbs);
         assert_eq!(Integer::from_twos_complement_limbs_asc(&limbs), *x);
         assert_eq!(
-            x.twos_complement_limbs_desc(),
+            x.to_twos_complement_limbs_desc(),
             limbs.iter().cloned().rev().collect::<Vec<u32>>()
         );
         match x.sign() {
@@ -114,10 +216,11 @@ fn twos_complement_limbs_asc_properties() {
 #[test]
 fn limbs_desc_properties() {
     test_properties(integers, |x| {
-        let limbs = x.twos_complement_limbs_desc();
+        let limbs = x.to_twos_complement_limbs_desc();
+        assert_eq!(x.clone().into_twos_complement_limbs_desc(), limbs);
         assert_eq!(Integer::from_twos_complement_limbs_desc(&limbs), *x);
         assert_eq!(
-            x.twos_complement_limbs_asc(),
+            x.to_twos_complement_limbs_asc(),
             limbs.iter().cloned().rev().collect::<Vec<u32>>()
         );
         match x.sign() {

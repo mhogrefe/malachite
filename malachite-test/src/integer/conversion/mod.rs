@@ -17,6 +17,7 @@ pub mod natural_assign_integer;
 pub mod serde;
 pub mod from_natural;
 pub mod to_sign_and_limbs;
+pub mod to_twos_complement_limbs;
 pub mod u32_from_integer;
 pub mod u64_from_integer;
 
@@ -38,6 +39,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     natural_assign_integer::register(registry);
     serde::register(registry);
     to_sign_and_limbs::register(registry);
+    to_twos_complement_limbs::register(registry);
     u32_from_integer::register(registry);
     u64_from_integer::register(registry);
 }

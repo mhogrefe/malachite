@@ -6,9 +6,9 @@ use natural::arithmetic::sub_u32::mpn_sub_1_in_place;
 use natural::Natural::{self, Large, Small};
 
 /// Interpreting a slice of `u32`s as the limbs (in ascending order) of a `Natural`, performs an
-/// equivalent of taking the two's complement of the limbs and getting the bit at the specified
-/// index. Sufficiently high indices will return `true`. The slice cannot be empty or contain only
-/// zeros.
+/// action equivalent to taking the two's complement of the limbs and getting the bit at the
+/// specified index. Sufficiently high indices will return `true`. The slice cannot be empty or
+/// contain only zeros.
 ///
 /// Time: worst case O(n)
 ///
@@ -86,7 +86,10 @@ pub fn limbs_set_bit_neg(limbs: &mut [u32], index: u64) {
         // boundary limb != u32::MAX here
         *boundary_limb += 1;
     } else {
-        mpn_sub_1_in_place(&mut limbs[limb_index..], 1 << reduced_index);
+        assert!(!mpn_sub_1_in_place(
+            &mut limbs[limb_index..],
+            1 << reduced_index
+        ));
     }
 }
 

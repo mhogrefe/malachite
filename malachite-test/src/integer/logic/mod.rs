@@ -9,7 +9,6 @@ pub mod not;
 pub mod set_bit;
 pub mod significant_bits;
 pub mod trailing_zeros;
-pub mod twos_complement_limbs;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     assign_bit::register(registry);
@@ -21,5 +20,4 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     set_bit::register(registry);
     significant_bits::register(registry);
     trailing_zeros::register(registry);
-    twos_complement_limbs::register(registry);
 }

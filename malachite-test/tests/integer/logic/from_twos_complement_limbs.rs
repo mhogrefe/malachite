@@ -114,7 +114,7 @@ fn from_twos_complement_limbs_asc_properties() {
         let mut trimmed_limbs: Vec<u32> = limbs.iter().cloned().rev().collect();
         trim_be_limbs(&mut trimmed_limbs);
         trimmed_limbs.reverse();
-        assert_eq!(x.twos_complement_limbs_asc(), trimmed_limbs);
+        assert_eq!(x.to_twos_complement_limbs_asc(), trimmed_limbs);
         assert_eq!(
             Integer::from_twos_complement_limbs_desc(&limbs
                 .iter()
@@ -137,7 +137,7 @@ fn from_twos_complement_limbs_asc_properties() {
                         || !limbs[limbs.len() - 2].get_bit(LAST_INDEX))
             }
         } {
-            assert_eq!(x.twos_complement_limbs_asc(), *limbs);
+            assert_eq!(x.to_twos_complement_limbs_asc(), *limbs);
         }
     });
 }
@@ -148,7 +148,7 @@ fn from_twos_complement_limbs_desc_properties() {
         let x = Integer::from_twos_complement_limbs_desc(limbs);
         let mut trimmed_limbs: Vec<u32> = limbs.to_vec();
         trim_be_limbs(&mut trimmed_limbs);
-        assert_eq!(x.twos_complement_limbs_desc(), trimmed_limbs);
+        assert_eq!(x.to_twos_complement_limbs_desc(), trimmed_limbs);
         assert_eq!(
             Integer::from_twos_complement_limbs_asc(&limbs
                 .iter()
@@ -169,7 +169,7 @@ fn from_twos_complement_limbs_desc_properties() {
                     && (first != !0 || limbs.len() <= 1 || !limbs[1].get_bit(LAST_INDEX))
             }
         } {
-            assert_eq!(x.twos_complement_limbs_desc(), *limbs);
+            assert_eq!(x.to_twos_complement_limbs_desc(), *limbs);
         }
     });
 }

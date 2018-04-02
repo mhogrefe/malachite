@@ -108,6 +108,7 @@ pub mod integer {
         pub mod natural_assign_integer;
         pub mod serde;
         pub mod to_sign_and_limbs;
+        pub mod to_twos_complement_limbs;
         pub mod u32_from_integer;
         pub mod u64_from_integer;
     }
@@ -121,7 +122,6 @@ pub mod integer {
         pub mod set_bit;
         pub mod significant_bits;
         pub mod trailing_zeros;
-        pub mod twos_complement_limbs;
     }
 }
 pub mod natural {
