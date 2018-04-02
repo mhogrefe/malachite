@@ -9,6 +9,7 @@ pub mod clone_and_assign;
 pub mod from_i32;
 pub mod from_i64;
 pub mod from_sign_and_limbs;
+pub mod from_twos_complement_limbs;
 pub mod from_u32;
 pub mod from_u64;
 pub mod i32_from_integer;
@@ -32,6 +33,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     from_i64::register(registry);
     from_natural::register(registry);
     from_sign_and_limbs::register(registry);
+    from_twos_complement_limbs::register(registry);
     from_u32::register(registry);
     from_u64::register(registry);
     i32_from_integer::register(registry);

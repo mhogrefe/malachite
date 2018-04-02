@@ -101,6 +101,7 @@ pub mod integer {
         pub mod from_i64;
         pub mod from_natural;
         pub mod from_sign_and_limbs;
+        pub mod from_twos_complement_limbs;
         pub mod from_u32;
         pub mod from_u64;
         pub mod i32_from_integer;
@@ -116,7 +117,6 @@ pub mod integer {
         pub mod assign_bit;
         pub mod clear_bit;
         pub mod flip_bit;
-        pub mod from_twos_complement_limbs;
         pub mod get_bit;
         pub mod not;
         pub mod set_bit;

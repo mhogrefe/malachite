@@ -82,6 +82,7 @@ pub mod from_i32;
 pub mod from_i64;
 pub mod from_natural;
 pub mod from_sign_and_limbs;
+pub mod from_twos_complement_limbs;
 pub mod from_u32;
 pub mod from_u64;
 pub mod i32_from_integer;

@@ -14,13 +14,13 @@ impl Integer {
     /// This function borrows `limbs`. If taking ownership of `limbs` is possible,
     /// `from_sign_and_owned_limbs_asc` is more efficient.
     ///
+    /// This method is more efficient than `from_sign_and_limbs_desc`.
+    ///
     /// Time: worst case O(n)
     ///
     /// Additional memory: worst case O(n)
     ///
     /// where n = `limbs.len()`
-    ///
-    /// This method is more efficient than `from_sign_and_limbs_desc`.
     ///
     /// # Panics
     /// Panics if all limbs are zero but `sign` is not `Ordering::Equal`, or if not all limbs are
@@ -66,13 +66,13 @@ impl Integer {
     /// This function borrows `limbs`. If taking ownership of `limbs` is possible,
     /// `from_sign_and_owned_limbs_desc` is more efficient.
     ///
+    /// This method is less efficient than `from_sign_and_limbs_asc`.
+    ///
     /// Time: worst case O(n)
     ///
     /// Additional memory: worst case O(n)
     ///
     /// where n = `limbs.len()`
-    ///
-    /// This method is less efficient than `from_sign_and_limbs_asc`.
     ///
     /// # Panics
     /// Panics if all limbs are zero but `sign` is not `Ordering::Equal`, or if not all limbs are
@@ -118,13 +118,13 @@ impl Integer {
     /// This function takes ownership of `limbs`. If it's necessary to borrow `limbs` instead, use
     /// `from_sign_and_limbs_asc`.
     ///
+    /// This method is more efficient than `from_sign_and_owned_limbs_desc`.
+    ///
     /// Time: worst case O(n)
     ///
     /// Additional memory: worst case O(n)
     ///
     /// where n = `limbs.len()`
-    ///
-    /// This method is more efficient than `from_sign_and_owned_limbs_desc`.
     ///
     /// # Panics
     /// Panics if all limbs are zero but `sign` is not `Ordering::Equal`, or if not all limbs are
@@ -173,13 +173,13 @@ impl Integer {
     /// This function takes ownership of `limbs`. If it's necessary to borrow `limbs` instead, use
     /// `from_sign_and_limbs_desc`.
     ///
+    /// This method is less efficient than `from_sign_and_owned_limbs_asc`.
+    ///
     /// Time: worst case O(n)
     ///
     /// Additional memory: worst case O(n)
     ///
     /// where n = `limbs.len()`
-    ///
-    /// This method is less efficient than `from_sign_and_owned_limbs_asc`.
     ///
     /// # Panics
     /// Panics if all limbs are zero but `sign` is not `Ordering::Equal`, or if not all limbs are

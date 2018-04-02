@@ -11,6 +11,9 @@ fn test_from_from_twos_complement_limbs_asc() {
         let x = Integer::from_twos_complement_limbs_asc(limbs);
         assert_eq!(x.to_string(), out);
         assert!(x.is_valid());
+        let x = Integer::from_owned_twos_complement_limbs_asc(limbs.to_vec());
+        assert_eq!(x.to_string(), out);
+        assert!(x.is_valid());
     };
     test(&[], "0");
     test(&[0], "0");
@@ -46,6 +49,9 @@ fn test_from_from_twos_complement_limbs_asc() {
 fn test_from_from_twos_complement_limbs_desc() {
     let test = |limbs: &[u32], out| {
         let x = Integer::from_twos_complement_limbs_desc(limbs);
+        assert_eq!(x.to_string(), out);
+        assert!(x.is_valid());
+        let x = Integer::from_owned_twos_complement_limbs_desc(limbs.to_vec());
         assert_eq!(x.to_string(), out);
         assert!(x.is_valid());
     };
@@ -111,6 +117,10 @@ const LAST_INDEX: u64 = u32::WIDTH as u64 - 1;
 fn from_twos_complement_limbs_asc_properties() {
     test_properties(vecs_of_unsigned, |limbs: &Vec<u32>| {
         let x = Integer::from_twos_complement_limbs_asc(limbs);
+        assert_eq!(
+            Integer::from_owned_twos_complement_limbs_asc(limbs.clone()),
+            x
+        );
         let mut trimmed_limbs: Vec<u32> = limbs.iter().cloned().rev().collect();
         trim_be_limbs(&mut trimmed_limbs);
         trimmed_limbs.reverse();
@@ -146,6 +156,10 @@ fn from_twos_complement_limbs_asc_properties() {
 fn from_twos_complement_limbs_desc_properties() {
     test_properties(vecs_of_unsigned, |limbs: &Vec<u32>| {
         let x = Integer::from_twos_complement_limbs_desc(limbs);
+        assert_eq!(
+            Integer::from_owned_twos_complement_limbs_desc(limbs.clone()),
+            x
+        );
         let mut trimmed_limbs: Vec<u32> = limbs.to_vec();
         trim_be_limbs(&mut trimmed_limbs);
         assert_eq!(x.to_twos_complement_limbs_desc(), trimmed_limbs);

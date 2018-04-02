@@ -3,6 +3,29 @@ use inputs::base::{vecs_of_unsigned, vecs_of_u32_var_1};
 use inputs::integer::integers;
 use malachite_base::num::SignificantBits;
 use malachite_nz::integer::conversion::to_twos_complement_limbs::*;
+use malachite_nz::natural::arithmetic::sub_u32::mpn_sub_1_in_place;
+use malachite_nz::natural::logic::not::limbs_not_in_place;
+
+pub fn limbs_slice_to_twos_complement_limbs_negative_alt_1(limbs: &mut [u32]) -> bool {
+    let mut carry = true;
+    for limb in limbs {
+        if carry {
+            if let (result, true) = limb.overflowing_neg() {
+                *limb = result;
+                carry = false;
+            }
+        } else {
+            *limb = !*limb;
+        }
+    }
+    carry
+}
+
+pub fn limbs_slice_to_twos_complement_limbs_negative_alt_2(limbs: &mut [u32]) -> bool {
+    let carry = mpn_sub_1_in_place(limbs, 1);
+    limbs_not_in_place(limbs);
+    carry
+}
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limbs_to_twos_complement_limbs_non_negative);
@@ -20,7 +43,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_bench!(
         registry,
         Small,
-        benchmark_limbs_slice_to_twos_complement_limbs_negative
+        benchmark_limbs_slice_to_twos_complement_limbs_negative_algorithms
     );
     register_bench!(
         registry,
@@ -137,14 +160,14 @@ fn benchmark_limbs_to_twos_complement_limbs_non_negative(
     );
 }
 
-fn benchmark_limbs_slice_to_twos_complement_limbs_negative(
+fn benchmark_limbs_slice_to_twos_complement_limbs_negative_algorithms(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,
 ) {
     m_run_benchmark(
         "limbs_slice_to_twos_complement_limbs_negative(&mut [u32])",
-        BenchmarkType::Single,
+        BenchmarkType::Algorithms,
         vecs_of_u32_var_1(gm),
         gm.name(),
         limit,
@@ -153,9 +176,21 @@ fn benchmark_limbs_slice_to_twos_complement_limbs_negative(
         "index",
         &mut [
             (
-                "malachite",
+                "default",
                 &mut (|ref mut limbs| {
                     no_out!(limbs_slice_to_twos_complement_limbs_negative(limbs))
+                }),
+            ),
+            (
+                "integrated",
+                &mut (|ref mut limbs| {
+                    no_out!(limbs_slice_to_twos_complement_limbs_negative_alt_1(limbs))
+                }),
+            ),
+            (
+                "sub 1 and not",
+                &mut (|ref mut limbs| {
+                    no_out!(limbs_slice_to_twos_complement_limbs_negative_alt_2(limbs))
                 }),
             ),
         ],

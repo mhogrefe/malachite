@@ -5,6 +5,7 @@ use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_test::inputs::base::{vecs_of_unsigned, vecs_of_u32_var_1};
 use malachite_test::inputs::integer::integers;
+use malachite_test::integer::conversion::to_twos_complement_limbs::*;
 use std::cmp::Ordering;
 use std::str::FromStr;
 use std::u32;
@@ -162,6 +163,12 @@ fn limbs_slice_to_twos_complement_limbs_negative_properties() {
     test_properties(vecs_of_unsigned, |limbs| {
         let mut mut_limbs = limbs.clone();
         limbs_slice_to_twos_complement_limbs_negative(&mut mut_limbs);
+        let mut mut_limbs_alt = limbs.clone();
+        limbs_slice_to_twos_complement_limbs_negative_alt_1(&mut mut_limbs_alt);
+        assert_eq!(mut_limbs_alt, mut_limbs);
+        let mut mut_limbs_alt = limbs.clone();
+        limbs_slice_to_twos_complement_limbs_negative_alt_2(&mut mut_limbs_alt);
+        assert_eq!(mut_limbs_alt, mut_limbs);
         if !limbs.is_empty() && *limbs.last().unwrap() != 0
             && mut_limbs.last().unwrap().get_bit(LAST_INDEX)
         {
@@ -184,7 +191,7 @@ fn limbs_vec_to_twos_complement_limbs_negative_properties() {
 }
 
 #[test]
-fn twos_complement_limbs_asc_properties() {
+fn to_twos_complement_limbs_asc_properties() {
     test_properties(integers, |x| {
         let limbs = x.to_twos_complement_limbs_asc();
         assert_eq!(x.clone().into_twos_complement_limbs_asc(), limbs);

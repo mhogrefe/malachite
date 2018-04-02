@@ -1,5 +1,7 @@
 use integer::Integer;
 use malachite_base::num::{BitAccess, PrimitiveInteger};
+use natural::arithmetic::add_u32::mpn_add_1_in_place;
+use natural::logic::not::limbs_not_in_place;
 use std::u32;
 
 /// Given the limbs, or base-2<sup>32</sup> digits, of a non-negative `Integer`, in ascending order,
@@ -52,18 +54,8 @@ pub fn limbs_to_twos_complement_limbs_non_negative(limbs: &mut Vec<u32>) {
 /// assert_eq!(limbs, &[0, 0, 0]);
 /// ```
 pub fn limbs_slice_to_twos_complement_limbs_negative(limbs: &mut [u32]) -> bool {
-    let mut carry = true;
-    for limb in limbs {
-        if carry {
-            if let (result, true) = limb.overflowing_neg() {
-                *limb = result;
-                carry = false;
-            }
-        } else {
-            *limb = !*limb;
-        }
-    }
-    carry
+    limbs_not_in_place(limbs);
+    mpn_add_1_in_place(limbs, 1)
 }
 
 /// Given the limbs, or base-2<sup>32</sup> digits, of the absolute value of a negative `Integer`,
