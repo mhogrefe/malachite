@@ -6,12 +6,13 @@ use std::ops::Index;
 ///
 /// This struct also supports retrieving limbs by index. This functionality is completely
 /// independent of the iterator's state. Indexing the implicit leading zero limbs is allowed.
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub struct LimbIterator<'a> {
     pub(crate) n: &'a Natural,
-    limb_count: usize,
+    pub(crate) limb_count: usize,
     // This is true iff `n` is nonzero and `i` and `j` are not yet equal. The iterator returns
     // `Some` iff this is true.
-    some_remaining: bool,
+    pub(crate) some_remaining: bool,
     // If `n` is nonzero, this index initially points to the least-significant limb, and is
     // incremented by next().
     pub(crate) i: u64,

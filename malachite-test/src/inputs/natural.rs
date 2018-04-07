@@ -682,6 +682,14 @@ pub fn pairs_of_natural_and_vec_of_bool_var_1(
     }
 }
 
+// All pairs of positive `Natural` and `Vec<bool>` where the length of the `Vec` is equal to the
+// limb count of the `Natural`.
+pub fn pairs_of_positive_natural_and_vec_of_bool_var_1(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (Natural, Vec<bool>)>> {
+    Box::new(pairs_of_natural_and_vec_of_bool_var_1(gm).filter(|&(ref n, _)| *n != 0))
+}
+
 struct RandomNaturalAndVecOfBoolVar2 {
     naturals: Box<Iterator<Item = Natural>>,
     rng: Box<IsaacRng>,

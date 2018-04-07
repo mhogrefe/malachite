@@ -4,7 +4,7 @@ use malachite_nz::integer::conversion::to_twos_complement_limbs::*;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_test::inputs::base::{vecs_of_unsigned, vecs_of_u32_var_1};
-use malachite_test::inputs::integer::integers;
+use malachite_test::inputs::integer::{integers, pairs_of_integer_and_vec_of_bool_var_1};
 use malachite_test::integer::conversion::to_twos_complement_limbs::*;
 use std::cmp::Ordering;
 use std::str::FromStr;
@@ -59,16 +59,10 @@ fn limbs_slice_clear_bit_fail() {
 #[test]
 fn test_twos_complement_limbs_asc() {
     let test = |n, out| {
-        assert_eq!(
-            Integer::from_str(n).unwrap().to_twos_complement_limbs_asc(),
-            out
-        );
-        assert_eq!(
-            Integer::from_str(n)
-                .unwrap()
-                .into_twos_complement_limbs_asc(),
-            out
-        );
+        let n = Integer::from_str(n).unwrap();
+        assert_eq!(n.twos_complement_limbs().collect::<Vec<u32>>(), out);
+        assert_eq!(n.to_twos_complement_limbs_asc(), out);
+        assert_eq!(n.into_twos_complement_limbs_asc(), out);
     };
     test("0", vec![]);
     test("123", vec![123]);
@@ -195,6 +189,7 @@ fn to_twos_complement_limbs_asc_properties() {
     test_properties(integers, |x| {
         let limbs = x.to_twos_complement_limbs_asc();
         assert_eq!(x.clone().into_twos_complement_limbs_asc(), limbs);
+        assert_eq!(x.twos_complement_limbs().collect::<Vec<u32>>(), limbs);
         assert_eq!(Integer::from_twos_complement_limbs_asc(&limbs), *x);
         assert_eq!(
             x.to_twos_complement_limbs_desc(),
@@ -225,6 +220,7 @@ fn limbs_desc_properties() {
     test_properties(integers, |x| {
         let limbs = x.to_twos_complement_limbs_desc();
         assert_eq!(x.clone().into_twos_complement_limbs_desc(), limbs);
+        assert_eq!(x.twos_complement_limbs().rev().collect::<Vec<u32>>(), limbs);
         assert_eq!(Integer::from_twos_complement_limbs_desc(&limbs), *x);
         assert_eq!(
             x.to_twos_complement_limbs_asc(),
@@ -248,4 +244,27 @@ fn limbs_desc_properties() {
             }
         }
     });
+}
+
+#[test]
+fn twos_complement_limbs_properties() {
+    test_properties(
+        pairs_of_integer_and_vec_of_bool_var_1,
+        |&(ref n, ref bs)| {
+            let mut limbs = n.twos_complement_limbs();
+            let mut limb_vec = Vec::new();
+            let mut i = 0;
+            for &b in bs {
+                if b {
+                    limb_vec.insert(i, limbs.next().unwrap());
+                    i += 1;
+                } else {
+                    limb_vec.insert(i, limbs.next_back().unwrap())
+                }
+            }
+            assert!(limbs.next().is_none());
+            assert!(limbs.next_back().is_none());
+            assert_eq!(n.to_twos_complement_limbs_asc(), limb_vec);
+        },
+    );
 }

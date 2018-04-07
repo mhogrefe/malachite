@@ -27,7 +27,7 @@ pub fn main() {
     if item_name == "all" {
         registry.benchmark_all(limit);
     } else if let Some(f) = registry.lookup_demo(item_name) {
-        f(get_gm(generation_mode, ScaleType::None), limit);
+        f(get_gm(generation_mode, ScaleType::Small), limit);
     } else if let Some(&(scale_type, f)) = registry.lookup_bench(item_name) {
         f(get_gm(generation_mode, scale_type), limit, "temp.gp");
     } else if let Some(f) = registry.lookup_no_special_demo(item_name) {

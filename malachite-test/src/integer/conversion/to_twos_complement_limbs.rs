@@ -35,6 +35,8 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_integer_to_twos_complement_limbs_desc);
     register_demo!(registry, demo_integer_into_twos_complement_limbs_asc);
     register_demo!(registry, demo_integer_into_twos_complement_limbs_desc);
+    register_demo!(registry, demo_integer_twos_complement_limbs);
+    register_demo!(registry, demo_integer_twos_complement_limbs_rev);
     register_bench!(
         registry,
         Small,
@@ -133,6 +135,26 @@ fn demo_integer_into_twos_complement_limbs_desc(gm: GenerationMode, limit: usize
             "into_twos_complement_limbs_desc({}) = {:?}",
             n,
             n.clone().into_twos_complement_limbs_desc()
+        );
+    }
+}
+
+fn demo_integer_twos_complement_limbs(gm: GenerationMode, limit: usize) {
+    for n in integers(gm).take(limit) {
+        println!(
+            "twos_complement_limbs({}) = {:?}",
+            n,
+            n.twos_complement_limbs().collect::<Vec<u32>>()
+        );
+    }
+}
+
+fn demo_integer_twos_complement_limbs_rev(gm: GenerationMode, limit: usize) {
+    for n in integers(gm).take(limit) {
+        println!(
+            "twos_complement_limbs({}).rev() = {:?}",
+            n,
+            n.twos_complement_limbs().rev().collect::<Vec<u32>>()
         );
     }
 }
@@ -243,6 +265,10 @@ fn benchmark_integer_to_twos_complement_limbs_asc_evaluation_strategy(
                 "Integer.into_twos_complement_limbs_asc()",
                 &mut (|n| no_out!(n.into_twos_complement_limbs_asc())),
             ),
+            (
+                "Integer.twos_complement_limbs().collect::<Vec<u32>>()",
+                &mut (|n| no_out!(n.twos_complement_limbs().collect::<Vec<u32>>())),
+            ),
         ],
     );
 }
@@ -269,6 +295,10 @@ fn benchmark_integer_to_twos_complement_limbs_desc_evaluation_strategy(
             (
                 "Integer.into_twos_complement_limbs_desc()",
                 &mut (|n| no_out!(n.into_twos_complement_limbs_desc())),
+            ),
+            (
+                "Integer.twos_complement_limbs().rev().collect::<Vec<u32>>()",
+                &mut (|n| no_out!(n.twos_complement_limbs().collect::<Vec<u32>>())),
             ),
         ],
     );

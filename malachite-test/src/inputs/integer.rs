@@ -5,9 +5,11 @@ use malachite_base::round::RoundingMode;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use num::BigInt;
+use rand::{IsaacRng, Rng, SeedableRng};
 use rug;
 use rust_wheels::iterators::bools::exhaustive_bools;
-use rust_wheels::iterators::common::EXAMPLE_SEED;
+use rust_wheels::iterators::common::{scramble, EXAMPLE_SEED};
+use rust_wheels::iterators::dependent_pairs::dependent_pairs;
 use rust_wheels::iterators::general::random;
 use rust_wheels::iterators::integers::{exhaustive_integers, exhaustive_natural_integers,
                                        random_integers, random_natural_integers,
@@ -22,6 +24,7 @@ use rust_wheels::iterators::tuples::{exhaustive_pairs, exhaustive_pairs_from_sin
                                      exhaustive_triples, exhaustive_triples_from_single,
                                      lex_pairs, log_pairs, random_pairs, random_pairs_from_single,
                                      random_triples, random_triples_from_single};
+use rust_wheels::iterators::vecs::exhaustive_fixed_size_vecs_from_single;
 
 pub fn integers(gm: GenerationMode) -> Box<Iterator<Item = Integer>> {
     match gm {
@@ -848,4 +851,67 @@ pub fn triples_of_integer_small_u32_and_rounding_mode_var_1(
         triples_of_integer_small_u32_and_rounding_mode(gm)
             .filter(|&(ref n, u, rm)| rm != RoundingMode::Exact || n.divisible_by_power_of_two(u)),
     )
+}
+
+struct RandomIntegerAndVecOfBoolVar1 {
+    integers: Box<Iterator<Item = Integer>>,
+    rng: Box<IsaacRng>,
+}
+
+impl Iterator for RandomIntegerAndVecOfBoolVar1 {
+    type Item = (Integer, Vec<bool>);
+
+    fn next(&mut self) -> Option<(Integer, Vec<bool>)> {
+        let n = self.integers.next().unwrap();
+        let mut bools = Vec::new();
+        for _ in 0..n.to_twos_complement_limbs_asc().len() {
+            bools.push(self.rng.gen::<bool>());
+        }
+        Some((n, bools))
+    }
+}
+
+fn random_pairs_of_integer_and_vec_of_bool_var_1(
+    seed: &[u32],
+    scale: u32,
+) -> RandomIntegerAndVecOfBoolVar1 {
+    RandomIntegerAndVecOfBoolVar1 {
+        integers: Box::new(random_integers(&scramble(seed, "integers"), scale)),
+        rng: Box::new(IsaacRng::from_seed(&scramble(seed, "bools"))),
+    }
+}
+
+fn special_random_pairs_of_integer_and_vec_of_bool_var_1(
+    seed: &[u32],
+    scale: u32,
+) -> RandomIntegerAndVecOfBoolVar1 {
+    RandomIntegerAndVecOfBoolVar1 {
+        integers: Box::new(special_random_integers(&scramble(seed, "integers"), scale)),
+        rng: Box::new(IsaacRng::from_seed(&scramble(seed, "bools"))),
+    }
+}
+
+// All pairs of `Integer` and `Vec<bool>` where the length of the `Vec` is equal to the twos'
+// complement limb count of the `Integer` (including sign extension limbs, if necessary).
+pub fn pairs_of_integer_and_vec_of_bool_var_1(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (Integer, Vec<bool>)>> {
+    match gm {
+        GenerationMode::Exhaustive => {
+            let f = move |i: &Integer| {
+                exhaustive_fixed_size_vecs_from_single(
+                    i.to_twos_complement_limbs_asc().len() as u64,
+                    exhaustive_bools(),
+                )
+            };
+            Box::new(dependent_pairs(exhaustive_integers(), f))
+        }
+        GenerationMode::Random(scale) => Box::new(random_pairs_of_integer_and_vec_of_bool_var_1(
+            &EXAMPLE_SEED,
+            scale,
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(
+            special_random_pairs_of_integer_and_vec_of_bool_var_1(&EXAMPLE_SEED, scale),
+        ),
+    }
 }
