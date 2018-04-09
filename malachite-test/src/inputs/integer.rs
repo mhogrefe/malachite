@@ -422,6 +422,12 @@ pub fn nrm_pairs_of_integer_and_small_u64(
     }))
 }
 
+pub fn pairs_of_integer_and_small_usize(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (Integer, usize)>> {
+    Box::new(pairs_of_integer_and_small_u32(gm).map(|(n, u)| (n, u as usize)))
+}
+
 pub fn triples_of_integer_small_u32_and_small_u32(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (Integer, u32, u32)>> {
@@ -912,6 +918,69 @@ pub fn pairs_of_integer_and_vec_of_bool_var_1(
         )),
         GenerationMode::SpecialRandom(scale) => Box::new(
             special_random_pairs_of_integer_and_vec_of_bool_var_1(&EXAMPLE_SEED, scale),
+        ),
+    }
+}
+
+struct RandomIntegerAndVecOfBoolVar2 {
+    integers: Box<Iterator<Item = Integer>>,
+    rng: Box<IsaacRng>,
+}
+
+impl Iterator for RandomIntegerAndVecOfBoolVar2 {
+    type Item = (Integer, Vec<bool>);
+
+    fn next(&mut self) -> Option<(Integer, Vec<bool>)> {
+        let n = self.integers.next().unwrap();
+        let mut bools = Vec::new();
+        for _ in 0..n.to_twos_complement_bits_asc().len() {
+            bools.push(self.rng.gen::<bool>());
+        }
+        Some((n, bools))
+    }
+}
+
+fn random_pairs_of_integer_and_vec_of_bool_var_2(
+    seed: &[u32],
+    scale: u32,
+) -> RandomIntegerAndVecOfBoolVar2 {
+    RandomIntegerAndVecOfBoolVar2 {
+        integers: Box::new(random_integers(&scramble(seed, "integers"), scale)),
+        rng: Box::new(IsaacRng::from_seed(&scramble(seed, "bools"))),
+    }
+}
+
+fn special_random_pairs_of_integer_and_vec_of_bool_var_2(
+    seed: &[u32],
+    scale: u32,
+) -> RandomIntegerAndVecOfBoolVar2 {
+    RandomIntegerAndVecOfBoolVar2 {
+        integers: Box::new(special_random_integers(&scramble(seed, "integers"), scale)),
+        rng: Box::new(IsaacRng::from_seed(&scramble(seed, "bools"))),
+    }
+}
+
+// All pairs of `Integer` and `Vec<bool>` where the length of the `Vec` is equal to the two's
+// complement bit count of the `Integer`.
+pub fn pairs_of_integer_and_vec_of_bool_var_2(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (Integer, Vec<bool>)>> {
+    match gm {
+        GenerationMode::Exhaustive => {
+            let f = move |n: &Integer| {
+                exhaustive_fixed_size_vecs_from_single(
+                    n.to_twos_complement_bits_asc().len() as u64,
+                    exhaustive_bools(),
+                )
+            };
+            Box::new(dependent_pairs(exhaustive_integers(), f))
+        }
+        GenerationMode::Random(scale) => Box::new(random_pairs_of_integer_and_vec_of_bool_var_2(
+            &EXAMPLE_SEED,
+            scale,
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(
+            special_random_pairs_of_integer_and_vec_of_bool_var_2(&EXAMPLE_SEED, scale),
         ),
     }
 }

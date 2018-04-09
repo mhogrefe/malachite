@@ -283,7 +283,7 @@ fn mpn_toom22_mul(p: &mut [u32], a: &[u32], b: &[u32], scratch: &mut [u32]) {
         };
     }
 
-    assert!(cy + 1 <= 3);
+    assert!(cy < 3);
     assert!(cy2 <= 2);
 
     mpn_add_1_in_place(&mut p[2 * n..2 * n + s + t], cy2);

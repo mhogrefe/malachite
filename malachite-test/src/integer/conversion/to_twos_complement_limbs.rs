@@ -1,10 +1,11 @@
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::{vecs_of_unsigned, vecs_of_u32_var_1};
-use inputs::integer::integers;
+use inputs::integer::{integers, pairs_of_integer_and_small_usize};
 use malachite_base::num::SignificantBits;
 use malachite_nz::integer::conversion::to_twos_complement_limbs::*;
 use malachite_nz::natural::arithmetic::sub_u32::mpn_sub_1_in_place;
 use malachite_nz::natural::logic::not::limbs_not_in_place;
+use std::u32;
 
 pub fn limbs_slice_to_twos_complement_limbs_negative_alt_1(limbs: &mut [u32]) -> bool {
     let mut carry = true;
@@ -37,6 +38,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_integer_into_twos_complement_limbs_desc);
     register_demo!(registry, demo_integer_twos_complement_limbs);
     register_demo!(registry, demo_integer_twos_complement_limbs_rev);
+    register_demo!(registry, demo_integer_twos_complement_limbs_get);
     register_bench!(
         registry,
         Small,
@@ -61,6 +63,11 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
         registry,
         Large,
         benchmark_integer_to_twos_complement_limbs_desc_evaluation_strategy
+    );
+    register_bench!(
+        registry,
+        Large,
+        benchmark_integer_twos_complement_limbs_get_algorithms
     );
 }
 
@@ -159,6 +166,17 @@ fn demo_integer_twos_complement_limbs_rev(gm: GenerationMode, limit: usize) {
     }
 }
 
+fn demo_integer_twos_complement_limbs_get(gm: GenerationMode, limit: usize) {
+    for (n, i) in pairs_of_integer_and_small_usize(gm).take(limit) {
+        println!(
+            "twos_complement_limbs({}).get({}) = {:?}",
+            n,
+            i,
+            n.twos_complement_limbs().get(i)
+        );
+    }
+}
+
 fn benchmark_limbs_to_twos_complement_limbs_non_negative(
     gm: GenerationMode,
     limit: usize,
@@ -242,6 +260,7 @@ fn benchmark_limbs_vec_to_twos_complement_limbs_negative(
     );
 }
 
+#[allow(unused_collect)]
 fn benchmark_integer_to_twos_complement_limbs_asc_evaluation_strategy(
     gm: GenerationMode,
     limit: usize,
@@ -273,6 +292,7 @@ fn benchmark_integer_to_twos_complement_limbs_asc_evaluation_strategy(
     );
 }
 
+#[allow(unused_collect)]
 fn benchmark_integer_to_twos_complement_limbs_desc_evaluation_strategy(
     gm: GenerationMode,
     limit: usize,
@@ -299,6 +319,45 @@ fn benchmark_integer_to_twos_complement_limbs_desc_evaluation_strategy(
             (
                 "Integer.twos_complement_limbs().rev().collect::<Vec<u32>>()",
                 &mut (|n| no_out!(n.twos_complement_limbs().collect::<Vec<u32>>())),
+            ),
+        ],
+    );
+}
+
+fn benchmark_integer_twos_complement_limbs_get_algorithms(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "Integer.twos_complement_limbs().get()",
+        BenchmarkType::Algorithms,
+        pairs_of_integer_and_small_usize(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(ref n, _)| n.significant_bits() as usize),
+        "n.significant_bits()",
+        &mut [
+            (
+                "Integer.twos_complement_limbs().get(u)",
+                &mut (|(n, u)| no_out!(n.twos_complement_limbs().get(u))),
+            ),
+            (
+                "Integer.into_twos_complement_limbs_asc()[u]",
+                &mut (|(n, u)| {
+                    let non_negative = n >= 0;
+                    let limbs = n.into_twos_complement_limbs_asc();
+                    if u >= limbs.len() {
+                        if non_negative {
+                            0
+                        } else {
+                            u32::MAX
+                        }
+                    } else {
+                        limbs[u]
+                    };
+                }),
             ),
         ],
     );

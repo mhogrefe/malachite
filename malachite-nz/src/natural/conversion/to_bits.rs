@@ -8,9 +8,10 @@ use std::ops::Index;
 ///
 /// This struct also supports retrieving bits by index. This functionality is completely independent
 /// of the iterator's state. Indexing the implicit leading false bits is allowed.
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub struct BitIterator<'a> {
-    significant_bits: u64,
-    limbs: LimbIterator<'a>,
+    pub(crate) significant_bits: u64,
+    pub(crate) limbs: LimbIterator<'a>,
     some_remaining: bool,
     indices_are_in_same_limb: bool,
     current_limb_forward: u32,
@@ -171,7 +172,7 @@ impl<'a> Index<u64> for BitIterator<'a> {
     type Output = bool;
 
     /// A function to retrieve bits by index. The index is the power of 2<sup>32</sub> of which the
-    /// limbs is a coefficient. Indexing at or above the limb count returns false bits.
+    /// limbs is a coefficient. Indexing at or above the significant bit count returns false bits.
     ///
     /// This is equivalent to the `get_bit` function.
     ///
@@ -189,8 +190,6 @@ impl<'a> Index<u64> for BitIterator<'a> {
     ///
     /// fn main() {
     ///     assert_eq!(Natural::ZERO.bits()[0], false);
-    ///
-    ///     assert_eq!(Natural::ZERO.bits().next_back(), None);
     ///
     ///     // 105 = 1101001b
     ///     let n = Natural::from(105u32);

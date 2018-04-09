@@ -91,8 +91,8 @@ fn test_limbs_asc_from_bits_desc() {
 fn test_from_bits_asc() {
     let test = |bits: &[bool], out| {
         let x = Natural::from_bits_asc(bits);
-        assert_eq!(x.to_string(), out);
         assert!(x.is_valid());
+        assert_eq!(x.to_string(), out);
     };
     test(&[], "0");
     test(&[false], "0");
@@ -131,8 +131,8 @@ fn test_from_bits_asc() {
 fn test_from_bits_desc() {
     let test = |bits: &[bool], out| {
         let x = Natural::from_bits_desc(bits);
-        assert_eq!(x.to_string(), out);
         assert!(x.is_valid());
+        assert_eq!(x.to_string(), out);
     };
     test(&[], "0");
     test(&[false], "0");
@@ -220,7 +220,7 @@ fn from_bits_asc_properties() {
 }
 
 #[test]
-fn from_limbs_desc_properties() {
+fn from_bits_desc_properties() {
     test_properties(vecs_of_bool, |bits| {
         let x = Natural::from_bits_desc(bits);
         assert!(x.is_valid());

@@ -831,3 +831,8 @@ pub fn vecs_of_bool(gm: GenerationMode) -> Box<Iterator<Item = Vec<bool>>> {
         }
     }
 }
+
+// All `Vec<bool>` that are nonempty and don't only contain `false`s.
+pub fn vecs_of_bool_var_1(gm: GenerationMode) -> Box<Iterator<Item = Vec<bool>>> {
+    Box::new(vecs_of_bool(gm).filter(|bits| bits.iter().any(|&bit| bit)))
+}

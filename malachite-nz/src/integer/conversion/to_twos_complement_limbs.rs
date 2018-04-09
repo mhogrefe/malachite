@@ -15,6 +15,22 @@ pub struct NegativeLimbIterator<'a> {
     first_nonzero_index: Option<usize>,
 }
 
+impl<'a> NegativeLimbIterator<'a> {
+    fn get(&self, index: usize) -> u32 {
+        if index >= self.limbs.len() {
+            // We're indexing into the infinite suffix of u32::MAXs
+            u32::MAX
+        } else {
+            for i in 0..index {
+                if self.limbs[i] != 0 {
+                    return !self.limbs[index];
+                }
+            }
+            self.limbs[index].wrapping_neg()
+        }
+    }
+}
+
 impl<'a> Iterator for NegativeLimbIterator<'a> {
     type Item = u32;
 
@@ -57,7 +73,7 @@ impl<'a> Iterator for NegativeLimbIterator<'a> {
 
 impl<'a> DoubleEndedIterator for NegativeLimbIterator<'a> {
     /// A function to iterate through the two's complement limbs of the negative of a `Natural` in
-    /// descending order (most-significant first). This is worst-case linear since in first
+    /// descending order (most-significant first). This is worst-case linear since the first
     /// `next_back` call needs to determine the index of the least-significant nonzero limb.
     ///
     /// Time: worst case O(n)
@@ -131,13 +147,12 @@ impl<'a> SignExtendedLimbIterator for NegativeLimbIterator<'a> {
     const EXTENSION: u32 = u32::MAX;
 
     fn needs_sign_extension(&self) -> bool {
-        let limbs = self.limbs.n.limbs();
         let mut i = 0;
-        while limbs[i] == 0 {
+        while self.limbs[i] == 0 {
             i += 1;
         }
         let last_limb_index = self.limbs.limb_count - 1;
-        let last_limb = limbs[last_limb_index];
+        let last_limb = self.limbs[last_limb_index];
         let twos_complement_limb = if i == last_limb_index {
             last_limb.wrapping_neg()
         } else {
@@ -148,14 +163,57 @@ impl<'a> SignExtendedLimbIterator for NegativeLimbIterator<'a> {
 }
 
 /// A double-ended iterator over the twos-complement limbs of an `Integer`. The forward order is
-/// ascending (least- significant first). The most significant bit of the most significant limb
+/// ascending (least-significant first). The most significant bit of the most significant limb
 /// corresponds to the sign of the `Integer`; `false` for non-negative and `true` for negative. This
 /// means that there may be a single most-significant sign-extension limb that is 0 or `u32::MAX`.
+///
+/// This struct also supports retrieving limbs by index. This functionality is completely
+/// independent of the iterator's state. Indexing the implicit leading limbs is allowed.
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub enum TwosComplementLimbIterator<'a> {
     Zero,
     Positive(LimbIterator<'a>, bool),
     Negative(NegativeLimbIterator<'a>, bool),
+}
+
+impl<'a> TwosComplementLimbIterator<'a> {
+    /// A function to retrieve twos-complement limbs by index. Indexing at or above the limb count
+    /// returns zero or `u32::MAX` limbs, depending on the sign of `self`.
+    ///
+    /// Time: worst case O(n)
+    ///
+    /// Additional memory: worst case O(1)
+    ///
+    /// where n = `self.significant_bits()`
+    ///
+    /// # Example
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::Zero;
+    /// use malachite_nz::integer::Integer;
+    /// use std::u32;
+    ///
+    /// fn main() {
+    ///     assert_eq!(Integer::ZERO.twos_complement_limbs().get(0), 0);
+    ///
+    ///     // 2^64 - 10^12 = 4294967063 * 2^32 + 727379968
+    ///     let negative_trillion = -Integer::trillion();
+    ///     let limbs = negative_trillion.twos_complement_limbs();
+    ///     assert_eq!(limbs.get(0), 727379968);
+    ///     assert_eq!(limbs.get(1), 4294967063);
+    ///     assert_eq!(limbs.get(2), u32::MAX);
+    ///     assert_eq!(limbs.get(100), u32::MAX);
+    /// }
+    /// ```
+    pub fn get(&self, index: usize) -> u32 {
+        match *self {
+            TwosComplementLimbIterator::Zero => 0,
+            TwosComplementLimbIterator::Positive(ref limbs, _) => limbs[index],
+            TwosComplementLimbIterator::Negative(ref limbs, _) => limbs.get(index),
+        }
+    }
 }
 
 impl<'a> Iterator for TwosComplementLimbIterator<'a> {
@@ -219,7 +277,7 @@ impl<'a> DoubleEndedIterator for TwosComplementLimbIterator<'a> {
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {
-    ///     assert_eq!(Integer::ZERO.twos_complement_limbs().next(), None);
+    ///     assert_eq!(Integer::ZERO.twos_complement_limbs().next_back(), None);
     ///
     ///     // 2^64 - 10^12 = 4294967063 * 2^32 + 727379968
     ///     let negative_trillion = -Integer::trillion();

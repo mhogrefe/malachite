@@ -443,6 +443,7 @@ impl<'a> ShrRound<u32> for &'a Natural {
     }
 }
 
+//TODO fix complexity
 /// Shifts a `Natural` right (divides it by a power of 2) and rounds according to the specified
 /// rounding mode, in place. Passing `RoundingMode::Floor` or `RoundingMode::Down` is equivalent to
 /// using `>>=`. To test whether `RoundingMode::Exact` can be passed, use
@@ -497,6 +498,7 @@ impl<'a> ShrRound<u32> for &'a Natural {
 ///     n.shr_round_assign(8, RoundingMode::Exact);
 ///     assert_eq!(n.to_string(), "1");
 /// }
+#[allow(unknown_lints, cyclomatic_complexity)]
 impl ShrRoundAssign<u32> for Natural {
     fn shr_round_assign(&mut self, other: u32, rm: RoundingMode) {
         if other == 0 || *self == 0 {

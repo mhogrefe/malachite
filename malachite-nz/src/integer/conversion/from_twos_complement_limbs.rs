@@ -77,7 +77,9 @@ impl Integer {
     ///     "-1000000000000");
     /// ```
     pub fn from_twos_complement_limbs_desc(limbs: &[u32]) -> Integer {
-        Integer::from_twos_complement_limbs_asc(&limbs.iter().cloned().rev().collect::<Vec<u32>>())
+        Integer::from_owned_twos_complement_limbs_asc(
+            limbs.iter().cloned().rev().collect::<Vec<u32>>(),
+        )
     }
 
     /// Converts a slice of limbs, or base-2<sup>32</sup> digits, to an `Integer`, in ascending

@@ -369,7 +369,7 @@ impl BitAccess for Integer {
 
 impl Natural {
     // self cannot be zero
-    fn get_bit_neg(&self, index: u64) -> bool {
+    pub(crate) fn get_bit_neg(&self, index: u64) -> bool {
         match *self {
             Small(small) => index >= u32::WIDTH.into() || small.wrapping_neg().get_bit(index),
             Large(ref limbs) => limbs_get_bit_neg(limbs, index),
