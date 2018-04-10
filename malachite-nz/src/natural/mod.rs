@@ -62,14 +62,6 @@ impl Natural {
     pub fn trillion() -> Natural {
         Natural::from_str("1000000000000").unwrap()
     }
-
-    //TODO test
-    pub fn count_ones(&self) -> u64 {
-        match *self {
-            Small(small) => small.count_ones().into(),
-            Large(ref limbs) => limbs.iter().map(|limb| u64::from(limb.count_ones())).sum(),
-        }
-    }
 }
 
 /// The constant 0.
@@ -192,6 +184,7 @@ pub mod comparison {
 }
 pub mod logic {
     pub mod bit_access;
+    pub mod count_ones;
     pub mod not;
     pub mod significant_bits;
     pub mod trailing_zeros;

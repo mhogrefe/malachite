@@ -180,4 +180,11 @@ pub mod comparison {
     pub mod sign;
 }
 pub mod conversion;
-pub mod logic;
+pub mod logic {
+    pub mod bit_access;
+    pub mod checked_count_ones;
+    pub mod checked_count_zeros;
+    pub mod not;
+    pub mod significant_bits;
+    pub mod trailing_zeros;
+}

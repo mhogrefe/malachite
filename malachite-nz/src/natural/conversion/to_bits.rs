@@ -309,7 +309,7 @@ impl Natural {
 
     /// Returns a double-ended iterator over the bits of a `Natural`. The forward order is
     /// ascending, so that less significant bits appear first. There are no trailing false bits
-    /// going  forward, or leading falses going backward.
+    /// going forward, or leading falses going backward.
     ///
     /// If it's necessary to get a `Vec` of all the bits, consider using `to_bits_asc` or
     /// `to_limbs_desc` instead.

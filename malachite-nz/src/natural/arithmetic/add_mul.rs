@@ -486,7 +486,7 @@ pub(crate) fn mpz_aorsmul(
     w.resize(max(wsize, tsize) + 1, 0);
 
     if wsize == 0 {
-        // Nothing to add to, just set w=x*y.  No w==x or w==y overlap here, since we know x,y != 0
+        // Nothing to add to, just set w=x*y. No w==x or w==y overlap here, since we know x,y != 0
         // but w == 0.
         let high = mpn_mul(w, x, y);
         if high == 0 {

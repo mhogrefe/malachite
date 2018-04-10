@@ -18,7 +18,6 @@ use std::ops::Not;
 /// # Example
 /// ```
 /// use malachite_nz::natural::logic::not::limbs_not;
-/// use std::cmp::Ordering;
 ///
 /// let mut limbs_out = [0, 1, 2];
 /// limbs_not(&mut limbs_out, &[0xffff0000, 0xf0f0f0f0]);

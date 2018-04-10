@@ -117,6 +117,8 @@ pub mod integer {
     }
     pub mod logic {
         pub mod assign_bit;
+        pub mod checked_count_ones;
+        pub mod checked_count_zeros;
         pub mod clear_bit;
         pub mod flip_bit;
         pub mod get_bit;
@@ -179,6 +181,7 @@ pub mod natural {
     pub mod logic {
         pub mod assign_bit;
         pub mod clear_bit;
+        pub mod count_ones;
         pub mod flip_bit;
         pub mod get_bit;
         pub mod limb_count;

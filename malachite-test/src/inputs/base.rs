@@ -545,6 +545,13 @@ pub fn vecs_of_unsigned_var_2<T: 'static + PrimitiveUnsigned>(
     )
 }
 
+//TODO use vecs_at_least
+pub fn nonempty_vecs_of_unsigned<T: 'static + PrimitiveUnsigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = Vec<T>>> {
+    Box::new(vecs_of_unsigned(gm).filter(|xs| !xs.is_empty()))
+}
+
 // All `Vec<u32>` that are nonempty and don't only contain zeros.
 pub fn vecs_of_u32_var_1(gm: GenerationMode) -> Box<Iterator<Item = Vec<u32>>> {
     Box::new(vecs_of_unsigned(gm).filter(|limbs| !limbs_test_zero(limbs)))

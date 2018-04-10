@@ -1,6 +1,32 @@
 use malachite_base::num::PrimitiveInteger;
 use natural::Natural::{self, Large, Small};
 
+/// Interpreting a slice of `u32`s as the limbs of a `Natural` in ascending order, returns the
+/// number of trailing zeros in the binary expansion of a `Natural` (equivalently, the multiplicity
+/// of 2 in its prime factorization). The limbs cannot be empty or all zero.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = `limbs.len()`
+///
+/// # Panics
+/// Panics if `limbs` only contains zeros.
+///
+/// # Example
+/// ```
+/// use malachite_nz::natural::logic::trailing_zeros::limbs_trailing_zeros;
+///
+/// assert_eq!(limbs_trailing_zeros(&[4]), 2);
+/// assert_eq!(limbs_trailing_zeros(&[0, 4]), 34);
+/// ```
+pub fn limbs_trailing_zeros(limbs: &[u32]) -> u64 {
+    let zero_limbs = limbs.iter().take_while(|&&limb| limb == 0).count();
+    let remaining_zeros = u64::from(limbs[zero_limbs].trailing_zeros());
+    ((zero_limbs as u64) << u32::LOG_WIDTH) + remaining_zeros
+}
+
 impl Natural {
     /// Returns the number of trailing zeros in the binary expansion of a `Natural` (equivalently,
     /// the multiplicity of 2 in its prime factorization) or `None` is the `Natural` is 0.
@@ -31,11 +57,7 @@ impl Natural {
         match *self {
             Small(0) => None,
             Small(small) => Some(small.trailing_zeros().into()),
-            Large(ref limbs) => {
-                let zero_limbs = limbs.iter().take_while(|&&limb| limb == 0).count();
-                let remaining_zeros = u64::from(limbs[zero_limbs].trailing_zeros());
-                Some(((zero_limbs as u64) << u32::LOG_WIDTH) + remaining_zeros)
-            }
+            Large(ref limbs) => Some(limbs_trailing_zeros(limbs)),
         }
     }
 }

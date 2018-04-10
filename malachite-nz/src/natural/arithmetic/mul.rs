@@ -147,7 +147,7 @@ fn toom22_mul_n_rec(p: &mut [u32], a: &[u32], b: &[u32], ws: &mut [u32]) {
     }
 }
 
-// Normally, this calls mul_basecase or toom22_mul.  But when when the fraction
+// Normally, this calls mul_basecase or toom22_mul. But when when the fraction
 // MUL_TOOM33_THRESHOLD / MUL_TOOM22_THRESHOLD is large, an initially small
 // relative unbalance will become a larger and larger relative unbalance with
 // each recursion (the difference s-t will be invariant over recursive calls).
@@ -162,7 +162,7 @@ fn toom22_mul_rec(p: &mut [u32], a: &[u32], b: &[u32], ws: &mut [u32]) {
     }
 }
 
-//  Evaluate in: -1, 0, +inf
+// Evaluate in: -1, 0, +inf
 
 // <-s--><--n-->
 //  ____ ______

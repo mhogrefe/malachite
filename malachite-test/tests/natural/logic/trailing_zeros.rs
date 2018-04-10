@@ -1,8 +1,32 @@
 use common::test_properties;
+use malachite_nz::natural::logic::trailing_zeros::limbs_trailing_zeros;
 use malachite_nz::natural::Natural;
+use malachite_test::inputs::base::vecs_of_u32_var_1;
 use malachite_test::inputs::natural::naturals;
 use std::str::FromStr;
 use std::u32;
+
+#[test]
+fn test_limbs_trailing_zeros() {
+    let test = |limbs, out| {
+        assert_eq!(limbs_trailing_zeros(limbs), out);
+    };
+    test(&[4], 2);
+    test(&[0, 4], 34);
+    test(&[1, 2, 3], 0);
+}
+
+#[test]
+#[should_panic(expected = "index out of bounds: the len is 0 but the index is 0")]
+fn limbs_trailing_zeros_fail_1() {
+    limbs_trailing_zeros(&[]);
+}
+
+#[test]
+#[should_panic(expected = "index out of bounds: the len is 3 but the index is 3")]
+fn limbs_trailing_zeros_fail_2() {
+    limbs_trailing_zeros(&[0, 0, 0]);
+}
 
 #[test]
 fn test_trailing_zeros() {
@@ -16,6 +40,16 @@ fn test_trailing_zeros() {
     test("4294967296", Some(32));
     test("18446744073709551615", Some(0));
     test("18446744073709551616", Some(64));
+}
+
+#[test]
+fn limbs_trailing_zeros_properties() {
+    test_properties(vecs_of_u32_var_1, |limbs| {
+        assert_eq!(
+            Some(limbs_trailing_zeros(limbs)),
+            Natural::from_limbs_asc(limbs).trailing_zeros()
+        );
+    });
 }
 
 #[test]

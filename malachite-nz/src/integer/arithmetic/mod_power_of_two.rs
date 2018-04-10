@@ -104,7 +104,7 @@ impl Integer {
     /// returns r, where `self` = q * 2<pow>`other`</pow> + r, (r == 0 or sgn(r) == sgn(`self`)),
     /// and 0 <= |r| < 2<pow>`other`</pow>.
     ///
-    /// Unlike `mod_power_of_two_ref  , this function always returns zero or a number with the same
+    /// Unlike `mod_power_of_two_ref, this function always returns zero or a number with the same
     /// sign as `self`.
     ///
     /// # Examples
