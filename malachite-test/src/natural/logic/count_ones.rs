@@ -3,12 +3,17 @@ use inputs::base::vecs_of_unsigned;
 use inputs::natural::naturals;
 use malachite_base::num::SignificantBits;
 use malachite_nz::natural::logic::count_ones::limbs_count_ones;
+use malachite_nz::natural::Natural;
+
+pub fn natural_count_ones_alt(n: &Natural) -> u64 {
+    n.bits().filter(|&b| b).count() as u64
+}
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limbs_count_ones);
     register_demo!(registry, demo_natural_count_ones);
     register_bench!(registry, Small, benchmark_limbs_count_ones);
-    register_bench!(registry, Large, benchmark_natural_count_ones);
+    register_bench!(registry, Large, benchmark_natural_count_ones_algorithms);
 }
 
 fn demo_limbs_count_ones(gm: GenerationMode, limit: usize) {
@@ -46,16 +51,22 @@ fn benchmark_limbs_count_ones(gm: GenerationMode, limit: usize, file_name: &str)
     );
 }
 
-fn benchmark_natural_count_ones(gm: GenerationMode, limit: usize, file_name: &str) {
+fn benchmark_natural_count_ones_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "Natural.count_ones()",
-        BenchmarkType::Single,
+        BenchmarkType::Algorithms,
         naturals(gm),
         gm.name(),
         limit,
         file_name,
         &(|n| n.significant_bits() as usize),
         "n.significant_bits()",
-        &mut [("malachite", &mut (|n| no_out!(n.count_ones())))],
+        &mut [
+            ("default", &mut (|n| no_out!(n.count_ones()))),
+            (
+                "using bits explicitly",
+                &mut (|n| no_out!(natural_count_ones_alt(&n))),
+            ),
+        ],
     );
 }

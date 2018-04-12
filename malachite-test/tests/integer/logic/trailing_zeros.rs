@@ -1,6 +1,7 @@
 use common::test_properties;
 use malachite_nz::integer::Integer;
 use malachite_test::inputs::integer::integers;
+use malachite_test::integer::logic::trailing_zeros::integer_trailing_zeros_alt;
 use std::str::FromStr;
 use std::u32;
 
@@ -28,6 +29,7 @@ fn test_trailing_zeros() {
 fn trailing_zeros_properties() {
     test_properties(integers, |x| {
         let trailing_zeros = x.trailing_zeros();
+        assert_eq!(integer_trailing_zeros_alt(x), trailing_zeros);
         assert_eq!(trailing_zeros.is_none(), *x == 0);
         assert_eq!((-x).trailing_zeros(), trailing_zeros);
         if *x != 0 {

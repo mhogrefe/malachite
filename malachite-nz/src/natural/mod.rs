@@ -185,6 +185,7 @@ pub mod comparison {
 pub mod logic {
     pub mod bit_access;
     pub mod count_ones;
+    pub mod hamming_distance_u32;
     pub mod not;
     pub mod significant_bits;
     pub mod trailing_zeros;

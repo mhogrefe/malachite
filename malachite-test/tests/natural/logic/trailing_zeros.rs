@@ -3,6 +3,7 @@ use malachite_nz::natural::logic::trailing_zeros::limbs_trailing_zeros;
 use malachite_nz::natural::Natural;
 use malachite_test::inputs::base::vecs_of_u32_var_1;
 use malachite_test::inputs::natural::naturals;
+use malachite_test::natural::logic::trailing_zeros::natural_trailing_zeros_alt;
 use std::str::FromStr;
 use std::u32;
 
@@ -56,6 +57,7 @@ fn limbs_trailing_zeros_properties() {
 fn trailing_zeros_properties() {
     test_properties(naturals, |x| {
         let trailing_zeros = x.trailing_zeros();
+        assert_eq!(natural_trailing_zeros_alt(x), trailing_zeros);
         assert_eq!(trailing_zeros.is_none(), *x == 0);
         if *x != 0 {
             let trailing_zeros = trailing_zeros.unwrap();

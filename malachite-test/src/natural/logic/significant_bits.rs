@@ -7,8 +7,8 @@ use malachite_nz::natural::logic::significant_bits::limbs_significant_bits;
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limbs_significant_bits);
     register_demo!(registry, demo_natural_significant_bits);
-    register_bench!(registry, Large, benchmark_natural_significant_bits);
     register_bench!(registry, Small, benchmark_limbs_significant_bits);
+    register_bench!(registry, Large, benchmark_natural_significant_bits);
 }
 
 fn demo_limbs_significant_bits(gm: GenerationMode, limit: usize) {

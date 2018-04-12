@@ -285,6 +285,27 @@ pub fn rm_pairs_of_unsigned_and_integer<T: 'static + PrimitiveUnsigned>(
     )
 }
 
+pub fn pairs_of_natural_integer_and_unsigned<T: 'static + PrimitiveUnsigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (Integer, T)>> {
+    match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_pairs(
+            exhaustive_natural_integers(),
+            exhaustive_unsigned(),
+        )),
+        GenerationMode::Random(scale) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| random_natural_integers(seed, scale)),
+            &(|seed| random(seed)),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_natural_integers(seed, scale)),
+            &(|seed| special_random_unsigned(seed)),
+        )),
+    }
+}
+
 fn random_triples_of_integer_integer_and_primitive<T: 'static + PrimitiveInteger>(
     scale: u32,
 ) -> Box<Iterator<Item = (Integer, Integer, T)>> {

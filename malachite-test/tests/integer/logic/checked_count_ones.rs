@@ -1,6 +1,7 @@
 use common::test_properties;
 use malachite_nz::integer::Integer;
 use malachite_test::inputs::integer::integers;
+use malachite_test::integer::logic::checked_count_ones::integer_checked_count_ones_alt;
 use std::str::FromStr;
 
 #[test]
@@ -27,6 +28,7 @@ fn test_checked_count_ones() {
 fn checked_count_ones_properties() {
     test_properties(integers, |x| {
         let ones = x.checked_count_ones();
+        assert_eq!(integer_checked_count_ones_alt(x), ones);
         assert_eq!(ones == Some(0), *x == 0);
         assert_eq!((!x).checked_count_zeros(), ones);
     });

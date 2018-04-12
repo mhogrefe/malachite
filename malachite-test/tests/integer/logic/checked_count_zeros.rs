@@ -4,6 +4,7 @@ use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_test::inputs::base::{nonempty_vecs_of_unsigned, vecs_of_u32_var_1};
 use malachite_test::inputs::integer::integers;
+use malachite_test::integer::logic::checked_count_zeros::integer_checked_count_zeros_alt;
 use std::str::FromStr;
 
 #[test]
@@ -53,6 +54,7 @@ fn limbs_count_zeros_neg_properties() {
 fn checked_count_zeros_properties() {
     test_properties(integers, |x| {
         let zeros = x.checked_count_zeros();
+        assert_eq!(integer_checked_count_zeros_alt(x), zeros);
         assert_eq!((!x).checked_count_ones(), zeros);
     });
 }

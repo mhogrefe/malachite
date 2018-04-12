@@ -551,6 +551,7 @@ pub trait PrimitiveInteger:
     + Endian
     + Eq
     + FromStr
+    + HammingDistance<Self>
     + Hash
     + LeadingZeros
     + LowerHex
@@ -1123,6 +1124,12 @@ macro_rules! integer_traits {
 
         impl Max for $t {
             const MAX: $t = std::$t::MAX;
+        }
+
+        impl HammingDistance<$t> for $t {
+            fn hamming_distance(self, other: $t) -> u64 {
+                u64::from((self ^ other).count_ones())
+            }
         }
 
         impl Walkable for $t {
@@ -2175,6 +2182,16 @@ pub trait UnsignedAbs {
     type Output;
 
     fn unsigned_abs(self) -> Self::Output;
+}
+
+//TODO doc and test
+pub trait HammingDistance<RHS> {
+    fn hamming_distance(self, rhs: RHS) -> u64;
+}
+
+//TODO doc and test
+pub trait CheckedHammingDistance<RHS> {
+    fn checked_hamming_distance(self, rhs: RHS) -> Option<u64>;
 }
 
 pub trait ShlRound<RHS> {
