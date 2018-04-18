@@ -18,7 +18,7 @@ use rust_wheels::iterators::integers_geometric::{i32s_geometric, u32s_geometric}
 use rust_wheels::iterators::naturals::{exhaustive_naturals, random_naturals,
                                        special_random_naturals};
 use rust_wheels::iterators::primitive_ints::{exhaustive_signed, exhaustive_unsigned,
-                                             special_random_signed, special_random_unsigned};
+                                             special_random_signed, special_random_unsigned, exhaustive_natural_signed, random_natural_signed, special_random_natural_signed};
 use rust_wheels::iterators::rounding_modes::{exhaustive_rounding_modes, random_rounding_modes};
 use rust_wheels::iterators::tuples::{exhaustive_pairs, exhaustive_pairs_from_single,
                                      exhaustive_triples, exhaustive_triples_from_single,
@@ -116,6 +116,23 @@ pub fn natural_integers(gm: GenerationMode) -> Box<Iterator<Item = Integer>> {
         GenerationMode::SpecialRandom(scale) => {
             Box::new(special_random_natural_integers(&EXAMPLE_SEED, scale))
         }
+    }
+}
+
+pub fn triples_of_natural_integers(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (Integer, Integer, Integer)>> {
+    match gm {
+        GenerationMode::Exhaustive => {
+            Box::new(exhaustive_triples_from_single(exhaustive_natural_integers()))
+        }
+        GenerationMode::Random(scale) => Box::new(random_triples_from_single(random_natural_integers(
+            &EXAMPLE_SEED,
+            scale,
+        ))),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_triples_from_single(
+            special_random_natural_integers(&EXAMPLE_SEED, scale),
+        )),
     }
 }
 
@@ -351,6 +368,78 @@ pub fn triples_of_integer_integer_and_unsigned<T: 'static + PrimitiveUnsigned>(
             &(|seed| special_random_integers(seed, scale)),
             &(|seed| special_random_integers(seed, scale)),
             &(|seed| special_random_unsigned(seed)),
+        )),
+    }
+}
+
+pub fn triples_of_natural_integer_unsigned_and_unsigned<T: 'static + PrimitiveUnsigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (Integer, T, T)>> {
+    match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_triples(
+            exhaustive_natural_integers(),
+            exhaustive_unsigned(),
+            exhaustive_unsigned(),
+        )),
+        GenerationMode::Random(scale) => Box::new(random_triples(
+        &EXAMPLE_SEED,
+        &(|seed| random_natural_integers(seed, scale)),
+        &(|seed| random(seed)),
+        &(|seed| random(seed)),
+    )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_natural_integers(seed, scale)),
+            &(|seed| special_random_unsigned(seed)),
+            &(|seed| special_random_unsigned(seed)),
+        )),
+    }
+}
+
+pub fn triples_of_natural_integer_natural_signed_and_natural_signed<T: 'static + PrimitiveSigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (Integer, T, T)>> {
+    match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_triples(
+            exhaustive_natural_integers(),
+            exhaustive_natural_signed(),
+            exhaustive_natural_signed(),
+        )),
+        GenerationMode::Random(scale) => Box::new(random_triples(
+        &EXAMPLE_SEED,
+        &(|seed| random_natural_integers(seed, scale)),
+        &(|seed| random_natural_signed(seed)),
+        &(|seed| random_natural_signed(seed)),
+    )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_natural_integers(seed, scale)),
+            &(|seed| special_random_natural_signed(seed)),
+            &(|seed| special_random_natural_signed(seed)),
+        )),
+    }
+}
+
+pub fn triples_of_natural_integer_natural_integer_and_natural_signed<T: 'static + PrimitiveSigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (Integer, Integer, T)>> {
+    match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_triples(
+            exhaustive_natural_integers(),
+            exhaustive_natural_integers(),
+            exhaustive_natural_signed(),
+        )),
+        GenerationMode::Random(scale) => Box::new(random_triples(
+        &EXAMPLE_SEED,
+        &(|seed| random_natural_integers(seed, scale)),
+        &(|seed| random_natural_integers(seed, scale)),
+        &(|seed| random_natural_signed(seed)),
+    )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_natural_integers(seed, scale)),
+            &(|seed| special_random_natural_integers(seed, scale)),
+            &(|seed| special_random_natural_signed(seed)),
         )),
     }
 }

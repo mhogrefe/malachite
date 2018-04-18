@@ -3,6 +3,7 @@ use common::DemoBenchRegistry;
 pub mod assign_bit;
 pub mod checked_count_ones;
 pub mod checked_count_zeros;
+pub mod checked_hamming_distance;
 pub mod checked_hamming_distance_i32;
 pub mod checked_hamming_distance_u32;
 pub mod clear_bit;
@@ -17,6 +18,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     assign_bit::register(registry);
     checked_count_ones::register(registry);
     checked_count_zeros::register(registry);
+    checked_hamming_distance::register(registry);
     checked_hamming_distance_i32::register(registry);
     checked_hamming_distance_u32::register(registry);
     clear_bit::register(registry);

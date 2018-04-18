@@ -58,3 +58,33 @@ impl<'a> HammingDistance<u32> for &'a Natural {
         }
     }
 }
+
+impl<'a> HammingDistance<&'a Natural> for u32 {
+    /// Determines the Hamming distance between a `u32` and a `Natural`. Both have infinitely many
+    /// implicit leading zeros.
+    ///
+    /// Time: worst case O(n)
+    ///
+    /// Additional memory: worst case O(1)
+    ///
+    /// where n = `other.significant_bits()`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::{HammingDistance, One, Zero};
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// fn main() {
+    ///     assert_eq!(0.hamming_distance(&Natural::ZERO), 0);
+    ///     // 105 = 1101001b, 123 = 1111011
+    ///     assert_eq!(123.hamming_distance(&Natural::from(105u32)), 2);
+    ///     assert_eq!(0.hamming_distance(&(Natural::ONE << 100u32)), 1);
+    /// }
+    /// ```
+    fn hamming_distance(self, other: &'a Natural) -> u64 {
+        other.hamming_distance(self)
+    }
+}

@@ -119,6 +119,7 @@ pub mod integer {
         pub mod assign_bit;
         pub mod checked_count_ones;
         pub mod checked_count_zeros;
+        pub mod checked_hamming_distance;
         pub mod checked_hamming_distance_i32;
         pub mod checked_hamming_distance_u32;
         pub mod clear_bit;
@@ -186,6 +187,7 @@ pub mod natural {
         pub mod count_ones;
         pub mod flip_bit;
         pub mod get_bit;
+        pub mod hamming_distance;
         pub mod hamming_distance_u32;
         pub mod limb_count;
         pub mod not;

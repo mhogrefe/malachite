@@ -38,3 +38,37 @@ impl<'a> CheckedHammingDistance<u32> for &'a Integer {
         }
     }
 }
+
+impl<'a> CheckedHammingDistance<&'a Integer> for u32 {
+    /// Determines the Hamming distance between a `u32` and an `Integer`. The `u32` has infinitely
+    /// many leading zeros. If the `Integer` is non-negative, it also has infinitely many leading
+    /// zeros and the Hamming distance is finite; if it is negative, it has infinitely many leading
+    /// ones and the Hamming distance is infinite, so `None` is returned.
+    ///
+    /// Time: worst case O(n)
+    ///
+    /// Additional memory: worst case O(1)
+    ///
+    /// where n = `other.significant_bits()`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::{CheckedHammingDistance, NegativeOne, One, Zero};
+    /// use malachite_nz::integer::Integer;
+    ///
+    /// fn main() {
+    ///     assert_eq!(0u32.checked_hamming_distance(&Integer::ZERO), Some(0));
+    ///     // 105 = 1101001b, 123 = 1111011
+    ///     assert_eq!(123u32.checked_hamming_distance(&Integer::from(105)), Some(2));
+    ///     assert_eq!(123u32.checked_hamming_distance(&Integer::from(-105)), None);
+    ///     assert_eq!(0u32.checked_hamming_distance(&(Integer::ONE << 100u32)), Some(1));
+    ///     assert_eq!(0u32.checked_hamming_distance(&(Integer::NEGATIVE_ONE << 100u32)), None);
+    /// }
+    /// ```
+    fn checked_hamming_distance(self, other: &'a Integer) -> Option<u64> {
+        other.checked_hamming_distance(self)
+    }
+}

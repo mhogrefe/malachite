@@ -603,6 +603,11 @@ pub fn pairs_of_unsigned_vec_var_2<T: 'static + PrimitiveUnsigned>(
     }
 }
 
+// All pairs of `Vec<u32>` where both elements are nonempty and don't only contain zeros.
+pub fn pairs_of_u32_vec_var_1(gm: GenerationMode) -> Box<Iterator<Item = (Vec<u32>, Vec<u32>)>> {
+    Box::new(pairs_of_unsigned_vec(gm).filter(|&(ref xs, ref ys)| !limbs_test_zero(xs) && !limbs_test_zero(ys)))
+}
+
 pub fn triples_of_unsigned_vec<T: 'static + PrimitiveUnsigned>(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (Vec<T>, Vec<T>, Vec<T>)>> {
@@ -798,41 +803,6 @@ pub fn pairs_of_unsigned_vec_and_small_u64<T: 'static + PrimitiveUnsigned>(
     }
 }
 
-fn pairs_of_unsigned_vec_and_negative_signed<
-    T: 'static + PrimitiveUnsigned,
-    U: 'static + PrimitiveSigned,
->(
-    gm: GenerationMode,
-) -> Box<Iterator<Item = (Vec<T>, U)>> {
-    match gm {
-        GenerationMode::Exhaustive => Box::new(exhaustive_pairs(
-            exhaustive_vecs(exhaustive_unsigned()),
-            exhaustive_negative_signed(),
-        )),
-        GenerationMode::Random(scale) => Box::new(random_pairs(
-            &EXAMPLE_SEED,
-            &(|seed| random_vecs(seed, scale, &(|seed_2| random(seed_2)))),
-            &(|seed| random_negative_signed(seed)),
-        )),
-        GenerationMode::SpecialRandom(scale) => Box::new(random_pairs(
-            &EXAMPLE_SEED,
-            &(|seed| special_random_unsigned_vecs(seed, scale)),
-            &(|seed| special_random_negative_signed(seed)),
-        )),
-    }
-}
-
-// All pairs of `Vec<u32>` and `T` where `T` is signed and the `Vec<T>` is nonempty and doesn't only
-// contain zeros.
-pub fn pairs_of_u32_vec_and_negative_signed_var_1<T: 'static + PrimitiveSigned>(
-    gm: GenerationMode,
-) -> Box<Iterator<Item = (Vec<u32>, T)>> {
-    Box::new(
-        pairs_of_unsigned_vec_and_negative_signed(gm)
-            .filter(|&(ref limbs, _)| !limbs_test_zero(limbs)),
-    )
-}
-
 // All pairs of `Vec<u32>` and small `u64` where the `Vec<u32>` are nonempty and don't only contain
 // zeros.
 pub fn pairs_of_u32_vec_and_small_u64_var_1(
@@ -864,6 +834,16 @@ pub fn pairs_of_u32_vec_and_small_u64_var_3(
             limbs_vec_clear_bit_neg(&mut mut_limbs, index);
             mut_limbs.len() == limbs.len()
         }),
+    )
+}
+
+// All pairs of `Vec<u32>` and positive `u32`, where the `Vec<u32>` are nonempty and don't only
+// contain zeros.
+pub fn pairs_of_u32_vec_and_positive_u32_var_1(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (Vec<u32>, u32)>> {
+    Box::new(
+        pairs_of_unsigned_vec_and_unsigned(gm).filter(|&(ref limbs, limb)| limb != 0 && !limbs_test_zero(limbs)),
     )
 }
 
