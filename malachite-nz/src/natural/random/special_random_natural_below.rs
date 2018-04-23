@@ -1,6 +1,6 @@
 use malachite_base::num::{IsPowerOfTwo, SignificantBits};
-use natural::Natural;
 use natural::random::special_random_natural_up_to_bits::special_random_natural_up_to_bits;
+use natural::Natural;
 use rand::Rng;
 
 /// Returns a random `Natural` sampled from [0, `n`). The `Natural` will typically have long runs of

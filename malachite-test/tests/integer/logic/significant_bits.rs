@@ -6,8 +6,8 @@ use malachite_test::common::{integer_to_bigint, integer_to_rug_integer};
 use malachite_test::inputs::integer::integers;
 use num::BigInt;
 use rug;
-use std::u32;
 use std::str::FromStr;
+use std::u32;
 
 #[test]
 fn test_significant_bits() {

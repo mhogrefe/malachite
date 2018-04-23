@@ -51,12 +51,10 @@ fn benchmark_integer_from_twos_complement_bits_asc(
         file_name,
         &(|bits| bits.len()),
         "bits.len()",
-        &mut [
-            (
-                "Integer::from_twos_complement_bits_asc(&[bool])",
-                &mut (|ref bits| no_out!(Integer::from_twos_complement_bits_asc(bits))),
-            ),
-        ],
+        &mut [(
+            "Integer::from_twos_complement_bits_asc(&[bool])",
+            &mut (|ref bits| no_out!(Integer::from_twos_complement_bits_asc(bits))),
+        )],
     );
 }
 
@@ -74,11 +72,9 @@ fn benchmark_integer_from_twos_complement_bits_desc(
         file_name,
         &(|bits| bits.len()),
         "bits.len()",
-        &mut [
-            (
-                "Integer::from_twos_complement_bits_desc(&[bool])",
-                &mut (|ref bits| no_out!(Integer::from_twos_complement_bits_desc(bits))),
-            ),
-        ],
+        &mut [(
+            "Integer::from_twos_complement_bits_desc(&[bool])",
+            &mut (|ref bits| no_out!(Integer::from_twos_complement_bits_desc(bits))),
+        )],
     );
 }

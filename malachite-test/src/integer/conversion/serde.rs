@@ -31,11 +31,9 @@ fn benchmark_integer_serialize_json(gm: GenerationMode, limit: usize, file_name:
         file_name,
         &(|n| n.significant_bits() as usize),
         "n.significant_bits()",
-        &mut [
-            (
-                "malachite",
-                &mut (|n| no_out!(serde_json::to_string(&n).unwrap())),
-            ),
-        ],
+        &mut [(
+            "malachite",
+            &mut (|n| no_out!(serde_json::to_string(&n).unwrap())),
+        )],
     );
 }

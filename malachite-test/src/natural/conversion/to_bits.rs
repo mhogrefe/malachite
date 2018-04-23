@@ -110,11 +110,9 @@ fn benchmark_natural_bits_size_hint(gm: GenerationMode, limit: usize, file_name:
         file_name,
         &(|n| n.significant_bits() as usize),
         "n.significant_bits()",
-        &mut [
-            (
-                "Natural.bits().size_hint()",
-                &mut (|n| no_out!(n.bits().size_hint())),
-            ),
-        ],
+        &mut [(
+            "Natural.bits().size_hint()",
+            &mut (|n| no_out!(n.bits().size_hint())),
+        )],
     );
 }

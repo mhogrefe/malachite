@@ -365,7 +365,7 @@ pub trait OverflowingAbs {
 //TODO is_positive, is_negative, sign
 
 macro_rules! lossless_checked_from_impl {
-    ($from: ty, $to: ty) => {
+    ($from:ty, $to:ty) => {
         impl CheckedFrom<$from> for $to {
             fn checked_from(value: $from) -> Option<$to> {
                 Some(value.into())
@@ -375,7 +375,7 @@ macro_rules! lossless_checked_from_impl {
 }
 
 macro_rules! lossy_checked_from_impl_a {
-    ($from: ident, $to: ty) => {
+    ($from:ident, $to:ty) => {
         impl CheckedFrom<$from> for $to {
             #[allow(unused_comparisons)]
             fn checked_from(value: $from) -> Option<$to> {
@@ -391,7 +391,7 @@ macro_rules! lossy_checked_from_impl_a {
 }
 
 macro_rules! lossy_checked_from_impl_b {
-    ($from: ident, $to: ty) => {
+    ($from:ident, $to:ty) => {
         impl CheckedFrom<$from> for $to {
             #[allow(unused_comparisons)]
             fn checked_from(value: $from) -> Option<$to> {
@@ -472,7 +472,7 @@ lossy_checked_from_impl_a!(i64, i32);
 lossless_checked_from_impl!(i64, i64);
 
 macro_rules! wrapping_impl_inner {
-    ($from: ty, $to: ty) => {
+    ($from:ty, $to:ty) => {
         #[allow(unknown_lints, cast_lossless)]
         impl WrappingFrom<$from> for $to {
             fn wrapping_from(value: $from) -> $to {
@@ -483,7 +483,7 @@ macro_rules! wrapping_impl_inner {
 }
 
 macro_rules! wrapping_impl {
-    ($from: ty) => {
+    ($from:ty) => {
         wrapping_impl_inner!($from, u8);
         wrapping_impl_inner!($from, u16);
         wrapping_impl_inner!($from, u32);
@@ -816,7 +816,7 @@ pub trait BitAccess {
 
 //TODO docs
 macro_rules! integer_traits {
-    ($t: ident, $log_width: expr, $u: ident, $from_u32: expr, $from_u64: expr) => {
+    ($t:ident, $log_width:expr, $u:ident, $from_u32:expr, $from_u64:expr) => {
         //TODO docs
         impl PrimitiveInteger for $t {
             const LOG_WIDTH: u32 = $log_width;
@@ -1194,7 +1194,7 @@ macro_rules! integer_traits {
 
 //TODO docs
 macro_rules! unsigned_traits {
-    ($t: ident, $log_width: expr, $u: ident, $from_u32: expr, $from_u64: expr) => {
+    ($t:ident, $log_width:expr, $u:ident, $from_u32:expr, $from_u64:expr) => {
         integer_traits!($t, $log_width, $u, $from_u32, $from_u64);
 
         impl OrdAbs for $t {
@@ -1415,15 +1415,15 @@ macro_rules! unsigned_traits {
 //TODO docs
 macro_rules! signed_traits {
     (
-        $t: ident,
-        $ut: ident,
-        $log_width: expr,
-        $u: ident,
-        $from_u32: expr,
-        $from_u64: expr,
-        $i: ident,
-        $from_i32: expr,
-        $from_i64: expr
+        $t:ident,
+        $ut:ident,
+        $log_width:expr,
+        $u:ident,
+        $from_u32:expr,
+        $from_u64:expr,
+        $i:ident,
+        $from_i32:expr,
+        $from_i64:expr
     ) => {
         integer_traits!($t, $log_width, $u, $from_u32, $from_u64);
 
@@ -1674,12 +1674,12 @@ macro_rules! signed_traits {
                 }
             }
         }
-    }
+    };
 }
 
 //TODO docs
 macro_rules! float_traits {
-    ($t: ident, $ut: ident) => {
+    ($t:ident, $ut:ident) => {
         //TODO docs
         impl PrimitiveFloat for $t {
             type UnsignedOfEqualWidth = $ut;
@@ -1934,7 +1934,7 @@ pub trait NegativeOne {
 
 /// Implements the constants 0, 1, and 2 for unsigned primitive integers.
 macro_rules! impl01_unsigned {
-    ($t: ty) => {
+    ($t:ty) => {
         /// The constant 0 for unsigned primitive integers.
         ///
         /// Time: worst case O(1)
@@ -1966,7 +1966,7 @@ macro_rules! impl01_unsigned {
 
 /// Implements the constants 0, 1, 2, and -1 for signed primitive integers.
 macro_rules! impl01_signed {
-    ($t: ty) => {
+    ($t:ty) => {
         impl01_unsigned!($t);
 
         /// The constant -1 for signed primitive integers.
@@ -1982,7 +1982,7 @@ macro_rules! impl01_signed {
 
 /// Implements the constants 0, 1, 2, and -1 for primitive floating-point types.
 macro_rules! impl01_float {
-    ($t: ty) => {
+    ($t:ty) => {
         /// The constant 0.0 for primitive floating-point types.
         ///
         /// Time: worst case O(1)
@@ -2093,7 +2093,7 @@ pub trait SplitInHalf: HasHalf {
 
 /// Implements `JoinHalves` and `SplitInHalf` for unsigned primitive integers.
 macro_rules! impl_halves_unsigned {
-    ($t: ident, $ht: ident) => {
+    ($t:ident, $ht:ident) => {
         /// Implements `HasHalf` for unsigned primitive integers.
         impl HasHalf for $t {
             /// The primitive integer type whose width is half of `Self`.

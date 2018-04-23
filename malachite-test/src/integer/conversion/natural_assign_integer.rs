@@ -1,8 +1,8 @@
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::integer::{pairs_of_natural_and_natural_integer,
                       rm_pairs_of_natural_and_natural_integer};
-use malachite_base::num::SignificantBits;
 use malachite_base::num::Assign;
+use malachite_base::num::SignificantBits;
 use rug::Assign as rug_assign;
 use std::cmp::max;
 

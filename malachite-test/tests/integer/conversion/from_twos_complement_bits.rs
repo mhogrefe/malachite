@@ -21,7 +21,7 @@ fn test_from_twos_complement_bits_asc() {
     );
     test(
         &[
-            true, false, false, true, false, true, true, false, false, false
+            true, false, false, true, false, true, true, false, false, false,
         ],
         "105",
     );
@@ -64,7 +64,7 @@ fn test_from_twos_complement_bits_desc() {
     );
     test(
         &[
-            false, false, false, true, true, false, true, false, false, true
+            false, false, false, true, true, false, true, false, false, true,
         ],
         "105",
     );

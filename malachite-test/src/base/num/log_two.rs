@@ -1,6 +1,6 @@
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use malachite_base::num::PrimitiveUnsigned;
 use inputs::base::positive_unsigneds;
+use malachite_base::num::PrimitiveUnsigned;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_u8_floor_log_two);
@@ -71,11 +71,11 @@ fn benchmark_unsigned_ceiling_log_two<T: 'static + PrimitiveUnsigned>(
 
 macro_rules! unsigned {
     (
-        $t: ident,
-        $demo_name_floor: ident,
-        $demo_name_ceiling: ident,
-        $bench_name_floor: ident,
-        $bench_name_ceiling: ident
+        $t:ident,
+        $demo_name_floor:ident,
+        $demo_name_ceiling:ident,
+        $bench_name_floor:ident,
+        $bench_name_ceiling:ident
     ) => {
         fn $demo_name_floor(gm: GenerationMode, limit: usize) {
             demo_unsigned_floor_log_two::<$t>(gm, limit);
@@ -92,7 +92,7 @@ macro_rules! unsigned {
         fn $bench_name_ceiling(gm: GenerationMode, limit: usize, file_name: &str) {
             benchmark_unsigned_ceiling_log_two::<$t>(gm, limit, file_name);
         }
-    }
+    };
 }
 
 unsigned!(

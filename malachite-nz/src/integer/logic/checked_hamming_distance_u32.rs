@@ -1,5 +1,5 @@
-use malachite_base::num::{CheckedHammingDistance, HammingDistance};
 use integer::Integer;
+use malachite_base::num::{CheckedHammingDistance, HammingDistance};
 
 impl<'a> CheckedHammingDistance<u32> for &'a Integer {
     /// Determines the Hamming distance between an `Integer` and a `u32`. The `u32` has infinitely

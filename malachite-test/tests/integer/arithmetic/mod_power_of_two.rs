@@ -1,6 +1,6 @@
 use common::test_properties;
-use malachite_base::round::RoundingMode;
 use malachite_base::num::{Abs, One, PartialOrdAbs, ShrRound, Zero};
+use malachite_base::round::RoundingMode;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_test::inputs::base::unsigneds;

@@ -37,11 +37,9 @@ fn benchmark_natural_random_natural_with_bits(
         file_name,
         &(|&bits| bits as usize),
         "bits",
-        &mut [
-            (
-                "malachite",
-                &mut (|bits| no_out!(random_natural_with_bits(&mut rng, bits))),
-            ),
-        ],
+        &mut [(
+            "malachite",
+            &mut (|bits| no_out!(random_natural_with_bits(&mut rng, bits))),
+        )],
     );
 }

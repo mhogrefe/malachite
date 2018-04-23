@@ -1,5 +1,7 @@
 use common::DemoBenchRegistry;
 
+pub mod and_i32;
+pub mod and_u32;
 pub mod assign_bit;
 pub mod checked_count_ones;
 pub mod checked_count_zeros;
@@ -15,6 +17,8 @@ pub mod significant_bits;
 pub mod trailing_zeros;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
+    and_i32::register(registry);
+    and_u32::register(registry);
     assign_bit::register(registry);
     checked_count_ones::register(registry);
     checked_count_zeros::register(registry);

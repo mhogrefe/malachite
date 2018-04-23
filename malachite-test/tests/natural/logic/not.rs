@@ -1,9 +1,9 @@
 use common::test_properties;
 use malachite_nz::integer::Integer;
-use malachite_nz::natural::Natural;
 use malachite_nz::natural::logic::not::{limbs_not, limbs_not_in_place};
+use malachite_nz::natural::Natural;
 use malachite_test::common::{natural_to_rug_integer, rug_integer_to_integer};
-use malachite_test::inputs::base::{vecs_of_unsigned, pairs_of_unsigned_vec_var_3};
+use malachite_test::inputs::base::{pairs_of_unsigned_vec_var_3, vecs_of_unsigned};
 use malachite_test::inputs::natural::naturals;
 use rug;
 use std::str::FromStr;

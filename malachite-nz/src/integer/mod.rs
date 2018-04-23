@@ -143,10 +143,10 @@ pub mod arithmetic {
     pub mod abs;
     pub mod add;
     pub mod add_i32;
-    pub mod add_u32;
     pub mod add_mul;
     pub mod add_mul_i32;
     pub mod add_mul_u32;
+    pub mod add_u32;
     pub mod divisible_by_power_of_two;
     pub mod even_odd;
     pub mod mod_power_of_two;
@@ -160,10 +160,10 @@ pub mod arithmetic {
     pub mod shr_u32;
     pub mod sub;
     pub mod sub_i32;
-    pub mod sub_u32;
     pub mod sub_mul;
     pub mod sub_mul_i32;
     pub mod sub_mul_u32;
+    pub mod sub_u32;
 }
 pub mod comparison {
     pub mod ord;
@@ -181,6 +181,8 @@ pub mod comparison {
 }
 pub mod conversion;
 pub mod logic {
+    pub mod and_i32;
+    pub mod and_u32;
     pub mod bit_access;
     pub mod checked_count_ones;
     pub mod checked_count_zeros;

@@ -159,12 +159,10 @@ fn benchmark_integer_shl_round_assign_i32(gm: GenerationMode, limit: usize, file
         file_name,
         &(|&(_, other, _)| other as usize),
         "other",
-        &mut [
-            (
-                "malachite",
-                &mut (|(mut x, y, rm)| x.shl_round_assign(y, rm)),
-            ),
-        ],
+        &mut [(
+            "malachite",
+            &mut (|(mut x, y, rm)| x.shl_round_assign(y, rm)),
+        )],
     );
 }
 

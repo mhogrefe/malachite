@@ -1,5 +1,5 @@
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::base::{vecs_of_unsigned, pairs_of_unsigned_vec_var_3};
+use inputs::base::{pairs_of_unsigned_vec_var_3, vecs_of_unsigned};
 use inputs::natural::{naturals, rm_naturals};
 use malachite_base::num::SignificantBits;
 use malachite_nz::natural::logic::not::{limbs_not, limbs_not_in_place};
@@ -59,12 +59,10 @@ fn benchmark_limbs_not(gm: GenerationMode, limit: usize, file_name: &str) {
         file_name,
         &(|&(_, ref limbs_in)| limbs_in.len() as usize),
         "limbs_in.len()",
-        &mut [
-            (
-                "malachite",
-                &mut (|(ref mut limbs_out, ref limbs_in)| limbs_not(limbs_out, limbs_in)),
-            ),
-        ],
+        &mut [(
+            "malachite",
+            &mut (|(ref mut limbs_out, ref limbs_in)| limbs_not(limbs_out, limbs_in)),
+        )],
     );
 }
 
@@ -78,12 +76,10 @@ fn benchmark_limbs_not_in_place(gm: GenerationMode, limit: usize, file_name: &st
         file_name,
         &(|limbs| limbs.len() as usize),
         "limbs.len()",
-        &mut [
-            (
-                "malachite",
-                &mut (|mut limbs| limbs_not_in_place(&mut limbs)),
-            ),
-        ],
+        &mut [(
+            "malachite",
+            &mut (|mut limbs| limbs_not_in_place(&mut limbs)),
+        )],
     );
 }
 

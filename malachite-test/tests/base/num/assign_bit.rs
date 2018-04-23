@@ -63,7 +63,7 @@ pub fn test_assign_bit() {
 }
 
 macro_rules! assign_bit_fail_helper_unsigned {
-    ($t: ident, $fail: ident) => {
+    ($t:ident, $fail:ident) => {
         #[test]
         #[should_panic(expected = "")]
         fn $fail() {
@@ -74,7 +74,7 @@ macro_rules! assign_bit_fail_helper_unsigned {
 }
 
 macro_rules! assign_bit_fail_helper_signed {
-    ($t: ident, $fail_1: ident, $fail_2: ident) => {
+    ($t:ident, $fail_1:ident, $fail_2:ident) => {
         assign_bit_fail_helper_unsigned!($t, $fail_1);
 
         #[test]

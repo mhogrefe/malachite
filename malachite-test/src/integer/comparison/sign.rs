@@ -1,8 +1,8 @@
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::integer::{integers, nrm_integers};
 use malachite_base::num::SignificantBits;
-use num::BigInt;
 use num::bigint::Sign;
+use num::BigInt;
 use std::cmp::Ordering;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {

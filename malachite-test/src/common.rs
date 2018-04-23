@@ -140,25 +140,25 @@ impl DemoBenchRegistry {
 }
 
 macro_rules! register_demo {
-    ($registry: ident, $f: ident) => {{
+    ($registry:ident, $f:ident) => {{
         $registry.register_demo(stringify!($f), &$f);
     }};
 }
 
 macro_rules! register_ns_demo {
-    ($registry: ident, $f: ident) => {{
+    ($registry:ident, $f:ident) => {{
         $registry.register_no_special_demo(stringify!($f), &$f);
     }};
 }
 
 macro_rules! register_bench {
-    ($registry: ident, $st: ident, $f: ident) => {{
+    ($registry:ident, $st:ident, $f:ident) => {{
         $registry.register_bench(ScaleType::$st, stringify!($f), &$f);
     }};
 }
 
 macro_rules! register_ns_bench {
-    ($registry: ident, $st: ident, $f: ident) => {{
+    ($registry:ident, $st:ident, $f:ident) => {{
         $registry.register_no_special_bench(ScaleType::$st, stringify!($f), &$f);
     }};
 }
@@ -253,7 +253,7 @@ pub fn m_run_benchmark<'a, I: Iterator>(
 }
 
 macro_rules! no_out {
-    ($e: expr) => {{
+    ($e:expr) => {{
         $e;
     }};
 }

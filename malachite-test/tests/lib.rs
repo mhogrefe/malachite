@@ -25,9 +25,9 @@ pub mod base {
         pub mod clear_bit;
         pub mod decrement;
         pub mod flip_bit;
+        pub mod get_bit;
         pub mod increment;
         pub mod join_halves;
-        pub mod get_bit;
         pub mod log_two;
         pub mod lower_half;
         pub mod set_bit;
@@ -47,10 +47,10 @@ pub mod integer {
         pub mod abs;
         pub mod add;
         pub mod add_i32;
-        pub mod add_u32;
         pub mod add_mul;
         pub mod add_mul_i32;
         pub mod add_mul_u32;
+        pub mod add_u32;
         pub mod divisible_by_power_of_two;
         pub mod even_odd;
         pub mod mod_power_of_two;
@@ -64,10 +64,10 @@ pub mod integer {
         pub mod shr_u32;
         pub mod sub;
         pub mod sub_i32;
-        pub mod sub_u32;
         pub mod sub_mul;
         pub mod sub_mul_i32;
         pub mod sub_mul_u32;
+        pub mod sub_u32;
     }
     pub mod basic {
         pub mod constants;
@@ -116,6 +116,8 @@ pub mod integer {
         pub mod u64_from_integer;
     }
     pub mod logic {
+        pub mod and_i32;
+        pub mod and_u32;
         pub mod assign_bit;
         pub mod checked_count_ones;
         pub mod checked_count_zeros;
@@ -134,11 +136,12 @@ pub mod integer {
 pub mod natural {
     pub mod arithmetic {
         pub mod add;
-        pub mod add_u32;
         pub mod add_mul;
         pub mod add_mul_u32;
+        pub mod add_u32;
         pub mod divisible_by_power_of_two;
         pub mod even_odd;
+        pub mod is_power_of_two;
         pub mod log_two;
         pub mod mod_power_of_two;
         pub mod mul;
@@ -149,10 +152,9 @@ pub mod natural {
         pub mod shr_i32;
         pub mod shr_u32;
         pub mod sub;
-        pub mod sub_u32;
         pub mod sub_mul;
         pub mod sub_mul_u32;
-        pub mod is_power_of_two;
+        pub mod sub_u32;
     }
     pub mod basic {
         pub mod constants;
@@ -182,6 +184,7 @@ pub mod natural {
         pub mod u64_from_natural;
     }
     pub mod logic {
+        pub mod and_u32;
         pub mod assign_bit;
         pub mod clear_bit;
         pub mod count_ones;
@@ -196,11 +199,11 @@ pub mod natural {
         pub mod trailing_zeros;
     }
     pub mod random {
-        pub mod random_natural_with_bits;
-        pub mod random_natural_up_to_bits;
         pub mod random_natural_below;
-        pub mod special_random_natural_with_bits;
-        pub mod special_random_natural_up_to_bits;
+        pub mod random_natural_up_to_bits;
+        pub mod random_natural_with_bits;
         pub mod special_random_natural_below;
+        pub mod special_random_natural_up_to_bits;
+        pub mod special_random_natural_with_bits;
     }
 }

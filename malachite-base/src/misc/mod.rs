@@ -75,7 +75,7 @@ pub trait Named {
 /// Implements `Named` for a type.
 #[macro_export]
 macro_rules! impl_named {
-    ($t: ident) => {
+    ($t:ident) => {
         impl Named for $t {
             /// Returns the name of a type.
             ///

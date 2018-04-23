@@ -4,8 +4,8 @@ use malachite_base::num::{One, PrimitiveInteger, SignificantBits};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_test::inputs::integer::integers;
-use std::{i32, i64};
 use std::str::FromStr;
+use std::{i32, i64};
 
 #[test]
 fn test_i64_checked_from_integer() {

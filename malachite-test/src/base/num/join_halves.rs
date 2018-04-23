@@ -56,7 +56,7 @@ fn benchmark_unsigned_join_halves<T: 'static + JoinHalves + PrimitiveUnsigned>(
 }
 
 macro_rules! unsigned {
-    ($t: ident, $demo_name: ident, $bench_name: ident) => {
+    ($t:ident, $demo_name:ident, $bench_name:ident) => {
         fn $demo_name(gm: GenerationMode, limit: usize) {
             demo_unsigned_join_halves::<$t>(gm, limit);
         }

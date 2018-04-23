@@ -53,7 +53,7 @@ pub fn test_set_bit() {
 }
 
 macro_rules! set_bit_fail_helper {
-    ($t: ident, $fail: ident, $err: expr) => {
+    ($t:ident, $fail:ident, $err:expr) => {
         #[test]
         #[should_panic(expected = $err)]
         fn $fail() {

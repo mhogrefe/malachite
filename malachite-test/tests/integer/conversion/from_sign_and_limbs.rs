@@ -40,43 +40,55 @@ fn test_from_sign_and_limbs_asc() {
 }
 
 #[test]
-#[should_panic(expected = "sign should be Equal iff limbs only contains zeros. sign: Equal, \
-                           limbs: [1]")]
+#[should_panic(
+    expected = "sign should be Equal iff limbs only contains zeros. sign: Equal, \
+                limbs: [1]"
+)]
 fn from_sign_and_limbs_asc_fail_1() {
     Integer::from_sign_and_limbs_asc(Ordering::Equal, &[1]);
 }
 
 #[test]
-#[should_panic(expected = "sign should be Equal iff limbs only contains zeros. sign: Greater, \
-                           limbs: []")]
+#[should_panic(
+    expected = "sign should be Equal iff limbs only contains zeros. sign: Greater, \
+                limbs: []"
+)]
 fn from_sign_and_limbs_asc_fail_2() {
     Integer::from_sign_and_limbs_asc(Ordering::Greater, &[]);
 }
 
 #[test]
-#[should_panic(expected = "sign should be Equal iff limbs only contains zeros. sign: Greater, \
-                           limbs: [0, 0, 0]")]
+#[should_panic(
+    expected = "sign should be Equal iff limbs only contains zeros. sign: Greater, \
+                limbs: [0, 0, 0]"
+)]
 fn from_sign_and_limbs_asc_fail_3() {
     Integer::from_sign_and_limbs_asc(Ordering::Greater, &[0, 0, 0]);
 }
 
 #[test]
-#[should_panic(expected = "sign should be Equal iff limbs only contains zeros. sign: Equal, \
-                           limbs: [1]")]
+#[should_panic(
+    expected = "sign should be Equal iff limbs only contains zeros. sign: Equal, \
+                limbs: [1]"
+)]
 fn from_sign_and_owned_limbs_asc_fail_1() {
     Integer::from_sign_and_owned_limbs_asc(Ordering::Equal, vec![1]);
 }
 
 #[test]
-#[should_panic(expected = "sign should be Equal iff limbs only contains zeros. sign: Greater, \
-                           limbs: []")]
+#[should_panic(
+    expected = "sign should be Equal iff limbs only contains zeros. sign: Greater, \
+                limbs: []"
+)]
 fn from_sign_and_owned_limbs_asc_fail_2() {
     Integer::from_sign_and_owned_limbs_asc(Ordering::Greater, vec![]);
 }
 
 #[test]
-#[should_panic(expected = "sign should be Equal iff limbs only contains zeros. sign: Greater, \
-                           limbs: [0, 0, 0]")]
+#[should_panic(
+    expected = "sign should be Equal iff limbs only contains zeros. sign: Greater, \
+                limbs: [0, 0, 0]"
+)]
 fn from_sign_and_owned_limbs_asc_fail_3() {
     Integer::from_sign_and_owned_limbs_asc(Ordering::Greater, vec![0, 0, 0]);
 }
@@ -118,43 +130,55 @@ fn test_from_sign_and_limbs_desc() {
 }
 
 #[test]
-#[should_panic(expected = "sign should be Equal iff limbs only contains zeros. sign: Equal, \
-                           limbs: [1]")]
+#[should_panic(
+    expected = "sign should be Equal iff limbs only contains zeros. sign: Equal, \
+                limbs: [1]"
+)]
 fn from_sign_and_limbs_desc_fail_1() {
     Integer::from_sign_and_limbs_desc(Ordering::Equal, &[1]);
 }
 
 #[test]
-#[should_panic(expected = "sign should be Equal iff limbs only contains zeros. sign: Greater, \
-                           limbs: []")]
+#[should_panic(
+    expected = "sign should be Equal iff limbs only contains zeros. sign: Greater, \
+                limbs: []"
+)]
 fn from_sign_and_limbs_desc_fail_2() {
     Integer::from_sign_and_limbs_desc(Ordering::Greater, &[]);
 }
 
 #[test]
-#[should_panic(expected = "sign should be Equal iff limbs only contains zeros. sign: Greater, \
-                           limbs: [0, 0, 0]")]
+#[should_panic(
+    expected = "sign should be Equal iff limbs only contains zeros. sign: Greater, \
+                limbs: [0, 0, 0]"
+)]
 fn from_sign_and_limbs_desc_fail_3() {
     Integer::from_sign_and_limbs_desc(Ordering::Greater, &[0, 0, 0]);
 }
 
 #[test]
-#[should_panic(expected = "sign should be Equal iff limbs only contains zeros. sign: Equal, \
-                           limbs: [1]")]
+#[should_panic(
+    expected = "sign should be Equal iff limbs only contains zeros. sign: Equal, \
+                limbs: [1]"
+)]
 fn from_sign_and_owned_limbs_desc_fail_1() {
     Integer::from_sign_and_owned_limbs_desc(Ordering::Equal, vec![1]);
 }
 
 #[test]
-#[should_panic(expected = "sign should be Equal iff limbs only contains zeros. sign: Greater, \
-                           limbs: []")]
+#[should_panic(
+    expected = "sign should be Equal iff limbs only contains zeros. sign: Greater, \
+                limbs: []"
+)]
 fn from_sign_and_owned_limbs_desc_fail_2() {
     Integer::from_sign_and_owned_limbs_desc(Ordering::Greater, vec![]);
 }
 
 #[test]
-#[should_panic(expected = "sign should be Equal iff limbs only contains zeros. sign: Greater, \
-                           limbs: [0, 0, 0]")]
+#[should_panic(
+    expected = "sign should be Equal iff limbs only contains zeros. sign: Greater, \
+                limbs: [0, 0, 0]"
+)]
 fn from_sign_and_owned_limbs_desc_fail_3() {
     Integer::from_sign_and_owned_limbs_desc(Ordering::Greater, vec![0, 0, 0]);
 }

@@ -27,7 +27,7 @@ pub fn test_floor_log_two() {
 }
 
 macro_rules! floor_log_two_fail {
-    ($t: ident, $floor_log_two_fail: ident) => {
+    ($t:ident, $floor_log_two_fail:ident) => {
         #[test]
         #[should_panic(expected = "Cannot take the base-2 logarithm of 0.")]
         fn $floor_log_two_fail() {
@@ -65,7 +65,7 @@ pub fn test_ceiling_log_two() {
 }
 
 macro_rules! ceiling_log_two_fail {
-    ($t: ident, $ceiling_log_two_fail: ident) => {
+    ($t:ident, $ceiling_log_two_fail:ident) => {
         #[test]
         #[should_panic(expected = "Cannot take the base-2 logarithm of 0.")]
         fn $ceiling_log_two_fail() {

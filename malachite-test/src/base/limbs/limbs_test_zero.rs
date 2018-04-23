@@ -23,8 +23,6 @@ fn benchmark_limbs_test_zero(gm: GenerationMode, limit: usize, file_name: &str) 
         file_name,
         &(|limbs| limbs.len()),
         "limbs.len()",
-        &mut [
-            ("malachite", &mut (|limbs| no_out!(limbs_test_zero(&limbs)))),
-        ],
+        &mut [("malachite", &mut (|limbs| no_out!(limbs_test_zero(&limbs))))],
     );
 }

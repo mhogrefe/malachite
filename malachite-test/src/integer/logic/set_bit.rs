@@ -41,12 +41,10 @@ fn benchmark_limbs_set_bit_neg(gm: GenerationMode, limit: usize, file_name: &str
         file_name,
         &(|&(_, index)| index as usize),
         "index",
-        &mut [
-            (
-                "malachite",
-                &mut (|(ref mut limbs, index)| limbs_set_bit_neg(limbs, index)),
-            ),
-        ],
+        &mut [(
+            "malachite",
+            &mut (|(ref mut limbs, index)| limbs_set_bit_neg(limbs, index)),
+        )],
     );
 }
 

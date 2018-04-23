@@ -144,12 +144,10 @@ fn benchmark_bits_to_twos_complement_bits_non_negative(
         file_name,
         &(|bits| bits.len()),
         "index",
-        &mut [
-            (
-                "malachite",
-                &mut (|ref mut bits| bits_to_twos_complement_bits_non_negative(bits)),
-            ),
-        ],
+        &mut [(
+            "malachite",
+            &mut (|ref mut bits| bits_to_twos_complement_bits_non_negative(bits)),
+        )],
     );
 }
 
@@ -167,12 +165,10 @@ fn benchmark_bits_slice_to_twos_complement_bits_negative(
         file_name,
         &(|bits| bits.len()),
         "index",
-        &mut [
-            (
-                "malachite",
-                &mut (|ref mut bits| no_out!(bits_slice_to_twos_complement_bits_negative(bits))),
-            ),
-        ],
+        &mut [(
+            "malachite",
+            &mut (|ref mut bits| no_out!(bits_slice_to_twos_complement_bits_negative(bits))),
+        )],
     );
 }
 
@@ -190,12 +186,10 @@ fn benchmark_bits_vec_to_twos_complement_bits_negative(
         file_name,
         &(|bits| bits.len()),
         "index",
-        &mut [
-            (
-                "malachite",
-                &mut (|ref mut bits| bits_vec_to_twos_complement_bits_negative(bits)),
-            ),
-        ],
+        &mut [(
+            "malachite",
+            &mut (|ref mut bits| bits_vec_to_twos_complement_bits_negative(bits)),
+        )],
     );
 }
 

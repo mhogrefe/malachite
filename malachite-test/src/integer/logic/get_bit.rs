@@ -42,12 +42,10 @@ fn benchmark_limbs_get_bit_neg(gm: GenerationMode, limit: usize, file_name: &str
         file_name,
         &(|&(ref limbs, _)| limbs.len()),
         "index",
-        &mut [
-            (
-                "malachite",
-                &mut (|(ref limbs, index)| no_out!(limbs_get_bit_neg(limbs, index))),
-            ),
-        ],
+        &mut [(
+            "malachite",
+            &mut (|(ref limbs, index)| no_out!(limbs_get_bit_neg(limbs, index))),
+        )],
     );
 }
 

@@ -1,6 +1,6 @@
 use integer::Integer;
-use malachite_base::round::RoundingMode;
 use malachite_base::num::{ShrRound, ShrRoundAssign, UnsignedAbs};
+use malachite_base::round::RoundingMode;
 use std::ops::{Shr, ShrAssign};
 
 /// Shifts an `Integer` right (divides it by a power of 2 and takes the floor or multiplies it by a

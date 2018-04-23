@@ -2,8 +2,8 @@ use common::test_properties;
 use malachite_base::num::Assign;
 use malachite_nz::integer::Integer;
 use malachite_test::inputs::integer::pairs_of_integer_and_signed;
-use std::{i32, i64};
 use std::str::FromStr;
+use std::{i32, i64};
 
 #[test]
 fn test_assign_i64() {

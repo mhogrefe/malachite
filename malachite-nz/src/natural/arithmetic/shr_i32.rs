@@ -1,5 +1,5 @@
-use malachite_base::round::RoundingMode;
 use malachite_base::num::{ShrRound, ShrRoundAssign, UnsignedAbs};
+use malachite_base::round::RoundingMode;
 use natural::Natural;
 use std::ops::{Shr, ShrAssign};
 

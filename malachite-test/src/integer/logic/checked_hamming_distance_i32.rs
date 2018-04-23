@@ -2,8 +2,8 @@ use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, 
 use inputs::base::pairs_of_u32_vec_and_positive_u32_var_1;
 use inputs::integer::{pairs_of_integer_and_signed, pairs_of_signed_and_integer};
 use malachite_base::num::{CheckedHammingDistance, SignificantBits};
-use malachite_nz::integer::Integer;
 use malachite_nz::integer::logic::checked_hamming_distance_i32::limbs_hamming_distance_limb_neg;
+use malachite_nz::integer::Integer;
 use std::iter::repeat;
 
 pub fn integer_checked_hamming_distance_i32_alt(n: &Integer, i: i32) -> Option<u64> {
@@ -19,7 +19,11 @@ pub fn integer_checked_hamming_distance_i32_alt(n: &Integer, i: i32) -> Option<u
                     .zip(i.twos_complement_bits().chain(repeat(negative))),
             )
         } else {
-            Box::new(n.twos_complement_bits().chain(repeat(negative)).zip(i.twos_complement_bits()))
+            Box::new(
+                n.twos_complement_bits()
+                    .chain(repeat(negative))
+                    .zip(i.twos_complement_bits()),
+            )
         };
     let mut distance = 0u64;
     for (b, c) in bit_zip {
@@ -40,7 +44,11 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
         Large,
         benchmark_integer_checked_hamming_distance_i32_algorithms
     );
-    register_bench!(registry, Large, benchmark_i32_checked_hamming_distance_integer);
+    register_bench!(
+        registry,
+        Large,
+        benchmark_i32_checked_hamming_distance_integer
+    );
 }
 
 fn demo_limbs_hamming_distance_limb_neg(gm: GenerationMode, limit: usize) {
@@ -86,12 +94,10 @@ fn benchmark_limbs_hamming_distance_limb_neg(gm: GenerationMode, limit: usize, f
         file_name,
         &(|&(ref limbs, _)| limbs.len()),
         "limbs.len()",
-        &mut [
-            (
-                "malachite",
-                &mut (|(ref limbs, limb)| no_out!(limbs_hamming_distance_limb_neg(limbs, limb))),
-            ),
-        ],
+        &mut [(
+            "malachite",
+            &mut (|(ref limbs, limb)| no_out!(limbs_hamming_distance_limb_neg(limbs, limb))),
+        )],
     );
 }
 
@@ -138,11 +144,9 @@ fn benchmark_i32_checked_hamming_distance_integer(
         file_name,
         &(|&(_, ref n)| n.significant_bits() as usize),
         "i.significant_bits()",
-        &mut [
-            (
-                "default",
-                &mut (|(i, ref other)| no_out!(i.checked_hamming_distance(other))),
-            ),
-        ],
+        &mut [(
+            "default",
+            &mut (|(i, ref other)| no_out!(i.checked_hamming_distance(other))),
+        )],
     );
 }

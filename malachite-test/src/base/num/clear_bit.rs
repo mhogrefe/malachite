@@ -74,7 +74,7 @@ fn benchmark_signed_clear_bit<T: 'static + PrimitiveSigned>(
 }
 
 macro_rules! unsigned {
-    ($t: ident, $demo_name: ident, $bench_name: ident) => {
+    ($t:ident, $demo_name:ident, $bench_name:ident) => {
         fn $demo_name(gm: GenerationMode, limit: usize) {
             demo_unsigned_clear_bit::<$t>(gm, limit);
         }
@@ -86,7 +86,7 @@ macro_rules! unsigned {
 }
 
 macro_rules! signed {
-    ($t: ident, $demo_name: ident, $bench_name: ident) => {
+    ($t:ident, $demo_name:ident, $bench_name:ident) => {
         fn $demo_name(gm: GenerationMode, limit: usize) {
             demo_signed_clear_bit::<$t>(gm, limit);
         }

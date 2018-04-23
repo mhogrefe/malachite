@@ -104,12 +104,10 @@ fn benchmark_natural_mod_power_of_two_assign(gm: GenerationMode, limit: usize, f
         file_name,
         &(|&(_, index)| index as usize),
         "other",
-        &mut [
-            (
-                "malachite",
-                &mut (|(mut n, u)| n.mod_power_of_two_assign(u)),
-            ),
-        ],
+        &mut [(
+            "malachite",
+            &mut (|(mut n, u)| n.mod_power_of_two_assign(u)),
+        )],
     );
 }
 
@@ -154,12 +152,10 @@ fn benchmark_natural_neg_mod_power_of_two_assign(
         file_name,
         &(|&(_, index)| index as usize),
         "other",
-        &mut [
-            (
-                "malachite",
-                &mut (|(mut n, u)| n.neg_mod_power_of_two_assign(u)),
-            ),
-        ],
+        &mut [(
+            "malachite",
+            &mut (|(mut n, u)| n.neg_mod_power_of_two_assign(u)),
+        )],
     );
 }
 

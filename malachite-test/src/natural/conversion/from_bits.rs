@@ -65,12 +65,10 @@ fn benchmark_limbs_asc_from_bits_asc(gm: GenerationMode, limit: usize, file_name
         file_name,
         &(|bits| bits.len()),
         "bits.len()",
-        &mut [
-            (
-                "limbs_asc_from_bits_asc(&[bool])",
-                &mut (|ref bits| no_out!(limbs_asc_from_bits_asc(bits))),
-            ),
-        ],
+        &mut [(
+            "limbs_asc_from_bits_asc(&[bool])",
+            &mut (|ref bits| no_out!(limbs_asc_from_bits_asc(bits))),
+        )],
     );
 }
 
@@ -84,12 +82,10 @@ fn benchmark_limbs_asc_from_bits_desc(gm: GenerationMode, limit: usize, file_nam
         file_name,
         &(|bits| bits.len()),
         "bits.len()",
-        &mut [
-            (
-                "limbs_asc_from_bits_desc(&[bool])",
-                &mut (|ref bits| no_out!(limbs_asc_from_bits_desc(bits))),
-            ),
-        ],
+        &mut [(
+            "limbs_asc_from_bits_desc(&[bool])",
+            &mut (|ref bits| no_out!(limbs_asc_from_bits_desc(bits))),
+        )],
     );
 }
 
@@ -103,12 +99,10 @@ fn benchmark_natural_from_bits_asc(gm: GenerationMode, limit: usize, file_name: 
         file_name,
         &(|bits| bits.len()),
         "bits.len()",
-        &mut [
-            (
-                "Natural::from_bits_asc(&[bool])",
-                &mut (|ref bits| no_out!(Natural::from_bits_asc(bits))),
-            ),
-        ],
+        &mut [(
+            "Natural::from_bits_asc(&[bool])",
+            &mut (|ref bits| no_out!(Natural::from_bits_asc(bits))),
+        )],
     );
 }
 
@@ -122,11 +116,9 @@ fn benchmark_natural_from_bits_desc(gm: GenerationMode, limit: usize, file_name:
         file_name,
         &(|bits| bits.len()),
         "bits.len()",
-        &mut [
-            (
-                "Natural::from_bits_desc(&[bool])",
-                &mut (|ref bits| no_out!(Natural::from_bits_desc(bits))),
-            ),
-        ],
+        &mut [(
+            "Natural::from_bits_desc(&[bool])",
+            &mut (|ref bits| no_out!(Natural::from_bits_desc(bits))),
+        )],
     );
 }

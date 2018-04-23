@@ -159,7 +159,7 @@ impl Walkable for Natural {
 }
 
 macro_rules! mutate_with_possible_promotion {
-    ($n: ident, $small: ident, $large: ident, $process_small: expr, $process_large: expr) => {
+    ($n:ident, $small:ident, $large:ident, $process_small:expr, $process_large:expr) => {
         if let Small(ref mut $small) = *$n {
             if let Some(small_result) = $process_small {
                 *$small = small_result;
@@ -183,6 +183,7 @@ pub mod comparison {
     pub mod partial_ord_u32;
 }
 pub mod logic {
+    pub mod and_u32;
     pub mod bit_access;
     pub mod count_ones;
     pub mod hamming_distance;

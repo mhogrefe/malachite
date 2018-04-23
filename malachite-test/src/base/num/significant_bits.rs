@@ -1,6 +1,6 @@
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use malachite_base::num::{PrimitiveSigned, PrimitiveUnsigned};
 use inputs::base::{signeds, unsigneds};
+use malachite_base::num::{PrimitiveSigned, PrimitiveUnsigned};
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_u8_significant_bits);
@@ -73,7 +73,7 @@ fn benchmark_signed_significant_bits<T: 'static + PrimitiveSigned>(
 }
 
 macro_rules! unsigned {
-    ($t: ident, $demo_name: ident, $bench_name: ident) => {
+    ($t:ident, $demo_name:ident, $bench_name:ident) => {
         fn $demo_name(gm: GenerationMode, limit: usize) {
             demo_unsigned_significant_bits::<$t>(gm, limit);
         }
@@ -85,7 +85,7 @@ macro_rules! unsigned {
 }
 
 macro_rules! signed {
-    ($t: ident, $demo_name: ident, $bench_name: ident) => {
+    ($t:ident, $demo_name:ident, $bench_name:ident) => {
         fn $demo_name(gm: GenerationMode, limit: usize) {
             demo_signed_significant_bits::<$t>(gm, limit);
         }

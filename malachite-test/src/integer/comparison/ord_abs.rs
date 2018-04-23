@@ -1,7 +1,7 @@
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::integer::{pairs_of_integers, rm_pairs_of_integers};
-use malachite_base::num::SignificantBits;
 use malachite_base::num::OrdAbs;
+use malachite_base::num::SignificantBits;
 use std::cmp::{max, Ordering};
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {

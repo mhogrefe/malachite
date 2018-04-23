@@ -43,7 +43,7 @@ pub fn test_increment() {
 }
 
 macro_rules! increment_fail {
-    ($t: ident, $increment_fail: ident) => {
+    ($t:ident, $increment_fail:ident) => {
         #[test]
         #[should_panic(expected = "Cannot increment past the maximum value.")]
         fn $increment_fail() {

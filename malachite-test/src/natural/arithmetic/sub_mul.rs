@@ -77,12 +77,10 @@ fn benchmark_natural_sub_mul_assign(gm: GenerationMode, limit: usize, file_name:
         file_name,
         &bucketing_function,
         BUCKETING_LABEL,
-        &mut [
-            (
-                "Natural.sub_mul_assign(&Natural, &Natural)",
-                &mut (|(mut a, b, c)| a.sub_mul_assign(&b, &c)),
-            ),
-        ],
+        &mut [(
+            "Natural.sub_mul_assign(&Natural, &Natural)",
+            &mut (|(mut a, b, c)| a.sub_mul_assign(&b, &c)),
+        )],
     );
 }
 

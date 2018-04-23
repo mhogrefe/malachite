@@ -2,8 +2,8 @@ use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, 
 use inputs::base::pairs_of_u32_vec_var_1;
 use inputs::integer::pairs_of_integers;
 use malachite_base::num::{CheckedHammingDistance, SignificantBits};
-use malachite_nz::integer::Integer;
 use malachite_nz::integer::logic::checked_hamming_distance::limbs_hamming_distance_neg;
+use malachite_nz::integer::Integer;
 use std::cmp::max;
 use std::iter::repeat;
 
@@ -14,9 +14,16 @@ pub fn integer_checked_hamming_distance_alt(x: &Integer, y: &Integer) -> Option<
     }
     let bit_zip: Box<Iterator<Item = (bool, bool)>> =
         if x.significant_bits() >= y.significant_bits() {
-            Box::new(x.twos_complement_bits().zip(y.twos_complement_bits().chain(repeat(negative))))
+            Box::new(
+                x.twos_complement_bits()
+                    .zip(y.twos_complement_bits().chain(repeat(negative))),
+            )
         } else {
-            Box::new(x.twos_complement_bits().chain(repeat(negative)).zip(y.twos_complement_bits()))
+            Box::new(
+                x.twos_complement_bits()
+                    .chain(repeat(negative))
+                    .zip(y.twos_complement_bits()),
+            )
         };
     let mut distance = 0u64;
     for (b, c) in bit_zip {
@@ -70,12 +77,10 @@ fn benchmark_limbs_hamming_distance_neg(gm: GenerationMode, limit: usize, file_n
         file_name,
         &(|&(ref xs, ref ys)| max(xs.len(), ys.len())),
         "max(xs.len(), ys.len())",
-        &mut [
-            (
-                "malachite",
-                &mut (|(ref xs, ref ys)| no_out!(limbs_hamming_distance_neg(xs, ys))),
-            ),
-        ],
+        &mut [(
+            "malachite",
+            &mut (|(ref xs, ref ys)| no_out!(limbs_hamming_distance_neg(xs, ys))),
+        )],
     );
 }
 
@@ -100,9 +105,7 @@ fn benchmark_integer_checked_hamming_distance_algorithms(
             ),
             (
                 "using bits explicitly",
-                &mut (|(n, other)| {
-                    no_out!(integer_checked_hamming_distance_alt(&n, &other))
-                }),
+                &mut (|(n, other)| no_out!(integer_checked_hamming_distance_alt(&n, &other))),
             ),
         ],
     );

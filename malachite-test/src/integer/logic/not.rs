@@ -1,7 +1,7 @@
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::integer::{integers, rm_integers};
-use malachite_base::num::SignificantBits;
 use malachite_base::num::NotAssign;
+use malachite_base::num::SignificantBits;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_integer_not_assign);

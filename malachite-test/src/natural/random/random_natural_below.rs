@@ -34,11 +34,9 @@ fn benchmark_natural_random_natural_below(gm: GenerationMode, limit: usize, file
         file_name,
         &(|n| n.significant_bits() as usize),
         "n.significant_bits()",
-        &mut [
-            (
-                "malachite",
-                &mut (|ref n| no_out!(random_natural_below(&mut rng, n))),
-            ),
-        ],
+        &mut [(
+            "malachite",
+            &mut (|ref n| no_out!(random_natural_below(&mut rng, n))),
+        )],
     );
 }

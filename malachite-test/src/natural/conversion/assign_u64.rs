@@ -1,7 +1,7 @@
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::natural::{nm_pairs_of_natural_and_unsigned, pairs_of_natural_and_unsigned};
-use malachite_base::num::SignificantBits;
 use malachite_base::num::Assign;
+use malachite_base::num::SignificantBits;
 use num::BigUint;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {

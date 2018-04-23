@@ -1,8 +1,8 @@
 use common::test_properties;
-use malachite_test::inputs::natural::pairs_of_natural_and_unsigned;
 use malachite_base::num::Assign;
 use malachite_nz::natural::Natural;
 use malachite_test::common::{biguint_to_natural, natural_to_biguint};
+use malachite_test::inputs::natural::pairs_of_natural_and_unsigned;
 use malachite_test::natural::conversion::assign_u64::num_assign_u64;
 use num::BigUint;
 use std::str::FromStr;

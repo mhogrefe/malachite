@@ -605,7 +605,10 @@ pub fn pairs_of_unsigned_vec_var_2<T: 'static + PrimitiveUnsigned>(
 
 // All pairs of `Vec<u32>` where both elements are nonempty and don't only contain zeros.
 pub fn pairs_of_u32_vec_var_1(gm: GenerationMode) -> Box<Iterator<Item = (Vec<u32>, Vec<u32>)>> {
-    Box::new(pairs_of_unsigned_vec(gm).filter(|&(ref xs, ref ys)| !limbs_test_zero(xs) && !limbs_test_zero(ys)))
+    Box::new(
+        pairs_of_unsigned_vec(gm)
+            .filter(|&(ref xs, ref ys)| !limbs_test_zero(xs) && !limbs_test_zero(ys)),
+    )
 }
 
 pub fn triples_of_unsigned_vec<T: 'static + PrimitiveUnsigned>(
@@ -843,7 +846,8 @@ pub fn pairs_of_u32_vec_and_positive_u32_var_1(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (Vec<u32>, u32)>> {
     Box::new(
-        pairs_of_unsigned_vec_and_unsigned(gm).filter(|&(ref limbs, limb)| limb != 0 && !limbs_test_zero(limbs)),
+        pairs_of_unsigned_vec_and_unsigned(gm)
+            .filter(|&(ref limbs, limb)| limb != 0 && !limbs_test_zero(limbs)),
     )
 }
 

@@ -3,10 +3,10 @@ use common::DemoBenchRegistry;
 pub mod abs;
 pub mod add;
 pub mod add_i32;
-pub mod add_u32;
 pub mod add_mul;
 pub mod add_mul_i32;
 pub mod add_mul_u32;
+pub mod add_u32;
 pub mod divisible_by_power_of_two;
 pub mod even_odd;
 pub mod mod_power_of_two;
@@ -20,10 +20,10 @@ pub mod shr_i32;
 pub mod shr_u32;
 pub mod sub;
 pub mod sub_i32;
-pub mod sub_u32;
 pub mod sub_mul;
 pub mod sub_mul_i32;
 pub mod sub_mul_u32;
+pub mod sub_u32;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     abs::register(registry);

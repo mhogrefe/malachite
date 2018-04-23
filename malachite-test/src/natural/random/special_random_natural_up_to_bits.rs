@@ -41,11 +41,9 @@ fn benchmark_natural_special_random_natural_up_to_bits(
         file_name,
         &(|&bits| bits as usize),
         "bits",
-        &mut [
-            (
-                "malachite",
-                &mut (|bits| no_out!(special_random_natural_up_to_bits(&mut rng, bits))),
-            ),
-        ],
+        &mut [(
+            "malachite",
+            &mut (|bits| no_out!(special_random_natural_up_to_bits(&mut rng, bits))),
+        )],
     );
 }

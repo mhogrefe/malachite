@@ -43,7 +43,7 @@ pub fn test_decrement() {
 }
 
 macro_rules! decrement_fail {
-    ($t: ident, $decrement_fail: ident) => {
+    ($t:ident, $decrement_fail:ident) => {
         #[test]
         #[should_panic(expected = "Cannot decrement past the minimum value.")]
         fn $decrement_fail() {

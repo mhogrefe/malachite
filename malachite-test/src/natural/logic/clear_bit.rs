@@ -40,12 +40,10 @@ fn benchmark_limbs_clear_bit(gm: GenerationMode, limit: usize, file_name: &str) 
         file_name,
         &(|&(_, index)| index as usize),
         "index",
-        &mut [
-            (
-                "malachite",
-                &mut (|(ref mut limbs, index)| no_out!(limbs_clear_bit(limbs, index))),
-            ),
-        ],
+        &mut [(
+            "malachite",
+            &mut (|(ref mut limbs, index)| no_out!(limbs_clear_bit(limbs, index))),
+        )],
     );
 }
 

@@ -30,13 +30,9 @@ fn benchmark_limbs_pad_left(gm: GenerationMode, limit: usize, file_name: &str) {
         file_name,
         &(|&(ref limbs, _, _)| limbs.len()),
         "limbs.len()",
-        &mut [
-            (
-                "malachite",
-                &mut (|(mut limbs, pad_size, pad_limb)| {
-                    limbs_pad_left(&mut limbs, pad_size, pad_limb)
-                }),
-            ),
-        ],
+        &mut [(
+            "malachite",
+            &mut (|(mut limbs, pad_size, pad_limb)| limbs_pad_left(&mut limbs, pad_size, pad_limb)),
+        )],
     );
 }

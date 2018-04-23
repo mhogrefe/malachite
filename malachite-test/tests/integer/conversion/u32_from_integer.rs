@@ -6,8 +6,8 @@ use malachite_test::common::integer_to_rug_integer;
 use malachite_test::inputs::integer::integers;
 use rug;
 use std::cmp::Ordering;
-use std::u32;
 use std::str::FromStr;
+use std::u32;
 
 #[test]
 fn test_u32_checked_from_integer() {

@@ -1,7 +1,7 @@
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::integer::{pairs_of_integer_and_unsigned, pairs_of_unsigned_and_integer};
-use malachite_base::num::SignificantBits;
 use malachite_base::num::PartialOrdAbs;
+use malachite_base::num::SignificantBits;
 use std::cmp::Ordering;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
@@ -41,9 +41,7 @@ fn benchmark_integer_partial_cmp_abs_u32(gm: GenerationMode, limit: usize, file_
         file_name,
         &(|&(ref n, _)| n.significant_bits() as usize),
         "n.significant_bits()",
-        &mut [
-            ("malachite", &mut (|(x, y)| no_out!(x.partial_cmp_abs(&y)))),
-        ],
+        &mut [("malachite", &mut (|(x, y)| no_out!(x.partial_cmp_abs(&y))))],
     );
 }
 
@@ -57,8 +55,6 @@ fn benchmark_u32_partial_cmp_abs_integer(gm: GenerationMode, limit: usize, file_
         file_name,
         &(|&(_, ref n)| n.significant_bits() as usize),
         "n.significant_bits()",
-        &mut [
-            ("malachite", &mut (|(x, y)| no_out!(x.partial_cmp_abs(&y)))),
-        ],
+        &mut [("malachite", &mut (|(x, y)| no_out!(x.partial_cmp_abs(&y))))],
     );
 }

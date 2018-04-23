@@ -1,6 +1,6 @@
-use malachite_base::num::{CheckedHammingDistance, HammingDistance, UnsignedAbs};
 use integer::logic::checked_count_zeros::limbs_count_zeros_neg;
 use integer::Integer;
+use malachite_base::num::{CheckedHammingDistance, HammingDistance, UnsignedAbs};
 use natural::Natural::{self, Large, Small};
 
 /// Interpreting a slice of `u32`s as the limbs of a `Natural` in ascending order, returns the

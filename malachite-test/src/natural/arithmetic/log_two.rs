@@ -57,12 +57,10 @@ fn benchmark_limbs_floor_log_two(gm: GenerationMode, limit: usize, file_name: &s
         file_name,
         &(|limbs| limbs.len()),
         "limbs.len()",
-        &mut [
-            (
-                "malachite",
-                &mut (|ref limbs| no_out!(limbs_floor_log_two(limbs))),
-            ),
-        ],
+        &mut [(
+            "malachite",
+            &mut (|ref limbs| no_out!(limbs_floor_log_two(limbs))),
+        )],
     );
 }
 
@@ -76,12 +74,10 @@ fn benchmark_limbs_ceiling_log_two(gm: GenerationMode, limit: usize, file_name: 
         file_name,
         &(|limbs| limbs.len()),
         "limbs.len()",
-        &mut [
-            (
-                "malachite",
-                &mut (|ref limbs| no_out!(limbs_ceiling_log_two(limbs))),
-            ),
-        ],
+        &mut [(
+            "malachite",
+            &mut (|ref limbs| no_out!(limbs_ceiling_log_two(limbs))),
+        )],
     );
 }
 

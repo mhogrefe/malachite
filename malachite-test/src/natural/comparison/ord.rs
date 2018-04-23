@@ -51,12 +51,10 @@ fn benchmark_limbs_cmp_same_length(gm: GenerationMode, limit: usize, file_name: 
         file_name,
         &(|&(ref xs, _)| xs.len()),
         "xs.len() = ys.len()",
-        &mut [
-            (
-                "malachite",
-                &mut (|(xs, ys)| no_out!(limbs_cmp_same_length(&xs, &ys))),
-            ),
-        ],
+        &mut [(
+            "malachite",
+            &mut (|(xs, ys)| no_out!(limbs_cmp_same_length(&xs, &ys))),
+        )],
     );
 }
 
@@ -70,9 +68,7 @@ fn benchmark_limbs_cmp(gm: GenerationMode, limit: usize, file_name: &str) {
         file_name,
         &(|&(ref xs, ref ys)| min(xs.len(), ys.len())),
         "min(xs.len(), ys.len())",
-        &mut [
-            ("malachite", &mut (|(xs, ys)| no_out!(limbs_cmp(&xs, &ys)))),
-        ],
+        &mut [("malachite", &mut (|(xs, ys)| no_out!(limbs_cmp(&xs, &ys))))],
     );
 }
 

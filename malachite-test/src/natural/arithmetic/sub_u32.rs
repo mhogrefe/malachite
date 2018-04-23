@@ -1,7 +1,7 @@
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::natural::{nrm_pairs_of_natural_and_unsigned, pairs_of_natural_and_unsigned,
-                      pairs_of_unsigned_and_natural, rm_pairs_of_unsigned_and_natural,
-                      pairs_of_natural_and_u32_var_1, rm_pairs_of_natural_and_u32_var_1};
+use inputs::natural::{nrm_pairs_of_natural_and_unsigned, pairs_of_natural_and_u32_var_1,
+                      pairs_of_natural_and_unsigned, pairs_of_unsigned_and_natural,
+                      rm_pairs_of_natural_and_u32_var_1, rm_pairs_of_unsigned_and_natural};
 use malachite_base::num::SignificantBits;
 use natural::comparison::partial_ord_u32::num_partial_cmp_u32;
 use num::BigUint;

@@ -1,7 +1,7 @@
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use malachite_base::num::{PrimitiveSigned, PrimitiveUnsigned};
 use inputs::base::{triples_of_signed_u64_width_range_and_bool_var_1,
                    triples_of_unsigned_u64_width_range_and_bool_var_1};
+use malachite_base::num::{PrimitiveSigned, PrimitiveUnsigned};
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_u8_assign_bit);
@@ -61,12 +61,10 @@ fn benchmark_unsigned_assign_bit<T: 'static + PrimitiveUnsigned>(
         file_name,
         &(|&(_, index, _)| index as usize),
         "index",
-        &mut [
-            (
-                "malachite",
-                &mut (|(mut n, index, bit)| n.assign_bit(index, bit)),
-            ),
-        ],
+        &mut [(
+            "malachite",
+            &mut (|(mut n, index, bit)| n.assign_bit(index, bit)),
+        )],
     );
 }
 
@@ -84,17 +82,15 @@ fn benchmark_signed_assign_bit<T: 'static + PrimitiveSigned>(
         file_name,
         &(|&(_, index, _)| index as usize),
         "index",
-        &mut [
-            (
-                "malachite",
-                &mut (|(mut n, index, bit)| n.assign_bit(index, bit)),
-            ),
-        ],
+        &mut [(
+            "malachite",
+            &mut (|(mut n, index, bit)| n.assign_bit(index, bit)),
+        )],
     );
 }
 
 macro_rules! unsigned {
-    ($t: ident, $demo_name: ident, $bench_name: ident) => {
+    ($t:ident, $demo_name:ident, $bench_name:ident) => {
         fn $demo_name(gm: GenerationMode, limit: usize) {
             demo_unsigned_assign_bit::<$t>(gm, limit);
         }
@@ -106,7 +102,7 @@ macro_rules! unsigned {
 }
 
 macro_rules! signed {
-    ($t: ident, $demo_name: ident, $bench_name: ident) => {
+    ($t:ident, $demo_name:ident, $bench_name:ident) => {
         fn $demo_name(gm: GenerationMode, limit: usize) {
             demo_signed_assign_bit::<$t>(gm, limit);
         }

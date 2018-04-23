@@ -62,12 +62,10 @@ fn benchmark_limbs_slice_set_bit(gm: GenerationMode, limit: usize, file_name: &s
         file_name,
         &(|&(_, index)| index as usize),
         "index",
-        &mut [
-            (
-                "malachite",
-                &mut (|(ref mut limbs, index)| no_out!(limbs_slice_set_bit(limbs, index))),
-            ),
-        ],
+        &mut [(
+            "malachite",
+            &mut (|(ref mut limbs, index)| no_out!(limbs_slice_set_bit(limbs, index))),
+        )],
     );
 }
 
@@ -81,12 +79,10 @@ fn benchmark_limbs_vec_set_bit(gm: GenerationMode, limit: usize, file_name: &str
         file_name,
         &(|&(_, index)| index as usize),
         "index",
-        &mut [
-            (
-                "malachite",
-                &mut (|(ref mut limbs, index)| no_out!(limbs_vec_set_bit(limbs, index))),
-            ),
-        ],
+        &mut [(
+            "malachite",
+            &mut (|(ref mut limbs, index)| no_out!(limbs_vec_set_bit(limbs, index))),
+        )],
     );
 }
 

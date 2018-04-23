@@ -1,5 +1,5 @@
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::base::{vecs_of_unsigned, vecs_of_u32_var_1};
+use inputs::base::{vecs_of_u32_var_1, vecs_of_unsigned};
 use inputs::integer::{integers, pairs_of_integer_and_small_usize};
 use malachite_base::num::SignificantBits;
 use malachite_nz::integer::conversion::to_twos_complement_limbs::*;
@@ -8,18 +8,17 @@ use malachite_nz::natural::logic::not::limbs_not_in_place;
 use std::u32;
 
 pub fn limbs_slice_to_twos_complement_limbs_negative_alt_1(limbs: &mut [u32]) -> bool {
-    let mut carry = true;
-    for limb in limbs {
-        if carry {
-            if let (result, true) = limb.overflowing_neg() {
-                *limb = result;
-                carry = false;
-            }
-        } else {
-            *limb = !*limb;
-        }
+    let i = limbs.iter().cloned().take_while(|&x| x == 0).count();
+    let len = limbs.len();
+    if i == len {
+        return true;
     }
-    carry
+    limbs[i] = limbs[i].wrapping_neg();
+    let j = i + 1;
+    if j != len {
+        limbs_not_in_place(&mut limbs[j..]);
+    }
+    false
 }
 
 pub fn limbs_slice_to_twos_complement_limbs_negative_alt_2(limbs: &mut [u32]) -> bool {
@@ -191,12 +190,10 @@ fn benchmark_limbs_to_twos_complement_limbs_non_negative(
         file_name,
         &(|limbs| limbs.len()),
         "index",
-        &mut [
-            (
-                "malachite",
-                &mut (|ref mut limbs| limbs_to_twos_complement_limbs_non_negative(limbs)),
-            ),
-        ],
+        &mut [(
+            "malachite",
+            &mut (|ref mut limbs| limbs_to_twos_complement_limbs_non_negative(limbs)),
+        )],
     );
 }
 
@@ -251,12 +248,10 @@ fn benchmark_limbs_vec_to_twos_complement_limbs_negative(
         file_name,
         &(|limbs| limbs.len()),
         "index",
-        &mut [
-            (
-                "malachite",
-                &mut (|ref mut limbs| limbs_vec_to_twos_complement_limbs_negative(limbs)),
-            ),
-        ],
+        &mut [(
+            "malachite",
+            &mut (|ref mut limbs| limbs_vec_to_twos_complement_limbs_negative(limbs)),
+        )],
     );
 }
 

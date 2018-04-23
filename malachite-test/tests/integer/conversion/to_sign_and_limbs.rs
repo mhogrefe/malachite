@@ -2,8 +2,8 @@ use common::test_properties;
 use malachite_nz::integer::Integer;
 use malachite_test::inputs::integer::integers;
 use std::cmp::Ordering;
-use std::u32;
 use std::str::FromStr;
+use std::u32;
 
 #[test]
 fn test_to_sign_and_limbs_asc() {

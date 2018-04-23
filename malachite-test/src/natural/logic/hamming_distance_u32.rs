@@ -55,7 +55,12 @@ fn demo_natural_hamming_distance_u32(gm: GenerationMode, limit: usize) {
 
 fn demo_u32_hamming_distance_natural(gm: GenerationMode, limit: usize) {
     for (u, n) in pairs_of_unsigned_and_natural::<u32>(gm).take(limit) {
-        println!("hamming_distance({}, {}) = {}", u, n, u.hamming_distance(&n));
+        println!(
+            "hamming_distance({}, {}) = {}",
+            u,
+            n,
+            u.hamming_distance(&n)
+        );
     }
 }
 
@@ -69,12 +74,10 @@ fn benchmark_limbs_hamming_distance_limb(gm: GenerationMode, limit: usize, file_
         file_name,
         &(|&(ref limbs, _)| limbs.len()),
         "limbs.len()",
-        &mut [
-            (
-                "malachite",
-                &mut (|(ref limbs, limb)| no_out!(limbs_hamming_distance_limb(limbs, limb))),
-            ),
-        ],
+        &mut [(
+            "malachite",
+            &mut (|(ref limbs, limb)| no_out!(limbs_hamming_distance_limb(limbs, limb))),
+        )],
     );
 }
 
@@ -105,11 +108,7 @@ fn benchmark_natural_hamming_distance_u32_algorithms(
     );
 }
 
-fn benchmark_u32_hamming_distance_natural(
-    gm: GenerationMode,
-    limit: usize,
-    file_name: &str,
-) {
+fn benchmark_u32_hamming_distance_natural(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "u32.hamming_distance(&Natural)",
         BenchmarkType::Single,
@@ -119,11 +118,9 @@ fn benchmark_u32_hamming_distance_natural(
         file_name,
         &(|&(_, ref n)| n.significant_bits() as usize),
         "n.significant_bits()",
-        &mut [
-            (
-                "default",
-                &mut (|(u, ref other)| no_out!(u.hamming_distance(other))),
-            ),
-        ],
+        &mut [(
+            "default",
+            &mut (|(u, ref other)| no_out!(u.hamming_distance(other))),
+        )],
     );
 }

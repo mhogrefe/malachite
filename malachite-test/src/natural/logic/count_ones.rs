@@ -42,12 +42,10 @@ fn benchmark_limbs_count_ones(gm: GenerationMode, limit: usize, file_name: &str)
         file_name,
         &(|limbs| limbs.len()),
         "limbs.len()",
-        &mut [
-            (
-                "malachite",
-                &mut (|limbs| no_out!(limbs_count_ones(&limbs))),
-            ),
-        ],
+        &mut [(
+            "malachite",
+            &mut (|limbs| no_out!(limbs_count_ones(&limbs))),
+        )],
     );
 }
 

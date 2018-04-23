@@ -2,8 +2,8 @@ use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, 
 use inputs::base::nonempty_vecs_of_unsigned;
 use inputs::integer::integers;
 use malachite_base::num::SignificantBits;
-use malachite_nz::integer::Integer;
 use malachite_nz::integer::logic::checked_count_zeros::limbs_count_zeros_neg;
+use malachite_nz::integer::Integer;
 
 pub fn integer_checked_count_zeros_alt(n: &Integer) -> Option<u64> {
     if *n < 0 {
@@ -50,12 +50,10 @@ fn benchmark_limbs_count_zeros_neg(gm: GenerationMode, limit: usize, file_name: 
         file_name,
         &(|limbs| limbs.len()),
         "limbs.len()",
-        &mut [
-            (
-                "malachite",
-                &mut (|limbs| no_out!(limbs_count_zeros_neg(&limbs))),
-            ),
-        ],
+        &mut [(
+            "malachite",
+            &mut (|limbs| no_out!(limbs_count_zeros_neg(&limbs))),
+        )],
     );
 }
 

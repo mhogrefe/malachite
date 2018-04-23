@@ -54,12 +54,10 @@ fn benchmark_limbs_slice_clear_bit_neg(gm: GenerationMode, limit: usize, file_na
         file_name,
         &(|&(_, index)| index as usize),
         "index",
-        &mut [
-            (
-                "malachite",
-                &mut (|(ref mut limbs, index)| no_out!(limbs_slice_clear_bit_neg(limbs, index))),
-            ),
-        ],
+        &mut [(
+            "malachite",
+            &mut (|(ref mut limbs, index)| no_out!(limbs_slice_clear_bit_neg(limbs, index))),
+        )],
     );
 }
 
@@ -73,12 +71,10 @@ fn benchmark_limbs_vec_clear_bit_neg(gm: GenerationMode, limit: usize, file_name
         file_name,
         &(|&(_, index)| index as usize),
         "index",
-        &mut [
-            (
-                "malachite",
-                &mut (|(ref mut limbs, index)| no_out!(limbs_vec_clear_bit_neg(limbs, index))),
-            ),
-        ],
+        &mut [(
+            "malachite",
+            &mut (|(ref mut limbs, index)| no_out!(limbs_vec_clear_bit_neg(limbs, index))),
+        )],
     );
 }
 

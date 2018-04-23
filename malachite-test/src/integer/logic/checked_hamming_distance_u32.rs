@@ -33,7 +33,11 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
         Large,
         benchmark_integer_checked_hamming_distance_u32_algorithms
     );
-    register_bench!(registry, Large, benchmark_u32_checked_hamming_distance_integer);
+    register_bench!(
+        registry,
+        Large,
+        benchmark_u32_checked_hamming_distance_integer
+    );
 }
 
 fn demo_integer_checked_hamming_distance_u32(gm: GenerationMode, limit: usize) {
@@ -101,11 +105,9 @@ fn benchmark_u32_checked_hamming_distance_integer(
         file_name,
         &(|&(_, ref n)| n.significant_bits() as usize),
         "n.significant_bits()",
-        &mut [
-            (
-                "default",
-                &mut (|(u, ref other)| no_out!(u.checked_hamming_distance(other))),
-            ),
-        ],
+        &mut [(
+            "default",
+            &mut (|(u, ref other)| no_out!(u.checked_hamming_distance(other))),
+        )],
     );
 }

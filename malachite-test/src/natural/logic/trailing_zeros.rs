@@ -46,12 +46,10 @@ fn benchmark_limbs_trailing_zeros(gm: GenerationMode, limit: usize, file_name: &
         file_name,
         &(|limbs| limbs.len()),
         "limbs.len()",
-        &mut [
-            (
-                "malachite",
-                &mut (|limbs| no_out!(limbs_trailing_zeros(&limbs))),
-            ),
-        ],
+        &mut [(
+            "malachite",
+            &mut (|limbs| no_out!(limbs_trailing_zeros(&limbs))),
+        )],
     );
 }
 

@@ -1,7 +1,7 @@
 use common::test_properties;
 use malachite_base::num::{BitAccess, SignificantBits};
-use malachite_nz::integer::Integer;
 use malachite_nz::integer::logic::bit_access::limbs_get_bit_neg;
+use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_test::common::integer_to_rug_integer;
 use malachite_test::inputs::base::pairs_of_u32_vec_and_small_u64_var_1;

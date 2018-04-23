@@ -1,6 +1,6 @@
 use common::test_properties;
-use malachite_base::num::{One, Zero};
 use malachite_base::num::{AddMul, AddMulAssign};
+use malachite_base::num::{One, Zero};
 use malachite_nz::natural::Natural;
 use malachite_test::inputs::natural::{pairs_of_naturals, triples_of_naturals};
 use std::str::FromStr;
