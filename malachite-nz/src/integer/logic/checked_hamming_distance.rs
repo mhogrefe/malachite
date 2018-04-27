@@ -1,5 +1,6 @@
 use integer::logic::checked_count_zeros::limbs_count_zeros_neg;
 use integer::Integer;
+use malachite_base::limbs::limbs_trailing_zero_limbs;
 use malachite_base::num::{CheckedHammingDistance, HammingDistance};
 use natural::logic::count_ones::limbs_count_ones;
 use natural::logic::hamming_distance::limbs_hamming_distance_same_length;
@@ -10,7 +11,7 @@ fn limbs_count_zeros(limbs: &[u32]) -> u64 {
     limbs.iter().map(|limb| u64::from(limb.count_zeros())).sum()
 }
 
-fn limbs_hamming_distance_neg_helper_2(xs: &[u32], ys: &[u32], i: usize) -> u64 {
+fn limbs_hamming_distance_neg_leading_limbs_helper(xs: &[u32], ys: &[u32], i: usize) -> u64 {
     let xs_len = xs.len();
     let ys_len = ys.len();
     match xs_len.cmp(&ys_len) {
@@ -54,7 +55,7 @@ fn limbs_hamming_distance_neg_helper(xs: &[u32], ys: &[u32], xs_i: usize, ys_i: 
     if xs_len == ys_i + 1 {
         return distance + limbs_count_ones(&ys[xs_len..]);
     }
-    distance + limbs_hamming_distance_neg_helper_2(xs, ys, ys_i)
+    distance + limbs_hamming_distance_neg_leading_limbs_helper(xs, ys, ys_i)
 }
 
 /// Interpreting two equal-length slices of `u32`s as the limbs of `Natural`s in ascending order,
@@ -67,6 +68,9 @@ fn limbs_hamming_distance_neg_helper(xs: &[u32], ys: &[u32], xs_i: usize, ys_i: 
 ///
 /// where n = `limbs.len()`
 ///
+/// # Panics
+/// May panic if `xs` or `ys` only contain zeros.
+///
 /// # Example
 /// ```
 /// use malachite_nz::integer::logic::checked_hamming_distance::limbs_hamming_distance_neg;
@@ -75,14 +79,14 @@ fn limbs_hamming_distance_neg_helper(xs: &[u32], ys: &[u32], xs_i: usize, ys_i: 
 /// assert_eq!(limbs_hamming_distance_neg(&[1, 1, 1], &[1, 2, 3]), 3);
 /// ```
 pub fn limbs_hamming_distance_neg(xs: &[u32], ys: &[u32]) -> u64 {
-    let xs_i = xs.iter().cloned().take_while(|&x| x == 0).count();
-    let ys_i = ys.iter().cloned().take_while(|&y| y == 0).count();
+    let xs_i = limbs_trailing_zero_limbs(xs);
+    let ys_i = limbs_trailing_zero_limbs(ys);
     match xs_i.cmp(&ys_i) {
         Ordering::Equal => {
             xs[xs_i]
                 .wrapping_neg()
                 .hamming_distance(ys[ys_i].wrapping_neg())
-                + limbs_hamming_distance_neg_helper_2(xs, ys, xs_i)
+                + limbs_hamming_distance_neg_leading_limbs_helper(xs, ys, xs_i)
         }
         Ordering::Less => limbs_hamming_distance_neg_helper(xs, ys, xs_i, ys_i),
         Ordering::Greater => limbs_hamming_distance_neg_helper(ys, xs, ys_i, xs_i),

@@ -63,16 +63,14 @@ fn and_u32_properties() {
             rug_n &= u;
             assert_eq!(rug_integer_to_natural(&rug_n), result);
 
-            let result_alt = n & u;
-            assert_eq!(result_alt, result);
-
-            let result_alt = u & n;
-            assert_eq!(result_alt, result);
-
+            assert_eq!(n & u, result);
+            assert_eq!(u & n, result);
             assert_eq!(natural_and_u32_alt(&n, u), result);
 
             //TODO assert_eq!(n & Natural::from(u), result);
             //TODO assert_eq!(Natural::from(u) & n, result);
+
+            assert_eq!(&result & u, result);
 
             assert_eq!(num_and_u32(natural_to_biguint(n), u), result);
             assert_eq!(

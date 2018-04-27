@@ -22,6 +22,18 @@ fn test_limbs_hamming_distance_neg() {
 }
 
 #[test]
+#[should_panic(expected = "index out of bounds: the len is 2 but the index is 2")]
+fn limbs_hamming_distance_neg_fail_1() {
+    limbs_hamming_distance_neg(&[0, 0], &[1, 2, 3]);
+}
+
+#[test]
+#[should_panic(expected = "index out of bounds: the len is 2 but the index is 2")]
+fn limbs_hamming_distance_neg_fail_2() {
+    limbs_hamming_distance_neg(&[1, 2, 3], &[0, 0]);
+}
+
+#[test]
 fn test_checked_hamming_distance() {
     let test = |x, y, out| {
         assert_eq!(

@@ -1,12 +1,113 @@
 use common::test_properties;
 use malachite_base::num::{NegativeOne, Zero};
+use malachite_nz::integer::logic::and_i32::{limbs_slice_neg_and_limb_neg,
+                                            limbs_slice_neg_and_limb_neg_in_place,
+                                            limbs_vec_neg_and_limb_neg,
+                                            limbs_vec_neg_and_limb_neg_in_place};
 use malachite_nz::integer::Integer;
 use malachite_test::common::{integer_to_rug_integer, rug_integer_to_integer};
-use malachite_test::inputs::base::signeds;
+use malachite_test::inputs::base::{pairs_of_u32_vec_and_u32_var_1, signeds,
+                                   triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_1};
 use malachite_test::inputs::integer::{integers, pairs_of_integer_and_signed};
 use malachite_test::integer::logic::and_i32::integer_and_i32_alt;
 use rug::{self, Assign};
 use std::str::FromStr;
+
+#[test]
+fn test_limbs_slice_neg_and_limb_neg() {
+    let test =
+        |out_limbs_before: &[u32], in_limbs: &[u32], limb: u32, carry, out_limbs_after: &[u32]| {
+            let mut out_limbs = out_limbs_before.to_vec();
+            assert_eq!(
+                limbs_slice_neg_and_limb_neg(&mut out_limbs, in_limbs, limb),
+                carry
+            );
+            assert_eq!(out_limbs, out_limbs_after);
+        };
+    test(&[0, 0], &[0, 2], 3, false, &[0, 2]);
+    test(&[1, 2, 100], &[0, 2, 100], 3, false, &[0, 2, 100]);
+    test(&[0, 0], &[1, 1], 3, false, &[4294967293, 1]);
+    test(&[0, 0], &[0xffff_fffe, 1], 1, false, &[0, 2]);
+    test(&[0, 0], &[0xffff_fffe, 0xffff_ffff], 1, true, &[0, 0]);
+    test(
+        &[1, 2, 100],
+        &[0xffff_fffe, 0xffff_ffff],
+        1,
+        true,
+        &[0, 0, 100],
+    );
+}
+
+#[test]
+#[should_panic(expected = "assertion failed: out_limbs.len() >= in_limbs.len()")]
+fn limbs_slice_neg_and_limb_neg_fail_1() {
+    limbs_slice_neg_and_limb_neg(&mut [1, 2, 3], &[1, 2, 3, 4], 10);
+}
+
+#[test]
+#[should_panic(expected = "index out of bounds: the len is 0 but the index is 0")]
+fn limbs_slice_neg_and_limb_neg_fail_2() {
+    limbs_slice_neg_and_limb_neg(&mut [1, 2, 3], &[], 10);
+}
+
+#[test]
+fn test_limbs_vec_neg_and_limb_neg() {
+    let test = |limbs: &[u32], limb: u32, out_limbs: &[u32]| {
+        assert_eq!(limbs_vec_neg_and_limb_neg(limbs, limb), out_limbs);
+    };
+    test(&[0, 2], 3, &[0, 2]);
+    test(&[1, 1], 3, &[4294967293, 1]);
+    test(&[0xffff_fffe, 1], 1, &[0, 2]);
+    test(&[0xffff_fffe, 0xffff_ffff], 1, &[0, 0, 1]);
+}
+
+#[test]
+#[should_panic(expected = "index out of bounds: the len is 0 but the index is 0")]
+fn limbs_vec_neg_and_limb_neg_fail() {
+    limbs_vec_neg_and_limb_neg(&[], 10);
+}
+
+#[test]
+fn test_limbs_slice_neg_and_limb_neg_in_place() {
+    let test = |limbs_before: &[u32], limb: u32, carry, limbs_after: &[u32]| {
+        let mut limbs = limbs_before.to_vec();
+        assert_eq!(
+            limbs_slice_neg_and_limb_neg_in_place(&mut limbs, limb),
+            carry
+        );
+        assert_eq!(limbs, limbs_after);
+    };
+    test(&[0, 2], 3, false, &[0, 2]);
+    test(&[1, 1], 3, false, &[4294967293, 1]);
+    test(&[0xffff_fffe, 1], 1, false, &[0, 2]);
+    test(&[0xffff_fffe, 0xffff_ffff], 1, true, &[0, 0]);
+}
+
+#[test]
+#[should_panic(expected = "assertion failed: mid <= len")]
+fn limbs_slice_neg_and_limb_neg_in_place_fail() {
+    limbs_slice_neg_and_limb_neg_in_place(&mut [], 10);
+}
+
+#[test]
+fn test_limbs_vec_neg_and_limb_neg_in_place() {
+    let test = |limbs_before: &[u32], limb: u32, limbs_after: &[u32]| {
+        let mut limbs = limbs_before.to_vec();
+        limbs_vec_neg_and_limb_neg_in_place(&mut limbs, limb);
+        assert_eq!(limbs, limbs_after);
+    };
+    test(&[0, 2], 3, &[0, 2]);
+    test(&[1, 1], 3, &[4294967293, 1]);
+    test(&[0xffff_fffe, 1], 1, &[0, 2]);
+    test(&[0xffff_fffe, 0xffff_ffff], 1, &[0, 0, 1]);
+}
+
+#[test]
+#[should_panic(expected = "assertion failed: mid <= len")]
+fn limbs_vec_neg_and_limb_neg_in_place_fail() {
+    let mut limbs = vec![];
+    limbs_vec_neg_and_limb_neg_in_place(&mut limbs, 10);
+}
 
 #[test]
 fn test_and_i32() {
@@ -20,10 +121,16 @@ fn test_and_i32() {
         n &= v;
         assert_eq!(n.to_string(), out);
 
+        let n = Integer::from_str(u).unwrap() & v;
+        assert_eq!(n.to_string(), out);
+
         let n = &Integer::from_str(u).unwrap() & v;
         assert_eq!(n.to_string(), out);
 
         let n = rug::Integer::from_str(u).unwrap() & v;
+        assert_eq!(n.to_string(), out);
+
+        let n = v & Integer::from_str(u).unwrap();
         assert_eq!(n.to_string(), out);
 
         let n = v & &Integer::from_str(u).unwrap();
@@ -78,6 +185,46 @@ fn test_and_i32() {
 }
 
 #[test]
+fn limbs_slice_neg_and_limb_neg_properties() {
+    test_properties(
+        triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_1,
+        |&(ref out_limbs, ref in_limbs, limb)| {
+            let mut out_limbs = out_limbs.to_vec();
+            limbs_slice_neg_and_limb_neg(&mut out_limbs, in_limbs, limb);
+            // TODO
+            // let n = -Natural::from_limbs_asc(&in_limbs) & limb.wrapping_neg();
+            // assert_eq!(n.into_twos_complement_limbs_asc()[0..in_limbs.len()], in_limbs);
+        },
+    );
+}
+
+#[test]
+fn limbs_vec_neg_and_limb_neg_properties() {
+    test_properties(pairs_of_u32_vec_and_u32_var_1, |&(ref limbs, limb)| {
+        limbs_vec_neg_and_limb_neg(limbs, limb);
+        // TODO
+    });
+}
+
+#[test]
+fn limbs_slice_neg_and_limb_neg_properties_in_place() {
+    test_properties(pairs_of_u32_vec_and_u32_var_1, |&(ref limbs, limb)| {
+        let mut limbs = limbs.to_vec();
+        limbs_slice_neg_and_limb_neg_in_place(&mut limbs, limb);
+        // TODO
+    });
+}
+
+#[test]
+fn limbs_vec_neg_and_limb_neg_properties_in_place() {
+    test_properties(pairs_of_u32_vec_and_u32_var_1, |&(ref limbs, limb)| {
+        let mut limbs = limbs.to_vec();
+        limbs_vec_neg_and_limb_neg_in_place(&mut limbs, limb);
+        // TODO
+    });
+}
+
+#[test]
 fn and_i32_properties() {
     test_properties(
         pairs_of_integer_and_signed,
@@ -92,12 +239,24 @@ fn and_i32_properties() {
             assert_eq!(rug_integer_to_integer(&rug_n), result, "{} {}", n, i);
 
             let result_alt = n & i;
+            assert!(result_alt.is_valid());
+            assert_eq!(result_alt, result);
+
+            let result_alt = n.clone() & i;
+            assert!(result_alt.is_valid());
             assert_eq!(result_alt, result);
 
             let result_alt = i & n;
+            assert!(result_alt.is_valid());
+            assert_eq!(result_alt, result);
+
+            let result_alt = i & n.clone();
+            assert!(result_alt.is_valid());
             assert_eq!(result_alt, result);
 
             assert_eq!(integer_and_i32_alt(&n, i), result);
+
+            assert_eq!(&result & i, result);
 
             //TODO assert_eq!(n & Integer::from(u), result);
             //TODO assert_eq!(Integer::from(u) & n, result);

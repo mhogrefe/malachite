@@ -64,16 +64,14 @@ fn and_u32_properties() {
             rug_n &= u;
             assert_eq!(rug_integer_to_integer(&rug_n), result);
 
-            let result_alt = n & u;
-            assert_eq!(result_alt, result);
-
-            let result_alt = u & n;
-            assert_eq!(result_alt, result);
-
+            assert_eq!(n & u, result);
+            assert_eq!(u & n, result);
             assert_eq!(integer_and_u32_alt(&n, u), result);
 
             //TODO assert_eq!(n & Integer::from(u), result);
             //TODO assert_eq!(Integer::from(u) & n, result);
+
+            assert_eq!(&result & u, result);
 
             assert_eq!(
                 rug_integer_to_integer(&(integer_to_rug_integer(n) & u)),

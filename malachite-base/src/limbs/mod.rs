@@ -97,3 +97,8 @@ pub fn limbs_delete_left(limbs: &mut Vec<u32>, delete_size: usize) {
     }
     limbs.truncate(remaining_size);
 }
+
+//TODO docs and tests
+pub fn limbs_trailing_zero_limbs(limbs: &[u32]) -> usize {
+    limbs.iter().take_while(|&&y| y == 0).count()
+}

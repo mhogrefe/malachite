@@ -21,9 +21,10 @@ use rust_wheels::iterators::primitive_ints::{exhaustive_negative_signed, exhaust
                                              special_random_signed, special_random_unsigned};
 use rust_wheels::iterators::rounding_modes::{exhaustive_rounding_modes, random_rounding_modes};
 use rust_wheels::iterators::tuples::{exhaustive_pairs, exhaustive_pairs_from_single,
-                                     exhaustive_triples_from_single, lex_pairs, lex_triples,
-                                     log_pairs, random_pairs, random_pairs_from_single,
-                                     random_triples, random_triples_from_single, sqrt_pairs};
+                                     exhaustive_triples, exhaustive_triples_from_single,
+                                     lex_pairs, lex_triples, log_pairs, random_pairs,
+                                     random_pairs_from_single, random_triples,
+                                     random_triples_from_single, sqrt_pairs};
 use rust_wheels::iterators::vecs::{exhaustive_vecs, random_vecs, special_random_bool_vecs,
                                    special_random_unsigned_vecs};
 use std::char;
@@ -840,6 +841,14 @@ pub fn pairs_of_u32_vec_and_small_u64_var_3(
     )
 }
 
+// All pairs of `Vec<u32>` and `u32`, where the `Vec<u32>` are nonempty and don't only contain
+// zeros.
+pub fn pairs_of_u32_vec_and_u32_var_1(gm: GenerationMode) -> Box<Iterator<Item = (Vec<u32>, u32)>> {
+    Box::new(
+        pairs_of_unsigned_vec_and_unsigned(gm).filter(|&(ref limbs, _)| !limbs_test_zero(limbs)),
+    )
+}
+
 // All pairs of `Vec<u32>` and positive `u32`, where the `Vec<u32>` are nonempty and don't only
 // contain zeros.
 pub fn pairs_of_u32_vec_and_positive_u32_var_1(
@@ -867,4 +876,42 @@ pub fn vecs_of_bool(gm: GenerationMode) -> Box<Iterator<Item = Vec<bool>>> {
 // All `Vec<bool>` that are nonempty and don't only contain `false`s.
 pub fn vecs_of_bool_var_1(gm: GenerationMode) -> Box<Iterator<Item = Vec<bool>>> {
     Box::new(vecs_of_bool(gm).filter(|bits| bits.iter().any(|&bit| bit)))
+}
+
+fn triples_of_unsigned_vec_unsigned_vec_and_unsigned<T: 'static + PrimitiveUnsigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (Vec<T>, Vec<T>, T)>> {
+    match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_triples(
+            exhaustive_vecs(exhaustive_unsigned()),
+            exhaustive_vecs(exhaustive_unsigned()),
+            exhaustive_unsigned(),
+        )),
+        GenerationMode::Random(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| random_vecs(seed, scale, &(|seed_2| random(seed_2)))),
+            &(|seed| random_vecs(seed, scale, &(|seed_2| random(seed_2)))),
+            &(|seed| random(seed)),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_unsigned_vecs(seed, scale)),
+            &(|seed| special_random_unsigned_vecs(seed, scale)),
+            &(|seed| special_random_unsigned(seed)),
+        )),
+    }
+}
+
+// All triples of `Vec<u32>`, `Vec<u32>`, and `u32` where the first `Vec` is at least as long as the
+// second and the second doesn't only contain zeros.
+pub fn triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_1(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (Vec<u32>, Vec<u32>, u32)>> {
+    Box::new(
+        triples_of_unsigned_vec_unsigned_vec_and_unsigned(gm).filter(
+            |&(ref out_limbs, ref in_limbs, _)| {
+                out_limbs.len() >= in_limbs.len() && !limbs_test_zero(in_limbs)
+            },
+        ),
+    )
 }
