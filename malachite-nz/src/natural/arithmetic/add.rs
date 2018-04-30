@@ -79,7 +79,7 @@ pub fn mpn_add_in_place(s1: &mut [u32], s2: &[u32]) -> bool {
 ///
 /// Time: worst case O(n)
 ///
-/// Additional memory: worst case O(n)
+/// Additional memory: worst case O(1)
 ///
 /// where n = `min(self.significant_bits(), other.significant_bits)`
 ///
@@ -234,7 +234,7 @@ impl<'a, 'b> Add<&'a Natural> for &'b Natural {
 ///
 /// Time: worst case O(n)
 ///
-/// Additional memory: worst case O(n)
+/// Additional memory: worst case O(1)
 ///
 /// where n = `min(self.significant_bits(), other.significant_bits)`
 ///

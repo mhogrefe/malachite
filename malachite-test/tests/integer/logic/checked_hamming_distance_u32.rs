@@ -34,7 +34,8 @@ fn checked_hamming_distance_u32_properties() {
         |&(ref n, u): &(Integer, u32)| {
             let distance = n.checked_hamming_distance(u);
             assert_eq!(u.checked_hamming_distance(n), distance);
-            assert_eq!(integer_checked_hamming_distance_u32_alt(n, u), distance);
+            assert_eq!(integer_checked_hamming_distance_u32_alt_1(n, u), distance);
+            assert_eq!(integer_checked_hamming_distance_u32_alt_2(n, u), distance);
             assert_eq!(distance == Some(0), *n == u);
             //TODO xor
             assert_eq!((!n).checked_hamming_distance(&!Integer::from(u)), distance);

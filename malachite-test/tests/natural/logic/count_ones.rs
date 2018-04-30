@@ -4,7 +4,8 @@ use malachite_nz::natural::logic::count_ones::limbs_count_ones;
 use malachite_nz::natural::Natural;
 use malachite_test::inputs::base::vecs_of_unsigned;
 use malachite_test::inputs::natural::naturals;
-use malachite_test::natural::logic::count_ones::natural_count_ones_alt;
+use malachite_test::natural::logic::count_ones::{natural_count_ones_alt_1,
+                                                 natural_count_ones_alt_2};
 use std::str::FromStr;
 
 #[test]
@@ -45,7 +46,8 @@ fn limbs_count_ones_properties() {
 fn count_ones_properties() {
     test_properties(naturals, |x| {
         let ones = x.count_ones();
-        assert_eq!(natural_count_ones_alt(x), ones);
+        assert_eq!(natural_count_ones_alt_1(x), ones);
+        assert_eq!(natural_count_ones_alt_2(x), ones);
         assert_eq!(ones == 0, *x == 0);
         assert_eq!(ones == 1, x.is_power_of_two());
         assert_eq!((!x).checked_count_zeros(), Some(ones));

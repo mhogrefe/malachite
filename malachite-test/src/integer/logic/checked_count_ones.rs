@@ -3,9 +3,21 @@ use inputs::integer::integers;
 use malachite_base::num::SignificantBits;
 use malachite_nz::integer::Integer;
 
-pub fn integer_checked_count_ones_alt(n: &Integer) -> Option<u64> {
+pub fn integer_checked_count_ones_alt_1(n: &Integer) -> Option<u64> {
     if *n >= 0 {
         Some(n.twos_complement_bits().filter(|&b| b).count() as u64)
+    } else {
+        None
+    }
+}
+
+pub fn integer_checked_count_ones_alt_2(n: &Integer) -> Option<u64> {
+    if *n >= 0 {
+        Some(
+            n.twos_complement_limbs()
+                .map(|limb| u64::from(limb.count_ones()))
+                .sum(),
+        )
     } else {
         None
     }
@@ -44,7 +56,11 @@ fn benchmark_integer_checked_count_ones_algorithms(
             ("default", &mut (|n| no_out!(n.checked_count_ones()))),
             (
                 "using bits explicitly",
-                &mut (|n| no_out!(integer_checked_count_ones_alt(&n))),
+                &mut (|n| no_out!(integer_checked_count_ones_alt_1(&n))),
+            ),
+            (
+                "using limbs explicitly",
+                &mut (|n| no_out!(integer_checked_count_ones_alt_2(&n))),
             ),
         ],
     );

@@ -68,19 +68,14 @@ impl<'a> BitAnd<&'a Natural> for u32 {
 ///
 /// # Examples
 /// ```
-/// extern crate malachite_base;
-/// extern crate malachite_nz;
-///
 /// use malachite_nz::natural::Natural;
 ///
-/// fn main() {
-///     let mut x = Natural::from(0xffff_ffffu32);
-///     x &= 0xf0ff_ffff;
-///     x &= 0xfff0_ffff;
-///     x &= 0xffff_f0ff;
-///     x &= 0xffff_fff0;
-///     assert_eq!(x, 0xf0f0_f0f0);
-/// }
+/// let mut x = Natural::from(0xffff_ffffu32);
+/// x &= 0xf0ff_ffff;
+/// x &= 0xfff0_ffff;
+/// x &= 0xffff_f0ff;
+/// x &= 0xffff_fff0;
+/// assert_eq!(x, 0xf0f0_f0f0);
 /// ```
 impl BitAndAssign<u32> for Natural {
     fn bitand_assign(&mut self, other: u32) {

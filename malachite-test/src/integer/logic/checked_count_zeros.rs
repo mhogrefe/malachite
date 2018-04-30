@@ -5,9 +5,21 @@ use malachite_base::num::SignificantBits;
 use malachite_nz::integer::logic::checked_count_zeros::limbs_count_zeros_neg;
 use malachite_nz::integer::Integer;
 
-pub fn integer_checked_count_zeros_alt(n: &Integer) -> Option<u64> {
+pub fn integer_checked_count_zeros_alt_1(n: &Integer) -> Option<u64> {
     if *n < 0 {
         Some(n.twos_complement_bits().filter(|&b| !b).count() as u64)
+    } else {
+        None
+    }
+}
+
+pub fn integer_checked_count_zeros_alt_2(n: &Integer) -> Option<u64> {
+    if *n < 0 {
+        Some(
+            n.twos_complement_limbs()
+                .map(|limb| u64::from(limb.count_zeros()))
+                .sum(),
+        )
     } else {
         None
     }
@@ -75,7 +87,11 @@ fn benchmark_integer_checked_count_zeros_algorithms(
             ("default", &mut (|n| no_out!(n.checked_count_zeros()))),
             (
                 "using bits explicitly",
-                &mut (|n| no_out!(integer_checked_count_zeros_alt(&n))),
+                &mut (|n| no_out!(integer_checked_count_zeros_alt_1(&n))),
+            ),
+            (
+                "using limbs explicitly",
+                &mut (|n| no_out!(integer_checked_count_zeros_alt_2(&n))),
             ),
         ],
     );

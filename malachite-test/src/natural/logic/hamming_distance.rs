@@ -8,7 +8,7 @@ use malachite_nz::natural::Natural;
 use std::cmp::max;
 use std::iter::repeat;
 
-pub fn natural_hamming_distance_alt(x: &Natural, y: &Natural) -> u64 {
+pub fn natural_hamming_distance_alt_1(x: &Natural, y: &Natural) -> u64 {
     let bit_zip: Box<Iterator<Item = (bool, bool)>> =
         if x.significant_bits() >= y.significant_bits() {
             Box::new(x.bits().zip(y.bits().chain(repeat(false))))
@@ -20,6 +20,19 @@ pub fn natural_hamming_distance_alt(x: &Natural, y: &Natural) -> u64 {
         if b != c {
             distance += 1;
         }
+    }
+    distance
+}
+
+pub fn natural_hamming_distance_alt_2(x: &Natural, y: &Natural) -> u64 {
+    let limb_zip: Box<Iterator<Item = (u32, u32)>> = if x.limb_count() >= y.limb_count() {
+        Box::new(x.limbs().zip(y.limbs().chain(repeat(0))))
+    } else {
+        Box::new(x.limbs().chain(repeat(0)).zip(y.limbs()))
+    };
+    let mut distance = 0u64;
+    for (x, y) in limb_zip {
+        distance += x.hamming_distance(y);
     }
     distance
 }
@@ -158,7 +171,11 @@ fn benchmark_natural_hamming_distance_algorithms(
             ("default", &mut (|(x, y)| no_out!(x.hamming_distance(&y)))),
             (
                 "using bits explicitly",
-                &mut (|(x, y)| no_out!(natural_hamming_distance_alt(&x, &y))),
+                &mut (|(x, y)| no_out!(natural_hamming_distance_alt_1(&x, &y))),
+            ),
+            (
+                "using limbs explicitly",
+                &mut (|(x, y)| no_out!(natural_hamming_distance_alt_2(&x, &y))),
             ),
         ],
     );

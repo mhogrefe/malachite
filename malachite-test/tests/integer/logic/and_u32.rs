@@ -4,7 +4,7 @@ use malachite_nz::integer::Integer;
 use malachite_test::common::{integer_to_rug_integer, rug_integer_to_integer};
 use malachite_test::inputs::base::unsigneds;
 use malachite_test::inputs::integer::{integers, pairs_of_integer_and_unsigned};
-use malachite_test::integer::logic::and_u32::integer_and_u32_alt;
+use malachite_test::integer::logic::and_u32::{integer_and_u32_alt_1, integer_and_u32_alt_2};
 use rug::{self, Assign};
 use std::str::FromStr;
 
@@ -66,7 +66,8 @@ fn and_u32_properties() {
 
             assert_eq!(n & u, result);
             assert_eq!(u & n, result);
-            assert_eq!(integer_and_u32_alt(&n, u), result);
+            assert_eq!(integer_and_u32_alt_1(&n, u), result);
+            assert_eq!(integer_and_u32_alt_2(&n, u), result);
 
             //TODO assert_eq!(n & Integer::from(u), result);
             //TODO assert_eq!(Integer::from(u) & n, result);

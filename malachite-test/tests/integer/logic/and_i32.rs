@@ -9,7 +9,7 @@ use malachite_test::common::{integer_to_rug_integer, rug_integer_to_integer};
 use malachite_test::inputs::base::{pairs_of_u32_vec_and_u32_var_1, signeds,
                                    triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_1};
 use malachite_test::inputs::integer::{integers, pairs_of_integer_and_signed};
-use malachite_test::integer::logic::and_i32::integer_and_i32_alt;
+use malachite_test::integer::logic::and_i32::{integer_and_i32_alt_1, integer_and_i32_alt_2};
 use rug::{self, Assign};
 use std::str::FromStr;
 
@@ -254,7 +254,8 @@ fn and_i32_properties() {
             assert!(result_alt.is_valid());
             assert_eq!(result_alt, result);
 
-            assert_eq!(integer_and_i32_alt(&n, i), result);
+            assert_eq!(integer_and_i32_alt_1(&n, i), result);
+            assert_eq!(integer_and_i32_alt_2(&n, i), result);
 
             assert_eq!(&result & i, result);
 

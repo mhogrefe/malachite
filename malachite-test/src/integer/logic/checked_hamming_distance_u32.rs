@@ -1,11 +1,11 @@
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::integer::{pairs_of_integer_and_unsigned, pairs_of_unsigned_and_integer};
-use malachite_base::num::{CheckedHammingDistance, SignificantBits};
+use malachite_base::num::{CheckedHammingDistance, HammingDistance, SignificantBits};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use std::iter::repeat;
 
-pub fn integer_checked_hamming_distance_u32_alt(n: &Integer, u: u32) -> Option<u64> {
+pub fn integer_checked_hamming_distance_u32_alt_1(n: &Integer, u: u32) -> Option<u64> {
     if *n < 0 {
         return None;
     }
@@ -21,6 +21,24 @@ pub fn integer_checked_hamming_distance_u32_alt(n: &Integer, u: u32) -> Option<u
         if b != c {
             distance += 1;
         }
+    }
+    Some(distance)
+}
+
+pub fn integer_checked_hamming_distance_u32_alt_2(n: &Integer, u: u32) -> Option<u64> {
+    if *n < 0 {
+        return None;
+    }
+    let u = Natural::from(u);
+    let limb_zip: Box<Iterator<Item = (u32, u32)>> =
+        if n.twos_complement_limbs().count() as u64 >= u.limb_count() {
+            Box::new(n.twos_complement_limbs().zip(u.limbs().chain(repeat(0))))
+        } else {
+            Box::new(n.twos_complement_limbs().chain(repeat(0)).zip(u.limbs()))
+        };
+    let mut distance = 0u64;
+    for (x, y) in limb_zip {
+        distance += x.hamming_distance(y);
     }
     Some(distance)
 }
@@ -84,7 +102,13 @@ fn benchmark_integer_checked_hamming_distance_u32_algorithms(
             (
                 "using bits explicitly",
                 &mut (|(ref n, other)| {
-                    no_out!(integer_checked_hamming_distance_u32_alt(&n, other))
+                    no_out!(integer_checked_hamming_distance_u32_alt_1(&n, other))
+                }),
+            ),
+            (
+                "using limbs explicitly",
+                &mut (|(ref n, other)| {
+                    no_out!(integer_checked_hamming_distance_u32_alt_2(&n, other))
                 }),
             ),
         ],

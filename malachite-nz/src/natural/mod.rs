@@ -183,6 +183,7 @@ pub mod comparison {
     pub mod partial_ord_u32;
 }
 pub mod logic {
+    pub mod and;
     pub mod and_u32;
     pub mod bit_access;
     pub mod count_ones;

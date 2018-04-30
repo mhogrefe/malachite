@@ -5,8 +5,12 @@ use malachite_base::num::SignificantBits;
 use malachite_nz::natural::logic::count_ones::limbs_count_ones;
 use malachite_nz::natural::Natural;
 
-pub fn natural_count_ones_alt(n: &Natural) -> u64 {
+pub fn natural_count_ones_alt_1(n: &Natural) -> u64 {
     n.bits().filter(|&b| b).count() as u64
+}
+
+pub fn natural_count_ones_alt_2(n: &Natural) -> u64 {
+    n.limbs().map(|limb| u64::from(limb.count_ones())).sum()
 }
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
@@ -63,7 +67,11 @@ fn benchmark_natural_count_ones_algorithms(gm: GenerationMode, limit: usize, fil
             ("default", &mut (|n| no_out!(n.count_ones()))),
             (
                 "using bits explicitly",
-                &mut (|n| no_out!(natural_count_ones_alt(&n))),
+                &mut (|n| no_out!(natural_count_ones_alt_1(&n))),
+            ),
+            (
+                "using limbs explicitly",
+                &mut (|n| no_out!(natural_count_ones_alt_2(&n))),
             ),
         ],
     );

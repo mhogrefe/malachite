@@ -7,7 +7,8 @@ use malachite_test::inputs::base::pairs_of_u32_vec_var_1;
 use malachite_test::inputs::integer::{integers, pairs_of_integers,
                                       triples_of_natural_integer_natural_integer_and_natural_signed,
                                       triples_of_natural_integers};
-use malachite_test::integer::logic::checked_hamming_distance::integer_checked_hamming_distance_alt;
+use malachite_test::integer::logic::checked_hamming_distance::{integer_checked_hamming_distance_alt_1,
+                                                               integer_checked_hamming_distance_alt_2};
 use std::str::FromStr;
 
 #[test]
@@ -84,7 +85,8 @@ fn checked_hamming_distance_properties() {
     test_properties(pairs_of_integers, |&(ref xs, ref ys)| {
         let distance = xs.checked_hamming_distance(ys);
         assert_eq!(ys.checked_hamming_distance(xs), distance);
-        assert_eq!(integer_checked_hamming_distance_alt(xs, ys), distance);
+        assert_eq!(integer_checked_hamming_distance_alt_1(xs, ys), distance);
+        assert_eq!(integer_checked_hamming_distance_alt_2(xs, ys), distance);
         assert_eq!(distance == Some(0), xs == ys);
         //TODO xor
         assert_eq!((!xs).checked_hamming_distance(&!ys), distance);

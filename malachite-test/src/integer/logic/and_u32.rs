@@ -5,8 +5,9 @@ use malachite_base::num::SignificantBits;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use std::iter::repeat;
+use std::u32;
 
-pub fn integer_and_u32_alt(n: &Integer, u: u32) -> Natural {
+pub fn integer_and_u32_alt_1(n: &Integer, u: u32) -> Natural {
     let u = Natural::from(u);
     let bit_zip: Box<Iterator<Item = (bool, bool)>> =
         if n.significant_bits() >= u.significant_bits() {
@@ -19,6 +20,25 @@ pub fn integer_and_u32_alt(n: &Integer, u: u32) -> Natural {
         and_bits.push(b && c);
     }
     Natural::from_bits_asc(&and_bits)
+}
+
+pub fn integer_and_u32_alt_2(n: &Integer, u: u32) -> Natural {
+    let u = Natural::from(u);
+    let limb_zip: Box<Iterator<Item = (u32, u32)>> =
+        if n.twos_complement_limbs().count() as u64 >= u.limb_count() {
+            Box::new(n.twos_complement_limbs().zip(u.limbs().chain(repeat(0))))
+        } else {
+            Box::new(
+                n.twos_complement_limbs()
+                    .chain(repeat(if *n < 0 { u32::MAX } else { 0 }))
+                    .zip(u.limbs()),
+            )
+        };
+    let mut and_limbs = Vec::new();
+    for (x, y) in limb_zip {
+        and_limbs.push(x & y);
+    }
+    Natural::from_owned_limbs_asc(and_limbs)
 }
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
@@ -114,7 +134,11 @@ fn benchmark_integer_and_u32_algorithms(gm: GenerationMode, limit: usize, file_n
             ("default", &mut (|(x, y)| no_out!(&x & y))),
             (
                 "using bits explicitly",
-                &mut (|(x, y)| no_out!(integer_and_u32_alt(&x, y))),
+                &mut (|(x, y)| no_out!(integer_and_u32_alt_1(&x, y))),
+            ),
+            (
+                "using limbs explicitly",
+                &mut (|(x, y)| no_out!(integer_and_u32_alt_2(&x, y))),
             ),
         ],
     );

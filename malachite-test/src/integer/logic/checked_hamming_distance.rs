@@ -1,13 +1,14 @@
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::pairs_of_u32_vec_var_1;
 use inputs::integer::pairs_of_integers;
-use malachite_base::num::{CheckedHammingDistance, SignificantBits};
+use malachite_base::num::{CheckedHammingDistance, HammingDistance, SignificantBits};
 use malachite_nz::integer::logic::checked_hamming_distance::limbs_hamming_distance_neg;
 use malachite_nz::integer::Integer;
 use std::cmp::max;
 use std::iter::repeat;
+use std::u32;
 
-pub fn integer_checked_hamming_distance_alt(x: &Integer, y: &Integer) -> Option<u64> {
+pub fn integer_checked_hamming_distance_alt_1(x: &Integer, y: &Integer) -> Option<u64> {
     let negative = *x < 0;
     if negative != (*y < 0) {
         return None;
@@ -30,6 +31,31 @@ pub fn integer_checked_hamming_distance_alt(x: &Integer, y: &Integer) -> Option<
         if b != c {
             distance += 1;
         }
+    }
+    Some(distance)
+}
+
+pub fn integer_checked_hamming_distance_alt_2(x: &Integer, y: &Integer) -> Option<u64> {
+    let extension = if *x < 0 { u32::MAX } else { 0 };
+    if (*x < 0) != (*y < 0) {
+        return None;
+    }
+    let limb_zip: Box<Iterator<Item = (u32, u32)>> =
+        if x.twos_complement_limbs().count() >= y.twos_complement_limbs().count() {
+            Box::new(
+                x.twos_complement_limbs()
+                    .zip(y.twos_complement_limbs().chain(repeat(extension))),
+            )
+        } else {
+            Box::new(
+                x.twos_complement_limbs()
+                    .chain(repeat(extension))
+                    .zip(y.twos_complement_limbs()),
+            )
+        };
+    let mut distance = 0u64;
+    for (x, y) in limb_zip {
+        distance += x.hamming_distance(y);
     }
     Some(distance)
 }
@@ -105,7 +131,11 @@ fn benchmark_integer_checked_hamming_distance_algorithms(
             ),
             (
                 "using bits explicitly",
-                &mut (|(n, other)| no_out!(integer_checked_hamming_distance_alt(&n, &other))),
+                &mut (|(n, other)| no_out!(integer_checked_hamming_distance_alt_1(&n, &other))),
+            ),
+            (
+                "using limbs explicitly",
+                &mut (|(n, other)| no_out!(integer_checked_hamming_distance_alt_2(&n, &other))),
             ),
         ],
     );

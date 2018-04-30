@@ -7,7 +7,8 @@ use malachite_nz::natural::Natural;
 use malachite_test::inputs::base::{pairs_of_unsigned_vec_var_1, pairs_of_unsigned_vec_var_2};
 use malachite_test::inputs::natural::{naturals, pairs_of_naturals,
                                       triples_of_natural_natural_and_unsigned, triples_of_naturals};
-use malachite_test::natural::logic::hamming_distance::natural_hamming_distance_alt;
+use malachite_test::natural::logic::hamming_distance::{natural_hamming_distance_alt_1,
+                                                       natural_hamming_distance_alt_2};
 use std::str::FromStr;
 
 #[test]
@@ -83,7 +84,8 @@ fn hamming_distance_properties() {
     test_properties(pairs_of_naturals, |&(ref x, ref y)| {
         let distance = x.hamming_distance(y);
         assert_eq!(y.hamming_distance(x), distance);
-        assert_eq!(natural_hamming_distance_alt(x, y), distance);
+        assert_eq!(natural_hamming_distance_alt_1(x, y), distance);
+        assert_eq!(natural_hamming_distance_alt_2(x, y), distance);
         assert_eq!(
             Integer::from(x).checked_hamming_distance(&Integer::from(y)),
             Some(distance)

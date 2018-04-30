@@ -184,6 +184,7 @@ pub mod natural {
         pub mod u64_from_natural;
     }
     pub mod logic {
+        pub mod and;
         pub mod and_u32;
         pub mod assign_bit;
         pub mod clear_bit;

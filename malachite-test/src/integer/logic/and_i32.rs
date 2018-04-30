@@ -10,8 +10,9 @@ use malachite_nz::integer::logic::and_i32::{limbs_slice_neg_and_limb_neg,
                                             limbs_vec_neg_and_limb_neg_in_place};
 use malachite_nz::integer::Integer;
 use std::iter::repeat;
+use std::u32;
 
-pub fn integer_and_i32_alt(n: &Integer, i: i32) -> Integer {
+pub fn integer_and_i32_alt_1(n: &Integer, i: i32) -> Integer {
     let n_negative = *n < 0;
     let i_negative = i < 0;
     let i = Integer::from(i);
@@ -34,6 +35,31 @@ pub fn integer_and_i32_alt(n: &Integer, i: i32) -> Integer {
     }
     and_bits.push(n_negative && i_negative);
     Integer::from_twos_complement_bits_asc(&and_bits)
+}
+
+pub fn integer_and_i32_alt_2(n: &Integer, i: i32) -> Integer {
+    let n_extension = if *n < 0 { u32::MAX } else { 0 };
+    let i_extension = if i < 0 { u32::MAX } else { 0 };
+    let i = Integer::from(i);
+    let limb_zip: Box<Iterator<Item = (u32, u32)>> =
+        if n.twos_complement_limbs().count() >= i.twos_complement_limbs().count() {
+            Box::new(
+                n.twos_complement_limbs()
+                    .zip(i.twos_complement_limbs().chain(repeat(i_extension))),
+            )
+        } else {
+            Box::new(
+                n.twos_complement_limbs()
+                    .chain(repeat(n_extension))
+                    .zip(i.twos_complement_limbs()),
+            )
+        };
+    let mut and_limbs = Vec::new();
+    for (x, y) in limb_zip {
+        and_limbs.push(x & y);
+    }
+    and_limbs.push(n_extension & i_extension);
+    Integer::from_owned_twos_complement_limbs_asc(and_limbs)
 }
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
@@ -326,7 +352,11 @@ fn benchmark_integer_and_i32_algorithms(gm: GenerationMode, limit: usize, file_n
             ("default", &mut (|(x, y)| no_out!(&x & y))),
             (
                 "using bits explicitly",
-                &mut (|(x, y)| no_out!(integer_and_i32_alt(&x, y))),
+                &mut (|(x, y)| no_out!(integer_and_i32_alt_1(&x, y))),
+            ),
+            (
+                "using limbs explicitly",
+                &mut (|(x, y)| no_out!(integer_and_i32_alt_2(&x, y))),
             ),
         ],
     );
