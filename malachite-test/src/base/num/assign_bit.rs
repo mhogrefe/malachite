@@ -1,6 +1,8 @@
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::base::{triples_of_signed_u64_width_range_and_bool_var_1,
-                   triples_of_unsigned_u64_width_range_and_bool_var_1};
+use inputs::base::{
+    triples_of_signed_u64_width_range_and_bool_var_1,
+    triples_of_unsigned_u64_width_range_and_bool_var_1,
+};
 use malachite_base::num::{PrimitiveSigned, PrimitiveUnsigned};
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {

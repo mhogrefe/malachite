@@ -4,8 +4,9 @@ use malachite_nz::natural::logic::count_ones::limbs_count_ones;
 use malachite_nz::natural::Natural;
 use malachite_test::inputs::base::vecs_of_unsigned;
 use malachite_test::inputs::natural::naturals;
-use malachite_test::natural::logic::count_ones::{natural_count_ones_alt_1,
-                                                 natural_count_ones_alt_2};
+use malachite_test::natural::logic::count_ones::{
+    natural_count_ones_alt_1, natural_count_ones_alt_2,
+};
 use std::str::FromStr;
 
 #[test]

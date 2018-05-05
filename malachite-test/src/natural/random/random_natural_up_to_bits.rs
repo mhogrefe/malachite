@@ -1,4 +1,6 @@
-use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, NoSpecialGenerationMode, ScaleType};
+use common::{
+    m_run_benchmark, BenchmarkType, DemoBenchRegistry, NoSpecialGenerationMode, ScaleType,
+};
 use inputs::base::small_u64s;
 use malachite_nz::natural::random::random_natural_up_to_bits::random_natural_up_to_bits;
 use rand::{IsaacRng, SeedableRng};

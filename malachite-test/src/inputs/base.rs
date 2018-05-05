@@ -11,22 +11,21 @@ use rust_wheels::iterators::common::EXAMPLE_SEED;
 use rust_wheels::iterators::general::{random, range_increasing};
 use rust_wheels::iterators::integers_geometric::u32s_geometric;
 use rust_wheels::iterators::orderings::{exhaustive_orderings, random_orderings};
-use rust_wheels::iterators::primitive_ints::{exhaustive_negative_signed, exhaustive_positive,
-                                             exhaustive_signed, exhaustive_unsigned,
-                                             random_negative_signed, random_positive_signed,
-                                             random_positive_unsigned, random_range,
-                                             special_random_negative_signed,
-                                             special_random_positive_signed,
-                                             special_random_positive_unsigned,
-                                             special_random_signed, special_random_unsigned};
+use rust_wheels::iterators::primitive_ints::{
+    exhaustive_negative_signed, exhaustive_positive, exhaustive_signed, exhaustive_unsigned,
+    random_negative_signed, random_positive_signed, random_positive_unsigned, random_range,
+    special_random_negative_signed, special_random_positive_signed,
+    special_random_positive_unsigned, special_random_signed, special_random_unsigned,
+};
 use rust_wheels::iterators::rounding_modes::{exhaustive_rounding_modes, random_rounding_modes};
-use rust_wheels::iterators::tuples::{exhaustive_pairs, exhaustive_pairs_from_single,
-                                     exhaustive_triples, exhaustive_triples_from_single,
-                                     lex_pairs, lex_triples, log_pairs, random_pairs,
-                                     random_pairs_from_single, random_triples,
-                                     random_triples_from_single, sqrt_pairs};
-use rust_wheels::iterators::vecs::{exhaustive_vecs, random_vecs, special_random_bool_vecs,
-                                   special_random_unsigned_vecs};
+use rust_wheels::iterators::tuples::{
+    exhaustive_pairs, exhaustive_pairs_from_single, exhaustive_triples,
+    exhaustive_triples_from_single, lex_pairs, lex_triples, log_pairs, random_pairs,
+    random_pairs_from_single, random_triples, random_triples_from_single, sqrt_pairs,
+};
+use rust_wheels::iterators::vecs::{
+    exhaustive_vecs, random_vecs, special_random_bool_vecs, special_random_unsigned_vecs,
+};
 use std::char;
 use std::cmp::Ordering;
 

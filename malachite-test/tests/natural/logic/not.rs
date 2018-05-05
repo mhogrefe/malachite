@@ -25,7 +25,7 @@ pub fn test_limbs_not() {
 }
 
 #[test]
-#[should_panic(expected = "assertion failed: limbs_out.len() >= n")]
+#[should_panic(expected = "assertion failed: limbs_out.len() >= limbs_in.len()")]
 fn limbs_not_fail() {
     let mut limbs_out = vec![1, 2];
     limbs_not(&mut limbs_out, &[1, 2, 3]);

@@ -1,6 +1,8 @@
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::integer::{pairs_of_integer_and_small_u32, rm_pairs_of_integer_and_small_u32,
-                      triples_of_integer_small_u32_and_rounding_mode_var_1};
+use inputs::integer::{
+    pairs_of_integer_and_small_u32, rm_pairs_of_integer_and_small_u32,
+    triples_of_integer_small_u32_and_rounding_mode_var_1,
+};
 use malachite_base::num::{ShrRound, ShrRoundAssign};
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {

@@ -181,6 +181,7 @@ pub mod comparison {
 }
 pub mod conversion;
 pub mod logic {
+    pub mod and;
     pub mod and_i32;
     pub mod and_u32;
     pub mod bit_access;

@@ -4,9 +4,10 @@ use malachite_base::round::RoundingMode;
 use malachite_nz::natural::Natural;
 use malachite_test::common::{natural_to_rug_integer, rug_integer_to_natural};
 use malachite_test::inputs::base::{pairs_of_signed_and_rounding_mode, signeds};
-use malachite_test::inputs::natural::{naturals, pairs_of_natural_and_rounding_mode,
-                                      pairs_of_natural_and_small_i32,
-                                      triples_of_natural_small_i32_and_rounding_mode_var_1};
+use malachite_test::inputs::natural::{
+    naturals, pairs_of_natural_and_rounding_mode, pairs_of_natural_and_small_i32,
+    triples_of_natural_small_i32_and_rounding_mode_var_1,
+};
 use rug;
 use std::str::FromStr;
 

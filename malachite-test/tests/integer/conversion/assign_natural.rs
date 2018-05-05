@@ -2,8 +2,9 @@ use common::test_properties;
 use malachite_base::num::Assign;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
-use malachite_test::common::{integer_to_rug_integer, natural_to_rug_integer,
-                             rug_integer_to_integer};
+use malachite_test::common::{
+    integer_to_rug_integer, natural_to_rug_integer, rug_integer_to_integer,
+};
 use malachite_test::inputs::integer::pairs_of_integer_and_natural;
 use rug;
 use rug::Assign as rug_assign;

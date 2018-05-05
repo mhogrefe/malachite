@@ -1,6 +1,7 @@
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::natural::{triples_of_natural_natural_and_u32_var_1,
-                      triples_of_natural_natural_and_unsigned};
+use inputs::natural::{
+    triples_of_natural_natural_and_u32_var_1, triples_of_natural_natural_and_unsigned,
+};
 use malachite_base::num::SignificantBits;
 use malachite_base::num::{SubMul, SubMulAssign};
 use std::cmp::max;

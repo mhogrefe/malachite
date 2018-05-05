@@ -24,10 +24,9 @@ use std::ops::Not;
 /// assert_eq!(limbs_out, [0x0000ffff, 0x0f0f0f0f, 2]);
 /// ```
 pub fn limbs_not(limbs_out: &mut [u32], limbs_in: &[u32]) {
-    let n = limbs_in.len();
-    assert!(limbs_out.len() >= n);
-    for i in 0..n {
-        limbs_out[i] = !limbs_in[i];
+    assert!(limbs_out.len() >= limbs_in.len());
+    for (x, y) in limbs_out.iter_mut().zip(limbs_in.iter()) {
+        *x = !y;
     }
 }
 

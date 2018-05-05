@@ -2,8 +2,9 @@ use common::test_properties;
 use malachite_base::num::{AddMul, AddMulAssign};
 use malachite_base::num::{One, Zero};
 use malachite_nz::natural::Natural;
-use malachite_test::inputs::natural::{pairs_of_natural_and_unsigned, pairs_of_naturals,
-                                      triples_of_natural_natural_and_unsigned};
+use malachite_test::inputs::natural::{
+    pairs_of_natural_and_unsigned, pairs_of_naturals, triples_of_natural_natural_and_unsigned,
+};
 use std::str::FromStr;
 
 #[test]

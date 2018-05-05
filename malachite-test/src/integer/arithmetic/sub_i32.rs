@@ -1,7 +1,8 @@
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::integer::{nrm_pairs_of_integer_and_signed, pairs_of_integer_and_signed,
-                      pairs_of_signed_and_integer, rm_pairs_of_integer_and_signed,
-                      rm_pairs_of_signed_and_integer};
+use inputs::integer::{
+    nrm_pairs_of_integer_and_signed, pairs_of_integer_and_signed, pairs_of_signed_and_integer,
+    rm_pairs_of_integer_and_signed, rm_pairs_of_signed_and_integer,
+};
 use malachite_base::num::SignificantBits;
 use num::BigInt;
 

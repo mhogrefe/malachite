@@ -1,10 +1,14 @@
 use common::test_properties;
-use malachite_base::num::{BitAccess, NotAssign};
-use malachite_nz::integer::logic::bit_access::{limbs_slice_clear_bit_neg, limbs_vec_clear_bit_neg};
+use malachite_base::misc::CheckedFrom;
+use malachite_base::num::{BitAccess, NotAssign, One};
+use malachite_nz::integer::logic::bit_access::{
+    limbs_slice_clear_bit_neg, limbs_vec_clear_bit_neg,
+};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
-use malachite_test::inputs::base::{pairs_of_u32_vec_and_small_u64_var_1,
-                                   pairs_of_u32_vec_and_small_u64_var_3};
+use malachite_test::inputs::base::{
+    pairs_of_u32_vec_and_small_u64_var_1, pairs_of_u32_vec_and_small_u64_var_3,
+};
 use malachite_test::inputs::integer::pairs_of_integer_and_small_u64;
 use std::str::FromStr;
 
@@ -130,6 +134,11 @@ fn clear_bit_properties() {
         let mut mut_n = n.clone();
         mut_n.assign_bit(index, false);
         assert_eq!(mut_n, result);
+
+        assert_eq!(
+            n & !(Integer::ONE << u32::checked_from(index).unwrap()),
+            result
+        );
 
         assert!(result <= *n);
         if n.get_bit(index) {

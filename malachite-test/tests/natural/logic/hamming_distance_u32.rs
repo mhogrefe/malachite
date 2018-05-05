@@ -4,10 +4,12 @@ use malachite_nz::integer::Integer;
 use malachite_nz::natural::logic::hamming_distance_u32::limbs_hamming_distance_limb;
 use malachite_nz::natural::Natural;
 use malachite_test::inputs::base::{pairs_of_nonempty_unsigned_vec_and_unsigned, unsigneds};
-use malachite_test::inputs::natural::{naturals, pairs_of_natural_and_unsigned,
-                                      triples_of_natural_unsigned_and_unsigned};
-use malachite_test::natural::logic::hamming_distance_u32::{natural_hamming_distance_u32_alt_1,
-                                                           natural_hamming_distance_u32_alt_2};
+use malachite_test::inputs::natural::{
+    naturals, pairs_of_natural_and_unsigned, triples_of_natural_unsigned_and_unsigned,
+};
+use malachite_test::natural::logic::hamming_distance_u32::{
+    natural_hamming_distance_u32_alt_1, natural_hamming_distance_u32_alt_2,
+};
 use std::str::FromStr;
 use std::u32;
 

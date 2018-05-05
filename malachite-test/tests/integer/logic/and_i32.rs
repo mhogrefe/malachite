@@ -1,13 +1,15 @@
 use common::test_properties;
 use malachite_base::num::{NegativeOne, Zero};
-use malachite_nz::integer::logic::and_i32::{limbs_slice_neg_and_limb_neg,
-                                            limbs_slice_neg_and_limb_neg_in_place,
-                                            limbs_vec_neg_and_limb_neg,
-                                            limbs_vec_neg_and_limb_neg_in_place};
+use malachite_nz::integer::logic::and_i32::{
+    limbs_slice_neg_and_limb_neg, limbs_slice_neg_and_limb_neg_in_place,
+    limbs_vec_neg_and_limb_neg, limbs_vec_neg_and_limb_neg_in_place,
+};
 use malachite_nz::integer::Integer;
 use malachite_test::common::{integer_to_rug_integer, rug_integer_to_integer};
-use malachite_test::inputs::base::{pairs_of_u32_vec_and_u32_var_1, signeds,
-                                   triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_1};
+use malachite_test::inputs::base::{
+    pairs_of_u32_vec_and_u32_var_1, signeds,
+    triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_1,
+};
 use malachite_test::inputs::integer::{integers, pairs_of_integer_and_signed};
 use malachite_test::integer::logic::and_i32::{integer_and_i32_alt_1, integer_and_i32_alt_2};
 use rug::{self, Assign};
@@ -259,8 +261,8 @@ fn and_i32_properties() {
 
             assert_eq!(&result & i, result);
 
-            //TODO assert_eq!(n & Integer::from(u), result);
-            //TODO assert_eq!(Integer::from(u) & n, result);
+            assert_eq!(n & Integer::from(i), result);
+            assert_eq!(Integer::from(i) & n, result);
 
             assert_eq!(
                 rug_integer_to_integer(&(integer_to_rug_integer(n) & i)),

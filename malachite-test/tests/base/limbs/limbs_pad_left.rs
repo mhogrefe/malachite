@@ -1,8 +1,9 @@
 use common::test_properties;
 use malachite_base::limbs::{limbs_delete_left, limbs_pad_left};
-use malachite_test::inputs::base::{pairs_of_small_usize_and_unsigned,
-                                   pairs_of_unsigned_vec_and_unsigned,
-                                   triples_of_unsigned_vec_small_usize_and_unsigned};
+use malachite_test::inputs::base::{
+    pairs_of_small_usize_and_unsigned, pairs_of_unsigned_vec_and_unsigned,
+    triples_of_unsigned_vec_small_usize_and_unsigned,
+};
 
 #[test]
 fn test_limbs_pad_left() {

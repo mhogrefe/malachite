@@ -1,9 +1,10 @@
 use common::test_properties;
 use malachite_base::num::{Abs, PartialOrdAbs};
 use malachite_nz::integer::Integer;
-use malachite_test::inputs::integer::{pairs_of_integer_and_signed,
-                                      triples_of_integer_signed_and_integer,
-                                      triples_of_signed_integer_and_signed};
+use malachite_test::inputs::integer::{
+    pairs_of_integer_and_signed, triples_of_integer_signed_and_integer,
+    triples_of_signed_integer_and_signed,
+};
 use std::cmp::Ordering;
 use std::str::FromStr;
 

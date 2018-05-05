@@ -1,8 +1,9 @@
 use common::test_properties;
 use malachite_base::num::Zero;
 use malachite_nz::natural::Natural;
-use malachite_test::common::{biguint_to_natural, natural_to_biguint, natural_to_rug_integer,
-                             rug_integer_to_natural};
+use malachite_test::common::{
+    biguint_to_natural, natural_to_biguint, natural_to_rug_integer, rug_integer_to_natural,
+};
 use malachite_test::inputs::natural::{naturals, pairs_of_naturals};
 use malachite_test::natural::arithmetic::sub::checked_sub;
 use num::BigUint;

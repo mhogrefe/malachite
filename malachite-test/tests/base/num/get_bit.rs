@@ -1,7 +1,8 @@
 use common::test_properties;
 use malachite_base::num::{PrimitiveInteger, PrimitiveSigned, PrimitiveUnsigned};
-use malachite_test::inputs::base::{pairs_of_signed_and_small_u64, pairs_of_unsigned_and_small_u64,
-                                   unsigneds};
+use malachite_test::inputs::base::{
+    pairs_of_signed_and_small_u64, pairs_of_unsigned_and_small_u64, unsigneds,
+};
 use std::u32;
 
 fn get_bit_helper_unsigned<T: PrimitiveInteger>() {

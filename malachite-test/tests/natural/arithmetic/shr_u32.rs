@@ -2,16 +2,18 @@ use common::test_properties;
 use malachite_base::num::{PrimitiveInteger, ShrRound, ShrRoundAssign, Zero};
 use malachite_base::round::RoundingMode;
 use malachite_nz::natural::Natural;
-use malachite_test::common::{biguint_to_natural, natural_to_biguint, natural_to_rug_integer,
-                             rug_integer_to_natural};
-use malachite_test::inputs::base::{pairs_of_positive_unsigned_and_small_u32,
-                                   pairs_of_unsigned_and_rounding_mode,
-                                   pairs_of_unsigned_and_small_u32, unsigneds};
-use malachite_test::inputs::natural::{naturals, pairs_of_natural_and_rounding_mode,
-                                      pairs_of_natural_and_small_u32,
-                                      pairs_of_natural_and_small_u32_var_2,
-                                      triples_of_natural_small_u32_and_rounding_mode_var_1,
-                                      triples_of_natural_small_u32_and_small_u32};
+use malachite_test::common::{
+    biguint_to_natural, natural_to_biguint, natural_to_rug_integer, rug_integer_to_natural,
+};
+use malachite_test::inputs::base::{
+    pairs_of_positive_unsigned_and_small_u32, pairs_of_unsigned_and_rounding_mode,
+    pairs_of_unsigned_and_small_u32, unsigneds,
+};
+use malachite_test::inputs::natural::{
+    naturals, pairs_of_natural_and_rounding_mode, pairs_of_natural_and_small_u32,
+    pairs_of_natural_and_small_u32_var_2, triples_of_natural_small_u32_and_rounding_mode_var_1,
+    triples_of_natural_small_u32_and_small_u32,
+};
 use num::BigUint;
 use rug;
 use std::i32;

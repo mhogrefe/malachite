@@ -1,40 +1,21 @@
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::natural::{nrm_pairs_of_natural_and_unsigned, pairs_of_natural_and_unsigned,
-                      pairs_of_unsigned_and_natural, rm_pairs_of_natural_and_unsigned,
-                      rm_pairs_of_unsigned_and_natural};
+use inputs::natural::{
+    nrm_pairs_of_natural_and_unsigned, pairs_of_natural_and_unsigned,
+    pairs_of_unsigned_and_natural, rm_pairs_of_natural_and_unsigned,
+    rm_pairs_of_unsigned_and_natural,
+};
 use malachite_base::misc::CheckedFrom;
 use malachite_base::num::SignificantBits;
 use malachite_nz::natural::Natural;
+use natural::logic::and::{natural_and_alt_1, natural_and_alt_2};
 use num::{BigUint, ToPrimitive};
-use std::iter::repeat;
 
 pub fn natural_and_u32_alt_1(n: &Natural, u: u32) -> u32 {
-    let u = Natural::from(u);
-    let bit_zip: Box<Iterator<Item = (bool, bool)>> =
-        if n.significant_bits() >= u.significant_bits() {
-            Box::new(n.bits().zip(u.bits().chain(repeat(false))))
-        } else {
-            Box::new(n.bits().chain(repeat(false)).zip(u.bits()))
-        };
-    let mut and_bits = Vec::new();
-    for (b, c) in bit_zip {
-        and_bits.push(b && c);
-    }
-    u32::checked_from(&Natural::from_bits_asc(&and_bits)).unwrap()
+    u32::checked_from(&natural_and_alt_1(n, &Natural::from(u))).unwrap()
 }
 
 pub fn natural_and_u32_alt_2(n: &Natural, u: u32) -> u32 {
-    let u = Natural::from(u);
-    let limb_zip: Box<Iterator<Item = (u32, u32)>> = if n.limb_count() >= u.limb_count() {
-        Box::new(n.limbs().zip(u.limbs().chain(repeat(0))))
-    } else {
-        Box::new(n.limbs().chain(repeat(0)).zip(u.limbs()))
-    };
-    let mut and_limbs = Vec::new();
-    for (x, y) in limb_zip {
-        and_limbs.push(x & y);
-    }
-    u32::checked_from(&Natural::from_owned_limbs_asc(and_limbs)).unwrap()
+    u32::checked_from(&natural_and_alt_2(n, &Natural::from(u))).unwrap()
 }
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {

@@ -2,7 +2,9 @@ use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, 
 use inputs::base::{pairs_of_u32_vec_and_small_u64_var_1, pairs_of_u32_vec_and_small_u64_var_3};
 use inputs::integer::pairs_of_integer_and_small_u64;
 use malachite_base::num::{BitAccess, SignificantBits};
-use malachite_nz::integer::logic::bit_access::{limbs_slice_clear_bit_neg, limbs_vec_clear_bit_neg};
+use malachite_nz::integer::logic::bit_access::{
+    limbs_slice_clear_bit_neg, limbs_vec_clear_bit_neg,
+};
 use std::cmp::max;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {

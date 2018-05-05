@@ -1,7 +1,8 @@
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::vecs_of_bool;
-use malachite_nz::natural::conversion::from_bits::{limbs_asc_from_bits_asc,
-                                                   limbs_asc_from_bits_desc};
+use malachite_nz::natural::conversion::from_bits::{
+    limbs_asc_from_bits_asc, limbs_asc_from_bits_desc,
+};
 use malachite_nz::natural::Natural;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {

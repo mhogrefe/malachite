@@ -1,9 +1,10 @@
 use common::test_properties;
 use malachite_nz::natural::Natural;
 use malachite_test::common::{natural_to_biguint, natural_to_rug_integer};
-use malachite_test::inputs::natural::{pairs_of_natural_and_unsigned,
-                                      triples_of_natural_unsigned_and_natural,
-                                      triples_of_unsigned_natural_and_unsigned};
+use malachite_test::inputs::natural::{
+    pairs_of_natural_and_unsigned, triples_of_natural_unsigned_and_natural,
+    triples_of_unsigned_natural_and_unsigned,
+};
 use malachite_test::natural::comparison::partial_ord_u32::num_partial_cmp_u32;
 use num::BigUint;
 use rug;

@@ -253,7 +253,7 @@ impl<'a> BitAnd<i32> for &'a Integer {
             Integer {
                 sign: self.sign,
                 abs: if self.sign {
-                    self.abs.and_u32_neg(u32::wrapping_from(other))
+                    self.abs.and_pos_u32_neg(u32::wrapping_from(other))
                 } else {
                     self.abs.and_neg_u32_neg(u32::wrapping_from(other))
                 },
@@ -360,22 +360,22 @@ impl BitAndAssign<i32> for Integer {
         if other >= 0 {
             *self &= other.unsigned_abs();
         } else if self.sign {
-            self.abs.and_assign_u32_neg(u32::wrapping_from(other));
+            self.abs.and_assign_pos_u32_neg(u32::wrapping_from(other));
         } else {
-            self.abs.and_neg_assign_u32_neg(u32::wrapping_from(other));
+            self.abs.and_assign_neg_u32_neg(u32::wrapping_from(other));
         }
     }
 }
 
 impl Natural {
-    fn and_assign_u32_neg(&mut self, other: u32) {
+    fn and_assign_pos_u32_neg(&mut self, other: u32) {
         match *self {
             Small(ref mut small) => *small &= other,
             Large(ref mut limbs) => limbs[0] &= other,
         }
     }
 
-    fn and_u32_neg(&self, other: u32) -> Natural {
+    pub(crate) fn and_pos_u32_neg(&self, other: u32) -> Natural {
         match *self {
             Small(small) => Small(small & other),
             Large(ref limbs) => {
@@ -386,7 +386,7 @@ impl Natural {
         }
     }
 
-    fn and_neg_assign_u32_neg(&mut self, other: u32) {
+    fn and_assign_neg_u32_neg(&mut self, other: u32) {
         if *self == 0 {
             return;
         }
@@ -410,7 +410,7 @@ impl Natural {
         );
     }
 
-    fn and_neg_u32_neg(&self, other: u32) -> Natural {
+    pub(crate) fn and_neg_u32_neg(&self, other: u32) -> Natural {
         match *self {
             Small(0) => Natural::ZERO,
             Small(small) => {

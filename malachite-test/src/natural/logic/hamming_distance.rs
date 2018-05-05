@@ -2,8 +2,9 @@ use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, 
 use inputs::base::{pairs_of_unsigned_vec_var_1, pairs_of_unsigned_vec_var_2};
 use inputs::natural::{pairs_of_naturals, rm_pairs_of_naturals};
 use malachite_base::num::{HammingDistance, SignificantBits};
-use malachite_nz::natural::logic::hamming_distance::{limbs_hamming_distance,
-                                                     limbs_hamming_distance_same_length};
+use malachite_nz::natural::logic::hamming_distance::{
+    limbs_hamming_distance, limbs_hamming_distance_same_length,
+};
 use malachite_nz::natural::Natural;
 use std::cmp::max;
 use std::iter::repeat;

@@ -11,21 +11,24 @@ use rust_wheels::iterators::bools::exhaustive_bools;
 use rust_wheels::iterators::common::{scramble, EXAMPLE_SEED};
 use rust_wheels::iterators::dependent_pairs::dependent_pairs;
 use rust_wheels::iterators::general::random;
-use rust_wheels::iterators::integers::{exhaustive_integers, exhaustive_natural_integers,
-                                       random_integers, random_natural_integers,
-                                       special_random_integers, special_random_natural_integers};
+use rust_wheels::iterators::integers::{
+    exhaustive_integers, exhaustive_natural_integers, random_integers, random_natural_integers,
+    special_random_integers, special_random_natural_integers,
+};
 use rust_wheels::iterators::integers_geometric::{i32s_geometric, u32s_geometric};
-use rust_wheels::iterators::naturals::{exhaustive_naturals, random_naturals,
-                                       special_random_naturals};
-use rust_wheels::iterators::primitive_ints::{exhaustive_natural_signed, exhaustive_signed,
-                                             exhaustive_unsigned, random_natural_signed,
-                                             special_random_natural_signed, special_random_signed,
-                                             special_random_unsigned};
+use rust_wheels::iterators::naturals::{
+    exhaustive_naturals, random_naturals, special_random_naturals,
+};
+use rust_wheels::iterators::primitive_ints::{
+    exhaustive_natural_signed, exhaustive_signed, exhaustive_unsigned, random_natural_signed,
+    special_random_natural_signed, special_random_signed, special_random_unsigned,
+};
 use rust_wheels::iterators::rounding_modes::{exhaustive_rounding_modes, random_rounding_modes};
-use rust_wheels::iterators::tuples::{exhaustive_pairs, exhaustive_pairs_from_single,
-                                     exhaustive_triples, exhaustive_triples_from_single,
-                                     lex_pairs, log_pairs, random_pairs, random_pairs_from_single,
-                                     random_triples, random_triples_from_single};
+use rust_wheels::iterators::tuples::{
+    exhaustive_pairs, exhaustive_pairs_from_single, exhaustive_triples,
+    exhaustive_triples_from_single, lex_pairs, log_pairs, random_pairs, random_pairs_from_single,
+    random_triples, random_triples_from_single,
+};
 use rust_wheels::iterators::vecs::exhaustive_fixed_size_vecs_from_single;
 
 pub fn integers(gm: GenerationMode) -> Box<Iterator<Item = Integer>> {

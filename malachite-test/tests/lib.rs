@@ -116,6 +116,7 @@ pub mod integer {
         pub mod u64_from_integer;
     }
     pub mod logic {
+        pub mod and;
         pub mod and_i32;
         pub mod and_u32;
         pub mod assign_bit;

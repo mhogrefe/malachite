@@ -2,8 +2,9 @@ use common::{test_properties, test_properties_no_special};
 use malachite_base::num::Zero;
 use malachite_nz::natural::Natural;
 use malachite_test::inputs::base::small_usizes;
-use malachite_test::inputs::natural::{naturals, pairs_of_natural_and_small_usize,
-                                      pairs_of_natural_and_vec_of_bool_var_1};
+use malachite_test::inputs::natural::{
+    naturals, pairs_of_natural_and_small_usize, pairs_of_natural_and_vec_of_bool_var_1,
+};
 use std::str::FromStr;
 use std::u32;
 

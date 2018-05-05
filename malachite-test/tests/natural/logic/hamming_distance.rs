@@ -1,14 +1,17 @@
 use common::test_properties;
 use malachite_base::num::{CheckedHammingDistance, HammingDistance, Zero};
 use malachite_nz::integer::Integer;
-use malachite_nz::natural::logic::hamming_distance::{limbs_hamming_distance,
-                                                     limbs_hamming_distance_same_length};
+use malachite_nz::natural::logic::hamming_distance::{
+    limbs_hamming_distance, limbs_hamming_distance_same_length,
+};
 use malachite_nz::natural::Natural;
 use malachite_test::inputs::base::{pairs_of_unsigned_vec_var_1, pairs_of_unsigned_vec_var_2};
-use malachite_test::inputs::natural::{naturals, pairs_of_naturals,
-                                      triples_of_natural_natural_and_unsigned, triples_of_naturals};
-use malachite_test::natural::logic::hamming_distance::{natural_hamming_distance_alt_1,
-                                                       natural_hamming_distance_alt_2};
+use malachite_test::inputs::natural::{
+    naturals, pairs_of_naturals, triples_of_natural_natural_and_unsigned, triples_of_naturals,
+};
+use malachite_test::natural::logic::hamming_distance::{
+    natural_hamming_distance_alt_1, natural_hamming_distance_alt_2,
+};
 use std::str::FromStr;
 
 #[test]

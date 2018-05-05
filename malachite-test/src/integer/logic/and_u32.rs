@@ -1,44 +1,21 @@
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::integer::{pairs_of_integer_and_unsigned, pairs_of_unsigned_and_integer,
-                      rm_pairs_of_integer_and_unsigned, rm_pairs_of_unsigned_and_integer};
+use inputs::integer::{
+    pairs_of_integer_and_unsigned, pairs_of_unsigned_and_integer, rm_pairs_of_integer_and_unsigned,
+    rm_pairs_of_unsigned_and_integer,
+};
+use integer::logic::and::{integer_and_alt_1, integer_and_alt_2};
+use malachite_base::misc::CheckedFrom;
 use malachite_base::num::SignificantBits;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
-use std::iter::repeat;
 use std::u32;
 
 pub fn integer_and_u32_alt_1(n: &Integer, u: u32) -> Natural {
-    let u = Natural::from(u);
-    let bit_zip: Box<Iterator<Item = (bool, bool)>> =
-        if n.significant_bits() >= u.significant_bits() {
-            Box::new(n.twos_complement_bits().zip(u.bits().chain(repeat(false))))
-        } else {
-            Box::new(n.twos_complement_bits().chain(repeat(*n < 0)).zip(u.bits()))
-        };
-    let mut and_bits = Vec::new();
-    for (b, c) in bit_zip {
-        and_bits.push(b && c);
-    }
-    Natural::from_bits_asc(&and_bits)
+    Natural::checked_from(integer_and_alt_1(n, &Integer::from(u))).unwrap()
 }
 
 pub fn integer_and_u32_alt_2(n: &Integer, u: u32) -> Natural {
-    let u = Natural::from(u);
-    let limb_zip: Box<Iterator<Item = (u32, u32)>> =
-        if n.twos_complement_limbs().count() as u64 >= u.limb_count() {
-            Box::new(n.twos_complement_limbs().zip(u.limbs().chain(repeat(0))))
-        } else {
-            Box::new(
-                n.twos_complement_limbs()
-                    .chain(repeat(if *n < 0 { u32::MAX } else { 0 }))
-                    .zip(u.limbs()),
-            )
-        };
-    let mut and_limbs = Vec::new();
-    for (x, y) in limb_zip {
-        and_limbs.push(x & y);
-    }
-    Natural::from_owned_limbs_asc(and_limbs)
+    Natural::checked_from(integer_and_alt_2(n, &Integer::from(u))).unwrap()
 }
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {

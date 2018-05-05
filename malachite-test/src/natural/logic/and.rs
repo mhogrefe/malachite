@@ -1,12 +1,15 @@
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::base::{pairs_of_unsigned_vec, pairs_of_unsigned_vec_var_1,
-                   triples_of_unsigned_vec_var_3, triples_of_unsigned_vec_var_4};
+use inputs::base::{
+    pairs_of_unsigned_vec, pairs_of_unsigned_vec_var_1, triples_of_unsigned_vec_var_3,
+    triples_of_unsigned_vec_var_4,
+};
 use inputs::natural::{nrm_pairs_of_naturals, pairs_of_naturals, rm_pairs_of_naturals};
 use malachite_base::num::SignificantBits;
-use malachite_nz::natural::logic::and::{limbs_and, limbs_and_in_place_either,
-                                        limbs_and_same_length_in_place_left,
-                                        limbs_and_same_length_to_out, limbs_and_to_out,
-                                        limbs_slice_and_in_place_left, limbs_vec_and_in_place_left};
+use malachite_nz::natural::logic::and::{
+    limbs_and, limbs_and_in_place_either, limbs_and_same_length_in_place_left,
+    limbs_and_same_length_to_out, limbs_and_to_out, limbs_slice_and_in_place_left,
+    limbs_vec_and_in_place_left,
+};
 use malachite_nz::natural::Natural;
 use std::cmp::{max, min};
 use std::iter::repeat;

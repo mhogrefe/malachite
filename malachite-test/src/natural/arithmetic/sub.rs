@@ -1,6 +1,7 @@
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::natural::{nrm_pairs_of_naturals, pairs_of_naturals, pairs_of_naturals_var_1,
-                      rm_pairs_of_naturals_var_1};
+use inputs::natural::{
+    nrm_pairs_of_naturals, pairs_of_naturals, pairs_of_naturals_var_1, rm_pairs_of_naturals_var_1,
+};
 use malachite_base::num::SignificantBits;
 use std::cmp::max;
 use std::ops::Sub;

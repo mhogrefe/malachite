@@ -1,8 +1,9 @@
 use common::test_properties;
 use malachite_nz::integer::Integer;
 use malachite_test::inputs::integer::integers;
-use malachite_test::integer::logic::checked_count_ones::{integer_checked_count_ones_alt_1,
-                                                         integer_checked_count_ones_alt_2};
+use malachite_test::integer::logic::checked_count_ones::{
+    integer_checked_count_ones_alt_1, integer_checked_count_ones_alt_2,
+};
 use std::str::FromStr;
 
 #[test]

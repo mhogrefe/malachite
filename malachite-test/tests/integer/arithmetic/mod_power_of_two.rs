@@ -4,10 +4,10 @@ use malachite_base::round::RoundingMode;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_test::inputs::base::unsigneds;
-use malachite_test::inputs::integer::{integers, pairs_of_integer_and_small_u32,
-                                      pairs_of_integer_and_small_u32_var_1,
-                                      pairs_of_integer_and_small_u32_var_2,
-                                      triples_of_integer_small_u32_and_small_u32};
+use malachite_test::inputs::integer::{
+    integers, pairs_of_integer_and_small_u32, pairs_of_integer_and_small_u32_var_1,
+    pairs_of_integer_and_small_u32_var_2, triples_of_integer_small_u32_and_small_u32,
+};
 use std::cmp::min;
 use std::str::FromStr;
 

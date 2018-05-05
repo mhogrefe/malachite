@@ -1,8 +1,9 @@
 use common::test_properties;
 use malachite_base::num::{NegativeOne, One, SubMul, SubMulAssign, Zero};
 use malachite_nz::integer::Integer;
-use malachite_test::inputs::integer::{integers, pairs_of_integer_and_signed, pairs_of_integers,
-                                      triples_of_integer_integer_and_signed};
+use malachite_test::inputs::integer::{
+    integers, pairs_of_integer_and_signed, pairs_of_integers, triples_of_integer_integer_and_signed,
+};
 
 use std::str::FromStr;
 

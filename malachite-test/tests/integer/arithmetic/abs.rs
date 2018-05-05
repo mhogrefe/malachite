@@ -2,8 +2,9 @@ use common::test_properties;
 use malachite_base::misc::CheckedInto;
 use malachite_base::num::{Abs, AbsAssign, UnsignedAbs};
 use malachite_nz::integer::Integer;
-use malachite_test::common::{bigint_to_integer, integer_to_bigint, integer_to_rug_integer,
-                             rug_integer_to_integer};
+use malachite_test::common::{
+    bigint_to_integer, integer_to_bigint, integer_to_rug_integer, rug_integer_to_integer,
+};
 use malachite_test::inputs::integer::integers;
 use num::{BigInt, Signed};
 use rug;

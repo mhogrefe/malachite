@@ -1,7 +1,8 @@
 use common::{test_properties_no_limit_exhaustive_no_special, test_properties_no_special};
-use malachite_base::chars::{char_to_contiguous_range, contiguous_range_to_char,
-                            CHAR_JUST_ABOVE_SURROGATES, CHAR_JUST_BELOW_SURROGATES,
-                            NUMBER_OF_CHARS};
+use malachite_base::chars::{
+    char_to_contiguous_range, contiguous_range_to_char, CHAR_JUST_ABOVE_SURROGATES,
+    CHAR_JUST_BELOW_SURROGATES, NUMBER_OF_CHARS,
+};
 use malachite_test::inputs::base::{chars, pairs_of_chars};
 use std::char;
 

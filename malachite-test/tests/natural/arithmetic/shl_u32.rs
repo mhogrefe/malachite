@@ -1,11 +1,13 @@
 use common::{test_properties, test_properties_no_special};
 use malachite_base::num::{IsPowerOfTwo, One, Zero};
 use malachite_nz::natural::Natural;
-use malachite_test::common::{biguint_to_natural, natural_to_biguint, natural_to_rug_integer,
-                             rug_integer_to_natural};
+use malachite_test::common::{
+    biguint_to_natural, natural_to_biguint, natural_to_rug_integer, rug_integer_to_natural,
+};
 use malachite_test::inputs::base::small_u32s;
-use malachite_test::inputs::natural::{naturals, pairs_of_natural_and_small_u32,
-                                      triples_of_natural_small_u32_and_small_u32};
+use malachite_test::inputs::natural::{
+    naturals, pairs_of_natural_and_small_u32, triples_of_natural_small_u32_and_small_u32,
+};
 use num::BigUint;
 use rug;
 use std::i32;

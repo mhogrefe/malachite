@@ -3,10 +3,10 @@ use malachite_base::num::{One, ShrRound, Zero};
 use malachite_base::round::RoundingMode;
 use malachite_nz::natural::Natural;
 use malachite_test::inputs::base::unsigneds;
-use malachite_test::inputs::natural::{naturals, pairs_of_natural_and_small_u32,
-                                      pairs_of_natural_and_small_u32_var_1,
-                                      pairs_of_natural_and_small_u32_var_2,
-                                      triples_of_natural_small_u32_and_small_u32};
+use malachite_test::inputs::natural::{
+    naturals, pairs_of_natural_and_small_u32, pairs_of_natural_and_small_u32_var_1,
+    pairs_of_natural_and_small_u32_var_2, triples_of_natural_small_u32_and_small_u32,
+};
 use std::cmp::min;
 use std::str::FromStr;
 

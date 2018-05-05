@@ -14,7 +14,7 @@ pub fn integer_checked_hamming_distance_alt_1(x: &Integer, y: &Integer) -> Optio
         return None;
     }
     let bit_zip: Box<Iterator<Item = (bool, bool)>> =
-        if x.significant_bits() >= y.significant_bits() {
+        if x.twos_complement_bits().count() >= y.twos_complement_bits().count() {
             Box::new(
                 x.twos_complement_bits()
                     .zip(y.twos_complement_bits().chain(repeat(negative))),

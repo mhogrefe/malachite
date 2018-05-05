@@ -4,8 +4,9 @@ use malachite_nz::integer::conversion::to_twos_complement_limbs::*;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_test::inputs::base::{small_usizes, vecs_of_u32_var_1, vecs_of_unsigned};
-use malachite_test::inputs::integer::{integers, pairs_of_integer_and_small_usize,
-                                      pairs_of_integer_and_vec_of_bool_var_1};
+use malachite_test::inputs::integer::{
+    integers, pairs_of_integer_and_small_usize, pairs_of_integer_and_vec_of_bool_var_1,
+};
 use malachite_test::integer::conversion::to_twos_complement_limbs::*;
 use std::cmp::Ordering;
 use std::str::FromStr;

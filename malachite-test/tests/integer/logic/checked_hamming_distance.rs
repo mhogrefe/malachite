@@ -4,11 +4,13 @@ use malachite_nz::integer::logic::checked_hamming_distance::limbs_hamming_distan
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_test::inputs::base::pairs_of_u32_vec_var_1;
-use malachite_test::inputs::integer::{integers, pairs_of_integers,
-                                      triples_of_natural_integer_natural_integer_and_natural_signed,
-                                      triples_of_natural_integers};
-use malachite_test::integer::logic::checked_hamming_distance::{integer_checked_hamming_distance_alt_1,
-                                                               integer_checked_hamming_distance_alt_2};
+use malachite_test::inputs::integer::{
+    integers, pairs_of_integers, triples_of_natural_integer_natural_integer_and_natural_signed,
+    triples_of_natural_integers,
+};
+use malachite_test::integer::logic::checked_hamming_distance::{
+    integer_checked_hamming_distance_alt_1, integer_checked_hamming_distance_alt_2,
+};
 use std::str::FromStr;
 
 #[test]

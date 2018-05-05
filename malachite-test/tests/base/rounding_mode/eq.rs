@@ -1,7 +1,8 @@
 use common::{test_eq_helper, test_properties_no_limit_exhaustive_no_special};
 use malachite_base::round::RoundingMode;
-use malachite_test::inputs::base::{pairs_of_rounding_modes, rounding_modes,
-                                   triples_of_rounding_modes};
+use malachite_test::inputs::base::{
+    pairs_of_rounding_modes, rounding_modes, triples_of_rounding_modes,
+};
 
 #[test]
 fn test_eq() {

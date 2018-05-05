@@ -1,4 +1,6 @@
-use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, NoSpecialGenerationMode, ScaleType};
+use common::{
+    m_run_benchmark, BenchmarkType, DemoBenchRegistry, NoSpecialGenerationMode, ScaleType,
+};
 use inputs::base::chars_not_max;
 use malachite_base::chars::char_to_contiguous_range;
 use malachite_base::misc::Walkable;

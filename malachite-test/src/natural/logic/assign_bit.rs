@@ -1,6 +1,7 @@
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::natural::{rm_triples_of_natural_small_u64_and_bool,
-                      triples_of_natural_small_u64_and_bool};
+use inputs::natural::{
+    rm_triples_of_natural_small_u64_and_bool, triples_of_natural_small_u64_and_bool,
+};
 use malachite_base::num::BitAccess;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {

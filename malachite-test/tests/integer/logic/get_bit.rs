@@ -1,5 +1,6 @@
 use common::test_properties;
-use malachite_base::num::{BitAccess, SignificantBits};
+use malachite_base::misc::CheckedFrom;
+use malachite_base::num::{BitAccess, One, SignificantBits};
 use malachite_nz::integer::logic::bit_access::limbs_get_bit_neg;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
@@ -90,6 +91,10 @@ fn get_bit_properties() {
         let bit = n.get_bit(index);
         assert_eq!(integer_to_rug_integer(n).get_bit(index as u32), bit);
 
+        assert_eq!(
+            n & (Integer::ONE << u32::checked_from(index).unwrap()) != 0,
+            bit
+        );
         assert_eq!(!(!n).get_bit(index), bit);
     });
 

@@ -1,8 +1,9 @@
 use common::test_properties;
 use malachite_base::num::Assign;
 use malachite_nz::integer::Integer;
-use malachite_test::common::{bigint_to_integer, integer_to_bigint, integer_to_rug_integer,
-                             rug_integer_to_integer};
+use malachite_test::common::{
+    bigint_to_integer, integer_to_bigint, integer_to_rug_integer, rug_integer_to_integer,
+};
 use malachite_test::inputs::integer::pairs_of_integer_and_signed;
 use malachite_test::integer::conversion::assign_i32::num_assign_i32;
 use num::BigInt;

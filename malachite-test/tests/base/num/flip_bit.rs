@@ -1,8 +1,10 @@
 use common::test_properties;
-use malachite_base::num::{BitAccess, NegativeOne, PrimitiveInteger, PrimitiveSigned,
-                          PrimitiveUnsigned};
-use malachite_test::inputs::base::{pairs_of_signed_and_u64_width_range,
-                                   pairs_of_unsigned_and_u64_width_range};
+use malachite_base::num::{
+    BitAccess, NegativeOne, PrimitiveInteger, PrimitiveSigned, PrimitiveUnsigned,
+};
+use malachite_test::inputs::base::{
+    pairs_of_signed_and_u64_width_range, pairs_of_unsigned_and_u64_width_range,
+};
 
 fn flip_bit_helper_unsigned<T: PrimitiveInteger>() {
     let test = |n: u64, index, out: u64| {

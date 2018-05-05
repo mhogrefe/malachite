@@ -4,8 +4,9 @@ use malachite_nz::natural::Natural;
 use malachite_test::common::{natural_to_biguint, natural_to_rug_integer, rug_integer_to_natural};
 use malachite_test::inputs::base::unsigneds;
 use malachite_test::inputs::natural::{naturals, pairs_of_natural_and_unsigned};
-use malachite_test::natural::logic::and_u32::{natural_and_u32_alt_1, natural_and_u32_alt_2,
-                                              num_and_u32};
+use malachite_test::natural::logic::and_u32::{
+    natural_and_u32_alt_1, natural_and_u32_alt_2, num_and_u32,
+};
 use num::BigUint;
 use rug::{self, Assign};
 use std::str::FromStr;

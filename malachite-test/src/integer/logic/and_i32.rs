@@ -1,65 +1,25 @@
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::base::{pairs_of_u32_vec_and_u32_var_1,
-                   triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_1};
-use inputs::integer::{pairs_of_integer_and_signed, pairs_of_signed_and_integer,
-                      rm_pairs_of_integer_and_signed, rm_pairs_of_signed_and_integer};
+use inputs::base::{
+    pairs_of_u32_vec_and_u32_var_1, triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_1,
+};
+use inputs::integer::{
+    pairs_of_integer_and_signed, pairs_of_signed_and_integer, rm_pairs_of_integer_and_signed,
+    rm_pairs_of_signed_and_integer,
+};
+use integer::logic::and::{integer_and_alt_1, integer_and_alt_2};
 use malachite_base::num::SignificantBits;
-use malachite_nz::integer::logic::and_i32::{limbs_slice_neg_and_limb_neg,
-                                            limbs_slice_neg_and_limb_neg_in_place,
-                                            limbs_vec_neg_and_limb_neg,
-                                            limbs_vec_neg_and_limb_neg_in_place};
+use malachite_nz::integer::logic::and_i32::{
+    limbs_slice_neg_and_limb_neg, limbs_slice_neg_and_limb_neg_in_place,
+    limbs_vec_neg_and_limb_neg, limbs_vec_neg_and_limb_neg_in_place,
+};
 use malachite_nz::integer::Integer;
-use std::iter::repeat;
-use std::u32;
 
 pub fn integer_and_i32_alt_1(n: &Integer, i: i32) -> Integer {
-    let n_negative = *n < 0;
-    let i_negative = i < 0;
-    let i = Integer::from(i);
-    let bit_zip: Box<Iterator<Item = (bool, bool)>> =
-        if n.significant_bits() >= i.significant_bits() {
-            Box::new(
-                n.twos_complement_bits()
-                    .zip(i.twos_complement_bits().chain(repeat(i_negative))),
-            )
-        } else {
-            Box::new(
-                n.twos_complement_bits()
-                    .chain(repeat(n_negative))
-                    .zip(i.twos_complement_bits()),
-            )
-        };
-    let mut and_bits = Vec::new();
-    for (b, c) in bit_zip {
-        and_bits.push(b && c);
-    }
-    and_bits.push(n_negative && i_negative);
-    Integer::from_twos_complement_bits_asc(&and_bits)
+    integer_and_alt_1(n, &Integer::from(i))
 }
 
 pub fn integer_and_i32_alt_2(n: &Integer, i: i32) -> Integer {
-    let n_extension = if *n < 0 { u32::MAX } else { 0 };
-    let i_extension = if i < 0 { u32::MAX } else { 0 };
-    let i = Integer::from(i);
-    let limb_zip: Box<Iterator<Item = (u32, u32)>> =
-        if n.twos_complement_limbs().count() >= i.twos_complement_limbs().count() {
-            Box::new(
-                n.twos_complement_limbs()
-                    .zip(i.twos_complement_limbs().chain(repeat(i_extension))),
-            )
-        } else {
-            Box::new(
-                n.twos_complement_limbs()
-                    .chain(repeat(n_extension))
-                    .zip(i.twos_complement_limbs()),
-            )
-        };
-    let mut and_limbs = Vec::new();
-    for (x, y) in limb_zip {
-        and_limbs.push(x & y);
-    }
-    and_limbs.push(n_extension & i_extension);
-    Integer::from_owned_twos_complement_limbs_asc(and_limbs)
+    integer_and_alt_2(n, &Integer::from(i))
 }
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
@@ -325,7 +285,7 @@ fn benchmark_integer_and_i32_evaluation_strategy(
     m_run_benchmark(
         "Integer & i32",
         BenchmarkType::EvaluationStrategy,
-        pairs_of_integer_and_signed(gm),
+        pairs_of_integer_and_signed::<i32>(gm),
         gm.name(),
         limit,
         file_name,

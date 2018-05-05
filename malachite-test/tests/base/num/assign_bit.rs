@@ -1,9 +1,12 @@
 use common::test_properties;
 use malachite_base::misc::CheckedFrom;
-use malachite_base::num::{BitAccess, NegativeOne, PrimitiveInteger, PrimitiveSigned,
-                          PrimitiveUnsigned};
-use malachite_test::inputs::base::{triples_of_signed_u64_width_range_and_bool_var_1,
-                                   triples_of_unsigned_u64_width_range_and_bool_var_1};
+use malachite_base::num::{
+    BitAccess, NegativeOne, PrimitiveInteger, PrimitiveSigned, PrimitiveUnsigned,
+};
+use malachite_test::inputs::base::{
+    triples_of_signed_u64_width_range_and_bool_var_1,
+    triples_of_unsigned_u64_width_range_and_bool_var_1,
+};
 
 fn assign_bit_helper_unsigned<T: PrimitiveInteger>() {
     let test = |n: u64, index, bit, out: u64| {
