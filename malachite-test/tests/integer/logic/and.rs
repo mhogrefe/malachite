@@ -78,6 +78,16 @@ fn test_and() {
     );
     test("-18446744073708507135", "-4194176", "-18446744073709551616");
     test("-4194176", "-18446744073708507135", "-18446744073709551616");
+    test(
+        "3332140978726732268209104861552",
+        "-478178031043645514337313657924474082957368",
+        "2539024739207132029580719268160",
+    );
+    test(
+        "-478178031043645514337313657924474082957368",
+        "3332140978726732268209104861552",
+        "2539024739207132029580719268160",
+    );
 }
 
 #[test]
@@ -87,7 +97,7 @@ fn and_properties() {
         let result_val_ref = x.clone() & y;
         let result_ref_val = x & y.clone();
         let result = x & y;
-        assert!(result_val_val.is_valid(), "{} & {} =? {}", x, y, result);
+        assert!(result_val_val.is_valid());
         assert!(result_val_ref.is_valid());
         assert!(result_ref_val.is_valid());
         assert!(result.is_valid());

@@ -1,10 +1,12 @@
 use common::test_properties;
+use malachite_base::misc::CheckedFrom;
 use malachite_base::num::{NegativeOne, Zero};
 use malachite_nz::integer::logic::and_i32::{
     limbs_slice_neg_and_limb_neg, limbs_slice_neg_and_limb_neg_in_place,
     limbs_vec_neg_and_limb_neg, limbs_vec_neg_and_limb_neg_in_place,
 };
 use malachite_nz::integer::Integer;
+use malachite_nz::natural::Natural;
 use malachite_test::common::{integer_to_rug_integer, rug_integer_to_integer};
 use malachite_test::inputs::base::{
     pairs_of_u32_vec_and_u32_var_1, signeds,
@@ -14,6 +16,7 @@ use malachite_test::inputs::integer::{integers, pairs_of_integer_and_signed};
 use malachite_test::integer::logic::and_i32::{integer_and_i32_alt_1, integer_and_i32_alt_2};
 use rug::{self, Assign};
 use std::str::FromStr;
+use std::u32;
 
 #[test]
 fn test_limbs_slice_neg_and_limb_neg() {
@@ -192,10 +195,16 @@ fn limbs_slice_neg_and_limb_neg_properties() {
         triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_1,
         |&(ref out_limbs, ref in_limbs, limb)| {
             let mut out_limbs = out_limbs.to_vec();
-            limbs_slice_neg_and_limb_neg(&mut out_limbs, in_limbs, limb);
-            // TODO
-            // let n = -Natural::from_limbs_asc(&in_limbs) & limb.wrapping_neg();
-            // assert_eq!(n.into_twos_complement_limbs_asc()[0..in_limbs.len()], in_limbs);
+            let old_out_limbs = out_limbs.clone();
+            let carry = limbs_slice_neg_and_limb_neg(&mut out_limbs, in_limbs, limb);
+            let n = -Natural::from_limbs_asc(in_limbs)
+                & Integer::from_owned_twos_complement_limbs_asc(vec![limb, u32::MAX]);
+            let len = in_limbs.len();
+            let mut limbs = Natural::checked_from(-n).unwrap().into_limbs_asc();
+            assert_eq!(carry, limbs.len() == len + 1);
+            limbs.resize(len, 0);
+            assert_eq!(limbs, &out_limbs[0..len]);
+            assert_eq!(&out_limbs[len..], &old_out_limbs[len..]);
         },
     );
 }
@@ -203,26 +212,40 @@ fn limbs_slice_neg_and_limb_neg_properties() {
 #[test]
 fn limbs_vec_neg_and_limb_neg_properties() {
     test_properties(pairs_of_u32_vec_and_u32_var_1, |&(ref limbs, limb)| {
-        limbs_vec_neg_and_limb_neg(limbs, limb);
-        // TODO
+        let limbs_out = limbs_vec_neg_and_limb_neg(limbs, limb);
+        let n = -Natural::from_limbs_asc(limbs)
+            & Integer::from_owned_twos_complement_limbs_asc(vec![limb, u32::MAX]);
+        assert_eq!(
+            Natural::from_owned_limbs_asc(limbs_out),
+            Natural::checked_from(-n).unwrap()
+        );
     });
 }
 
 #[test]
-fn limbs_slice_neg_and_limb_neg_properties_in_place() {
+fn limbs_slice_neg_and_limb_neg_in_place_properties() {
     test_properties(pairs_of_u32_vec_and_u32_var_1, |&(ref limbs, limb)| {
         let mut limbs = limbs.to_vec();
         limbs_slice_neg_and_limb_neg_in_place(&mut limbs, limb);
-        // TODO
+        let n = -Natural::from_limbs_asc(&limbs)
+            & Integer::from_owned_twos_complement_limbs_asc(vec![limb, u32::MAX]);
+        let mut expected_limbs = Natural::checked_from(-n).unwrap().into_limbs_asc();
+        expected_limbs.resize(limbs.len(), 0);
+        assert_eq!(limbs, expected_limbs);
     });
 }
 
 #[test]
-fn limbs_vec_neg_and_limb_neg_properties_in_place() {
+fn limbs_vec_neg_and_limb_neg_in_place_properties() {
     test_properties(pairs_of_u32_vec_and_u32_var_1, |&(ref limbs, limb)| {
         let mut limbs = limbs.to_vec();
         limbs_vec_neg_and_limb_neg_in_place(&mut limbs, limb);
-        // TODO
+        let n = -Natural::from_limbs_asc(&limbs)
+            & Integer::from_owned_twos_complement_limbs_asc(vec![limb, u32::MAX]);
+        assert_eq!(
+            Natural::from_owned_limbs_asc(limbs),
+            Natural::checked_from(-n).unwrap()
+        );
     });
 }
 

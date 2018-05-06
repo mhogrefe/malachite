@@ -265,7 +265,7 @@ dependencies = [
  "proc-macro2 0.3.8 (registry+https://github.com/rust-lang/crates.io-index)",
  "quote 0.5.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_derive_internals 0.23.1 (registry+https://github.com/rust-lang/crates.io-index)",
- "syn 0.13.5 (registry+https://github.com/rust-lang/crates.io-index)",
+ "syn 0.13.7 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -274,7 +274,7 @@ version = "0.23.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "proc-macro2 0.3.8 (registry+https://github.com/rust-lang/crates.io-index)",
- "syn 0.13.5 (registry+https://github.com/rust-lang/crates.io-index)",
+ "syn 0.13.7 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -307,7 +307,7 @@ dependencies = [
 
 [[package]]
 name = "syn"
-version = "0.13.5"
+version = "0.13.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "proc-macro2 0.3.8 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -389,7 +389,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 "checksum serde_json 1.0.17 (registry+https://github.com/rust-lang/crates.io-index)" = "f3ad6d546e765177cf3dded3c2e424a8040f870083a0e64064746b958ece9cb1"
 "checksum sha3 0.4.1 (registry+https://github.com/rust-lang/crates.io-index)" = "47e72786a5f51fbce3ba5485ef4fcbff99eda815d2e0a3c619460cd90e2a660c"
 "checksum streaming-stats 0.1.29 (registry+https://github.com/rust-lang/crates.io-index)" = "dbc32bf233385fb1ae0c4cf13a8dfd11efec71f6a9de95feac8c870788bc8b25"
-"checksum syn 0.13.5 (registry+https://github.com/rust-lang/crates.io-index)" = "aadff791b6c1677eabf79679c6bf8798541dedef6caf0cf9334746799d1df275"
+"checksum syn 0.13.7 (registry+https://github.com/rust-lang/crates.io-index)" = "61b8f1b737f929c6516ba46a3133fd6d5215ad8a62f66760f851f7048aebedfb"
 "checksum time 0.1.39 (registry+https://github.com/rust-lang/crates.io-index)" = "a15375f1df02096fb3317256ce2cee6a1f42fc84ea5ad5fc8c421cfe40c73098"
 "checksum typenum 1.10.0 (registry+https://github.com/rust-lang/crates.io-index)" = "612d636f949607bdf9b123b4a6f6d966dedf3ff669f7f045890d3a4a73948169"
 "checksum unicode-xid 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)" = "fc72304796d0818e357ead4e000d19c9c174ab23dc11093ac919054d20a6a7fc"

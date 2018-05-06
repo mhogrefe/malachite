@@ -368,7 +368,7 @@ impl BitAndAssign<i32> for Integer {
 }
 
 impl Natural {
-    fn and_assign_pos_u32_neg(&mut self, other: u32) {
+    pub(crate) fn and_assign_pos_u32_neg(&mut self, other: u32) {
         match *self {
             Small(ref mut small) => *small &= other,
             Large(ref mut limbs) => limbs[0] &= other,
@@ -386,7 +386,7 @@ impl Natural {
         }
     }
 
-    fn and_assign_neg_u32_neg(&mut self, other: u32) {
+    pub(crate) fn and_assign_neg_u32_neg(&mut self, other: u32) {
         if *self == 0 {
             return;
         }
