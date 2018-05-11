@@ -5,10 +5,11 @@ use natural::arithmetic::add_u32::{mpn_add_1, mpn_add_1_in_place};
 use natural::Natural::{self, Large, Small};
 use std::ops::{BitAnd, BitAndAssign};
 
-/// Interpreting a slice of `u32`s as the twos-complement limbs of the negative of an `Integer`, in
-/// ascending order, writes the limbs of the bitwise and of the `Integer` and a negative number
-/// whose lowest limb is given by `limb` and whose other limbs are full of `true` bits to an output
-/// slice. `in_limbs` may not be empty or only contain zeros. Returns whether a carry occurs.
+/// Interpreting a slice of `u32`s as the limbs (in ascending order) of the negative of an
+/// `Integer`, writes the limbs of the bitwise and of the `Integer` and a negative number whose
+/// lowest limb is given by `limb` and whose other limbs are full of `true` bits to an output slice.
+/// `in_limbs` may not be empty or only contain zeros. Returns whether a carry occurs. The output
+/// slice must be at least as long as the input slice.
 ///
 /// Time: worst case O(n)
 ///
@@ -21,25 +22,30 @@ use std::ops::{BitAnd, BitAndAssign};
 ///
 /// # Example
 /// ```
-/// use malachite_nz::integer::logic::and_i32::limbs_slice_neg_and_limb_neg;
+/// use malachite_nz::integer::logic::and_i32::limbs_slice_neg_and_limb_neg_to_out;
 ///
 /// let mut result = vec![0, 0];
-/// assert_eq!(limbs_slice_neg_and_limb_neg(&mut result, &[0, 2], 3), false);
+/// assert_eq!(limbs_slice_neg_and_limb_neg_to_out(&mut result, &[0, 2], 3), false);
 /// assert_eq!(result, vec![0, 2]);
 ///
 /// let mut result = vec![0, 0];
-/// assert_eq!(limbs_slice_neg_and_limb_neg(&mut result, &[1, 1], 3), false);
+/// assert_eq!(limbs_slice_neg_and_limb_neg_to_out(&mut result, &[1, 1], 3), false);
 /// assert_eq!(result, vec![4294967293, 1]);
 ///
 /// let mut result = vec![0, 0];
-/// assert_eq!(limbs_slice_neg_and_limb_neg(&mut result, &[0xffff_fffe, 1], 1), false);
+/// assert_eq!(limbs_slice_neg_and_limb_neg_to_out(&mut result, &[0xffff_fffe, 1], 1), false);
 /// assert_eq!(result, vec![0, 2]);
 ///
 /// let mut result = vec![0, 0];
-/// assert_eq!(limbs_slice_neg_and_limb_neg(&mut result, &[0xffff_fffe, 0xffff_ffff], 1), true);
+/// assert_eq!(limbs_slice_neg_and_limb_neg_to_out(&mut result, &[0xffff_fffe, 0xffff_ffff], 1),
+///         true);
 /// assert_eq!(result, vec![0, 0]);
 /// ```
-pub fn limbs_slice_neg_and_limb_neg(out_limbs: &mut [u32], in_limbs: &[u32], limb: u32) -> bool {
+pub fn limbs_slice_neg_and_limb_neg_to_out(
+    out_limbs: &mut [u32],
+    in_limbs: &[u32],
+    limb: u32,
+) -> bool {
     assert!(out_limbs.len() >= in_limbs.len());
     if in_limbs[0] == 0 {
         out_limbs[0..in_limbs.len()].copy_from_slice(in_limbs);
@@ -58,10 +64,10 @@ pub fn limbs_slice_neg_and_limb_neg(out_limbs: &mut [u32], in_limbs: &[u32], lim
     false
 }
 
-/// Interpreting a slice of `u32`s as the twos-complement limbs of the negative of an `Integer`, in
-/// ascending order, returns the limbs of the bitwise and of the `Integer` and a negative number
-/// whose lowest limb is given by `limb` and whose other limbs are full of `true` bits. `limbs` may
-/// not be empty or only contain zeros.
+/// Interpreting a slice of `u32`s as the limbs (in ascending order) of the negative of an
+/// `Integer`, returns the limbs of the bitwise and of the `Integer` and a negative number whose
+/// lowest limb is given by `limb` and whose other limbs are full of `true` bits. `limbs` may not be
+/// empty or only contain zeros.
 ///
 /// Time: worst case O(n)
 ///
@@ -83,16 +89,16 @@ pub fn limbs_slice_neg_and_limb_neg(out_limbs: &mut [u32], in_limbs: &[u32], lim
 /// ```
 pub fn limbs_vec_neg_and_limb_neg(limbs: &[u32], limb: u32) -> Vec<u32> {
     let mut result_limbs = vec![0; limbs.len()];
-    if limbs_slice_neg_and_limb_neg(&mut result_limbs, limbs, limb) {
+    if limbs_slice_neg_and_limb_neg_to_out(&mut result_limbs, limbs, limb) {
         result_limbs.push(1);
     }
     result_limbs
 }
 
-/// Interpreting a `Vec` of `u32`s as the twos-complement limbs of the negative of an `Integer`, in
-/// ascending order, takes the bitwise and of the `Integer` and a negative number whose lowest limb
-/// is given by `limb` and whose other limbs are full of `true` bits, in place. `limbs` may not be
-///// empty or only contain zeros. Returns whether there is a carry.
+/// Interpreting a `Vec` of `u32`s as the limbs (in ascending order) of the negative of an
+/// `Integer`, takes the bitwise and of the `Integer` and a negative number whose lowest limb is
+/// given by `limb` and whose other limbs are full of `true` bits, in place. `limbs` may not be
+/// empty or only contain zeros. Returns whether there is a carry.
 ///
 /// Time: worst case O(n)
 ///
@@ -139,9 +145,9 @@ pub fn limbs_slice_neg_and_limb_neg_in_place(limbs: &mut [u32], limb: u32) -> bo
     }
 }
 
-/// Interpreting a slices of `u32`s as the twos-complement limbs of the negative of an `Integer`, in
-/// ascending order, takes the bitwise and of the `Integer` and a negative number whose lowest limb
-/// is given by `limb` and whose other limbs are full of `true` bits, in place. `limbs` may not be
+/// Interpreting a slices of `u32`s as the limbs (in ascending order) of the negative of an
+/// `Integer`, takes the bitwise and of the `Integer` and a negative number whose lowest limb is
+/// given by `limb` and whose other limbs are full of `true` bits, in place. `limbs` may not be
 /// empty or only contain zeros. If there is a carry, increases the length of the `Vec` by 1.
 ///
 /// Time: worst case O(n)

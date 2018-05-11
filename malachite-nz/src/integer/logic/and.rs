@@ -5,11 +5,33 @@ use std::cmp::max;
 use std::ops::{BitAnd, BitAndAssign};
 use std::u32;
 
+/// Interpreting two slices of `u32`s as the limbs (in ascending order) of one `Integer` and the
+/// negative of another, returns the limbs of the bitwise and of the `Integer`s. `xs` and `ys` may
+/// not be empty or only contain zeros.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(n)
+///
+/// where n = `xs.len()`
+///
+/// # Panics
+/// Panics if `xs` or `ys` are empty or contain only zeros.
+///
+/// # Example
+/// ```
+/// use malachite_nz::integer::logic::and::limbs_and_pos_neg;
+///
+/// assert_eq!(limbs_and_pos_neg(&[1, 2], &[100, 200]), vec![0, 2]);
+/// assert_eq!(limbs_and_pos_neg(&[1, 2, 5], &[100, 200]), vec![0, 2, 5]);
+/// ```
 pub fn limbs_and_pos_neg(xs: &[u32], ys: &[u32]) -> Vec<u32> {
     let xs_len = xs.len();
     let ys_len = ys.len();
     let x_i = limbs_trailing_zero_limbs(xs);
     let y_i = limbs_trailing_zero_limbs(ys);
+    assert!(x_i < xs_len);
+    assert!(y_i < ys_len);
     if y_i >= xs_len {
         return Vec::new();
     } else if x_i >= ys_len {
@@ -36,11 +58,98 @@ pub fn limbs_and_pos_neg(xs: &[u32], ys: &[u32]) -> Vec<u32> {
     result_limbs
 }
 
+/// Interpreting two slices of `u32`s as the limbs (in ascending order) of one `Integer` and the
+/// negative of another, writes the limbs of the bitwise and of the `Integer`s to an output slice.
+/// `xs` and `ys` may not be empty or only contain zeros. The output slice must be at least as long
+/// as the first input slice. `xs.len()` limbs will be written; if the number of significant limbs
+/// of the result is lower, some of the written limbs will be zero.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = `xs.len()`
+///
+/// # Panics
+/// Panics if `xs` or `ys` are empty or contain only zeros, or if `out_limbs` is shorter than `xs`.
+///
+/// # Example
+/// ```
+/// use malachite_nz::integer::logic::and::limbs_and_pos_neg_to_out;
+///
+/// let mut result = vec![0, 0];
+/// limbs_and_pos_neg_to_out(&mut result, &[1, 2], &[100, 200]);
+/// assert_eq!(result, vec![0, 2]);
+///
+/// let mut result = vec![10, 10, 10, 10];
+/// limbs_and_pos_neg_to_out(&mut result, &[1, 2, 5], &[100, 200]);
+/// assert_eq!(result, vec![0, 2, 5, 10]);
+/// ```
+pub fn limbs_and_pos_neg_to_out(out_limbs: &mut [u32], xs: &[u32], ys: &[u32]) {
+    let xs_len = xs.len();
+    let ys_len = ys.len();
+    assert!(out_limbs.len() >= xs_len);
+    let x_i = limbs_trailing_zero_limbs(xs);
+    let y_i = limbs_trailing_zero_limbs(ys);
+    assert!(x_i < xs_len);
+    assert!(y_i < ys_len);
+    if y_i >= xs_len {
+        limbs_set_zero(&mut out_limbs[0..xs_len]);
+        return;
+    } else if x_i >= ys_len {
+        out_limbs[0..xs_len].copy_from_slice(xs);
+        return;
+    }
+    let max_i = max(x_i, y_i);
+    limbs_set_zero(&mut out_limbs[0..max_i]);
+    out_limbs[max_i] = xs[max_i] & if x_i <= y_i {
+        ys[max_i].wrapping_neg()
+    } else {
+        !ys[max_i]
+    };
+    for (z, (x, y)) in out_limbs[max_i + 1..]
+        .iter_mut()
+        .zip(xs[max_i + 1..].iter().zip(ys[max_i + 1..].iter()))
+    {
+        *z = x & !y;
+    }
+    if xs_len > ys_len {
+        out_limbs[ys_len..xs_len].copy_from_slice(&xs[ys_len..]);
+    }
+}
+
+/// Interpreting two slices of `u32`s as the limbs (in ascending order) of one `Integer` and the
+/// negative of another, writes the limbs of the bitwise and of the `Integer`s to the first (left)
+/// slice. `xs` and `ys` may not be empty or only contain zeros.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = `xs.len()`
+///
+/// # Panics
+/// Panics if `xs` or `ys` are empty or contain only zeros.
+///
+/// # Example
+/// ```
+/// use malachite_nz::integer::logic::and::limbs_and_pos_neg_in_place_left;
+///
+/// let mut xs = vec![1, 2];
+/// limbs_and_pos_neg_in_place_left(&mut xs, &[100, 200]);
+/// assert_eq!(xs, vec![0, 2]);
+///
+/// let mut xs = vec![1, 2, 5];
+/// limbs_and_pos_neg_in_place_left(&mut xs, &[100, 200]);
+/// assert_eq!(xs, vec![0, 2, 5]);
+/// ```
 pub fn limbs_and_pos_neg_in_place_left(xs: &mut [u32], ys: &[u32]) {
     let xs_len = xs.len();
     let ys_len = ys.len();
     let x_i = limbs_trailing_zero_limbs(xs);
     let y_i = limbs_trailing_zero_limbs(ys);
+    assert!(x_i < xs_len);
+    assert!(y_i < ys_len);
     if y_i >= xs_len {
         limbs_set_zero(xs);
         return;
@@ -59,11 +168,41 @@ pub fn limbs_and_pos_neg_in_place_left(xs: &mut [u32], ys: &[u32]) {
     }
 }
 
+/// Interpreting two slices of `u32`s as the limbs (in ascending order) of one `Integer` and the
+/// negative of another, writes the lowest min(`xs.len()`, `ys.len()`) limbs of the bitwise and of
+/// the `Integer`s to the second (right) slice. `xs` and `ys` may not be empty or only contain
+/// zeros. If `ys` is shorter than `xs`, the result may be too long to fit in `ys`. The extra limbs
+/// in this case are just `xs[ys.len()..]`.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = `xs.len()`
+///
+/// # Panics
+/// Panics if `xs` or `ys` are empty or contain only zeros.
+///
+/// # Example
+/// ```
+/// use malachite_nz::integer::logic::and::limbs_slice_and_pos_neg_in_place_right;
+///
+/// let mut ys = vec![100, 200];
+/// limbs_slice_and_pos_neg_in_place_right(&[1, 2], &mut ys);
+/// assert_eq!(ys, vec![0, 2]);
+///
+/// let mut ys = vec![100, 200];
+/// limbs_slice_and_pos_neg_in_place_right(&[1, 2, 5], &mut ys);
+/// // The result is missing the most-significant limb, which is 5
+/// assert_eq!(ys, vec![0, 2]);
+/// ```
 pub fn limbs_slice_and_pos_neg_in_place_right(xs: &[u32], ys: &mut [u32]) {
     let xs_len = xs.len();
     let ys_len = ys.len();
     let x_i = limbs_trailing_zero_limbs(xs);
     let y_i = limbs_trailing_zero_limbs(ys);
+    assert!(x_i < xs_len);
+    assert!(y_i < ys_len);
     if y_i >= xs_len || x_i >= ys_len {
         limbs_set_zero(ys);
         return;
@@ -84,6 +223,35 @@ pub fn limbs_slice_and_pos_neg_in_place_right(xs: &[u32], ys: &mut [u32]) {
     }
 }
 
+/// Interpreting a slice of `u32`s and a `Vec` of `u32`s as the limbs (in ascending order) of one
+/// `Integer` and the negative of another, writes the limbs of the bitwise and of the `Integer`s to
+/// the `Vec`. `xs` and `ys` may not be empty or only contain zeros.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = `xs.len()`
+///
+/// # Panics
+/// Panics if `xs` or `ys` are empty or contain only zeros.
+///
+/// # Example
+/// ```
+/// use malachite_nz::integer::logic::and::limbs_vec_and_pos_neg_in_place_right;
+///
+/// let mut ys = vec![100, 200];
+/// limbs_vec_and_pos_neg_in_place_right(&[1, 2], &mut ys);
+/// assert_eq!(ys, vec![0, 2]);
+///
+/// let mut ys = vec![100, 200];
+/// limbs_vec_and_pos_neg_in_place_right(&[1, 2, 5], &mut ys);
+/// assert_eq!(ys, vec![0, 2, 5]);
+///
+/// let mut ys = vec![1, 2, 5];
+/// limbs_vec_and_pos_neg_in_place_right(&[100, 200], &mut ys);
+/// assert_eq!(ys, vec![100, 200]);
+/// ```
 pub fn limbs_vec_and_pos_neg_in_place_right(xs: &[u32], ys: &mut Vec<u32>) {
     limbs_slice_and_pos_neg_in_place_right(xs, ys);
     let xs_len = xs.len();
@@ -108,11 +276,33 @@ fn limbs_and_neg_neg_helper(input: u32, boundary_limb_seen: &mut bool) -> u32 {
     }
 }
 
+/// Interpreting two slices of `u32`s as the limbs (in ascending order) of the negatives of two
+/// `Integer`s, returns the limbs of the bitwise and of the `Integer`s. `xs` and `ys` may not be
+/// empty or only contain zeros.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(n)
+///
+/// where n = max(`xs.len()`, `ys.len()`)
+///
+/// # Panics
+/// Panics if `xs` or `ys` are empty or contain only zeros.
+///
+/// # Example
+/// ```
+/// use malachite_nz::integer::logic::and::limbs_and_neg_neg;
+///
+/// assert_eq!(limbs_and_neg_neg(&[1, 2], &[100, 200]), vec![100, 202]);
+/// assert_eq!(limbs_and_neg_neg(&[1, 2, 5], &[100, 200]), vec![100, 202, 5]);
+/// ```
 pub fn limbs_and_neg_neg(xs: &[u32], ys: &[u32]) -> Vec<u32> {
     let xs_len = xs.len();
     let ys_len = ys.len();
     let x_i = limbs_trailing_zero_limbs(xs);
     let y_i = limbs_trailing_zero_limbs(ys);
+    assert!(x_i < xs_len);
+    assert!(y_i < ys_len);
     if y_i >= xs_len {
         return ys.to_vec();
     } else if x_i >= ys_len {
@@ -160,12 +350,131 @@ pub fn limbs_and_neg_neg(xs: &[u32], ys: &[u32]) -> Vec<u32> {
     result_limbs
 }
 
+/// Interpreting two slices of `u32`s as the limbs (in ascending order) of the negatives of two
+/// `Integer`s, writes the max(`xs.len()`, `ys.len()`) limbs of the bitwise and of the `Integer`s to
+/// an output slice. `xs` and `ys` may not be empty or only contain zeros. Returns whether the
+/// least-significant max(`xs.len()`, `ys.len()`) limbs of the output are not all zero. The output
+/// slice must be at least as long as the longer input slice.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = max(`xs.len()`, `ys.len()`)
+///
+/// # Panics
+/// Panics if `xs` or `ys` are empty or contain only zeros, or if `out_limbs` is shorter than the
+/// longer of `xs` and `ys`.
+///
+/// # Example
+/// ```
+/// use malachite_nz::integer::logic::and::limbs_and_neg_neg_to_out;
+///
+/// let mut result = vec![0, 0];
+/// assert_eq!(limbs_and_neg_neg_to_out(&mut result, &[1, 2], &[100, 200]), true);
+/// assert_eq!(result, vec![100, 202]);
+///
+/// let mut result = vec![10, 10, 10, 10];
+/// assert_eq!(limbs_and_neg_neg_to_out(&mut result, &[1, 2, 5], &[100, 200]), true);
+/// assert_eq!(result, vec![100, 202, 5, 10]);
+/// ```
+pub fn limbs_and_neg_neg_to_out(out_limbs: &mut [u32], xs: &[u32], ys: &[u32]) -> bool {
+    let xs_len = xs.len();
+    let ys_len = ys.len();
+    let x_i = limbs_trailing_zero_limbs(xs);
+    let y_i = limbs_trailing_zero_limbs(ys);
+    assert!(x_i < xs_len);
+    assert!(y_i < ys_len);
+    if y_i >= xs_len {
+        out_limbs[0..ys_len].copy_from_slice(ys);
+        if xs_len > ys_len {
+            limbs_set_zero(&mut out_limbs[ys_len..xs_len]);
+        }
+        return true;
+    } else if x_i >= ys_len {
+        out_limbs[0..xs_len].copy_from_slice(xs);
+        if ys_len > xs_len {
+            limbs_set_zero(&mut out_limbs[xs_len..ys_len]);
+        }
+        return true;
+    }
+    let max_i = max(x_i, y_i);
+    limbs_set_zero(&mut out_limbs[0..max_i]);
+    let x = if x_i >= y_i {
+        xs[max_i].wrapping_sub(1)
+    } else {
+        xs[max_i]
+    };
+    let y = if x_i <= y_i {
+        ys[max_i].wrapping_sub(1)
+    } else {
+        ys[max_i]
+    };
+    let mut boundary_limb_seen = false;
+    out_limbs[max_i] = limbs_and_neg_neg_helper(x | y, &mut boundary_limb_seen);
+    let xys = xs[max_i + 1..].iter().zip(ys[max_i + 1..].iter());
+    if boundary_limb_seen {
+        for (z, (x, y)) in out_limbs[max_i + 1..].iter_mut().zip(xys) {
+            *z = x | y;
+        }
+    } else {
+        for (z, (x, y)) in out_limbs[max_i + 1..].iter_mut().zip(xys) {
+            *z = limbs_and_neg_neg_helper(x | y, &mut boundary_limb_seen);
+        }
+    }
+    let (xs, xs_len, ys_len) = if xs_len >= ys_len {
+        (xs, xs_len, ys_len)
+    } else {
+        (ys, ys_len, xs_len)
+    };
+    if xs_len != ys_len {
+        let zs = &xs[ys_len..];
+        if boundary_limb_seen {
+            out_limbs[ys_len..xs_len].copy_from_slice(zs);
+        } else {
+            for (z_out, &z_in) in out_limbs[ys_len..xs_len].iter_mut().zip(zs.iter()) {
+                *z_out = limbs_and_neg_neg_helper(z_in, &mut boundary_limb_seen);
+            }
+        }
+    }
+    boundary_limb_seen
+}
+
+/// Interpreting two slices of `u32`s as the limbs (in ascending order) of the negatives of two
+/// `Integer`s, writes the lower `xs.len()` limbs of the bitwise and of the `Integer`s to the first
+/// (left) slice. `xs` and `ys` may not be empty or only contain zeros, and `xs` must be at least as
+/// long as `ys`. Returns whether the least-significant `xs.len()` limbs of the output are not all
+/// zero.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = `xs.len()`
+///
+/// # Panics
+/// Panics if `xs` or `ys` are empty or contain only zeros, or if `xs` is shorter than `ys`.
+///
+/// # Example
+/// ```
+/// use malachite_nz::integer::logic::and::limbs_slice_and_neg_neg_in_place_left;
+///
+/// let mut xs = vec![1, 2];
+/// assert_eq!(limbs_slice_and_neg_neg_in_place_left(&mut xs, &[100, 200]), true);
+/// assert_eq!(xs, vec![100, 202]);
+///
+/// let mut xs = vec![1, 2, 5];
+/// assert_eq!(limbs_slice_and_neg_neg_in_place_left(&mut xs, &[100, 200]), true);
+/// assert_eq!(xs, vec![100, 202, 5]);
+/// ```
 pub fn limbs_slice_and_neg_neg_in_place_left(xs: &mut [u32], ys: &[u32]) -> bool {
     let xs_len = xs.len();
     let ys_len = ys.len();
     assert!(xs_len >= ys_len);
     let x_i = limbs_trailing_zero_limbs(xs);
     let y_i = limbs_trailing_zero_limbs(ys);
+    assert!(x_i < xs_len);
+    assert!(y_i < ys_len);
     if x_i >= ys_len {
         return true;
     }
@@ -205,10 +514,40 @@ pub fn limbs_slice_and_neg_neg_in_place_left(xs: &mut [u32], ys: &[u32]) -> bool
     boundary_limb_seen
 }
 
+/// Interpreting a slice of `u32`s and a `Vec` of `u32`s as the limbs (in ascending order) of the
+/// negatives of two `Integer`s, writes the limbs of the bitwise and of the `Integer`s to the `Vec`.
+/// `xs` and `ys` may not be empty or only contain zeros.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(n)
+///
+/// where n = max(`xs.len()`, `ys.len()`)
+///
+/// # Panics
+/// Panics if `xs` or `ys` are empty or contain only zeros.
+///
+/// # Example
+/// ```
+/// use malachite_nz::integer::logic::and::limbs_vec_and_neg_neg_in_place_left;
+///
+/// let mut xs = vec![1, 2];
+/// limbs_vec_and_neg_neg_in_place_left(&mut xs, &[100, 200]);
+/// assert_eq!(xs, vec![100, 202]);
+///
+/// let mut xs = vec![100, 200];
+/// limbs_vec_and_neg_neg_in_place_left(&mut xs, &[1, 2, 5]);
+/// assert_eq!(xs, vec![100, 202, 5]);
+///
+/// let mut xs = vec![1, 2, 5];
+/// limbs_vec_and_neg_neg_in_place_left(&mut xs, &[100, 200]);
+/// assert_eq!(xs, vec![100, 202, 5]);
+/// ```
 pub fn limbs_vec_and_neg_neg_in_place_left(xs: &mut Vec<u32>, ys: &[u32]) {
     let xs_len = xs.len();
     let ys_len = ys.len();
     let y_i = limbs_trailing_zero_limbs(ys);
+    assert!(y_i < ys_len);
     if y_i >= xs_len {
         xs.resize(ys_len, 0);
         xs.copy_from_slice(ys);
@@ -233,6 +572,44 @@ pub fn limbs_vec_and_neg_neg_in_place_left(xs: &mut Vec<u32>, ys: &[u32]) {
     }
 }
 
+/// Interpreting two slices of `u32`s as the limbs (in ascending order) of the negatives of two
+/// `Integer`s, writes the lower max(`xs.len()`, `ys.len()`) limbs of the bitwise and to the longer
+/// slice (or the first one, if they are equally long). `xs` and `ys` may not be empty or only
+/// contain zeros. Returns a pair of `bool`s. The first is `false` when the output is to the first
+/// slice and `true` when it's to the second slice, and the second is whether the least-significant
+/// max(`xs.len()`, `ys.len()`) limbs of the output are not all zero.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = max(`xs.len()`, `ys.len()`)
+///
+/// # Panics
+/// Panics if `xs` or `ys` are empty or contain only zeros.
+///
+/// # Example
+/// ```
+/// use malachite_nz::integer::logic::and::limbs_slice_and_neg_neg_in_place_either;
+///
+/// let mut xs = vec![1, 2];
+/// let mut ys = vec![100, 200];
+/// assert_eq!(limbs_slice_and_neg_neg_in_place_either(&mut xs, &mut ys), (false, true));
+/// assert_eq!(xs, vec![100, 202]);
+/// assert_eq!(ys, vec![100, 200]);
+///
+/// let mut xs = vec![1, 2, 5];
+/// let mut ys = vec![100, 200];
+/// assert_eq!(limbs_slice_and_neg_neg_in_place_either(&mut xs, &mut ys), (false, true));
+/// assert_eq!(xs, vec![100, 202, 5]);
+/// assert_eq!(ys, vec![100, 200]);
+///
+/// let mut xs = vec![100, 200];
+/// let mut ys = vec![1, 2, 5];
+/// assert_eq!(limbs_slice_and_neg_neg_in_place_either(&mut xs, &mut ys), (true, true));
+/// assert_eq!(xs, vec![100, 200]);
+/// assert_eq!(ys, vec![100, 202, 5]);
+/// ```
 pub fn limbs_slice_and_neg_neg_in_place_either(xs: &mut [u32], ys: &mut [u32]) -> (bool, bool) {
     if xs.len() >= ys.len() {
         (false, limbs_slice_and_neg_neg_in_place_left(xs, ys))
@@ -241,6 +618,42 @@ pub fn limbs_slice_and_neg_neg_in_place_either(xs: &mut [u32], ys: &mut [u32]) -
     }
 }
 
+/// Interpreting two `Vec`s of `u32`s as the limbs (in ascending order) of the negatives of two
+/// `Integer`s, writes the limbs of the bitwise and to the longer `Vec` (or the first one, if they
+/// are equally long). `xs` and `ys` may not be empty or only contain zeros. Returns a `bool` which
+/// is `false` when the output is to the first slice and `true` when it's to the second slice.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = max(`xs.len()`, `ys.len()`)
+///
+/// # Panics
+/// Panics if `xs` or `ys` are empty or contain only zeros.
+///
+/// # Example
+/// ```
+/// use malachite_nz::integer::logic::and::limbs_vec_and_neg_neg_in_place_either;
+///
+/// let mut xs = vec![1, 2];
+/// let mut ys = vec![100, 200];
+/// assert_eq!(limbs_vec_and_neg_neg_in_place_either(&mut xs, &mut ys), false);
+/// assert_eq!(xs, vec![100, 202]);
+/// assert_eq!(ys, vec![100, 200]);
+///
+/// let mut xs = vec![1, 2, 5];
+/// let mut ys = vec![100, 200];
+/// assert_eq!(limbs_vec_and_neg_neg_in_place_either(&mut xs, &mut ys), false);
+/// assert_eq!(xs, vec![100, 202, 5]);
+/// assert_eq!(ys, vec![100, 200]);
+///
+/// let mut xs = vec![100, 200];
+/// let mut ys = vec![1, 2, 5];
+/// assert_eq!(limbs_vec_and_neg_neg_in_place_either(&mut xs, &mut ys), true);
+/// assert_eq!(xs, vec![100, 200]);
+/// assert_eq!(ys, vec![100, 202, 5]);
+/// ```
 pub fn limbs_vec_and_neg_neg_in_place_either(xs: &mut Vec<u32>, ys: &mut Vec<u32>) -> bool {
     if xs.len() >= ys.len() {
         limbs_vec_and_neg_neg_in_place_left(xs, ys);

@@ -2,7 +2,7 @@ use common::test_properties;
 use malachite_base::misc::CheckedFrom;
 use malachite_base::num::{NegativeOne, Zero};
 use malachite_nz::integer::logic::and_i32::{
-    limbs_slice_neg_and_limb_neg, limbs_slice_neg_and_limb_neg_in_place,
+    limbs_slice_neg_and_limb_neg_in_place, limbs_slice_neg_and_limb_neg_to_out,
     limbs_vec_neg_and_limb_neg, limbs_vec_neg_and_limb_neg_in_place,
 };
 use malachite_nz::integer::Integer;
@@ -19,12 +19,29 @@ use std::str::FromStr;
 use std::u32;
 
 #[test]
-fn test_limbs_slice_neg_and_limb_neg() {
+fn test_limbs_vec_neg_and_limb_neg() {
+    let test = |limbs: &[u32], limb: u32, out_limbs: &[u32]| {
+        assert_eq!(limbs_vec_neg_and_limb_neg(limbs, limb), out_limbs);
+    };
+    test(&[0, 2], 3, &[0, 2]);
+    test(&[1, 1], 3, &[4294967293, 1]);
+    test(&[0xffff_fffe, 1], 1, &[0, 2]);
+    test(&[0xffff_fffe, 0xffff_ffff], 1, &[0, 0, 1]);
+}
+
+#[test]
+#[should_panic(expected = "index out of bounds: the len is 0 but the index is 0")]
+fn limbs_vec_neg_and_limb_neg_fail() {
+    limbs_vec_neg_and_limb_neg(&[], 10);
+}
+
+#[test]
+fn test_limbs_slice_neg_and_limb_neg_to_out() {
     let test =
         |out_limbs_before: &[u32], in_limbs: &[u32], limb: u32, carry, out_limbs_after: &[u32]| {
             let mut out_limbs = out_limbs_before.to_vec();
             assert_eq!(
-                limbs_slice_neg_and_limb_neg(&mut out_limbs, in_limbs, limb),
+                limbs_slice_neg_and_limb_neg_to_out(&mut out_limbs, in_limbs, limb),
                 carry
             );
             assert_eq!(out_limbs, out_limbs_after);
@@ -45,31 +62,14 @@ fn test_limbs_slice_neg_and_limb_neg() {
 
 #[test]
 #[should_panic(expected = "assertion failed: out_limbs.len() >= in_limbs.len()")]
-fn limbs_slice_neg_and_limb_neg_fail_1() {
-    limbs_slice_neg_and_limb_neg(&mut [1, 2, 3], &[1, 2, 3, 4], 10);
+fn limbs_slice_neg_and_limb_neg_to_out_fail_1() {
+    limbs_slice_neg_and_limb_neg_to_out(&mut [1, 2, 3], &[1, 2, 3, 4], 10);
 }
 
 #[test]
 #[should_panic(expected = "index out of bounds: the len is 0 but the index is 0")]
-fn limbs_slice_neg_and_limb_neg_fail_2() {
-    limbs_slice_neg_and_limb_neg(&mut [1, 2, 3], &[], 10);
-}
-
-#[test]
-fn test_limbs_vec_neg_and_limb_neg() {
-    let test = |limbs: &[u32], limb: u32, out_limbs: &[u32]| {
-        assert_eq!(limbs_vec_neg_and_limb_neg(limbs, limb), out_limbs);
-    };
-    test(&[0, 2], 3, &[0, 2]);
-    test(&[1, 1], 3, &[4294967293, 1]);
-    test(&[0xffff_fffe, 1], 1, &[0, 2]);
-    test(&[0xffff_fffe, 0xffff_ffff], 1, &[0, 0, 1]);
-}
-
-#[test]
-#[should_panic(expected = "index out of bounds: the len is 0 but the index is 0")]
-fn limbs_vec_neg_and_limb_neg_fail() {
-    limbs_vec_neg_and_limb_neg(&[], 10);
+fn limbs_slice_neg_and_limb_neg_to_out_fail_2() {
+    limbs_slice_neg_and_limb_neg_to_out(&mut [1, 2, 3], &[], 10);
 }
 
 #[test]
@@ -190,13 +190,13 @@ fn test_and_i32() {
 }
 
 #[test]
-fn limbs_slice_neg_and_limb_neg_properties() {
+fn limbs_slice_neg_and_limb_neg_to_out_properties() {
     test_properties(
         triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_1,
         |&(ref out_limbs, ref in_limbs, limb)| {
             let mut out_limbs = out_limbs.to_vec();
             let old_out_limbs = out_limbs.clone();
-            let carry = limbs_slice_neg_and_limb_neg(&mut out_limbs, in_limbs, limb);
+            let carry = limbs_slice_neg_and_limb_neg_to_out(&mut out_limbs, in_limbs, limb);
             let n = -Natural::from_limbs_asc(in_limbs)
                 & Integer::from_owned_twos_complement_limbs_asc(vec![limb, u32::MAX]);
             let len = in_limbs.len();
