@@ -956,9 +956,23 @@ fn triples_of_unsigned_vec_unsigned_vec_and_unsigned<T: 'static + PrimitiveUnsig
     }
 }
 
-// All triples of `Vec<u32>`, `Vec<u32>`, and `u32` where the first `Vec` is at least as long as the
-// second and the second doesn't only contain zeros.
+// All triples of `Vec<T>`, `Vec<T>`, and `T` where `T` is unsigned, the first `Vec` is at least as
+// long as the second, and the second is nonempty.
 pub fn triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_1(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (Vec<u32>, Vec<u32>, u32)>> {
+    Box::new(
+        triples_of_unsigned_vec_unsigned_vec_and_unsigned(gm).filter(
+            |&(ref out_limbs, ref in_limbs, _)| {
+                !in_limbs.is_empty() && out_limbs.len() >= in_limbs.len()
+            },
+        ),
+    )
+}
+
+// All triples of `Vec<u32>`, `Vec<u32>`, and `u32` where the first `Vec` is at least as long as the
+// second, and the second doesn't only contain zeros.
+pub fn triples_of_u32_vec_u32_vec_and_u32_var_2(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (Vec<u32>, Vec<u32>, u32)>> {
     Box::new(

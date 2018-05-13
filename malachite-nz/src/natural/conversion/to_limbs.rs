@@ -209,9 +209,9 @@ impl Natural {
     ///
     /// fn main() {
     ///     assert!(Natural::ZERO.to_limbs_asc().is_empty());
-    ///     assert_eq!(Natural::from(123u32).to_limbs_asc(), vec![123]);
+    ///     assert_eq!(Natural::from(123u32).to_limbs_asc(), &[123]);
     ///     // 10^12 = 232 * 2^32 + 3567587328
-    ///     assert_eq!(Natural::trillion().to_limbs_asc(), vec![3567587328, 232]);
+    ///     assert_eq!(Natural::trillion().to_limbs_asc(), &[3567587328, 232]);
     /// }
     /// ```
     pub fn to_limbs_asc(&self) -> Vec<u32> {
@@ -247,9 +247,9 @@ impl Natural {
     ///
     /// fn main() {
     ///     assert!(Natural::ZERO.to_limbs_desc().is_empty());
-    ///     assert_eq!(Natural::from(123u32).to_limbs_desc(), vec![123]);
+    ///     assert_eq!(Natural::from(123u32).to_limbs_desc(), &[123]);
     ///     // 10^12 = 232 * 2^32 + 3567587328
-    ///     assert_eq!(Natural::trillion().to_limbs_desc(), vec![232, 3567587328]);
+    ///     assert_eq!(Natural::trillion().to_limbs_desc(), &[232, 3567587328]);
     /// }
     /// ```
     pub fn to_limbs_desc(&self) -> Vec<u32> {
@@ -283,9 +283,9 @@ impl Natural {
     ///
     /// fn main() {
     ///     assert!(Natural::ZERO.into_limbs_asc().is_empty());
-    ///     assert_eq!(Natural::from(123u32).into_limbs_asc(), vec![123]);
+    ///     assert_eq!(Natural::from(123u32).into_limbs_asc(), &[123]);
     ///     // 10^12 = 232 * 2^32 + 3567587328
-    ///     assert_eq!(Natural::trillion().into_limbs_asc(), vec![3567587328, 232]);
+    ///     assert_eq!(Natural::trillion().into_limbs_asc(), &[3567587328, 232]);
     /// }
     /// ```
     pub fn into_limbs_asc(self) -> Vec<u32> {
@@ -321,9 +321,9 @@ impl Natural {
     ///
     /// fn main() {
     ///     assert!(Natural::ZERO.into_limbs_desc().is_empty());
-    ///     assert_eq!(Natural::from(123u32).into_limbs_desc(), vec![123]);
+    ///     assert_eq!(Natural::from(123u32).into_limbs_desc(), &[123]);
     ///     // 10^12 = 232 * 2^32 + 3567587328
-    ///     assert_eq!(Natural::trillion().into_limbs_desc(), vec![232, 3567587328]);
+    ///     assert_eq!(Natural::trillion().into_limbs_desc(), &[232, 3567587328]);
     /// }
     /// ```
     pub fn into_limbs_desc(self) -> Vec<u32> {
@@ -358,16 +358,15 @@ impl Natural {
     ///
     /// fn main() {
     ///     assert!(Natural::ZERO.limbs().next().is_none());
-    ///     assert_eq!(Natural::from(123u32).limbs().collect::<Vec<u32>>(), vec![123]);
+    ///     assert_eq!(Natural::from(123u32).limbs().collect::<Vec<u32>>(), &[123]);
     ///     // 10^12 = 232 * 2^32 + 3567587328
-    ///     assert_eq!(Natural::trillion().limbs().collect::<Vec<u32>>(),
-    ///         vec![3567587328, 232]);
+    ///     assert_eq!(Natural::trillion().limbs().collect::<Vec<u32>>(), &[3567587328, 232]);
     ///
     ///     assert!(Natural::ZERO.limbs().rev().next().is_none());
-    ///     assert_eq!(Natural::from(123u32).limbs().rev().collect::<Vec<u32>>(), vec![123]);
+    ///     assert_eq!(Natural::from(123u32).limbs().rev().collect::<Vec<u32>>(), &[123]);
     ///     // 10^12 = 232 * 2^32 + 3567587328
     ///     assert_eq!(Natural::trillion().limbs().rev().collect::<Vec<u32>>(),
-    ///         vec![232, 3567587328]);
+    ///         &[232, 3567587328]);
     /// }
     /// ```
     pub fn limbs(&self) -> LimbIterator {

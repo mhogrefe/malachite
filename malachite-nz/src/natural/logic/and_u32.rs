@@ -2,6 +2,27 @@ use malachite_base::misc::WrappingFrom;
 use natural::Natural::{self, Small};
 use std::ops::{BitAnd, BitAndAssign};
 
+/// Interpreting a slice of `u32`s as the limbs (in ascending order) of a `Natural`s, returns the
+/// bitwise and of the `Natural` and a `u32`. The slice cannot be empty.
+///
+/// Time: worst case O(1)
+///
+/// Additional memory: worst case O(1)
+///
+/// # Panics
+/// Panics if `limbs` is empty.
+///
+/// # Example
+/// ```
+/// use malachite_nz::natural::logic::and_u32::limbs_and_limb;
+///
+/// assert_eq!(limbs_and_limb(&[6, 7], 2), 2);
+/// assert_eq!(limbs_and_limb(&[100, 101, 102], 10), 0);
+/// ```
+pub fn limbs_and_limb(limbs: &[u32], limb: u32) -> u32 {
+    limbs[0] & limb
+}
+
 /// Takes the bitwise and of a `Natural` and a `u32`, taking the `Natural` by reference. The output
 /// is a `u32`.
 ///

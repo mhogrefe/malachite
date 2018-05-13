@@ -419,12 +419,12 @@ impl Integer {
     ///
     /// fn main() {
     ///     assert!(Integer::ZERO.to_twos_complement_limbs_asc().is_empty());
-    ///     assert_eq!(Integer::from(123).to_twos_complement_limbs_asc(), vec![123]);
-    ///     assert_eq!(Integer::from(-123).to_twos_complement_limbs_asc(), vec![4294967173]);
+    ///     assert_eq!(Integer::from(123).to_twos_complement_limbs_asc(), &[123]);
+    ///     assert_eq!(Integer::from(-123).to_twos_complement_limbs_asc(), &[4294967173]);
     ///     // 10^12 = 232 * 2^32 + 3567587328
-    ///     assert_eq!(Integer::trillion().to_twos_complement_limbs_asc(), vec![3567587328, 232]);
+    ///     assert_eq!(Integer::trillion().to_twos_complement_limbs_asc(), &[3567587328, 232]);
     ///     assert_eq!((-Integer::trillion()).to_twos_complement_limbs_asc(),
-    ///         vec![727379968, 4294967063]);
+    ///         &[727379968, 4294967063]);
     /// }
     /// ```
     pub fn to_twos_complement_limbs_asc(&self) -> Vec<u32> {
@@ -468,12 +468,12 @@ impl Integer {
     ///
     /// fn main() {
     ///     assert!(Integer::ZERO.to_twos_complement_limbs_desc().is_empty());
-    ///     assert_eq!(Integer::from(123).to_twos_complement_limbs_desc(), vec![123]);
-    ///     assert_eq!(Integer::from(-123).to_twos_complement_limbs_desc(), vec![4294967173]);
+    ///     assert_eq!(Integer::from(123).to_twos_complement_limbs_desc(), &[123]);
+    ///     assert_eq!(Integer::from(-123).to_twos_complement_limbs_desc(), &[4294967173]);
     ///     // 10^12 = 232 * 2^32 + 3567587328
-    ///     assert_eq!(Integer::trillion().to_twos_complement_limbs_desc(), vec![232, 3567587328]);
+    ///     assert_eq!(Integer::trillion().to_twos_complement_limbs_desc(), &[232, 3567587328]);
     ///     assert_eq!((-Integer::trillion()).to_twos_complement_limbs_desc(),
-    ///         vec![4294967063, 727379968]);
+    ///         &[4294967063, 727379968]);
     /// }
     pub fn to_twos_complement_limbs_desc(&self) -> Vec<u32> {
         let mut limbs = self.to_twos_complement_limbs_asc();
@@ -510,12 +510,12 @@ impl Integer {
     ///
     /// fn main() {
     ///     assert!(Integer::ZERO.into_twos_complement_limbs_asc().is_empty());
-    ///     assert_eq!(Integer::from(123).into_twos_complement_limbs_asc(), vec![123]);
-    ///     assert_eq!(Integer::from(-123).into_twos_complement_limbs_asc(), vec![4294967173]);
+    ///     assert_eq!(Integer::from(123).into_twos_complement_limbs_asc(), &[123]);
+    ///     assert_eq!(Integer::from(-123).into_twos_complement_limbs_asc(), &[4294967173]);
     ///     // 10^12 = 232 * 2^32 + 3567587328
-    ///     assert_eq!(Integer::trillion().into_twos_complement_limbs_asc(), vec![3567587328, 232]);
+    ///     assert_eq!(Integer::trillion().into_twos_complement_limbs_asc(), &[3567587328, 232]);
     ///     assert_eq!((-Integer::trillion()).into_twos_complement_limbs_asc(),
-    ///         vec![727379968, 4294967063]);
+    ///         &[727379968, 4294967063]);
     /// }
     /// ```
     pub fn into_twos_complement_limbs_asc(self) -> Vec<u32> {
@@ -559,13 +559,13 @@ impl Integer {
     ///
     /// fn main() {
     ///     assert!(Integer::ZERO.into_twos_complement_limbs_desc().is_empty());
-    ///     assert_eq!(Integer::from(123).into_twos_complement_limbs_desc(), vec![123]);
-    ///     assert_eq!(Integer::from(-123).into_twos_complement_limbs_desc(), vec![4294967173]);
+    ///     assert_eq!(Integer::from(123).into_twos_complement_limbs_desc(), &[123]);
+    ///     assert_eq!(Integer::from(-123).into_twos_complement_limbs_desc(), &[4294967173]);
     ///     // 10^12 = 232 * 2^32 + 3567587328
     ///     assert_eq!(Integer::trillion().into_twos_complement_limbs_desc(),
-    ///         vec![232, 3567587328]);
+    ///         &[232, 3567587328]);
     ///     assert_eq!((-Integer::trillion()).into_twos_complement_limbs_desc(),
-    ///         vec![4294967063, 727379968]);
+    ///         &[4294967063, 727379968]);
     /// }
     pub fn into_twos_complement_limbs_desc(self) -> Vec<u32> {
         let mut limbs = self.into_twos_complement_limbs_asc();
@@ -596,37 +596,37 @@ impl Integer {
     ///
     /// fn main() {
     ///     assert!(Integer::ZERO.twos_complement_limbs().next().is_none());
-    ///     assert_eq!(Integer::from(123).twos_complement_limbs().collect::<Vec<u32>>(), vec![123]);
+    ///     assert_eq!(Integer::from(123).twos_complement_limbs().collect::<Vec<u32>>(), &[123]);
     ///     assert_eq!(Integer::from(-123).twos_complement_limbs().collect::<Vec<u32>>(),
-    ///         vec![4294967173]);
+    ///         &[4294967173]);
     ///     // 10^12 = 232 * 2^32 + 3567587328
     ///     assert_eq!(Integer::trillion().twos_complement_limbs().collect::<Vec<u32>>(),
-    ///         vec![3567587328, 232]);
+    ///         &[3567587328, 232]);
     ///     // Sign-extension for a non-negative `Integer`
     ///     assert_eq!(Integer::from(0xffff_ffffu32).twos_complement_limbs().collect::<Vec<u32>>(),
-    ///         vec![0xffff_ffff, 0]);
+    ///         &[0xffff_ffff, 0]);
     ///     assert_eq!((-Integer::trillion()).twos_complement_limbs().collect::<Vec<u32>>(),
-    ///         vec![727379968, 4294967063]);
+    ///         &[727379968, 4294967063]);
     ///     // Sign-extension for a negative `Integer`
     ///     assert_eq!((-Integer::from(0xffff_ffffu32)).twos_complement_limbs()
-    ///         .collect::<Vec<u32>>(), vec![1, 0xffff_ffff]);
+    ///         .collect::<Vec<u32>>(), &[1, 0xffff_ffff]);
     ///
     ///     assert!(Integer::ZERO.twos_complement_limbs().rev().next().is_none());
     ///     assert_eq!(Integer::from(123).twos_complement_limbs().rev().collect::<Vec<u32>>(),
-    ///         vec![123]);
+    ///         &[123]);
     ///     assert_eq!(Integer::from(-123).twos_complement_limbs().rev().collect::<Vec<u32>>(),
-    ///         vec![4294967173]);
+    ///         &[4294967173]);
     ///     // 10^12 = 232 * 2^32 + 3567587328
     ///     assert_eq!(Integer::trillion().twos_complement_limbs().rev().collect::<Vec<u32>>(),
-    ///         vec![232, 3567587328]);
+    ///         &[232, 3567587328]);
     ///     // Sign-extension for a non-negative `Integer`
     ///     assert_eq!(Integer::from(0xffff_ffffu32).twos_complement_limbs().rev()
-    ///         .collect::<Vec<u32>>(), vec![0, 0xffff_ffff]);
+    ///         .collect::<Vec<u32>>(), &[0, 0xffff_ffff]);
     ///     assert_eq!((-Integer::trillion()).twos_complement_limbs().rev().collect::<Vec<u32>>(),
-    ///         vec![4294967063, 727379968]);
+    ///         &[4294967063, 727379968]);
     ///     // Sign-extension for a negative `Integer`
     ///     assert_eq!((-Integer::from(0xffff_ffffu32)).twos_complement_limbs().rev()
-    ///         .collect::<Vec<u32>>(), vec![0xffff_ffff, 1]);
+    ///         .collect::<Vec<u32>>(), &[0xffff_ffff, 1]);
     /// }
     /// ```
     pub fn twos_complement_limbs(&self) -> TwosComplementLimbIterator {

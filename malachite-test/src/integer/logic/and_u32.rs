@@ -55,7 +55,7 @@ fn demo_integer_and_u32(gm: GenerationMode, limit: usize) {
 
 fn demo_u32_and_integer(gm: GenerationMode, limit: usize) {
     for (u, n) in pairs_of_unsigned_and_integer::<u32>(gm).take(limit) {
-        println!("{} + &{} = {}", u, n, u & &n);
+        println!("{} & &{} = {}", u, n, u & &n);
     }
 }
 

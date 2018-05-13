@@ -17,8 +17,8 @@ use std::ops::{BitAnd, BitAndAssign};
 /// ```
 /// use malachite_nz::natural::logic::and::limbs_and;
 ///
-/// assert_eq!(limbs_and(&[6, 7], &[1, 2, 3]), vec![0, 2]);
-/// assert_eq!(limbs_and(&[100, 101, 102], &[102, 101, 100]), vec![100, 101, 100]);
+/// assert_eq!(limbs_and(&[6, 7], &[1, 2, 3]), &[0, 2]);
+/// assert_eq!(limbs_and(&[100, 101, 102], &[102, 101, 100]), &[100, 101, 100]);
 /// ```
 pub fn limbs_and(xs: &[u32], ys: &[u32]) -> Vec<u32> {
     xs.iter().zip(ys.iter()).map(|(x, y)| x & y).collect()
@@ -49,11 +49,11 @@ fn limbs_and_same_length_to_out_no_check(out_limbs: &mut [u32], xs: &[u32], ys: 
 ///
 /// let mut out = vec![10, 10, 10, 10];
 /// limbs_and_same_length_to_out(&mut out, &[6, 7], &[1, 2]);
-/// assert_eq!(out, vec![0, 2, 10, 10]);
+/// assert_eq!(out, &[0, 2, 10, 10]);
 ///
 /// let mut out = vec![10, 10, 10, 10];
 /// limbs_and_same_length_to_out(&mut out, &[100, 101, 102], &[102, 101, 100]);
-/// assert_eq!(out, vec![100, 101, 100, 10]);
+/// assert_eq!(out, &[100, 101, 100, 10]);
 /// ```
 pub fn limbs_and_same_length_to_out(out_limbs: &mut [u32], xs: &[u32], ys: &[u32]) {
     let len = xs.len();
@@ -81,11 +81,11 @@ pub fn limbs_and_same_length_to_out(out_limbs: &mut [u32], xs: &[u32], ys: &[u32
 ///
 /// let mut out = vec![10, 10, 10, 10];
 /// limbs_and_to_out(&mut out, &[6, 7], &[1, 2, 3]);
-/// assert_eq!(out, vec![0, 2, 0, 10]);
+/// assert_eq!(out, &[0, 2, 0, 10]);
 ///
 /// let mut out = vec![10, 10, 10, 10];
 /// limbs_and_to_out(&mut out, &[100, 101, 102], &[102, 101, 100]);
-/// assert_eq!(out, vec![100, 101, 100, 10]);
+/// assert_eq!(out, &[100, 101, 100, 10]);
 /// ```
 pub fn limbs_and_to_out(out_limbs: &mut [u32], xs: &[u32], ys: &[u32]) {
     let xs_len = xs.len();
@@ -125,11 +125,11 @@ fn limbs_and_same_length_in_place_left_no_check(xs: &mut [u32], ys: &[u32]) {
 ///
 /// let mut xs = vec![6, 7];
 /// limbs_and_same_length_in_place_left(&mut xs, &[1, 2]);
-/// assert_eq!(xs, vec![0, 2]);
+/// assert_eq!(xs, &[0, 2]);
 ///
 /// let mut xs = vec![100, 101, 102];
 /// limbs_and_same_length_in_place_left(&mut xs, &[102, 101, 100]);
-/// assert_eq!(xs, vec![100, 101, 100]);
+/// assert_eq!(xs, &[100, 101, 100]);
 /// ```
 pub fn limbs_and_same_length_in_place_left(xs: &mut [u32], ys: &[u32]) {
     assert_eq!(xs.len(), ys.len());
@@ -155,15 +155,15 @@ pub fn limbs_and_same_length_in_place_left(xs: &mut [u32], ys: &[u32]) {
 ///
 /// let mut xs = vec![6, 7];
 /// assert_eq!(limbs_slice_and_in_place_left(&mut xs, &[1, 2, 3]), None);
-/// assert_eq!(xs, vec![0, 2]);
+/// assert_eq!(xs, &[0, 2]);
 ///
 /// let mut xs = vec![1, 2, 3];
 /// assert_eq!(limbs_slice_and_in_place_left(&mut xs, &[6, 7]), Some(2));
-/// assert_eq!(xs, vec![0, 2, 3]);
+/// assert_eq!(xs, &[0, 2, 3]);
 ///
 /// let mut xs = vec![100, 101, 102];
 /// assert_eq!(limbs_slice_and_in_place_left(&mut xs, &[102, 101, 100]), None);
-/// assert_eq!(xs, vec![100, 101, 100]);
+/// assert_eq!(xs, &[100, 101, 100]);
 /// ```
 pub fn limbs_slice_and_in_place_left(xs: &mut [u32], ys: &[u32]) -> Option<usize> {
     let xs_len = xs.len();
@@ -201,15 +201,15 @@ pub fn limbs_slice_and_in_place_left(xs: &mut [u32], ys: &[u32]) -> Option<usize
 ///
 /// let mut xs = vec![6, 7];
 /// limbs_vec_and_in_place_left(&mut xs, &[1, 2, 3]);
-/// assert_eq!(xs, vec![0, 2]);
+/// assert_eq!(xs, &[0, 2]);
 ///
 /// let mut xs = vec![1, 2, 3];
 /// limbs_vec_and_in_place_left(&mut xs, &[6, 7]);
-/// assert_eq!(xs, vec![0, 2]);
+/// assert_eq!(xs, &[0, 2]);
 ///
 /// let mut xs = vec![100, 101, 102];
 /// limbs_vec_and_in_place_left(&mut xs, &[102, 101, 100]);
-/// assert_eq!(xs, vec![100, 101, 100]);
+/// assert_eq!(xs, &[100, 101, 100]);
 /// ```
 pub fn limbs_vec_and_in_place_left(xs: &mut Vec<u32>, ys: &[u32]) {
     if let Some(truncate_size) = limbs_slice_and_in_place_left(xs, ys) {
@@ -235,20 +235,20 @@ pub fn limbs_vec_and_in_place_left(xs: &mut Vec<u32>, ys: &[u32]) {
 /// let mut xs = vec![6, 7];
 /// let mut ys = vec![1, 2, 3];
 /// assert_eq!(limbs_and_in_place_either(&mut xs, &mut ys), false);
-/// assert_eq!(xs, vec![0, 2]);
-/// assert_eq!(ys, vec![1, 2, 3]);
+/// assert_eq!(xs, &[0, 2]);
+/// assert_eq!(ys, &[1, 2, 3]);
 ///
 /// let mut xs = vec![1, 2, 3];
 /// let mut ys = vec![6, 7];
 /// assert_eq!(limbs_and_in_place_either(&mut xs, &mut ys), true);
-/// assert_eq!(xs, vec![1, 2, 3]);
-/// assert_eq!(ys, vec![0, 2]);
+/// assert_eq!(xs, &[1, 2, 3]);
+/// assert_eq!(ys, &[0, 2]);
 ///
 /// let mut xs = vec![100, 101, 102];
 /// let mut ys = vec![102, 101, 100];
 /// assert_eq!(limbs_and_in_place_either(&mut xs, &mut ys), false);
-/// assert_eq!(xs, vec![100, 101, 100]);
-/// assert_eq!(ys, vec![102, 101, 100]);
+/// assert_eq!(xs, &[100, 101, 100]);
+/// assert_eq!(ys, &[102, 101, 100]);
 /// ```
 pub fn limbs_and_in_place_either(xs: &mut [u32], ys: &mut [u32]) -> bool {
     let xs_len = xs.len();

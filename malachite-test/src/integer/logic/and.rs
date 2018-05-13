@@ -37,7 +37,6 @@ pub fn integer_and_alt_1(x: &Integer, y: &Integer) -> Integer {
     for (b, c) in bit_zip {
         and_bits.push(b && c);
     }
-    and_bits.push(x_negative && y_negative);
     Integer::from_twos_complement_bits_asc(&and_bits)
 }
 
@@ -61,7 +60,6 @@ pub fn integer_and_alt_2(x: &Integer, y: &Integer) -> Integer {
     for (x, y) in limb_zip {
         and_limbs.push(x & y);
     }
-    and_limbs.push(x_extension & y_extension);
     Integer::from_owned_twos_complement_limbs_asc(and_limbs)
 }
 

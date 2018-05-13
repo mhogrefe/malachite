@@ -9,8 +9,7 @@ use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_test::common::{integer_to_rug_integer, rug_integer_to_integer};
 use malachite_test::inputs::base::{
-    pairs_of_u32_vec_and_u32_var_1, signeds,
-    triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_1,
+    pairs_of_u32_vec_and_u32_var_1, signeds, triples_of_u32_vec_u32_vec_and_u32_var_2,
 };
 use malachite_test::inputs::integer::{integers, pairs_of_integer_and_signed};
 use malachite_test::integer::logic::and_i32::{integer_and_i32_alt_1, integer_and_i32_alt_2};
@@ -190,9 +189,22 @@ fn test_and_i32() {
 }
 
 #[test]
+fn limbs_vec_neg_and_limb_neg_properties() {
+    test_properties(pairs_of_u32_vec_and_u32_var_1, |&(ref limbs, limb)| {
+        let limbs_out = limbs_vec_neg_and_limb_neg(limbs, limb);
+        let n = -Natural::from_limbs_asc(limbs)
+            & Integer::from_owned_twos_complement_limbs_asc(vec![limb, u32::MAX]);
+        assert_eq!(
+            Natural::from_owned_limbs_asc(limbs_out),
+            Natural::checked_from(-n).unwrap()
+        );
+    });
+}
+
+#[test]
 fn limbs_slice_neg_and_limb_neg_to_out_properties() {
     test_properties(
-        triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_1,
+        triples_of_u32_vec_u32_vec_and_u32_var_2,
         |&(ref out_limbs, ref in_limbs, limb)| {
             let mut out_limbs = out_limbs.to_vec();
             let old_out_limbs = out_limbs.clone();
@@ -207,19 +219,6 @@ fn limbs_slice_neg_and_limb_neg_to_out_properties() {
             assert_eq!(&out_limbs[len..], &old_out_limbs[len..]);
         },
     );
-}
-
-#[test]
-fn limbs_vec_neg_and_limb_neg_properties() {
-    test_properties(pairs_of_u32_vec_and_u32_var_1, |&(ref limbs, limb)| {
-        let limbs_out = limbs_vec_neg_and_limb_neg(limbs, limb);
-        let n = -Natural::from_limbs_asc(limbs)
-            & Integer::from_owned_twos_complement_limbs_asc(vec![limb, u32::MAX]);
-        assert_eq!(
-            Natural::from_owned_limbs_asc(limbs_out),
-            Natural::checked_from(-n).unwrap()
-        );
-    });
 }
 
 #[test]

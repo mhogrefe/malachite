@@ -1,8 +1,9 @@
 use common::test_properties;
 use malachite_base::num::Zero;
+use malachite_nz::natural::logic::and_u32::limbs_and_limb;
 use malachite_nz::natural::Natural;
 use malachite_test::common::{natural_to_biguint, natural_to_rug_integer, rug_integer_to_natural};
-use malachite_test::inputs::base::unsigneds;
+use malachite_test::inputs::base::{pairs_of_nonempty_unsigned_vec_and_unsigned, unsigneds};
 use malachite_test::inputs::natural::{naturals, pairs_of_natural_and_unsigned};
 use malachite_test::natural::logic::and_u32::{
     natural_and_u32_alt_1, natural_and_u32_alt_2, num_and_u32,
@@ -10,6 +11,21 @@ use malachite_test::natural::logic::and_u32::{
 use num::BigUint;
 use rug::{self, Assign};
 use std::str::FromStr;
+
+#[test]
+fn test_limbs_and_limb() {
+    let test = |limbs: &[u32], limb: u32, out: u32| {
+        assert_eq!(limbs_and_limb(limbs, limb), out);
+    };
+    test(&[6, 7], 2, 2);
+    test(&[100, 101, 102], 10, 0);
+}
+
+#[test]
+#[should_panic(expected = "index out of bounds: the len is 0 but the index is 0")]
+fn limbs_and_limb_fail() {
+    limbs_and_limb(&[], 10);
+}
 
 #[test]
 fn test_and_u32() {
@@ -49,6 +65,19 @@ fn test_and_u32() {
     test("1000000000000", 123, "0");
     test("1000000000001", 123, "1");
     test("12345678987654321", 987_654_321, "579887281");
+}
+
+#[test]
+fn limbs_and_limb_properties() {
+    test_properties(
+        pairs_of_nonempty_unsigned_vec_and_unsigned,
+        |&(ref limbs, limb)| {
+            assert_eq!(
+                limbs_and_limb(limbs, limb),
+                &Natural::from_limbs_asc(limbs) & limb
+            );
+        },
+    );
 }
 
 #[test]

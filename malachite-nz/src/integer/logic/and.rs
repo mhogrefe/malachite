@@ -22,8 +22,8 @@ use std::u32;
 /// ```
 /// use malachite_nz::integer::logic::and::limbs_and_pos_neg;
 ///
-/// assert_eq!(limbs_and_pos_neg(&[1, 2], &[100, 200]), vec![0, 2]);
-/// assert_eq!(limbs_and_pos_neg(&[1, 2, 5], &[100, 200]), vec![0, 2, 5]);
+/// assert_eq!(limbs_and_pos_neg(&[1, 2], &[100, 200]), &[0, 2]);
+/// assert_eq!(limbs_and_pos_neg(&[1, 2, 5], &[100, 200]), &[0, 2, 5]);
 /// ```
 pub fn limbs_and_pos_neg(xs: &[u32], ys: &[u32]) -> Vec<u32> {
     let xs_len = xs.len();
@@ -79,11 +79,11 @@ pub fn limbs_and_pos_neg(xs: &[u32], ys: &[u32]) -> Vec<u32> {
 ///
 /// let mut result = vec![0, 0];
 /// limbs_and_pos_neg_to_out(&mut result, &[1, 2], &[100, 200]);
-/// assert_eq!(result, vec![0, 2]);
+/// assert_eq!(result, &[0, 2]);
 ///
 /// let mut result = vec![10, 10, 10, 10];
 /// limbs_and_pos_neg_to_out(&mut result, &[1, 2, 5], &[100, 200]);
-/// assert_eq!(result, vec![0, 2, 5, 10]);
+/// assert_eq!(result, &[0, 2, 5, 10]);
 /// ```
 pub fn limbs_and_pos_neg_to_out(out_limbs: &mut [u32], xs: &[u32], ys: &[u32]) {
     let xs_len = xs.len();
@@ -137,11 +137,11 @@ pub fn limbs_and_pos_neg_to_out(out_limbs: &mut [u32], xs: &[u32], ys: &[u32]) {
 ///
 /// let mut xs = vec![1, 2];
 /// limbs_and_pos_neg_in_place_left(&mut xs, &[100, 200]);
-/// assert_eq!(xs, vec![0, 2]);
+/// assert_eq!(xs, &[0, 2]);
 ///
 /// let mut xs = vec![1, 2, 5];
 /// limbs_and_pos_neg_in_place_left(&mut xs, &[100, 200]);
-/// assert_eq!(xs, vec![0, 2, 5]);
+/// assert_eq!(xs, &[0, 2, 5]);
 /// ```
 pub fn limbs_and_pos_neg_in_place_left(xs: &mut [u32], ys: &[u32]) {
     let xs_len = xs.len();
@@ -189,12 +189,12 @@ pub fn limbs_and_pos_neg_in_place_left(xs: &mut [u32], ys: &[u32]) {
 ///
 /// let mut ys = vec![100, 200];
 /// limbs_slice_and_pos_neg_in_place_right(&[1, 2], &mut ys);
-/// assert_eq!(ys, vec![0, 2]);
+/// assert_eq!(ys, &[0, 2]);
 ///
 /// let mut ys = vec![100, 200];
 /// limbs_slice_and_pos_neg_in_place_right(&[1, 2, 5], &mut ys);
 /// // The result is missing the most-significant limb, which is 5
-/// assert_eq!(ys, vec![0, 2]);
+/// assert_eq!(ys, &[0, 2]);
 /// ```
 pub fn limbs_slice_and_pos_neg_in_place_right(xs: &[u32], ys: &mut [u32]) {
     let xs_len = xs.len();
@@ -242,15 +242,15 @@ pub fn limbs_slice_and_pos_neg_in_place_right(xs: &[u32], ys: &mut [u32]) {
 ///
 /// let mut ys = vec![100, 200];
 /// limbs_vec_and_pos_neg_in_place_right(&[1, 2], &mut ys);
-/// assert_eq!(ys, vec![0, 2]);
+/// assert_eq!(ys, &[0, 2]);
 ///
 /// let mut ys = vec![100, 200];
 /// limbs_vec_and_pos_neg_in_place_right(&[1, 2, 5], &mut ys);
-/// assert_eq!(ys, vec![0, 2, 5]);
+/// assert_eq!(ys, &[0, 2, 5]);
 ///
 /// let mut ys = vec![1, 2, 5];
 /// limbs_vec_and_pos_neg_in_place_right(&[100, 200], &mut ys);
-/// assert_eq!(ys, vec![100, 200]);
+/// assert_eq!(ys, &[100, 200]);
 /// ```
 pub fn limbs_vec_and_pos_neg_in_place_right(xs: &[u32], ys: &mut Vec<u32>) {
     limbs_slice_and_pos_neg_in_place_right(xs, ys);
@@ -293,8 +293,8 @@ fn limbs_and_neg_neg_helper(input: u32, boundary_limb_seen: &mut bool) -> u32 {
 /// ```
 /// use malachite_nz::integer::logic::and::limbs_and_neg_neg;
 ///
-/// assert_eq!(limbs_and_neg_neg(&[1, 2], &[100, 200]), vec![100, 202]);
-/// assert_eq!(limbs_and_neg_neg(&[1, 2, 5], &[100, 200]), vec![100, 202, 5]);
+/// assert_eq!(limbs_and_neg_neg(&[1, 2], &[100, 200]), &[100, 202]);
+/// assert_eq!(limbs_and_neg_neg(&[1, 2, 5], &[100, 200]), &[100, 202, 5]);
 /// ```
 pub fn limbs_and_neg_neg(xs: &[u32], ys: &[u32]) -> Vec<u32> {
     let xs_len = xs.len();
@@ -372,11 +372,11 @@ pub fn limbs_and_neg_neg(xs: &[u32], ys: &[u32]) -> Vec<u32> {
 ///
 /// let mut result = vec![0, 0];
 /// assert_eq!(limbs_and_neg_neg_to_out(&mut result, &[1, 2], &[100, 200]), true);
-/// assert_eq!(result, vec![100, 202]);
+/// assert_eq!(result, &[100, 202]);
 ///
 /// let mut result = vec![10, 10, 10, 10];
 /// assert_eq!(limbs_and_neg_neg_to_out(&mut result, &[1, 2, 5], &[100, 200]), true);
-/// assert_eq!(result, vec![100, 202, 5, 10]);
+/// assert_eq!(result, &[100, 202, 5, 10]);
 /// ```
 pub fn limbs_and_neg_neg_to_out(out_limbs: &mut [u32], xs: &[u32], ys: &[u32]) -> bool {
     let xs_len = xs.len();
@@ -461,11 +461,11 @@ pub fn limbs_and_neg_neg_to_out(out_limbs: &mut [u32], xs: &[u32], ys: &[u32]) -
 ///
 /// let mut xs = vec![1, 2];
 /// assert_eq!(limbs_slice_and_neg_neg_in_place_left(&mut xs, &[100, 200]), true);
-/// assert_eq!(xs, vec![100, 202]);
+/// assert_eq!(xs, &[100, 202]);
 ///
 /// let mut xs = vec![1, 2, 5];
 /// assert_eq!(limbs_slice_and_neg_neg_in_place_left(&mut xs, &[100, 200]), true);
-/// assert_eq!(xs, vec![100, 202, 5]);
+/// assert_eq!(xs, &[100, 202, 5]);
 /// ```
 pub fn limbs_slice_and_neg_neg_in_place_left(xs: &mut [u32], ys: &[u32]) -> bool {
     let xs_len = xs.len();
@@ -533,15 +533,15 @@ pub fn limbs_slice_and_neg_neg_in_place_left(xs: &mut [u32], ys: &[u32]) -> bool
 ///
 /// let mut xs = vec![1, 2];
 /// limbs_vec_and_neg_neg_in_place_left(&mut xs, &[100, 200]);
-/// assert_eq!(xs, vec![100, 202]);
+/// assert_eq!(xs, &[100, 202]);
 ///
 /// let mut xs = vec![100, 200];
 /// limbs_vec_and_neg_neg_in_place_left(&mut xs, &[1, 2, 5]);
-/// assert_eq!(xs, vec![100, 202, 5]);
+/// assert_eq!(xs, &[100, 202, 5]);
 ///
 /// let mut xs = vec![1, 2, 5];
 /// limbs_vec_and_neg_neg_in_place_left(&mut xs, &[100, 200]);
-/// assert_eq!(xs, vec![100, 202, 5]);
+/// assert_eq!(xs, &[100, 202, 5]);
 /// ```
 pub fn limbs_vec_and_neg_neg_in_place_left(xs: &mut Vec<u32>, ys: &[u32]) {
     let xs_len = xs.len();
@@ -595,20 +595,20 @@ pub fn limbs_vec_and_neg_neg_in_place_left(xs: &mut Vec<u32>, ys: &[u32]) {
 /// let mut xs = vec![1, 2];
 /// let mut ys = vec![100, 200];
 /// assert_eq!(limbs_slice_and_neg_neg_in_place_either(&mut xs, &mut ys), (false, true));
-/// assert_eq!(xs, vec![100, 202]);
-/// assert_eq!(ys, vec![100, 200]);
+/// assert_eq!(xs, &[100, 202]);
+/// assert_eq!(ys, &[100, 200]);
 ///
 /// let mut xs = vec![1, 2, 5];
 /// let mut ys = vec![100, 200];
 /// assert_eq!(limbs_slice_and_neg_neg_in_place_either(&mut xs, &mut ys), (false, true));
-/// assert_eq!(xs, vec![100, 202, 5]);
-/// assert_eq!(ys, vec![100, 200]);
+/// assert_eq!(xs, &[100, 202, 5]);
+/// assert_eq!(ys, &[100, 200]);
 ///
 /// let mut xs = vec![100, 200];
 /// let mut ys = vec![1, 2, 5];
 /// assert_eq!(limbs_slice_and_neg_neg_in_place_either(&mut xs, &mut ys), (true, true));
-/// assert_eq!(xs, vec![100, 200]);
-/// assert_eq!(ys, vec![100, 202, 5]);
+/// assert_eq!(xs, &[100, 200]);
+/// assert_eq!(ys, &[100, 202, 5]);
 /// ```
 pub fn limbs_slice_and_neg_neg_in_place_either(xs: &mut [u32], ys: &mut [u32]) -> (bool, bool) {
     if xs.len() >= ys.len() {
@@ -639,20 +639,20 @@ pub fn limbs_slice_and_neg_neg_in_place_either(xs: &mut [u32], ys: &mut [u32]) -
 /// let mut xs = vec![1, 2];
 /// let mut ys = vec![100, 200];
 /// assert_eq!(limbs_vec_and_neg_neg_in_place_either(&mut xs, &mut ys), false);
-/// assert_eq!(xs, vec![100, 202]);
-/// assert_eq!(ys, vec![100, 200]);
+/// assert_eq!(xs, &[100, 202]);
+/// assert_eq!(ys, &[100, 200]);
 ///
 /// let mut xs = vec![1, 2, 5];
 /// let mut ys = vec![100, 200];
 /// assert_eq!(limbs_vec_and_neg_neg_in_place_either(&mut xs, &mut ys), false);
-/// assert_eq!(xs, vec![100, 202, 5]);
-/// assert_eq!(ys, vec![100, 200]);
+/// assert_eq!(xs, &[100, 202, 5]);
+/// assert_eq!(ys, &[100, 200]);
 ///
 /// let mut xs = vec![100, 200];
 /// let mut ys = vec![1, 2, 5];
 /// assert_eq!(limbs_vec_and_neg_neg_in_place_either(&mut xs, &mut ys), true);
-/// assert_eq!(xs, vec![100, 200]);
-/// assert_eq!(ys, vec![100, 202, 5]);
+/// assert_eq!(xs, &[100, 200]);
+/// assert_eq!(ys, &[100, 202, 5]);
 /// ```
 pub fn limbs_vec_and_neg_neg_in_place_either(xs: &mut Vec<u32>, ys: &mut Vec<u32>) -> bool {
     if xs.len() >= ys.len() {

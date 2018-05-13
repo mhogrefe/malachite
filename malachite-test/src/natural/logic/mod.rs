@@ -11,6 +11,8 @@ pub mod hamming_distance;
 pub mod hamming_distance_u32;
 pub mod limb_count;
 pub mod not;
+pub mod or;
+pub mod or_u32;
 pub mod set_bit;
 pub mod significant_bits;
 pub mod trailing_zeros;
@@ -27,6 +29,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     hamming_distance_u32::register(registry);
     limb_count::register(registry);
     not::register(registry);
+    or_u32::register(registry);
     set_bit::register(registry);
     significant_bits::register(registry);
     trailing_zeros::register(registry);

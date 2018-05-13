@@ -26,20 +26,20 @@ use std::ops::{BitAnd, BitAndAssign};
 ///
 /// let mut result = vec![0, 0];
 /// assert_eq!(limbs_slice_neg_and_limb_neg_to_out(&mut result, &[0, 2], 3), false);
-/// assert_eq!(result, vec![0, 2]);
+/// assert_eq!(result, &[0, 2]);
 ///
 /// let mut result = vec![0, 0];
 /// assert_eq!(limbs_slice_neg_and_limb_neg_to_out(&mut result, &[1, 1], 3), false);
-/// assert_eq!(result, vec![4294967293, 1]);
+/// assert_eq!(result, &[4294967293, 1]);
 ///
 /// let mut result = vec![0, 0];
 /// assert_eq!(limbs_slice_neg_and_limb_neg_to_out(&mut result, &[0xffff_fffe, 1], 1), false);
-/// assert_eq!(result, vec![0, 2]);
+/// assert_eq!(result, &[0, 2]);
 ///
 /// let mut result = vec![0, 0];
 /// assert_eq!(limbs_slice_neg_and_limb_neg_to_out(&mut result, &[0xffff_fffe, 0xffff_ffff], 1),
 ///         true);
-/// assert_eq!(result, vec![0, 0]);
+/// assert_eq!(result, &[0, 0]);
 /// ```
 pub fn limbs_slice_neg_and_limb_neg_to_out(
     out_limbs: &mut [u32],
@@ -82,10 +82,10 @@ pub fn limbs_slice_neg_and_limb_neg_to_out(
 /// ```
 /// use malachite_nz::integer::logic::and_i32::limbs_vec_neg_and_limb_neg;
 ///
-/// assert_eq!(limbs_vec_neg_and_limb_neg(&[0, 2], 3), vec![0, 2]);
-/// assert_eq!(limbs_vec_neg_and_limb_neg(&[1, 1], 3), vec![4294967293, 1]);
-/// assert_eq!(limbs_vec_neg_and_limb_neg(&[0xffff_fffe, 1], 1), vec![0, 2]);
-/// assert_eq!(limbs_vec_neg_and_limb_neg(&[0xffff_fffe, 0xffff_ffff], 1), vec![0, 0, 1]);
+/// assert_eq!(limbs_vec_neg_and_limb_neg(&[0, 2], 3), &[0, 2]);
+/// assert_eq!(limbs_vec_neg_and_limb_neg(&[1, 1], 3), &[4294967293, 1]);
+/// assert_eq!(limbs_vec_neg_and_limb_neg(&[0xffff_fffe, 1], 1), &[0, 2]);
+/// assert_eq!(limbs_vec_neg_and_limb_neg(&[0xffff_fffe, 0xffff_ffff], 1), &[0, 0, 1]);
 /// ```
 pub fn limbs_vec_neg_and_limb_neg(limbs: &[u32], limb: u32) -> Vec<u32> {
     let mut result_limbs = vec![0; limbs.len()];
@@ -115,19 +115,19 @@ pub fn limbs_vec_neg_and_limb_neg(limbs: &[u32], limb: u32) -> Vec<u32> {
 ///
 /// let mut limbs = vec![0, 2];
 /// assert_eq!(limbs_slice_neg_and_limb_neg_in_place(&mut limbs, 3), false);
-/// assert_eq!(limbs, vec![0, 2]);
+/// assert_eq!(limbs, &[0, 2]);
 ///
 /// let mut limbs = vec![1, 1];
 /// assert_eq!(limbs_slice_neg_and_limb_neg_in_place(&mut limbs, 3), false);
-/// assert_eq!(limbs, vec![4294967293, 1]);
+/// assert_eq!(limbs, &[4294967293, 1]);
 ///
 /// let mut limbs = vec![0xffff_fffe, 1];
 /// assert_eq!(limbs_slice_neg_and_limb_neg_in_place(&mut limbs, 1), false);
-/// assert_eq!(limbs, vec![0, 2]);
+/// assert_eq!(limbs, &[0, 2]);
 ///
 /// let mut limbs = vec![0xffff_fffe, 0xffff_ffff];
 /// assert_eq!(limbs_slice_neg_and_limb_neg_in_place(&mut limbs, 1), true);
-/// assert_eq!(limbs, vec![0, 0]);
+/// assert_eq!(limbs, &[0, 0]);
 /// ```
 pub fn limbs_slice_neg_and_limb_neg_in_place(limbs: &mut [u32], limb: u32) -> bool {
     let (head, tail) = limbs.split_at_mut(1);
@@ -165,19 +165,19 @@ pub fn limbs_slice_neg_and_limb_neg_in_place(limbs: &mut [u32], limb: u32) -> bo
 ///
 /// let mut limbs = vec![0, 2];
 /// limbs_vec_neg_and_limb_neg_in_place(&mut limbs, 3);
-/// assert_eq!(limbs, vec![0, 2]);
+/// assert_eq!(limbs, &[0, 2]);
 ///
 /// let mut limbs = vec![1, 1];
 /// limbs_vec_neg_and_limb_neg_in_place(&mut limbs, 3);
-/// assert_eq!(limbs, vec![4294967293, 1]);
+/// assert_eq!(limbs, &[4294967293, 1]);
 ///
 /// let mut limbs = vec![0xffff_fffe, 1];
 /// limbs_vec_neg_and_limb_neg_in_place(&mut limbs, 1);
-/// assert_eq!(limbs, vec![0, 2]);
+/// assert_eq!(limbs, &[0, 2]);
 ///
 /// let mut limbs = vec![0xffff_fffe, 0xffff_ffff];
 /// limbs_vec_neg_and_limb_neg_in_place(&mut limbs, 1);
-/// assert_eq!(limbs, vec![0, 0, 1]);
+/// assert_eq!(limbs, &[0, 0, 1]);
 /// ```
 pub fn limbs_vec_neg_and_limb_neg_in_place(limbs: &mut Vec<u32>, limb: u32) {
     if limbs_slice_neg_and_limb_neg_in_place(limbs, limb) {
@@ -274,7 +274,7 @@ impl<'a> BitAnd<i32> for &'a Integer {
 ///
 /// Additional memory: worst case O(1)
 ///
-/// where n = `self.significant_bits()`
+/// where n = `other.significant_bits()`
 ///
 /// ```
 /// extern crate malachite_base;
@@ -308,7 +308,7 @@ impl BitAnd<Integer> for i32 {
 ///
 /// Additional memory: worst case O(n)
 ///
-/// where n = `self.significant_bits()`
+/// where n = `other.significant_bits()`
 ///
 /// ```
 /// extern crate malachite_base;
