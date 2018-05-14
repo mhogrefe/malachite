@@ -1,3 +1,4 @@
+use malachite_base::limbs::limbs_trailing_zero_limbs;
 use malachite_base::misc::{Min, Named, Walkable};
 use malachite_base::num::{One, Two, Zero};
 use natural::Natural::*;
@@ -16,15 +17,15 @@ pub enum Natural {
 
 impl Natural {
     fn demote_if_small(&mut self) {
-        let mut demoted_value = None;
-        if let Large(ref limbs) = *self {
-            let limb_count = limbs.len();
-            match limb_count {
-                0 => demoted_value = Some(0),
-                1 => demoted_value = Some(limbs[0]),
-                _ => {}
+        let demoted_value = if let Large(ref limbs) = *self {
+            match limbs.len() {
+                0 => Some(0),
+                1 => Some(limbs[0]),
+                _ => None,
             }
-        }
+        } else {
+            None
+        };
         if let Some(small) = demoted_value {
             *self = Small(small);
         }
@@ -42,10 +43,9 @@ impl Natural {
     }
 
     pub(crate) fn trim(&mut self) {
-        if let Large(ref mut xs) = *self {
-            while !xs.is_empty() && xs.last().unwrap() == &0 {
-                xs.pop();
-            }
+        if let Large(ref mut limbs) = *self {
+            let significant_length = limbs.len() - limbs_trailing_zero_limbs(limbs);
+            limbs.truncate(significant_length);
         }
         self.demote_if_small();
     }
@@ -55,7 +55,7 @@ impl Natural {
     pub fn is_valid(&self) -> bool {
         match *self {
             Small(_) => true,
-            Large(ref xs) => xs.len() > 1 && xs.last().unwrap() != &0,
+            Large(ref xs) => xs.len() > 1 && *xs.last().unwrap() != 0,
         }
     }
 

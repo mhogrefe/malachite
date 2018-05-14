@@ -10,7 +10,8 @@ pub fn main() {
     }
     let generation_mode = &args[1];
     assert!(
-        generation_mode == "exhaustive" || generation_mode == "random"
+        generation_mode == "exhaustive"
+            || generation_mode == "random"
             || generation_mode == "special_random",
         "Bad generation mode"
     );

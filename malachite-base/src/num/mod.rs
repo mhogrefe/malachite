@@ -1157,7 +1157,8 @@ macro_rules! integer_traits {
             /// }
             /// ```
             fn increment(&mut self) {
-                *self = self.checked_add(1)
+                *self = self
+                    .checked_add(1)
                     .expect("Cannot increment past the maximum value.");
             }
 
@@ -1185,7 +1186,8 @@ macro_rules! integer_traits {
             /// }
             /// ```
             fn decrement(&mut self) {
-                *self = self.checked_sub(1)
+                *self = self
+                    .checked_sub(1)
                     .expect("Cannot decrement past the minimum value.");
             }
         }

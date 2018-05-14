@@ -1,5 +1,5 @@
 use integer::Integer;
-use malachite_base::limbs::{limbs_set_zero, limbs_trailing_zero_limbs};
+use malachite_base::limbs::{limbs_leading_zero_limbs, limbs_set_zero};
 use natural::Natural::{self, Large, Small};
 use std::cmp::max;
 use std::ops::{BitAnd, BitAndAssign};
@@ -28,8 +28,8 @@ use std::u32;
 pub fn limbs_and_pos_neg(xs: &[u32], ys: &[u32]) -> Vec<u32> {
     let xs_len = xs.len();
     let ys_len = ys.len();
-    let x_i = limbs_trailing_zero_limbs(xs);
-    let y_i = limbs_trailing_zero_limbs(ys);
+    let x_i = limbs_leading_zero_limbs(xs);
+    let y_i = limbs_leading_zero_limbs(ys);
     assert!(x_i < xs_len);
     assert!(y_i < ys_len);
     if y_i >= xs_len {
@@ -89,8 +89,8 @@ pub fn limbs_and_pos_neg_to_out(out_limbs: &mut [u32], xs: &[u32], ys: &[u32]) {
     let xs_len = xs.len();
     let ys_len = ys.len();
     assert!(out_limbs.len() >= xs_len);
-    let x_i = limbs_trailing_zero_limbs(xs);
-    let y_i = limbs_trailing_zero_limbs(ys);
+    let x_i = limbs_leading_zero_limbs(xs);
+    let y_i = limbs_leading_zero_limbs(ys);
     assert!(x_i < xs_len);
     assert!(y_i < ys_len);
     if y_i >= xs_len {
@@ -146,8 +146,8 @@ pub fn limbs_and_pos_neg_to_out(out_limbs: &mut [u32], xs: &[u32], ys: &[u32]) {
 pub fn limbs_and_pos_neg_in_place_left(xs: &mut [u32], ys: &[u32]) {
     let xs_len = xs.len();
     let ys_len = ys.len();
-    let x_i = limbs_trailing_zero_limbs(xs);
-    let y_i = limbs_trailing_zero_limbs(ys);
+    let x_i = limbs_leading_zero_limbs(xs);
+    let y_i = limbs_leading_zero_limbs(ys);
     assert!(x_i < xs_len);
     assert!(y_i < ys_len);
     if y_i >= xs_len {
@@ -199,8 +199,8 @@ pub fn limbs_and_pos_neg_in_place_left(xs: &mut [u32], ys: &[u32]) {
 pub fn limbs_slice_and_pos_neg_in_place_right(xs: &[u32], ys: &mut [u32]) {
     let xs_len = xs.len();
     let ys_len = ys.len();
-    let x_i = limbs_trailing_zero_limbs(xs);
-    let y_i = limbs_trailing_zero_limbs(ys);
+    let x_i = limbs_leading_zero_limbs(xs);
+    let y_i = limbs_leading_zero_limbs(ys);
     assert!(x_i < xs_len);
     assert!(y_i < ys_len);
     if y_i >= xs_len || x_i >= ys_len {
@@ -299,8 +299,8 @@ fn limbs_and_neg_neg_helper(input: u32, boundary_limb_seen: &mut bool) -> u32 {
 pub fn limbs_and_neg_neg(xs: &[u32], ys: &[u32]) -> Vec<u32> {
     let xs_len = xs.len();
     let ys_len = ys.len();
-    let x_i = limbs_trailing_zero_limbs(xs);
-    let y_i = limbs_trailing_zero_limbs(ys);
+    let x_i = limbs_leading_zero_limbs(xs);
+    let y_i = limbs_leading_zero_limbs(ys);
     assert!(x_i < xs_len);
     assert!(y_i < ys_len);
     if y_i >= xs_len {
@@ -381,8 +381,8 @@ pub fn limbs_and_neg_neg(xs: &[u32], ys: &[u32]) -> Vec<u32> {
 pub fn limbs_and_neg_neg_to_out(out_limbs: &mut [u32], xs: &[u32], ys: &[u32]) -> bool {
     let xs_len = xs.len();
     let ys_len = ys.len();
-    let x_i = limbs_trailing_zero_limbs(xs);
-    let y_i = limbs_trailing_zero_limbs(ys);
+    let x_i = limbs_leading_zero_limbs(xs);
+    let y_i = limbs_leading_zero_limbs(ys);
     assert!(x_i < xs_len);
     assert!(y_i < ys_len);
     if y_i >= xs_len {
@@ -471,8 +471,8 @@ pub fn limbs_slice_and_neg_neg_in_place_left(xs: &mut [u32], ys: &[u32]) -> bool
     let xs_len = xs.len();
     let ys_len = ys.len();
     assert!(xs_len >= ys_len);
-    let x_i = limbs_trailing_zero_limbs(xs);
-    let y_i = limbs_trailing_zero_limbs(ys);
+    let x_i = limbs_leading_zero_limbs(xs);
+    let y_i = limbs_leading_zero_limbs(ys);
     assert!(x_i < xs_len);
     assert!(y_i < ys_len);
     if x_i >= ys_len {
@@ -546,7 +546,7 @@ pub fn limbs_slice_and_neg_neg_in_place_left(xs: &mut [u32], ys: &[u32]) -> bool
 pub fn limbs_vec_and_neg_neg_in_place_left(xs: &mut Vec<u32>, ys: &[u32]) {
     let xs_len = xs.len();
     let ys_len = ys.len();
-    let y_i = limbs_trailing_zero_limbs(ys);
+    let y_i = limbs_leading_zero_limbs(ys);
     assert!(y_i < ys_len);
     if y_i >= xs_len {
         xs.resize(ys_len, 0);

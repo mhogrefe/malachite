@@ -81,7 +81,7 @@ impl<'a> BitAnd<&'a Natural> for u32 {
     }
 }
 
-/// Bitwise-ands a `u32` with a `Natural` in place.
+/// Bitwise-ands a `Natural` with a `u32` in place.
 ///
 /// Time: worst case O(1)
 ///

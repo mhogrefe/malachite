@@ -193,7 +193,8 @@ fn limbs_slice_to_twos_complement_limbs_negative_properties() {
         let mut mut_limbs_alt = limbs.clone();
         limbs_slice_to_twos_complement_limbs_negative_alt_2(&mut mut_limbs_alt);
         assert_eq!(mut_limbs_alt, mut_limbs);
-        if !limbs.is_empty() && *limbs.last().unwrap() != 0
+        if !limbs.is_empty()
+            && *limbs.last().unwrap() != 0
             && mut_limbs.last().unwrap().get_bit(LAST_INDEX)
         {
             let n = -Natural::from_limbs_asc(limbs);

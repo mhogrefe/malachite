@@ -602,7 +602,8 @@ pub fn triples_of_natural_small_i32_and_rounding_mode_var_1(
 ) -> Box<Iterator<Item = (Natural, i32, RoundingMode)>> {
     Box::new(
         triples_of_natural_small_i32_and_rounding_mode(gm).filter(|&(ref n, i, rm)| {
-            i >= 0 || rm != RoundingMode::Exact
+            i >= 0
+                || rm != RoundingMode::Exact
                 || n.divisible_by_power_of_two(i.wrapping_neg() as u32)
         }),
     )

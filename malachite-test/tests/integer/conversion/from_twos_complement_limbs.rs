@@ -143,7 +143,8 @@ fn from_twos_complement_limbs_asc_properties() {
             Ordering::Less => {
                 let last = *limbs.last().unwrap();
                 last.get_bit(LAST_INDEX)
-                    && (last != !0 || limbs.len() <= 1
+                    && (last != !0
+                        || limbs.len() <= 1
                         || !limbs[limbs.len() - 2].get_bit(LAST_INDEX))
             }
         } {

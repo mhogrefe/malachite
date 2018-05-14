@@ -191,6 +191,7 @@ pub mod logic {
     pub mod checked_hamming_distance_i32;
     pub mod checked_hamming_distance_u32;
     pub mod not;
+    pub mod or_u32;
     pub mod significant_bits;
     pub mod trailing_zeros;
 }

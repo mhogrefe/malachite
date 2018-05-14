@@ -1,6 +1,6 @@
 use integer::logic::checked_count_zeros::limbs_count_zeros_neg;
 use integer::Integer;
-use malachite_base::limbs::limbs_trailing_zero_limbs;
+use malachite_base::limbs::limbs_leading_zero_limbs;
 use malachite_base::num::{CheckedHammingDistance, HammingDistance};
 use natural::logic::count_ones::limbs_count_ones;
 use natural::logic::hamming_distance::limbs_hamming_distance_same_length;
@@ -79,8 +79,8 @@ fn limbs_hamming_distance_neg_helper(xs: &[u32], ys: &[u32], xs_i: usize, ys_i: 
 /// assert_eq!(limbs_hamming_distance_neg(&[1, 1, 1], &[1, 2, 3]), 3);
 /// ```
 pub fn limbs_hamming_distance_neg(xs: &[u32], ys: &[u32]) -> u64 {
-    let xs_i = limbs_trailing_zero_limbs(xs);
-    let ys_i = limbs_trailing_zero_limbs(ys);
+    let xs_i = limbs_leading_zero_limbs(xs);
+    let ys_i = limbs_leading_zero_limbs(ys);
     match xs_i.cmp(&ys_i) {
         Ordering::Equal => {
             xs[xs_i]

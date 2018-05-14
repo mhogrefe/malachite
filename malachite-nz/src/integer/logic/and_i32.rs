@@ -336,7 +336,7 @@ impl<'a> BitAnd<&'a Integer> for i32 {
     }
 }
 
-/// Bitwise-ands an `i32` with an `Integer` in place.
+/// Bitwise-ands an `Integer` with an `i32` in place.
 ///
 /// Time: worst case O(n)
 ///

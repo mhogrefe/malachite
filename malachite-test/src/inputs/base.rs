@@ -718,7 +718,9 @@ pub fn triples_of_u32_vec_var_6(
 ) -> Box<Iterator<Item = (Vec<u32>, Vec<u32>, Vec<u32>)>> {
     Box::new(
         triples_of_unsigned_vec(gm).filter(|&(ref xs, ref ys, ref zs)| {
-            xs.len() >= ys.len() && xs.len() >= zs.len() && !limbs_test_zero(ys)
+            xs.len() >= ys.len()
+                && xs.len() >= zs.len()
+                && !limbs_test_zero(ys)
                 && !limbs_test_zero(zs)
         }),
     )

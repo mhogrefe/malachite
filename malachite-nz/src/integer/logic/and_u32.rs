@@ -65,7 +65,7 @@ impl<'a> BitAnd<&'a Integer> for u32 {
     }
 }
 
-/// Bitwise-ands a `u32` with an `Integer` in place.
+/// Bitwise-ands an `Integer` with a `u32` in place.
 ///
 /// Time: worst case O(1)
 ///

@@ -198,7 +198,7 @@ impl<'a> BitOr<&'a Natural> for u32 {
     }
 }
 
-/// Bitwise-ors a `u32` with a `Natural` in place.
+/// Bitwise-ors a `Natural` with a `u32` in place.
 ///
 /// Time: worst case O(1)
 ///
