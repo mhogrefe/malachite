@@ -120,7 +120,7 @@ name = "num"
 version = "0.1.42"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
- "num-bigint 0.1.43 (registry+https://github.com/rust-lang/crates.io-index)",
+ "num-bigint 0.1.44 (registry+https://github.com/rust-lang/crates.io-index)",
  "num-complex 0.1.43 (registry+https://github.com/rust-lang/crates.io-index)",
  "num-integer 0.1.38 (registry+https://github.com/rust-lang/crates.io-index)",
  "num-iter 0.1.37 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -130,7 +130,7 @@ dependencies = [
 
 [[package]]
 name = "num-bigint"
-version = "0.1.43"
+version = "0.1.44"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "num-integer 0.1.38 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -170,7 +170,7 @@ name = "num-rational"
 version = "0.1.42"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
- "num-bigint 0.1.43 (registry+https://github.com/rust-lang/crates.io-index)",
+ "num-bigint 0.1.44 (registry+https://github.com/rust-lang/crates.io-index)",
  "num-integer 0.1.38 (registry+https://github.com/rust-lang/crates.io-index)",
  "num-traits 0.2.4 (registry+https://github.com/rust-lang/crates.io-index)",
  "rustc-serialize 0.3.24 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -360,7 +360,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 "checksum libc 0.2.40 (registry+https://github.com/rust-lang/crates.io-index)" = "6fd41f331ac7c5b8ac259b8bf82c75c0fb2e469bbf37d2becbba9a6a2221965b"
 "checksum nodrop 0.1.12 (registry+https://github.com/rust-lang/crates.io-index)" = "9a2228dca57108069a5262f2ed8bd2e82496d2e074a06d1ccc7ce1687b6ae0a2"
 "checksum num 0.1.42 (registry+https://github.com/rust-lang/crates.io-index)" = "4703ad64153382334aa8db57c637364c322d3372e097840c72000dabdcf6156e"
-"checksum num-bigint 0.1.43 (registry+https://github.com/rust-lang/crates.io-index)" = "81b483ea42927c463e191802e7334556b48e7875297564c0e9951bd3a0ae53e3"
+"checksum num-bigint 0.1.44 (registry+https://github.com/rust-lang/crates.io-index)" = "e63899ad0da84ce718c14936262a41cee2c79c981fc0a0e7c7beb47d5a07e8c1"
 "checksum num-complex 0.1.43 (registry+https://github.com/rust-lang/crates.io-index)" = "b288631d7878aaf59442cffd36910ea604ecd7745c36054328595114001c9656"
 "checksum num-integer 0.1.38 (registry+https://github.com/rust-lang/crates.io-index)" = "6ac0ea58d64a89d9d6b7688031b3be9358d6c919badcf7fbb0527ccfd891ee45"
 "checksum num-iter 0.1.37 (registry+https://github.com/rust-lang/crates.io-index)" = "af3fdbbc3291a5464dc57b03860ec37ca6bf915ed6ee385e7c6c052c422b2124"

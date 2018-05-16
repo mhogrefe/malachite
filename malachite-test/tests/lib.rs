@@ -129,6 +129,7 @@ pub mod integer {
         pub mod flip_bit;
         pub mod get_bit;
         pub mod not;
+        pub mod or_i32;
         pub mod or_u32;
         pub mod set_bit;
         pub mod significant_bits;

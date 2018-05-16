@@ -916,6 +916,41 @@ pub fn pairs_of_u32_vec_and_positive_u32_var_1(
     )
 }
 
+fn pairs_of_unsigned_vec_and_negative_signed<
+    T: 'static + PrimitiveUnsigned,
+    U: 'static + PrimitiveSigned,
+>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (Vec<T>, U)>> {
+    match gm {
+        GenerationMode::Exhaustive => Box::new(log_pairs(
+            exhaustive_vecs(exhaustive_unsigned()),
+            exhaustive_negative_signed(),
+        )),
+        GenerationMode::Random(scale) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| random_vecs(seed, scale, &(|seed_2| random(seed_2)))),
+            &(|seed| random_negative_signed(seed)),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_unsigned_vecs(seed, scale)),
+            &(|seed| special_random_negative_signed(seed)),
+        )),
+    }
+}
+
+// All pairs of `Vec<u32>` and negative `T`, where `T` is signed and the `Vec<u32>` are nonempty and
+// don't only contain zeros.
+pub fn pairs_of_u32_vec_and_negative_signed_var_1<T: 'static + PrimitiveSigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (Vec<u32>, T)>> {
+    Box::new(
+        pairs_of_unsigned_vec_and_negative_signed(gm)
+            .filter(|&(ref limbs, _)| !limbs_test_zero(limbs)),
+    )
+}
+
 pub fn vecs_of_bool(gm: GenerationMode) -> Box<Iterator<Item = Vec<bool>>> {
     match gm {
         //TODO shortlex would be better
