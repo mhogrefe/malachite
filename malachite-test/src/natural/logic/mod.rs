@@ -29,6 +29,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     hamming_distance_u32::register(registry);
     limb_count::register(registry);
     not::register(registry);
+    or::register(registry);
     or_u32::register(registry);
     set_bit::register(registry);
     significant_bits::register(registry);

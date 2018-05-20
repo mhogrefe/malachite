@@ -198,6 +198,7 @@ pub mod natural {
         pub mod hamming_distance_u32;
         pub mod limb_count;
         pub mod not;
+        pub mod or;
         pub mod or_u32;
         pub mod set_bit;
         pub mod significant_bits;

@@ -277,7 +277,7 @@ fn benchmark_limbs_slice_and_in_place_left(gm: GenerationMode, limit: usize, fil
         limit,
         file_name,
         &(|&(ref xs, ref ys)| min(xs.len(), ys.len())),
-        "xs.len() = ys.len()",
+        "min(xs.len(), ys.len())",
         &mut [(
             "malachite",
             &mut (|(mut xs, ys)| no_out!(limbs_slice_and_in_place_left(&mut xs, &ys))),
@@ -311,7 +311,7 @@ fn benchmark_limbs_and_in_place_either(gm: GenerationMode, limit: usize, file_na
         limit,
         file_name,
         &(|&(ref xs, ref ys)| min(xs.len(), ys.len())),
-        "xs.len() = ys.len()",
+        "min(xs.len(), ys.len())",
         &mut [(
             "malachite",
             &mut (|(mut xs, mut ys)| no_out!(limbs_and_in_place_either(&mut xs, &mut ys))),

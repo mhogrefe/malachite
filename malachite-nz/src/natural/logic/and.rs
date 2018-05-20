@@ -5,7 +5,7 @@ use std::ops::{BitAnd, BitAndAssign};
 
 /// Interpreting two slices of `u32`s as the limbs (in ascending order) of two `Natural`s, returns
 /// a `Vec` of the limbs of the bitwise and of the `Natural`s. The length of the result is the
-/// length of the smaller input slice.
+/// length of the shorter input slice.
 ///
 /// Time: worst case O(n)
 ///
@@ -352,7 +352,7 @@ impl<'a> BitAnd<Natural> for &'a Natural {
 ///
 /// Additional memory: worst case O(n)
 ///
-/// where n = `max(self.significant_bits(), other.significant_bits)`
+/// where n = `min(self.significant_bits(), other.significant_bits)`
 ///
 /// # Examples
 /// ```

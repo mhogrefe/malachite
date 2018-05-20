@@ -88,10 +88,10 @@ fn test_limbs_and_to_out() {
 }
 
 #[test]
-#[should_panic(expected = "assertion failed: out_limbs.len() >= xs_len")]
+#[should_panic(expected = "assertion failed: out_limbs.len() >= ys_len")]
 fn limbs_and_to_out_fail() {
-    let mut out = vec![10];
-    limbs_and_to_out(&mut out, &[6, 7], &[1, 2]);
+    let mut out = vec![10, 10];
+    limbs_and_to_out(&mut out, &[6, 7], &[1, 2, 3]);
 }
 
 #[test]

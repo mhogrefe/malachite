@@ -844,6 +844,7 @@ fn and_properties() {
         assert_eq!(x & Integer::ZERO, 0);
         assert_eq!(Integer::ZERO & x, 0);
         assert_eq!(x & x, *x);
+        assert_eq!(x & !x, Integer::ZERO);
     });
 
     test_properties(triples_of_integers, |&(ref x, ref y, ref z)| {

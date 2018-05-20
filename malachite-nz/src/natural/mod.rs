@@ -190,6 +190,7 @@ pub mod logic {
     pub mod hamming_distance;
     pub mod hamming_distance_u32;
     pub mod not;
+    pub mod or;
     pub mod or_u32;
     pub mod significant_bits;
     pub mod trailing_zeros;

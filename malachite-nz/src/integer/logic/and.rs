@@ -573,11 +573,11 @@ pub fn limbs_vec_and_neg_neg_in_place_left(xs: &mut Vec<u32>, ys: &[u32]) {
 }
 
 /// Interpreting two slices of `u32`s as the limbs (in ascending order) of the negatives of two
-/// `Integer`s, writes the lower max(`xs.len()`, `ys.len()`) limbs of the bitwise and to the longer
-/// slice (or the first one, if they are equally long). `xs` and `ys` may not be empty or only
-/// contain zeros. Returns a pair of `bool`s. The first is `false` when the output is to the first
-/// slice and `true` when it's to the second slice, and the second is whether the least-significant
-/// max(`xs.len()`, `ys.len()`) limbs of the output are not all zero.
+/// `Integer`s, writes the lower max(`xs.len()`, `ys.len()`) limbs of the bitwise and of the
+/// `Integer`s to the longer slice (or the first one, if they are equally long). `xs` and `ys` may
+/// not be empty or only contain zeros. Returns a pair of `bool`s. The first is `false` when the
+/// output is to the first slice and `true` when it's to the second slice, and the second is whether
+/// the least-significant max(`xs.len()`, `ys.len()`) limbs of the output are not all zero.
 ///
 /// Time: worst case O(n)
 ///
@@ -619,9 +619,10 @@ pub fn limbs_slice_and_neg_neg_in_place_either(xs: &mut [u32], ys: &mut [u32]) -
 }
 
 /// Interpreting two `Vec`s of `u32`s as the limbs (in ascending order) of the negatives of two
-/// `Integer`s, writes the limbs of the bitwise and to the longer `Vec` (or the first one, if they
-/// are equally long). `xs` and `ys` may not be empty or only contain zeros. Returns a `bool` which
-/// is `false` when the output is to the first slice and `true` when it's to the second slice.
+/// `Integer`s, writes the limbs of the bitwise and of the `Integer`s to the longer `Vec` (or the
+/// first one, if they are equally long). `xs` and `ys` may not be empty or only contain zeros.
+/// Returns a `bool` which is `false` when the output is to the first slice and `true` when it's to
+/// the second slice.
 ///
 /// Time: worst case O(n)
 ///
