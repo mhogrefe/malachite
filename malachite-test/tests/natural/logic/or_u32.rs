@@ -96,9 +96,11 @@ fn test_or_i32() {
 
         let n = Natural::from_str(u).unwrap() | v;
         assert_eq!(n.to_string(), out);
+        assert!(n.is_valid());
 
         let n = &Natural::from_str(u).unwrap() | v;
         assert_eq!(n.to_string(), out);
+        assert!(n.is_valid());
 
         let n = num_or_u32(BigUint::from_str(u).unwrap(), v);
         assert_eq!(n.to_string(), out);
@@ -108,9 +110,11 @@ fn test_or_i32() {
 
         let n = v | Natural::from_str(u).unwrap();
         assert_eq!(n.to_string(), out);
+        assert!(n.is_valid());
 
         let n = v | &Natural::from_str(u).unwrap();
         assert_eq!(n.to_string(), out);
+        assert!(n.is_valid());
 
         let n = v | rug::Integer::from_str(u).unwrap();
         assert_eq!(n.to_string(), out);
@@ -197,8 +201,8 @@ fn or_u32_properties() {
             assert_eq!(natural_or_u32_alt_1(&n, u), result);
             assert_eq!(natural_or_u32_alt_2(&n, u), result);
 
-            //TODO assert_eq!(n | Natural::from(u), result);
-            //TODO assert_eq!(Natural::from(u) | n, result);
+            assert_eq!(n | Natural::from(u), result);
+            assert_eq!(Natural::from(u) | n, result);
 
             assert_eq!(&result | u, result);
 

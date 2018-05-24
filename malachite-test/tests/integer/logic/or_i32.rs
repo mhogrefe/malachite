@@ -1,44 +1,44 @@
 use common::test_properties;
 use malachite_base::num::{NegativeOne, Zero};
-use malachite_nz::integer::logic::or_i32::{limbs_neg_or_neg_i32, limbs_pos_or_neg_i32};
+use malachite_nz::integer::logic::or_i32::{limbs_neg_or_neg_limb, limbs_pos_or_neg_limb};
 use malachite_nz::integer::Integer;
 use malachite_test::common::{integer_to_rug_integer, rug_integer_to_integer};
-use malachite_test::inputs::base::{pairs_of_u32_vec_and_negative_signed_var_1, signeds};
+use malachite_test::inputs::base::{pairs_of_u32_vec_and_positive_u32_var_1, signeds};
 use malachite_test::inputs::integer::{integers, pairs_of_integer_and_signed};
 use malachite_test::integer::logic::or_i32::{integer_or_i32_alt_1, integer_or_i32_alt_2};
 use rug::{self, Assign};
 use std::str::FromStr;
 
 #[test]
-fn test_limbs_pos_or_neg_i32() {
-    let test = |limbs: &[u32], i: i32, out: u32| {
-        assert_eq!(limbs_pos_or_neg_i32(limbs, i), out);
+fn test_limbs_pos_or_neg_limb() {
+    let test = |limbs: &[u32], u: u32, out: u32| {
+        assert_eq!(limbs_pos_or_neg_limb(limbs, u), out);
     };
-    test(&[6, 7], -3, 1);
-    test(&[100, 101, 102], -10, 10);
-    test(&[0, 0, 1], -100, 100);
+    test(&[6, 7], 3, 0xffff_fff9);
+    test(&[100, 101, 102], 10, 0xffff_ff92);
+    test(&[0, 0, 1], 100, 0xffff_ff9c);
 }
 
 #[test]
 #[should_panic(expected = "index out of bounds: the len is 0 but the index is 0")]
-fn limbs_pos_or_neg_i32_fail() {
-    limbs_pos_or_neg_i32(&[], 10);
+fn limbs_pos_or_neg_limb_fail() {
+    limbs_pos_or_neg_limb(&[], 10);
 }
 
 #[test]
-fn test_limbs_neg_or_neg_i32() {
-    let test = |limbs: &[u32], i: i32, out: u32| {
-        assert_eq!(limbs_neg_or_neg_i32(limbs, i), out);
+fn test_limbs_neg_or_neg_limb() {
+    let test = |limbs: &[u32], u: u32, out: u32| {
+        assert_eq!(limbs_neg_or_neg_limb(limbs, u), out);
     };
-    test(&[6, 7], -3, 1);
-    test(&[100, 101, 102], -10, 2);
-    test(&[0, 0, 1], -100, 100);
+    test(&[6, 7], 3, 5);
+    test(&[100, 101, 102], 10, 98);
+    test(&[0, 0, 1], 100, 0xffff_ff9c);
 }
 
 #[test]
 #[should_panic(expected = "index out of bounds: the len is 0 but the index is 0")]
-fn limbs_neg_or_neg_i32_fail() {
-    limbs_neg_or_neg_i32(&[], 10);
+fn limbs_neg_or_neg_limb_fail() {
+    limbs_neg_or_neg_limb(&[], 10);
 }
 
 #[test]
@@ -55,18 +55,22 @@ fn test_or_i32() {
 
         let n = Integer::from_str(u).unwrap() | v;
         assert_eq!(n.to_string(), out);
+        assert!(n.is_valid());
 
         let n = &Integer::from_str(u).unwrap() | v;
         assert_eq!(n.to_string(), out);
+        assert!(n.is_valid());
 
         let n = rug::Integer::from_str(u).unwrap() | v;
         assert_eq!(n.to_string(), out);
 
         let n = v | Integer::from_str(u).unwrap();
         assert_eq!(n.to_string(), out);
+        assert!(n.is_valid());
 
         let n = v | &Integer::from_str(u).unwrap();
         assert_eq!(n.to_string(), out);
+        assert!(n.is_valid());
 
         let n = v | rug::Integer::from_str(u).unwrap();
         assert_eq!(n.to_string(), out);
@@ -113,22 +117,22 @@ fn test_or_i32() {
 }
 
 #[test]
-fn limbs_pos_or_neg_i32_properties() {
+fn limbs_pos_or_neg_limb_properties() {
     test_properties(
-        pairs_of_u32_vec_and_negative_signed_var_1,
-        |&(ref limbs, i)| {
-            limbs_pos_or_neg_i32(limbs, i);
+        pairs_of_u32_vec_and_positive_u32_var_1,
+        |&(ref limbs, u)| {
+            limbs_pos_or_neg_limb(limbs, u);
             //TODO
         },
     );
 }
 
 #[test]
-fn limbs_neg_or_neg_i32_properties() {
+fn limbs_neg_or_neg_limb_properties() {
     test_properties(
-        pairs_of_u32_vec_and_negative_signed_var_1,
-        |&(ref limbs, i)| {
-            limbs_neg_or_neg_i32(limbs, i);
+        pairs_of_u32_vec_and_positive_u32_var_1,
+        |&(ref limbs, u)| {
+            limbs_neg_or_neg_limb(limbs, u);
             //TODO
         },
     );
@@ -153,8 +157,8 @@ fn or_i32_properties() {
             assert_eq!(integer_or_i32_alt_1(&n, i), result);
             assert_eq!(integer_or_i32_alt_2(&n, i), result);
 
-            //TODO assert_eq!(n | Integer::from(u), result);
-            //TODO assert_eq!(Integer::from(u) | n, result);
+            assert_eq!(n | Integer::from(i), result);
+            assert_eq!(Integer::from(i) | n, result);
 
             assert_eq!(&result | i, result);
 

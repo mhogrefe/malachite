@@ -127,18 +127,22 @@ fn test_and_i32() {
 
         let n = Integer::from_str(u).unwrap() & v;
         assert_eq!(n.to_string(), out);
+        assert!(n.is_valid());
 
         let n = &Integer::from_str(u).unwrap() & v;
         assert_eq!(n.to_string(), out);
+        assert!(n.is_valid());
 
         let n = rug::Integer::from_str(u).unwrap() & v;
         assert_eq!(n.to_string(), out);
 
         let n = v & Integer::from_str(u).unwrap();
         assert_eq!(n.to_string(), out);
+        assert!(n.is_valid());
 
         let n = v & &Integer::from_str(u).unwrap();
         assert_eq!(n.to_string(), out);
+        assert!(n.is_valid());
 
         let n = v & rug::Integer::from_str(u).unwrap();
         assert_eq!(n.to_string(), out);

@@ -733,8 +733,6 @@ impl<'a> BitAnd<&'a Integer> for Integer {
 /// assert_eq!((&Integer::from(-123) & Integer::from(-456)).to_string(), "-512");
 /// assert_eq!((&-Integer::trillion() & -(Integer::trillion() + 1u32)).to_string(),
 ///     "-1000000004096");
-/// assert_eq!((&Integer::from_str("3332140978726732268209104861552").unwrap() & Integer::from_str("-478178031043645514337313657924474082957368").unwrap()).to_string(),
-///     "2539024739207132029580719268160");
 /// ```
 impl<'a> BitAnd<Integer> for &'a Integer {
     type Output = Integer;
@@ -761,8 +759,6 @@ impl<'a> BitAnd<Integer> for &'a Integer {
 /// assert_eq!((&Integer::from(-123) & &Integer::from(-456)).to_string(), "-512");
 /// assert_eq!((&-Integer::trillion() & &-(Integer::trillion() + 1u32)).to_string(),
 ///     "-1000000004096");
-/// assert_eq!((&Integer::from_str("3332140978726732268209104861552").unwrap() & &Integer::from_str("-478178031043645514337313657924474082957368").unwrap()).to_string(),
-///     "2539024739207132029580719268160");
 /// ```
 impl<'a, 'b> BitAnd<&'a Integer> for &'b Integer {
     type Output = Integer;

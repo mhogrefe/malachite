@@ -1,12 +1,12 @@
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::base::pairs_of_u32_vec_and_negative_signed_var_1;
+use inputs::base::pairs_of_u32_vec_and_positive_u32_var_1;
 use inputs::integer::{
     pairs_of_integer_and_signed, pairs_of_signed_and_integer, rm_pairs_of_integer_and_signed,
     rm_pairs_of_signed_and_integer,
 };
 use integer::logic::or::{integer_or_alt_1, integer_or_alt_2};
 use malachite_base::num::SignificantBits;
-use malachite_nz::integer::logic::or_i32::{limbs_neg_or_neg_i32, limbs_pos_or_neg_i32};
+use malachite_nz::integer::logic::or_i32::{limbs_neg_or_neg_limb, limbs_pos_or_neg_limb};
 use malachite_nz::integer::Integer;
 
 pub fn integer_or_i32_alt_1(n: &Integer, i: i32) -> Integer {
@@ -18,15 +18,15 @@ pub fn integer_or_i32_alt_2(n: &Integer, i: i32) -> Integer {
 }
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
-    register_demo!(registry, demo_limbs_pos_or_neg_i32);
-    register_demo!(registry, demo_limbs_neg_or_neg_i32);
+    register_demo!(registry, demo_limbs_pos_or_neg_limb);
+    register_demo!(registry, demo_limbs_neg_or_neg_limb);
     register_demo!(registry, demo_integer_or_assign_i32);
     register_demo!(registry, demo_integer_or_i32);
     register_demo!(registry, demo_integer_or_i32_ref);
     register_demo!(registry, demo_i32_or_integer);
     register_demo!(registry, demo_i32_or_integer_ref);
-    register_bench!(registry, Small, benchmark_limbs_pos_or_neg_i32);
-    register_bench!(registry, Small, benchmark_limbs_neg_or_neg_i32);
+    register_bench!(registry, Small, benchmark_limbs_pos_or_neg_limb);
+    register_bench!(registry, Small, benchmark_limbs_neg_or_neg_limb);
     register_bench!(
         registry,
         Large,
@@ -47,24 +47,24 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     );
 }
 
-fn demo_limbs_pos_or_neg_i32(gm: GenerationMode, limit: usize) {
-    for (limbs, limb) in pairs_of_u32_vec_and_negative_signed_var_1(gm).take(limit) {
+fn demo_limbs_pos_or_neg_limb(gm: GenerationMode, limit: usize) {
+    for (limbs, limb) in pairs_of_u32_vec_and_positive_u32_var_1(gm).take(limit) {
         println!(
-            "limbs_pos_or_neg_i32({:?}, {}) = {:?}",
+            "limbs_pos_or_neg_limb({:?}, {}) = {:?}",
             limbs,
             limb,
-            limbs_pos_or_neg_i32(&limbs, limb)
+            limbs_pos_or_neg_limb(&limbs, limb)
         );
     }
 }
 
-fn demo_limbs_neg_or_neg_i32(gm: GenerationMode, limit: usize) {
-    for (limbs, limb) in pairs_of_u32_vec_and_negative_signed_var_1(gm).take(limit) {
+fn demo_limbs_neg_or_neg_limb(gm: GenerationMode, limit: usize) {
+    for (limbs, limb) in pairs_of_u32_vec_and_positive_u32_var_1(gm).take(limit) {
         println!(
-            "limbs_neg_or_neg_i32({:?}, {}) = {:?}",
+            "limbs_neg_or_neg_limb({:?}, {}) = {:?}",
             limbs,
             limb,
-            limbs_neg_or_neg_i32(&limbs, limb)
+            limbs_neg_or_neg_limb(&limbs, limb)
         );
     }
 }
@@ -103,11 +103,11 @@ fn demo_i32_or_integer_ref(gm: GenerationMode, limit: usize) {
     }
 }
 
-fn benchmark_limbs_pos_or_neg_i32(gm: GenerationMode, limit: usize, file_name: &str) {
+fn benchmark_limbs_pos_or_neg_limb(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
-        "limbs_pos_or_neg_i32(&[u32], i32)",
+        "limbs_pos_or_neg_limb(&[u32], i32)",
         BenchmarkType::Single,
-        pairs_of_u32_vec_and_negative_signed_var_1(gm),
+        pairs_of_u32_vec_and_positive_u32_var_1(gm),
         gm.name(),
         limit,
         file_name,
@@ -115,16 +115,16 @@ fn benchmark_limbs_pos_or_neg_i32(gm: GenerationMode, limit: usize, file_name: &
         "limbs.len()",
         &mut [(
             "malachite",
-            &mut (|(limbs, i)| no_out!(limbs_pos_or_neg_i32(&limbs, i))),
+            &mut (|(limbs, i)| no_out!(limbs_pos_or_neg_limb(&limbs, i))),
         )],
     );
 }
 
-fn benchmark_limbs_neg_or_neg_i32(gm: GenerationMode, limit: usize, file_name: &str) {
+fn benchmark_limbs_neg_or_neg_limb(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
-        "limbs_neg_or_neg_i32(&[u32], i32)",
+        "limbs_neg_or_neg_limb(&[u32], i32)",
         BenchmarkType::Single,
-        pairs_of_u32_vec_and_negative_signed_var_1(gm),
+        pairs_of_u32_vec_and_positive_u32_var_1(gm),
         gm.name(),
         limit,
         file_name,
@@ -132,7 +132,7 @@ fn benchmark_limbs_neg_or_neg_i32(gm: GenerationMode, limit: usize, file_name: &
         "limbs.len()",
         &mut [(
             "malachite",
-            &mut (|(limbs, i)| no_out!(limbs_neg_or_neg_i32(&limbs, i))),
+            &mut (|(limbs, i)| no_out!(limbs_neg_or_neg_limb(&limbs, i))),
         )],
     );
 }

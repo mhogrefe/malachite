@@ -31,7 +31,7 @@ impl<'a> BitAnd<u32> for &'a Integer {
         if self.sign {
             &self.abs & other
         } else {
-            self.abs.neg_and_u32(other)
+            self.abs.and_neg_u32_pos(other)
         }
     }
 }
@@ -94,13 +94,13 @@ impl BitAndAssign<u32> for Integer {
             self.abs &= other;
         } else {
             self.sign = true;
-            self.abs = Small(self.abs.neg_and_u32(other));
+            self.abs = Small(self.abs.and_neg_u32_pos(other));
         }
     }
 }
 
 impl Natural {
-    fn neg_and_u32(&self, other: u32) -> u32 {
+    fn and_neg_u32_pos(&self, other: u32) -> u32 {
         u32::wrapping_from(self).wrapping_neg() & other
     }
 }

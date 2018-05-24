@@ -1,4 +1,8 @@
+use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
+use inputs::integer::{pairs_of_integers, rm_pairs_of_integers};
+use malachite_base::num::SignificantBits;
 use malachite_nz::integer::Integer;
+use std::cmp::max;
 use std::iter::repeat;
 use std::u32;
 
@@ -18,11 +22,11 @@ pub fn integer_or_alt_1(x: &Integer, y: &Integer) -> Integer {
                     .zip(y.twos_complement_bits()),
             )
         };
-    let mut and_bits = Vec::new();
+    let mut or_bits = Vec::new();
     for (b, c) in bit_zip {
-        and_bits.push(b || c);
+        or_bits.push(b || c);
     }
-    Integer::from_twos_complement_bits_asc(&and_bits)
+    Integer::from_twos_complement_bits_asc(&or_bits)
 }
 
 pub fn integer_or_alt_2(x: &Integer, y: &Integer) -> Integer {
@@ -41,9 +45,177 @@ pub fn integer_or_alt_2(x: &Integer, y: &Integer) -> Integer {
                     .zip(y.twos_complement_limbs()),
             )
         };
-    let mut and_limbs = Vec::new();
+    let mut or_limbs = Vec::new();
     for (x, y) in limb_zip {
-        and_limbs.push(x | y);
+        or_limbs.push(x | y);
     }
-    Integer::from_owned_twos_complement_limbs_asc(and_limbs)
+    Integer::from_owned_twos_complement_limbs_asc(or_limbs)
+}
+
+pub(crate) fn register(registry: &mut DemoBenchRegistry) {
+    register_demo!(registry, demo_integer_or_assign);
+    register_demo!(registry, demo_integer_or_assign_ref);
+    register_demo!(registry, demo_integer_or);
+    register_demo!(registry, demo_integer_or_val_ref);
+    register_demo!(registry, demo_integer_or_ref_val);
+    register_demo!(registry, demo_integer_or_ref_ref);
+    register_bench!(
+        registry,
+        Large,
+        benchmark_integer_or_assign_library_comparison
+    );
+    register_bench!(
+        registry,
+        Large,
+        benchmark_integer_or_assign_evaluation_strategy
+    );
+    register_bench!(registry, Large, benchmark_integer_or_library_comparison);
+    register_bench!(registry, Large, benchmark_integer_or_algorithms);
+    register_bench!(registry, Large, benchmark_integer_or_evaluation_strategy);
+}
+
+fn demo_integer_or_assign(gm: GenerationMode, limit: usize) {
+    for (mut x, y) in pairs_of_integers(gm).take(limit) {
+        let x_old = x.clone();
+        x |= y.clone();
+        println!("x := {}; x |= {}; x = {}", x_old, y, x);
+    }
+}
+
+fn demo_integer_or_assign_ref(gm: GenerationMode, limit: usize) {
+    for (mut x, y) in pairs_of_integers(gm).take(limit) {
+        let x_old = x.clone();
+        x |= &y;
+        println!("x := {}; x |= &{}; x = {}", x_old, y, x);
+    }
+}
+
+fn demo_integer_or(gm: GenerationMode, limit: usize) {
+    for (x, y) in pairs_of_integers(gm).take(limit) {
+        let x_old = x.clone();
+        let y_old = y.clone();
+        println!("{} | {} = {}", x_old, y_old, x | y);
+    }
+}
+
+fn demo_integer_or_val_ref(gm: GenerationMode, limit: usize) {
+    for (x, y) in pairs_of_integers(gm).take(limit) {
+        let x_old = x.clone();
+        println!("{} | &{} = {}", x_old, y, x | &y);
+    }
+}
+
+fn demo_integer_or_ref_val(gm: GenerationMode, limit: usize) {
+    for (x, y) in pairs_of_integers(gm).take(limit) {
+        let y_old = y.clone();
+        println!("&{} | {} = {}", x, y_old, &x | y);
+    }
+}
+
+fn demo_integer_or_ref_ref(gm: GenerationMode, limit: usize) {
+    for (x, y) in pairs_of_integers(gm).take(limit) {
+        println!("&{} | &{} = {}", x, y, &x | &y);
+    }
+}
+
+fn benchmark_integer_or_assign_library_comparison(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "Integer |= Integer",
+        BenchmarkType::LibraryComparison,
+        rm_pairs_of_integers(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(_, (ref x, ref y))| max(x.significant_bits(), y.significant_bits()) as usize),
+        "max(x.significant_bits(), y.significant_bits())",
+        &mut [
+            ("malachite", &mut (|(_, (mut x, y))| x |= y)),
+            ("rug", &mut (|((mut x, y), _)| x |= y)),
+        ],
+    );
+}
+
+fn benchmark_integer_or_assign_evaluation_strategy(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "Integer |= Integer",
+        BenchmarkType::EvaluationStrategy,
+        pairs_of_integers(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),
+        "max(x.significant_bits(), y.significant_bits())",
+        &mut [
+            ("Integer |= Integer", &mut (|(mut x, y)| no_out!(x |= y))),
+            ("Integer |= &Integer", &mut (|(mut x, y)| no_out!(x |= &y))),
+        ],
+    );
+}
+
+fn benchmark_integer_or_library_comparison(gm: GenerationMode, limit: usize, file_name: &str) {
+    m_run_benchmark(
+        "Integer | Integer",
+        BenchmarkType::LibraryComparison,
+        rm_pairs_of_integers(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(_, (ref x, ref y))| max(x.significant_bits(), y.significant_bits()) as usize),
+        "max(x.significant_bits(), y.significant_bits())",
+        &mut [
+            ("malachite", &mut (|(_, (x, y))| no_out!(x | y))),
+            ("rug", &mut (|((x, y), _)| no_out!(x | y))),
+        ],
+    );
+}
+
+fn benchmark_integer_or_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
+    m_run_benchmark(
+        "Integer | Integer",
+        BenchmarkType::Algorithms,
+        pairs_of_integers(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),
+        "max(x.significant_bits(), y.significant_bits())",
+        &mut [
+            ("default", &mut (|(ref x, ref y)| no_out!(x | y))),
+            (
+                "using bits explicitly",
+                &mut (|(ref x, ref y)| no_out!(integer_or_alt_1(x, y))),
+            ),
+            (
+                "using limbs explicitly",
+                &mut (|(ref x, ref y)| no_out!(integer_or_alt_2(x, y))),
+            ),
+        ],
+    );
+}
+
+fn benchmark_integer_or_evaluation_strategy(gm: GenerationMode, limit: usize, file_name: &str) {
+    m_run_benchmark(
+        "Integer | Integer",
+        BenchmarkType::EvaluationStrategy,
+        pairs_of_integers(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),
+        "max(x.significant_bits(), y.significant_bits())",
+        &mut [
+            ("Integer | Integer", &mut (|(x, y)| no_out!(x | y))),
+            ("Integer | &Integer", &mut (|(x, y)| no_out!(x | &y))),
+            ("&Integer | Integer", &mut (|(x, y)| no_out!(&x | y))),
+            ("&Integer | &Integer", &mut (|(x, y)| no_out!(&x | &y))),
+        ],
+    );
 }

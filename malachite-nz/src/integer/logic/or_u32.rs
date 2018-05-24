@@ -196,7 +196,7 @@ impl<'a> BitOr<u32> for &'a Integer {
             abs: if self.sign {
                 &self.abs | other
             } else {
-                self.abs.or_neg_u32(other)
+                self.abs.or_neg_u32_pos(other)
             },
         }
     }
@@ -292,13 +292,13 @@ impl BitOrAssign<u32> for Integer {
         if self.sign {
             self.abs |= other;
         } else {
-            self.abs.or_assign_neg_u32(other);
+            self.abs.or_assign_neg_u32_pos(other);
         }
     }
 }
 
 impl Natural {
-    fn or_assign_neg_u32(&mut self, other: u32) {
+    fn or_assign_neg_u32_pos(&mut self, other: u32) {
         match *self {
             Small(ref mut small) => {
                 *small = (small.wrapping_neg() | other).wrapping_neg();
@@ -309,7 +309,7 @@ impl Natural {
         self.trim();
     }
 
-    fn or_neg_u32(&self, other: u32) -> Natural {
+    pub(crate) fn or_neg_u32_pos(&self, other: u32) -> Natural {
         match *self {
             Small(ref small) => Small((small.wrapping_neg() | other).wrapping_neg()),
             Large(ref limbs) => {

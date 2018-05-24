@@ -829,6 +829,7 @@ fn and_properties() {
         assert_eq!(y & x, result);
         assert_eq!(&result & x, result);
         assert_eq!(&result & y, result);
+        assert_eq!(!(!x | !y), result);
     });
 
     test_properties(
