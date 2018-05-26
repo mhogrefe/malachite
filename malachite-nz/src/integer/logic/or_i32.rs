@@ -242,7 +242,7 @@ impl BitOrAssign<i32> for Integer {
 }
 
 impl Natural {
-    fn or_assign_pos_u32_neg(&mut self, other: u32) {
+    pub(crate) fn or_assign_pos_u32_neg(&mut self, other: u32) {
         *self = self.or_pos_u32_neg(other);
     }
 
@@ -253,7 +253,7 @@ impl Natural {
         })
     }
 
-    fn or_assign_neg_u32_neg(&mut self, other: u32) {
+    pub(crate) fn or_assign_neg_u32_neg(&mut self, other: u32) {
         *self = self.or_neg_u32_neg(other);
     }
 

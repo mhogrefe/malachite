@@ -1,7 +1,7 @@
 use integer::Integer;
 use malachite_base::limbs::limbs_leading_zero_limbs;
 use natural::Natural::{self, Large, Small};
-use std::cmp::min;
+use std::cmp::{max, min};
 use std::iter::repeat;
 use std::ops::{BitOr, BitOrAssign};
 use std::u32;
@@ -49,6 +49,95 @@ pub fn limbs_or_pos_neg(xs: &[u32], ys: &[u32]) -> Vec<u32> {
     result_limbs
 }
 
+pub fn limbs_or_pos_neg_in_place_left(xs: &mut Vec<u32>, ys: &[u32]) {
+    let xs_len = xs.len();
+    let ys_len = ys.len();
+    let x_i = limbs_leading_zero_limbs(xs);
+    let y_i = limbs_leading_zero_limbs(ys);
+    assert!(x_i < xs_len);
+    assert!(y_i < ys_len);
+    if y_i >= xs_len {
+        xs[x_i] = xs[x_i].wrapping_neg();
+        for x in xs[x_i + 1..].iter_mut() {
+            *x = !*x;
+        }
+        xs.extend(repeat(u32::MAX).take(y_i - xs_len));
+        xs.push(ys[y_i] - 1);
+        xs.extend_from_slice(&ys[y_i + 1..]);
+        return;
+    } else if x_i >= ys_len {
+        *xs = ys.to_vec();
+        return;
+    }
+    let max_i = max(x_i, y_i);
+    if x_i == y_i {
+        xs[x_i] = (!xs[x_i] & (ys[y_i] - 1)) + 1;
+    } else if x_i > y_i {
+        xs[y_i..x_i].copy_from_slice(&ys[y_i..x_i]);
+        xs[x_i] = !xs[x_i] & ys[x_i];
+    } else {
+        xs[x_i] = xs[x_i].wrapping_neg();
+        for x in xs[x_i + 1..y_i].iter_mut() {
+            *x = !*x;
+        }
+        xs[y_i] = !xs[y_i] & (ys[y_i] - 1);
+    };
+    if xs_len < ys_len {
+        for (x, y) in xs[max_i + 1..].iter_mut().zip(ys[max_i + 1..xs_len].iter()) {
+            *x = !*x & y
+        }
+        xs.extend_from_slice(&ys[xs_len..]);
+    } else {
+        for (x, y) in xs[max_i + 1..ys_len].iter_mut().zip(ys[max_i + 1..].iter()) {
+            *x = !*x & y
+        }
+        xs.truncate(ys_len);
+    }
+}
+
+pub fn limbs_or_pos_neg_in_place_right(xs: &[u32], ys: &mut [u32]) {
+    let xs_len = xs.len();
+    let ys_len = ys.len();
+    let x_i = limbs_leading_zero_limbs(xs);
+    let y_i = limbs_leading_zero_limbs(ys);
+    assert!(x_i < xs_len);
+    assert!(y_i < ys_len);
+    if y_i >= xs_len {
+        ys[x_i] = xs[x_i].wrapping_neg();
+        for i in x_i + 1..xs_len {
+            ys[i] = !xs[i];
+        }
+        for y in ys.iter_mut().take(y_i).skip(xs_len) {
+            *y = u32::MAX;
+        }
+        ys[y_i] -= 1;
+        return;
+    } else if x_i >= ys_len {
+        return;
+    }
+    let max_i = max(x_i, y_i);
+    if x_i == y_i {
+        ys[y_i] = (!xs[x_i] & (ys[y_i] - 1)) + 1;
+    } else if x_i > y_i {
+        ys[x_i] &= !xs[x_i];
+    } else {
+        ys[x_i] = xs[x_i].wrapping_neg();
+        for i in x_i + 1..y_i {
+            ys[i] = !xs[i];
+        }
+        ys[y_i] = !xs[y_i] & (ys[y_i] - 1);
+    };
+    if xs_len < ys_len {
+        for (x, y) in xs[max_i + 1..].iter().zip(ys[max_i + 1..xs_len].iter_mut()) {
+            *y &= !x;
+        }
+    } else {
+        for (x, y) in xs[max_i + 1..ys_len].iter().zip(ys[max_i + 1..].iter_mut()) {
+            *y &= !x;
+        }
+    }
+}
+
 pub fn limbs_or_neg_neg(xs: &[u32], ys: &[u32]) -> Vec<u32> {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -82,6 +171,73 @@ pub fn limbs_or_neg_neg(xs: &[u32], ys: &[u32]) -> Vec<u32> {
             .map(|(x, y)| x & y),
     );
     result_limbs
+}
+
+pub fn limbs_or_neg_neg_in_place_left(xs: &mut Vec<u32>, ys: &[u32]) {
+    let xs_len = xs.len();
+    let ys_len = ys.len();
+    let x_i = limbs_leading_zero_limbs(xs);
+    let y_i = limbs_leading_zero_limbs(ys);
+    assert!(x_i < xs_len);
+    assert!(y_i < ys_len);
+    if y_i >= xs_len {
+        return;
+    } else if x_i >= ys_len {
+        *xs = ys.to_vec();
+        return;
+    }
+    let max_i = max(x_i, y_i);
+    if x_i > y_i {
+        xs[y_i..x_i].copy_from_slice(&ys[y_i..x_i]);
+    }
+    xs[max_i] = if x_i == y_i {
+        ((xs[x_i] - 1) & (ys[y_i] - 1)) + 1
+    } else if x_i > y_i {
+        (xs[x_i] - 1) & ys[x_i]
+    } else {
+        xs[y_i] & (ys[y_i] - 1)
+    };
+    for (x, y) in xs[max_i + 1..].iter_mut().zip(ys[max_i + 1..].iter()) {
+        *x &= y;
+    }
+    xs.truncate(ys_len);
+}
+
+pub fn limbs_or_neg_neg_in_place_either(xs: &mut Vec<u32>, ys: &mut Vec<u32>) -> bool {
+    let xs_len = xs.len();
+    let ys_len = ys.len();
+    let x_i = limbs_leading_zero_limbs(xs);
+    let y_i = limbs_leading_zero_limbs(ys);
+    assert!(x_i < xs_len);
+    assert!(y_i < ys_len);
+    if y_i >= xs_len {
+        return false;
+    } else if x_i >= ys_len {
+        return true;
+    }
+    let max_i = max(x_i, y_i);
+    let boundary_limb = if x_i == y_i {
+        ((xs[x_i] - 1) & (ys[y_i] - 1)) + 1
+    } else if x_i > y_i {
+        (xs[x_i] - 1) & ys[x_i]
+    } else {
+        xs[y_i] & (ys[y_i] - 1)
+    };
+    if x_i > y_i {
+        ys[max_i] = boundary_limb;
+        for (y, x) in ys[max_i + 1..].iter_mut().zip(xs[max_i + 1..].iter()) {
+            *y &= x;
+        }
+        ys.truncate(xs_len);
+        true
+    } else {
+        xs[max_i] = boundary_limb;
+        for (x, y) in xs[max_i + 1..].iter_mut().zip(ys[max_i + 1..].iter()) {
+            *x &= y;
+        }
+        xs.truncate(ys_len);
+        false
+    }
 }
 
 /// Takes the bitwise or of two `Integer`s, taking both by value.
@@ -231,8 +387,15 @@ impl<'a, 'b> BitOr<&'a Integer> for &'b Integer {
 /// ```
 impl BitOrAssign<Integer> for Integer {
     fn bitor_assign(&mut self, other: Integer) {
-        //TODO
-        *self = &*self | &other;
+        match (self.sign, other.sign) {
+            (true, true) => self.abs.bitor_assign(other.abs),
+            (true, false) => {
+                self.sign = false;
+                self.abs.or_assign_pos_neg(other.abs)
+            }
+            (false, true) => self.abs.or_assign_neg_pos(other.abs),
+            (false, false) => self.abs.or_assign_neg_neg(other.abs),
+        }
     }
 }
 
@@ -264,12 +427,74 @@ impl BitOrAssign<Integer> for Integer {
 /// ```
 impl<'a> BitOrAssign<&'a Integer> for Integer {
     fn bitor_assign(&mut self, other: &'a Integer) {
-        //TODO
-        *self = &*self | other;
+        match (self.sign, other.sign) {
+            (true, true) => self.abs.bitor_assign(&other.abs),
+            (true, false) => {
+                self.sign = false;
+                self.abs.or_assign_pos_neg_ref(&other.abs)
+            }
+            (false, true) => self.abs.or_assign_neg_pos_ref(&other.abs),
+            (false, false) => self.abs.or_assign_neg_neg_ref(&other.abs),
+        }
     }
 }
 
 impl Natural {
+    fn or_assign_pos_neg_ref(&mut self, other: &Natural) {
+        if let Small(y) = *other {
+            self.or_assign_pos_u32_neg(y.wrapping_neg());
+        } else if let Small(x) = *self {
+            *self = other.or_neg_u32_pos(x);
+        } else if let Large(ref ys) = *other {
+            if let Large(ref mut xs) = *self {
+                limbs_or_pos_neg_in_place_left(xs, ys);
+            }
+            self.trim();
+        }
+    }
+
+    fn or_assign_pos_neg(&mut self, other: Natural) {
+        if let Small(y) = other {
+            self.or_assign_pos_u32_neg(y.wrapping_neg());
+        } else if let Small(x) = *self {
+            *self = other;
+            self.or_assign_neg_u32_pos(x);
+        } else if let Large(mut ys) = other {
+            if let Large(ref mut xs) = *self {
+                limbs_or_pos_neg_in_place_right(xs, &mut ys);
+                *xs = ys;
+            }
+            self.trim();
+        }
+    }
+
+    fn or_assign_neg_pos_ref(&mut self, other: &Natural) {
+        if let Small(y) = *other {
+            self.or_assign_neg_u32_pos(y);
+        } else if let Small(x) = *self {
+            *self = other.or_pos_u32_neg(x.wrapping_neg());
+        } else if let Large(ref ys) = *other {
+            if let Large(ref mut xs) = *self {
+                limbs_or_pos_neg_in_place_right(ys, xs);
+            }
+            self.trim();
+        }
+    }
+
+    fn or_assign_neg_pos(&mut self, other: Natural) {
+        if let Small(y) = other {
+            self.or_assign_neg_u32_pos(y);
+        } else if let Small(x) = *self {
+            *self = other;
+            self.or_assign_pos_u32_neg(x.wrapping_neg());
+        } else if let Large(ref ys) = other {
+            if let Large(ref mut xs) = *self {
+                limbs_or_pos_neg_in_place_right(ys, xs);
+            }
+            self.trim();
+        }
+    }
+
     fn or_pos_neg(&self, other: &Natural) -> Natural {
         match (self, other) {
             (_, &Small(y)) => self.or_pos_u32_neg(y.wrapping_neg()),
@@ -279,6 +504,35 @@ impl Natural {
                 result.trim();
                 result
             }
+        }
+    }
+
+    fn or_assign_neg_neg_ref(&mut self, other: &Natural) {
+        if let Small(y) = *other {
+            self.or_assign_neg_u32_neg(y.wrapping_neg());
+        } else if let Small(x) = *self {
+            *self = other.or_neg_u32_neg(x.wrapping_neg());
+        } else if let Large(ref ys) = *other {
+            if let Large(ref mut xs) = *self {
+                limbs_or_neg_neg_in_place_left(xs, ys);
+            }
+            self.trim();
+        }
+    }
+
+    fn or_assign_neg_neg(&mut self, other: Natural) {
+        if let Small(y) = other {
+            self.or_assign_neg_u32_neg(y.wrapping_neg());
+        } else if let Small(x) = *self {
+            *self = other;
+            self.or_assign_neg_u32_neg(x.wrapping_neg());
+        } else if let Large(mut ys) = other {
+            if let Large(ref mut xs) = *self {
+                if limbs_or_neg_neg_in_place_either(xs, &mut ys) {
+                    *xs = ys;
+                }
+            }
+            self.trim();
         }
     }
 

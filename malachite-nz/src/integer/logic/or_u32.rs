@@ -298,7 +298,7 @@ impl BitOrAssign<u32> for Integer {
 }
 
 impl Natural {
-    fn or_assign_neg_u32_pos(&mut self, other: u32) {
+    pub(crate) fn or_assign_neg_u32_pos(&mut self, other: u32) {
         match *self {
             Small(ref mut small) => {
                 *small = (small.wrapping_neg() | other).wrapping_neg();
