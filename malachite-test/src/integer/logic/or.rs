@@ -1,6 +1,13 @@
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
+use inputs::base::{pairs_of_u32_vec_var_1, triples_of_u32_vec_var_6, triples_of_u32_vec_var_8};
 use inputs::integer::{pairs_of_integers, rm_pairs_of_integers};
 use malachite_base::num::SignificantBits;
+use malachite_nz::integer::logic::or::{
+    limbs_or_neg_neg, limbs_or_neg_neg_in_place_either, limbs_or_neg_neg_to_out, limbs_or_pos_neg,
+    limbs_or_pos_neg_in_place_right, limbs_or_pos_neg_to_out, limbs_slice_or_neg_neg_in_place_left,
+    limbs_slice_or_pos_neg_in_place_left, limbs_vec_or_neg_neg_in_place_left,
+    limbs_vec_or_pos_neg_in_place_left,
+};
 use malachite_nz::integer::Integer;
 use std::cmp::max;
 use std::iter::repeat;
@@ -53,12 +60,48 @@ pub fn integer_or_alt_2(x: &Integer, y: &Integer) -> Integer {
 }
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
+    register_demo!(registry, demo_limbs_or_pos_neg);
+    register_demo!(registry, demo_limbs_or_pos_neg_to_out);
+    register_demo!(registry, demo_limbs_slice_or_pos_neg_in_place_left);
+    register_demo!(registry, demo_limbs_vec_or_pos_neg_in_place_left);
+    register_demo!(registry, demo_limbs_or_pos_neg_in_place_right);
+    register_demo!(registry, demo_limbs_or_neg_neg);
+    register_demo!(registry, demo_limbs_or_neg_neg_to_out);
+    register_demo!(registry, demo_limbs_slice_or_neg_neg_in_place_left);
+    register_demo!(registry, demo_limbs_vec_or_neg_neg_in_place_left);
+    register_demo!(registry, demo_limbs_or_neg_neg_in_place_either);
     register_demo!(registry, demo_integer_or_assign);
     register_demo!(registry, demo_integer_or_assign_ref);
     register_demo!(registry, demo_integer_or);
     register_demo!(registry, demo_integer_or_val_ref);
     register_demo!(registry, demo_integer_or_ref_val);
     register_demo!(registry, demo_integer_or_ref_ref);
+    register_bench!(registry, Small, benchmark_limbs_or_pos_neg);
+    register_bench!(registry, Small, benchmark_limbs_or_pos_neg_to_out);
+    register_bench!(
+        registry,
+        Small,
+        benchmark_limbs_slice_or_pos_neg_in_place_left
+    );
+    register_bench!(
+        registry,
+        Small,
+        benchmark_limbs_vec_or_pos_neg_in_place_left
+    );
+    register_bench!(registry, Small, benchmark_limbs_or_pos_neg_in_place_right);
+    register_bench!(registry, Small, benchmark_limbs_or_neg_neg);
+    register_bench!(registry, Small, benchmark_limbs_or_neg_neg_to_out);
+    register_bench!(
+        registry,
+        Small,
+        benchmark_limbs_slice_or_neg_neg_in_place_left
+    );
+    register_bench!(
+        registry,
+        Small,
+        benchmark_limbs_vec_or_neg_neg_in_place_left
+    );
+    register_bench!(registry, Small, benchmark_limbs_or_neg_neg_in_place_either);
     register_bench!(
         registry,
         Large,
@@ -72,6 +115,129 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_bench!(registry, Large, benchmark_integer_or_library_comparison);
     register_bench!(registry, Large, benchmark_integer_or_algorithms);
     register_bench!(registry, Large, benchmark_integer_or_evaluation_strategy);
+}
+
+fn demo_limbs_or_pos_neg(gm: GenerationMode, limit: usize) {
+    for (ref xs, ref ys) in pairs_of_u32_vec_var_1(gm).take(limit) {
+        println!(
+            "limbs_or_pos_neg({:?}, {:?}) = {:?}",
+            xs,
+            ys,
+            limbs_or_pos_neg(xs, ys)
+        );
+    }
+}
+
+fn demo_limbs_or_pos_neg_to_out(gm: GenerationMode, limit: usize) {
+    for (ref out_limbs, ref xs, ref ys) in triples_of_u32_vec_var_6(gm).take(limit) {
+        let mut out_limbs = out_limbs.to_vec();
+        let mut out_limbs_old = out_limbs.clone();
+        limbs_or_pos_neg_to_out(&mut out_limbs, xs, ys);
+        println!(
+            "out_limbs := {:?}; limbs_or_pos_neg_to_out(&mut out_limbs, {:?}, {:?}); \
+             out_limbs = {:?}",
+            out_limbs_old, xs, ys, out_limbs
+        );
+    }
+}
+
+fn demo_limbs_slice_or_pos_neg_in_place_left(gm: GenerationMode, limit: usize) {
+    for (ref xs, ref ys) in pairs_of_u32_vec_var_1(gm).take(limit) {
+        let mut xs = xs.to_vec();
+        let mut xs_old = xs.clone();
+        let out = limbs_slice_or_pos_neg_in_place_left(&mut xs, ys);
+        println!(
+            "xs := {:?}; limbs_slice_or_pos_neg_in_place_left(&mut xs, {:?}) = {}; xs = {:?}",
+            xs_old, ys, out, xs
+        );
+    }
+}
+
+fn demo_limbs_vec_or_pos_neg_in_place_left(gm: GenerationMode, limit: usize) {
+    for (ref xs, ref ys) in pairs_of_u32_vec_var_1(gm).take(limit) {
+        let mut xs = xs.to_vec();
+        let mut xs_old = xs.clone();
+        limbs_vec_or_pos_neg_in_place_left(&mut xs, ys);
+        println!(
+            "xs := {:?}; limbs_vec_or_pos_neg_in_place_left(&mut xs, {:?}); xs = {:?}",
+            xs_old, ys, xs
+        );
+    }
+}
+
+fn demo_limbs_or_pos_neg_in_place_right(gm: GenerationMode, limit: usize) {
+    for (ref xs, ref ys) in pairs_of_u32_vec_var_1(gm).take(limit) {
+        let mut ys = ys.to_vec();
+        let mut ys_old = ys.clone();
+        limbs_or_pos_neg_in_place_right(xs, &mut ys);
+        println!(
+            "ys := {:?}; limbs_or_pos_neg_in_place_right({:?}, &mut ys); ys = {:?}",
+            xs, ys_old, ys
+        );
+    }
+}
+
+fn demo_limbs_or_neg_neg(gm: GenerationMode, limit: usize) {
+    for (ref xs, ref ys) in pairs_of_u32_vec_var_1(gm).take(limit) {
+        println!(
+            "limbs_or_neg_neg({:?}, {:?}) = {:?}",
+            xs,
+            ys,
+            limbs_or_neg_neg(xs, ys)
+        );
+    }
+}
+
+fn demo_limbs_or_neg_neg_to_out(gm: GenerationMode, limit: usize) {
+    for (ref out_limbs, ref xs, ref ys) in triples_of_u32_vec_var_8(gm).take(limit) {
+        let mut out_limbs = out_limbs.to_vec();
+        let mut out_limbs_old = out_limbs.clone();
+        limbs_or_neg_neg_to_out(&mut out_limbs, xs, ys);
+        println!(
+            "out_limbs := {:?}; limbs_or_neg_neg_to_out(&mut out_limbs, {:?}, {:?}); \
+             out_limbs = {:?}",
+            out_limbs_old, xs, ys, out_limbs
+        );
+    }
+}
+
+fn demo_limbs_slice_or_neg_neg_in_place_left(gm: GenerationMode, limit: usize) {
+    for (ref xs, ref ys) in pairs_of_u32_vec_var_1(gm).take(limit) {
+        let mut xs = xs.to_vec();
+        let mut xs_old = xs.clone();
+        limbs_slice_or_neg_neg_in_place_left(&mut xs, ys);
+        println!(
+            "xs := {:?}; limbs_slice_or_neg_neg_in_place_left(&mut xs, {:?}); xs = {:?}",
+            xs_old, ys, xs
+        );
+    }
+}
+
+fn demo_limbs_vec_or_neg_neg_in_place_left(gm: GenerationMode, limit: usize) {
+    for (ref xs, ref ys) in pairs_of_u32_vec_var_1(gm).take(limit) {
+        let mut xs = xs.to_vec();
+        let mut xs_old = xs.clone();
+        limbs_vec_or_neg_neg_in_place_left(&mut xs, ys);
+        println!(
+            "xs := {:?}; limbs_vec_or_neg_neg_in_place_left(&mut xs, {:?}); xs = {:?}",
+            xs_old, ys, xs
+        );
+    }
+}
+
+fn demo_limbs_or_neg_neg_in_place_either(gm: GenerationMode, limit: usize) {
+    for (ref xs, ref ys) in pairs_of_u32_vec_var_1(gm).take(limit) {
+        let mut xs = xs.to_vec();
+        let mut xs_old = xs.clone();
+        let mut ys = ys.to_vec();
+        let mut ys_old = ys.clone();
+        let b = limbs_or_neg_neg_in_place_either(&mut xs, &mut ys);
+        println!(
+            "xs := {:?}; ys := {:?}; limbs_or_neg_neg_in_place_either(&mut xs, &mut ys) = {}; \
+             xs = {:?}; ys = {:?}",
+            xs_old, ys_old, b, xs, ys
+        );
+    }
 }
 
 fn demo_integer_or_assign(gm: GenerationMode, limit: usize) {
@@ -116,6 +282,184 @@ fn demo_integer_or_ref_ref(gm: GenerationMode, limit: usize) {
     for (x, y) in pairs_of_integers(gm).take(limit) {
         println!("&{} | &{} = {}", x, y, &x | &y);
     }
+}
+
+fn benchmark_limbs_or_pos_neg(gm: GenerationMode, limit: usize, file_name: &str) {
+    m_run_benchmark(
+        "limbs_or_pos_neg(&[u32], &[u32])",
+        BenchmarkType::Single,
+        pairs_of_u32_vec_var_1(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(ref xs, _)| xs.len()),
+        "xs.len()",
+        &mut [(
+            "malachite",
+            &mut (|(ref xs, ref ys)| no_out!(limbs_or_pos_neg(xs, ys))),
+        )],
+    );
+}
+
+fn benchmark_limbs_or_pos_neg_to_out(gm: GenerationMode, limit: usize, file_name: &str) {
+    m_run_benchmark(
+        "limbs_or_pos_neg_to_out(&mut [u32], &[u32], &[u32])",
+        BenchmarkType::Single,
+        triples_of_u32_vec_var_6(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(_, ref xs, _)| xs.len()),
+        "xs.len()",
+        &mut [(
+            "malachite",
+            &mut (|(ref mut out_limbs, ref xs, ref ys)| limbs_or_pos_neg_to_out(out_limbs, xs, ys)),
+        )],
+    );
+}
+
+fn benchmark_limbs_slice_or_pos_neg_in_place_left(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "limbs_slice_or_pos_neg_in_place_left(&mut [u32], &[u32])",
+        BenchmarkType::Single,
+        pairs_of_u32_vec_var_1(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(ref xs, _)| xs.len()),
+        "xs.len()",
+        &mut [(
+            "malachite",
+            &mut (|(ref mut xs, ref ys)| no_out!(limbs_slice_or_pos_neg_in_place_left(xs, ys))),
+        )],
+    );
+}
+
+fn benchmark_limbs_vec_or_pos_neg_in_place_left(gm: GenerationMode, limit: usize, file_name: &str) {
+    m_run_benchmark(
+        "limbs_vec_or_pos_neg_in_place_left(&Vec<u32>, &[u32])",
+        BenchmarkType::Single,
+        pairs_of_u32_vec_var_1(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(ref xs, _)| xs.len()),
+        "xs.len()",
+        &mut [(
+            "malachite",
+            &mut (|(ref mut xs, ref ys)| limbs_vec_or_pos_neg_in_place_left(xs, ys)),
+        )],
+    );
+}
+
+fn benchmark_limbs_or_pos_neg_in_place_right(gm: GenerationMode, limit: usize, file_name: &str) {
+    m_run_benchmark(
+        "limbs_or_pos_neg_in_place_right(&[u32], &mut [u32])",
+        BenchmarkType::Single,
+        pairs_of_u32_vec_var_1(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(ref xs, _)| xs.len()),
+        "xs.len()",
+        &mut [(
+            "malachite",
+            &mut (|(ref xs, ref mut ys)| limbs_or_pos_neg_in_place_right(xs, ys)),
+        )],
+    );
+}
+
+fn benchmark_limbs_or_neg_neg(gm: GenerationMode, limit: usize, file_name: &str) {
+    m_run_benchmark(
+        "limbs_or_neg_neg(&[u32], &[u32])",
+        BenchmarkType::Single,
+        pairs_of_u32_vec_var_1(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(ref xs, _)| xs.len()),
+        "xs.len()",
+        &mut [(
+            "malachite",
+            &mut (|(ref xs, ref ys)| no_out!(limbs_or_neg_neg(xs, ys))),
+        )],
+    );
+}
+
+fn benchmark_limbs_or_neg_neg_to_out(gm: GenerationMode, limit: usize, file_name: &str) {
+    m_run_benchmark(
+        "limbs_or_neg_neg_to_out(&mut [u32], &[u32], &[u32])",
+        BenchmarkType::Single,
+        triples_of_u32_vec_var_8(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(_, ref xs, _)| xs.len()),
+        "xs.len()",
+        &mut [(
+            "malachite",
+            &mut (|(ref mut out_limbs, ref xs, ref ys)| limbs_or_neg_neg_to_out(out_limbs, xs, ys)),
+        )],
+    );
+}
+
+fn benchmark_limbs_slice_or_neg_neg_in_place_left(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "limbs_slice_or_neg_neg_in_place_left(&mut [u32], &[u32])",
+        BenchmarkType::Single,
+        pairs_of_u32_vec_var_1(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(ref xs, _)| xs.len()),
+        "xs.len()",
+        &mut [(
+            "malachite",
+            &mut (|(ref mut xs, ref ys)| limbs_slice_or_neg_neg_in_place_left(xs, ys)),
+        )],
+    );
+}
+
+fn benchmark_limbs_vec_or_neg_neg_in_place_left(gm: GenerationMode, limit: usize, file_name: &str) {
+    m_run_benchmark(
+        "limbs_vec_or_neg_neg_in_place_left(&mut Vec<u32>, &[u32])",
+        BenchmarkType::Single,
+        pairs_of_u32_vec_var_1(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(ref xs, _)| xs.len()),
+        "xs.len()",
+        &mut [(
+            "malachite",
+            &mut (|(ref mut xs, ref ys)| limbs_vec_or_neg_neg_in_place_left(xs, ys)),
+        )],
+    );
+}
+
+fn benchmark_limbs_or_neg_neg_in_place_either(gm: GenerationMode, limit: usize, file_name: &str) {
+    m_run_benchmark(
+        "limbs_or_neg_neg_in_place_either(&mut [u32], &mut [u32])",
+        BenchmarkType::Single,
+        pairs_of_u32_vec_var_1(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(ref xs, _)| xs.len()),
+        "xs.len()",
+        &mut [(
+            "malachite",
+            &mut (|(ref mut xs, ref mut ys)| no_out!(limbs_or_neg_neg_in_place_either(xs, ys))),
+        )],
+    );
 }
 
 fn benchmark_integer_or_assign_library_comparison(

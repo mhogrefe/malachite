@@ -126,11 +126,9 @@ fn from_twos_complement_limbs_asc_properties() {
         trimmed_limbs.reverse();
         assert_eq!(x.to_twos_complement_limbs_asc(), trimmed_limbs);
         assert_eq!(
-            Integer::from_twos_complement_limbs_desc(&limbs
-                .iter()
-                .cloned()
-                .rev()
-                .collect::<Vec<u32>>()),
+            Integer::from_twos_complement_limbs_desc(
+                &limbs.iter().cloned().rev().collect::<Vec<u32>>()
+            ),
             x
         );
         if match x.sign() {
@@ -165,11 +163,9 @@ fn from_twos_complement_limbs_desc_properties() {
         trim_be_limbs(&mut trimmed_limbs);
         assert_eq!(x.to_twos_complement_limbs_desc(), trimmed_limbs);
         assert_eq!(
-            Integer::from_twos_complement_limbs_asc(&limbs
-                .iter()
-                .cloned()
-                .rev()
-                .collect::<Vec<u32>>()),
+            Integer::from_twos_complement_limbs_asc(
+                &limbs.iter().cloned().rev().collect::<Vec<u32>>()
+            ),
             x
         );
         if match x.sign() {

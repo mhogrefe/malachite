@@ -1,7 +1,7 @@
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::{
     pairs_of_u32_vec_var_1, pairs_of_u32_vec_var_2, triples_of_u32_vec_var_5,
-    triples_of_u32_vec_var_6,
+    triples_of_u32_vec_var_7,
 };
 use inputs::integer::{pairs_of_integers, rm_pairs_of_integers};
 use malachite_base::num::SignificantBits;
@@ -203,7 +203,7 @@ fn demo_limbs_and_neg_neg(gm: GenerationMode, limit: usize) {
 }
 
 fn demo_limbs_and_neg_neg_to_out(gm: GenerationMode, limit: usize) {
-    for (ref out_limbs, ref xs, ref ys) in triples_of_u32_vec_var_6(gm).take(limit) {
+    for (ref out_limbs, ref xs, ref ys) in triples_of_u32_vec_var_7(gm).take(limit) {
         let mut out_limbs = out_limbs.to_vec();
         let mut out_limbs_old = out_limbs.clone();
         let b = limbs_and_neg_neg_to_out(&mut out_limbs, xs, ys);
@@ -429,7 +429,7 @@ fn benchmark_limbs_and_neg_neg_to_out(gm: GenerationMode, limit: usize, file_nam
     m_run_benchmark(
         "limbs_and_neg_neg_to_out(&mut [u32], &[u32], &[u32])",
         BenchmarkType::Single,
-        triples_of_u32_vec_var_6(gm),
+        triples_of_u32_vec_var_7(gm),
         gm.name(),
         limit,
         file_name,

@@ -13,7 +13,7 @@ use malachite_nz::natural::Natural;
 use malachite_test::common::{integer_to_rug_integer, rug_integer_to_integer};
 use malachite_test::inputs::base::{
     pairs_of_u32_vec_var_1, pairs_of_u32_vec_var_2, triples_of_u32_vec_var_5,
-    triples_of_u32_vec_var_6,
+    triples_of_u32_vec_var_7,
 };
 use malachite_test::inputs::integer::{
     integers, pairs_of_integer_and_unsigned, pairs_of_integers, triples_of_integers,
@@ -320,9 +320,9 @@ fn limbs_and_neg_neg_to_out_fail_4() {
 
 #[test]
 fn test_limbs_slice_and_neg_neg_in_place_left() {
-    let test = |xs_before: &[u32], ys, right, xs_after| {
+    let test = |xs_before: &[u32], ys, b, xs_after| {
         let mut xs = xs_before.to_vec();
-        assert_eq!(limbs_slice_and_neg_neg_in_place_left(&mut xs, ys), right);
+        assert_eq!(limbs_slice_and_neg_neg_in_place_left(&mut xs, ys), b);
         assert_eq!(xs, xs_after);
     };
     test(&[2], &[3], true, vec![4]);
@@ -632,17 +632,20 @@ fn limbs_and_pos_neg_properties() {
 
 #[test]
 fn limbs_and_pos_neg_to_out_properties() {
-    test_properties(triples_of_u32_vec_var_5, |&(ref xs, ref ys, ref zs)| {
-        let mut xs = xs.to_vec();
-        let xs_old = xs.clone();
-        limbs_and_pos_neg_to_out(&mut xs, ys, zs);
-        let len = ys.len();
-        assert_eq!(
-            Natural::from_limbs_asc(&xs[0..len]),
-            Integer::from(Natural::from_limbs_asc(ys)) & -Natural::from_limbs_asc(zs)
-        );
-        assert_eq!(&xs[len..], &xs_old[len..]);
-    });
+    test_properties(
+        triples_of_u32_vec_var_5,
+        |&(ref out_limbs, ref xs, ref ys)| {
+            let mut out_limbs = out_limbs.to_vec();
+            let out_limbs_old = out_limbs.clone();
+            limbs_and_pos_neg_to_out(&mut out_limbs, xs, ys);
+            let len = xs.len();
+            assert_eq!(
+                Natural::from_limbs_asc(&out_limbs[0..len]),
+                Integer::from(Natural::from_limbs_asc(xs)) & -Natural::from_limbs_asc(ys)
+            );
+            assert_eq!(&out_limbs[len..], &out_limbs_old[len..]);
+        },
+    );
 }
 
 #[test]
@@ -700,7 +703,7 @@ fn limbs_and_neg_neg_properties() {
 
 #[test]
 fn limbs_and_neg_neg_to_out_properties() {
-    test_properties(triples_of_u32_vec_var_6, |&(ref xs, ref ys, ref zs)| {
+    test_properties(triples_of_u32_vec_var_7, |&(ref xs, ref ys, ref zs)| {
         let mut xs = xs.to_vec();
         let xs_old = xs.clone();
         let b = limbs_and_neg_neg_to_out(&mut xs, ys, zs);

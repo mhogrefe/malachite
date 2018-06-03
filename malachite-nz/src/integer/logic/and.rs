@@ -11,9 +11,9 @@ use std::u32;
 ///
 /// Time: worst case O(n)
 ///
-/// Additional memory: worst case O(n)
+/// Additional memory: worst case O(m)
 ///
-/// where n = `xs.len()`
+/// where n = `xs.len() + ys.len()`, m = `xs.len()`
 ///
 /// # Panics
 /// Panics if `xs` or `ys` are empty or contain only zeros.
@@ -68,7 +68,7 @@ pub fn limbs_and_pos_neg(xs: &[u32], ys: &[u32]) -> Vec<u32> {
 ///
 /// Additional memory: worst case O(1)
 ///
-/// where n = `xs.len()`
+/// where n = `xs.len() + ys.len()`
 ///
 /// # Panics
 /// Panics if `xs` or `ys` are empty or contain only zeros, or if `out_limbs` is shorter than `xs`.
@@ -126,7 +126,7 @@ pub fn limbs_and_pos_neg_to_out(out_limbs: &mut [u32], xs: &[u32], ys: &[u32]) {
 ///
 /// Additional memory: worst case O(1)
 ///
-/// where n = `xs.len()`
+/// where n = `xs.len() + ys.len()`
 ///
 /// # Panics
 /// Panics if `xs` or `ys` are empty or contain only zeros.
@@ -178,7 +178,7 @@ pub fn limbs_and_pos_neg_in_place_left(xs: &mut [u32], ys: &[u32]) {
 ///
 /// Additional memory: worst case O(1)
 ///
-/// where n = `xs.len()`
+/// where n = `xs.len() + ys.len()`
 ///
 /// # Panics
 /// Panics if `xs` or `ys` are empty or contain only zeros.
@@ -231,7 +231,7 @@ pub fn limbs_slice_and_pos_neg_in_place_right(xs: &[u32], ys: &mut [u32]) {
 ///
 /// Additional memory: worst case O(1)
 ///
-/// where n = `xs.len()`
+/// where n = `xs.len() + ys.len()`
 ///
 /// # Panics
 /// Panics if `xs` or `ys` are empty or contain only zeros.
@@ -282,9 +282,9 @@ fn limbs_and_neg_neg_helper(input: u32, boundary_limb_seen: &mut bool) -> u32 {
 ///
 /// Time: worst case O(n)
 ///
-/// Additional memory: worst case O(n)
+/// Additional memory: worst case O(m)
 ///
-/// where n = max(`xs.len()`, `ys.len()`)
+/// where n = `xs.len() + ys.len()`, m = max(`xs.len()`, `ys.len()`)
 ///
 /// # Panics
 /// Panics if `xs` or `ys` are empty or contain only zeros.
@@ -360,7 +360,7 @@ pub fn limbs_and_neg_neg(xs: &[u32], ys: &[u32]) -> Vec<u32> {
 ///
 /// Additional memory: worst case O(1)
 ///
-/// where n = max(`xs.len()`, `ys.len()`)
+/// where n = `xs.len() + ys.len()`
 ///
 /// # Panics
 /// Panics if `xs` or `ys` are empty or contain only zeros, or if `out_limbs` is shorter than the
@@ -450,7 +450,7 @@ pub fn limbs_and_neg_neg_to_out(out_limbs: &mut [u32], xs: &[u32], ys: &[u32]) -
 ///
 /// Additional memory: worst case O(1)
 ///
-/// where n = `xs.len()`
+/// where n = `xs.len() + ys.len()`
 ///
 /// # Panics
 /// Panics if `xs` or `ys` are empty or contain only zeros, or if `xs` is shorter than `ys`.
@@ -520,9 +520,9 @@ pub fn limbs_slice_and_neg_neg_in_place_left(xs: &mut [u32], ys: &[u32]) -> bool
 ///
 /// Time: worst case O(n)
 ///
-/// Additional memory: worst case O(n)
+/// Additional memory: worst case O(m)
 ///
-/// where n = max(`xs.len()`, `ys.len()`)
+/// where n = `xs.len() + ys.len()`, m = max(`xs.len()`, `ys.len()`)
 ///
 /// # Panics
 /// Panics if `xs` or `ys` are empty or contain only zeros.
@@ -583,7 +583,7 @@ pub fn limbs_vec_and_neg_neg_in_place_left(xs: &mut Vec<u32>, ys: &[u32]) {
 ///
 /// Additional memory: worst case O(1)
 ///
-/// where n = max(`xs.len()`, `ys.len()`)
+/// where n = `xs.len() + ys.len()`
 ///
 /// # Panics
 /// Panics if `xs` or `ys` are empty or contain only zeros.
@@ -628,7 +628,7 @@ pub fn limbs_slice_and_neg_neg_in_place_either(xs: &mut [u32], ys: &mut [u32]) -
 ///
 /// Additional memory: worst case O(1)
 ///
-/// where n = max(`xs.len()`, `ys.len()`)
+/// where n = `xs.len() + ys.len()`
 ///
 /// # Panics
 /// Panics if `xs` or `ys` are empty or contain only zeros.
@@ -671,7 +671,7 @@ pub fn limbs_vec_and_neg_neg_in_place_either(xs: &mut Vec<u32>, ys: &mut Vec<u32
 ///
 /// Additional memory: worst case O(1)
 ///
-/// where n = `min(self.significant_bits(), other.significant_bits)`
+/// where n = `self.significant_bits() + other.significant_bits()`
 ///
 /// # Examples
 /// ```
@@ -695,9 +695,9 @@ impl BitAnd<Integer> for Integer {
 ///
 /// Time: worst case O(n)
 ///
-/// Additional memory: worst case O(n)
+/// Additional memory: worst case O(m)
 ///
-/// where n = `other.significant_bits`
+/// where n = `self.significant_bits() + other.significant_bits()`, m = `other.significant_bits()`
 ///
 /// # Examples
 /// ```
@@ -721,9 +721,9 @@ impl<'a> BitAnd<&'a Integer> for Integer {
 ///
 /// Time: worst case O(n)
 ///
-/// Additional memory: worst case O(n)
+/// Additional memory: worst case O(m)
 ///
-/// where n = `self.significant_bits`
+/// where n = `xs.significant_bits() + ys.significant_bits()`, m = `self.significant_bits()`
 ///
 /// # Examples
 /// ```
@@ -747,9 +747,10 @@ impl<'a> BitAnd<Integer> for &'a Integer {
 ///
 /// Time: worst case O(n)
 ///
-/// Additional memory: worst case O(n)
+/// Additional memory: worst case O(m)
 ///
-/// where n = `max(self.significant_bits(), other.significant_bits)`
+/// where n = `self.significant_bits() + other.significant_bits()`,
+///     m = `max(self.significant_bits(), other.significant_bits)`
 ///
 /// # Examples
 /// ```
@@ -792,7 +793,7 @@ impl<'a, 'b> BitAnd<&'a Integer> for &'b Integer {
 ///
 /// Additional memory: worst case O(1)
 ///
-/// where n = `min(self.significant_bits(), other.significant_bits)`
+/// where n = `self.significant_bits() + other.significant_bits()`
 ///
 /// # Examples
 /// ```
@@ -830,9 +831,9 @@ impl BitAndAssign<Integer> for Integer {
 ///
 /// Time: worst case O(n)
 ///
-/// Additional memory: worst case O(n)
+/// Additional memory: worst case O(m)
 ///
-/// where n = `other.significant_bits`
+/// where n = `xs.significant_bits() + ys.significant_bits()`, m = `other.significant_bits`
 ///
 /// # Examples
 /// ```

@@ -712,14 +712,40 @@ pub fn triples_of_u32_vec_var_5(
 }
 
 // All triples of `Vec<u32>` where the second and third elements are nonempty and don't only contain
-// zeros, and the first is at least as long as the second and at least as long as the third.
+// zeros, and the first is at least as long as the third.
 pub fn triples_of_u32_vec_var_6(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (Vec<u32>, Vec<u32>, Vec<u32>)>> {
+    Box::new(
+        triples_of_unsigned_vec(gm).filter(|&(ref xs, ref ys, ref zs)| {
+            xs.len() >= zs.len() && !limbs_test_zero(ys) && !limbs_test_zero(zs)
+        }),
+    )
+}
+
+// All triples of `Vec<u32>` where the second and third elements are nonempty and don't only contain
+// zeros, and the first is at least as long as the second and at least as long as the third.
+pub fn triples_of_u32_vec_var_7(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (Vec<u32>, Vec<u32>, Vec<u32>)>> {
     Box::new(
         triples_of_unsigned_vec(gm).filter(|&(ref xs, ref ys, ref zs)| {
             xs.len() >= ys.len()
                 && xs.len() >= zs.len()
+                && !limbs_test_zero(ys)
+                && !limbs_test_zero(zs)
+        }),
+    )
+}
+
+// All triples of `Vec<u32>` where the second and third elements are nonempty and don't only contain
+// zeros, and the first is at least as long as the second or at least as long as the third.
+pub fn triples_of_u32_vec_var_8(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (Vec<u32>, Vec<u32>, Vec<u32>)>> {
+    Box::new(
+        triples_of_unsigned_vec(gm).filter(|&(ref xs, ref ys, ref zs)| {
+            (xs.len() >= ys.len() || xs.len() >= zs.len())
                 && !limbs_test_zero(ys)
                 && !limbs_test_zero(zs)
         }),

@@ -1,5 +1,6 @@
 use common::test_properties;
-use malachite_base::num::BitAccess;
+use malachite_base::misc::CheckedFrom;
+use malachite_base::num::{BitAccess, One};
 use malachite_nz::natural::logic::bit_access::{limbs_slice_set_bit, limbs_vec_set_bit};
 use malachite_nz::natural::Natural;
 use malachite_test::common::{
@@ -120,6 +121,11 @@ fn set_bit_properties() {
         let mut rug_n = natural_to_rug_integer(n);
         rug_n.set_bit(index as u32, true);
         assert_eq!(rug_integer_to_natural(&rug_n), result);
+
+        assert_eq!(
+            n | (Natural::ONE << u32::checked_from(index).unwrap()),
+            result
+        );
 
         assert_ne!(result, 0);
         assert!(result >= *n);

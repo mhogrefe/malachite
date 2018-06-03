@@ -94,11 +94,9 @@ fn from_twos_complement_bits_asc_properties() {
         let x = Integer::from_twos_complement_bits_asc(bits);
         assert!(x.is_valid());
         assert_eq!(
-            Integer::from_twos_complement_bits_desc(&bits
-                .iter()
-                .cloned()
-                .rev()
-                .collect::<Vec<bool>>()),
+            Integer::from_twos_complement_bits_desc(
+                &bits.iter().cloned().rev().collect::<Vec<bool>>()
+            ),
             x
         );
         assert_eq!(bits.iter().all(|b| !b), x == 0);
@@ -111,11 +109,9 @@ fn from_twos_complement_limbs_desc_properties() {
         let x = Integer::from_twos_complement_bits_desc(bits);
         assert!(x.is_valid());
         assert_eq!(
-            Integer::from_twos_complement_bits_asc(&bits
-                .iter()
-                .cloned()
-                .rev()
-                .collect::<Vec<bool>>()),
+            Integer::from_twos_complement_bits_asc(
+                &bits.iter().cloned().rev().collect::<Vec<bool>>()
+            ),
             x
         );
         assert_eq!(bits.iter().all(|b| !b), x == 0);

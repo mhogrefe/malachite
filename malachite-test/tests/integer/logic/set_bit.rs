@@ -1,6 +1,7 @@
 use common::test_properties;
-use malachite_base::num::BitAccess;
+use malachite_base::misc::CheckedFrom;
 use malachite_base::num::NotAssign;
+use malachite_base::num::{BitAccess, One};
 use malachite_nz::integer::logic::bit_access::limbs_set_bit_neg;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
@@ -77,6 +78,11 @@ fn set_bit_properties() {
         let mut mut_n = n.clone();
         mut_n.assign_bit(index, true);
         assert_eq!(mut_n, result);
+
+        assert_eq!(
+            n | (Integer::ONE << u32::checked_from(index).unwrap()),
+            result
+        );
 
         assert_ne!(result, 0);
         assert!(result >= *n);
