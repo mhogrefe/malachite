@@ -16,6 +16,8 @@ pub mod or_u32;
 pub mod set_bit;
 pub mod significant_bits;
 pub mod trailing_zeros;
+pub mod xor;
+pub mod xor_u32;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     and::register(registry);
@@ -34,4 +36,5 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     set_bit::register(registry);
     significant_bits::register(registry);
     trailing_zeros::register(registry);
+    xor_u32::register(registry);
 }

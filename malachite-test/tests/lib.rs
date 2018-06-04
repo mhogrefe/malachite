@@ -204,6 +204,7 @@ pub mod natural {
         pub mod set_bit;
         pub mod significant_bits;
         pub mod trailing_zeros;
+        pub mod xor_u32;
     }
     pub mod random {
         pub mod random_natural_below;
