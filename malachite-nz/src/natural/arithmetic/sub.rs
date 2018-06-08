@@ -1,5 +1,5 @@
 use malachite_base::num::Zero;
-use natural::arithmetic::sub_u32::{mpn_sub_1, mpn_sub_1_in_place, sub_assign_u32_helper};
+use natural::arithmetic::sub_u32::{mpn_sub_1_in_place, mpn_sub_1_to_out, sub_assign_u32_helper};
 use natural::Natural::{self, Large, Small};
 use std::ops::{Sub, SubAssign};
 
@@ -64,7 +64,7 @@ pub fn mpn_sub(r: &mut [u32], s1: &[u32], s2: &[u32]) -> bool {
     if s1_len == s2_len {
         borrow
     } else if borrow {
-        mpn_sub_1(&mut r[s2_len..], &s1[s2_len..], 1)
+        mpn_sub_1_to_out(&mut r[s2_len..], &s1[s2_len..], 1)
     } else {
         r[s2_len..s1_len].copy_from_slice(&s1[s2_len..]);
         false
@@ -96,7 +96,7 @@ pub fn mpn_sub_aba(a: &mut [u32], b: &[u32], len: usize) -> bool {
     if s1_len == len {
         borrow
     } else if borrow {
-        mpn_sub_1(&mut a[len..], &b[len..], 1)
+        mpn_sub_1_to_out(&mut a[len..], &b[len..], 1)
     } else {
         a[len..s1_len].copy_from_slice(&b[len..]);
         false

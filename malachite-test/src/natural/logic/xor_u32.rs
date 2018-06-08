@@ -31,8 +31,8 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_natural_xor_assign_u32);
     register_demo!(registry, demo_natural_xor_u32);
     register_demo!(registry, demo_natural_xor_u32_ref);
-    register_demo!(registry, demo_u32_or_natural);
-    register_demo!(registry, demo_u32_or_natural_ref);
+    register_demo!(registry, demo_u32_xor_natural);
+    register_demo!(registry, demo_u32_xor_natural_ref);
     register_bench!(registry, Small, benchmark_limbs_xor_limb);
     register_bench!(registry, Small, benchmark_limbs_xor_limb_to_out);
     register_bench!(registry, Small, benchmark_limbs_xor_limb_in_place);
@@ -52,11 +52,11 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
         benchmark_natural_xor_u32_evaluation_strategy
     );
     register_bench!(registry, Large, benchmark_natural_xor_u32_algorithms);
-    register_bench!(registry, Large, benchmark_u32_or_natural_library_comparison);
+    register_bench!(registry, Large, benchmark_u32_xor_natural_library_comparison);
     register_bench!(
         registry,
         Large,
-        benchmark_u32_or_natural_evaluation_strategy
+        benchmark_u32_xor_natural_evaluation_strategy
     );
 }
 
@@ -122,14 +122,14 @@ fn demo_natural_xor_u32_ref(gm: GenerationMode, limit: usize) {
     }
 }
 
-fn demo_u32_or_natural(gm: GenerationMode, limit: usize) {
+fn demo_u32_xor_natural(gm: GenerationMode, limit: usize) {
     for (u, n) in pairs_of_unsigned_and_natural::<u32>(gm).take(limit) {
         let n_old = n.clone();
         println!("{} ^ {} = {}", u, n_old, u ^ n);
     }
 }
 
-fn demo_u32_or_natural_ref(gm: GenerationMode, limit: usize) {
+fn demo_u32_xor_natural_ref(gm: GenerationMode, limit: usize) {
     for (u, n) in pairs_of_unsigned_and_natural::<u32>(gm).take(limit) {
         println!("{} ^ &{} = {}", u, n, u ^ &n);
     }
@@ -251,7 +251,7 @@ fn benchmark_natural_xor_u32_evaluation_strategy(
 fn benchmark_natural_xor_u32_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "Natural ^ u32",
-        BenchmarkType::LibraryComparison,
+        BenchmarkType::Algorithms,
         pairs_of_natural_and_unsigned(gm),
         gm.name(),
         limit,
@@ -272,7 +272,7 @@ fn benchmark_natural_xor_u32_algorithms(gm: GenerationMode, limit: usize, file_n
     );
 }
 
-fn benchmark_u32_or_natural_library_comparison(gm: GenerationMode, limit: usize, file_name: &str) {
+fn benchmark_u32_xor_natural_library_comparison(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "u32 ^ Natural",
         BenchmarkType::LibraryComparison,
@@ -289,7 +289,7 @@ fn benchmark_u32_or_natural_library_comparison(gm: GenerationMode, limit: usize,
     );
 }
 
-fn benchmark_u32_or_natural_evaluation_strategy(gm: GenerationMode, limit: usize, file_name: &str) {
+fn benchmark_u32_xor_natural_evaluation_strategy(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "u32 ^ Natural",
         BenchmarkType::EvaluationStrategy,

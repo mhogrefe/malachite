@@ -1,7 +1,7 @@
 use integer::Integer;
 use malachite_base::misc::WrappingFrom;
 use malachite_base::num::{UnsignedAbs, Zero};
-use natural::arithmetic::add_u32::{mpn_add_1, mpn_add_1_in_place};
+use natural::arithmetic::add_u32::{mpn_add_1_in_place, mpn_add_1_to_out};
 use natural::Natural::{self, Large, Small};
 use std::ops::{BitAnd, BitAndAssign};
 
@@ -53,7 +53,7 @@ pub fn limbs_slice_neg_and_limb_neg_to_out(
         let result_head = in_limbs[0].wrapping_neg() & limb;
         if result_head == 0 {
             out_limbs[0] = 0;
-            if mpn_add_1(&mut out_limbs[1..], &in_limbs[1..], 1) {
+            if mpn_add_1_to_out(&mut out_limbs[1..], &in_limbs[1..], 1) {
                 return true;
             }
         } else {

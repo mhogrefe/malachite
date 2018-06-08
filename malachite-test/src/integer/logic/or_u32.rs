@@ -150,7 +150,7 @@ fn benchmark_limbs_neg_or_limb_to_out(gm: GenerationMode, limit: usize, file_nam
         &mut [(
             "malachite",
             &mut (|(mut out_limbs, in_limbs, limb)| {
-                no_out!(limbs_neg_or_limb_to_out(&mut out_limbs, &in_limbs, limb))
+                limbs_neg_or_limb_to_out(&mut out_limbs, &in_limbs, limb)
             }),
         )],
     );
@@ -168,7 +168,7 @@ fn benchmark_limbs_neg_or_limb_in_place(gm: GenerationMode, limit: usize, file_n
         "limbs.len()",
         &mut [(
             "malachite",
-            &mut (|(mut limbs, limb)| no_out!(limbs_neg_or_limb_in_place(&mut limbs, limb))),
+            &mut (|(mut limbs, limb)| limbs_neg_or_limb_in_place(&mut limbs, limb)),
         )],
     );
 }
@@ -231,7 +231,7 @@ fn benchmark_integer_or_u32_evaluation_strategy(gm: GenerationMode, limit: usize
 fn benchmark_integer_or_u32_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "Integer | u32",
-        BenchmarkType::LibraryComparison,
+        BenchmarkType::Algorithms,
         pairs_of_integer_and_unsigned(gm),
         gm.name(),
         limit,

@@ -2,12 +2,14 @@ use common::test_properties;
 use malachite_base::num::{NegativeOne, Zero};
 use malachite_nz::integer::logic::or_i32::{limbs_neg_or_neg_limb, limbs_pos_or_neg_limb};
 use malachite_nz::integer::Integer;
+use malachite_nz::natural::Natural;
 use malachite_test::common::{integer_to_rug_integer, rug_integer_to_integer};
 use malachite_test::inputs::base::{pairs_of_u32_vec_and_positive_u32_var_1, signeds};
 use malachite_test::inputs::integer::{integers, pairs_of_integer_and_signed};
 use malachite_test::integer::logic::or_i32::{integer_or_i32_alt_1, integer_or_i32_alt_2};
 use rug::{self, Assign};
 use std::str::FromStr;
+use std::u32;
 
 #[test]
 fn test_limbs_pos_or_neg_limb() {
@@ -121,8 +123,11 @@ fn limbs_pos_or_neg_limb_properties() {
     test_properties(
         pairs_of_u32_vec_and_positive_u32_var_1,
         |&(ref limbs, u)| {
-            limbs_pos_or_neg_limb(limbs, u);
-            //TODO
+            assert_eq!(
+                limbs_pos_or_neg_limb(limbs, u),
+                -(Integer::from(Natural::from_limbs_asc(limbs))
+                    | Integer::from_owned_twos_complement_limbs_asc(vec![u, u32::MAX]))
+            );
         },
     );
 }
@@ -132,8 +137,11 @@ fn limbs_neg_or_neg_limb_properties() {
     test_properties(
         pairs_of_u32_vec_and_positive_u32_var_1,
         |&(ref limbs, u)| {
-            limbs_neg_or_neg_limb(limbs, u);
-            //TODO
+            assert_eq!(
+                limbs_neg_or_neg_limb(limbs, u),
+                -(-Natural::from_limbs_asc(limbs)
+                    | Integer::from_owned_twos_complement_limbs_asc(vec![u, u32::MAX]))
+            );
         },
     );
 }

@@ -307,7 +307,7 @@ fn benchmark_integer_and_i32_evaluation_strategy(
 fn benchmark_integer_and_i32_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "Integer & i32",
-        BenchmarkType::LibraryComparison,
+        BenchmarkType::Algorithms,
         pairs_of_integer_and_signed(gm),
         gm.name(),
         limit,

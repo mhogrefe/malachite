@@ -4,7 +4,7 @@ use natural::Natural::{self, Large, Small};
 use std::ops::{BitOr, BitOrAssign};
 
 /// Interpreting a slice of `u32`s as the limbs (in ascending order) of an `Integer`, returns the
-/// negative of the bitwise and of the `Integer` and a negative number whose lowest limb is given by
+/// negative of the bitwise or of the `Integer` and a negative number whose lowest limb is given by
 /// `limb` and whose other limbs are full of `true` bits. The slice cannot be empty or only contain
 /// zeros.
 ///
@@ -27,7 +27,7 @@ pub fn limbs_pos_or_neg_limb(limbs: &[u32], limb: u32) -> u32 {
 }
 
 /// Interpreting a slice of `u32`s as the limbs (in ascending order) of the negative of an
-/// `Integer`, returns the negative of the bitwise and of the `Integer` and a negative number whose
+/// `Integer`, returns the negative of the bitwise or of the `Integer` and a negative number whose
 /// lowest limb is given by `limb` and whose other limbs are full of `true` bits. The slice cannot
 /// be empty or only contain zeros.
 ///

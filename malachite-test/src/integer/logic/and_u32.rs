@@ -100,7 +100,7 @@ fn benchmark_integer_and_u32_library_comparison(gm: GenerationMode, limit: usize
 fn benchmark_integer_and_u32_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "&Integer & u32",
-        BenchmarkType::LibraryComparison,
+        BenchmarkType::Algorithms,
         pairs_of_integer_and_unsigned(gm),
         gm.name(),
         limit,

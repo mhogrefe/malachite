@@ -1,4 +1,4 @@
-use natural::arithmetic::add_u32::{mpn_add_1, mpn_add_1_in_place};
+use natural::arithmetic::add_u32::{mpn_add_1_in_place, mpn_add_1_to_out};
 use natural::Natural::{self, Large, Small};
 use std::mem::swap;
 use std::ops::{Add, AddAssign};
@@ -52,7 +52,7 @@ pub fn mpn_add(r: &mut [u32], s1: &[u32], s2: &[u32]) -> bool {
     if s1_len == s2_len {
         carry
     } else if carry {
-        mpn_add_1(&mut r[s2_len..], &s1[s2_len..], 1)
+        mpn_add_1_to_out(&mut r[s2_len..], &s1[s2_len..], 1)
     } else {
         r[s2_len..s1_len].copy_from_slice(&s1[s2_len..]);
         false

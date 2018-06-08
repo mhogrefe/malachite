@@ -5,8 +5,8 @@ use std::ops::{BitOr, BitOrAssign};
 use std::u32;
 
 /// Interpreting a slice of `u32`s as the limbs (in ascending order) of the negative of an
-/// `Integer`, writes the limbs of the bitwise and of the `Integer`, returns the limbs of the
-/// bitwise or of the `Integer` and a `u32`. `limbs` cannot be empty or only contain zeros.
+/// `Integer`, returns the limbs of the bitwise or of the `Integer` and a `u32`. `limbs` cannot be
+/// empty or only contain zeros.
 ///
 /// Time: worst case O(n)
 ///
@@ -45,9 +45,9 @@ pub fn limbs_neg_or_limb(limbs: &[u32], limb: u32) -> Vec<u32> {
 }
 
 /// Interpreting a slice of `u32`s as the limbs (in ascending order) of the negative of an
-/// `Integer`, writes the limbs of the bitwise and of the `Integer`, writes the limbs of the bitwise
-/// or of the `Integer` and a `u32` to an output slice. The output slice must be at least as long as
-/// the input slice. `limbs` cannot be empty or only contain zeros.
+/// `Integer`, writes the limbs of the bitwise or of the `Integer` and a `u32` to an output slice.
+/// The output slice must be at least as long as the input slice. `limbs` cannot be empty or only
+/// contain zeros.
 ///
 /// Time: worst case O(n)
 ///
@@ -93,7 +93,7 @@ pub fn limbs_neg_or_limb_to_out(out_limbs: &mut [u32], in_limbs: &[u32], limb: u
 }
 
 /// Interpreting a slice of `u32`s as the limbs (in ascending order) of the negative of an
-/// `Integer`, writes the limbs of the bitwise and of the `Integer`, writes the limbs of the bitwise
+/// `Integer`, writes the limbs of the bitwise or of the `Integer`, writes the limbs of the bitwise
 /// or of the `Integer` and a `u32` to the input slice. `limbs` cannot be empty or only contain
 /// zeros.
 ///
@@ -232,7 +232,7 @@ impl BitOr<Integer> for u32 {
     }
 }
 
-/// Takes the bitwise and of a `u32` and an `Integer`, taking the `Integer` by reference.
+/// Takes the bitwise or of a `u32` and an `Integer`, taking the `Integer` by reference.
 ///
 /// Time: worst case O(n)
 ///

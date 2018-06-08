@@ -138,7 +138,7 @@ fn benchmark_natural_and_u32_library_comparison(gm: GenerationMode, limit: usize
 fn benchmark_natural_and_u32_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "&Natural & u32",
-        BenchmarkType::LibraryComparison,
+        BenchmarkType::Algorithms,
         pairs_of_natural_and_unsigned(gm),
         gm.name(),
         limit,

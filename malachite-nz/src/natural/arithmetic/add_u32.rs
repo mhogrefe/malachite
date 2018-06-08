@@ -2,9 +2,29 @@ use malachite_base::num::Assign;
 use natural::Natural::{self, Large, Small};
 use std::ops::{Add, AddAssign};
 
+pub fn mpn_add_1(s1: &[u32], mut s2limb: u32) -> Vec<u32> {
+    let s1_len = s1.len();
+    let mut result_limbs = Vec::with_capacity(s1_len);
+    for i in 0..s1_len {
+        let (sum, overflow) = s1[i].overflowing_add(s2limb);
+        result_limbs.push(sum);
+        if overflow {
+            s2limb = 1;
+        } else {
+            s2limb = 0;
+            result_limbs.extend_from_slice(&s1[i + 1..]);
+            break;
+        }
+    }
+    if s2limb != 0 {
+        result_limbs.push(s2limb);
+    }
+    result_limbs
+}
+
 // Add s1 and s2limb, and write the s1.len() least significant limbs of the result to r. Return
 // carry. r must have size at least s1.len().
-pub fn mpn_add_1(r: &mut [u32], s1: &[u32], mut s2limb: u32) -> bool {
+pub fn mpn_add_1_to_out(r: &mut [u32], s1: &[u32], mut s2limb: u32) -> bool {
     let s1_len = s1.len();
     assert!(r.len() >= s1_len);
     for i in 0..s1_len {
@@ -104,7 +124,7 @@ impl<'a> Add<u32> for &'a Natural {
             },
             Large(ref limbs) => {
                 let mut sum_limbs = vec![0; limbs.len()];
-                if mpn_add_1(&mut sum_limbs[..], limbs, other) {
+                if mpn_add_1_to_out(&mut sum_limbs[..], limbs, other) {
                     sum_limbs.push(1);
                 }
                 Large(sum_limbs)

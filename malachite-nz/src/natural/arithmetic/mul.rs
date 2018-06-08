@@ -2,7 +2,7 @@ use malachite_base::limbs::{limbs_set_zero, limbs_test_zero};
 use malachite_base::num::PrimitiveInteger;
 use natural::arithmetic::add::{mpn_add, mpn_add_in_place, mpn_add_n, mpn_add_n_in_place};
 use natural::arithmetic::add_mul_u32::mpn_addmul_1;
-use natural::arithmetic::add_u32::{mpn_add_1, mpn_add_1_in_place};
+use natural::arithmetic::add_u32::{mpn_add_1_in_place, mpn_add_1_to_out};
 use natural::arithmetic::mul_u32::mpn_mul_1;
 use natural::arithmetic::shl_u32::{mpn_lshift, mpn_lshift_in_place};
 use natural::arithmetic::shr_u32::mpn_rshift_in_place;
@@ -601,7 +601,7 @@ fn mpn_toom42_mul(p: &mut [u32], a: &[u32], b: &[u32], scratch: &mut [u32]) {
         0
     };
     if s != n {
-        cy = if mpn_add_1(&mut as2[s..], &a2[s..n], cy) {
+        cy = if mpn_add_1_to_out(&mut as2[s..], &a2[s..n], cy) {
             1
         } else {
             0
