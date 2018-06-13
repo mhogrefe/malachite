@@ -179,7 +179,7 @@ fn benchmark_limbs_or_limb_in_place(gm: GenerationMode, limit: usize, file_name:
         "limbs.len()",
         &mut [(
             "malachite",
-            &mut (|(mut limbs, limb)| no_out!(limbs_or_limb_in_place(&mut limbs, limb))),
+            &mut (|(mut limbs, limb)| limbs_or_limb_in_place(&mut limbs, limb)),
         )],
     );
 }

@@ -87,7 +87,11 @@ pub struct DemoBenchRegistry {
 
 impl DemoBenchRegistry {
     pub fn register_demo(&mut self, name: &'static str, f: DemoFn) {
-        self.demo_map.insert(name, f);
+        assert!(
+            self.demo_map.insert(name, f).is_none(),
+            "Duplicate demo with name {}",
+            name
+        );
     }
 
     pub fn lookup_demo(&self, name: &str) -> Option<&DemoFn> {
@@ -95,7 +99,11 @@ impl DemoBenchRegistry {
     }
 
     pub fn register_bench(&mut self, scale_type: ScaleType, name: &'static str, f: BenchFn) {
-        self.bench_map.insert(name, (scale_type, f));
+        assert!(
+            self.bench_map.insert(name, (scale_type, f)).is_none(),
+            "Duplicate bench with name {}",
+            name
+        );
     }
 
     pub fn lookup_bench(&self, name: &str) -> Option<&(ScaleType, BenchFn)> {
@@ -103,7 +111,11 @@ impl DemoBenchRegistry {
     }
 
     pub fn register_no_special_demo(&mut self, name: &'static str, f: NoSpecialDemoFn) {
-        self.no_special_demo_map.insert(name, f);
+        assert!(
+            self.no_special_demo_map.insert(name, f).is_none(),
+            "Duplicate demo with name {}",
+            name
+        );
     }
 
     pub fn lookup_no_special_demo(&self, name: &str) -> Option<&NoSpecialDemoFn> {
@@ -116,7 +128,13 @@ impl DemoBenchRegistry {
         name: &'static str,
         f: NoSpecialBenchFn,
     ) {
-        self.no_special_bench_map.insert(name, (scale_type, f));
+        assert!(
+            self.no_special_bench_map
+                .insert(name, (scale_type, f))
+                .is_none(),
+            "Duplicate bench with name {}",
+            name
+        );
     }
 
     pub fn lookup_no_special_bench(&self, name: &str) -> Option<&(ScaleType, NoSpecialBenchFn)> {

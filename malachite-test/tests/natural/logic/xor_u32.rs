@@ -197,8 +197,22 @@ fn xor_u32_properties() {
             rug_n ^= u;
             assert_eq!(rug_integer_to_natural(&rug_n), result);
 
-            assert_eq!(n ^ u, result);
-            assert_eq!(u ^ n, result);
+            let result_alt = n ^ u;
+            assert!(result_alt.is_valid());
+            assert_eq!(result_alt, result);
+
+            let result_alt = n.clone() ^ u;
+            assert!(result_alt.is_valid());
+            assert_eq!(result_alt, result);
+
+            let result_alt = u ^ n;
+            assert!(result_alt.is_valid());
+            assert_eq!(result_alt, result);
+
+            let result_alt = u ^ n.clone();
+            assert!(result_alt.is_valid());
+            assert_eq!(result_alt, result);
+
             assert_eq!(natural_xor_u32_alt_1(&n, u), result);
             assert_eq!(natural_xor_u32_alt_2(&n, u), result);
 

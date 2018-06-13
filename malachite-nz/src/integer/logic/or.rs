@@ -1,5 +1,6 @@
 use integer::Integer;
 use malachite_base::limbs::{limbs_leading_zero_limbs, limbs_set_zero};
+use natural::logic::not::{limbs_not_in_place, limbs_not_to_out};
 use natural::Natural::{self, Large, Small};
 use std::cmp::max;
 use std::iter::repeat;
@@ -106,12 +107,7 @@ pub fn limbs_or_pos_neg_to_out(out_limbs: &mut [u32], xs: &[u32], ys: &[u32]) {
     if y_i >= xs_len {
         limbs_set_zero(&mut out_limbs[0..x_i]);
         out_limbs[x_i] = xs[x_i].wrapping_neg();
-        for (out, x) in out_limbs[x_i + 1..xs_len]
-            .iter_mut()
-            .zip(xs[x_i + 1..].iter())
-        {
-            *out = !x;
-        }
+        limbs_not_to_out(&mut out_limbs[x_i + 1..xs_len], &xs[x_i + 1..]);
         for x in out_limbs[xs_len..y_i].iter_mut() {
             *x = u32::MAX;
         }
@@ -131,12 +127,7 @@ pub fn limbs_or_pos_neg_to_out(out_limbs: &mut [u32], xs: &[u32], ys: &[u32]) {
         out_limbs[x_i] = !xs[x_i] & ys[x_i];
     } else {
         out_limbs[x_i] = xs[x_i].wrapping_neg();
-        for (out, x) in out_limbs[x_i + 1..y_i]
-            .iter_mut()
-            .zip(xs[x_i + 1..y_i].iter())
-        {
-            *out = !x;
-        }
+        limbs_not_to_out(&mut out_limbs[x_i + 1..y_i], &xs[x_i + 1..y_i]);
         out_limbs[y_i] = !xs[y_i] & (ys[y_i] - 1);
     };
     for (out, (x, y)) in out_limbs[max_i + 1..]
@@ -186,9 +177,7 @@ pub fn limbs_slice_or_pos_neg_in_place_left(xs: &mut [u32], ys: &[u32]) -> bool 
     assert!(y_i < ys_len);
     if y_i >= xs_len {
         xs[x_i] = xs[x_i].wrapping_neg();
-        for x in xs[x_i + 1..].iter_mut() {
-            *x = !*x;
-        }
+        limbs_not_in_place(&mut xs[x_i + 1..]);
         return true;
     } else if x_i >= ys_len {
         xs[0..ys_len].copy_from_slice(ys);
@@ -203,9 +192,7 @@ pub fn limbs_slice_or_pos_neg_in_place_left(xs: &mut [u32], ys: &[u32]) -> bool 
         xs[x_i] = !xs[x_i] & ys[x_i];
     } else {
         xs[x_i] = xs[x_i].wrapping_neg();
-        for x in xs[x_i + 1..y_i].iter_mut() {
-            *x = !*x;
-        }
+        limbs_not_in_place(&mut xs[x_i + 1..y_i]);
         xs[y_i] = !xs[y_i] & (ys[y_i] - 1);
     };
     if xs_len < ys_len {
@@ -256,9 +243,7 @@ pub fn limbs_vec_or_pos_neg_in_place_left(xs: &mut Vec<u32>, ys: &[u32]) {
     assert!(y_i < ys_len);
     if y_i >= xs_len {
         xs[x_i] = xs[x_i].wrapping_neg();
-        for x in xs[x_i + 1..].iter_mut() {
-            *x = !*x;
-        }
+        limbs_not_in_place(&mut xs[x_i + 1..]);
         xs.extend(repeat(u32::MAX).take(y_i - xs_len));
         xs.push(ys[y_i] - 1);
         xs.extend_from_slice(&ys[y_i + 1..]);
@@ -275,9 +260,7 @@ pub fn limbs_vec_or_pos_neg_in_place_left(xs: &mut Vec<u32>, ys: &[u32]) {
         xs[x_i] = !xs[x_i] & ys[x_i];
     } else {
         xs[x_i] = xs[x_i].wrapping_neg();
-        for x in xs[x_i + 1..y_i].iter_mut() {
-            *x = !*x;
-        }
+        limbs_not_in_place(&mut xs[x_i + 1..y_i]);
         xs[y_i] = !xs[y_i] & (ys[y_i] - 1);
     };
     if xs_len < ys_len {
@@ -331,9 +314,7 @@ pub fn limbs_or_pos_neg_in_place_right(xs: &[u32], ys: &mut [u32]) {
     assert!(y_i < ys_len);
     if y_i >= xs_len {
         ys[x_i] = xs[x_i].wrapping_neg();
-        for i in x_i + 1..xs_len {
-            ys[i] = !xs[i];
-        }
+        limbs_not_to_out(&mut ys[x_i + 1..xs_len], &xs[x_i + 1..]);
         for y in ys.iter_mut().take(y_i).skip(xs_len) {
             *y = u32::MAX;
         }
@@ -349,9 +330,7 @@ pub fn limbs_or_pos_neg_in_place_right(xs: &[u32], ys: &mut [u32]) {
         ys[x_i] &= !xs[x_i];
     } else {
         ys[x_i] = xs[x_i].wrapping_neg();
-        for i in x_i + 1..y_i {
-            ys[i] = !xs[i];
-        }
+        limbs_not_to_out(&mut ys[x_i + 1..y_i], &xs[x_i + 1..y_i]);
         ys[y_i] = !xs[y_i] & (ys[y_i] - 1);
     };
     if xs_len < ys_len {

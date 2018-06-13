@@ -1,6 +1,7 @@
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::{pairs_of_u32_vec_var_1, triples_of_u32_vec_var_6, triples_of_u32_vec_var_8};
 use inputs::integer::{pairs_of_integers, rm_pairs_of_integers};
+use integer::logic::{integer_op_bits, integer_op_limbs};
 use malachite_base::num::SignificantBits;
 use malachite_nz::integer::logic::or::{
     limbs_or_neg_neg, limbs_or_neg_neg_in_place_either, limbs_or_neg_neg_to_out, limbs_or_pos_neg,
@@ -10,53 +11,13 @@ use malachite_nz::integer::logic::or::{
 };
 use malachite_nz::integer::Integer;
 use std::cmp::max;
-use std::iter::repeat;
-use std::u32;
 
 pub fn integer_or_alt_1(x: &Integer, y: &Integer) -> Integer {
-    let x_negative = *x < 0;
-    let y_negative = *y < 0;
-    let bit_zip: Box<Iterator<Item = (bool, bool)>> =
-        if x.twos_complement_bits().count() >= y.twos_complement_bits().count() {
-            Box::new(
-                x.twos_complement_bits()
-                    .zip(y.twos_complement_bits().chain(repeat(y_negative))),
-            )
-        } else {
-            Box::new(
-                x.twos_complement_bits()
-                    .chain(repeat(x_negative))
-                    .zip(y.twos_complement_bits()),
-            )
-        };
-    let mut or_bits = Vec::new();
-    for (b, c) in bit_zip {
-        or_bits.push(b || c);
-    }
-    Integer::from_twos_complement_bits_asc(&or_bits)
+    integer_op_bits(&|a, b| a || b, x, y)
 }
 
 pub fn integer_or_alt_2(x: &Integer, y: &Integer) -> Integer {
-    let x_extension = if *x < 0 { u32::MAX } else { 0 };
-    let y_extension = if *y < 0 { u32::MAX } else { 0 };
-    let limb_zip: Box<Iterator<Item = (u32, u32)>> =
-        if x.twos_complement_limbs().count() >= y.twos_complement_limbs().count() {
-            Box::new(
-                x.twos_complement_limbs()
-                    .zip(y.twos_complement_limbs().chain(repeat(y_extension))),
-            )
-        } else {
-            Box::new(
-                x.twos_complement_limbs()
-                    .chain(repeat(x_extension))
-                    .zip(y.twos_complement_limbs()),
-            )
-        };
-    let mut or_limbs = Vec::new();
-    for (x, y) in limb_zip {
-        or_limbs.push(x | y);
-    }
-    Integer::from_owned_twos_complement_limbs_asc(or_limbs)
+    integer_op_limbs(&|a, b| a | b, x, y)
 }
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {

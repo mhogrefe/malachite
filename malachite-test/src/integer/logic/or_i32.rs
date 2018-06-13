@@ -50,7 +50,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
 fn demo_limbs_pos_or_neg_limb(gm: GenerationMode, limit: usize) {
     for (limbs, limb) in pairs_of_u32_vec_and_positive_u32_var_1(gm).take(limit) {
         println!(
-            "limbs_pos_or_neg_limb({:?}, {}) = {:?}",
+            "limbs_pos_or_neg_limb({:?}, {}) = {}",
             limbs,
             limb,
             limbs_pos_or_neg_limb(&limbs, limb)
@@ -61,7 +61,7 @@ fn demo_limbs_pos_or_neg_limb(gm: GenerationMode, limit: usize) {
 fn demo_limbs_neg_or_neg_limb(gm: GenerationMode, limit: usize) {
     for (limbs, limb) in pairs_of_u32_vec_and_positive_u32_var_1(gm).take(limit) {
         println!(
-            "limbs_neg_or_neg_limb({:?}, {}) = {:?}",
+            "limbs_neg_or_neg_limb({:?}, {}) = {}",
             limbs,
             limb,
             limbs_neg_or_neg_limb(&limbs, limb)

@@ -52,7 +52,11 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
         benchmark_natural_xor_u32_evaluation_strategy
     );
     register_bench!(registry, Large, benchmark_natural_xor_u32_algorithms);
-    register_bench!(registry, Large, benchmark_u32_xor_natural_library_comparison);
+    register_bench!(
+        registry,
+        Large,
+        benchmark_u32_xor_natural_library_comparison
+    );
     register_bench!(
         registry,
         Large,
@@ -289,7 +293,11 @@ fn benchmark_u32_xor_natural_library_comparison(gm: GenerationMode, limit: usize
     );
 }
 
-fn benchmark_u32_xor_natural_evaluation_strategy(gm: GenerationMode, limit: usize, file_name: &str) {
+fn benchmark_u32_xor_natural_evaluation_strategy(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
     m_run_benchmark(
         "u32 ^ Natural",
         BenchmarkType::EvaluationStrategy,

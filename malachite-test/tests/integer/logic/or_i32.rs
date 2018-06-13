@@ -160,8 +160,22 @@ fn or_i32_properties() {
             rug_n |= i;
             assert_eq!(rug_integer_to_integer(&rug_n), result);
 
-            assert_eq!(n | i, result);
-            assert_eq!(i | n, result);
+            let result_alt = n | i;
+            assert!(result_alt.is_valid());
+            assert_eq!(result_alt, result);
+
+            let result_alt = n.clone() | i;
+            assert!(result_alt.is_valid());
+            assert_eq!(result_alt, result);
+
+            let result_alt = i | n;
+            assert!(result_alt.is_valid());
+            assert_eq!(result_alt, result);
+
+            let result_alt = i | n.clone();
+            assert!(result_alt.is_valid());
+            assert_eq!(result_alt, result);
+
             assert_eq!(integer_or_i32_alt_1(&n, i), result);
             assert_eq!(integer_or_i32_alt_2(&n, i), result);
 

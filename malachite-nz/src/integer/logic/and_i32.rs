@@ -1,15 +1,40 @@
 use integer::Integer;
 use malachite_base::misc::WrappingFrom;
-use malachite_base::num::{UnsignedAbs, Zero};
+use malachite_base::num::UnsignedAbs;
 use natural::arithmetic::add_u32::{mpn_add_1_in_place, mpn_add_1_to_out};
 use natural::Natural::{self, Large, Small};
 use std::ops::{BitAnd, BitAndAssign};
 
-/// Interpreting a slice of `u32`s as the limbs (in ascending order) of the negative of an
-/// `Integer`, writes the limbs of the bitwise and of the `Integer` and a negative number whose
-/// lowest limb is given by `limb` and whose other limbs are full of `true` bits to an output slice.
-/// `in_limbs` may not be empty or only contain zeros. Returns whether a carry occurs. The output
-/// slice must be at least as long as the input slice.
+/// Interpreting a slice of `u32`s as the limbs (in ascending order) of an `Integer`, returns the
+/// limbs of the bitwise and of the `Integer` and a negative number whose lowest limb is given by
+/// `limb` and whose other limbs are full of `true` bits. `limbs` may not be empty.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(n)
+///
+/// where n = `limbs.len()`
+///
+/// # Panics
+/// Panics if `limbs` is empty.
+///
+/// # Example
+/// ```
+/// use malachite_nz::integer::logic::and_i32::limbs_pos_and_limb_neg;
+///
+/// assert_eq!(limbs_pos_and_limb_neg(&[0, 2], 3), &[0, 2]);
+/// assert_eq!(limbs_pos_and_limb_neg(&[123, 456], 789), &[17, 456]);
+/// ```
+pub fn limbs_pos_and_limb_neg(limbs: &[u32], limb: u32) -> Vec<u32> {
+    let mut result_limbs = limbs.to_vec();
+    result_limbs[0] &= limb;
+    result_limbs
+}
+
+/// Interpreting a slice of `u32`s as the limbs (in ascending order) of an `Integer`, writes the
+/// limbs of the bitwise and of the `Integer` and a negative number whose lowest limb is given by
+/// `limb` and whose other limbs are full of `true` bits, to an output slice. `in_limbs` may not be
+/// empty. The output slice must be at least as long as the input slice.
 ///
 /// Time: worst case O(n)
 ///
@@ -22,46 +47,51 @@ use std::ops::{BitAnd, BitAndAssign};
 ///
 /// # Example
 /// ```
-/// use malachite_nz::integer::logic::and_i32::limbs_slice_neg_and_limb_neg_to_out;
+/// use malachite_nz::integer::logic::and_i32::limbs_pos_and_limb_neg_to_out;
 ///
-/// let mut result = vec![0, 0];
-/// assert_eq!(limbs_slice_neg_and_limb_neg_to_out(&mut result, &[0, 2], 3), false);
+/// let mut result = vec![10, 10];
+/// limbs_pos_and_limb_neg_to_out(&mut result, &[0, 2], 3);
 /// assert_eq!(result, &[0, 2]);
 ///
-/// let mut result = vec![0, 0];
-/// assert_eq!(limbs_slice_neg_and_limb_neg_to_out(&mut result, &[1, 1], 3), false);
-/// assert_eq!(result, &[4294967293, 1]);
-///
-/// let mut result = vec![0, 0];
-/// assert_eq!(limbs_slice_neg_and_limb_neg_to_out(&mut result, &[0xffff_fffe, 1], 1), false);
-/// assert_eq!(result, &[0, 2]);
-///
-/// let mut result = vec![0, 0];
-/// assert_eq!(limbs_slice_neg_and_limb_neg_to_out(&mut result, &[0xffff_fffe, 0xffff_ffff], 1),
-///         true);
-/// assert_eq!(result, &[0, 0]);
+/// let mut result = vec![10, 10, 10, 10];
+/// limbs_pos_and_limb_neg_to_out(&mut result, &[123, 456], 789);
+/// assert_eq!(result, &[17, 456, 10, 10]);
 /// ```
-pub fn limbs_slice_neg_and_limb_neg_to_out(
-    out_limbs: &mut [u32],
-    in_limbs: &[u32],
-    limb: u32,
-) -> bool {
-    assert!(out_limbs.len() >= in_limbs.len());
-    if in_limbs[0] == 0 {
-        out_limbs[0..in_limbs.len()].copy_from_slice(in_limbs);
-    } else {
-        let result_head = in_limbs[0].wrapping_neg() & limb;
-        if result_head == 0 {
-            out_limbs[0] = 0;
-            if mpn_add_1_to_out(&mut out_limbs[1..], &in_limbs[1..], 1) {
-                return true;
-            }
-        } else {
-            out_limbs[0] = result_head.wrapping_neg();
-            out_limbs[1..in_limbs.len()].copy_from_slice(&in_limbs[1..]);
-        }
-    }
-    false
+pub fn limbs_pos_and_limb_neg_to_out(out_limbs: &mut [u32], in_limbs: &[u32], limb: u32) {
+    let len = in_limbs.len();
+    assert!(out_limbs.len() >= len);
+    out_limbs[0] = in_limbs[0] & limb;
+    out_limbs[1..len].copy_from_slice(&in_limbs[1..]);
+}
+
+/// Interpreting a slice of `u32`s as the limbs (in ascending order) of an `Integer`, writes the
+/// limbs of the bitwise and of the `Integer` and a negative number whose lowest limb is given by
+/// `limb` and whose other limbs are full of `true` bits, to the input slice. `limbs` may not be
+/// empty.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = `limbs.len()`
+///
+/// # Panics
+/// Panics if `in_limbs` is empty.
+///
+/// # Example
+/// ```
+/// use malachite_nz::integer::logic::and_i32::limbs_pos_and_limb_neg_in_place;
+///
+/// let mut limbs = vec![0, 2];
+/// limbs_pos_and_limb_neg_in_place(&mut limbs, 3);
+/// assert_eq!(limbs, &[0, 2]);
+///
+/// let mut limbs = vec![123, 456];
+/// limbs_pos_and_limb_neg_in_place(&mut limbs, 789);
+/// assert_eq!(limbs, &[17, 456]);
+/// ```
+pub fn limbs_pos_and_limb_neg_in_place(limbs: &mut [u32], limb: u32) {
+    limbs[0] &= limb;
 }
 
 /// Interpreting a slice of `u32`s as the limbs (in ascending order) of the negative of an
@@ -80,22 +110,74 @@ pub fn limbs_slice_neg_and_limb_neg_to_out(
 ///
 /// # Example
 /// ```
-/// use malachite_nz::integer::logic::and_i32::limbs_vec_neg_and_limb_neg;
+/// use malachite_nz::integer::logic::and_i32::limbs_neg_and_limb_neg;
 ///
-/// assert_eq!(limbs_vec_neg_and_limb_neg(&[0, 2], 3), &[0, 2]);
-/// assert_eq!(limbs_vec_neg_and_limb_neg(&[1, 1], 3), &[4294967293, 1]);
-/// assert_eq!(limbs_vec_neg_and_limb_neg(&[0xffff_fffe, 1], 1), &[0, 2]);
-/// assert_eq!(limbs_vec_neg_and_limb_neg(&[0xffff_fffe, 0xffff_ffff], 1), &[0, 0, 1]);
+/// assert_eq!(limbs_neg_and_limb_neg(&[0, 2], 3), &[0, 2]);
+/// assert_eq!(limbs_neg_and_limb_neg(&[1, 1], 3), &[4294967293, 1]);
+/// assert_eq!(limbs_neg_and_limb_neg(&[0xffff_fffe, 1], 1), &[0, 2]);
+/// assert_eq!(limbs_neg_and_limb_neg(&[0xffff_fffe, 0xffff_ffff], 1), &[0, 0, 1]);
 /// ```
-pub fn limbs_vec_neg_and_limb_neg(limbs: &[u32], limb: u32) -> Vec<u32> {
-    let mut result_limbs = vec![0; limbs.len()];
-    if limbs_slice_neg_and_limb_neg_to_out(&mut result_limbs, limbs, limb) {
-        result_limbs.push(1);
-    }
+pub fn limbs_neg_and_limb_neg(limbs: &[u32], limb: u32) -> Vec<u32> {
+    let mut result_limbs = limbs.to_vec();
+    limbs_vec_neg_and_limb_neg_in_place(&mut result_limbs, limb);
     result_limbs
 }
 
-/// Interpreting a `Vec` of `u32`s as the limbs (in ascending order) of the negative of an
+/// Interpreting a slice of `u32`s as the limbs (in ascending order) of the negative of an
+/// `Integer`, writes the limbs of the bitwise and of the `Integer` and a negative number whose
+/// lowest limb is given by `limb` and whose other limbs are full of `true` bits to an output slice.
+/// `in_limbs` may not be empty or only contain zeros. Returns whether a carry occurs. The output
+/// slice must be at least as long as the input slice.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = `in_limbs.len()`
+///
+/// # Panics
+/// Panics if `in_limbs` is empty or if `out_limbs` is shorter than `in_limbs`.
+///
+/// # Example
+/// ```
+/// use malachite_nz::integer::logic::and_i32::limbs_neg_and_limb_neg_to_out;
+///
+/// let mut result = vec![0, 0];
+/// assert_eq!(limbs_neg_and_limb_neg_to_out(&mut result, &[0, 2], 3), false);
+/// assert_eq!(result, &[0, 2]);
+///
+/// let mut result = vec![0, 0];
+/// assert_eq!(limbs_neg_and_limb_neg_to_out(&mut result, &[1, 1], 3), false);
+/// assert_eq!(result, &[4294967293, 1]);
+///
+/// let mut result = vec![0, 0];
+/// assert_eq!(limbs_neg_and_limb_neg_to_out(&mut result, &[0xffff_fffe, 1], 1), false);
+/// assert_eq!(result, &[0, 2]);
+///
+/// let mut result = vec![0, 0];
+/// assert_eq!(limbs_neg_and_limb_neg_to_out(&mut result, &[0xffff_fffe, 0xffff_ffff], 1),
+///         true);
+/// assert_eq!(result, &[0, 0]);
+/// ```
+pub fn limbs_neg_and_limb_neg_to_out(out_limbs: &mut [u32], in_limbs: &[u32], limb: u32) -> bool {
+    assert!(out_limbs.len() >= in_limbs.len());
+    if in_limbs[0] == 0 {
+        out_limbs[0..in_limbs.len()].copy_from_slice(in_limbs);
+        false
+    } else {
+        let result_head = in_limbs[0].wrapping_neg() & limb;
+        if result_head == 0 {
+            out_limbs[0] = 0;
+            mpn_add_1_to_out(&mut out_limbs[1..], &in_limbs[1..], 1)
+        } else {
+            out_limbs[0] = result_head.wrapping_neg();
+            out_limbs[1..in_limbs.len()].copy_from_slice(&in_limbs[1..]);
+            false
+        }
+    }
+}
+
+/// Interpreting a slice of `u32`s as the limbs (in ascending order) of the negative of an
 /// `Integer`, takes the bitwise and of the `Integer` and a negative number whose lowest limb is
 /// given by `limb` and whose other limbs are full of `true` bits, in place. `limbs` may not be
 /// empty or only contain zeros. Returns whether there is a carry.
@@ -145,7 +227,7 @@ pub fn limbs_slice_neg_and_limb_neg_in_place(limbs: &mut [u32], limb: u32) -> bo
     }
 }
 
-/// Interpreting a slices of `u32`s as the limbs (in ascending order) of the negative of an
+/// Interpreting a `Vec` of `u32`s as the limbs (in ascending order) of the negative of an
 /// `Integer`, takes the bitwise and of the `Integer` and a negative number whose lowest limb is
 /// given by `limb` and whose other limbs are full of `true` bits, in place. `limbs` may not be
 /// empty or only contain zeros. If there is a carry, increases the length of the `Vec` by 1.
@@ -250,18 +332,19 @@ impl<'a> BitAnd<i32> for &'a Integer {
     type Output = Integer;
 
     fn bitand(self, other: i32) -> Integer {
+        let u_other = u32::wrapping_from(other);
         if other >= 0 {
             Integer {
                 sign: true,
-                abs: Small(self & other.unsigned_abs()),
+                abs: Small(self & u_other),
             }
         } else {
             Integer {
                 sign: self.sign,
                 abs: if self.sign {
-                    self.abs.and_pos_u32_neg(u32::wrapping_from(other))
+                    self.abs.and_pos_u32_neg(u_other)
                 } else {
-                    self.abs.and_neg_u32_neg(u32::wrapping_from(other))
+                    self.abs.and_neg_u32_neg(u_other)
                 },
             }
         }
@@ -377,18 +460,14 @@ impl Natural {
     pub(crate) fn and_assign_pos_u32_neg(&mut self, other: u32) {
         match *self {
             Small(ref mut small) => *small &= other,
-            Large(ref mut limbs) => limbs[0] &= other,
+            Large(ref mut limbs) => limbs_pos_and_limb_neg_in_place(limbs, other),
         }
     }
 
     pub(crate) fn and_pos_u32_neg(&self, other: u32) -> Natural {
         match *self {
             Small(small) => Small(small & other),
-            Large(ref limbs) => {
-                let mut result_limbs = limbs.clone();
-                result_limbs[0] &= other;
-                Large(result_limbs)
-            }
+            Large(ref limbs) => Large(limbs_pos_and_limb_neg(limbs, other)),
         }
     }
 
@@ -401,15 +480,11 @@ impl Natural {
             small,
             limbs,
             {
-                if *small == 0 {
-                    Some(0)
+                let result = small.wrapping_neg() & other;
+                if result == 0 {
+                    None
                 } else {
-                    let result = (small.wrapping_neg() & other).wrapping_neg();
-                    if result == 0 {
-                        None
-                    } else {
-                        Some(result)
-                    }
+                    Some(result.wrapping_neg())
                 }
             },
             { limbs_vec_neg_and_limb_neg_in_place(limbs, other) }
@@ -418,16 +493,15 @@ impl Natural {
 
     pub(crate) fn and_neg_u32_neg(&self, other: u32) -> Natural {
         match *self {
-            Small(0) => Natural::ZERO,
             Small(small) => {
-                let result = (small.wrapping_neg() & other).wrapping_neg();
+                let result = small.wrapping_neg() & other;
                 if result == 0 {
                     Large(vec![0, 1])
                 } else {
-                    Small(result)
+                    Small(result.wrapping_neg())
                 }
             }
-            Large(ref limbs) => Large(limbs_vec_neg_and_limb_neg(limbs, other)),
+            Large(ref limbs) => Large(limbs_neg_and_limb_neg(limbs, other)),
         }
     }
 }
