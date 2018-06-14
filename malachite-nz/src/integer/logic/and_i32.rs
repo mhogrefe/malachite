@@ -69,11 +69,9 @@ pub fn limbs_pos_and_limb_neg_to_out(out_limbs: &mut [u32], in_limbs: &[u32], li
 /// `limb` and whose other limbs are full of `true` bits, to the input slice. `limbs` may not be
 /// empty.
 ///
-/// Time: worst case O(n)
+/// Time: worst case O(1)
 ///
 /// Additional memory: worst case O(1)
-///
-/// where n = `limbs.len()`
 ///
 /// # Panics
 /// Panics if `in_limbs` is empty.
