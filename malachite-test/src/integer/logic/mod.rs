@@ -96,6 +96,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     set_bit::register(registry);
     significant_bits::register(registry);
     trailing_zeros::register(registry);
+    xor::register(registry);
     xor_i32::register(registry);
     xor_u32::register(registry);
 }

@@ -3,7 +3,7 @@ use malachite_base::limbs::limbs_test_zero;
 use malachite_base::num::{AddMul, AddMulAssign};
 use natural::arithmetic::add::mpn_add_in_place;
 use natural::arithmetic::mul::mpn_mul;
-use natural::arithmetic::sub::{mpn_sub_aba, mpn_sub_in_place};
+use natural::arithmetic::sub::{mpn_sub_aba, mpn_sub_in_place_left};
 use natural::comparison::ord::limbs_cmp;
 use natural::Natural::{self, Large, Small};
 use std::cmp::{max, Ordering};
@@ -524,7 +524,7 @@ pub(crate) fn mpz_aorsmul(
         }
         assert!(!mpn_sub_aba(w, &t[0..tsize], wsize));
     } else {
-        assert!(!mpn_sub_in_place(&mut w[0..wsize], &t[0..tsize]));
+        assert!(!mpn_sub_in_place_left(&mut w[0..wsize], &t[0..tsize]));
     }
     if limbs_test_zero(w) {
         *w_sign = false;

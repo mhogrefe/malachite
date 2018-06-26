@@ -1,5 +1,6 @@
 use common::test_properties;
-use malachite_base::num::BitAccess;
+use malachite_base::misc::CheckedFrom;
+use malachite_base::num::{BitAccess, One};
 use malachite_nz::integer::Integer;
 use malachite_test::common::{integer_to_rug_integer, rug_integer_to_integer};
 use malachite_test::inputs::integer::pairs_of_integer_and_small_u64;
@@ -49,5 +50,10 @@ fn flip_bit_properties() {
         let mut mut_result = result.clone();
         mut_result.flip_bit(index);
         assert_eq!(mut_result, *n);
+
+        assert_eq!(
+            n ^ (Integer::ONE << u32::checked_from(index).unwrap()),
+            result
+        );
     });
 }

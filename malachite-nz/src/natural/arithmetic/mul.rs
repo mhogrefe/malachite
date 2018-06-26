@@ -6,7 +6,7 @@ use natural::arithmetic::add_u32::{mpn_add_1_in_place, mpn_add_1_to_out};
 use natural::arithmetic::mul_u32::mpn_mul_1;
 use natural::arithmetic::shl_u32::{mpn_lshift, mpn_lshift_in_place};
 use natural::arithmetic::shr_u32::mpn_rshift_in_place;
-use natural::arithmetic::sub::{mpn_sub, mpn_sub_n, mpn_sub_n_aba, mpn_sub_n_in_place};
+use natural::arithmetic::sub::{mpn_sub_n, mpn_sub_n_aba, mpn_sub_n_in_place, mpn_sub_to_out};
 use natural::arithmetic::sub_u32::mpn_sub_1_in_place;
 use natural::comparison::ord::limbs_cmp_same_length;
 use natural::Natural::{self, Large, Small};
@@ -223,7 +223,7 @@ fn mpn_toom22_mul(p: &mut [u32], a: &[u32], b: &[u32], scratch: &mut [u32]) {
         limbs_set_zero(&mut p[n + t..2 * n]);
         vm1_neg = !vm1_neg;
     } else {
-        mpn_sub(&mut p[n..], &b[0..n], &b[n..n + t]);
+        mpn_sub_to_out(&mut p[n..], &b[0..n], &b[n..n + t]);
     }
 
     // vm1, 2n limbs
@@ -649,7 +649,7 @@ fn mpn_toom42_mul(p: &mut [u32], a: &[u32], b: &[u32], scratch: &mut [u32]) {
             limbs_set_zero(&mut bsm1[t..n]);
             vm1_neg = !vm1_neg;
         } else {
-            mpn_sub(bsm1, &b0[0..n], &b1[0..t]);
+            mpn_sub_to_out(bsm1, &b0[0..n], &b1[0..t]);
         }
     }
 

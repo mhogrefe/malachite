@@ -188,8 +188,8 @@ pub enum NoSpecialGenerationMode {
 }
 
 impl NoSpecialGenerationMode {
-    pub fn name(&self) -> &str {
-        match *self {
+    pub fn name(self) -> &'static str {
+        match self {
             NoSpecialGenerationMode::Exhaustive => "exhaustive",
             NoSpecialGenerationMode::Random(_) => "random",
         }
@@ -204,8 +204,8 @@ pub enum GenerationMode {
 }
 
 impl GenerationMode {
-    pub fn name(&self) -> &str {
-        match *self {
+    pub fn name(self) -> &'static str {
+        match self {
             GenerationMode::Exhaustive => "exhaustive",
             GenerationMode::Random(_) => "random",
             GenerationMode::SpecialRandom(_) => "special_random",

@@ -53,9 +53,16 @@ pub fn mpn_sub_n_aba(s1: &mut [u32], s2: &[u32]) -> bool {
     borrow
 }
 
+pub fn mpn_sub(s1: &[u32], s2: &[u32]) -> (bool, Vec<u32>) {
+    //TODO
+    let mut result_limbs = vec![0; s1.len()];
+    let carry = mpn_sub_to_out(&mut result_limbs, s1, s2);
+    (carry, result_limbs)
+}
+
 // Subtract s2 from s1, and write the s1.len() least significant limbs of the result to r. Return
 // borrow. This function requires that s1.len() >= s2.len() and r.len() >= s1.len().
-pub fn mpn_sub(r: &mut [u32], s1: &[u32], s2: &[u32]) -> bool {
+pub fn mpn_sub_to_out(r: &mut [u32], s1: &[u32], s2: &[u32]) -> bool {
     let s1_len = s1.len();
     let s2_len = s2.len();
     assert!(s1_len >= s2_len);
@@ -73,7 +80,7 @@ pub fn mpn_sub(r: &mut [u32], s1: &[u32], s2: &[u32]) -> bool {
 
 // Subtract s2 from s1, and write the s1.len() least significant limbs of the result to s1. Return
 // borrow. This function requires that s1.len() >= s2.len().
-pub fn mpn_sub_in_place(s1: &mut [u32], s2: &[u32]) -> bool {
+pub fn mpn_sub_in_place_left(s1: &mut [u32], s2: &[u32]) -> bool {
     let s1_len = s1.len();
     let s2_len = s2.len();
     assert!(s1_len >= s2_len);
@@ -85,6 +92,13 @@ pub fn mpn_sub_in_place(s1: &mut [u32], s2: &[u32]) -> bool {
     } else {
         false
     }
+}
+
+pub fn mpn_sub_in_place_right(s1: &[u32], s2: &mut Vec<u32>) -> bool {
+    //TODO
+    let (carry, result) = mpn_sub(s1, s2);
+    *s2 = result;
+    carry
 }
 
 //TODO docs
@@ -117,7 +131,7 @@ fn sub_assign_helper<'a>(x: &mut Natural, y: &'a Natural) -> bool {
     } else {
         match (&mut (*x), y) {
             (&mut Large(ref mut xs), &Large(ref ys)) => {
-                if mpn_sub_in_place(xs, ys) {
+                if mpn_sub_in_place_left(xs, ys) {
                     return true;
                 }
             }
@@ -206,7 +220,7 @@ impl<'a, 'b> Sub<&'a Natural> for &'b Natural {
                         None
                     } else {
                         let mut difference_limbs = vec![0; xs_len];
-                        if mpn_sub(&mut difference_limbs, xs, ys) {
+                        if mpn_sub_to_out(&mut difference_limbs, xs, ys) {
                             None
                         } else {
                             let mut difference = Large(difference_limbs);
