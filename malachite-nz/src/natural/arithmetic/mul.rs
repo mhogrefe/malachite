@@ -1,5 +1,5 @@
 use malachite_base::limbs::{limbs_set_zero, limbs_test_zero};
-use malachite_base::num::PrimitiveInteger;
+use malachite_base::num::{NotAssign, PrimitiveInteger};
 use natural::arithmetic::add::{mpn_add, mpn_add_in_place, mpn_add_n, mpn_add_n_in_place};
 use natural::arithmetic::add_mul_u32::mpn_addmul_1;
 use natural::arithmetic::add_u32::{mpn_add_1_in_place, mpn_add_1_to_out};
@@ -212,7 +212,7 @@ fn mpn_toom22_mul(p: &mut [u32], a: &[u32], b: &[u32], scratch: &mut [u32]) {
     if t == n {
         if limbs_cmp_same_length(&b[0..n], &b[n..2 * n]) == Ordering::Less {
             mpn_sub_n(&mut p[n..], &b[n..2 * n], &b[0..n]);
-            vm1_neg = !vm1_neg;
+            vm1_neg.not_assign();
         } else {
             mpn_sub_n(&mut p[n..], &b[0..n], &b[n..2 * n]);
         }
@@ -221,7 +221,7 @@ fn mpn_toom22_mul(p: &mut [u32], a: &[u32], b: &[u32], scratch: &mut [u32]) {
     {
         mpn_sub_n(&mut p[n..], &b[n..n + t], &b[0..t]);
         limbs_set_zero(&mut p[n + t..2 * n]);
-        vm1_neg = !vm1_neg;
+        vm1_neg.not_assign();
     } else {
         mpn_sub_to_out(&mut p[n..], &b[0..n], &b[n..n + t]);
     }
@@ -631,7 +631,7 @@ fn mpn_toom42_mul(p: &mut [u32], a: &[u32], b: &[u32], scratch: &mut [u32]) {
 
         if limbs_cmp_same_length(&b0[0..n], &b1[0..n]) == Ordering::Less {
             mpn_sub_n(bsm1, &b1[0..n], &b0[0..n]);
-            vm1_neg = !vm1_neg;
+            vm1_neg.not_assign();
         } else {
             mpn_sub_n(bsm1, &b0[0..n], &b1[0..n]);
         }
@@ -647,7 +647,7 @@ fn mpn_toom42_mul(p: &mut [u32], a: &[u32], b: &[u32], scratch: &mut [u32]) {
         {
             mpn_sub_n(bsm1, &b1[0..t], &b0[0..t]);
             limbs_set_zero(&mut bsm1[t..n]);
-            vm1_neg = !vm1_neg;
+            vm1_neg.not_assign();
         } else {
             mpn_sub_to_out(bsm1, &b0[0..n], &b1[0..t]);
         }

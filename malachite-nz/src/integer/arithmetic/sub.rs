@@ -1,5 +1,5 @@
 use integer::Integer;
-use malachite_base::num::{NegAssign, Zero};
+use malachite_base::num::{NegAssign, NotAssign, Zero};
 use std::mem::swap;
 use std::ops::{Sub, SubAssign};
 
@@ -253,7 +253,7 @@ impl SubAssign<Integer> for Integer {
             _ => {
                 swap(self, &mut other);
                 self.abs -= &other.abs;
-                self.sign = !self.sign;
+                self.sign.not_assign();
             }
         }
     }

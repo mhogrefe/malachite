@@ -1,5 +1,6 @@
 use integer::Integer;
 use malachite_base::limbs::{limbs_leading_zero_limbs, limbs_set_zero};
+use malachite_base::num::WrappingNegAssign;
 use natural::arithmetic::sub::{
     mpn_sub, mpn_sub_in_place_left, mpn_sub_in_place_right, mpn_sub_to_out,
 };
@@ -150,7 +151,7 @@ pub fn limbs_xor_pos_neg_to_out(out_limbs: &mut [u32], xs: &[u32], ys: &[u32]) {
         {
             *out = !x;
         }
-        for out in out_limbs.iter_mut().take(y_i).skip(xs_len) {
+        for out in out_limbs[xs_len..y_i].iter_mut() {
             *out = u32::MAX;
         }
         out_limbs[y_i] = ys[y_i] - 1;
@@ -229,7 +230,7 @@ fn limbs_xor_pos_neg_in_place_left_helper(
         xs[x_i] ^= ys[x_i];
     } else {
         boundary_limb_seen = true;
-        xs[x_i] = xs[x_i].wrapping_neg();
+        xs[x_i].wrapping_neg_assign();
         limbs_not_in_place(&mut xs[x_i + 1..y_i]);
         xs[y_i] ^= ys[y_i] - 1;
     }
@@ -279,7 +280,7 @@ pub fn limbs_xor_pos_neg_in_place_left(xs: &mut Vec<u32>, ys: &[u32]) {
     assert!(x_i < xs_len);
     assert!(y_i < ys_len);
     if y_i >= xs_len {
-        xs[x_i] = xs[x_i].wrapping_neg();
+        xs[x_i].wrapping_neg_assign();
         limbs_not_in_place(&mut xs[x_i + 1..]);
         xs.extend(repeat(u32::MAX).take(y_i - xs_len));
         xs.push(ys[y_i] - 1);
@@ -454,7 +455,7 @@ pub fn limbs_xor_pos_neg_in_place_either(xs: &mut [u32], ys: &mut [u32]) -> bool
         for (y, &x) in ys[x_i + 1..].iter_mut().zip(xs[x_i + 1..].iter()) {
             *y = !x;
         }
-        for y in ys.iter_mut().take(y_i).skip(xs_len) {
+        for y in ys[xs_len..y_i].iter_mut() {
             *y = u32::MAX;
         }
         ys[y_i] -= 1;
@@ -618,7 +619,7 @@ fn limbs_xor_neg_neg_in_place_helper(xs: &mut [u32], ys: &[u32], x_i: usize, y_i
     if x_i == y_i {
         xs[x_i] = xs[x_i].wrapping_neg() ^ ys[x_i].wrapping_neg();
     } else if x_i <= y_i {
-        xs[min_i] = xs[min_i].wrapping_neg();
+        xs[min_i].wrapping_neg_assign();
         limbs_not_in_place(&mut xs[min_i + 1..max_i]);
         xs[max_i] ^= ys[max_i] - 1;
     } else {

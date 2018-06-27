@@ -362,6 +362,10 @@ pub trait OverflowingAbs {
     fn abs(self) -> (Self::Output, bool);
 }
 
+pub trait WrappingNegAssign {
+    fn wrapping_neg_assign(&mut self);
+}
+
 //TODO is_positive, is_negative, sign
 
 macro_rules! lossless_checked_from_impl {
@@ -504,6 +508,24 @@ wrapping_impl!(i16);
 wrapping_impl!(i32);
 wrapping_impl!(i64);
 
+impl NotAssign for bool {
+    fn not_assign(&mut self) {
+        *self = !*self
+    }
+}
+
+impl NegAssign for isize {
+    fn neg_assign(&mut self) {
+        *self = -*self
+    }
+}
+
+impl NotAssign for isize {
+    fn not_assign(&mut self) {
+        *self = !*self
+    }
+}
+
 //TODO docs
 pub trait PrimitiveInteger:
     Add<Output = Self>
@@ -561,6 +583,7 @@ pub trait PrimitiveInteger:
     + MulAssign<Self>
     + Named
     + Not<Output = Self>
+    + NotAssign
     + Octal
     + One
     + Ord
@@ -619,6 +642,7 @@ pub trait PrimitiveInteger:
     + WrappingInto<i64>
     + WrappingMul<Output = Self>
     + WrappingNeg<Output = Self>
+    + WrappingNegAssign
     + WrappingRem<Output = Self>
     + WrappingShl<Output = Self>
     + WrappingShr<Output = Self>
@@ -658,8 +682,8 @@ pub trait PrimitiveSigned:
     + From<i8>
     + Into<i64>
     + Neg<Output = Self>
+    + NegAssign
     + NegativeOne
-    + Not<Output = Self>
     + OverflowingAbs<Output = Self>
     + PrimitiveInteger
     + UnsignedAbs
@@ -691,6 +715,7 @@ pub trait PrimitiveFloat:
     + MulAssign<Self>
     + Named
     + Neg<Output = Self>
+    + NegAssign
     + One
     + PartialEq<Self>
     + PartialOrd<Self>
@@ -1191,6 +1216,20 @@ macro_rules! integer_traits {
                     .expect("Cannot decrement past the minimum value.");
             }
         }
+
+        //TODO docs, test
+        impl NotAssign for $t {
+            fn not_assign(&mut self) {
+                *self = !*self;
+            }
+        }
+
+        //TODO docs, test
+        impl WrappingNegAssign for $t {
+            fn wrapping_neg_assign(&mut self) {
+                *self = self.wrapping_neg();
+            }
+        }
     };
 }
 
@@ -1676,6 +1715,13 @@ macro_rules! signed_traits {
                 }
             }
         }
+
+        //TODO docs, test
+        impl NegAssign for $t {
+            fn neg_assign(&mut self) {
+                *self = -*self;
+            }
+        }
     };
 }
 
@@ -1740,6 +1786,12 @@ macro_rules! float_traits {
 
         impl Max for $t {
             const MAX: $t = $t::INFINITY;
+        }
+
+        impl NegAssign for $t {
+            fn neg_assign(&mut self) {
+                *self = -*self;
+            }
         }
     };
 }

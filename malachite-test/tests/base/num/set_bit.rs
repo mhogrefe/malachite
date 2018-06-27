@@ -151,7 +151,7 @@ fn set_bit_properties_helper_signed<T: 'static + PrimitiveSigned>() {
 
         let mut m = !n;
         m.clear_bit(index);
-        m = !m; //TODO use not_assign
+        m.not_assign();
         let mut mut_n = n;
         mut_n.set_bit(index);
         assert_eq!(m, mut_n);

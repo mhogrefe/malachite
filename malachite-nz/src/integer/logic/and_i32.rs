@@ -1,6 +1,6 @@
 use integer::Integer;
 use malachite_base::misc::WrappingFrom;
-use malachite_base::num::UnsignedAbs;
+use malachite_base::num::{UnsignedAbs, WrappingNegAssign};
 use natural::arithmetic::add_u32::{mpn_add_1_in_place, mpn_add_1_to_out};
 use natural::Natural::{self, Large, Small};
 use std::ops::{BitAnd, BitAndAssign};
@@ -219,7 +219,7 @@ pub fn limbs_slice_neg_and_limb_neg_in_place(limbs: &mut [u32], limb: u32) -> bo
         if *head == 0 {
             mpn_add_1_in_place(tail, 1)
         } else {
-            *head = head.wrapping_neg();
+            head.wrapping_neg_assign();
             false
         }
     }

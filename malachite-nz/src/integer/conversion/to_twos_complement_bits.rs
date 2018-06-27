@@ -1,5 +1,5 @@
 use integer::Integer;
-use malachite_base::num::BitAccess;
+use malachite_base::num::{BitAccess, NotAssign};
 use natural::conversion::to_bits::BitIterator;
 use natural::Natural;
 use std::ops::Index;
@@ -366,7 +366,7 @@ pub fn bits_slice_to_twos_complement_bits_negative(bits: &mut [bool]) -> bool {
     let mut true_seen = false;
     for bit in bits.iter_mut() {
         if true_seen {
-            *bit = !*bit;
+            bit.not_assign();
         } else if *bit {
             true_seen = true;
         }

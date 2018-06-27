@@ -1,6 +1,6 @@
 use integer::Integer;
 use malachite_base::misc::CheckedFrom;
-use malachite_base::num::{Assign, NegAssign, UnsignedAbs};
+use malachite_base::num::{Assign, NegAssign, NotAssign, UnsignedAbs};
 use natural::Natural;
 use std::ops::{Sub, SubAssign};
 
@@ -199,7 +199,7 @@ impl SubAssign<i32> for Integer {
                 ref mut sign,
                 ref mut abs,
             } => {
-                *sign = !*sign;
+                sign.not_assign();
                 let small_abs = u32::checked_from(&*abs).unwrap();
                 abs.assign(abs_other - small_abs);
             }

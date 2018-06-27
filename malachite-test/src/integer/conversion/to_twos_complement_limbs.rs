@@ -1,7 +1,7 @@
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::{vecs_of_u32_var_1, vecs_of_unsigned};
 use inputs::integer::{integers, pairs_of_integer_and_small_usize};
-use malachite_base::num::SignificantBits;
+use malachite_base::num::{SignificantBits, WrappingNegAssign};
 use malachite_nz::integer::conversion::to_twos_complement_limbs::*;
 use malachite_nz::natural::arithmetic::sub_u32::mpn_sub_1_in_place;
 use malachite_nz::natural::logic::not::limbs_not_in_place;
@@ -13,7 +13,7 @@ pub fn limbs_slice_to_twos_complement_limbs_negative_alt_1(limbs: &mut [u32]) ->
     if i == len {
         return true;
     }
-    limbs[i] = limbs[i].wrapping_neg();
+    limbs[i].wrapping_neg_assign();
     let j = i + 1;
     if j != len {
         limbs_not_in_place(&mut limbs[j..]);

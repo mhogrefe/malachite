@@ -1,5 +1,6 @@
 use integer::Integer;
 use malachite_base::limbs::{limbs_leading_zero_limbs, limbs_set_zero};
+use malachite_base::num::WrappingNegAssign;
 use natural::logic::not::{limbs_not_in_place, limbs_not_to_out};
 use natural::Natural::{self, Large, Small};
 use std::cmp::max;
@@ -176,7 +177,7 @@ pub fn limbs_slice_or_pos_neg_in_place_left(xs: &mut [u32], ys: &[u32]) -> bool 
     assert!(x_i < xs_len);
     assert!(y_i < ys_len);
     if y_i >= xs_len {
-        xs[x_i] = xs[x_i].wrapping_neg();
+        xs[x_i].wrapping_neg_assign();
         limbs_not_in_place(&mut xs[x_i + 1..]);
         return true;
     } else if x_i >= ys_len {
@@ -191,7 +192,7 @@ pub fn limbs_slice_or_pos_neg_in_place_left(xs: &mut [u32], ys: &[u32]) -> bool 
         xs[y_i..x_i].copy_from_slice(&ys[y_i..x_i]);
         xs[x_i] = !xs[x_i] & ys[x_i];
     } else {
-        xs[x_i] = xs[x_i].wrapping_neg();
+        xs[x_i].wrapping_neg_assign();
         limbs_not_in_place(&mut xs[x_i + 1..y_i]);
         xs[y_i] = !xs[y_i] & (ys[y_i] - 1);
     };
@@ -242,7 +243,7 @@ pub fn limbs_vec_or_pos_neg_in_place_left(xs: &mut Vec<u32>, ys: &[u32]) {
     assert!(x_i < xs_len);
     assert!(y_i < ys_len);
     if y_i >= xs_len {
-        xs[x_i] = xs[x_i].wrapping_neg();
+        xs[x_i].wrapping_neg_assign();
         limbs_not_in_place(&mut xs[x_i + 1..]);
         xs.extend(repeat(u32::MAX).take(y_i - xs_len));
         xs.push(ys[y_i] - 1);
@@ -259,7 +260,7 @@ pub fn limbs_vec_or_pos_neg_in_place_left(xs: &mut Vec<u32>, ys: &[u32]) {
         xs[y_i..x_i].copy_from_slice(&ys[y_i..x_i]);
         xs[x_i] = !xs[x_i] & ys[x_i];
     } else {
-        xs[x_i] = xs[x_i].wrapping_neg();
+        xs[x_i].wrapping_neg_assign();
         limbs_not_in_place(&mut xs[x_i + 1..y_i]);
         xs[y_i] = !xs[y_i] & (ys[y_i] - 1);
     };
@@ -315,7 +316,7 @@ pub fn limbs_or_pos_neg_in_place_right(xs: &[u32], ys: &mut [u32]) {
     if y_i >= xs_len {
         ys[x_i] = xs[x_i].wrapping_neg();
         limbs_not_to_out(&mut ys[x_i + 1..xs_len], &xs[x_i + 1..]);
-        for y in ys.iter_mut().take(y_i).skip(xs_len) {
+        for y in ys[xs_len..y_i].iter_mut() {
             *y = u32::MAX;
         }
         ys[y_i] -= 1;

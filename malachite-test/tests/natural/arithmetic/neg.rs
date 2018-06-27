@@ -13,7 +13,7 @@ fn test_neg() {
         assert!(neg.is_valid());
         assert_eq!(neg.to_string(), out);
 
-        let neg = -(&Natural::from_str(s).unwrap());
+        let neg = -&Natural::from_str(s).unwrap();
         assert!(neg.is_valid());
         assert_eq!(neg.to_string(), out);
 
@@ -28,7 +28,7 @@ fn test_neg() {
 #[test]
 fn neg_properties() {
     test_properties(naturals, |x| {
-        let neg = -(x.clone());
+        let neg = -x.clone();
         assert!(neg.is_valid());
 
         let neg_alt = -x;

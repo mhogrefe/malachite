@@ -1,5 +1,5 @@
 use integer::Integer;
-use malachite_base::num::{NegAssign, Zero};
+use malachite_base::num::{NegAssign, NotAssign, Zero};
 use std::ops::Neg;
 
 /// Returns the negative of an `Integer`, taking the `Integer` by value.
@@ -27,7 +27,7 @@ impl Neg for Integer {
 
     fn neg(mut self) -> Integer {
         if self.abs != 0 {
-            self.sign = !self.sign;
+            self.sign.not_assign();
         }
         self
     }
@@ -101,7 +101,7 @@ impl<'a> Neg for &'a Integer {
 impl NegAssign for Integer {
     fn neg_assign(&mut self) {
         if self.abs != 0 {
-            self.sign = !self.sign;
+            self.sign.not_assign();
         }
     }
 }

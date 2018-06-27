@@ -1,4 +1,5 @@
 use integer::Integer;
+use malachite_base::num::WrappingNegAssign;
 use natural::arithmetic::add_u32::{mpn_add_1, mpn_add_1_in_place, mpn_add_1_to_out};
 use natural::arithmetic::sub_u32::{mpn_sub_1, mpn_sub_1_in_place, mpn_sub_1_to_out};
 use natural::Natural::{self, Large, Small};
@@ -129,7 +130,7 @@ pub fn limbs_slice_neg_xor_limb_in_place(limbs: &mut [u32], limb: u32) -> bool {
         if *head == 0 {
             mpn_add_1_in_place(tail, 1)
         } else {
-            *head = head.wrapping_neg();
+            head.wrapping_neg_assign();
             false
         }
     } else {

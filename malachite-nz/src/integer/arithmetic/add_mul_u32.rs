@@ -1,6 +1,6 @@
 use integer::Integer;
 use malachite_base::limbs::limbs_test_zero;
-use malachite_base::num::{AddMul, AddMulAssign};
+use malachite_base::num::{AddMul, AddMulAssign, NegAssign, NotAssign};
 use natural::arithmetic::add_mul_u32::mpn_addmul_1;
 use natural::arithmetic::add_u32::mpn_add_1_in_place;
 use natural::arithmetic::mul_u32::{mpn_mul_1, mpn_mul_1c};
@@ -369,7 +369,7 @@ pub(crate) fn mpz_aorsmul_1(
                     y,
                 )
             } else {
-                dsize = -dsize;
+                dsize.neg_assign();
                 0
             };
             cy = cy2 + if mpn_add_1_in_place(&mut w[min_size..min_size + dsize as usize], cy) {
@@ -401,7 +401,7 @@ pub(crate) fn mpz_aorsmul_1(
                 new_wsize += 1;
                 mpn_add_1_in_place(&mut w[0..new_wsize], 1);
                 if new_wsize != 0 {
-                    *w_sign = !*w_sign;
+                    w_sign.not_assign();
                 }
             }
         } else {
@@ -432,7 +432,7 @@ pub(crate) fn mpz_aorsmul_1(
                 mpn_sub_1_in_place(&mut w[wsize..new_wsize], 1);
             }
             if new_wsize != 0 {
-                *w_sign = !*w_sign;
+                w_sign.not_assign();
             }
         }
         w.resize(new_wsize, 0);

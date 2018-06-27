@@ -1,5 +1,6 @@
 use integer::Integer;
 use malachite_base::limbs::{limbs_leading_zero_limbs, limbs_set_zero};
+use malachite_base::num::{NotAssign, WrappingNegAssign};
 use natural::Natural::{self, Large, Small};
 use std::cmp::max;
 use std::ops::{BitAnd, BitAndAssign};
@@ -212,9 +213,9 @@ pub fn limbs_slice_and_pos_neg_in_place_right(xs: &[u32], ys: &mut [u32]) {
     {
         let ys_max_i = &mut ys[max_i];
         if x_i <= y_i {
-            *ys_max_i = ys_max_i.wrapping_neg();
+            ys_max_i.wrapping_neg_assign();
         } else {
-            *ys_max_i = !*ys_max_i;
+            ys_max_i.not_assign();
         }
         *ys_max_i &= xs[max_i];
     }

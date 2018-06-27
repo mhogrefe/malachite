@@ -94,18 +94,18 @@ fn trim_be_limbs(xs: &mut Vec<u32>) {
             None => xs.clear(),
             Some(i) => {
                 let i = if xs[i] & 0x8000_0000 != 0 { i - 1 } else { i };
-                *xs = xs.iter().cloned().skip(i).collect();
+                *xs = xs[i..].iter().cloned().collect();
             }
         }
     } else {
-        match xs.iter().position(|&limb| limb != 0xffff_ffff) {
+        match xs.iter().position(|&limb| limb != u32::MAX) {
             None => {
                 xs.clear();
-                xs.push(0xffff_ffff);
+                xs.push(u32::MAX);
             }
             Some(i) => {
                 let i = if xs[i] & 0x8000_0000 == 0 { i - 1 } else { i };
-                *xs = xs.iter().cloned().skip(i).collect();
+                *xs = xs[i..].iter().cloned().collect();
             }
         }
     }

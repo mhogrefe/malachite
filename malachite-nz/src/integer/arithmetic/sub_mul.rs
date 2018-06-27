@@ -1,5 +1,5 @@
 use integer::Integer;
-use malachite_base::num::{AddMul, AddMulAssign, SubMul, SubMulAssign};
+use malachite_base::num::{AddMul, AddMulAssign, NotAssign, SubMul, SubMulAssign};
 use natural::arithmetic::add_mul::mpz_aorsmul;
 use natural::Natural::{Large, Small};
 
@@ -234,7 +234,7 @@ impl<'a, 'b, 'c> SubMul<&'a Integer, &'b Integer> for &'c Integer {
                     c_limbs,
                     false,
                 );
-                result_sign = !result_sign;
+                result_sign.not_assign();
                 let mut abs_result = Large(result_limbs);
                 abs_result.trim();
                 Integer {

@@ -1,6 +1,6 @@
 use integer::Integer;
 use malachite_base::limbs::limbs_test_zero;
-use malachite_base::num::{BitAccess, PrimitiveInteger};
+use malachite_base::num::{BitAccess, PrimitiveInteger, WrappingNegAssign};
 use natural::arithmetic::add_u32::mpn_add_1_in_place;
 use natural::arithmetic::sub_u32::mpn_sub_1_in_place;
 use natural::Natural::{self, Large, Small};
@@ -381,9 +381,9 @@ impl Natural {
         match *self {
             Small(ref mut small) => {
                 if index < u32::WIDTH.into() {
-                    *small = small.wrapping_neg();
+                    small.wrapping_neg_assign();
                     small.set_bit(index);
-                    *small = small.wrapping_neg();
+                    small.wrapping_neg_assign();
                 }
                 return;
             }

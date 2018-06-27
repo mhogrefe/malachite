@@ -1,4 +1,5 @@
 use integer::Integer;
+use malachite_base::num::NotAssign;
 use natural::Natural;
 use std::ops::Not;
 
@@ -67,7 +68,7 @@ pub fn limbs_not_to_out(limbs_out: &mut [u32], limbs_in: &[u32]) {
 /// ```
 pub fn limbs_not_in_place(limbs: &mut [u32]) {
     for limb in limbs.iter_mut() {
-        *limb = !*limb;
+        limb.not_assign();
     }
 }
 

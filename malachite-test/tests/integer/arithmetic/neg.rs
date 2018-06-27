@@ -16,7 +16,7 @@ fn test_neg() {
         assert!(neg.is_valid());
         assert_eq!(neg.to_string(), out);
 
-        let neg = -(&Integer::from_str(s).unwrap());
+        let neg = -&Integer::from_str(s).unwrap();
         assert!(neg.is_valid());
         assert_eq!(neg.to_string(), out);
 
@@ -44,7 +44,7 @@ fn neg_properties() {
         assert!(negative.is_valid());
         assert!(negative.is_valid());
 
-        let negative_alt = -(x.clone());
+        let negative_alt = -x.clone();
         assert!(negative_alt.is_valid());
         assert_eq!(negative_alt, negative);
 
