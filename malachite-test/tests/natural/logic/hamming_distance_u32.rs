@@ -34,6 +34,14 @@ fn limbs_hamming_distance_limb_fail() {
 fn test_hamming_distance_u32() {
     let test = |n, u, out| {
         assert_eq!(Natural::from_str(n).unwrap().hamming_distance(u), out);
+        assert_eq!(
+            natural_hamming_distance_u32_alt_1(&Natural::from_str(n).unwrap(), u),
+            out
+        );
+        assert_eq!(
+            natural_hamming_distance_u32_alt_2(&Natural::from_str(n).unwrap(), u),
+            out
+        );
     };
     test("105", 123, 2);
     test("1000000000000", 0, 13);
@@ -65,7 +73,7 @@ fn hamming_distance_u32_properties() {
             assert_eq!(natural_hamming_distance_u32_alt_2(n, u), distance);
             assert_eq!(Integer::from(n).checked_hamming_distance(u), Some(distance));
             assert_eq!(distance == 0, *n == u);
-            //TODO xor
+            assert_eq!((n ^ u).count_ones(), distance);
             assert_eq!(
                 (!n).checked_hamming_distance(&!Natural::from(u)),
                 Some(distance)

@@ -233,6 +233,15 @@ fn test_xor_i32() {
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
+        assert_eq!(
+            integer_xor_i32_alt_1(&Integer::from_str(u).unwrap(), v).to_string(),
+            out
+        );
+        assert_eq!(
+            integer_xor_i32_alt_2(&Integer::from_str(u).unwrap(), v).to_string(),
+            out
+        );
+
         let n = v ^ rug::Integer::from_str(u).unwrap();
         assert_eq!(n.to_string(), out);
 

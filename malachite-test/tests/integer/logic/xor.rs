@@ -462,6 +462,21 @@ fn test_xor() {
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
+        assert_eq!(
+            integer_xor_alt_1(
+                &Integer::from_str(u).unwrap(),
+                &Integer::from_str(v).unwrap()
+            ).to_string(),
+            out
+        );
+        assert_eq!(
+            integer_xor_alt_2(
+                &Integer::from_str(u).unwrap(),
+                &Integer::from_str(v).unwrap()
+            ).to_string(),
+            out
+        );
+
         let n = rug::Integer::from_str(u).unwrap() ^ rug::Integer::from_str(v).unwrap();
         assert_eq!(n.to_string(), out);
     };

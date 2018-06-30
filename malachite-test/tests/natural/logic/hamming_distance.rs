@@ -5,6 +5,7 @@ use malachite_nz::natural::logic::hamming_distance::{
     limbs_hamming_distance, limbs_hamming_distance_same_length,
 };
 use malachite_nz::natural::Natural;
+use malachite_test::common::natural_to_rug_integer;
 use malachite_test::inputs::base::{pairs_of_unsigned_vec_var_1, pairs_of_unsigned_vec_var_2};
 use malachite_test::inputs::natural::{
     naturals, pairs_of_naturals, triples_of_natural_natural_and_unsigned, triples_of_naturals,
@@ -12,6 +13,7 @@ use malachite_test::inputs::natural::{
 use malachite_test::natural::logic::hamming_distance::{
     natural_hamming_distance_alt_1, natural_hamming_distance_alt_2,
 };
+use rug;
 use std::str::FromStr;
 
 #[test]
@@ -53,6 +55,29 @@ fn test_hamming_distance() {
                 .hamming_distance(&Natural::from_str(y).unwrap()),
             out
         );
+        assert_eq!(
+            natural_hamming_distance_alt_1(
+                &Natural::from_str(x).unwrap(),
+                &Natural::from_str(y).unwrap()
+            ),
+            out
+        );
+        assert_eq!(
+            natural_hamming_distance_alt_2(
+                &Natural::from_str(x).unwrap(),
+                &Natural::from_str(y).unwrap()
+            ),
+            out
+        );
+        assert_eq!(
+            u64::from(
+                rug::Integer::from_str(x)
+                    .unwrap()
+                    .hamming_dist(&rug::Integer::from_str(y).unwrap())
+                    .unwrap()
+            ),
+            out
+        );
     };
     test("105", "123", 2);
     test("1000000000000", "0", 13);
@@ -86,6 +111,14 @@ fn limbs_hamming_distance_properties() {
 fn hamming_distance_properties() {
     test_properties(pairs_of_naturals, |&(ref x, ref y)| {
         let distance = x.hamming_distance(y);
+        assert_eq!(
+            u64::from(
+                natural_to_rug_integer(x)
+                    .hamming_dist(&natural_to_rug_integer(y))
+                    .unwrap()
+            ),
+            distance
+        );
         assert_eq!(y.hamming_distance(x), distance);
         assert_eq!(natural_hamming_distance_alt_1(x, y), distance);
         assert_eq!(natural_hamming_distance_alt_2(x, y), distance);
@@ -94,7 +127,7 @@ fn hamming_distance_properties() {
             Some(distance)
         );
         assert_eq!(distance == 0, x == y);
-        //TODO xor
+        assert_eq!((x ^ y).count_ones(), distance);
         assert_eq!((!x).checked_hamming_distance(&!y), Some(distance));
     });
 

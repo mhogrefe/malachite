@@ -202,6 +202,21 @@ fn test_xor() {
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
+        assert_eq!(
+            natural_xor_alt_1(
+                &Natural::from_str(u).unwrap(),
+                &Natural::from_str(v).unwrap()
+            ).to_string(),
+            out
+        );
+        assert_eq!(
+            natural_xor_alt_2(
+                &Natural::from_str(u).unwrap(),
+                &Natural::from_str(v).unwrap()
+            ).to_string(),
+            out
+        );
+
         let n = BigUint::from_str(u).unwrap() ^ BigUint::from_str(v).unwrap();
         assert_eq!(n.to_string(), out);
 

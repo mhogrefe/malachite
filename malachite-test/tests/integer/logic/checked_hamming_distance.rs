@@ -3,6 +3,7 @@ use malachite_base::num::{CheckedHammingDistance, NegativeOne, Zero};
 use malachite_nz::integer::logic::checked_hamming_distance::limbs_hamming_distance_neg;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
+use malachite_test::common::integer_to_rug_integer;
 use malachite_test::inputs::base::pairs_of_u32_vec_var_1;
 use malachite_test::inputs::integer::{
     integers, pairs_of_integers, triples_of_natural_integer_natural_integer_and_natural_signed,
@@ -11,6 +12,7 @@ use malachite_test::inputs::integer::{
 use malachite_test::integer::logic::checked_hamming_distance::{
     integer_checked_hamming_distance_alt_1, integer_checked_hamming_distance_alt_2,
 };
+use rug;
 use std::str::FromStr;
 
 #[test]
@@ -43,6 +45,27 @@ fn test_checked_hamming_distance() {
             Integer::from_str(x)
                 .unwrap()
                 .checked_hamming_distance(&Integer::from_str(y).unwrap()),
+            out
+        );
+        assert_eq!(
+            integer_checked_hamming_distance_alt_1(
+                &Integer::from_str(x).unwrap(),
+                &Integer::from_str(y).unwrap()
+            ),
+            out
+        );
+        assert_eq!(
+            integer_checked_hamming_distance_alt_2(
+                &Integer::from_str(x).unwrap(),
+                &Integer::from_str(y).unwrap()
+            ),
+            out
+        );
+        assert_eq!(
+            rug::Integer::from_str(x)
+                .unwrap()
+                .hamming_dist(&rug::Integer::from_str(y).unwrap())
+                .map(|u| u64::from(u)),
             out
         );
     };
@@ -84,14 +107,20 @@ fn limbs_hamming_distance_neg_properties() {
 
 #[test]
 fn checked_hamming_distance_properties() {
-    test_properties(pairs_of_integers, |&(ref xs, ref ys)| {
-        let distance = xs.checked_hamming_distance(ys);
-        assert_eq!(ys.checked_hamming_distance(xs), distance);
-        assert_eq!(integer_checked_hamming_distance_alt_1(xs, ys), distance);
-        assert_eq!(integer_checked_hamming_distance_alt_2(xs, ys), distance);
-        assert_eq!(distance == Some(0), xs == ys);
-        //TODO xor
-        assert_eq!((!xs).checked_hamming_distance(&!ys), distance);
+    test_properties(pairs_of_integers, |&(ref x, ref y)| {
+        let distance = x.checked_hamming_distance(y);
+        assert_eq!(
+            integer_to_rug_integer(x)
+                .hamming_dist(&integer_to_rug_integer(y))
+                .map(|u| u64::from(u)),
+            distance
+        );
+        assert_eq!(y.checked_hamming_distance(x), distance);
+        assert_eq!(integer_checked_hamming_distance_alt_1(x, y), distance);
+        assert_eq!(integer_checked_hamming_distance_alt_2(x, y), distance);
+        assert_eq!(distance == Some(0), x == y);
+        assert_eq!((x ^ y).checked_count_ones(), distance);
+        assert_eq!((!x).checked_hamming_distance(&!y), distance);
     });
 
     test_properties(

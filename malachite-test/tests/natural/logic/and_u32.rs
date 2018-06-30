@@ -42,6 +42,15 @@ fn test_and_u32() {
         let n = &Natural::from_str(u).unwrap() & v;
         assert_eq!(n.to_string(), out);
 
+        assert_eq!(
+            natural_and_u32_alt_1(&Natural::from_str(u).unwrap(), v).to_string(),
+            out
+        );
+        assert_eq!(
+            natural_and_u32_alt_2(&Natural::from_str(u).unwrap(), v).to_string(),
+            out
+        );
+
         let n = num_and_u32(BigUint::from_str(u).unwrap(), v);
         assert_eq!(n.to_string(), out);
 

@@ -33,6 +33,20 @@ pub fn test_limbs_slice_to_twos_complement_limbs_negative() {
             carry
         );
         assert_eq!(mut_limbs, out_limbs);
+
+        let mut mut_limbs = limbs.to_vec();
+        assert_eq!(
+            limbs_slice_to_twos_complement_limbs_negative_alt_1(&mut mut_limbs),
+            carry
+        );
+        assert_eq!(mut_limbs, out_limbs);
+
+        let mut mut_limbs = limbs.to_vec();
+        assert_eq!(
+            limbs_slice_to_twos_complement_limbs_negative_alt_2(&mut mut_limbs),
+            carry
+        );
+        assert_eq!(mut_limbs, out_limbs);
     };
     test(&[], &[], true);
     test(&[1, 2, 3], &[0xffff_ffff, 0xffff_fffd, 0xffff_fffc], false);

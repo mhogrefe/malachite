@@ -23,6 +23,14 @@ fn test_limbs_count_ones() {
 fn test_count_ones() {
     let test = |n, out| {
         assert_eq!(Natural::from_str(n).unwrap().count_ones(), out);
+        assert_eq!(
+            natural_count_ones_alt_1(&Natural::from_str(n).unwrap()),
+            out
+        );
+        assert_eq!(
+            natural_count_ones_alt_2(&Natural::from_str(n).unwrap()),
+            out
+        );
     };
     test("0", 0);
     test("105", 4);

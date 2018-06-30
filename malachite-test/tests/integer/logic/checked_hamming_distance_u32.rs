@@ -17,6 +17,14 @@ fn test_checked_hamming_distance_u32() {
             Integer::from_str(n).unwrap().checked_hamming_distance(u),
             out
         );
+        assert_eq!(
+            integer_checked_hamming_distance_u32_alt_1(&Integer::from_str(n).unwrap(), u),
+            out
+        );
+        assert_eq!(
+            integer_checked_hamming_distance_u32_alt_2(&Integer::from_str(n).unwrap(), u),
+            out
+        );
     };
     test("105", 123, Some(2));
     test("1000000000000", 0, Some(13));
@@ -38,7 +46,7 @@ fn checked_hamming_distance_u32_properties() {
             assert_eq!(integer_checked_hamming_distance_u32_alt_1(n, u), distance);
             assert_eq!(integer_checked_hamming_distance_u32_alt_2(n, u), distance);
             assert_eq!(distance == Some(0), *n == u);
-            //TODO xor
+            assert_eq!((n ^ u).checked_count_ones(), distance);
             assert_eq!((!n).checked_hamming_distance(&!Integer::from(u)), distance);
         },
     );

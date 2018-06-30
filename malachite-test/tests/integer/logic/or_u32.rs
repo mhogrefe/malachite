@@ -110,6 +110,15 @@ fn test_or_i32() {
         let n = v | &Integer::from_str(u).unwrap();
         assert_eq!(n.to_string(), out);
 
+        assert_eq!(
+            integer_or_u32_alt_1(&Integer::from_str(u).unwrap(), v).to_string(),
+            out
+        );
+        assert_eq!(
+            integer_or_u32_alt_2(&Integer::from_str(u).unwrap(), v).to_string(),
+            out
+        );
+
         let n = v | rug::Integer::from_str(u).unwrap();
         assert_eq!(n.to_string(), out);
 

@@ -33,6 +33,10 @@ fn limbs_trailing_zeros_fail_2() {
 fn test_trailing_zeros() {
     let test = |n, out| {
         assert_eq!(Natural::from_str(n).unwrap().trailing_zeros(), out);
+        assert_eq!(
+            natural_trailing_zeros_alt(&Natural::from_str(n).unwrap()),
+            out
+        );
     };
     test("0", None);
     test("123", Some(0));

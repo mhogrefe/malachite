@@ -11,7 +11,6 @@ use natural::Natural::{self, Large, Small};
 /// # Example
 /// ```
 /// use malachite_nz::natural::logic::bit_access::limbs_get_bit;
-/// use std::cmp::Ordering;
 ///
 /// assert_eq!(limbs_get_bit(&[0, 0b1011], 0), false);
 /// assert_eq!(limbs_get_bit(&[0, 0b1011], 32), true);
@@ -46,7 +45,6 @@ fn limbs_set_bit_helper(limbs: &mut [u32], index: u64, limb_index: usize) {
 /// # Example
 /// ```
 /// use malachite_nz::natural::logic::bit_access::limbs_slice_set_bit;
-/// use std::cmp::Ordering;
 ///
 /// let mut limbs = &mut [0, 1];
 /// limbs_slice_set_bit(limbs, 0);
@@ -71,7 +69,6 @@ pub fn limbs_slice_set_bit(limbs: &mut [u32], index: u64) {
 /// # Example
 /// ```
 /// use malachite_nz::natural::logic::bit_access::limbs_vec_set_bit;
-/// use std::cmp::Ordering;
 ///
 /// let mut limbs = vec![0, 1];
 /// limbs_vec_set_bit(&mut limbs, 0);
@@ -102,7 +99,6 @@ pub fn limbs_vec_set_bit(limbs: &mut Vec<u32>, index: u64) {
 /// # Example
 /// ```
 /// use malachite_nz::natural::logic::bit_access::limbs_clear_bit;
-/// use std::cmp::Ordering;
 ///
 /// let mut limbs = &mut [3, 3];
 /// limbs_clear_bit(limbs, 33);

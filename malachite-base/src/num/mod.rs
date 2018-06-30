@@ -366,6 +366,13 @@ pub trait WrappingNegAssign {
     fn wrapping_neg_assign(&mut self);
 }
 
+//TODO docs, test
+pub trait BitScan {
+    fn index_of_next_false_bit(&self, starting_index: u64) -> Option<u64>;
+
+    fn index_of_next_true_bit(&self, starting_index: u64) -> Option<u64>;
+}
+
 //TODO is_positive, is_negative, sign
 
 macro_rules! lossless_checked_from_impl {
@@ -1450,6 +1457,33 @@ macro_rules! unsigned_traits {
                 }
             }
         }
+
+        impl BitScan for $t {
+            fn index_of_next_false_bit(&self, starting_index: u64) -> Option<u64> {
+                Some(if starting_index >= Self::WIDTH.into() {
+                    starting_index
+                } else {
+                    (!(self | ((1 << starting_index) - 1)))
+                        .trailing_zeros()
+                        .into()
+                })
+            }
+
+            fn index_of_next_true_bit(&self, starting_index: u64) -> Option<u64> {
+                if starting_index >= Self::WIDTH.into() {
+                    None
+                } else {
+                    let index = (self & !((1 << starting_index) - 1))
+                        .trailing_zeros()
+                        .into();
+                    if index == Self::WIDTH.into() {
+                        None
+                    } else {
+                        Some(index)
+                    }
+                }
+            }
+        }
     };
 }
 
@@ -1720,6 +1754,47 @@ macro_rules! signed_traits {
         impl NegAssign for $t {
             fn neg_assign(&mut self) {
                 *self = -*self;
+            }
+        }
+
+        //TODO
+        impl BitScan for $t {
+            fn index_of_next_false_bit(&self, starting_index: u64) -> Option<u64> {
+                if starting_index >= u64::from(Self::WIDTH) - 1 {
+                    if *self >= 0 {
+                        Some(starting_index)
+                    } else {
+                        None
+                    }
+                } else {
+                    let index = (!(self | ((1 << starting_index) - 1)))
+                        .trailing_zeros()
+                        .into();
+                    if index == Self::WIDTH.into() {
+                        None
+                    } else {
+                        Some(index)
+                    }
+                }
+            }
+
+            fn index_of_next_true_bit(&self, starting_index: u64) -> Option<u64> {
+                if starting_index >= u64::from(Self::WIDTH) - 1 {
+                    if *self >= 0 {
+                        None
+                    } else {
+                        Some(starting_index)
+                    }
+                } else {
+                    let index = (self & !((1 << starting_index) - 1))
+                        .trailing_zeros()
+                        .into();
+                    if index == Self::WIDTH.into() {
+                        None
+                    } else {
+                        Some(index)
+                    }
+                }
             }
         }
     };
