@@ -1,6 +1,7 @@
 use integer::Integer;
+use malachite_base::num::Parity;
 
-impl Integer {
+impl Parity for Integer {
     /// Determines whether `self` is even.
     ///
     /// Time: worst case O(1)
@@ -12,7 +13,7 @@ impl Integer {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::Zero;
+    /// use malachite_base::num::{Parity, Zero};
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {
@@ -23,7 +24,7 @@ impl Integer {
     ///     assert_eq!((-Integer::trillion() - 1u32).is_even(), false);
     /// }
     /// ```
-    pub fn is_even(&self) -> bool {
+    fn is_even(&self) -> bool {
         match *self {
             Integer { ref abs, .. } => abs.is_even(),
         }
@@ -40,7 +41,7 @@ impl Integer {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::Zero;
+    /// use malachite_base::num::{Parity, Zero};
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {
@@ -51,7 +52,7 @@ impl Integer {
     ///     assert_eq!((-Integer::trillion() - 1u32).is_odd(), true);
     /// }
     /// ```
-    pub fn is_odd(&self) -> bool {
+    fn is_odd(&self) -> bool {
         match *self {
             Integer { ref abs, .. } => abs.is_odd(),
         }

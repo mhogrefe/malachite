@@ -1,4 +1,5 @@
 use common::test_properties;
+use malachite_base::num::Parity;
 use malachite_nz::natural::Natural;
 use malachite_test::inputs::natural::naturals;
 use std::str::FromStr;

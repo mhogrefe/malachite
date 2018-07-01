@@ -373,6 +373,12 @@ pub trait BitScan {
     fn index_of_next_true_bit(&self, starting_index: u64) -> Option<u64>;
 }
 
+pub trait Parity {
+    fn is_even(&self) -> bool;
+
+    fn is_odd(&self) -> bool;
+}
+
 //TODO is_positive, is_negative, sign
 
 macro_rules! lossless_checked_from_impl {
@@ -543,6 +549,7 @@ pub trait PrimitiveInteger:
     + BitAndAssign<Self>
     + BitOr<Output = Self>
     + BitOrAssign<Self>
+    + BitScan
     + BitXor<Output = Self>
     + BitXorAssign<Self>
     + CheckedAdd<Output = Self>
@@ -603,6 +610,7 @@ pub trait PrimitiveInteger:
     + OverflowingShl<Output = Self>
     + OverflowingShr<Output = Self>
     + OverflowingSub<Output = Self>
+    + Parity
     + PartialEq<Self>
     + PartialOrd<Self>
     + PartialOrdAbs<Self>
@@ -1237,7 +1245,37 @@ macro_rules! integer_traits {
                 *self = self.wrapping_neg();
             }
         }
+
+        impl Parity for $t {
+            fn is_even(&self) -> bool {
+                (*self & Self::ONE) == Self::ZERO
+            }
+
+            fn is_odd(&self) -> bool {
+                (*self & Self::ONE) != Self::ZERO
+            }
+        }
     };
+}
+
+impl Parity for usize {
+    fn is_even(&self) -> bool {
+        (*self & 1) == 0
+    }
+
+    fn is_odd(&self) -> bool {
+        (*self & 1) != 0
+    }
+}
+
+impl Parity for isize {
+    fn is_even(&self) -> bool {
+        (*self & 1) == 0
+    }
+
+    fn is_odd(&self) -> bool {
+        (*self & 1) != 0
+    }
 }
 
 //TODO docs

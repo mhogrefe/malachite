@@ -1,5 +1,7 @@
 use malachite_base::limbs::{limbs_delete_left, limbs_test_zero};
-use malachite_base::num::{BitAccess, One, PrimitiveInteger, ShrRound, ShrRoundAssign, Zero};
+use malachite_base::num::{
+    BitAccess, One, Parity, PrimitiveInteger, ShrRound, ShrRoundAssign, Zero,
+};
 use malachite_base::round::RoundingMode;
 use natural::Natural::{self, Large, Small};
 use std::ops::{Shr, ShrAssign};
@@ -284,7 +286,7 @@ impl<'a> ShrRound<u32> for &'a Natural {
                     RoundingMode::Nearest if other >= u32::WIDTH => 0,
                     RoundingMode::Nearest => {
                         let mostly_shifted = small >> (other - 1);
-                        if (mostly_shifted & 1) == 0 {
+                        if mostly_shifted.is_even() {
                             // round down
                             mostly_shifted >> 1
                         } else if mostly_shifted << (other - 1) != *small {
@@ -293,7 +295,7 @@ impl<'a> ShrRound<u32> for &'a Natural {
                         } else {
                             // result is half-integer; round to even
                             let shifted = mostly_shifted >> 1;
-                            if (shifted & 1) == 0 {
+                            if shifted.is_even() {
                                 shifted
                             } else {
                                 shifted + 1
@@ -524,7 +526,7 @@ impl ShrRoundAssign<u32> for Natural {
                     RoundingMode::Nearest => {
                         let original = *small;
                         *small >>= other - 1;
-                        if (*small & 1) == 0 {
+                        if small.is_even() {
                             // round down
                             *small >>= 1;
                         } else if *small << (other - 1) != original {
@@ -534,7 +536,7 @@ impl ShrRoundAssign<u32> for Natural {
                         } else {
                             // result is half-integer; round to even
                             *small >>= 1;
-                            if (*small & 1) != 0 {
+                            if small.is_odd() {
                                 *small += 1;
                             }
                         }

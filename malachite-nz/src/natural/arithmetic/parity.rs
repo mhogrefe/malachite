@@ -1,6 +1,7 @@
+use malachite_base::num::Parity;
 use natural::Natural::{self, Large, Small};
 
-impl Natural {
+impl Parity for Natural {
     /// Determines whether a `Natural` is even.
     ///
     /// Time: worst case O(1)
@@ -12,7 +13,7 @@ impl Natural {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::Zero;
+    /// use malachite_base::num::{Parity, Zero};
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
@@ -23,10 +24,10 @@ impl Natural {
     ///     assert_eq!((Natural::trillion() + 1).is_even(), false);
     /// }
     /// ```
-    pub fn is_even(&self) -> bool {
+    fn is_even(&self) -> bool {
         match *self {
-            Small(small) => small & 1 == 0,
-            Large(ref limbs) => limbs[0] & 1 == 0,
+            Small(small) => small.is_even(),
+            Large(ref limbs) => limbs[0].is_even(),
         }
     }
 
@@ -41,7 +42,7 @@ impl Natural {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::Zero;
+    /// use malachite_base::num::{Parity, Zero};
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
@@ -52,10 +53,10 @@ impl Natural {
     ///     assert_eq!((Natural::trillion() + 1).is_odd(), true);
     /// }
     /// ```
-    pub fn is_odd(&self) -> bool {
+    fn is_odd(&self) -> bool {
         match *self {
-            Small(small) => small & 1 != 0,
-            Large(ref limbs) => limbs[0] & 1 != 0,
+            Small(small) => small.is_odd(),
+            Large(ref limbs) => limbs[0].is_odd(),
         }
     }
 }

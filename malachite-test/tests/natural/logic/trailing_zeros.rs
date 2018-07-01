@@ -1,4 +1,5 @@
 use common::test_properties;
+use malachite_base::num::Parity;
 use malachite_nz::natural::logic::trailing_zeros::limbs_trailing_zeros;
 use malachite_nz::natural::Natural;
 use malachite_test::inputs::base::vecs_of_u32_var_1;

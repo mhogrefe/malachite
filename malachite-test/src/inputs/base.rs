@@ -2,7 +2,7 @@ use common::{GenerationMode, NoSpecialGenerationMode};
 use inputs::common::{permute_1_3_2, permute_2_1, reshape_2_1_to_3};
 use malachite_base::chars::NUMBER_OF_CHARS;
 use malachite_base::limbs::limbs_test_zero;
-use malachite_base::num::{PrimitiveInteger, PrimitiveSigned, PrimitiveUnsigned};
+use malachite_base::num::{Parity, PrimitiveInteger, PrimitiveSigned, PrimitiveUnsigned};
 use malachite_base::round::RoundingMode;
 use malachite_nz::integer::logic::bit_access::limbs_vec_clear_bit_neg;
 use rust_wheels::iterators::bools::exhaustive_bools;
@@ -582,7 +582,7 @@ pub fn pairs_of_unsigned_vec_var_1<T: 'static + PrimitiveUnsigned>(
 ) -> Box<Iterator<Item = (Vec<T>, Vec<T>)>> {
     Box::new(
         vecs_of_unsigned(gm)
-            .filter(|xs| (xs.len() & 1) == 0)
+            .filter(|xs| xs.len().is_even())
             .map(|xs| {
                 let half_length = xs.len() >> 1;
                 (xs[0..half_length].to_vec(), xs[half_length..].to_vec())
