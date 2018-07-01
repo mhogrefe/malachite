@@ -185,6 +185,7 @@ pub mod logic {
     pub mod and_i32;
     pub mod and_u32;
     pub mod bit_access;
+    pub mod bit_scan;
     pub mod checked_count_ones;
     pub mod checked_count_zeros;
     pub mod checked_hamming_distance;

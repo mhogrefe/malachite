@@ -94,7 +94,7 @@ fn index_of_next_false_bit_properties() {
         assert!(result >= u);
         assert!(!n.get_bit(result));
         assert_eq!(result == u, !n.get_bit(u));
-        //TODO not
+        assert_eq!((!n).index_of_next_true_bit(u), Some(result));
     });
 
     test_properties(naturals, |n| {

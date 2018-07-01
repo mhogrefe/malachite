@@ -128,6 +128,8 @@ pub mod integer {
         pub mod clear_bit;
         pub mod flip_bit;
         pub mod get_bit;
+        pub mod index_of_next_false_bit;
+        pub mod index_of_next_true_bit;
         pub mod not;
         pub mod or;
         pub mod or_i32;
