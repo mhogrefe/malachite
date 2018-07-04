@@ -1,6 +1,6 @@
 use integer::Integer;
 use malachite_base::num::{BitAccess, PrimitiveInteger};
-use natural::arithmetic::add_u32::mpn_add_1_in_place;
+use natural::arithmetic::add_u32::limbs_slice_add_limb_in_place;
 use natural::conversion::to_limbs::LimbIterator;
 use natural::logic::not::limbs_not_in_place;
 use natural::Natural;
@@ -351,7 +351,7 @@ pub fn limbs_to_twos_complement_limbs_non_negative(limbs: &mut Vec<u32>) {
 /// ```
 pub fn limbs_slice_to_twos_complement_limbs_negative(limbs: &mut [u32]) -> bool {
     limbs_not_in_place(limbs);
-    mpn_add_1_in_place(limbs, 1)
+    limbs_slice_add_limb_in_place(limbs, 1)
 }
 
 /// Given the limbs, or base-2<sup>32</sup> digits, of the absolute value of a negative `Integer`,

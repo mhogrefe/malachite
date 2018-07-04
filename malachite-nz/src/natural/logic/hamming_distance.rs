@@ -56,11 +56,11 @@ pub fn limbs_hamming_distance(xs: &[u32], ys: &[u32]) -> u64 {
     match xs_len.cmp(&ys_len) {
         Ordering::Equal => limbs_hamming_distance_same_length_no_check(xs, ys),
         Ordering::Less => {
-            limbs_hamming_distance_same_length_no_check(xs, &ys[0..xs_len])
+            limbs_hamming_distance_same_length_no_check(xs, &ys[..xs_len])
                 + limbs_count_ones(&ys[xs_len..])
         }
         Ordering::Greater => {
-            limbs_hamming_distance_same_length_no_check(&xs[0..ys_len], ys)
+            limbs_hamming_distance_same_length_no_check(&xs[..ys_len], ys)
                 + limbs_count_ones(&xs[ys_len..])
         }
     }

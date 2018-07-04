@@ -9,7 +9,7 @@ use malachite_test::common::{
 };
 use malachite_test::inputs::base::{
     pairs_of_nonempty_unsigned_vec_and_unsigned,
-    triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_1, unsigneds,
+    triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_2, unsigneds,
 };
 use malachite_test::inputs::natural::{naturals, pairs_of_natural_and_unsigned};
 use malachite_test::natural::logic::xor_u32::{
@@ -161,14 +161,14 @@ fn limbs_xor_limb_properties() {
 #[test]
 fn limbs_xor_limb_to_out_properties() {
     test_properties(
-        triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_1,
+        triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_2,
         |&(ref out_limbs, ref in_limbs, limb)| {
             let mut out_limbs = out_limbs.to_vec();
             let old_out_limbs = out_limbs.clone();
             limbs_xor_limb_to_out(&mut out_limbs, in_limbs, limb);
             let len = in_limbs.len();
             assert_eq!(
-                Natural::from_limbs_asc(&out_limbs[0..len]),
+                Natural::from_limbs_asc(&out_limbs[..len]),
                 Natural::from_limbs_asc(in_limbs) ^ limb
             );
             assert_eq!(&out_limbs[len..], &old_out_limbs[len..]);

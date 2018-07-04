@@ -1,7 +1,7 @@
 use integer::Integer;
 use malachite_base::misc::WrappingFrom;
 use malachite_base::num::{UnsignedAbs, WrappingNegAssign};
-use natural::arithmetic::add_u32::{mpn_add_1_in_place, mpn_add_1_to_out};
+use natural::arithmetic::add_u32::{limbs_add_limb_to_out, limbs_slice_add_limb_in_place};
 use natural::Natural::{self, Large, Small};
 use std::ops::{BitAnd, BitAndAssign};
 
@@ -160,13 +160,13 @@ pub fn limbs_neg_and_limb_neg(limbs: &[u32], limb: u32) -> Vec<u32> {
 pub fn limbs_neg_and_limb_neg_to_out(out_limbs: &mut [u32], in_limbs: &[u32], limb: u32) -> bool {
     assert!(out_limbs.len() >= in_limbs.len());
     if in_limbs[0] == 0 {
-        out_limbs[0..in_limbs.len()].copy_from_slice(in_limbs);
+        out_limbs[..in_limbs.len()].copy_from_slice(in_limbs);
         false
     } else {
         let result_head = in_limbs[0].wrapping_neg() & limb;
         if result_head == 0 {
             out_limbs[0] = 0;
-            mpn_add_1_to_out(&mut out_limbs[1..], &in_limbs[1..], 1)
+            limbs_add_limb_to_out(&mut out_limbs[1..], &in_limbs[1..], 1)
         } else {
             out_limbs[0] = result_head.wrapping_neg();
             out_limbs[1..in_limbs.len()].copy_from_slice(&in_limbs[1..]);
@@ -217,7 +217,7 @@ pub fn limbs_slice_neg_and_limb_neg_in_place(limbs: &mut [u32], limb: u32) -> bo
     } else {
         *head = head.wrapping_neg() & limb;
         if *head == 0 {
-            mpn_add_1_in_place(tail, 1)
+            limbs_slice_add_limb_in_place(tail, 1)
         } else {
             head.wrapping_neg_assign();
             false

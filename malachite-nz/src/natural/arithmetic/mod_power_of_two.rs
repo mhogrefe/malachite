@@ -57,7 +57,7 @@ impl Natural {
                     if result_limb_count >= limbs.len() {
                         return self.clone();
                     }
-                    let mut result = limbs[0..result_limb_count].to_vec();
+                    let mut result = limbs[..result_limb_count].to_vec();
                     if leftover_bits != 0 {
                         result.push(limbs[result_limb_count] & ((1 << leftover_bits) - 1));
                     }

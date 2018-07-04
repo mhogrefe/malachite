@@ -2,7 +2,7 @@ use integer::Integer;
 use malachite_base::limbs::limbs_test_zero;
 use malachite_base::num::{AddMul, AddMulAssign, NegAssign, NotAssign};
 use natural::arithmetic::add_mul_u32::mpn_addmul_1;
-use natural::arithmetic::add_u32::mpn_add_1_in_place;
+use natural::arithmetic::add_u32::limbs_slice_add_limb_in_place;
 use natural::arithmetic::mul_u32::{mpn_mul_1, mpn_mul_1c};
 use natural::arithmetic::sub_mul_u32::mpn_submul_1;
 use natural::arithmetic::sub_u32::mpn_sub_1_in_place;
@@ -343,7 +343,7 @@ pub(crate) fn mpz_aorsmul_1(
     if wsize == 0 {
         // nothing to add to, just set x * y, `sub` gives the sign
         w.resize(xsize + 1, 0);
-        let cy = mpn_mul_1(w, &x[0..xsize], y);
+        let cy = mpn_mul_1(w, &x[..xsize], y);
         w[xsize] = cy;
         if cy != 0 {
             xsize += 1;
@@ -359,7 +359,7 @@ pub(crate) fn mpz_aorsmul_1(
 
     if sub {
         // addmul of absolute values
-        let mut cy = mpn_addmul_1(w, &x[0..min_size], y);
+        let mut cy = mpn_addmul_1(w, &x[..min_size], y);
         let mut dsize = xsize as isize - wsize as isize;
         if dsize != 0 {
             let cy2 = if dsize > 0 {
@@ -372,7 +372,10 @@ pub(crate) fn mpz_aorsmul_1(
                 dsize.neg_assign();
                 0
             };
-            cy = cy2 + if mpn_add_1_in_place(&mut w[min_size..min_size + dsize as usize], cy) {
+            cy = cy2 + if limbs_slice_add_limb_in_place(
+                &mut w[min_size..min_size + dsize as usize],
+                cy,
+            ) {
                 1
             } else {
                 0
@@ -382,7 +385,7 @@ pub(crate) fn mpz_aorsmul_1(
         w[min_size + dsize] = cy;
     } else {
         // submul of absolute values
-        let mut cy = mpn_submul_1(w, &x[0..min_size], y);
+        let mut cy = mpn_submul_1(w, &x[..min_size], y);
         if wsize >= xsize {
             // if w bigger than x, then propagate borrow through it
             if wsize != xsize {
@@ -397,9 +400,9 @@ pub(crate) fn mpz_aorsmul_1(
                 // Borrow out of w, take twos complement negative to get absolute value, flip sign
                 // of w.
                 w[new_wsize] = !(!cy).wrapping_add(1); // extra limb is 0 - cy
-                limbs_not_in_place(&mut w[0..new_wsize]);
+                limbs_not_in_place(&mut w[..new_wsize]);
                 new_wsize += 1;
-                mpn_add_1_in_place(&mut w[0..new_wsize], 1);
+                limbs_slice_add_limb_in_place(&mut w[..new_wsize], 1);
                 if new_wsize != 0 {
                     w_sign.not_assign();
                 }
@@ -411,8 +414,8 @@ pub(crate) fn mpz_aorsmul_1(
             // use an mpn_mul_1 for the rest.
 
             // -(-cy*b^n + w-x*y) = (cy-1)*b^n + ~(w-x*y) + 1
-            limbs_not_in_place(&mut w[0..wsize]);
-            if !mpn_add_1_in_place(&mut w[0..wsize], 1) {
+            limbs_not_in_place(&mut w[..wsize]);
+            if !limbs_slice_add_limb_in_place(&mut w[..wsize], 1) {
                 cy = cy.wrapping_sub(1);
             }
 

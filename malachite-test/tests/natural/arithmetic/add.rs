@@ -1,15 +1,363 @@
 use common::test_properties;
 use malachite_base::num::Zero;
+use malachite_nz::natural::arithmetic::add::{
+    limbs_add, limbs_add_same_length_to_out, limbs_add_to_out,
+    limbs_slice_add_greater_in_place_left, limbs_slice_add_in_place_either,
+    limbs_slice_add_same_length_in_place_left, limbs_vec_add_in_place_either,
+    limbs_vec_add_in_place_left,
+};
 use malachite_nz::natural::Natural;
 use malachite_test::common::{
     biguint_to_natural, natural_to_biguint, natural_to_rug_integer, rug_integer_to_natural,
+};
+use malachite_test::inputs::base::{
+    pairs_of_unsigned_vec, pairs_of_unsigned_vec_var_1, pairs_of_unsigned_vec_var_3,
+    triples_of_unsigned_vec_var_3, triples_of_unsigned_vec_var_4,
 };
 use malachite_test::inputs::natural::{
     naturals, pairs_of_natural_and_unsigned, pairs_of_naturals, triples_of_naturals,
 };
 use num::BigUint;
 use rug;
+use std::cmp::max;
 use std::str::FromStr;
+
+#[test]
+fn test_limbs_add() {
+    let test = |xs, ys, out| {
+        assert_eq!(limbs_add(xs, ys), out);
+    };
+    test(&[], &[], vec![]);
+    test(&[2], &[], vec![2]);
+    test(&[], &[2], vec![2]);
+    test(&[2], &[3], vec![5]);
+    test(&[1, 1, 1], &[1, 2, 3], vec![2, 3, 4]);
+    test(&[6, 7], &[1, 2, 3], vec![7, 9, 3]);
+    test(&[1, 2, 3], &[6, 7], vec![7, 9, 3]);
+    test(&[100, 101, 102], &[102, 101, 100], vec![202, 202, 202]);
+    test(&[0xffff_ffff, 3], &[1], vec![0, 4]);
+    test(&[1], &[0xffff_ffff, 3], vec![0, 4]);
+    test(&[0xffff_ffff], &[1], vec![0, 1]);
+    test(&[1], &[0xffff_ffff], vec![0, 1]);
+    test(&[0xffff_ffff], &[0xffff_ffff], vec![0xffff_fffe, 1]);
+}
+
+#[test]
+fn test_limbs_add_same_length_to_out() {
+    let test = |xs, ys, out_before: &[u32], carry, out_after| {
+        let mut out = out_before.to_vec();
+        assert_eq!(limbs_add_same_length_to_out(&mut out, xs, ys), carry);
+        assert_eq!(out, out_after);
+    };
+    test(&[], &[], &[0, 0], false, vec![0, 0]);
+    test(&[2], &[3], &[0, 0], false, vec![5, 0]);
+    test(
+        &[1, 1, 1],
+        &[1, 2, 3],
+        &[5, 5, 5, 5],
+        false,
+        vec![2, 3, 4, 5],
+    );
+    test(
+        &[100, 101, 102],
+        &[102, 101, 100],
+        &[10, 10, 10, 10],
+        false,
+        vec![202, 202, 202, 10],
+    );
+    test(
+        &[0xffff_ffff],
+        &[1],
+        &[10, 10, 10, 10],
+        true,
+        vec![0, 10, 10, 10],
+    );
+    test(
+        &[1],
+        &[0xffff_ffff],
+        &[10, 10, 10, 10],
+        true,
+        vec![0, 10, 10, 10],
+    );
+    test(
+        &[0xffff_ffff],
+        &[0xffff_ffff],
+        &[10, 10, 10, 10],
+        true,
+        vec![0xffff_fffe, 10, 10, 10],
+    );
+}
+
+#[test]
+fn test_limbs_add_to_out() {
+    let test = |xs, ys, out_before: &[u32], carry, out_after| {
+        let mut out = out_before.to_vec();
+        assert_eq!(limbs_add_to_out(&mut out, xs, ys), carry);
+        assert_eq!(out, out_after);
+    };
+    test(&[], &[], &[0, 0], false, vec![0, 0]);
+    test(&[2], &[], &[0, 0], false, vec![2, 0]);
+    test(&[], &[2], &[0, 0], false, vec![2, 0]);
+    test(&[2], &[3], &[0, 0], false, vec![5, 0]);
+    test(
+        &[1, 1, 1],
+        &[1, 2, 3],
+        &[5, 5, 5, 5],
+        false,
+        vec![2, 3, 4, 5],
+    );
+    test(&[6, 7], &[1, 2, 3], &[0, 0, 0], false, vec![7, 9, 3]);
+    test(&[1, 2, 3], &[6, 7], &[0, 0, 0], false, vec![7, 9, 3]);
+    test(
+        &[6, 7],
+        &[1, 2, 3],
+        &[10, 10, 10, 10],
+        false,
+        vec![7, 9, 3, 10],
+    );
+    test(
+        &[100, 101, 102],
+        &[102, 101, 100],
+        &[10, 10, 10, 10],
+        false,
+        vec![202, 202, 202, 10],
+    );
+    test(
+        &[0xffff_ffff, 3],
+        &[1],
+        &[10, 10, 10, 10],
+        false,
+        vec![0, 4, 10, 10],
+    );
+    test(
+        &[1],
+        &[0xffff_ffff, 3],
+        &[10, 10, 10, 10],
+        false,
+        vec![0, 4, 10, 10],
+    );
+    test(
+        &[0xffff_ffff],
+        &[1],
+        &[10, 10, 10, 10],
+        true,
+        vec![0, 10, 10, 10],
+    );
+    test(
+        &[1],
+        &[0xffff_ffff],
+        &[10, 10, 10, 10],
+        true,
+        vec![0, 10, 10, 10],
+    );
+    test(
+        &[0xffff_ffff],
+        &[0xffff_ffff],
+        &[10, 10, 10, 10],
+        true,
+        vec![0xffff_fffe, 10, 10, 10],
+    );
+}
+
+#[test]
+#[should_panic(expected = "assertion failed: `(left == right)`")]
+fn limbs_add_same_length_to_out_fail_1() {
+    let mut out = vec![10, 10, 10, 10];
+    limbs_add_same_length_to_out(&mut out, &[6, 7], &[1, 2, 3]);
+}
+
+#[test]
+#[should_panic(expected = "assertion failed: out_limbs.len() >= len")]
+fn limbs_add_same_length_to_out_fail_2() {
+    let mut out = vec![10];
+    limbs_add_same_length_to_out(&mut out, &[6, 7], &[1, 2]);
+}
+
+#[test]
+fn test_limbs_slice_add_same_length_in_place_left() {
+    let test = |xs_before: &[u32], ys, carry, xs_after| {
+        let mut xs = xs_before.to_vec();
+        assert_eq!(
+            limbs_slice_add_same_length_in_place_left(&mut xs, ys),
+            carry
+        );
+        assert_eq!(xs, xs_after);
+    };
+    test(&[], &[], false, vec![]);
+    test(&[2], &[3], false, vec![5]);
+    test(&[1, 1, 1], &[1, 2, 3], false, vec![2, 3, 4]);
+    test(
+        &[100, 101, 102],
+        &[102, 101, 100],
+        false,
+        vec![202, 202, 202],
+    );
+    test(&[0xffff_ffff], &[1], true, vec![0]);
+    test(&[1], &[0xffff_ffff], true, vec![0]);
+    test(&[0xffff_ffff], &[0xffff_ffff], true, vec![0xffff_fffe]);
+}
+
+#[test]
+#[should_panic(expected = "assertion failed: `(left == right)`")]
+fn limbs_slice_add_same_length_in_place_left_fail() {
+    let mut out = vec![6, 7];
+    limbs_slice_add_same_length_in_place_left(&mut out, &[1, 2, 3]);
+}
+
+#[test]
+fn test_limbs_slice_add_greater_in_place_left() {
+    let test = |xs_before: &[u32], ys, carry, xs_after| {
+        let mut xs = xs_before.to_vec();
+        assert_eq!(limbs_slice_add_greater_in_place_left(&mut xs, ys), carry);
+        assert_eq!(xs, xs_after);
+    };
+    test(&[], &[], false, vec![]);
+    test(&[2], &[], false, vec![2]);
+    test(&[2], &[3], false, vec![5]);
+    test(&[1, 1, 1], &[1, 2, 3], false, vec![2, 3, 4]);
+    test(&[1, 2, 3], &[6, 7], false, vec![7, 9, 3]);
+    test(
+        &[100, 101, 102],
+        &[102, 101, 100],
+        false,
+        vec![202, 202, 202],
+    );
+    test(&[0xffff_ffff, 3], &[1], false, vec![0, 4]);
+    test(&[0xffff_ffff], &[1], true, vec![0]);
+    test(&[1], &[0xffff_ffff], true, vec![0]);
+    test(&[0xffff_ffff], &[0xffff_ffff], true, vec![0xffff_fffe]);
+}
+
+#[test]
+#[should_panic(expected = "assertion failed: xs_len >= ys_len")]
+fn limbs_slice_add_greater_in_place_left_fail() {
+    let mut out = vec![6, 7];
+    limbs_slice_add_greater_in_place_left(&mut out, &[1, 2, 3]);
+}
+
+#[test]
+fn test_limbs_vec_add_in_place_left() {
+    let test = |xs_before: &[u32], ys, xs_after| {
+        let mut xs = xs_before.to_vec();
+        limbs_vec_add_in_place_left(&mut xs, ys);
+        assert_eq!(xs, xs_after);
+    };
+    test(&[], &[], vec![]);
+    test(&[2], &[], vec![2]);
+    test(&[], &[2], vec![2]);
+    test(&[2], &[3], vec![5]);
+    test(&[1, 1, 1], &[1, 2, 3], vec![2, 3, 4]);
+    test(&[6, 7], &[1, 2, 3], vec![7, 9, 3]);
+    test(&[1, 2, 3], &[6, 7], vec![7, 9, 3]);
+    test(&[100, 101, 102], &[102, 101, 100], vec![202, 202, 202]);
+    test(&[0xffff_ffff, 3], &[1], vec![0, 4]);
+    test(&[1], &[0xffff_ffff, 3], vec![0, 4]);
+    test(&[0xffff_ffff], &[1], vec![0, 1]);
+    test(&[1], &[0xffff_ffff], vec![0, 1]);
+    test(&[0xffff_ffff], &[0xffff_ffff], vec![0xffff_fffe, 1]);
+}
+
+#[test]
+fn test_limbs_slice_add_in_place_either() {
+    let test = |xs_before: &[u32], ys_before: &[u32], right, xs_after, ys_after| {
+        let mut xs = xs_before.to_vec();
+        let mut ys = ys_before.to_vec();
+        assert_eq!(limbs_slice_add_in_place_either(&mut xs, &mut ys), right);
+        assert_eq!(xs, xs_after);
+        assert_eq!(ys, ys_after);
+    };
+    test(&[], &[], (false, false), vec![], vec![]);
+    test(&[2], &[], (false, false), vec![2], vec![]);
+    test(&[], &[2], (true, false), vec![], vec![2]);
+    test(&[2], &[3], (false, false), vec![5], vec![3]);
+    test(&[6, 7], &[1, 2], (false, false), vec![7, 9], vec![1, 2]);
+    test(
+        &[6, 7],
+        &[1, 2, 3],
+        (true, false),
+        vec![6, 7],
+        vec![7, 9, 3],
+    );
+    test(
+        &[1, 2, 3],
+        &[6, 7],
+        (false, false),
+        vec![7, 9, 3],
+        vec![6, 7],
+    );
+    test(&[], &[1, 2, 3], (true, false), vec![], vec![1, 2, 3]);
+    test(&[1, 2, 3], &[], (false, false), vec![1, 2, 3], vec![]);
+    test(
+        &[1, 1, 1],
+        &[1, 2, 3],
+        (false, false),
+        vec![2, 3, 4],
+        vec![1, 2, 3],
+    );
+    test(
+        &[100, 101, 102],
+        &[102, 101, 100],
+        (false, false),
+        vec![202, 202, 202],
+        vec![102, 101, 100],
+    );
+    test(&[0xffff_ffff, 3], &[1], (false, false), vec![0, 4], vec![1]);
+    test(&[1], &[0xffff_ffff, 3], (true, false), vec![1], vec![0, 4]);
+    test(&[0xffff_ffff], &[1], (false, true), vec![0], vec![1]);
+    test(
+        &[1],
+        &[0xffff_ffff],
+        (false, true),
+        vec![0],
+        vec![0xffff_ffff],
+    );
+    test(
+        &[0xffff_ffff],
+        &[0xffff_ffff],
+        (false, true),
+        vec![0xffff_fffe],
+        vec![0xffff_ffff],
+    );
+}
+
+#[test]
+fn test_limbs_vec_add_in_place_either() {
+    let test = |xs_before: &[u32], ys_before: &[u32], right, xs_after, ys_after| {
+        let mut xs = xs_before.to_vec();
+        let mut ys = ys_before.to_vec();
+        assert_eq!(limbs_vec_add_in_place_either(&mut xs, &mut ys), right);
+        assert_eq!(xs, xs_after);
+        assert_eq!(ys, ys_after);
+    };
+    test(&[], &[], false, vec![], vec![]);
+    test(&[2], &[], false, vec![2], vec![]);
+    test(&[], &[2], true, vec![], vec![2]);
+    test(&[2], &[3], false, vec![5], vec![3]);
+    test(&[6, 7], &[1, 2], false, vec![7, 9], vec![1, 2]);
+    test(&[6, 7], &[1, 2, 3], true, vec![6, 7], vec![7, 9, 3]);
+    test(&[1, 2, 3], &[6, 7], false, vec![7, 9, 3], vec![6, 7]);
+    test(&[], &[1, 2, 3], true, vec![], vec![1, 2, 3]);
+    test(&[1, 2, 3], &[], false, vec![1, 2, 3], vec![]);
+    test(&[1, 1, 1], &[1, 2, 3], false, vec![2, 3, 4], vec![1, 2, 3]);
+    test(
+        &[100, 101, 102],
+        &[102, 101, 100],
+        false,
+        vec![202, 202, 202],
+        vec![102, 101, 100],
+    );
+    test(&[0xffff_ffff, 3], &[1], false, vec![0, 4], vec![1]);
+    test(&[1], &[0xffff_ffff, 3], true, vec![1], vec![0, 4]);
+    test(&[0xffff_ffff], &[1], false, vec![0, 1], vec![1]);
+    test(&[1], &[0xffff_ffff], false, vec![0, 1], vec![0xffff_ffff]);
+    test(
+        &[0xffff_ffff],
+        &[0xffff_ffff],
+        false,
+        vec![0xffff_fffe, 1],
+        vec![0xffff_ffff],
+    );
+}
 
 #[test]
 fn test_add() {
@@ -58,6 +406,144 @@ fn test_add() {
         "1000000000000000000000000",
         "1000000000001000000000000",
     );
+    test(
+        "157489031134308824401228232926",
+        "2350262829889206551114184866",
+        "159839293964198030952342417792",
+    );
+}
+
+#[test]
+fn limbs_add_properties() {
+    test_properties(pairs_of_unsigned_vec, |&(ref xs, ref ys)| {
+        assert_eq!(
+            Natural::from_owned_limbs_asc(limbs_add(xs, ys)),
+            Natural::from_limbs_asc(xs) + Natural::from_limbs_asc(ys)
+        );
+    });
+}
+
+#[test]
+fn limbs_add_same_length_to_out_properties() {
+    test_properties(
+        triples_of_unsigned_vec_var_3,
+        |&(ref out_limbs, ref xs, ref ys)| {
+            let mut out_limbs = out_limbs.to_vec();
+            let old_out_limbs = out_limbs.clone();
+            let carry = limbs_add_same_length_to_out(&mut out_limbs, xs, ys);
+            let n = Natural::from_limbs_asc(xs) + Natural::from_limbs_asc(ys);
+            let len = xs.len();
+            let mut limbs = n.into_limbs_asc();
+            assert_eq!(carry, limbs.len() == len + 1);
+            limbs.resize(len, 0);
+            assert_eq!(limbs, &out_limbs[..len]);
+            assert_eq!(&out_limbs[len..], &old_out_limbs[len..]);
+        },
+    );
+}
+
+#[test]
+fn limbs_add_to_out_properties() {
+    test_properties(
+        triples_of_unsigned_vec_var_4,
+        |&(ref out_limbs, ref xs, ref ys)| {
+            let mut out_limbs = out_limbs.to_vec();
+            let old_out_limbs = out_limbs.clone();
+            let carry = limbs_add_to_out(&mut out_limbs, xs, ys);
+            let n = Natural::from_limbs_asc(xs) + Natural::from_limbs_asc(ys);
+            let len = max(xs.len(), ys.len());
+            let mut limbs = n.into_limbs_asc();
+            assert_eq!(carry, limbs.len() == len + 1);
+            limbs.resize(len, 0);
+            assert_eq!(limbs, &out_limbs[..len]);
+            assert_eq!(&out_limbs[len..], &old_out_limbs[len..]);
+        },
+    );
+}
+
+#[test]
+fn limbs_slice_add_same_length_in_place_left_properties() {
+    test_properties(pairs_of_unsigned_vec_var_1, |&(ref xs, ref ys)| {
+        let mut xs = xs.to_vec();
+        let xs_old = xs.clone();
+        let carry = limbs_slice_add_same_length_in_place_left(&mut xs, ys);
+        let n = Natural::from_owned_limbs_asc(xs_old) + Natural::from_limbs_asc(ys);
+        let len = xs.len();
+        let mut limbs = n.into_limbs_asc();
+        assert_eq!(carry, limbs.len() == len + 1);
+        limbs.resize(len, 0);
+        assert_eq!(limbs, xs);
+    });
+}
+
+#[test]
+fn limbs_slice_add_greater_in_place_left_properties() {
+    test_properties(pairs_of_unsigned_vec_var_3, |&(ref xs, ref ys)| {
+        let mut xs = xs.to_vec();
+        let xs_old = xs.clone();
+        let carry = limbs_slice_add_greater_in_place_left(&mut xs, ys);
+        let n = Natural::from_owned_limbs_asc(xs_old) + Natural::from_limbs_asc(ys);
+        let len = xs.len();
+        let mut limbs = n.into_limbs_asc();
+        assert_eq!(carry, limbs.len() == len + 1);
+        limbs.resize(len, 0);
+        assert_eq!(limbs, xs);
+    });
+}
+
+#[test]
+fn limbs_vec_add_in_place_left_properties() {
+    test_properties(pairs_of_unsigned_vec, |&(ref xs, ref ys)| {
+        let mut xs = xs.to_vec();
+        let xs_old = xs.clone();
+        limbs_vec_add_in_place_left(&mut xs, ys);
+        assert_eq!(
+            Natural::from_owned_limbs_asc(xs),
+            Natural::from_owned_limbs_asc(xs_old) + Natural::from_limbs_asc(ys)
+        );
+    });
+}
+
+#[test]
+fn limbs_slice_add_in_place_either_properties() {
+    test_properties(pairs_of_unsigned_vec, |&(ref xs, ref ys)| {
+        let mut xs = xs.to_vec();
+        let mut ys = ys.to_vec();
+        let xs_old = xs.clone();
+        let ys_old = ys.clone();
+        let (right, b) = limbs_slice_add_in_place_either(&mut xs, &mut ys);
+        let len = max(xs_old.len(), ys_old.len());
+        let result = Natural::from_limbs_asc(&xs_old) + Natural::from_limbs_asc(&ys_old);
+        let mut expected_limbs = result.to_limbs_asc();
+        expected_limbs.resize(len, 0);
+        assert_eq!(!b, Natural::from_limbs_asc(&expected_limbs) == result);
+        if right {
+            assert_eq!(ys, expected_limbs.as_slice());
+            assert_eq!(xs, xs_old);
+        } else {
+            assert_eq!(xs, expected_limbs.as_slice());
+            assert_eq!(ys, ys_old);
+        }
+    });
+}
+
+#[test]
+fn limbs_vec_add_in_place_either_properties() {
+    test_properties(pairs_of_unsigned_vec, |&(ref xs, ref ys)| {
+        let mut xs = xs.to_vec();
+        let mut ys = ys.to_vec();
+        let xs_old = xs.clone();
+        let ys_old = ys.clone();
+        let right = limbs_vec_add_in_place_either(&mut xs, &mut ys);
+        let n = Natural::from_limbs_asc(&xs_old) + Natural::from_limbs_asc(&ys_old);
+        if right {
+            assert_eq!(xs, xs_old);
+            assert_eq!(Natural::from_owned_limbs_asc(ys), n);
+        } else {
+            assert_eq!(Natural::from_owned_limbs_asc(xs), n);
+            assert_eq!(ys, ys_old);
+        }
+    });
 }
 
 #[test]

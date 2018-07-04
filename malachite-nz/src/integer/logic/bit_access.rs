@@ -1,7 +1,7 @@
 use integer::Integer;
 use malachite_base::limbs::limbs_test_zero;
 use malachite_base::num::{BitAccess, PrimitiveInteger, WrappingNegAssign};
-use natural::arithmetic::add_u32::mpn_add_1_in_place;
+use natural::arithmetic::add_u32::limbs_slice_add_limb_in_place;
 use natural::arithmetic::sub_u32::mpn_sub_1_in_place;
 use natural::Natural::{self, Large, Small};
 
@@ -34,7 +34,7 @@ pub fn limbs_get_bit_neg(limbs: &[u32], index: u64) -> bool {
         // We're indexing into the infinite suffix of 1s
         true
     } else {
-        let limb = if limbs_test_zero(&limbs[0..limb_index]) {
+        let limb = if limbs_test_zero(&limbs[..limb_index]) {
             limbs[limb_index].wrapping_neg()
         } else {
             !limbs[limb_index]
@@ -107,7 +107,7 @@ fn limbs_clear_bit_neg_helper(limbs: &mut [u32], limb_index: usize, reduced_inde
         boundary_limb.set_bit(reduced_index);
         boundary_limb = boundary_limb.wrapping_add(1);
         limbs[limb_index] = boundary_limb;
-        if boundary_limb == 0 && mpn_add_1_in_place(&mut limbs[limb_index + 1..], 1) {
+        if boundary_limb == 0 && limbs_slice_add_limb_in_place(&mut limbs[limb_index + 1..], 1) {
             return true;
         }
     }

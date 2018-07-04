@@ -1,5 +1,5 @@
 use malachite_base::num::{BitAccess, PrimitiveInteger};
-use natural::arithmetic::add_u32::mpn_add_1_in_place;
+use natural::arithmetic::add_u32::limbs_slice_add_limb_in_place;
 use natural::Natural;
 use rand::distributions::{IndependentSample, Range};
 use rand::Rng;
@@ -34,7 +34,7 @@ pub fn limbs_special_random_up_to_bits<R: Rng>(rng: &mut R, bits: u64) -> Vec<u3
         limbs[(i >> u32::LOG_WIDTH) as usize].clear_bit(u64::from(i & u32::WIDTH_MASK));
         chunk_size = chunk_size_range.ind_sample(rng);
         i = if i < chunk_size { 0 } else { i - chunk_size };
-        mpn_add_1_in_place(
+        limbs_slice_add_limb_in_place(
             &mut limbs[(i >> u32::LOG_WIDTH) as usize..],
             1 << (i & u32::WIDTH_MASK),
         );

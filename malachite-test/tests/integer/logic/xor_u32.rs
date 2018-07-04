@@ -9,7 +9,7 @@ use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_test::common::{integer_to_rug_integer, rug_integer_to_integer};
 use malachite_test::inputs::base::{
-    pairs_of_u32_vec_and_u32_var_1, triples_of_u32_vec_u32_vec_and_u32_var_2, unsigneds,
+    pairs_of_u32_vec_and_u32_var_1, triples_of_u32_vec_u32_vec_and_u32_var_3, unsigneds,
 };
 use malachite_test::inputs::integer::{integers, pairs_of_integer_and_unsigned};
 use malachite_test::integer::logic::xor_u32::{integer_xor_u32_alt_1, integer_xor_u32_alt_2};
@@ -209,7 +209,7 @@ fn limbs_neg_xor_limb_properties() {
 #[test]
 fn limbs_neg_xor_limb_to_out_properties() {
     test_properties(
-        triples_of_u32_vec_u32_vec_and_u32_var_2,
+        triples_of_u32_vec_u32_vec_and_u32_var_3,
         |&(ref out_limbs, ref in_limbs, limb)| {
             let mut out_limbs = out_limbs.to_vec();
             let old_out_limbs = out_limbs.clone();
@@ -220,10 +220,10 @@ fn limbs_neg_xor_limb_to_out_properties() {
                 ).unwrap()
                     .to_limbs_asc();
                 result_limbs.resize(len, 0);
-                assert_eq!(result_limbs, &out_limbs[0..len]);
+                assert_eq!(result_limbs, &out_limbs[..len]);
             } else {
                 assert_eq!(
-                    -Natural::from_limbs_asc(&out_limbs[0..len]),
+                    -Natural::from_limbs_asc(&out_limbs[..len]),
                     -Natural::from_limbs_asc(in_limbs) ^ limb,
                 );
             }

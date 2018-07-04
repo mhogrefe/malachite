@@ -40,7 +40,7 @@ impl Natural {
         match significant_length {
             0 => Small(0u32),
             1 => Small(limbs[0]),
-            _ => Large(limbs[0..significant_length].to_vec()),
+            _ => Large(limbs[..significant_length].to_vec()),
         }
     }
 

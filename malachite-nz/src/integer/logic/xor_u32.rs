@@ -1,6 +1,8 @@
 use integer::Integer;
 use malachite_base::num::WrappingNegAssign;
-use natural::arithmetic::add_u32::{mpn_add_1, mpn_add_1_in_place, mpn_add_1_to_out};
+use natural::arithmetic::add_u32::{
+    limbs_add_limb, limbs_add_limb_to_out, limbs_slice_add_limb_in_place,
+};
 use natural::arithmetic::sub_u32::{mpn_sub_1, mpn_sub_1_in_place, mpn_sub_1_to_out};
 use natural::Natural::{self, Large, Small};
 use std::ops::{BitXor, BitXorAssign};
@@ -34,7 +36,7 @@ pub fn limbs_neg_xor_limb(limbs: &[u32], limb: u32) -> Vec<u32> {
         let head = head.wrapping_neg() ^ limb;
         if head == 0 {
             result_limbs.push(0);
-            result_limbs.extend_from_slice(&mpn_add_1(tail, 1));
+            result_limbs.extend_from_slice(&limbs_add_limb(tail, 1));
         } else {
             result_limbs.push(head.wrapping_neg());
             result_limbs.extend_from_slice(tail);
@@ -75,7 +77,7 @@ pub fn limbs_neg_xor_limb_to_out(out_limbs: &mut [u32], in_limbs: &[u32], limb: 
     let len = in_limbs.len();
     assert!(out_limbs.len() >= len);
     if limb == 0 {
-        out_limbs[0..len].copy_from_slice(in_limbs);
+        out_limbs[..len].copy_from_slice(in_limbs);
         return false;
     }
     let head = in_limbs[0];
@@ -84,7 +86,7 @@ pub fn limbs_neg_xor_limb_to_out(out_limbs: &mut [u32], in_limbs: &[u32], limb: 
         let head = head.wrapping_neg() ^ limb;
         if head == 0 {
             out_limbs[0] = 0;
-            mpn_add_1_to_out(&mut out_limbs[1..len], tail, 1)
+            limbs_add_limb_to_out(&mut out_limbs[1..len], tail, 1)
         } else {
             out_limbs[0] = head.wrapping_neg();
             out_limbs[1..len].copy_from_slice(tail);
@@ -128,7 +130,7 @@ pub fn limbs_slice_neg_xor_limb_in_place(limbs: &mut [u32], limb: u32) -> bool {
     if *head != 0 {
         *head = head.wrapping_neg() ^ limb;
         if *head == 0 {
-            mpn_add_1_in_place(tail, 1)
+            limbs_slice_add_limb_in_place(tail, 1)
         } else {
             head.wrapping_neg_assign();
             false

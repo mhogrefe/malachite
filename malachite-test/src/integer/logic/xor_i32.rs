@@ -1,8 +1,8 @@
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::{
     pairs_of_nonempty_unsigned_vec_and_unsigned, pairs_of_u32_vec_and_u32_var_1,
-    triples_of_u32_vec_u32_vec_and_u32_var_2,
-    triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_1,
+    triples_of_u32_vec_u32_vec_and_u32_var_3,
+    triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_2,
 };
 use inputs::integer::{
     pairs_of_integer_and_signed, pairs_of_signed_and_integer, rm_pairs_of_integer_and_signed,
@@ -94,7 +94,7 @@ fn demo_limbs_pos_xor_limb_neg(gm: GenerationMode, limit: usize) {
 
 fn demo_limbs_pos_xor_limb_neg_to_out(gm: GenerationMode, limit: usize) {
     for (out_limbs, in_limbs, limb) in
-        triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_1(gm).take(limit)
+        triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_2(gm).take(limit)
     {
         let mut out_limbs = out_limbs.to_vec();
         let mut out_limbs_old = out_limbs.clone();
@@ -144,7 +144,7 @@ fn demo_limbs_neg_xor_limb_neg(gm: GenerationMode, limit: usize) {
 }
 
 fn demo_limbs_neg_xor_limb_neg_to_out(gm: GenerationMode, limit: usize) {
-    for (out_limbs, in_limbs, limb) in triples_of_u32_vec_u32_vec_and_u32_var_2(gm).take(limit) {
+    for (out_limbs, in_limbs, limb) in triples_of_u32_vec_u32_vec_and_u32_var_3(gm).take(limit) {
         let mut out_limbs = out_limbs.to_vec();
         let mut out_limbs_old = out_limbs.clone();
         limbs_neg_xor_limb_neg_to_out(&mut out_limbs, &in_limbs, limb);
@@ -224,7 +224,7 @@ fn benchmark_limbs_pos_xor_limb_neg_to_out(gm: GenerationMode, limit: usize, fil
     m_run_benchmark(
         "limbs_pos_xor_limb_neg_to_out(&mut [u32], &[u32], u32)",
         BenchmarkType::Single,
-        triples_of_u32_vec_u32_vec_and_u32_var_2(gm),
+        triples_of_u32_vec_u32_vec_and_u32_var_3(gm),
         gm.name(),
         limit,
         file_name,
@@ -308,7 +308,7 @@ fn benchmark_limbs_neg_xor_limb_neg_to_out(gm: GenerationMode, limit: usize, fil
     m_run_benchmark(
         "limbs_neg_xor_limb_neg_to_out(&mut [u32], &[u32], u32)",
         BenchmarkType::Single,
-        triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_1(gm),
+        triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_2(gm),
         gm.name(),
         limit,
         file_name,

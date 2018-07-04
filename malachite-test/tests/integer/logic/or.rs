@@ -540,7 +540,7 @@ fn limbs_or_pos_neg_to_out_properties() {
             limbs_or_pos_neg_to_out(&mut out_limbs, xs, ys);
             let len = ys.len();
             assert_eq!(
-                -Natural::from_limbs_asc(&out_limbs[0..len]),
+                -Natural::from_limbs_asc(&out_limbs[..len]),
                 Integer::from(Natural::from_limbs_asc(xs)) | -Natural::from_limbs_asc(ys)
             );
             assert_eq!(&out_limbs[len..], &out_limbs_old[len..]);
@@ -618,7 +618,7 @@ fn limbs_or_neg_neg_to_out_properties() {
         ).unwrap();
         let mut expected_limbs = result.to_limbs_asc();
         expected_limbs.resize(len, 0);
-        assert_eq!(&xs[0..len], expected_limbs.as_slice());
+        assert_eq!(&xs[..len], expected_limbs.as_slice());
         assert_eq!(&xs[len..], &xs_old[len..]);
     });
 }

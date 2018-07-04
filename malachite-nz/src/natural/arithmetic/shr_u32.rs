@@ -334,7 +334,7 @@ impl<'a> ShrRound<u32> for &'a Natural {
                     if limbs_to_delete >= limbs.len() {
                         return Natural::ONE;
                     } else {
-                        let mut exact = limbs_test_zero(&limbs[0..limbs_to_delete]);
+                        let mut exact = limbs_test_zero(&limbs[..limbs_to_delete]);
                         let small_shift = other & u32::WIDTH_MASK;
                         let mut result = limbs[limbs_to_delete..].to_vec();
                         if small_shift != 0 {
@@ -393,7 +393,7 @@ impl<'a> ShrRound<u32> for &'a Natural {
                                 return if limbs_to_delete >= limbs.len() {
                                     Natural::ONE
                                 } else {
-                                    let mut exact = limbs_test_zero(&limbs[0..limbs_to_delete]);
+                                    let mut exact = limbs_test_zero(&limbs[..limbs_to_delete]);
                                     let small_shift = other & u32::WIDTH_MASK;
                                     let mut result = limbs[limbs_to_delete..].to_vec();
                                     if small_shift != 0 {

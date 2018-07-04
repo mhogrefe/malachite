@@ -10,13 +10,13 @@ use std::str::FromStr;
 #[derive(Clone, Hash, Eq, PartialEq)]
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
 pub struct Integer {
-    pub(crate) sign: bool, // must be true if abs is zero
+    pub(crate) sign: bool, // whether the Integer is non-negative
     pub(crate) abs: Natural,
 }
 
 impl Integer {
-    /// Returns true iff `self` is valid. To be valid, it can only be Large when its absolute value
-    /// is at least 2<sup>31</sup>. All Integers must be valid.
+    /// Returns true iff `self` is valid. To be valid, its absolute value must be valid, and if the
+    /// absolute value is zero, the sign must be true. All Integers must be valid.
     pub fn is_valid(&self) -> bool {
         self.abs.is_valid() && (self.sign || self.abs != 0)
     }

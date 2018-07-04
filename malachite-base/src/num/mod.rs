@@ -2080,21 +2080,25 @@ pub trait OrdAbs: Eq + PartialOrdAbs<Self> {
 }
 
 /// Provides the constant 0.
+#[allow(unknown_lints, declare_interior_mutable_const)]
 pub trait Zero {
     const ZERO: Self;
 }
 
 /// Provides the constant 1.
+#[allow(unknown_lints, declare_interior_mutable_const)]
 pub trait One {
     const ONE: Self;
 }
 
 /// Provides the constant 2.
+#[allow(unknown_lints, declare_interior_mutable_const)]
 pub trait Two {
     const TWO: Self;
 }
 
 /// Provides the constant -1.
+#[allow(unknown_lints, declare_interior_mutable_const)]
 pub trait NegativeOne {
     const NEGATIVE_ONE: Self;
 }
@@ -2398,7 +2402,7 @@ impl FromU32Slice for u32 {
     fn copy_from_u32_slice(out_slice: &mut [u32], in_slice: &[u32]) {
         let out_len = out_slice.len();
         assert!(out_len >= in_slice.len());
-        out_slice.copy_from_slice(&in_slice[0..out_len]);
+        out_slice.copy_from_slice(&in_slice[..out_len]);
     }
 }
 

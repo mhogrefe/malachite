@@ -51,11 +51,11 @@ pub fn limbs_xor(xs: &[u32], ys: &[u32]) -> Vec<u32> {
     let xs_len = xs.len();
     let ys_len = ys.len();
     if xs_len >= ys_len {
-        let mut result = limbs_xor_same_length_no_check(&xs[0..ys_len], ys);
+        let mut result = limbs_xor_same_length_no_check(&xs[..ys_len], ys);
         result.extend_from_slice(&xs[ys_len..]);
         result
     } else {
-        let mut result = limbs_xor_same_length_no_check(xs, &ys[0..xs_len]);
+        let mut result = limbs_xor_same_length_no_check(xs, &ys[..xs_len]);
         result.extend_from_slice(&ys[xs_len..]);
         result
     }
@@ -78,7 +78,7 @@ fn limbs_xor_same_length_to_out_no_check(out_limbs: &mut [u32], xs: &[u32], ys: 
 /// where n = `xs.len()` = `ys.len()`
 ///
 /// # Panics
-/// Panics if `xs` and `ys` have different lengths or if out_limbs is too short.
+/// Panics if `xs` and `ys` have different lengths or if `out_limbs` is too short.
 ///
 /// # Example
 /// ```
@@ -110,7 +110,7 @@ pub fn limbs_xor_same_length_to_out(out_limbs: &mut [u32], xs: &[u32], ys: &[u32
 /// where n = max(`xs.len()`, `ys.len()`)
 ///
 /// # Panics
-/// Panics if out_limbs is too short.
+/// Panics if `out_limbs` is too short.
 ///
 /// # Example
 /// ```
@@ -129,11 +129,11 @@ pub fn limbs_xor_to_out(out_limbs: &mut [u32], xs: &[u32], ys: &[u32]) {
     let ys_len = ys.len();
     if xs_len >= ys_len {
         assert!(out_limbs.len() >= xs_len);
-        limbs_xor_same_length_to_out_no_check(out_limbs, &xs[0..ys_len], ys);
+        limbs_xor_same_length_to_out_no_check(out_limbs, &xs[..ys_len], ys);
         out_limbs[ys_len..xs_len].copy_from_slice(&xs[ys_len..]);
     } else {
         assert!(out_limbs.len() >= ys_len);
-        limbs_xor_same_length_to_out_no_check(out_limbs, xs, &ys[0..xs_len]);
+        limbs_xor_same_length_to_out_no_check(out_limbs, xs, &ys[..xs_len]);
         out_limbs[xs_len..ys_len].copy_from_slice(&ys[xs_len..]);
     }
 }
@@ -203,9 +203,9 @@ pub fn limbs_xor_in_place_left(xs: &mut Vec<u32>, ys: &[u32]) {
     let xs_len = xs.len();
     let ys_len = ys.len();
     if xs_len >= ys_len {
-        limbs_xor_same_length_in_place_left_no_check(&mut xs[0..ys_len], ys);
+        limbs_xor_same_length_in_place_left_no_check(&mut xs[..ys_len], ys);
     } else {
-        limbs_xor_same_length_in_place_left_no_check(xs, &ys[0..xs_len]);
+        limbs_xor_same_length_in_place_left_no_check(xs, &ys[..xs_len]);
         xs.extend_from_slice(&ys[xs_len..]);
     }
 }
@@ -247,10 +247,10 @@ pub fn limbs_xor_in_place_either(xs: &mut Vec<u32>, ys: &mut Vec<u32>) -> bool {
     let xs_len = xs.len();
     let ys_len = ys.len();
     if xs_len >= ys_len {
-        limbs_xor_same_length_in_place_left_no_check(&mut xs[0..ys_len], ys);
+        limbs_xor_same_length_in_place_left_no_check(&mut xs[..ys_len], ys);
         false
     } else {
-        limbs_xor_same_length_in_place_left_no_check(&mut ys[0..xs_len], xs);
+        limbs_xor_same_length_in_place_left_no_check(&mut ys[..xs_len], xs);
         true
     }
 }

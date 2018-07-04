@@ -95,14 +95,14 @@ pub fn limbs_and_pos_neg_to_out(out_limbs: &mut [u32], xs: &[u32], ys: &[u32]) {
     assert!(x_i < xs_len);
     assert!(y_i < ys_len);
     if y_i >= xs_len {
-        limbs_set_zero(&mut out_limbs[0..xs_len]);
+        limbs_set_zero(&mut out_limbs[..xs_len]);
         return;
     } else if x_i >= ys_len {
-        out_limbs[0..xs_len].copy_from_slice(xs);
+        out_limbs[..xs_len].copy_from_slice(xs);
         return;
     }
     let max_i = max(x_i, y_i);
-    limbs_set_zero(&mut out_limbs[0..max_i]);
+    limbs_set_zero(&mut out_limbs[..max_i]);
     out_limbs[max_i] = xs[max_i] & if x_i <= y_i {
         ys[max_i].wrapping_neg()
     } else {
@@ -158,7 +158,7 @@ pub fn limbs_and_pos_neg_in_place_left(xs: &mut [u32], ys: &[u32]) {
         return;
     }
     let max_i = max(x_i, y_i);
-    limbs_set_zero(&mut xs[0..max_i]);
+    limbs_set_zero(&mut xs[..max_i]);
     xs[max_i] &= if x_i <= y_i {
         ys[max_i].wrapping_neg()
     } else {
@@ -209,7 +209,7 @@ pub fn limbs_slice_and_pos_neg_in_place_right(xs: &[u32], ys: &mut [u32]) {
         return;
     }
     let max_i = max(x_i, y_i);
-    limbs_set_zero(&mut ys[0..max_i]);
+    limbs_set_zero(&mut ys[..max_i]);
     {
         let ys_max_i = &mut ys[max_i];
         if x_i <= y_i {
@@ -387,20 +387,20 @@ pub fn limbs_and_neg_neg_to_out(out_limbs: &mut [u32], xs: &[u32], ys: &[u32]) -
     assert!(x_i < xs_len);
     assert!(y_i < ys_len);
     if y_i >= xs_len {
-        out_limbs[0..ys_len].copy_from_slice(ys);
+        out_limbs[..ys_len].copy_from_slice(ys);
         if xs_len > ys_len {
             limbs_set_zero(&mut out_limbs[ys_len..xs_len]);
         }
         return true;
     } else if x_i >= ys_len {
-        out_limbs[0..xs_len].copy_from_slice(xs);
+        out_limbs[..xs_len].copy_from_slice(xs);
         if ys_len > xs_len {
             limbs_set_zero(&mut out_limbs[xs_len..ys_len]);
         }
         return true;
     }
     let max_i = max(x_i, y_i);
-    limbs_set_zero(&mut out_limbs[0..max_i]);
+    limbs_set_zero(&mut out_limbs[..max_i]);
     let x = if x_i >= y_i {
         xs[max_i].wrapping_sub(1)
     } else {
@@ -555,7 +555,7 @@ pub fn limbs_vec_and_neg_neg_in_place_left(xs: &mut Vec<u32>, ys: &[u32]) {
         return;
     }
     let boundary_limb_seen = if ys_len > xs_len {
-        let mut boundary_limb_seen = limbs_slice_and_neg_neg_in_place_left(xs, &ys[0..xs_len]);
+        let mut boundary_limb_seen = limbs_slice_and_neg_neg_in_place_left(xs, &ys[..xs_len]);
         let zs = &ys[xs_len..];
         if boundary_limb_seen {
             xs.extend_from_slice(zs);

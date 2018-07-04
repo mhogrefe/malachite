@@ -1,6 +1,8 @@
 use integer::Integer;
 use malachite_base::misc::WrappingFrom;
-use natural::arithmetic::add_u32::{mpn_add_1, mpn_add_1_in_place, mpn_add_1_to_out};
+use natural::arithmetic::add_u32::{
+    limbs_add_limb, limbs_add_limb_to_out, limbs_slice_add_limb_in_place,
+};
 use natural::arithmetic::sub_u32::{mpn_sub_1, mpn_sub_1_in_place, mpn_sub_1_to_out};
 use natural::Natural::{self, Large, Small};
 use std::ops::{BitXor, BitXorAssign};
@@ -31,7 +33,7 @@ pub fn limbs_pos_xor_limb_neg(limbs: &[u32], limb: u32) -> Vec<u32> {
     let lowest_limb = limbs[0] ^ limb;
     let mut result_limbs;
     if lowest_limb == 0 {
-        result_limbs = mpn_add_1(&limbs[1..], 1);
+        result_limbs = limbs_add_limb(&limbs[1..], 1);
         result_limbs.insert(0, 0);
     } else {
         result_limbs = limbs.to_vec();
@@ -77,7 +79,7 @@ pub fn limbs_pos_xor_limb_neg_to_out(out_limbs: &mut [u32], in_limbs: &[u32], li
     let lowest_limb = in_limbs[0] ^ limb;
     if lowest_limb == 0 {
         out_limbs[0] = 0;
-        mpn_add_1_to_out(&mut out_limbs[1..len], &in_limbs[1..], 1)
+        limbs_add_limb_to_out(&mut out_limbs[1..len], &in_limbs[1..], 1)
     } else {
         out_limbs[0] = lowest_limb.wrapping_neg();
         out_limbs[1..len].copy_from_slice(&in_limbs[1..]);
@@ -120,7 +122,7 @@ pub fn limbs_slice_pos_xor_limb_neg_in_place(limbs: &mut [u32], limb: u32) -> bo
     let head = &mut head[0];
     *head ^= limb;
     if *head == 0 {
-        mpn_add_1_in_place(tail, 1)
+        limbs_slice_add_limb_in_place(tail, 1)
     } else {
         *head = head.wrapping_neg();
         false

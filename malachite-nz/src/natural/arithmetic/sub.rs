@@ -67,7 +67,7 @@ pub fn mpn_sub_to_out(r: &mut [u32], s1: &[u32], s2: &[u32]) -> bool {
     let s2_len = s2.len();
     assert!(s1_len >= s2_len);
     assert!(r.len() >= s1_len);
-    let borrow = mpn_sub_n(r, &s1[0..s2_len], s2);
+    let borrow = mpn_sub_n(r, &s1[..s2_len], s2);
     if s1_len == s2_len {
         borrow
     } else if borrow {
@@ -84,7 +84,7 @@ pub fn mpn_sub_in_place_left(s1: &mut [u32], s2: &[u32]) -> bool {
     let s1_len = s1.len();
     let s2_len = s2.len();
     assert!(s1_len >= s2_len);
-    let borrow = mpn_sub_n_in_place(&mut s1[0..s2_len], s2);
+    let borrow = mpn_sub_n_in_place(&mut s1[..s2_len], s2);
     if s1_len == s2_len {
         borrow
     } else if borrow {
@@ -106,7 +106,7 @@ pub fn mpn_sub_aba(a: &mut [u32], b: &[u32], len: usize) -> bool {
     let s1_len = b.len();
     assert!(s1_len >= len);
     assert!(a.len() >= s1_len);
-    let borrow = mpn_sub_n_aba(&mut a[0..len], &b[0..len]);
+    let borrow = mpn_sub_n_aba(&mut a[..len], &b[..len]);
     if s1_len == len {
         borrow
     } else if borrow {

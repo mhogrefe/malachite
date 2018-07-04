@@ -86,8 +86,8 @@ fn limbs_not_to_out_properties() {
         |&(ref limbs_out, ref limbs_in)| {
             let mut mut_limbs_out = limbs_out.to_vec();
             limbs_not_to_out(&mut mut_limbs_out, limbs_in);
-            limbs_not_in_place(&mut mut_limbs_out[0..limbs_in.len()]);
-            assert_eq!(mut_limbs_out[0..limbs_in.len()], **limbs_in);
+            limbs_not_in_place(&mut mut_limbs_out[..limbs_in.len()]);
+            assert_eq!(mut_limbs_out[..limbs_in.len()], **limbs_in);
         },
     );
 }

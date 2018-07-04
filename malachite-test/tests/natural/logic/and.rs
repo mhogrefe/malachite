@@ -1,8 +1,8 @@
 use common::test_properties;
 use malachite_base::num::Zero;
 use malachite_nz::natural::logic::and::{
-    limbs_and, limbs_and_in_place_either, limbs_and_same_length_in_place_left,
-    limbs_and_same_length_to_out, limbs_and_to_out, limbs_slice_and_in_place_left,
+    limbs_and, limbs_and_in_place_either, limbs_and_same_length_to_out, limbs_and_to_out,
+    limbs_slice_and_in_place_left, limbs_slice_and_same_length_in_place_left,
     limbs_vec_and_in_place_left,
 };
 use malachite_nz::natural::Natural;
@@ -95,10 +95,10 @@ fn limbs_and_to_out_fail() {
 }
 
 #[test]
-fn test_limbs_and_same_length_in_place_left() {
+fn test_limbs_slice_and_same_length_in_place_left() {
     let test = |xs_before: &[u32], ys, xs_after| {
         let mut xs = xs_before.to_vec();
-        limbs_and_same_length_in_place_left(&mut xs, ys);
+        limbs_slice_and_same_length_in_place_left(&mut xs, ys);
         assert_eq!(xs, xs_after);
     };
     test(&[], &[], vec![]);
@@ -109,9 +109,9 @@ fn test_limbs_and_same_length_in_place_left() {
 
 #[test]
 #[should_panic(expected = "assertion failed: `(left == right)`")]
-fn limbs_and_same_length_in_place_left_fail() {
+fn limbs_slice_and_same_length_in_place_left_fail() {
     let mut out = vec![6, 7];
-    limbs_and_same_length_in_place_left(&mut out, &[1, 2, 3]);
+    limbs_slice_and_same_length_in_place_left(&mut out, &[1, 2, 3]);
 }
 
 #[test]
@@ -258,7 +258,7 @@ fn limbs_and_same_length_to_out_properties() {
             limbs_and_same_length_to_out(&mut xs, ys, zs);
             let len = ys.len();
             assert_eq!(
-                Natural::from_limbs_asc(&xs[0..len]),
+                Natural::from_limbs_asc(&xs[..len]),
                 Natural::from_limbs_asc(ys) & Natural::from_limbs_asc(zs)
             );
             assert_eq!(&xs[len..], &xs_old[len..]);
@@ -276,7 +276,7 @@ fn limbs_and_to_out_properties() {
             limbs_and_to_out(&mut xs, ys, zs);
             let len = max(ys.len(), zs.len());
             assert_eq!(
-                Natural::from_limbs_asc(&xs[0..len]),
+                Natural::from_limbs_asc(&xs[..len]),
                 Natural::from_limbs_asc(ys) & Natural::from_limbs_asc(zs)
             );
             assert_eq!(&xs[len..], &xs_old[len..]);
@@ -285,11 +285,11 @@ fn limbs_and_to_out_properties() {
 }
 
 #[test]
-fn limbs_and_same_length_in_place_left_properties() {
+fn limbs_slice_and_same_length_in_place_left_properties() {
     test_properties(pairs_of_unsigned_vec_var_1, |&(ref xs, ref ys)| {
         let mut xs = xs.to_vec();
         let xs_old = xs.clone();
-        limbs_and_same_length_in_place_left(&mut xs, ys);
+        limbs_slice_and_same_length_in_place_left(&mut xs, ys);
         assert_eq!(
             Natural::from_owned_limbs_asc(xs),
             Natural::from_owned_limbs_asc(xs_old) & Natural::from_limbs_asc(ys)
@@ -299,13 +299,13 @@ fn limbs_and_same_length_in_place_left_properties() {
 
 #[test]
 fn limbs_slice_and_in_place_left_properties() {
-    test_properties(pairs_of_unsigned_vec_var_1, |&(ref xs, ref ys)| {
+    test_properties(pairs_of_unsigned_vec, |&(ref xs, ref ys)| {
         let mut xs = xs.to_vec();
         let xs_old = xs.clone();
         let truncate_size = limbs_slice_and_in_place_left(&mut xs, ys);
         let n = Natural::from_limbs_asc(&xs_old) & Natural::from_limbs_asc(ys);
         if let Some(truncate_size) = truncate_size {
-            assert_eq!(Natural::from_limbs_asc(&xs[0..truncate_size]), n);
+            assert_eq!(Natural::from_limbs_asc(&xs[..truncate_size]), n);
             assert_eq!(&xs[truncate_size..], &xs_old[truncate_size..]);
         } else {
             assert_eq!(Natural::from_owned_limbs_asc(xs), n);
@@ -315,20 +315,20 @@ fn limbs_slice_and_in_place_left_properties() {
 
 #[test]
 fn limbs_vec_and_in_place_left_properties() {
-    test_properties(pairs_of_unsigned_vec_var_1, |&(ref xs, ref ys)| {
+    test_properties(pairs_of_unsigned_vec, |&(ref xs, ref ys)| {
         let mut xs = xs.to_vec();
         let xs_old = xs.clone();
         limbs_vec_and_in_place_left(&mut xs, ys);
         assert_eq!(
             Natural::from_owned_limbs_asc(xs),
-            Natural::from_limbs_asc(&xs_old) & Natural::from_limbs_asc(ys)
+            Natural::from_owned_limbs_asc(xs_old) & Natural::from_limbs_asc(ys)
         );
     });
 }
 
 #[test]
 fn limbs_and_in_place_either_properties() {
-    test_properties(pairs_of_unsigned_vec_var_1, |&(ref xs, ref ys)| {
+    test_properties(pairs_of_unsigned_vec, |&(ref xs, ref ys)| {
         let mut xs = xs.to_vec();
         let mut ys = ys.to_vec();
         let xs_old = xs.clone();

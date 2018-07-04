@@ -39,6 +39,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
         benchmark_u32_and_integer_library_comparison
     );
 }
+
 fn demo_integer_and_assign_u32(gm: GenerationMode, limit: usize) {
     for (mut n, u) in pairs_of_integer_and_unsigned::<u32>(gm).take(limit) {
         let n_old = n.clone();

@@ -143,7 +143,7 @@ pub fn limbs_xor_pos_neg_to_out(out_limbs: &mut [u32], xs: &[u32], ys: &[u32]) {
     assert!(x_i < xs_len);
     assert!(y_i < ys_len);
     if y_i >= xs_len {
-        limbs_set_zero(&mut out_limbs[0..x_i]);
+        limbs_set_zero(&mut out_limbs[..x_i]);
         out_limbs[x_i] = xs[x_i].wrapping_neg();
         for (out, &x) in out_limbs[x_i + 1..xs_len]
             .iter_mut()
@@ -158,12 +158,12 @@ pub fn limbs_xor_pos_neg_to_out(out_limbs: &mut [u32], xs: &[u32], ys: &[u32]) {
         out_limbs[y_i + 1..ys_len].copy_from_slice(&ys[y_i + 1..]);
         return;
     } else if x_i >= ys_len {
-        out_limbs[0..ys_len].copy_from_slice(ys);
+        out_limbs[..ys_len].copy_from_slice(ys);
         out_limbs[ys_len..xs_len].copy_from_slice(&xs[ys_len..]);
         return;
     }
     let (min_i, max_i) = if x_i <= y_i { (x_i, y_i) } else { (y_i, x_i) };
-    limbs_set_zero(&mut out_limbs[0..min_i]);
+    limbs_set_zero(&mut out_limbs[..min_i]);
     let mut boundary_limb_seen = false;
     if x_i == y_i {
         out_limbs[x_i] =
@@ -287,7 +287,7 @@ pub fn limbs_xor_pos_neg_in_place_left(xs: &mut Vec<u32>, ys: &[u32]) {
         xs.extend_from_slice(&ys[y_i + 1..]);
         return;
     } else if x_i >= ys_len {
-        xs[0..ys_len].copy_from_slice(ys);
+        xs[..ys_len].copy_from_slice(ys);
         return;
     }
     let mut boundary_limb_seen = limbs_xor_pos_neg_in_place_left_helper(xs, ys, x_i, y_i);
@@ -461,7 +461,7 @@ pub fn limbs_xor_pos_neg_in_place_either(xs: &mut [u32], ys: &mut [u32]) -> bool
         ys[y_i] -= 1;
         return true;
     } else if x_i >= ys_len {
-        xs[0..ys_len].copy_from_slice(ys);
+        xs[..ys_len].copy_from_slice(ys);
         return false;
     }
     if xs_len >= ys_len {
@@ -587,7 +587,7 @@ pub fn limbs_xor_neg_neg_to_out(out_limbs: &mut [u32], xs: &[u32], ys: &[u32]) {
         return;
     }
     let (min_i, max_i) = if x_i <= y_i { (x_i, y_i) } else { (y_i, x_i) };
-    limbs_set_zero(&mut out_limbs[0..min_i]);
+    limbs_set_zero(&mut out_limbs[..min_i]);
     if x_i == y_i {
         out_limbs[x_i] = xs[x_i].wrapping_neg() ^ ys[x_i].wrapping_neg();
     } else {

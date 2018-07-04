@@ -75,7 +75,7 @@ pub fn limbs_neg_or_limb_to_out(out_limbs: &mut [u32], in_limbs: &[u32], limb: u
     let len = in_limbs.len();
     assert!(out_limbs.len() >= len);
     if limb == 0 {
-        out_limbs[0..len].copy_from_slice(in_limbs);
+        out_limbs[..len].copy_from_slice(in_limbs);
         return;
     }
     let i = limbs_leading_zero_limbs(in_limbs);

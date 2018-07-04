@@ -6,8 +6,8 @@ use inputs::base::{
 use inputs::natural::{nrm_pairs_of_naturals, pairs_of_naturals, rm_pairs_of_naturals};
 use malachite_base::num::SignificantBits;
 use malachite_nz::natural::logic::and::{
-    limbs_and, limbs_and_in_place_either, limbs_and_same_length_in_place_left,
-    limbs_and_same_length_to_out, limbs_and_to_out, limbs_slice_and_in_place_left,
+    limbs_and, limbs_and_in_place_either, limbs_and_same_length_to_out, limbs_and_to_out,
+    limbs_slice_and_in_place_left, limbs_slice_and_same_length_in_place_left,
     limbs_vec_and_in_place_left,
 };
 use malachite_nz::natural::Natural;
@@ -26,7 +26,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limbs_and);
     register_demo!(registry, demo_limbs_and_same_length_to_out);
     register_demo!(registry, demo_limbs_and_to_out);
-    register_demo!(registry, demo_limbs_and_same_length_in_place_left);
+    register_demo!(registry, demo_limbs_slice_and_same_length_in_place_left);
     register_demo!(registry, demo_limbs_slice_and_in_place_left);
     register_demo!(registry, demo_limbs_vec_and_in_place_left);
     register_demo!(registry, demo_limbs_and_in_place_either);
@@ -42,7 +42,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_bench!(
         registry,
         Small,
-        benchmark_limbs_and_same_length_in_place_left
+        benchmark_limbs_slice_and_same_length_in_place_left
     );
     register_bench!(registry, Small, benchmark_limbs_slice_and_in_place_left);
     register_bench!(registry, Small, benchmark_limbs_vec_and_in_place_left);
@@ -73,7 +73,11 @@ fn demo_limbs_and_same_length_to_out(gm: GenerationMode, limit: usize) {
         let mut xs = xs.to_vec();
         let xs_old = xs.clone();
         limbs_and_same_length_to_out(&mut xs, &ys, &zs);
-        println!("limbs_out := {:?}; limbs_and_same_length_to_out(&mut limbs_out, {:?}, {:?}); limbs_out = {:?}", xs_old, ys, zs, xs);
+        println!(
+            "limbs_out := {:?}; limbs_and_same_length_to_out(&mut limbs_out, {:?}, {:?}); \
+             limbs_out = {:?}",
+            xs_old, ys, zs, xs
+        );
     }
 }
 
@@ -89,13 +93,13 @@ fn demo_limbs_and_to_out(gm: GenerationMode, limit: usize) {
     }
 }
 
-fn demo_limbs_and_same_length_in_place_left(gm: GenerationMode, limit: usize) {
+fn demo_limbs_slice_and_same_length_in_place_left(gm: GenerationMode, limit: usize) {
     for (xs, ys) in pairs_of_unsigned_vec_var_1(gm).take(limit) {
         let mut xs = xs.to_vec();
         let xs_old = xs.clone();
-        limbs_and_same_length_in_place_left(&mut xs, &ys);
+        limbs_slice_and_same_length_in_place_left(&mut xs, &ys);
         println!(
-            "xs := {:?}; limbs_and_same_length_in_place_left(&mut xs, {:?}); xs = {:?}",
+            "xs := {:?}; limbs_slice_and_same_length_in_place_left(&mut xs, {:?}); xs = {:?}",
             xs_old, ys, xs
         );
     }
@@ -132,7 +136,11 @@ fn demo_limbs_and_in_place_either(gm: GenerationMode, limit: usize) {
         let xs_old = xs.clone();
         let ys_old = ys.clone();
         let right = limbs_and_in_place_either(&mut xs, &mut ys);
-        println!("xs := {:?}; ys := {:?}; limbs_and_in_place_either(&mut xs, &mut ys) = {}; xs = {:?}; ys = {:?}", xs_old, ys_old, right, xs, ys);
+        println!(
+            "xs := {:?}; ys := {:?}; limbs_and_in_place_either(&mut xs, &mut ys) = {}; \
+             xs = {:?}; ys = {:?}",
+            xs_old, ys_old, right, xs, ys
+        );
     }
 }
 
@@ -228,13 +236,13 @@ fn benchmark_limbs_and_to_out(gm: GenerationMode, limit: usize, file_name: &str)
     );
 }
 
-fn benchmark_limbs_and_same_length_in_place_left(
+fn benchmark_limbs_slice_and_same_length_in_place_left(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,
 ) {
     m_run_benchmark(
-        "limbs_and_same_length_in_place_left(&mut [u32], &[u32])",
+        "limbs_slice_and_same_length_in_place_left(&mut [u32], &[u32])",
         BenchmarkType::Single,
         pairs_of_unsigned_vec_var_1(gm),
         gm.name(),
@@ -244,7 +252,7 @@ fn benchmark_limbs_and_same_length_in_place_left(
         "xs.len() = ys.len()",
         &mut [(
             "malachite",
-            &mut (|(mut xs, ys)| limbs_and_same_length_in_place_left(&mut xs, &ys)),
+            &mut (|(mut xs, ys)| limbs_slice_and_same_length_in_place_left(&mut xs, &ys)),
         )],
     );
 }
@@ -275,10 +283,10 @@ fn benchmark_limbs_vec_and_in_place_left(gm: GenerationMode, limit: usize, file_
         limit,
         file_name,
         &(|&(ref xs, ref ys)| min(xs.len(), ys.len())),
-        "xs.len() = ys.len()",
+        "min(xs.len(), ys.len())",
         &mut [(
             "malachite",
-            &mut (|(mut xs, ys)| no_out!(limbs_vec_and_in_place_left(&mut xs, &ys))),
+            &mut (|(mut xs, ys)| limbs_vec_and_in_place_left(&mut xs, &ys)),
         )],
     );
 }

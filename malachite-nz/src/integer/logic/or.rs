@@ -106,7 +106,7 @@ pub fn limbs_or_pos_neg_to_out(out_limbs: &mut [u32], xs: &[u32], ys: &[u32]) {
     assert!(x_i < xs_len);
     assert!(y_i < ys_len);
     if y_i >= xs_len {
-        limbs_set_zero(&mut out_limbs[0..x_i]);
+        limbs_set_zero(&mut out_limbs[..x_i]);
         out_limbs[x_i] = xs[x_i].wrapping_neg();
         limbs_not_to_out(&mut out_limbs[x_i + 1..xs_len], &xs[x_i + 1..]);
         for x in out_limbs[xs_len..y_i].iter_mut() {
@@ -116,11 +116,11 @@ pub fn limbs_or_pos_neg_to_out(out_limbs: &mut [u32], xs: &[u32], ys: &[u32]) {
         out_limbs[y_i + 1..ys_len].copy_from_slice(&ys[y_i + 1..]);
         return;
     } else if x_i >= ys_len {
-        out_limbs[0..ys_len].copy_from_slice(ys);
+        out_limbs[..ys_len].copy_from_slice(ys);
         return;
     }
     let (min_i, max_i) = if x_i <= y_i { (x_i, y_i) } else { (y_i, x_i) };
-    limbs_set_zero(&mut out_limbs[0..min_i]);
+    limbs_set_zero(&mut out_limbs[..min_i]);
     if x_i == y_i {
         out_limbs[x_i] = (!xs[x_i] & (ys[y_i] - 1)) + 1;
     } else if x_i > y_i {
@@ -181,7 +181,7 @@ pub fn limbs_slice_or_pos_neg_in_place_left(xs: &mut [u32], ys: &[u32]) -> bool 
         limbs_not_in_place(&mut xs[x_i + 1..]);
         return true;
     } else if x_i >= ys_len {
-        xs[0..ys_len].copy_from_slice(ys);
+        xs[..ys_len].copy_from_slice(ys);
         limbs_set_zero(&mut xs[ys_len..]);
         return false;
     }
@@ -436,14 +436,14 @@ pub fn limbs_or_neg_neg_to_out(out_limbs: &mut [u32], xs: &[u32], ys: &[u32]) {
     assert!(x_i < xs_len);
     assert!(y_i < ys_len);
     if y_i >= xs_len {
-        out_limbs[0..xs_len].copy_from_slice(xs);
+        out_limbs[..xs_len].copy_from_slice(xs);
         return;
     } else if x_i >= ys_len {
-        out_limbs[0..ys_len].copy_from_slice(ys);
+        out_limbs[..ys_len].copy_from_slice(ys);
         return;
     }
     let (min_i, max_i) = if x_i <= y_i { (x_i, y_i) } else { (y_i, x_i) };
-    limbs_set_zero(&mut out_limbs[0..min_i]);
+    limbs_set_zero(&mut out_limbs[..min_i]);
     if x_i > y_i {
         out_limbs[y_i..x_i].copy_from_slice(&ys[y_i..x_i]);
     } else if y_i > x_i {
@@ -500,7 +500,7 @@ pub fn limbs_slice_or_neg_neg_in_place_left(xs: &mut [u32], ys: &[u32]) {
     if y_i >= xs_len {
         return;
     } else if x_i >= ys_len {
-        xs[0..ys_len].copy_from_slice(ys);
+        xs[..ys_len].copy_from_slice(ys);
         limbs_set_zero(&mut xs[ys_len..]);
         return;
     }

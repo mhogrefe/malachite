@@ -263,7 +263,7 @@ fn limbs_xor_same_length_to_out_properties() {
             limbs_xor_same_length_to_out(&mut xs, ys, zs);
             let len = ys.len();
             assert_eq!(
-                Natural::from_limbs_asc(&xs[0..len]),
+                Natural::from_limbs_asc(&xs[..len]),
                 Natural::from_limbs_asc(ys) ^ Natural::from_limbs_asc(zs)
             );
             assert_eq!(&xs[len..], &xs_old[len..]);
@@ -281,7 +281,7 @@ fn limbs_xor_to_out_properties() {
             limbs_xor_to_out(&mut xs, ys, zs);
             let len = max(ys.len(), zs.len());
             assert_eq!(
-                Natural::from_limbs_asc(&xs[0..len]),
+                Natural::from_limbs_asc(&xs[..len]),
                 Natural::from_limbs_asc(ys) ^ Natural::from_limbs_asc(zs)
             );
             assert_eq!(&xs[len..], &xs_old[len..]);

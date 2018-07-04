@@ -11,8 +11,8 @@ use malachite_nz::natural::Natural;
 use malachite_test::common::{integer_to_rug_integer, rug_integer_to_integer};
 use malachite_test::inputs::base::{
     pairs_of_nonempty_unsigned_vec_and_unsigned, pairs_of_u32_vec_and_u32_var_1, signeds,
-    triples_of_u32_vec_u32_vec_and_u32_var_2,
-    triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_1,
+    triples_of_u32_vec_u32_vec_and_u32_var_3,
+    triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_2,
 };
 use malachite_test::inputs::integer::{integers, pairs_of_integer_and_signed};
 use malachite_test::integer::logic::xor_i32::{integer_xor_i32_alt_1, integer_xor_i32_alt_2};
@@ -314,7 +314,7 @@ fn limbs_pos_xor_limb_neg_properties() {
 #[test]
 fn limbs_pos_xor_limb_neg_to_out_properties() {
     test_properties(
-        triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_1,
+        triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_2,
         |&(ref out_limbs, ref in_limbs, limb)| {
             let mut out_limbs = out_limbs.to_vec();
             let old_out_limbs = out_limbs.clone();
@@ -324,7 +324,7 @@ fn limbs_pos_xor_limb_neg_to_out_properties() {
             let len = in_limbs.len();
             let mut limbs = Natural::checked_from(-n).unwrap().into_limbs_asc();
             limbs.resize(len, 0);
-            assert_eq!(limbs, &out_limbs[0..len]);
+            assert_eq!(limbs, &out_limbs[..len]);
             assert_eq!(&out_limbs[len..], &old_out_limbs[len..]);
         },
     );
@@ -341,7 +341,7 @@ fn limbs_slice_pos_xor_limb_neg_in_place_properties() {
                 ^ Integer::from_owned_twos_complement_limbs_asc(vec![limb, u32::MAX]);
             if carry {
                 let result_limbs = Natural::checked_from(-n).unwrap().to_limbs_asc();
-                assert_eq!(mut_limbs, &result_limbs[0..limbs.len()]);
+                assert_eq!(mut_limbs, &result_limbs[..limbs.len()]);
             } else {
                 assert_eq!(
                     Natural::from_owned_limbs_asc(mut_limbs),
@@ -385,7 +385,7 @@ fn limbs_neg_xor_limb_neg_properties() {
 #[test]
 fn limbs_neg_xor_limb_neg_to_out_properties() {
     test_properties(
-        triples_of_u32_vec_u32_vec_and_u32_var_2,
+        triples_of_u32_vec_u32_vec_and_u32_var_3,
         |&(ref out_limbs, ref in_limbs, limb)| {
             let mut out_limbs = out_limbs.to_vec();
             let old_out_limbs = out_limbs.clone();
@@ -395,7 +395,7 @@ fn limbs_neg_xor_limb_neg_to_out_properties() {
             let len = in_limbs.len();
             let mut limbs = Natural::checked_from(n).unwrap().into_limbs_asc();
             limbs.resize(len, 0);
-            assert_eq!(limbs, &out_limbs[0..len]);
+            assert_eq!(limbs, &out_limbs[..len]);
             assert_eq!(&out_limbs[len..], &old_out_limbs[len..]);
         },
     );

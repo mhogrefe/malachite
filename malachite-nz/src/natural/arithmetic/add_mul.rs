@@ -1,7 +1,7 @@
 use integer::arithmetic::add_mul_u32::mpz_aorsmul_1;
 use malachite_base::limbs::limbs_test_zero;
 use malachite_base::num::{AddMul, AddMulAssign, NotAssign};
-use natural::arithmetic::add::mpn_add_in_place;
+use natural::arithmetic::add::limbs_slice_add_greater_in_place_left;
 use natural::arithmetic::mul::mpn_mul;
 use natural::arithmetic::sub::{mpn_sub_aba, mpn_sub_in_place_left};
 use natural::comparison::ord::limbs_cmp;
@@ -504,27 +504,27 @@ pub(crate) fn mpz_aorsmul(
     assert_ne!(t[tsize - 1], 0);
     if sub {
         if wsize < tsize {
-            let c = if mpn_add_in_place(&mut w[0..tsize], &t[0..tsize]) {
+            let c = if limbs_slice_add_greater_in_place_left(&mut w[..tsize], &t[..tsize]) {
                 1
             } else {
                 0
             };
             w[tsize] = c;
         } else {
-            let c = if mpn_add_in_place(&mut w[0..wsize], &t[0..tsize]) {
+            let c = if limbs_slice_add_greater_in_place_left(&mut w[..wsize], &t[..tsize]) {
                 1
             } else {
                 0
             };
             w[wsize] = c;
         }
-    } else if mpn_cmp_twosizes_lt(&w[0..wsize], &t[0..tsize]) {
+    } else if mpn_cmp_twosizes_lt(&w[..wsize], &t[..tsize]) {
         if tsize != 0 {
             w_sign.not_assign();
         }
-        assert!(!mpn_sub_aba(w, &t[0..tsize], wsize));
+        assert!(!mpn_sub_aba(w, &t[..tsize], wsize));
     } else {
-        assert!(!mpn_sub_in_place_left(&mut w[0..wsize], &t[0..tsize]));
+        assert!(!mpn_sub_in_place_left(&mut w[..wsize], &t[..tsize]));
     }
     if limbs_test_zero(w) {
         *w_sign = false;

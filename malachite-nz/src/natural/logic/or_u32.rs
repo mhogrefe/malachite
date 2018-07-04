@@ -47,7 +47,7 @@ pub fn limbs_or_limb(limbs: &[u32], limb: u32) -> Vec<u32> {
 /// assert_eq!(out_limbs, &[895, 456, 0]);
 /// ```
 pub fn limbs_or_limb_to_out(out_limbs: &mut [u32], in_limbs: &[u32], limb: u32) {
-    out_limbs[0..in_limbs.len()].copy_from_slice(in_limbs);
+    out_limbs[..in_limbs.len()].copy_from_slice(in_limbs);
     limbs_or_limb_in_place(out_limbs, limb);
 }
 
@@ -60,7 +60,7 @@ pub fn limbs_or_limb_to_out(out_limbs: &mut [u32], in_limbs: &[u32], limb: u32) 
 /// Additional memory: worst case O(1)
 ///
 /// # Panics
-/// Panics if `in_limbs` is empty.
+/// Panics if `limbs` is empty.
 ///
 /// # Example
 /// ```

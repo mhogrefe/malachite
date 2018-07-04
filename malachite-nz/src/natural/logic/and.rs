@@ -41,7 +41,7 @@ fn limbs_and_same_length_to_out_no_check(out_limbs: &mut [u32], xs: &[u32], ys: 
 /// where n = `xs.len()` = `ys.len()`
 ///
 /// # Panics
-/// Panics if `xs` and `ys` have different lengths or if out_limbs is too short.
+/// Panics if `xs` and `ys` have different lengths or if `out_limbs` is too short.
 ///
 /// # Example
 /// ```
@@ -73,7 +73,7 @@ pub fn limbs_and_same_length_to_out(out_limbs: &mut [u32], xs: &[u32], ys: &[u32
 /// where n = max(`xs.len()`, `ys.len()`)
 ///
 /// # Panics
-/// Panics if out_limbs is too short.
+/// Panics if `out_limbs` is too short.
 ///
 /// # Example
 /// ```
@@ -92,16 +92,16 @@ pub fn limbs_and_to_out(out_limbs: &mut [u32], xs: &[u32], ys: &[u32]) {
     let ys_len = ys.len();
     if xs_len >= ys_len {
         assert!(out_limbs.len() >= xs_len);
-        limbs_and_same_length_to_out_no_check(out_limbs, &xs[0..ys_len], ys);
+        limbs_and_same_length_to_out_no_check(out_limbs, &xs[..ys_len], ys);
         limbs_set_zero(&mut out_limbs[ys_len..xs_len]);
     } else {
         assert!(out_limbs.len() >= ys_len);
-        limbs_and_same_length_to_out_no_check(out_limbs, xs, &ys[0..xs_len]);
+        limbs_and_same_length_to_out_no_check(out_limbs, xs, &ys[..xs_len]);
         limbs_set_zero(&mut out_limbs[xs_len..ys_len]);
     }
 }
 
-fn limbs_and_same_length_in_place_left_no_check(xs: &mut [u32], ys: &[u32]) {
+fn limbs_slice_and_same_length_in_place_left_no_check(xs: &mut [u32], ys: &[u32]) {
     for i in 0..xs.len() {
         xs[i] &= ys[i];
     }
@@ -121,19 +121,19 @@ fn limbs_and_same_length_in_place_left_no_check(xs: &mut [u32], ys: &[u32]) {
 ///
 /// # Example
 /// ```
-/// use malachite_nz::natural::logic::and::limbs_and_same_length_in_place_left;
+/// use malachite_nz::natural::logic::and::limbs_slice_and_same_length_in_place_left;
 ///
 /// let mut xs = vec![6, 7];
-/// limbs_and_same_length_in_place_left(&mut xs, &[1, 2]);
+/// limbs_slice_and_same_length_in_place_left(&mut xs, &[1, 2]);
 /// assert_eq!(xs, &[0, 2]);
 ///
 /// let mut xs = vec![100, 101, 102];
-/// limbs_and_same_length_in_place_left(&mut xs, &[102, 101, 100]);
+/// limbs_slice_and_same_length_in_place_left(&mut xs, &[102, 101, 100]);
 /// assert_eq!(xs, &[100, 101, 100]);
 /// ```
-pub fn limbs_and_same_length_in_place_left(xs: &mut [u32], ys: &[u32]) {
+pub fn limbs_slice_and_same_length_in_place_left(xs: &mut [u32], ys: &[u32]) {
     assert_eq!(xs.len(), ys.len());
-    limbs_and_same_length_in_place_left_no_check(xs, ys);
+    limbs_slice_and_same_length_in_place_left_no_check(xs, ys);
 }
 
 /// Interpreting two slices of `u32`s as the limbs (in ascending order) of two `Natural`s, writes
@@ -170,15 +170,15 @@ pub fn limbs_slice_and_in_place_left(xs: &mut [u32], ys: &[u32]) -> Option<usize
     let ys_len = ys.len();
     match xs_len.cmp(&ys.len()) {
         Ordering::Equal => {
-            limbs_and_same_length_in_place_left_no_check(xs, ys);
+            limbs_slice_and_same_length_in_place_left_no_check(xs, ys);
             None
         }
         Ordering::Greater => {
-            limbs_and_same_length_in_place_left_no_check(&mut xs[0..ys_len], ys);
+            limbs_slice_and_same_length_in_place_left_no_check(&mut xs[..ys_len], ys);
             Some(ys_len)
         }
         Ordering::Less => {
-            limbs_and_same_length_in_place_left_no_check(xs, &ys[0..xs_len]);
+            limbs_slice_and_same_length_in_place_left_no_check(xs, &ys[..xs_len]);
             None
         }
     }
@@ -255,15 +255,15 @@ pub fn limbs_and_in_place_either(xs: &mut [u32], ys: &mut [u32]) -> bool {
     let ys_len = ys.len();
     match xs_len.cmp(&ys_len) {
         Ordering::Equal => {
-            limbs_and_same_length_in_place_left_no_check(xs, ys);
+            limbs_slice_and_same_length_in_place_left_no_check(xs, ys);
             false
         }
         Ordering::Less => {
-            limbs_and_same_length_in_place_left_no_check(xs, &ys[0..xs_len]);
+            limbs_slice_and_same_length_in_place_left_no_check(xs, &ys[..xs_len]);
             false
         }
         Ordering::Greater => {
-            limbs_and_same_length_in_place_left_no_check(ys, &xs[0..ys_len]);
+            limbs_slice_and_same_length_in_place_left_no_check(ys, &xs[..ys_len]);
             true
         }
     }

@@ -1,5 +1,5 @@
 use malachite_base::num::{AddMul, AddMulAssign, PrimitiveInteger, SplitInHalf};
-use natural::arithmetic::add_u32::mpn_add_1_in_place;
+use natural::arithmetic::add_u32::limbs_slice_add_limb_in_place;
 use natural::Natural::{self, Large, Small};
 
 // Multiply s1 and s2limb, and add the s1.len() least significant limbs of the product to r and
@@ -132,7 +132,7 @@ impl<'a> AddMul<Natural, u32> for &'a Natural {
         };
         if carry != 0 {
             if a_len > b_len {
-                if mpn_add_1_in_place(&mut result_limbs[b_len..], carry) {
+                if limbs_slice_add_limb_in_place(&mut result_limbs[b_len..], carry) {
                     result_limbs.push(1);
                 }
             } else {
@@ -193,7 +193,7 @@ impl<'a, 'b> AddMul<&'a Natural, u32> for &'b Natural {
         };
         if carry != 0 {
             if a_len > b_len {
-                if mpn_add_1_in_place(&mut result_limbs[b_len..], carry) {
+                if limbs_slice_add_limb_in_place(&mut result_limbs[b_len..], carry) {
                     result_limbs.push(1);
                 }
             } else {
@@ -259,7 +259,7 @@ impl AddMulAssign<Natural, u32> for Natural {
             };
             if carry != 0 {
                 if a_len > b_len {
-                    if mpn_add_1_in_place(&mut self_limbs[b_len..], carry) {
+                    if limbs_slice_add_limb_in_place(&mut self_limbs[b_len..], carry) {
                         self_limbs.push(1);
                     }
                 } else {
@@ -325,7 +325,7 @@ impl<'a> AddMulAssign<&'a Natural, u32> for Natural {
             };
             if carry != 0 {
                 if a_len > b_len {
-                    if mpn_add_1_in_place(&mut self_limbs[b_len..], carry) {
+                    if limbs_slice_add_limb_in_place(&mut self_limbs[b_len..], carry) {
                         self_limbs.push(1);
                     }
                 } else {
