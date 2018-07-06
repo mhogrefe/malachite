@@ -74,7 +74,7 @@ impl<'a> Not for &'a Integer {
                 ref abs,
             } => Integer {
                 sign: true,
-                abs: (abs - 1).unwrap(),
+                abs: abs - 1,
             },
         }
     }

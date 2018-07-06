@@ -1,6 +1,6 @@
-use malachite_base::num::SplitInHalf;
+use malachite_base::num::{CheckedSub, SplitInHalf};
 use malachite_base::num::{SubMul, SubMulAssign};
-use natural::arithmetic::sub_u32::{mpn_sub_1_in_place, sub_assign_u32_helper};
+use natural::arithmetic::sub_u32::limbs_sub_limb_in_place;
 use natural::Natural::{self, Large, Small};
 
 // Multiply s1 and s2limb, and subtract the s1.len() least significant limbs of the product from r
@@ -107,19 +107,19 @@ impl<'a, 'b> SubMul<&'a Natural, u32> for &'b Natural {
             return None;
         } else if let Small(small_b) = *b {
             if let Some(product) = small_b.checked_mul(c) {
-                return self - product;
+                return self.checked_sub(product);
             }
         }
         let mut a_limbs = self.to_limbs_asc();
         let borrow = match *b {
-            Small(small_b) => mpn_submul_1(&mut a_limbs[..], &[small_b], c),
-            Large(ref b_limbs) => mpn_submul_1(&mut a_limbs[..], b_limbs, c),
+            Small(small_b) => mpn_submul_1(&mut a_limbs, &[small_b], c),
+            Large(ref b_limbs) => mpn_submul_1(&mut a_limbs, b_limbs, c),
         };
         let nonzero_borrow = {
             if a_limb_count == b_limb_count {
                 borrow != 0
             } else {
-                mpn_sub_1_in_place(&mut a_limbs[b_limb_count as usize..], borrow)
+                limbs_sub_limb_in_place(&mut a_limbs[b_limb_count as usize..], borrow)
             }
         };
         if nonzero_borrow {
@@ -176,7 +176,7 @@ pub(crate) fn sub_mul_assign_u32_helper(a: &mut Natural, b: &Natural, c: u32) ->
     }
     if let Small(small_b) = *b {
         if let Some(product) = small_b.checked_mul(c) {
-            return sub_assign_u32_helper(a, product);
+            return a.sub_assign_u32_no_panic(product);
         }
     }
     let a_limb_count = a.limb_count();
@@ -193,7 +193,7 @@ pub(crate) fn sub_mul_assign_u32_helper(a: &mut Natural, b: &Natural, c: u32) ->
         if a_limb_count == b_limb_count {
             borrow != 0
         } else {
-            mpn_sub_1_in_place(&mut a_limbs[b_limb_count as usize..], borrow)
+            limbs_sub_limb_in_place(&mut a_limbs[b_limb_count as usize..], borrow)
         }
     };
     if !nonzero_borrow {

@@ -4,6 +4,7 @@ pub mod add;
 pub mod add_mul;
 pub mod add_mul_u32;
 pub mod add_u32;
+pub mod checked_sub_u32;
 pub mod divisible_by_power_of_two;
 pub mod is_power_of_two;
 pub mod log_two;
@@ -26,6 +27,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     add_u32::register(registry);
     add_mul::register(registry);
     add_mul_u32::register(registry);
+    checked_sub_u32::register(registry);
     divisible_by_power_of_two::register(registry);
     is_power_of_two::register(registry);
     log_two::register(registry);

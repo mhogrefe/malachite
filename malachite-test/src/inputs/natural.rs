@@ -1,4 +1,5 @@
 use common::{natural_to_biguint, natural_to_rug_integer, GenerationMode};
+use inputs::base::pairs_of_unsigneds;
 use inputs::common::{reshape_1_2_to_3, reshape_2_1_to_3};
 use malachite_base::num::{PrimitiveInteger, PrimitiveSigned, PrimitiveUnsigned, SignificantBits};
 use malachite_base::round::RoundingMode;
@@ -218,6 +219,18 @@ pub fn rm_pairs_of_natural_and_u32_var_1(
     )
 }
 
+pub fn nrm_pairs_of_natural_and_u32_var_1(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = ((BigUint, u32), (rug::Integer, u32), (Natural, u32))>> {
+    Box::new(pairs_of_natural_and_u32_var_1(gm).map(|(x, y)| {
+        (
+            (natural_to_biguint(&x), y),
+            (natural_to_rug_integer(&x), y),
+            (x, y),
+        )
+    }))
+}
+
 pub fn pairs_of_unsigned_and_natural<T: 'static + PrimitiveUnsigned>(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (T, Natural)>> {
@@ -240,6 +253,23 @@ pub fn rm_pairs_of_unsigned_and_natural<T: 'static + PrimitiveUnsigned>(
 ) -> Box<Iterator<Item = ((T, rug::Integer), (T, Natural))>> {
     Box::new(
         pairs_of_unsigned_and_natural(gm).map(|(x, y)| ((x, natural_to_rug_integer(&y)), (x, y))),
+    )
+}
+
+// All pairs of `u32` and `Natural` where the `u32` is greater than or equal to the `Natural`.
+pub fn pairs_of_u32_and_natural_var_1(gm: GenerationMode) -> Box<Iterator<Item = (u32, Natural)>> {
+    Box::new(
+        pairs_of_unsigneds(gm)
+            .filter(|(x, y)| x >= y)
+            .map(|(x, y)| (x, Natural::from(y))),
+    )
+}
+
+pub fn rm_pairs_of_u32_and_natural_var_1(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = ((u32, rug::Integer), (u32, Natural))>> {
+    Box::new(
+        pairs_of_u32_and_natural_var_1(gm).map(|(x, y)| ((x, natural_to_rug_integer(&y)), (x, y))),
     )
 }
 

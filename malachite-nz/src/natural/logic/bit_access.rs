@@ -110,8 +110,6 @@ pub fn limbs_clear_bit(limbs: &mut [u32], index: u64) {
     let limb_index = (index >> u32::LOG_WIDTH) as usize;
     if limb_index < limbs.len() {
         limbs[limb_index].clear_bit(index & u64::from(u32::WIDTH_MASK));
-    } else {
-        return;
     }
 }
 

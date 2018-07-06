@@ -27,7 +27,7 @@ fn limbs_pad_left_properties() {
             assert_eq!(mut_limbs == *limbs, pad_size == 0);
             assert_eq!(mut_limbs.len(), limbs.len() + pad_size);
             assert!(mut_limbs[..pad_size].iter().all(|&limb| limb == pad_limb));
-            assert_eq!(&mut_limbs[pad_size..], &limbs[..]);
+            assert_eq!(&mut_limbs[pad_size..], limbs.as_slice());
             limbs_delete_left(&mut mut_limbs, pad_size);
             assert_eq!(mut_limbs, *limbs);
         },

@@ -3,7 +3,9 @@ use malachite_base::num::WrappingNegAssign;
 use natural::arithmetic::add_u32::{
     limbs_add_limb, limbs_add_limb_to_out, limbs_slice_add_limb_in_place,
 };
-use natural::arithmetic::sub_u32::{mpn_sub_1, mpn_sub_1_in_place, mpn_sub_1_to_out};
+use natural::arithmetic::sub_u32::{
+    limbs_sub_limb, limbs_sub_limb_in_place, limbs_sub_limb_to_out,
+};
 use natural::Natural::{self, Large, Small};
 use std::ops::{BitXor, BitXorAssign};
 use std::u32;
@@ -43,7 +45,7 @@ pub fn limbs_neg_xor_limb(limbs: &[u32], limb: u32) -> Vec<u32> {
         }
     } else {
         result_limbs.push(limb.wrapping_neg());
-        result_limbs.extend_from_slice(&mpn_sub_1(tail, 1).0);
+        result_limbs.extend_from_slice(&limbs_sub_limb(tail, 1).0);
     }
     result_limbs
 }
@@ -94,7 +96,7 @@ pub fn limbs_neg_xor_limb_to_out(out_limbs: &mut [u32], in_limbs: &[u32], limb: 
         }
     } else {
         out_limbs[0] = limb.wrapping_neg();
-        mpn_sub_1_to_out(&mut out_limbs[1..len], tail, 1);
+        limbs_sub_limb_to_out(&mut out_limbs[1..len], tail, 1);
         false
     }
 }
@@ -137,7 +139,7 @@ pub fn limbs_slice_neg_xor_limb_in_place(limbs: &mut [u32], limb: u32) -> bool {
         }
     } else {
         *head = limb.wrapping_neg();
-        mpn_sub_1_in_place(tail, 1);
+        limbs_sub_limb_in_place(tail, 1);
         false
     }
 }

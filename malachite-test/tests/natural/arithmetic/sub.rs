@@ -139,10 +139,10 @@ fn sub_properties() {
 
     #[allow(unknown_lints, identity_op, eq_op)]
     test_properties(naturals, |x| {
-        assert_eq!((x - 0).unwrap(), *x);
+        assert_eq!((x - &Natural::ZERO).unwrap(), *x);
         assert_eq!((x - x).unwrap(), Natural::ZERO);
         if *x != 0 {
-            assert!((0 - x).is_none());
+            assert!((Natural::ZERO - x).is_none());
         }
     });
 }

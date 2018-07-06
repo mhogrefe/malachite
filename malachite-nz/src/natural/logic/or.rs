@@ -268,7 +268,7 @@ pub fn limbs_or_in_place_either(xs: &mut Vec<u32>, ys: &mut Vec<u32>) -> bool {
 /// use malachite_nz::natural::Natural;
 ///
 /// assert_eq!((Natural::from(123u32) | Natural::from(456u32)).to_string(), "507");
-/// assert_eq!((Natural::trillion() | (Natural::trillion() - 1).unwrap()).to_string(),
+/// assert_eq!((Natural::trillion() | (Natural::trillion() - 1)).to_string(),
 ///     "1000000004095");
 /// ```
 impl BitOr<Natural> for Natural {
@@ -294,7 +294,7 @@ impl BitOr<Natural> for Natural {
 /// use malachite_nz::natural::Natural;
 ///
 /// assert_eq!((Natural::from(123u32) | &Natural::from(456u32)).to_string(), "507");
-/// assert_eq!((Natural::trillion() | &(Natural::trillion() - 1).unwrap()).to_string(),
+/// assert_eq!((Natural::trillion() | &(Natural::trillion() - 1)).to_string(),
 ///     "1000000004095");
 /// ```
 impl<'a> BitOr<&'a Natural> for Natural {
@@ -320,7 +320,7 @@ impl<'a> BitOr<&'a Natural> for Natural {
 /// use malachite_nz::natural::Natural;
 ///
 /// assert_eq!((&Natural::from(123u32) | Natural::from(456u32)).to_string(), "507");
-/// assert_eq!((&Natural::trillion() | (Natural::trillion() - 1).unwrap()).to_string(),
+/// assert_eq!((&Natural::trillion() | (Natural::trillion() - 1)).to_string(),
 ///     "1000000004095");
 /// ```
 impl<'a> BitOr<Natural> for &'a Natural {
@@ -345,7 +345,7 @@ impl<'a> BitOr<Natural> for &'a Natural {
 /// use malachite_nz::natural::Natural;
 ///
 /// assert_eq!((&Natural::from(123u32) | &Natural::from(456u32)).to_string(), "507");
-/// assert_eq!((&Natural::trillion() | &(Natural::trillion() - 1).unwrap()).to_string(),
+/// assert_eq!((&Natural::trillion() | &(Natural::trillion() - 1)).to_string(),
 ///     "1000000004095");
 /// ```
 impl<'a, 'b> BitOr<&'a Natural> for &'b Natural {

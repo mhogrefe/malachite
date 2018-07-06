@@ -262,7 +262,7 @@ fn add_u32_properties() {
 
             assert!(sum >= *n);
             assert!(sum >= u);
-            assert_eq!((&sum - u).as_ref(), Some(n));
+            assert_eq!(&sum - u, *n);
             assert_eq!(sum - n, Some(Natural::from(u)));
         },
     );

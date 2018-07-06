@@ -1,5 +1,5 @@
-use malachite_base::num::Zero;
-use natural::arithmetic::sub_u32::{mpn_sub_1_in_place, mpn_sub_1_to_out, sub_assign_u32_helper};
+use malachite_base::num::{CheckedSub, Zero};
+use natural::arithmetic::sub_u32::{limbs_sub_limb_in_place, limbs_sub_limb_to_out};
 use natural::Natural::{self, Large, Small};
 use std::ops::{Sub, SubAssign};
 
@@ -71,7 +71,7 @@ pub fn mpn_sub_to_out(r: &mut [u32], s1: &[u32], s2: &[u32]) -> bool {
     if s1_len == s2_len {
         borrow
     } else if borrow {
-        mpn_sub_1_to_out(&mut r[s2_len..], &s1[s2_len..], 1)
+        limbs_sub_limb_to_out(&mut r[s2_len..], &s1[s2_len..], 1)
     } else {
         r[s2_len..s1_len].copy_from_slice(&s1[s2_len..]);
         false
@@ -88,7 +88,7 @@ pub fn mpn_sub_in_place_left(s1: &mut [u32], s2: &[u32]) -> bool {
     if s1_len == s2_len {
         borrow
     } else if borrow {
-        mpn_sub_1_in_place(&mut s1[s2_len..], 1)
+        limbs_sub_limb_in_place(&mut s1[s2_len..], 1)
     } else {
         false
     }
@@ -110,7 +110,7 @@ pub fn mpn_sub_aba(a: &mut [u32], b: &[u32], len: usize) -> bool {
     if s1_len == len {
         borrow
     } else if borrow {
-        mpn_sub_1_to_out(&mut a[len..], &b[len..], 1)
+        limbs_sub_limb_to_out(&mut a[len..], &b[len..], 1)
     } else {
         a[len..s1_len].copy_from_slice(&b[len..]);
         false
@@ -127,7 +127,7 @@ fn sub_assign_helper<'a>(x: &mut Natural, y: &'a Natural) -> bool {
     } else if x.limb_count() < y.limb_count() {
         true
     } else if let Small(y) = *y {
-        sub_assign_u32_helper(x, y)
+        x.sub_assign_u32_no_panic(y)
     } else {
         match (&mut (*x), y) {
             (&mut Large(ref mut xs), &Large(ref ys)) => {
@@ -212,7 +212,7 @@ impl<'a, 'b> Sub<&'a Natural> for &'b Natural {
         } else {
             match (self, other) {
                 (x, &Small(0)) => Some(x.clone()),
-                (x, &Small(y)) => x - y,
+                (x, &Small(y)) => x.checked_sub(y),
                 (&Small(_), _) => None,
                 (&Large(ref xs), &Large(ref ys)) => {
                     let xs_len = xs.len();

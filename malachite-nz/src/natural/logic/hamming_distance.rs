@@ -89,7 +89,7 @@ impl<'a, 'b> HammingDistance<&'a Natural> for &'b Natural {
     ///     // 105 = 1101001b, 123 = 1111011
     ///     assert_eq!(Natural::from(105u32).hamming_distance(&Natural::from(123u32)), 2);
     ///     let n = Natural::ONE << 100u32;
-    ///     assert_eq!(n.hamming_distance(&(&n - 1).unwrap()), 101);
+    ///     assert_eq!(n.hamming_distance(&(&n - 1)), 101);
     /// }
     /// ```
     fn hamming_distance(self, other: &'a Natural) -> u64 {

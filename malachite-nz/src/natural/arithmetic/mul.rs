@@ -10,7 +10,7 @@ use natural::arithmetic::mul_u32::mpn_mul_1;
 use natural::arithmetic::shl_u32::{mpn_lshift, mpn_lshift_in_place};
 use natural::arithmetic::shr_u32::mpn_rshift_in_place;
 use natural::arithmetic::sub::{mpn_sub_n, mpn_sub_n_aba, mpn_sub_n_in_place, mpn_sub_to_out};
-use natural::arithmetic::sub_u32::mpn_sub_1_in_place;
+use natural::arithmetic::sub_u32::limbs_sub_limb_in_place;
 use natural::comparison::ord::limbs_cmp_same_length;
 use natural::Natural::{self, Large, Small};
 use std::cmp::Ordering;
@@ -124,19 +124,19 @@ pub fn mpn_mul_n(p: &mut [u32], a: &[u32], b: &[u32]) {
     } else if n < MUL_TOOM33_THRESHOLD {
         let mut ws = vec![0; mpn_toom22_mul_itch(MUL_TOOM33_THRESHOLD_LIMIT - 1)];
         assert!(MUL_TOOM33_THRESHOLD <= MUL_TOOM33_THRESHOLD_LIMIT);
-        mpn_toom22_mul(p, a, b, &mut ws[..]);
+        mpn_toom22_mul(p, a, b, &mut ws);
     } else if n < MUL_TOOM44_THRESHOLD {
         let mut ws = vec![0; mpn_toom33_mul_itch(n)];
-        mpn_toom33_mul(p, a, b, &mut ws[..]);
+        mpn_toom33_mul(p, a, b, &mut ws);
     } else if n < MUL_TOOM6H_THRESHOLD {
         let mut ws = vec![0; mpn_toom44_mul_itch(n)];
-        mpn_toom44_mul(p, a, b, &mut ws[..]);
+        mpn_toom44_mul(p, a, b, &mut ws);
     } else if n < MUL_TOOM8H_THRESHOLD {
         let mut ws = vec![0; mpn_toom6_mul_n_itch(n)];
-        mpn_toom6h_mul(p, a, b, &mut ws[..]);
+        mpn_toom6h_mul(p, a, b, &mut ws);
     } else {
         let mut ws = vec![0; mpn_toom8_mul_n_itch(n)];
-        mpn_toom8h_mul(p, a, b, &mut ws[..]);
+        mpn_toom8h_mul(p, a, b, &mut ws);
     }
 }
 
@@ -193,18 +193,18 @@ fn mpn_toom22_mul(p: &mut [u32], a: &[u32], b: &[u32], scratch: &mut [u32]) {
     // Compute asm1.
     if s == n {
         if limbs_cmp_same_length(&a[..n], &a[n..2 * n]) == Ordering::Less {
-            mpn_sub_n(&mut p[..], &a[n..2 * n], &a[..n]);
+            mpn_sub_n(p, &a[n..2 * n], &a[..n]);
             vm1_neg = true;
         } else {
-            mpn_sub_n(&mut p[..], &a[..n], &a[n..2 * n]);
+            mpn_sub_n(p, &a[..n], &a[n..2 * n]);
         }
     } else if a[s] == 0 && limbs_cmp_same_length(&a[..s], &a[n..n + s]) == Ordering::Less {
         // n - s == 1
-        mpn_sub_n(&mut p[..], &a[n..n + s], &a[..s]);
+        mpn_sub_n(p, &a[n..n + s], &a[..s]);
         p[s] = 0;
         vm1_neg = true;
     } else {
-        p[s] = a[s] - if mpn_sub_n(&mut p[..], &a[..s], &a[n..n + s]) {
+        p[s] = a[s] - if mpn_sub_n(p, &a[..s], &a[n..n + s]) {
             1
         } else {
             0
@@ -298,7 +298,7 @@ fn mpn_toom22_mul(p: &mut [u32], a: &[u32], b: &[u32], scratch: &mut [u32]) {
         // if s+t==n, cy is zero, but we should not access pp[3*n] at all.
         limbs_slice_add_limb_in_place(&mut p[3 * n..2 * n + s + t], cy);
     } else {
-        mpn_sub_1_in_place(&mut p[3 * n..2 * n + s + t], 1);
+        limbs_sub_limb_in_place(&mut p[3 * n..2 * n + s + t], 1);
     }
 }
 
@@ -488,7 +488,7 @@ fn mpn_toom_interpolate_5pts(
     } else {
         0
     };
-    mpn_sub_1_in_place(&mut v2[twor..kk1], cy);
+    limbs_sub_limb_in_place(&mut v2[twor..kk1], cy);
 
     // Current matrix is
     // [1 0 0 0 0; vinf
@@ -542,7 +542,7 @@ fn mpn_toom_interpolate_5pts(
     };
     vinf0 = c[4 * k]; // Save again the right value for vinf0
     c[4 * k] = saved;
-    mpn_sub_1_in_place(&mut c[2 * k + twor..2 * k + kk1], cy); // Treat the last bytes.
+    limbs_sub_limb_in_place(&mut c[2 * k + twor..2 * k + kk1], cy); // Treat the last bytes.
 
     // (8) vm1 <- vm1-v2          (0 1 0 1 0) - (0 1 0 0 0) = (0 0 0 1 0)
     // Operate only on the low half.
@@ -552,7 +552,7 @@ fn mpn_toom_interpolate_5pts(
     } else {
         0
     };
-    mpn_sub_1_in_place(&mut c[2 * k..2 * k + kk1], cy);
+    limbs_sub_limb_in_place(&mut c[2 * k..2 * k + kk1], cy);
 
     //********************* Beginning the final phase **********************
 
@@ -889,7 +889,7 @@ pub fn mpn_mul_unfinished(prod: &mut [u32], u: &[u32], v: &[u32]) -> u32 {
             // The maximum ws usage is for the mpn_mul result.
             let mut ws = vec![0; 4 * vn];
 
-            mpn_toom42_mul(prod, &u[..2 * vn], v, &mut scratch[..]);
+            mpn_toom42_mul(prod, &u[..2 * vn], v, &mut scratch);
             un -= 2 * vn;
             let mut u_offset = 0;
             let mut prod_offset = 0;
@@ -897,12 +897,7 @@ pub fn mpn_mul_unfinished(prod: &mut [u32], u: &[u32], v: &[u32]) -> u32 {
             prod_offset += 2 * vn;
 
             while un >= 3 * vn {
-                mpn_toom42_mul(
-                    &mut ws[..],
-                    &u[u_offset..u_offset + 2 * vn],
-                    v,
-                    &mut scratch[..],
-                );
+                mpn_toom42_mul(&mut ws, &u[u_offset..u_offset + 2 * vn], v, &mut scratch);
                 un -= 2 * vn;
                 u_offset += 2 * vn;
                 let cy = limbs_slice_add_same_length_in_place_left(
@@ -919,26 +914,11 @@ pub fn mpn_mul_unfinished(prod: &mut [u32], u: &[u32], v: &[u32]) -> u32 {
             // vn <= un < 3vn
 
             if 4 * un < 5 * vn {
-                mpn_toom22_mul(
-                    &mut ws[..],
-                    &u[u_offset..u_offset + un],
-                    v,
-                    &mut scratch[..],
-                );
+                mpn_toom22_mul(&mut ws, &u[u_offset..u_offset + un], v, &mut scratch);
             } else if 4 * un < 7 * vn {
-                mpn_toom32_mul(
-                    &mut ws[..],
-                    &u[u_offset..u_offset + un],
-                    v,
-                    &mut scratch[..],
-                );
+                mpn_toom32_mul(&mut ws, &u[u_offset..u_offset + un], v, &mut scratch);
             } else {
-                mpn_toom42_mul(
-                    &mut ws[..],
-                    &u[u_offset..u_offset + un],
-                    v,
-                    &mut scratch[..],
-                );
+                mpn_toom42_mul(&mut ws, &u[u_offset..u_offset + un], v, &mut scratch);
             }
 
             let cy = limbs_slice_add_same_length_in_place_left(
@@ -953,11 +933,11 @@ pub fn mpn_mul_unfinished(prod: &mut [u32], u: &[u32], v: &[u32]) -> u32 {
                 );
             }
         } else if 4 * un < 5 * vn {
-            mpn_toom22_mul(prod, u, v, &mut scratch[..]);
+            mpn_toom22_mul(prod, u, v, &mut scratch);
         } else if 4 * un < 7 * vn {
-            mpn_toom32_mul(prod, u, v, &mut scratch[..]);
+            mpn_toom32_mul(prod, u, v, &mut scratch);
         } else {
-            mpn_toom42_mul(prod, u, v, &mut scratch[..]);
+            mpn_toom42_mul(prod, u, v, &mut scratch);
         }
     // Handle the largest operands that are not in the FFT range.  The 2nd
     // condition makes very unbalanced operands avoid the FFT code (except
@@ -982,9 +962,9 @@ pub fn mpn_mul_unfinished(prod: &mut [u32], u: &[u32], v: &[u32]) -> u32 {
             let mut ws = vec![0; (7 * vn) >> 1];
 
             if vn < MUL_TOOM42_TO_TOOM63_THRESHOLD {
-                mpn_toom42_mul(prod, &u[..2 * vn], v, &mut scratch[..]);
+                mpn_toom42_mul(prod, &u[..2 * vn], v, &mut scratch);
             } else {
-                mpn_toom63_mul(prod, &u[..2 * vn], v, &mut scratch[..]);
+                mpn_toom63_mul(prod, &u[..2 * vn], v, &mut scratch);
             }
             un -= 2 * vn;
             let mut u_offset = 0;
@@ -996,19 +976,9 @@ pub fn mpn_mul_unfinished(prod: &mut [u32], u: &[u32], v: &[u32]) -> u32 {
             // un >= 2.5vn
             {
                 if vn < MUL_TOOM42_TO_TOOM63_THRESHOLD {
-                    mpn_toom42_mul(
-                        &mut ws[..],
-                        &u[u_offset..u_offset + 2 * vn],
-                        v,
-                        &mut scratch[..],
-                    );
+                    mpn_toom42_mul(&mut ws, &u[u_offset..u_offset + 2 * vn], v, &mut scratch);
                 } else {
-                    mpn_toom63_mul(
-                        &mut ws[..],
-                        &u[u_offset..u_offset + 2 * vn],
-                        v,
-                        &mut scratch[..],
-                    );
+                    mpn_toom63_mul(&mut ws, &u[u_offset..u_offset + 2 * vn], v, &mut scratch);
                 }
                 un -= 2 * vn;
                 u_offset += 2 * vn;
@@ -1024,9 +994,9 @@ pub fn mpn_mul_unfinished(prod: &mut [u32], u: &[u32], v: &[u32]) -> u32 {
             // vn / 2 <= un < 2.5vn
 
             if un < vn {
-                mpn_mul(&mut ws[..], v, &u[u_offset..u_offset + un]);
+                mpn_mul(&mut ws, v, &u[u_offset..u_offset + un]);
             } else {
-                mpn_mul(&mut ws[..], &u[u_offset..u_offset + un], v);
+                mpn_mul(&mut ws, &u[u_offset..u_offset + un], v);
             }
 
             let cy = limbs_slice_add_same_length_in_place_left(
@@ -1038,39 +1008,39 @@ pub fn mpn_mul_unfinished(prod: &mut [u32], u: &[u32], v: &[u32]) -> u32 {
                 limbs_slice_add_limb_in_place(&mut prod[prod_offset + vn..], 1);
             }
         } else if 6 * un < 7 * vn {
-            mpn_toom33_mul(prod, u, v, &mut scratch[..]);
+            mpn_toom33_mul(prod, u, v, &mut scratch);
         } else if 2 * un < 3 * vn {
             if vn < MUL_TOOM32_TO_TOOM43_THRESHOLD {
-                mpn_toom32_mul(prod, u, v, &mut scratch[..]);
+                mpn_toom32_mul(prod, u, v, &mut scratch);
             } else {
-                mpn_toom43_mul(prod, u, v, &mut scratch[..]);
+                mpn_toom43_mul(prod, u, v, &mut scratch);
             }
         } else if 6 * un < 11 * vn {
             if 4 * un < 7 * vn {
                 if vn < MUL_TOOM32_TO_TOOM53_THRESHOLD {
-                    mpn_toom32_mul(prod, u, v, &mut scratch[..]);
+                    mpn_toom32_mul(prod, u, v, &mut scratch);
                 } else {
-                    mpn_toom53_mul(prod, u, v, &mut scratch[..]);
+                    mpn_toom53_mul(prod, u, v, &mut scratch);
                 }
             } else if vn < MUL_TOOM42_TO_TOOM53_THRESHOLD {
-                mpn_toom42_mul(prod, u, v, &mut scratch[..]);
+                mpn_toom42_mul(prod, u, v, &mut scratch);
             } else {
-                mpn_toom53_mul(prod, u, v, &mut scratch[..]);
+                mpn_toom53_mul(prod, u, v, &mut scratch);
             }
         } else if vn < MUL_TOOM42_TO_TOOM63_THRESHOLD {
-            mpn_toom42_mul(prod, u, v, &mut scratch[..]);
+            mpn_toom42_mul(prod, u, v, &mut scratch);
         } else {
-            mpn_toom63_mul(prod, u, v, &mut scratch[..]);
+            mpn_toom63_mul(prod, u, v, &mut scratch);
         }
     } else if vn < MUL_TOOM6H_THRESHOLD {
         let mut scratch = vec![0; mpn_toom44_mul_itch(un)];
-        mpn_toom44_mul(prod, u, v, &mut scratch[..]);
+        mpn_toom44_mul(prod, u, v, &mut scratch);
     } else if vn < MUL_TOOM8H_THRESHOLD {
         let mut scratch = vec![0; mpn_toom6h_mul_itch(un, vn)];
-        mpn_toom6h_mul(prod, u, v, &mut scratch[..]);
+        mpn_toom6h_mul(prod, u, v, &mut scratch);
     } else {
         let mut scratch = vec![0; mpn_toom8h_mul_itch(un, vn)];
-        mpn_toom8h_mul(prod, u, v, &mut scratch[..]);
+        mpn_toom8h_mul(prod, u, v, &mut scratch);
     }
     prod[un + vn - 1] // historic
 }

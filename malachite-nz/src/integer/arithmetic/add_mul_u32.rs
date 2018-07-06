@@ -5,7 +5,7 @@ use natural::arithmetic::add_mul_u32::mpn_addmul_1;
 use natural::arithmetic::add_u32::limbs_slice_add_limb_in_place;
 use natural::arithmetic::mul_u32::{mpn_mul_1, mpn_mul_1c};
 use natural::arithmetic::sub_mul_u32::mpn_submul_1;
-use natural::arithmetic::sub_u32::mpn_sub_1_in_place;
+use natural::arithmetic::sub_u32::limbs_sub_limb_in_place;
 use natural::logic::not::limbs_not_in_place;
 use natural::Natural::{self, Large, Small};
 use std::cmp::{max, min};
@@ -389,7 +389,7 @@ pub(crate) fn mpz_aorsmul_1(
         if wsize >= xsize {
             // if w bigger than x, then propagate borrow through it
             if wsize != xsize {
-                cy = if mpn_sub_1_in_place(&mut w[xsize..wsize], cy) {
+                cy = if limbs_sub_limb_in_place(&mut w[xsize..wsize], cy) {
                     1
                 } else {
                     0
@@ -432,7 +432,7 @@ pub(crate) fn mpz_aorsmul_1(
             // Apply any -1 from above. The value at wp+wsize is non-zero because y != 0 and the
             // high limb of x will be non-zero.
             if cy2 != 0 {
-                mpn_sub_1_in_place(&mut w[wsize..new_wsize], 1);
+                limbs_sub_limb_in_place(&mut w[wsize..new_wsize], 1);
             }
             if new_wsize != 0 {
                 w_sign.not_assign();

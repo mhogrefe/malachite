@@ -2,7 +2,7 @@ use integer::Integer;
 use malachite_base::limbs::limbs_test_zero;
 use malachite_base::num::{BitAccess, PrimitiveInteger, WrappingNegAssign};
 use natural::arithmetic::add_u32::limbs_slice_add_limb_in_place;
-use natural::arithmetic::sub_u32::mpn_sub_1_in_place;
+use natural::arithmetic::sub_u32::limbs_sub_limb_in_place;
 use natural::Natural::{self, Large, Small};
 
 /// Interpreting a slice of `u32`s as the limbs (in ascending order) of a `Natural`, performs an
@@ -86,7 +86,7 @@ pub fn limbs_set_bit_neg(limbs: &mut [u32], index: u64) {
         // boundary limb != u32::MAX here
         *boundary_limb += 1;
     } else {
-        assert!(!mpn_sub_1_in_place(
+        assert!(!limbs_sub_limb_in_place(
             &mut limbs[limb_index..],
             1 << reduced_index
         ));

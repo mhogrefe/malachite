@@ -3,7 +3,9 @@ use malachite_base::misc::WrappingFrom;
 use natural::arithmetic::add_u32::{
     limbs_add_limb, limbs_add_limb_to_out, limbs_slice_add_limb_in_place,
 };
-use natural::arithmetic::sub_u32::{mpn_sub_1, mpn_sub_1_in_place, mpn_sub_1_to_out};
+use natural::arithmetic::sub_u32::{
+    limbs_sub_limb, limbs_sub_limb_in_place, limbs_sub_limb_to_out,
+};
 use natural::Natural::{self, Large, Small};
 use std::ops::{BitXor, BitXorAssign};
 use std::u32;
@@ -187,7 +189,7 @@ pub fn limbs_vec_pos_xor_limb_neg_in_place(limbs: &mut Vec<u32>, limb: u32) {
 pub fn limbs_neg_xor_limb_neg(limbs: &[u32], limb: u32) -> Vec<u32> {
     let mut result_limbs;
     if limbs[0] == 0 {
-        let (result, carry) = mpn_sub_1(limbs, 1);
+        let (result, carry) = limbs_sub_limb(limbs, 1);
         result_limbs = result;
         assert!(!carry);
         result_limbs[0] = limb;
@@ -231,7 +233,11 @@ pub fn limbs_neg_xor_limb_neg_to_out(out_limbs: &mut [u32], in_limbs: &[u32], li
     assert!(out_limbs.len() >= len);
     if in_limbs[0] == 0 {
         out_limbs[0] = limb;
-        assert!(!mpn_sub_1_to_out(&mut out_limbs[1..len], &in_limbs[1..], 1));
+        assert!(!limbs_sub_limb_to_out(
+            &mut out_limbs[1..len],
+            &in_limbs[1..],
+            1
+        ));
     } else {
         out_limbs[0] = in_limbs[0].wrapping_neg() ^ limb;
         out_limbs[1..len].copy_from_slice(&in_limbs[1..]);
@@ -266,7 +272,7 @@ pub fn limbs_neg_xor_limb_neg_to_out(out_limbs: &mut [u32], in_limbs: &[u32], li
 /// ```
 pub fn limbs_neg_xor_limb_neg_in_place(limbs: &mut [u32], limb: u32) {
     if limbs[0] == 0 {
-        assert!(!mpn_sub_1_in_place(&mut limbs[1..], 1));
+        assert!(!limbs_sub_limb_in_place(&mut limbs[1..], 1));
         limbs[0] = limb;
     } else {
         limbs[0] = limbs[0].wrapping_neg() ^ limb;

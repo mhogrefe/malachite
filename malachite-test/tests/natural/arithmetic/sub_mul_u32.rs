@@ -1,6 +1,6 @@
 use common::test_properties;
+use malachite_base::num::{CheckedSub, SubMul, SubMulAssign};
 use malachite_base::num::{One, Zero};
-use malachite_base::num::{SubMul, SubMulAssign};
 use malachite_nz::natural::Natural;
 use malachite_test::inputs::natural::{
     naturals, pairs_of_natural_and_unsigned, pairs_of_naturals,
@@ -129,7 +129,7 @@ fn sub_mul_u32_properties() {
         pairs_of_natural_and_unsigned,
         |&(ref n, c): &(Natural, u32)| {
             assert_eq!(n.sub_mul(&Natural::ZERO, c).as_ref(), Some(n));
-            assert_eq!(n.sub_mul(&Natural::ONE, c), n - c);
+            assert_eq!(n.sub_mul(&Natural::ONE, c), n.checked_sub(c));
             assert_eq!((n * c).sub_mul(n, c), Some(Natural::ZERO));
         },
     );

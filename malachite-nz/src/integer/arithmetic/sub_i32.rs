@@ -78,7 +78,7 @@ impl<'a> Sub<i32> for &'a Integer {
             // e.g. 10 - 5, -10 - -5, or 5 - 5; sign of self is unchanged
             Integer { sign, ref abs } if sign && *abs == abs_other || *abs > abs_other => Integer {
                 sign,
-                abs: (abs - abs_other).unwrap(),
+                abs: abs - abs_other,
             },
             // e.g. 5 - 10, -5 - -10, or -5 - -5; sign of self is flipped
             Integer { ref sign, ref abs } => Integer {

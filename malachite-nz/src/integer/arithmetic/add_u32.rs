@@ -84,7 +84,7 @@ impl<'a> Add<u32> for &'a Integer {
             {
                 Integer {
                     sign: false,
-                    abs: (abs - other).unwrap(),
+                    abs: abs - other,
                 }
             }
             // e.g. -5 + 10 or -5 + 5; self becomes non-negative

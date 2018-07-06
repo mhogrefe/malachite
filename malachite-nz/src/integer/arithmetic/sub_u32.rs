@@ -73,7 +73,7 @@ impl<'a> Sub<u32> for &'a Integer {
             {
                 Integer {
                     sign: true,
-                    abs: (abs - other).unwrap(),
+                    abs: abs - other,
                 }
             }
             // e.g. 5 - 10; self becomes negative

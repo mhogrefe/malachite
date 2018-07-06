@@ -3,7 +3,7 @@ use inputs::base::{vecs_of_u32_var_1, vecs_of_unsigned};
 use inputs::integer::{integers, pairs_of_integer_and_small_usize};
 use malachite_base::num::{SignificantBits, WrappingNegAssign};
 use malachite_nz::integer::conversion::to_twos_complement_limbs::*;
-use malachite_nz::natural::arithmetic::sub_u32::mpn_sub_1_in_place;
+use malachite_nz::natural::arithmetic::sub_u32::limbs_sub_limb_in_place;
 use malachite_nz::natural::logic::not::limbs_not_in_place;
 use std::u32;
 
@@ -22,7 +22,7 @@ pub fn limbs_slice_to_twos_complement_limbs_negative_alt_1(limbs: &mut [u32]) ->
 }
 
 pub fn limbs_slice_to_twos_complement_limbs_negative_alt_2(limbs: &mut [u32]) -> bool {
-    let carry = mpn_sub_1_in_place(limbs, 1);
+    let carry = limbs_sub_limb_in_place(limbs, 1);
     limbs_not_in_place(limbs);
     carry
 }

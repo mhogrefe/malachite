@@ -44,8 +44,11 @@ impl Natural {
 
     pub(crate) fn trim(&mut self) {
         if let Large(ref mut limbs) = *self {
-            let significant_length = limbs.len() - limbs_trailing_zero_limbs(limbs);
-            limbs.truncate(significant_length);
+            let trailing_zero_count = limbs_trailing_zero_limbs(limbs);
+            if trailing_zero_count != 0 {
+                let len = limbs.len();
+                limbs.truncate(len - trailing_zero_count);
+            }
         }
         self.demote_if_small();
     }

@@ -1,86 +1,137 @@
-use malachite_base::misc::CheckedFrom;
-use natural::Natural::{self, Large, Small};
+use malachite_base::num::CheckedSub;
+use natural::Natural;
+use std::fmt::Display;
 use std::ops::{Sub, SubAssign};
 
-pub fn mpn_sub_1(s1: &[u32], mut s2limb: u32) -> (Vec<u32>, bool) {
-    let s1_len = s1.len();
-    let mut result_limbs = Vec::with_capacity(s1_len);
-    for i in 0..s1_len {
-        let (difference, overflow) = s1[i].overflowing_sub(s2limb);
+/// Interpreting a slice of `u32`s as the limbs (in ascending order) of a `Natural`, subtracts the
+/// `u32` from the `Natural`. Returns a pair consisting of the limbs of the result, and whether
+/// there was a borrow left over; that is, whether the `u32` was greater than the `Natural`.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(n)
+///
+/// where n = `limbs.len()`
+///
+/// # Example
+/// ```
+/// use malachite_nz::natural::arithmetic::sub_u32::limbs_sub_limb;
+///
+/// assert_eq!(limbs_sub_limb(&[123, 456], 78), (vec![45, 456], false));
+/// assert_eq!(limbs_sub_limb(&[123, 456], 789), (vec![4_294_966_630, 455], false));
+/// assert_eq!(limbs_sub_limb(&[1], 2), (vec![4_294_967_295], true));
+/// ```
+pub fn limbs_sub_limb(limbs: &[u32], mut limb: u32) -> (Vec<u32>, bool) {
+    let len = limbs.len();
+    let mut result_limbs = Vec::with_capacity(len);
+    for i in 0..len {
+        let (difference, overflow) = limbs[i].overflowing_sub(limb);
         result_limbs.push(difference);
         if overflow {
-            s2limb = 1;
+            limb = 1;
         } else {
-            s2limb = 0;
-            result_limbs.extend_from_slice(&s1[i + 1..]);
+            limb = 0;
+            result_limbs.extend_from_slice(&limbs[i + 1..]);
             break;
         }
     }
-    (result_limbs, s2limb != 0)
+    (result_limbs, limb != 0)
 }
 
-// Subtract s2limb from s1, and write the s1.len() least significant limbs of the result to r.
-// Return borrow. r must have size at least s1.len().
-pub fn mpn_sub_1_to_out(r: &mut [u32], s1: &[u32], mut s2limb: u32) -> bool {
-    let s1_len = s1.len();
-    assert!(r.len() >= s1_len);
-    for i in 0..s1_len {
-        let (difference, overflow) = s1[i].overflowing_sub(s2limb);
-        r[i] = difference;
+/// Interpreting a slice of `u32`s as the limbs (in ascending order) of a `Natural`, subtracts the
+/// `u32` from the `Natural`, writing the `in_limbs.len()` limbs of the result to an output slice.
+/// Returns whether there was a borrow left over; that is, whether the `u32` was greater than the
+/// `Natural`. The output slice must be at least as long as the input slice.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = `limbs.len()`
+///
+/// # Panics
+/// Panics if `out_limbs` is shorter than `in_limbs`.
+///
+/// # Example
+/// ```
+/// use malachite_nz::natural::arithmetic::sub_u32::limbs_sub_limb_to_out;
+///
+/// let mut out_limbs = vec![0, 0, 0];
+/// assert_eq!(limbs_sub_limb_to_out(&mut out_limbs, &[123, 456], 78), false);
+/// assert_eq!(out_limbs, &[45, 456, 0]);
+///
+/// let mut out_limbs = vec![0, 0, 0];
+/// assert_eq!(limbs_sub_limb_to_out(&mut out_limbs, &[123, 456], 789), false);
+/// assert_eq!(out_limbs, &[4_294_966_630, 455, 0]);
+///
+/// let mut out_limbs = vec![0, 0, 0];
+/// assert_eq!(limbs_sub_limb_to_out(&mut out_limbs, &[1], 2), true);
+/// assert_eq!(out_limbs, &[4_294_967_295, 0, 0]);
+/// ```
+pub fn limbs_sub_limb_to_out(out_limbs: &mut [u32], in_limbs: &[u32], mut limb: u32) -> bool {
+    let len = in_limbs.len();
+    assert!(out_limbs.len() >= len);
+    for i in 0..len {
+        let (difference, overflow) = in_limbs[i].overflowing_sub(limb);
+        out_limbs[i] = difference;
         if overflow {
-            s2limb = 1;
+            limb = 1;
         } else {
-            s2limb = 0;
+            limb = 0;
             let copy_index = i + 1;
-            r[copy_index..s1_len].copy_from_slice(&s1[copy_index..]);
+            out_limbs[copy_index..len].copy_from_slice(&in_limbs[copy_index..]);
             break;
         }
     }
-    s2limb != 0
+    limb != 0
 }
 
-// Subtract s2limb from s1, and write the s1.len() least significant limbs of the result to s1.
-// Return borrow.
-pub fn mpn_sub_1_in_place(s1: &mut [u32], mut s2limb: u32) -> bool {
-    for limb in s1.iter_mut() {
-        let (difference, overflow) = limb.overflowing_sub(s2limb);
-        *limb = difference;
+/// Interpreting a slice of `u32`s as the limbs (in ascending order) of a `Natural`, subtracts the
+/// `u32` from the `Natural` and writes the limbs of the result to the input slice. Returns whether
+/// there was a borrow left over; that is, whether the `u32` was greater than the `Natural`.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(1)
+///
+/// # Example
+/// ```
+/// use malachite_nz::natural::arithmetic::sub_u32::limbs_sub_limb_in_place;
+///
+/// let mut limbs = vec![123, 456];
+/// assert_eq!(limbs_sub_limb_in_place(&mut limbs, 78), false);
+/// assert_eq!(limbs, &[45, 456]);
+///
+/// let mut limbs = vec![123, 456];
+/// assert_eq!(limbs_sub_limb_in_place(&mut limbs, 789), false);
+/// assert_eq!(limbs, &[4_294_966_630, 455]);
+///
+/// let mut limbs = vec![1];
+/// assert_eq!(limbs_sub_limb_in_place(&mut limbs, 2), true);
+/// assert_eq!(limbs, &[4_294_967_295]);
+/// ```
+pub fn limbs_sub_limb_in_place(limbs: &mut [u32], mut limb: u32) -> bool {
+    for x in limbs.iter_mut() {
+        let (difference, overflow) = x.overflowing_sub(limb);
+        *x = difference;
         if overflow {
-            s2limb = 1;
+            limb = 1;
         } else {
             return false;
         }
     }
-    true
+    limb != 0
 }
 
-// x -= y, return borrow
-pub(crate) fn sub_assign_u32_helper(x: &mut Natural, y: u32) -> bool {
-    if y == 0 {
-        return false;
-    }
-    match *x {
-        Small(ref mut small) => {
-            return match small.checked_sub(y) {
-                Some(difference) => {
-                    *small = difference;
-                    false
-                }
-                None => true,
-            }
-        }
-        Large(ref mut limbs) => {
-            if mpn_sub_1_in_place(&mut limbs[..], y) {
-                return true;
-            }
-        }
-    }
-    x.trim();
-    false
+fn sub_panic<S: Display, T: Display>(x: S, y: T) {
+    panic!(
+        "Cannot subtract a u32 from a smaller Natural. self: {}, other: {}",
+        x, y
+    );
 }
 
-/// Subtracts a `u32` from a `Natural`, taking the `Natural` by value. If the `u32` is greater than
-/// the `Natural`, returns `None`.
+/// Subtracts a `u32` from a `Natural`, taking the `Natural` by value. Panics if the `u32` is
+/// greater than the `Natural`.
 ///
 /// Time: worst case O(n)
 ///
@@ -88,30 +139,29 @@ pub(crate) fn sub_assign_u32_helper(x: &mut Natural, y: u32) -> bool {
 ///
 /// where n = `self.significant_bits()`
 ///
+/// # Panics
+/// Panics if `other` is greater than `self`.
+///
 /// # Examples
 /// ```
 /// use malachite_nz::natural::Natural;
 ///
-/// assert_eq!(format!("{:?}", Natural::from(123u32) - 123), "Some(0)");
-/// assert_eq!(format!("{:?}", Natural::from(123u32) - 0), "Some(123)");
-/// assert_eq!(format!("{:?}", Natural::from(456u32) - 123), "Some(333)");
-/// assert_eq!(format!("{:?}", Natural::from(123u32) - 456), "None");
-/// assert_eq!(format!("{:?}", Natural::trillion() - 123), "Some(999999999877)");
+/// assert_eq!((Natural::from(123u32) - 123).to_string(), "0");
+/// assert_eq!((Natural::from(123u32) - 0).to_string(), "123");
+/// assert_eq!((Natural::from(456u32) - 123).to_string(), "333");
+/// assert_eq!((Natural::trillion() - 123).to_string(), "999999999877");
 /// ```
 impl Sub<u32> for Natural {
-    type Output = Option<Natural>;
+    type Output = Natural;
 
-    fn sub(mut self, other: u32) -> Option<Natural> {
-        if sub_assign_u32_helper(&mut self, other) {
-            None
-        } else {
-            Some(self)
-        }
+    fn sub(self, other: u32) -> Natural {
+        self.checked_sub(other)
+            .expect("Cannot subtract a u32 from a smaller Natural")
     }
 }
 
-/// Subtracts a `u32` from a `Natural`, taking the `Natural` by reference. If the `u32` is greater
-/// than the `Natural`, returns `None`.
+/// Subtracts a `u32` from a `Natural`, taking the `Natural` by reference. Panics if the `u32` is
+/// greater than the `Natural`.
 ///
 /// Time: worst case O(n)
 ///
@@ -119,42 +169,40 @@ impl Sub<u32> for Natural {
 ///
 /// where n = `self.significant_bits()`
 ///
+/// # Panics
+/// Panics if `other` is greater than `self`.
+///
 /// # Examples
 /// ```
 /// use malachite_nz::natural::Natural;
 ///
-/// assert_eq!(format!("{:?}", &Natural::from(123u32) - 123), "Some(0)");
-/// assert_eq!(format!("{:?}", &Natural::from(123u32) - 0), "Some(123)");
-/// assert_eq!(format!("{:?}", &Natural::from(456u32) - 123), "Some(333)");
-/// assert_eq!(format!("{:?}", &Natural::from(123u32) - 456), "None");
-/// assert_eq!(format!("{:?}", &Natural::trillion() - 123), "Some(999999999877)");
+/// assert_eq!((&Natural::from(123u32) - 123).to_string(), "0");
+/// assert_eq!((&Natural::from(123u32) - 0).to_string(), "123");
+/// assert_eq!((&Natural::from(456u32) - 123).to_string(), "333");
+/// assert_eq!((&Natural::trillion() - 123).to_string(), "999999999877");
 /// ```
 impl<'a> Sub<u32> for &'a Natural {
-    type Output = Option<Natural>;
+    type Output = Natural;
 
-    fn sub(self, other: u32) -> Option<Natural> {
-        if other == 0 {
-            return Some(self.clone());
-        }
-        match *self {
-            Small(small) => small.checked_sub(other).map(Small),
-            Large(ref limbs) => {
-                let mut difference_limbs = vec![0; limbs.len()];
-                if mpn_sub_1_to_out(&mut difference_limbs, limbs, other) {
-                    None
-                } else {
-                    let mut difference = Large(difference_limbs);
-                    difference.trim();
-                    Some(difference)
-                }
-            }
-        }
+    fn sub(self, other: u32) -> Natural {
+        self.checked_sub(other).unwrap_or_else(|| {
+            sub_panic(self, other);
+            unreachable!();
+        })
     }
 }
 
-/// Subtracts a `Natural` from a `u32`, taking the `Natural` by reference. If the `Natural` is
-/// greater than the `u32`, returns `None`.
+/// Subtracts a `Natural` from a `u32`, taking the `Natural` by reference. Panics if the `Natural`
+/// is greater than the `u32`.
 ///
+/// Time: worst case O(1)
+///
+/// Additional memory: worst case O(1)
+///
+/// # Panics
+/// Panics if `other` is greater than `self`.
+///
+/// # Examples
 /// ```
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
@@ -163,20 +211,19 @@ impl<'a> Sub<u32> for &'a Natural {
 /// use malachite_nz::natural::Natural;
 ///
 /// fn main() {
-///     assert_eq!(format!("{:?}", 123 - &Natural::from(123u32)), "Some(0)");
-///     assert_eq!(format!("{:?}", 123 - &Natural::ZERO), "Some(123)");
-///     assert_eq!(format!("{:?}", 456 - &Natural::from(123u32)), "Some(333)");
-///     assert_eq!(format!("{:?}", 123 - &Natural::from(456u32)), "None");
-///     assert_eq!(format!("{:?}", 123 - &Natural::trillion()), "None");
+///     assert_eq!(123 - &Natural::from(123u32), 0);
+///     assert_eq!(123 - &Natural::ZERO, 123);
+///     assert_eq!(456 - &Natural::from(123u32), 333);
 /// }
 /// ```
 impl<'a> Sub<&'a Natural> for u32 {
-    type Output = Option<Natural>;
+    type Output = u32;
 
-    fn sub(self, other: &'a Natural) -> Option<Natural> {
-        u32::checked_from(other)
-            .and_then(|x| self.checked_sub(x))
-            .map(Natural::from)
+    fn sub(self, other: &'a Natural) -> u32 {
+        CheckedSub::checked_sub(self, other).unwrap_or_else(|| {
+            sub_panic(self, other);
+            unreachable!();
+        })
     }
 }
 
@@ -204,11 +251,8 @@ impl<'a> Sub<&'a Natural> for u32 {
 /// ```
 impl SubAssign<u32> for Natural {
     fn sub_assign(&mut self, other: u32) {
-        if sub_assign_u32_helper(self, other) {
-            panic!(
-                "Cannot subtract a u32 from a smaller Natural. self: {}, other: {}",
-                *self, other
-            );
+        if self.sub_assign_u32_no_panic(other) {
+            sub_panic(self, other);
         }
     }
 }

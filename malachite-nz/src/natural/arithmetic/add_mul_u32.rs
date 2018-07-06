@@ -127,8 +127,8 @@ impl<'a> AddMul<Natural, u32> for &'a Natural {
             result_limbs.resize(b_len, 0);
         }
         let carry = match b {
-            Small(small) => mpn_addmul_1(&mut result_limbs[..], &[small], c),
-            Large(ref b_limbs) => mpn_addmul_1(&mut result_limbs[..], b_limbs, c),
+            Small(small) => mpn_addmul_1(&mut result_limbs, &[small], c),
+            Large(ref b_limbs) => mpn_addmul_1(&mut result_limbs, b_limbs, c),
         };
         if carry != 0 {
             if a_len > b_len {
@@ -188,8 +188,8 @@ impl<'a, 'b> AddMul<&'a Natural, u32> for &'b Natural {
             result_limbs.resize(b_len, 0);
         }
         let carry = match *b {
-            Small(small) => mpn_addmul_1(&mut result_limbs[..], &[small], c),
-            Large(ref b_limbs) => mpn_addmul_1(&mut result_limbs[..], b_limbs, c),
+            Small(small) => mpn_addmul_1(&mut result_limbs, &[small], c),
+            Large(ref b_limbs) => mpn_addmul_1(&mut result_limbs, b_limbs, c),
         };
         if carry != 0 {
             if a_len > b_len {
