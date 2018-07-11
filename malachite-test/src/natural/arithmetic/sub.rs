@@ -1,10 +1,9 @@
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::natural::{
-    nrm_pairs_of_naturals, pairs_of_naturals, pairs_of_naturals_var_1, rm_pairs_of_naturals_var_1,
+    pairs_of_naturals_var_1, rm_pairs_of_naturals_var_1, nrm_pairs_of_naturals_var_1,
 };
 use malachite_base::num::SignificantBits;
 use std::cmp::max;
-use std::ops::Sub;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_natural_sub_assign);
@@ -19,14 +18,6 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_bench!(registry, Large, benchmark_natural_sub_evaluation_strategy);
 }
 
-pub fn checked_sub<T: Ord + Sub>(x: T, y: T) -> Option<<T as Sub>::Output> {
-    if x >= y {
-        Some(x - y)
-    } else {
-        None
-    }
-}
-
 fn demo_natural_sub_assign(gm: GenerationMode, limit: usize) {
     for (mut x, y) in pairs_of_naturals_var_1(gm).take(limit) {
         let x_old = x.clone();
@@ -36,15 +27,15 @@ fn demo_natural_sub_assign(gm: GenerationMode, limit: usize) {
 }
 
 fn demo_natural_sub(gm: GenerationMode, limit: usize) {
-    for (x, y) in pairs_of_naturals(gm).take(limit) {
+    for (x, y) in pairs_of_naturals_var_1(gm).take(limit) {
         let x_old = x.clone();
-        println!("{} - &{} = {:?}", x_old, y, x - &y);
+        println!("{} - &{} = {}", x_old, y, x - &y);
     }
 }
 
 fn demo_natural_sub_ref_ref(gm: GenerationMode, limit: usize) {
-    for (x, y) in pairs_of_naturals(gm).take(limit) {
-        println!("&{} - &{} = {:?}", x, y, &x - &y);
+    for (x, y) in pairs_of_naturals_var_1(gm).take(limit) {
+        println!("&{} - &{} = {}", x, y, &x - &y);
     }
 }
 
@@ -73,7 +64,7 @@ fn benchmark_natural_sub_library_comparison(gm: GenerationMode, limit: usize, fi
     m_run_benchmark(
         "Natural - Natural",
         BenchmarkType::LibraryComparison,
-        nrm_pairs_of_naturals(gm),
+        nrm_pairs_of_naturals_var_1(gm),
         gm.name(),
         limit,
         file_name,
@@ -81,8 +72,8 @@ fn benchmark_natural_sub_library_comparison(gm: GenerationMode, limit: usize, fi
         "max(x.significant_bits(), y.significant_bits())",
         &mut [
             ("malachite", &mut (|(_, _, (x, y))| no_out!(x - &y))),
-            ("num", &mut (|((x, y), _, _)| no_out!(checked_sub(x, y)))),
-            ("rug", &mut (|(_, (x, y), _)| no_out!(checked_sub(x, y)))),
+            ("num", &mut (|((x, y), _, _)| no_out!(x - y))),
+            ("rug", &mut (|(_, (x, y), _)| no_out!(x - y))),
         ],
     );
 }
@@ -91,7 +82,7 @@ fn benchmark_natural_sub_evaluation_strategy(gm: GenerationMode, limit: usize, f
     m_run_benchmark(
         "Natural - Natural",
         BenchmarkType::EvaluationStrategy,
-        pairs_of_naturals(gm),
+        pairs_of_naturals_var_1(gm),
         gm.name(),
         limit,
         file_name,

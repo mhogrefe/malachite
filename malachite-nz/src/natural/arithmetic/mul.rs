@@ -9,7 +9,7 @@ use natural::arithmetic::add_u32::{limbs_add_limb_to_out, limbs_slice_add_limb_i
 use natural::arithmetic::mul_u32::mpn_mul_1;
 use natural::arithmetic::shl_u32::{mpn_lshift, mpn_lshift_in_place};
 use natural::arithmetic::shr_u32::mpn_rshift_in_place;
-use natural::arithmetic::sub::{mpn_sub_n, mpn_sub_n_aba, mpn_sub_n_in_place, mpn_sub_to_out};
+use natural::arithmetic::sub::{limbs_sub_same_length_to_out, limbs_sub_same_length_in_place_right, limbs_sub_same_length_in_place_left, limbs_sub_to_out};
 use natural::arithmetic::sub_u32::limbs_sub_limb_in_place;
 use natural::comparison::ord::limbs_cmp_same_length;
 use natural::Natural::{self, Large, Small};
@@ -193,18 +193,18 @@ fn mpn_toom22_mul(p: &mut [u32], a: &[u32], b: &[u32], scratch: &mut [u32]) {
     // Compute asm1.
     if s == n {
         if limbs_cmp_same_length(&a[..n], &a[n..2 * n]) == Ordering::Less {
-            mpn_sub_n(p, &a[n..2 * n], &a[..n]);
+            limbs_sub_same_length_to_out(p, &a[n..2 * n], &a[..n]);
             vm1_neg = true;
         } else {
-            mpn_sub_n(p, &a[..n], &a[n..2 * n]);
+            limbs_sub_same_length_to_out(p, &a[..n], &a[n..2 * n]);
         }
     } else if a[s] == 0 && limbs_cmp_same_length(&a[..s], &a[n..n + s]) == Ordering::Less {
         // n - s == 1
-        mpn_sub_n(p, &a[n..n + s], &a[..s]);
+        limbs_sub_same_length_to_out(p, &a[n..n + s], &a[..s]);
         p[s] = 0;
         vm1_neg = true;
     } else {
-        p[s] = a[s] - if mpn_sub_n(p, &a[..s], &a[n..n + s]) {
+        p[s] = a[s] - if limbs_sub_same_length_to_out(p, &a[..s], &a[n..n + s]) {
             1
         } else {
             0
@@ -214,19 +214,19 @@ fn mpn_toom22_mul(p: &mut [u32], a: &[u32], b: &[u32], scratch: &mut [u32]) {
     // Compute bsm1.
     if t == n {
         if limbs_cmp_same_length(&b[..n], &b[n..2 * n]) == Ordering::Less {
-            mpn_sub_n(&mut p[n..], &b[n..2 * n], &b[..n]);
+            limbs_sub_same_length_to_out(&mut p[n..], &b[n..2 * n], &b[..n]);
             vm1_neg.not_assign();
         } else {
-            mpn_sub_n(&mut p[n..], &b[..n], &b[n..2 * n]);
+            limbs_sub_same_length_to_out(&mut p[n..], &b[..n], &b[n..2 * n]);
         }
     } else if limbs_test_zero(&b[t..n])
         && limbs_cmp_same_length(&b[..t], &b[n..n + t]) == Ordering::Less
     {
-        mpn_sub_n(&mut p[n..], &b[n..n + t], &b[..t]);
+        limbs_sub_same_length_to_out(&mut p[n..], &b[n..n + t], &b[..t]);
         limbs_set_zero(&mut p[n + t..2 * n]);
         vm1_neg.not_assign();
     } else {
-        mpn_sub_to_out(&mut p[n..], &b[..n], &b[n..n + t]);
+        limbs_sub_to_out(&mut p[n..], &b[..n], &b[n..n + t]);
     }
 
     // vm1, 2n limbs
@@ -283,7 +283,7 @@ fn mpn_toom22_mul(p: &mut [u32], a: &[u32], b: &[u32], scratch: &mut [u32]) {
             0
         };
     } else {
-        cy -= if mpn_sub_n_in_place(&mut p[n..3 * n], &scratch[..2 * n]) {
+        cy -= if limbs_sub_same_length_in_place_left(&mut p[n..3 * n], &scratch[..2 * n]) {
             1
         } else {
             0
@@ -362,9 +362,9 @@ fn mpn_toom_eval_dgr3_pm1(
     let neg = limbs_cmp_same_length(&xp1[..n + 1], &t[..n + 1]) == Ordering::Less;
 
     if neg {
-        mpn_sub_n(xm1, &t[..n + 1], &xp1[..n + 1]);
+        limbs_sub_same_length_to_out(xm1, &t[..n + 1], &xp1[..n + 1]);
     } else {
-        mpn_sub_n(xm1, &xp1[..n + 1], &t[..n + 1]);
+        limbs_sub_same_length_to_out(xm1, &xp1[..n + 1], &t[..n + 1]);
     }
 
     limbs_slice_add_same_length_in_place_left(&mut xp1[..n + 1], &t[..n + 1]);
@@ -410,7 +410,7 @@ fn mpn_toom_interpolate_5pts(
             &vm1[..kk1]
         ));
     } else {
-        assert!(!mpn_sub_n_in_place(&mut v2[..kk1], &vm1[..kk1]));
+        assert!(!limbs_sub_same_length_in_place_left(&mut v2[..kk1], &vm1[..kk1]));
     }
 
     // {c,2k} {c+2k,2k+1} {c+4k+1,2r-1} {t,2k+1} {t+2k+1,2k+1} {t+4k+2,2r}
@@ -434,7 +434,7 @@ fn mpn_toom_interpolate_5pts(
         ));
         assert_eq!(mpn_rshift_in_place(&mut vm1[..kk1], 1), 0);
     } else {
-        assert!(!mpn_sub_n_aba(&mut vm1[..kk1], &c[k..k + kk1]));
+        assert!(!limbs_sub_same_length_in_place_right(&c[k..k + kk1], &mut vm1[..kk1]));
         assert_eq!(mpn_rshift_in_place(&mut vm1[..kk1], 1), 0);
     }
 
@@ -445,7 +445,7 @@ fn mpn_toom_interpolate_5pts(
     // t1 >= 0
     let carry = {
         let (c1, c2) = c.split_at_mut(twok);
-        if mpn_sub_n_in_place(&mut c2[..twok], c1) {
+        if limbs_sub_same_length_in_place_left(&mut c2[..twok], c1) {
             1
         } else {
             0
@@ -458,7 +458,7 @@ fn mpn_toom_interpolate_5pts(
     //
     // (4) v2 <- t2 := ((v2-vm1)/3-t1)/2 = (v2-vm1-3*t1)/6
     // t2 >= 0                  [(5 3 1 1 0) - (1 1 1 1 0)]/2 = (2 1 0 0 0)
-    assert!(!mpn_sub_n_in_place(&mut v2[..kk1], &c[2 * k..2 * k + kk1]));
+    assert!(!limbs_sub_same_length_in_place_left(&mut v2[..kk1], &c[2 * k..2 * k + kk1]));
     assert_eq!(mpn_rshift_in_place(&mut v2[..kk1], 1), 0);
 
     // {c,2k} {c+2k,2k+1} {c+4k+1,2r-1} {t,2k+1} {t+2k+1,2k+1} {t+4k+2,2r}
@@ -466,7 +466,7 @@ fn mpn_toom_interpolate_5pts(
     //
     // (5) v1 <- t1-tm1           (1 1 1 1 0) - (0 1 0 1 0) = (1 0 1 0 0)
     // result is v1 >= 0
-    assert!(!mpn_sub_n_in_place(&mut c[2 * k..], &vm1[..kk1]));
+    assert!(!limbs_sub_same_length_in_place_left(&mut c[2 * k..], &vm1[..kk1]));
 
     // We do not need to read the value in vm1, so we add it in {c+k, ...}
     let mut cy = if limbs_slice_add_same_length_in_place_left(&mut c[k..], &vm1[..kk1]) {
@@ -483,7 +483,7 @@ fn mpn_toom_interpolate_5pts(
     c[4 * k] = vinf0; // Set the right value for vinf0
                       // Overwrite unused vm1
     cy = mpn_lshift(vm1, &c[4 * k..4 * k + twor], 1);
-    cy += if mpn_sub_n_in_place(&mut v2[..twor], &vm1[..twor]) {
+    cy += if limbs_sub_same_length_in_place_left(&mut v2[..twor], &vm1[..twor]) {
         1
     } else {
         0
@@ -534,7 +534,7 @@ fn mpn_toom_interpolate_5pts(
     cy = {
         let (c1, c2) = c.split_at_mut(2 * k + twor);
         // vinf is at most twor long.
-        if mpn_sub_n_in_place(&mut c1[2 * k..], &c2[2 * k - twor..2 * k]) {
+        if limbs_sub_same_length_in_place_left(&mut c1[2 * k..], &c2[2 * k - twor..2 * k]) {
             1
         } else {
             0
@@ -547,7 +547,7 @@ fn mpn_toom_interpolate_5pts(
     // (8) vm1 <- vm1-v2          (0 1 0 1 0) - (0 1 0 0 0) = (0 0 0 1 0)
     // Operate only on the low half.
 
-    cy = if mpn_sub_n_in_place(&mut c[k..2 * k], &v2[..k]) {
+    cy = if limbs_sub_same_length_in_place_left(&mut c[k..2 * k], &v2[..k]) {
         1
     } else {
         0
@@ -646,10 +646,10 @@ fn mpn_toom42_mul(p: &mut [u32], a: &[u32], b: &[u32], scratch: &mut [u32]) {
         };
 
         if limbs_cmp_same_length(&b0[..n], &b1[..n]) == Ordering::Less {
-            mpn_sub_n(bsm1, &b1[..n], &b0[..n]);
+            limbs_sub_same_length_to_out(bsm1, &b1[..n], &b0[..n]);
             vm1_neg.not_assign();
         } else {
-            mpn_sub_n(bsm1, &b0[..n], &b1[..n]);
+            limbs_sub_same_length_to_out(bsm1, &b0[..n], &b1[..n]);
         }
     } else {
         bs1[n] = if limbs_add_to_out(bs1, &b0[..n], &b1[..t]) {
@@ -660,11 +660,11 @@ fn mpn_toom42_mul(p: &mut [u32], a: &[u32], b: &[u32], scratch: &mut [u32]) {
 
         if limbs_test_zero(&b0[t..n]) && limbs_cmp_same_length(&b0[..t], &b1[..t]) == Ordering::Less
         {
-            mpn_sub_n(bsm1, &b1[..t], &b0[..t]);
+            limbs_sub_same_length_to_out(bsm1, &b1[..t], &b0[..t]);
             limbs_set_zero(&mut bsm1[t..n]);
             vm1_neg.not_assign();
         } else {
-            mpn_sub_to_out(bsm1, &b0[..n], &b1[..t]);
+            limbs_sub_to_out(bsm1, &b0[..n], &b1[..t]);
         }
     }
 

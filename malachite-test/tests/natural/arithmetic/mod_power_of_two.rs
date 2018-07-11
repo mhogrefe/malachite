@@ -158,10 +158,7 @@ fn neg_mod_power_of_two_properties() {
         assert!(result_alt.is_valid());
         assert_eq!(result_alt, result);
 
-        assert_eq!(
-            ((n.shr_round(u, RoundingMode::Ceiling) << u) - &result).as_ref(),
-            Some(n)
-        );
+        assert_eq!((n.shr_round(u, RoundingMode::Ceiling) << u) - &result, *n);
         assert!(result < (Natural::ONE << u));
         assert_eq!(result == 0, n.divisible_by_power_of_two(u));
         assert_eq!(
@@ -178,7 +175,7 @@ fn neg_mod_power_of_two_properties() {
     test_properties(pairs_of_natural_and_small_u32_var_2, |&(ref n, u)| {
         let m = n.neg_mod_power_of_two_ref(u);
         assert_ne!(m, 0);
-        assert_eq!(((((n >> u) + 1) << u) - &m), Some(n.clone()));
+        assert_eq!((((n >> u) + 1) << u) - &m, *n);
         assert_eq!(n.mod_power_of_two_ref(u) + m, Natural::ONE << u);
     });
 

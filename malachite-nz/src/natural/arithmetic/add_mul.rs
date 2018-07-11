@@ -3,7 +3,8 @@ use malachite_base::limbs::limbs_test_zero;
 use malachite_base::num::{AddMul, AddMulAssign, NotAssign};
 use natural::arithmetic::add::limbs_slice_add_greater_in_place_left;
 use natural::arithmetic::mul::mpn_mul;
-use natural::arithmetic::sub::{mpn_sub_aba, mpn_sub_in_place_left};
+use natural::arithmetic::sub::{limbs_sub_same_length_in_place_right, limbs_sub_in_place_left};
+use natural::arithmetic::sub_u32::limbs_sub_limb_to_out;
 use natural::comparison::ord::limbs_cmp;
 use natural::Natural::{self, Large, Small};
 use std::cmp::{max, Ordering};
@@ -454,6 +455,21 @@ fn mpn_cmp_twosizes_lt(x: &[u32], y: &[u32]) -> bool {
     limbs_cmp(x, y) == Ordering::Less
 }
 
+fn mpn_sub_aba(a: &mut [u32], b: &[u32], len: usize) -> bool {
+    let s1_len = b.len();
+    assert!(s1_len >= len);
+    assert!(a.len() >= s1_len);
+    let borrow = limbs_sub_same_length_in_place_right(&b[..len], &mut a[..len]);
+    if s1_len == len {
+        borrow
+    } else if borrow {
+        limbs_sub_limb_to_out(&mut a[len..], &b[len..], 1)
+    } else {
+        a[len..s1_len].copy_from_slice(&b[len..]);
+        false
+    }
+}
+
 #[allow(unknown_lints, many_single_char_names)]
 pub(crate) fn mpz_aorsmul(
     w_sign: &mut bool,
@@ -524,7 +540,7 @@ pub(crate) fn mpz_aorsmul(
         }
         assert!(!mpn_sub_aba(w, &t[..tsize], wsize));
     } else {
-        assert!(!mpn_sub_in_place_left(&mut w[..wsize], &t[..tsize]));
+        assert!(!limbs_sub_in_place_left(&mut w[..wsize], &t[..tsize]));
     }
     if limbs_test_zero(w) {
         *w_sign = false;

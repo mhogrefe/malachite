@@ -168,7 +168,7 @@ impl<'a, 'b> Sub<&'a Integer> for &'b Integer {
                 {
                     Integer {
                         sign: sx,
-                        abs: (ax - ay).unwrap(),
+                        abs: ax - ay,
                     }
                 }
                 // e.g. 5 - 10, -5 - -10, or -5 - -5; sign of result is opposite of sign of other
@@ -180,7 +180,7 @@ impl<'a, 'b> Sub<&'a Integer> for &'b Integer {
                     },
                 ) => Integer {
                     sign: !sy,
-                    abs: (ay - ax).unwrap(),
+                    abs: ay - ax,
                 },
             }
         }
@@ -324,7 +324,7 @@ impl<'a> SubAssign<&'a Integer> for Integer {
             _ => {
                 *self = Integer {
                     sign: !other.sign,
-                    abs: (&other.abs - &self.abs).unwrap(),
+                    abs: &other.abs - &self.abs,
                 }
             }
         }

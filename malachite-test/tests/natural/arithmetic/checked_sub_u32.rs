@@ -101,8 +101,8 @@ fn sub_u32_properties() {
                 );
             }
 
-            //TODO assert_eq!(n - &Natural::from(u), difference);
-            //TODO assert_eq!(u - n, Natural::from(u) - n);
+            assert_eq!(n.checked_sub(&Natural::from(u)), difference);
+            assert_eq!(CheckedSub::checked_sub(u, n).map(Natural::from), Natural::from(u).checked_sub(n));
 
             assert_eq!(
                 num_checked_sub_u32(natural_to_biguint(n), u).map(|x| biguint_to_natural(&x)),

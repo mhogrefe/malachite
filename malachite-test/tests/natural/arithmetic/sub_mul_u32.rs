@@ -116,7 +116,7 @@ fn sub_mul_u32_properties() {
             assert!(result_alt.as_ref().map_or(true, |n| n.is_valid()));
             assert_eq!(result_alt, result);
 
-            assert_eq!(a - &(b * c), result);
+            assert_eq!(a.checked_sub(&(b * c)), result);
             assert_eq!(a.sub_mul(b, &Natural::from(c)), result);
         },
     );
@@ -136,6 +136,6 @@ fn sub_mul_u32_properties() {
 
     test_properties(pairs_of_naturals, |&(ref a, ref b)| {
         assert_eq!(a.sub_mul(b, 0).as_ref(), Some(a));
-        assert_eq!(a.sub_mul(b, 1), a - b);
+        assert_eq!(a.sub_mul(b, 1), a.checked_sub(b));
     });
 }

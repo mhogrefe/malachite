@@ -583,8 +583,8 @@ fn add_properties() {
             sum
         );
         assert_eq!(y + x, sum);
-        assert_eq!((&sum - x).unwrap(), *y);
-        assert_eq!((&sum - y).unwrap(), *x);
+        assert_eq!(&sum - x, *y);
+        assert_eq!(&sum - y, *x);
 
         assert!(sum >= *x);
         assert!(sum >= *y);

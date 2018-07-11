@@ -1,6 +1,7 @@
-use malachite_base::num::{CheckedSub, Zero};
+use malachite_base::num::CheckedSub;
 use natural::arithmetic::sub_u32::{limbs_sub_limb_in_place, limbs_sub_limb_to_out};
-use natural::Natural::{self, Large, Small};
+use natural::Natural;
+use std::fmt::Display;
 use std::ops::{Sub, SubAssign};
 
 fn sub_and_borrow(x: u32, y: u32, borrow: &mut bool) -> u32 {
@@ -16,130 +17,115 @@ fn sub_and_borrow(x: u32, y: u32, borrow: &mut bool) -> u32 {
     }
 }
 
+pub fn limbs_sub(xs: &[u32], ys: &[u32]) -> (Vec<u32>, bool) {
+    let xs_len = xs.len();
+    let ys_len = ys.len();
+    assert!(xs_len >= ys_len);
+    let mut difference_limbs = Vec::with_capacity(xs_len);
+    let mut borrow = false;
+    for i in 0..ys_len {
+        difference_limbs.push(sub_and_borrow(xs[i], ys[i], &mut borrow));
+    }
+    if xs_len != ys_len {
+        difference_limbs.extend_from_slice(&xs[ys_len..]);
+        if borrow {
+            borrow = limbs_sub_limb_in_place(&mut difference_limbs[ys_len..], 1);
+        }
+    }
+    (difference_limbs, borrow)
+}
+
 // Subtract s2 from s1 (which must both have length n), and write the n least significant limbs of
 // the result to r. Return borrow. r must have size at least n.
-pub fn mpn_sub_n(r: &mut [u32], s1: &[u32], s2: &[u32]) -> bool {
-    let s1_len = s1.len();
-    assert_eq!(s1_len, s2.len());
-    assert!(r.len() >= s1_len);
+pub fn limbs_sub_same_length_to_out(out_limbs: &mut [u32], xs: &[u32], ys: &[u32]) -> bool {
+    let xs_len = xs.len();
+    assert_eq!(xs_len, ys.len());
+    assert!(out_limbs.len() >= xs_len);
     let mut borrow = false;
-    for i in 0..s1_len {
-        r[i] = sub_and_borrow(s1[i], s2[i], &mut borrow);
+    for i in 0..xs_len {
+        out_limbs[i] = sub_and_borrow(xs[i], ys[i], &mut borrow);
     }
     borrow
-}
-
-// Subtract s2 from s1 (which must both have length n), and write the n least significant limbs of
-// the result to s1. Return borrow.
-pub fn mpn_sub_n_in_place(s1: &mut [u32], s2: &[u32]) -> bool {
-    let s1_len = s1.len();
-    assert_eq!(s1_len, s2.len());
-    let mut borrow = false;
-    for i in 0..s1_len {
-        s1[i] = sub_and_borrow(s1[i], s2[i], &mut borrow);
-    }
-    borrow
-}
-
-//TODO docs
-// s1 = s2 - s1
-pub fn mpn_sub_n_aba(s1: &mut [u32], s2: &[u32]) -> bool {
-    let s1_len = s1.len();
-    assert_eq!(s1_len, s2.len());
-    let mut borrow = false;
-    for i in 0..s1_len {
-        s1[i] = sub_and_borrow(s2[i], s1[i], &mut borrow);
-    }
-    borrow
-}
-
-pub fn mpn_sub(s1: &[u32], s2: &[u32]) -> (bool, Vec<u32>) {
-    //TODO
-    let mut result_limbs = vec![0; s1.len()];
-    let carry = mpn_sub_to_out(&mut result_limbs, s1, s2);
-    (carry, result_limbs)
 }
 
 // Subtract s2 from s1, and write the s1.len() least significant limbs of the result to r. Return
 // borrow. This function requires that s1.len() >= s2.len() and r.len() >= s1.len().
-pub fn mpn_sub_to_out(r: &mut [u32], s1: &[u32], s2: &[u32]) -> bool {
-    let s1_len = s1.len();
-    let s2_len = s2.len();
-    assert!(s1_len >= s2_len);
-    assert!(r.len() >= s1_len);
-    let borrow = mpn_sub_n(r, &s1[..s2_len], s2);
-    if s1_len == s2_len {
+pub fn limbs_sub_to_out(out_limbs: &mut [u32], xs: &[u32], ys: &[u32]) -> bool {
+    let xs_len = xs.len();
+    let ys_len = ys.len();
+    assert!(xs_len >= ys_len);
+    assert!(out_limbs.len() >= xs_len);
+    let borrow = limbs_sub_same_length_to_out(out_limbs, &xs[..ys_len], ys);
+    if xs_len == ys_len {
         borrow
     } else if borrow {
-        limbs_sub_limb_to_out(&mut r[s2_len..], &s1[s2_len..], 1)
+        limbs_sub_limb_to_out(&mut out_limbs[ys_len..], &xs[ys_len..], 1)
     } else {
-        r[s2_len..s1_len].copy_from_slice(&s1[s2_len..]);
+        out_limbs[ys_len..xs_len].copy_from_slice(&xs[ys_len..]);
         false
     }
+}
+
+// Subtract s2 from s1 (which must both have length n), and write the n least significant limbs of
+// the result to s1. Return borrow.
+pub fn limbs_sub_same_length_in_place_left(xs: &mut [u32], ys: &[u32]) -> bool {
+    let xs_len = xs.len();
+    assert_eq!(xs_len, ys.len());
+    let mut borrow = false;
+    for i in 0..xs_len {
+        xs[i] = sub_and_borrow(xs[i], ys[i], &mut borrow);
+    }
+    borrow
 }
 
 // Subtract s2 from s1, and write the s1.len() least significant limbs of the result to s1. Return
 // borrow. This function requires that s1.len() >= s2.len().
-pub fn mpn_sub_in_place_left(s1: &mut [u32], s2: &[u32]) -> bool {
-    let s1_len = s1.len();
-    let s2_len = s2.len();
-    assert!(s1_len >= s2_len);
-    let borrow = mpn_sub_n_in_place(&mut s1[..s2_len], s2);
-    if s1_len == s2_len {
+pub fn limbs_sub_in_place_left(xs: &mut [u32], ys: &[u32]) -> bool {
+    let xs_len = xs.len();
+    let ys_len = ys.len();
+    assert!(xs_len >= ys_len);
+    let borrow = limbs_sub_same_length_in_place_left(&mut xs[..ys_len], ys);
+    if xs_len == ys_len {
         borrow
     } else if borrow {
-        limbs_sub_limb_in_place(&mut s1[s2_len..], 1)
+        limbs_sub_limb_in_place(&mut xs[ys_len..], 1)
     } else {
         false
     }
 }
 
-pub fn mpn_sub_in_place_right(s1: &[u32], s2: &mut Vec<u32>) -> bool {
-    //TODO
-    let (carry, result) = mpn_sub(s1, s2);
-    *s2 = result;
-    carry
-}
-
-//TODO docs
-pub fn mpn_sub_aba(a: &mut [u32], b: &[u32], len: usize) -> bool {
-    let s1_len = b.len();
-    assert!(s1_len >= len);
-    assert!(a.len() >= s1_len);
-    let borrow = mpn_sub_n_aba(&mut a[..len], &b[..len]);
-    if s1_len == len {
-        borrow
-    } else if borrow {
-        limbs_sub_limb_to_out(&mut a[len..], &b[len..], 1)
-    } else {
-        a[len..s1_len].copy_from_slice(&b[len..]);
-        false
+pub fn limbs_sub_same_length_in_place_right(xs: &[u32], ys: &mut [u32]) -> bool {
+    let ys_len = ys.len();
+    assert_eq!(xs.len(), ys_len);
+    let mut borrow = false;
+    for i in 0..ys_len {
+        ys[i] = sub_and_borrow(xs[i], ys[i], &mut borrow);
     }
+    borrow
 }
 
-// x -= y, return borrow
-fn sub_assign_helper<'a>(x: &mut Natural, y: &'a Natural) -> bool {
-    if *y == 0 {
-        false
-    } else if x as *const Natural == y as *const Natural {
-        *x = Small(0);
-        false
-    } else if x.limb_count() < y.limb_count() {
-        true
-    } else if let Small(y) = *y {
-        x.sub_assign_u32_no_panic(y)
+pub fn limbs_sub_in_place_right(xs: &[u32], ys: &mut Vec<u32>) -> bool {
+    let xs_len = xs.len();
+    let ys_len = ys.len();
+    assert!(xs_len >= ys_len);
+    let borrow = limbs_sub_same_length_in_place_right(&xs[..ys_len], ys);
+    if xs_len == ys_len {
+        borrow
     } else {
-        match (&mut (*x), y) {
-            (&mut Large(ref mut xs), &Large(ref ys)) => {
-                if mpn_sub_in_place_left(xs, ys) {
-                    return true;
-                }
-            }
-            _ => unreachable!(),
+        ys.extend_from_slice(&xs[ys_len..]);
+        if borrow {
+            limbs_sub_limb_in_place(&mut ys[ys_len..], 1)
+        } else {
+            false
         }
-        x.trim();
-        false
     }
+}
+
+fn sub_panic<S: Display, T: Display>(x: S, y: T) {
+    panic!(
+        "Cannot subtract a Natural from a smaller Natural. self: {}, other: {}",
+        x, y
+    );
 }
 
 /// Subtracts a `Natural` from a `Natural`, taking the left `Natural` by value and the right
@@ -160,22 +146,17 @@ fn sub_assign_helper<'a>(x: &mut Natural, y: &'a Natural) -> bool {
 /// use malachite_nz::natural::Natural;
 ///
 /// fn main() {
-///     assert_eq!(format!("{:?}", Natural::ZERO - &Natural::from(123u32)), "None");
-///     assert_eq!(format!("{:?}", Natural::from(123u32) - &Natural::ZERO), "Some(123)");
-///     assert_eq!(format!("{:?}", Natural::from(456u32) - &Natural::from(123u32)), "Some(333)");
-///     assert_eq!(format!("{:?}", Natural::trillion() * 3 - &Natural::trillion()),
-///         "Some(2000000000000)");
+///     assert_eq!((Natural::from(123u32) - &Natural::ZERO).to_string(), "123");
+///     assert_eq!((Natural::from(456u32) - &Natural::from(123u32)).to_string(), "333");
+///     assert_eq!((Natural::trillion() * 3 - &Natural::trillion()).to_string(), "2000000000000");
 /// }
 /// ```
 impl<'a> Sub<&'a Natural> for Natural {
-    type Output = Option<Natural>;
+    type Output = Natural;
 
-    fn sub(mut self, other: &'a Natural) -> Option<Natural> {
-        if sub_assign_helper(&mut self, other) {
-            None
-        } else {
-            Some(self)
-        }
+    fn sub(self, other: &'a Natural) -> Natural {
+        self.checked_sub(other)
+            .expect("Cannot subtract a Natural from a smaller Natural")
     }
 }
 
@@ -196,41 +177,20 @@ impl<'a> Sub<&'a Natural> for Natural {
 /// use malachite_nz::natural::Natural;
 ///
 /// fn main() {
-///     assert_eq!(format!("{:?}", &Natural::ZERO - &Natural::from(123u32)), "None");
-///     assert_eq!(format!("{:?}", &Natural::from(123u32) - &Natural::ZERO), "Some(123)");
-///     assert_eq!(format!("{:?}", &Natural::from(456u32) - &Natural::from(123u32)), "Some(333)");
-///     assert_eq!(format!("{:?}", &(Natural::trillion() * 3) - &Natural::trillion()),
-///         "Some(2000000000000)");
+///     assert_eq!((&Natural::from(123u32) - &Natural::ZERO).to_string(), "123");
+///     assert_eq!((&Natural::from(456u32) - &Natural::from(123u32)).to_string(), "333");
+///     assert_eq!((&(Natural::trillion() * 3) - &Natural::trillion()).to_string(),
+///         "2000000000000");
 /// }
 /// ```
 impl<'a, 'b> Sub<&'a Natural> for &'b Natural {
-    type Output = Option<Natural>;
+    type Output = Natural;
 
-    fn sub(self, other: &'a Natural) -> Option<Natural> {
-        if self as *const Natural == other as *const Natural {
-            Some(Natural::ZERO)
-        } else {
-            match (self, other) {
-                (x, &Small(0)) => Some(x.clone()),
-                (x, &Small(y)) => x.checked_sub(y),
-                (&Small(_), _) => None,
-                (&Large(ref xs), &Large(ref ys)) => {
-                    let xs_len = xs.len();
-                    if xs_len < ys.len() {
-                        None
-                    } else {
-                        let mut difference_limbs = vec![0; xs_len];
-                        if mpn_sub_to_out(&mut difference_limbs, xs, ys) {
-                            None
-                        } else {
-                            let mut difference = Large(difference_limbs);
-                            difference.trim();
-                            Some(difference)
-                        }
-                    }
-                }
-            }
-        }
+    fn sub(self, other: &'a Natural) -> Natural {
+        self.checked_sub(other).unwrap_or_else(|| {
+            sub_panic(self, other);
+            unreachable!();
+        })
     }
 }
 
@@ -258,9 +218,8 @@ impl<'a, 'b> Sub<&'a Natural> for &'b Natural {
 /// ```
 impl<'a> SubAssign<&'a Natural> for Natural {
     fn sub_assign(&mut self, other: &'a Natural) {
-        if sub_assign_helper(self, other) {
+        if self.sub_assign_no_panic(other) {
             panic!("Cannot subtract a Natural from a smaller Natural");
         }
-        self.trim();
     }
 }

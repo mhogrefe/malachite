@@ -157,14 +157,14 @@ fn test_sub_u32() {
 #[should_panic(expected = "Cannot subtract a u32 from a smaller Natural")]
 #[allow(unused_must_use)]
 fn sub_u32_fail_1() {
-    Natural::from_str("123").unwrap() - 456;
+    Natural::from(123_u32) - 456;
 }
 
 #[test]
 #[should_panic(expected = "Cannot subtract a u32 from a smaller Natural. self: 123, other: 456")]
 #[allow(unused_must_use)]
 fn sub_u32_fail_2() {
-    &Natural::from_str("123").unwrap() - 456;
+    &Natural::from(123_u32) - 456;
 }
 
 #[test]
@@ -278,14 +278,11 @@ fn sub_u32_properties() {
             assert!(difference_alt.is_valid());
             assert_eq!(difference_alt, difference);
 
-            //TODO assert_eq!(n - &Natural::from(u), difference);
-            //TODO assert_eq!(u - n, Natural::from(u) - n);
+            assert_eq!(n - &Natural::from(u), difference);
+            assert_eq!(n - &difference, u);
 
             assert_eq!(biguint_to_natural(&(natural_to_biguint(n) - u)), difference);
-            assert_eq!(
-                rug_integer_to_natural(&(natural_to_rug_integer(n) - u)),
-                difference
-            );
+            assert_eq!(rug_integer_to_natural(&(natural_to_rug_integer(n) - u)), difference);
 
             assert!(difference <= *n);
             assert_eq!(difference + u, *n);

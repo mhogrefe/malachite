@@ -2,7 +2,7 @@ use integer::Integer;
 use malachite_base::limbs::{limbs_leading_zero_limbs, limbs_set_zero};
 use malachite_base::num::WrappingNegAssign;
 use natural::arithmetic::sub::{
-    mpn_sub, mpn_sub_in_place_left, mpn_sub_in_place_right, mpn_sub_to_out,
+    limbs_sub, limbs_sub_in_place_left, limbs_sub_in_place_right, limbs_sub_to_out,
 };
 use natural::logic::not::limbs_not_in_place;
 use natural::Natural::{self, Large, Small};
@@ -511,12 +511,12 @@ pub fn limbs_xor_neg_neg(xs: &[u32], ys: &[u32]) -> Vec<u32> {
     assert!(x_i < xs_len);
     assert!(y_i < ys_len);
     if y_i >= xs_len {
-        let (carry, result) = mpn_sub(ys, xs);
-        assert!(!carry);
+        let (result, borrow) = limbs_sub(ys, xs);
+        assert!(!borrow);
         return result;
     } else if x_i >= ys_len {
-        let (carry, result) = mpn_sub(xs, ys);
-        assert!(!carry);
+        let (result, borrow) = limbs_sub(xs, ys);
+        assert!(!borrow);
         return result;
     }
     let (min_i, max_i) = if x_i <= y_i { (x_i, y_i) } else { (y_i, x_i) };
@@ -580,10 +580,10 @@ pub fn limbs_xor_neg_neg_to_out(out_limbs: &mut [u32], xs: &[u32], ys: &[u32]) {
     assert!(x_i < xs_len);
     assert!(y_i < ys_len);
     if y_i >= xs_len {
-        assert!(!mpn_sub_to_out(out_limbs, ys, xs));
+        assert!(!limbs_sub_to_out(out_limbs, ys, xs));
         return;
     } else if x_i >= ys_len {
-        assert!(!mpn_sub_to_out(out_limbs, xs, ys));
+        assert!(!limbs_sub_to_out(out_limbs, xs, ys));
         return;
     }
     let (min_i, max_i) = if x_i <= y_i { (x_i, y_i) } else { (y_i, x_i) };
@@ -672,10 +672,10 @@ pub fn limbs_xor_neg_neg_in_place_left(xs: &mut Vec<u32>, ys: &[u32]) {
     assert!(x_i < xs_len);
     assert!(y_i < ys_len);
     if y_i >= xs_len {
-        assert!(!mpn_sub_in_place_right(ys, xs));
+        assert!(!limbs_sub_in_place_right(ys, xs));
         return;
     } else if x_i >= ys_len {
-        assert!(!mpn_sub_in_place_left(xs, ys));
+        assert!(!limbs_sub_in_place_left(xs, ys));
         return;
     }
     limbs_xor_neg_neg_in_place_helper(xs, ys, x_i, y_i);
@@ -728,10 +728,10 @@ pub fn limbs_xor_neg_neg_in_place_either(xs: &mut [u32], ys: &mut [u32]) -> bool
     assert!(x_i < xs_len);
     assert!(y_i < ys_len);
     if y_i >= xs_len {
-        assert!(!mpn_sub_in_place_left(ys, xs));
+        assert!(!limbs_sub_in_place_left(ys, xs));
         return true;
     } else if x_i >= ys_len {
-        assert!(!mpn_sub_in_place_left(xs, ys));
+        assert!(!limbs_sub_in_place_left(xs, ys));
         return false;
     }
     if xs_len >= ys_len {

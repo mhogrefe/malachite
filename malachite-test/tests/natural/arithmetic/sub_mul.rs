@@ -1,6 +1,5 @@
 use common::test_properties;
-use malachite_base::num::{One, Zero};
-use malachite_base::num::{SubMul, SubMulAssign};
+use malachite_base::num::{CheckedSub, One, Zero, SubMul, SubMulAssign};
 use malachite_nz::natural::Natural;
 use malachite_test::inputs::natural::{pairs_of_naturals, triples_of_naturals};
 use std::str::FromStr;
@@ -122,13 +121,13 @@ fn sub_mul_properties() {
         assert!(result_alt.as_ref().map_or(true, |n| n.is_valid()));
         assert_eq!(result_alt, result);
 
-        assert_eq!(a - &(b * c), result);
+        assert_eq!(a.checked_sub(&(b * c)), result);
     });
 
     test_properties(pairs_of_naturals, |&(ref a, ref b)| {
         assert_eq!(a.sub_mul(&Natural::ZERO, b).as_ref(), Some(a));
         assert_eq!(a.sub_mul(b, &Natural::ZERO).as_ref(), Some(a));
-        assert_eq!(a.sub_mul(&Natural::ONE, b), a - b);
-        assert_eq!(a.sub_mul(b, &Natural::ONE), a - b);
+        assert_eq!(a.sub_mul(&Natural::ONE, b), a.checked_sub(b));
+        assert_eq!(a.sub_mul(b, &Natural::ONE), a.checked_sub(b));
     });
 }
