@@ -1,5 +1,5 @@
+use integer::conversion::to_twos_complement_limbs::limbs_slice_to_twos_complement_limbs_negative;
 use malachite_base::num::{Assign, PrimitiveInteger, Zero};
-use natural::arithmetic::neg::mpn_neg_in_place;
 use natural::Natural::{self, Large, Small};
 
 impl Natural {
@@ -181,7 +181,7 @@ impl Natural {
             }
             let new_limb_count = new_limb_count as usize;
             limbs.resize(new_limb_count, 0);
-            mpn_neg_in_place(&mut limbs);
+            limbs_slice_to_twos_complement_limbs_negative(&mut limbs);
             if leftover_bits != 0 {
                 limbs[new_limb_count - 1] &= (1 << leftover_bits) - 1;
             }
@@ -233,7 +233,7 @@ impl Natural {
                 }
                 let new_limb_count = new_limb_count as usize;
                 limbs.resize(new_limb_count, 0);
-                mpn_neg_in_place(limbs);
+                limbs_slice_to_twos_complement_limbs_negative(limbs);
                 if leftover_bits != 0 {
                     limbs[new_limb_count - 1] &= (1 << leftover_bits) - 1;
                 }
