@@ -89,6 +89,20 @@ fn test_limbs_add_same_length_to_out() {
 }
 
 #[test]
+#[should_panic(expected = "assertion failed: `(left == right)`")]
+fn limbs_add_same_length_to_out_fail_1() {
+    let mut out = vec![10, 10, 10, 10];
+    limbs_add_same_length_to_out(&mut out, &[6, 7], &[1, 2, 3]);
+}
+
+#[test]
+#[should_panic(expected = "assertion failed: out_limbs.len() >= len")]
+fn limbs_add_same_length_to_out_fail_2() {
+    let mut out = vec![10];
+    limbs_add_same_length_to_out(&mut out, &[6, 7], &[1, 2]);
+}
+
+#[test]
 fn test_limbs_add_to_out() {
     let test = |xs, ys, out_before: &[u32], carry, out_after| {
         let mut out = out_before.to_vec();
@@ -160,17 +174,10 @@ fn test_limbs_add_to_out() {
 }
 
 #[test]
-#[should_panic(expected = "assertion failed: `(left == right)`")]
-fn limbs_add_same_length_to_out_fail_1() {
-    let mut out = vec![10, 10, 10, 10];
-    limbs_add_same_length_to_out(&mut out, &[6, 7], &[1, 2, 3]);
-}
-
-#[test]
-#[should_panic(expected = "assertion failed: out_limbs.len() >= len")]
-fn limbs_add_same_length_to_out_fail_2() {
-    let mut out = vec![10];
-    limbs_add_same_length_to_out(&mut out, &[6, 7], &[1, 2]);
+#[should_panic(expected = "assertion failed: out_limbs.len() >= max_len")]
+fn limbs_add_to_out_fail() {
+    let mut out = vec![10, 10];
+    limbs_add_to_out(&mut out, &[6, 7, 8], &[1, 2]);
 }
 
 #[test]

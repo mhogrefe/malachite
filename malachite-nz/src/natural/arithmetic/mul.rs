@@ -9,7 +9,10 @@ use natural::arithmetic::add_u32::{limbs_add_limb_to_out, limbs_slice_add_limb_i
 use natural::arithmetic::mul_u32::mpn_mul_1;
 use natural::arithmetic::shl_u32::{mpn_lshift, mpn_lshift_in_place};
 use natural::arithmetic::shr_u32::mpn_rshift_in_place;
-use natural::arithmetic::sub::{limbs_sub_same_length_to_out, limbs_sub_same_length_in_place_right, limbs_sub_same_length_in_place_left, limbs_sub_to_out};
+use natural::arithmetic::sub::{
+    limbs_sub_same_length_in_place_left, limbs_sub_same_length_in_place_right,
+    limbs_sub_same_length_to_out, limbs_sub_to_out,
+};
 use natural::arithmetic::sub_u32::limbs_sub_limb_in_place;
 use natural::comparison::ord::limbs_cmp_same_length;
 use natural::Natural::{self, Large, Small};
@@ -43,11 +46,12 @@ fn mpn_toom33_mul_itch(an: usize) -> usize {
 }
 
 fn mpn_toom32_mul_itch(an: usize, bn: usize) -> usize {
-    let n = 1 + (if 2 * an >= 3 * bn {
-        (an - 1) / 3
-    } else {
-        (bn - 1) >> 1
-    });
+    let n = 1
+        + (if 2 * an >= 3 * bn {
+            (an - 1) / 3
+        } else {
+            (bn - 1) >> 1
+        });
     2 * n + 1
 }
 
@@ -61,11 +65,12 @@ fn mpn_toom42_mul_itch(an: usize, bn: usize) -> usize {
 }
 
 fn mpn_toom43_mul_itch(an: usize, bn: usize) -> usize {
-    let n = 1 + (if 3 * an >= 4 * bn {
-        (an - 1) >> 2
-    } else {
-        (bn - 1) / 3
-    });
+    let n = 1
+        + (if 3 * an >= 4 * bn {
+            (an - 1) >> 2
+        } else {
+            (bn - 1) / 3
+        });
     6 * n + 4
 }
 
@@ -74,20 +79,22 @@ fn mpn_toom44_mul_itch(an: usize) -> usize {
 }
 
 fn mpn_toom53_mul_itch(an: usize, bn: usize) -> usize {
-    let n = 1 + (if 3 * an >= 5 * bn {
-        (an - 1) / 5
-    } else {
-        (bn - 1) / 3
-    });
+    let n = 1
+        + (if 3 * an >= 5 * bn {
+            (an - 1) / 5
+        } else {
+            (bn - 1) / 3
+        });
     10 * n + 10
 }
 
 fn mpn_toom63_mul_itch(an: usize, bn: usize) -> usize {
-    let n = 1 + (if an >= 2 * bn {
-        (an - 1) / 6
-    } else {
-        (bn - 1) / 3
-    });
+    let n = 1
+        + (if an >= 2 * bn {
+            (an - 1) / 6
+        } else {
+            (bn - 1) / 3
+        });
     9 * n + 3
 }
 
@@ -410,7 +417,10 @@ fn mpn_toom_interpolate_5pts(
             &vm1[..kk1]
         ));
     } else {
-        assert!(!limbs_sub_same_length_in_place_left(&mut v2[..kk1], &vm1[..kk1]));
+        assert!(!limbs_sub_same_length_in_place_left(
+            &mut v2[..kk1],
+            &vm1[..kk1]
+        ));
     }
 
     // {c,2k} {c+2k,2k+1} {c+4k+1,2r-1} {t,2k+1} {t+2k+1,2k+1} {t+4k+2,2r}
@@ -434,7 +444,10 @@ fn mpn_toom_interpolate_5pts(
         ));
         assert_eq!(mpn_rshift_in_place(&mut vm1[..kk1], 1), 0);
     } else {
-        assert!(!limbs_sub_same_length_in_place_right(&c[k..k + kk1], &mut vm1[..kk1]));
+        assert!(!limbs_sub_same_length_in_place_right(
+            &c[k..k + kk1],
+            &mut vm1[..kk1]
+        ));
         assert_eq!(mpn_rshift_in_place(&mut vm1[..kk1], 1), 0);
     }
 
@@ -458,7 +471,10 @@ fn mpn_toom_interpolate_5pts(
     //
     // (4) v2 <- t2 := ((v2-vm1)/3-t1)/2 = (v2-vm1-3*t1)/6
     // t2 >= 0                  [(5 3 1 1 0) - (1 1 1 1 0)]/2 = (2 1 0 0 0)
-    assert!(!limbs_sub_same_length_in_place_left(&mut v2[..kk1], &c[2 * k..2 * k + kk1]));
+    assert!(!limbs_sub_same_length_in_place_left(
+        &mut v2[..kk1],
+        &c[2 * k..2 * k + kk1]
+    ));
     assert_eq!(mpn_rshift_in_place(&mut v2[..kk1], 1), 0);
 
     // {c,2k} {c+2k,2k+1} {c+4k+1,2r-1} {t,2k+1} {t+2k+1,2k+1} {t+4k+2,2r}
@@ -466,7 +482,10 @@ fn mpn_toom_interpolate_5pts(
     //
     // (5) v1 <- t1-tm1           (1 1 1 1 0) - (0 1 0 1 0) = (1 0 1 0 0)
     // result is v1 >= 0
-    assert!(!limbs_sub_same_length_in_place_left(&mut c[2 * k..], &vm1[..kk1]));
+    assert!(!limbs_sub_same_length_in_place_left(
+        &mut c[2 * k..],
+        &vm1[..kk1]
+    ));
 
     // We do not need to read the value in vm1, so we add it in {c+k, ...}
     let mut cy = if limbs_slice_add_same_length_in_place_left(&mut c[k..], &vm1[..kk1]) {
@@ -708,12 +727,14 @@ fn mpn_toom42_mul(p: &mut [u32], a: &[u32], b: &[u32], scratch: &mut [u32]) {
         // v1, 2n+1 limbs
         toom42_mul_n_rec(v1_vinf, &as1[..n], &bs1[..n]);
         if as1[n] == 1 {
-            cy = bs1[n]
-                + if limbs_slice_add_same_length_in_place_left(&mut v1_vinf[n..2 * n], &bs1[..n]) {
-                    1
-                } else {
-                    0
-                };
+            cy = bs1[n] + if limbs_slice_add_same_length_in_place_left(
+                &mut v1_vinf[n..2 * n],
+                &bs1[..n],
+            ) {
+                1
+            } else {
+                0
+            };
         } else if as1[n] == 2 {
             cy = 2 * bs1[n] + mpn_addmul_1(&mut v1_vinf[n..2 * n], &bs1[..n], 2);
         } else if as1[n] == 3 {

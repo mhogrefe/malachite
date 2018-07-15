@@ -69,7 +69,8 @@ impl<'a> Sub<u32> for &'a Integer {
             Integer {
                 sign: true,
                 ref abs,
-            } if *abs >= other =>
+            }
+                if *abs >= other =>
             {
                 Integer {
                     sign: true,
@@ -174,7 +175,8 @@ impl SubAssign<u32> for Integer {
             Integer {
                 sign: true,
                 ref mut abs,
-            } if *abs >= other =>
+            }
+                if *abs >= other =>
             {
                 *abs -= other
             }

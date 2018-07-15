@@ -1,5 +1,5 @@
 use malachite_base::num::{CheckedSub, Zero};
-use natural::arithmetic::sub::{limbs_sub_in_place_left, limbs_sub};
+use natural::arithmetic::sub::{limbs_sub, limbs_sub_in_place_left};
 use natural::Natural::{self, Large, Small};
 
 impl Natural {

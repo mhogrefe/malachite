@@ -120,7 +120,15 @@ pub fn rm_pairs_of_naturals_var_1(
 //TODO use subset_pairs
 pub fn nrm_pairs_of_naturals_var_1(
     gm: GenerationMode,
-) -> Box<Iterator<Item = ((BigUint, BigUint), (rug::Integer, rug::Integer), (Natural, Natural))>> {
+) -> Box<
+    Iterator<
+        Item = (
+            (BigUint, BigUint),
+            (rug::Integer, rug::Integer),
+            (Natural, Natural),
+        ),
+    >,
+> {
     Box::new(pairs_of_naturals_var_1(gm).map(|(x, y)| {
         (
             (natural_to_biguint(&x), natural_to_biguint(&y)),

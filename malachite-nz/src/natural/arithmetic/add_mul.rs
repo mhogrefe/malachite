@@ -3,7 +3,7 @@ use malachite_base::limbs::limbs_test_zero;
 use malachite_base::num::{AddMul, AddMulAssign, NotAssign};
 use natural::arithmetic::add::limbs_slice_add_greater_in_place_left;
 use natural::arithmetic::mul::mpn_mul;
-use natural::arithmetic::sub::{limbs_sub_same_length_in_place_right, limbs_sub_in_place_left};
+use natural::arithmetic::sub::{limbs_sub_in_place_left, limbs_sub_same_length_in_place_right};
 use natural::arithmetic::sub_u32::limbs_sub_limb_to_out;
 use natural::comparison::ord::limbs_cmp;
 use natural::Natural::{self, Large, Small};

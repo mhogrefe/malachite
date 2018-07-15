@@ -80,7 +80,8 @@ impl<'a> Add<u32> for &'a Integer {
             Integer {
                 sign: false,
                 ref abs,
-            } if *abs > other =>
+            }
+                if *abs > other =>
             {
                 Integer {
                     sign: false,
@@ -193,7 +194,8 @@ impl AddAssign<u32> for Integer {
             Integer {
                 sign: false,
                 ref mut abs,
-            } if *abs > other =>
+            }
+                if *abs > other =>
             {
                 *abs -= other
             }

@@ -1,5 +1,5 @@
 use common::test_properties;
-use malachite_base::num::{CheckedSub, One, Zero, SubMul, SubMulAssign};
+use malachite_base::num::{CheckedSub, One, SubMul, SubMulAssign, Zero};
 use malachite_nz::natural::Natural;
 use malachite_test::inputs::natural::{pairs_of_naturals, triples_of_naturals};
 use std::str::FromStr;

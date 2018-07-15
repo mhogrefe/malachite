@@ -13,7 +13,9 @@ use std::str::FromStr;
 #[test]
 fn test_checked_sub_natural() {
     let test = |u, v, out| {
-        let on = Natural::from_str(u).unwrap().checked_sub(&Natural::from_str(v).unwrap());
+        let on = Natural::from_str(u)
+            .unwrap()
+            .checked_sub(&Natural::from_str(v).unwrap());
         assert_eq!(format!("{:?}", on), out);
         assert!(on.map_or(true, |n| n.is_valid()));
 

@@ -1,7 +1,5 @@
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::natural::{
-    nrm_pairs_of_naturals, pairs_of_naturals
-};
+use inputs::natural::{nrm_pairs_of_naturals, pairs_of_naturals};
 use malachite_base::num::{CheckedSub, SignificantBits};
 use std::cmp::max;
 use std::ops::Sub;
@@ -9,8 +7,16 @@ use std::ops::Sub;
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_natural_checked_sub);
     register_demo!(registry, demo_natural_checked_sub_ref_ref);
-    register_bench!(registry, Large, benchmark_natural_checked_sub_library_comparison);
-    register_bench!(registry, Large, benchmark_natural_checked_sub_evaluation_strategy);
+    register_bench!(
+        registry,
+        Large,
+        benchmark_natural_checked_sub_library_comparison
+    );
+    register_bench!(
+        registry,
+        Large,
+        benchmark_natural_checked_sub_evaluation_strategy
+    );
 }
 
 pub fn checked_sub<T: Ord + Sub>(x: T, y: T) -> Option<<T as Sub>::Output> {
@@ -34,7 +40,11 @@ fn demo_natural_checked_sub_ref_ref(gm: GenerationMode, limit: usize) {
     }
 }
 
-fn benchmark_natural_checked_sub_library_comparison(gm: GenerationMode, limit: usize, file_name: &str) {
+fn benchmark_natural_checked_sub_library_comparison(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
     m_run_benchmark(
         "Natural.checked_sub(Natural)",
         BenchmarkType::LibraryComparison,
@@ -45,14 +55,21 @@ fn benchmark_natural_checked_sub_library_comparison(gm: GenerationMode, limit: u
         &(|&(_, _, (ref x, ref y))| max(x.significant_bits(), y.significant_bits()) as usize),
         "max(x.significant_bits(), y.significant_bits())",
         &mut [
-            ("malachite", &mut (|(_, _, (x, y))| no_out!(x.checked_sub(&y)))),
+            (
+                "malachite",
+                &mut (|(_, _, (x, y))| no_out!(x.checked_sub(&y))),
+            ),
             ("num", &mut (|((x, y), _, _)| no_out!(checked_sub(x, y)))),
             ("rug", &mut (|(_, (x, y), _)| no_out!(checked_sub(x, y)))),
         ],
     );
 }
 
-fn benchmark_natural_checked_sub_evaluation_strategy(gm: GenerationMode, limit: usize, file_name: &str) {
+fn benchmark_natural_checked_sub_evaluation_strategy(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
     m_run_benchmark(
         "Natural.checked_sub(Natural)",
         BenchmarkType::EvaluationStrategy,
@@ -63,8 +80,14 @@ fn benchmark_natural_checked_sub_evaluation_strategy(gm: GenerationMode, limit: 
         &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),
         "max(x.significant_bits(), y.significant_bits())",
         &mut [
-            ("Natural - &Natural", &mut (|(x, y)| no_out!(x.checked_sub(&y)))),
-            ("&Natural - &Natural", &mut (|(x, y)| no_out!((&x).checked_sub(&y)))),
+            (
+                "Natural - &Natural",
+                &mut (|(x, y)| no_out!(x.checked_sub(&y))),
+            ),
+            (
+                "&Natural - &Natural",
+                &mut (|(x, y)| no_out!((&x).checked_sub(&y))),
+            ),
         ],
     );
 }

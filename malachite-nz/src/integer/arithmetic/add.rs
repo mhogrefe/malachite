@@ -154,7 +154,8 @@ impl<'a, 'b> Add<&'a Integer> for &'b Integer {
                         sign: sy,
                         abs: ref ay,
                     },
-                ) if sx == (sy && *ay != 0) =>
+                )
+                    if sx == (sy && *ay != 0) =>
                 {
                     Integer {
                         sign: sx,
@@ -168,7 +169,8 @@ impl<'a, 'b> Add<&'a Integer> for &'b Integer {
                         abs: ref ax,
                     },
                     &Integer { abs: ref ay, .. },
-                ) if sx && *ax == *ay || *ax > *ay =>
+                )
+                    if sx && *ax == *ay || *ax > *ay =>
                 {
                     Integer {
                         sign: sx,
@@ -231,7 +233,8 @@ impl AddAssign<Integer> for Integer {
                     sign: sy,
                     abs: ref ay,
                 },
-            ) if sx == (sy && *ay != 0) =>
+            )
+                if sx == (sy && *ay != 0) =>
             {
                 0
             }
@@ -241,7 +244,8 @@ impl AddAssign<Integer> for Integer {
                     abs: ref mut ax,
                 },
                 &Integer { abs: ref ay, .. },
-            ) if sx && *ax == *ay || *ax > *ay =>
+            )
+                if sx && *ax == *ay || *ax > *ay =>
             {
                 1
             }
@@ -301,7 +305,8 @@ impl<'a> AddAssign<&'a Integer> for Integer {
                     sign: sy,
                     abs: ref ay,
                 },
-            ) if sx == (sy && *ay != 0) =>
+            )
+                if sx == (sy && *ay != 0) =>
             {
                 0
             }
@@ -311,7 +316,8 @@ impl<'a> AddAssign<&'a Integer> for Integer {
                     abs: ref mut ax,
                 },
                 &Integer { abs: ref ay, .. },
-            ) if sx && *ax == *ay || *ax > *ay =>
+            )
+                if sx && *ax == *ay || *ax > *ay =>
             {
                 1
             }

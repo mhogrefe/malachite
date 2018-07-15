@@ -1258,6 +1258,7 @@ macro_rules! integer_traits {
     };
 }
 
+//TODO fix code duplication
 impl Parity for usize {
     fn is_even(&self) -> bool {
         (*self & 1) == 0

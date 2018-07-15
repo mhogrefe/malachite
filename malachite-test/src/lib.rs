@@ -1,4 +1,10 @@
-#![allow(unknown_lints, no_effect, type_complexity, unnecessary_operation, unused_must_use)]
+#![allow(
+    unknown_lints,
+    no_effect,
+    type_complexity,
+    unnecessary_operation,
+    unused_must_use
+)]
 
 extern crate malachite_base;
 extern crate malachite_nz;

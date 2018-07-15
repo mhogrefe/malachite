@@ -40,11 +40,10 @@ pub fn limbs_index_of_next_false_bit(limbs: &[u32], starting_index: u64) -> u64 
     if starting_limb_index == limbs.len() - 1 {
         return (limbs.len() as u64) << u32::LOG_WIDTH;
     }
-    let false_index = starting_limb_index + 1
-        + limbs[starting_limb_index + 1..]
-            .iter()
-            .take_while(|&&y| y == u32::MAX)
-            .count();
+    let false_index = starting_limb_index + 1 + limbs[starting_limb_index + 1..]
+        .iter()
+        .take_while(|&&y| y == u32::MAX)
+        .count();
     let result_offset = false_index << u32::LOG_WIDTH;
     (if false_index == limbs.len() {
         result_offset

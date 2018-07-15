@@ -23,6 +23,7 @@ use rug;
 use std::cmp::{max, min};
 use std::str::FromStr;
 
+//TODO continue removing duplication
 #[test]
 fn test_limbs_and_pos_neg() {
     let test = |xs, ys, out| {
@@ -96,11 +97,18 @@ fn limbs_and_pos_neg_to_out_fail_3() {
 }
 
 #[test]
-fn test_limbs_and_pos_neg_in_place_left() {
-    let test = |xs_before: &[u32], ys, xs_after| {
-        let mut xs = xs_before.to_vec();
-        limbs_and_pos_neg_in_place_left(&mut xs, ys);
-        assert_eq!(xs, xs_after);
+fn test_limbs_pos_neg_in_place_left_and_limbs_vec_and_pos_neg_in_place_right() {
+    let test = |xs: &[u32], ys, out| {
+        {
+            let mut xs_mut = xs.to_vec();
+            limbs_and_pos_neg_in_place_left(&mut xs_mut, ys);
+            assert_eq!(xs_mut, out);
+        }
+        {
+            let mut ys_mut = ys.to_vec();
+            limbs_vec_and_pos_neg_in_place_right(xs, &mut ys_mut);
+            assert_eq!(ys_mut, out);
+        }
     };
     test(&[2], &[3], vec![0]);
     test(&[1, 1, 1], &[1, 2, 3], vec![1, 1, 0]);
@@ -123,6 +131,20 @@ fn limbs_and_pos_neg_in_place_left_fail_1() {
 #[should_panic(expected = "assertion failed: y_i < ys_len")]
 fn limbs_and_pos_neg_in_place_left_fail_2() {
     limbs_and_pos_neg_in_place_left(&mut [3], &[0, 0, 0]);
+}
+
+#[test]
+#[should_panic(expected = "assertion failed: x_i < xs_len")]
+fn limbs_vec_and_pos_neg_in_place_right_fail_1() {
+    let mut ys = vec![3];
+    limbs_vec_and_pos_neg_in_place_right(&[0, 0, 0], &mut ys);
+}
+
+#[test]
+#[should_panic(expected = "assertion failed: y_i < ys_len")]
+fn limbs_vec_and_pos_neg_in_place_right_fail_2() {
+    let mut ys = vec![0, 0, 0];
+    limbs_vec_and_pos_neg_in_place_right(&[3], &mut ys);
 }
 
 #[test]
@@ -156,41 +178,14 @@ fn limbs_slice_and_pos_neg_in_place_right_fail_2() {
 }
 
 #[test]
-fn test_limbs_vec_and_pos_neg_in_place_right() {
-    let test = |xs, ys_before: &[u32], ys_after| {
-        let mut ys = ys_before.to_vec();
-        limbs_vec_and_pos_neg_in_place_right(xs, &mut ys);
-        assert_eq!(ys, ys_after);
-    };
-    test(&[2], &[3], vec![0]);
-    test(&[1, 1, 1], &[1, 2, 3], vec![1, 1, 0]);
-    test(&[6, 7], &[1, 2, 3], vec![6, 5]);
-    test(&[1, 2, 3], &[6, 7], vec![0, 0, 3]);
-    test(&[100, 101, 102], &[102, 101, 100], vec![0, 0, 2]);
-    test(&[0, 0, 1], &[3], vec![0, 0, 1]);
-    test(&[3], &[0, 0, 1], vec![0]);
-    test(&[0, 3, 3], &[0, 0, 3], vec![0, 0, 1]);
-    test(&[0, 0, 3], &[0, 3, 3], vec![0, 0, 0]);
-}
-
-#[test]
-#[should_panic(expected = "assertion failed: x_i < xs_len")]
-fn limbs_vec_and_pos_neg_in_place_right_fail_1() {
-    let mut ys = vec![3];
-    limbs_vec_and_pos_neg_in_place_right(&[0, 0, 0], &mut ys);
-}
-
-#[test]
-#[should_panic(expected = "assertion failed: y_i < ys_len")]
-fn limbs_vec_and_pos_neg_in_place_right_fail_2() {
-    let mut ys = vec![0, 0, 0];
-    limbs_vec_and_pos_neg_in_place_right(&[3], &mut ys);
-}
-
-#[test]
-fn test_limbs_and_neg_neg() {
+fn test_limbs_and_neg_neg_and_limbs_vec_and_neg_neg_in_place_left() {
     let test = |xs, ys, out| {
         assert_eq!(limbs_and_neg_neg(xs, ys), out);
+        {
+            let mut xs_mut = xs.to_vec();
+            limbs_vec_and_neg_neg_in_place_left(&mut xs_mut, ys);
+            assert_eq!(xs_mut, out);
+        }
     };
     test(&[2], &[3], vec![4]);
     test(&[1, 1, 1], &[1, 2, 3], vec![1, 3, 3]);
@@ -201,6 +196,8 @@ fn test_limbs_and_neg_neg() {
     test(&[3], &[0, 0, 1], vec![0, 0, 1]);
     test(&[0, 3, 3], &[0, 0, 3], vec![0, 0, 4]);
     test(&[0, 0, 3], &[0, 3, 3], vec![0, 0, 4]);
+    test(&[0, 2, 1], &[0, 0xffff_ffff, 0xffff_ffff], vec![0, 0, 0, 1]);
+    test(&[0, 2], &[0, 0xffff_ffff, 0xffff_ffff], vec![0, 0, 0, 1]);
 }
 
 #[test]
@@ -213,6 +210,18 @@ fn limbs_and_neg_neg_fail_1() {
 #[should_panic(expected = "assertion failed: y_i < ys_len")]
 fn limbs_and_neg_neg_fail_2() {
     limbs_and_neg_neg(&[3], &[0, 0, 0]);
+}
+
+#[test]
+#[should_panic(expected = "assertion failed: x_i < xs_len")]
+fn limbs_vec_and_neg_neg_in_place_left_fail_1() {
+    limbs_vec_and_neg_neg_in_place_left(&mut vec![0, 0, 0], &[3]);
+}
+
+#[test]
+#[should_panic(expected = "assertion failed: y_i < ys_len")]
+fn limbs_vec_and_neg_neg_in_place_left_fail_2() {
+    limbs_vec_and_neg_neg_in_place_left(&mut vec![3], &[0, 0, 0]);
 }
 
 #[test]
@@ -362,39 +371,6 @@ fn limbs_slice_and_neg_neg_in_place_left_fail_2() {
 #[should_panic(expected = "assertion failed: xs_len >= ys_len")]
 fn limbs_slice_and_neg_neg_in_place_left_fail_3() {
     limbs_slice_and_neg_neg_in_place_left(&mut [6, 7], &[1, 2, 3]);
-}
-
-#[test]
-fn test_limbs_vec_and_neg_neg_in_place_left() {
-    let test = |xs_before: &[u32], ys, xs_after| {
-        let mut xs = xs_before.to_vec();
-        limbs_vec_and_neg_neg_in_place_left(&mut xs, ys);
-        assert_eq!(xs, xs_after);
-    };
-    test(&[2], &[3], vec![4]);
-    test(&[1, 1, 1], &[1, 2, 3], vec![1, 3, 3]);
-    test(&[1, 2, 3], &[6, 7], vec![6, 7, 3]);
-    test(&[6, 7], &[1, 2, 3], vec![6, 7, 3]);
-    test(&[100, 101, 102], &[102, 101, 100], vec![104, 101, 102]);
-    test(&[0, 0, 1], &[3], vec![0, 0, 1]);
-    test(&[3], &[0, 0, 1], vec![0, 0, 1]);
-    test(&[0, 3, 3], &[0, 0, 3], vec![0, 0, 4]);
-    test(&[0, 0, 3], &[0, 3, 3], vec![0, 0, 4]);
-    test(&[0, 2], &[0, 0xffff_ffff], vec![0, 0, 1]);
-    test(&[0, 2, 1], &[0, 0xffff_ffff, 0xffff_ffff], vec![0, 0, 0, 1]);
-    test(&[0, 2], &[0, 0xffff_ffff, 0xffff_ffff], vec![0, 0, 0, 1]);
-}
-
-#[test]
-#[should_panic(expected = "assertion failed: x_i < xs_len")]
-fn limbs_vec_and_neg_neg_in_place_left_fail_1() {
-    limbs_vec_and_neg_neg_in_place_left(&mut vec![0, 0, 0], &[3]);
-}
-
-#[test]
-#[should_panic(expected = "assertion failed: y_i < ys_len")]
-fn limbs_vec_and_neg_neg_in_place_left_fail_2() {
-    limbs_vec_and_neg_neg_in_place_left(&mut vec![3], &[0, 0, 0]);
 }
 
 #[test]

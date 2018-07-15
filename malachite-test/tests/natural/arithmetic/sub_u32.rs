@@ -282,7 +282,10 @@ fn sub_u32_properties() {
             assert_eq!(n - &difference, u);
 
             assert_eq!(biguint_to_natural(&(natural_to_biguint(n) - u)), difference);
-            assert_eq!(rug_integer_to_natural(&(natural_to_rug_integer(n) - u)), difference);
+            assert_eq!(
+                rug_integer_to_natural(&(natural_to_rug_integer(n) - u)),
+                difference
+            );
 
             assert!(difference <= *n);
             assert_eq!(difference + u, *n);

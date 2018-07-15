@@ -17,6 +17,27 @@ fn sub_and_borrow(x: u32, y: u32, borrow: &mut bool) -> u32 {
     }
 }
 
+/// Interpreting a two slices of `u32`s as the limbs (in ascending order) of two `Natural`s,
+/// subtracts the second from the first. Returns a pair consisting of the limbs of the result, and
+/// whether there was a borrow left over; that is, whether the second `Natural` was greater than the
+/// first `Natural`. The first slice must be at least as long as the second.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(n)
+///
+/// where n = `xs.len()`
+///
+/// # Panics
+/// Panics if `xs` is shorter than `ys`.
+///
+/// # Example
+/// ```
+/// use malachite_nz::natural::arithmetic::sub::limbs_sub;
+///
+/// assert_eq!(limbs_sub(&[123, 456], &[789]), (vec![4_294_966_630, 455], false));
+/// assert_eq!(limbs_sub(&[123, 456], &[456, 789]), (vec![4_294_966_963, 4_294_966_962], true));
+/// ```
 pub fn limbs_sub(xs: &[u32], ys: &[u32]) -> (Vec<u32>, bool) {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -35,21 +56,71 @@ pub fn limbs_sub(xs: &[u32], ys: &[u32]) -> (Vec<u32>, bool) {
     (difference_limbs, borrow)
 }
 
-// Subtract s2 from s1 (which must both have length n), and write the n least significant limbs of
-// the result to r. Return borrow. r must have size at least n.
+/// Interpreting a two equal-length slices of `u32`s as the limbs (in ascending order) of two
+/// `Natural`s, subtracts the second from the first, writing the `xs.len()` limbs of the result to
+/// an output slice. Returns whether there was a borrow left over; that is, whether the second
+/// `Natural` was greater than the first `Natural`. The output slice must be at least as long as
+/// either input slice.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = `xs.len()` = `ys.len()`
+///
+/// # Panics
+/// Panics if `out_limbs` is shorter than `xs` or if `xs` and `ys` have different lengths.
+///
+/// # Example
+/// ```
+/// use malachite_nz::natural::arithmetic::sub::limbs_sub_same_length_to_out;
+///
+/// let mut out_limbs = vec![0, 0, 0];
+/// assert_eq!(limbs_sub_same_length_to_out(&mut out_limbs, &[123, 456], &[789, 123]), false);
+/// assert_eq!(out_limbs, &[4_294_966_630, 332, 0]);
+///
+/// let mut out_limbs = vec![0, 0, 0];
+/// assert_eq!(limbs_sub_same_length_to_out(&mut out_limbs, &[123, 456], &[456, 789]), true);
+/// assert_eq!(out_limbs, &[4_294_966_963, 4_294_966_962, 0]);
+/// ```
 pub fn limbs_sub_same_length_to_out(out_limbs: &mut [u32], xs: &[u32], ys: &[u32]) -> bool {
-    let xs_len = xs.len();
-    assert_eq!(xs_len, ys.len());
-    assert!(out_limbs.len() >= xs_len);
+    let len = xs.len();
+    assert_eq!(len, ys.len());
+    assert!(out_limbs.len() >= len);
     let mut borrow = false;
-    for i in 0..xs_len {
+    for i in 0..len {
         out_limbs[i] = sub_and_borrow(xs[i], ys[i], &mut borrow);
     }
     borrow
 }
 
-// Subtract s2 from s1, and write the s1.len() least significant limbs of the result to r. Return
-// borrow. This function requires that s1.len() >= s2.len() and r.len() >= s1.len().
+/// Interpreting a two slices of `u32`s as the limbs (in ascending order) of two `Natural`s,
+/// subtracts the second from the first, writing the `xs.len()` limbs of the result to an output
+/// slice. Returns whether there was a borrow left over; that is, whether the second `Natural` was
+/// greater than the first `Natural`. The output slice must be at least as long as the first input
+/// slice and the first input slice must be at least as long as the second.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = `xs.len()`
+///
+/// # Panics
+/// Panics if `out_limbs` is shorter than `xs` or if `xs` is shorter than `ys`.
+///
+/// # Example
+/// ```
+/// use malachite_nz::natural::arithmetic::sub::limbs_sub_to_out;
+///
+/// let mut out_limbs = vec![0, 0, 0];
+/// assert_eq!(limbs_sub_to_out(&mut out_limbs, &[123, 456], &[789]), false);
+/// assert_eq!(out_limbs, &[4_294_966_630, 455, 0]);
+///
+/// let mut out_limbs = vec![0, 0, 0];
+/// assert_eq!(limbs_sub_to_out(&mut out_limbs, &[123, 456], &[456, 789]), true);
+/// assert_eq!(out_limbs, &[4_294_966_963, 4_294_966_962, 0]);
+/// ```
 pub fn limbs_sub_to_out(out_limbs: &mut [u32], xs: &[u32], ys: &[u32]) -> bool {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -66,20 +137,68 @@ pub fn limbs_sub_to_out(out_limbs: &mut [u32], xs: &[u32], ys: &[u32]) -> bool {
     }
 }
 
-// Subtract s2 from s1 (which must both have length n), and write the n least significant limbs of
-// the result to s1. Return borrow.
+/// Interpreting two equal-length slices of `u32`s as the limbs (in ascending order) of two
+/// `Natural`s, subtracts the second from the first, writing the `xs.len()` limbs of the result to
+/// the first (left) slice. Returns whether there was a borrow left over; that is, whether the
+/// second `Natural` was greater than the first `Natural`.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = `xs.len()` = `ys.len()`
+///
+/// # Panics
+/// Panics if `xs` and `ys` have different lengths.
+///
+/// # Example
+/// ```
+/// use malachite_nz::natural::arithmetic::sub::limbs_sub_same_length_in_place_left;
+///
+/// let xs = &mut [123, 456];
+/// assert_eq!(limbs_sub_same_length_in_place_left(xs, &[789, 123]), false);
+/// assert_eq!(xs, &[4_294_966_630, 332]);
+///
+/// let xs = &mut [123, 456];
+/// assert_eq!(limbs_sub_same_length_in_place_left(xs, &[456, 789]), true);
+/// assert_eq!(xs, &[4_294_966_963, 4_294_966_962]);
+/// ```
 pub fn limbs_sub_same_length_in_place_left(xs: &mut [u32], ys: &[u32]) -> bool {
-    let xs_len = xs.len();
-    assert_eq!(xs_len, ys.len());
+    let len = xs.len();
+    assert_eq!(len, ys.len());
     let mut borrow = false;
-    for i in 0..xs_len {
+    for i in 0..len {
         xs[i] = sub_and_borrow(xs[i], ys[i], &mut borrow);
     }
     borrow
 }
 
-// Subtract s2 from s1, and write the s1.len() least significant limbs of the result to s1. Return
-// borrow. This function requires that s1.len() >= s2.len().
+/// Interpreting two slices of `u32`s as the limbs (in ascending order) of two `Natural`s, subtracts
+/// the second from the first, writing the `xs.len()` limbs of the result to the first (left) slice.
+/// Returns whether there was a borrow left over; that is, whether the second `Natural` was greater
+/// than the first `Natural`. The first slice must be at least as long as the second.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = `xs.len()`
+///
+/// # Panics
+/// Panics if `xs` is shorter than `ys`.
+///
+/// # Example
+/// ```
+/// use malachite_nz::natural::arithmetic::sub::limbs_sub_in_place_left;
+///
+/// let xs = &mut [123, 456];
+/// assert_eq!(limbs_sub_in_place_left(xs, &[789]), false);
+/// assert_eq!(xs, &[4_294_966_630, 455]);
+///
+/// let xs = &mut [123, 456];
+/// assert_eq!(limbs_sub_in_place_left(xs, &[456, 789]), true);
+/// assert_eq!(xs, &[4_294_966_963, 4_294_966_962]);
+/// ```
 pub fn limbs_sub_in_place_left(xs: &mut [u32], ys: &[u32]) -> bool {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -94,16 +213,69 @@ pub fn limbs_sub_in_place_left(xs: &mut [u32], ys: &[u32]) -> bool {
     }
 }
 
+/// Interpreting two equal-length slices of `u32`s as the limbs (in ascending order) of two
+/// `Natural`s, subtracts the second from the first, writing the `xs.len()` limbs of the result to
+/// the second (right) slice. Returns whether there was a borrow left over; that is, whether the
+/// second `Natural` was greater than the first `Natural`.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = `xs.len()` = `ys.len()`
+///
+/// # Panics
+/// Panics if `xs` and `ys` have different lengths.
+///
+/// # Example
+/// ```
+/// use malachite_nz::natural::arithmetic::sub::limbs_sub_same_length_in_place_right;
+///
+/// let ys = &mut [789, 123];
+/// assert_eq!(limbs_sub_same_length_in_place_right(&[123, 456], ys), false);
+/// assert_eq!(ys, &[4_294_966_630, 332]);
+///
+/// let ys = &mut [456, 789];
+/// assert_eq!(limbs_sub_same_length_in_place_right(&[123, 456], ys), true);
+/// assert_eq!(ys, &[4_294_966_963, 4_294_966_962]);
+/// ```
 pub fn limbs_sub_same_length_in_place_right(xs: &[u32], ys: &mut [u32]) -> bool {
-    let ys_len = ys.len();
-    assert_eq!(xs.len(), ys_len);
+    let len = ys.len();
+    assert_eq!(xs.len(), len);
     let mut borrow = false;
-    for i in 0..ys_len {
+    for i in 0..len {
         ys[i] = sub_and_borrow(xs[i], ys[i], &mut borrow);
     }
     borrow
 }
 
+/// Interpreting a of `u32`s and a `Vec` of `u32`s as the limbs (in ascending order) of two
+/// `Natural`s, subtracts the second from the first, writing the `xs.len()` limbs of the result to
+/// the `Vec`, possibly extending the `Vec`'s length. Returns whether there was a borrow left over;
+/// that is, whether the second `Natural` was greater than the first `Natural`. The first slice must
+/// be at least as long as the second.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(m)
+///
+/// where n = `xs.len()`, m = `xs.len()` - `ys.len()`
+///
+/// # Panics
+/// Panics if `xs` is shorter than `ys`.
+///
+/// # Example
+/// ```
+/// use malachite_nz::natural::arithmetic::sub::limbs_sub_in_place_right;
+///
+/// let mut ys = vec![789];
+/// assert_eq!(limbs_sub_in_place_right(&[123, 456], &mut ys), false);
+/// assert_eq!(ys, &[4_294_966_630, 455]);
+///
+/// let mut ys = vec![456, 789];
+/// assert_eq!(limbs_sub_in_place_right(&[123, 456], &mut ys), true);
+/// assert_eq!(ys, &[4_294_966_963, 4_294_966_962]);
+/// ```
 pub fn limbs_sub_in_place_right(xs: &[u32], ys: &mut Vec<u32>) -> bool {
     let xs_len = xs.len();
     let ys_len = ys.len();
