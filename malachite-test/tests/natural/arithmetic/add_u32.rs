@@ -196,9 +196,10 @@ fn limbs_slice_add_limb_in_place_properties() {
     test_properties(pairs_of_unsigned_vec_and_unsigned, |&(ref limbs, limb)| {
         let mut limbs = limbs.to_vec();
         let old_limbs = limbs.clone();
-        limbs_slice_add_limb_in_place(&mut limbs, limb);
+        let carry = limbs_slice_add_limb_in_place(&mut limbs, limb);
         let n = Natural::from_limbs_asc(&old_limbs) + limb;
         let mut expected_limbs = n.into_limbs_asc();
+        assert_eq!(carry, expected_limbs.len() == limbs.len() + 1);
         expected_limbs.resize(limbs.len(), 0);
         assert_eq!(limbs, expected_limbs);
     });

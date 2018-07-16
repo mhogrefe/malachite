@@ -3,7 +3,7 @@ use malachite_base::limbs::limbs_test_zero;
 use malachite_base::num::{AddMul, AddMulAssign, NegAssign, NotAssign};
 use natural::arithmetic::add_mul_u32::mpn_addmul_1;
 use natural::arithmetic::add_u32::limbs_slice_add_limb_in_place;
-use natural::arithmetic::mul_u32::{mpn_mul_1, mpn_mul_1c};
+use natural::arithmetic::mul_u32::{limbs_mul_limb_to_out, limbs_mul_limb_with_carry_to_out};
 use natural::arithmetic::sub_mul_u32::mpn_submul_1;
 use natural::arithmetic::sub_u32::limbs_sub_limb_in_place;
 use natural::logic::not::limbs_not_in_place;
@@ -343,7 +343,7 @@ pub(crate) fn mpz_aorsmul_1(
     if wsize == 0 {
         // nothing to add to, just set x * y, `sub` gives the sign
         w.resize(xsize + 1, 0);
-        let cy = mpn_mul_1(w, &x[..xsize], y);
+        let cy = limbs_mul_limb_to_out(w, &x[..xsize], y);
         w[xsize] = cy;
         if cy != 0 {
             xsize += 1;
@@ -363,7 +363,7 @@ pub(crate) fn mpz_aorsmul_1(
         let mut dsize = xsize as isize - wsize as isize;
         if dsize != 0 {
             let cy2 = if dsize > 0 {
-                mpn_mul_1(
+                limbs_mul_limb_to_out(
                     &mut w[min_size..],
                     &x[min_size..min_size + dsize as usize],
                     y,
@@ -423,7 +423,7 @@ pub(crate) fn mpz_aorsmul_1(
             // cy == MP_LIMB_T_MAX so that value always indicates a -1.
             let cy2 = if cy == u32::MAX { 1 } else { 0 };
             cy = cy.wrapping_add(cy2);
-            cy = mpn_mul_1c(&mut w[wsize..xsize], &x[wsize..xsize], y, cy);
+            cy = limbs_mul_limb_with_carry_to_out(&mut w[wsize..xsize], &x[wsize..xsize], y, cy);
             w[new_wsize] = cy;
             if cy != 0 {
                 new_wsize += 1;

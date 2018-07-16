@@ -199,7 +199,7 @@ fn benchmark_limbs_slice_add_limb_in_place(gm: GenerationMode, limit: usize, fil
 
 fn benchmark_limbs_vec_add_limb_in_place(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
-        "limbs_vec_add_limb_in_place(&mut [u32], u32)",
+        "limbs_vec_add_limb_in_place(&mut Vec<u32>, u32)",
         BenchmarkType::Single,
         pairs_of_nonempty_unsigned_vec_and_unsigned(gm),
         gm.name(),
@@ -209,7 +209,7 @@ fn benchmark_limbs_vec_add_limb_in_place(gm: GenerationMode, limit: usize, file_
         "limbs.len()",
         &mut [(
             "malachite",
-            &mut (|(mut limbs, limb)| no_out!(limbs_vec_add_limb_in_place(&mut limbs, limb))),
+            &mut (|(mut limbs, limb)| limbs_vec_add_limb_in_place(&mut limbs, limb)),
         )],
     );
 }

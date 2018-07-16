@@ -6,7 +6,7 @@ use natural::arithmetic::add::{
 };
 use natural::arithmetic::add_mul_u32::mpn_addmul_1;
 use natural::arithmetic::add_u32::{limbs_add_limb_to_out, limbs_slice_add_limb_in_place};
-use natural::arithmetic::mul_u32::mpn_mul_1;
+use natural::arithmetic::mul_u32::limbs_mul_limb_to_out;
 use natural::arithmetic::shl_u32::{mpn_lshift, mpn_lshift_in_place};
 use natural::arithmetic::shr_u32::mpn_rshift_in_place;
 use natural::arithmetic::sub::{
@@ -820,7 +820,7 @@ fn mpn_toom8h_mul(prod: &mut [u32], u: &[u32], v: &[u32], scratch: &mut [u32]) {
 fn mpn_mul_basecase(prod: &mut [u32], u: &[u32], v: &[u32]) {
     let u_len = u.len();
     assert!(u_len >= v.len());
-    let carry = mpn_mul_1(prod, u, v[0]);
+    let carry = limbs_mul_limb_to_out(prod, u, v[0]);
     if carry != 0 {
         prod[u_len] = carry;
     }

@@ -3,44 +3,138 @@ use malachite_base::num::{Assign, Zero};
 use natural::Natural::{self, Large, Small};
 use std::ops::{Mul, MulAssign};
 
-// Multiply s1 by s2limb, and write the n least significant limbs of the product to r. Return the
-// most significant limb of the product. r.len() >= s1.len().
-pub fn mpn_mul_1(r: &mut [u32], s1: &[u32], s2limb: u32) -> u32 {
-    let s1_len = s1.len();
-    assert!(r.len() >= s1_len);
+/// Interpreting a slice of `u32`s as the limbs (in ascending order) of a `Natural`, returns the
+/// limbs of the product of the `Natural` and a `u32`.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(n)
+///
+/// where n = `limbs.len()`
+///
+/// # Example
+/// ```
+/// use malachite_nz::natural::arithmetic::mul_u32::limbs_mul_limb;
+///
+/// assert_eq!(limbs_mul_limb(&[123, 456], 789), &[97_047, 359_784]);
+/// assert_eq!(limbs_mul_limb(&[0xffff_ffff, 5], 2), &[4_294_967_294, 11]);
+/// assert_eq!(limbs_mul_limb(&[0xffff_ffff], 2), &[4_294_967_294, 1]);
+/// ```
+pub fn limbs_mul_limb(limbs: &[u32], limb: u32) -> Vec<u32> {
     let mut carry = 0;
-    let s2limb_u64 = u64::from(s2limb);
-    for i in 0..s1_len {
-        let limb_result = u64::from(s1[i]) * s2limb_u64 + u64::from(carry);
-        r[i] = limb_result.lower_half();
+    let limb = u64::from(limb);
+    let mut result_limbs = Vec::with_capacity(limbs.len());
+    for &x in limbs {
+        let limb_result = u64::from(x) * limb + u64::from(carry);
+        result_limbs.push(limb_result.lower_half());
+        carry = limb_result.upper_half();
+    }
+    if carry != 0 {
+        result_limbs.push(carry);
+    }
+    result_limbs
+}
+
+pub(crate) fn limbs_mul_limb_with_carry_to_out(
+    out_limbs: &mut [u32],
+    in_limbs: &[u32],
+    limb: u32,
+    mut carry: u32,
+) -> u32 {
+    let len = in_limbs.len();
+    assert!(out_limbs.len() >= len);
+    let limb = u64::from(limb);
+    for i in 0..len {
+        let limb_result = u64::from(in_limbs[i]) * limb + u64::from(carry);
+        out_limbs[i] = limb_result.lower_half();
         carry = limb_result.upper_half();
     }
     carry
 }
 
-// Multiply s1 by s2limb, and write the n least significant limbs of the product to s1. Return the
-// most significant limb of the product.
-pub fn mpn_mul_1_in_place(s1: &mut [u32], s2limb: u32) -> u32 {
+/// Interpreting a slice of `u32`s as the limbs (in ascending order) of a `Natural`, writes the
+/// limbs of the product of the `Natural` and a `u32` to an output slice. The output slice must be
+/// at least as long as the input slice. Returns the 32-bit carry.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = `limbs.len()`
+///
+/// # Panics
+/// Panics if `out_limbs` is shorter than `in_limbs`.
+///
+/// # Example
+/// ```
+/// use malachite_nz::natural::arithmetic::mul_u32::limbs_mul_limb_to_out;
+///
+/// let mut out_limbs = vec![0, 0, 0];
+/// assert_eq!(limbs_mul_limb_to_out(&mut out_limbs, &[123, 456], 789), 0);
+/// assert_eq!(out_limbs, &[97_047, 359_784, 0]);
+///
+/// let mut out_limbs = vec![0, 0, 0];
+/// assert_eq!(limbs_mul_limb_to_out(&mut out_limbs, &[0xffff_ffff], 2), 1);
+/// assert_eq!(out_limbs, &[4_294_967_294, 0, 0]);
+/// ```
+pub fn limbs_mul_limb_to_out(out_limbs: &mut [u32], in_limbs: &[u32], limb: u32) -> u32 {
+    limbs_mul_limb_with_carry_to_out(out_limbs, in_limbs, limb, 0)
+}
+
+/// Interpreting a slice of `u32`s as the limbs (in ascending order) of a `Natural`, writes the
+/// limbs of the product of the `Natural` and a `u32` to the input slice. Returns the 32-bit carry.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(1)
+///
+/// # Example
+/// ```
+/// use malachite_nz::natural::arithmetic::mul_u32::limbs_slice_mul_limb_in_place;
+///
+/// let mut limbs = vec![123, 456];
+/// assert_eq!(limbs_slice_mul_limb_in_place(&mut limbs, 789), 0);
+/// assert_eq!(limbs, &[97_047, 359_784]);
+///
+/// let mut limbs = vec![0xffff_ffff];
+/// assert_eq!(limbs_slice_mul_limb_in_place(&mut limbs, 2), 1);
+/// assert_eq!(limbs, &[4_294_967_294]);
+/// ```
+pub fn limbs_slice_mul_limb_in_place(limbs: &mut [u32], limb: u32) -> u32 {
     let mut carry = 0;
-    let s2limb_u64 = u64::from(s2limb);
-    for limb in s1.iter_mut() {
-        let limb_result = u64::from(*limb) * s2limb_u64 + u64::from(carry);
-        *limb = limb_result.lower_half();
+    let limb = u64::from(limb);
+    for x in limbs.iter_mut() {
+        let limb_result = u64::from(*x) * limb + u64::from(carry);
+        *x = limb_result.lower_half();
         carry = limb_result.upper_half();
     }
     carry
 }
 
-pub(crate) fn mpn_mul_1c(r: &mut [u32], s1: &[u32], s2limb: u32, mut carry: u32) -> u32 {
-    let s1_len = s1.len();
-    assert!(r.len() >= s1_len);
-    let s2limb_u64 = u64::from(s2limb);
-    for i in 0..s1_len {
-        let limb_result = u64::from(s1[i]) * s2limb_u64 + u64::from(carry);
-        r[i] = limb_result.lower_half();
-        carry = limb_result.upper_half();
+/// Interpreting a `Vec` of `u32`s as the limbs (in ascending order) of a `Natural`, writes the
+/// limbs of the product of the `Natural` and a `u32` to the input `Vec`.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(1)
+///
+/// # Example
+/// ```
+/// use malachite_nz::natural::arithmetic::mul_u32::limbs_vec_mul_limb_in_place;
+///
+/// let mut limbs = vec![123, 456];
+/// limbs_vec_mul_limb_in_place(&mut limbs, 789);
+/// assert_eq!(limbs, &[97_047, 359_784]);
+///
+/// let mut limbs = vec![0xffff_ffff];
+/// limbs_vec_mul_limb_in_place(&mut limbs, 2);
+/// assert_eq!(limbs, &[4_294_967_294, 1]);
+/// ```
+pub fn limbs_vec_mul_limb_in_place(limbs: &mut Vec<u32>, limb: u32) {
+    let carry = limbs_slice_mul_limb_in_place(limbs, limb);
+    if carry != 0 {
+        limbs.push(carry);
     }
-    carry
 }
 
 /// Multiplies a `Natural` by a `u32`, taking the `Natural` by value.
@@ -116,14 +210,7 @@ impl<'a> Mul<u32> for &'a Natural {
                     Large(vec![lower, upper])
                 }
             }
-            Large(ref limbs) => {
-                let mut product_limbs = vec![0; limbs.len()];
-                let carry = mpn_mul_1(&mut product_limbs, limbs, other);
-                if carry != 0 {
-                    product_limbs.push(carry);
-                }
-                Large(product_limbs)
-            }
+            Large(ref limbs) => Large(limbs_mul_limb(limbs, other)),
         }
     }
 }
@@ -228,10 +315,7 @@ impl MulAssign<u32> for Natural {
             return;
         }
         mutate_with_possible_promotion!(self, small, limbs, { small.checked_mul(other) }, {
-            let carry = mpn_mul_1_in_place(limbs, other);
-            if carry != 0 {
-                limbs.push(carry);
-            }
+            limbs_vec_mul_limb_in_place(limbs, other);
         });
     }
 }
