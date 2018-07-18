@@ -150,8 +150,8 @@ fn benchmark_natural_sub_mul_algorithms(gm: GenerationMode, limit: usize, file_n
                 &mut (|(a, b, c)| no_out!(a.sub_mul(&b, &c))),
             ),
             (
-                "Natural - &(&Natural * &Natural)",
-                &mut (|(a, b, c)| no_out!(a - &(&b * &c))),
+                "Natural - &Natural * &Natural",
+                &mut (|(a, b, c)| no_out!(a - &b * &c)),
             ),
         ],
     );
@@ -173,8 +173,8 @@ fn benchmark_natural_sub_mul_ref_algorithms(gm: GenerationMode, limit: usize, fi
                 &mut (|(a, b, c)| no_out!((&a).sub_mul(&b, &c))),
             ),
             (
-                "(&Natural) - &(&Natural * &Natural)",
-                &mut (|(a, b, c)| no_out!((&a) - &(&b * &c))),
+                "(&Natural) - &Natural * &Natural",
+                &mut (|(a, b, c)| no_out!((&a) - &b * &c)),
             ),
         ],
     );

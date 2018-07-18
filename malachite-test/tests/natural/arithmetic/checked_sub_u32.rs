@@ -101,7 +101,7 @@ fn sub_u32_properties() {
                 );
             }
 
-            assert_eq!(n.checked_sub(&Natural::from(u)), difference);
+            assert_eq!(n.checked_sub(Natural::from(u)), difference);
             assert_eq!(
                 CheckedSub::checked_sub(u, n).map(Natural::from),
                 Natural::from(u).checked_sub(n)

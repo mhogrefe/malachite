@@ -395,6 +395,11 @@ fn limbs_sub_in_place_right_fail() {
 fn test_sub_assign_natural() {
     let test = |u, v, out| {
         let mut n = Natural::from_str(u).unwrap();
+        n -= Natural::from_str(v).unwrap();
+        assert_eq!(n.to_string(), out);
+        assert!(n.is_valid());
+
+        let mut n = Natural::from_str(u).unwrap();
         n -= &Natural::from_str(v).unwrap();
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
@@ -417,13 +422,28 @@ fn test_sub_assign_natural() {
 #[should_panic(expected = "Cannot subtract a Natural from a smaller Natural")]
 fn sub_assign_fail() {
     let mut x = Natural::from_str("123").unwrap();
+    x -= Natural::from_str("456").unwrap();
+}
+
+#[test]
+#[should_panic(expected = "Cannot subtract a Natural from a smaller Natural")]
+fn sub_assign_ref_fail() {
+    let mut x = Natural::from_str("123").unwrap();
     x -= &Natural::from_str("456").unwrap();
 }
 
 #[test]
 fn test_sub_natural() {
     let test = |u, v, out| {
+        let n = Natural::from_str(u).unwrap() - Natural::from_str(v).unwrap();
+        assert_eq!(n.to_string(), out);
+        assert!(n.is_valid());
+
         let n = Natural::from_str(u).unwrap() - &Natural::from_str(v).unwrap();
+        assert_eq!(n.to_string(), out);
+        assert!(n.is_valid());
+
+        let n = &Natural::from_str(u).unwrap() - Natural::from_str(v).unwrap();
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
@@ -456,7 +476,21 @@ fn test_sub_natural() {
 #[should_panic(expected = "Cannot subtract a Natural from a smaller Natural")]
 #[allow(unused_must_use)]
 fn sub_fail_1() {
+    Natural::from(123_u32) - Natural::from(456_u32);
+}
+
+#[test]
+#[should_panic(expected = "Cannot subtract a Natural from a smaller Natural")]
+#[allow(unused_must_use)]
+fn sub_fail_2() {
     Natural::from(123_u32) - &Natural::from(456_u32);
+}
+
+#[test]
+#[should_panic(expected = "Cannot subtract a Natural from a smaller Natural")]
+#[allow(unused_must_use)]
+fn sub_fail_3() {
+    &Natural::from(123_u32) - Natural::from(456_u32);
 }
 
 #[test]
@@ -464,7 +498,7 @@ fn sub_fail_1() {
     expected = "Cannot subtract a Natural from a smaller Natural. self: 123, other: 456"
 )]
 #[allow(unused_must_use)]
-fn sub_fail_2() {
+fn sub_fail_4() {
     &Natural::from(123_u32) - &Natural::from(456_u32);
 }
 
@@ -482,10 +516,7 @@ fn limbs_sub_properties() {
                     + (Integer::ONE << (u32::WIDTH * len))
             );
         } else {
-            assert_eq!(
-                n,
-                Natural::from_limbs_asc(xs) - &Natural::from_limbs_asc(ys)
-            );
+            assert_eq!(n, Natural::from_limbs_asc(xs) - Natural::from_limbs_asc(ys));
         }
     });
 }
@@ -507,7 +538,7 @@ fn limbs_sub_to_out_helper(
         limbs.resize(len, u32::MAX);
         limbs
     } else {
-        let n = Natural::from_limbs_asc(xs) - &Natural::from_limbs_asc(ys);
+        let n = Natural::from_limbs_asc(xs) - Natural::from_limbs_asc(ys);
         let mut limbs = n.into_limbs_asc();
         limbs.resize(len, 0);
         limbs
@@ -556,7 +587,7 @@ fn limbs_sub_in_place_left_helper(
     } else {
         assert_eq!(
             n,
-            Natural::from_owned_limbs_asc(xs_old) - &Natural::from_limbs_asc(ys)
+            Natural::from_owned_limbs_asc(xs_old) - Natural::from_limbs_asc(ys)
         );
     }
 }
@@ -593,7 +624,7 @@ macro_rules! limbs_sub_in_place_right_helper {
             } else {
                 assert_eq!(
                     n,
-                    Natural::from_limbs_asc($xs) - &Natural::from_owned_limbs_asc(ys_old)
+                    Natural::from_limbs_asc($xs) - Natural::from_owned_limbs_asc(ys_old)
                 );
             }
         }
@@ -620,19 +651,33 @@ fn limbs_sub_in_place_right_properties() {
 fn sub_properties() {
     test_properties(pairs_of_naturals_var_1, |&(ref x, ref y)| {
         let mut mut_x = x.clone();
-        mut_x -= y;
+        mut_x -= y.clone();
         assert!(mut_x.is_valid());
         let difference = mut_x;
+
+        let mut mut_x = x.clone();
+        mut_x -= y;
+        assert!(mut_x.is_valid());
+        let difference_alt = mut_x;
+        assert_eq!(difference_alt, difference);
 
         let mut rug_x = natural_to_rug_integer(x);
         rug_x -= natural_to_rug_integer(y);
         assert_eq!(rug_integer_to_natural(&rug_x), difference);
 
-        let difference_alt = x - y;
+        let difference_alt = x.clone() - y.clone();
+        assert!(difference_alt.is_valid());
+        assert_eq!(difference_alt, difference);
+
+        let difference_alt = x.clone() - y;
         assert_eq!(difference_alt, difference);
         assert!(difference_alt.is_valid());
 
-        let difference_alt = x.clone() - y;
+        let difference_alt = x - y.clone();
+        assert_eq!(difference_alt, difference);
+        assert!(difference_alt.is_valid());
+
+        let difference_alt = x - y;
         assert_eq!(difference_alt, difference);
         assert!(difference_alt.is_valid());
 
@@ -651,7 +696,7 @@ fn sub_properties() {
 
     #[allow(unknown_lints, identity_op, eq_op)]
     test_properties(naturals, |x| {
-        assert_eq!(x - &Natural::ZERO, *x);
+        assert_eq!(x - Natural::ZERO, *x);
         assert_eq!(x - x, Natural::ZERO);
     });
 }

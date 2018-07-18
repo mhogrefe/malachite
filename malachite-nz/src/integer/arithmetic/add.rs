@@ -330,10 +330,8 @@ impl<'a> AddAssign<&'a Integer> for Integer {
             1 => self.abs -= &other.abs,
             // e.g. 5 + -10, -5 + 10, or -5 + 5; sign of self is flipped
             _ => {
-                *self = Integer {
-                    sign: other.sign,
-                    abs: &other.abs - &self.abs,
-                }
+                self.sign = other.sign;
+                self.abs.sub_right_assign_no_panic(&other.abs);
             }
         }
     }

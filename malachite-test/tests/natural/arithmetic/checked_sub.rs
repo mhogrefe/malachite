@@ -15,7 +15,17 @@ fn test_checked_sub_natural() {
     let test = |u, v, out| {
         let on = Natural::from_str(u)
             .unwrap()
+            .checked_sub(Natural::from_str(v).unwrap());
+        assert_eq!(format!("{:?}", on), out);
+        assert!(on.map_or(true, |n| n.is_valid()));
+
+        let on = Natural::from_str(u)
+            .unwrap()
             .checked_sub(&Natural::from_str(v).unwrap());
+        assert_eq!(format!("{:?}", on), out);
+        assert!(on.map_or(true, |n| n.is_valid()));
+
+        let on = (&Natural::from_str(u).unwrap()).checked_sub(Natural::from_str(v).unwrap());
         assert_eq!(format!("{:?}", on), out);
         assert!(on.map_or(true, |n| n.is_valid()));
 
@@ -62,7 +72,7 @@ fn test_checked_sub_natural() {
 }
 
 #[test]
-fn sub_properties() {
+fn checked_sub_properties() {
     test_properties(pairs_of_naturals, |&(ref x, ref y)| {
         let difference = if *x >= *y {
             let mut mut_x = x.clone();
@@ -78,11 +88,19 @@ fn sub_properties() {
             None
         };
 
-        let difference_alt = x.checked_sub(y);
+        let difference_alt = x.clone().checked_sub(y.clone());
         assert_eq!(difference_alt, difference);
         assert!(difference.as_ref().map_or(true, |x| x.is_valid()));
 
         let difference_alt = x.clone().checked_sub(y);
+        assert_eq!(difference_alt, difference);
+        assert!(difference.as_ref().map_or(true, |x| x.is_valid()));
+
+        let difference_alt = x.checked_sub(y.clone());
+        assert_eq!(difference_alt, difference);
+        assert!(difference.as_ref().map_or(true, |x| x.is_valid()));
+
+        let difference_alt = x.checked_sub(y);
         assert_eq!(difference_alt, difference);
         assert!(difference.as_ref().map_or(true, |x| x.is_valid()));
 
@@ -112,7 +130,7 @@ fn sub_properties() {
 
     #[allow(unknown_lints, identity_op, eq_op)]
     test_properties(naturals, |x| {
-        assert_eq!(x.checked_sub(&Natural::ZERO).as_ref(), Some(x));
+        assert_eq!(x.checked_sub(Natural::ZERO).as_ref(), Some(x));
         assert_eq!(x.checked_sub(x), Some(Natural::ZERO));
         if *x != 0 {
             assert!((Natural::ZERO.checked_sub(x)).is_none());

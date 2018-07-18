@@ -116,7 +116,7 @@ fn sub_mul_u32_properties() {
             assert!(result_alt.as_ref().map_or(true, |n| n.is_valid()));
             assert_eq!(result_alt, result);
 
-            assert_eq!(a.checked_sub(&(b * c)), result);
+            assert_eq!(a.checked_sub(b * c), result);
             assert_eq!(a.sub_mul(b, &Natural::from(c)), result);
         },
     );

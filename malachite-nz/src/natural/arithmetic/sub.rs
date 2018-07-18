@@ -300,6 +300,37 @@ fn sub_panic<S: Display, T: Display>(x: S, y: T) {
     );
 }
 
+/// Subtracts a `Natural` from a `Natural`, taking both `Natural`s by value.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(n)
+///
+/// where n = `self.significant_bits()`
+///
+/// # Examples
+/// ```
+/// extern crate malachite_base;
+/// extern crate malachite_nz;
+///
+/// use malachite_base::num::Zero;
+/// use malachite_nz::natural::Natural;
+///
+/// fn main() {
+///     assert_eq!((Natural::from(123u32) - Natural::ZERO).to_string(), "123");
+///     assert_eq!((Natural::from(456u32) - Natural::from(123u32)).to_string(), "333");
+///     assert_eq!((Natural::trillion() * 3 - Natural::trillion()).to_string(), "2000000000000");
+/// }
+/// ```
+impl Sub<Natural> for Natural {
+    type Output = Natural;
+
+    fn sub(self, other: Natural) -> Natural {
+        self.checked_sub(other)
+            .expect("Cannot subtract a Natural from a smaller Natural")
+    }
+}
+
 /// Subtracts a `Natural` from a `Natural`, taking the left `Natural` by value and the right
 /// `Natural` by reference.
 ///
@@ -327,6 +358,38 @@ impl<'a> Sub<&'a Natural> for Natural {
     type Output = Natural;
 
     fn sub(self, other: &'a Natural) -> Natural {
+        self.checked_sub(other)
+            .expect("Cannot subtract a Natural from a smaller Natural")
+    }
+}
+
+/// Subtracts a `Natural` from a `Natural`, taking the left `Natural` by reference and the right
+/// `Natural` by value.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(n)
+///
+/// where n = `self.significant_bits()`
+///
+/// # Examples
+/// ```
+/// extern crate malachite_base;
+/// extern crate malachite_nz;
+///
+/// use malachite_base::num::Zero;
+/// use malachite_nz::natural::Natural;
+///
+/// fn main() {
+///     assert_eq!((&Natural::from(123u32) - Natural::ZERO).to_string(), "123");
+///     assert_eq!((&Natural::from(456u32) - Natural::from(123u32)).to_string(), "333");
+///     assert_eq!((&(Natural::trillion() * 3) - Natural::trillion()).to_string(), "2000000000000");
+/// }
+/// ```
+impl<'a> Sub<Natural> for &'a Natural {
+    type Output = Natural;
+
+    fn sub(self, other: Natural) -> Natural {
         self.checked_sub(other)
             .expect("Cannot subtract a Natural from a smaller Natural")
     }
@@ -366,6 +429,36 @@ impl<'a, 'b> Sub<&'a Natural> for &'b Natural {
     }
 }
 
+/// Subtracts a `Natural` from a `Natural` in place, taking the `Natural` on the RHS by value.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(n)
+///
+/// where n = `self.significant_bits()`
+///
+/// # Panics
+/// Panics if `other` is greater than `self`.
+///
+/// # Examples
+/// ```
+/// use malachite_nz::natural::Natural;
+///
+/// let mut x = Natural::trillion() * 10;
+/// x -= Natural::trillion();
+/// x -= (Natural::trillion() * 2);
+/// x -= (Natural::trillion() * 3);
+/// x -= (Natural::trillion() * 4);
+/// assert_eq!(x.to_string(), "0");
+/// ```
+impl SubAssign<Natural> for Natural {
+    fn sub_assign(&mut self, other: Natural) {
+        if self.sub_assign_no_panic(other) {
+            panic!("Cannot subtract a Natural from a smaller Natural");
+        }
+    }
+}
+
 /// Subtracts a `Natural` from a `Natural` in place, taking the `Natural` on the RHS by reference.
 ///
 /// Time: worst case O(n)
@@ -390,7 +483,7 @@ impl<'a, 'b> Sub<&'a Natural> for &'b Natural {
 /// ```
 impl<'a> SubAssign<&'a Natural> for Natural {
     fn sub_assign(&mut self, other: &'a Natural) {
-        if self.sub_assign_no_panic(other) {
+        if self.sub_assign_ref_no_panic(other) {
             panic!("Cannot subtract a Natural from a smaller Natural");
         }
     }

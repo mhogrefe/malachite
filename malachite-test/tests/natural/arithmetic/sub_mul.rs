@@ -121,7 +121,7 @@ fn sub_mul_properties() {
         assert!(result_alt.as_ref().map_or(true, |n| n.is_valid()));
         assert_eq!(result_alt, result);
 
-        assert_eq!(a.checked_sub(&(b * c)), result);
+        assert_eq!(a.checked_sub(b * c), result);
     });
 
     test_properties(pairs_of_naturals, |&(ref a, ref b)| {
