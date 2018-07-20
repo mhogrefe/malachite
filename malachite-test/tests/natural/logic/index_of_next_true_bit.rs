@@ -5,7 +5,7 @@ use malachite_nz::natural::logic::bit_scan::limbs_index_of_next_true_bit;
 use malachite_nz::natural::Natural;
 use malachite_test::common::natural_to_rug_integer;
 use malachite_test::inputs::base::{pairs_of_unsigned_vec_and_small_u64, unsigneds};
-use malachite_test::inputs::natural::{naturals, pairs_of_natural_and_small_u64};
+use malachite_test::inputs::natural::{naturals, pairs_of_natural_and_small_unsigned};
 use malachite_test::natural::logic::index_of_next_true_bit::natural_index_of_next_true_bit_alt;
 use rug;
 use std::str::FromStr;
@@ -79,7 +79,7 @@ fn limbs_index_of_next_true_bit_properties() {
 
 #[test]
 fn index_of_next_true_bit_properties() {
-    test_properties(pairs_of_natural_and_small_u64, |&(ref n, u)| {
+    test_properties(pairs_of_natural_and_small_unsigned, |&(ref n, u)| {
         let result = n.index_of_next_true_bit(u);
         assert_eq!(result, natural_index_of_next_true_bit_alt(n, u));
         assert_eq!(

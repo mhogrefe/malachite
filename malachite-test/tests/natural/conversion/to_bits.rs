@@ -1,9 +1,9 @@
 use common::{test_properties, test_properties_no_special};
 use malachite_base::num::{SignificantBits, Zero};
 use malachite_nz::natural::Natural;
-use malachite_test::inputs::base::small_u64s;
+use malachite_test::inputs::base::small_unsigneds;
 use malachite_test::inputs::natural::{
-    naturals, pairs_of_natural_and_small_u64, pairs_of_natural_and_vec_of_bool_var_2,
+    naturals, pairs_of_natural_and_small_unsigned, pairs_of_natural_and_vec_of_bool_var_2,
 };
 use std::str::FromStr;
 
@@ -212,7 +212,7 @@ fn bits_properties() {
         },
     );
 
-    test_properties(pairs_of_natural_and_small_u64, |&(ref n, u)| {
+    test_properties(pairs_of_natural_and_small_unsigned, |&(ref n, u)| {
         if u < n.significant_bits() {
             assert_eq!(n.bits()[u], n.to_bits_asc()[u as usize]);
         } else {
@@ -220,7 +220,7 @@ fn bits_properties() {
         }
     });
 
-    test_properties_no_special(small_u64s, |&u| {
+    test_properties_no_special(small_unsigneds, |&u| {
         assert_eq!(Natural::ZERO.bits()[u], false);
     });
 }

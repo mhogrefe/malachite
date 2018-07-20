@@ -7,7 +7,7 @@ use natural::arithmetic::add::{
 use natural::arithmetic::add_mul_u32::mpn_addmul_1;
 use natural::arithmetic::add_u32::{limbs_add_limb_to_out, limbs_slice_add_limb_in_place};
 use natural::arithmetic::mul_u32::limbs_mul_limb_to_out;
-use natural::arithmetic::shl_u32::{mpn_lshift, mpn_lshift_in_place};
+use natural::arithmetic::shl_u::{limbs_shl_to_out, limbs_slice_shl_in_place};
 use natural::arithmetic::shr_u32::mpn_rshift_in_place;
 use natural::arithmetic::sub::{
     limbs_sub_same_length_in_place_left, limbs_sub_same_length_in_place_right,
@@ -501,7 +501,7 @@ fn mpn_toom_interpolate_5pts(
     let saved = c[4 * k]; // Remember v1's highest byte (will be overwritten).
     c[4 * k] = vinf0; // Set the right value for vinf0
                       // Overwrite unused vm1
-    cy = mpn_lshift(vm1, &c[4 * k..4 * k + twor], 1);
+    cy = limbs_shl_to_out(vm1, &c[4 * k..4 * k + twor], 1);
     cy += if limbs_sub_same_length_in_place_left(&mut v2[..twor], &vm1[..twor]) {
         1
     } else {
@@ -629,7 +629,7 @@ fn mpn_toom42_mul(p: &mut [u32], a: &[u32], b: &[u32], scratch: &mut [u32]) {
     let mut vm1_neg = mpn_toom_eval_dgr3_pm1(as1, asm1, a, n, s, p);
 
     // Compute as2.
-    let mut cy = mpn_lshift(as2, &a3[..s], 1);
+    let mut cy = limbs_shl_to_out(as2, &a3[..s], 1);
     cy += if limbs_slice_add_same_length_in_place_left(&mut as2[..s], &a2[..s]) {
         1
     } else {
@@ -642,13 +642,13 @@ fn mpn_toom42_mul(p: &mut [u32], a: &[u32], b: &[u32], scratch: &mut [u32]) {
             0
         };
     }
-    cy = 2 * cy + mpn_lshift_in_place(&mut as2[..n], 1);
+    cy = 2 * cy + limbs_slice_shl_in_place(&mut as2[..n], 1);
     cy += if limbs_slice_add_same_length_in_place_left(&mut as2[..n], &a1[..n]) {
         1
     } else {
         0
     };
-    cy = 2 * cy + mpn_lshift_in_place(&mut as2[..n], 1);
+    cy = 2 * cy + limbs_slice_shl_in_place(&mut as2[..n], 1);
     cy += if limbs_slice_add_same_length_in_place_left(&mut as2[..n], &a0[..n]) {
         1
     } else {

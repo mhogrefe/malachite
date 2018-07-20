@@ -2,7 +2,7 @@ use common::test_properties;
 use malachite_base::num::Zero;
 use malachite_nz::natural::Natural;
 use malachite_test::inputs::base::unsigneds;
-use malachite_test::inputs::natural::{naturals, pairs_of_natural_and_small_u32};
+use malachite_test::inputs::natural::{naturals, pairs_of_natural_and_small_unsigned};
 use std::str::FromStr;
 
 #[test]
@@ -36,7 +36,7 @@ fn test_divisible_by_power_of_two() {
 #[test]
 fn divisible_by_power_of_two_properties() {
     test_properties(
-        pairs_of_natural_and_small_u32,
+        pairs_of_natural_and_small_unsigned,
         |&(ref x, pow): &(Natural, u32)| {
             let divisible = x.divisible_by_power_of_two(pow);
             if *x != 0 {

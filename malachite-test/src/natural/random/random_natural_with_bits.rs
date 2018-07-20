@@ -1,7 +1,7 @@
 use common::{
     m_run_benchmark, BenchmarkType, DemoBenchRegistry, NoSpecialGenerationMode, ScaleType,
 };
-use inputs::base::small_u64s;
+use inputs::base::small_unsigneds;
 use malachite_nz::natural::random::random_natural_with_bits::random_natural_with_bits;
 use rand::{IsaacRng, SeedableRng};
 use rust_wheels::iterators::adaptors::{generate_from_function, to_limited_string};
@@ -13,7 +13,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
 }
 
 fn demo_natural_random_natural_with_bits(gm: NoSpecialGenerationMode, limit: usize) {
-    for bits in small_u64s(gm).take(limit) {
+    for bits in small_unsigneds(gm).take(limit) {
         let mut rng = IsaacRng::from_seed(&EXAMPLE_SEED);
         let mut xs = generate_from_function(|| random_natural_with_bits(&mut rng, bits));
         println!(
@@ -33,7 +33,7 @@ fn benchmark_natural_random_natural_with_bits(
     m_run_benchmark(
         "random_natural_with_bits(&mut Rng, u64)",
         BenchmarkType::Single,
-        small_u64s(gm),
+        small_unsigneds(gm),
         gm.name(),
         limit,
         file_name,

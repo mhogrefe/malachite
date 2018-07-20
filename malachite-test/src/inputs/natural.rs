@@ -338,27 +338,30 @@ fn log_pairs_of_natural_and_unsigned<T: 'static + PrimitiveUnsigned>(
     Box::new(log_pairs(exhaustive_naturals(), exhaustive_unsigned()))
 }
 
-pub fn pairs_of_natural_and_small_u32(gm: GenerationMode) -> Box<Iterator<Item = (Natural, u32)>> {
+pub fn pairs_of_natural_and_small_unsigned<T: 'static + PrimitiveUnsigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (Natural, T)>> {
     match gm {
         GenerationMode::Exhaustive => log_pairs_of_natural_and_unsigned(),
         GenerationMode::Random(scale) => Box::new(random_pairs(
             &EXAMPLE_SEED,
             &(|seed| random_naturals(seed, scale)),
-            &(|seed| u32s_geometric(seed, scale)),
+            &(|seed| u32s_geometric(seed, scale).flat_map(|u| T::checked_from(u))),
         )),
         GenerationMode::SpecialRandom(scale) => Box::new(random_pairs(
             &EXAMPLE_SEED,
             &(|seed| special_random_naturals(seed, scale)),
-            &(|seed| u32s_geometric(seed, scale)),
+            &(|seed| u32s_geometric(seed, scale).flat_map(|u| T::checked_from(u))),
         )),
     }
 }
 
-pub fn rm_pairs_of_natural_and_small_u32(
+pub fn rm_pairs_of_natural_and_small_unsigned<T: 'static + PrimitiveUnsigned>(
     gm: GenerationMode,
-) -> Box<Iterator<Item = ((rug::Integer, u32), (Natural, u32))>> {
+) -> Box<Iterator<Item = ((rug::Integer, T), (Natural, T))>> {
     Box::new(
-        pairs_of_natural_and_small_u32(gm).map(|(x, y)| ((natural_to_rug_integer(&x), y), (x, y))),
+        pairs_of_natural_and_small_unsigned(gm)
+            .map(|(x, y)| ((natural_to_rug_integer(&x), y), (x, y))),
     )
 }
 
@@ -366,7 +369,7 @@ pub fn rm_pairs_of_natural_and_small_u32(
 pub fn pairs_of_natural_and_small_u32_var_1(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (Natural, u32)>> {
-    Box::new(pairs_of_natural_and_small_u32(gm).map(|(n, u)| (n << u, u)))
+    Box::new(pairs_of_natural_and_small_unsigned(gm).map(|(n, u)| (n << u, u)))
 }
 
 // All pairs of `Natural` and `u32` where the `Natural` is not divisible by 2 to the power of the
@@ -375,7 +378,8 @@ pub fn pairs_of_natural_and_small_u32_var_2(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (Natural, u32)>> {
     Box::new(
-        pairs_of_natural_and_small_u32(gm).filter(|&(ref n, u)| !n.divisible_by_power_of_two(u)),
+        pairs_of_natural_and_small_unsigned(gm)
+            .filter(|&(ref n, u)| !n.divisible_by_power_of_two(u)),
     )
 }
 
@@ -408,40 +412,18 @@ pub fn rm_pairs_of_natural_and_small_i32(
     )
 }
 
-pub fn pairs_of_natural_and_small_u64(gm: GenerationMode) -> Box<Iterator<Item = (Natural, u64)>> {
-    match gm {
-        GenerationMode::Exhaustive => log_pairs_of_natural_and_unsigned(),
-        GenerationMode::Random(scale) => Box::new(random_pairs(
-            &EXAMPLE_SEED,
-            &(|seed| random_naturals(seed, scale)),
-            &(|seed| u32s_geometric(seed, scale).map(|i| i.into())),
-        )),
-        GenerationMode::SpecialRandom(scale) => Box::new(random_pairs(
-            &EXAMPLE_SEED,
-            &(|seed| special_random_naturals(seed, scale)),
-            &(|seed| u32s_geometric(seed, scale).map(|i| i.into())),
-        )),
-    }
-}
-
-pub fn rm_pairs_of_natural_and_small_u64(
-    gm: GenerationMode,
-) -> Box<Iterator<Item = ((rug::Integer, u64), (Natural, u64))>> {
-    Box::new(
-        pairs_of_natural_and_small_u64(gm).map(|(x, y)| ((natural_to_rug_integer(&x), y), (x, y))),
-    )
-}
-
 pub fn nm_pairs_of_natural_and_small_u64(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = ((BigUint, u64), (Natural, u64))>> {
-    Box::new(pairs_of_natural_and_small_u64(gm).map(|(x, y)| ((natural_to_biguint(&x), y), (x, y))))
+    Box::new(
+        pairs_of_natural_and_small_unsigned(gm).map(|(x, y)| ((natural_to_biguint(&x), y), (x, y))),
+    )
 }
 
-pub fn nrm_pairs_of_natural_and_small_u64(
+pub fn nrm_pairs_of_natural_and_small_unsigned(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = ((BigUint, u64), (rug::Integer, u64), (Natural, u64))>> {
-    Box::new(pairs_of_natural_and_small_u64(gm).map(|(x, y)| {
+    Box::new(pairs_of_natural_and_small_unsigned(gm).map(|(x, y)| {
         (
             (natural_to_biguint(&x), y),
             (natural_to_rug_integer(&x), y),
@@ -453,12 +435,12 @@ pub fn nrm_pairs_of_natural_and_small_u64(
 pub fn pairs_of_natural_and_small_usize(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (Natural, usize)>> {
-    Box::new(pairs_of_natural_and_small_u32(gm).map(|(n, u)| (n, u as usize)))
+    Box::new(pairs_of_natural_and_small_unsigned(gm).map(|(n, u): (Natural, u64)| (n, u as usize)))
 }
 
-pub fn triples_of_natural_small_u32_and_small_u32(
+pub fn triples_of_natural_small_unsigned_and_small_unsigned<T: 'static + PrimitiveUnsigned>(
     gm: GenerationMode,
-) -> Box<Iterator<Item = (Natural, u32, u32)>> {
+) -> Box<Iterator<Item = (Natural, T, T)>> {
     match gm {
         GenerationMode::Exhaustive => reshape_1_2_to_3(Box::new(log_pairs(
             exhaustive_naturals(),
@@ -467,14 +449,14 @@ pub fn triples_of_natural_small_u32_and_small_u32(
         GenerationMode::Random(scale) => Box::new(random_triples(
             &EXAMPLE_SEED,
             &(|seed| random_naturals(seed, scale)),
-            &(|seed| u32s_geometric(seed, scale)),
-            &(|seed| u32s_geometric(seed, scale)),
+            &(|seed| u32s_geometric(seed, scale).flat_map(|u| T::checked_from(u))),
+            &(|seed| u32s_geometric(seed, scale).flat_map(|u| T::checked_from(u))),
         )),
         GenerationMode::SpecialRandom(scale) => Box::new(random_triples(
             &EXAMPLE_SEED,
             &(|seed| special_random_naturals(seed, scale)),
-            &(|seed| u32s_geometric(seed, scale)),
-            &(|seed| u32s_geometric(seed, scale)),
+            &(|seed| u32s_geometric(seed, scale).flat_map(|u| T::checked_from(u))),
+            &(|seed| u32s_geometric(seed, scale).flat_map(|u| T::checked_from(u))),
         )),
     }
 }

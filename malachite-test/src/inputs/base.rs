@@ -105,24 +105,19 @@ pub fn pairs_of_u32s_range_1(gm: NoSpecialGenerationMode) -> Box<Iterator<Item =
     }
 }
 
-pub fn small_u32s(gm: NoSpecialGenerationMode) -> Box<Iterator<Item = u32>> {
-    match gm {
-        NoSpecialGenerationMode::Exhaustive => Box::new(exhaustive_unsigned()),
-        NoSpecialGenerationMode::Random(scale) => Box::new(u32s_geometric(&EXAMPLE_SEED, scale)),
-    }
-}
-
-pub fn small_u64s(gm: NoSpecialGenerationMode) -> Box<Iterator<Item = u64>> {
+pub fn small_unsigneds<T: 'static + PrimitiveUnsigned>(
+    gm: NoSpecialGenerationMode,
+) -> Box<Iterator<Item = T>> {
     match gm {
         NoSpecialGenerationMode::Exhaustive => Box::new(exhaustive_unsigned()),
         NoSpecialGenerationMode::Random(scale) => {
-            Box::new(u32s_geometric(&EXAMPLE_SEED, scale).map(|i| i.into()))
+            Box::new(u32s_geometric(&EXAMPLE_SEED, scale).flat_map(|u| T::checked_from(u)))
         }
     }
 }
 
 pub fn small_usizes(gm: NoSpecialGenerationMode) -> Box<Iterator<Item = usize>> {
-    Box::new(small_u32s(gm).map(|u| u as usize))
+    Box::new(small_unsigneds::<u64>(gm).map(|u| u as usize))
 }
 
 fn sqrt_pairs_of_unsigneds<T: 'static + PrimitiveUnsigned, U: 'static + PrimitiveUnsigned>(
@@ -879,6 +874,28 @@ pub fn pairs_of_nonempty_unsigned_vec_and_unsigned<T: 'static + PrimitiveUnsigne
     Box::new(pairs_of_unsigned_vec_and_unsigned(gm).filter(|&(ref xs, _)| !xs.is_empty()))
 }
 
+// All pairs of `Vec<T>` where `T` is unsigned, and a `u32` between 1 and 31, inclusive.
+pub fn pairs_of_unsigned_vec_and_u32_var_1<T: 'static + PrimitiveUnsigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (Vec<T>, u32)>> {
+    match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_pairs(
+            exhaustive_vecs(exhaustive_unsigned()),
+            range_increasing(1, u32::WIDTH - 1),
+        )),
+        GenerationMode::Random(scale) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| random_vecs(seed, scale, &(|seed_2| random(seed_2)))),
+            &(|seed| random_range(seed, 1, u32::WIDTH - 1)),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_unsigned_vecs(seed, scale)),
+            &(|seed| random_range(seed, 1, u32::WIDTH - 1)),
+        )),
+    }
+}
+
 pub fn pairs_of_unsigned_vec_and_small_u64<T: 'static + PrimitiveUnsigned>(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (Vec<T>, u64)>> {
@@ -1031,5 +1048,42 @@ pub fn triples_of_u32_vec_u32_vec_and_u32_var_3(
                 out_limbs.len() >= in_limbs.len() && !limbs_test_zero(in_limbs)
             },
         ),
+    )
+}
+
+// All triples of `Vec<T>`, `Vec<T>`, and `u32` where `T` is unsigned and the `u32` is between 1 and
+// 31, inclusive.
+fn triples_of_unsigned_vec_unsigned_vec_and_u32_var_4(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (Vec<u32>, Vec<u32>, u32)>> {
+    match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_triples(
+            exhaustive_vecs(exhaustive_unsigned()),
+            exhaustive_vecs(exhaustive_unsigned()),
+            range_increasing(1, u32::WIDTH - 1),
+        )),
+        GenerationMode::Random(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| random_vecs(seed, scale, &(|seed_2| random(seed_2)))),
+            &(|seed| random_vecs(seed, scale, &(|seed_2| random(seed_2)))),
+            &(|seed| random_range(seed, 1, u32::WIDTH - 1)),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_unsigned_vecs(seed, scale)),
+            &(|seed| special_random_unsigned_vecs(seed, scale)),
+            &(|seed| random_range(seed, 1, u32::WIDTH - 1)),
+        )),
+    }
+}
+
+// All triples of `Vec<T>`, `Vec<T>`, and `u32` where `T` is unsigned, the first `Vec` is at least
+// as long as the second, and the `u32` is between 1 and 31, inclusive.
+pub fn triples_of_unsigned_vec_unsigned_vec_and_u32_var_5(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (Vec<u32>, Vec<u32>, u32)>> {
+    Box::new(
+        triples_of_unsigned_vec_unsigned_vec_and_u32_var_4(gm)
+            .filter(|&(ref out_limbs, ref in_limbs, _)| out_limbs.len() >= in_limbs.len()),
     )
 }

@@ -1,5 +1,5 @@
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::natural::pairs_of_natural_and_small_u32;
+use inputs::natural::pairs_of_natural_and_small_unsigned;
 use malachite_base::num::SignificantBits;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
@@ -12,7 +12,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
 }
 
 fn demo_natural_divisible_by_power_of_two(gm: GenerationMode, limit: usize) {
-    for (n, pow) in pairs_of_natural_and_small_u32(gm).take(limit) {
+    for (n, pow) in pairs_of_natural_and_small_unsigned(gm).take(limit) {
         if n.divisible_by_power_of_two(pow) {
             println!("{} is divisible by 2^{}", n, pow);
         } else {
@@ -29,7 +29,7 @@ fn benchmark_natural_divisible_by_power_of_two_algorithms(
     m_run_benchmark(
         "Natural.divisible_by_power_of_two(u32)",
         BenchmarkType::Algorithms,
-        pairs_of_natural_and_small_u32(gm),
+        pairs_of_natural_and_small_unsigned(gm),
         gm.name(),
         limit,
         file_name,

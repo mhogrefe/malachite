@@ -255,11 +255,11 @@ impl AddAssign<Integer> for Integer {
             // e.g. 10 + 5 or -10 + -5; sign of self is unchanged
             0 => self.abs += other.abs,
             // e.g. 10 + -5, -10 + 5, or 5 + -5; sign of self is unchanged
-            1 => self.abs -= &other.abs,
+            1 => self.abs -= other.abs,
             // e.g. 5 + -10, -5 + 10, or -5 + 5; sign of self is flipped
             _ => {
                 swap(self, &mut other);
-                self.abs -= &other.abs;
+                self.abs -= other.abs;
             }
         }
     }

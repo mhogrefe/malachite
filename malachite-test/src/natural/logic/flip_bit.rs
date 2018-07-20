@@ -1,5 +1,7 @@
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::natural::{pairs_of_natural_and_small_u64, rm_pairs_of_natural_and_small_u64};
+use inputs::natural::{
+    pairs_of_natural_and_small_unsigned, rm_pairs_of_natural_and_small_unsigned,
+};
 use malachite_base::num::BitAccess;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
@@ -12,7 +14,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
 }
 
 fn demo_natural_flip_bit(gm: GenerationMode, limit: usize) {
-    for (mut n, index) in pairs_of_natural_and_small_u64(gm).take(limit) {
+    for (mut n, index) in pairs_of_natural_and_small_unsigned(gm).take(limit) {
         let n_old = n.clone();
         n.flip_bit(index);
         println!("x := {}; x.flip_bit({}); x = {}", n_old, index, n);
@@ -27,7 +29,7 @@ fn benchmark_natural_flip_bit_library_comparison(
     m_run_benchmark(
         "Natural.flip_bit(u64)",
         BenchmarkType::LibraryComparison,
-        rm_pairs_of_natural_and_small_u64(gm),
+        rm_pairs_of_natural_and_small_unsigned(gm),
         gm.name(),
         limit,
         file_name,

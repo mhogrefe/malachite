@@ -2,7 +2,7 @@ use common::{test_properties, test_properties_no_special};
 use malachite_base::num::{SignificantBits, Zero};
 use malachite_nz::integer::conversion::to_twos_complement_bits::*;
 use malachite_nz::integer::Integer;
-use malachite_test::inputs::base::{small_u64s, vecs_of_bool, vecs_of_bool_var_1};
+use malachite_test::inputs::base::{small_unsigneds, vecs_of_bool, vecs_of_bool_var_1};
 use malachite_test::inputs::integer::{
     integers, pairs_of_integer_and_small_u64, pairs_of_integer_and_vec_of_bool_var_2,
 };
@@ -424,7 +424,7 @@ fn twos_complement_bits_properties() {
         }
     });
 
-    test_properties_no_special(small_u64s, |&u| {
+    test_properties_no_special(small_unsigneds, |&u| {
         assert_eq!(Integer::ZERO.twos_complement_bits()[u], false);
     });
 }

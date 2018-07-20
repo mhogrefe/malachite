@@ -101,7 +101,7 @@ fn benchmark_natural_sub_mul_assign_algorithms(gm: GenerationMode, limit: usize,
             ),
             (
                 "Natural -= &(&Natural * &Natural)",
-                &mut (|(mut a, b, c)| a -= &(&b * &c)),
+                &mut (|(mut a, b, c)| a -= &b * &c),
             ),
         ],
     );

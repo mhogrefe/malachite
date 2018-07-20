@@ -1,6 +1,6 @@
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::pairs_of_unsigned_vec_and_small_u64;
-use inputs::natural::pairs_of_natural_and_small_u64;
+use inputs::natural::pairs_of_natural_and_small_unsigned;
 use malachite_base::num::{BitScan, SignificantBits};
 use malachite_nz::natural::logic::bit_scan::limbs_index_of_next_true_bit;
 use malachite_nz::natural::Natural;
@@ -37,7 +37,7 @@ fn demo_limbs_index_of_next_true_bit(gm: GenerationMode, limit: usize) {
 }
 
 fn demo_natural_index_of_next_true_bit(gm: GenerationMode, limit: usize) {
-    for (n, u) in pairs_of_natural_and_small_u64(gm).take(limit) {
+    for (n, u) in pairs_of_natural_and_small_unsigned(gm).take(limit) {
         println!(
             "index_of_next_true_bit({}, {}) = {:?}",
             n,
@@ -72,7 +72,7 @@ fn benchmark_natural_index_of_next_true_bit_algorithms(
     m_run_benchmark(
         "Natural.index_of_next_true_bit(u64)",
         BenchmarkType::Algorithms,
-        pairs_of_natural_and_small_u64(gm),
+        pairs_of_natural_and_small_unsigned(gm),
         gm.name(),
         limit,
         file_name,

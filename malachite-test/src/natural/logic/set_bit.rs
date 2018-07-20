@@ -1,6 +1,6 @@
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::{pairs_of_u32_vec_and_small_u64_var_2, pairs_of_unsigned_vec_and_small_u64};
-use inputs::natural::{nm_pairs_of_natural_and_small_u64, pairs_of_natural_and_small_u64};
+use inputs::natural::{nm_pairs_of_natural_and_small_u64, pairs_of_natural_and_small_unsigned};
 use malachite_base::num::BitAccess;
 use malachite_nz::natural::logic::bit_access::{limbs_slice_set_bit, limbs_vec_set_bit};
 use num::{BigUint, One};
@@ -45,7 +45,7 @@ fn demo_limbs_vec_set_bit(gm: GenerationMode, limit: usize) {
 }
 
 fn demo_natural_set_bit(gm: GenerationMode, limit: usize) {
-    for (mut n, index) in pairs_of_natural_and_small_u64(gm).take(limit) {
+    for (mut n, index) in pairs_of_natural_and_small_unsigned(gm).take(limit) {
         let n_old = n.clone();
         n.set_bit(index);
         println!("x := {}; x.set_bit({}); x = {}", n_old, index, n);

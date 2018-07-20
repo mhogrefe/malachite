@@ -10,9 +10,9 @@ use malachite_test::inputs::base::{
     pairs_of_unsigned_and_small_u32, unsigneds,
 };
 use malachite_test::inputs::natural::{
-    naturals, pairs_of_natural_and_rounding_mode, pairs_of_natural_and_small_u32,
-    pairs_of_natural_and_small_u32_var_2, triples_of_natural_small_u32_and_rounding_mode_var_1,
-    triples_of_natural_small_u32_and_small_u32,
+    naturals, pairs_of_natural_and_rounding_mode, pairs_of_natural_and_small_u32_var_2,
+    pairs_of_natural_and_small_unsigned, triples_of_natural_small_u32_and_rounding_mode_var_1,
+    triples_of_natural_small_unsigned_and_small_unsigned,
 };
 use num::BigUint;
 use rug;
@@ -93,7 +93,7 @@ fn test_shr_u32() {
 
 #[test]
 fn shr_u32_properties() {
-    test_properties(pairs_of_natural_and_small_u32, |&(ref n, u)| {
+    test_properties(pairs_of_natural_and_small_unsigned::<u32>, |&(ref n, u)| {
         let mut mut_n = n.clone();
         mut_n >>= u;
         assert!(mut_n.is_valid());
@@ -138,7 +138,7 @@ fn shr_u32_properties() {
     });
 
     test_properties(
-        triples_of_natural_small_u32_and_small_u32,
+        triples_of_natural_small_unsigned_and_small_unsigned::<u32>,
         |&(ref n, u, v)| {
             assert_eq!(n >> u >> v, n >> (u + v));
         },
@@ -774,7 +774,7 @@ fn shr_round_u32_properties() {
         },
     );
 
-    test_properties(pairs_of_natural_and_small_u32, |&(ref n, u)| {
+    test_properties(pairs_of_natural_and_small_unsigned::<u32>, |&(ref n, u)| {
         let left_shifted = n << u;
         assert_eq!((&left_shifted).shr_round(u, RoundingMode::Down), *n);
         assert_eq!((&left_shifted).shr_round(u, RoundingMode::Up), *n);

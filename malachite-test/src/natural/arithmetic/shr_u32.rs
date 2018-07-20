@@ -1,6 +1,6 @@
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::natural::{
-    pairs_of_natural_and_small_u32, rm_pairs_of_natural_and_small_u32,
+    pairs_of_natural_and_small_unsigned, rm_pairs_of_natural_and_small_unsigned,
     triples_of_natural_small_u32_and_rounding_mode_var_1,
 };
 use malachite_base::num::{ShrRound, ShrRoundAssign};
@@ -36,7 +36,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
 }
 
 fn demo_natural_shr_assign_u32(gm: GenerationMode, limit: usize) {
-    for (mut n, u) in pairs_of_natural_and_small_u32(gm).take(limit) {
+    for (mut n, u) in pairs_of_natural_and_small_unsigned::<u32>(gm).take(limit) {
         let n_old = n.clone();
         n >>= u;
         println!("x := {}; x >>= {}; x = {}", n_old, u, n);
@@ -44,14 +44,14 @@ fn demo_natural_shr_assign_u32(gm: GenerationMode, limit: usize) {
 }
 
 fn demo_natural_shr_u32(gm: GenerationMode, limit: usize) {
-    for (n, u) in pairs_of_natural_and_small_u32(gm).take(limit) {
+    for (n, u) in pairs_of_natural_and_small_unsigned::<u32>(gm).take(limit) {
         let n_old = n.clone();
         println!("{} >> {} = {}", n_old, u, n >> u);
     }
 }
 
 fn demo_natural_shr_u32_ref(gm: GenerationMode, limit: usize) {
-    for (n, u) in pairs_of_natural_and_small_u32(gm).take(limit) {
+    for (n, u) in pairs_of_natural_and_small_unsigned::<u32>(gm).take(limit) {
         println!("&{} >> {} = {}", n, u, &n >> u);
     }
 }
@@ -100,7 +100,7 @@ fn benchmark_natural_shr_assign_u32_library_comparison(
     m_run_benchmark(
         "Natural >>= u32",
         BenchmarkType::Single,
-        rm_pairs_of_natural_and_small_u32(gm),
+        rm_pairs_of_natural_and_small_unsigned::<u32>(gm),
         gm.name(),
         limit,
         file_name,
@@ -117,7 +117,7 @@ fn benchmark_natural_shr_u32_library_comparison(gm: GenerationMode, limit: usize
     m_run_benchmark(
         "Natural >> u32",
         BenchmarkType::LibraryComparison,
-        rm_pairs_of_natural_and_small_u32(gm),
+        rm_pairs_of_natural_and_small_unsigned::<u32>(gm),
         gm.name(),
         limit,
         file_name,
@@ -138,7 +138,7 @@ fn benchmark_natural_shr_u32_evaluation_strategy(
     m_run_benchmark(
         "Natural >> u32",
         BenchmarkType::EvaluationStrategy,
-        pairs_of_natural_and_small_u32(gm),
+        pairs_of_natural_and_small_unsigned::<u32>(gm),
         gm.name(),
         limit,
         file_name,

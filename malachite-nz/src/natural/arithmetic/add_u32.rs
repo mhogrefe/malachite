@@ -90,6 +90,8 @@ pub fn limbs_add_limb_to_out(out_limbs: &mut [u32], in_limbs: &[u32], mut limb: 
 ///
 /// Additional memory: worst case O(1)
 ///
+/// where n = `limbs.len()`
+///
 /// # Example
 /// ```
 /// use malachite_nz::natural::arithmetic::add_u32::limbs_slice_add_limb_in_place;
@@ -121,6 +123,8 @@ pub fn limbs_slice_add_limb_in_place(limbs: &mut [u32], mut limb: u32) -> bool {
 /// Time: worst case O(n)
 ///
 /// Additional memory: worst case O(1)
+///
+/// where n = `limbs.len()`
 ///
 /// # Panics
 /// Panics if `limbs` is empty.

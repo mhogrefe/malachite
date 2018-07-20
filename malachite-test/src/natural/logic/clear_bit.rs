@@ -1,6 +1,6 @@
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::pairs_of_unsigned_vec_and_small_u64;
-use inputs::natural::pairs_of_natural_and_small_u64;
+use inputs::natural::pairs_of_natural_and_small_unsigned;
 use malachite_base::num::BitAccess;
 use malachite_nz::natural::logic::bit_access::limbs_clear_bit;
 
@@ -23,7 +23,7 @@ fn demo_limbs_clear_bit(gm: GenerationMode, limit: usize) {
 }
 
 fn demo_natural_clear_bit(gm: GenerationMode, limit: usize) {
-    for (mut n, index) in pairs_of_natural_and_small_u64(gm).take(limit) {
+    for (mut n, index) in pairs_of_natural_and_small_unsigned(gm).take(limit) {
         let n_old = n.clone();
         n.clear_bit(index);
         println!("x := {}; x.clear_bit({}); x = {}", n_old, index, n);
@@ -51,7 +51,7 @@ fn benchmark_natural_clear_bit(gm: GenerationMode, limit: usize, file_name: &str
     m_run_benchmark(
         "Natural.clear_bit(u64)",
         BenchmarkType::Single,
-        pairs_of_natural_and_small_u64(gm),
+        pairs_of_natural_and_small_unsigned(gm),
         gm.name(),
         limit,
         file_name,

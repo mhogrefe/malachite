@@ -9,7 +9,7 @@ use malachite_test::common::{
 use malachite_test::inputs::base::{
     pairs_of_u32_vec_and_small_u64_var_2, pairs_of_unsigned_vec_and_small_u64,
 };
-use malachite_test::inputs::natural::pairs_of_natural_and_small_u64;
+use malachite_test::inputs::natural::pairs_of_natural_and_small_unsigned;
 use malachite_test::natural::logic::set_bit::num_set_bit;
 use num::BigUint;
 use rug;
@@ -104,7 +104,7 @@ fn limbs_vec_set_bit_properties() {
 
 #[test]
 fn set_bit_properties() {
-    test_properties(pairs_of_natural_and_small_u64, |&(ref n, index)| {
+    test_properties(pairs_of_natural_and_small_unsigned, |&(ref n, index)| {
         let mut mut_n = n.clone();
         mut_n.set_bit(index);
         assert!(mut_n.is_valid());

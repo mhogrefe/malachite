@@ -6,7 +6,7 @@ use malachite_nz::natural::logic::bit_access::limbs_clear_bit;
 use malachite_nz::natural::Natural;
 use malachite_test::common::{natural_to_rug_integer, rug_integer_to_natural};
 use malachite_test::inputs::base::pairs_of_unsigned_vec_and_small_u64;
-use malachite_test::inputs::natural::pairs_of_natural_and_small_u64;
+use malachite_test::inputs::natural::pairs_of_natural_and_small_unsigned;
 use rug;
 use std::str::FromStr;
 
@@ -60,7 +60,7 @@ fn limbs_clear_bit_properties() {
 
 #[test]
 fn clear_bit_properties() {
-    test_properties(pairs_of_natural_and_small_u64, |&(ref n, index)| {
+    test_properties(pairs_of_natural_and_small_unsigned, |&(ref n, index)| {
         let mut mut_n = n.clone();
         mut_n.clear_bit(index);
         assert!(mut_n.is_valid());

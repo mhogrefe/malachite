@@ -6,7 +6,7 @@ use malachite_nz::natural::Natural;
 use malachite_test::common::{
     bigint_to_integer, integer_to_bigint, integer_to_rug_integer, rug_integer_to_integer,
 };
-use malachite_test::inputs::base::small_u32s;
+use malachite_test::inputs::base::small_unsigneds;
 use malachite_test::inputs::integer::{integers, pairs_of_integer_and_small_u32};
 use num::BigInt;
 use rug;
@@ -136,7 +136,7 @@ fn shl_u32_properties() {
         assert_eq!(n << 0, *n);
     });
 
-    test_properties_no_special(small_u32s, |&u: &u32| {
+    test_properties_no_special(small_unsigneds, |&u: &u32| {
         assert_eq!(Integer::ZERO << u, 0);
         assert!(
             Natural::checked_from(Integer::ONE << u)

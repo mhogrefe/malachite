@@ -5,7 +5,7 @@ use malachite_nz::natural::logic::bit_access::limbs_get_bit;
 use malachite_nz::natural::Natural;
 use malachite_test::common::{natural_to_biguint, natural_to_rug_integer};
 use malachite_test::inputs::base::pairs_of_unsigned_vec_and_small_u64;
-use malachite_test::inputs::natural::{naturals, pairs_of_natural_and_small_u64};
+use malachite_test::inputs::natural::{naturals, pairs_of_natural_and_small_unsigned};
 use malachite_test::natural::logic::get_bit::num_get_bit;
 use num::BigUint;
 use rug;
@@ -64,7 +64,7 @@ fn limbs_get_bit_properties() {
 
 #[test]
 fn get_bit_properties() {
-    test_properties(pairs_of_natural_and_small_u64, |&(ref n, index)| {
+    test_properties(pairs_of_natural_and_small_unsigned, |&(ref n, index)| {
         let bit = n.get_bit(index);
         assert_eq!(num_get_bit(&natural_to_biguint(n), index), bit);
         assert_eq!(natural_to_rug_integer(n).get_bit(index as u32), bit);

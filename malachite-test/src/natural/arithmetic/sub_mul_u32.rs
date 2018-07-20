@@ -77,7 +77,7 @@ fn benchmark_natural_sub_mul_assign_u32_algorithms(
             ),
             (
                 "Natural -= &(&Natural * u32)",
-                &mut (|(mut a, b, c)| a -= &(&b * c)),
+                &mut (|(mut a, b, c)| a -= &b * c),
             ),
         ],
     );
