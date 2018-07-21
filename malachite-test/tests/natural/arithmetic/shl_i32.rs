@@ -716,7 +716,7 @@ fn shl_round_assign_i32_fail_2() {
 }
 
 #[test]
-#[should_panic(expected = "Right shift is not exact: 1000000000001 >>= 1")]
+#[should_panic(expected = "Right shift is not exact.")]
 fn shl_round_assign_i32_fail_3() {
     Natural::from_str("1000000000001")
         .unwrap()
@@ -724,7 +724,7 @@ fn shl_round_assign_i32_fail_3() {
 }
 
 #[test]
-#[should_panic(expected = "Right shift is not exact: 1000000000001 >>= 100")]
+#[should_panic(expected = "Right shift is not exact.")]
 fn shl_round_assign_i32_fail_4() {
     Natural::from_str("1000000000001")
         .unwrap()
@@ -744,7 +744,7 @@ fn shl_round_i32_fail_2() {
 }
 
 #[test]
-#[should_panic(expected = "Right shift is not exact: 1000000000001 >>= 1")]
+#[should_panic(expected = "Right shift is not exact.")]
 fn shl_round_i32_fail_3() {
     Natural::from_str("1000000000001")
         .unwrap()
@@ -752,7 +752,7 @@ fn shl_round_i32_fail_3() {
 }
 
 #[test]
-#[should_panic(expected = "Right shift is not exact: 1000000000001 >>= 100")]
+#[should_panic(expected = "Right shift is not exact.")]
 fn shl_round_i32_fail_4() {
     Natural::from_str("1000000000001")
         .unwrap()

@@ -8,7 +8,7 @@ use natural::arithmetic::add_mul_u32::mpn_addmul_1;
 use natural::arithmetic::add_u32::{limbs_add_limb_to_out, limbs_slice_add_limb_in_place};
 use natural::arithmetic::mul_u32::limbs_mul_limb_to_out;
 use natural::arithmetic::shl_u::{limbs_shl_to_out, limbs_slice_shl_in_place};
-use natural::arithmetic::shr_u32::mpn_rshift_in_place;
+use natural::arithmetic::shr_u32::limbs_slice_shr_in_place;
 use natural::arithmetic::sub::{
     limbs_sub_same_length_in_place_left, limbs_sub_same_length_in_place_right,
     limbs_sub_same_length_to_out, limbs_sub_to_out,
@@ -442,13 +442,13 @@ fn mpn_toom_interpolate_5pts(
             &mut vm1[..kk1],
             &c[k..k + kk1]
         ));
-        assert_eq!(mpn_rshift_in_place(&mut vm1[..kk1], 1), 0);
+        assert_eq!(limbs_slice_shr_in_place(&mut vm1[..kk1], 1), 0);
     } else {
         assert!(!limbs_sub_same_length_in_place_right(
             &c[k..k + kk1],
             &mut vm1[..kk1]
         ));
-        assert_eq!(mpn_rshift_in_place(&mut vm1[..kk1], 1), 0);
+        assert_eq!(limbs_slice_shr_in_place(&mut vm1[..kk1], 1), 0);
     }
 
     // {c,2k} {c+2k,2k+1} {c+4k+1,2r-1} {t,2k+1} {t+2k+1,2k+1} {t+4k+2,2r}
@@ -475,7 +475,7 @@ fn mpn_toom_interpolate_5pts(
         &mut v2[..kk1],
         &c[2 * k..2 * k + kk1]
     ));
-    assert_eq!(mpn_rshift_in_place(&mut v2[..kk1], 1), 0);
+    assert_eq!(limbs_slice_shr_in_place(&mut v2[..kk1], 1), 0);
 
     // {c,2k} {c+2k,2k+1} {c+4k+1,2r-1} {t,2k+1} {t+2k+1,2k+1} {t+4k+2,2r}
     //   v0     v1-v0        hi(vinf)     tm1    (v2-vm1-3t1)/6    EMPTY

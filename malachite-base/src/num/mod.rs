@@ -2386,6 +2386,133 @@ pub trait ShrRoundAssign<Rhs = Self> {
     fn shr_round_assign(&mut self, rhs: Rhs, rm: RoundingMode);
 }
 
+macro_rules! round_shift_unsigned {
+    ($t:ident, $u:ident) => {
+        impl ShrRound<$u> for $t {
+            type Output = $t;
+
+            fn shr_round(self, other: $u, rm: RoundingMode) -> $t {
+                if other == 0 || self == 0 {
+                    return self;
+                }
+                let width = $u::wrapping_from($t::WIDTH);
+                match rm {
+                    RoundingMode::Down | RoundingMode::Floor if other >= width => 0,
+                    RoundingMode::Down | RoundingMode::Floor => self >> other,
+                    RoundingMode::Up | RoundingMode::Ceiling if other >= width => 1,
+                    RoundingMode::Up | RoundingMode::Ceiling => {
+                        let shifted = self >> other;
+                        if shifted << other == self {
+                            shifted
+                        } else {
+                            shifted + 1
+                        }
+                    }
+                    RoundingMode::Nearest if other == width && self > (1 << ($t::WIDTH - 1)) => 1,
+                    RoundingMode::Nearest if other >= width => 0,
+                    RoundingMode::Nearest => {
+                        let mostly_shifted = self >> (other - 1);
+                        if mostly_shifted.is_even() {
+                            // round down
+                            mostly_shifted >> 1
+                        } else if mostly_shifted << (other - 1) != self {
+                            // round up
+                            (mostly_shifted >> 1) + 1
+                        } else {
+                            // result is half-integer; round to even
+                            let shifted = mostly_shifted >> 1;
+                            if shifted.is_even() {
+                                shifted
+                            } else {
+                                shifted + 1
+                            }
+                        }
+                    }
+                    RoundingMode::Exact if other >= width => {
+                        panic!("Right shift is not exact: {} >> {}", self, other);
+                    }
+                    RoundingMode::Exact => {
+                        let shifted = self >> other;
+                        if shifted << other != self {
+                            panic!("Right shift is not exact: {} >> {}", self, other);
+                        }
+                        shifted
+                    }
+                }
+            }
+        }
+
+        impl ShrRoundAssign<$u> for $t {
+            fn shr_round_assign(&mut self, other: $u, rm: RoundingMode) {
+                if other == 0 || *self == 0 {
+                    return;
+                }
+                let width = $u::wrapping_from($t::WIDTH);
+                match rm {
+                    RoundingMode::Down | RoundingMode::Floor if other >= width => *self = 0,
+                    RoundingMode::Down | RoundingMode::Floor => *self >>= other,
+                    RoundingMode::Up | RoundingMode::Ceiling if other >= width => *self = 1,
+                    RoundingMode::Up | RoundingMode::Ceiling => {
+                        let original = *self;
+                        *self >>= other;
+                        if *self << other != original {
+                            *self += 1;
+                        }
+                    }
+                    RoundingMode::Nearest if other == width && *self > (1 << ($t::WIDTH - 1)) => {
+                        *self = 1;
+                    }
+                    RoundingMode::Nearest if other >= width => *self = 0,
+                    RoundingMode::Nearest => {
+                        let original = *self;
+                        *self >>= other - 1;
+                        if self.is_even() {
+                            // round down
+                            *self >>= 1;
+                        } else if *self << (other - 1) != original {
+                            // round up
+                            *self >>= 1;
+                            *self += 1;
+                        } else {
+                            // result is half-integer; round to even
+                            *self >>= 1;
+                            if self.is_odd() {
+                                *self += 1;
+                            }
+                        }
+                    }
+                    RoundingMode::Exact if other >= width => {
+                        panic!("Right shift is not exact: {} >>= {}", *self, other);
+                    }
+                    RoundingMode::Exact => {
+                        let original = *self;
+                        *self >>= other;
+                        if *self << other != original {
+                            panic!("Right shift is not exact: {} >>= {}", original, other);
+                        }
+                    }
+                }
+            }
+        }
+    };
+}
+round_shift_unsigned!(u8, u8);
+round_shift_unsigned!(u8, u16);
+round_shift_unsigned!(u8, u32);
+round_shift_unsigned!(u8, u64);
+round_shift_unsigned!(u16, u8);
+round_shift_unsigned!(u16, u16);
+round_shift_unsigned!(u16, u32);
+round_shift_unsigned!(u16, u64);
+round_shift_unsigned!(u32, u8);
+round_shift_unsigned!(u32, u16);
+round_shift_unsigned!(u32, u32);
+round_shift_unsigned!(u32, u64);
+round_shift_unsigned!(u64, u8);
+round_shift_unsigned!(u64, u16);
+round_shift_unsigned!(u64, u32);
+round_shift_unsigned!(u64, u64);
+
 //TODO doc and test
 pub trait FromU32Slice: Sized {
     fn from_u32_slice(slice: &[u32]) -> Self;
