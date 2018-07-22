@@ -1,5 +1,7 @@
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::base::{pairs_of_signed_and_u64_width_range_var_2, pairs_of_unsigned_and_small_u64};
+use inputs::base::{
+    pairs_of_signed_and_u64_width_range_var_2, pairs_of_unsigned_and_small_unsigned,
+};
 use malachite_base::num::{PrimitiveSigned, PrimitiveUnsigned};
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
@@ -22,7 +24,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
 }
 
 fn demo_unsigned_clear_bit<T: 'static + PrimitiveUnsigned>(gm: GenerationMode, limit: usize) {
-    for (mut n, index) in pairs_of_unsigned_and_small_u64::<T>(gm).take(limit) {
+    for (mut n, index) in pairs_of_unsigned_and_small_unsigned::<T, u64>(gm).take(limit) {
         let n_old = n;
         n.clear_bit(index);
         println!("x := {}; x.clear_bit({}); x = {}", n_old, index, n);
@@ -45,7 +47,7 @@ fn benchmark_unsigned_clear_bit<T: 'static + PrimitiveUnsigned>(
     m_run_benchmark(
         &format!("{}.clear_bit(u64)", T::NAME),
         BenchmarkType::Single,
-        pairs_of_unsigned_and_small_u64::<T>(gm),
+        pairs_of_unsigned_and_small_unsigned::<T, u64>(gm),
         gm.name(),
         limit,
         file_name,

@@ -17,7 +17,7 @@ pub mod parity;
 pub mod shl_i32;
 pub mod shl_u;
 pub mod shr_i32;
-pub mod shr_u32;
+pub mod shr_u;
 pub mod sub;
 pub mod sub_mul;
 pub mod sub_mul_u32;
@@ -41,7 +41,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     shl_i32::register(registry);
     shl_u::register(registry);
     shr_i32::register(registry);
-    shr_u32::register(registry);
+    shr_u::register(registry);
     sub::register(registry);
     sub_u32::register(registry);
     sub_mul::register(registry);

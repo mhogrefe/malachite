@@ -5,7 +5,7 @@ use malachite_nz::integer::Integer;
 use malachite_test::common::{integer_to_rug_integer, rug_integer_to_integer};
 use malachite_test::inputs::base::{
     pairs_of_negative_signed_not_min_and_small_u32s, pairs_of_positive_signed_and_small_u32,
-    pairs_of_unsigned_and_rounding_mode, pairs_of_unsigned_and_small_u32, unsigneds,
+    pairs_of_unsigned_and_rounding_mode, pairs_of_unsigned_and_small_unsigned, unsigneds,
 };
 use malachite_test::inputs::integer::{
     integers, pairs_of_integer_and_rounding_mode, pairs_of_integer_and_small_u32,
@@ -167,9 +167,12 @@ fn shr_u32_properties() {
         }
     });
 
-    test_properties(pairs_of_unsigned_and_small_u32, |&(u, v): &(u32, u32)| {
-        assert_eq!(Integer::from(u) >> (v + u32::WIDTH), 0);
-    });
+    test_properties(
+        pairs_of_unsigned_and_small_unsigned,
+        |&(u, v): &(u32, u32)| {
+            assert_eq!(Integer::from(u) >> (v + u32::WIDTH), 0);
+        },
+    );
 
     test_properties(
         triples_of_integer_small_u32_and_small_u32,

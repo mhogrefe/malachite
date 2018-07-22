@@ -248,7 +248,7 @@ macro_rules! tests_and_properties {
 
                 assert!($shifted >= *$n);
                 assert_eq!($shifted, $n * (Natural::ONE << $u));
-                //TODO assert_eq!(&$shifted >> $u, *$n);
+                assert_eq!(&$shifted >> $u, *$n);
 
                 //TODO
                 /*

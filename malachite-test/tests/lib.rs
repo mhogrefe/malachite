@@ -161,7 +161,7 @@ pub mod natural {
         pub mod shl_i32;
         pub mod shl_u;
         pub mod shr_i32;
-        pub mod shr_u32;
+        pub mod shr_u;
         pub mod sub;
         pub mod sub_mul;
         pub mod sub_mul_u32;

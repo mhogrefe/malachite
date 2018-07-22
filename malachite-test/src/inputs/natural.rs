@@ -372,14 +372,15 @@ pub fn pairs_of_natural_and_small_u32_var_1(
     Box::new(pairs_of_natural_and_small_unsigned(gm).map(|(n, u)| (n << u, u)))
 }
 
-// All pairs of `Natural` and `u32` where the `Natural` is not divisible by 2 to the power of the
-// `u32`.
-pub fn pairs_of_natural_and_small_u32_var_2(
+//TODO divisible_by_power_of_two
+// All pairs of `Natural` and `T`, where `T` is unsigned and the `Natural` is not divisible by 2 to
+// the power of the `T`.
+pub fn pairs_of_natural_and_small_unsigned_var_2<T: 'static + PrimitiveUnsigned>(
     gm: GenerationMode,
-) -> Box<Iterator<Item = (Natural, u32)>> {
+) -> Box<Iterator<Item = (Natural, T)>> {
     Box::new(
-        pairs_of_natural_and_small_unsigned(gm)
-            .filter(|&(ref n, u)| !n.divisible_by_power_of_two(u)),
+        pairs_of_natural_and_small_unsigned::<T>(gm)
+            .filter(|&(ref n, u)| !n.divisible_by_power_of_two(u.checked_into().unwrap())),
     )
 }
 
@@ -655,9 +656,9 @@ pub fn triples_of_natural_small_i32_and_rounding_mode_var_2(
     )
 }
 
-fn triples_of_natural_small_u32_and_rounding_mode(
+fn triples_of_natural_small_unsigned_and_rounding_mode<T: 'static + PrimitiveUnsigned>(
     gm: GenerationMode,
-) -> Box<Iterator<Item = (Natural, u32, RoundingMode)>> {
+) -> Box<Iterator<Item = (Natural, T, RoundingMode)>> {
     match gm {
         GenerationMode::Exhaustive => reshape_2_1_to_3(Box::new(lex_pairs(
             log_pairs_of_natural_and_unsigned(),
@@ -666,26 +667,28 @@ fn triples_of_natural_small_u32_and_rounding_mode(
         GenerationMode::Random(scale) => Box::new(random_triples(
             &EXAMPLE_SEED,
             &(|seed| random_naturals(seed, scale)),
-            &(|seed| u32s_geometric(seed, scale)),
+            &(|seed| u32s_geometric(seed, scale).flat_map(|u| T::checked_from(u))),
             &(|seed| random_rounding_modes(seed)),
         )),
         GenerationMode::SpecialRandom(scale) => Box::new(random_triples(
             &EXAMPLE_SEED,
             &(|seed| special_random_naturals(seed, scale)),
-            &(|seed| u32s_geometric(seed, scale)),
+            &(|seed| u32s_geometric(seed, scale).flat_map(|u| T::checked_from(u))),
             &(|seed| random_rounding_modes(seed)),
         )),
     }
 }
 
+//TODO use divisible_by_power_of_two u64 version
 // All triples of `Natural`, `u32`, and `RoundingMode`, where if the `RoundingMode` is
 // `RoundingMode::Exact`, the `Natural` is divisible by 2 to the power of the `u32`.
-pub fn triples_of_natural_small_u32_and_rounding_mode_var_1(
+pub fn triples_of_natural_small_unsigned_and_rounding_mode_var_1<T: 'static + PrimitiveUnsigned>(
     gm: GenerationMode,
-) -> Box<Iterator<Item = (Natural, u32, RoundingMode)>> {
+) -> Box<Iterator<Item = (Natural, T, RoundingMode)>> {
     Box::new(
-        triples_of_natural_small_u32_and_rounding_mode(gm)
-            .filter(|&(ref n, u, rm)| rm != RoundingMode::Exact || n.divisible_by_power_of_two(u)),
+        triples_of_natural_small_unsigned_and_rounding_mode::<T>(gm).filter(|&(ref n, u, rm)| {
+            rm != RoundingMode::Exact || n.divisible_by_power_of_two(u.checked_into().unwrap())
+        }),
     )
 }
 

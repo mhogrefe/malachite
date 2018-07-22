@@ -4,8 +4,9 @@ use malachite_base::round::RoundingMode;
 use malachite_nz::natural::Natural;
 use malachite_test::inputs::base::unsigneds;
 use malachite_test::inputs::natural::{
-    naturals, pairs_of_natural_and_small_u32_var_1, pairs_of_natural_and_small_u32_var_2,
-    pairs_of_natural_and_small_unsigned, triples_of_natural_small_unsigned_and_small_unsigned,
+    naturals, pairs_of_natural_and_small_u32_var_1, pairs_of_natural_and_small_unsigned,
+    pairs_of_natural_and_small_unsigned_var_2,
+    triples_of_natural_small_unsigned_and_small_unsigned,
 };
 use std::cmp::min;
 use std::str::FromStr;
@@ -115,7 +116,7 @@ fn mod_power_of_two_properties() {
         assert_eq!(n.mod_power_of_two_ref(u), 0);
     });
 
-    test_properties(pairs_of_natural_and_small_u32_var_2, |&(ref n, u)| {
+    test_properties(pairs_of_natural_and_small_unsigned_var_2, |&(ref n, u)| {
         assert_ne!(n.mod_power_of_two_ref(u), 0);
         assert_eq!(
             n.mod_power_of_two_ref(u) + n.neg_mod_power_of_two_ref(u),
@@ -172,7 +173,7 @@ fn neg_mod_power_of_two_properties() {
         assert_eq!(n.neg_mod_power_of_two_ref(u), 0);
     });
 
-    test_properties(pairs_of_natural_and_small_u32_var_2, |&(ref n, u)| {
+    test_properties(pairs_of_natural_and_small_unsigned_var_2, |&(ref n, u)| {
         let m = n.neg_mod_power_of_two_ref(u);
         assert_ne!(m, 0);
         assert_eq!((((n >> u) + 1) << u) - &m, *n);

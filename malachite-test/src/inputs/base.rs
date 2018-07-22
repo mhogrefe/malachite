@@ -125,50 +125,32 @@ fn sqrt_pairs_of_unsigneds<T: 'static + PrimitiveUnsigned, U: 'static + Primitiv
     Box::new(sqrt_pairs(exhaustive_unsigned(), exhaustive_unsigned()))
 }
 
-fn random_pairs_of_primitive_and_geometric_u32<T: 'static + PrimitiveInteger>(
+fn random_pairs_of_primitive_and_geometric_unsigned<
+    T: 'static + PrimitiveInteger,
+    U: 'static + PrimitiveInteger,
+>(
     scale: u32,
-) -> Box<Iterator<Item = (T, u32)>> {
+) -> Box<Iterator<Item = (T, U)>> {
     Box::new(random_pairs(
         &EXAMPLE_SEED,
         &(|seed| random(seed)),
-        &(|seed| u32s_geometric(seed, scale)),
+        &(|seed| u32s_geometric(seed, scale).flat_map(|u| U::checked_from(u))),
     ))
 }
 
-fn random_pairs_of_primitive_and_geometric_u64<T: 'static + PrimitiveInteger>(
-    scale: u32,
-) -> It<(T, u64)> {
-    Box::new(random_pairs(
-        &EXAMPLE_SEED,
-        &(|seed| random(seed)),
-        &(|seed| u32s_geometric(seed, scale).map(|i| i.into())),
-    ))
-}
-
-pub fn pairs_of_unsigned_and_small_u32<T: 'static + PrimitiveUnsigned>(
+pub fn pairs_of_unsigned_and_small_unsigned<
+    T: 'static + PrimitiveUnsigned,
+    U: 'static + PrimitiveUnsigned,
+>(
     gm: GenerationMode,
-) -> Box<Iterator<Item = (T, u32)>> {
+) -> Box<Iterator<Item = (T, U)>> {
     match gm {
         GenerationMode::Exhaustive => sqrt_pairs_of_unsigneds(),
-        GenerationMode::Random(scale) => random_pairs_of_primitive_and_geometric_u32(scale),
+        GenerationMode::Random(scale) => random_pairs_of_primitive_and_geometric_unsigned(scale),
         GenerationMode::SpecialRandom(scale) => Box::new(random_pairs(
             &EXAMPLE_SEED,
             &(|seed| special_random_unsigned(seed)),
-            &(|seed| u32s_geometric(seed, scale)),
-        )),
-    }
-}
-
-pub fn pairs_of_unsigned_and_small_u64<T: 'static + PrimitiveUnsigned>(
-    gm: GenerationMode,
-) -> It<(T, u64)> {
-    match gm {
-        GenerationMode::Exhaustive => sqrt_pairs_of_unsigneds(),
-        GenerationMode::Random(scale) => random_pairs_of_primitive_and_geometric_u64(scale),
-        GenerationMode::SpecialRandom(scale) => Box::new(random_pairs(
-            &EXAMPLE_SEED,
-            &(|seed| special_random_unsigned(seed)),
-            &(|seed| u32s_geometric(seed, scale).map(|i| i.into())),
+            &(|seed| u32s_geometric(seed, scale).flat_map(|u| U::checked_from(u))),
         )),
     }
 }
@@ -201,20 +183,23 @@ fn log_pairs_of_positive_primitive_and_unsigned<
     Box::new(log_pairs(exhaustive_positive(), exhaustive_unsigned()))
 }
 
-pub fn pairs_of_positive_unsigned_and_small_u32<T: 'static + PrimitiveUnsigned>(
+pub fn pairs_of_positive_unsigned_and_small_unsigned<
+    T: 'static + PrimitiveUnsigned,
+    U: 'static + PrimitiveUnsigned,
+>(
     gm: GenerationMode,
-) -> Box<Iterator<Item = (T, u32)>> {
+) -> Box<Iterator<Item = (T, U)>> {
     match gm {
         GenerationMode::Exhaustive => log_pairs_of_positive_primitive_and_unsigned(),
         GenerationMode::Random(scale) => Box::new(random_pairs(
             &EXAMPLE_SEED,
             &(|seed| random_positive_unsigned(seed)),
-            &(|seed| u32s_geometric(seed, scale)),
+            &(|seed| u32s_geometric(seed, scale).flat_map(|u| U::checked_from(u))),
         )),
         GenerationMode::SpecialRandom(scale) => Box::new(random_pairs(
             &EXAMPLE_SEED,
             &(|seed| special_random_positive_unsigned(seed)),
-            &(|seed| u32s_geometric(seed, scale)),
+            &(|seed| u32s_geometric(seed, scale).flat_map(|u| U::checked_from(u))),
         )),
     }
 }
@@ -249,7 +234,7 @@ pub fn pairs_of_signed_and_small_u64<T: 'static + PrimitiveSigned>(
 ) -> It<(T, u64)> {
     match gm {
         GenerationMode::Exhaustive => sqrt_pairs_of_signed_and_unsigned(),
-        GenerationMode::Random(scale) => random_pairs_of_primitive_and_geometric_u64(scale),
+        GenerationMode::Random(scale) => random_pairs_of_primitive_and_geometric_unsigned(scale),
         GenerationMode::SpecialRandom(scale) => Box::new(random_pairs(
             &EXAMPLE_SEED,
             &(|seed| special_random_signed(seed)),

@@ -3,7 +3,7 @@ use malachite_base::num::{
     BitAccess, NegativeOne, PrimitiveInteger, PrimitiveSigned, PrimitiveUnsigned,
 };
 use malachite_test::inputs::base::{
-    pairs_of_signed_and_u64_width_range_var_2, pairs_of_unsigned_and_small_u64,
+    pairs_of_signed_and_u64_width_range_var_2, pairs_of_unsigned_and_small_unsigned,
 };
 
 fn clear_bit_helper_unsigned<T: PrimitiveInteger>() {
@@ -87,7 +87,7 @@ clear_bit_fail_helper!(
 );
 
 fn clear_bit_properties_helper_unsigned<T: 'static + PrimitiveUnsigned>() {
-    test_properties(pairs_of_unsigned_and_small_u64, |&(n, index)| {
+    test_properties(pairs_of_unsigned_and_small_unsigned, |&(n, index)| {
         let mut mut_n: T = n;
         mut_n.clear_bit(index);
 
