@@ -5,11 +5,12 @@ use malachite_nz::integer::logic::bit_access::limbs_get_bit_neg;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_test::common::integer_to_rug_integer;
-use malachite_test::inputs::base::pairs_of_u32_vec_and_small_u64_var_1;
+use malachite_test::inputs::base::pairs_of_unsigned_vec_and_small_u64_var_1;
 use malachite_test::inputs::integer::{natural_integers, pairs_of_integer_and_small_u64};
 use rug;
 use std::str::FromStr;
 
+//TODO continue removing duplication
 #[test]
 pub fn test_limbs_get_bit_neg() {
     let test = |limbs: &[u32], index: u64, out: bool| {
@@ -75,7 +76,7 @@ pub fn test_get_bit() {
 #[test]
 fn limbs_get_bit_neg_properties() {
     test_properties(
-        pairs_of_u32_vec_and_small_u64_var_1,
+        pairs_of_unsigned_vec_and_small_u64_var_1,
         |&(ref limbs, index)| {
             assert_eq!(
                 (-Natural::from_limbs_asc(limbs)).get_bit(index),

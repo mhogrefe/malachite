@@ -21,9 +21,13 @@ use std::str::FromStr;
 use std::u32;
 
 #[test]
-fn test_limbs_pos_and_limb_neg() {
+fn test_limbs_pos_and_limb_neg_and_limbs_pos_and_limb_neg_in_place() {
     let test = |limbs: &[u32], limb: u32, out: &[u32]| {
         assert_eq!(limbs_pos_and_limb_neg(limbs, limb), out);
+
+        let mut limbs = limbs.to_vec();
+        limbs_pos_and_limb_neg_in_place(&mut limbs, limb);
+        assert_eq!(limbs, out);
     };
     test(&[6, 7], 2, &[2, 7]);
     test(&[100, 101, 102], 10, &[0, 101, 102]);
@@ -61,27 +65,19 @@ fn limbs_pos_and_limb_neg_to_out_fail_2() {
 }
 
 #[test]
-fn test_limbs_pos_and_limb_neg_in_place() {
-    let test = |limbs: &[u32], limb: u32, out: &[u32]| {
-        let mut limbs = limbs.to_vec();
-        limbs_pos_and_limb_neg_in_place(&mut limbs, limb);
-        assert_eq!(limbs, out);
-    };
-    test(&[6, 7], 2, &[2, 7]);
-    test(&[100, 101, 102], 10, &[0, 101, 102]);
-    test(&[123, 456], 789, &[17, 456]);
-}
-
-#[test]
 #[should_panic(expected = "index out of bounds: the len is 0 but the index is 0")]
 fn limbs_pos_and_limb_neg_in_place_fail() {
     limbs_pos_and_limb_neg_in_place(&mut [], 10);
 }
 
 #[test]
-fn test_limbs_neg_and_limb_neg() {
+fn test_limbs_neg_and_limb_neg_and_limbs_vec_neg_and_limb_neg_in_place() {
     let test = |limbs: &[u32], limb: u32, out_limbs: &[u32]| {
         assert_eq!(limbs_neg_and_limb_neg(limbs, limb), out_limbs);
+
+        let mut limbs = limbs.to_vec();
+        limbs_vec_neg_and_limb_neg_in_place(&mut limbs, limb);
+        assert_eq!(limbs, out_limbs);
     };
     test(&[0, 2], 3, &[0, 2]);
     test(&[1, 1], 3, &[4_294_967_293, 1]);
@@ -152,19 +148,6 @@ fn test_limbs_slice_neg_and_limb_neg_in_place() {
 #[should_panic(expected = "assertion failed: mid <= len")]
 fn limbs_slice_neg_and_limb_neg_in_place_fail() {
     limbs_slice_neg_and_limb_neg_in_place(&mut [], 10);
-}
-
-#[test]
-fn test_limbs_vec_neg_and_limb_neg_in_place() {
-    let test = |limbs_before: &[u32], limb: u32, limbs_after: &[u32]| {
-        let mut limbs = limbs_before.to_vec();
-        limbs_vec_neg_and_limb_neg_in_place(&mut limbs, limb);
-        assert_eq!(limbs, limbs_after);
-    };
-    test(&[0, 2], 3, &[0, 2]);
-    test(&[1, 1], 3, &[4_294_967_293, 1]);
-    test(&[0xffff_fffe, 1], 1, &[0, 2]);
-    test(&[0xffff_fffe, 0xffff_ffff], 1, &[0, 0, 1]);
 }
 
 #[test]

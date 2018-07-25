@@ -1,12 +1,37 @@
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
+use inputs::base::{
+    pairs_of_unsigned_vec_and_small_u64, pairs_of_unsigned_vec_and_small_u64_var_1,
+    pairs_of_unsigned_vec_and_u32_var_2, triples_of_unsigned_vec_small_u64_and_rounding_mode_var_1,
+    triples_of_unsigned_vec_unsigned_vec_and_u32_var_6,
+};
 use inputs::natural::{
     pairs_of_natural_and_small_unsigned, rm_pairs_of_natural_and_small_unsigned,
     triples_of_natural_small_unsigned_and_rounding_mode_var_1,
 };
 use malachite_base::misc::Named;
-use malachite_base::num::{ShrRound, ShrRoundAssign};
+use malachite_base::num::{PrimitiveInteger, ShrRound, ShrRoundAssign};
+use malachite_nz::natural::arithmetic::shr_u::{
+    limbs_shr, limbs_shr_exact, limbs_shr_round, limbs_shr_round_to_nearest, limbs_shr_round_up,
+    limbs_shr_to_out, limbs_slice_shr_in_place, limbs_vec_shr_exact_in_place,
+    limbs_vec_shr_in_place, limbs_vec_shr_round_in_place, limbs_vec_shr_round_to_nearest_in_place,
+    limbs_vec_shr_round_up_in_place,
+};
+use std::cmp::max;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
+    register_demo!(registry, demo_limbs_shr);
+    register_demo!(registry, demo_limbs_shr_round_up);
+    register_demo!(registry, demo_limbs_shr_round_to_nearest);
+    register_demo!(registry, demo_limbs_shr_exact);
+    register_demo!(registry, demo_limbs_shr_round);
+    register_demo!(registry, demo_limbs_shr_to_out);
+    register_demo!(registry, demo_limbs_slice_shr_in_place);
+    register_demo!(registry, demo_limbs_vec_shr_in_place);
+    register_demo!(registry, demo_limbs_vec_shr_round_up_in_place);
+    register_demo!(registry, demo_limbs_vec_shr_round_to_nearest_in_place);
+    register_demo!(registry, demo_limbs_vec_shr_exact_in_place);
+    register_demo!(registry, demo_limbs_vec_shr_round_in_place);
+
     register_demo!(registry, demo_natural_shr_assign_u8);
     register_demo!(registry, demo_natural_shr_assign_u16);
     register_demo!(registry, demo_natural_shr_assign_u32);
@@ -36,6 +61,23 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_natural_shr_round_u16_ref);
     register_demo!(registry, demo_natural_shr_round_u32_ref);
     register_demo!(registry, demo_natural_shr_round_u64_ref);
+
+    register_bench!(registry, Small, benchmark_limbs_shr);
+    register_bench!(registry, Small, benchmark_limbs_shr_round_up);
+    register_bench!(registry, Small, benchmark_limbs_shr_round_to_nearest);
+    register_bench!(registry, Small, benchmark_limbs_shr_exact);
+    register_bench!(registry, Small, benchmark_limbs_shr_round);
+    register_bench!(registry, Small, benchmark_limbs_shr_to_out);
+    register_bench!(registry, Small, benchmark_limbs_slice_shr_in_place);
+    register_bench!(registry, Small, benchmark_limbs_vec_shr_in_place);
+    register_bench!(registry, Small, benchmark_limbs_vec_shr_round_up_in_place);
+    register_bench!(
+        registry,
+        Small,
+        benchmark_limbs_vec_shr_round_to_nearest_in_place
+    );
+    register_bench!(registry, Small, benchmark_limbs_vec_shr_exact_in_place);
+    register_bench!(registry, Small, benchmark_limbs_vec_shr_round_in_place);
 
     register_bench!(
         registry,
@@ -94,6 +136,152 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
         Large,
         benchmark_natural_shr_u32_library_comparison
     );
+}
+
+fn demo_limbs_shr(gm: GenerationMode, limit: usize) {
+    for (limbs, bits) in pairs_of_unsigned_vec_and_small_u64(gm).take(limit) {
+        println!(
+            "limbs_shr({:?}, {}) = {:?}",
+            limbs,
+            bits,
+            limbs_shr(&limbs, bits)
+        );
+    }
+}
+
+fn demo_limbs_shr_round_up(gm: GenerationMode, limit: usize) {
+    for (limbs, bits) in pairs_of_unsigned_vec_and_small_u64_var_1(gm).take(limit) {
+        println!(
+            "limbs_shr_round_up({:?}, {}) = {:?}",
+            limbs,
+            bits,
+            limbs_shr_round_up(&limbs, bits)
+        );
+    }
+}
+
+fn demo_limbs_shr_round_to_nearest(gm: GenerationMode, limit: usize) {
+    for (limbs, bits) in pairs_of_unsigned_vec_and_small_u64(gm).take(limit) {
+        println!(
+            "limbs_shr_round_to_nearest({:?}, {}) = {:?}",
+            limbs,
+            bits,
+            limbs_shr_round_to_nearest(&limbs, bits)
+        );
+    }
+}
+
+fn demo_limbs_shr_exact(gm: GenerationMode, limit: usize) {
+    for (limbs, bits) in pairs_of_unsigned_vec_and_small_u64(gm).take(limit) {
+        println!(
+            "limbs_shr_exact({:?}, {}) = {:?}",
+            limbs,
+            bits,
+            limbs_shr_exact(&limbs, bits)
+        );
+    }
+}
+
+fn demo_limbs_shr_round(gm: GenerationMode, limit: usize) {
+    for (limbs, bits, rm) in
+        triples_of_unsigned_vec_small_u64_and_rounding_mode_var_1(gm).take(limit)
+    {
+        println!(
+            "limbs_shr_round({:?}, {}, {}) = {:?}",
+            limbs,
+            bits,
+            rm,
+            limbs_shr_round(&limbs, bits, rm)
+        );
+    }
+}
+
+fn demo_limbs_shr_to_out(gm: GenerationMode, limit: usize) {
+    for (out_limbs, in_limbs, bits) in
+        triples_of_unsigned_vec_unsigned_vec_and_u32_var_6(gm).take(limit)
+    {
+        let mut out_limbs = out_limbs.to_vec();
+        let mut out_limbs_old = out_limbs.clone();
+        let carry = limbs_shr_to_out(&mut out_limbs, &in_limbs, bits);
+        println!(
+            "out_limbs := {:?}; limbs_shr_to_out(&mut out_limbs, {:?}, {}) = {}; out_limbs = {:?}",
+            out_limbs_old, in_limbs, bits, carry, out_limbs
+        );
+    }
+}
+
+fn demo_limbs_slice_shr_in_place(gm: GenerationMode, limit: usize) {
+    for (limbs, bits) in pairs_of_unsigned_vec_and_u32_var_2(gm).take(limit) {
+        let mut limbs = limbs.to_vec();
+        let mut limbs_old = limbs.clone();
+        let carry = limbs_slice_shr_in_place(&mut limbs, bits);
+        println!(
+            "limbs := {:?}; limbs_slice_shr_in_place(&mut limbs, {}) = {}; limbs = {:?}",
+            limbs_old, bits, carry, limbs
+        );
+    }
+}
+
+fn demo_limbs_vec_shr_in_place(gm: GenerationMode, limit: usize) {
+    for (limbs, bits) in pairs_of_unsigned_vec_and_small_u64(gm).take(limit) {
+        let mut limbs = limbs.to_vec();
+        let mut limbs_old = limbs.clone();
+        limbs_vec_shr_in_place(&mut limbs, bits);
+        println!(
+            "limbs := {:?}; limbs_vec_shr_in_place(&mut limbs, {}); limbs = {:?}",
+            limbs_old, bits, limbs
+        );
+    }
+}
+
+fn demo_limbs_vec_shr_round_up_in_place(gm: GenerationMode, limit: usize) {
+    for (limbs, bits) in pairs_of_unsigned_vec_and_small_u64_var_1(gm).take(limit) {
+        let mut limbs = limbs.to_vec();
+        let mut limbs_old = limbs.clone();
+        limbs_vec_shr_round_up_in_place(&mut limbs, bits);
+        println!(
+            "limbs := {:?}; limbs_vec_shr_round_up_in_place(&mut limbs, {}); limbs = {:?}",
+            limbs_old, bits, limbs
+        );
+    }
+}
+
+fn demo_limbs_vec_shr_round_to_nearest_in_place(gm: GenerationMode, limit: usize) {
+    for (limbs, bits) in pairs_of_unsigned_vec_and_small_u64(gm).take(limit) {
+        let mut limbs = limbs.to_vec();
+        let mut limbs_old = limbs.clone();
+        limbs_vec_shr_round_to_nearest_in_place(&mut limbs, bits);
+        println!(
+            "limbs := {:?}; limbs_vec_shr_round_to_nearest_in_place(&mut limbs, {}); limbs = {:?}",
+            limbs_old, bits, limbs
+        );
+    }
+}
+
+fn demo_limbs_vec_shr_exact_in_place(gm: GenerationMode, limit: usize) {
+    for (limbs, bits) in pairs_of_unsigned_vec_and_small_u64(gm).take(limit) {
+        let mut limbs = limbs.to_vec();
+        let mut limbs_old = limbs.clone();
+        let result = limbs_vec_shr_exact_in_place(&mut limbs, bits);
+        println!(
+            "limbs := {:?}; limbs_vec_shr_exact_in_place(&mut limbs, {}) = {}; limbs = {:?}",
+            limbs_old, bits, result, limbs
+        );
+    }
+}
+
+fn demo_limbs_vec_shr_round_in_place(gm: GenerationMode, limit: usize) {
+    for (limbs, bits, rm) in
+        triples_of_unsigned_vec_small_u64_and_rounding_mode_var_1(gm).take(limit)
+    {
+        let mut limbs = limbs.to_vec();
+        let mut limbs_old = limbs.clone();
+        let result = limbs_vec_shr_round_in_place(&mut limbs, bits, rm);
+        println!(
+            "limbs := {:?}; limbs_vec_shr_round_in_place(&mut limbs, {}, {}) = {}; limbs = {:?}",
+            limbs_old, bits, rm, result, limbs
+        );
+    }
 }
 
 macro_rules! demos_and_benches {
@@ -296,6 +484,243 @@ demos_and_benches!(
     benchmark_natural_shr_round_assign_u64,
     benchmark_natural_shr_round_u64_evaluation_strategy
 );
+
+fn benchmark_limbs_shr(gm: GenerationMode, limit: usize, file_name: &str) {
+    m_run_benchmark(
+        "limbs_shr(&[u32], u32)",
+        BenchmarkType::Single,
+        pairs_of_unsigned_vec_and_small_u64(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(ref limbs, bits)| {
+            max(
+                1,
+                limbs.len() as isize - ((bits / u64::from(u32::WIDTH)) as isize),
+            ) as usize
+        }),
+        "max(1, limbs.len() - bits / u32::WIDTH)",
+        &mut [(
+            "malachite",
+            &mut (|(limbs, bits)| no_out!(limbs_shr(&limbs, bits))),
+        )],
+    );
+}
+
+fn benchmark_limbs_shr_round_up(gm: GenerationMode, limit: usize, file_name: &str) {
+    m_run_benchmark(
+        "limbs_shr_round_up(&[u32], u32)",
+        BenchmarkType::Single,
+        pairs_of_unsigned_vec_and_small_u64_var_1(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(ref limbs, bits)| {
+            max(
+                1,
+                limbs.len() as isize - ((bits / u64::from(u32::WIDTH)) as isize),
+            ) as usize
+        }),
+        "max(1, limbs.len() - bits / u32::WIDTH)",
+        &mut [(
+            "malachite",
+            &mut (|(limbs, bits)| no_out!(limbs_shr_round_up(&limbs, bits))),
+        )],
+    );
+}
+
+fn benchmark_limbs_shr_round_to_nearest(gm: GenerationMode, limit: usize, file_name: &str) {
+    m_run_benchmark(
+        "limbs_shr_round_to_nearest(&[u32], u32)",
+        BenchmarkType::Single,
+        pairs_of_unsigned_vec_and_small_u64(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(ref limbs, bits)| {
+            max(
+                1,
+                limbs.len() as isize - ((bits / u64::from(u32::WIDTH)) as isize),
+            ) as usize
+        }),
+        "max(1, limbs.len() - bits / u32::WIDTH)",
+        &mut [(
+            "malachite",
+            &mut (|(limbs, bits)| no_out!(limbs_shr_round_to_nearest(&limbs, bits))),
+        )],
+    );
+}
+
+fn benchmark_limbs_shr_exact(gm: GenerationMode, limit: usize, file_name: &str) {
+    m_run_benchmark(
+        "limbs_shr_exact(&[u32], u32)",
+        BenchmarkType::Single,
+        pairs_of_unsigned_vec_and_small_u64(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(ref limbs, bits)| {
+            max(
+                1,
+                limbs.len() as isize - ((bits / u64::from(u32::WIDTH)) as isize),
+            ) as usize
+        }),
+        "max(1, limbs.len() - bits / u32::WIDTH)",
+        &mut [(
+            "malachite",
+            &mut (|(limbs, bits)| no_out!(limbs_shr_exact(&limbs, bits))),
+        )],
+    );
+}
+
+fn benchmark_limbs_shr_round(gm: GenerationMode, limit: usize, file_name: &str) {
+    m_run_benchmark(
+        "limbs_shr_round(&[u32], u32, RoundingMode)",
+        BenchmarkType::Single,
+        triples_of_unsigned_vec_small_u64_and_rounding_mode_var_1(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(ref limbs, bits, _)| {
+            max(
+                1,
+                limbs.len() as isize - ((bits / u64::from(u32::WIDTH)) as isize),
+            ) as usize
+        }),
+        "max(1, limbs.len() - bits / u32::WIDTH)",
+        &mut [(
+            "malachite",
+            &mut (|(limbs, bits, rm)| no_out!(limbs_shr_round(&limbs, bits, rm))),
+        )],
+    );
+}
+
+fn benchmark_limbs_shr_to_out(gm: GenerationMode, limit: usize, file_name: &str) {
+    m_run_benchmark(
+        "limbs_shr_to_out(&mut [u32], &[u32], u32)",
+        BenchmarkType::Single,
+        triples_of_unsigned_vec_unsigned_vec_and_u32_var_6(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(_, ref in_limbs, _)| in_limbs.len()),
+        "in_limbs.len()",
+        &mut [(
+            "malachite",
+            &mut (|(mut out_limbs, in_limbs, bits)| {
+                no_out!(limbs_shr_to_out(&mut out_limbs, &in_limbs, bits))
+            }),
+        )],
+    );
+}
+
+fn benchmark_limbs_slice_shr_in_place(gm: GenerationMode, limit: usize, file_name: &str) {
+    m_run_benchmark(
+        "limbs_slice_shr_in_place(&mut [u32], u32)",
+        BenchmarkType::Single,
+        pairs_of_unsigned_vec_and_u32_var_2(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(ref limbs, _)| limbs.len()),
+        "limbs.len()",
+        &mut [(
+            "malachite",
+            &mut (|(mut limbs, bits)| no_out!(limbs_slice_shr_in_place(&mut limbs, bits))),
+        )],
+    );
+}
+
+fn benchmark_limbs_vec_shr_in_place(gm: GenerationMode, limit: usize, file_name: &str) {
+    m_run_benchmark(
+        "limbs_vec_shr_in_place(&mut Vec<u32>, u32)",
+        BenchmarkType::Single,
+        pairs_of_unsigned_vec_and_small_u64(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(ref limbs, bits)| limbs.len() + (bits / u64::from(u32::WIDTH)) as usize),
+        "limbs.len()",
+        &mut [(
+            "malachite",
+            &mut (|(mut limbs, bits)| limbs_vec_shr_in_place(&mut limbs, bits)),
+        )],
+    );
+}
+
+fn benchmark_limbs_vec_shr_round_up_in_place(gm: GenerationMode, limit: usize, file_name: &str) {
+    m_run_benchmark(
+        "limbs_vec_shr_round_up_in_place(&mut Vec<u32>, u32)",
+        BenchmarkType::Single,
+        pairs_of_unsigned_vec_and_small_u64_var_1(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(ref limbs, bits)| limbs.len() + (bits / u64::from(u32::WIDTH)) as usize),
+        "limbs.len()",
+        &mut [(
+            "malachite",
+            &mut (|(mut limbs, bits)| limbs_vec_shr_round_up_in_place(&mut limbs, bits)),
+        )],
+    );
+}
+
+fn benchmark_limbs_vec_shr_round_to_nearest_in_place(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "limbs_vec_shr_round_to_nearest_in_place(&mut Vec<u32>, u32)",
+        BenchmarkType::Single,
+        pairs_of_unsigned_vec_and_small_u64(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(ref limbs, bits)| limbs.len() + (bits / u64::from(u32::WIDTH)) as usize),
+        "limbs.len()",
+        &mut [(
+            "malachite",
+            &mut (|(mut limbs, bits)| limbs_vec_shr_round_to_nearest_in_place(&mut limbs, bits)),
+        )],
+    );
+}
+
+fn benchmark_limbs_vec_shr_exact_in_place(gm: GenerationMode, limit: usize, file_name: &str) {
+    m_run_benchmark(
+        "limbs_vec_shr_exact_in_place(&mut Vec<u32>, u32)",
+        BenchmarkType::Single,
+        pairs_of_unsigned_vec_and_small_u64(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(ref limbs, bits)| limbs.len() + (bits / u64::from(u32::WIDTH)) as usize),
+        "limbs.len()",
+        &mut [(
+            "malachite",
+            &mut (|(mut limbs, bits)| no_out!(limbs_vec_shr_exact_in_place(&mut limbs, bits))),
+        )],
+    );
+}
+
+fn benchmark_limbs_vec_shr_round_in_place(gm: GenerationMode, limit: usize, file_name: &str) {
+    m_run_benchmark(
+        "limbs_vec_shr_round_in_place(&mut Vec<u32>, u32, RoundingMode)",
+        BenchmarkType::Single,
+        triples_of_unsigned_vec_small_u64_and_rounding_mode_var_1(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(ref limbs, bits, _)| limbs.len() + (bits / u64::from(u32::WIDTH)) as usize),
+        "limbs.len()",
+        &mut [(
+            "malachite",
+            &mut (|(mut limbs, bits, rm)| {
+                no_out!(limbs_vec_shr_round_in_place(&mut limbs, bits, rm))
+            }),
+        )],
+    );
+}
 
 fn benchmark_natural_shr_assign_u32_library_comparison(
     gm: GenerationMode,

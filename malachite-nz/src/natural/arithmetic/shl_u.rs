@@ -163,7 +163,7 @@ macro_rules! impl_natural_shl_unsigned {
         ///
         /// Additional memory: worst case O(m)
         ///
-        /// where n = `self.significant_bits()` + `other` / 32, m = `other`
+        /// where n = `self.significant_bits()` + `other`, m = `other`
         ///
         /// # Examples
         /// ```
@@ -195,7 +195,7 @@ macro_rules! impl_natural_shl_unsigned {
         ///
         /// Additional memory: worst case O(n)
         ///
-        /// where n = `self.significant_bits()` + `other` / 32
+        /// where n = `self.significant_bits()` + `other`
         ///
         /// # Examples
         /// ```
@@ -235,7 +235,7 @@ macro_rules! impl_natural_shl_unsigned {
         ///
         /// Additional memory: worst case O(m)
         ///
-        /// where n = `self.significant_bits()` + `other` / 32, m = `other`
+        /// where n = `self.significant_bits()` + `other`, m = `other`
         ///
         /// # Examples
         /// ```

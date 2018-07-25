@@ -881,6 +881,14 @@ pub fn pairs_of_unsigned_vec_and_u32_var_1<T: 'static + PrimitiveUnsigned>(
     }
 }
 
+// All pairs of `Vec<T>` where `T` is unsigned, and a `u32` between 1 and 31, inclusive, where the
+// `Vec` is nonempty.
+pub fn pairs_of_unsigned_vec_and_u32_var_2<T: 'static + PrimitiveUnsigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (Vec<T>, u32)>> {
+    Box::new(pairs_of_unsigned_vec_and_u32_var_1(gm).filter(|&(ref xs, _)| !xs.is_empty()))
+}
+
 pub fn pairs_of_unsigned_vec_and_small_u64<T: 'static + PrimitiveUnsigned>(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (Vec<T>, u64)>> {
@@ -902,11 +910,11 @@ pub fn pairs_of_unsigned_vec_and_small_u64<T: 'static + PrimitiveUnsigned>(
     }
 }
 
-// All pairs of `Vec<u32>` and small `u64` where the `Vec<u32>` are nonempty and don't only contain
-// zeros.
-pub fn pairs_of_u32_vec_and_small_u64_var_1(
+// All pairs of `Vec<T>` and small `u64` where `T` is unsigned and the `Vec<T>` is nonempty and
+// doesn't only contain zeros.
+pub fn pairs_of_unsigned_vec_and_small_u64_var_1<T: 'static + PrimitiveUnsigned>(
     gm: GenerationMode,
-) -> Box<Iterator<Item = (Vec<u32>, u64)>> {
+) -> Box<Iterator<Item = (Vec<T>, u64)>> {
     Box::new(
         pairs_of_unsigned_vec_and_small_u64(gm).filter(|&(ref limbs, _)| !limbs_test_zero(limbs)),
     )
@@ -928,7 +936,7 @@ pub fn pairs_of_u32_vec_and_small_u64_var_3(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (Vec<u32>, u64)>> {
     Box::new(
-        pairs_of_u32_vec_and_small_u64_var_1(gm).filter(|&(ref limbs, index)| {
+        pairs_of_unsigned_vec_and_small_u64_var_1(gm).filter(|&(ref limbs, index)| {
             let mut mut_limbs = limbs.clone();
             limbs_vec_clear_bit_neg(&mut mut_limbs, index);
             mut_limbs.len() == limbs.len()
@@ -1070,5 +1078,54 @@ pub fn triples_of_unsigned_vec_unsigned_vec_and_u32_var_5(
     Box::new(
         triples_of_unsigned_vec_unsigned_vec_and_u32_var_4(gm)
             .filter(|&(ref out_limbs, ref in_limbs, _)| out_limbs.len() >= in_limbs.len()),
+    )
+}
+
+// All triples of `Vec<T>`, `Vec<T>`, and `u32` where `T` is unsigned, the first `Vec` is at least
+// as long as the second, the second is nonempty, and the `u32` is between 1 and 31, inclusive.
+pub fn triples_of_unsigned_vec_unsigned_vec_and_u32_var_6(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (Vec<u32>, Vec<u32>, u32)>> {
+    Box::new(
+        triples_of_unsigned_vec_unsigned_vec_and_u32_var_4(gm).filter(
+            |&(ref out_limbs, ref in_limbs, _)| {
+                !in_limbs.is_empty() && out_limbs.len() >= in_limbs.len()
+            },
+        ),
+    )
+}
+
+fn triples_of_unsigned_vec_small_u64_and_rounding_mode<T: 'static + PrimitiveUnsigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (Vec<T>, u64, RoundingMode)>> {
+    match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_triples(
+            exhaustive_vecs(exhaustive_unsigned()),
+            exhaustive_unsigned::<u64>(),
+            exhaustive_rounding_modes(),
+        )),
+        GenerationMode::Random(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| random_vecs(seed, scale, &(|seed_2| random(seed_2)))),
+            &(|seed| u32s_geometric(seed, scale).map(|u| u.into())),
+            &(|seed| random_rounding_modes(seed)),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_unsigned_vecs(seed, scale)),
+            &(|seed| u32s_geometric(seed, scale).map(|u| u.into())),
+            &(|seed| random_rounding_modes(seed)),
+        )),
+    }
+}
+
+// All triples of `Vec<T>`, `u64`, and `RoundingMode` where `T` is unsigned and the `Vec` doesn't
+// only contain zeros.
+pub fn triples_of_unsigned_vec_small_u64_and_rounding_mode_var_1<T: 'static + PrimitiveUnsigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (Vec<T>, u64, RoundingMode)>> {
+    Box::new(
+        triples_of_unsigned_vec_small_u64_and_rounding_mode(gm)
+            .filter(|&(ref limbs, _, _)| !limbs_test_zero(limbs)),
     )
 }

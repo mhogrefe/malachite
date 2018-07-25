@@ -1,3 +1,6 @@
+use num::PrimitiveUnsigned;
+
+//TODO test other unsigned besides u32
 /// Tests whether all limbs in a slice are equal to 0.
 ///
 /// Equivalent to GMP's `mpn_zero_p`.
@@ -12,11 +15,11 @@
 /// ```
 /// use malachite_base::limbs::limbs_test_zero;
 ///
-/// assert!(limbs_test_zero(&[0, 0, 0]));
-/// assert!(!limbs_test_zero(&[0, 1, 0]));
+/// assert!(limbs_test_zero::<u32>(&[0, 0, 0]));
+/// assert!(!limbs_test_zero::<u32>(&[0, 1, 0]));
 /// ```
-pub fn limbs_test_zero(limbs: &[u32]) -> bool {
-    limbs.iter().all(|&limb| limb == 0)
+pub fn limbs_test_zero<T: PrimitiveUnsigned>(limbs: &[T]) -> bool {
+    limbs.iter().all(|&limb| limb == T::ZERO)
 }
 
 /// Sets all limbs in a slice to 0.

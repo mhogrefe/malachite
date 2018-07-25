@@ -7,7 +7,7 @@ use malachite_nz::integer::logic::bit_access::{
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_test::inputs::base::{
-    pairs_of_u32_vec_and_small_u64_var_1, pairs_of_u32_vec_and_small_u64_var_3,
+    pairs_of_u32_vec_and_small_u64_var_3, pairs_of_unsigned_vec_and_small_u64_var_1,
 };
 use malachite_test::inputs::integer::pairs_of_integer_and_small_u64;
 use std::str::FromStr;
@@ -89,37 +89,31 @@ fn test_clear_bit() {
     test("-4294967288", 3, "-4294967296");
 }
 
+macro_rules! limbs_clear_bit_neg_helper {
+    ($f:ident, $limbs:ident, $index:ident) => {
+        |&(ref $limbs, $index)| {
+            let mut mut_limbs = $limbs.clone();
+            let mut n = -Natural::from_limbs_asc($limbs);
+            $f(&mut mut_limbs, $index);
+            n.clear_bit($index);
+            assert_eq!(-Natural::from_limbs_asc(&mut_limbs), n);
+        }
+    };
+}
+
 #[test]
 fn limbs_slice_clear_bit_neg_properties() {
     test_properties(
         pairs_of_u32_vec_and_small_u64_var_3,
-        |&(ref limbs, index)| {
-            let mut mut_limbs = limbs.clone();
-            let mut n = -Natural::from_limbs_asc(limbs);
-            limbs_slice_clear_bit_neg(&mut mut_limbs, index);
-            n.clear_bit(index);
-            assert_eq!(-Natural::from_limbs_asc(&mut_limbs), n);
-        },
+        limbs_clear_bit_neg_helper!(limbs_slice_clear_bit_neg, limbs, index),
     );
 }
 
 #[test]
 fn limbs_vec_clear_bit_neg_properties() {
     test_properties(
-        pairs_of_u32_vec_and_small_u64_var_1,
-        |&(ref limbs, index)| {
-            let mut mut_limbs = limbs.clone();
-            let mut n = -Natural::from_limbs_asc(limbs);
-            limbs_vec_clear_bit_neg(&mut mut_limbs, index);
-            n.clear_bit(index);
-            assert_eq!(
-                -Natural::from_limbs_asc(&mut_limbs),
-                n,
-                "{:?} {}",
-                limbs,
-                index
-            );
-        },
+        pairs_of_unsigned_vec_and_small_u64_var_1,
+        limbs_clear_bit_neg_helper!(limbs_vec_clear_bit_neg, limbs, index),
     );
 }
 

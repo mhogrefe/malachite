@@ -8,7 +8,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
 }
 
 fn demo_limbs_test_zero(gm: GenerationMode, limit: usize) {
-    for xs in vecs_of_unsigned(gm).take(limit) {
+    for xs in vecs_of_unsigned::<u32>(gm).take(limit) {
         println!("limbs_test_zero({:?}) = {:?}", xs, limbs_test_zero(&xs));
     }
 }
@@ -17,7 +17,7 @@ fn benchmark_limbs_test_zero(gm: GenerationMode, limit: usize, file_name: &str) 
     m_run_benchmark(
         "limbs_test_zero(&[u32])",
         BenchmarkType::Single,
-        vecs_of_unsigned(gm),
+        vecs_of_unsigned::<u32>(gm),
         gm.name(),
         limit,
         file_name,

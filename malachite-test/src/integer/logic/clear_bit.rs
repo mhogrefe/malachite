@@ -1,5 +1,7 @@
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::base::{pairs_of_u32_vec_and_small_u64_var_1, pairs_of_u32_vec_and_small_u64_var_3};
+use inputs::base::{
+    pairs_of_u32_vec_and_small_u64_var_3, pairs_of_unsigned_vec_and_small_u64_var_1,
+};
 use inputs::integer::pairs_of_integer_and_small_u64;
 use malachite_base::num::{BitAccess, SignificantBits};
 use malachite_nz::integer::logic::bit_access::{
@@ -28,7 +30,7 @@ fn demo_limbs_slice_clear_bit_neg(gm: GenerationMode, limit: usize) {
 }
 
 fn demo_limbs_vec_clear_bit_neg(gm: GenerationMode, limit: usize) {
-    for (limbs, index) in pairs_of_u32_vec_and_small_u64_var_1(gm).take(limit) {
+    for (limbs, index) in pairs_of_unsigned_vec_and_small_u64_var_1(gm).take(limit) {
         let mut mut_limbs = limbs.clone();
         limbs_vec_clear_bit_neg(&mut mut_limbs, index);
         println!(
@@ -67,7 +69,7 @@ fn benchmark_limbs_vec_clear_bit_neg(gm: GenerationMode, limit: usize, file_name
     m_run_benchmark(
         "limbs_vec_clear_bit_neg(&mut [u32], u64)",
         BenchmarkType::Single,
-        pairs_of_u32_vec_and_small_u64_var_1(gm),
+        pairs_of_unsigned_vec_and_small_u64_var_1(gm),
         gm.name(),
         limit,
         file_name,

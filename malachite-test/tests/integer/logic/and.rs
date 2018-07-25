@@ -23,7 +23,6 @@ use rug;
 use std::cmp::{max, min};
 use std::str::FromStr;
 
-//TODO continue removing duplication
 #[test]
 fn test_limbs_and_pos_neg() {
     let test = |xs, ys, out| {

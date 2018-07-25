@@ -1,5 +1,5 @@
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::base::pairs_of_u32_vec_and_small_u64_var_1;
+use inputs::base::pairs_of_unsigned_vec_and_small_u64_var_1;
 use inputs::integer::pairs_of_integer_and_small_u64;
 use malachite_base::num::{BitScan, SignificantBits};
 use malachite_nz::integer::logic::bit_scan::limbs_index_of_next_false_bit_neg;
@@ -34,7 +34,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
 }
 
 fn demo_limbs_index_of_next_false_bit_neg(gm: GenerationMode, limit: usize) {
-    for (ref limbs, u) in pairs_of_u32_vec_and_small_u64_var_1(gm).take(limit) {
+    for (ref limbs, u) in pairs_of_unsigned_vec_and_small_u64_var_1(gm).take(limit) {
         println!(
             "limbs_index_of_next_false_bit_neg({:?}, {}) = {:?}",
             limbs,
@@ -59,7 +59,7 @@ fn benchmark_limbs_index_of_next_false_bit_neg(gm: GenerationMode, limit: usize,
     m_run_benchmark(
         "limbs_index_of_next_false_bit_neg(&[u32], u64)",
         BenchmarkType::Single,
-        pairs_of_u32_vec_and_small_u64_var_1(gm),
+        pairs_of_unsigned_vec_and_small_u64_var_1(gm),
         gm.name(),
         limit,
         file_name,

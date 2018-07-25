@@ -127,11 +127,11 @@ fn limbs_shl_properties() {
 fn limbs_shl_to_out_properties() {
     test_properties(
         triples_of_unsigned_vec_unsigned_vec_and_u32_var_5,
-        |&(ref out_limbs, ref in_limbs, limb)| {
+        |&(ref out_limbs, ref in_limbs, bits)| {
             let mut out_limbs = out_limbs.to_vec();
             let old_out_limbs = out_limbs.clone();
-            let carry = limbs_shl_to_out(&mut out_limbs, in_limbs, limb);
-            let n = Natural::from_limbs_asc(in_limbs) << limb;
+            let carry = limbs_shl_to_out(&mut out_limbs, in_limbs, bits);
+            let n = Natural::from_limbs_asc(in_limbs) << bits;
             let len = in_limbs.len();
             let mut limbs = n.into_limbs_asc();
             assert_eq!(carry != 0, limbs.len() == len + 1);
@@ -148,11 +148,11 @@ fn limbs_shl_to_out_properties() {
 
 #[test]
 fn limbs_slice_shl_in_place_properties() {
-    test_properties(pairs_of_unsigned_vec_and_u32_var_1, |&(ref limbs, limb)| {
+    test_properties(pairs_of_unsigned_vec_and_u32_var_1, |&(ref limbs, bits)| {
         let mut limbs = limbs.to_vec();
         let old_limbs = limbs.clone();
-        let carry = limbs_slice_shl_in_place(&mut limbs, limb);
-        let n = Natural::from_limbs_asc(&old_limbs) << limb;
+        let carry = limbs_slice_shl_in_place(&mut limbs, bits);
+        let n = Natural::from_limbs_asc(&old_limbs) << bits;
         let mut expected_limbs = n.into_limbs_asc();
         assert_eq!(carry != 0, expected_limbs.len() == limbs.len() + 1);
         if carry != 0 {
@@ -165,11 +165,11 @@ fn limbs_slice_shl_in_place_properties() {
 
 #[test]
 fn limbs_vec_shl_in_place_properties() {
-    test_properties(pairs_of_unsigned_vec_and_small_u64, |&(ref limbs, limb)| {
+    test_properties(pairs_of_unsigned_vec_and_small_u64, |&(ref limbs, bits)| {
         let mut limbs = limbs.to_vec();
         let old_limbs = limbs.clone();
-        limbs_vec_shl_in_place(&mut limbs, limb);
-        let n = Natural::from_limbs_asc(&old_limbs) << limb;
+        limbs_vec_shl_in_place(&mut limbs, bits);
+        let n = Natural::from_limbs_asc(&old_limbs) << bits;
         assert_eq!(Natural::from_owned_limbs_asc(limbs), n);
     });
 }
