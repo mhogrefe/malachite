@@ -23,7 +23,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_bench!(registry, None, benchmark_i64_set_bit);
 }
 
-fn demo_unsigned_set_bit<T: 'static + PrimitiveUnsigned>(gm: GenerationMode, limit: usize) {
+fn demo_unsigned_set_bit<T: PrimitiveUnsigned>(gm: GenerationMode, limit: usize) {
     for (mut n, index) in pairs_of_unsigned_and_u64_width_range::<T>(gm).take(limit) {
         let n_old = n;
         n.set_bit(index);
@@ -31,7 +31,7 @@ fn demo_unsigned_set_bit<T: 'static + PrimitiveUnsigned>(gm: GenerationMode, lim
     }
 }
 
-fn demo_signed_set_bit<T: 'static + PrimitiveSigned>(gm: GenerationMode, limit: usize) {
+fn demo_signed_set_bit<T: PrimitiveSigned>(gm: GenerationMode, limit: usize) {
     for (mut n, index) in pairs_of_signed_and_u64_width_range_var_1::<T>(gm).take(limit) {
         let n_old = n;
         n.set_bit(index);
@@ -39,7 +39,7 @@ fn demo_signed_set_bit<T: 'static + PrimitiveSigned>(gm: GenerationMode, limit: 
     }
 }
 
-fn benchmark_unsigned_set_bit<T: 'static + PrimitiveUnsigned>(
+fn benchmark_unsigned_set_bit<T: PrimitiveUnsigned>(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,
@@ -57,11 +57,7 @@ fn benchmark_unsigned_set_bit<T: 'static + PrimitiveUnsigned>(
     );
 }
 
-fn benchmark_signed_set_bit<T: 'static + PrimitiveSigned>(
-    gm: GenerationMode,
-    limit: usize,
-    file_name: &str,
-) {
+fn benchmark_signed_set_bit<T: PrimitiveSigned>(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         &format!("{}.set_bit(u64)", T::NAME),
         BenchmarkType::Single,

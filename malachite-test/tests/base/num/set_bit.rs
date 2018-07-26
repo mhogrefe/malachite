@@ -105,7 +105,7 @@ set_bit_fail_helper!(
     "Cannot set bit 100 in non-negative value of width 64"
 );
 
-fn set_bit_properties_helper_unsigned<T: 'static + PrimitiveUnsigned>() {
+fn set_bit_properties_helper_unsigned<T: PrimitiveUnsigned>() {
     test_properties(pairs_of_unsigned_and_u64_width_range, |&(n, index)| {
         let mut mut_n: T = n;
         mut_n.set_bit(index);
@@ -126,7 +126,7 @@ fn set_bit_properties_helper_unsigned<T: 'static + PrimitiveUnsigned>() {
     });
 }
 
-fn set_bit_properties_helper_signed<T: 'static + PrimitiveSigned>() {
+fn set_bit_properties_helper_signed<T: PrimitiveSigned>() {
     test_properties(pairs_of_signed_and_u64_width_range_var_1, |&(n, index)| {
         let mut mut_n: T = n;
         mut_n.set_bit(index);

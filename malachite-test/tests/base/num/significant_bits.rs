@@ -53,7 +53,7 @@ pub fn test_significant_bits() {
     significant_bits_helper_signed::<i64>(i64::MAX, i64::MIN);
 }
 
-fn significant_bits_properties_helper_unsigned<T: 'static + PrimitiveUnsigned>() {
+fn significant_bits_properties_helper_unsigned<T: PrimitiveUnsigned>() {
     test_properties(unsigneds, |&n: &T| {
         let significant_bits = n.significant_bits();
         assert!(significant_bits <= u64::from(T::WIDTH));
@@ -64,7 +64,7 @@ fn significant_bits_properties_helper_unsigned<T: 'static + PrimitiveUnsigned>()
     });
 }
 
-fn significant_bits_properties_helper_signed<T: 'static + PrimitiveSigned>() {
+fn significant_bits_properties_helper_signed<T: PrimitiveSigned>() {
     test_properties(signeds, |&n: &T| {
         let significant_bits = n.significant_bits();
         assert!(significant_bits <= u64::from(T::WIDTH));

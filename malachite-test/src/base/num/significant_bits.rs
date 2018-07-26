@@ -21,22 +21,19 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_bench!(registry, None, benchmark_i64_significant_bits);
 }
 
-fn demo_unsigned_significant_bits<T: 'static + PrimitiveUnsigned>(
-    gm: GenerationMode,
-    limit: usize,
-) {
+fn demo_unsigned_significant_bits<T: PrimitiveUnsigned>(gm: GenerationMode, limit: usize) {
     for n in unsigneds::<T>(gm).take(limit) {
         println!("{}.significant_bits() = {}", n, n.significant_bits());
     }
 }
 
-fn demo_signed_significant_bits<T: 'static + PrimitiveSigned>(gm: GenerationMode, limit: usize) {
+fn demo_signed_significant_bits<T: PrimitiveSigned>(gm: GenerationMode, limit: usize) {
     for n in signeds::<T>(gm).take(limit) {
         println!("{}.significant_bits() = {}", n, n.significant_bits());
     }
 }
 
-fn benchmark_unsigned_significant_bits<T: 'static + PrimitiveUnsigned>(
+fn benchmark_unsigned_significant_bits<T: PrimitiveUnsigned>(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,
@@ -54,7 +51,7 @@ fn benchmark_unsigned_significant_bits<T: 'static + PrimitiveUnsigned>(
     );
 }
 
-fn benchmark_signed_significant_bits<T: 'static + PrimitiveSigned>(
+fn benchmark_signed_significant_bits<T: PrimitiveSigned>(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,

@@ -21,19 +21,19 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_bench!(registry, None, benchmark_i64_get_bit);
 }
 
-fn demo_unsigned_get_bit<T: 'static + PrimitiveUnsigned>(gm: GenerationMode, limit: usize) {
+fn demo_unsigned_get_bit<T: PrimitiveUnsigned>(gm: GenerationMode, limit: usize) {
     for (n, index) in pairs_of_unsigned_and_small_unsigned::<T, u64>(gm).take(limit) {
         println!("get_bit({}, {}) = {}", n, index, n.get_bit(index));
     }
 }
 
-fn demo_signed_get_bit<T: 'static + PrimitiveSigned>(gm: GenerationMode, limit: usize) {
+fn demo_signed_get_bit<T: PrimitiveSigned>(gm: GenerationMode, limit: usize) {
     for (n, index) in pairs_of_signed_and_small_u64::<T>(gm).take(limit) {
         println!("get_bit({}, {}) = {}", n, index, n.get_bit(index));
     }
 }
 
-fn benchmark_unsigned_get_bit<T: 'static + PrimitiveUnsigned>(
+fn benchmark_unsigned_get_bit<T: PrimitiveUnsigned>(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,
@@ -51,11 +51,7 @@ fn benchmark_unsigned_get_bit<T: 'static + PrimitiveUnsigned>(
     );
 }
 
-fn benchmark_signed_get_bit<T: 'static + PrimitiveSigned>(
-    gm: GenerationMode,
-    limit: usize,
-    file_name: &str,
-) {
+fn benchmark_signed_get_bit<T: PrimitiveSigned>(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         &format!("{}.get_bit(u64)", T::NAME),
         BenchmarkType::Single,

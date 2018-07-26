@@ -110,7 +110,7 @@ assign_bit_fail_helper_signed!(
     assign_bit_i64_fail_2_helper
 );
 
-fn assign_bit_properties_helper_unsigned<T: 'static + PrimitiveUnsigned>() {
+fn assign_bit_properties_helper_unsigned<T: PrimitiveUnsigned>() {
     test_properties(
         triples_of_unsigned_u64_width_range_and_bool_var_1,
         |&(n, index, bit)| {
@@ -120,7 +120,7 @@ fn assign_bit_properties_helper_unsigned<T: 'static + PrimitiveUnsigned>() {
     );
 }
 
-fn assign_bit_properties_helper_signed<T: 'static + PrimitiveSigned>() {
+fn assign_bit_properties_helper_signed<T: PrimitiveSigned>() {
     test_properties(
         triples_of_signed_u64_width_range_and_bool_var_1,
         |&(n, index, bit)| {

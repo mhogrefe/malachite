@@ -18,7 +18,7 @@ pub fn test_join_halves() {
     join_halves_helper(0xabcd, 0x1234, 0xabcd_1234u32);
 }
 
-fn join_halves_properties_helper<T: 'static + JoinHalves + PrimitiveUnsigned + SplitInHalf>()
+fn join_halves_properties_helper<T: JoinHalves + PrimitiveUnsigned + SplitInHalf>()
 where
     T::Half: PrimitiveUnsigned,
 {

@@ -86,7 +86,7 @@ clear_bit_fail_helper!(
     "Cannot clear bit 100 in negative value of width 64"
 );
 
-fn clear_bit_properties_helper_unsigned<T: 'static + PrimitiveUnsigned>() {
+fn clear_bit_properties_helper_unsigned<T: PrimitiveUnsigned>() {
     test_properties(pairs_of_unsigned_and_small_unsigned, |&(n, index)| {
         let mut mut_n: T = n;
         mut_n.clear_bit(index);
@@ -106,7 +106,7 @@ fn clear_bit_properties_helper_unsigned<T: 'static + PrimitiveUnsigned>() {
     });
 }
 
-fn clear_bit_properties_helper_signed<T: 'static + PrimitiveSigned>() {
+fn clear_bit_properties_helper_signed<T: PrimitiveSigned>() {
     test_properties(pairs_of_signed_and_u64_width_range_var_2, |&(n, index)| {
         let mut mut_n: T = n;
         mut_n.clear_bit(index);

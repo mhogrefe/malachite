@@ -11,10 +11,8 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_bench!(registry, None, benchmark_u64_split_in_half);
 }
 
-fn demo_unsigned_split_in_half<T: 'static + PrimitiveUnsigned + SplitInHalf>(
-    gm: GenerationMode,
-    limit: usize,
-) where
+fn demo_unsigned_split_in_half<T: PrimitiveUnsigned + SplitInHalf>(gm: GenerationMode, limit: usize)
+where
     T::Half: PrimitiveUnsigned,
 {
     for u in unsigneds::<T>(gm).take(limit) {
@@ -22,7 +20,7 @@ fn demo_unsigned_split_in_half<T: 'static + PrimitiveUnsigned + SplitInHalf>(
     }
 }
 
-fn benchmark_unsigned_split_in_half<T: 'static + PrimitiveUnsigned + SplitInHalf>(
+fn benchmark_unsigned_split_in_half<T: PrimitiveUnsigned + SplitInHalf>(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,

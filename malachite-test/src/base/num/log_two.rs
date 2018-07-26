@@ -21,19 +21,19 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_bench!(registry, None, benchmark_u64_ceiling_log_two);
 }
 
-fn demo_unsigned_floor_log_two<T: 'static + PrimitiveUnsigned>(gm: GenerationMode, limit: usize) {
+fn demo_unsigned_floor_log_two<T: PrimitiveUnsigned>(gm: GenerationMode, limit: usize) {
     for n in positive_unsigneds::<T>(gm).take(limit) {
         println!("{}.floor_log_two() = {}", n, n.floor_log_two());
     }
 }
 
-fn demo_unsigned_ceiling_log_two<T: 'static + PrimitiveUnsigned>(gm: GenerationMode, limit: usize) {
+fn demo_unsigned_ceiling_log_two<T: PrimitiveUnsigned>(gm: GenerationMode, limit: usize) {
     for n in positive_unsigneds::<T>(gm).take(limit) {
         println!("{}.ceiling_log_two() = {}", n, n.ceiling_log_two());
     }
 }
 
-fn benchmark_unsigned_floor_log_two<T: 'static + PrimitiveUnsigned>(
+fn benchmark_unsigned_floor_log_two<T: PrimitiveUnsigned>(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,
@@ -51,7 +51,7 @@ fn benchmark_unsigned_floor_log_two<T: 'static + PrimitiveUnsigned>(
     );
 }
 
-fn benchmark_unsigned_ceiling_log_two<T: 'static + PrimitiveUnsigned>(
+fn benchmark_unsigned_ceiling_log_two<T: PrimitiveUnsigned>(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,

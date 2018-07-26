@@ -58,7 +58,7 @@ pub fn test_get_bit() {
     get_bit_helper_signed::<i64>();
 }
 
-fn get_bit_properties_helper_unsigned<T: 'static + PrimitiveUnsigned>() {
+fn get_bit_properties_helper_unsigned<T: PrimitiveUnsigned>() {
     test_properties(
         pairs_of_unsigned_and_small_unsigned::<T, u64>,
         |&(n, index)| {
@@ -80,7 +80,7 @@ fn get_bit_properties_helper_unsigned<T: 'static + PrimitiveUnsigned>() {
     });
 }
 
-fn get_bit_properties_helper_signed<T: 'static + PrimitiveSigned>() {
+fn get_bit_properties_helper_signed<T: PrimitiveSigned>() {
     test_properties(pairs_of_signed_and_small_u64, |&(n, index): &(T, u64)| {
         let bit = n.get_bit(index);
         if index >= u64::from(T::WIDTH) {

@@ -1,5 +1,6 @@
 use common::{test_properties, test_properties_no_special};
-use malachite_base::num::{IsPowerOfTwo, One, Zero};
+use malachite_base::misc::Max;
+use malachite_base::num::{IsPowerOfTwo, One, PrimitiveSigned, PrimitiveUnsigned, Zero};
 use malachite_nz::natural::arithmetic::shl_u::{
     limbs_shl, limbs_shl_to_out, limbs_slice_shl_in_place, limbs_vec_shl_in_place,
 };
@@ -250,12 +251,11 @@ macro_rules! tests_and_properties {
                 assert_eq!($shifted, $n * (Natural::ONE << $u));
                 assert_eq!(&$shifted >> $u, *$n);
 
-                //TODO
-                /*
-                if u <= (i32::MAX as u32) {
-                    assert_eq!(n << (u as i32), shifted);
-                    assert_eq!(n >> -(u as i32), shifted);
-                }*/
+                if $u < (<$t as PrimitiveUnsigned>::SignedOfEqualWidth::MAX.to_unsigned_bitwise()) {
+                    let u = $u.to_signed_bitwise();
+                    assert_eq!($n << u, $shifted);
+                    assert_eq!($n >> -u, $shifted);
+                }
             });
 
             test_properties(

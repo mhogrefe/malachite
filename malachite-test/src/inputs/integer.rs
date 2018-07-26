@@ -140,7 +140,7 @@ pub fn triples_of_natural_integers(
     }
 }
 
-fn random_pairs_of_integer_and_primitive<T: 'static + PrimitiveInteger>(
+fn random_pairs_of_integer_and_primitive<T: PrimitiveInteger>(
     scale: u32,
 ) -> Box<Iterator<Item = (Integer, T)>> {
     Box::new(random_pairs(
@@ -150,7 +150,7 @@ fn random_pairs_of_integer_and_primitive<T: 'static + PrimitiveInteger>(
     ))
 }
 
-fn random_pairs_of_primitive_and_integer<T: 'static + PrimitiveInteger>(
+fn random_pairs_of_primitive_and_integer<T: PrimitiveInteger>(
     scale: u32,
 ) -> Box<Iterator<Item = (T, Integer)>> {
     Box::new(random_pairs(
@@ -160,7 +160,7 @@ fn random_pairs_of_primitive_and_integer<T: 'static + PrimitiveInteger>(
     ))
 }
 
-pub fn pairs_of_integer_and_signed<T: 'static + PrimitiveSigned>(
+pub fn pairs_of_integer_and_signed<T: PrimitiveSigned>(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (Integer, T)>> {
     match gm {
@@ -176,13 +176,13 @@ pub fn pairs_of_integer_and_signed<T: 'static + PrimitiveSigned>(
     }
 }
 
-pub fn nm_pairs_of_integer_and_signed<T: 'static + PrimitiveSigned>(
+pub fn nm_pairs_of_integer_and_signed<T: PrimitiveSigned>(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = ((BigInt, T), (Integer, T))>> {
     Box::new(pairs_of_integer_and_signed(gm).map(|(x, y)| ((integer_to_bigint(&x), y), (x, y))))
 }
 
-pub fn rm_pairs_of_integer_and_signed<T: 'static + PrimitiveSigned>(
+pub fn rm_pairs_of_integer_and_signed<T: PrimitiveSigned>(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = ((rug::Integer, T), (Integer, T))>> {
     Box::new(
@@ -190,7 +190,7 @@ pub fn rm_pairs_of_integer_and_signed<T: 'static + PrimitiveSigned>(
     )
 }
 
-pub fn nrm_pairs_of_integer_and_signed<T: 'static + PrimitiveSigned>(
+pub fn nrm_pairs_of_integer_and_signed<T: PrimitiveSigned>(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = ((BigInt, T), (rug::Integer, T), (Integer, T))>> {
     Box::new(pairs_of_integer_and_signed(gm).map(|(x, y)| {
@@ -202,7 +202,7 @@ pub fn nrm_pairs_of_integer_and_signed<T: 'static + PrimitiveSigned>(
     }))
 }
 
-pub fn pairs_of_signed_and_integer<T: 'static + PrimitiveSigned>(
+pub fn pairs_of_signed_and_integer<T: PrimitiveSigned>(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (T, Integer)>> {
     match gm {
@@ -218,7 +218,7 @@ pub fn pairs_of_signed_and_integer<T: 'static + PrimitiveSigned>(
     }
 }
 
-pub fn rm_pairs_of_signed_and_integer<T: 'static + PrimitiveSigned>(
+pub fn rm_pairs_of_signed_and_integer<T: PrimitiveSigned>(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = ((T, rug::Integer), (T, Integer))>> {
     Box::new(
@@ -226,7 +226,7 @@ pub fn rm_pairs_of_signed_and_integer<T: 'static + PrimitiveSigned>(
     )
 }
 
-pub fn pairs_of_integer_and_unsigned<T: 'static + PrimitiveUnsigned>(
+pub fn pairs_of_integer_and_unsigned<T: PrimitiveUnsigned>(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (Integer, T)>> {
     match gm {
@@ -243,7 +243,7 @@ pub fn pairs_of_integer_and_unsigned<T: 'static + PrimitiveUnsigned>(
     }
 }
 
-pub fn rm_pairs_of_integer_and_unsigned<T: 'static + PrimitiveUnsigned>(
+pub fn rm_pairs_of_integer_and_unsigned<T: PrimitiveUnsigned>(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = ((rug::Integer, T), (Integer, T))>> {
     Box::new(
@@ -251,13 +251,13 @@ pub fn rm_pairs_of_integer_and_unsigned<T: 'static + PrimitiveUnsigned>(
     )
 }
 
-pub fn nm_pairs_of_integer_and_unsigned<T: 'static + PrimitiveUnsigned>(
+pub fn nm_pairs_of_integer_and_unsigned<T: PrimitiveUnsigned>(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = ((BigInt, T), (Integer, T))>> {
     Box::new(pairs_of_integer_and_unsigned(gm).map(|(x, y)| ((integer_to_bigint(&x), y), (x, y))))
 }
 
-pub fn nrm_pairs_of_integer_and_unsigned<T: 'static + PrimitiveUnsigned>(
+pub fn nrm_pairs_of_integer_and_unsigned<T: PrimitiveUnsigned>(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = ((BigInt, T), (rug::Integer, T), (Integer, T))>> {
     Box::new(pairs_of_integer_and_unsigned(gm).map(|(x, y)| {
@@ -269,7 +269,7 @@ pub fn nrm_pairs_of_integer_and_unsigned<T: 'static + PrimitiveUnsigned>(
     }))
 }
 
-pub fn pairs_of_unsigned_and_integer<T: 'static + PrimitiveUnsigned>(
+pub fn pairs_of_unsigned_and_integer<T: PrimitiveUnsigned>(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (T, Integer)>> {
     match gm {
@@ -286,7 +286,7 @@ pub fn pairs_of_unsigned_and_integer<T: 'static + PrimitiveUnsigned>(
     }
 }
 
-pub fn nrm_pairs_of_unsigned_and_integer<T: 'static + PrimitiveUnsigned>(
+pub fn nrm_pairs_of_unsigned_and_integer<T: PrimitiveUnsigned>(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = ((T, BigInt), (T, rug::Integer), (T, Integer))>> {
     Box::new(pairs_of_unsigned_and_integer(gm).map(|(x, y)| {
@@ -298,7 +298,7 @@ pub fn nrm_pairs_of_unsigned_and_integer<T: 'static + PrimitiveUnsigned>(
     }))
 }
 
-pub fn rm_pairs_of_unsigned_and_integer<T: 'static + PrimitiveUnsigned>(
+pub fn rm_pairs_of_unsigned_and_integer<T: PrimitiveUnsigned>(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = ((T, rug::Integer), (T, Integer))>> {
     Box::new(
@@ -306,7 +306,7 @@ pub fn rm_pairs_of_unsigned_and_integer<T: 'static + PrimitiveUnsigned>(
     )
 }
 
-pub fn pairs_of_natural_integer_and_unsigned<T: 'static + PrimitiveUnsigned>(
+pub fn pairs_of_natural_integer_and_unsigned<T: PrimitiveUnsigned>(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (Integer, T)>> {
     match gm {
@@ -327,7 +327,7 @@ pub fn pairs_of_natural_integer_and_unsigned<T: 'static + PrimitiveUnsigned>(
     }
 }
 
-fn random_triples_of_integer_integer_and_primitive<T: 'static + PrimitiveInteger>(
+fn random_triples_of_integer_integer_and_primitive<T: PrimitiveInteger>(
     scale: u32,
 ) -> Box<Iterator<Item = (Integer, Integer, T)>> {
     Box::new(random_triples(
@@ -338,7 +338,7 @@ fn random_triples_of_integer_integer_and_primitive<T: 'static + PrimitiveInteger
     ))
 }
 
-pub fn triples_of_integer_integer_and_signed<T: 'static + PrimitiveSigned>(
+pub fn triples_of_integer_integer_and_signed<T: PrimitiveSigned>(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (Integer, Integer, T)>> {
     match gm {
@@ -357,7 +357,7 @@ pub fn triples_of_integer_integer_and_signed<T: 'static + PrimitiveSigned>(
     }
 }
 
-pub fn triples_of_integer_integer_and_unsigned<T: 'static + PrimitiveUnsigned>(
+pub fn triples_of_integer_integer_and_unsigned<T: PrimitiveUnsigned>(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (Integer, Integer, T)>> {
     match gm {
@@ -376,7 +376,7 @@ pub fn triples_of_integer_integer_and_unsigned<T: 'static + PrimitiveUnsigned>(
     }
 }
 
-pub fn triples_of_natural_integer_unsigned_and_unsigned<T: 'static + PrimitiveUnsigned>(
+pub fn triples_of_natural_integer_unsigned_and_unsigned<T: PrimitiveUnsigned>(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (Integer, T, T)>> {
     match gm {
@@ -400,9 +400,7 @@ pub fn triples_of_natural_integer_unsigned_and_unsigned<T: 'static + PrimitiveUn
     }
 }
 
-pub fn triples_of_natural_integer_natural_signed_and_natural_signed<
-    T: 'static + PrimitiveSigned,
->(
+pub fn triples_of_natural_integer_natural_signed_and_natural_signed<T: PrimitiveSigned>(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (Integer, T, T)>> {
     match gm {
@@ -426,9 +424,7 @@ pub fn triples_of_natural_integer_natural_signed_and_natural_signed<
     }
 }
 
-pub fn triples_of_natural_integer_natural_integer_and_natural_signed<
-    T: 'static + PrimitiveSigned,
->(
+pub fn triples_of_natural_integer_natural_integer_and_natural_signed<T: PrimitiveSigned>(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (Integer, Integer, T)>> {
     match gm {
@@ -452,8 +448,7 @@ pub fn triples_of_natural_integer_natural_integer_and_natural_signed<
     }
 }
 
-fn log_pairs_of_integer_and_unsigned<T: 'static + PrimitiveUnsigned>(
-) -> Box<Iterator<Item = (Integer, T)>> {
+fn log_pairs_of_integer_and_unsigned<T: PrimitiveUnsigned>() -> Box<Iterator<Item = (Integer, T)>> {
     Box::new(log_pairs(exhaustive_integers(), exhaustive_unsigned()))
 }
 
@@ -569,8 +564,7 @@ pub fn triples_of_integer_small_u32_and_small_u32(
     }
 }
 
-fn log_pairs_of_integer_and_signed<T: 'static + PrimitiveSigned>(
-) -> Box<Iterator<Item = (Integer, T)>> {
+fn log_pairs_of_integer_and_signed<T: PrimitiveSigned>() -> Box<Iterator<Item = (Integer, T)>> {
     Box::new(log_pairs(exhaustive_integers(), exhaustive_signed()))
 }
 
@@ -598,7 +592,7 @@ pub fn rm_pairs_of_integer_and_small_i32(
     )
 }
 
-fn random_triples_of_integer_primitive_and_integer<T: 'static + PrimitiveInteger>(
+fn random_triples_of_integer_primitive_and_integer<T: PrimitiveInteger>(
     scale: u32,
 ) -> Box<Iterator<Item = (Integer, T, Integer)>> {
     Box::new(random_triples(
@@ -609,7 +603,7 @@ fn random_triples_of_integer_primitive_and_integer<T: 'static + PrimitiveInteger
     ))
 }
 
-fn random_triples_of_primitive_integer_and_primitive<T: 'static + PrimitiveInteger>(
+fn random_triples_of_primitive_integer_and_primitive<T: PrimitiveInteger>(
     scale: u32,
 ) -> Box<Iterator<Item = (T, Integer, T)>> {
     Box::new(random_triples(
@@ -620,7 +614,7 @@ fn random_triples_of_primitive_integer_and_primitive<T: 'static + PrimitiveInteg
     ))
 }
 
-pub fn triples_of_integer_unsigned_and_integer<T: 'static + PrimitiveUnsigned>(
+pub fn triples_of_integer_unsigned_and_integer<T: PrimitiveUnsigned>(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (Integer, T, Integer)>> {
     match gm {
@@ -639,7 +633,7 @@ pub fn triples_of_integer_unsigned_and_integer<T: 'static + PrimitiveUnsigned>(
     }
 }
 
-pub fn triples_of_unsigned_integer_and_unsigned<T: 'static + PrimitiveUnsigned>(
+pub fn triples_of_unsigned_integer_and_unsigned<T: PrimitiveUnsigned>(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (T, Integer, T)>> {
     match gm {
@@ -658,7 +652,7 @@ pub fn triples_of_unsigned_integer_and_unsigned<T: 'static + PrimitiveUnsigned>(
     }
 }
 
-pub fn triples_of_integer_signed_and_integer<T: 'static + PrimitiveSigned>(
+pub fn triples_of_integer_signed_and_integer<T: PrimitiveSigned>(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (Integer, T, Integer)>> {
     match gm {
@@ -677,7 +671,7 @@ pub fn triples_of_integer_signed_and_integer<T: 'static + PrimitiveSigned>(
     }
 }
 
-pub fn triples_of_signed_integer_and_signed<T: 'static + PrimitiveSigned>(
+pub fn triples_of_signed_integer_and_signed<T: PrimitiveSigned>(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (T, Integer, T)>> {
     match gm {

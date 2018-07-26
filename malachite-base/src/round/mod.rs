@@ -32,8 +32,8 @@ pub enum RoundingMode {
     Exact,
 }
 
-/// Returns the negative of a `RoundingMode`. The negative is defined so that f(x, -rm) = -f(x, rm).
-/// Floor and ceiling are swapped, and the other modes are unchanged.
+/// Returns the negative of a `RoundingMode`. The negative is defined so that for an odd function f,
+/// f(x, -rm) = -f(-x, rm). Floor and ceiling are swapped, and the other modes are unchanged.
 ///
 /// Time: worst case O(1)
 ///

@@ -126,8 +126,6 @@ macro_rules! demos_and_benches {
         $demo_natural_shl_assign_u:ident,
         $demo_natural_shl_u:ident,
         $demo_natural_shl_u_ref:ident,
-        $benchmark_natural_shl_assign_u_library_comparison:ident,
-        $benchmark_natural_shl_u_library_comparison:ident,
         $benchmark_natural_shl_u_evaluation_strategy:ident
     ) => {
         fn $demo_natural_shl_assign_u(gm: GenerationMode, limit: usize) {
@@ -184,8 +182,6 @@ demos_and_benches!(
     demo_natural_shl_assign_u8,
     demo_natural_shl_u8,
     demo_natural_shl_u8_ref,
-    benchmark_natural_shl_assign_u8_library_comparison,
-    benchmark_natural_shl_u8_library_comparison,
     benchmark_natural_shl_u8_evaluation_strategy
 );
 demos_and_benches!(
@@ -193,8 +189,6 @@ demos_and_benches!(
     demo_natural_shl_assign_u16,
     demo_natural_shl_u16,
     demo_natural_shl_u16_ref,
-    benchmark_natural_shl_assign_u16_library_comparison,
-    benchmark_natural_shl_u16_library_comparison,
     benchmark_natural_shl_u16_evaluation_strategy
 );
 demos_and_benches!(
@@ -202,8 +196,6 @@ demos_and_benches!(
     demo_natural_shl_assign_u32,
     demo_natural_shl_u32,
     demo_natural_shl_u32_ref,
-    benchmark_natural_shl_assign_u32_library_comparison,
-    benchmark_natural_shl_u32_library_comparison,
     benchmark_natural_shl_u32_evaluation_strategy
 );
 demos_and_benches!(
@@ -211,8 +203,6 @@ demos_and_benches!(
     demo_natural_shl_assign_u64,
     demo_natural_shl_u64,
     demo_natural_shl_u64_ref,
-    benchmark_natural_shl_assign_u64_library_comparison,
-    benchmark_natural_shl_u64_library_comparison,
     benchmark_natural_shl_u64_evaluation_strategy
 );
 

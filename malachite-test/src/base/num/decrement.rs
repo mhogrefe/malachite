@@ -21,7 +21,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_bench!(registry, None, benchmark_i64_decrement);
 }
 
-fn demo_unsigned_decrement<T: 'static + PrimitiveUnsigned>(gm: GenerationMode, limit: usize) {
+fn demo_unsigned_decrement<T: PrimitiveUnsigned>(gm: GenerationMode, limit: usize) {
     for mut n in positive_unsigneds::<T>(gm).take(limit) {
         let n_old = n;
         n.decrement();
@@ -29,7 +29,7 @@ fn demo_unsigned_decrement<T: 'static + PrimitiveUnsigned>(gm: GenerationMode, l
     }
 }
 
-fn demo_signed_decrement<T: 'static + PrimitiveSigned>(gm: GenerationMode, limit: usize) {
+fn demo_signed_decrement<T: PrimitiveSigned>(gm: GenerationMode, limit: usize) {
     for mut n in signeds_no_min::<T>(gm).take(limit) {
         let n_old = n;
         n.decrement();
@@ -37,7 +37,7 @@ fn demo_signed_decrement<T: 'static + PrimitiveSigned>(gm: GenerationMode, limit
     }
 }
 
-fn benchmark_unsigned_decrement<T: 'static + PrimitiveUnsigned>(
+fn benchmark_unsigned_decrement<T: PrimitiveUnsigned>(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,
@@ -55,7 +55,7 @@ fn benchmark_unsigned_decrement<T: 'static + PrimitiveUnsigned>(
     );
 }
 
-fn benchmark_signed_decrement<T: 'static + PrimitiveSigned>(
+fn benchmark_signed_decrement<T: PrimitiveSigned>(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,

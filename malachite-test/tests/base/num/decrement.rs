@@ -62,7 +62,7 @@ decrement_fail!(i16, decrement_i16_fail);
 decrement_fail!(i32, decrement_i32_fail);
 decrement_fail!(i64, decrement_i64_fail);
 
-fn decrement_properties_helper_unsigned<T: 'static + PrimitiveUnsigned>() {
+fn decrement_properties_helper_unsigned<T: PrimitiveUnsigned>() {
     test_properties(positive_unsigneds, |&n: &T| {
         let mut n_mut = n;
         n_mut.decrement();
@@ -72,7 +72,7 @@ fn decrement_properties_helper_unsigned<T: 'static + PrimitiveUnsigned>() {
     });
 }
 
-fn decrement_properties_helper_signed<T: 'static + PrimitiveSigned>() {
+fn decrement_properties_helper_signed<T: PrimitiveSigned>() {
     test_properties(signeds_no_min, |&n: &T| {
         let mut n_mut = n;
         n_mut.decrement();

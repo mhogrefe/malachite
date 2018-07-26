@@ -13,10 +13,8 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_bench!(registry, None, benchmark_u64_join_halves);
 }
 
-fn demo_unsigned_join_halves<T: 'static + JoinHalves + PrimitiveUnsigned>(
-    gm: GenerationMode,
-    limit: usize,
-) where
+fn demo_unsigned_join_halves<T: JoinHalves + PrimitiveUnsigned>(gm: GenerationMode, limit: usize)
+where
     T::Half: PrimitiveUnsigned,
 {
     for (x, y) in pairs_of_unsigneds::<T::Half>(gm).take(limit) {
@@ -30,7 +28,7 @@ fn demo_unsigned_join_halves<T: 'static + JoinHalves + PrimitiveUnsigned>(
     }
 }
 
-fn benchmark_unsigned_join_halves<T: 'static + JoinHalves + PrimitiveUnsigned>(
+fn benchmark_unsigned_join_halves<T: JoinHalves + PrimitiveUnsigned>(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,

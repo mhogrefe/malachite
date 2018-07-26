@@ -95,7 +95,7 @@ flip_bit_fail_helper_signed!(i16, flip_bit_i16_fail_1_helper, flip_bit_i16_fail_
 flip_bit_fail_helper_signed!(i32, flip_bit_i32_fail_1_helper, flip_bit_i32_fail_2_helper);
 flip_bit_fail_helper_signed!(i64, flip_bit_i64_fail_1_helper, flip_bit_i64_fail_2_helper);
 
-fn flip_bit_properties_helper_unsigned<T: 'static + PrimitiveUnsigned>() {
+fn flip_bit_properties_helper_unsigned<T: PrimitiveUnsigned>() {
     test_properties(pairs_of_unsigned_and_u64_width_range, |&(n, index)| {
         let mut mut_n: T = n;
         mut_n.flip_bit(index);
@@ -106,7 +106,7 @@ fn flip_bit_properties_helper_unsigned<T: 'static + PrimitiveUnsigned>() {
     });
 }
 
-fn flip_bit_properties_helper_signed<T: 'static + PrimitiveSigned>() {
+fn flip_bit_properties_helper_signed<T: PrimitiveSigned>() {
     test_properties(pairs_of_signed_and_u64_width_range, |&(n, index)| {
         let mut mut_n: T = n;
         mut_n.flip_bit(index);

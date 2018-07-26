@@ -62,7 +62,7 @@ increment_fail!(i16, increment_i16_fail);
 increment_fail!(i32, increment_i32_fail);
 increment_fail!(i64, increment_i64_fail);
 
-fn increment_properties_helper_unsigned<T: 'static + PrimitiveUnsigned>() {
+fn increment_properties_helper_unsigned<T: PrimitiveUnsigned>() {
     test_properties(unsigneds_no_max, |&n: &T| {
         let mut n_mut = n;
         n_mut.increment();
@@ -72,7 +72,7 @@ fn increment_properties_helper_unsigned<T: 'static + PrimitiveUnsigned>() {
     });
 }
 
-fn increment_properties_helper_signed<T: 'static + PrimitiveSigned>() {
+fn increment_properties_helper_signed<T: PrimitiveSigned>() {
     test_properties(signeds_no_max, |&n: &T| {
         let mut n_mut = n;
         n_mut.increment();

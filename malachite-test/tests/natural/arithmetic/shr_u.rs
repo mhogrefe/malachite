@@ -1,6 +1,8 @@
 use common::test_properties;
-use malachite_base::misc::WrappingFrom;
-use malachite_base::num::{PrimitiveInteger, ShrRound, ShrRoundAssign, Zero};
+use malachite_base::misc::{Max, WrappingFrom};
+use malachite_base::num::{
+    PrimitiveInteger, PrimitiveSigned, PrimitiveUnsigned, ShrRound, ShrRoundAssign, Zero,
+};
 use malachite_base::round::RoundingMode;
 use malachite_nz::natural::arithmetic::shr_u::{
     limbs_shr, limbs_shr_exact, limbs_shr_round, limbs_shr_round_to_nearest, limbs_shr_round_up,
@@ -593,12 +595,12 @@ macro_rules! tests_and_properties {
 
                     $shl_library_comparison_properties
 
-                    //TODO
-                                        /*
-                                        if u <= (i32::MAX as u32) {
-                                            assert_eq!(n >> (u as i32), shifted);
-                                            assert_eq!(n << -(u as i32), shifted);
-                                        }*/        },
+                    if $u < (<$t as PrimitiveUnsigned>::SignedOfEqualWidth::MAX.to_unsigned_bitwise()) {
+                        let u = $u.to_signed_bitwise();
+                        assert_eq!($n >> u, $shifted);
+                        assert_eq!($n << -u, $shifted);
+                    }
+                },
             );
 
             test_properties(

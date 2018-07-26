@@ -541,7 +541,8 @@ impl NotAssign for isize {
 
 //TODO docs
 pub trait PrimitiveInteger:
-    Add<Output = Self>
+    'static
+    + Add<Output = Self>
     + AddAssign<Self>
     + Binary
     + BitAccess
@@ -713,7 +714,8 @@ pub trait PrimitiveSigned:
 
 //TODO docs
 pub trait PrimitiveFloat:
-    Add<Output = Self>
+    'static
+    + Add<Output = Self>
     + AddAssign<Self>
     + Copy
     + Debug
@@ -2386,7 +2388,7 @@ pub trait ShrRoundAssign<Rhs = Self> {
     fn shr_round_assign(&mut self, rhs: Rhs, rm: RoundingMode);
 }
 
-macro_rules! round_shift_unsigned {
+macro_rules! round_shift_unsigned_unsigned {
     ($t:ident, $u:ident) => {
         impl ShrRound<$u> for $t {
             type Output = $t;
@@ -2496,22 +2498,86 @@ macro_rules! round_shift_unsigned {
         }
     };
 }
-round_shift_unsigned!(u8, u8);
-round_shift_unsigned!(u8, u16);
-round_shift_unsigned!(u8, u32);
-round_shift_unsigned!(u8, u64);
-round_shift_unsigned!(u16, u8);
-round_shift_unsigned!(u16, u16);
-round_shift_unsigned!(u16, u32);
-round_shift_unsigned!(u16, u64);
-round_shift_unsigned!(u32, u8);
-round_shift_unsigned!(u32, u16);
-round_shift_unsigned!(u32, u32);
-round_shift_unsigned!(u32, u64);
-round_shift_unsigned!(u64, u8);
-round_shift_unsigned!(u64, u16);
-round_shift_unsigned!(u64, u32);
-round_shift_unsigned!(u64, u64);
+round_shift_unsigned_unsigned!(u8, u8);
+round_shift_unsigned_unsigned!(u8, u16);
+round_shift_unsigned_unsigned!(u8, u32);
+round_shift_unsigned_unsigned!(u8, u64);
+round_shift_unsigned_unsigned!(u16, u8);
+round_shift_unsigned_unsigned!(u16, u16);
+round_shift_unsigned_unsigned!(u16, u32);
+round_shift_unsigned_unsigned!(u16, u64);
+round_shift_unsigned_unsigned!(u32, u8);
+round_shift_unsigned_unsigned!(u32, u16);
+round_shift_unsigned_unsigned!(u32, u32);
+round_shift_unsigned_unsigned!(u32, u64);
+round_shift_unsigned_unsigned!(u64, u8);
+round_shift_unsigned_unsigned!(u64, u16);
+round_shift_unsigned_unsigned!(u64, u32);
+round_shift_unsigned_unsigned!(u64, u64);
+
+macro_rules! round_shift_unsigned_signed {
+    ($t:ident, $u:ident) => {
+        impl ShlRound<$u> for $t {
+            type Output = $t;
+
+            fn shl_round(self, other: $u, rm: RoundingMode) -> $t {
+                if other >= 0 {
+                    self << other.to_unsigned_bitwise()
+                } else {
+                    self.shr_round(other.unsigned_abs(), rm)
+                }
+            }
+        }
+
+        impl ShlRoundAssign<$u> for $t {
+            fn shl_round_assign(&mut self, other: $u, rm: RoundingMode) {
+                if other >= 0 {
+                    *self <<= other.to_unsigned_bitwise();
+                } else {
+                    self.shr_round_assign(other.unsigned_abs(), rm);
+                }
+            }
+        }
+
+        impl ShrRound<$u> for $t {
+            type Output = $t;
+
+            fn shr_round(self, other: $u, rm: RoundingMode) -> $t {
+                if other >= 0 {
+                    self.shr_round(other.to_unsigned_bitwise(), rm)
+                } else {
+                    self << other.unsigned_abs()
+                }
+            }
+        }
+
+        impl ShrRoundAssign<$u> for $t {
+            fn shr_round_assign(&mut self, other: $u, rm: RoundingMode) {
+                if other >= 0 {
+                    self.shr_round_assign(other.to_unsigned_bitwise(), rm);
+                } else {
+                    *self <<= other.unsigned_abs()
+                }
+            }
+        }
+    };
+}
+round_shift_unsigned_signed!(u8, i8);
+round_shift_unsigned_signed!(u8, i16);
+round_shift_unsigned_signed!(u8, i32);
+round_shift_unsigned_signed!(u8, i64);
+round_shift_unsigned_signed!(u16, i8);
+round_shift_unsigned_signed!(u16, i16);
+round_shift_unsigned_signed!(u16, i32);
+round_shift_unsigned_signed!(u16, i64);
+round_shift_unsigned_signed!(u32, i8);
+round_shift_unsigned_signed!(u32, i16);
+round_shift_unsigned_signed!(u32, i32);
+round_shift_unsigned_signed!(u32, i64);
+round_shift_unsigned_signed!(u64, i8);
+round_shift_unsigned_signed!(u64, i16);
+round_shift_unsigned_signed!(u64, i32);
+round_shift_unsigned_signed!(u64, i64);
 
 //TODO doc and test
 pub trait FromU32Slice: Sized {

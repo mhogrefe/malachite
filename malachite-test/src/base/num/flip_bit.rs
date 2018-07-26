@@ -21,7 +21,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_bench!(registry, None, benchmark_i64_flip_bit);
 }
 
-fn demo_unsigned_flip_bit<T: 'static + PrimitiveUnsigned>(gm: GenerationMode, limit: usize) {
+fn demo_unsigned_flip_bit<T: PrimitiveUnsigned>(gm: GenerationMode, limit: usize) {
     for (mut n, index) in pairs_of_unsigned_and_u64_width_range::<T>(gm).take(limit) {
         let n_old = n;
         n.flip_bit(index);
@@ -29,7 +29,7 @@ fn demo_unsigned_flip_bit<T: 'static + PrimitiveUnsigned>(gm: GenerationMode, li
     }
 }
 
-fn demo_signed_flip_bit<T: 'static + PrimitiveSigned>(gm: GenerationMode, limit: usize) {
+fn demo_signed_flip_bit<T: PrimitiveSigned>(gm: GenerationMode, limit: usize) {
     for (mut n, index) in pairs_of_signed_and_u64_width_range::<T>(gm).take(limit) {
         let n_old = n;
         n.flip_bit(index);
@@ -37,7 +37,7 @@ fn demo_signed_flip_bit<T: 'static + PrimitiveSigned>(gm: GenerationMode, limit:
     }
 }
 
-fn benchmark_unsigned_flip_bit<T: 'static + PrimitiveUnsigned>(
+fn benchmark_unsigned_flip_bit<T: PrimitiveUnsigned>(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,
@@ -55,7 +55,7 @@ fn benchmark_unsigned_flip_bit<T: 'static + PrimitiveUnsigned>(
     );
 }
 
-fn benchmark_signed_flip_bit<T: 'static + PrimitiveSigned>(
+fn benchmark_signed_flip_bit<T: PrimitiveSigned>(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,

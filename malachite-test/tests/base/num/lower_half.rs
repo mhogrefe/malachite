@@ -21,7 +21,7 @@ pub fn test_lower_half() {
     lower_half_helper(0xabcd_1234u32, 0x1234);
 }
 
-fn lower_half_properties_helper<T: 'static + JoinHalves + PrimitiveUnsigned + SplitInHalf>() {
+fn lower_half_properties_helper<T: JoinHalves + PrimitiveUnsigned + SplitInHalf>() {
     test_properties(unsigneds, |&n: &T| {
         let lower = n.lower_half();
         assert_eq!(T::join_halves(n.upper_half(), lower), n)

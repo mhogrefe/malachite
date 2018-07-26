@@ -79,7 +79,7 @@ ceiling_log_two_fail!(u16, ceiling_log_two_u16_fail);
 ceiling_log_two_fail!(u32, ceiling_log_two_u32_fail);
 ceiling_log_two_fail!(u64, ceiling_log_two_u64_fail);
 
-fn floor_log_two_properties_helper<T: 'static + PrimitiveUnsigned>() {
+fn floor_log_two_properties_helper<T: PrimitiveUnsigned>() {
     test_properties(positive_unsigneds, |&n: &T| {
         let floor_log_two = n.floor_log_two();
         assert_eq!(floor_log_two, n.significant_bits() - 1);
@@ -96,7 +96,7 @@ fn floor_log_two_properties() {
     floor_log_two_properties_helper::<u64>();
 }
 
-fn ceiling_log_two_properties_helper<T: 'static + PrimitiveUnsigned>() {
+fn ceiling_log_two_properties_helper<T: PrimitiveUnsigned>() {
     test_properties(positive_unsigneds, |&n: &T| {
         let ceiling_log_two = n.ceiling_log_two();
         assert!(ceiling_log_two <= u64::from(T::WIDTH));
