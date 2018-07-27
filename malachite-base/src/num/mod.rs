@@ -577,6 +577,7 @@ pub trait PrimitiveInteger:
     + CheckedShl<Output = Self>
     + CheckedShr<Output = Self>
     + CheckedSub<Output = Self>
+    + Clone
     + Copy
     + CountOnes
     + CountZeros
@@ -626,10 +627,38 @@ pub trait PrimitiveInteger:
     + SaturatingAdd<Output = Self>
     + SaturatingMul<Output = Self>
     + SaturatingSub<Output = Self>
+    + Shl<i8, Output = Self>
+    + Shl<i16, Output = Self>
+    + Shl<i32, Output = Self>
+    + Shl<i64, Output = Self>
+    + Shl<u8, Output = Self>
+    + Shl<u16, Output = Self>
     + Shl<u32, Output = Self>
+    + Shl<u64, Output = Self>
+    + ShlAssign<i8>
+    + ShlAssign<i16>
+    + ShlAssign<i32>
+    + ShlAssign<i64>
+    + ShlAssign<u8>
+    + ShlAssign<u16>
     + ShlAssign<u32>
+    + ShlAssign<u64>
+    + Shr<i8, Output = Self>
+    + Shr<i16, Output = Self>
+    + Shr<i32, Output = Self>
+    + Shr<i64, Output = Self>
+    + Shr<u8, Output = Self>
+    + Shr<u16, Output = Self>
     + Shr<u32, Output = Self>
+    + Shr<u64, Output = Self>
+    + ShrAssign<i8>
+    + ShrAssign<i16>
+    + ShrAssign<i32>
+    + ShrAssign<i64>
+    + ShrAssign<u8>
+    + ShrAssign<u16>
     + ShrAssign<u32>
+    + ShrAssign<u64>
     + SignificantBits
     + Sized
     + Sub<Output = Self>
@@ -2578,6 +2607,52 @@ round_shift_unsigned_signed!(u64, i8);
 round_shift_unsigned_signed!(u64, i16);
 round_shift_unsigned_signed!(u64, i32);
 round_shift_unsigned_signed!(u64, i64);
+
+macro_rules! round_shift_signed_unsigned {
+    ($t:ident, $u:ident) => {
+        impl ShrRound<$u> for $t {
+            type Output = $t;
+
+            fn shr_round(self, other: $u, rm: RoundingMode) -> $t {
+                let abs = self.unsigned_abs();
+                if self >= 0 {
+                    abs.shr_round(other, rm).to_signed_bitwise()
+                } else {
+                    let abs_shifted = abs.shr_round(other, -rm);
+                    if abs_shifted == 0 {
+                        0
+                    } else if abs_shifted == $t::MIN.unsigned_abs() {
+                        $t::MIN
+                    } else {
+                        -abs_shifted.to_signed_bitwise()
+                    }
+                }
+            }
+        }
+
+        impl ShrRoundAssign<$u> for $t {
+            fn shr_round_assign(&mut self, other: $u, rm: RoundingMode) {
+                *self = self.shr_round(other, rm);
+            }
+        }
+    };
+}
+round_shift_signed_unsigned!(i8, u8);
+round_shift_signed_unsigned!(i8, u16);
+round_shift_signed_unsigned!(i8, u32);
+round_shift_signed_unsigned!(i8, u64);
+round_shift_signed_unsigned!(i16, u8);
+round_shift_signed_unsigned!(i16, u16);
+round_shift_signed_unsigned!(i16, u32);
+round_shift_signed_unsigned!(i16, u64);
+round_shift_signed_unsigned!(i32, u8);
+round_shift_signed_unsigned!(i32, u16);
+round_shift_signed_unsigned!(i32, u32);
+round_shift_signed_unsigned!(i32, u64);
+round_shift_signed_unsigned!(i64, u8);
+round_shift_signed_unsigned!(i64, u16);
+round_shift_signed_unsigned!(i64, u32);
+round_shift_signed_unsigned!(i64, u64);
 
 //TODO doc and test
 pub trait FromU32Slice: Sized {

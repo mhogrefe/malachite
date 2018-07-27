@@ -111,7 +111,7 @@ pub fn small_unsigneds<T: PrimitiveUnsigned>(
     match gm {
         NoSpecialGenerationMode::Exhaustive => Box::new(exhaustive_unsigned()),
         NoSpecialGenerationMode::Random(scale) => {
-            Box::new(u32s_geometric(&EXAMPLE_SEED, scale).flat_map(|u| T::checked_from(u)))
+            Box::new(u32s_geometric(&EXAMPLE_SEED, scale).flat_map(T::checked_from))
         }
     }
 }
@@ -131,7 +131,7 @@ fn random_pairs_of_primitive_and_geometric_unsigned<T: PrimitiveInteger, U: Prim
     Box::new(random_pairs(
         &EXAMPLE_SEED,
         &(|seed| random(seed)),
-        &(|seed| u32s_geometric(seed, scale).flat_map(|u| U::checked_from(u))),
+        &(|seed| u32s_geometric(seed, scale).flat_map(U::checked_from)),
     ))
 }
 
@@ -144,7 +144,7 @@ pub fn pairs_of_unsigned_and_small_unsigned<T: PrimitiveUnsigned, U: PrimitiveUn
         GenerationMode::SpecialRandom(scale) => Box::new(random_pairs(
             &EXAMPLE_SEED,
             &(|seed| special_random_unsigned(seed)),
-            &(|seed| u32s_geometric(seed, scale).flat_map(|u| U::checked_from(u))),
+            &(|seed| u32s_geometric(seed, scale).flat_map(U::checked_from)),
         )),
     }
 }
@@ -183,30 +183,30 @@ pub fn pairs_of_positive_unsigned_and_small_unsigned<T: PrimitiveUnsigned, U: Pr
         GenerationMode::Random(scale) => Box::new(random_pairs(
             &EXAMPLE_SEED,
             &(|seed| random_positive_unsigned(seed)),
-            &(|seed| u32s_geometric(seed, scale).flat_map(|u| U::checked_from(u))),
+            &(|seed| u32s_geometric(seed, scale).flat_map(U::checked_from)),
         )),
         GenerationMode::SpecialRandom(scale) => Box::new(random_pairs(
             &EXAMPLE_SEED,
             &(|seed| special_random_positive_unsigned(seed)),
-            &(|seed| u32s_geometric(seed, scale).flat_map(|u| U::checked_from(u))),
+            &(|seed| u32s_geometric(seed, scale).flat_map(U::checked_from)),
         )),
     }
 }
 
-pub fn pairs_of_positive_signed_and_small_u32<T: PrimitiveSigned>(
+pub fn pairs_of_positive_signed_and_small_unsigned<T: PrimitiveSigned, U: PrimitiveUnsigned>(
     gm: GenerationMode,
-) -> Box<Iterator<Item = (T, u32)>> {
+) -> Box<Iterator<Item = (T, U)>> {
     match gm {
         GenerationMode::Exhaustive => log_pairs_of_positive_primitive_and_unsigned(),
         GenerationMode::Random(scale) => Box::new(random_pairs(
             &EXAMPLE_SEED,
             &(|seed| random_positive_signed(seed)),
-            &(|seed| u32s_geometric(seed, scale)),
+            &(|seed| u32s_geometric(seed, scale).flat_map(U::checked_from)),
         )),
         GenerationMode::SpecialRandom(scale) => Box::new(random_pairs(
             &EXAMPLE_SEED,
             &(|seed| special_random_positive_signed(seed)),
-            &(|seed| u32s_geometric(seed, scale)),
+            &(|seed| u32s_geometric(seed, scale).flat_map(U::checked_from)),
         )),
     }
 }
@@ -351,9 +351,12 @@ pub fn triples_of_signed_u64_width_range_and_bool_var_1<T: PrimitiveSigned>(
     )
 }
 
-pub fn pairs_of_negative_signed_not_min_and_small_u32s<T: PrimitiveSigned>(
+pub fn pairs_of_negative_signed_not_min_and_small_unsigned<
+    T: PrimitiveSigned,
+    U: PrimitiveUnsigned,
+>(
     gm: GenerationMode,
-) -> Box<Iterator<Item = (T, u32)>> {
+) -> Box<Iterator<Item = (T, U)>> {
     match gm {
         GenerationMode::Exhaustive => Box::new(log_pairs(
             exhaustive_negative_signed().filter(|&i| i != T::MIN),
@@ -362,12 +365,12 @@ pub fn pairs_of_negative_signed_not_min_and_small_u32s<T: PrimitiveSigned>(
         GenerationMode::Random(scale) => Box::new(random_pairs(
             &EXAMPLE_SEED,
             &(|seed| random_negative_signed(seed).filter(|&i| i != T::MIN)),
-            &(|seed| u32s_geometric(seed, scale)),
+            &(|seed| u32s_geometric(seed, scale).flat_map(U::checked_from)),
         )),
         GenerationMode::SpecialRandom(scale) => Box::new(random_pairs(
             &EXAMPLE_SEED,
             &(|seed| special_random_negative_signed(seed).filter(|&i| i != T::MIN)),
-            &(|seed| u32s_geometric(seed, scale)),
+            &(|seed| u32s_geometric(seed, scale).flat_map(U::checked_from)),
         )),
     }
 }

@@ -348,12 +348,12 @@ pub fn pairs_of_natural_and_small_unsigned<T: PrimitiveUnsigned>(
         GenerationMode::Random(scale) => Box::new(random_pairs(
             &EXAMPLE_SEED,
             &(|seed| random_naturals(seed, scale)),
-            &(|seed| u32s_geometric(seed, scale).flat_map(|u| T::checked_from(u))),
+            &(|seed| u32s_geometric(seed, scale).flat_map(T::checked_from)),
         )),
         GenerationMode::SpecialRandom(scale) => Box::new(random_pairs(
             &EXAMPLE_SEED,
             &(|seed| special_random_naturals(seed, scale)),
-            &(|seed| u32s_geometric(seed, scale).flat_map(|u| T::checked_from(u))),
+            &(|seed| u32s_geometric(seed, scale).flat_map(T::checked_from)),
         )),
     }
 }
@@ -454,14 +454,14 @@ pub fn triples_of_natural_small_unsigned_and_small_unsigned<T: PrimitiveUnsigned
         GenerationMode::Random(scale) => Box::new(random_triples(
             &EXAMPLE_SEED,
             &(|seed| random_naturals(seed, scale)),
-            &(|seed| u32s_geometric(seed, scale).flat_map(|u| T::checked_from(u))),
-            &(|seed| u32s_geometric(seed, scale).flat_map(|u| T::checked_from(u))),
+            &(|seed| u32s_geometric(seed, scale).flat_map(T::checked_from)),
+            &(|seed| u32s_geometric(seed, scale).flat_map(T::checked_from)),
         )),
         GenerationMode::SpecialRandom(scale) => Box::new(random_triples(
             &EXAMPLE_SEED,
             &(|seed| special_random_naturals(seed, scale)),
-            &(|seed| u32s_geometric(seed, scale).flat_map(|u| T::checked_from(u))),
-            &(|seed| u32s_geometric(seed, scale).flat_map(|u| T::checked_from(u))),
+            &(|seed| u32s_geometric(seed, scale).flat_map(T::checked_from)),
+            &(|seed| u32s_geometric(seed, scale).flat_map(T::checked_from)),
         )),
     }
 }
@@ -679,13 +679,13 @@ fn triples_of_natural_small_unsigned_and_rounding_mode<T: PrimitiveUnsigned>(
         GenerationMode::Random(scale) => Box::new(random_triples(
             &EXAMPLE_SEED,
             &(|seed| random_naturals(seed, scale)),
-            &(|seed| u32s_geometric(seed, scale).flat_map(|u| T::checked_from(u))),
+            &(|seed| u32s_geometric(seed, scale).flat_map(T::checked_from)),
             &(|seed| random_rounding_modes(seed)),
         )),
         GenerationMode::SpecialRandom(scale) => Box::new(random_triples(
             &EXAMPLE_SEED,
             &(|seed| special_random_naturals(seed, scale)),
-            &(|seed| u32s_geometric(seed, scale).flat_map(|u| T::checked_from(u))),
+            &(|seed| u32s_geometric(seed, scale).flat_map(T::checked_from)),
             &(|seed| random_rounding_modes(seed)),
         )),
     }

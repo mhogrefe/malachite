@@ -280,7 +280,6 @@ macro_rules! tests_and_properties {
         }
     }
 }
-
 tests_and_properties!(
     u8,
     test_shl_u8,

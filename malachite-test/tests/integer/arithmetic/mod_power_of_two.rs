@@ -5,8 +5,9 @@ use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_test::inputs::base::unsigneds;
 use malachite_test::inputs::integer::{
-    integers, pairs_of_integer_and_small_u32, pairs_of_integer_and_small_u32_var_1,
-    pairs_of_integer_and_small_u32_var_2, triples_of_integer_small_u32_and_small_u32,
+    integers, pairs_of_integer_and_small_unsigned, pairs_of_integer_and_small_unsigned_var_1,
+    pairs_of_integer_and_small_unsigned_var_2,
+    triples_of_integer_small_unsigned_and_small_unsigned,
 };
 use std::cmp::min;
 use std::str::FromStr;
@@ -258,7 +259,7 @@ fn test_ceiling_mod_power_of_two() {
 
 #[test]
 fn mod_power_of_two_properties() {
-    test_properties(pairs_of_integer_and_small_u32, |&(ref n, u)| {
+    test_properties(pairs_of_integer_and_small_unsigned, |&(ref n, u)| {
         let mut mut_n = n.clone();
         mut_n.mod_power_of_two_assign(u);
         assert!(mut_n.is_valid());
@@ -277,11 +278,11 @@ fn mod_power_of_two_properties() {
         assert_eq!(result.mod_power_of_two_ref(u), result);
     });
 
-    test_properties(pairs_of_integer_and_small_u32_var_1, |&(ref n, u)| {
+    test_properties(pairs_of_integer_and_small_unsigned_var_1, |&(ref n, u)| {
         assert_eq!(n.mod_power_of_two_ref(u), 0);
     });
 
-    test_properties(pairs_of_integer_and_small_u32_var_2, |&(ref n, u)| {
+    test_properties(pairs_of_integer_and_small_unsigned_var_2, |&(ref n, u)| {
         assert_ne!(n.mod_power_of_two_ref(u), 0);
         assert_eq!(
             Integer::from(n.mod_power_of_two_ref(u)) - n.ceiling_mod_power_of_two_ref(u),
@@ -290,7 +291,7 @@ fn mod_power_of_two_properties() {
     });
 
     test_properties(
-        triples_of_integer_small_u32_and_small_u32,
+        triples_of_integer_small_unsigned_and_small_unsigned,
         |&(ref n, u, v)| {
             assert_eq!(
                 n.mod_power_of_two_ref(u).mod_power_of_two(v),
@@ -310,7 +311,7 @@ fn mod_power_of_two_properties() {
 
 #[test]
 fn rem_power_of_two_properties() {
-    test_properties(pairs_of_integer_and_small_u32, |&(ref n, u)| {
+    test_properties(pairs_of_integer_and_small_unsigned, |&(ref n, u)| {
         let mut mut_n = n.clone();
         mut_n.rem_power_of_two_assign(u);
         assert!(mut_n.is_valid());
@@ -330,17 +331,17 @@ fn rem_power_of_two_properties() {
         assert_eq!(n.abs().mod_power_of_two(u), result.abs());
     });
 
-    test_properties(pairs_of_integer_and_small_u32_var_1, |&(ref n, u)| {
+    test_properties(pairs_of_integer_and_small_unsigned_var_1, |&(ref n, u)| {
         assert_eq!(n.rem_power_of_two_ref(u), 0);
     });
 
-    test_properties(pairs_of_integer_and_small_u32_var_2, |&(ref n, u)| {
+    test_properties(pairs_of_integer_and_small_unsigned_var_2, |&(ref n, u)| {
         assert_ne!(n.rem_power_of_two_ref(u), 0);
         assert_eq!(n.rem_power_of_two_ref(u).sign(), n.sign());
     });
 
     test_properties(
-        triples_of_integer_small_u32_and_small_u32,
+        triples_of_integer_small_unsigned_and_small_unsigned,
         |&(ref n, u, v)| {
             assert_eq!(
                 n.rem_power_of_two_ref(u).rem_power_of_two(v),
@@ -360,7 +361,7 @@ fn rem_power_of_two_properties() {
 
 #[test]
 fn ceiling_mod_power_of_two_properties() {
-    test_properties(pairs_of_integer_and_small_u32, |&(ref n, u)| {
+    test_properties(pairs_of_integer_and_small_unsigned, |&(ref n, u)| {
         let mut mut_n = n.clone();
         mut_n.ceiling_mod_power_of_two_assign(u);
         assert!(mut_n.is_valid());
@@ -380,11 +381,11 @@ fn ceiling_mod_power_of_two_properties() {
         assert_eq!((-n).mod_power_of_two(u), -result);
     });
 
-    test_properties(pairs_of_integer_and_small_u32_var_1, |&(ref n, u)| {
+    test_properties(pairs_of_integer_and_small_unsigned_var_1, |&(ref n, u)| {
         assert_eq!(n.ceiling_mod_power_of_two_ref(u), 0);
     });
 
-    test_properties(pairs_of_integer_and_small_u32_var_2, |&(ref n, u)| {
+    test_properties(pairs_of_integer_and_small_unsigned_var_2, |&(ref n, u)| {
         assert_ne!(n.ceiling_mod_power_of_two_ref(u), 0);
     });
 
