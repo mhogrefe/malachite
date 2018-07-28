@@ -58,7 +58,7 @@ fn divisible_by_power_of_two_properties() {
                 assert_eq!(x.trailing_zeros().unwrap() >= u64::from(pow), divisible);
             }
             assert_eq!((-x).divisible_by_power_of_two(pow), divisible);
-            assert!((x << pow as u32).divisible_by_power_of_two(pow));
+            assert!((x << pow).divisible_by_power_of_two(pow));
             assert_eq!(x >> pow << pow == *x, divisible);
         },
     );

@@ -1,5 +1,4 @@
 use common::test_properties;
-use malachite_base::misc::CheckedFrom;
 use malachite_base::num::{BitAccess, One, SignificantBits};
 use malachite_nz::natural::logic::bit_access::limbs_get_bit;
 use malachite_nz::natural::Natural;
@@ -69,10 +68,7 @@ fn get_bit_properties() {
         assert_eq!(num_get_bit(&natural_to_biguint(n), index), bit);
         assert_eq!(natural_to_rug_integer(n).get_bit(index as u32), bit);
 
-        assert_eq!(
-            n & (Natural::ONE << u32::checked_from(index).unwrap()) != 0,
-            bit
-        );
+        assert_eq!(n & (Natural::ONE << index) != 0, bit);
         assert_ne!((!n).get_bit(index), bit);
     });
 

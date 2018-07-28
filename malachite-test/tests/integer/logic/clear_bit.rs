@@ -1,5 +1,4 @@
 use common::test_properties;
-use malachite_base::misc::CheckedFrom;
 use malachite_base::num::{BitAccess, NotAssign, One};
 use malachite_nz::integer::logic::bit_access::{
     limbs_slice_clear_bit_neg, limbs_vec_clear_bit_neg,
@@ -129,10 +128,7 @@ fn clear_bit_properties() {
         mut_n.assign_bit(index, false);
         assert_eq!(mut_n, result);
 
-        assert_eq!(
-            n & !(Integer::ONE << u32::checked_from(index).unwrap()),
-            result
-        );
+        assert_eq!(n & !(Integer::ONE << index), result);
 
         assert!(result <= *n);
         if n.get_bit(index) {

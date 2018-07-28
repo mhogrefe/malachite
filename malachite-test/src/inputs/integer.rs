@@ -1,6 +1,7 @@
 use common::{integer_to_bigint, integer_to_rug_integer, natural_to_rug_integer, GenerationMode};
 use inputs::common::{reshape_1_2_to_3, reshape_2_1_to_3};
-use malachite_base::num::{PrimitiveInteger, PrimitiveSigned, PrimitiveUnsigned};
+use malachite_base::misc::CheckedFrom;
+use malachite_base::num::{PrimitiveInteger, PrimitiveSigned, PrimitiveUnsigned, UnsignedAbs};
 use malachite_base::round::RoundingMode;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
@@ -580,27 +581,30 @@ fn log_pairs_of_integer_and_signed<T: PrimitiveSigned>() -> Box<Iterator<Item = 
     Box::new(log_pairs(exhaustive_integers(), exhaustive_signed()))
 }
 
-pub fn pairs_of_integer_and_small_i32(gm: GenerationMode) -> Box<Iterator<Item = (Integer, i32)>> {
+pub fn pairs_of_integer_and_small_signed<T: PrimitiveSigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (Integer, T)>> {
     match gm {
         GenerationMode::Exhaustive => log_pairs_of_integer_and_signed(),
         GenerationMode::Random(scale) => Box::new(random_pairs(
             &EXAMPLE_SEED,
             &(|seed| random_integers(seed, scale)),
-            &(|seed| i32s_geometric(seed, scale)),
+            &(|seed| i32s_geometric(seed, scale).flat_map(T::checked_from)),
         )),
         GenerationMode::SpecialRandom(scale) => Box::new(random_pairs(
             &EXAMPLE_SEED,
             &(|seed| special_random_integers(seed, scale)),
-            &(|seed| i32s_geometric(seed, scale)),
+            &(|seed| i32s_geometric(seed, scale).flat_map(T::checked_from)),
         )),
     }
 }
 
-pub fn rm_pairs_of_integer_and_small_i32(
+pub fn rm_pairs_of_integer_and_small_signed<T: PrimitiveSigned>(
     gm: GenerationMode,
-) -> Box<Iterator<Item = ((rug::Integer, i32), (Integer, i32))>> {
+) -> Box<Iterator<Item = ((rug::Integer, T), (Integer, T))>> {
     Box::new(
-        pairs_of_integer_and_small_i32(gm).map(|(x, y)| ((integer_to_rug_integer(&x), y), (x, y))),
+        pairs_of_integer_and_small_signed(gm)
+            .map(|(x, y)| ((integer_to_rug_integer(&x), y), (x, y))),
     )
 }
 
@@ -899,9 +903,9 @@ pub fn pairs_of_integer_and_rounding_mode(
     }
 }
 
-fn triples_of_integer_small_i32_and_rounding_mode(
+fn triples_of_integer_small_signed_and_rounding_mode<T: PrimitiveSigned>(
     gm: GenerationMode,
-) -> Box<Iterator<Item = (Integer, i32, RoundingMode)>> {
+) -> Box<Iterator<Item = (Integer, T, RoundingMode)>> {
     match gm {
         GenerationMode::Exhaustive => reshape_2_1_to_3(Box::new(lex_pairs(
             log_pairs_of_integer_and_signed(),
@@ -910,42 +914,50 @@ fn triples_of_integer_small_i32_and_rounding_mode(
         GenerationMode::Random(scale) => Box::new(random_triples(
             &EXAMPLE_SEED,
             &(|seed| random_integers(seed, scale)),
-            &(|seed| i32s_geometric(seed, scale)),
+            &(|seed| i32s_geometric(seed, scale).flat_map(T::checked_from)),
             &(|seed| random_rounding_modes(seed)),
         )),
         GenerationMode::SpecialRandom(scale) => Box::new(random_triples(
             &EXAMPLE_SEED,
             &(|seed| special_random_integers(seed, scale)),
-            &(|seed| i32s_geometric(seed, scale)),
+            &(|seed| i32s_geometric(seed, scale).flat_map(T::checked_from)),
             &(|seed| random_rounding_modes(seed)),
         )),
     }
 }
 
-// All triples of `Integer`, `i32`, and `RoundingMode`, such that if the `i32` is negative and the
-// `RoundingMode` is `RoundingMode::Exact`, the `Integer` is divisible by 2 to the power of the
-// negative of the `i32`.
-pub fn triples_of_integer_small_i32_and_rounding_mode_var_1(
+// All triples of `Integer`, `T`, and `RoundingMode`, where `T` is signed, such that if the `T` is
+// negative and the `RoundingMode` is `RoundingMode::Exact`, the `Integer` is divisible by 2 to the
+// power of the negative of the `T`.
+pub fn triples_of_integer_small_signed_and_rounding_mode_var_1<T: PrimitiveSigned>(
     gm: GenerationMode,
-) -> Box<Iterator<Item = (Integer, i32, RoundingMode)>> {
+) -> Box<Iterator<Item = (Integer, T, RoundingMode)>>
+where
+    u32: CheckedFrom<<T as UnsignedAbs>::Output>,
+{
     Box::new(
-        triples_of_integer_small_i32_and_rounding_mode(gm).filter(|&(ref n, i, rm)| {
-            i >= 0
+        triples_of_integer_small_signed_and_rounding_mode::<T>(gm).filter(|&(ref n, i, rm)| {
+            i >= T::ZERO
                 || rm != RoundingMode::Exact
-                || n.divisible_by_power_of_two(i.wrapping_neg() as u32)
+                || n.divisible_by_power_of_two(u32::checked_from(i.unsigned_abs()).unwrap())
         }),
     )
 }
 
-// All triples of `Integer`, `i32`, and `RoundingMode`, such that if the `i32` is positive and the
-// `RoundingMode` is `RoundingMode::Exact`, the `Integer` is divisible by 2 to the power of the
-// `i32`.
-pub fn triples_of_integer_small_i32_and_rounding_mode_var_2(
+// All triples of `Integer`, `T`, and `RoundingMode`, where `T` is signed, such that if the `i32` is
+// positive and the `RoundingMode` is `RoundingMode::Exact`, the `Integer` is divisible by 2 to the
+// power of the `T`.
+pub fn triples_of_integer_small_signed_and_rounding_mode_var_2<T: PrimitiveSigned>(
     gm: GenerationMode,
-) -> Box<Iterator<Item = (Integer, i32, RoundingMode)>> {
+) -> Box<Iterator<Item = (Integer, T, RoundingMode)>>
+where
+    u32: CheckedFrom<T>,
+{
     Box::new(
-        triples_of_integer_small_i32_and_rounding_mode(gm).filter(|&(ref n, i, rm)| {
-            i <= 0 || rm != RoundingMode::Exact || n.divisible_by_power_of_two(i as u32)
+        triples_of_integer_small_signed_and_rounding_mode::<T>(gm).filter(|&(ref n, i, rm)| {
+            i <= T::ZERO
+                || rm != RoundingMode::Exact
+                || n.divisible_by_power_of_two(u32::checked_from(i).unwrap())
         }),
     )
 }

@@ -58,9 +58,9 @@ pub mod integer {
         pub mod mul_u32;
         pub mod neg;
         pub mod parity;
-        pub mod shl_i32;
+        pub mod shl_i;
         pub mod shl_u;
-        pub mod shr_i32;
+        pub mod shr_i;
         pub mod shr_u;
         pub mod sub;
         pub mod sub_i32;

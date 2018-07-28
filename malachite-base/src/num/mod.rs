@@ -643,6 +643,14 @@ pub trait PrimitiveInteger:
     + ShlAssign<u16>
     + ShlAssign<u32>
     + ShlAssign<u64>
+    + ShlRound<i8, Output = Self>
+    + ShlRound<i16, Output = Self>
+    + ShlRound<i32, Output = Self>
+    + ShlRound<i64, Output = Self>
+    + ShlRoundAssign<i8>
+    + ShlRoundAssign<i16>
+    + ShlRoundAssign<i32>
+    + ShlRoundAssign<i64>
     + Shr<i8, Output = Self>
     + Shr<i16, Output = Self>
     + Shr<i32, Output = Self>
@@ -659,6 +667,22 @@ pub trait PrimitiveInteger:
     + ShrAssign<u16>
     + ShrAssign<u32>
     + ShrAssign<u64>
+    + ShrRound<i8, Output = Self>
+    + ShrRound<i16, Output = Self>
+    + ShrRound<i32, Output = Self>
+    + ShrRound<i64, Output = Self>
+    + ShrRound<u8, Output = Self>
+    + ShrRound<u16, Output = Self>
+    + ShrRound<u32, Output = Self>
+    + ShrRound<u64, Output = Self>
+    + ShrRoundAssign<i8>
+    + ShrRoundAssign<i16>
+    + ShrRoundAssign<i32>
+    + ShrRoundAssign<i64>
+    + ShrRoundAssign<u8>
+    + ShrRoundAssign<u16>
+    + ShrRoundAssign<u32>
+    + ShrRoundAssign<u64>
     + SignificantBits
     + Sized
     + Sub<Output = Self>
@@ -2544,7 +2568,7 @@ round_shift_unsigned_unsigned!(u64, u16);
 round_shift_unsigned_unsigned!(u64, u32);
 round_shift_unsigned_unsigned!(u64, u64);
 
-macro_rules! round_shift_unsigned_signed {
+macro_rules! round_shift_primitive_signed {
     ($t:ident, $u:ident) => {
         impl ShlRound<$u> for $t {
             type Output = $t;
@@ -2591,22 +2615,38 @@ macro_rules! round_shift_unsigned_signed {
         }
     };
 }
-round_shift_unsigned_signed!(u8, i8);
-round_shift_unsigned_signed!(u8, i16);
-round_shift_unsigned_signed!(u8, i32);
-round_shift_unsigned_signed!(u8, i64);
-round_shift_unsigned_signed!(u16, i8);
-round_shift_unsigned_signed!(u16, i16);
-round_shift_unsigned_signed!(u16, i32);
-round_shift_unsigned_signed!(u16, i64);
-round_shift_unsigned_signed!(u32, i8);
-round_shift_unsigned_signed!(u32, i16);
-round_shift_unsigned_signed!(u32, i32);
-round_shift_unsigned_signed!(u32, i64);
-round_shift_unsigned_signed!(u64, i8);
-round_shift_unsigned_signed!(u64, i16);
-round_shift_unsigned_signed!(u64, i32);
-round_shift_unsigned_signed!(u64, i64);
+round_shift_primitive_signed!(u8, i8);
+round_shift_primitive_signed!(u8, i16);
+round_shift_primitive_signed!(u8, i32);
+round_shift_primitive_signed!(u8, i64);
+round_shift_primitive_signed!(u16, i8);
+round_shift_primitive_signed!(u16, i16);
+round_shift_primitive_signed!(u16, i32);
+round_shift_primitive_signed!(u16, i64);
+round_shift_primitive_signed!(u32, i8);
+round_shift_primitive_signed!(u32, i16);
+round_shift_primitive_signed!(u32, i32);
+round_shift_primitive_signed!(u32, i64);
+round_shift_primitive_signed!(u64, i8);
+round_shift_primitive_signed!(u64, i16);
+round_shift_primitive_signed!(u64, i32);
+round_shift_primitive_signed!(u64, i64);
+round_shift_primitive_signed!(i8, i8);
+round_shift_primitive_signed!(i8, i16);
+round_shift_primitive_signed!(i8, i32);
+round_shift_primitive_signed!(i8, i64);
+round_shift_primitive_signed!(i16, i8);
+round_shift_primitive_signed!(i16, i16);
+round_shift_primitive_signed!(i16, i32);
+round_shift_primitive_signed!(i16, i64);
+round_shift_primitive_signed!(i32, i8);
+round_shift_primitive_signed!(i32, i16);
+round_shift_primitive_signed!(i32, i32);
+round_shift_primitive_signed!(i32, i64);
+round_shift_primitive_signed!(i64, i8);
+round_shift_primitive_signed!(i64, i16);
+round_shift_primitive_signed!(i64, i32);
+round_shift_primitive_signed!(i64, i64);
 
 macro_rules! round_shift_signed_unsigned {
     ($t:ident, $u:ident) => {

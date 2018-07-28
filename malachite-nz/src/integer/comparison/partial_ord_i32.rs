@@ -1,5 +1,5 @@
 use integer::Integer;
-use malachite_base::num::UnsignedAbs;
+use malachite_base::num::{PrimitiveSigned, UnsignedAbs};
 use std::cmp::Ordering;
 
 /// Compares `self` to an `i32`.
@@ -25,7 +25,7 @@ impl PartialOrd<i32> for Integer {
     fn partial_cmp(&self, other: &i32) -> Option<Ordering> {
         if self.sign {
             if *other >= 0 {
-                self.abs.partial_cmp(&(*other as u32))
+                self.abs.partial_cmp(&(other.to_unsigned_bitwise()))
             } else {
                 Some(Ordering::Greater)
             }

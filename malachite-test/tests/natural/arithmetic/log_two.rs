@@ -100,10 +100,7 @@ fn limbs_floor_log_two_properties() {
             floor_log_two,
             Natural::from_limbs_asc(limbs).floor_log_two()
         );
-        //TODO
-        /*let n = floor_log_two as u32;
-        assert!(Natural::ONE << n <= *x);
-        assert!(*x < Natural::ONE << (n + 1));*/    });
+    });
 }
 
 #[test]
@@ -118,10 +115,7 @@ fn limbs_ceiling_log_two_properties() {
             ceiling_log_two,
             Natural::from_limbs_asc(limbs).ceiling_log_two()
         );
-        //TODO
-        /*let n = floor_log_two as u32;
-        assert!(Natural::ONE << n <= *x);
-        assert!(*x < Natural::ONE << (n + 1))*/    });
+    });
 }
 
 #[test]

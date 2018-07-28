@@ -1,73 +1,60 @@
 use common::test_properties;
-use malachite_base::misc::{Max, WrappingFrom};
-use malachite_base::num::{
-    PartialOrdAbs, PrimitiveInteger, PrimitiveSigned, PrimitiveUnsigned, ShrRound, ShrRoundAssign,
-    Zero,
-};
+use malachite_base::num::{ShrRound, ShrRoundAssign, Zero};
 use malachite_base::round::RoundingMode;
 use malachite_nz::integer::Integer;
-use malachite_test::common::{
-    bigint_to_integer, integer_to_bigint, integer_to_rug_integer, rug_integer_to_integer,
-};
-use malachite_test::inputs::base::{
-    pairs_of_negative_signed_not_min_and_small_unsigned,
-    pairs_of_positive_signed_and_small_unsigned, pairs_of_unsigned_and_rounding_mode,
-    pairs_of_unsigned_and_small_unsigned, unsigneds,
-};
+use malachite_test::common::{integer_to_rug_integer, rug_integer_to_integer};
+use malachite_test::inputs::base::{pairs_of_signed_and_rounding_mode, signeds};
 use malachite_test::inputs::integer::{
-    integers, pairs_of_integer_and_rounding_mode, pairs_of_integer_and_small_unsigned,
-    pairs_of_integer_and_small_unsigned_var_2,
-    triples_of_integer_small_unsigned_and_rounding_mode_var_1,
-    triples_of_integer_small_unsigned_and_small_unsigned,
+    integers, pairs_of_integer_and_rounding_mode, pairs_of_integer_and_small_signed,
+    triples_of_integer_small_signed_and_rounding_mode_var_2,
 };
 use rug;
-use std::i32;
 use std::str::FromStr;
 
 macro_rules! tests_and_properties {
     (
         $t:ident,
-        $test_shr_u:ident,
-        $shr_u_properties:ident,
-        $test_shr_round_u:ident,
-        $shr_round_assign_u_fail_1:ident,
-        $shr_round_assign_u_fail_2:ident,
-        $shr_round_assign_u_fail_3:ident,
-        $shr_round_assign_u_fail_4:ident,
-        $shr_round_u_fail_1:ident,
-        $shr_round_u_fail_2:ident,
-        $shr_round_u_fail_3:ident,
-        $shr_round_u_fail_4:ident,
-        $shr_round_u_ref_fail_1:ident,
-        $shr_round_u_ref_fail_2:ident,
-        $shr_round_u_ref_fail_3:ident,
-        $shr_round_u_ref_fail_4:ident,
-        $shr_round_u_properties:ident,
-        $u:ident,
-        $v:ident,
+        $test_shr_i:ident,
+        $shr_i_properties:ident,
+        $test_shr_round_i:ident,
+        $shr_round_assign_i_fail_1:ident,
+        $shr_round_assign_i_fail_2:ident,
+        $shr_round_assign_i_fail_3:ident,
+        $shr_round_assign_i_fail_4:ident,
+        $shr_round_i_fail_1:ident,
+        $shr_round_i_fail_2:ident,
+        $shr_round_i_fail_3:ident,
+        $shr_round_i_fail_4:ident,
+        $shr_round_i_ref_fail_1:ident,
+        $shr_round_i_ref_fail_2:ident,
+        $shr_round_i_ref_fail_3:ident,
+        $shr_round_i_ref_fail_4:ident,
+        $shr_round_i_properties:ident,
+        $i:ident,
+        $j:ident,
         $out:ident,
-        $shl_library_comparison_tests:expr,
+        $shr_library_comparison_tests:expr,
         $n:ident,
         $shifted:ident,
-        $shl_library_comparison_properties:expr
+        $shr_library_comparison_properties:expr
     ) => {
         #[test]
-        fn $test_shr_u() {
-            let test = |$u, $v: $t, $out| {
-                let mut n = Integer::from_str($u).unwrap();
-                n >>= $v;
+        fn $test_shr_i() {
+            let test = |$i, $j: $t, $out| {
+                let mut n = Integer::from_str($i).unwrap();
+                n >>= $j;
                 assert_eq!(n.to_string(), $out);
                 assert!(n.is_valid());
 
-                let n = Integer::from_str($u).unwrap() >> $v;
+                let n = Integer::from_str($i).unwrap() >> $j;
                 assert_eq!(n.to_string(), $out);
                 assert!(n.is_valid());
 
-                let n = &Integer::from_str($u).unwrap() >> $v;
+                let n = &Integer::from_str($i).unwrap() >> $j;
                 assert_eq!(n.to_string(), $out);
                 assert!(n.is_valid());
 
-                $shl_library_comparison_tests
+                $shr_library_comparison_tests
             };
             test("0", 0, "0");
             test("0", 10, "0");
@@ -151,80 +138,87 @@ macro_rules! tests_and_properties {
             test("-4294967295", 32, "-1");
             test("-4294967296", 32, "-1");
             test("-4294967296", 33, "-1");
+
+            test("0", -10, "0");
+            test("123", -1, "246");
+            test("123", -2, "492");
+            test("123", -25, "4127195136");
+            test("123", -26, "8254390272");
+            test("123", -100, "155921023828072216384094494261248");
+            test("2147483648", -1, "4294967296");
+            test("1000000000000", -3, "8000000000000");
+            test("1000000000000", -24, "16777216000000000000");
+            test("1000000000000", -25, "33554432000000000000");
+            test("1000000000000", -31, "2147483648000000000000");
+            test("1000000000000", -32, "4294967296000000000000");
+            test("1000000000000", -33, "8589934592000000000000");
+            test(
+                "1000000000000",
+                -100,
+                "1267650600228229401496703205376000000000000",
+            );
+
+            test("-123", -1, "-246");
+            test("-123", -2, "-492");
+            test("-123", -25, "-4127195136");
+            test("-123", -26, "-8254390272");
+            test("-123", -100, "-155921023828072216384094494261248");
+            test("-2147483648", -1, "-4294967296");
+            test("-1000000000000", -3, "-8000000000000");
+            test("-1000000000000", -24, "-16777216000000000000");
+            test("-1000000000000", -25, "-33554432000000000000");
+            test("-1000000000000", -31, "-2147483648000000000000");
+            test("-1000000000000", -32, "-4294967296000000000000");
+            test("-1000000000000", -33, "-8589934592000000000000");
+            test(
+                "-1000000000000",
+                -100,
+                "-1267650600228229401496703205376000000000000",
+            );
         }
 
         #[test]
-        fn $shr_u_properties() {
-            test_properties(
-                pairs_of_integer_and_small_unsigned::<$t>,
-                |&(ref $n, $u)| {
-                    let mut mut_n = $n.clone();
-                    mut_n >>= $u;
-                    assert!(mut_n.is_valid());
-                    let $shifted = mut_n;
+        fn $shr_i_properties() {
+            test_properties(pairs_of_integer_and_small_signed::<$t>, |&(ref $n, $i)| {
+                let mut mut_n = $n.clone();
+                mut_n >>= $i;
+                assert!(mut_n.is_valid());
+                let $shifted = mut_n;
 
-                    let shifted_alt = $n >> $u;
-                    assert!(shifted_alt.is_valid());
-                    assert_eq!(shifted_alt, $shifted);
-                    let shifted_alt = $n.clone() >> $u;
-                    assert!(shifted_alt.is_valid());
-                    assert_eq!(shifted_alt, $shifted);
+                let shifted_alt = $n >> $i;
+                assert_eq!(shifted_alt, $shifted);
+                assert!(shifted_alt.is_valid());
+                let shifted_alt = $n.clone() >> $i;
+                assert_eq!(shifted_alt, $shifted);
+                assert!(shifted_alt.is_valid());
 
-                    assert!($shifted.le_abs($n));
-                    assert_eq!($n.shr_round($u, RoundingMode::Floor), $shifted);
+                assert_eq!($n.shr_round($i, RoundingMode::Floor), $shifted);
 
-                    if $u
-                        < (<$t as PrimitiveUnsigned>::SignedOfEqualWidth::MAX.to_unsigned_bitwise())
-                    {
-                        let u = $u.to_signed_bitwise();
-                        assert_eq!($n >> u, $shifted);
-                        assert_eq!($n << -u, $shifted);
-                    }
-
-                    $shl_library_comparison_properties
-                },
-            );
-
-            test_properties(
-                pairs_of_unsigned_and_small_unsigned::<u32, $t>,
-                |&(u, v)| {
-                    if let Some(sum) = v.checked_add($t::wrapping_from(u32::WIDTH)) {
-                        assert_eq!(Integer::from(u) >> sum, 0);
-                    }
-                },
-            );
-
-            test_properties(
-                triples_of_integer_small_unsigned_and_small_unsigned::<$t, $t>,
-                |&(ref n, u, v)| {
-                    if let Some(sum) = u.checked_add(v) {
-                        assert_eq!(n >> u >> v, n >> sum);
-                    }
-                },
-            );
+                $shr_library_comparison_properties
+            });
 
             test_properties(integers, |n| {
                 assert_eq!(n >> $t::ZERO, *n);
             });
 
-            test_properties(unsigneds::<$t>, |&u| {
-                assert_eq!(Integer::ZERO >> u, 0);
+            test_properties(signeds::<$t>, |&i| {
+                assert_eq!(Integer::ZERO >> i, 0);
             });
         }
 
         #[test]
-        fn $test_shr_round_u() {
-            let test = |u, v: $t, rm: RoundingMode, out| {
-                let mut n = Integer::from_str(u).unwrap();
-                n.shr_round_assign(v, rm);
+        fn $test_shr_round_i() {
+            let test = |i, j: $t, rm: RoundingMode, out| {
+                let mut n = Integer::from_str(i).unwrap();
+                n.shr_round_assign(j, rm);
                 assert_eq!(n.to_string(), out);
                 assert!(n.is_valid());
 
-                let n = Integer::from_str(u).unwrap().shr_round(v, rm);
+                let n = Integer::from_str(i).unwrap().shr_round(j, rm);
                 assert_eq!(n.to_string(), out);
                 assert!(n.is_valid());
 
-                let n = &Integer::from_str(u).unwrap().shr_round(v, rm);
+                let n = &Integer::from_str(i).unwrap().shr_round(j, rm);
                 assert_eq!(n.to_string(), out);
                 assert!(n.is_valid());
             };
@@ -1215,23 +1209,122 @@ macro_rules! tests_and_properties {
             test("-4294967296", 33, RoundingMode::Floor, "-1");
             test("-4294967296", 33, RoundingMode::Ceiling, "0");
             test("-4294967296", 33, RoundingMode::Nearest, "0");
+
+            test("0", -10, RoundingMode::Exact, "0");
+            test("123", -1, RoundingMode::Exact, "246");
+            test("123", -2, RoundingMode::Exact, "492");
+            test("123", -25, RoundingMode::Exact, "4127195136");
+            test("123", -26, RoundingMode::Exact, "8254390272");
+            test(
+                "123",
+                -100,
+                RoundingMode::Exact,
+                "155921023828072216384094494261248",
+            );
+            test("2147483648", -1, RoundingMode::Exact, "4294967296");
+            test("1000000000000", -3, RoundingMode::Exact, "8000000000000");
+            test(
+                "1000000000000",
+                -24,
+                RoundingMode::Exact,
+                "16777216000000000000",
+            );
+            test(
+                "1000000000000",
+                -25,
+                RoundingMode::Exact,
+                "33554432000000000000",
+            );
+            test(
+                "1000000000000",
+                -31,
+                RoundingMode::Exact,
+                "2147483648000000000000",
+            );
+            test(
+                "1000000000000",
+                -32,
+                RoundingMode::Exact,
+                "4294967296000000000000",
+            );
+            test(
+                "1000000000000",
+                -33,
+                RoundingMode::Exact,
+                "8589934592000000000000",
+            );
+            test(
+                "1000000000000",
+                -100,
+                RoundingMode::Exact,
+                "1267650600228229401496703205376000000000000",
+            );
+
+            test("-123", -1, RoundingMode::Exact, "-246");
+            test("-123", -2, RoundingMode::Exact, "-492");
+            test("-123", -25, RoundingMode::Exact, "-4127195136");
+            test("-123", -26, RoundingMode::Exact, "-8254390272");
+            test(
+                "-123",
+                -100,
+                RoundingMode::Exact,
+                "-155921023828072216384094494261248",
+            );
+            test("-2147483648", -1, RoundingMode::Exact, "-4294967296");
+            test("-1000000000000", -3, RoundingMode::Exact, "-8000000000000");
+            test(
+                "-1000000000000",
+                -24,
+                RoundingMode::Exact,
+                "-16777216000000000000",
+            );
+            test(
+                "-1000000000000",
+                -25,
+                RoundingMode::Exact,
+                "-33554432000000000000",
+            );
+            test(
+                "-1000000000000",
+                -31,
+                RoundingMode::Exact,
+                "-2147483648000000000000",
+            );
+            test(
+                "-1000000000000",
+                -32,
+                RoundingMode::Exact,
+                "-4294967296000000000000",
+            );
+            test(
+                "-1000000000000",
+                -33,
+                RoundingMode::Exact,
+                "-8589934592000000000000",
+            );
+            test(
+                "-1000000000000",
+                -100,
+                RoundingMode::Exact,
+                "-1267650600228229401496703205376000000000000",
+            );
         }
 
         #[test]
         #[should_panic(expected = "Right shift is not exact: 123 >>= 1")]
-        fn $shr_round_assign_u_fail_1() {
+        fn $shr_round_assign_i_fail_1() {
             Integer::from(123u32).shr_round_assign(1 as $t, RoundingMode::Exact);
         }
 
         #[test]
         #[should_panic(expected = "Right shift is not exact: 123 >>= 100")]
-        fn $shr_round_assign_u_fail_2() {
+        fn $shr_round_assign_i_fail_2() {
             Integer::from(123u32).shr_round_assign(100 as $t, RoundingMode::Exact);
         }
 
         #[test]
         #[should_panic(expected = "Right shift is not exact.")]
-        fn $shr_round_assign_u_fail_3() {
+        fn $shr_round_assign_i_fail_3() {
             Integer::from_str("1000000000001")
                 .unwrap()
                 .shr_round_assign(1 as $t, RoundingMode::Exact);
@@ -1239,7 +1332,7 @@ macro_rules! tests_and_properties {
 
         #[test]
         #[should_panic(expected = "Right shift is not exact.")]
-        fn $shr_round_assign_u_fail_4() {
+        fn $shr_round_assign_i_fail_4() {
             Integer::from_str("1000000000001")
                 .unwrap()
                 .shr_round_assign(100 as $t, RoundingMode::Exact);
@@ -1247,19 +1340,19 @@ macro_rules! tests_and_properties {
 
         #[test]
         #[should_panic(expected = "Right shift is not exact: 123 >>= 1")]
-        fn $shr_round_u_fail_1() {
+        fn $shr_round_i_fail_1() {
             Integer::from(123u32).shr_round(1 as $t, RoundingMode::Exact);
         }
 
         #[test]
         #[should_panic(expected = "Right shift is not exact: 123 >>= 100")]
-        fn $shr_round_u_fail_2() {
+        fn $shr_round_i_fail_2() {
             Integer::from(123u32).shr_round(100 as $t, RoundingMode::Exact);
         }
 
         #[test]
         #[should_panic(expected = "Right shift is not exact.")]
-        fn $shr_round_u_fail_3() {
+        fn $shr_round_i_fail_3() {
             Integer::from_str("1000000000001")
                 .unwrap()
                 .shr_round(1 as $t, RoundingMode::Exact);
@@ -1267,7 +1360,7 @@ macro_rules! tests_and_properties {
 
         #[test]
         #[should_panic(expected = "Right shift is not exact.")]
-        fn $shr_round_u_fail_4() {
+        fn $shr_round_i_fail_4() {
             Integer::from_str("1000000000001")
                 .unwrap()
                 .shr_round(100 as $t, RoundingMode::Exact);
@@ -1275,108 +1368,47 @@ macro_rules! tests_and_properties {
 
         #[test]
         #[should_panic(expected = "Right shift is not exact: 123 >> 1")]
-        fn $shr_round_u_ref_fail_1() {
+        fn $shr_round_i_ref_fail_1() {
             (&Integer::from(123u32)).shr_round(1 as $t, RoundingMode::Exact);
         }
 
         #[test]
         #[should_panic(expected = "Right shift is not exact: 123 >> 100")]
-        fn $shr_round_u_ref_fail_2() {
+        fn $shr_round_i_ref_fail_2() {
             (&Integer::from(123u32)).shr_round(100 as $t, RoundingMode::Exact);
         }
 
         #[test]
         #[should_panic(expected = "Right shift is not exact: 1000000000001 >> 1")]
-        fn $shr_round_u_ref_fail_3() {
+        fn $shr_round_i_ref_fail_3() {
             (&Integer::from_str("1000000000001").unwrap()).shr_round(1 as $t, RoundingMode::Exact);
         }
 
         #[test]
         #[should_panic(expected = "Right shift is not exact: 1000000000001 >> 100")]
-        fn $shr_round_u_ref_fail_4() {
+        fn $shr_round_i_ref_fail_4() {
             (&Integer::from_str("1000000000001").unwrap())
                 .shr_round(100 as $t, RoundingMode::Exact);
         }
 
         #[test]
-        fn $shr_round_u_properties() {
-            // TODO n.shr_round(u, rm) == n.div_round(1 << u)
+        fn $shr_round_i_properties() {
             test_properties(
-                triples_of_integer_small_unsigned_and_rounding_mode_var_1::<$t>,
-                |&(ref n, u, rm)| {
+                triples_of_integer_small_signed_and_rounding_mode_var_2::<$t>,
+                |&(ref n, i, rm)| {
                     let mut mut_n = n.clone();
-                    mut_n.shr_round_assign(u, rm);
+                    mut_n.shr_round_assign(i, rm);
                     assert!(mut_n.is_valid());
                     let shifted = mut_n;
 
-                    let shifted_alt = n.shr_round(u, rm);
+                    let shifted_alt = n.shr_round(i, rm);
                     assert!(shifted_alt.is_valid());
                     assert_eq!(shifted_alt, shifted);
-                    let shifted_alt = n.clone().shr_round(u, rm);
+                    let shifted_alt = n.clone().shr_round(i, rm);
                     assert!(shifted_alt.is_valid());
                     assert_eq!(shifted_alt, shifted);
 
-                    assert!(n.shr_round(u, rm).le_abs(n));
-                    assert_eq!(-(-n).shr_round(u, -rm), shifted);
-                },
-            );
-
-            test_properties(pairs_of_integer_and_small_unsigned::<$t>, |&(ref n, u)| {
-                let left_shifted = n << u;
-                assert_eq!((&left_shifted).shr_round(u, RoundingMode::Down), *n);
-                assert_eq!((&left_shifted).shr_round(u, RoundingMode::Up), *n);
-                assert_eq!((&left_shifted).shr_round(u, RoundingMode::Floor), *n);
-                assert_eq!((&left_shifted).shr_round(u, RoundingMode::Ceiling), *n);
-                assert_eq!((&left_shifted).shr_round(u, RoundingMode::Nearest), *n);
-                assert_eq!((&left_shifted).shr_round(u, RoundingMode::Exact), *n);
-            });
-
-            // TODO test using Rationals
-            test_properties(
-                pairs_of_integer_and_small_unsigned_var_2::<$t>,
-                |&(ref n, u)| {
-                    let floor = n.shr_round(u, RoundingMode::Floor);
-                    let ceiling = &floor + 1;
-                    assert_eq!(n.shr_round(u, RoundingMode::Ceiling), ceiling);
-                    if *n >= 0 {
-                        assert_eq!(n.shr_round(u, RoundingMode::Up), ceiling);
-                        assert_eq!(n.shr_round(u, RoundingMode::Down), floor);
-                    } else {
-                        assert_eq!(n.shr_round(u, RoundingMode::Up), floor);
-                        assert_eq!(n.shr_round(u, RoundingMode::Down), ceiling);
-                    }
-                    let nearest = n.shr_round(u, RoundingMode::Nearest);
-                    assert!(nearest == floor || nearest == ceiling);
-                },
-            );
-
-            test_properties(
-                pairs_of_positive_signed_and_small_unsigned::<i32, $t>,
-                |&(i, u)| {
-                    if let Some(sum) = u.checked_add($t::wrapping_from(u32::WIDTH - 1)) {
-                        assert_eq!(Integer::from(i).shr_round(sum, RoundingMode::Down), 0);
-                        assert_eq!(Integer::from(i).shr_round(sum, RoundingMode::Floor), 0);
-                        assert_eq!(Integer::from(i).shr_round(sum, RoundingMode::Up), 1);
-                        assert_eq!(Integer::from(i).shr_round(sum, RoundingMode::Ceiling), 1);
-                        if let Some(sum) = sum.checked_add(1) {
-                            assert_eq!(Integer::from(i).shr_round(sum, RoundingMode::Nearest), 0);
-                        }
-                    }
-                },
-            );
-
-            test_properties(
-                pairs_of_negative_signed_not_min_and_small_unsigned::<i32, $t>,
-                |&(i, u)| {
-                    if let Some(sum) = u.checked_add($t::wrapping_from(u32::WIDTH - 1)) {
-                        assert_eq!(Integer::from(i).shr_round(sum, RoundingMode::Down), 0);
-                        assert_eq!(Integer::from(i).shr_round(sum, RoundingMode::Floor), -1);
-                        assert_eq!(Integer::from(i).shr_round(sum, RoundingMode::Up), -1);
-                        assert_eq!(Integer::from(i).shr_round(sum, RoundingMode::Ceiling), 0);
-                        if let Some(sum) = sum.checked_add(1) {
-                            assert_eq!(Integer::from(i).shr_round(sum, RoundingMode::Nearest), 0);
-                        }
-                    }
+                    assert_eq!(-(-n).shr_round(i, -rm), shifted);
                 },
             );
 
@@ -1384,31 +1416,31 @@ macro_rules! tests_and_properties {
                 assert_eq!(n.shr_round($t::ZERO, rm), *n);
             });
 
-            test_properties(pairs_of_unsigned_and_rounding_mode::<$t>, |&(u, rm)| {
-                assert_eq!(Integer::ZERO.shr_round(u, rm), 0);
+            test_properties(pairs_of_signed_and_rounding_mode::<$t>, |&(i, rm)| {
+                assert_eq!(Integer::ZERO.shr_round(i, rm), 0);
             });
         }
     };
 }
 tests_and_properties!(
-    u8,
-    test_shr_u8,
-    shr_u8_properties,
-    test_shr_round_u8,
-    shr_round_assign_u8_fail_1,
-    shr_round_assign_u8_fail_2,
-    shr_round_assign_u8_fail_3,
-    shr_round_assign_u8_fail_4,
-    shr_round_u8_fail_1,
-    shr_round_u8_fail_2,
-    shr_round_u8_fail_3,
-    shr_round_u8_fail_4,
-    shr_round_u8_ref_fail_1,
-    shr_round_u8_ref_fail_2,
-    shr_round_u8_ref_fail_3,
-    shr_round_u8_ref_fail_4,
-    shr_round_u8_properties,
-    u,
+    i8,
+    test_shr_i8,
+    shr_i8_properties,
+    test_shr_round_i8,
+    shr_round_assign_i8_fail_1,
+    shr_round_assign_i8_fail_2,
+    shr_round_assign_i8_fail_3,
+    shr_round_assign_i8_fail_4,
+    shr_round_i8_fail_1,
+    shr_round_i8_fail_2,
+    shr_round_i8_fail_3,
+    shr_round_i8_fail_4,
+    shr_round_i8_ref_fail_1,
+    shr_round_i8_ref_fail_2,
+    shr_round_i8_ref_fail_3,
+    shr_round_i8_ref_fail_4,
+    shr_round_i8_properties,
+    i,
     v,
     out,
     {},
@@ -1417,24 +1449,24 @@ tests_and_properties!(
     {}
 );
 tests_and_properties!(
-    u16,
-    test_shr_u16,
-    shr_u16_properties,
-    test_shr_round_u16,
-    shr_round_assign_u16_fail_1,
-    shr_round_assign_u16_fail_2,
-    shr_round_assign_u16_fail_3,
-    shr_round_assign_u16_fail_4,
-    shr_round_u16_fail_1,
-    shr_round_u16_fail_2,
-    shr_round_u16_fail_3,
-    shr_round_u16_fail_4,
-    shr_round_u16_ref_fail_1,
-    shr_round_u16_ref_fail_2,
-    shr_round_u16_ref_fail_3,
-    shr_round_u16_ref_fail_4,
-    shr_round_u16_properties,
-    u,
+    i16,
+    test_shr_i16,
+    shr_i16_properties,
+    test_shr_round_i16,
+    shr_round_assign_i16_fail_1,
+    shr_round_assign_i16_fail_2,
+    shr_round_assign_i16_fail_3,
+    shr_round_assign_i16_fail_4,
+    shr_round_i16_fail_1,
+    shr_round_i16_fail_2,
+    shr_round_i16_fail_3,
+    shr_round_i16_fail_4,
+    shr_round_i16_ref_fail_1,
+    shr_round_i16_ref_fail_2,
+    shr_round_i16_ref_fail_3,
+    shr_round_i16_ref_fail_4,
+    shr_round_i16_properties,
+    i,
     v,
     out,
     {},
@@ -1443,75 +1475,66 @@ tests_and_properties!(
     {}
 );
 tests_and_properties!(
-    u32,
-    test_shr_u32,
-    shr_u32_properties,
-    test_shr_round_u32,
-    shr_round_assign_u32_fail_1,
-    shr_round_assign_u32_fail_2,
-    shr_round_assign_u32_fail_3,
-    shr_round_assign_u32_fail_4,
-    shr_round_u32_fail_1,
-    shr_round_u32_fail_2,
-    shr_round_u32_fail_3,
-    shr_round_u32_fail_4,
-    shr_round_u32_ref_fail_1,
-    shr_round_u32_ref_fail_2,
-    shr_round_u32_ref_fail_3,
-    shr_round_u32_ref_fail_4,
-    shr_round_u32_properties,
-    u,
-    v,
+    i32,
+    test_shr_i32,
+    shr_i32_properties,
+    test_shr_round_i32,
+    shr_round_assign_i32_fail_1,
+    shr_round_assign_i32_fail_2,
+    shr_round_assign_i32_fail_3,
+    shr_round_assign_i32_fail_4,
+    shr_round_i32_fail_1,
+    shr_round_i32_fail_2,
+    shr_round_i32_fail_3,
+    shr_round_i32_fail_4,
+    shr_round_i32_ref_fail_1,
+    shr_round_i32_ref_fail_2,
+    shr_round_i32_ref_fail_3,
+    shr_round_i32_ref_fail_4,
+    shr_round_i32_properties,
+    i,
+    j,
     out,
     {
-        let mut n = rug::Integer::from_str(u).unwrap();
-        n >>= v;
+        let mut n = rug::Integer::from_str(i).unwrap();
+        n >>= j;
         assert_eq!(n.to_string(), out);
 
-        let n = rug::Integer::from_str(u).unwrap() >> v;
+        let n = rug::Integer::from_str(i).unwrap() >> j;
         assert_eq!(n.to_string(), out);
     },
     n,
     shifted,
     {
         let mut rug_n = integer_to_rug_integer(n);
-        rug_n >>= u;
+        rug_n >>= i;
         assert_eq!(rug_integer_to_integer(&rug_n), shifted);
 
         assert_eq!(
-            rug_integer_to_integer(&(integer_to_rug_integer(n) >> u)),
-            shifted
-        );
-
-        assert_eq!(
-            bigint_to_integer(&(&integer_to_bigint(n) >> u as usize)),
-            shifted
-        );
-        assert_eq!(
-            bigint_to_integer(&(integer_to_bigint(n) >> u as usize)),
+            rug_integer_to_integer(&(integer_to_rug_integer(n) >> i)),
             shifted
         );
     }
 );
 tests_and_properties!(
-    u64,
-    test_shr_u64,
-    shr_u64_properties,
-    test_shr_round_u64,
-    shr_round_assign_u64_fail_1,
-    shr_round_assign_u64_fail_2,
-    shr_round_assign_u64_fail_3,
-    shr_round_assign_u64_fail_4,
-    shr_round_u64_fail_1,
-    shr_round_u64_fail_2,
-    shr_round_u64_fail_3,
-    shr_round_u64_fail_4,
-    shr_round_u64_ref_fail_1,
-    shr_round_u64_ref_fail_2,
-    shr_round_u64_ref_fail_3,
-    shr_round_u64_ref_fail_4,
-    shr_round_u64_properties,
-    u,
+    i64,
+    test_shr_i64,
+    shr_i64_properties,
+    test_shr_round_i64,
+    shr_round_assign_i64_fail_1,
+    shr_round_assign_i64_fail_2,
+    shr_round_assign_i64_fail_3,
+    shr_round_assign_i64_fail_4,
+    shr_round_i64_fail_1,
+    shr_round_i64_fail_2,
+    shr_round_i64_fail_3,
+    shr_round_i64_fail_4,
+    shr_round_i64_ref_fail_1,
+    shr_round_i64_ref_fail_2,
+    shr_round_i64_ref_fail_3,
+    shr_round_i64_ref_fail_4,
+    shr_round_i64_properties,
+    i,
     v,
     out,
     {},

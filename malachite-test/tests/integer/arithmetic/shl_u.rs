@@ -1,6 +1,6 @@
 use common::{test_properties, test_properties_no_special};
-use malachite_base::misc::CheckedFrom;
-use malachite_base::num::{Abs, IsPowerOfTwo, One, Zero};
+use malachite_base::misc::{CheckedFrom, Max};
+use malachite_base::num::{Abs, IsPowerOfTwo, One, PrimitiveSigned, PrimitiveUnsigned, Zero};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_test::common::{
@@ -110,11 +110,13 @@ macro_rules! tests_and_properties {
                     assert_eq!($n << $u, $n * (Integer::ONE << $u));
                     assert_eq!($n << $u >> $u, *$n);
 
-                    //TODO
-                        /*if u <= (i32::MAX as u32) {
-                            assert_eq!(n << (u as i32), shifted);
-                            assert_eq!(n >> -(u as i32), shifted);
-                        }*/
+                    if $u
+                        < (<$t as PrimitiveUnsigned>::SignedOfEqualWidth::MAX.to_unsigned_bitwise())
+                    {
+                        let u = $u.to_signed_bitwise();
+                        assert_eq!($n << u, $shifted);
+                        assert_eq!($n >> -u, $shifted);
+                    }
 
                     $library_comparison_properties
                 },

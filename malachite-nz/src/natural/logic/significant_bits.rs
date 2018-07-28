@@ -22,8 +22,7 @@ use natural::Natural::{self, Large, Small};
 /// assert_eq!(limbs_significant_bits(&[0, 0b1101]), 36);
 /// ```
 pub fn limbs_significant_bits(limbs: &[u32]) -> u64 {
-    ((limbs.len() as u64 - 1) << u64::from(u32::LOG_WIDTH))
-        + limbs.last().unwrap().significant_bits()
+    ((limbs.len() as u64 - 1) << u32::LOG_WIDTH) + limbs.last().unwrap().significant_bits()
 }
 
 impl<'a> SignificantBits for &'a Natural {

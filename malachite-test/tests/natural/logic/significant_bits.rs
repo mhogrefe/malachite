@@ -59,10 +59,7 @@ fn limbs_significant_bits_properties() {
             significant_bits,
             Natural::from_limbs_asc(limbs).significant_bits()
         );
-        //TODO
-        /*let n = significant_bits as u32;
-        assert!(Natural::ONE << (n - 1) <= *x);
-        assert!(*x < Natural::ONE << n);*/    });
+    });
 }
 
 #[test]

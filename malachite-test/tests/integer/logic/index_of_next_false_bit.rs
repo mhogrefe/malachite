@@ -108,8 +108,7 @@ fn index_of_next_false_bit_properties() {
                 .map(|u| u64::from(u)),
             result
         );
-        //TODO use >> u64
-        assert_eq!(result.is_some(), n >> u32::checked_from(u).unwrap() != -1);
+        assert_eq!(result.is_some(), n >> u != -1);
         if let Some(result) = result {
             assert!(result >= u);
             assert!(!n.get_bit(result));
