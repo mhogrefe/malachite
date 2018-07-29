@@ -1,6 +1,7 @@
 use integer::Integer;
+use malachite_base::num::DivisibleByPowerOfTwo;
 
-impl Integer {
+impl DivisibleByPowerOfTwo for Integer {
     /// Returns whether `self` is divisible by 2<sup>`pow`</sup>. If `self` is 0, the result is
     /// always true; otherwise, it is equivalent to `self.trailing_zeros().unwrap() <= pow`, but
     /// more efficient.
@@ -16,7 +17,7 @@ impl Integer {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::Zero;
+    /// use malachite_base::num::{DivisibleByPowerOfTwo, Zero};
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {
@@ -24,10 +25,10 @@ impl Integer {
     ///     assert_eq!(Integer::from(-100).divisible_by_power_of_two(2), true);
     ///     assert_eq!(Integer::from(100u32).divisible_by_power_of_two(3), false);
     ///     assert_eq!((-Integer::trillion()).divisible_by_power_of_two(12), true);
-    ///     assert_eq!(Integer::trillion().divisible_by_power_of_two(13), false);
+    ///     assert_eq!((-Integer::trillion()).divisible_by_power_of_two(13), false);
     /// }
     /// ```
-    pub fn divisible_by_power_of_two(&self, pow: u32) -> bool {
+    fn divisible_by_power_of_two(&self, pow: u64) -> bool {
         self.abs.divisible_by_power_of_two(pow)
     }
 }

@@ -1,5 +1,5 @@
 use common::test_properties;
-use malachite_base::num::{One, ShrRound, Zero};
+use malachite_base::num::{DivisibleByPowerOfTwo, One, ShrRound, Zero};
 use malachite_base::round::RoundingMode;
 use malachite_nz::natural::Natural;
 use malachite_test::inputs::base::unsigneds;
@@ -108,7 +108,7 @@ fn mod_power_of_two_properties() {
 
         assert_eq!((n >> u << u) + &result, *n);
         assert!(result < (Natural::ONE << u));
-        assert_eq!(result == 0, n.divisible_by_power_of_two(u));
+        assert_eq!(result == 0, n.divisible_by_power_of_two(u as u64));
         assert_eq!(result.mod_power_of_two_ref(u), result);
     });
 
@@ -161,7 +161,7 @@ fn neg_mod_power_of_two_properties() {
 
         assert_eq!((n.shr_round(u, RoundingMode::Ceiling) << u) - &result, *n);
         assert!(result < (Natural::ONE << u));
-        assert_eq!(result == 0, n.divisible_by_power_of_two(u));
+        assert_eq!(result == 0, n.divisible_by_power_of_two(u as u64));
         assert_eq!(
             result.neg_mod_power_of_two_ref(u),
             n.mod_power_of_two_ref(u)

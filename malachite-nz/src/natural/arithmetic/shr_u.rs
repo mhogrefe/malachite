@@ -3,6 +3,7 @@ use malachite_base::misc::WrappingFrom;
 use malachite_base::num::{Parity, PrimitiveInteger, ShrRound, ShrRoundAssign, Zero};
 use malachite_base::round::RoundingMode;
 use natural::arithmetic::add_u32::limbs_vec_add_limb_in_place;
+use natural::arithmetic::divisible_by_power_of_two::limbs_divisible_by_power_of_two;
 use natural::logic::bit_access::limbs_get_bit;
 use natural::Natural::{self, Large, Small};
 use std::ops::{Shr, ShrAssign};
@@ -137,7 +138,7 @@ fn limbs_shr_round_half_integer_to_even(limbs: &[u32], bits: u64) -> Vec<u32> {
 pub fn limbs_shr_round_to_nearest(limbs: &[u32], bits: u64) -> Vec<u32> {
     if !limbs_get_bit(limbs, bits - 1) {
         limbs_shr(limbs, bits)
-    } else if !Natural::from_limbs_asc(limbs).divisible_by_power_of_two((bits - 1) as u32) {
+    } else if !limbs_divisible_by_power_of_two(limbs, bits - 1) {
         limbs_shr_round_up(limbs, bits)
     } else {
         limbs_shr_round_half_integer_to_even(limbs, bits)
@@ -146,7 +147,7 @@ pub fn limbs_shr_round_to_nearest(limbs: &[u32], bits: u64) -> Vec<u32> {
 
 /// Interpreting a slice of `u32`s as the limbs (in ascending order) of a `Natural`, returns the
 /// limbs of the `Natural` right-shifted by a `u32`, if the shift is exact (doesn't remove any
-/// `true` bits). If the shift is inexact, `None` is returned.
+/// `true` bits). If the shift is inexact, `None` is returned. The limbs should not all be zero.
 ///
 /// Time: worst case O(n)
 ///
@@ -171,8 +172,7 @@ pub fn limbs_shr_round_to_nearest(limbs: &[u32], bits: u64) -> Vec<u32> {
 /// assert_eq!(limbs_shr_exact(&[4_294_967_295, 4_294_967_295], 32), None);
 /// ```
 pub fn limbs_shr_exact(limbs: &[u32], bits: u64) -> Option<Vec<u32>> {
-    //TODO use limb fns
-    if Natural::from_limbs_asc(limbs).divisible_by_power_of_two(bits as u32) {
+    if limbs_divisible_by_power_of_two(limbs, bits) {
         Some(limbs_shr(limbs, bits))
     } else {
         None
@@ -539,7 +539,7 @@ fn limbs_vec_shr_round_half_integer_to_even_in_place(limbs: &mut Vec<u32>, bits:
 pub fn limbs_vec_shr_round_to_nearest_in_place(limbs: &mut Vec<u32>, bits: u64) {
     if !limbs_get_bit(limbs, bits - 1) {
         limbs_vec_shr_in_place(limbs, bits)
-    } else if !Natural::from_limbs_asc(limbs).divisible_by_power_of_two((bits - 1) as u32) {
+    } else if !limbs_divisible_by_power_of_two(limbs, bits - 1) {
         limbs_vec_shr_round_up_in_place(limbs, bits)
     } else {
         limbs_vec_shr_round_half_integer_to_even_in_place(limbs, bits)
@@ -548,7 +548,8 @@ pub fn limbs_vec_shr_round_to_nearest_in_place(limbs: &mut Vec<u32>, bits: u64) 
 
 /// Interpreting a `Vec` of `u32`s as the limbs (in ascending order) of a `Natural`, writes the
 /// limbs of the `Natural` right-shifted by a `u32` to the input `Vec`, if the shift is exact
-/// (doesn't remove any `true` bits). Returns whether the shift was exact.
+/// (doesn't remove any `true` bits). Returns whether the shift was exact. The limbs should not all
+/// be zero.
 ///
 /// Time: worst case O(n)
 ///
@@ -596,8 +597,7 @@ pub fn limbs_vec_shr_round_to_nearest_in_place(limbs: &mut Vec<u32>, bits: u64) 
 /// assert_eq!(limbs_vec_shr_exact_in_place(&mut limbs, 32), false);
 /// ```
 pub fn limbs_vec_shr_exact_in_place(limbs: &mut Vec<u32>, bits: u64) -> bool {
-    //TODO use limb fns
-    if Natural::from_limbs_asc(limbs).divisible_by_power_of_two(bits as u32) {
+    if limbs_divisible_by_power_of_two(limbs, bits) {
         limbs_vec_shr_in_place(limbs, bits);
         true
     } else {

@@ -1,5 +1,5 @@
 use common::test_properties;
-use malachite_base::num::{Abs, One, PartialOrdAbs, ShrRound, Zero};
+use malachite_base::num::{Abs, DivisibleByPowerOfTwo, One, PartialOrdAbs, ShrRound, Zero};
 use malachite_base::round::RoundingMode;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
@@ -274,7 +274,7 @@ fn mod_power_of_two_properties() {
 
         assert_eq!((n >> u << u) + &result, *n);
         assert!(result < (Natural::ONE << u));
-        assert_eq!(result == 0, n.divisible_by_power_of_two(u));
+        assert_eq!(result == 0, n.divisible_by_power_of_two(u as u64));
         assert_eq!(result.mod_power_of_two_ref(u), result);
     });
 
@@ -326,7 +326,7 @@ fn rem_power_of_two_properties() {
 
         assert_eq!(((n.shr_round(u, RoundingMode::Down) << u) + &result), *n);
         assert!(result.lt_abs(&(Natural::ONE << u)));
-        assert_eq!(result == 0, n.divisible_by_power_of_two(u));
+        assert_eq!(result == 0, n.divisible_by_power_of_two(u as u64));
         assert_eq!(result.rem_power_of_two_ref(u), result);
         assert_eq!(n.abs().mod_power_of_two(u), result.abs());
     });
@@ -377,7 +377,7 @@ fn ceiling_mod_power_of_two_properties() {
         assert_eq!(((n.shr_round(u, RoundingMode::Ceiling) << u) + &result), *n);
         assert!(result <= 0);
         assert!(-&result <= Natural::ONE << u);
-        assert_eq!(result == 0, n.divisible_by_power_of_two(u));
+        assert_eq!(result == 0, n.divisible_by_power_of_two(u as u64));
         assert_eq!((-n).mod_power_of_two(u), -result);
     });
 

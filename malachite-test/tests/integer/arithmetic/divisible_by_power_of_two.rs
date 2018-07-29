@@ -1,5 +1,5 @@
 use common::test_properties;
-use malachite_base::num::Zero;
+use malachite_base::num::{DivisibleByPowerOfTwo, Zero};
 use malachite_nz::integer::Integer;
 use malachite_test::inputs::base::unsigneds;
 use malachite_test::inputs::integer::{integers, pairs_of_integer_and_small_unsigned};
@@ -50,18 +50,15 @@ fn test_divisible_by_power_of_two() {
 
 #[test]
 fn divisible_by_power_of_two_properties() {
-    test_properties(
-        pairs_of_integer_and_small_unsigned,
-        |&(ref x, pow): &(Integer, u32)| {
-            let divisible = x.divisible_by_power_of_two(pow);
-            if *x != 0 {
-                assert_eq!(x.trailing_zeros().unwrap() >= u64::from(pow), divisible);
-            }
-            assert_eq!((-x).divisible_by_power_of_two(pow), divisible);
-            assert!((x << pow).divisible_by_power_of_two(pow));
-            assert_eq!(x >> pow << pow == *x, divisible);
-        },
-    );
+    test_properties(pairs_of_integer_and_small_unsigned, |&(ref x, pow)| {
+        let divisible = x.divisible_by_power_of_two(pow);
+        if *x != 0 {
+            assert_eq!(x.trailing_zeros().unwrap() >= pow, divisible);
+        }
+        assert_eq!((-x).divisible_by_power_of_two(pow), divisible);
+        assert!((x << pow).divisible_by_power_of_two(pow));
+        assert_eq!(x >> pow << pow == *x, divisible);
+    });
 
     test_properties(integers, |x| {
         assert!(x.divisible_by_power_of_two(0));

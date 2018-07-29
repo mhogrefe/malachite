@@ -1,6 +1,6 @@
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::integer::pairs_of_integer_and_small_unsigned;
-use malachite_base::num::SignificantBits;
+use malachite_base::num::{DivisibleByPowerOfTwo, SignificantBits};
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_integer_divisible_by_power_of_two);
@@ -27,7 +27,7 @@ fn benchmark_integer_divisible_by_power_of_two_algorithms(
     file_name: &str,
 ) {
     m_run_benchmark(
-        "Integer.divisible_by_power_of_two(u32)",
+        "Integer.divisible_by_power_of_two(u64)",
         BenchmarkType::Algorithms,
         pairs_of_integer_and_small_unsigned(gm),
         gm.name(),
@@ -37,12 +37,12 @@ fn benchmark_integer_divisible_by_power_of_two_algorithms(
         "n.significant_bits()",
         &mut [
             (
-                "Integer.divisible_by_power_of_2(u32)",
+                "Integer.divisible_by_power_of_2(u64)",
                 &mut (|(n, pow)| no_out!(n.divisible_by_power_of_two(pow))),
             ),
             (
-                "Integer.trailing_zeros().map_or(true, |z| z >= u32)",
-                &mut (|(n, pow)| no_out!(n.trailing_zeros().map_or(true, |z| z >= u64::from(pow)))),
+                "Integer.trailing_zeros().map_or(true, |z| z >= u64)",
+                &mut (|(n, pow)| no_out!(n.trailing_zeros().map_or(true, |z| z >= pow))),
             ),
         ],
     );

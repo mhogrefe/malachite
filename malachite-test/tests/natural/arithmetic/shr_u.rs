@@ -127,12 +127,6 @@ fn test_limbs_shr_exact_and_limbs_vec_shr_exact_in_place() {
             assert_eq!(None, out)
         }
     };
-    test(&[], 0, Some(vec![]));
-    test(&[], 1, Some(vec![]));
-    test(&[], 100, Some(vec![]));
-    test(&[0, 0, 0], 0, Some(vec![0, 0, 0]));
-    test(&[0, 0, 0], 1, Some(vec![0, 0, 0]));
-    test(&[0, 0, 0], 100, Some(vec![]));
     test(&[1], 0, Some(vec![1]));
     test(&[1], 1, None);
     test(&[3], 1, None);
@@ -344,16 +338,19 @@ fn limbs_shr_round_to_nearest_properties() {
 
 #[test]
 fn limbs_shr_exact_properties() {
-    test_properties(pairs_of_unsigned_vec_and_small_u64, |&(ref limbs, bits)| {
-        let n = Natural::from_limbs_asc(limbs);
-        if let Some(result_limbs) = limbs_shr_exact(limbs, bits) {
-            let m = (&n).shr_round(bits, RoundingMode::Exact);
-            assert_eq!(Natural::from_owned_limbs_asc(result_limbs), m);
-            assert_eq!(m << bits, n);
-        } else {
-            assert_ne!(&n >> bits << bits, n);
-        }
-    });
+    test_properties(
+        pairs_of_unsigned_vec_and_small_u64_var_1,
+        |&(ref limbs, bits)| {
+            let n = Natural::from_limbs_asc(limbs);
+            if let Some(result_limbs) = limbs_shr_exact(limbs, bits) {
+                let m = (&n).shr_round(bits, RoundingMode::Exact);
+                assert_eq!(Natural::from_owned_limbs_asc(result_limbs), m);
+                assert_eq!(m << bits, n);
+            } else {
+                assert_ne!(&n >> bits << bits, n);
+            }
+        },
+    );
 }
 
 #[test]
@@ -450,17 +447,20 @@ fn limbs_vec_shr_round_to_nearest_in_place_properties() {
 
 #[test]
 fn limbs_vec_shr_exact_in_place_properties() {
-    test_properties(pairs_of_unsigned_vec_and_small_u64, |&(ref limbs, bits)| {
-        let n = Natural::from_limbs_asc(limbs);
-        let mut limbs = limbs.to_vec();
-        if limbs_vec_shr_exact_in_place(&mut limbs, bits) {
-            let m = (&n).shr_round(bits, RoundingMode::Exact);
-            assert_eq!(Natural::from_owned_limbs_asc(limbs), m);
-            assert_eq!(m << bits, n);
-        } else {
-            assert_ne!(&n >> bits << bits, n);
-        }
-    });
+    test_properties(
+        pairs_of_unsigned_vec_and_small_u64_var_1,
+        |&(ref limbs, bits)| {
+            let n = Natural::from_limbs_asc(limbs);
+            let mut limbs = limbs.to_vec();
+            if limbs_vec_shr_exact_in_place(&mut limbs, bits) {
+                let m = (&n).shr_round(bits, RoundingMode::Exact);
+                assert_eq!(Natural::from_owned_limbs_asc(limbs), m);
+                assert_eq!(m << bits, n);
+            } else {
+                assert_ne!(&n >> bits << bits, n);
+            }
+        },
+    );
 }
 
 #[test]

@@ -379,6 +379,10 @@ pub trait Parity {
     fn is_odd(&self) -> bool;
 }
 
+pub trait DivisibleByPowerOfTwo {
+    fn divisible_by_power_of_two(&self, pow: u64) -> bool;
+}
+
 //TODO is_positive, is_negative, sign
 
 macro_rules! lossless_checked_from_impl {
@@ -586,6 +590,7 @@ pub trait PrimitiveInteger:
     + Display
     + Div<Output = Self>
     + DivAssign
+    + DivisibleByPowerOfTwo
     + Endian
     + Eq
     + FromStr
@@ -1578,6 +1583,12 @@ macro_rules! unsigned_traits {
                 }
             }
         }
+
+        impl DivisibleByPowerOfTwo for $t {
+            fn divisible_by_power_of_two(&self, pow: u64) -> bool {
+                *self == 0 || (pow < $t::WIDTH.into() && *self & ((1 << pow) - 1) == 0)
+            }
+        }
     };
 }
 
@@ -1889,6 +1900,12 @@ macro_rules! signed_traits {
                         Some(index)
                     }
                 }
+            }
+        }
+
+        impl DivisibleByPowerOfTwo for $t {
+            fn divisible_by_power_of_two(&self, pow: u64) -> bool {
+                self.to_unsigned_bitwise().divisible_by_power_of_two(pow)
             }
         }
     };

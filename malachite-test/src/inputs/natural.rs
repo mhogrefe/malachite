@@ -3,7 +3,8 @@ use inputs::base::pairs_of_unsigneds;
 use inputs::common::{reshape_1_2_to_3, reshape_2_1_to_3};
 use malachite_base::misc::CheckedFrom;
 use malachite_base::num::{
-    PrimitiveInteger, PrimitiveSigned, PrimitiveUnsigned, SignificantBits, UnsignedAbs,
+    DivisibleByPowerOfTwo, PrimitiveInteger, PrimitiveSigned, PrimitiveUnsigned, SignificantBits,
+    UnsignedAbs,
 };
 use malachite_base::round::RoundingMode;
 use malachite_nz::natural::Natural;
@@ -382,7 +383,7 @@ pub fn pairs_of_natural_and_small_unsigned_var_2<T: PrimitiveUnsigned>(
 ) -> Box<Iterator<Item = (Natural, T)>> {
     Box::new(
         pairs_of_natural_and_small_unsigned::<T>(gm)
-            .filter(|&(ref n, u)| !n.divisible_by_power_of_two(u.checked_into().unwrap())),
+            .filter(|&(ref n, u)| !n.divisible_by_power_of_two(u.into())),
     )
 }
 
@@ -639,13 +640,13 @@ pub fn triples_of_natural_small_signed_and_rounding_mode_var_1<T: PrimitiveSigne
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (Natural, T, RoundingMode)>>
 where
-    u32: CheckedFrom<<T as UnsignedAbs>::Output>,
+    u64: CheckedFrom<<T as UnsignedAbs>::Output>,
 {
     Box::new(
         triples_of_natural_small_signed_and_rounding_mode::<T>(gm).filter(|&(ref n, i, rm)| {
             i >= T::ZERO
                 || rm != RoundingMode::Exact
-                || n.divisible_by_power_of_two(u32::checked_from(i.unsigned_abs()).unwrap())
+                || n.divisible_by_power_of_two(u64::checked_from(i.unsigned_abs()).unwrap())
         }),
     )
 }
@@ -657,13 +658,13 @@ pub fn triples_of_natural_small_signed_and_rounding_mode_var_2<T: PrimitiveSigne
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (Natural, T, RoundingMode)>>
 where
-    u32: CheckedFrom<T>,
+    u64: CheckedFrom<T>,
 {
     Box::new(
         triples_of_natural_small_signed_and_rounding_mode(gm).filter(|&(ref n, i, rm)| {
             i <= T::ZERO
                 || rm != RoundingMode::Exact
-                || n.divisible_by_power_of_two(u32::checked_from(i).unwrap())
+                || n.divisible_by_power_of_two(u64::checked_from(i).unwrap())
         }),
     )
 }
