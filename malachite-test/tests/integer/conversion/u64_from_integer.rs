@@ -1,6 +1,6 @@
 use common::test_properties;
 use malachite_base::misc::{CheckedFrom, WrappingFrom};
-use malachite_base::num::{PrimitiveInteger, SignificantBits};
+use malachite_base::num::{ModPowerOfTwo, PrimitiveInteger, SignificantBits};
 use malachite_nz::integer::Integer;
 use malachite_test::inputs::integer::integers;
 use std::cmp::Ordering;
@@ -62,13 +62,12 @@ fn u64_checked_from_integer_properties() {
 
 #[test]
 fn u64_wrapping_from_integer_properties() {
-    // TODO relate with BitAnd
     test_properties(integers, |x| {
         let result = u64::wrapping_from(x);
         assert_eq!(result.wrapping_add(u64::wrapping_from(&-x)), 0);
         assert_eq!(
             result,
-            u64::checked_from(&x.mod_power_of_two_ref(u64::WIDTH)).unwrap()
+            u64::checked_from(&(&x).mod_power_of_two(u64::WIDTH.into())).unwrap()
         );
     });
 }

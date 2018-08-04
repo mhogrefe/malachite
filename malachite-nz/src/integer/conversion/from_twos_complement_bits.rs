@@ -1,4 +1,4 @@
-use integer::conversion::to_twos_complement_limbs::limbs_slice_to_twos_complement_limbs_negative;
+use integer::conversion::to_twos_complement_limbs::limbs_twos_complement_in_place;
 use integer::Integer;
 use malachite_base::num::{PrimitiveInteger, Zero};
 use natural::conversion::from_bits::{limbs_asc_from_bits_asc, limbs_asc_from_bits_desc};
@@ -12,7 +12,7 @@ fn limbs_asc_from_negative_twos_complement_limbs_asc(mut limbs: Vec<u32>) -> Vec
             *most_significant_limb |= !((1 << (u32::WIDTH - leading_zeros)) - 1);
         }
     }
-    assert!(!limbs_slice_to_twos_complement_limbs_negative(&mut limbs));
+    assert!(!limbs_twos_complement_in_place(&mut limbs));
     limbs
 }
 

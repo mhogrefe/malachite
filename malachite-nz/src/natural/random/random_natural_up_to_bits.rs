@@ -1,4 +1,4 @@
-use malachite_base::num::{PrimitiveInteger, Zero};
+use malachite_base::num::{ModPowerOfTwoAssign, PrimitiveInteger, Zero};
 use natural::Natural;
 use rand::Rng;
 
@@ -26,7 +26,7 @@ pub fn random_natural_up_to_bits<R: Rng>(rng: &mut R, bits: u64) -> Natural {
     if bits == 0 {
         return Natural::ZERO;
     }
-    let remainder_bits = (bits & u64::from(u32::WIDTH_MASK)) as u32;
+    let remainder_bits = bits & u64::from(u32::WIDTH_MASK);
     let limb_count = if remainder_bits == 0 {
         bits >> u32::LOG_WIDTH
     } else {
@@ -37,7 +37,8 @@ pub fn random_natural_up_to_bits<R: Rng>(rng: &mut R, bits: u64) -> Natural {
         limbs.push(rng.gen());
     }
     if remainder_bits != 0 {
-        *limbs.last_mut().unwrap() &= (1 << remainder_bits) - 1;
+        let last_limb: &mut u32 = limbs.last_mut().unwrap();
+        last_limb.mod_power_of_two_assign(remainder_bits);
     }
     Natural::from_owned_limbs_asc(limbs)
 }

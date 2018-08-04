@@ -383,6 +383,46 @@ pub trait DivisibleByPowerOfTwo {
     fn divisible_by_power_of_two(&self, pow: u64) -> bool;
 }
 
+pub trait ModPowerOfTwo {
+    type Output;
+
+    fn mod_power_of_two(self, other: u64) -> Self::Output;
+}
+
+pub trait ModPowerOfTwoAssign {
+    fn mod_power_of_two_assign(&mut self, other: u64);
+}
+
+pub trait NegModPowerOfTwo {
+    type Output;
+
+    fn neg_mod_power_of_two(self, other: u64) -> Self::Output;
+}
+
+pub trait NegModPowerOfTwoAssign {
+    fn neg_mod_power_of_two_assign(&mut self, other: u64);
+}
+
+pub trait RemPowerOfTwo {
+    type Output;
+
+    fn rem_power_of_two(self, other: u64) -> Self::Output;
+}
+
+pub trait RemPowerOfTwoAssign {
+    fn rem_power_of_two_assign(&mut self, other: u64);
+}
+
+pub trait CeilingModPowerOfTwo {
+    type Output;
+
+    fn ceiling_mod_power_of_two(self, other: u64) -> Self::Output;
+}
+
+pub trait CeilingModPowerOfTwoAssign {
+    fn ceiling_mod_power_of_two_assign(&mut self, other: u64);
+}
+
 //TODO is_positive, is_negative, sign
 
 macro_rules! lossless_checked_from_impl {
@@ -737,8 +777,12 @@ pub trait PrimitiveUnsigned:
     + FromU32Slice
     + Into<u64>
     + IsPowerOfTwo
+    + ModPowerOfTwo<Output = Self>
+    + ModPowerOfTwoAssign
     + NextPowerOfTwo
     + PrimitiveInteger
+    + RemPowerOfTwo<Output = Self>
+    + RemPowerOfTwoAssign
 {
     type SignedOfEqualWidth: PrimitiveSigned;
 
@@ -843,10 +887,9 @@ pub trait PrimitiveFloat:
 
     fn to_adjusted_mantissa_and_exponent(self) -> (Self::UnsignedOfEqualWidth, u32) {
         let bits = self.to_bits();
-        let one = Self::UnsignedOfEqualWidth::ONE;
-        let mantissa = bits & ((one << Self::MANTISSA_WIDTH) - one);
+        let mantissa = bits.mod_power_of_two(Self::MANTISSA_WIDTH.into());
         let exponent: u32 = (bits >> Self::MANTISSA_WIDTH).checked_into().unwrap();
-        let exponent = exponent & ((1 << Self::EXPONENT_WIDTH) - 1);
+        let exponent = exponent.mod_power_of_two(Self::EXPONENT_WIDTH.into());
         (mantissa, exponent)
     }
 
@@ -1586,7 +1629,41 @@ macro_rules! unsigned_traits {
 
         impl DivisibleByPowerOfTwo for $t {
             fn divisible_by_power_of_two(&self, pow: u64) -> bool {
-                *self == 0 || (pow < $t::WIDTH.into() && *self & ((1 << pow) - 1) == 0)
+                self.mod_power_of_two(pow) == 0
+            }
+        }
+
+        impl ModPowerOfTwo for $t {
+            type Output = $t;
+
+            fn mod_power_of_two(self, pow: u64) -> $t {
+                if self == 0 || pow >= $t::WIDTH.into() {
+                    self
+                } else {
+                    self & ((1 << pow) - 1)
+                }
+            }
+        }
+
+        impl ModPowerOfTwoAssign for $t {
+            fn mod_power_of_two_assign(&mut self, pow: u64) {
+                if *self != 0 && pow < $t::WIDTH.into() {
+                    *self &= (1 << pow) - 1;
+                }
+            }
+        }
+
+        impl RemPowerOfTwo for $t {
+            type Output = $t;
+
+            fn rem_power_of_two(self, pow: u64) -> $t {
+                self.mod_power_of_two(pow)
+            }
+        }
+
+        impl RemPowerOfTwoAssign for $t {
+            fn rem_power_of_two_assign(&mut self, pow: u64) {
+                self.mod_power_of_two_assign(pow)
             }
         }
     };

@@ -59,8 +59,7 @@ impl DivisibleByPowerOfTwo for Natural {
     /// ```
     fn divisible_by_power_of_two(&self, pow: u64) -> bool {
         match (self, pow) {
-            (_, 0) | (&Small(0), _) => true,
-            (&Small(_), pow) if pow >= u32::WIDTH.into() => false,
+            (_, 0) => true,
             (&Small(small), pow) => small.divisible_by_power_of_two(pow),
             (&Large(ref limbs), pow) => limbs_divisible_by_power_of_two(limbs, pow),
         }

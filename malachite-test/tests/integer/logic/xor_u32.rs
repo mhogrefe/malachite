@@ -218,7 +218,7 @@ fn limbs_neg_xor_limb_to_out_properties() {
                 let mut result_limbs = Natural::checked_from(
                     -(Integer::from(Natural::from_limbs_asc(in_limbs)) ^ limb),
                 ).unwrap()
-                    .to_limbs_asc();
+                .to_limbs_asc();
                 result_limbs.resize(len, 0);
                 assert_eq!(result_limbs, &out_limbs[..len]);
             } else {
@@ -241,7 +241,7 @@ fn limbs_slice_neg_xor_limb_in_place_properties() {
             let mut result_limbs = Natural::checked_from(
                 -(Integer::from(Natural::from_owned_limbs_asc(old_limbs)) ^ limb),
             ).unwrap()
-                .to_limbs_asc();
+            .to_limbs_asc();
             result_limbs.resize(limbs.len(), 0);
             assert_eq!(result_limbs, limbs);
         } else {

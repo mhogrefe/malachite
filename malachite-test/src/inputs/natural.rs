@@ -368,14 +368,14 @@ pub fn rm_pairs_of_natural_and_small_unsigned<T: PrimitiveUnsigned>(
     )
 }
 
-// All pairs of `Natural` and `u32` where the `Natural` is divisible by 2 to the power of the `u32`.
-pub fn pairs_of_natural_and_small_u32_var_1(
+// All pairs of `Natural` and `T`, where `T` is unsigned and the `Natural` is divisible by 2 to the
+// power of the `T`.
+pub fn pairs_of_natural_and_small_unsigned_var_1<T: PrimitiveUnsigned>(
     gm: GenerationMode,
-) -> Box<Iterator<Item = (Natural, u32)>> {
-    Box::new(pairs_of_natural_and_small_unsigned(gm).map(|(n, u)| (n << u, u)))
+) -> Box<Iterator<Item = (Natural, T)>> {
+    Box::new(pairs_of_natural_and_small_unsigned::<T>(gm).map(|(n, u)| (n << u.into(), u)))
 }
 
-//TODO divisible_by_power_of_two
 // All pairs of `Natural` and `T`, where `T` is unsigned and the `Natural` is not divisible by 2 to
 // the power of the `T`.
 pub fn pairs_of_natural_and_small_unsigned_var_2<T: PrimitiveUnsigned>(
@@ -692,7 +692,6 @@ fn triples_of_natural_small_unsigned_and_rounding_mode<T: PrimitiveUnsigned>(
     }
 }
 
-//TODO use divisible_by_power_of_two u64 version
 // All triples of `Natural`, `u32`, and `RoundingMode`, where if the `RoundingMode` is
 // `RoundingMode::Exact`, the `Natural` is divisible by 2 to the power of the `u32`.
 pub fn triples_of_natural_small_unsigned_and_rounding_mode_var_1<T: PrimitiveUnsigned>(
@@ -700,7 +699,7 @@ pub fn triples_of_natural_small_unsigned_and_rounding_mode_var_1<T: PrimitiveUns
 ) -> Box<Iterator<Item = (Natural, T, RoundingMode)>> {
     Box::new(
         triples_of_natural_small_unsigned_and_rounding_mode::<T>(gm).filter(|&(ref n, u, rm)| {
-            rm != RoundingMode::Exact || n.divisible_by_power_of_two(u.checked_into().unwrap())
+            rm != RoundingMode::Exact || n.divisible_by_power_of_two(u.into())
         }),
     )
 }

@@ -13,10 +13,10 @@ use std::str::FromStr;
 use std::u32;
 
 #[test]
-pub fn test_limbs_to_twos_complement_limbs_non_negative() {
+pub fn test_limbs_maybe_sign_extend_non_negative_in_place() {
     let test = |limbs: &[u32], out_limbs: &[u32]| {
         let mut mut_limbs = limbs.to_vec();
-        limbs_to_twos_complement_limbs_non_negative(&mut mut_limbs);
+        limbs_maybe_sign_extend_non_negative_in_place(&mut mut_limbs);
         assert_eq!(mut_limbs, out_limbs);
     };
     test(&[], &[]);
@@ -25,27 +25,18 @@ pub fn test_limbs_to_twos_complement_limbs_non_negative() {
 }
 
 #[test]
-pub fn test_limbs_slice_to_twos_complement_limbs_negative() {
+pub fn test_limbs_twos_complement_in_place() {
     let test = |limbs: &[u32], out_limbs: &[u32], carry: bool| {
         let mut mut_limbs = limbs.to_vec();
-        assert_eq!(
-            limbs_slice_to_twos_complement_limbs_negative(&mut mut_limbs),
-            carry
-        );
+        assert_eq!(limbs_twos_complement_in_place(&mut mut_limbs), carry);
         assert_eq!(mut_limbs, out_limbs);
 
         let mut mut_limbs = limbs.to_vec();
-        assert_eq!(
-            limbs_slice_to_twos_complement_limbs_negative_alt_1(&mut mut_limbs),
-            carry
-        );
+        assert_eq!(limbs_twos_complement_in_place_alt_1(&mut mut_limbs), carry);
         assert_eq!(mut_limbs, out_limbs);
 
         let mut mut_limbs = limbs.to_vec();
-        assert_eq!(
-            limbs_slice_to_twos_complement_limbs_negative_alt_2(&mut mut_limbs),
-            carry
-        );
+        assert_eq!(limbs_twos_complement_in_place_alt_2(&mut mut_limbs), carry);
         assert_eq!(mut_limbs, out_limbs);
     };
     test(&[], &[], true);
@@ -54,10 +45,10 @@ pub fn test_limbs_slice_to_twos_complement_limbs_negative() {
 }
 
 #[test]
-pub fn test_limbs_vec_to_twos_complement_limbs_negative() {
+pub fn test_limbs_twos_complement_and_maybe_sign_extend_negative_in_place() {
     let test = |limbs: &[u32], out_limbs: &[u32]| {
         let mut mut_limbs = limbs.to_vec();
-        limbs_vec_to_twos_complement_limbs_negative(&mut mut_limbs);
+        limbs_twos_complement_and_maybe_sign_extend_negative_in_place(&mut mut_limbs);
         assert_eq!(mut_limbs, out_limbs);
     };
     test(&[1, 2, 3], &[0xffff_ffff, 0xffff_fffd, 0xffff_fffc]);
@@ -65,13 +56,10 @@ pub fn test_limbs_vec_to_twos_complement_limbs_negative() {
 }
 
 #[test]
-#[should_panic(
-    expected = "assertion failed: !limbs_slice_to_twos_complement_limbs_negative\
-                (limbs)"
-)]
-fn limbs_vec_to_twos_complement_limbs_negative_fail() {
+#[should_panic(expected = "assertion failed: !limbs_twos_complement_in_place(limbs)")]
+fn limbs_twos_complement_and_maybe_sign_extend_negative_in_place_fail() {
     let mut mut_limbs = vec![0, 0, 0];
-    limbs_vec_to_twos_complement_limbs_negative(&mut mut_limbs);
+    limbs_twos_complement_and_maybe_sign_extend_negative_in_place(&mut mut_limbs);
 }
 
 #[test]
@@ -185,10 +173,10 @@ fn test_twos_complement_limbs_desc() {
 const LAST_INDEX: u64 = u32::WIDTH as u64 - 1;
 
 #[test]
-fn limbs_to_twos_complement_limbs_non_negative_properties() {
+fn limbs_maybe_sign_extend_non_negative_in_place_properties() {
     test_properties(vecs_of_unsigned, |limbs| {
         let mut mut_limbs = limbs.clone();
-        limbs_to_twos_complement_limbs_non_negative(&mut mut_limbs);
+        limbs_maybe_sign_extend_non_negative_in_place(&mut mut_limbs);
         if !limbs.is_empty() && *limbs.last().unwrap() != 0 {
             let n = Integer::from(Natural::from_limbs_asc(limbs));
             assert_eq!(n.to_twos_complement_limbs_asc(), mut_limbs);
@@ -197,15 +185,15 @@ fn limbs_to_twos_complement_limbs_non_negative_properties() {
 }
 
 #[test]
-fn limbs_slice_to_twos_complement_limbs_negative_properties() {
+fn limbs_twos_complement_in_place_properties() {
     test_properties(vecs_of_unsigned, |limbs| {
         let mut mut_limbs = limbs.clone();
-        limbs_slice_to_twos_complement_limbs_negative(&mut mut_limbs);
+        limbs_twos_complement_in_place(&mut mut_limbs);
         let mut mut_limbs_alt = limbs.clone();
-        limbs_slice_to_twos_complement_limbs_negative_alt_1(&mut mut_limbs_alt);
+        limbs_twos_complement_in_place_alt_1(&mut mut_limbs_alt);
         assert_eq!(mut_limbs_alt, mut_limbs);
         let mut mut_limbs_alt = limbs.clone();
-        limbs_slice_to_twos_complement_limbs_negative_alt_2(&mut mut_limbs_alt);
+        limbs_twos_complement_in_place_alt_2(&mut mut_limbs_alt);
         assert_eq!(mut_limbs_alt, mut_limbs);
         if !limbs.is_empty()
             && *limbs.last().unwrap() != 0
@@ -218,10 +206,10 @@ fn limbs_slice_to_twos_complement_limbs_negative_properties() {
 }
 
 #[test]
-fn limbs_vec_to_twos_complement_limbs_negative_properties() {
+fn limbs_twos_complement_and_maybe_sign_extend_negative_in_place_properties() {
     test_properties(vecs_of_u32_var_1, |limbs| {
         let mut mut_limbs = limbs.clone();
-        limbs_vec_to_twos_complement_limbs_negative(&mut mut_limbs);
+        limbs_twos_complement_and_maybe_sign_extend_negative_in_place(&mut mut_limbs);
         if !limbs.is_empty() && *limbs.last().unwrap() != 0 {
             let n = -Natural::from_limbs_asc(limbs);
             assert_eq!(n.to_twos_complement_limbs_asc(), mut_limbs);

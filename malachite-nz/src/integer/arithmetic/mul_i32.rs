@@ -65,11 +65,7 @@ impl<'a> Mul<i32> for &'a Integer {
             Integer::ZERO
         } else {
             Integer {
-                sign: if other > 0 {
-                    self.sign
-                } else {
-                    !self.sign
-                },
+                sign: if other > 0 { self.sign } else { !self.sign },
                 abs: &self.abs * other.unsigned_abs(),
             }
         }

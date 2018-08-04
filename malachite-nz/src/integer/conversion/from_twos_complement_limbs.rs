@@ -1,4 +1,6 @@
-use integer::conversion::to_twos_complement_limbs::limbs_slice_to_twos_complement_limbs_negative;
+use integer::conversion::to_twos_complement_limbs::{
+    limbs_twos_complement, limbs_twos_complement_in_place,
+};
 use integer::Integer;
 use malachite_base::num::{BitAccess, PrimitiveInteger, Zero};
 use natural::Natural;
@@ -40,9 +42,7 @@ impl Integer {
         } else if !limbs.last().unwrap().get_bit(u64::from(u32::WIDTH) - 1) {
             Natural::from_limbs_asc(limbs).into()
         } else {
-            let mut limbs = limbs.to_vec();
-            assert!(!limbs_slice_to_twos_complement_limbs_negative(&mut limbs));
-            -Natural::from_owned_limbs_asc(limbs)
+            -Natural::from_owned_limbs_asc(limbs_twos_complement(limbs))
         }
     }
 
@@ -120,7 +120,7 @@ impl Integer {
         } else if !limbs.last().unwrap().get_bit(u64::from(u32::WIDTH) - 1) {
             Natural::from_owned_limbs_asc(limbs).into()
         } else {
-            assert!(!limbs_slice_to_twos_complement_limbs_negative(&mut limbs));
+            assert!(!limbs_twos_complement_in_place(&mut limbs));
             -Natural::from_owned_limbs_asc(limbs)
         }
     }

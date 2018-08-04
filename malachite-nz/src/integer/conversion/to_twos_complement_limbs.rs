@@ -1,4 +1,5 @@
 use integer::Integer;
+use malachite_base::limbs::limbs_leading_zero_limbs;
 use malachite_base::num::{BitAccess, PrimitiveInteger};
 use natural::arithmetic::add_u32::limbs_slice_add_limb_in_place;
 use natural::conversion::to_limbs::LimbIterator;
@@ -300,6 +301,18 @@ impl<'a> DoubleEndedIterator for TwosComplementLimbIterator<'a> {
     }
 }
 
+pub fn limbs_twos_complement(limbs: &[u32]) -> Vec<u32> {
+    let i = limbs_leading_zero_limbs(limbs);
+    let mut result_limbs = vec![0; i];
+    if i != limbs.len() {
+        result_limbs.push(limbs[i].wrapping_neg());
+        for limb in &limbs[i + 1..] {
+            result_limbs.push(!limb);
+        }
+    }
+    result_limbs
+}
+
 /// Given the limbs, or base-2<sup>32</sup> digits, of a non-negative `Integer`, in ascending order,
 /// checks whether the most significant bit is `false`; if it isn't, appends an extra zero bit. This
 /// way the `Integer`'s non-negativity is preserved in its limbs.
@@ -313,23 +326,23 @@ impl<'a> DoubleEndedIterator for TwosComplementLimbIterator<'a> {
 /// use malachite_nz::integer::conversion::to_twos_complement_limbs::*;
 ///
 /// let mut limbs = vec![1, 2, 3];
-/// limbs_to_twos_complement_limbs_non_negative(&mut limbs);
+/// limbs_maybe_sign_extend_non_negative_in_place(&mut limbs);
 /// assert_eq!(limbs, &[1, 2, 3]);
 ///
 /// let mut limbs = vec![1, 2, 0xffff_ffff];
-/// limbs_to_twos_complement_limbs_non_negative(&mut limbs);
+/// limbs_maybe_sign_extend_non_negative_in_place(&mut limbs);
 /// assert_eq!(limbs, &[1, 2, 0xffff_ffff, 0]);
 /// ```
-pub fn limbs_to_twos_complement_limbs_non_negative(limbs: &mut Vec<u32>) {
+pub fn limbs_maybe_sign_extend_non_negative_in_place(limbs: &mut Vec<u32>) {
     if !limbs.is_empty() && limbs.last().unwrap().get_bit(u64::from(u32::WIDTH) - 1) {
         // Sign-extend with an extra 0 limb to indicate a positive Integer
         limbs.push(0);
     }
 }
 
-/// Given the limbs, or base-2<sup>32</sup> digits, of the absolute value of a negative `Integer`,
-/// in ascending order, converts the limbs to two's complement. Returns whether there is a carry
-/// left over from the two's complement conversion process.
+/// Given the limbs, or base-2<sup>32</sup> digits, of the absolute value of an `Integer`, in
+/// ascending order, converts the limbs to two's complement. Returns whether there is a carry left
+/// over from the two's complement conversion process.
 ///
 /// Time: worst case O(n)
 ///
@@ -342,14 +355,14 @@ pub fn limbs_to_twos_complement_limbs_non_negative(limbs: &mut Vec<u32>) {
 /// use malachite_nz::integer::conversion::to_twos_complement_limbs::*;
 ///
 /// let mut limbs = &mut [1, 2, 3];
-/// assert!(!limbs_slice_to_twos_complement_limbs_negative(limbs));
+/// assert!(!limbs_twos_complement_in_place(limbs));
 /// assert_eq!(limbs, &[0xffff_ffff, 0xffff_fffd, 0xffff_fffc]);
 ///
 /// let mut limbs = &mut [0, 0, 0];
-/// assert!(limbs_slice_to_twos_complement_limbs_negative(limbs));
+/// assert!(limbs_twos_complement_in_place(limbs));
 /// assert_eq!(limbs, &[0, 0, 0]);
 /// ```
-pub fn limbs_slice_to_twos_complement_limbs_negative(limbs: &mut [u32]) -> bool {
+pub fn limbs_twos_complement_in_place(limbs: &mut [u32]) -> bool {
     limbs_not_in_place(limbs);
     limbs_slice_add_limb_in_place(limbs, 1)
 }
@@ -374,15 +387,15 @@ pub fn limbs_slice_to_twos_complement_limbs_negative(limbs: &mut [u32]) -> bool 
 /// use malachite_nz::integer::conversion::to_twos_complement_limbs::*;
 ///
 /// let mut limbs = vec![1, 2, 3];
-/// limbs_vec_to_twos_complement_limbs_negative(&mut limbs);
+/// limbs_twos_complement_and_maybe_sign_extend_negative_in_place(&mut limbs);
 /// assert_eq!(limbs, &[0xffff_ffff, 0xffff_fffd, 0xffff_fffc]);
 ///
 /// let mut limbs = vec![0, 0xffff_ffff];
-/// limbs_vec_to_twos_complement_limbs_negative(&mut limbs);
+/// limbs_twos_complement_and_maybe_sign_extend_negative_in_place(&mut limbs);
 /// assert_eq!(limbs, &[0, 1, 0xffff_ffff]);
 /// ```
-pub fn limbs_vec_to_twos_complement_limbs_negative(limbs: &mut Vec<u32>) {
-    assert!(!limbs_slice_to_twos_complement_limbs_negative(limbs));
+pub fn limbs_twos_complement_and_maybe_sign_extend_negative_in_place(limbs: &mut Vec<u32>) {
+    assert!(!limbs_twos_complement_in_place(limbs));
     if !limbs.last().unwrap().get_bit(u64::from(u32::WIDTH) - 1) {
         // Sign-extend with an extra !0 limb to indicate a negative Integer
         limbs.push(u32::MAX);
@@ -430,9 +443,9 @@ impl Integer {
     pub fn to_twos_complement_limbs_asc(&self) -> Vec<u32> {
         let mut limbs = self.abs.to_limbs_asc();
         if self.sign {
-            limbs_to_twos_complement_limbs_non_negative(&mut limbs);
+            limbs_maybe_sign_extend_non_negative_in_place(&mut limbs);
         } else {
-            limbs_vec_to_twos_complement_limbs_negative(&mut limbs);
+            limbs_twos_complement_and_maybe_sign_extend_negative_in_place(&mut limbs);
         }
         limbs
     }
@@ -521,9 +534,9 @@ impl Integer {
     pub fn into_twos_complement_limbs_asc(self) -> Vec<u32> {
         let mut limbs = self.abs.into_limbs_asc();
         if self.sign {
-            limbs_to_twos_complement_limbs_non_negative(&mut limbs);
+            limbs_maybe_sign_extend_non_negative_in_place(&mut limbs);
         } else {
-            limbs_vec_to_twos_complement_limbs_negative(&mut limbs);
+            limbs_twos_complement_and_maybe_sign_extend_negative_in_place(&mut limbs);
         }
         limbs
     }

@@ -651,9 +651,9 @@ fn limbs_xor_neg_neg_to_out_properties() {
         let xs_old = xs.clone();
         limbs_xor_neg_neg_to_out(&mut xs, ys, zs);
         let len = max(ys.len(), zs.len());
-        let result = Natural::checked_from(
-            -Natural::from_limbs_asc(ys) ^ -Natural::from_limbs_asc(zs),
-        ).unwrap();
+        let result =
+            Natural::checked_from(-Natural::from_limbs_asc(ys) ^ -Natural::from_limbs_asc(zs))
+                .unwrap();
         let mut expected_limbs = result.to_limbs_asc();
         expected_limbs.resize(len, 0);
         assert_eq!(&xs[..len], expected_limbs.as_slice());

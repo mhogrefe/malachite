@@ -9,7 +9,6 @@ use malachite_test::inputs::integer::{natural_integers, pairs_of_integer_and_sma
 use rug;
 use std::str::FromStr;
 
-//TODO continue removing duplication
 #[test]
 pub fn test_limbs_get_bit_neg() {
     let test = |limbs: &[u32], index: u64, out: bool| {

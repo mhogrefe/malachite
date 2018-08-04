@@ -103,9 +103,9 @@ pub fn limbs_delete_left(limbs: &mut Vec<u32>, delete_size: usize) {
 
 //TODO docs and tests
 pub fn limbs_leading_zero_limbs(limbs: &[u32]) -> usize {
-    limbs.iter().take_while(|&&y| y == 0).count()
+    limbs.iter().take_while(|&&limb| limb == 0).count()
 }
 
 pub fn limbs_trailing_zero_limbs(limbs: &[u32]) -> usize {
-    limbs.iter().rev().take_while(|&&y| y == 0).count()
+    limbs.iter().rev().take_while(|&&limb| limb == 0).count()
 }

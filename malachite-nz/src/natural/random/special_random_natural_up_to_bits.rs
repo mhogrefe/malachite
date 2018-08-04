@@ -1,4 +1,4 @@
-use malachite_base::num::{BitAccess, PrimitiveInteger};
+use malachite_base::num::{BitAccess, ModPowerOfTwoAssign, PrimitiveInteger};
 use natural::arithmetic::add_u32::limbs_slice_add_limb_in_place;
 use natural::Natural;
 use rand::distributions::{IndependentSample, Range};
@@ -11,7 +11,7 @@ pub fn limbs_special_random_up_to_bits<R: Rng>(rng: &mut R, bits: u64) -> Vec<u3
     if bits == 0 {
         return Vec::new();
     }
-    let remainder_bits = (bits & u64::from(u32::WIDTH_MASK)) as u32;
+    let remainder_bits = bits & u64::from(u32::WIDTH_MASK);
     let limb_count = if remainder_bits == 0 {
         bits >> u32::LOG_WIDTH
     } else {
@@ -43,7 +43,10 @@ pub fn limbs_special_random_up_to_bits<R: Rng>(rng: &mut R, bits: u64) -> Vec<u3
         }
     }
     if remainder_bits != 0 {
-        *limbs.last_mut().unwrap() &= (1 << remainder_bits) - 1;
+        limbs
+            .last_mut()
+            .unwrap()
+            .mod_power_of_two_assign(remainder_bits);
     }
     limbs
 }

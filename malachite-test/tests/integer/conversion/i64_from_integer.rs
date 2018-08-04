@@ -1,6 +1,8 @@
 use common::test_properties;
 use malachite_base::misc::{CheckedFrom, WrappingFrom};
-use malachite_base::num::{One, PrimitiveInteger, SignificantBits};
+use malachite_base::num::{
+    ModPowerOfTwo, One, PrimitiveInteger, PrimitiveUnsigned, SignificantBits,
+};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_test::inputs::integer::integers;
@@ -67,9 +69,14 @@ fn i64_checked_from_integer_properties() {
 
 #[test]
 fn i64_wrapping_from_integer_properties() {
-    // TODO relate with BitAnd
     test_properties(integers, |x| {
         let result = i64::wrapping_from(x);
         assert_eq!(-result, i64::wrapping_from(&-x));
+        assert_eq!(
+            result,
+            u64::checked_from(&x.mod_power_of_two(u64::WIDTH.into()))
+                .unwrap()
+                .to_signed_bitwise()
+        );
     });
 }

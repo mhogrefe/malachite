@@ -1,6 +1,6 @@
 use common::test_properties;
 use malachite_base::misc::{CheckedFrom, WrappingFrom};
-use malachite_base::num::{PrimitiveInteger, SignificantBits};
+use malachite_base::num::{ModPowerOfTwo, PrimitiveInteger, SignificantBits};
 use malachite_nz::natural::Natural;
 use malachite_test::inputs::natural::naturals;
 use std::str::FromStr;
@@ -45,11 +45,10 @@ fn u64_checked_from_natural_properties() {
 
 #[test]
 fn u64_wrapping_from_natural_properties() {
-    // TODO relate with BitAnd
     test_properties(naturals, |x| {
         assert_eq!(
             u64::wrapping_from(x),
-            u64::checked_from(&x.mod_power_of_two_ref(u64::WIDTH)).unwrap()
+            u64::checked_from(&(&x).mod_power_of_two(u64::WIDTH.into())).unwrap()
         );
     });
 }

@@ -225,8 +225,8 @@ fn xor_u32_properties() {
             assert_eq!(natural_xor_u32_alt_1(&n, u), result);
             assert_eq!(natural_xor_u32_alt_2(&n, u), result);
 
-            //TODO assert_eq!(n ^ Natural::from(u), result);
-            //TODO assert_eq!(Natural::from(u) ^ n, result);
+            assert_eq!(n ^ Natural::from(u), result);
+            assert_eq!(Natural::from(u) ^ n, result);
 
             assert_eq!(&result ^ u, *n);
 

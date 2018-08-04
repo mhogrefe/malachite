@@ -7,7 +7,7 @@ use malachite_nz::natural::arithmetic::sub_u32::limbs_sub_limb_in_place;
 use malachite_nz::natural::logic::not::limbs_not_in_place;
 use std::u32;
 
-pub fn limbs_slice_to_twos_complement_limbs_negative_alt_1(limbs: &mut [u32]) -> bool {
+pub fn limbs_twos_complement_in_place_alt_1(limbs: &mut [u32]) -> bool {
     let i = limbs.iter().cloned().take_while(|&x| x == 0).count();
     let len = limbs.len();
     if i == len {
@@ -21,16 +21,19 @@ pub fn limbs_slice_to_twos_complement_limbs_negative_alt_1(limbs: &mut [u32]) ->
     false
 }
 
-pub fn limbs_slice_to_twos_complement_limbs_negative_alt_2(limbs: &mut [u32]) -> bool {
+pub fn limbs_twos_complement_in_place_alt_2(limbs: &mut [u32]) -> bool {
     let carry = limbs_sub_limb_in_place(limbs, 1);
     limbs_not_in_place(limbs);
     carry
 }
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
-    register_demo!(registry, demo_limbs_to_twos_complement_limbs_non_negative);
-    register_demo!(registry, demo_limbs_slice_to_twos_complement_limbs_negative);
-    register_demo!(registry, demo_limbs_vec_to_twos_complement_limbs_negative);
+    register_demo!(registry, demo_limbs_maybe_sign_extend_non_negative_in_place);
+    register_demo!(registry, demo_limbs_twos_complement_in_place);
+    register_demo!(
+        registry,
+        demo_limbs_twos_complement_and_maybe_sign_extend_negative_in_place
+    );
     register_demo!(registry, demo_integer_to_twos_complement_limbs_asc);
     register_demo!(registry, demo_integer_to_twos_complement_limbs_desc);
     register_demo!(registry, demo_integer_into_twos_complement_limbs_asc);
@@ -41,17 +44,17 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_bench!(
         registry,
         Small,
-        benchmark_limbs_to_twos_complement_limbs_non_negative
+        benchmark_limbs_maybe_sign_extend_non_negative_in_place
     );
     register_bench!(
         registry,
         Small,
-        benchmark_limbs_slice_to_twos_complement_limbs_negative_algorithms
+        benchmark_limbs_twos_complement_in_place_algorithms
     );
     register_bench!(
         registry,
         Small,
-        benchmark_limbs_vec_to_twos_complement_limbs_negative
+        benchmark_limbs_twos_complement_and_maybe_sign_extend_negative_in_place
     );
     register_bench!(
         registry,
@@ -70,36 +73,40 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     );
 }
 
-fn demo_limbs_to_twos_complement_limbs_non_negative(gm: GenerationMode, limit: usize) {
+fn demo_limbs_maybe_sign_extend_non_negative_in_place(gm: GenerationMode, limit: usize) {
     for limbs in vecs_of_unsigned(gm).take(limit) {
         let mut mut_limbs = limbs.clone();
-        limbs_to_twos_complement_limbs_non_negative(&mut mut_limbs);
+        limbs_maybe_sign_extend_non_negative_in_place(&mut mut_limbs);
         println!(
-            "limbs := {:?}; limbs_to_twos_complement_limbs_non_negative(&mut limbs); limbs = {:?}",
+            "limbs := {:?}; limbs_maybe_sign_extend_non_negative_in_place(&mut limbs); \
+             limbs = {:?}",
             limbs, mut_limbs
         );
     }
 }
 
-fn demo_limbs_slice_to_twos_complement_limbs_negative(gm: GenerationMode, limit: usize) {
+fn demo_limbs_twos_complement_in_place(gm: GenerationMode, limit: usize) {
     for limbs in vecs_of_unsigned(gm).take(limit) {
         let mut mut_limbs = limbs.clone();
-        let carry = limbs_slice_to_twos_complement_limbs_negative(&mut mut_limbs);
+        let carry = limbs_twos_complement_in_place(&mut mut_limbs);
         println!(
-            "limbs := {:?}; limbs_slice_to_twos_complement_limbs_negative(&mut limbs) = {}; \
+            "limbs := {:?}; limbs_twos_complement_in_place(&mut limbs) = {}; \
              limbs = {:?}",
             limbs, carry, mut_limbs
         );
     }
 }
 
-fn demo_limbs_vec_to_twos_complement_limbs_negative(gm: GenerationMode, limit: usize) {
+fn demo_limbs_twos_complement_and_maybe_sign_extend_negative_in_place(
+    gm: GenerationMode,
+    limit: usize,
+) {
     for limbs in vecs_of_u32_var_1(gm).take(limit) {
         let mut mut_limbs = limbs.clone();
-        limbs_vec_to_twos_complement_limbs_negative(&mut mut_limbs);
+        limbs_twos_complement_and_maybe_sign_extend_negative_in_place(&mut mut_limbs);
         println!(
-            "limbs := {:?}; limbs_vec_to_twos_complement_limbs_negative(&mut limbs); \
-             limbs = {:?}",
+            "limbs := {:?}; limbs_twos_complement_and_maybe_sign_extend_negative_in_place(\
+             &mut limbs); limbs = {:?}",
             limbs, mut_limbs
         );
     }
@@ -176,13 +183,13 @@ fn demo_integer_twos_complement_limbs_get(gm: GenerationMode, limit: usize) {
     }
 }
 
-fn benchmark_limbs_to_twos_complement_limbs_non_negative(
+fn benchmark_limbs_maybe_sign_extend_non_negative_in_place(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,
 ) {
     m_run_benchmark(
-        "limbs_to_twos_complement_limbs_non_negative(&mut [u32])",
+        "limbs_maybe_sign_extend_non_negative_in_place(&mut [u32])",
         BenchmarkType::Single,
         vecs_of_unsigned(gm),
         gm.name(),
@@ -192,18 +199,18 @@ fn benchmark_limbs_to_twos_complement_limbs_non_negative(
         "index",
         &mut [(
             "malachite",
-            &mut (|ref mut limbs| limbs_to_twos_complement_limbs_non_negative(limbs)),
+            &mut (|ref mut limbs| limbs_maybe_sign_extend_non_negative_in_place(limbs)),
         )],
     );
 }
 
-fn benchmark_limbs_slice_to_twos_complement_limbs_negative_algorithms(
+fn benchmark_limbs_twos_complement_in_place_algorithms(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,
 ) {
     m_run_benchmark(
-        "limbs_slice_to_twos_complement_limbs_negative(&mut [u32])",
+        "limbs_twos_complement_in_place(&mut [u32])",
         BenchmarkType::Algorithms,
         vecs_of_u32_var_1(gm),
         gm.name(),
@@ -214,33 +221,27 @@ fn benchmark_limbs_slice_to_twos_complement_limbs_negative_algorithms(
         &mut [
             (
                 "default",
-                &mut (|ref mut limbs| {
-                    no_out!(limbs_slice_to_twos_complement_limbs_negative(limbs))
-                }),
+                &mut (|ref mut limbs| no_out!(limbs_twos_complement_in_place(limbs))),
             ),
             (
                 "integrated",
-                &mut (|ref mut limbs| {
-                    no_out!(limbs_slice_to_twos_complement_limbs_negative_alt_1(limbs))
-                }),
+                &mut (|ref mut limbs| no_out!(limbs_twos_complement_in_place_alt_1(limbs))),
             ),
             (
                 "sub 1 and not",
-                &mut (|ref mut limbs| {
-                    no_out!(limbs_slice_to_twos_complement_limbs_negative_alt_2(limbs))
-                }),
+                &mut (|ref mut limbs| no_out!(limbs_twos_complement_in_place_alt_2(limbs))),
             ),
         ],
     );
 }
 
-fn benchmark_limbs_vec_to_twos_complement_limbs_negative(
+fn benchmark_limbs_twos_complement_and_maybe_sign_extend_negative_in_place(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,
 ) {
     m_run_benchmark(
-        "limbs_vec_to_twos_complement_limbs_negative(&mut [u32])",
+        "limbs_twos_complement_and_maybe_sign_extend_negative_in_place(&mut [u32])",
         BenchmarkType::Single,
         vecs_of_u32_var_1(gm),
         gm.name(),
@@ -250,7 +251,9 @@ fn benchmark_limbs_vec_to_twos_complement_limbs_negative(
         "index",
         &mut [(
             "malachite",
-            &mut (|ref mut limbs| limbs_vec_to_twos_complement_limbs_negative(limbs)),
+            &mut (|ref mut limbs| {
+                limbs_twos_complement_and_maybe_sign_extend_negative_in_place(limbs)
+            }),
         )],
     );
 }

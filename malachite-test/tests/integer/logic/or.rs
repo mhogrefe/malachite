@@ -22,9 +22,17 @@ use std::cmp::min;
 use std::str::FromStr;
 
 #[test]
-fn test_limbs_or_pos_neg() {
-    let test = |xs, ys, out| {
-        assert_eq!(limbs_or_pos_neg(xs, ys), out);
+fn test_limbs_or_pos_neg_limbs_vec_or_pos_neg_in_place_left_and_limbs_or_pos_neg_in_place_right() {
+    let test = |xs_before, ys_before, out| {
+        assert_eq!(limbs_or_pos_neg(xs_before, ys_before), out);
+
+        let mut xs = xs_before.to_vec();
+        limbs_vec_or_pos_neg_in_place_left(&mut xs, ys_before);
+        assert_eq!(xs, out);
+
+        let mut ys = ys_before.to_vec();
+        limbs_or_pos_neg_in_place_right(xs_before, &mut ys);
+        assert_eq!(ys, out);
     };
     test(&[2], &[3], vec![1]);
     test(&[1, 1, 1], &[1, 2, 3], vec![1, 2, 2]);
@@ -145,26 +153,6 @@ fn limbs_slice_or_pos_neg_in_place_left_fail_2() {
 }
 
 #[test]
-fn test_limbs_vec_or_pos_neg_in_place_left() {
-    let test = |xs_before: &[u32], ys, xs_after| {
-        let mut xs = xs_before.to_vec();
-        limbs_vec_or_pos_neg_in_place_left(&mut xs, ys);
-        assert_eq!(xs, xs_after);
-    };
-    test(&[2], &[3], vec![1]);
-    test(&[1, 1, 1], &[1, 2, 3], vec![1, 2, 2]);
-    test(&[6, 7], &[1, 2, 3], vec![1, 0, 3]);
-    test(&[1, 2, 3], &[6, 7], vec![5, 5]);
-    test(&[100, 101, 102], &[102, 101, 100], vec![2, 0, 0]);
-    test(&[0, 0, 1], &[3], vec![3]);
-    test(&[3], &[0, 0, 1], vec![4_294_967_293, 4_294_967_295, 0]);
-    test(&[0, 3, 3], &[0, 0, 3], vec![0, 4_294_967_293, 0]);
-    test(&[0, 0, 3], &[0, 3, 3], vec![0, 3, 0]);
-    test(&[0, 3], &[0, 0, 3], vec![0, 4_294_967_293, 2]);
-    test(&[0, 0, 3], &[0, 3], vec![0, 3]);
-}
-
-#[test]
 #[should_panic(expected = "assertion failed: x_i < xs_len")]
 fn limbs_vec_or_pos_neg_in_place_left_fail_1() {
     limbs_vec_or_pos_neg_in_place_left(&mut vec![0, 0, 0], &[3]);
@@ -174,26 +162,6 @@ fn limbs_vec_or_pos_neg_in_place_left_fail_1() {
 #[should_panic(expected = "assertion failed: y_i < ys_len")]
 fn limbs_vec_or_pos_neg_in_place_left_fail_2() {
     limbs_vec_or_pos_neg_in_place_left(&mut vec![3], &[0, 0, 0]);
-}
-
-#[test]
-fn test_limbs_or_pos_neg_in_place_right() {
-    let test = |xs, ys_before: &[u32], ys_after| {
-        let mut ys = ys_before.to_vec();
-        limbs_or_pos_neg_in_place_right(xs, &mut ys);
-        assert_eq!(ys, ys_after);
-    };
-    test(&[2], &[3], vec![1]);
-    test(&[1, 1, 1], &[1, 2, 3], vec![1, 2, 2]);
-    test(&[6, 7], &[1, 2, 3], vec![1, 0, 3]);
-    test(&[1, 2, 3], &[6, 7], vec![5, 5]);
-    test(&[100, 101, 102], &[102, 101, 100], vec![2, 0, 0]);
-    test(&[0, 0, 1], &[3], vec![3]);
-    test(&[3], &[0, 0, 1], vec![4_294_967_293, 4_294_967_295, 0]);
-    test(&[0, 3, 3], &[0, 0, 3], vec![0, 4_294_967_293, 0]);
-    test(&[0, 0, 3], &[0, 3, 3], vec![0, 3, 0]);
-    test(&[0, 3], &[0, 0, 3], vec![0, 4_294_967_293, 2]);
-    test(&[0, 0, 3], &[0, 3], vec![0, 3]);
 }
 
 #[test]
@@ -209,9 +177,13 @@ fn limbs_or_pos_neg_in_place_right_fail_2() {
 }
 
 #[test]
-fn test_limbs_or_neg_neg() {
-    let test = |xs, ys, out| {
-        assert_eq!(limbs_or_neg_neg(xs, ys), out);
+fn test_limbs_or_neg_neg_and_limbs_vec_or_neg_neg_in_place_left() {
+    let test = |xs_before, ys, out| {
+        assert_eq!(limbs_or_neg_neg(xs_before, ys), out);
+
+        let mut xs = xs_before.to_vec();
+        limbs_vec_or_neg_neg_in_place_left(&mut xs, ys);
+        assert_eq!(xs, out);
     };
     test(&[2], &[3], vec![1]);
     test(&[1, 1, 1], &[1, 2, 3], vec![1, 0, 1]);
@@ -317,26 +289,6 @@ fn limbs_slice_or_neg_neg_in_place_left_fail_1() {
 #[should_panic(expected = "assertion failed: y_i < ys_len")]
 fn limbs_slice_or_neg_neg_in_place_left_fail_2() {
     limbs_slice_or_neg_neg_in_place_left(&mut [3], &[0, 0, 0]);
-}
-
-#[test]
-fn test_limbs_vec_or_neg_neg_in_place_left() {
-    let test = |xs_before: &[u32], ys, xs_after| {
-        let mut xs = xs_before.to_vec();
-        limbs_vec_or_neg_neg_in_place_left(&mut xs, ys);
-        assert_eq!(xs, xs_after);
-    };
-    test(&[2], &[3], vec![1]);
-    test(&[1, 1, 1], &[1, 2, 3], vec![1, 0, 1]);
-    test(&[6, 7], &[1, 2, 3], vec![1, 2]);
-    test(&[1, 2, 3], &[6, 7], vec![1, 2]);
-    test(&[100, 101, 102], &[102, 101, 100], vec![98, 101, 100]);
-    test(&[0, 0, 1], &[3], vec![3]);
-    test(&[3], &[0, 0, 1], vec![3]);
-    test(&[0, 3, 3], &[0, 0, 3], vec![0, 3, 2]);
-    test(&[0, 0, 3], &[0, 3, 3], vec![0, 3, 2]);
-    test(&[0, 3], &[0, 0, 3], vec![0, 3]);
-    test(&[0, 0, 3], &[0, 3], vec![0, 3]);
 }
 
 #[test]
@@ -558,7 +510,7 @@ fn limbs_slice_or_pos_neg_in_place_left_properties() {
                 -(Integer::from(Natural::from_owned_limbs_asc(xs_old))
                     | -Natural::from_limbs_asc(ys)),
             ).unwrap()
-                .to_limbs_asc();
+            .to_limbs_asc();
             result_limbs.resize(xs.len(), 0);
             assert_eq!(result_limbs, xs);
         } else {
@@ -613,9 +565,9 @@ fn limbs_or_neg_neg_to_out_properties() {
         let xs_old = xs.clone();
         limbs_or_neg_neg_to_out(&mut xs, ys, zs);
         let len = min(ys.len(), zs.len());
-        let result = Natural::checked_from(
-            -(-Natural::from_limbs_asc(ys) | -Natural::from_limbs_asc(zs)),
-        ).unwrap();
+        let result =
+            Natural::checked_from(-(-Natural::from_limbs_asc(ys) | -Natural::from_limbs_asc(zs)))
+                .unwrap();
         let mut expected_limbs = result.to_limbs_asc();
         expected_limbs.resize(len, 0);
         assert_eq!(&xs[..len], expected_limbs.as_slice());
@@ -623,30 +575,34 @@ fn limbs_or_neg_neg_to_out_properties() {
     });
 }
 
+macro_rules! limbs_slice_or_neg_neg_in_place_left_helper {
+    ($f:ident, $xs:ident, $ys:ident) => {
+        |&(ref $xs, ref $ys)| {
+            let mut xs = $xs.to_vec();
+            let xs_old = $xs.clone();
+            $f(&mut xs, $ys);
+            assert_eq!(
+                -Natural::from_owned_limbs_asc(xs),
+                -Natural::from_owned_limbs_asc(xs_old) | -Natural::from_limbs_asc($ys)
+            );
+        }
+    };
+}
+
 #[test]
 fn limbs_slice_or_neg_neg_in_place_left_properties() {
-    test_properties(pairs_of_u32_vec_var_1, |&(ref xs, ref ys)| {
-        let mut xs = xs.to_vec();
-        let xs_old = xs.clone();
-        limbs_slice_or_neg_neg_in_place_left(&mut xs, ys);
-        assert_eq!(
-            -Natural::from_owned_limbs_asc(xs),
-            -Natural::from_owned_limbs_asc(xs_old) | -Natural::from_limbs_asc(ys)
-        );
-    });
+    test_properties(
+        pairs_of_u32_vec_var_1,
+        limbs_slice_or_neg_neg_in_place_left_helper!(limbs_slice_or_neg_neg_in_place_left, xs, ys),
+    );
 }
 
 #[test]
 fn limbs_vec_or_neg_neg_in_place_left_properties() {
-    test_properties(pairs_of_u32_vec_var_1, |&(ref xs, ref ys)| {
-        let mut xs = xs.to_vec();
-        let xs_old = xs.clone();
-        limbs_vec_or_neg_neg_in_place_left(&mut xs, ys);
-        assert_eq!(
-            -Natural::from_owned_limbs_asc(xs),
-            -Natural::from_owned_limbs_asc(xs_old) | -Natural::from_limbs_asc(ys)
-        );
-    });
+    test_properties(
+        pairs_of_u32_vec_var_1,
+        limbs_slice_or_neg_neg_in_place_left_helper!(limbs_vec_or_neg_neg_in_place_left, xs, ys),
+    );
 }
 
 #[test]

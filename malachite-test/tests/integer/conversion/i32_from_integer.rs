@@ -1,5 +1,6 @@
 use common::test_properties;
 use malachite_base::misc::{CheckedFrom, WrappingFrom};
+use malachite_base::num::{ModPowerOfTwo, PrimitiveInteger, PrimitiveUnsigned};
 use malachite_nz::integer::Integer;
 use malachite_test::common::integer_to_rug_integer;
 use malachite_test::inputs::integer::integers;
@@ -57,10 +58,15 @@ fn i32_checked_from_integer_properties() {
 
 #[test]
 fn i32_wrapping_from_integer_properties() {
-    // TODO relate with BitAnd
     test_properties(integers, |x| {
         let result = i32::wrapping_from(x);
         assert_eq!(integer_to_rug_integer(x).to_i32_wrapping(), result);
         assert_eq!(-result, i32::wrapping_from(&-x));
+        assert_eq!(
+            result,
+            u32::checked_from(&x.mod_power_of_two(u32::WIDTH.into()))
+                .unwrap()
+                .to_signed_bitwise()
+        );
     });
 }
