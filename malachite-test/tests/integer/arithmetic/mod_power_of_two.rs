@@ -10,7 +10,7 @@ use malachite_nz::natural::Natural;
 use malachite_test::inputs::base::unsigneds;
 use malachite_test::inputs::integer::{
     integers, pairs_of_integer_and_small_unsigned, pairs_of_integer_and_small_unsigned_var_1,
-    pairs_of_integer_and_small_unsigned_var_2,
+    pairs_of_integer_and_small_unsigned_var_2, triples_of_integer_integer_and_small_unsigned,
     triples_of_integer_small_unsigned_and_small_unsigned,
 };
 use std::cmp::min;
@@ -362,6 +362,17 @@ fn mod_power_of_two_properties() {
         assert_eq!(n & ((Integer::ONE << u) - 1), result);
     });
 
+    test_properties(
+        triples_of_integer_integer_and_small_unsigned,
+        |&(ref x, ref y, u)| {
+            let xm = Integer::from(x.mod_power_of_two(u));
+            let ym = Integer::from(y.mod_power_of_two(u));
+            assert_eq!((x + y).mod_power_of_two(u), (&xm + &ym).mod_power_of_two(u));
+            assert_eq!((x - y).mod_power_of_two(u), (&xm - &ym).mod_power_of_two(u));
+            assert_eq!((x * y).mod_power_of_two(u), (xm * ym).mod_power_of_two(u));
+        },
+    );
+
     test_properties(pairs_of_integer_and_small_unsigned_var_1, |&(ref n, u)| {
         assert_eq!(n.mod_power_of_two(u), 0);
     });
@@ -466,6 +477,26 @@ fn neg_mod_power_of_two_properties() {
         assert_eq!(n.ceiling_mod_power_of_two(u).abs(), result);
     });
 
+    test_properties(
+        triples_of_integer_integer_and_small_unsigned,
+        |&(ref x, ref y, u)| {
+            let xm = Integer::from(x.mod_power_of_two(u));
+            let ym = Integer::from(y.mod_power_of_two(u));
+            assert_eq!(
+                (x + y).neg_mod_power_of_two(u),
+                (&xm + &ym).neg_mod_power_of_two(u)
+            );
+            assert_eq!(
+                (x - y).neg_mod_power_of_two(u),
+                (&xm - &ym).neg_mod_power_of_two(u)
+            );
+            assert_eq!(
+                (x * y).neg_mod_power_of_two(u),
+                (xm * ym).neg_mod_power_of_two(u)
+            );
+        },
+    );
+
     test_properties(pairs_of_integer_and_small_unsigned_var_1, |&(ref n, u)| {
         assert_eq!(n.neg_mod_power_of_two(u), 0);
     });
@@ -504,6 +535,26 @@ fn ceiling_mod_power_of_two_properties() {
         assert_eq!(result == 0, n.divisible_by_power_of_two(u));
         assert_eq!((-n).mod_power_of_two(u), -result);
     });
+
+    test_properties(
+        triples_of_integer_integer_and_small_unsigned,
+        |&(ref x, ref y, u)| {
+            let xm = Integer::from(x.mod_power_of_two(u));
+            let ym = Integer::from(y.mod_power_of_two(u));
+            assert_eq!(
+                (x + y).ceiling_mod_power_of_two(u),
+                Integer::from(&xm + &ym).ceiling_mod_power_of_two(u)
+            );
+            assert_eq!(
+                (x - y).ceiling_mod_power_of_two(u),
+                Integer::from(&xm - &ym).ceiling_mod_power_of_two(u)
+            );
+            assert_eq!(
+                (x * y).ceiling_mod_power_of_two(u),
+                Integer::from(xm * ym).ceiling_mod_power_of_two(u)
+            );
+        },
+    );
 
     test_properties(pairs_of_integer_and_small_unsigned_var_1, |&(ref n, u)| {
         assert_eq!(n.ceiling_mod_power_of_two(u), 0);

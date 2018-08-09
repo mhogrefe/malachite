@@ -320,14 +320,22 @@ pub trait IsPowerOfTwo {
 
 /// Returns the smallest power of two greater than or equal to `self`.
 pub trait NextPowerOfTwo {
-    fn next_power_of_two(&self) -> Self;
+    type Output;
+
+    fn next_power_of_two(self) -> Self::Output;
+}
+
+pub trait NextPowerOfTwoAssign {
+    fn next_power_of_two_assign(&mut self);
 }
 
 /// Returns the smallest power of two greater than or equal to `self`. If the next power of two is
 /// greater than the type's maximum value, `None` is returned, otherwise the power of two is wrapped
 /// in `Some`.
 pub trait CheckedNextPowerOfTwo: Sized {
-    fn checked_next_power_of_two(&self) -> Option<Self>;
+    type Output;
+
+    fn checked_next_power_of_two(self) -> Option<Self::Output>;
 }
 
 /// Computes the absolute value of `self`.
@@ -771,7 +779,7 @@ pub trait PrimitiveInteger:
 //TODO docs
 pub trait PrimitiveUnsigned:
     CeilingLogTwo
-    + CheckedNextPowerOfTwo
+    + CheckedNextPowerOfTwo<Output = Self>
     + FloorLogTwo
     + From<u8>
     + FromU32Slice
@@ -779,7 +787,8 @@ pub trait PrimitiveUnsigned:
     + IsPowerOfTwo
     + ModPowerOfTwo<Output = Self>
     + ModPowerOfTwoAssign
-    + NextPowerOfTwo
+    + NextPowerOfTwo<Output = Self>
+    + NextPowerOfTwoAssign
     + PrimitiveInteger
     + RemPowerOfTwo<Output = Self>
     + RemPowerOfTwoAssign
@@ -1400,14 +1409,24 @@ macro_rules! unsigned_traits {
         }
 
         impl NextPowerOfTwo for $t {
-            fn next_power_of_two(&self) -> $t {
-                $t::next_power_of_two(*self)
+            type Output = $t;
+
+            fn next_power_of_two(self) -> $t {
+                $t::next_power_of_two(self)
+            }
+        }
+
+        impl NextPowerOfTwoAssign for $t {
+            fn next_power_of_two_assign(&mut self) {
+                *self = $t::next_power_of_two(*self)
             }
         }
 
         impl CheckedNextPowerOfTwo for $t {
-            fn checked_next_power_of_two(&self) -> Option<$t> {
-                $t::checked_next_power_of_two(*self)
+            type Output = $t;
+
+            fn checked_next_power_of_two(self) -> Option<$t> {
+                $t::checked_next_power_of_two(self)
             }
         }
 

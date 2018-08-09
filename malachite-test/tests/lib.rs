@@ -157,6 +157,7 @@ pub mod natural {
         pub mod mul;
         pub mod mul_u32;
         pub mod neg;
+        pub mod next_power_of_two;
         pub mod parity;
         pub mod shl_i;
         pub mod shl_u;

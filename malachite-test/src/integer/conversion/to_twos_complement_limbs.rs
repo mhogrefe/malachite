@@ -1,5 +1,5 @@
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::base::{vecs_of_u32_var_1, vecs_of_unsigned};
+use inputs::base::{vecs_of_unsigned, vecs_of_unsigned_var_3};
 use inputs::integer::{integers, pairs_of_integer_and_small_usize};
 use malachite_base::num::{SignificantBits, WrappingNegAssign};
 use malachite_nz::integer::conversion::to_twos_complement_limbs::*;
@@ -101,7 +101,7 @@ fn demo_limbs_twos_complement_and_maybe_sign_extend_negative_in_place(
     gm: GenerationMode,
     limit: usize,
 ) {
-    for limbs in vecs_of_u32_var_1(gm).take(limit) {
+    for limbs in vecs_of_unsigned_var_3(gm).take(limit) {
         let mut mut_limbs = limbs.clone();
         limbs_twos_complement_and_maybe_sign_extend_negative_in_place(&mut mut_limbs);
         println!(
@@ -212,7 +212,7 @@ fn benchmark_limbs_twos_complement_in_place_algorithms(
     m_run_benchmark(
         "limbs_twos_complement_in_place(&mut [u32])",
         BenchmarkType::Algorithms,
-        vecs_of_u32_var_1(gm),
+        vecs_of_unsigned_var_3(gm),
         gm.name(),
         limit,
         file_name,
@@ -243,7 +243,7 @@ fn benchmark_limbs_twos_complement_and_maybe_sign_extend_negative_in_place(
     m_run_benchmark(
         "limbs_twos_complement_and_maybe_sign_extend_negative_in_place(&mut [u32])",
         BenchmarkType::Single,
-        vecs_of_u32_var_1(gm),
+        vecs_of_unsigned_var_3(gm),
         gm.name(),
         limit,
         file_name,

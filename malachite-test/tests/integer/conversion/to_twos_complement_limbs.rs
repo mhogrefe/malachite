@@ -3,7 +3,7 @@ use malachite_base::num::{BitAccess, PrimitiveInteger, Zero};
 use malachite_nz::integer::conversion::to_twos_complement_limbs::*;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
-use malachite_test::inputs::base::{small_usizes, vecs_of_u32_var_1, vecs_of_unsigned};
+use malachite_test::inputs::base::{small_usizes, vecs_of_unsigned, vecs_of_unsigned_var_3};
 use malachite_test::inputs::integer::{
     integers, pairs_of_integer_and_small_usize, pairs_of_integer_and_vec_of_bool_var_1,
 };
@@ -207,7 +207,7 @@ fn limbs_twos_complement_in_place_properties() {
 
 #[test]
 fn limbs_twos_complement_and_maybe_sign_extend_negative_in_place_properties() {
-    test_properties(vecs_of_u32_var_1, |limbs| {
+    test_properties(vecs_of_unsigned_var_3, |limbs| {
         let mut mut_limbs = limbs.clone();
         limbs_twos_complement_and_maybe_sign_extend_negative_in_place(&mut mut_limbs);
         if !limbs.is_empty() && *limbs.last().unwrap() != 0 {

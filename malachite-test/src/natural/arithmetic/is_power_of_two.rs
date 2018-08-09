@@ -1,10 +1,28 @@
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::natural::naturals;
+use inputs::base::vecs_of_unsigned_var_1;
+use inputs::natural::{naturals, rm_naturals};
 use malachite_base::num::{IsPowerOfTwo, SignificantBits};
+use malachite_nz::natural::arithmetic::is_power_of_two::limbs_is_power_of_two;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
+    register_demo!(registry, demo_limbs_is_power_of_two);
     register_demo!(registry, demo_natural_is_power_of_two);
-    register_bench!(registry, Large, benchmark_natural_is_power_of_two);
+    register_bench!(registry, Small, benchmark_limbs_is_power_of_two);
+    register_bench!(
+        registry,
+        Large,
+        benchmark_natural_is_power_of_two_library_comparison
+    );
+}
+
+fn demo_limbs_is_power_of_two(gm: GenerationMode, limit: usize) {
+    for limbs in vecs_of_unsigned_var_1(gm).take(limit) {
+        println!(
+            "limbs_is_power_of_two({:?}) = {:?}",
+            limbs,
+            limbs_is_power_of_two(&limbs)
+        );
+    }
 }
 
 fn demo_natural_is_power_of_two(gm: GenerationMode, limit: usize) {
@@ -17,16 +35,40 @@ fn demo_natural_is_power_of_two(gm: GenerationMode, limit: usize) {
     }
 }
 
-fn benchmark_natural_is_power_of_two(gm: GenerationMode, limit: usize, file_name: &str) {
+fn benchmark_limbs_is_power_of_two(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
-        "Natural.is_power_of_two()",
+        "limbs_is_power_of_two(&[u32])",
         BenchmarkType::Single,
-        naturals(gm),
+        vecs_of_unsigned_var_1(gm),
         gm.name(),
         limit,
         file_name,
-        &(|n| n.significant_bits() as usize),
+        &(|ref limbs| limbs.len()),
+        "limbs.len()",
+        &mut [(
+            "malachite",
+            &mut (|ref limbs| no_out!(limbs_is_power_of_two(limbs))),
+        )],
+    );
+}
+
+fn benchmark_natural_is_power_of_two_library_comparison(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "Natural.is_power_of_two()",
+        BenchmarkType::LibraryComparison,
+        rm_naturals(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(_, ref n)| n.significant_bits() as usize),
         "n.significant_bits()",
-        &mut [("malachite", &mut (|n| no_out!(n.is_power_of_two())))],
+        &mut [
+            ("malachite", &mut (|(_, n)| no_out!(n.is_power_of_two()))),
+            ("rug", &mut (|(n, _)| no_out!(n.is_power_of_two()))),
+        ],
     );
 }

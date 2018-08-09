@@ -2,7 +2,7 @@ use common::test_properties;
 use malachite_base::num::Parity;
 use malachite_nz::natural::logic::trailing_zeros::limbs_trailing_zeros;
 use malachite_nz::natural::Natural;
-use malachite_test::inputs::base::vecs_of_u32_var_1;
+use malachite_test::inputs::base::vecs_of_unsigned_var_3;
 use malachite_test::inputs::natural::naturals;
 use malachite_test::natural::logic::trailing_zeros::natural_trailing_zeros_alt;
 use std::str::FromStr;
@@ -50,7 +50,7 @@ fn test_trailing_zeros() {
 
 #[test]
 fn limbs_trailing_zeros_properties() {
-    test_properties(vecs_of_u32_var_1, |limbs| {
+    test_properties(vecs_of_unsigned_var_3, |limbs| {
         assert_eq!(
             Some(limbs_trailing_zeros(limbs)),
             Natural::from_limbs_asc(limbs).trailing_zeros()

@@ -13,6 +13,7 @@ pub mod mod_power_of_two;
 pub mod mul;
 pub mod mul_u32;
 pub mod neg;
+pub mod next_power_of_two;
 pub mod parity;
 pub mod shl_i;
 pub mod shl_u;
@@ -34,6 +35,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     is_power_of_two::register(registry);
     log_two::register(registry);
     mod_power_of_two::register(registry);
+    next_power_of_two::register(registry);
     mul::register(registry);
     mul_u32::register(registry);
     neg::register(registry);

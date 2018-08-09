@@ -21,6 +21,6 @@ serde = "1.0"
 serde_json = "1.0"
 
 [dependencies.rug]
-version = "0.9.2"
+version = "1.2.0"
 default-features = false
 features = ["integer"]

@@ -12,7 +12,7 @@ use malachite_nz::natural::Natural;
 use malachite_test::inputs::base::{pairs_of_unsigned_vec_and_small_u64, unsigneds};
 use malachite_test::inputs::natural::{
     naturals, pairs_of_natural_and_small_unsigned, pairs_of_natural_and_small_unsigned_var_1,
-    pairs_of_natural_and_small_unsigned_var_2,
+    pairs_of_natural_and_small_unsigned_var_2, triples_of_natural_natural_and_small_unsigned,
     triples_of_natural_small_unsigned_and_small_unsigned,
 };
 use std::cmp::min;
@@ -237,6 +237,20 @@ fn mod_power_of_two_and_rem_power_of_two_properties() {
         assert_eq!(n & ((Natural::ONE << u) - 1), result);
     });
 
+    test_properties(
+        triples_of_natural_natural_and_small_unsigned,
+        |&(ref x, ref y, u)| {
+            assert_eq!(
+                (x + y).mod_power_of_two(u),
+                (x.mod_power_of_two(u) + y.mod_power_of_two(u)).mod_power_of_two(u)
+            );
+            assert_eq!(
+                (x * y).mod_power_of_two(u),
+                (x.mod_power_of_two(u) * y.mod_power_of_two(u)).mod_power_of_two(u)
+            );
+        },
+    );
+
     test_properties(pairs_of_natural_and_small_unsigned_var_1, |&(ref n, u)| {
         assert_eq!(n.mod_power_of_two(u), 0);
     });
@@ -290,6 +304,20 @@ fn neg_mod_power_of_two_properties() {
         assert_eq!((&result).neg_mod_power_of_two(u), n.mod_power_of_two(u));
         assert_eq!((-n).mod_power_of_two(u), result);
     });
+
+    test_properties(
+        triples_of_natural_natural_and_small_unsigned,
+        |&(ref x, ref y, u)| {
+            assert_eq!(
+                (x + y).neg_mod_power_of_two(u),
+                (x.mod_power_of_two(u) + y.mod_power_of_two(u)).neg_mod_power_of_two(u)
+            );
+            assert_eq!(
+                (x * y).neg_mod_power_of_two(u),
+                (x.mod_power_of_two(u) * y.mod_power_of_two(u)).neg_mod_power_of_two(u)
+            );
+        },
+    );
 
     test_properties(pairs_of_natural_and_small_unsigned_var_1, |&(ref n, u)| {
         assert_eq!(n.neg_mod_power_of_two(u), 0);

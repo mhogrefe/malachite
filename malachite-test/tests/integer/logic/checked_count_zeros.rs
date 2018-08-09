@@ -2,7 +2,7 @@ use common::test_properties;
 use malachite_nz::integer::logic::checked_count_zeros::limbs_count_zeros_neg;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
-use malachite_test::inputs::base::{nonempty_vecs_of_unsigned, vecs_of_u32_var_1};
+use malachite_test::inputs::base::{nonempty_vecs_of_unsigned, vecs_of_unsigned_var_3};
 use malachite_test::inputs::integer::integers;
 use malachite_test::integer::logic::checked_count_zeros::{
     integer_checked_count_zeros_alt_1, integer_checked_count_zeros_alt_2,
@@ -52,7 +52,7 @@ fn limbs_count_zeros_neg_properties() {
         limbs_count_zeros_neg(limbs);
     });
 
-    test_properties(vecs_of_u32_var_1, |limbs| {
+    test_properties(vecs_of_unsigned_var_3, |limbs| {
         assert_eq!(
             Some(limbs_count_zeros_neg(limbs)),
             (-Natural::from_limbs_asc(limbs)).checked_count_zeros()

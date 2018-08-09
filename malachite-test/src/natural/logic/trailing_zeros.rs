@@ -1,5 +1,5 @@
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::base::vecs_of_u32_var_1;
+use inputs::base::vecs_of_unsigned_var_3;
 use inputs::natural::naturals;
 use malachite_base::num::SignificantBits;
 use malachite_nz::natural::logic::trailing_zeros::limbs_trailing_zeros;
@@ -21,7 +21,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
 }
 
 fn demo_limbs_trailing_zeros(gm: GenerationMode, limit: usize) {
-    for limbs in vecs_of_u32_var_1(gm).take(limit) {
+    for limbs in vecs_of_unsigned_var_3(gm).take(limit) {
         println!(
             "limbs_trailing_zeros({:?}) = {}",
             limbs,
@@ -40,7 +40,7 @@ fn benchmark_limbs_trailing_zeros(gm: GenerationMode, limit: usize, file_name: &
     m_run_benchmark(
         "limbs_trailing_zeros(&[u32])",
         BenchmarkType::Single,
-        vecs_of_u32_var_1(gm),
+        vecs_of_unsigned_var_3(gm),
         gm.name(),
         limit,
         file_name,

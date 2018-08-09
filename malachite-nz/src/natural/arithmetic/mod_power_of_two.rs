@@ -38,8 +38,8 @@ pub fn limbs_mod_power_of_two(limbs: &[u32], pow: u64) -> Vec<u32> {
     result
 }
 
-/// Interpreting a slice of `u32`s as the limbs (in ascending order) of a `Natural`, writes the
-/// limbs of the `Natural` mod two raised to `pow` to the input slice. Equivalently, retains only
+/// Interpreting a `Vec` of `u32`s as the limbs (in ascending order) of a `Natural`, writes the
+/// limbs of the `Natural` mod two raised to `pow` to the input `Vec`. Equivalently, retains only
 /// the least-significant `pow` bits.
 ///
 /// Time: worst case O(1)
@@ -104,8 +104,8 @@ pub fn limbs_neg_mod_power_of_two(limbs: &[u32], pow: u64) -> Vec<u32> {
     result_limbs
 }
 
-/// Interpreting a slice of `u32`s as the limbs (in ascending order) of a `Natural`, writes the
-/// limbs of the negative of the `Natural` mod two raised to `pow` to the input slice. Equivalently,
+/// Interpreting a `Vec` of `u32`s as the limbs (in ascending order) of a `Natural`, writes the
+/// limbs of the negative of the `Natural` mod two raised to `pow` to the input `Vec`. Equivalently,
 /// takes the two's complement and retains only the least-significant `pow` bits.
 ///
 /// Time: worst case O(`pow`)

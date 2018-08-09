@@ -538,6 +538,30 @@ pub fn triples_of_unsigned_natural_and_unsigned<T: PrimitiveUnsigned>(
     }
 }
 
+pub fn triples_of_natural_natural_and_small_unsigned<T: PrimitiveUnsigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (Natural, Natural, T)>> {
+    match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_triples(
+            exhaustive_naturals(),
+            exhaustive_naturals(),
+            exhaustive_unsigned(),
+        )),
+        GenerationMode::Random(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| random_naturals(seed, scale)),
+            &(|seed| random_naturals(seed, scale)),
+            &(|seed| u32s_geometric(seed, scale).flat_map(T::checked_from)),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_naturals(seed, scale)),
+            &(|seed| special_random_naturals(seed, scale)),
+            &(|seed| u32s_geometric(seed, scale).flat_map(T::checked_from)),
+        )),
+    }
+}
+
 pub fn triples_of_natural_unsigned_and_unsigned<T: PrimitiveUnsigned>(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (Natural, T, T)>> {

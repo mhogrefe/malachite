@@ -26,6 +26,7 @@ use natural::Natural::{self, Large, Small};
 /// assert_eq!(limbs_is_power_of_two(&[0, 0b1010]), false);
 /// ```
 pub fn limbs_is_power_of_two(limbs: &[u32]) -> bool {
+    assert!(!limbs.is_empty());
     limbs_test_zero(&limbs[..limbs.len() - 1]) && limbs.last().unwrap().is_power_of_two()
 }
 
