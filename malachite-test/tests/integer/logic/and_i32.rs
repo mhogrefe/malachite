@@ -11,8 +11,8 @@ use malachite_nz::natural::Natural;
 use malachite_test::common::{integer_to_rug_integer, rug_integer_to_integer};
 use malachite_test::inputs::base::{
     pairs_of_nonempty_unsigned_vec_and_unsigned, pairs_of_u32_vec_and_u32_var_1, signeds,
-    triples_of_u32_vec_u32_vec_and_u32_var_3,
     triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_2,
+    triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_3,
 };
 use malachite_test::inputs::integer::{integers, pairs_of_integer_and_signed};
 use malachite_test::integer::logic::and_i32::{integer_and_i32_alt_1, integer_and_i32_alt_2};
@@ -313,7 +313,7 @@ fn limbs_neg_and_limb_neg_properties() {
 #[test]
 fn limbs_neg_and_limb_neg_to_out_properties() {
     test_properties(
-        triples_of_u32_vec_u32_vec_and_u32_var_3,
+        triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_3,
         |&(ref out_limbs, ref in_limbs, limb)| {
             let mut out_limbs = out_limbs.to_vec();
             let old_out_limbs = out_limbs.clone();

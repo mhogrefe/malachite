@@ -329,6 +329,10 @@ pub trait NextPowerOfTwoAssign {
     fn next_power_of_two_assign(&mut self);
 }
 
+pub trait EqModPowerOfTwo<Rhs: ?Sized = Self> {
+    fn eq_mod_power_of_two(&self, other: &Rhs, pow: u64) -> bool;
+}
+
 /// Returns the smallest power of two greater than or equal to `self`. If the next power of two is
 /// greater than the type's maximum value, `None` is returned, otherwise the power of two is wrapped
 /// in `Some`.
@@ -641,6 +645,7 @@ pub trait PrimitiveInteger:
     + DivisibleByPowerOfTwo
     + Endian
     + Eq
+    + EqModPowerOfTwo<Self>
     + FromStr
     + HammingDistance<Self>
     + Hash
@@ -1360,11 +1365,17 @@ macro_rules! integer_traits {
 
         impl Parity for $t {
             fn is_even(&self) -> bool {
-                (*self & Self::ONE) == Self::ZERO
+                (*self & 1) == 0
             }
 
             fn is_odd(&self) -> bool {
-                (*self & Self::ONE) != Self::ZERO
+                (*self & 1) != 0
+            }
+        }
+
+        impl EqModPowerOfTwo<Self> for $t {
+            fn eq_mod_power_of_two(&self, other: &$t, pow: u64) -> bool {
+                (self ^ other).divisible_by_power_of_two(pow)
             }
         }
     };
@@ -1554,7 +1565,7 @@ macro_rules! unsigned_traits {
             /// assert_eq!(1_000_000_000_000u64.get_bit(100), false);
             /// ```
             fn get_bit(&self, index: u64) -> bool {
-                index < Self::WIDTH.into() && *self & (Self::ONE << index) != Self::ZERO
+                index < Self::WIDTH.into() && *self & (1 << index) != 0
             }
 
             /// Sets the `index`th bit of a primitive unsigned integer, or the coefficient of
@@ -1581,7 +1592,7 @@ macro_rules! unsigned_traits {
             /// ```
             fn set_bit(&mut self, index: u64) {
                 if index < Self::WIDTH.into() {
-                    *self |= Self::ONE << index;
+                    *self |= 1 << index;
                 } else {
                     panic!(
                         "Cannot set bit {} in non-negative value of width {}",
@@ -1614,7 +1625,7 @@ macro_rules! unsigned_traits {
             /// ```
             fn clear_bit(&mut self, index: u64) {
                 if index < Self::WIDTH.into() {
-                    *self &= !(Self::ONE << index);
+                    *self &= !(1 << index);
                 }
             }
         }
