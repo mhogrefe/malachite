@@ -3,7 +3,7 @@ use malachite_base::num::{DivisibleByPowerOfTwo, EqModPowerOfTwo, ModPowerOfTwo,
 use malachite_nz::natural::arithmetic::eq_mod_power_of_two_u32::limbs_eq_mod_power_of_two_limb;
 use malachite_nz::natural::Natural;
 use malachite_test::inputs::base::{
-    pairs_of_unsigned_and_small_unsigned, triples_of_unsigned_vec_unsigned_and_small_unsigned_var_1,
+    pairs_of_unsigned_and_small_unsigned, triples_of_unsigned_vec_unsigned_and_small_unsigned_var_2,
 };
 use malachite_test::inputs::natural::{
     pairs_of_natural_and_small_unsigned, triples_of_natural_unsigned_and_small_unsigned,
@@ -40,12 +40,13 @@ fn test_eq_mod_power_of_two_u32() {
     test("13", 21, 100, false);
     test("1000000000001", 1, 12, true);
     test("1000000000001", 1, 13, false);
+    test("4294967295", 4294967295, 32, true);
 }
 
 #[test]
 fn limbs_eq_mod_power_of_two_limb_properties() {
     test_properties(
-        triples_of_unsigned_vec_unsigned_and_small_unsigned_var_1,
+        triples_of_unsigned_vec_unsigned_and_small_unsigned_var_2,
         |&(ref limbs, limb, pow)| {
             assert_eq!(
                 limbs_eq_mod_power_of_two_limb(limbs, limb, pow),

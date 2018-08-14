@@ -1091,7 +1091,45 @@ pub fn triples_of_unsigned_vec_unsigned_vec_and_u32_var_6<T: PrimitiveUnsigned>(
     )
 }
 
+// All triples of `Vec<T>`, T, and small `U`, where `T` and `U` are unsigned, the `Vec` is
+// non-empty, and its last element is nonzero.
 pub fn triples_of_unsigned_vec_unsigned_and_small_unsigned_var_1<
+    T: PrimitiveUnsigned,
+    U: PrimitiveUnsigned,
+>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (Vec<T>, T, U)>> {
+    match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_triples(
+            exhaustive_vecs(exhaustive_unsigned())
+                .filter(|limbs| !limbs.is_empty() && *limbs.last().unwrap() != T::ZERO),
+            exhaustive_unsigned(),
+            exhaustive_unsigned(),
+        )),
+        GenerationMode::Random(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| {
+                random_vecs(seed, scale, &(|seed_2| random(seed_2)))
+                    .filter(|limbs| !limbs.is_empty() && *limbs.last().unwrap() != T::ZERO)
+            }),
+            &(|seed| random(seed)),
+            &(|seed| u32s_geometric(seed, scale).flat_map(U::checked_from)),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| {
+                special_random_unsigned_vecs(seed, scale)
+                    .filter(|limbs| !limbs.is_empty() && *limbs.last().unwrap() != T::ZERO)
+            }),
+            &(|seed| special_random_unsigned(seed)),
+            &(|seed| u32s_geometric(seed, scale).flat_map(U::checked_from)),
+        )),
+    }
+}
+
+// All triples of `Vec<T>`, T, and small `U`, where `T` and `U` are unsigned, the `Vec` has at least
+// 2 elements, and its last element is nonzero.
+pub fn triples_of_unsigned_vec_unsigned_and_small_unsigned_var_2<
     T: PrimitiveUnsigned,
     U: PrimitiveUnsigned,
 >(
