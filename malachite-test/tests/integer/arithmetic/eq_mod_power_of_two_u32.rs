@@ -34,7 +34,7 @@ fn test_limbs_eq_mod_power_of_two_neg_limb() {
 
 #[test]
 fn test_eq_mod_power_of_two_u32() {
-    let test = |n, u, pow, out| {
+    let test = |n, u: u32, pow, out| {
         assert_eq!(
             Integer::from_str(n).unwrap().eq_mod_power_of_two(&u, pow),
             out
@@ -87,7 +87,7 @@ fn limbs_eq_mod_power_of_two_neg_limb_properties() {
 #[test]
 fn eq_mod_power_of_two_u32_properties() {
     test_properties(
-        triples_of_integer_unsigned_and_small_unsigned,
+        triples_of_integer_unsigned_and_small_unsigned::<u32, u64>,
         |&(ref n, u, pow)| {
             let eq_mod_power_of_two = n.eq_mod_power_of_two(&u, pow);
             assert_eq!(
@@ -99,15 +99,18 @@ fn eq_mod_power_of_two_u32_properties() {
 
     test_properties(pairs_of_integer_and_small_unsigned, |&(ref n, pow)| {
         assert_eq!(
-            n.eq_mod_power_of_two(&0, pow),
+            n.eq_mod_power_of_two(&0u32, pow),
             n.divisible_by_power_of_two(pow),
         );
     });
 
-    test_properties(pairs_of_unsigned_and_small_unsigned, |&(u, pow)| {
-        assert_eq!(
-            Integer::ZERO.eq_mod_power_of_two(&u, pow),
-            u.divisible_by_power_of_two(pow)
-        );
-    });
+    test_properties(
+        pairs_of_unsigned_and_small_unsigned::<u32, u64>,
+        |&(u, pow)| {
+            assert_eq!(
+                Integer::ZERO.eq_mod_power_of_two(&u, pow),
+                u.divisible_by_power_of_two(pow)
+            );
+        },
+    );
 }

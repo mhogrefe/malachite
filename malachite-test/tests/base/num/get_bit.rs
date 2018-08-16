@@ -1,7 +1,7 @@
 use common::test_properties;
 use malachite_base::num::{PrimitiveInteger, PrimitiveSigned, PrimitiveUnsigned};
 use malachite_test::inputs::base::{
-    pairs_of_signed_and_small_u64, pairs_of_unsigned_and_small_unsigned, unsigneds,
+    pairs_of_signed_and_small_unsigned, pairs_of_unsigned_and_small_unsigned, unsigneds,
 };
 use std::u32;
 
@@ -81,14 +81,17 @@ fn get_bit_properties_helper_unsigned<T: PrimitiveUnsigned>() {
 }
 
 fn get_bit_properties_helper_signed<T: PrimitiveSigned>() {
-    test_properties(pairs_of_signed_and_small_u64, |&(n, index): &(T, u64)| {
-        let bit = n.get_bit(index);
-        if index >= u64::from(T::WIDTH) {
-            assert_eq!(bit, n < T::ZERO);
-        } else {
-            assert_eq!(bit, !(!n).get_bit(index));
-        }
-    });
+    test_properties(
+        pairs_of_signed_and_small_unsigned,
+        |&(n, index): &(T, u64)| {
+            let bit = n.get_bit(index);
+            if index >= u64::from(T::WIDTH) {
+                assert_eq!(bit, n < T::ZERO);
+            } else {
+                assert_eq!(bit, !(!n).get_bit(index));
+            }
+        },
+    );
 }
 
 #[test]

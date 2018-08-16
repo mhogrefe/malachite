@@ -216,14 +216,16 @@ fn sqrt_pairs_of_signed_and_unsigned<T: PrimitiveSigned, U: PrimitiveUnsigned>(
     Box::new(sqrt_pairs(exhaustive_signed(), exhaustive_unsigned()))
 }
 
-pub fn pairs_of_signed_and_small_u64<T: PrimitiveSigned>(gm: GenerationMode) -> It<(T, u64)> {
+pub fn pairs_of_signed_and_small_unsigned<T: PrimitiveSigned, U: PrimitiveUnsigned>(
+    gm: GenerationMode,
+) -> It<(T, U)> {
     match gm {
         GenerationMode::Exhaustive => sqrt_pairs_of_signed_and_unsigned(),
         GenerationMode::Random(scale) => random_pairs_of_primitive_and_geometric_unsigned(scale),
         GenerationMode::SpecialRandom(scale) => Box::new(random_pairs(
             &EXAMPLE_SEED,
             &(|seed| special_random_signed(seed)),
-            &(|seed| u32s_geometric(seed, scale).map(|i| i.into())),
+            &(|seed| u32s_geometric(seed, scale).flat_map(U::checked_from)),
         )),
     }
 }
@@ -281,7 +283,7 @@ pub fn pairs_of_signed_and_u64_width_range_var_1<T: PrimitiveSigned>(
     gm: GenerationMode,
 ) -> It<(T, u64)> {
     Box::new(
-        pairs_of_signed_and_small_u64(gm)
+        pairs_of_signed_and_small_unsigned(gm)
             .filter(|&(n, index)| n < T::ZERO || index < u64::from(T::WIDTH)),
     )
 }
@@ -292,7 +294,7 @@ pub fn pairs_of_signed_and_u64_width_range_var_2<T: PrimitiveSigned>(
     gm: GenerationMode,
 ) -> It<(T, u64)> {
     Box::new(
-        pairs_of_signed_and_small_u64(gm)
+        pairs_of_signed_and_small_unsigned(gm)
             .filter(|&(n, index)| n >= T::ZERO || index < u64::from(T::WIDTH)),
     )
 }

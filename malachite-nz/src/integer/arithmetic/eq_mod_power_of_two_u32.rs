@@ -66,8 +66,8 @@ impl EqModPowerOfTwo<u32> for Integer {
     ///
     /// fn main() {
     ///     assert_eq!((&Integer::ZERO).eq_mod_power_of_two(&256u32, 8), true);
-    ///     assert_eq!((&Integer::from(-0b1101)).eq_mod_power_of_two(&0b1011, 3), true);
-    ///     assert_eq!((&Integer::from(-0b1101)).eq_mod_power_of_two(&0b1011, 4), false);
+    ///     assert_eq!((&Integer::from(-0b1101)).eq_mod_power_of_two(&0b1011u32, 3), true);
+    ///     assert_eq!((&Integer::from(-0b1101)).eq_mod_power_of_two(&0b1011u32, 4), false);
     /// }
     /// ```
     fn eq_mod_power_of_two(&self, other: &u32, pow: u64) -> bool {

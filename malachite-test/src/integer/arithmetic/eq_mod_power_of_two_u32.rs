@@ -34,7 +34,7 @@ fn demo_limbs_eq_mod_power_of_two_neg_limb(gm: GenerationMode, limit: usize) {
 }
 
 fn demo_integer_eq_mod_power_of_two_u32(gm: GenerationMode, limit: usize) {
-    for (n, u, pow) in triples_of_integer_unsigned_and_small_unsigned(gm).take(limit) {
+    for (n, u, pow) in triples_of_integer_unsigned_and_small_unsigned::<u32, u64>(gm).take(limit) {
         println!(
             "{}.eq_mod_power_of_two({}, {}) = {}",
             n,
@@ -72,7 +72,7 @@ fn benchmark_integer_eq_mod_power_of_two_u32_algorithms(
     m_run_benchmark(
         "Integer.eq_mod_power_of_two(&u32, u64)",
         BenchmarkType::Algorithms,
-        triples_of_integer_unsigned_and_small_unsigned(gm),
+        triples_of_integer_unsigned_and_small_unsigned::<u32, u64>(gm),
         gm.name(),
         limit,
         file_name,
