@@ -3,7 +3,6 @@ use inputs::integer::triples_of_integers;
 use malachite_base::num::SignificantBits;
 use malachite_base::num::{SubMul, SubMulAssign};
 use malachite_nz::integer::Integer;
-use std::cmp::max;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_integer_sub_mul_assign);
@@ -175,9 +174,10 @@ fn demo_integer_sub_mul_ref_ref_ref(gm: GenerationMode, limit: usize) {
 }
 
 fn bucketing_function(t: &(Integer, Integer, Integer)) -> usize {
-    max(
-        max(t.0.significant_bits(), t.1.significant_bits()),
-        t.2.significant_bits(),
+    max!(
+        t.0.significant_bits(),
+        t.1.significant_bits(),
+        t.2.significant_bits()
     ) as usize
 }
 

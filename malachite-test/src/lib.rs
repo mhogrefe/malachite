@@ -6,6 +6,7 @@
     unused_must_use
 )]
 
+#[macro_use]
 extern crate malachite_base;
 extern crate malachite_nz;
 extern crate num;

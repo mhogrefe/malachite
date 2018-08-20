@@ -45,7 +45,7 @@ impl EqModPowerOfTwo<u32> for Natural {
     ///
     /// Additional memory: worst case O(1)
     ///
-    /// where n = `self.significant_bits()`
+    /// where n = min(`pow`, `self.significant_bits()`)
     ///
     /// # Examples
     /// ```

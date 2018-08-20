@@ -3,6 +3,7 @@ use inputs::base::pairs_of_unsigned_vec_and_small_u64_var_1;
 use inputs::natural::pairs_of_natural_and_small_unsigned;
 use malachite_base::num::{DivisibleByPowerOfTwo, SignificantBits};
 use malachite_nz::natural::arithmetic::divisible_by_power_of_two::limbs_divisible_by_power_of_two;
+use std::cmp::min;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limbs_divisible_by_power_of_two);
@@ -44,8 +45,8 @@ fn benchmark_limbs_divisible_by_power_of_two(gm: GenerationMode, limit: usize, f
         gm.name(),
         limit,
         file_name,
-        &(|&(ref limbs, _)| limbs.len()),
-        "limbs.len()",
+        &(|&(ref limbs, pow)| min(pow as usize, limbs.len())),
+        "min(pow, limbs.len())",
         &mut [(
             "malachite",
             &mut (|(limbs, pow)| no_out!(limbs_divisible_by_power_of_two(&limbs, pow))),
@@ -65,8 +66,8 @@ fn benchmark_natural_divisible_by_power_of_two_algorithms(
         gm.name(),
         limit,
         file_name,
-        &(|&(ref n, _)| n.significant_bits() as usize),
-        "n.significant_bits()",
+        &(|&(ref n, pow)| min(pow, n.significant_bits()) as usize),
+        "min(pow, n.significant_bits())",
         &mut [
             (
                 "Natural.divisible_by_power_of_2(u64)",

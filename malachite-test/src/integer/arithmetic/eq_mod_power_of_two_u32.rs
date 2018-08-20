@@ -47,7 +47,7 @@ fn demo_integer_eq_mod_power_of_two_u32(gm: GenerationMode, limit: usize) {
 
 fn benchmark_limbs_eq_mod_power_of_two_neg_limb(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
-        "limbs_eq_mod_power_of_two_neg_limb(&[u32])",
+        "limbs_eq_mod_power_of_two_neg_limb(&[u32], u64)",
         BenchmarkType::Single,
         triples_of_unsigned_vec_unsigned_and_small_unsigned_var_2(gm),
         gm.name(),

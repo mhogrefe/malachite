@@ -59,7 +59,7 @@ fn limbs_eq_mod_power_of_two_limb_properties() {
 #[test]
 fn eq_mod_power_of_two_u32_properties() {
     test_properties(
-        triples_of_natural_unsigned_and_small_unsigned,
+        triples_of_natural_unsigned_and_small_unsigned::<u32, u64>,
         |&(ref n, u, pow)| {
             let eq_mod_power_of_two = n.eq_mod_power_of_two(&u, pow);
             assert_eq!(
@@ -76,10 +76,13 @@ fn eq_mod_power_of_two_u32_properties() {
         );
     });
 
-    test_properties(pairs_of_unsigned_and_small_unsigned, |&(u, pow)| {
-        assert_eq!(
-            Natural::ZERO.eq_mod_power_of_two(&u, pow),
-            u.divisible_by_power_of_two(pow)
-        );
-    });
+    test_properties(
+        pairs_of_unsigned_and_small_unsigned::<u32, u64>,
+        |&(u, pow)| {
+            assert_eq!(
+                Natural::ZERO.eq_mod_power_of_two(&u, pow),
+                u.divisible_by_power_of_two(pow)
+            );
+        },
+    );
 }

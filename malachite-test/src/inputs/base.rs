@@ -1093,6 +1093,53 @@ pub fn triples_of_unsigned_vec_unsigned_vec_and_u32_var_6<T: PrimitiveUnsigned>(
     )
 }
 
+fn triples_of_unsigned_vec_unsigned_vec_and_small_unsigned<
+    T: PrimitiveUnsigned,
+    U: PrimitiveUnsigned,
+>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (Vec<T>, Vec<T>, U)>> {
+    match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_triples(
+            exhaustive_vecs(exhaustive_unsigned()),
+            exhaustive_vecs(exhaustive_unsigned()),
+            exhaustive_unsigned(),
+        )),
+        GenerationMode::Random(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| random_vecs(seed, scale, &(|seed_2| random(seed_2)))),
+            &(|seed| random_vecs(seed, scale, &(|seed_2| random(seed_2)))),
+            &(|seed| u32s_geometric(seed, scale).flat_map(U::checked_from)),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_unsigned_vecs(seed, scale)),
+            &(|seed| special_random_unsigned_vecs(seed, scale)),
+            &(|seed| u32s_geometric(seed, scale).flat_map(U::checked_from)),
+        )),
+    }
+}
+
+// All triples of `Vec<T>`, `Vec<T>`, and small `U` where `T` and `U` are unsigned and the `Vec`s
+// are nonempty and have no trailing zeros.
+pub fn triples_of_unsigned_vec_unsigned_vec_and_small_unsigned_var_1<
+    T: PrimitiveUnsigned,
+    U: PrimitiveUnsigned,
+>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (Vec<T>, Vec<T>, U)>> {
+    Box::new(
+        triples_of_unsigned_vec_unsigned_vec_and_small_unsigned(gm).filter(
+            |&(ref xs, ref ys, _)| {
+                !xs.is_empty()
+                    && !ys.is_empty()
+                    && *xs.last().unwrap() != T::ZERO
+                    && *ys.last().unwrap() != T::ZERO
+            },
+        ),
+    )
+}
+
 // All triples of `Vec<T>`, T, and small `U`, where `T` and `U` are unsigned, the `Vec` is
 // non-empty, and its last element is nonzero.
 pub fn triples_of_unsigned_vec_unsigned_and_small_unsigned_var_1<

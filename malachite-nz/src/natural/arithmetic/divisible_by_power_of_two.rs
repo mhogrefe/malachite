@@ -11,7 +11,7 @@ use natural::Natural::{self, Large, Small};
 ///
 /// Additional memory: worst case O(1)
 ///
-/// where n = `limbs.len()`
+/// where n = min(pow, `limbs.len()`)
 ///
 /// # Example
 /// ```
@@ -39,7 +39,7 @@ impl DivisibleByPowerOfTwo for Natural {
     ///
     /// Additional memory: worst case O(1)
     ///
-    /// where n = `self.significant_bits`
+    /// where n = min(pow, `self.significant_bits`)
     ///
     /// # Examples
     /// ```

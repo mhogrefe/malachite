@@ -115,3 +115,35 @@ pub trait Walkable: Eq + Ord {
     /// exists.
     fn decrement(&mut self);
 }
+
+#[macro_export]
+macro_rules! min {
+    ($first: expr $(,$next: expr)*) => {
+        {
+            let mut min = $first;
+            $(
+                let next = $next;
+                if next < min {
+                    min = next;
+                }
+            )*
+            min
+        }
+    };
+}
+
+#[macro_export]
+macro_rules! max {
+    ($first: expr $(,$next: expr)*) => {
+        {
+            let mut max = $first;
+            $(
+                let next = $next;
+                if next > max {
+                    max = next;
+                }
+            )*
+            max
+        }
+    };
+}

@@ -3,7 +3,6 @@ use inputs::natural::triples_of_naturals;
 use malachite_base::num::SignificantBits;
 use malachite_base::num::{AddMul, AddMulAssign};
 use malachite_nz::natural::Natural;
-use std::cmp::max;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_natural_add_mul_assign);
@@ -175,9 +174,10 @@ fn demo_natural_add_mul_ref_ref_ref(gm: GenerationMode, limit: usize) {
 }
 
 fn bucketing_function(t: &(Natural, Natural, Natural)) -> usize {
-    max(
-        max(t.0.significant_bits(), t.1.significant_bits()),
-        t.2.significant_bits(),
+    max!(
+        t.0.significant_bits(),
+        t.1.significant_bits(),
+        t.2.significant_bits()
     ) as usize
 }
 

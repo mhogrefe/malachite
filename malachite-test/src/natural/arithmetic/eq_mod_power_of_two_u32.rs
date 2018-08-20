@@ -3,6 +3,7 @@ use inputs::base::triples_of_unsigned_vec_unsigned_and_small_unsigned_var_1;
 use inputs::natural::triples_of_natural_unsigned_and_small_unsigned;
 use malachite_base::num::{EqModPowerOfTwo, ModPowerOfTwo, SignificantBits};
 use malachite_nz::natural::arithmetic::eq_mod_power_of_two_u32::limbs_eq_mod_power_of_two_limb;
+use std::cmp::min;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limbs_eq_mod_power_of_two_limb);
@@ -30,7 +31,7 @@ fn demo_limbs_eq_mod_power_of_two_limb(gm: GenerationMode, limit: usize) {
 }
 
 fn demo_natural_eq_mod_power_of_two_u32(gm: GenerationMode, limit: usize) {
-    for (n, u, pow) in triples_of_natural_unsigned_and_small_unsigned(gm).take(limit) {
+    for (n, u, pow) in triples_of_natural_unsigned_and_small_unsigned::<u32, u64>(gm).take(limit) {
         println!(
             "{}.eq_mod_power_of_two({}, {}) = {}",
             n,
@@ -43,7 +44,7 @@ fn demo_natural_eq_mod_power_of_two_u32(gm: GenerationMode, limit: usize) {
 
 fn benchmark_limbs_eq_mod_power_of_two_limb(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
-        "limbs_eq_mod_power_of_two_limb(&[u32])",
+        "limbs_eq_mod_power_of_two_limb(&[u32], u64)",
         BenchmarkType::Single,
         triples_of_unsigned_vec_unsigned_and_small_unsigned_var_1(gm),
         gm.name(),
@@ -68,12 +69,12 @@ fn benchmark_natural_eq_mod_power_of_two_u32_algorithms(
     m_run_benchmark(
         "Natural.eq_mod_power_of_two(&u32, u64)",
         BenchmarkType::Algorithms,
-        triples_of_natural_unsigned_and_small_unsigned(gm),
+        triples_of_natural_unsigned_and_small_unsigned::<u32, u64>(gm),
         gm.name(),
         limit,
         file_name,
-        &(|(ref n, _, _)| n.significant_bits() as usize),
-        "n.significant_bits()",
+        &(|&(ref n, _, pow)| min(pow, n.significant_bits()) as usize),
+        "min(pow, n.significant_bits())",
         &mut [
             (
                 "Natural.eq_mod_power_of_two(&u32, u64)",
