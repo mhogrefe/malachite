@@ -4,7 +4,7 @@ use malachite_nz::natural::arithmetic::eq_mod_power_of_two::limbs_eq_mod_power_o
 use malachite_nz::natural::Natural;
 use malachite_test::inputs::base::triples_of_unsigned_vec_unsigned_vec_and_small_unsigned_var_1;
 use malachite_test::inputs::natural::{
-    pairs_of_natural_and_small_unsigned, triples_of_natural_natural_and_small_unsigned,
+    pairs_of_natural_and_small_unsigned, triples_of_natural_natural_and_small_unsigned, quadruples_of_natural_natural_natural_and_small_unsigned
 };
 use std::str::FromStr;
 
@@ -13,26 +13,26 @@ fn test_limbs_eq_mod_power_of_two() {
     let test = |xs, ys, pow, out| {
         assert_eq!(limbs_eq_mod_power_of_two(xs, ys, pow), out);
     };
-    test(&[0b1111011, 0b111001000], &[0b101011], 4, true);
-    test(&[0b1111011, 0b111001000], &[0b101011], 5, false);
-    test(&[0b1111011, 0b111001000], &[0b1111011], 35, true);
-    test(&[0b1111011, 0b111001000], &[0b1111011], 36, false);
-    test(&[0b1111011, 0b111001000], &[0b1111011], 100, false);
+    test(&[0b111_1011, 0b1_1100_1000], &[0b10_1011], 4, true);
+    test(&[0b111_1011, 0b1_1100_1000], &[0b10_1011], 5, false);
+    test(&[0b111_1011, 0b1_1100_1000], &[0b111_1011], 35, true);
+    test(&[0b111_1011, 0b1_1100_1000], &[0b111_1011], 36, false);
+    test(&[0b111_1011, 0b1_1100_1000], &[0b111_1011], 100, false);
     test(
-        &[0b1111011, 0b111001000],
-        &[0b1111011, 0b111101000],
+        &[0b111_1011, 0b1_1100_1000],
+        &[0b111_1011, 0b1_1110_1000],
         37,
         true,
     );
     test(
-        &[0b1111011, 0b111001000],
-        &[0b1111011, 0b111101000],
+        &[0b111_1011, 0b1_1100_1000],
+        &[0b111_1011, 0b1_1110_1000],
         38,
         false,
     );
     test(
-        &[0b1111011, 0b111001000],
-        &[0b1111011, 0b111101000],
+        &[0b111_1011, 0b1_1100_1000],
+        &[0b111_1011, 0b1_1110_1000],
         100,
         false,
     );
@@ -91,6 +91,7 @@ fn eq_mod_power_of_two_properties() {
     );
 
     test_properties(pairs_of_natural_and_small_unsigned, |&(ref n, pow)| {
+        assert!(n.eq_mod_power_of_two(n, pow));
         assert_eq!(
             n.eq_mod_power_of_two(&Natural::ZERO, pow),
             n.divisible_by_power_of_two(pow)
@@ -100,4 +101,13 @@ fn eq_mod_power_of_two_properties() {
             n.divisible_by_power_of_two(pow)
         );
     });
+
+    test_properties(
+        quadruples_of_natural_natural_natural_and_small_unsigned,
+        |&(ref x, ref y, ref z, pow)| {
+            if x.eq_mod_power_of_two(y, pow) && y.eq_mod_power_of_two(z, pow) {
+                assert!(x.eq_mod_power_of_two(z, pow));
+            }
+        },
+    );
 }

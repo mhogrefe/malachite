@@ -27,7 +27,7 @@ use rust_wheels::iterators::rounding_modes::{exhaustive_rounding_modes, random_r
 use rust_wheels::iterators::tuples::{
     exhaustive_pairs, exhaustive_pairs_from_single, exhaustive_triples,
     exhaustive_triples_from_single, lex_pairs, log_pairs, random_pairs, random_pairs_from_single,
-    random_triples, random_triples_from_single,
+    random_triples, random_triples_from_single, exhaustive_quadruples, random_quadruples
 };
 use rust_wheels::iterators::vecs::exhaustive_fixed_size_vecs_from_single;
 
@@ -880,5 +880,32 @@ pub fn pairs_of_natural_and_vec_of_bool_var_2(
         GenerationMode::SpecialRandom(scale) => Box::new(
             special_random_pairs_of_natural_and_vec_of_bool_var_2(&EXAMPLE_SEED, scale),
         ),
+    }
+}
+
+pub fn quadruples_of_natural_natural_natural_and_small_unsigned<T: PrimitiveUnsigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (Natural, Natural, Natural, T)>> {
+    match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_quadruples(
+            exhaustive_naturals(),
+            exhaustive_naturals(),
+            exhaustive_naturals(),
+            exhaustive_unsigned(),
+        )),
+        GenerationMode::Random(scale) => Box::new(random_quadruples(
+            &EXAMPLE_SEED,
+            &(|seed| random_naturals(seed, scale)),
+            &(|seed| random_naturals(seed, scale)),
+            &(|seed| random_naturals(seed, scale)),
+            &(|seed| u32s_geometric(seed, scale).flat_map(T::checked_from)),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_quadruples(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_naturals(seed, scale)),
+            &(|seed| special_random_naturals(seed, scale)),
+            &(|seed| special_random_naturals(seed, scale)),
+            &(|seed| u32s_geometric(seed, scale).flat_map(T::checked_from)),
+        )),
     }
 }
