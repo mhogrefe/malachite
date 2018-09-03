@@ -435,11 +435,38 @@ pub trait CeilingModPowerOfTwoAssign {
     fn ceiling_mod_power_of_two_assign(&mut self, other: u64);
 }
 
+pub trait DivMod<RHS = Self> {
+    type DivOutput;
+    type ModOutput;
+
+    fn div_mod(self, rhs: RHS) -> (Self::DivOutput, Self::ModOutput);
+}
+
+pub trait DivAssignMod<RHS = Self> {
+    type ModOutput;
+
+    fn div_assign_mod(&mut self, rhs: RHS) -> Self::ModOutput;
+}
+
+pub trait DivRem<RHS = Self> {
+    type DivOutput;
+    type RemOutput;
+
+    fn div_rem(self, rhs: RHS) -> (Self::DivOutput, Self::RemOutput);
+}
+
+pub trait DivAssignRem<RHS = Self> {
+    type RemOutput;
+
+    fn div_assign_rem(&mut self, rhs: RHS) -> Self::RemOutput;
+}
+
 //TODO is_positive, is_negative, sign
 
 macro_rules! lossless_checked_from_impl {
     ($from:ty, $to:ty) => {
         impl CheckedFrom<$from> for $to {
+            #[inline]
             fn checked_from(value: $from) -> Option<$to> {
                 Some(value.into())
             }
@@ -451,6 +478,7 @@ macro_rules! lossy_checked_from_impl_a {
     ($from:ident, $to:ty) => {
         impl CheckedFrom<$from> for $to {
             #[allow(unused_comparisons)]
+            #[inline]
             fn checked_from(value: $from) -> Option<$to> {
                 let result = value as $to;
                 if (result < 0) == (value < 0) && $from::from(result) == value {
@@ -467,6 +495,7 @@ macro_rules! lossy_checked_from_impl_b {
     ($from:ident, $to:ty) => {
         impl CheckedFrom<$from> for $to {
             #[allow(unused_comparisons)]
+            #[inline]
             fn checked_from(value: $from) -> Option<$to> {
                 let result = value as $to;
                 if (result < 0) == (value < 0) && result as $from == value {
@@ -548,6 +577,7 @@ macro_rules! wrapping_impl_inner {
     ($from:ty, $to:ty) => {
         #[allow(unknown_lints, cast_lossless)]
         impl WrappingFrom<$from> for $to {
+            #[inline]
             fn wrapping_from(value: $from) -> $to {
                 value as $to
             }
@@ -642,7 +672,9 @@ pub trait PrimitiveInteger:
     + Display
     + Div<Output = Self>
     + DivAssign
+    + DivAssignRem<RemOutput = Self>
     + DivisibleByPowerOfTwo
+    + DivRem<DivOutput = Self, RemOutput = Self>
     + Endian
     + Eq
     + EqModPowerOfTwo<Self>
@@ -941,6 +973,7 @@ pub trait BitAccess {
     ///
     /// # Panics
     /// See panics for `set_bit` and `assign_bit`.
+    #[inline]
     fn assign_bit(&mut self, index: u64, bit: bool) {
         if bit {
             self.set_bit(index);
@@ -962,6 +995,7 @@ pub trait BitAccess {
     ///
     /// # Panics
     /// See panics for `get_bit`, `set_bit` and `assign_bit`.
+    #[inline]
     fn flip_bit(&mut self, index: u64) {
         if self.get_bit(index) {
             self.clear_bit(index);
@@ -982,70 +1016,83 @@ macro_rules! integer_traits {
         impl_named!($t);
 
         impl PartialOrdAbs<$t> for $t {
+            #[inline]
             fn partial_cmp_abs(&self, other: &$t) -> Option<Ordering> {
                 Some(self.cmp_abs(other))
             }
         }
 
         impl FromStrRadix for $t {
+            #[inline]
             fn from_str_radix(src: &str, radix: u32) -> Result<Self, ParseIntError> {
                 $t::from_str_radix(src, radix)
             }
         }
 
         impl CountZeros for $t {
+            #[inline]
             fn count_zeros(self) -> u32 {
                 $t::count_zeros(self)
             }
         }
 
         impl CountOnes for $t {
+            #[inline]
             fn count_ones(self) -> u32 {
                 $t::count_ones(self)
             }
         }
 
         impl LeadingZeros for $t {
+            #[inline]
             fn leading_zeros(self) -> u32 {
                 $t::leading_zeros(self)
             }
         }
 
         impl TrailingZeros for $t {
+            #[inline]
             fn trailing_zeros(self) -> u32 {
                 $t::trailing_zeros(self)
             }
         }
 
         impl RotateLeft for $t {
+            #[inline]
             fn rotate_left(&self, n: u32) -> $t {
                 $t::rotate_left(*self, n)
             }
         }
 
         impl RotateRight for $t {
+            #[inline]
             fn rotate_right(&self, n: u32) -> $t {
                 $t::rotate_right(*self, n)
             }
         }
 
         impl Endian for $t {
+            #[inline]
             fn swap_bytes(&self) -> $t {
                 $t::swap_bytes(*self)
             }
 
+            #[inline]
             fn from_be(x: &Self) -> $t {
                 $t::from_be(*x)
             }
 
+            #[inline]
             fn from_le(x: &Self) -> $t {
                 $t::from_le(*x)
             }
 
+            #[inline]
             fn to_be(&self) -> $t {
                 $t::to_be(*self)
             }
 
+            #[inline]
             fn to_le(&self) -> $t {
                 $t::to_le(*self)
             }
@@ -1054,6 +1101,7 @@ macro_rules! integer_traits {
         impl CheckedAdd<$t> for $t {
             type Output = $t;
 
+            #[inline]
             fn checked_add(self, rhs: $t) -> Option<$t> {
                 $t::checked_add(self, rhs)
             }
@@ -1062,6 +1110,7 @@ macro_rules! integer_traits {
         impl CheckedSub<$t> for $t {
             type Output = $t;
 
+            #[inline]
             fn checked_sub(self, rhs: $t) -> Option<$t> {
                 $t::checked_sub(self, rhs)
             }
@@ -1070,6 +1119,7 @@ macro_rules! integer_traits {
         impl CheckedMul<$t> for $t {
             type Output = $t;
 
+            #[inline]
             fn checked_mul(self, rhs: $t) -> Option<$t> {
                 $t::checked_mul(self, rhs)
             }
@@ -1078,6 +1128,7 @@ macro_rules! integer_traits {
         impl CheckedDiv<$t> for $t {
             type Output = $t;
 
+            #[inline]
             fn checked_div(self, rhs: $t) -> Option<$t> {
                 $t::checked_div(self, rhs)
             }
@@ -1086,6 +1137,7 @@ macro_rules! integer_traits {
         impl CheckedRem<$t> for $t {
             type Output = $t;
 
+            #[inline]
             fn checked_rem(self, rhs: $t) -> Option<$t> {
                 $t::checked_rem(self, rhs)
             }
@@ -1094,6 +1146,7 @@ macro_rules! integer_traits {
         impl CheckedNeg for $t {
             type Output = $t;
 
+            #[inline]
             fn checked_neg(self) -> Option<$t> {
                 $t::checked_neg(self)
             }
@@ -1102,6 +1155,7 @@ macro_rules! integer_traits {
         impl CheckedShl for $t {
             type Output = $t;
 
+            #[inline]
             fn checked_shl(self, rhs: u32) -> Option<$t> {
                 $t::checked_shl(self, rhs)
             }
@@ -1110,6 +1164,7 @@ macro_rules! integer_traits {
         impl CheckedShr for $t {
             type Output = $t;
 
+            #[inline]
             fn checked_shr(self, rhs: u32) -> Option<$t> {
                 $t::checked_shr(self, rhs)
             }
@@ -1118,6 +1173,7 @@ macro_rules! integer_traits {
         impl SaturatingAdd<$t> for $t {
             type Output = $t;
 
+            #[inline]
             fn saturating_add(self, rhs: $t) -> $t {
                 $t::saturating_add(self, rhs)
             }
@@ -1126,6 +1182,7 @@ macro_rules! integer_traits {
         impl SaturatingSub<$t> for $t {
             type Output = $t;
 
+            #[inline]
             fn saturating_sub(self, rhs: $t) -> $t {
                 $t::saturating_sub(self, rhs)
             }
@@ -1134,6 +1191,7 @@ macro_rules! integer_traits {
         impl SaturatingMul<$t> for $t {
             type Output = $t;
 
+            #[inline]
             fn saturating_mul(self, rhs: $t) -> $t {
                 $t::saturating_mul(self, rhs)
             }
@@ -1142,6 +1200,7 @@ macro_rules! integer_traits {
         impl WrappingAdd<$t> for $t {
             type Output = $t;
 
+            #[inline]
             fn wrapping_add(self, rhs: $t) -> $t {
                 $t::wrapping_add(self, rhs)
             }
@@ -1150,6 +1209,7 @@ macro_rules! integer_traits {
         impl WrappingSub<$t> for $t {
             type Output = $t;
 
+            #[inline]
             fn wrapping_sub(self, rhs: $t) -> $t {
                 $t::wrapping_sub(self, rhs)
             }
@@ -1158,6 +1218,7 @@ macro_rules! integer_traits {
         impl WrappingMul<$t> for $t {
             type Output = $t;
 
+            #[inline]
             fn wrapping_mul(self, rhs: $t) -> $t {
                 $t::wrapping_mul(self, rhs)
             }
@@ -1166,6 +1227,7 @@ macro_rules! integer_traits {
         impl WrappingDiv<$t> for $t {
             type Output = $t;
 
+            #[inline]
             fn wrapping_div(self, rhs: $t) -> $t {
                 $t::wrapping_div(self, rhs)
             }
@@ -1174,6 +1236,7 @@ macro_rules! integer_traits {
         impl WrappingRem<$t> for $t {
             type Output = $t;
 
+            #[inline]
             fn wrapping_rem(self, rhs: $t) -> $t {
                 $t::wrapping_rem(self, rhs)
             }
@@ -1182,6 +1245,7 @@ macro_rules! integer_traits {
         impl WrappingNeg for $t {
             type Output = $t;
 
+            #[inline]
             fn wrapping_neg(self) -> $t {
                 $t::wrapping_neg(self)
             }
@@ -1190,6 +1254,7 @@ macro_rules! integer_traits {
         impl WrappingShl for $t {
             type Output = $t;
 
+            #[inline]
             fn wrapping_shl(self, rhs: u32) -> $t {
                 $t::wrapping_shl(self, rhs)
             }
@@ -1198,6 +1263,7 @@ macro_rules! integer_traits {
         impl WrappingShr for $t {
             type Output = $t;
 
+            #[inline]
             fn wrapping_shr(self, rhs: u32) -> $t {
                 $t::wrapping_shr(self, rhs)
             }
@@ -1206,6 +1272,7 @@ macro_rules! integer_traits {
         impl OverflowingAdd<$t> for $t {
             type Output = $t;
 
+            #[inline]
             fn overflowing_add(self, rhs: $t) -> ($t, bool) {
                 $t::overflowing_add(self, rhs)
             }
@@ -1214,6 +1281,7 @@ macro_rules! integer_traits {
         impl OverflowingSub<$t> for $t {
             type Output = $t;
 
+            #[inline]
             fn overflowing_sub(self, rhs: $t) -> ($t, bool) {
                 $t::overflowing_sub(self, rhs)
             }
@@ -1222,6 +1290,7 @@ macro_rules! integer_traits {
         impl OverflowingMul<$t> for $t {
             type Output = $t;
 
+            #[inline]
             fn overflowing_mul(self, rhs: $t) -> ($t, bool) {
                 $t::overflowing_mul(self, rhs)
             }
@@ -1230,6 +1299,7 @@ macro_rules! integer_traits {
         impl OverflowingDiv<$t> for $t {
             type Output = $t;
 
+            #[inline]
             fn overflowing_div(self, rhs: $t) -> ($t, bool) {
                 $t::overflowing_div(self, rhs)
             }
@@ -1238,6 +1308,7 @@ macro_rules! integer_traits {
         impl OverflowingRem<$t> for $t {
             type Output = $t;
 
+            #[inline]
             fn overflowing_rem(self, rhs: $t) -> ($t, bool) {
                 $t::overflowing_rem(self, rhs)
             }
@@ -1246,6 +1317,7 @@ macro_rules! integer_traits {
         impl OverflowingNeg for $t {
             type Output = $t;
 
+            #[inline]
             fn overflowing_neg(self) -> ($t, bool) {
                 $t::overflowing_neg(self)
             }
@@ -1254,6 +1326,7 @@ macro_rules! integer_traits {
         impl OverflowingShl for $t {
             type Output = $t;
 
+            #[inline]
             fn overflowing_shl(self, rhs: u32) -> ($t, bool) {
                 $t::overflowing_shl(self, rhs)
             }
@@ -1262,6 +1335,7 @@ macro_rules! integer_traits {
         impl OverflowingShr for $t {
             type Output = $t;
 
+            #[inline]
             fn overflowing_shr(self, rhs: u32) -> ($t, bool) {
                 $t::overflowing_shr(self, rhs)
             }
@@ -1270,6 +1344,7 @@ macro_rules! integer_traits {
         impl Pow<u32> for $t {
             type Output = $t;
 
+            #[inline]
             fn pow(self, exp: u32) -> $t {
                 $t::pow(self, exp)
             }
@@ -1284,6 +1359,7 @@ macro_rules! integer_traits {
         }
 
         impl HammingDistance<$t> for $t {
+            #[inline]
             fn hamming_distance(self, other: $t) -> u64 {
                 u64::from((self ^ other).count_ones())
             }
@@ -1313,6 +1389,7 @@ macro_rules! integer_traits {
             ///     assert_eq!(i, -4);
             /// }
             /// ```
+            #[inline]
             fn increment(&mut self) {
                 *self = self
                     .checked_add(1)
@@ -1342,6 +1419,7 @@ macro_rules! integer_traits {
             ///     assert_eq!(i, -6);
             /// }
             /// ```
+            #[inline]
             fn decrement(&mut self) {
                 *self = self
                     .checked_sub(1)
@@ -1351,6 +1429,7 @@ macro_rules! integer_traits {
 
         //TODO docs, test
         impl NotAssign for $t {
+            #[inline]
             fn not_assign(&mut self) {
                 *self = !*self;
             }
@@ -1358,24 +1437,49 @@ macro_rules! integer_traits {
 
         //TODO docs, test
         impl WrappingNegAssign for $t {
+            #[inline]
             fn wrapping_neg_assign(&mut self) {
                 *self = self.wrapping_neg();
             }
         }
 
         impl Parity for $t {
+            #[inline]
             fn is_even(&self) -> bool {
                 (*self & 1) == 0
             }
 
+            #[inline]
             fn is_odd(&self) -> bool {
                 (*self & 1) != 0
             }
         }
 
         impl EqModPowerOfTwo<Self> for $t {
+            #[inline]
             fn eq_mod_power_of_two(&self, other: &$t, pow: u64) -> bool {
                 (self ^ other).divisible_by_power_of_two(pow)
+            }
+        }
+
+        impl DivRem for $t {
+            type DivOutput = $t;
+            type RemOutput = $t;
+
+            #[inline]
+            fn div_rem(self, rhs: $t) -> ($t, $t) {
+                (self / rhs, self % rhs)
+            }
+        }
+
+        impl DivAssignRem for $t {
+            type RemOutput = $t;
+
+            #[inline]
+            fn div_assign_rem(&mut self, rhs: $t) -> $t {
+                let rem = *self % rhs;
+                *self /= rhs;
+                rem
             }
         }
     };
@@ -1383,20 +1487,24 @@ macro_rules! integer_traits {
 
 //TODO fix code duplication
 impl Parity for usize {
+    #[inline]
     fn is_even(&self) -> bool {
         (*self & 1) == 0
     }
 
+    #[inline]
     fn is_odd(&self) -> bool {
         (*self & 1) != 0
     }
 }
 
 impl Parity for isize {
+    #[inline]
     fn is_even(&self) -> bool {
         (*self & 1) == 0
     }
 
+    #[inline]
     fn is_odd(&self) -> bool {
         (*self & 1) != 0
     }
@@ -1408,12 +1516,14 @@ macro_rules! unsigned_traits {
         integer_traits!($t, $log_width, $u, $from_u32, $from_u64);
 
         impl OrdAbs for $t {
+            #[inline]
             fn cmp_abs(&self, other: &Self) -> Ordering {
                 self.cmp(other)
             }
         }
 
         impl IsPowerOfTwo for $t {
+            #[inline]
             fn is_power_of_two(&self) -> bool {
                 $t::is_power_of_two(*self)
             }
@@ -1422,12 +1532,14 @@ macro_rules! unsigned_traits {
         impl NextPowerOfTwo for $t {
             type Output = $t;
 
+            #[inline]
             fn next_power_of_two(self) -> $t {
                 $t::next_power_of_two(self)
             }
         }
 
         impl NextPowerOfTwoAssign for $t {
+            #[inline]
             fn next_power_of_two_assign(&mut self) {
                 *self = $t::next_power_of_two(*self)
             }
@@ -1436,6 +1548,7 @@ macro_rules! unsigned_traits {
         impl CheckedNextPowerOfTwo for $t {
             type Output = $t;
 
+            #[inline]
             fn checked_next_power_of_two(self) -> Option<$t> {
                 $t::checked_next_power_of_two(self)
             }
@@ -1458,6 +1571,7 @@ macro_rules! unsigned_traits {
             ///     assert_eq!(100u64.significant_bits(), 7);
             /// }
             /// ```
+            #[inline]
             fn significant_bits(self) -> u64 {
                 (Self::WIDTH - self.leading_zeros()).into()
             }
@@ -1482,6 +1596,7 @@ macro_rules! unsigned_traits {
             ///     assert_eq!(100u64.floor_log_two(), 6);
             /// }
             /// ```
+            #[inline]
             fn floor_log_two(self) -> u64 {
                 if self == 0 {
                     panic!("Cannot take the base-2 logarithm of 0.");
@@ -1510,6 +1625,7 @@ macro_rules! unsigned_traits {
             ///     assert_eq!(100u64.ceiling_log_two(), 7);
             /// }
             /// ```
+            #[inline]
             fn ceiling_log_two(self) -> u64 {
                 let floor_log_two = self.floor_log_two();
                 if self.is_power_of_two() {
@@ -1564,6 +1680,7 @@ macro_rules! unsigned_traits {
             /// assert_eq!(1_000_000_000_000u64.get_bit(12), true);
             /// assert_eq!(1_000_000_000_000u64.get_bit(100), false);
             /// ```
+            #[inline]
             fn get_bit(&self, index: u64) -> bool {
                 index < Self::WIDTH.into() && *self & (1 << index) != 0
             }
@@ -1590,6 +1707,7 @@ macro_rules! unsigned_traits {
             /// x.set_bit(6);
             /// assert_eq!(x, 100);
             /// ```
+            #[inline]
             fn set_bit(&mut self, index: u64) {
                 if index < Self::WIDTH.into() {
                     *self |= 1 << index;
@@ -1623,6 +1741,7 @@ macro_rules! unsigned_traits {
             /// x.clear_bit(4);
             /// assert_eq!(x, 100);
             /// ```
+            #[inline]
             fn clear_bit(&mut self, index: u64) {
                 if index < Self::WIDTH.into() {
                     *self &= !(1 << index);
@@ -1631,6 +1750,7 @@ macro_rules! unsigned_traits {
         }
 
         impl BitScan for $t {
+            #[inline]
             fn index_of_next_false_bit(&self, starting_index: u64) -> Option<u64> {
                 Some(if starting_index >= Self::WIDTH.into() {
                     starting_index
@@ -1641,6 +1761,7 @@ macro_rules! unsigned_traits {
                 })
             }
 
+            #[inline]
             fn index_of_next_true_bit(&self, starting_index: u64) -> Option<u64> {
                 if starting_index >= Self::WIDTH.into() {
                     None
@@ -1658,6 +1779,7 @@ macro_rules! unsigned_traits {
         }
 
         impl DivisibleByPowerOfTwo for $t {
+            #[inline]
             fn divisible_by_power_of_two(&self, pow: u64) -> bool {
                 self.mod_power_of_two(pow) == 0
             }
@@ -1666,6 +1788,7 @@ macro_rules! unsigned_traits {
         impl ModPowerOfTwo for $t {
             type Output = $t;
 
+            #[inline]
             fn mod_power_of_two(self, pow: u64) -> $t {
                 if self == 0 || pow >= $t::WIDTH.into() {
                     self
@@ -1676,6 +1799,7 @@ macro_rules! unsigned_traits {
         }
 
         impl ModPowerOfTwoAssign for $t {
+            #[inline]
             fn mod_power_of_two_assign(&mut self, pow: u64) {
                 if *self != 0 && pow < $t::WIDTH.into() {
                     *self &= (1 << pow) - 1;
@@ -1686,12 +1810,14 @@ macro_rules! unsigned_traits {
         impl RemPowerOfTwo for $t {
             type Output = $t;
 
+            #[inline]
             fn rem_power_of_two(self, pow: u64) -> $t {
                 self.mod_power_of_two(pow)
             }
         }
 
         impl RemPowerOfTwoAssign for $t {
+            #[inline]
             fn rem_power_of_two_assign(&mut self, pow: u64) {
                 self.mod_power_of_two_assign(pow)
             }
@@ -1718,16 +1844,19 @@ macro_rules! signed_traits {
         impl PrimitiveSigned for $t {
             type UnsignedOfEqualWidth = $ut;
 
+            #[inline]
             fn to_unsigned_bitwise(self) -> Self::UnsignedOfEqualWidth {
                 self as $ut
             }
 
+            #[inline]
             fn from_unsigned_bitwise(u: Self::UnsignedOfEqualWidth) -> Self {
                 u as $t
             }
         }
 
         impl OrdAbs for $t {
+            #[inline]
             fn cmp_abs(&self, other: &Self) -> Ordering {
                 self.unsigned_abs().cmp(&other.unsigned_abs())
             }
@@ -1736,6 +1865,7 @@ macro_rules! signed_traits {
         impl Abs for $t {
             type Output = $t;
 
+            #[inline]
             fn abs(self) -> $t {
                 $t::abs(self)
             }
@@ -1744,6 +1874,7 @@ macro_rules! signed_traits {
         impl UnsignedAbs for $t {
             type Output = $ut;
 
+            #[inline]
             fn unsigned_abs(self) -> $ut {
                 $t::wrapping_abs(self) as $ut
             }
@@ -1752,6 +1883,7 @@ macro_rules! signed_traits {
         impl CheckedAbs for $t {
             type Output = $t;
 
+            #[inline]
             fn abs(self) -> Option<$t> {
                 $t::checked_abs(self)
             }
@@ -1760,6 +1892,7 @@ macro_rules! signed_traits {
         impl WrappingAbs for $t {
             type Output = $t;
 
+            #[inline]
             fn abs(self) -> $t {
                 $t::wrapping_abs(self)
             }
@@ -1768,6 +1901,7 @@ macro_rules! signed_traits {
         impl OverflowingAbs for $t {
             type Output = $t;
 
+            #[inline]
             fn abs(self) -> ($t, bool) {
                 $t::overflowing_abs(self)
             }
@@ -1790,6 +1924,7 @@ macro_rules! signed_traits {
         /// }
         /// ```
         impl SignificantBits for $t {
+            #[inline]
             fn significant_bits(self) -> u64 {
                 self.unsigned_abs().significant_bits()
             }
@@ -1865,6 +2000,7 @@ macro_rules! signed_traits {
             /// assert_eq!((-1_000_000_000_000i64).get_bit(12), true);
             /// assert_eq!((-1_000_000_000_000i64).get_bit(100), true);
             /// ```
+            #[inline]
             fn get_bit(&self, index: u64) -> bool {
                 if index < Self::WIDTH.into() {
                     self & (1 << index) != 0
@@ -1904,6 +2040,7 @@ macro_rules! signed_traits {
             /// x.set_bit(6);
             /// assert_eq!(x, -156);
             /// ```
+            #[inline]
             fn set_bit(&mut self, index: u64) {
                 if index < Self::WIDTH.into() {
                     *self |= 1 << index;
@@ -1949,6 +2086,7 @@ macro_rules! signed_traits {
             /// x.clear_bit(6);
             /// assert_eq!(x, -256);
             /// ```
+            #[inline]
             fn clear_bit(&mut self, index: u64) {
                 if index < Self::WIDTH.into() {
                     *self &= !(1 << index);
@@ -1964,6 +2102,7 @@ macro_rules! signed_traits {
 
         //TODO docs, test
         impl NegAssign for $t {
+            #[inline]
             fn neg_assign(&mut self) {
                 *self = -*self;
             }
@@ -1971,6 +2110,7 @@ macro_rules! signed_traits {
 
         //TODO
         impl BitScan for $t {
+            #[inline]
             fn index_of_next_false_bit(&self, starting_index: u64) -> Option<u64> {
                 if starting_index >= u64::from(Self::WIDTH) - 1 {
                     if *self >= 0 {
@@ -1990,6 +2130,7 @@ macro_rules! signed_traits {
                 }
             }
 
+            #[inline]
             fn index_of_next_true_bit(&self, starting_index: u64) -> Option<u64> {
                 if starting_index >= u64::from(Self::WIDTH) - 1 {
                     if *self >= 0 {
@@ -2011,6 +2152,7 @@ macro_rules! signed_traits {
         }
 
         impl DivisibleByPowerOfTwo for $t {
+            #[inline]
             fn divisible_by_power_of_two(&self, pow: u64) -> bool {
                 self.to_unsigned_bitwise().divisible_by_power_of_two(pow)
             }
@@ -2034,38 +2176,47 @@ macro_rules! float_traits {
             const MAX_FINITE: Self = std::$t::MAX;
             const MIN_FINITE: Self = std::$t::MIN;
 
+            #[inline]
             fn is_nan(self) -> bool {
                 $t::is_nan(self)
             }
 
+            #[inline]
             fn is_infinite(self) -> bool {
                 $t::is_infinite(self)
             }
 
+            #[inline]
             fn is_finite(self) -> bool {
                 $t::is_finite(self)
             }
 
+            #[inline]
             fn is_normal(self) -> bool {
                 $t::is_normal(self)
             }
 
+            #[inline]
             fn classify(self) -> FpCategory {
                 $t::classify(self)
             }
 
+            #[inline]
             fn is_sign_positive(self) -> bool {
                 $t::is_sign_positive(self)
             }
 
+            #[inline]
             fn is_sign_negative(self) -> bool {
                 $t::is_sign_negative(self)
             }
 
+            #[inline]
             fn to_bits(self) -> $ut {
                 $t::to_bits(self)
             }
 
+            #[inline]
             fn from_bits(v: $ut) -> $t {
                 $t::from_bits(v)
             }
@@ -2082,6 +2233,7 @@ macro_rules! float_traits {
         }
 
         impl NegAssign for $t {
+            #[inline]
             fn neg_assign(&mut self) {
                 *self = -*self;
             }
@@ -2093,10 +2245,12 @@ macro_rules! float_traits {
 impl PrimitiveUnsigned for u8 {
     type SignedOfEqualWidth = i8;
 
+    #[inline]
     fn to_signed_bitwise(self) -> i8 {
         self as i8
     }
 
+    #[inline]
     fn to_signed_checked(self) -> Option<i8> {
         if self <= i8::MAX as u8 {
             Some(self as i8)
@@ -2105,6 +2259,7 @@ impl PrimitiveUnsigned for u8 {
         }
     }
 
+    #[inline]
     fn from_signed_bitwise(i: i8) -> u8 {
         i as u8
     }
@@ -2113,10 +2268,12 @@ impl PrimitiveUnsigned for u8 {
 impl PrimitiveUnsigned for u16 {
     type SignedOfEqualWidth = i16;
 
+    #[inline]
     fn to_signed_bitwise(self) -> i16 {
         self as i16
     }
 
+    #[inline]
     fn to_signed_checked(self) -> Option<i16> {
         if self <= i16::MAX as u16 {
             Some(self as i16)
@@ -2125,6 +2282,7 @@ impl PrimitiveUnsigned for u16 {
         }
     }
 
+    #[inline]
     fn from_signed_bitwise(i: i16) -> u16 {
         i as u16
     }
@@ -2133,10 +2291,12 @@ impl PrimitiveUnsigned for u16 {
 impl PrimitiveUnsigned for u32 {
     type SignedOfEqualWidth = i32;
 
+    #[inline]
     fn to_signed_bitwise(self) -> i32 {
         self as i32
     }
 
+    #[inline]
     fn to_signed_checked(self) -> Option<i32> {
         if self <= i32::MAX as u32 {
             Some(self as i32)
@@ -2145,6 +2305,7 @@ impl PrimitiveUnsigned for u32 {
         }
     }
 
+    #[inline]
     fn from_signed_bitwise(i: i32) -> u32 {
         i as u32
     }
@@ -2153,10 +2314,12 @@ impl PrimitiveUnsigned for u32 {
 impl PrimitiveUnsigned for u64 {
     type SignedOfEqualWidth = i64;
 
+    #[inline]
     fn to_signed_bitwise(self) -> i64 {
         self as i64
     }
 
+    #[inline]
     fn to_signed_checked(self) -> Option<i64> {
         if self <= i64::MAX as u64 {
             Some(self as i64)
@@ -2165,6 +2328,7 @@ impl PrimitiveUnsigned for u64 {
         }
     }
 
+    #[inline]
     fn from_signed_bitwise(i: i64) -> u64 {
         i as u64
     }
@@ -2226,6 +2390,7 @@ pub trait SubMul<B, C> {
 pub trait PartialOrdAbs<Rhs: ?Sized = Self>: PartialEq<Rhs> {
     fn partial_cmp_abs(&self, other: &Rhs) -> Option<Ordering>;
 
+    #[inline]
     fn lt_abs(&self, other: &Rhs) -> bool {
         match self.partial_cmp_abs(other) {
             Some(Ordering::Less) => true,
@@ -2233,6 +2398,7 @@ pub trait PartialOrdAbs<Rhs: ?Sized = Self>: PartialEq<Rhs> {
         }
     }
 
+    #[inline]
     fn le_abs(&self, other: &Rhs) -> bool {
         match self.partial_cmp_abs(other) {
             Some(Ordering::Less) | Some(Ordering::Equal) => true,
@@ -2240,6 +2406,7 @@ pub trait PartialOrdAbs<Rhs: ?Sized = Self>: PartialEq<Rhs> {
         }
     }
 
+    #[inline]
     fn gt_abs(&self, other: &Rhs) -> bool {
         match self.partial_cmp_abs(other) {
             Some(Ordering::Greater) => true,
@@ -2247,6 +2414,7 @@ pub trait PartialOrdAbs<Rhs: ?Sized = Self>: PartialEq<Rhs> {
         }
     }
 
+    #[inline]
     fn ge_abs(&self, other: &Rhs) -> bool {
         match self.partial_cmp_abs(other) {
             Some(Ordering::Greater) | Some(Ordering::Equal) => true,
@@ -2423,6 +2591,7 @@ pub trait JoinHalves: HasHalf {
 /// `u32`s.
 pub trait SplitInHalf: HasHalf {
     /// Extracts the lower, or least significant half, of `self`.
+    ///
     fn lower_half(&self) -> Self::Half;
 
     /// Extracts the upper, or most significant half, of `self`.
@@ -2437,6 +2606,7 @@ pub trait SplitInHalf: HasHalf {
     ///     additional-memory complexity of `Self::lower_half` and g(n) is the worst-case
     ///     additional-memory complexity of `Self::upper_half.
     ///
+    #[inline]
     fn split_in_half(&self) -> (Self::Half, Self::Half) {
         (self.upper_half(), self.lower_half())
     }
@@ -2468,6 +2638,7 @@ macro_rules! impl_halves_unsigned {
             /// assert_eq!(u16::join_halves(1, 2), 258);
             /// assert_eq!(u32::join_halves(0xabcd, 0x1234), 0xabcd1234);
             /// ```
+            #[inline]
             fn join_halves(upper: Self::Half, lower: Self::Half) -> Self {
                 $t::from(upper) << $ht::WIDTH | $t::from(lower)
             }
@@ -2498,6 +2669,7 @@ macro_rules! impl_halves_unsigned {
             /// assert_eq!(258u16.lower_half(), 2);
             /// assert_eq!(0xabcd1234u32.lower_half(), 0x1234);
             /// ```
+            #[inline]
             fn lower_half(&self) -> Self::Half {
                 *self as $ht
             }
@@ -2517,6 +2689,7 @@ macro_rules! impl_halves_unsigned {
             /// assert_eq!(258u16.upper_half(), 1);
             /// assert_eq!(0xabcd1234u32.upper_half(), 0xabcd);
             /// ```
+            #[inline]
             fn upper_half(&self) -> Self::Half {
                 (self >> $ht::WIDTH) as $ht
             }
@@ -2697,6 +2870,7 @@ macro_rules! round_shift_primitive_signed {
         impl ShlRound<$u> for $t {
             type Output = $t;
 
+            #[inline]
             fn shl_round(self, other: $u, rm: RoundingMode) -> $t {
                 if other >= 0 {
                     self << other.to_unsigned_bitwise()
@@ -2707,6 +2881,7 @@ macro_rules! round_shift_primitive_signed {
         }
 
         impl ShlRoundAssign<$u> for $t {
+            #[inline]
             fn shl_round_assign(&mut self, other: $u, rm: RoundingMode) {
                 if other >= 0 {
                     *self <<= other.to_unsigned_bitwise();
@@ -2719,6 +2894,7 @@ macro_rules! round_shift_primitive_signed {
         impl ShrRound<$u> for $t {
             type Output = $t;
 
+            #[inline]
             fn shr_round(self, other: $u, rm: RoundingMode) -> $t {
                 if other >= 0 {
                     self.shr_round(other.to_unsigned_bitwise(), rm)
@@ -2729,6 +2905,7 @@ macro_rules! round_shift_primitive_signed {
         }
 
         impl ShrRoundAssign<$u> for $t {
+            #[inline]
             fn shr_round_assign(&mut self, other: $u, rm: RoundingMode) {
                 if other >= 0 {
                     self.shr_round_assign(other.to_unsigned_bitwise(), rm);
@@ -2795,6 +2972,7 @@ macro_rules! round_shift_signed_unsigned {
         }
 
         impl ShrRoundAssign<$u> for $t {
+            #[inline]
             fn shr_round_assign(&mut self, other: $u, rm: RoundingMode) {
                 *self = self.shr_round(other, rm);
             }
@@ -2827,11 +3005,13 @@ pub trait FromU32Slice: Sized {
 
 //TODO doc and test
 impl FromU32Slice for u32 {
+    #[inline]
     fn from_u32_slice(slice: &[u32]) -> Self {
         assert!(!slice.is_empty());
         slice[0]
     }
 
+    #[inline]
     fn copy_from_u32_slice(out_slice: &mut [u32], in_slice: &[u32]) {
         let out_len = out_slice.len();
         assert!(out_len >= in_slice.len());
@@ -2841,6 +3021,7 @@ impl FromU32Slice for u32 {
 
 //TODO doc and test
 impl FromU32Slice for u8 {
+    #[inline]
     fn from_u32_slice(slice: &[u32]) -> Self {
         assert!(!slice.is_empty());
         slice[0] as u8
@@ -2865,6 +3046,7 @@ impl FromU32Slice for u8 {
 
 //TODO doc and test
 impl FromU32Slice for u16 {
+    #[inline]
     fn from_u32_slice(slice: &[u32]) -> Self {
         assert!(!slice.is_empty());
         slice[0] as u16
@@ -2885,6 +3067,7 @@ impl FromU32Slice for u16 {
 
 //TODO doc and test
 impl FromU32Slice for u64 {
+    #[inline]
     fn from_u32_slice(slice: &[u32]) -> Self {
         assert!(slice.len() >= 2);
         u64::join_halves(slice[1], slice[0])

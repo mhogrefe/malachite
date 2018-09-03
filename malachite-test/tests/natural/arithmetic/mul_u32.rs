@@ -1,5 +1,5 @@
 use common::test_properties;
-use malachite_base::num::{One, Zero};
+use malachite_base::num::{DivMod, One, Zero};
 use malachite_nz::natural::arithmetic::mul_u32::{
     limbs_mul_limb, limbs_mul_limb_to_out, limbs_slice_mul_limb_in_place,
     limbs_vec_mul_limb_in_place,
@@ -278,7 +278,11 @@ fn mul_u32_properties() {
                 assert!(product >= *n);
                 assert!(product >= u);
             }
-            //TODO assert_eq!(product / u, n);
+            if u != 0 {
+                let (q, r) = product.div_mod(u);
+                assert_eq!(q, *n);
+                assert_eq!(r, 0);
+            }
             //TODO assert_eq!(product / n, u);
         },
     );

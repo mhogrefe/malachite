@@ -1,5 +1,5 @@
 use error::ParseIntegerError;
-use malachite_base::num::{Assign, Zero};
+use malachite_base::num::{Assign, DivAssignMod, Zero};
 use natural::Natural::{self, Large, Small};
 use std::fmt::{self, Debug, Display, Formatter};
 use std::str::FromStr;
@@ -42,7 +42,7 @@ fn make_string(i: &Natural, radix: i32, to_upper: bool) -> String {
     while i_cloned != Natural::ZERO {
         cs.push(
             i_cloned
-                .div_rem_in_place_u32(10)
+                .div_assign_mod(10)
                 .to_string()
                 .chars()
                 .next()

@@ -4,7 +4,8 @@ use malachite_nz::natural::arithmetic::eq_mod_power_of_two::limbs_eq_mod_power_o
 use malachite_nz::natural::Natural;
 use malachite_test::inputs::base::triples_of_unsigned_vec_unsigned_vec_and_small_unsigned_var_1;
 use malachite_test::inputs::natural::{
-    pairs_of_natural_and_small_unsigned, triples_of_natural_natural_and_small_unsigned, quadruples_of_natural_natural_natural_and_small_unsigned
+    pairs_of_natural_and_small_unsigned, quadruples_of_natural_natural_natural_and_small_unsigned,
+    triples_of_natural_natural_and_small_unsigned,
 };
 use std::str::FromStr;
 

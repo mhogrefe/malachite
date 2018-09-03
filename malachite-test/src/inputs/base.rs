@@ -857,6 +857,35 @@ pub fn pairs_of_nonempty_unsigned_vec_and_unsigned<T: PrimitiveUnsigned>(
     Box::new(pairs_of_unsigned_vec_and_unsigned(gm).filter(|&(ref xs, _)| !xs.is_empty()))
 }
 
+pub fn pairs_of_unsigned_vec_and_positive_unsigned<T: PrimitiveUnsigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (Vec<T>, T)>> {
+    match gm {
+        GenerationMode::Exhaustive => Box::new(Box::new(exhaustive_pairs(
+            exhaustive_vecs(exhaustive_unsigned()),
+            exhaustive_positive(),
+        ))),
+        GenerationMode::Random(scale) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| random_vecs(seed, scale, &(|seed_2| random(seed_2)))),
+            &(|seed| random_positive_unsigned(seed)),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_unsigned_vecs(seed, scale)),
+            &(|seed| special_random_positive_unsigned(seed)),
+        )),
+    }
+}
+
+// All pairs of `Vec<T>` and positive `T`, where `T` is unsigned and the `Vec`'s length is greater
+// than 1.
+pub fn pairs_of_unsigned_vec_and_positive_unsigned_var_1<T: PrimitiveUnsigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (Vec<T>, T)>> {
+    Box::new(pairs_of_unsigned_vec_and_positive_unsigned(gm).filter(|&(ref xs, _)| xs.len() > 1))
+}
+
 // All pairs of `Vec<T>` where `T` is unsigned, and a `u32` between 1 and 31, inclusive.
 pub fn pairs_of_unsigned_vec_and_u32_var_1<T: PrimitiveUnsigned>(
     gm: GenerationMode,
@@ -1003,6 +1032,30 @@ fn triples_of_unsigned_vec_unsigned_vec_and_unsigned<T: PrimitiveUnsigned>(
     }
 }
 
+fn triples_of_unsigned_vec_unsigned_vec_and_positive_unsigned<T: PrimitiveUnsigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (Vec<T>, Vec<T>, T)>> {
+    match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_triples(
+            exhaustive_vecs(exhaustive_unsigned()),
+            exhaustive_vecs(exhaustive_unsigned()),
+            exhaustive_positive(),
+        )),
+        GenerationMode::Random(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| random_vecs(seed, scale, &(|seed_2| random(seed_2)))),
+            &(|seed| random_vecs(seed, scale, &(|seed_2| random(seed_2)))),
+            &(|seed| random_positive_unsigned(seed)),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_unsigned_vecs(seed, scale)),
+            &(|seed| special_random_unsigned_vecs(seed, scale)),
+            &(|seed| special_random_positive_unsigned(seed)),
+        )),
+    }
+}
+
 // All triples of `Vec<T>`, `Vec<T>`, and `T` where `T` is unsigned and the first `Vec` is at least
 // as long as the second.
 pub fn triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_1<T: PrimitiveUnsigned>(
@@ -1088,6 +1141,20 @@ pub fn triples_of_unsigned_vec_unsigned_vec_and_u32_var_6<T: PrimitiveUnsigned>(
         triples_of_unsigned_vec_unsigned_vec_and_u32_var_4(gm).filter(
             |&(ref out_limbs, ref in_limbs, _)| {
                 !in_limbs.is_empty() && out_limbs.len() >= in_limbs.len()
+            },
+        ),
+    )
+}
+
+// All triples of `Vec<T>`, `Vec<T>`, and `T` where `T` is unsigned, the first `Vec` is at least as
+// long as the second, and the length of the second `Vec` is greater than 1.
+pub fn triples_of_unsigned_vec_unsigned_vec_and_positive_unsigned_var_1<T: PrimitiveUnsigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (Vec<T>, Vec<T>, T)>> {
+    Box::new(
+        triples_of_unsigned_vec_unsigned_vec_and_positive_unsigned(gm).filter(
+            |&(ref out_limbs, ref in_limbs, _)| {
+                out_limbs.len() >= in_limbs.len() && in_limbs.len() > 1
             },
         ),
     )

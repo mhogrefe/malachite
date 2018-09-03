@@ -178,7 +178,34 @@ macro_rules! mutate_with_possible_promotion {
     };
 }
 
-pub mod arithmetic;
+pub mod arithmetic {
+    pub mod add;
+    pub mod add_mul;
+    pub mod add_mul_u32;
+    pub mod add_u32;
+    pub mod checked_sub;
+    pub mod checked_sub_u32;
+    pub mod div_mod_u32;
+    pub mod divisible_by_power_of_two;
+    pub mod eq_mod_power_of_two;
+    pub mod eq_mod_power_of_two_u32;
+    pub mod is_power_of_two;
+    pub mod log_two;
+    pub mod mod_power_of_two;
+    pub mod mul;
+    pub mod mul_u32;
+    pub mod neg;
+    pub mod next_power_of_two;
+    pub mod parity;
+    pub mod shl_i;
+    pub mod shl_u;
+    pub mod shr_i;
+    pub mod shr_u;
+    pub mod sub;
+    pub mod sub_mul;
+    pub mod sub_mul_u32;
+    pub mod sub_u32;
+}
 pub mod conversion;
 pub mod comparison {
     pub mod ord;

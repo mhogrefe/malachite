@@ -28,9 +28,9 @@ use rust_wheels::iterators::primitive_ints::{
 };
 use rust_wheels::iterators::rounding_modes::{exhaustive_rounding_modes, random_rounding_modes};
 use rust_wheels::iterators::tuples::{
-    exhaustive_pairs, exhaustive_pairs_from_single, exhaustive_triples,
+    exhaustive_pairs, exhaustive_pairs_from_single, exhaustive_quadruples, exhaustive_triples,
     exhaustive_triples_from_single, lex_pairs, log_pairs, random_pairs, random_pairs_from_single,
-    random_triples, random_triples_from_single, exhaustive_quadruples, random_quadruples
+    random_quadruples, random_triples, random_triples_from_single,
 };
 use rust_wheels::iterators::vecs::exhaustive_fixed_size_vecs_from_single;
 use std::ops::Shl;

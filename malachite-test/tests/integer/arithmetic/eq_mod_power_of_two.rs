@@ -5,7 +5,8 @@ use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_test::inputs::base::triples_of_unsigned_vec_unsigned_vec_and_small_unsigned_var_1;
 use malachite_test::inputs::integer::{
-    pairs_of_integer_and_small_unsigned, triples_of_integer_integer_and_small_unsigned, quadruples_of_integer_integer_integer_and_small_unsigned
+    pairs_of_integer_and_small_unsigned, quadruples_of_integer_integer_integer_and_small_unsigned,
+    triples_of_integer_integer_and_small_unsigned,
 };
 use std::str::FromStr;
 
@@ -16,9 +17,24 @@ fn test_limbs_eq_mod_power_of_two_neg_pos() {
     };
     test(&[0b111_1011, 0b1_1100_1000], &[0b1_0101], 4, true);
     test(&[0b111_1011, 0b1_1100_1000], &[0b1_0101], 5, false);
-    test(&[0b111_1011, 0b1_1100_1000], &[0b1111_1111_1111_1111_1111_1111_1000_0101, 0b1111], 35, true);
-    test(&[0b111_1011, 0b1_1100_1000], &[0b1111_1111_1111_1111_1111_1111_1000_0101, 0b1111], 36, false);
-    test(&[0b111_1011, 0b1_1100_1000], &[0b1111_1111_1111_1111_1111_1111_1000_0101, 0b1111], 100, false);
+    test(
+        &[0b111_1011, 0b1_1100_1000],
+        &[0b1111_1111_1111_1111_1111_1111_1000_0101, 0b1111],
+        35,
+        true,
+    );
+    test(
+        &[0b111_1011, 0b1_1100_1000],
+        &[0b1111_1111_1111_1111_1111_1111_1000_0101, 0b1111],
+        36,
+        false,
+    );
+    test(
+        &[0b111_1011, 0b1_1100_1000],
+        &[0b1111_1111_1111_1111_1111_1111_1000_0101, 0b1111],
+        100,
+        false,
+    );
     test(
         &[0b111_1011, 0b1_1100_1000],
         &[0b1111_1111_1111_1111_1111_1111_1000_0101, 0b1_0111],
@@ -38,16 +54,56 @@ fn test_limbs_eq_mod_power_of_two_neg_pos() {
         false,
     );
 
-    test(&[0xabcd_abcd, 0x1234_1234], &[0x5432_5433, 0xedcb_edcb], 64, true);
-    test(&[0xabcd_abcd, 0x1234_1234], &[0x0000_0000, 0xedcb_edcb], 64, false);
-    test(&[0xabcd_abcd, 0x1234_1234], &[0x5432_5433, 0xedcb_edcb], 65, false);
-    test(&[0xabcd_abcd, 0x1234_1234], &[0x5432_5433, 0xedcb_edcb], 128, false);
+    test(
+        &[0xabcd_abcd, 0x1234_1234],
+        &[0x5432_5433, 0xedcb_edcb],
+        64,
+        true,
+    );
+    test(
+        &[0xabcd_abcd, 0x1234_1234],
+        &[0x0000_0000, 0xedcb_edcb],
+        64,
+        false,
+    );
+    test(
+        &[0xabcd_abcd, 0x1234_1234],
+        &[0x5432_5433, 0xedcb_edcb],
+        65,
+        false,
+    );
+    test(
+        &[0xabcd_abcd, 0x1234_1234],
+        &[0x5432_5433, 0xedcb_edcb],
+        128,
+        false,
+    );
     test(&[0, 0, 0x1234_1234], &[0, 0, 0x1234_edcc], 80, true);
 
-    test(&[0x5432_5433, 0xedcb_edcb], &[0xabcd_abcd, 0x1234_1234], 64, true);
-    test(&[0x0000_0000, 0xedcb_edcb], &[0xabcd_abcd, 0x1234_1234], 64, false);
-    test(&[0x5432_5433, 0xedcb_edcb], &[0xabcd_abcd, 0x1234_1234], 65, false);
-    test(&[0x5432_5433, 0xedcb_edcb], &[0xabcd_abcd, 0x1234_1234], 128, false);
+    test(
+        &[0x5432_5433, 0xedcb_edcb],
+        &[0xabcd_abcd, 0x1234_1234],
+        64,
+        true,
+    );
+    test(
+        &[0x0000_0000, 0xedcb_edcb],
+        &[0xabcd_abcd, 0x1234_1234],
+        64,
+        false,
+    );
+    test(
+        &[0x5432_5433, 0xedcb_edcb],
+        &[0xabcd_abcd, 0x1234_1234],
+        65,
+        false,
+    );
+    test(
+        &[0x5432_5433, 0xedcb_edcb],
+        &[0xabcd_abcd, 0x1234_1234],
+        128,
+        false,
+    );
     test(&[0, 0, 0x1234_edcc], &[0, 0, 0x1234_1234], 80, true);
 }
 
@@ -113,13 +169,23 @@ fn test_eq_mod_power_of_two() {
     test("1311693408901639117", "-17135050663395328000", 64, false);
     test("1311693408901639117", "-17135050664807912499", 65, false);
     test("1311693408901639117", "-17135050664807912499", 128, false);
-    test("5633680281231555440641310720", "-5634717283396403096794955776", 80, true);
+    test(
+        "5633680281231555440641310720",
+        "-5634717283396403096794955776",
+        80,
+        true,
+    );
 
     test("-1311693408901639117", "17135050664807912499", 64, true);
     test("-1311693408901639117", "17135050663395328000", 64, false);
     test("-1311693408901639117", "17135050664807912499", 65, false);
     test("-1311693408901639117", "17135050664807912499", 128, false);
-    test("-5633680281231555440641310720", "5634717283396403096794955776", 80, true);
+    test(
+        "-5633680281231555440641310720",
+        "5634717283396403096794955776",
+        80,
+        true,
+    );
 }
 
 #[test]
@@ -129,7 +195,8 @@ fn limbs_eq_mod_power_of_two_neg_pos_properties() {
         |&(ref xs, ref ys, pow)| {
             assert_eq!(
                 limbs_eq_mod_power_of_two_neg_pos(xs, ys, pow),
-                (-Natural::from_limbs_asc(xs)).eq_mod_power_of_two(&Integer::from(Natural::from_limbs_asc(ys)), pow)
+                (-Natural::from_limbs_asc(xs))
+                    .eq_mod_power_of_two(&Integer::from(Natural::from_limbs_asc(ys)), pow)
             );
         },
     );
@@ -144,7 +211,11 @@ fn eq_mod_power_of_two_properties() {
             assert_eq!(y.eq_mod_power_of_two(x, pow), eq_mod_power_of_two);
             assert_eq!(
                 x.mod_power_of_two(pow) == y.mod_power_of_two(pow),
-                eq_mod_power_of_two, "{} {} {}", x, y, pow
+                eq_mod_power_of_two,
+                "{} {} {}",
+                x,
+                y,
+                pow
             );
         },
     );

@@ -21,13 +21,14 @@ use rust_wheels::iterators::naturals::{
     special_random_naturals, special_random_positive_naturals,
 };
 use rust_wheels::iterators::primitive_ints::{
-    exhaustive_signed, exhaustive_unsigned, special_random_unsigned,
+    exhaustive_positive, exhaustive_signed, exhaustive_unsigned, random_positive_unsigned,
+    range_up_increasing, special_random_positive_unsigned, special_random_unsigned,
 };
 use rust_wheels::iterators::rounding_modes::{exhaustive_rounding_modes, random_rounding_modes};
 use rust_wheels::iterators::tuples::{
-    exhaustive_pairs, exhaustive_pairs_from_single, exhaustive_triples,
+    exhaustive_pairs, exhaustive_pairs_from_single, exhaustive_quadruples, exhaustive_triples,
     exhaustive_triples_from_single, lex_pairs, log_pairs, random_pairs, random_pairs_from_single,
-    random_triples, random_triples_from_single, exhaustive_quadruples, random_quadruples
+    random_quadruples, random_triples, random_triples_from_single,
 };
 use rust_wheels::iterators::vecs::exhaustive_fixed_size_vecs_from_single;
 
@@ -178,6 +179,16 @@ fn random_pairs_of_natural_and_primitive<T: PrimitiveInteger>(
     ))
 }
 
+fn random_pairs_of_natural_and_positive_unsigned<T: PrimitiveUnsigned>(
+    scale: u32,
+) -> Box<Iterator<Item = (Natural, T)>> {
+    Box::new(random_pairs(
+        &EXAMPLE_SEED,
+        &(|seed| random_naturals(seed, scale)),
+        &(|seed| random_positive_unsigned(seed)),
+    ))
+}
+
 fn random_pairs_of_primitive_and_natural<T: PrimitiveInteger>(
     scale: u32,
 ) -> Box<Iterator<Item = (T, Natural)>> {
@@ -256,6 +267,35 @@ pub fn nrm_pairs_of_natural_and_u32_var_1(
     }))
 }
 
+// All pairs of `Natural` and `T` where `T` is unsigned and the most-significant bit of the `T` is
+// set.
+pub fn pairs_of_natural_and_unsigned_var_2<T: PrimitiveUnsigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (Natural, T)>> {
+    match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_pairs(
+            exhaustive_naturals(),
+            range_up_increasing(T::ONE << (T::WIDTH - 1)),
+        )),
+        GenerationMode::Random(scale) => Box::new(
+            random_pairs_of_natural_and_primitive::<T>(scale).map(|(n, mut u)| {
+                u.set_bit(u64::from(T::WIDTH - 1));
+                (n, u)
+            }),
+        ),
+        GenerationMode::SpecialRandom(scale) => Box::new(
+            random_pairs(
+                &EXAMPLE_SEED,
+                &(|seed| special_random_naturals(seed, scale)),
+                &(|seed| special_random_unsigned::<T>(seed)),
+            ).map(|(n, mut u)| {
+                u.set_bit(u64::from(T::WIDTH - 1));
+                (n, u)
+            }),
+        ),
+    }
+}
+
 pub fn pairs_of_unsigned_and_natural<T: PrimitiveUnsigned>(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (T, Natural)>> {
@@ -296,6 +336,56 @@ pub fn rm_pairs_of_u32_and_natural_var_1(
     Box::new(
         pairs_of_u32_and_natural_var_1(gm).map(|(x, y)| ((x, natural_to_rug_integer(&y)), (x, y))),
     )
+}
+
+pub fn pairs_of_natural_and_positive_unsigned<T: PrimitiveUnsigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (Natural, T)>> {
+    match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_pairs(
+            exhaustive_naturals(),
+            exhaustive_positive(),
+        )),
+        GenerationMode::Random(scale) => random_pairs_of_natural_and_positive_unsigned(scale),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_naturals(seed, scale)),
+            &(|seed| special_random_positive_unsigned(seed)),
+        )),
+    }
+}
+
+pub fn nrm_pairs_of_natural_and_positive_unsigned<T: PrimitiveUnsigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = ((BigUint, T), (rug::Integer, T), (Natural, T))>> {
+    Box::new(pairs_of_natural_and_positive_unsigned(gm).map(|(x, y)| {
+        (
+            (natural_to_biguint(&x), y),
+            (natural_to_rug_integer(&x), y),
+            (x, y),
+        )
+    }))
+}
+
+pub fn pairs_of_unsigned_and_positive_natural<T: PrimitiveUnsigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (T, Natural)>> {
+    match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_pairs(
+            exhaustive_unsigned(),
+            exhaustive_positive_naturals(),
+        )),
+        GenerationMode::Random(scale) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| random(seed)),
+            &(|seed| random_positive_naturals(seed, scale)),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_unsigned(seed)),
+            &(|seed| special_random_positive_naturals(seed, scale)),
+        )),
+    }
 }
 
 fn random_triples_of_natural_natural_and_primitive<T: PrimitiveInteger>(

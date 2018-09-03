@@ -11,6 +11,7 @@ impl<T, U> CheckedInto<U> for T
 where
     U: CheckedFrom<T>,
 {
+    #[inline]
     fn checked_into(self) -> Option<U> {
         U::checked_from(self)
     }
@@ -29,6 +30,7 @@ impl<T, U> WrappingInto<U> for T
 where
     U: WrappingFrom<T>,
 {
+    #[inline]
     fn wrapping_into(self) -> U {
         U::wrapping_from(self)
     }
@@ -47,6 +49,7 @@ impl<T, U> BitwiseInto<U> for T
 where
     U: BitwiseFrom<T>,
 {
+    #[inline]
     fn bitwise_into(self) -> U {
         U::bitwise_from(self)
     }

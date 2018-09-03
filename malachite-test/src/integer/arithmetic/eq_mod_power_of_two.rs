@@ -71,7 +71,9 @@ fn benchmark_integer_eq_mod_power_of_two_algorithms(
         gm.name(),
         limit,
         file_name,
-        &(|&(ref x, ref y, pow)| min(pow, max(x.significant_bits(), y.significant_bits())) as usize),
+        &(|&(ref x, ref y, pow)| {
+            min(pow, max(x.significant_bits(), y.significant_bits())) as usize
+        }),
         "min(pow, max(x.significant_bits(), y.significant_bits()))",
         &mut [
             (
