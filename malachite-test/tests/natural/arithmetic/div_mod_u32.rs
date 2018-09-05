@@ -246,8 +246,58 @@ fn test_div_mod_u32() {
 }
 
 #[test]
+#[should_panic(expected = "division by zero")]
+fn div_assign_mod_u32_fail() {
+    Natural::from(10u32).div_assign_mod(0);
+}
+
+#[test]
+#[should_panic(expected = "division by zero")]
+fn div_mod_u32_fail() {
+    Natural::from(10u32).div_mod(0);
+}
+
+#[test]
+#[should_panic(expected = "division by zero")]
+fn div_mod_u32_ref_fail() {
+    (&Natural::from(10u32)).div_mod(0);
+}
+
+#[test]
+#[should_panic(expected = "division by zero")]
+fn div_assign_rem_u32_fail() {
+    Natural::from(10u32).div_assign_rem(0);
+}
+
+#[test]
+#[should_panic(expected = "division by zero")]
+fn div_rem_u32_fail() {
+    Natural::from(10u32).div_rem(0);
+}
+
+#[test]
+#[should_panic(expected = "division by zero")]
+fn div_rem_u32_ref_fail() {
+    (&Natural::from(10u32)).div_rem(0);
+}
+
+#[test]
 fn test_u32_div_mod_natural() {
     let test = |u: u32, v, quotient, remainder| {
+        let mut mut_u = u;
+        assert_eq!(
+            mut_u.div_assign_mod(Natural::from_str(v).unwrap()),
+            remainder
+        );
+        assert_eq!(mut_u, quotient);
+
+        let mut mut_u = u;
+        assert_eq!(
+            mut_u.div_assign_mod(&Natural::from_str(v).unwrap()),
+            remainder
+        );
+        assert_eq!(mut_u, quotient);
+
         let (q, r) = u.div_mod(Natural::from_str(v).unwrap());
         assert_eq!(q, quotient);
         assert_eq!(r, remainder);
@@ -255,6 +305,20 @@ fn test_u32_div_mod_natural() {
         let (q, r) = u.div_mod(&Natural::from_str(v).unwrap());
         assert_eq!(q, quotient);
         assert_eq!(r, remainder);
+
+        let mut mut_u = u;
+        assert_eq!(
+            mut_u.div_assign_rem(Natural::from_str(v).unwrap()),
+            remainder
+        );
+        assert_eq!(mut_u, quotient);
+
+        let mut mut_u = u;
+        assert_eq!(
+            mut_u.div_assign_rem(&Natural::from_str(v).unwrap()),
+            remainder
+        );
+        assert_eq!(mut_u, quotient);
 
         let (q, r) = u.div_rem(Natural::from_str(v).unwrap());
         assert_eq!(q, quotient);
@@ -277,7 +341,100 @@ fn test_u32_div_mod_natural() {
     test(123, "1000000000000", 0, 123);
 }
 
-fn div_mod_u32_test_helper(n: &Natural, u: u32) {
+#[test]
+#[should_panic(expected = "division by zero")]
+fn u32_div_mod_natural_fail() {
+    10.div_mod(Natural::ZERO);
+}
+
+#[test]
+#[should_panic(expected = "division by zero")]
+fn u32_div_mod_natural_ref_fail() {
+    10.div_mod(&Natural::ZERO);
+}
+
+#[test]
+#[should_panic(expected = "division by zero")]
+fn u32_div_assign_mod_natural_fail() {
+    10.div_assign_mod(Natural::ZERO);
+}
+
+#[test]
+#[should_panic(expected = "division by zero")]
+fn u32_div_assign_mod_natural_ref_fail() {
+    10.div_assign_mod(&Natural::ZERO);
+}
+
+#[test]
+#[should_panic(expected = "division by zero")]
+fn u32_div_rem_natural_fail() {
+    10.div_rem(Natural::ZERO);
+}
+
+#[test]
+#[should_panic(expected = "division by zero")]
+fn u32_div_rem_natural_ref_fail() {
+    10.div_rem(&Natural::ZERO);
+}
+
+#[test]
+#[should_panic(expected = "division by zero")]
+fn u32_div_assign_rem_natural_fail() {
+    10.div_assign_rem(Natural::ZERO);
+}
+
+#[test]
+#[should_panic(expected = "division by zero")]
+fn u32_div_assign_rem_natural_ref_fail() {
+    10.div_assign_rem(&Natural::ZERO);
+}
+
+#[test]
+fn limbs_div_limb_mod_properties() {
+    test_properties(
+        pairs_of_unsigned_vec_and_positive_unsigned_var_1,
+        |&(ref limbs, limb)| {
+            let (quotient_limbs, remainder) = limbs_div_limb_mod(limbs, limb);
+            let (quotient, remainder_alt) = Natural::from_limbs_asc(limbs).div_mod(limb);
+            assert_eq!(Natural::from_owned_limbs_asc(quotient_limbs), quotient);
+            assert_eq!(remainder, remainder_alt);
+        },
+    );
+}
+
+#[test]
+fn limbs_div_limb_to_out_mod_properties() {
+    test_properties(
+        triples_of_unsigned_vec_unsigned_vec_and_positive_unsigned_var_1,
+        |&(ref out_limbs, ref in_limbs, limb)| {
+            let mut out_limbs = out_limbs.to_vec();
+            let old_out_limbs = out_limbs.clone();
+            let remainder = limbs_div_limb_to_out_mod(&mut out_limbs, in_limbs, limb);
+            let (quotient, remainder_alt) = Natural::from_limbs_asc(in_limbs).div_mod(limb);
+            assert_eq!(remainder, remainder_alt);
+            let len = in_limbs.len();
+            assert_eq!(Natural::from_limbs_asc(&out_limbs[..len]), quotient);
+            assert_eq!(&out_limbs[len..], &old_out_limbs[len..]);
+        },
+    );
+}
+
+#[test]
+fn limbs_div_limb_in_place_mod_properties() {
+    test_properties(
+        pairs_of_unsigned_vec_and_positive_unsigned_var_1,
+        |&(ref limbs, limb)| {
+            let mut limbs = limbs.to_vec();
+            let old_limbs = limbs.clone();
+            let remainder = limbs_div_limb_in_place_mod(&mut limbs, limb);
+            let (quotient, remainder_alt) = Natural::from_limbs_asc(&old_limbs).div_mod(limb);
+            assert_eq!(Natural::from_owned_limbs_asc(limbs), quotient);
+            assert_eq!(remainder, remainder_alt);
+        },
+    );
+}
+
+fn div_mod_u32_properties_helper(n: &Natural, u: u32) {
     let mut mut_n = n.clone();
     let remainder = mut_n.div_assign_mod(u);
     assert!(mut_n.is_valid());
@@ -337,63 +494,18 @@ fn div_mod_u32_test_helper(n: &Natural, u: u32) {
 }
 
 #[test]
-fn limbs_div_limb_mod_properties() {
-    test_properties(
-        pairs_of_unsigned_vec_and_positive_unsigned_var_1,
-        |&(ref limbs, limb)| {
-            let (quotient_limbs, remainder) = limbs_div_limb_mod(limbs, limb);
-            let (quotient, remainder_alt) = Natural::from_limbs_asc(limbs).div_mod(limb);
-            assert_eq!(Natural::from_owned_limbs_asc(quotient_limbs), quotient);
-            assert_eq!(remainder, remainder_alt);
-        },
-    );
-}
-
-#[test]
-fn limbs_div_limb_to_out_mod_properties() {
-    test_properties(
-        triples_of_unsigned_vec_unsigned_vec_and_positive_unsigned_var_1,
-        |&(ref out_limbs, ref in_limbs, limb)| {
-            let mut out_limbs = out_limbs.to_vec();
-            let old_out_limbs = out_limbs.clone();
-            let remainder = limbs_div_limb_to_out_mod(&mut out_limbs, in_limbs, limb);
-            let (quotient, remainder_alt) = Natural::from_limbs_asc(in_limbs).div_mod(limb);
-            assert_eq!(remainder, remainder_alt);
-            let len = in_limbs.len();
-            assert_eq!(Natural::from_limbs_asc(&out_limbs[..len]), quotient);
-            assert_eq!(&out_limbs[len..], &old_out_limbs[len..]);
-        },
-    );
-}
-
-#[test]
-fn limbs_div_limb_in_place_mod_properties() {
-    test_properties(
-        pairs_of_unsigned_vec_and_positive_unsigned_var_1,
-        |&(ref limbs, limb)| {
-            let mut limbs = limbs.to_vec();
-            let old_limbs = limbs.clone();
-            let remainder = limbs_div_limb_in_place_mod(&mut limbs, limb);
-            let (quotient, remainder_alt) = Natural::from_limbs_asc(&old_limbs).div_mod(limb);
-            assert_eq!(Natural::from_owned_limbs_asc(limbs), quotient);
-            assert_eq!(remainder, remainder_alt);
-        },
-    );
-}
-
-#[test]
 fn div_mod_u32_properties() {
     test_properties(
         pairs_of_natural_and_positive_unsigned,
         |&(ref n, u): &(Natural, u32)| {
-            div_mod_u32_test_helper(n, u);
+            div_mod_u32_properties_helper(n, u);
         },
     );
 
     test_properties(
         pairs_of_natural_and_unsigned_var_2,
         |&(ref n, u): &(Natural, u32)| {
-            div_mod_u32_test_helper(n, u);
+            div_mod_u32_properties_helper(n, u);
         },
     );
 
@@ -406,6 +518,14 @@ fn div_mod_u32_properties() {
             assert_eq!(quotient_alt, quotient);
             assert_eq!(remainder_alt, remainder);
 
+            let mut mut_u = u;
+            assert_eq!(mut_u.div_assign_mod(n), remainder);
+            assert_eq!(mut_u, quotient);
+
+            let mut mut_u = u;
+            assert_eq!(mut_u.div_assign_mod(n.clone()), remainder);
+            assert_eq!(mut_u, quotient);
+
             let (quotient_alt, remainder_alt) = u.div_rem(n);
             assert_eq!(quotient_alt, quotient);
             assert_eq!(remainder_alt, remainder);
@@ -413,6 +533,14 @@ fn div_mod_u32_properties() {
             let (quotient_alt, remainder_alt) = u.div_rem(n.clone());
             assert_eq!(quotient_alt, quotient);
             assert_eq!(remainder_alt, remainder);
+
+            let mut mut_u = u;
+            assert_eq!(mut_u.div_assign_rem(n), remainder);
+            assert_eq!(mut_u, quotient);
+
+            let mut mut_u = u;
+            assert_eq!(mut_u.div_assign_rem(n.clone()), remainder);
+            assert_eq!(mut_u, quotient);
 
             if u != 0 && u < *n {
                 assert_eq!(remainder, u);

@@ -18,6 +18,7 @@ use rug;
 use std::cmp::max;
 use std::str::FromStr;
 
+//TODO continue deduplication
 #[test]
 fn test_limbs_xor_pos_neg() {
     let test = |xs, ys, out| {

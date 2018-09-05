@@ -295,7 +295,21 @@ fn sub_u32_properties() {
     test_properties(
         pairs_of_u32_and_natural_var_1,
         |&(u, ref n): &(u32, Natural)| {
-            let difference = u - n;
+            let mut mut_u = u;
+            mut_u -= n;
+            let difference = mut_u;
+
+            let mut mut_u = u;
+            mut_u -= n.clone();
+            let difference_alt = mut_u;
+            assert_eq!(difference_alt, difference);
+
+            let difference_alt = u - n;
+            assert_eq!(difference_alt, difference);
+
+            let difference_alt = u - n.clone();
+            assert_eq!(difference_alt, difference);
+
             assert_eq!(Natural::from(u) - u32::checked_from(n).unwrap(), difference);
             assert_eq!(difference + n, u);
         },

@@ -28,8 +28,12 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_natural_div_rem_u32_ref);
     register_demo!(registry, demo_u32_div_mod_natural);
     register_demo!(registry, demo_u32_div_mod_natural_ref);
+    register_demo!(registry, demo_u32_div_assign_mod_natural);
+    register_demo!(registry, demo_u32_div_assign_mod_natural_ref);
     register_demo!(registry, demo_u32_div_rem_natural);
     register_demo!(registry, demo_u32_div_rem_natural_ref);
+    register_demo!(registry, demo_u32_div_assign_rem_natural);
+    register_demo!(registry, demo_u32_div_assign_rem_natural_ref);
     register_bench!(registry, Small, benchmark_limbs_div_limb_mod);
     register_bench!(registry, Small, benchmark_limbs_div_limb_to_out_mod);
     register_bench!(registry, Small, benchmark_limbs_div_limb_in_place_mod);
@@ -64,7 +68,17 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_bench!(
         registry,
         Large,
+        benchmark_u32_div_assign_mod_natural_evaluation_strategy
+    );
+    register_bench!(
+        registry,
+        Large,
         benchmark_u32_div_rem_natural_evaluation_strategy
+    );
+    register_bench!(
+        registry,
+        Large,
+        benchmark_u32_div_assign_rem_natural_evaluation_strategy
     );
 }
 
@@ -187,6 +201,29 @@ fn demo_u32_div_mod_natural_ref(gm: GenerationMode, limit: usize) {
     }
 }
 
+fn demo_u32_div_assign_mod_natural(gm: GenerationMode, limit: usize) {
+    for (mut u, n) in pairs_of_unsigned_and_positive_natural::<u32>(gm).take(limit) {
+        let u_old = u;
+        let n_old = n.clone();
+        let remainder = u.div_assign_mod(n);
+        println!(
+            "x := {}; x.div_assign_mod({}) = {}; x = {}",
+            u_old, n_old, remainder, u
+        );
+    }
+}
+
+fn demo_u32_div_assign_mod_natural_ref(gm: GenerationMode, limit: usize) {
+    for (mut u, n) in pairs_of_unsigned_and_positive_natural::<u32>(gm).take(limit) {
+        let u_old = u;
+        let remainder = u.div_assign_mod(&n);
+        println!(
+            "x := {}; x.div_assign_mod(&{}) = {}; x = {}",
+            u_old, n, remainder, u
+        );
+    }
+}
+
 fn demo_u32_div_rem_natural(gm: GenerationMode, limit: usize) {
     for (u, n) in pairs_of_unsigned_and_positive_natural::<u32>(gm).take(limit) {
         let n_old = n.clone();
@@ -198,6 +235,29 @@ fn demo_u32_div_rem_natural_ref(gm: GenerationMode, limit: usize) {
     for (u, n) in pairs_of_unsigned_and_positive_natural::<u32>(gm).take(limit) {
         let n_old = n.clone();
         println!("{}.div_rem(&{}) = {:?}", u, n_old, u.div_rem(&n));
+    }
+}
+
+fn demo_u32_div_assign_rem_natural(gm: GenerationMode, limit: usize) {
+    for (mut u, n) in pairs_of_unsigned_and_positive_natural::<u32>(gm).take(limit) {
+        let u_old = u;
+        let n_old = n.clone();
+        let remainder = u.div_assign_rem(n);
+        println!(
+            "x := {}; x.div_assign_rem({}) = {}; x = {}",
+            u_old, n_old, remainder, u
+        );
+    }
+}
+
+fn demo_u32_div_assign_rem_natural_ref(gm: GenerationMode, limit: usize) {
+    for (mut u, n) in pairs_of_unsigned_and_positive_natural::<u32>(gm).take(limit) {
+        let u_old = u;
+        let remainder = u.div_assign_rem(&n);
+        println!(
+            "x := {}; x.div_assign_rem(&{}) = {}; x = {}",
+            u_old, n, remainder, u
+        );
     }
 }
 
@@ -442,6 +502,33 @@ fn benchmark_u32_div_mod_natural_evaluation_strategy(
     );
 }
 
+fn benchmark_u32_div_assign_mod_natural_evaluation_strategy(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "u32.div_assign_mod(Natural)",
+        BenchmarkType::EvaluationStrategy,
+        pairs_of_unsigned_and_positive_natural::<u32>(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(_, ref n)| n.significant_bits() as usize),
+        "n.significant_bits()",
+        &mut [
+            (
+                "u32.div_assign_mod(Natural)",
+                &mut (|(mut x, y)| no_out!(x.div_assign_mod(y))),
+            ),
+            (
+                "u32.div_assign_mod(&Natural)",
+                &mut (|(mut x, y)| no_out!(x.div_assign_mod(&y))),
+            ),
+        ],
+    );
+}
+
 fn benchmark_u32_div_rem_natural_evaluation_strategy(
     gm: GenerationMode,
     limit: usize,
@@ -464,6 +551,33 @@ fn benchmark_u32_div_rem_natural_evaluation_strategy(
             (
                 "u32.div_rem(&Natural)",
                 &mut (|(x, y)| no_out!(x.div_rem(&y))),
+            ),
+        ],
+    );
+}
+
+fn benchmark_u32_div_assign_rem_natural_evaluation_strategy(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "u32.div_assign_rem(Natural)",
+        BenchmarkType::EvaluationStrategy,
+        pairs_of_unsigned_and_positive_natural::<u32>(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(_, ref n)| n.significant_bits() as usize),
+        "n.significant_bits()",
+        &mut [
+            (
+                "u32.div_assign_rem(Natural)",
+                &mut (|(mut x, y)| no_out!(x.div_assign_rem(y))),
+            ),
+            (
+                "u32.div_assign_rem(&Natural)",
+                &mut (|(mut x, y)| no_out!(x.div_assign_rem(&y))),
             ),
         ],
     );

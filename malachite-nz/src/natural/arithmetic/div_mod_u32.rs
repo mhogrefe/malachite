@@ -10,7 +10,12 @@ use std::u32;
 // These functions are adapted from udiv_qrnnd_preinv, mpn_div_qr_1n_pi1, and mpn_div_qr_1 in GMP
 // 6.1.2.
 
-fn div_by_preinversion(n_high: u32, n_low: u32, divisor: u32, divisor_inverse: u32) -> (u32, u32) {
+pub(crate) fn div_mod_by_preinversion(
+    n_high: u32,
+    n_low: u32,
+    divisor: u32,
+    divisor_inverse: u32,
+) -> (u32, u32) {
     let (mut quotient_high, quotient_low) = (u64::from(n_high) * u64::from(divisor_inverse))
         .wrapping_add(u64::join_halves(n_high.wrapping_add(1), n_low))
         .split_in_half();
@@ -36,7 +41,7 @@ fn limbs_div_normalized_in_place_mod(
     let len = limbs.len();
     if len == 1 {
         let (quotient, remainder) =
-            div_by_preinversion(high_limb, limbs[0], divisor, divisor_inverse);
+            div_mod_by_preinversion(high_limb, limbs[0], divisor, divisor_inverse);
         limbs[0] = quotient;
         return remainder;
     }
@@ -46,15 +51,12 @@ fn limbs_div_normalized_in_place_mod(
     quotient_high = quotient_high.wrapping_add(high_limb);
     let second_highest_limb = limbs[len - 1];
     limbs[len - 1] = quotient_high;
-    let (sum, carry) = u64::join_halves(second_highest_limb, limbs[len - 2])
+    let (sum, mut big_carry) = u64::join_halves(second_highest_limb, limbs[len - 2])
         .overflowing_add(u64::from(power_of_two) * u64::from(high_limb));
     let (mut sum_high, mut sum_low) = sum.split_in_half();
-    let mut big_carry = carry;
     for j in (0..len - 2).rev() {
         let (temp, remainder) = (u64::from(sum_high) * u64::from(divisor_inverse)).split_in_half();
-        let mut quotient = u64::from(sum_high)
-            .wrapping_add(u64::from(temp))
-            .wrapping_add(u64::from(quotient_low));
+        let mut quotient = u64::from(sum_high) + u64::from(temp) + u64::from(quotient_low);
         quotient_low = remainder;
         if big_carry {
             quotient = quotient.wrapping_add(u64::join_halves(1, divisor_inverse));
@@ -86,7 +88,7 @@ fn limbs_div_normalized_in_place_mod(
         quotient_high += 1;
         sum_high = sum_high.wrapping_sub(divisor);
     }
-    let (temp, remainder) = div_by_preinversion(sum_high, sum_low, divisor, divisor_inverse);
+    let (temp, remainder) = div_mod_by_preinversion(sum_high, sum_low, divisor, divisor_inverse);
     let (quotient_high, quotient_low) = u64::join_halves(quotient_high, quotient_low)
         .wrapping_add(u64::from(temp))
         .split_in_half();
@@ -109,7 +111,7 @@ fn limbs_div_normalized_to_out_mod(
     let len = in_limbs.len();
     if len == 1 {
         let (quotient, remainder) =
-            div_by_preinversion(high_limb, in_limbs[0], divisor, divisor_inverse);
+            div_mod_by_preinversion(high_limb, in_limbs[0], divisor, divisor_inverse);
         out_limbs[0] = quotient;
         return remainder;
     }
@@ -118,15 +120,12 @@ fn limbs_div_normalized_to_out_mod(
         (u64::from(divisor_inverse) * u64::from(high_limb)).split_in_half();
     quotient_high = quotient_high.wrapping_add(high_limb);
     out_limbs[len - 1] = quotient_high;
-    let (sum, carry) = u64::join_halves(in_limbs[len - 1], in_limbs[len - 2])
+    let (sum, mut big_carry) = u64::join_halves(in_limbs[len - 1], in_limbs[len - 2])
         .overflowing_add(u64::from(power_of_two) * u64::from(high_limb));
     let (mut sum_high, mut sum_low) = sum.split_in_half();
-    let mut big_carry = carry;
     for j in (0..len - 2).rev() {
         let (temp, remainder) = (u64::from(sum_high) * u64::from(divisor_inverse)).split_in_half();
-        let mut quotient = u64::from(sum_high)
-            .wrapping_add(u64::from(temp))
-            .wrapping_add(u64::from(quotient_low));
+        let mut quotient = u64::from(sum_high) + u64::from(temp) + u64::from(quotient_low);
         quotient_low = remainder;
         if big_carry {
             quotient = quotient.wrapping_add(u64::join_halves(1, divisor_inverse));
@@ -158,7 +157,7 @@ fn limbs_div_normalized_to_out_mod(
         quotient_high += 1;
         sum_high = sum_high.wrapping_sub(divisor);
     }
-    let (temp, remainder) = div_by_preinversion(sum_high, sum_low, divisor, divisor_inverse);
+    let (temp, remainder) = div_mod_by_preinversion(sum_high, sum_low, divisor, divisor_inverse);
     let (quotient_high, quotient_low) = u64::join_halves(quotient_high, quotient_low)
         .wrapping_add(u64::from(temp))
         .split_in_half();
@@ -193,8 +192,8 @@ fn limbs_div_normalized_to_out_mod(
 /// ```
 pub fn limbs_div_limb_mod(limbs: &[u32], limb: u32) -> (Vec<u32>, u32) {
     let mut quotient_limbs = vec![0; limbs.len()];
-    let rem = limbs_div_limb_to_out_mod(&mut quotient_limbs, limbs, limb);
-    (quotient_limbs, rem)
+    let remainder = limbs_div_limb_to_out_mod(&mut quotient_limbs, limbs, limb);
+    (quotient_limbs, remainder)
 }
 
 /// Interpreting a slice of `u32`s as the limbs (in ascending order) of a `Natural`, writes the
@@ -252,7 +251,7 @@ pub fn limbs_div_limb_to_out_mod(out_limbs: &mut [u32], in_limbs: &[u32], mut li
         let highest_limb = limbs_shl_to_out(out_limbs, in_limbs, bits);
         let limb_inverse = (u64::join_halves(!limb, u32::MAX) / u64::from(limb)) as u32;
         let (quotient, remainder) =
-            div_by_preinversion(highest_limb, out_limbs[len_minus_1], limb, limb_inverse);
+            div_mod_by_preinversion(highest_limb, out_limbs[len_minus_1], limb, limb_inverse);
         out_limbs[len_minus_1] = quotient;
         limbs_div_normalized_in_place_mod(
             &mut out_limbs[..len_minus_1],
@@ -314,7 +313,7 @@ pub fn limbs_div_limb_in_place_mod(limbs: &mut [u32], mut limb: u32) -> u32 {
         let highest_limb = limbs_slice_shl_in_place(limbs, bits);
         let limb_inverse = (u64::join_halves(!limb, u32::MAX) / u64::from(limb)) as u32;
         let (quotient, remainder) =
-            div_by_preinversion(highest_limb, limbs[len_minus_1], limb, limb_inverse);
+            div_mod_by_preinversion(highest_limb, limbs[len_minus_1], limb, limb_inverse);
         limbs[len_minus_1] = quotient;
         limbs_div_normalized_in_place_mod(&mut limbs[..len_minus_1], remainder, limb, limb_inverse)
             >> bits
@@ -346,11 +345,10 @@ impl DivMod<u32> for Natural {
     ///
     /// fn main() {
     ///     // 3 * 123 + 87 = 456
-    ///     assert_eq!(Natural::from(456u32).div_mod(123), (Natural::from(3u32), 87));
+    ///     assert_eq!(format!("{:?}", Natural::from(456u32).div_mod(123)), "(3, 87)");
     ///
     ///     // 8,130,081,300 * 123 + 100 = 10^12
-    ///     assert_eq!(Natural::from_str("1000000000000").unwrap().div_mod(123),
-    ///         (Natural::from_str("8130081300").unwrap(), 100));
+    ///     assert_eq!(format!("{:?}", Natural::trillion().div_mod(123)), "(8130081300, 100)");
     /// }
     /// ```
     fn div_mod(mut self, other: u32) -> (Natural, u32) {
@@ -384,11 +382,10 @@ impl<'a> DivMod<u32> for &'a Natural {
     ///
     /// fn main() {
     ///     // 3 * 123 + 87 = 456
-    ///     assert_eq!((&Natural::from(456u32)).div_mod(123), (Natural::from(3u32), 87));
+    ///     assert_eq!(format!("{:?}", (&Natural::from(456u32)).div_mod(123)), "(3, 87)");
     ///
     ///     // 8,130,081,300 * 123 + 100 = 10^12
-    ///     assert_eq!((&Natural::from_str("1000000000000").unwrap()).div_mod(123),
-    ///         (Natural::from_str("8130081300").unwrap(), 100));
+    ///     assert_eq!(format!("{:?}", (&Natural::trillion()).div_mod(123)), "(8130081300, 100)");
     /// }
     /// ```
     fn div_mod(self, other: u32) -> (Natural, u32) {
@@ -413,100 +410,10 @@ impl<'a> DivMod<u32> for &'a Natural {
     }
 }
 
-impl DivMod<Natural> for u32 {
-    type DivOutput = u32;
-    type ModOutput = u32;
-
-    /// Divides a `u32` by a `Natural`, taking the `Natural` by value and returning the quotient and
-    /// remainder. In other words, returns (q, r), where `self` = q * `other` + r and
-    /// 0 <= r < `other`.
-    ///
-    /// Time: worst case O(n)
-    ///
-    /// Additional memory: worst case O(1)
-    ///
-    /// where n = `other.significant_bits()`
-    ///
-    /// # Examples
-    /// ```
-    /// extern crate malachite_base;
-    /// extern crate malachite_nz;
-    ///
-    /// use malachite_base::num::DivMod;
-    /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
-    ///
-    /// fn main() {
-    ///     // 3 * 123 + 87 = 456
-    ///     assert_eq!(456.div_mod(Natural::from(123u32)), (3, 87));
-    ///
-    ///     // 0 * 10^12 + 123 = 123
-    ///     assert_eq!(123.div_mod(Natural::from_str("1000000000000").unwrap()), (0, 123));
-    /// }
-    /// ```
-    fn div_mod(self, other: Natural) -> (u32, u32) {
-        if other == 0 {
-            panic!("division by zero");
-        } else if other == 1 {
-            (self, 0)
-        } else {
-            match other {
-                Small(small) => self.div_rem(small),
-                Large(_) => (0, self),
-            }
-        }
-    }
-}
-
-impl<'a> DivMod<&'a Natural> for u32 {
-    type DivOutput = u32;
-    type ModOutput = u32;
-
-    /// Divides a `u32` by a `Natural`, taking the `Natural` by reference and returning the quotient
-    /// and remainder. In other words, returns (q, r), where `self` = q * `other` + r and
-    /// 0 <= r < `other`.
-    ///
-    /// Time: worst case O(n)
-    ///
-    /// Additional memory: worst case O(1)
-    ///
-    /// where n = `other.significant_bits()`
-    ///
-    /// # Examples
-    /// ```
-    /// extern crate malachite_base;
-    /// extern crate malachite_nz;
-    ///
-    /// use malachite_base::num::DivMod;
-    /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
-    ///
-    /// fn main() {
-    ///     // 3 * 123 + 87 = 456
-    ///     assert_eq!(456.div_mod(&Natural::from(123u32)), (3, 87));
-    ///
-    ///     // 0 * 10^12 + 123 = 123
-    ///     assert_eq!(123.div_mod(&Natural::from_str("1000000000000").unwrap()), (0, 123));
-    /// }
-    /// ```
-    fn div_mod(self, other: &'a Natural) -> (u32, u32) {
-        if *other == 0 {
-            panic!("division by zero");
-        } else if *other == 1 {
-            (self, 0)
-        } else {
-            match *other {
-                Small(small) => self.div_rem(small),
-                Large(_) => (0, self),
-            }
-        }
-    }
-}
-
 impl DivAssignMod<u32> for Natural {
     type ModOutput = u32;
 
-    /// Divides a `Natural` by a `u32` in-place, returning the remainder. In other words, replaces
+    /// Divides a `Natural` by a `u32` in place, returning the remainder. In other words, replaces
     /// `self` with q and returns r, where `self` = q * `other` + r and 0 <= r < `other`.
     ///
     /// Time: worst case O(n)
@@ -528,12 +435,12 @@ impl DivAssignMod<u32> for Natural {
     ///     // 3 * 123 + 87 = 456
     ///     let mut x = Natural::from(456u32);
     ///     assert_eq!(x.div_assign_mod(123), 87);
-    ///     assert_eq!(x, Natural::from(3u32));
+    ///     assert_eq!(x.to_string(), "3");
     ///
     ///     // 8,130,081,300 * 123 + 100 = 10^12
-    ///     let mut x = Natural::from_str("1000000000000").unwrap();
+    ///     let mut x = Natural::trillion();
     ///     assert_eq!(x.div_assign_mod(123), 100);
-    ///     assert_eq!(x, Natural::from_str("8130081300").unwrap());
+    ///     assert_eq!(x.to_string(), "8130081300");
     /// }
     /// ```
     fn div_assign_mod(&mut self, other: u32) -> u32 {
@@ -551,6 +458,159 @@ impl DivAssignMod<u32> for Natural {
             self.trim();
             remainder
         }
+    }
+}
+
+impl DivMod<Natural> for u32 {
+    type DivOutput = u32;
+    type ModOutput = u32;
+
+    /// Divides a `u32` by a `Natural`, taking the `Natural` by value and returning the quotient and
+    /// remainder. In other words, returns (q, r), where `self` = q * `other` + r and
+    /// 0 <= r < `other`.
+    ///
+    /// Time: worst case O(1)
+    ///
+    /// Additional memory: worst case O(1)
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::DivMod;
+    /// use malachite_nz::natural::Natural;
+    /// use std::str::FromStr;
+    ///
+    /// fn main() {
+    ///     // 3 * 123 + 87 = 456
+    ///     assert_eq!(456.div_mod(Natural::from(123u32)), (3, 87));
+    ///
+    ///     // 0 * 10^12 + 123 = 123
+    ///     assert_eq!(123.div_mod(Natural::trillion()), (0, 123));
+    /// }
+    /// ```
+    fn div_mod(self, other: Natural) -> (u32, u32) {
+        self.div_mod(&other)
+    }
+}
+
+impl<'a> DivMod<&'a Natural> for u32 {
+    type DivOutput = u32;
+    type ModOutput = u32;
+
+    /// Divides a `u32` by a `Natural`, taking the `Natural` by reference and returning the quotient
+    /// and remainder. In other words, returns (q, r), where `self` = q * `other` + r and
+    /// 0 <= r < `other`.
+    ///
+    /// Time: worst case O(1)
+    ///
+    /// Additional memory: worst case O(1)
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::DivMod;
+    /// use malachite_nz::natural::Natural;
+    /// use std::str::FromStr;
+    ///
+    /// fn main() {
+    ///     // 3 * 123 + 87 = 456
+    ///     assert_eq!(456.div_mod(&Natural::from(123u32)), (3, 87));
+    ///
+    ///     // 0 * 10^12 + 123 = 123
+    ///     assert_eq!(123.div_mod(&Natural::trillion()), (0, 123));
+    /// }
+    /// ```
+    fn div_mod(self, other: &'a Natural) -> (u32, u32) {
+        if *other == 0 {
+            panic!("division by zero");
+        } else if *other == 1 {
+            (self, 0)
+        } else {
+            match *other {
+                Small(small) => self.div_rem(small),
+                Large(_) => (0, self),
+            }
+        }
+    }
+}
+
+impl DivAssignMod<Natural> for u32 {
+    type ModOutput = u32;
+
+    /// Divides a `u32` by a `Natural` in place, taking the `Natural` by value and returning the
+    /// remainder. In other words, replaces `self` with q and returns r, where
+    /// `self` = q * `other` + r and 0 <= r < `other`.
+    ///
+    /// Time: worst case O(1)
+    ///
+    /// Additional memory: worst case O(1)
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::DivAssignMod;
+    /// use malachite_nz::natural::Natural;
+    /// use std::str::FromStr;
+    ///
+    /// fn main() {
+    ///     // 3 * 123 + 87 = 456
+    ///     let mut n = 456;
+    ///     assert_eq!(n.div_assign_mod(Natural::from(123u32)), 87);
+    ///     assert_eq!(n, 3);
+    ///
+    ///     // 0 * 10^12 + 123 = 123
+    ///     let mut n = 123;
+    ///     assert_eq!(n.div_assign_mod(Natural::trillion()), 123);
+    ///     assert_eq!(n, 0);
+    /// }
+    /// ```
+    fn div_assign_mod(&mut self, other: Natural) -> u32 {
+        self.div_assign_mod(&other)
+    }
+}
+
+impl<'a> DivAssignMod<&'a Natural> for u32 {
+    type ModOutput = u32;
+
+    /// Divides a `u32` by a `Natural` in place, taking the `Natural` by reference and returning the
+    /// remainder. In other words, replaces `self` with q and returns r, where
+    /// `self` = q * `other` + r and 0 <= r < `other`.
+    ///
+    /// Time: worst case O(1)
+    ///
+    /// Additional memory: worst case O(1)
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::DivAssignMod;
+    /// use malachite_nz::natural::Natural;
+    /// use std::str::FromStr;
+    ///
+    /// fn main() {
+    ///     // 3 * 123 + 87 = 456
+    ///     let mut n = 456;
+    ///     assert_eq!(n.div_assign_mod(&Natural::from(123u32)), 87);
+    ///     assert_eq!(n, 3);
+    ///
+    ///     // 0 * 10^12 + 123 = 123
+    ///     let mut n = 123;
+    ///     assert_eq!(n.div_assign_mod(&Natural::trillion()), 123);
+    ///     assert_eq!(n, 0);
+    /// }
+    /// ```
+    fn div_assign_mod(&mut self, other: &'a Natural) -> u32 {
+        let (q, r) = self.div_mod(other);
+        *self = q;
+        r
     }
 }
 
@@ -578,11 +638,10 @@ impl DivRem<u32> for Natural {
     ///
     /// fn main() {
     ///     // 3 * 123 + 87 = 456
-    ///     assert_eq!(Natural::from(456u32).div_rem(123), (Natural::from(3u32), 87));
+    ///     assert_eq!(format!("{:?}", Natural::from(456u32).div_rem(123)), "(3, 87)");
     ///
     ///     // 8,130,081,300 * 123 + 100 = 10^12
-    ///     assert_eq!(Natural::from_str("1000000000000").unwrap().div_rem(123),
-    ///         (Natural::from_str("8130081300").unwrap(), 100));
+    ///     assert_eq!(format!("{:?}", Natural::trillion().div_rem(123)), "(8130081300, 100)");
     /// }
     /// ```
     fn div_rem(self, other: u32) -> (Natural, u32) {
@@ -614,11 +673,10 @@ impl<'a> DivRem<u32> for &'a Natural {
     ///
     /// fn main() {
     ///     // 3 * 123 + 87 = 456
-    ///     assert_eq!((&Natural::from(456u32)).div_rem(123), (Natural::from(3u32), 87));
+    ///     assert_eq!(format!("{:?}", (&Natural::from(456u32)).div_rem(123)), "(3, 87)");
     ///
     ///     // 8,130,081,300 * 123 + 100 = 10^12
-    ///     assert_eq!((&Natural::from_str("1000000000000").unwrap()).div_rem(123),
-    ///         (Natural::from_str("8130081300").unwrap(), 100));
+    ///     assert_eq!(format!("{:?}", (&Natural::trillion()).div_rem(123)), "(8130081300, 100)");
     /// }
     /// ```
     fn div_rem(self, other: u32) -> (Natural, u32) {
@@ -626,80 +684,10 @@ impl<'a> DivRem<u32> for &'a Natural {
     }
 }
 
-impl DivRem<Natural> for u32 {
-    type DivOutput = u32;
-    type RemOutput = u32;
-
-    /// Divides a `u32` by a `Natural`, taking the `Natural` by value and returning the quotient and
-    /// remainder. For `Natural`s, rem is equivalent to mod.
-    ///
-    /// Time: worst case O(n)
-    ///
-    /// Additional memory: worst case O(1)
-    ///
-    /// where n = `other.significant_bits()`
-    ///
-    /// # Examples
-    /// ```
-    /// extern crate malachite_base;
-    /// extern crate malachite_nz;
-    ///
-    /// use malachite_base::num::DivRem;
-    /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
-    ///
-    /// fn main() {
-    ///     // 3 * 123 + 87 = 456
-    ///     assert_eq!(456.div_rem(Natural::from(123u32)), (3, 87));
-    ///
-    ///     // 0 * 10^12 + 123 = 123
-    ///     assert_eq!(123.div_rem(Natural::from_str("1000000000000").unwrap()), (0, 123));
-    /// }
-    /// ```
-    fn div_rem(self, other: Natural) -> (u32, u32) {
-        self.div_mod(other)
-    }
-}
-
-impl<'a> DivRem<&'a Natural> for u32 {
-    type DivOutput = u32;
-    type RemOutput = u32;
-
-    /// Divides a `u32` by a `Natural`, taking the `Natural` by reference and returning the quotient
-    /// and remainder. For `Natural`s, rem is equivalent to mod.
-    ///
-    /// Time: worst case O(n)
-    ///
-    /// Additional memory: worst case O(1)
-    ///
-    /// where n = `other.significant_bits()`
-    ///
-    /// # Examples
-    /// ```
-    /// extern crate malachite_base;
-    /// extern crate malachite_nz;
-    ///
-    /// use malachite_base::num::DivRem;
-    /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
-    ///
-    /// fn main() {
-    ///     // 3 * 123 + 87 = 456
-    ///     assert_eq!(456.div_rem(&Natural::from(123u32)), (3, 87));
-    ///
-    ///     // 0 * 10^12 + 123 = 123
-    ///     assert_eq!(123.div_rem(&Natural::from_str("1000000000000").unwrap()), (0, 123));
-    /// }
-    /// ```
-    fn div_rem(self, other: &'a Natural) -> (u32, u32) {
-        self.div_mod(other)
-    }
-}
-
 impl DivAssignRem<u32> for Natural {
     type RemOutput = u32;
 
-    /// Divides a `Natural` by a `u32` in-place, returning the remainder. For `Natural`s, rem is
+    /// Divides a `Natural` by a `u32` in place, returning the remainder. For `Natural`s, rem is
     /// equivalent to mod.
     ///
     /// Time: worst case O(n)
@@ -721,15 +709,153 @@ impl DivAssignRem<u32> for Natural {
     ///     // 3 * 123 + 87 = 456
     ///     let mut x = Natural::from(456u32);
     ///     assert_eq!(x.div_assign_rem(123), 87);
-    ///     assert_eq!(x, Natural::from(3u32));
+    ///     assert_eq!(x.to_string(), "3");
     ///
     ///     // 8,130,081,300 * 123 + 100 = 10^12
-    ///     let mut x = Natural::from_str("1000000000000").unwrap();
+    ///     let mut x = Natural::trillion();
     ///     assert_eq!(x.div_assign_rem(123), 100);
-    ///     assert_eq!(x, Natural::from_str("8130081300").unwrap());
+    ///     assert_eq!(x.to_string(), "8130081300");
     /// }
     /// ```
     fn div_assign_rem(&mut self, other: u32) -> u32 {
+        self.div_assign_mod(other)
+    }
+}
+
+impl DivRem<Natural> for u32 {
+    type DivOutput = u32;
+    type RemOutput = u32;
+
+    /// Divides a `u32` by a `Natural`, taking the `Natural` by value and returning the quotient and
+    /// remainder. For `Natural`s, rem is equivalent to mod.
+    ///
+    /// Time: worst case O(1)
+    ///
+    /// Additional memory: worst case O(1)
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::DivRem;
+    /// use malachite_nz::natural::Natural;
+    /// use std::str::FromStr;
+    ///
+    /// fn main() {
+    ///     // 3 * 123 + 87 = 456
+    ///     assert_eq!(456.div_rem(Natural::from(123u32)), (3, 87));
+    ///
+    ///     // 0 * 10^12 + 123 = 123
+    ///     assert_eq!(123.div_rem(Natural::trillion()), (0, 123));
+    /// }
+    /// ```
+    fn div_rem(self, other: Natural) -> (u32, u32) {
+        self.div_mod(other)
+    }
+}
+
+impl<'a> DivRem<&'a Natural> for u32 {
+    type DivOutput = u32;
+    type RemOutput = u32;
+
+    /// Divides a `u32` by a `Natural`, taking the `Natural` by reference and returning the quotient
+    /// and remainder. For `Natural`s, rem is equivalent to mod.
+    ///
+    /// Time: worst case O(1)
+    ///
+    /// Additional memory: worst case O(1)
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::DivRem;
+    /// use malachite_nz::natural::Natural;
+    /// use std::str::FromStr;
+    ///
+    /// fn main() {
+    ///     // 3 * 123 + 87 = 456
+    ///     assert_eq!(456.div_rem(&Natural::from(123u32)), (3, 87));
+    ///
+    ///     // 0 * 10^12 + 123 = 123
+    ///     assert_eq!(123.div_rem(&Natural::trillion()), (0, 123));
+    /// }
+    /// ```
+    fn div_rem(self, other: &'a Natural) -> (u32, u32) {
+        self.div_mod(other)
+    }
+}
+
+impl DivAssignRem<Natural> for u32 {
+    type RemOutput = u32;
+
+    /// Divides a `u32` by a `Natural` in place, taking the `Natural` by value and returning the
+    /// remainder. For `Natural`s, rem is equivalent to mod.
+    ///
+    /// Time: worst case O(1)
+    ///
+    /// Additional memory: worst case O(1)
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::DivAssignRem;
+    /// use malachite_nz::natural::Natural;
+    /// use std::str::FromStr;
+    ///
+    /// fn main() {
+    ///     // 3 * 123 + 87 = 456
+    ///     let mut n = 456;
+    ///     assert_eq!(n.div_assign_rem(Natural::from(123u32)), 87);
+    ///     assert_eq!(n, 3);
+    ///
+    ///     // 0 * 10^12 + 123 = 123
+    ///     let mut n = 123;
+    ///     assert_eq!(n.div_assign_rem(Natural::trillion()), 123);
+    ///     assert_eq!(n, 0);
+    /// }
+    /// ```
+    fn div_assign_rem(&mut self, other: Natural) -> u32 {
+        self.div_assign_mod(other)
+    }
+}
+
+impl<'a> DivAssignRem<&'a Natural> for u32 {
+    type RemOutput = u32;
+
+    /// Divides a `u32` by a `Natural` in place, taking the `Natural` by reference and returning the
+    /// remainder. For `Natural`s, rem is equivalent to mod.
+    ///
+    /// Time: worst case O(1)
+    ///
+    /// Additional memory: worst case O(1)
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::DivAssignRem;
+    /// use malachite_nz::natural::Natural;
+    /// use std::str::FromStr;
+    ///
+    /// fn main() {
+    ///     // 3 * 123 + 87 = 456
+    ///     let mut n = 456;
+    ///     assert_eq!(n.div_assign_rem(&Natural::from(123u32)), 87);
+    ///     assert_eq!(n, 3);
+    ///
+    ///     // 0 * 10^12 + 123 = 123
+    ///     let mut n = 123;
+    ///     assert_eq!(n.div_assign_rem(&Natural::trillion()), 123);
+    ///     assert_eq!(n, 0);
+    /// }
+    /// ```
+    fn div_assign_rem(&mut self, other: &'a Natural) -> u32 {
         self.div_assign_mod(other)
     }
 }

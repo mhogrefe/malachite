@@ -123,7 +123,7 @@ pub fn limbs_sub_limb_in_place(limbs: &mut [u32], mut limb: u32) -> bool {
     limb != 0
 }
 
-fn sub_panic<S: Display, T: Display>(x: S, y: T) {
+fn sub_panic<S: Display, T: Display>(x: S, y: T) -> ! {
     panic!(
         "Cannot subtract a u32 from a smaller Natural. self: {}, other: {}",
         x, y
@@ -187,7 +187,70 @@ impl<'a> Sub<u32> for &'a Natural {
     fn sub(self, other: u32) -> Natural {
         self.checked_sub(other).unwrap_or_else(|| {
             sub_panic(self, other);
-            unreachable!();
+        })
+    }
+}
+
+/// Subtracts a `u32` from a `Natural` in place.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = `self.significant_bits()`
+///
+/// # Panics
+/// Panics if `other` is greater than `self`.
+///
+/// # Example
+/// ```
+/// use malachite_nz::natural::Natural;
+///
+/// let mut x = Natural::from(15u32);
+/// x -= 1;
+/// x -= 2;
+/// x -= 3;
+/// x -= 4;
+/// assert_eq!(x.to_string(), "5");
+/// ```
+impl SubAssign<u32> for Natural {
+    fn sub_assign(&mut self, other: u32) {
+        if self.sub_assign_u32_no_panic(other) {
+            sub_panic(self, other);
+        }
+    }
+}
+
+/// Subtracts a `Natural` from a `u32`, taking the `Natural` by value. Panics if the `Natural` is
+/// greater than the `u32`.
+///
+/// Time: worst case O(1)
+///
+/// Additional memory: worst case O(1)
+///
+/// # Panics
+/// Panics if `other` is greater than `self`.
+///
+/// # Examples
+/// ```
+/// extern crate malachite_base;
+/// extern crate malachite_nz;
+///
+/// use malachite_base::num::Zero;
+/// use malachite_nz::natural::Natural;
+///
+/// fn main() {
+///     assert_eq!(123 - Natural::from(123u32), 0);
+///     assert_eq!(123 - Natural::ZERO, 123);
+///     assert_eq!(456 - Natural::from(123u32), 333);
+/// }
+/// ```
+impl Sub<Natural> for u32 {
+    type Output = u32;
+
+    fn sub(self, other: Natural) -> u32 {
+        CheckedSub::checked_sub(self, &other).unwrap_or_else(|| {
+            sub_panic(self, other);
         })
     }
 }
@@ -222,37 +285,82 @@ impl<'a> Sub<&'a Natural> for u32 {
     fn sub(self, other: &'a Natural) -> u32 {
         CheckedSub::checked_sub(self, other).unwrap_or_else(|| {
             sub_panic(self, other);
-            unreachable!();
         })
     }
 }
 
-/// Subtracts a `u32` from a `Natural` in place.
+/// Subtracts a `Natural` from a `u32` in place, taking the `Natural` by value. Panics if the
+/// `Natural` is greater than the `u32`.
 ///
-/// Time: worst case O(n)
+/// Time: worst case O(1)
 ///
 /// Additional memory: worst case O(1)
-///
-/// where n = `self.significant_bits()`
 ///
 /// # Panics
 /// Panics if `other` is greater than `self`.
 ///
-/// # Example
+/// # Examples
 /// ```
+/// extern crate malachite_base;
+/// extern crate malachite_nz;
+///
+/// use malachite_base::num::Zero;
 /// use malachite_nz::natural::Natural;
 ///
-/// let mut x = Natural::from(15u32);
-/// x -= 1;
-/// x -= 2;
-/// x -= 3;
-/// x -= 4;
-/// assert_eq!(x.to_string(), "5");
+/// fn main() {
+///     let mut x = 123;
+///     x -= Natural::from(123u32);
+///     assert_eq!(x, 0);
+///
+///     let mut x = 123;
+///     x -= Natural::ZERO;
+///     assert_eq!(x, 123);
+///
+///     let mut x = 456;
+///     x -= Natural::from(123u32);
+///     assert_eq!(x, 333);
+/// }
 /// ```
-impl SubAssign<u32> for Natural {
-    fn sub_assign(&mut self, other: u32) {
-        if self.sub_assign_u32_no_panic(other) {
-            sub_panic(self, other);
-        }
+impl SubAssign<Natural> for u32 {
+    fn sub_assign(&mut self, other: Natural) {
+        *self = *self - other;
+    }
+}
+
+/// Subtracts a `Natural` from a `u32` in place, taking the `Natural` by reference. Panics if the
+/// `Natural` is greater than the `u32`.
+///
+/// Time: worst case O(1)
+///
+/// Additional memory: worst case O(1)
+///
+/// # Panics
+/// Panics if `other` is greater than `self`.
+///
+/// # Examples
+/// ```
+/// extern crate malachite_base;
+/// extern crate malachite_nz;
+///
+/// use malachite_base::num::Zero;
+/// use malachite_nz::natural::Natural;
+///
+/// fn main() {
+///     let mut x = 123;
+///     x -= &Natural::from(123u32);
+///     assert_eq!(x, 0);
+///
+///     let mut x = 123;
+///     x -= &Natural::ZERO;
+///     assert_eq!(x, 123);
+///
+///     let mut x = 456;
+///     x -= &Natural::from(123u32);
+///     assert_eq!(x, 333);
+/// }
+/// ```
+impl<'a> SubAssign<&'a Natural> for u32 {
+    fn sub_assign(&mut self, other: &'a Natural) {
+        *self = *self - other;
     }
 }

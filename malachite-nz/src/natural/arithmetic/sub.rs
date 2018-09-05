@@ -293,7 +293,7 @@ pub fn limbs_sub_in_place_right(xs: &[u32], ys: &mut Vec<u32>) -> bool {
     }
 }
 
-fn sub_panic<S: Display, T: Display>(x: S, y: T) {
+fn sub_panic<S: Display, T: Display>(x: S, y: T) -> ! {
     panic!(
         "Cannot subtract a Natural from a smaller Natural. self: {}, other: {}",
         x, y
@@ -424,7 +424,6 @@ impl<'a, 'b> Sub<&'a Natural> for &'b Natural {
     fn sub(self, other: &'a Natural) -> Natural {
         self.checked_sub(other).unwrap_or_else(|| {
             sub_panic(self, other);
-            unreachable!();
         })
     }
 }

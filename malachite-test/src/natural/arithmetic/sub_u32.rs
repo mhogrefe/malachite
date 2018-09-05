@@ -19,7 +19,10 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_natural_sub_assign_u32);
     register_demo!(registry, demo_natural_sub_u32);
     register_demo!(registry, demo_natural_sub_u32_ref);
+    register_demo!(registry, demo_u32_sub_assign_natural);
+    register_demo!(registry, demo_u32_sub_assign_natural_ref);
     register_demo!(registry, demo_u32_sub_natural);
+    register_demo!(registry, demo_u32_sub_natural_ref);
     register_bench!(registry, Small, benchmark_limbs_sub_limb);
     register_bench!(registry, Small, benchmark_limbs_sub_limb_to_out);
     register_bench!(registry, Small, benchmark_limbs_sub_limb_in_place);
@@ -41,7 +44,17 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_bench!(
         registry,
         Large,
+        benchmark_u32_sub_assign_natural_evaluation_strategy
+    );
+    register_bench!(
+        registry,
+        Large,
         benchmark_u32_sub_natural_library_comparison
+    );
+    register_bench!(
+        registry,
+        Large,
+        benchmark_u32_sub_natural_evaluation_strategy
     );
 }
 
@@ -106,7 +119,31 @@ fn demo_natural_sub_u32_ref(gm: GenerationMode, limit: usize) {
 fn demo_u32_sub_natural(gm: GenerationMode, limit: usize) {
     for (u, n) in pairs_of_u32_and_natural_var_1(gm).take(limit) {
         let n_old = n.clone();
-        println!("{} - {} = {}", u, n_old, u - &n);
+        println!("{} - {} = {}", u, n_old, u - n);
+    }
+}
+
+fn demo_u32_sub_natural_ref(gm: GenerationMode, limit: usize) {
+    for (u, n) in pairs_of_u32_and_natural_var_1(gm).take(limit) {
+        let n_old = n.clone();
+        println!("{} - &{} = {}", u, n_old, u - &n);
+    }
+}
+
+fn demo_u32_sub_assign_natural(gm: GenerationMode, limit: usize) {
+    for (mut u, n) in pairs_of_u32_and_natural_var_1(gm).take(limit) {
+        let u_old = u;
+        let n_old = n.clone();
+        u -= n;
+        println!("x := {}; x -= {}; x = {}", u_old, n_old, u);
+    }
+}
+
+fn demo_u32_sub_assign_natural_ref(gm: GenerationMode, limit: usize) {
+    for (mut u, n) in pairs_of_u32_and_natural_var_1(gm).take(limit) {
+        let u_old = u;
+        u -= &n;
+        println!("x := {}; x -= &{}; x = {}", u_old, n, u);
     }
 }
 
@@ -223,6 +260,27 @@ fn benchmark_natural_sub_u32_evaluation_strategy(
     );
 }
 
+fn benchmark_u32_sub_assign_natural_evaluation_strategy(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "u32 -= Natural",
+        BenchmarkType::EvaluationStrategy,
+        pairs_of_u32_and_natural_var_1(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(_, ref n)| n.significant_bits() as usize),
+        "n.significant_bits()",
+        &mut [
+            ("u32 -= Natural", &mut (|(mut x, y)| x -= y)),
+            ("u32 -= &Natural", &mut (|(mut x, y)| x -= &y)),
+        ],
+    );
+}
+
 fn benchmark_u32_sub_natural_library_comparison(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "u32 - Natural",
@@ -234,8 +292,29 @@ fn benchmark_u32_sub_natural_library_comparison(gm: GenerationMode, limit: usize
         &(|&(_, (_, ref n))| n.significant_bits() as usize),
         "n.significant_bits()",
         &mut [
-            ("malachite", &mut (|(_, (x, y))| no_out!(x - &y))),
+            ("malachite", &mut (|(_, (x, y))| no_out!(x - y))),
             ("rug", &mut (|((x, y), _)| no_out!(x - y))),
+        ],
+    );
+}
+
+fn benchmark_u32_sub_natural_evaluation_strategy(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "u32 - Natural",
+        BenchmarkType::EvaluationStrategy,
+        pairs_of_u32_and_natural_var_1(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(_, ref n)| n.significant_bits() as usize),
+        "n.significant_bits()",
+        &mut [
+            ("u32 - Natural", &mut (|(x, y)| no_out!(x - y))),
+            ("u32 - &Natural", &mut (|(x, y)| no_out!(x - &y))),
         ],
     );
 }

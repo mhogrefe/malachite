@@ -15,17 +15,26 @@ use malachite_test::integer::logic::or_u32::{integer_or_u32_alt_1, integer_or_u3
 use rug::{self, Assign};
 use std::str::FromStr;
 
-//TODO continue deduplication
 #[test]
-fn test_limbs_neg_or_limb() {
+fn test_limbs_neg_or_limb_and_limbs_neg_or_limb_in_place() {
     let test = |limbs: &[u32], limb: u32, out: &[u32]| {
         assert_eq!(limbs_neg_or_limb(limbs, limb), out);
+
+        let mut limbs = limbs.to_vec();
+        limbs_neg_or_limb_in_place(&mut limbs, limb);
+        assert_eq!(limbs, out);
     };
     test(&[6, 7], 0, &[6, 7]);
     test(&[6, 7], 2, &[6, 7]);
     test(&[100, 101, 102], 10, &[98, 101, 102]);
     test(&[123, 456], 789, &[107, 456]);
     test(&[0, 0, 456], 789, &[0xffff_fceb, 0xffff_ffff, 455]);
+}
+
+#[test]
+#[should_panic(expected = "index out of bounds: the len is 3 but the index is 3")]
+fn limbs_neg_or_limb_in_place_fail() {
+    limbs_neg_or_limb_in_place(&mut [0, 0, 0], 10);
 }
 
 #[test]
@@ -63,26 +72,6 @@ fn limbs_neg_or_limb_to_out_fail_1() {
 #[should_panic(expected = "assertion failed: out_limbs.len() >= len")]
 fn limbs_neg_or_limb_to_out_fail_2() {
     limbs_neg_or_limb_to_out(&mut [10], &[10, 10], 10);
-}
-
-#[test]
-fn test_limbs_neg_or_limb_in_place() {
-    let test = |limbs: &[u32], limb: u32, out: &[u32]| {
-        let mut limbs = limbs.to_vec();
-        limbs_neg_or_limb_in_place(&mut limbs, limb);
-        assert_eq!(limbs, out);
-    };
-    test(&[6, 7], 0, &[6, 7]);
-    test(&[6, 7], 2, &[6, 7]);
-    test(&[100, 101, 102], 10, &[98, 101, 102]);
-    test(&[123, 456], 789, &[107, 456]);
-    test(&[0, 0, 456], 789, &[0xffff_fceb, 0xffff_ffff, 455]);
-}
-
-#[test]
-#[should_panic(expected = "index out of bounds: the len is 3 but the index is 3")]
-fn limbs_neg_or_limb_in_place_fail() {
-    limbs_neg_or_limb_in_place(&mut [0, 0, 0], 10);
 }
 
 #[test]
