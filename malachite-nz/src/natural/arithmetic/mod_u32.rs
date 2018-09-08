@@ -1,4 +1,6 @@
-use malachite_base::num::{JoinHalves, Mod, ModAssign, PrimitiveInteger, SplitInHalf};
+use malachite_base::num::{
+    JoinHalves, Mod, ModAssign, NegMod, NegModAssign, PrimitiveInteger, SplitInHalf, Zero,
+};
 use natural::Natural::{self, Large, Small};
 use std::ops::{Rem, RemAssign};
 use std::u32;
@@ -655,6 +657,197 @@ impl<'a> ModAssign<&'a Natural> for u32 {
     /// ```
     fn mod_assign(&mut self, other: &'a Natural) {
         *self %= other;
+    }
+}
+
+impl NegMod<u32> for Natural {
+    type Output = u32;
+
+    /// Divides the negative of a `Natural` by a `u32`, taking the `Natural` by value and returning
+    /// the remainder. In other words, returns r, where `self` = q * `other` - r and
+    /// 0 <= r < `other`.
+    ///
+    /// Time: worst case O(n)
+    ///
+    /// Additional memory: worst case O(1)
+    ///
+    /// where n = `other.significant_bits()`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::NegMod;
+    /// use malachite_nz::natural::Natural;
+    /// use std::str::FromStr;
+    ///
+    /// fn main() {
+    ///     // 4 * 123 - 36 = 456
+    ///     assert_eq!(Natural::from(456u32).neg_mod(123), 36);
+    ///
+    ///     // 8,130,081,301 * 123 - 23 = 10^12
+    ///     assert_eq!(Natural::trillion().neg_mod(123), 23);
+    /// }
+    /// ```
+    fn neg_mod(self, other: u32) -> u32 {
+        (&self).neg_mod(other)
+    }
+}
+
+impl<'a> NegMod<u32> for &'a Natural {
+    type Output = u32;
+
+    /// Divides the negative of a `Natural` by a `u32`, taking the `Natural` by reference and
+    /// returning the remainder. In other words, returns r, where `self` = q * `other` - r and
+    /// 0 <= r < `other`.
+    ///
+    /// Time: worst case O(n)
+    ///
+    /// Additional memory: worst case O(1)
+    ///
+    /// where n = `other.significant_bits()`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::NegMod;
+    /// use malachite_nz::natural::Natural;
+    /// use std::str::FromStr;
+    ///
+    /// fn main() {
+    ///     // 3 * 124 - 36 = 456
+    ///     assert_eq!((&Natural::from(456u32)).neg_mod(123), 36);
+    ///
+    ///     // 8,130,081,301 * 123 - 23 = 10^12
+    ///     assert_eq!((&Natural::trillion()).neg_mod(123), 23);
+    /// }
+    /// ```
+    fn neg_mod(self, other: u32) -> u32 {
+        let rem = self % other;
+        if rem == 0 {
+            0
+        } else {
+            other - rem
+        }
+    }
+}
+
+impl NegModAssign<u32> for Natural {
+    /// Divides the negative of a `Natural` by a `u32`, replacing the `Natural` by the remainder.
+    /// In other words, replaces `self` with r, where `self` = q * `other` - r and 0 <= r < `other`.
+    ///
+    /// Time: worst case O(n)
+    ///
+    /// Additional memory: worst case O(1)
+    ///
+    /// where n = `other.significant_bits()`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::NegModAssign;
+    /// use malachite_nz::natural::Natural;
+    /// use std::str::FromStr;
+    ///
+    /// fn main() {
+    ///     // 4 * 123 - 36 = 456
+    ///     let mut x = Natural::from(456u32);
+    ///     x.neg_mod_assign(123);
+    ///     assert_eq!(x.to_string(), "36");
+    ///
+    ///     // 8,130,081,301 * 123 - 23 = 10^12
+    ///     let mut x = Natural::trillion();
+    ///     x.neg_mod_assign(123);
+    ///     assert_eq!(x.to_string(), "23");
+    /// }
+    /// ```
+    fn neg_mod_assign(&mut self, other: u32) {
+        *self = Small((&*self).neg_mod(other));
+    }
+}
+
+impl NegMod<Natural> for u32 {
+    type Output = Natural;
+
+    /// Divides the negative of a `u32` by a `Natural`, taking the `Natural` by value and returning
+    /// the remainder. In other words, returns r, where `self` = q * `other` - r and
+    /// 0 <= r < `other`.
+    ///
+    /// Time: worst case O(n)
+    ///
+    /// Additional memory: worst case O(1)
+    ///
+    /// where n = `self.significant_bits()`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::NegMod;
+    /// use malachite_nz::natural::Natural;
+    /// use std::str::FromStr;
+    ///
+    /// fn main() {
+    ///     // 4 * 123 - 36 = 456
+    ///     assert_eq!(456.neg_mod(Natural::from(123u32)).to_string(), "36");
+    ///
+    ///     // 0 * 10^12 + 123 = 123
+    ///     assert_eq!(123.neg_mod(Natural::trillion()).to_string(), "999999999877");
+    /// }
+    /// ```
+    fn neg_mod(self, other: Natural) -> Natural {
+        let rem = self % &other;
+        if rem == 0 {
+            Natural::ZERO
+        } else {
+            other - rem
+        }
+    }
+}
+
+impl<'a> NegMod<&'a Natural> for u32 {
+    type Output = Natural;
+
+    /// Divides the negative of a `u32` by a `Natural`, taking the `Natural` by reference and
+    /// returning the remainder. In other words, returns r, where `self` = q * `other` - r and
+    /// 0 <= r < `other`.
+    ///
+    /// Time: worst case O(n)
+    ///
+    /// Additional memory: worst case O(1)
+    ///
+    /// where n = `self.significant_bits()`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::NegMod;
+    /// use malachite_nz::natural::Natural;
+    /// use std::str::FromStr;
+    ///
+    /// fn main() {
+    ///     // 4 * 123 - 36 = 456
+    ///     assert_eq!(456.neg_mod(&Natural::from(123u32)).to_string(), "36");
+    ///
+    ///     // 0 * 10^12 + 123 = 123
+    ///     assert_eq!(123.neg_mod(&Natural::trillion()).to_string(), "999999999877");
+    /// }
+    /// ```
+    fn neg_mod(self, other: &'a Natural) -> Natural {
+        let rem = self % other;
+        if rem == 0 {
+            Natural::ZERO
+        } else {
+            other - rem
+        }
     }
 }
 

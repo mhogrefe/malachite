@@ -4,7 +4,7 @@ use inputs::natural::{
     nrm_pairs_of_natural_and_positive_unsigned, pairs_of_natural_and_positive_unsigned,
     pairs_of_unsigned_and_positive_natural,
 };
-use malachite_base::num::{DivMod, Mod, ModAssign, SignificantBits};
+use malachite_base::num::{DivMod, Mod, ModAssign, NegMod, NegModAssign, SignificantBits};
 use malachite_nz::natural::arithmetic::mod_u32::limbs_mod_limb;
 use num::{BigUint, ToPrimitive};
 
@@ -18,6 +18,9 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_natural_mod_assign_u32);
     register_demo!(registry, demo_natural_mod_u32);
     register_demo!(registry, demo_natural_mod_u32_ref);
+    register_demo!(registry, demo_natural_neg_mod_assign_u32);
+    register_demo!(registry, demo_natural_neg_mod_u32);
+    register_demo!(registry, demo_natural_neg_mod_u32_ref);
     register_demo!(registry, demo_u32_rem_natural);
     register_demo!(registry, demo_u32_rem_natural_ref);
     register_demo!(registry, demo_u32_rem_assign_natural);
@@ -26,6 +29,8 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_u32_mod_natural_ref);
     register_demo!(registry, demo_u32_mod_assign_natural);
     register_demo!(registry, demo_u32_mod_assign_natural_ref);
+    register_demo!(registry, demo_u32_neg_mod_natural);
+    register_demo!(registry, demo_u32_neg_mod_natural_ref);
     register_bench!(registry, Small, benchmark_limbs_mod_limb);
     register_bench!(registry, Large, benchmark_natural_rem_assign_u32);
     register_bench!(
@@ -50,6 +55,12 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
         Large,
         benchmark_natural_mod_u32_evaluation_strategy
     );
+    register_bench!(registry, Large, benchmark_natural_neg_mod_assign_u32);
+    register_bench!(
+        registry,
+        Large,
+        benchmark_natural_neg_mod_u32_evaluation_strategy
+    );
     register_bench!(
         registry,
         Large,
@@ -69,6 +80,11 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
         registry,
         Large,
         benchmark_u32_mod_assign_natural_evaluation_strategy
+    );
+    register_bench!(
+        registry,
+        Large,
+        benchmark_u32_neg_mod_natural_evaluation_strategy
     );
 }
 
@@ -126,6 +142,27 @@ fn demo_natural_mod_u32(gm: GenerationMode, limit: usize) {
 fn demo_natural_mod_u32_ref(gm: GenerationMode, limit: usize) {
     for (n, u) in pairs_of_natural_and_positive_unsigned::<u32>(gm).take(limit) {
         println!("(&{}).mod({}) = {}", n, u, (&n).mod_op(u));
+    }
+}
+
+fn demo_natural_neg_mod_assign_u32(gm: GenerationMode, limit: usize) {
+    for (mut n, u) in pairs_of_natural_and_positive_unsigned::<u32>(gm).take(limit) {
+        let n_old = n.clone();
+        n.neg_mod_assign(u);
+        println!("x := {}; x.neg_mod_assign({}); x = {}", n_old, u, n);
+    }
+}
+
+fn demo_natural_neg_mod_u32(gm: GenerationMode, limit: usize) {
+    for (n, u) in pairs_of_natural_and_positive_unsigned::<u32>(gm).take(limit) {
+        let n_old = n.clone();
+        println!("{}.neg_mod({}) = {}", n_old, u, n.neg_mod(u));
+    }
+}
+
+fn demo_natural_neg_mod_u32_ref(gm: GenerationMode, limit: usize) {
+    for (n, u) in pairs_of_natural_and_positive_unsigned::<u32>(gm).take(limit) {
+        println!("(&{}).neg_mod({}) = {}", n, u, (&n).neg_mod(u));
     }
 }
 
@@ -188,6 +225,20 @@ fn demo_u32_mod_assign_natural_ref(gm: GenerationMode, limit: usize) {
         let u_old = u;
         u.mod_assign(&n);
         println!("x := {}; x.mod_assign(&{}); x = {}", u_old, n, u);
+    }
+}
+
+fn demo_u32_neg_mod_natural(gm: GenerationMode, limit: usize) {
+    for (u, n) in pairs_of_unsigned_and_positive_natural::<u32>(gm).take(limit) {
+        let n_old = n.clone();
+        println!("{}.neg_mod({}) = {:?}", u, n_old, u.neg_mod(n));
+    }
+}
+
+fn demo_u32_neg_mod_natural_ref(gm: GenerationMode, limit: usize) {
+    for (u, n) in pairs_of_unsigned_and_positive_natural::<u32>(gm).take(limit) {
+        let n_old = n.clone();
+        println!("{}.neg_mod(&{}) = {:?}", u, n_old, u.neg_mod(&n));
     }
 }
 
@@ -335,6 +386,47 @@ fn benchmark_natural_mod_u32_evaluation_strategy(
     );
 }
 
+fn benchmark_natural_neg_mod_assign_u32(gm: GenerationMode, limit: usize, file_name: &str) {
+    m_run_benchmark(
+        "Natural.neg_mod_assign(u32)",
+        BenchmarkType::Single,
+        pairs_of_natural_and_positive_unsigned::<u32>(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(ref n, _)| n.significant_bits() as usize),
+        "n.significant_bits()",
+        &mut [("malachite", &mut (|(mut x, y)| x.neg_mod_assign(y)))],
+    );
+}
+
+fn benchmark_natural_neg_mod_u32_evaluation_strategy(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "Natural.neg_mod(u32)",
+        BenchmarkType::EvaluationStrategy,
+        pairs_of_natural_and_positive_unsigned::<u32>(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(ref n, _)| n.significant_bits() as usize),
+        "n.significant_bits()",
+        &mut [
+            (
+                "Natural.neg_mod(u32)",
+                &mut (|(x, y)| no_out!(x.neg_mod(y))),
+            ),
+            (
+                "(&Natural).neg_mod(u32)",
+                &mut (|(x, y)| no_out!((&x).neg_mod(y))),
+            ),
+        ],
+    );
+}
+
 fn benchmark_u32_rem_natural_evaluation_strategy(
     gm: GenerationMode,
     limit: usize,
@@ -420,6 +512,33 @@ fn benchmark_u32_mod_assign_natural_evaluation_strategy(
             (
                 "u32.mod_assign(&Natural)",
                 &mut (|(mut x, y)| x.mod_assign(&y)),
+            ),
+        ],
+    );
+}
+
+fn benchmark_u32_neg_mod_natural_evaluation_strategy(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "u32.neg_mod(Natural)",
+        BenchmarkType::EvaluationStrategy,
+        pairs_of_unsigned_and_positive_natural::<u32>(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(_, ref n)| n.significant_bits() as usize),
+        "n.significant_bits()",
+        &mut [
+            (
+                "u32.neg_mod(Natural)",
+                &mut (|(x, y)| no_out!(x.neg_mod(y))),
+            ),
+            (
+                "u32.neg_mod(&Natural)",
+                &mut (|(x, y)| no_out!(x.neg_mod(&y))),
             ),
         ],
     );

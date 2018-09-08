@@ -472,6 +472,16 @@ pub trait ModAssign<RHS = Self> {
     fn mod_assign(&mut self, rhs: RHS);
 }
 
+pub trait NegMod<RHS = Self> {
+    type Output;
+
+    fn neg_mod(self, rhs: RHS) -> Self::Output;
+}
+
+pub trait NegModAssign<RHS = Self> {
+    fn neg_mod_assign(&mut self, rhs: RHS);
+}
+
 //TODO is_positive, is_negative, sign
 
 macro_rules! lossless_checked_from_impl {
@@ -1830,6 +1840,64 @@ macro_rules! unsigned_traits {
             #[inline]
             fn rem_power_of_two_assign(&mut self, pow: u64) {
                 self.mod_power_of_two_assign(pow)
+            }
+        }
+
+        impl DivMod for $t {
+            type DivOutput = $t;
+            type ModOutput = $t;
+
+            #[inline]
+            fn div_mod(self, rhs: $t) -> ($t, $t) {
+                (self / rhs, self % rhs)
+            }
+        }
+
+        impl DivAssignMod for $t {
+            type ModOutput = $t;
+
+            #[inline]
+            fn div_assign_mod(&mut self, rhs: $t) -> $t {
+                let rem = *self % rhs;
+                *self /= rhs;
+                rem
+            }
+        }
+
+        impl Mod for $t {
+            type Output = $t;
+
+            #[inline]
+            fn mod_op(self, rhs: $t) -> $t {
+                self % rhs
+            }
+        }
+
+        impl ModAssign for $t {
+            #[inline]
+            fn mod_assign(&mut self, rhs: $t) {
+                *self %= rhs;
+            }
+        }
+
+        impl NegMod for $t {
+            type Output = $t;
+
+            #[inline]
+            fn neg_mod(self, rhs: $t) -> $t {
+                let rem = self % rhs;
+                if rem == 0 {
+                    0
+                } else {
+                    rhs - rem
+                }
+            }
+        }
+
+        impl NegModAssign for $t {
+            #[inline]
+            fn neg_mod_assign(&mut self, rhs: $t) {
+                *self = self.neg_mod(rhs);
             }
         }
     };
