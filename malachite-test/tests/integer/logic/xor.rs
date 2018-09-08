@@ -18,11 +18,18 @@ use rug;
 use std::cmp::max;
 use std::str::FromStr;
 
-//TODO continue deduplication
 #[test]
-fn test_limbs_xor_pos_neg() {
-    let test = |xs, ys, out| {
-        assert_eq!(limbs_xor_pos_neg(xs, ys), out);
+fn test_limbs_xor_pos_neg_limbs_xor_pos_neg_in_place_left_and_limbs_xor_pos_neg_in_place_right() {
+    let test = |xs_before, ys_before, out| {
+        assert_eq!(limbs_xor_pos_neg(xs_before, ys_before), out);
+
+        let mut xs = xs_before.to_vec();
+        limbs_xor_pos_neg_in_place_left(&mut xs, ys_before);
+        assert_eq!(xs, out);
+
+        let mut ys = ys_before.to_vec();
+        limbs_xor_pos_neg_in_place_right(xs_before, &mut ys);
+        assert_eq!(ys, out);
     };
     test(&[2], &[3], vec![1]);
     test(&[1, 1, 1], &[1, 2, 3], vec![2, 3, 2]);
@@ -47,6 +54,30 @@ fn limbs_xor_pos_neg_fail_1() {
 #[should_panic(expected = "assertion failed: y_i < ys_len")]
 fn limbs_xor_pos_neg_fail_2() {
     limbs_xor_pos_neg(&[3], &[0, 0, 0]);
+}
+
+#[test]
+#[should_panic(expected = "assertion failed: x_i < xs_len")]
+fn limbs_xor_pos_neg_in_place_left_fail_1() {
+    limbs_xor_pos_neg_in_place_left(&mut vec![0, 0, 0], &[3]);
+}
+
+#[test]
+#[should_panic(expected = "assertion failed: y_i < ys_len")]
+fn limbs_xor_pos_neg_in_place_left_fail_2() {
+    limbs_xor_pos_neg_in_place_left(&mut vec![3], &[0, 0, 0]);
+}
+
+#[test]
+#[should_panic(expected = "assertion failed: x_i < xs_len")]
+fn limbs_xor_pos_neg_in_place_right_fail_1() {
+    limbs_xor_pos_neg_in_place_right(&[0, 0, 0], &mut vec![3]);
+}
+
+#[test]
+#[should_panic(expected = "assertion failed: y_i < ys_len")]
+fn limbs_xor_pos_neg_in_place_right_fail_2() {
+    limbs_xor_pos_neg_in_place_right(&[3], &mut vec![0, 0, 0]);
 }
 
 #[test]
@@ -111,70 +142,6 @@ fn limbs_xor_pos_neg_to_out_fail_3() {
 }
 
 #[test]
-fn test_limbs_xor_pos_neg_in_place_left() {
-    let test = |xs_before: &[u32], ys, xs_after| {
-        let mut xs = xs_before.to_vec();
-        limbs_xor_pos_neg_in_place_left(&mut xs, ys);
-        assert_eq!(xs, xs_after);
-    };
-    test(&[2], &[3], vec![1]);
-    test(&[1, 1, 1], &[1, 2, 3], vec![2, 3, 2]);
-    test(&[6, 7], &[1, 2, 3], vec![7, 5, 3]);
-    test(&[1, 2, 3], &[6, 7], vec![5, 5, 3]);
-    test(&[100, 101, 102], &[102, 101, 100], vec![2, 0, 2]);
-    test(&[0, 0, 1], &[3], vec![3, 0, 1]);
-    test(&[3], &[0, 0, 1], vec![4_294_967_293, 4_294_967_295, 0]);
-    test(&[0, 3, 3], &[0, 0, 3], vec![0, 4_294_967_293, 1]);
-    test(&[0, 0, 3], &[0, 3, 3], vec![0, 3, 0]);
-    test(&[0, 3], &[0, 0, 3], vec![0, 4_294_967_293, 2]);
-    test(&[0, 0, 3], &[0, 3], vec![0, 3, 3]);
-}
-
-#[test]
-#[should_panic(expected = "assertion failed: x_i < xs_len")]
-fn limbs_xor_pos_neg_in_place_left_fail_1() {
-    limbs_xor_pos_neg_in_place_left(&mut vec![0, 0, 0], &[3]);
-}
-
-#[test]
-#[should_panic(expected = "assertion failed: y_i < ys_len")]
-fn limbs_xor_pos_neg_in_place_left_fail_2() {
-    limbs_xor_pos_neg_in_place_left(&mut vec![3], &[0, 0, 0]);
-}
-
-#[test]
-fn test_limbs_xor_pos_neg_in_place_right() {
-    let test = |xs, ys_before: &[u32], ys_after| {
-        let mut ys = ys_before.to_vec();
-        limbs_xor_pos_neg_in_place_right(xs, &mut ys);
-        assert_eq!(ys, ys_after);
-    };
-    test(&[2], &[3], vec![1]);
-    test(&[1, 1, 1], &[1, 2, 3], vec![2, 3, 2]);
-    test(&[6, 7], &[1, 2, 3], vec![7, 5, 3]);
-    test(&[1, 2, 3], &[6, 7], vec![5, 5, 3]);
-    test(&[100, 101, 102], &[102, 101, 100], vec![2, 0, 2]);
-    test(&[0, 0, 1], &[3], vec![3, 0, 1]);
-    test(&[3], &[0, 0, 1], vec![4_294_967_293, 4_294_967_295, 0]);
-    test(&[0, 3, 3], &[0, 0, 3], vec![0, 4_294_967_293, 1]);
-    test(&[0, 0, 3], &[0, 3, 3], vec![0, 3, 0]);
-    test(&[0, 3], &[0, 0, 3], vec![0, 4_294_967_293, 2]);
-    test(&[0, 0, 3], &[0, 3], vec![0, 3, 3]);
-}
-
-#[test]
-#[should_panic(expected = "assertion failed: x_i < xs_len")]
-fn limbs_xor_pos_neg_in_place_right_fail_1() {
-    limbs_xor_pos_neg_in_place_right(&[0, 0, 0], &mut vec![3]);
-}
-
-#[test]
-#[should_panic(expected = "assertion failed: y_i < ys_len")]
-fn limbs_xor_pos_neg_in_place_right_fail_2() {
-    limbs_xor_pos_neg_in_place_right(&[3], &mut vec![0, 0, 0]);
-}
-
-#[test]
 fn test_limbs_xor_pos_neg_in_place_either() {
     let test = |xs_before: &[u32], ys_before: &[u32], b, xs_after, ys_after| {
         let mut xs = xs_before.to_vec();
@@ -233,9 +200,13 @@ fn limbs_xor_pos_neg_in_place_either_fail_2() {
 }
 
 #[test]
-fn test_limbs_xor_neg_neg() {
-    let test = |xs, ys, out| {
-        assert_eq!(limbs_xor_neg_neg(xs, ys), out);
+fn test_limbs_xor_neg_neg_and_limbs_xor_neg_neg_in_place_left() {
+    let test = |xs_before, ys, out| {
+        assert_eq!(limbs_xor_neg_neg(xs_before, ys), out);
+
+        let mut xs = xs_before.to_vec();
+        limbs_xor_neg_neg_in_place_left(&mut xs, ys);
+        assert_eq!(xs, out);
     };
     test(&[2], &[3], vec![3]);
     test(&[1, 1, 1], &[1, 2, 3], vec![0, 3, 2]);
@@ -248,6 +219,18 @@ fn test_limbs_xor_neg_neg() {
     test(&[0, 0, 3], &[0, 3, 3], vec![0, 4_294_967_293, 1]);
     test(&[0, 3], &[0, 0, 3], vec![0, 4_294_967_293, 2]);
     test(&[0, 0, 3], &[0, 3], vec![0, 4_294_967_293, 2]);
+}
+
+#[test]
+#[should_panic(expected = "assertion failed: x_i < xs_len")]
+fn limbs_xor_neg_neg_in_place_left_fail_1() {
+    limbs_xor_neg_neg_in_place_left(&mut vec![0, 0, 0], &[3]);
+}
+
+#[test]
+#[should_panic(expected = "assertion failed: y_i < ys_len")]
+fn limbs_xor_neg_neg_in_place_left_fail_2() {
+    limbs_xor_neg_neg_in_place_left(&mut vec![3], &[0, 0, 0]);
 }
 
 #[test]
@@ -324,38 +307,6 @@ fn limbs_xor_neg_neg_to_out_fail_2() {
 fn limbs_xor_neg_neg_to_out_fail_3() {
     let mut out = vec![10];
     limbs_xor_neg_neg_to_out(&mut out, &[6, 7], &[1, 2]);
-}
-
-#[test]
-fn test_limbs_xor_neg_neg_in_place_left() {
-    let test = |xs_before: &[u32], ys, xs_after| {
-        let mut xs = xs_before.to_vec();
-        limbs_xor_neg_neg_in_place_left(&mut xs, ys);
-        assert_eq!(xs, xs_after);
-    };
-    test(&[2], &[3], vec![3]);
-    test(&[1, 1, 1], &[1, 2, 3], vec![0, 3, 2]);
-    test(&[6, 7], &[1, 2, 3], vec![5, 5, 3]);
-    test(&[1, 2, 3], &[6, 7], vec![5, 5, 3]);
-    test(&[100, 101, 102], &[102, 101, 100], vec![6, 0, 2]);
-    test(&[0, 0, 1], &[3], vec![4_294_967_293, 4_294_967_295, 0]);
-    test(&[3], &[0, 0, 1], vec![4_294_967_293, 4_294_967_295, 0]);
-    test(&[0, 3, 3], &[0, 0, 3], vec![0, 4_294_967_293, 1]);
-    test(&[0, 0, 3], &[0, 3, 3], vec![0, 4_294_967_293, 1]);
-    test(&[0, 3], &[0, 0, 3], vec![0, 4_294_967_293, 2]);
-    test(&[0, 0, 3], &[0, 3], vec![0, 4_294_967_293, 2]);
-}
-
-#[test]
-#[should_panic(expected = "assertion failed: x_i < xs_len")]
-fn limbs_xor_neg_neg_in_place_left_fail_1() {
-    limbs_xor_neg_neg_in_place_left(&mut vec![0, 0, 0], &[3]);
-}
-
-#[test]
-#[should_panic(expected = "assertion failed: y_i < ys_len")]
-fn limbs_xor_neg_neg_in_place_left_fail_2() {
-    limbs_xor_neg_neg_in_place_left(&mut vec![3], &[0, 0, 0]);
 }
 
 #[test]

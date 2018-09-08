@@ -20,6 +20,7 @@ use rug::{self, Assign};
 use std::str::FromStr;
 use std::u32;
 
+//TODO continue deduplication
 #[test]
 fn test_limbs_pos_xor_limb_neg() {
     let test = |limbs: &[u32], limb: u32, out_limbs: &[u32]| {
