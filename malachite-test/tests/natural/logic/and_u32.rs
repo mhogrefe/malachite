@@ -39,8 +39,8 @@ fn test_and_u32() {
         n &= v;
         assert_eq!(n.to_string(), out);
 
-        let n = &Natural::from_str(u).unwrap() & v;
-        assert_eq!(n.to_string(), out);
+        assert_eq!((Natural::from_str(u).unwrap() & v).to_string(), out);
+        assert_eq!((&Natural::from_str(u).unwrap() & v).to_string(), out);
 
         assert_eq!(
             natural_and_u32_alt_1(&Natural::from_str(u).unwrap(), v).to_string(),
@@ -51,17 +51,24 @@ fn test_and_u32() {
             out
         );
 
-        let n = num_and_u32(BigUint::from_str(u).unwrap(), v);
+        assert_eq!(
+            num_and_u32(BigUint::from_str(u).unwrap(), v).to_string(),
+            out
+        );
+        assert_eq!((rug::Integer::from_str(u).unwrap() & v).to_string(), out);
+
+        assert_eq!((v & Natural::from_str(u).unwrap()).to_string(), out);
+        assert_eq!((v & &Natural::from_str(u).unwrap()).to_string(), out);
+
+        let mut n = v;
+        n &= Natural::from_str(u).unwrap();
         assert_eq!(n.to_string(), out);
 
-        let n = rug::Integer::from_str(u).unwrap() & v;
+        let mut n = v;
+        n &= &Natural::from_str(u).unwrap();
         assert_eq!(n.to_string(), out);
 
-        let n = v & &Natural::from_str(u).unwrap();
-        assert_eq!(n.to_string(), out);
-
-        let n = v & rug::Integer::from_str(u).unwrap();
-        assert_eq!(n.to_string(), out);
+        assert_eq!((v & rug::Integer::from_str(u).unwrap()).to_string(), out);
 
         let mut n = rug::Integer::from(0);
         n.assign(v & &rug::Integer::from_str(u).unwrap());
@@ -104,7 +111,18 @@ fn and_u32_properties() {
             assert_eq!(rug_integer_to_natural(&rug_n), result);
 
             assert_eq!(n & u, result);
+            assert_eq!(n.clone() & u, result);
             assert_eq!(u & n, result);
+            assert_eq!(u & n.clone(), result);
+
+            let mut mut_u = u;
+            mut_u &= n;
+            assert_eq!(mut_u, result);
+
+            let mut mut_u = u;
+            mut_u &= n.clone();
+            assert_eq!(mut_u, result);
+
             assert_eq!(natural_and_u32_alt_1(&n, u), result);
             assert_eq!(natural_and_u32_alt_2(&n, u), result);
 
