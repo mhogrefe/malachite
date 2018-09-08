@@ -301,9 +301,7 @@ fn div_u32_properties_helper(n: &Natural, u: u32) {
     assert!(quotient_alt.is_valid());
     assert_eq!(quotient_alt, quotient);
 
-    let quotient_alt = n.div_mod(u).0;
-    assert!(quotient_alt.is_valid());
-    assert_eq!(quotient_alt, quotient);
+    assert_eq!(n.div_mod(u).0, quotient);
 
     //TODO assert_eq!(n / Natural::from(u), quotient);
 
@@ -348,6 +346,8 @@ fn div_u32_properties() {
 
             let quotient_alt = u / n.clone();
             assert_eq!(quotient_alt, quotient);
+
+            assert_eq!(u.div_mod(n).0, quotient);
 
             assert!(u - &(quotient * n) < *n);
         },

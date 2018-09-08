@@ -1,7 +1,4 @@
-use malachite_base::num::{
-    BitAccess, DivAssignMod, DivAssignRem, DivMod, DivRem, JoinHalves, PrimitiveInteger,
-    SplitInHalf,
-};
+use malachite_base::num::{DivAssignMod, DivAssignRem, DivMod, DivRem, JoinHalves, SplitInHalf};
 use natural::arithmetic::add_u32::limbs_slice_add_limb_in_place;
 use natural::arithmetic::shl_u::{limbs_shl_to_out, limbs_slice_shl_in_place};
 use natural::Natural::{self, Large, Small};
@@ -32,7 +29,7 @@ pub(crate) fn div_mod_by_preinversion(
 }
 
 // high bit of divisor must be set
-fn limbs_div_normalized_in_place_mod(
+fn limbs_div_limb_normalized_in_place_mod(
     limbs: &mut [u32],
     high_limb: u32,
     divisor: u32,
@@ -101,7 +98,7 @@ fn limbs_div_normalized_in_place_mod(
 }
 
 // high bit of divisor must be set
-fn limbs_div_normalized_to_out_mod(
+fn limbs_div_limb_normalized_to_out_mod(
     out_limbs: &mut [u32],
     in_limbs: &[u32],
     high_limb: u32,
@@ -230,15 +227,16 @@ pub fn limbs_div_limb_to_out_mod(out_limbs: &mut [u32], in_limbs: &[u32], mut li
     assert!(limb > 0);
     let len_minus_1 = len - 1;
     let mut highest_limb = in_limbs[len_minus_1];
-    if limb.get_bit(u64::from(u32::WIDTH) - 1) {
+    let bits = limb.leading_zeros();
+    if bits == 0 {
         out_limbs[len_minus_1] = if highest_limb >= limb {
             highest_limb -= limb;
             1
         } else {
             0
         };
-        let limb_inverse = (u64::join_halves(!limb, u32::MAX) / u64::from(limb)) as u32;
-        limbs_div_normalized_to_out_mod(
+        let limb_inverse = (u64::join_halves(!limb, u32::MAX) / u64::from(limb)).lower_half();
+        limbs_div_limb_normalized_to_out_mod(
             out_limbs,
             &in_limbs[..len_minus_1],
             highest_limb,
@@ -246,14 +244,13 @@ pub fn limbs_div_limb_to_out_mod(out_limbs: &mut [u32], in_limbs: &[u32], mut li
             limb_inverse,
         )
     } else {
-        let bits = limb.leading_zeros();
         limb <<= bits;
         let highest_limb = limbs_shl_to_out(out_limbs, in_limbs, bits);
-        let limb_inverse = (u64::join_halves(!limb, u32::MAX) / u64::from(limb)) as u32;
+        let limb_inverse = (u64::join_halves(!limb, u32::MAX) / u64::from(limb)).lower_half();
         let (quotient, remainder) =
             div_mod_by_preinversion(highest_limb, out_limbs[len_minus_1], limb, limb_inverse);
         out_limbs[len_minus_1] = quotient;
-        limbs_div_normalized_in_place_mod(
+        limbs_div_limb_normalized_in_place_mod(
             &mut out_limbs[..len_minus_1],
             remainder,
             limb,
@@ -293,30 +290,34 @@ pub fn limbs_div_limb_in_place_mod(limbs: &mut [u32], mut limb: u32) -> u32 {
     assert!(limb > 0);
     let len_minus_1 = len - 1;
     let mut highest_limb = limbs[len_minus_1];
-    if limb.get_bit(u64::from(u32::WIDTH) - 1) {
+    let bits = limb.leading_zeros();
+    if bits == 0 {
         limbs[len_minus_1] = if highest_limb >= limb {
             highest_limb -= limb;
             1
         } else {
             0
         };
-        let limb_inverse = (u64::join_halves(!limb, u32::MAX) / u64::from(limb)) as u32;
-        limbs_div_normalized_in_place_mod(
+        let limb_inverse = (u64::join_halves(!limb, u32::MAX) / u64::from(limb)).lower_half();
+        limbs_div_limb_normalized_in_place_mod(
             &mut limbs[..len_minus_1],
             highest_limb,
             limb,
             limb_inverse,
         )
     } else {
-        let bits = limb.leading_zeros();
         limb <<= bits;
         let highest_limb = limbs_slice_shl_in_place(limbs, bits);
-        let limb_inverse = (u64::join_halves(!limb, u32::MAX) / u64::from(limb)) as u32;
+        let limb_inverse = (u64::join_halves(!limb, u32::MAX) / u64::from(limb)).lower_half();
         let (quotient, remainder) =
             div_mod_by_preinversion(highest_limb, limbs[len_minus_1], limb, limb_inverse);
         limbs[len_minus_1] = quotient;
-        limbs_div_normalized_in_place_mod(&mut limbs[..len_minus_1], remainder, limb, limb_inverse)
-            >> bits
+        limbs_div_limb_normalized_in_place_mod(
+            &mut limbs[..len_minus_1],
+            remainder,
+            limb,
+            limb_inverse,
+        ) >> bits
     }
 }
 
@@ -873,12 +874,12 @@ fn _limbs_div_in_place_mod_naive(limbs: &mut [u32], limb: u32) -> u32 {
 }
 
 impl Natural {
-    pub fn _div_mod_naive(mut self, other: u32) -> (Natural, u32) {
-        let remainder = self._div_assign_mod_naive(other);
+    pub fn _div_mod_u32_naive(mut self, other: u32) -> (Natural, u32) {
+        let remainder = self._div_assign_mod_u32_naive(other);
         (self, remainder)
     }
 
-    pub fn _div_assign_mod_naive(&mut self, other: u32) -> u32 {
+    pub fn _div_assign_mod_u32_naive(&mut self, other: u32) -> u32 {
         if other == 0 {
             panic!("division by zero");
         } else if other == 1 {

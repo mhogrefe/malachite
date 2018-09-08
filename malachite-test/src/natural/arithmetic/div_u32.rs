@@ -12,8 +12,6 @@ use malachite_nz::natural::arithmetic::div_u32::{
     limbs_div_limb, limbs_div_limb_in_place, limbs_div_limb_to_out,
 };
 
-// For `Natural`s, `div` is equivalent to `rem`.
-
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limbs_div_limb);
     register_demo!(registry, demo_limbs_div_limb_to_out);
@@ -238,6 +236,7 @@ fn benchmark_natural_div_u32_algorithms(gm: GenerationMode, limit: usize, file_n
         "n.significant_bits()",
         &mut [
             ("standard", &mut (|(x, y)| no_out!(x / y))),
+            ("naive", &mut (|(x, y)| no_out!(x._div_u32_naive(y)))),
             ("using div_mod", &mut (|(x, y)| no_out!(x.div_mod(y).0))),
         ],
     );

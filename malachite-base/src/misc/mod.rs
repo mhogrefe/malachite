@@ -56,14 +56,12 @@ where
 }
 
 /// This trait defines the minimum value of a type.
-#[allow(unknown_lints, declare_interior_mutable_const)]
 pub trait Min {
     /// The minimum value of `Self`.
     const MIN: Self;
 }
 
 /// This trait defines the minimum value of a type.
-#[allow(unknown_lints, declare_interior_mutable_const)]
 pub trait Max {
     /// The maximum value of `Self`.
     const MAX: Self;
@@ -71,7 +69,6 @@ pub trait Max {
 
 /// This trait defines the name of a type. This is useful when constructing error messages in a
 /// generic function.
-#[allow(unknown_lints, const_static_lifetime)]
 pub trait Named {
     /// The name of `Self`.
     const NAME: &'static str;

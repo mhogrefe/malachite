@@ -14,6 +14,7 @@ pub mod eq_mod_power_of_two_u32;
 pub mod is_power_of_two;
 pub mod log_two;
 pub mod mod_power_of_two;
+pub mod mod_u32;
 pub mod mul;
 pub mod mul_u32;
 pub mod neg;
@@ -44,6 +45,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     log_two::register(registry);
     mod_power_of_two::register(registry);
     next_power_of_two::register(registry);
+    mod_u32::register(registry);
     mul::register(registry);
     mul_u32::register(registry);
     neg::register(registry);

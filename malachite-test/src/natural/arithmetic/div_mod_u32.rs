@@ -14,7 +14,7 @@ use malachite_nz::natural::arithmetic::div_mod_u32::{
 use num::{BigUint, Integer, ToPrimitive};
 use rug;
 
-// For `Natural`s, `div` is equivalent to `rem`.
+// For `Natural`s, `mod` is equivalent to `rem`.
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limbs_div_limb_mod);
@@ -371,7 +371,14 @@ fn benchmark_natural_div_mod_u32_algorithms(gm: GenerationMode, limit: usize, fi
         "n.significant_bits()",
         &mut [
             ("standard", &mut (|(x, y)| no_out!(x.div_mod(y)))),
-            ("naive", &mut (|(x, y)| no_out!(x._div_mod_naive(y)))),
+            ("naive", &mut (|(x, y)| no_out!(x._div_mod_u32_naive(y)))),
+            (
+                "using / and %",
+                &mut (|(x, y)| {
+                    let remainder = &x % y;
+                    (x / y, remainder);
+                }),
+            ),
         ],
     );
 }

@@ -185,7 +185,7 @@ fn test_div_mod_u32() {
         assert!(q.is_valid());
         assert_eq!(r, remainder);
 
-        let (q, r) = Natural::from_str(u).unwrap()._div_mod_naive(v);
+        let (q, r) = Natural::from_str(u).unwrap()._div_mod_u32_naive(v);
         assert_eq!(q.to_string(), quotient);
         assert!(q.is_valid());
         assert_eq!(r, remainder);
@@ -466,8 +466,12 @@ fn div_mod_u32_properties_helper(n: &Natural, u: u32) {
     assert_eq!(quotient_alt, quotient);
     assert_eq!(remainder_alt, remainder);
 
-    let (quotient_alt, remainder_alt) = n.clone()._div_mod_naive(u);
+    let (quotient_alt, remainder_alt) = n.clone()._div_mod_u32_naive(u);
     assert!(quotient_alt.is_valid());
+    assert_eq!(quotient_alt, quotient);
+    assert_eq!(remainder_alt, remainder);
+
+    let (quotient_alt, remainder_alt) = n.div_mod(u);
     assert_eq!(quotient_alt, quotient);
     assert_eq!(remainder_alt, remainder);
 
@@ -541,6 +545,8 @@ fn div_mod_u32_properties() {
             let mut mut_u = u;
             assert_eq!(mut_u.div_assign_rem(n.clone()), remainder);
             assert_eq!(mut_u, quotient);
+
+            assert_eq!((quotient, remainder), u.div_mod(n));
 
             if u != 0 && u < *n {
                 assert_eq!(remainder, u);

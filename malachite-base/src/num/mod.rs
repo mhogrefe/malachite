@@ -461,6 +461,17 @@ pub trait DivAssignRem<RHS = Self> {
     fn div_assign_rem(&mut self, rhs: RHS) -> Self::RemOutput;
 }
 
+pub trait Mod<RHS = Self> {
+    type Output;
+
+    // would be called `mod`, but that's a keyword
+    fn mod_op(self, rhs: RHS) -> Self::Output;
+}
+
+pub trait ModAssign<RHS = Self> {
+    fn mod_assign(&mut self, rhs: RHS);
+}
+
 //TODO is_positive, is_negative, sign
 
 macro_rules! lossless_checked_from_impl {
@@ -575,7 +586,6 @@ lossless_checked_from_impl!(i64, i64);
 
 macro_rules! wrapping_impl_inner {
     ($from:ty, $to:ty) => {
-        #[allow(unknown_lints, cast_lossless)]
         impl WrappingFrom<$from> for $to {
             #[inline]
             fn wrapping_from(value: $from) -> $to {
@@ -2428,25 +2438,21 @@ pub trait OrdAbs: Eq + PartialOrdAbs<Self> {
 }
 
 /// Provides the constant 0.
-#[allow(unknown_lints, declare_interior_mutable_const)]
 pub trait Zero {
     const ZERO: Self;
 }
 
 /// Provides the constant 1.
-#[allow(unknown_lints, declare_interior_mutable_const)]
 pub trait One {
     const ONE: Self;
 }
 
 /// Provides the constant 2.
-#[allow(unknown_lints, declare_interior_mutable_const)]
 pub trait Two {
     const TWO: Self;
 }
 
 /// Provides the constant -1.
-#[allow(unknown_lints, declare_interior_mutable_const)]
 pub trait NegativeOne {
     const NEGATIVE_ONE: Self;
 }
