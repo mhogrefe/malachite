@@ -20,11 +20,14 @@ use rug::{self, Assign};
 use std::str::FromStr;
 use std::u32;
 
-//TODO continue deduplication
 #[test]
-fn test_limbs_pos_xor_limb_neg() {
+fn test_limbs_pos_xor_limb_neg_and_limbs_vec_pos_xor_limb_neg_in_place() {
     let test = |limbs: &[u32], limb: u32, out_limbs: &[u32]| {
         assert_eq!(limbs_pos_xor_limb_neg(limbs, limb), out_limbs);
+
+        let mut limbs = limbs.to_vec();
+        limbs_vec_pos_xor_limb_neg_in_place(&mut limbs, limb);
+        assert_eq!(limbs, out_limbs);
     };
     test(&[0, 2], 3, &[4_294_967_293, 2]);
     test(&[1, 2, 3], 4, &[4_294_967_291, 2, 3]);
@@ -36,6 +39,13 @@ fn test_limbs_pos_xor_limb_neg() {
 #[should_panic(expected = "index out of bounds: the len is 0 but the index is 0")]
 fn limbs_pos_xor_limb_neg_fail() {
     limbs_pos_xor_limb_neg(&[], 10);
+}
+
+#[test]
+#[should_panic(expected = "assertion failed: mid <= len")]
+fn limbs_vec_pos_xor_limb_neg_in_place_fail() {
+    let mut limbs = vec![];
+    limbs_vec_pos_xor_limb_neg_in_place(&mut limbs, 10);
 }
 
 #[test]
@@ -110,29 +120,13 @@ fn limbs_slice_pos_xor_limb_neg_in_place_fail() {
 }
 
 #[test]
-fn test_limbs_vec_pos_xor_limb_neg_in_place() {
-    let test = |limbs_before: &[u32], limb: u32, limbs_after: &[u32]| {
-        let mut limbs = limbs_before.to_vec();
-        limbs_vec_pos_xor_limb_neg_in_place(&mut limbs, limb);
-        assert_eq!(limbs, limbs_after);
-    };
-    test(&[0, 2], 3, &[4_294_967_293, 2]);
-    test(&[1, 2, 3], 4, &[4_294_967_291, 2, 3]);
-    test(&[2, 0xffff_ffff], 2, &[0, 0, 1]);
-    test(&[2, 0xffff_ffff, 0xffff_ffff], 2, &[0, 0, 0, 1]);
-}
-
-#[test]
-#[should_panic(expected = "assertion failed: mid <= len")]
-fn limbs_vec_pos_xor_limb_neg_in_place_fail() {
-    let mut limbs = vec![];
-    limbs_vec_pos_xor_limb_neg_in_place(&mut limbs, 10);
-}
-
-#[test]
-fn test_limbs_neg_xor_limb_neg() {
+fn test_limbs_neg_xor_limb_neg_and_limbs_neg_xor_limb_neg_in_place() {
     let test = |limbs: &[u32], limb: u32, out: &[u32]| {
         assert_eq!(limbs_neg_xor_limb_neg(limbs, limb), out);
+
+        let mut limbs = limbs.to_vec();
+        limbs_neg_xor_limb_neg_in_place(&mut limbs, limb);
+        assert_eq!(limbs, out);
     };
     test(&[0, 2], 3, &[3, 1]);
     test(&[6, 7], 2, &[4_294_967_288, 7]);
@@ -145,6 +139,12 @@ fn test_limbs_neg_xor_limb_neg() {
 #[should_panic(expected = "index out of bounds: the len is 0 but the index is 0")]
 fn limbs_neg_xor_limb_neg_fail() {
     limbs_neg_xor_limb_neg(&[], 10);
+}
+
+#[test]
+#[should_panic(expected = "index out of bounds: the len is 0 but the index is 0")]
+fn limbs_neg_xor_limb_neg_in_place_fail() {
+    limbs_neg_xor_limb_neg_in_place(&mut [], 10);
 }
 
 #[test]
@@ -181,26 +181,6 @@ fn limbs_neg_xor_limb_neg_to_out_fail_1() {
 #[should_panic(expected = "assertion failed: out_limbs.len() >= len")]
 fn limbs_neg_xor_limb_neg_to_out_fail_2() {
     limbs_neg_xor_limb_neg_to_out(&mut [10], &[10, 10], 10);
-}
-
-#[test]
-fn test_limbs_neg_xor_limb_neg_in_place() {
-    let test = |limbs: &[u32], limb: u32, out: &[u32]| {
-        let mut limbs = limbs.to_vec();
-        limbs_neg_xor_limb_neg_in_place(&mut limbs, limb);
-        assert_eq!(limbs, out);
-    };
-    test(&[0, 2], 3, &[3, 1]);
-    test(&[6, 7], 2, &[4_294_967_288, 7]);
-    test(&[1, 2, 3], 4, &[4_294_967_291, 2, 3]);
-    test(&[100, 101, 102], 10, &[4_294_967_190, 101, 102]);
-    test(&[123, 456], 789, &[4_294_966_416, 456]);
-}
-
-#[test]
-#[should_panic(expected = "index out of bounds: the len is 0 but the index is 0")]
-fn limbs_neg_xor_limb_neg_in_place_fail() {
-    limbs_neg_xor_limb_neg_in_place(&mut [], 10);
 }
 
 #[test]

@@ -17,6 +17,7 @@ use malachite_test::integer::logic::xor_u32::{integer_xor_u32_alt_1, integer_xor
 use rug::{self, Assign};
 use std::str::FromStr;
 
+//TODO continue deduplication
 #[test]
 fn test_limbs_neg_xor_limb() {
     let test = |limbs: &[u32], limb: u32, out: &[u32]| {
