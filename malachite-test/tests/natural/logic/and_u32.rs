@@ -152,7 +152,7 @@ fn and_u32_properties() {
     });
 
     test_properties(unsigneds, |&u: &u32| {
-        assert_eq!(&Natural::ZERO & u, 0);
-        assert_eq!(u & &Natural::ZERO, 0);
+        assert_eq!(Natural::ZERO & u, 0);
+        assert_eq!(u & Natural::ZERO, 0);
     });
 }

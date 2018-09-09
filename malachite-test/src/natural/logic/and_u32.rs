@@ -169,7 +169,7 @@ fn benchmark_natural_and_assign_u32_library_comparison(
 
 fn benchmark_natural_and_u32_library_comparison(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
-        "&Natural & u32",
+        "Natural & u32",
         BenchmarkType::LibraryComparison,
         nrm_pairs_of_natural_and_unsigned(gm),
         gm.name(),

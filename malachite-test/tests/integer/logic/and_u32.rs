@@ -13,50 +13,58 @@ fn test_and_u32() {
     let test = |u, v: u32, out| {
         let mut n = Integer::from_str(u).unwrap();
         n &= v;
-        assert_eq!(n.to_string(), out);
+        assert_eq!(n, out);
         assert!(n.is_valid());
 
         let mut n = rug::Integer::from_str(u).unwrap();
         n &= v;
-        assert_eq!(n.to_string(), out);
+        assert_eq!(n, out);
 
-        let n = &Integer::from_str(u).unwrap() & v;
-        assert_eq!(n.to_string(), out);
+        assert_eq!(Integer::from_str(u).unwrap() & v, out);
+        assert_eq!(&Integer::from_str(u).unwrap() & v, out);
 
         let n = rug::Integer::from_str(u).unwrap() & v;
-        assert_eq!(n.to_string(), out);
+        assert_eq!(n, out);
 
-        let n = v & &Integer::from_str(u).unwrap();
-        assert_eq!(n.to_string(), out);
+        assert_eq!(v & Integer::from_str(u).unwrap(), out);
+        assert_eq!(v & &Integer::from_str(u).unwrap(), out);
 
         assert_eq!(
-            integer_and_u32_alt_1(&Integer::from_str(u).unwrap(), v).to_string(),
+            integer_and_u32_alt_1(&Integer::from_str(u).unwrap(), v),
             out
         );
         assert_eq!(
-            integer_and_u32_alt_2(&Integer::from_str(u).unwrap(), v).to_string(),
+            integer_and_u32_alt_2(&Integer::from_str(u).unwrap(), v),
             out
         );
 
         let n = v & rug::Integer::from_str(u).unwrap();
-        assert_eq!(n.to_string(), out);
+        assert_eq!(n, out);
+
+        let mut n = v;
+        n &= &Integer::from_str(u).unwrap();
+        assert_eq!(n, out);
+
+        let mut n = v;
+        n &= Integer::from_str(u).unwrap();
+        assert_eq!(n, out);
 
         let mut n = rug::Integer::from(0);
         n.assign(v & &rug::Integer::from_str(u).unwrap());
-        assert_eq!(n.to_string(), out);
+        assert_eq!(n, out);
     };
-    test("0", 0, "0");
-    test("0", 123, "0");
-    test("123", 0, "0");
-    test("123", 456, "72");
-    test("1000000000000", 123, "0");
-    test("1000000000001", 123, "1");
-    test("12345678987654321", 987_654_321, "579887281");
-    test("-123", 0, "0");
-    test("-123", 456, "384");
-    test("-1000000000000", 123, "0");
-    test("-1000000000001", 123, "123");
-    test("-12345678987654321", 987_654_321, "407767041");
+    test("0", 0, 0);
+    test("0", 123, 0);
+    test("123", 0, 0);
+    test("123", 456, 72);
+    test("1000000000000", 123, 0);
+    test("1000000000001", 123, 1);
+    test("12345678987654321", 987_654_321, 579_887_281);
+    test("-123", 0, 0);
+    test("-123", 456, 384);
+    test("-1000000000000", 123, 0);
+    test("-1000000000001", 123, 123);
+    test("-12345678987654321", 987_654_321, 407_767_041);
 }
 
 #[test]
@@ -74,9 +82,19 @@ fn and_u32_properties() {
             assert_eq!(rug_integer_to_integer(&rug_n), result);
 
             assert_eq!(n & u, result);
+            assert_eq!(n.clone() & u, result);
             assert_eq!(u & n, result);
+            assert_eq!(u & n.clone(), result);
             assert_eq!(integer_and_u32_alt_1(&n, u), result);
             assert_eq!(integer_and_u32_alt_2(&n, u), result);
+
+            let mut mut_u = u;
+            mut_u &= n;
+            assert_eq!(mut_u, result);
+
+            let mut mut_u = u;
+            mut_u &= n.clone();
+            assert_eq!(mut_u, result);
 
             assert_eq!(n & Integer::from(u), result);
             assert_eq!(Integer::from(u) & n, result);
@@ -96,9 +114,9 @@ fn and_u32_properties() {
     });
 
     test_properties(unsigneds, |&u: &u32| {
-        assert_eq!(&Integer::ZERO & u, 0);
-        assert_eq!(u & &Integer::ZERO, 0);
-        assert_eq!(&Integer::NEGATIVE_ONE & u, u);
-        assert_eq!(u & &Integer::NEGATIVE_ONE, u);
+        assert_eq!(Integer::ZERO & u, 0);
+        assert_eq!(u & Integer::ZERO, 0);
+        assert_eq!(Integer::NEGATIVE_ONE & u, u);
+        assert_eq!(u & Integer::NEGATIVE_ONE, u);
     });
 }
