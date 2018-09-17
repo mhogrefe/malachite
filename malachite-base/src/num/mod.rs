@@ -482,6 +482,16 @@ pub trait NegModAssign<RHS = Self> {
     fn neg_mod_assign(&mut self, rhs: RHS);
 }
 
+pub trait DivRound<RHS = Self> {
+    type Output;
+
+    fn div_round(self, rhs: RHS, rm: RoundingMode) -> Self::Output;
+}
+
+pub trait DivRoundAssign<RHS = Self> {
+    fn div_round_assign(&mut self, rhs: RHS, rm: RoundingMode);
+}
+
 //TODO is_positive, is_negative, sign
 
 macro_rules! lossless_checked_from_impl {
@@ -1898,6 +1908,43 @@ macro_rules! unsigned_traits {
             #[inline]
             fn neg_mod_assign(&mut self, rhs: $t) {
                 *self = self.neg_mod(rhs);
+            }
+        }
+
+        impl DivRound for $t {
+            type Output = $t;
+
+            fn div_round(self, rhs: $t, rm: RoundingMode) -> $t {
+                let quotient = self / rhs;
+                if rm == RoundingMode::Down || rm == RoundingMode::Floor {
+                    quotient
+                } else {
+                    let remainder = self % rhs;
+                    match rm {
+                        _ if remainder == 0 => quotient,
+                        RoundingMode::Up | RoundingMode::Ceiling => quotient + 1,
+                        RoundingMode::Nearest => {
+                            let shifted_rhs = rhs >> 1;
+                            if remainder > shifted_rhs
+                                || remainder == shifted_rhs && rhs.is_even() && quotient.is_odd()
+                            {
+                                quotient + 1
+                            } else {
+                                quotient
+                            }
+                        }
+                        RoundingMode::Exact => {
+                            panic!("Division is not exact: {} / {}", self, rhs);
+                        }
+                        _ => unreachable!(),
+                    }
+                }
+            }
+        }
+
+        impl DivRoundAssign for $t {
+            fn div_round_assign(&mut self, rhs: $t, rm: RoundingMode) {
+                *self = self.div_round(rhs, rm);
             }
         }
     };

@@ -2,11 +2,12 @@ use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, 
 use inputs::base::pairs_of_unsigned_vec_and_positive_unsigned_var_1;
 use inputs::natural::{
     nrm_pairs_of_natural_and_positive_unsigned, pairs_of_natural_and_positive_unsigned,
-    pairs_of_unsigned_and_positive_natural,
+    pairs_of_unsigned_and_positive_natural, rm_pairs_of_natural_and_positive_unsigned,
 };
 use malachite_base::num::{DivMod, Mod, ModAssign, NegMod, NegModAssign, SignificantBits};
 use malachite_nz::natural::arithmetic::mod_u32::limbs_mod_limb;
 use num::{BigUint, ToPrimitive};
+use rug::{self, ops::RemRounding};
 
 // For `Natural`s, `mod` is equivalent to `rem`.
 
@@ -59,6 +60,11 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_bench!(
         registry,
         Large,
+        benchmark_natural_neg_mod_u32_library_comparison
+    );
+    register_bench!(
+        registry,
+        Large,
         benchmark_natural_neg_mod_u32_evaluation_strategy
     );
     register_bench!(
@@ -90,6 +96,10 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
 
 pub fn num_rem_u32(x: BigUint, u: u32) -> u32 {
     (x % u).to_u32().unwrap()
+}
+
+pub fn rug_neg_mod_u32(x: rug::Integer, u: u32) -> u32 {
+    (-x.rem_ceil(u)).to_u32_wrapping()
 }
 
 fn demo_limbs_mod_limb(gm: GenerationMode, limit: usize) {
@@ -397,6 +407,27 @@ fn benchmark_natural_neg_mod_assign_u32(gm: GenerationMode, limit: usize, file_n
         &(|&(ref n, _)| n.significant_bits() as usize),
         "n.significant_bits()",
         &mut [("malachite", &mut (|(mut x, y)| x.neg_mod_assign(y)))],
+    );
+}
+
+fn benchmark_natural_neg_mod_u32_library_comparison(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "Natural.neg_mod(u32)",
+        BenchmarkType::LibraryComparison,
+        rm_pairs_of_natural_and_positive_unsigned(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(_, (ref n, _))| n.significant_bits() as usize),
+        "n.significant_bits()",
+        &mut [
+            ("malachite", &mut (|(_, (x, y))| no_out!(x.neg_mod(y)))),
+            ("rug", &mut (|((x, y), _)| no_out!(rug_neg_mod_u32(x, y)))),
+        ],
     );
 }
 

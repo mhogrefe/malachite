@@ -1,8 +1,7 @@
 use common::{integer_to_bigint, integer_to_rug_integer, natural_to_rug_integer, GenerationMode};
 use inputs::common::{reshape_1_2_to_3, reshape_2_1_to_3};
-use malachite_base::misc::CheckedFrom;
 use malachite_base::num::{
-    DivisibleByPowerOfTwo, PrimitiveInteger, PrimitiveSigned, PrimitiveUnsigned, UnsignedAbs,
+    DivisibleByPowerOfTwo, PrimitiveInteger, PrimitiveSigned, PrimitiveUnsigned,
 };
 use malachite_base::round::RoundingMode;
 use malachite_nz::integer::Integer;
@@ -33,7 +32,7 @@ use rust_wheels::iterators::tuples::{
     random_quadruples, random_triples, random_triples_from_single,
 };
 use rust_wheels::iterators::vecs::exhaustive_fixed_size_vecs_from_single;
-use std::ops::Shl;
+use std::ops::{Shl, Shr};
 
 pub fn integers(gm: GenerationMode) -> Box<Iterator<Item = Integer>> {
     match gm {
@@ -1003,39 +1002,33 @@ fn triples_of_integer_small_signed_and_rounding_mode<T: PrimitiveSigned>(
     }
 }
 
-// All triples of `Integer`, `T`, and `RoundingMode`, where `T` is signed, such that if the `T` is
-// negative and the `RoundingMode` is `RoundingMode::Exact`, the `Integer` is divisible by 2 to the
-// power of the negative of the `T`.
+// All triples of `Integer`, small `T`, and `RoundingMode`, where `T` is signed, such that if the
+// `T` is negative and the `RoundingMode` is `RoundingMode::Exact`, the `Integer` is divisible by 2
+// to the power of the negative of the `T`.
 pub fn triples_of_integer_small_signed_and_rounding_mode_var_1<T: PrimitiveSigned>(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (Integer, T, RoundingMode)>>
 where
-    u64: From<<T as UnsignedAbs>::Output>,
+    Integer: Shr<T, Output = Integer>,
 {
     Box::new(
-        triples_of_integer_small_signed_and_rounding_mode::<T>(gm).filter(|&(ref n, i, rm)| {
-            i >= T::ZERO
-                || rm != RoundingMode::Exact
-                || n.divisible_by_power_of_two(i.unsigned_abs().into())
-        }),
+        triples_of_integer_small_signed_and_rounding_mode::<T>(gm)
+            .map(|(n, i, rm)| (if i < T::ZERO { n >> i } else { n }, i, rm)),
     )
 }
 
-// All triples of `Integer`, `T`, and `RoundingMode`, where `T` is signed, such that if the `i32` is
-// positive and the `RoundingMode` is `RoundingMode::Exact`, the `Integer` is divisible by 2 to the
-// power of the `T`.
+// All triples of `Integer`, small `T`, and `RoundingMode`, where `T` is signed, such that if the
+// `i32` is positive and the `RoundingMode` is `RoundingMode::Exact`, the `Integer` is divisible by
+// 2 to the power of the `T`.
 pub fn triples_of_integer_small_signed_and_rounding_mode_var_2<T: PrimitiveSigned>(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (Integer, T, RoundingMode)>>
 where
-    u64: CheckedFrom<T>,
+    Integer: Shl<T, Output = Integer>,
 {
     Box::new(
-        triples_of_integer_small_signed_and_rounding_mode::<T>(gm).filter(|&(ref n, i, rm)| {
-            i <= T::ZERO
-                || rm != RoundingMode::Exact
-                || n.divisible_by_power_of_two(u64::checked_from(i).unwrap())
-        }),
+        triples_of_integer_small_signed_and_rounding_mode::<T>(gm)
+            .map(|(n, i, rm)| (if i > T::ZERO { n << i } else { n }, i, rm)),
     )
 }
 
@@ -1062,14 +1055,21 @@ fn triples_of_integer_small_unsigned_and_rounding_mode<T: PrimitiveUnsigned>(
     }
 }
 
-// All triples of `Integer`, `T`, and `RoundingMode`, where `T` is unsigned and if the
+// All triples of `Integer`, small `T`, and `RoundingMode`, where `T` is unsigned and if the
 // `RoundingMode` is `RoundingMode::Exact`, the `Integer` is divisible by 2 to the power of the `T`.
 pub fn triples_of_integer_small_unsigned_and_rounding_mode_var_1<T: PrimitiveUnsigned>(
     gm: GenerationMode,
-) -> Box<Iterator<Item = (Integer, T, RoundingMode)>> {
+) -> Box<Iterator<Item = (Integer, T, RoundingMode)>>
+where
+    Integer: Shl<T, Output = Integer>,
+{
     Box::new(
-        triples_of_integer_small_unsigned_and_rounding_mode::<T>(gm).filter(|&(ref n, u, rm)| {
-            rm != RoundingMode::Exact || n.divisible_by_power_of_two(u.checked_into().unwrap())
+        triples_of_integer_small_unsigned_and_rounding_mode::<T>(gm).map(|(n, u, rm)| {
+            if rm == RoundingMode::Exact {
+                (n << u, u, rm)
+            } else {
+                (n, u, rm)
+            }
         }),
     )
 }

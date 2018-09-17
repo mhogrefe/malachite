@@ -117,8 +117,7 @@ fn demo_u32_div_natural(gm: GenerationMode, limit: usize) {
 
 fn demo_u32_div_natural_ref(gm: GenerationMode, limit: usize) {
     for (u, n) in pairs_of_unsigned_and_positive_natural::<u32>(gm).take(limit) {
-        let n_old = n.clone();
-        println!("{} / &{} = {}", u, n_old, u / &n);
+        println!("{} / &{} = {}", u, n, u / &n);
     }
 }
 

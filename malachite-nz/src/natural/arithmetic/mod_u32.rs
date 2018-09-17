@@ -42,7 +42,7 @@ fn limbs_mod_limb_normalized(
     let (sum, mut big_carry) = u64::join_halves(limbs[len - 1], limbs[len - 2])
         .overflowing_add(u64::from(power_of_two) * u64::from(high_limb));
     let (mut sum_high, mut sum_low) = sum.split_in_half();
-    for j in (0..len - 2).rev() {
+    for &limb in limbs[..len - 2].iter().rev() {
         if big_carry {
             let (sum, carry) = sum_low.overflowing_add(power_of_two);
             sum_low = sum;
@@ -50,7 +50,7 @@ fn limbs_mod_limb_normalized(
                 sum_low = sum_low.wrapping_sub(divisor);
             }
         }
-        let (sum, carry) = u64::join_halves(sum_low, limbs[j])
+        let (sum, carry) = u64::join_halves(sum_low, limb)
             .overflowing_add(u64::from(sum_high) * u64::from(power_of_two));
         sum_high = sum.upper_half();
         sum_low = sum.lower_half();

@@ -416,8 +416,6 @@ impl Div<Natural> for u32 {
     fn div(self, other: Natural) -> u32 {
         if other == 0 {
             panic!("division by zero");
-        } else if other == 1 {
-            self
         } else {
             match other {
                 Small(small) => self / small,
@@ -458,8 +456,6 @@ impl<'a> Div<&'a Natural> for u32 {
     fn div(self, other: &'a Natural) -> u32 {
         if *other == 0 {
             panic!("division by zero");
-        } else if *other == 1 {
-            self
         } else {
             match *other {
                 Small(small) => self / small,

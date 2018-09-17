@@ -1,5 +1,5 @@
 use common::test_properties;
-use malachite_base::num::{DivMod, Zero};
+use malachite_base::num::{DivMod, One, Zero};
 use malachite_nz::natural::arithmetic::div_u32::{
     limbs_div_limb, limbs_div_limb_in_place, limbs_div_limb_to_out,
 };
@@ -362,5 +362,6 @@ fn div_u32_properties() {
         if u > 1 {
             assert_eq!(1 / u, 0);
         }
+        assert_eq!(u / Natural::ONE, u);
     });
 }

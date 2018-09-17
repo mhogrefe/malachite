@@ -1,5 +1,5 @@
 use common::{GenerationMode, NoSpecialGenerationMode};
-use inputs::common::{permute_1_3_2, permute_2_1, reshape_2_1_to_3};
+use inputs::common::{permute_1_2, permute_1_3_2, reshape_2_1_to_3};
 use malachite_base::chars::NUMBER_OF_CHARS;
 use malachite_base::limbs::limbs_test_zero;
 use malachite_base::num::{Parity, PrimitiveInteger, PrimitiveSigned, PrimitiveUnsigned};
@@ -153,7 +153,7 @@ pub fn pairs_of_small_usize_and_unsigned<T: PrimitiveUnsigned>(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (usize, T)>> {
     match gm {
-        GenerationMode::Exhaustive => permute_2_1(Box::new(log_pairs(
+        GenerationMode::Exhaustive => permute_1_2(Box::new(log_pairs(
             exhaustive_unsigned(),
             exhaustive_unsigned::<u32>().map(|u| u as usize),
         ))),
@@ -465,6 +465,27 @@ pub fn pairs_of_unsigned_and_rounding_mode<T: PrimitiveUnsigned>(
     }
 }
 
+pub fn pairs_of_positive_unsigned_and_rounding_mode<T: PrimitiveUnsigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (T, RoundingMode)>> {
+    match gm {
+        GenerationMode::Exhaustive => Box::new(lex_pairs(
+            exhaustive_positive(),
+            exhaustive_rounding_modes(),
+        )),
+        GenerationMode::Random(_) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| random_positive_unsigned(seed)),
+            &(|seed| random_rounding_modes(seed)),
+        )),
+        GenerationMode::SpecialRandom(_) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_positive_unsigned(seed)),
+            &(|seed| random_rounding_modes(seed)),
+        )),
+    }
+}
+
 pub fn pairs_of_signed_and_rounding_mode<T: PrimitiveSigned>(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (T, RoundingMode)>> {
@@ -745,7 +766,7 @@ fn pairs_of_ordering_and_vec_of_unsigned<T: PrimitiveUnsigned>(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (Ordering, Vec<T>)>> {
     match gm {
-        GenerationMode::Exhaustive => permute_2_1(Box::new(lex_pairs(
+        GenerationMode::Exhaustive => permute_1_2(Box::new(lex_pairs(
             exhaustive_vecs(exhaustive_unsigned()),
             exhaustive_orderings(),
         ))),
@@ -1303,13 +1324,48 @@ fn triples_of_unsigned_vec_small_u64_and_rounding_mode<T: PrimitiveUnsigned>(
     }
 }
 
-// All triples of `Vec<T>`, `u64`, and `RoundingMode` where `T` is unsigned and the `Vec` doesn't
-// only contain zeros.
+// All triples of `Vec<T>`, small `u64`, and `RoundingMode` where `T` is unsigned and the `Vec`
+// doesn't only contain zeros.
 pub fn triples_of_unsigned_vec_small_u64_and_rounding_mode_var_1<T: PrimitiveUnsigned>(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (Vec<T>, u64, RoundingMode)>> {
     Box::new(
         triples_of_unsigned_vec_small_u64_and_rounding_mode(gm)
             .filter(|&(ref limbs, _, _)| !limbs_test_zero(limbs)),
+    )
+}
+
+fn triples_of_unsigned_unsigned_vec_and_rounding_mode<T: PrimitiveUnsigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (T, Vec<T>, RoundingMode)>> {
+    match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_triples(
+            exhaustive_unsigned(),
+            exhaustive_vecs(exhaustive_unsigned()),
+            exhaustive_rounding_modes(),
+        )),
+        GenerationMode::Random(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| random(seed)),
+            &(|seed| random_vecs(seed, scale, &(|seed_2| random(seed_2)))),
+            &(|seed| random_rounding_modes(seed)),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_unsigned(seed)),
+            &(|seed| special_random_unsigned_vecs(seed, scale)),
+            &(|seed| random_rounding_modes(seed)),
+        )),
+    }
+}
+
+// All triples of `T`, `Vec<T>`, and `RoundingMode`, where `T` is unsigned and the `Vec` has length
+// greater than one and its last element is nonzero.
+pub fn triples_of_unsigned_unsigned_vec_and_rounding_mode_var_1<T: PrimitiveUnsigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (T, Vec<T>, RoundingMode)>> {
+    Box::new(
+        triples_of_unsigned_unsigned_vec_and_rounding_mode(gm)
+            .filter(|&(_, ref limbs, _)| limbs.len() > 1 && *limbs.last().unwrap() != T::ZERO),
     )
 }

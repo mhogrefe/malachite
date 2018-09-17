@@ -11,7 +11,7 @@ use malachite_test::inputs::natural::{
     naturals, pairs_of_natural_and_positive_unsigned, pairs_of_natural_and_unsigned_var_2,
     pairs_of_unsigned_and_positive_natural,
 };
-use malachite_test::natural::arithmetic::mod_u32::num_rem_u32;
+use malachite_test::natural::arithmetic::mod_u32::{num_rem_u32, rug_neg_mod_u32};
 use num::BigUint;
 use rug;
 use std::str::FromStr;
@@ -133,6 +133,11 @@ fn test_neg_mod_u32() {
 
         assert_eq!(Natural::from_str(u).unwrap().neg_mod(v), remainder);
         assert_eq!((&Natural::from_str(u).unwrap()).neg_mod(v), remainder);
+
+        assert_eq!(
+            rug_neg_mod_u32(rug::Integer::from_str(u).unwrap(), v),
+            remainder
+        );
     };
     test("0", 1, 0);
     test("0", 123, 0);
@@ -412,6 +417,8 @@ fn neg_mod_u32_properties_helper(n: &Natural, u: u32) {
     assert_eq!(n.clone().neg_mod(u), remainder);
 
     //TODO assert_eq!(n.neg_mod(Natural::from(u)), remainder);
+
+    assert_eq!(rug_neg_mod_u32(natural_to_rug_integer(n), u), remainder);
 
     assert!(remainder < u);
 }

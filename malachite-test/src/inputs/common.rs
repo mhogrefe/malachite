@@ -10,7 +10,7 @@ pub fn reshape_1_2_to_3<A: 'static, B: 'static, C: 'static>(
     Box::new(it.map(|(a, (b, c))| (a, b, c)))
 }
 
-pub fn permute_2_1<A: 'static, B: 'static>(
+pub fn permute_1_2<A: 'static, B: 'static>(
     it: Box<Iterator<Item = (A, B)>>,
 ) -> Box<Iterator<Item = (B, A)>> {
     Box::new(it.map(|(a, b)| (b, a)))
