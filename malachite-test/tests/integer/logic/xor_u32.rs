@@ -17,11 +17,14 @@ use malachite_test::integer::logic::xor_u32::{integer_xor_u32_alt_1, integer_xor
 use rug::{self, Assign};
 use std::str::FromStr;
 
-//TODO continue deduplication
 #[test]
-fn test_limbs_neg_xor_limb() {
+fn test_limbs_neg_xor_limb_and_limbs_vec_neg_xor_limb_in_place() {
     let test = |limbs: &[u32], limb: u32, out: &[u32]| {
         assert_eq!(limbs_neg_xor_limb(limbs, limb), out);
+
+        let mut limbs = limbs.to_vec();
+        limbs_vec_neg_xor_limb_in_place(&mut limbs, limb);
+        assert_eq!(limbs, out);
     };
     test(&[6, 7], 0, &[6, 7]);
     test(&[6, 7], 2, &[8, 7]);
@@ -105,25 +108,6 @@ fn test_limbs_slice_neg_xor_limb_in_place() {
         &[0, 0, 0, 1],
         2,
         false,
-        &[0xffff_fffe, 0xffff_ffff, 0xffff_ffff, 0],
-    );
-}
-
-#[test]
-fn test_limbs_vec_neg_xor_limb_in_place() {
-    let test = |limbs: &[u32], limb: u32, out: &[u32]| {
-        let mut limbs = limbs.to_vec();
-        limbs_vec_neg_xor_limb_in_place(&mut limbs, limb);
-        assert_eq!(limbs, out);
-    };
-    test(&[6, 7], 0, &[6, 7]);
-    test(&[6, 7], 2, &[8, 7]);
-    test(&[100, 101, 102], 10, &[106, 101, 102]);
-    test(&[123, 456], 789, &[880, 456]);
-    test(&[0xffff_fffe, 0xffff_ffff, 0xffff_ffff], 2, &[0, 0, 0, 1]);
-    test(
-        &[0, 0, 0, 1],
-        2,
         &[0xffff_fffe, 0xffff_ffff, 0xffff_ffff, 0],
     );
 }
