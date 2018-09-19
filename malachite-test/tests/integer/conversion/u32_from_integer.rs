@@ -12,6 +12,7 @@ use std::u32;
 #[test]
 fn test_u32_checked_from_integer() {
     let test = |n, out| {
+        assert_eq!(u32::checked_from(Integer::from_str(n).unwrap()), out);
         assert_eq!(u32::checked_from(&Integer::from_str(n).unwrap()), out);
         assert_eq!(rug::Integer::from_str(n).unwrap().to_u32(), out);
     };
@@ -27,6 +28,7 @@ fn test_u32_checked_from_integer() {
 #[test]
 fn test_u32_wrapping_from_integer() {
     let test = |n, out| {
+        assert_eq!(u32::wrapping_from(Integer::from_str(n).unwrap()), out);
         assert_eq!(u32::wrapping_from(&Integer::from_str(n).unwrap()), out);
         assert_eq!(rug::Integer::from_str(n).unwrap().to_u32_wrapping(), out);
     };
@@ -45,6 +47,7 @@ fn test_u32_wrapping_from_integer() {
 fn u32_checked_from_integer_properties() {
     test_properties(integers, |x| {
         let result = u32::checked_from(x);
+        assert_eq!(u32::checked_from(x.clone()), result);
         assert_eq!(integer_to_rug_integer(x).to_u32(), result);
         if x.sign() != Ordering::Less && x.significant_bits() <= u64::from(u32::WIDTH) {
             assert_eq!(Integer::from(result.unwrap()), *x);
@@ -59,6 +62,7 @@ fn u32_checked_from_integer_properties() {
 fn u32_wrapping_from_integer_properties() {
     test_properties(integers, |x| {
         let result = u32::wrapping_from(x);
+        assert_eq!(u32::wrapping_from(x.clone()), result);
         assert_eq!(integer_to_rug_integer(x).to_u32_wrapping(), result);
         assert_eq!(result.wrapping_add(u32::wrapping_from(&-x)), 0);
         assert_eq!(

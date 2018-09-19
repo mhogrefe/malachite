@@ -10,6 +10,7 @@ use std::{u32, u64};
 #[test]
 fn test_u64_checked_from_integer() {
     let test = |n, out| {
+        assert_eq!(u64::checked_from(Integer::from_str(n).unwrap()), out);
         assert_eq!(u64::checked_from(&Integer::from_str(n).unwrap()), out);
     };
     test("0", Some(0));
@@ -28,6 +29,7 @@ fn test_u64_checked_from_integer() {
 #[test]
 fn test_u64_wrapping_from_integer() {
     let test = |n, out| {
+        assert_eq!(u64::wrapping_from(Integer::from_str(n).unwrap()), out);
         assert_eq!(u64::wrapping_from(&Integer::from_str(n).unwrap()), out);
     };
     test("0", 0);
@@ -51,6 +53,7 @@ fn test_u64_wrapping_from_integer() {
 fn u64_checked_from_integer_properties() {
     test_properties(integers, |x| {
         let result = u64::checked_from(x);
+        assert_eq!(u64::checked_from(x.clone()), result);
         if x.sign() != Ordering::Less && x.significant_bits() <= u64::from(u64::WIDTH) {
             assert_eq!(Integer::from(result.unwrap()), *x);
             assert_eq!(result, Some(u64::wrapping_from(x)));
@@ -64,6 +67,7 @@ fn u64_checked_from_integer_properties() {
 fn u64_wrapping_from_integer_properties() {
     test_properties(integers, |x| {
         let result = u64::wrapping_from(x);
+        assert_eq!(u64::wrapping_from(x.clone()), result);
         assert_eq!(result.wrapping_add(u64::wrapping_from(&-x)), 0);
         assert_eq!(
             result,

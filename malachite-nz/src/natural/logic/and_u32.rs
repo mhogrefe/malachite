@@ -48,7 +48,7 @@ impl BitAnd<u32> for Natural {
     type Output = u32;
 
     fn bitand(self, other: u32) -> u32 {
-        u32::wrapping_from(&self) & other
+        u32::wrapping_from(self) & other
     }
 }
 

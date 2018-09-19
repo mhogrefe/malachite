@@ -13,11 +13,11 @@ use natural::logic::and::{natural_and_alt_1, natural_and_alt_2};
 use num::{BigUint, ToPrimitive};
 
 pub fn natural_and_u32_alt_1(n: &Natural, u: u32) -> u32 {
-    u32::checked_from(&natural_and_alt_1(n, &Natural::from(u))).unwrap()
+    u32::checked_from(natural_and_alt_1(n, &Natural::from(u))).unwrap()
 }
 
 pub fn natural_and_u32_alt_2(n: &Natural, u: u32) -> u32 {
-    u32::checked_from(&natural_and_alt_2(n, &Natural::from(u))).unwrap()
+    u32::checked_from(natural_and_alt_2(n, &Natural::from(u))).unwrap()
 }
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {

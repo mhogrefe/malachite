@@ -10,11 +10,11 @@ use malachite_nz::integer::Integer;
 use std::u32;
 
 pub fn integer_and_u32_alt_1(n: &Integer, u: u32) -> u32 {
-    u32::checked_from(&integer_and_alt_1(n, &Integer::from(u))).unwrap()
+    u32::checked_from(integer_and_alt_1(n, &Integer::from(u))).unwrap()
 }
 
 pub fn integer_and_u32_alt_2(n: &Integer, u: u32) -> u32 {
-    u32::checked_from(&integer_and_alt_2(n, &Integer::from(u))).unwrap()
+    u32::checked_from(integer_and_alt_2(n, &Integer::from(u))).unwrap()
 }
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {

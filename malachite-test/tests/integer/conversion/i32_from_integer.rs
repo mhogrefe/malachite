@@ -11,6 +11,7 @@ use std::str::FromStr;
 #[test]
 fn test_i32_checked_from_integer() {
     let test = |n, out| {
+        assert_eq!(i32::checked_from(Integer::from_str(n).unwrap()), out);
         assert_eq!(i32::checked_from(&Integer::from_str(n).unwrap()), out);
         assert_eq!(rug::Integer::from_str(n).unwrap().to_i32(), out);
     };
@@ -28,6 +29,7 @@ fn test_i32_checked_from_integer() {
 #[test]
 fn test_i32_wrapping_from_integer() {
     let test = |n, out| {
+        assert_eq!(i32::wrapping_from(Integer::from_str(n).unwrap()), out);
         assert_eq!(i32::wrapping_from(&Integer::from_str(n).unwrap()), out);
         assert_eq!(rug::Integer::from_str(n).unwrap().to_i32_wrapping(), out);
     };
@@ -46,6 +48,7 @@ fn test_i32_wrapping_from_integer() {
 fn i32_checked_from_integer_properties() {
     test_properties(integers, |x| {
         let result = i32::checked_from(x);
+        assert_eq!(i32::checked_from(x.clone()), result);
         assert_eq!(integer_to_rug_integer(x).to_i32(), result);
         if *x >= i32::MIN && *x <= i32::MAX {
             assert_eq!(Integer::from(result.unwrap()), *x);
@@ -60,6 +63,7 @@ fn i32_checked_from_integer_properties() {
 fn i32_wrapping_from_integer_properties() {
     test_properties(integers, |x| {
         let result = i32::wrapping_from(x);
+        assert_eq!(i32::wrapping_from(x.clone()), result);
         assert_eq!(integer_to_rug_integer(x).to_i32_wrapping(), result);
         assert_eq!(-result, i32::wrapping_from(&-x));
         assert_eq!(

@@ -321,7 +321,7 @@ fn mod_u32_properties_helper(n: &Natural, u: u32) {
     let mut mut_n = n.clone();
     mut_n %= u;
     assert!(mut_n.is_valid());
-    let remainder = u32::checked_from(&mut_n).unwrap();
+    let remainder = u32::checked_from(mut_n).unwrap();
 
     assert_eq!(n % u, remainder);
     assert_eq!(n.clone() % u, remainder);
@@ -411,7 +411,7 @@ fn neg_mod_u32_properties_helper(n: &Natural, u: u32) {
     let mut mut_n = n.clone();
     mut_n.neg_mod_assign(u);
     assert!(mut_n.is_valid());
-    let remainder = u32::checked_from(&mut_n).unwrap();
+    let remainder = u32::checked_from(mut_n).unwrap();
 
     assert_eq!(n.neg_mod(u), remainder);
     assert_eq!(n.clone().neg_mod(u), remainder);

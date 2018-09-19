@@ -9,6 +9,7 @@ use std::u64;
 #[test]
 fn test_u64_checked_from_natural() {
     let test = |n, out| {
+        assert_eq!(u64::checked_from(Natural::from_str(n).unwrap()), out);
         assert_eq!(u64::checked_from(&Natural::from_str(n).unwrap()), out);
     };
     test("0", Some(0));
@@ -21,6 +22,7 @@ fn test_u64_checked_from_natural() {
 #[test]
 fn test_u64_wrapping_from_natural() {
     let test = |n, out| {
+        assert_eq!(u64::wrapping_from(Natural::from_str(n).unwrap()), out);
         assert_eq!(u64::wrapping_from(&Natural::from_str(n).unwrap()), out);
     };
     test("0", 0);
@@ -34,6 +36,7 @@ fn test_u64_wrapping_from_natural() {
 fn u64_checked_from_natural_properties() {
     test_properties(naturals, |x| {
         let result = u64::checked_from(x);
+        assert_eq!(u64::checked_from(x.clone()), result);
         if x.significant_bits() <= u64::from(u64::WIDTH) {
             assert_eq!(Natural::from(result.unwrap()), *x);
             assert_eq!(result, Some(u64::wrapping_from(x)));
@@ -46,9 +49,11 @@ fn u64_checked_from_natural_properties() {
 #[test]
 fn u64_wrapping_from_natural_properties() {
     test_properties(naturals, |x| {
+        let result = u64::wrapping_from(x);
+        assert_eq!(u64::wrapping_from(x.clone()), result);
         assert_eq!(
-            u64::wrapping_from(x),
-            u64::checked_from(&(&x).mod_power_of_two(u64::WIDTH.into())).unwrap()
+            u64::checked_from((&x).mod_power_of_two(u64::WIDTH.into())).unwrap(),
+            result,
         );
     });
 }

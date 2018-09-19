@@ -11,6 +11,7 @@ use std::u32;
 #[test]
 fn test_u32_checked_from_natural() {
     let test = |n, out| {
+        assert_eq!(u32::checked_from(Natural::from_str(n).unwrap()), out);
         assert_eq!(u32::checked_from(&Natural::from_str(n).unwrap()), out);
         assert_eq!(rug::Integer::from_str(n).unwrap().to_u32(), out);
     };
@@ -24,6 +25,7 @@ fn test_u32_checked_from_natural() {
 #[test]
 fn test_u32_wrapping_from_natural() {
     let test = |n, out| {
+        assert_eq!(u32::wrapping_from(Natural::from_str(n).unwrap()), out);
         assert_eq!(u32::wrapping_from(&Natural::from_str(n).unwrap()), out);
         assert_eq!(rug::Integer::from_str(n).unwrap().to_u32_wrapping(), out);
     };
@@ -38,6 +40,7 @@ fn test_u32_wrapping_from_natural() {
 fn u32_checked_from_natural_properties() {
     test_properties(naturals, |x| {
         let result = u32::checked_from(x);
+        assert_eq!(u32::checked_from(x.clone()), result);
         assert_eq!(natural_to_rug_integer(x).to_u32(), result);
         if x.significant_bits() <= u64::from(u32::WIDTH) {
             assert_eq!(Natural::from(result.unwrap()), *x);
@@ -52,10 +55,11 @@ fn u32_checked_from_natural_properties() {
 fn u32_wrapping_from_natural_properties() {
     test_properties(naturals, |x| {
         let result = u32::wrapping_from(x);
+        assert_eq!(u32::wrapping_from(x.clone()), result);
         assert_eq!(natural_to_rug_integer(x).to_u32_wrapping(), result);
         assert_eq!(
             result,
-            u32::checked_from(&(&x).mod_power_of_two(u32::WIDTH.into())).unwrap()
+            u32::checked_from((&x).mod_power_of_two(u32::WIDTH.into())).unwrap()
         );
     });
 }
