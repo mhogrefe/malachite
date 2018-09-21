@@ -492,6 +492,19 @@ pub trait DivRoundAssign<RHS = Self> {
     fn div_round_assign(&mut self, rhs: RHS, rm: RoundingMode);
 }
 
+pub trait CeilingDivNegMod<RHS = Self> {
+    type DivOutput;
+    type ModOutput;
+
+    fn ceiling_div_neg_mod(self, rhs: RHS) -> (Self::DivOutput, Self::ModOutput);
+}
+
+pub trait CeilingDivAssignNegMod<RHS = Self> {
+    type ModOutput;
+
+    fn ceiling_div_assign_neg_mod(&mut self, rhs: RHS) -> Self::ModOutput;
+}
+
 //TODO is_positive, is_negative, sign
 
 macro_rules! lossless_checked_from_impl {
@@ -1945,6 +1958,38 @@ macro_rules! unsigned_traits {
         impl DivRoundAssign for $t {
             fn div_round_assign(&mut self, rhs: $t, rm: RoundingMode) {
                 *self = self.div_round(rhs, rm);
+            }
+        }
+
+        impl CeilingDivNegMod for $t {
+            type DivOutput = $t;
+            type ModOutput = $t;
+
+            #[inline]
+            fn ceiling_div_neg_mod(self, rhs: $t) -> ($t, $t) {
+                let quotient = self / rhs;
+                let remainder = self % rhs;
+                if remainder == 0 {
+                    (quotient, 0)
+                } else {
+                    (quotient + 1, rhs - remainder)
+                }
+            }
+        }
+
+        impl CeilingDivAssignNegMod for $t {
+            type ModOutput = $t;
+
+            #[inline]
+            fn ceiling_div_assign_neg_mod(&mut self, rhs: $t) -> $t {
+                let remainder = *self % rhs;
+                *self /= rhs;
+                if remainder == 0 {
+                    0
+                } else {
+                    *self += 1;
+                    rhs - remainder
+                }
             }
         }
     };

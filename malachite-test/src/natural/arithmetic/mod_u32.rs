@@ -4,7 +4,9 @@ use inputs::natural::{
     nrm_pairs_of_natural_and_positive_unsigned, pairs_of_natural_and_positive_unsigned,
     pairs_of_unsigned_and_positive_natural, rm_pairs_of_natural_and_positive_unsigned,
 };
-use malachite_base::num::{DivMod, Mod, ModAssign, NegMod, NegModAssign, SignificantBits};
+use malachite_base::num::{
+    CeilingDivNegMod, DivMod, Mod, ModAssign, NegMod, NegModAssign, SignificantBits,
+};
 use malachite_nz::natural::arithmetic::mod_u32::limbs_mod_limb;
 use num::{BigUint, ToPrimitive};
 use rug::{self, ops::RemRounding};
@@ -62,6 +64,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
         Large,
         benchmark_natural_neg_mod_u32_library_comparison
     );
+    register_bench!(registry, Large, benchmark_natural_neg_mod_u32_algorithms);
     register_bench!(
         registry,
         Large,
@@ -427,6 +430,26 @@ fn benchmark_natural_neg_mod_u32_library_comparison(
         &mut [
             ("malachite", &mut (|(_, (x, y))| no_out!(x.neg_mod(y)))),
             ("rug", &mut (|((x, y), _)| no_out!(rug_neg_mod_u32(x, y)))),
+        ],
+    );
+}
+
+fn benchmark_natural_neg_mod_u32_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
+    m_run_benchmark(
+        "Natural.neg_mod(u32)",
+        BenchmarkType::Algorithms,
+        pairs_of_natural_and_positive_unsigned::<u32>(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(ref n, _)| n.significant_bits() as usize),
+        "n.significant_bits()",
+        &mut [
+            ("standard", &mut (|(x, y)| no_out!(x % y))),
+            (
+                "using ceiling_div_neg_mod",
+                &mut (|(x, y)| no_out!(x.ceiling_div_neg_mod(y).1)),
+            ),
         ],
     );
 }

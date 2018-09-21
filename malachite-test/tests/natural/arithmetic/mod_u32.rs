@@ -1,6 +1,8 @@
 use common::test_properties;
 use malachite_base::misc::CheckedFrom;
-use malachite_base::num::{DivMod, Mod, ModAssign, NegMod, NegModAssign, One, Zero};
+use malachite_base::num::{
+    CeilingDivNegMod, DivMod, Mod, ModAssign, NegMod, NegModAssign, One, Zero,
+};
 use malachite_nz::natural::arithmetic::mod_u32::limbs_mod_limb;
 use malachite_nz::natural::Natural;
 use malachite_test::common::{natural_to_biguint, natural_to_rug_integer};
@@ -415,6 +417,8 @@ fn neg_mod_u32_properties_helper(n: &Natural, u: u32) {
 
     assert_eq!(n.neg_mod(u), remainder);
     assert_eq!(n.clone().neg_mod(u), remainder);
+
+    assert_eq!(n.ceiling_div_neg_mod(u).1, remainder);
 
     //TODO assert_eq!(n.neg_mod(Natural::from(u)), remainder);
 

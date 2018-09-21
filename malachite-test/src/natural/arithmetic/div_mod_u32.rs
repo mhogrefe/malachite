@@ -5,9 +5,13 @@ use inputs::base::{
 };
 use inputs::natural::{
     nrm_pairs_of_natural_and_positive_unsigned, pairs_of_natural_and_positive_unsigned,
-    pairs_of_unsigned_and_positive_natural,
+    pairs_of_unsigned_and_positive_natural, rm_pairs_of_natural_and_positive_unsigned,
 };
-use malachite_base::num::{DivAssignMod, DivAssignRem, DivMod, DivRem, SignificantBits};
+use malachite_base::num::{
+    CeilingDivAssignNegMod, CeilingDivNegMod, DivAssignMod, DivAssignRem, DivMod, DivRem, DivRound,
+    NegMod, SignificantBits,
+};
+use malachite_base::round::RoundingMode;
 use malachite_nz::natural::arithmetic::div_mod_u32::{
     limbs_div_limb_in_place_mod, limbs_div_limb_mod, limbs_div_limb_to_out_mod,
 };
@@ -26,6 +30,9 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_natural_div_assign_rem_u32);
     register_demo!(registry, demo_natural_div_rem_u32);
     register_demo!(registry, demo_natural_div_rem_u32_ref);
+    register_demo!(registry, demo_natural_ceiling_div_assign_neg_mod_u32);
+    register_demo!(registry, demo_natural_ceiling_div_neg_mod_u32);
+    register_demo!(registry, demo_natural_ceiling_div_neg_mod_u32_ref);
     register_demo!(registry, demo_u32_div_mod_natural);
     register_demo!(registry, demo_u32_div_mod_natural_ref);
     register_demo!(registry, demo_u32_div_assign_mod_natural);
@@ -59,6 +66,26 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
         registry,
         Large,
         benchmark_natural_div_rem_u32_evaluation_strategy
+    );
+    register_bench!(
+        registry,
+        Large,
+        benchmark_natural_ceiling_div_assign_neg_mod_u32
+    );
+    register_bench!(
+        registry,
+        Large,
+        benchmark_natural_ceiling_div_neg_mod_u32_library_comparison
+    );
+    register_bench!(
+        registry,
+        Large,
+        benchmark_natural_ceiling_div_neg_mod_u32_algorithms
+    );
+    register_bench!(
+        registry,
+        Large,
+        benchmark_natural_ceiling_div_neg_mod_u32_evaluation_strategy
     );
     register_bench!(
         registry,
@@ -102,6 +129,11 @@ pub fn rug_div_rem_u32(x: rug::Integer, u: u32) -> (rug::Integer, u32) {
     (quotient, remainder.to_u32_wrapping())
 }
 
+pub fn rug_ceiling_div_neg_mod_u32(x: rug::Integer, u: u32) -> (rug::Integer, u32) {
+    let (quotient, remainder) = x.div_rem_ceil(rug::Integer::from(u));
+    (quotient, (-remainder).to_u32_wrapping())
+}
+
 fn demo_limbs_div_limb_mod(gm: GenerationMode, limit: usize) {
     for (limbs, limb) in pairs_of_unsigned_vec_and_positive_unsigned_var_1(gm).take(limit) {
         println!(
@@ -121,7 +153,8 @@ fn demo_limbs_div_limb_to_out_mod(gm: GenerationMode, limit: usize) {
         let mut out_limbs_old = out_limbs.clone();
         let remainder = limbs_div_limb_to_out_mod(&mut out_limbs, &in_limbs, limb);
         println!(
-            "out_limbs := {:?}; limbs_div_limb_to_out_mod(&mut out_limbs, {:?}, {}) = {}; out_limbs = {:?}",
+            "out_limbs := {:?}; limbs_div_limb_to_out_mod(&mut out_limbs, {:?}, {}) = {}; \
+             out_limbs = {:?}",
             out_limbs_old, in_limbs, limb, remainder, out_limbs
         );
     }
@@ -184,6 +217,40 @@ fn demo_natural_div_rem_u32(gm: GenerationMode, limit: usize) {
 fn demo_natural_div_rem_u32_ref(gm: GenerationMode, limit: usize) {
     for (n, u) in pairs_of_natural_and_positive_unsigned::<u32>(gm).take(limit) {
         println!("(&{}).div_rem({}) = {:?}", n, u, (&n).div_rem(u));
+    }
+}
+
+fn demo_natural_ceiling_div_assign_neg_mod_u32(gm: GenerationMode, limit: usize) {
+    for (mut n, u) in pairs_of_natural_and_positive_unsigned::<u32>(gm).take(limit) {
+        let n_old = n.clone();
+        let remainder = n.ceiling_div_assign_neg_mod(u);
+        println!(
+            "x := {}; x.ceiling_div_assign_neg_mod({}) = {}; x = {}",
+            n_old, u, remainder, n
+        );
+    }
+}
+
+fn demo_natural_ceiling_div_neg_mod_u32(gm: GenerationMode, limit: usize) {
+    for (n, u) in pairs_of_natural_and_positive_unsigned::<u32>(gm).take(limit) {
+        let n_old = n.clone();
+        println!(
+            "{}.ceiling_div_neg_mod({}) = {:?}",
+            n_old,
+            u,
+            n.ceiling_div_neg_mod(u)
+        );
+    }
+}
+
+fn demo_natural_ceiling_div_neg_mod_u32_ref(gm: GenerationMode, limit: usize) {
+    for (n, u) in pairs_of_natural_and_positive_unsigned::<u32>(gm).take(limit) {
+        println!(
+            "(&{}).ceiling_div_neg_mod({}) = {:?}",
+            n,
+            u,
+            (&n).ceiling_div_neg_mod(u)
+        );
     }
 }
 
@@ -477,6 +544,108 @@ fn benchmark_natural_div_rem_u32_evaluation_strategy(
             (
                 "(&Natural).div_rem(u32)",
                 &mut (|(x, y)| no_out!((&x).div_rem(y))),
+            ),
+        ],
+    );
+}
+
+fn benchmark_natural_ceiling_div_assign_neg_mod_u32(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "Natural.ceiling_div_assign_neg_mod(u32)",
+        BenchmarkType::Single,
+        pairs_of_natural_and_positive_unsigned::<u32>(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(ref n, _)| n.significant_bits() as usize),
+        "n.significant_bits()",
+        &mut [(
+            "malachite",
+            &mut (|(mut x, y)| no_out!(x.ceiling_div_assign_neg_mod(y))),
+        )],
+    );
+}
+
+fn benchmark_natural_ceiling_div_neg_mod_u32_library_comparison(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "Natural.ceiling_div_neg_mod(u32)",
+        BenchmarkType::LibraryComparison,
+        rm_pairs_of_natural_and_positive_unsigned(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(_, (ref n, _))| n.significant_bits() as usize),
+        "n.significant_bits()",
+        &mut [
+            (
+                "malachite",
+                &mut (|(_, (x, y))| no_out!(x.ceiling_div_neg_mod(y))),
+            ),
+            (
+                "rug",
+                &mut (|((x, y), _)| no_out!(rug_ceiling_div_neg_mod_u32(x, y))),
+            ),
+        ],
+    );
+}
+
+fn benchmark_natural_ceiling_div_neg_mod_u32_algorithms(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "Natural.ceiling_div_neg_mod(u32)",
+        BenchmarkType::Algorithms,
+        pairs_of_natural_and_positive_unsigned::<u32>(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(ref n, _)| n.significant_bits() as usize),
+        "n.significant_bits()",
+        &mut [
+            ("standard", &mut (|(x, y)| no_out!(x.div_mod(y)))),
+            (
+                "using div_round and %",
+                &mut (|(x, y)| {
+                    let remainder = (&x).neg_mod(y);
+                    (x.div_round(y, RoundingMode::Ceiling), remainder);
+                }),
+            ),
+        ],
+    );
+}
+
+fn benchmark_natural_ceiling_div_neg_mod_u32_evaluation_strategy(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "Natural.ceiling_div_neg_mod(u32)",
+        BenchmarkType::EvaluationStrategy,
+        pairs_of_natural_and_positive_unsigned::<u32>(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(ref n, _)| n.significant_bits() as usize),
+        "n.significant_bits()",
+        &mut [
+            (
+                "Natural.ceiling_div_neg_mod(u32)",
+                &mut (|(x, y)| no_out!(x.ceiling_div_neg_mod(y))),
+            ),
+            (
+                "(&Natural).ceiling_div_neg_mod(u32)",
+                &mut (|(x, y)| no_out!((&x).ceiling_div_neg_mod(y))),
             ),
         ],
     );

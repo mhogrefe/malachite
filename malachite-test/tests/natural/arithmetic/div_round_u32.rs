@@ -1,5 +1,5 @@
 use common::test_properties;
-use malachite_base::num::{DivRound, DivRoundAssign, One, Zero};
+use malachite_base::num::{CeilingDivNegMod, DivRound, DivRoundAssign, One, Zero};
 use malachite_base::round::RoundingMode;
 use malachite_nz::natural::arithmetic::div_round_u32::limbs_limb_div_round_limbs;
 use malachite_nz::natural::Natural;
@@ -452,6 +452,10 @@ fn div_u32_properties() {
             );
             assert_eq!(
                 rug_integer_to_natural(&natural_to_rug_integer(n).div_ceil(u)),
+                n.div_round(u, RoundingMode::Ceiling)
+            );
+            assert_eq!(
+                n.ceiling_div_neg_mod(u).0,
                 n.div_round(u, RoundingMode::Ceiling)
             );
         },

@@ -1,4 +1,7 @@
-use malachite_base::num::{DivAssignMod, DivAssignRem, DivMod, DivRem, JoinHalves, SplitInHalf};
+use malachite_base::num::{
+    CeilingDivAssignNegMod, CeilingDivNegMod, DivAssignMod, DivAssignRem, DivMod, DivRem,
+    JoinHalves, SplitInHalf,
+};
 use natural::arithmetic::add_u32::limbs_slice_add_limb_in_place;
 use natural::arithmetic::shl_u::{limbs_shl_to_out, limbs_slice_shl_in_place};
 use natural::Natural::{self, Large, Small};
@@ -858,6 +861,132 @@ impl<'a> DivAssignRem<&'a Natural> for u32 {
     /// ```
     fn div_assign_rem(&mut self, other: &'a Natural) -> u32 {
         self.div_assign_mod(other)
+    }
+}
+
+impl CeilingDivNegMod<u32> for Natural {
+    type DivOutput = Natural;
+    type ModOutput = u32;
+
+    /// Divides a `Natural` by a `u32`, taking the `Natural` by value and returning the ceiling of
+    /// the quotient and the remainder of the negative of the `Natural` divided by the `u32`. In
+    /// other words, returns (q, r), where `self` = q * `other` - r and 0 <= r < `other`.
+    ///
+    /// Time: worst case O(n)
+    ///
+    /// Additional memory: worst case O(1)
+    ///
+    /// where n = `other.significant_bits()`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::CeilingDivNegMod;
+    /// use malachite_nz::natural::Natural;
+    /// use std::str::FromStr;
+    ///
+    /// fn main() {
+    ///     // 4 * 123 - 36 = 456
+    ///     assert_eq!(format!("{:?}", Natural::from(456u32).ceiling_div_neg_mod(123)), "(4, 36)");
+    ///
+    ///     // 8,130,081,301 * 123 - 23 = 10^12
+    ///     assert_eq!(format!("{:?}", Natural::trillion().ceiling_div_neg_mod(123)),
+    ///         "(8130081301, 23)");
+    /// }
+    /// ```
+    fn ceiling_div_neg_mod(mut self, other: u32) -> (Natural, u32) {
+        let remainder = self.ceiling_div_assign_neg_mod(other);
+        (self, remainder)
+    }
+}
+
+impl<'a> CeilingDivNegMod<u32> for &'a Natural {
+    type DivOutput = Natural;
+    type ModOutput = u32;
+
+    /// Divides a `Natural` by a `u32`, taking the `Natural` by reference and returning the ceiling
+    /// of the quotient and the remainder of the negative of the `Natural` divided by the `u32`. In
+    /// other words, returns (q, r), where `self` = q * `other` - r and 0 <= r < `other`.
+    ///
+    /// Time: worst case O(n)
+    ///
+    /// Additional memory: worst case O(n)
+    ///
+    /// where n = `other.significant_bits()`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::CeilingDivNegMod;
+    /// use malachite_nz::natural::Natural;
+    /// use std::str::FromStr;
+    ///
+    /// fn main() {
+    ///     // 4 * 123 - 36 = 456
+    ///     assert_eq!(format!("{:?}", (&Natural::from(456u32)).ceiling_div_neg_mod(123)),
+    ///         "(4, 36)");
+    ///
+    ///     // 8,130,081,301 * 123 - 23 = 10^12
+    ///     assert_eq!(format!("{:?}", (&Natural::trillion()).ceiling_div_neg_mod(123)),
+    ///         "(8130081301, 23)");
+    /// }
+    /// ```
+    fn ceiling_div_neg_mod(self, other: u32) -> (Natural, u32) {
+        let (quotient, remainder) = self.div_mod(other);
+        if remainder == 0 {
+            (quotient, 0)
+        } else {
+            (quotient + 1, other - remainder)
+        }
+    }
+}
+
+impl CeilingDivAssignNegMod<u32> for Natural {
+    type ModOutput = u32;
+
+    /// Divides a `Natural` by a `u32` in place, taking the ceiling of the quotient and returning
+    /// the remainder of the negative of the `Natural` divided by the `u32`. In other words,
+    /// replaces `self` with q and returns r, where `self` = q * `other` - r and 0 <= r < `other`.
+    ///
+    /// Time: worst case O(n)
+    ///
+    /// Additional memory: worst case O(1)
+    ///
+    /// where n = `other.significant_bits()`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::CeilingDivAssignNegMod;
+    /// use malachite_nz::natural::Natural;
+    /// use std::str::FromStr;
+    ///
+    /// fn main() {
+    ///     // 4 * 123 - 36 = 456
+    ///     let mut x = Natural::from(456u32);
+    ///     assert_eq!(x.ceiling_div_assign_neg_mod(123), 36);
+    ///     assert_eq!(x.to_string(), "4");
+    ///
+    ///     // 8,130,081,301 * 123 - 23 = 10^12
+    ///     let mut x = Natural::trillion();
+    ///     assert_eq!(x.ceiling_div_assign_neg_mod(123), 23);
+    ///     assert_eq!(x.to_string(), "8130081301");
+    /// }
+    /// ```
+    fn ceiling_div_assign_neg_mod(&mut self, other: u32) -> u32 {
+        let remainder = self.div_assign_mod(other);
+        if remainder == 0 {
+            0
+        } else {
+            *self += 1;
+            other - remainder
+        }
     }
 }
 
