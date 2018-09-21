@@ -22,11 +22,14 @@ use rug;
 use std::cmp::max;
 use std::str::FromStr;
 
-//TODO continue deduplication
 #[test]
-fn test_limbs_add() {
-    let test = |xs, ys, out| {
-        assert_eq!(limbs_add(xs, ys), out);
+fn test_limbs_add_and_limbs_vec_add_in_place_left() {
+    let test = |xs_before, ys, out| {
+        assert_eq!(limbs_add(xs_before, ys), out);
+
+        let mut xs = xs_before.to_vec();
+        limbs_vec_add_in_place_left(&mut xs, ys);
+        assert_eq!(xs, out);
     };
     test(&[], &[], vec![]);
     test(&[2], &[], vec![2]);
@@ -244,28 +247,6 @@ fn limbs_slice_add_greater_in_place_left_fail() {
 }
 
 #[test]
-fn test_limbs_vec_add_in_place_left() {
-    let test = |xs_before: &[u32], ys, xs_after| {
-        let mut xs = xs_before.to_vec();
-        limbs_vec_add_in_place_left(&mut xs, ys);
-        assert_eq!(xs, xs_after);
-    };
-    test(&[], &[], vec![]);
-    test(&[2], &[], vec![2]);
-    test(&[], &[2], vec![2]);
-    test(&[2], &[3], vec![5]);
-    test(&[1, 1, 1], &[1, 2, 3], vec![2, 3, 4]);
-    test(&[6, 7], &[1, 2, 3], vec![7, 9, 3]);
-    test(&[1, 2, 3], &[6, 7], vec![7, 9, 3]);
-    test(&[100, 101, 102], &[102, 101, 100], vec![202, 202, 202]);
-    test(&[0xffff_ffff, 3], &[1], vec![0, 4]);
-    test(&[1], &[0xffff_ffff, 3], vec![0, 4]);
-    test(&[0xffff_ffff], &[1], vec![0, 1]);
-    test(&[1], &[0xffff_ffff], vec![0, 1]);
-    test(&[0xffff_ffff], &[0xffff_ffff], vec![0xffff_fffe, 1]);
-}
-
-#[test]
 fn test_limbs_slice_add_in_place_either() {
     let test = |xs_before: &[u32], ys_before: &[u32], right, xs_after, ys_after| {
         let mut xs = xs_before.to_vec();
@@ -469,33 +450,37 @@ fn limbs_add_to_out_properties() {
     );
 }
 
+fn limbs_slice_add_in_place_left_helper(
+    f: &mut FnMut(&mut [u32], &[u32]) -> bool,
+    xs: &Vec<u32>,
+    ys: &Vec<u32>,
+) {
+    let mut xs = xs.to_vec();
+    let xs_old = xs.clone();
+    let carry = f(&mut xs, ys);
+    let n = Natural::from_owned_limbs_asc(xs_old) + Natural::from_limbs_asc(ys);
+    let len = xs.len();
+    let mut limbs = n.into_limbs_asc();
+    assert_eq!(carry, limbs.len() == len + 1);
+    limbs.resize(len, 0);
+    assert_eq!(limbs, xs);
+}
+
 #[test]
 fn limbs_slice_add_same_length_in_place_left_properties() {
     test_properties(pairs_of_unsigned_vec_var_1, |&(ref xs, ref ys)| {
-        let mut xs = xs.to_vec();
-        let xs_old = xs.clone();
-        let carry = limbs_slice_add_same_length_in_place_left(&mut xs, ys);
-        let n = Natural::from_owned_limbs_asc(xs_old) + Natural::from_limbs_asc(ys);
-        let len = xs.len();
-        let mut limbs = n.into_limbs_asc();
-        assert_eq!(carry, limbs.len() == len + 1);
-        limbs.resize(len, 0);
-        assert_eq!(limbs, xs);
+        limbs_slice_add_in_place_left_helper(
+            &mut limbs_slice_add_same_length_in_place_left,
+            xs,
+            ys,
+        );
     });
 }
 
 #[test]
 fn limbs_slice_add_greater_in_place_left_properties() {
     test_properties(pairs_of_unsigned_vec_var_3, |&(ref xs, ref ys)| {
-        let mut xs = xs.to_vec();
-        let xs_old = xs.clone();
-        let carry = limbs_slice_add_greater_in_place_left(&mut xs, ys);
-        let n = Natural::from_owned_limbs_asc(xs_old) + Natural::from_limbs_asc(ys);
-        let len = xs.len();
-        let mut limbs = n.into_limbs_asc();
-        assert_eq!(carry, limbs.len() == len + 1);
-        limbs.resize(len, 0);
-        assert_eq!(limbs, xs);
+        limbs_slice_add_in_place_left_helper(&mut limbs_slice_add_greater_in_place_left, xs, ys);
     });
 }
 
