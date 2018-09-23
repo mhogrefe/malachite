@@ -167,7 +167,7 @@ fn limbs_div_limb_normalized_to_out(
 /// where n = `limbs.len()`
 ///
 /// # Panics
-/// Panics if the length of `limbs` is less than 2 or if `limb` is zero.
+/// Panics if the length of `limbs` is less than 2 or if `divisor` is zero.
 ///
 /// # Example
 /// ```
@@ -176,9 +176,9 @@ fn limbs_div_limb_normalized_to_out(
 /// assert_eq!(limbs_div_limb(&[123, 456], 789), &[2_482_262_467, 0]);
 /// assert_eq!(limbs_div_limb(&[0xffff_ffff, 0xffff_ffff], 3), &[0x5555_5555, 0x5555_5555]);
 /// ```
-pub fn limbs_div_limb(limbs: &[u32], limb: u32) -> Vec<u32> {
+pub fn limbs_div_limb(limbs: &[u32], divisor: u32) -> Vec<u32> {
     let mut quotient_limbs = vec![0; limbs.len()];
-    limbs_div_limb_to_out(&mut quotient_limbs, limbs, limb);
+    limbs_div_limb_to_out(&mut quotient_limbs, limbs, divisor);
     quotient_limbs
 }
 
@@ -195,7 +195,7 @@ pub fn limbs_div_limb(limbs: &[u32], limb: u32) -> Vec<u32> {
 ///
 /// # Panics
 /// Panics if `out_limbs` is shorter than `in_limbs`, the length of `in_limbs` is less than 2, or if
-/// `limb` is zero.
+/// `divisor` is zero.
 ///
 /// # Example
 /// ```
@@ -209,40 +209,40 @@ pub fn limbs_div_limb(limbs: &[u32], limb: u32) -> Vec<u32> {
 /// limbs_div_limb_to_out(&mut out_limbs, &[0xffff_ffff, 0xffff_ffff], 3);
 /// assert_eq!(out_limbs, &[0x5555_5555, 0x5555_5555, 10, 10]);
 /// ```
-pub fn limbs_div_limb_to_out(out_limbs: &mut [u32], in_limbs: &[u32], mut limb: u32) {
+pub fn limbs_div_limb_to_out(out_limbs: &mut [u32], in_limbs: &[u32], mut divisor: u32) {
+    assert!(divisor > 0);
     let len = in_limbs.len();
-    assert!(out_limbs.len() >= len);
     assert!(len > 1);
-    assert!(limb > 0);
+    assert!(out_limbs.len() >= len);
     let len_minus_1 = len - 1;
     let mut highest_limb = in_limbs[len_minus_1];
-    let bits = limb.leading_zeros();
+    let bits = divisor.leading_zeros();
     if bits == 0 {
-        out_limbs[len_minus_1] = if highest_limb >= limb {
-            highest_limb -= limb;
+        out_limbs[len_minus_1] = if highest_limb >= divisor {
+            highest_limb -= divisor;
             1
         } else {
             0
         };
-        let limb_inverse = (u64::join_halves(!limb, u32::MAX) / u64::from(limb)).lower_half();
+        let limb_inverse = (u64::join_halves(!divisor, u32::MAX) / u64::from(divisor)).lower_half();
         limbs_div_limb_normalized_to_out(
             out_limbs,
             &in_limbs[..len_minus_1],
             highest_limb,
-            limb,
+            divisor,
             limb_inverse,
         )
     } else {
-        limb <<= bits;
+        divisor <<= bits;
         let highest_limb = limbs_shl_to_out(out_limbs, in_limbs, bits);
-        let limb_inverse = (u64::join_halves(!limb, u32::MAX) / u64::from(limb)).lower_half();
+        let limb_inverse = (u64::join_halves(!divisor, u32::MAX) / u64::from(divisor)).lower_half();
         let (quotient, remainder) =
-            div_mod_by_preinversion(highest_limb, out_limbs[len_minus_1], limb, limb_inverse);
+            div_mod_by_preinversion(highest_limb, out_limbs[len_minus_1], divisor, limb_inverse);
         out_limbs[len_minus_1] = quotient;
         limbs_div_limb_normalized_in_place(
             &mut out_limbs[..len_minus_1],
             remainder,
-            limb,
+            divisor,
             limb_inverse,
         )
     }
@@ -259,7 +259,7 @@ pub fn limbs_div_limb_to_out(out_limbs: &mut [u32], in_limbs: &[u32], mut limb: 
 /// where n = `limbs.len()`
 ///
 /// # Panics
-/// Panics if the length of `limbs` is less than 2 or if `limb` is zero.
+/// Panics if the length of `limbs` is less than 2 or if `divisor` is zero.
 ///
 /// # Example
 /// ```
@@ -273,35 +273,40 @@ pub fn limbs_div_limb_to_out(out_limbs: &mut [u32], in_limbs: &[u32], mut limb: 
 /// limbs_div_limb_in_place(&mut limbs, 3);
 /// assert_eq!(limbs, &[0x5555_5555, 0x5555_5555]);
 /// ```
-pub fn limbs_div_limb_in_place(limbs: &mut [u32], mut limb: u32) {
+pub fn limbs_div_limb_in_place(limbs: &mut [u32], mut divisor: u32) {
+    assert!(divisor > 0);
     let len = limbs.len();
     assert!(len > 1);
-    assert!(limb > 0);
     let len_minus_1 = len - 1;
     let mut highest_limb = limbs[len_minus_1];
-    let bits = limb.leading_zeros();
+    let bits = divisor.leading_zeros();
     if bits == 0 {
-        limbs[len_minus_1] = if highest_limb >= limb {
-            highest_limb -= limb;
+        limbs[len_minus_1] = if highest_limb >= divisor {
+            highest_limb -= divisor;
             1
         } else {
             0
         };
-        let limb_inverse = (u64::join_halves(!limb, u32::MAX) / u64::from(limb)).lower_half();
+        let limb_inverse = (u64::join_halves(!divisor, u32::MAX) / u64::from(divisor)).lower_half();
         limbs_div_limb_normalized_in_place(
             &mut limbs[..len_minus_1],
             highest_limb,
-            limb,
+            divisor,
             limb_inverse,
         )
     } else {
-        limb <<= bits;
+        divisor <<= bits;
         let highest_limb = limbs_slice_shl_in_place(limbs, bits);
-        let limb_inverse = (u64::join_halves(!limb, u32::MAX) / u64::from(limb)).lower_half();
+        let limb_inverse = (u64::join_halves(!divisor, u32::MAX) / u64::from(divisor)).lower_half();
         let (quotient, remainder) =
-            div_mod_by_preinversion(highest_limb, limbs[len_minus_1], limb, limb_inverse);
+            div_mod_by_preinversion(highest_limb, limbs[len_minus_1], divisor, limb_inverse);
         limbs[len_minus_1] = quotient;
-        limbs_div_limb_normalized_in_place(&mut limbs[..len_minus_1], remainder, limb, limb_inverse)
+        limbs_div_limb_normalized_in_place(
+            &mut limbs[..len_minus_1],
+            remainder,
+            divisor,
+            limb_inverse,
+        )
     }
 }
 
@@ -385,86 +390,6 @@ impl<'a> Div<u32> for &'a Natural {
     }
 }
 
-impl Div<Natural> for u32 {
-    type Output = u32;
-
-    /// Divides a `u32` by a `Natural`, taking the `Natural` by value. In other words, returns q,
-    /// where `self` = q * `other` + r and 0 <= r < `other`.
-    ///
-    /// Time: worst case O(n)
-    ///
-    /// Additional memory: worst case O(1)
-    ///
-    /// where n = `other.significant_bits()`
-    ///
-    /// # Examples
-    /// ```
-    /// extern crate malachite_base;
-    /// extern crate malachite_nz;
-    ///
-    /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
-    ///
-    /// fn main() {
-    ///     // 3 * 123 + 87 = 456
-    ///     assert_eq!(456 / Natural::from(123u32), 3);
-    ///
-    ///     // 0 * 10^12 + 123 = 123
-    ///     assert_eq!(123 / Natural::trillion(), 0);
-    /// }
-    /// ```
-    fn div(self, other: Natural) -> u32 {
-        if other == 0 {
-            panic!("division by zero");
-        } else {
-            match other {
-                Small(small) => self / small,
-                Large(_) => 0,
-            }
-        }
-    }
-}
-
-impl<'a> Div<&'a Natural> for u32 {
-    type Output = u32;
-
-    /// Divides a `u32` by a `Natural`, taking the `Natural` by reference. In other words, returns
-    /// q, where `self` = q * `other` + r and 0 <= r < `other`.
-    ///
-    /// Time: worst case O(n)
-    ///
-    /// Additional memory: worst case O(1)
-    ///
-    /// where n = `other.significant_bits()`
-    ///
-    /// # Examples
-    /// ```
-    /// extern crate malachite_base;
-    /// extern crate malachite_nz;
-    ///
-    /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
-    ///
-    /// fn main() {
-    ///     // 3 * 123 + 87 = 456
-    ///     assert_eq!(456 / &Natural::from(123u32), 3);
-    ///
-    ///     // 0 * 10^12 + 123 = 123
-    ///     assert_eq!(123 / &Natural::trillion(), 0);
-    /// }
-    /// ```
-    fn div(self, other: &'a Natural) -> u32 {
-        if *other == 0 {
-            panic!("division by zero");
-        } else {
-            match *other {
-                Small(small) => self / small,
-                Large(_) => 0,
-            }
-        }
-    }
-}
-
 impl DivAssign<u32> for Natural {
     /// Divides a `Natural` by a `u32` in place. In other words, replaces `self` with q, where
     /// `self` = q * `other` + r and 0 <= r < `other`.
@@ -507,6 +432,82 @@ impl DivAssign<u32> for Natural {
                 Large(ref mut limbs) => limbs_div_limb_in_place(limbs, other),
             }
             self.trim();
+        }
+    }
+}
+
+impl Div<Natural> for u32 {
+    type Output = u32;
+
+    /// Divides a `u32` by a `Natural`, taking the `Natural` by value. In other words, returns q,
+    /// where `self` = q * `other` + r and 0 <= r < `other`.
+    ///
+    /// Time: worst case O(1)
+    ///
+    /// Additional memory: worst case O(1)
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_nz::natural::Natural;
+    /// use std::str::FromStr;
+    ///
+    /// fn main() {
+    ///     // 3 * 123 + 87 = 456
+    ///     assert_eq!(456 / Natural::from(123u32), 3);
+    ///
+    ///     // 0 * 10^12 + 123 = 123
+    ///     assert_eq!(123 / Natural::trillion(), 0);
+    /// }
+    /// ```
+    fn div(self, other: Natural) -> u32 {
+        if other == 0 {
+            panic!("division by zero");
+        } else {
+            match other {
+                Small(small) => self / small,
+                Large(_) => 0,
+            }
+        }
+    }
+}
+
+impl<'a> Div<&'a Natural> for u32 {
+    type Output = u32;
+
+    /// Divides a `u32` by a `Natural`, taking the `Natural` by reference. In other words, returns
+    /// q, where `self` = q * `other` + r and 0 <= r < `other`.
+    ///
+    /// Time: worst case O(1)
+    ///
+    /// Additional memory: worst case O(1)
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_nz::natural::Natural;
+    /// use std::str::FromStr;
+    ///
+    /// fn main() {
+    ///     // 3 * 123 + 87 = 456
+    ///     assert_eq!(456 / &Natural::from(123u32), 3);
+    ///
+    ///     // 0 * 10^12 + 123 = 123
+    ///     assert_eq!(123 / &Natural::trillion(), 0);
+    /// }
+    /// ```
+    fn div(self, other: &'a Natural) -> u32 {
+        if *other == 0 {
+            panic!("division by zero");
+        } else {
+            match *other {
+                Small(small) => self / small,
+                Large(_) => 0,
+            }
         }
     }
 }

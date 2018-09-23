@@ -2,9 +2,12 @@ use common::{GenerationMode, NoSpecialGenerationMode};
 use inputs::common::{permute_1_2, permute_1_3_2, reshape_2_1_to_3};
 use malachite_base::chars::NUMBER_OF_CHARS;
 use malachite_base::limbs::limbs_test_zero;
-use malachite_base::num::{Parity, PrimitiveInteger, PrimitiveSigned, PrimitiveUnsigned};
+use malachite_base::num::{
+    BitAccess, Parity, PrimitiveInteger, PrimitiveSigned, PrimitiveUnsigned,
+};
 use malachite_base::round::RoundingMode;
 use malachite_nz::integer::logic::bit_access::limbs_vec_clear_bit_neg;
+use malachite_nz::natural::arithmetic::mul_u32::limbs_mul_limb;
 use rust_wheels::iterators::bools::exhaustive_bools;
 use rust_wheels::iterators::chars::exhaustive_chars;
 use rust_wheels::iterators::common::EXAMPLE_SEED;
@@ -14,8 +17,9 @@ use rust_wheels::iterators::orderings::{exhaustive_orderings, random_orderings};
 use rust_wheels::iterators::primitive_ints::{
     exhaustive_negative_signed, exhaustive_positive, exhaustive_signed, exhaustive_unsigned,
     random_negative_signed, random_positive_signed, random_positive_unsigned, random_range,
-    special_random_negative_signed, special_random_positive_signed,
-    special_random_positive_unsigned, special_random_signed, special_random_unsigned,
+    random_range_down, range_down_increasing, special_random_negative_signed,
+    special_random_positive_signed, special_random_positive_unsigned, special_random_signed,
+    special_random_unsigned,
 };
 use rust_wheels::iterators::rounding_modes::{exhaustive_rounding_modes, random_rounding_modes};
 use rust_wheels::iterators::tuples::{
@@ -84,24 +88,42 @@ pub fn pairs_of_unsigneds<T: PrimitiveUnsigned>(
 // All `u32`s smaller than `NUMBER_OF_CHARS`.
 pub fn u32s_range_1(gm: NoSpecialGenerationMode) -> It<u32> {
     match gm {
-        NoSpecialGenerationMode::Exhaustive => Box::new(range_increasing(0, NUMBER_OF_CHARS - 1)),
+        NoSpecialGenerationMode::Exhaustive => Box::new(range_down_increasing(NUMBER_OF_CHARS - 1)),
         NoSpecialGenerationMode::Random(_) => {
-            Box::new(random_range(&EXAMPLE_SEED, 0, NUMBER_OF_CHARS - 1))
+            Box::new(random_range_down(&EXAMPLE_SEED, NUMBER_OF_CHARS - 1))
         }
     }
+}
+
+// All `u32`s smaller than 2<sup>31<sup>.
+fn u32s_range_2(gm: GenerationMode) -> It<u32> {
+    let upper = 1 << (u32::WIDTH - 1);
+    match gm {
+        GenerationMode::Exhaustive => Box::new(range_down_increasing(upper)),
+        GenerationMode::Random(_) => Box::new(random_range_down(&EXAMPLE_SEED, upper)),
+        GenerationMode::SpecialRandom(_) => {
+            Box::new(special_random_unsigned::<u32>(&EXAMPLE_SEED).map(|u| {
+                let mut u = u;
+                u.clear_bit(u64::from(u32::WIDTH - 1));
+                u
+            }))
+        }
+    }
+}
+
+pub fn odd_u32s(gm: GenerationMode) -> Box<Iterator<Item = u32>> {
+    Box::new(u32s_range_2(gm).map(|u| (u << 1) + 1))
 }
 
 // All pairs of `u32`s smaller than `NUMBER_OF_CHARS`.
 pub fn pairs_of_u32s_range_1(gm: NoSpecialGenerationMode) -> Box<Iterator<Item = (u32, u32)>> {
     match gm {
         NoSpecialGenerationMode::Exhaustive => Box::new(exhaustive_pairs_from_single(
-            range_increasing(0, NUMBER_OF_CHARS - 1),
+            range_down_increasing(NUMBER_OF_CHARS - 1),
         )),
-        NoSpecialGenerationMode::Random(_) => Box::new(random_pairs_from_single(random_range(
-            &EXAMPLE_SEED,
-            0,
-            NUMBER_OF_CHARS - 1,
-        ))),
+        NoSpecialGenerationMode::Random(_) => Box::new(random_pairs_from_single(
+            random_range_down(&EXAMPLE_SEED, NUMBER_OF_CHARS - 1),
+        )),
     }
 }
 
@@ -234,7 +256,7 @@ type ItU<T> = It<(T, u64)>;
 fn exhaustive_pairs_of_unsigned_and_u64_width_range<T: PrimitiveUnsigned>() -> ItU<T> {
     Box::new(lex_pairs(
         exhaustive_unsigned(),
-        range_increasing(0, u64::from(T::WIDTH) - 1),
+        range_down_increasing(u64::from(T::WIDTH) - 1),
     ))
 }
 
@@ -242,7 +264,7 @@ fn random_pairs_of_primitive_and_u64_width_range<T: PrimitiveInteger>() -> It<(T
     Box::new(random_pairs(
         &EXAMPLE_SEED,
         &(|seed| random(seed)),
-        &(|seed| random_range(seed, 0, u64::from(T::WIDTH) - 1)),
+        &(|seed| random_range_down(seed, u64::from(T::WIDTH) - 1)),
     ))
 }
 
@@ -256,7 +278,7 @@ pub fn pairs_of_unsigned_and_u64_width_range<T: PrimitiveUnsigned>(
         GenerationMode::SpecialRandom(_) => Box::new(random_pairs(
             &EXAMPLE_SEED,
             &(|seed| special_random_unsigned(seed)),
-            &(|seed| random_range(seed, 0, u64::from(T::WIDTH) - 1)),
+            &(|seed| random_range_down(seed, u64::from(T::WIDTH) - 1)),
         )),
     }
 }
@@ -266,13 +288,13 @@ pub fn pairs_of_signed_and_u64_width_range<T: PrimitiveSigned>(gm: GenerationMod
     match gm {
         GenerationMode::Exhaustive => Box::new(lex_pairs(
             exhaustive_signed(),
-            range_increasing(0, u64::from(T::WIDTH) - 1),
+            range_down_increasing(u64::from(T::WIDTH) - 1),
         )),
         GenerationMode::Random(_) => random_pairs_of_primitive_and_u64_width_range(),
         GenerationMode::SpecialRandom(_) => Box::new(random_pairs(
             &EXAMPLE_SEED,
             &(|seed| special_random_signed(seed)),
-            &(|seed| random_range(seed, 0, u64::from(T::WIDTH) - 1)),
+            &(|seed| random_range_down(seed, u64::from(T::WIDTH) - 1)),
         )),
     }
 }
@@ -907,6 +929,18 @@ pub fn pairs_of_unsigned_vec_and_positive_unsigned_var_1<T: PrimitiveUnsigned>(
     Box::new(pairs_of_unsigned_vec_and_positive_unsigned(gm).filter(|&(ref xs, _)| xs.len() > 1))
 }
 
+// All pairs of `Vec<T>` and positive `u32`, where the `Vec` is nonempty and represents a `Natural`
+// divisible by the `u32`.
+pub fn pairs_of_u32_vec_and_positive_u32_var_2(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (Vec<u32>, u32)>> {
+    Box::new(
+        pairs_of_unsigned_vec_and_positive_unsigned(gm)
+            .filter(|(ref limbs, _)| limbs.len() > 0)
+            .map(|(limbs, limb)| (limbs_mul_limb(&limbs, limb), limb)),
+    )
+}
+
 // All pairs of `Vec<T>` where `T` is unsigned, and a `u32` between 1 and 31, inclusive.
 pub fn pairs_of_unsigned_vec_and_u32_var_1<T: PrimitiveUnsigned>(
     gm: GenerationMode,
@@ -1178,6 +1212,21 @@ pub fn triples_of_unsigned_vec_unsigned_vec_and_positive_unsigned_var_1<T: Primi
                 out_limbs.len() >= in_limbs.len() && in_limbs.len() > 1
             },
         ),
+    )
+}
+
+// All triples of `Vec<u32>`, `Vec<u32>`, and positive `u32`, where the first `Vec` is at least as
+// long as the second and the second `Vec` is nonempty and represents a `Natural` divisible by the
+// `u32`.
+pub fn triples_of_u32_vec_u32_vec_and_positive_u32_var_2(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (Vec<u32>, Vec<u32>, u32)>> {
+    Box::new(
+        triples_of_unsigned_vec_unsigned_vec_and_positive_unsigned(gm)
+            .map(|(out_limbs, in_limbs, limb)| (out_limbs, limbs_mul_limb(&in_limbs, limb), limb))
+            .filter(|(ref out_limbs, ref in_limbs, _)| {
+                out_limbs.len() >= in_limbs.len() && in_limbs.len() > 0
+            }),
     )
 }
 

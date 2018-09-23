@@ -6,6 +6,7 @@ pub mod add_mul_u32;
 pub mod add_u32;
 pub mod checked_sub;
 pub mod checked_sub_u32;
+pub mod div_exact_u32;
 pub mod div_mod_u32;
 pub mod div_round_u32;
 pub mod div_u32;
@@ -37,6 +38,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     add_mul_u32::register(registry);
     checked_sub::register(registry);
     checked_sub_u32::register(registry);
+    div_exact_u32::register(registry);
     div_mod_u32::register(registry);
     div_round_u32::register(registry);
     div_u32::register(registry);

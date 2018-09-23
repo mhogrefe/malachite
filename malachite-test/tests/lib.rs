@@ -153,6 +153,7 @@ pub mod natural {
         pub mod add_u32;
         pub mod checked_sub;
         pub mod checked_sub_u32;
+        pub mod div_exact_u32;
         pub mod div_mod_u32;
         pub mod div_round_u32;
         pub mod div_u32;

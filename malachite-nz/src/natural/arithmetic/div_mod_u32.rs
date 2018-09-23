@@ -180,7 +180,7 @@ fn limbs_div_limb_normalized_to_out_mod(
 /// where n = `limbs.len()`
 ///
 /// # Panics
-/// Panics if the length of `limbs` is less than 2 or if `limb` is zero.
+/// Panics if the length of `limbs` is less than 2 or if `divisor` is zero.
 ///
 /// # Example
 /// ```
@@ -190,9 +190,9 @@ fn limbs_div_limb_normalized_to_out_mod(
 /// assert_eq!(limbs_div_limb_mod(&[0xffff_ffff, 0xffff_ffff], 3),
 ///     (vec![0x5555_5555, 0x5555_5555], 0));
 /// ```
-pub fn limbs_div_limb_mod(limbs: &[u32], limb: u32) -> (Vec<u32>, u32) {
+pub fn limbs_div_limb_mod(limbs: &[u32], divisor: u32) -> (Vec<u32>, u32) {
     let mut quotient_limbs = vec![0; limbs.len()];
-    let remainder = limbs_div_limb_to_out_mod(&mut quotient_limbs, limbs, limb);
+    let remainder = limbs_div_limb_to_out_mod(&mut quotient_limbs, limbs, divisor);
     (quotient_limbs, remainder)
 }
 
@@ -209,7 +209,7 @@ pub fn limbs_div_limb_mod(limbs: &[u32], limb: u32) -> (Vec<u32>, u32) {
 ///
 /// # Panics
 /// Panics if `out_limbs` is shorter than `in_limbs`, the length of `in_limbs` is less than 2, or if
-/// `limb` is zero.
+/// `divisor` is zero.
 ///
 /// # Example
 /// ```
@@ -223,40 +223,40 @@ pub fn limbs_div_limb_mod(limbs: &[u32], limb: u32) -> (Vec<u32>, u32) {
 /// assert_eq!(limbs_div_limb_to_out_mod(&mut out_limbs, &[0xffff_ffff, 0xffff_ffff], 3), 0);
 /// assert_eq!(out_limbs, &[0x5555_5555, 0x5555_5555, 10, 10]);
 /// ```
-pub fn limbs_div_limb_to_out_mod(out_limbs: &mut [u32], in_limbs: &[u32], mut limb: u32) -> u32 {
+pub fn limbs_div_limb_to_out_mod(out_limbs: &mut [u32], in_limbs: &[u32], mut divisor: u32) -> u32 {
+    assert!(divisor > 0);
     let len = in_limbs.len();
-    assert!(out_limbs.len() >= len);
     assert!(len > 1);
-    assert!(limb > 0);
+    assert!(out_limbs.len() >= len);
     let len_minus_1 = len - 1;
     let mut highest_limb = in_limbs[len_minus_1];
-    let bits = limb.leading_zeros();
+    let bits = divisor.leading_zeros();
     if bits == 0 {
-        out_limbs[len_minus_1] = if highest_limb >= limb {
-            highest_limb -= limb;
+        out_limbs[len_minus_1] = if highest_limb >= divisor {
+            highest_limb -= divisor;
             1
         } else {
             0
         };
-        let limb_inverse = (u64::join_halves(!limb, u32::MAX) / u64::from(limb)).lower_half();
+        let limb_inverse = (u64::join_halves(!divisor, u32::MAX) / u64::from(divisor)).lower_half();
         limbs_div_limb_normalized_to_out_mod(
             out_limbs,
             &in_limbs[..len_minus_1],
             highest_limb,
-            limb,
+            divisor,
             limb_inverse,
         )
     } else {
-        limb <<= bits;
+        divisor <<= bits;
         let highest_limb = limbs_shl_to_out(out_limbs, in_limbs, bits);
-        let limb_inverse = (u64::join_halves(!limb, u32::MAX) / u64::from(limb)).lower_half();
+        let limb_inverse = (u64::join_halves(!divisor, u32::MAX) / u64::from(divisor)).lower_half();
         let (quotient, remainder) =
-            div_mod_by_preinversion(highest_limb, out_limbs[len_minus_1], limb, limb_inverse);
+            div_mod_by_preinversion(highest_limb, out_limbs[len_minus_1], divisor, limb_inverse);
         out_limbs[len_minus_1] = quotient;
         limbs_div_limb_normalized_in_place_mod(
             &mut out_limbs[..len_minus_1],
             remainder,
-            limb,
+            divisor,
             limb_inverse,
         ) >> bits
     }
@@ -273,7 +273,7 @@ pub fn limbs_div_limb_to_out_mod(out_limbs: &mut [u32], in_limbs: &[u32], mut li
 /// where n = `limbs.len()`
 ///
 /// # Panics
-/// Panics if the length of `limbs` is less than 2 or if `limb` is zero.
+/// Panics if the length of `limbs` is less than 2 or if `divisor` is zero.
 ///
 /// # Example
 /// ```
@@ -287,38 +287,38 @@ pub fn limbs_div_limb_to_out_mod(out_limbs: &mut [u32], in_limbs: &[u32], mut li
 /// assert_eq!(limbs_div_limb_in_place_mod(&mut limbs, 3), 0);
 /// assert_eq!(limbs, &[0x5555_5555, 0x5555_5555]);
 /// ```
-pub fn limbs_div_limb_in_place_mod(limbs: &mut [u32], mut limb: u32) -> u32 {
+pub fn limbs_div_limb_in_place_mod(limbs: &mut [u32], mut divisor: u32) -> u32 {
+    assert!(divisor > 0);
     let len = limbs.len();
     assert!(len > 1);
-    assert!(limb > 0);
     let len_minus_1 = len - 1;
     let mut highest_limb = limbs[len_minus_1];
-    let bits = limb.leading_zeros();
+    let bits = divisor.leading_zeros();
     if bits == 0 {
-        limbs[len_minus_1] = if highest_limb >= limb {
-            highest_limb -= limb;
+        limbs[len_minus_1] = if highest_limb >= divisor {
+            highest_limb -= divisor;
             1
         } else {
             0
         };
-        let limb_inverse = (u64::join_halves(!limb, u32::MAX) / u64::from(limb)).lower_half();
+        let limb_inverse = (u64::join_halves(!divisor, u32::MAX) / u64::from(divisor)).lower_half();
         limbs_div_limb_normalized_in_place_mod(
             &mut limbs[..len_minus_1],
             highest_limb,
-            limb,
+            divisor,
             limb_inverse,
         )
     } else {
-        limb <<= bits;
+        divisor <<= bits;
         let highest_limb = limbs_slice_shl_in_place(limbs, bits);
-        let limb_inverse = (u64::join_halves(!limb, u32::MAX) / u64::from(limb)).lower_half();
+        let limb_inverse = (u64::join_halves(!divisor, u32::MAX) / u64::from(divisor)).lower_half();
         let (quotient, remainder) =
-            div_mod_by_preinversion(highest_limb, limbs[len_minus_1], limb, limb_inverse);
+            div_mod_by_preinversion(highest_limb, limbs[len_minus_1], divisor, limb_inverse);
         limbs[len_minus_1] = quotient;
         limbs_div_limb_normalized_in_place_mod(
             &mut limbs[..len_minus_1],
             remainder,
-            limb,
+            divisor,
             limb_inverse,
         ) >> bits
     }

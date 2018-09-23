@@ -128,7 +128,7 @@ fn limbs_mod_limb_normalized_shl(
 /// where n = `limbs.len()`
 ///
 /// # Panics
-/// Panics if the length of `limbs` is less than 2 or if `limb` is zero.
+/// Panics if the length of `limbs` is less than 2 or if `divisor` is zero.
 ///
 /// # Example
 /// ```
@@ -137,31 +137,36 @@ fn limbs_mod_limb_normalized_shl(
 /// assert_eq!(limbs_mod_limb(&[123, 456], 789), 636);
 /// assert_eq!(limbs_mod_limb(&[0xffff_ffff, 0xffff_ffff], 3), 0);
 /// ```
-pub fn limbs_mod_limb(limbs: &[u32], mut limb: u32) -> u32 {
+pub fn limbs_mod_limb(limbs: &[u32], mut divisor: u32) -> u32 {
+    assert!(divisor > 0);
     let len = limbs.len();
     assert!(len > 1);
-    assert!(limb > 0);
     let len_minus_1 = len - 1;
     let mut highest_limb = limbs[len_minus_1];
-    let bits = limb.leading_zeros();
+    let bits = divisor.leading_zeros();
     if bits == 0 {
-        if highest_limb >= limb {
-            highest_limb -= limb;
+        if highest_limb >= divisor {
+            highest_limb -= divisor;
         }
-        let limb_inverse = (u64::join_halves(!limb, u32::MAX) / u64::from(limb)).lower_half();
-        limbs_mod_limb_normalized(&limbs[..len_minus_1], highest_limb, limb, limb_inverse)
+        let limb_inverse = (u64::join_halves(!divisor, u32::MAX) / u64::from(divisor)).lower_half();
+        limbs_mod_limb_normalized(&limbs[..len_minus_1], highest_limb, divisor, limb_inverse)
     } else {
-        limb <<= bits;
+        divisor <<= bits;
         let cobits = u32::WIDTH - bits;
-        let limb_inverse = (u64::join_halves(!limb, u32::MAX) / u64::from(limb)).lower_half();
+        let limb_inverse = (u64::join_halves(!divisor, u32::MAX) / u64::from(divisor)).lower_half();
         let remainder = mod_by_preinversion(
             highest_limb >> cobits,
             (highest_limb << bits) | (limbs[len - 2] >> cobits),
-            limb,
+            divisor,
             limb_inverse,
         );
-        limbs_mod_limb_normalized_shl(&limbs[..len_minus_1], remainder, limb, limb_inverse, bits)
-            >> bits
+        limbs_mod_limb_normalized_shl(
+            &limbs[..len_minus_1],
+            remainder,
+            divisor,
+            limb_inverse,
+            bits,
+        ) >> bits
     }
 }
 

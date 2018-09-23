@@ -505,6 +505,16 @@ pub trait CeilingDivAssignNegMod<RHS = Self> {
     fn ceiling_div_assign_neg_mod(&mut self, rhs: RHS) -> Self::ModOutput;
 }
 
+pub trait DivExact<RHS = Self> {
+    type Output;
+
+    fn div_exact(self, rhs: RHS) -> Self::Output;
+}
+
+pub trait DivExactAssign<RHS = Self> {
+    fn div_exact_assign(&mut self, rhs: RHS);
+}
+
 //TODO is_positive, is_negative, sign
 
 macro_rules! lossless_checked_from_impl {
@@ -1523,6 +1533,22 @@ macro_rules! integer_traits {
                 let rem = *self % rhs;
                 *self /= rhs;
                 rem
+            }
+        }
+
+        impl DivExact for $t {
+            type Output = $t;
+
+            #[inline]
+            fn div_exact(self, rhs: $t) -> $t {
+                self / rhs
+            }
+        }
+
+        impl DivExactAssign for $t {
+            #[inline]
+            fn div_exact_assign(&mut self, rhs: $t) {
+                *self /= rhs;
             }
         }
     };

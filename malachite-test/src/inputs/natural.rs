@@ -377,11 +377,37 @@ pub fn nrm_pairs_of_natural_and_positive_unsigned<T: PrimitiveUnsigned>(
 }
 
 // All pairs of `Natural` and positive `u32`, where the `Natural` is not divisible by the `u32`.
-pub fn pairs_of_natural_and_positive_u32_var_3(
+pub fn pairs_of_natural_and_positive_u32_var_1(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (Natural, u32)>> {
     //TODO use divisible
     Box::new(pairs_of_natural_and_positive_unsigned(gm).filter(|&(ref n, u)| n % u != 0))
+}
+
+// All triples of `Natural` and positive `T`, where `T` is unsigned and the `Natural` is divisible
+// by the `T`.
+pub fn pairs_of_natural_and_positive_u32_var_2(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (Natural, u32)>> {
+    Box::new(pairs_of_natural_and_positive_unsigned(gm).map(|(n, u)| (n * u, u)))
+}
+
+pub fn nrm_pairs_of_natural_and_positive_u32_var_2(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = ((BigUint, u32), (rug::Integer, u32), (Natural, u32))>> {
+    Box::new(pairs_of_natural_and_positive_u32_var_2(gm).map(|(x, y)| {
+        (
+            (natural_to_biguint(&x), y),
+            (natural_to_rug_integer(&x), y),
+            (x, y),
+        )
+    }))
+}
+
+// All pairs of `Natural` and `u32` where the most-significant bit of the `u32` is set and the
+// `Natural` is divisible by the `u32`.
+pub fn pairs_of_natural_and_u32_var_3(gm: GenerationMode) -> Box<Iterator<Item = (Natural, u32)>> {
+    Box::new(pairs_of_natural_and_unsigned_var_2(gm).map(|(n, u)| (n * u, u)))
 }
 
 pub fn pairs_of_unsigned_and_positive_natural<T: PrimitiveUnsigned>(
@@ -405,12 +431,22 @@ pub fn pairs_of_unsigned_and_positive_natural<T: PrimitiveUnsigned>(
     }
 }
 
-// All pairs of `Natural` and positive `u32`, where the `Natural` is not divisible by the `u32`.
+// All pairs of `u32` and positive `Natural` where the `u32` is not divisible by the `Natural`.
 pub fn pairs_of_u32_and_positive_natural_var_1(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (u32, Natural)>> {
     //TODO use divisible
     Box::new(pairs_of_unsigned_and_positive_natural(gm).filter(|&(u, ref n)| u % n != 0))
+}
+
+// All pairs of `u32` and positive `Natural` where the `u32` is divisible by the `Natural`.
+pub fn pairs_of_u32_and_positive_natural_var_2(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (u32, Natural)>> {
+    Box::new(
+        pairs_of_unsigned_and_positive_natural::<u32>(gm)
+            .filter_map(|(u, n)| u32::checked_from(u * n.clone()).map(|u| (u, n))),
+    )
 }
 
 fn random_triples_of_natural_natural_and_primitive<T: PrimitiveInteger>(

@@ -39,7 +39,7 @@ fn limbs_mod_limb_fail_1() {
 }
 
 #[test]
-#[should_panic(expected = "assertion failed: limb > 0")]
+#[should_panic(expected = "assertion failed: divisor > 0")]
 fn limbs_mod_limb_fail_2() {
     limbs_mod_limb(&[10, 10], 0);
 }
