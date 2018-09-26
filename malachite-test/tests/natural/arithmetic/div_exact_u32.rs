@@ -2,14 +2,15 @@ use common::test_properties;
 use malachite_base::num::{DivExact, DivExactAssign, DivRound, One, Zero};
 use malachite_base::round::RoundingMode;
 use malachite_nz::natural::arithmetic::div_exact_u32::{
-    self, limbs_div_exact_limb, limbs_div_exact_limb_in_place, limbs_div_exact_limb_to_out,
-    limbs_invert_limb,
+    self, _limbs_div_exact_3_in_place_alt, _limbs_div_exact_3_to_out_alt, limbs_div_exact_3,
+    limbs_div_exact_3_in_place, limbs_div_exact_3_to_out, limbs_div_exact_limb,
+    limbs_div_exact_limb_in_place, limbs_div_exact_limb_to_out, limbs_invert_limb,
 };
 use malachite_nz::natural::Natural;
 use malachite_test::common::{natural_to_rug_integer, rug_integer_to_natural};
 use malachite_test::inputs::base::{
-    odd_u32s, pairs_of_u32_vec_and_positive_u32_var_2, positive_unsigneds,
-    triples_of_u32_vec_u32_vec_and_positive_u32_var_2,
+    odd_u32s, pairs_of_u32_vec_and_positive_u32_var_2, pairs_of_u32_vec_var_3, positive_unsigneds,
+    triples_of_u32_vec_u32_vec_and_positive_u32_var_2, vecs_of_unsigned_var_5,
 };
 use malachite_test::inputs::natural::{
     naturals, pairs_of_natural_and_positive_u32_var_2, pairs_of_natural_and_u32_var_3,
@@ -18,6 +19,11 @@ use malachite_test::inputs::natural::{
 use malachite_test::natural::arithmetic::div_exact_u32::rug_div_exact_u32;
 use rug;
 use std::str::FromStr;
+
+#[test]
+fn test_invert_limb_table() {
+    div_exact_u32::test_invert_limb_table();
+}
 
 #[test]
 fn test_limbs_invert_limb() {
@@ -68,14 +74,26 @@ fn test_limbs_div_exact_limb_and_limbs_div_exact_limb_in_place() {
 }
 
 #[test]
-#[should_panic(expected = "assertion failed: divisor > 0")]
-fn limbs_div_exact_limb_fail() {
-    limbs_div_exact_limb(&[10, 10], 0);
+#[should_panic(expected = "assertion failed: len > 0")]
+fn limbs_div_exact_limb_fail_1() {
+    limbs_div_exact_limb(&[], 10);
 }
 
 #[test]
 #[should_panic(expected = "assertion failed: divisor > 0")]
-fn limbs_div_exact_limb_in_place_fail() {
+fn limbs_div_exact_limb_fail_2() {
+    limbs_div_exact_limb(&[10, 10], 0);
+}
+
+#[test]
+#[should_panic(expected = "assertion failed: len > 0")]
+fn limbs_div_exact_limb_in_place_fail_1() {
+    limbs_div_exact_limb_in_place(&mut [], 10);
+}
+
+#[test]
+#[should_panic(expected = "assertion failed: divisor > 0")]
+fn limbs_div_exact_limb_in_place_fail_2() {
     limbs_div_exact_limb_in_place(&mut [10, 10], 0);
 }
 
@@ -118,20 +136,94 @@ fn test_limbs_div_exact_limb_to_out() {
 }
 
 #[test]
-#[should_panic(expected = "assertion failed: divisor > 0")]
+#[should_panic(expected = "assertion failed: len > 0")]
 fn limbs_div_exact_limb_to_out_fail_1() {
+    limbs_div_exact_limb_to_out(&mut [10, 10], &[], 10);
+}
+
+#[test]
+#[should_panic(expected = "assertion failed: divisor > 0")]
+fn limbs_div_exact_limb_to_out_fail_2() {
     limbs_div_exact_limb_to_out(&mut [10, 10], &[10, 10], 0);
 }
 
 #[test]
 #[should_panic(expected = "assertion failed: out_limbs.len() >= len")]
-fn limbs_div_exact_limb_to_out_fail_2() {
+fn limbs_div_exact_limb_to_out_fail_3() {
     limbs_div_exact_limb_to_out(&mut [10], &[10, 10], 10);
 }
 
 #[test]
-fn test_invert_limb_table() {
-    div_exact_u32::test_invert_limb_table();
+fn test_limbs_div_exact_3_and_limbs_div_exact_3_in_place() {
+    let test = |limbs: &[u32], quotient: &[u32]| {
+        let old_limbs = limbs.clone();
+        assert_eq!(limbs_div_exact_3(limbs), quotient);
+
+        let mut limbs = old_limbs.to_vec();
+        limbs_div_exact_3_in_place(&mut limbs);
+        assert_eq!(limbs, quotient);
+
+        let mut limbs = old_limbs.to_vec();
+        _limbs_div_exact_3_in_place_alt(&mut limbs);
+        assert_eq!(limbs, quotient);
+    };
+    test(&[0], &[0]);
+    test(&[6], &[2]);
+    test(&[0, 0], &[0, 0]);
+    test(&[8, 7], &[1_431_655_768, 2]);
+    test(&[100, 101, 102], &[2_863_311_564, 33, 34]);
+    test(&[0xffff_ffff, 0xffff_ffff], &[0x5555_5555, 0x5555_5555]);
+}
+
+#[test]
+#[should_panic(expected = "assertion failed: len > 0")]
+fn limbs_div_exact_3_fail() {
+    limbs_div_exact_3(&[]);
+}
+
+#[test]
+#[should_panic(expected = "assertion failed: len > 0")]
+fn limbs_div_exact_3_in_place_fail() {
+    limbs_div_exact_3_in_place(&mut []);
+}
+
+#[test]
+fn test_limbs_div_exact_3_to_out() {
+    let test = |limbs_out_before: &[u32], limbs_in: &[u32], limbs_out_after: &[u32]| {
+        let mut limbs_out = limbs_out_before.to_vec();
+        limbs_div_exact_3_to_out(&mut limbs_out, limbs_in);
+        assert_eq!(limbs_out, limbs_out_after);
+
+        let mut limbs_out = limbs_out_before.to_vec();
+        _limbs_div_exact_3_to_out_alt(&mut limbs_out, limbs_in);
+        assert_eq!(limbs_out, limbs_out_after);
+    };
+    test(&[10, 10, 10, 10], &[0], &[0, 10, 10, 10]);
+    test(&[10, 10, 10, 10], &[6], &[2, 10, 10, 10]);
+    test(&[10, 10, 10, 10], &[0, 0], &[0, 0, 10, 10]);
+    test(&[10, 10, 10, 10], &[8, 7], &[1_431_655_768, 2, 10, 10]);
+    test(
+        &[10, 10, 10, 10],
+        &[100, 101, 102],
+        &[2_863_311_564, 33, 34, 10],
+    );
+    test(
+        &[10, 10, 10, 10],
+        &[0xffff_ffff, 0xffff_ffff],
+        &[0x5555_5555, 0x5555_5555, 10, 10],
+    );
+}
+
+#[test]
+#[should_panic(expected = "assertion failed: len > 0")]
+fn limbs_div_exact_3_to_out_fail_1() {
+    limbs_div_exact_3_to_out(&mut [10, 10], &[]);
+}
+
+#[test]
+#[should_panic(expected = "assertion failed: out_limbs.len() >= len")]
+fn limbs_div_exact_3_to_out_fail_2() {
+    limbs_div_exact_3_to_out(&mut [10], &[10, 10]);
 }
 
 #[test]
@@ -301,6 +393,62 @@ fn limbs_div_exact_limb_in_place_properties() {
             );
         },
     );
+}
+
+#[test]
+fn limbs_div_exact_3_properties() {
+    test_properties(vecs_of_unsigned_var_5, |ref limbs| {
+        let quotient_limbs = Natural::from_owned_limbs_asc(limbs_div_exact_3(limbs));
+        assert_eq!(
+            Natural::from_owned_limbs_asc(limbs_div_exact_limb(limbs, 3)),
+            quotient_limbs,
+        );
+        assert_eq!(Natural::from_limbs_asc(limbs).div_exact(3), quotient_limbs);
+    });
+}
+
+#[test]
+fn limbs_div_exact_3_to_out_properties() {
+    test_properties(pairs_of_u32_vec_var_3, |&(ref out_limbs, ref in_limbs)| {
+        let mut out_limbs = out_limbs.to_vec();
+        let old_out_limbs = out_limbs.clone();
+        limbs_div_exact_3_to_out(&mut out_limbs, in_limbs);
+        let len = in_limbs.len();
+        assert_eq!(
+            Natural::from_limbs_asc(&out_limbs[..len]),
+            Natural::from_limbs_asc(in_limbs).div_exact(3)
+        );
+        assert_eq!(&out_limbs[len..], &old_out_limbs[len..]);
+
+        let mut out_limbs_alt = old_out_limbs.clone();
+        limbs_div_exact_limb_to_out(&mut out_limbs_alt, in_limbs, 3);
+        assert_eq!(out_limbs_alt, out_limbs);
+
+        let mut out_limbs_alt = old_out_limbs.clone();
+        _limbs_div_exact_3_to_out_alt(&mut out_limbs_alt, in_limbs);
+        assert_eq!(out_limbs_alt, out_limbs);
+    });
+}
+
+#[test]
+fn limbs_div_exact_3_in_place_properties() {
+    test_properties(vecs_of_unsigned_var_5, |ref limbs| {
+        let mut limbs = limbs.to_vec();
+        let old_limbs = limbs.clone();
+        limbs_div_exact_3_in_place(&mut limbs);
+        assert_eq!(
+            Natural::from_limbs_asc(&limbs),
+            Natural::from_limbs_asc(&old_limbs).div_exact(3)
+        );
+
+        let mut limbs_alt = old_limbs.clone();
+        limbs_div_exact_limb_in_place(&mut limbs_alt, 3);
+        assert_eq!(limbs_alt, limbs);
+
+        let mut limbs_alt = old_limbs.clone();
+        _limbs_div_exact_3_in_place_alt(&mut limbs_alt);
+        assert_eq!(limbs_alt, limbs);
+    });
 }
 
 fn div_exact_u32_properties_helper(n: &Natural, u: u32) {

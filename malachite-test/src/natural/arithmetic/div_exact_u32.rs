@@ -1,16 +1,17 @@
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::{
-    odd_u32s, pairs_of_u32_vec_and_positive_u32_var_2,
-    triples_of_u32_vec_u32_vec_and_positive_u32_var_2,
+    odd_u32s, pairs_of_u32_vec_and_positive_u32_var_2, pairs_of_u32_vec_var_3,
+    triples_of_u32_vec_u32_vec_and_positive_u32_var_2, vecs_of_unsigned_var_5,
 };
 use inputs::natural::{
-    nrm_pairs_of_natural_and_positive_u32_var_2, pairs_of_natural_and_positive_u32_var_2,
-    pairs_of_u32_and_positive_natural_var_2,
+    naturals_var_1, nrm_pairs_of_natural_and_positive_u32_var_2,
+    pairs_of_natural_and_positive_u32_var_2, pairs_of_u32_and_positive_natural_var_2,
 };
 use malachite_base::num::{DivExact, DivExactAssign, SignificantBits};
 use malachite_nz::natural::arithmetic::div_exact_u32::{
-    limbs_div_exact_limb, limbs_div_exact_limb_in_place, limbs_div_exact_limb_to_out,
-    limbs_invert_limb,
+    _limbs_div_exact_3_in_place_alt, _limbs_div_exact_3_to_out_alt, limbs_div_exact_3,
+    limbs_div_exact_3_in_place, limbs_div_exact_3_to_out, limbs_div_exact_limb,
+    limbs_div_exact_limb_in_place, limbs_div_exact_limb_to_out, limbs_invert_limb,
 };
 use rug;
 
@@ -19,6 +20,9 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limbs_div_exact_limb);
     register_demo!(registry, demo_limbs_div_exact_limb_to_out);
     register_demo!(registry, demo_limbs_div_exact_limb_in_place);
+    register_demo!(registry, demo_limbs_div_exact_3);
+    register_demo!(registry, demo_limbs_div_exact_3_to_out);
+    register_demo!(registry, demo_limbs_div_exact_3_in_place);
     register_demo!(registry, demo_natural_div_exact_assign_u32);
     register_demo!(registry, demo_natural_div_exact_u32);
     register_demo!(registry, demo_natural_div_exact_u32_ref);
@@ -30,6 +34,17 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_bench!(registry, Small, benchmark_limbs_div_exact_limb);
     register_bench!(registry, Small, benchmark_limbs_div_exact_limb_to_out);
     register_bench!(registry, Small, benchmark_limbs_div_exact_limb_in_place);
+    register_bench!(registry, Small, benchmark_limbs_div_exact_3);
+    register_bench!(
+        registry,
+        Small,
+        benchmark_limbs_div_exact_3_to_out_algorithms
+    );
+    register_bench!(
+        registry,
+        Small,
+        benchmark_limbs_div_exact_3_in_place_algorithms
+    );
     register_bench!(
         registry,
         Large,
@@ -38,9 +53,19 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_bench!(
         registry,
         Large,
+        benchmark_natural_div_exact_assign_3_algorithms
+    );
+    register_bench!(
+        registry,
+        Large,
         benchmark_natural_div_exact_u32_library_comparison
     );
     register_bench!(registry, Large, benchmark_natural_div_exact_u32_algorithms);
+    register_bench!(
+        registry,
+        Large,
+        benchmark_natural_div_exact_ref_3_algorithms
+    );
     register_bench!(
         registry,
         Large,
@@ -108,6 +133,41 @@ fn demo_limbs_div_exact_limb_in_place(gm: GenerationMode, limit: usize) {
         println!(
             "limbs := {:?}; limbs_div_exact_limb_in_place(&mut limbs, {}); limbs = {:?}",
             limbs_old, limb, limbs
+        );
+    }
+}
+
+fn demo_limbs_div_exact_3(gm: GenerationMode, limit: usize) {
+    for limbs in vecs_of_unsigned_var_5(gm).take(limit) {
+        println!(
+            "limbs_div_exact_3({:?}) = {:?}",
+            limbs,
+            limbs_div_exact_3(&limbs)
+        );
+    }
+}
+
+fn demo_limbs_div_exact_3_to_out(gm: GenerationMode, limit: usize) {
+    for (out_limbs, in_limbs) in pairs_of_u32_vec_var_3(gm).take(limit) {
+        let mut out_limbs = out_limbs.to_vec();
+        let mut out_limbs_old = out_limbs.clone();
+        limbs_div_exact_3_to_out(&mut out_limbs, &in_limbs);
+        println!(
+            "out_limbs := {:?}; limbs_exact_div_3_to_out(&mut out_limbs, {:?}); \
+             out_limbs = {:?}",
+            out_limbs_old, in_limbs, out_limbs
+        );
+    }
+}
+
+fn demo_limbs_div_exact_3_in_place(gm: GenerationMode, limit: usize) {
+    for limbs in vecs_of_unsigned_var_5(gm).take(limit) {
+        let mut limbs = limbs.to_vec();
+        let mut limbs_old = limbs.clone();
+        limbs_div_exact_3_in_place(&mut limbs);
+        println!(
+            "limbs := {:?}; limbs_div_exact_3_in_place(&mut limbs); limbs = {:?}",
+            limbs_old, limbs
         );
     }
 }
@@ -230,6 +290,91 @@ fn benchmark_limbs_div_exact_limb_in_place(gm: GenerationMode, limit: usize, fil
     );
 }
 
+fn benchmark_limbs_div_exact_3(gm: GenerationMode, limit: usize, file_name: &str) {
+    m_run_benchmark(
+        "limbs_div_exact_3(&[u32])",
+        BenchmarkType::Single,
+        vecs_of_unsigned_var_5(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|ref limbs| limbs.len()),
+        "limbs.len()",
+        &mut [(
+            "malachite",
+            &mut (|ref limbs| no_out!(limbs_div_exact_3(limbs))),
+        )],
+    );
+}
+
+fn benchmark_limbs_div_exact_3_to_out_algorithms(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "limbs_div_exact_limb_to_out(&mut [u32], 3)",
+        BenchmarkType::Algorithms,
+        pairs_of_u32_vec_var_3(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(_, ref in_limbs)| in_limbs.len()),
+        "in_limbs.len()",
+        &mut [
+            (
+                "limbs_div_exact_limb_to_out",
+                &mut (|(mut out_limbs, in_limbs)| {
+                    limbs_div_exact_limb_to_out(&mut out_limbs, &in_limbs, 3)
+                }),
+            ),
+            (
+                "limbs_div_exact_3_to_out",
+                &mut (|(mut out_limbs, in_limbs)| {
+                    limbs_div_exact_3_to_out(&mut out_limbs, &in_limbs)
+                }),
+            ),
+            (
+                "_limbs_div_exact_3_to_out_alt",
+                &mut (|(mut out_limbs, in_limbs)| {
+                    _limbs_div_exact_3_to_out_alt(&mut out_limbs, &in_limbs)
+                }),
+            ),
+        ],
+    );
+}
+
+fn benchmark_limbs_div_exact_3_in_place_algorithms(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "limbs_div_exact_limb_in_place(&mut [u32], 3)",
+        BenchmarkType::Algorithms,
+        vecs_of_unsigned_var_5(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|ref limbs| limbs.len()),
+        "limbs.len()",
+        &mut [
+            (
+                "limbs_div_exact_limb_in_place",
+                &mut (|mut limbs| limbs_div_exact_limb_in_place(&mut limbs, 3)),
+            ),
+            (
+                "limbs_div_exact_3_in_place",
+                &mut (|mut limbs| limbs_div_exact_3_in_place(&mut limbs)),
+            ),
+            (
+                "_limbs_div_exact_3_in_place_alt",
+                &mut (|mut limbs| _limbs_div_exact_3_in_place_alt(&mut limbs)),
+            ),
+        ],
+    );
+}
+
 fn benchmark_natural_div_exact_assign_u32_algorithms(
     gm: GenerationMode,
     limit: usize,
@@ -247,6 +392,35 @@ fn benchmark_natural_div_exact_assign_u32_algorithms(
         &mut [
             ("ordinary division", &mut (|(mut x, y)| x /= y)),
             ("exact division", &mut (|(mut x, y)| x.div_exact_assign(y))),
+            (
+                "exact division no special case 3",
+                &mut (|(mut x, y)| x._div_exact_assign_no_special_case_3(y)),
+            ),
+        ],
+    );
+}
+
+fn benchmark_natural_div_exact_assign_3_algorithms(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "Natural.div_exact_assign(3)",
+        BenchmarkType::Algorithms,
+        naturals_var_1(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|ref n| n.significant_bits() as usize),
+        "n.significant_bits()",
+        &mut [
+            ("ordinary division", &mut (|mut x| x /= 3)),
+            ("exact division", &mut (|mut x| x.div_exact_assign(3))),
+            (
+                "exact division no special case 3",
+                &mut (|mut x| x._div_exact_assign_no_special_case_3(3)),
+            ),
         ],
     );
 }
@@ -287,8 +461,36 @@ fn benchmark_natural_div_exact_u32_algorithms(gm: GenerationMode, limit: usize, 
         &(|&(ref n, _)| n.significant_bits() as usize),
         "n.significant_bits()",
         &mut [
-            ("ordinary division", &mut (|(x, y)| no_out!(x / y))),
-            ("exact division", &mut (|(x, y)| no_out!(x.div_exact(y)))),
+            ("ordinary division", &mut (|(ref x, y)| no_out!(x / y))),
+            (
+                "exact division",
+                &mut (|(ref x, y)| no_out!(x.div_exact(y))),
+            ),
+            (
+                "exact division no special case 3",
+                &mut (|(ref x, y)| no_out!(x._div_exact_no_special_case_3(y))),
+            ),
+        ],
+    );
+}
+
+fn benchmark_natural_div_exact_ref_3_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
+    m_run_benchmark(
+        "Natural.div_exact(3)",
+        BenchmarkType::Algorithms,
+        naturals_var_1(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|ref n| n.significant_bits() as usize),
+        "n.significant_bits()",
+        &mut [
+            ("ordinary division", &mut (|x| no_out!(x / 3))),
+            ("exact division", &mut (|x| no_out!(x.div_exact(3)))),
+            (
+                "exact division no special case 3",
+                &mut (|x| no_out!(x._div_exact_no_special_case_3(3))),
+            ),
         ],
     );
 }

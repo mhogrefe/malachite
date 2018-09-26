@@ -578,6 +578,15 @@ pub fn vecs_of_unsigned_var_4<T: PrimitiveUnsigned>(
     )
 }
 
+// All `Vec<T>` that are nonempty and represent a `Natural` divisible by 3.
+pub fn vecs_of_unsigned_var_5(gm: GenerationMode) -> Box<Iterator<Item = Vec<u32>>> {
+    Box::new(
+        vecs_of_unsigned(gm)
+            .filter(|ref limbs| limbs.len() > 0)
+            .map(|limbs| limbs_mul_limb(&limbs, 3)),
+    )
+}
+
 pub fn pairs_of_unsigned_vec<T: PrimitiveUnsigned>(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (Vec<T>, Vec<T>)>> {
@@ -645,6 +654,18 @@ pub fn pairs_of_u32_vec_var_2(gm: GenerationMode) -> Box<Iterator<Item = (Vec<u3
     Box::new(pairs_of_unsigned_vec(gm).filter(|&(ref xs, ref ys)| {
         xs.len() >= ys.len() && !limbs_test_zero(xs) && !limbs_test_zero(ys)
     }))
+}
+
+// All pairs of `Vec<u32>`, where the first `Vec` is at least as long as the second and the second
+// `Vec` is nonempty and represents a `Natural` divisible by 3.
+pub fn pairs_of_u32_vec_var_3(gm: GenerationMode) -> Box<Iterator<Item = (Vec<u32>, Vec<u32>)>> {
+    Box::new(
+        pairs_of_unsigned_vec(gm)
+            .map(|(out_limbs, in_limbs)| (out_limbs, limbs_mul_limb(&in_limbs, 3)))
+            .filter(|(ref out_limbs, ref in_limbs)| {
+                out_limbs.len() >= in_limbs.len() && in_limbs.len() > 0
+            }),
+    )
 }
 
 pub fn triples_of_unsigned_vec<T: PrimitiveUnsigned>(

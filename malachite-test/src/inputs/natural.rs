@@ -46,6 +46,11 @@ pub fn rm_naturals(gm: GenerationMode) -> Box<Iterator<Item = (rug::Integer, Nat
     Box::new(naturals(gm).map(|n| (natural_to_rug_integer(&n), n)))
 }
 
+// All `Natural` multiples of 3.
+pub fn naturals_var_1(gm: GenerationMode) -> Box<Iterator<Item = Natural>> {
+    Box::new(naturals(gm).map(|n| n * 3))
+}
+
 pub fn nrm_naturals(gm: GenerationMode) -> Box<Iterator<Item = (BigUint, rug::Integer, Natural)>> {
     Box::new(naturals(gm).map(|n| (natural_to_biguint(&n), natural_to_rug_integer(&n), n)))
 }
