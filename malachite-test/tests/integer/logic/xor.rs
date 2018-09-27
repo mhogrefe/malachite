@@ -418,14 +418,16 @@ fn test_xor() {
             integer_xor_alt_1(
                 &Integer::from_str(u).unwrap(),
                 &Integer::from_str(v).unwrap()
-            ).to_string(),
+            )
+            .to_string(),
             out
         );
         assert_eq!(
             integer_xor_alt_2(
                 &Integer::from_str(u).unwrap(),
                 &Integer::from_str(v).unwrap()
-            ).to_string(),
+            )
+            .to_string(),
             out
         );
 

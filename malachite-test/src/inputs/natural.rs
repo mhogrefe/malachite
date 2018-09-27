@@ -51,6 +51,11 @@ pub fn naturals_var_1(gm: GenerationMode) -> Box<Iterator<Item = Natural>> {
     Box::new(naturals(gm).map(|n| n * 3))
 }
 
+// All pairs of `Natural` multiples of 3 and `3u32`.
+pub fn pairs_of_natural_var_1_and_3(gm: GenerationMode) -> Box<Iterator<Item = (Natural, u32)>> {
+    Box::new(naturals_var_1(gm).map(|n| (n, 3)))
+}
+
 pub fn nrm_naturals(gm: GenerationMode) -> Box<Iterator<Item = (BigUint, rug::Integer, Natural)>> {
     Box::new(naturals(gm).map(|n| (natural_to_biguint(&n), natural_to_rug_integer(&n), n)))
 }
@@ -293,7 +298,8 @@ pub fn pairs_of_natural_and_unsigned_var_2<T: PrimitiveUnsigned>(
                 &EXAMPLE_SEED,
                 &(|seed| special_random_naturals(seed, scale)),
                 &(|seed| special_random_unsigned::<T>(seed)),
-            ).map(|(n, mut u)| {
+            )
+            .map(|(n, mut u)| {
                 u.set_bit(u64::from(T::WIDTH - 1));
                 (n, u)
             }),

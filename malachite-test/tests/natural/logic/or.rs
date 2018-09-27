@@ -206,14 +206,16 @@ fn test_or() {
             natural_or_alt_1(
                 &Natural::from_str(u).unwrap(),
                 &Natural::from_str(v).unwrap()
-            ).to_string(),
+            )
+            .to_string(),
             out
         );
         assert_eq!(
             natural_or_alt_2(
                 &Natural::from_str(u).unwrap(),
                 &Natural::from_str(v).unwrap()
-            ).to_string(),
+            )
+            .to_string(),
             out
         );
 

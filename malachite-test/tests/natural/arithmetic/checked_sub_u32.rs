@@ -96,7 +96,8 @@ fn sub_u32_properties() {
                         &Natural::from(u)
                             .checked_sub(u32::checked_from(n).unwrap())
                             .unwrap()
-                    ).unwrap(),
+                    )
+                    .unwrap(),
                     reverse_difference
                 );
             }

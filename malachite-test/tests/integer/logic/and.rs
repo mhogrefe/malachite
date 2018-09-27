@@ -547,14 +547,16 @@ fn test_and() {
             integer_and_alt_1(
                 &Integer::from_str(u).unwrap(),
                 &Integer::from_str(v).unwrap()
-            ).to_string(),
+            )
+            .to_string(),
             out
         );
         assert_eq!(
             integer_and_alt_2(
                 &Integer::from_str(u).unwrap(),
                 &Integer::from_str(v).unwrap()
-            ).to_string(),
+            )
+            .to_string(),
             out
         );
 
@@ -718,7 +720,8 @@ fn limbs_slice_and_neg_neg_in_place_left_properties() {
         let len = xs_old.len();
         let result = Natural::checked_from(
             -(-Natural::from_owned_limbs_asc(xs_old) & -Natural::from_limbs_asc(ys)),
-        ).unwrap();
+        )
+        .unwrap();
         let mut expected_limbs = result.to_limbs_asc();
         expected_limbs.resize(len, 0);
         assert_eq!(b, Natural::from_limbs_asc(&expected_limbs) == result);
@@ -750,7 +753,8 @@ fn limbs_slice_and_neg_neg_in_place_either_properties() {
         let len = max(xs_old.len(), ys_old.len());
         let result = Natural::checked_from(
             -(-Natural::from_limbs_asc(&xs_old) & -Natural::from_limbs_asc(&ys_old)),
-        ).unwrap();
+        )
+        .unwrap();
         let mut expected_limbs = result.to_limbs_asc();
         expected_limbs.resize(len, 0);
         assert_eq!(b, Natural::from_limbs_asc(&expected_limbs) == result);

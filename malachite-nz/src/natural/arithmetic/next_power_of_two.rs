@@ -208,11 +208,13 @@ impl<'a> NextPowerOfTwo for &'a Natural {
     /// ```
     fn next_power_of_two(self) -> Natural {
         match *self {
-            Small(small) => if let Some(result) = small.checked_next_power_of_two() {
-                Small(result)
-            } else {
-                Large(vec![0, 1])
-            },
+            Small(small) => {
+                if let Some(result) = small.checked_next_power_of_two() {
+                    Small(result)
+                } else {
+                    Large(vec![0, 1])
+                }
+            }
             Large(ref limbs) => Large(limbs_next_power_of_two(limbs)),
         }
     }

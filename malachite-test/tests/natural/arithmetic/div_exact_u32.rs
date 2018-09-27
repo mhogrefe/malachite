@@ -14,7 +14,7 @@ use malachite_test::inputs::base::{
 };
 use malachite_test::inputs::natural::{
     naturals, pairs_of_natural_and_positive_u32_var_2, pairs_of_natural_and_u32_var_3,
-    pairs_of_u32_and_positive_natural_var_2,
+    pairs_of_natural_var_1_and_3, pairs_of_u32_and_positive_natural_var_2,
 };
 use malachite_test::natural::arithmetic::div_exact_u32::rug_div_exact_u32;
 use rug;
@@ -490,6 +490,13 @@ fn div_exact_u32_properties() {
 
     test_properties(
         pairs_of_natural_and_u32_var_3,
+        |&(ref n, u): &(Natural, u32)| {
+            div_exact_u32_properties_helper(n, u);
+        },
+    );
+
+    test_properties(
+        pairs_of_natural_var_1_and_3,
         |&(ref n, u): &(Natural, u32)| {
             div_exact_u32_properties_helper(n, u);
         },

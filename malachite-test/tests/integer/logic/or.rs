@@ -376,14 +376,16 @@ fn test_or() {
             integer_or_alt_1(
                 &Integer::from_str(u).unwrap(),
                 &Integer::from_str(v).unwrap()
-            ).to_string(),
+            )
+            .to_string(),
             out
         );
         assert_eq!(
             integer_or_alt_2(
                 &Integer::from_str(u).unwrap(),
                 &Integer::from_str(v).unwrap()
-            ).to_string(),
+            )
+            .to_string(),
             out
         );
 
@@ -509,7 +511,8 @@ fn limbs_slice_or_pos_neg_in_place_left_properties() {
             let mut result_limbs = Natural::checked_from(
                 -(Integer::from(Natural::from_owned_limbs_asc(xs_old))
                     | -Natural::from_limbs_asc(ys)),
-            ).unwrap()
+            )
+            .unwrap()
             .to_limbs_asc();
             result_limbs.resize(xs.len(), 0);
             assert_eq!(result_limbs, xs);

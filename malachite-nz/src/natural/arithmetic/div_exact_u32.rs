@@ -540,11 +540,13 @@ impl DivExactAssign<u32> for Natural {
                     *small /= other;
                     return;
                 }
-                Large(ref mut limbs) => if other == 3 {
-                    limbs_div_exact_3_in_place(limbs)
-                } else {
-                    limbs_div_exact_limb_in_place(limbs, other)
-                },
+                Large(ref mut limbs) => {
+                    if other == 3 {
+                        limbs_div_exact_3_in_place(limbs)
+                    } else {
+                        limbs_div_exact_limb_in_place(limbs, other)
+                    }
+                }
             }
             self.trim();
         }

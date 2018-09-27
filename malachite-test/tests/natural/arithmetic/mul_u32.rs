@@ -19,9 +19,13 @@ use rug::{self, Assign};
 use std::str::FromStr;
 
 #[test]
-fn test_limbs_mul_limb() {
+fn test_limbs_mul_limb_and_limbs_vec_mul_limb_in_place() {
     let test = |limbs: &[u32], limb: u32, out: &[u32]| {
         assert_eq!(limbs_mul_limb(limbs, limb), out);
+
+        let mut limbs = limbs.to_vec();
+        limbs_vec_mul_limb_in_place(&mut limbs, limb);
+        assert_eq!(limbs, out);
     };
     test(&[], 0, &[]);
     test(&[], 5, &[]);
@@ -105,23 +109,6 @@ fn test_limbs_slice_mul_limb_in_place() {
     test(&[0xffff_ffff, 5], 2, 0, &[4_294_967_294, 11]);
     test(&[0xffff_ffff], 2, 1, &[4_294_967_294]);
     test(&[0xffff_ffff], 0xffff_ffff, 4_294_967_294, &[1]);
-}
-
-#[test]
-fn test_limbs_vec_mul_limb_in_place() {
-    let test = |limbs: &[u32], limb: u32, out: &[u32]| {
-        let mut limbs = limbs.to_vec();
-        limbs_vec_mul_limb_in_place(&mut limbs, limb);
-        assert_eq!(limbs, out);
-    };
-    test(&[], 0, &[]);
-    test(&[], 5, &[]);
-    test(&[6, 7], 2, &[12, 14]);
-    test(&[100, 101, 102], 10, &[1000, 1010, 1020]);
-    test(&[123, 456], 789, &[97_047, 359_784]);
-    test(&[0xffff_ffff, 5], 2, &[4_294_967_294, 11]);
-    test(&[0xffff_ffff], 2, &[4_294_967_294, 1]);
-    test(&[0xffff_ffff], 0xffff_ffff, &[1, 4_294_967_294]);
 }
 
 #[test]
