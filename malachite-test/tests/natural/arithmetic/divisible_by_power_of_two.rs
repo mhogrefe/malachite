@@ -1,9 +1,12 @@
 use common::test_properties;
+use malachite_base::misc::CheckedFrom;
 use malachite_base::num::{DivisibleByPowerOfTwo, Zero};
 use malachite_nz::natural::arithmetic::divisible_by_power_of_two::limbs_divisible_by_power_of_two;
 use malachite_nz::natural::Natural;
+use malachite_test::common::natural_to_rug_integer;
 use malachite_test::inputs::base::{pairs_of_unsigned_vec_and_small_u64_var_1, unsigneds};
 use malachite_test::inputs::natural::{naturals, pairs_of_natural_and_small_unsigned};
+use rug;
 use std::str::FromStr;
 
 #[test]
@@ -31,6 +34,12 @@ fn test_divisible_by_power_of_two() {
     let test = |n, pow, out| {
         assert_eq!(
             Natural::from_str(n).unwrap().divisible_by_power_of_two(pow),
+            out
+        );
+        assert_eq!(
+            rug::Integer::from_str(n)
+                .unwrap()
+                .is_divisible_2pow(u32::checked_from(pow).unwrap()),
             out
         );
     };
@@ -71,6 +80,10 @@ fn limbs_divisible_by_power_of_two_properties() {
 fn divisible_by_power_of_two_properties() {
     test_properties(pairs_of_natural_and_small_unsigned, |&(ref x, pow)| {
         let divisible = x.divisible_by_power_of_two(pow);
+        assert_eq!(
+            natural_to_rug_integer(x).is_divisible_2pow(u32::checked_from(pow).unwrap()),
+            divisible
+        );
         if *x != 0 {
             assert_eq!(x.trailing_zeros().unwrap() >= u64::from(pow), divisible);
         }

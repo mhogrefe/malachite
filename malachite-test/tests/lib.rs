@@ -158,6 +158,7 @@ pub mod natural {
         pub mod div_round_u32;
         pub mod div_u32;
         pub mod divisible_by_power_of_two;
+        pub mod divisible_by_u32;
         pub mod eq_mod_power_of_two;
         pub mod eq_mod_power_of_two_u32;
         pub mod is_power_of_two;

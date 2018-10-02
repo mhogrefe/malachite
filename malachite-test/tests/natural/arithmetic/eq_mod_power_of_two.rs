@@ -1,12 +1,16 @@
 use common::test_properties;
+use malachite_base::misc::CheckedFrom;
 use malachite_base::num::{DivisibleByPowerOfTwo, EqModPowerOfTwo, ModPowerOfTwo, Zero};
 use malachite_nz::natural::arithmetic::eq_mod_power_of_two::limbs_eq_mod_power_of_two;
 use malachite_nz::natural::Natural;
+use malachite_test::common::natural_to_rug_integer;
 use malachite_test::inputs::base::triples_of_unsigned_vec_unsigned_vec_and_small_unsigned_var_1;
 use malachite_test::inputs::natural::{
-    pairs_of_natural_and_small_unsigned, quadruples_of_natural_natural_natural_and_small_unsigned,
+    pairs_of_natural_and_small_unsigned, pairs_of_naturals,
+    quadruples_of_natural_natural_natural_and_small_unsigned,
     triples_of_natural_natural_and_small_unsigned,
 };
+use rug;
 use std::str::FromStr;
 
 #[test]
@@ -48,6 +52,13 @@ fn test_eq_mod_power_of_two() {
                 .eq_mod_power_of_two(&Natural::from_str(y).unwrap(), pow),
             out
         );
+        assert_eq!(
+            rug::Integer::from_str(x).unwrap().is_congruent_2pow(
+                &rug::Integer::from_str(y).unwrap(),
+                u32::checked_from(pow).unwrap()
+            ),
+            out
+        );
     };
     test("0", "256", 8, true);
     test("0", "256", 9, false);
@@ -83,6 +94,11 @@ fn eq_mod_power_of_two_properties() {
         triples_of_natural_natural_and_small_unsigned,
         |&(ref x, ref y, pow)| {
             let eq_mod_power_of_two = x.eq_mod_power_of_two(y, pow);
+            assert_eq!(
+                natural_to_rug_integer(x)
+                    .is_congruent_2pow(&natural_to_rug_integer(y), u32::checked_from(pow).unwrap()),
+                eq_mod_power_of_two
+            );
             assert_eq!(y.eq_mod_power_of_two(x, pow), eq_mod_power_of_two);
             assert_eq!(
                 x.mod_power_of_two(pow) == y.mod_power_of_two(pow),
@@ -111,4 +127,8 @@ fn eq_mod_power_of_two_properties() {
             }
         },
     );
+
+    test_properties(pairs_of_naturals, |&(ref x, ref y)| {
+        assert!(x.eq_mod_power_of_two(y, 0));
+    });
 }

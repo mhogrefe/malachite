@@ -515,6 +515,10 @@ pub trait DivExactAssign<RHS = Self> {
     fn div_exact_assign(&mut self, rhs: RHS);
 }
 
+pub trait DivisibleBy<RHS = Self> {
+    fn divisible_by(&self, rhs: &RHS) -> bool;
+}
+
 //TODO is_positive, is_negative, sign
 
 macro_rules! lossless_checked_from_impl {
@@ -726,6 +730,9 @@ pub trait PrimitiveInteger:
     + Div<Output = Self>
     + DivAssign
     + DivAssignRem<RemOutput = Self>
+    + DivExact
+    + DivExactAssign
+    + DivisibleBy
     + DivisibleByPowerOfTwo
     + DivRem<DivOutput = Self, RemOutput = Self>
     + Endian
@@ -1549,6 +1556,13 @@ macro_rules! integer_traits {
             #[inline]
             fn div_exact_assign(&mut self, rhs: $t) {
                 *self /= rhs;
+            }
+        }
+
+        impl DivisibleBy for $t {
+            #[inline]
+            fn divisible_by(&self, rhs: &$t) -> bool {
+                *self == 0 || *rhs != 0 && *self % rhs == 0
             }
         }
     };

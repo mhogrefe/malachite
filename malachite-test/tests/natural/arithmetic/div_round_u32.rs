@@ -1,5 +1,5 @@
 use common::test_properties;
-use malachite_base::num::{CeilingDivNegMod, DivRound, DivRoundAssign, One, Zero};
+use malachite_base::num::{CeilingDivNegMod, DivRound, DivRoundAssign, DivisibleBy, One, Zero};
 use malachite_base::round::RoundingMode;
 use malachite_nz::natural::arithmetic::div_round_u32::limbs_limb_div_round_limbs;
 use malachite_nz::natural::Natural;
@@ -396,8 +396,7 @@ fn limbs_limb_div_round_limbs_properties() {
                 assert_eq!(quotient, limb.div_round(n, rm));
             } else {
                 assert_eq!(rm, RoundingMode::Exact);
-                //TODO use divisible
-                assert_ne!(limb % n, 0);
+                assert!(!limb.divisible_by(&n));
             }
         },
     );

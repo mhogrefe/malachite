@@ -16,8 +16,8 @@ use malachite_test::inputs::base::{
     triples_of_unsigned_vec_unsigned_vec_and_positive_unsigned_var_1,
 };
 use malachite_test::inputs::natural::{
-    naturals, pairs_of_natural_and_positive_unsigned, pairs_of_natural_and_unsigned_var_2,
-    pairs_of_unsigned_and_positive_natural,
+    naturals, pairs_of_natural_and_positive_u32_var_2, pairs_of_natural_and_positive_unsigned,
+    pairs_of_natural_and_unsigned_var_2, pairs_of_unsigned_and_positive_natural,
 };
 use malachite_test::natural::arithmetic::div_mod_u32::{
     num_div_mod_u32, num_div_rem_u32, rug_ceiling_div_neg_mod_u32, rug_div_mod_u32, rug_div_rem_u32,
@@ -597,6 +597,13 @@ fn div_mod_u32_properties() {
     );
 
     test_properties(
+        pairs_of_natural_and_positive_u32_var_2,
+        |&(ref n, u): &(Natural, u32)| {
+            div_mod_u32_properties_helper(n, u);
+        },
+    );
+
+    test_properties(
         pairs_of_unsigned_and_positive_natural,
         |&(u, ref n): &(u32, Natural)| {
             let (quotient, remainder) = u.div_mod(n);
@@ -694,6 +701,13 @@ fn ceiling_div_neg_mod_u32_properties() {
 
     test_properties(
         pairs_of_natural_and_unsigned_var_2,
+        |&(ref n, u): &(Natural, u32)| {
+            ceiling_div_neg_mod_u32_properties_helper(n, u);
+        },
+    );
+
+    test_properties(
+        pairs_of_natural_and_positive_u32_var_2,
         |&(ref n, u): &(Natural, u32)| {
             ceiling_div_neg_mod_u32_properties_helper(n, u);
         },

@@ -1,6 +1,9 @@
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::pairs_of_unsigned_vec_and_small_u64_var_1;
-use inputs::natural::pairs_of_natural_and_small_unsigned;
+use inputs::natural::{
+    pairs_of_natural_and_small_unsigned, rm_pairs_of_natural_and_small_unsigned,
+};
+use malachite_base::misc::CheckedFrom;
 use malachite_base::num::{DivisibleByPowerOfTwo, SignificantBits};
 use malachite_nz::natural::arithmetic::divisible_by_power_of_two::limbs_divisible_by_power_of_two;
 use std::cmp::min;
@@ -9,6 +12,11 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limbs_divisible_by_power_of_two);
     register_demo!(registry, demo_natural_divisible_by_power_of_two);
     register_bench!(registry, Small, benchmark_limbs_divisible_by_power_of_two);
+    register_bench!(
+        registry,
+        Large,
+        benchmark_natural_divisible_by_power_of_two_library_comparison
+    );
     register_bench!(
         registry,
         Large,
@@ -51,6 +59,35 @@ fn benchmark_limbs_divisible_by_power_of_two(gm: GenerationMode, limit: usize, f
             "malachite",
             &mut (|(limbs, pow)| no_out!(limbs_divisible_by_power_of_two(&limbs, pow))),
         )],
+    );
+}
+
+fn benchmark_natural_divisible_by_power_of_two_library_comparison(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "Natural.divisible_by_power_of_two(u64)",
+        BenchmarkType::LibraryComparison,
+        rm_pairs_of_natural_and_small_unsigned(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(_, (ref n, _))| n.significant_bits() as usize),
+        "n.significant_bits()",
+        &mut [
+            (
+                "malachite",
+                &mut (|(_, (n, pow))| no_out!(n.divisible_by_power_of_two(pow))),
+            ),
+            (
+                "rug",
+                &mut (|((n, pow), _)| {
+                    no_out!(n.is_divisible_2pow(u32::checked_from(pow).unwrap()))
+                }),
+            ),
+        ],
     );
 }
 

@@ -1,6 +1,9 @@
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::triples_of_unsigned_vec_unsigned_vec_and_small_unsigned_var_1;
-use inputs::natural::triples_of_natural_natural_and_small_unsigned;
+use inputs::natural::{
+    rm_triples_of_natural_natural_and_small_unsigned, triples_of_natural_natural_and_small_unsigned,
+};
+use malachite_base::misc::CheckedFrom;
 use malachite_base::num::{EqModPowerOfTwo, ModPowerOfTwo, SignificantBits};
 use malachite_nz::natural::arithmetic::eq_mod_power_of_two::limbs_eq_mod_power_of_two;
 
@@ -8,6 +11,11 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limbs_eq_mod_power_of_two);
     register_demo!(registry, demo_natural_eq_mod_power_of_two);
     register_bench!(registry, Small, benchmark_limbs_eq_mod_power_of_two);
+    register_bench!(
+        registry,
+        Large,
+        benchmark_natural_eq_mod_power_of_two_library_comparison
+    );
     register_bench!(
         registry,
         Large,
@@ -55,6 +63,35 @@ fn benchmark_limbs_eq_mod_power_of_two(gm: GenerationMode, limit: usize, file_na
             "malachite",
             &mut (|(ref xs, ref ys, pow)| no_out!(limbs_eq_mod_power_of_two(xs, ys, pow))),
         )],
+    );
+}
+
+fn benchmark_natural_eq_mod_power_of_two_library_comparison(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "Natural.eq_mod_power_of_two(&Natural, u64)",
+        BenchmarkType::LibraryComparison,
+        rm_triples_of_natural_natural_and_small_unsigned::<u64>(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(_, (ref n, _, _))| n.significant_bits() as usize),
+        "n.significant_bits()",
+        &mut [
+            (
+                "malachite",
+                &mut (|(_, (ref n, ref u, pow))| no_out!(n.eq_mod_power_of_two(u, pow))),
+            ),
+            (
+                "rug",
+                &mut (|((ref n, ref u, pow), _)| {
+                    no_out!(n.is_congruent_2pow(u, u32::checked_from(pow).unwrap()))
+                }),
+            ),
+        ],
     );
 }
 

@@ -10,8 +10,9 @@ use malachite_test::inputs::base::{
     pairs_of_unsigned_vec_and_positive_unsigned_var_1, positive_unsigneds,
 };
 use malachite_test::inputs::natural::{
-    naturals, pairs_of_natural_and_positive_unsigned, pairs_of_natural_and_unsigned_var_2,
-    pairs_of_unsigned_and_positive_natural,
+    naturals, pairs_of_natural_and_positive_u32_var_2, pairs_of_natural_and_positive_unsigned,
+    pairs_of_natural_and_unsigned_var_2, pairs_of_unsigned_and_positive_natural,
+    triples_of_natural_natural_and_positive_unsigned,
 };
 use malachite_test::natural::arithmetic::mod_u32::{num_rem_u32, rug_neg_mod_u32};
 use num::BigUint;
@@ -364,6 +365,13 @@ fn mod_u32_properties() {
     );
 
     test_properties(
+        pairs_of_natural_and_positive_u32_var_2,
+        |&(ref n, u): &(Natural, u32)| {
+            mod_u32_properties_helper(n, u);
+        },
+    );
+
+    test_properties(
         pairs_of_unsigned_and_positive_natural,
         |&(u, ref n): &(u32, Natural)| {
             let remainder = u % n;
@@ -407,6 +415,17 @@ fn mod_u32_properties() {
             assert_eq!(Natural::ONE % u, 1);
         }
     });
+
+    test_properties(
+        triples_of_natural_natural_and_positive_unsigned,
+        |&(ref x, ref y, u)| {
+            assert_eq!(
+                (x + y) % u,
+                (Natural::from(x % u) + Natural::from(y % u)) % u,
+            );
+            assert_eq!(x * y % u, Natural::from(x % u) * Natural::from(y % u) % u,);
+        },
+    );
 }
 
 fn neg_mod_u32_properties_helper(n: &Natural, u: u32) {
@@ -444,6 +463,13 @@ fn neg_mod_u32_properties() {
     );
 
     test_properties(
+        pairs_of_natural_and_positive_u32_var_2,
+        |&(ref n, u): &(Natural, u32)| {
+            neg_mod_u32_properties_helper(n, u);
+        },
+    );
+
+    test_properties(
         pairs_of_unsigned_and_positive_natural,
         |&(u, ref n): &(u32, Natural)| {
             let remainder = u.neg_mod(n);
@@ -470,4 +496,18 @@ fn neg_mod_u32_properties() {
             assert_eq!(Natural::ONE.neg_mod(u), u - 1);
         }
     });
+
+    test_properties(
+        triples_of_natural_natural_and_positive_unsigned,
+        |&(ref x, ref y, u)| {
+            assert_eq!(
+                (x + y).neg_mod(u),
+                (Natural::from(x % u) + Natural::from(y % u)).neg_mod(u)
+            );
+            assert_eq!(
+                (x * y).neg_mod(u),
+                (Natural::from(x % u) * Natural::from(y % u)).neg_mod(u)
+            );
+        },
+    );
 }

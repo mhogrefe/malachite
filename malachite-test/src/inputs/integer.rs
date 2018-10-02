@@ -734,6 +734,18 @@ pub fn triples_of_integer_unsigned_and_small_unsigned<
     }
 }
 
+pub fn rm_triples_of_integer_unsigned_and_small_unsigned<
+    T: PrimitiveUnsigned,
+    U: PrimitiveUnsigned,
+>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = ((rug::Integer, T, U), (Integer, T, U))>> {
+    Box::new(
+        triples_of_integer_unsigned_and_small_unsigned(gm)
+            .map(|(x, y, z)| ((integer_to_rug_integer(&x), y, z), (x, y, z))),
+    )
+}
+
 pub fn triples_of_integer_signed_and_small_unsigned<T: PrimitiveSigned, U: PrimitiveUnsigned>(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (Integer, T, U)>> {
@@ -756,6 +768,15 @@ pub fn triples_of_integer_signed_and_small_unsigned<T: PrimitiveSigned, U: Primi
             &(|seed| u32s_geometric(seed, scale).flat_map(U::checked_from)),
         )),
     }
+}
+
+pub fn rm_triples_of_integer_signed_and_small_unsigned<T: PrimitiveSigned, U: PrimitiveUnsigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = ((rug::Integer, T, U), (Integer, T, U))>> {
+    Box::new(
+        triples_of_integer_signed_and_small_unsigned(gm)
+            .map(|(x, y, z)| ((integer_to_rug_integer(&x), y, z), (x, y, z))),
+    )
 }
 
 pub fn pairs_of_integer_and_natural(
@@ -924,6 +945,19 @@ pub fn triples_of_integer_integer_and_small_unsigned<T: PrimitiveUnsigned>(
             &(|seed| u32s_geometric(seed, scale).flat_map(T::checked_from)),
         )),
     }
+}
+
+pub fn rm_triples_of_integer_integer_and_small_unsigned<T: PrimitiveUnsigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = ((rug::Integer, rug::Integer, T), (Integer, Integer, T))>> {
+    Box::new(
+        triples_of_integer_integer_and_small_unsigned(gm).map(|(x, y, z)| {
+            (
+                (integer_to_rug_integer(&x), integer_to_rug_integer(&y), z),
+                (x, y, z),
+            )
+        }),
+    )
 }
 
 pub fn triples_of_integer_small_u64_and_bool(

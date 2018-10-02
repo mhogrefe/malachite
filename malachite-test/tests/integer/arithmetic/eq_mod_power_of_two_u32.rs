@@ -3,12 +3,15 @@ use malachite_base::num::{DivisibleByPowerOfTwo, EqModPowerOfTwo, ModPowerOfTwo,
 use malachite_nz::integer::arithmetic::eq_mod_power_of_two_u32::limbs_eq_mod_power_of_two_neg_limb;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
+use malachite_test::common::integer_to_rug_integer;
 use malachite_test::inputs::base::{
     pairs_of_unsigned_and_small_unsigned, triples_of_unsigned_vec_unsigned_and_small_unsigned_var_2,
 };
 use malachite_test::inputs::integer::{
     pairs_of_integer_and_small_unsigned, triples_of_integer_unsigned_and_small_unsigned,
 };
+use malachite_test::natural::arithmetic::eq_mod_power_of_two_u32::rug_eq_mod_power_of_two_u32;
+use rug;
 use std::str::FromStr;
 use std::u32;
 
@@ -37,6 +40,10 @@ fn test_eq_mod_power_of_two_u32() {
     let test = |n, u: u32, pow, out| {
         assert_eq!(
             Integer::from_str(n).unwrap().eq_mod_power_of_two(&u, pow),
+            out
+        );
+        assert_eq!(
+            rug_eq_mod_power_of_two_u32(&rug::Integer::from_str(n).unwrap(), &u, pow),
             out
         );
     };
@@ -90,6 +97,10 @@ fn eq_mod_power_of_two_u32_properties() {
         triples_of_integer_unsigned_and_small_unsigned::<u32, u64>,
         |&(ref n, u, pow)| {
             let eq_mod_power_of_two = n.eq_mod_power_of_two(&u, pow);
+            assert_eq!(
+                rug_eq_mod_power_of_two_u32(&integer_to_rug_integer(n), &u, pow),
+                eq_mod_power_of_two
+            );
             assert_eq!(
                 n.mod_power_of_two(pow) == u.mod_power_of_two(pow),
                 eq_mod_power_of_two,

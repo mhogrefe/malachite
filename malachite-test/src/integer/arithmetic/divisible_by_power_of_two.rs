@@ -1,9 +1,17 @@
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::integer::pairs_of_integer_and_small_unsigned;
+use inputs::integer::{
+    pairs_of_integer_and_small_unsigned, rm_pairs_of_integer_and_small_unsigned,
+};
+use malachite_base::misc::CheckedFrom;
 use malachite_base::num::{DivisibleByPowerOfTwo, SignificantBits};
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_integer_divisible_by_power_of_two);
+    register_bench!(
+        registry,
+        Large,
+        benchmark_integer_divisible_by_power_of_two_library_comparison
+    );
     register_bench!(
         registry,
         Large,
@@ -19,6 +27,35 @@ fn demo_integer_divisible_by_power_of_two(gm: GenerationMode, limit: usize) {
             println!("{} is not divisible by 2^{}", n, pow);
         }
     }
+}
+
+fn benchmark_integer_divisible_by_power_of_two_library_comparison(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "Integer.divisible_by_power_of_two(u64)",
+        BenchmarkType::LibraryComparison,
+        rm_pairs_of_integer_and_small_unsigned(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(_, (ref n, _))| n.significant_bits() as usize),
+        "n.significant_bits()",
+        &mut [
+            (
+                "malachite",
+                &mut (|(_, (n, pow))| no_out!(n.divisible_by_power_of_two(pow))),
+            ),
+            (
+                "rug",
+                &mut (|((n, pow), _)| {
+                    no_out!(n.is_divisible_2pow(u32::checked_from(pow).unwrap()))
+                }),
+            ),
+        ],
+    );
 }
 
 fn benchmark_integer_divisible_by_power_of_two_algorithms(

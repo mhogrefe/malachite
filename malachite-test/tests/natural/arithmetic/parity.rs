@@ -1,5 +1,5 @@
 use common::test_properties;
-use malachite_base::num::Parity;
+use malachite_base::num::{DivisibleBy, Parity};
 use malachite_nz::natural::Natural;
 use malachite_test::inputs::natural::naturals;
 use std::str::FromStr;
@@ -36,7 +36,7 @@ fn test_is_odd() {
 fn is_even_properties() {
     test_properties(naturals, |x| {
         let is_even = x.is_even();
-        assert_eq!(x % 2 == 0, is_even);
+        assert_eq!(x.divisible_by(&2), is_even);
         assert_eq!(!x.is_odd(), is_even);
         assert_eq!((x + 1).is_odd(), is_even);
     });
@@ -46,7 +46,7 @@ fn is_even_properties() {
 fn is_odd_properties() {
     test_properties(naturals, |x| {
         let is_odd = x.is_odd();
-        assert_eq!(x % 2 != 0, is_odd);
+        assert_eq!(!x.divisible_by(&2), is_odd);
         assert_eq!(!x.is_even(), is_odd);
         assert_eq!((x + 1).is_even(), is_odd);
     });

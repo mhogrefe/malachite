@@ -3,7 +3,7 @@ use malachite_base::num::{DivisibleByPowerOfTwo, PrimitiveInteger};
 use natural::Natural::{self, Large, Small};
 
 /// Interpreting a slice of `u32`s as the limbs of a `Natural` in ascending order, determines
-/// whether that `Natural` divisible by 2 raised to a given power.
+/// whether that `Natural` is divisible by 2 raised to a given power.
 ///
 /// This function assumes that `limbs` is nonempty and does not only contain zeros.
 ///

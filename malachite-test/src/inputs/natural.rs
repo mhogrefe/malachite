@@ -3,7 +3,8 @@ use inputs::base::pairs_of_unsigneds;
 use inputs::common::{reshape_1_2_to_3, reshape_2_1_to_3};
 use malachite_base::misc::CheckedFrom;
 use malachite_base::num::{
-    DivisibleByPowerOfTwo, PrimitiveInteger, PrimitiveSigned, PrimitiveUnsigned, SignificantBits,
+    DivisibleBy, DivisibleByPowerOfTwo, PrimitiveInteger, PrimitiveSigned, PrimitiveUnsigned,
+    SignificantBits,
 };
 use malachite_base::round::RoundingMode;
 use malachite_nz::natural::Natural;
@@ -392,7 +393,7 @@ pub fn pairs_of_natural_and_positive_u32_var_1(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (Natural, u32)>> {
     //TODO use divisible
-    Box::new(pairs_of_natural_and_positive_unsigned(gm).filter(|&(ref n, u)| n % u != 0))
+    Box::new(pairs_of_natural_and_positive_unsigned(gm).filter(|&(ref n, u)| !n.divisible_by(&u)))
 }
 
 // All triples of `Natural` and positive `T`, where `T` is unsigned and the `Natural` is divisible
@@ -446,8 +447,9 @@ pub fn pairs_of_unsigned_and_positive_natural<T: PrimitiveUnsigned>(
 pub fn pairs_of_u32_and_positive_natural_var_1(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (u32, Natural)>> {
-    //TODO use divisible
-    Box::new(pairs_of_unsigned_and_positive_natural(gm).filter(|&(u, ref n)| u % n != 0))
+    Box::new(
+        pairs_of_unsigned_and_positive_natural::<u32>(gm).filter(|&(u, ref n)| !u.divisible_by(n)),
+    )
 }
 
 // All pairs of `u32` and positive `Natural` where the `u32` is divisible by the `Natural`.
@@ -632,6 +634,30 @@ pub fn triples_of_natural_small_unsigned_and_small_unsigned<T: PrimitiveUnsigned
     }
 }
 
+pub fn triples_of_natural_natural_and_positive_unsigned<T: PrimitiveUnsigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (Natural, Natural, T)>> {
+    match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_triples(
+            exhaustive_naturals(),
+            exhaustive_naturals(),
+            exhaustive_positive(),
+        )),
+        GenerationMode::Random(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| random_naturals(seed, scale)),
+            &(|seed| random_naturals(seed, scale)),
+            &(|seed| random_positive_unsigned(seed)),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_naturals(seed, scale)),
+            &(|seed| special_random_naturals(seed, scale)),
+            &(|seed| special_random_positive_unsigned(seed)),
+        )),
+    }
+}
+
 fn random_triples_of_natural_primitive_and_natural<T: PrimitiveInteger>(
     scale: u32,
 ) -> Box<Iterator<Item = (Natural, T, Natural)>> {
@@ -727,6 +753,19 @@ pub fn triples_of_natural_natural_and_small_unsigned<T: PrimitiveUnsigned>(
     }
 }
 
+pub fn rm_triples_of_natural_natural_and_small_unsigned<T: PrimitiveUnsigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = ((rug::Integer, rug::Integer, T), (Natural, Natural, T))>> {
+    Box::new(
+        triples_of_natural_natural_and_small_unsigned(gm).map(|(x, y, z)| {
+            (
+                (natural_to_rug_integer(&x), natural_to_rug_integer(&y), z),
+                (x, y, z),
+            )
+        }),
+    )
+}
+
 pub fn triples_of_natural_unsigned_and_unsigned<T: PrimitiveUnsigned>(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (Natural, T, T)>> {
@@ -771,6 +810,18 @@ pub fn triples_of_natural_unsigned_and_small_unsigned<
             &(|seed| u32s_geometric(seed, scale).flat_map(U::checked_from)),
         )),
     }
+}
+
+pub fn rm_triples_of_natural_unsigned_and_small_unsigned<
+    T: PrimitiveUnsigned,
+    U: PrimitiveUnsigned,
+>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = ((rug::Integer, T, U), (Natural, T, U))>> {
+    Box::new(
+        triples_of_natural_unsigned_and_small_unsigned(gm)
+            .map(|(x, y, z)| ((natural_to_rug_integer(&x), y, z), (x, y, z))),
+    )
 }
 
 pub fn triples_of_natural_small_u64_and_bool(
