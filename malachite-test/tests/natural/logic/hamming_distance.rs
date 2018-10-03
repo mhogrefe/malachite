@@ -16,6 +16,7 @@ use malachite_test::natural::logic::hamming_distance::{
 use rug;
 use std::str::FromStr;
 
+//TODO continue deduplication
 #[test]
 fn test_limbs_hamming_distance_same_length() {
     let test = |xs, ys, out| {

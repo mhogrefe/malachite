@@ -23,9 +23,13 @@ use std::cmp::max;
 use std::str::FromStr;
 
 #[test]
-fn test_limbs_and() {
-    let test = |xs, ys, out| {
-        assert_eq!(limbs_and(xs, ys), out);
+fn test_limbs_and_and_limbs_vec_and_in_place_left() {
+    let test = |xs_before, ys, out| {
+        assert_eq!(limbs_and(xs_before, ys), out);
+
+        let mut xs = xs_before.to_vec();
+        limbs_vec_and_in_place_left(&mut xs, ys);
+        assert_eq!(xs, out);
     };
     test(&[], &[], vec![]);
     test(&[2], &[3], vec![2]);
@@ -134,23 +138,6 @@ fn test_limbs_slice_and_in_place_left() {
         None,
         vec![100, 101, 100],
     );
-}
-
-#[test]
-fn test_limbs_vec_and_in_place_left() {
-    let test = |xs_before: &[u32], ys, xs_after| {
-        let mut xs = xs_before.to_vec();
-        limbs_vec_and_in_place_left(&mut xs, ys);
-        assert_eq!(xs, xs_after);
-    };
-    test(&[], &[], vec![]);
-    test(&[6, 7], &[1, 2], vec![0, 2]);
-    test(&[6, 7], &[1, 2, 3], vec![0, 2]);
-    test(&[1, 2, 3], &[6, 7], vec![0, 2]);
-    test(&[], &[1, 2, 3], vec![]);
-    test(&[1, 2, 3], &[], vec![]);
-    test(&[1, 1, 1], &[1, 2, 3], vec![1, 0, 1]);
-    test(&[100, 101, 102], &[102, 101, 100], vec![100, 101, 100]);
 }
 
 #[test]
@@ -286,17 +273,26 @@ fn limbs_and_to_out_properties() {
     );
 }
 
+macro_rules! limbs_and_in_place_left_helper {
+    ($f:ident, $xs:ident, $ys:ident) => {
+        |&(ref $xs, ref $ys)| {
+            let mut xs = $xs.to_vec();
+            let xs_old = xs.clone();
+            $f(&mut xs, $ys);
+            assert_eq!(
+                Natural::from_owned_limbs_asc(xs),
+                Natural::from_owned_limbs_asc(xs_old) & Natural::from_limbs_asc($ys)
+            );
+        }
+    };
+}
+
 #[test]
 fn limbs_slice_and_same_length_in_place_left_properties() {
-    test_properties(pairs_of_unsigned_vec_var_1, |&(ref xs, ref ys)| {
-        let mut xs = xs.to_vec();
-        let xs_old = xs.clone();
-        limbs_slice_and_same_length_in_place_left(&mut xs, ys);
-        assert_eq!(
-            Natural::from_owned_limbs_asc(xs),
-            Natural::from_owned_limbs_asc(xs_old) & Natural::from_limbs_asc(ys)
-        );
-    });
+    test_properties(
+        pairs_of_unsigned_vec_var_1,
+        limbs_and_in_place_left_helper!(limbs_slice_and_same_length_in_place_left, xs, ys),
+    );
 }
 
 #[test]
@@ -317,15 +313,10 @@ fn limbs_slice_and_in_place_left_properties() {
 
 #[test]
 fn limbs_vec_and_in_place_left_properties() {
-    test_properties(pairs_of_unsigned_vec, |&(ref xs, ref ys)| {
-        let mut xs = xs.to_vec();
-        let xs_old = xs.clone();
-        limbs_vec_and_in_place_left(&mut xs, ys);
-        assert_eq!(
-            Natural::from_owned_limbs_asc(xs),
-            Natural::from_owned_limbs_asc(xs_old) & Natural::from_limbs_asc(ys)
-        );
-    });
+    test_properties(
+        pairs_of_unsigned_vec,
+        limbs_and_in_place_left_helper!(limbs_vec_and_in_place_left, xs, ys),
+    );
 }
 
 #[test]
