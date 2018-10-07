@@ -12,7 +12,7 @@ use malachite_test::inputs::base::{
     triples_of_unsigned_vec_unsigned_vec_and_positive_unsigned_var_1,
 };
 use malachite_test::inputs::natural::{
-    naturals, pairs_of_natural_and_positive_u32_var_2, pairs_of_natural_and_positive_unsigned,
+    naturals, pairs_of_natural_and_positive_u32_var_1, pairs_of_natural_and_positive_unsigned,
     pairs_of_natural_and_unsigned_var_2, pairs_of_unsigned_and_positive_natural,
 };
 use num::BigUint;
@@ -331,7 +331,7 @@ fn div_u32_properties() {
     );
 
     test_properties(
-        pairs_of_natural_and_positive_u32_var_2,
+        pairs_of_natural_and_positive_u32_var_1,
         |&(ref n, u): &(Natural, u32)| {
             div_u32_properties_helper(n, u);
         },

@@ -4,8 +4,8 @@ use inputs::base::{
     triples_of_u32_vec_u32_vec_and_positive_u32_var_2, vecs_of_unsigned_var_5,
 };
 use inputs::natural::{
-    naturals_var_1, nrm_pairs_of_natural_and_positive_u32_var_2,
-    pairs_of_natural_and_positive_u32_var_2, pairs_of_u32_and_positive_natural_var_2,
+    naturals_var_1, nrm_pairs_of_natural_and_positive_u32_var_1,
+    pairs_of_natural_and_positive_u32_var_1, pairs_of_u32_and_positive_natural_var_2,
 };
 use malachite_base::num::{DivExact, DivExactAssign, SignificantBits};
 use malachite_nz::natural::arithmetic::div_exact_u32::{
@@ -173,7 +173,7 @@ fn demo_limbs_div_exact_3_in_place(gm: GenerationMode, limit: usize) {
 }
 
 fn demo_natural_div_exact_assign_u32(gm: GenerationMode, limit: usize) {
-    for (mut n, u) in pairs_of_natural_and_positive_u32_var_2(gm).take(limit) {
+    for (mut n, u) in pairs_of_natural_and_positive_u32_var_1(gm).take(limit) {
         let n_old = n.clone();
         n.div_exact_assign(u);
         println!("x := {}; x.div_exact_assign({}); x = {}", n_old, u, n);
@@ -181,14 +181,14 @@ fn demo_natural_div_exact_assign_u32(gm: GenerationMode, limit: usize) {
 }
 
 fn demo_natural_div_exact_u32(gm: GenerationMode, limit: usize) {
-    for (n, u) in pairs_of_natural_and_positive_u32_var_2(gm).take(limit) {
+    for (n, u) in pairs_of_natural_and_positive_u32_var_1(gm).take(limit) {
         let n_old = n.clone();
         println!("{}.div_exact({}) = {}", n_old, u, n.div_exact(u));
     }
 }
 
 fn demo_natural_div_exact_u32_ref(gm: GenerationMode, limit: usize) {
-    for (n, u) in pairs_of_natural_and_positive_u32_var_2(gm).take(limit) {
+    for (n, u) in pairs_of_natural_and_positive_u32_var_1(gm).take(limit) {
         println!("(&{}).div_exact({}) = {}", n, u, (&n).div_exact(u));
     }
 }
@@ -383,7 +383,7 @@ fn benchmark_natural_div_exact_assign_u32_algorithms(
     m_run_benchmark(
         "Natural.div_exact_assign(u32)",
         BenchmarkType::Algorithms,
-        pairs_of_natural_and_positive_u32_var_2(gm),
+        pairs_of_natural_and_positive_u32_var_1(gm),
         gm.name(),
         limit,
         file_name,
@@ -433,7 +433,7 @@ fn benchmark_natural_div_exact_u32_library_comparison(
     m_run_benchmark(
         "Natural.div_exact(u32)",
         BenchmarkType::LibraryComparison,
-        nrm_pairs_of_natural_and_positive_u32_var_2(gm),
+        nrm_pairs_of_natural_and_positive_u32_var_1(gm),
         gm.name(),
         limit,
         file_name,
@@ -454,7 +454,7 @@ fn benchmark_natural_div_exact_u32_algorithms(gm: GenerationMode, limit: usize, 
     m_run_benchmark(
         "Natural.div_exact(u32)",
         BenchmarkType::Algorithms,
-        pairs_of_natural_and_positive_u32_var_2(gm),
+        pairs_of_natural_and_positive_u32_var_1(gm),
         gm.name(),
         limit,
         file_name,
@@ -503,7 +503,7 @@ fn benchmark_natural_div_exact_u32_evaluation_strategy(
     m_run_benchmark(
         "Natural.div_exact(u32)",
         BenchmarkType::EvaluationStrategy,
-        pairs_of_natural_and_positive_u32_var_2(gm),
+        pairs_of_natural_and_positive_u32_var_1(gm),
         gm.name(),
         limit,
         file_name,

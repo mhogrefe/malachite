@@ -11,7 +11,7 @@ use malachite_test::inputs::base::{
     triples_of_unsigned_unsigned_vec_and_rounding_mode_var_1,
 };
 use malachite_test::inputs::natural::{
-    pairs_of_natural_and_positive_u32_var_1, pairs_of_natural_and_positive_unsigned,
+    pairs_of_natural_and_positive_u32_var_2, pairs_of_natural_and_positive_unsigned,
     pairs_of_natural_and_rounding_mode, pairs_of_u32_and_positive_natural_var_1,
     triples_of_natural_positive_unsigned_and_rounding_mode_var_1,
     triples_of_unsigned_positive_natural_and_rounding_mode_var_1,
@@ -461,7 +461,7 @@ fn div_u32_properties() {
     );
 
     // TODO test using Rationals
-    test_properties(pairs_of_natural_and_positive_u32_var_1, |&(ref n, u)| {
+    test_properties(pairs_of_natural_and_positive_u32_var_2, |&(ref n, u)| {
         let down = n.div_round(u, RoundingMode::Down);
         let up = &down + 1;
         assert_eq!(n.div_round(u, RoundingMode::Up), up);

@@ -38,7 +38,7 @@ fn limbs_eq_mod_power_of_two_neg_pos_greater(xs: &[u32], ys: &[u32], pow: u64) -
             } else {
                 ys[i].wrapping_neg()
             };
-            xs[i].eq_mod_power_of_two(&y, small_pow)
+            xs[i].eq_mod_power_of_two(y, small_pow)
         }
     }
 }
@@ -81,7 +81,7 @@ pub fn limbs_eq_mod_power_of_two_neg_pos(xs: &[u32], ys: &[u32], pow: u64) -> bo
     }
 }
 
-impl EqModPowerOfTwo<Integer> for Integer {
+impl<'a, 'b> EqModPowerOfTwo<&'b Integer> for &'a Integer {
     /// Returns whether two `Integer`s are equivalent mod two to the power of `pow`; that is,
     /// whether their `pow` least-significant bits are equal.
     ///
@@ -107,7 +107,7 @@ impl EqModPowerOfTwo<Integer> for Integer {
     ///         4), false);
     /// }
     /// ```
-    fn eq_mod_power_of_two(&self, other: &Integer, pow: u64) -> bool {
+    fn eq_mod_power_of_two(self, other: &'b Integer, pow: u64) -> bool {
         if self.sign == other.sign {
             self.abs.eq_mod_power_of_two(&other.abs, pow)
         } else {
@@ -119,8 +119,8 @@ impl EqModPowerOfTwo<Integer> for Integer {
 impl Natural {
     fn eq_mod_power_of_two_neg_pos(&self, other: &Natural, pow: u64) -> bool {
         match (self, other) {
-            (_, &Small(ref y)) => self.eq_mod_power_of_two_neg_u32(y, pow),
-            (&Small(ref x), _) => other.eq_mod_power_of_two_neg_u32(x, pow),
+            (_, &Small(y)) => self.eq_mod_power_of_two_neg_u32(y, pow),
+            (&Small(x), _) => other.eq_mod_power_of_two_neg_u32(x, pow),
             (&Large(ref xs), &Large(ref ys)) => limbs_eq_mod_power_of_two_neg_pos(xs, ys, pow),
         }
     }

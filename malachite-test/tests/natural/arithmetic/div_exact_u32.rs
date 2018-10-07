@@ -13,7 +13,7 @@ use malachite_test::inputs::base::{
     triples_of_u32_vec_u32_vec_and_positive_u32_var_2, vecs_of_unsigned_var_5,
 };
 use malachite_test::inputs::natural::{
-    naturals, pairs_of_natural_and_positive_u32_var_2, pairs_of_natural_and_u32_var_3,
+    naturals, pairs_of_natural_and_positive_u32_var_1, pairs_of_natural_and_u32_var_3,
     pairs_of_natural_var_1_and_3, pairs_of_u32_and_positive_natural_var_2,
 };
 use malachite_test::natural::arithmetic::div_exact_u32::rug_div_exact_u32;
@@ -42,13 +42,13 @@ fn test_limbs_invert_limb() {
 }
 
 #[test]
-#[should_panic(expected = "assertion failed: limb.is_odd()")]
+#[should_panic(expected = "assertion failed: limb.odd()")]
 fn limbs_invert_limb_fail_1() {
     limbs_invert_limb(0);
 }
 
 #[test]
-#[should_panic(expected = "assertion failed: limb.is_odd()")]
+#[should_panic(expected = "assertion failed: limb.odd()")]
 fn limbs_invert_limb_fail_2() {
     limbs_invert_limb(2);
 }
@@ -482,7 +482,7 @@ fn div_exact_u32_properties_helper(n: &Natural, u: u32) {
 #[test]
 fn div_exact_u32_properties() {
     test_properties(
-        pairs_of_natural_and_positive_u32_var_2,
+        pairs_of_natural_and_positive_u32_var_1,
         |&(ref n, u): &(Natural, u32)| {
             div_exact_u32_properties_helper(n, u);
         },

@@ -1,7 +1,7 @@
 use integer::Integer;
 use malachite_base::num::DivisibleByPowerOfTwo;
 
-impl DivisibleByPowerOfTwo for Integer {
+impl<'a> DivisibleByPowerOfTwo for &'a Integer {
     /// Returns whether `self` is divisible by 2<sup>`pow`</sup>. If `self` is 0, the result is
     /// always true; otherwise, it is equivalent to `self.trailing_zeros().unwrap() <= pow`, but
     /// more efficient.
@@ -28,7 +28,7 @@ impl DivisibleByPowerOfTwo for Integer {
     ///     assert_eq!((-Integer::trillion()).divisible_by_power_of_two(13), false);
     /// }
     /// ```
-    fn divisible_by_power_of_two(&self, pow: u64) -> bool {
+    fn divisible_by_power_of_two(self, pow: u64) -> bool {
         self.abs.divisible_by_power_of_two(pow)
     }
 }

@@ -162,7 +162,7 @@ impl<'a> DivRound<u32> for &'a Natural {
                 RoundingMode::Nearest => {
                     let shifted_other = other >> 1;
                     if remainder > shifted_other
-                        || remainder == shifted_other && other.is_even() && quotient.is_odd()
+                        || remainder == shifted_other && other.even() && quotient.odd()
                     {
                         quotient + 1
                     } else {
@@ -333,7 +333,7 @@ impl DivRoundAssign<u32> for Natural {
                 RoundingMode::Nearest => {
                     let shifted_other = other >> 1;
                     if remainder > shifted_other
-                        || remainder == shifted_other && other.is_even() && self.is_odd()
+                        || remainder == shifted_other && other.even() && self.odd()
                     {
                         *self += 1;
                     }

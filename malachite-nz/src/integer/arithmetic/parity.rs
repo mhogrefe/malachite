@@ -1,7 +1,7 @@
 use integer::Integer;
 use malachite_base::num::Parity;
 
-impl Parity for Integer {
+impl<'a> Parity for &'a Integer {
     /// Determines whether `self` is even.
     ///
     /// Time: worst case O(1)
@@ -17,16 +17,16 @@ impl Parity for Integer {
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {
-    ///     assert_eq!(Integer::ZERO.is_even(), true);
-    ///     assert_eq!(Integer::from(123).is_even(), false);
-    ///     assert_eq!(Integer::from(-0x80).is_even(), true);
-    ///     assert_eq!(Integer::trillion().is_even(), true);
-    ///     assert_eq!((-Integer::trillion() - 1u32).is_even(), false);
+    ///     assert_eq!(Integer::ZERO.even(), true);
+    ///     assert_eq!(Integer::from(123).even(), false);
+    ///     assert_eq!(Integer::from(-0x80).even(), true);
+    ///     assert_eq!(Integer::trillion().even(), true);
+    ///     assert_eq!((-Integer::trillion() - 1u32).even(), false);
     /// }
     /// ```
-    fn is_even(&self) -> bool {
+    fn even(self) -> bool {
         match *self {
-            Integer { ref abs, .. } => abs.is_even(),
+            Integer { ref abs, .. } => abs.even(),
         }
     }
 
@@ -45,16 +45,16 @@ impl Parity for Integer {
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {
-    ///     assert_eq!(Integer::ZERO.is_odd(), false);
-    ///     assert_eq!(Integer::from(123).is_odd(), true);
-    ///     assert_eq!(Integer::from(-0x80).is_odd(), false);
-    ///     assert_eq!(Integer::trillion().is_odd(), false);
-    ///     assert_eq!((-Integer::trillion() - 1u32).is_odd(), true);
+    ///     assert_eq!(Integer::ZERO.odd(), false);
+    ///     assert_eq!(Integer::from(123).odd(), true);
+    ///     assert_eq!(Integer::from(-0x80).odd(), false);
+    ///     assert_eq!(Integer::trillion().odd(), false);
+    ///     assert_eq!((-Integer::trillion() - 1u32).odd(), true);
     /// }
     /// ```
-    fn is_odd(&self) -> bool {
+    fn odd(self) -> bool {
         match *self {
-            Integer { ref abs, .. } => abs.is_odd(),
+            Integer { ref abs, .. } => abs.odd(),
         }
     }
 }

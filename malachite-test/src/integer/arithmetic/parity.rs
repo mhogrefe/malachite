@@ -3,15 +3,15 @@ use inputs::integer::integers;
 use malachite_base::num::{Parity, SignificantBits};
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
-    register_demo!(registry, demo_integer_is_even);
-    register_demo!(registry, demo_integer_is_odd);
-    register_bench!(registry, Large, benchmark_integer_is_even);
-    register_bench!(registry, Large, benchmark_integer_is_odd);
+    register_demo!(registry, demo_integer_even);
+    register_demo!(registry, demo_integer_odd);
+    register_bench!(registry, Large, benchmark_integer_even);
+    register_bench!(registry, Large, benchmark_integer_odd);
 }
 
-fn demo_integer_is_even(gm: GenerationMode, limit: usize) {
+fn demo_integer_even(gm: GenerationMode, limit: usize) {
     for n in integers(gm).take(limit) {
-        if n.is_even() {
+        if n.even() {
             println!("{} is even", n);
         } else {
             println!("{} is not even", n);
@@ -19,9 +19,9 @@ fn demo_integer_is_even(gm: GenerationMode, limit: usize) {
     }
 }
 
-fn demo_integer_is_odd(gm: GenerationMode, limit: usize) {
+fn demo_integer_odd(gm: GenerationMode, limit: usize) {
     for n in integers(gm).take(limit) {
-        if n.is_odd() {
+        if n.odd() {
             println!("{} is odd", n);
         } else {
             println!("{} is not odd", n);
@@ -29,9 +29,9 @@ fn demo_integer_is_odd(gm: GenerationMode, limit: usize) {
     }
 }
 
-fn benchmark_integer_is_even(gm: GenerationMode, limit: usize, file_name: &str) {
+fn benchmark_integer_even(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
-        "Integer.is_even()",
+        "Integer.even()",
         BenchmarkType::Single,
         integers(gm),
         gm.name(),
@@ -39,13 +39,13 @@ fn benchmark_integer_is_even(gm: GenerationMode, limit: usize, file_name: &str) 
         file_name,
         &(|n| n.significant_bits() as usize),
         "n.significant_bits()",
-        &mut [("malachite", &mut (|n| no_out!(n.is_even())))],
+        &mut [("malachite", &mut (|n| no_out!(n.even())))],
     );
 }
 
-fn benchmark_integer_is_odd(gm: GenerationMode, limit: usize, file_name: &str) {
+fn benchmark_integer_odd(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
-        "Integer.is_odd()",
+        "Integer.odd()",
         BenchmarkType::Single,
         integers(gm),
         gm.name(),
@@ -53,6 +53,6 @@ fn benchmark_integer_is_odd(gm: GenerationMode, limit: usize, file_name: &str) {
         file_name,
         &(|n| n.significant_bits() as usize),
         "n.significant_bits()",
-        &mut [("malachite", &mut (|n| no_out!(n.is_odd())))],
+        &mut [("malachite", &mut (|n| no_out!(n.odd())))],
     );
 }

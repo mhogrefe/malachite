@@ -48,7 +48,7 @@ pub trait TrailingZeros {
 ///
 /// Please note this isn't the same operation as `<<`!
 pub trait RotateLeft {
-    fn rotate_left(&self, n: u32) -> Self;
+    fn rotate_left(self, n: u32) -> Self;
 }
 
 /// Shifts the bits to the right by a specified amount, `n`, wrapping the truncated bits to the end
@@ -56,33 +56,33 @@ pub trait RotateLeft {
 ///
 /// Please note this isn't the same operation as `>>`!
 pub trait RotateRight {
-    fn rotate_right(&self, n: u32) -> Self;
+    fn rotate_right(self, n: u32) -> Self;
 }
 
 /// Defines functions for manipulating the endianness of a value.
 pub trait Endian {
     /// Reverses the byte order of the value.
-    fn swap_bytes(&self) -> Self;
+    fn swap_bytes(self) -> Self;
 
     /// Converts a value from big endian to the target's endianness.
     ///
     /// On big endian this is a no-op. On little endian the bytes are swapped.
-    fn from_be(x: &Self) -> Self;
+    fn from_be(x: Self) -> Self;
 
     /// Converts a value from little endian to the target's endianness.
     ///
     /// On little endian this is a no-op. On big endian the bytes are swapped.
-    fn from_le(x: &Self) -> Self;
+    fn from_le(x: Self) -> Self;
 
     /// Converts `self` to big endian from the target's endianness.
     ///
     /// On big endian this is a no-op. On little endian the bytes are swapped.
-    fn to_be(&self) -> Self;
+    fn to_be(self) -> Self;
 
     /// Converts `self` to little endian from the target's endianness.
     ///
     /// On little endian this is a no-op. On big endian the bytes are swapped.
-    fn to_le(&self) -> Self;
+    fn to_le(self) -> Self;
 }
 
 /// Checked addition. Computes `self + rhs`, returning `None` if there is no valid result.
@@ -315,7 +315,7 @@ pub trait Pow<RHS> {
 
 /// Returns `true` iff `self == 2^k` for some integer `k`.
 pub trait IsPowerOfTwo {
-    fn is_power_of_two(&self) -> bool;
+    fn is_power_of_two(self) -> bool;
 }
 
 /// Returns the smallest power of two greater than or equal to `self`.
@@ -329,14 +329,18 @@ pub trait NextPowerOfTwoAssign {
     fn next_power_of_two_assign(&mut self);
 }
 
-pub trait EqModPowerOfTwo<Rhs: ?Sized = Self> {
-    fn eq_mod_power_of_two(&self, other: &Rhs, pow: u64) -> bool;
+pub trait EqModPowerOfTwo<Rhs = Self> {
+    fn eq_mod_power_of_two(self, other: Rhs, pow: u64) -> bool;
+}
+
+pub trait EqMod<Rhs = Self, Mod = Self> {
+    fn eq_mod(self, other: Rhs, modulus: Mod) -> bool;
 }
 
 /// Returns the smallest power of two greater than or equal to `self`. If the next power of two is
 /// greater than the type's maximum value, `None` is returned, otherwise the power of two is wrapped
 /// in `Some`.
-pub trait CheckedNextPowerOfTwo: Sized {
+pub trait CheckedNextPowerOfTwo {
     type Output;
 
     fn checked_next_power_of_two(self) -> Option<Self::Output>;
@@ -380,19 +384,19 @@ pub trait WrappingNegAssign {
 
 //TODO docs, test
 pub trait BitScan {
-    fn index_of_next_false_bit(&self, starting_index: u64) -> Option<u64>;
+    fn index_of_next_false_bit(self, starting_index: u64) -> Option<u64>;
 
-    fn index_of_next_true_bit(&self, starting_index: u64) -> Option<u64>;
+    fn index_of_next_true_bit(self, starting_index: u64) -> Option<u64>;
 }
 
 pub trait Parity {
-    fn is_even(&self) -> bool;
+    fn even(self) -> bool;
 
-    fn is_odd(&self) -> bool;
+    fn odd(self) -> bool;
 }
 
 pub trait DivisibleByPowerOfTwo {
-    fn divisible_by_power_of_two(&self, pow: u64) -> bool;
+    fn divisible_by_power_of_two(self, pow: u64) -> bool;
 }
 
 pub trait ModPowerOfTwo {
@@ -516,7 +520,7 @@ pub trait DivExactAssign<RHS = Self> {
 }
 
 pub trait DivisibleBy<RHS = Self> {
-    fn divisible_by(&self, rhs: &RHS) -> bool;
+    fn divisible_by(self, rhs: RHS) -> bool;
 }
 
 //TODO is_positive, is_negative, sign
@@ -1119,42 +1123,42 @@ macro_rules! integer_traits {
 
         impl RotateLeft for $t {
             #[inline]
-            fn rotate_left(&self, n: u32) -> $t {
-                $t::rotate_left(*self, n)
+            fn rotate_left(self, n: u32) -> $t {
+                $t::rotate_left(self, n)
             }
         }
 
         impl RotateRight for $t {
             #[inline]
-            fn rotate_right(&self, n: u32) -> $t {
-                $t::rotate_right(*self, n)
+            fn rotate_right(self, n: u32) -> $t {
+                $t::rotate_right(self, n)
             }
         }
 
         impl Endian for $t {
             #[inline]
-            fn swap_bytes(&self) -> $t {
-                $t::swap_bytes(*self)
+            fn swap_bytes(self) -> $t {
+                $t::swap_bytes(self)
             }
 
             #[inline]
-            fn from_be(x: &Self) -> $t {
-                $t::from_be(*x)
+            fn from_be(x: $t) -> $t {
+                $t::from_be(x)
             }
 
             #[inline]
-            fn from_le(x: &Self) -> $t {
-                $t::from_le(*x)
+            fn from_le(x: $t) -> $t {
+                $t::from_le(x)
             }
 
             #[inline]
-            fn to_be(&self) -> $t {
-                $t::to_be(*self)
+            fn to_be(self) -> $t {
+                $t::to_be(self)
             }
 
             #[inline]
-            fn to_le(&self) -> $t {
-                $t::to_le(*self)
+            fn to_le(self) -> $t {
+                $t::to_le(self)
             }
         }
 
@@ -1505,19 +1509,19 @@ macro_rules! integer_traits {
 
         impl Parity for $t {
             #[inline]
-            fn is_even(&self) -> bool {
-                (*self & 1) == 0
+            fn even(self) -> bool {
+                (self & 1) == 0
             }
 
             #[inline]
-            fn is_odd(&self) -> bool {
-                (*self & 1) != 0
+            fn odd(self) -> bool {
+                (self & 1) != 0
             }
         }
 
         impl EqModPowerOfTwo<Self> for $t {
             #[inline]
-            fn eq_mod_power_of_two(&self, other: &$t, pow: u64) -> bool {
+            fn eq_mod_power_of_two(self, other: $t, pow: u64) -> bool {
                 (self ^ other).divisible_by_power_of_two(pow)
             }
         }
@@ -1561,8 +1565,8 @@ macro_rules! integer_traits {
 
         impl DivisibleBy for $t {
             #[inline]
-            fn divisible_by(&self, rhs: &$t) -> bool {
-                *self == 0 || *rhs != 0 && *self % rhs == 0
+            fn divisible_by(self, rhs: $t) -> bool {
+                self == 0 || rhs != 0 && self % rhs == 0
             }
         }
     };
@@ -1571,25 +1575,25 @@ macro_rules! integer_traits {
 //TODO fix code duplication
 impl Parity for usize {
     #[inline]
-    fn is_even(&self) -> bool {
-        (*self & 1) == 0
+    fn even(self) -> bool {
+        (self & 1) == 0
     }
 
     #[inline]
-    fn is_odd(&self) -> bool {
-        (*self & 1) != 0
+    fn odd(self) -> bool {
+        (self & 1) != 0
     }
 }
 
 impl Parity for isize {
     #[inline]
-    fn is_even(&self) -> bool {
-        (*self & 1) == 0
+    fn even(self) -> bool {
+        (self & 1) == 0
     }
 
     #[inline]
-    fn is_odd(&self) -> bool {
-        (*self & 1) != 0
+    fn odd(self) -> bool {
+        (self & 1) != 0
     }
 }
 
@@ -1607,8 +1611,8 @@ macro_rules! unsigned_traits {
 
         impl IsPowerOfTwo for $t {
             #[inline]
-            fn is_power_of_two(&self) -> bool {
-                $t::is_power_of_two(*self)
+            fn is_power_of_two(self) -> bool {
+                $t::is_power_of_two(self)
             }
         }
 
@@ -1834,7 +1838,7 @@ macro_rules! unsigned_traits {
 
         impl BitScan for $t {
             #[inline]
-            fn index_of_next_false_bit(&self, starting_index: u64) -> Option<u64> {
+            fn index_of_next_false_bit(self, starting_index: u64) -> Option<u64> {
                 Some(if starting_index >= Self::WIDTH.into() {
                     starting_index
                 } else {
@@ -1845,7 +1849,7 @@ macro_rules! unsigned_traits {
             }
 
             #[inline]
-            fn index_of_next_true_bit(&self, starting_index: u64) -> Option<u64> {
+            fn index_of_next_true_bit(self, starting_index: u64) -> Option<u64> {
                 if starting_index >= Self::WIDTH.into() {
                     None
                 } else {
@@ -1863,7 +1867,7 @@ macro_rules! unsigned_traits {
 
         impl DivisibleByPowerOfTwo for $t {
             #[inline]
-            fn divisible_by_power_of_two(&self, pow: u64) -> bool {
+            fn divisible_by_power_of_two(self, pow: u64) -> bool {
                 self.mod_power_of_two(pow) == 0
             }
         }
@@ -1979,7 +1983,7 @@ macro_rules! unsigned_traits {
                         RoundingMode::Nearest => {
                             let shifted_rhs = rhs >> 1;
                             if remainder > shifted_rhs
-                                || remainder == shifted_rhs && rhs.is_even() && quotient.is_odd()
+                                || remainder == shifted_rhs && rhs.even() && quotient.odd()
                             {
                                 quotient + 1
                             } else {
@@ -2030,6 +2034,13 @@ macro_rules! unsigned_traits {
                     *self += 1;
                     rhs - remainder
                 }
+            }
+        }
+
+        impl EqMod for $t {
+            #[inline]
+            fn eq_mod(self, other: $t, modulus: $t) -> bool {
+                self == other || modulus != 0 && self % modulus == other % modulus
             }
         }
     };
@@ -2321,9 +2332,9 @@ macro_rules! signed_traits {
         //TODO
         impl BitScan for $t {
             #[inline]
-            fn index_of_next_false_bit(&self, starting_index: u64) -> Option<u64> {
+            fn index_of_next_false_bit(self, starting_index: u64) -> Option<u64> {
                 if starting_index >= u64::from(Self::WIDTH) - 1 {
-                    if *self >= 0 {
+                    if self >= 0 {
                         Some(starting_index)
                     } else {
                         None
@@ -2332,7 +2343,7 @@ macro_rules! signed_traits {
                     let index = (!(self | ((1 << starting_index) - 1)))
                         .trailing_zeros()
                         .into();
-                    if index == Self::WIDTH.into() {
+                    if index == $t::WIDTH.into() {
                         None
                     } else {
                         Some(index)
@@ -2341,9 +2352,9 @@ macro_rules! signed_traits {
             }
 
             #[inline]
-            fn index_of_next_true_bit(&self, starting_index: u64) -> Option<u64> {
+            fn index_of_next_true_bit(self, starting_index: u64) -> Option<u64> {
                 if starting_index >= u64::from(Self::WIDTH) - 1 {
-                    if *self >= 0 {
+                    if self >= 0 {
                         None
                     } else {
                         Some(starting_index)
@@ -2352,7 +2363,7 @@ macro_rules! signed_traits {
                     let index = (self & !((1 << starting_index) - 1))
                         .trailing_zeros()
                         .into();
-                    if index == Self::WIDTH.into() {
+                    if index == $t::WIDTH.into() {
                         None
                     } else {
                         Some(index)
@@ -2363,7 +2374,7 @@ macro_rules! signed_traits {
 
         impl DivisibleByPowerOfTwo for $t {
             #[inline]
-            fn divisible_by_power_of_two(&self, pow: u64) -> bool {
+            fn divisible_by_power_of_two(self, pow: u64) -> bool {
                 self.to_unsigned_bitwise().divisible_by_power_of_two(pow)
             }
         }
@@ -2970,7 +2981,7 @@ macro_rules! round_shift_unsigned_unsigned {
                     RoundingMode::Nearest if other >= width => 0,
                     RoundingMode::Nearest => {
                         let mostly_shifted = self >> (other - 1);
-                        if mostly_shifted.is_even() {
+                        if mostly_shifted.even() {
                             // round down
                             mostly_shifted >> 1
                         } else if mostly_shifted << (other - 1) != self {
@@ -2979,7 +2990,7 @@ macro_rules! round_shift_unsigned_unsigned {
                         } else {
                             // result is half-integer; round to even
                             let shifted = mostly_shifted >> 1;
-                            if shifted.is_even() {
+                            if shifted.even() {
                                 shifted
                             } else {
                                 shifted + 1
@@ -3024,7 +3035,7 @@ macro_rules! round_shift_unsigned_unsigned {
                     RoundingMode::Nearest => {
                         let original = *self;
                         *self >>= other - 1;
-                        if self.is_even() {
+                        if self.even() {
                             // round down
                             *self >>= 1;
                         } else if *self << (other - 1) != original {
@@ -3034,7 +3045,7 @@ macro_rules! round_shift_unsigned_unsigned {
                         } else {
                             // result is half-integer; round to even
                             *self >>= 1;
-                            if self.is_odd() {
+                            if self.odd() {
                                 *self += 1;
                             }
                         }

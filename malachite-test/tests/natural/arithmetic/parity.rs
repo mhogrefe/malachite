@@ -5,9 +5,9 @@ use malachite_test::inputs::natural::naturals;
 use std::str::FromStr;
 
 #[test]
-fn test_is_even() {
+fn test_even() {
     let test = |n, out| {
-        assert_eq!(Natural::from_str(n).unwrap().is_even(), out);
+        assert_eq!(Natural::from_str(n).unwrap().even(), out);
     };
     test("0", true);
     test("1", false);
@@ -19,9 +19,9 @@ fn test_is_even() {
 }
 
 #[test]
-fn test_is_odd() {
+fn test_odd() {
     let test = |n, out| {
-        assert_eq!(Natural::from_str(n).unwrap().is_odd(), out);
+        assert_eq!(Natural::from_str(n).unwrap().odd(), out);
     };
     test("0", false);
     test("1", true);
@@ -33,21 +33,21 @@ fn test_is_odd() {
 }
 
 #[test]
-fn is_even_properties() {
+fn even_properties() {
     test_properties(naturals, |x| {
-        let is_even = x.is_even();
-        assert_eq!(x.divisible_by(&2), is_even);
-        assert_eq!(!x.is_odd(), is_even);
-        assert_eq!((x + 1).is_odd(), is_even);
+        let even = x.even();
+        assert_eq!(x.divisible_by(2), even);
+        assert_eq!(!x.odd(), even);
+        assert_eq!((x + 1).odd(), even);
     });
 }
 
 #[test]
-fn is_odd_properties() {
+fn odd_properties() {
     test_properties(naturals, |x| {
-        let is_odd = x.is_odd();
-        assert_eq!(!x.divisible_by(&2), is_odd);
-        assert_eq!(!x.is_even(), is_odd);
-        assert_eq!((x + 1).is_even(), is_odd);
+        let odd = x.odd();
+        assert_eq!(!x.divisible_by(2), odd);
+        assert_eq!(!x.even(), odd);
+        assert_eq!((x + 1).even(), odd);
     });
 }

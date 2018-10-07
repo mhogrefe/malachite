@@ -4,22 +4,24 @@ use malachite_nz::integer::Integer;
 use malachite_test::common::integer_to_rug_integer;
 use malachite_test::inputs::base::pairs_of_signed_and_small_unsigned;
 use malachite_test::inputs::integer::{
-    pairs_of_integer_and_small_unsigned, triples_of_integer_signed_and_small_unsigned,
+    pairs_of_integer_and_signed, pairs_of_integer_and_small_unsigned,
+    triples_of_integer_i32_and_small_unsigned_var_2, triples_of_integer_signed_and_small_unsigned,
+    triples_of_integer_signed_and_small_unsigned_var_1,
 };
-use malachite_test::integer::arithmetic::eq_mod_power_of_two_i32::rug_eq_mod_power_of_two_i32;
+use malachite_test::integer::arithmetic::eq_i32_mod_power_of_two::rug_eq_i32_mod_power_of_two;
 use rug;
 use std::i32;
 use std::str::FromStr;
 
 #[test]
-fn test_eq_mod_power_of_two_i32() {
+fn test_eq_i32_mod_power_of_two() {
     let test = |n, i: i32, pow, out| {
         assert_eq!(
-            Integer::from_str(n).unwrap().eq_mod_power_of_two(&i, pow),
+            Integer::from_str(n).unwrap().eq_mod_power_of_two(i, pow),
             out
         );
         assert_eq!(
-            rug_eq_mod_power_of_two_i32(&rug::Integer::from_str(n).unwrap(), &i, pow),
+            rug_eq_i32_mod_power_of_two(&rug::Integer::from_str(n).unwrap(), i, pow),
             out
         );
     };
@@ -78,13 +80,13 @@ fn test_eq_mod_power_of_two_i32() {
 }
 
 #[test]
-fn eq_mod_power_of_two_i32_properties() {
+fn eq_i32_mod_power_of_two_properties() {
     test_properties(
         triples_of_integer_signed_and_small_unsigned::<i32, u64>,
         |&(ref n, i, pow)| {
-            let eq_mod_power_of_two = n.eq_mod_power_of_two(&i, pow);
+            let eq_mod_power_of_two = n.eq_mod_power_of_two(i, pow);
             assert_eq!(
-                rug_eq_mod_power_of_two_i32(&integer_to_rug_integer(n), &i, pow),
+                rug_eq_i32_mod_power_of_two(&integer_to_rug_integer(n), i, pow),
                 eq_mod_power_of_two
             );
             assert_eq!(
@@ -94,9 +96,45 @@ fn eq_mod_power_of_two_i32_properties() {
         },
     );
 
+    test_properties(
+        triples_of_integer_signed_and_small_unsigned_var_1::<i32, u64>,
+        |&(ref n, i, pow)| {
+            assert!(n.eq_mod_power_of_two(i, pow));
+            assert!(rug_eq_i32_mod_power_of_two(
+                &integer_to_rug_integer(n),
+                i,
+                pow
+            ));
+            assert_eq!(
+                n.mod_power_of_two(pow),
+                Integer::from(i).mod_power_of_two(pow),
+            );
+        },
+    );
+
+    test_properties(
+        triples_of_integer_i32_and_small_unsigned_var_2::<u64>,
+        |&(ref n, i, pow)| {
+            assert!(!n.eq_mod_power_of_two(i, pow));
+            assert!(!rug_eq_i32_mod_power_of_two(
+                &integer_to_rug_integer(n),
+                i,
+                pow
+            ));
+            assert_ne!(
+                n.mod_power_of_two(pow),
+                Integer::from(i).mod_power_of_two(pow),
+            );
+        },
+    );
+
+    test_properties(pairs_of_integer_and_signed::<i32>, |&(ref n, i)| {
+        assert!(n.eq_mod_power_of_two(i, 0));
+    });
+
     test_properties(pairs_of_integer_and_small_unsigned, |&(ref n, pow)| {
         assert_eq!(
-            n.eq_mod_power_of_two(&0i32, pow),
+            n.eq_mod_power_of_two(0i32, pow),
             n.divisible_by_power_of_two(pow),
         );
     });
@@ -105,7 +143,7 @@ fn eq_mod_power_of_two_i32_properties() {
         pairs_of_signed_and_small_unsigned::<i32, u64>,
         |&(i, pow)| {
             assert_eq!(
-                Integer::ZERO.eq_mod_power_of_two(&i, pow),
+                Integer::ZERO.eq_mod_power_of_two(i, pow),
                 i.divisible_by_power_of_two(pow)
             );
         },

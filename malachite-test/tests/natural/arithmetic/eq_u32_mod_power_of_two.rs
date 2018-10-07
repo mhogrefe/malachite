@@ -1,22 +1,25 @@
 use common::test_properties;
 use malachite_base::num::{DivisibleByPowerOfTwo, EqModPowerOfTwo, ModPowerOfTwo, Zero};
-use malachite_nz::natural::arithmetic::eq_mod_power_of_two_u32::limbs_eq_mod_power_of_two_limb;
+use malachite_nz::natural::arithmetic::eq_u32_mod_power_of_two::limbs_eq_limb_mod_power_of_two;
 use malachite_nz::natural::Natural;
 use malachite_test::common::natural_to_rug_integer;
 use malachite_test::inputs::base::{
     pairs_of_unsigned_and_small_unsigned, triples_of_unsigned_vec_unsigned_and_small_unsigned_var_2,
 };
 use malachite_test::inputs::natural::{
-    pairs_of_natural_and_small_unsigned, triples_of_natural_unsigned_and_small_unsigned,
+    pairs_of_natural_and_small_unsigned, pairs_of_natural_and_unsigned,
+    triples_of_natural_u32_and_small_unsigned_var_2,
+    triples_of_natural_unsigned_and_small_unsigned,
+    triples_of_natural_unsigned_and_small_unsigned_var_1,
 };
-use malachite_test::natural::arithmetic::eq_mod_power_of_two_u32::rug_eq_mod_power_of_two_u32;
+use malachite_test::natural::arithmetic::eq_u32_mod_power_of_two::rug_eq_u32_mod_power_of_two;
 use rug;
 use std::str::FromStr;
 
 #[test]
-fn test_limbs_eq_mod_power_of_two_limb() {
+fn test_limbs_eq_limb_mod_power_of_two() {
     let test = |limbs, limb, pow, out| {
-        assert_eq!(limbs_eq_mod_power_of_two_limb(limbs, limb, pow), out);
+        assert_eq!(limbs_eq_limb_mod_power_of_two(limbs, limb, pow), out);
     };
     test(&[0b1111011, 0b111001000], 0b101011, 4, true);
     test(&[0b1111011, 0b111001000], 0b101011, 5, false);
@@ -26,14 +29,14 @@ fn test_limbs_eq_mod_power_of_two_limb() {
 }
 
 #[test]
-fn test_eq_mod_power_of_two_u32() {
+fn test_eq_u32_mod_power_of_two() {
     let test = |n, u, pow, out| {
         assert_eq!(
-            Natural::from_str(n).unwrap().eq_mod_power_of_two(&u, pow),
+            Natural::from_str(n).unwrap().eq_mod_power_of_two(u, pow),
             out
         );
         assert_eq!(
-            rug_eq_mod_power_of_two_u32(&rug::Integer::from_str(n).unwrap(), &u, pow),
+            rug_eq_u32_mod_power_of_two(&rug::Integer::from_str(n).unwrap(), u, pow),
             out
         );
     };
@@ -51,26 +54,26 @@ fn test_eq_mod_power_of_two_u32() {
 }
 
 #[test]
-fn limbs_eq_mod_power_of_two_limb_properties() {
+fn limbs_eq_limb_mod_power_of_two_properties() {
     test_properties(
         triples_of_unsigned_vec_unsigned_and_small_unsigned_var_2,
         |&(ref limbs, limb, pow)| {
             assert_eq!(
-                limbs_eq_mod_power_of_two_limb(limbs, limb, pow),
-                Natural::from_limbs_asc(limbs).eq_mod_power_of_two(&limb, pow)
+                limbs_eq_limb_mod_power_of_two(limbs, limb, pow),
+                Natural::from_limbs_asc(limbs).eq_mod_power_of_two(limb, pow)
             );
         },
     );
 }
 
 #[test]
-fn eq_mod_power_of_two_u32_properties() {
+fn eq_u32_mod_power_of_two_properties() {
     test_properties(
         triples_of_natural_unsigned_and_small_unsigned::<u32, u64>,
         |&(ref n, u, pow)| {
-            let eq_mod_power_of_two = n.eq_mod_power_of_two(&u, pow);
+            let eq_mod_power_of_two = n.eq_mod_power_of_two(u, pow);
             assert_eq!(
-                rug_eq_mod_power_of_two_u32(&natural_to_rug_integer(n), &u, pow),
+                rug_eq_u32_mod_power_of_two(&natural_to_rug_integer(n), u, pow),
                 eq_mod_power_of_two
             );
             assert_eq!(
@@ -80,9 +83,39 @@ fn eq_mod_power_of_two_u32_properties() {
         },
     );
 
+    test_properties(
+        triples_of_natural_unsigned_and_small_unsigned_var_1::<u32, u64>,
+        |&(ref n, u, pow)| {
+            assert!(n.eq_mod_power_of_two(u, pow));
+            assert!(rug_eq_u32_mod_power_of_two(
+                &natural_to_rug_integer(n),
+                u,
+                pow
+            ));
+            assert_eq!(n.mod_power_of_two(pow), u.mod_power_of_two(pow),);
+        },
+    );
+
+    test_properties(
+        triples_of_natural_u32_and_small_unsigned_var_2::<u64>,
+        |&(ref n, u, pow)| {
+            assert!(!n.eq_mod_power_of_two(u, pow));
+            assert!(!rug_eq_u32_mod_power_of_two(
+                &natural_to_rug_integer(n),
+                u,
+                pow
+            ));
+            assert_ne!(n.mod_power_of_two(pow), u.mod_power_of_two(pow),);
+        },
+    );
+
+    test_properties(pairs_of_natural_and_unsigned::<u32>, |&(ref n, u)| {
+        assert!(n.eq_mod_power_of_two(u, 0));
+    });
+
     test_properties(pairs_of_natural_and_small_unsigned, |&(ref n, pow)| {
         assert_eq!(
-            n.eq_mod_power_of_two(&0, pow),
+            n.eq_mod_power_of_two(0, pow),
             n.divisible_by_power_of_two(pow)
         );
     });
@@ -91,7 +124,7 @@ fn eq_mod_power_of_two_u32_properties() {
         pairs_of_unsigned_and_small_unsigned::<u32, u64>,
         |&(u, pow)| {
             assert_eq!(
-                Natural::ZERO.eq_mod_power_of_two(&u, pow),
+                Natural::ZERO.eq_mod_power_of_two(u, pow),
                 u.divisible_by_power_of_two(pow)
             );
         },

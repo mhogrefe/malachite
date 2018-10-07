@@ -68,7 +68,7 @@ fn trailing_zeros_properties() {
             let trailing_zeros = trailing_zeros.unwrap();
             if trailing_zeros <= u64::from(u32::MAX) {
                 let trailing_zeros = trailing_zeros as u32;
-                assert!((x >> trailing_zeros).is_odd());
+                assert!((x >> trailing_zeros).odd());
                 assert_eq!(x >> trailing_zeros << trailing_zeros, *x);
             }
         }

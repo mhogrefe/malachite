@@ -62,7 +62,7 @@ pub fn test_invert_limb_table() {
 /// assert_eq!(limbs_invert_limb(1_000_000_001), 2_211_001_857);
 /// ```
 pub fn limbs_invert_limb(limb: u32) -> u32 {
-    assert!(limb.is_odd());
+    assert!(limb.odd());
     let index = (limb >> 1).mod_power_of_two(INVERT_LIMB_TABLE_LOG_SIZE);
     let mut inverse: u32 = INVERT_LIMB_TABLE[index as usize].into();
     inverse = (inverse << 1).wrapping_sub((inverse * inverse).wrapping_mul(limb));
@@ -129,7 +129,7 @@ pub fn limbs_div_exact_limb_to_out(out_limbs: &mut [u32], in_limbs: &[u32], divi
     let len = in_limbs.len();
     assert!(len > 0);
     assert!(out_limbs.len() >= len);
-    if divisor.is_even() {
+    if divisor.even() {
         let shift = divisor.trailing_zeros();
         let shift_complement = u32::WIDTH - shift;
         let shifted_divisor = divisor >> shift;
@@ -199,7 +199,7 @@ pub fn limbs_div_exact_limb_in_place(limbs: &mut [u32], divisor: u32) {
     assert!(divisor > 0);
     let len = limbs.len();
     assert!(len > 0);
-    if divisor.is_even() {
+    if divisor.even() {
         let shift = divisor.trailing_zeros();
         let shift_complement = u32::WIDTH - shift;
         let shifted_divisor = divisor >> shift;

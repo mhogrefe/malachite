@@ -100,7 +100,7 @@ pub fn limbs_index_of_next_true_bit(limbs: &[u32], starting_index: u64) -> Optio
     }
 }
 
-impl BitScan for Natural {
+impl<'a> BitScan for &'a Natural {
     /// Finds the lowest index greater than or equal to `starting_index` at which the `Natural` has
     /// a `false` bit. This function always returns a `Some`.
     ///
@@ -129,7 +129,7 @@ impl BitScan for Natural {
     ///     assert_eq!(Natural::from(0xb_0000_0000u64).index_of_next_false_bit(100), Some(100));
     /// }
     /// ```
-    fn index_of_next_false_bit(&self, starting_index: u64) -> Option<u64> {
+    fn index_of_next_false_bit(self, starting_index: u64) -> Option<u64> {
         match *self {
             Small(small) => small.index_of_next_false_bit(starting_index),
             Large(ref limbs) => Some(limbs_index_of_next_false_bit(limbs, starting_index)),
@@ -166,7 +166,7 @@ impl BitScan for Natural {
     ///     assert_eq!(Natural::from(0xb_0000_0000u64).index_of_next_true_bit(100), None);
     /// }
     /// ```
-    fn index_of_next_true_bit(&self, starting_index: u64) -> Option<u64> {
+    fn index_of_next_true_bit(self, starting_index: u64) -> Option<u64> {
         match *self {
             Small(small) => small.index_of_next_true_bit(starting_index),
             Large(ref limbs) => limbs_index_of_next_true_bit(limbs, starting_index),

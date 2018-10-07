@@ -100,7 +100,7 @@ fn limbs_shr_round_half_integer_to_even(limbs: &[u32], bits: u64) -> Vec<u32> {
         if small_bits != 0 {
             limbs_slice_shr_in_place(&mut result_limbs, small_bits);
         }
-        if !result_limbs.is_empty() && result_limbs[0].is_odd() {
+        if !result_limbs.is_empty() && result_limbs[0].odd() {
             limbs_vec_add_limb_in_place(&mut result_limbs, 1);
         }
         result_limbs
@@ -470,7 +470,7 @@ fn limbs_vec_shr_round_half_integer_to_even_in_place(limbs: &mut Vec<u32>, bits:
         if small_bits != 0 {
             limbs_slice_shr_in_place(limbs, small_bits);
         }
-        if !limbs.is_empty() && limbs[0].is_odd() {
+        if !limbs.is_empty() && limbs[0].odd() {
             limbs_vec_add_limb_in_place(limbs, 1);
         }
     }
@@ -862,7 +862,7 @@ macro_rules! impl_natural_shr_unsigned {
         /// specified rounding mode, taking the `Natural` by reference. Passing
         /// `RoundingMode::Floor` or `RoundingMode::Down` is equivalent to using `>>`. To test
         /// whether `RoundingMode::Exact` can be passed, use
-        /// `self.is_divisible_by_power_of_two(other)`.
+        /// `self.divisible_by_power_of_two(other)`.
         ///
         /// Time: worst case O(n)
         ///
@@ -928,7 +928,7 @@ macro_rules! impl_natural_shr_unsigned {
         /// Shifts a `Natural` right (divides it by a power of 2) and rounds according to the
         /// specified rounding mode, in place. Passing `RoundingMode::Floor` or `RoundingMode::Down`
         /// is equivalent to using `>>=`. To test whether `RoundingMode::Exact` can be passed, use
-        /// `self.is_divisible_by_power_of_two(other)`.
+        /// `self.divisible_by_power_of_two(other)`.
         ///
         /// Time: worst case O(n)
         ///

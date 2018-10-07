@@ -10,8 +10,9 @@ use malachite_test::inputs::base::{
     pairs_of_unsigned_vec_and_positive_unsigned_var_1, positive_unsigneds,
 };
 use malachite_test::inputs::natural::{
-    naturals, pairs_of_natural_and_positive_u32_var_2, pairs_of_natural_and_unsigned,
-    pairs_of_natural_and_unsigned_var_2, pairs_of_unsigned_and_natural, positive_naturals,
+    naturals, pairs_of_natural_and_positive_u32_var_1, pairs_of_natural_and_positive_u32_var_2,
+    pairs_of_natural_and_unsigned, pairs_of_natural_and_unsigned_var_2,
+    pairs_of_unsigned_and_natural, positive_naturals,
 };
 use malachite_test::natural::arithmetic::divisible_by_u32::num_divisible_by_u32;
 use num::BigUint;
@@ -45,7 +46,7 @@ fn limbs_divisible_by_limb_fail() {
 fn test_divisible_by_u32() {
     let test = |u, v: u32, divisible| {
         let n = Natural::from_str(u).unwrap();
-        assert_eq!(n.divisible_by(&v), divisible);
+        assert_eq!(n.divisible_by(v), divisible);
         assert_eq!(n == 0 || v != 0 && n % v == 0, divisible);
 
         assert_eq!(
@@ -111,10 +112,7 @@ fn limbs_divisible_by_limb_properties() {
         pairs_of_unsigned_vec_and_positive_unsigned_var_1,
         |&(ref limbs, limb)| {
             let divisible = limbs_divisible_by_limb(limbs, limb);
-            assert_eq!(
-                Natural::from_limbs_asc(limbs).divisible_by(&limb),
-                divisible,
-            );
+            assert_eq!(Natural::from_limbs_asc(limbs).divisible_by(limb), divisible,);
             assert_eq!(limbs_mod_limb(limbs, limb) == 0, divisible,);
             assert_eq!(_combined_limbs_divisible_by_limb(limbs, limb), divisible,);
         },
@@ -122,7 +120,7 @@ fn limbs_divisible_by_limb_properties() {
 }
 
 fn divisible_by_u32_properties_helper(n: &Natural, u: u32) {
-    let divisible = n.divisible_by(&u);
+    let divisible = n.divisible_by(u);
     assert_eq!(*n == 0 || u != 0 && n % u == 0, divisible);
 
     //TODO assert_eq!(n.divisible_by(Natural::from(u)), remainder);
@@ -148,9 +146,28 @@ fn divisible_by_u32_properties() {
     );
 
     test_properties(
+        pairs_of_natural_and_positive_u32_var_1,
+        |&(ref n, u): &(Natural, u32)| {
+            assert!(n.divisible_by(u));
+            assert!(*n == 0 || u != 0 && n % u == 0);
+
+            //TODO assert!(n.divisible_by(Natural::from(u));
+
+            assert!(num_divisible_by_u32(natural_to_biguint(n), u));
+            assert!(natural_to_rug_integer(n).is_divisible_u(u));
+        },
+    );
+
+    test_properties(
         pairs_of_natural_and_positive_u32_var_2,
         |&(ref n, u): &(Natural, u32)| {
-            divisible_by_u32_properties_helper(n, u);
+            assert!(!n.divisible_by(u));
+            assert!(*n != 0 && (u == 0 || n % u != 0));
+
+            //TODO assert!(n.divisible_by(Natural::from(u));
+
+            assert!(!num_divisible_by_u32(natural_to_biguint(n), u));
+            assert!(!natural_to_rug_integer(n).is_divisible_u(u));
         },
     );
 
@@ -163,17 +180,17 @@ fn divisible_by_u32_properties() {
     );
 
     test_properties(naturals, |n| {
-        assert!(n.divisible_by(&1));
+        assert!(n.divisible_by(1));
     });
 
     test_properties(positive_naturals, |n| {
-        assert!(!n.divisible_by(&0));
+        assert!(!n.divisible_by(0));
     });
 
     test_properties(positive_unsigneds, |&u: &u32| {
-        assert!(Natural::ZERO.divisible_by(&u));
+        assert!(Natural::ZERO.divisible_by(u));
         if u > 1 {
-            assert!(!Natural::ONE.divisible_by(&u));
+            assert!(!Natural::ONE.divisible_by(u));
         }
     });
 }

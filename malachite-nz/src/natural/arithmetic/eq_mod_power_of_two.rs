@@ -9,7 +9,7 @@ fn limbs_eq_mod_power_of_two_equal(xs: &[u32], ys: &[u32], pow: u64) -> bool {
     if i >= len {
         xs == ys
     } else {
-        &xs[..i] == &ys[..i] && xs[i].eq_mod_power_of_two(&ys[i], pow & u64::from(u32::WIDTH_MASK))
+        &xs[..i] == &ys[..i] && xs[i].eq_mod_power_of_two(ys[i], pow & u64::from(u32::WIDTH_MASK))
     }
 }
 
@@ -26,7 +26,7 @@ fn limbs_eq_mod_power_of_two_greater(xs: &[u32], ys: &[u32], pow: u64) -> bool {
             pow - u64::from(u32::WIDTH) * ys_len as u64,
         )
     } else {
-        &xs[..i] == &ys[..i] && xs[i].eq_mod_power_of_two(&ys[i], pow & u64::from(u32::WIDTH_MASK))
+        &xs[..i] == &ys[..i] && xs[i].eq_mod_power_of_two(ys[i], pow & u64::from(u32::WIDTH_MASK))
     }
 }
 
@@ -67,7 +67,7 @@ pub fn limbs_eq_mod_power_of_two(xs: &[u32], ys: &[u32], pow: u64) -> bool {
     }
 }
 
-impl EqModPowerOfTwo<Natural> for Natural {
+impl<'a, 'b> EqModPowerOfTwo<&'b Natural> for &'a Natural {
     /// Returns whether two `Natural`s are equivalent mod two to the power of `pow`; that is,
     /// whether their `pow` least-significant bits are equal.
     ///
@@ -93,10 +93,10 @@ impl EqModPowerOfTwo<Natural> for Natural {
     ///         4), false);
     /// }
     /// ```
-    fn eq_mod_power_of_two(&self, other: &Natural, pow: u64) -> bool {
+    fn eq_mod_power_of_two(self, other: &'b Natural, pow: u64) -> bool {
         match (self, other) {
-            (_, &Small(ref y)) => self.eq_mod_power_of_two(y, pow),
-            (&Small(ref x), _) => other.eq_mod_power_of_two(x, pow),
+            (_, &Small(y)) => self.eq_mod_power_of_two(y, pow),
+            (&Small(x), _) => other.eq_mod_power_of_two(x, pow),
             (&Large(ref xs), &Large(ref ys)) => limbs_eq_mod_power_of_two(xs, ys, pow),
         }
     }

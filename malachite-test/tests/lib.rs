@@ -52,9 +52,9 @@ pub mod integer {
         pub mod add_mul_u32;
         pub mod add_u32;
         pub mod divisible_by_power_of_two;
+        pub mod eq_i32_mod_power_of_two;
         pub mod eq_mod_power_of_two;
-        pub mod eq_mod_power_of_two_i32;
-        pub mod eq_mod_power_of_two_u32;
+        pub mod eq_u32_mod_power_of_two;
         pub mod mod_power_of_two;
         pub mod mul;
         pub mod mul_i32;
@@ -160,7 +160,8 @@ pub mod natural {
         pub mod divisible_by_power_of_two;
         pub mod divisible_by_u32;
         pub mod eq_mod_power_of_two;
-        pub mod eq_mod_power_of_two_u32;
+        pub mod eq_u32_mod_power_of_two;
+        pub mod eq_u32_mod_u32;
         pub mod is_power_of_two;
         pub mod log_two;
         pub mod mod_power_of_two;

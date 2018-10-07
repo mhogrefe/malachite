@@ -610,14 +610,10 @@ pub fn pairs_of_unsigned_vec<T: PrimitiveUnsigned>(
 pub fn pairs_of_unsigned_vec_var_1<T: PrimitiveUnsigned>(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (Vec<T>, Vec<T>)>> {
-    Box::new(
-        vecs_of_unsigned(gm)
-            .filter(|xs| xs.len().is_even())
-            .map(|xs| {
-                let half_length = xs.len() >> 1;
-                (xs[..half_length].to_vec(), xs[half_length..].to_vec())
-            }),
-    )
+    Box::new(vecs_of_unsigned(gm).filter(|xs| xs.len().even()).map(|xs| {
+        let half_length = xs.len() >> 1;
+        (xs[..half_length].to_vec(), xs[half_length..].to_vec())
+    }))
 }
 
 // All pairs of `Vec<T>`, where `T` is unsigned and the last `T`s of both `Vec`s are nonzero.
@@ -1296,6 +1292,39 @@ pub fn triples_of_unsigned_vec_unsigned_vec_and_small_unsigned_var_1<
             },
         ),
     )
+}
+
+// All triples of `Vec<T>`, T, and `T`, where `T` is unsigned, the second `T` is positive, the `Vec`
+// has at least two elements, and the `Vec`'s last element is nonzero.
+pub fn triples_of_unsigned_vec_unsigned_and_positive_unsigned_var_1<T: PrimitiveUnsigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (Vec<T>, T, T)>> {
+    match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_triples(
+            exhaustive_vecs(exhaustive_unsigned())
+                .filter(|limbs| limbs.len() > 1 && *limbs.last().unwrap() != T::ZERO),
+            exhaustive_unsigned(),
+            exhaustive_positive(),
+        )),
+        GenerationMode::Random(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| {
+                random_vecs(seed, scale, &(|seed_2| random(seed_2)))
+                    .filter(|limbs| limbs.len() > 1 && *limbs.last().unwrap() != T::ZERO)
+            }),
+            &(|seed| random(seed)),
+            &(|seed| random_positive_unsigned(seed)),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| {
+                special_random_unsigned_vecs(seed, scale)
+                    .filter(|limbs| limbs.len() > 1 && *limbs.last().unwrap() != T::ZERO)
+            }),
+            &(|seed| special_random_unsigned(seed)),
+            &(|seed| special_random_positive_unsigned(seed)),
+        )),
+    }
 }
 
 // All triples of `Vec<T>`, T, and small `U`, where `T` and `U` are unsigned, the `Vec` is

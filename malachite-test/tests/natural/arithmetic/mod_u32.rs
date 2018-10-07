@@ -10,7 +10,7 @@ use malachite_test::inputs::base::{
     pairs_of_unsigned_vec_and_positive_unsigned_var_1, positive_unsigneds,
 };
 use malachite_test::inputs::natural::{
-    naturals, pairs_of_natural_and_positive_u32_var_2, pairs_of_natural_and_positive_unsigned,
+    naturals, pairs_of_natural_and_positive_u32_var_1, pairs_of_natural_and_positive_unsigned,
     pairs_of_natural_and_unsigned_var_2, pairs_of_unsigned_and_positive_natural,
     triples_of_natural_natural_and_positive_unsigned,
 };
@@ -365,7 +365,7 @@ fn mod_u32_properties() {
     );
 
     test_properties(
-        pairs_of_natural_and_positive_u32_var_2,
+        pairs_of_natural_and_positive_u32_var_1,
         |&(ref n, u): &(Natural, u32)| {
             mod_u32_properties_helper(n, u);
         },
@@ -463,7 +463,7 @@ fn neg_mod_u32_properties() {
     );
 
     test_properties(
-        pairs_of_natural_and_positive_u32_var_2,
+        pairs_of_natural_and_positive_u32_var_1,
         |&(ref n, u): &(Natural, u32)| {
             neg_mod_u32_properties_helper(n, u);
         },

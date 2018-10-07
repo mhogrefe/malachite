@@ -1,7 +1,7 @@
 use malachite_base::num::Parity;
 use natural::Natural::{self, Large, Small};
 
-impl Parity for Natural {
+impl<'a> Parity for &'a Natural {
     /// Determines whether a `Natural` is even.
     ///
     /// Time: worst case O(1)
@@ -17,17 +17,17 @@ impl Parity for Natural {
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
-    ///     assert_eq!(Natural::ZERO.is_even(), true);
-    ///     assert_eq!(Natural::from(123u32).is_even(), false);
-    ///     assert_eq!(Natural::from(0x80u32).is_even(), true);
-    ///     assert_eq!(Natural::trillion().is_even(), true);
-    ///     assert_eq!((Natural::trillion() + 1).is_even(), false);
+    ///     assert_eq!(Natural::ZERO.even(), true);
+    ///     assert_eq!(Natural::from(123u32).even(), false);
+    ///     assert_eq!(Natural::from(0x80u32).even(), true);
+    ///     assert_eq!(Natural::trillion().even(), true);
+    ///     assert_eq!((Natural::trillion() + 1).even(), false);
     /// }
     /// ```
-    fn is_even(&self) -> bool {
-        match *self {
-            Small(small) => small.is_even(),
-            Large(ref limbs) => limbs[0].is_even(),
+    fn even(self) -> bool {
+        match self {
+            Small(small) => small.even(),
+            Large(ref limbs) => limbs[0].even(),
         }
     }
 
@@ -46,17 +46,17 @@ impl Parity for Natural {
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
-    ///     assert_eq!(Natural::ZERO.is_odd(), false);
-    ///     assert_eq!(Natural::from(123u32).is_odd(), true);
-    ///     assert_eq!(Natural::from(0x80u32).is_odd(), false);
-    ///     assert_eq!(Natural::trillion().is_odd(), false);
-    ///     assert_eq!((Natural::trillion() + 1).is_odd(), true);
+    ///     assert_eq!(Natural::ZERO.odd(), false);
+    ///     assert_eq!(Natural::from(123u32).odd(), true);
+    ///     assert_eq!(Natural::from(0x80u32).odd(), false);
+    ///     assert_eq!(Natural::trillion().odd(), false);
+    ///     assert_eq!((Natural::trillion() + 1).odd(), true);
     /// }
     /// ```
-    fn is_odd(&self) -> bool {
+    fn odd(self) -> bool {
         match *self {
-            Small(small) => small.is_odd(),
-            Large(ref limbs) => limbs[0].is_odd(),
+            Small(small) => small.odd(),
+            Large(ref limbs) => limbs[0].odd(),
         }
     }
 }

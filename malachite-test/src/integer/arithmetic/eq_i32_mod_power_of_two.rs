@@ -8,36 +8,36 @@ use malachite_nz::integer::Integer;
 use rug;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
-    register_demo!(registry, demo_integer_eq_mod_power_of_two_i32);
+    register_demo!(registry, demo_integer_eq_i32_mod_power_of_two);
     register_bench!(
         registry,
         Large,
-        benchmark_integer_eq_mod_power_of_two_i32_library_comparison
+        benchmark_integer_eq_i32_mod_power_of_two_library_comparison
     );
     register_bench!(
         registry,
         Large,
-        benchmark_integer_eq_mod_power_of_two_i32_algorithms
+        benchmark_integer_eq_i32_mod_power_of_two_algorithms
     );
 }
 
-pub fn rug_eq_mod_power_of_two_i32(x: &rug::Integer, i: &i32, pow: u64) -> bool {
-    x.is_congruent_2pow(&rug::Integer::from(*i), u32::checked_from(pow).unwrap())
+pub fn rug_eq_i32_mod_power_of_two(x: &rug::Integer, i: i32, pow: u64) -> bool {
+    x.is_congruent_2pow(&rug::Integer::from(i), u32::checked_from(pow).unwrap())
 }
 
-fn demo_integer_eq_mod_power_of_two_i32(gm: GenerationMode, limit: usize) {
+fn demo_integer_eq_i32_mod_power_of_two(gm: GenerationMode, limit: usize) {
     for (n, i, pow) in triples_of_integer_signed_and_small_unsigned::<i32, u64>(gm).take(limit) {
         println!(
             "{}.eq_mod_power_of_two({}, {}) = {}",
             n,
             i,
             pow,
-            n.eq_mod_power_of_two(&i, pow)
+            n.eq_mod_power_of_two(i, pow)
         );
     }
 }
 
-fn benchmark_integer_eq_mod_power_of_two_i32_library_comparison(
+fn benchmark_integer_eq_i32_mod_power_of_two_library_comparison(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,
@@ -54,17 +54,17 @@ fn benchmark_integer_eq_mod_power_of_two_i32_library_comparison(
         &mut [
             (
                 "malachite",
-                &mut (|(_, (ref n, ref i, pow))| no_out!(n.eq_mod_power_of_two(i, pow))),
+                &mut (|(_, (ref n, i, pow))| no_out!(n.eq_mod_power_of_two(i, pow))),
             ),
             (
                 "rug",
-                &mut (|((ref n, ref i, pow), _)| no_out!(rug_eq_mod_power_of_two_i32(n, i, pow))),
+                &mut (|((ref n, i, pow), _)| no_out!(rug_eq_i32_mod_power_of_two(n, i, pow))),
             ),
         ],
     );
 }
 
-fn benchmark_integer_eq_mod_power_of_two_i32_algorithms(
+fn benchmark_integer_eq_i32_mod_power_of_two_algorithms(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,
@@ -81,7 +81,7 @@ fn benchmark_integer_eq_mod_power_of_two_i32_algorithms(
         &mut [
             (
                 "Integer.eq_mod_power_of_two(&i32, u64)",
-                &mut (|(n, i, pow)| no_out!(n.eq_mod_power_of_two(&i, pow))),
+                &mut (|(n, i, pow)| no_out!(n.eq_mod_power_of_two(i, pow))),
             ),
             (
                 "Integer.mod_power_of_two(u64) == i32.mod_power_of_two(u64)",

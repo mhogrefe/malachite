@@ -30,7 +30,7 @@ pub fn limbs_divisible_by_power_of_two(limbs: &[u32], pow: u64) -> bool {
         && limbs[zero_limbs].divisible_by_power_of_two(pow & u64::from(u32::WIDTH_MASK))
 }
 
-impl DivisibleByPowerOfTwo for Natural {
+impl<'a> DivisibleByPowerOfTwo for &'a Natural {
     /// Returns whether `self` is divisible by 2<sup>`pow`</sup>. If `self` is 0, the result is
     /// always true; otherwise, it is equivalent to `self.trailing_zeros().unwrap() <= pow`, but
     /// more efficient.
@@ -57,7 +57,7 @@ impl DivisibleByPowerOfTwo for Natural {
     ///     assert_eq!(Natural::trillion().divisible_by_power_of_two(13), false);
     /// }
     /// ```
-    fn divisible_by_power_of_two(&self, pow: u64) -> bool {
+    fn divisible_by_power_of_two(self, pow: u64) -> bool {
         match (self, pow) {
             (_, 0) => true,
             (&Small(small), pow) => small.divisible_by_power_of_two(pow),

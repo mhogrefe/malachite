@@ -5,7 +5,10 @@ use malachite_nz::natural::arithmetic::divisible_by_power_of_two::limbs_divisibl
 use malachite_nz::natural::Natural;
 use malachite_test::common::natural_to_rug_integer;
 use malachite_test::inputs::base::{pairs_of_unsigned_vec_and_small_u64_var_1, unsigneds};
-use malachite_test::inputs::natural::{naturals, pairs_of_natural_and_small_unsigned};
+use malachite_test::inputs::natural::{
+    naturals, pairs_of_natural_and_small_unsigned, pairs_of_natural_and_small_unsigned_var_1,
+    pairs_of_natural_and_small_unsigned_var_2,
+};
 use rug;
 use std::str::FromStr;
 
@@ -85,12 +88,38 @@ fn divisible_by_power_of_two_properties() {
             divisible
         );
         if *x != 0 {
-            assert_eq!(x.trailing_zeros().unwrap() >= u64::from(pow), divisible);
+            assert_eq!(x.trailing_zeros().unwrap() >= pow, divisible);
         }
         assert_eq!((-x).divisible_by_power_of_two(pow), divisible);
         assert!((x << pow as u32).divisible_by_power_of_two(pow));
         assert_eq!(x >> pow << pow == *x, divisible);
     });
+
+    test_properties(
+        pairs_of_natural_and_small_unsigned_var_1,
+        |&(ref x, pow)| {
+            assert!(x.divisible_by_power_of_two(pow));
+            assert!(natural_to_rug_integer(x).is_divisible_2pow(u32::checked_from(pow).unwrap()));
+            if *x != 0 {
+                assert!(x.trailing_zeros().unwrap() >= pow);
+            }
+            assert!((-x).divisible_by_power_of_two(pow));
+            assert_eq!(x >> pow << pow, *x);
+        },
+    );
+
+    test_properties(
+        pairs_of_natural_and_small_unsigned_var_2,
+        |&(ref x, pow)| {
+            assert!(!x.divisible_by_power_of_two(pow));
+            assert!(!natural_to_rug_integer(x).is_divisible_2pow(u32::checked_from(pow).unwrap()));
+            if *x != 0 {
+                assert!(x.trailing_zeros().unwrap() < pow);
+            }
+            assert!(!(-x).divisible_by_power_of_two(pow));
+            assert_ne!(x >> pow << pow, *x);
+        },
+    );
 
     test_properties(naturals, |x| {
         assert!(x.divisible_by_power_of_two(0));

@@ -1,7 +1,7 @@
 use common::{integer_to_bigint, integer_to_rug_integer, natural_to_rug_integer, GenerationMode};
 use inputs::common::{reshape_1_2_to_3, reshape_2_1_to_3};
 use malachite_base::num::{
-    DivisibleByPowerOfTwo, PrimitiveInteger, PrimitiveSigned, PrimitiveUnsigned,
+    DivisibleByPowerOfTwo, EqModPowerOfTwo, PrimitiveInteger, PrimitiveSigned, PrimitiveUnsigned,
 };
 use malachite_base::round::RoundingMode;
 use malachite_nz::integer::Integer;
@@ -32,7 +32,7 @@ use rust_wheels::iterators::tuples::{
     random_quadruples, random_triples, random_triples_from_single,
 };
 use rust_wheels::iterators::vecs::exhaustive_fixed_size_vecs_from_single;
-use std::ops::{Shl, Shr};
+use std::ops::{Add, Shl, Shr};
 
 pub fn integers(gm: GenerationMode) -> Box<Iterator<Item = Integer>> {
     match gm {
@@ -746,6 +746,34 @@ pub fn rm_triples_of_integer_unsigned_and_small_unsigned<
     )
 }
 
+// All triples of `Integer`, `T`, and small `U`, where `T` and `U` are unsigned and the `Integer` is
+// equal to the first `T` mod 2 to the power of the second `T`.
+pub fn triples_of_integer_unsigned_and_small_unsigned_var_1<
+    T: PrimitiveUnsigned,
+    U: PrimitiveUnsigned,
+>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (Integer, T, U)>>
+where
+    Integer: Shl<U, Output = Integer> + Add<T, Output = Integer>,
+{
+    Box::new(
+        triples_of_integer_unsigned_and_small_unsigned(gm)
+            .map(|(n, u, pow)| ((n << pow) + u, u, pow)),
+    )
+}
+
+// All triples of `Integer`, `u32`, and small `T`, where `T` is unsigned and the `Integer` is not
+// equal to the `u32` mod 2 to the power of the `T`.
+pub fn triples_of_integer_u32_and_small_unsigned_var_2<T: PrimitiveUnsigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (Integer, u32, T)>> {
+    Box::new(
+        triples_of_integer_unsigned_and_small_unsigned::<u32, T>(gm)
+            .filter(|&(ref n, u, pow)| !n.eq_mod_power_of_two(u, pow.into())),
+    )
+}
+
 pub fn triples_of_integer_signed_and_small_unsigned<T: PrimitiveSigned, U: PrimitiveUnsigned>(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (Integer, T, U)>> {
@@ -776,6 +804,34 @@ pub fn rm_triples_of_integer_signed_and_small_unsigned<T: PrimitiveSigned, U: Pr
     Box::new(
         triples_of_integer_signed_and_small_unsigned(gm)
             .map(|(x, y, z)| ((integer_to_rug_integer(&x), y, z), (x, y, z))),
+    )
+}
+
+// All triples of `Integer`, `T`, and small `U`, where `T` is signed, `U` is unsigned, and the
+// `Integer` is equal to the `T` mod 2 to the power of the `T`.
+pub fn triples_of_integer_signed_and_small_unsigned_var_1<
+    T: PrimitiveSigned,
+    U: PrimitiveUnsigned,
+>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (Integer, T, U)>>
+where
+    Integer: Shl<U, Output = Integer> + Add<T, Output = Integer>,
+{
+    Box::new(
+        triples_of_integer_signed_and_small_unsigned(gm)
+            .map(|(n, u, pow)| ((n << pow) + u, u, pow)),
+    )
+}
+
+// All triples of `Integer`, `i32`, and small `T`, where `U` is unsigned and the `Integer` is not
+// equal to the `i32` mod 2 to the power of the `T`.
+pub fn triples_of_integer_i32_and_small_unsigned_var_2<T: PrimitiveUnsigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (Integer, i32, T)>> {
+    Box::new(
+        triples_of_integer_signed_and_small_unsigned::<i32, T>(gm)
+            .filter(|&(ref n, i, pow)| !n.eq_mod_power_of_two(i, pow.into())),
     )
 }
 
@@ -957,6 +1013,31 @@ pub fn rm_triples_of_integer_integer_and_small_unsigned<T: PrimitiveUnsigned>(
                 (x, y, z),
             )
         }),
+    )
+}
+
+// All triples of `Integer`, `Integer`, and small `T`, where `T` is unsigned and the `Integer`s are
+// equal mod 2 to the power of the `T`.
+pub fn triples_of_integer_integer_and_small_unsigned_var_1<T: PrimitiveUnsigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (Integer, Integer, T)>>
+where
+    Integer: Shl<T, Output = Integer>,
+{
+    Box::new(
+        triples_of_integer_integer_and_small_unsigned(gm)
+            .map(|(x, y, pow)| ((x << pow) + &y, y, pow)),
+    )
+}
+
+// All triples of `Integer`, `Integer`, and small `T`, where `T` is unsigned and the `Integer`s are
+// not equal mod 2 to the power of the `T`.
+pub fn triples_of_integer_integer_and_small_unsigned_var_2<T: PrimitiveUnsigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (Integer, Integer, T)>> {
+    Box::new(
+        triples_of_integer_integer_and_small_unsigned::<T>(gm)
+            .filter(|&(ref x, ref y, pow)| !x.eq_mod_power_of_two(y, pow.into())),
     )
 }
 

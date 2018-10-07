@@ -3,8 +3,8 @@ use inputs::base::pairs_of_unsigneds;
 use inputs::common::{reshape_1_2_to_3, reshape_2_1_to_3};
 use malachite_base::misc::CheckedFrom;
 use malachite_base::num::{
-    DivisibleBy, DivisibleByPowerOfTwo, PrimitiveInteger, PrimitiveSigned, PrimitiveUnsigned,
-    SignificantBits,
+    DivisibleBy, DivisibleByPowerOfTwo, EqMod, EqModPowerOfTwo, PrimitiveInteger, PrimitiveSigned,
+    PrimitiveUnsigned, SignificantBits,
 };
 use malachite_base::round::RoundingMode;
 use malachite_nz::natural::Natural;
@@ -31,7 +31,7 @@ use rust_wheels::iterators::tuples::{
     random_quadruples, random_triples, random_triples_from_single,
 };
 use rust_wheels::iterators::vecs::exhaustive_fixed_size_vecs_from_single;
-use std::ops::{Mul, Shl, Shr};
+use std::ops::{Add, Mul, Shl, Shr};
 
 pub fn naturals(gm: GenerationMode) -> Box<Iterator<Item = Natural>> {
     match gm {
@@ -388,32 +388,30 @@ pub fn nrm_pairs_of_natural_and_positive_unsigned<T: PrimitiveUnsigned>(
     }))
 }
 
-// All pairs of `Natural` and positive `u32`, where the `Natural` is not divisible by the `u32`.
+// All triples of `Natural` and positive `u32`, where the `Natural` is not divisible by the `T`.
 pub fn pairs_of_natural_and_positive_u32_var_1(
-    gm: GenerationMode,
-) -> Box<Iterator<Item = (Natural, u32)>> {
-    //TODO use divisible
-    Box::new(pairs_of_natural_and_positive_unsigned(gm).filter(|&(ref n, u)| !n.divisible_by(&u)))
-}
-
-// All triples of `Natural` and positive `T`, where `T` is unsigned and the `Natural` is divisible
-// by the `T`.
-pub fn pairs_of_natural_and_positive_u32_var_2(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (Natural, u32)>> {
     Box::new(pairs_of_natural_and_positive_unsigned(gm).map(|(n, u)| (n * u, u)))
 }
 
-pub fn nrm_pairs_of_natural_and_positive_u32_var_2(
+pub fn nrm_pairs_of_natural_and_positive_u32_var_1(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = ((BigUint, u32), (rug::Integer, u32), (Natural, u32))>> {
-    Box::new(pairs_of_natural_and_positive_u32_var_2(gm).map(|(x, y)| {
+    Box::new(pairs_of_natural_and_positive_u32_var_1(gm).map(|(x, y)| {
         (
             (natural_to_biguint(&x), y),
             (natural_to_rug_integer(&x), y),
             (x, y),
         )
     }))
+}
+
+// All pairs of `Natural` and positive `u32`, where the `Natural` is not divisible by the `u32`.
+pub fn pairs_of_natural_and_positive_u32_var_2(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (Natural, u32)>> {
+    Box::new(pairs_of_natural_and_positive_unsigned(gm).filter(|&(ref n, u)| !n.divisible_by(u)))
 }
 
 // All pairs of `Natural` and `u32` where the most-significant bit of the `u32` is set and the
@@ -766,6 +764,31 @@ pub fn rm_triples_of_natural_natural_and_small_unsigned<T: PrimitiveUnsigned>(
     )
 }
 
+// All triples of `Natural`, `Natural`, and small `T`, where `T` is unsigned and the `Natural`s are
+// equal mod 2 to the power of the `T`.
+pub fn triples_of_natural_natural_and_small_unsigned_var_1<T: PrimitiveUnsigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (Natural, Natural, T)>>
+where
+    Natural: Shl<T, Output = Natural>,
+{
+    Box::new(
+        triples_of_natural_natural_and_small_unsigned(gm)
+            .map(|(x, y, pow)| ((x << pow) + &y, y, pow)),
+    )
+}
+
+// All triples of `Natural`, `Natural`, and small `T`, where `T` is unsigned and the `Natural`s are
+// not equal mod 2 to the power of the `T`.
+pub fn triples_of_natural_natural_and_small_unsigned_var_2<T: PrimitiveUnsigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (Natural, Natural, T)>> {
+    Box::new(
+        triples_of_natural_natural_and_small_unsigned::<T>(gm)
+            .filter(|&(ref x, ref y, pow)| !x.eq_mod_power_of_two(y, pow.into())),
+    )
+}
+
 pub fn triples_of_natural_unsigned_and_unsigned<T: PrimitiveUnsigned>(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (Natural, T, T)>> {
@@ -783,6 +806,43 @@ pub fn triples_of_natural_unsigned_and_unsigned<T: PrimitiveUnsigned>(
             &(|seed| special_random_unsigned(seed)),
         )),
     }
+}
+
+pub fn rm_triples_of_natural_unsigned_and_unsigned<T: PrimitiveUnsigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = ((rug::Integer, T, T), (Natural, T, T))>> {
+    Box::new(
+        triples_of_natural_unsigned_and_unsigned(gm)
+            .map(|(x, y, z)| ((natural_to_rug_integer(&x), y, z), (x, y, z))),
+    )
+}
+
+// All triples of `Natural`, `T`, `T`, where `T` is unsigned and the `Natural` is equal to the first
+// `T` mod the second `T`.
+pub fn triples_of_natural_unsigned_and_unsigned_var_1<T: PrimitiveUnsigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (Natural, T, T)>>
+where
+    Natural: Mul<T, Output = Natural> + Add<T, Output = Natural>,
+{
+    Box::new(
+        triples_of_natural_unsigned_and_unsigned(gm)
+            .map(|(n, u, modulus)| (n * modulus + u, u, modulus)),
+    )
+}
+
+// All triples of `Natural`, `T`, `T`, where `T` is unsigned and the `Natural` is not equal to the
+// first `T` mod the second `T`.
+pub fn triples_of_natural_unsigned_and_unsigned_var_2<T: PrimitiveUnsigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (Natural, T, T)>> {
+    Box::new(
+        triples_of_natural_unsigned_and_unsigned::<T>(gm).filter(|&(ref n, u, modulus)| {
+            let u: u32 = u.checked_into().unwrap();
+            let modulus: u32 = modulus.checked_into().unwrap();
+            !n.eq_mod(u, modulus)
+        }),
+    )
 }
 
 pub fn triples_of_natural_unsigned_and_small_unsigned<
@@ -821,6 +881,34 @@ pub fn rm_triples_of_natural_unsigned_and_small_unsigned<
     Box::new(
         triples_of_natural_unsigned_and_small_unsigned(gm)
             .map(|(x, y, z)| ((natural_to_rug_integer(&x), y, z), (x, y, z))),
+    )
+}
+
+// All triples of `Natural`, `T`, and small `U`, where `T` and `U` are unsigned and the `Natural` is
+// equal to the `T` mod 2 to the power of the `T`.
+pub fn triples_of_natural_unsigned_and_small_unsigned_var_1<
+    T: PrimitiveUnsigned,
+    U: PrimitiveUnsigned,
+>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (Natural, T, U)>>
+where
+    Natural: Shl<U, Output = Natural> + Add<T, Output = Natural>,
+{
+    Box::new(
+        triples_of_natural_unsigned_and_small_unsigned(gm)
+            .map(|(n, u, pow)| ((n << pow) + u, u, pow)),
+    )
+}
+
+// All triples of `Natural`, `u32`, and small `T`, where `T` is unsigned and the `Natural` is not
+// equal to the `u32` mod 2 to the power of the `T`.
+pub fn triples_of_natural_u32_and_small_unsigned_var_2<T: PrimitiveUnsigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (Natural, u32, T)>> {
+    Box::new(
+        triples_of_natural_unsigned_and_small_unsigned::<u32, T>(gm)
+            .filter(|&(ref n, u, pow)| !n.eq_mod_power_of_two(u, pow.into())),
     )
 }
 

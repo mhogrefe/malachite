@@ -44,7 +44,7 @@ fn demo_limbs_divisible_by_limb(gm: GenerationMode, limit: usize) {
 
 fn demo_natural_divisible_by_u32(gm: GenerationMode, limit: usize) {
     for (n, u) in pairs_of_natural_and_unsigned::<u32>(gm).take(limit) {
-        if n.divisible_by(&u) {
+        if n.divisible_by(u) {
             println!("{} is divisible by {}", n, u);
         } else {
             println!("{} is not divisible by {}", n, u);
@@ -111,7 +111,7 @@ fn benchmark_natural_divisible_by_u32_library_comparison(
         &mut [
             (
                 "malachite",
-                &mut (|(_, _, (x, y))| no_out!(x.divisible_by(&y))),
+                &mut (|(_, _, (x, y))| no_out!(x.divisible_by(y))),
             ),
             (
                 "num",

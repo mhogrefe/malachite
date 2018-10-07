@@ -20,7 +20,7 @@ use natural::Natural::{self, Large, Small};
 ///
 /// # Example
 /// ```
-/// use malachite_nz::integer::arithmetic::eq_mod_power_of_two_u32::*;
+/// use malachite_nz::integer::arithmetic::eq_u32_mod_power_of_two::*;
 /// use std::u32;
 ///
 /// assert_eq!(limbs_eq_mod_power_of_two_neg_limb(&[1, 1], u32::MAX, 0), true);
@@ -37,15 +37,15 @@ pub fn limbs_eq_mod_power_of_two_neg_limb(limbs: &[u32], limb: u32, pow: u64) ->
     if i >= limbs.len() {
         false
     } else if i == 0 {
-        limbs[0].eq_mod_power_of_two(&limb.wrapping_neg(), pow)
+        limbs[0].eq_mod_power_of_two(limb.wrapping_neg(), pow)
     } else {
         limbs[0] == limb.wrapping_neg()
             && limbs[1..i].iter().all(|&x| x == u32::MAX)
-            && limbs[i].eq_mod_power_of_two(&u32::MAX, pow & u64::from(u32::WIDTH_MASK))
+            && limbs[i].eq_mod_power_of_two(u32::MAX, pow & u64::from(u32::WIDTH_MASK))
     }
 }
 
-impl EqModPowerOfTwo<u32> for Integer {
+impl<'a> EqModPowerOfTwo<u32> for &'a Integer {
     /// Returns whether this `Integer` is equivalent to a `u32` mod two to the power of `pow`; that
     /// is, whether the `pow` least-significant twos-complement bits of the `Integer` and the `u32`
     /// are equal.
@@ -65,12 +65,12 @@ impl EqModPowerOfTwo<u32> for Integer {
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {
-    ///     assert_eq!((&Integer::ZERO).eq_mod_power_of_two(&256u32, 8), true);
-    ///     assert_eq!((&Integer::from(-0b1101)).eq_mod_power_of_two(&0b1011u32, 3), true);
-    ///     assert_eq!((&Integer::from(-0b1101)).eq_mod_power_of_two(&0b1011u32, 4), false);
+    ///     assert_eq!((&Integer::ZERO).eq_mod_power_of_two(256u32, 8), true);
+    ///     assert_eq!((&Integer::from(-0b1101)).eq_mod_power_of_two(0b1011u32, 3), true);
+    ///     assert_eq!((&Integer::from(-0b1101)).eq_mod_power_of_two(0b1011u32, 4), false);
     /// }
     /// ```
-    fn eq_mod_power_of_two(&self, other: &u32, pow: u64) -> bool {
+    fn eq_mod_power_of_two(self, other: u32, pow: u64) -> bool {
         if self.sign {
             self.abs.eq_mod_power_of_two(other, pow)
         } else {
@@ -80,12 +80,12 @@ impl EqModPowerOfTwo<u32> for Integer {
 }
 
 impl Natural {
-    pub(crate) fn eq_mod_power_of_two_neg_u32(&self, other: &u32, pow: u64) -> bool {
+    pub(crate) fn eq_mod_power_of_two_neg_u32(&self, other: u32, pow: u64) -> bool {
         match *self {
             Small(ref small) => {
                 pow <= u64::from(u32::WIDTH) && small.wrapping_neg().eq_mod_power_of_two(other, pow)
             }
-            Large(ref limbs) => limbs_eq_mod_power_of_two_neg_limb(limbs, *other, pow),
+            Large(ref limbs) => limbs_eq_mod_power_of_two_neg_limb(limbs, other, pow),
         }
     }
 }
