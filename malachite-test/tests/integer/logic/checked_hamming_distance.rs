@@ -158,6 +158,7 @@ fn checked_hamming_distance_properties() {
     });
 
     test_properties(integers, |n| {
+        assert_eq!(n.checked_hamming_distance(n), Some(0));
         assert_eq!(
             n.checked_hamming_distance(&Integer::ZERO),
             n.checked_count_ones()

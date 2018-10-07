@@ -16,7 +16,6 @@ use malachite_test::natural::logic::hamming_distance::{
 use rug;
 use std::str::FromStr;
 
-//TODO continue deduplication
 #[test]
 fn test_limbs_hamming_distance_same_length() {
     let test = |xs, ys, out| {
@@ -88,23 +87,28 @@ fn test_hamming_distance() {
     test("1000000000000", "1000000000001", 1);
 }
 
+fn limbs_hamming_distance_helper(
+    f: &mut FnMut(&[u32], &[u32]) -> u64,
+    xs: &Vec<u32>,
+    ys: &Vec<u32>,
+) {
+    assert_eq!(
+        f(xs, ys),
+        Natural::from_limbs_asc(xs).hamming_distance(&Natural::from_limbs_asc(ys))
+    );
+}
+
 #[test]
 fn limbs_hamming_distance_properties_same_length() {
     test_properties(pairs_of_unsigned_vec_var_1, |&(ref xs, ref ys)| {
-        assert_eq!(
-            limbs_hamming_distance_same_length(xs, ys),
-            Natural::from_limbs_asc(xs).hamming_distance(&Natural::from_limbs_asc(ys))
-        );
+        limbs_hamming_distance_helper(&mut limbs_hamming_distance_same_length, xs, ys);
     });
 }
 
 #[test]
 fn limbs_hamming_distance_properties() {
     test_properties(pairs_of_unsigned_vec_var_2, |&(ref xs, ref ys)| {
-        assert_eq!(
-            limbs_hamming_distance(xs, ys),
-            Natural::from_limbs_asc(xs).hamming_distance(&Natural::from_limbs_asc(ys))
-        );
+        limbs_hamming_distance_helper(&mut limbs_hamming_distance, xs, ys);
     });
 }
 
@@ -144,6 +148,7 @@ fn hamming_distance_properties() {
     });
 
     test_properties(naturals, |n| {
+        assert_eq!(n.hamming_distance(n), 0);
         assert_eq!(n.hamming_distance(&Natural::ZERO), n.count_ones());
         assert_eq!(Natural::ZERO.hamming_distance(n), n.count_ones());
     });
