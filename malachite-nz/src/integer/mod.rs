@@ -7,6 +7,8 @@ use std::str::FromStr;
 ///
 /// Any `Integer` whose absolute value is small enough to fit into an `u32` is represented inline.
 /// Only integers outside this range incur the costs of heap-allocation.
+///
+/// On a 64-bit system, an `Integer` takes up 40 bytes of space on the stack.
 #[derive(Clone, Hash, Eq, PartialEq)]
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
 pub struct Integer {
@@ -147,6 +149,7 @@ pub mod arithmetic {
     pub mod add_mul_i32;
     pub mod add_mul_u32;
     pub mod add_u32;
+    pub mod div_mod_u32;
     pub mod divisible_by_power_of_two;
     pub mod eq_i32_mod_power_of_two;
     pub mod eq_mod_power_of_two;

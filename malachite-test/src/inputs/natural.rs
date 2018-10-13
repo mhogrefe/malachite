@@ -388,7 +388,7 @@ pub fn nrm_pairs_of_natural_and_positive_unsigned<T: PrimitiveUnsigned>(
     }))
 }
 
-// All triples of `Natural` and positive `u32`, where the `Natural` is not divisible by the `T`.
+// All triples of `Natural` and positive `u32` where the `Natural` is not divisible by the `T`.
 pub fn pairs_of_natural_and_positive_u32_var_1(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (Natural, u32)>> {

@@ -8,6 +8,8 @@ use std::str::FromStr;
 ///
 /// Any `Natural` small enough to fit into an `u32` is represented inline. Only naturals outside
 /// this range incur the costs of heap-allocation.
+///
+/// On a 64-bit system, a `Natural` takes up 32 bytes of space on the stack.
 #[derive(Clone, Eq, Hash, PartialEq)]
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
 pub enum Natural {

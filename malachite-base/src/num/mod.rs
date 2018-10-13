@@ -509,6 +509,19 @@ pub trait CeilingDivAssignNegMod<RHS = Self> {
     fn ceiling_div_assign_neg_mod(&mut self, rhs: RHS) -> Self::ModOutput;
 }
 
+pub trait CeilingDivMod<RHS = Self> {
+    type DivOutput;
+    type ModOutput;
+
+    fn ceiling_div_mod(self, rhs: RHS) -> (Self::DivOutput, Self::ModOutput);
+}
+
+pub trait CeilingDivAssignMod<RHS = Self> {
+    type ModOutput;
+
+    fn ceiling_div_assign_mod(&mut self, rhs: RHS) -> Self::ModOutput;
+}
+
 pub trait DivExact<RHS = Self> {
     type Output;
 
@@ -700,6 +713,8 @@ pub trait PrimitiveInteger:
     + BitScan
     + BitXor<Output = Self>
     + BitXorAssign<Self>
+    + CeilingDivNegMod
+    + CeilingDivAssignNegMod
     + CheckedAdd<Output = Self>
     + CheckedDiv<Output = Self>
     + CheckedFrom<u8>
@@ -733,11 +748,13 @@ pub trait PrimitiveInteger:
     + Display
     + Div<Output = Self>
     + DivAssign
+    + DivAssignMod
     + DivAssignRem<RemOutput = Self>
     + DivExact
     + DivExactAssign
     + DivisibleBy
     + DivisibleByPowerOfTwo
+    + DivMod
     + DivRem<DivOutput = Self, RemOutput = Self>
     + Endian
     + Eq
@@ -749,9 +766,11 @@ pub trait PrimitiveInteger:
     + LowerHex
     + Min
     + Max
+    + Mod
     + Mul<Output = Self>
     + MulAssign<Self>
     + Named
+    + NegMod
     + Not<Output = Self>
     + NotAssign
     + Octal
@@ -2376,6 +2395,115 @@ macro_rules! signed_traits {
             #[inline]
             fn divisible_by_power_of_two(self, pow: u64) -> bool {
                 self.to_unsigned_bitwise().divisible_by_power_of_two(pow)
+            }
+        }
+
+        impl DivMod for $t {
+            type DivOutput = $t;
+            type ModOutput = $ut;
+
+            #[inline]
+            fn div_mod(self, rhs: $t) -> ($t, $ut) {
+                let self_abs = self.unsigned_abs();
+                let rhs_abs = rhs.unsigned_abs();
+                if rhs > 0 {
+                    let (q, r) = self_abs.div_mod(rhs_abs);
+                    (q as $t, r)
+                } else {
+                    let (q, r) = self_abs.ceiling_div_neg_mod(rhs_abs);
+                    (-(q as $t), r)
+                }
+            }
+        }
+
+        impl DivAssignMod for $t {
+            type ModOutput = $ut;
+
+            #[inline]
+            fn div_assign_mod(&mut self, rhs: $t) -> $ut {
+                let (q, r) = self.div_mod(rhs);
+                *self = q;
+                r
+            }
+        }
+
+        impl Mod for $t {
+            type Output = $ut;
+
+            #[inline]
+            fn mod_op(self, rhs: $t) -> $ut {
+                let self_abs = self.unsigned_abs();
+                let rhs_abs = rhs.unsigned_abs();
+                if rhs > 0 {
+                    self_abs.mod_op(rhs_abs)
+                } else {
+                    self_abs.neg_mod(rhs_abs)
+                }
+            }
+        }
+
+        impl CeilingDivNegMod for $t {
+            type DivOutput = $t;
+            type ModOutput = $ut;
+
+            #[inline]
+            fn ceiling_div_neg_mod(self, rhs: $t) -> ($t, $ut) {
+                let (quotient, remainder) = self.div_mod(rhs);
+                if remainder == 0 {
+                    (quotient, 0)
+                } else {
+                    (quotient + 1, rhs.unsigned_abs() - remainder)
+                }
+            }
+        }
+
+        impl CeilingDivAssignNegMod for $t {
+            type ModOutput = $ut;
+
+            #[inline]
+            fn ceiling_div_assign_neg_mod(&mut self, rhs: $t) -> $ut {
+                let remainder = self.div_assign_mod(rhs);
+                if remainder == 0 {
+                    0
+                } else {
+                    *self += 1;
+                    rhs.unsigned_abs() - remainder
+                }
+            }
+        }
+
+        impl CeilingDivMod for $t {
+            type DivOutput = $t;
+            type ModOutput = $t;
+
+            #[inline]
+            fn ceiling_div_mod(self, rhs: $t) -> ($t, $t) {
+                let (quotient, remainder) = self.ceiling_div_neg_mod(rhs);
+                (quotient, -(remainder as $t))
+            }
+        }
+
+        impl CeilingDivAssignMod for $t {
+            type ModOutput = $t;
+
+            #[inline]
+            fn ceiling_div_assign_mod(&mut self, rhs: $t) -> $t {
+                let remainder = self.ceiling_div_assign_neg_mod(rhs);
+                -(remainder as $t)
+            }
+        }
+
+        impl NegMod for $t {
+            type Output = $ut;
+
+            #[inline]
+            fn neg_mod(self, rhs: $t) -> $ut {
+                let remainder = self.mod_op(rhs);
+                if remainder == 0 {
+                    0
+                } else {
+                    rhs.unsigned_abs() - remainder
+                }
             }
         }
     };

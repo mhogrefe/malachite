@@ -22,6 +22,8 @@ use std::str::FromStr;
 ///
 /// Sometimes a `RoundingMode` is used in an unusual context, such as rounding _to_ a floating-point
 /// number, in which case further explanation of its behavior is provided at the usage site.
+///
+/// A `RoundingMode` takes up 1 byte of space.
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub enum RoundingMode {
     Down,

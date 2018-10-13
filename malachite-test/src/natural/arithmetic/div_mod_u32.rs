@@ -41,6 +41,10 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_u32_div_rem_natural_ref);
     register_demo!(registry, demo_u32_div_assign_rem_natural);
     register_demo!(registry, demo_u32_div_assign_rem_natural_ref);
+    register_demo!(registry, demo_u32_ceiling_div_neg_mod_natural);
+    register_demo!(registry, demo_u32_ceiling_div_neg_mod_natural_ref);
+    register_demo!(registry, demo_u32_ceiling_div_assign_neg_mod_natural);
+    register_demo!(registry, demo_u32_ceiling_div_assign_neg_mod_natural_ref);
     register_bench!(registry, Small, benchmark_limbs_div_limb_mod);
     register_bench!(registry, Small, benchmark_limbs_div_limb_to_out_mod);
     register_bench!(registry, Small, benchmark_limbs_div_limb_in_place_mod);
@@ -107,6 +111,16 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
         Large,
         benchmark_u32_div_assign_rem_natural_evaluation_strategy
     );
+    register_bench!(
+        registry,
+        Large,
+        benchmark_u32_ceiling_div_neg_mod_natural_evaluation_strategy
+    );
+    register_bench!(
+        registry,
+        Large,
+        benchmark_u32_ceiling_div_assign_neg_mod_natural_evaluation_strategy
+    );
 }
 
 pub fn num_div_mod_u32(x: BigUint, u: u32) -> (BigUint, u32) {
@@ -115,7 +129,7 @@ pub fn num_div_mod_u32(x: BigUint, u: u32) -> (BigUint, u32) {
 }
 
 pub fn rug_div_mod_u32(x: rug::Integer, u: u32) -> (rug::Integer, u32) {
-    let (quotient, remainder) = x.div_rem(rug::Integer::from(u));
+    let (quotient, remainder) = x.div_rem_euc(rug::Integer::from(u));
     (quotient, remainder.to_u32_wrapping())
 }
 
@@ -125,7 +139,7 @@ pub fn num_div_rem_u32(x: BigUint, u: u32) -> (BigUint, u32) {
 }
 
 pub fn rug_div_rem_u32(x: rug::Integer, u: u32) -> (rug::Integer, u32) {
-    let (quotient, remainder) = x.div_rem_floor(rug::Integer::from(u));
+    let (quotient, remainder) = x.div_rem(rug::Integer::from(u));
     (quotient, remainder.to_u32_wrapping())
 }
 
@@ -323,6 +337,53 @@ fn demo_u32_div_assign_rem_natural_ref(gm: GenerationMode, limit: usize) {
         let remainder = u.div_assign_rem(&n);
         println!(
             "x := {}; x.div_assign_rem(&{}) = {}; x = {}",
+            u_old, n, remainder, u
+        );
+    }
+}
+
+fn demo_u32_ceiling_div_neg_mod_natural(gm: GenerationMode, limit: usize) {
+    for (u, n) in pairs_of_unsigned_and_positive_natural::<u32>(gm).take(limit) {
+        let n_old = n.clone();
+        println!(
+            "{}.ceiling_div_neg_mod({}) = {:?}",
+            u,
+            n_old,
+            u.ceiling_div_neg_mod(n)
+        );
+    }
+}
+
+fn demo_u32_ceiling_div_neg_mod_natural_ref(gm: GenerationMode, limit: usize) {
+    for (u, n) in pairs_of_unsigned_and_positive_natural::<u32>(gm).take(limit) {
+        let n_old = n.clone();
+        println!(
+            "{}.ceiling_div_neg_mod(&{}) = {:?}",
+            u,
+            n_old,
+            u.ceiling_div_neg_mod(&n)
+        );
+    }
+}
+
+fn demo_u32_ceiling_div_assign_neg_mod_natural(gm: GenerationMode, limit: usize) {
+    for (mut u, n) in pairs_of_unsigned_and_positive_natural::<u32>(gm).take(limit) {
+        let u_old = u;
+        let n_old = n.clone();
+        let remainder = u.ceiling_div_assign_neg_mod(n);
+        println!(
+            "x := {}; x.ceiling_div_assign_neg_mod({}) = {:?}; x = {}",
+            u_old, n_old, remainder, u
+        );
+    }
+}
+
+fn demo_u32_ceiling_div_assign_neg_mod_natural_ref(gm: GenerationMode, limit: usize) {
+    for (mut u, n) in pairs_of_unsigned_and_positive_natural::<u32>(gm).take(limit) {
+        let u_old = u;
+        let remainder = u.ceiling_div_assign_neg_mod(&n);
+        println!(
+            "x := {}; x.ceiling_div_assign_neg_mod(&{}) = {:?}; x = {}",
             u_old, n, remainder, u
         );
     }
@@ -612,7 +673,10 @@ fn benchmark_natural_ceiling_div_neg_mod_u32_algorithms(
         &(|&(ref n, _)| n.significant_bits() as usize),
         "n.significant_bits()",
         &mut [
-            ("standard", &mut (|(x, y)| no_out!(x.div_mod(y)))),
+            (
+                "standard",
+                &mut (|(x, y)| no_out!(x.ceiling_div_neg_mod(y))),
+            ),
             (
                 "using div_round and %",
                 &mut (|(x, y)| {
@@ -754,6 +818,60 @@ fn benchmark_u32_div_assign_rem_natural_evaluation_strategy(
             (
                 "u32.div_assign_rem(&Natural)",
                 &mut (|(mut x, y)| no_out!(x.div_assign_rem(&y))),
+            ),
+        ],
+    );
+}
+
+fn benchmark_u32_ceiling_div_neg_mod_natural_evaluation_strategy(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "u32.ceiling_div_neg_mod(Natural)",
+        BenchmarkType::EvaluationStrategy,
+        pairs_of_unsigned_and_positive_natural::<u32>(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(_, ref n)| n.significant_bits() as usize),
+        "n.significant_bits()",
+        &mut [
+            (
+                "u32.ceiling_div_neg_mod(Natural)",
+                &mut (|(x, y)| no_out!(x.ceiling_div_neg_mod(y))),
+            ),
+            (
+                "u32.ceiling_div_neg_mod(&Natural)",
+                &mut (|(x, y)| no_out!(x.ceiling_div_neg_mod(&y))),
+            ),
+        ],
+    );
+}
+
+fn benchmark_u32_ceiling_div_assign_neg_mod_natural_evaluation_strategy(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "u32.ceiling_div_assign_neg_mod(Natural)",
+        BenchmarkType::EvaluationStrategy,
+        pairs_of_unsigned_and_positive_natural::<u32>(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(_, ref n)| n.significant_bits() as usize),
+        "n.significant_bits()",
+        &mut [
+            (
+                "u32.ceiling_div_assign_neg_mod(Natural)",
+                &mut (|(mut x, y)| no_out!(x.ceiling_div_assign_neg_mod(y))),
+            ),
+            (
+                "u32.ceiling_div_assign_neg_mod(&Natural)",
+                &mut (|(mut x, y)| no_out!(x.ceiling_div_assign_neg_mod(&y))),
             ),
         ],
     );
