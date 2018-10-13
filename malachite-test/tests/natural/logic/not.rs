@@ -8,11 +8,14 @@ use malachite_test::inputs::natural::naturals;
 use rug;
 use std::str::FromStr;
 
-//TODO continue deduplication
 #[test]
-pub fn test_limbs_not() {
+pub fn test_limbs_not_and_limbs_not_in_place() {
     let test = |limbs_in: &[u32], limbs_out: &[u32]| {
         assert_eq!(limbs_not(limbs_in), limbs_out);
+
+        let mut mut_limbs = limbs_in.to_vec();
+        limbs_not_in_place(&mut mut_limbs);
+        assert_eq!(mut_limbs, limbs_out);
     };
     test(&[], &[]);
     test(&[0, 1, 2], &[0xffff_ffff, 0xffff_fffe, 0xffff_fffd]);
@@ -40,18 +43,6 @@ pub fn test_limbs_not_to_out() {
 fn limbs_not_to_out_fail() {
     let mut limbs_out = vec![1, 2];
     limbs_not_to_out(&mut limbs_out, &[1, 2, 3]);
-}
-
-#[test]
-pub fn test_limbs_not_in_place() {
-    let test = |limbs: &[u32], out: &[u32]| {
-        let mut mut_limbs = limbs.to_vec();
-        limbs_not_in_place(&mut mut_limbs);
-        assert_eq!(mut_limbs, out);
-    };
-    test(&[], &[]);
-    test(&[0, 1, 2], &[0xffff_ffff, 0xffff_fffe, 0xffff_fffd]);
-    test(&[0xffff_ffff, 0xffff_fffe, 0xffff_fffd], &[0, 1, 2]);
 }
 
 #[test]
