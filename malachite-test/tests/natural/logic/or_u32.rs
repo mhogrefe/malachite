@@ -19,6 +19,7 @@ use num::BigUint;
 use rug::{self, Assign};
 use std::str::FromStr;
 
+//TODO continue deduplication
 #[test]
 fn test_limbs_or_limb() {
     let test = |limbs: &[u32], limb: u32, out: &[u32]| {

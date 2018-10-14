@@ -21,11 +21,14 @@ use rug;
 use std::cmp::max;
 use std::str::FromStr;
 
-//TODO continue deduplication
 #[test]
-fn test_limbs_or_same_length() {
-    let test = |xs, ys, out| {
-        assert_eq!(limbs_or_same_length(xs, ys), out);
+fn test_limbs_or_same_length_and_limbs_or_same_length_in_place_left() {
+    let test = |xs_before, ys, out| {
+        assert_eq!(limbs_or_same_length(xs_before, ys), out);
+
+        let mut xs = xs_before.to_vec();
+        limbs_or_same_length_in_place_left(&mut xs, ys);
+        assert_eq!(xs, out);
     };
     test(&[], &[], vec![]);
     test(&[2], &[3], vec![3]);
@@ -38,6 +41,13 @@ fn test_limbs_or_same_length() {
 #[should_panic(expected = "assertion failed: `(left == right)`")]
 fn limbs_or_same_length_fail_1() {
     limbs_or_same_length(&[6, 7], &[1, 2, 3]);
+}
+
+#[test]
+#[should_panic(expected = "assertion failed: `(left == right)`")]
+fn limbs_or_same_length_in_place_left_fail() {
+    let mut out = vec![6, 7];
+    limbs_or_same_length_in_place_left(&mut out, &[1, 2, 3]);
 }
 
 #[test]
@@ -110,26 +120,6 @@ fn test_limbs_or_to_out() {
 fn limbs_or_to_out_fail() {
     let mut out = vec![10, 10];
     limbs_or_to_out(&mut out, &[6, 7], &[1, 2, 3]);
-}
-
-#[test]
-fn test_limbs_or_same_length_in_place_left() {
-    let test = |xs_before: &[u32], ys, xs_after| {
-        let mut xs = xs_before.to_vec();
-        limbs_or_same_length_in_place_left(&mut xs, ys);
-        assert_eq!(xs, xs_after);
-    };
-    test(&[], &[], vec![]);
-    test(&[6, 7], &[1, 2], vec![7, 7]);
-    test(&[1, 1, 1], &[1, 2, 3], vec![1, 3, 3]);
-    test(&[100, 101, 102], &[102, 101, 100], vec![102, 101, 102]);
-}
-
-#[test]
-#[should_panic(expected = "assertion failed: `(left == right)`")]
-fn limbs_or_same_length_in_place_left_fail() {
-    let mut out = vec![6, 7];
-    limbs_or_same_length_in_place_left(&mut out, &[1, 2, 3]);
 }
 
 #[test]
@@ -236,23 +226,24 @@ fn test_or() {
     test("12345678987654321", "314159265358979", "12347506587071667");
 }
 
+fn limbs_or_helper(f: &mut FnMut(&[u32], &[u32]) -> Vec<u32>, xs: &Vec<u32>, ys: &Vec<u32>) {
+    assert_eq!(
+        Natural::from_owned_limbs_asc(f(xs, ys)),
+        Natural::from_limbs_asc(xs) | Natural::from_limbs_asc(ys)
+    );
+}
+
 #[test]
 fn limbs_or_same_length_properties() {
     test_properties(pairs_of_unsigned_vec_var_1, |&(ref xs, ref ys)| {
-        assert_eq!(
-            Natural::from_owned_limbs_asc(limbs_or_same_length(xs, ys)),
-            Natural::from_limbs_asc(xs) | Natural::from_limbs_asc(ys)
-        );
+        limbs_or_helper(&mut limbs_or_same_length, xs, ys);
     });
 }
 
 #[test]
 fn limbs_or_properties() {
     test_properties(pairs_of_unsigned_vec, |&(ref xs, ref ys)| {
-        assert_eq!(
-            Natural::from_owned_limbs_asc(limbs_or(xs, ys)),
-            Natural::from_limbs_asc(xs) | Natural::from_limbs_asc(ys)
-        );
+        limbs_or_helper(&mut limbs_or, xs, ys);
     });
 }
 
