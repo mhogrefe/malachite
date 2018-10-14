@@ -168,14 +168,14 @@ impl DivMod<Integer> for u32 {
     /// ```
     fn div_mod(self, other: Integer) -> (Integer, u32) {
         let non_negative = other >= 0;
-        let (q, r) = self.div_mod(other.abs);
+        let (quotient, remainder) = self.div_mod(other.abs);
         (
             if non_negative {
-                Integer::from(q)
+                Integer::from(quotient)
             } else {
-                -Natural::from(q)
+                -Natural::from(quotient)
             },
-            r,
+            remainder,
         )
     }
 }
@@ -210,14 +210,14 @@ impl<'a> DivMod<&'a Integer> for u32 {
     /// }
     /// ```
     fn div_mod(self, other: &'a Integer) -> (Integer, u32) {
-        let (q, r) = self.div_mod(&other.abs);
+        let (quotient, remainder) = self.div_mod(&other.abs);
         (
             if *other >= 0 {
-                Integer::from(q)
+                Integer::from(quotient)
             } else {
-                -Natural::from(q)
+                -Natural::from(quotient)
             },
-            r,
+            remainder,
         )
     }
 }
@@ -593,14 +593,14 @@ impl CeilingDivNegMod<Integer> for u32 {
     /// ```
     fn ceiling_div_neg_mod(self, other: Integer) -> (Integer, Natural) {
         let non_negative = other >= 0;
-        let (q, r) = self.ceiling_div_neg_mod(other.abs);
+        let (quotient, remainder) = self.ceiling_div_neg_mod(other.abs);
         (
             if non_negative {
-                Integer::from(q)
+                Integer::from(quotient)
             } else {
-                -Natural::from(q)
+                -Natural::from(quotient)
             },
-            r,
+            remainder,
         )
     }
 }
@@ -640,14 +640,14 @@ impl<'a> CeilingDivNegMod<&'a Integer> for u32 {
     /// }
     /// ```
     fn ceiling_div_neg_mod(self, other: &'a Integer) -> (Integer, Natural) {
-        let (q, r) = self.ceiling_div_neg_mod(&other.abs);
+        let (quotient, remainder) = self.ceiling_div_neg_mod(&other.abs);
         (
             if *other >= 0 {
-                Integer::from(q)
+                Integer::from(quotient)
             } else {
-                -Natural::from(q)
+                -Natural::from(quotient)
             },
-            r,
+            remainder,
         )
     }
 }

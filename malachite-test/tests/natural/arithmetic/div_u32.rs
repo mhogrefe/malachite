@@ -1,5 +1,6 @@
 use common::test_properties;
-use malachite_base::num::{DivMod, One, Zero};
+use malachite_base::num::{DivRem, One, Zero};
+use malachite_nz::integer::Integer;
 use malachite_nz::natural::arithmetic::div_u32::{
     limbs_div_limb, limbs_div_limb_in_place, limbs_div_limb_to_out,
 };
@@ -131,7 +132,7 @@ fn test_div_u32() {
         assert!(q.is_valid());
         assert_eq!(q.to_string(), quotient);
 
-        let q = Natural::from_str(u).unwrap().div_mod(v).0;
+        let q = Natural::from_str(u).unwrap().div_rem(v).0;
         assert!(q.is_valid());
         assert_eq!(q.to_string(), quotient);
 
@@ -198,6 +199,8 @@ fn test_u32_div_natural() {
 
         assert_eq!(u / Natural::from_str(v).unwrap(), quotient);
         assert_eq!(u / &Natural::from_str(v).unwrap(), quotient);
+
+        assert_eq!(u.div_rem(Natural::from_str(v).unwrap()).0, quotient);
     };
     test(0, "1", 0);
     test(0, "123", 0);
@@ -301,7 +304,7 @@ fn div_u32_properties_helper(n: &Natural, u: u32) {
     assert!(quotient_alt.is_valid());
     assert_eq!(quotient_alt, quotient);
 
-    assert_eq!(n.div_mod(u).0, quotient);
+    assert_eq!(n.div_rem(u).0, quotient);
 
     //TODO assert_eq!(n / Natural::from(u), quotient);
 
@@ -310,6 +313,8 @@ fn div_u32_properties_helper(n: &Natural, u: u32) {
         rug_integer_to_natural(&(natural_to_rug_integer(n) / u)),
         quotient
     );
+
+    assert_eq!(Integer::from(n) / u, quotient);
 
     assert!(n - quotient * u < u);
 }
@@ -354,9 +359,11 @@ fn div_u32_properties() {
             let quotient_alt = u / n.clone();
             assert_eq!(quotient_alt, quotient);
 
-            assert_eq!(u.div_mod(n).0, quotient);
+            assert_eq!(u.div_rem(n).0, quotient);
 
-            assert!(u - &(quotient * n) < *n);
+            assert_eq!(u / Integer::from(n), quotient);
+
+            assert!(u - quotient * n < *n);
         },
     );
 
@@ -370,5 +377,6 @@ fn div_u32_properties() {
             assert_eq!(1 / u, 0);
         }
         assert_eq!(u / Natural::ONE, u);
+        assert_eq!(u / Natural::from(u), 1);
     });
 }
