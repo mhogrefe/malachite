@@ -445,7 +445,7 @@ fn benchmark_natural_neg_mod_u32_algorithms(gm: GenerationMode, limit: usize, fi
         &(|&(ref n, _)| n.significant_bits() as usize),
         "n.significant_bits()",
         &mut [
-            ("standard", &mut (|(x, y)| no_out!(x % y))),
+            ("standard", &mut (|(x, y)| no_out!(x.neg_mod(y)))),
             (
                 "using ceiling_div_neg_mod",
                 &mut (|(x, y)| no_out!(x.ceiling_div_neg_mod(y).1)),

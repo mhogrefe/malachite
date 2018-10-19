@@ -52,9 +52,9 @@ impl<'a> DivMod<u32> for &'a Integer {
     type DivOutput = Integer;
     type ModOutput = u32;
 
-    /// Divides a `Natural` by a `u32`, taking the `Natural` by reference and returning the quotient
-    /// and remainder. The quotient is rounded towards negative infinity, and the remainder is
-    /// always non-negative and less than the divisor. In other words, returns (q, r), where
+    /// Divides an `Integer` by a `u32`, taking the `Integer` by reference and returning the
+    /// quotient and remainder. The quotient is rounded towards negative infinity, and the remainder
+    /// is always non-negative and less than the divisor. In other words, returns (q, r), where
     /// `self` = q * `other` + r and 0 <= r < `other`.
     ///
     /// Time: worst case O(n)
@@ -93,7 +93,7 @@ impl<'a> DivMod<u32> for &'a Integer {
 impl DivAssignMod<u32> for Integer {
     type ModOutput = u32;
 
-    /// Divides a `Natural` by a `u32` in place, returning the remainder. The quotient is rounded
+    /// Divides an `Integer` by a `u32` in place, returning the remainder. The quotient is rounded
     /// towards negative infinity, and the remainder is always non-negative and less than the
     /// divisor. In other words, replaces `self` with q and returns r, where
     /// `self` = q * `other` + r and 0 <= r < `other`.
@@ -141,9 +141,9 @@ impl DivMod<Integer> for u32 {
     type DivOutput = Integer;
     type ModOutput = u32;
 
-    /// Divides a `u32` by a `Natural`, taking the `Natural` by value and returning the quotient and
-    /// remainder. The quotient is rounded towards negative infinity, and the remainder is always
-    /// non-negative and less than the absolute value of the divisor. In other words, returns
+    /// Divides a `u32` by an `Integer`, taking the `Integer` by value and returning the quotient
+    /// and remainder. The quotient is rounded towards negative infinity, and the remainder is
+    /// always non-negative and less than the absolute value of the divisor. In other words, returns
     /// (q, r), where `self` = q * |`other`| + r and 0 <= r < |`other`|.
     ///
     /// Time: worst case O(1)
@@ -160,7 +160,7 @@ impl DivMod<Integer> for u32 {
     ///
     /// fn main() {
     ///     // 3 * 123 + 87 = 456
-    ///     assert_eq!(format!("{:?}", 456.div_mod(-Integer::from(123u32))), "(-3, 87)");
+    ///     assert_eq!(format!("{:?}", 456.div_mod(Integer::from(-123))), "(-3, 87)");
     ///
     ///     // 0 * 10^12 + 123 = 123
     ///     assert_eq!(format!("{:?}", 123.div_mod(Integer::trillion())), "(0, 123)");
@@ -184,10 +184,10 @@ impl<'a> DivMod<&'a Integer> for u32 {
     type DivOutput = Integer;
     type ModOutput = u32;
 
-    /// Divides a `u32` by a `Natural`, taking the `Natural` by reference and returning the quotient
-    /// and remainder. The quotient is rounded towards negative infinity, and the remainder is
-    /// always non-negative and less than the absolute value of the divisor. In other words, returns
-    /// (q, r), where `self` = q * `other` + r and 0 <= r < |`other`|.
+    /// Divides a `u32` by an `Integer`, taking the `Integer` by reference and returning the
+    /// quotient and remainder. The quotient is rounded towards negative infinity, and the remainder
+    /// is always non-negative and less than the absolute value of the divisor. In other words,
+    /// returns (q, r), where `self` = q * `other` + r and 0 <= r < |`other`|.
     ///
     /// Time: worst case O(1)
     ///
@@ -203,7 +203,7 @@ impl<'a> DivMod<&'a Integer> for u32 {
     ///
     /// fn main() {
     ///     // 3 * 123 + 87 = 456
-    ///     assert_eq!(format!("{:?}", 456.div_mod(&-Integer::from(123u32))), "(-3, 87)");
+    ///     assert_eq!(format!("{:?}", 456.div_mod(&Integer::from(-123))), "(-3, 87)");
     ///
     ///     // 0 * 10^12 + 123 = 123
     ///     assert_eq!(format!("{:?}", 123.div_mod(&Integer::trillion())), "(0, 123)");
@@ -226,10 +226,11 @@ impl DivRem<u32> for Integer {
     type DivOutput = Integer;
     type RemOutput = Integer;
 
-    /// Divides a `Natural` by a `u32`, taking the `Natural` by value and returning the quotient and
-    /// remainder. The quotient is rounded towards zero, and the remainder has the same sign as the
-    /// dividend and its absolute value is less than the divisor. In other words, returns (q, r),
-    /// where `self` = q * `other` + r, (r = 0 or sign(r) = sign(q)), and 0 <= |r| < `other`.
+    /// Divides an `Integer` by a `u32`, taking the `Integer` by value and returning the quotient
+    /// and remainder. The quotient is rounded towards zero, and the remainder has the same sign as
+    /// the dividend and its absolute value is less than the divisor. In other words, returns
+    /// (q, r), where `self` = q * `other` + r, (r = 0 or sign(r) = sign(q)), and
+    /// 0 <= |r| < `other`.
     ///
     /// Time: worst case O(n)
     ///
@@ -258,7 +259,7 @@ impl DivRem<u32> for Integer {
         if self.sign {
             (Integer::from(quotient), Integer::from(remainder))
         } else {
-            (-quotient, -Integer::from(remainder))
+            (-quotient, -Natural::from(remainder))
         }
     }
 }
@@ -267,10 +268,10 @@ impl<'a> DivRem<u32> for &'a Integer {
     type DivOutput = Integer;
     type RemOutput = Integer;
 
-    /// Divides a `Natural` by a `u32`, taking the `Natural` by reference and returning the quotient
-    /// and remainder. The quotient is rounded towards zero, and the remainder has the same sign as
-    /// the dividend and its absolute value is less than the divisor. In other words, returns
-    /// (q, r), where `self` = q * `other` + r, (r = 0 or sign(r) = sign(q)), and
+    /// Divides an `Integer` by a `u32`, taking the `Integer` by reference and returning the
+    /// quotient and remainder. The quotient is rounded towards zero, and the remainder has the same
+    /// sign as the dividend and its absolute value is less than the divisor. In other words,
+    /// returns (q, r), where `self` = q * `other` + r, (r = 0 or sign(r) = sign(q)), and
     /// 0 <= |r| < `other`.
     ///
     /// Time: worst case O(n)
@@ -301,7 +302,7 @@ impl<'a> DivRem<u32> for &'a Integer {
         if self.sign {
             (Integer::from(quotient), Integer::from(remainder))
         } else {
-            (-quotient, -Integer::from(remainder))
+            (-quotient, -Natural::from(remainder))
         }
     }
 }
@@ -309,7 +310,7 @@ impl<'a> DivRem<u32> for &'a Integer {
 impl DivAssignRem<u32> for Integer {
     type RemOutput = Integer;
 
-    /// Divides a `Natural` by a `u32` in place, returning the remainder. The quotient is rounded
+    /// Divides an `Integer` by a `u32` in place, returning the remainder. The quotient is rounded
     /// towards zero, and the remainder has the same sign as the dividend and its absolute value is
     /// less than the divisor. In other words, returns (q, r), where `self` = q * `other` + r,
     /// (r = 0 or sign(r) = sign(q)), and 0 <= |r| < `other`.
@@ -348,7 +349,7 @@ impl DivAssignRem<u32> for Integer {
             if self.abs == 0 {
                 self.sign = true;
             }
-            -Integer::from(remainder)
+            -Natural::from(remainder)
         }
     }
 }
@@ -357,41 +358,7 @@ impl DivRem<Integer> for u32 {
     type DivOutput = Integer;
     type RemOutput = u32;
 
-    /// Divides a `u32` by a `Natural`, taking the `Natural` by value and returning the quotient and
-    /// remainder. The quotient is rounded towards zero, and the remainder has the same sign as the
-    /// dividend and its absolute value is less than the divisor. In other words, returns (q, r),
-    /// where `self` = q * `other` + r and 0 <= r < |`other`|.
-    ///
-    /// Time: worst case O(1)
-    ///
-    /// Additional memory: worst case O(1)
-    ///
-    /// # Examples
-    /// ```
-    /// extern crate malachite_base;
-    /// extern crate malachite_nz;
-    ///
-    /// use malachite_base::num::DivRem;
-    /// use malachite_nz::integer::Integer;
-    ///
-    /// fn main() {
-    ///     // 3 * 123 + 87 = 456
-    ///     assert_eq!(format!("{:?}", 456.div_rem(-Integer::from(123u32))), "(-3, 87)");
-    ///
-    ///     // 0 * 10^12 + 123 = 123
-    ///     assert_eq!(format!("{:?}", 123.div_rem(Integer::trillion())), "(0, 123)");
-    /// }
-    /// ```
-    fn div_rem(self, other: Integer) -> (Integer, u32) {
-        self.div_mod(other)
-    }
-}
-
-impl<'a> DivRem<&'a Integer> for u32 {
-    type DivOutput = Integer;
-    type RemOutput = u32;
-
-    /// Divides a `u32` by a `Natural`, taking the `Natural` by reference and returning the quotient
+    /// Divides a `u32` by an `Integer`, taking the `Integer` by value and returning the quotient
     /// and remainder. The quotient is rounded towards zero, and the remainder has the same sign as
     /// the dividend and its absolute value is less than the divisor. In other words, returns
     /// (q, r), where `self` = q * `other` + r and 0 <= r < |`other`|.
@@ -410,7 +377,41 @@ impl<'a> DivRem<&'a Integer> for u32 {
     ///
     /// fn main() {
     ///     // 3 * 123 + 87 = 456
-    ///     assert_eq!(format!("{:?}", 456.div_rem(&-Integer::from(123u32))), "(-3, 87)");
+    ///     assert_eq!(format!("{:?}", 456.div_rem(Integer::from(-123))), "(-3, 87)");
+    ///
+    ///     // 0 * 10^12 + 123 = 123
+    ///     assert_eq!(format!("{:?}", 123.div_rem(Integer::trillion())), "(0, 123)");
+    /// }
+    /// ```
+    fn div_rem(self, other: Integer) -> (Integer, u32) {
+        self.div_mod(other)
+    }
+}
+
+impl<'a> DivRem<&'a Integer> for u32 {
+    type DivOutput = Integer;
+    type RemOutput = u32;
+
+    /// Divides a `u32` by an `Integer`, taking the `Integer` by reference and returning the
+    /// quotient and remainder. The quotient is rounded towards zero, and the remainder has the same
+    /// sign as the dividend and its absolute value is less than the divisor. In other words,
+    /// returns (q, r), where `self` = q * `other` + r and 0 <= r < |`other`|.
+    ///
+    /// Time: worst case O(1)
+    ///
+    /// Additional memory: worst case O(1)
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::DivRem;
+    /// use malachite_nz::integer::Integer;
+    ///
+    /// fn main() {
+    ///     // 3 * 123 + 87 = 456
+    ///     assert_eq!(format!("{:?}", 456.div_rem(&Integer::from(-123))), "(-3, 87)");
     ///
     ///     // 0 * 10^12 + 123 = 123
     ///     assert_eq!(format!("{:?}", 123.div_rem(&Integer::trillion())), "(0, 123)");
@@ -425,10 +426,10 @@ impl CeilingDivNegMod<u32> for Integer {
     type DivOutput = Integer;
     type ModOutput = u32;
 
-    /// Divides a `Natural` by a `u32`, taking the `Natural` by value and returning the quotient and
-    /// the remainder of the negative of the `Natural` divided by the `u32`. The quotient is rounded
-    /// towards positive infinity, and the remainder is always non-negative and less than the
-    /// divisor. In other words, returns (q, r), where `self` = q * `other` - r and
+    /// Divides an `Integer` by a `u32`, taking the `Integer` by value and returning the quotient
+    /// and the remainder of the negative of the `Integer` divided by the `u32`. The quotient is
+    /// rounded towards positive infinity, and the remainder is always non-negative and less than
+    /// the divisor. In other words, returns (q, r), where `self` = q * `other` - r and
     /// 0 <= r < `other`.
     ///
     /// Time: worst case O(n)
@@ -469,10 +470,10 @@ impl<'a> CeilingDivNegMod<u32> for &'a Integer {
     type DivOutput = Integer;
     type ModOutput = u32;
 
-    /// Divides a `Natural` by a `u32`, taking the `Natural` by reference and returning the quotient
-    /// and the remainder of the negative of the `Natural` divided by the `u32`. The quotient is
-    /// rounded towards positive infinity, and the remainder is always non-negative and less than
-    /// the divisor. In other words, returns (q, r), where `self` = q * `other` - r and
+    /// Divides an `Integer` by a `u32`, taking the `Integer` by reference and returning the
+    /// quotient and the remainder of the negative of the `Integer` divided by the `u32`. The
+    /// quotient is rounded towards positive infinity, and the remainder is always non-negative and
+    /// less than the divisor. In other words, returns (q, r), where `self` = q * `other` - r and
     /// 0 <= r < `other`.
     ///
     /// Time: worst case O(n)
@@ -513,10 +514,11 @@ impl<'a> CeilingDivNegMod<u32> for &'a Integer {
 impl CeilingDivAssignNegMod<u32> for Integer {
     type ModOutput = u32;
 
-    /// Divides a `Natural` by a `u32` in place, taking the the quotient and returning the remainder
-    /// of the negative of the `Natural` divided by the `u32`. The quotient is rounded towards
-    /// positive infinity, and the remainder is always non-negative and less than the divisor. In
-    /// other words, returns (q, r), where `self` = q * `other` - r and 0 <= r < `other`.
+    /// Divides an `Integer` by a `u32` in place, taking the the quotient and returning the
+    /// remainder of the negative of the `Integer` divided by the `u32`. The quotient is rounded
+    /// towards positive infinity, and the remainder is always non-negative and less than the
+    /// divisor. In other words, returns (q, r), where `self` = q * `other` - r and
+    /// 0 <= r < `other`.
     ///
     /// Time: worst case O(n)
     ///
@@ -561,10 +563,10 @@ impl CeilingDivNegMod<Integer> for u32 {
     type DivOutput = Integer;
     type ModOutput = Natural;
 
-    /// Divides a `u32` by a `Natural`, taking the `Natural` by value and returning the quotient and
-    /// the remainder of the negative of the `u32` divided by the `Natural`. The quotient is rounded
-    /// towards positive infinity, and the remainder is always non-negative and less than the
-    /// absolute value of the divisor. In other words, returns (q, r), where
+    /// Divides a `u32` by an `Integer`, taking the `Integer` by value and returning the quotient
+    /// and the remainder of the negative of the `u32` divided by the `Integer`. The quotient is
+    /// rounded towards positive infinity, and the remainder is always non-negative and less than
+    /// the absolute value of the divisor. In other words, returns (q, r), where
     /// `self` = q * `other` - r and 0 <= r < |`other`|.
     ///
     /// Time: worst case O(n)
@@ -583,7 +585,7 @@ impl CeilingDivNegMod<Integer> for u32 {
     ///
     /// fn main() {
     ///     // 4 * 123 - 36 = 456
-    ///     assert_eq!(format!("{:?}", 456.ceiling_div_neg_mod(-Integer::from(123u32))),
+    ///     assert_eq!(format!("{:?}", 456.ceiling_div_neg_mod(Integer::from(-123))),
     ///         "(-4, 36)");
     ///
     ///     // 1 * 10^12 - 999,999,999,877 = 123
@@ -609,10 +611,10 @@ impl<'a> CeilingDivNegMod<&'a Integer> for u32 {
     type DivOutput = Integer;
     type ModOutput = Natural;
 
-    /// Divides a `u32` by a `Natural`, taking the `Natural` by reference and returning the quotient
-    /// and the remainder of the negative of the `u32` divided by the `Natural`. The quotient is
-    /// rounded towards positive infinity, and the remainder is always non-negative and less than
-    /// the absolute value of the divisor. In other words, returns (q, r), where
+    /// Divides a `u32` by an `Integer`, taking the `Integer` by reference and returning the
+    /// quotient and the remainder of the negative of the `u32` divided by the `Integer`. The
+    /// quotient is rounded towards positive infinity, and the remainder is always non-negative and
+    /// less than the absolute value of the divisor. In other words, returns (q, r), where
     /// `self` = q * `other` - r and 0 <= r < |`other`|.
     ///
     /// Time: worst case O(n)
@@ -631,7 +633,7 @@ impl<'a> CeilingDivNegMod<&'a Integer> for u32 {
     ///
     /// fn main() {
     ///     // 4 * 123 - 36 = 456
-    ///     assert_eq!(format!("{:?}", 456.ceiling_div_neg_mod(&-Integer::from(123u32))),
+    ///     assert_eq!(format!("{:?}", 456.ceiling_div_neg_mod(&Integer::from(-123))),
     ///         "(-4, 36)");
     ///
     ///     // 1 * 10^12 - 999,999,999,877 = 123
@@ -656,8 +658,8 @@ impl CeilingDivMod<u32> for Integer {
     type DivOutput = Integer;
     type ModOutput = Integer;
 
-    /// Divides a `Natural` by a `u32`, taking the `Natural` by value and returning the quotient and
-    /// the remainder of the `Natural` divided by the `u32`. The quotient is rounded towards
+    /// Divides an `Integer` by a `u32`, taking the `Integer` by value and returning the quotient
+    /// and the remainder of the `Integer` divided by the `u32`. The quotient is rounded towards
     /// positive infinity, and the remainder is always non-positive and its absolute value is less
     /// than the divisor. In other words, returns (q, r), where `self` = q * `other` + r and
     /// 0 <= -r < `other`.
@@ -695,10 +697,10 @@ impl<'a> CeilingDivMod<u32> for &'a Integer {
     type DivOutput = Integer;
     type ModOutput = Integer;
 
-    /// Divides a `Natural` by a `u32`, taking the `Natural` by reference and returning the quotient
-    /// and the remainder of the `Natural` divided by the `u32`. The quotient is rounded towards
-    /// positive infinity, and the remainder is always non-positive and its absolute value is less
-    /// than the divisor. In other words, returns (q, r), where `self` = q * `other` + r and
+    /// Divides an `Integer` by a `u32`, taking the `Integer` by reference and returning the
+    /// quotient and the remainder of the `Integer` divided by the `u32`. The quotient is rounded
+    /// towards positive infinity, and the remainder is always non-positive and its absolute value
+    /// is less than the divisor. In other words, returns (q, r), where `self` = q * `other` + r and
     /// 0 <= -r < `other`.
     ///
     /// Time: worst case O(n)
@@ -733,8 +735,8 @@ impl<'a> CeilingDivMod<u32> for &'a Integer {
 impl CeilingDivAssignMod<u32> for Integer {
     type ModOutput = Integer;
 
-    /// Divides a `Natural` by a `u32` in place, taking the quotient and returning the remainder of
-    /// the `Natural` divided by the `u32`. The quotient is rounded towards positive infinity, and
+    /// Divides an `Integer` by a `u32` in place, taking the quotient and returning the remainder of
+    /// the `Integer` divided by the `u32`. The quotient is rounded towards positive infinity, and
     /// the remainder is always non-positive and its absolute value is less than the divisor. In
     /// other words, returns (q, r), where `self` = q * `other` + r and 0 <= -r < `other`.
     ///
@@ -774,8 +776,8 @@ impl CeilingDivMod<Integer> for u32 {
     type DivOutput = Integer;
     type ModOutput = Integer;
 
-    /// Divides a `u32` by a `Natural`, taking the `Natural` by value and returning the quotient and
-    /// the remainder of the `u32` divided by the `Natural`. The quotient is rounded towards
+    /// Divides a `u32` by an `Integer`, taking the `Integer` by value and returning the quotient
+    /// and the remainder of the `u32` divided by the `Integer`. The quotient is rounded towards
     /// positive infinity, and the remainder is always non-positive and its absolute value is less
     /// than the absolute value of the divisor. In other words, returns (q, r), where
     /// `self` = q * `other` + r and 0 <= -r < |`other`|.
@@ -813,10 +815,10 @@ impl<'a> CeilingDivMod<&'a Integer> for u32 {
     type DivOutput = Integer;
     type ModOutput = Integer;
 
-    /// Divides a `u32` by a `Natural`, taking the `Natural` by reference and returning the quotient
-    /// and the remainder of the `u32` divided by the `Natural`. The quotient is rounded towards
-    /// positive infinity, and the remainder is always non-positive and its absolute value is less
-    /// than the absolute value of the divisor. In other words, returns (q, r), where
+    /// Divides a `u32` by an `Integer`, taking the `Integer` by reference and returning the
+    /// quotient and the remainder of the `u32` divided by the `Integer`. The quotient is rounded
+    /// towards positive infinity, and the remainder is always non-positive and its absolute value
+    /// is less than the absolute value of the divisor. In other words, returns (q, r), where
     /// `self` = q * `other` + r and 0 <= -r < |`other`|.
     ///
     /// Time: worst case O(n)

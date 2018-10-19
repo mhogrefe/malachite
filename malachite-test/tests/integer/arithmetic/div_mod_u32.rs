@@ -691,7 +691,7 @@ fn div_mod_u32_properties_helper(n: &Integer, u: u32) {
     assert_eq!(quotient_alt, quotient);
     assert_eq!(remainder_alt, remainder);
 
-    //TODO let (quotient_alt, remainder_alt) = (n / u, n.mod_op(u));
+    //TODO let (quotient_alt, remainder_alt) = (n.div_round(u, RoundingMode::Floor), n.mod_op(u));
     // assert_eq!(quotient_alt, quotient);
     // assert_eq!(remainder_alt, remainder);
 
@@ -795,9 +795,9 @@ fn div_rem_u32_properties_helper(n: &Integer, u: u32) {
     assert_eq!(quotient_alt, quotient);
     assert_eq!(remainder_alt, remainder);
 
-    //TODO let (quotient_alt, remainder_alt) = (n / u, n % u);
-    // assert_eq!(quotient_alt, quotient);
-    // assert_eq!(remainder_alt, remainder);
+    let (quotient_alt, remainder_alt) = (n / u, n % u);
+    assert_eq!(quotient_alt, quotient);
+    assert_eq!(remainder_alt, remainder);
 
     //TODO assert_eq!(n.div_rem(Integer::from(u)), (quotient.clone(), remainder));
 

@@ -5,7 +5,7 @@ use inputs::integer::{
 };
 use malachite_base::num::{
     CeilingDivAssignMod, CeilingDivAssignNegMod, CeilingDivMod, CeilingDivNegMod, DivAssignMod,
-    DivAssignRem, DivMod, DivRem, SignificantBits,
+    DivAssignRem, DivMod, DivRem, Mod, SignificantBits,
 };
 use num::{BigInt, Integer, ToPrimitive};
 use rug;
@@ -388,13 +388,13 @@ fn benchmark_integer_div_mod_u32_algorithms(gm: GenerationMode, limit: usize, fi
         "n.significant_bits()",
         &mut [
             ("standard", &mut (|(x, y)| no_out!(x.div_mod(y)))),
-            //TODO(
-            //    "using / and %",
-            //    &mut (|(x, y)| {
-            //        let remainder = x.mod_op(y);
-            //        (x / y, remainder);
-            //    }),
-            //),
+            (
+                "using / and %",
+                &mut (|(x, y)| {
+                    let remainder = (&x).mod_op(y);
+                    (x / y, remainder);
+                }),
+            ),
         ],
     );
 }
@@ -483,13 +483,13 @@ fn benchmark_integer_div_rem_u32_algorithms(gm: GenerationMode, limit: usize, fi
         "n.significant_bits()",
         &mut [
             ("standard", &mut (|(x, y)| no_out!(x.div_rem(y)))),
-            //TODO(
-            //    "using / and %",
-            //    &mut (|(x, y)| {
-            //        let remainder = &x % y;
-            //        (x / y, remainder);
-            //    }),
-            //),
+            (
+                "using / and %",
+                &mut (|(x, y)| {
+                    let remainder = &x % y;
+                    (x / y, remainder);
+                }),
+            ),
         ],
     );
 }

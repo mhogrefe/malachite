@@ -188,7 +188,6 @@ impl Rem<u32> for Natural {
     /// extern crate malachite_nz;
     ///
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
     ///
     /// fn main() {
     ///     // 3 * 123 + 87 = 456
@@ -222,7 +221,6 @@ impl<'a> Rem<u32> for &'a Natural {
     /// extern crate malachite_nz;
     ///
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
     ///
     /// fn main() {
     ///     // 3 * 123 + 87 = 456
@@ -260,7 +258,6 @@ impl RemAssign<u32> for Natural {
     /// extern crate malachite_nz;
     ///
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
     ///
     /// fn main() {
     ///     // 3 * 123 + 87 = 456
@@ -306,7 +303,6 @@ impl Rem<Natural> for u32 {
     /// extern crate malachite_nz;
     ///
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
     ///
     /// fn main() {
     ///     // 3 * 123 + 87 = 456
@@ -337,7 +333,6 @@ impl<'a> Rem<&'a Natural> for u32 {
     /// extern crate malachite_nz;
     ///
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
     ///
     /// fn main() {
     ///     // 3 * 123 + 87 = 456
@@ -376,7 +371,6 @@ impl RemAssign<Natural> for u32 {
     /// extern crate malachite_nz;
     ///
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
     ///
     /// fn main() {
     ///     // 3 * 123 + 87 = 456
@@ -410,7 +404,6 @@ impl<'a> RemAssign<&'a Natural> for u32 {
     /// extern crate malachite_nz;
     ///
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
     ///
     /// fn main() {
     ///     // 3 * 123 + 87 = 456
@@ -448,7 +441,6 @@ impl Mod<u32> for Natural {
     ///
     /// use malachite_base::num::Mod;
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
     ///
     /// fn main() {
     ///     // 3 * 123 + 87 = 456
@@ -482,7 +474,6 @@ impl<'a> Mod<u32> for &'a Natural {
     ///
     /// use malachite_base::num::Mod;
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
     ///
     /// fn main() {
     ///     // 3 * 123 + 87 = 456
@@ -514,7 +505,6 @@ impl ModAssign<u32> for Natural {
     ///
     /// use malachite_base::num::ModAssign;
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
     ///
     /// fn main() {
     ///     // 3 * 123 + 87 = 456
@@ -550,7 +540,6 @@ impl Mod<Natural> for u32 {
     ///
     /// use malachite_base::num::Mod;
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
     ///
     /// fn main() {
     ///     // 3 * 123 + 87 = 456
@@ -582,7 +571,6 @@ impl<'a> Mod<&'a Natural> for u32 {
     ///
     /// use malachite_base::num::Mod;
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
     ///
     /// fn main() {
     ///     // 3 * 123 + 87 = 456
@@ -612,7 +600,6 @@ impl ModAssign<Natural> for u32 {
     ///
     /// use malachite_base::num::ModAssign;
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
     ///
     /// fn main() {
     ///     // 3 * 123 + 87 = 456
@@ -646,7 +633,6 @@ impl<'a> ModAssign<&'a Natural> for u32 {
     ///
     /// use malachite_base::num::ModAssign;
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
     ///
     /// fn main() {
     ///     // 3 * 123 + 87 = 456
@@ -685,7 +671,6 @@ impl NegMod<u32> for Natural {
     ///
     /// use malachite_base::num::NegMod;
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
     ///
     /// fn main() {
     ///     // 4 * 123 - 36 = 456
@@ -720,7 +705,6 @@ impl<'a> NegMod<u32> for &'a Natural {
     ///
     /// use malachite_base::num::NegMod;
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
     ///
     /// fn main() {
     ///     // 3 * 124 - 36 = 456
@@ -757,7 +741,6 @@ impl NegModAssign<u32> for Natural {
     ///
     /// use malachite_base::num::NegModAssign;
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
     ///
     /// fn main() {
     ///     // 4 * 123 - 36 = 456
@@ -796,7 +779,6 @@ impl NegMod<Natural> for u32 {
     ///
     /// use malachite_base::num::NegMod;
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
     ///
     /// fn main() {
     ///     // 4 * 123 - 36 = 456
@@ -836,7 +818,6 @@ impl<'a> NegMod<&'a Natural> for u32 {
     ///
     /// use malachite_base::num::NegMod;
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
     ///
     /// fn main() {
     ///     // 4 * 123 - 36 = 456

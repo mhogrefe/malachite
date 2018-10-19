@@ -40,6 +40,7 @@ pub mod base {
         pub mod eq;
         pub mod hash;
         pub mod neg;
+        pub mod size;
     }
 }
 pub mod integer {
@@ -58,6 +59,7 @@ pub mod integer {
         pub mod eq_mod_power_of_two;
         pub mod eq_u32_mod_power_of_two;
         pub mod mod_power_of_two;
+        pub mod mod_u32;
         pub mod mul;
         pub mod mul_i32;
         pub mod mul_u32;
@@ -78,6 +80,7 @@ pub mod integer {
         pub mod constants;
         pub mod decrement;
         pub mod increment;
+        pub mod size;
     }
     pub mod comparison {
         pub mod eq;
@@ -186,6 +189,7 @@ pub mod natural {
         pub mod constants;
         pub mod decrement;
         pub mod increment;
+        pub mod size;
     }
     pub mod comparison {
         pub mod eq;

@@ -486,6 +486,16 @@ pub trait NegModAssign<RHS = Self> {
     fn neg_mod_assign(&mut self, rhs: RHS);
 }
 
+pub trait CeilingMod<RHS = Self> {
+    type Output;
+
+    fn ceiling_mod(self, rhs: RHS) -> Self::Output;
+}
+
+pub trait CeilingModAssign<RHS = Self> {
+    fn ceiling_mod_assign(&mut self, rhs: RHS);
+}
+
 pub trait DivRound<RHS = Self> {
     type Output;
 

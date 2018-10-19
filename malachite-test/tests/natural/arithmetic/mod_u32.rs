@@ -3,6 +3,7 @@ use malachite_base::misc::CheckedFrom;
 use malachite_base::num::{
     CeilingDivNegMod, DivMod, Mod, ModAssign, NegMod, NegModAssign, One, Zero,
 };
+use malachite_nz::integer::Integer;
 use malachite_nz::natural::arithmetic::mod_u32::limbs_mod_limb;
 use malachite_nz::natural::Natural;
 use malachite_test::common::{natural_to_biguint, natural_to_rug_integer};
@@ -345,6 +346,9 @@ fn mod_u32_properties_helper(n: &Natural, u: u32) {
     assert_eq!(num_rem_u32(natural_to_biguint(n), u), remainder);
     assert_eq!(natural_to_rug_integer(n) % u, remainder);
 
+    assert_eq!(Integer::from(n) % u, remainder);
+    assert_eq!(Integer::from(n).mod_op(u), remainder);
+
     assert!(remainder < u);
 }
 
@@ -398,6 +402,9 @@ fn mod_u32_properties() {
 
             assert_eq!(u.div_mod(n).1, remainder);
 
+            assert_eq!(u % Integer::from(n), remainder);
+            assert_eq!(u.mod_op(Integer::from(n)), remainder);
+
             if u != 0 && u < *n {
                 assert_eq!(remainder, u);
             }
@@ -410,6 +417,8 @@ fn mod_u32_properties() {
     });
 
     test_properties(positive_unsigneds, |&u: &u32| {
+        assert_eq!(u % Natural::ONE, 0);
+        assert_eq!(u % Natural::from(u), 0);
         assert_eq!(Natural::ZERO % u, 0);
         if u > 1 {
             assert_eq!(Natural::ONE % u, 1);
@@ -442,6 +451,8 @@ fn neg_mod_u32_properties_helper(n: &Natural, u: u32) {
     //TODO assert_eq!(n.neg_mod(Natural::from(u)), remainder);
 
     assert_eq!(rug_neg_mod_u32(natural_to_rug_integer(n), u), remainder);
+
+    assert_eq!(Integer::from(n).neg_mod(u), remainder);
 
     assert!(remainder < u);
 }
@@ -479,6 +490,8 @@ fn neg_mod_u32_properties() {
             assert!(remainder_alt.is_valid());
             assert_eq!(remainder_alt, remainder);
 
+            assert_eq!(u.neg_mod(Integer::from(n)), remainder);
+
             if u != 0 && u < *n {
                 assert_eq!(remainder, n - u);
             }
@@ -491,10 +504,10 @@ fn neg_mod_u32_properties() {
     });
 
     test_properties(positive_unsigneds, |&u: &u32| {
+        assert_eq!(u.neg_mod(Natural::ONE), 0);
+        assert_eq!(u.neg_mod(Natural::from(u)), 0);
         assert_eq!(Natural::ZERO.neg_mod(u), 0);
-        if u > 1 {
-            assert_eq!(Natural::ONE.neg_mod(u), u - 1);
-        }
+        assert_eq!(Natural::ONE.neg_mod(u), u - 1);
     });
 
     test_properties(
