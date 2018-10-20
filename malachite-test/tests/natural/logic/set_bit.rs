@@ -14,6 +14,7 @@ use num::BigUint;
 use rug;
 use std::str::FromStr;
 
+//TODO continue deduplication
 #[test]
 pub fn test_limbs_slice_set_bit() {
     let test = |limbs: &[u32], index: u64, out_limbs: &[u32]| {
