@@ -74,17 +74,23 @@ fn test_set_bit() {
     test("5", 100, "1267650600228229401496703205381");
 }
 
+macro_rules! limbs_set_bit_helper {
+    ($f:ident, $limbs:ident, $index:ident) => {
+        |&(ref $limbs, $index)| {
+            let mut mut_limbs = $limbs.clone();
+            let mut n = Natural::from_limbs_asc($limbs);
+            $f(&mut mut_limbs, $index);
+            n.set_bit($index);
+            assert_eq!(Natural::from_limbs_asc(&mut_limbs), n);
+        }
+    };
+}
+
 #[test]
 fn limbs_slice_set_bit_properties() {
     test_properties(
         pairs_of_u32_vec_and_small_u64_var_2,
-        |&(ref limbs, index)| {
-            let mut mut_limbs = limbs.clone();
-            let mut n = Natural::from_limbs_asc(limbs);
-            limbs_slice_set_bit(&mut mut_limbs, index);
-            n.set_bit(index);
-            assert_eq!(Natural::from_limbs_asc(&mut_limbs), n);
-        },
+        limbs_set_bit_helper!(limbs_slice_set_bit, limbs, index),
     );
 }
 
@@ -92,13 +98,7 @@ fn limbs_slice_set_bit_properties() {
 fn limbs_vec_set_bit_properties() {
     test_properties(
         pairs_of_unsigned_vec_and_small_u64,
-        |&(ref limbs, index)| {
-            let mut mut_limbs = limbs.clone();
-            let mut n = Natural::from_limbs_asc(limbs);
-            limbs_vec_set_bit(&mut mut_limbs, index);
-            n.set_bit(index);
-            assert_eq!(Natural::from_limbs_asc(&mut_limbs), n);
-        },
+        limbs_set_bit_helper!(limbs_vec_set_bit, limbs, index),
     );
 }
 
