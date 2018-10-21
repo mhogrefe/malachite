@@ -1,6 +1,7 @@
 use common::test_properties;
 use malachite_base::num::{CeilingDivNegMod, DivRound, DivRoundAssign, DivisibleBy, One, Zero};
 use malachite_base::round::RoundingMode;
+use malachite_nz::integer::Integer;
 use malachite_nz::natural::arithmetic::div_round_u32::limbs_limb_div_round_limbs;
 use malachite_nz::natural::Natural;
 use malachite_test::common::{
@@ -12,7 +13,8 @@ use malachite_test::inputs::base::{
 };
 use malachite_test::inputs::natural::{
     pairs_of_natural_and_positive_u32_var_2, pairs_of_natural_and_positive_unsigned,
-    pairs_of_natural_and_rounding_mode, pairs_of_u32_and_positive_natural_var_1,
+    pairs_of_natural_and_rounding_mode, pairs_of_positive_natural_and_rounding_mode,
+    pairs_of_u32_and_positive_natural_var_1,
     triples_of_natural_positive_unsigned_and_rounding_mode_var_1,
     triples_of_unsigned_positive_natural_and_rounding_mode_var_1,
 };
@@ -403,7 +405,7 @@ fn limbs_limb_div_round_limbs_properties() {
 }
 
 #[test]
-fn div_u32_properties() {
+fn div_round_u32_properties() {
     test_properties(
         triples_of_natural_positive_unsigned_and_rounding_mode_var_1,
         |&(ref n, u, rm): &(Natural, u32, RoundingMode)| {
@@ -423,6 +425,8 @@ fn div_u32_properties() {
             assert!(quotient <= *n);
 
             //TODO assert_eq!(n.div_round(Natural::from(u), rm), quotient);
+
+            assert_eq!(Integer::from(n).div_round(u, rm), quotient);
         },
     );
 
@@ -471,15 +475,22 @@ fn div_u32_properties() {
         assert!(nearest == down || nearest == up);
     });
 
-    #[allow(unknown_lints, identity_op)]
     test_properties(pairs_of_natural_and_rounding_mode, |&(ref n, rm)| {
         assert_eq!(n.div_round(1, rm), *n);
     });
 
     test_properties(
+        pairs_of_positive_natural_and_rounding_mode,
+        |&(ref n, rm)| {
+            assert_eq!(0.div_round(n, rm), 0);
+        },
+    );
+
+    test_properties(
         pairs_of_positive_unsigned_and_rounding_mode::<u32>,
         |&(u, rm)| {
             assert_eq!(Natural::ZERO.div_round(u, rm), 0);
+            assert_eq!(u.div_round(Natural::from(u), rm), 1);
         },
     );
 
@@ -503,6 +514,8 @@ fn div_u32_properties() {
             assert!(quotient <= u);
 
             //TODO assert_eq!(Natural::from(u).div_round(n, rm), quotient);
+
+            assert_eq!(u.div_round(Integer::from(n), rm), quotient);
         },
     );
 

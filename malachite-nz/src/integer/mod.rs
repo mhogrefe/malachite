@@ -150,6 +150,7 @@ pub mod arithmetic {
     pub mod add_mul_u32;
     pub mod add_u32;
     pub mod div_mod_u32;
+    pub mod div_round_u32;
     pub mod div_u32;
     pub mod divisible_by_power_of_two;
     pub mod eq_i32_mod_power_of_two;

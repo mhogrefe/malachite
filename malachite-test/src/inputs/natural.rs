@@ -965,6 +965,27 @@ pub fn pairs_of_natural_and_rounding_mode(
     }
 }
 
+pub fn pairs_of_positive_natural_and_rounding_mode(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (Natural, RoundingMode)>> {
+    match gm {
+        GenerationMode::Exhaustive => Box::new(lex_pairs(
+            exhaustive_positive_naturals(),
+            exhaustive_rounding_modes(),
+        )),
+        GenerationMode::Random(scale) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| random_positive_naturals(seed, scale)),
+            &(|seed| random_rounding_modes(seed)),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_positive_naturals(seed, scale)),
+            &(|seed| random_rounding_modes(seed)),
+        )),
+    }
+}
+
 fn triples_of_natural_small_signed_and_rounding_mode<T: PrimitiveSigned>(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (Natural, T, RoundingMode)>> {

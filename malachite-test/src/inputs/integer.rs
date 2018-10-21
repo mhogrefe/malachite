@@ -1,5 +1,6 @@
 use common::{integer_to_bigint, integer_to_rug_integer, natural_to_rug_integer, GenerationMode};
 use inputs::common::{reshape_1_2_to_3, reshape_2_1_to_3};
+use malachite_base::misc::CheckedFrom;
 use malachite_base::num::{
     DivisibleByPowerOfTwo, EqModPowerOfTwo, PrimitiveInteger, PrimitiveSigned, PrimitiveUnsigned,
 };
@@ -34,7 +35,7 @@ use rust_wheels::iterators::tuples::{
     random_quadruples, random_triples, random_triples_from_single,
 };
 use rust_wheels::iterators::vecs::exhaustive_fixed_size_vecs_from_single;
-use std::ops::{Add, Shl, Shr};
+use std::ops::{Add, Mul, Shl, Shr};
 
 pub fn integers(gm: GenerationMode) -> Box<Iterator<Item = Integer>> {
     match gm {
@@ -316,11 +317,19 @@ pub fn nrm_pairs_of_integer_and_positive_unsigned<T: PrimitiveUnsigned>(
     }))
 }
 
-// All triples of `Integer` and positive `u32` where the `Integer` is not divisible by the `T`.
+// All triples of `Integer` and positive `u32` where the `Integer` is divisible by the `T`.
 pub fn pairs_of_integer_and_positive_u32_var_1(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (Integer, u32)>> {
     Box::new(pairs_of_integer_and_positive_unsigned(gm).map(|(n, u)| (n * u, u)))
+}
+
+// All pairs of `Integer` and positive `u32`, where the `Integer` is not divisible by the `u32`.
+pub fn pairs_of_integer_and_positive_u32_var_2(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (Integer, u32)>> {
+    //TODO use divisible_by
+    Box::new(pairs_of_integer_and_positive_unsigned(gm).filter(|&(ref n, u)| n % u != 0))
 }
 
 pub fn pairs_of_unsigned_and_integer<T: PrimitiveUnsigned>(
@@ -379,6 +388,16 @@ pub fn pairs_of_unsigned_and_nonzero_integer<T: PrimitiveUnsigned>(
             &(|seed| special_random_nonzero_integers(seed, scale)),
         )),
     }
+}
+
+// All pairs of `u32` and positive `Integer` where the `u32` is not divisible by the `Integer`.
+pub fn pairs_of_u32_and_nonzero_integer_var_1(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (u32, Integer)>> {
+    Box::new(
+        //TODO use divisible_by
+        pairs_of_unsigned_and_nonzero_integer::<u32>(gm).filter(|&(u, ref n)| u % n != 0),
+    )
 }
 
 pub fn pairs_of_natural_integer_and_unsigned<T: PrimitiveUnsigned>(
@@ -1190,6 +1209,27 @@ pub fn pairs_of_integer_and_rounding_mode(
     }
 }
 
+pub fn pairs_of_nonzero_integer_and_rounding_mode(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (Integer, RoundingMode)>> {
+    match gm {
+        GenerationMode::Exhaustive => Box::new(lex_pairs(
+            exhaustive_nonzero_integers(),
+            exhaustive_rounding_modes(),
+        )),
+        GenerationMode::Random(scale) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| random_nonzero_integers(seed, scale)),
+            &(|seed| random_rounding_modes(seed)),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_nonzero_integers(seed, scale)),
+            &(|seed| random_rounding_modes(seed)),
+        )),
+    }
+}
+
 fn triples_of_integer_small_signed_and_rounding_mode<T: PrimitiveSigned>(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (Integer, T, RoundingMode)>> {
@@ -1436,4 +1476,89 @@ pub fn quadruples_of_integer_integer_integer_and_small_unsigned<T: PrimitiveUnsi
             &(|seed| u32s_geometric(seed, scale).flat_map(T::checked_from)),
         )),
     }
+}
+
+fn triples_of_integer_positive_unsigned_and_rounding_mode<T: PrimitiveUnsigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (Integer, T, RoundingMode)>> {
+    match gm {
+        GenerationMode::Exhaustive => reshape_2_1_to_3(Box::new(lex_pairs(
+            exhaustive_pairs(exhaustive_integers(), exhaustive_positive()),
+            exhaustive_rounding_modes(),
+        ))),
+        GenerationMode::Random(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| random_integers(seed, scale)),
+            &(|seed| random_positive_unsigned(seed)),
+            &(|seed| random_rounding_modes(seed)),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_integers(seed, scale)),
+            &(|seed| special_random_positive_unsigned(seed)),
+            &(|seed| random_rounding_modes(seed)),
+        )),
+    }
+}
+
+// All triples of `Integer`, positive `T`, and `RoundingMode`, where `T` is unsigned and if the
+// `RoundingMode` is `RoundingMode::Exact`, the `Integer` is divisible by the `T`.
+pub fn triples_of_integer_positive_unsigned_and_rounding_mode_var_1<T: PrimitiveUnsigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (Integer, T, RoundingMode)>>
+where
+    Integer: Mul<T, Output = Integer>,
+{
+    Box::new(
+        triples_of_integer_positive_unsigned_and_rounding_mode::<T>(gm).map(|(n, u, rm)| {
+            if rm == RoundingMode::Exact {
+                (n * u, u, rm)
+            } else {
+                (n, u, rm)
+            }
+        }),
+    )
+}
+
+fn triples_of_unsigned_nonzero_integer_and_rounding_mode<T: PrimitiveUnsigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (T, Integer, RoundingMode)>> {
+    match gm {
+        GenerationMode::Exhaustive => reshape_2_1_to_3(Box::new(lex_pairs(
+            exhaustive_pairs(exhaustive_unsigned(), exhaustive_nonzero_integers()),
+            exhaustive_rounding_modes(),
+        ))),
+        GenerationMode::Random(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| random(seed)),
+            &(|seed| random_nonzero_integers(seed, scale)),
+            &(|seed| random_rounding_modes(seed)),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_unsigned(seed)),
+            &(|seed| special_random_nonzero_integers(seed, scale)),
+            &(|seed| random_rounding_modes(seed)),
+        )),
+    }
+}
+
+// All triples of `T`, nonzero `Integer`, and `RoundingMode`, where `T` is unsigned and if the
+// `RoundingMode` is `RoundingMode::Exact`, the `T` is divisible by the `Integer`.
+pub fn triples_of_unsigned_nonzero_integer_and_rounding_mode_var_1<T: PrimitiveUnsigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (T, Integer, RoundingMode)>>
+where
+    T: Mul<Integer, Output = Integer>,
+    T: CheckedFrom<Integer>,
+{
+    Box::new(
+        triples_of_unsigned_nonzero_integer_and_rounding_mode::<T>(gm).filter_map(|(u, n, rm)| {
+            if rm == RoundingMode::Exact {
+                T::checked_from(u * n.clone()).map(|u| (u, n, rm))
+            } else {
+                Some((u, n, rm))
+            }
+        }),
+    )
 }

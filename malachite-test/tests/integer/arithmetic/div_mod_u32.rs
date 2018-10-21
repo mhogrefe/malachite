@@ -1,8 +1,10 @@
 use common::test_properties;
 use malachite_base::num::{
     Abs, CeilingDivAssignMod, CeilingDivAssignNegMod, CeilingDivMod, CeilingDivNegMod,
-    DivAssignMod, DivAssignRem, DivMod, DivRem, NegAssign, NegativeOne, One, PartialOrdAbs, Zero,
+    DivAssignMod, DivAssignRem, DivMod, DivRem, DivRound, Mod, NegAssign, NegMod, NegativeOne, One,
+    PartialOrdAbs, Zero,
 };
+use malachite_base::round::RoundingMode;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_test::common::{
@@ -47,9 +49,14 @@ fn test_div_mod_u32() {
         assert_eq!(q.to_string(), quotient);
         assert_eq!(r, remainder);
 
-        //TODO let (q, r) = (Integer::from_str(u).unwrap() / v, Integer::from_str(u).unwrap().mod_op(v));
-        //assert_eq!(q.to_string(), quotient);
-        //assert_eq!(r, remainder);
+        let (q, r) = (
+            Integer::from_str(u)
+                .unwrap()
+                .div_round(v, RoundingMode::Floor),
+            Integer::from_str(u).unwrap().mod_op(v),
+        );
+        assert_eq!(q.to_string(), quotient);
+        assert_eq!(r, remainder);
     };
     test("0", 1, "0", 0);
     test("0", 123, "0", 0);
@@ -174,9 +181,12 @@ fn test_div_rem_u32() {
         assert_eq!(q.to_string(), quotient);
         assert_eq!(r.to_string(), remainder);
 
-        //TODO let (q, r) = (Integer::from_str(u).unwrap() / v, Integer::from_str(u).unwrap() % v);
-        //assert_eq!(q.to_string(), quotient);
-        //assert_eq!(r, remainder);
+        let (q, r) = (
+            Integer::from_str(u).unwrap() / v,
+            Integer::from_str(u).unwrap() % v,
+        );
+        assert_eq!(q.to_string(), quotient);
+        assert_eq!(r.to_string(), remainder);
     };
     test("0", 1, "0", "0");
     test("0", 123, "0", "0");
@@ -691,9 +701,9 @@ fn div_mod_u32_properties_helper(n: &Integer, u: u32) {
     assert_eq!(quotient_alt, quotient);
     assert_eq!(remainder_alt, remainder);
 
-    //TODO let (quotient_alt, remainder_alt) = (n.div_round(u, RoundingMode::Floor), n.mod_op(u));
-    // assert_eq!(quotient_alt, quotient);
-    // assert_eq!(remainder_alt, remainder);
+    let (quotient_alt, remainder_alt) = (n.div_round(u, RoundingMode::Floor), n.mod_op(u));
+    assert_eq!(quotient_alt, quotient);
+    assert_eq!(remainder_alt, remainder);
 
     //TODO assert_eq!(n.div_mod(Integer::from(u)), (quotient.clone(), remainder));
 
@@ -906,9 +916,9 @@ fn ceiling_div_neg_mod_u32_properties_helper(n: &Integer, u: u32) {
     assert_eq!(quotient_alt, quotient);
     assert_eq!(-remainder_alt, remainder);
 
-    //TODO let (quotient_alt, remainder_alt) = (n.div_round(u, RoundingMode::Ceiling), n.neg_mod(u));
-    //assert_eq!(quotient_alt, quotient);
-    //assert_eq!(remainder_alt, remainder);
+    let (quotient_alt, remainder_alt) = (n.div_round(u, RoundingMode::Ceiling), n.neg_mod(u));
+    assert_eq!(quotient_alt, quotient);
+    assert_eq!(remainder_alt, remainder);
 
     //TODO assert_eq!(n.ceiling_div_neg_mod(Integer::from(u)), (quotient.clone(), remainder));
 
@@ -1020,9 +1030,12 @@ fn ceiling_div_mod_u32_properties_helper(n: &Integer, u: u32) {
     assert_eq!(quotient_alt, quotient);
     assert_eq!(remainder_alt, -&remainder);
 
-    //TODO let (quotient_alt, remainder_alt) = (n.div_round(u, RoundingMode::Ceiling), n.neg_mod(u));
-    //assert_eq!(quotient_alt, quotient);
-    //assert_eq!(remainder_alt, remainder);
+    let (quotient_alt, remainder_alt) = (
+        n.div_round(u, RoundingMode::Ceiling),
+        -Natural::from(n.neg_mod(u)),
+    );
+    assert_eq!(quotient_alt, quotient);
+    assert_eq!(remainder_alt, remainder);
 
     //TODO assert_eq!(n.ceiling_div_mod(Integer::from(u)), (quotient.clone(), remainder));
 

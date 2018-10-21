@@ -5,8 +5,9 @@ use inputs::integer::{
 };
 use malachite_base::num::{
     CeilingDivAssignMod, CeilingDivAssignNegMod, CeilingDivMod, CeilingDivNegMod, DivAssignMod,
-    DivAssignRem, DivMod, DivRem, Mod, SignificantBits,
+    DivAssignRem, DivMod, DivRem, DivRound, Mod, NegMod, SignificantBits,
 };
+use malachite_base::round::RoundingMode;
 use num::{BigInt, Integer, ToPrimitive};
 use rug;
 
@@ -588,13 +589,13 @@ fn benchmark_integer_ceiling_div_neg_mod_u32_algorithms(
                 "standard",
                 &mut (|(x, y)| no_out!(x.ceiling_div_neg_mod(y))),
             ),
-            //TODO(
-            //    "using div_round and %",
-            //    &mut (|(x, y)| {
-            //        let remainder = (&x).neg_mod(y);
-            //        (x.div_round(y, RoundingMode::Ceiling), remainder);
-            //    }),
-            //),
+            (
+                "using div_round and %",
+                &mut (|(x, y)| {
+                    let remainder = (&x).neg_mod(y);
+                    (x.div_round(y, RoundingMode::Ceiling), remainder);
+                }),
+            ),
         ],
     );
 }
@@ -669,13 +670,13 @@ fn benchmark_integer_ceiling_div_mod_u32_algorithms(
         "n.significant_bits()",
         &mut [
             ("standard", &mut (|(x, y)| no_out!(x.ceiling_div_mod(y)))),
-            //TODO(
-            //    "using div_round and %",
-            //    &mut (|(x, y)| {
-            //        let remainder = -(&x).neg_mod(y);
-            //        (x.div_round(y, RoundingMode::Ceiling), remainder);
-            //    }),
-            //),
+            (
+                "using div_round and %",
+                &mut (|(x, y)| {
+                    let remainder = (&x).neg_mod(y);
+                    (-x.div_round(y, RoundingMode::Ceiling), remainder);
+                }),
+            ),
         ],
     );
 }
