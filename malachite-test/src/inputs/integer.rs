@@ -324,6 +324,18 @@ pub fn pairs_of_integer_and_positive_u32_var_1(
     Box::new(pairs_of_integer_and_positive_unsigned(gm).map(|(n, u)| (n * u, u)))
 }
 
+pub fn nrm_pairs_of_integer_and_positive_u32_var_1(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = ((BigInt, u32), (rug::Integer, u32), (Integer, u32))>> {
+    Box::new(pairs_of_integer_and_positive_u32_var_1(gm).map(|(x, y)| {
+        (
+            (integer_to_bigint(&x), y),
+            (integer_to_rug_integer(&x), y),
+            (x, y),
+        )
+    }))
+}
+
 // All pairs of `Integer` and positive `u32`, where the `Integer` is not divisible by the `u32`.
 pub fn pairs_of_integer_and_positive_u32_var_2(
     gm: GenerationMode,
@@ -397,6 +409,16 @@ pub fn pairs_of_u32_and_nonzero_integer_var_1(
     Box::new(
         //TODO use divisible_by
         pairs_of_unsigned_and_nonzero_integer::<u32>(gm).filter(|&(u, ref n)| u % n != 0),
+    )
+}
+
+// All pairs of `u32` and nonzero `Integer` where the `u32` is divisible by the `Integer`.
+pub fn pairs_of_u32_and_nonzero_integer_var_2(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (u32, Integer)>> {
+    Box::new(
+        pairs_of_unsigned_and_nonzero_integer::<u32>(gm)
+            .filter_map(|(u, n)| u32::checked_from(u * n.clone()).map(|u| (u, n))),
     )
 }
 
@@ -584,7 +606,7 @@ where
     Box::new(pairs_of_integer_and_small_unsigned::<T>(gm).map(|(n, u)| (n << u, u)))
 }
 
-// All pairs of `Natural` and `T` where `T` is unsigned and the `Natural` is not divisible by 2 to
+// All pairs of `Integer` and `T` where `T` is unsigned and the `Integer` is not divisible by 2 to
 // the power of the `T`.
 pub fn pairs_of_integer_and_small_unsigned_var_2<T: PrimitiveUnsigned>(
     gm: GenerationMode,
