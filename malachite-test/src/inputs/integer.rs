@@ -2,7 +2,8 @@ use common::{integer_to_bigint, integer_to_rug_integer, natural_to_rug_integer, 
 use inputs::common::{reshape_1_2_to_3, reshape_2_1_to_3};
 use malachite_base::misc::CheckedFrom;
 use malachite_base::num::{
-    DivisibleByPowerOfTwo, EqModPowerOfTwo, PrimitiveInteger, PrimitiveSigned, PrimitiveUnsigned,
+    Abs, DivisibleByPowerOfTwo, EqModPowerOfTwo, PrimitiveInteger, PrimitiveSigned,
+    PrimitiveUnsigned,
 };
 use malachite_base::round::RoundingMode;
 use malachite_nz::integer::Integer;
@@ -418,7 +419,7 @@ pub fn pairs_of_u32_and_nonzero_integer_var_2(
 ) -> Box<Iterator<Item = (u32, Integer)>> {
     Box::new(
         pairs_of_unsigned_and_nonzero_integer::<u32>(gm)
-            .filter_map(|(u, n)| u32::checked_from(u * n.clone()).map(|u| (u, n))),
+            .filter_map(|(u, n)| u32::checked_from(u * (&n).abs()).map(|u| (u, n))),
     )
 }
 
@@ -1577,7 +1578,7 @@ where
     Box::new(
         triples_of_unsigned_nonzero_integer_and_rounding_mode::<T>(gm).filter_map(|(u, n, rm)| {
             if rm == RoundingMode::Exact {
-                T::checked_from(u * n.clone()).map(|u| (u, n, rm))
+                T::checked_from(u * (&n).abs()).map(|u| (u, n, rm))
             } else {
                 Some((u, n, rm))
             }
