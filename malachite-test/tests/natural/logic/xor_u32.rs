@@ -20,9 +20,13 @@ use rug::{self, Assign};
 use std::str::FromStr;
 
 #[test]
-fn test_limbs_xor_limb() {
+fn test_limbs_xor_limb_and_limbs_xor_limb_in_place() {
     let test = |limbs: &[u32], limb: u32, out: &[u32]| {
         assert_eq!(limbs_xor_limb(limbs, limb), out);
+
+        let mut limbs = limbs.to_vec();
+        limbs_xor_limb_in_place(&mut limbs, limb);
+        assert_eq!(limbs, out);
     };
     test(&[6, 7], 2, &[4, 7]);
     test(&[100, 101, 102], 10, &[110, 101, 102]);
@@ -33,6 +37,12 @@ fn test_limbs_xor_limb() {
 #[should_panic(expected = "index out of bounds: the len is 0 but the index is 0")]
 fn limbs_xor_limb_fail() {
     limbs_xor_limb(&[], 10);
+}
+
+#[test]
+#[should_panic(expected = "index out of bounds: the len is 0 but the index is 0")]
+fn limbs_xor_limb_in_place_fail() {
+    limbs_xor_limb_in_place(&mut [], 10);
 }
 
 #[test]
@@ -62,24 +72,6 @@ fn limbs_xor_limb_to_out_fail_1() {
 #[should_panic(expected = "index 2 out of range for slice of length 1")]
 fn limbs_xor_limb_to_out_fail_2() {
     limbs_xor_limb_to_out(&mut [10], &[10, 10], 10);
-}
-
-#[test]
-fn test_limbs_xor_limb_in_place() {
-    let test = |limbs: &[u32], limb: u32, out: &[u32]| {
-        let mut limbs = limbs.to_vec();
-        limbs_xor_limb_in_place(&mut limbs, limb);
-        assert_eq!(limbs, out);
-    };
-    test(&[6, 7], 2, &[4, 7]);
-    test(&[100, 101, 102], 10, &[110, 101, 102]);
-    test(&[123, 456], 789, &[878, 456]);
-}
-
-#[test]
-#[should_panic(expected = "index out of bounds: the len is 0 but the index is 0")]
-fn limbs_xor_limb_in_place_fail() {
-    limbs_xor_limb_in_place(&mut [], 10);
 }
 
 #[test]

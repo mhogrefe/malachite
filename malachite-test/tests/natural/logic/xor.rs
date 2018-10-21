@@ -22,9 +22,13 @@ use std::cmp::max;
 use std::str::FromStr;
 
 #[test]
-fn test_limbs_xor_same_length() {
-    let test = |xs, ys, out| {
-        assert_eq!(limbs_xor_same_length(xs, ys), out);
+fn test_limbs_xor_same_length_and_limbs_xor_same_length_in_place_left() {
+    let test = |xs_before, ys, out| {
+        assert_eq!(limbs_xor_same_length(xs_before, ys), out);
+
+        let mut xs = xs_before.to_vec();
+        limbs_xor_same_length_in_place_left(&mut xs, ys);
+        assert_eq!(xs, out);
     };
     test(&[], &[], vec![]);
     test(&[2], &[3], vec![1]);
@@ -40,9 +44,20 @@ fn limbs_xor_same_length_fail_1() {
 }
 
 #[test]
-fn test_limbs_xor() {
-    let test = |xs, ys, out| {
-        assert_eq!(limbs_xor(xs, ys), out);
+#[should_panic(expected = "assertion failed: `(left == right)`")]
+fn limbs_xor_same_length_in_place_left_fail() {
+    let mut out = vec![6, 7];
+    limbs_xor_same_length_in_place_left(&mut out, &[1, 2, 3]);
+}
+
+#[test]
+fn test_limbs_xor_and_limbs_xor_in_place_left() {
+    let test = |xs_before, ys, out| {
+        assert_eq!(limbs_xor(xs_before, ys), out);
+
+        let mut xs = xs_before.to_vec();
+        limbs_xor_in_place_left(&mut xs, ys);
+        assert_eq!(xs, out);
     };
     test(&[], &[], vec![]);
     test(&[2], &[3], vec![1]);
@@ -109,43 +124,6 @@ fn test_limbs_xor_to_out() {
 fn limbs_xor_to_out_fail() {
     let mut out = vec![10, 10];
     limbs_xor_to_out(&mut out, &[6, 7], &[1, 2, 3]);
-}
-
-#[test]
-fn test_limbs_xor_same_length_in_place_left() {
-    let test = |xs_before: &[u32], ys, xs_after| {
-        let mut xs = xs_before.to_vec();
-        limbs_xor_same_length_in_place_left(&mut xs, ys);
-        assert_eq!(xs, xs_after);
-    };
-    test(&[], &[], vec![]);
-    test(&[6, 7], &[1, 2], vec![7, 5]);
-    test(&[1, 1, 1], &[1, 2, 3], vec![0, 3, 2]);
-    test(&[100, 101, 102], &[102, 101, 100], vec![2, 0, 2]);
-}
-
-#[test]
-#[should_panic(expected = "assertion failed: `(left == right)`")]
-fn limbs_xor_same_length_in_place_left_fail() {
-    let mut out = vec![6, 7];
-    limbs_xor_same_length_in_place_left(&mut out, &[1, 2, 3]);
-}
-
-#[test]
-fn test_limbs_xor_in_place_left() {
-    let test = |xs_before: &[u32], ys, xs_after| {
-        let mut xs = xs_before.to_vec();
-        limbs_xor_in_place_left(&mut xs, ys);
-        assert_eq!(xs, xs_after);
-    };
-    test(&[], &[], vec![]);
-    test(&[6, 7], &[1, 2], vec![7, 5]);
-    test(&[6, 7], &[1, 2, 3], vec![7, 5, 3]);
-    test(&[1, 2, 3], &[6, 7], vec![7, 5, 3]);
-    test(&[], &[1, 2, 3], vec![1, 2, 3]);
-    test(&[1, 2, 3], &[], vec![1, 2, 3]);
-    test(&[1, 1, 1], &[1, 2, 3], vec![0, 3, 2]);
-    test(&[100, 101, 102], &[102, 101, 100], vec![2, 0, 2]);
 }
 
 #[test]
@@ -235,23 +213,24 @@ fn test_xor() {
     test("12345678987654321", "314159265358979", "12035174921130034");
 }
 
+fn limbs_xor_helper(f: &mut Fn(&[u32], &[u32]) -> Vec<u32>, xs: &Vec<u32>, ys: &Vec<u32>) {
+    assert_eq!(
+        Natural::from_owned_limbs_asc(f(xs, ys)),
+        Natural::from_limbs_asc(xs) ^ Natural::from_limbs_asc(ys)
+    );
+}
+
 #[test]
 fn limbs_xor_same_length_properties() {
     test_properties(pairs_of_unsigned_vec_var_1, |&(ref xs, ref ys)| {
-        assert_eq!(
-            Natural::from_owned_limbs_asc(limbs_xor_same_length(xs, ys)),
-            Natural::from_limbs_asc(xs) ^ Natural::from_limbs_asc(ys)
-        );
+        limbs_xor_helper(&mut limbs_xor_same_length, xs, ys);
     });
 }
 
 #[test]
 fn limbs_xor_properties() {
     test_properties(pairs_of_unsigned_vec, |&(ref xs, ref ys)| {
-        assert_eq!(
-            Natural::from_owned_limbs_asc(limbs_xor(xs, ys)),
-            Natural::from_limbs_asc(xs) ^ Natural::from_limbs_asc(ys)
-        );
+        limbs_xor_helper(&mut limbs_xor, xs, ys);
     });
 }
 
@@ -291,28 +270,34 @@ fn limbs_xor_to_out_properties() {
     );
 }
 
+macro_rules! limbs_xor_in_place_left_helper {
+    ($f:ident, $xs:ident, $ys:ident) => {
+        |&(ref $xs, ref $ys)| {
+            let mut xs = $xs.to_vec();
+            let xs_old = xs.clone();
+            $f(&mut xs, $ys);
+            assert_eq!(
+                Natural::from_owned_limbs_asc(xs),
+                Natural::from_owned_limbs_asc(xs_old) ^ Natural::from_limbs_asc($ys)
+            );
+        }
+    };
+}
+
 #[test]
 fn limbs_xor_same_length_in_place_left_properties() {
-    test_properties(pairs_of_unsigned_vec_var_1, |&(ref xs, ref ys)| {
-        let mut xs = xs.to_vec();
-        let xs_old = xs.clone();
-        limbs_xor_same_length_in_place_left(&mut xs, ys);
-        assert_eq!(
-            Natural::from_owned_limbs_asc(xs),
-            Natural::from_owned_limbs_asc(xs_old) ^ Natural::from_limbs_asc(ys)
-        );
-    });
+    test_properties(
+        pairs_of_unsigned_vec_var_1,
+        limbs_xor_in_place_left_helper!(limbs_xor_same_length_in_place_left, xs, ys),
+    );
 }
 
 #[test]
 fn limbs_xor_in_place_left_properties() {
-    test_properties(pairs_of_unsigned_vec_var_1, |&(ref xs, ref ys)| {
-        let mut xs = xs.to_vec();
-        let xs_old = xs.clone();
-        limbs_xor_in_place_left(&mut xs, ys);
-        let n = Natural::from_limbs_asc(&xs_old) ^ Natural::from_limbs_asc(ys);
-        assert_eq!(Natural::from_owned_limbs_asc(xs), n);
-    });
+    test_properties(
+        pairs_of_unsigned_vec,
+        limbs_xor_in_place_left_helper!(limbs_xor_in_place_left, xs, ys),
+    );
 }
 
 #[test]
