@@ -49,8 +49,8 @@ pub fn limbs_divisible_by_limb(limbs: &[u32], divisor: u32) -> bool {
 }
 
 impl<'a> DivisibleBy<u32> for &'a Natural {
-    /// Returns whether a `Natural` is divisible by a `u32`; in other worst, whether the `Natural`
-    /// is a multiple of the `u32`. THis means that zero is divisible by any number, including zero;
+    /// Returns whether a `Natural` is divisible by a `u32`; in other words, whether the `Natural`
+    /// is a multiple of the `u32`. This means that zero is divisible by any number, including zero;
     /// but a nonzero number is never divisible by zero.
     ///
     /// This method is more efficient than finding a remainder and checking whether it's zero.
@@ -86,8 +86,8 @@ impl<'a> DivisibleBy<u32> for &'a Natural {
 }
 
 impl<'a> DivisibleBy<&'a Natural> for u32 {
-    /// Returns whether a `u32` is divisible by a `Natural`; in other worst, whether the `u32` is a
-    /// multiple of the `Natural`. THis means that zero is divisible by any number, including zero;
+    /// Returns whether a `u32` is divisible by a `Natural`; in other words, whether the `u32` is a
+    /// multiple of the `Natural`. This means that zero is divisible by any number, including zero;
     /// but a nonzero number is never divisible by zero.
     ///
     /// Time: worst case O(1)

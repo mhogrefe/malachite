@@ -777,7 +777,9 @@ fn div_mod_u32_properties() {
         assert_eq!(u.div_mod(Integer::ONE), (Integer::from(u), 0));
         assert_eq!(u.div_mod(Integer::NEGATIVE_ONE), (-Natural::from(u), 0));
         assert_eq!(u.div_mod(Integer::from(u)), (Integer::ONE, 0));
+        assert_eq!(Integer::from(u).div_mod(u), (Integer::ONE, 0));
         assert_eq!(u.div_mod(-Natural::from(u)), (Integer::NEGATIVE_ONE, 0));
+        assert_eq!((-Natural::from(u)).div_mod(u), (Integer::NEGATIVE_ONE, 0));
         assert_eq!(Integer::ZERO.div_mod(u), (Integer::ZERO, 0));
         if u > 1 {
             assert_eq!(Integer::ONE.div_mod(u), (Integer::ZERO, 1));
@@ -883,7 +885,12 @@ fn div_rem_u32_properties() {
         assert_eq!(u.div_rem(Integer::ONE), (Integer::from(u), 0));
         assert_eq!(u.div_rem(Integer::NEGATIVE_ONE), (-Natural::from(u), 0));
         assert_eq!(u.div_rem(Integer::from(u)), (Integer::ONE, 0));
+        assert_eq!(Integer::from(u).div_rem(u), (Integer::ONE, Integer::ZERO));
         assert_eq!(u.div_rem(-Natural::from(u)), (Integer::NEGATIVE_ONE, 0));
+        assert_eq!(
+            (-Natural::from(u)).div_rem(u),
+            (Integer::NEGATIVE_ONE, Integer::ZERO)
+        );
         assert_eq!(Integer::ZERO.div_rem(u), (Integer::ZERO, Integer::ZERO));
         if u > 1 {
             assert_eq!(Integer::ONE.div_rem(u), (Integer::ZERO, Integer::ONE));
@@ -998,6 +1005,11 @@ fn ceiling_div_neg_mod_u32_properties() {
         assert_eq!(
             u.ceiling_div_neg_mod(Integer::from(u)),
             (Integer::ONE, Natural::ZERO)
+        );
+        assert_eq!(Integer::from(u).ceiling_div_neg_mod(u), (Integer::ONE, 0));
+        assert_eq!(
+            (-Natural::from(u)).ceiling_div_neg_mod(u),
+            (Integer::NEGATIVE_ONE, 0)
         );
         assert_eq!(
             u.ceiling_div_neg_mod(-Natural::from(u)),
@@ -1117,6 +1129,10 @@ fn ceiling_div_mod_u32_properties() {
         );
         assert_eq!(
             u.ceiling_div_mod(Integer::from(u)),
+            (Integer::ONE, Integer::ZERO)
+        );
+        assert_eq!(
+            Integer::from(u).ceiling_div_mod(u),
             (Integer::ONE, Integer::ZERO)
         );
         assert_eq!(

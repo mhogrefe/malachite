@@ -12,6 +12,7 @@ pub mod div_mod_u32;
 pub mod div_round_u32;
 pub mod div_u32;
 pub mod divisible_by_power_of_two;
+pub mod divisible_by_u32;
 pub mod eq_i32_mod_power_of_two;
 pub mod eq_mod_power_of_two;
 pub mod eq_u32_mod_power_of_two;
@@ -46,6 +47,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     div_round_u32::register(registry);
     div_u32::register(registry);
     divisible_by_power_of_two::register(registry);
+    divisible_by_u32::register(registry);
     eq_mod_power_of_two::register(registry);
     eq_i32_mod_power_of_two::register(registry);
     eq_u32_mod_power_of_two::register(registry);

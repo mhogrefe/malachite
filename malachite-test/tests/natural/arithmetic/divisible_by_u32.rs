@@ -1,5 +1,6 @@
 use common::test_properties;
 use malachite_base::num::{DivisibleBy, One, Zero};
+use malachite_nz::integer::Integer;
 use malachite_nz::natural::arithmetic::divisible_by_u32::{
     _combined_limbs_divisible_by_limb, limbs_divisible_by_limb,
 };
@@ -127,6 +128,8 @@ fn divisible_by_u32_properties_helper(n: &Natural, u: u32) {
 
     assert_eq!(num_divisible_by_u32(natural_to_biguint(n), u), divisible);
     assert_eq!(natural_to_rug_integer(n).is_divisible_u(u), divisible);
+
+    assert_eq!(Integer::from(n).divisible_by(u), divisible);
 }
 
 #[test]
@@ -176,6 +179,7 @@ fn divisible_by_u32_properties() {
         |&(u, ref n): &(u32, Natural)| {
             let divisible = u.divisible_by(n);
             assert_eq!(u == 0 || *n != 0 && u % n == 0, divisible);
+            assert_eq!(u.divisible_by(&Integer::from(n)), divisible);
         },
     );
 
@@ -192,5 +196,6 @@ fn divisible_by_u32_properties() {
         if u > 1 {
             assert!(!Natural::ONE.divisible_by(u));
         }
+        assert!(u.divisible_by(&Natural::from(u)));
     });
 }

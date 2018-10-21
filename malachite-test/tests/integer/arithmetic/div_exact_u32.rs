@@ -167,6 +167,8 @@ fn div_exact_u32_properties_helper(n: &Integer, u: u32) {
         quotient
     );
 
+    assert_eq!((-n).div_exact(u), -&quotient);
+
     assert_eq!(quotient * u, *n);
 }
 
@@ -191,6 +193,8 @@ fn div_exact_u32_properties() {
 
             assert_eq!(u.div_round(n, RoundingMode::Exact), quotient);
 
+            assert_eq!(u.div_exact(-n), -&quotient);
+
             assert_eq!(quotient * n, u);
         },
     );
@@ -204,6 +208,8 @@ fn div_exact_u32_properties() {
         assert_eq!(u.div_exact(Integer::ONE), u);
         assert_eq!(u.div_exact(Integer::NEGATIVE_ONE), -Natural::from(u));
         assert_eq!(u.div_exact(Integer::from(u)), 1);
+        assert_eq!(Integer::from(u).div_exact(u), 1);
         assert_eq!(u.div_exact(-Natural::from(u)), -1);
+        assert_eq!((-Natural::from(u)).div_exact(u), -1);
     });
 }

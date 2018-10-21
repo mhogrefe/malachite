@@ -572,7 +572,9 @@ fn mod_u32_properties() {
         assert_eq!(u.mod_op(Integer::ONE), 0);
         assert_eq!(u.mod_op(Integer::NEGATIVE_ONE), 0);
         assert_eq!(u.mod_op(Integer::from(u)), 0);
+        assert_eq!(Integer::from(u).mod_op(u), 0);
         assert_eq!(u.mod_op(-Natural::from(u)), 0);
+        assert_eq!((-Natural::from(u)).mod_op(u), 0);
         assert_eq!(Integer::ZERO.mod_op(u), 0);
         if u > 1 {
             assert_eq!(Integer::ONE.mod_op(u), 1);
@@ -661,7 +663,9 @@ fn rem_u32_properties() {
         assert_eq!(u % Integer::ONE, 0);
         assert_eq!(u % Integer::NEGATIVE_ONE, 0);
         assert_eq!(u % Integer::from(u), 0);
+        assert_eq!(Integer::from(u) % u, 0);
         assert_eq!(u % -Natural::from(u), 0);
+        assert_eq!(-Natural::from(u) % u, 0);
         assert_eq!(Integer::ZERO % u, 0);
         if u > 1 {
             assert_eq!(Integer::ONE % u, 1);
@@ -736,7 +740,9 @@ fn neg_mod_u32_properties() {
         assert_eq!(u.neg_mod(Integer::ONE), 0);
         assert_eq!(u.neg_mod(Integer::NEGATIVE_ONE), 0);
         assert_eq!(u.neg_mod(Integer::from(u)), 0);
+        assert_eq!(Integer::from(u).neg_mod(u), 0);
         assert_eq!(u.neg_mod(-Natural::from(u)), 0);
+        assert_eq!((-Natural::from(u)).neg_mod(u), 0);
         assert_eq!(Integer::ZERO.neg_mod(u), 0);
         assert_eq!(Integer::ONE.neg_mod(u), u - 1);
     });
@@ -823,7 +829,9 @@ fn ceiling_mod_u32_properties() {
         assert_eq!(u.ceiling_mod(Integer::ONE), 0);
         assert_eq!(u.ceiling_mod(Integer::NEGATIVE_ONE), 0);
         assert_eq!(u.ceiling_mod(Integer::from(u)), 0);
+        assert_eq!(Integer::from(u).ceiling_mod(u), 0);
         assert_eq!(u.ceiling_mod(-Natural::from(u)), 0);
+        assert_eq!((-Natural::from(u)).ceiling_mod(u), 0);
         assert_eq!(Integer::ZERO.ceiling_mod(u), 0);
         assert_eq!(-Integer::ONE.ceiling_mod(u), u - 1);
     });

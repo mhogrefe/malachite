@@ -2,7 +2,7 @@ use common::{integer_to_bigint, integer_to_rug_integer, natural_to_rug_integer, 
 use inputs::common::{reshape_1_2_to_3, reshape_2_1_to_3};
 use malachite_base::misc::CheckedFrom;
 use malachite_base::num::{
-    Abs, DivisibleByPowerOfTwo, EqModPowerOfTwo, PrimitiveInteger, PrimitiveSigned,
+    Abs, DivisibleBy, DivisibleByPowerOfTwo, EqModPowerOfTwo, PrimitiveInteger, PrimitiveSigned,
     PrimitiveUnsigned,
 };
 use malachite_base::round::RoundingMode;
@@ -58,6 +58,16 @@ pub fn nm_integers(gm: GenerationMode) -> Box<Iterator<Item = (BigInt, Integer)>
 
 pub fn nrm_integers(gm: GenerationMode) -> Box<Iterator<Item = (BigInt, rug::Integer, Integer)>> {
     Box::new(integers(gm).map(|n| (integer_to_bigint(&n), integer_to_rug_integer(&n), n)))
+}
+
+pub fn nonzero_integers(gm: GenerationMode) -> Box<Iterator<Item = Integer>> {
+    match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_nonzero_integers()),
+        GenerationMode::Random(scale) => Box::new(random_nonzero_integers(&EXAMPLE_SEED, scale)),
+        GenerationMode::SpecialRandom(scale) => {
+            Box::new(special_random_nonzero_integers(&EXAMPLE_SEED, scale))
+        }
+    }
 }
 
 pub fn pairs_of_integers(gm: GenerationMode) -> Box<Iterator<Item = (Integer, Integer)>> {
@@ -341,8 +351,7 @@ pub fn nrm_pairs_of_integer_and_positive_u32_var_1(
 pub fn pairs_of_integer_and_positive_u32_var_2(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (Integer, u32)>> {
-    //TODO use divisible_by
-    Box::new(pairs_of_integer_and_positive_unsigned(gm).filter(|&(ref n, u)| n % u != 0))
+    Box::new(pairs_of_integer_and_positive_unsigned(gm).filter(|&(ref n, u)| !n.divisible_by(u)))
 }
 
 pub fn pairs_of_unsigned_and_integer<T: PrimitiveUnsigned>(
@@ -408,8 +417,7 @@ pub fn pairs_of_u32_and_nonzero_integer_var_1(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (u32, Integer)>> {
     Box::new(
-        //TODO use divisible_by
-        pairs_of_unsigned_and_nonzero_integer::<u32>(gm).filter(|&(u, ref n)| u % n != 0),
+        pairs_of_unsigned_and_nonzero_integer::<u32>(gm).filter(|&(u, ref n)| !u.divisible_by(n)),
     )
 }
 

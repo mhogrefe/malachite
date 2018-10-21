@@ -237,5 +237,8 @@ fn div_u32_properties() {
         assert_eq!(u / Integer::ONE, u);
         assert_eq!(u / Integer::NEGATIVE_ONE, -Natural::from(u));
         assert_eq!(u / Integer::from(u), 1);
+        assert_eq!(Integer::from(u) / u, 1);
+        assert_eq!(u / -Natural::from(u), -1);
+        assert_eq!(-Natural::from(u) / u, -1);
     });
 }

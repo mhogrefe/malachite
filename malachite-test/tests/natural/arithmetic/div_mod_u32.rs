@@ -765,6 +765,7 @@ fn div_mod_u32_properties() {
     test_properties(positive_unsigneds, |&u: &u32| {
         assert_eq!(u.div_mod(Natural::ONE), (u, 0));
         assert_eq!(u.div_mod(Natural::from(u)), (1, 0));
+        assert_eq!(Natural::from(u).div_mod(u), (Natural::ONE, 0));
         assert_eq!(Natural::ZERO.div_mod(u), (Natural::ZERO, 0));
         if u > 1 {
             assert_eq!(Natural::ONE.div_mod(u), (Natural::ZERO, 1));
@@ -875,6 +876,7 @@ fn ceiling_div_neg_mod_u32_properties() {
     test_properties(positive_unsigneds, |&u: &u32| {
         assert_eq!(u.ceiling_div_neg_mod(Natural::ONE), (u, Natural::ZERO));
         assert_eq!(u.ceiling_div_neg_mod(Natural::from(u)), (1, Natural::ZERO));
+        assert_eq!(Natural::from(u).ceiling_div_neg_mod(u), (Natural::ONE, 0));
         assert_eq!(Natural::ZERO.ceiling_div_neg_mod(u), (Natural::ZERO, 0));
         assert_eq!(Natural::ONE.ceiling_div_neg_mod(u), (Natural::ONE, u - 1));
     });

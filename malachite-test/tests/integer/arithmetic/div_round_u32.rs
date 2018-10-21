@@ -583,7 +583,9 @@ fn div_round_u32_properties() {
         |&(u, rm)| {
             assert_eq!(Integer::ZERO.div_round(u, rm), 0);
             assert_eq!(u.div_round(Integer::from(u), rm), 1);
+            assert_eq!(Integer::from(u).div_round(u, rm), 1);
             assert_eq!(u.div_round(-Natural::from(u), rm), -1);
+            assert_eq!((-Natural::from(u)).div_round(u, rm), -1);
         },
     );
 

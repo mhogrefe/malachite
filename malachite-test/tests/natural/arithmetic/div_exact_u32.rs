@@ -538,5 +538,6 @@ fn div_exact_u32_properties() {
         assert_eq!(Natural::ZERO.div_exact(u), 0);
         assert_eq!(u.div_exact(Natural::ONE), u);
         assert_eq!(u.div_exact(Natural::from(u)), 1);
+        assert_eq!(Natural::from(u).div_exact(u), 1);
     });
 }
