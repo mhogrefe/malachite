@@ -17,10 +17,10 @@ malachite-nz = { path = "../malachite-nz", features = ["serde"] }
 rust-wheels = { path = "../../rust-wheels" }
 num = "0.2.0"
 rand = "0.3.0"
-serde = "1.0"
-serde_json = "1.0"
+serde = "^1.0.0"
+serde_json = "^1.0.32"
 
 [dependencies.rug]
-version = "1.2.0"
+version = "^1.2.0"
 default-features = false
 features = ["integer"]

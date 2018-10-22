@@ -50,9 +50,7 @@ fn benchmark_integer_divisible_by_power_of_two_library_comparison(
             ),
             (
                 "rug",
-                &mut (|((n, pow), _)| {
-                    no_out!(n.is_divisible_2pow(u32::checked_from(pow).unwrap()))
-                }),
+                &mut (|((n, pow), _)| no_out!(n.is_divisible_2pow(u32::checked_from(pow).unwrap()))),
             ),
         ],
     );

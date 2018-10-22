@@ -41,11 +41,12 @@ pub fn limbs_and_pos_neg(xs: &[u32], ys: &[u32]) -> Vec<u32> {
     let max_i = max(x_i, y_i);
     let mut result_limbs = vec![0; max_i];
     result_limbs.push(
-        xs[max_i] & if x_i <= y_i {
-            ys[max_i].wrapping_neg()
-        } else {
-            !ys[max_i]
-        },
+        xs[max_i]
+            & if x_i <= y_i {
+                ys[max_i].wrapping_neg()
+            } else {
+                !ys[max_i]
+            },
     );
     result_limbs.extend(
         xs[max_i + 1..]
@@ -103,11 +104,12 @@ pub fn limbs_and_pos_neg_to_out(out_limbs: &mut [u32], xs: &[u32], ys: &[u32]) {
     }
     let max_i = max(x_i, y_i);
     limbs_set_zero(&mut out_limbs[..max_i]);
-    out_limbs[max_i] = xs[max_i] & if x_i <= y_i {
-        ys[max_i].wrapping_neg()
-    } else {
-        !ys[max_i]
-    };
+    out_limbs[max_i] = xs[max_i]
+        & if x_i <= y_i {
+            ys[max_i].wrapping_neg()
+        } else {
+            !ys[max_i]
+        };
     for (z, (x, y)) in out_limbs[max_i + 1..]
         .iter_mut()
         .zip(xs[max_i + 1..].iter().zip(ys[max_i + 1..].iter()))

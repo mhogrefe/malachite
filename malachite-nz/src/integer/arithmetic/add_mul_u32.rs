@@ -372,14 +372,13 @@ pub(crate) fn mpz_aorsmul_1(
                 dsize.neg_assign();
                 0
             };
-            cy = cy2 + if limbs_slice_add_limb_in_place(
-                &mut w[min_size..min_size + dsize as usize],
-                cy,
-            ) {
-                1
-            } else {
-                0
-            };
+            cy = cy2
+                + if limbs_slice_add_limb_in_place(&mut w[min_size..min_size + dsize as usize], cy)
+                {
+                    1
+                } else {
+                    0
+                };
         }
         let dsize = dsize as usize;
         w[min_size + dsize] = cy;

@@ -129,11 +129,9 @@ macro_rules! tests_and_properties {
 
             test_properties_no_special(small_unsigneds::<$t>, |&u| {
                 assert_eq!(Integer::ZERO << u, 0);
-                assert!(
-                    Natural::checked_from(Integer::ONE << u)
-                        .unwrap()
-                        .is_power_of_two()
-                );
+                assert!(Natural::checked_from(Integer::ONE << u)
+                    .unwrap()
+                    .is_power_of_two());
             });
         }
     };

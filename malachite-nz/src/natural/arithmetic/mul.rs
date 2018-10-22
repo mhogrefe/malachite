@@ -211,11 +211,12 @@ fn mpn_toom22_mul(p: &mut [u32], a: &[u32], b: &[u32], scratch: &mut [u32]) {
         p[s] = 0;
         vm1_neg = true;
     } else {
-        p[s] = a[s] - if limbs_sub_same_length_to_out(p, &a[..s], &a[n..n + s]) {
-            1
-        } else {
-            0
-        };
+        p[s] = a[s]
+            - if limbs_sub_same_length_to_out(p, &a[..s], &a[n..n + s]) {
+                1
+            } else {
+                0
+            };
     }
 
     // Compute bsm1.
@@ -727,14 +728,12 @@ fn mpn_toom42_mul(p: &mut [u32], a: &[u32], b: &[u32], scratch: &mut [u32]) {
         // v1, 2n+1 limbs
         toom42_mul_n_rec(v1_vinf, &as1[..n], &bs1[..n]);
         if as1[n] == 1 {
-            cy = bs1[n] + if limbs_slice_add_same_length_in_place_left(
-                &mut v1_vinf[n..2 * n],
-                &bs1[..n],
-            ) {
-                1
-            } else {
-                0
-            };
+            cy = bs1[n]
+                + if limbs_slice_add_same_length_in_place_left(&mut v1_vinf[n..2 * n], &bs1[..n]) {
+                    1
+                } else {
+                    0
+                };
         } else if as1[n] == 2 {
             cy = 2 * bs1[n] + mpn_addmul_1(&mut v1_vinf[n..2 * n], &bs1[..n], 2);
         } else if as1[n] == 3 {

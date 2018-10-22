@@ -80,14 +80,10 @@ impl<'a> Add<u32> for &'a Integer {
             Integer {
                 sign: false,
                 ref abs,
-            }
-                if *abs > other =>
-            {
-                Integer {
-                    sign: false,
-                    abs: abs - other,
-                }
-            }
+            } if *abs > other => Integer {
+                sign: false,
+                abs: abs - other,
+            },
             // e.g. -5 + 10 or -5 + 5; self becomes non-negative
             Integer { ref abs, .. } => Integer::from(other - u32::checked_from(abs).unwrap()),
         }
@@ -194,11 +190,7 @@ impl AddAssign<u32> for Integer {
             Integer {
                 sign: false,
                 ref mut abs,
-            }
-                if *abs > other =>
-            {
-                *abs -= other
-            }
+            } if *abs > other => *abs -= other,
             // e.g. -5 + 10 or -5 + 5; self becomes non-negative
             Integer {
                 ref mut sign,

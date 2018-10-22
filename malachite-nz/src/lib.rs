@@ -1,8 +1,4 @@
-#![allow(
-    unknown_lints,
-    suspicious_arithmetic_impl,
-    suspicious_op_assign_impl
-)]
+#![allow(unknown_lints, suspicious_arithmetic_impl, suspicious_op_assign_impl)]
 
 #[macro_use]
 extern crate malachite_base;

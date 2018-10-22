@@ -57,15 +57,17 @@ pub fn limbs_limb_div_round_limbs(limb: u32, limbs: &[u32], rm: RoundingMode) ->
             RoundingMode::Up | RoundingMode::Ceiling => Some(1),
             RoundingMode::Exact => None,
             // 1 if 2 * limb > Natural::from_limbs_asc(limbs); otherwise, 0
-            RoundingMode::Nearest => Some(if limbs.len() == 2
-                && limbs[1] == 1
-                && limb.get_bit(u64::from(u32::WIDTH) - 1)
-                && (limb << 1) > limbs[0]
-            {
-                1
-            } else {
-                0
-            }),
+            RoundingMode::Nearest => Some(
+                if limbs.len() == 2
+                    && limbs[1] == 1
+                    && limb.get_bit(u64::from(u32::WIDTH) - 1)
+                    && (limb << 1) > limbs[0]
+                {
+                    1
+                } else {
+                    0
+                },
+            ),
         }
     }
 }

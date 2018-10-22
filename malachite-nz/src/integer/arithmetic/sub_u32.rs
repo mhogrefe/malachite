@@ -69,14 +69,10 @@ impl<'a> Sub<u32> for &'a Integer {
             Integer {
                 sign: true,
                 ref abs,
-            }
-                if *abs >= other =>
-            {
-                Integer {
-                    sign: true,
-                    abs: abs - other,
-                }
-            }
+            } if *abs >= other => Integer {
+                sign: true,
+                abs: abs - other,
+            },
             // e.g. 5 - 10; self becomes negative
             Integer { ref abs, .. } => Integer {
                 sign: false,
@@ -175,11 +171,7 @@ impl SubAssign<u32> for Integer {
             Integer {
                 sign: true,
                 ref mut abs,
-            }
-                if *abs >= other =>
-            {
-                *abs -= other
-            }
+            } if *abs >= other => *abs -= other,
             // e.g. 5 - 10; self becomes negative
             Integer {
                 ref mut sign,

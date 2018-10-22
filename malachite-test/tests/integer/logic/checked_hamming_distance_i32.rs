@@ -96,18 +96,20 @@ fn checked_hamming_distance_i32_properties() {
         |&(ref a, b, c): &(Integer, i32, i32)| {
             assert!(
                 a.checked_hamming_distance(c).unwrap()
-                    <= a.checked_hamming_distance(b).unwrap() + Integer::from(b)
-                        .checked_hamming_distance(&Integer::from(c))
-                        .unwrap()
+                    <= a.checked_hamming_distance(b).unwrap()
+                        + Integer::from(b)
+                            .checked_hamming_distance(&Integer::from(c))
+                            .unwrap()
             );
             let a = !a;
             let b = !b;
             let c = !c;
             assert!(
                 a.checked_hamming_distance(c).unwrap()
-                    <= a.checked_hamming_distance(b).unwrap() + Integer::from(b)
-                        .checked_hamming_distance(&Integer::from(c))
-                        .unwrap()
+                    <= a.checked_hamming_distance(b).unwrap()
+                        + Integer::from(b)
+                            .checked_hamming_distance(&Integer::from(c))
+                            .unwrap()
             );
         },
     );

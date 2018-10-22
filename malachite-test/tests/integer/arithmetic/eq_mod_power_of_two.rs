@@ -238,10 +238,8 @@ fn eq_mod_power_of_two_properties() {
         triples_of_integer_integer_and_small_unsigned_var_1::<u64>,
         |&(ref x, ref y, pow)| {
             assert!(x.eq_mod_power_of_two(y, pow));
-            assert!(
-                integer_to_rug_integer(x)
-                    .is_congruent_2pow(&integer_to_rug_integer(y), u32::checked_from(pow).unwrap())
-            );
+            assert!(integer_to_rug_integer(x)
+                .is_congruent_2pow(&integer_to_rug_integer(y), u32::checked_from(pow).unwrap()));
             assert!(y.eq_mod_power_of_two(x, pow));
             assert_eq!(x.mod_power_of_two(pow), y.mod_power_of_two(pow),);
         },
@@ -251,10 +249,8 @@ fn eq_mod_power_of_two_properties() {
         triples_of_integer_integer_and_small_unsigned_var_2::<u64>,
         |&(ref x, ref y, pow)| {
             assert!(!x.eq_mod_power_of_two(y, pow));
-            assert!(
-                !integer_to_rug_integer(x)
-                    .is_congruent_2pow(&integer_to_rug_integer(y), u32::checked_from(pow).unwrap())
-            );
+            assert!(!integer_to_rug_integer(x)
+                .is_congruent_2pow(&integer_to_rug_integer(y), u32::checked_from(pow).unwrap()));
             assert!(!y.eq_mod_power_of_two(x, pow));
             assert_ne!(x.mod_power_of_two(pow), y.mod_power_of_two(pow),);
         },

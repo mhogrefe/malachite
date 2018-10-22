@@ -21,10 +21,11 @@ fn limbs_eq_mod_power_of_two_greater(xs: &[u32], ys: &[u32], pow: u64) -> bool {
     if i >= xs_len {
         false
     } else if i >= ys_len {
-        &xs[..ys_len] == ys && limbs_divisible_by_power_of_two(
-            &xs[ys_len..],
-            pow - u64::from(u32::WIDTH) * ys_len as u64,
-        )
+        &xs[..ys_len] == ys
+            && limbs_divisible_by_power_of_two(
+                &xs[ys_len..],
+                pow - u64::from(u32::WIDTH) * ys_len as u64,
+            )
     } else {
         &xs[..i] == &ys[..i] && xs[i].eq_mod_power_of_two(ys[i], pow & u64::from(u32::WIDTH_MASK))
     }
