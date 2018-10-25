@@ -4,6 +4,7 @@ use num::{BigInt, BigUint};
 use rug;
 use rust_wheels::benchmarks::{run_benchmark, BenchmarkOptions, BenchmarkSeriesOptions};
 use std::collections::BTreeMap;
+use std::fs;
 use std::str::FromStr;
 
 pub fn biguint_to_natural(n: &BigUint) -> Natural {
@@ -99,6 +100,7 @@ impl DemoBenchRegistry {
     }
 
     pub fn register_bench(&mut self, scale_type: ScaleType, name: &'static str, f: BenchFn) {
+        f(GenerationMode::Exhaustive, 0, "validation");
         assert!(
             self.bench_map.insert(name, (scale_type, f)).is_none(),
             "Duplicate bench with name {}",
@@ -128,6 +130,7 @@ impl DemoBenchRegistry {
         name: &'static str,
         f: NoSpecialBenchFn,
     ) {
+        f(NoSpecialGenerationMode::Exhaustive, 0, "validation");
         assert!(
             self.no_special_bench_map
                 .insert(name, (scale_type, f))
@@ -142,6 +145,15 @@ impl DemoBenchRegistry {
     }
 
     pub fn benchmark_all(&self, limit: usize) {
+        let files: Vec<String> = fs::read_dir("benchmarks/")
+            .unwrap()
+            .into_iter()
+            .map(|file| file.unwrap().path().display().to_string())
+            .filter(|file| file.ends_with(".gp"))
+            .collect();
+        for file in files {
+            fs::remove_file(file);
+        }
         for (name, &(st, f)) in &self.no_special_bench_map {
             for gm_string in &["exhaustive", "random"] {
                 let gm = get_no_special_gm(gm_string, st);
@@ -235,6 +247,16 @@ pub fn m_run_benchmark<'a, I: Iterator>(
 ) where
     I::Item: Clone,
 {
+    if (benchmark_type == BenchmarkType::Single) != (series.len() == 1) {
+        panic!(
+            "Bad benchmark: {}. \
+             Benchmarks should have type Single iff they have only one series.",
+            title
+        );
+    }
+    if limit == 0 {
+        return;
+    }
     let title = match benchmark_type {
         BenchmarkType::Single => title.to_owned(),
         BenchmarkType::LibraryComparison => format!("{} library comparison", title),
@@ -245,9 +267,6 @@ pub fn m_run_benchmark<'a, I: Iterator>(
     let colors = vec!["green", "blue", "red", "black", "orange"];
     if series.len() > colors.len() {
         panic!("not enough available colors");
-    }
-    if (benchmark_type == BenchmarkType::Single) != (series.len() == 1) {
-        panic!("Benchmarks have type Single iff they have only one series");
     }
     let mut series_options = Vec::new();
     for (&mut (label, ref mut function), color) in series.iter_mut().zip(colors.iter()) {

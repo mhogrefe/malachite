@@ -2,8 +2,8 @@ use common::{integer_to_bigint, integer_to_rug_integer, natural_to_rug_integer, 
 use inputs::common::{reshape_1_2_to_3, reshape_2_1_to_3};
 use malachite_base::misc::CheckedFrom;
 use malachite_base::num::{
-    Abs, DivisibleBy, DivisibleByPowerOfTwo, EqModPowerOfTwo, PrimitiveInteger, PrimitiveSigned,
-    PrimitiveUnsigned,
+    Abs, DivisibleBy, DivisibleByPowerOfTwo, EqMod, EqModPowerOfTwo, PrimitiveInteger,
+    PrimitiveSigned, PrimitiveUnsigned,
 };
 use malachite_base::round::RoundingMode;
 use malachite_nz::integer::Integer;
@@ -777,6 +777,17 @@ fn random_triples_of_primitive_integer_and_primitive<T: PrimitiveInteger>(
     ))
 }
 
+fn random_triples_of_integer_primitive_and_primitive<T: PrimitiveInteger>(
+    scale: u32,
+) -> Box<Iterator<Item = (Integer, T, T)>> {
+    Box::new(random_triples(
+        &EXAMPLE_SEED,
+        &(|seed| random_integers(seed, scale)),
+        &(|seed| random(seed)),
+        &(|seed| random(seed)),
+    ))
+}
+
 pub fn triples_of_integer_unsigned_and_integer<T: PrimitiveUnsigned>(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (Integer, T, Integer)>> {
@@ -813,6 +824,62 @@ pub fn triples_of_unsigned_integer_and_unsigned<T: PrimitiveUnsigned>(
             &(|seed| special_random_unsigned(seed)),
         )),
     }
+}
+
+pub fn triples_of_integer_unsigned_and_unsigned<T: PrimitiveUnsigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (Integer, T, T)>> {
+    match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_triples(
+            exhaustive_integers(),
+            exhaustive_unsigned(),
+            exhaustive_unsigned(),
+        )),
+        GenerationMode::Random(scale) => random_triples_of_integer_primitive_and_primitive(scale),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_integers(seed, scale)),
+            &(|seed| special_random_unsigned(seed)),
+            &(|seed| special_random_unsigned(seed)),
+        )),
+    }
+}
+
+pub fn rm_triples_of_integer_unsigned_and_unsigned<T: PrimitiveUnsigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = ((rug::Integer, T, T), (Integer, T, T))>> {
+    Box::new(
+        triples_of_integer_unsigned_and_unsigned(gm)
+            .map(|(x, y, z)| ((integer_to_rug_integer(&x), y, z), (x, y, z))),
+    )
+}
+
+// All triples of `Integer`, `T`, `T`, where `T` is unsigned and the `Integer` is equal to the first
+// `T` mod the second `T`.
+pub fn triples_of_integer_unsigned_and_unsigned_var_1<T: PrimitiveUnsigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (Integer, T, T)>>
+where
+    Integer: Mul<T, Output = Integer> + Add<T, Output = Integer>,
+{
+    Box::new(
+        triples_of_integer_unsigned_and_unsigned(gm)
+            .map(|(n, u, modulus)| (n * modulus + u, u, modulus)),
+    )
+}
+
+// All triples of `Integer`, `T`, `T`, where `T` is unsigned and the `Integer` is not equal to the
+// first `T` mod the second `T`.
+pub fn triples_of_integer_unsigned_and_unsigned_var_2<T: PrimitiveUnsigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (Integer, T, T)>> {
+    Box::new(
+        triples_of_integer_unsigned_and_unsigned::<T>(gm).filter(|&(ref n, u, modulus)| {
+            let u: u32 = u.checked_into().unwrap();
+            let modulus: u32 = modulus.checked_into().unwrap();
+            !n.eq_mod(u, modulus)
+        }),
+    )
 }
 
 pub fn triples_of_integer_signed_and_integer<T: PrimitiveSigned>(

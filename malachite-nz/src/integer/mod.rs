@@ -158,6 +158,7 @@ pub mod arithmetic {
     pub mod eq_i32_mod_power_of_two;
     pub mod eq_mod_power_of_two;
     pub mod eq_u32_mod_power_of_two;
+    pub mod eq_u32_mod_u32;
     pub mod mod_power_of_two;
     pub mod mod_u32;
     pub mod mul;

@@ -298,7 +298,7 @@ fn benchmark_integer_shr_assign_u32_library_comparison(
 ) {
     m_run_benchmark(
         "Integer >>= u32",
-        BenchmarkType::Single,
+        BenchmarkType::LibraryComparison,
         rm_pairs_of_integer_and_small_unsigned::<u32>(gm),
         gm.name(),
         limit,

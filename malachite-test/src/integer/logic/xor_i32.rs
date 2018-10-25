@@ -293,7 +293,7 @@ fn benchmark_limbs_neg_xor_limb_neg(gm: GenerationMode, limit: usize, file_name:
     m_run_benchmark(
         "limbs_neg_xor_limb_neg(&[u32], u32)",
         BenchmarkType::Single,
-        pairs_of_nonempty_unsigned_vec_and_unsigned(gm),
+        pairs_of_u32_vec_and_u32_var_1(gm),
         gm.name(),
         limit,
         file_name,
@@ -310,7 +310,7 @@ fn benchmark_limbs_neg_xor_limb_neg_to_out(gm: GenerationMode, limit: usize, fil
     m_run_benchmark(
         "limbs_neg_xor_limb_neg_to_out(&mut [u32], &[u32], u32)",
         BenchmarkType::Single,
-        triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_2(gm),
+        triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_3(gm),
         gm.name(),
         limit,
         file_name,
@@ -333,7 +333,7 @@ fn benchmark_limbs_neg_xor_limb_neg_in_place(gm: GenerationMode, limit: usize, f
     m_run_benchmark(
         "limbs_neg_xor_limb_neg_in_place(&mut [u32], u32)",
         BenchmarkType::Single,
-        pairs_of_nonempty_unsigned_vec_and_unsigned(gm),
+        pairs_of_u32_vec_and_u32_var_1(gm),
         gm.name(),
         limit,
         file_name,

@@ -729,7 +729,7 @@ fn benchmark_natural_shr_assign_u32_library_comparison(
 ) {
     m_run_benchmark(
         "Natural >>= u32",
-        BenchmarkType::Single,
+        BenchmarkType::LibraryComparison,
         rm_pairs_of_natural_and_small_unsigned::<u32>(gm),
         gm.name(),
         limit,

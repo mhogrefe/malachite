@@ -330,7 +330,7 @@ fn benchmark_integer_ceiling_mod_power_of_two_assign(
     file_name: &str,
 ) {
     m_run_benchmark(
-        "Integer.ceiling_ceiling_mod_power_of_two_assign(u64)",
+        "Integer.ceiling_mod_power_of_two_assign(u64)",
         BenchmarkType::Single,
         pairs_of_integer_and_small_unsigned(gm),
         gm.name(),

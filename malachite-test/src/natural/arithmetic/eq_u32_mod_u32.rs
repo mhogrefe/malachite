@@ -20,7 +20,8 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
         Large,
         benchmark_natural_eq_u32_mod_u32_library_comparison
     );
-    register_bench!(registry, Large, benchmark_u32_eq_natural_mod_u32);
+    register_bench!(registry, Large, benchmark_natural_eq_u32_mod_u32_algorithms);
+    register_bench!(registry, Large, benchmark_u32_eq_natural_mod_u32_algorithms);
 }
 
 fn demo_limbs_eq_limb_mod_limb(gm: GenerationMode, limit: usize) {
@@ -122,19 +123,52 @@ fn benchmark_natural_eq_u32_mod_u32_library_comparison(
     );
 }
 
-fn benchmark_u32_eq_natural_mod_u32(gm: GenerationMode, limit: usize, file_name: &str) {
+fn benchmark_natural_eq_u32_mod_u32_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
+    m_run_benchmark(
+        "Natural.eq_mod(u32, u32)",
+        BenchmarkType::Algorithms,
+        triples_of_natural_unsigned_and_unsigned(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(ref n, _, _)| n.significant_bits() as usize),
+        "n.significant_bits()",
+        &mut [
+            (
+                "Natural.eq_mod(u32, u32)",
+                &mut (|(n, u, modulus)| no_out!(n.eq_mod(u, modulus))),
+            ),
+            (
+                "Natural == u32 || u32 != 0 && Natural % u32 == u32 % u32",
+                &mut (|(n, u, modulus)| {
+                    no_out!(n == u || modulus != 0 && n % modulus == u % modulus)
+                }),
+            ),
+        ],
+    );
+}
+
+fn benchmark_u32_eq_natural_mod_u32_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "u32.eq_mod(&Natural, u32)",
-        BenchmarkType::Single,
+        BenchmarkType::Algorithms,
         triples_of_unsigned_natural_and_unsigned::<u32>(gm),
         gm.name(),
         limit,
         file_name,
         &(|&(_, ref n, _)| n.significant_bits() as usize),
         "n.significant_bits()",
-        &mut [(
-            "u32.divisible_by(&Natural)",
-            &mut (|(u, ref n, modulus)| no_out!(u.eq_mod(n, modulus))),
-        )],
+        &mut [
+            (
+                "u32.eq_mod(&Natural, u32)",
+                &mut (|(u, ref n, modulus)| no_out!(u.eq_mod(n, modulus))),
+            ),
+            (
+                "u32 == Natural || u32 != 0 && u32 % u32 == Natural % u32",
+                &mut (|(n, u, modulus)| {
+                    no_out!(u == n || modulus != 0 && u % modulus == n % modulus)
+                }),
+            ),
+        ],
     );
 }

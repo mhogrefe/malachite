@@ -89,7 +89,9 @@ pub fn limbs_eq_limb_mod_limb(limbs: &[u32], limb: u32, modulus: u32) -> bool {
 }
 
 impl<'a> EqMod<u32, u32> for &'a Natural {
-    /// Returns whether this `Natural` is equivalent to a `u32` mod a `u32` `modulus`.
+    /// Returns whether this `Natural` is equivalent to a `u32` mod a `u32` `modulus`; that is,
+    /// whether `self` - other is a multiple of `modulus`. Two numbers are equal to each other mod 0
+    /// iff they are equal.
     ///
     /// Time: worst case O(n)
     ///
@@ -122,7 +124,9 @@ impl<'a> EqMod<u32, u32> for &'a Natural {
 }
 
 impl<'a> EqMod<&'a Natural, u32> for u32 {
-    /// Returns whether this `u32` is equivalent to a `Natural` mod a `u32` `modulus`.
+    /// Returns whether this `u32` is equivalent to a `Natural` mod a `u32` `modulus`; that is,
+    /// whether other - `self` is a multiple of `modulus`. Two numbers are equal to each other mod 0
+    /// iff they are equal.
     ///
     /// Time: worst case O(n)
     ///

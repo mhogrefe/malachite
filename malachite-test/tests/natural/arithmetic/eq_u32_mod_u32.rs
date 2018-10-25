@@ -1,5 +1,6 @@
 use common::test_properties;
 use malachite_base::num::{DivisibleBy, EqMod, Zero};
+use malachite_nz::integer::Integer;
 use malachite_nz::natural::arithmetic::eq_u32_mod_u32::{
     _combined_limbs_eq_limb_mod_limb, limbs_eq_limb_mod_limb,
 };
@@ -89,7 +90,7 @@ fn limbs_eq_limb_mod_limb_properties() {
         triples_of_unsigned_vec_unsigned_and_positive_unsigned_var_1,
         |&(ref limbs, limb, modulus)| {
             let equal = limbs_eq_limb_mod_limb(limbs, limb, modulus);
-            assert_eq!(Natural::from_limbs_asc(limbs).eq_mod(limb, modulus), equal,);
+            assert_eq!(Natural::from_limbs_asc(limbs).eq_mod(limb, modulus), equal);
             assert_eq!(
                 modulus != 0 && limbs_mod_limb(limbs, modulus) == limb % modulus,
                 equal
@@ -113,6 +114,8 @@ fn eq_u32_mod_u32_properties() {
 
             //TODO assert_eq!(n.eq_mod(Natural::from(u), modulus), equal);
 
+            assert_eq!(Integer::from(n).eq_mod(u, modulus), equal);
+
             assert_eq!(natural_to_rug_integer(n).is_congruent_u(u, modulus), equal);
         },
     );
@@ -125,6 +128,9 @@ fn eq_u32_mod_u32_properties() {
             assert!(*n == u || modulus != 0 && n % modulus == u % modulus);
 
             //TODO assert!(n.eq_mod(Natural::from(u), modulus));
+
+            assert!(Integer::from(n).eq_mod(u, modulus));
+            assert!(u.eq_mod(&Integer::from(n), modulus));
 
             assert!(natural_to_rug_integer(n).is_congruent_u(u, modulus));
         },
@@ -139,6 +145,9 @@ fn eq_u32_mod_u32_properties() {
 
             //TODO assert!(!n.eq_mod(Natural::from(u), modulus));
 
+            assert!(!Integer::from(n).eq_mod(u, modulus));
+            assert!(!u.eq_mod(&Integer::from(n), modulus));
+
             assert!(!natural_to_rug_integer(n).is_congruent_u(u, modulus));
         },
     );
@@ -151,6 +160,8 @@ fn eq_u32_mod_u32_properties() {
     });
 
     test_properties(pairs_of_unsigneds::<u32>, |&(u, modulus)| {
+        assert!(Natural::from(u).eq_mod(u, modulus));
+        assert!(u.eq_mod(&Natural::from(u), modulus));
         assert_eq!(Natural::ZERO.eq_mod(u, modulus), u.divisible_by(modulus));
         assert_eq!(u.eq_mod(&Natural::ZERO, modulus), u.divisible_by(modulus));
     });
