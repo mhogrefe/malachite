@@ -1,8 +1,12 @@
 use common::test_properties;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
-use malachite_test::common::{natural_to_rug_integer, rug_integer_to_integer};
+use malachite_test::common::{
+    bigint_to_integer, natural_to_biguint, natural_to_rug_integer, rug_integer_to_integer,
+};
 use malachite_test::inputs::natural::naturals;
+use malachite_test::natural::arithmetic::neg::neg_num;
+use num::BigUint;
 use rug;
 use std::str::FromStr;
 
@@ -18,6 +22,7 @@ fn test_neg() {
         assert_eq!(neg.to_string(), out);
 
         assert_eq!((-rug::Integer::from_str(s).unwrap()).to_string(), out);
+        assert_eq!(neg_num(BigUint::from_str(s).unwrap()).to_string(), out);
     };
     test("0", "0");
     test("123", "-123");
@@ -36,6 +41,7 @@ fn neg_properties() {
         assert_eq!(neg_alt, neg);
 
         assert_eq!(rug_integer_to_integer(&(-natural_to_rug_integer(x))), neg);
+        assert_eq!(bigint_to_integer(&neg_num(natural_to_biguint(x))), neg);
 
         assert_eq!(-Integer::from(x), neg);
         assert_eq!(neg == *x, *x == 0);

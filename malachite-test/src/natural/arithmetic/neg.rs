@@ -1,6 +1,7 @@
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::natural::{naturals, nrm_naturals};
 use malachite_base::num::SignificantBits;
+use num::{BigInt, BigUint};
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_natural_neg);
@@ -21,6 +22,10 @@ fn demo_natural_neg_ref(gm: GenerationMode, limit: usize) {
     }
 }
 
+pub fn neg_num(u: BigUint) -> BigInt {
+    -BigInt::from(u)
+}
+
 fn benchmark_natural_neg_library_comparison(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "-Natural",
@@ -33,7 +38,7 @@ fn benchmark_natural_neg_library_comparison(gm: GenerationMode, limit: usize, fi
         "n.significant_bits()",
         &mut [
             ("malachite", &mut (|(_, _, n)| no_out!(-n))),
-            ("num", &mut (|(n, _, _)| no_out!(-n))),
+            ("num", &mut (|(n, _, _)| no_out!(neg_num(n)))),
             ("rug", &mut (|(_, n, _)| no_out!(-n))),
         ],
     );
