@@ -6,6 +6,12 @@ use rand::Rng;
 /// Returns a random `Natural` sampled from [0, `n`). The `Natural` will typically have long runs of
 /// 0s and 1s in its binary expansion, to help trigger edge cases for testing.
 ///
+/// Time: worst case expected O(n)
+///
+/// Additional memory: worst case O(n)
+///
+/// where n = `self.significant_bits()`
+///
 /// # Panics
 /// Panics if `n` is 0.
 ///

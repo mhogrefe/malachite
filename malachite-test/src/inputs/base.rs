@@ -12,7 +12,7 @@ use rust_wheels::iterators::bools::exhaustive_bools;
 use rust_wheels::iterators::chars::exhaustive_chars;
 use rust_wheels::iterators::common::EXAMPLE_SEED;
 use rust_wheels::iterators::general::{random, range_increasing};
-use rust_wheels::iterators::integers_geometric::u32s_geometric;
+use rust_wheels::iterators::integers_geometric::{positive_u32s_geometric, u32s_geometric};
 use rust_wheels::iterators::orderings::{exhaustive_orderings, random_orderings};
 use rust_wheels::iterators::primitive_ints::{
     exhaustive_negative_signed, exhaustive_positive, exhaustive_signed, exhaustive_unsigned,
@@ -134,6 +134,17 @@ pub fn small_unsigneds<T: PrimitiveUnsigned>(
         NoSpecialGenerationMode::Exhaustive => Box::new(exhaustive_unsigned()),
         NoSpecialGenerationMode::Random(scale) => {
             Box::new(u32s_geometric(&EXAMPLE_SEED, scale).flat_map(T::checked_from))
+        }
+    }
+}
+
+pub fn small_positive_unsigneds<T: PrimitiveUnsigned>(
+    gm: NoSpecialGenerationMode,
+) -> Box<Iterator<Item = T>> {
+    match gm {
+        NoSpecialGenerationMode::Exhaustive => Box::new(exhaustive_positive()),
+        NoSpecialGenerationMode::Random(scale) => {
+            Box::new(positive_u32s_geometric(&EXAMPLE_SEED, scale).flat_map(T::checked_from))
         }
     }
 }

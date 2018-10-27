@@ -1,9 +1,63 @@
-use malachite_base::num::{ModPowerOfTwoAssign, PrimitiveInteger, Zero};
+use malachite_base::num::{ModPowerOfTwo, ModPowerOfTwoAssign, PrimitiveInteger, ShrRound, Zero};
+use malachite_base::round::RoundingMode;
 use natural::Natural;
 use rand::Rng;
 
+/// Returns a slice of `u32`s representing a random `Natural` with up to `bits` bits; equivalently,
+/// returns the limbs of a random `Natural` uniformly sampled from [0, 2<sup>`bits`</sup>). There
+/// may be trailing zero limbs.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(n)
+///
+/// where n = `bits`
+///
+/// # Panics
+/// Panics if `bits` is zero.
+///
+/// # Example
+/// ```
+/// extern crate malachite_nz;
+/// extern crate rand;
+///
+/// use malachite_nz::natural::random::random_natural_up_to_bits::limbs_random_up_to_bits;
+/// use rand::{SeedableRng, StdRng};
+///
+/// fn main() {
+///     let seed: &[_] = &[1, 2, 3, 4];
+///     let mut rng: StdRng = SeedableRng::from_seed(seed);
+///     assert_eq!(limbs_random_up_to_bits(&mut rng, 4), &[2]);
+///     assert_eq!(limbs_random_up_to_bits(&mut rng, 10), &[205]);
+///     assert_eq!(limbs_random_up_to_bits(&mut rng, 100),
+///         &[1930352495, 1261517434, 2051352252, 14]);
+/// }
+/// ```
+pub fn limbs_random_up_to_bits<R: Rng>(rng: &mut R, bits: u64) -> Vec<u32> {
+    assert_ne!(bits, 0);
+    let remainder_bits = bits.mod_power_of_two(u64::from(u32::LOG_WIDTH));
+    let limb_count = bits.shr_round(u32::LOG_WIDTH, RoundingMode::Ceiling);
+    let mut limbs: Vec<u32> = Vec::with_capacity(limb_count as usize);
+    for _ in 0..limb_count {
+        limbs.push(rng.gen());
+    }
+    if remainder_bits != 0 {
+        limbs
+            .last_mut()
+            .unwrap()
+            .mod_power_of_two_assign(remainder_bits);
+    }
+    limbs
+}
+
 /// Returns a random `Natural` with up to `bits` bits; equivalently, returns a random `Natural`
 /// uniformly sampled from [0, 2<sup>`bits`</sup>).
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(n)
+///
+/// where n = `bits`
 ///
 /// # Example
 /// ```
@@ -24,21 +78,8 @@ use rand::Rng;
 /// ```
 pub fn random_natural_up_to_bits<R: Rng>(rng: &mut R, bits: u64) -> Natural {
     if bits == 0 {
-        return Natural::ZERO;
-    }
-    let remainder_bits = bits & u64::from(u32::WIDTH_MASK);
-    let limb_count = if remainder_bits == 0 {
-        bits >> u32::LOG_WIDTH
+        Natural::ZERO
     } else {
-        (bits >> u32::LOG_WIDTH) + 1
-    };
-    let mut limbs = Vec::with_capacity(limb_count as usize);
-    for _ in 0..limb_count {
-        limbs.push(rng.gen());
+        Natural::from_owned_limbs_asc(limbs_random_up_to_bits(rng, bits))
     }
-    if remainder_bits != 0 {
-        let last_limb: &mut u32 = limbs.last_mut().unwrap();
-        last_limb.mod_power_of_two_assign(remainder_bits);
-    }
-    Natural::from_owned_limbs_asc(limbs)
 }

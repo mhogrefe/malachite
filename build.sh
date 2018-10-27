@@ -6,6 +6,7 @@ cargo +nightly fmt &&
 cargo test --release &&
 cargo doc &&
 cargo rustc --release -- --emit asm &&
+cargo build --release --target wasm32-unknown-unknown &&
 cd ../malachite-nz &&
 cargo update &&
 cargo +nightly fmt &&
@@ -13,6 +14,7 @@ cargo +nightly fmt &&
 cargo test --release &&
 cargo doc &&
 cargo rustc --release -- --emit asm &&
+cargo build --release --target wasm32-unknown-unknown &&
 cd ../malachite-test &&
 cargo update &&
 cargo +nightly fmt &&

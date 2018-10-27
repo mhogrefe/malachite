@@ -5,6 +5,12 @@ use rand::Rng;
 
 /// Returns a random `Natural` uniformly sampled from [0, `n`).
 ///
+/// Time: worst case expected O(n)
+///
+/// Additional memory: worst case O(n)
+///
+/// where n = `self.significant_bits()`
+///
 /// # Panics
 /// Panics if `n` is 0.
 ///

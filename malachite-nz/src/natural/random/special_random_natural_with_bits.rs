@@ -7,6 +7,12 @@ use rand::Rng;
 /// sampled from [2<sup>`bits`-1</sup>, 2<sup>`bits`</sup>). The `Natural` will typically have long
 /// runs of 0s and 1s in its binary expansion, to help trigger edge cases for testing.
 ///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(n)
+///
+/// where n = `bits`
+///
 /// # Example
 /// ```
 /// extern crate malachite_nz;

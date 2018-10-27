@@ -9,3 +9,6 @@ path = "src/lib.rs"
 
 [dependencies]
 rand = "0.3.0"
+
+[profile.release]
+lto = true

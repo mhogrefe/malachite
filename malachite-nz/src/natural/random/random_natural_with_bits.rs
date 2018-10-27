@@ -6,6 +6,12 @@ use rand::Rng;
 /// Returns a random `Natural` with exactly `bits` bits; equivalently, returns a random `Natural`
 /// uniformly sampled from [2<sup>`bits`-1</sup>, 2<sup>`bits`</sup>).
 ///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(n)
+///
+/// where n = `bits`
+///
 /// # Example
 /// ```
 /// extern crate malachite_nz;
