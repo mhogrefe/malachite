@@ -6,6 +6,7 @@ use malachite_test::inputs::integer::{
     pairs_of_integer_and_natural, triples_of_integer_natural_and_integer,
     triples_of_natural_integer_and_natural,
 };
+use malachite_test::inputs::natural::pairs_of_naturals;
 use std::cmp::Ordering;
 use std::str::FromStr;
 
@@ -72,4 +73,9 @@ fn partial_cmp_integer_natural_properties() {
             }
         },
     );
+
+    test_properties(pairs_of_naturals, |&(ref x, ref y)| {
+        assert_eq!(Integer::from(x).partial_cmp(y), Some(x.cmp(y)));
+        assert_eq!(x.partial_cmp(&Integer::from(y)), Some(x.cmp(y)));
+    });
 }

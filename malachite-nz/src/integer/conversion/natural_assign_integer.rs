@@ -1,5 +1,5 @@
 use integer::Integer;
-use malachite_base::num::Assign;
+use malachite_base::num::{Assign, Sign};
 use natural::Natural;
 use std::cmp::Ordering;
 

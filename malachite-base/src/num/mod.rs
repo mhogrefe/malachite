@@ -546,6 +546,10 @@ pub trait DivisibleBy<RHS = Self> {
     fn divisible_by(self, rhs: RHS) -> bool;
 }
 
+pub trait Sign {
+    fn sign(&self) -> Ordering;
+}
+
 //TODO is_positive, is_negative, sign
 
 macro_rules! lossless_checked_from_impl {
@@ -943,6 +947,7 @@ pub trait PrimitiveSigned:
     + NegativeOne
     + OverflowingAbs<Output = Self>
     + PrimitiveInteger
+    + Sign
     + UnsignedAbs
     + WrappingAbs<Output = Self>
 {
@@ -2514,6 +2519,12 @@ macro_rules! signed_traits {
                 } else {
                     rhs.unsigned_abs() - remainder
                 }
+            }
+        }
+
+        impl Sign for $t {
+            fn sign(&self) -> Ordering {
+                self.cmp(&0)
             }
         }
     };

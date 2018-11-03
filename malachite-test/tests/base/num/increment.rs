@@ -64,21 +64,21 @@ increment_fail!(i64, increment_i64_fail);
 
 fn increment_properties_helper_unsigned<T: PrimitiveUnsigned>() {
     test_properties(unsigneds_no_max, |&n: &T| {
-        let mut n_mut = n;
-        n_mut.increment();
-        assert_ne!(n_mut, n);
-        n_mut.decrement();
-        assert_eq!(n_mut, n);
+        let mut mut_n = n;
+        mut_n.increment();
+        assert_ne!(mut_n, n);
+        mut_n.decrement();
+        assert_eq!(mut_n, n);
     });
 }
 
 fn increment_properties_helper_signed<T: PrimitiveSigned>() {
     test_properties(signeds_no_max, |&n: &T| {
-        let mut n_mut = n;
-        n_mut.increment();
-        assert_ne!(n_mut, n);
-        n_mut.decrement();
-        assert_eq!(n_mut, n);
+        let mut mut_n = n;
+        mut_n.increment();
+        assert_ne!(mut_n, n);
+        mut_n.decrement();
+        assert_eq!(mut_n, n);
     });
 }
 

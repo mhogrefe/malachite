@@ -73,9 +73,9 @@ fn test_clone_clone_from_assign() {
 #[test]
 fn clone_clone_from_and_assign_properties() {
     test_properties(integers, |x| {
-        let x_mut = x.clone();
-        assert!(x_mut.is_valid());
-        assert_eq!(x_mut, *x);
+        let mut_x = x.clone();
+        assert!(mut_x.is_valid());
+        assert_eq!(mut_x, *x);
 
         assert_eq!(bigint_to_integer(&integer_to_bigint(x).clone()), *x);
         assert_eq!(

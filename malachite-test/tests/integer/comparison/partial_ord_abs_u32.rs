@@ -1,10 +1,12 @@
 use common::test_properties;
 use malachite_base::num::{Abs, PartialOrdAbs};
 use malachite_nz::integer::Integer;
+use malachite_test::inputs::base::pairs_of_unsigneds;
 use malachite_test::inputs::integer::{
     pairs_of_integer_and_unsigned, triples_of_integer_unsigned_and_integer,
     triples_of_unsigned_integer_and_unsigned,
 };
+use malachite_test::inputs::natural::pairs_of_natural_and_unsigned;
 use std::cmp::Ordering;
 use std::str::FromStr;
 
@@ -68,4 +70,14 @@ fn partial_cmp_u32_properties() {
             }
         },
     );
+
+    test_properties(pairs_of_natural_and_unsigned::<u32>, |&(ref x, y)| {
+        assert_eq!(Integer::from(x).partial_cmp_abs(&y), x.partial_cmp(&y));
+        assert_eq!(x.partial_cmp_abs(&Integer::from(y)), x.partial_cmp(&y));
+    });
+
+    test_properties(pairs_of_unsigneds::<u32>, |&(x, y)| {
+        assert_eq!(Integer::from(x).partial_cmp_abs(&y), Some(x.cmp(&y)));
+        assert_eq!(x.partial_cmp_abs(&Integer::from(y)), Some(x.cmp(&y)));
+    });
 }

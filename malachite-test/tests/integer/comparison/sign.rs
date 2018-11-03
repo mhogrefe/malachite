@@ -1,5 +1,7 @@
 use common::test_properties;
+use malachite_base::num::Sign;
 use malachite_nz::integer::Integer;
+use malachite_test::inputs::base::signeds;
 use malachite_test::inputs::integer::integers;
 use malachite_test::integer::comparison::sign::num_sign;
 use num::BigInt;
@@ -27,5 +29,9 @@ fn sign_properties() {
         let sign = n.sign();
         assert_eq!(n.partial_cmp(&0), Some(sign));
         assert_eq!((-n).sign(), sign.reverse());
+    });
+
+    test_properties(signeds::<i32>, |&i| {
+        assert_eq!(Integer::from(i).sign(), i.sign());
     });
 }

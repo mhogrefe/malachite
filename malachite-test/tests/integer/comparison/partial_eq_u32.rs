@@ -1,7 +1,9 @@
 use common::test_properties;
 use malachite_nz::integer::Integer;
 use malachite_test::common::{integer_to_bigint, integer_to_rug_integer};
+use malachite_test::inputs::base::pairs_of_unsigneds;
 use malachite_test::inputs::integer::pairs_of_integer_and_unsigned;
+use malachite_test::inputs::natural::pairs_of_natural_and_unsigned;
 use malachite_test::integer::comparison::partial_eq_u32::num_partial_eq_u32;
 use num::BigInt;
 use rug;
@@ -41,4 +43,14 @@ fn partial_eq_u32_properties() {
             assert_eq!(Integer::from(u) == *n, eq);
         },
     );
+
+    test_properties(pairs_of_natural_and_unsigned::<u32>, |&(ref x, y)| {
+        assert_eq!(Integer::from(x) == y, *x == y);
+        assert_eq!(*x == Integer::from(y), *x == y);
+    });
+
+    test_properties(pairs_of_unsigneds::<u32>, |&(x, y)| {
+        assert_eq!(Integer::from(x) == y, x == y);
+        assert_eq!(x == Integer::from(y), x == y);
+    });
 }

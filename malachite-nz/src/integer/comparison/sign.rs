@@ -1,7 +1,8 @@
 use integer::Integer;
+use malachite_base::num::Sign;
 use std::cmp::Ordering;
 
-impl Integer {
+impl Sign for Integer {
     /// Returns the sign of an `Integer`. Interpret the result as the result of a comparison to
     /// zero, so that `Equal` means zero, `Greater` means positive, and `Less` means negative.
     ///
@@ -14,7 +15,7 @@ impl Integer {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::Zero;
+    /// use malachite_base::num::{Sign, Zero};
     /// use malachite_nz::integer::Integer;
     /// use std::cmp::Ordering;
     ///
@@ -24,7 +25,7 @@ impl Integer {
     ///     assert_eq!(Integer::from(-123).sign(), Ordering::Less);
     /// }
     /// ```
-    pub fn sign(&self) -> Ordering {
+    fn sign(&self) -> Ordering {
         if self.sign {
             if self.abs == 0 {
                 Ordering::Equal

@@ -1,6 +1,7 @@
 use common::test_properties;
 use malachite_base::misc::Walkable;
 use malachite_nz::natural::Natural;
+use malachite_test::inputs::base::unsigneds_no_max;
 use malachite_test::inputs::natural::naturals;
 use std::str::FromStr;
 
@@ -20,10 +21,19 @@ fn test_natural_increment() {
 #[test]
 fn natural_increment_properties() {
     test_properties(naturals, |n| {
-        let mut n_mut = n.clone();
-        n_mut.increment();
-        assert_ne!(n_mut, *n);
-        n_mut.decrement();
-        assert_eq!(n_mut, *n);
+        let mut mut_n = n.clone();
+        mut_n.increment();
+        assert_ne!(mut_n, *n);
+        mut_n.decrement();
+        assert_eq!(mut_n, *n);
+    });
+
+    test_properties(unsigneds_no_max::<u32>, |&u| {
+        let mut mut_u = u;
+        mut_u.increment();
+
+        let mut n = Natural::from(u);
+        n.increment();
+        assert_eq!(n, mut_u);
     });
 }

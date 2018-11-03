@@ -25,9 +25,10 @@ use rust_wheels::iterators::naturals::{
     exhaustive_naturals, random_naturals, special_random_naturals,
 };
 use rust_wheels::iterators::primitive_ints::{
-    exhaustive_natural_signed, exhaustive_positive, exhaustive_signed, exhaustive_unsigned,
-    random_natural_signed, random_positive_unsigned, special_random_natural_signed,
-    special_random_positive_unsigned, special_random_signed, special_random_unsigned,
+    exhaustive_natural_signed, exhaustive_nonzero_signed, exhaustive_positive, exhaustive_signed,
+    exhaustive_unsigned, random_natural_signed, random_nonzero_signed, random_positive_unsigned,
+    special_random_natural_signed, special_random_nonzero_signed, special_random_positive_unsigned,
+    special_random_signed, special_random_unsigned,
 };
 use rust_wheels::iterators::rounding_modes::{exhaustive_rounding_modes, random_rounding_modes};
 use rust_wheels::iterators::tuples::{
@@ -328,6 +329,48 @@ pub fn nrm_pairs_of_integer_and_positive_unsigned<T: PrimitiveUnsigned>(
     }))
 }
 
+pub fn pairs_of_integer_and_nonzero_signed<T: PrimitiveSigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (Integer, T)>> {
+    match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_pairs(
+            exhaustive_integers(),
+            exhaustive_nonzero_signed(),
+        )),
+        GenerationMode::Random(scale) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| random_integers(seed, scale)),
+            &(|seed| random_nonzero_signed(seed)),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_integers(seed, scale)),
+            &(|seed| special_random_nonzero_signed(seed)),
+        )),
+    }
+}
+
+pub fn rm_pairs_of_integer_and_nonzero_signed<T: PrimitiveSigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = ((rug::Integer, T), (Integer, T))>> {
+    Box::new(
+        pairs_of_integer_and_nonzero_signed(gm)
+            .map(|(x, y)| ((integer_to_rug_integer(&x), y), (x, y))),
+    )
+}
+
+pub fn nrm_pairs_of_integer_and_nonzero_signed<T: PrimitiveSigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = ((BigInt, T), (rug::Integer, T), (Integer, T))>> {
+    Box::new(pairs_of_integer_and_nonzero_signed(gm).map(|(x, y)| {
+        (
+            (integer_to_bigint(&x), y),
+            (integer_to_rug_integer(&x), y),
+            (x, y),
+        )
+    }))
+}
+
 // All triples of `Integer` and positive `u32` where the `Integer` is divisible by the `T`.
 pub fn pairs_of_integer_and_positive_u32_var_1(
     gm: GenerationMode,
@@ -371,6 +414,13 @@ pub fn pairs_of_unsigned_and_integer<T: PrimitiveUnsigned>(
     }
 }
 
+// All triples of `Integer` and nonzero `i32` where the `Integer` is divisible by the `T`.
+pub fn pairs_of_integer_and_nonzero_i32_var_1(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (Integer, i32)>> {
+    Box::new(pairs_of_integer_and_nonzero_signed(gm).map(|(n, i)| (n * i, i)))
+}
+
 pub fn nrm_pairs_of_unsigned_and_integer<T: PrimitiveUnsigned>(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = ((T, BigInt), (T, rug::Integer), (T, Integer))>> {
@@ -396,7 +446,7 @@ pub fn pairs_of_unsigned_and_nonzero_integer<T: PrimitiveUnsigned>(
 ) -> Box<Iterator<Item = (T, Integer)>> {
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_pairs(
-            exhaustive_positive(),
+            exhaustive_unsigned(),
             exhaustive_nonzero_integers(),
         )),
         GenerationMode::Random(scale) => Box::new(random_pairs(
@@ -429,6 +479,27 @@ pub fn pairs_of_u32_and_nonzero_integer_var_2(
         pairs_of_unsigned_and_nonzero_integer::<u32>(gm)
             .filter_map(|(u, n)| u32::checked_from(u * (&n).abs()).map(|u| (u, n))),
     )
+}
+
+pub fn pairs_of_signed_and_nonzero_integer<T: PrimitiveSigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (T, Integer)>> {
+    match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_pairs(
+            exhaustive_signed(),
+            exhaustive_nonzero_integers(),
+        )),
+        GenerationMode::Random(scale) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| random(seed)),
+            &(|seed| random_nonzero_integers(seed, scale)),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_signed(seed)),
+            &(|seed| special_random_nonzero_integers(seed, scale)),
+        )),
+    }
 }
 
 pub fn pairs_of_natural_integer_and_unsigned<T: PrimitiveUnsigned>(

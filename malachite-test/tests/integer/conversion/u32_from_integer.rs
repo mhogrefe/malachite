@@ -1,6 +1,6 @@
 use common::test_properties;
 use malachite_base::misc::{CheckedFrom, WrappingFrom};
-use malachite_base::num::{ModPowerOfTwo, PrimitiveInteger, SignificantBits};
+use malachite_base::num::{ModPowerOfTwo, PrimitiveInteger, Sign, SignificantBits};
 use malachite_nz::integer::Integer;
 use malachite_test::common::integer_to_rug_integer;
 use malachite_test::inputs::integer::integers;

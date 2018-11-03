@@ -27,10 +27,10 @@ fn char_increment_fail() {
 #[test]
 fn char_increment_properties() {
     test_properties_no_limit_exhaustive_no_special(chars_not_max, |&c| {
-        let mut c_mut = c;
-        c_mut.increment();
-        assert_ne!(c_mut, c);
-        c_mut.decrement();
-        assert_eq!(c_mut, c);
+        let mut mut_c = c;
+        mut_c.increment();
+        assert_ne!(mut_c, c);
+        mut_c.decrement();
+        assert_eq!(mut_c, c);
     });
 }

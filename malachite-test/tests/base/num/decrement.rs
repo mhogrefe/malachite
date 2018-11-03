@@ -64,21 +64,21 @@ decrement_fail!(i64, decrement_i64_fail);
 
 fn decrement_properties_helper_unsigned<T: PrimitiveUnsigned>() {
     test_properties(positive_unsigneds, |&n: &T| {
-        let mut n_mut = n;
-        n_mut.decrement();
-        assert_ne!(n_mut, n);
-        n_mut.increment();
-        assert_eq!(n_mut, n);
+        let mut mut_n = n;
+        mut_n.decrement();
+        assert_ne!(mut_n, n);
+        mut_n.increment();
+        assert_eq!(mut_n, n);
     });
 }
 
 fn decrement_properties_helper_signed<T: PrimitiveSigned>() {
     test_properties(signeds_no_min, |&n: &T| {
-        let mut n_mut = n;
-        n_mut.decrement();
-        assert_ne!(n_mut, n);
-        n_mut.increment();
-        assert_eq!(n_mut, n);
+        let mut mut_n = n;
+        mut_n.decrement();
+        assert_ne!(mut_n, n);
+        mut_n.increment();
+        assert_eq!(mut_n, n);
     });
 }
 

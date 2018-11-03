@@ -1,7 +1,9 @@
 use common::{test_cmp_helper, test_properties};
 use malachite_nz::integer::Integer;
 use malachite_test::common::integer_to_rug_integer;
+use malachite_test::inputs::base::pairs_of_signeds;
 use malachite_test::inputs::integer::{integers, pairs_of_integers, triples_of_integers};
+use malachite_test::inputs::natural::pairs_of_naturals;
 use num::BigInt;
 use rug;
 use std::cmp::Ordering;
@@ -50,5 +52,13 @@ fn cmp_properties() {
         } else if x > y && y > z {
             assert!(x > z);
         }
+    });
+
+    test_properties(pairs_of_naturals, |&(ref x, ref y)| {
+        assert_eq!(Integer::from(x).cmp(&Integer::from(y)), x.cmp(y));
+    });
+
+    test_properties(pairs_of_signeds::<i32>, |&(x, y)| {
+        assert_eq!(Integer::from(x).cmp(&Integer::from(y)), x.cmp(&y));
     });
 }

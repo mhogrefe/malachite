@@ -2,7 +2,7 @@ use common::test_properties;
 use malachite_base::num::{
     Abs, CeilingModPowerOfTwo, CeilingModPowerOfTwoAssign, DivisibleByPowerOfTwo, ModPowerOfTwo,
     ModPowerOfTwoAssign, NegModPowerOfTwo, NegModPowerOfTwoAssign, One, PartialOrdAbs,
-    RemPowerOfTwo, RemPowerOfTwoAssign, ShrRound, Zero,
+    RemPowerOfTwo, RemPowerOfTwoAssign, ShrRound, Sign, Zero,
 };
 use malachite_base::round::RoundingMode;
 use malachite_nz::integer::Integer;

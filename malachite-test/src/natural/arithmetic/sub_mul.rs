@@ -1,7 +1,7 @@
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::natural::{triples_of_naturals, triples_of_naturals_var_1};
 use malachite_base::num::SignificantBits;
-use malachite_base::num::{SubMul, SubMulAssign};
+use malachite_base::num::{CheckedSub, SubMul, SubMulAssign};
 use malachite_nz::natural::Natural;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
@@ -151,7 +151,7 @@ fn benchmark_natural_sub_mul_algorithms(gm: GenerationMode, limit: usize, file_n
             ),
             (
                 "Natural - &Natural * &Natural",
-                &mut (|(a, b, c)| no_out!(a - &b * &c)),
+                &mut (|(a, b, c)| no_out!(a.checked_sub(&b * &c))),
             ),
         ],
     );
@@ -174,7 +174,7 @@ fn benchmark_natural_sub_mul_ref_algorithms(gm: GenerationMode, limit: usize, fi
             ),
             (
                 "(&Natural) - &Natural * &Natural",
-                &mut (|(a, b, c)| no_out!((&a) - &b * &c)),
+                &mut (|(a, b, c)| no_out!((&a).checked_sub(&b * &c))),
             ),
         ],
     );

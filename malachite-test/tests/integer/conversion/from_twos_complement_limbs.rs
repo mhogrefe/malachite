@@ -1,5 +1,5 @@
 use common::test_properties;
-use malachite_base::num::{BitAccess, PrimitiveInteger};
+use malachite_base::num::{BitAccess, PrimitiveInteger, Sign};
 use malachite_nz::integer::Integer;
 use malachite_test::inputs::base::vecs_of_unsigned;
 use std::cmp::Ordering;

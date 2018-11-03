@@ -8,6 +8,7 @@ pub mod add_mul_i32;
 pub mod add_mul_u32;
 pub mod add_u32;
 pub mod div_exact_u32;
+pub mod div_mod_i32;
 pub mod div_mod_u32;
 pub mod div_round_u32;
 pub mod div_u32;
@@ -44,6 +45,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     add_mul_i32::register(registry);
     add_mul_u32::register(registry);
     div_exact_u32::register(registry);
+    div_mod_i32::register(registry);
     div_mod_u32::register(registry);
     div_round_u32::register(registry);
     div_u32::register(registry);

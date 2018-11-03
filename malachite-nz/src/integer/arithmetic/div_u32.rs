@@ -8,7 +8,7 @@ impl Div<u32> for Integer {
 
     /// Divides a `Integer` by a `u32`, taking the `Integer` by value. The quotient is rounded
     /// towards zero. In other words, returns q, where `self` = q * `other` + r,
-    /// (r = 0 or sign(r) = sign(q)), and 0 <= |r| < `other`.
+    /// (r = 0 or sign(r) = sign(`self`)), and 0 <= |r| < `other`.
     ///
     /// Time: worst case O(n)
     ///
@@ -43,7 +43,7 @@ impl<'a> Div<u32> for &'a Integer {
 
     /// Divides a `Integer` by a `u32`, taking the `Integer` by reference. The quotient is rounded
     /// towards zero. In other words, returns q, where `self` = q * `other` + r,
-    /// (r = 0 or sign(r) = sign(q)), and 0 <= |r| < `other`.
+    /// (r = 0 or sign(r) = sign(`self`)), and 0 <= |r| < `other`.
     ///
     /// Time: worst case O(n)
     ///

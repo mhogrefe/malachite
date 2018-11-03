@@ -99,14 +99,14 @@ fn limbs_and_pos_neg_to_out_fail_3() {
 fn test_limbs_pos_neg_in_place_left_and_limbs_vec_and_pos_neg_in_place_right() {
     let test = |xs: &[u32], ys, out| {
         {
-            let mut xs_mut = xs.to_vec();
-            limbs_and_pos_neg_in_place_left(&mut xs_mut, ys);
-            assert_eq!(xs_mut, out);
+            let mut mut_xs = xs.to_vec();
+            limbs_and_pos_neg_in_place_left(&mut mut_xs, ys);
+            assert_eq!(mut_xs, out);
         }
         {
-            let mut ys_mut = ys.to_vec();
-            limbs_vec_and_pos_neg_in_place_right(xs, &mut ys_mut);
-            assert_eq!(ys_mut, out);
+            let mut mut_ys = ys.to_vec();
+            limbs_vec_and_pos_neg_in_place_right(xs, &mut mut_ys);
+            assert_eq!(mut_ys, out);
         }
     };
     test(&[2], &[3], vec![0]);
@@ -181,9 +181,9 @@ fn test_limbs_and_neg_neg_and_limbs_vec_and_neg_neg_in_place_left() {
     let test = |xs, ys, out| {
         assert_eq!(limbs_and_neg_neg(xs, ys), out);
         {
-            let mut xs_mut = xs.to_vec();
-            limbs_vec_and_neg_neg_in_place_left(&mut xs_mut, ys);
-            assert_eq!(xs_mut, out);
+            let mut mut_xs = xs.to_vec();
+            limbs_vec_and_neg_neg_in_place_left(&mut mut_xs, ys);
+            assert_eq!(mut_xs, out);
         }
     };
     test(&[2], &[3], vec![4]);

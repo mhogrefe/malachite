@@ -1,9 +1,8 @@
 use misc::Walkable;
 use std::char;
 
-// The number of Unicode scalar values, or 2<sup>20</sup> + 2<sup>16</sup> - 2<sup>11</sup>, or
-// 1,112,064.
-pub const NUMBER_OF_CHARS: u32 = 0x10_f800;
+// The number of Unicode scalar values, or 1,112,064.
+pub const NUMBER_OF_CHARS: u32 = (1 << 20) + (1 << 16) - SURROGATE_RANGE_SIZE;
 
 // The size of the surrogate range; this is a range of code points that do not correspond to any
 // valid `char` and must be skipped.

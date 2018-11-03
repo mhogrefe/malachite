@@ -136,19 +136,19 @@ fn test_div_mod_u32() {
 #[test]
 #[should_panic(expected = "division by zero")]
 fn div_assign_mod_u32_fail() {
-    Integer::from(10u32).div_assign_mod(0);
+    Integer::from(10u32).div_assign_mod(0u32);
 }
 
 #[test]
 #[should_panic(expected = "division by zero")]
 fn div_mod_u32_fail() {
-    Integer::from(10u32).div_mod(0);
+    Integer::from(10u32).div_mod(0u32);
 }
 
 #[test]
 #[should_panic(expected = "division by zero")]
 fn div_mod_u32_ref_fail() {
-    (&Integer::from(10u32)).div_mod(0);
+    (&Integer::from(10u32)).div_mod(0u32);
 }
 
 #[test]
@@ -266,19 +266,19 @@ fn test_div_rem_u32() {
 #[test]
 #[should_panic(expected = "division by zero")]
 fn div_assign_rem_u32_fail() {
-    Integer::from(10u32).div_assign_rem(0);
+    Integer::from(10u32).div_assign_rem(0u32);
 }
 
 #[test]
 #[should_panic(expected = "division by zero")]
 fn div_rem_u32_fail() {
-    Integer::from(10u32).div_rem(0);
+    Integer::from(10u32).div_rem(0u32);
 }
 
 #[test]
 #[should_panic(expected = "division by zero")]
 fn div_rem_u32_ref_fail() {
-    (&Integer::from(10u32)).div_rem(0);
+    (&Integer::from(10u32)).div_rem(0u32);
 }
 
 #[test]
@@ -381,19 +381,19 @@ fn test_ceiling_div_neg_mod_u32() {
 #[test]
 #[should_panic(expected = "division by zero")]
 fn ceiling_div_assign_neg_mod_u32_fail() {
-    Integer::from(10u32).ceiling_div_assign_neg_mod(0);
+    Integer::from(10u32).ceiling_div_assign_neg_mod(0u32);
 }
 
 #[test]
 #[should_panic(expected = "division by zero")]
 fn ceiling_div_neg_mod_u32_fail() {
-    Integer::from(10u32).ceiling_div_neg_mod(0);
+    Integer::from(10u32).ceiling_div_neg_mod(0u32);
 }
 
 #[test]
 #[should_panic(expected = "division by zero")]
 fn ceiling_div_neg_mod_u32_ref_fail() {
-    (&Integer::from(10u32)).ceiling_div_neg_mod(0);
+    (&Integer::from(10u32)).ceiling_div_neg_mod(0u32);
 }
 
 #[test]
@@ -500,19 +500,19 @@ fn test_ceiling_div_mod_u32() {
 #[test]
 #[should_panic(expected = "division by zero")]
 fn ceiling_div_assign_mod_u32_fail() {
-    Integer::from(10u32).ceiling_div_assign_mod(0);
+    Integer::from(10u32).ceiling_div_assign_mod(0u32);
 }
 
 #[test]
 #[should_panic(expected = "division by zero")]
 fn ceiling_div_mod_u32_fail() {
-    Integer::from(10u32).ceiling_div_mod(0);
+    Integer::from(10u32).ceiling_div_mod(0u32);
 }
 
 #[test]
 #[should_panic(expected = "division by zero")]
 fn ceiling_div_mod_u32_ref_fail() {
-    (&Integer::from(10u32)).ceiling_div_mod(0);
+    (&Integer::from(10u32)).ceiling_div_mod(0u32);
 }
 
 #[test]
@@ -564,25 +564,25 @@ fn test_u32_div_mod_integer() {
 #[test]
 #[should_panic(expected = "division by zero")]
 fn u32_div_mod_integer_fail() {
-    10.div_mod(Integer::ZERO);
+    10u32.div_mod(Integer::ZERO);
 }
 
 #[test]
 #[should_panic(expected = "division by zero")]
 fn u32_div_mod_integer_ref_fail() {
-    10.div_mod(&Integer::ZERO);
+    10u32.div_mod(&Integer::ZERO);
 }
 
 #[test]
 #[should_panic(expected = "division by zero")]
 fn u32_div_rem_integer_fail() {
-    10.div_rem(Integer::ZERO);
+    10u32.div_rem(Integer::ZERO);
 }
 
 #[test]
 #[should_panic(expected = "division by zero")]
 fn u32_div_rem_integer_ref_fail() {
-    10.div_rem(&Integer::ZERO);
+    10u32.div_rem(&Integer::ZERO);
 }
 
 #[test]
@@ -626,13 +626,13 @@ fn test_u32_ceiling_div_neg_mod_integer() {
 #[test]
 #[should_panic(expected = "division by zero")]
 fn u32_ceiling_div_neg_mod_integer_fail() {
-    10.ceiling_div_neg_mod(Integer::ZERO);
+    10u32.ceiling_div_neg_mod(Integer::ZERO);
 }
 
 #[test]
 #[should_panic(expected = "division by zero")]
 fn u32_ceiling_div_neg_mod_integer_ref_fail() {
-    10.ceiling_div_neg_mod(&Integer::ZERO);
+    10u32.ceiling_div_neg_mod(&Integer::ZERO);
 }
 
 #[test]
@@ -676,13 +676,13 @@ fn test_u32_ceiling_div_mod_integer() {
 #[test]
 #[should_panic(expected = "division by zero")]
 fn u32_ceiling_div_mod_integer_fail() {
-    10.ceiling_div_mod(Integer::ZERO);
+    10u32.ceiling_div_mod(Integer::ZERO);
 }
 
 #[test]
 #[should_panic(expected = "division by zero")]
 fn u32_ceiling_div_mod_integer_ref_fail() {
-    10.ceiling_div_mod(&Integer::ZERO);
+    10u32.ceiling_div_mod(&Integer::ZERO);
 }
 
 fn div_mod_u32_properties_helper(n: &Integer, u: u32) {
@@ -768,7 +768,7 @@ fn div_mod_u32_properties() {
     );
 
     test_properties(integers, |n| {
-        let (q, r) = n.div_mod(1);
+        let (q, r) = n.div_mod(1u32);
         assert_eq!(q, *n);
         assert_eq!(r, 0);
     });
@@ -795,15 +795,18 @@ fn div_rem_u32_properties_helper(n: &Integer, u: u32) {
     let mut mut_n = n.clone();
     let remainder = mut_n.div_assign_rem(u);
     assert!(mut_n.is_valid());
+    assert!(remainder.is_valid());
     let quotient = mut_n;
 
     let (quotient_alt, remainder_alt) = n.div_rem(u);
     assert!(quotient_alt.is_valid());
+    assert!(remainder_alt.is_valid());
     assert_eq!(quotient_alt, quotient);
     assert_eq!(remainder_alt, remainder);
 
     let (quotient_alt, remainder_alt) = n.clone().div_rem(u);
     assert!(quotient_alt.is_valid());
+    assert!(remainder_alt.is_valid());
     assert_eq!(quotient_alt, quotient);
     assert_eq!(remainder_alt, remainder);
 
@@ -876,7 +879,7 @@ fn div_rem_u32_properties() {
     );
 
     test_properties(integers, |n| {
-        let (q, r) = n.div_rem(1);
+        let (q, r) = n.div_rem(1u32);
         assert_eq!(q, *n);
         assert_eq!(r, 0);
     });
@@ -988,7 +991,7 @@ fn ceiling_div_neg_mod_u32_properties() {
     );
 
     test_properties(integers, |n| {
-        let (q, r) = n.ceiling_div_neg_mod(1);
+        let (q, r) = n.ceiling_div_neg_mod(1u32);
         assert_eq!(q, *n);
         assert_eq!(r, 0);
     });
@@ -1113,7 +1116,7 @@ fn ceiling_div_mod_u32_properties() {
     );
 
     test_properties(integers, |n| {
-        let (q, r) = n.ceiling_div_mod(1);
+        let (q, r) = n.ceiling_div_mod(1u32);
         assert_eq!(q, *n);
         assert_eq!(r, 0);
     });

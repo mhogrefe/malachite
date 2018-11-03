@@ -1,5 +1,5 @@
 use common::{test_properties, test_properties_no_special};
-use malachite_base::num::{BitAccess, PrimitiveInteger, Zero};
+use malachite_base::num::{BitAccess, PrimitiveInteger, Sign, Zero};
 use malachite_nz::integer::conversion::to_twos_complement_limbs::*;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;

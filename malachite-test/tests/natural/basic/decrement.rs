@@ -2,6 +2,7 @@ use common::test_properties;
 use malachite_base::misc::Walkable;
 use malachite_base::num::Zero;
 use malachite_nz::natural::Natural;
+use malachite_test::inputs::base::positive_unsigneds;
 use malachite_test::inputs::natural::positive_naturals;
 use std::str::FromStr;
 
@@ -28,10 +29,19 @@ fn natural_decrement_fail() {
 #[test]
 fn natural_decrement_properties() {
     test_properties(positive_naturals, |n| {
-        let mut n_mut = n.clone();
-        n_mut.decrement();
-        assert_ne!(n_mut, *n);
-        n_mut.increment();
-        assert_eq!(n_mut, *n);
+        let mut mut_n = n.clone();
+        mut_n.decrement();
+        assert_ne!(mut_n, *n);
+        mut_n.increment();
+        assert_eq!(mut_n, *n);
+    });
+
+    test_properties(positive_unsigneds::<u32>, |&u| {
+        let mut mut_u = u;
+        mut_u.decrement();
+
+        let mut n = Natural::from(u);
+        n.decrement();
+        assert_eq!(n, mut_u);
     });
 }

@@ -3,7 +3,7 @@ use inputs::natural::{
     triples_of_natural_natural_and_u32_var_1, triples_of_natural_natural_and_unsigned,
 };
 use malachite_base::num::SignificantBits;
-use malachite_base::num::{SubMul, SubMulAssign};
+use malachite_base::num::{CheckedSub, SubMul, SubMulAssign};
 use std::cmp::max;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
@@ -127,7 +127,7 @@ fn benchmark_natural_sub_mul_u32_algorithms(gm: GenerationMode, limit: usize, fi
             ),
             (
                 "Natural - &Natural * u32",
-                &mut (|(a, b, c)| no_out!(a - &b * c)),
+                &mut (|(a, b, c)| no_out!(a.checked_sub(&b * c))),
             ),
         ],
     );
@@ -150,7 +150,7 @@ fn benchmark_natural_sub_mul_u32_ref_algorithms(gm: GenerationMode, limit: usize
             ),
             (
                 "&Natural - &Natural * u32",
-                &mut (|(a, b, c)| no_out!(&a - &b * c)),
+                &mut (|(a, b, c)| no_out!(&a.checked_sub(&b * c))),
             ),
         ],
     );

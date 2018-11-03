@@ -1,6 +1,7 @@
 use common::test_properties;
 use malachite_nz::integer::Integer;
 use malachite_test::common::{integer_to_bigint, integer_to_rug_integer};
+use malachite_test::inputs::base::pairs_of_signeds;
 use malachite_test::inputs::integer::pairs_of_integer_and_signed;
 use malachite_test::integer::comparison::partial_eq_i32::num_partial_eq_i32;
 use num::BigInt;
@@ -43,4 +44,9 @@ fn partial_eq_i32_properties() {
             assert_eq!(Integer::from(i) == *n, eq);
         },
     );
+
+    test_properties(pairs_of_signeds::<i32>, |&(x, y)| {
+        assert_eq!(Integer::from(x) == y, x == y);
+        assert_eq!(x == Integer::from(y), x == y);
+    });
 }

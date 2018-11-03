@@ -257,7 +257,7 @@ impl Rem<u32> for Integer {
     /// Divides an `Integer` by a `u32`, taking the `Integer` by value and returning the remainder.
     /// The remainder has the same sign as the dividend and its absolute value is less than the
     /// divisor. In other words, returns r, where `self` = q * `other` + r,
-    /// (r = 0 or sign(r) = sign(q)), and 0 <= |r| < `other`.
+    /// (r = 0 or sign(r) = sign(`self`)), and 0 <= |r| < `other`.
     ///
     /// Time: worst case O(n)
     ///
@@ -296,7 +296,7 @@ impl<'a> Rem<u32> for &'a Integer {
     /// Divides an `Integer` by a `u32`, taking the `Integer` by reference and returning the
     /// remainder. The remainder has the same sign as the dividend and its absolute value is less
     /// than the divisor. In other words, returns r, where `self` = q * `other` + r,
-    /// (r = 0 or sign(r) = sign(q)), and 0 <= |r| < `other`.
+    /// (r = 0 or sign(r) = sign(`self`)), and 0 <= |r| < `other`.
     ///
     /// Time: worst case O(n)
     ///
@@ -332,8 +332,8 @@ impl<'a> Rem<u32> for &'a Integer {
 impl RemAssign<u32> for Integer {
     /// Divides an `Integer` by a `u32`, replacing the `Integer` by the remainder. The remainder has
     /// the same sign as the dividend and its absolute value is less than the divisor. In other
-    /// words, replaces `self` with r, where `self` = q * `other` + r, (r = 0 or sign(r) = sign(q)),
-    /// and 0 <= |r| < `other`.
+    /// words, replaces `self` with r, where `self` = q * `other` + r,
+    /// (r = 0 or sign(r) = sign(`self`)), and 0 <= |r| < `other`.
     ///
     /// Time: worst case O(n)
     ///

@@ -1,7 +1,7 @@
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::integer::{integers, nrm_integers};
-use malachite_base::num::SignificantBits;
-use num::bigint::Sign;
+use malachite_base::num::{Sign, SignificantBits};
+use num::bigint::Sign as NumSign;
 use num::BigInt;
 use std::cmp::Ordering;
 
@@ -12,9 +12,9 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
 
 pub fn num_sign(x: &BigInt) -> Ordering {
     match x.sign() {
-        Sign::NoSign => Ordering::Equal,
-        Sign::Plus => Ordering::Greater,
-        Sign::Minus => Ordering::Less,
+        NumSign::NoSign => Ordering::Equal,
+        NumSign::Plus => Ordering::Greater,
+        NumSign::Minus => Ordering::Less,
     }
 }
 

@@ -1,6 +1,7 @@
 use common::test_properties;
 use malachite_nz::natural::Natural;
 use malachite_test::common::{natural_to_biguint, natural_to_rug_integer};
+use malachite_test::inputs::base::pairs_of_unsigneds;
 use malachite_test::inputs::natural::{
     pairs_of_natural_and_unsigned, triples_of_natural_unsigned_and_natural,
     triples_of_unsigned_natural_and_unsigned,
@@ -69,4 +70,9 @@ fn partial_cmp_u32_properties() {
             }
         },
     );
+
+    test_properties(pairs_of_unsigneds::<u32>, |&(x, y)| {
+        assert_eq!(Natural::from(x).partial_cmp(&y), Some(x.cmp(&y)));
+        assert_eq!(x.partial_cmp(&Natural::from(y)), Some(x.cmp(&y)));
+    });
 }

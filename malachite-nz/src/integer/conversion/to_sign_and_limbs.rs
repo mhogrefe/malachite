@@ -1,4 +1,5 @@
 use integer::Integer;
+use malachite_base::num::Sign;
 use std::cmp::Ordering;
 
 impl Integer {

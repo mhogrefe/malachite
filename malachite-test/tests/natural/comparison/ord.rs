@@ -3,8 +3,9 @@ use malachite_nz::natural::comparison::ord::{limbs_cmp, limbs_cmp_same_length};
 use malachite_nz::natural::Natural;
 use malachite_test::common::{natural_to_biguint, natural_to_rug_integer};
 use malachite_test::inputs::base::{
-    pairs_of_unsigned_vec_var_1, pairs_of_unsigned_vec_var_2, triples_of_unsigned_vec_var_1,
-    triples_of_unsigned_vec_var_2, vecs_of_unsigned_var_1, vecs_of_unsigned_var_2,
+    pairs_of_unsigned_vec_var_1, pairs_of_unsigned_vec_var_2, pairs_of_unsigneds,
+    triples_of_unsigned_vec_var_1, triples_of_unsigned_vec_var_2, vecs_of_unsigned_var_1,
+    vecs_of_unsigned_var_2,
 };
 use malachite_test::inputs::natural::{naturals, pairs_of_naturals, triples_of_naturals};
 use num::BigUint;
@@ -138,5 +139,9 @@ fn cmp_properties() {
         } else if x > y && y > z {
             assert!(x > z);
         }
+    });
+
+    test_properties(pairs_of_unsigneds::<u32>, |&(x, y)| {
+        assert_eq!(Natural::from(x).cmp(&Natural::from(y)), x.cmp(&y));
     });
 }
