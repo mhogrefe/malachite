@@ -2,6 +2,7 @@ use common::test_properties;
 use malachite_base::num::Assign;
 use malachite_nz::natural::Natural;
 use malachite_test::common::{biguint_to_natural, natural_to_biguint};
+use malachite_test::inputs::base::pairs_of_unsigneds;
 use malachite_test::inputs::natural::pairs_of_natural_and_unsigned;
 use malachite_test::natural::conversion::assign_u64::num_assign_u64;
 use num::BigUint;
@@ -46,4 +47,13 @@ fn assign_u64_properties() {
             assert_eq!(biguint_to_natural(&num_n), natural_u);
         },
     );
+
+    test_properties(pairs_of_unsigneds::<u64>, #[allow(unused_assignments)]
+    |&(u, v)| {
+        let mut mut_u = u;
+        let mut mut_n = Natural::from(u);
+        mut_u = v;
+        mut_n.assign(v);
+        assert_eq!(Natural::from(mut_u), mut_n);
+    });
 }

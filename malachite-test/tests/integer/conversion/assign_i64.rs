@@ -1,6 +1,7 @@
 use common::test_properties;
 use malachite_base::num::Assign;
 use malachite_nz::integer::Integer;
+use malachite_test::inputs::base::pairs_of_signeds;
 use malachite_test::inputs::integer::pairs_of_integer_and_signed;
 use std::str::FromStr;
 use std::{i32, i64};
@@ -32,4 +33,13 @@ fn assign_i64_properties() {
             assert_eq!(mut_n, Integer::from(i));
         },
     );
+
+    test_properties(pairs_of_signeds::<i64>, #[allow(unused_assignments)]
+    |&(i, j)| {
+        let mut mut_i = i;
+        let mut mut_n = Integer::from(i);
+        mut_i = j;
+        mut_n.assign(j);
+        assert_eq!(Integer::from(mut_i), mut_n);
+    });
 }

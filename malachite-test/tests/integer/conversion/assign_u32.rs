@@ -4,6 +4,7 @@ use malachite_nz::integer::Integer;
 use malachite_test::common::{
     bigint_to_integer, integer_to_bigint, integer_to_rug_integer, rug_integer_to_integer,
 };
+use malachite_test::inputs::base::pairs_of_unsigneds;
 use malachite_test::inputs::integer::pairs_of_integer_and_unsigned;
 use malachite_test::integer::conversion::assign_u32::num_assign_u32;
 use num::BigInt;
@@ -52,4 +53,13 @@ fn assign_u32_properties() {
             assert_eq!(rug_integer_to_integer(&rug_n), u);
         },
     );
+
+    test_properties(pairs_of_unsigneds::<u32>, #[allow(unused_assignments)]
+    |&(u, v)| {
+        let mut mut_u = u;
+        let mut mut_n = Integer::from(u);
+        mut_u = v;
+        mut_n.assign(v);
+        assert_eq!(mut_u, mut_n);
+    });
 }

@@ -4,6 +4,7 @@ use malachite_nz::natural::Natural;
 use malachite_test::common::{
     biguint_to_natural, natural_to_biguint, natural_to_rug_integer, rug_integer_to_natural,
 };
+use malachite_test::inputs::base::pairs_of_unsigneds;
 use malachite_test::inputs::natural::pairs_of_natural_and_unsigned;
 use malachite_test::natural::conversion::assign_u32::num_assign_u32;
 use num::BigUint;
@@ -35,25 +36,31 @@ fn test_assign_u32() {
 
 #[test]
 fn assign_u32_properties() {
-    test_properties(
-        pairs_of_natural_and_unsigned,
-        |&(ref n, u): &(Natural, u32)| {
-            let mut mut_n = n.clone();
-            mut_n.assign(u);
-            assert!(mut_n.is_valid());
-            assert_eq!(mut_n, u);
+    test_properties(pairs_of_natural_and_unsigned::<u32>, |&(ref n, u)| {
+        let mut mut_n = n.clone();
+        mut_n.assign(u);
+        assert!(mut_n.is_valid());
+        assert_eq!(mut_n, u);
 
-            let mut mut_n = n.clone();
-            mut_n.assign(Natural::from(u));
-            assert_eq!(mut_n, u);
+        let mut mut_n = n.clone();
+        mut_n.assign(Natural::from(u));
+        assert_eq!(mut_n, u);
 
-            let mut num_n = natural_to_biguint(n);
-            num_assign_u32(&mut num_n, u);
-            assert_eq!(biguint_to_natural(&num_n), u);
+        let mut num_n = natural_to_biguint(n);
+        num_assign_u32(&mut num_n, u);
+        assert_eq!(biguint_to_natural(&num_n), u);
 
-            let mut rug_n = natural_to_rug_integer(n);
-            rug_n.assign(u);
-            assert_eq!(rug_integer_to_natural(&rug_n), u);
-        },
-    );
+        let mut rug_n = natural_to_rug_integer(n);
+        rug_n.assign(u);
+        assert_eq!(rug_integer_to_natural(&rug_n), u);
+    });
+
+    test_properties(pairs_of_unsigneds::<u32>, #[allow(unused_assignments)]
+    |&(u, v)| {
+        let mut mut_u = u;
+        let mut mut_n = Natural::from(u);
+        mut_u = v;
+        mut_n.assign(v);
+        assert_eq!(mut_u, mut_n);
+    });
 }

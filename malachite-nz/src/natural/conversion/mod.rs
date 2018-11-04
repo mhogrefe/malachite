@@ -110,7 +110,6 @@ pub mod assign;
 pub mod assign_u32;
 pub mod assign_u64;
 pub mod from_bits;
-pub mod from_integer;
 pub mod from_limbs;
 pub mod from_u32;
 pub mod from_u64;

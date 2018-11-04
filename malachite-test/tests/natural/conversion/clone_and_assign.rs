@@ -4,6 +4,7 @@ use malachite_nz::natural::Natural;
 use malachite_test::common::{
     biguint_to_natural, natural_to_biguint, natural_to_rug_integer, rug_integer_to_natural,
 };
+use malachite_test::inputs::base::{pairs_of_unsigneds, unsigneds};
 use malachite_test::inputs::natural::{naturals, pairs_of_naturals};
 use num::BigUint;
 use rug;
@@ -84,6 +85,13 @@ fn clone_clone_from_and_assign_properties() {
         );
     });
 
+    test_properties(unsigneds::<u32>, |&u| {
+        let n = Natural::from(u);
+        let cloned_u = u;
+        let cloned_n = n.clone();
+        assert_eq!(cloned_u, cloned_n);
+    });
+
     test_properties(pairs_of_naturals, |&(ref x, ref y)| {
         let mut mut_x = x.clone();
         mut_x.clone_from(y);
@@ -113,5 +121,29 @@ fn clone_clone_from_and_assign_properties() {
         let mut rug_x = natural_to_rug_integer(x);
         rug_x.assign(&natural_to_rug_integer(y));
         assert_eq!(rug_integer_to_natural(&rug_x), *y);
+    });
+
+    test_properties(pairs_of_unsigneds::<u32>, #[allow(unused_assignments)]
+    |&(u, v)| {
+        let x = Natural::from(u);
+        let y = Natural::from(v);
+
+        let mut mut_u = u;
+        let mut mut_x = x.clone();
+        mut_u.clone_from(&v);
+        mut_x.clone_from(&y);
+        assert_eq!(mut_x, mut_u);
+
+        let mut mut_u = u;
+        let mut mut_x = x.clone();
+        mut_u = v;
+        mut_x.assign(&y);
+        assert_eq!(mut_x, mut_u);
+
+        let mut mut_u = u;
+        let mut mut_x = x.clone();
+        mut_u = v;
+        mut_x.assign(y);
+        assert_eq!(mut_x, mut_u);
     });
 }

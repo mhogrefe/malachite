@@ -121,6 +121,7 @@ pub mod integer {
         pub mod i32_from_integer;
         pub mod i64_from_integer;
         pub mod natural_assign_integer;
+        pub mod natural_from_integer;
         pub mod serde;
         pub mod to_sign_and_limbs;
         pub mod to_twos_complement_bits;
@@ -208,7 +209,6 @@ pub mod natural {
         pub mod assign_u64;
         pub mod clone_and_assign;
         pub mod from_bits;
-        pub mod from_integer;
         pub mod from_limbs;
         pub mod from_u32;
         pub mod from_u64;

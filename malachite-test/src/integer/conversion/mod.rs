@@ -17,6 +17,7 @@ pub mod from_u64;
 pub mod i32_from_integer;
 pub mod i64_from_integer;
 pub mod natural_assign_integer;
+pub mod natural_from_integer;
 pub mod serde;
 pub mod to_sign_and_limbs;
 pub mod to_twos_complement_bits;
@@ -42,6 +43,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     i32_from_integer::register(registry);
     i64_from_integer::register(registry);
     natural_assign_integer::register(registry);
+    natural_from_integer::register(registry);
     serde::register(registry);
     to_sign_and_limbs::register(registry);
     to_twos_complement_bits::register(registry);

@@ -4,7 +4,6 @@ pub mod assign_u32;
 pub mod assign_u64;
 pub mod clone_and_assign;
 pub mod from_bits;
-pub mod from_integer;
 pub mod from_limbs;
 pub mod from_u32;
 pub mod from_u64;
@@ -19,7 +18,6 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     assign_u64::register(registry);
     clone_and_assign::register(registry);
     from_bits::register(registry);
-    from_integer::register(registry);
     from_limbs::register(registry);
     from_u32::register(registry);
     from_u64::register(registry);

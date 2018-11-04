@@ -9,7 +9,7 @@ use malachite_nz::natural::Natural;
 use malachite_test::common::{
     bigint_to_integer, integer_to_bigint, integer_to_rug_integer, rug_integer_to_integer,
 };
-use malachite_test::inputs::base::{nonzero_signeds, pairs_of_signed_and_nonzero_signed};
+use malachite_test::inputs::base::nonzero_signeds;
 use malachite_test::inputs::integer::{
     integers, pairs_of_integer_and_nonzero_i32_var_1, pairs_of_integer_and_nonzero_signed,
     pairs_of_signed_and_nonzero_integer,

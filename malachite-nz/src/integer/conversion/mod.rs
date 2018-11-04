@@ -89,6 +89,7 @@ pub mod from_u64;
 pub mod i32_from_integer;
 pub mod i64_from_integer;
 pub mod natural_assign_integer;
+pub mod natural_from_integer;
 pub mod to_sign_and_limbs;
 pub mod to_twos_complement_bits;
 pub mod to_twos_complement_limbs;
