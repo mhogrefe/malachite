@@ -1,4 +1,4 @@
-use malachite_base::num::{DivRem, JoinHalves, SplitInHalf};
+use malachite_base::num::{DivRem, JoinHalves, SplitInHalf, WrappingAddAssign, WrappingSubAssign};
 use natural::arithmetic::add_u32::limbs_slice_add_limb_in_place;
 use natural::arithmetic::div_mod_u32::div_mod_by_preinversion;
 use natural::arithmetic::shl_u::{limbs_shl_to_out, limbs_slice_shl_in_place};
@@ -15,11 +15,11 @@ fn div_by_preinversion(n_high: u32, n_low: u32, divisor: u32, divisor_inverse: u
         .split_in_half();
     let mut remainder = n_low.wrapping_sub(quotient_high.wrapping_mul(divisor));
     if remainder > quotient_low {
-        quotient_high = quotient_high.wrapping_sub(1);
-        remainder = remainder.wrapping_add(divisor);
+        quotient_high.wrapping_sub_assign(1);
+        remainder.wrapping_add_assign(divisor);
     }
     if remainder >= divisor {
-        quotient_high = quotient_high.wrapping_add(1);
+        quotient_high.wrapping_add_assign(1);
     }
     quotient_high
 }
@@ -39,7 +39,7 @@ fn limbs_div_limb_normalized_in_place(
     let power_of_two = divisor.wrapping_neg().wrapping_mul(divisor_inverse);
     let (mut quotient_high, mut quotient_low) =
         (u64::from(divisor_inverse) * u64::from(high_limb)).split_in_half();
-    quotient_high = quotient_high.wrapping_add(high_limb);
+    quotient_high.wrapping_add_assign(high_limb);
     let second_highest_limb = limbs[len - 1];
     limbs[len - 1] = quotient_high;
     let (sum, mut big_carry) = u64::join_halves(second_highest_limb, limbs[len - 2])
@@ -50,12 +50,12 @@ fn limbs_div_limb_normalized_in_place(
         let mut quotient = u64::from(sum_high) + u64::from(temp) + u64::from(quotient_low);
         quotient_low = remainder;
         if big_carry {
-            quotient = quotient.wrapping_add(u64::join_halves(1, divisor_inverse));
+            quotient.wrapping_add_assign(u64::join_halves(1, divisor_inverse));
             let (sum, carry) = sum_low.overflowing_add(power_of_two);
             sum_low = sum;
             if carry {
-                sum_low = sum_low.wrapping_sub(divisor);
-                quotient = quotient.wrapping_add(1);
+                sum_low.wrapping_sub_assign(divisor);
+                quotient.wrapping_add_assign(1);
             }
         }
         let (quotient_higher, quotient_high) = quotient.split_in_half();
@@ -73,11 +73,11 @@ fn limbs_div_limb_normalized_in_place(
     let mut quotient_high = 0;
     if big_carry {
         quotient_high += 1;
-        sum_high = sum_high.wrapping_sub(divisor);
+        sum_high.wrapping_sub_assign(divisor);
     }
     if sum_high >= divisor {
         quotient_high += 1;
-        sum_high = sum_high.wrapping_sub(divisor);
+        sum_high.wrapping_sub_assign(divisor);
     }
     let temp = div_by_preinversion(sum_high, sum_low, divisor, divisor_inverse);
     let (quotient_high, quotient_low) = u64::join_halves(quotient_high, quotient_low)
@@ -106,7 +106,7 @@ fn limbs_div_limb_normalized_to_out(
     let power_of_two = divisor.wrapping_neg().wrapping_mul(divisor_inverse);
     let (mut quotient_high, mut quotient_low) =
         (u64::from(divisor_inverse) * u64::from(high_limb)).split_in_half();
-    quotient_high = quotient_high.wrapping_add(high_limb);
+    quotient_high.wrapping_add_assign(high_limb);
     out_limbs[len - 1] = quotient_high;
     let (sum, mut big_carry) = u64::join_halves(in_limbs[len - 1], in_limbs[len - 2])
         .overflowing_add(u64::from(power_of_two) * u64::from(high_limb));
@@ -116,12 +116,12 @@ fn limbs_div_limb_normalized_to_out(
         let mut quotient = u64::from(sum_high) + u64::from(temp) + u64::from(quotient_low);
         quotient_low = remainder;
         if big_carry {
-            quotient = quotient.wrapping_add(u64::join_halves(1, divisor_inverse));
+            quotient.wrapping_add_assign(u64::join_halves(1, divisor_inverse));
             let (sum, carry) = sum_low.overflowing_add(power_of_two);
             sum_low = sum;
             if carry {
-                sum_low = sum_low.wrapping_sub(divisor);
-                quotient = quotient.wrapping_add(1);
+                sum_low.wrapping_sub_assign(divisor);
+                quotient.wrapping_add_assign(1);
             }
         }
         let (quotient_higher, quotient_high) = quotient.split_in_half();
@@ -139,11 +139,11 @@ fn limbs_div_limb_normalized_to_out(
     let mut quotient_high = 0;
     if big_carry {
         quotient_high += 1;
-        sum_high = sum_high.wrapping_sub(divisor);
+        sum_high.wrapping_sub_assign(divisor);
     }
     if sum_high >= divisor {
         quotient_high += 1;
-        sum_high = sum_high.wrapping_sub(divisor);
+        sum_high.wrapping_sub_assign(divisor);
     }
     let temp = div_by_preinversion(sum_high, sum_low, divisor, divisor_inverse);
     let (quotient_high, quotient_low) = u64::join_halves(quotient_high, quotient_low)

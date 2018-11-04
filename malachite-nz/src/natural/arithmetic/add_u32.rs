@@ -1,4 +1,4 @@
-use malachite_base::num::Assign;
+use malachite_base::num::{Assign, OverflowingAddAssign};
 use natural::Natural::{self, Large, Small};
 use std::ops::{Add, AddAssign};
 
@@ -106,9 +106,7 @@ pub fn limbs_add_limb_to_out(out_limbs: &mut [u32], in_limbs: &[u32], mut limb: 
 /// ```
 pub fn limbs_slice_add_limb_in_place(limbs: &mut [u32], mut limb: u32) -> bool {
     for x in limbs.iter_mut() {
-        let (sum, overflow) = x.overflowing_add(limb);
-        *x = sum;
-        if overflow {
+        if x.overflowing_add_assign(limb) {
             limb = 1;
         } else {
             return false;

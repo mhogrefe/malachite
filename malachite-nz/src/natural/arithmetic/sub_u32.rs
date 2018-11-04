@@ -1,4 +1,4 @@
-use malachite_base::num::CheckedSub;
+use malachite_base::num::{CheckedSub, OverflowingSubAssign};
 use natural::Natural;
 use std::fmt::Display;
 use std::ops::{Sub, SubAssign};
@@ -112,9 +112,7 @@ pub fn limbs_sub_limb_to_out(out_limbs: &mut [u32], in_limbs: &[u32], mut limb: 
 /// ```
 pub fn limbs_sub_limb_in_place(limbs: &mut [u32], mut limb: u32) -> bool {
     for x in limbs.iter_mut() {
-        let (difference, overflow) = x.overflowing_sub(limb);
-        *x = difference;
-        if overflow {
+        if x.overflowing_sub_assign(limb) {
             limb = 1;
         } else {
             return false;

@@ -1,5 +1,6 @@
 use malachite_base::num::{
-    JoinHalves, Mod, ModAssign, NegMod, NegModAssign, PrimitiveInteger, SplitInHalf, Zero,
+    JoinHalves, Mod, ModAssign, NegMod, NegModAssign, PrimitiveInteger, SplitInHalf,
+    WrappingAddAssign, WrappingSubAssign, Zero,
 };
 use natural::Natural::{self, Large, Small};
 use std::ops::{Rem, RemAssign};
@@ -19,7 +20,7 @@ pub(crate) fn mod_by_preinversion(
         .split_in_half();
     let mut remainder = n_low.wrapping_sub(quotient_high.wrapping_mul(divisor));
     if remainder > quotient_low {
-        remainder = remainder.wrapping_add(divisor);
+        remainder.wrapping_add_assign(divisor);
     }
     if remainder >= divisor {
         remainder -= divisor;
@@ -47,7 +48,7 @@ fn limbs_mod_limb_normalized(
             let (sum, carry) = sum_low.overflowing_add(power_of_two);
             sum_low = sum;
             if carry {
-                sum_low = sum_low.wrapping_sub(divisor);
+                sum_low.wrapping_sub_assign(divisor);
             }
         }
         let (sum, carry) = u64::join_halves(sum_low, limb)
@@ -57,10 +58,10 @@ fn limbs_mod_limb_normalized(
         big_carry = carry;
     }
     if big_carry {
-        sum_high = sum_high.wrapping_sub(divisor);
+        sum_high.wrapping_sub_assign(divisor);
     }
     if sum_high >= divisor {
-        sum_high = sum_high.wrapping_sub(divisor);
+        sum_high.wrapping_sub_assign(divisor);
     }
     mod_by_preinversion(sum_high, sum_low, divisor, divisor_inverse)
 }
@@ -94,7 +95,7 @@ fn limbs_mod_limb_normalized_shl(
             let (sum, carry) = sum_low.overflowing_add(power_of_two);
             sum_low = sum;
             if carry {
-                sum_low = sum_low.wrapping_sub(divisor);
+                sum_low.wrapping_sub_assign(divisor);
             }
         }
         let mut limb = limbs[j] << bits;
@@ -108,10 +109,10 @@ fn limbs_mod_limb_normalized_shl(
         big_carry = carry;
     }
     if big_carry {
-        sum_high = sum_high.wrapping_sub(divisor);
+        sum_high.wrapping_sub_assign(divisor);
     }
     if sum_high >= divisor {
-        sum_high = sum_high.wrapping_sub(divisor);
+        sum_high.wrapping_sub_assign(divisor);
     }
     mod_by_preinversion(sum_high, sum_low, divisor, divisor_inverse)
 }

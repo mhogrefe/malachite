@@ -1,6 +1,6 @@
 use integer::Integer;
 use malachite_base::limbs::limbs_test_zero;
-use malachite_base::num::{BitAccess, PrimitiveInteger, WrappingNegAssign};
+use malachite_base::num::{BitAccess, PrimitiveInteger, WrappingAddAssign, WrappingNegAssign};
 use natural::arithmetic::add_u32::limbs_slice_add_limb_in_place;
 use natural::arithmetic::sub_u32::limbs_sub_limb_in_place;
 use natural::Natural::{self, Large, Small};
@@ -105,7 +105,7 @@ fn limbs_clear_bit_neg_helper(limbs: &mut [u32], limb_index: usize, reduced_inde
         // limbs[limb_index] != 0 here
         let mut boundary_limb = limbs[limb_index] - 1;
         boundary_limb.set_bit(reduced_index);
-        boundary_limb = boundary_limb.wrapping_add(1);
+        boundary_limb.wrapping_add_assign(1);
         limbs[limb_index] = boundary_limb;
         if boundary_limb == 0 && limbs_slice_add_limb_in_place(&mut limbs[limb_index + 1..], 1) {
             return true;

@@ -1,5 +1,5 @@
 use malachite_base::num::{CheckedSub, SplitInHalf};
-use malachite_base::num::{SubMul, SubMulAssign};
+use malachite_base::num::{SubMul, SubMulAssign, WrappingAddAssign};
 use natural::arithmetic::sub_u32::limbs_sub_limb_in_place;
 use natural::Natural::{self, Large, Small};
 
@@ -15,7 +15,7 @@ pub fn mpn_submul_1(r: &mut [u32], s1: &[u32], s2limb: u32) -> u32 {
         let product = u64::from(s1[i]) * s2limb_u64;
         let upper = product.upper_half();
         let mut lower = product.lower_half();
-        lower = lower.wrapping_add(borrow);
+        lower.wrapping_add_assign(borrow);
         if lower < borrow {
             borrow = upper.wrapping_add(1);
         } else {
@@ -24,7 +24,7 @@ pub fn mpn_submul_1(r: &mut [u32], s1: &[u32], s2limb: u32) -> u32 {
         let limb = r[i];
         lower = limb.wrapping_sub(lower);
         if lower > limb {
-            borrow = borrow.wrapping_add(1);
+            borrow.wrapping_add_assign(1);
         }
         r[i] = lower;
     }

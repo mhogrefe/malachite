@@ -1,4 +1,4 @@
-use malachite_base::num::{DivisibleByPowerOfTwo, EqMod, Parity, SplitInHalf};
+use malachite_base::num::{DivisibleByPowerOfTwo, EqMod, Parity, SplitInHalf, WrappingAddAssign};
 use natural::arithmetic::div_exact_u32::limbs_invert_limb;
 use natural::arithmetic::mod_u32::limbs_mod_limb;
 use natural::Natural::{self, Large, Small};
@@ -29,7 +29,7 @@ pub(crate) fn limbs_mod_exact_odd_limb(limbs: &[u32], divisor: u32, mut carry: u
         let (mut difference, small_carry) = limb.overflowing_sub(carry);
         carry = (u64::from(difference.wrapping_mul(inverse)) * divisor_u64).upper_half();
         if small_carry {
-            carry = carry.wrapping_add(1);
+            carry.wrapping_add_assign(1);
         }
     }
     let last = limbs[last_index];
@@ -43,7 +43,7 @@ pub(crate) fn limbs_mod_exact_odd_limb(limbs: &[u32], divisor: u32, mut carry: u
         let (difference, small_carry) = last.overflowing_sub(carry);
         carry = (u64::from(difference.wrapping_mul(inverse)) * divisor_u64).upper_half();
         if small_carry {
-            carry = carry.wrapping_add(1);
+            carry.wrapping_add_assign(1);
         }
         carry
     }

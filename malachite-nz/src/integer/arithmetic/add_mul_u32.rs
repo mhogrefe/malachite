@@ -1,6 +1,8 @@
 use integer::Integer;
 use malachite_base::limbs::limbs_test_zero;
-use malachite_base::num::{AddMul, AddMulAssign, NegAssign, NotAssign};
+use malachite_base::num::{
+    AddMul, AddMulAssign, NegAssign, NotAssign, WrappingAddAssign, WrappingSubAssign,
+};
 use natural::arithmetic::add_mul_u32::mpn_addmul_1;
 use natural::arithmetic::add_u32::limbs_slice_add_limb_in_place;
 use natural::arithmetic::mul_u32::{limbs_mul_limb_to_out, limbs_mul_limb_with_carry_to_out};
@@ -415,13 +417,13 @@ pub(crate) fn mpz_aorsmul_1(
             // -(-cy*b^n + w-x*y) = (cy-1)*b^n + ~(w-x*y) + 1
             limbs_not_in_place(&mut w[..wsize]);
             if !limbs_slice_add_limb_in_place(&mut w[..wsize], 1) {
-                cy = cy.wrapping_sub(1);
+                cy.wrapping_sub_assign(1);
             }
 
             // If cy - 1 == -1 then hold that -1 for latter. mpn_submul_1 never returns
             // cy == MP_LIMB_T_MAX so that value always indicates a -1.
             let cy2 = if cy == u32::MAX { 1 } else { 0 };
-            cy = cy.wrapping_add(cy2);
+            cy.wrapping_add_assign(cy2);
             cy = limbs_mul_limb_with_carry_to_out(&mut w[wsize..xsize], &x[wsize..xsize], y, cy);
             w[new_wsize] = cy;
             if cy != 0 {

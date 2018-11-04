@@ -1,5 +1,6 @@
 use malachite_base::num::{
     DivExact, DivExactAssign, ModPowerOfTwo, Parity, PrimitiveInteger, SplitInHalf,
+    WrappingSubAssign,
 };
 use natural::Natural::{self, Large, Small};
 use std::u32;
@@ -308,11 +309,11 @@ pub fn limbs_div_exact_3_to_out(out_limbs: &mut [u32], in_limbs: &[u32]) {
     for i in 0..last_index {
         let (upper, lower) = (u64::from(in_limbs[i]) * MAX_OVER_3_U64).split_in_half();
         let carry = out_limb < lower;
-        out_limb = out_limb.wrapping_sub(lower);
+        out_limb.wrapping_sub_assign(lower);
         out_limbs[i] = out_limb;
-        out_limb = out_limb.wrapping_sub(upper);
+        out_limb.wrapping_sub_assign(upper);
         if carry {
-            out_limb = out_limb.wrapping_sub(1);
+            out_limb.wrapping_sub_assign(1);
         }
     }
     let lower = (u64::from(in_limbs[last_index]) * MAX_OVER_3_U64).lower_half();
@@ -378,11 +379,11 @@ pub fn limbs_div_exact_3_in_place(limbs: &mut [u32]) {
     for limb in limbs[..last_index].iter_mut() {
         let (upper, lower) = (u64::from(*limb) * MAX_OVER_3_U64).split_in_half();
         let carry = out_limb < lower;
-        out_limb = out_limb.wrapping_sub(lower);
+        out_limb.wrapping_sub_assign(lower);
         *limb = out_limb;
-        out_limb = out_limb.wrapping_sub(upper);
+        out_limb.wrapping_sub_assign(upper);
         if carry {
-            out_limb = out_limb.wrapping_sub(1);
+            out_limb.wrapping_sub_assign(1);
         }
     }
     let lower = (u64::from(limbs[last_index]) * MAX_OVER_3_U64).lower_half();

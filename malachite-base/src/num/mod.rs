@@ -306,6 +306,62 @@ pub trait OverflowingShr {
     fn overflowing_shr(self, rhs: u32) -> (Self::Output, bool);
 }
 
+pub trait WrappingAddAssign<RHS = Self> {
+    fn wrapping_add_assign(&mut self, rhs: RHS);
+}
+
+pub trait WrappingSubAssign<RHS = Self> {
+    fn wrapping_sub_assign(&mut self, rhs: RHS);
+}
+
+pub trait WrappingDivAssign<RHS = Self> {
+    fn wrapping_div_assign(&mut self, rhs: RHS);
+}
+
+pub trait WrappingMulAssign<RHS = Self> {
+    fn wrapping_mul_assign(&mut self, rhs: RHS);
+}
+
+pub trait WrappingRemAssign<RHS = Self> {
+    fn wrapping_rem_assign(&mut self, rhs: RHS);
+}
+
+pub trait SaturatingAddAssign<RHS = Self> {
+    fn saturating_add_assign(&mut self, rhs: RHS);
+}
+
+pub trait SaturatingMulAssign<RHS = Self> {
+    fn saturating_mul_assign(&mut self, rhs: RHS);
+}
+
+pub trait SaturatingSubAssign<RHS = Self> {
+    fn saturating_sub_assign(&mut self, rhs: RHS);
+}
+
+pub trait OverflowingAddAssign<RHS = Self> {
+    fn overflowing_add_assign(&mut self, rhs: RHS) -> bool;
+}
+
+pub trait OverflowingSubAssign<RHS = Self> {
+    fn overflowing_sub_assign(&mut self, rhs: RHS) -> bool;
+}
+
+pub trait OverflowingDivAssign<RHS = Self> {
+    fn overflowing_div_assign(&mut self, rhs: RHS) -> bool;
+}
+
+pub trait OverflowingMulAssign<RHS = Self> {
+    fn overflowing_mul_assign(&mut self, rhs: RHS) -> bool;
+}
+
+pub trait OverflowingRemAssign<RHS = Self> {
+    fn overflowing_rem_assign(&mut self, rhs: RHS) -> bool;
+}
+
+pub trait OverflowingNegAssign {
+    fn overflowing_neg_assign(&mut self) -> bool;
+}
+
 /// Raises `self` to the power of `exp`.
 pub trait Pow<RHS> {
     type Output;
@@ -792,10 +848,15 @@ pub trait PrimitiveInteger:
     + Ord
     + OrdAbs
     + OverflowingAdd<Output = Self>
+    + OverflowingAddAssign
     + OverflowingDiv<Output = Self>
+    + OverflowingDivAssign
     + OverflowingMul<Output = Self>
+    + OverflowingMulAssign
     + OverflowingNeg<Output = Self>
+    + OverflowingNegAssign
     + OverflowingRem<Output = Self>
+    + OverflowingRemAssign
     + OverflowingShl<Output = Self>
     + OverflowingShr<Output = Self>
     + OverflowingSub<Output = Self>
@@ -812,8 +873,11 @@ pub trait PrimitiveInteger:
     + RotateRight
     + SampleRange
     + SaturatingAdd<Output = Self>
+    + SaturatingAddAssign
     + SaturatingMul<Output = Self>
+    + SaturatingMulAssign
     + SaturatingSub<Output = Self>
+    + SaturatingSubAssign
     + Shl<i8, Output = Self>
     + Shl<i16, Output = Self>
     + Shl<i32, Output = Self>
@@ -879,7 +943,9 @@ pub trait PrimitiveInteger:
     + UpperHex
     + Walkable
     + WrappingAdd<Output = Self>
+    + WrappingAddAssign
     + WrappingDiv<Output = Self>
+    + WrappingDivAssign
     + WrappingFrom<u8>
     + WrappingFrom<u16>
     + WrappingFrom<u32>
@@ -897,12 +963,15 @@ pub trait PrimitiveInteger:
     + WrappingInto<i32>
     + WrappingInto<i64>
     + WrappingMul<Output = Self>
+    + WrappingMulAssign
     + WrappingNeg<Output = Self>
     + WrappingNegAssign
     + WrappingRem<Output = Self>
+    + WrappingRemAssign
     + WrappingShl<Output = Self>
     + WrappingShr<Output = Self>
     + WrappingSub<Output = Self>
+    + WrappingSubAssign
     + Zero
 {
     const LOG_WIDTH: u32;
@@ -1436,6 +1505,116 @@ macro_rules! integer_traits {
             #[inline]
             fn overflowing_shr(self, rhs: u32) -> ($t, bool) {
                 $t::overflowing_shr(self, rhs)
+            }
+        }
+
+        impl WrappingAddAssign for $t {
+            #[inline]
+            fn wrapping_add_assign(&mut self, rhs: $t) {
+                *self = self.wrapping_add(rhs);
+            }
+        }
+
+        impl WrappingSubAssign for $t {
+            #[inline]
+            fn wrapping_sub_assign(&mut self, rhs: $t) {
+                *self = self.wrapping_sub(rhs);
+            }
+        }
+
+        impl WrappingMulAssign for $t {
+            #[inline]
+            fn wrapping_mul_assign(&mut self, rhs: $t) {
+                *self = self.wrapping_mul(rhs);
+            }
+        }
+
+        impl WrappingDivAssign for $t {
+            #[inline]
+            fn wrapping_div_assign(&mut self, rhs: $t) {
+                *self = self.wrapping_div(rhs);
+            }
+        }
+
+        impl WrappingRemAssign for $t {
+            #[inline]
+            fn wrapping_rem_assign(&mut self, rhs: $t) {
+                *self = self.wrapping_rem(rhs);
+            }
+        }
+
+        impl OverflowingAddAssign for $t {
+            #[inline]
+            fn overflowing_add_assign(&mut self, rhs: $t) -> bool {
+                let (result, overflow) = self.overflowing_add(rhs);
+                *self = result;
+                overflow
+            }
+        }
+
+        impl OverflowingSubAssign for $t {
+            #[inline]
+            fn overflowing_sub_assign(&mut self, rhs: $t) -> bool {
+                let (result, overflow) = self.overflowing_sub(rhs);
+                *self = result;
+                overflow
+            }
+        }
+
+        impl OverflowingMulAssign for $t {
+            #[inline]
+            fn overflowing_mul_assign(&mut self, rhs: $t) -> bool {
+                let (result, overflow) = self.overflowing_mul(rhs);
+                *self = result;
+                overflow
+            }
+        }
+
+        impl OverflowingDivAssign for $t {
+            #[inline]
+            fn overflowing_div_assign(&mut self, rhs: $t) -> bool {
+                let (result, overflow) = self.overflowing_div(rhs);
+                *self = result;
+                overflow
+            }
+        }
+
+        impl OverflowingRemAssign for $t {
+            #[inline]
+            fn overflowing_rem_assign(&mut self, rhs: $t) -> bool {
+                let (result, overflow) = self.overflowing_rem(rhs);
+                *self = result;
+                overflow
+            }
+        }
+
+        impl OverflowingNegAssign for $t {
+            #[inline]
+            fn overflowing_neg_assign(&mut self) -> bool {
+                let (result, overflow) = self.overflowing_neg();
+                *self = result;
+                overflow
+            }
+        }
+
+        impl SaturatingAddAssign for $t {
+            #[inline]
+            fn saturating_add_assign(&mut self, rhs: $t) {
+                *self = self.saturating_add(rhs);
+            }
+        }
+
+        impl SaturatingSubAssign for $t {
+            #[inline]
+            fn saturating_sub_assign(&mut self, rhs: $t) {
+                *self = self.saturating_sub(rhs);
+            }
+        }
+
+        impl SaturatingMulAssign for $t {
+            #[inline]
+            fn saturating_mul_assign(&mut self, rhs: $t) {
+                *self = self.saturating_mul(rhs);
             }
         }
 
