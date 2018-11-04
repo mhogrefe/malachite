@@ -26,10 +26,10 @@ impl Div<u32> for Integer {
     ///
     /// fn main() {
     ///     // 3 * 123 + 87 = 456
-    ///     assert_eq!((Integer::from(456u32) / 123).to_string(), "3");
+    ///     assert_eq!((Integer::from(456u32) / 123u32).to_string(), "3");
     ///
     ///     // 8,130,081,300 * 123 + 100 = 10^12
-    ///     assert_eq!((-Integer::trillion() / 123).to_string(), "-8130081300");
+    ///     assert_eq!((-Integer::trillion() / 123u32).to_string(), "-8130081300");
     /// }
     /// ```
     fn div(mut self, other: u32) -> Integer {
@@ -61,10 +61,10 @@ impl<'a> Div<u32> for &'a Integer {
     ///
     /// fn main() {
     ///     // 3 * 123 + 87 = 456
-    ///     assert_eq!((&Integer::from(456u32) / 123).to_string(), "3");
+    ///     assert_eq!((&Integer::from(456u32) / 123u32).to_string(), "3");
     ///
     ///     // 8,130,081,300 * 123 + 100 = 10^12
-    ///     assert_eq!((&-Integer::trillion() / 123).to_string(), "-8130081300");
+    ///     assert_eq!((&-Integer::trillion() / 123u32).to_string(), "-8130081300");
     /// }
     /// ```
     fn div(self, other: u32) -> Integer {
@@ -98,12 +98,12 @@ impl DivAssign<u32> for Integer {
     /// fn main() {
     ///     // 3 * 123 + 87 = 456
     ///     let mut x = Integer::from(456u32);
-    ///     x /= 123;
+    ///     x /= 123u32;
     ///     assert_eq!(x.to_string(), "3");
     ///
     ///     // 8,130,081,300 * 123 + 100 = 10^12
     ///     let mut x = -Integer::trillion();
-    ///     x /= 123;
+    ///     x /= 123u32;
     ///     assert_eq!(x.to_string(), "-8130081300");
     /// }
     /// ```
@@ -136,10 +136,10 @@ impl Div<Integer> for u32 {
     ///
     /// fn main() {
     ///     // 3 * 123 + 87 = 456
-    ///     assert_eq!(456 / Integer::from(123u32), 3);
+    ///     assert_eq!(456u32 / Integer::from(123u32), 3);
     ///
     ///     // 0 * 10^12 + 123 = 123
-    ///     assert_eq!(123 / -Integer::trillion(), 0);
+    ///     assert_eq!(123u32 / -Integer::trillion(), 0);
     /// }
     /// ```
     fn div(self, other: Integer) -> Integer {
@@ -174,10 +174,10 @@ impl<'a> Div<&'a Integer> for u32 {
     ///
     /// fn main() {
     ///     // 3 * 123 + 87 = 456
-    ///     assert_eq!(456 / &Integer::from(123u32), 3);
+    ///     assert_eq!(456u32 / &Integer::from(123u32), 3);
     ///
     ///     // 0 * 10^12 + 123 = 123
-    ///     assert_eq!(123 / &-Integer::trillion(), 0);
+    ///     assert_eq!(123u32 / &-Integer::trillion(), 0);
     /// }
     /// ```
     fn div(self, other: &'a Integer) -> Integer {

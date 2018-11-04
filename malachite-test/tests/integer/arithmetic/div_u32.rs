@@ -91,21 +91,21 @@ fn test_div_u32() {
 #[should_panic(expected = "division by zero")]
 fn div_assign_u32_fail() {
     let mut n = Integer::from(10u32);
-    n /= 0;
+    n /= 0u32;
 }
 
 #[test]
 #[allow(unused_must_use)]
 #[should_panic(expected = "division by zero")]
 fn div_u32_fail() {
-    Integer::from(10u32) / 0;
+    Integer::from(10u32) / 0u32;
 }
 
 #[test]
 #[allow(unused_must_use)]
 #[should_panic(expected = "division by zero")]
 fn div_u32_ref_fail() {
-    &Integer::from(10u32) / 0;
+    &Integer::from(10u32) / 0u32;
 }
 
 #[test]
@@ -226,7 +226,7 @@ fn div_u32_properties() {
     );
 
     test_properties(integers, |n| {
-        assert_eq!(n / 1, *n);
+        assert_eq!(n / 1u32, *n);
     });
 
     test_properties(positive_unsigneds, |&u: &u32| {

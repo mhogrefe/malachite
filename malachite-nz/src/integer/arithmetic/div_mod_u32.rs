@@ -315,8 +315,8 @@ impl DivAssignRem<u32> for Integer {
 
     /// Divides an `Integer` by a `u32` in place, returning the remainder. The quotient is rounded
     /// towards zero, and the remainder has the same sign as the dividend and its absolute value is
-    /// less than the divisor. In other words, returns (q, r), where `self` = q * `other` + r,
-    /// (r = 0 or sign(r) = sign(`self`)), and 0 <= |r| < `other`.
+    /// less than the divisor. In other words, replaces `self` with q and returns r, where
+    /// `self` = q * `other` + r, (r = 0 or sign(r) = sign(`self`)), and 0 <= |r| < `other`.
     ///
     /// Time: worst case O(n)
     ///
@@ -521,8 +521,8 @@ impl CeilingDivAssignNegMod<u32> for Integer {
     /// Divides an `Integer` by a `u32` in place, taking the the quotient and returning the
     /// remainder of the negative of the `Integer` divided by the `u32`. The quotient is rounded
     /// towards positive infinity, and the remainder is always non-negative and less than the
-    /// divisor. In other words, returns (q, r), where `self` = q * `other` - r and
-    /// 0 <= r < `other`.
+    /// divisor. In other words, replaces `self` with q and returns r, where
+    /// `self` = q * `other` - r and 0 <= r < `other`.
     ///
     /// Time: worst case O(n)
     ///
@@ -743,7 +743,8 @@ impl CeilingDivAssignMod<u32> for Integer {
     /// Divides an `Integer` by a `u32` in place, taking the quotient and returning the remainder of
     /// the `Integer` divided by the `u32`. The quotient is rounded towards positive infinity, and
     /// the remainder is always non-positive and its absolute value is less than the divisor. In
-    /// other words, returns (q, r), where `self` = q * `other` + r and 0 <= -r < `other`.
+    /// other words, replaces `self` with q and returns r, where `self` = q * `other` + r and
+    /// 0 <= -r < `other`.
     ///
     /// Time: worst case O(n)
     ///
