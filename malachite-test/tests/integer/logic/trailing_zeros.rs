@@ -1,6 +1,7 @@
 use common::test_properties;
 use malachite_base::num::Parity;
 use malachite_nz::integer::Integer;
+use malachite_test::inputs::base::nonzero_signeds;
 use malachite_test::inputs::integer::integers;
 use malachite_test::integer::logic::trailing_zeros::integer_trailing_zeros_alt;
 use std::str::FromStr;
@@ -46,5 +47,12 @@ fn trailing_zeros_properties() {
                 assert_eq!(x >> trailing_zeros << trailing_zeros, *x);
             }
         }
+    });
+
+    test_properties(nonzero_signeds::<i32>, |&i| {
+        assert_eq!(
+            Integer::from(i).trailing_zeros(),
+            Some(u64::from(i.trailing_zeros()))
+        );
     });
 }

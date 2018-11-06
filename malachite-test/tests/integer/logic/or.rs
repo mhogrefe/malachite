@@ -11,11 +11,12 @@ use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_test::common::{integer_to_rug_integer, rug_integer_to_integer};
 use malachite_test::inputs::base::{
-    pairs_of_u32_vec_var_1, triples_of_u32_vec_var_6, triples_of_u32_vec_var_8,
+    pairs_of_signeds, pairs_of_u32_vec_var_1, triples_of_u32_vec_var_6, triples_of_u32_vec_var_8,
 };
 use malachite_test::inputs::integer::{
     integers, pairs_of_integer_and_signed, pairs_of_integers, triples_of_integers,
 };
+use malachite_test::inputs::natural::pairs_of_naturals;
 use malachite_test::integer::logic::or::{integer_or_alt_1, integer_or_alt_2};
 use rug;
 use std::cmp::min;
@@ -693,5 +694,13 @@ fn or_properties() {
         assert_eq!((x & y) | z, (x | z) & (y | z));
         assert_eq!(x | (y & z), (x | y) & (x | z));
         assert_eq!((x | y) & z, (x & z) | (y & z));
+    });
+
+    test_properties(pairs_of_signeds::<i32>, |&(i, j)| {
+        assert_eq!(Integer::from(i) | Integer::from(j), i | j);
+    });
+
+    test_properties(pairs_of_naturals, |&(ref x, ref y)| {
+        assert_eq!(Integer::from(x) | Integer::from(y), x | y);
     });
 }

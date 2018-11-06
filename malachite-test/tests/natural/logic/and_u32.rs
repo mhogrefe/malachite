@@ -3,7 +3,9 @@ use malachite_base::num::Zero;
 use malachite_nz::natural::logic::and_u32::limbs_and_limb;
 use malachite_nz::natural::Natural;
 use malachite_test::common::{natural_to_biguint, natural_to_rug_integer, rug_integer_to_natural};
-use malachite_test::inputs::base::{pairs_of_nonempty_unsigned_vec_and_unsigned, unsigneds};
+use malachite_test::inputs::base::{
+    pairs_of_nonempty_unsigned_vec_and_unsigned, pairs_of_unsigneds, unsigneds,
+};
 use malachite_test::inputs::natural::{naturals, pairs_of_natural_and_unsigned};
 use malachite_test::natural::logic::and_u32::{
     natural_and_u32_alt_1, natural_and_u32_alt_2, num_and_u32,
@@ -154,5 +156,10 @@ fn and_u32_properties() {
     test_properties(unsigneds, |&u: &u32| {
         assert_eq!(Natural::ZERO & u, 0);
         assert_eq!(u & Natural::ZERO, 0);
+    });
+
+    test_properties(pairs_of_unsigneds::<u32>, |&(x, y)| {
+        assert_eq!(Natural::from(x) & y, x & y);
+        assert_eq!(x & Natural::from(y), x & y);
     });
 }

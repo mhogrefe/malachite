@@ -12,12 +12,13 @@ use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_test::common::{integer_to_rug_integer, rug_integer_to_integer};
 use malachite_test::inputs::base::{
-    pairs_of_u32_vec_var_1, pairs_of_u32_vec_var_2, triples_of_u32_vec_var_5,
+    pairs_of_signeds, pairs_of_u32_vec_var_1, pairs_of_u32_vec_var_2, triples_of_u32_vec_var_5,
     triples_of_u32_vec_var_7,
 };
 use malachite_test::inputs::integer::{
     integers, pairs_of_integer_and_unsigned, pairs_of_integers, triples_of_integers,
 };
+use malachite_test::inputs::natural::pairs_of_naturals;
 use malachite_test::integer::logic::and::{integer_and_alt_1, integer_and_alt_2};
 use rug;
 use std::cmp::{max, min};
@@ -847,5 +848,13 @@ fn and_properties() {
 
     test_properties(triples_of_integers, |&(ref x, ref y, ref z)| {
         assert_eq!((x & y) & z, x & (y & z));
+    });
+
+    test_properties(pairs_of_signeds::<i32>, |&(i, j)| {
+        assert_eq!(Integer::from(i) & Integer::from(j), i & j);
+    });
+
+    test_properties(pairs_of_naturals, |&(ref x, ref y)| {
+        assert_eq!(Integer::from(x) & Integer::from(y), x & y);
     });
 }

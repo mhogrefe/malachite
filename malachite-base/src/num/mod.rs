@@ -369,6 +369,8 @@ pub trait Pow<RHS> {
     fn pow(self, exp: RHS) -> Self::Output;
 }
 
+//TODO WrappingPow, CheckedPow, SaturatingPow, OverflowingPow
+
 /// Returns `true` iff `self == 2^k` for some integer `k`.
 pub trait IsPowerOfTwo {
     fn is_power_of_two(self) -> bool;

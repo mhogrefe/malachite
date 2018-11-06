@@ -55,6 +55,7 @@ pub enum RoundingMode {
 impl Neg for RoundingMode {
     type Output = RoundingMode;
 
+    #[inline]
     fn neg(self) -> RoundingMode {
         match self {
             RoundingMode::Floor => RoundingMode::Ceiling,
@@ -65,6 +66,7 @@ impl Neg for RoundingMode {
 }
 
 impl Display for RoundingMode {
+    #[inline]
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
         f.write_str(&format!("{:?}", self))
     }
@@ -79,6 +81,7 @@ pub struct ParseRoundingModeError {
 impl FromStr for RoundingMode {
     type Err = ParseRoundingModeError;
 
+    #[inline]
     fn from_str(src: &str) -> Result<Self, Self::Err> {
         match src {
             "Down" => Ok(RoundingMode::Down),

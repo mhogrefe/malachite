@@ -1,9 +1,10 @@
 use common::test_properties;
 use malachite_base::num::{CheckedHammingDistance, HammingDistance, Zero};
-use malachite_nz::integer::Integer;
 use malachite_nz::natural::logic::hamming_distance_u32::limbs_hamming_distance_limb;
 use malachite_nz::natural::Natural;
-use malachite_test::inputs::base::{pairs_of_nonempty_unsigned_vec_and_unsigned, unsigneds};
+use malachite_test::inputs::base::{
+    pairs_of_nonempty_unsigned_vec_and_unsigned, pairs_of_unsigneds, unsigneds,
+};
 use malachite_test::inputs::natural::{
     naturals, pairs_of_natural_and_unsigned, triples_of_natural_unsigned_and_unsigned,
 };
@@ -71,7 +72,6 @@ fn hamming_distance_u32_properties() {
             assert_eq!(u.hamming_distance(n), distance);
             assert_eq!(natural_hamming_distance_u32_alt_1(n, u), distance);
             assert_eq!(natural_hamming_distance_u32_alt_2(n, u), distance);
-            assert_eq!(Integer::from(n).checked_hamming_distance(u), Some(distance));
             assert_eq!(distance == 0, *n == u);
             assert_eq!((n ^ u).count_ones(), distance);
             assert_eq!(
@@ -94,5 +94,10 @@ fn hamming_distance_u32_properties() {
 
     test_properties(unsigneds, |&u: &u32| {
         assert_eq!(Natural::ZERO.hamming_distance(u), u64::from(u.count_ones()));
+    });
+
+    test_properties(pairs_of_unsigneds::<u32>, |&(x, y)| {
+        assert_eq!(Natural::from(x).hamming_distance(y), x.hamming_distance(y));
+        assert_eq!(x.hamming_distance(&Natural::from(y)), x.hamming_distance(y));
     });
 }

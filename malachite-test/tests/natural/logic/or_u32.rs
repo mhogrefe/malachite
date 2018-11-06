@@ -8,7 +8,7 @@ use malachite_test::common::{
     biguint_to_natural, natural_to_biguint, natural_to_rug_integer, rug_integer_to_natural,
 };
 use malachite_test::inputs::base::{
-    pairs_of_nonempty_unsigned_vec_and_unsigned,
+    pairs_of_nonempty_unsigned_vec_and_unsigned, pairs_of_unsigneds,
     triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_2, unsigneds,
 };
 use malachite_test::inputs::natural::{naturals, pairs_of_natural_and_unsigned};
@@ -247,5 +247,10 @@ fn or_u32_properties() {
     test_properties(unsigneds, |&u: &u32| {
         assert_eq!(&Natural::ZERO | u, u);
         assert_eq!(u | &Natural::ZERO, u);
+    });
+
+    test_properties(pairs_of_unsigneds::<u32>, |&(x, y)| {
+        assert_eq!(Natural::from(x) | y, x | y);
+        assert_eq!(x | Natural::from(y), x | y);
     });
 }

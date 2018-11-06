@@ -4,7 +4,7 @@ use malachite_nz::natural::arithmetic::log_two::limbs_floor_log_two;
 use malachite_nz::natural::logic::significant_bits::limbs_significant_bits;
 use malachite_nz::natural::Natural;
 use malachite_test::common::{natural_to_biguint, natural_to_rug_integer};
-use malachite_test::inputs::base::vecs_of_unsigned_var_1;
+use malachite_test::inputs::base::{unsigneds, vecs_of_unsigned_var_1};
 use malachite_test::inputs::natural::naturals;
 use num::BigUint;
 use rug;
@@ -79,5 +79,9 @@ fn significant_bits_properties() {
             assert!(Natural::ONE << (n - 1) <= *x);
             assert!(*x < Natural::ONE << n);
         }
+    });
+
+    test_properties(unsigneds::<u32>, |&u| {
+        assert_eq!(Natural::from(u).significant_bits(), u.significant_bits());
     });
 }

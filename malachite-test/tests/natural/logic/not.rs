@@ -1,5 +1,4 @@
 use common::test_properties;
-use malachite_nz::integer::Integer;
 use malachite_nz::natural::logic::not::{limbs_not, limbs_not_in_place, limbs_not_to_out};
 use malachite_nz::natural::Natural;
 use malachite_test::common::{natural_to_rug_integer, rug_integer_to_integer};
@@ -108,7 +107,6 @@ fn not_properties() {
         assert_eq!(not_alt, not);
 
         assert!(not < 0);
-        assert_eq!(!Integer::from(x), not);
         assert_ne!(not, *x);
         assert_eq!(!&not, *x);
     });

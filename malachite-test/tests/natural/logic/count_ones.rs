@@ -2,7 +2,7 @@ use common::test_properties;
 use malachite_base::num::IsPowerOfTwo;
 use malachite_nz::natural::logic::count_ones::limbs_count_ones;
 use malachite_nz::natural::Natural;
-use malachite_test::inputs::base::vecs_of_unsigned;
+use malachite_test::inputs::base::{unsigneds, vecs_of_unsigned};
 use malachite_test::inputs::natural::naturals;
 use malachite_test::natural::logic::count_ones::{
     natural_count_ones_alt_1, natural_count_ones_alt_2,
@@ -60,5 +60,9 @@ fn count_ones_properties() {
         assert_eq!(ones == 0, *x == 0);
         assert_eq!(ones == 1, x.is_power_of_two());
         assert_eq!((!x).checked_count_zeros(), Some(ones));
+    });
+
+    test_properties(unsigneds::<u32>, |&u| {
+        assert_eq!(Natural::from(u).count_ones(), u64::from(u.count_ones()));
     });
 }

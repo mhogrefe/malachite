@@ -3,6 +3,7 @@ use malachite_base::num::{Abs, One, PrimitiveInteger, SignificantBits};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_test::common::{integer_to_bigint, integer_to_rug_integer};
+use malachite_test::inputs::base::signeds;
 use malachite_test::inputs::integer::integers;
 use num::BigInt;
 use rug;
@@ -43,5 +44,9 @@ fn significant_bits_properties() {
             assert!(Natural::ONE << (n - 1) <= x_abs);
             assert!(x_abs < Natural::ONE << n);
         }
+    });
+
+    test_properties(signeds::<i32>, |&i| {
+        assert_eq!(Integer::from(i).significant_bits(), i.significant_bits());
     });
 }

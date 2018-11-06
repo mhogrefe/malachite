@@ -1,5 +1,5 @@
 use common::test_properties;
-use malachite_base::num::{CheckedHammingDistance, NegativeOne, Zero};
+use malachite_base::num::{CheckedHammingDistance, HammingDistance, NegativeOne, Zero};
 use malachite_nz::integer::logic::checked_hamming_distance::limbs_hamming_distance_neg;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
@@ -9,6 +9,7 @@ use malachite_test::inputs::integer::{
     integers, pairs_of_integers, triples_of_natural_integer_natural_integer_and_natural_signed,
     triples_of_natural_integers,
 };
+use malachite_test::inputs::natural::pairs_of_naturals;
 use malachite_test::integer::logic::checked_hamming_distance::{
     integer_checked_hamming_distance_alt_1, integer_checked_hamming_distance_alt_2,
 };
@@ -174,6 +175,13 @@ fn checked_hamming_distance_properties() {
         assert_eq!(
             Integer::NEGATIVE_ONE.checked_hamming_distance(n),
             n.checked_count_zeros()
+        );
+    });
+
+    test_properties(pairs_of_naturals, |&(ref x, ref y)| {
+        assert_eq!(
+            Integer::from(x).checked_hamming_distance(&Integer::from(y)),
+            Some(x.hamming_distance(y))
         );
     });
 }

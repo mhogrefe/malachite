@@ -1,6 +1,7 @@
 use common::test_properties;
 use malachite_base::num::One;
 use malachite_nz::natural::Natural;
+use malachite_test::inputs::base::unsigneds;
 use malachite_test::inputs::natural::naturals;
 use std::str::FromStr;
 use std::u32;
@@ -29,5 +30,9 @@ fn limb_count_properties() {
             assert!(Natural::ONE << ((n - 1) << 5) <= *x);
             assert!(*x < Natural::ONE << (n << 5));
         }
+    });
+
+    test_properties(unsigneds::<u32>, |&u| {
+        assert!(Natural::from(u).limb_count() <= 1);
     });
 }

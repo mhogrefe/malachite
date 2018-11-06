@@ -2,7 +2,7 @@ use common::test_properties;
 use malachite_base::num::Parity;
 use malachite_nz::natural::logic::trailing_zeros::limbs_trailing_zeros;
 use malachite_nz::natural::Natural;
-use malachite_test::inputs::base::vecs_of_unsigned_var_3;
+use malachite_test::inputs::base::{positive_unsigneds, vecs_of_unsigned_var_3};
 use malachite_test::inputs::natural::naturals;
 use malachite_test::natural::logic::trailing_zeros::natural_trailing_zeros_alt;
 use std::str::FromStr;
@@ -72,5 +72,12 @@ fn trailing_zeros_properties() {
                 assert_eq!(x >> trailing_zeros << trailing_zeros, *x);
             }
         }
+    });
+
+    test_properties(positive_unsigneds::<u32>, |&u| {
+        assert_eq!(
+            Natural::from(u).trailing_zeros(),
+            Some(u64::from(u.trailing_zeros()))
+        );
     });
 }

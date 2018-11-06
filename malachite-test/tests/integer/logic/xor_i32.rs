@@ -10,8 +10,8 @@ use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_test::common::{integer_to_rug_integer, rug_integer_to_integer};
 use malachite_test::inputs::base::{
-    pairs_of_nonempty_unsigned_vec_and_unsigned, pairs_of_u32_vec_and_u32_var_1, signeds,
-    triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_2,
+    pairs_of_nonempty_unsigned_vec_and_unsigned, pairs_of_signeds, pairs_of_u32_vec_and_u32_var_1,
+    signeds, triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_2,
     triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_3,
 };
 use malachite_test::inputs::integer::{integers, pairs_of_integer_and_signed};
@@ -452,5 +452,10 @@ fn or_i32_properties() {
         assert_eq!(i ^ &Integer::ZERO, i);
         assert_eq!(&Integer::NEGATIVE_ONE ^ i, !i);
         assert_eq!(i ^ &Integer::NEGATIVE_ONE, !i);
+    });
+
+    test_properties(pairs_of_signeds::<i32>, |&(i, j)| {
+        assert_eq!(Integer::from(i) ^ j, i ^ j);
+        assert_eq!(i ^ Integer::from(j), i ^ j);
     });
 }

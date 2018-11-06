@@ -15,11 +15,13 @@ use rust_wheels::iterators::general::{random, range_increasing};
 use rust_wheels::iterators::integers_geometric::{positive_u32s_geometric, u32s_geometric};
 use rust_wheels::iterators::orderings::{exhaustive_orderings, random_orderings};
 use rust_wheels::iterators::primitive_ints::{
-    exhaustive_negative_signed, exhaustive_nonzero_signed, exhaustive_positive, exhaustive_signed,
-    exhaustive_unsigned, random_negative_signed, random_nonzero_signed, random_positive_signed,
+    exhaustive_natural_signed, exhaustive_negative_signed, exhaustive_nonzero_signed,
+    exhaustive_positive, exhaustive_signed, exhaustive_unsigned, random_natural_signed,
+    random_negative_signed, random_nonzero_signed, random_positive_signed,
     random_positive_unsigned, random_range, random_range_down, range_down_increasing,
-    special_random_negative_signed, special_random_nonzero_signed, special_random_positive_signed,
-    special_random_positive_unsigned, special_random_signed, special_random_unsigned,
+    special_random_natural_signed, special_random_negative_signed, special_random_nonzero_signed,
+    special_random_positive_signed, special_random_positive_unsigned, special_random_signed,
+    special_random_unsigned,
 };
 use rust_wheels::iterators::rounding_modes::{exhaustive_rounding_modes, random_rounding_modes};
 use rust_wheels::iterators::tuples::{
@@ -66,6 +68,22 @@ pub fn nonzero_signeds<T: PrimitiveSigned>(gm: GenerationMode) -> It<T> {
         GenerationMode::Exhaustive => Box::new(exhaustive_nonzero_signed()),
         GenerationMode::Random(_) => Box::new(random_nonzero_signed(&EXAMPLE_SEED)),
         GenerationMode::SpecialRandom(_) => Box::new(special_random_nonzero_signed(&EXAMPLE_SEED)),
+    }
+}
+
+pub fn natural_signeds<T: PrimitiveSigned>(gm: GenerationMode) -> It<T> {
+    match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_natural_signed()),
+        GenerationMode::Random(_) => Box::new(random_natural_signed(&EXAMPLE_SEED)),
+        GenerationMode::SpecialRandom(_) => Box::new(special_random_natural_signed(&EXAMPLE_SEED)),
+    }
+}
+
+pub fn negative_signeds<T: PrimitiveSigned>(gm: GenerationMode) -> It<T> {
+    match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_negative_signed()),
+        GenerationMode::Random(_) => Box::new(random_negative_signed(&EXAMPLE_SEED)),
+        GenerationMode::SpecialRandom(_) => Box::new(special_random_negative_signed(&EXAMPLE_SEED)),
     }
 }
 

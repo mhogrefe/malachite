@@ -4,7 +4,9 @@ use malachite_nz::integer::logic::or_i32::{limbs_neg_or_neg_limb, limbs_pos_or_n
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_test::common::{integer_to_rug_integer, rug_integer_to_integer};
-use malachite_test::inputs::base::{pairs_of_u32_vec_and_positive_u32_var_1, signeds};
+use malachite_test::inputs::base::{
+    pairs_of_signeds, pairs_of_u32_vec_and_positive_u32_var_1, signeds,
+};
 use malachite_test::inputs::integer::{integers, pairs_of_integer_and_signed};
 use malachite_test::integer::logic::or_i32::{integer_or_i32_alt_1, integer_or_i32_alt_2};
 use rug::{self, Assign};
@@ -212,5 +214,10 @@ fn or_i32_properties() {
         assert_eq!(i | &Integer::ZERO, i);
         assert_eq!(&Integer::NEGATIVE_ONE | i, -1);
         assert_eq!(i | &Integer::NEGATIVE_ONE, -1);
+    });
+
+    test_properties(pairs_of_signeds::<i32>, |&(i, j)| {
+        assert_eq!(Integer::from(i) | j, i | j);
+        assert_eq!(i | Integer::from(j), i | j);
     });
 }

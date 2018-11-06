@@ -5,7 +5,9 @@ use malachite_nz::integer::logic::bit_scan::limbs_index_of_next_false_bit_neg;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_test::common::integer_to_rug_integer;
-use malachite_test::inputs::base::{pairs_of_unsigned_vec_and_small_u64_var_1, unsigneds};
+use malachite_test::inputs::base::{
+    pairs_of_signed_and_small_unsigned, pairs_of_unsigned_vec_and_small_u64_var_1, unsigneds,
+};
 use malachite_test::inputs::integer::{integers, pairs_of_integer_and_small_u64};
 use malachite_test::integer::logic::index_of_next_false_bit::integer_index_of_next_false_bit_alt;
 use rug;
@@ -125,4 +127,14 @@ fn index_of_next_false_bit_properties() {
         assert_eq!(Integer::ZERO.index_of_next_false_bit(u), Some(u));
         assert_eq!(Integer::NEGATIVE_ONE.index_of_next_false_bit(u), None);
     });
+
+    test_properties(
+        pairs_of_signed_and_small_unsigned::<i32, u64>,
+        |&(i, index)| {
+            assert_eq!(
+                Integer::from(i).index_of_next_false_bit(index),
+                i.index_of_next_false_bit(index)
+            );
+        },
+    );
 }

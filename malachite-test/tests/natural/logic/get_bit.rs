@@ -3,7 +3,9 @@ use malachite_base::num::{BitAccess, One, SignificantBits};
 use malachite_nz::natural::logic::bit_access::limbs_get_bit;
 use malachite_nz::natural::Natural;
 use malachite_test::common::{natural_to_biguint, natural_to_rug_integer};
-use malachite_test::inputs::base::pairs_of_unsigned_vec_and_small_u64;
+use malachite_test::inputs::base::{
+    pairs_of_unsigned_and_small_unsigned, pairs_of_unsigned_vec_and_small_u64,
+};
 use malachite_test::inputs::natural::{naturals, pairs_of_natural_and_small_unsigned};
 use malachite_test::natural::logic::get_bit::num_get_bit;
 use num::BigUint;
@@ -79,4 +81,11 @@ fn get_bit_properties() {
             assert!(n.get_bit(significant_bits - 1));
         }
     });
+
+    test_properties(
+        pairs_of_unsigned_and_small_unsigned::<u32, u64>,
+        |&(u, index)| {
+            assert_eq!(Natural::from(u).get_bit(index), u.get_bit(index));
+        },
+    );
 }
