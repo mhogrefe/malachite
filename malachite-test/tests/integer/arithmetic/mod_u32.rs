@@ -72,19 +72,19 @@ fn test_mod_u32() {
 #[test]
 #[should_panic(expected = "division by zero")]
 fn mod_assign_u32_fail() {
-    Integer::from(10u32).mod_assign(0);
+    Integer::from(10u32).mod_assign(0u32);
 }
 
 #[test]
 #[should_panic(expected = "division by zero")]
 fn mod_u32_fail() {
-    Integer::from(10u32).mod_op(0);
+    Integer::from(10u32).mod_op(0u32);
 }
 
 #[test]
 #[should_panic(expected = "division by zero")]
 fn mod_u32_ref_fail() {
-    (&Integer::from(10u32)).mod_op(0);
+    (&Integer::from(10u32)).mod_op(0u32);
 }
 
 #[test]
@@ -95,8 +95,12 @@ fn test_rem_u32() {
         assert!(n.is_valid());
         assert_eq!(n.to_string(), remainder);
 
-        assert_eq!((Integer::from_str(u).unwrap() % v).to_string(), remainder);
-        assert_eq!((&Integer::from_str(u).unwrap() % v).to_string(), remainder);
+        let r = Integer::from_str(u).unwrap() % v;
+        assert!(r.is_valid());
+        assert_eq!(r.to_string(), remainder);
+        let r = &Integer::from_str(u).unwrap() % v;
+        assert!(r.is_valid());
+        assert_eq!(r.to_string(), remainder);
 
         assert_eq!((BigInt::from_str(u).unwrap() % v).to_string(), remainder);
         assert_eq!(
@@ -143,21 +147,21 @@ fn test_rem_u32() {
 #[should_panic(expected = "division by zero")]
 fn rem_assign_u32_fail() {
     let mut n = Integer::from(10u32);
-    n %= 0;
+    n %= 0u32;
 }
 
 #[test]
 #[allow(unused_must_use)]
 #[should_panic(expected = "division by zero")]
 fn rem_u32_fail() {
-    Integer::from(10u32) % 0;
+    Integer::from(10u32) % 0u32;
 }
 
 #[test]
 #[allow(unused_must_use)]
 #[should_panic(expected = "division by zero")]
 fn rem_u32_ref_fail() {
-    &Integer::from(10u32) % 0;
+    &Integer::from(10u32) % 0u32;
 }
 
 #[test]
@@ -213,19 +217,19 @@ fn test_neg_mod_u32() {
 #[test]
 #[should_panic(expected = "division by zero")]
 fn neg_mod_assign_u32_fail() {
-    Integer::from(10u32).neg_mod_assign(0);
+    Integer::from(10u32).neg_mod_assign(0u32);
 }
 
 #[test]
 #[should_panic(expected = "division by zero")]
 fn neg_mod_u32_fail() {
-    Integer::from(10u32).neg_mod(0);
+    Integer::from(10u32).neg_mod(0u32);
 }
 
 #[test]
 #[should_panic(expected = "division by zero")]
 fn neg_mod_u32_ref_fail() {
-    (&Integer::from(10u32)).neg_mod(0);
+    (&Integer::from(10u32)).neg_mod(0u32);
 }
 
 #[test]
@@ -235,14 +239,12 @@ fn test_ceiling_mod_u32() {
         n.ceiling_mod_assign(v);
         assert_eq!(n.to_string(), remainder);
 
-        assert_eq!(
-            Integer::from_str(u).unwrap().ceiling_mod(v).to_string(),
-            remainder
-        );
-        assert_eq!(
-            (&Integer::from_str(u).unwrap()).ceiling_mod(v).to_string(),
-            remainder
-        );
+        let r = Integer::from_str(u).unwrap().ceiling_mod(v);
+        assert!(r.is_valid());
+        assert_eq!(r.to_string(), remainder);
+        let r = (&Integer::from_str(u).unwrap()).ceiling_mod(v);
+        assert!(r.is_valid());
+        assert_eq!(r.to_string(), remainder);
 
         assert_eq!(
             rug::Integer::from_str(u).unwrap().rem_ceil(v).to_string(),
@@ -287,19 +289,19 @@ fn test_ceiling_mod_u32() {
 #[test]
 #[should_panic(expected = "division by zero")]
 fn ceiling_mod_assign_u32_fail() {
-    Integer::from(10u32).ceiling_mod_assign(0);
+    Integer::from(10u32).ceiling_mod_assign(0u32);
 }
 
 #[test]
 #[should_panic(expected = "division by zero")]
 fn ceiling_mod_u32_fail() {
-    Integer::from(10u32).ceiling_mod(0);
+    Integer::from(10u32).ceiling_mod(0u32);
 }
 
 #[test]
 #[should_panic(expected = "division by zero")]
 fn ceiling_mod_u32_ref_fail() {
-    (&Integer::from(10u32)).ceiling_mod(0);
+    (&Integer::from(10u32)).ceiling_mod(0u32);
 }
 
 #[test]
@@ -356,53 +358,53 @@ fn test_u32_mod_integer() {
 #[allow(unused_must_use)]
 #[should_panic(expected = "division by zero")]
 fn u32_rem_integer_fail() {
-    10 % Integer::ZERO;
+    10u32 % Integer::ZERO;
 }
 
 #[test]
 #[allow(unused_must_use)]
 #[should_panic(expected = "division by zero")]
 fn u32_rem_integer_ref_fail() {
-    10 % &Integer::ZERO;
+    10u32 % &Integer::ZERO;
 }
 
 #[test]
 #[should_panic(expected = "division by zero")]
 fn u32_rem_assign_integer_fail() {
-    let mut n = 10;
+    let mut n = 10u32;
     n %= Integer::ZERO;
 }
 
 #[test]
 #[should_panic(expected = "division by zero")]
 fn u32_rem_assign_integer_ref_fail() {
-    let mut n = 10;
+    let mut n = 10u32;
     n %= &Integer::ZERO;
 }
 
 #[test]
 #[should_panic(expected = "division by zero")]
 fn u32_mod_integer_fail() {
-    10.mod_op(Integer::ZERO);
+    10u32.mod_op(Integer::ZERO);
 }
 
 #[test]
 #[should_panic(expected = "division by zero")]
 fn u32_mod_integer_ref_fail() {
-    10.mod_op(&Integer::ZERO);
+    10u32.mod_op(&Integer::ZERO);
 }
 
 #[test]
 #[should_panic(expected = "division by zero")]
 fn u32_mod_assign_integer_fail() {
-    let mut n = 10;
+    let mut n = 10u32;
     n.mod_assign(Integer::ZERO);
 }
 
 #[test]
 #[should_panic(expected = "division by zero")]
 fn u32_mod_assign_integer_ref_fail() {
-    let mut n = 10;
+    let mut n = 10u32;
     n.mod_assign(&Integer::ZERO);
 }
 
@@ -445,13 +447,13 @@ fn test_u32_neg_mod_integer() {
 #[test]
 #[should_panic(expected = "division by zero")]
 fn u32_neg_mod_integer_fail() {
-    10.neg_mod(Integer::ZERO);
+    10u32.neg_mod(Integer::ZERO);
 }
 
 #[test]
 #[should_panic(expected = "division by zero")]
 fn u32_neg_mod_integer_ref_fail() {
-    10.neg_mod(&Integer::ZERO);
+    10u32.neg_mod(&Integer::ZERO);
 }
 
 #[test]
@@ -493,13 +495,13 @@ fn test_u32_ceiling_mod_integer() {
 #[test]
 #[should_panic(expected = "division by zero")]
 fn u32_ceiling_mod_integer_fail() {
-    10.ceiling_mod(Integer::ZERO);
+    10u32.ceiling_mod(Integer::ZERO);
 }
 
 #[test]
 #[should_panic(expected = "division by zero")]
 fn u32_ceiling_mod_integer_ref_fail() {
-    10.ceiling_mod(&Integer::ZERO);
+    10u32.ceiling_mod(&Integer::ZERO);
 }
 
 fn mod_u32_properties_helper(n: &Integer, u: u32) {
@@ -565,7 +567,7 @@ fn mod_u32_properties() {
     );
 
     test_properties(integers, |n| {
-        assert_eq!(n.mod_op(1), 0);
+        assert_eq!(n.mod_op(1u32), 0);
     });
 
     test_properties(positive_unsigneds, |&u: &u32| {
@@ -583,7 +585,7 @@ fn mod_u32_properties() {
     });
 
     test_properties(
-        triples_of_integer_integer_and_positive_unsigned,
+        triples_of_integer_integer_and_positive_unsigned::<u32>,
         |&(ref x, ref y, u)| {
             assert_eq!(
                 (x + y).mod_op(u),
@@ -656,7 +658,7 @@ fn rem_u32_properties() {
     );
 
     test_properties(integers, |n| {
-        assert_eq!(n % 1, 0);
+        assert_eq!(n % 1u32, 0);
     });
 
     test_properties(positive_unsigneds, |&u: &u32| {
@@ -674,7 +676,7 @@ fn rem_u32_properties() {
     });
 
     test_properties(
-        triples_of_integer_integer_and_positive_unsigned,
+        triples_of_integer_integer_and_positive_unsigned::<u32>,
         |&(ref x, ref y, u)| {
             assert_eq!(x * y % u, Integer::from(x % u) * Integer::from(y % u) % u);
         },
@@ -733,7 +735,7 @@ fn neg_mod_u32_properties() {
     );
 
     test_properties(integers, |n| {
-        assert_eq!(n.neg_mod(1), 0);
+        assert_eq!(n.neg_mod(1u32), 0);
     });
 
     test_properties(positive_unsigneds, |&u: &u32| {
@@ -748,7 +750,7 @@ fn neg_mod_u32_properties() {
     });
 
     test_properties(
-        triples_of_integer_integer_and_positive_unsigned,
+        triples_of_integer_integer_and_positive_unsigned::<u32>,
         |&(ref x, ref y, u)| {
             assert_eq!(
                 (x + y).neg_mod(u),
@@ -785,6 +787,7 @@ fn ceiling_mod_u32_properties_helper(n: &Integer, u: u32) {
         remainder
     );
 
+    assert!(remainder <= 0);
     assert!(-remainder < u);
 }
 
@@ -814,6 +817,7 @@ fn ceiling_mod_u32_properties() {
             assert!(remainder_alt.is_valid());
             assert_eq!(remainder_alt, remainder);
 
+            assert!(remainder <= 0);
             if u != 0 && u < *n {
                 assert_eq!(remainder, u - n);
             }
@@ -822,7 +826,7 @@ fn ceiling_mod_u32_properties() {
     );
 
     test_properties(integers, |n| {
-        assert_eq!(n.ceiling_mod(1), 0);
+        assert_eq!(n.ceiling_mod(1u32), 0);
     });
 
     test_properties(positive_unsigneds, |&u: &u32| {
@@ -837,7 +841,7 @@ fn ceiling_mod_u32_properties() {
     });
 
     test_properties(
-        triples_of_integer_integer_and_positive_unsigned,
+        triples_of_integer_integer_and_positive_unsigned::<u32>,
         |&(ref x, ref y, u)| {
             assert_eq!(
                 (x + y).ceiling_mod(u),

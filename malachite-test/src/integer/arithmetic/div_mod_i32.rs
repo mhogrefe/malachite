@@ -5,7 +5,7 @@ use inputs::integer::{
 };
 use malachite_base::num::{
     CeilingDivAssignMod, CeilingDivAssignNegMod, CeilingDivMod, CeilingDivNegMod, DivAssignMod,
-    DivAssignRem, DivMod, DivRem, SignificantBits, UnsignedAbs,
+    DivAssignRem, DivMod, DivRem, Mod, SignificantBits, UnsignedAbs,
 };
 use num::{BigInt, Integer, ToPrimitive};
 use rug;
@@ -398,14 +398,13 @@ fn benchmark_integer_div_mod_i32_algorithms(gm: GenerationMode, limit: usize, fi
         "n.significant_bits()",
         &mut [
             ("standard", &mut (|(x, y)| no_out!(x.div_mod(y)))),
-            ("standard", &mut (|(x, y)| no_out!(x.div_mod(y)))),
-            //TODO(
-            //TODO    "using / and %",
-            //TODO    &mut (|(x, y)| {
-            //TODO        let remainder = (&x).mod_op(y);
-            //TODO        (x / y, remainder);
-            //TODO    }),
-            //TODO),
+            (
+                "using / and %",
+                &mut (|(x, y)| {
+                    let remainder = (&x).mod_op(y);
+                    (x / y, remainder);
+                }),
+            ),
         ],
     );
 }
@@ -494,14 +493,13 @@ fn benchmark_integer_div_rem_i32_algorithms(gm: GenerationMode, limit: usize, fi
         "n.significant_bits()",
         &mut [
             ("standard", &mut (|(x, y)| no_out!(x.div_rem(y)))),
-            ("standard", &mut (|(x, y)| no_out!(x.div_rem(y)))),
-            //TODO(
-            //TODO    "using / and %",
-            //TODO    &mut (|(x, y)| {
-            //TODO        let remainder = &x % y;
-            //TODO        (x / y, remainder);
-            //TODO    }),
-            //TODO),
+            (
+                "using / and %",
+                &mut (|(x, y)| {
+                    let remainder = &x % y;
+                    (x / y, remainder);
+                }),
+            ),
         ],
     );
 }

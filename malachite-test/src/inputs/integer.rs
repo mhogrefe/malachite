@@ -795,6 +795,30 @@ pub fn triples_of_integer_integer_and_positive_unsigned<T: PrimitiveUnsigned>(
     }
 }
 
+pub fn triples_of_integer_integer_and_nonzero_signed<T: PrimitiveSigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (Integer, Integer, T)>> {
+    match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_triples(
+            exhaustive_integers(),
+            exhaustive_integers(),
+            exhaustive_nonzero_signed(),
+        )),
+        GenerationMode::Random(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| random_integers(seed, scale)),
+            &(|seed| random_integers(seed, scale)),
+            &(|seed| random_nonzero_signed(seed)),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_integers(seed, scale)),
+            &(|seed| special_random_integers(seed, scale)),
+            &(|seed| special_random_nonzero_signed(seed)),
+        )),
+    }
+}
+
 fn log_pairs_of_integer_and_signed<T: PrimitiveSigned>() -> Box<Iterator<Item = (Integer, T)>> {
     Box::new(log_pairs(exhaustive_integers(), exhaustive_signed()))
 }

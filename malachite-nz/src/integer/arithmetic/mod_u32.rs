@@ -28,10 +28,10 @@ impl Mod<u32> for Integer {
     ///
     /// fn main() {
     ///     // 3 * 123 + 87 = 456
-    ///     assert_eq!(Integer::from(456u32).mod_op(123), 87);
+    ///     assert_eq!(Integer::from(456u32).mod_op(123u32), 87);
     ///
     ///     // -8,130,081,301 * 123 + 23 = -10^12
-    ///     assert_eq!((-Integer::trillion()).mod_op(123), 23);
+    ///     assert_eq!((-Integer::trillion()).mod_op(123u32), 23);
     /// }
     /// ```
     fn mod_op(self, other: u32) -> u32 {
@@ -66,10 +66,10 @@ impl<'a> Mod<u32> for &'a Integer {
     ///
     /// fn main() {
     ///     // 3 * 123 + 87 = 456
-    ///     assert_eq!((&Integer::from(456u32)).mod_op(123), 87);
+    ///     assert_eq!((&Integer::from(456u32)).mod_op(123u32), 87);
     ///
     ///     // -8,130,081,301 * 123 + 23 = -10^12
-    ///     assert_eq!((&-Integer::trillion()).mod_op(123), 23);
+    ///     assert_eq!((&-Integer::trillion()).mod_op(123u32), 23);
     /// }
     /// ```
     fn mod_op(self, other: u32) -> u32 {
@@ -103,12 +103,12 @@ impl ModAssign<u32> for Integer {
     /// fn main() {
     ///     // 3 * 123 + 87 = 456
     ///     let mut x = Integer::from(456u32);
-    ///     x.mod_assign(123);
+    ///     x.mod_assign(123u32);
     ///     assert_eq!(x.to_string(), "87");
     ///
     ///     // -8,130,081,301 * 123 + 23 = -10^12
     ///     let mut x = -Integer::trillion();
-    ///     x.mod_assign(123);
+    ///     x.mod_assign(123u32);
     ///     assert_eq!(x.to_string(), "23");
     /// }
     /// ```
@@ -138,10 +138,10 @@ impl Mod<Integer> for u32 {
     ///
     /// fn main() {
     ///     // 3 * 123 + 87 = 456
-    ///     assert_eq!(456.mod_op(Integer::from(-123)), 87);
+    ///     assert_eq!(456u32.mod_op(Integer::from(-123)), 87);
     ///
     ///     // 0 * 10^12 + 123 = 123
-    ///     assert_eq!(123.mod_op(-Integer::trillion()), 123);
+    ///     assert_eq!(123u32.mod_op(-Integer::trillion()), 123);
     /// }
     /// ```
     fn mod_op(self, other: Integer) -> u32 {
@@ -201,12 +201,12 @@ impl ModAssign<Integer> for u32 {
     ///
     /// fn main() {
     ///     // 3 * 123 + 87 = 456
-    ///     let mut n = 456;
+    ///     let mut n = 456u32;
     ///     n.mod_assign(Integer::from(123u32));
     ///     assert_eq!(n, 87);
     ///
     ///     // 0 * 10^12 + 123 = 123
-    ///     let mut n = 123;
+    ///     let mut n = 123u32;
     ///     n.mod_assign(-Integer::trillion());
     ///     assert_eq!(n, 123);
     /// }
@@ -274,10 +274,10 @@ impl Rem<u32> for Integer {
     ///
     /// fn main() {
     ///     // 3 * 123 + 87 = 456
-    ///     assert_eq!((Integer::from(456u32) % 123).to_string(), "87");
+    ///     assert_eq!((Integer::from(456u32) % 123u32).to_string(), "87");
     ///
     ///     // -8,130,081,300 * 123 - 100 = -10^12
-    ///     assert_eq!((-Integer::trillion() % 123).to_string(), "-100");
+    ///     assert_eq!((-Integer::trillion() % 123u32).to_string(), "-100");
     /// }
     /// ```
     fn rem(self, other: u32) -> Integer {
@@ -313,10 +313,10 @@ impl<'a> Rem<u32> for &'a Integer {
     ///
     /// fn main() {
     ///     // 3 * 123 + 87 = 456
-    ///     assert_eq!((&Integer::from(456u32) % 123).to_string(), "87");
+    ///     assert_eq!((&Integer::from(456u32) % 123u32).to_string(), "87");
     ///
     ///     // -8,130,081,300 * 123 - 100 = -10^12
-    ///     assert_eq!((&-Integer::trillion() % 123).to_string(), "-100");
+    ///     assert_eq!((&-Integer::trillion() % 123u32).to_string(), "-100");
     /// }
     /// ```
     fn rem(self, other: u32) -> Integer {
@@ -351,12 +351,12 @@ impl RemAssign<u32> for Integer {
     /// fn main() {
     ///     // 3 * 123 + 87 = 456
     ///     let mut x = Integer::from(456u32);
-    ///     x %= 123;
+    ///     x %= 123u32;
     ///     assert_eq!(x.to_string(), "87");
     ///
     ///     // -8,130,081,300 * 123 - 100 = -10^12
     ///     let mut x = -Integer::trillion();
-    ///     x %= 123;
+    ///     x %= 123u32;
     ///     assert_eq!(x.to_string(), "-100");
     /// }
     /// ```
@@ -386,10 +386,10 @@ impl Rem<Integer> for u32 {
     ///
     /// fn main() {
     ///     // 3 * 123 + 87 = 456
-    ///     assert_eq!(456 % Integer::from(-123), 87);
+    ///     assert_eq!(456u32 % Integer::from(-123), 87);
     ///
     ///     // 0 * 10^12 + 123 = 123
-    ///     assert_eq!(123 % Integer::trillion(), 123);
+    ///     assert_eq!(123u32 % Integer::trillion(), 123);
     /// }
     /// ```
     fn rem(self, other: Integer) -> u32 {
@@ -419,10 +419,10 @@ impl<'a> Rem<&'a Integer> for u32 {
     ///
     /// fn main() {
     ///     // 3 * 123 + 87 = 456
-    ///     assert_eq!(456 % &Integer::from(-123), 87);
+    ///     assert_eq!(456u32 % &Integer::from(-123), 87);
     ///
     ///     // 0 * 10^12 + 123 = 123
-    ///     assert_eq!(123 % &-Integer::trillion(), 123);
+    ///     assert_eq!(123u32 % &-Integer::trillion(), 123);
     /// }
     /// ```
     fn rem(self, other: &'a Integer) -> u32 {
@@ -449,12 +449,12 @@ impl RemAssign<Integer> for u32 {
     ///
     /// fn main() {
     ///     // 3 * 123 + 87 = 456
-    ///     let mut n = 456;
+    ///     let mut n = 456u32;
     ///     n %= Integer::from(123u32);
     ///     assert_eq!(n, 87);
     ///
     ///     // 0 * 10^12 + 123 = 123
-    ///     let mut n = 123;
+    ///     let mut n = 123u32;
     ///     n %= -Integer::trillion();
     ///     assert_eq!(n, 123);
     /// }
@@ -483,12 +483,12 @@ impl<'a> RemAssign<&'a Integer> for u32 {
     ///
     /// fn main() {
     ///     // 3 * 123 + 87 = 456
-    ///     let mut n = 456;
+    ///     let mut n = 456u32;
     ///     n %= &Integer::from(123u32);
     ///     assert_eq!(n, 87);
     ///
     ///     // 0 * 10^12 + 123 = 123
-    ///     let mut n = 123;
+    ///     let mut n = 123u32;
     ///     n %= &-Integer::trillion();
     ///     assert_eq!(n, 123);
     /// }
@@ -522,10 +522,10 @@ impl NegMod<u32> for Integer {
     ///
     /// fn main() {
     ///     // 4 * 123 - 36 = 456
-    ///     assert_eq!(Integer::from(456u32).neg_mod(123), 36);
+    ///     assert_eq!(Integer::from(456u32).neg_mod(123u32), 36);
     ///
     ///     // -8,130,081,300 * 123 - 100 = -10^12
-    ///     assert_eq!((-Integer::trillion()).neg_mod(123), 100);
+    ///     assert_eq!((-Integer::trillion()).neg_mod(123u32), 100);
     /// }
     /// ```
     fn neg_mod(self, other: u32) -> u32 {
@@ -561,10 +561,10 @@ impl<'a> NegMod<u32> for &'a Integer {
     ///
     /// fn main() {
     ///     // 4 * 123 - 36 = 456
-    ///     assert_eq!((&Integer::from(456u32)).neg_mod(123), 36);
+    ///     assert_eq!((&Integer::from(456u32)).neg_mod(123u32), 36);
     ///
     ///     // -8,130,081,300 * 123 - 100 = -10^12
-    ///     assert_eq!((&-Integer::trillion()).neg_mod(123), 100);
+    ///     assert_eq!((&-Integer::trillion()).neg_mod(123u32), 100);
     /// }
     /// ```
     fn neg_mod(self, other: u32) -> u32 {
@@ -597,12 +597,12 @@ impl NegModAssign<u32> for Integer {
     /// fn main() {
     ///     // 4 * 123 - 36 = 456
     ///     let mut x = Integer::from(456u32);
-    ///     x.neg_mod_assign(123);
+    ///     x.neg_mod_assign(123u32);
     ///     assert_eq!(x.to_string(), "36");
     ///
     ///     // -8,130,081,300 * 123 - 100 = -10^12
     ///     let mut x = -Integer::trillion();
-    ///     x.neg_mod_assign(123);
+    ///     x.neg_mod_assign(123u32);
     ///     assert_eq!(x.to_string(), "100");
     /// }
     /// ```
@@ -634,10 +634,10 @@ impl NegMod<Integer> for u32 {
     ///
     /// fn main() {
     ///     // 4 * 123 - 36 = 456
-    ///     assert_eq!(456.neg_mod(Integer::from(123u32)).to_string(), "36");
+    ///     assert_eq!(456u32.neg_mod(Integer::from(123u32)).to_string(), "36");
     ///
     ///     // 0 * 10^12 + 123 = 123
-    ///     assert_eq!(123.neg_mod(-Integer::trillion()).to_string(), "999999999877");
+    ///     assert_eq!(123u32.neg_mod(-Integer::trillion()).to_string(), "999999999877");
     /// }
     /// ```
     fn neg_mod(self, other: Integer) -> Natural {
@@ -668,10 +668,10 @@ impl<'a> NegMod<&'a Integer> for u32 {
     ///
     /// fn main() {
     ///     // 4 * 123 - 36 = 456
-    ///     assert_eq!(456.neg_mod(&Integer::from(123u32)).to_string(), "36");
+    ///     assert_eq!(456u32.neg_mod(&Integer::from(123u32)).to_string(), "36");
     ///
     ///     // 0 * 10^12 + 123 = 123
-    ///     assert_eq!(123.neg_mod(&-Integer::trillion()).to_string(), "999999999877");
+    ///     assert_eq!(123u32.neg_mod(&-Integer::trillion()).to_string(), "999999999877");
     /// }
     /// ```
     fn neg_mod(self, other: &'a Integer) -> Natural {
@@ -702,10 +702,10 @@ impl CeilingMod<u32> for Integer {
     ///
     /// fn main() {
     ///     // 4 * 123 + -36 = 456
-    ///     assert_eq!(Integer::from(456u32).ceiling_mod(123).to_string(), "-36");
+    ///     assert_eq!(Integer::from(456u32).ceiling_mod(123u32).to_string(), "-36");
     ///
     ///     // -8,130,081,300 * 123 + -100 = -10^12
-    ///     assert_eq!((-Integer::trillion()).ceiling_mod(123).to_string(), "-100");
+    ///     assert_eq!((-Integer::trillion()).ceiling_mod(123u32).to_string(), "-100");
     /// }
     /// ```
     fn ceiling_mod(self, other: u32) -> Integer {
@@ -736,10 +736,10 @@ impl<'a> CeilingMod<u32> for &'a Integer {
     ///
     /// fn main() {
     ///     // 4 * 123 + -36 = 456
-    ///     assert_eq!((&Integer::from(456u32)).ceiling_mod(123).to_string(), "-36");
+    ///     assert_eq!((&Integer::from(456u32)).ceiling_mod(123u32).to_string(), "-36");
     ///
     ///     // -8,130,081,300 * 123 + -100 = -10^12
-    ///     assert_eq!((&-Integer::trillion()).ceiling_mod(123).to_string(), "-100");
+    ///     assert_eq!((&-Integer::trillion()).ceiling_mod(123u32).to_string(), "-100");
     /// }
     /// ```
     fn ceiling_mod(self, other: u32) -> Integer {
@@ -769,12 +769,12 @@ impl CeilingModAssign<u32> for Integer {
     /// fn main() {
     ///     // 4 * 123 + -36 = 456
     ///     let mut x = Integer::from(456u32);
-    ///     x.ceiling_mod_assign(123);
+    ///     x.ceiling_mod_assign(123u32);
     ///     assert_eq!(x.to_string(), "-36");
     ///
     ///     // 8,130,081,301 * 123 + -23 = 10^12
     ///     let mut x = -Integer::trillion();
-    ///     x.ceiling_mod_assign(123);
+    ///     x.ceiling_mod_assign(123u32);
     ///     assert_eq!(x.to_string(), "-100");
     /// }
     /// ```
@@ -808,10 +808,10 @@ impl CeilingMod<Integer> for u32 {
     ///
     /// fn main() {
     ///     // 4 * 123 + -36 = 456
-    ///     assert_eq!(456.ceiling_mod(Integer::from(123u32)).to_string(), "-36");
+    ///     assert_eq!(456u32.ceiling_mod(Integer::from(123u32)).to_string(), "-36");
     ///
     ///     // 1 * 10^12 + -999,999,999,877 = 123
-    ///     assert_eq!(123.ceiling_mod(-Integer::trillion()).to_string(), "-999999999877");
+    ///     assert_eq!(123u32.ceiling_mod(-Integer::trillion()).to_string(), "-999999999877");
     /// }
     /// ```
     fn ceiling_mod(self, other: Integer) -> Integer {
@@ -843,10 +843,10 @@ impl<'a> CeilingMod<&'a Integer> for u32 {
     ///
     /// fn main() {
     ///     // 4 * 123 + -36 = 456
-    ///     assert_eq!(456.ceiling_mod(&Integer::from(123u32)).to_string(), "-36");
+    ///     assert_eq!(456u32.ceiling_mod(&Integer::from(123u32)).to_string(), "-36");
     ///
     ///     // 1 * 10^12 + -999,999,999,877 = 123
-    ///     assert_eq!(123.ceiling_mod(&-Integer::trillion()).to_string(), "-999999999877");
+    ///     assert_eq!(123u32.ceiling_mod(&-Integer::trillion()).to_string(), "-999999999877");
     /// }
     /// ```
     fn ceiling_mod(self, other: &'a Integer) -> Integer {

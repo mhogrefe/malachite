@@ -19,6 +19,7 @@ pub mod eq_i32_mod_power_of_two;
 pub mod eq_mod_power_of_two;
 pub mod eq_u32_mod_power_of_two;
 pub mod eq_u32_mod_u32;
+pub mod mod_i32;
 pub mod mod_power_of_two;
 pub mod mod_u32;
 pub mod mul;
@@ -57,6 +58,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     eq_mod_power_of_two::register(registry);
     eq_u32_mod_power_of_two::register(registry);
     eq_u32_mod_u32::register(registry);
+    mod_i32::register(registry);
     mod_power_of_two::register(registry);
     mod_u32::register(registry);
     mul::register(registry);

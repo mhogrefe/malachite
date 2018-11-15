@@ -270,12 +270,12 @@ fn test_div_rem_i32() {
         assert_eq!(q.to_string(), quotient);
         assert_eq!(r.to_string(), remainder);
 
-        //TODO let (q, r) = (
-        //TODO     Integer::from_str(u).unwrap() / v,
-        //TODO     Integer::from_str(u).unwrap() % v,
-        //TODO );
-        //TODO assert_eq!(q.to_string(), quotient);
-        //TODO assert_eq!(r.to_string(), remainder);
+        let (q, r) = (
+            Integer::from_str(u).unwrap() / v,
+            Integer::from_str(u).unwrap() % v,
+        );
+        assert_eq!(q.to_string(), quotient);
+        assert_eq!(r.to_string(), remainder);
     };
     test("0", 1, "0", "0");
     test("0", 123, "0", "0");
@@ -941,7 +941,7 @@ fn i32_div_mod_integer_fail() {
 fn i32_div_mod_integer_ref_fail() {
     10i32.div_mod(&Integer::ZERO);
 }
-//TODO
+
 #[test]
 fn test_i32_div_rem_integer() {
     let test = |i: i32, j, quotient, remainder| {
@@ -1298,11 +1298,11 @@ fn div_rem_i32_properties_helper(n: &Integer, i: i32) {
     assert_eq!(quotient_alt, quotient);
     assert_eq!(remainder_alt, remainder);
 
-    //TODO let (quotient_alt, remainder_alt) = (n / u, n % u);
-    //TODO assert_eq!(quotient_alt, quotient);
-    //TODO assert_eq!(remainder_alt, remainder);
+    let (quotient_alt, remainder_alt) = (n / i, n % i);
+    assert_eq!(quotient_alt, quotient);
+    assert_eq!(remainder_alt, remainder);
 
-    //TODO assert_eq!(n.div_rem(Integer::from(u)), (quotient.clone(), remainder));
+    //TODO assert_eq!(n.div_rem(Integer::from(i)), (quotient.clone(), remainder));
 
     let (num_quotient, num_remainder) = num_div_rem_i32(integer_to_bigint(n), i);
     assert_eq!(bigint_to_integer(&num_quotient), quotient);

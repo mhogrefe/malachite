@@ -318,7 +318,7 @@ fn benchmark_integer_rem_u32_library_comparison(gm: GenerationMode, limit: usize
     m_run_benchmark(
         "Integer % u32",
         BenchmarkType::LibraryComparison,
-        nrm_pairs_of_integer_and_positive_unsigned(gm),
+        nrm_pairs_of_integer_and_positive_unsigned::<u32>(gm),
         gm.name(),
         limit,
         file_name,
@@ -530,7 +530,7 @@ fn benchmark_integer_ceiling_mod_u32_library_comparison(
     m_run_benchmark(
         "Integer.ceiling_mod(u32)",
         BenchmarkType::LibraryComparison,
-        rm_pairs_of_integer_and_positive_unsigned(gm),
+        rm_pairs_of_integer_and_positive_unsigned::<u32>(gm),
         gm.name(),
         limit,
         file_name,
