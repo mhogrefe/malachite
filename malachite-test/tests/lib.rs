@@ -184,6 +184,7 @@ pub mod natural {
         pub mod neg;
         pub mod next_power_of_two;
         pub mod parity;
+        pub mod saturating_sub_u32;
         pub mod shl_i;
         pub mod shl_u;
         pub mod shr_i;

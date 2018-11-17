@@ -24,6 +24,7 @@ pub mod mul_u32;
 pub mod neg;
 pub mod next_power_of_two;
 pub mod parity;
+pub mod saturating_sub_u32;
 pub mod shl_i;
 pub mod shl_u;
 pub mod shr_i;
@@ -58,6 +59,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     mul_u32::register(registry);
     neg::register(registry);
     parity::register(registry);
+    saturating_sub_u32::register(registry);
     shl_i::register(registry);
     shl_u::register(registry);
     shr_i::register(registry);

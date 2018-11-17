@@ -114,6 +114,37 @@ impl<'a> CheckedSub<u32> for &'a Natural {
     }
 }
 
+/// Subtracts a `Natural` from a `u32`, taking the `Natural` by value. If the `Natural` is greater
+/// than the `u32`, returns `None`.
+///
+/// Time: worst case O(1)
+///
+/// Additional memory: worst case O(1)
+///
+/// # Examples
+/// ```
+/// extern crate malachite_base;
+/// extern crate malachite_nz;
+///
+/// use malachite_base::num::{CheckedSub, Zero};
+/// use malachite_nz::natural::Natural;
+///
+/// fn main() {
+///     assert_eq!(123.checked_sub(Natural::from(123u32)), Some(0));
+///     assert_eq!(123.checked_sub(Natural::ZERO), Some(123));
+///     assert_eq!(456.checked_sub(Natural::from(123u32)), Some(333));
+///     assert_eq!(123.checked_sub(Natural::from(456u32)), None);
+///     assert_eq!(123.checked_sub(Natural::trillion()), None);
+/// }
+/// ```
+impl CheckedSub<Natural> for u32 {
+    type Output = u32;
+
+    fn checked_sub(self, other: Natural) -> Option<u32> {
+        CheckedSub::checked_sub(self, &other)
+    }
+}
+
 /// Subtracts a `Natural` from a `u32`, taking the `Natural` by reference. If the `Natural` is
 /// greater than the `u32`, returns `None`.
 ///

@@ -13,6 +13,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_natural_checked_sub_u32);
     register_demo!(registry, demo_natural_checked_sub_u32_ref);
     register_demo!(registry, demo_u32_checked_sub_natural);
+    register_demo!(registry, demo_u32_checked_sub_natural_ref);
     register_bench!(
         registry,
         Large,
@@ -27,6 +28,11 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
         registry,
         Large,
         benchmark_u32_checked_sub_natural_library_comparison
+    );
+    register_bench!(
+        registry,
+        Large,
+        benchmark_u32_checked_sub_natural_evaluation_strategy
     );
 }
 
@@ -64,6 +70,18 @@ fn demo_u32_checked_sub_natural(gm: GenerationMode, limit: usize) {
         let n_old = n.clone();
         println!(
             "{}.checked_sub({}) = {:?}",
+            u,
+            n_old,
+            CheckedSub::checked_sub(u, n)
+        );
+    }
+}
+
+fn demo_u32_checked_sub_natural_ref(gm: GenerationMode, limit: usize) {
+    for (u, n) in pairs_of_unsigned_and_natural::<u32>(gm).take(limit) {
+        let n_old = n.clone();
+        println!(
+            "{}.checked_sub(&{}) = {:?}",
             u,
             n_old,
             CheckedSub::checked_sub(u, &n)
@@ -135,7 +153,7 @@ fn benchmark_u32_checked_sub_natural_library_comparison(
     file_name: &str,
 ) {
     m_run_benchmark(
-        "u32.checked_sub(&Natural)",
+        "u32.checked_sub(Natural)",
         BenchmarkType::LibraryComparison,
         rm_pairs_of_unsigned_and_natural::<u32>(gm),
         gm.name(),
@@ -146,9 +164,36 @@ fn benchmark_u32_checked_sub_natural_library_comparison(
         &mut [
             (
                 "malachite",
-                &mut (|(_, (x, y))| no_out!(CheckedSub::checked_sub(x, &y))),
+                &mut (|(_, (x, y))| no_out!(CheckedSub::checked_sub(x, y))),
             ),
             ("rug", &mut (|((x, y), _)| no_out!(x - y))),
+        ],
+    );
+}
+
+fn benchmark_u32_checked_sub_natural_evaluation_strategy(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "u32.checked_sub(Natural)",
+        BenchmarkType::EvaluationStrategy,
+        pairs_of_unsigned_and_natural::<u32>(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(_, ref n)| n.significant_bits() as usize),
+        "n.significant_bits()",
+        &mut [
+            (
+                "u32.checked_sub(Natural)",
+                &mut (|(x, y)| no_out!(CheckedSub::checked_sub(x, y))),
+            ),
+            (
+                "u32.checked_sub(&Natural)",
+                &mut (|(x, y)| no_out!(CheckedSub::checked_sub(x, &y))),
+            ),
         ],
     );
 }

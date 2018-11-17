@@ -46,6 +46,9 @@ fn test_checked_sub_u32() {
 #[test]
 fn test_u32_checked_sub_natural() {
     let test = |u: u32, v, out| {
+        let on = CheckedSub::checked_sub(u, Natural::from_str(v).unwrap());
+        assert_eq!(format!("{:?}", on), out);
+
         let on = CheckedSub::checked_sub(u, &Natural::from_str(v).unwrap());
         assert_eq!(format!("{:?}", on), out);
     };
@@ -86,6 +89,8 @@ fn sub_u32_properties() {
             assert_eq!(difference_alt, difference);
 
             let reverse_difference = CheckedSub::checked_sub(u, n);
+            let reverse_difference_alt = CheckedSub::checked_sub(u, n.clone());
+            assert_eq!(reverse_difference, reverse_difference_alt);
             assert_eq!(
                 reverse_difference.is_some(),
                 *n == u || difference.is_none()
