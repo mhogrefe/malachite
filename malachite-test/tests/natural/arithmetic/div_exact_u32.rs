@@ -1,7 +1,6 @@
 use common::test_properties;
 use malachite_base::num::{DivExact, DivExactAssign, DivRound, One, Zero};
 use malachite_base::round::RoundingMode;
-use malachite_nz::integer::Integer;
 use malachite_nz::natural::arithmetic::div_exact_u32::{
     self, _limbs_div_exact_3_in_place_alt, _limbs_div_exact_3_to_out_alt, limbs_div_exact_3,
     limbs_div_exact_3_in_place, limbs_div_exact_3_to_out, limbs_div_exact_limb,
@@ -10,8 +9,9 @@ use malachite_nz::natural::arithmetic::div_exact_u32::{
 use malachite_nz::natural::Natural;
 use malachite_test::common::{natural_to_rug_integer, rug_integer_to_natural};
 use malachite_test::inputs::base::{
-    odd_u32s, pairs_of_u32_vec_and_positive_u32_var_2, pairs_of_u32_vec_var_3, positive_unsigneds,
-    triples_of_u32_vec_u32_vec_and_positive_u32_var_2, vecs_of_unsigned_var_5,
+    odd_u32s, pairs_of_u32_and_positive_u32_var_1, pairs_of_u32_vec_and_positive_u32_var_2,
+    pairs_of_u32_vec_var_3, positive_unsigneds, triples_of_u32_vec_u32_vec_and_positive_u32_var_2,
+    vecs_of_unsigned_var_5,
 };
 use malachite_test::inputs::natural::{
     naturals, pairs_of_natural_and_positive_u32_var_1, pairs_of_natural_and_u32_var_3,
@@ -477,8 +477,6 @@ fn div_exact_u32_properties_helper(n: &Natural, u: u32) {
         quotient
     );
 
-    assert_eq!(Integer::from(n).div_exact(u), quotient);
-
     assert_eq!(quotient * u, *n);
 }
 
@@ -524,11 +522,15 @@ fn div_exact_u32_properties() {
 
             assert_eq!(u.div_round(n, RoundingMode::Exact), quotient);
 
-            assert_eq!(u.div_exact(Integer::from(n)), quotient);
-
             assert_eq!(quotient * n, u);
         },
     );
+
+    test_properties(pairs_of_u32_and_positive_u32_var_1, |&(x, y)| {
+        let quotient = x.div_exact(y);
+        assert_eq!(quotient, Natural::from(x).div_exact(y));
+        assert_eq!(quotient, DivExact::div_exact(x, Natural::from(y)));
+    });
 
     test_properties(naturals, |n| {
         assert_eq!(n.div_exact(1), *n);

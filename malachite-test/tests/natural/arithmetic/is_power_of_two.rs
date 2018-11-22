@@ -3,7 +3,7 @@ use malachite_base::num::{IsPowerOfTwo, SignificantBits};
 use malachite_nz::natural::arithmetic::is_power_of_two::limbs_is_power_of_two;
 use malachite_nz::natural::Natural;
 use malachite_test::common::natural_to_rug_integer;
-use malachite_test::inputs::base::vecs_of_unsigned_var_1;
+use malachite_test::inputs::base::{unsigneds, vecs_of_unsigned_var_1};
 use malachite_test::inputs::natural::naturals;
 use rug;
 use std::str::FromStr;
@@ -73,5 +73,9 @@ fn is_power_of_two_properties() {
                 assert_eq!(x >> trailing_zeros == 1, is_power_of_two);
             }
         }
+    });
+
+    test_properties(unsigneds::<u32>, |&u| {
+        assert_eq!(u.is_power_of_two(), Natural::from(u).is_power_of_two());
     });
 }

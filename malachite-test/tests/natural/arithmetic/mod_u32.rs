@@ -3,12 +3,12 @@ use malachite_base::misc::CheckedFrom;
 use malachite_base::num::{
     CeilingDivNegMod, DivMod, Mod, ModAssign, NegMod, NegModAssign, One, Zero,
 };
-use malachite_nz::integer::Integer;
 use malachite_nz::natural::arithmetic::mod_u32::limbs_mod_limb;
 use malachite_nz::natural::Natural;
 use malachite_test::common::{natural_to_biguint, natural_to_rug_integer};
 use malachite_test::inputs::base::{
-    pairs_of_unsigned_vec_and_positive_unsigned_var_1, positive_unsigneds,
+    pairs_of_unsigned_and_positive_unsigned, pairs_of_unsigned_vec_and_positive_unsigned_var_1,
+    positive_unsigneds,
 };
 use malachite_test::inputs::natural::{
     naturals, pairs_of_natural_and_positive_u32_var_1, pairs_of_natural_and_positive_unsigned,
@@ -346,9 +346,6 @@ fn mod_u32_properties_helper(n: &Natural, u: u32) {
     assert_eq!(num_rem_u32(natural_to_biguint(n), u), remainder);
     assert_eq!(natural_to_rug_integer(n) % u, remainder);
 
-    assert_eq!(Integer::from(n) % u, remainder);
-    assert_eq!(Integer::from(n).mod_op(u), remainder);
-
     assert!(remainder < u);
 }
 
@@ -402,15 +399,18 @@ fn mod_u32_properties() {
 
             assert_eq!(u.div_mod(n).1, remainder);
 
-            assert_eq!(u % Integer::from(n), remainder);
-            assert_eq!(u.mod_op(Integer::from(n)), remainder);
-
             if u != 0 && u < *n {
                 assert_eq!(remainder, u);
             }
             assert!(remainder < *n);
         },
     );
+
+    test_properties(pairs_of_unsigned_and_positive_unsigned, |&(x, y)| {
+        let result = x % y;
+        assert_eq!(result, Natural::from(x) % y);
+        assert_eq!(result, x % Natural::from(y));
+    });
 
     test_properties(naturals, |n| {
         assert_eq!(n % 1, 0);
@@ -451,9 +451,6 @@ fn neg_mod_u32_properties_helper(n: &Natural, u: u32) {
     //TODO assert_eq!(n.neg_mod(Natural::from(u)), remainder);
 
     assert_eq!(rug_neg_mod_u32(natural_to_rug_integer(n), u), remainder);
-
-    assert_eq!(Integer::from(n).neg_mod(u), remainder);
-
     assert!(remainder < u);
 }
 
@@ -490,14 +487,18 @@ fn neg_mod_u32_properties() {
             assert!(remainder_alt.is_valid());
             assert_eq!(remainder_alt, remainder);
 
-            assert_eq!(u.neg_mod(Integer::from(n)), remainder);
-
             if u != 0 && u < *n {
                 assert_eq!(remainder, n - u);
             }
             assert!(remainder < *n);
         },
     );
+
+    test_properties(pairs_of_unsigned_and_positive_unsigned::<u32>, |&(x, y)| {
+        let result = x.neg_mod(y);
+        assert_eq!(result, Natural::from(x).neg_mod(y));
+        assert_eq!(result, x.neg_mod(Natural::from(y)));
+    });
 
     test_properties(naturals, |n| {
         assert_eq!(n.neg_mod(1), 0);

@@ -1,6 +1,7 @@
 use common::test_properties;
 use malachite_base::num::{DivisibleBy, Parity};
 use malachite_nz::natural::Natural;
+use malachite_test::inputs::base::unsigneds;
 use malachite_test::inputs::natural::naturals;
 use std::str::FromStr;
 
@@ -40,6 +41,10 @@ fn even_properties() {
         assert_eq!(!x.odd(), even);
         assert_eq!((x + 1).odd(), even);
     });
+
+    test_properties(unsigneds::<u32>, |&u| {
+        assert_eq!(u.even(), Natural::from(u).even());
+    });
 }
 
 #[test]
@@ -49,5 +54,9 @@ fn odd_properties() {
         assert_eq!(!x.divisible_by(2), odd);
         assert_eq!(!x.even(), odd);
         assert_eq!((x + 1).even(), odd);
+    });
+
+    test_properties(unsigneds::<u32>, |&u| {
+        assert_eq!(u.odd(), Natural::from(u).odd());
     });
 }

@@ -4,7 +4,8 @@ use malachite_nz::natural::Natural;
 use malachite_test::common::{
     biguint_to_natural, natural_to_biguint, natural_to_rug_integer, rug_integer_to_natural,
 };
-use malachite_test::inputs::natural::{naturals, pairs_of_naturals};
+use malachite_test::inputs::base::pairs_of_unsigneds;
+use malachite_test::inputs::natural::{naturals, pairs_of_natural_and_unsigned, pairs_of_naturals};
 use malachite_test::natural::arithmetic::checked_sub::checked_sub;
 use num::BigUint;
 use rug;
@@ -126,6 +127,18 @@ fn checked_sub_properties() {
             assert!(difference <= *x);
             assert_eq!(difference + y, *x);
         }
+    });
+
+    test_properties(pairs_of_natural_and_unsigned::<u32>, |&(ref x, y)| {
+        let difference = x.checked_sub(Natural::from(y));
+        assert_eq!(x.checked_sub(y), difference);
+    });
+
+    test_properties(pairs_of_unsigneds::<u32>, |&(x, y)| {
+        assert_eq!(
+            x.checked_sub(y).map(Natural::from),
+            Natural::from(x).checked_sub(Natural::from(y))
+        );
     });
 
     #[allow(unknown_lints, identity_op, eq_op)]

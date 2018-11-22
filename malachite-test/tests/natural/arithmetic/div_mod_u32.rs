@@ -1,10 +1,10 @@
 use common::test_properties;
+use malachite_base::misc::CheckedFrom;
 use malachite_base::num::{
     CeilingDivAssignNegMod, CeilingDivNegMod, DivAssignMod, DivAssignRem, DivMod, DivRem, DivRound,
     NegMod, One, Zero,
 };
 use malachite_base::round::RoundingMode;
-use malachite_nz::integer::Integer;
 use malachite_nz::natural::arithmetic::div_mod_u32::{
     limbs_div_limb_in_place_mod, limbs_div_limb_mod, limbs_div_limb_to_out_mod,
 };
@@ -13,8 +13,8 @@ use malachite_test::common::{
     biguint_to_natural, natural_to_biguint, natural_to_rug_integer, rug_integer_to_natural,
 };
 use malachite_test::inputs::base::{
-    pairs_of_unsigned_vec_and_positive_unsigned_var_1, positive_unsigneds,
-    triples_of_unsigned_vec_unsigned_vec_and_positive_unsigned_var_1,
+    pairs_of_unsigned_and_positive_unsigned, pairs_of_unsigned_vec_and_positive_unsigned_var_1,
+    positive_unsigneds, triples_of_unsigned_vec_unsigned_vec_and_positive_unsigned_var_1,
 };
 use malachite_test::inputs::natural::{
     naturals, pairs_of_natural_and_positive_u32_var_1, pairs_of_natural_and_positive_unsigned,
@@ -217,14 +217,6 @@ fn test_div_mod_u32() {
         );
         assert_eq!(q.to_string(), quotient);
         assert_eq!(r, remainder);
-
-        let (q, r) = Integer::from_str(u).unwrap().div_mod(v);
-        assert_eq!(q.to_string(), quotient);
-        assert_eq!(r, remainder);
-
-        let (q, r) = Integer::from_str(u).unwrap().div_rem(v);
-        assert_eq!(q.to_string(), quotient);
-        assert_eq!(r, remainder);
     };
     test("0", 1, "0", 0);
     test("0", 123, "0", 0);
@@ -320,10 +312,6 @@ fn test_ceiling_div_neg_mod_u32() {
         assert_eq!(r, remainder);
 
         let (q, r) = rug_ceiling_div_neg_mod_u32(rug::Integer::from_str(u).unwrap(), v);
-        assert_eq!(q.to_string(), quotient);
-        assert_eq!(r, remainder);
-
-        let (q, r) = Integer::from_str(u).unwrap().ceiling_div_neg_mod(v);
         assert_eq!(q.to_string(), quotient);
         assert_eq!(r, remainder);
     };
@@ -430,14 +418,6 @@ fn test_u32_div_mod_natural() {
         let (q, r) = u.div_rem(&Natural::from_str(v).unwrap());
         assert_eq!(q, quotient);
         assert_eq!(r, remainder);
-
-        let (q, r) = u.div_mod(&Integer::from_str(v).unwrap());
-        assert_eq!(q, quotient);
-        assert_eq!(r, remainder);
-
-        let (q, r) = u.div_rem(&Integer::from_str(v).unwrap());
-        assert_eq!(q, quotient);
-        assert_eq!(r, remainder);
     };
     test(0, "1", 0, 0);
     test(0, "123", 0, 0);
@@ -524,10 +504,6 @@ fn test_u32_ceiling_div_neg_mod_natural() {
         assert_eq!(q, quotient);
         assert_eq!(r.to_string(), remainder);
         assert!(r.is_valid());
-
-        let (q, r) = u.ceiling_div_neg_mod(&Integer::from_str(v).unwrap());
-        assert_eq!(q, quotient);
-        assert_eq!(r.to_string(), remainder);
     };
     test(0, "1", 0, "0");
     test(0, "123", 0, "0");
@@ -670,14 +646,6 @@ fn div_mod_u32_properties_helper(n: &Natural, u: u32) {
     assert_eq!(rug_integer_to_natural(&rug_quotient), quotient);
     assert_eq!(rug_remainder, remainder);
 
-    let (quotient_alt, remainder_alt) = Integer::from(n).div_mod(u);
-    assert_eq!(quotient_alt, quotient);
-    assert_eq!(remainder_alt, remainder);
-
-    let (quotient_alt, remainder_alt) = Integer::from(n).div_rem(u);
-    assert_eq!(quotient_alt, quotient);
-    assert_eq!(remainder_alt, remainder);
-
     assert!(remainder < u);
     assert_eq!(quotient * u + remainder, *n);
 }
@@ -740,14 +708,6 @@ fn div_mod_u32_properties() {
 
             //TODO assert_eq!((quotient, remainder), Natural::from(u).div_mod(n));
 
-            let (quotient_alt, remainder_alt) = u.div_mod(Integer::from(n));
-            assert_eq!(quotient_alt, quotient);
-            assert_eq!(remainder_alt, remainder);
-
-            let (quotient_alt, remainder_alt) = u.div_rem(Integer::from(n));
-            assert_eq!(quotient_alt, quotient);
-            assert_eq!(remainder_alt, remainder);
-
             if u != 0 && u < *n {
                 assert_eq!(remainder, u);
             }
@@ -755,6 +715,13 @@ fn div_mod_u32_properties() {
             assert_eq!(quotient * n + remainder, u);
         },
     );
+
+    test_properties(pairs_of_unsigned_and_positive_unsigned::<u32>, |&(x, y)| {
+        let result = u32::from(x).div_mod(u32::from(y));
+        let (q_alt, r_alt) = Natural::from(x).div_mod(y);
+        assert_eq!(result, (u32::checked_from(q_alt).unwrap(), r_alt));
+        assert_eq!(result, x.div_mod(Natural::from(y)));
+    });
 
     test_properties(naturals, |n| {
         let (q, r) = n.div_mod(1);
@@ -798,10 +765,6 @@ fn ceiling_div_neg_mod_u32_properties_helper(n: &Natural, u: u32) {
     let (rug_quotient, rug_remainder) = rug_ceiling_div_neg_mod_u32(natural_to_rug_integer(n), u);
     assert_eq!(rug_integer_to_natural(&rug_quotient), quotient);
     assert_eq!(rug_remainder, remainder);
-
-    let (quotient_alt, remainder_alt) = Integer::from(n).ceiling_div_neg_mod(u);
-    assert_eq!(quotient_alt, quotient);
-    assert_eq!(remainder_alt, remainder);
 
     assert!(remainder < u);
     assert_eq!(quotient * u - remainder, *n);
@@ -855,10 +818,6 @@ fn ceiling_div_neg_mod_u32_properties() {
 
             //TODO assert_eq!((quotient, remainder), Natural::from(u).ceiling_div_neg_mod(n));
 
-            let (quotient_alt, remainder_alt) = u.ceiling_div_neg_mod(Integer::from(n));
-            assert_eq!(quotient_alt, quotient);
-            assert_eq!(remainder_alt, remainder);
-
             if u != 0 && u < *n {
                 assert_eq!(remainder, n - u);
             }
@@ -866,6 +825,14 @@ fn ceiling_div_neg_mod_u32_properties() {
             assert_eq!(quotient * n - remainder, u);
         },
     );
+
+    test_properties(pairs_of_unsigned_and_positive_unsigned::<u32>, |&(x, y)| {
+        let result = u32::from(x).ceiling_div_neg_mod(u32::from(y));
+        let (q_alt, r_alt) = Natural::from(x).ceiling_div_neg_mod(y);
+        assert_eq!(result, (u32::checked_from(q_alt).unwrap(), r_alt));
+        let (q_alt, r_alt) = x.ceiling_div_neg_mod(Natural::from(y));
+        assert_eq!(result, (q_alt, u32::checked_from(r_alt).unwrap()));
+    });
 
     test_properties(naturals, |n| {
         let (q, r) = n.ceiling_div_neg_mod(1);

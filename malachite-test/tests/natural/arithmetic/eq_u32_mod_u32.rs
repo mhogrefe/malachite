@@ -1,6 +1,5 @@
 use common::test_properties;
 use malachite_base::num::{DivisibleBy, EqMod, Zero};
-use malachite_nz::integer::Integer;
 use malachite_nz::natural::arithmetic::eq_u32_mod_u32::{
     _combined_limbs_eq_limb_mod_limb, limbs_eq_limb_mod_limb,
 };
@@ -9,6 +8,7 @@ use malachite_nz::natural::Natural;
 use malachite_test::common::natural_to_rug_integer;
 use malachite_test::inputs::base::{
     pairs_of_unsigneds, triples_of_unsigned_vec_unsigned_and_positive_unsigned_var_1,
+    triples_of_unsigneds,
 };
 use malachite_test::inputs::natural::{
     pairs_of_natural_and_unsigned, triples_of_natural_unsigned_and_unsigned,
@@ -114,8 +114,6 @@ fn eq_u32_mod_u32_properties() {
 
             //TODO assert_eq!(n.eq_mod(Natural::from(u), modulus), equal);
 
-            assert_eq!(Integer::from(n).eq_mod(u, modulus), equal);
-
             assert_eq!(natural_to_rug_integer(n).is_congruent_u(u, modulus), equal);
         },
     );
@@ -128,10 +126,6 @@ fn eq_u32_mod_u32_properties() {
             assert!(*n == u || modulus != 0 && n % modulus == u % modulus);
 
             //TODO assert!(n.eq_mod(Natural::from(u), modulus));
-
-            assert!(Integer::from(n).eq_mod(u, modulus));
-            assert!(u.eq_mod(&Integer::from(n), modulus));
-
             assert!(natural_to_rug_integer(n).is_congruent_u(u, modulus));
         },
     );
@@ -144,10 +138,6 @@ fn eq_u32_mod_u32_properties() {
             assert!(*n != u && (modulus == 0 || n % modulus != u % modulus));
 
             //TODO assert!(!n.eq_mod(Natural::from(u), modulus));
-
-            assert!(!Integer::from(n).eq_mod(u, modulus));
-            assert!(!u.eq_mod(&Integer::from(n), modulus));
-
             assert!(!natural_to_rug_integer(n).is_congruent_u(u, modulus));
         },
     );
@@ -164,5 +154,11 @@ fn eq_u32_mod_u32_properties() {
         assert!(u.eq_mod(&Natural::from(u), modulus));
         assert_eq!(Natural::ZERO.eq_mod(u, modulus), u.divisible_by(modulus));
         assert_eq!(u.eq_mod(&Natural::ZERO, modulus), u.divisible_by(modulus));
+    });
+
+    test_properties(triples_of_unsigneds::<u32>, |&(u, v, modulus)| {
+        let equal = u.eq_mod(v, modulus);
+        assert_eq!(Natural::from(u).eq_mod(v, modulus), equal);
+        assert_eq!(EqMod::eq_mod(u, &Natural::from(v), modulus), equal);
     });
 }

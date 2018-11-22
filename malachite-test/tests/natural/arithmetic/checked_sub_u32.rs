@@ -5,7 +5,7 @@ use malachite_nz::natural::Natural;
 use malachite_test::common::{
     biguint_to_natural, natural_to_biguint, natural_to_rug_integer, rug_integer_to_natural,
 };
-use malachite_test::inputs::base::unsigneds;
+use malachite_test::inputs::base::{pairs_of_unsigneds, unsigneds};
 use malachite_test::inputs::natural::{naturals, pairs_of_natural_and_unsigned};
 use malachite_test::natural::arithmetic::checked_sub_u32::{
     num_checked_sub_u32, rug_checked_sub_u32,
@@ -129,6 +129,17 @@ fn sub_u32_properties() {
             }
         },
     );
+
+    test_properties(pairs_of_unsigneds::<u32>, |&(x, y)| {
+        let difference = x.checked_sub(y);
+        assert_eq!(
+            difference,
+            Natural::from(x)
+                .checked_sub(y)
+                .map(|z| u32::checked_from(z).unwrap())
+        );
+        assert_eq!(difference, CheckedSub::checked_sub(x, Natural::from(y)));
+    });
 
     #[allow(unknown_lints, identity_op)]
     test_properties(naturals, |n| {

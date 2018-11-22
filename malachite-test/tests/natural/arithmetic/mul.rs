@@ -4,6 +4,7 @@ use malachite_nz::natural::Natural;
 use malachite_test::common::{
     biguint_to_natural, natural_to_biguint, natural_to_rug_integer, rug_integer_to_natural,
 };
+use malachite_test::inputs::base::pairs_of_unsigneds;
 use malachite_test::inputs::natural::{
     naturals, pairs_of_natural_and_unsigned, pairs_of_naturals, triples_of_naturals,
 };
@@ -102,7 +103,7 @@ fn test_mul() {
 
 #[test]
 fn mul_properties() {
-    test_properties_custom_scale(2048, pairs_of_naturals, |&(ref x, ref y)| {
+    test_properties_custom_scale(2_048, pairs_of_naturals, |&(ref x, ref y)| {
         let product_val_val = x.clone() * y.clone();
         let product_val_ref = x.clone() * y;
         let product_ref_val = x * y.clone();
@@ -153,7 +154,7 @@ fn mul_properties() {
     });
 
     test_properties_custom_scale(
-        2048,
+        2_048,
         pairs_of_natural_and_unsigned,
         |&(ref x, y): &(Natural, u32)| {
             let product = x * Natural::from(y);
@@ -162,8 +163,25 @@ fn mul_properties() {
         },
     );
 
+    test_properties_custom_scale(
+        2_048,
+        pairs_of_natural_and_unsigned::<u32>,
+        |&(ref x, y)| {
+            let product = x * Natural::from(y);
+            assert_eq!(x * y, product);
+            assert_eq!(y * x, product);
+        },
+    );
+
+    test_properties_custom_scale(2_048, pairs_of_unsigneds::<u32>, |&(x, y)| {
+        assert_eq!(
+            Natural::from(u64::from(x) * u64::from(y)),
+            Natural::from(x) * Natural::from(y)
+        );
+    });
+
     #[allow(unknown_lints, erasing_op)]
-    test_properties_custom_scale(2048, naturals, |x| {
+    test_properties_custom_scale(2_048, naturals, |x| {
         assert_eq!(x * Natural::ZERO, 0);
         assert_eq!(Natural::ZERO * 0, 0);
         assert_eq!(x * Natural::ONE, *x);
@@ -171,7 +189,7 @@ fn mul_properties() {
         //TODO assert_eq!(x * x, x.pow(2));
     });
 
-    test_properties_custom_scale(2048, triples_of_naturals, |&(ref x, ref y, ref z)| {
+    test_properties_custom_scale(2_048, triples_of_naturals, |&(ref x, ref y, ref z)| {
         assert_eq!((x * y) * z, x * (y * z));
         assert_eq!(x * (y + z), x * y + x * z);
         assert_eq!((x + y) * z, x * z + y * z);

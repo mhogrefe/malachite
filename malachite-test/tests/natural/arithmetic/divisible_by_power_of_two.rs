@@ -4,7 +4,9 @@ use malachite_base::num::{DivisibleByPowerOfTwo, Zero};
 use malachite_nz::natural::arithmetic::divisible_by_power_of_two::limbs_divisible_by_power_of_two;
 use malachite_nz::natural::Natural;
 use malachite_test::common::natural_to_rug_integer;
-use malachite_test::inputs::base::{pairs_of_unsigned_vec_and_small_u64_var_1, unsigneds};
+use malachite_test::inputs::base::{
+    pairs_of_unsigned_and_small_unsigned, pairs_of_unsigned_vec_and_small_u64_var_1, unsigneds,
+};
 use malachite_test::inputs::natural::{
     naturals, pairs_of_natural_and_small_unsigned, pairs_of_natural_and_small_unsigned_var_1,
     pairs_of_natural_and_small_unsigned_var_2,
@@ -118,6 +120,16 @@ fn divisible_by_power_of_two_properties() {
             }
             assert!(!(-x).divisible_by_power_of_two(pow));
             assert_ne!(x >> pow << pow, *x);
+        },
+    );
+
+    test_properties(
+        pairs_of_unsigned_and_small_unsigned::<u32, u64>,
+        |&(x, pow)| {
+            assert_eq!(
+                x.divisible_by_power_of_two(pow),
+                Natural::from(x).divisible_by_power_of_two(pow)
+            );
         },
     );
 

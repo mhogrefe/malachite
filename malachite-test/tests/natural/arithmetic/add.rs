@@ -12,7 +12,7 @@ use malachite_test::common::{
 };
 use malachite_test::inputs::base::{
     pairs_of_unsigned_vec, pairs_of_unsigned_vec_var_1, pairs_of_unsigned_vec_var_3,
-    triples_of_unsigned_vec_var_3, triples_of_unsigned_vec_var_4,
+    pairs_of_unsigneds, triples_of_unsigned_vec_var_3, triples_of_unsigned_vec_var_4,
 };
 use malachite_test::inputs::natural::{
     naturals, pairs_of_natural_and_unsigned, pairs_of_naturals, triples_of_naturals,
@@ -583,14 +583,18 @@ fn add_properties() {
         assert!(sum >= *y);
     });
 
-    test_properties(
-        pairs_of_natural_and_unsigned,
-        |&(ref x, y): &(Natural, u32)| {
-            let sum = x + Natural::from(y);
-            assert_eq!(x + y, sum);
-            assert_eq!(y + x, sum);
-        },
-    );
+    test_properties(pairs_of_natural_and_unsigned::<u32>, |&(ref x, y)| {
+        let sum = x + Natural::from(y);
+        assert_eq!(x + y, sum);
+        assert_eq!(y + x, sum);
+    });
+
+    test_properties(pairs_of_unsigneds::<u32>, |&(x, y)| {
+        assert_eq!(
+            Natural::from(u64::from(x) + u64::from(y)),
+            Natural::from(x) + Natural::from(y)
+        );
+    });
 
     test_properties(naturals, |x| {
         assert_eq!(x + Natural::ZERO, *x);

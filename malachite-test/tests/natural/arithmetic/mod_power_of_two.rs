@@ -9,7 +9,9 @@ use malachite_nz::natural::arithmetic::mod_power_of_two::{
     limbs_neg_mod_power_of_two_in_place,
 };
 use malachite_nz::natural::Natural;
-use malachite_test::inputs::base::{pairs_of_unsigned_vec_and_small_u64, unsigneds};
+use malachite_test::inputs::base::{
+    pairs_of_unsigned_and_small_unsigned, pairs_of_unsigned_vec_and_small_u64, unsigneds,
+};
 use malachite_test::inputs::natural::{
     naturals, pairs_of_natural_and_small_unsigned, pairs_of_natural_and_small_unsigned_var_1,
     pairs_of_natural_and_small_unsigned_var_2, triples_of_natural_natural_and_small_unsigned,
@@ -269,6 +271,16 @@ fn mod_power_of_two_and_rem_power_of_two_properties() {
             assert_eq!(
                 n.mod_power_of_two(u).mod_power_of_two(v),
                 n.mod_power_of_two(min(u, v))
+            );
+        },
+    );
+
+    test_properties(
+        pairs_of_unsigned_and_small_unsigned::<u32, u64>,
+        |&(u, pow)| {
+            assert_eq!(
+                u.mod_power_of_two(pow),
+                Natural::from(u).mod_power_of_two(pow)
             );
         },
     );

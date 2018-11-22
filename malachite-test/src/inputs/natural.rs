@@ -388,7 +388,7 @@ pub fn nrm_pairs_of_natural_and_positive_unsigned<T: PrimitiveUnsigned>(
     }))
 }
 
-// All triples of `Natural` and positive `u32` where the `Natural` is not divisible by the `T`.
+// All pairs of `Natural` and positive `u32` where the `Natural` is divisible by the `u32`.
 pub fn pairs_of_natural_and_positive_u32_var_1(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (Natural, u32)>> {
@@ -867,6 +867,33 @@ pub fn triples_of_natural_unsigned_and_small_unsigned<
             &EXAMPLE_SEED,
             &(|seed| special_random_naturals(seed, scale)),
             &(|seed| special_random_unsigned(seed)),
+            &(|seed| u32s_geometric(seed, scale).flat_map(U::checked_from)),
+        )),
+    }
+}
+
+pub fn triples_of_unsigned_natural_and_small_unsigned<
+    T: PrimitiveUnsigned,
+    U: PrimitiveUnsigned,
+>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (T, Natural, U)>> {
+    match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_triples(
+            exhaustive_unsigned(),
+            exhaustive_naturals(),
+            exhaustive_unsigned(),
+        )),
+        GenerationMode::Random(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| random(seed)),
+            &(|seed| random_naturals(seed, scale)),
+            &(|seed| u32s_geometric(seed, scale).flat_map(U::checked_from)),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_unsigned(seed)),
+            &(|seed| special_random_naturals(seed, scale)),
             &(|seed| u32s_geometric(seed, scale).flat_map(U::checked_from)),
         )),
     }

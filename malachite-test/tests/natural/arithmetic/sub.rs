@@ -11,11 +11,15 @@ use malachite_nz::natural::Natural;
 use malachite_test::common::{
     biguint_to_natural, natural_to_biguint, natural_to_rug_integer, rug_integer_to_natural,
 };
+use malachite_test::inputs::base::pairs_of_unsigneds_var_1;
 use malachite_test::inputs::base::{
     pairs_of_unsigned_vec_var_1, pairs_of_unsigned_vec_var_3, triples_of_unsigned_vec_var_3,
     triples_of_unsigned_vec_var_9,
 };
-use malachite_test::inputs::natural::{naturals, pairs_of_naturals_var_1};
+use malachite_test::inputs::natural::{
+    naturals, pairs_of_natural_and_u32_var_1, pairs_of_naturals_var_1,
+    pairs_of_u32_and_natural_var_1,
+};
 use num::BigUint;
 use rug;
 use std::str::FromStr;
@@ -692,6 +696,18 @@ fn sub_properties() {
 
         assert!(difference <= *x);
         assert_eq!(difference + y, *x);
+    });
+
+    test_properties(pairs_of_natural_and_u32_var_1, |&(ref x, y)| {
+        assert_eq!(x - y, x - Natural::from(y));
+    });
+
+    test_properties(pairs_of_u32_and_natural_var_1, |&(x, ref y)| {
+        assert_eq!(x - y, Natural::from(x) - y);
+    });
+
+    test_properties(pairs_of_unsigneds_var_1::<u32>, |&(x, y)| {
+        assert_eq!(Natural::from(x - y), Natural::from(x) - Natural::from(y));
     });
 
     #[allow(unknown_lints, identity_op, eq_op)]

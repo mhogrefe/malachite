@@ -9,8 +9,8 @@ use malachite_test::common::{
     biguint_to_natural, natural_to_biguint, natural_to_rug_integer, rug_integer_to_natural,
 };
 use malachite_test::inputs::base::{
-    pairs_of_unsigned_vec_and_unsigned, triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_1,
-    unsigneds,
+    pairs_of_unsigned_vec_and_unsigned, pairs_of_unsigneds,
+    triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_1, unsigneds,
 };
 use malachite_test::inputs::natural::{naturals, pairs_of_natural_and_unsigned};
 use malachite_test::natural::arithmetic::mul_u32::num_mul_u32;
@@ -273,6 +273,12 @@ fn mul_u32_properties() {
             //TODO assert_eq!(product / n, u);
         },
     );
+
+    test_properties(pairs_of_unsigneds::<u32>, |&(x, y)| {
+        let product = Natural::from(u64::from(x) * u64::from(y));
+        assert_eq!(product, Natural::from(x) * y);
+        assert_eq!(product, x * Natural::from(y));
+    });
 
     #[allow(unknown_lints, erasing_op, identity_op)]
     test_properties(naturals, |n| {

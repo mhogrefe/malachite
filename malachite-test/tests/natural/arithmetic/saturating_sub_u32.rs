@@ -2,7 +2,7 @@ use common::test_properties;
 use malachite_base::misc::CheckedFrom;
 use malachite_base::num::{SaturatingSub, SaturatingSubAssign, Zero};
 use malachite_nz::natural::Natural;
-use malachite_test::inputs::base::unsigneds;
+use malachite_test::inputs::base::{pairs_of_unsigneds, unsigneds};
 use malachite_test::inputs::natural::{naturals, pairs_of_natural_and_unsigned};
 use std::str::FromStr;
 use std::u32;
@@ -97,6 +97,15 @@ fn saturating_sub_u32_properties() {
     test_properties(naturals, |n| {
         assert_eq!(n.saturating_sub(0), *n);
         assert_eq!(0.saturating_sub(n), 0);
+    });
+
+    test_properties(pairs_of_unsigneds::<u32>, |&(x, y)| {
+        let difference = x.saturating_sub(y);
+        assert_eq!(difference, Natural::from(x).saturating_sub(y));
+        assert_eq!(
+            difference,
+            SaturatingSub::saturating_sub(x, Natural::from(y))
+        );
     });
 
     test_properties(unsigneds, |&u: &u32| {

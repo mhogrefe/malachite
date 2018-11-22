@@ -1,6 +1,5 @@
 use common::test_properties;
 use malachite_base::num::{DivisibleBy, One, Zero};
-use malachite_nz::integer::Integer;
 use malachite_nz::natural::arithmetic::divisible_by_u32::{
     _combined_limbs_divisible_by_limb, limbs_divisible_by_limb,
 };
@@ -8,7 +7,7 @@ use malachite_nz::natural::arithmetic::mod_u32::limbs_mod_limb;
 use malachite_nz::natural::Natural;
 use malachite_test::common::{natural_to_biguint, natural_to_rug_integer};
 use malachite_test::inputs::base::{
-    pairs_of_unsigned_vec_and_positive_unsigned_var_1, positive_unsigneds,
+    pairs_of_unsigned_vec_and_positive_unsigned_var_1, pairs_of_unsigneds, positive_unsigneds,
 };
 use malachite_test::inputs::natural::{
     naturals, pairs_of_natural_and_positive_u32_var_1, pairs_of_natural_and_positive_u32_var_2,
@@ -128,8 +127,6 @@ fn divisible_by_u32_properties_helper(n: &Natural, u: u32) {
 
     assert_eq!(num_divisible_by_u32(natural_to_biguint(n), u), divisible);
     assert_eq!(natural_to_rug_integer(n).is_divisible_u(u), divisible);
-
-    assert_eq!(Integer::from(n).divisible_by(u), divisible);
 }
 
 #[test]
@@ -179,9 +176,14 @@ fn divisible_by_u32_properties() {
         |&(u, ref n): &(u32, Natural)| {
             let divisible = u.divisible_by(n);
             assert_eq!(u == 0 || *n != 0 && u % n == 0, divisible);
-            assert_eq!(u.divisible_by(&Integer::from(n)), divisible);
         },
     );
+
+    test_properties(pairs_of_unsigneds::<u32>, |&(x, y)| {
+        let divisible = x.divisible_by(y);
+        assert_eq!(divisible, Natural::from(x).divisible_by(y));
+        assert_eq!(divisible, x.divisible_by(&Natural::from(y)));
+    });
 
     test_properties(naturals, |n| {
         assert!(n.divisible_by(1));

@@ -6,7 +6,7 @@ use malachite_nz::natural::arithmetic::next_power_of_two::{
 };
 use malachite_nz::natural::Natural;
 use malachite_test::common::{natural_to_rug_integer, rug_integer_to_natural};
-use malachite_test::inputs::base::vecs_of_unsigned_var_1;
+use malachite_test::inputs::base::{unsigneds, vecs_of_unsigned_var_1};
 use malachite_test::inputs::natural::naturals;
 use rug;
 use std::str::FromStr;
@@ -162,6 +162,12 @@ fn next_power_of_two_properties() {
         if *n != 0 {
             assert!(&result >> 1 < *n);
             assert_eq!(Natural::ONE << n.ceiling_log_two(), result);
+        }
+    });
+
+    test_properties(unsigneds::<u32>, |&u| {
+        if let Some(power) = u.checked_next_power_of_two() {
+            assert_eq!(power, Natural::from(u).next_power_of_two());
         }
     });
 }

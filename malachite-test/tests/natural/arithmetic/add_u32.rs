@@ -10,7 +10,7 @@ use malachite_test::common::{
 };
 use malachite_test::inputs::base::{
     pairs_of_nonempty_unsigned_vec_and_unsigned, pairs_of_unsigned_vec_and_unsigned,
-    triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_1, unsigneds,
+    pairs_of_unsigneds, triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_1, unsigneds,
 };
 use malachite_test::inputs::natural::{naturals, pairs_of_natural_and_unsigned};
 use malachite_test::natural::arithmetic::add_u32::num_add_u32;
@@ -267,6 +267,12 @@ fn add_u32_properties() {
             assert_eq!(sum - n, u);
         },
     );
+
+    test_properties(pairs_of_unsigneds::<u32>, |&(x, y)| {
+        let sum = Natural::from(u64::from(x) + u64::from(y));
+        assert_eq!(sum, Natural::from(x) + y);
+        assert_eq!(sum, x + Natural::from(y));
+    });
 
     #[allow(unknown_lints, identity_op)]
     test_properties(naturals, |n| {

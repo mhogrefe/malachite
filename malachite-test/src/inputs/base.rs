@@ -111,6 +111,14 @@ pub fn pairs_of_unsigneds<T: PrimitiveUnsigned>(
     }
 }
 
+//TODO use subset_pairs
+// All pairs of `T`s where `T` is unsigned and the first `T` is greater than or equal to the second.
+pub fn pairs_of_unsigneds_var_1<T: PrimitiveUnsigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (T, T)>> {
+    Box::new(pairs_of_unsigneds(gm).filter(|&(x, y)| x >= y))
+}
+
 pub fn pairs_of_signeds<T: PrimitiveSigned>(gm: GenerationMode) -> Box<Iterator<Item = (T, T)>> {
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_pairs_from_single(exhaustive_signed())),
@@ -138,6 +146,20 @@ pub fn pairs_of_signed_and_nonzero_signed<T: PrimitiveSigned>(
             &EXAMPLE_SEED,
             &(|seed| special_random_signed(seed)),
             &(|seed| special_random_nonzero_signed(seed)),
+        )),
+    }
+}
+
+pub fn triples_of_unsigneds<T: PrimitiveUnsigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (T, T, T)>> {
+    match gm {
+        GenerationMode::Exhaustive => {
+            Box::new(exhaustive_triples_from_single(exhaustive_unsigned()))
+        }
+        GenerationMode::Random(_) => Box::new(random_triples_from_single(random(&EXAMPLE_SEED))),
+        GenerationMode::SpecialRandom(_) => Box::new(random_triples_from_single(
+            special_random_unsigned(&EXAMPLE_SEED),
         )),
     }
 }
@@ -389,6 +411,36 @@ pub fn pairs_of_signed_and_u64_width_range_var_2<T: PrimitiveSigned>(
     )
 }
 
+pub fn pairs_of_unsigned_and_positive_unsigned<T: PrimitiveUnsigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (T, T)>> {
+    match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_pairs(
+            exhaustive_unsigned(),
+            exhaustive_positive(),
+        )),
+        GenerationMode::Random(_) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| random(seed)),
+            &(|seed| random_positive_unsigned(seed)),
+        )),
+        GenerationMode::SpecialRandom(_) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_unsigned(seed)),
+            &(|seed| special_random_positive_unsigned(seed)),
+        )),
+    }
+}
+
+// Pairs of `u32` and positive `u32` where each every `u32` is less than 2<sup>16</sup>the first
+// `u32` is divisible by the second.
+pub fn pairs_of_u32_and_positive_u32_var_1(gm: GenerationMode) -> Box<Iterator<Item = (u32, u32)>> {
+    Box::new(
+        pairs_of_unsigned_and_positive_unsigned::<u16>(gm)
+            .map(|(x, y)| (u32::from(x) * u32::from(y), u32::from(y))),
+    )
+}
+
 // All triples of unsigned `T`, `u64`, and `bool`, where the `bool` is false or the `u64` is smaller
 // than `T::WIDTH`.
 pub fn triples_of_unsigned_u64_width_range_and_bool_var_1<T: PrimitiveUnsigned>(
@@ -588,6 +640,71 @@ pub fn pairs_of_signed_and_rounding_mode<T: PrimitiveSigned>(
             &EXAMPLE_SEED,
             &(|seed| special_random_signed(seed)),
             &(|seed| random_rounding_modes(seed)),
+        )),
+    }
+}
+
+fn triples_of_unsigned_positive_unsigned_and_rounding_mode<T: PrimitiveUnsigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (T, T, RoundingMode)>> {
+    match gm {
+        GenerationMode::Exhaustive => reshape_2_1_to_3(Box::new(lex_pairs(
+            exhaustive_pairs(exhaustive_unsigned(), exhaustive_positive()),
+            exhaustive_rounding_modes(),
+        ))),
+        GenerationMode::Random(_) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| random(seed)),
+            &(|seed| random_positive_unsigned(seed)),
+            &(|seed| random_rounding_modes(seed)),
+        )),
+        GenerationMode::SpecialRandom(_) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_unsigned(seed)),
+            &(|seed| special_random_positive_unsigned(seed)),
+            &(|seed| random_rounding_modes(seed)),
+        )),
+    }
+}
+
+// All triples of `u32`, positive `u32`, and `RoundingMode`, where both `u32`s are less than
+// 2<sup>16</sup> and if the `RoundingMode` is `RoundingMode::Exact`, the first `T` is divisible by
+// the second.
+pub fn triples_of_u32_positive_u32_and_rounding_mode_var_1(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (u32, u32, RoundingMode)>> {
+    Box::new(
+        triples_of_unsigned_positive_unsigned_and_rounding_mode::<u16>(gm).map(|(x, y, rm)| {
+            let x = u32::from(x);
+            let y = u32::from(y);
+            if rm == RoundingMode::Exact {
+                (x * y, y, rm)
+            } else {
+                (x, y, rm)
+            }
+        }),
+    )
+}
+
+pub fn triples_of_unsigned_unsigned_and_small_u64<T: PrimitiveUnsigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (T, T, u64)>> {
+    match gm {
+        GenerationMode::Exhaustive => reshape_2_1_to_3(Box::new(log_pairs(
+            exhaustive_pairs_from_single(exhaustive_unsigned()),
+            exhaustive_unsigned(),
+        ))),
+        GenerationMode::Random(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| random(seed)),
+            &(|seed| random(seed)),
+            &(|seed| u32s_geometric(seed, scale).map(|u| u.into())),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_unsigned(seed)),
+            &(|seed| special_random_unsigned(seed)),
+            &(|seed| u32s_geometric(seed, scale).map(|u| u.into())),
         )),
     }
 }

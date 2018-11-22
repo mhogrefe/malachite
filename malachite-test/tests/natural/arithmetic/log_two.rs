@@ -5,7 +5,7 @@ use malachite_base::num::{
 use malachite_nz::natural::arithmetic::log_two::{limbs_ceiling_log_two, limbs_floor_log_two};
 use malachite_nz::natural::logic::significant_bits::limbs_significant_bits;
 use malachite_nz::natural::Natural;
-use malachite_test::inputs::base::vecs_of_unsigned_var_1;
+use malachite_test::inputs::base::{positive_unsigneds, vecs_of_unsigned_var_1};
 use malachite_test::inputs::natural::positive_naturals;
 use std::str::FromStr;
 use std::u32;
@@ -129,6 +129,10 @@ fn floor_log_two_properties() {
         assert!(Natural::ONE << n <= *x);
         assert!(*x < Natural::ONE << (n + 1));
     });
+
+    test_properties(positive_unsigneds::<u32>, |&u| {
+        assert_eq!(u.floor_log_two(), Natural::from(u).floor_log_two());
+    });
 }
 
 #[test]
@@ -142,5 +146,9 @@ fn ceiling_log_two_properties() {
             assert!(Natural::ONE << (n - 1) < *x);
         }
         assert!(*x <= Natural::ONE << n);
+    });
+
+    test_properties(positive_unsigneds::<u32>, |&u| {
+        assert_eq!(u.ceiling_log_two(), Natural::from(u).ceiling_log_two());
     });
 }

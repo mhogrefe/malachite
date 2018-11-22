@@ -10,8 +10,8 @@ use malachite_test::common::{
     biguint_to_natural, natural_to_biguint, natural_to_rug_integer, rug_integer_to_natural,
 };
 use malachite_test::inputs::base::{
-    pairs_of_unsigned_vec_and_unsigned, triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_1,
-    unsigneds,
+    pairs_of_unsigned_vec_and_unsigned, pairs_of_unsigneds_var_1,
+    triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_1, unsigneds,
 };
 use malachite_test::inputs::natural::{
     naturals, pairs_of_natural_and_u32_var_1, pairs_of_u32_and_natural_var_1,
@@ -314,6 +314,12 @@ fn sub_u32_properties() {
             assert_eq!(difference + n, u);
         },
     );
+
+    test_properties(pairs_of_unsigneds_var_1::<u32>, |&(x, y)| {
+        let difference = x - y;
+        assert_eq!(difference, Natural::from(x) - y);
+        assert_eq!(difference, x - Natural::from(y));
+    });
 
     #[allow(unknown_lints, identity_op)]
     test_properties(naturals, |n| {

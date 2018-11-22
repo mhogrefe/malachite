@@ -1,7 +1,6 @@
 use common::test_properties;
 use malachite_base::num::{CeilingDivNegMod, DivRound, DivRoundAssign, DivisibleBy, One, Zero};
 use malachite_base::round::RoundingMode;
-use malachite_nz::integer::Integer;
 use malachite_nz::natural::arithmetic::div_round_u32::limbs_limb_div_round_limbs;
 use malachite_nz::natural::Natural;
 use malachite_test::common::{
@@ -9,6 +8,7 @@ use malachite_test::common::{
 };
 use malachite_test::inputs::base::{
     pairs_of_positive_unsigned_and_rounding_mode, pairs_of_unsigned_and_rounding_mode,
+    triples_of_u32_positive_u32_and_rounding_mode_var_1,
     triples_of_unsigned_unsigned_vec_and_rounding_mode_var_1,
 };
 use malachite_test::inputs::natural::{
@@ -425,8 +425,6 @@ fn div_round_u32_properties() {
             assert!(quotient <= *n);
 
             //TODO assert_eq!(n.div_round(Natural::from(u), rm), quotient);
-
-            assert_eq!(Integer::from(n).div_round(u, rm), quotient);
         },
     );
 
@@ -515,8 +513,6 @@ fn div_round_u32_properties() {
             assert!(quotient <= u);
 
             //TODO assert_eq!(Natural::from(u).div_round(n, rm), quotient);
-
-            assert_eq!(u.div_round(Integer::from(n), rm), quotient);
         },
     );
 
@@ -530,6 +526,15 @@ fn div_round_u32_properties() {
         let nearest = u.div_round(n, RoundingMode::Nearest);
         assert!(nearest == down || nearest == up);
     });
+
+    test_properties(
+        triples_of_u32_positive_u32_and_rounding_mode_var_1,
+        |&(x, y, rm)| {
+            let quotient = x.div_round(y, rm);
+            assert_eq!(Natural::from(x).div_round(y, rm), quotient);
+            assert_eq!(x.div_round(Natural::from(y), rm), quotient);
+        },
+    );
 
     test_properties(pairs_of_unsigned_and_rounding_mode::<u32>, |&(u, rm)| {
         assert_eq!(u.div_round(Natural::ONE, rm), u);

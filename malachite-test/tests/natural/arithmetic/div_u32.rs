@@ -1,6 +1,5 @@
 use common::test_properties;
 use malachite_base::num::{DivRem, One, Zero};
-use malachite_nz::integer::Integer;
 use malachite_nz::natural::arithmetic::div_u32::{
     limbs_div_limb, limbs_div_limb_in_place, limbs_div_limb_to_out,
 };
@@ -9,8 +8,8 @@ use malachite_test::common::{
     biguint_to_natural, natural_to_biguint, natural_to_rug_integer, rug_integer_to_natural,
 };
 use malachite_test::inputs::base::{
-    pairs_of_unsigned_vec_and_positive_unsigned_var_1, positive_unsigneds,
-    triples_of_unsigned_vec_unsigned_vec_and_positive_unsigned_var_1,
+    pairs_of_unsigned_and_positive_unsigned, pairs_of_unsigned_vec_and_positive_unsigned_var_1,
+    positive_unsigneds, triples_of_unsigned_vec_unsigned_vec_and_positive_unsigned_var_1,
 };
 use malachite_test::inputs::natural::{
     naturals, pairs_of_natural_and_positive_u32_var_1, pairs_of_natural_and_positive_unsigned,
@@ -313,9 +312,6 @@ fn div_u32_properties_helper(n: &Natural, u: u32) {
         rug_integer_to_natural(&(natural_to_rug_integer(n) / u)),
         quotient
     );
-
-    assert_eq!(Integer::from(n) / u, quotient);
-
     assert!(n - quotient * u < u);
 }
 
@@ -360,12 +356,15 @@ fn div_u32_properties() {
             assert_eq!(quotient_alt, quotient);
 
             assert_eq!(u.div_rem(n).0, quotient);
-
-            assert_eq!(u / Integer::from(n), quotient);
-
             assert!(u - quotient * n < *n);
         },
     );
+
+    test_properties(pairs_of_unsigned_and_positive_unsigned, |&(x, y)| {
+        let quotient = x / y;
+        assert_eq!(quotient, Natural::from(x) / y);
+        assert_eq!(quotient, x / Natural::from(y));
+    });
 
     test_properties(naturals, |n| {
         assert_eq!(n / 1, *n);
