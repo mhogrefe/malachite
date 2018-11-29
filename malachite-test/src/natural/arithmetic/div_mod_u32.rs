@@ -129,7 +129,7 @@ pub fn num_div_mod_u32(x: BigUint, u: u32) -> (BigUint, u32) {
 }
 
 pub fn rug_div_mod_u32(x: rug::Integer, u: u32) -> (rug::Integer, u32) {
-    let (quotient, remainder) = x.div_rem_euc(rug::Integer::from(u));
+    let (quotient, remainder) = x.div_rem_floor(rug::Integer::from(u));
     (quotient, remainder.to_u32_wrapping())
 }
 

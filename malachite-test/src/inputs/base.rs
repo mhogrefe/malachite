@@ -644,6 +644,27 @@ pub fn pairs_of_signed_and_rounding_mode<T: PrimitiveSigned>(
     }
 }
 
+pub fn pairs_of_nonzero_signed_and_rounding_mode<T: PrimitiveSigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (T, RoundingMode)>> {
+    match gm {
+        GenerationMode::Exhaustive => Box::new(lex_pairs(
+            exhaustive_nonzero_signed(),
+            exhaustive_rounding_modes(),
+        )),
+        GenerationMode::Random(_) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| random_nonzero_signed(seed)),
+            &(|seed| random_rounding_modes(seed)),
+        )),
+        GenerationMode::SpecialRandom(_) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_nonzero_signed(seed)),
+            &(|seed| random_rounding_modes(seed)),
+        )),
+    }
+}
+
 fn triples_of_unsigned_positive_unsigned_and_rounding_mode<T: PrimitiveUnsigned>(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (T, T, RoundingMode)>> {

@@ -7,8 +7,7 @@ impl Div<u32> for Integer {
     type Output = Integer;
 
     /// Divides a `Integer` by a `u32`, taking the `Integer` by value. The quotient is rounded
-    /// towards zero. In other words, returns q, where `self` = q * `other` + r,
-    /// (r = 0 or sign(r) = sign(`self`)), and 0 <= |r| < `other`.
+    /// towards zero.
     ///
     /// Time: worst case O(n)
     ///
@@ -25,11 +24,11 @@ impl Div<u32> for Integer {
     /// use std::str::FromStr;
     ///
     /// fn main() {
-    ///     // 3 * 123 + 87 = 456
-    ///     assert_eq!((Integer::from(456u32) / 123u32).to_string(), "3");
+    ///     // 2 * 10 + 3 = 23
+    ///     assert_eq!((Integer::from(23u32) / 10u32).to_string(), "2");
     ///
-    ///     // 8,130,081,300 * 123 + 100 = 10^12
-    ///     assert_eq!((-Integer::trillion() / 123u32).to_string(), "-8130081300");
+    ///     // -2 * 10 + -3 = -23
+    ///     assert_eq!((Integer::from(-23) / 10u32).to_string(), "-2");
     /// }
     /// ```
     fn div(mut self, other: u32) -> Integer {
@@ -42,8 +41,7 @@ impl<'a> Div<u32> for &'a Integer {
     type Output = Integer;
 
     /// Divides a `Integer` by a `u32`, taking the `Integer` by reference. The quotient is rounded
-    /// towards zero. In other words, returns q, where `self` = q * `other` + r,
-    /// (r = 0 or sign(r) = sign(`self`)), and 0 <= |r| < `other`.
+    /// towards zero.
     ///
     /// Time: worst case O(n)
     ///
@@ -60,11 +58,11 @@ impl<'a> Div<u32> for &'a Integer {
     /// use std::str::FromStr;
     ///
     /// fn main() {
-    ///     // 3 * 123 + 87 = 456
-    ///     assert_eq!((&Integer::from(456u32) / 123u32).to_string(), "3");
+    ///     // 2 * 10 + 3 = 23
+    ///     assert_eq!((&Integer::from(23u32) / 10u32).to_string(), "2");
     ///
-    ///     // 8,130,081,300 * 123 + 100 = 10^12
-    ///     assert_eq!((&-Integer::trillion() / 123u32).to_string(), "-8130081300");
+    ///     // -2 * 10 + -3 = -23
+    ///     assert_eq!((&Integer::from(-23) / 10u32).to_string(), "-2");
     /// }
     /// ```
     fn div(self, other: u32) -> Integer {
@@ -78,8 +76,7 @@ impl<'a> Div<u32> for &'a Integer {
 }
 
 impl DivAssign<u32> for Integer {
-    /// Divides a `Integer` by a `u32` in place. The quotient is rounded towards zero. In other
-    /// words, replaces `self` with q, where `self` = q * `other` + r and 0 <= r < |`other`|.
+    /// Divides a `Integer` by a `u32` in place. The quotient is rounded towards zero.
     ///
     /// Time: worst case O(n)
     ///
@@ -96,31 +93,27 @@ impl DivAssign<u32> for Integer {
     /// use std::str::FromStr;
     ///
     /// fn main() {
-    ///     // 3 * 123 + 87 = 456
-    ///     let mut x = Integer::from(456u32);
-    ///     x /= 123u32;
-    ///     assert_eq!(x.to_string(), "3");
+    ///     // 2 * 10 + 3 = 23
+    ///     let mut x = Integer::from(23u32);
+    ///     x /= 10u32;
+    ///     assert_eq!(x.to_string(), "2");
     ///
-    ///     // 8,130,081,300 * 123 + 100 = 10^12
-    ///     let mut x = -Integer::trillion();
-    ///     x /= 123u32;
-    ///     assert_eq!(x.to_string(), "-8130081300");
+    ///     // -2 * 10 + -3 = -23
+    ///     let mut x = Integer::from(-23);
+    ///     x /= 10u32;
+    ///     assert_eq!(x.to_string(), "-2");
     /// }
     /// ```
     fn div_assign(&mut self, other: u32) {
         self.abs /= other;
-        if !self.sign && self.abs == 0 {
-            self.sign = true;
-        }
+        self.sign |= self.abs == 0;
     }
 }
 
 impl Div<Integer> for u32 {
     type Output = Integer;
 
-    /// Divides a `u32` by a `Integer`, taking the `Integer` by value. The quotient is rounded
-    /// towards zero. In other words, returns q, where `self` = q * `other` + r and
-    /// 0 <= r < |`other`|.
+    /// Divides a `u32` by a `Integer`, taking the `Integer` by value.
     ///
     /// Time: worst case O(1)
     ///
@@ -135,11 +128,11 @@ impl Div<Integer> for u32 {
     /// use std::str::FromStr;
     ///
     /// fn main() {
-    ///     // 3 * 123 + 87 = 456
-    ///     assert_eq!(456u32 / Integer::from(123u32), 3);
+    ///     // 2 * 10 + 3 = 23
+    ///     assert_eq!(23u32 / Integer::from(10u32), 2);
     ///
-    ///     // 0 * 10^12 + 123 = 123
-    ///     assert_eq!(123u32 / -Integer::trillion(), 0);
+    ///     // -2 * 10 + -3 = -23
+    ///     assert_eq!(23u32 / Integer::from(-10), -2);
     /// }
     /// ```
     fn div(self, other: Integer) -> Integer {
@@ -157,8 +150,7 @@ impl<'a> Div<&'a Integer> for u32 {
     type Output = Integer;
 
     /// Divides a `u32` by a `Integer`, taking the `Integer` by reference. The quotient is rounded
-    /// towards zero. In other words, returns q, where `self` = q * `other` + r and
-    /// 0 <= r < `other`.
+    /// towards zero.
     ///
     /// Time: worst case O(1)
     ///
@@ -173,11 +165,11 @@ impl<'a> Div<&'a Integer> for u32 {
     /// use std::str::FromStr;
     ///
     /// fn main() {
-    ///     // 3 * 123 + 87 = 456
-    ///     assert_eq!(456u32 / &Integer::from(123u32), 3);
+    ///     // 2 * 10 + 3 = 23
+    ///     assert_eq!(23u32 / &Integer::from(10u32), 2);
     ///
-    ///     // 0 * 10^12 + 123 = 123
-    ///     assert_eq!(123u32 / &-Integer::trillion(), 0);
+    ///     // -2 * 10 + -3 = -23
+    ///     assert_eq!(23u32 / &Integer::from(-10), -2);
     /// }
     /// ```
     fn div(self, other: &'a Integer) -> Integer {

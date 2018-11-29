@@ -313,8 +313,8 @@ pub fn limbs_div_limb_in_place(limbs: &mut [u32], mut divisor: u32) {
 impl Div<u32> for Natural {
     type Output = Natural;
 
-    /// Divides a `Natural` by a `u32`, taking the `Natural` by value. In other words, returns q,
-    /// where `self` = q * `other` + r and 0 <= r < `other`.
+    /// Divides a `Natural` by a `u32`, taking the `Natural` by value. The quotient is rounded
+    /// towards negative infinity.
     ///
     /// Time: worst case O(n)
     ///
@@ -324,19 +324,10 @@ impl Div<u32> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    /// extern crate malachite_nz;
-    ///
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
     ///
-    /// fn main() {
-    ///     // 3 * 123 + 87 = 456
-    ///     assert_eq!((Natural::from(456u32) / 123).to_string(), "3");
-    ///
-    ///     // 8,130,081,300 * 123 + 100 = 10^12
-    ///     assert_eq!((Natural::trillion() / 123).to_string(), "8130081300");
-    /// }
+    /// // 2 * 10 + 3 = 23
+    /// assert_eq!((Natural::from(23u32) / 10).to_string(), "2");
     /// ```
     fn div(mut self, other: u32) -> Natural {
         self /= other;
@@ -347,8 +338,8 @@ impl Div<u32> for Natural {
 impl<'a> Div<u32> for &'a Natural {
     type Output = Natural;
 
-    /// Divides a `Natural` by a `u32`, taking the `Natural` by reference. In other words, returns
-    /// q, where `self` = q * `other` + r and 0 <= r < `other`.
+    /// Divides a `Natural` by a `u32`, taking the `Natural` by reference. The quotient is rounded
+    /// towards negative infinity.
     ///
     /// Time: worst case O(n)
     ///
@@ -358,19 +349,10 @@ impl<'a> Div<u32> for &'a Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    /// extern crate malachite_nz;
-    ///
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
     ///
-    /// fn main() {
-    ///     // 3 * 123 + 87 = 456
-    ///     assert_eq!((&Natural::from(456u32) / 123).to_string(), "3");
-    ///
-    ///     // 8,130,081,300 * 123 + 100 = 10^12
-    ///     assert_eq!((&Natural::trillion() / 123).to_string(), "8130081300");
-    /// }
+    /// // 2 * 10 + 3 = 23
+    /// assert_eq!((&Natural::from(23u32) / 10).to_string(), "2");
     /// ```
     fn div(self, other: u32) -> Natural {
         if other == 0 {
@@ -391,8 +373,7 @@ impl<'a> Div<u32> for &'a Natural {
 }
 
 impl DivAssign<u32> for Natural {
-    /// Divides a `Natural` by a `u32` in place. In other words, replaces `self` with q, where
-    /// `self` = q * `other` + r and 0 <= r < `other`.
+    /// Divides a `Natural` by a `u32` in place. The quotient is rounded towards negative infinity.
     ///
     /// Time: worst case O(n)
     ///
@@ -402,23 +383,12 @@ impl DivAssign<u32> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    /// extern crate malachite_nz;
-    ///
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
     ///
-    /// fn main() {
-    ///     // 3 * 123 + 87 = 456
-    ///     let mut x = Natural::from(456u32);
-    ///     x /= 123;
-    ///     assert_eq!(x.to_string(), "3");
-    ///
-    ///     // 8,130,081,300 * 123 + 100 = 10^12
-    ///     let mut x = Natural::trillion();
-    ///     x /= 123;
-    ///     assert_eq!(x.to_string(), "8130081300");
-    /// }
+    /// // 2 * 10 + 3 = 23
+    /// let mut x = Natural::from(23u32);
+    /// x /= 10;
+    /// assert_eq!(x.to_string(), "2");
     /// ```
     fn div_assign(&mut self, other: u32) {
         if other == 0 {
@@ -439,8 +409,8 @@ impl DivAssign<u32> for Natural {
 impl Div<Natural> for u32 {
     type Output = u32;
 
-    /// Divides a `u32` by a `Natural`, taking the `Natural` by value. In other words, returns q,
-    /// where `self` = q * `other` + r and 0 <= r < `other`.
+    /// Divides a `u32` by a `Natural`, taking the `Natural` by value. The quotient is rounded
+    /// towards negative infinity.
     ///
     /// Time: worst case O(1)
     ///
@@ -448,19 +418,10 @@ impl Div<Natural> for u32 {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    /// extern crate malachite_nz;
-    ///
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
     ///
-    /// fn main() {
-    ///     // 3 * 123 + 87 = 456
-    ///     assert_eq!(456 / Natural::from(123u32), 3);
-    ///
-    ///     // 0 * 10^12 + 123 = 123
-    ///     assert_eq!(123 / Natural::trillion(), 0);
-    /// }
+    /// // 2 * 10 + 3 = 23
+    /// assert_eq!(23 / Natural::from(10u32), 2);
     /// ```
     fn div(self, other: Natural) -> u32 {
         if other == 0 {
@@ -477,8 +438,8 @@ impl Div<Natural> for u32 {
 impl<'a> Div<&'a Natural> for u32 {
     type Output = u32;
 
-    /// Divides a `u32` by a `Natural`, taking the `Natural` by reference. In other words, returns
-    /// q, where `self` = q * `other` + r and 0 <= r < `other`.
+    /// Divides a `u32` by a `Natural`, taking the `Natural` by reference. The quotient is rounded
+    /// towards negative infinity.
     ///
     /// Time: worst case O(1)
     ///
@@ -486,19 +447,10 @@ impl<'a> Div<&'a Natural> for u32 {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    /// extern crate malachite_nz;
-    ///
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
     ///
-    /// fn main() {
-    ///     // 3 * 123 + 87 = 456
-    ///     assert_eq!(456 / &Natural::from(123u32), 3);
-    ///
-    ///     // 0 * 10^12 + 123 = 123
-    ///     assert_eq!(123 / &Natural::trillion(), 0);
-    /// }
+    /// // 2 * 10 + 3 = 23
+    /// assert_eq!(23 / &Natural::from(10u32), 2);
     /// ```
     fn div(self, other: &'a Natural) -> u32 {
         if *other == 0 {
@@ -513,8 +465,8 @@ impl<'a> Div<&'a Natural> for u32 {
 }
 
 impl DivAssign<Natural> for u32 {
-    /// Divides a `u32` by a `Natural` in place, taking the `Natural` by value. In other words,
-    /// replaces `self` with q, where `self` = q * `other` + r and 0 <= r < `other`.
+    /// Divides a `u32` by a `Natural` in place, taking the `Natural` by value. The quotient is
+    /// rounded towards negative infinity.
     ///
     /// Time: worst case O(1)
     ///
@@ -522,23 +474,12 @@ impl DivAssign<Natural> for u32 {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    /// extern crate malachite_nz;
-    ///
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
     ///
-    /// fn main() {
-    ///     // 3 * 123 + 87 = 456
-    ///     let mut n = 456;
-    ///     n /= Natural::from(123u32);
-    ///     assert_eq!(n, 3);
-    ///
-    ///     // 0 * 10^12 + 123 = 123
-    ///     let mut n = 123;
-    ///     n /= Natural::trillion();
-    ///     assert_eq!(n, 0);
-    /// }
+    /// // 2 * 10 + 3 = 23
+    /// let mut n = 23;
+    /// n /= Natural::from(10u32);
+    /// assert_eq!(n, 2);
     /// ```
     fn div_assign(&mut self, other: Natural) {
         *self /= &other;
@@ -546,8 +487,8 @@ impl DivAssign<Natural> for u32 {
 }
 
 impl<'a> DivAssign<&'a Natural> for u32 {
-    /// Divides a `u32` by a `Natural` in place, taking the `Natural` by reference. In other words,
-    /// replaces `self` with q and returns r, where `self` = q * `other` + r and 0 <= r < `other`.
+    /// Divides a `u32` by a `Natural` in place, taking the `Natural` by reference. The quotient is
+    /// rounded towards negative infinity.
     ///
     /// Time: worst case O(1)
     ///
@@ -555,23 +496,12 @@ impl<'a> DivAssign<&'a Natural> for u32 {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    /// extern crate malachite_nz;
-    ///
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
     ///
-    /// fn main() {
-    ///     // 3 * 123 + 87 = 456
-    ///     let mut n = 456;
-    ///     n /= &Natural::from(123u32);
-    ///     assert_eq!(n, 3);
-    ///
-    ///     // 0 * 10^12 + 123 = 123
-    ///     let mut n = 123;
-    ///     n /= &Natural::trillion();
-    ///     assert_eq!(n, 0);
-    /// }
+    /// // 2 * 10 + 3 = 23
+    /// let mut n = 23;
+    /// n /= &Natural::from(10u32);
+    /// assert_eq!(n, 2);
     /// ```
     fn div_assign(&mut self, other: &'a Natural) {
         *self = *self / other;

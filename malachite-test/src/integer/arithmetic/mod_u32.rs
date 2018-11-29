@@ -4,11 +4,10 @@ use inputs::integer::{
     pairs_of_unsigned_and_nonzero_integer, rm_pairs_of_integer_and_positive_unsigned,
 };
 use malachite_base::num::{
-    CeilingDivMod, CeilingDivNegMod, CeilingMod, CeilingModAssign, DivMod, Mod, ModAssign, NegMod,
-    NegModAssign, SignificantBits,
+    CeilingDivMod, CeilingMod, CeilingModAssign, DivMod, Mod, ModAssign, SignificantBits,
 };
 use num::{BigInt, Integer, ToPrimitive};
-use rug::{self, ops::RemRounding};
+use rug::ops::RemRounding;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_integer_rem_assign_u32);
@@ -17,9 +16,6 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_integer_mod_assign_u32);
     register_demo!(registry, demo_integer_mod_u32);
     register_demo!(registry, demo_integer_mod_u32_ref);
-    register_demo!(registry, demo_integer_neg_mod_assign_u32);
-    register_demo!(registry, demo_integer_neg_mod_u32);
-    register_demo!(registry, demo_integer_neg_mod_u32_ref);
     register_demo!(registry, demo_integer_ceiling_mod_assign_u32);
     register_demo!(registry, demo_integer_ceiling_mod_u32);
     register_demo!(registry, demo_integer_ceiling_mod_u32_ref);
@@ -29,10 +25,6 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_u32_rem_assign_integer_ref);
     register_demo!(registry, demo_u32_mod_integer);
     register_demo!(registry, demo_u32_mod_integer_ref);
-    register_demo!(registry, demo_u32_mod_assign_integer);
-    register_demo!(registry, demo_u32_mod_assign_integer_ref);
-    register_demo!(registry, demo_u32_neg_mod_integer);
-    register_demo!(registry, demo_u32_neg_mod_integer_ref);
     register_demo!(registry, demo_u32_ceiling_mod_integer);
     register_demo!(registry, demo_u32_ceiling_mod_integer_ref);
     register_bench!(registry, Large, benchmark_integer_rem_assign_u32);
@@ -57,18 +49,6 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
         registry,
         Large,
         benchmark_integer_mod_u32_evaluation_strategy
-    );
-    register_bench!(registry, Large, benchmark_integer_neg_mod_assign_u32);
-    register_bench!(
-        registry,
-        Large,
-        benchmark_integer_neg_mod_u32_library_comparison
-    );
-    register_bench!(registry, Large, benchmark_integer_neg_mod_u32_algorithms);
-    register_bench!(
-        registry,
-        Large,
-        benchmark_integer_neg_mod_u32_evaluation_strategy
     );
     register_bench!(registry, Large, benchmark_integer_ceiling_mod_assign_u32);
     register_bench!(
@@ -104,26 +84,12 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_bench!(
         registry,
         Large,
-        benchmark_u32_mod_assign_integer_evaluation_strategy
-    );
-    register_bench!(
-        registry,
-        Large,
-        benchmark_u32_neg_mod_integer_evaluation_strategy
-    );
-    register_bench!(
-        registry,
-        Large,
         benchmark_u32_ceiling_mod_integer_evaluation_strategy
     );
 }
 
 pub fn num_mod_u32(x: BigInt, u: u32) -> u32 {
     x.mod_floor(&BigInt::from(u)).to_u32().unwrap()
-}
-
-pub fn rug_neg_mod_u32(x: rug::Integer, u: u32) -> u32 {
-    (-x.rem_ceil(u)).to_u32_wrapping()
 }
 
 fn demo_integer_rem_assign_u32(gm: GenerationMode, limit: usize) {
@@ -165,27 +131,6 @@ fn demo_integer_mod_u32(gm: GenerationMode, limit: usize) {
 fn demo_integer_mod_u32_ref(gm: GenerationMode, limit: usize) {
     for (n, u) in pairs_of_integer_and_positive_unsigned::<u32>(gm).take(limit) {
         println!("(&{}).mod({}) = {}", n, u, (&n).mod_op(u));
-    }
-}
-
-fn demo_integer_neg_mod_assign_u32(gm: GenerationMode, limit: usize) {
-    for (mut n, u) in pairs_of_integer_and_positive_unsigned::<u32>(gm).take(limit) {
-        let n_old = n.clone();
-        n.neg_mod_assign(u);
-        println!("x := {}; x.neg_mod_assign({}); x = {}", n_old, u, n);
-    }
-}
-
-fn demo_integer_neg_mod_u32(gm: GenerationMode, limit: usize) {
-    for (n, u) in pairs_of_integer_and_positive_unsigned::<u32>(gm).take(limit) {
-        let n_old = n.clone();
-        println!("{}.neg_mod({}) = {}", n_old, u, n.neg_mod(u));
-    }
-}
-
-fn demo_integer_neg_mod_u32_ref(gm: GenerationMode, limit: usize) {
-    for (n, u) in pairs_of_integer_and_positive_unsigned::<u32>(gm).take(limit) {
-        println!("(&{}).neg_mod({}) = {}", n, u, (&n).neg_mod(u));
     }
 }
 
@@ -244,59 +189,28 @@ fn demo_u32_rem_assign_integer_ref(gm: GenerationMode, limit: usize) {
 fn demo_u32_mod_integer(gm: GenerationMode, limit: usize) {
     for (u, n) in pairs_of_unsigned_and_nonzero_integer::<u32>(gm).take(limit) {
         let n_old = n.clone();
-        println!("{}.mod({}) = {:?}", u, n_old, u.mod_op(n));
+        println!("{}.mod({}) = {}", u, n_old, u.mod_op(n));
     }
 }
 
 fn demo_u32_mod_integer_ref(gm: GenerationMode, limit: usize) {
     for (u, n) in pairs_of_unsigned_and_nonzero_integer::<u32>(gm).take(limit) {
         let n_old = n.clone();
-        println!("{}.mod(&{}) = {:?}", u, n_old, u.mod_op(&n));
-    }
-}
-
-fn demo_u32_mod_assign_integer(gm: GenerationMode, limit: usize) {
-    for (mut u, n) in pairs_of_unsigned_and_nonzero_integer::<u32>(gm).take(limit) {
-        let u_old = u;
-        let n_old = n.clone();
-        u.mod_assign(n);
-        println!("x := {}; x.mod_assign({}); x = {}", u_old, n_old, u);
-    }
-}
-
-fn demo_u32_mod_assign_integer_ref(gm: GenerationMode, limit: usize) {
-    for (mut u, n) in pairs_of_unsigned_and_nonzero_integer::<u32>(gm).take(limit) {
-        let u_old = u;
-        u.mod_assign(&n);
-        println!("x := {}; x.mod_assign(&{}); x = {}", u_old, n, u);
-    }
-}
-
-fn demo_u32_neg_mod_integer(gm: GenerationMode, limit: usize) {
-    for (u, n) in pairs_of_unsigned_and_nonzero_integer::<u32>(gm).take(limit) {
-        let n_old = n.clone();
-        println!("{}.neg_mod({}) = {:?}", u, n_old, u.neg_mod(n));
-    }
-}
-
-fn demo_u32_neg_mod_integer_ref(gm: GenerationMode, limit: usize) {
-    for (u, n) in pairs_of_unsigned_and_nonzero_integer::<u32>(gm).take(limit) {
-        let n_old = n.clone();
-        println!("{}.neg_mod(&{}) = {:?}", u, n_old, u.neg_mod(&n));
+        println!("{}.mod(&{}) = {}", u, n_old, u.mod_op(&n));
     }
 }
 
 fn demo_u32_ceiling_mod_integer(gm: GenerationMode, limit: usize) {
     for (u, n) in pairs_of_unsigned_and_nonzero_integer::<u32>(gm).take(limit) {
         let n_old = n.clone();
-        println!("{}.ceiling_mod({}) = {:?}", u, n_old, u.ceiling_mod(n));
+        println!("{}.ceiling_mod({}) = {}", u, n_old, u.ceiling_mod(n));
     }
 }
 
 fn demo_u32_ceiling_mod_integer_ref(gm: GenerationMode, limit: usize) {
     for (u, n) in pairs_of_unsigned_and_nonzero_integer::<u32>(gm).take(limit) {
         let n_old = n.clone();
-        println!("{}.ceiling_mod(&{}) = {:?}", u, n_old, u.ceiling_mod(&n));
+        println!("{}.ceiling_mod(&{}) = {}", u, n_old, u.ceiling_mod(&n));
     }
 }
 
@@ -421,88 +335,6 @@ fn benchmark_integer_mod_u32_evaluation_strategy(
             (
                 "(&Integer).mod(u32)",
                 &mut (|(x, y)| no_out!((&x).mod_op(y))),
-            ),
-        ],
-    );
-}
-
-fn benchmark_integer_neg_mod_assign_u32(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
-        "Integer.neg_mod_assign(u32)",
-        BenchmarkType::Single,
-        pairs_of_integer_and_positive_unsigned::<u32>(gm),
-        gm.name(),
-        limit,
-        file_name,
-        &(|&(ref n, _)| n.significant_bits() as usize),
-        "n.significant_bits()",
-        &mut [("malachite", &mut (|(mut x, y)| x.neg_mod_assign(y)))],
-    );
-}
-
-fn benchmark_integer_neg_mod_u32_library_comparison(
-    gm: GenerationMode,
-    limit: usize,
-    file_name: &str,
-) {
-    m_run_benchmark(
-        "Integer.neg_mod(u32)",
-        BenchmarkType::LibraryComparison,
-        rm_pairs_of_integer_and_positive_unsigned(gm),
-        gm.name(),
-        limit,
-        file_name,
-        &(|&(_, (ref n, _))| n.significant_bits() as usize),
-        "n.significant_bits()",
-        &mut [
-            ("malachite", &mut (|(_, (x, y))| no_out!(x.neg_mod(y)))),
-            ("rug", &mut (|((x, y), _)| no_out!(rug_neg_mod_u32(x, y)))),
-        ],
-    );
-}
-
-fn benchmark_integer_neg_mod_u32_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
-        "Integer.neg_mod(u32)",
-        BenchmarkType::Algorithms,
-        pairs_of_integer_and_positive_unsigned::<u32>(gm),
-        gm.name(),
-        limit,
-        file_name,
-        &(|&(ref n, _)| n.significant_bits() as usize),
-        "n.significant_bits()",
-        &mut [
-            ("standard", &mut (|(x, y)| no_out!(x.neg_mod(y)))),
-            (
-                "using ceiling_div_neg_mod",
-                &mut (|(x, y)| no_out!(x.ceiling_div_neg_mod(y).1)),
-            ),
-        ],
-    );
-}
-
-fn benchmark_integer_neg_mod_u32_evaluation_strategy(
-    gm: GenerationMode,
-    limit: usize,
-    file_name: &str,
-) {
-    m_run_benchmark(
-        "Integer.neg_mod(u32)",
-        BenchmarkType::EvaluationStrategy,
-        pairs_of_integer_and_positive_unsigned::<u32>(gm),
-        gm.name(),
-        limit,
-        file_name,
-        &(|&(ref n, _)| n.significant_bits() as usize),
-        "n.significant_bits()",
-        &mut [
-            (
-                "Integer.neg_mod(u32)",
-                &mut (|(x, y)| no_out!(x.neg_mod(y))),
-            ),
-            (
-                "(&Integer).neg_mod(u32)",
-                &mut (|(x, y)| no_out!((&x).neg_mod(y))),
             ),
         ],
     );
@@ -649,60 +481,6 @@ fn benchmark_u32_mod_integer_evaluation_strategy(
         &mut [
             ("u32.mod(Integer)", &mut (|(x, y)| no_out!(x.mod_op(y)))),
             ("u32.mod(&Integer)", &mut (|(x, y)| no_out!(x.mod_op(&y)))),
-        ],
-    );
-}
-
-fn benchmark_u32_mod_assign_integer_evaluation_strategy(
-    gm: GenerationMode,
-    limit: usize,
-    file_name: &str,
-) {
-    m_run_benchmark(
-        "u32.mod_assign(Integer)",
-        BenchmarkType::EvaluationStrategy,
-        pairs_of_unsigned_and_nonzero_integer::<u32>(gm),
-        gm.name(),
-        limit,
-        file_name,
-        &(|&(_, ref n)| n.significant_bits() as usize),
-        "n.significant_bits()",
-        &mut [
-            (
-                "u32.mod_assign(Integer)",
-                &mut (|(mut x, y)| x.mod_assign(y)),
-            ),
-            (
-                "u32.mod_assign(&Integer)",
-                &mut (|(mut x, y)| x.mod_assign(&y)),
-            ),
-        ],
-    );
-}
-
-fn benchmark_u32_neg_mod_integer_evaluation_strategy(
-    gm: GenerationMode,
-    limit: usize,
-    file_name: &str,
-) {
-    m_run_benchmark(
-        "u32.neg_mod(Integer)",
-        BenchmarkType::EvaluationStrategy,
-        pairs_of_unsigned_and_nonzero_integer::<u32>(gm),
-        gm.name(),
-        limit,
-        file_name,
-        &(|&(_, ref n)| n.significant_bits() as usize),
-        "n.significant_bits()",
-        &mut [
-            (
-                "u32.neg_mod(Integer)",
-                &mut (|(x, y)| no_out!(x.neg_mod(y))),
-            ),
-            (
-                "u32.neg_mod(&Integer)",
-                &mut (|(x, y)| no_out!(x.neg_mod(&y))),
-            ),
         ],
     );
 }

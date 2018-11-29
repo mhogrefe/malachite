@@ -1,6 +1,6 @@
 use common::test_properties;
 use malachite_base::num::{
-    CeilingDivNegMod, DivRound, DivRoundAssign, NegativeOne, One, PartialOrdAbs, Zero,
+    CeilingDivMod, DivRound, DivRoundAssign, NegativeOne, One, PartialOrdAbs, Zero,
 };
 use malachite_base::round::RoundingMode;
 use malachite_nz::integer::Integer;
@@ -273,38 +273,38 @@ fn test_div_round_u32() {
 #[should_panic(expected = "division by zero")]
 fn div_round_assign_u32_fail_1() {
     let mut n = Integer::from(10u32);
-    n.div_round_assign(0, RoundingMode::Floor);
+    n.div_round_assign(0u32, RoundingMode::Floor);
 }
 
 #[test]
 #[should_panic(expected = "Division is not exact")]
 fn div_round_assign_u32_fail_2() {
     let mut n = Integer::from(10u32);
-    n.div_round_assign(3, RoundingMode::Exact);
+    n.div_round_assign(3u32, RoundingMode::Exact);
 }
 
 #[test]
 #[should_panic(expected = "division by zero")]
 fn div_round_u32_fail_1() {
-    Integer::from(10u32).div_round(0, RoundingMode::Floor);
+    Integer::from(10u32).div_round(0u32, RoundingMode::Floor);
 }
 
 #[test]
 #[should_panic(expected = "Division is not exact")]
 fn div_round_u32_fail_2() {
-    Integer::from(10u32).div_round(3, RoundingMode::Exact);
+    Integer::from(10u32).div_round(3u32, RoundingMode::Exact);
 }
 
 #[test]
 #[should_panic(expected = "division by zero")]
 fn div_round_u32_ref_fail_1() {
-    (&Integer::from(10u32)).div_round(0, RoundingMode::Floor);
+    (&Integer::from(10u32)).div_round(0u32, RoundingMode::Floor);
 }
 
 #[test]
 #[should_panic(expected = "Division is not exact: 10 / 3")]
 fn div_round_u32_ref_fail_2() {
-    (&Integer::from(10u32)).div_round(3, RoundingMode::Exact);
+    (&Integer::from(10u32)).div_round(3u32, RoundingMode::Exact);
 }
 
 #[test]
@@ -474,25 +474,25 @@ fn test_u32_div_round_integer() {
 #[test]
 #[should_panic(expected = "division by zero")]
 fn u32_div_round_integer_fail_1() {
-    10.div_round(Integer::ZERO, RoundingMode::Floor);
+    10u32.div_round(Integer::ZERO, RoundingMode::Floor);
 }
 
 #[test]
 #[should_panic(expected = "Division is not exact")]
 fn u32_div_round_integer_fail_2() {
-    10.div_round(Integer::from(3u32), RoundingMode::Exact);
+    10u32.div_round(Integer::from(3u32), RoundingMode::Exact);
 }
 
 #[test]
 #[should_panic(expected = "division by zero")]
 fn u32_div_round_integer_ref_fail_1() {
-    10.div_round(&Integer::ZERO, RoundingMode::Floor);
+    10u32.div_round(&Integer::ZERO, RoundingMode::Floor);
 }
 
 #[test]
 #[should_panic(expected = "Division is not exact: 10 / 3")]
 fn u32_div_round_integer_ref_fail_2() {
-    10.div_round(&Integer::from(3u32), RoundingMode::Exact);
+    10u32.div_round(&Integer::from(3u32), RoundingMode::Exact);
 }
 
 #[test]
@@ -549,7 +549,7 @@ fn div_round_u32_properties() {
                 n.div_round(u, RoundingMode::Ceiling)
             );
             assert_eq!(
-                n.ceiling_div_neg_mod(u).0,
+                n.ceiling_div_mod(u).0,
                 n.div_round(u, RoundingMode::Ceiling)
             );
         },
@@ -568,13 +568,13 @@ fn div_round_u32_properties() {
     });
 
     test_properties(pairs_of_integer_and_rounding_mode, |&(ref n, rm)| {
-        assert_eq!(n.div_round(1, rm), *n);
+        assert_eq!(n.div_round(1u32, rm), *n);
     });
 
     test_properties(
         pairs_of_nonzero_integer_and_rounding_mode,
         |&(ref n, rm)| {
-            assert_eq!(0.div_round(n, rm), 0);
+            assert_eq!(0u32.div_round(n, rm), 0);
         },
     );
 

@@ -487,6 +487,8 @@ fn neg_mod_u32_properties() {
             assert!(remainder_alt.is_valid());
             assert_eq!(remainder_alt, remainder);
 
+            assert_eq!(u.ceiling_div_neg_mod(n).1, remainder);
+
             if u != 0 && u < *n {
                 assert_eq!(remainder, n - u);
             }

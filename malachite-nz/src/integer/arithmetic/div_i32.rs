@@ -7,8 +7,7 @@ impl Div<i32> for Integer {
     type Output = Integer;
 
     /// Divides an `Integer` by an `i32`, taking the `Integer` by value. The quotient is rounded
-    /// towards zero. In other words, returns q, where `self` = q * `other` + r,
-    /// (r = 0 or sign(r) = sign(`self`)), and 0 <= |r| < |`other`|.
+    /// towards zero.
     ///
     /// Time: worst case O(n)
     ///
@@ -24,17 +23,17 @@ impl Div<i32> for Integer {
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {
-    ///     // 3 * 123 + 87 = 456
-    ///     assert_eq!((Integer::from(456) / 123i32).to_string(), "3");
+    ///     // 2 * 10 + 3 = 23
+    ///     assert_eq!((Integer::from(23) / 10i32).to_string(), "2");
     ///
-    ///     // -3 * -123 + 87 = 456
-    ///     assert_eq!((Integer::from(456) / -123i32).to_string(), "-3");
+    ///     // -2 * -10 + 3 = 23
+    ///     assert_eq!((Integer::from(23) / -10i32).to_string(), "-2");
     ///
-    ///     // -3 * 123 + -87 = -456
-    ///     assert_eq!((Integer::from(-456) / 123i32).to_string(), "-3");
+    ///     // -2 * 10 + -3 = -23
+    ///     assert_eq!((Integer::from(-23) / 10i32).to_string(), "-2");
     ///
-    ///     // 3 * -123 + -87 = -456
-    ///     assert_eq!((Integer::from(-456) / -123i32).to_string(), "3");
+    ///     // 2 * -10 + -3 = -23
+    ///     assert_eq!((Integer::from(-23) / -10i32).to_string(), "2");
     /// }
     /// ```
     fn div(self, other: i32) -> Integer {
@@ -51,8 +50,7 @@ impl<'a> Div<i32> for &'a Integer {
     type Output = Integer;
 
     /// Divides an `Integer` by an `i32`, taking the `Integer` by reference. The quotient is rounded
-    /// towards zero. In other words, returns q, where `self` = q * `other` + r,
-    /// (r = 0 or sign(r) = sign(`self`)), and 0 <= |r| < |`other`|.
+    /// towards zero.
     ///
     /// Time: worst case O(n)
     ///
@@ -68,17 +66,17 @@ impl<'a> Div<i32> for &'a Integer {
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {
-    ///     // 3 * 123 + 87 = 456
-    ///     assert_eq!((&Integer::from(456) / 123i32).to_string(), "3");
+    ///     // 2 * 10 + 3 = 23
+    ///     assert_eq!((&Integer::from(23) / 10i32).to_string(), "2");
     ///
-    ///     // -3 * -123 + 87 = 456
-    ///     assert_eq!((&Integer::from(456) / -123i32).to_string(), "-3");
+    ///     // -2 * -10 + 3 = 23
+    ///     assert_eq!((&Integer::from(23) / -10i32).to_string(), "-2");
     ///
-    ///     // -3 * 123 + -87 = -456
-    ///     assert_eq!((&Integer::from(-456) / 123i32).to_string(), "-3");
+    ///     // -2 * 10 + -3 = -23
+    ///     assert_eq!((&Integer::from(-23) / 10i32).to_string(), "-2");
     ///
-    ///     // 3 * -123 + -87 = -456
-    ///     assert_eq!((&Integer::from(-456) / -123i32).to_string(), "3");
+    ///     // 2 * -10 + -3 = -23
+    ///     assert_eq!((&Integer::from(-23) / -10i32).to_string(), "2");
     /// }
     /// ```
     fn div(self, other: i32) -> Integer {
@@ -92,9 +90,7 @@ impl<'a> Div<i32> for &'a Integer {
 }
 
 impl DivAssign<i32> for Integer {
-    /// Divides an `Integer` by an `i32` in place. The quotient is rounded towards zero. In other
-    /// words, replaces `self` by q, where `self` = q * `other` + r,
-    /// (r = 0 or sign(r) = sign(`self`)), and 0 <= |r| < |`other`|.
+    /// Divides an `Integer` by an `i32` in place. The quotient is rounded towards zero.
     ///
     /// Time: worst case O(n)
     ///
@@ -110,25 +106,25 @@ impl DivAssign<i32> for Integer {
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {
-    ///     // 3 * 123 + 87 = 456
-    ///     let mut x = Integer::from(456);
-    ///     x /= 123i32;
-    ///     assert_eq!(x.to_string(), "3");
+    ///     // 2 * 10 + 3 = 23
+    ///     let mut x = Integer::from(23);
+    ///     x /= 10i32;
+    ///     assert_eq!(x.to_string(), "2");
     ///
-    ///     // -3 * -123 + 87 = 456
-    ///     let mut x = Integer::from(456);
-    ///     x /= -123i32;
-    ///     assert_eq!(x.to_string(), "-3");
+    ///     // -2 * -10 + 3 = 23
+    ///     let mut x = Integer::from(23);
+    ///     x /= -10i32;
+    ///     assert_eq!(x.to_string(), "-2");
     ///
-    ///     // -3 * 123 + -87 = -456
-    ///     let mut x = Integer::from(-456);
-    ///     x /= 123i32;
-    ///     assert_eq!(x.to_string(), "-3");
+    ///     // -2 * 10 + -3 = -23
+    ///     let mut x = Integer::from(-23);
+    ///     x /= 10i32;
+    ///     assert_eq!(x.to_string(), "-2");
     ///
-    ///     // 3 * -123 + -87 = -456
-    ///     let mut x = Integer::from(-456);
-    ///     x /= -123i32;
-    ///     assert_eq!(x.to_string(), "3");
+    ///     // 2 * -10 + -3 = -23
+    ///     let mut x = Integer::from(-23);
+    ///     x /= -10i32;
+    ///     assert_eq!(x.to_string(), "2");
     /// }
     /// ```
     fn div_assign(&mut self, other: i32) {
@@ -144,8 +140,7 @@ impl Div<Integer> for i32 {
     type Output = Integer;
 
     /// Divides an `i32` by an `Integer`, taking the `Integer` by value. The quotient is rounded
-    /// towards zero. In other words, returns q, where `self` = q * `other` + r and
-    /// 0 <= |r| < |`other`|.
+    /// towards zero.
     ///
     /// Time: worst case O(1)
     ///
@@ -159,17 +154,17 @@ impl Div<Integer> for i32 {
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {
-    ///     // 3 * 123 + 87 = 456
-    ///     assert_eq!((456i32 / Integer::from(123)).to_string(), "3");
+    ///     // 2 * 10 + 3 = 23
+    ///     assert_eq!((23i32 / Integer::from(10)).to_string(), "2");
     ///
-    ///     // -3 * -123 + 87 = 456
-    ///     assert_eq!((456i32 / Integer::from(-123)).to_string(), "-3");
+    ///     // -2 * -10 + 3 = 23
+    ///     assert_eq!((23i32 / Integer::from(-10)).to_string(), "-2");
     ///
-    ///     // -3 * 123 + -87 = -456
-    ///     assert_eq!((-456i32 / Integer::from(123)).to_string(), "-3");
+    ///     // -2 * 10 + -3 = -23
+    ///     assert_eq!((-23i32 / Integer::from(10)).to_string(), "-2");
     ///
-    ///     // 3 * -123 + -87 = -456
-    ///     assert_eq!((-456i32 / Integer::from(-123)).to_string(), "3");
+    ///     // 2 * -10 + -3 = -23
+    ///     assert_eq!((-23i32 / Integer::from(-10)).to_string(), "2");
     /// }
     /// ```
     fn div(self, other: Integer) -> Integer {
@@ -186,8 +181,7 @@ impl<'a> Div<&'a Integer> for i32 {
     type Output = Integer;
 
     /// Divides an `i32` by an `Integer`, taking the `Integer` by reference. The quotient is rounded
-    /// towards zero. In other words, returns q, where `self` = q * `other` + r and
-    /// 0 <= |r| < |`other`|.
+    /// towards zero.
     ///
     /// Time: worst case O(1)
     ///
@@ -201,17 +195,17 @@ impl<'a> Div<&'a Integer> for i32 {
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {
-    ///     // 3 * 123 + 87 = 456
-    ///     assert_eq!((456i32 / &Integer::from(123)).to_string(), "3");
+    ///     // 2 * 10 + 3 = 23
+    ///     assert_eq!((23i32 / &Integer::from(10)).to_string(), "2");
     ///
-    ///     // -3 * -123 + 87 = 456
-    ///     assert_eq!((456i32 / &Integer::from(-123)).to_string(), "-3");
+    ///     // -2 * -10 + 3 = 23
+    ///     assert_eq!((23i32 / &Integer::from(-10)).to_string(), "-2");
     ///
-    ///     // -3 * 123 + -87 = -456
-    ///     assert_eq!((-456i32 / &Integer::from(123)).to_string(), "-3");
+    ///     // -2 * 10 + -3 = -23
+    ///     assert_eq!((-23i32 / &Integer::from(10)).to_string(), "-2");
     ///
-    ///     // 3 * -123 + -87 = -456
-    ///     assert_eq!((-456i32 / &Integer::from(-123)).to_string(), "3");
+    ///     // 2 * -10 + -3 = -23
+    ///     assert_eq!((-23i32 / &Integer::from(-10)).to_string(), "2");
     /// }
     /// ```
     fn div(self, other: &'a Integer) -> Integer {

@@ -706,6 +706,10 @@ fn div_mod_u32_properties() {
             assert_eq!(mut_u.div_assign_rem(n.clone()), remainder);
             assert_eq!(mut_u, quotient);
 
+            let (quotient_alt, remainder_alt) = (u / n, u % n);
+            assert_eq!(quotient_alt, quotient);
+            assert_eq!(remainder_alt, remainder);
+
             //TODO assert_eq!((quotient, remainder), Natural::from(u).div_mod(n));
 
             if u != 0 && u < *n {

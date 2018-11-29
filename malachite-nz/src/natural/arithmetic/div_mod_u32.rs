@@ -329,8 +329,8 @@ impl DivMod<u32> for Natural {
     type ModOutput = u32;
 
     /// Divides a `Natural` by a `u32`, taking the `Natural` by value and returning the quotient and
-    /// remainder. In other words, returns (q, r), where `self` = q * `other` + r and
-    /// 0 <= r < `other`.
+    /// remainder. The quotient is rounded towards negative infinity. The quotient and remainder
+    /// satisfy `self` = q * `other` + r and 0 <= r < `other`.
     ///
     /// Time: worst case O(n)
     ///
@@ -347,11 +347,8 @@ impl DivMod<u32> for Natural {
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
-    ///     // 3 * 123 + 87 = 456
-    ///     assert_eq!(format!("{:?}", Natural::from(456u32).div_mod(123)), "(3, 87)");
-    ///
-    ///     // 8,130,081,300 * 123 + 100 = 10^12
-    ///     assert_eq!(format!("{:?}", Natural::trillion().div_mod(123)), "(8130081300, 100)");
+    ///     // 2 * 10 + 3 = 23
+    ///     assert_eq!(format!("{:?}", Natural::from(23u32).div_mod(10)), "(2, 3)");
     /// }
     /// ```
     fn div_mod(mut self, other: u32) -> (Natural, u32) {
@@ -365,8 +362,8 @@ impl<'a> DivMod<u32> for &'a Natural {
     type ModOutput = u32;
 
     /// Divides a `Natural` by a `u32`, taking the `Natural` by reference and returning the quotient
-    /// and remainder. In other words, returns (q, r), where `self` = q * `other` + r and
-    /// 0 <= r < `other`.
+    /// and remainder. The quotient is rounded towards negative infinity. The quotient and remainder
+    /// satisfy `self` = q * `other` + r and 0 <= r < `other`. 0 <= r < `other`.
     ///
     /// Time: worst case O(n)
     ///
@@ -383,11 +380,8 @@ impl<'a> DivMod<u32> for &'a Natural {
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
-    ///     // 3 * 123 + 87 = 456
-    ///     assert_eq!(format!("{:?}", (&Natural::from(456u32)).div_mod(123)), "(3, 87)");
-    ///
-    ///     // 8,130,081,300 * 123 + 100 = 10^12
-    ///     assert_eq!(format!("{:?}", (&Natural::trillion()).div_mod(123)), "(8130081300, 100)");
+    ///     // 2 * 10 + 3 = 23
+    ///     assert_eq!(format!("{:?}", (&Natural::from(23u32)).div_mod(10)), "(2, 3)");
     /// }
     /// ```
     fn div_mod(self, other: u32) -> (Natural, u32) {
@@ -415,8 +409,9 @@ impl<'a> DivMod<u32> for &'a Natural {
 impl DivAssignMod<u32> for Natural {
     type ModOutput = u32;
 
-    /// Divides a `Natural` by a `u32` in place, returning the remainder. In other words, replaces
-    /// `self` with q and returns r, where `self` = q * `other` + r and 0 <= r < `other`.
+    /// Divides a `Natural` by a `u32` in place, returning the remainder. The quotient is rounded
+    /// towards negative infinity. The quotient and remainder satisfy `self` = q * `other` + r and
+    /// 0 <= r < `other`.
     ///
     /// Time: worst case O(n)
     ///
@@ -433,15 +428,10 @@ impl DivAssignMod<u32> for Natural {
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
-    ///     // 3 * 123 + 87 = 456
-    ///     let mut x = Natural::from(456u32);
-    ///     assert_eq!(x.div_assign_mod(123), 87);
-    ///     assert_eq!(x.to_string(), "3");
-    ///
-    ///     // 8,130,081,300 * 123 + 100 = 10^12
-    ///     let mut x = Natural::trillion();
-    ///     assert_eq!(x.div_assign_mod(123), 100);
-    ///     assert_eq!(x.to_string(), "8130081300");
+    ///     // 2 * 10 + 3 = 23
+    ///     let mut x = Natural::from(23u32);
+    ///     assert_eq!(x.div_assign_mod(10), 3);
+    ///     assert_eq!(x.to_string(), "2");
     /// }
     /// ```
     fn div_assign_mod(&mut self, other: u32) -> u32 {
@@ -467,8 +457,8 @@ impl DivMod<Natural> for u32 {
     type ModOutput = u32;
 
     /// Divides a `u32` by a `Natural`, taking the `Natural` by value and returning the quotient and
-    /// remainder. In other words, returns (q, r), where `self` = q * `other` + r and
-    /// 0 <= r < `other`.
+    /// remainder. The quotient is rounded towards negative infinity. The quotient and remainder
+    /// satisfy `self` = q * `other` + r and 0 <= r < `other`.
     ///
     /// Time: worst case O(1)
     ///
@@ -483,11 +473,8 @@ impl DivMod<Natural> for u32 {
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
-    ///     // 3 * 123 + 87 = 456
-    ///     assert_eq!(456.div_mod(Natural::from(123u32)), (3, 87));
-    ///
-    ///     // 0 * 10^12 + 123 = 123
-    ///     assert_eq!(123.div_mod(Natural::trillion()), (0, 123));
+    ///     // 2 * 10 + 3 = 23
+    ///     assert_eq!(23.div_mod(Natural::from(10u32)), (2, 3));
     /// }
     /// ```
     fn div_mod(self, other: Natural) -> (u32, u32) {
@@ -500,8 +487,8 @@ impl<'a> DivMod<&'a Natural> for u32 {
     type ModOutput = u32;
 
     /// Divides a `u32` by a `Natural`, taking the `Natural` by reference and returning the quotient
-    /// and remainder. In other words, returns (q, r), where `self` = q * `other` + r and
-    /// 0 <= r < `other`.
+    /// and remainder. The quotient is rounded towards negative infinity. The quotient and remainder
+    /// satisfy `self` = q * `other` + r and 0 <= r < `other`.
     ///
     /// Time: worst case O(1)
     ///
@@ -516,11 +503,8 @@ impl<'a> DivMod<&'a Natural> for u32 {
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
-    ///     // 3 * 123 + 87 = 456
-    ///     assert_eq!(456.div_mod(&Natural::from(123u32)), (3, 87));
-    ///
-    ///     // 0 * 10^12 + 123 = 123
-    ///     assert_eq!(123.div_mod(&Natural::trillion()), (0, 123));
+    ///     // 2 * 10 + 3 = 23
+    ///     assert_eq!(23.div_mod(&Natural::from(10u32)), (2, 3));
     /// }
     /// ```
     fn div_mod(self, other: &'a Natural) -> (u32, u32) {
@@ -541,8 +525,8 @@ impl DivAssignMod<Natural> for u32 {
     type ModOutput = u32;
 
     /// Divides a `u32` by a `Natural` in place, taking the `Natural` by value and returning the
-    /// remainder. In other words, replaces `self` with q and returns r, where
-    /// `self` = q * `other` + r and 0 <= r < `other`.
+    /// remainder. The quotient is rounded towards negative infinity. The quotient and remainder
+    /// satisfy `self` = q * `other` + r and 0 <= r < `other`.
     ///
     /// Time: worst case O(1)
     ///
@@ -557,15 +541,10 @@ impl DivAssignMod<Natural> for u32 {
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
-    ///     // 3 * 123 + 87 = 456
-    ///     let mut n = 456;
-    ///     assert_eq!(n.div_assign_mod(Natural::from(123u32)), 87);
-    ///     assert_eq!(n, 3);
-    ///
-    ///     // 0 * 10^12 + 123 = 123
-    ///     let mut n = 123;
-    ///     assert_eq!(n.div_assign_mod(Natural::trillion()), 123);
-    ///     assert_eq!(n, 0);
+    ///     // 2 * 10 + 3 = 23
+    ///     let mut n = 23;
+    ///     assert_eq!(n.div_assign_mod(Natural::from(10u32)), 3);
+    ///     assert_eq!(n, 2);
     /// }
     /// ```
     fn div_assign_mod(&mut self, other: Natural) -> u32 {
@@ -577,8 +556,8 @@ impl<'a> DivAssignMod<&'a Natural> for u32 {
     type ModOutput = u32;
 
     /// Divides a `u32` by a `Natural` in place, taking the `Natural` by reference and returning the
-    /// remainder. In other words, replaces `self` with q and returns r, where
-    /// `self` = q * `other` + r and 0 <= r < `other`.
+    /// remainder. The quotient is rounded towards negative infinity. The quotient and remainder
+    /// satisfy `self` = q * `other` + r and 0 <= r < `other`.
     ///
     /// Time: worst case O(1)
     ///
@@ -593,15 +572,10 @@ impl<'a> DivAssignMod<&'a Natural> for u32 {
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
-    ///     // 3 * 123 + 87 = 456
-    ///     let mut n = 456;
-    ///     assert_eq!(n.div_assign_mod(&Natural::from(123u32)), 87);
-    ///     assert_eq!(n, 3);
-    ///
-    ///     // 0 * 10^12 + 123 = 123
-    ///     let mut n = 123;
-    ///     assert_eq!(n.div_assign_mod(&Natural::trillion()), 123);
-    ///     assert_eq!(n, 0);
+    ///     // 2 * 10 + 3 = 23
+    ///     let mut n = 23;
+    ///     assert_eq!(n.div_assign_mod(&Natural::from(10u32)), 3);
+    ///     assert_eq!(n, 2);
     /// }
     /// ```
     fn div_assign_mod(&mut self, other: &'a Natural) -> u32 {
@@ -616,7 +590,9 @@ impl DivRem<u32> for Natural {
     type RemOutput = u32;
 
     /// Divides a `Natural` by a `u32`, taking the `Natural` by value and returning the quotient and
-    /// remainder. For `Natural`s, rem is equivalent to mod.
+    /// remainder. The quotient is rounded towards negative infinity. The quotient and remainder
+    /// satisfy `self` = q * `other` + r and 0 <= r < `other`. For `Natural`s, rem is equivalent to
+    /// mod.
     ///
     /// Time: worst case O(n)
     ///
@@ -633,11 +609,8 @@ impl DivRem<u32> for Natural {
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
-    ///     // 3 * 123 + 87 = 456
-    ///     assert_eq!(format!("{:?}", Natural::from(456u32).div_rem(123)), "(3, 87)");
-    ///
-    ///     // 8,130,081,300 * 123 + 100 = 10^12
-    ///     assert_eq!(format!("{:?}", Natural::trillion().div_rem(123)), "(8130081300, 100)");
+    ///     // 2 * 10 + 3 = 23
+    ///     assert_eq!(format!("{:?}", Natural::from(23u32).div_rem(10)), "(2, 3)");
     /// }
     /// ```
     fn div_rem(self, other: u32) -> (Natural, u32) {
@@ -650,7 +623,9 @@ impl<'a> DivRem<u32> for &'a Natural {
     type RemOutput = u32;
 
     /// Divides a `Natural` by a `u32`, taking the `Natural` by reference and returning the quotient
-    /// and remainder. For `Natural`s, rem is equivalent to mod.
+    /// and remainder. The quotient is rounded towards negative infinity. The quotient and remainder
+    /// satisfy `self` = q * `other` + r and 0 <= r < `other`. For `Natural`s, rem is equivalent to
+    /// mod.
     ///
     /// Time: worst case O(n)
     ///
@@ -667,11 +642,8 @@ impl<'a> DivRem<u32> for &'a Natural {
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
-    ///     // 3 * 123 + 87 = 456
-    ///     assert_eq!(format!("{:?}", (&Natural::from(456u32)).div_rem(123)), "(3, 87)");
-    ///
-    ///     // 8,130,081,300 * 123 + 100 = 10^12
-    ///     assert_eq!(format!("{:?}", (&Natural::trillion()).div_rem(123)), "(8130081300, 100)");
+    ///     // 2 * 10 + 3 = 23
+    ///     assert_eq!(format!("{:?}", (&Natural::from(23u32)).div_rem(10)), "(2, 3)");
     /// }
     /// ```
     fn div_rem(self, other: u32) -> (Natural, u32) {
@@ -682,8 +654,9 @@ impl<'a> DivRem<u32> for &'a Natural {
 impl DivAssignRem<u32> for Natural {
     type RemOutput = u32;
 
-    /// Divides a `Natural` by a `u32` in place, returning the remainder. For `Natural`s, rem is
-    /// equivalent to mod.
+    /// Divides a `Natural` by a `u32` in place, returning the remainder. The quotient is rounded
+    /// towards negative infinity. The quotient and remainder satisfy `self` = q * `other` + r and
+    /// 0 <= r < `other`.For `Natural`s, rem is equivalent to mod.
     ///
     /// Time: worst case O(n)
     ///
@@ -700,15 +673,10 @@ impl DivAssignRem<u32> for Natural {
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
-    ///     // 3 * 123 + 87 = 456
-    ///     let mut x = Natural::from(456u32);
-    ///     assert_eq!(x.div_assign_rem(123), 87);
-    ///     assert_eq!(x.to_string(), "3");
-    ///
-    ///     // 8,130,081,300 * 123 + 100 = 10^12
-    ///     let mut x = Natural::trillion();
-    ///     assert_eq!(x.div_assign_rem(123), 100);
-    ///     assert_eq!(x.to_string(), "8130081300");
+    ///     // 2 * 10 + 3 = 23
+    ///     let mut x = Natural::from(23u32);
+    ///     assert_eq!(x.div_assign_rem(10), 3);
+    ///     assert_eq!(x.to_string(), "2");
     /// }
     /// ```
     fn div_assign_rem(&mut self, other: u32) -> u32 {
@@ -721,7 +689,9 @@ impl DivRem<Natural> for u32 {
     type RemOutput = u32;
 
     /// Divides a `u32` by a `Natural`, taking the `Natural` by value and returning the quotient and
-    /// remainder. For `Natural`s, rem is equivalent to mod.
+    /// remainder. The quotient is rounded towards negative infinity. The quotient and remainder
+    /// satisfy `self` = q * `other` + r and 0 <= r < `other`. For `Natural`s, rem is equivalent to
+    /// mod.
     ///
     /// Time: worst case O(1)
     ///
@@ -736,11 +706,8 @@ impl DivRem<Natural> for u32 {
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
-    ///     // 3 * 123 + 87 = 456
-    ///     assert_eq!(456.div_rem(Natural::from(123u32)), (3, 87));
-    ///
-    ///     // 0 * 10^12 + 123 = 123
-    ///     assert_eq!(123.div_rem(Natural::trillion()), (0, 123));
+    ///     // 2 * 10 + 3 = 23
+    ///     assert_eq!(23.div_rem(Natural::from(10u32)), (2, 3));
     /// }
     /// ```
     fn div_rem(self, other: Natural) -> (u32, u32) {
@@ -753,7 +720,9 @@ impl<'a> DivRem<&'a Natural> for u32 {
     type RemOutput = u32;
 
     /// Divides a `u32` by a `Natural`, taking the `Natural` by reference and returning the quotient
-    /// and remainder. For `Natural`s, rem is equivalent to mod.
+    /// and remainder. The quotient is rounded towards negative infinity. The quotient and remainder
+    /// satisfy `self` = q * `other` + r and 0 <= r < `other`. For `Natural`s, rem is equivalent to
+    /// mod.
     ///
     /// Time: worst case O(1)
     ///
@@ -768,11 +737,8 @@ impl<'a> DivRem<&'a Natural> for u32 {
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
-    ///     // 3 * 123 + 87 = 456
-    ///     assert_eq!(456.div_rem(&Natural::from(123u32)), (3, 87));
-    ///
-    ///     // 0 * 10^12 + 123 = 123
-    ///     assert_eq!(123.div_rem(&Natural::trillion()), (0, 123));
+    ///     // 2 * 10 + 3 = 23
+    ///     assert_eq!(23.div_rem(&Natural::from(10u32)), (2, 3));
     /// }
     /// ```
     fn div_rem(self, other: &'a Natural) -> (u32, u32) {
@@ -784,7 +750,9 @@ impl DivAssignRem<Natural> for u32 {
     type RemOutput = u32;
 
     /// Divides a `u32` by a `Natural` in place, taking the `Natural` by value and returning the
-    /// remainder. For `Natural`s, rem is equivalent to mod.
+    /// remainder. The quotient is rounded towards negative infinity. The quotient and remainder
+    /// satisfy `self` = q * `other` + r and 0 <= r < `other`. For `Natural`s, rem is equivalent to
+    /// mod.
     ///
     /// Time: worst case O(1)
     ///
@@ -799,15 +767,10 @@ impl DivAssignRem<Natural> for u32 {
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
-    ///     // 3 * 123 + 87 = 456
-    ///     let mut n = 456;
-    ///     assert_eq!(n.div_assign_rem(Natural::from(123u32)), 87);
-    ///     assert_eq!(n, 3);
-    ///
-    ///     // 0 * 10^12 + 123 = 123
-    ///     let mut n = 123;
-    ///     assert_eq!(n.div_assign_rem(Natural::trillion()), 123);
-    ///     assert_eq!(n, 0);
+    ///     // 2 * 10 + 3 = 23
+    ///     let mut n = 23;
+    ///     assert_eq!(n.div_assign_rem(Natural::from(10u32)), 3);
+    ///     assert_eq!(n, 2);
     /// }
     /// ```
     fn div_assign_rem(&mut self, other: Natural) -> u32 {
@@ -819,7 +782,9 @@ impl<'a> DivAssignRem<&'a Natural> for u32 {
     type RemOutput = u32;
 
     /// Divides a `u32` by a `Natural` in place, taking the `Natural` by reference and returning the
-    /// remainder. For `Natural`s, rem is equivalent to mod.
+    /// remainder. The quotient is rounded towards negative infinity. The quotient and remainder
+    /// satisfy `self` = q * `other` + r and 0 <= r < `other`. For `Natural`s, rem is equivalent to
+    /// mod.
     ///
     /// Time: worst case O(1)
     ///
@@ -834,15 +799,10 @@ impl<'a> DivAssignRem<&'a Natural> for u32 {
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
-    ///     // 3 * 123 + 87 = 456
-    ///     let mut n = 456;
-    ///     assert_eq!(n.div_assign_rem(&Natural::from(123u32)), 87);
-    ///     assert_eq!(n, 3);
-    ///
-    ///     // 0 * 10^12 + 123 = 123
-    ///     let mut n = 123;
-    ///     assert_eq!(n.div_assign_rem(&Natural::trillion()), 123);
-    ///     assert_eq!(n, 0);
+    ///     // 2 * 10 + 3 = 23
+    ///     let mut n = 23;
+    ///     assert_eq!(n.div_assign_rem(&Natural::from(10u32)), 3);
+    ///     assert_eq!(n, 2);
     /// }
     /// ```
     fn div_assign_rem(&mut self, other: &'a Natural) -> u32 {
@@ -854,9 +814,9 @@ impl CeilingDivNegMod<u32> for Natural {
     type DivOutput = Natural;
     type ModOutput = u32;
 
-    /// Divides a `Natural` by a `u32`, taking the `Natural` by value and returning the ceiling of
-    /// the quotient and the remainder of the negative of the `Natural` divided by the `u32`. In
-    /// other words, returns (q, r), where `self` = q * `other` - r and 0 <= r < `other`.
+    /// Divides the `Natural` by a `u32`, taking the `Natural` by value and returning the ceiling of
+    /// the quotient and the remainder of the negative of the `Natural` divided by the `u32`. The
+    /// quotient and remainder satisfy `self` = q * `other` - r and 0 <= r < `other`.
     ///
     /// Time: worst case O(n)
     ///
@@ -873,12 +833,8 @@ impl CeilingDivNegMod<u32> for Natural {
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
-    ///     // 4 * 123 - 36 = 456
-    ///     assert_eq!(format!("{:?}", Natural::from(456u32).ceiling_div_neg_mod(123)), "(4, 36)");
-    ///
-    ///     // 8,130,081,301 * 123 - 23 = 10^12
-    ///     assert_eq!(format!("{:?}", Natural::trillion().ceiling_div_neg_mod(123)),
-    ///         "(8130081301, 23)");
+    ///     // 3 * 10 - 7 = 23
+    ///     assert_eq!(format!("{:?}", Natural::from(23u32).ceiling_div_neg_mod(10)), "(3, 7)");
     /// }
     /// ```
     fn ceiling_div_neg_mod(mut self, other: u32) -> (Natural, u32) {
@@ -892,8 +848,8 @@ impl<'a> CeilingDivNegMod<u32> for &'a Natural {
     type ModOutput = u32;
 
     /// Divides a `Natural` by a `u32`, taking the `Natural` by reference and returning the ceiling
-    /// of the quotient and the remainder of the negative of the `Natural` divided by the `u32`. In
-    /// other words, returns (q, r), where `self` = q * `other` - r and 0 <= r < `other`.
+    /// of the quotient and the remainder of the negative of the `Natural` divided by the `u32`. The
+    /// quotient and remainder satisfy `self` = q * `other` - r and 0 <= r < `other`.
     ///
     /// Time: worst case O(n)
     ///
@@ -910,13 +866,8 @@ impl<'a> CeilingDivNegMod<u32> for &'a Natural {
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
-    ///     // 4 * 123 - 36 = 456
-    ///     assert_eq!(format!("{:?}", (&Natural::from(456u32)).ceiling_div_neg_mod(123)),
-    ///         "(4, 36)");
-    ///
-    ///     // 8,130,081,301 * 123 - 23 = 10^12
-    ///     assert_eq!(format!("{:?}", (&Natural::trillion()).ceiling_div_neg_mod(123)),
-    ///         "(8130081301, 23)");
+    ///     // 3 * 10 - 7 = 23
+    ///     assert_eq!(format!("{:?}", (&Natural::from(23u32)).ceiling_div_neg_mod(10)), "(3, 7)");
     /// }
     /// ```
     fn ceiling_div_neg_mod(self, other: u32) -> (Natural, u32) {
@@ -933,8 +884,8 @@ impl CeilingDivAssignNegMod<u32> for Natural {
     type ModOutput = u32;
 
     /// Divides a `Natural` by a `u32` in place, taking the ceiling of the quotient and returning
-    /// the remainder of the negative of the `Natural` divided by the `u32`. In other words,
-    /// replaces `self` with q and returns r, where `self` = q * `other` - r and 0 <= r < `other`.
+    /// the remainder of the negative of the `Natural` divided by the `u32`. The quotient and
+    /// remainder satisfy `self` = q * `other` - r and 0 <= r < `other`.
     ///
     /// Time: worst case O(n)
     ///
@@ -951,15 +902,10 @@ impl CeilingDivAssignNegMod<u32> for Natural {
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
-    ///     // 4 * 123 - 36 = 456
-    ///     let mut x = Natural::from(456u32);
-    ///     assert_eq!(x.ceiling_div_assign_neg_mod(123), 36);
-    ///     assert_eq!(x.to_string(), "4");
-    ///
-    ///     // 8,130,081,301 * 123 - 23 = 10^12
-    ///     let mut x = Natural::trillion();
-    ///     assert_eq!(x.ceiling_div_assign_neg_mod(123), 23);
-    ///     assert_eq!(x.to_string(), "8130081301");
+    ///     // 3 * 10 - 7 = 23
+    ///     let mut x = Natural::from(23u32);
+    ///     assert_eq!(x.ceiling_div_assign_neg_mod(10), 7);
+    ///     assert_eq!(x.to_string(), "3");
     /// }
     /// ```
     fn ceiling_div_assign_neg_mod(&mut self, other: u32) -> u32 {
@@ -978,8 +924,8 @@ impl CeilingDivNegMod<Natural> for u32 {
     type ModOutput = Natural;
 
     /// Divides a `u32` by a `Natural`, taking the `Natural` by value and returning the ceiling of
-    /// the quotient and the remainder of the negative of the `u32` divided by the `Natural`. In
-    /// other words, returns (q, r), where `self` = q * `other` - r and 0 <= r < `other`.
+    /// the quotient and the remainder of the negative of the `u32` divided by the `Natural`. The
+    /// quotient and remainder satisfy `self` = q * `other` - r and 0 <= r < `other`.
     ///
     /// Time: worst case O(n)
     ///
@@ -996,13 +942,8 @@ impl CeilingDivNegMod<Natural> for u32 {
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
-    ///     // 4 * 123 - 36 = 456
-    ///     assert_eq!(format!("{:?}", 456.ceiling_div_neg_mod(Natural::from(123u32))),
-    ///         "(4, 36)");
-    ///
-    ///     // 1 * 10^12 - 999,999,999,877 = 123
-    ///     assert_eq!(format!("{:?}", 123.ceiling_div_neg_mod(Natural::trillion())),
-    ///         "(1, 999999999877)");
+    ///     // 3 * 10 - 7 = 23
+    ///     assert_eq!(format!("{:?}", 23.ceiling_div_neg_mod(Natural::from(10u32))), "(3, 7)");
     /// }
     /// ```
     fn ceiling_div_neg_mod(self, other: Natural) -> (u32, Natural) {
@@ -1015,8 +956,8 @@ impl<'a> CeilingDivNegMod<&'a Natural> for u32 {
     type ModOutput = Natural;
 
     /// Divides a `u32` by a `Natural`, taking the `Natural` by reference and returning the ceiling
-    /// of the quotient and the remainder of the negative of the `u32` divided by the `Natural`. In
-    /// other words, returns (q, r), where `self` = q * `other` - r and 0 <= r < `other`.
+    /// of the quotient and the remainder of the negative of the `u32` divided by the `Natural`. The
+    /// quotient and remainder satisfy `self` = q * `other` - r and 0 <= r < `other`.
     ///
     /// Time: worst case O(n)
     ///
@@ -1033,13 +974,8 @@ impl<'a> CeilingDivNegMod<&'a Natural> for u32 {
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
-    ///     // 4 * 123 - 36 = 456
-    ///     assert_eq!(format!("{:?}", 456.ceiling_div_neg_mod(&Natural::from(123u32))),
-    ///         "(4, 36)");
-    ///
-    ///     // 1 * 10^12 - 999,999,999,877 = 123
-    ///     assert_eq!(format!("{:?}", 123.ceiling_div_neg_mod(&Natural::trillion())),
-    ///         "(1, 999999999877)");
+    ///     // 3 * 10 - 7 = 23
+    ///     assert_eq!(format!("{:?}", 23.ceiling_div_neg_mod(&Natural::from(10u32))), "(3, 7)");
     /// }
     /// ```
     fn ceiling_div_neg_mod(self, other: &'a Natural) -> (u32, Natural) {
@@ -1057,8 +993,7 @@ impl CeilingDivAssignNegMod<Natural> for u32 {
 
     /// Divides a `u32` by a `Natural` in place, taking the `Natural` by value, taking the ceiling
     /// of the quotient and returning the remainder of the negative of the `u32` divided by the
-    /// `Natural`. In other words, replaces `self` with q and returns r, where
-    /// `self` = q * `other` - r and 0 <= r < `other`.
+    /// `Natural`. The quotient and remainder satisfy `self` = q * `other` - r and 0 <= r < `other`.
     ///
     /// Time: worst case O(n)
     ///
@@ -1075,16 +1010,10 @@ impl CeilingDivAssignNegMod<Natural> for u32 {
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
-    ///     // 4 * 123 - 36 = 456
-    ///     let mut x = 456;
-    ///     assert_eq!(x.ceiling_div_assign_neg_mod(Natural::from(123u32)), 36);
-    ///     assert_eq!(x.to_string(), "4");
-    ///
-    ///     // 1 * 10^12 - 999,999,999,877 = 123
-    ///     let mut x = 123;
-    ///     assert_eq!(x.ceiling_div_assign_neg_mod(Natural::trillion()).to_string(),
-    ///         "999999999877");
-    ///     assert_eq!(x, 1);
+    ///     // 3 * 10 - 7 = 23
+    ///     let mut x = 23;
+    ///     assert_eq!(x.ceiling_div_assign_neg_mod(Natural::from(10u32)), 7);
+    ///     assert_eq!(x.to_string(), "3");
     /// }
     /// ```
     fn ceiling_div_assign_neg_mod(&mut self, other: Natural) -> Natural {
@@ -1097,8 +1026,8 @@ impl<'a> CeilingDivAssignNegMod<&'a Natural> for u32 {
 
     /// Divides a `u32` by a `Natural` in place, taking the `Natural` by reference, taking the
     /// ceiling of the quotient and returning the remainder of the negative of the `u32` divided by
-    /// the `Natural`. In other words, replaces `self` with q and returns r, where
-    /// `self` = q * `other` - r and 0 <= r < `other`.
+    /// the `Natural`. The quotient and remainder satisfy `self` = q * `other` - r and
+    /// 0 <= r < `other`.
     ///
     /// Time: worst case O(n)
     ///
@@ -1115,16 +1044,10 @@ impl<'a> CeilingDivAssignNegMod<&'a Natural> for u32 {
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
-    ///     // 4 * 123 - 36 = 456
-    ///     let mut x = 456;
-    ///     assert_eq!(x.ceiling_div_assign_neg_mod(&Natural::from(123u32)), 36);
-    ///     assert_eq!(x.to_string(), "4");
-    ///
-    ///     // 1 * 10^12 - 999,999,999,877 = 123
-    ///     let mut x = 123;
-    ///     assert_eq!(x.ceiling_div_assign_neg_mod(&Natural::trillion()).to_string(),
-    ///         "999999999877");
-    ///     assert_eq!(x, 1);
+    ///     // 3 * 10 - 7 = 23
+    ///     let mut x = 23;
+    ///     assert_eq!(x.ceiling_div_assign_neg_mod(&Natural::from(10u32)), 7);
+    ///     assert_eq!(x.to_string(), "3");
     /// }
     /// ```
     fn ceiling_div_assign_neg_mod(&mut self, other: &Natural) -> Natural {

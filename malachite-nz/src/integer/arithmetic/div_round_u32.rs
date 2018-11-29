@@ -25,17 +25,17 @@ impl DivRound<u32> for Integer {
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {
-    ///     assert_eq!(Integer::from(-10).div_round(4, RoundingMode::Down).to_string(), "-2");
-    ///     assert_eq!((-Integer::trillion()).div_round(3, RoundingMode::Floor).to_string(),
+    ///     assert_eq!(Integer::from(-10).div_round(4u32, RoundingMode::Down).to_string(), "-2");
+    ///     assert_eq!((-Integer::trillion()).div_round(3u32, RoundingMode::Floor).to_string(),
     ///         "-333333333334");
-    ///     assert_eq!(Integer::from(-10).div_round(4, RoundingMode::Up).to_string(), "-3");
-    ///     assert_eq!((-Integer::trillion()).div_round(3, RoundingMode::Ceiling).to_string(),
+    ///     assert_eq!(Integer::from(-10).div_round(4u32, RoundingMode::Up).to_string(), "-3");
+    ///     assert_eq!((-Integer::trillion()).div_round(3u32, RoundingMode::Ceiling).to_string(),
     ///         "-333333333333");
-    ///     assert_eq!(Integer::from(-10).div_round(5, RoundingMode::Exact).to_string(), "-2");
-    ///     assert_eq!(Integer::from(-10).div_round(3, RoundingMode::Nearest).to_string(), "-3");
-    ///     assert_eq!(Integer::from(-20).div_round(3, RoundingMode::Nearest).to_string(), "-7");
-    ///     assert_eq!(Integer::from(-10).div_round(4, RoundingMode::Nearest).to_string(), "-2");
-    ///     assert_eq!(Integer::from(-14).div_round(4, RoundingMode::Nearest).to_string(), "-4");
+    ///     assert_eq!(Integer::from(-10).div_round(5u32, RoundingMode::Exact).to_string(), "-2");
+    ///     assert_eq!(Integer::from(-10).div_round(3u32, RoundingMode::Nearest).to_string(), "-3");
+    ///     assert_eq!(Integer::from(-20).div_round(3u32, RoundingMode::Nearest).to_string(), "-7");
+    ///     assert_eq!(Integer::from(-10).div_round(4u32, RoundingMode::Nearest).to_string(), "-2");
+    ///     assert_eq!(Integer::from(-14).div_round(4u32, RoundingMode::Nearest).to_string(), "-4");
     /// }
     /// ```
     fn div_round(mut self, other: u32, rm: RoundingMode) -> Integer {
@@ -66,17 +66,22 @@ impl<'a> DivRound<u32> for &'a Integer {
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {
-    ///     assert_eq!((&Integer::from(-10)).div_round(4, RoundingMode::Down).to_string(), "-2");
-    ///     assert_eq!((&-Integer::trillion()).div_round(3, RoundingMode::Floor).to_string(),
+    ///     assert_eq!((&Integer::from(-10)).div_round(4u32, RoundingMode::Down).to_string(), "-2");
+    ///     assert_eq!((&-Integer::trillion()).div_round(3u32, RoundingMode::Floor).to_string(),
     ///         "-333333333334");
-    ///     assert_eq!((&Integer::from(-10)).div_round(4, RoundingMode::Up).to_string(), "-3");
-    ///     assert_eq!((&-Integer::trillion()).div_round(3, RoundingMode::Ceiling).to_string(),
+    ///     assert_eq!((&Integer::from(-10)).div_round(4u32, RoundingMode::Up).to_string(), "-3");
+    ///     assert_eq!((&-Integer::trillion()).div_round(3u32, RoundingMode::Ceiling).to_string(),
     ///         "-333333333333");
-    ///     assert_eq!((&Integer::from(-10)).div_round(5, RoundingMode::Exact).to_string(), "-2");
-    ///     assert_eq!((&Integer::from(-10)).div_round(3, RoundingMode::Nearest).to_string(), "-3");
-    ///     assert_eq!((&Integer::from(-20)).div_round(3, RoundingMode::Nearest).to_string(), "-7");
-    ///     assert_eq!((&Integer::from(-10)).div_round(4, RoundingMode::Nearest).to_string(), "-2");
-    ///     assert_eq!((&Integer::from(-14)).div_round(4, RoundingMode::Nearest).to_string(), "-4");
+    ///     assert_eq!((&Integer::from(-10)).div_round(5u32, RoundingMode::Exact).to_string(),
+    ///         "-2");
+    ///     assert_eq!((&Integer::from(-10)).div_round(3u32, RoundingMode::Nearest).to_string(),
+    ///         "-3");
+    ///     assert_eq!((&Integer::from(-20)).div_round(3u32, RoundingMode::Nearest).to_string(),
+    ///         "-7");
+    ///     assert_eq!((&Integer::from(-10)).div_round(4u32, RoundingMode::Nearest).to_string(),
+    ///         "-2");
+    ///     assert_eq!((&Integer::from(-14)).div_round(4u32, RoundingMode::Nearest).to_string(),
+    ///         "-4");
     /// }
     /// ```
     fn div_round(self, other: u32, rm: RoundingMode) -> Integer {
@@ -118,16 +123,17 @@ impl DivRound<Integer> for u32 {
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {
-    ///     assert_eq!(10.div_round(Integer::from(-4), RoundingMode::Down).to_string(), "-2");
-    ///     assert_eq!(1000.div_round(-Integer::trillion(), RoundingMode::Floor).to_string(), "-1");
-    ///     assert_eq!(10.div_round(Integer::from(-4), RoundingMode::Up).to_string(), "-3");
-    ///     assert_eq!(1000.div_round(-Integer::trillion(), RoundingMode::Ceiling).to_string(),
+    ///     assert_eq!(10u32.div_round(Integer::from(-4), RoundingMode::Down).to_string(), "-2");
+    ///     assert_eq!(1000u32.div_round(-Integer::trillion(), RoundingMode::Floor).to_string(),
+    ///         "-1");
+    ///     assert_eq!(10u32.div_round(Integer::from(-4), RoundingMode::Up).to_string(), "-3");
+    ///     assert_eq!(1000u32.div_round(-Integer::trillion(), RoundingMode::Ceiling).to_string(),
     ///         "0");
-    ///     assert_eq!(10.div_round(Integer::from(-5), RoundingMode::Exact).to_string(), "-2");
-    ///     assert_eq!(10.div_round(Integer::from(-3), RoundingMode::Nearest).to_string(), "-3");
-    ///     assert_eq!(20.div_round(Integer::from(-3), RoundingMode::Nearest).to_string(), "-7");
-    ///     assert_eq!(10.div_round(Integer::from(-4), RoundingMode::Nearest).to_string(), "-2");
-    ///     assert_eq!(14.div_round(Integer::from(-4), RoundingMode::Nearest).to_string(), "-4");
+    ///     assert_eq!(10u32.div_round(Integer::from(-5), RoundingMode::Exact).to_string(), "-2");
+    ///     assert_eq!(10u32.div_round(Integer::from(-3), RoundingMode::Nearest).to_string(), "-3");
+    ///     assert_eq!(20u32.div_round(Integer::from(-3), RoundingMode::Nearest).to_string(), "-7");
+    ///     assert_eq!(10u32.div_round(Integer::from(-4), RoundingMode::Nearest).to_string(), "-2");
+    ///     assert_eq!(14u32.div_round(Integer::from(-4), RoundingMode::Nearest).to_string(), "-4");
     /// }
     /// ```
     fn div_round(self, other: Integer, rm: RoundingMode) -> Integer {
@@ -157,17 +163,21 @@ impl<'a> DivRound<&'a Integer> for u32 {
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {
-    ///     assert_eq!(10.div_round(&Integer::from(-4), RoundingMode::Down).to_string(), "-2");
-    ///     assert_eq!(1000.div_round(&-Integer::trillion(), RoundingMode::Floor).to_string(),
+    ///     assert_eq!(10u32.div_round(&Integer::from(-4), RoundingMode::Down).to_string(), "-2");
+    ///     assert_eq!(1000u32.div_round(&-Integer::trillion(), RoundingMode::Floor).to_string(),
     ///         "-1");
-    ///     assert_eq!(10.div_round(&Integer::from(-4), RoundingMode::Up).to_string(), "-3");
-    ///     assert_eq!(1000.div_round(&-Integer::trillion(), RoundingMode::Ceiling).to_string(),
+    ///     assert_eq!(10u32.div_round(&Integer::from(-4), RoundingMode::Up).to_string(), "-3");
+    ///     assert_eq!(1000u32.div_round(&-Integer::trillion(), RoundingMode::Ceiling).to_string(),
     ///         "0");
-    ///     assert_eq!(10.div_round(&Integer::from(-5), RoundingMode::Exact).to_string(), "-2");
-    ///     assert_eq!(10.div_round(&Integer::from(-3), RoundingMode::Nearest).to_string(), "-3");
-    ///     assert_eq!(20.div_round(&Integer::from(-3), RoundingMode::Nearest).to_string(), "-7");
-    ///     assert_eq!(10.div_round(&Integer::from(-4), RoundingMode::Nearest).to_string(), "-2");
-    ///     assert_eq!(14.div_round(&Integer::from(-4), RoundingMode::Nearest).to_string(), "-4");
+    ///     assert_eq!(10u32.div_round(&Integer::from(-5), RoundingMode::Exact).to_string(), "-2");
+    ///     assert_eq!(10u32.div_round(&Integer::from(-3), RoundingMode::Nearest).to_string(),
+    ///         "-3");
+    ///     assert_eq!(20u32.div_round(&Integer::from(-3), RoundingMode::Nearest).to_string(),
+    ///         "-7");
+    ///     assert_eq!(10u32.div_round(&Integer::from(-4), RoundingMode::Nearest).to_string(),
+    ///         "-2");
+    ///     assert_eq!(14u32.div_round(&Integer::from(-4), RoundingMode::Nearest).to_string(),
+    ///         "-4");
     /// }
     /// ```
     fn div_round(self, other: &'a Integer, rm: RoundingMode) -> Integer {
@@ -208,39 +218,39 @@ impl DivRoundAssign<u32> for Integer {
     ///
     /// fn main() {
     ///     let mut n = Integer::from(-10);
-    ///     n.div_round_assign(4, RoundingMode::Down);
+    ///     n.div_round_assign(4u32, RoundingMode::Down);
     ///     assert_eq!(n.to_string(), "-2");
     ///
     ///     let mut n = -Integer::trillion();
-    ///     n.div_round_assign(3, RoundingMode::Floor);
+    ///     n.div_round_assign(3u32, RoundingMode::Floor);
     ///     assert_eq!(n.to_string(), "-333333333334");
     ///
     ///     let mut n = Integer::from(-10);
-    ///     n.div_round_assign(4, RoundingMode::Up);
+    ///     n.div_round_assign(4u32, RoundingMode::Up);
     ///     assert_eq!(n.to_string(), "-3");
     ///
     ///     let mut n = -Integer::trillion();
-    ///     n.div_round_assign(3, RoundingMode::Ceiling);
+    ///     n.div_round_assign(3u32, RoundingMode::Ceiling);
     ///     assert_eq!(n.to_string(), "-333333333333");
     ///
     ///     let mut n = Integer::from(-10);
-    ///     n.div_round_assign(5, RoundingMode::Exact);
+    ///     n.div_round_assign(5u32, RoundingMode::Exact);
     ///     assert_eq!(n.to_string(), "-2");
     ///
     ///     let mut n = Integer::from(-10);
-    ///     n.div_round_assign(3, RoundingMode::Nearest);
+    ///     n.div_round_assign(3u32, RoundingMode::Nearest);
     ///     assert_eq!(n.to_string(), "-3");
     ///
     ///     let mut n = Integer::from(-20);
-    ///     n.div_round_assign(3, RoundingMode::Nearest);
+    ///     n.div_round_assign(3u32, RoundingMode::Nearest);
     ///     assert_eq!(n.to_string(), "-7");
     ///
     ///     let mut n = Integer::from(-10);
-    ///     n.div_round_assign(4, RoundingMode::Nearest);
+    ///     n.div_round_assign(4u32, RoundingMode::Nearest);
     ///     assert_eq!(n.to_string(), "-2");
     ///
     ///     let mut n = Integer::from(-14);
-    ///     n.div_round_assign(4, RoundingMode::Nearest);
+    ///     n.div_round_assign(4u32, RoundingMode::Nearest);
     ///     assert_eq!(n.to_string(), "-4");
     /// }
     /// ```

@@ -421,6 +421,14 @@ pub fn pairs_of_integer_and_nonzero_i32_var_1(
     Box::new(pairs_of_integer_and_nonzero_signed(gm).map(|(n, i)| (n * i, i)))
 }
 
+// All pairs of `Integer` and nonzero `i32`, where the `Integer` is not divisible by the `i32`.
+pub fn pairs_of_integer_and_nonzero_i32_var_2(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (Integer, i32)>> {
+    //TODO use divisible_by
+    Box::new(pairs_of_integer_and_nonzero_signed(gm).filter(|&(ref n, i)| n % i != 0))
+}
+
 pub fn nrm_pairs_of_unsigned_and_integer<T: PrimitiveUnsigned>(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = ((T, BigInt), (T, rug::Integer), (T, Integer))>> {
@@ -500,6 +508,14 @@ pub fn pairs_of_signed_and_nonzero_integer<T: PrimitiveSigned>(
             &(|seed| special_random_nonzero_integers(seed, scale)),
         )),
     }
+}
+
+// All pairs of `i32` and positive `Integer` where the `i32` is not divisible by the `Integer`.
+pub fn pairs_of_i32_and_nonzero_integer_var_1(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (i32, Integer)>> {
+    //TODO use divisible_by
+    Box::new(pairs_of_signed_and_nonzero_integer(gm).filter(|&(i, ref n)| i % n != 0))
 }
 
 pub fn pairs_of_natural_integer_and_unsigned<T: PrimitiveUnsigned>(
@@ -1751,6 +1767,91 @@ where
                 T::checked_from(u * (&n).abs()).map(|u| (u, n, rm))
             } else {
                 Some((u, n, rm))
+            }
+        }),
+    )
+}
+
+fn triples_of_integer_nonzero_signed_and_rounding_mode<T: PrimitiveSigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (Integer, T, RoundingMode)>> {
+    match gm {
+        GenerationMode::Exhaustive => reshape_2_1_to_3(Box::new(lex_pairs(
+            exhaustive_pairs(exhaustive_integers(), exhaustive_nonzero_signed()),
+            exhaustive_rounding_modes(),
+        ))),
+        GenerationMode::Random(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| random_integers(seed, scale)),
+            &(|seed| random_nonzero_signed(seed)),
+            &(|seed| random_rounding_modes(seed)),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_integers(seed, scale)),
+            &(|seed| special_random_nonzero_signed(seed)),
+            &(|seed| random_rounding_modes(seed)),
+        )),
+    }
+}
+
+// All triples of `Integer`, positive `T`, and `RoundingMode`, where `T` is signed and if the
+// `RoundingMode` is `RoundingMode::Exact`, the `Integer` is divisible by the `T`.
+pub fn triples_of_integer_nonzero_signed_and_rounding_mode_var_1<T: PrimitiveSigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (Integer, T, RoundingMode)>>
+where
+    Integer: Mul<T, Output = Integer>,
+{
+    Box::new(
+        triples_of_integer_nonzero_signed_and_rounding_mode::<T>(gm).map(|(n, i, rm)| {
+            if rm == RoundingMode::Exact {
+                (n * i, i, rm)
+            } else {
+                (n, i, rm)
+            }
+        }),
+    )
+}
+
+fn triples_of_signed_nonzero_integer_and_rounding_mode<T: PrimitiveSigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (T, Integer, RoundingMode)>> {
+    match gm {
+        GenerationMode::Exhaustive => reshape_2_1_to_3(Box::new(lex_pairs(
+            exhaustive_pairs(exhaustive_signed(), exhaustive_nonzero_integers()),
+            exhaustive_rounding_modes(),
+        ))),
+        GenerationMode::Random(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| random(seed)),
+            &(|seed| random_nonzero_integers(seed, scale)),
+            &(|seed| random_rounding_modes(seed)),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_signed(seed)),
+            &(|seed| special_random_nonzero_integers(seed, scale)),
+            &(|seed| random_rounding_modes(seed)),
+        )),
+    }
+}
+
+// All triples of `T`, nonzero `Integer`, and `RoundingMode`, where `T` is signed and if the
+// `RoundingMode` is `RoundingMode::Exact`, the `T` is divisible by the `Integer`.
+pub fn triples_of_signed_nonzero_integer_and_rounding_mode_var_1<T: PrimitiveSigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (T, Integer, RoundingMode)>>
+where
+    T: Mul<Integer, Output = Integer>,
+    T: CheckedFrom<Integer>,
+{
+    Box::new(
+        triples_of_signed_nonzero_integer_and_rounding_mode::<T>(gm).filter_map(|(i, n, rm)| {
+            if rm == RoundingMode::Exact {
+                T::checked_from(i * (&n).abs()).map(|i| (i, n, rm))
+            } else {
+                Some((i, n, rm))
             }
         }),
     )

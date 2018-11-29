@@ -31,36 +31,36 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
 }
 
 fn demo_integer_div_assign_i32(gm: GenerationMode, limit: usize) {
-    for (mut n, u) in pairs_of_integer_and_nonzero_signed::<i32>(gm).take(limit) {
+    for (mut n, i) in pairs_of_integer_and_nonzero_signed::<i32>(gm).take(limit) {
         let n_old = n.clone();
-        n /= u;
-        println!("x := {}; x /= {}; x = {}", n_old, u, n);
+        n /= i;
+        println!("x := {}; x /= {}; x = {}", n_old, i, n);
     }
 }
 
 fn demo_integer_div_i32(gm: GenerationMode, limit: usize) {
-    for (n, u) in pairs_of_integer_and_nonzero_signed::<i32>(gm).take(limit) {
+    for (n, i) in pairs_of_integer_and_nonzero_signed::<i32>(gm).take(limit) {
         let n_old = n.clone();
-        println!("{} / {} = {}", n_old, u, n / u);
+        println!("{} / {} = {}", n_old, i, n / i);
     }
 }
 
 fn demo_integer_div_i32_ref(gm: GenerationMode, limit: usize) {
-    for (n, u) in pairs_of_integer_and_nonzero_signed::<i32>(gm).take(limit) {
-        println!("&{} / {} = {}", n, u, &n / u);
+    for (n, i) in pairs_of_integer_and_nonzero_signed::<i32>(gm).take(limit) {
+        println!("&{} / {} = {}", n, i, &n / i);
     }
 }
 
 fn demo_i32_div_integer(gm: GenerationMode, limit: usize) {
-    for (u, n) in pairs_of_signed_and_nonzero_integer::<i32>(gm).take(limit) {
+    for (i, n) in pairs_of_signed_and_nonzero_integer::<i32>(gm).take(limit) {
         let n_old = n.clone();
-        println!("{} / {} = {}", u, n_old, u / n);
+        println!("{} / {} = {}", i, n_old, i / n);
     }
 }
 
 fn demo_i32_div_integer_ref(gm: GenerationMode, limit: usize) {
-    for (u, n) in pairs_of_signed_and_nonzero_integer::<i32>(gm).take(limit) {
-        println!("{} / &{} = {}", u, n, u / &n);
+    for (i, n) in pairs_of_signed_and_nonzero_integer::<i32>(gm).take(limit) {
+        println!("{} / &{} = {}", i, n, i / &n);
     }
 }
 
