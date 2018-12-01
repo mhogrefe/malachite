@@ -28,11 +28,6 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_natural_sub_val_ref);
     register_demo!(registry, demo_natural_sub_ref_val);
     register_demo!(registry, demo_natural_sub_ref_ref);
-    register_bench!(
-        registry,
-        Large,
-        benchmark_natural_sub_assign_library_comparison
-    );
     register_bench!(registry, Small, benchmark_limbs_sub);
     register_bench!(registry, Small, benchmark_limbs_sub_same_length_to_out);
     register_bench!(registry, Small, benchmark_limbs_sub_to_out);
@@ -48,6 +43,16 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
         benchmark_limbs_sub_same_length_in_place_right
     );
     register_bench!(registry, Small, benchmark_limbs_sub_in_place_right);
+    register_bench!(
+        registry,
+        Large,
+        benchmark_natural_sub_assign_library_comparison
+    );
+    register_bench!(
+        registry,
+        Large,
+        benchmark_natural_sub_assign_evaluation_strategy
+    );
     register_bench!(registry, Large, benchmark_natural_sub_library_comparison);
     register_bench!(registry, Large, benchmark_natural_sub_evaluation_strategy);
 }
@@ -318,6 +323,27 @@ fn benchmark_natural_sub_assign_library_comparison(
         &mut [
             ("malachite", &mut (|(_, (mut x, y))| x -= y)),
             ("rug", &mut (|((mut x, y), _)| x -= y)),
+        ],
+    );
+}
+
+fn benchmark_natural_sub_assign_evaluation_strategy(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "Natural -= Natural",
+        BenchmarkType::EvaluationStrategy,
+        pairs_of_naturals_var_1(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),
+        "max(x.significant_bits(), y.significant_bits())",
+        &mut [
+            ("Natural -= Natural", &mut (|(mut x, y)| x -= y)),
+            ("Natural -= &Natural", &mut (|(mut x, y)| x -= &y)),
         ],
     );
 }

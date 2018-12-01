@@ -396,7 +396,7 @@ fn limbs_sub_in_place_right_fail() {
 }
 
 #[test]
-fn test_sub_assign_natural() {
+fn test_sub_natural() {
     let test = |u, v, out| {
         let mut n = Natural::from_str(u).unwrap();
         n -= Natural::from_str(v).unwrap();
@@ -407,38 +407,7 @@ fn test_sub_assign_natural() {
         n -= &Natural::from_str(v).unwrap();
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
-    };
-    test("0", "0", "0");
-    test("123", "0", "123");
-    test("456", "123", "333");
-    test("1000000000000", "123", "999999999877");
-    test("12345678987654321", "314159265358979", "12031519722295342");
-    test("4294967296", "1", "4294967295");
-    test("4294967295", "4294967295", "0");
-    test("4294967296", "4294967295", "1");
-    test("4294967296", "4294967296", "0");
-    test("18446744073709551616", "1", "18446744073709551615");
-    test("18446744073709551615", "18446744073709551615", "0");
-    test("18446744073709551616", "18446744073709551615", "1");
-}
 
-#[test]
-#[should_panic(expected = "Cannot subtract a Natural from a smaller Natural")]
-fn sub_assign_fail() {
-    let mut x = Natural::from_str("123").unwrap();
-    x -= Natural::from_str("456").unwrap();
-}
-
-#[test]
-#[should_panic(expected = "Cannot subtract a Natural from a smaller Natural")]
-fn sub_assign_ref_fail() {
-    let mut x = Natural::from_str("123").unwrap();
-    x -= &Natural::from_str("456").unwrap();
-}
-
-#[test]
-fn test_sub_natural() {
-    let test = |u, v, out| {
         let n = Natural::from_str(u).unwrap() - Natural::from_str(v).unwrap();
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
@@ -474,6 +443,20 @@ fn test_sub_natural() {
     test("18446744073709551615", "18446744073709551615", "0");
     test("18446744073709551616", "18446744073709551615", "1");
     test("70734740290631708", "282942734368", "70734457347897340");
+}
+
+#[test]
+#[should_panic(expected = "Cannot subtract a Natural from a smaller Natural")]
+fn sub_assign_fail() {
+    let mut x = Natural::from_str("123").unwrap();
+    x -= Natural::from_str("456").unwrap();
+}
+
+#[test]
+#[should_panic(expected = "Cannot subtract a Natural from a smaller Natural")]
+fn sub_assign_ref_fail() {
+    let mut x = Natural::from_str("123").unwrap();
+    x -= &Natural::from_str("456").unwrap();
 }
 
 #[test]

@@ -26,7 +26,7 @@ impl Natural {
     }
 
     // self -= &other, return borrow
-    pub(crate) fn sub_assign_ref_no_panic<'a>(&mut self, other: &'a Natural) -> bool {
+    pub(crate) fn sub_assign_ref_no_panic(&mut self, other: &Natural) -> bool {
         if *other == 0 {
             false
         } else if self as *const Natural == other as *const Natural {
@@ -51,7 +51,7 @@ impl Natural {
     }
 
     // self = &other - self, return borrow
-    pub(crate) fn sub_right_assign_no_panic<'a>(&mut self, other: &'a Natural) -> bool {
+    pub(crate) fn sub_right_assign_no_panic(&mut self, other: &Natural) -> bool {
         if self as *const Natural == other as *const Natural {
             *self = Small(0);
             false
@@ -84,7 +84,7 @@ impl Natural {
 ///
 /// Time: worst case O(n)
 ///
-/// Additional memory: worst case O(n)
+/// Additional memory: worst case O(1)
 ///
 /// where n = `self.significant_bits()`
 ///
@@ -156,7 +156,7 @@ impl<'a> CheckedSub<&'a Natural> for Natural {
 }
 
 /// Subtracts a `Natural` from a `Natural`, taking the left `Natural` by reference and the right
-/// `Natural` by value. If the second `Natural`  is greater than the first, returns `None`.
+/// `Natural` by value. If the second `Natural` is greater than the first, returns `None`.
 ///
 /// Time: worst case O(n)
 ///

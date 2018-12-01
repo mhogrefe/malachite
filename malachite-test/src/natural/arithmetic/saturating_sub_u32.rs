@@ -29,7 +29,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
 }
 
 fn demo_natural_saturating_sub_assign_u32(gm: GenerationMode, limit: usize) {
-    for (mut n, u) in pairs_of_natural_and_unsigned(gm).take(limit) {
+    for (mut n, u) in pairs_of_natural_and_unsigned::<u32>(gm).take(limit) {
         let n_old = n.clone();
         n.saturating_sub_assign(u);
         println!("x := {}; x.saturating_sub_assign({}); x = {}", n_old, u, n);
@@ -37,14 +37,14 @@ fn demo_natural_saturating_sub_assign_u32(gm: GenerationMode, limit: usize) {
 }
 
 fn demo_natural_saturating_sub_u32(gm: GenerationMode, limit: usize) {
-    for (n, u) in pairs_of_natural_and_unsigned(gm).take(limit) {
+    for (n, u) in pairs_of_natural_and_unsigned::<u32>(gm).take(limit) {
         let n_old = n.clone();
         println!("{}.saturating_sub({}) = {}", n_old, u, n.saturating_sub(u));
     }
 }
 
 fn demo_natural_saturating_sub_u32_ref(gm: GenerationMode, limit: usize) {
-    for (n, u) in pairs_of_natural_and_unsigned(gm).take(limit) {
+    for (n, u) in pairs_of_natural_and_unsigned::<u32>(gm).take(limit) {
         println!(
             "(&{}).saturating_sub({}) = {}",
             n,
@@ -102,7 +102,7 @@ fn benchmark_natural_saturating_sub_assign_u32(gm: GenerationMode, limit: usize,
     m_run_benchmark(
         "Natural.saturating_sub_assign(u32)",
         BenchmarkType::Single,
-        pairs_of_natural_and_unsigned(gm),
+        pairs_of_natural_and_unsigned::<u32>(gm),
         gm.name(),
         limit,
         file_name,

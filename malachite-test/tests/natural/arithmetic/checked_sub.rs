@@ -91,26 +91,25 @@ fn checked_sub_properties() {
 
         let difference_alt = x.clone().checked_sub(y.clone());
         assert_eq!(difference_alt, difference);
-        assert!(difference.as_ref().map_or(true, |x| x.is_valid()));
+        assert!(difference_alt.as_ref().map_or(true, |x| x.is_valid()));
 
         let difference_alt = x.clone().checked_sub(y);
         assert_eq!(difference_alt, difference);
-        assert!(difference.as_ref().map_or(true, |x| x.is_valid()));
+        assert!(difference_alt.as_ref().map_or(true, |x| x.is_valid()));
 
         let difference_alt = x.checked_sub(y.clone());
         assert_eq!(difference_alt, difference);
-        assert!(difference.as_ref().map_or(true, |x| x.is_valid()));
+        assert!(difference_alt.as_ref().map_or(true, |x| x.is_valid()));
 
         let difference_alt = x.checked_sub(y);
         assert_eq!(difference_alt, difference);
-        assert!(difference.as_ref().map_or(true, |x| x.is_valid()));
+        assert!(difference_alt.as_ref().map_or(true, |x| x.is_valid()));
 
         let reverse_difference = y.checked_sub(x);
         assert_eq!(
             reverse_difference.is_some(),
             *x == *y || difference.is_none()
         );
-        assert!(reverse_difference.map_or(true, |x| x.is_valid()));
 
         assert_eq!(
             checked_sub(natural_to_biguint(x), natural_to_biguint(y))
@@ -132,6 +131,9 @@ fn checked_sub_properties() {
     test_properties(pairs_of_natural_and_unsigned::<u32>, |&(ref x, y)| {
         let difference = x.checked_sub(Natural::from(y));
         assert_eq!(x.checked_sub(y), difference);
+
+        let difference = Natural::from(y).checked_sub(x);
+        assert_eq!(CheckedSub::checked_sub(y, x).map(Natural::from), difference);
     });
 
     test_properties(pairs_of_unsigneds::<u32>, |&(x, y)| {

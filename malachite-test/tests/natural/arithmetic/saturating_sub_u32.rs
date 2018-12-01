@@ -81,12 +81,6 @@ fn saturating_sub_u32_properties() {
                 );
             }
 
-            //TODO assert_eq!(n.saturating_sub(Natural::from(u)), difference);
-            //TODO assert_eq!(
-            //TODO     SaturatingSub::saturating_sub(u, n).map(Natural::from),
-            //TODO     Natural::from(u).saturating_sub(n)
-            //TODO );
-
             assert!(difference <= *n);
             if *n >= u {
                 assert_eq!(difference, n - u);

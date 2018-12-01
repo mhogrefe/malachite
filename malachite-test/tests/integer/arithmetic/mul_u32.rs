@@ -117,7 +117,9 @@ fn mul_u32_properties() {
             );
 
             assert_eq!((-n) * u, -(n * u));
-            //TODO assert_eq!(product / u, Some(n));
+            if u != 0 {
+                assert_eq!(product / u, *n);
+            }
         },
     );
 

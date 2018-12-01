@@ -140,7 +140,9 @@ fn mul_i32_properties() {
             if i != i32::MIN {
                 assert_eq!(n * (-i), -(n * i));
             }
-            //TODO assert_eq!(product / u, Some(n));
+            if i != 0 {
+                assert_eq!(product / i, *n);
+            }
         },
     );
 
