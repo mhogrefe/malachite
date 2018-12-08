@@ -4,8 +4,9 @@ use malachite_nz::integer::Integer;
 use malachite_test::common::{
     bigint_to_integer, integer_to_bigint, integer_to_rug_integer, rug_integer_to_integer,
 };
-use malachite_test::inputs::base::unsigneds;
+use malachite_test::inputs::base::{pairs_of_unsigneds, unsigneds};
 use malachite_test::inputs::integer::{integers, pairs_of_integer_and_unsigned};
+use malachite_test::inputs::natural::pairs_of_natural_and_unsigned;
 use malachite_test::integer::arithmetic::mul_u32::num_mul_u32;
 use num::BigInt;
 use rug::{self, Assign};
@@ -138,5 +139,15 @@ fn mul_u32_properties() {
         assert_eq!(u * Integer::ZERO, 0);
         assert_eq!(Integer::ONE * u, u);
         assert_eq!(u * Integer::ONE, u);
+    });
+
+    test_properties(pairs_of_unsigneds::<u32>, |&(x, y)| {
+        let product = Integer::from(u64::from(x) * u64::from(y));
+        assert_eq!(product, Integer::from(x) * y);
+        assert_eq!(product, x * Integer::from(y));
+    });
+
+    test_properties(pairs_of_natural_and_unsigned::<u32>, |&(ref n, u)| {
+        assert_eq!(n * u, Integer::from(n) * u);
     });
 }

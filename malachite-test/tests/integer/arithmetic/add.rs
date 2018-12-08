@@ -4,9 +4,12 @@ use malachite_nz::integer::Integer;
 use malachite_test::common::{
     bigint_to_integer, integer_to_bigint, integer_to_rug_integer, rug_integer_to_integer,
 };
+use malachite_test::inputs::base::pairs_of_signeds;
 use malachite_test::inputs::integer::{
-    integers, pairs_of_integer_and_signed, pairs_of_integers, triples_of_integers,
+    integers, pairs_of_integer_and_signed, pairs_of_integer_and_unsigned, pairs_of_integers,
+    triples_of_integers,
 };
+use malachite_test::inputs::natural::pairs_of_naturals;
 use num::BigInt;
 use rug;
 use std::str::FromStr;
@@ -120,5 +123,28 @@ fn add_properties() {
 
     test_properties(triples_of_integers, |&(ref x, ref y, ref z)| {
         assert_eq!((x + y) + z, x + (y + z));
+    });
+
+    test_properties(pairs_of_integer_and_unsigned::<u32>, |&(ref x, y)| {
+        let sum = x + Integer::from(y);
+        assert_eq!(x + y, sum);
+        assert_eq!(y + x, sum);
+    });
+
+    test_properties(pairs_of_integer_and_signed::<i32>, |&(ref x, y)| {
+        let sum = x + Integer::from(y);
+        assert_eq!(x + y, sum);
+        assert_eq!(y + x, sum);
+    });
+
+    test_properties(pairs_of_naturals, |&(ref x, ref y)| {
+        assert_eq!(x + y, Integer::from(x) + Integer::from(y));
+    });
+
+    test_properties(pairs_of_signeds::<i32>, |&(x, y)| {
+        assert_eq!(
+            Integer::from(i64::from(x) + i64::from(y)),
+            Integer::from(x) + Integer::from(y)
+        );
     });
 }

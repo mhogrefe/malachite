@@ -1,6 +1,7 @@
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::integer::{
     rm_triples_of_integer_signed_and_small_unsigned, triples_of_integer_signed_and_small_unsigned,
+    triples_of_signed_integer_and_small_unsigned,
 };
 use malachite_base::misc::CheckedFrom;
 use malachite_base::num::{EqModPowerOfTwo, ModPowerOfTwo, SignificantBits};
@@ -9,6 +10,7 @@ use rug;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_integer_eq_i32_mod_power_of_two);
+    register_demo!(registry, demo_i32_eq_integer_mod_power_of_two);
     register_bench!(
         registry,
         Large,
@@ -19,6 +21,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
         Large,
         benchmark_integer_eq_i32_mod_power_of_two_algorithms
     );
+    register_bench!(registry, Large, benchmark_i32_eq_integer_mod_power_of_two);
 }
 
 pub fn rug_eq_i32_mod_power_of_two(x: &rug::Integer, i: i32, pow: u64) -> bool {
@@ -33,6 +36,18 @@ fn demo_integer_eq_i32_mod_power_of_two(gm: GenerationMode, limit: usize) {
             i,
             pow,
             n.eq_mod_power_of_two(i, pow)
+        );
+    }
+}
+
+fn demo_i32_eq_integer_mod_power_of_two(gm: GenerationMode, limit: usize) {
+    for (i, n, pow) in triples_of_signed_integer_and_small_unsigned::<i32, u64>(gm).take(limit) {
+        println!(
+            "{}.eq_mod_power_of_two({}, {}) = {}",
+            i,
+            n,
+            pow,
+            i.eq_mod_power_of_two(&n, pow)
         );
     }
 }
@@ -90,5 +105,22 @@ fn benchmark_integer_eq_i32_mod_power_of_two_algorithms(
                 }),
             ),
         ],
+    );
+}
+
+fn benchmark_i32_eq_integer_mod_power_of_two(gm: GenerationMode, limit: usize, file_name: &str) {
+    m_run_benchmark(
+        "i32.eq_mod_power_of_two(&Integer, u64)",
+        BenchmarkType::Single,
+        triples_of_signed_integer_and_small_unsigned::<i32, u64>(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|(_, ref n, _)| n.significant_bits() as usize),
+        "n.significant_bits()",
+        &mut [(
+            "i32.eq_mod_power_of_two(&Integer, u64)",
+            &mut (|(i, ref n, pow)| no_out!(n.eq_mod_power_of_two(i, pow))),
+        )],
     );
 }

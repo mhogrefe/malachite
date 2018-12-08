@@ -1,7 +1,7 @@
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::{
-    triples_of_signed_u64_width_range_and_bool_var_1,
-    triples_of_unsigned_u64_width_range_and_bool_var_1,
+    triples_of_signed_unsigned_width_range_and_bool_var_1,
+    triples_of_unsigned_unsigned_width_range_and_bool_var_1,
 };
 use malachite_base::num::{PrimitiveSigned, PrimitiveUnsigned};
 
@@ -26,7 +26,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
 
 fn demo_unsigned_assign_bit<T: PrimitiveUnsigned>(gm: GenerationMode, limit: usize) {
     for (mut n, index, bit) in
-        triples_of_unsigned_u64_width_range_and_bool_var_1::<T>(gm).take(limit)
+        triples_of_unsigned_unsigned_width_range_and_bool_var_1::<T, u64>(gm).take(limit)
     {
         let n_old = n;
         n.assign_bit(index, bit);
@@ -38,7 +38,8 @@ fn demo_unsigned_assign_bit<T: PrimitiveUnsigned>(gm: GenerationMode, limit: usi
 }
 
 fn demo_signed_assign_bit<T: PrimitiveSigned>(gm: GenerationMode, limit: usize) {
-    for (mut n, index, bit) in triples_of_signed_u64_width_range_and_bool_var_1::<T>(gm).take(limit)
+    for (mut n, index, bit) in
+        triples_of_signed_unsigned_width_range_and_bool_var_1::<T, u64>(gm).take(limit)
     {
         let n_old = n;
         n.assign_bit(index, bit);
@@ -57,7 +58,7 @@ fn benchmark_unsigned_assign_bit<T: PrimitiveUnsigned>(
     m_run_benchmark(
         &format!("{}.assign_bit(u64)", T::NAME),
         BenchmarkType::Single,
-        triples_of_unsigned_u64_width_range_and_bool_var_1::<T>(gm),
+        triples_of_unsigned_unsigned_width_range_and_bool_var_1::<T, u64>(gm),
         gm.name(),
         limit,
         file_name,
@@ -78,7 +79,7 @@ fn benchmark_signed_assign_bit<T: PrimitiveSigned>(
     m_run_benchmark(
         &format!("{}.assign_bit(u64)", T::NAME),
         BenchmarkType::Single,
-        triples_of_signed_u64_width_range_and_bool_var_1::<T>(gm),
+        triples_of_signed_unsigned_width_range_and_bool_var_1::<T, u64>(gm),
         gm.name(),
         limit,
         file_name,

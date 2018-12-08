@@ -5,6 +5,7 @@ use malachite_nz::integer::Integer;
 use malachite_test::common::{
     bigint_to_integer, integer_to_bigint, integer_to_rug_integer, rug_integer_to_integer,
 };
+use malachite_test::inputs::base::signeds;
 use malachite_test::inputs::integer::integers;
 use num::{BigInt, Signed};
 use rug;
@@ -84,5 +85,9 @@ fn abs_properties() {
         let internal_abs = x.unsigned_abs_ref();
         assert!(internal_abs.is_valid());
         assert_eq!(*internal_abs, abs_alt);
+    });
+
+    test_properties(signeds::<i32>, |&i| {
+        assert_eq!(Integer::from(i).abs(), Integer::from(i64::from(i).abs()));
     });
 }

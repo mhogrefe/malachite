@@ -5,14 +5,19 @@ use malachite_nz::integer::arithmetic::eq_mod_power_of_two::limbs_eq_mod_power_o
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_test::common::integer_to_rug_integer;
-use malachite_test::inputs::base::triples_of_unsigned_vec_unsigned_vec_and_small_unsigned_var_1;
+use malachite_test::inputs::base::{
+    triples_of_signed_signed_and_small_unsigned,
+    triples_of_unsigned_vec_unsigned_vec_and_small_unsigned_var_1,
+};
 use malachite_test::inputs::integer::{
     pairs_of_integer_and_small_unsigned, pairs_of_integers,
     quadruples_of_integer_integer_integer_and_small_unsigned,
     triples_of_integer_integer_and_small_unsigned,
     triples_of_integer_integer_and_small_unsigned_var_1,
     triples_of_integer_integer_and_small_unsigned_var_2,
+    triples_of_integer_signed_and_small_unsigned, triples_of_integer_unsigned_and_small_unsigned,
 };
+use malachite_test::inputs::natural::triples_of_natural_natural_and_small_unsigned;
 use rug;
 use std::str::FromStr;
 
@@ -280,4 +285,42 @@ fn eq_mod_power_of_two_properties() {
     test_properties(pairs_of_integers, |&(ref x, ref y)| {
         assert!(x.eq_mod_power_of_two(y, 0));
     });
+
+    test_properties(
+        triples_of_integer_unsigned_and_small_unsigned::<u32, u64>,
+        |&(ref x, y, pow)| {
+            let equal = x.eq_mod_power_of_two(&Integer::from(y), pow);
+            assert_eq!(x.eq_mod_power_of_two(y, pow), equal);
+            assert_eq!(y.eq_mod_power_of_two(x, pow), equal);
+        },
+    );
+
+    test_properties(
+        triples_of_integer_signed_and_small_unsigned::<i32, u64>,
+        |&(ref x, y, pow)| {
+            let equal = x.eq_mod_power_of_two(&Integer::from(y), pow);
+            assert_eq!(x.eq_mod_power_of_two(y, pow), equal);
+            assert_eq!(y.eq_mod_power_of_two(x, pow), equal);
+        },
+    );
+
+    test_properties(
+        triples_of_natural_natural_and_small_unsigned,
+        |&(ref x, ref y, pow)| {
+            assert_eq!(
+                x.eq_mod_power_of_two(y, pow),
+                Integer::from(x).eq_mod_power_of_two(&Integer::from(y), pow),
+            );
+        },
+    );
+
+    test_properties(
+        triples_of_signed_signed_and_small_unsigned::<i32, u64>,
+        |&(x, y, pow)| {
+            assert_eq!(
+                x.eq_mod_power_of_two(y, pow),
+                Integer::from(x).eq_mod_power_of_two(&Integer::from(y), pow),
+            );
+        },
+    );
 }

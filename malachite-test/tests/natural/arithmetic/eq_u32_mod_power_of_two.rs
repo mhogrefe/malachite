@@ -4,7 +4,7 @@ use malachite_nz::natural::arithmetic::eq_u32_mod_power_of_two::limbs_eq_limb_mo
 use malachite_nz::natural::Natural;
 use malachite_test::common::natural_to_rug_integer;
 use malachite_test::inputs::base::{
-    pairs_of_unsigned_and_small_unsigned, triples_of_unsigned_unsigned_and_small_u64,
+    pairs_of_unsigned_and_small_unsigned, triples_of_unsigned_unsigned_and_small_unsigned,
     triples_of_unsigned_vec_unsigned_and_small_unsigned_var_2,
 };
 use malachite_test::inputs::natural::{
@@ -148,7 +148,7 @@ fn eq_u32_mod_power_of_two_properties() {
     );
 
     test_properties(
-        triples_of_unsigned_unsigned_and_small_u64::<u32>,
+        triples_of_unsigned_unsigned_and_small_unsigned::<u32, u64>,
         |&(x, y, pow)| {
             let eq_mod_power_of_two = x.eq_mod_power_of_two(y, pow);
             assert_eq!(

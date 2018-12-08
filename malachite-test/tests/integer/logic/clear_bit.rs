@@ -6,7 +6,7 @@ use malachite_nz::integer::logic::bit_access::{
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_test::inputs::base::{
-    pairs_of_u32_vec_and_small_u64_var_3, pairs_of_unsigned_vec_and_small_u64_var_1,
+    pairs_of_u32_vec_and_small_u64_var_3, pairs_of_unsigned_vec_and_small_unsigned_var_1,
 };
 use malachite_test::inputs::integer::pairs_of_integer_and_small_u64;
 use std::str::FromStr;
@@ -111,7 +111,7 @@ fn limbs_slice_clear_bit_neg_properties() {
 #[test]
 fn limbs_vec_clear_bit_neg_properties() {
     test_properties(
-        pairs_of_unsigned_vec_and_small_u64_var_1,
+        pairs_of_unsigned_vec_and_small_unsigned_var_1,
         limbs_clear_bit_neg_helper!(limbs_vec_clear_bit_neg, limbs, index),
     );
 }

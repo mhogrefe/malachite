@@ -5,7 +5,7 @@ use malachite_nz::natural::arithmetic::divisible_by_power_of_two::limbs_divisibl
 use malachite_nz::natural::Natural;
 use malachite_test::common::natural_to_rug_integer;
 use malachite_test::inputs::base::{
-    pairs_of_unsigned_and_small_unsigned, pairs_of_unsigned_vec_and_small_u64_var_1, unsigneds,
+    pairs_of_unsigned_and_small_unsigned, pairs_of_unsigned_vec_and_small_unsigned_var_1, unsigneds,
 };
 use malachite_test::inputs::natural::{
     naturals, pairs_of_natural_and_small_unsigned, pairs_of_natural_and_small_unsigned_var_1,
@@ -71,7 +71,7 @@ fn test_divisible_by_power_of_two() {
 #[test]
 fn limbs_divisible_by_power_of_two_properties() {
     test_properties(
-        pairs_of_unsigned_vec_and_small_u64_var_1,
+        pairs_of_unsigned_vec_and_small_unsigned_var_1,
         |&(ref limbs, pow)| {
             assert_eq!(
                 limbs_divisible_by_power_of_two(limbs, pow),

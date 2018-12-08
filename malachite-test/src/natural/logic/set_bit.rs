@@ -1,5 +1,7 @@
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::base::{pairs_of_u32_vec_and_small_u64_var_2, pairs_of_unsigned_vec_and_small_u64};
+use inputs::base::{
+    pairs_of_u32_vec_and_small_u64_var_2, pairs_of_unsigned_vec_and_small_unsigned,
+};
 use inputs::natural::{nm_pairs_of_natural_and_small_u64, pairs_of_natural_and_small_unsigned};
 use malachite_base::num::BitAccess;
 use malachite_nz::natural::logic::bit_access::{limbs_slice_set_bit, limbs_vec_set_bit};
@@ -34,7 +36,7 @@ fn demo_limbs_slice_set_bit(gm: GenerationMode, limit: usize) {
 }
 
 fn demo_limbs_vec_set_bit(gm: GenerationMode, limit: usize) {
-    for (limbs, index) in pairs_of_unsigned_vec_and_small_u64(gm).take(limit) {
+    for (limbs, index) in pairs_of_unsigned_vec_and_small_unsigned(gm).take(limit) {
         let mut mut_limbs = limbs.clone();
         limbs_vec_set_bit(&mut mut_limbs, index);
         println!(
@@ -73,7 +75,7 @@ fn benchmark_limbs_vec_set_bit(gm: GenerationMode, limit: usize, file_name: &str
     m_run_benchmark(
         "limbs_vec_set_bit(&mut Vec<u32>, u64)",
         BenchmarkType::Single,
-        pairs_of_unsigned_vec_and_small_u64(gm),
+        pairs_of_unsigned_vec_and_small_unsigned(gm),
         gm.name(),
         limit,
         file_name,

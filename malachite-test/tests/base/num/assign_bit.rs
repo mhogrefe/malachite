@@ -4,8 +4,8 @@ use malachite_base::num::{
     BitAccess, NegativeOne, PrimitiveInteger, PrimitiveSigned, PrimitiveUnsigned,
 };
 use malachite_test::inputs::base::{
-    triples_of_signed_u64_width_range_and_bool_var_1,
-    triples_of_unsigned_u64_width_range_and_bool_var_1,
+    triples_of_signed_unsigned_width_range_and_bool_var_1,
+    triples_of_unsigned_unsigned_width_range_and_bool_var_1,
 };
 
 fn assign_bit_helper_unsigned<T: PrimitiveInteger>() {
@@ -112,7 +112,7 @@ assign_bit_fail_helper_signed!(
 
 fn assign_bit_properties_helper_unsigned<T: PrimitiveUnsigned>() {
     test_properties(
-        triples_of_unsigned_u64_width_range_and_bool_var_1,
+        triples_of_unsigned_unsigned_width_range_and_bool_var_1,
         |&(n, index, bit)| {
             let mut mut_n: T = n;
             mut_n.assign_bit(index, bit);
@@ -122,7 +122,7 @@ fn assign_bit_properties_helper_unsigned<T: PrimitiveUnsigned>() {
 
 fn assign_bit_properties_helper_signed<T: PrimitiveSigned>() {
     test_properties(
-        triples_of_signed_u64_width_range_and_bool_var_1,
+        triples_of_signed_unsigned_width_range_and_bool_var_1,
         |&(n, index, bit)| {
             let mut mut_n: T = n;
             mut_n.assign_bit(index, bit);

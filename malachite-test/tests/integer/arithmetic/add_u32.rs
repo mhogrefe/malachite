@@ -4,8 +4,9 @@ use malachite_nz::integer::Integer;
 use malachite_test::common::{
     bigint_to_integer, integer_to_bigint, integer_to_rug_integer, rug_integer_to_integer,
 };
-use malachite_test::inputs::base::unsigneds;
+use malachite_test::inputs::base::{pairs_of_unsigneds, unsigneds};
 use malachite_test::inputs::integer::{integers, pairs_of_integer_and_unsigned};
+use malachite_test::inputs::natural::pairs_of_natural_and_unsigned;
 use malachite_test::integer::arithmetic::add_u32::num_add_u32;
 use num::BigInt;
 use rug::{self, Assign};
@@ -70,51 +71,48 @@ fn test_add_u32() {
 
 #[test]
 fn add_u32_properties() {
-    test_properties(
-        pairs_of_integer_and_unsigned,
-        |&(ref n, u): &(Integer, u32)| {
-            let mut mut_n = n.clone();
-            mut_n += u;
-            assert!(mut_n.is_valid());
-            let result = mut_n;
+    test_properties(pairs_of_integer_and_unsigned::<u32>, |&(ref n, u)| {
+        let mut mut_n = n.clone();
+        mut_n += u;
+        assert!(mut_n.is_valid());
+        let result = mut_n;
 
-            let mut rug_n = integer_to_rug_integer(n);
-            rug_n += u;
-            assert_eq!(rug_integer_to_integer(&rug_n), result);
+        let mut rug_n = integer_to_rug_integer(n);
+        rug_n += u;
+        assert_eq!(rug_integer_to_integer(&rug_n), result);
 
-            let result_alt = n + u;
-            assert!(result_alt.is_valid());
-            assert_eq!(result_alt, result);
-            let result_alt = n.clone() + u;
-            assert!(result_alt.is_valid());
-            assert_eq!(result_alt, result);
+        let result_alt = n + u;
+        assert!(result_alt.is_valid());
+        assert_eq!(result_alt, result);
+        let result_alt = n.clone() + u;
+        assert!(result_alt.is_valid());
+        assert_eq!(result_alt, result);
 
-            let result_alt = u + n;
-            assert!(result_alt.is_valid());
-            assert_eq!(result_alt, result);
-            let result_alt = u + n.clone();
-            assert!(result_alt.is_valid());
-            assert_eq!(result_alt, result);
+        let result_alt = u + n;
+        assert!(result_alt.is_valid());
+        assert_eq!(result_alt, result);
+        let result_alt = u + n.clone();
+        assert!(result_alt.is_valid());
+        assert_eq!(result_alt, result);
 
-            let result_alt = n + Integer::from(u);
-            assert_eq!(result_alt, result);
+        let result_alt = n + Integer::from(u);
+        assert_eq!(result_alt, result);
 
-            let result_alt = Integer::from(u) + n;
-            assert_eq!(result_alt, result);
+        let result_alt = Integer::from(u) + n;
+        assert_eq!(result_alt, result);
 
-            assert_eq!(
-                bigint_to_integer(&num_add_u32(integer_to_bigint(n), u)),
-                result
-            );
-            assert_eq!(
-                rug_integer_to_integer(&(integer_to_rug_integer(n) + u)),
-                result
-            );
+        assert_eq!(
+            bigint_to_integer(&num_add_u32(integer_to_bigint(n), u)),
+            result
+        );
+        assert_eq!(
+            rug_integer_to_integer(&(integer_to_rug_integer(n) + u)),
+            result
+        );
 
-            assert_eq!(&result - u, *n);
-            assert_eq!(result - n, u);
-        },
-    );
+        assert_eq!(&result - u, *n);
+        assert_eq!(result - n, u);
+    });
 
     #[allow(unknown_lints, identity_op)]
     test_properties(integers, |n| {
@@ -125,5 +123,15 @@ fn add_u32_properties() {
     test_properties(unsigneds, |&u: &u32| {
         assert_eq!(Integer::ZERO + u, u);
         assert_eq!(u + Integer::ZERO, u);
+    });
+
+    test_properties(pairs_of_unsigneds::<u32>, |&(x, y)| {
+        let sum = Integer::from(u64::from(x) + u64::from(y));
+        assert_eq!(sum, Integer::from(x) + y);
+        assert_eq!(sum, x + Integer::from(y));
+    });
+
+    test_properties(pairs_of_natural_and_unsigned::<u32>, |&(ref n, u)| {
+        assert_eq!(n + u, Integer::from(n) + u);
     });
 }

@@ -10,6 +10,7 @@ use malachite_test::common::{
 };
 use malachite_test::inputs::base::{
     pairs_of_positive_unsigned_and_rounding_mode, pairs_of_unsigned_and_rounding_mode,
+    triples_of_u32_positive_u32_and_rounding_mode_var_1,
 };
 use malachite_test::inputs::integer::{
     pairs_of_integer_and_positive_u32_var_2, pairs_of_integer_and_positive_unsigned,
@@ -17,6 +18,10 @@ use malachite_test::inputs::integer::{
     pairs_of_u32_and_nonzero_integer_var_1,
     triples_of_integer_positive_unsigned_and_rounding_mode_var_1,
     triples_of_unsigned_nonzero_integer_and_rounding_mode_var_1,
+};
+use malachite_test::inputs::natural::{
+    triples_of_natural_positive_unsigned_and_rounding_mode_var_1,
+    triples_of_unsigned_positive_natural_and_rounding_mode_var_1,
 };
 use malachite_test::integer::arithmetic::div_round_u32::num_div_round_u32_floor;
 use num::BigInt;
@@ -621,4 +626,27 @@ fn div_round_u32_properties() {
         assert_eq!(u.div_round(Integer::ONE, rm), u);
         assert_eq!(u.div_round(Integer::NEGATIVE_ONE, rm), -Natural::from(u));
     });
+
+    test_properties(
+        triples_of_u32_positive_u32_and_rounding_mode_var_1,
+        |&(x, y, rm)| {
+            let quotient = x.div_round(y, rm);
+            assert_eq!(Integer::from(x).div_round(y, rm), quotient);
+            assert_eq!(x.div_round(Integer::from(y), rm), quotient);
+        },
+    );
+
+    test_properties(
+        triples_of_natural_positive_unsigned_and_rounding_mode_var_1::<u32>,
+        |&(ref n, u, rm)| {
+            assert_eq!(n.div_round(u, rm), Integer::from(n).div_round(u, rm));
+        },
+    );
+
+    test_properties(
+        triples_of_unsigned_positive_natural_and_rounding_mode_var_1::<u32>,
+        |&(u, ref n, rm)| {
+            assert_eq!(u.div_round(n, rm), u.div_round(Integer::from(n), rm));
+        },
+    );
 }

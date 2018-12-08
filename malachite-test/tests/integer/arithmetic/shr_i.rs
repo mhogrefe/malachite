@@ -8,6 +8,9 @@ use malachite_test::inputs::integer::{
     integers, pairs_of_integer_and_rounding_mode, pairs_of_integer_and_small_signed,
     triples_of_integer_small_signed_and_rounding_mode_var_2,
 };
+use malachite_test::inputs::natural::{
+    pairs_of_natural_and_small_signed, triples_of_natural_small_signed_and_rounding_mode_var_2,
+};
 use rug;
 use std::str::FromStr;
 
@@ -203,6 +206,10 @@ macro_rules! tests_and_properties {
 
             test_properties(signeds::<$t>, |&i| {
                 assert_eq!(Integer::ZERO >> i, 0);
+            });
+
+            test_properties(pairs_of_natural_and_small_signed::<$t>, |&(ref n, i)| {
+                assert_eq!(n >> i, Integer::from(n) >> i);
             });
         }
 
@@ -1419,6 +1426,13 @@ macro_rules! tests_and_properties {
             test_properties(pairs_of_signed_and_rounding_mode::<$t>, |&(i, rm)| {
                 assert_eq!(Integer::ZERO.shr_round(i, rm), 0);
             });
+
+            test_properties(
+                triples_of_natural_small_signed_and_rounding_mode_var_2::<$t>,
+                |&(ref n, i, rm)| {
+                    assert_eq!(n.shr_round(i, rm), Integer::from(n).shr_round(i, rm));
+                },
+            );
         }
     };
 }

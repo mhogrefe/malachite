@@ -1,5 +1,5 @@
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::base::pairs_of_unsigned_vec_and_small_u64_var_1;
+use inputs::base::pairs_of_unsigned_vec_and_small_unsigned_var_1;
 use inputs::natural::{
     pairs_of_natural_and_small_unsigned, rm_pairs_of_natural_and_small_unsigned,
 };
@@ -25,7 +25,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
 }
 
 fn demo_limbs_divisible_by_power_of_two(gm: GenerationMode, limit: usize) {
-    for (limbs, pow) in pairs_of_unsigned_vec_and_small_u64_var_1(gm).take(limit) {
+    for (limbs, pow) in pairs_of_unsigned_vec_and_small_unsigned_var_1(gm).take(limit) {
         println!(
             "limbs_divisible_by_power_of_two({:?}, {}) = {:?}",
             limbs,
@@ -49,7 +49,7 @@ fn benchmark_limbs_divisible_by_power_of_two(gm: GenerationMode, limit: usize, f
     m_run_benchmark(
         "limbs_shr_exact(&[u32], u32)",
         BenchmarkType::Single,
-        pairs_of_unsigned_vec_and_small_u64_var_1(gm),
+        pairs_of_unsigned_vec_and_small_unsigned_var_1(gm),
         gm.name(),
         limit,
         file_name,

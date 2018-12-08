@@ -1,5 +1,5 @@
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::base::pairs_of_unsigned_vec_and_small_u64;
+use inputs::base::pairs_of_unsigned_vec_and_small_unsigned;
 use inputs::natural::{
     nrm_pairs_of_natural_and_small_unsigned, pairs_of_natural_and_small_unsigned,
 };
@@ -23,7 +23,7 @@ pub fn num_get_bit(x: &BigUint, index: u64) -> bool {
 }
 
 fn demo_limbs_get_bit(gm: GenerationMode, limit: usize) {
-    for (limbs, index) in pairs_of_unsigned_vec_and_small_u64(gm).take(limit) {
+    for (limbs, index) in pairs_of_unsigned_vec_and_small_unsigned(gm).take(limit) {
         println!(
             "limbs_get_bit({:?}, {}) = {}",
             limbs,
@@ -43,7 +43,7 @@ fn benchmark_limbs_get_bit(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "limbs_get_bit(&[u32], u64)",
         BenchmarkType::Single,
-        pairs_of_unsigned_vec_and_small_u64(gm),
+        pairs_of_unsigned_vec_and_small_unsigned(gm),
         gm.name(),
         limit,
         file_name,

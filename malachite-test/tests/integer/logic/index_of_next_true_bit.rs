@@ -6,7 +6,7 @@ use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_test::common::integer_to_rug_integer;
 use malachite_test::inputs::base::{
-    pairs_of_signed_and_small_unsigned, pairs_of_unsigned_vec_and_small_u64_var_1, unsigneds,
+    pairs_of_signed_and_small_unsigned, pairs_of_unsigned_vec_and_small_unsigned_var_1, unsigneds,
 };
 use malachite_test::inputs::integer::{integers, pairs_of_integer_and_small_u64};
 use malachite_test::integer::logic::index_of_next_true_bit::integer_index_of_next_true_bit_alt;
@@ -88,7 +88,7 @@ fn test_index_of_next_true_bit() {
 #[test]
 fn limbs_index_of_next_true_bit_neg_properties() {
     test_properties(
-        pairs_of_unsigned_vec_and_small_u64_var_1,
+        pairs_of_unsigned_vec_and_small_unsigned_var_1,
         |&(ref limbs, u)| {
             assert_eq!(
                 Some(limbs_index_of_next_true_bit_neg(limbs, u)),

@@ -4,7 +4,7 @@ use malachite_nz::integer::Integer;
 use malachite_test::common::{
     bigint_to_integer, integer_to_bigint, integer_to_rug_integer, rug_integer_to_integer,
 };
-use malachite_test::inputs::base::nonzero_signeds;
+use malachite_test::inputs::base::{nonzero_signeds, pairs_of_signed_and_nonzero_signed};
 use malachite_test::inputs::integer::{
     integers, pairs_of_integer_and_nonzero_i32_var_1, pairs_of_integer_and_nonzero_signed,
     pairs_of_signed_and_nonzero_integer,
@@ -322,5 +322,11 @@ fn div_i32_properties() {
         assert_eq!(Integer::from(i) / i, 1);
         assert_eq!(i / -Integer::from(i), -1);
         assert_eq!(-Integer::from(i) / i, -1);
+    });
+
+    test_properties(pairs_of_signed_and_nonzero_signed::<i32>, |&(x, y)| {
+        let quotient = x / y;
+        assert_eq!(quotient, Integer::from(x) / y);
+        assert_eq!(quotient, x / Integer::from(y));
     });
 }

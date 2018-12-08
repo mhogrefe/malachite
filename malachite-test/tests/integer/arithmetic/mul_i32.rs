@@ -4,7 +4,7 @@ use malachite_nz::integer::Integer;
 use malachite_test::common::{
     bigint_to_integer, integer_to_bigint, integer_to_rug_integer, rug_integer_to_integer,
 };
-use malachite_test::inputs::base::signeds;
+use malachite_test::inputs::base::{pairs_of_signeds, signeds};
 use malachite_test::inputs::integer::{integers, pairs_of_integer_and_signed};
 use malachite_test::integer::arithmetic::mul_i32::num_mul_i32;
 use num::BigInt;
@@ -167,5 +167,11 @@ fn mul_i32_properties() {
             assert_eq!(Integer::NEGATIVE_ONE * i, -i);
             assert_eq!(i * Integer::NEGATIVE_ONE, -i);
         }
+    });
+
+    test_properties(pairs_of_signeds::<i32>, |&(x, y)| {
+        let product = Integer::from(i64::from(x) * i64::from(y));
+        assert_eq!(product, Integer::from(x) * y);
+        assert_eq!(product, x * Integer::from(y));
     });
 }

@@ -3,11 +3,12 @@ use malachite_base::misc::CheckedFrom;
 use malachite_base::num::{DivisibleByPowerOfTwo, Zero};
 use malachite_nz::integer::Integer;
 use malachite_test::common::integer_to_rug_integer;
-use malachite_test::inputs::base::unsigneds;
+use malachite_test::inputs::base::{pairs_of_signed_and_small_unsigned, unsigneds};
 use malachite_test::inputs::integer::{
     integers, pairs_of_integer_and_small_unsigned, pairs_of_integer_and_small_unsigned_var_1,
     pairs_of_integer_and_small_unsigned_var_2,
 };
+use malachite_test::inputs::natural::pairs_of_natural_and_small_unsigned;
 use rug;
 use std::str::FromStr;
 
@@ -108,5 +109,22 @@ fn divisible_by_power_of_two_properties() {
 
     test_properties(unsigneds, |&pow| {
         assert!(Integer::ZERO.divisible_by_power_of_two(pow));
+    });
+
+    test_properties(
+        pairs_of_signed_and_small_unsigned::<i32, u64>,
+        |&(x, pow)| {
+            assert_eq!(
+                x.divisible_by_power_of_two(pow),
+                Integer::from(x).divisible_by_power_of_two(pow)
+            );
+        },
+    );
+
+    test_properties(pairs_of_natural_and_small_unsigned, |&(ref x, pow)| {
+        assert_eq!(
+            x.divisible_by_power_of_two(pow),
+            Integer::from(x).divisible_by_power_of_two(pow)
+        );
     });
 }

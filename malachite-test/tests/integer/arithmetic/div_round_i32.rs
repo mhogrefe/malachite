@@ -9,6 +9,7 @@ use malachite_test::common::{
 };
 use malachite_test::inputs::base::{
     pairs_of_nonzero_signed_and_rounding_mode, pairs_of_signed_and_rounding_mode,
+    triples_of_i32_nonzero_i32_and_rounding_mode_var_1,
 };
 use malachite_test::inputs::integer::{
     pairs_of_i32_and_nonzero_integer_var_1, pairs_of_integer_and_nonzero_i32_var_2,
@@ -890,4 +891,13 @@ fn div_round_i32_properties() {
         assert_eq!(i.div_round(Integer::ONE, rm), i);
         assert_eq!(i.div_round(Integer::NEGATIVE_ONE, rm), -Integer::from(i));
     });
+
+    test_properties(
+        triples_of_i32_nonzero_i32_and_rounding_mode_var_1,
+        |&(x, y, rm)| {
+            let quotient = x.div_round(y, rm);
+            assert_eq!(quotient, Integer::from(x).div_round(y, rm));
+            assert_eq!(quotient, x.div_round(Integer::from(y), rm));
+        },
+    );
 }

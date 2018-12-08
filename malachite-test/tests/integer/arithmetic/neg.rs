@@ -4,7 +4,9 @@ use malachite_nz::integer::Integer;
 use malachite_test::common::{
     bigint_to_integer, integer_to_bigint, integer_to_rug_integer, rug_integer_to_integer,
 };
+use malachite_test::inputs::base::signeds;
 use malachite_test::inputs::integer::integers;
+use malachite_test::inputs::natural::naturals;
 use num::BigInt;
 use rug;
 use std::str::FromStr;
@@ -56,5 +58,13 @@ fn neg_properties() {
 
         assert_eq!(negative == *x, *x == 0);
         assert_eq!(-negative, *x);
+    });
+
+    test_properties(signeds::<i32>, |&x| {
+        assert_eq!(Integer::from(-i64::from(x)), -Integer::from(x));
+    });
+
+    test_properties(naturals, |x| {
+        assert_eq!(-x, -Integer::from(x));
     });
 }

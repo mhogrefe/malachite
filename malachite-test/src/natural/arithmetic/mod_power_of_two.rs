@@ -1,5 +1,5 @@
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::base::pairs_of_unsigned_vec_and_small_u64;
+use inputs::base::pairs_of_unsigned_vec_and_small_unsigned;
 use inputs::natural::pairs_of_natural_and_small_unsigned;
 use malachite_base::num::{
     ModPowerOfTwo, ModPowerOfTwoAssign, NegModPowerOfTwo, NegModPowerOfTwoAssign, RemPowerOfTwo,
@@ -57,7 +57,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
 }
 
 fn demo_limbs_mod_power_of_two(gm: GenerationMode, limit: usize) {
-    for (limbs, pow) in pairs_of_unsigned_vec_and_small_u64(gm).take(limit) {
+    for (limbs, pow) in pairs_of_unsigned_vec_and_small_unsigned(gm).take(limit) {
         println!(
             "limbs_mod_power_of_two({:?}, {}) = {:?}",
             limbs,
@@ -68,7 +68,7 @@ fn demo_limbs_mod_power_of_two(gm: GenerationMode, limit: usize) {
 }
 
 fn demo_limbs_mod_power_of_two_in_place(gm: GenerationMode, limit: usize) {
-    for (limbs, pow) in pairs_of_unsigned_vec_and_small_u64(gm).take(limit) {
+    for (limbs, pow) in pairs_of_unsigned_vec_and_small_unsigned(gm).take(limit) {
         let mut limbs = limbs.to_vec();
         let mut limbs_old = limbs.clone();
         limbs_mod_power_of_two_in_place(&mut limbs, pow);
@@ -80,7 +80,7 @@ fn demo_limbs_mod_power_of_two_in_place(gm: GenerationMode, limit: usize) {
 }
 
 fn demo_limbs_neg_mod_power_of_two(gm: GenerationMode, limit: usize) {
-    for (limbs, pow) in pairs_of_unsigned_vec_and_small_u64(gm).take(limit) {
+    for (limbs, pow) in pairs_of_unsigned_vec_and_small_unsigned(gm).take(limit) {
         println!(
             "limbs_neg_mod_power_of_two({:?}, {}) = {:?}",
             limbs,
@@ -91,7 +91,7 @@ fn demo_limbs_neg_mod_power_of_two(gm: GenerationMode, limit: usize) {
 }
 
 fn demo_limbs_neg_mod_power_of_two_in_place(gm: GenerationMode, limit: usize) {
-    for (limbs, pow) in pairs_of_unsigned_vec_and_small_u64(gm).take(limit) {
+    for (limbs, pow) in pairs_of_unsigned_vec_and_small_unsigned(gm).take(limit) {
         let mut limbs = limbs.to_vec();
         let mut limbs_old = limbs.clone();
         limbs_neg_mod_power_of_two_in_place(&mut limbs, pow);
@@ -206,9 +206,9 @@ fn demo_natural_neg_mod_power_of_two_ref(gm: GenerationMode, limit: usize) {
 
 fn benchmark_limbs_mod_power_of_two(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
-        "limbs_mod_power_of_two(&[u32], u32)",
+        "limbs_mod_power_of_two(&[u32], u64)",
         BenchmarkType::Single,
-        pairs_of_unsigned_vec_and_small_u64(gm),
+        pairs_of_unsigned_vec_and_small_unsigned(gm),
         gm.name(),
         limit,
         file_name,
@@ -223,9 +223,9 @@ fn benchmark_limbs_mod_power_of_two(gm: GenerationMode, limit: usize, file_name:
 
 fn benchmark_limbs_mod_power_of_two_in_place(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
-        "limbs_mod_power_of_two_in_place(&mut Vec<u32>, u32)",
+        "limbs_mod_power_of_two_in_place(&mut Vec<u32>, u64)",
         BenchmarkType::Single,
-        pairs_of_unsigned_vec_and_small_u64(gm),
+        pairs_of_unsigned_vec_and_small_unsigned(gm),
         gm.name(),
         limit,
         file_name,
@@ -240,9 +240,9 @@ fn benchmark_limbs_mod_power_of_two_in_place(gm: GenerationMode, limit: usize, f
 
 fn benchmark_limbs_neg_mod_power_of_two(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
-        "limbs_neg_mod_power_of_two(&[u32], u32)",
+        "limbs_neg_mod_power_of_two(&[u32], u64)",
         BenchmarkType::Single,
-        pairs_of_unsigned_vec_and_small_u64(gm),
+        pairs_of_unsigned_vec_and_small_unsigned(gm),
         gm.name(),
         limit,
         file_name,
@@ -261,9 +261,9 @@ fn benchmark_limbs_neg_mod_power_of_two_in_place(
     file_name: &str,
 ) {
     m_run_benchmark(
-        "limbs_neg_mod_power_of_two_in_place(&mut Vec<u32>, u32)",
+        "limbs_neg_mod_power_of_two_in_place(&mut Vec<u32>, u64)",
         BenchmarkType::Single,
-        pairs_of_unsigned_vec_and_small_u64(gm),
+        pairs_of_unsigned_vec_and_small_unsigned(gm),
         gm.name(),
         limit,
         file_name,

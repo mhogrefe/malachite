@@ -129,11 +129,11 @@ fn benchmark_natural_saturating_sub_u32_evaluation_strategy(
         &mut [
             (
                 "Natural.saturating_sub(u32)",
-                &mut (|(x, y)| no_out!(x - y)),
+                &mut (|(x, y)| no_out!(x.saturating_sub(y))),
             ),
             (
                 "(&Natural).saturating_sub(u32)",
-                &mut (|(x, y)| no_out!(&x - y)),
+                &mut (|(x, y)| no_out!((&x).saturating_sub(y))),
             ),
         ],
     );
@@ -183,11 +183,11 @@ fn benchmark_u32_saturating_sub_natural_evaluation_strategy(
         &mut [
             (
                 "u32.saturating_sub(Natural)",
-                &mut (|(x, y)| no_out!(x - y)),
+                &mut (|(x, y)| no_out!(SaturatingSub::saturating_sub(x, y))),
             ),
             (
                 "u32.saturating_sub(&Natural)",
-                &mut (|(x, y)| no_out!(x - &y)),
+                &mut (|(x, y)| no_out!(SaturatingSub::saturating_sub(x, &y))),
             ),
         ],
     );

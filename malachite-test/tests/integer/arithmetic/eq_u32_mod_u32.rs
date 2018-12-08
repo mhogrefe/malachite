@@ -6,11 +6,13 @@ use malachite_nz::natural::Natural;
 use malachite_test::common::integer_to_rug_integer;
 use malachite_test::inputs::base::{
     pairs_of_unsigneds, triples_of_unsigned_vec_unsigned_and_positive_unsigned_var_1,
+    triples_of_unsigneds,
 };
 use malachite_test::inputs::integer::{
     pairs_of_integer_and_unsigned, triples_of_integer_unsigned_and_unsigned,
     triples_of_integer_unsigned_and_unsigned_var_1, triples_of_integer_unsigned_and_unsigned_var_2,
 };
+use malachite_test::inputs::natural::triples_of_natural_unsigned_and_unsigned;
 use rug;
 use std::str::FromStr;
 
@@ -168,4 +170,15 @@ fn eq_u32_mod_u32_properties() {
         assert_eq!(Integer::ZERO.eq_mod(u, modulus), u.divisible_by(modulus));
         assert_eq!(u.eq_mod(&Integer::ZERO, modulus), u.divisible_by(modulus));
     });
+
+    test_properties(triples_of_unsigneds::<u32>, |&(n, u, modulus)| {
+        assert_eq!(n.eq_mod(u, modulus), Integer::from(n).eq_mod(u, modulus));
+    });
+
+    test_properties(
+        triples_of_natural_unsigned_and_unsigned::<u32>,
+        |&(ref n, u, modulus)| {
+            assert_eq!(n.eq_mod(u, modulus), Integer::from(n).eq_mod(u, modulus));
+        },
+    );
 }

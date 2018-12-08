@@ -1098,6 +1098,33 @@ pub fn triples_of_integer_u32_and_small_unsigned_var_2<T: PrimitiveUnsigned>(
     )
 }
 
+pub fn triples_of_unsigned_integer_and_small_unsigned<
+    T: PrimitiveUnsigned,
+    U: PrimitiveUnsigned,
+>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (T, Integer, U)>> {
+    match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_triples(
+            exhaustive_unsigned(),
+            exhaustive_integers(),
+            exhaustive_unsigned(),
+        )),
+        GenerationMode::Random(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| random(seed)),
+            &(|seed| random_integers(seed, scale)),
+            &(|seed| u32s_geometric(seed, scale).flat_map(U::checked_from)),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_unsigned(seed)),
+            &(|seed| special_random_integers(seed, scale)),
+            &(|seed| u32s_geometric(seed, scale).flat_map(U::checked_from)),
+        )),
+    }
+}
+
 pub fn triples_of_integer_signed_and_small_unsigned<T: PrimitiveSigned, U: PrimitiveUnsigned>(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (Integer, T, U)>> {
@@ -1157,6 +1184,30 @@ pub fn triples_of_integer_i32_and_small_unsigned_var_2<T: PrimitiveUnsigned>(
         triples_of_integer_signed_and_small_unsigned::<i32, T>(gm)
             .filter(|&(ref n, i, pow)| !n.eq_mod_power_of_two(i, pow.into())),
     )
+}
+
+pub fn triples_of_signed_integer_and_small_unsigned<T: PrimitiveSigned, U: PrimitiveUnsigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (T, Integer, U)>> {
+    match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_triples(
+            exhaustive_signed(),
+            exhaustive_integers(),
+            exhaustive_unsigned(),
+        )),
+        GenerationMode::Random(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| random(seed)),
+            &(|seed| random_integers(seed, scale)),
+            &(|seed| u32s_geometric(seed, scale).flat_map(U::checked_from)),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_signed(seed)),
+            &(|seed| special_random_integers(seed, scale)),
+            &(|seed| u32s_geometric(seed, scale).flat_map(U::checked_from)),
+        )),
+    }
 }
 
 pub fn pairs_of_integer_and_natural(

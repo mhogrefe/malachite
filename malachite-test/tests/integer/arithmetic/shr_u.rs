@@ -1,5 +1,5 @@
 use common::test_properties;
-use malachite_base::misc::{Max, WrappingFrom};
+use malachite_base::misc::{CheckedFrom, Max};
 use malachite_base::num::{
     PartialOrdAbs, PrimitiveInteger, PrimitiveSigned, PrimitiveUnsigned, ShrRound, ShrRoundAssign,
     Zero,
@@ -11,14 +11,18 @@ use malachite_test::common::{
 };
 use malachite_test::inputs::base::{
     pairs_of_negative_signed_not_min_and_small_unsigned,
-    pairs_of_positive_signed_and_small_unsigned, pairs_of_unsigned_and_rounding_mode,
-    pairs_of_unsigned_and_small_unsigned, unsigneds,
+    pairs_of_positive_signed_and_small_unsigned, pairs_of_signed_and_small_unsigned,
+    pairs_of_unsigned_and_rounding_mode, triples_of_signed_small_unsigned_and_rounding_mode_var_1,
+    unsigneds,
 };
 use malachite_test::inputs::integer::{
     integers, pairs_of_integer_and_rounding_mode, pairs_of_integer_and_small_unsigned,
     pairs_of_integer_and_small_unsigned_var_2,
     triples_of_integer_small_unsigned_and_rounding_mode_var_1,
     triples_of_integer_small_unsigned_and_small_unsigned,
+};
+use malachite_test::inputs::natural::{
+    pairs_of_natural_and_small_unsigned, triples_of_natural_small_unsigned_and_rounding_mode_var_1,
 };
 use rug;
 use std::i32;
@@ -185,14 +189,20 @@ macro_rules! tests_and_properties {
                 },
             );
 
-            test_properties(
-                pairs_of_unsigned_and_small_unsigned::<u32, $t>,
-                |&(u, v)| {
-                    if let Some(sum) = v.checked_add($t::wrapping_from(u32::WIDTH)) {
-                        assert_eq!(Integer::from(u) >> sum, 0);
+            test_properties(pairs_of_signed_and_small_unsigned::<i32, $t>, |&(i, j)| {
+                if let Some(sum) = j.checked_add($t::checked_from(i32::WIDTH).unwrap()) {
+                    let shifted = Integer::from(i) >> sum;
+                    if i >= 0 {
+                        assert_eq!(shifted, 0);
+                    } else {
+                        assert_eq!(shifted, -1);
                     }
-                },
-            );
+                }
+
+                if j < $t::checked_from(i32::WIDTH).unwrap() {
+                    assert_eq!(i >> j, Integer::from(i) >> j);
+                }
+            });
 
             test_properties(
                 triples_of_integer_small_unsigned_and_small_unsigned::<$t, $t>,
@@ -209,6 +219,10 @@ macro_rules! tests_and_properties {
 
             test_properties(unsigneds::<$t>, |&u| {
                 assert_eq!(Integer::ZERO >> u, 0);
+            });
+
+            test_properties(pairs_of_natural_and_small_unsigned::<$t>, |&(ref n, u)| {
+                assert_eq!(n >> u, Integer::from(n) >> u);
             });
         }
 
@@ -1353,7 +1367,7 @@ macro_rules! tests_and_properties {
             test_properties(
                 pairs_of_positive_signed_and_small_unsigned::<i32, $t>,
                 |&(i, u)| {
-                    if let Some(sum) = u.checked_add($t::wrapping_from(u32::WIDTH - 1)) {
+                    if let Some(sum) = u.checked_add($t::checked_from(u32::WIDTH - 1).unwrap()) {
                         assert_eq!(Integer::from(i).shr_round(sum, RoundingMode::Down), 0);
                         assert_eq!(Integer::from(i).shr_round(sum, RoundingMode::Floor), 0);
                         assert_eq!(Integer::from(i).shr_round(sum, RoundingMode::Up), 1);
@@ -1368,7 +1382,7 @@ macro_rules! tests_and_properties {
             test_properties(
                 pairs_of_negative_signed_not_min_and_small_unsigned::<i32, $t>,
                 |&(i, u)| {
-                    if let Some(sum) = u.checked_add($t::wrapping_from(u32::WIDTH - 1)) {
+                    if let Some(sum) = u.checked_add($t::checked_from(u32::WIDTH - 1).unwrap()) {
                         assert_eq!(Integer::from(i).shr_round(sum, RoundingMode::Down), 0);
                         assert_eq!(Integer::from(i).shr_round(sum, RoundingMode::Floor), -1);
                         assert_eq!(Integer::from(i).shr_round(sum, RoundingMode::Up), -1);
@@ -1387,6 +1401,22 @@ macro_rules! tests_and_properties {
             test_properties(pairs_of_unsigned_and_rounding_mode::<$t>, |&(u, rm)| {
                 assert_eq!(Integer::ZERO.shr_round(u, rm), 0);
             });
+
+            test_properties(
+                triples_of_natural_small_unsigned_and_rounding_mode_var_1::<$t>,
+                |&(ref n, u, rm)| {
+                    assert_eq!(n.shr_round(u, rm), Integer::from(n).shr_round(u, rm));
+                },
+            );
+
+            test_properties(
+                triples_of_signed_small_unsigned_and_rounding_mode_var_1::<i32, $t>,
+                |&(n, u, rm)| {
+                    if u < $t::checked_from(i32::WIDTH).unwrap() {
+                        assert_eq!(n.shr_round(u, rm), Integer::from(n).shr_round(u, rm));
+                    }
+                },
+            );
         }
     };
 }

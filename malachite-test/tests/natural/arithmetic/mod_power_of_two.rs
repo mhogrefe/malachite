@@ -10,7 +10,7 @@ use malachite_nz::natural::arithmetic::mod_power_of_two::{
 };
 use malachite_nz::natural::Natural;
 use malachite_test::inputs::base::{
-    pairs_of_unsigned_and_small_unsigned, pairs_of_unsigned_vec_and_small_u64, unsigneds,
+    pairs_of_unsigned_and_small_unsigned, pairs_of_unsigned_vec_and_small_unsigned, unsigneds,
 };
 use malachite_test::inputs::natural::{
     naturals, pairs_of_natural_and_small_unsigned, pairs_of_natural_and_small_unsigned_var_1,
@@ -162,44 +162,56 @@ fn test_neg_mod_power_of_two() {
 
 #[test]
 fn limbs_mod_power_of_two_properties() {
-    test_properties(pairs_of_unsigned_vec_and_small_u64, |&(ref limbs, pow)| {
-        assert_eq!(
-            Natural::from_owned_limbs_asc(limbs_mod_power_of_two(limbs, pow)),
-            Natural::from_limbs_asc(limbs).mod_power_of_two(pow),
-        );
-    });
+    test_properties(
+        pairs_of_unsigned_vec_and_small_unsigned,
+        |&(ref limbs, pow)| {
+            assert_eq!(
+                Natural::from_owned_limbs_asc(limbs_mod_power_of_two(limbs, pow)),
+                Natural::from_limbs_asc(limbs).mod_power_of_two(pow),
+            );
+        },
+    );
 }
 
 #[test]
 fn limbs_mod_power_of_two_in_place_properties() {
-    test_properties(pairs_of_unsigned_vec_and_small_u64, |&(ref limbs, pow)| {
-        let mut limbs = limbs.to_vec();
-        let old_limbs = limbs.clone();
-        limbs_mod_power_of_two_in_place(&mut limbs, pow);
-        let n = Natural::from_limbs_asc(&old_limbs).mod_power_of_two(pow);
-        assert_eq!(Natural::from_owned_limbs_asc(limbs), n);
-    });
+    test_properties(
+        pairs_of_unsigned_vec_and_small_unsigned,
+        |&(ref limbs, pow)| {
+            let mut limbs = limbs.to_vec();
+            let old_limbs = limbs.clone();
+            limbs_mod_power_of_two_in_place(&mut limbs, pow);
+            let n = Natural::from_limbs_asc(&old_limbs).mod_power_of_two(pow);
+            assert_eq!(Natural::from_owned_limbs_asc(limbs), n);
+        },
+    );
 }
 
 #[test]
 fn limbs_neg_mod_power_of_two_properties() {
-    test_properties(pairs_of_unsigned_vec_and_small_u64, |&(ref limbs, pow)| {
-        assert_eq!(
-            Natural::from_owned_limbs_asc(limbs_neg_mod_power_of_two(limbs, pow)),
-            Natural::from_limbs_asc(limbs).neg_mod_power_of_two(pow),
-        );
-    });
+    test_properties(
+        pairs_of_unsigned_vec_and_small_unsigned,
+        |&(ref limbs, pow)| {
+            assert_eq!(
+                Natural::from_owned_limbs_asc(limbs_neg_mod_power_of_two(limbs, pow)),
+                Natural::from_limbs_asc(limbs).neg_mod_power_of_two(pow),
+            );
+        },
+    );
 }
 
 #[test]
 fn limbs_neg_mod_power_of_two_in_place_properties() {
-    test_properties(pairs_of_unsigned_vec_and_small_u64, |&(ref limbs, pow)| {
-        let mut limbs = limbs.to_vec();
-        let old_limbs = limbs.clone();
-        limbs_neg_mod_power_of_two_in_place(&mut limbs, pow);
-        let n = Natural::from_limbs_asc(&old_limbs).neg_mod_power_of_two(pow);
-        assert_eq!(Natural::from_owned_limbs_asc(limbs), n);
-    });
+    test_properties(
+        pairs_of_unsigned_vec_and_small_unsigned,
+        |&(ref limbs, pow)| {
+            let mut limbs = limbs.to_vec();
+            let old_limbs = limbs.clone();
+            limbs_neg_mod_power_of_two_in_place(&mut limbs, pow);
+            let n = Natural::from_limbs_asc(&old_limbs).neg_mod_power_of_two(pow);
+            assert_eq!(Natural::from_owned_limbs_asc(limbs), n);
+        },
+    );
 }
 
 #[test]

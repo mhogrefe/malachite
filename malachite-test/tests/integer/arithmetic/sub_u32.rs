@@ -4,8 +4,11 @@ use malachite_nz::integer::Integer;
 use malachite_test::common::{
     bigint_to_integer, integer_to_bigint, integer_to_rug_integer, rug_integer_to_integer,
 };
-use malachite_test::inputs::base::unsigneds;
+use malachite_test::inputs::base::{pairs_of_unsigneds_var_1, unsigneds};
 use malachite_test::inputs::integer::{integers, pairs_of_integer_and_unsigned};
+use malachite_test::inputs::natural::{
+    pairs_of_natural_and_u32_var_1, pairs_of_u32_and_natural_var_1,
+};
 use malachite_test::integer::arithmetic::sub_u32::num_sub_u32;
 use num::BigInt;
 use rug::{self, Assign};
@@ -122,5 +125,19 @@ fn sub_u32_properties() {
     test_properties(unsigneds, |&u: &u32| {
         assert_eq!(Integer::ZERO - u, -Integer::from(u));
         assert_eq!(u - Integer::ZERO, u);
+    });
+
+    test_properties(pairs_of_unsigneds_var_1::<u32>, |&(x, y)| {
+        let difference = x - y;
+        assert_eq!(difference, Integer::from(x) - y);
+        assert_eq!(difference, x - Integer::from(y));
+    });
+
+    test_properties(pairs_of_natural_and_u32_var_1, |&(ref n, u)| {
+        assert_eq!(n - u, Integer::from(n) - u);
+    });
+
+    test_properties(pairs_of_u32_and_natural_var_1, |&(u, ref n)| {
+        assert_eq!(u - n, u - Integer::from(n));
     });
 }

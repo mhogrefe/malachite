@@ -9,7 +9,7 @@ use malachite_test::common::{
     biguint_to_natural, natural_to_biguint, natural_to_rug_integer, rug_integer_to_natural,
 };
 use malachite_test::inputs::base::{
-    pairs_of_unsigned_vec_and_small_u64, pairs_of_unsigned_vec_and_u32_var_1, small_unsigneds,
+    pairs_of_unsigned_vec_and_small_unsigned, pairs_of_unsigned_vec_and_u32_var_1, small_unsigneds,
     triples_of_unsigned_vec_unsigned_vec_and_u32_var_5,
 };
 use malachite_test::inputs::natural::{
@@ -116,12 +116,15 @@ fn limbs_slice_shl_in_place_fail_2() {
 
 #[test]
 fn limbs_shl_properties() {
-    test_properties(pairs_of_unsigned_vec_and_small_u64, |&(ref limbs, bits)| {
-        assert_eq!(
-            Natural::from_owned_limbs_asc(limbs_shl(limbs, bits)),
-            Natural::from_limbs_asc(limbs) << bits
-        );
-    });
+    test_properties(
+        pairs_of_unsigned_vec_and_small_unsigned,
+        |&(ref limbs, bits)| {
+            assert_eq!(
+                Natural::from_owned_limbs_asc(limbs_shl(limbs, bits)),
+                Natural::from_limbs_asc(limbs) << bits
+            );
+        },
+    );
 }
 
 #[test]
@@ -166,13 +169,16 @@ fn limbs_slice_shl_in_place_properties() {
 
 #[test]
 fn limbs_vec_shl_in_place_properties() {
-    test_properties(pairs_of_unsigned_vec_and_small_u64, |&(ref limbs, bits)| {
-        let mut limbs = limbs.to_vec();
-        let old_limbs = limbs.clone();
-        limbs_vec_shl_in_place(&mut limbs, bits);
-        let n = Natural::from_limbs_asc(&old_limbs) << bits;
-        assert_eq!(Natural::from_owned_limbs_asc(limbs), n);
-    });
+    test_properties(
+        pairs_of_unsigned_vec_and_small_unsigned,
+        |&(ref limbs, bits)| {
+            let mut limbs = limbs.to_vec();
+            let old_limbs = limbs.clone();
+            limbs_vec_shl_in_place(&mut limbs, bits);
+            let n = Natural::from_limbs_asc(&old_limbs) << bits;
+            assert_eq!(Natural::from_owned_limbs_asc(limbs), n);
+        },
+    );
 }
 
 macro_rules! tests_and_properties {

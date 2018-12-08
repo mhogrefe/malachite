@@ -21,9 +21,9 @@ impl<'a> EqModPowerOfTwo<i32> for &'a Integer {
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {
-    ///     assert_eq!((&Integer::ZERO).eq_mod_power_of_two(256, 8), true);
-    ///     assert_eq!((&Integer::from(-0b1101)).eq_mod_power_of_two(0b1011, 3), true);
-    ///     assert_eq!((&Integer::from(-0b1101)).eq_mod_power_of_two(0b1011, 4), false);
+    ///     assert_eq!((&Integer::ZERO).eq_mod_power_of_two(256i32, 8), true);
+    ///     assert_eq!((&Integer::from(-0b1101)).eq_mod_power_of_two(0b1011i32, 3), true);
+    ///     assert_eq!((&Integer::from(-0b1101)).eq_mod_power_of_two(0b1011i32, 4), false);
     ///     assert_eq!((&Integer::from(0b1101)).eq_mod_power_of_two(-0b1011, 3), true);
     ///     assert_eq!((&Integer::from(0b1101)).eq_mod_power_of_two(-0b1011, 4), false);
     /// }
@@ -37,5 +37,37 @@ impl<'a> EqModPowerOfTwo<i32> for &'a Integer {
         } else {
             self.abs.eq_mod_power_of_two(other_abs, pow)
         }
+    }
+}
+
+impl<'a> EqModPowerOfTwo<&'a Integer> for i32 {
+    /// Returns whether this `i32` is equivalent to a `Integer` mod two to the power of `pow`; that
+    /// is, whether the `pow` least-significant twos-complement bits of the `i32` and the `Integer`
+    /// are equal.
+    ///
+    /// Time: worst case O(n)
+    ///
+    /// Additional memory: worst case O(1)
+    ///
+    /// where n = min(`pow`, `self.significant_bits()`)
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::{EqModPowerOfTwo, Zero};
+    /// use malachite_nz::integer::Integer;
+    ///
+    /// fn main() {
+    ///     assert_eq!(256i32.eq_mod_power_of_two(&Integer::ZERO, 8), true);
+    ///     assert_eq!(0b10101i32.eq_mod_power_of_two(&Integer::from(-0b11011), 3), true);
+    ///     assert_eq!(0b10101i32.eq_mod_power_of_two(&Integer::from(-0b10011), 4), false);
+    ///     assert_eq!((-0b11011).eq_mod_power_of_two(&Integer::from(0b10101), 3), true);
+    ///     assert_eq!((-0b10011).eq_mod_power_of_two(&Integer::from(0b10101), 4), false);
+    /// }
+    /// ```
+    fn eq_mod_power_of_two(self, other: &'a Integer, pow: u64) -> bool {
+        other.eq_mod_power_of_two(self, pow)
     }
 }

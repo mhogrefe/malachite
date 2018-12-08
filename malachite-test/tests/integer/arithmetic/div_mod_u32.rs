@@ -10,10 +10,13 @@ use malachite_nz::natural::Natural;
 use malachite_test::common::{
     bigint_to_integer, integer_to_bigint, integer_to_rug_integer, rug_integer_to_integer,
 };
-use malachite_test::inputs::base::positive_unsigneds;
+use malachite_test::inputs::base::{pairs_of_unsigned_and_positive_unsigned, positive_unsigneds};
 use malachite_test::inputs::integer::{
     integers, pairs_of_integer_and_positive_u32_var_1, pairs_of_integer_and_positive_unsigned,
     pairs_of_unsigned_and_nonzero_integer,
+};
+use malachite_test::inputs::natural::{
+    pairs_of_natural_and_positive_unsigned, pairs_of_unsigned_and_positive_natural,
 };
 use malachite_test::integer::arithmetic::div_mod_u32::{
     num_div_mod_u32, num_div_rem_u32, rug_ceiling_div_mod_u32, rug_div_mod_u32, rug_div_rem_u32,
@@ -662,6 +665,38 @@ fn div_mod_u32_properties() {
             );
         }
     });
+
+    test_properties(pairs_of_unsigned_and_positive_unsigned::<u32>, |&(x, y)| {
+        let (quotient, remainder) = x.div_mod(y);
+        let quotient = Integer::from(quotient);
+        assert_eq!((quotient.clone(), remainder), Integer::from(x).div_mod(y));
+        assert_eq!(
+            (quotient, Integer::from(remainder)),
+            x.div_mod(Integer::from(y))
+        );
+    });
+
+    test_properties(
+        pairs_of_natural_and_positive_unsigned::<u32>,
+        |&(ref n, u)| {
+            let (quotient, remainder) = n.div_mod(u);
+            assert_eq!(
+                (Integer::from(quotient), remainder),
+                Integer::from(n).div_mod(u)
+            );
+        },
+    );
+
+    test_properties(
+        pairs_of_unsigned_and_positive_natural::<u32>,
+        |&(u, ref n)| {
+            let (quotient, remainder) = u.div_mod(n);
+            assert_eq!(
+                (Integer::from(quotient), Integer::from(remainder)),
+                u.div_mod(Integer::from(n))
+            );
+        },
+    );
 }
 
 fn div_rem_u32_properties_helper(n: &Integer, u: u32) {
@@ -772,6 +807,38 @@ fn div_rem_u32_properties() {
             );
         }
     });
+
+    test_properties(pairs_of_unsigned_and_positive_unsigned::<u32>, |&(x, y)| {
+        let (quotient, remainder) = x.div_rem(y);
+        let quotient = Integer::from(quotient);
+        assert_eq!(
+            (quotient.clone(), Integer::from(remainder)),
+            Integer::from(x).div_rem(y)
+        );
+        assert_eq!((quotient, remainder), x.div_rem(Integer::from(y)));
+    });
+
+    test_properties(
+        pairs_of_natural_and_positive_unsigned::<u32>,
+        |&(ref n, u)| {
+            let (quotient, remainder) = n.div_rem(u);
+            assert_eq!(
+                (Integer::from(quotient), Integer::from(remainder)),
+                Integer::from(n).div_rem(u)
+            );
+        },
+    );
+
+    test_properties(
+        pairs_of_unsigned_and_positive_natural::<u32>,
+        |&(u, ref n)| {
+            let (quotient, remainder) = u.div_rem(n);
+            assert_eq!(
+                (Integer::from(quotient), remainder),
+                u.div_rem(Integer::from(n))
+            );
+        },
+    );
 }
 
 fn ceiling_div_mod_u32_properties_helper(n: &Integer, u: u32) {

@@ -785,8 +785,6 @@ pub trait PrimitiveInteger:
     + BitScan
     + BitXor<Output = Self>
     + BitXorAssign<Self>
-    + CeilingDivNegMod
-    + CeilingDivAssignNegMod
     + CheckedAdd<Output = Self>
     + CheckedDiv<Output = Self>
     + CheckedFrom<u8>
@@ -820,7 +818,7 @@ pub trait PrimitiveInteger:
     + Display
     + Div<Output = Self>
     + DivAssign
-    + DivAssignMod
+    + DivAssignMod<ModOutput = Self>
     + DivAssignRem<RemOutput = Self>
     + DivExact
     + DivExactAssign
@@ -828,6 +826,8 @@ pub trait PrimitiveInteger:
     + DivisibleByPowerOfTwo
     + DivMod
     + DivRem<DivOutput = Self, RemOutput = Self>
+    + DivRound<Output = Self>
+    + DivRoundAssign
     + Endian
     + Eq
     + EqModPowerOfTwo<Self>
@@ -839,10 +839,10 @@ pub trait PrimitiveInteger:
     + Min
     + Max
     + Mod
+    + ModAssign
     + Mul<Output = Self>
     + MulAssign<Self>
     + Named
-    + NegMod
     + Not<Output = Self>
     + NotAssign
     + Octal
@@ -984,6 +984,8 @@ pub trait PrimitiveInteger:
 //TODO docs
 pub trait PrimitiveUnsigned:
     CeilingLogTwo
+    + CeilingDivNegMod
+    + CeilingDivAssignNegMod
     + CheckedNextPowerOfTwo<Output = Self>
     + FloorLogTwo
     + From<u8>
@@ -992,6 +994,8 @@ pub trait PrimitiveUnsigned:
     + IsPowerOfTwo
     + ModPowerOfTwo<Output = Self>
     + ModPowerOfTwoAssign
+    + NegMod
+    + NegModAssign
     + NextPowerOfTwo<Output = Self>
     + NextPowerOfTwoAssign
     + PrimitiveInteger
@@ -1010,6 +1014,8 @@ pub trait PrimitiveUnsigned:
 //TODO docs
 pub trait PrimitiveSigned:
     Abs<Output = Self>
+    + CeilingMod
+    + CeilingModAssign
     + CheckedAbs<Output = Self>
     + From<i8>
     + Into<i64>
@@ -1784,6 +1790,19 @@ macro_rules! integer_traits {
                 self == 0 || rhs != 0 && self % rhs == 0
             }
         }
+
+        impl DivRoundAssign for $t {
+            fn div_round_assign(&mut self, rhs: $t, rm: RoundingMode) {
+                *self = self.div_round(rhs, rm);
+            }
+        }
+
+        impl ModAssign for $t {
+            #[inline]
+            fn mod_assign(&mut self, rhs: $t) {
+                *self %= rhs;
+            }
+        }
     };
 }
 
@@ -2155,13 +2174,6 @@ macro_rules! unsigned_traits {
             }
         }
 
-        impl ModAssign for $t {
-            #[inline]
-            fn mod_assign(&mut self, rhs: $t) {
-                *self %= rhs;
-            }
-        }
-
         impl NegMod for $t {
             type Output = $t;
 
@@ -2211,12 +2223,6 @@ macro_rules! unsigned_traits {
                         _ => unreachable!(),
                     }
                 }
-            }
-        }
-
-        impl DivRoundAssign for $t {
-            fn div_round_assign(&mut self, rhs: $t, rm: RoundingMode) {
-                *self = self.div_round(rhs, rm);
             }
         }
 
@@ -2596,27 +2602,35 @@ macro_rules! signed_traits {
 
         impl DivMod for $t {
             type DivOutput = $t;
-            type ModOutput = $ut;
+            type ModOutput = $t;
 
             #[inline]
-            fn div_mod(self, rhs: $t) -> ($t, $ut) {
-                let self_abs = self.unsigned_abs();
-                let rhs_abs = rhs.unsigned_abs();
-                if rhs > 0 {
-                    let (q, r) = self_abs.div_mod(rhs_abs);
-                    (q as $t, r)
+            fn div_mod(self, other: $t) -> ($t, $t) {
+                let (quotient, remainder) = if (self >= 0) == (other >= 0) {
+                    let (quotient, remainder) = self.unsigned_abs().div_mod(other.unsigned_abs());
+                    ($t::checked_from(quotient).unwrap(), remainder)
                 } else {
-                    let (q, r) = self_abs.ceiling_div_neg_mod(rhs_abs);
-                    (-(q as $t), r)
-                }
+                    let (quotient, remainder) = self
+                        .unsigned_abs()
+                        .ceiling_div_neg_mod(other.unsigned_abs());
+                    (-$t::checked_from(quotient).unwrap(), remainder)
+                };
+                (
+                    quotient,
+                    if other >= 0 {
+                        $t::checked_from(remainder).unwrap()
+                    } else {
+                        -$t::checked_from(remainder).unwrap()
+                    },
+                )
             }
         }
 
         impl DivAssignMod for $t {
-            type ModOutput = $ut;
+            type ModOutput = $t;
 
             #[inline]
-            fn div_assign_mod(&mut self, rhs: $t) -> $ut {
+            fn div_assign_mod(&mut self, rhs: $t) -> $t {
                 let (q, r) = self.div_mod(rhs);
                 *self = q;
                 r
@@ -2624,46 +2638,19 @@ macro_rules! signed_traits {
         }
 
         impl Mod for $t {
-            type Output = $ut;
+            type Output = $t;
 
             #[inline]
-            fn mod_op(self, rhs: $t) -> $ut {
-                let self_abs = self.unsigned_abs();
-                let rhs_abs = rhs.unsigned_abs();
-                if rhs > 0 {
-                    self_abs.mod_op(rhs_abs)
+            fn mod_op(self, other: $t) -> $t {
+                let remainder = if (self >= 0) == (other >= 0) {
+                    self.unsigned_abs().mod_op(other.unsigned_abs())
                 } else {
-                    self_abs.neg_mod(rhs_abs)
-                }
-            }
-        }
-
-        impl CeilingDivNegMod for $t {
-            type DivOutput = $t;
-            type ModOutput = $ut;
-
-            #[inline]
-            fn ceiling_div_neg_mod(self, rhs: $t) -> ($t, $ut) {
-                let (quotient, remainder) = self.div_mod(rhs);
-                if remainder == 0 {
-                    (quotient, 0)
+                    self.unsigned_abs().neg_mod(other.unsigned_abs())
+                };
+                if other >= 0 {
+                    $t::checked_from(remainder).unwrap()
                 } else {
-                    (quotient + 1, rhs.unsigned_abs() - remainder)
-                }
-            }
-        }
-
-        impl CeilingDivAssignNegMod for $t {
-            type ModOutput = $ut;
-
-            #[inline]
-            fn ceiling_div_assign_neg_mod(&mut self, rhs: $t) -> $ut {
-                let remainder = self.div_assign_mod(rhs);
-                if remainder == 0 {
-                    0
-                } else {
-                    *self += 1;
-                    rhs.unsigned_abs() - remainder
+                    -$t::checked_from(remainder).unwrap()
                 }
             }
         }
@@ -2673,9 +2660,24 @@ macro_rules! signed_traits {
             type ModOutput = $t;
 
             #[inline]
-            fn ceiling_div_mod(self, rhs: $t) -> ($t, $t) {
-                let (quotient, remainder) = self.ceiling_div_neg_mod(rhs);
-                (quotient, -(remainder as $t))
+            fn ceiling_div_mod(self, other: $t) -> ($t, $t) {
+                let (quotient, remainder) = if (self >= 0) == (other >= 0) {
+                    let (quotient, remainder) = self
+                        .unsigned_abs()
+                        .ceiling_div_neg_mod(other.unsigned_abs());
+                    ($t::checked_from(quotient).unwrap(), remainder)
+                } else {
+                    let (quotient, remainder) = self.unsigned_abs().div_mod(other.unsigned_abs());
+                    (-$t::checked_from(quotient).unwrap(), remainder)
+                };
+                (
+                    quotient,
+                    if other >= 0 {
+                        -$t::checked_from(remainder).unwrap()
+                    } else {
+                        $t::checked_from(remainder).unwrap()
+                    },
+                )
             }
         }
 
@@ -2684,28 +2686,58 @@ macro_rules! signed_traits {
 
             #[inline]
             fn ceiling_div_assign_mod(&mut self, rhs: $t) -> $t {
-                let remainder = self.ceiling_div_assign_neg_mod(rhs);
-                -(remainder as $t)
+                let (q, r) = self.ceiling_div_mod(rhs);
+                *self = q;
+                r
             }
         }
 
-        impl NegMod for $t {
-            type Output = $ut;
+        impl CeilingMod for $t {
+            type Output = $t;
 
             #[inline]
-            fn neg_mod(self, rhs: $t) -> $ut {
-                let remainder = self.mod_op(rhs);
-                if remainder == 0 {
-                    0
+            fn ceiling_mod(self, other: $t) -> $t {
+                let remainder = if (self >= 0) == (other >= 0) {
+                    self.unsigned_abs().neg_mod(other.unsigned_abs())
                 } else {
-                    rhs.unsigned_abs() - remainder
+                    self.unsigned_abs().mod_op(other.unsigned_abs())
+                };
+                if other >= 0 {
+                    -$t::checked_from(remainder).unwrap()
+                } else {
+                    $t::checked_from(remainder).unwrap()
                 }
+            }
+        }
+
+        impl CeilingModAssign for $t {
+            #[inline]
+            fn ceiling_mod_assign(&mut self, rhs: $t) {
+                *self = self.ceiling_mod(rhs);
             }
         }
 
         impl Sign for $t {
             fn sign(&self) -> Ordering {
                 self.cmp(&0)
+            }
+        }
+
+        impl DivRound for $t {
+            type Output = $t;
+
+            fn div_round(self, other: $t, rm: RoundingMode) -> $t {
+                let result_sign = (self >= 0) == (other >= 0);
+                let abs = if result_sign {
+                    self.unsigned_abs().div_round(other.unsigned_abs(), rm)
+                } else {
+                    self.unsigned_abs().div_round(other.unsigned_abs(), -rm)
+                };
+                if result_sign {
+                    $t::checked_from(abs).unwrap()
+                } else {
+                    -$t::checked_from(abs).unwrap()
+                }
             }
         }
     };

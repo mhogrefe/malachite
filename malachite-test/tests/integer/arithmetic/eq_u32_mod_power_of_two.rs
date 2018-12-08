@@ -5,7 +5,8 @@ use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_test::common::integer_to_rug_integer;
 use malachite_test::inputs::base::{
-    pairs_of_unsigned_and_small_unsigned, triples_of_unsigned_vec_unsigned_and_small_unsigned_var_2,
+    pairs_of_unsigned_and_small_unsigned, triples_of_unsigned_unsigned_and_small_unsigned,
+    triples_of_unsigned_vec_unsigned_and_small_unsigned_var_2,
 };
 use malachite_test::inputs::integer::{
     pairs_of_integer_and_small_unsigned, pairs_of_integer_and_unsigned,
@@ -13,6 +14,7 @@ use malachite_test::inputs::integer::{
     triples_of_integer_unsigned_and_small_unsigned,
     triples_of_integer_unsigned_and_small_unsigned_var_1,
 };
+use malachite_test::inputs::natural::triples_of_natural_unsigned_and_small_unsigned;
 use malachite_test::natural::arithmetic::eq_u32_mod_power_of_two::rug_eq_u32_mod_power_of_two;
 use rug;
 use std::str::FromStr;
@@ -43,6 +45,10 @@ fn test_eq_u32_mod_power_of_two() {
     let test = |n, u: u32, pow, out| {
         assert_eq!(
             Integer::from_str(n).unwrap().eq_mod_power_of_two(u, pow),
+            out
+        );
+        assert_eq!(
+            u.eq_mod_power_of_two(&Integer::from_str(n).unwrap(), pow),
             out
         );
         assert_eq!(
@@ -100,6 +106,7 @@ fn eq_u32_mod_power_of_two_properties() {
         triples_of_integer_unsigned_and_small_unsigned::<u32, u64>,
         |&(ref n, u, pow)| {
             let eq_mod_power_of_two = n.eq_mod_power_of_two(u, pow);
+            assert_eq!(u.eq_mod_power_of_two(n, pow), eq_mod_power_of_two);
             assert_eq!(
                 rug_eq_u32_mod_power_of_two(&integer_to_rug_integer(n), u, pow),
                 eq_mod_power_of_two
@@ -115,6 +122,7 @@ fn eq_u32_mod_power_of_two_properties() {
         triples_of_integer_unsigned_and_small_unsigned_var_1::<u32, u64>,
         |&(ref n, u, pow)| {
             assert!(n.eq_mod_power_of_two(u, pow));
+            assert!(u.eq_mod_power_of_two(n, pow));
             assert!(rug_eq_u32_mod_power_of_two(
                 &integer_to_rug_integer(n),
                 u,
@@ -128,6 +136,7 @@ fn eq_u32_mod_power_of_two_properties() {
         triples_of_integer_u32_and_small_unsigned_var_2::<u64>,
         |&(ref n, u, pow)| {
             assert!(!n.eq_mod_power_of_two(u, pow));
+            assert!(!u.eq_mod_power_of_two(n, pow));
             assert!(!rug_eq_u32_mod_power_of_two(
                 &integer_to_rug_integer(n),
                 u,
@@ -139,11 +148,16 @@ fn eq_u32_mod_power_of_two_properties() {
 
     test_properties(pairs_of_integer_and_unsigned::<u32>, |&(ref n, u)| {
         assert!(n.eq_mod_power_of_two(u, 0));
+        assert!(u.eq_mod_power_of_two(n, 0));
     });
 
     test_properties(pairs_of_integer_and_small_unsigned, |&(ref n, pow)| {
         assert_eq!(
             n.eq_mod_power_of_two(0u32, pow),
+            n.divisible_by_power_of_two(pow),
+        );
+        assert_eq!(
+            0u32.eq_mod_power_of_two(n, pow),
             n.divisible_by_power_of_two(pow),
         );
     });
@@ -154,6 +168,29 @@ fn eq_u32_mod_power_of_two_properties() {
             assert_eq!(
                 Integer::ZERO.eq_mod_power_of_two(u, pow),
                 u.divisible_by_power_of_two(pow)
+            );
+            assert_eq!(
+                u.eq_mod_power_of_two(&Integer::ZERO, pow),
+                u.divisible_by_power_of_two(pow)
+            );
+        },
+    );
+
+    test_properties(
+        triples_of_unsigned_unsigned_and_small_unsigned::<u32, u64>,
+        |&(x, y, pow)| {
+            let equal = x.eq_mod_power_of_two(y, pow);
+            assert_eq!(equal, Integer::from(x).eq_mod_power_of_two(y, pow));
+            assert_eq!(equal, x.eq_mod_power_of_two(&Integer::from(y), pow));
+        },
+    );
+
+    test_properties(
+        triples_of_natural_unsigned_and_small_unsigned::<u32, u64>,
+        |&(ref n, u, pow)| {
+            assert_eq!(
+                n.eq_mod_power_of_two(u, pow),
+                Integer::from(n).eq_mod_power_of_two(u, pow)
             );
         },
     );

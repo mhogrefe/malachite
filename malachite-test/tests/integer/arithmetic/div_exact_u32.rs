@@ -4,7 +4,10 @@ use malachite_base::round::RoundingMode;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_test::common::{integer_to_rug_integer, rug_integer_to_integer};
-use malachite_test::inputs::base::positive_unsigneds;
+use malachite_test::inputs::base::{
+    pairs_of_i32_and_positive_u32_var_1, pairs_of_u32_and_nonzero_i32_var_1,
+    pairs_of_u32_and_positive_u32_var_1, positive_unsigneds,
+};
 use malachite_test::inputs::integer::{
     integers, pairs_of_integer_and_positive_u32_var_1, pairs_of_u32_and_nonzero_integer_var_2,
 };
@@ -211,5 +214,23 @@ fn div_exact_u32_properties() {
         assert_eq!(Integer::from(u).div_exact(u), 1);
         assert_eq!(u.div_exact(-Natural::from(u)), -1);
         assert_eq!((-Natural::from(u)).div_exact(u), -1);
+    });
+
+    test_properties(pairs_of_u32_and_nonzero_i32_var_1, |&(x, y)| {
+        let quotient = Integer::from(i64::from(x).div_exact(i64::from(y)));
+        // TODO move assert_eq!(quotient, Integer::from(x).div_exact(y));
+        assert_eq!(quotient, DivExact::div_exact(x, Integer::from(y)));
+    });
+
+    test_properties(pairs_of_i32_and_positive_u32_var_1, |&(x, y)| {
+        let quotient = Integer::from(i64::from(x).div_exact(i64::from(y)));
+        assert_eq!(quotient, Integer::from(x).div_exact(y));
+        //TODO move assert_eq!(quotient, DivExact::div_exact(x, Integer::from(y)));
+    });
+
+    test_properties(pairs_of_u32_and_positive_u32_var_1, |&(x, y)| {
+        let quotient = x.div_exact(y);
+        assert_eq!(quotient, Integer::from(x).div_exact(y));
+        assert_eq!(quotient, DivExact::div_exact(x, Integer::from(y)));
     });
 }

@@ -1,6 +1,7 @@
 use common::test_properties;
 use malachite_base::num::Parity;
 use malachite_nz::integer::Integer;
+use malachite_test::inputs::base::signeds;
 use malachite_test::inputs::integer::integers;
 use std::str::FromStr;
 
@@ -52,6 +53,10 @@ fn even_properties() {
         assert_eq!((x + 1u32).odd(), even);
         assert_eq!((x - 1u32).odd(), even);
     });
+
+    test_properties(signeds::<i32>, |&i| {
+        assert_eq!(i.even(), Integer::from(i).even());
+    });
 }
 
 #[test]
@@ -61,5 +66,9 @@ fn odd_properties() {
         assert_eq!(!x.even(), odd);
         assert_eq!((x + 1u32).even(), odd);
         assert_eq!((x - 1u32).even(), odd);
+    });
+
+    test_properties(signeds::<i32>, |&i| {
+        assert_eq!(i.odd(), Integer::from(i).odd());
     });
 }

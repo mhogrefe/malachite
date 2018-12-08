@@ -9,10 +9,13 @@ use malachite_nz::natural::Natural;
 use malachite_test::common::{
     bigint_to_integer, integer_to_bigint, integer_to_rug_integer, rug_integer_to_integer,
 };
-use malachite_test::inputs::base::positive_unsigneds;
+use malachite_test::inputs::base::{pairs_of_unsigned_and_positive_unsigned, positive_unsigneds};
 use malachite_test::inputs::integer::{
     integers, pairs_of_integer_and_positive_u32_var_1, pairs_of_integer_and_positive_unsigned,
     pairs_of_unsigned_and_nonzero_integer, triples_of_integer_integer_and_positive_unsigned,
+};
+use malachite_test::inputs::natural::{
+    pairs_of_natural_and_positive_unsigned, pairs_of_unsigned_and_positive_natural,
 };
 use malachite_test::integer::arithmetic::mod_u32::num_mod_u32;
 use num::BigInt;
@@ -475,6 +478,26 @@ fn mod_u32_properties() {
             );
         },
     );
+
+    test_properties(pairs_of_unsigned_and_positive_unsigned::<u32>, |&(x, y)| {
+        let remainder = x.mod_op(y);
+        assert_eq!(remainder, Integer::from(x).mod_op(y));
+        assert_eq!(remainder, x.mod_op(Integer::from(y)));
+    });
+
+    test_properties(
+        pairs_of_natural_and_positive_unsigned::<u32>,
+        |&(ref n, u)| {
+            assert_eq!(n.mod_op(u), Integer::from(n).mod_op(u));
+        },
+    );
+
+    test_properties(
+        pairs_of_unsigned_and_positive_natural::<u32>,
+        |&(u, ref n)| {
+            assert_eq!(u.mod_op(n), u.mod_op(Integer::from(n)));
+        },
+    );
 }
 
 fn rem_u32_properties_helper(n: &Integer, u: u32) {
@@ -656,6 +679,26 @@ fn ceiling_mod_u32_properties() {
                 (x * y).ceiling_mod(u),
                 (Integer::from(x % u) * Integer::from(y % u)).ceiling_mod(u)
             );
+        },
+    );
+
+    test_properties(pairs_of_unsigned_and_positive_unsigned::<u32>, |&(x, y)| {
+        let remainder = x % y;
+        assert_eq!(remainder, Integer::from(x) % y);
+        assert_eq!(remainder, x % Integer::from(y));
+    });
+
+    test_properties(
+        pairs_of_natural_and_positive_unsigned::<u32>,
+        |&(ref n, u)| {
+            assert_eq!(n % u, Integer::from(n) % u);
+        },
+    );
+
+    test_properties(
+        pairs_of_unsigned_and_positive_natural::<u32>,
+        |&(u, ref n)| {
+            assert_eq!(u % n, u % Integer::from(n));
         },
     );
 }

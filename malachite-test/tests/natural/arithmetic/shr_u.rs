@@ -1,5 +1,5 @@
 use common::test_properties;
-use malachite_base::misc::{Max, WrappingFrom};
+use malachite_base::misc::{CheckedFrom, Max};
 use malachite_base::num::{
     PrimitiveInteger, PrimitiveSigned, PrimitiveUnsigned, ShrRound, ShrRoundAssign, Zero,
 };
@@ -16,9 +16,10 @@ use malachite_test::common::{
 };
 use malachite_test::inputs::base::{
     pairs_of_positive_unsigned_and_small_unsigned, pairs_of_unsigned_and_rounding_mode,
-    pairs_of_unsigned_and_small_unsigned, pairs_of_unsigned_vec_and_small_u64,
-    pairs_of_unsigned_vec_and_small_u64_var_1, pairs_of_unsigned_vec_and_u32_var_2,
-    triples_of_unsigned_vec_small_u64_and_rounding_mode_var_1,
+    pairs_of_unsigned_and_small_unsigned, pairs_of_unsigned_vec_and_small_unsigned,
+    pairs_of_unsigned_vec_and_small_unsigned_var_1, pairs_of_unsigned_vec_and_u32_var_2,
+    triples_of_unsigned_small_unsigned_and_rounding_mode_var_1,
+    triples_of_unsigned_vec_small_unsigned_and_rounding_mode_var_1,
     triples_of_unsigned_vec_unsigned_vec_and_u32_var_6, unsigneds,
 };
 use malachite_test::inputs::natural::{
@@ -305,18 +306,21 @@ fn limbs_slice_shr_in_place_fail_3() {
 
 #[test]
 fn limbs_shr_properties() {
-    test_properties(pairs_of_unsigned_vec_and_small_u64, |&(ref limbs, bits)| {
-        assert_eq!(
-            Natural::from_owned_limbs_asc(limbs_shr(limbs, bits)),
-            Natural::from_limbs_asc(limbs) >> bits
-        );
-    });
+    test_properties(
+        pairs_of_unsigned_vec_and_small_unsigned,
+        |&(ref limbs, bits)| {
+            assert_eq!(
+                Natural::from_owned_limbs_asc(limbs_shr(limbs, bits)),
+                Natural::from_limbs_asc(limbs) >> bits
+            );
+        },
+    );
 }
 
 #[test]
 fn limbs_shr_round_up_properties() {
     test_properties(
-        pairs_of_unsigned_vec_and_small_u64_var_1,
+        pairs_of_unsigned_vec_and_small_unsigned_var_1,
         |&(ref limbs, bits)| {
             assert_eq!(
                 Natural::from_owned_limbs_asc(limbs_shr_round_up(limbs, bits)),
@@ -328,18 +332,21 @@ fn limbs_shr_round_up_properties() {
 
 #[test]
 fn limbs_shr_round_to_nearest_properties() {
-    test_properties(pairs_of_unsigned_vec_and_small_u64, |&(ref limbs, bits)| {
-        assert_eq!(
-            Natural::from_owned_limbs_asc(limbs_shr_round_to_nearest(limbs, bits)),
-            Natural::from_limbs_asc(limbs).shr_round(bits, RoundingMode::Nearest),
-        );
-    });
+    test_properties(
+        pairs_of_unsigned_vec_and_small_unsigned,
+        |&(ref limbs, bits)| {
+            assert_eq!(
+                Natural::from_owned_limbs_asc(limbs_shr_round_to_nearest(limbs, bits)),
+                Natural::from_limbs_asc(limbs).shr_round(bits, RoundingMode::Nearest),
+            );
+        },
+    );
 }
 
 #[test]
 fn limbs_shr_exact_properties() {
     test_properties(
-        pairs_of_unsigned_vec_and_small_u64_var_1,
+        pairs_of_unsigned_vec_and_small_unsigned_var_1,
         |&(ref limbs, bits)| {
             let n = Natural::from_limbs_asc(limbs);
             if let Some(result_limbs) = limbs_shr_exact(limbs, bits) {
@@ -356,7 +363,7 @@ fn limbs_shr_exact_properties() {
 #[test]
 fn limbs_shr_round_properties() {
     test_properties(
-        triples_of_unsigned_vec_small_u64_and_rounding_mode_var_1,
+        triples_of_unsigned_vec_small_unsigned_and_rounding_mode_var_1,
         |&(ref limbs, bits, rm)| {
             let n = Natural::from_limbs_asc(limbs);
             if let Some(result_limbs) = limbs_shr_round(limbs, bits, rm) {
@@ -411,19 +418,22 @@ fn limbs_slice_shr_in_place_properties() {
 
 #[test]
 fn limbs_vec_shr_in_place_properties() {
-    test_properties(pairs_of_unsigned_vec_and_small_u64, |&(ref limbs, bits)| {
-        let mut limbs = limbs.to_vec();
-        let old_limbs = limbs.clone();
-        limbs_vec_shr_in_place(&mut limbs, bits);
-        let n = Natural::from_limbs_asc(&old_limbs) >> bits;
-        assert_eq!(Natural::from_owned_limbs_asc(limbs), n);
-    });
+    test_properties(
+        pairs_of_unsigned_vec_and_small_unsigned,
+        |&(ref limbs, bits)| {
+            let mut limbs = limbs.to_vec();
+            let old_limbs = limbs.clone();
+            limbs_vec_shr_in_place(&mut limbs, bits);
+            let n = Natural::from_limbs_asc(&old_limbs) >> bits;
+            assert_eq!(Natural::from_owned_limbs_asc(limbs), n);
+        },
+    );
 }
 
 #[test]
 fn limbs_vec_shr_round_up_in_place_properties() {
     test_properties(
-        pairs_of_unsigned_vec_and_small_u64_var_1,
+        pairs_of_unsigned_vec_and_small_unsigned_var_1,
         |&(ref limbs, bits)| {
             let mut limbs = limbs.to_vec();
             let old_limbs = limbs.clone();
@@ -436,19 +446,22 @@ fn limbs_vec_shr_round_up_in_place_properties() {
 
 #[test]
 fn limbs_vec_shr_round_to_nearest_in_place_properties() {
-    test_properties(pairs_of_unsigned_vec_and_small_u64, |&(ref limbs, bits)| {
-        let mut limbs = limbs.to_vec();
-        let old_limbs = limbs.clone();
-        limbs_vec_shr_round_to_nearest_in_place(&mut limbs, bits);
-        let n = Natural::from_limbs_asc(&old_limbs).shr_round(bits, RoundingMode::Nearest);
-        assert_eq!(Natural::from_owned_limbs_asc(limbs), n);
-    });
+    test_properties(
+        pairs_of_unsigned_vec_and_small_unsigned,
+        |&(ref limbs, bits)| {
+            let mut limbs = limbs.to_vec();
+            let old_limbs = limbs.clone();
+            limbs_vec_shr_round_to_nearest_in_place(&mut limbs, bits);
+            let n = Natural::from_limbs_asc(&old_limbs).shr_round(bits, RoundingMode::Nearest);
+            assert_eq!(Natural::from_owned_limbs_asc(limbs), n);
+        },
+    );
 }
 
 #[test]
 fn limbs_vec_shr_exact_in_place_properties() {
     test_properties(
-        pairs_of_unsigned_vec_and_small_u64_var_1,
+        pairs_of_unsigned_vec_and_small_unsigned_var_1,
         |&(ref limbs, bits)| {
             let n = Natural::from_limbs_asc(limbs);
             let mut limbs = limbs.to_vec();
@@ -466,7 +479,7 @@ fn limbs_vec_shr_exact_in_place_properties() {
 #[test]
 fn limbs_vec_shr_round_in_place_properties() {
     test_properties(
-        triples_of_unsigned_vec_small_u64_and_rounding_mode_var_1,
+        triples_of_unsigned_vec_small_unsigned_and_rounding_mode_var_1,
         |&(ref limbs, bits, rm)| {
             let n = Natural::from_limbs_asc(limbs);
             let mut limbs = limbs.to_vec();
@@ -606,8 +619,12 @@ macro_rules! tests_and_properties {
             test_properties(
                 pairs_of_unsigned_and_small_unsigned::<u32, $t>,
                 |&(u, v)| {
-                    if let Some(shift) = v.checked_add($t::wrapping_from(u32::WIDTH)) {
+                    if let Some(shift) = v.checked_add($t::checked_from(u32::WIDTH).unwrap()) {
                         assert_eq!(Natural::from(u) >> shift, 0);
+                    }
+
+                    if v < $t::checked_from(u32::WIDTH).unwrap() {
+                        assert_eq!(u >> v, Natural::from(u) >> v);
                     }
                 },
             );
@@ -1279,7 +1296,7 @@ macro_rules! tests_and_properties {
             test_properties(
                 pairs_of_positive_unsigned_and_small_unsigned::<u32, $t>,
                 |&(u, v)| {
-                    if let Some(shift) = v.checked_add($t::wrapping_from(u32::WIDTH)) {
+                    if let Some(shift) = v.checked_add($t::checked_from(u32::WIDTH).unwrap()) {
                         assert_eq!(Natural::from(u).shr_round(shift, RoundingMode::Down), 0);
                         assert_eq!(Natural::from(u).shr_round(shift, RoundingMode::Floor), 0);
                         assert_eq!(Natural::from(u).shr_round(shift, RoundingMode::Up), 1);
@@ -1302,6 +1319,13 @@ macro_rules! tests_and_properties {
             test_properties(pairs_of_unsigned_and_rounding_mode::<$t>, |&(u, rm)| {
                 assert_eq!(Natural::ZERO.shr_round(u, rm), 0);
             });
+
+            test_properties(
+                triples_of_unsigned_small_unsigned_and_rounding_mode_var_1::<u32, $t>,
+                |&(n, u, rm)| {
+                    assert_eq!(n.shr_round(u, rm), Natural::from(n).shr_round(u, rm));
+                },
+            );
         }
     };
 }

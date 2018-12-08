@@ -5,11 +5,12 @@ use malachite_nz::natural::Natural;
 use malachite_test::common::{
     bigint_to_integer, integer_to_bigint, integer_to_rug_integer, rug_integer_to_integer,
 };
-use malachite_test::inputs::base::positive_unsigneds;
+use malachite_test::inputs::base::{pairs_of_unsigned_and_positive_unsigned, positive_unsigneds};
 use malachite_test::inputs::integer::{
     integers, pairs_of_integer_and_positive_u32_var_1, pairs_of_integer_and_positive_unsigned,
     pairs_of_unsigned_and_nonzero_integer,
 };
+use malachite_test::inputs::natural::pairs_of_natural_and_positive_unsigned;
 use num::BigInt;
 use rug;
 use std::str::FromStr;
@@ -241,4 +242,17 @@ fn div_u32_properties() {
         assert_eq!(u / -Natural::from(u), -1);
         assert_eq!(-Natural::from(u) / u, -1);
     });
+
+    test_properties(pairs_of_unsigned_and_positive_unsigned::<u32>, |&(x, y)| {
+        let quotient = x / y;
+        assert_eq!(quotient, Integer::from(x) / y);
+        assert_eq!(quotient, x / Integer::from(y));
+    });
+
+    test_properties(
+        pairs_of_natural_and_positive_unsigned::<u32>,
+        |&(ref n, u)| {
+            assert_eq!(n / u, Integer::from(n) / u);
+        },
+    );
 }

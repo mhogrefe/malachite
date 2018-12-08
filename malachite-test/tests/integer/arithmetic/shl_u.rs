@@ -8,6 +8,7 @@ use malachite_test::common::{
 };
 use malachite_test::inputs::base::small_unsigneds;
 use malachite_test::inputs::integer::{integers, pairs_of_integer_and_small_unsigned};
+use malachite_test::inputs::natural::pairs_of_natural_and_small_unsigned;
 use num::BigInt;
 use rug;
 use std::str::FromStr;
@@ -132,6 +133,10 @@ macro_rules! tests_and_properties {
                 assert!(Natural::checked_from(Integer::ONE << u)
                     .unwrap()
                     .is_power_of_two());
+            });
+
+            test_properties(pairs_of_natural_and_small_unsigned::<$t>, |&(ref n, u)| {
+                assert_eq!(n << u, Integer::from(n) << u);
             });
         }
     };

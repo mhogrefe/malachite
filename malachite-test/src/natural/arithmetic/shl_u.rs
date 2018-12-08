@@ -1,6 +1,6 @@
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::{
-    pairs_of_unsigned_vec_and_small_u64, pairs_of_unsigned_vec_and_u32_var_1,
+    pairs_of_unsigned_vec_and_small_unsigned, pairs_of_unsigned_vec_and_u32_var_1,
     triples_of_unsigned_vec_unsigned_vec_and_u32_var_5,
 };
 use inputs::natural::{
@@ -72,7 +72,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
 }
 
 fn demo_limbs_shl(gm: GenerationMode, limit: usize) {
-    for (limbs, bits) in pairs_of_unsigned_vec_and_small_u64(gm).take(limit) {
+    for (limbs, bits) in pairs_of_unsigned_vec_and_small_unsigned(gm).take(limit) {
         println!(
             "limbs_shl({:?}, {}) = {:?}",
             limbs,
@@ -109,7 +109,7 @@ fn demo_limbs_slice_shl_in_place(gm: GenerationMode, limit: usize) {
 }
 
 fn demo_limbs_vec_shl_in_place(gm: GenerationMode, limit: usize) {
-    for (limbs, bits) in pairs_of_unsigned_vec_and_small_u64(gm).take(limit) {
+    for (limbs, bits) in pairs_of_unsigned_vec_and_small_unsigned(gm).take(limit) {
         let mut limbs = limbs.to_vec();
         let mut limbs_old = limbs.clone();
         limbs_vec_shl_in_place(&mut limbs, bits);
@@ -210,7 +210,7 @@ fn benchmark_limbs_shl(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "limbs_shl(&[u32], u32)",
         BenchmarkType::Single,
-        pairs_of_unsigned_vec_and_small_u64(gm),
+        pairs_of_unsigned_vec_and_small_unsigned(gm),
         gm.name(),
         limit,
         file_name,
@@ -263,7 +263,7 @@ fn benchmark_limbs_vec_shl_in_place(gm: GenerationMode, limit: usize, file_name:
     m_run_benchmark(
         "limbs_vec_shl_in_place(&mut Vec<u32>, u32)",
         BenchmarkType::Single,
-        pairs_of_unsigned_vec_and_small_u64(gm),
+        pairs_of_unsigned_vec_and_small_unsigned(gm),
         gm.name(),
         limit,
         file_name,
