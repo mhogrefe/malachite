@@ -86,19 +86,19 @@ fn test_div_exact_u32() {
 #[should_panic(expected = "division by zero")]
 fn div_exact_assign_u32_fail() {
     let mut n = Integer::from(10u32);
-    n.div_exact_assign(0);
+    n.div_exact_assign(0u32);
 }
 
 #[test]
 #[should_panic(expected = "division by zero")]
 fn div_exact_u32_fail() {
-    Integer::from(10u32).div_exact(0);
+    Integer::from(10u32).div_exact(0u32);
 }
 
 #[test]
 #[should_panic(expected = "division by zero")]
 fn div_exact_u32_ref_fail() {
-    (&Integer::from(10u32)).div_exact(0);
+    (&Integer::from(10u32)).div_exact(0u32);
 }
 
 #[test]
@@ -136,13 +136,13 @@ fn test_u32_div_exact_integer() {
 #[test]
 #[should_panic(expected = "division by zero")]
 fn u32_div_exact_integer_fail() {
-    10.div_exact(Integer::ZERO);
+    10u32.div_exact(Integer::ZERO);
 }
 
 #[test]
 #[should_panic(expected = "division by zero")]
 fn u32_div_exact_integer_ref_fail() {
-    10.div_exact(&Integer::ZERO);
+    10u32.div_exact(&Integer::ZERO);
 }
 
 fn div_exact_u32_properties_helper(n: &Integer, u: u32) {
@@ -203,7 +203,7 @@ fn div_exact_u32_properties() {
     );
 
     test_properties(integers, |n| {
-        assert_eq!(n.div_exact(1), *n);
+        assert_eq!(n.div_exact(1u32), *n);
     });
 
     test_properties(positive_unsigneds, |&u: &u32| {
@@ -218,14 +218,12 @@ fn div_exact_u32_properties() {
 
     test_properties(pairs_of_u32_and_nonzero_i32_var_1, |&(x, y)| {
         let quotient = Integer::from(i64::from(x).div_exact(i64::from(y)));
-        // TODO move assert_eq!(quotient, Integer::from(x).div_exact(y));
         assert_eq!(quotient, DivExact::div_exact(x, Integer::from(y)));
     });
 
     test_properties(pairs_of_i32_and_positive_u32_var_1, |&(x, y)| {
         let quotient = Integer::from(i64::from(x).div_exact(i64::from(y)));
         assert_eq!(quotient, Integer::from(x).div_exact(y));
-        //TODO move assert_eq!(quotient, DivExact::div_exact(x, Integer::from(y)));
     });
 
     test_properties(pairs_of_u32_and_positive_u32_var_1, |&(x, y)| {

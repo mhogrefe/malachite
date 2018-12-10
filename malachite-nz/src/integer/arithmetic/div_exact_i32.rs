@@ -1,13 +1,13 @@
 use integer::Integer;
-use malachite_base::num::{DivExact, DivExactAssign, Zero};
+use malachite_base::num::{DivExact, DivExactAssign, UnsignedAbs, Zero};
 use natural::Natural;
-use std::u32;
+use std::i32;
 
-impl DivExact<u32> for Integer {
+impl DivExact<i32> for Integer {
     type Output = Integer;
 
-    /// Divides an `Integer` by a `u32`, taking the `Integer` by value. The `Integer` must be
-    /// exactly divisible by the `u32`. If it isn't, the behavior of this function is undefined.
+    /// Divides an `Integer` by an `i32`, taking the `Integer` by value. The `Integer` must be
+    /// exactly divisible by the `i32`. If it isn't, the behavior of this function is undefined.
     ///
     /// Time: worst case O(n)
     ///
@@ -25,25 +25,25 @@ impl DivExact<u32> for Integer {
     /// use std::str::FromStr;
     ///
     /// fn main() {
-    ///     // -3 * 123 = -369
-    ///     assert_eq!(Integer::from(-369).div_exact(123u32).to_string(), "-3");
+    ///     // 3 * 123 = 369
+    ///     assert_eq!(Integer::from(-369).div_exact(123i32).to_string(), "-3");
     ///
-    ///     // -8,130,081,300 * 123 = -999,999,999,900
-    ///     assert_eq!(Integer::from_str("-999999999900").unwrap().div_exact(123u32).to_string(),
-    ///         "-8130081300");
+    ///     // 8,130,081,300 * -123 = -999,999,999,900
+    ///     assert_eq!(Integer::from_str("-999999999900").unwrap().div_exact(-123i32).to_string(),
+    ///         "8130081300");
     /// }
     /// ```
-    fn div_exact(mut self, other: u32) -> Integer {
+    fn div_exact(mut self, other: i32) -> Integer {
         self.div_exact_assign(other);
         self
     }
 }
 
-impl<'a> DivExact<u32> for &'a Integer {
+impl<'a> DivExact<i32> for &'a Integer {
     type Output = Integer;
 
-    /// Divides an `Integer` by a `u32`, taking the `Integer` by reference. The `Integer` must be
-    /// exactly divisible by the `u32`. If it isn't, the behavior of this function is undefined.
+    /// Divides an `Integer` by an `i32`, taking the `Integer` by reference. The `Integer` must be
+    /// exactly divisible by the `i32`. If it isn't, the behavior of this function is undefined.
     ///
     /// Time: worst case O(n)
     ///
@@ -62,29 +62,29 @@ impl<'a> DivExact<u32> for &'a Integer {
     ///
     /// fn main() {
     ///     // -3 * 123 = -369
-    ///     assert_eq!((&Integer::from(-369)).div_exact(123u32).to_string(), "-3");
+    ///     assert_eq!((&Integer::from(-369)).div_exact(123i32).to_string(), "-3");
     ///
-    ///     // -8,130,081,300 * 123 = -999,999,999,900
-    ///     assert_eq!((&Integer::from_str("-999999999900").unwrap()).div_exact(123u32).to_string(),
-    ///         "-8130081300");
+    ///     // 8,130,081,300 * -123 = -999,999,999,900
+    ///     assert_eq!((&Integer::from_str("-999999999900").unwrap()).div_exact(-123i32)
+    ///         .to_string(), "8130081300");
     /// }
     /// ```
-    fn div_exact(self, other: u32) -> Integer {
-        let abs = (&self.abs).div_exact(other);
+    fn div_exact(self, other: i32) -> Integer {
+        let abs = (&self.abs).div_exact(other.unsigned_abs());
         if abs == 0 {
             Integer::ZERO
         } else {
             Integer {
-                sign: self.sign,
+                sign: self.sign == (other >= 0),
                 abs,
             }
         }
     }
 }
 
-impl DivExactAssign<u32> for Integer {
-    /// Divides an `Integer` by a `u32` in place. The `Integer` must be exactly divisible by the
-    /// `u32`. If it isn't, the behavior of this function is undefined.
+impl DivExactAssign<i32> for Integer {
+    /// Divides an `Integer` by an `i32` in place. The `Integer` must be exactly divisible by the
+    /// `i32`. If it isn't, the behavior of this function is undefined.
     ///
     /// Time: worst case O(n)
     ///
@@ -104,25 +104,25 @@ impl DivExactAssign<u32> for Integer {
     /// fn main() {
     ///     // -3 * 123 = -369
     ///     let mut x = Integer::from(-369);
-    ///     x.div_exact_assign(123u32);
+    ///     x.div_exact_assign(123i32);
     ///     assert_eq!(x.to_string(), "-3");
     ///
     ///     // -8,130,081,300 * 123 = -999,999,999,900
     ///     let mut x = Integer::from_str("-999999999900").unwrap();
-    ///     x.div_exact_assign(123u32);
+    ///     x.div_exact_assign(123);
     ///     assert_eq!(x.to_string(), "-8130081300");
     /// }
     /// ```
-    fn div_exact_assign(&mut self, other: u32) {
-        self.abs.div_exact_assign(other);
-        self.sign |= self.abs == 0;
+    fn div_exact_assign(&mut self, other: i32) {
+        self.abs.div_exact_assign(other.unsigned_abs());
+        self.sign = self.sign == (other >= 0) || self.abs == 0
     }
 }
 
-impl DivExact<Integer> for u32 {
+impl DivExact<Integer> for i32 {
     type Output = Integer;
 
-    /// Divides a `u32` by an `Integer`, taking the `Integer` by value. The `u32` must be exactly
+    /// Divides an `i32` by an `Integer`, taking the `Integer` by value. The `i32` must be exactly
     /// divisible by the `Integer`. If it isn't, the behavior of this function is undefined.
     ///
     /// Time: worst case O(1)
@@ -138,27 +138,27 @@ impl DivExact<Integer> for u32 {
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {
-    ///     // -3 * -123 = 369
-    ///     assert_eq!(369u32.div_exact(Integer::from(-123)).to_string(), "-3");
+    ///     // 3 * -123 = -369
+    ///     assert_eq!((-369i32).div_exact(Integer::from(-123)).to_string(), "3");
     /// }
     /// ```
     fn div_exact(self, other: Integer) -> Integer {
-        let abs = self.div_exact(other.abs);
+        let abs = self.unsigned_abs().div_exact(other.abs);
         if abs == 0 {
             Integer::ZERO
         } else {
             Integer {
-                sign: other.sign,
+                sign: (self >= 0) == other.sign,
                 abs: Natural::from(abs),
             }
         }
     }
 }
 
-impl<'a> DivExact<&'a Integer> for u32 {
+impl<'a> DivExact<&'a Integer> for i32 {
     type Output = Integer;
 
-    /// Divides a `u32` by an `Integer`, taking the `Integer` by reference. The `u32` must be
+    /// Divides an `i32` by an `Integer`, taking the `Integer` by reference. The `i32` must be
     /// exactly divisible by the `Integer`. If it isn't, the behavior of this function is undefined.
     ///
     /// Time: worst case O(1)
@@ -174,17 +174,17 @@ impl<'a> DivExact<&'a Integer> for u32 {
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {
-    ///     // -3 * -123 = 369
-    ///     assert_eq!(369u32.div_exact(&Integer::from(-123)).to_string(), "-3");
+    ///     // 3 * -123 = -369
+    ///     assert_eq!((-369i32).div_exact(&Integer::from(-123)).to_string(), "3");
     /// }
     /// ```
     fn div_exact(self, other: &'a Integer) -> Integer {
-        let abs = self.div_exact(&other.abs);
+        let abs = self.unsigned_abs().div_exact(&other.abs);
         if abs == 0 {
             Integer::ZERO
         } else {
             Integer {
-                sign: other.sign,
+                sign: (self >= 0) == other.sign,
                 abs: Natural::from(abs),
             }
         }

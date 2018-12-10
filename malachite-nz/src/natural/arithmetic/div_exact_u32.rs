@@ -557,8 +557,8 @@ impl DivExactAssign<u32> for Natural {
 impl DivExact<Natural> for u32 {
     type Output = u32;
 
-    /// Divides a `u32` by a `Natural`, taking the `Natural` by value. The `Natural` must be exactly
-    /// divisible by the `u32`. If it isn't, the behavior of this function is undefined.
+    /// Divides a `u32` by a `Natural`, taking the `Natural` by value. The `u32` must be exactly
+    /// divisible by the `Natural`. If it isn't, the behavior of this function is undefined.
     ///
     /// Time: worst case O(1)
     ///
@@ -592,8 +592,8 @@ impl DivExact<Natural> for u32 {
 impl<'a> DivExact<&'a Natural> for u32 {
     type Output = u32;
 
-    /// Divides a `u32` by a `Natural`, taking the `Natural` by reference. The `Natural` must be
-    /// exactly divisible by the `u32`. If it isn't, the behavior of this function is undefined.
+    /// Divides a `u32` by a `Natural`, taking the `Natural` by reference. The `u32` must be exactly
+    /// divisible by the `Natural`. If it isn't, the behavior of this function is undefined.
     ///
     /// Time: worst case O(1)
     ///
@@ -625,8 +625,8 @@ impl<'a> DivExact<&'a Natural> for u32 {
 }
 
 impl DivExactAssign<Natural> for u32 {
-    /// Divides a `u32` by a `Natural` in place, taking the `Natural` by value. The `Natural` must
-    /// be exactly divisible by the `u32`. If it isn't, the behavior of this function is undefined.
+    /// Divides a `u32` by a `Natural` in place, taking the `Natural` by value. The `u32` must be
+    /// exactly divisible by the `Natural`. If it isn't, the behavior of this function is undefined.
     ///
     /// Time: worst case O(1)
     ///
@@ -653,8 +653,8 @@ impl DivExactAssign<Natural> for u32 {
 }
 
 impl<'a> DivExactAssign<&'a Natural> for u32 {
-    /// Divides a `u32` by a `Natural` in place, taking the `Natural` by reference. The `Natural`
-    /// must be exactly divisible by the `u32`. If it isn't, the behavior of this function is
+    /// Divides a `u32` by a `Natural` in place, taking the `Natural` by reference. The `u32` must
+    /// be exactly divisible by the `Natural`. If it isn't, the behavior of this function is
     /// undefined.
     ///
     /// Time: worst case O(1)
