@@ -17,7 +17,7 @@ impl Natural {
                         false
                     }
                     None => true,
-                }
+                };
             }
             Large(ref mut limbs) => {
                 if limbs_sub_limb_in_place(limbs, other) {

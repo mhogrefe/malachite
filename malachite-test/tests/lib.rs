@@ -136,6 +136,7 @@ pub mod integer {
     pub mod logic {
         pub mod and;
         pub mod and_i32;
+        pub mod and_natural;
         pub mod and_u32;
         pub mod assign_bit;
         pub mod checked_count_ones;
