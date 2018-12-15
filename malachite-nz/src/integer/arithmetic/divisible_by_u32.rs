@@ -23,9 +23,9 @@ impl<'a> DivisibleBy<u32> for &'a Integer {
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {
-    ///     assert_eq!(Integer::ZERO.divisible_by(0), true);
-    ///     assert_eq!(Integer::from(100).divisible_by(3), false);
-    ///     assert_eq!(Integer::from(-102).divisible_by(3), true);
+    ///     assert_eq!(Integer::ZERO.divisible_by(0u32), true);
+    ///     assert_eq!(Integer::from(100).divisible_by(3u32), false);
+    ///     assert_eq!(Integer::from(-102).divisible_by(3u32), true);
     /// }
     /// ```
     fn divisible_by(self, other: u32) -> bool {
@@ -51,9 +51,9 @@ impl<'a> DivisibleBy<&'a Integer> for u32 {
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {
-    ///     assert_eq!(0.divisible_by(&Integer::ZERO), true);
-    ///     assert_eq!(100.divisible_by(&Integer::from(3)), false);
-    ///     assert_eq!(102.divisible_by(&Integer::from(-3)), true);
+    ///     assert_eq!(0u32.divisible_by(&Integer::ZERO), true);
+    ///     assert_eq!(100u32.divisible_by(&Integer::from(3)), false);
+    ///     assert_eq!(102u32.divisible_by(&Integer::from(-3)), true);
     /// }
     /// ```
     fn divisible_by(self, other: &'a Integer) -> bool {

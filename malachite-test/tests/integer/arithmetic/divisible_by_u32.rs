@@ -94,8 +94,8 @@ fn test_u32_divisible_by_integer() {
     test(123, "456", false);
     test(456, "123", false);
     test(369, "123", true);
-    test(4294967295, "1", true);
-    test(4294967295, "4294967295", true);
+    test(4_294_967_295, "1", true);
+    test(4_294_967_295, "4294967295", true);
     test(0, "1000000000000", true);
     test(123, "1000000000000", false);
 
@@ -107,8 +107,8 @@ fn test_u32_divisible_by_integer() {
     test(123, "-456", false);
     test(456, "-123", false);
     test(369, "-123", true);
-    test(4294967295, "-1", true);
-    test(4294967295, "-4294967295", true);
+    test(4_294_967_295, "-1", true);
+    test(4_294_967_295, "-4294967295", true);
     test(0, "-1000000000000", true);
     test(123, "-1000000000000", false);
 }
@@ -170,11 +170,11 @@ fn divisible_by_u32_properties() {
     );
 
     test_properties(integers, |n| {
-        assert!(n.divisible_by(1));
+        assert!(n.divisible_by(1u32));
     });
 
     test_properties(nonzero_integers, |n| {
-        assert!(!n.divisible_by(0));
+        assert!(!n.divisible_by(0u32));
     });
 
     test_properties(positive_unsigneds, |&u: &u32| {
