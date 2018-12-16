@@ -12,7 +12,7 @@ use malachite_test::inputs::natural::{
     naturals, pairs_of_naturals, triples_of_natural_natural_and_unsigned, triples_of_naturals,
 };
 use malachite_test::natural::logic::hamming_distance::{
-    natural_hamming_distance_alt_1, natural_hamming_distance_alt_2,
+    natural_hamming_distance_alt_1, natural_hamming_distance_alt_2, rug_hamming_distance,
 };
 use rug;
 use std::str::FromStr;
@@ -71,11 +71,9 @@ fn test_hamming_distance() {
             out
         );
         assert_eq!(
-            u64::from(
-                rug::Integer::from_str(x)
-                    .unwrap()
-                    .hamming_dist(&rug::Integer::from_str(y).unwrap())
-                    .unwrap()
+            rug_hamming_distance(
+                &rug::Integer::from_str(x).unwrap(),
+                &rug::Integer::from_str(y).unwrap()
             ),
             out
         );
@@ -118,11 +116,7 @@ fn hamming_distance_properties() {
     test_properties(pairs_of_naturals, |&(ref x, ref y)| {
         let distance = x.hamming_distance(y);
         assert_eq!(
-            u64::from(
-                natural_to_rug_integer(x)
-                    .hamming_dist(&natural_to_rug_integer(y))
-                    .unwrap()
-            ),
+            rug_hamming_distance(&natural_to_rug_integer(x), &natural_to_rug_integer(y)),
             distance
         );
         assert_eq!(y.hamming_distance(x), distance);

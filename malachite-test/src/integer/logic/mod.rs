@@ -12,6 +12,7 @@ pub mod checked_count_ones;
 pub mod checked_count_zeros;
 pub mod checked_hamming_distance;
 pub mod checked_hamming_distance_i32;
+pub mod checked_hamming_distance_natural;
 pub mod checked_hamming_distance_u32;
 pub mod clear_bit;
 pub mod flip_bit;
@@ -89,6 +90,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     checked_count_zeros::register(registry);
     checked_hamming_distance::register(registry);
     checked_hamming_distance_i32::register(registry);
+    checked_hamming_distance_natural::register(registry);
     checked_hamming_distance_u32::register(registry);
     clear_bit::register(registry);
     flip_bit::register(registry);

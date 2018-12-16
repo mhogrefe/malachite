@@ -209,6 +209,7 @@ pub mod logic {
     pub mod checked_count_zeros;
     pub mod checked_hamming_distance;
     pub mod checked_hamming_distance_i32;
+    pub mod checked_hamming_distance_natural;
     pub mod checked_hamming_distance_u32;
     pub mod not;
     pub mod or;

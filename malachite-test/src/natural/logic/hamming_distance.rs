@@ -6,6 +6,7 @@ use malachite_nz::natural::logic::hamming_distance::{
     limbs_hamming_distance, limbs_hamming_distance_same_length,
 };
 use malachite_nz::natural::Natural;
+use rug;
 use std::cmp::max;
 use std::iter::repeat;
 
@@ -36,6 +37,10 @@ pub fn natural_hamming_distance_alt_2(x: &Natural, y: &Natural) -> u64 {
         distance += x.hamming_distance(y);
     }
     distance
+}
+
+pub fn rug_hamming_distance(x: &rug::Integer, y: &rug::Integer) -> u64 {
+    u64::from(x.hamming_dist(y).unwrap())
 }
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
@@ -148,7 +153,7 @@ fn benchmark_natural_hamming_distance_library_comparison(
             ),
             (
                 "rug",
-                &mut (|((x, y), _)| no_out!(x.hamming_dist(&y).unwrap())),
+                &mut (|((x, y), _)| no_out!(rug_hamming_distance(&x, &y))),
             ),
         ],
     );

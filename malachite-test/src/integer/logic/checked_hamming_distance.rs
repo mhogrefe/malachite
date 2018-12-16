@@ -1,6 +1,6 @@
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::pairs_of_u32_vec_var_1;
-use inputs::integer::pairs_of_integers;
+use inputs::integer::{pairs_of_integers, rm_pairs_of_integers};
 use malachite_base::num::{CheckedHammingDistance, HammingDistance, SignificantBits};
 use malachite_nz::integer::logic::checked_hamming_distance::limbs_hamming_distance_neg;
 use malachite_nz::integer::Integer;
@@ -35,11 +35,15 @@ pub fn integer_checked_hamming_distance_alt_1(x: &Integer, y: &Integer) -> Optio
     Some(distance)
 }
 
+pub fn rug_checked_hamming_distance(x: &rug::Integer, y: &rug::Integer) -> Option<u64> {
+    x.hamming_dist(y).map(|u| u64::from(u))
+}
+
 pub fn integer_checked_hamming_distance_alt_2(x: &Integer, y: &Integer) -> Option<u64> {
-    let extension = if *x < 0 { u32::MAX } else { 0 };
     if (*x < 0) != (*y < 0) {
         return None;
     }
+    let extension = if *x < 0 { u32::MAX } else { 0 };
     let limb_zip: Box<Iterator<Item = (u32, u32)>> =
         if x.twos_complement_limbs().count() >= y.twos_complement_limbs().count() {
             Box::new(
@@ -64,6 +68,11 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limbs_hamming_distance_neg);
     register_demo!(registry, demo_integer_checked_hamming_distance);
     register_bench!(registry, Small, benchmark_limbs_hamming_distance_neg);
+    register_bench!(
+        registry,
+        Large,
+        benchmark_integer_checked_hamming_distance_library_comparison
+    );
     register_bench!(
         registry,
         Large,
@@ -110,13 +119,40 @@ fn benchmark_limbs_hamming_distance_neg(gm: GenerationMode, limit: usize, file_n
     );
 }
 
+fn benchmark_integer_checked_hamming_distance_library_comparison(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "Integer.checked_hamming_distance(&Integer)",
+        BenchmarkType::LibraryComparison,
+        rm_pairs_of_integers(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(_, (ref x, ref y))| max(x.significant_bits(), y.significant_bits()) as usize),
+        "max(x.significant_bits(), y.significant_bits())",
+        &mut [
+            (
+                "malachite",
+                &mut (|(_, (x, y))| no_out!(x.checked_hamming_distance(&y))),
+            ),
+            (
+                "rug",
+                &mut (|((x, y), _)| no_out!(rug_checked_hamming_distance(&x, &y))),
+            ),
+        ],
+    );
+}
+
 fn benchmark_integer_checked_hamming_distance_algorithms(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,
 ) {
     m_run_benchmark(
-        "Integer.checked_hamming_distance(u32)",
+        "Integer.checked_hamming_distance(&Integer)",
         BenchmarkType::Algorithms,
         pairs_of_integers(gm),
         gm.name(),

@@ -6,12 +6,12 @@ use malachite_nz::natural::Natural;
 use malachite_test::common::integer_to_rug_integer;
 use malachite_test::inputs::base::pairs_of_u32_vec_var_1;
 use malachite_test::inputs::integer::{
-    integers, pairs_of_integers, triples_of_natural_integer_natural_integer_and_natural_signed,
-    triples_of_natural_integers,
+    integers, pairs_of_integers, pairs_of_natural_and_integer, triples_of_natural_integers,
 };
 use malachite_test::inputs::natural::pairs_of_naturals;
 use malachite_test::integer::logic::checked_hamming_distance::{
     integer_checked_hamming_distance_alt_1, integer_checked_hamming_distance_alt_2,
+    rug_checked_hamming_distance,
 };
 use rug;
 use std::str::FromStr;
@@ -63,10 +63,10 @@ fn test_checked_hamming_distance() {
             out
         );
         assert_eq!(
-            rug::Integer::from_str(x)
-                .unwrap()
-                .hamming_dist(&rug::Integer::from_str(y).unwrap())
-                .map(|u| u64::from(u)),
+            rug_checked_hamming_distance(
+                &rug::Integer::from_str(x).unwrap(),
+                &rug::Integer::from_str(y).unwrap()
+            ),
             out
         );
     };
@@ -111,9 +111,7 @@ fn checked_hamming_distance_properties() {
     test_properties(pairs_of_integers, |&(ref x, ref y)| {
         let distance = x.checked_hamming_distance(y);
         assert_eq!(
-            integer_to_rug_integer(x)
-                .hamming_dist(&integer_to_rug_integer(y))
-                .map(|u| u64::from(u)),
+            rug_checked_hamming_distance(&integer_to_rug_integer(x), &integer_to_rug_integer(y)),
             distance
         );
         assert_eq!(y.checked_hamming_distance(x), distance);
@@ -123,25 +121,6 @@ fn checked_hamming_distance_properties() {
         assert_eq!((x ^ y).checked_count_ones(), distance);
         assert_eq!((!x).checked_hamming_distance(&!y), distance);
     });
-
-    test_properties(
-        triples_of_natural_integer_natural_integer_and_natural_signed,
-        |&(ref a, ref b, c): &(Integer, Integer, i32)| {
-            assert!(
-                a.checked_hamming_distance(c).unwrap()
-                    <= a.checked_hamming_distance(b).unwrap()
-                        + b.checked_hamming_distance(&Integer::from(c)).unwrap()
-            );
-            let a = !a;
-            let b = !b;
-            let c = !c;
-            assert!(
-                a.checked_hamming_distance(c).unwrap()
-                    <= a.checked_hamming_distance(&b).unwrap()
-                        + b.checked_hamming_distance(&Integer::from(c)).unwrap()
-            );
-        },
-    );
 
     test_properties(triples_of_natural_integers, |&(ref a, ref b, ref c)| {
         assert!(
@@ -183,5 +162,11 @@ fn checked_hamming_distance_properties() {
             Integer::from(x).checked_hamming_distance(&Integer::from(y)),
             Some(x.hamming_distance(y))
         );
+    });
+
+    test_properties(pairs_of_natural_and_integer, |&(ref x, ref y)| {
+        let distance = x.checked_hamming_distance(y);
+        assert_eq!(Integer::from(x).checked_hamming_distance(y), distance,);
+        assert_eq!(y.checked_hamming_distance(&Integer::from(x)), distance,);
     });
 }
