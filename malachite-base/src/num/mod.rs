@@ -830,6 +830,7 @@ pub trait PrimitiveInteger:
     + DivRoundAssign
     + Endian
     + Eq
+    + EqMod<Self, Self>
     + EqModPowerOfTwo<Self>
     + FromStr
     + HammingDistance<Self>
@@ -1803,6 +1804,13 @@ macro_rules! integer_traits {
                 *self %= rhs;
             }
         }
+
+        impl EqMod for $t {
+            #[inline]
+            fn eq_mod(self, other: $t, modulus: $t) -> bool {
+                self == other || modulus != 0 && self.mod_op(modulus) == other.mod_op(modulus)
+            }
+        }
     };
 }
 
@@ -2255,13 +2263,6 @@ macro_rules! unsigned_traits {
                     *self += 1;
                     rhs - remainder
                 }
-            }
-        }
-
-        impl EqMod for $t {
-            #[inline]
-            fn eq_mod(self, other: $t, modulus: $t) -> bool {
-                self == other || modulus != 0 && self % modulus == other % modulus
             }
         }
     };

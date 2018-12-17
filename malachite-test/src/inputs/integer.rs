@@ -1015,6 +1015,62 @@ pub fn triples_of_integer_unsigned_and_unsigned_var_2<T: PrimitiveUnsigned>(
     )
 }
 
+pub fn triples_of_integer_signed_and_signed<T: PrimitiveSigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (Integer, T, T)>> {
+    match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_triples(
+            exhaustive_integers(),
+            exhaustive_signed(),
+            exhaustive_signed(),
+        )),
+        GenerationMode::Random(scale) => random_triples_of_integer_primitive_and_primitive(scale),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_integers(seed, scale)),
+            &(|seed| special_random_signed(seed)),
+            &(|seed| special_random_signed(seed)),
+        )),
+    }
+}
+
+pub fn rm_triples_of_integer_signed_and_signed<T: PrimitiveSigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = ((rug::Integer, T, T), (Integer, T, T))>> {
+    Box::new(
+        triples_of_integer_signed_and_signed(gm)
+            .map(|(x, y, z)| ((integer_to_rug_integer(&x), y, z), (x, y, z))),
+    )
+}
+
+// All triples of `Integer`, `T`, `T`, where `T` is signed and the `Integer` is equal to the first
+// `T` mod the second `T`.
+pub fn triples_of_integer_signed_and_signed_var_1<T: PrimitiveSigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (Integer, T, T)>>
+where
+    Integer: Mul<T, Output = Integer> + Add<T, Output = Integer>,
+{
+    Box::new(
+        triples_of_integer_signed_and_signed(gm)
+            .map(|(n, i, modulus)| (n * modulus + i, i, modulus)),
+    )
+}
+
+// All triples of `Integer`, `T`, `T`, where `T` is signed and the `Integer` is not equal to the
+// first `T` mod the second `T`.
+pub fn triples_of_integer_signed_and_signed_var_2<T: PrimitiveSigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (Integer, T, T)>> {
+    Box::new(
+        triples_of_integer_signed_and_signed::<T>(gm).filter(|&(ref n, i, modulus)| {
+            let i: i32 = i.checked_into().unwrap();
+            let modulus: i32 = modulus.checked_into().unwrap();
+            !n.eq_mod(i, modulus)
+        }),
+    )
+}
+
 pub fn triples_of_integer_signed_and_integer<T: PrimitiveSigned>(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (Integer, T, Integer)>> {

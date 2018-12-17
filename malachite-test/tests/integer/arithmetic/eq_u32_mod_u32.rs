@@ -44,7 +44,7 @@ fn limbs_eq_limb_mod_neg_limb_fail() {
 
 #[test]
 fn test_eq_u32_mod_u32() {
-    let test = |n, u, modulus, out| {
+    let test = |n, u: u32, modulus, out| {
         assert_eq!(Integer::from_str(n).unwrap().eq_mod(u, modulus), out);
         assert_eq!(u.eq_mod(&Integer::from_str(n).unwrap(), modulus), out);
         assert_eq!(
@@ -158,10 +158,10 @@ fn eq_u32_mod_u32_properties() {
     );
 
     test_properties(pairs_of_integer_and_unsigned, |&(ref n, u)| {
-        assert!(n.eq_mod(u, 1));
-        assert!(u.eq_mod(n, 1));
-        assert_eq!(n.eq_mod(0, u), n.divisible_by(u));
-        assert_eq!(0.eq_mod(n, u), n.divisible_by(u));
+        assert!(n.eq_mod(u, 1u32));
+        assert!(u.eq_mod(n, 1u32));
+        assert_eq!(n.eq_mod(0u32, u), n.divisible_by(u));
+        assert_eq!(0u32.eq_mod(n, u), n.divisible_by(u));
     });
 
     test_properties(pairs_of_unsigneds::<u32>, |&(u, modulus)| {

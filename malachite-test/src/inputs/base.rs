@@ -130,6 +130,18 @@ pub fn pairs_of_signeds<T: PrimitiveSigned>(gm: GenerationMode) -> Box<Iterator<
     }
 }
 
+pub fn triples_of_signeds<T: PrimitiveSigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (T, T, T)>> {
+    match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_triples_from_single(exhaustive_signed())),
+        GenerationMode::Random(_) => Box::new(random_triples_from_single(random(&EXAMPLE_SEED))),
+        GenerationMode::SpecialRandom(_) => Box::new(random_triples_from_single(
+            special_random_signed(&EXAMPLE_SEED),
+        )),
+    }
+}
+
 pub fn pairs_of_signed_and_nonzero_signed<T: PrimitiveSigned>(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (T, T)>> {

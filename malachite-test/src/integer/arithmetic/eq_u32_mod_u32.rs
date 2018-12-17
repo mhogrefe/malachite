@@ -105,7 +105,7 @@ fn benchmark_integer_eq_u32_mod_u32_algorithms(gm: GenerationMode, limit: usize,
     m_run_benchmark(
         "Integer.eq_mod(u32, u32)",
         BenchmarkType::Algorithms,
-        triples_of_integer_unsigned_and_unsigned(gm),
+        triples_of_integer_unsigned_and_unsigned::<u32>(gm),
         gm.name(),
         limit,
         file_name,

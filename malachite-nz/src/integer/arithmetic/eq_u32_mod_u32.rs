@@ -51,10 +51,10 @@ impl<'a> EqMod<u32, u32> for &'a Integer {
     ///
     /// fn main() {
     ///     assert_eq!(Integer::from(13u32).eq_mod(21, 8), true);
-    ///     assert_eq!(Integer::from_str("12345678987654321").unwrap().eq_mod(321, 1_000), true);
-    ///     assert_eq!(Integer::from_str("12345678987654321").unwrap().eq_mod(322, 1_000), false);
-    ///     assert_eq!(Integer::from_str("-12345678987654321").unwrap().eq_mod(679, 1_000), true);
-    ///     assert_eq!(Integer::from_str("-12345678987654321").unwrap().eq_mod(680, 1_000), false);
+    ///     assert_eq!(Integer::from_str("987654321").unwrap().eq_mod(321u32, 1_000u32), true);
+    ///     assert_eq!(Integer::from_str("987654321").unwrap().eq_mod(322u32, 1_000u32), false);
+    ///     assert_eq!(Integer::from_str("-987654321").unwrap().eq_mod(679u32, 1_000u32), true);
+    ///     assert_eq!(Integer::from_str("-987654321").unwrap().eq_mod(680u32, 1_000u32), false);
     /// }
     /// ```
     fn eq_mod(self, other: u32, modulus: u32) -> bool {
@@ -87,11 +87,11 @@ impl<'a> EqMod<&'a Integer, u32> for u32 {
     /// use std::str::FromStr;
     ///
     /// fn main() {
-    ///     assert_eq!(21.eq_mod(&Integer::from(13u32), 8), true);
-    ///     assert_eq!(321.eq_mod(&Integer::from_str("12345678987654321").unwrap(), 1_000), true);
-    ///     assert_eq!(322.eq_mod(&Integer::from_str("12345678987654321").unwrap(), 1_000), false);
-    ///     assert_eq!(679.eq_mod(&Integer::from_str("-12345678987654321").unwrap(), 1_000), true);
-    ///     assert_eq!(680.eq_mod(&Integer::from_str("-12345678987654321").unwrap(), 1_000), false);
+    ///     assert_eq!(21u32.eq_mod(&Integer::from(13), 8u32), true);
+    ///     assert_eq!(321u32.eq_mod(&Integer::from_str("987654321").unwrap(), 1_000u32), true);
+    ///     assert_eq!(322u32.eq_mod(&Integer::from_str("987654321").unwrap(), 1_000u32), false);
+    ///     assert_eq!(679u32.eq_mod(&Integer::from_str("-987654321").unwrap(), 1_000u32), true);
+    ///     assert_eq!(680u32.eq_mod(&Integer::from_str("-987654321").unwrap(), 1_000u32), false);
     /// }
     /// ```
     fn eq_mod(self, other: &'a Integer, modulus: u32) -> bool {
@@ -101,7 +101,7 @@ impl<'a> EqMod<&'a Integer, u32> for u32 {
 
 impl Natural {
     // other cannot be zero.
-    fn eq_mod_neg_u32(&self, other: u32, modulus: u32) -> bool {
+    pub(crate) fn eq_mod_neg_u32(&self, other: u32, modulus: u32) -> bool {
         modulus != 0
             && match *self {
                 Small(small) => small % modulus == other.neg_mod(modulus),

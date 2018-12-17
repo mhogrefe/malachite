@@ -63,6 +63,7 @@ pub mod integer {
         pub mod divisible_by_i32;
         pub mod divisible_by_power_of_two;
         pub mod divisible_by_u32;
+        pub mod eq_i32_mod_i32;
         pub mod eq_i32_mod_power_of_two;
         pub mod eq_mod_power_of_two;
         pub mod eq_u32_mod_power_of_two;
