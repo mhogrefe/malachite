@@ -549,6 +549,76 @@ impl<'a, 'b> BitAnd<&'a Integer> for &'b Natural {
     }
 }
 
+/// Bitwise-ands an `Integer` with a `Natural` in place, taking the `Natural` by value.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = `self.significant_bits() + other.significant_bits()`
+///
+/// # Examples
+/// ```
+/// extern crate malachite_base;
+/// extern crate malachite_nz;
+///
+/// use malachite_nz::integer::Integer;
+/// use malachite_nz::natural::Natural;
+///
+/// fn main() {
+///     let mut x = Natural::from(0xffff_ffffu32);
+///     x &= Integer::from(0x70ff_ffff);
+///     x &= Integer::from(0x7ff0_ffff);
+///     x &= Integer::from(0x7fff_f0ff);
+///     x &= Integer::from(0x7fff_fff0);
+///     assert_eq!(x, 0x70f0f0f0);
+/// }
+/// ```
+impl BitAndAssign<Integer> for Natural {
+    fn bitand_assign(&mut self, other: Integer) {
+        if other.sign {
+            self.bitand_assign(other.abs);
+        } else {
+            self.and_assign_pos_neg(&other.abs);
+        }
+    }
+}
+
+/// Bitwise-ands an `Integer` with a `Natural` in place, taking the `Natural` by reference.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(m)
+///
+/// where n = `xs.significant_bits() + ys.significant_bits()`, m = `other.significant_bits`
+///
+/// # Examples
+/// ```
+/// extern crate malachite_base;
+/// extern crate malachite_nz;
+///
+/// use malachite_nz::integer::Integer;
+/// use malachite_nz::natural::Natural;
+///
+/// fn main() {
+///     let mut x = Natural::from(0xffff_ffffu32);
+///     x &= &Integer::from(0x70ff_ffff);
+///     x &= &Integer::from(0x7ff0_ffff);
+///     x &= &Integer::from(0x7fff_f0ff);
+///     x &= &Integer::from(0x7fff_fff0);
+///     assert_eq!(x, 0x70f0f0f0);
+/// }
+/// ```
+impl<'a> BitAndAssign<&'a Integer> for Natural {
+    fn bitand_assign(&mut self, other: &'a Integer) {
+        if other.sign {
+            self.bitand_assign(&other.abs);
+        } else {
+            self.and_assign_pos_neg(&other.abs);
+        }
+    }
+}
+
 impl Natural {
     pub(crate) fn and_assign_pos_neg(&mut self, other: &Natural) {
         if let Small(y) = *other {

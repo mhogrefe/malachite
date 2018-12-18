@@ -155,6 +155,7 @@ pub mod integer {
         pub mod not;
         pub mod or;
         pub mod or_i32;
+        pub mod or_natural;
         pub mod or_u32;
         pub mod set_bit;
         pub mod significant_bits;

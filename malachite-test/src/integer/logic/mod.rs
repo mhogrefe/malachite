@@ -22,6 +22,7 @@ pub mod index_of_next_true_bit;
 pub mod not;
 pub mod or;
 pub mod or_i32;
+pub mod or_natural;
 pub mod or_u32;
 pub mod set_bit;
 pub mod significant_bits;
@@ -99,6 +100,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     index_of_next_true_bit::register(registry);
     not::register(registry);
     or::register(registry);
+    or_natural::register(registry);
     or_i32::register(registry);
     or_u32::register(registry);
     set_bit::register(registry);

@@ -215,6 +215,7 @@ pub mod logic {
     pub mod not;
     pub mod or;
     pub mod or_i32;
+    pub mod or_natural;
     pub mod or_u32;
     pub mod significant_bits;
     pub mod trailing_zeros;

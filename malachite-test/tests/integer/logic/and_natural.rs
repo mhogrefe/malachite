@@ -171,7 +171,7 @@ fn limbs_slice_and_pos_neg_in_place_right_fail_2() {
 }
 
 #[test]
-fn test_and() {
+fn test_and_natural() {
     let test = |u, v, out| {
         let mut n = Integer::from_str(u).unwrap();
         n &= Natural::from_str(v).unwrap();
@@ -196,6 +196,16 @@ fn test_and() {
         assert!(n.is_valid());
 
         let n = &Integer::from_str(u).unwrap() & &Natural::from_str(v).unwrap();
+        assert_eq!(n.to_string(), out);
+        assert!(n.is_valid());
+
+        let mut n = Natural::from_str(v).unwrap();
+        n &= Integer::from_str(u).unwrap();
+        assert_eq!(n.to_string(), out);
+        assert!(n.is_valid());
+
+        let mut n = Natural::from_str(v).unwrap();
+        n &= &Integer::from_str(u).unwrap();
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
@@ -311,7 +321,7 @@ fn limbs_vec_and_pos_neg_in_place_right_properties() {
 }
 
 #[test]
-fn and_properties() {
+fn and_natural_properties() {
     test_properties(pairs_of_integer_and_natural, |&(ref x, ref y)| {
         let result_val_val = x.clone() & y.clone();
         let result_val_ref = x.clone() & y;
@@ -347,6 +357,15 @@ fn and_properties() {
         assert_eq!(mut_x, result);
         assert!(mut_x.is_valid());
 
+        let mut mut_y = y.clone();
+        mut_y &= x.clone();
+        assert!(mut_y.is_valid());
+        assert_eq!(mut_y, result);
+        let mut mut_y = y.clone();
+        mut_y &= x;
+        assert_eq!(mut_y, result);
+        assert!(mut_y.is_valid());
+
         let mut mut_x = integer_to_rug_integer(x);
         mut_x &= natural_to_rug_integer(y);
         assert_eq!(rug_integer_to_integer(&mut_x), result);
@@ -371,6 +390,7 @@ fn and_properties() {
         assert_eq!(x & Integer::ZERO, 0);
         assert_eq!(Integer::ZERO & x, 0);
         assert_eq!(x & Integer::from(x), *x);
+        assert_eq!(Integer::from(x) & x, *x);
         assert_eq!(x & !x, Integer::ZERO);
     });
 

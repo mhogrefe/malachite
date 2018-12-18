@@ -376,7 +376,7 @@ impl Natural {
             limb_count: limb_count as usize,
             some_remaining: limb_count != 0,
             i: 0,
-            j: limb_count - 1,
+            j: limb_count.saturating_sub(1),
         }
     }
 }
