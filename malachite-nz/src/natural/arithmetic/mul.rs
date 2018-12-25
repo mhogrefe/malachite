@@ -1,17 +1,20 @@
 use malachite_base::limbs::{limbs_set_zero, limbs_test_zero};
 use malachite_base::misc::CheckedFrom;
-use malachite_base::num::PrimitiveInteger;
+use malachite_base::num::{PrimitiveInteger, WrappingSubAssign};
 use natural::arithmetic::add::{
     limbs_add_same_length_to_out, limbs_add_to_out, limbs_slice_add_greater_in_place_left,
     limbs_slice_add_same_length_in_place_left, mpn_add_nc_in_place,
 };
 use natural::arithmetic::add_mul_u32::mpn_addmul_1;
-use natural::arithmetic::add_u32::limbs_slice_add_limb_in_place;
+use natural::arithmetic::add_u32::{limbs_add_limb_to_out, limbs_slice_add_limb_in_place};
+use natural::arithmetic::div_exact_u32::limbs_div_exact_3_in_place;
 use natural::arithmetic::mul_u32::limbs_mul_limb_to_out;
+use natural::arithmetic::shl_u::{limbs_shl_to_out, limbs_slice_shl_in_place};
 use natural::arithmetic::shr_u::limbs_slice_shr_in_place;
 use natural::arithmetic::sub::{
-    limbs_sub_in_place_left, limbs_sub_same_length_in_place_left, limbs_sub_same_length_to_out,
-    limbs_sub_to_out, mpn_sub_nc, mpn_sub_nc_in_place,
+    limbs_sub_in_place_left, limbs_sub_same_length_in_place_left,
+    limbs_sub_same_length_in_place_right, limbs_sub_same_length_to_out, limbs_sub_to_out,
+    mpn_sub_nc, mpn_sub_nc_in_place,
 };
 use natural::arithmetic::sub_u32::limbs_sub_limb_in_place;
 use natural::comparison::ord::limbs_cmp_same_length;
@@ -601,6 +604,428 @@ pub fn mpn_mul_basecase(rp: &mut [u32], up: &[u32], vp: &[u32]) -> u32 {
 
 //TODO test
 // docs preserved
+// Interpolate for toom3, 33, 42.
+// mpn_toom_interpolate_5pts in mpn/generic/mpn_toom_interpolate_5pts.c
+pub fn mpn_toom_interpolate_5pts(
+    c: &mut [u32],
+    v2: &mut [u32],
+    vm1: &mut [u32],
+    k: usize,
+    twor: usize,
+    sa: u32,
+    mut vinf0: u32,
+) {
+    let twok = k + k;
+    let kk1 = twok + 1;
+    {
+        let (_, remainder) = c.split_at_mut(k);
+        let (v1, _) = remainder.split_at_mut(k);
+
+        // (1) v2 <- v2-vm1 < v2+|vm1|,       (16 8 4 2 1) - (1 -1 1 -1  1) =
+        // thus 0 <= v2 < 50*B^(2k) < 2^6*B^(2k)             (15 9 3  3  0)
+        //
+        if sa != 0 {
+            assert!(!limbs_slice_add_same_length_in_place_left(
+                &mut v2[..kk1],
+                &vm1[..kk1]
+            ));
+        } else {
+            assert!(!limbs_sub_same_length_in_place_left(
+                &mut v2[..kk1],
+                &vm1[..kk1]
+            ));
+        }
+
+        // {c,2k} {c+2k,2k+1} {c+4k+1,2r-1} {t,2k+1} {t+2k+1,2k+1} {t+4k+2,2r}
+        //   v0       v1       hi(vinf)       |vm1|     v2-vm1      EMPTY
+        limbs_div_exact_3_in_place(&mut v2[..kk1]); // v2 <- v2 / 3
+                                                    // (5 3 1 1 0)
+
+        // {c,2k} {c+2k,2k+1} {c+4k+1,2r-1} {t,2k+1} {t+2k+1,2k+1} {t+4k+2,2r}
+        //   v0       v1      hi(vinf)       |vm1|     (v2-vm1)/3    EMPTY
+        //
+        // (2) vm1 <- tm1 := (v1 - vm1) / 2  [(1 1 1 1 1) - (1 -1 1 -1 1)] / 2 =
+        // tm1 >= 0                                         (0  1 0  1 0)
+        // No carry comes out from {v1, kk1} +/- {vm1, kk1},
+        // and the division by two is exact.
+        // If (sa!=0) the sign of vm1 is negative
+        if sa != 0 {
+            assert!(!limbs_slice_add_same_length_in_place_left(
+                &mut vm1[..kk1],
+                &v1[..kk1]
+            ));
+            assert_eq!(limbs_slice_shr_in_place(&mut vm1[..kk1], 1), 0);
+        } else {
+            assert!(!limbs_sub_same_length_in_place_right(
+                &v1[..kk1],
+                &mut vm1[..kk1]
+            ));
+            assert_eq!(limbs_slice_shr_in_place(&mut vm1[..kk1], 1), 0);
+        }
+
+        // {c,2k} {c+2k,2k+1} {c+4k+1,2r-1} {t,2k+1} {t+2k+1,2k+1} {t+4k+2,2r}
+        //   v0       v1        hi(vinf)       tm1     (v2-vm1)/3    EMPTY
+        //
+        // (3) v1 <- t1 := v1 - v0    (1 1 1 1 1) - (0 0 0 0 1) = (1 1 1 1 0)
+        // t1 >= 0
+        //
+    }
+    let vinf_lowest = {
+        let (c_lo, v1) = c.split_at_mut(twok);
+        if limbs_sub_same_length_in_place_left(v1, c_lo) {
+            1
+        } else {
+            0
+        }
+    };
+    let (c1, remainder) = c.split_at_mut(k);
+    let (v1, remainder) = remainder.split_at_mut(k);
+    let (c3, remainder) = remainder.split_at_mut(k);
+    let (vinf, _) = remainder.split_at_mut(k);
+    vinf[0].wrapping_sub_assign(vinf_lowest);
+
+    // {c,2k} {c+2k,2k+1} {c+4k+1,2r-1} {t,2k+1} {t+2k+1,2k+1} {t+4k+2,2r}
+    //   v0     v1-v0        hi(vinf)       tm1     (v2-vm1)/3    EMPTY
+    //
+    // (4) v2 <- t2 := ((v2-vm1)/3-t1)/2 = (v2-vm1-3*t1)/6
+    // t2 >= 0                  [(5 3 1 1 0) - (1 1 1 1 0)]/2 = (2 1 0 0 0)
+    //
+    assert!(!limbs_sub_same_length_in_place_left(v2, &v1[..kk1]));
+    assert_eq!(limbs_slice_shr_in_place(&mut v2[..kk1], 1), 0);
+
+    // {c,2k} {c+2k,2k+1} {c+4k+1,2r-1} {t,2k+1} {t+2k+1,2k+1} {t+4k+2,2r}
+    //   v0     v1-v0        hi(vinf)     tm1    (v2-vm1-3t1)/6    EMPTY
+    //
+    // (5) v1 <- t1-tm1           (1 1 1 1 0) - (0 1 0 1 0) = (1 0 1 0 0)
+    // result is v1 >= 0
+    //
+    assert!(!limbs_sub_same_length_in_place_left(
+        &mut v1[..kk1],
+        &vm1[..kk1]
+    ));
+
+    // We do not need to read the value in vm1, so we add it in {c+k, ...}
+    let mut cy = if limbs_slice_add_same_length_in_place_left(&mut c1[..kk1], &vm1[..kk1]) {
+        1
+    } else {
+        0
+    };
+    assert!(!limbs_slice_add_limb_in_place(&mut c3[1..twor + k], cy)); // 2n-(3k+1) = 2r+k-1
+    // Memory allocated for vm1 is now free, it can be recycled
+
+    // (6) v2 <- v2 - 2*vinf,     (2 1 0 0 0) - 2*(1 0 0 0 0) = (0 1 0 0 0)
+    // result is v2 >= 0
+    let saved = vinf[0]; // Remember v1's highest byte (will be overwritten).
+    vinf[0] = vinf0; // Set the right value for vinf0
+                     // Overwrite unused vm1
+    cy = limbs_shl_to_out(vm1, &mut vinf[..twor], 1);
+    cy += if limbs_sub_same_length_in_place_left(&mut v2[..twor], &vm1[..twor]) {
+        1
+    } else {
+        0
+    };
+    assert!(!limbs_sub_limb_in_place(&mut v2[twor..kk1], cy));
+
+    //  Current matrix is
+    //  [1 0 0 0 0; vinf
+    //   0 1 0 0 0; v2
+    //   1 0 1 0 0; v1
+    //   0 1 0 1 0; vm1
+    //   0 0 0 0 1] v0
+    //  Some values already are in-place (we added vm1 in the correct position)
+    //  | vinf|  v1 |  v0 |
+    //       | vm1 |
+    //  One still is in a separated area
+    // | +v2 |
+    //  We have to compute v1-=vinf; vm1 -= v2,
+    //    |-vinf|
+    //       | -v2 |
+    //  Carefully reordering operations we can avoid to compute twice the sum
+    //  of the high half of v2 plus the low half of vinf.
+    //
+    // Add the high half of t2 in {vinf}
+    if twor > k + 1 {
+        // This is the expected flow
+        cy = if limbs_slice_add_same_length_in_place_left(&mut vinf[..k + 1], &v2[k..2 * k + 1]) {
+            1
+        } else {
+            0
+        };
+        assert!(!limbs_slice_add_limb_in_place(
+            &mut c3[kk1..kk1 + twor - k - 1],
+            cy
+        )); // 2n-(5k+1) = 2r-k-1
+    } else {
+        // triggered only by very unbalanced cases like (k+k+(k-2))x(k+k+1), should be handled by
+        // toom32
+        assert!(!limbs_slice_add_same_length_in_place_left(
+            &mut vinf[..twor],
+            &v2[k..k + twor]
+        ));
+    }
+    // (7) v1 <- v1 - vinf,       (1 0 1 0 0) - (1 0 0 0 0) = (0 0 1 0 0)
+    // result is >= 0
+    // Side effect: we also subtracted (high half) vm1 -= v2
+    // vinf is at most twor long.
+    cy = if limbs_sub_same_length_in_place_left(&mut v1[..twor], &vinf[..twor]) {
+        1
+    } else {
+        0
+    };
+    vinf0 = vinf[0]; // Save again the right value for vinf0
+    vinf[0] = saved;
+    assert!(!limbs_sub_limb_in_place(&mut v1[twor..kk1], cy)); // Treat the last bytes.
+
+    // (8) vm1 <- vm1-v2          (0 1 0 1 0) - (0 1 0 0 0) = (0 0 0 1 0)
+    // Operate only on the low half.
+    //
+    cy = if limbs_sub_same_length_in_place_left(&mut c1[..k], &v2[..k]) {
+        1
+    } else {
+        0
+    };
+    assert!(!limbs_sub_limb_in_place(&mut v1[..kk1], cy));
+
+    // Beginning the final phase
+    // Most of the recomposition was done
+    // add t2 in {c+3k, ...}, but only the low half
+    cy = if limbs_slice_add_same_length_in_place_left(&mut c3[..k], &v2[..k]) {
+        1
+    } else {
+        0
+    };
+    vinf[0] += cy;
+    assert!(vinf[0] >= cy); // No carry
+    // Add vinf0, propagate carry.
+    assert!(!limbs_slice_add_limb_in_place(&mut vinf[..twor], vinf0));
+}
+
+//TODO test
+// docs preserved
+// Evaluate a degree 3 polynomial in +1 and -1
+// mpn_toom_eval_dgr3_pm1 in mpn/generic/toom_eval_dgr3_pm1.c
+pub fn mpn_toom_eval_dgr3_pm1(
+    xp1: &mut [u32],
+    xm1: &mut [u32],
+    xp: &[u32],
+    n: usize,
+    x3n: usize,
+    tp: &mut [u32],
+) -> u32 {
+    assert!(x3n > 0);
+    assert!(x3n <= n);
+    xp1[n] = if limbs_add_same_length_to_out(xp1, &xp[..n], &xp[n..3 * n]) {
+        1
+    } else {
+        0
+    };
+    tp[n] = if limbs_add_to_out(tp, &xp[n..2 * n], &xp[3 * n..3 * n + x3n]) {
+        1
+    } else {
+        0
+    };
+    let neg = if limbs_cmp_same_length(&xp1[..n + 1], &tp[..n + 1]) == Ordering::Less {
+        u32::MAX
+    } else {
+        0
+    };
+    if neg != 0 {
+        limbs_sub_same_length_to_out(xm1, &tp[..n + 1], &xp1[..n + 1]);
+    } else {
+        limbs_sub_same_length_to_out(xm1, &xp1[..n + 1], &tp[..n + 1]);
+    }
+    limbs_slice_add_same_length_in_place_left(&mut xp1[..n + 1], &tp[..n + 1]);
+    assert!(xp1[n] <= 3);
+    assert!(xm1[n] <= 1);
+    neg
+}
+
+//TODO test
+// docs preserved
+// TOOM42_MUL_N_REC from mpn/generic/toom42_mul.c
+pub fn toom42_mul_n_rec(p: &mut [u32], a: &[u32], b: &[u32]) {
+    mpn_mul_n(p, a, b);
+}
+
+//TODO test
+// docs preserved
+// Multiply {ap,an} and {bp,bn} where an is nominally twice as large as bn. Or more accurately,
+// (3 / 2)bn < an < 4bn.
+// Evaluate in: -1, 0, +1, +2, +inf
+//
+// <-s-><--n--><--n--><--n-->
+//  ___ ______ ______ ______
+// |a3_|___a2_|___a1_|___a0_|
+//          |_b1_|___b0_|
+//          <-t--><--n-->
+//
+// v0  =  a0             * b0      #   A(0)*B(0)
+// v1  = (a0+ a1+ a2+ a3)*(b0+ b1) #   A(1)*B(1)      ah  <= 3  bh <= 1
+// vm1 = (a0- a1+ a2- a3)*(b0- b1) #  A(-1)*B(-1)    |ah| <= 1  bh  = 0
+// v2  = (a0+2a1+4a2+8a3)*(b0+2b1) #   A(2)*B(2)      ah  <= 14 bh <= 2
+// vinf=              a3 *     b1  # A(inf)*B(inf)
+//
+// mpn_toom42_mul from mpn/generic/toom42_mul.c
+pub fn mpn_toom42_mul(pp: &mut [u32], ap: &[u32], bp: &[u32], scratch: &mut [u32]) {
+    let an = ap.len();
+    let bn = bp.len();
+    let n = if an >= 2 * bn {
+        (an + 3) >> 2
+    } else {
+        (bn + 1) >> 1
+    };
+    let a0 = ap;
+    let a1 = &ap[n..];
+    let a2 = &ap[2 * n..];
+    let a3 = &ap[3 * n..];
+    let b0 = bp;
+    let b1 = &bp[n..];
+
+    let s = an - 3 * n;
+    let t = bn - n;
+
+    assert!(0 < s && s <= n);
+    assert!(0 < t && t <= n);
+
+    let mut tmp = vec![0; 6 * n + 5];
+    let (as1, remainder) = tmp.split_at_mut(n + 1);
+    let (asm1, remainder) = remainder.split_at_mut(n + 1);
+    let (as2, remainder) = remainder.split_at_mut(n + 1);
+    let (bs1, remainder) = remainder.split_at_mut(n + 1);
+    let (bsm1, remainder) = remainder.split_at_mut(n);
+    let (bs2, _) = remainder.split_at_mut(n + 1);
+
+    // Compute as1 and asm1.
+    let mut vm1_neg = mpn_toom_eval_dgr3_pm1(as1, asm1, ap, n, s, pp) & 1;
+
+    // Compute as2.
+    let mut cy = limbs_shl_to_out(as2, &a3[..s], 1);
+    cy += if limbs_slice_add_same_length_in_place_left(&mut as2[..s], &a2[..s]) {
+        1
+    } else {
+        0
+    };
+    if s != n {
+        cy = if limbs_add_limb_to_out(&mut as2[s..], &a2[s..n], cy) {
+            1
+        } else {
+            0
+        };
+    }
+    cy = 2 * cy + limbs_slice_shl_in_place(&mut as2[..n], 1);
+    cy += if limbs_slice_add_same_length_in_place_left(&mut as2[..n], &a1[..n]) {
+        1
+    } else {
+        0
+    };
+    cy = 2 * cy + limbs_slice_shl_in_place(&mut as2[..n], 1);
+    cy += if limbs_slice_add_same_length_in_place_left(&mut as2[..n], &a0[..n]) {
+        1
+    } else {
+        0
+    };
+    as2[n] = cy;
+
+    // Compute bs1 and bsm1.
+    if t == n {
+        bs1[n] = if limbs_add_same_length_to_out(bs1, &b0[..n], &b1[..n]) {
+            1
+        } else {
+            0
+        };
+        if limbs_cmp_same_length(&b0[..n], &b1[..n]) == Ordering::Less {
+            limbs_sub_same_length_to_out(bsm1, &b1[..n], &b0[..n]);
+            vm1_neg ^= 1;
+        } else {
+            limbs_sub_same_length_to_out(bsm1, &b0[..n], &b1[..n]);
+        }
+    } else {
+        bs1[n] = if limbs_add_to_out(bs1, &b0[..n], &b1[..t]) {
+            1
+        } else {
+            0
+        };
+
+        if limbs_test_zero(&b0[t..n]) && limbs_cmp_same_length(&b0[..t], &b1[..t]) == Ordering::Less
+        {
+            limbs_sub_same_length_to_out(bsm1, &b1[..t], &b0[..t]);
+            limbs_set_zero(&mut bsm1[t..n]);
+            vm1_neg ^= 1;
+        } else {
+            limbs_sub_to_out(bsm1, &b0[..n], &b1[..t]);
+        }
+    }
+
+    // Compute bs2, recycling bs1. bs2=bs1+b1
+    limbs_add_to_out(bs2, &bs1[..n + 1], &b1[..t]);
+
+    assert!(as1[n] <= 3);
+    assert!(bs1[n] <= 1);
+    assert!(asm1[n] <= 1);
+    assert!(as2[n] <= 14);
+    assert!(bs2[n] <= 2);
+
+    let (vm1, v2) = scratch.split_at_mut(2 * n + 1);
+    let vinf0;
+    {
+        let (v0, remainder) = pp.split_at_mut(2 * n);
+        let (v1, vinf) = remainder.split_at_mut(2 * n);
+
+        // vm1, 2n+1 limbs
+        toom42_mul_n_rec(vm1, &asm1[..n], &bsm1[..n]);
+        let mut cy = 0;
+        if asm1[n] != 0 {
+            cy = if limbs_slice_add_same_length_in_place_left(&mut vm1[n..], &bsm1[..n]) {
+                1
+            } else {
+                0
+            };
+        }
+        vm1[2 * n] = cy;
+
+        toom42_mul_n_rec(v2, &as2[..n + 1], &bs2[..n + 1]); // v2, 2n+1 limbs
+
+        // vinf, s+t limbs
+        if s > t {
+            mpn_mul(vinf, &a3[..s], &b1[..t]);
+        } else {
+            mpn_mul(vinf, &b1[..t], &a3[..s]);
+        }
+
+        vinf0 = vinf[0]; // v1 overlaps with this
+
+        // v1, 2n+1 limbs
+        toom42_mul_n_rec(v1, &as1[..n], &bs1[..n]);
+        cy = if as1[n] == 1 {
+            bs1[n]
+                + if limbs_slice_add_same_length_in_place_left(&mut v1[n..2 * n], &bs1[..n]) {
+                    1
+                } else {
+                    0
+                }
+        } else if as1[n] == 2 {
+            2 * bs1[n] + mpn_addmul_1(&mut v1[n..], &bs1[..n], 2)
+        } else if as1[n] == 3 {
+            3 * bs1[n] + mpn_addmul_1(&mut v1[n..], &bs1[..n], 3)
+        } else {
+            0
+        };
+        if bs1[n] != 0 {
+            cy += if limbs_slice_add_same_length_in_place_left(&mut v1[n..2 * n], &as1[..n]) {
+                1
+            } else {
+                0
+            };
+        }
+        v1[2 * n] = cy;
+
+        toom42_mul_n_rec(v0, &ap[..n], &bp[..n]); // v0, 2n limbs
+    }
+    mpn_toom_interpolate_5pts(pp, v2, vm1, n, s + t, vm1_neg, vinf0);
+}
+
+//TODO test
+// docs preserved
 //  Evaluate in: -1, 0, +1, +inf
 //
 // <-s-><--n--><--n-->
@@ -941,6 +1366,7 @@ pub fn toom22_mul_n_rec(p: &mut [u32], a: &[u32], b: &[u32], ws: &mut [u32]) {
 // MUL_TOOM33_THRESHOLD / MUL_TOOM22_THRESHOLD is large, an initially small relative unbalance will
 // become a larger and larger relative unbalance with each recursion (the difference s - t will be
 // invariant over recursive calls). Therefore, we need to call toom32_mul.
+// MPN_TOOM22_MUL from mpn/generic/toom22_mul.c
 pub fn toom22_mul_rec(p: &mut [u32], a: &[u32], b: &[u32], ws: &mut [u32]) {
     let an = a.len();
     let bn = b.len();
