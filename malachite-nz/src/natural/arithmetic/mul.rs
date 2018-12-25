@@ -1,6 +1,6 @@
 use malachite_base::limbs::{limbs_set_zero, limbs_test_zero};
 use malachite_base::misc::CheckedFrom;
-use malachite_base::num::{PrimitiveInteger, WrappingSubAssign};
+use malachite_base::num::{PrimitiveInteger, WrappingAddAssign, WrappingSubAssign};
 use natural::arithmetic::add::{
     limbs_add_same_length_to_out, limbs_add_to_out, limbs_slice_add_greater_in_place_left,
     limbs_slice_add_same_length_in_place_left, mpn_add_nc_in_place,
@@ -602,6 +602,287 @@ pub fn mpn_mul_basecase(rp: &mut [u32], up: &[u32], vp: &[u32]) -> u32 {
     rp[un + vp.len() - 1] // remove once mpn_mul is ready
 }
 
+/* Evaluate in: -1, 0, +1, +2, +inf
+
+  <-s--><--n--><--n-->
+   ____ ______ ______
+  |_a2_|___a1_|___a0_|
+   |b2_|___b1_|___b0_|
+   <-t-><--n--><--n-->
+
+  v0  =  a0         * b0          #   A(0)*B(0)
+  v1  = (a0+ a1+ a2)*(b0+ b1+ b2) #   A(1)*B(1)      ah  <= 2  bh <= 2
+  vm1 = (a0- a1+ a2)*(b0- b1+ b2) #  A(-1)*B(-1)    |ah| <= 1  bh <= 1
+  v2  = (a0+2a1+4a2)*(b0+2b1+4b2) #   A(2)*B(2)      ah  <= 6  bh <= 6
+  vinf=          a2 *         b2  # A(inf)*B(inf)
+*/
+
+pub const MAYBE_MUL_BASECASE: bool =
+    TUNE_PROGRAM_BUILD || WANT_FAT_BINARY || MUL_TOOM33_THRESHOLD < 3 * MUL_TOOM22_THRESHOLD;
+pub const MAYBE_MUL_TOOM33: bool =
+    TUNE_PROGRAM_BUILD || WANT_FAT_BINARY || MUL_TOOM44_THRESHOLD >= 3 * MUL_TOOM33_THRESHOLD;
+
+//TODO test
+// docs preserved
+// TOOM33_MUL_N_REC from mpn/generic/toom33_mul.c
+pub fn toom33_mul_n_rec(p: &mut [u32], a: &[u32], b: &[u32], ws: &mut [u32]) {
+    let n = a.len();
+    assert_eq!(a.len(), n);
+    if MAYBE_MUL_BASECASE && n < MUL_TOOM22_THRESHOLD {
+        mpn_mul_basecase(p, a, b);
+    } else if !MAYBE_MUL_TOOM33 || n < MUL_TOOM33_THRESHOLD {
+        mpn_toom22_mul(p, a, b, ws);
+    } else {
+        mpn_toom33_mul(p, a, b, ws);
+    }
+}
+
+pub const SMALLER_RECURSION: bool = false;
+
+//TODO test
+// docs preserved
+// mpn_toom33_mul from mpn/generic/toom33_mul.c
+pub fn mpn_toom33_mul(pp: &mut [u32], ap: &[u32], bp: &[u32], scratch: &mut [u32]) {
+    let an = ap.len();
+    let bn = bp.len();
+
+    let n = (an + 2) / 3;
+    let a0 = ap;
+    let a1 = &ap[n..];
+    let a2 = &ap[2 * n..];
+    let b0 = bp;
+    let b1 = &bp[n..];
+    let b2 = &bp[2 * n..];
+
+    let s = an - 2 * n;
+    let t = bn - 2 * n;
+
+    assert!(an >= bn);
+    assert!(0 < s && s <= n);
+    assert!(0 < t && t <= n);
+    let mut vm1_neg = 0;
+    {
+        let (bs1, remainder) = pp.split_at_mut(n + 1);
+        let (as2, bs2) = remainder.split_at_mut(n + 1);
+        {
+            // we need 4n+4 <= 4n+s+t */
+            let (gp, remainder) = scratch.split_at_mut(2 * n + 2);
+            let (asm1, remainder) = remainder.split_at_mut(n + 1);
+            let (bsm1, as1) = remainder.split_at_mut(n + 1);
+
+            // Compute as1 and asm1.
+            let mut cy = if limbs_add_to_out(gp, &a0[..n], &a2[..s]) {
+                1
+            } else {
+                0
+            };
+            as1[n] = cy
+                + if limbs_add_same_length_to_out(as1, &gp[..n], &a1[..n]) {
+                    1
+                } else {
+                    0
+                };
+            if cy == 0 && limbs_cmp_same_length(&gp[..n], &a1[..n]) == Ordering::Less {
+                limbs_sub_same_length_to_out(asm1, &a1[..n], &gp[..n]);
+                asm1[n] = 0;
+                vm1_neg = 1;
+            } else {
+                cy -= if limbs_sub_same_length_to_out(asm1, &gp[..n], &a1[..n]) {
+                    1
+                } else {
+                    0
+                };
+                asm1[n] = cy;
+            }
+
+            // Compute as2.
+            cy = if limbs_add_same_length_to_out(as2, &a2[..s], &as1[..s]) {
+                1
+            } else {
+                0
+            };
+            if s != n {
+                cy = if limbs_add_limb_to_out(&mut as2[s..], &as1[s..n], cy) {
+                    1
+                } else {
+                    0
+                };
+            }
+            cy.wrapping_add_assign(as1[n]);
+            cy = 2 * cy + limbs_slice_shl_in_place(&mut as2[..n], 1);
+            cy.wrapping_sub_assign(
+                if limbs_sub_same_length_in_place_left(&mut as2[..n], &a0[..n]) {
+                    1
+                } else {
+                    0
+                },
+            );
+            as2[n] = cy;
+
+            // Compute bs1 and bsm1.
+            cy = if limbs_add_to_out(gp, &b0[..n], &b2[..t]) {
+                1
+            } else {
+                0
+            };
+            bs1[n] = cy
+                + if limbs_add_same_length_to_out(bs1, &gp[..n], &b1[..n]) {
+                    1
+                } else {
+                    0
+                };
+            if cy == 0 && limbs_cmp_same_length(&gp[..n], &b1[..n]) == Ordering::Less {
+                limbs_sub_same_length_to_out(bsm1, &b1[..n], &gp[..n]);
+                bsm1[n] = 0;
+                vm1_neg ^= 1;
+            } else {
+                cy.wrapping_sub_assign(if limbs_sub_same_length_to_out(bsm1, &gp[..n], &b1[..n]) {
+                    1
+                } else {
+                    0
+                });
+                bsm1[n] = cy;
+            }
+
+            // Compute bs2.
+            cy = if limbs_add_same_length_to_out(bs2, &bs1[..t], &b2[..t]) {
+                1
+            } else {
+                0
+            };
+            if t != n {
+                cy = if limbs_add_limb_to_out(&mut bs2[t..], &bs1[t..n], cy) {
+                    1
+                } else {
+                    0
+                };
+            }
+            cy.wrapping_add_assign(bs1[n]);
+            cy = 2 * cy + limbs_slice_shl_in_place(&mut bs2[..n], 1);
+            cy.wrapping_sub_assign(
+                if limbs_sub_same_length_in_place_left(&mut bs2[..n], &b0[..n]) {
+                    1
+                } else {
+                    0
+                },
+            );
+            bs2[n] = cy;
+
+            assert!(as1[n] <= 2);
+            assert!(bs1[n] <= 2);
+            assert!(asm1[n] <= 1);
+            assert!(bsm1[n] <= 1);
+            assert!(as2[n] <= 6);
+            assert!(bs2[n] <= 6);
+        }
+        {
+            let (vm1, remainder) = scratch.split_at_mut(2 * n + 2);
+            let (asm1, remainder) = remainder.split_at_mut(n + 1);
+            let (bsm1, scratch_out) = remainder.split_at_mut(2 * n + 2);
+            if SMALLER_RECURSION {
+                toom33_mul_n_rec(vm1, &asm1[..n], &bsm1[..n], scratch_out);
+                let mut cy = 0;
+                if asm1[n] != 0 {
+                    cy = bsm1[n]
+                        + if limbs_slice_add_same_length_in_place_left(
+                            &mut vm1[n..2 * n],
+                            &bsm1[..n],
+                        ) {
+                            1
+                        } else {
+                            0
+                        };
+                }
+                if bsm1[n] != 0 {
+                    cy += if limbs_slice_add_same_length_in_place_left(
+                        &mut vm1[n..2 * n],
+                        &asm1[..n],
+                    ) {
+                        1
+                    } else {
+                        0
+                    };
+                }
+                vm1[2 * n] = cy;
+            } else {
+                toom33_mul_n_rec(vm1, &asm1[..n + 1], &bsm1[..n + 1], scratch_out);
+            }
+        }
+        {
+            let (_, remainder) = scratch.split_at_mut(2 * n + 1);
+            let (v2, scratch_out) = remainder.split_at_mut(3 * n + 4);
+            toom33_mul_n_rec(v2, &as2[..n + 1], &bs2[..n + 1], scratch_out); // v2, 2n+1 limbs
+        }
+    }
+    let vinf0;
+    {
+        let vinf = &mut pp[4 * n..];
+        // vinf, s+t limbs
+        if s > t {
+            mpn_mul(vinf, &a2[..s], &b2[..t]);
+        } else {
+            let (_, remainder) = scratch.split_at_mut(2 * n + 1);
+            let (_, scratch_out) = remainder.split_at_mut(3 * n + 4);
+            toom33_mul_n_rec(vinf, &a2[..s], &b2[..s], scratch_out);
+        }
+        vinf0 = vinf[0]; // v1 overlaps with this
+    }
+
+    if SMALLER_RECURSION {
+        let (bs1, v1) = pp.split_at_mut(2 * n);
+        let (_, remainder) = scratch[3 * n + 3..].split_at_mut(n + 1);
+        let (as1, scratch_out) = remainder.split_at_mut(n + 1);
+        let mut cy;
+        // v1, 2n+1 limbs
+        toom33_mul_n_rec(v1, &as1[..n], &bs1[..n], scratch_out);
+        if as1[n] == 1 {
+            cy = bs1[n]
+                + if limbs_slice_add_same_length_in_place_left(&mut v1[n..2 * n], &bs1[..n]) {
+                    1
+                } else {
+                    0
+                };
+        } else if as1[n] != 0 {
+            cy = 2 * bs1[n] + mpn_addmul_1(&mut v1[n..], &bs1[n..], 2);
+        } else {
+            cy = 0;
+        }
+        if bs1[n] == 1 {
+            cy += if limbs_slice_add_same_length_in_place_left(&mut v1[n..2 * n], &as1[..n]) {
+                1
+            } else {
+                0
+            };
+        } else if bs1[n] != 0 {
+            cy += mpn_addmul_1(&mut v1[n..], &as1[..n], 2);
+        }
+        v1[2 * n] = cy;
+    } else {
+        let cy;
+        {
+            let vinf = &mut pp[4 * n..];
+            cy = vinf[1];
+        }
+        {
+            let (bs1, v1) = pp.split_at_mut(2 * n);
+            let (_, remainder) = scratch[3 * n + 3..].split_at_mut(n + 1);
+            let (as1, scratch_out) = remainder.split_at_mut(n + 1);
+            toom33_mul_n_rec(v1, &as1[..n + 1], &bs1[..n + 1], scratch_out);
+        }
+        let vinf = &mut pp[4 * n..];
+        vinf[1] = cy;
+    }
+
+    {
+        let (_, remainder) = scratch[3 * n + 3..].split_at_mut(n + 1);
+        let (_, scratch_out) = remainder.split_at_mut(n + 1);
+        toom33_mul_n_rec(pp, &ap[..n], &bp[..n], scratch_out); // v0, 2n limbs
+    }
+
+    let (vm1, v2) = scratch.split_at_mut(2 * n + 1);
+    mpn_toom_interpolate_5pts(pp, v2, vm1, n, s + t, vm1_neg, vinf0);
+}
+
 //TODO test
 // docs preserved
 // Interpolate for toom3, 33, 42.
@@ -710,8 +991,9 @@ pub fn mpn_toom_interpolate_5pts(
     } else {
         0
     };
-    assert!(!limbs_slice_add_limb_in_place(&mut c3[1..twor + k], cy)); // 2n-(3k+1) = 2r+k-1
+    // 2n-(3k+1) = 2r+k-1
     // Memory allocated for vm1 is now free, it can be recycled
+    assert!(!limbs_slice_add_limb_in_place(&mut c3[1..twor + k], cy));
 
     // (6) v2 <- v2 - 2*vinf,     (2 1 0 0 0) - 2*(1 0 0 0 0) = (0 1 0 0 0)
     // result is v2 >= 0
