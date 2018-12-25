@@ -4,6 +4,44 @@ use natural::Natural;
 use std::fmt::Display;
 use std::ops::{Sub, SubAssign};
 
+// docs preserved
+//TODO test
+// mpn_sub_nc from gmp-impl.h
+pub fn mpn_sub_nc(rp: &mut [u32], up: &[u32], vp: &[u32], ci: u32) -> u32 {
+    let n = up.len();
+    assert_eq!(vp.len(), n);
+    let mut co = if limbs_sub_same_length_to_out(rp, &up[..n], &vp[..n]) {
+        1
+    } else {
+        0
+    };
+    co += if limbs_sub_limb_in_place(&mut rp[..n], ci) {
+        1
+    } else {
+        0
+    };
+    co
+}
+
+// docs preserved
+//TODO test
+// mpn_sub_nc from gmp-impl.h, rp == up
+pub fn mpn_sub_nc_in_place(rp: &mut [u32], vp: &[u32], ci: u32) -> u32 {
+    let n = rp.len();
+    assert_eq!(vp.len(), n);
+    let mut co = if limbs_sub_same_length_in_place_left(&mut rp[..n], &vp[..n]) {
+        1
+    } else {
+        0
+    };
+    co += if limbs_sub_limb_in_place(&mut rp[..n], ci) {
+        1
+    } else {
+        0
+    };
+    co
+}
+
 fn sub_and_borrow(x: u32, y: u32, borrow: &mut bool) -> u32 {
     let (difference, overflow) = x.overflowing_sub(y);
     if *borrow {
