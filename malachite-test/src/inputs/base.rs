@@ -25,9 +25,10 @@ use rust_wheels::iterators::primitive_ints::{
 };
 use rust_wheels::iterators::rounding_modes::{exhaustive_rounding_modes, random_rounding_modes};
 use rust_wheels::iterators::tuples::{
-    exhaustive_pairs, exhaustive_pairs_from_single, exhaustive_triples,
+    exhaustive_pairs, exhaustive_pairs_from_single, exhaustive_quadruples, exhaustive_triples,
     exhaustive_triples_from_single, lex_pairs, lex_triples, log_pairs, random_pairs,
-    random_pairs_from_single, random_triples, random_triples_from_single, sqrt_pairs,
+    random_pairs_from_single, random_quadruples, random_triples, random_triples_from_single,
+    sqrt_pairs,
 };
 use rust_wheels::iterators::vecs::{
     exhaustive_vecs, random_vecs, special_random_bool_vecs, special_random_unsigned_vecs,
@@ -970,7 +971,7 @@ pub fn pairs_of_unsigned_vec<T: PrimitiveUnsigned>(
     }
 }
 
-// All pairs of `Vec<T>`, T being unsigned, where the two components of the pair have the same
+// All pairs of `Vec<T>` where `T` is unsigned and the two components of the pair have the same
 // length.
 pub fn pairs_of_unsigned_vec_var_1<T: PrimitiveUnsigned>(
     gm: GenerationMode,
@@ -1025,6 +1026,42 @@ pub fn pairs_of_u32_vec_var_3(gm: GenerationMode) -> Box<Iterator<Item = (Vec<u3
             .map(|(out_limbs, in_limbs)| (out_limbs, limbs_mul_limb(&in_limbs, 3)))
             .filter(|(ref out_limbs, ref in_limbs)| {
                 out_limbs.len() >= in_limbs.len() && in_limbs.len() > 0
+            }),
+    )
+}
+
+fn pairs_of_two_unsigned_vec_and_bool<T: PrimitiveUnsigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (Vec<T>, bool)>> {
+    match gm {
+        GenerationMode::Exhaustive => Box::new(log_pairs(
+            exhaustive_vecs(exhaustive_unsigned()),
+            exhaustive_bools(),
+        )),
+        GenerationMode::Random(scale) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| random_vecs(seed, scale, &(|seed_2| random(seed_2)))),
+            &(|seed| random(seed)),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_unsigned_vecs(seed, scale)),
+            &(|seed| random(seed)),
+        )),
+    }
+}
+
+// All triples of `Vec<T>`, `Vec<T>`, and `bool`, where `T` is unsigned and the two `Vec`s have the
+// same length.
+pub fn triples_of_two_unsigned_vecs_and_bool_var_1<T: PrimitiveUnsigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (Vec<T>, Vec<T>, bool)>> {
+    Box::new(
+        pairs_of_two_unsigned_vec_and_bool(gm)
+            .filter(|(xs, _)| xs.len().even())
+            .map(|(xs, b)| {
+                let half_length = xs.len() >> 1;
+                (xs[..half_length].to_vec(), xs[half_length..].to_vec(), b)
             }),
     )
 }
@@ -1163,6 +1200,44 @@ pub fn triples_of_unsigned_vec_var_9<T: PrimitiveUnsigned>(
     Box::new(
         triples_of_unsigned_vec(gm)
             .filter(|&(ref xs, ref ys, ref zs)| xs.len() >= ys.len() && ys.len() >= zs.len()),
+    )
+}
+
+pub fn quadruples_of_three_unsigned_vecs_and_bool<T: PrimitiveUnsigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (Vec<T>, Vec<T>, Vec<T>, bool)>> {
+    match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_quadruples(
+            exhaustive_vecs(exhaustive_unsigned()),
+            exhaustive_vecs(exhaustive_unsigned()),
+            exhaustive_vecs(exhaustive_unsigned()),
+            exhaustive_bools(),
+        )),
+        GenerationMode::Random(scale) => Box::new(random_quadruples(
+            &EXAMPLE_SEED,
+            &(|seed| random_vecs(seed, scale, &(|seed_2| random(seed_2)))),
+            &(|seed| random_vecs(seed, scale, &(|seed_2| random(seed_2)))),
+            &(|seed| random_vecs(seed, scale, &(|seed_2| random(seed_2)))),
+            &(|seed| random(seed)),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_quadruples(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_unsigned_vecs(seed, scale)),
+            &(|seed| special_random_unsigned_vecs(seed, scale)),
+            &(|seed| special_random_unsigned_vecs(seed, scale)),
+            &(|seed| random(seed)),
+        )),
+    }
+}
+
+// All quadruples of `Vec<T>`, `Vec<T>`, `Vec<T>`, and `bool`, where `T` is unsigned, the first
+// `Vec` is at least as long as the second, and the second and third are equally long.
+pub fn quadruples_of_three_unsigned_vecs_and_bool_var_1<T: PrimitiveUnsigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (Vec<T>, Vec<T>, Vec<T>, bool)>> {
+    Box::new(
+        quadruples_of_three_unsigned_vecs_and_bool(gm)
+            .filter(|&(ref xs, ref ys, ref zs, _)| ys.len() == zs.len() && xs.len() >= ys.len()),
     )
 }
 

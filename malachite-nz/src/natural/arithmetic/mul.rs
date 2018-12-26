@@ -2,8 +2,9 @@ use malachite_base::limbs::{limbs_set_zero, limbs_test_zero};
 use malachite_base::misc::CheckedFrom;
 use malachite_base::num::{PrimitiveInteger, WrappingAddAssign, WrappingSubAssign};
 use natural::arithmetic::add::{
-    limbs_add_same_length_to_out, limbs_add_to_out, limbs_slice_add_greater_in_place_left,
-    limbs_slice_add_same_length_in_place_left, mpn_add_nc_in_place,
+    _limbs_add_same_length_with_carry_in_in_place_left, limbs_add_same_length_to_out,
+    limbs_add_to_out, limbs_slice_add_greater_in_place_left,
+    limbs_slice_add_same_length_in_place_left,
 };
 use natural::arithmetic::add_mul_u32::mpn_addmul_1;
 use natural::arithmetic::add_u32::{limbs_add_limb_to_out, limbs_slice_add_limb_in_place};
@@ -12,9 +13,10 @@ use natural::arithmetic::mul_u32::limbs_mul_limb_to_out;
 use natural::arithmetic::shl_u::{limbs_shl_to_out, limbs_slice_shl_in_place};
 use natural::arithmetic::shr_u::limbs_slice_shr_in_place;
 use natural::arithmetic::sub::{
-    limbs_sub_in_place_left, limbs_sub_same_length_in_place_left,
-    limbs_sub_same_length_in_place_right, limbs_sub_same_length_to_out, limbs_sub_to_out,
-    mpn_sub_nc, mpn_sub_nc_in_place,
+    _limbs_sub_same_length_with_borrow_in_in_place_left,
+    _limbs_sub_same_length_with_borrow_in_to_out, limbs_sub_in_place_left,
+    limbs_sub_same_length_in_place_left, limbs_sub_same_length_in_place_right,
+    limbs_sub_same_length_to_out, limbs_sub_to_out,
 };
 use natural::arithmetic::sub_u32::limbs_sub_limb_in_place;
 use natural::comparison::ord::limbs_cmp_same_length;
@@ -1078,7 +1080,7 @@ pub fn mpn_toom_interpolate_5pts(
     };
     vinf[0] += cy;
     assert!(vinf[0] >= cy); // No carry
-    // Add vinf0, propagate carry.
+                            // Add vinf0, propagate carry.
     assert!(!limbs_slice_add_limb_in_place(&mut vinf[..twor], vinf0));
 }
 
@@ -1498,12 +1500,11 @@ pub fn mpn_toom32_mul(pp: &mut [u32], ap: &[u32], bp: &[u32], scratch: &mut [u32
     // Since we store y0 at the same location as the low half of x0 + x2, we need to do the middle
     // sum first.
     hi = pp[2 * n];
-    let mut cy =
-        if limbs_add_same_length_to_out(&mut pp[2 * n..], &scratch[..n], &scratch[n..2 * n]) {
-            1
-        } else {
-            0
-        };
+    let cy = if limbs_add_same_length_to_out(&mut pp[2 * n..], &scratch[..n], &scratch[n..2 * n]) {
+        1
+    } else {
+        0
+    };
     let v1_high = scratch[2 * n];
     assert!(!limbs_slice_add_limb_in_place(
         &mut scratch[n..2 * n + 1],
@@ -1511,25 +1512,25 @@ pub fn mpn_toom32_mul(pp: &mut [u32], ap: &[u32], bp: &[u32], scratch: &mut [u32
     ));
 
     if vm1_neg != 0 {
-        cy = if limbs_slice_add_same_length_in_place_left(&mut scratch[..n], &pp[..n]) {
+        let cy = limbs_slice_add_same_length_in_place_left(&mut scratch[..n], &pp[..n]);
+        let (pp_lo, pp_hi) = pp.split_at_mut(2 * n);
+        hi += if _limbs_add_same_length_with_carry_in_in_place_left(&mut pp_hi[..n], pp_lo, cy) {
             1
         } else {
             0
         };
-        let (pp_lo, pp_hi) = pp.split_at_mut(2 * n);
-        hi += mpn_add_nc_in_place(&mut pp_hi[..n], pp_lo, cy);
         assert!(!limbs_slice_add_limb_in_place(
             &mut scratch[n..2 * n + 1],
             hi
         ));
     } else {
-        cy = if limbs_sub_same_length_in_place_left(&mut scratch[..n], &pp[..n]) {
+        let cy = limbs_sub_same_length_in_place_left(&mut scratch[..n], &pp[..n]);
+        let (pp_lo, pp_hi) = pp.split_at_mut(2 * n);
+        hi += if _limbs_sub_same_length_with_borrow_in_in_place_left(&mut pp_hi[..n], pp_lo, cy) {
             1
         } else {
             0
         };
-        let (pp_lo, pp_hi) = pp.split_at_mut(2 * n);
-        hi += mpn_sub_nc_in_place(&mut pp_hi[..n], pp_lo, cy);
         assert!(!limbs_sub_limb_in_place(&mut scratch[n..2 * n + 1], hi));
     }
 
@@ -1568,15 +1569,15 @@ pub fn mpn_toom32_mul(pp: &mut [u32], ap: &[u32], bp: &[u32], scratch: &mut [u32
         let (pp_lo, pp_hi) = pp.split_at_mut(2 * n);
         let (pp0, pp1) = pp_lo.split_at_mut(n);
         let (pp2, pp3) = pp_hi.split_at_mut(n);
-        cy = if limbs_sub_same_length_in_place_left(pp1, pp3) {
+        let mut cy = limbs_sub_same_length_in_place_left(pp1, pp3);
+        hi = scratch[2 * n] + if cy { 1 } else { 0 };
+
+        cy = _limbs_sub_same_length_with_borrow_in_in_place_left(pp2, pp0, cy);
+        hi -= if _limbs_sub_same_length_with_borrow_in_to_out(pp3, &scratch[n..2 * n], pp1, cy) {
             1
         } else {
             0
         };
-        hi = scratch[2 * n] + cy;
-
-        cy = mpn_sub_nc_in_place(pp2, pp0, cy);
-        hi -= mpn_sub_nc(pp3, &scratch[n..2 * n], pp1, cy);
     }
 
     hi += if limbs_slice_add_greater_in_place_left(&mut pp[n..4 * n], &scratch[..n]) {

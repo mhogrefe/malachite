@@ -24,12 +24,6 @@ pub fn limbs_and(xs: &[u32], ys: &[u32]) -> Vec<u32> {
     xs.iter().zip(ys.iter()).map(|(x, y)| x & y).collect()
 }
 
-fn limbs_and_same_length_to_out_no_check(out_limbs: &mut [u32], xs: &[u32], ys: &[u32]) {
-    for i in 0..xs.len() {
-        out_limbs[i] = xs[i] & ys[i];
-    }
-}
-
 /// Interpreting two equal-length slices of `u32`s as the limbs (in ascending order) of two
 /// `Natural`s, writes the limbs of the bitwise and of the `Natural`s to a specified slice. The
 /// output slice must be at least as long as the length of one of the input slices.
@@ -59,7 +53,9 @@ pub fn limbs_and_same_length_to_out(out_limbs: &mut [u32], xs: &[u32], ys: &[u32
     let len = xs.len();
     assert_eq!(len, ys.len());
     assert!(out_limbs.len() >= len);
-    limbs_and_same_length_to_out_no_check(out_limbs, xs, ys);
+    for i in 0..xs.len() {
+        out_limbs[i] = xs[i] & ys[i];
+    }
 }
 
 /// Interpreting two slices of `u32`s as the limbs (in ascending order) of two `Natural`s, writes
@@ -92,18 +88,12 @@ pub fn limbs_and_to_out(out_limbs: &mut [u32], xs: &[u32], ys: &[u32]) {
     let ys_len = ys.len();
     if xs_len >= ys_len {
         assert!(out_limbs.len() >= xs_len);
-        limbs_and_same_length_to_out_no_check(out_limbs, &xs[..ys_len], ys);
+        limbs_and_same_length_to_out(out_limbs, &xs[..ys_len], ys);
         limbs_set_zero(&mut out_limbs[ys_len..xs_len]);
     } else {
         assert!(out_limbs.len() >= ys_len);
-        limbs_and_same_length_to_out_no_check(out_limbs, xs, &ys[..xs_len]);
+        limbs_and_same_length_to_out(out_limbs, xs, &ys[..xs_len]);
         limbs_set_zero(&mut out_limbs[xs_len..ys_len]);
-    }
-}
-
-fn limbs_slice_and_same_length_in_place_left_no_check(xs: &mut [u32], ys: &[u32]) {
-    for i in 0..xs.len() {
-        xs[i] &= ys[i];
     }
 }
 
@@ -133,7 +123,9 @@ fn limbs_slice_and_same_length_in_place_left_no_check(xs: &mut [u32], ys: &[u32]
 /// ```
 pub fn limbs_slice_and_same_length_in_place_left(xs: &mut [u32], ys: &[u32]) {
     assert_eq!(xs.len(), ys.len());
-    limbs_slice_and_same_length_in_place_left_no_check(xs, ys);
+    for i in 0..xs.len() {
+        xs[i] &= ys[i];
+    }
 }
 
 /// Interpreting two slices of `u32`s as the limbs (in ascending order) of two `Natural`s, writes
@@ -170,15 +162,15 @@ pub fn limbs_slice_and_in_place_left(xs: &mut [u32], ys: &[u32]) -> Option<usize
     let ys_len = ys.len();
     match xs_len.cmp(&ys.len()) {
         Ordering::Equal => {
-            limbs_slice_and_same_length_in_place_left_no_check(xs, ys);
+            limbs_slice_and_same_length_in_place_left(xs, ys);
             None
         }
         Ordering::Greater => {
-            limbs_slice_and_same_length_in_place_left_no_check(&mut xs[..ys_len], ys);
+            limbs_slice_and_same_length_in_place_left(&mut xs[..ys_len], ys);
             Some(ys_len)
         }
         Ordering::Less => {
-            limbs_slice_and_same_length_in_place_left_no_check(xs, &ys[..xs_len]);
+            limbs_slice_and_same_length_in_place_left(xs, &ys[..xs_len]);
             None
         }
     }
@@ -255,15 +247,15 @@ pub fn limbs_and_in_place_either(xs: &mut [u32], ys: &mut [u32]) -> bool {
     let ys_len = ys.len();
     match xs_len.cmp(&ys_len) {
         Ordering::Equal => {
-            limbs_slice_and_same_length_in_place_left_no_check(xs, ys);
+            limbs_slice_and_same_length_in_place_left(xs, ys);
             false
         }
         Ordering::Less => {
-            limbs_slice_and_same_length_in_place_left_no_check(xs, &ys[..xs_len]);
+            limbs_slice_and_same_length_in_place_left(xs, &ys[..xs_len]);
             false
         }
         Ordering::Greater => {
-            limbs_slice_and_same_length_in_place_left_no_check(ys, &xs[..ys_len]);
+            limbs_slice_and_same_length_in_place_left(ys, &xs[..ys_len]);
             true
         }
     }

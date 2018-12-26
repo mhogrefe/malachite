@@ -1,10 +1,6 @@
 use natural::Natural::{self, Large, Small};
 use std::ops::{BitXor, BitXorAssign};
 
-fn limbs_xor_same_length_no_check(xs: &[u32], ys: &[u32]) -> Vec<u32> {
-    xs.iter().zip(ys.iter()).map(|(x, y)| x ^ y).collect()
-}
-
 /// Interpreting two equal-length slices of `u32`s as the limbs (in ascending order) of two
 /// `Natural`s, returns a `Vec` of the limbs of the bitwise xor of the `Natural`s. The length of the
 /// result is the length of one of the input slices.
@@ -27,7 +23,7 @@ fn limbs_xor_same_length_no_check(xs: &[u32], ys: &[u32]) -> Vec<u32> {
 /// ```
 pub fn limbs_xor_same_length(xs: &[u32], ys: &[u32]) -> Vec<u32> {
     assert_eq!(xs.len(), ys.len());
-    limbs_xor_same_length_no_check(xs, ys)
+    xs.iter().zip(ys.iter()).map(|(x, y)| x ^ y).collect()
 }
 
 /// Interpreting two slices of `u32`s as the limbs (in ascending order) of two `Natural`s, returns
@@ -51,19 +47,13 @@ pub fn limbs_xor(xs: &[u32], ys: &[u32]) -> Vec<u32> {
     let xs_len = xs.len();
     let ys_len = ys.len();
     if xs_len >= ys_len {
-        let mut result = limbs_xor_same_length_no_check(&xs[..ys_len], ys);
+        let mut result = limbs_xor_same_length(&xs[..ys_len], ys);
         result.extend_from_slice(&xs[ys_len..]);
         result
     } else {
-        let mut result = limbs_xor_same_length_no_check(xs, &ys[..xs_len]);
+        let mut result = limbs_xor_same_length(xs, &ys[..xs_len]);
         result.extend_from_slice(&ys[xs_len..]);
         result
-    }
-}
-
-fn limbs_xor_same_length_to_out_no_check(out_limbs: &mut [u32], xs: &[u32], ys: &[u32]) {
-    for i in 0..xs.len() {
-        out_limbs[i] = xs[i] ^ ys[i];
     }
 }
 
@@ -96,7 +86,9 @@ pub fn limbs_xor_same_length_to_out(out_limbs: &mut [u32], xs: &[u32], ys: &[u32
     let len = xs.len();
     assert_eq!(len, ys.len());
     assert!(out_limbs.len() >= len);
-    limbs_xor_same_length_to_out_no_check(out_limbs, xs, ys);
+    for i in 0..xs.len() {
+        out_limbs[i] = xs[i] ^ ys[i];
+    }
 }
 
 /// Interpreting two slices of `u32`s as the limbs (in ascending order) of two `Natural`s, writes
@@ -129,18 +121,12 @@ pub fn limbs_xor_to_out(out_limbs: &mut [u32], xs: &[u32], ys: &[u32]) {
     let ys_len = ys.len();
     if xs_len >= ys_len {
         assert!(out_limbs.len() >= xs_len);
-        limbs_xor_same_length_to_out_no_check(out_limbs, &xs[..ys_len], ys);
+        limbs_xor_same_length_to_out(out_limbs, &xs[..ys_len], ys);
         out_limbs[ys_len..xs_len].copy_from_slice(&xs[ys_len..]);
     } else {
         assert!(out_limbs.len() >= ys_len);
-        limbs_xor_same_length_to_out_no_check(out_limbs, xs, &ys[..xs_len]);
+        limbs_xor_same_length_to_out(out_limbs, xs, &ys[..xs_len]);
         out_limbs[xs_len..ys_len].copy_from_slice(&ys[xs_len..]);
-    }
-}
-
-fn limbs_xor_same_length_in_place_left_no_check(xs: &mut [u32], ys: &[u32]) {
-    for i in 0..xs.len() {
-        xs[i] ^= ys[i];
     }
 }
 
@@ -170,7 +156,9 @@ fn limbs_xor_same_length_in_place_left_no_check(xs: &mut [u32], ys: &[u32]) {
 /// ```
 pub fn limbs_xor_same_length_in_place_left(xs: &mut [u32], ys: &[u32]) {
     assert_eq!(xs.len(), ys.len());
-    limbs_xor_same_length_in_place_left_no_check(xs, ys);
+    for i in 0..xs.len() {
+        xs[i] ^= ys[i];
+    }
 }
 
 /// Interpreting a `Vec` of `u32`s and a slice of `u32`s as the limbs (in ascending order) of two
@@ -203,9 +191,9 @@ pub fn limbs_xor_in_place_left(xs: &mut Vec<u32>, ys: &[u32]) {
     let xs_len = xs.len();
     let ys_len = ys.len();
     if xs_len >= ys_len {
-        limbs_xor_same_length_in_place_left_no_check(&mut xs[..ys_len], ys);
+        limbs_xor_same_length_in_place_left(&mut xs[..ys_len], ys);
     } else {
-        limbs_xor_same_length_in_place_left_no_check(xs, &ys[..xs_len]);
+        limbs_xor_same_length_in_place_left(xs, &ys[..xs_len]);
         xs.extend_from_slice(&ys[xs_len..]);
     }
 }
@@ -247,10 +235,10 @@ pub fn limbs_xor_in_place_either(xs: &mut Vec<u32>, ys: &mut Vec<u32>) -> bool {
     let xs_len = xs.len();
     let ys_len = ys.len();
     if xs_len >= ys_len {
-        limbs_xor_same_length_in_place_left_no_check(&mut xs[..ys_len], ys);
+        limbs_xor_same_length_in_place_left(&mut xs[..ys_len], ys);
         false
     } else {
-        limbs_xor_same_length_in_place_left_no_check(&mut ys[..xs_len], xs);
+        limbs_xor_same_length_in_place_left(&mut ys[..xs_len], xs);
         true
     }
 }

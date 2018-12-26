@@ -1,10 +1,6 @@
 use natural::Natural::{self, Large, Small};
 use std::cmp::Ordering;
 
-fn limbs_cmp_same_length_no_check(xs: &[u32], ys: &[u32]) -> Ordering {
-    xs.into_iter().rev().cmp(ys.into_iter().rev())
-}
-
 /// Interpreting two equal-length slices of `u32`s as the limbs (in ascending order) of two
 /// `Natural`s, compares the two `Natural`s.
 ///
@@ -31,7 +27,7 @@ fn limbs_cmp_same_length_no_check(xs: &[u32], ys: &[u32]) -> Ordering {
 /// ```
 pub fn limbs_cmp_same_length(xs: &[u32], ys: &[u32]) -> Ordering {
     assert_eq!(xs.len(), ys.len());
-    limbs_cmp_same_length_no_check(xs, ys)
+    xs.into_iter().rev().cmp(ys.into_iter().rev())
 }
 
 /// Interpreting two slices of `u32`s as the limbs (in ascending order) of two `Natural`s, compares
@@ -56,7 +52,7 @@ pub fn limbs_cmp_same_length(xs: &[u32], ys: &[u32]) -> Ordering {
 pub fn limbs_cmp(xs: &[u32], ys: &[u32]) -> Ordering {
     xs.len()
         .cmp(&ys.len())
-        .then_with(|| limbs_cmp_same_length_no_check(xs, ys))
+        .then_with(|| limbs_cmp_same_length(xs, ys))
 }
 
 /// Compares a `Natural` to another `Natural`.

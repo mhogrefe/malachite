@@ -3,44 +3,6 @@ use natural::Natural::{self, Large, Small};
 use std::cmp::max;
 use std::ops::{Add, AddAssign};
 
-// docs preserved
-//TODO test
-// mpn_add_nc from gmp-impl.h
-pub fn mpn_add_nc(rp: &mut [u32], up: &[u32], vp: &[u32], ci: u32) -> u32 {
-    let n = up.len();
-    assert_eq!(vp.len(), n);
-    let mut co = if limbs_add_same_length_to_out(rp, &up[..n], &vp[..n]) {
-        1
-    } else {
-        0
-    };
-    co += if limbs_slice_add_limb_in_place(&mut rp[..n], ci) {
-        1
-    } else {
-        0
-    };
-    co
-}
-
-// docs preserved
-//TODO test
-// mpn_add_nc from gmp-impl.h, rp == up
-pub fn mpn_add_nc_in_place(rp: &mut [u32], vp: &[u32], ci: u32) -> u32 {
-    let n = rp.len();
-    assert_eq!(vp.len(), n);
-    let mut co = if limbs_slice_add_same_length_in_place_left(&mut rp[..n], &vp[..n]) {
-        1
-    } else {
-        0
-    };
-    co += if limbs_slice_add_limb_in_place(&mut rp[..n], ci) {
-        1
-    } else {
-        0
-    };
-    co
-}
-
 fn add_and_carry(x: u32, y: u32, carry: &mut bool) -> u32 {
     let (sum, overflow) = x.overflowing_add(y);
     if *carry {
@@ -398,6 +360,60 @@ pub fn limbs_vec_add_in_place_either(xs: &mut Vec<u32>, ys: &mut Vec<u32>) -> bo
         }
         true
     }
+}
+
+/// Interpreting two equal-length slices of `u32`s as the limbs (in ascending order) of two
+/// `Natural`s, writes the `xs.len()` least-significant limbs of the sum of the `Natural`s and a
+/// carry (`false` is 0, `true` is 1) to an output slice. The output must be at least as long as one
+/// of the input slices. Returns whether there is a carry.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = `xs.len()` = `ys.len()`
+///
+/// # Panics
+/// Panics if `xs` and `ys` have different lengths or if `out_limbs` is too short.
+///
+/// This is mpn_add_nc from gmp-impl.h, where rp and up are disjoint.
+pub fn _limbs_add_same_length_with_carry_in_to_out(
+    out_limbs: &mut [u32],
+    xs: &[u32],
+    ys: &[u32],
+    carry_in: bool,
+) -> bool {
+    let mut carry = limbs_add_same_length_to_out(out_limbs, xs, ys);
+    if carry_in {
+        carry |= limbs_slice_add_limb_in_place(&mut out_limbs[..xs.len()], 1);
+    }
+    carry
+}
+
+/// Interpreting two equal-length slices of `u32`s as the limbs (in ascending order) of two
+/// `Natural`s, writes the `xs.len()` least-significant limbs of the sum of the `Natural`s and a
+/// carry (`false` is 0, `true` is 1) to the first (left) slice. Returns whether there is a carry.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = `xs.len()` = `ys.len()`
+///
+/// # Panics
+/// Panics if `xs` and `ys` have different lengths.
+///
+/// This is mpn_add_nc from gmp-impl.h, where rp is the same as up.
+pub fn _limbs_add_same_length_with_carry_in_in_place_left(
+    xs: &mut [u32],
+    ys: &[u32],
+    carry_in: bool,
+) -> bool {
+    let mut carry = limbs_slice_add_same_length_in_place_left(xs, ys);
+    if carry_in {
+        carry |= limbs_slice_add_limb_in_place(xs, 1);
+    }
+    carry
 }
 
 /// Adds a `Natural` to a `Natural`, taking both `Natural`s by value.

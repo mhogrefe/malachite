@@ -4,44 +4,6 @@ use natural::Natural;
 use std::fmt::Display;
 use std::ops::{Sub, SubAssign};
 
-// docs preserved
-//TODO test
-// mpn_sub_nc from gmp-impl.h
-pub fn mpn_sub_nc(rp: &mut [u32], up: &[u32], vp: &[u32], ci: u32) -> u32 {
-    let n = up.len();
-    assert_eq!(vp.len(), n);
-    let mut co = if limbs_sub_same_length_to_out(rp, &up[..n], &vp[..n]) {
-        1
-    } else {
-        0
-    };
-    co += if limbs_sub_limb_in_place(&mut rp[..n], ci) {
-        1
-    } else {
-        0
-    };
-    co
-}
-
-// docs preserved
-//TODO test
-// mpn_sub_nc from gmp-impl.h, rp == up
-pub fn mpn_sub_nc_in_place(rp: &mut [u32], vp: &[u32], ci: u32) -> u32 {
-    let n = rp.len();
-    assert_eq!(vp.len(), n);
-    let mut co = if limbs_sub_same_length_in_place_left(&mut rp[..n], &vp[..n]) {
-        1
-    } else {
-        0
-    };
-    co += if limbs_sub_limb_in_place(&mut rp[..n], ci) {
-        1
-    } else {
-        0
-    };
-    co
-}
-
 fn sub_and_borrow(x: u32, y: u32, borrow: &mut bool) -> u32 {
     let (difference, overflow) = x.overflowing_sub(y);
     if *borrow {
@@ -329,6 +291,61 @@ pub fn limbs_sub_in_place_right(xs: &[u32], ys: &mut Vec<u32>) -> bool {
             false
         }
     }
+}
+
+/// Interpreting a two equal-length slices of `u32`s as the limbs (in ascending order) of two
+/// `Natural`s, subtracts the second from the first, and then subtracts a borrow (`false` is 0,
+/// `true` is 1), writing the `xs.len()` limbs of the result to an output slice. Returns whether
+/// there was a borrow left over. The output slice must be at least as long as either input slice.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = `xs.len()` = `ys.len()`
+///
+/// # Panics
+/// Panics if `out_limbs` is shorter than `xs` or if `xs` and `ys` have different lengths.
+///
+/// This is mpn_sub_nc from gmp-impl.h, where rp and up are disjoint.
+pub fn _limbs_sub_same_length_with_borrow_in_to_out(
+    out_limbs: &mut [u32],
+    xs: &[u32],
+    ys: &[u32],
+    borrow_in: bool,
+) -> bool {
+    let mut borrow = limbs_sub_same_length_to_out(out_limbs, xs, ys);
+    if borrow_in {
+        borrow |= limbs_sub_limb_in_place(&mut out_limbs[..xs.len()], 1);
+    }
+    borrow
+}
+
+/// Interpreting two slices of `u32`s as the limbs (in ascending order) of two `Natural`s, subtracts
+/// the second from the first, and then subtracts a borrow (`false` is 0, `true` is 1), writing the
+/// `xs.len()` limbs of the result to the first (left) slice. Returns whether there was a borrow
+/// left over. The first slice must be at least as long as the second.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = `xs.len()`
+///
+/// # Panics
+/// Panics if `xs` is shorter than `ys`.
+///
+/// This is mpn_sub_nc from gmp-impl.h, where rp is the same as up.
+pub fn _limbs_sub_same_length_with_borrow_in_in_place_left(
+    xs: &mut [u32],
+    ys: &[u32],
+    borrow_in: bool,
+) -> bool {
+    let mut borrow = limbs_sub_same_length_in_place_left(xs, ys);
+    if borrow_in {
+        borrow |= limbs_sub_limb_in_place(xs, 1);
+    }
+    borrow
 }
 
 fn sub_panic<S: Display, T: Display>(x: S, y: T) -> ! {

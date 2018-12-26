@@ -3,13 +3,6 @@ use natural::logic::count_ones::limbs_count_ones;
 use natural::Natural::{self, Large, Small};
 use std::cmp::Ordering;
 
-fn limbs_hamming_distance_same_length_no_check(xs: &[u32], ys: &[u32]) -> u64 {
-    xs.iter()
-        .zip(ys.iter())
-        .map(|(x, &y)| x.hamming_distance(y))
-        .sum()
-}
-
 /// Interpreting two equal-length slices of `u32`s as the limbs of `Natural`s in ascending order,
 /// returns the Hamming distance between them. Both have infinitely many implicit leading zeros.
 ///
@@ -31,7 +24,10 @@ fn limbs_hamming_distance_same_length_no_check(xs: &[u32], ys: &[u32]) -> u64 {
 /// ```
 pub fn limbs_hamming_distance_same_length(xs: &[u32], ys: &[u32]) -> u64 {
     assert_eq!(xs.len(), ys.len());
-    limbs_hamming_distance_same_length_no_check(xs, ys)
+    xs.iter()
+        .zip(ys.iter())
+        .map(|(x, &y)| x.hamming_distance(y))
+        .sum()
 }
 
 /// Interpreting two slices of `u32`s as the limbs of `Natural`s in ascending order, returns the
@@ -54,14 +50,12 @@ pub fn limbs_hamming_distance(xs: &[u32], ys: &[u32]) -> u64 {
     let xs_len = xs.len();
     let ys_len = ys.len();
     match xs_len.cmp(&ys_len) {
-        Ordering::Equal => limbs_hamming_distance_same_length_no_check(xs, ys),
+        Ordering::Equal => limbs_hamming_distance_same_length(xs, ys),
         Ordering::Less => {
-            limbs_hamming_distance_same_length_no_check(xs, &ys[..xs_len])
-                + limbs_count_ones(&ys[xs_len..])
+            limbs_hamming_distance_same_length(xs, &ys[..xs_len]) + limbs_count_ones(&ys[xs_len..])
         }
         Ordering::Greater => {
-            limbs_hamming_distance_same_length_no_check(&xs[..ys_len], ys)
-                + limbs_count_ones(&xs[ys_len..])
+            limbs_hamming_distance_same_length(&xs[..ys_len], ys) + limbs_count_ones(&xs[ys_len..])
         }
     }
 }
