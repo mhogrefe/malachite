@@ -38,7 +38,7 @@ are
   code is derived from GMP, FLINT, and Arb, which are
   themselves released under LGPL.
 * Malachite is very much under development, and not yet
-  ready for general use. At some point in 2018, when
+  ready for general use. At some point in 2019, when
   `malachite-nz` is stabilized, this warning will be
   removed. 
 

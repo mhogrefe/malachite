@@ -1,20 +1,18 @@
-use malachite_base::num::CheckedSub;
+use malachite_base::num::{CheckedSub, OverflowingSubAssign};
 use natural::arithmetic::sub_u32::{limbs_sub_limb_in_place, limbs_sub_limb_to_out};
 use natural::Natural;
 use std::fmt::Display;
 use std::ops::{Sub, SubAssign};
 
 fn sub_and_borrow(x: u32, y: u32, borrow: &mut bool) -> u32 {
-    let (difference, overflow) = x.overflowing_sub(y);
+    let (mut difference, overflow) = x.overflowing_sub(y);
     if *borrow {
         *borrow = overflow;
-        let (difference, overflow) = difference.overflowing_sub(1);
-        *borrow |= overflow;
-        difference
+        *borrow |= difference.overflowing_sub_assign(1);
     } else {
         *borrow = overflow;
-        difference
     }
+    difference
 }
 
 /// Interpreting a two slices of `u32`s as the limbs (in ascending order) of two `Natural`s,
@@ -344,6 +342,19 @@ pub fn _limbs_sub_same_length_with_borrow_in_in_place_left(
     let mut borrow = limbs_sub_same_length_in_place_left(xs, ys);
     if borrow_in {
         borrow |= limbs_sub_limb_in_place(xs, 1);
+    }
+    borrow
+}
+
+//TODO test
+pub fn _limbs_sub_same_length_in_place_with_overlap(
+    xs: &mut [u32],
+    input_start_index: usize,
+) -> bool {
+    let len = xs.len() - input_start_index;
+    let mut borrow = false;
+    for i in 0..len {
+        xs[i] = sub_and_borrow(xs[i], xs[i + input_start_index], &mut borrow);
     }
     borrow
 }

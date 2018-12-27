@@ -107,7 +107,6 @@ fn limbs_shr_round_half_integer_to_even(limbs: &[u32], bits: u64) -> Vec<u32> {
     }
 }
 
-//TODO only use limb fns
 /// Interpreting a slice of `u32`s as the limbs (in ascending order) of a `Natural`, returns the
 /// limbs of the `Natural` right-shifted by a `u32`, rounding to the `Natural` nearest to the actual
 /// value of `self` divided by 2<sup>`other`</sup>. If the actual value is exactly between two
@@ -476,7 +475,6 @@ fn limbs_vec_shr_round_half_integer_to_even_in_place(limbs: &mut Vec<u32>, bits:
     }
 }
 
-//TODO only use limb fns
 /// Interpreting a `Vec` of `u32`s as the limbs (in ascending order) of a `Natural`, writes the
 /// limbs of the `Natural` right-shifted by a `u32` to the input `Vec`, rounding to the `Natural`
 /// nearest to the actual value of `self` divided by 2<sup>`other`</sup>. If the actual value is

@@ -1,19 +1,18 @@
+use malachite_base::num::OverflowingAddAssign;
 use natural::arithmetic::add_u32::{limbs_add_limb_to_out, limbs_slice_add_limb_in_place};
 use natural::Natural::{self, Large, Small};
 use std::cmp::max;
 use std::ops::{Add, AddAssign};
 
 fn add_and_carry(x: u32, y: u32, carry: &mut bool) -> u32 {
-    let (sum, overflow) = x.overflowing_add(y);
+    let (mut sum, overflow) = x.overflowing_add(y);
     if *carry {
         *carry = overflow;
-        let (sum, overflow) = sum.overflowing_add(1);
-        *carry |= overflow;
-        sum
+        *carry |= sum.overflowing_add_assign(1);
     } else {
         *carry = overflow;
-        sum
     }
+    sum
 }
 
 // xs.len() >= ys_len
@@ -154,6 +153,24 @@ pub fn limbs_add_to_out(out_limbs: &mut [u32], xs: &[u32], ys: &[u32]) -> bool {
         out_limbs[xs_len..ys_len].copy_from_slice(&ys[xs_len..]);
         false
     }
+}
+
+//TODO test
+// e.g.
+// _limbs_add_to_out_special(&mut xs[..12], 7, &ys[0..10])
+// is equivalent to
+// limbs_add_to_out(&mut xs[..12], &xs[..7], &ys[0..10])
+// if the latter were allowed.
+pub fn _limbs_add_to_out_special(xs: &mut [u32], in_size: usize, ys: &[u32]) -> bool {
+    assert!(in_size <= xs.len());
+    assert!(in_size <= ys.len());
+    assert!(xs.len() >= ys.len());
+    let mut carry = limbs_slice_add_same_length_in_place_left(&mut xs[..in_size], &ys[..in_size]);
+    xs[in_size..ys.len()].copy_from_slice(&ys[in_size..]);
+    if carry {
+        carry |= limbs_slice_add_limb_in_place(&mut xs[in_size..ys.len()], 1);
+    }
+    carry
 }
 
 /// Interpreting two equal-length slices of `u32`s as the limbs (in ascending order) of two
@@ -317,8 +334,8 @@ pub fn limbs_slice_add_in_place_either(xs: &mut Vec<u32>, ys: &mut Vec<u32>) -> 
 
 /// Interpreting two `Vec`s of `u32`s as the limbs (in ascending order) of two `Natural`s, writes
 /// the limbs of the sum of the `Natural`s to the longer slice (or the first one, if they are
-/// equally long). Returns a `bool` which is `false` when the output is to the first slice and
-/// `true` when it's to the second slice.
+/// equally long). Returns a `bool` which is `false` when the output is to the first `Vec` and
+/// `true` when it's to the second `Vec`.
 ///
 /// Time: worst case O(n)
 ///
