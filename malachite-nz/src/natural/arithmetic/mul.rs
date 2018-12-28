@@ -564,45 +564,44 @@ pub const MUL_TOOM42_TO_TOOM53_THRESHOLD: usize = 100;
 pub const MUL_TOOM42_TO_TOOM63_THRESHOLD: usize = 110;
 pub const MUL_TOOM33_THRESHOLD_LIMIT: usize = MUL_TOOM33_THRESHOLD;
 
-//TODO test
-// docs preserved
-// Internal routine to multiply two natural numbers of length m and n.
-// Multiply up by vpand write the result to {prodp, up.len() + vp.len()}. Must have usize >= vsize.
-//
-// Note that prodp gets up.len() + vp.len() limbs stored, even if the actual result only needs
-// up.len() + vp.len() -1.
-//
-// There's no good reason to call here with v.len() >= MUL_TOOM22_THRESHOLD. Currently this is
-// allowed, but it might not be in the future.
-//
-// This is the most critical code for multiplication. All multiplies rely on this, both small and
-// huge. Small ones arrive here immediately, huge ones arrive here as this is the base case for
-// Karatsuba's recursive algorithm.
-// mul_basecase from mpn/generic/mul_basecase.c
-pub fn mpn_mul_basecase(rp: &mut [u32], up: &[u32], vp: &[u32]) -> u32 {
-    let un = up.len();
-    let mut vn = vp.len();
-    assert!(un >= vn);
-    assert!(vn >= 1);
+/// Interpreting two slices of `u32`s as the limbs (in ascending order) of two `Natural`s, writes
+/// the `xs.len() + ys.len()` least-significant limbs of the product of the `Natural`s to an output
+/// slice. The output must be at least as long as `xs.len() + ys.len()`, `xs` must be as least as
+/// long as `ys`, and `ys` cannot be empty. Returns the result limbs at index
+/// `xs.len() + ys.len() - 1` (which may be empty).
+///
+/// This uses the basecase, quadratic, schoolbook algorithm, and it is most critical code for
+/// multiplication. All multiplies rely on this, both small and huge. Small ones arrive here
+/// immediately, and huge ones arrive here as this is the base case for Karatsuba's recursive
+/// algorithm.
+///
+/// Time: worst case O(n<sup>2</sup>)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = `xs.len()` + `ys.len()`
+///
+/// # Panics
+/// Panics if `out_limbs` is too short, `xs` is shorter than `ys`, or `ys` is empty.
+///
+/// This is mpn_mul_basecase from mpn/generic/mul_basecase.c.
+pub fn _limbs_mul_to_out_basecase(out_limbs: &mut [u32], xs: &[u32], ys: &[u32]) -> u32 {
+    let xs_len = xs.len();
+    let ys_len = ys.len();
+    assert_ne!(ys_len, 0);
+    assert!(xs_len >= ys_len);
+    assert!(out_limbs.len() >= xs_len + ys_len);
 
-    // We first multiply by the low order limb (or depending on optional function availability,
-    // limbs). This result can be stored, not added, to rp. We also avoid a loop for zeroing this
-    // way.
-    rp[un] = limbs_mul_limb_to_out(rp, up, vp[0]);
-    let mut rp_offset = 1;
-    let mut vp_offset = 1;
-    vn -= 1;
+    // We first multiply by the low order limb. This result can be stored, not added, to out_limbs.
+    // We also avoid a loop for zeroing this way.
+    out_limbs[xs_len] = limbs_mul_limb_to_out(out_limbs, xs, ys[0]);
 
-    // Now accumulate the product of up[] and the next higher limb (or depending on optional
-    // function availability, limbs) from vp[].
-
-    while vn >= 1 {
-        rp[rp_offset + un] = mpn_addmul_1(&mut rp[rp_offset..], up, vp[vp_offset]);
-        rp_offset += 1;
-        vp_offset += 1;
-        vn -= 1;
+    // Now accumulate the product of xs and the next higher limb from ys.
+    for i in 1..ys_len {
+        out_limbs[xs_len + i] = mpn_addmul_1(&mut out_limbs[i..], xs, ys[i]);
     }
-    rp[un + vp.len() - 1] // remove once mpn_mul is ready
+    // TODO maybe remove return once mpn_mul is ready
+    out_limbs[xs_len + ys_len - 1]
 }
 
 // toom6_flags from gmp-impl.h
@@ -1263,7 +1262,7 @@ pub fn toom33_mul_n_rec(p: &mut [u32], a: &[u32], b: &[u32], ws: &mut [u32]) {
     let n = a.len();
     assert_eq!(a.len(), n);
     if MAYBE_MUL_BASECASE && n < MUL_TOOM22_THRESHOLD {
-        mpn_mul_basecase(p, a, b);
+        _limbs_mul_to_out_basecase(p, a, b);
     } else if !MAYBE_MUL_TOOM33 || n < MUL_TOOM33_THRESHOLD {
         mpn_toom22_mul(p, a, b, ws);
     } else {
@@ -2286,7 +2285,7 @@ pub const MAYBE_MUL_TOOM22: bool =
 pub fn toom22_mul_n_rec(p: &mut [u32], a: &[u32], b: &[u32], ws: &mut [u32]) {
     assert_eq!(a.len(), b.len());
     if !MAYBE_MUL_TOOM22 || a.len() < MUL_TOOM22_THRESHOLD {
-        mpn_mul_basecase(p, a, b);
+        _limbs_mul_to_out_basecase(p, a, b);
     } else {
         mpn_toom22_mul(p, a, b, ws);
     }
@@ -2303,7 +2302,7 @@ pub fn toom22_mul_rec(p: &mut [u32], a: &[u32], b: &[u32], ws: &mut [u32]) {
     let an = a.len();
     let bn = b.len();
     if !MAYBE_MUL_TOOM22 || bn < MUL_TOOM22_THRESHOLD {
-        mpn_mul_basecase(p, a, b);
+        _limbs_mul_to_out_basecase(p, a, b);
     } else if 4 * an < 5 * bn {
         mpn_toom22_mul(p, a, b, ws);
     } else {
@@ -2505,9 +2504,9 @@ fn mpn_mul_basecase_mem_opt_helper(prod: &mut [u32], u: &[u32], v: &[u32]) {
     let mut offset = 0;
     for chunk in u.chunks(MUL_BASECASE_MAX_UN) {
         if chunk.len() >= v_len {
-            mpn_mul_basecase(&mut prod[offset..], chunk, v);
+            _limbs_mul_to_out_basecase(&mut prod[offset..], chunk, v);
         } else {
-            mpn_mul_basecase(&mut prod[offset..], v, chunk);
+            _limbs_mul_to_out_basecase(&mut prod[offset..], v, chunk);
         }
         if offset != 0 {
             limbs_slice_add_greater_in_place_left(&mut prod[offset..], &triangle_buffer[..v_len]);
@@ -2527,7 +2526,7 @@ fn mpn_mul_basecase_mem_opt(prod: &mut [u32], u: &[u32], v: &[u32]) {
     if v_len > 1 && v_len < MUL_TOOM22_THRESHOLD && u.len() > MUL_BASECASE_MAX_UN {
         mpn_mul_basecase_mem_opt_helper(prod, u, v)
     } else {
-        mpn_mul_basecase(prod, u, v);
+        _limbs_mul_to_out_basecase(prod, u, v);
     }
 }
 
@@ -2544,9 +2543,9 @@ pub fn mul_helper(xs: &[u32], ys: &[u32]) -> Vec<u32> {
 pub fn mul_basecase_helper(xs: &[u32], ys: &[u32]) -> Vec<u32> {
     let mut product_limbs = vec![0; xs.len() + ys.len()];
     if xs.len() >= ys.len() {
-        mpn_mul_basecase(&mut product_limbs, xs, ys);
+        _limbs_mul_to_out_basecase(&mut product_limbs, xs, ys);
     } else {
-        mpn_mul_basecase(&mut product_limbs, ys, xs);
+        _limbs_mul_to_out_basecase(&mut product_limbs, ys, xs);
     }
     product_limbs
 }

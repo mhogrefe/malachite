@@ -2,7 +2,7 @@ use integer::arithmetic::add_mul_u32::mpz_aorsmul_1;
 use malachite_base::limbs::limbs_test_zero;
 use malachite_base::num::{AddMul, AddMulAssign, NotAssign};
 use natural::arithmetic::add::limbs_slice_add_greater_in_place_left;
-use natural::arithmetic::mul::mpn_mul_basecase;
+use natural::arithmetic::mul::_limbs_mul_to_out_basecase;
 use natural::arithmetic::sub::{limbs_sub_in_place_left, limbs_sub_same_length_in_place_right};
 use natural::arithmetic::sub_u32::limbs_sub_limb_to_out;
 use natural::comparison::ord::limbs_cmp;
@@ -505,7 +505,7 @@ pub(crate) fn mpz_aorsmul(
         // Nothing to add to, just set w=x*y. No w==x or w==y overlap here, since we know x,y != 0
         // but w == 0.
         //TODO change to non-basecase once everything is implemented
-        let high = mpn_mul_basecase(w, x, y);
+        let high = _limbs_mul_to_out_basecase(w, x, y);
         if high == 0 {
             tsize -= 1;
         }
@@ -515,7 +515,7 @@ pub(crate) fn mpz_aorsmul(
 
     let mut t = vec![0; tsize];
     //TODO change to non-basecase once everything is implemented
-    let high = mpn_mul_basecase(&mut t, x, y);
+    let high = _limbs_mul_to_out_basecase(&mut t, x, y);
     if high == 0 {
         tsize -= 1;
     }

@@ -1,16 +1,93 @@
 use common::test_properties_custom_scale;
 use malachite_base::num::{One, Zero};
+use malachite_nz::natural::arithmetic::mul::_limbs_mul_to_out_basecase;
 use malachite_nz::natural::Natural;
 use malachite_test::common::{
     biguint_to_natural, natural_to_biguint, natural_to_rug_integer, rug_integer_to_natural,
 };
-use malachite_test::inputs::base::pairs_of_unsigneds;
+use malachite_test::inputs::base::{pairs_of_unsigneds, triples_of_unsigned_vec_var_10};
 use malachite_test::inputs::natural::{
     naturals, pairs_of_natural_and_unsigned, pairs_of_naturals, triples_of_naturals,
 };
 use num::BigUint;
 use rug;
 use std::str::FromStr;
+
+#[test]
+fn test_limbs_mul_to_out() {
+    let test = |xs, ys, out_before: &[u32], highest_result_limb, out_after| {
+        let mut out = out_before.to_vec();
+        assert_eq!(
+            _limbs_mul_to_out_basecase(&mut out, xs, ys),
+            highest_result_limb
+        );
+        assert_eq!(out, out_after);
+    };
+    test(&[2], &[3], &[10, 10, 10], 0, vec![6, 0, 10]);
+    test(
+        &[1, 1, 1],
+        &[1, 2, 3],
+        &[5, 5, 5, 5, 5, 5, 5, 5],
+        0,
+        vec![1, 3, 6, 5, 3, 0, 5, 5],
+    );
+    test(
+        &[1, 2, 3],
+        &[6, 7],
+        &[0, 0, 0, 0, 0],
+        0,
+        vec![6, 19, 32, 21, 0],
+    );
+    test(
+        &[100, 101, 102],
+        &[102, 101, 100],
+        &[10, 10, 10, 10, 10, 10, 10],
+        0,
+        vec![10_200, 20_402, 30_605, 20_402, 10_200, 0, 10],
+    );
+    test(
+        &[0xffff_ffff],
+        &[1],
+        &[10, 10, 10],
+        0,
+        vec![0xffff_ffff, 0, 10],
+    );
+    test(
+        &[0xffff_ffff],
+        &[0xffff_ffff],
+        &[10, 10, 10, 10],
+        0xffff_fffe,
+        vec![1, 0xffff_fffe, 10, 10],
+    );
+    test(
+        &[0xffff_ffff, 0xffff_ffff, 0xffff_ffff],
+        &[0xffff_ffff, 0xffff_ffff, 0xffff_ffff],
+        &[10, 10, 10, 10, 10, 10],
+        0xffff_ffff,
+        vec![1, 0, 0, 0xffff_fffe, 0xffff_ffff, 0xffff_ffff],
+    );
+}
+
+#[test]
+#[should_panic(expected = "assertion failed: out_limbs.len() >= xs_len + ys_len")]
+fn limbs_mul_to_out_fail_1() {
+    let mut out = vec![10, 10, 10, 10];
+    _limbs_mul_to_out_basecase(&mut out, &[6, 7, 8], &[1, 2]);
+}
+
+#[test]
+#[should_panic(expected = "assertion failed: xs_len >= ys_len")]
+fn limbs_mul_to_out_fail_2() {
+    let mut out = vec![10, 10, 10, 10, 10];
+    _limbs_mul_to_out_basecase(&mut out, &[6, 7], &[1, 2, 3]);
+}
+
+#[test]
+#[should_panic(expected = "assertion failed: `(left != right)")]
+fn limbs_mul_to_out_fail_3() {
+    let mut out = vec![10, 10, 10];
+    _limbs_mul_to_out_basecase(&mut out, &[6, 7], &[]);
+}
 
 #[test]
 fn test_mul() {
@@ -98,6 +175,27 @@ fn test_mul() {
         4059991707077834107830876756821880651429748186401020760113859498185638133726165286481741014\
         9079906337286599226335508424466369316294442004040440528589582239717042654541745348050157252\
         3448224036804997350851153108395928780441635856",
+    );
+}
+
+#[test]
+fn limbs_mul_to_out_properties() {
+    test_properties_custom_scale(
+        2_048,
+        triples_of_unsigned_vec_var_10,
+        |&(ref out_limbs, ref xs, ref ys)| {
+            let mut out_limbs = out_limbs.to_vec();
+            let old_out_limbs = out_limbs.clone();
+            let highest_result_limb = _limbs_mul_to_out_basecase(&mut out_limbs, xs, ys);
+            let n = Natural::from_limbs_asc(xs) * Natural::from_limbs_asc(ys);
+            let len = xs.len() + ys.len();
+            let mut limbs = n.into_limbs_asc();
+            assert_eq!(highest_result_limb, out_limbs[len - 1]);
+            assert_eq!(highest_result_limb == 0, limbs.len() < len);
+            limbs.resize(len, 0);
+            assert_eq!(limbs, &out_limbs[..len]);
+            assert_eq!(&out_limbs[len..], &old_out_limbs[len..]);
+        },
     );
 }
 

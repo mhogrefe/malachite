@@ -1192,14 +1192,26 @@ pub fn triples_of_u32_vec_var_8(
     )
 }
 
-// All triples of `Vec<T>`, where `T` is unsigned and the first `Vec` is at least as long as the
-// second and the second is at least as long as the third.
+// All triples of `Vec<T>`, where `T` is unsigned, the first `Vec` is at least as long as the
+// second, and the second is at least as long as the third.
 pub fn triples_of_unsigned_vec_var_9<T: PrimitiveUnsigned>(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (Vec<T>, Vec<T>, Vec<T>)>> {
     Box::new(
         triples_of_unsigned_vec(gm)
             .filter(|&(ref xs, ref ys, ref zs)| xs.len() >= ys.len() && ys.len() >= zs.len()),
+    )
+}
+
+// All triples of `Vec<T>`, where `T` is unsigned, the first `Vec` is at least as long as the sum of
+// the second and the third, the second is at least as long as the third, and the third is nonempty.
+pub fn triples_of_unsigned_vec_var_10<T: PrimitiveUnsigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (Vec<T>, Vec<T>, Vec<T>)>> {
+    Box::new(
+        triples_of_unsigned_vec(gm).filter(|&(ref xs, ref ys, ref zs)| {
+            !zs.is_empty() && ys.len() >= zs.len() && xs.len() >= ys.len() + zs.len()
+        }),
     )
 }
 
