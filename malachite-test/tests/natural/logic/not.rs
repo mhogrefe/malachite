@@ -38,7 +38,7 @@ pub fn test_limbs_not_to_out() {
 }
 
 #[test]
-#[should_panic(expected = "assertion failed: limbs_out.len() >= limbs_in.len()")]
+#[should_panic(expected = "assertion failed: out_limbs.len() >= in_limbs.len()")]
 fn limbs_not_to_out_fail() {
     let mut limbs_out = vec![1, 2];
     limbs_not_to_out(&mut limbs_out, &[1, 2, 3]);

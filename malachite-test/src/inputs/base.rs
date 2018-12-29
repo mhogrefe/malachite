@@ -1215,6 +1215,26 @@ pub fn triples_of_unsigned_vec_var_10<T: PrimitiveUnsigned>(
     )
 }
 
+// All triples of `Vec<T>`, where `T` is unsigned and `out_limbs`, `xs`, and `ys` meet the
+// preconditions of `_limbs_mul_to_out_toom_22`.
+pub fn triples_of_unsigned_vec_var_11<T: PrimitiveUnsigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (Vec<T>, Vec<T>, Vec<T>)>> {
+    Box::new(
+        triples_of_unsigned_vec(gm).filter(|&(ref out_limbs, ref xs, ref ys)| {
+            !ys.is_empty()
+                && xs.len() >= 3
+                && xs.len() >= ys.len()
+                && out_limbs.len() >= xs.len() + ys.len()
+                && if xs.len().even() {
+                    xs.len()
+                } else {
+                    xs.len() + 1
+                } < 2 * ys.len()
+        }),
+    )
+}
+
 pub fn quadruples_of_three_unsigned_vecs_and_bool<T: PrimitiveUnsigned>(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (Vec<T>, Vec<T>, Vec<T>, bool)>> {

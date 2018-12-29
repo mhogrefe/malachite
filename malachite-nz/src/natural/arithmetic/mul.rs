@@ -1,6 +1,6 @@
 use malachite_base::limbs::{limbs_set_zero, limbs_test_zero};
 use malachite_base::misc::CheckedFrom;
-use malachite_base::num::{PrimitiveInteger, WrappingAddAssign, WrappingSubAssign};
+use malachite_base::num::{NotAssign, PrimitiveInteger, WrappingAddAssign, WrappingSubAssign};
 use natural::arithmetic::add::{
     _limbs_add_same_length_with_carry_in_in_place_left, _limbs_add_to_out_special,
     limbs_add_same_length_to_out, limbs_add_to_out, limbs_slice_add_greater_in_place_left,
@@ -567,8 +567,8 @@ pub const MUL_TOOM33_THRESHOLD_LIMIT: usize = MUL_TOOM33_THRESHOLD;
 /// Interpreting two slices of `u32`s as the limbs (in ascending order) of two `Natural`s, writes
 /// the `xs.len() + ys.len()` least-significant limbs of the product of the `Natural`s to an output
 /// slice. The output must be at least as long as `xs.len() + ys.len()`, `xs` must be as least as
-/// long as `ys`, and `ys` cannot be empty. Returns the result limbs at index
-/// `xs.len() + ys.len() - 1` (which may be empty).
+/// long as `ys`, and `ys` cannot be empty. Returns the result limb at index
+/// `xs.len() + ys.len() - 1` (which may be zero).
 ///
 /// This uses the basecase, quadratic, schoolbook algorithm, and it is most critical code for
 /// multiplication. All multiplies rely on this, both small and huge. Small ones arrive here
@@ -1264,7 +1264,7 @@ pub fn toom33_mul_n_rec(p: &mut [u32], a: &[u32], b: &[u32], ws: &mut [u32]) {
     if MAYBE_MUL_BASECASE && n < MUL_TOOM22_THRESHOLD {
         _limbs_mul_to_out_basecase(p, a, b);
     } else if !MAYBE_MUL_TOOM33 || n < MUL_TOOM33_THRESHOLD {
-        mpn_toom22_mul(p, a, b, ws);
+        _limbs_mul_to_out_toom_22(p, a, b, ws);
     } else {
         mpn_toom33_mul(p, a, b, ws);
     }
@@ -2260,16 +2260,20 @@ pub fn mpn_toom32_mul(pp: &mut [u32], ap: &[u32], bp: &[u32], scratch: &mut [u32
     }
 }
 
-//TODO test
-// docs preserved
-// Scratch need is 2*(an + k), k is the recursion depth. k is the smallest k such that
-//   ceil(an / 2 ^ k) < MUL_TOOM22_THRESHOLD,
-// which implies that
-//   k = bitsize of floor ((an - 1) / (MUL_TOOM22_THRESHOLD - 1))
-//     = 1 + floor (log_2(floor((an - 1) / (MUL_TOOM22_THRESHOLD - 1))))
-// mpn_toom22_mul_itch from gmp-impl.h
-pub fn mpn_toom22_mul_itch(an: usize) -> usize {
-    2 * (an + u32::WIDTH as usize)
+/// This function can be used to determine the length of the input `scratch` slice in
+/// `_limbs_mul_to_out_toom_22`.
+///
+/// Scratch need is 2 * (xs.len() + k); k is the recursion depth. k is the smallest k such that
+///   ceil(xs.len() / 2 ^ k) < MUL_TOOM22_THRESHOLD,
+/// which implies that
+///   k = bitsize of floor((xs.len() - 1) / (MUL_TOOM22_THRESHOLD - 1))
+///     = 1 + floor(log_2(floor((xs.len() - 1) / (MUL_TOOM22_THRESHOLD - 1))))
+///
+/// The actual scratch size returned is a quicker-to-compute upper bound.
+///
+/// This is mpn_toom22_mul_itch from gmp-impl.h.
+pub fn _limbs_mul_to_out_toom_22_scratch_size(xs_len: usize) -> usize {
+    2 * (xs_len + u32::WIDTH as usize)
 }
 
 // TODO make these compiler flags?
@@ -2279,195 +2283,216 @@ pub const WANT_FAT_BINARY: bool = false;
 pub const MAYBE_MUL_TOOM22: bool =
     TUNE_PROGRAM_BUILD || WANT_FAT_BINARY || MUL_TOOM33_THRESHOLD >= 2 * MUL_TOOM22_THRESHOLD;
 
-//TODO test
-// docs preserved
-// TOOM22_MUL_N_REC in mpn/generic/toom22_mul.c
-pub fn toom22_mul_n_rec(p: &mut [u32], a: &[u32], b: &[u32], ws: &mut [u32]) {
-    assert_eq!(a.len(), b.len());
-    if !MAYBE_MUL_TOOM22 || a.len() < MUL_TOOM22_THRESHOLD {
-        _limbs_mul_to_out_basecase(p, a, b);
+/// A helper function for `_limbs_mul_to_out_toom_22`.
+///
+/// This is TOOM22_MUL_N_REC from mpn/generic/toom22_mul.c.
+fn _limbs_mul_same_length_to_out_toom_22_recursive(
+    out_limbs: &mut [u32],
+    xs: &[u32],
+    ys: &[u32],
+    scratch: &mut [u32],
+) {
+    assert_eq!(xs.len(), ys.len());
+    if !MAYBE_MUL_TOOM22 || xs.len() < MUL_TOOM22_THRESHOLD {
+        _limbs_mul_to_out_basecase(out_limbs, xs, ys);
     } else {
-        mpn_toom22_mul(p, a, b, ws);
+        _limbs_mul_to_out_toom_22(out_limbs, xs, ys, scratch);
     }
 }
 
-//TODO test
-// docs preserved
-// Normally, this calls mul_basecase or toom22_mul. But when when the fraction
-// MUL_TOOM33_THRESHOLD / MUL_TOOM22_THRESHOLD is large, an initially small relative unbalance will
-// become a larger and larger relative unbalance with each recursion (the difference s - t will be
-// invariant over recursive calls). Therefore, we need to call toom32_mul.
-// TOOM22_MUL_REC from mpn/generic/toom22_mul.c
-pub fn toom22_mul_rec(p: &mut [u32], a: &[u32], b: &[u32], ws: &mut [u32]) {
-    let an = a.len();
-    let bn = b.len();
-    if !MAYBE_MUL_TOOM22 || bn < MUL_TOOM22_THRESHOLD {
-        _limbs_mul_to_out_basecase(p, a, b);
-    } else if 4 * an < 5 * bn {
-        mpn_toom22_mul(p, a, b, ws);
+/// A helper function for `_limbs_mul_to_out_toom_22`.
+///
+/// Normally, this calls `_limbs_mul_to_out_basecase` or `_limbs_mul_to_out_toom_22`. But when when
+/// the fraction MUL_TOOM33_THRESHOLD / MUL_TOOM22_THRESHOLD is large, an initially small relative
+/// unbalance will become a larger and larger relative unbalance with each recursion (the difference
+/// s - t will be invariant over recursive calls). Therefore, we need to call
+/// `_limbs_mul_to_out_toom_32`.
+///
+/// This is TOOM22_MUL_REC from mpn/generic/toom22_mul.c.
+fn _limbs_mul_to_out_toom_22_recursive(
+    out_limbs: &mut [u32],
+    xs: &[u32],
+    ys: &[u32],
+    scratch: &mut [u32],
+) {
+    let xs_len = xs.len();
+    let ys_len = ys.len();
+    if !MAYBE_MUL_TOOM22 || ys_len < MUL_TOOM22_THRESHOLD {
+        _limbs_mul_to_out_basecase(out_limbs, xs, ys);
+    } else if 4 * xs_len < 5 * ys_len {
+        _limbs_mul_to_out_toom_22(out_limbs, xs, ys, scratch);
     } else {
-        mpn_toom32_mul(p, a, b, ws);
+        //TODO replace with mpn_toom32_mul(p, a, b, ws); scratch will become necessary
+        _limbs_mul_to_out_basecase(out_limbs, xs, ys);
     }
 }
 
-//TODO test
-// docs preserved
-// Multiply {ap,an} and {bp,bn} where an >= bn. Or more accurately, bn <= an < 2bn.
-//
-// Evaluate in: -1, 0, +inf
-//
-//  <-s--><--n-->
-//   ____ ______
-//  |_a1_|___a0_|
-//   |b1_|___b0_|
-//   <-t-><--n-->
-//
-//  v0  =  a0     * b0       #   A(0)*B(0)
-//  vm1 = (a0- a1)*(b0- b1)  #  A(-1)*B(-1)
-//  vinf =      a1 *     b1   # A(inf)*B(inf)
-//
-//
-// mpn_toom22_mul from mpn/generic/toom22_mul.c
-pub fn mpn_toom22_mul(pp: &mut [u32], ap: &[u32], bp: &[u32], scratch: &mut [u32]) {
-    let an = ap.len();
-    let bn = bp.len();
+/// Interpreting two slices of `u32`s as the limbs (in ascending order) of two `Natural`s, writes
+/// the `xs.len() + ys.len()` least-significant limbs of the product of the `Natural`s to an output
+/// slice. A "scratch" slice is provided for the algorithm to use. An upper bound for the number of
+/// scratch limbs needed is provided by `_limbs_mul_to_out_toom_22_scratch_size`. The following
+/// restrictions on the input slices must be met:
+/// 1. out_limbs.len() >= xs.len() + ys.len()
+/// 2. xs.len() >= ys.len()
+/// 3. xs.len() > 2
+/// 4. ys.len() > 0
+/// 5a. If xs.len() is even, xs.len() < 2 * ys.len()
+/// 5b. If xs.len() is odd, xs.len() + 1 < 2 * ys.len()
+///
+/// This uses the Toom-22, aka Toom-2, aka Karatsuba algorithm.
+///
+/// Evaluate in: -1, 0, +inf
+///
+///  <--s--><--n--->
+///   ______________
+///  |_xs1_|__xs0__|
+///   |ys1_|__ys0__|
+///   <-t--><--n--->
+///
+///  v0   = xs0         * ys0         # X(0)   * Y(0)
+///  vm1  = (xs0 - xs1) * (ys0 - ys1) # X(-1)  * Y(-1)
+///  vinf = xs1         * ys1         # X(inf) * Y(inf)
+///
+/// Time: TODO (should be something like O(n<sup>log<sub>2</sub>3</sup>))
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = `xs.len()` + `ys.len()`
+///
+/// # Panics
+/// May panic if the input slice conditions are not met.
+///
+/// This is mpn_toom22_mul from mpn/generic/toom22_mul.c.
+pub fn _limbs_mul_to_out_toom_22(
+    out_limbs: &mut [u32],
+    xs: &[u32],
+    ys: &[u32],
+    scratch: &mut [u32],
+) {
+    let xs_len = xs.len();
+    let ys_len = ys.len();
 
-    let s = an >> 1;
-    let n = an - s;
-    let t = bn - n;
+    let s = xs_len >> 1;
+    let n = xs_len - s;
+    let t = ys_len - n;
 
-    let a0 = ap;
-    let a1 = &ap[n..];
-    let b0 = bp;
-    let b1 = &bp[n..];
-
-    assert!(an >= bn);
-
-    assert!(0 < s && s <= n && s >= n - 1);
+    assert!(xs_len >= ys_len);
+    assert!(s > 0 && (s == n || s == n - 1));
     assert!(0 < t && t <= s);
-    let mut vm1_neg = 0;
+
+    let xs0 = &xs[..n]; // length n
+    let xs1 = &xs[n..]; // length s
+    let ys0 = &ys[..n]; // length n
+    let ys1 = &ys[n..]; // length t
+
+    let mut v_neg_1_neg = false;
     {
-        let (asm1, bsm1) = pp.split_at_mut(n);
+        let (asm1, bsm1) = out_limbs.split_at_mut(n); // asm1: length n
+
         // Compute asm1.
         if s == n {
-            if limbs_cmp_same_length(&a0[..n], &a1[..n]) == Ordering::Less {
-                limbs_sub_same_length_to_out(asm1, &a1[..n], &a0[..n]);
-                vm1_neg = 1;
+            if limbs_cmp_same_length(xs0, xs1) == Ordering::Less {
+                limbs_sub_same_length_to_out(asm1, xs1, xs0);
+                v_neg_1_neg = true;
             } else {
-                limbs_sub_same_length_to_out(asm1, &a0[..n], &a1[..n]);
+                limbs_sub_same_length_to_out(asm1, xs0, xs1);
             }
         } else {
             // n - s == 1
-            if a0[s] == 0 && limbs_cmp_same_length(&a0[..s], &a1[..s]) == Ordering::Less {
-                limbs_sub_same_length_to_out(asm1, &a1[..s], &a0[..s]);
+            if xs0[s] == 0 && limbs_cmp_same_length(&xs0[..s], xs1) == Ordering::Less {
+                limbs_sub_same_length_to_out(asm1, xs1, &xs0[..s]);
                 asm1[s] = 0;
-                vm1_neg = 1;
+                v_neg_1_neg = true;
             } else {
-                asm1[s] = a0[s]
-                    - if limbs_sub_same_length_to_out(asm1, &a0[..s], &a1[..s]) {
-                        1
-                    } else {
-                        0
-                    };
+                asm1[s] = xs0[s];
+                if limbs_sub_same_length_to_out(asm1, &xs0[..s], xs1) {
+                    asm1[s].wrapping_sub_assign(1);
+                }
             }
         }
 
         // Compute bsm1.
         if t == n {
-            if limbs_cmp_same_length(&b0[..n], &b1[..n]) == Ordering::Less {
-                limbs_sub_same_length_to_out(bsm1, &b1[..n], &b0[..n]);
-                vm1_neg ^= 1;
+            if limbs_cmp_same_length(ys0, ys1) == Ordering::Less {
+                limbs_sub_same_length_to_out(bsm1, ys1, ys0);
+                v_neg_1_neg.not_assign();
             } else {
-                limbs_sub_same_length_to_out(bsm1, &b0[..n], &b1[..n]);
+                limbs_sub_same_length_to_out(bsm1, ys0, ys1);
             }
         } else {
-            if limbs_test_zero(&b0[t..n])
-                && limbs_cmp_same_length(&b0[..t], &b1[..t]) == Ordering::Less
+            if limbs_test_zero(&ys0[t..]) && limbs_cmp_same_length(&ys0[..t], ys1) == Ordering::Less
             {
-                limbs_sub_same_length_to_out(bsm1, &b1[..t], &b0[..t]);
+                limbs_sub_same_length_to_out(bsm1, ys1, &ys0[..t]);
                 limbs_set_zero(&mut bsm1[t..n]);
-                vm1_neg ^= 1;
+                v_neg_1_neg.not_assign();
             } else {
-                limbs_sub_to_out(bsm1, &b0[..n], &b1[..t]);
+                limbs_sub_to_out(bsm1, ys0, ys1);
             }
         }
 
-        let (vm1, scratch_out) = scratch.split_at_mut(2 * n); // 2n
-
-        // vm1, 2n limbs
-        toom22_mul_n_rec(vm1, &asm1[..n], &bsm1[..n], scratch_out);
+        let (v_neg_1, scratch_out) = scratch.split_at_mut(2 * n); // v_neg_1: length 2 * n
+        _limbs_mul_same_length_to_out_toom_22_recursive(v_neg_1, asm1, &bsm1[..n], scratch_out);
     }
-    let (vm1, scratch_out) = scratch.split_at_mut(2 * n);
-    let mut cy;
-    let cy2;
+    let (v_neg_1, scratch_out) = scratch.split_at_mut(2 * n); // v_neg_1: length 2 * n
+    let mut carry = 0;
+    let mut carry2;
     {
-        let (v0, vinf) = pp.split_at_mut(2 * n); // 2n, s + t
+        let (v_0, v_pos_inf) = out_limbs.split_at_mut(2 * n); // v_0: length 2 * n
         if s > t {
-            toom22_mul_rec(vinf, &a1[..s], &b1[..t], scratch_out);
+            _limbs_mul_to_out_toom_22_recursive(v_pos_inf, xs1, ys1, scratch_out);
         } else {
-            toom22_mul_n_rec(vinf, &a1[..s], &b1[..s], scratch_out);
+            _limbs_mul_same_length_to_out_toom_22_recursive(v_pos_inf, xs1, &ys1[..s], scratch_out);
         }
 
-        // v0, 2n limbs
-        toom22_mul_n_rec(v0, &ap[..n], &bp[..n], scratch_out);
+        // v_0, 2 * n limbs
+        _limbs_mul_same_length_to_out_toom_22_recursive(v_0, xs0, ys0, scratch_out);
 
-        // H(v0) + L(vinf)
-        cy = if limbs_slice_add_same_length_in_place_left(&mut vinf[n..2 * n], &v0[n..2 * n]) {
-            1
-        } else {
-            0
-        };
+        // H(v_0) + L(v_pos_inf)
+        if limbs_slice_add_same_length_in_place_left(&mut v_pos_inf[..n], &v_0[n..]) {
+            carry += 1;
+        }
 
-        // L(v0) + H(v0)
-        cy2 = {
-            let (v0_lo, v0_hi) = v0.split_at_mut(n);
-            cy + if limbs_add_same_length_to_out(&mut v0_hi[..n], &vinf[..n], v0_lo) {
-                1
-            } else {
-                0
-            }
-        };
+        // L(v_0) + H(v_0)
+        carry2 = carry;
+        let (v_0_lo, v_0_hi) = v_0.split_at_mut(n); // v_0_lo: length n, vo_hi: length n
+        if limbs_add_same_length_to_out(v_0_hi, &v_pos_inf[..n], v_0_lo) {
+            carry2 += 1;
+        }
 
-        // L(vinf) + H(vinf)
-        cy += {
-            let (vinf_lo, vinf_hi) = vinf.split_at_mut(n);
-            if limbs_slice_add_greater_in_place_left(vinf_lo, &vinf_hi[..s + t - n]) {
-                1
-            } else {
-                0
-            }
-        };
+        // L(v_pos_inf) + H(v_pos_inf)
+        let (v_pos_inf_lo, v_pos_inf_hi) = v_pos_inf.split_at_mut(n); // v_pos_inf_lo: length n
+
+        // s + t - n == either ys_len - (xs_len >> 1) or ys_len - (xs_len >> 1) - 2.
+        // n == xs_len - (xs_len >> 1) and xs_len >= ys_len.
+        // So n >= s + t - n.
+        if limbs_slice_add_greater_in_place_left(v_pos_inf_lo, &v_pos_inf_hi[..s + t - n]) {
+            carry += 1;
+        }
     }
 
-    if vm1_neg != 0 {
-        cy += if limbs_slice_add_same_length_in_place_left(&mut pp[n..3 * n], &vm1[..2 * n]) {
-            1
-        } else {
-            0
-        };
+    if v_neg_1_neg {
+        if limbs_slice_add_same_length_in_place_left(&mut out_limbs[n..3 * n], v_neg_1) {
+            carry += 1;
+        }
     } else {
-        cy -= if limbs_sub_same_length_in_place_left(&mut pp[n..3 * n], &vm1[..2 * n]) {
-            1
-        } else {
-            0
-        };
+        if limbs_sub_same_length_in_place_left(&mut out_limbs[n..3 * n], v_neg_1) {
+            carry.wrapping_sub_assign(1);
+        }
     }
-
-    assert!(cy + 1 <= 3);
-    assert!(cy2 <= 2);
-
     assert!(!limbs_slice_add_limb_in_place(
-        &mut pp[2 * n..2 * n + s + t],
-        cy2
+        &mut out_limbs[2 * n..2 * n + s + t],
+        carry2
     ));
-    if cy <= 2 {
-        // if s + t == n, cy is zero, but we should not access pp[3 * n] at all.
+    if carry <= 2 {
         assert!(!limbs_slice_add_limb_in_place(
-            &mut pp[3 * n..2 * n + s + t],
-            cy
+            &mut out_limbs[3 * n..2 * n + s + t],
+            carry
         ));
     } else {
-        assert!(!limbs_sub_limb_in_place(&mut pp[3 * n..2 * n + s + t], 1));
+        assert!(!limbs_sub_limb_in_place(
+            &mut out_limbs[3 * n..2 * n + s + t],
+            1
+        ));
     }
 }
 
