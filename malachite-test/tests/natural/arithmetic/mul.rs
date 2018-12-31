@@ -2,7 +2,8 @@ use common::test_properties_custom_scale;
 use malachite_base::num::{One, Zero};
 use malachite_nz::natural::arithmetic::mul::{
     _limbs_mul_to_out_basecase, _limbs_mul_to_out_toom_22, _limbs_mul_to_out_toom_22_scratch_size,
-    _limbs_mul_to_out_toom_32, _limbs_mul_to_out_toom_32_scratch_size, MUL_TOOM22_THRESHOLD,
+    _limbs_mul_to_out_toom_32, _limbs_mul_to_out_toom_32_scratch_size, mpn_mul,
+    MUL_TOOM22_THRESHOLD,
 };
 use malachite_nz::natural::Natural;
 use malachite_test::common::{
@@ -23,10 +24,10 @@ use std::str::FromStr;
 fn test_limbs_mul_to_out() {
     let test = |xs, ys, out_before: &[u32], highest_result_limb, out_after| {
         let mut out = out_before.to_vec();
-        assert_eq!(
-            _limbs_mul_to_out_basecase(&mut out, xs, ys),
-            highest_result_limb
-        );
+        _limbs_mul_to_out_basecase(&mut out, xs, ys);
+        assert_eq!(out, out_after);
+        let mut out = out_before.to_vec();
+        assert_eq!(mpn_mul(&mut out, xs, ys), highest_result_limb);
         assert_eq!(out, out_after);
     };
     test(&[2], &[3], &[10, 10, 10], 0, vec![6, 0, 10]);
@@ -351,11 +352,11 @@ fn limbs_mul_to_out_toom_22_fail_7() {
 #[test]
 fn test_limbs_mul_to_out_toom_32() {
     let test = |xs: Vec<u32>, ys: Vec<u32>, out_before: Vec<u32>, out_after| {
-        let mut scratch = vec![0; _limbs_mul_to_out_toom_32_scratch_size(xs.len(), ys.len())];
         let mut out = out_before.to_vec();
         _limbs_mul_to_out_basecase(&mut out, &xs, &ys);
         assert_eq!(out, out_after);
         let mut out = out_before.to_vec();
+        let mut scratch = vec![0; _limbs_mul_to_out_toom_32_scratch_size(xs.len(), ys.len())];
         _limbs_mul_to_out_toom_32(&mut out, &xs, &ys, &mut scratch);
         assert_eq!(out, out_after);
     };
@@ -1115,15 +1116,13 @@ fn test_mul() {
     );
 }
 
-fn limbs_mul_helper(out_limbs: &Vec<u32>, xs: &Vec<u32>, ys: &Vec<u32>) -> Vec<u32> {
+fn limbs_mul_basecase_helper(out_limbs: &Vec<u32>, xs: &Vec<u32>, ys: &Vec<u32>) -> Vec<u32> {
     let mut out_limbs = out_limbs.to_vec();
     let old_out_limbs = out_limbs.clone();
-    let highest_result_limb = _limbs_mul_to_out_basecase(&mut out_limbs, xs, ys);
+    _limbs_mul_to_out_basecase(&mut out_limbs, xs, ys);
     let n = Natural::from_limbs_asc(xs) * Natural::from_limbs_asc(ys);
     let len = xs.len() + ys.len();
     let mut limbs = n.into_limbs_asc();
-    assert_eq!(highest_result_limb, out_limbs[len - 1]);
-    assert_eq!(highest_result_limb == 0, limbs.len() < len);
     limbs.resize(len, 0);
     assert_eq!(limbs, &out_limbs[..len]);
     assert_eq!(&out_limbs[len..], &old_out_limbs[len..]);
@@ -1136,7 +1135,11 @@ fn limbs_mul_to_out_properties() {
         2_048,
         triples_of_unsigned_vec_var_10,
         |&(ref out_limbs, ref xs, ref ys)| {
-            limbs_mul_helper(out_limbs, xs, ys);
+            let expected_out_limbs = limbs_mul_basecase_helper(out_limbs, xs, ys);
+            let mut out_limbs = out_limbs.to_vec();
+            let highest_result_limb = mpn_mul(&mut out_limbs, xs, ys);
+            assert_eq!(highest_result_limb, out_limbs[xs.len() + ys.len() - 1]);
+            assert_eq!(out_limbs, expected_out_limbs);
         },
     );
 }
@@ -1147,7 +1150,7 @@ fn limbs_mul_to_out_toom_22_properties() {
         2_048,
         triples_of_unsigned_vec_var_11,
         |&(ref out_limbs, ref xs, ref ys)| {
-            let expected_out_limbs = limbs_mul_helper(out_limbs, xs, ys);
+            let expected_out_limbs = limbs_mul_basecase_helper(out_limbs, xs, ys);
             let mut out_limbs = out_limbs.to_vec();
             let mut scratch = vec![0; _limbs_mul_to_out_toom_22_scratch_size(xs.len())];
             _limbs_mul_to_out_toom_22(&mut out_limbs, xs, ys, &mut scratch);
@@ -1162,7 +1165,7 @@ fn limbs_mul_to_out_toom_32_properties() {
         2_048,
         triples_of_unsigned_vec_var_12,
         |&(ref out_limbs, ref xs, ref ys)| {
-            let expected_out_limbs = limbs_mul_helper(out_limbs, xs, ys);
+            let expected_out_limbs = limbs_mul_basecase_helper(out_limbs, xs, ys);
             let mut out_limbs = out_limbs.to_vec();
             let mut scratch = vec![0; _limbs_mul_to_out_toom_32_scratch_size(xs.len(), ys.len())];
             _limbs_mul_to_out_toom_32(&mut out_limbs, xs, ys, &mut scratch);

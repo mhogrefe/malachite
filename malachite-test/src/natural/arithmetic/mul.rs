@@ -101,7 +101,7 @@ fn benchmark_limbs_mul_to_out_toom_22_algorithms(
             (
                 "basecase",
                 &mut (|(mut out_limbs, xs, ys)| {
-                    no_out!(_limbs_mul_to_out_basecase(&mut out_limbs, &xs, &ys))
+                    _limbs_mul_to_out_basecase(&mut out_limbs, &xs, &ys)
                 }),
             ),
             (
@@ -133,7 +133,7 @@ fn benchmark_limbs_mul_to_out_toom_32_algorithms(
             (
                 "basecase",
                 &mut (|(mut out_limbs, xs, ys)| {
-                    no_out!(_limbs_mul_to_out_basecase(&mut out_limbs, &xs, &ys))
+                    _limbs_mul_to_out_basecase(&mut out_limbs, &xs, &ys)
                 }),
             ),
             (

@@ -588,7 +588,7 @@ pub const MUL_TOOM33_THRESHOLD_LIMIT: usize = MUL_TOOM33_THRESHOLD;
 /// Panics if `out_limbs` is too short, `xs` is shorter than `ys`, or `ys` is empty.
 ///
 /// This is mpn_mul_basecase from mpn/generic/mul_basecase.c.
-pub fn _limbs_mul_to_out_basecase(out_limbs: &mut [u32], xs: &[u32], ys: &[u32]) -> u32 {
+pub fn _limbs_mul_to_out_basecase(out_limbs: &mut [u32], xs: &[u32], ys: &[u32]) {
     let xs_len = xs.len();
     let ys_len = ys.len();
     assert_ne!(ys_len, 0);
@@ -603,8 +603,6 @@ pub fn _limbs_mul_to_out_basecase(out_limbs: &mut [u32], xs: &[u32], ys: &[u32])
     for i in 1..ys_len {
         out_limbs[xs_len + i] = mpn_addmul_1(&mut out_limbs[i..], xs, ys[i]);
     }
-    // TODO maybe remove return once mpn_mul is ready
-    out_limbs[xs_len + ys_len - 1]
 }
 
 // toom6_flags from gmp-impl.h
@@ -1533,14 +1531,18 @@ pub fn mpn_toom33_mul(pp: &mut [u32], ap: &[u32], bp: &[u32], scratch: &mut [u32
     }
 
     let (vm1, v2) = scratch.split_at_mut(2 * n + 1);
-    mpn_toom_interpolate_5pts(pp, v2, vm1, n, s + t, vm1_neg, vinf0);
+    _limbs_mul_toom_interpolate_5_points(pp, v2, vm1, n, s + t, vm1_neg, vinf0);
 }
 
 //TODO test
 // docs preserved
 // Interpolate for toom3, 33, 42.
 // mpn_toom_interpolate_5pts in mpn/generic/mpn_toom_interpolate_5pts.c
-pub fn mpn_toom_interpolate_5pts(
+// input: vm1, v2, c: [_, v1, v0, vinf], each subslice k long
+// output: c??
+// 4 * k + 1 <= c.len()
+// 3 * k + twor <= c.len()
+pub fn _limbs_mul_toom_interpolate_5_points(
     c: &mut [u32],
     v2: &mut [u32],
     vm1: &mut [u32],
@@ -1681,6 +1683,7 @@ pub fn mpn_toom_interpolate_5pts(
     // Add the high half of t2 in {vinf}
     if twor > k + 1 {
         // This is the expected flow
+        //TODO k analysis
         cy = if limbs_slice_add_same_length_in_place_left(&mut vinf[..k + 1], &v2[k..2 * k + 1]) {
             1
         } else {
@@ -1956,7 +1959,7 @@ pub fn mpn_toom42_mul(pp: &mut [u32], ap: &[u32], bp: &[u32], scratch: &mut [u32
 
         toom42_mul_n_rec(v0, &ap[..n], &bp[..n]); // v0, 2n limbs
     }
-    mpn_toom_interpolate_5pts(pp, v2, vm1, n, s + t, vm1_neg, vinf0);
+    _limbs_mul_toom_interpolate_5_points(pp, v2, vm1, n, s + t, vm1_neg, vinf0);
 }
 
 /// This function can be used to determine the length of the input `scratch` slice in
@@ -2229,11 +2232,10 @@ pub fn _limbs_mul_to_out_toom_32(
 
     _limbs_mul_same_length_to_out_toom_32_recursive(out_limbs, xs0, ys0);
     // s + t limbs. Use mpn_mul for now, to handle unbalanced operands
-    //TODO switch from basecase to to mpn_mul once ready
     if s > t {
-        _limbs_mul_to_out_basecase(&mut out_limbs[3 * n..], xs2, ys1);
+        mpn_mul(&mut out_limbs[3 * n..], xs2, ys1);
     } else {
-        _limbs_mul_to_out_basecase(&mut out_limbs[3 * n..], ys1, xs2);
+        mpn_mul(&mut out_limbs[3 * n..], ys1, xs2);
     }
 
     // Remaining interpolation.
@@ -2376,8 +2378,7 @@ fn _limbs_mul_to_out_toom_22_recursive(
     } else if _limbs_mul_to_out_toom_32_input_sizes_valid(xs_len, ys_len) {
         _limbs_mul_to_out_toom_32(out_limbs, xs, ys, scratch);
     } else {
-        //TODO replace with mul eventually
-        _limbs_mul_to_out_basecase(out_limbs, xs, ys);
+        mpn_mul(out_limbs, xs, ys);
     }
 }
 
@@ -2552,18 +2553,95 @@ pub fn _limbs_mul_to_out_toom_22(
 //TODO test
 // multiply natural numbers.
 // mpn_mul_n from mpn/generic/mul_n.c
-pub fn mpn_mul_n(_p: &mut [u32], a: &[u32], b: &[u32]) {
+pub fn mpn_mul_n(p: &mut [u32], a: &[u32], b: &[u32]) {
     let n = a.len();
     assert_eq!(b.len(), n);
-    unimplemented!();
-    //TODO PASTE B
+    assert!(n >= 1);
+
+    if n < MUL_TOOM22_THRESHOLD {
+        _limbs_mul_to_out_basecase(p, a, b);
+    } else if n < MUL_TOOM33_THRESHOLD {
+        // TODO once const fn is stable: Allocate workspace of fixed size on stack: fast!
+        let mut ws =
+            vec![0; _limbs_mul_to_out_toom_22_scratch_size(MUL_TOOM33_THRESHOLD_LIMIT - 1)];
+        assert!(MUL_TOOM33_THRESHOLD <= MUL_TOOM33_THRESHOLD_LIMIT);
+        _limbs_mul_to_out_toom_22(p, a, b, &mut ws);
+    } else {
+        //TODO remove
+        _limbs_mul_to_out_basecase(p, a, b);
+    }
+    /*else if n < MUL_TOOM44_THRESHOLD
+      {
+        mp_ptr ws;
+        TMP_SDECL;
+        TMP_SMARK;
+        ws = TMP_SALLOC_LIMBS (mpn_toom33_mul_itch (n, n));
+        mpn_toom33_mul (p, a, n, b, n, ws);
+        TMP_SFREE;
+      }
+    else if (BELOW_THRESHOLD (n, MUL_TOOM6H_THRESHOLD))
+      {
+        mp_ptr ws;
+        TMP_SDECL;
+        TMP_SMARK;
+        ws = TMP_SALLOC_LIMBS (mpn_toom44_mul_itch (n, n));
+        mpn_toom44_mul (p, a, n, b, n, ws);
+        TMP_SFREE;
+      }
+    else if (BELOW_THRESHOLD (n, MUL_TOOM8H_THRESHOLD))
+      {
+        mp_ptr ws;
+        TMP_SDECL;
+        TMP_SMARK;
+        ws = TMP_SALLOC_LIMBS (mpn_toom6_mul_n_itch (n));
+        mpn_toom6h_mul (p, a, n, b, n, ws);
+        TMP_SFREE;
+      }
+    else if (BELOW_THRESHOLD (n, MUL_FFT_THRESHOLD))
+      {
+        mp_ptr ws;
+        TMP_DECL;
+        TMP_MARK;
+        ws = TMP_ALLOC_LIMBS (mpn_toom8_mul_n_itch (n));
+        mpn_toom8h_mul (p, a, n, b, n, ws);
+        TMP_FREE;
+      }
+    else
+      {
+        /* The current FFT code allocates its own space.  That should probably
+       change.  */
+    mpn_fft_mul (p, a, n, b, n);
+    }*/
 }
 
 //TODO test
 // Multiply two natural numbers.
 // mpn_mul from mpn/generic/mul.c
-pub fn mpn_mul(_prodp: &mut [u32], _up: &[u32], _vp: &[u32]) -> u32 {
-    unimplemented!();
+pub fn mpn_mul(prodp: &mut [u32], up: &[u32], vp: &[u32]) -> u32 {
+    let un = up.len();
+    let vn = vp.len();
+    assert!(un >= vn);
+    assert!(vn >= 1);
+
+    if un == vn {
+        if up == vp {
+            //TODO mpn_sqr(prodp, up, un);
+            mpn_mul_n(prodp, up, vp);
+        } else {
+            mpn_mul_n(prodp, up, vp);
+        }
+    } else if vn < MUL_TOOM22_THRESHOLD {
+        // plain schoolbook multiplication. Unless un is very large, or else if have an applicable
+        // mpn_mul_N, perform basecase multiply directly.
+        _limbs_mul_to_out_basecase(prodp, up, vp);
+    } else if vn < MUL_TOOM33_THRESHOLD {
+        //TODO Use ToomX2 variants; remove basecase
+        _limbs_mul_to_out_basecase(prodp, up, vp);
+    } else {
+        //TODO remove
+        _limbs_mul_to_out_basecase(prodp, up, vp);
+    }
+    prodp[un + vn - 1]
     //TODO PASTE C
 }
 
@@ -2614,16 +2692,6 @@ pub fn mul_helper(xs: &[u32], ys: &[u32]) -> Vec<u32> {
         mpn_mul(&mut product_limbs, xs, ys);
     } else {
         mpn_mul(&mut product_limbs, ys, xs);
-    }
-    product_limbs
-}
-
-pub fn mul_basecase_helper(xs: &[u32], ys: &[u32]) -> Vec<u32> {
-    let mut product_limbs = vec![0; xs.len() + ys.len()];
-    if xs.len() >= ys.len() {
-        _limbs_mul_to_out_basecase(&mut product_limbs, xs, ys);
-    } else {
-        _limbs_mul_to_out_basecase(&mut product_limbs, ys, xs);
     }
     product_limbs
 }
@@ -2782,8 +2850,7 @@ impl<'a, 'b> Mul<&'a Natural> for &'b Natural {
         } else {
             match (self, other) {
                 (&Large(ref xs), &Large(ref ys)) => {
-                    //TODO change to non-basecase once everything is implemented
-                    let mut product = Large(mul_basecase_helper(xs, ys));
+                    let mut product = Large(mul_helper(xs, ys));
                     product.trim();
                     product
                 }
@@ -2830,8 +2897,7 @@ impl MulAssign<Natural> for Natural {
         } else {
             match (&mut (*self), other) {
                 (&mut Large(ref mut xs), Large(ref mut ys)) => {
-                    //TODO change to non-basecase once everything is implemented
-                    *xs = mul_basecase_helper(xs, ys);
+                    *xs = mul_helper(xs, ys);
                 }
                 _ => unreachable!(),
             }
@@ -2876,8 +2942,7 @@ impl<'a> MulAssign<&'a Natural> for Natural {
         } else {
             match (&mut (*self), other) {
                 (&mut Large(ref mut xs), &Large(ref ys)) => {
-                    //TODO change to non-basecase once everything is implemented
-                    *xs = mul_basecase_helper(xs, ys);
+                    *xs = mul_helper(xs, ys);
                 }
                 _ => unreachable!(),
             }

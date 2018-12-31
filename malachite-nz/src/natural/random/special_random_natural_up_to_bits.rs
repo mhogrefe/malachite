@@ -1,5 +1,6 @@
 use malachite_base::num::{
-    BitAccess, ModPowerOfTwo, ModPowerOfTwoAssign, PrimitiveInteger, ShrRound, Zero,
+    BitAccess, ModPowerOfTwo, ModPowerOfTwoAssign, PrimitiveInteger, SaturatingSubAssign, ShrRound,
+    Zero,
 };
 use malachite_base::round::RoundingMode;
 use natural::arithmetic::add_u32::limbs_slice_add_limb_in_place;
@@ -54,15 +55,13 @@ pub fn limbs_special_random_up_to_bits<R: Rng>(rng: &mut R, bits: u64) -> Vec<u3
     let mut i = ((limb_count as u32) << u32::LOG_WIDTH) - rng.gen_range(0, u32::WIDTH);
     loop {
         let mut chunk_size = chunk_size_range.ind_sample(rng);
-        //TODO use saturating sub
-        i = if i < chunk_size { 0 } else { i - chunk_size };
+        i.saturating_sub_assign(chunk_size);
         if i == 0 {
             break;
         }
         limbs[(i >> u32::LOG_WIDTH) as usize].clear_bit(u64::from(i & u32::WIDTH_MASK));
         chunk_size = chunk_size_range.ind_sample(rng);
-        //TODO use saturating sub
-        i = if i < chunk_size { 0 } else { i - chunk_size };
+        i.saturating_sub_assign(chunk_size);
         limbs_slice_add_limb_in_place(
             &mut limbs[(i >> u32::LOG_WIDTH) as usize..],
             1 << (i & u32::WIDTH_MASK),
