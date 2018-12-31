@@ -7,6 +7,7 @@ use malachite_base::num::{
 };
 use malachite_base::round::RoundingMode;
 use malachite_nz::integer::logic::bit_access::limbs_vec_clear_bit_neg;
+use malachite_nz::natural::arithmetic::mul::_limbs_mul_to_out_toom_32_input_sizes_valid;
 use malachite_nz::natural::arithmetic::mul_u32::limbs_mul_limb;
 use rust_wheels::iterators::bools::exhaustive_bools;
 use rust_wheels::iterators::chars::exhaustive_chars;
@@ -31,7 +32,9 @@ use rust_wheels::iterators::tuples::{
     sqrt_pairs,
 };
 use rust_wheels::iterators::vecs::{
-    exhaustive_vecs, random_vecs, special_random_bool_vecs, special_random_unsigned_vecs,
+    exhaustive_vecs, exhaustive_vecs_min_length, random_vecs, random_vecs_min_length,
+    special_random_bool_vecs, special_random_unsigned_vecs,
+    special_random_unsigned_vecs_min_length,
 };
 use std::char;
 use std::cmp::Ordering;
@@ -1215,24 +1218,62 @@ pub fn triples_of_unsigned_vec_var_10<T: PrimitiveUnsigned>(
     )
 }
 
+pub fn triples_of_unsigned_vec_min_sizes<T: PrimitiveUnsigned>(
+    gm: GenerationMode,
+    min_xs_len: u64,
+    min_ys_len: u64,
+    min_zs_len: u64,
+) -> Box<Iterator<Item = (Vec<T>, Vec<T>, Vec<T>)>> {
+    match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_triples(
+            exhaustive_vecs_min_length(min_xs_len, exhaustive_unsigned()),
+            exhaustive_vecs_min_length(min_ys_len, exhaustive_unsigned()),
+            exhaustive_vecs_min_length(min_zs_len, exhaustive_unsigned()),
+        )),
+        GenerationMode::Random(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| random_vecs_min_length(seed, scale, min_xs_len, &(|seed_2| random(seed_2)))),
+            &(|seed| random_vecs_min_length(seed, scale, min_ys_len, &(|seed_2| random(seed_2)))),
+            &(|seed| random_vecs_min_length(seed, scale, min_zs_len, &(|seed_2| random(seed_2)))),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_unsigned_vecs_min_length(seed, scale, min_xs_len)),
+            &(|seed| special_random_unsigned_vecs_min_length(seed, scale, min_ys_len)),
+            &(|seed| special_random_unsigned_vecs_min_length(seed, scale, min_zs_len)),
+        )),
+    }
+}
+
 // All triples of `Vec<T>`, where `T` is unsigned and `out_limbs`, `xs`, and `ys` meet the
 // preconditions of `_limbs_mul_to_out_toom_22`.
 pub fn triples_of_unsigned_vec_var_11<T: PrimitiveUnsigned>(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (Vec<T>, Vec<T>, Vec<T>)>> {
-    Box::new(
-        triples_of_unsigned_vec(gm).filter(|&(ref out_limbs, ref xs, ref ys)| {
-            !ys.is_empty()
-                && xs.len() >= 3
-                && xs.len() >= ys.len()
+    Box::new(triples_of_unsigned_vec_min_sizes(gm, 3, 3, 1).filter(
+        |&(ref out_limbs, ref xs, ref ys)| {
+            xs.len() >= ys.len()
                 && out_limbs.len() >= xs.len() + ys.len()
                 && if xs.len().even() {
                     xs.len()
                 } else {
                     xs.len() + 1
                 } < 2 * ys.len()
-        }),
-    )
+        },
+    ))
+}
+
+// All triples of `Vec<T>`, where `T` is unsigned and `out_limbs`, `xs`, and `ys` meet the
+// preconditions of `_limbs_mul_to_out_toom_32`.
+pub fn triples_of_unsigned_vec_var_12<T: PrimitiveUnsigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (Vec<T>, Vec<T>, Vec<T>)>> {
+    Box::new(triples_of_unsigned_vec_min_sizes(gm, 10, 6, 4).filter(
+        |&(ref out_limbs, ref xs, ref ys)| {
+            out_limbs.len() >= xs.len() + ys.len()
+                && _limbs_mul_to_out_toom_32_input_sizes_valid(xs.len(), ys.len())
+        },
+    ))
 }
 
 pub fn quadruples_of_three_unsigned_vecs_and_bool<T: PrimitiveUnsigned>(

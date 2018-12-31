@@ -1,6 +1,11 @@
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
+use inputs::base::{triples_of_unsigned_vec_var_11, triples_of_unsigned_vec_var_12};
 use inputs::natural::{nrm_pairs_of_naturals, pairs_of_naturals, rm_pairs_of_naturals};
 use malachite_base::num::SignificantBits;
+use malachite_nz::natural::arithmetic::mul::{
+    _limbs_mul_to_out_basecase, _limbs_mul_to_out_toom_22, _limbs_mul_to_out_toom_22_scratch_size,
+    _limbs_mul_to_out_toom_32, _limbs_mul_to_out_toom_32_scratch_size,
+};
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_natural_mul_assign);
@@ -9,6 +14,16 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_natural_mul_val_ref);
     register_demo!(registry, demo_natural_mul_ref_val);
     register_demo!(registry, demo_natural_mul_ref_ref);
+    register_bench!(
+        registry,
+        Large,
+        benchmark_limbs_mul_to_out_toom_22_algorithms
+    );
+    register_bench!(
+        registry,
+        Large,
+        benchmark_limbs_mul_to_out_toom_32_algorithms
+    );
     register_bench!(
         registry,
         Large,
@@ -66,6 +81,71 @@ fn demo_natural_mul_ref_ref(gm: GenerationMode, limit: usize) {
     for (x, y) in pairs_of_naturals(gm).take(limit) {
         println!("&{} * &{} = {}", x, y, &x * &y);
     }
+}
+
+fn benchmark_limbs_mul_to_out_toom_22_algorithms(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "limbs_mul_to_out(&mut [u32], &[u32], &[u32])",
+        BenchmarkType::Algorithms,
+        triples_of_unsigned_vec_var_11(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(_, ref xs, ref ys)| xs.len() + ys.len()),
+        "x.len() + y.len()",
+        &mut [
+            (
+                "basecase",
+                &mut (|(mut out_limbs, xs, ys)| {
+                    no_out!(_limbs_mul_to_out_basecase(&mut out_limbs, &xs, &ys))
+                }),
+            ),
+            (
+                "Toom22",
+                &mut (|(mut out_limbs, xs, ys)| {
+                    let mut scratch = vec![0; _limbs_mul_to_out_toom_22_scratch_size(xs.len())];
+                    _limbs_mul_to_out_toom_22(&mut out_limbs, &xs, &ys, &mut scratch)
+                }),
+            ),
+        ],
+    );
+}
+
+fn benchmark_limbs_mul_to_out_toom_32_algorithms(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "limbs_mul_to_out(&mut [u32], &[u32], &[u32])",
+        BenchmarkType::Algorithms,
+        triples_of_unsigned_vec_var_12(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(_, ref xs, ref ys)| xs.len() + ys.len()),
+        "x.len() + y.len()",
+        &mut [
+            (
+                "basecase",
+                &mut (|(mut out_limbs, xs, ys)| {
+                    no_out!(_limbs_mul_to_out_basecase(&mut out_limbs, &xs, &ys))
+                }),
+            ),
+            (
+                "Toom32",
+                &mut (|(mut out_limbs, xs, ys)| {
+                    let mut scratch =
+                        vec![0; _limbs_mul_to_out_toom_32_scratch_size(xs.len(), ys.len())];
+                    _limbs_mul_to_out_toom_32(&mut out_limbs, &xs, &ys, &mut scratch)
+                }),
+            ),
+        ],
+    );
 }
 
 fn benchmark_natural_mul_assign_library_comparison(
