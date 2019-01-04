@@ -1,10 +1,13 @@
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::base::{triples_of_unsigned_vec_var_11, triples_of_unsigned_vec_var_12};
+use inputs::base::{
+    triples_of_unsigned_vec_var_11, triples_of_unsigned_vec_var_12, triples_of_unsigned_vec_var_13,
+};
 use inputs::natural::{nrm_pairs_of_naturals, pairs_of_naturals, rm_pairs_of_naturals};
 use malachite_base::num::SignificantBits;
 use malachite_nz::natural::arithmetic::mul::{
     _limbs_mul_to_out_basecase, _limbs_mul_to_out_toom_22, _limbs_mul_to_out_toom_22_scratch_size,
-    _limbs_mul_to_out_toom_32, _limbs_mul_to_out_toom_32_scratch_size,
+    _limbs_mul_to_out_toom_32, _limbs_mul_to_out_toom_32_scratch_size, _limbs_mul_to_out_toom_33,
+    _limbs_mul_to_out_toom_33_scratch_size,
 };
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
@@ -23,6 +26,11 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
         registry,
         Large,
         benchmark_limbs_mul_to_out_toom_32_algorithms
+    );
+    register_bench!(
+        registry,
+        Large,
+        benchmark_limbs_mul_to_out_toom_33_algorithms
     );
     register_bench!(
         registry,
@@ -142,6 +150,38 @@ fn benchmark_limbs_mul_to_out_toom_32_algorithms(
                     let mut scratch =
                         vec![0; _limbs_mul_to_out_toom_32_scratch_size(xs.len(), ys.len())];
                     _limbs_mul_to_out_toom_32(&mut out_limbs, &xs, &ys, &mut scratch)
+                }),
+            ),
+        ],
+    );
+}
+
+fn benchmark_limbs_mul_to_out_toom_33_algorithms(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "limbs_mul_to_out(&mut [u32], &[u32], &[u32])",
+        BenchmarkType::Algorithms,
+        triples_of_unsigned_vec_var_13(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(_, ref xs, ref ys)| xs.len() + ys.len()),
+        "x.len() + y.len()",
+        &mut [
+            (
+                "basecase",
+                &mut (|(mut out_limbs, xs, ys)| {
+                    _limbs_mul_to_out_basecase(&mut out_limbs, &xs, &ys)
+                }),
+            ),
+            (
+                "Toom32",
+                &mut (|(mut out_limbs, xs, ys)| {
+                    let mut scratch = vec![0; _limbs_mul_to_out_toom_33_scratch_size(xs.len())];
+                    _limbs_mul_to_out_toom_33(&mut out_limbs, &xs, &ys, &mut scratch)
                 }),
             ),
         ],
