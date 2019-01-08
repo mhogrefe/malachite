@@ -33,9 +33,8 @@ const INVERT_LIMB_TABLE: [u8; INVERT_LIMB_TABLE_SIZE] = [
 /// test_invert_limb_table();
 /// ```
 pub fn test_invert_limb_table() {
-    for i in 0..INVERT_LIMB_TABLE_SIZE {
+    for (i, &inverse) in INVERT_LIMB_TABLE.iter().enumerate() {
         let value = ((i as u8) << 1) + 1;
-        let inverse = INVERT_LIMB_TABLE[i];
         let product = value.wrapping_mul(inverse);
         assert_eq!(
             product, 1,

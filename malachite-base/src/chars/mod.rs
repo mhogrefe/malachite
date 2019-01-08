@@ -121,6 +121,7 @@ impl Walkable for char {
     /// c.decrement();
     /// assert_eq!(c, 'a');
     /// ```
+    #[allow(clippy::panic_params)]
     fn decrement(&mut self) {
         if *self == '\u{0}' {
             panic!("Cannot decrement char '\\u{0}'");

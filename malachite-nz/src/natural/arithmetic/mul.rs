@@ -70,7 +70,7 @@ pub fn mpn_bc_mulmod_bnp1(rp: &mut [u32], ap: &[u32], bp: &[u32], tp: &mut [u32]
             0
         };
     rp[rn] = 0;
-    limbs_slice_add_limb_in_place(&mut rp[..rn + 1], cy);
+    limbs_slice_add_limb_in_place(&mut rp[..=rn], cy);
 }
 
 //TODO PASTE A
@@ -210,85 +210,97 @@ const MUL_FFT_TABLE3: [FFTTableNK; FFT_TABLE3_SIZE] = [
     FFTTableNK { n: 959, k: 14 },
     FFTTableNK { n: 255, k: 13 },
     FFTTableNK { n: 511, k: 12 },
-    FFTTableNK { n: 1023, k: 13 },
+    FFTTableNK { n: 1_023, k: 13 },
     FFTTableNK { n: 575, k: 12 },
-    FFTTableNK { n: 1215, k: 13 },
+    FFTTableNK { n: 1_215, k: 13 },
     FFTTableNK { n: 639, k: 12 },
-    FFTTableNK { n: 1279, k: 13 },
+    FFTTableNK { n: 1_279, k: 13 },
     FFTTableNK { n: 703, k: 14 },
     FFTTableNK { n: 383, k: 13 },
     FFTTableNK { n: 831, k: 12 },
-    FFTTableNK { n: 1663, k: 13 },
+    FFTTableNK { n: 1_663, k: 13 },
     FFTTableNK { n: 959, k: 15 },
     FFTTableNK { n: 255, k: 14 },
     FFTTableNK { n: 511, k: 13 },
-    FFTTableNK { n: 1087, k: 12 },
-    FFTTableNK { n: 2175, k: 13 },
-    FFTTableNK { n: 1215, k: 14 },
+    FFTTableNK { n: 1_087, k: 12 },
+    FFTTableNK { n: 2_175, k: 13 },
+    FFTTableNK { n: 1_215, k: 14 },
     FFTTableNK { n: 639, k: 13 },
-    FFTTableNK { n: 1343, k: 12 },
-    FFTTableNK { n: 2687, k: 13 },
-    FFTTableNK { n: 1407, k: 14 },
+    FFTTableNK { n: 1_343, k: 12 },
+    FFTTableNK { n: 2_687, k: 13 },
+    FFTTableNK { n: 1_407, k: 14 },
     FFTTableNK { n: 767, k: 13 },
-    FFTTableNK { n: 1535, k: 12 },
-    FFTTableNK { n: 3199, k: 13 },
-    FFTTableNK { n: 1663, k: 14 },
+    FFTTableNK { n: 1_535, k: 12 },
+    FFTTableNK { n: 3_199, k: 13 },
+    FFTTableNK { n: 1_663, k: 14 },
     FFTTableNK { n: 895, k: 15 },
     FFTTableNK { n: 511, k: 14 },
-    FFTTableNK { n: 1023, k: 13 },
-    FFTTableNK { n: 2175, k: 14 },
-    FFTTableNK { n: 1151, k: 13 },
-    FFTTableNK { n: 2303, k: 12 },
-    FFTTableNK { n: 4607, k: 13 },
-    FFTTableNK { n: 2431, k: 12 },
-    FFTTableNK { n: 4863, k: 14 },
-    FFTTableNK { n: 1279, k: 13 },
-    FFTTableNK { n: 2687, k: 14 },
-    FFTTableNK { n: 1407, k: 15 },
+    FFTTableNK { n: 1_023, k: 13 },
+    FFTTableNK { n: 2_175, k: 14 },
+    FFTTableNK { n: 1_151, k: 13 },
+    FFTTableNK { n: 2_303, k: 12 },
+    FFTTableNK { n: 4_607, k: 13 },
+    FFTTableNK { n: 2_431, k: 12 },
+    FFTTableNK { n: 4_863, k: 14 },
+    FFTTableNK { n: 1_279, k: 13 },
+    FFTTableNK { n: 2_687, k: 14 },
+    FFTTableNK { n: 1_407, k: 15 },
     FFTTableNK { n: 767, k: 14 },
-    FFTTableNK { n: 1535, k: 13 },
-    FFTTableNK { n: 3199, k: 14 },
-    FFTTableNK { n: 1663, k: 13 },
-    FFTTableNK { n: 3327, k: 12 },
-    FFTTableNK { n: 6655, k: 13 },
-    FFTTableNK { n: 3455, k: 12 },
-    FFTTableNK { n: 6911, k: 14 },
-    FFTTableNK { n: 1791, k: 16 },
+    FFTTableNK { n: 1_535, k: 13 },
+    FFTTableNK { n: 3_199, k: 14 },
+    FFTTableNK { n: 1_663, k: 13 },
+    FFTTableNK { n: 3_327, k: 12 },
+    FFTTableNK { n: 6_655, k: 13 },
+    FFTTableNK { n: 3_455, k: 12 },
+    FFTTableNK { n: 6_911, k: 14 },
+    FFTTableNK { n: 1_791, k: 16 },
     FFTTableNK { n: 511, k: 15 },
-    FFTTableNK { n: 1023, k: 14 },
-    FFTTableNK { n: 2175, k: 13 },
-    FFTTableNK { n: 4351, k: 12 },
-    FFTTableNK { n: 8703, k: 14 },
-    FFTTableNK { n: 2303, k: 13 },
-    FFTTableNK { n: 4607, k: 14 },
-    FFTTableNK { n: 2431, k: 13 },
-    FFTTableNK { n: 4863, k: 15 },
-    FFTTableNK { n: 1279, k: 14 },
-    FFTTableNK { n: 2815, k: 13 },
-    FFTTableNK { n: 5631, k: 14 },
-    FFTTableNK { n: 2943, k: 13 },
-    FFTTableNK { n: 5887, k: 12 },
-    FFTTableNK { n: 11775, k: 15 },
-    FFTTableNK { n: 1535, k: 14 },
-    FFTTableNK { n: 3199, k: 13 },
-    FFTTableNK { n: 6399, k: 14 },
-    FFTTableNK { n: 3327, k: 13 },
-    FFTTableNK { n: 6655, k: 14 },
-    FFTTableNK { n: 3455, k: 13 },
-    FFTTableNK { n: 6911, k: 15 },
-    FFTTableNK { n: 1791, k: 14 },
-    FFTTableNK { n: 3583, k: 13 },
-    FFTTableNK { n: 7167, k: 14 },
-    FFTTableNK { n: 3839, k: 13 },
-    FFTTableNK { n: 7679, k: 16 },
-    FFTTableNK { n: 65536, k: 17 },
-    FFTTableNK { n: 131072, k: 18 },
-    FFTTableNK { n: 262144, k: 19 },
-    FFTTableNK { n: 524288, k: 20 },
-    FFTTableNK { n: 1048576, k: 21 },
-    FFTTableNK { n: 2097152, k: 22 },
-    FFTTableNK { n: 4194304, k: 23 },
-    FFTTableNK { n: 8388608, k: 24 },
+    FFTTableNK { n: 1_023, k: 14 },
+    FFTTableNK { n: 2_175, k: 13 },
+    FFTTableNK { n: 4_351, k: 12 },
+    FFTTableNK { n: 8_703, k: 14 },
+    FFTTableNK { n: 2_303, k: 13 },
+    FFTTableNK { n: 4_607, k: 14 },
+    FFTTableNK { n: 2_431, k: 13 },
+    FFTTableNK { n: 4_863, k: 15 },
+    FFTTableNK { n: 1_279, k: 14 },
+    FFTTableNK { n: 2_815, k: 13 },
+    FFTTableNK { n: 5_631, k: 14 },
+    FFTTableNK { n: 2_943, k: 13 },
+    FFTTableNK { n: 5_887, k: 12 },
+    FFTTableNK { n: 11_775, k: 15 },
+    FFTTableNK { n: 1_535, k: 14 },
+    FFTTableNK { n: 3_199, k: 13 },
+    FFTTableNK { n: 6_399, k: 14 },
+    FFTTableNK { n: 3_327, k: 13 },
+    FFTTableNK { n: 6_655, k: 14 },
+    FFTTableNK { n: 3_455, k: 13 },
+    FFTTableNK { n: 6_911, k: 15 },
+    FFTTableNK { n: 1_791, k: 14 },
+    FFTTableNK { n: 3_583, k: 13 },
+    FFTTableNK { n: 7_167, k: 14 },
+    FFTTableNK { n: 3_839, k: 13 },
+    FFTTableNK { n: 7_679, k: 16 },
+    FFTTableNK { n: 65_536, k: 17 },
+    FFTTableNK { n: 131_072, k: 18 },
+    FFTTableNK { n: 262_144, k: 19 },
+    FFTTableNK { n: 524_288, k: 20 },
+    FFTTableNK {
+        n: 1_048_576,
+        k: 21,
+    },
+    FFTTableNK {
+        n: 2_097_152,
+        k: 22,
+    },
+    FFTTableNK {
+        n: 4_194_304,
+        k: 23,
+    },
+    FFTTableNK {
+        n: 8_388_608,
+        k: 24,
+    },
 ];
 
 // from mpn/*/*/gmp-mparam.h
@@ -409,83 +421,95 @@ const SQR_FFT_TABLE3: [FFTTableNK; FFT_TABLE3_SIZE] = [
     FFTTableNK { n: 959, k: 14 },
     FFTTableNK { n: 255, k: 13 },
     FFTTableNK { n: 511, k: 12 },
-    FFTTableNK { n: 1023, k: 13 },
+    FFTTableNK { n: 1_023, k: 13 },
     FFTTableNK { n: 575, k: 12 },
-    FFTTableNK { n: 1215, k: 13 },
+    FFTTableNK { n: 1_215, k: 13 },
     FFTTableNK { n: 639, k: 12 },
-    FFTTableNK { n: 1279, k: 13 },
+    FFTTableNK { n: 1_279, k: 13 },
     FFTTableNK { n: 703, k: 14 },
     FFTTableNK { n: 383, k: 13 },
     FFTTableNK { n: 831, k: 12 },
-    FFTTableNK { n: 1663, k: 13 },
+    FFTTableNK { n: 1_663, k: 13 },
     FFTTableNK { n: 959, k: 15 },
     FFTTableNK { n: 255, k: 14 },
     FFTTableNK { n: 511, k: 13 },
-    FFTTableNK { n: 1087, k: 12 },
-    FFTTableNK { n: 2175, k: 13 },
-    FFTTableNK { n: 1215, k: 14 },
+    FFTTableNK { n: 1_087, k: 12 },
+    FFTTableNK { n: 2_175, k: 13 },
+    FFTTableNK { n: 1_215, k: 14 },
     FFTTableNK { n: 639, k: 13 },
-    FFTTableNK { n: 1343, k: 12 },
-    FFTTableNK { n: 2687, k: 13 },
-    FFTTableNK { n: 1407, k: 12 },
-    FFTTableNK { n: 2815, k: 14 },
+    FFTTableNK { n: 1_343, k: 12 },
+    FFTTableNK { n: 2_687, k: 13 },
+    FFTTableNK { n: 1_407, k: 12 },
+    FFTTableNK { n: 2_815, k: 14 },
     FFTTableNK { n: 767, k: 13 },
-    FFTTableNK { n: 1535, k: 12 },
-    FFTTableNK { n: 3199, k: 13 },
-    FFTTableNK { n: 1663, k: 14 },
+    FFTTableNK { n: 1_535, k: 12 },
+    FFTTableNK { n: 3_199, k: 13 },
+    FFTTableNK { n: 1_663, k: 14 },
     FFTTableNK { n: 895, k: 15 },
     FFTTableNK { n: 511, k: 14 },
-    FFTTableNK { n: 1023, k: 13 },
-    FFTTableNK { n: 2175, k: 14 },
-    FFTTableNK { n: 1151, k: 13 },
-    FFTTableNK { n: 2303, k: 12 },
-    FFTTableNK { n: 4607, k: 13 },
-    FFTTableNK { n: 2431, k: 12 },
-    FFTTableNK { n: 4863, k: 14 },
-    FFTTableNK { n: 1279, k: 13 },
-    FFTTableNK { n: 2687, k: 14 },
-    FFTTableNK { n: 1407, k: 15 },
+    FFTTableNK { n: 1_023, k: 13 },
+    FFTTableNK { n: 2_175, k: 14 },
+    FFTTableNK { n: 1_151, k: 13 },
+    FFTTableNK { n: 2_303, k: 12 },
+    FFTTableNK { n: 4_607, k: 13 },
+    FFTTableNK { n: 2_431, k: 12 },
+    FFTTableNK { n: 4_863, k: 14 },
+    FFTTableNK { n: 1_279, k: 13 },
+    FFTTableNK { n: 2_687, k: 14 },
+    FFTTableNK { n: 1_407, k: 15 },
     FFTTableNK { n: 767, k: 14 },
-    FFTTableNK { n: 1535, k: 13 },
-    FFTTableNK { n: 3199, k: 14 },
-    FFTTableNK { n: 1663, k: 13 },
-    FFTTableNK { n: 3327, k: 12 },
-    FFTTableNK { n: 6655, k: 13 },
-    FFTTableNK { n: 3455, k: 14 },
-    FFTTableNK { n: 1791, k: 16 },
+    FFTTableNK { n: 1_535, k: 13 },
+    FFTTableNK { n: 3_199, k: 14 },
+    FFTTableNK { n: 1_663, k: 13 },
+    FFTTableNK { n: 3_327, k: 12 },
+    FFTTableNK { n: 6_655, k: 13 },
+    FFTTableNK { n: 3_455, k: 14 },
+    FFTTableNK { n: 1_791, k: 16 },
     FFTTableNK { n: 511, k: 15 },
-    FFTTableNK { n: 1023, k: 14 },
-    FFTTableNK { n: 2175, k: 13 },
-    FFTTableNK { n: 4351, k: 12 },
-    FFTTableNK { n: 8703, k: 14 },
-    FFTTableNK { n: 2303, k: 13 },
-    FFTTableNK { n: 4607, k: 14 },
-    FFTTableNK { n: 2431, k: 13 },
-    FFTTableNK { n: 4863, k: 15 },
-    FFTTableNK { n: 1279, k: 14 },
-    FFTTableNK { n: 2815, k: 13 },
-    FFTTableNK { n: 5631, k: 14 },
-    FFTTableNK { n: 2943, k: 13 },
-    FFTTableNK { n: 5887, k: 12 },
-    FFTTableNK { n: 11775, k: 15 },
-    FFTTableNK { n: 1535, k: 14 },
-    FFTTableNK { n: 3199, k: 13 },
-    FFTTableNK { n: 6399, k: 14 },
-    FFTTableNK { n: 3327, k: 13 },
-    FFTTableNK { n: 6655, k: 14 },
-    FFTTableNK { n: 3455, k: 15 },
-    FFTTableNK { n: 1791, k: 14 },
-    FFTTableNK { n: 3583, k: 13 },
-    FFTTableNK { n: 7167, k: 14 },
-    FFTTableNK { n: 3839, k: 16 },
-    FFTTableNK { n: 65536, k: 17 },
-    FFTTableNK { n: 131072, k: 18 },
-    FFTTableNK { n: 262144, k: 19 },
-    FFTTableNK { n: 524288, k: 20 },
-    FFTTableNK { n: 1048576, k: 21 },
-    FFTTableNK { n: 2097152, k: 22 },
-    FFTTableNK { n: 4194304, k: 23 },
-    FFTTableNK { n: 8388608, k: 24 },
+    FFTTableNK { n: 1_023, k: 14 },
+    FFTTableNK { n: 2_175, k: 13 },
+    FFTTableNK { n: 4_351, k: 12 },
+    FFTTableNK { n: 8_703, k: 14 },
+    FFTTableNK { n: 2_303, k: 13 },
+    FFTTableNK { n: 4_607, k: 14 },
+    FFTTableNK { n: 2_431, k: 13 },
+    FFTTableNK { n: 4_863, k: 15 },
+    FFTTableNK { n: 1_279, k: 14 },
+    FFTTableNK { n: 2_815, k: 13 },
+    FFTTableNK { n: 5_631, k: 14 },
+    FFTTableNK { n: 2_943, k: 13 },
+    FFTTableNK { n: 5_887, k: 12 },
+    FFTTableNK { n: 11_775, k: 15 },
+    FFTTableNK { n: 1_535, k: 14 },
+    FFTTableNK { n: 3_199, k: 13 },
+    FFTTableNK { n: 6_399, k: 14 },
+    FFTTableNK { n: 3_327, k: 13 },
+    FFTTableNK { n: 6_655, k: 14 },
+    FFTTableNK { n: 3_455, k: 15 },
+    FFTTableNK { n: 1_791, k: 14 },
+    FFTTableNK { n: 3_583, k: 13 },
+    FFTTableNK { n: 7_167, k: 14 },
+    FFTTableNK { n: 3_839, k: 16 },
+    FFTTableNK { n: 65_536, k: 17 },
+    FFTTableNK { n: 131_072, k: 18 },
+    FFTTableNK { n: 262_144, k: 19 },
+    FFTTableNK { n: 524_288, k: 20 },
+    FFTTableNK {
+        n: 1_048_576,
+        k: 21,
+    },
+    FFTTableNK {
+        n: 2_097_152,
+        k: 22,
+    },
+    FFTTableNK {
+        n: 4_194_304,
+        k: 23,
+    },
+    FFTTableNK {
+        n: 8_388_608,
+        k: 24,
+    },
 ];
 
 const MPN_FFT_TABLE_3: [[FFTTableNK; FFT_TABLE3_SIZE]; 2] = [MUL_FFT_TABLE3, SQR_FFT_TABLE3];
@@ -611,14 +635,16 @@ pub enum Toom6Flags {
     Toom6AllPos,
     Toom6Vm1Neg,
     Toom6Vm2Neg,
+    Unknown,
 }
 
 impl Toom6Flags {
-    pub fn to_u32(&self) -> u32 {
-        match *self {
+    pub fn into_u32(self) -> u32 {
+        match self {
             Toom6Flags::Toom6AllPos => 0,
             Toom6Flags::Toom6Vm1Neg => 1,
             Toom6Flags::Toom6Vm2Neg => 2,
+            Toom6Flags::Unknown => 3,
         }
     }
 
@@ -627,6 +653,7 @@ impl Toom6Flags {
             0 => Toom6Flags::Toom6AllPos,
             1 => Toom6Flags::Toom6Vm1Neg,
             2 => Toom6Flags::Toom6Vm2Neg,
+            3 => Toom6Flags::Unknown,
             _ => panic!(),
         }
     }
@@ -658,8 +685,9 @@ impl Toom6Flags {
 // instruction set", and a final saving of an operation by interlacing
 // interpolation and recomposition phases.
 //
-// mpn_toom_interpolate_6pts from mpn/generic/mpn_toom_interpolate_6pts.c
-pub fn mpn_toom_interpolate_6pts(
+// This is mpn_toom_interpolate_6pts from mpn/generic/mpn_toom_interpolate_6pts.c.
+#[allow(clippy::cyclomatic_complexity)]
+pub fn _limbs_mul_toom_interpolate_6_points(
     pp: &mut [u32],
     n: usize,
     flags: Toom6Flags,
@@ -670,7 +698,7 @@ pub fn mpn_toom_interpolate_6pts(
 ) {
     assert_ne!(n, 0);
     assert!(2 * n >= w0n && w0n > 0);
-
+    let limit = 2 * n + 1;
     {
         let (w5, remainder) = pp.split_at_mut(2 * n);
         let (w3, _) = remainder.split_at_mut(3 * n);
@@ -690,12 +718,12 @@ pub fn mpn_toom_interpolate_6pts(
         // W2 = W2 - W0
         //
         // W2 =(W1 - W2)>>2
-        if (flags.to_u32() & Toom6Flags::Toom6Vm2Neg.to_u32()) != 0 {
-            limbs_slice_add_same_length_in_place_left(&mut w2[..2 * n + 1], &w1[..2 * n + 1]);
+        if (flags.into_u32() & Toom6Flags::Toom6Vm2Neg.into_u32()) != 0 {
+            limbs_slice_add_same_length_in_place_left(&mut w2[..limit], &w1[..limit]);
         } else {
-            limbs_sub_same_length_in_place_right(&w1[..2 * n + 1], &mut w2[..2 * n + 1]);
+            limbs_sub_same_length_in_place_right(&w1[..limit], &mut w2[..limit]);
         }
-        limbs_slice_shr_in_place(&mut w2[..2 * n + 1], 2);
+        limbs_slice_shr_in_place(&mut w2[..limit], 2);
 
         // W1 =(W1 - W5)>>1
         let local_borrow = if limbs_sub_same_length_in_place_left(&mut w1[..2 * n], &w5[..2 * n]) {
@@ -704,27 +732,27 @@ pub fn mpn_toom_interpolate_6pts(
             0
         };
         w1[2 * n].wrapping_sub_assign(local_borrow);
-        limbs_slice_shr_in_place(&mut w1[..2 * n + 1], 1);
+        limbs_slice_shr_in_place(&mut w1[..limit], 1);
 
         // W1 =(W1 - W2)>>1
-        limbs_sub_same_length_in_place_left(&mut w1[..2 * n + 1], &w2[..2 * n + 1]);
-        limbs_slice_shr_in_place(&mut w1[..2 * n + 1], 1);
+        limbs_sub_same_length_in_place_left(&mut w1[..limit], &w2[..limit]);
+        limbs_slice_shr_in_place(&mut w1[..limit], 1);
 
         //W4 =(W3 - W4)>>1
-        if (flags.to_u32() & Toom6Flags::Toom6Vm1Neg.to_u32()) != 0 {
-            limbs_slice_add_same_length_in_place_left(&mut w4[..2 * n + 1], &w3[..2 * n + 1]);
-            limbs_slice_shr_in_place(&mut w4[..2 * n + 1], 1);
+        if (flags.into_u32() & Toom6Flags::Toom6Vm1Neg.into_u32()) != 0 {
+            limbs_slice_add_same_length_in_place_left(&mut w4[..limit], &w3[..limit]);
+            limbs_slice_shr_in_place(&mut w4[..limit], 1);
         } else {
-            limbs_sub_same_length_in_place_right(&w3[..2 * n + 1], &mut w4[..2 * n + 1]);
-            limbs_slice_shr_in_place(&mut w4[..2 * n + 1], 1);
+            limbs_sub_same_length_in_place_right(&w3[..limit], &mut w4[..limit]);
+            limbs_slice_shr_in_place(&mut w4[..limit], 1);
         }
 
         // W2 =(W2 - W4)/3
-        limbs_sub_same_length_in_place_left(&mut w2[..2 * n + 1], &w4[..2 * n + 1]);
-        limbs_div_exact_3_in_place(&mut w2[..2 * n + 1]);
+        limbs_sub_same_length_in_place_left(&mut w2[..limit], &w4[..limit]);
+        limbs_div_exact_3_in_place(&mut w2[..limit]);
 
         // W3 = W3 - W4 - W5
-        limbs_sub_same_length_in_place_left(&mut w3[..2 * n + 1], &w4[..2 * n + 1]);
+        limbs_sub_same_length_in_place_left(&mut w3[..limit], &w4[..limit]);
         let local_borrow = if limbs_sub_same_length_in_place_left(&mut w3[..2 * n], &w5[..2 * n]) {
             1
         } else {
@@ -733,8 +761,8 @@ pub fn mpn_toom_interpolate_6pts(
         w3[2 * n].wrapping_sub_assign(local_borrow);
 
         // W1 =(W1 - W3)/3
-        limbs_sub_same_length_in_place_left(&mut w1[..2 * n + 1], &w3[..2 * n + 1]);
-        limbs_div_exact_3_in_place(&mut w1[..2 * n + 1]);
+        limbs_sub_same_length_in_place_left(&mut w1[..limit], &w3[..limit]);
+        limbs_div_exact_3_in_place(&mut w1[..limit]);
     }
     // [1 0 0 0 0 0;
     //  0 1 0 0 0 0;
@@ -755,14 +783,13 @@ pub fn mpn_toom_interpolate_6pts(
     //             ||-H w1  |-L w1  |
     //          |-H w0  |-L w0 ||-H w2  |-L w2  |
     //
-    let mut cy =
-        if limbs_slice_add_same_length_in_place_left(&mut pp[n..3 * n + 1], &w4[..2 * n + 1]) {
-            1
-        } else {
-            0
-        };
+    let mut cy = if limbs_slice_add_same_length_in_place_left(&mut pp[n..=3 * n], &w4[..limit]) {
+        1
+    } else {
+        0
+    };
     assert!(!limbs_slice_add_limb_in_place(
-        &mut pp[3 * n + 1..4 * n + 1],
+        &mut pp[3 * n + 1..=4 * n],
         cy
     ));
 
@@ -777,7 +804,7 @@ pub fn mpn_toom_interpolate_6pts(
         } else {
             0
         };
-        assert!(!limbs_sub_limb_in_place(&mut w2[w0n..2 * n + 1], cy));
+        assert!(!limbs_sub_limb_in_place(&mut w2[w0n..limit], cy));
     }
 
     // W4L = W4L - W2L
@@ -789,7 +816,7 @@ pub fn mpn_toom_interpolate_6pts(
     {
         let (_, remainder) = pp.split_at_mut(2 * n);
         let (w3, _) = remainder.split_at_mut(3 * n);
-        assert!(!limbs_sub_limb_in_place(&mut w3[..2 * n + 1], cy));
+        assert!(!limbs_sub_limb_in_place(&mut w3[..limit], cy));
     }
 
     let local_carry = if limbs_slice_add_same_length_in_place_left(&mut pp[3 * n..4 * n], &w2[..n])
@@ -812,7 +839,7 @@ pub fn mpn_toom_interpolate_6pts(
         } else {
             0
         };
-    assert!(!limbs_slice_add_limb_in_place(&mut w1[n..2 * n + 1], cy));
+    assert!(!limbs_slice_add_limb_in_place(&mut w1[n..limit], cy));
     let cy6;
     {
         let (_, remainder) = pp.split_at_mut(2 * n);
@@ -825,12 +852,10 @@ pub fn mpn_toom_interpolate_6pts(
                 } else {
                     0
                 }
+        } else if limbs_slice_add_same_length_in_place_left(&mut w0[..w0n], &w1[n..n + w0n]) {
+            1
         } else {
-            if limbs_slice_add_same_length_in_place_left(&mut w0[..w0n], &w1[n..n + w0n]) {
-                1
-            } else {
-                0
-            }
+            0
         };
     }
 
@@ -851,7 +876,7 @@ pub fn mpn_toom_interpolate_6pts(
     {
         let (_, remainder) = pp.split_at_mut(2 * n);
         let (_, w0) = remainder.split_at_mut(3 * n);
-        embankment = w0[w0n - 1] - 1;
+        embankment = w0[w0n - 1].wrapping_sub(1);
         w0[w0n - 1] = 1;
     }
     if w0n > n {
@@ -986,25 +1011,26 @@ pub fn mpn_toom_eval_pm2(
     }
     tp[n] = cy;
 
+    let limit = n + 1;
     if (k & 1) != 0 {
-        assert_eq!(limbs_slice_shl_in_place(&mut tp[..n + 1], 1), 0);
+        assert_eq!(limbs_slice_shl_in_place(&mut tp[..limit], 1), 0);
     } else {
-        assert_eq!(limbs_slice_shl_in_place(&mut xp2[..n + 1], 1), 0);
+        assert_eq!(limbs_slice_shl_in_place(&mut xp2[..limit], 1), 0);
     }
 
-    let mut neg = if limbs_cmp_same_length(&xp2[..n + 1], &tp[..n + 1]) == Ordering::Less {
+    let mut neg = if limbs_cmp_same_length(&xp2[..limit], &tp[..limit]) == Ordering::Less {
         u32::MAX
     } else {
         0
     };
 
     if neg != 0 {
-        limbs_sub_same_length_to_out(xm2, &tp[..n + 1], &xp2[..n + 1]);
+        limbs_sub_same_length_to_out(xm2, &tp[..limit], &xp2[..limit]);
     } else {
-        limbs_sub_same_length_to_out(xm2, &xp2[..n + 1], &tp[..n + 1]);
+        limbs_sub_same_length_to_out(xm2, &xp2[..limit], &tp[..limit]);
     }
 
-    limbs_slice_add_same_length_in_place_left(&mut xp2[..n + 1], &tp[..n + 1]);
+    limbs_slice_add_same_length_in_place_left(&mut xp2[..limit], &tp[..limit]);
 
     assert!(xp2[n] < (1 << (k + 2)) - 1);
     assert!(xm2[n] < ((1 << (k + 3)) - 1 - (1 ^ k & 1)) / 3);
@@ -1018,7 +1044,7 @@ pub fn mpn_toom_eval_pm2(
 // Evaluate a degree 3 polynomial in +2 and -2
 // Needs n+1 limbs of temporary storage.
 // mpn_toom_eval_dgr3_pm2 from mpn/generic/toom_eval_dg3_pm2.c
-pub fn mpn_toom_eval_dgr3_pm2(
+pub fn _limbs_mul_toom_evaluate_deg_3_poly_in_2_and_neg_2(
     xp2: &mut [u32],
     xm2: &mut [u32],
     xp: &[u32],
@@ -1052,27 +1078,57 @@ pub fn mpn_toom_eval_dgr3_pm2(
             0
         };
     }
-    limbs_slice_shl_in_place(&mut tp[..n + 1], 1);
+    let limit = n + 1;
+    limbs_slice_shl_in_place(&mut tp[..limit], 1);
 
-    let neg = if limbs_cmp_same_length(&xp2[..n + 1], &tp[..n + 1]) == Ordering::Less {
+    let neg = if limbs_cmp_same_length(&xp2[..limit], &tp[..limit]) == Ordering::Less {
         u32::MAX
     } else {
         0
     };
     if neg != 0 {
-        limbs_sub_same_length_to_out(xm2, &tp[..n + 1], &xp2[..n + 1]);
+        limbs_sub_same_length_to_out(xm2, &tp[..limit], &xp2[..limit]);
     } else {
-        limbs_sub_same_length_to_out(xm2, &xp2[..n + 1], &tp[..n + 1]);
+        limbs_sub_same_length_to_out(xm2, &xp2[..limit], &tp[..limit]);
     }
-    limbs_slice_add_same_length_in_place_left(&mut xp2[..n + 1], &tp[..n + 1]);
+    limbs_slice_add_same_length_in_place_left(&mut xp2[..limit], &tp[..limit]);
     assert!(xp2[n] < 15);
     assert!(xm2[n] < 10);
     neg
 }
 
+/// This function can be used to determine whether the sizes of the input slices to
+/// `_limbs_mul_to_out_toom_43` are valid.
+pub fn _limbs_mul_to_out_toom_43_input_sizes_valid(xs_len: usize, ys_len: usize) -> bool {
+    if ys_len == 0 || xs_len < ys_len {
+        return false;
+    }
+    let n = 1 + if 3 * xs_len >= 4 * ys_len {
+        (xs_len - 1) >> 2
+    } else {
+        (ys_len - 1) / 3
+    };
+    let s = xs_len - 3 * n;
+    let t = ys_len - 2 * n;
+    0 < s && s <= n && 0 < t && t <= n && s + t >= 5
+}
+
+/// This function can be used to determine the length of the input `scratch` slice in
+/// `_limbs_mul_to_out_toom_43`.
+///
+/// This is mpn_toom43_mul_itch from gmp-impl.h.
+pub fn _limbs_mul_to_out_toom_43_scratch_size(xs_len: usize, ys_len: usize) -> usize {
+    let n = 1 + if 3 * xs_len >= 4 * ys_len {
+        (xs_len - 1) >> 2
+    } else {
+        (ys_len - 1) / 3
+    };
+    6 * n + 4
+}
+
 //TODO test
 // docs preserved
-// mpn_toom43_mul -- Multiply {ap,an} and {bp,bn} where an is nominally 4/3 times as large as bn. Or
+// mpn_toom43_mul -- Multiply {xs,an} and {ys,bn} where an is nominally 4/3 times as large as bn. Or
 // more accurately, bn < an < 2 bn.
 //  Evaluate in: -2, -1, 0, +1, +2, +inf
 //
@@ -1090,18 +1146,18 @@ pub fn mpn_toom_eval_dgr3_pm2(
 // vinf=              a3 *         b2  # A(inf)*B(inf)
 //
 // mpn_toom43_mul from mpn/generic/toom43_mul.c
-pub fn mpn_toom43_mul(pp: &mut [u32], ap: &[u32], bp: &[u32], scratch: &mut [u32]) {
-    let an = ap.len();
-    let bn = bp.len();
+pub fn _limbs_mul_to_out_toom_43(pp: &mut [u32], xs: &[u32], ys: &[u32], scratch: &mut [u32]) {
+    let an = xs.len();
+    let bn = ys.len();
     let n = 1 + if 3 * an >= 4 * bn {
         (an - 1) >> 2
     } else {
         (bn - 1) / 3
     };
-    let a3 = &ap[3 * n..];
-    let b0 = bp;
-    let b1 = &bp[n..];
-    let b2 = &bp[2 * n..];
+    let a3 = &xs[3 * n..];
+    let b0 = ys;
+    let b1 = &ys[n..];
+    let b2 = &ys[2 * n..];
 
     let s = an - 3 * n;
     let t = bn - 2 * n;
@@ -1116,20 +1172,21 @@ pub fn mpn_toom43_mul(pp: &mut [u32], ap: &[u32], bp: &[u32], scratch: &mut [u32
     // Total scratch need is 6 * n + 3 + 1; we allocate one extra limb, because products will
     // overwrite 2n+2 limbs.
 
+    let limit = n + 1;
     let mut flags;
     {
-        let (bs1, remainder) = pp.split_at_mut(n + 1);
-        let (bsm2, remainder) = remainder.split_at_mut(n + 1);
-        let (bs2, remainder) = remainder.split_at_mut(n + 1);
-        let (as2, as1) = remainder.split_at_mut(n + 1);
+        let (bs1, remainder) = pp.split_at_mut(limit);
+        let (bsm2, remainder) = remainder.split_at_mut(limit);
+        let (bs2, remainder) = remainder.split_at_mut(limit);
+        let (as2, as1) = remainder.split_at_mut(limit);
         {
             let (_, remainder) = scratch.split_at_mut(2 * n + 2);
-            let (bsm1, remainder) = remainder.split_at_mut(n + 1);
-            let (asm1, asm2) = remainder.split_at_mut(n + 1);
+            let (bsm1, remainder) = remainder.split_at_mut(limit);
+            let (asm1, asm2) = remainder.split_at_mut(limit);
             // Compute as2 and asm2.
             flags = Toom6Flags::from_u32(
-                Toom6Flags::Toom6Vm2Neg.to_u32()
-                    & mpn_toom_eval_dgr3_pm2(as2, asm2, ap, n, s, asm1),
+                Toom6Flags::Toom6Vm2Neg.into_u32()
+                    & _limbs_mul_toom_evaluate_deg_3_poly_in_2_and_neg_2(as2, asm2, xs, n, s, asm1),
             );
 
             // Compute bs2 and bsm2.
@@ -1151,24 +1208,24 @@ pub fn mpn_toom43_mul(pp: &mut [u32], ap: &[u32], bp: &[u32], scratch: &mut [u32
         scratch[n] = cy;
 
         let (small_scratch, remainder) = scratch.split_at_mut(2 * n + 2);
-        let (bsm1, remainder) = remainder.split_at_mut(n + 1);
-        let (asm1, asm2) = remainder.split_at_mut(n + 1);
-        limbs_add_same_length_to_out(bs2, &small_scratch[..n + 1], &bsm1[..n + 1]);
-        if limbs_cmp_same_length(&small_scratch[..n + 1], &bsm1[..n + 1]) == Ordering::Less {
-            limbs_sub_same_length_to_out(bsm2, &bsm1[..n + 1], &small_scratch[..n + 1]);
-            flags = Toom6Flags::from_u32(flags.to_u32() ^ Toom6Flags::Toom6Vm2Neg.to_u32());
+        let (bsm1, remainder) = remainder.split_at_mut(limit);
+        let (asm1, asm2) = remainder.split_at_mut(limit);
+        limbs_add_same_length_to_out(bs2, &small_scratch[..limit], &bsm1[..limit]);
+        if limbs_cmp_same_length(&small_scratch[..limit], &bsm1[..limit]) == Ordering::Less {
+            limbs_sub_same_length_to_out(bsm2, &bsm1[..limit], &small_scratch[..limit]);
+            flags = Toom6Flags::from_u32(flags.into_u32() ^ Toom6Flags::Toom6Vm2Neg.into_u32());
         } else {
-            limbs_sub_same_length_to_out(bsm2, &small_scratch[..n + 1], &bsm1[..n + 1]);
+            limbs_sub_same_length_to_out(bsm2, &small_scratch[..limit], &bsm1[..limit]);
         }
 
         // Compute as1 and asm1.
         flags = Toom6Flags::from_u32(
-            flags.to_u32()
-                ^ (Toom6Flags::Toom6Vm1Neg.to_u32()
+            flags.into_u32()
+                ^ (Toom6Flags::Toom6Vm1Neg.into_u32()
                     & if _limbs_mul_toom_evaluate_deg_3_poly_in_1_and_neg_1(
                         as1,
                         asm1,
-                        ap,
+                        xs,
                         n,
                         s,
                         small_scratch,
@@ -1193,7 +1250,7 @@ pub fn mpn_toom43_mul(pp: &mut [u32], ap: &[u32], bp: &[u32], scratch: &mut [u32
             };
         if bsm1[n] == 0 && limbs_cmp_same_length(&bsm1[..n], &b1[..n]) == Ordering::Less {
             limbs_sub_same_length_in_place_right(&b1[..n], &mut bsm1[..n]);
-            flags = Toom6Flags::from_u32(flags.to_u32() ^ Toom6Flags::Toom6Vm1Neg.to_u32());
+            flags = Toom6Flags::from_u32(flags.into_u32() ^ Toom6Flags::Toom6Vm1Neg.into_u32());
         } else {
             bsm1[n] -= if limbs_sub_same_length_in_place_left(&mut bsm1[..n], &b1[..n]) {
                 1
@@ -1214,36 +1271,36 @@ pub fn mpn_toom43_mul(pp: &mut [u32], ap: &[u32], bp: &[u32], scratch: &mut [u32
 
     {
         let (vm1, remainder) = scratch.split_at_mut(2 * n + 2);
-        let (bsm1, asm1) = remainder.split_at_mut(n + 1);
+        let (bsm1, asm1) = remainder.split_at_mut(limit);
         // vm1, 2n+1 limbs
-        mpn_mul_n(vm1, &asm1[..n + 1], &bsm1[..n + 1]); // W4
+        mpn_mul_n(vm1, &asm1[..limit], &bsm1[..limit]); // W4
     }
 
     {
         let (_, remainder) = scratch.split_at_mut(2 * n + 1);
         let (vm2, asm2) = remainder.split_at_mut(2 * n + 3);
-        let bsm2 = &mut pp[n + 1..];
+        let bsm2 = &mut pp[limit..];
         // vm2, 2n+1 limbs
-        mpn_mul_n(vm2, &asm2[..n + 1], &bsm2[..n + 1]); // W2
+        mpn_mul_n(vm2, &asm2[..limit], &bsm2[..limit]); // W2
     }
     {
         let (_, remainder) = scratch.split_at_mut(2 * n + 1);
         let (_, v2) = remainder.split_at_mut(2 * n + 1);
 
-        let (_, remainder) = pp.split_at_mut(n + 1);
-        let (_, remainder) = remainder.split_at_mut(n + 1);
-        let (bs2, remainder) = remainder.split_at_mut(n + 1);
-        let (as2, _) = remainder.split_at_mut(n + 1);
+        let (_, remainder) = pp.split_at_mut(limit);
+        let (_, remainder) = remainder.split_at_mut(limit);
+        let (bs2, remainder) = remainder.split_at_mut(limit);
+        let (as2, _) = remainder.split_at_mut(limit);
 
         // v2, 2n+1 limbs
-        mpn_mul_n(v2, &as2[..n + 1], &bs2[..n + 1]); // W1
+        mpn_mul_n(v2, &as2[..limit], &bs2[..limit]); // W1
     }
     {
         let (bs1, remainder) = pp.split_at_mut(2 * n);
         let (v1, as1) = remainder.split_at_mut(2 * n + 4);
 
         // v1, 2n+1 limbs
-        mpn_mul_n(v1, &as1[..n + 1], &bs1[..n + 1]); // W3
+        mpn_mul_n(v1, &as1[..limit], &bs1[..limit]); // W3
     }
     {
         let vinf = &mut pp[5 * n..];
@@ -1256,10 +1313,10 @@ pub fn mpn_toom43_mul(pp: &mut [u32], ap: &[u32], bp: &[u32], scratch: &mut [u32
     }
 
     // v0, 2n limbs
-    mpn_mul_n(pp, &ap[..n], &bp[..n]); // W5
+    mpn_mul_n(pp, &xs[..n], &ys[..n]); // W5
     let (vm1, remainder) = scratch.split_at_mut(2 * n + 1);
     let (vm2, v2) = remainder.split_at_mut(2 * n + 1);
-    mpn_toom_interpolate_6pts(pp, n, flags, vm1, vm2, v2, t + s);
+    _limbs_mul_toom_interpolate_6_points(pp, n, flags, vm1, vm2, v2, t + s);
 }
 
 /// This function can be used to determine the length of the input `scratch` slice in
@@ -1303,7 +1360,7 @@ const SMALLER_RECURSION: bool = false;
 /// This function can be used to determine whether the sizes of the input slices to
 /// `_limbs_mul_to_out_toom_33` are valid.
 pub fn _limbs_mul_to_out_toom_33_input_sizes_valid(xs_len: usize, ys_len: usize) -> bool {
-    if xs_len < ys_len {
+    if ys_len == 0 || xs_len < ys_len {
         return false;
     }
     let n = (xs_len + 2) / 3;
@@ -1351,6 +1408,7 @@ pub fn _limbs_mul_to_out_toom_33_input_sizes_valid(xs_len: usize, ys_len: usize)
 /// May panic if the input slice conditions are not met.
 ///
 /// This is mpn_toom33_mul from mpn/generic/toom33_mul.c.
+#[allow(clippy::cyclomatic_complexity)]
 pub fn _limbs_mul_to_out_toom_33(
     out_limbs: &mut [u32],
     xs: &[u32],
@@ -1384,10 +1442,11 @@ pub fn _limbs_mul_to_out_toom_33(
             let (bsm1, as1) = remainder.split_at_mut(n + 1); // bsm1 length: n + 1
 
             // Compute as1 and asm1.
-            let mut carry = 0;
-            if limbs_add_to_out(gp, xs_0, xs_2) {
-                carry = 1;
-            }
+            let mut carry = if limbs_add_to_out(gp, xs_0, xs_2) {
+                1
+            } else {
+                0
+            };
             as1[n] = carry;
             if limbs_add_same_length_to_out(as1, gp, xs_1) {
                 as1[n].wrapping_add_assign(1);
@@ -1404,10 +1463,11 @@ pub fn _limbs_mul_to_out_toom_33(
             }
 
             // Compute as2.
-            let mut carry = 0;
-            if limbs_add_same_length_to_out(as2, xs_2, &as1[..s]) {
-                carry = 1;
-            }
+            let mut carry = if limbs_add_same_length_to_out(as2, xs_2, &as1[..s]) {
+                1
+            } else {
+                0
+            };
             if s != n {
                 carry = if limbs_add_limb_to_out(&mut as2[s..], &as1[s..n], carry) {
                     1
@@ -1487,11 +1547,10 @@ pub fn _limbs_mul_to_out_toom_33(
                         carry += 1;
                     }
                 }
-                if bsm1[n] != 0 {
-                    if limbs_slice_add_same_length_in_place_left(&mut v_neg_1[n..2 * n], &asm1[..n])
-                    {
-                        carry += 1;
-                    }
+                if bsm1[n] != 0
+                    && limbs_slice_add_same_length_in_place_left(&mut v_neg_1[n..2 * n], &asm1[..n])
+                {
+                    carry += 1;
                 }
                 v_neg_1[2 * n] = carry;
             } else {
@@ -1784,7 +1843,7 @@ pub fn _limbs_mul_toom_evaluate_deg_3_poly_in_1_and_neg_1(
 /// This function can be used to determine whether the sizes of the input slices to
 /// `_limbs_mul_to_out_toom_42` are valid.
 pub fn _limbs_mul_to_out_toom_42_input_sizes_valid(xs_len: usize, ys_len: usize) -> bool {
-    if xs_len < ys_len {
+    if ys_len == 0 || xs_len < ys_len {
         return false;
     }
     let n = if xs_len >= 2 * ys_len {
@@ -2001,10 +2060,8 @@ pub fn _limbs_mul_to_out_toom_42(
         } else if as1[n] == 3 {
             carry = 3 * bs1[n] + mpn_addmul_1(v_1, &bs1[..n], 3);
         }
-        if bs1[n] != 0 {
-            if limbs_slice_add_same_length_in_place_left(v_1, &as1[..n]) {
-                carry += 1;
-            }
+        if bs1[n] != 0 && limbs_slice_add_same_length_in_place_left(v_1, &as1[..n]) {
+            carry += 1;
         }
         v_inf[0] = carry;
         // v_0, 2 * n limbs
@@ -2036,7 +2093,7 @@ pub fn _limbs_mul_same_length_to_out_toom_32_recursive(p: &mut [u32], a: &[u32],
 /// This function can be used to determine whether the sizes of the input slices to
 /// `_limbs_mul_to_out_toom_32` are valid.
 pub fn _limbs_mul_to_out_toom_32_input_sizes_valid(xs_len: usize, ys_len: usize) -> bool {
-    if xs_len < ys_len {
+    if ys_len == 0 || xs_len < ys_len {
         return false;
     }
     let n = 1 + if 2 * xs_len >= 3 * ys_len {
@@ -2523,15 +2580,14 @@ pub fn _limbs_mul_to_out_toom_22(
             } else {
                 limbs_sub_same_length_to_out(bsm1, ys0, ys1);
             }
+        } else if limbs_test_zero(&ys0[t..])
+            && limbs_cmp_same_length(&ys0[..t], ys1) == Ordering::Less
+        {
+            limbs_sub_same_length_to_out(bsm1, ys1, &ys0[..t]);
+            limbs_set_zero(&mut bsm1[t..n]);
+            v_neg_1_neg.not_assign();
         } else {
-            if limbs_test_zero(&ys0[t..]) && limbs_cmp_same_length(&ys0[..t], ys1) == Ordering::Less
-            {
-                limbs_sub_same_length_to_out(bsm1, ys1, &ys0[..t]);
-                limbs_set_zero(&mut bsm1[t..n]);
-                v_neg_1_neg.not_assign();
-            } else {
-                limbs_sub_to_out(bsm1, ys0, ys1);
-            }
+            limbs_sub_to_out(bsm1, ys0, ys1);
         }
 
         let (v_neg_1, scratch_out) = scratch.split_at_mut(2 * n); // v_neg_1: length 2 * n
@@ -2578,10 +2634,8 @@ pub fn _limbs_mul_to_out_toom_22(
         if limbs_slice_add_same_length_in_place_left(&mut out_limbs[n..3 * n], v_neg_1) {
             carry += 1;
         }
-    } else {
-        if limbs_sub_same_length_in_place_left(&mut out_limbs[n..3 * n], v_neg_1) {
-            carry.wrapping_sub_assign(1);
-        }
+    } else if limbs_sub_same_length_in_place_left(&mut out_limbs[n..3 * n], v_neg_1) {
+        carry.wrapping_sub_assign(1);
     }
     assert!(!limbs_slice_add_limb_in_place(
         &mut out_limbs[2 * n..2 * n + s + t],
@@ -2671,12 +2725,13 @@ pub fn mpn_mul(out_limbs: &mut [u32], xs: &[u32], ys: &[u32]) -> u32 {
     assert!(ys_len >= 1);
 
     if xs_len == ys_len {
-        if xs as *const [u32] == ys as *const [u32] {
-            //TODO mpn_sqr(out_limbs, xs, xs_len);
-            mpn_mul_n(out_limbs, xs, ys);
-        } else {
-            mpn_mul_n(out_limbs, xs, ys);
-        }
+        //TODO if xs as *const [u32] == ys as *const [u32] {
+        //TODO     mpn_sqr(out_limbs, xs, xs_len);
+        //TODO     mpn_mul_n(out_limbs, xs, ys);
+        //TODO } else {
+        //TODO     mpn_mul_n(out_limbs, xs, ys);
+        //TODO }
+        mpn_mul_n(out_limbs, xs, ys);
     } else if ys_len < MUL_TOOM22_THRESHOLD {
         // plain schoolbook multiplication. Unless xs_len is very large, or else if have an
         // applicable mpn_mul_N, perform basecase multiply directly.
@@ -2741,14 +2796,12 @@ pub fn mpn_mul(out_limbs: &mut [u32], xs: &[u32], ys: &[u32]) -> u32 {
                     1
                 ));
             }
+        } else if 4 * xs_len < 5 * ys_len {
+            _limbs_mul_to_out_toom_22(out_limbs, xs, ys, &mut scratch);
+        } else if 4 * xs_len < 7 * ys_len {
+            _limbs_mul_to_out_toom_32(out_limbs, xs, ys, &mut scratch);
         } else {
-            if 4 * xs_len < 5 * ys_len {
-                _limbs_mul_to_out_toom_22(out_limbs, xs, ys, &mut scratch);
-            } else if 4 * xs_len < 7 * ys_len {
-                _limbs_mul_to_out_toom_32(out_limbs, xs, ys, &mut scratch);
-            } else {
-                _limbs_mul_to_out_toom_42(out_limbs, xs, ys, &mut scratch);
-            }
+            _limbs_mul_to_out_toom_42(out_limbs, xs, ys, &mut scratch);
         }
     //TODO PASTE C
     } else {

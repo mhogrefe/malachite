@@ -9,7 +9,7 @@ fn limbs_eq_mod_power_of_two_equal(xs: &[u32], ys: &[u32], pow: u64) -> bool {
     if i >= len {
         xs == ys
     } else {
-        &xs[..i] == &ys[..i] && xs[i].eq_mod_power_of_two(ys[i], pow & u64::from(u32::WIDTH_MASK))
+        xs[..i] == ys[..i] && xs[i].eq_mod_power_of_two(ys[i], pow & u64::from(u32::WIDTH_MASK))
     }
 }
 
@@ -27,7 +27,7 @@ fn limbs_eq_mod_power_of_two_greater(xs: &[u32], ys: &[u32], pow: u64) -> bool {
                 pow - u64::from(u32::WIDTH) * ys_len as u64,
             )
     } else {
-        &xs[..i] == &ys[..i] && xs[i].eq_mod_power_of_two(ys[i], pow & u64::from(u32::WIDTH_MASK))
+        xs[..i] == ys[..i] && xs[i].eq_mod_power_of_two(ys[i], pow & u64::from(u32::WIDTH_MASK))
     }
 }
 

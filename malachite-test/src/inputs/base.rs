@@ -9,7 +9,7 @@ use malachite_base::round::RoundingMode;
 use malachite_nz::integer::logic::bit_access::limbs_vec_clear_bit_neg;
 use malachite_nz::natural::arithmetic::mul::{
     _limbs_mul_to_out_toom_32_input_sizes_valid, _limbs_mul_to_out_toom_33_input_sizes_valid,
-    _limbs_mul_to_out_toom_42_input_sizes_valid,
+    _limbs_mul_to_out_toom_42_input_sizes_valid, _limbs_mul_to_out_toom_43_input_sizes_valid,
 };
 use malachite_nz::natural::arithmetic::mul_u32::limbs_mul_limb;
 use rust_wheels::iterators::bools::exhaustive_bools;
@@ -1301,6 +1301,19 @@ pub fn triples_of_unsigned_vec_var_14<T: PrimitiveUnsigned>(
         |&(ref out_limbs, ref xs, ref ys)| {
             out_limbs.len() >= xs.len() + ys.len()
                 && _limbs_mul_to_out_toom_42_input_sizes_valid(xs.len(), ys.len())
+        },
+    ))
+}
+
+// All triples of `Vec<T>`, where `T` is unsigned and `out_limbs`, `xs`, and `ys` meet the
+// preconditions of `_limbs_mul_to_out_toom_43`.
+pub fn triples_of_unsigned_vec_var_15<T: PrimitiveUnsigned>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (Vec<T>, Vec<T>, Vec<T>)>> {
+    Box::new(triples_of_unsigned_vec_min_sizes(gm, 19, 11, 8).filter(
+        |&(ref out_limbs, ref xs, ref ys)| {
+            out_limbs.len() >= xs.len() + ys.len()
+                && _limbs_mul_to_out_toom_43_input_sizes_valid(xs.len(), ys.len())
         },
     ))
 }

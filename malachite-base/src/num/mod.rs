@@ -722,6 +722,7 @@ lossless_checked_from_impl!(i64, i64);
 
 macro_rules! wrapping_impl_inner {
     ($from:ty, $to:ty) => {
+        #[allow(clippy::cast_lossless)]
         impl WrappingFrom<$from> for $to {
             #[inline]
             fn wrapping_from(value: $from) -> $to {
@@ -3017,21 +3018,25 @@ pub trait OrdAbs: Eq + PartialOrdAbs<Self> {
 }
 
 /// Provides the constant 0.
+#[allow(clippy::declare_interior_mutable_const)]
 pub trait Zero {
     const ZERO: Self;
 }
 
 /// Provides the constant 1.
+#[allow(clippy::declare_interior_mutable_const)]
 pub trait One {
     const ONE: Self;
 }
 
 /// Provides the constant 2.
+#[allow(clippy::declare_interior_mutable_const)]
 pub trait Two {
     const TWO: Self;
 }
 
 /// Provides the constant -1.
+#[allow(clippy::declare_interior_mutable_const)]
 pub trait NegativeOne {
     const NEGATIVE_ONE: Self;
 }

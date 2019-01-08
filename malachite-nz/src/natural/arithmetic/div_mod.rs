@@ -64,10 +64,8 @@ fn invert_pi1(dinv: &mut u32, d1: u32, d0: u32) {
     p.wrapping_add_assign(t1);
     if p < t1 {
         v.wrapping_sub_assign(1);
-        if p >= d1 {
-            if p > d1 || t0 >= d0 {
-                v.wrapping_sub_assign(1);
-            }
+        if p >= d1 && (p > d1 || t0 >= d0) {
+            v.wrapping_sub_assign(1);
         }
     }
     *dinv = v;
@@ -92,6 +90,7 @@ fn add_ssaaaa(sh: &mut u32, sl: &mut u32, ah1: u32, al1: u32, ah2: u32, al2: u32
 //
 // NOTE: Output variables are updated multiple times.
 // udiv_qr_3by2 from gmp-impl.h
+#[allow(clippy::too_many_arguments)]
 fn udiv_qr_3by2(
     q: &mut u32,
     r1: &mut u32,
@@ -127,13 +126,11 @@ fn udiv_qr_3by2(
     let old_r1 = *r1;
     let old_r0 = *r0;
     add_ssaaaa(r1, r0, old_r1, old_r0, mask & d1, mask & d0);
-    if *r1 >= d1 {
-        if *r1 > d1 || *r0 >= d0 {
-            q.wrapping_add_assign(1);
-            let old_r1 = *r1;
-            let old_r0 = *r0;
-            sub_ddmmss(r1, r0, old_r1, old_r0, d1, d0);
-        }
+    if *r1 >= d1 && (*r1 > d1 || *r0 >= d0) {
+        q.wrapping_add_assign(1);
+        let old_r1 = *r1;
+        let old_r0 = *r0;
+        sub_ddmmss(r1, r0, old_r1, old_r0, d1, d0);
     }
 }
 
@@ -164,13 +161,14 @@ pub fn mpn_divrem_2(qp: &mut [u32], np: &mut [u32], dp: &[u32]) -> u32 {
     let mut r1 = np[np_offset + 1];
     let mut r0 = np[np_offset];
 
-    let mut most_significant_q_limb = 0;
-    if r1 >= d1 && (r1 > d1 || r0 >= d0) {
+    let most_significant_q_limb = if r1 >= d1 && (r1 > d1 || r0 >= d0) {
         let old_r1 = r1;
         let old_r0 = r0;
         sub_ddmmss(&mut r1, &mut r0, old_r1, old_r0, d1, d0);
-        most_significant_q_limb = 1;
-    }
+        1
+    } else {
+        0
+    };
 
     let mut di = 0;
     invert_pi1(&mut di, d1, d0);
@@ -215,7 +213,7 @@ pub fn mpn_sbpi1_div_qr(qp: &mut [u32], np: &mut [u32], dp: &[u32], dinv: u32) -
 
     dn -= 2; // offset dn by 2 for main division loops, saving two iterations in mpn_submul_1.
     let d1 = dp[dn + 1];
-    let d0 = dp[dn + 0];
+    let d0 = dp[dn];
 
     np_offset -= 2;
 
@@ -253,7 +251,7 @@ pub fn mpn_sbpi1_div_qr(qp: &mut [u32], np: &mut [u32], dp: &[u32], dinv: u32) -
                 n1.wrapping_add_assign(d1.wrapping_add(
                     if limbs_slice_add_same_length_in_place_left(
                         &mut np[np_offset - dn..],
-                        &dp[..dn + 1],
+                        &dp[..=dn],
                     ) {
                         1
                     } else {
@@ -378,6 +376,7 @@ pub fn mpn_dcpi1_div_qr_n(
 // checked
 // docs preserved
 // mpn_dcpi1_div_qr from mpn/generic/dcpi1_div_qr.c
+#[allow(clippy::cyclomatic_complexity)]
 pub fn mpn_dcpi1_div_qr(qp: &mut [u32], np: &mut [u32], dp: &[u32], dinv: u32) -> u32 {
     let nn = np.len();
     let dn = dp.len();
@@ -404,7 +403,7 @@ pub fn mpn_dcpi1_div_qr(qp: &mut [u32], np: &mut [u32], dp: &[u32], dinv: u32) -
         // Perform the typically smaller block first.
         if qn == 1 {
             // Handle qh up front, for simplicity.
-            qh = if limbs_cmp_same_length(&np[np_offset - dn + 1..np_offset + 1], &dp[..dn])
+            qh = if limbs_cmp_same_length(&np[np_offset - dn + 1..=np_offset], &dp[..dn])
                 >= Ordering::Equal
             {
                 1
@@ -414,7 +413,7 @@ pub fn mpn_dcpi1_div_qr(qp: &mut [u32], np: &mut [u32], dp: &[u32], dinv: u32) -
             if qh != 0 {
                 //TODO
                 assert!(!limbs_sub_same_length_in_place_left(
-                    &mut np[np_offset - dn + 1..np_offset + 1],
+                    &mut np[np_offset - dn + 1..=np_offset],
                     &dp[dp_offset - dn..dp_offset]
                 ));
             }
@@ -611,7 +610,7 @@ pub fn mpn_dcpi1_div_qr(qp: &mut [u32], np: &mut [u32], dp: &[u32], dinv: u32) -
 
             let mut cy = if limbs_sub_same_length_in_place_left(
                 &mut np[np_offset - dn..np_offset],
-                &mut tp[..dn],
+                &tp[..dn],
             ) {
                 1
             } else {
@@ -774,8 +773,8 @@ pub fn mpn_sbpi1_divappr_q(qp: &mut [u32], np: &mut [u32], dp: &[u32], dinv: u32
             if cy != 0 {
                 n1.wrapping_add_assign(d1.wrapping_add(
                     if limbs_slice_add_same_length_in_place_left(
-                        &mut np[np_offset - dn..np_offset + 1],
-                        &dp[dp_offset..dp_offset + dn + 1],
+                        &mut np[np_offset - dn..=np_offset],
+                        &dp[dp_offset..=dp_offset + dn],
                     ) {
                         1
                     } else {
@@ -791,7 +790,8 @@ pub fn mpn_sbpi1_divappr_q(qp: &mut [u32], np: &mut [u32], dp: &[u32], dinv: u32
 
     let mut flag = u32::MAX;
     if dn_was_at_least_2 {
-        for _ in 0..dn {
+        let limit = dn;
+        for _ in 0..limit {
             np_offset -= 1;
             if n1 >= (d1 & flag) {
                 q = u32::MAX;
@@ -840,8 +840,8 @@ pub fn mpn_sbpi1_divappr_q(qp: &mut [u32], np: &mut [u32], dp: &[u32], dinv: u32
                 if cy != 0 {
                     n1.wrapping_add_assign(d1.wrapping_add(
                         if limbs_slice_add_same_length_in_place_left(
-                            &mut np[np_offset - dn..np_offset + 1],
-                            &dp[dp_offset..dp_offset + dn + 1],
+                            &mut np[np_offset - dn..=np_offset],
+                            &dp[dp_offset..=dp_offset + dn],
                         ) {
                             1
                         } else {
@@ -864,21 +864,19 @@ pub fn mpn_sbpi1_divappr_q(qp: &mut [u32], np: &mut [u32], dp: &[u32], dinv: u32
             q = u32::MAX;
             let cy = mpn_submul_1(&mut np[np_offset..], &dp[dp_offset..dp_offset + 2], q);
 
-            if n1 != cy {
-                if n1 < (cy & flag) {
-                    q.wrapping_sub_assign(1);
-                    let old_np0 = np[np_offset];
-                    let old_np1 = np[np_offset + 1];
-                    let (np_lo, np_hi) = np.split_at_mut(np_offset + 1);
-                    add_ssaaaa(
-                        &mut np_hi[0],
-                        &mut np_lo[np_offset],
-                        old_np1,
-                        old_np0,
-                        dp[dp_offset + 1],
-                        dp[dp_offset],
-                    );
-                }
+            if n1 != cy && n1 < (cy & flag) {
+                q.wrapping_sub_assign(1);
+                let old_np0 = np[np_offset];
+                let old_np1 = np[np_offset + 1];
+                let (np_lo, np_hi) = np.split_at_mut(np_offset + 1);
+                add_ssaaaa(
+                    &mut np_hi[0],
+                    &mut np_lo[np_offset],
+                    old_np1,
+                    old_np0,
+                    dp[dp_offset + 1],
+                    dp[dp_offset],
+                );
             }
             n1 = np[np_offset + 1];
         } else {
@@ -993,6 +991,7 @@ pub fn mpn_dcpi1_divappr_q_n(
 // divide-and-conquer division, returning approximate quotient. The quotient returned is either
 // correct, or one too large.
 // mpn_dcpi1_divappr_q from mpn/generic/dcpi1_divappr_q.c
+#[allow(clippy::cyclomatic_complexity)]
 pub fn mpn_dcpi1_divappr_q(qp: &mut [u32], np: &mut [u32], dp: &[u32], dinv: u32) -> u32 {
     let nn = np.len();
     let dn = dp.len();
@@ -1022,7 +1021,7 @@ pub fn mpn_dcpi1_divappr_q(qp: &mut [u32], np: &mut [u32], dp: &[u32], dinv: u32
         if qn == 1 {
             // Handle qh up front, for simplicity.
             qh = if limbs_cmp_same_length(
-                &np[np_offset - dn + 1..np_offset + 1],
+                &np[np_offset - dn + 1..=np_offset],
                 &dp[dp_offset - dn..dp_offset],
             ) >= Ordering::Equal
             {
@@ -1032,7 +1031,7 @@ pub fn mpn_dcpi1_divappr_q(qp: &mut [u32], np: &mut [u32], dp: &[u32], dinv: u32
             };
             if qh != 0 {
                 assert!(!limbs_sub_same_length_in_place_left(
-                    &mut np[np_offset - dn + 1..np_offset + 1],
+                    &mut np[np_offset - dn + 1..=np_offset],
                     &dp[dp_offset - dn..dp_offset]
                 ));
             }
@@ -1225,7 +1224,7 @@ pub fn mpn_dcpi1_divappr_q(qp: &mut [u32], np: &mut [u32], dp: &[u32], dinv: u32
                 &mut tp,
             );
         }
-        qp[qp_offset..qp_offset + qn].copy_from_slice(&q2p[1..qn + 1]);
+        qp[qp_offset..qp_offset + qn].copy_from_slice(&q2p[1..=qn]);
     }
     qh
 }

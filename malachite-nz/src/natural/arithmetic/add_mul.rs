@@ -470,7 +470,7 @@ fn mpn_sub_aba(a: &mut [u32], b: &[u32], len: usize) -> bool {
     }
 }
 
-#[allow(unknown_lints, many_single_char_names)]
+#[allow(unknown_lints, clippy::many_single_char_names)]
 pub(crate) fn mpz_aorsmul(
     w_sign: &mut bool,
     w: &mut Vec<u32>,

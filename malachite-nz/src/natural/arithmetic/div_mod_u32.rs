@@ -97,7 +97,7 @@ fn limbs_div_limb_normalized_in_place_mod(
         quotient_high
     ));
     limbs[0] = quotient_low;
-    return remainder;
+    remainder
 }
 
 // high bit of divisor must be set
@@ -166,7 +166,7 @@ fn limbs_div_limb_normalized_to_out_mod(
         quotient_high
     ));
     out_limbs[0] = quotient_low;
-    return remainder;
+    remainder
 }
 
 /// Interpreting a slice of `u32`s as the limbs (in ascending order) of a `Natural`, returns the
