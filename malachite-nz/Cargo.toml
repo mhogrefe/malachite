@@ -7,6 +7,13 @@ authors = ["Mikhail Hogrefe <mikhailhogrefe@gmail.com>"]
 name = "malachite_nz"
 path = "src/lib.rs"
 
+[features]
+
+default = ["32_bit_limbs"]
+
+32_bit_limbs = []
+64_bit_limbs = []
+
 [dependencies]
 malachite-base = { path = "../malachite-base" }
 rand = "0.3.0"

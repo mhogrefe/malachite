@@ -1,6 +1,7 @@
 use natural::Natural::{self, Large, Small};
+use platform::Limb;
 
-/// Interpreting a slice of `u32`s, as the limbs (in ascending order) of a `Natural`, counts the
+/// Interpreting a slice of `Limb`s, as the limbs (in ascending order) of a `Natural`, counts the
 /// number of ones in the binary expansion of the `Natural`.
 ///
 /// Time: worst case O(n)
@@ -16,7 +17,7 @@ use natural::Natural::{self, Large, Small};
 /// assert_eq!(limbs_count_ones(&[0, 1, 2]), 2);
 /// assert_eq!(limbs_count_ones(&[1, 0xffff_ffff]), 33);
 /// ```
-pub fn limbs_count_ones(limbs: &[u32]) -> u64 {
+pub fn limbs_count_ones(limbs: &[Limb]) -> u64 {
     limbs.iter().map(|limb| u64::from(limb.count_ones())).sum()
 }
 

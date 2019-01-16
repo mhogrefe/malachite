@@ -1,13 +1,15 @@
 use common::test_properties;
+use malachite_base::misc::Max;
 use malachite_base::num::Parity;
 use malachite_nz::natural::logic::trailing_zeros::limbs_trailing_zeros;
 use malachite_nz::natural::Natural;
+use malachite_nz::platform::Limb;
 use malachite_test::inputs::base::{positive_unsigneds, vecs_of_unsigned_var_3};
 use malachite_test::inputs::natural::naturals;
 use malachite_test::natural::logic::trailing_zeros::natural_trailing_zeros_alt;
 use std::str::FromStr;
-use std::u32;
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_trailing_zeros() {
     let test = |limbs, out| {
@@ -18,12 +20,14 @@ fn test_limbs_trailing_zeros() {
     test(&[1, 2, 3], 0);
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic(expected = "index out of bounds: the len is 0 but the index is 0")]
 fn limbs_trailing_zeros_fail_1() {
     limbs_trailing_zeros(&[]);
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic(expected = "index out of bounds: the len is 3 but the index is 3")]
 fn limbs_trailing_zeros_fail_2() {
@@ -66,15 +70,14 @@ fn trailing_zeros_properties() {
         assert_eq!(trailing_zeros.is_none(), *x == 0);
         if *x != 0 {
             let trailing_zeros = trailing_zeros.unwrap();
-            if trailing_zeros <= u64::from(u32::MAX) {
-                let trailing_zeros = trailing_zeros as u32;
+            if trailing_zeros <= u64::from(Limb::MAX) {
                 assert!((x >> trailing_zeros).odd());
                 assert_eq!(x >> trailing_zeros << trailing_zeros, *x);
             }
         }
     });
 
-    test_properties(positive_unsigneds::<u32>, |&u| {
+    test_properties(positive_unsigneds::<Limb>, |&u| {
         assert_eq!(
             Natural::from(u).trailing_zeros(),
             Some(u64::from(u.trailing_zeros()))

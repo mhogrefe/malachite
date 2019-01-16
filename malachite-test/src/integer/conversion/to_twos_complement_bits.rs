@@ -3,6 +3,7 @@ use inputs::base::{vecs_of_bool, vecs_of_bool_var_1};
 use inputs::integer::{integers, pairs_of_integer_and_small_u64};
 use malachite_base::num::SignificantBits;
 use malachite_nz::integer::conversion::to_twos_complement_bits::*;
+use malachite_nz::platform::Limb;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_bits_to_twos_complement_bits_non_negative);
@@ -274,7 +275,7 @@ fn benchmark_integer_twos_complement_bits_get_algorithms(
                     let bits = n.to_twos_complement_bits_asc();
                     let u = u as usize;
                     if u >= bits.len() {
-                        n < 0
+                        n < 0 as Limb
                     } else {
                         bits[u]
                     };

@@ -1,15 +1,16 @@
 use integer::Integer;
 use malachite_base::limbs::limbs_leading_zero_limbs;
+use malachite_base::misc::Max;
 use malachite_base::num::{BitAccess, PrimitiveInteger};
-use natural::arithmetic::add_u32::limbs_slice_add_limb_in_place;
+use natural::arithmetic::add_limb::limbs_slice_add_limb_in_place;
 use natural::conversion::to_limbs::LimbIterator;
 use natural::logic::not::limbs_not_in_place;
 use natural::Natural;
-use std::u32;
+use platform::Limb;
 
 /// A double-ended iterator over the two's complement limbs of the negative of a `Natural`. The
 /// forward order is ascending (least-significant first). There may be at most one implicit
-/// most-significant `u32::MAX` limb.
+/// most-significant `Limb::MAX` limb.
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub struct NegativeLimbIterator<'a> {
     pub(crate) limbs: LimbIterator<'a>,
@@ -17,10 +18,10 @@ pub struct NegativeLimbIterator<'a> {
 }
 
 impl<'a> NegativeLimbIterator<'a> {
-    fn get(&self, index: usize) -> u32 {
+    fn get(&self, index: usize) -> Limb {
         if index >= self.limbs.len() {
-            // We're indexing into the infinite suffix of u32::MAXs
-            u32::MAX
+            // We're indexing into the infinite suffix of Limb::MAXs
+            Limb::MAX
         } else {
             for i in 0..index {
                 if self.limbs[i] != 0 {
@@ -33,7 +34,7 @@ impl<'a> NegativeLimbIterator<'a> {
 }
 
 impl<'a> Iterator for NegativeLimbIterator<'a> {
-    type Item = u32;
+    type Item = Limb;
 
     /// A function to iterate through the two's complement limbs of the negative of a `Natural` in
     /// ascending order (least-significant first).
@@ -41,7 +42,7 @@ impl<'a> Iterator for NegativeLimbIterator<'a> {
     /// Time: worst case O(1)
     ///
     /// Additional memory: worst case O(1)
-    fn next(&mut self) -> Option<u32> {
+    fn next(&mut self) -> Option<Limb> {
         let previous_i = self.limbs.i as u64;
         self.limbs.next().map(|limb| {
             if let Some(first_nonzero_index) = self.first_nonzero_index {
@@ -82,7 +83,7 @@ impl<'a> DoubleEndedIterator for NegativeLimbIterator<'a> {
     /// Additional memory: worst case O(1)
     ///
     /// where n = `self.significant_bits()`
-    fn next_back(&mut self) -> Option<u32> {
+    fn next_back(&mut self) -> Option<Limb> {
         let previous_j = self.limbs.j as u64;
         self.limbs.next_back().map(|limb| {
             if self.first_nonzero_index.is_none() {
@@ -102,12 +103,12 @@ impl<'a> DoubleEndedIterator for NegativeLimbIterator<'a> {
     }
 }
 
-trait SignExtendedLimbIterator: DoubleEndedIterator<Item = u32> {
-    const EXTENSION: u32;
+trait SignExtendedLimbIterator: DoubleEndedIterator<Item = Limb> {
+    const EXTENSION: Limb;
 
     fn needs_sign_extension(&self) -> bool;
 
-    fn iterate_forward(&mut self, extension_checked: &mut bool) -> Option<u32> {
+    fn iterate_forward(&mut self, extension_checked: &mut bool) -> Option<Limb> {
         let next = self.next();
         if next.is_none() {
             if *extension_checked {
@@ -125,7 +126,7 @@ trait SignExtendedLimbIterator: DoubleEndedIterator<Item = u32> {
         }
     }
 
-    fn iterate_backward(&mut self, extension_checked: &mut bool) -> Option<u32> {
+    fn iterate_backward(&mut self, extension_checked: &mut bool) -> Option<Limb> {
         if !*extension_checked {
             *extension_checked = true;
             if self.needs_sign_extension() {
@@ -137,15 +138,15 @@ trait SignExtendedLimbIterator: DoubleEndedIterator<Item = u32> {
 }
 
 impl<'a> SignExtendedLimbIterator for LimbIterator<'a> {
-    const EXTENSION: u32 = 0;
+    const EXTENSION: Limb = 0;
 
     fn needs_sign_extension(&self) -> bool {
-        self[self.limb_count - 1].get_bit(u64::from(u32::WIDTH) - 1)
+        self[self.limb_count - 1].get_bit(u64::from(Limb::WIDTH) - 1)
     }
 }
 
 impl<'a> SignExtendedLimbIterator for NegativeLimbIterator<'a> {
-    const EXTENSION: u32 = u32::MAX;
+    const EXTENSION: Limb = Limb::MAX;
 
     fn needs_sign_extension(&self) -> bool {
         let mut i = 0;
@@ -159,14 +160,14 @@ impl<'a> SignExtendedLimbIterator for NegativeLimbIterator<'a> {
         } else {
             !last_limb
         };
-        !twos_complement_limb.get_bit(u64::from(u32::WIDTH) - 1)
+        !twos_complement_limb.get_bit(u64::from(Limb::WIDTH) - 1)
     }
 }
 
 /// A double-ended iterator over the twos-complement limbs of an `Integer`. The forward order is
 /// ascending (least-significant first). The most significant bit of the most significant limb
 /// corresponds to the sign of the `Integer`; `false` for non-negative and `true` for negative. This
-/// means that there may be a single most-significant sign-extension limb that is 0 or `u32::MAX`.
+/// means that there may be a single most-significant sign-extension limb that is 0 or `Limb::MAX`.
 ///
 /// This struct also supports retrieving limbs by index. This functionality is completely
 /// independent of the iterator's state. Indexing the implicit leading limbs is allowed.
@@ -179,7 +180,7 @@ pub enum TwosComplementLimbIterator<'a> {
 
 impl<'a> TwosComplementLimbIterator<'a> {
     /// A function to retrieve twos-complement limbs by index. Indexing at or above the limb count
-    /// returns zero or `u32::MAX` limbs, depending on the sign of `self`.
+    /// returns zero or `Limb::MAX` limbs, depending on the sign of `self`.
     ///
     /// Time: worst case O(n)
     ///
@@ -208,7 +209,7 @@ impl<'a> TwosComplementLimbIterator<'a> {
     ///     assert_eq!(limbs.get(100), u32::MAX);
     /// }
     /// ```
-    pub fn get(&self, index: usize) -> u32 {
+    pub fn get(&self, index: usize) -> Limb {
         match *self {
             TwosComplementLimbIterator::Zero => 0,
             TwosComplementLimbIterator::Positive(ref limbs, _) => limbs[index],
@@ -218,7 +219,7 @@ impl<'a> TwosComplementLimbIterator<'a> {
 }
 
 impl<'a> Iterator for TwosComplementLimbIterator<'a> {
-    type Item = u32;
+    type Item = Limb;
 
     /// A function to iterate through the twos-complement limbs of an `Integer` in ascending order
     /// (least-significant first). The last limb may be a sign-extension limb.
@@ -246,7 +247,7 @@ impl<'a> Iterator for TwosComplementLimbIterator<'a> {
     ///     assert_eq!(limbs.next(), None);
     /// }
     /// ```
-    fn next(&mut self) -> Option<u32> {
+    fn next(&mut self) -> Option<Limb> {
         match *self {
             TwosComplementLimbIterator::Zero => None,
             TwosComplementLimbIterator::Positive(ref mut limbs, ref mut extension_checked) => {
@@ -288,7 +289,7 @@ impl<'a> DoubleEndedIterator for TwosComplementLimbIterator<'a> {
     ///     assert_eq!(limbs.next_back(), None);
     /// }
     /// ```
-    fn next_back(&mut self) -> Option<u32> {
+    fn next_back(&mut self) -> Option<Limb> {
         match *self {
             TwosComplementLimbIterator::Zero => None,
             TwosComplementLimbIterator::Positive(ref mut limbs, ref mut extension_checked) => {
@@ -301,7 +302,7 @@ impl<'a> DoubleEndedIterator for TwosComplementLimbIterator<'a> {
     }
 }
 
-pub fn limbs_twos_complement(limbs: &[u32]) -> Vec<u32> {
+pub fn limbs_twos_complement(limbs: &[Limb]) -> Vec<Limb> {
     let i = limbs_leading_zero_limbs(limbs);
     let mut result_limbs = vec![0; i];
     if i != limbs.len() {
@@ -313,7 +314,7 @@ pub fn limbs_twos_complement(limbs: &[u32]) -> Vec<u32> {
     result_limbs
 }
 
-/// Given the limbs, or base-2<sup>32</sup> digits, of a non-negative `Integer`, in ascending order,
+/// Given the limbs of a non-negative `Integer`, in ascending order,
 /// checks whether the most significant bit is `false`; if it isn't, appends an extra zero bit. This
 /// way the `Integer`'s non-negativity is preserved in its limbs.
 ///
@@ -333,14 +334,14 @@ pub fn limbs_twos_complement(limbs: &[u32]) -> Vec<u32> {
 /// limbs_maybe_sign_extend_non_negative_in_place(&mut limbs);
 /// assert_eq!(limbs, &[1, 2, 0xffff_ffff, 0]);
 /// ```
-pub fn limbs_maybe_sign_extend_non_negative_in_place(limbs: &mut Vec<u32>) {
-    if !limbs.is_empty() && limbs.last().unwrap().get_bit(u64::from(u32::WIDTH) - 1) {
+pub fn limbs_maybe_sign_extend_non_negative_in_place(limbs: &mut Vec<Limb>) {
+    if !limbs.is_empty() && limbs.last().unwrap().get_highest_bit() {
         // Sign-extend with an extra 0 limb to indicate a positive Integer
         limbs.push(0);
     }
 }
 
-/// Given the limbs, or base-2<sup>32</sup> digits, of the absolute value of an `Integer`, in
+/// Given the limbs of the absolute value of an `Integer`, in
 /// ascending order, converts the limbs to two's complement. Returns whether there is a carry left
 /// over from the two's complement conversion process.
 ///
@@ -362,14 +363,14 @@ pub fn limbs_maybe_sign_extend_non_negative_in_place(limbs: &mut Vec<u32>) {
 /// assert!(limbs_twos_complement_in_place(limbs));
 /// assert_eq!(limbs, &[0, 0, 0]);
 /// ```
-pub fn limbs_twos_complement_in_place(limbs: &mut [u32]) -> bool {
+pub fn limbs_twos_complement_in_place(limbs: &mut [Limb]) -> bool {
     limbs_not_in_place(limbs);
     limbs_slice_add_limb_in_place(limbs, 1)
 }
 
-/// Given the limbs, or base-2<sup>32</sup> digits, of the absolute value of a negative `Integer`,
+/// Given the limbs of the absolute value of a negative `Integer`,
 /// in ascending order, converts the limbs to two's complement and checks whether the most
-/// significant bit is `true`; if it isn't, appends an extra `u32::MAX` bit. This way the
+/// significant bit is `true`; if it isn't, appends an extra `Limb::MAX` bit. This way the
 /// `Integer`'s negativity is preserved in its limbs. The limbs cannot be empty or contain only
 /// zeros.
 ///
@@ -394,16 +395,16 @@ pub fn limbs_twos_complement_in_place(limbs: &mut [u32]) -> bool {
 /// limbs_twos_complement_and_maybe_sign_extend_negative_in_place(&mut limbs);
 /// assert_eq!(limbs, &[0, 1, 0xffff_ffff]);
 /// ```
-pub fn limbs_twos_complement_and_maybe_sign_extend_negative_in_place(limbs: &mut Vec<u32>) {
+pub fn limbs_twos_complement_and_maybe_sign_extend_negative_in_place(limbs: &mut Vec<Limb>) {
     assert!(!limbs_twos_complement_in_place(limbs));
-    if !limbs.last().unwrap().get_bit(u64::from(u32::WIDTH) - 1) {
+    if !limbs.last().unwrap().get_highest_bit() {
         // Sign-extend with an extra !0 limb to indicate a negative Integer
-        limbs.push(u32::MAX);
+        limbs.push(Limb::MAX);
     }
 }
 
 impl Integer {
-    /// Returns the limbs, or base-2<sup>32</sup> digits, of an `Integer`, in ascending order,
+    /// Returns the limbs of an `Integer`, in ascending order,
     /// so that less significant limbs have lower indices in the output vector. The limbs are in
     /// two's complement, and the most significant bit of the limbs indicates the sign; if the bit
     /// is zero, the `Integer` is positive, and if the bit is one it is negative. There are no
@@ -440,7 +441,7 @@ impl Integer {
     ///         &[727379968, 4294967063]);
     /// }
     /// ```
-    pub fn to_twos_complement_limbs_asc(&self) -> Vec<u32> {
+    pub fn to_twos_complement_limbs_asc(&self) -> Vec<Limb> {
         let mut limbs = self.abs.to_limbs_asc();
         if self.sign {
             limbs_maybe_sign_extend_non_negative_in_place(&mut limbs);
@@ -450,7 +451,7 @@ impl Integer {
         limbs
     }
 
-    /// Returns the limbs, or base-2<sup>32</sup> digits, of an `Integer`, in descending order, so
+    /// Returns the limbs of an `Integer`, in descending order, so
     /// that less significant limbs have higher indices in the output vector. The limbs are in two's
     /// complement, and the most significant bit of the limbs indicates the sign; if the bit is
     /// zero, the `Integer` is positive, and if the bit is one it is negative. There are no
@@ -488,13 +489,13 @@ impl Integer {
     ///     assert_eq!((-Integer::trillion()).to_twos_complement_limbs_desc(),
     ///         &[4294967063, 727379968]);
     /// }
-    pub fn to_twos_complement_limbs_desc(&self) -> Vec<u32> {
+    pub fn to_twos_complement_limbs_desc(&self) -> Vec<Limb> {
         let mut limbs = self.to_twos_complement_limbs_asc();
         limbs.reverse();
         limbs
     }
 
-    /// Returns the limbs, or base-2<sup>32</sup> digits, of an `Integer`, in ascending order,
+    /// Returns the limbs of an `Integer`, in ascending order,
     /// so that less significant limbs have lower indices in the output vector. The limbs are in
     /// two's complement, and the most significant bit of the limbs indicates the sign; if the bit
     /// is zero, the `Integer` is positive, and if the bit is one it is negative. There are no
@@ -531,7 +532,7 @@ impl Integer {
     ///         &[727379968, 4294967063]);
     /// }
     /// ```
-    pub fn into_twos_complement_limbs_asc(self) -> Vec<u32> {
+    pub fn into_twos_complement_limbs_asc(self) -> Vec<Limb> {
         let mut limbs = self.abs.into_limbs_asc();
         if self.sign {
             limbs_maybe_sign_extend_non_negative_in_place(&mut limbs);
@@ -541,7 +542,7 @@ impl Integer {
         limbs
     }
 
-    /// Returns the limbs, or base-2<sup>32</sup> digits, of an `Integer`, in descending order, so
+    /// Returns the limbs of an `Integer`, in descending order, so
     /// that less significant limbs have higher indices in the output vector. The limbs are in two's
     /// complement, and the most significant bit of the limbs indicates the sign; if the bit is
     /// zero, the `Integer` is positive, and if the bit is one it is negative. There are no
@@ -580,7 +581,7 @@ impl Integer {
     ///     assert_eq!((-Integer::trillion()).into_twos_complement_limbs_desc(),
     ///         &[4294967063, 727379968]);
     /// }
-    pub fn into_twos_complement_limbs_desc(self) -> Vec<u32> {
+    pub fn into_twos_complement_limbs_desc(self) -> Vec<Limb> {
         let mut limbs = self.into_twos_complement_limbs_asc();
         limbs.reverse();
         limbs
@@ -643,7 +644,7 @@ impl Integer {
     /// }
     /// ```
     pub fn twos_complement_limbs(&self) -> TwosComplementLimbIterator {
-        if *self == 0 {
+        if *self == 0 as Limb {
             TwosComplementLimbIterator::Zero
         } else if self.sign {
             TwosComplementLimbIterator::Positive(self.abs.limbs(), false)
@@ -656,7 +657,7 @@ impl Integer {
 impl Natural {
     /// Returns a double-ended iterator over the two's complement limbs of the negative of a
     /// `Natural`. The forward order is ascending, so that less significant limbs appear first.
-    /// There may be at most one trailing `u32::MAX` limb going forward, or leading `u32::MAX` limb
+    /// There may be at most one trailing `Limb::MAX` limb going forward, or leading `Limb::MAX` limb
     /// going backward. The `Natural` cannot be zero.
     ///
     /// Time: worst case O(1)

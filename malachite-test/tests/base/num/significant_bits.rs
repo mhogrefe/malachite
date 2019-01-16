@@ -1,6 +1,7 @@
 use common::test_properties;
 use malachite_base::num::{PrimitiveInteger, PrimitiveSigned, PrimitiveUnsigned};
 use malachite_test::inputs::base::{signeds, unsigneds};
+use rand::Rand;
 use std::{i16, i32, i64, i8, u16, u32, u64, u8};
 
 fn significant_bits_helper_common<T: PrimitiveInteger>() {
@@ -53,7 +54,7 @@ pub fn test_significant_bits() {
     significant_bits_helper_signed::<i64>(i64::MAX, i64::MIN);
 }
 
-fn significant_bits_properties_helper_unsigned<T: PrimitiveUnsigned>() {
+fn significant_bits_properties_helper_unsigned<T: PrimitiveUnsigned + Rand>() {
     test_properties(unsigneds, |&n: &T| {
         let significant_bits = n.significant_bits();
         assert!(significant_bits <= u64::from(T::WIDTH));
@@ -64,7 +65,10 @@ fn significant_bits_properties_helper_unsigned<T: PrimitiveUnsigned>() {
     });
 }
 
-fn significant_bits_properties_helper_signed<T: PrimitiveSigned>() {
+fn significant_bits_properties_helper_signed<T: PrimitiveSigned + Rand>()
+where
+    T::UnsignedOfEqualWidth: Rand,
+{
     test_properties(signeds, |&n: &T| {
         let significant_bits = n.significant_bits();
         assert!(significant_bits <= u64::from(T::WIDTH));

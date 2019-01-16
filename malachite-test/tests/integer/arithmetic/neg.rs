@@ -1,6 +1,7 @@
 use common::test_properties;
 use malachite_base::num::NegAssign;
 use malachite_nz::integer::Integer;
+use malachite_nz::platform::{Limb, SignedLimb};
 use malachite_test::common::{
     bigint_to_integer, integer_to_bigint, integer_to_rug_integer, rug_integer_to_integer,
 };
@@ -56,11 +57,11 @@ fn neg_properties() {
             negative
         );
 
-        assert_eq!(negative == *x, *x == 0);
+        assert_eq!(negative == *x, *x == 0 as Limb);
         assert_eq!(-negative, *x);
     });
 
-    test_properties(signeds::<i32>, |&x| {
+    test_properties(signeds::<SignedLimb>, |&x| {
         assert_eq!(Integer::from(-i64::from(x)), -Integer::from(x));
     });
 

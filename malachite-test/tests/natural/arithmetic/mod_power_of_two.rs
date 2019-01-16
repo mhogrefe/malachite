@@ -9,6 +9,7 @@ use malachite_nz::natural::arithmetic::mod_power_of_two::{
     limbs_neg_mod_power_of_two_in_place,
 };
 use malachite_nz::natural::Natural;
+use malachite_nz::platform::Limb;
 use malachite_test::inputs::base::{
     pairs_of_unsigned_and_small_unsigned, pairs_of_unsigned_vec_and_small_unsigned, unsigneds,
 };
@@ -20,9 +21,10 @@ use malachite_test::inputs::natural::{
 use std::cmp::min;
 use std::str::FromStr;
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_mod_power_of_two_and_limbs_mod_power_of_two_in_place() {
-    let test = |limbs: &[u32], pow: u64, out: &[u32]| {
+    let test = |limbs: &[Limb], pow: u64, out: &[Limb]| {
         assert_eq!(limbs_mod_power_of_two(limbs, pow), out);
 
         let mut limbs = limbs.to_vec();
@@ -42,9 +44,10 @@ fn test_limbs_mod_power_of_two_and_limbs_mod_power_of_two_in_place() {
     test(&[123, 456], 100, &[123, 456]);
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_neg_mod_power_of_two_and_limbs_neg_mod_power_of_two_in_place() {
-    let test = |limbs: &[u32], pow: u64, out: &[u32]| {
+    let test = |limbs: &[Limb], pow: u64, out: &[Limb]| {
         assert_eq!(limbs_neg_mod_power_of_two(limbs, pow), out);
 
         let mut limbs = limbs.to_vec();
@@ -288,7 +291,7 @@ fn mod_power_of_two_and_rem_power_of_two_properties() {
     );
 
     test_properties(
-        pairs_of_unsigned_and_small_unsigned::<u32, u64>,
+        pairs_of_unsigned_and_small_unsigned::<Limb, u64>,
         |&(u, pow)| {
             assert_eq!(
                 u.mod_power_of_two(pow),

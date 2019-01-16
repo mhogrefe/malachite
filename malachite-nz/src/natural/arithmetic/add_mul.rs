@@ -1,12 +1,13 @@
-use integer::arithmetic::add_mul_u32::mpz_aorsmul_1;
+use integer::arithmetic::add_mul_limb::mpz_aorsmul_1;
 use malachite_base::limbs::limbs_test_zero;
 use malachite_base::num::{AddMul, AddMulAssign, NotAssign};
 use natural::arithmetic::add::limbs_slice_add_greater_in_place_left;
 use natural::arithmetic::mul::mpn_mul;
 use natural::arithmetic::sub::{limbs_sub_in_place_left, limbs_sub_same_length_in_place_right};
-use natural::arithmetic::sub_u32::limbs_sub_limb_to_out;
+use natural::arithmetic::sub_limb::limbs_sub_limb_to_out;
 use natural::comparison::ord::limbs_cmp;
 use natural::Natural::{self, Large, Small};
+use platform::Limb;
 use std::cmp::{max, Ordering};
 
 /// Adds the product of a `Natural` (b) and a `Natural` (c) to a `Natural` (self), taking `self`, b,
@@ -451,11 +452,11 @@ impl<'a, 'b> AddMulAssign<&'a Natural, &'b Natural> for Natural {
 }
 
 // expecting x and y both with non-zero high limbs
-fn mpn_cmp_twosizes_lt(x: &[u32], y: &[u32]) -> bool {
+fn mpn_cmp_twosizes_lt(x: &[Limb], y: &[Limb]) -> bool {
     limbs_cmp(x, y) == Ordering::Less
 }
 
-fn mpn_sub_aba(a: &mut [u32], b: &[u32], len: usize) -> bool {
+fn mpn_sub_aba(a: &mut [Limb], b: &[Limb], len: usize) -> bool {
     let s1_len = b.len();
     assert!(s1_len >= len);
     assert!(a.len() >= s1_len);
@@ -473,11 +474,11 @@ fn mpn_sub_aba(a: &mut [u32], b: &[u32], len: usize) -> bool {
 #[allow(unknown_lints, clippy::many_single_char_names)]
 pub(crate) fn mpz_aorsmul(
     w_sign: &mut bool,
-    w: &mut Vec<u32>,
+    w: &mut Vec<Limb>,
     x_sign: bool,
-    x: &[u32],
+    x: &[Limb],
     y_sign: bool,
-    y: &[u32],
+    y: &[Limb],
     mut sub: bool,
 ) {
     // make x the bigger of the two

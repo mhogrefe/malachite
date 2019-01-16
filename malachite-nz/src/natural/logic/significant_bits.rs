@@ -1,7 +1,8 @@
 use malachite_base::num::{PrimitiveInteger, SignificantBits};
 use natural::Natural::{self, Large, Small};
+use platform::Limb;
 
-/// Interpreting a slice of `u32`s as the limbs of a `Natural` in ascending order, returns the
+/// Interpreting a slice of `Limb`s as the limbs of a `Natural` in ascending order, returns the
 /// smallest number of bits necessary to represent that `Natural`. 0 has zero significant bits. When
 /// the `Natural` is nonzero, this is equal to 1 + floor(log<sub>2<\sub>(`self`)).
 ///
@@ -21,8 +22,8 @@ use natural::Natural::{self, Large, Small};
 /// assert_eq!(limbs_significant_bits(&[0b11]), 2);
 /// assert_eq!(limbs_significant_bits(&[0, 0b1101]), 36);
 /// ```
-pub fn limbs_significant_bits(limbs: &[u32]) -> u64 {
-    ((limbs.len() as u64 - 1) << u32::LOG_WIDTH) + limbs.last().unwrap().significant_bits()
+pub fn limbs_significant_bits(limbs: &[Limb]) -> u64 {
+    ((limbs.len() as u64 - 1) << Limb::LOG_WIDTH) + limbs.last().unwrap().significant_bits()
 }
 
 impl<'a> SignificantBits for &'a Natural {

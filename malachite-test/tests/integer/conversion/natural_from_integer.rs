@@ -2,6 +2,7 @@ use common::test_properties;
 use malachite_base::misc::CheckedFrom;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
+use malachite_nz::platform::Limb;
 use malachite_test::inputs::integer::integers;
 use std::str::FromStr;
 
@@ -36,7 +37,7 @@ fn from_integer_properties() {
         let natural_x = Natural::checked_from(x);
         assert!(natural_x.as_ref().map_or(true, |n| n.is_valid()));
 
-        assert_eq!(natural_x.is_some(), *x >= 0);
+        assert_eq!(natural_x.is_some(), *x >= 0 as Limb);
         if let Some(n) = natural_x {
             assert_eq!(n.to_string(), x.to_string());
             assert_eq!(Integer::from(&n), *x);

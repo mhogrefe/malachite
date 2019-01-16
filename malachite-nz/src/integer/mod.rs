@@ -1,11 +1,12 @@
 use malachite_base::misc::{Named, Walkable};
 use malachite_base::num::{NegativeOne, One, Two, Zero};
 use natural::Natural::{self, Small};
+use platform::Limb;
 use std::str::FromStr;
 
 /// An integer.
 ///
-/// Any `Integer` whose absolute value is small enough to fit into an `u32` is represented inline.
+/// Any `Integer` whose absolute value is small enough to fit into an `Limb` is represented inline.
 /// Only integers outside this range incur the costs of heap-allocation.
 ///
 /// On a 64-bit system, an `Integer` takes up 40 bytes of space on the stack.
@@ -107,7 +108,7 @@ impl Walkable for Integer {
     /// }
     /// ```
     fn increment(&mut self) {
-        *self += 1u32;
+        *self += 1 as Limb;
     }
 
     /// Decrements `self`.
@@ -137,40 +138,40 @@ impl Walkable for Integer {
     /// }
     /// ```
     fn decrement(&mut self) {
-        *self -= 1u32;
+        *self -= 1 as Limb;
     }
 }
 
 pub mod arithmetic {
     pub mod abs;
     pub mod add;
-    pub mod add_i32;
+    pub mod add_limb;
     pub mod add_mul;
-    pub mod add_mul_i32;
-    pub mod add_mul_u32;
-    pub mod add_u32;
-    pub mod div_exact_i32;
-    pub mod div_exact_u32;
-    pub mod div_i32;
-    pub mod div_mod_i32;
-    pub mod div_mod_u32;
-    pub mod div_round_i32;
-    pub mod div_round_u32;
-    pub mod div_u32;
-    pub mod divisible_by_i32;
+    pub mod add_mul_limb;
+    pub mod add_mul_signed_limb;
+    pub mod add_signed_limb;
+    pub mod div_exact_limb;
+    pub mod div_exact_signed_limb;
+    pub mod div_limb;
+    pub mod div_mod_limb;
+    pub mod div_mod_signed_limb;
+    pub mod div_round_limb;
+    pub mod div_round_signed_limb;
+    pub mod div_signed_limb;
+    pub mod divisible_by_limb;
     pub mod divisible_by_power_of_two;
-    pub mod divisible_by_u32;
-    pub mod eq_i32_mod_i32;
-    pub mod eq_i32_mod_power_of_two;
+    pub mod divisible_by_signed_limb;
+    pub mod eq_limb_mod_limb;
+    pub mod eq_limb_mod_power_of_two;
     pub mod eq_mod_power_of_two;
-    pub mod eq_u32_mod_power_of_two;
-    pub mod eq_u32_mod_u32;
-    pub mod mod_i32;
+    pub mod eq_signed_limb_mod_power_of_two;
+    pub mod eq_signed_limb_mod_signed_limb;
+    pub mod mod_limb;
     pub mod mod_power_of_two;
-    pub mod mod_u32;
+    pub mod mod_signed_limb;
     pub mod mul;
-    pub mod mul_i32;
-    pub mod mul_u32;
+    pub mod mul_limb;
+    pub mod mul_signed_limb;
     pub mod neg;
     pub mod parity;
     pub mod shl_i;
@@ -178,48 +179,48 @@ pub mod arithmetic {
     pub mod shr_i;
     pub mod shr_u;
     pub mod sub;
-    pub mod sub_i32;
+    pub mod sub_limb;
     pub mod sub_mul;
-    pub mod sub_mul_i32;
-    pub mod sub_mul_u32;
-    pub mod sub_u32;
+    pub mod sub_mul_limb;
+    pub mod sub_mul_signed_limb;
+    pub mod sub_signed_limb;
 }
 pub mod comparison {
     pub mod ord;
     pub mod ord_abs;
-    pub mod partial_eq_i32;
+    pub mod partial_eq_limb;
     pub mod partial_eq_natural;
-    pub mod partial_eq_u32;
-    pub mod partial_ord_abs_i32;
+    pub mod partial_eq_signed_limb;
+    pub mod partial_ord_abs_limb;
     pub mod partial_ord_abs_natural;
-    pub mod partial_ord_abs_u32;
-    pub mod partial_ord_i32;
+    pub mod partial_ord_abs_signed_limb;
+    pub mod partial_ord_limb;
     pub mod partial_ord_natural;
-    pub mod partial_ord_u32;
+    pub mod partial_ord_signed_limb;
     pub mod sign;
 }
 pub mod conversion;
 pub mod logic {
     pub mod and;
-    pub mod and_i32;
+    pub mod and_limb;
     pub mod and_natural;
-    pub mod and_u32;
+    pub mod and_signed_limb;
     pub mod bit_access;
     pub mod bit_scan;
     pub mod checked_count_ones;
     pub mod checked_count_zeros;
     pub mod checked_hamming_distance;
-    pub mod checked_hamming_distance_i32;
+    pub mod checked_hamming_distance_limb;
     pub mod checked_hamming_distance_natural;
-    pub mod checked_hamming_distance_u32;
+    pub mod checked_hamming_distance_signed_limb;
     pub mod not;
     pub mod or;
-    pub mod or_i32;
+    pub mod or_limb;
     pub mod or_natural;
-    pub mod or_u32;
+    pub mod or_signed_limb;
     pub mod significant_bits;
     pub mod trailing_zeros;
     pub mod xor;
-    pub mod xor_i32;
-    pub mod xor_u32;
+    pub mod xor_limb;
+    pub mod xor_signed_limb;
 }

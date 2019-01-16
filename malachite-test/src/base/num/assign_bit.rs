@@ -4,6 +4,7 @@ use inputs::base::{
     triples_of_unsigned_unsigned_width_range_and_bool_var_1,
 };
 use malachite_base::num::{PrimitiveSigned, PrimitiveUnsigned};
+use rand::Rand;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_u8_assign_bit);
@@ -24,7 +25,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_bench!(registry, None, benchmark_i64_assign_bit);
 }
 
-fn demo_unsigned_assign_bit<T: PrimitiveUnsigned>(gm: GenerationMode, limit: usize) {
+fn demo_unsigned_assign_bit<T: PrimitiveUnsigned + Rand>(gm: GenerationMode, limit: usize) {
     for (mut n, index, bit) in
         triples_of_unsigned_unsigned_width_range_and_bool_var_1::<T, u64>(gm).take(limit)
     {
@@ -37,7 +38,10 @@ fn demo_unsigned_assign_bit<T: PrimitiveUnsigned>(gm: GenerationMode, limit: usi
     }
 }
 
-fn demo_signed_assign_bit<T: PrimitiveSigned>(gm: GenerationMode, limit: usize) {
+fn demo_signed_assign_bit<T: PrimitiveSigned + Rand>(gm: GenerationMode, limit: usize)
+where
+    T::UnsignedOfEqualWidth: Rand,
+{
     for (mut n, index, bit) in
         triples_of_signed_unsigned_width_range_and_bool_var_1::<T, u64>(gm).take(limit)
     {
@@ -50,7 +54,7 @@ fn demo_signed_assign_bit<T: PrimitiveSigned>(gm: GenerationMode, limit: usize) 
     }
 }
 
-fn benchmark_unsigned_assign_bit<T: PrimitiveUnsigned>(
+fn benchmark_unsigned_assign_bit<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,
@@ -71,11 +75,13 @@ fn benchmark_unsigned_assign_bit<T: PrimitiveUnsigned>(
     );
 }
 
-fn benchmark_signed_assign_bit<T: PrimitiveSigned>(
+fn benchmark_signed_assign_bit<T: PrimitiveSigned + Rand>(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,
-) {
+) where
+    T::UnsignedOfEqualWidth: Rand,
+{
     m_run_benchmark(
         &format!("{}.assign_bit(u64)", T::NAME),
         BenchmarkType::Single,

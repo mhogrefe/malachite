@@ -202,7 +202,7 @@ fn demo_natural_add_ref_ref(gm: GenerationMode, limit: usize) {
 
 fn benchmark_limbs_add(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
-        "limbs_add(&[u32], &[u32])",
+        "limbs_add(&[Limb], &[Limb])",
         BenchmarkType::Single,
         pairs_of_unsigned_vec(gm),
         gm.name(),
@@ -216,7 +216,7 @@ fn benchmark_limbs_add(gm: GenerationMode, limit: usize, file_name: &str) {
 
 fn benchmark_limbs_add_same_length_to_out(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
-        "limbs_add_same_length_to_out(&mut [u32], &[u32], &[u32])",
+        "limbs_add_same_length_to_out(&mut [Limb], &[Limb], &[Limb])",
         BenchmarkType::Single,
         triples_of_unsigned_vec_var_3(gm),
         gm.name(),
@@ -233,7 +233,7 @@ fn benchmark_limbs_add_same_length_to_out(gm: GenerationMode, limit: usize, file
 
 fn benchmark_limbs_add_to_out(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
-        "limbs_add_to_out(&mut [u32], &[u32], &[u32])",
+        "limbs_add_to_out(&mut [Limb], &[Limb], &[Limb])",
         BenchmarkType::Single,
         triples_of_unsigned_vec_var_4(gm),
         gm.name(),
@@ -254,7 +254,7 @@ fn benchmark_limbs_slice_add_same_length_in_place_left(
     file_name: &str,
 ) {
     m_run_benchmark(
-        "limbs_slice_add_same_length_in_place_left(&mut [u32], &[u32])",
+        "limbs_slice_add_same_length_in_place_left(&mut [Limb], &[Limb])",
         BenchmarkType::Single,
         pairs_of_unsigned_vec_var_1(gm),
         gm.name(),
@@ -275,7 +275,7 @@ fn benchmark_limbs_slice_add_greater_in_place_left(
     file_name: &str,
 ) {
     m_run_benchmark(
-        "limbs_slice_add_greater_in_place_left(&mut [u32], &[u32])",
+        "limbs_slice_add_greater_in_place_left(&mut [Limb], &[Limb])",
         BenchmarkType::Single,
         pairs_of_unsigned_vec_var_3(gm),
         gm.name(),
@@ -292,7 +292,7 @@ fn benchmark_limbs_slice_add_greater_in_place_left(
 
 fn benchmark_limbs_vec_add_in_place_left(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
-        "limbs_vec_add_in_place_left(&Vec<u32>, &[u32])",
+        "limbs_vec_add_in_place_left(&Vec<Limb>, &[Limb])",
         BenchmarkType::Single,
         pairs_of_unsigned_vec(gm),
         gm.name(),
@@ -309,7 +309,7 @@ fn benchmark_limbs_vec_add_in_place_left(gm: GenerationMode, limit: usize, file_
 
 fn benchmark_limbs_slice_add_in_place_either(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
-        "limbs_slice_add_in_place_either(&mut [u32], &mut [u32])",
+        "limbs_slice_add_in_place_either(&mut [Limb], &mut [Limb])",
         BenchmarkType::Single,
         pairs_of_unsigned_vec(gm),
         gm.name(),
@@ -326,7 +326,7 @@ fn benchmark_limbs_slice_add_in_place_either(gm: GenerationMode, limit: usize, f
 
 fn benchmark_limbs_vec_add_in_place_either(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
-        "limbs_vec_add_in_place_either(&mut [u32], &mut [u32])",
+        "limbs_vec_add_in_place_either(&mut [Limb], &mut [Limb])",
         BenchmarkType::Single,
         pairs_of_unsigned_vec(gm),
         gm.name(),

@@ -1,10 +1,11 @@
 use malachite_base::num::{CheckedSub, OverflowingSubAssign};
-use natural::arithmetic::sub_u32::{limbs_sub_limb_in_place, limbs_sub_limb_to_out};
+use natural::arithmetic::sub_limb::{limbs_sub_limb_in_place, limbs_sub_limb_to_out};
 use natural::Natural;
+use platform::Limb;
 use std::fmt::Display;
 use std::ops::{Sub, SubAssign};
 
-fn sub_and_borrow(x: u32, y: u32, borrow: &mut bool) -> u32 {
+fn sub_and_borrow(x: Limb, y: Limb, borrow: &mut bool) -> Limb {
     let (mut difference, overflow) = x.overflowing_sub(y);
     if *borrow {
         *borrow = overflow;
@@ -15,7 +16,7 @@ fn sub_and_borrow(x: u32, y: u32, borrow: &mut bool) -> u32 {
     difference
 }
 
-/// Interpreting a two slices of `u32`s as the limbs (in ascending order) of two `Natural`s,
+/// Interpreting a two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s,
 /// subtracts the second from the first. Returns a pair consisting of the limbs of the result, and
 /// whether there was a borrow left over; that is, whether the second `Natural` was greater than the
 /// first `Natural`. The first slice must be at least as long as the second.
@@ -36,7 +37,7 @@ fn sub_and_borrow(x: u32, y: u32, borrow: &mut bool) -> u32 {
 /// assert_eq!(limbs_sub(&[123, 456], &[789]), (vec![4_294_966_630, 455], false));
 /// assert_eq!(limbs_sub(&[123, 456], &[456, 789]), (vec![4_294_966_963, 4_294_966_962], true));
 /// ```
-pub fn limbs_sub(xs: &[u32], ys: &[u32]) -> (Vec<u32>, bool) {
+pub fn limbs_sub(xs: &[Limb], ys: &[Limb]) -> (Vec<Limb>, bool) {
     let xs_len = xs.len();
     let ys_len = ys.len();
     assert!(xs_len >= ys_len);
@@ -54,7 +55,7 @@ pub fn limbs_sub(xs: &[u32], ys: &[u32]) -> (Vec<u32>, bool) {
     (difference_limbs, borrow)
 }
 
-/// Interpreting a two equal-length slices of `u32`s as the limbs (in ascending order) of two
+/// Interpreting a two equal-length slices of `Limb`s as the limbs (in ascending order) of two
 /// `Natural`s, subtracts the second from the first, writing the `xs.len()` limbs of the result to
 /// an output slice. Returns whether there was a borrow left over; that is, whether the second
 /// `Natural` was greater than the first `Natural`. The output slice must be at least as long as
@@ -81,7 +82,7 @@ pub fn limbs_sub(xs: &[u32], ys: &[u32]) -> (Vec<u32>, bool) {
 /// assert_eq!(limbs_sub_same_length_to_out(&mut out_limbs, &[123, 456], &[456, 789]), true);
 /// assert_eq!(out_limbs, &[4_294_966_963, 4_294_966_962, 0]);
 /// ```
-pub fn limbs_sub_same_length_to_out(out_limbs: &mut [u32], xs: &[u32], ys: &[u32]) -> bool {
+pub fn limbs_sub_same_length_to_out(out_limbs: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> bool {
     let len = xs.len();
     assert_eq!(len, ys.len());
     assert!(out_limbs.len() >= len);
@@ -92,7 +93,7 @@ pub fn limbs_sub_same_length_to_out(out_limbs: &mut [u32], xs: &[u32], ys: &[u32
     borrow
 }
 
-/// Interpreting a two slices of `u32`s as the limbs (in ascending order) of two `Natural`s,
+/// Interpreting a two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s,
 /// subtracts the second from the first, writing the `xs.len()` limbs of the result to an output
 /// slice. Returns whether there was a borrow left over; that is, whether the second `Natural` was
 /// greater than the first `Natural`. The output slice must be at least as long as the first input
@@ -119,7 +120,7 @@ pub fn limbs_sub_same_length_to_out(out_limbs: &mut [u32], xs: &[u32], ys: &[u32
 /// assert_eq!(limbs_sub_to_out(&mut out_limbs, &[123, 456], &[456, 789]), true);
 /// assert_eq!(out_limbs, &[4_294_966_963, 4_294_966_962, 0]);
 /// ```
-pub fn limbs_sub_to_out(out_limbs: &mut [u32], xs: &[u32], ys: &[u32]) -> bool {
+pub fn limbs_sub_to_out(out_limbs: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> bool {
     let xs_len = xs.len();
     let ys_len = ys.len();
     assert!(xs_len >= ys_len);
@@ -135,7 +136,7 @@ pub fn limbs_sub_to_out(out_limbs: &mut [u32], xs: &[u32], ys: &[u32]) -> bool {
     }
 }
 
-/// Interpreting two equal-length slices of `u32`s as the limbs (in ascending order) of two
+/// Interpreting two equal-length slices of `Limb`s as the limbs (in ascending order) of two
 /// `Natural`s, subtracts the second from the first, writing the `xs.len()` limbs of the result to
 /// the first (left) slice. Returns whether there was a borrow left over; that is, whether the
 /// second `Natural` was greater than the first `Natural`.
@@ -161,7 +162,7 @@ pub fn limbs_sub_to_out(out_limbs: &mut [u32], xs: &[u32], ys: &[u32]) -> bool {
 /// assert_eq!(limbs_sub_same_length_in_place_left(xs, &[456, 789]), true);
 /// assert_eq!(xs, &[4_294_966_963, 4_294_966_962]);
 /// ```
-pub fn limbs_sub_same_length_in_place_left(xs: &mut [u32], ys: &[u32]) -> bool {
+pub fn limbs_sub_same_length_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> bool {
     let len = xs.len();
     assert_eq!(len, ys.len());
     let mut borrow = false;
@@ -171,7 +172,7 @@ pub fn limbs_sub_same_length_in_place_left(xs: &mut [u32], ys: &[u32]) -> bool {
     borrow
 }
 
-/// Interpreting two slices of `u32`s as the limbs (in ascending order) of two `Natural`s, subtracts
+/// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, subtracts
 /// the second from the first, writing the `xs.len()` limbs of the result to the first (left) slice.
 /// Returns whether there was a borrow left over; that is, whether the second `Natural` was greater
 /// than the first `Natural`. The first slice must be at least as long as the second.
@@ -197,7 +198,7 @@ pub fn limbs_sub_same_length_in_place_left(xs: &mut [u32], ys: &[u32]) -> bool {
 /// assert_eq!(limbs_sub_in_place_left(xs, &[456, 789]), true);
 /// assert_eq!(xs, &[4_294_966_963, 4_294_966_962]);
 /// ```
-pub fn limbs_sub_in_place_left(xs: &mut [u32], ys: &[u32]) -> bool {
+pub fn limbs_sub_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> bool {
     let xs_len = xs.len();
     let ys_len = ys.len();
     assert!(xs_len >= ys_len);
@@ -211,7 +212,7 @@ pub fn limbs_sub_in_place_left(xs: &mut [u32], ys: &[u32]) -> bool {
     }
 }
 
-/// Interpreting two equal-length slices of `u32`s as the limbs (in ascending order) of two
+/// Interpreting two equal-length slices of `Limb`s as the limbs (in ascending order) of two
 /// `Natural`s, subtracts the second from the first, writing the `xs.len()` limbs of the result to
 /// the second (right) slice. Returns whether there was a borrow left over; that is, whether the
 /// second `Natural` was greater than the first `Natural`.
@@ -237,7 +238,7 @@ pub fn limbs_sub_in_place_left(xs: &mut [u32], ys: &[u32]) -> bool {
 /// assert_eq!(limbs_sub_same_length_in_place_right(&[123, 456], ys), true);
 /// assert_eq!(ys, &[4_294_966_963, 4_294_966_962]);
 /// ```
-pub fn limbs_sub_same_length_in_place_right(xs: &[u32], ys: &mut [u32]) -> bool {
+pub fn limbs_sub_same_length_in_place_right(xs: &[Limb], ys: &mut [Limb]) -> bool {
     let len = ys.len();
     assert_eq!(xs.len(), len);
     let mut borrow = false;
@@ -247,7 +248,7 @@ pub fn limbs_sub_same_length_in_place_right(xs: &[u32], ys: &mut [u32]) -> bool 
     borrow
 }
 
-/// Interpreting a of `u32`s and a `Vec` of `u32`s as the limbs (in ascending order) of two
+/// Interpreting a of `Limb`s and a `Vec` of `Limb`s as the limbs (in ascending order) of two
 /// `Natural`s, subtracts the second from the first, writing the `xs.len()` limbs of the result to
 /// the `Vec`, possibly extending the `Vec`'s length. Returns whether there was a borrow left over;
 /// that is, whether the second `Natural` was greater than the first `Natural`. The first slice must
@@ -274,7 +275,7 @@ pub fn limbs_sub_same_length_in_place_right(xs: &[u32], ys: &mut [u32]) -> bool 
 /// assert_eq!(limbs_sub_in_place_right(&[123, 456], &mut ys), true);
 /// assert_eq!(ys, &[4_294_966_963, 4_294_966_962]);
 /// ```
-pub fn limbs_sub_in_place_right(xs: &[u32], ys: &mut Vec<u32>) -> bool {
+pub fn limbs_sub_in_place_right(xs: &[Limb], ys: &mut Vec<Limb>) -> bool {
     let xs_len = xs.len();
     let ys_len = ys.len();
     assert!(xs_len >= ys_len);
@@ -291,7 +292,7 @@ pub fn limbs_sub_in_place_right(xs: &[u32], ys: &mut Vec<u32>) -> bool {
     }
 }
 
-/// Interpreting a two equal-length slices of `u32`s as the limbs (in ascending order) of two
+/// Interpreting a two equal-length slices of `Limb`s as the limbs (in ascending order) of two
 /// `Natural`s, subtracts the second from the first, and then subtracts a borrow (`false` is 0,
 /// `true` is 1), writing the `xs.len()` limbs of the result to an output slice. Returns whether
 /// there was a borrow left over. The output slice must be at least as long as either input slice.
@@ -307,9 +308,9 @@ pub fn limbs_sub_in_place_right(xs: &[u32], ys: &mut Vec<u32>) -> bool {
 ///
 /// This is mpn_sub_nc from gmp-impl.h, where rp and up are disjoint.
 pub fn _limbs_sub_same_length_with_borrow_in_to_out(
-    out_limbs: &mut [u32],
-    xs: &[u32],
-    ys: &[u32],
+    out_limbs: &mut [Limb],
+    xs: &[Limb],
+    ys: &[Limb],
     borrow_in: bool,
 ) -> bool {
     let mut borrow = limbs_sub_same_length_to_out(out_limbs, xs, ys);
@@ -319,7 +320,7 @@ pub fn _limbs_sub_same_length_with_borrow_in_to_out(
     borrow
 }
 
-/// Interpreting two slices of `u32`s as the limbs (in ascending order) of two `Natural`s, subtracts
+/// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, subtracts
 /// the second from the first, and then subtracts a borrow (`false` is 0, `true` is 1), writing the
 /// `xs.len()` limbs of the result to the first (left) slice. Returns whether there was a borrow
 /// left over. The first slice must be at least as long as the second.
@@ -335,8 +336,8 @@ pub fn _limbs_sub_same_length_with_borrow_in_to_out(
 ///
 /// This is mpn_sub_nc from gmp-impl.h, where rp is the same as up.
 pub fn _limbs_sub_same_length_with_borrow_in_in_place_left(
-    xs: &mut [u32],
-    ys: &[u32],
+    xs: &mut [Limb],
+    ys: &[Limb],
     borrow_in: bool,
 ) -> bool {
     let mut borrow = limbs_sub_same_length_in_place_left(xs, ys);
@@ -348,7 +349,7 @@ pub fn _limbs_sub_same_length_with_borrow_in_in_place_left(
 
 //TODO test
 pub fn _limbs_sub_same_length_in_place_with_overlap(
-    xs: &mut [u32],
+    xs: &mut [Limb],
     input_start_index: usize,
 ) -> bool {
     let len = xs.len() - input_start_index;

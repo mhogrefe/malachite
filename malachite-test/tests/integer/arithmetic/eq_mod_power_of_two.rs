@@ -1,9 +1,12 @@
 use common::test_properties;
+#[cfg(feature = "32_bit_limbs")]
 use malachite_base::misc::CheckedFrom;
 use malachite_base::num::{DivisibleByPowerOfTwo, EqModPowerOfTwo, ModPowerOfTwo, Zero};
 use malachite_nz::integer::arithmetic::eq_mod_power_of_two::limbs_eq_mod_power_of_two_neg_pos;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
+use malachite_nz::platform::{Limb, SignedLimb};
+#[cfg(feature = "32_bit_limbs")]
 use malachite_test::common::integer_to_rug_integer;
 use malachite_test::inputs::base::{
     triples_of_signed_signed_and_small_unsigned,
@@ -18,9 +21,11 @@ use malachite_test::inputs::integer::{
     triples_of_integer_signed_and_small_unsigned, triples_of_integer_unsigned_and_small_unsigned,
 };
 use malachite_test::inputs::natural::triples_of_natural_natural_and_small_unsigned;
+#[cfg(feature = "32_bit_limbs")]
 use rug;
 use std::str::FromStr;
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_eq_mod_power_of_two_neg_pos() {
     let test = |xs, ys, pow, out| {
@@ -127,10 +132,11 @@ fn test_eq_mod_power_of_two() {
                 .eq_mod_power_of_two(&Integer::from_str(y).unwrap(), pow),
             out
         );
+        #[cfg(feature = "32_bit_limbs")]
         assert_eq!(
             rug::Integer::from_str(x).unwrap().is_congruent_2pow(
                 &rug::Integer::from_str(y).unwrap(),
-                u32::checked_from(pow).unwrap()
+                Limb::checked_from(pow).unwrap()
             ),
             out
         );
@@ -226,9 +232,12 @@ fn eq_mod_power_of_two_properties() {
         triples_of_integer_integer_and_small_unsigned,
         |&(ref x, ref y, pow)| {
             let eq_mod_power_of_two = x.eq_mod_power_of_two(y, pow);
+            #[cfg(feature = "32_bit_limbs")]
             assert_eq!(
-                integer_to_rug_integer(x)
-                    .is_congruent_2pow(&integer_to_rug_integer(y), u32::checked_from(pow).unwrap()),
+                integer_to_rug_integer(x).is_congruent_2pow(
+                    &integer_to_rug_integer(y),
+                    Limb::checked_from(pow).unwrap()
+                ),
                 eq_mod_power_of_two
             );
             assert_eq!(y.eq_mod_power_of_two(x, pow), eq_mod_power_of_two);
@@ -243,8 +252,9 @@ fn eq_mod_power_of_two_properties() {
         triples_of_integer_integer_and_small_unsigned_var_1::<u64>,
         |&(ref x, ref y, pow)| {
             assert!(x.eq_mod_power_of_two(y, pow));
+            #[cfg(feature = "32_bit_limbs")]
             assert!(integer_to_rug_integer(x)
-                .is_congruent_2pow(&integer_to_rug_integer(y), u32::checked_from(pow).unwrap()));
+                .is_congruent_2pow(&integer_to_rug_integer(y), Limb::checked_from(pow).unwrap()));
             assert!(y.eq_mod_power_of_two(x, pow));
             assert_eq!(x.mod_power_of_two(pow), y.mod_power_of_two(pow),);
         },
@@ -254,8 +264,9 @@ fn eq_mod_power_of_two_properties() {
         triples_of_integer_integer_and_small_unsigned_var_2::<u64>,
         |&(ref x, ref y, pow)| {
             assert!(!x.eq_mod_power_of_two(y, pow));
+            #[cfg(feature = "32_bit_limbs")]
             assert!(!integer_to_rug_integer(x)
-                .is_congruent_2pow(&integer_to_rug_integer(y), u32::checked_from(pow).unwrap()));
+                .is_congruent_2pow(&integer_to_rug_integer(y), Limb::checked_from(pow).unwrap()));
             assert!(!y.eq_mod_power_of_two(x, pow));
             assert_ne!(x.mod_power_of_two(pow), y.mod_power_of_two(pow),);
         },
@@ -287,7 +298,7 @@ fn eq_mod_power_of_two_properties() {
     });
 
     test_properties(
-        triples_of_integer_unsigned_and_small_unsigned::<u32, u64>,
+        triples_of_integer_unsigned_and_small_unsigned::<Limb, u64>,
         |&(ref x, y, pow)| {
             let equal = x.eq_mod_power_of_two(&Integer::from(y), pow);
             assert_eq!(x.eq_mod_power_of_two(y, pow), equal);
@@ -296,7 +307,7 @@ fn eq_mod_power_of_two_properties() {
     );
 
     test_properties(
-        triples_of_integer_signed_and_small_unsigned::<i32, u64>,
+        triples_of_integer_signed_and_small_unsigned::<SignedLimb, u64>,
         |&(ref x, y, pow)| {
             let equal = x.eq_mod_power_of_two(&Integer::from(y), pow);
             assert_eq!(x.eq_mod_power_of_two(y, pow), equal);
@@ -315,7 +326,7 @@ fn eq_mod_power_of_two_properties() {
     );
 
     test_properties(
-        triples_of_signed_signed_and_small_unsigned::<i32, u64>,
+        triples_of_signed_signed_and_small_unsigned::<SignedLimb, u64>,
         |&(x, y, pow)| {
             assert_eq!(
                 x.eq_mod_power_of_two(y, pow),

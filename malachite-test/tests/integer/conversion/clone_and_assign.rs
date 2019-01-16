@@ -1,6 +1,7 @@
 use common::test_properties;
 use malachite_base::num::Assign;
 use malachite_nz::integer::Integer;
+use malachite_nz::platform::SignedLimb;
 use malachite_test::common::{
     bigint_to_integer, integer_to_bigint, integer_to_rug_integer, rug_integer_to_integer,
 };
@@ -116,7 +117,7 @@ fn clone_clone_from_and_assign_properties() {
         assert_eq!(rug_integer_to_integer(&rug_x), *y);
     });
 
-    test_properties(pairs_of_signeds::<i32>, #[allow(unused_assignments)]
+    test_properties(pairs_of_signeds::<SignedLimb>, #[allow(unused_assignments)]
     |&(i, j)| {
         let x = Integer::from(i);
         let y = Integer::from(j);

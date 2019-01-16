@@ -3,9 +3,9 @@ use malachite_base::limbs::limbs_leading_zero_limbs;
 use malachite_base::num::{BitScan, PrimitiveInteger};
 use natural::logic::bit_scan::{limbs_index_of_next_false_bit, limbs_index_of_next_true_bit};
 use natural::Natural::{self, Large, Small};
-use std::u32;
+use platform::Limb;
 
-/// Interpreting a slice of `u32`s as the limbs (in ascending order) of the negative of an
+/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of the negative of an
 /// `Integer`, finds the lowest index greater than or equal to `starting_index` at which the
 /// `Integer` has a `false` bit. If the starting index is too large and there are no more `false`
 /// bits above it, `None` is returned.
@@ -29,25 +29,25 @@ use std::u32;
 /// assert_eq!(limbs_index_of_next_false_bit_neg(&[0, 0b101], 35), None);
 /// assert_eq!(limbs_index_of_next_false_bit_neg(&[0, 0b101], 100), None);
 /// ```
-pub fn limbs_index_of_next_false_bit_neg(limbs: &[u32], mut starting_index: u64) -> Option<u64> {
+pub fn limbs_index_of_next_false_bit_neg(limbs: &[Limb], mut starting_index: u64) -> Option<u64> {
     let n = limbs.len();
     let i = limbs_leading_zero_limbs(limbs);
     assert!(i < n);
-    let starting_limb_index = (starting_index >> u32::LOG_WIDTH) as usize;
+    let starting_limb_index = (starting_index >> Limb::LOG_WIDTH) as usize;
     if starting_limb_index >= n {
         return None;
     }
-    let after_boundary_offset = ((i as u64) + 1) << u32::LOG_WIDTH;
+    let after_boundary_offset = ((i as u64) + 1) << Limb::LOG_WIDTH;
     if starting_limb_index < i {
         return Some(starting_index);
     } else if starting_limb_index == i {
-        let within_limb_index = starting_index & u64::from(u32::WIDTH_MASK);
+        let within_limb_index = starting_index & u64::from(Limb::WIDTH_MASK);
         if let Some(result) = limbs[i]
             .wrapping_neg()
             .index_of_next_false_bit(within_limb_index)
         {
-            if result < u32::WIDTH.into() {
-                return Some(((i as u64) << u32::LOG_WIDTH) + result);
+            if result < u64::from(Limb::WIDTH) {
+                return Some(((i as u64) << Limb::LOG_WIDTH) + result);
             } else {
                 starting_index = 0;
             }
@@ -59,7 +59,7 @@ pub fn limbs_index_of_next_false_bit_neg(limbs: &[u32], mut starting_index: u64)
         .map(|result| result + after_boundary_offset)
 }
 
-/// Interpreting a slice of `u32`s as the limbs (in ascending order) of the negative of an
+/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of the negative of an
 /// `Integer`, finds the lowest index greater than or equal to `starting_index` at which the
 /// `Integer` has a `true` bit.
 ///
@@ -83,26 +83,26 @@ pub fn limbs_index_of_next_false_bit_neg(limbs: &[u32], mut starting_index: u64)
 /// assert_eq!(limbs_index_of_next_true_bit_neg(&[0, 0b101], 36), 36);
 /// assert_eq!(limbs_index_of_next_true_bit_neg(&[0, 0b101], 100), 100);
 /// ```
-pub fn limbs_index_of_next_true_bit_neg(limbs: &[u32], mut starting_index: u64) -> u64 {
+pub fn limbs_index_of_next_true_bit_neg(limbs: &[Limb], mut starting_index: u64) -> u64 {
     let n = limbs.len();
     let i = limbs_leading_zero_limbs(limbs);
     assert!(i < n);
-    let mut starting_limb_index = (starting_index >> u32::LOG_WIDTH) as usize;
+    let mut starting_limb_index = (starting_index >> Limb::LOG_WIDTH) as usize;
     if starting_limb_index >= n {
         return starting_index;
     }
-    let after_boundary_offset = ((i as u64) + 1) << u32::LOG_WIDTH;
+    let after_boundary_offset = ((i as u64) + 1) << Limb::LOG_WIDTH;
     if starting_limb_index < i {
-        starting_index = (i as u64) << u32::LOG_WIDTH;
+        starting_index = (i as u64) << Limb::LOG_WIDTH;
         starting_limb_index = i;
     }
     if starting_limb_index == i {
-        let within_limb_index = starting_index & u64::from(u32::WIDTH_MASK);
+        let within_limb_index = starting_index & u64::from(Limb::WIDTH_MASK);
         if let Some(result) = limbs[i]
             .wrapping_neg()
             .index_of_next_true_bit(within_limb_index)
         {
-            return ((i as u64) << u32::LOG_WIDTH) + result;
+            return ((i as u64) << Limb::LOG_WIDTH) + result;
         } else {
             starting_index = 0;
         }
@@ -194,13 +194,13 @@ impl Natural {
     fn index_of_next_false_bit_neg(&self, starting_index: u64) -> Option<u64> {
         match *self {
             Small(small) => {
-                if starting_index >= u64::from(u32::WIDTH) {
+                if starting_index >= u64::from(Limb::WIDTH) {
                     None
                 } else {
                     let index = ((small - 1) & !((1 << starting_index) - 1))
                         .trailing_zeros()
                         .into();
-                    if index == u32::WIDTH.into() {
+                    if index == u64::from(Limb::WIDTH) {
                         None
                     } else {
                         Some(index)
@@ -215,7 +215,7 @@ impl Natural {
     fn index_of_next_true_bit_neg(&self, starting_index: u64) -> u64 {
         match *self {
             Small(small) => {
-                if starting_index >= u64::from(u32::WIDTH) {
+                if starting_index >= u64::from(Limb::WIDTH) {
                     starting_index
                 } else {
                     (!((small - 1) | ((1 << starting_index) - 1)))

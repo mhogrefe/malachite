@@ -8,6 +8,7 @@ use malachite_nz::natural::arithmetic::add::{
     limbs_vec_add_in_place_left,
 };
 use malachite_nz::natural::Natural;
+use malachite_nz::platform::{DoubleLimb, Limb};
 use malachite_test::common::{
     biguint_to_natural, natural_to_biguint, natural_to_rug_integer, rug_integer_to_natural,
 };
@@ -25,6 +26,7 @@ use rug;
 use std::cmp::max;
 use std::str::FromStr;
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_add_and_limbs_vec_add_in_place_left() {
     let test = |xs_before, ys, out| {
@@ -49,9 +51,10 @@ fn test_limbs_add_and_limbs_vec_add_in_place_left() {
     test(&[0xffff_ffff], &[0xffff_ffff], vec![0xffff_fffe, 1]);
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_add_same_length_to_out() {
-    let test = |xs, ys, out_before: &[u32], carry, out_after| {
+    let test = |xs, ys, out_before: &[Limb], carry, out_after| {
         let mut out = out_before.to_vec();
         assert_eq!(limbs_add_same_length_to_out(&mut out, xs, ys), carry);
         assert_eq!(out, out_after);
@@ -95,6 +98,7 @@ fn test_limbs_add_same_length_to_out() {
     );
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic(expected = "assertion failed: `(left == right)`")]
 fn limbs_add_same_length_to_out_fail_1() {
@@ -102,6 +106,7 @@ fn limbs_add_same_length_to_out_fail_1() {
     limbs_add_same_length_to_out(&mut out, &[6, 7], &[1, 2, 3]);
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic(expected = "assertion failed: out_limbs.len() >= len")]
 fn limbs_add_same_length_to_out_fail_2() {
@@ -109,9 +114,10 @@ fn limbs_add_same_length_to_out_fail_2() {
     limbs_add_same_length_to_out(&mut out, &[6, 7], &[1, 2]);
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_add_to_out() {
-    let test = |xs, ys, out_before: &[u32], carry, out_after| {
+    let test = |xs, ys, out_before: &[Limb], carry, out_after| {
         let mut out = out_before.to_vec();
         assert_eq!(limbs_add_to_out(&mut out, xs, ys), carry);
         assert_eq!(out, out_after);
@@ -180,6 +186,7 @@ fn test_limbs_add_to_out() {
     );
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic(expected = "assertion failed: out_limbs.len() >= max_len")]
 fn limbs_add_to_out_fail() {
@@ -187,9 +194,10 @@ fn limbs_add_to_out_fail() {
     limbs_add_to_out(&mut out, &[6, 7, 8], &[1, 2]);
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_slice_add_same_length_in_place_left() {
-    let test = |xs_before: &[u32], ys, carry, xs_after| {
+    let test = |xs_before: &[Limb], ys, carry, xs_after| {
         let mut xs = xs_before.to_vec();
         assert_eq!(
             limbs_slice_add_same_length_in_place_left(&mut xs, ys),
@@ -211,6 +219,7 @@ fn test_limbs_slice_add_same_length_in_place_left() {
     test(&[0xffff_ffff], &[0xffff_ffff], true, vec![0xffff_fffe]);
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic(expected = "assertion failed: `(left == right)`")]
 fn limbs_slice_add_same_length_in_place_left_fail() {
@@ -218,9 +227,10 @@ fn limbs_slice_add_same_length_in_place_left_fail() {
     limbs_slice_add_same_length_in_place_left(&mut out, &[1, 2, 3]);
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_slice_add_greater_in_place_left() {
-    let test = |xs_before: &[u32], ys, carry, xs_after| {
+    let test = |xs_before: &[Limb], ys, carry, xs_after| {
         let mut xs = xs_before.to_vec();
         assert_eq!(limbs_slice_add_greater_in_place_left(&mut xs, ys), carry);
         assert_eq!(xs, xs_after);
@@ -242,6 +252,7 @@ fn test_limbs_slice_add_greater_in_place_left() {
     test(&[0xffff_ffff], &[0xffff_ffff], true, vec![0xffff_fffe]);
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic(expected = "assertion failed: xs_len >= ys_len")]
 fn limbs_slice_add_greater_in_place_left_fail() {
@@ -249,9 +260,10 @@ fn limbs_slice_add_greater_in_place_left_fail() {
     limbs_slice_add_greater_in_place_left(&mut out, &[1, 2, 3]);
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_slice_add_in_place_either() {
-    let test = |xs_before: &[u32], ys_before: &[u32], right, xs_after, ys_after| {
+    let test = |xs_before: &[Limb], ys_before: &[Limb], right, xs_after, ys_after| {
         let mut xs = xs_before.to_vec();
         let mut ys = ys_before.to_vec();
         assert_eq!(limbs_slice_add_in_place_either(&mut xs, &mut ys), right);
@@ -312,9 +324,10 @@ fn test_limbs_slice_add_in_place_either() {
     );
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_vec_add_in_place_either() {
-    let test = |xs_before: &[u32], ys_before: &[u32], right, xs_after, ys_after| {
+    let test = |xs_before: &[Limb], ys_before: &[Limb], right, xs_after, ys_after| {
         let mut xs = xs_before.to_vec();
         let mut ys = ys_before.to_vec();
         assert_eq!(limbs_vec_add_in_place_either(&mut xs, &mut ys), right);
@@ -351,9 +364,10 @@ fn test_limbs_vec_add_in_place_either() {
     );
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_add_same_length_with_carry_in_to_out() {
-    let test = |xs, ys, carry_in, out_before: &[u32], carry, out_after| {
+    let test = |xs, ys, carry_in, out_before: &[Limb], carry, out_after| {
         let mut out = out_before.to_vec();
         assert_eq!(
             _limbs_add_same_length_with_carry_in_to_out(&mut out, xs, ys, carry_in),
@@ -439,23 +453,26 @@ fn test_limbs_add_same_length_with_carry_in_to_out() {
     );
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic(expected = "assertion failed: `(left == right)`")]
-fn _limbs_add_same_length_with_carry_in_to_out_fail_1() {
+fn limbs_add_same_length_with_carry_in_to_out_fail_1() {
     let mut out = vec![10, 10, 10, 10];
     _limbs_add_same_length_with_carry_in_to_out(&mut out, &[6, 7], &[1, 2, 3], false);
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic(expected = "assertion failed: out_limbs.len() >= len")]
-fn _limbs_add_same_length_with_carry_in_to_out_fail_2() {
+fn limbs_add_same_length_with_carry_in_to_out_fail_2() {
     let mut out = vec![10];
     _limbs_add_same_length_with_carry_in_to_out(&mut out, &[6, 7], &[1, 2], false);
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_add_same_length_with_carry_in_in_place_left() {
-    let test = |xs_before: &[u32], ys, carry_in, carry, xs_after| {
+    let test = |xs_before: &[Limb], ys, carry_in, carry, xs_after| {
         let mut xs = xs_before.to_vec();
         assert_eq!(
             _limbs_add_same_length_with_carry_in_in_place_left(&mut xs, ys, carry_in),
@@ -495,6 +512,7 @@ fn test_limbs_add_same_length_with_carry_in_in_place_left() {
     );
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic(expected = "assertion failed: `(left == right)`")]
 fn limbs_add_same_length_with_carry_in_in_place_left_fail() {
@@ -605,9 +623,9 @@ fn limbs_add_to_out_properties() {
 }
 
 fn limbs_slice_add_in_place_left_helper(
-    f: &mut FnMut(&mut [u32], &[u32]) -> bool,
-    xs: &Vec<u32>,
-    ys: &Vec<u32>,
+    f: &mut FnMut(&mut [Limb], &[Limb]) -> bool,
+    xs: &Vec<Limb>,
+    ys: &Vec<Limb>,
 ) {
     let mut xs = xs.to_vec();
     let xs_old = xs.clone();
@@ -781,15 +799,15 @@ fn add_properties() {
         assert!(sum >= *y);
     });
 
-    test_properties(pairs_of_natural_and_unsigned::<u32>, |&(ref x, y)| {
+    test_properties(pairs_of_natural_and_unsigned::<Limb>, |&(ref x, y)| {
         let sum = x + Natural::from(y);
         assert_eq!(x + y, sum);
         assert_eq!(y + x, sum);
     });
 
-    test_properties(pairs_of_unsigneds::<u32>, |&(x, y)| {
+    test_properties(pairs_of_unsigneds::<Limb>, |&(x, y)| {
         assert_eq!(
-            Natural::from(u64::from(x) + u64::from(y)),
+            Natural::from(DoubleLimb::from(x) + DoubleLimb::from(y)),
             Natural::from(x) + Natural::from(y)
         );
     });

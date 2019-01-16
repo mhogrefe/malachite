@@ -1,6 +1,7 @@
 use common::test_properties;
 use malachite_base::num::Assign;
 use malachite_nz::natural::Natural;
+use malachite_nz::platform::Limb;
 use malachite_test::common::{
     biguint_to_natural, natural_to_biguint, natural_to_rug_integer, rug_integer_to_natural,
 };
@@ -85,7 +86,7 @@ fn clone_clone_from_and_assign_properties() {
         );
     });
 
-    test_properties(unsigneds::<u32>, |&u| {
+    test_properties(unsigneds::<Limb>, |&u| {
         let n = Natural::from(u);
         let cloned_u = u;
         let cloned_n = n.clone();
@@ -123,7 +124,7 @@ fn clone_clone_from_and_assign_properties() {
         assert_eq!(rug_integer_to_natural(&rug_x), *y);
     });
 
-    test_properties(pairs_of_unsigneds::<u32>, #[allow(unused_assignments)]
+    test_properties(pairs_of_unsigneds::<Limb>, #[allow(unused_assignments)]
     |&(u, v)| {
         let x = Natural::from(u);
         let y = Natural::from(v);

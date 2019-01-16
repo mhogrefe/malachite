@@ -4,10 +4,11 @@ use inputs::integer::pairs_of_integer_and_small_u64;
 use malachite_base::num::{BitScan, SignificantBits};
 use malachite_nz::integer::logic::bit_scan::limbs_index_of_next_true_bit_neg;
 use malachite_nz::integer::Integer;
+use malachite_nz::platform::Limb;
 
 pub fn integer_index_of_next_true_bit_alt(n: &Integer, u: u64) -> Option<u64> {
     if u >= n.significant_bits() {
-        if *n >= 0 {
+        if *n >= 0 as Limb {
             None
         } else {
             Some(u)

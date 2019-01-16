@@ -1,10 +1,14 @@
 use common::test_properties;
+#[cfg(feature = "32_bit_limbs")]
+use malachite_base::misc::Max;
 use malachite_nz::integer::Integer;
+use malachite_nz::platform::Limb;
 use malachite_test::inputs::integer::integers;
 use std::cmp::Ordering;
+#[cfg(feature = "32_bit_limbs")]
 use std::str::FromStr;
-use std::u32;
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_to_sign_and_limbs_asc() {
     let test = |n, out| {
@@ -28,22 +32,23 @@ fn test_to_sign_and_limbs_asc() {
         "-1701411834921604967429270619762735448065",
         (Ordering::Less, vec![1, 2, 3, 4, 5]),
     );
-    test("4294967295", (Ordering::Greater, vec![u32::MAX]));
-    test("-4294967295", (Ordering::Less, vec![u32::MAX]));
+    test("4294967295", (Ordering::Greater, vec![Limb::MAX]));
+    test("-4294967295", (Ordering::Less, vec![Limb::MAX]));
     test("4294967296", (Ordering::Greater, vec![0, 1]));
     test("-4294967296", (Ordering::Less, vec![0, 1]));
     test(
         "18446744073709551615",
-        (Ordering::Greater, vec![u32::MAX, u32::MAX]),
+        (Ordering::Greater, vec![Limb::MAX, Limb::MAX]),
     );
     test(
         "-18446744073709551615",
-        (Ordering::Less, vec![u32::MAX, u32::MAX]),
+        (Ordering::Less, vec![Limb::MAX, Limb::MAX]),
     );
     test("18446744073709551616", (Ordering::Greater, vec![0, 0, 1]));
     test("-18446744073709551616", (Ordering::Less, vec![0, 0, 1]));
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_to_sign_and_limbs_desc() {
     let test = |n, out| {
@@ -67,17 +72,17 @@ fn test_to_sign_and_limbs_desc() {
         "-1701411834921604967429270619762735448065",
         (Ordering::Less, vec![5, 4, 3, 2, 1]),
     );
-    test("4294967295", (Ordering::Greater, vec![u32::MAX]));
-    test("-4294967295", (Ordering::Less, vec![u32::MAX]));
+    test("4294967295", (Ordering::Greater, vec![Limb::MAX]));
+    test("-4294967295", (Ordering::Less, vec![Limb::MAX]));
     test("4294967296", (Ordering::Greater, vec![1, 0]));
     test("-4294967296", (Ordering::Less, vec![1, 0]));
     test(
         "18446744073709551615",
-        (Ordering::Greater, vec![u32::MAX, u32::MAX]),
+        (Ordering::Greater, vec![Limb::MAX, Limb::MAX]),
     );
     test(
         "-18446744073709551615",
-        (Ordering::Less, vec![u32::MAX, u32::MAX]),
+        (Ordering::Less, vec![Limb::MAX, Limb::MAX]),
     );
     test("18446744073709551616", (Ordering::Greater, vec![1, 0, 0]));
     test("-18446744073709551616", (Ordering::Less, vec![1, 0, 0]));
@@ -91,12 +96,12 @@ fn to_sign_and_limbs_asc_properties() {
         assert_eq!(Integer::from_sign_and_limbs_asc(sign, &limbs), *x);
         assert_eq!(
             x.to_sign_and_limbs_desc(),
-            (sign, limbs.iter().cloned().rev().collect::<Vec<u32>>(),)
+            (sign, limbs.iter().cloned().rev().collect::<Vec<Limb>>(),)
         );
         assert_eq!(sign == Ordering::Equal, limbs.is_empty());
-        assert_eq!(sign == Ordering::Equal, *x == 0);
-        if *x != 0 {
-            assert_ne!(*limbs.last().unwrap(), 0);
+        assert_eq!(sign == Ordering::Equal, *x == 0 as Limb);
+        if *x != 0 as Limb {
+            assert_ne!(*limbs.last().unwrap(), 0 as Limb);
         }
         assert_eq!((-x).to_sign_and_limbs_asc(), (sign.reverse(), limbs));
     });
@@ -110,12 +115,12 @@ fn to_sign_and_limbs_desc_properties() {
         assert_eq!(Integer::from_sign_and_limbs_desc(sign, &limbs), *x);
         assert_eq!(
             x.to_sign_and_limbs_asc(),
-            (sign, limbs.iter().cloned().rev().collect::<Vec<u32>>(),)
+            (sign, limbs.iter().cloned().rev().collect::<Vec<Limb>>(),)
         );
         assert_eq!(sign == Ordering::Equal, limbs.is_empty());
-        assert_eq!(sign == Ordering::Equal, *x == 0);
-        if *x != 0 {
-            assert_ne!(limbs[0], 0);
+        assert_eq!(sign == Ordering::Equal, *x == 0 as Limb);
+        if *x != 0 as Limb {
+            assert_ne!(limbs[0], 0 as Limb);
         }
         assert_eq!((-x).to_sign_and_limbs_desc(), (sign.reverse(), limbs));
     });

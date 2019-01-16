@@ -1,8 +1,9 @@
 use malachite_base::limbs::limbs_test_zero;
 use malachite_base::num::IsPowerOfTwo;
 use natural::Natural::{self, Large, Small};
+use platform::Limb;
 
-/// Interpreting a slice of `u32`s as the limbs of a `Natural` in ascending order, determines
+/// Interpreting a slice of `Limb`s as the limbs of a `Natural` in ascending order, determines
 /// whether that `Natural` is an integer power of 2.
 ///
 /// This function assumes that `limbs` is nonempty and the last (most significant) limb is nonzero.
@@ -25,7 +26,7 @@ use natural::Natural::{self, Large, Small};
 /// assert_eq!(limbs_is_power_of_two(&[1, 0b1000]), false);
 /// assert_eq!(limbs_is_power_of_two(&[0, 0b1010]), false);
 /// ```
-pub fn limbs_is_power_of_two(limbs: &[u32]) -> bool {
+pub fn limbs_is_power_of_two(limbs: &[Limb]) -> bool {
     assert!(!limbs.is_empty());
     limbs_test_zero(&limbs[..limbs.len() - 1]) && limbs.last().unwrap().is_power_of_two()
 }

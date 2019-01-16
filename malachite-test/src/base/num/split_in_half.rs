@@ -1,6 +1,7 @@
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::unsigneds;
 use malachite_base::num::{PrimitiveUnsigned, SplitInHalf};
+use rand::Rand;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_u16_split_in_half);
@@ -11,8 +12,10 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_bench!(registry, None, benchmark_u64_split_in_half);
 }
 
-fn demo_unsigned_split_in_half<T: PrimitiveUnsigned + SplitInHalf>(gm: GenerationMode, limit: usize)
-where
+fn demo_unsigned_split_in_half<T: PrimitiveUnsigned + SplitInHalf + Rand>(
+    gm: GenerationMode,
+    limit: usize,
+) where
     T::Half: PrimitiveUnsigned,
 {
     for u in unsigneds::<T>(gm).take(limit) {
@@ -20,7 +23,7 @@ where
     }
 }
 
-fn benchmark_unsigned_split_in_half<T: PrimitiveUnsigned + SplitInHalf>(
+fn benchmark_unsigned_split_in_half<T: PrimitiveUnsigned + Rand + SplitInHalf>(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,

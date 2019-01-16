@@ -2,10 +2,11 @@ use integer::Integer;
 use malachite_base::limbs::limbs_test_zero;
 use malachite_base::num::Zero;
 use natural::Natural;
+use platform::Limb;
 use std::cmp::Ordering;
 
 impl Integer {
-    /// Converts a sign and a slice of limbs, or base-2<sup>32</sup> digits, to an `Integer`. The
+    /// Converts a sign and a slice of limbs to an `Integer`. The
     /// sign is `Ordering::Greater` if the `Natural` is positive, `Ordering::Equal` if it is zero
     /// (in which case the limbs, if any, must all equal 0), and `Ordering::Less` if it is negative.
     /// The limbs are in ascending order, so that less significant limbs have lower indices in the
@@ -42,7 +43,7 @@ impl Integer {
     ///     Integer::from_sign_and_limbs_asc(Ordering::Less, &[3567587328, 232]).to_string(),
     ///     "-1000000000000");
     /// ```
-    pub fn from_sign_and_limbs_asc(sign: Ordering, limbs: &[u32]) -> Integer {
+    pub fn from_sign_and_limbs_asc(sign: Ordering, limbs: &[Limb]) -> Integer {
         assert_eq!(
             limbs_test_zero(limbs),
             sign == Ordering::Equal,
@@ -57,7 +58,7 @@ impl Integer {
         }
     }
 
-    /// Converts a sign and a slice of limbs, or base-2<sup>32</sup> digits, to an `Integer`. The
+    /// Converts a sign and a slice of limbs to an `Integer`. The
     /// sign is `Ordering::Greater` if the `Natural` is positive, `Ordering::Equal` if it is zero
     /// (in which case the limbs, if any, must all equal 0), and `Ordering::Less` if it is negative.
     /// The limbs are in descending order, so that less significant limbs have higher indices in the
@@ -94,7 +95,7 @@ impl Integer {
     ///     Integer::from_sign_and_limbs_desc(Ordering::Less, &[232, 3567587328]).to_string(),
     ///     "-1000000000000");
     /// ```
-    pub fn from_sign_and_limbs_desc(sign: Ordering, limbs: &[u32]) -> Integer {
+    pub fn from_sign_and_limbs_desc(sign: Ordering, limbs: &[Limb]) -> Integer {
         assert_eq!(
             limbs.iter().all(|&limb| limb == 0),
             sign == Ordering::Equal,
@@ -109,7 +110,7 @@ impl Integer {
         }
     }
 
-    /// Converts a sign and a slice of limbs, or base-2<sup>32</sup> digits, to an `Integer`. The
+    /// Converts a sign and a slice of limbs to an `Integer`. The
     /// sign is `Ordering::Greater` if the `Natural` is positive, `Ordering::Equal` if it is zero
     /// (in which case the limbs, if any, must all equal 0), and `Ordering::Less` if it is negative.
     /// The limbs are in ascending order, so that less significant limbs have lower indices in the
@@ -149,7 +150,7 @@ impl Integer {
     ///     Integer::from_sign_and_owned_limbs_asc(Ordering::Less, vec![3567587328, 232])
     ///     .to_string(), "-1000000000000");
     /// ```
-    pub fn from_sign_and_owned_limbs_asc(sign: Ordering, limbs: Vec<u32>) -> Integer {
+    pub fn from_sign_and_owned_limbs_asc(sign: Ordering, limbs: Vec<Limb>) -> Integer {
         assert_eq!(
             limbs_test_zero(&limbs),
             sign == Ordering::Equal,
@@ -164,7 +165,7 @@ impl Integer {
         }
     }
 
-    /// Converts a sign and a slice of limbs, or base-2<sup>32</sup> digits, to an `Integer`. The
+    /// Converts a sign and a slice of limbs to an `Integer`. The
     /// sign is `Ordering::Greater` if the `Natural` is positive, `Ordering::Equal` if it is zero
     /// (in which case the limbs, if any, must all equal 0), and `Ordering::Less` if it is negative.
     /// The limbs are in descending order, so that less significant limbs have higher indices in the
@@ -204,7 +205,7 @@ impl Integer {
     ///     Integer::from_sign_and_owned_limbs_desc(Ordering::Less, vec![232, 3567587328])
     ///     .to_string(), "-1000000000000");
     /// ```
-    pub fn from_sign_and_owned_limbs_desc(sign: Ordering, limbs: Vec<u32>) -> Integer {
+    pub fn from_sign_and_owned_limbs_desc(sign: Ordering, limbs: Vec<Limb>) -> Integer {
         assert_eq!(
             limbs.iter().all(|&limb| limb == 0),
             sign == Ordering::Equal,

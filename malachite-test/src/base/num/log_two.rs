@@ -1,39 +1,40 @@
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::positive_unsigneds;
 use malachite_base::num::PrimitiveUnsigned;
+use rand::Rand;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_u8_floor_log_two);
     register_demo!(registry, demo_u16_floor_log_two);
-    register_demo!(registry, demo_u32_floor_log_two);
+    register_demo!(registry, demo_limb_floor_log_two);
     register_demo!(registry, demo_u64_floor_log_two);
     register_demo!(registry, demo_u8_ceiling_log_two);
     register_demo!(registry, demo_u16_ceiling_log_two);
-    register_demo!(registry, demo_u32_ceiling_log_two);
+    register_demo!(registry, demo_limb_ceiling_log_two);
     register_demo!(registry, demo_u64_ceiling_log_two);
     register_bench!(registry, None, benchmark_u8_floor_log_two);
     register_bench!(registry, None, benchmark_u16_floor_log_two);
-    register_bench!(registry, None, benchmark_u32_floor_log_two);
+    register_bench!(registry, None, benchmark_limb_floor_log_two);
     register_bench!(registry, None, benchmark_u64_floor_log_two);
     register_bench!(registry, None, benchmark_u8_ceiling_log_two);
     register_bench!(registry, None, benchmark_u16_ceiling_log_two);
-    register_bench!(registry, None, benchmark_u32_ceiling_log_two);
+    register_bench!(registry, None, benchmark_limb_ceiling_log_two);
     register_bench!(registry, None, benchmark_u64_ceiling_log_two);
 }
 
-fn demo_unsigned_floor_log_two<T: PrimitiveUnsigned>(gm: GenerationMode, limit: usize) {
+fn demo_unsigned_floor_log_two<T: PrimitiveUnsigned + Rand>(gm: GenerationMode, limit: usize) {
     for n in positive_unsigneds::<T>(gm).take(limit) {
         println!("{}.floor_log_two() = {}", n, n.floor_log_two());
     }
 }
 
-fn demo_unsigned_ceiling_log_two<T: PrimitiveUnsigned>(gm: GenerationMode, limit: usize) {
+fn demo_unsigned_ceiling_log_two<T: PrimitiveUnsigned + Rand>(gm: GenerationMode, limit: usize) {
     for n in positive_unsigneds::<T>(gm).take(limit) {
         println!("{}.ceiling_log_two() = {}", n, n.ceiling_log_two());
     }
 }
 
-fn benchmark_unsigned_floor_log_two<T: PrimitiveUnsigned>(
+fn benchmark_unsigned_floor_log_two<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,
@@ -51,7 +52,7 @@ fn benchmark_unsigned_floor_log_two<T: PrimitiveUnsigned>(
     );
 }
 
-fn benchmark_unsigned_ceiling_log_two<T: PrimitiveUnsigned>(
+fn benchmark_unsigned_ceiling_log_two<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,
@@ -111,10 +112,10 @@ unsigned!(
 );
 unsigned!(
     u32,
-    demo_u32_floor_log_two,
-    demo_u32_ceiling_log_two,
-    benchmark_u32_floor_log_two,
-    benchmark_u32_ceiling_log_two
+    demo_limb_floor_log_two,
+    demo_limb_ceiling_log_two,
+    benchmark_limb_floor_log_two,
+    benchmark_limb_ceiling_log_two
 );
 unsigned!(
     u64,

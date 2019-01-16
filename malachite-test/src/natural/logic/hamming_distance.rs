@@ -6,6 +6,7 @@ use malachite_nz::natural::logic::hamming_distance::{
     limbs_hamming_distance, limbs_hamming_distance_same_length,
 };
 use malachite_nz::natural::Natural;
+use malachite_nz::platform::Limb;
 use rug;
 use std::cmp::max;
 use std::iter::repeat;
@@ -27,7 +28,7 @@ pub fn natural_hamming_distance_alt_1(x: &Natural, y: &Natural) -> u64 {
 }
 
 pub fn natural_hamming_distance_alt_2(x: &Natural, y: &Natural) -> u64 {
-    let limb_zip: Box<Iterator<Item = (u32, u32)>> = if x.limb_count() >= y.limb_count() {
+    let limb_zip: Box<Iterator<Item = (Limb, Limb)>> = if x.limb_count() >= y.limb_count() {
         Box::new(x.limbs().zip(y.limbs().chain(repeat(0))))
     } else {
         Box::new(x.limbs().chain(repeat(0)).zip(y.limbs()))
@@ -100,7 +101,7 @@ fn demo_natural_hamming_distance(gm: GenerationMode, limit: usize) {
 
 fn benchmark_limbs_hamming_distance_same_length(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
-        "limbs_hamming_distance_same_length(&[u32], &[u32])",
+        "limbs_hamming_distance_same_length(&[Limb], &[Limb])",
         BenchmarkType::Single,
         pairs_of_unsigned_vec_var_1(gm),
         gm.name(),
@@ -117,7 +118,7 @@ fn benchmark_limbs_hamming_distance_same_length(gm: GenerationMode, limit: usize
 
 fn benchmark_limbs_hamming_distance(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
-        "limbs_hamming_distance(&[u32], &[u32])",
+        "limbs_hamming_distance(&[Limb], &[Limb])",
         BenchmarkType::Single,
         pairs_of_unsigned_vec_var_2(gm),
         gm.name(),

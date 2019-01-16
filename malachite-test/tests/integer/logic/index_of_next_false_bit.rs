@@ -4,6 +4,7 @@ use malachite_base::num::{BitAccess, BitScan, NegativeOne, Zero};
 use malachite_nz::integer::logic::bit_scan::limbs_index_of_next_false_bit_neg;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
+use malachite_nz::platform::SignedLimb;
 use malachite_test::common::integer_to_rug_integer;
 use malachite_test::inputs::base::{
     pairs_of_signed_and_small_unsigned, pairs_of_unsigned_vec_and_small_unsigned_var_1, unsigneds,
@@ -12,8 +13,8 @@ use malachite_test::inputs::integer::{integers, pairs_of_integer_and_small_u64};
 use malachite_test::integer::logic::index_of_next_false_bit::integer_index_of_next_false_bit_alt;
 use rug;
 use std::str::FromStr;
-use std::u32;
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_index_of_next_false_bit_neg() {
     let test = |limbs, u, out| {
@@ -110,7 +111,7 @@ fn index_of_next_false_bit_properties() {
                 .map(|u| u64::from(u)),
             result
         );
-        assert_eq!(result.is_some(), n >> u != -1);
+        assert_eq!(result.is_some(), n >> u != -1 as SignedLimb);
         if let Some(result) = result {
             assert!(result >= u);
             assert!(!n.get_bit(result));
@@ -129,7 +130,7 @@ fn index_of_next_false_bit_properties() {
     });
 
     test_properties(
-        pairs_of_signed_and_small_unsigned::<i32, u64>,
+        pairs_of_signed_and_small_unsigned::<SignedLimb, u64>,
         |&(i, index)| {
             assert_eq!(
                 Integer::from(i).index_of_next_false_bit(index),

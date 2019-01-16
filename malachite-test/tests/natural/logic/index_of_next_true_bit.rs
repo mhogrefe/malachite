@@ -3,6 +3,7 @@ use malachite_base::misc::CheckedFrom;
 use malachite_base::num::{BitAccess, BitScan, SignificantBits, Zero};
 use malachite_nz::natural::logic::bit_scan::limbs_index_of_next_true_bit;
 use malachite_nz::natural::Natural;
+use malachite_nz::platform::Limb;
 use malachite_test::common::natural_to_rug_integer;
 use malachite_test::inputs::base::{
     pairs_of_unsigned_and_small_unsigned, pairs_of_unsigned_vec_and_small_unsigned, unsigneds,
@@ -12,6 +13,7 @@ use malachite_test::natural::logic::index_of_next_true_bit::natural_index_of_nex
 use rug;
 use std::str::FromStr;
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_index_of_next_true_bit() {
     let test = |limbs, u, out| {
@@ -111,7 +113,7 @@ fn index_of_next_true_bit_properties() {
     });
 
     test_properties(
-        pairs_of_unsigned_and_small_unsigned::<u32, u64>,
+        pairs_of_unsigned_and_small_unsigned::<Limb, u64>,
         |&(u, index)| {
             assert_eq!(
                 Natural::from(u).index_of_next_true_bit(index),

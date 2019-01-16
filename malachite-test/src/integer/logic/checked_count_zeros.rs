@@ -4,9 +4,10 @@ use inputs::integer::integers;
 use malachite_base::num::SignificantBits;
 use malachite_nz::integer::logic::checked_count_zeros::limbs_count_zeros_neg;
 use malachite_nz::integer::Integer;
+use malachite_nz::platform::Limb;
 
 pub fn integer_checked_count_zeros_alt_1(n: &Integer) -> Option<u64> {
-    if *n < 0 {
+    if *n < 0 as Limb {
         Some(n.twos_complement_bits().filter(|&b| !b).count() as u64)
     } else {
         None
@@ -14,7 +15,7 @@ pub fn integer_checked_count_zeros_alt_1(n: &Integer) -> Option<u64> {
 }
 
 pub fn integer_checked_count_zeros_alt_2(n: &Integer) -> Option<u64> {
-    if *n < 0 {
+    if *n < 0 as Limb {
         Some(
             n.twos_complement_limbs()
                 .map(|limb| u64::from(limb.count_zeros()))

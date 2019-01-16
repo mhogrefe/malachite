@@ -1,4 +1,5 @@
 use natural::Natural::{self, Large, Small};
+use platform::Limb;
 use std::ops::Index;
 
 /// A double-ended iterator over the limbs of a `Natural`. The forward order is ascending (least-
@@ -22,7 +23,7 @@ pub struct LimbIterator<'a> {
 }
 
 impl<'a> Iterator for LimbIterator<'a> {
-    type Item = u32;
+    type Item = Limb;
 
     /// A function to iterate through the limbs of a `Natural` in ascending order (least-significant
     /// first).
@@ -50,7 +51,7 @@ impl<'a> Iterator for LimbIterator<'a> {
     ///     assert_eq!(limbs.next(), None);
     /// }
     /// ```
-    fn next(&mut self) -> Option<u32> {
+    fn next(&mut self) -> Option<Limb> {
         if self.some_remaining {
             let limb = match *self.n {
                 Small(small) => small,
@@ -120,7 +121,7 @@ impl<'a> DoubleEndedIterator for LimbIterator<'a> {
     ///     assert_eq!(limbs.next_back(), None);
     /// }
     /// ```
-    fn next_back(&mut self) -> Option<u32> {
+    fn next_back(&mut self) -> Option<Limb> {
         if self.some_remaining {
             let limb = match *self.n {
                 Small(small) => small,
@@ -142,7 +143,7 @@ impl<'a> DoubleEndedIterator for LimbIterator<'a> {
 impl<'a> ExactSizeIterator for LimbIterator<'a> {}
 
 impl<'a> Index<usize> for LimbIterator<'a> {
-    type Output = u32;
+    type Output = Limb;
 
     /// A function to retrieve limbs by index. The index is the power of 2<sup>32</sub> of which the
     /// limbs is a coefficient. Indexing at or above the limb count returns zero limbs.
@@ -171,7 +172,7 @@ impl<'a> Index<usize> for LimbIterator<'a> {
     ///     assert_eq!(limbs[100], 0);
     /// }
     /// ```
-    fn index(&self, index: usize) -> &u32 {
+    fn index(&self, index: usize) -> &Limb {
         if index >= self.limb_count {
             &0
         } else {
@@ -184,7 +185,7 @@ impl<'a> Index<usize> for LimbIterator<'a> {
 }
 
 impl Natural {
-    /// Returns the limbs, or base-2<sup>32</sup> digits, of a `Natural`, in ascending order, so
+    /// Returns the limbs of a `Natural`, in ascending order, so
     /// that less significant limbs have lower indices in the output vector. There are no trailing
     /// zero limbs.
     ///
@@ -214,7 +215,7 @@ impl Natural {
     ///     assert_eq!(Natural::trillion().to_limbs_asc(), &[3567587328, 232]);
     /// }
     /// ```
-    pub fn to_limbs_asc(&self) -> Vec<u32> {
+    pub fn to_limbs_asc(&self) -> Vec<Limb> {
         match *self {
             Small(0) => Vec::new(),
             Small(small) => vec![small],
@@ -222,7 +223,7 @@ impl Natural {
         }
     }
 
-    /// Returns the limbs, or base-2<sup>32</sup> digits, of a `Natural`, in descending order, so
+    /// Returns the limbs of a `Natural`, in descending order, so
     /// that less significant limbs have higher indices in the output vector. There are no leading
     /// zero limbs.
     ///
@@ -252,7 +253,7 @@ impl Natural {
     ///     assert_eq!(Natural::trillion().to_limbs_desc(), &[232, 3567587328]);
     /// }
     /// ```
-    pub fn to_limbs_desc(&self) -> Vec<u32> {
+    pub fn to_limbs_desc(&self) -> Vec<Limb> {
         match *self {
             Small(0) => Vec::new(),
             Small(small) => vec![small],
@@ -260,7 +261,7 @@ impl Natural {
         }
     }
 
-    /// Returns the limbs, or base-2<sup>32</sup> digits, of a `Natural`, in ascending order, so
+    /// Returns the limbs of a `Natural`, in ascending order, so
     /// that less significant limbs have lower indices in the output vector. There are no trailing
     /// zero limbs.
     ///
@@ -288,7 +289,7 @@ impl Natural {
     ///     assert_eq!(Natural::trillion().into_limbs_asc(), &[3567587328, 232]);
     /// }
     /// ```
-    pub fn into_limbs_asc(self) -> Vec<u32> {
+    pub fn into_limbs_asc(self) -> Vec<Limb> {
         match self {
             Small(0) => Vec::new(),
             Small(small) => vec![small],
@@ -296,7 +297,7 @@ impl Natural {
         }
     }
 
-    /// Returns the limbs, or base-2<sup>32</sup> digits, of a `Natural`, in descending order, so
+    /// Returns the limbs of a `Natural`, in descending order, so
     /// that less significant limbs have higher indices in the output vector. There are no leading
     /// zero limbs.
     ///
@@ -326,7 +327,7 @@ impl Natural {
     ///     assert_eq!(Natural::trillion().into_limbs_desc(), &[232, 3567587328]);
     /// }
     /// ```
-    pub fn into_limbs_desc(self) -> Vec<u32> {
+    pub fn into_limbs_desc(self) -> Vec<Limb> {
         match self {
             Small(0) => Vec::new(),
             Small(small) => vec![small],
@@ -337,7 +338,7 @@ impl Natural {
         }
     }
 
-    /// Returns a double-ended iterator over the limbs, or base-2<sup>32</sup> digits, of a
+    /// Returns a double-ended iterator over the limbs of a
     /// `Natural`. The forward order is ascending, so that less significant limbs appear first.
     /// There are no trailing zero limbs going forward, or leading zeros going backward.
     ///

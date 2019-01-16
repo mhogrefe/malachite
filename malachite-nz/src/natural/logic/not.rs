@@ -1,6 +1,7 @@
 use integer::Integer;
 use malachite_base::num::NotAssign;
 use natural::Natural;
+use platform::Limb;
 use std::ops::Not;
 
 /// Returns the bitwise not of a slice of limbs.
@@ -18,7 +19,7 @@ use std::ops::Not;
 ///
 /// assert_eq!(limbs_not(&[0, 1, 2]), [0xffffffff, 0xfffffffe, 0xfffffffd]);
 /// ```
-pub fn limbs_not(limbs: &[u32]) -> Vec<u32> {
+pub fn limbs_not(limbs: &[Limb]) -> Vec<Limb> {
     limbs.iter().map(|limb| !limb).collect()
 }
 
@@ -42,7 +43,7 @@ pub fn limbs_not(limbs: &[u32]) -> Vec<u32> {
 /// limbs_not_to_out(&mut out_limbs, &[0xffff0000, 0xf0f0f0f0]);
 /// assert_eq!(out_limbs, [0x0000ffff, 0x0f0f0f0f, 2]);
 /// ```
-pub fn limbs_not_to_out(out_limbs: &mut [u32], in_limbs: &[u32]) {
+pub fn limbs_not_to_out(out_limbs: &mut [Limb], in_limbs: &[Limb]) {
     assert!(out_limbs.len() >= in_limbs.len());
     for (x, y) in out_limbs.iter_mut().zip(in_limbs.iter()) {
         *x = !y;
@@ -66,7 +67,7 @@ pub fn limbs_not_to_out(out_limbs: &mut [u32], in_limbs: &[u32]) {
 /// limbs_not_in_place(&mut limbs);
 /// assert_eq!(limbs, [0xffffffff, 0xfffffffe, 0xfffffffd]);
 /// ```
-pub fn limbs_not_in_place(limbs: &mut [u32]) {
+pub fn limbs_not_in_place(limbs: &mut [Limb]) {
     for limb in limbs.iter_mut() {
         limb.not_assign();
     }

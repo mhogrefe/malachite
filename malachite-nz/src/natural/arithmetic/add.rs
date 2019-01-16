@@ -1,10 +1,11 @@
 use malachite_base::num::OverflowingAddAssign;
-use natural::arithmetic::add_u32::{limbs_add_limb_to_out, limbs_slice_add_limb_in_place};
+use natural::arithmetic::add_limb::{limbs_add_limb_to_out, limbs_slice_add_limb_in_place};
 use natural::Natural::{self, Large, Small};
+use platform::Limb;
 use std::cmp::max;
 use std::ops::{Add, AddAssign};
 
-fn add_and_carry(x: u32, y: u32, carry: &mut bool) -> u32 {
+fn add_and_carry(x: Limb, y: Limb, carry: &mut bool) -> Limb {
     let (mut sum, overflow) = x.overflowing_add(y);
     if *carry {
         *carry = overflow;
@@ -17,11 +18,11 @@ fn add_and_carry(x: u32, y: u32, carry: &mut bool) -> u32 {
 
 // xs.len() >= ys_len
 fn limbs_add_helper(
-    xs: &[u32],
+    xs: &[Limb],
     ys_len: usize,
-    mut result_limbs: Vec<u32>,
+    mut result_limbs: Vec<Limb>,
     carry: bool,
-) -> Vec<u32> {
+) -> Vec<Limb> {
     result_limbs.extend_from_slice(&xs[ys_len..]);
     if carry && limbs_slice_add_limb_in_place(&mut result_limbs[ys_len..], 1) {
         result_limbs.push(1);
@@ -29,7 +30,7 @@ fn limbs_add_helper(
     result_limbs
 }
 
-/// Interpreting two slices of `u32`s as the limbs (in ascending order) of two `Natural`s, returns
+/// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, returns
 /// a `Vec` of the limbs of the sum of the `Natural`s.
 ///
 /// Time: worst case O(n)
@@ -45,7 +46,7 @@ fn limbs_add_helper(
 /// assert_eq!(limbs_add(&[6, 7], &[1, 2, 3]), &[7, 9, 3]);
 /// assert_eq!(limbs_add(&[100, 101, 0xffff_ffff], &[102, 101, 2]), &[202, 202, 1, 1]);
 /// ```
-pub fn limbs_add(xs: &[u32], ys: &[u32]) -> Vec<u32> {
+pub fn limbs_add(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
     let xs_len = xs.len();
     let ys_len = ys.len();
     let mut result_limbs = Vec::with_capacity(max(xs_len, ys_len));
@@ -65,7 +66,7 @@ pub fn limbs_add(xs: &[u32], ys: &[u32]) -> Vec<u32> {
     }
 }
 
-/// Interpreting two equal-length slices of `u32`s as the limbs (in ascending order) of two
+/// Interpreting two equal-length slices of `Limb`s as the limbs (in ascending order) of two
 /// `Natural`s, writes the `xs.len()` least-significant limbs of the sum of the `Natural`s to an
 /// output slice. The output must be at least as long as one of the input slices. Returns whether
 /// there is a carry.
@@ -91,7 +92,7 @@ pub fn limbs_add(xs: &[u32], ys: &[u32]) -> Vec<u32> {
 /// assert_eq!(limbs_add_same_length_to_out(limbs, &[100, 101, 0xffff_ffff], &[102, 101, 2]), true);
 /// assert_eq!(limbs, &[202, 202, 1, 10]);
 /// ```
-pub fn limbs_add_same_length_to_out(out_limbs: &mut [u32], xs: &[u32], ys: &[u32]) -> bool {
+pub fn limbs_add_same_length_to_out(out_limbs: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> bool {
     let len = xs.len();
     assert_eq!(len, ys.len());
     assert!(out_limbs.len() >= len);
@@ -102,7 +103,7 @@ pub fn limbs_add_same_length_to_out(out_limbs: &mut [u32], xs: &[u32], ys: &[u32
     carry
 }
 
-/// Interpreting two slices of `u32`s as the limbs (in ascending order) of two `Natural`s, writes
+/// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, writes
 /// the `max(xs.len(), ys.len())` least-significant limbs of the sum of the `Natural`s to an output
 /// slice. The output must be at least as long as the longer input slice. Returns whether there is a
 /// carry.
@@ -128,7 +129,7 @@ pub fn limbs_add_same_length_to_out(out_limbs: &mut [u32], xs: &[u32], ys: &[u32
 /// assert_eq!(limbs_add_to_out(limbs, &[100, 101, 0xffff_ffff], &[102, 101, 2]), true);
 /// assert_eq!(limbs, &[202, 202, 1, 10]);
 /// ```
-pub fn limbs_add_to_out(out_limbs: &mut [u32], xs: &[u32], ys: &[u32]) -> bool {
+pub fn limbs_add_to_out(out_limbs: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> bool {
     let xs_len = xs.len();
     let ys_len = ys.len();
     let (min_len, max_len) = if xs_len <= ys_len {
@@ -161,7 +162,7 @@ pub fn limbs_add_to_out(out_limbs: &mut [u32], xs: &[u32], ys: &[u32]) -> bool {
 // is equivalent to
 // limbs_add_to_out(&mut xs[..12], &xs[..7], &ys[0..10])
 // if the latter were allowed.
-pub fn _limbs_add_to_out_special(xs: &mut [u32], in_size: usize, ys: &[u32]) -> bool {
+pub fn _limbs_add_to_out_special(xs: &mut [Limb], in_size: usize, ys: &[Limb]) -> bool {
     assert!(in_size <= xs.len());
     assert!(in_size <= ys.len());
     assert!(xs.len() >= ys.len());
@@ -173,7 +174,7 @@ pub fn _limbs_add_to_out_special(xs: &mut [u32], in_size: usize, ys: &[u32]) -> 
     carry
 }
 
-/// Interpreting two equal-length slices of `u32`s as the limbs (in ascending order) of two
+/// Interpreting two equal-length slices of `Limb`s as the limbs (in ascending order) of two
 /// `Natural`s, writes the `xs.len()` least-significant limbs of the sum of the `Natural`s to the
 /// first (left) slice. Returns whether there is a carry.
 ///
@@ -198,7 +199,7 @@ pub fn _limbs_add_to_out_special(xs: &mut [u32], in_size: usize, ys: &[u32]) -> 
 /// assert_eq!(limbs_slice_add_same_length_in_place_left(xs, &[102, 101, 2]), true);
 /// assert_eq!(xs, &[202, 202, 1]);
 /// ```
-pub fn limbs_slice_add_same_length_in_place_left(xs: &mut [u32], ys: &[u32]) -> bool {
+pub fn limbs_slice_add_same_length_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> bool {
     let xs_len = xs.len();
     assert_eq!(xs_len, ys.len());
     let mut carry = false;
@@ -208,7 +209,7 @@ pub fn limbs_slice_add_same_length_in_place_left(xs: &mut [u32], ys: &[u32]) -> 
     carry
 }
 
-/// Interpreting two slices of `u32`s as the limbs (in ascending order) of two `Natural`s, where the
+/// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, where the
 /// length of the first slice is greater than or equal to the length of the second, writes the
 /// `xs.len()` least-significant limbs of the sum of the `Natural`s to the first (left) slice.
 /// Returns whether there is a carry.
@@ -234,7 +235,7 @@ pub fn limbs_slice_add_same_length_in_place_left(xs: &mut [u32], ys: &[u32]) -> 
 /// assert_eq!(limbs_slice_add_greater_in_place_left(xs, &[102, 101, 2]), true);
 /// assert_eq!(xs, &[202, 202, 1]);
 /// ```
-pub fn limbs_slice_add_greater_in_place_left(xs: &mut [u32], ys: &[u32]) -> bool {
+pub fn limbs_slice_add_greater_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> bool {
     let xs_len = xs.len();
     let ys_len = ys.len();
     assert!(xs_len >= ys_len);
@@ -248,7 +249,7 @@ pub fn limbs_slice_add_greater_in_place_left(xs: &mut [u32], ys: &[u32]) -> bool
     }
 }
 
-/// Interpreting a `Vec` of `u32`s and a slice of `u32`s as the limbs (in ascending order) of two
+/// Interpreting a `Vec` of `Limb`s and a slice of `Limb`s as the limbs (in ascending order) of two
 /// `Natural`s, writes the limbs of the sum of the `Natural`s to the first (left) slice.
 ///
 /// Time: worst case O(n)
@@ -272,7 +273,7 @@ pub fn limbs_slice_add_greater_in_place_left(xs: &mut [u32], ys: &[u32]) -> bool
 /// limbs_vec_add_in_place_left(&mut xs, &[102, 101, 2]);
 /// assert_eq!(xs, &[202, 202, 1, 1]);
 /// ```
-pub fn limbs_vec_add_in_place_left(xs: &mut Vec<u32>, ys: &[u32]) {
+pub fn limbs_vec_add_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
     let xs_len = xs.len();
     let ys_len = ys.len();
     let carry = if xs_len >= ys_len {
@@ -290,7 +291,7 @@ pub fn limbs_vec_add_in_place_left(xs: &mut Vec<u32>, ys: &[u32]) {
     }
 }
 
-/// Interpreting two slices of `u32`s as the limbs (in ascending order) of two `Natural`s, writes
+/// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, writes
 /// the `max(xs.len(), ys.len())` least-significant limbs of the sum of the `Natural`s to the longer
 /// slice (or the first one, if they are equally long). Returns a pair of `bool`s. The first is
 /// `false` when the output is to the first slice and `true` when it's to the second slice, and the
@@ -324,7 +325,7 @@ pub fn limbs_vec_add_in_place_left(xs: &mut Vec<u32>, ys: &[u32]) {
 /// assert_eq!(xs, &[202, 202, 1]);
 /// assert_eq!(ys, &[102, 101, 2]);
 /// ```
-pub fn limbs_slice_add_in_place_either(xs: &mut Vec<u32>, ys: &mut Vec<u32>) -> (bool, bool) {
+pub fn limbs_slice_add_in_place_either(xs: &mut Vec<Limb>, ys: &mut Vec<Limb>) -> (bool, bool) {
     if xs.len() >= ys.len() {
         (false, limbs_slice_add_greater_in_place_left(xs, ys))
     } else {
@@ -332,7 +333,7 @@ pub fn limbs_slice_add_in_place_either(xs: &mut Vec<u32>, ys: &mut Vec<u32>) -> 
     }
 }
 
-/// Interpreting two `Vec`s of `u32`s as the limbs (in ascending order) of two `Natural`s, writes
+/// Interpreting two `Vec`s of `Limb`s as the limbs (in ascending order) of two `Natural`s, writes
 /// the limbs of the sum of the `Natural`s to the longer slice (or the first one, if they are
 /// equally long). Returns a `bool` which is `false` when the output is to the first `Vec` and
 /// `true` when it's to the second `Vec`.
@@ -365,7 +366,7 @@ pub fn limbs_slice_add_in_place_either(xs: &mut Vec<u32>, ys: &mut Vec<u32>) -> 
 /// assert_eq!(xs, &[202, 202, 1, 1]);
 /// assert_eq!(ys, &[102, 101, 2]);
 /// ```
-pub fn limbs_vec_add_in_place_either(xs: &mut Vec<u32>, ys: &mut Vec<u32>) -> bool {
+pub fn limbs_vec_add_in_place_either(xs: &mut Vec<Limb>, ys: &mut Vec<Limb>) -> bool {
     if xs.len() >= ys.len() {
         if limbs_slice_add_greater_in_place_left(xs, ys) {
             xs.push(1);
@@ -379,7 +380,7 @@ pub fn limbs_vec_add_in_place_either(xs: &mut Vec<u32>, ys: &mut Vec<u32>) -> bo
     }
 }
 
-/// Interpreting two equal-length slices of `u32`s as the limbs (in ascending order) of two
+/// Interpreting two equal-length slices of `Limb`s as the limbs (in ascending order) of two
 /// `Natural`s, writes the `xs.len()` least-significant limbs of the sum of the `Natural`s and a
 /// carry (`false` is 0, `true` is 1) to an output slice. The output must be at least as long as one
 /// of the input slices. Returns whether there is a carry.
@@ -395,9 +396,9 @@ pub fn limbs_vec_add_in_place_either(xs: &mut Vec<u32>, ys: &mut Vec<u32>) -> bo
 ///
 /// This is mpn_add_nc from gmp-impl.h, where rp and up are disjoint.
 pub fn _limbs_add_same_length_with_carry_in_to_out(
-    out_limbs: &mut [u32],
-    xs: &[u32],
-    ys: &[u32],
+    out_limbs: &mut [Limb],
+    xs: &[Limb],
+    ys: &[Limb],
     carry_in: bool,
 ) -> bool {
     let mut carry = limbs_add_same_length_to_out(out_limbs, xs, ys);
@@ -407,7 +408,7 @@ pub fn _limbs_add_same_length_with_carry_in_to_out(
     carry
 }
 
-/// Interpreting two equal-length slices of `u32`s as the limbs (in ascending order) of two
+/// Interpreting two equal-length slices of `Limb`s as the limbs (in ascending order) of two
 /// `Natural`s, writes the `xs.len()` least-significant limbs of the sum of the `Natural`s and a
 /// carry (`false` is 0, `true` is 1) to the first (left) slice. Returns whether there is a carry.
 ///
@@ -422,8 +423,8 @@ pub fn _limbs_add_same_length_with_carry_in_to_out(
 ///
 /// This is mpn_add_nc from gmp-impl.h, where rp is the same as up.
 pub fn _limbs_add_same_length_with_carry_in_in_place_left(
-    xs: &mut [u32],
-    ys: &[u32],
+    xs: &mut [Limb],
+    ys: &[Limb],
     carry_in: bool,
 ) -> bool {
     let mut carry = limbs_slice_add_same_length_in_place_left(xs, ys);

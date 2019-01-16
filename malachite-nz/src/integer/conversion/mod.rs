@@ -73,25 +73,25 @@ impl FromStr for Integer {
 }
 
 pub mod assign;
-pub mod assign_i32;
-pub mod assign_i64;
+pub mod assign_double_limb;
+pub mod assign_limb;
 pub mod assign_natural;
-pub mod assign_u32;
-pub mod assign_u64;
-pub mod from_i32;
-pub mod from_i64;
+pub mod assign_signed_double_limb;
+pub mod assign_signed_limb;
+pub mod double_limb_from_integer;
+pub mod from_double_limb;
+pub mod from_limb;
 pub mod from_natural;
 pub mod from_sign_and_limbs;
+pub mod from_signed_double_limb;
+pub mod from_signed_limb;
 pub mod from_twos_complement_bits;
 pub mod from_twos_complement_limbs;
-pub mod from_u32;
-pub mod from_u64;
-pub mod i32_from_integer;
-pub mod i64_from_integer;
+pub mod limb_from_integer;
 pub mod natural_assign_integer;
 pub mod natural_from_integer;
+pub mod signed_double_limb_from_integer;
+pub mod signed_limb_from_integer;
 pub mod to_sign_and_limbs;
 pub mod to_twos_complement_bits;
 pub mod to_twos_complement_limbs;
-pub mod u32_from_integer;
-pub mod u64_from_integer;

@@ -114,7 +114,7 @@ fn test_add_mul() {
 }
 
 #[test]
-fn add_mul_u32_properties() {
+fn add_mul_limb_properties() {
     test_properties(triples_of_naturals, |&(ref a, ref b, ref c)| {
         let mut mut_a = a.clone();
         mut_a.add_mul_assign(b.clone(), c.clone());

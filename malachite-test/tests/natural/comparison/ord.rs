@@ -1,6 +1,7 @@
 use common::{test_cmp_helper, test_properties};
 use malachite_nz::natural::comparison::ord::{limbs_cmp, limbs_cmp_same_length};
 use malachite_nz::natural::Natural;
+use malachite_nz::platform::Limb;
 use malachite_test::common::{natural_to_biguint, natural_to_rug_integer};
 use malachite_test::inputs::base::{
     pairs_of_unsigned_vec_var_1, pairs_of_unsigned_vec_var_2, pairs_of_unsigneds,
@@ -12,9 +13,10 @@ use num::BigUint;
 use rug;
 use std::cmp::Ordering;
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_cmp_same_length() {
-    let test = |xs: &[u32], ys: &[u32], out| {
+    let test = |xs: &[Limb], ys: &[Limb], out| {
         assert_eq!(limbs_cmp_same_length(xs, ys), out);
     };
     test(&[3], &[5], Ordering::Less);
@@ -23,15 +25,17 @@ fn test_limbs_cmp_same_length() {
     test(&[1, 2, 3], &[1, 2, 3], Ordering::Equal);
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic(expected = "assertion failed: `(left == right)`")]
 fn limbs_cmp_same_length_fail() {
     limbs_cmp_same_length(&[1], &[2, 3]);
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_cmp() {
-    let test = |xs: &[u32], ys: &[u32], out| {
+    let test = |xs: &[Limb], ys: &[Limb], out| {
         assert_eq!(limbs_cmp(xs, ys), out);
     };
     test(&[3], &[5], Ordering::Less);
@@ -141,7 +145,7 @@ fn cmp_properties() {
         }
     });
 
-    test_properties(pairs_of_unsigneds::<u32>, |&(x, y)| {
+    test_properties(pairs_of_unsigneds::<Limb>, |&(x, y)| {
         assert_eq!(Natural::from(x).cmp(&Natural::from(y)), x.cmp(&y));
     });
 }

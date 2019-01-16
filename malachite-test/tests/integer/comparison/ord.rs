@@ -1,5 +1,6 @@
 use common::{test_cmp_helper, test_properties};
 use malachite_nz::integer::Integer;
+use malachite_nz::platform::SignedLimb;
 use malachite_test::common::integer_to_rug_integer;
 use malachite_test::inputs::base::pairs_of_signeds;
 use malachite_test::inputs::integer::{integers, pairs_of_integers, triples_of_integers};
@@ -58,7 +59,7 @@ fn cmp_properties() {
         assert_eq!(Integer::from(x).cmp(&Integer::from(y)), x.cmp(y));
     });
 
-    test_properties(pairs_of_signeds::<i32>, |&(x, y)| {
+    test_properties(pairs_of_signeds::<SignedLimb>, |&(x, y)| {
         assert_eq!(Integer::from(x).cmp(&Integer::from(y)), x.cmp(&y));
     });
 }

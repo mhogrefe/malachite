@@ -1,6 +1,7 @@
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::natural::naturals;
 use malachite_base::num::SignificantBits;
+use malachite_nz::platform::Limb;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_natural_to_bits_asc);
@@ -93,8 +94,8 @@ fn benchmark_natural_bits_rev_evaluation_strategy(
                 &mut (|n| no_out!(n.to_bits_desc())),
             ),
             (
-                "Natural.limbs().rev().collect::<Vec<u32>>()",
-                &mut (|n| no_out!(n.limbs().rev().collect::<Vec<u32>>())),
+                "Natural.limbs().rev().collect::<Vec<Limb>>()",
+                &mut (|n| no_out!(n.limbs().rev().collect::<Vec<Limb>>())),
             ),
         ],
     );

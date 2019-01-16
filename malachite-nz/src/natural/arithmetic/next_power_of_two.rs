@@ -1,8 +1,9 @@
 use malachite_base::limbs::{limbs_set_zero, limbs_test_zero};
 use malachite_base::num::{NextPowerOfTwo, NextPowerOfTwoAssign};
 use natural::Natural::{self, Large, Small};
+use platform::Limb;
 
-fn checked_shl_1(u: u32) -> Option<u32> {
+fn checked_shl_1(u: Limb) -> Option<Limb> {
     let result = u << 1;
     if result >> 1 == u {
         Some(result)
@@ -11,7 +12,7 @@ fn checked_shl_1(u: u32) -> Option<u32> {
     }
 }
 
-/// Interpreting a slice of `u32`s as the limbs (in ascending order) of a `Natural`, returns the
+/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
 /// limbs of the smallest integer power of 2 greater than or equal to the `Natural`.
 ///
 /// This function assumes that `limbs` is nonempty and the last (most significant) limb is nonzero.
@@ -33,7 +34,7 @@ fn checked_shl_1(u: u32) -> Option<u32> {
 /// assert_eq!(limbs_next_power_of_two(&[123, 456]), &[0, 512]);
 /// assert_eq!(limbs_next_power_of_two(&[123, 456, 0xffff_ffff]), &[0, 0, 0, 1]);
 /// ```
-pub fn limbs_next_power_of_two(limbs: &[u32]) -> Vec<u32> {
+pub fn limbs_next_power_of_two(limbs: &[Limb]) -> Vec<Limb> {
     let last_limb = limbs.last().unwrap();
     let mut result_limbs;
     if let Some(limb) = last_limb.checked_next_power_of_two() {
@@ -55,7 +56,7 @@ pub fn limbs_next_power_of_two(limbs: &[u32]) -> Vec<u32> {
     result_limbs
 }
 
-/// Interpreting a slice of `u32`s as the limbs (in ascending order) of a `Natural`, writes the
+/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
 /// limbs of the smallest integer power of 2 greater than or equal to the `Natural` to the input
 /// slice. If the input slice is to small to hold the result, the limbs are all set to zero and the
 /// carry bit, `true`, is returned. Otherwise, `false` is returned.
@@ -87,7 +88,7 @@ pub fn limbs_next_power_of_two(limbs: &[u32]) -> Vec<u32> {
 /// assert_eq!(limbs_slice_next_power_of_two_in_place(&mut limbs), true);
 /// assert_eq!(limbs, &[0, 0, 0]);
 /// ```
-pub fn limbs_slice_next_power_of_two_in_place(limbs: &mut [u32]) -> bool {
+pub fn limbs_slice_next_power_of_two_in_place(limbs: &mut [Limb]) -> bool {
     let (last_limb, init) = limbs.split_last_mut().unwrap();
     if let Some(limb) = last_limb.checked_next_power_of_two() {
         if limb == *last_limb && !limbs_test_zero(init) {
@@ -111,7 +112,7 @@ pub fn limbs_slice_next_power_of_two_in_place(limbs: &mut [u32]) -> bool {
     }
 }
 
-/// Interpreting a `Vec` of `u32`s as the limbs (in ascending order) of a `Natural`, writes the
+/// Interpreting a `Vec` of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
 /// limbs of the smallest integer power of 2 greater than or equal to the `Natural` to the input
 /// `Vec`.
 ///
@@ -142,7 +143,7 @@ pub fn limbs_slice_next_power_of_two_in_place(limbs: &mut [u32]) -> bool {
 /// limbs_vec_next_power_of_two_in_place(&mut limbs);
 /// assert_eq!(limbs, &[0, 0, 0, 1]);
 /// ```
-pub fn limbs_vec_next_power_of_two_in_place(limbs: &mut Vec<u32>) {
+pub fn limbs_vec_next_power_of_two_in_place(limbs: &mut Vec<Limb>) {
     if limbs_slice_next_power_of_two_in_place(limbs) {
         limbs.push(1);
     }

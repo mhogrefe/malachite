@@ -3,24 +3,25 @@ use integer::Integer;
 use malachite_base::num::{PrimitiveInteger, Zero};
 use natural::conversion::from_bits::{limbs_asc_from_bits_asc, limbs_asc_from_bits_desc};
 use natural::Natural;
+use platform::Limb;
 
-fn limbs_asc_from_negative_twos_complement_limbs_asc(mut limbs: Vec<u32>) -> Vec<u32> {
+fn limbs_asc_from_negative_twos_complement_limbs_asc(mut limbs: Vec<Limb>) -> Vec<Limb> {
     {
         let most_significant_limb = limbs.last_mut().unwrap();
         let leading_zeros = most_significant_limb.leading_zeros();
         if leading_zeros != 0 {
-            *most_significant_limb |= !((1 << (u32::WIDTH - leading_zeros)) - 1);
+            *most_significant_limb |= !((1 << (Limb::WIDTH - leading_zeros)) - 1);
         }
     }
     assert!(!limbs_twos_complement_in_place(&mut limbs));
     limbs
 }
 
-fn limbs_asc_from_negative_twos_complement_bits_asc(bits: &[bool]) -> Vec<u32> {
+fn limbs_asc_from_negative_twos_complement_bits_asc(bits: &[bool]) -> Vec<Limb> {
     limbs_asc_from_negative_twos_complement_limbs_asc(limbs_asc_from_bits_asc(bits))
 }
 
-fn limbs_asc_from_negative_twos_complement_bits_desc(bits: &[bool]) -> Vec<u32> {
+fn limbs_asc_from_negative_twos_complement_bits_desc(bits: &[bool]) -> Vec<Limb> {
     limbs_asc_from_negative_twos_complement_limbs_asc(limbs_asc_from_bits_desc(bits))
 }
 

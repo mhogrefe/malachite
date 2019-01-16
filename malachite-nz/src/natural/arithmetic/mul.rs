@@ -1,5 +1,5 @@
 use malachite_base::limbs::{limbs_set_zero, limbs_test_zero};
-use malachite_base::misc::CheckedFrom;
+use malachite_base::misc::{CheckedFrom, Max, WrappingFrom};
 use malachite_base::num::{
     NotAssign, PrimitiveInteger, PrimitiveSigned, PrimitiveUnsigned, WrappingAddAssign,
     WrappingSubAssign,
@@ -9,10 +9,10 @@ use natural::arithmetic::add::{
     limbs_add_same_length_to_out, limbs_add_to_out, limbs_slice_add_greater_in_place_left,
     limbs_slice_add_same_length_in_place_left,
 };
-use natural::arithmetic::add_mul_u32::mpn_addmul_1;
-use natural::arithmetic::add_u32::{limbs_add_limb_to_out, limbs_slice_add_limb_in_place};
-use natural::arithmetic::div_exact_u32::limbs_div_exact_3_in_place;
-use natural::arithmetic::mul_u32::limbs_mul_limb_to_out;
+use natural::arithmetic::add_limb::{limbs_add_limb_to_out, limbs_slice_add_limb_in_place};
+use natural::arithmetic::add_mul_limb::mpn_addmul_1;
+use natural::arithmetic::div_exact_limb::limbs_div_exact_3_in_place;
+use natural::arithmetic::mul_limb::limbs_mul_limb_to_out;
 use natural::arithmetic::shl_u::{limbs_shl_to_out, limbs_slice_shl_in_place};
 use natural::arithmetic::shr_u::limbs_slice_shr_in_place;
 use natural::arithmetic::sub::{
@@ -22,12 +22,12 @@ use natural::arithmetic::sub::{
     limbs_sub_same_length_in_place_left, limbs_sub_same_length_in_place_right,
     limbs_sub_same_length_to_out, limbs_sub_to_out,
 };
-use natural::arithmetic::sub_u32::limbs_sub_limb_in_place;
+use natural::arithmetic::sub_limb::limbs_sub_limb_in_place;
 use natural::comparison::ord::limbs_cmp_same_length;
 use natural::Natural::{self, Large, Small};
+use platform::{Limb, SignedLimb};
 use std::cmp::Ordering;
 use std::ops::{Mul, MulAssign};
-use std::u32;
 
 //TODO use better algorithms
 
@@ -37,7 +37,7 @@ use std::u32;
 // B ^ rn - 1, and values are semi-normalised; zero is represented as either 0 or B ^ n - 1. Needs a
 // scratch of 2rn limbs at tp.
 // mpn_bc_mulmod_bnm1 from mpn/generic/mulmod_bnm1.c
-pub fn mpn_bc_mulmod_bnm1(rp: &mut [u32], ap: &[u32], bp: &[u32], tp: &mut [u32]) {
+pub fn mpn_bc_mulmod_bnm1(rp: &mut [Limb], ap: &[Limb], bp: &[Limb], tp: &mut [Limb]) {
     let rn = ap.len();
     assert_ne!(rn, 0);
     mpn_mul_n(tp, ap, bp);
@@ -57,12 +57,12 @@ pub fn mpn_bc_mulmod_bnm1(rp: &mut [u32], ap: &[u32], bp: &[u32], tp: &mut [u32]
 // representation, computation is mod B ^ rn + 1. Needs a scratch area of 2rn + 2 limbs at tp.
 // Output is normalised.
 // mpn_bc_mulmod_bnp1 from mpn/generic/mulmod_bnm1.c
-pub fn mpn_bc_mulmod_bnp1(rp: &mut [u32], ap: &[u32], bp: &[u32], tp: &mut [u32]) {
+pub fn mpn_bc_mulmod_bnp1(rp: &mut [Limb], ap: &[Limb], bp: &[Limb], tp: &mut [Limb]) {
     let rn = ap.len() - 1;
     assert_ne!(rn, 0);
     mpn_mul_n(tp, ap, bp);
     assert_eq!(tp[2 * rn + 1], 0);
-    assert!(tp[2 * rn] < u32::MAX);
+    assert!(tp[2 * rn] < Limb::MAX);
     let cy = tp[2 * rn]
         + if limbs_sub_same_length_to_out(rp, &tp[..rn], &tp[rn..2 * rn]) {
             1
@@ -517,7 +517,7 @@ const MPN_FFT_TABLE_3: [[FFTTableNK; FFT_TABLE3_SIZE]; 2] = [MUL_FFT_TABLE3, SQR
 //TODO test
 // checked
 // docs preserved
-// Find the best k to use for a mod 2 ^ (m * u32::WIDTH) + 1 FFT for m >= n. We have sqr = 0 if for
+// Find the best k to use for a mod 2 ^ (m * Limb::WIDTH) + 1 FFT for m >= n. We have sqr = 0 if for
 // a multiply, sqr = 1 for a square.
 // mpn_fft_best_k from mpn/generic/mul-fft.c, mpn_fft_table3 variant
 pub fn mpn_fft_best_k(n: usize, sqr: usize) -> u32 {
@@ -591,7 +591,7 @@ pub const MUL_TOOM42_TO_TOOM53_THRESHOLD: usize = 100;
 pub const MUL_TOOM42_TO_TOOM63_THRESHOLD: usize = 110;
 pub const MUL_TOOM33_THRESHOLD_LIMIT: usize = MUL_TOOM33_THRESHOLD;
 
-/// Interpreting two slices of `u32`s as the limbs (in ascending order) of two `Natural`s, writes
+/// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, writes
 /// the `xs.len() + ys.len()` least-significant limbs of the product of the `Natural`s to an output
 /// slice. The output must be at least as long as `xs.len() + ys.len()`, `xs` must be as least as
 /// long as `ys`, and `ys` cannot be empty. Returns the result limb at index
@@ -612,7 +612,7 @@ pub const MUL_TOOM33_THRESHOLD_LIMIT: usize = MUL_TOOM33_THRESHOLD;
 /// Panics if `out_limbs` is too short, `xs` is shorter than `ys`, or `ys` is empty.
 ///
 /// This is mpn_mul_basecase from mpn/generic/mul_basecase.c.
-pub fn _limbs_mul_to_out_basecase(out_limbs: &mut [u32], xs: &[u32], ys: &[u32]) {
+pub fn _limbs_mul_to_out_basecase(out_limbs: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
     let xs_len = xs.len();
     let ys_len = ys.len();
     assert_ne!(ys_len, 0);
@@ -688,12 +688,12 @@ impl Toom6Flags {
 // This is mpn_toom_interpolate_6pts from mpn/generic/mpn_toom_interpolate_6pts.c.
 #[allow(clippy::cyclomatic_complexity)]
 pub fn _limbs_mul_toom_interpolate_6_points(
-    pp: &mut [u32],
+    pp: &mut [Limb],
     n: usize,
     flags: Toom6Flags,
-    w4: &mut [u32],
-    w2: &mut [u32],
-    w1: &mut [u32],
+    w4: &mut [Limb],
+    w2: &mut [Limb],
+    w1: &mut [Limb],
     w0n: usize,
 ) {
     assert_ne!(n, 0);
@@ -919,7 +919,7 @@ pub fn _limbs_mul_toom_interpolate_6_points(
 // The following is not a general substitute for addlsh2. It is correct if d == b, but it is not if
 // d == a.
 // DO_addlsh2 from mpn/generic/toom_eval_pm2.c
-fn do_addlsh2(d: &mut [u32], a: &[u32], b: &[u32], cy: &mut u32) {
+fn do_addlsh2(d: &mut [Limb], a: &[Limb], b: &[Limb], cy: &mut Limb) {
     *cy <<= 2;
     *cy += limbs_shl_to_out(d, b, 2);
     *cy += if limbs_slice_add_same_length_in_place_left(d, a) {
@@ -935,7 +935,7 @@ fn do_addlsh2(d: &mut [u32], a: &[u32], b: &[u32], cy: &mut u32) {
 // The following is not a general substitute for addlsh2. It is correct if d == b, but it is not if
 // d == a.
 // DO_addlsh2 from mpn/generic/toom_eval_pm2.c, when d == b
-fn do_addlsh2_in_place_right(a: &[u32], b: &mut [u32], cy: &mut u32) {
+fn do_addlsh2_in_place_right(a: &[Limb], b: &mut [Limb], cy: &mut Limb) {
     *cy <<= 2;
     *cy += limbs_slice_shl_in_place(b, 2);
     *cy += if limbs_slice_add_same_length_in_place_left(b, a) {
@@ -951,16 +951,16 @@ fn do_addlsh2_in_place_right(a: &[u32], b: &mut [u32], cy: &mut u32) {
 // Evaluates a polynomial of degree 2 < k < GMP_NUMB_BITS, in the points +2 and -2.
 // mpn_toom_eval_pm2 from mpn/generic/toom_eval_pm2.c
 pub fn mpn_toom_eval_pm2(
-    xp2: &mut [u32],
-    xm2: &mut [u32],
+    xp2: &mut [Limb],
+    xm2: &mut [Limb],
     mut k: u32,
-    xp: &[u32],
+    xp: &[Limb],
     n: usize,
     hn: usize,
-    tp: &mut [u32],
-) -> u32 {
+    tp: &mut [Limb],
+) -> Limb {
     assert!(k >= 3);
-    assert!(k < u32::WIDTH);
+    assert!(k < Limb::WIDTH);
     assert!(hn > 0);
     assert!(hn <= n);
 
@@ -1019,7 +1019,7 @@ pub fn mpn_toom_eval_pm2(
     }
 
     let mut neg = if limbs_cmp_same_length(&xp2[..limit], &tp[..limit]) == Ordering::Less {
-        u32::MAX
+        Limb::MAX
     } else {
         0
     };
@@ -1033,9 +1033,9 @@ pub fn mpn_toom_eval_pm2(
     limbs_slice_add_same_length_in_place_left(&mut xp2[..limit], &tp[..limit]);
 
     assert!(xp2[n] < (1 << (k + 2)) - 1);
-    assert!(xm2[n] < ((1 << (k + 3)) - 1 - (1 ^ k & 1)) / 3);
+    assert!(xm2[n] < Limb::from(((1 << (k + 3)) - 1 - (1 ^ k & 1)) / 3));
 
-    neg ^= (k & 1) - 1;
+    neg ^= (Limb::from(k) & 1).wrapping_sub(1);
     neg
 }
 
@@ -1045,13 +1045,13 @@ pub fn mpn_toom_eval_pm2(
 // Needs n+1 limbs of temporary storage.
 // mpn_toom_eval_dgr3_pm2 from mpn/generic/toom_eval_dg3_pm2.c
 pub fn _limbs_mul_toom_evaluate_deg_3_poly_in_2_and_neg_2(
-    xp2: &mut [u32],
-    xm2: &mut [u32],
-    xp: &[u32],
+    xp2: &mut [Limb],
+    xm2: &mut [Limb],
+    xp: &[Limb],
     n: usize,
     x3n: usize,
-    tp: &mut [u32],
-) -> u32 {
+    tp: &mut [Limb],
+) -> Limb {
     assert!(x3n > 0);
     assert!(x3n <= n);
 
@@ -1082,7 +1082,7 @@ pub fn _limbs_mul_toom_evaluate_deg_3_poly_in_2_and_neg_2(
     limbs_slice_shl_in_place(&mut tp[..limit], 1);
 
     let neg = if limbs_cmp_same_length(&xp2[..limit], &tp[..limit]) == Ordering::Less {
-        u32::MAX
+        Limb::MAX
     } else {
         0
     };
@@ -1146,7 +1146,7 @@ pub fn _limbs_mul_to_out_toom_43_scratch_size(xs_len: usize, ys_len: usize) -> u
 // vinf=              a3 *         b2  # A(inf)*B(inf)
 //
 // mpn_toom43_mul from mpn/generic/toom43_mul.c
-pub fn _limbs_mul_to_out_toom_43(pp: &mut [u32], xs: &[u32], ys: &[u32], scratch: &mut [u32]) {
+pub fn _limbs_mul_to_out_toom_43(pp: &mut [Limb], xs: &[Limb], ys: &[Limb], scratch: &mut [Limb]) {
     let an = xs.len();
     let bn = ys.len();
     let n = 1 + if 3 * an >= 4 * bn {
@@ -1186,7 +1186,9 @@ pub fn _limbs_mul_to_out_toom_43(pp: &mut [u32], xs: &[u32], ys: &[u32], scratch
             // Compute as2 and asm2.
             flags = Toom6Flags::from_u32(
                 Toom6Flags::Toom6Vm2Neg.into_u32()
-                    & _limbs_mul_toom_evaluate_deg_3_poly_in_2_and_neg_2(as2, asm2, xs, n, s, asm1),
+                    & u32::wrapping_from(_limbs_mul_toom_evaluate_deg_3_poly_in_2_and_neg_2(
+                        as2, asm2, xs, n, s, asm1,
+                    )),
             );
 
             // Compute bs2 and bsm2.
@@ -1327,7 +1329,7 @@ pub fn _limbs_mul_to_out_toom_43(pp: &mut [u32], xs: &[u32], ys: &[u32], scratch
 ///
 /// This is mpn_toom33_mul_itch from gmp-impl.h.
 pub fn _limbs_mul_to_out_toom_33_scratch_size(xs_len: usize) -> usize {
-    3 * xs_len + u32::WIDTH as usize
+    3 * xs_len + Limb::WIDTH as usize
 }
 
 pub const MAYBE_MUL_BASECASE: bool =
@@ -1339,10 +1341,10 @@ pub const MAYBE_MUL_TOOM33: bool =
 ///
 /// This is TOOM33_MUL_N_REC from mpn/generic/toom33_mul.c.
 pub fn _limbs_mul_same_length_to_out_toom_33_recursive(
-    out_limbs: &mut [u32],
-    xs: &[u32],
-    ys: &[u32],
-    scratch: &mut [u32],
+    out_limbs: &mut [Limb],
+    xs: &[Limb],
+    ys: &[Limb],
+    scratch: &mut [Limb],
 ) {
     let n = xs.len();
     assert_eq!(xs.len(), n);
@@ -1372,7 +1374,7 @@ pub fn _limbs_mul_to_out_toom_33_input_sizes_valid(xs_len: usize, ys_len: usize)
     0 < s && s <= n && 0 < t && t <= n
 }
 
-/// Interpreting two slices of `u32`s as the limbs (in ascending order) of two `Natural`s, writes
+/// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, writes
 /// the `xs.len() + ys.len()` least-significant limbs of the product of the `Natural`s to an output
 /// slice. A "scratch" slice is provided for the algorithm to use. An upper bound for the number of
 /// scratch limbs needed is provided by `_limbs_mul_to_out_toom_33_scratch_size`. The following
@@ -1410,10 +1412,10 @@ pub fn _limbs_mul_to_out_toom_33_input_sizes_valid(xs_len: usize, ys_len: usize)
 /// This is mpn_toom33_mul from mpn/generic/toom33_mul.c.
 #[allow(clippy::cyclomatic_complexity)]
 pub fn _limbs_mul_to_out_toom_33(
-    out_limbs: &mut [u32],
-    xs: &[u32],
-    ys: &[u32],
-    scratch: &mut [u32],
+    out_limbs: &mut [Limb],
+    xs: &[Limb],
+    ys: &[Limb],
+    scratch: &mut [Limb],
 ) {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -1630,13 +1632,13 @@ pub fn _limbs_mul_to_out_toom_33(
 
 /// This is mpn_toom_interpolate_5pts in mpn/generic/toom_interpolate_5pts.c.
 fn _limbs_mul_toom_interpolate_5_points(
-    c: &mut [u32],
-    v_2: &mut [u32],
-    v_neg_1: &mut [u32],
+    c: &mut [Limb],
+    v_2: &mut [Limb],
+    v_neg_1: &mut [Limb],
     k: usize,
     two_r: usize,
     v_neg_1_neg: bool,
-    mut v_inf_0: u32,
+    mut v_inf_0: Limb,
 ) {
     let two_k = k + k;
     let two_k_plus_1 = two_k + 1;
@@ -1809,12 +1811,12 @@ fn _limbs_mul_toom_interpolate_5_points(
 ///
 /// This is mpn_toom_eval_dgr3_pm1 in mpn/generic/toom_eval_dgr3_pm1.c.
 pub fn _limbs_mul_toom_evaluate_deg_3_poly_in_1_and_neg_1(
-    xp1: &mut [u32],
-    xm1: &mut [u32],
-    xp: &[u32],
+    xp1: &mut [Limb],
+    xm1: &mut [Limb],
+    xp: &[Limb],
     n: usize,
     x3n: usize,
-    tp: &mut [u32],
+    tp: &mut [Limb],
 ) -> bool {
     assert_ne!(x3n, 0);
     assert!(x3n <= n);
@@ -1879,14 +1881,14 @@ pub fn _limbs_mul_to_out_toom_42_scratch_size(xs_len: usize, ys_len: usize) -> u
 ///
 /// This is TOOM42_MUL_N_REC from mpn/generic/toom42_mul.c.
 pub fn _limbs_mul_same_length_to_out_toom_42_recursive(
-    out_limbs: &mut [u32],
-    xs: &[u32],
-    ys: &[u32],
+    out_limbs: &mut [Limb],
+    xs: &[Limb],
+    ys: &[Limb],
 ) {
     mpn_mul_n(out_limbs, xs, ys);
 }
 
-/// Interpreting two slices of `u32`s as the limbs (in ascending order) of two `Natural`s, writes
+/// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, writes
 /// the `xs.len() + ys.len()` least-significant limbs of the product of the `Natural`s to an output
 /// slice. A "scratch" slice is provided for the algorithm to use. An upper bound for the number of
 /// scratch limbs needed is provided by `_limbs_mul_to_out_toom_42_scratch_size`. The following
@@ -1923,10 +1925,10 @@ pub fn _limbs_mul_same_length_to_out_toom_42_recursive(
 ///
 /// This is mpn_toom42_mul from mpn/generic/toom42_mul.c.
 pub fn _limbs_mul_to_out_toom_42(
-    out_limbs: &mut [u32],
-    xs: &[u32],
-    ys: &[u32],
-    scratch: &mut [u32],
+    out_limbs: &mut [Limb],
+    xs: &[Limb],
+    ys: &[Limb],
+    scratch: &mut [Limb],
 ) {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -2086,7 +2088,7 @@ pub fn _limbs_mul_to_out_toom_32_scratch_size(xs_len: usize, ys_len: usize) -> u
 /// A helper function for `_limbs_mul_to_out_toom_22`.
 ///
 /// This is TOOM32_MUL_N_REC from mpn/generic/toom32_mul.c.
-pub fn _limbs_mul_same_length_to_out_toom_32_recursive(p: &mut [u32], a: &[u32], b: &[u32]) {
+pub fn _limbs_mul_same_length_to_out_toom_32_recursive(p: &mut [Limb], a: &[Limb], b: &[Limb]) {
     mpn_mul_n(p, a, b);
 }
 
@@ -2109,7 +2111,7 @@ pub fn _limbs_mul_to_out_toom_32_input_sizes_valid(xs_len: usize, ys_len: usize)
     0 < s && s <= n && 0 < t && t <= n && s + t >= n
 }
 
-/// Interpreting two slices of `u32`s as the limbs (in ascending order) of two `Natural`s, writes
+/// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, writes
 /// the `xs.len() + ys.len()` least-significant limbs of the product of the `Natural`s to an output
 /// slice. A "scratch" slice is provided for the algorithm to use. An upper bound for the number of
 /// scratch limbs needed is provided by `_limbs_mul_to_out_toom_32_scratch_size`. The following
@@ -2146,10 +2148,10 @@ pub fn _limbs_mul_to_out_toom_32_input_sizes_valid(xs_len: usize, ys_len: usize)
 /// This is mpn_toom32_mul from mpn/generic/toom32_mul.c.
 #[allow(unreachable_code)] //TODO remove
 pub fn _limbs_mul_to_out_toom_32(
-    out_limbs: &mut [u32],
-    xs: &[u32],
-    ys: &[u32],
-    scratch: &mut [u32],
+    out_limbs: &mut [Limb],
+    xs: &[Limb],
+    ys: &[Limb],
+    scratch: &mut [Limb],
 ) {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -2175,7 +2177,7 @@ pub fn _limbs_mul_to_out_toom_32(
     let (xs1, xs2) = remainder.split_at(n); // xs1: length n, xs2: length s
     let (ys0, ys1) = ys.split_at(n); // ys0: length n, ys1: length t
 
-    let mut hi: i32;
+    let mut hi: SignedLimb;
     let mut v_neg_1_neg;
     {
         // Product area of size xs_len + ys_len = 3 * n + s + t >= 4 * n + 2.
@@ -2408,12 +2410,12 @@ pub fn _limbs_mul_to_out_toom_32(
             panic!("hi < 0 second time: {:?} {:?}", xs, ys);
             assert!(!limbs_sub_limb_in_place(
                 out_limbs_hi,
-                u32::checked_from(-hi).unwrap()
+                Limb::checked_from(-hi).unwrap()
             ));
         } else {
             assert!(!limbs_slice_add_limb_in_place(
                 out_limbs_hi,
-                u32::checked_from(hi).unwrap()
+                Limb::checked_from(hi).unwrap()
             ));
         }
     } else {
@@ -2434,7 +2436,7 @@ pub fn _limbs_mul_to_out_toom_32(
 ///
 /// This is mpn_toom22_mul_itch from gmp-impl.h.
 pub fn _limbs_mul_to_out_toom_22_scratch_size(xs_len: usize) -> usize {
-    2 * (xs_len + u32::WIDTH as usize)
+    2 * (xs_len + Limb::WIDTH as usize)
 }
 
 // TODO make these compiler flags?
@@ -2448,10 +2450,10 @@ pub const MAYBE_MUL_TOOM22: bool =
 ///
 /// This is TOOM22_MUL_N_REC from mpn/generic/toom22_mul.c.
 fn _limbs_mul_same_length_to_out_toom_22_recursive(
-    out_limbs: &mut [u32],
-    xs: &[u32],
-    ys: &[u32],
-    scratch: &mut [u32],
+    out_limbs: &mut [Limb],
+    xs: &[Limb],
+    ys: &[Limb],
+    scratch: &mut [Limb],
 ) {
     assert_eq!(xs.len(), ys.len());
     if !MAYBE_MUL_TOOM22 || xs.len() < MUL_TOOM22_THRESHOLD {
@@ -2471,10 +2473,10 @@ fn _limbs_mul_same_length_to_out_toom_22_recursive(
 ///
 /// This is TOOM22_MUL_REC from mpn/generic/toom22_mul.c.
 fn _limbs_mul_to_out_toom_22_recursive(
-    out_limbs: &mut [u32],
-    xs: &[u32],
-    ys: &[u32],
-    scratch: &mut [u32],
+    out_limbs: &mut [Limb],
+    xs: &[Limb],
+    ys: &[Limb],
+    scratch: &mut [Limb],
 ) {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -2489,7 +2491,7 @@ fn _limbs_mul_to_out_toom_22_recursive(
     }
 }
 
-/// Interpreting two slices of `u32`s as the limbs (in ascending order) of two `Natural`s, writes
+/// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, writes
 /// the `xs.len() + ys.len()` least-significant limbs of the product of the `Natural`s to an output
 /// slice. A "scratch" slice is provided for the algorithm to use. An upper bound for the number of
 /// scratch limbs needed is provided by `_limbs_mul_to_out_toom_22_scratch_size`. The following
@@ -2526,10 +2528,10 @@ fn _limbs_mul_to_out_toom_22_recursive(
 ///
 /// This is mpn_toom22_mul from mpn/generic/toom22_mul.c.
 pub fn _limbs_mul_to_out_toom_22(
-    out_limbs: &mut [u32],
-    xs: &[u32],
-    ys: &[u32],
-    scratch: &mut [u32],
+    out_limbs: &mut [Limb],
+    xs: &[Limb],
+    ys: &[Limb],
+    scratch: &mut [Limb],
 ) {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -2657,7 +2659,7 @@ pub fn _limbs_mul_to_out_toom_22(
 //TODO test
 // multiply natural numbers.
 // mpn_mul_n from mpn/generic/mul_n.c
-pub fn mpn_mul_n(out_limbs: &mut [u32], xs: &[u32], ys: &[u32]) {
+pub fn mpn_mul_n(out_limbs: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
     let len = xs.len();
     assert_eq!(ys.len(), len);
     assert!(len >= 1);
@@ -2669,7 +2671,7 @@ pub fn mpn_mul_n(out_limbs: &mut [u32], xs: &[u32], ys: &[u32]) {
         // _limbs_mul_to_out_toom_22_scratch_size(MUL_TOOM33_THRESHOLD_LIMIT - 1)
 
         // Allocate workspace of fixed size on stack: fast!
-        let scratch = &mut [0; 2 * (MUL_TOOM33_THRESHOLD_LIMIT - 1 + u32::WIDTH as usize)];
+        let scratch = &mut [0; 2 * (MUL_TOOM33_THRESHOLD_LIMIT - 1 + Limb::WIDTH as usize)];
         assert!(MUL_TOOM33_THRESHOLD <= MUL_TOOM33_THRESHOLD_LIMIT);
         _limbs_mul_to_out_toom_22(out_limbs, xs, ys, scratch);
     } else if len < MUL_TOOM44_THRESHOLD {
@@ -2718,14 +2720,14 @@ pub fn mpn_mul_n(out_limbs: &mut [u32], xs: &[u32], ys: &[u32]) {
 //TODO test
 // Multiply two natural numbers.
 // mpn_mul from mpn/generic/mul.c
-pub fn mpn_mul(out_limbs: &mut [u32], xs: &[u32], ys: &[u32]) -> u32 {
+pub fn mpn_mul(out_limbs: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> Limb {
     let xs_len = xs.len();
     let ys_len = ys.len();
     assert!(xs_len >= ys_len);
     assert!(ys_len >= 1);
 
     if xs_len == ys_len {
-        //TODO if xs as *const [u32] == ys as *const [u32] {
+        //TODO if xs as *const [Limb] == ys as *const [Limb] {
         //TODO     mpn_sqr(out_limbs, xs, xs_len);
         //TODO     mpn_mul_n(out_limbs, xs, ys);
         //TODO } else {
@@ -2737,7 +2739,7 @@ pub fn mpn_mul(out_limbs: &mut [u32], xs: &[u32], ys: &[u32]) -> u32 {
         // applicable mpn_mul_N, perform basecase multiply directly.
         _limbs_mul_to_out_basecase(out_limbs, xs, ys);
     } else if ys_len < MUL_TOOM33_THRESHOLD {
-        let toom_x2_scratch_size = 9 * ys_len / 2 + u32::WIDTH as usize * 2;
+        let toom_x2_scratch_size = 9 * ys_len / 2 + Limb::WIDTH as usize * 2;
         // toom_22_scratch_size((5 * ys_len - 1) / 4) <= toom_x2_scratch_size
         // toom_32_scratch_size((7 * ys_len - 1) / 4, ys_len) <= toom_x2_scratch_size
         // toom_42_scratch_size(3 * ys_len - 1, ys_len) <= toom_x2_scratch_size
@@ -2815,7 +2817,7 @@ pub fn mpn_mul(out_limbs: &mut [u32], xs: &[u32], ys: &[u32]) -> u32 {
 // 1 < v.len() < MUL_TOOM22_THRESHOLD < MUL_BASECASE_MAX_UN < u.len()
 //
 // This is currently not measurably better than just basecase.
-fn mpn_mul_basecase_mem_opt_helper(prod: &mut [u32], u: &[u32], v: &[u32]) {
+fn mpn_mul_basecase_mem_opt_helper(prod: &mut [Limb], u: &[Limb], v: &[Limb]) {
     let u_len = u.len();
     let v_len = v.len();
     assert!(1 < v_len);
@@ -2841,7 +2843,7 @@ fn mpn_mul_basecase_mem_opt_helper(prod: &mut [u32], u: &[u32], v: &[u32]) {
 }
 
 //TODO update docs
-fn mpn_mul_basecase_mem_opt(prod: &mut [u32], u: &[u32], v: &[u32]) {
+fn mpn_mul_basecase_mem_opt(prod: &mut [Limb], u: &[Limb], v: &[Limb]) {
     let u_len = u.len();
     let v_len = v.len();
     assert!(u_len >= v_len);
@@ -2852,7 +2854,7 @@ fn mpn_mul_basecase_mem_opt(prod: &mut [u32], u: &[u32], v: &[u32]) {
     }
 }
 
-pub fn mul_helper(xs: &[u32], ys: &[u32]) -> Vec<u32> {
+pub fn mul_helper(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
     let mut product_limbs = vec![0; xs.len() + ys.len()];
     if xs.len() >= ys.len() {
         mpn_mul(&mut product_limbs, xs, ys);
@@ -2862,7 +2864,7 @@ pub fn mul_helper(xs: &[u32], ys: &[u32]) -> Vec<u32> {
     product_limbs
 }
 
-fn mul_basecase_mem_opt_helper(xs: &[u32], ys: &[u32]) -> Vec<u32> {
+fn mul_basecase_mem_opt_helper(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
     let mut product_limbs = vec![0; xs.len() + ys.len()];
     if xs.len() >= ys.len() {
         mpn_mul_basecase_mem_opt(&mut product_limbs, xs, ys);

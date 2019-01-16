@@ -2,6 +2,7 @@ use integer::Integer;
 use malachite_base::num::{BitAccess, NotAssign};
 use natural::conversion::to_bits::BitIterator;
 use natural::Natural;
+use platform::Limb;
 use std::ops::Index;
 
 /// A double-ended iterator over the two's complement bits of the negative of a `Natural`. The
@@ -530,7 +531,7 @@ impl Integer {
     /// }
     /// ```
     pub fn twos_complement_bits(&self) -> TwosComplementBitIterator {
-        if *self == 0 {
+        if *self == 0 as Limb {
             TwosComplementBitIterator::Zero
         } else if self.sign {
             TwosComplementBitIterator::Positive(self.abs.bits(), false)

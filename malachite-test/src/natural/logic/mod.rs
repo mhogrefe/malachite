@@ -1,28 +1,29 @@
 use common::DemoBenchRegistry;
 use malachite_base::num::SignificantBits;
 use malachite_nz::natural::Natural;
+use malachite_nz::platform::Limb;
 use std::iter::repeat;
 
 pub mod and;
-pub mod and_u32;
+pub mod and_limb;
 pub mod assign_bit;
 pub mod clear_bit;
 pub mod count_ones;
 pub mod flip_bit;
 pub mod get_bit;
 pub mod hamming_distance;
-pub mod hamming_distance_u32;
+pub mod hamming_distance_limb;
 pub mod index_of_next_false_bit;
 pub mod index_of_next_true_bit;
 pub mod limb_count;
 pub mod not;
 pub mod or;
-pub mod or_u32;
+pub mod or_limb;
 pub mod set_bit;
 pub mod significant_bits;
 pub mod trailing_zeros;
 pub mod xor;
-pub mod xor_u32;
+pub mod xor_limb;
 
 pub(crate) fn natural_op_bits(
     bit_fn: &Fn(bool, bool) -> bool,
@@ -42,8 +43,12 @@ pub(crate) fn natural_op_bits(
     Natural::from_bits_asc(&and_bits)
 }
 
-pub(crate) fn natural_op_limbs(limb_fn: &Fn(u32, u32) -> u32, x: &Natural, y: &Natural) -> Natural {
-    let limb_zip: Box<Iterator<Item = (u32, u32)>> = if x.limb_count() >= y.limb_count() {
+pub(crate) fn natural_op_limbs(
+    limb_fn: &Fn(Limb, Limb) -> Limb,
+    x: &Natural,
+    y: &Natural,
+) -> Natural {
+    let limb_zip: Box<Iterator<Item = (Limb, Limb)>> = if x.limb_count() >= y.limb_count() {
         Box::new(x.limbs().zip(y.limbs().chain(repeat(0))))
     } else {
         Box::new(x.limbs().chain(repeat(0)).zip(y.limbs()))
@@ -57,23 +62,23 @@ pub(crate) fn natural_op_limbs(limb_fn: &Fn(u32, u32) -> u32, x: &Natural, y: &N
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     and::register(registry);
-    and_u32::register(registry);
+    and_limb::register(registry);
     assign_bit::register(registry);
     clear_bit::register(registry);
     count_ones::register(registry);
     flip_bit::register(registry);
     get_bit::register(registry);
     hamming_distance::register(registry);
-    hamming_distance_u32::register(registry);
+    hamming_distance_limb::register(registry);
     index_of_next_false_bit::register(registry);
     index_of_next_true_bit::register(registry);
     limb_count::register(registry);
     not::register(registry);
     or::register(registry);
-    or_u32::register(registry);
+    or_limb::register(registry);
     set_bit::register(registry);
     significant_bits::register(registry);
     trailing_zeros::register(registry);
     xor::register(registry);
-    xor_u32::register(registry);
+    xor_limb::register(registry);
 }

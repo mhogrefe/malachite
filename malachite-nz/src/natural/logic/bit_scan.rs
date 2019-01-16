@@ -1,9 +1,10 @@
 use malachite_base::limbs::limbs_leading_zero_limbs;
+use malachite_base::misc::Max;
 use malachite_base::num::{BitScan, PrimitiveInteger};
 use natural::Natural::{self, Large, Small};
-use std::u32;
+use platform::Limb;
 
-/// Interpreting a slice of `u32`s as the limbs (in ascending order) of a `Natural`, finds the
+/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, finds the
 /// lowest index greater than or equal to `starting_index` at which the `Natural` has a `false` bit.
 ///
 /// Time: worst case O(n)
@@ -25,28 +26,28 @@ use std::u32;
 /// assert_eq!(limbs_index_of_next_false_bit(&[0, 0b1011], 35), 36);
 /// assert_eq!(limbs_index_of_next_false_bit(&[0, 0b1011], 100), 100);
 /// ```
-pub fn limbs_index_of_next_false_bit(limbs: &[u32], starting_index: u64) -> u64 {
-    let starting_limb_index = (starting_index >> u32::LOG_WIDTH) as usize;
+pub fn limbs_index_of_next_false_bit(limbs: &[Limb], starting_index: u64) -> u64 {
+    let starting_limb_index = (starting_index >> Limb::LOG_WIDTH) as usize;
     if starting_limb_index >= limbs.len() {
         return starting_index;
     }
     if let Some(result) = limbs[starting_limb_index]
-        .index_of_next_false_bit(starting_index & u64::from(u32::WIDTH_MASK))
+        .index_of_next_false_bit(starting_index & u64::from(Limb::WIDTH_MASK))
     {
-        if result != u32::WIDTH.into() {
-            return ((starting_limb_index as u64) << u32::LOG_WIDTH) + result;
+        if result != u64::from(Limb::WIDTH) {
+            return ((starting_limb_index as u64) << Limb::LOG_WIDTH) + result;
         }
     }
     if starting_limb_index == limbs.len() - 1 {
-        return (limbs.len() as u64) << u32::LOG_WIDTH;
+        return (limbs.len() as u64) << Limb::LOG_WIDTH;
     }
     let false_index = starting_limb_index
         + 1
         + limbs[starting_limb_index + 1..]
             .iter()
-            .take_while(|&&y| y == u32::MAX)
+            .take_while(|&&y| y == Limb::MAX)
             .count();
-    let result_offset = false_index << u32::LOG_WIDTH;
+    let result_offset = false_index << Limb::LOG_WIDTH;
     (if false_index == limbs.len() {
         result_offset
     } else {
@@ -54,7 +55,7 @@ pub fn limbs_index_of_next_false_bit(limbs: &[u32], starting_index: u64) -> u64 
     }) as u64
 }
 
-/// Interpreting a slice of `u32`s as the limbs (in ascending order) of a `Natural`, finds the
+/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, finds the
 /// lowest index greater than or equal to `starting_index` at which the `Natural` has a `true` bit.
 /// If the starting index is too large and there are no more `true` bits above it, `None` is
 /// returned.
@@ -79,15 +80,15 @@ pub fn limbs_index_of_next_false_bit(limbs: &[u32], starting_index: u64) -> u64 
 /// assert_eq!(limbs_index_of_next_true_bit(&[0, 0b1011], 36), None);
 /// assert_eq!(limbs_index_of_next_true_bit(&[0, 0b1011], 100), None);
 /// ```
-pub fn limbs_index_of_next_true_bit(limbs: &[u32], starting_index: u64) -> Option<u64> {
-    let starting_limb_index = (starting_index >> u32::LOG_WIDTH) as usize;
+pub fn limbs_index_of_next_true_bit(limbs: &[Limb], starting_index: u64) -> Option<u64> {
+    let starting_limb_index = (starting_index >> Limb::LOG_WIDTH) as usize;
     if starting_limb_index >= limbs.len() {
         return None;
     }
     if let Some(result) = limbs[starting_limb_index]
-        .index_of_next_true_bit(starting_index & u64::from(u32::WIDTH_MASK))
+        .index_of_next_true_bit(starting_index & u64::from(Limb::WIDTH_MASK))
     {
-        return Some(((starting_limb_index as u64) << u32::LOG_WIDTH) + result);
+        return Some(((starting_limb_index as u64) << Limb::LOG_WIDTH) + result);
     }
     if starting_limb_index == limbs.len() - 1 {
         return None;
@@ -97,7 +98,7 @@ pub fn limbs_index_of_next_true_bit(limbs: &[u32], starting_index: u64) -> Optio
     if true_index == limbs.len() {
         None
     } else {
-        let result_offset = true_index << u32::LOG_WIDTH;
+        let result_offset = true_index << Limb::LOG_WIDTH;
         Some((result_offset + limbs[true_index].trailing_zeros() as usize) as u64)
     }
 }

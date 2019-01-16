@@ -2,10 +2,11 @@ use integer::Integer;
 use malachite_base::limbs::{limbs_leading_zero_limbs, limbs_set_zero};
 use malachite_base::num::{NotAssign, WrappingNegAssign};
 use natural::Natural::{self, Large, Small};
+use platform::Limb;
 use std::cmp::max;
 use std::ops::{BitAnd, BitAndAssign};
 
-/// Interpreting two slices of `u32`s as the limbs (in ascending order) of one `Integer` and the
+/// Interpreting two slices of `Limb`s as the limbs (in ascending order) of one `Integer` and the
 /// negative of another, returns the limbs of the bitwise and of the `Integer`s. `xs` and `ys` may
 /// not be empty or only contain zeros.
 ///
@@ -25,7 +26,7 @@ use std::ops::{BitAnd, BitAndAssign};
 /// assert_eq!(limbs_and_pos_neg(&[1, 2], &[100, 200]), &[0, 2]);
 /// assert_eq!(limbs_and_pos_neg(&[1, 2, 5], &[100, 200]), &[0, 2, 5]);
 /// ```
-pub fn limbs_and_pos_neg(xs: &[u32], ys: &[u32]) -> Vec<u32> {
+pub fn limbs_and_pos_neg(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
     let xs_len = xs.len();
     let ys_len = ys.len();
     let x_i = limbs_leading_zero_limbs(xs);
@@ -59,7 +60,7 @@ pub fn limbs_and_pos_neg(xs: &[u32], ys: &[u32]) -> Vec<u32> {
     result_limbs
 }
 
-/// Interpreting two slices of `u32`s as the limbs (in ascending order) of one `Integer` and the
+/// Interpreting two slices of `Limb`s as the limbs (in ascending order) of one `Integer` and the
 /// negative of another, writes the limbs of the bitwise and of the `Integer`s to an output slice.
 /// `xs` and `ys` may not be empty or only contain zeros. The output slice must be at least as long
 /// as the first input slice. `xs.len()` limbs will be written; if the number of significant limbs
@@ -86,7 +87,7 @@ pub fn limbs_and_pos_neg(xs: &[u32], ys: &[u32]) -> Vec<u32> {
 /// limbs_and_pos_neg_to_out(&mut result, &[1, 2, 5], &[100, 200]);
 /// assert_eq!(result, &[0, 2, 5, 10]);
 /// ```
-pub fn limbs_and_pos_neg_to_out(out_limbs: &mut [u32], xs: &[u32], ys: &[u32]) {
+pub fn limbs_and_pos_neg_to_out(out_limbs: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
     let xs_len = xs.len();
     let ys_len = ys.len();
     assert!(out_limbs.len() >= xs_len);
@@ -120,7 +121,7 @@ pub fn limbs_and_pos_neg_to_out(out_limbs: &mut [u32], xs: &[u32], ys: &[u32]) {
     }
 }
 
-/// Interpreting two slices of `u32`s as the limbs (in ascending order) of one `Integer` and the
+/// Interpreting two slices of `Limb`s as the limbs (in ascending order) of one `Integer` and the
 /// negative of another, writes the limbs of the bitwise and of the `Integer`s to the first (left)
 /// slice. `xs` and `ys` may not be empty or only contain zeros.
 ///
@@ -145,7 +146,7 @@ pub fn limbs_and_pos_neg_to_out(out_limbs: &mut [u32], xs: &[u32], ys: &[u32]) {
 /// limbs_and_pos_neg_in_place_left(&mut xs, &[100, 200]);
 /// assert_eq!(xs, &[0, 2, 5]);
 /// ```
-pub fn limbs_and_pos_neg_in_place_left(xs: &mut [u32], ys: &[u32]) {
+pub fn limbs_and_pos_neg_in_place_left(xs: &mut [Limb], ys: &[Limb]) {
     let xs_len = xs.len();
     let ys_len = ys.len();
     let x_i = limbs_leading_zero_limbs(xs);
@@ -170,7 +171,7 @@ pub fn limbs_and_pos_neg_in_place_left(xs: &mut [u32], ys: &[u32]) {
     }
 }
 
-/// Interpreting two slices of `u32`s as the limbs (in ascending order) of one `Integer` and the
+/// Interpreting two slices of `Limb`s as the limbs (in ascending order) of one `Integer` and the
 /// negative of another, writes the lowest min(`xs.len()`, `ys.len()`) limbs of the bitwise and of
 /// the `Integer`s to the second (right) slice. `xs` and `ys` may not be empty or only contain
 /// zeros. If `ys` is shorter than `xs`, the result may be too long to fit in `ys`. The extra limbs
@@ -198,7 +199,7 @@ pub fn limbs_and_pos_neg_in_place_left(xs: &mut [u32], ys: &[u32]) {
 /// // The result is missing the most-significant limb, which is 5
 /// assert_eq!(ys, &[0, 2]);
 /// ```
-pub fn limbs_slice_and_pos_neg_in_place_right(xs: &[u32], ys: &mut [u32]) {
+pub fn limbs_slice_and_pos_neg_in_place_right(xs: &[Limb], ys: &mut [Limb]) {
     let xs_len = xs.len();
     let ys_len = ys.len();
     let x_i = limbs_leading_zero_limbs(xs);
@@ -225,7 +226,7 @@ pub fn limbs_slice_and_pos_neg_in_place_right(xs: &[u32], ys: &mut [u32]) {
     }
 }
 
-/// Interpreting a slice of `u32`s and a `Vec` of `u32`s as the limbs (in ascending order) of one
+/// Interpreting a slice of `Limb`s and a `Vec` of `Limb`s as the limbs (in ascending order) of one
 /// `Integer` and the negative of another, writes the limbs of the bitwise and of the `Integer`s to
 /// the `Vec`. `xs` and `ys` may not be empty or only contain zeros.
 ///
@@ -254,7 +255,7 @@ pub fn limbs_slice_and_pos_neg_in_place_right(xs: &[u32], ys: &mut [u32]) {
 /// limbs_vec_and_pos_neg_in_place_right(&[100, 200], &mut ys);
 /// assert_eq!(ys, &[100, 200]);
 /// ```
-pub fn limbs_vec_and_pos_neg_in_place_right(xs: &[u32], ys: &mut Vec<u32>) {
+pub fn limbs_vec_and_pos_neg_in_place_right(xs: &[Limb], ys: &mut Vec<Limb>) {
     limbs_slice_and_pos_neg_in_place_right(xs, ys);
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -622,7 +623,7 @@ impl<'a> BitAndAssign<&'a Integer> for Natural {
 impl Natural {
     pub(crate) fn and_assign_pos_neg(&mut self, other: &Natural) {
         if let Small(y) = *other {
-            self.and_assign_pos_u32_neg(y.wrapping_neg());
+            self.and_assign_pos_limb_neg(y.wrapping_neg());
         } else if let Small(ref mut x) = *self {
             if let Large(ref ys) = *other {
                 *x &= ys[0].wrapping_neg();
@@ -643,7 +644,7 @@ impl Natural {
     pub(crate) fn and_assign_neg_pos_ref(&mut self, other: &Natural) {
         let new_self_value = if let Small(x) = *self {
             let mut new_self_value = other.clone();
-            new_self_value.and_assign_pos_u32_neg(x.wrapping_neg());
+            new_self_value.and_assign_pos_limb_neg(x.wrapping_neg());
             Some(new_self_value)
         } else if let Small(ref y) = *other {
             let x = if let Large(ref xs) = *self {
@@ -669,7 +670,7 @@ impl Natural {
 
     pub(crate) fn and_pos_neg(&self, other: &Natural) -> Natural {
         match (self, other) {
-            (_, &Small(y)) => self.and_pos_u32_neg(y.wrapping_neg()),
+            (_, &Small(y)) => self.and_pos_limb_neg(y.wrapping_neg()),
             (&Small(x), &Large(ref ys)) => Small(x & ys[0].wrapping_neg()),
             (&Large(ref xs), &Large(ref ys)) => {
                 let mut result = Large(limbs_and_pos_neg(xs, ys));

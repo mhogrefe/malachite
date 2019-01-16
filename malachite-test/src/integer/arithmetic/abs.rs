@@ -1,8 +1,6 @@
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::base::pairs_of_unsigneds;
 use inputs::integer::{integers, nrm_integers};
 use malachite_base::num::{Abs, AbsAssign, SignificantBits, UnsignedAbs};
-use malachite_nz::natural::arithmetic::mul::_limbs_mul_to_out_toom_43_input_sizes_valid;
 use num::Signed;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
@@ -24,26 +22,11 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
 }
 
 fn demo_integer_abs_assign(gm: GenerationMode, limit: usize) {
-    for (xs_len, ys_len) in pairs_of_unsigneds::<u32>(gm).take(limit) {
-        // s >= n
-        if _limbs_mul_to_out_toom_43_input_sizes_valid(xs_len as usize, ys_len as usize) {
-            let n = 1 + if 3 * xs_len >= 4 * ys_len {
-                (xs_len - 1) >> 2
-            } else {
-                (ys_len - 1) / 3
-            };
-            let s = xs_len - 3 * n;
-            let t = ys_len - 2 * n;
-            if t + s <= n {
-                println!("{} {}", xs_len, ys_len);
-            }
-        }
+    for mut n in integers(gm).take(limit) {
+        let n_old = n.clone();
+        n.abs_assign();
+        println!("n := {}; n.abs_assign(); n = {}", n_old, n);
     }
-    //for mut n in integers(gm).take(limit) {
-    //    let n_old = n.clone();
-    //    n.abs_assign();
-    //    println!("n := {}; n.abs_assign(); n = {}", n_old, n);
-    //}
 }
 
 fn demo_integer_abs(gm: GenerationMode, limit: usize) {

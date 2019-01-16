@@ -1,5 +1,6 @@
 use integer::Integer;
 use malachite_base::num::{NegAssign, NotAssign, Zero};
+use platform::Limb;
 use std::mem::swap;
 use std::ops::{Sub, SubAssign};
 
@@ -134,9 +135,9 @@ impl<'a, 'b> Sub<&'a Integer> for &'b Integer {
     fn sub(self, other: &'a Integer) -> Integer {
         if self as *const Integer == other as *const Integer {
             Integer::ZERO
-        } else if *self == 0 {
+        } else if *self == 0 as Limb {
             -other.clone()
-        } else if *other == 0 {
+        } else if *other == 0 as Limb {
             self.clone()
         } else {
             match (self, other) {
@@ -208,9 +209,9 @@ impl<'a, 'b> Sub<&'a Integer> for &'b Integer {
 /// ```
 impl SubAssign<Integer> for Integer {
     fn sub_assign(&mut self, mut other: Integer) {
-        if other == 0 {
+        if other == 0 as Limb {
             return;
-        } else if *self == 0 {
+        } else if *self == 0 as Limb {
             *self = other;
             self.neg_assign();
             return;
@@ -274,9 +275,9 @@ impl SubAssign<Integer> for Integer {
 /// ```
 impl<'a> SubAssign<&'a Integer> for Integer {
     fn sub_assign(&mut self, other: &'a Integer) {
-        if *other == 0 {
+        if *other == 0 as Limb {
             return;
-        } else if *self == 0 {
+        } else if *self == 0 as Limb {
             *self = -other.clone();
             return;
         }

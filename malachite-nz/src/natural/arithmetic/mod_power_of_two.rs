@@ -4,8 +4,9 @@ use malachite_base::num::{
     PrimitiveInteger, RemPowerOfTwo, RemPowerOfTwoAssign, Zero,
 };
 use natural::Natural::{self, Large, Small};
+use platform::Limb;
 
-/// Interpreting a slice of `u32`s as the limbs (in ascending order) of a `Natural`, returns the
+/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
 /// limbs of the `Natural` mod two raised to `pow`. Equivalently, retains only the least-significant
 /// `pow` bits.
 ///
@@ -21,12 +22,12 @@ use natural::Natural::{self, Large, Small};
 /// assert_eq!(limbs_mod_power_of_two(&[123, 456], 33), &[123, 0]);
 /// assert_eq!(limbs_mod_power_of_two(&[123, 456], 40), &[123, 200]);
 /// ```
-pub fn limbs_mod_power_of_two(limbs: &[u32], pow: u64) -> Vec<u32> {
+pub fn limbs_mod_power_of_two(limbs: &[Limb], pow: u64) -> Vec<Limb> {
     if pow == 0 {
         return Vec::new();
     }
-    let result_limb_count = pow >> u32::LOG_WIDTH;
-    let leftover_bits = pow & u64::from(u32::WIDTH_MASK);
+    let result_limb_count = pow >> Limb::LOG_WIDTH;
+    let leftover_bits = pow & u64::from(Limb::WIDTH_MASK);
     let result_limb_count = result_limb_count as usize;
     if result_limb_count >= limbs.len() {
         return limbs.to_vec();
@@ -38,7 +39,7 @@ pub fn limbs_mod_power_of_two(limbs: &[u32], pow: u64) -> Vec<u32> {
     result
 }
 
-/// Interpreting a `Vec` of `u32`s as the limbs (in ascending order) of a `Natural`, writes the
+/// Interpreting a `Vec` of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
 /// limbs of the `Natural` mod two raised to `pow` to the input `Vec`. Equivalently, retains only
 /// the least-significant `pow` bits.
 ///
@@ -62,13 +63,13 @@ pub fn limbs_mod_power_of_two(limbs: &[u32], pow: u64) -> Vec<u32> {
 /// limbs_mod_power_of_two_in_place(&mut limbs, 40);
 /// assert_eq!(limbs, &[123, 200]);
 /// ```
-pub fn limbs_mod_power_of_two_in_place(limbs: &mut Vec<u32>, pow: u64) {
+pub fn limbs_mod_power_of_two_in_place(limbs: &mut Vec<Limb>, pow: u64) {
     if pow == 0 {
         limbs.clear();
         return;
     }
-    let mut new_limb_count = pow >> u32::LOG_WIDTH;
-    let leftover_bits = pow & u64::from(u32::WIDTH_MASK);
+    let mut new_limb_count = pow >> Limb::LOG_WIDTH;
+    let leftover_bits = pow & u64::from(Limb::WIDTH_MASK);
     if leftover_bits != 0 {
         new_limb_count += 1;
     }
@@ -82,7 +83,7 @@ pub fn limbs_mod_power_of_two_in_place(limbs: &mut Vec<u32>, pow: u64) {
     }
 }
 
-/// Interpreting a slice of `u32`s as the limbs (in ascending order) of a `Natural`, returns the
+/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
 /// limbs of the negative of the `Natural` mod two raised to `pow`. Equivalently, takes the two's
 /// complement and retains only the least-significant `pow` bits.
 ///
@@ -98,13 +99,13 @@ pub fn limbs_mod_power_of_two_in_place(limbs: &mut Vec<u32>, pow: u64) {
 /// assert_eq!(limbs_neg_mod_power_of_two(&[123, 456], 33), &[4_294_967_173, 1]);
 /// assert_eq!(limbs_neg_mod_power_of_two(&[123, 456], 40), &[4_294_967_173, 55]);
 /// ```
-pub fn limbs_neg_mod_power_of_two(limbs: &[u32], pow: u64) -> Vec<u32> {
+pub fn limbs_neg_mod_power_of_two(limbs: &[Limb], pow: u64) -> Vec<Limb> {
     let mut result_limbs = limbs.to_vec();
     limbs_neg_mod_power_of_two_in_place(&mut result_limbs, pow);
     result_limbs
 }
 
-/// Interpreting a `Vec` of `u32`s as the limbs (in ascending order) of a `Natural`, writes the
+/// Interpreting a `Vec` of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
 /// limbs of the negative of the `Natural` mod two raised to `pow` to the input `Vec`. Equivalently,
 /// takes the two's complement and retains only the least-significant `pow` bits.
 ///
@@ -128,9 +129,9 @@ pub fn limbs_neg_mod_power_of_two(limbs: &[u32], pow: u64) -> Vec<u32> {
 /// limbs_neg_mod_power_of_two_in_place(&mut limbs, 40);
 /// assert_eq!(limbs, &[4_294_967_173, 55]);
 /// ```
-pub fn limbs_neg_mod_power_of_two_in_place(limbs: &mut Vec<u32>, pow: u64) {
-    let mut new_limb_count = (pow >> u32::LOG_WIDTH) as usize;
-    let leftover_bits = pow & u64::from(u32::WIDTH_MASK);
+pub fn limbs_neg_mod_power_of_two_in_place(limbs: &mut Vec<Limb>, pow: u64) {
+    let mut new_limb_count = (pow >> Limb::LOG_WIDTH) as usize;
+    let leftover_bits = pow & u64::from(Limb::WIDTH_MASK);
     if leftover_bits != 0 {
         new_limb_count += 1;
     }
@@ -410,7 +411,7 @@ impl<'a> NegModPowerOfTwo for &'a Natural {
                 Small(small) => {
                     if small == 0 {
                         Natural::ZERO
-                    } else if other < u32::WIDTH.into() {
+                    } else if other < u64::from(Limb::WIDTH) {
                         Small(small.wrapping_neg().mod_power_of_two(other))
                     } else {
                         let mut result = Large(limbs_neg_mod_power_of_two(&[small], other));
@@ -458,7 +459,7 @@ impl NegModPowerOfTwoAssign for Natural {
     /// ```
     fn neg_mod_power_of_two_assign(&mut self, other: u64) {
         if other == 0 {
-            self.assign(0u32);
+            self.assign(Limb::ZERO);
             return;
         }
         mutate_with_possible_promotion!(
@@ -468,7 +469,7 @@ impl NegModPowerOfTwoAssign for Natural {
             {
                 if *small == 0 {
                     Some(0)
-                } else if other < u32::WIDTH.into() {
+                } else if other < u64::from(Limb::WIDTH) {
                     Some(small.wrapping_neg().mod_power_of_two(other))
                 } else {
                     None

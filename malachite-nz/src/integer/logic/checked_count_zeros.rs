@@ -1,8 +1,9 @@
 use integer::Integer;
 use malachite_base::num::PrimitiveInteger;
 use natural::Natural::{self, Large, Small};
+use platform::Limb;
 
-/// Interpreting a slice of `u32`s, as the limbs (in ascending order) of a `Natural`, counts the
+/// Interpreting a slice of `Limb`s, as the limbs (in ascending order) of a `Natural`, counts the
 /// number of zeros in the binary expansion of the negative (two's complement) of the `Natural`.
 /// `limbs` cannot be empty.
 ///
@@ -19,14 +20,14 @@ use natural::Natural::{self, Large, Small};
 /// assert_eq!(limbs_count_zeros_neg(&[0, 1, 2]), 33);
 /// assert_eq!(limbs_count_zeros_neg(&[1, 0xffff_ffff]), 32);
 /// ```
-pub fn limbs_count_zeros_neg(limbs: &[u32]) -> u64 {
+pub fn limbs_count_zeros_neg(limbs: &[Limb]) -> u64 {
     let mut sum = 0;
     let mut nonzero_limb_seen = false;
     for &limb in limbs.iter() {
         sum += u64::from(if nonzero_limb_seen {
             limb.count_ones()
         } else if limb == 0 {
-            u32::WIDTH
+            Limb::WIDTH
         } else {
             nonzero_limb_seen = true;
             limb.wrapping_neg().count_zeros()

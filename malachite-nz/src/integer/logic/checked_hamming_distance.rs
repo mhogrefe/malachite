@@ -5,13 +5,14 @@ use malachite_base::num::{CheckedHammingDistance, HammingDistance};
 use natural::logic::count_ones::limbs_count_ones;
 use natural::logic::hamming_distance::limbs_hamming_distance_same_length;
 use natural::Natural::{self, Large, Small};
+use platform::Limb;
 use std::cmp::Ordering;
 
-fn limbs_count_zeros(limbs: &[u32]) -> u64 {
+fn limbs_count_zeros(limbs: &[Limb]) -> u64 {
     limbs.iter().map(|limb| u64::from(limb.count_zeros())).sum()
 }
 
-fn limbs_hamming_distance_neg_leading_limbs_helper(xs: &[u32], ys: &[u32], i: usize) -> u64 {
+fn limbs_hamming_distance_neg_leading_limbs_helper(xs: &[Limb], ys: &[Limb], i: usize) -> u64 {
     let xs_len = xs.len();
     let ys_len = ys.len();
     match xs_len.cmp(&ys_len) {
@@ -38,7 +39,7 @@ fn limbs_hamming_distance_neg_leading_limbs_helper(xs: &[u32], ys: &[u32], i: us
 // where 0 is a zero limb, n is a nonzero limb, and b is the boundary (least-significant) nonzero
 // limb. xs_i and ys_i are the indices of the boundary limbs in xs and ys. xs_i < ys_i but xs may be
 // shorter, longer, or the same length as ys.
-fn limbs_hamming_distance_neg_helper(xs: &[u32], ys: &[u32], xs_i: usize, ys_i: usize) -> u64 {
+fn limbs_hamming_distance_neg_helper(xs: &[Limb], ys: &[Limb], xs_i: usize, ys_i: usize) -> u64 {
     let mut distance = u64::from(xs[xs_i].wrapping_neg().count_ones());
     let xs_len = xs.len();
     if xs_i == xs_len - 1 {
@@ -58,7 +59,7 @@ fn limbs_hamming_distance_neg_helper(xs: &[u32], ys: &[u32], xs_i: usize, ys_i: 
     distance + limbs_hamming_distance_neg_leading_limbs_helper(xs, ys, ys_i)
 }
 
-/// Interpreting two equal-length slices of `u32`s as the limbs of `Natural`s in ascending order,
+/// Interpreting two equal-length slices of `Limb`s as the limbs of `Natural`s in ascending order,
 /// returns the Hamming distance between their negatives (two's complement). Both have infinitely
 /// many implicit leading ones. Neither slice may be empty or only contain zeros.
 ///
@@ -78,7 +79,7 @@ fn limbs_hamming_distance_neg_helper(xs: &[u32], ys: &[u32], xs_i: usize, ys_i: 
 /// assert_eq!(limbs_hamming_distance_neg(&[2], &[3]), 2);
 /// assert_eq!(limbs_hamming_distance_neg(&[1, 1, 1], &[1, 2, 3]), 3);
 /// ```
-pub fn limbs_hamming_distance_neg(xs: &[u32], ys: &[u32]) -> u64 {
+pub fn limbs_hamming_distance_neg(xs: &[Limb], ys: &[Limb]) -> u64 {
     let xs_i = limbs_leading_zero_limbs(xs);
     let ys_i = limbs_leading_zero_limbs(ys);
     match xs_i.cmp(&ys_i) {
@@ -132,8 +133,8 @@ impl<'a, 'b> CheckedHammingDistance<&'a Integer> for &'b Integer {
 impl Natural {
     fn hamming_distance_neg(&self, other: &Natural) -> u64 {
         match (self, other) {
-            (&Small(x), _) => other.hamming_distance_neg_u32(x),
-            (_, &Small(y)) => self.hamming_distance_neg_u32(y),
+            (&Small(x), _) => other.hamming_distance_neg_limb(x),
+            (_, &Small(y)) => self.hamming_distance_neg_limb(y),
             (&Large(ref xs), &Large(ref ys)) => limbs_hamming_distance_neg(xs, ys),
         }
     }

@@ -114,3 +114,4 @@ impl_integer_shl_unsigned!(u8);
 impl_integer_shl_unsigned!(u16);
 impl_integer_shl_unsigned!(u32);
 impl_integer_shl_unsigned!(u64);
+impl_integer_shl_unsigned!(u128);

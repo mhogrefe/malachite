@@ -2,6 +2,7 @@ use common::test_properties;
 use malachite_base::misc::Walkable;
 use malachite_base::num::Zero;
 use malachite_nz::natural::Natural;
+use malachite_nz::platform::Limb;
 use malachite_test::inputs::base::positive_unsigneds;
 use malachite_test::inputs::natural::positive_naturals;
 use std::str::FromStr;
@@ -20,7 +21,7 @@ fn test_natural_decrement() {
 }
 
 #[test]
-#[should_panic(expected = "Cannot subtract a u32 from a smaller Natural. self: 0, other: 1")]
+#[should_panic(expected = "Cannot subtract a Limb from a smaller Natural. self: 0, other: 1")]
 fn natural_decrement_fail() {
     let mut n = Natural::ZERO;
     n.decrement();
@@ -36,7 +37,7 @@ fn natural_decrement_properties() {
         assert_eq!(mut_n, *n);
     });
 
-    test_properties(positive_unsigneds::<u32>, |&u| {
+    test_properties(positive_unsigneds::<Limb>, |&u| {
         let mut mut_u = u;
         mut_u.decrement();
 

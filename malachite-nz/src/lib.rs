@@ -11,6 +11,15 @@ extern crate rand;
 #[macro_use]
 extern crate serde;
 
+#[cfg(feature = "32_bit_limbs")]
+pub mod platform_32;
+#[cfg(feature = "32_bit_limbs")]
+pub use platform_32 as platform;
+#[cfg(feature = "64_bit_limbs")]
+pub mod platform_64;
+#[cfg(feature = "64_bit_limbs")]
+pub use platform_64 as platform;
+
 pub mod error;
 #[macro_use]
 pub mod natural;

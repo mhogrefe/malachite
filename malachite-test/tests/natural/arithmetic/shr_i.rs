@@ -720,19 +720,19 @@ macro_rules! tests_and_properties {
         }
 
         #[test]
-        #[should_panic(expected = "Right shift is not exact: 123 >>= 1")]
+        #[should_panic(expected = "Right shift is not exact")]
         fn $shr_round_assign_i_fail_1() {
             Natural::from(123u32).shr_round_assign(1 as $t, RoundingMode::Exact);
         }
 
         #[test]
-        #[should_panic(expected = "Right shift is not exact: 123 >>= 100")]
+        #[should_panic(expected = "Right shift is not exact")]
         fn $shr_round_assign_i_fail_2() {
             Natural::from(123u32).shr_round_assign(100 as $t, RoundingMode::Exact);
         }
 
         #[test]
-        #[should_panic(expected = "Right shift is not exact.")]
+        #[should_panic(expected = "Right shift is not exact")]
         fn $shr_round_assign_i_fail_3() {
             Natural::from_str("1000000000001")
                 .unwrap()
@@ -740,7 +740,7 @@ macro_rules! tests_and_properties {
         }
 
         #[test]
-        #[should_panic(expected = "Right shift is not exact.")]
+        #[should_panic(expected = "Right shift is not exact")]
         fn $shr_round_assign_i_fail_4() {
             Natural::from_str("1000000000001")
                 .unwrap()
@@ -748,19 +748,19 @@ macro_rules! tests_and_properties {
         }
 
         #[test]
-        #[should_panic(expected = "Right shift is not exact: 123 >>= 1")]
+        #[should_panic(expected = "Right shift is not exact")]
         fn $shr_round_i_fail_1() {
             Natural::from(123u32).shr_round(1 as $t, RoundingMode::Exact);
         }
 
         #[test]
-        #[should_panic(expected = "Right shift is not exact: 123 >>= 100")]
+        #[should_panic(expected = "Right shift is not exact")]
         fn $shr_round_i_fail_2() {
             Natural::from(123u32).shr_round(100 as $t, RoundingMode::Exact);
         }
 
         #[test]
-        #[should_panic(expected = "Right shift is not exact.")]
+        #[should_panic(expected = "Right shift is not exact")]
         fn $shr_round_i_fail_3() {
             Natural::from_str("1000000000001")
                 .unwrap()
@@ -768,7 +768,7 @@ macro_rules! tests_and_properties {
         }
 
         #[test]
-        #[should_panic(expected = "Right shift is not exact.")]
+        #[should_panic(expected = "Right shift is not exact")]
         fn $shr_round_i_fail_4() {
             Natural::from_str("1000000000001")
                 .unwrap()
@@ -776,25 +776,25 @@ macro_rules! tests_and_properties {
         }
 
         #[test]
-        #[should_panic(expected = "Right shift is not exact: 123 >> 1")]
+        #[should_panic(expected = "Right shift is not exact")]
         fn $shr_round_i_ref_fail_1() {
             (&Natural::from(123u32)).shr_round(1 as $t, RoundingMode::Exact);
         }
 
         #[test]
-        #[should_panic(expected = "Right shift is not exact: 123 >> 100")]
+        #[should_panic(expected = "Right shift is not exact")]
         fn $shr_round_i_ref_fail_2() {
             (&Natural::from(123u32)).shr_round(100 as $t, RoundingMode::Exact);
         }
 
         #[test]
-        #[should_panic(expected = "Right shift is not exact: 1000000000001 >> 1")]
+        #[should_panic(expected = "Right shift is not exact")]
         fn $shr_round_i_ref_fail_3() {
             (&Natural::from_str("1000000000001").unwrap()).shr_round(1 as $t, RoundingMode::Exact);
         }
 
         #[test]
-        #[should_panic(expected = "Right shift is not exact: 1000000000001 >> 100")]
+        #[should_panic(expected = "Right shift is not exact")]
         fn $shr_round_i_ref_fail_4() {
             (&Natural::from_str("1000000000001").unwrap())
                 .shr_round(100 as $t, RoundingMode::Exact);
@@ -885,22 +885,22 @@ tests_and_properties!(
 );
 tests_and_properties!(
     i32,
-    test_shr_i32,
-    shr_i32_properties,
-    test_shr_round_i32,
-    shr_round_assign_i32_fail_1,
-    shr_round_assign_i32_fail_2,
-    shr_round_assign_i32_fail_3,
-    shr_round_assign_i32_fail_4,
-    shr_round_i32_fail_1,
-    shr_round_i32_fail_2,
-    shr_round_i32_fail_3,
-    shr_round_i32_fail_4,
-    shr_round_i32_ref_fail_1,
-    shr_round_i32_ref_fail_2,
-    shr_round_i32_ref_fail_3,
-    shr_round_i32_ref_fail_4,
-    shr_round_i32_properties,
+    test_shr_signed_limb,
+    shr_signed_limb_properties,
+    test_shr_round_signed_limb,
+    shr_round_assign_signed_limb_fail_1,
+    shr_round_assign_signed_limb_fail_2,
+    shr_round_assign_signed_limb_fail_3,
+    shr_round_assign_signed_limb_fail_4,
+    shr_round_signed_limb_fail_1,
+    shr_round_signed_limb_fail_2,
+    shr_round_signed_limb_fail_3,
+    shr_round_signed_limb_fail_4,
+    shr_round_signed_limb_ref_fail_1,
+    shr_round_signed_limb_ref_fail_2,
+    shr_round_signed_limb_ref_fail_3,
+    shr_round_signed_limb_ref_fail_4,
+    shr_round_signed_limb_properties,
     i,
     j,
     out,

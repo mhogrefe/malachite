@@ -1,5 +1,6 @@
 use malachite_base::num::{BitAccess, PrimitiveInteger};
 use natural::Natural;
+use platform::Limb;
 
 /// Converts a slice of bits in ascending order to a `Vec` of limbs in ascending order. There may be
 /// trailing zero limbs.
@@ -24,19 +25,19 @@ use natural::Natural;
 ///           true, true]),
 ///     vec![3567587328, 232]);
 /// ```
-pub fn limbs_asc_from_bits_asc(bits: &[bool]) -> Vec<u32> {
+pub fn limbs_asc_from_bits_asc(bits: &[bool]) -> Vec<Limb> {
     if bits.is_empty() {
         return Vec::new();
     }
-    let mut limb_count = bits.len() >> u32::LOG_WIDTH;
-    let remainder = bits.len() & (u32::WIDTH_MASK as usize);
+    let mut limb_count = bits.len() >> Limb::LOG_WIDTH;
+    let remainder = bits.len() & (Limb::WIDTH_MASK as usize);
     if remainder != 0 {
         limb_count += 1;
     }
     let mut limbs = vec![0; limb_count];
     let mut limb_i = 0;
     let mut i = 0;
-    let width = u64::from(u32::WIDTH);
+    let width = u64::from(Limb::WIDTH);
     for &bit in bits {
         if bit {
             limbs[limb_i].set_bit(i);
@@ -73,18 +74,18 @@ pub fn limbs_asc_from_bits_asc(bits: &[bool]) -> Vec<u32> {
 ///           false, false]),
 ///     vec![3567587328, 232]);
 /// ```
-pub fn limbs_asc_from_bits_desc(bits: &[bool]) -> Vec<u32> {
+pub fn limbs_asc_from_bits_desc(bits: &[bool]) -> Vec<Limb> {
     if bits.is_empty() {
         return Vec::new();
     }
-    let mut limb_count = bits.len() >> u32::LOG_WIDTH;
-    let remainder = bits.len() & (u32::WIDTH_MASK as usize);
+    let mut limb_count = bits.len() >> Limb::LOG_WIDTH;
+    let remainder = bits.len() & (Limb::WIDTH_MASK as usize);
     if remainder != 0 {
         limb_count += 1;
     }
     let mut limbs = vec![0; limb_count];
     let mut limb_i = limb_count - 1;
-    let width_minus_one = u64::from(u32::WIDTH) - 1;
+    let width_minus_one = u64::from(Limb::WIDTH) - 1;
     let mut i = if remainder == 0 {
         width_minus_one
     } else {

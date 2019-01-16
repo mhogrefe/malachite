@@ -9,6 +9,7 @@ use malachite_nz::natural::arithmetic::sub::{
     limbs_sub_same_length_in_place_right, limbs_sub_same_length_to_out, limbs_sub_to_out,
 };
 use malachite_nz::natural::Natural;
+use malachite_nz::platform::Limb;
 use malachite_test::common::{
     biguint_to_natural, natural_to_biguint, natural_to_rug_integer, rug_integer_to_natural,
 };
@@ -19,13 +20,14 @@ use malachite_test::inputs::base::{
     triples_of_unsigned_vec_var_3, triples_of_unsigned_vec_var_9,
 };
 use malachite_test::inputs::natural::{
-    naturals, pairs_of_natural_and_u32_var_1, pairs_of_naturals_var_1,
-    pairs_of_u32_and_natural_var_1,
+    naturals, pairs_of_limb_and_natural_var_1, pairs_of_natural_and_limb_var_1,
+    pairs_of_naturals_var_1,
 };
 use num::BigUint;
 use rug;
 use std::str::FromStr;
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_sub() {
     let test = |xs, ys, out| {
@@ -63,15 +65,17 @@ fn test_limbs_sub() {
     );
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic(expected = "assertion failed: xs_len >= ys_len")]
 fn limbs_sub_fail() {
     limbs_sub(&[6, 7], &[1, 2, 3]);
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_sub_same_length_to_out() {
-    let test = |xs, ys, out_before: &[u32], borrow, out_after| {
+    let test = |xs, ys, out_before: &[Limb], borrow, out_after| {
         let mut out = out_before.to_vec();
         assert_eq!(limbs_sub_same_length_to_out(&mut out, xs, ys), borrow);
         assert_eq!(out, out_after);
@@ -116,6 +120,7 @@ fn test_limbs_sub_same_length_to_out() {
     );
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic(expected = "assertion failed: out_limbs.len() >= len")]
 fn limbs_sub_same_length_to_out_fail_1() {
@@ -123,6 +128,7 @@ fn limbs_sub_same_length_to_out_fail_1() {
     limbs_sub_same_length_to_out(&mut out, &[6, 7, 8], &[1, 2, 3]);
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic(expected = "assertion failed: `(left == right)`")]
 fn limbs_sub_same_length_to_out_fail_2() {
@@ -130,9 +136,10 @@ fn limbs_sub_same_length_to_out_fail_2() {
     limbs_sub_same_length_to_out(&mut out, &[6, 7, 8], &[1, 2]);
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_sub_to_out() {
-    let test = |xs, ys, out_before: &[u32], borrow, out_after| {
+    let test = |xs, ys, out_before: &[Limb], borrow, out_after| {
         let mut out = out_before.to_vec();
         assert_eq!(limbs_sub_to_out(&mut out, xs, ys), borrow);
         assert_eq!(out, out_after);
@@ -185,6 +192,7 @@ fn test_limbs_sub_to_out() {
     );
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic(expected = "assertion failed: out_limbs.len() >= xs_len")]
 fn limbs_sub_to_out_fail_1() {
@@ -192,6 +200,7 @@ fn limbs_sub_to_out_fail_1() {
     limbs_sub_to_out(&mut out, &[6, 7, 8], &[1, 2]);
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic(expected = "assertion failed: xs_len >= ys_len")]
 fn limbs_sub_to_out_fail_2() {
@@ -199,9 +208,10 @@ fn limbs_sub_to_out_fail_2() {
     limbs_sub_to_out(&mut out, &[6, 7], &[1, 2, 3]);
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_sub_same_length_in_place_left() {
-    let test = |xs_before: &[u32], ys, borrow, xs_after| {
+    let test = |xs_before: &[Limb], ys, borrow, xs_after| {
         let mut xs = xs_before.to_vec();
         assert_eq!(limbs_sub_same_length_in_place_left(&mut xs, ys), borrow);
         assert_eq!(xs, xs_after);
@@ -236,15 +246,17 @@ fn test_limbs_sub_same_length_in_place_left() {
     );
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic(expected = "assertion failed: `(left == right)")]
 fn limbs_sub_same_length_in_place_left_fail() {
     limbs_sub_same_length_in_place_left(&mut [6, 7], &[1, 2, 3]);
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_sub_in_place_left() {
-    let test = |xs_before: &[u32], ys, borrow, xs_after| {
+    let test = |xs_before: &[Limb], ys, borrow, xs_after| {
         let mut xs = xs_before.to_vec();
         assert_eq!(limbs_sub_in_place_left(&mut xs, ys), borrow);
         assert_eq!(xs, xs_after);
@@ -286,15 +298,17 @@ fn test_limbs_sub_in_place_left() {
     );
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic(expected = "assertion failed: xs_len >= ys_len")]
 fn limbs_sub_in_place_left_fail() {
     limbs_sub_in_place_left(&mut [6, 7], &[1, 2, 3]);
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_sub_same_length_in_place_right() {
-    let test = |xs, ys_before: &[u32], borrow, ys_after| {
+    let test = |xs, ys_before: &[Limb], borrow, ys_after| {
         let mut ys = ys_before.to_vec();
         assert_eq!(limbs_sub_same_length_in_place_right(xs, &mut ys), borrow);
         assert_eq!(ys, ys_after);
@@ -329,21 +343,24 @@ fn test_limbs_sub_same_length_in_place_right() {
     );
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic(expected = "assertion failed: `(left == right)")]
 fn limbs_sub_same_length_in_place_right_fail_1() {
     limbs_sub_same_length_in_place_right(&[6, 7], &mut vec![1, 2, 3]);
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic(expected = "assertion failed: `(left == right)")]
 fn limbs_sub_same_length_in_place_right_fail_2() {
     limbs_sub_same_length_in_place_right(&[1, 2], &mut vec![6, 7, 8]);
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_sub_in_place_right() {
-    let test = |xs, ys_before: &[u32], borrow, ys_after| {
+    let test = |xs, ys_before: &[Limb], borrow, ys_after| {
         let mut ys = ys_before.to_vec();
         assert_eq!(limbs_sub_in_place_right(xs, &mut ys), borrow);
         assert_eq!(ys, ys_after);
@@ -385,15 +402,17 @@ fn test_limbs_sub_in_place_right() {
     );
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic(expected = "assertion failed: xs_len >= ys_len")]
 fn limbs_sub_in_place_right_fail() {
     limbs_sub_in_place_right(&[6, 7], &mut vec![1, 2, 3]);
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_sub_same_length_with_borrow_in_to_out() {
-    let test = |xs, ys, borrow_in, out_before: &[u32], borrow, out_after| {
+    let test = |xs, ys, borrow_in, out_before: &[Limb], borrow, out_after| {
         let mut out = out_before.to_vec();
         assert_eq!(
             _limbs_sub_same_length_with_borrow_in_to_out(&mut out, xs, ys, borrow_in),
@@ -466,6 +485,7 @@ fn test_limbs_sub_same_length_with_borrow_in_to_out() {
     );
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic(expected = "assertion failed: out_limbs.len() >= len")]
 fn limbs_sub_same_length_with_borrow_in_to_out_fail_1() {
@@ -473,6 +493,7 @@ fn limbs_sub_same_length_with_borrow_in_to_out_fail_1() {
     _limbs_sub_same_length_with_borrow_in_to_out(&mut out, &[6, 7, 8], &[1, 2, 3], false);
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic(expected = "assertion failed: `(left == right)`")]
 fn limbs_sub_same_length_with_borrow_in_to_out_fail_2() {
@@ -480,9 +501,10 @@ fn limbs_sub_same_length_with_borrow_in_to_out_fail_2() {
     _limbs_sub_same_length_with_borrow_in_to_out(&mut out, &[6, 7, 8], &[1, 2], false);
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_sub_same_length_with_borrow_in_in_place_left() {
-    let test = |xs_before: &[u32], ys, borrow_in, borrow, xs_after| {
+    let test = |xs_before: &[Limb], ys, borrow_in, borrow, xs_after| {
         let mut xs = xs_before.to_vec();
         assert_eq!(
             _limbs_sub_same_length_with_borrow_in_in_place_left(&mut xs, ys, borrow_in),
@@ -542,6 +564,7 @@ fn test_limbs_sub_same_length_with_borrow_in_in_place_left() {
     );
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic(expected = "assertion failed: `(left == right)")]
 fn limbs_sub_same_length_with_borrow_in_in_place_left_fail() {
@@ -616,21 +639,21 @@ fn sub_assign_ref_fail() {
 #[should_panic(expected = "Cannot subtract a Natural from a smaller Natural")]
 #[allow(unused_must_use)]
 fn sub_fail_1() {
-    Natural::from(123_u32) - Natural::from(456_u32);
+    Natural::from(123u32) - Natural::from(456u32);
 }
 
 #[test]
 #[should_panic(expected = "Cannot subtract a Natural from a smaller Natural")]
 #[allow(unused_must_use)]
 fn sub_fail_2() {
-    Natural::from(123_u32) - &Natural::from(456_u32);
+    Natural::from(123u32) - &Natural::from(456u32);
 }
 
 #[test]
 #[should_panic(expected = "Cannot subtract a Natural from a smaller Natural")]
 #[allow(unused_must_use)]
 fn sub_fail_3() {
-    &Natural::from(123_u32) - Natural::from(456_u32);
+    &Natural::from(123u32) - Natural::from(456u32);
 }
 
 #[test]
@@ -639,7 +662,7 @@ fn sub_fail_3() {
 )]
 #[allow(unused_must_use)]
 fn sub_fail_4() {
-    &Natural::from(123_u32) - &Natural::from(456_u32);
+    &Natural::from(123u32) - &Natural::from(456u32);
 }
 
 #[test]
@@ -653,7 +676,7 @@ fn limbs_sub_properties() {
                 n,
                 Integer::from(Natural::from_limbs_asc(xs))
                     - Integer::from(Natural::from_limbs_asc(ys))
-                    + (Integer::ONE << (u32::WIDTH * len))
+                    + (Integer::ONE << (Limb::WIDTH * len))
             );
         } else {
             assert_eq!(n, Natural::from_limbs_asc(xs) - Natural::from_limbs_asc(ys));
@@ -662,10 +685,10 @@ fn limbs_sub_properties() {
 }
 
 fn limbs_sub_to_out_helper(
-    f: &mut FnMut(&mut [u32], &[u32], &[u32]) -> bool,
-    out_limbs: &Vec<u32>,
-    xs: &Vec<u32>,
-    ys: &Vec<u32>,
+    f: &mut FnMut(&mut [Limb], &[Limb], &[Limb]) -> bool,
+    out_limbs: &Vec<Limb>,
+    xs: &Vec<Limb>,
+    ys: &Vec<Limb>,
 ) {
     let mut out_limbs = out_limbs.to_vec();
     let old_out_limbs = out_limbs.clone();
@@ -673,9 +696,9 @@ fn limbs_sub_to_out_helper(
     let limbs = if f(&mut out_limbs, xs, ys) {
         let n = Integer::from(Natural::from_limbs_asc(xs))
             - Integer::from(Natural::from_limbs_asc(ys))
-            + (Integer::ONE << (u32::WIDTH * (len as u32)));
+            + (Integer::ONE << (Limb::WIDTH * (len as u32)));
         let mut limbs = Natural::checked_from(n).unwrap().into_limbs_asc();
-        limbs.resize(len, u32::MAX);
+        limbs.resize(len, Limb::MAX);
         limbs
     } else {
         let n = Natural::from_limbs_asc(xs) - Natural::from_limbs_asc(ys);
@@ -708,9 +731,9 @@ fn limbs_sub_to_out_properties() {
 }
 
 fn limbs_sub_in_place_left_helper(
-    f: &mut FnMut(&mut [u32], &[u32]) -> bool,
-    xs: &Vec<u32>,
-    ys: &Vec<u32>,
+    f: &mut FnMut(&mut [Limb], &[Limb]) -> bool,
+    xs: &Vec<Limb>,
+    ys: &Vec<Limb>,
 ) {
     let mut xs = xs.to_vec();
     let xs_old = xs.clone();
@@ -722,7 +745,7 @@ fn limbs_sub_in_place_left_helper(
             n,
             Integer::from(Natural::from_owned_limbs_asc(xs_old))
                 - Integer::from(Natural::from_limbs_asc(ys))
-                + (Integer::ONE << (u32::WIDTH * len))
+                + (Integer::ONE << (Limb::WIDTH * len))
         );
     } else {
         assert_eq!(
@@ -759,7 +782,7 @@ macro_rules! limbs_sub_in_place_right_helper {
                     n,
                     Integer::from(Natural::from_limbs_asc($xs))
                         - Integer::from(Natural::from_owned_limbs_asc(ys_old))
-                        + (Integer::ONE << (u32::WIDTH * len))
+                        + (Integer::ONE << (Limb::WIDTH * len))
                 );
             } else {
                 assert_eq!(
@@ -803,17 +826,17 @@ fn limbs_sub_same_length_with_borrow_in_to_out_properties() {
             ) {
                 let mut n = Integer::from(Natural::from_limbs_asc(xs))
                     - Integer::from(Natural::from_limbs_asc(ys))
-                    + (Integer::ONE << (u32::WIDTH * (len as u32)));
+                    + (Integer::ONE << (Limb::WIDTH * (len as u32)));
                 if borrow_in {
-                    n -= 1;
+                    n -= 1 as Limb;
                 }
                 let mut limbs = Natural::checked_from(n).unwrap().into_limbs_asc();
-                limbs.resize(len, u32::MAX);
+                limbs.resize(len, Limb::MAX);
                 limbs
             } else {
                 let mut n = Natural::from_limbs_asc(xs) - Natural::from_limbs_asc(ys);
                 if borrow_in {
-                    n -= 1;
+                    n -= 1 as Limb;
                 }
                 let mut limbs = n.into_limbs_asc();
                 limbs.resize(len, 0);
@@ -840,7 +863,7 @@ fn limbs_sub_same_length_with_borrow_in_in_place_left_properties() {
                 Natural::checked_from(
                     Integer::from(Natural::from_owned_limbs_asc(xs_old))
                         - Integer::from(Natural::from_limbs_asc(ys))
-                        + (Integer::ONE << (u32::WIDTH * len)),
+                        + (Integer::ONE << (Limb::WIDTH * len)),
                 )
                 .unwrap()
             } else {
@@ -901,15 +924,15 @@ fn sub_properties() {
         assert_eq!(difference + y, *x);
     });
 
-    test_properties(pairs_of_natural_and_u32_var_1, |&(ref x, y)| {
+    test_properties(pairs_of_natural_and_limb_var_1, |&(ref x, y)| {
         assert_eq!(x - y, x - Natural::from(y));
     });
 
-    test_properties(pairs_of_u32_and_natural_var_1, |&(x, ref y)| {
+    test_properties(pairs_of_limb_and_natural_var_1, |&(x, ref y)| {
         assert_eq!(x - y, Natural::from(x) - y);
     });
 
-    test_properties(pairs_of_unsigneds_var_1::<u32>, |&(x, y)| {
+    test_properties(pairs_of_unsigneds_var_1::<Limb>, |&(x, y)| {
         assert_eq!(Natural::from(x - y), Natural::from(x) - Natural::from(y));
     });
 

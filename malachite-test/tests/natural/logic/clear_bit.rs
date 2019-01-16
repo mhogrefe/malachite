@@ -3,17 +3,21 @@ use malachite_base::num::{BitAccess, One};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::logic::bit_access::limbs_clear_bit;
 use malachite_nz::natural::Natural;
+use malachite_nz::platform::Limb;
 use malachite_test::common::{natural_to_rug_integer, rug_integer_to_natural};
 use malachite_test::inputs::base::{
     pairs_of_unsigned_and_small_unsigned, pairs_of_unsigned_vec_and_small_unsigned,
 };
 use malachite_test::inputs::natural::pairs_of_natural_and_small_unsigned;
+#[cfg(feature = "32_bit_limbs")]
 use rug;
+#[cfg(feature = "32_bit_limbs")]
 use std::str::FromStr;
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 pub fn test_limbs_clear_bit() {
-    let test = |limbs: &[u32], index: u64, out_limbs: &[u32]| {
+    let test = |limbs: &[Limb], index: u64, out_limbs: &[Limb]| {
         let mut mut_limbs = limbs.to_vec();
         limbs_clear_bit(&mut mut_limbs, index);
         assert_eq!(mut_limbs, out_limbs);
@@ -23,6 +27,7 @@ pub fn test_limbs_clear_bit() {
     test(&[3, 3], 100, &[3, 3]);
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_clear_bit() {
     let test = |u, index, out| {
@@ -89,7 +94,7 @@ fn clear_bit_properties() {
     });
 
     test_properties(
-        pairs_of_unsigned_and_small_unsigned::<u32, u64>,
+        pairs_of_unsigned_and_small_unsigned::<Limb, u64>,
         |&(u, index)| {
             let mut mut_u = u;
             mut_u.clear_bit(index);

@@ -11,16 +11,17 @@ use malachite_nz::natural::arithmetic::shr_u::{
     limbs_vec_shr_round_up_in_place,
 };
 use malachite_nz::natural::Natural;
+use malachite_nz::platform::Limb;
 use malachite_test::common::{
     biguint_to_natural, natural_to_biguint, natural_to_rug_integer, rug_integer_to_natural,
 };
 use malachite_test::inputs::base::{
     pairs_of_positive_unsigned_and_small_unsigned, pairs_of_unsigned_and_rounding_mode,
-    pairs_of_unsigned_and_small_unsigned, pairs_of_unsigned_vec_and_small_unsigned,
-    pairs_of_unsigned_vec_and_small_unsigned_var_1, pairs_of_unsigned_vec_and_u32_var_2,
+    pairs_of_unsigned_and_small_unsigned, pairs_of_unsigned_vec_and_limb_var_2,
+    pairs_of_unsigned_vec_and_small_unsigned, pairs_of_unsigned_vec_and_small_unsigned_var_1,
     triples_of_unsigned_small_unsigned_and_rounding_mode_var_1,
     triples_of_unsigned_vec_small_unsigned_and_rounding_mode_var_1,
-    triples_of_unsigned_vec_unsigned_vec_and_u32_var_6, unsigneds,
+    triples_of_unsigned_vec_unsigned_vec_and_limb_var_6, unsigneds,
 };
 use malachite_test::inputs::natural::{
     naturals, pairs_of_natural_and_rounding_mode, pairs_of_natural_and_small_unsigned,
@@ -32,9 +33,10 @@ use num::BigUint;
 use rug;
 use std::str::FromStr;
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_shr_and_limbs_vec_shr_in_place() {
-    let test = |limbs: &[u32], bits: u64, out: &[u32]| {
+    let test = |limbs: &[Limb], bits: u64, out: &[Limb]| {
         assert_eq!(limbs_shr(limbs, bits), out);
 
         let mut limbs = limbs.to_vec();
@@ -62,9 +64,10 @@ fn test_limbs_shr_and_limbs_vec_shr_in_place() {
     test(&[4_294_967_295, 4_294_967_295], 32, &[4_294_967_295]);
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_shr_round_up_and_limbs_vec_shr_round_up_in_place() {
-    let test = |limbs: &[u32], bits: u64, out: &[u32]| {
+    let test = |limbs: &[Limb], bits: u64, out: &[Limb]| {
         assert_eq!(limbs_shr_round_up(limbs, bits), out);
 
         let mut limbs = limbs.to_vec();
@@ -86,9 +89,10 @@ fn test_limbs_shr_round_up_and_limbs_vec_shr_round_up_in_place() {
     test(&[4_294_967_295, 4_294_967_295], 32, &[0, 1]);
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_shr_round_to_nearest_and_limbs_vec_shr_round_to_nearest_in_place() {
-    let test = |limbs: &[u32], bits: u64, out: &[u32]| {
+    let test = |limbs: &[Limb], bits: u64, out: &[Limb]| {
         assert_eq!(limbs_shr_round_to_nearest(limbs, bits), out);
 
         let mut limbs = limbs.to_vec();
@@ -116,9 +120,10 @@ fn test_limbs_shr_round_to_nearest_and_limbs_vec_shr_round_to_nearest_in_place()
     test(&[4_294_967_295, 4_294_967_295], 32, &[0, 1]);
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_shr_exact_and_limbs_vec_shr_exact_in_place() {
-    let test = |limbs: &[u32], bits: u64, out: Option<Vec<u32>>| {
+    let test = |limbs: &[Limb], bits: u64, out: Option<Vec<Limb>>| {
         assert_eq!(limbs_shr_exact(limbs, bits), out);
 
         let mut limbs = limbs.to_vec();
@@ -143,9 +148,10 @@ fn test_limbs_shr_exact_and_limbs_vec_shr_exact_in_place() {
     test(&[4_294_967_295, 4_294_967_295], 32, None);
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_shr_round_and_limbs_vec_shr_round_in_place() {
-    let test = |limbs: &[u32], bits: u64, rm: RoundingMode, out: Option<Vec<u32>>| {
+    let test = |limbs: &[Limb], bits: u64, rm: RoundingMode, out: Option<Vec<Limb>>| {
         assert_eq!(limbs_shr_round(limbs, bits, rm), out);
 
         let mut limbs = limbs.to_vec();
@@ -185,13 +191,14 @@ fn test_limbs_shr_round_and_limbs_vec_shr_round_in_place() {
     );
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_shr_to_out() {
-    let test = |limbs_out_before: &[u32],
-                limbs_in: &[u32],
-                bits: u32,
-                carry: u32,
-                limbs_out_after: &[u32]| {
+    let test = |limbs_out_before: &[Limb],
+                limbs_in: &[Limb],
+                bits: Limb,
+                carry: Limb,
+                limbs_out_after: &[Limb]| {
         let mut limbs_out = limbs_out_before.to_vec();
         assert_eq!(limbs_shr_to_out(&mut limbs_out, limbs_in, bits), carry);
         assert_eq!(limbs_out, limbs_out_after);
@@ -238,33 +245,38 @@ fn test_limbs_shr_to_out() {
     );
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic(expected = "assertion failed: len > 0")]
 fn limbs_shr_to_out_fail_1() {
     limbs_shr_to_out(&mut [10, 10], &[], 10);
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic(expected = "assertion failed: out_limbs.len() >= len")]
 fn limbs_shr_to_out_fail_2() {
     limbs_shr_to_out(&mut [10], &[10, 10], 10);
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic(expected = "assertion failed: bits > 0")]
 fn limbs_shr_to_out_fail_3() {
     limbs_shr_to_out(&mut [10, 10, 10], &[123, 456], 0);
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "assertion failed: bits < u32::WIDTH")]
+#[should_panic(expected = "assertion failed: bits < Limb::WIDTH")]
 fn limbs_shr_to_out_fail_4() {
     limbs_shr_to_out(&mut [10, 10, 10], &[123, 456], 100);
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_slice_shr_in_place() {
-    let test = |limbs: &[u32], bits: u32, carry: u32, out: &[u32]| {
+    let test = |limbs: &[Limb], bits: Limb, carry: Limb, out: &[Limb]| {
         let mut limbs = limbs.to_vec();
         assert_eq!(limbs_slice_shr_in_place(&mut limbs, bits), carry);
         assert_eq!(limbs, out);
@@ -286,20 +298,23 @@ fn test_limbs_slice_shr_in_place() {
     );
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic(expected = "assertion failed: len > 0")]
 fn limbs_slice_shr_in_place_fail_1() {
     limbs_slice_shr_in_place(&mut [], 1);
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic(expected = "assertion failed: bits > 0")]
 fn limbs_slice_shr_in_place_fail_2() {
     limbs_slice_shr_in_place(&mut [123, 456], 0);
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "assertion failed: bits < u32::WIDTH")]
+#[should_panic(expected = "assertion failed: bits < Limb::WIDTH")]
 fn limbs_slice_shr_in_place_fail_3() {
     limbs_slice_shr_in_place(&mut [123, 456], 100);
 }
@@ -383,7 +398,7 @@ fn limbs_shr_round_properties() {
 #[test]
 fn limbs_shr_to_out_properties() {
     test_properties(
-        triples_of_unsigned_vec_unsigned_vec_and_u32_var_6,
+        triples_of_unsigned_vec_unsigned_vec_and_limb_var_6,
         |&(ref out_limbs, ref in_limbs, bits)| {
             let mut out_limbs = out_limbs.to_vec();
             let old_out_limbs = out_limbs.clone();
@@ -403,17 +418,20 @@ fn limbs_shr_to_out_properties() {
 
 #[test]
 fn limbs_slice_shr_in_place_properties() {
-    test_properties(pairs_of_unsigned_vec_and_u32_var_2, |&(ref limbs, bits)| {
-        let mut limbs = limbs.to_vec();
-        let old_limbs = limbs.clone();
-        let carry = limbs_slice_shr_in_place(&mut limbs, bits);
-        let n = Natural::from_limbs_asc(&old_limbs);
-        let m = &n >> bits;
-        assert_eq!(carry == 0, &m << bits == n);
-        let mut expected_limbs = m.into_limbs_asc();
-        expected_limbs.resize(limbs.len(), 0);
-        assert_eq!(limbs, expected_limbs);
-    });
+    test_properties(
+        pairs_of_unsigned_vec_and_limb_var_2,
+        |&(ref limbs, bits)| {
+            let mut limbs = limbs.to_vec();
+            let old_limbs = limbs.clone();
+            let carry = limbs_slice_shr_in_place(&mut limbs, bits);
+            let n = Natural::from_limbs_asc(&old_limbs);
+            let m = &n >> bits;
+            assert_eq!(carry == 0, &m << bits == n);
+            let mut expected_limbs = m.into_limbs_asc();
+            expected_limbs.resize(limbs.len(), 0);
+            assert_eq!(limbs, expected_limbs);
+        },
+    );
 }
 
 #[test]
@@ -617,13 +635,13 @@ macro_rules! tests_and_properties {
             );
 
             test_properties(
-                pairs_of_unsigned_and_small_unsigned::<u32, $t>,
+                pairs_of_unsigned_and_small_unsigned::<Limb, $t>,
                 |&(u, v)| {
-                    if let Some(shift) = v.checked_add($t::checked_from(u32::WIDTH).unwrap()) {
+                    if let Some(shift) = v.checked_add($t::checked_from(Limb::WIDTH).unwrap()) {
                         assert_eq!(Natural::from(u) >> shift, 0);
                     }
 
-                    if v < $t::checked_from(u32::WIDTH).unwrap() {
+                    if v < $t::checked_from(Limb::WIDTH).unwrap() {
                         assert_eq!(u >> v, Natural::from(u) >> v);
                     }
                 },
@@ -650,7 +668,7 @@ macro_rules! tests_and_properties {
 
         #[test]
         fn $test_shr_round_u() {
-            let test = |u, v: u32, rm: RoundingMode, out| {
+            let test = |u, v: $t, rm: RoundingMode, out| {
                 let mut n = Natural::from_str(u).unwrap();
                 n.shr_round_assign(v, rm);
                 assert_eq!(n.to_string(), out);
@@ -1167,19 +1185,19 @@ macro_rules! tests_and_properties {
         }
 
         #[test]
-        #[should_panic(expected = "Right shift is not exact: 123 >>= 1")]
+        #[should_panic(expected = "Right shift is not exact")]
         fn $shr_round_assign_u_fail_1() {
             Natural::from(123u32).shr_round_assign(1 as $t, RoundingMode::Exact);
         }
 
         #[test]
-        #[should_panic(expected = "Right shift is not exact: 123 >>= 100")]
+        #[should_panic(expected = "Right shift is not exact")]
         fn $shr_round_assign_u_fail_2() {
             Natural::from(123u32).shr_round_assign(100 as $t, RoundingMode::Exact);
         }
 
         #[test]
-        #[should_panic(expected = "Right shift is not exact.")]
+        #[should_panic(expected = "Right shift is not exact")]
         fn $shr_round_assign_u_fail_3() {
             Natural::from_str("1000000000001")
                 .unwrap()
@@ -1187,7 +1205,7 @@ macro_rules! tests_and_properties {
         }
 
         #[test]
-        #[should_panic(expected = "Right shift is not exact.")]
+        #[should_panic(expected = "Right shift is not exact")]
         fn $shr_round_assign_u_fail_4() {
             Natural::from_str("1000000000001")
                 .unwrap()
@@ -1195,19 +1213,19 @@ macro_rules! tests_and_properties {
         }
 
         #[test]
-        #[should_panic(expected = "Right shift is not exact: 123 >>= 1")]
+        #[should_panic(expected = "Right shift is not exact")]
         fn $shr_round_u_fail_1() {
             Natural::from(123u32).shr_round(1 as $t, RoundingMode::Exact);
         }
 
         #[test]
-        #[should_panic(expected = "Right shift is not exact: 123 >>= 100")]
+        #[should_panic(expected = "Right shift is not exact")]
         fn $shr_round_u_fail_2() {
             Natural::from(123u32).shr_round(100 as $t, RoundingMode::Exact);
         }
 
         #[test]
-        #[should_panic(expected = "Right shift is not exact.")]
+        #[should_panic(expected = "Right shift is not exact")]
         fn $shr_round_u_fail_3() {
             Natural::from_str("1000000000001")
                 .unwrap()
@@ -1215,7 +1233,7 @@ macro_rules! tests_and_properties {
         }
 
         #[test]
-        #[should_panic(expected = "Right shift is not exact.")]
+        #[should_panic(expected = "Right shift is not exact")]
         fn $shr_round_u_fail_4() {
             Natural::from_str("1000000000001")
                 .unwrap()
@@ -1223,25 +1241,25 @@ macro_rules! tests_and_properties {
         }
 
         #[test]
-        #[should_panic(expected = "Right shift is not exact: 123 >> 1")]
+        #[should_panic(expected = "Right shift is not exact")]
         fn $shr_round_u_ref_fail_1() {
             (&Natural::from(123u32)).shr_round(1 as $t, RoundingMode::Exact);
         }
 
         #[test]
-        #[should_panic(expected = "Right shift is not exact: 123 >> 100")]
+        #[should_panic(expected = "Right shift is not exact")]
         fn $shr_round_u_ref_fail_2() {
             (&Natural::from(123u32)).shr_round(100 as $t, RoundingMode::Exact);
         }
 
         #[test]
-        #[should_panic(expected = "Right shift is not exact: 1000000000001 >> 1")]
+        #[should_panic(expected = "Right shift is not exact")]
         fn $shr_round_u_ref_fail_3() {
             (&Natural::from_str("1000000000001").unwrap()).shr_round(1 as $t, RoundingMode::Exact);
         }
 
         #[test]
-        #[should_panic(expected = "Right shift is not exact: 1000000000001 >> 100")]
+        #[should_panic(expected = "Right shift is not exact")]
         fn $shr_round_u_ref_fail_4() {
             (&Natural::from_str("1000000000001").unwrap())
                 .shr_round(100 as $t, RoundingMode::Exact);
@@ -1294,9 +1312,9 @@ macro_rules! tests_and_properties {
             );
 
             test_properties(
-                pairs_of_positive_unsigned_and_small_unsigned::<u32, $t>,
+                pairs_of_positive_unsigned_and_small_unsigned::<Limb, $t>,
                 |&(u, v)| {
-                    if let Some(shift) = v.checked_add($t::checked_from(u32::WIDTH).unwrap()) {
+                    if let Some(shift) = v.checked_add($t::checked_from(Limb::WIDTH).unwrap()) {
                         assert_eq!(Natural::from(u).shr_round(shift, RoundingMode::Down), 0);
                         assert_eq!(Natural::from(u).shr_round(shift, RoundingMode::Floor), 0);
                         assert_eq!(Natural::from(u).shr_round(shift, RoundingMode::Up), 1);
@@ -1321,7 +1339,7 @@ macro_rules! tests_and_properties {
             });
 
             test_properties(
-                triples_of_unsigned_small_unsigned_and_rounding_mode_var_1::<u32, $t>,
+                triples_of_unsigned_small_unsigned_and_rounding_mode_var_1::<Limb, $t>,
                 |&(n, u, rm)| {
                     assert_eq!(n.shr_round(u, rm), Natural::from(n).shr_round(u, rm));
                 },
@@ -1383,22 +1401,22 @@ tests_and_properties!(
 );
 tests_and_properties!(
     u32,
-    test_shr_u32,
-    shr_u32_properties,
-    test_shr_round_u32,
-    shr_round_assign_u32_fail_1,
-    shr_round_assign_u32_fail_2,
-    shr_round_assign_u32_fail_3,
-    shr_round_assign_u32_fail_4,
-    shr_round_u32_fail_1,
-    shr_round_u32_fail_2,
-    shr_round_u32_fail_3,
-    shr_round_u32_fail_4,
-    shr_round_u32_ref_fail_1,
-    shr_round_u32_ref_fail_2,
-    shr_round_u32_ref_fail_3,
-    shr_round_u32_ref_fail_4,
-    shr_round_u32_properties,
+    test_shr_limb,
+    shr_limb_properties,
+    test_shr_round_limb,
+    shr_round_assign_limb_fail_1,
+    shr_round_assign_limb_fail_2,
+    shr_round_assign_limb_fail_3,
+    shr_round_assign_limb_fail_4,
+    shr_round_limb_fail_1,
+    shr_round_limb_fail_2,
+    shr_round_limb_fail_3,
+    shr_round_limb_fail_4,
+    shr_round_limb_ref_fail_1,
+    shr_round_limb_ref_fail_2,
+    shr_round_limb_ref_fail_3,
+    shr_round_limb_ref_fail_4,
+    shr_round_limb_properties,
     u,
     v,
     out,

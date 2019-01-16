@@ -1,6 +1,4 @@
 use misc::{CheckedFrom, CheckedInto, Max, Min, Named, Walkable, WrappingFrom, WrappingInto};
-use rand::distributions::range::SampleRange;
-use rand::Rand;
 use round::RoundingMode;
 use std;
 use std::cmp::Ordering;
@@ -659,66 +657,102 @@ lossless_checked_from_impl!(u8, u8);
 lossless_checked_from_impl!(u8, u16);
 lossless_checked_from_impl!(u8, u32);
 lossless_checked_from_impl!(u8, u64);
+lossless_checked_from_impl!(u8, u128);
 lossy_checked_from_impl_b!(u8, i8);
 lossless_checked_from_impl!(u8, i16);
 lossless_checked_from_impl!(u8, i32);
 lossless_checked_from_impl!(u8, i64);
+lossless_checked_from_impl!(u8, i128);
 lossy_checked_from_impl_a!(u16, u8);
 lossless_checked_from_impl!(u16, u16);
 lossless_checked_from_impl!(u16, u32);
 lossless_checked_from_impl!(u16, u64);
+lossless_checked_from_impl!(u16, u128);
 lossy_checked_from_impl_b!(u16, i8);
 lossy_checked_from_impl_b!(u16, i16);
 lossless_checked_from_impl!(u16, i32);
 lossless_checked_from_impl!(u16, i64);
+lossless_checked_from_impl!(u16, i128);
 lossy_checked_from_impl_a!(u32, u8);
 lossy_checked_from_impl_a!(u32, u16);
 lossless_checked_from_impl!(u32, u32);
 lossless_checked_from_impl!(u32, u64);
+lossless_checked_from_impl!(u32, u128);
 lossy_checked_from_impl_b!(u32, i8);
 lossy_checked_from_impl_b!(u32, i16);
 lossy_checked_from_impl_b!(u32, i32);
 lossless_checked_from_impl!(u32, i64);
+lossless_checked_from_impl!(u32, i128);
 lossy_checked_from_impl_a!(u64, u8);
 lossy_checked_from_impl_a!(u64, u16);
 lossy_checked_from_impl_a!(u64, u32);
 lossless_checked_from_impl!(u64, u64);
+lossless_checked_from_impl!(u64, u128);
 lossy_checked_from_impl_b!(u64, i8);
 lossy_checked_from_impl_b!(u64, i16);
 lossy_checked_from_impl_b!(u64, i32);
 lossy_checked_from_impl_b!(u64, i64);
+lossless_checked_from_impl!(u64, i128);
+lossy_checked_from_impl_a!(u128, u8);
+lossy_checked_from_impl_a!(u128, u16);
+lossy_checked_from_impl_a!(u128, u32);
+lossy_checked_from_impl_a!(u128, u64);
+lossless_checked_from_impl!(u128, u128);
+lossy_checked_from_impl_b!(u128, i8);
+lossy_checked_from_impl_b!(u128, i16);
+lossy_checked_from_impl_b!(u128, i32);
+lossy_checked_from_impl_b!(u128, i64);
+lossy_checked_from_impl_b!(u128, i128);
 lossy_checked_from_impl_b!(i8, u8);
 lossy_checked_from_impl_b!(i8, u16);
 lossy_checked_from_impl_b!(i8, u32);
 lossy_checked_from_impl_b!(i8, u64);
+lossy_checked_from_impl_b!(i8, u128);
 lossless_checked_from_impl!(i8, i8);
 lossless_checked_from_impl!(i8, i16);
 lossless_checked_from_impl!(i8, i32);
 lossless_checked_from_impl!(i8, i64);
+lossless_checked_from_impl!(i8, i128);
 lossy_checked_from_impl_a!(i16, u8);
 lossy_checked_from_impl_b!(i16, u16);
 lossy_checked_from_impl_b!(i16, u32);
 lossy_checked_from_impl_b!(i16, u64);
+lossy_checked_from_impl_b!(i16, u128);
 lossy_checked_from_impl_a!(i16, i8);
 lossless_checked_from_impl!(i16, i16);
 lossless_checked_from_impl!(i16, i32);
 lossless_checked_from_impl!(i16, i64);
+lossless_checked_from_impl!(i16, i128);
 lossy_checked_from_impl_a!(i32, u8);
 lossy_checked_from_impl_a!(i32, u16);
 lossy_checked_from_impl_b!(i32, u32);
 lossy_checked_from_impl_b!(i32, u64);
+lossy_checked_from_impl_b!(i32, u128);
 lossy_checked_from_impl_a!(i32, i8);
 lossy_checked_from_impl_a!(i32, i16);
 lossless_checked_from_impl!(i32, i32);
 lossless_checked_from_impl!(i32, i64);
+lossless_checked_from_impl!(i32, i128);
 lossy_checked_from_impl_a!(i64, u8);
 lossy_checked_from_impl_a!(i64, u16);
 lossy_checked_from_impl_a!(i64, u32);
 lossy_checked_from_impl_b!(i64, u64);
+lossy_checked_from_impl_b!(i64, u128);
 lossy_checked_from_impl_a!(i64, i8);
 lossy_checked_from_impl_a!(i64, i16);
 lossy_checked_from_impl_a!(i64, i32);
 lossless_checked_from_impl!(i64, i64);
+lossless_checked_from_impl!(i64, i128);
+lossy_checked_from_impl_a!(i128, u8);
+lossy_checked_from_impl_a!(i128, u16);
+lossy_checked_from_impl_a!(i128, u32);
+lossy_checked_from_impl_b!(i128, u64);
+lossy_checked_from_impl_b!(i128, u128);
+lossy_checked_from_impl_a!(i128, i8);
+lossy_checked_from_impl_a!(i128, i16);
+lossy_checked_from_impl_a!(i128, i32);
+lossy_checked_from_impl_a!(i128, i64);
+lossless_checked_from_impl!(i128, i128);
 
 macro_rules! wrapping_impl_inner {
     ($from:ty, $to:ty) => {
@@ -738,10 +772,12 @@ macro_rules! wrapping_impl {
         wrapping_impl_inner!($from, u16);
         wrapping_impl_inner!($from, u32);
         wrapping_impl_inner!($from, u64);
+        wrapping_impl_inner!($from, u128);
         wrapping_impl_inner!($from, i8);
         wrapping_impl_inner!($from, i16);
         wrapping_impl_inner!($from, i32);
         wrapping_impl_inner!($from, i64);
+        wrapping_impl_inner!($from, i128);
     };
 }
 
@@ -749,10 +785,12 @@ wrapping_impl!(u8);
 wrapping_impl!(u16);
 wrapping_impl!(u32);
 wrapping_impl!(u64);
+wrapping_impl!(u128);
 wrapping_impl!(i8);
 wrapping_impl!(i16);
 wrapping_impl!(i32);
 wrapping_impl!(i64);
+wrapping_impl!(i128);
 
 impl NotAssign for bool {
     fn not_assign(&mut self) {
@@ -792,18 +830,22 @@ pub trait PrimitiveInteger:
     + CheckedFrom<u16>
     + CheckedFrom<u32>
     + CheckedFrom<u64>
+    + CheckedFrom<u128>
     + CheckedFrom<i8>
     + CheckedFrom<i16>
     + CheckedFrom<i32>
     + CheckedFrom<i64>
+    + CheckedFrom<i128>
     + CheckedInto<u8>
     + CheckedInto<u16>
     + CheckedInto<u32>
     + CheckedInto<u64>
+    + CheckedInto<u128>
     + CheckedInto<i8>
     + CheckedInto<i16>
     + CheckedInto<i32>
     + CheckedInto<i64>
+    + CheckedInto<i128>
     + CheckedMul<Output = Self>
     + CheckedNeg<Output = Self>
     + CheckedRem<Output = Self>
@@ -870,12 +912,10 @@ pub trait PrimitiveInteger:
     + PartialOrdAbs<Self>
     + Pow<u32>
     + Product
-    + Rand
     + Rem<Output = Self>
     + RemAssign<Self>
     + RotateLeft
     + RotateRight
-    + SampleRange
     + SaturatingAdd<Output = Self>
     + SaturatingAddAssign
     + SaturatingMul<Output = Self>
@@ -886,58 +926,72 @@ pub trait PrimitiveInteger:
     + Shl<i16, Output = Self>
     + Shl<i32, Output = Self>
     + Shl<i64, Output = Self>
+    + Shl<i128, Output = Self>
     + Shl<u8, Output = Self>
     + Shl<u16, Output = Self>
     + Shl<u32, Output = Self>
     + Shl<u64, Output = Self>
+    + Shl<u128, Output = Self>
     + ShlAssign<i8>
     + ShlAssign<i16>
     + ShlAssign<i32>
     + ShlAssign<i64>
+    + ShlAssign<i128>
     + ShlAssign<u8>
     + ShlAssign<u16>
     + ShlAssign<u32>
     + ShlAssign<u64>
+    + ShlAssign<u128>
     + ShlRound<i8, Output = Self>
     + ShlRound<i16, Output = Self>
     + ShlRound<i32, Output = Self>
     + ShlRound<i64, Output = Self>
+    + ShlRound<i128, Output = Self>
     + ShlRoundAssign<i8>
     + ShlRoundAssign<i16>
     + ShlRoundAssign<i32>
     + ShlRoundAssign<i64>
+    + ShlRoundAssign<i128>
     + Shr<i8, Output = Self>
     + Shr<i16, Output = Self>
     + Shr<i32, Output = Self>
     + Shr<i64, Output = Self>
+    + Shr<i128, Output = Self>
     + Shr<u8, Output = Self>
     + Shr<u16, Output = Self>
     + Shr<u32, Output = Self>
     + Shr<u64, Output = Self>
+    + Shr<u128, Output = Self>
     + ShrAssign<i8>
     + ShrAssign<i16>
     + ShrAssign<i32>
     + ShrAssign<i64>
+    + ShrAssign<i128>
     + ShrAssign<u8>
     + ShrAssign<u16>
     + ShrAssign<u32>
     + ShrAssign<u64>
+    + ShrAssign<u128>
     + ShrRound<i8, Output = Self>
     + ShrRound<i16, Output = Self>
     + ShrRound<i32, Output = Self>
     + ShrRound<i64, Output = Self>
+    + ShrRound<i128, Output = Self>
     + ShrRound<u8, Output = Self>
     + ShrRound<u16, Output = Self>
     + ShrRound<u32, Output = Self>
     + ShrRound<u64, Output = Self>
+    + ShrRound<u128, Output = Self>
     + ShrRoundAssign<i8>
     + ShrRoundAssign<i16>
     + ShrRoundAssign<i32>
     + ShrRoundAssign<i64>
+    + ShrRoundAssign<i128>
     + ShrRoundAssign<u8>
     + ShrRoundAssign<u16>
     + ShrRoundAssign<u32>
     + ShrRoundAssign<u64>
+    + ShrRoundAssign<u128>
     + SignificantBits
     + Sized
     + Sub<Output = Self>
@@ -954,18 +1008,22 @@ pub trait PrimitiveInteger:
     + WrappingFrom<u16>
     + WrappingFrom<u32>
     + WrappingFrom<u64>
+    + WrappingFrom<u128>
     + WrappingFrom<i8>
     + WrappingFrom<i16>
     + WrappingFrom<i32>
     + WrappingFrom<i64>
+    + WrappingFrom<i128>
     + WrappingInto<u8>
     + WrappingInto<u16>
     + WrappingInto<u32>
     + WrappingInto<u64>
+    + WrappingInto<u128>
     + WrappingInto<i8>
     + WrappingInto<i16>
     + WrappingInto<i32>
     + WrappingInto<i64>
+    + WrappingInto<i128>
     + WrappingMul<Output = Self>
     + WrappingMulAssign
     + WrappingNeg<Output = Self>
@@ -997,7 +1055,7 @@ pub trait PrimitiveUnsigned:
     + FloorLogTwo
     + From<u8>
     + FromU32Slice
-    + Into<u64>
+    + Into<u128>
     + IsPowerOfTwo
     + ModPowerOfTwo<Output = Self>
     + ModPowerOfTwoAssign
@@ -1025,7 +1083,7 @@ pub trait PrimitiveSigned:
     + CeilingModAssign
     + CheckedAbs<Output = Self>
     + From<i8>
-    + Into<i64>
+    + Into<i128>
     + Neg<Output = Self>
     + NegAssign
     + NegativeOne
@@ -1067,10 +1125,8 @@ pub trait PrimitiveFloat:
     + PartialEq<Self>
     + PartialOrd<Self>
     + Product
-    + Rand
     + Rem<Output = Self>
     + RemAssign<Self>
-    + SampleRange
     + Sized
     + Sub<Output = Self>
     + SubAssign<Self>
@@ -1189,7 +1245,7 @@ pub trait BitAccess {
 
 //TODO docs
 macro_rules! integer_traits {
-    ($t:ident, $log_width:expr, $u:ident, $from_u32:expr, $from_u64:expr) => {
+    ($t:ident, $log_width:expr) => {
         //TODO docs
         impl PrimitiveInteger for $t {
             const LOG_WIDTH: u32 = $log_width;
@@ -1847,8 +1903,8 @@ impl Parity for isize {
 
 //TODO docs
 macro_rules! unsigned_traits {
-    ($t:ident, $log_width:expr, $u:ident, $from_u32:expr, $from_u64:expr) => {
-        integer_traits!($t, $log_width, $u, $from_u32, $from_u64);
+    ($t:ident, $log_width:expr) => {
+        integer_traits!($t, $log_width);
 
         impl OrdAbs for $t {
             #[inline]
@@ -2279,15 +2335,9 @@ macro_rules! signed_traits {
     (
         $t:ident,
         $ut:ident,
-        $log_width:expr,
-        $u:ident,
-        $from_u32:expr,
-        $from_u64:expr,
-        $i:ident,
-        $from_i32:expr,
-        $from_i64:expr
+        $log_width:expr
     ) => {
-        integer_traits!($t, $log_width, $u, $from_u32, $from_u64);
+        integer_traits!($t, $log_width);
 
         //TODO docs
         impl PrimitiveSigned for $t {
@@ -2924,15 +2974,40 @@ impl PrimitiveUnsigned for u64 {
     }
 }
 
-unsigned_traits!(u8, 3, u, u as u8, u as u8);
-unsigned_traits!(u16, 4, u, u as u16, u as u16);
-unsigned_traits!(u32, 5, u, u, u as u32);
-unsigned_traits!(u64, 6, u, u.into(), u);
+impl PrimitiveUnsigned for u128 {
+    type SignedOfEqualWidth = i128;
 
-signed_traits!(i8, u8, 3, u, u as i8, u as i8, i, i as i8, i as i8);
-signed_traits!(i16, u16, 4, u, u as i16, u as i16, i, i as i16, i as i16);
-signed_traits!(i32, u32, 5, u, u as i32, u as i32, i, i, i as i32);
-signed_traits!(i64, u64, 6, u, u.into(), u as i64, i, i.into(), i);
+    #[inline]
+    fn to_signed_bitwise(self) -> i128 {
+        self as i128
+    }
+
+    #[inline]
+    fn to_signed_checked(self) -> Option<i128> {
+        if self <= i128::MAX as u128 {
+            Some(self as i128)
+        } else {
+            None
+        }
+    }
+
+    #[inline]
+    fn from_signed_bitwise(i: i128) -> u128 {
+        i as u128
+    }
+}
+
+unsigned_traits!(u8, 3);
+unsigned_traits!(u16, 4);
+unsigned_traits!(u32, 5);
+unsigned_traits!(u64, 6);
+unsigned_traits!(u128, 7);
+
+signed_traits!(i8, u8, 3);
+signed_traits!(i16, u16, 4);
+signed_traits!(i32, u32, 5);
+signed_traits!(i64, u64, 6);
+signed_traits!(i128, u128, 7);
 
 float_traits!(f32, u32);
 float_traits!(f64, u64);
@@ -3134,12 +3209,14 @@ impl01_unsigned!(u8);
 impl01_unsigned!(u16);
 impl01_unsigned!(u32);
 impl01_unsigned!(u64);
+impl01_unsigned!(u128);
 impl01_unsigned!(usize);
 
 impl01_signed!(i8);
 impl01_signed!(i16);
 impl01_signed!(i32);
 impl01_signed!(i64);
+impl01_signed!(i128);
 impl01_signed!(isize);
 
 impl01_float!(f32);
@@ -3290,6 +3367,7 @@ macro_rules! impl_halves_unsigned {
 impl_halves_unsigned!(u16, u8);
 impl_halves_unsigned!(u32, u16);
 impl_halves_unsigned!(u64, u32);
+impl_halves_unsigned!(u128, u64);
 
 /// Computes the absolute value of `self` and converts to the unsigned equivalent.
 pub trait UnsignedAbs {
@@ -3442,18 +3520,27 @@ round_shift_unsigned_unsigned!(u8, u8);
 round_shift_unsigned_unsigned!(u8, u16);
 round_shift_unsigned_unsigned!(u8, u32);
 round_shift_unsigned_unsigned!(u8, u64);
+round_shift_unsigned_unsigned!(u8, u128);
 round_shift_unsigned_unsigned!(u16, u8);
 round_shift_unsigned_unsigned!(u16, u16);
 round_shift_unsigned_unsigned!(u16, u32);
 round_shift_unsigned_unsigned!(u16, u64);
+round_shift_unsigned_unsigned!(u16, u128);
 round_shift_unsigned_unsigned!(u32, u8);
 round_shift_unsigned_unsigned!(u32, u16);
 round_shift_unsigned_unsigned!(u32, u32);
 round_shift_unsigned_unsigned!(u32, u64);
+round_shift_unsigned_unsigned!(u32, u128);
 round_shift_unsigned_unsigned!(u64, u8);
 round_shift_unsigned_unsigned!(u64, u16);
 round_shift_unsigned_unsigned!(u64, u32);
 round_shift_unsigned_unsigned!(u64, u64);
+round_shift_unsigned_unsigned!(u64, u128);
+round_shift_unsigned_unsigned!(u128, u8);
+round_shift_unsigned_unsigned!(u128, u16);
+round_shift_unsigned_unsigned!(u128, u32);
+round_shift_unsigned_unsigned!(u128, u64);
+round_shift_unsigned_unsigned!(u128, u128);
 
 macro_rules! round_shift_primitive_signed {
     ($t:ident, $u:ident) => {
@@ -3510,34 +3597,52 @@ round_shift_primitive_signed!(u8, i8);
 round_shift_primitive_signed!(u8, i16);
 round_shift_primitive_signed!(u8, i32);
 round_shift_primitive_signed!(u8, i64);
+round_shift_primitive_signed!(u8, i128);
 round_shift_primitive_signed!(u16, i8);
 round_shift_primitive_signed!(u16, i16);
 round_shift_primitive_signed!(u16, i32);
 round_shift_primitive_signed!(u16, i64);
+round_shift_primitive_signed!(u16, i128);
 round_shift_primitive_signed!(u32, i8);
 round_shift_primitive_signed!(u32, i16);
 round_shift_primitive_signed!(u32, i32);
 round_shift_primitive_signed!(u32, i64);
+round_shift_primitive_signed!(u32, i128);
 round_shift_primitive_signed!(u64, i8);
 round_shift_primitive_signed!(u64, i16);
 round_shift_primitive_signed!(u64, i32);
 round_shift_primitive_signed!(u64, i64);
+round_shift_primitive_signed!(u64, i128);
+round_shift_primitive_signed!(u128, i8);
+round_shift_primitive_signed!(u128, i16);
+round_shift_primitive_signed!(u128, i32);
+round_shift_primitive_signed!(u128, i64);
+round_shift_primitive_signed!(u128, i128);
 round_shift_primitive_signed!(i8, i8);
 round_shift_primitive_signed!(i8, i16);
 round_shift_primitive_signed!(i8, i32);
 round_shift_primitive_signed!(i8, i64);
+round_shift_primitive_signed!(i8, i128);
 round_shift_primitive_signed!(i16, i8);
 round_shift_primitive_signed!(i16, i16);
 round_shift_primitive_signed!(i16, i32);
 round_shift_primitive_signed!(i16, i64);
+round_shift_primitive_signed!(i16, i128);
 round_shift_primitive_signed!(i32, i8);
 round_shift_primitive_signed!(i32, i16);
 round_shift_primitive_signed!(i32, i32);
 round_shift_primitive_signed!(i32, i64);
+round_shift_primitive_signed!(i32, i128);
 round_shift_primitive_signed!(i64, i8);
 round_shift_primitive_signed!(i64, i16);
 round_shift_primitive_signed!(i64, i32);
 round_shift_primitive_signed!(i64, i64);
+round_shift_primitive_signed!(i64, i128);
+round_shift_primitive_signed!(i128, i8);
+round_shift_primitive_signed!(i128, i16);
+round_shift_primitive_signed!(i128, i32);
+round_shift_primitive_signed!(i128, i64);
+round_shift_primitive_signed!(i128, i128);
 
 macro_rules! round_shift_signed_unsigned {
     ($t:ident, $u:ident) => {
@@ -3573,18 +3678,27 @@ round_shift_signed_unsigned!(i8, u8);
 round_shift_signed_unsigned!(i8, u16);
 round_shift_signed_unsigned!(i8, u32);
 round_shift_signed_unsigned!(i8, u64);
+round_shift_signed_unsigned!(i8, u128);
 round_shift_signed_unsigned!(i16, u8);
 round_shift_signed_unsigned!(i16, u16);
 round_shift_signed_unsigned!(i16, u32);
 round_shift_signed_unsigned!(i16, u64);
+round_shift_signed_unsigned!(i16, u128);
 round_shift_signed_unsigned!(i32, u8);
 round_shift_signed_unsigned!(i32, u16);
 round_shift_signed_unsigned!(i32, u32);
 round_shift_signed_unsigned!(i32, u64);
+round_shift_signed_unsigned!(i32, u128);
 round_shift_signed_unsigned!(i64, u8);
 round_shift_signed_unsigned!(i64, u16);
 round_shift_signed_unsigned!(i64, u32);
 round_shift_signed_unsigned!(i64, u64);
+round_shift_signed_unsigned!(i64, u128);
+round_shift_signed_unsigned!(i128, u8);
+round_shift_signed_unsigned!(i128, u16);
+round_shift_signed_unsigned!(i128, u32);
+round_shift_signed_unsigned!(i128, u64);
+round_shift_signed_unsigned!(i128, u128);
 
 //TODO doc and test
 pub trait FromU32Slice: Sized {
@@ -3670,6 +3784,31 @@ impl FromU32Slice for u64 {
         for out in out_slice.iter_mut() {
             *out = u64::join_halves(in_slice[i + 1], in_slice[i]);
             i += 2;
+        }
+    }
+}
+
+//TODO doc and test
+impl FromU32Slice for u128 {
+    #[inline]
+    fn from_u32_slice(slice: &[u32]) -> Self {
+        assert!(slice.len() >= 4);
+        u128::join_halves(
+            u64::join_halves(slice[3], slice[2]),
+            u64::join_halves(slice[1], slice[0]),
+        )
+    }
+
+    fn copy_from_u32_slice(out_slice: &mut [u128], in_slice: &[u32]) {
+        let out_len = out_slice.len();
+        assert!(out_len >= in_slice.len() >> 2);
+        let mut i = 0;
+        for out in out_slice.iter_mut() {
+            *out = u128::join_halves(
+                u64::join_halves(in_slice[i + 3], in_slice[i + 2]),
+                u64::join_halves(in_slice[i + 1], in_slice[i]),
+            );
+            i += 4;
         }
     }
 }

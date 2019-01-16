@@ -1,6 +1,7 @@
 use common::test_properties;
 use malachite_base::misc::Walkable;
 use malachite_nz::natural::Natural;
+use malachite_nz::platform::Limb;
 use malachite_test::inputs::base::unsigneds_no_max;
 use malachite_test::inputs::natural::naturals;
 use std::str::FromStr;
@@ -28,7 +29,7 @@ fn natural_increment_properties() {
         assert_eq!(mut_n, *n);
     });
 
-    test_properties(unsigneds_no_max::<u32>, |&u| {
+    test_properties(unsigneds_no_max::<Limb>, |&u| {
         let mut mut_u = u;
         mut_u.increment();
 

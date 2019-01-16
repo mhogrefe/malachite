@@ -3,7 +3,7 @@ use malachite_base::chars::{
     char_to_contiguous_range, contiguous_range_to_char, CHAR_JUST_ABOVE_SURROGATES,
     CHAR_JUST_BELOW_SURROGATES, NUMBER_OF_CHARS,
 };
-use malachite_test::inputs::base::{pairs_of_u32s_range_1, u32s_range_1, unsigneds};
+use malachite_test::inputs::base::{pairs_of_limbs_range_1, u32s_range_1, unsigneds};
 use std::{char, u32};
 
 #[test]
@@ -34,7 +34,7 @@ fn contiguous_range_to_char_properties() {
         );
     });
 
-    test_properties_no_special(pairs_of_u32s_range_1, |&(u, v)| {
+    test_properties_no_special(pairs_of_limbs_range_1, |&(u, v)| {
         assert_eq!(
             u.cmp(&v),
             contiguous_range_to_char(u).cmp(&contiguous_range_to_char(v))

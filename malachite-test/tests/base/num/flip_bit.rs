@@ -5,6 +5,7 @@ use malachite_base::num::{
 use malachite_test::inputs::base::{
     pairs_of_signed_and_u64_width_range, pairs_of_unsigned_and_u64_width_range,
 };
+use rand::Rand;
 
 fn flip_bit_helper_unsigned<T: PrimitiveInteger>() {
     let test = |n: u64, index, out: u64| {
@@ -88,14 +89,18 @@ macro_rules! flip_bit_fail_helper_signed {
 
 flip_bit_fail_helper_unsigned!(u8, flip_bit_u8_fail_helper);
 flip_bit_fail_helper_unsigned!(u16, flip_bit_u16_fail_helper);
-flip_bit_fail_helper_unsigned!(u32, flip_bit_u32_fail_helper);
+flip_bit_fail_helper_unsigned!(u32, flip_bit_limb_fail_helper);
 flip_bit_fail_helper_unsigned!(u64, flip_bit_u64_fail_helper);
 flip_bit_fail_helper_signed!(i8, flip_bit_i8_fail_1_helper, flip_bit_i8_fail_2_helper);
 flip_bit_fail_helper_signed!(i16, flip_bit_i16_fail_1_helper, flip_bit_i16_fail_2_helper);
-flip_bit_fail_helper_signed!(i32, flip_bit_i32_fail_1_helper, flip_bit_i32_fail_2_helper);
+flip_bit_fail_helper_signed!(
+    i32,
+    flip_bit_signed_limb_fail_1_helper,
+    flip_bit_signed_limb_fail_2_helper
+);
 flip_bit_fail_helper_signed!(i64, flip_bit_i64_fail_1_helper, flip_bit_i64_fail_2_helper);
 
-fn flip_bit_properties_helper_unsigned<T: PrimitiveUnsigned>() {
+fn flip_bit_properties_helper_unsigned<T: PrimitiveUnsigned + Rand>() {
     test_properties(pairs_of_unsigned_and_u64_width_range, |&(n, index)| {
         let mut mut_n: T = n;
         mut_n.flip_bit(index);
@@ -106,7 +111,10 @@ fn flip_bit_properties_helper_unsigned<T: PrimitiveUnsigned>() {
     });
 }
 
-fn flip_bit_properties_helper_signed<T: PrimitiveSigned>() {
+fn flip_bit_properties_helper_signed<T: PrimitiveSigned + Rand>()
+where
+    T::UnsignedOfEqualWidth: Rand,
+{
     test_properties(pairs_of_signed_and_u64_width_range, |&(n, index)| {
         let mut mut_n: T = n;
         mut_n.flip_bit(index);

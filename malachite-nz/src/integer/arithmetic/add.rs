@@ -1,4 +1,5 @@
 use integer::Integer;
+use platform::Limb;
 use std::mem::swap;
 use std::ops::{Add, AddAssign};
 
@@ -138,9 +139,9 @@ impl<'a, 'b> Add<&'a Integer> for &'b Integer {
     fn add(self, other: &'a Integer) -> Integer {
         if self as *const Integer == other as *const Integer {
             self << 1
-        } else if *self == 0 {
+        } else if *self == 0 as Limb {
             other.clone()
-        } else if *other == 0 {
+        } else if *other == 0 as Limb {
             self.clone()
         } else {
             match (self, other) {
@@ -212,9 +213,9 @@ impl<'a, 'b> Add<&'a Integer> for &'b Integer {
 /// ```
 impl AddAssign<Integer> for Integer {
     fn add_assign(&mut self, mut other: Integer) {
-        if other == 0 {
+        if other == 0 as Limb {
             return;
-        } else if *self == 0 {
+        } else if *self == 0 as Limb {
             *self = other;
             return;
         }
@@ -276,9 +277,9 @@ impl AddAssign<Integer> for Integer {
 /// ```
 impl<'a> AddAssign<&'a Integer> for Integer {
     fn add_assign(&mut self, other: &'a Integer) {
-        if *other == 0 {
+        if *other == 0 as Limb {
             return;
-        } else if *self == 0 {
+        } else if *self == 0 as Limb {
             *self = other.clone();
             return;
         }

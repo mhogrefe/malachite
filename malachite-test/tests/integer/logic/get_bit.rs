@@ -3,6 +3,7 @@ use malachite_base::num::{BitAccess, One, SignificantBits};
 use malachite_nz::integer::logic::bit_access::limbs_get_bit_neg;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
+use malachite_nz::platform::{Limb, SignedLimb};
 use malachite_test::common::integer_to_rug_integer;
 use malachite_test::inputs::base::{
     pairs_of_signed_and_small_unsigned, pairs_of_unsigned_vec_and_small_unsigned_var_1,
@@ -11,9 +12,10 @@ use malachite_test::inputs::integer::{natural_integers, pairs_of_integer_and_sma
 use rug;
 use std::str::FromStr;
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 pub fn test_limbs_get_bit_neg() {
-    let test = |limbs: &[u32], index: u64, out: bool| {
+    let test = |limbs: &[Limb], index: u64, out: bool| {
         assert_eq!(limbs_get_bit_neg(limbs, index), out);
     };
     test(&[1], 0, true);
@@ -92,20 +94,20 @@ fn get_bit_properties() {
         let bit = n.get_bit(index);
         assert_eq!(integer_to_rug_integer(n).get_bit(index as u32), bit);
 
-        assert_eq!(n & (Integer::ONE << index) != 0, bit);
+        assert_eq!(n & (Integer::ONE << index) != 0 as Limb, bit);
         assert_eq!(!(!n).get_bit(index), bit);
     });
 
     test_properties(natural_integers, |n| {
         let significant_bits = n.significant_bits();
         assert!(!n.get_bit(significant_bits));
-        if *n != 0 {
+        if *n != 0 as Limb {
             assert!(n.get_bit(significant_bits - 1));
         }
     });
 
     test_properties(
-        pairs_of_signed_and_small_unsigned::<i32, u64>,
+        pairs_of_signed_and_small_unsigned::<SignedLimb, u64>,
         |&(i, index)| {
             assert_eq!(Integer::from(i).get_bit(index), i.get_bit(index));
         },

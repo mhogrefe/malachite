@@ -5,15 +5,17 @@ use malachite_nz::natural::arithmetic::next_power_of_two::{
     limbs_vec_next_power_of_two_in_place,
 };
 use malachite_nz::natural::Natural;
+use malachite_nz::platform::Limb;
 use malachite_test::common::{natural_to_rug_integer, rug_integer_to_natural};
 use malachite_test::inputs::base::{unsigneds, vecs_of_unsigned_var_1};
 use malachite_test::inputs::natural::naturals;
 use rug;
 use std::str::FromStr;
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_next_power_of_two_and_limbs_vec_next_power_of_two_in_place() {
-    let test = |limbs: &[u32], out: &[u32]| {
+    let test = |limbs: &[Limb], out: &[Limb]| {
         assert_eq!(limbs_next_power_of_two(limbs), out);
 
         let mut limbs = limbs.to_vec();
@@ -27,27 +29,31 @@ fn test_limbs_next_power_of_two_and_limbs_vec_next_power_of_two_in_place() {
     test(&[123, 456, 0xffff_ffff], &[0, 0, 0, 1]);
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic(expected = "called `Option::unwrap()` on a `None` value")]
 fn limbs_next_power_of_two_fail() {
     limbs_next_power_of_two(&[]);
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic(expected = "called `Option::unwrap()` on a `None` value")]
 fn limbs_slice_next_power_of_two_in_place_fail() {
     limbs_slice_next_power_of_two_in_place(&mut []);
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic(expected = "called `Option::unwrap()` on a `None` value")]
 fn limbs_vec_next_power_of_two_in_place_fail() {
     limbs_vec_next_power_of_two_in_place(&mut Vec::new());
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_slice_next_power_of_two_in_place() {
-    let test = |limbs: &[u32], carry: bool, out: &[u32]| {
+    let test = |limbs: &[Limb], carry: bool, out: &[Limb]| {
         let mut limbs = limbs.to_vec();
         assert_eq!(limbs_slice_next_power_of_two_in_place(&mut limbs), carry);
         assert_eq!(limbs, out);
@@ -165,7 +171,7 @@ fn next_power_of_two_properties() {
         }
     });
 
-    test_properties(unsigneds::<u32>, |&u| {
+    test_properties(unsigneds::<Limb>, |&u| {
         if let Some(power) = u.checked_next_power_of_two() {
             assert_eq!(power, Natural::from(u).next_power_of_two());
         }

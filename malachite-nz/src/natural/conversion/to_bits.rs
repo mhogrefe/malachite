@@ -1,6 +1,7 @@
 use malachite_base::num::{BitAccess, PrimitiveInteger, SignificantBits};
 use natural::conversion::to_limbs::LimbIterator;
 use natural::Natural;
+use platform::Limb;
 use std::ops::Index;
 
 /// A double-ended iterator over the bits of a `Natural`. The forward order is ascending (least-
@@ -14,8 +15,8 @@ pub struct BitIterator<'a> {
     pub(crate) limbs: LimbIterator<'a>,
     some_remaining: bool,
     indices_are_in_same_limb: bool,
-    current_limb_forward: u32,
-    current_limb_back: u32,
+    current_limb_forward: Limb,
+    current_limb_back: Limb,
     // If `n` is nonzero, this index initially points to the least-significant bit in the least-
     // significant limb, and is incremented by next().
     i: u64,
@@ -65,7 +66,7 @@ impl<'a> Iterator for BitIterator<'a> {
                 self.some_remaining = false;
             }
             self.i += 1;
-            if self.i == u32::WIDTH.into() {
+            if self.i == u64::from(Limb::WIDTH) {
                 self.i = 0;
                 match self.limbs.next() {
                     Some(next) => self.current_limb_forward = next,
@@ -147,7 +148,7 @@ impl<'a> DoubleEndedIterator for BitIterator<'a> {
             }
             let bit = self.current_limb_back.get_bit(self.j);
             if self.j == 0 {
-                self.j = u64::from(u32::WIDTH) - 1;
+                self.j = u64::from(Limb::WIDTH) - 1;
                 match self.limbs.next_back() {
                     Some(next_back) => self.current_limb_back = next_back,
                     None => {
@@ -248,7 +249,7 @@ impl Natural {
         let last_index = self.limb_count() as usize - 1;
         let mut last = limbs[last_index];
         for limb in limbs.take(last_index) {
-            for i in 0..u32::WIDTH.into() {
+            for i in 0..Limb::WIDTH.into() {
                 bits.push(limb.get_bit(i));
             }
         }
@@ -292,9 +293,9 @@ impl Natural {
         for limb in self.limbs().rev() {
             let mut i = u64::from(if first {
                 first = false;
-                u32::WIDTH - limb.leading_zeros() - 1
+                Limb::WIDTH - limb.leading_zeros() - 1
             } else {
-                u32::WIDTH - 1
+                Limb::WIDTH - 1
             });
             loop {
                 bits.push(limb.get_bit(i));
@@ -344,7 +345,7 @@ impl Natural {
             significant_bits,
             limbs: self.limbs(),
             some_remaining: significant_bits != 0,
-            indices_are_in_same_limb: significant_bits <= u64::from(u32::WIDTH),
+            indices_are_in_same_limb: significant_bits <= u64::from(Limb::WIDTH),
             current_limb_forward: 0,
             current_limb_back: 0,
             i: 0,
@@ -358,11 +359,11 @@ impl Natural {
         } else {
             bits.current_limb_back = bits.current_limb_forward;
         }
-        let remainder = significant_bits & u64::from(u32::WIDTH_MASK);
+        let remainder = significant_bits & u64::from(Limb::WIDTH_MASK);
         if remainder != 0 {
             bits.j = remainder - 1;
         } else {
-            bits.j = u64::from(u32::WIDTH) - 1;
+            bits.j = u64::from(Limb::WIDTH) - 1;
         }
         bits
     }

@@ -1,9 +1,10 @@
 use integer::Integer;
 use malachite_base::num::Sign;
+use platform::Limb;
 use std::cmp::Ordering;
 
 impl Integer {
-    /// Returns the sign and limbs, or base-2<sup>32</sup> digits, of a `Natural`. The sign is
+    /// Returns the sign and limbs of a `Natural`. The sign is
     /// `Ordering::Greater` if the `Natural` is positive, `Ordering::Equal` if it is zero (in which
     /// case the limbs are empty), and `Ordering::Less` if it is negative. The limbs are the limbs
     /// of the `Natural`'s absolute value. They are in ascending order, so that less significant
@@ -40,11 +41,11 @@ impl Integer {
     ///         (Ordering::Less, vec![3567587328, 232]));
     /// }
     /// ```
-    pub fn to_sign_and_limbs_asc(&self) -> (Ordering, Vec<u32>) {
+    pub fn to_sign_and_limbs_asc(&self) -> (Ordering, Vec<Limb>) {
         (self.sign(), self.abs.to_limbs_asc())
     }
 
-    /// Returns the sign and limbs, or base-2<sup>32</sup> digits, of a `Natural`. The sign is
+    /// Returns the sign and limbs of a `Natural`. The sign is
     /// `Ordering::Greater` if the `Natural` is positive, `Ordering::Equal` if it is zero (in which
     /// case the limbs are empty), and `Ordering::Less` if it is negative. The limbs are the limbs
     /// of the `Natural`'s absolute value. They are in descending order, so that less significant
@@ -81,11 +82,11 @@ impl Integer {
     ///         (Ordering::Less, vec![232, 3567587328]));
     /// }
     /// ```
-    pub fn to_sign_and_limbs_desc(&self) -> (Ordering, Vec<u32>) {
+    pub fn to_sign_and_limbs_desc(&self) -> (Ordering, Vec<Limb>) {
         (self.sign(), self.abs.to_limbs_desc())
     }
 
-    /// Returns the sign and limbs, or base-2<sup>32</sup> digits, of a `Natural`. The sign is
+    /// Returns the sign and limbs of a `Natural`. The sign is
     /// `Ordering::Greater` if the `Natural` is positive, `Ordering::Equal` if it is zero (in which
     /// case the limbs are empty), and `Ordering::Less` if it is negative. The limbs are the limbs
     /// of the `Natural`'s absolute value. They are in ascending order, so that less significant
@@ -123,11 +124,11 @@ impl Integer {
     ///         (Ordering::Less, vec![3567587328, 232]));
     /// }
     /// ```
-    pub fn into_sign_and_limbs_asc(self) -> (Ordering, Vec<u32>) {
+    pub fn into_sign_and_limbs_asc(self) -> (Ordering, Vec<Limb>) {
         (self.sign(), self.abs.into_limbs_asc())
     }
 
-    /// Returns the sign and limbs, or base-2<sup>32</sup> digits, of a `Natural`. The sign is
+    /// Returns the sign and limbs of a `Natural`. The sign is
     /// `Ordering::Greater` if the `Natural` is positive, `Ordering::Equal` if it is zero (in which
     /// case the limbs are empty), and `Ordering::Less` if it is negative. The limbs are the limbs
     /// of the `Natural`'s absolute value. They are in descending order, so that less significant
@@ -165,7 +166,7 @@ impl Integer {
     ///         (Ordering::Less, vec![232, 3567587328]));
     /// }
     /// ```
-    pub fn into_sign_and_limbs_desc(self) -> (Ordering, Vec<u32>) {
+    pub fn into_sign_and_limbs_desc(self) -> (Ordering, Vec<Limb>) {
         (self.sign(), self.abs.into_limbs_desc())
     }
 }

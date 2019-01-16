@@ -1,13 +1,16 @@
 use common::test_properties;
-use malachite_base::num::{BitAccess, PrimitiveInteger, Sign};
+use malachite_base::limbs::limbs_delete_left;
+use malachite_base::misc::Max;
+use malachite_base::num::{PrimitiveInteger, Sign};
 use malachite_nz::integer::Integer;
+use malachite_nz::platform::Limb;
 use malachite_test::inputs::base::vecs_of_unsigned;
 use std::cmp::Ordering;
-use std::u32;
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_from_from_twos_complement_limbs_asc() {
-    let test = |limbs: &[u32], out| {
+    let test = |limbs: &[Limb], out| {
         let x = Integer::from_twos_complement_limbs_asc(limbs);
         assert_eq!(x.to_string(), out);
         assert!(x.is_valid());
@@ -21,33 +24,34 @@ fn test_from_from_twos_complement_limbs_asc() {
     test(&[123], "123");
     test(&[123, 0], "123");
     test(&[4_294_967_173], "-123");
-    test(&[4_294_967_173, u32::MAX], "-123");
+    test(&[4_294_967_173, Limb::MAX], "-123");
     test(&[3_567_587_328, 232], "1000000000000");
     test(&[727_379_968, 4_294_967_063], "-1000000000000");
     test(&[1, 2, 3, 4, 5], "1701411834921604967429270619762735448065");
     test(
         &[
-            u32::MAX,
-            u32::MAX - 2,
-            u32::MAX - 3,
-            u32::MAX - 4,
-            u32::MAX - 5,
+            Limb::MAX,
+            Limb::MAX - 2,
+            Limb::MAX - 3,
+            Limb::MAX - 4,
+            Limb::MAX - 5,
         ],
         "-1701411834921604967429270619762735448065",
     );
-    test(&[u32::MAX, 0], "4294967295");
-    test(&[1, u32::MAX], "-4294967295");
+    test(&[Limb::MAX, 0], "4294967295");
+    test(&[1, Limb::MAX], "-4294967295");
     test(&[0, 1], "4294967296");
-    test(&[0, u32::MAX], "-4294967296");
-    test(&[u32::MAX, u32::MAX, 0], "18446744073709551615");
-    test(&[1, 0, u32::MAX], "-18446744073709551615");
+    test(&[0, Limb::MAX], "-4294967296");
+    test(&[Limb::MAX, Limb::MAX, 0], "18446744073709551615");
+    test(&[1, 0, Limb::MAX], "-18446744073709551615");
     test(&[0, 0, 1], "18446744073709551616");
-    test(&[0, 0, u32::MAX], "-18446744073709551616");
+    test(&[0, 0, Limb::MAX], "-18446744073709551616");
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
-fn test_from_from_twos_complement_limbs_desc() {
-    let test = |limbs: &[u32], out| {
+fn test_from_twos_complement_limbs_desc() {
+    let test = |limbs: &[Limb], out| {
         let x = Integer::from_twos_complement_limbs_desc(limbs);
         assert_eq!(x.to_string(), out);
         assert!(x.is_valid());
@@ -61,73 +65,68 @@ fn test_from_from_twos_complement_limbs_desc() {
     test(&[123], "123");
     test(&[0, 123], "123");
     test(&[4_294_967_173], "-123");
-    test(&[u32::MAX, 4_294_967_173], "-123");
+    test(&[Limb::MAX, 4_294_967_173], "-123");
     test(&[232, 3_567_587_328], "1000000000000");
     test(&[4_294_967_063, 727_379_968], "-1000000000000");
     test(&[5, 4, 3, 2, 1], "1701411834921604967429270619762735448065");
     test(
         &[
-            u32::MAX - 5,
-            u32::MAX - 4,
-            u32::MAX - 3,
-            u32::MAX - 2,
-            u32::MAX,
+            Limb::MAX - 5,
+            Limb::MAX - 4,
+            Limb::MAX - 3,
+            Limb::MAX - 2,
+            Limb::MAX,
         ],
         "-1701411834921604967429270619762735448065",
     );
-    test(&[0, u32::MAX], "4294967295");
-    test(&[u32::MAX, 1], "-4294967295");
+    test(&[0, Limb::MAX], "4294967295");
+    test(&[Limb::MAX, 1], "-4294967295");
     test(&[1, 0], "4294967296");
-    test(&[u32::MAX, 0], "-4294967296");
-    test(&[0, u32::MAX, u32::MAX], "18446744073709551615");
-    test(&[u32::MAX, 0, 1], "-18446744073709551615");
+    test(&[Limb::MAX, 0], "-4294967296");
+    test(&[0, Limb::MAX, Limb::MAX], "18446744073709551615");
+    test(&[Limb::MAX, 0, 1], "-18446744073709551615");
     test(&[1, 0, 0], "18446744073709551616");
-    test(&[u32::MAX, 0, 0], "-18446744073709551616");
+    test(&[Limb::MAX, 0, 0], "-18446744073709551616");
 }
 
-fn trim_be_limbs(xs: &mut Vec<u32>) {
+fn trim_be_limbs(xs: &mut Vec<Limb>) {
     if xs.is_empty() {
         return;
     }
-    if xs[0] & 0x8000_0000 == 0 {
-        match xs.iter().position(|&limb| limb != 0) {
-            None => xs.clear(),
+    if xs[0].get_highest_bit() {
+        match xs.iter().position(|&limb| limb != Limb::MAX) {
+            None => *xs = vec![Limb::MAX],
             Some(i) => {
-                let i = if xs[i] & 0x8000_0000 != 0 { i - 1 } else { i };
-                *xs = xs[i..].iter().cloned().collect();
+                let i = if !xs[i].get_highest_bit() { i - 1 } else { i };
+                limbs_delete_left(xs, i);
             }
         }
     } else {
-        match xs.iter().position(|&limb| limb != u32::MAX) {
-            None => {
-                xs.clear();
-                xs.push(u32::MAX);
-            }
+        match xs.iter().position(|&limb| limb != 0) {
+            None => xs.clear(),
             Some(i) => {
-                let i = if xs[i] & 0x8000_0000 == 0 { i - 1 } else { i };
-                *xs = xs[i..].iter().cloned().collect();
+                let i = if xs[i].get_highest_bit() { i - 1 } else { i };
+                limbs_delete_left(xs, i);
             }
         }
     }
 }
 
-const LAST_INDEX: u64 = u32::WIDTH as u64 - 1;
-
 #[test]
 fn from_twos_complement_limbs_asc_properties() {
-    test_properties(vecs_of_unsigned, |limbs: &Vec<u32>| {
+    test_properties(vecs_of_unsigned, |limbs: &Vec<Limb>| {
         let x = Integer::from_twos_complement_limbs_asc(limbs);
         assert_eq!(
             Integer::from_owned_twos_complement_limbs_asc(limbs.clone()),
             x
         );
-        let mut trimmed_limbs: Vec<u32> = limbs.iter().cloned().rev().collect();
+        let mut trimmed_limbs: Vec<Limb> = limbs.iter().cloned().rev().collect();
         trim_be_limbs(&mut trimmed_limbs);
         trimmed_limbs.reverse();
         assert_eq!(x.to_twos_complement_limbs_asc(), trimmed_limbs);
         assert_eq!(
             Integer::from_twos_complement_limbs_desc(
-                &limbs.iter().cloned().rev().collect::<Vec<u32>>()
+                &limbs.iter().cloned().rev().collect::<Vec<Limb>>()
             ),
             x
         );
@@ -135,15 +134,14 @@ fn from_twos_complement_limbs_asc_properties() {
             Ordering::Equal => limbs.is_empty(),
             Ordering::Greater => {
                 let last = *limbs.last().unwrap();
-                !last.get_bit(LAST_INDEX)
-                    && (last != 0 || limbs[limbs.len() - 2].get_bit(LAST_INDEX))
+                !last.get_highest_bit() && (last != 0 || limbs[limbs.len() - 2].get_highest_bit())
             }
             Ordering::Less => {
                 let last = *limbs.last().unwrap();
-                last.get_bit(LAST_INDEX)
-                    && (last != !0
+                last.get_highest_bit()
+                    && (last != Limb::MAX
                         || limbs.len() <= 1
-                        || !limbs[limbs.len() - 2].get_bit(LAST_INDEX))
+                        || !limbs[limbs.len() - 2].get_highest_bit())
             }
         } {
             assert_eq!(x.to_twos_complement_limbs_asc(), *limbs);
@@ -153,18 +151,18 @@ fn from_twos_complement_limbs_asc_properties() {
 
 #[test]
 fn from_twos_complement_limbs_desc_properties() {
-    test_properties(vecs_of_unsigned, |limbs: &Vec<u32>| {
+    test_properties(vecs_of_unsigned, |limbs: &Vec<Limb>| {
         let x = Integer::from_twos_complement_limbs_desc(limbs);
         assert_eq!(
             Integer::from_owned_twos_complement_limbs_desc(limbs.clone()),
             x
         );
-        let mut trimmed_limbs: Vec<u32> = limbs.to_vec();
+        let mut trimmed_limbs: Vec<Limb> = limbs.to_vec();
         trim_be_limbs(&mut trimmed_limbs);
         assert_eq!(x.to_twos_complement_limbs_desc(), trimmed_limbs);
         assert_eq!(
             Integer::from_twos_complement_limbs_asc(
-                &limbs.iter().cloned().rev().collect::<Vec<u32>>()
+                &limbs.iter().cloned().rev().collect::<Vec<Limb>>()
             ),
             x
         );
@@ -172,12 +170,12 @@ fn from_twos_complement_limbs_desc_properties() {
             Ordering::Equal => limbs.is_empty(),
             Ordering::Greater => {
                 let first = limbs[0];
-                !first.get_bit(LAST_INDEX) && (first != 0 || limbs[1].get_bit(LAST_INDEX))
+                !first.get_highest_bit() && (first != 0 || limbs[1].get_highest_bit())
             }
             Ordering::Less => {
                 let first = limbs[0];
-                first.get_bit(LAST_INDEX)
-                    && (first != !0 || limbs.len() <= 1 || !limbs[1].get_bit(LAST_INDEX))
+                first.get_highest_bit()
+                    && (first != Limb::MAX || limbs.len() <= 1 || !limbs[1].get_highest_bit())
             }
         } {
             assert_eq!(x.to_twos_complement_limbs_desc(), *limbs);

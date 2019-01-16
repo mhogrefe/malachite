@@ -1,15 +1,16 @@
 use malachite_base::limbs::{limbs_delete_left, limbs_test_zero};
-use malachite_base::misc::WrappingFrom;
+use malachite_base::misc::{CheckedFrom, WrappingFrom};
 use malachite_base::num::{Parity, PrimitiveInteger, ShrRound, ShrRoundAssign, Zero};
 use malachite_base::round::RoundingMode;
-use natural::arithmetic::add_u32::limbs_vec_add_limb_in_place;
+use natural::arithmetic::add_limb::limbs_vec_add_limb_in_place;
 use natural::arithmetic::divisible_by_power_of_two::limbs_divisible_by_power_of_two;
 use natural::logic::bit_access::limbs_get_bit;
 use natural::Natural::{self, Large, Small};
+use platform::Limb;
 use std::ops::{Shr, ShrAssign};
 
-/// Interpreting a slice of `u32`s as the limbs (in ascending order) of a `Natural`, returns the
-/// limbs of the `Natural` right-shifted by a `u32`, rounding down.
+/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
+/// limbs of the `Natural` right-shifted by a `Limb`, rounding down.
 ///
 /// Time: worst case O(n)
 ///
@@ -33,12 +34,12 @@ use std::ops::{Shr, ShrAssign};
 /// assert_eq!(limbs_shr(&[4_294_967_295, 1], 1), &[4_294_967_295, 0]);
 /// assert_eq!(limbs_shr(&[4_294_967_295, 4_294_967_295], 32), &[4_294_967_295]);
 /// ```
-pub fn limbs_shr(limbs: &[u32], bits: u64) -> Vec<u32> {
-    let limbs_to_delete = (bits >> u32::LOG_WIDTH) as usize;
+pub fn limbs_shr(limbs: &[Limb], bits: u64) -> Vec<Limb> {
+    let limbs_to_delete = (bits >> Limb::LOG_WIDTH) as usize;
     if limbs_to_delete >= limbs.len() {
         Vec::new()
     } else {
-        let small_bits = u32::wrapping_from(bits) & u32::WIDTH_MASK;
+        let small_bits = u32::wrapping_from(bits) & Limb::WIDTH_MASK;
         let mut result_limbs = limbs[limbs_to_delete..].to_vec();
         if small_bits != 0 {
             limbs_slice_shr_in_place(&mut result_limbs, small_bits);
@@ -47,8 +48,8 @@ pub fn limbs_shr(limbs: &[u32], bits: u64) -> Vec<u32> {
     }
 }
 
-/// Interpreting a slice of `u32`s as the limbs (in ascending order) of a `Natural`, returns the
-/// limbs of the `Natural` right-shifted by a `u32`, rounding up. The limbs should not all be zero.
+/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
+/// limbs of the `Natural` right-shifted by a `Limb`, rounding up. The limbs should not all be zero.
 ///
 /// Time: worst case O(n)
 ///
@@ -72,13 +73,13 @@ pub fn limbs_shr(limbs: &[u32], bits: u64) -> Vec<u32> {
 /// assert_eq!(limbs_shr_round_up(&[4_294_967_295, 1], 1), &[0, 1]);
 /// assert_eq!(limbs_shr_round_up(&[4_294_967_295, 4_294_967_295], 32), &[0, 1]);
 /// ```
-pub fn limbs_shr_round_up(limbs: &[u32], bits: u64) -> Vec<u32> {
-    let limbs_to_delete = (bits >> u32::LOG_WIDTH) as usize;
+pub fn limbs_shr_round_up(limbs: &[Limb], bits: u64) -> Vec<Limb> {
+    let limbs_to_delete = (bits >> Limb::LOG_WIDTH) as usize;
     if limbs_to_delete >= limbs.len() {
         vec![1]
     } else {
         let mut exact = limbs_test_zero(&limbs[..limbs_to_delete]);
-        let small_bits = u32::wrapping_from(bits) & u32::WIDTH_MASK;
+        let small_bits = u32::wrapping_from(bits) & Limb::WIDTH_MASK;
         let mut result_limbs = limbs[limbs_to_delete..].to_vec();
         if small_bits != 0 {
             exact &= limbs_slice_shr_in_place(&mut result_limbs, small_bits) == 0;
@@ -90,12 +91,12 @@ pub fn limbs_shr_round_up(limbs: &[u32], bits: u64) -> Vec<u32> {
     }
 }
 
-fn limbs_shr_round_half_integer_to_even(limbs: &[u32], bits: u64) -> Vec<u32> {
-    let limbs_to_delete = (bits >> u32::LOG_WIDTH) as usize;
+fn limbs_shr_round_half_integer_to_even(limbs: &[Limb], bits: u64) -> Vec<Limb> {
+    let limbs_to_delete = (bits >> Limb::LOG_WIDTH) as usize;
     if limbs_to_delete >= limbs.len() {
         Vec::new()
     } else {
-        let small_bits = u32::wrapping_from(bits) & u32::WIDTH_MASK;
+        let small_bits = u32::wrapping_from(bits) & Limb::WIDTH_MASK;
         let mut result_limbs = limbs[limbs_to_delete..].to_vec();
         if small_bits != 0 {
             limbs_slice_shr_in_place(&mut result_limbs, small_bits);
@@ -107,8 +108,8 @@ fn limbs_shr_round_half_integer_to_even(limbs: &[u32], bits: u64) -> Vec<u32> {
     }
 }
 
-/// Interpreting a slice of `u32`s as the limbs (in ascending order) of a `Natural`, returns the
-/// limbs of the `Natural` right-shifted by a `u32`, rounding to the `Natural` nearest to the actual
+/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
+/// limbs of the `Natural` right-shifted by a `Limb`, rounding to the `Natural` nearest to the actual
 /// value of `self` divided by 2<sup>`other`</sup>. If the actual value is exactly between two
 /// integers, it is rounded to the even one.
 ///
@@ -134,7 +135,7 @@ fn limbs_shr_round_half_integer_to_even(limbs: &[u32], bits: u64) -> Vec<u32> {
 /// assert_eq!(limbs_shr_round_to_nearest(&[4_294_967_295, 1], 1), &[0, 1]);
 /// assert_eq!(limbs_shr_round_to_nearest(&[4_294_967_295, 4_294_967_295], 32), &[0, 1]);
 /// ```
-pub fn limbs_shr_round_to_nearest(limbs: &[u32], bits: u64) -> Vec<u32> {
+pub fn limbs_shr_round_to_nearest(limbs: &[Limb], bits: u64) -> Vec<Limb> {
     if !limbs_get_bit(limbs, bits - 1) {
         limbs_shr(limbs, bits)
     } else if !limbs_divisible_by_power_of_two(limbs, bits - 1) {
@@ -144,8 +145,8 @@ pub fn limbs_shr_round_to_nearest(limbs: &[u32], bits: u64) -> Vec<u32> {
     }
 }
 
-/// Interpreting a slice of `u32`s as the limbs (in ascending order) of a `Natural`, returns the
-/// limbs of the `Natural` right-shifted by a `u32`, if the shift is exact (doesn't remove any
+/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
+/// limbs of the `Natural` right-shifted by a `Limb`, if the shift is exact (doesn't remove any
 /// `true` bits). If the shift is inexact, `None` is returned. The limbs should not all be zero.
 ///
 /// Time: worst case O(n)
@@ -170,7 +171,7 @@ pub fn limbs_shr_round_to_nearest(limbs: &[u32], bits: u64) -> Vec<u32> {
 /// assert_eq!(limbs_shr_exact(&[4_294_967_295, 1], 1), None);
 /// assert_eq!(limbs_shr_exact(&[4_294_967_295, 4_294_967_295], 32), None);
 /// ```
-pub fn limbs_shr_exact(limbs: &[u32], bits: u64) -> Option<Vec<u32>> {
+pub fn limbs_shr_exact(limbs: &[Limb], bits: u64) -> Option<Vec<Limb>> {
     if limbs_divisible_by_power_of_two(limbs, bits) {
         Some(limbs_shr(limbs, bits))
     } else {
@@ -178,8 +179,8 @@ pub fn limbs_shr_exact(limbs: &[u32], bits: u64) -> Option<Vec<u32>> {
     }
 }
 
-/// Interpreting a slice of `u32`s as the limbs (in ascending order) of a `Natural`, returns the
-/// limbs of the `Natural` right-shifted by a `u32`, rounded using a specified rounding format. The
+/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
+/// limbs of the `Natural` right-shifted by a `Limb`, rounded using a specified rounding format. The
 /// limbs should not all be zero.
 ///
 /// Time: worst case O(n)
@@ -213,7 +214,7 @@ pub fn limbs_shr_exact(limbs: &[u32], bits: u64) -> Option<Vec<u32>> {
 ///         Some(vec![4_294_967_295]));
 /// }
 /// ```
-pub fn limbs_shr_round(limbs: &[u32], bits: u64, rm: RoundingMode) -> Option<Vec<u32>> {
+pub fn limbs_shr_round(limbs: &[Limb], bits: u64, rm: RoundingMode) -> Option<Vec<Limb>> {
     match rm {
         RoundingMode::Down | RoundingMode::Floor => Some(limbs_shr(limbs, bits)),
         RoundingMode::Up | RoundingMode::Ceiling => Some(limbs_shr_round_up(limbs, bits)),
@@ -222,9 +223,9 @@ pub fn limbs_shr_round(limbs: &[u32], bits: u64, rm: RoundingMode) -> Option<Vec
     }
 }
 
-/// Interpreting a nonempty slice of `u32`s as the limbs (in ascending order) of a `Natural`, writes
-/// the limbs of the `Natural` right-shifted by a `u32` to an output slice. The output slice must be
-/// at least as long as the input slice. The `u32` must be between 1 and 31, inclusive. The carry,
+/// Interpreting a nonempty slice of `Limb`s as the limbs (in ascending order) of a `Natural`, writes
+/// the limbs of the `Natural` right-shifted by a `Limb` to an output slice. The output slice must be
+/// at least as long as the input slice. The `Limb` must be between 1 and 31, inclusive. The carry,
 /// or the bits that are shifted past the width of the input slice, is returned. The input slice
 /// should not only contain zeros.
 ///
@@ -250,13 +251,13 @@ pub fn limbs_shr_round(limbs: &[u32], bits: u64, rm: RoundingMode) -> Option<Vec
 /// assert_eq!(limbs_shr_to_out(&mut out_limbs, &[122, 455], 1), 0);
 /// assert_eq!(out_limbs, &[2_147_483_709, 227, 0]);
 /// ```
-pub fn limbs_shr_to_out(out_limbs: &mut [u32], in_limbs: &[u32], bits: u32) -> u32 {
+pub fn limbs_shr_to_out(out_limbs: &mut [Limb], in_limbs: &[Limb], bits: u32) -> Limb {
     let len = in_limbs.len();
     assert!(len > 0);
     assert!(bits > 0);
-    assert!(bits < u32::WIDTH);
+    assert!(bits < Limb::WIDTH);
     assert!(out_limbs.len() >= len);
-    let cobits = u32::WIDTH - bits;
+    let cobits = Limb::WIDTH - bits;
     let mut high_limb = in_limbs[0];
     let remaining_bits = high_limb << cobits;
     let mut low_limb = high_limb >> bits;
@@ -269,8 +270,8 @@ pub fn limbs_shr_to_out(out_limbs: &mut [u32], in_limbs: &[u32], bits: u32) -> u
     remaining_bits
 }
 
-/// Interpreting a nonempty slice of `u32`s as the limbs (in ascending order) of a `Natural`, writes
-/// the limbs of the `Natural` right-shifted by a `u32` to the input slice. The `u32` must be
+/// Interpreting a nonempty slice of `Limb`s as the limbs (in ascending order) of a `Natural`, writes
+/// the limbs of the `Natural` right-shifted by a `Limb` to the input slice. The `Limb` must be
 /// between 1 and 31, inclusive. The carry, or the bits that are shifted past the width of the input
 /// slice, is returned.
 ///
@@ -295,12 +296,12 @@ pub fn limbs_shr_to_out(out_limbs: &mut [u32], in_limbs: &[u32], bits: u32) -> u
 /// assert_eq!(limbs_slice_shr_in_place(&mut limbs, 1), 0);
 /// assert_eq!(limbs, &[2_147_483_709, 227]);
 /// ```
-pub fn limbs_slice_shr_in_place(limbs: &mut [u32], bits: u32) -> u32 {
+pub fn limbs_slice_shr_in_place(limbs: &mut [Limb], bits: u32) -> Limb {
     assert!(bits > 0);
-    assert!(bits < u32::WIDTH);
+    assert!(bits < Limb::WIDTH);
     let len = limbs.len();
     assert!(len > 0);
-    let cobits = u32::WIDTH - bits;
+    let cobits = Limb::WIDTH - bits;
     let mut high_limb = limbs[0];
     let remaining_bits = high_limb << cobits;
     let mut low_limb = high_limb >> bits;
@@ -313,8 +314,8 @@ pub fn limbs_slice_shr_in_place(limbs: &mut [u32], bits: u32) -> u32 {
     remaining_bits
 }
 
-/// Interpreting a `Vec` of `u32`s as the limbs (in ascending order) of a `Natural`, writes the
-/// limbs of the `Natural` right-shifted by a `u32` to the input `Vec`.
+/// Interpreting a `Vec` of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
+/// limbs of the `Natural` right-shifted by a `Limb` to the input `Vec`.
 ///
 /// Time: worst case O(n)
 ///
@@ -370,12 +371,12 @@ pub fn limbs_slice_shr_in_place(limbs: &mut [u32], bits: u32) -> u32 {
 /// limbs_vec_shr_in_place(&mut limbs, 32);
 /// assert_eq!(limbs, &[4_294_967_295]);
 /// ```
-pub fn limbs_vec_shr_in_place(limbs: &mut Vec<u32>, bits: u64) {
-    let limbs_to_delete = (bits >> u32::LOG_WIDTH) as usize;
+pub fn limbs_vec_shr_in_place(limbs: &mut Vec<Limb>, bits: u64) {
+    let limbs_to_delete = (bits >> Limb::LOG_WIDTH) as usize;
     if limbs_to_delete >= limbs.len() {
         limbs.clear();
     } else {
-        let small_shift = u32::wrapping_from(bits) & u32::WIDTH_MASK;
+        let small_shift = u32::wrapping_from(bits) & Limb::WIDTH_MASK;
         limbs_delete_left(limbs, limbs_to_delete);
         if small_shift != 0 {
             limbs_slice_shr_in_place(limbs, small_shift);
@@ -383,8 +384,8 @@ pub fn limbs_vec_shr_in_place(limbs: &mut Vec<u32>, bits: u64) {
     }
 }
 
-/// Interpreting a `Vec` of `u32`s as the limbs (in ascending order) of a `Natural`, writes the
-/// limbs of the `Natural` right-shifted by a `u32`, rounding up, to the input `Vec`. The limbs
+/// Interpreting a `Vec` of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
+/// limbs of the `Natural` right-shifted by a `Limb`, rounding up, to the input `Vec`. The limbs
 /// should not all be zero.
 ///
 /// Time: worst case O(n)
@@ -441,14 +442,14 @@ pub fn limbs_vec_shr_in_place(limbs: &mut Vec<u32>, bits: u64) {
 /// limbs_vec_shr_round_up_in_place(&mut limbs, 32);
 /// assert_eq!(limbs, &[0, 1]);
 /// ```
-pub fn limbs_vec_shr_round_up_in_place(limbs: &mut Vec<u32>, bits: u64) {
-    let limbs_to_delete = (bits >> u32::LOG_WIDTH) as usize;
+pub fn limbs_vec_shr_round_up_in_place(limbs: &mut Vec<Limb>, bits: u64) {
+    let limbs_to_delete = (bits >> Limb::LOG_WIDTH) as usize;
     if limbs_to_delete >= limbs.len() {
         limbs.truncate(1);
         limbs[0] = 1;
     } else {
         let mut exact = limbs_test_zero(&limbs[..limbs_to_delete]);
-        let small_bits = u32::wrapping_from(bits) & u32::WIDTH_MASK;
+        let small_bits = u32::wrapping_from(bits) & Limb::WIDTH_MASK;
         limbs_delete_left(limbs, limbs_to_delete);
         if small_bits != 0 {
             exact &= limbs_slice_shr_in_place(limbs, small_bits) == 0;
@@ -459,12 +460,12 @@ pub fn limbs_vec_shr_round_up_in_place(limbs: &mut Vec<u32>, bits: u64) {
     }
 }
 
-fn limbs_vec_shr_round_half_integer_to_even_in_place(limbs: &mut Vec<u32>, bits: u64) {
-    let limbs_to_delete = (bits >> u32::LOG_WIDTH) as usize;
+fn limbs_vec_shr_round_half_integer_to_even_in_place(limbs: &mut Vec<Limb>, bits: u64) {
+    let limbs_to_delete = (bits >> Limb::LOG_WIDTH) as usize;
     if limbs_to_delete >= limbs.len() {
         limbs.clear();
     } else {
-        let small_bits = u32::wrapping_from(bits) & u32::WIDTH_MASK;
+        let small_bits = u32::wrapping_from(bits) & Limb::WIDTH_MASK;
         limbs_delete_left(limbs, limbs_to_delete);
         if small_bits != 0 {
             limbs_slice_shr_in_place(limbs, small_bits);
@@ -475,8 +476,8 @@ fn limbs_vec_shr_round_half_integer_to_even_in_place(limbs: &mut Vec<u32>, bits:
     }
 }
 
-/// Interpreting a `Vec` of `u32`s as the limbs (in ascending order) of a `Natural`, writes the
-/// limbs of the `Natural` right-shifted by a `u32` to the input `Vec`, rounding to the `Natural`
+/// Interpreting a `Vec` of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
+/// limbs of the `Natural` right-shifted by a `Limb` to the input `Vec`, rounding to the `Natural`
 /// nearest to the actual value of `self` divided by 2<sup>`other`</sup>. If the actual value is
 /// exactly between two integers, it is rounded to the even one.
 ///
@@ -534,7 +535,7 @@ fn limbs_vec_shr_round_half_integer_to_even_in_place(limbs: &mut Vec<u32>, bits:
 /// limbs_vec_shr_round_to_nearest_in_place(&mut limbs, 32);
 /// assert_eq!(limbs, &[0, 1]);
 /// ```
-pub fn limbs_vec_shr_round_to_nearest_in_place(limbs: &mut Vec<u32>, bits: u64) {
+pub fn limbs_vec_shr_round_to_nearest_in_place(limbs: &mut Vec<Limb>, bits: u64) {
     if !limbs_get_bit(limbs, bits - 1) {
         limbs_vec_shr_in_place(limbs, bits)
     } else if !limbs_divisible_by_power_of_two(limbs, bits - 1) {
@@ -544,8 +545,8 @@ pub fn limbs_vec_shr_round_to_nearest_in_place(limbs: &mut Vec<u32>, bits: u64) 
     }
 }
 
-/// Interpreting a `Vec` of `u32`s as the limbs (in ascending order) of a `Natural`, writes the
-/// limbs of the `Natural` right-shifted by a `u32` to the input `Vec`, if the shift is exact
+/// Interpreting a `Vec` of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
+/// limbs of the `Natural` right-shifted by a `Limb` to the input `Vec`, if the shift is exact
 /// (doesn't remove any `true` bits). Returns whether the shift was exact. The limbs should not all
 /// be zero.
 ///
@@ -594,7 +595,7 @@ pub fn limbs_vec_shr_round_to_nearest_in_place(limbs: &mut Vec<u32>, bits: u64) 
 /// let mut limbs = vec![4_294_967_295, 4_294_967_295];
 /// assert_eq!(limbs_vec_shr_exact_in_place(&mut limbs, 32), false);
 /// ```
-pub fn limbs_vec_shr_exact_in_place(limbs: &mut Vec<u32>, bits: u64) -> bool {
+pub fn limbs_vec_shr_exact_in_place(limbs: &mut Vec<Limb>, bits: u64) -> bool {
     if limbs_divisible_by_power_of_two(limbs, bits) {
         limbs_vec_shr_in_place(limbs, bits);
         true
@@ -603,8 +604,8 @@ pub fn limbs_vec_shr_exact_in_place(limbs: &mut Vec<u32>, bits: u64) -> bool {
     }
 }
 
-/// Interpreting a slice of `u32`s as the limbs (in ascending order) of a `Natural`, writes the
-/// limbs of the `Natural` right-shifted by a `u32` to the input `Vec`, rounded using a specified
+/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
+/// limbs of the `Natural` right-shifted by a `Limb` to the input `Vec`, rounded using a specified
 /// rounding format. If the shift is inexact (removes some `true` bits) and the `RoundingMode` is
 /// `Exact`, the value of `limbs` becomes unspecified and `false` is returned. Otherwise, `true` is
 /// returned. The limbs should not all be zero.
@@ -668,7 +669,7 @@ pub fn limbs_vec_shr_exact_in_place(limbs: &mut Vec<u32>, bits: u64) -> bool {
 ///     assert_eq!(limbs, vec![4_294_967_295]);
 /// }
 /// ```
-pub fn limbs_vec_shr_round_in_place(limbs: &mut Vec<u32>, bits: u64, rm: RoundingMode) -> bool {
+pub fn limbs_vec_shr_round_in_place(limbs: &mut Vec<Limb>, bits: u64, rm: RoundingMode) -> bool {
     match rm {
         RoundingMode::Down | RoundingMode::Floor => {
             limbs_vec_shr_in_place(limbs, bits);
@@ -751,10 +752,10 @@ macro_rules! impl_natural_shr_unsigned {
                     return self.clone();
                 }
                 match *self {
-                    Small(_) if other >= $t::wrapping_from(u32::WIDTH) => Natural::ZERO,
+                    Small(_) if other >= $t::wrapping_from(Limb::WIDTH) => Natural::ZERO,
                     Small(small) => Small(small >> other),
                     Large(ref limbs) => {
-                        let mut result = Large(limbs_shr(limbs, u64::from(other)));
+                        let mut result = Large(limbs_shr(limbs, u64::checked_from(other).unwrap()));
                         result.trim();
                         result
                     }
@@ -787,7 +788,7 @@ macro_rules! impl_natural_shr_unsigned {
                     return;
                 }
                 match *self {
-                    Small(ref mut small) if other >= $t::wrapping_from(u32::WIDTH) => {
+                    Small(ref mut small) if other >= $t::wrapping_from(Limb::WIDTH) => {
                         *small = 0;
                         return;
                     }
@@ -796,7 +797,7 @@ macro_rules! impl_natural_shr_unsigned {
                         return;
                     }
                     Large(ref mut limbs) => {
-                        limbs_vec_shr_in_place(limbs, u64::from(other));
+                        limbs_vec_shr_in_place(limbs, u64::checked_from(other).unwrap());
                     }
                 }
                 self.trim();
@@ -911,7 +912,9 @@ macro_rules! impl_natural_shr_unsigned {
                 match *self {
                     Small(ref small) => Small(small.shr_round(other, rm)),
                     Large(ref limbs) => {
-                        if let Some(result_limbs) = limbs_shr_round(limbs, u64::from(other), rm) {
+                        if let Some(result_limbs) =
+                            limbs_shr_round(limbs, u64::checked_from(other).unwrap(), rm)
+                        {
                             let mut result = Large(result_limbs);
                             result.trim();
                             result
@@ -991,7 +994,11 @@ macro_rules! impl_natural_shr_unsigned {
                         return;
                     }
                     Large(ref mut limbs) => {
-                        if !limbs_vec_shr_round_in_place(limbs, u64::from(other), rm) {
+                        if !limbs_vec_shr_round_in_place(
+                            limbs,
+                            u64::checked_from(other).unwrap(),
+                            rm,
+                        ) {
                             panic!("Right shift is not exact.");
                         }
                     }
@@ -1005,3 +1012,4 @@ impl_natural_shr_unsigned!(u8);
 impl_natural_shr_unsigned!(u16);
 impl_natural_shr_unsigned!(u32);
 impl_natural_shr_unsigned!(u64);
+impl_natural_shr_unsigned!(u128);

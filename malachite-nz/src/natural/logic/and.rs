@@ -1,9 +1,10 @@
 use malachite_base::limbs::limbs_set_zero;
 use natural::Natural::{self, Large, Small};
+use platform::Limb;
 use std::cmp::Ordering;
 use std::ops::{BitAnd, BitAndAssign};
 
-/// Interpreting two slices of `u32`s as the limbs (in ascending order) of two `Natural`s, returns
+/// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, returns
 /// a `Vec` of the limbs of the bitwise and of the `Natural`s. The length of the result is the
 /// length of the shorter input slice.
 ///
@@ -20,11 +21,11 @@ use std::ops::{BitAnd, BitAndAssign};
 /// assert_eq!(limbs_and(&[6, 7], &[1, 2, 3]), &[0, 2]);
 /// assert_eq!(limbs_and(&[100, 101, 102], &[102, 101, 100]), &[100, 101, 100]);
 /// ```
-pub fn limbs_and(xs: &[u32], ys: &[u32]) -> Vec<u32> {
+pub fn limbs_and(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
     xs.iter().zip(ys.iter()).map(|(x, y)| x & y).collect()
 }
 
-/// Interpreting two equal-length slices of `u32`s as the limbs (in ascending order) of two
+/// Interpreting two equal-length slices of `Limb`s as the limbs (in ascending order) of two
 /// `Natural`s, writes the limbs of the bitwise and of the `Natural`s to a specified slice. The
 /// output slice must be at least as long as the length of one of the input slices.
 ///
@@ -49,7 +50,7 @@ pub fn limbs_and(xs: &[u32], ys: &[u32]) -> Vec<u32> {
 /// limbs_and_same_length_to_out(&mut out, &[100, 101, 102], &[102, 101, 100]);
 /// assert_eq!(out, &[100, 101, 100, 10]);
 /// ```
-pub fn limbs_and_same_length_to_out(out_limbs: &mut [u32], xs: &[u32], ys: &[u32]) {
+pub fn limbs_and_same_length_to_out(out_limbs: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
     let len = xs.len();
     assert_eq!(len, ys.len());
     assert!(out_limbs.len() >= len);
@@ -58,7 +59,7 @@ pub fn limbs_and_same_length_to_out(out_limbs: &mut [u32], xs: &[u32], ys: &[u32
     }
 }
 
-/// Interpreting two slices of `u32`s as the limbs (in ascending order) of two `Natural`s, writes
+/// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, writes
 /// the limbs of the bitwise and of the `Natural`s to a specified slice. The output slice must be at
 /// least as long as the longer input slice.
 ///
@@ -83,7 +84,7 @@ pub fn limbs_and_same_length_to_out(out_limbs: &mut [u32], xs: &[u32], ys: &[u32
 /// limbs_and_to_out(&mut out, &[100, 101, 102], &[102, 101, 100]);
 /// assert_eq!(out, &[100, 101, 100, 10]);
 /// ```
-pub fn limbs_and_to_out(out_limbs: &mut [u32], xs: &[u32], ys: &[u32]) {
+pub fn limbs_and_to_out(out_limbs: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
     let xs_len = xs.len();
     let ys_len = ys.len();
     if xs_len >= ys_len {
@@ -97,7 +98,7 @@ pub fn limbs_and_to_out(out_limbs: &mut [u32], xs: &[u32], ys: &[u32]) {
     }
 }
 
-/// Interpreting two equal-length slices of `u32`s as the limbs (in ascending order) of two
+/// Interpreting two equal-length slices of `Limb`s as the limbs (in ascending order) of two
 /// `Natural`s, writes the limbs of the bitwise and of the `Natural`s to the first (left) slice.
 ///
 /// Time: worst case O(n)
@@ -121,14 +122,14 @@ pub fn limbs_and_to_out(out_limbs: &mut [u32], xs: &[u32], ys: &[u32]) {
 /// limbs_slice_and_same_length_in_place_left(&mut xs, &[102, 101, 100]);
 /// assert_eq!(xs, &[100, 101, 100]);
 /// ```
-pub fn limbs_slice_and_same_length_in_place_left(xs: &mut [u32], ys: &[u32]) {
+pub fn limbs_slice_and_same_length_in_place_left(xs: &mut [Limb], ys: &[Limb]) {
     assert_eq!(xs.len(), ys.len());
     for i in 0..xs.len() {
         xs[i] &= ys[i];
     }
 }
 
-/// Interpreting two slices of `u32`s as the limbs (in ascending order) of two `Natural`s, writes
+/// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, writes
 /// the limbs of the bitwise and of the `Natural`s to the first (left) slice. If the second slice is
 /// shorter than the first, then some of the most-significant bits of the first slice should become
 /// zero. Rather than setting them to zero, this function optionally returns the length of the
@@ -157,7 +158,7 @@ pub fn limbs_slice_and_same_length_in_place_left(xs: &mut [u32], ys: &[u32]) {
 /// assert_eq!(limbs_slice_and_in_place_left(&mut xs, &[102, 101, 100]), None);
 /// assert_eq!(xs, &[100, 101, 100]);
 /// ```
-pub fn limbs_slice_and_in_place_left(xs: &mut [u32], ys: &[u32]) -> Option<usize> {
+pub fn limbs_slice_and_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> Option<usize> {
     let xs_len = xs.len();
     let ys_len = ys.len();
     match xs_len.cmp(&ys.len()) {
@@ -176,7 +177,7 @@ pub fn limbs_slice_and_in_place_left(xs: &mut [u32], ys: &[u32]) -> Option<usize
     }
 }
 
-/// Interpreting a `Vec` of `u32`s and a slice of `u32`s as the limbs (in ascending order) of two
+/// Interpreting a `Vec` of `Limb`s and a slice of `Limb`s as the limbs (in ascending order) of two
 /// `Natural`s, writes the limbs of the bitwise and of the `Natural`s to the `Vec`. If the slice is
 /// shorter than the `Vec`, then some of the most-significant bits of the `Vec` should become zero.
 /// Rather than setting them to zero, this function truncates the `Vec`.
@@ -203,13 +204,13 @@ pub fn limbs_slice_and_in_place_left(xs: &mut [u32], ys: &[u32]) -> Option<usize
 /// limbs_vec_and_in_place_left(&mut xs, &[102, 101, 100]);
 /// assert_eq!(xs, &[100, 101, 100]);
 /// ```
-pub fn limbs_vec_and_in_place_left(xs: &mut Vec<u32>, ys: &[u32]) {
+pub fn limbs_vec_and_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
     if let Some(truncate_size) = limbs_slice_and_in_place_left(xs, ys) {
         xs.truncate(truncate_size);
     }
 }
 
-/// Interpreting two slices of `u32`s as the limbs (in ascending order) of two `Natural`s, takes
+/// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, takes
 /// the limbs of the bitwise and of the `Natural`s and writes them to the shorter slice (or the
 /// first one, if they are equally long). If the function writes to the first slice, it returns
 /// `false`; otherwise, it returns `true`.
@@ -242,7 +243,7 @@ pub fn limbs_vec_and_in_place_left(xs: &mut Vec<u32>, ys: &[u32]) {
 /// assert_eq!(xs, &[100, 101, 100]);
 /// assert_eq!(ys, &[102, 101, 100]);
 /// ```
-pub fn limbs_and_in_place_either(xs: &mut [u32], ys: &mut [u32]) -> bool {
+pub fn limbs_and_in_place_either(xs: &mut [Limb], ys: &mut [Limb]) -> bool {
     let xs_len = xs.len();
     let ys_len = ys.len();
     match xs_len.cmp(&ys_len) {

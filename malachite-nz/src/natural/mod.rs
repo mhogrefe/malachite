@@ -2,6 +2,7 @@ use malachite_base::limbs::limbs_trailing_zero_limbs;
 use malachite_base::misc::{Min, Named, Walkable};
 use malachite_base::num::{One, Two, Zero};
 use natural::Natural::*;
+use platform::Limb;
 use std::str::FromStr;
 
 /// A natural (non-negative) integer.
@@ -13,8 +14,8 @@ use std::str::FromStr;
 #[derive(Clone, Eq, Hash, PartialEq)]
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
 pub enum Natural {
-    Small(u32),
-    Large(Vec<u32>),
+    Small(Limb),
+    Large(Vec<Limb>),
 }
 
 impl Natural {
@@ -33,7 +34,7 @@ impl Natural {
         }
     }
 
-    pub(crate) fn promote_in_place(&mut self) -> &mut Vec<u32> {
+    pub(crate) fn promote_in_place(&mut self) -> &mut Vec<Limb> {
         if let Small(x) = *self {
             *self = Large(vec![x]);
         }
@@ -182,63 +183,63 @@ macro_rules! mutate_with_possible_promotion {
 
 pub mod arithmetic {
     pub mod add;
+    pub mod add_limb;
     pub mod add_mul;
-    pub mod add_mul_u32;
-    pub mod add_u32;
+    pub mod add_mul_limb;
     pub mod checked_sub;
-    pub mod checked_sub_u32;
-    pub mod div_exact_u32;
+    pub mod checked_sub_limb;
+    pub mod div_exact_limb;
+    pub mod div_limb;
     pub mod div_mod;
-    pub mod div_mod_u32;
-    pub mod div_round_u32;
-    pub mod div_u32;
+    pub mod div_mod_limb;
+    pub mod div_round_limb;
+    pub mod divisible_by_limb;
     pub mod divisible_by_power_of_two;
-    pub mod divisible_by_u32;
+    pub mod eq_limb_mod_limb;
+    pub mod eq_limb_mod_power_of_two;
     pub mod eq_mod_power_of_two;
-    pub mod eq_u32_mod_power_of_two;
-    pub mod eq_u32_mod_u32;
     pub mod is_power_of_two;
     pub mod log_two;
+    pub mod mod_limb;
     pub mod mod_power_of_two;
-    pub mod mod_u32;
     pub mod mul;
-    pub mod mul_u32;
+    pub mod mul_limb;
     pub mod neg;
     pub mod next_power_of_two;
     pub mod parity;
     pub mod saturating_sub;
-    pub mod saturating_sub_u32;
+    pub mod saturating_sub_limb;
     pub mod shl_i;
     pub mod shl_u;
     pub mod shr_i;
     pub mod shr_u;
     pub mod square;
     pub mod sub;
+    pub mod sub_limb;
     pub mod sub_mul;
-    pub mod sub_mul_u32;
-    pub mod sub_u32;
+    pub mod sub_mul_limb;
 }
 pub mod conversion;
 pub mod comparison {
     pub mod ord;
-    pub mod partial_eq_u32;
-    pub mod partial_ord_u32;
+    pub mod partial_eq_limb;
+    pub mod partial_ord_limb;
 }
 pub mod logic {
     pub mod and;
-    pub mod and_u32;
+    pub mod and_limb;
     pub mod bit_access;
     pub mod bit_scan;
     pub mod count_ones;
     pub mod hamming_distance;
-    pub mod hamming_distance_u32;
+    pub mod hamming_distance_limb;
     pub mod not;
     pub mod or;
-    pub mod or_u32;
+    pub mod or_limb;
     pub mod significant_bits;
     pub mod trailing_zeros;
     pub mod xor;
-    pub mod xor_u32;
+    pub mod xor_limb;
 }
 pub mod random {
     pub mod random_natural_below;

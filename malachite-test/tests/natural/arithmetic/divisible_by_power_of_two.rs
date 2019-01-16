@@ -3,6 +3,7 @@ use malachite_base::misc::CheckedFrom;
 use malachite_base::num::{DivisibleByPowerOfTwo, Zero};
 use malachite_nz::natural::arithmetic::divisible_by_power_of_two::limbs_divisible_by_power_of_two;
 use malachite_nz::natural::Natural;
+use malachite_nz::platform::Limb;
 use malachite_test::common::natural_to_rug_integer;
 use malachite_test::inputs::base::{
     pairs_of_unsigned_and_small_unsigned, pairs_of_unsigned_vec_and_small_unsigned_var_1, unsigneds,
@@ -14,9 +15,10 @@ use malachite_test::inputs::natural::{
 use rug;
 use std::str::FromStr;
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_divisible_by_power_of_two() {
-    let test = |limbs: &[u32], pow: u64, out: bool| {
+    let test = |limbs: &[Limb], pow: u64, out: bool| {
         assert_eq!(limbs_divisible_by_power_of_two(limbs, pow), out);
     };
     test(&[1], 0, true);
@@ -93,7 +95,7 @@ fn divisible_by_power_of_two_properties() {
             assert_eq!(x.trailing_zeros().unwrap() >= pow, divisible);
         }
         assert_eq!((-x).divisible_by_power_of_two(pow), divisible);
-        assert!((x << pow as u32).divisible_by_power_of_two(pow));
+        assert!((x << pow).divisible_by_power_of_two(pow));
         assert_eq!(x >> pow << pow == *x, divisible);
     });
 
@@ -124,7 +126,7 @@ fn divisible_by_power_of_two_properties() {
     );
 
     test_properties(
-        pairs_of_unsigned_and_small_unsigned::<u32, u64>,
+        pairs_of_unsigned_and_small_unsigned::<Limb, u64>,
         |&(x, pow)| {
             assert_eq!(
                 x.divisible_by_power_of_two(pow),

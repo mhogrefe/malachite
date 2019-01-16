@@ -1,16 +1,17 @@
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::base::pairs_of_u32_vec_var_1;
+use inputs::base::pairs_of_limb_vec_var_1;
 use inputs::integer::{pairs_of_integers, rm_pairs_of_integers};
+use malachite_base::misc::Max;
 use malachite_base::num::{CheckedHammingDistance, HammingDistance, SignificantBits};
 use malachite_nz::integer::logic::checked_hamming_distance::limbs_hamming_distance_neg;
 use malachite_nz::integer::Integer;
+use malachite_nz::platform::Limb;
 use std::cmp::max;
 use std::iter::repeat;
-use std::u32;
 
 pub fn integer_checked_hamming_distance_alt_1(x: &Integer, y: &Integer) -> Option<u64> {
-    let negative = *x < 0;
-    if negative != (*y < 0) {
+    let negative = *x < 0 as Limb;
+    if negative != (*y < 0 as Limb) {
         return None;
     }
     let bit_zip: Box<Iterator<Item = (bool, bool)>> =
@@ -40,11 +41,11 @@ pub fn rug_checked_hamming_distance(x: &rug::Integer, y: &rug::Integer) -> Optio
 }
 
 pub fn integer_checked_hamming_distance_alt_2(x: &Integer, y: &Integer) -> Option<u64> {
-    if (*x < 0) != (*y < 0) {
+    if (*x < 0 as Limb) != (*y < 0 as Limb) {
         return None;
     }
-    let extension = if *x < 0 { u32::MAX } else { 0 };
-    let limb_zip: Box<Iterator<Item = (u32, u32)>> =
+    let extension = if *x < 0 as Limb { Limb::MAX } else { 0 };
+    let limb_zip: Box<Iterator<Item = (Limb, Limb)>> =
         if x.twos_complement_limbs().count() >= y.twos_complement_limbs().count() {
             Box::new(
                 x.twos_complement_limbs()
@@ -81,7 +82,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
 }
 
 fn demo_limbs_hamming_distance_neg(gm: GenerationMode, limit: usize) {
-    for (ref xs, ref ys) in pairs_of_u32_vec_var_1(gm).take(limit) {
+    for (ref xs, ref ys) in pairs_of_limb_vec_var_1(gm).take(limit) {
         println!(
             "limbs_hamming_distance_neg({:?}, {:?}) = {}",
             xs,
@@ -104,9 +105,9 @@ fn demo_integer_checked_hamming_distance(gm: GenerationMode, limit: usize) {
 
 fn benchmark_limbs_hamming_distance_neg(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
-        "limbs_hamming_distance_neg(&[u32], &[u32])",
+        "limbs_hamming_distance_neg(&[Limb], &[Limb])",
         BenchmarkType::Single,
-        pairs_of_u32_vec_var_1(gm),
+        pairs_of_limb_vec_var_1(gm),
         gm.name(),
         limit,
         file_name,

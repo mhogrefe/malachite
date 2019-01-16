@@ -1,6 +1,6 @@
 use malachite_base::num::{SubMul, SubMulAssign};
 use natural::arithmetic::add_mul::mpz_aorsmul;
-use natural::arithmetic::sub_mul_u32::sub_mul_assign_u32_helper;
+use natural::arithmetic::sub_mul_limb::sub_mul_assign_limb_helper;
 use natural::Natural::{self, Large, Small};
 
 /// Subtracts the product of a `Natural` (b) and a `Natural` (c) from a `Natural` (self), taking
@@ -151,9 +151,9 @@ impl<'a, 'b> SubMulAssign<&'a Natural, &'b Natural> for Natural {
 
 fn sub_mul_assign_helper(a: &mut Natural, b: &Natural, c: &Natural) -> bool {
     if let Small(small_b) = *b {
-        sub_mul_assign_u32_helper(a, c, small_b)
+        sub_mul_assign_limb_helper(a, c, small_b)
     } else if let Small(small_c) = *c {
-        sub_mul_assign_u32_helper(a, b, small_c)
+        sub_mul_assign_limb_helper(a, b, small_c)
     } else if a.limb_count() < b.limb_count() + c.limb_count() - 1 {
         true
     } else {

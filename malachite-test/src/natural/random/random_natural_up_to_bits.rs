@@ -21,7 +21,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
 fn demo_limbs_random_up_to_bits(gm: NoSpecialGenerationMode, limit: usize) {
     for bits in small_positive_unsigneds(gm).take(limit) {
         let mut rng = IsaacRng::from_seed(&EXAMPLE_SEED);
-        let mut xs = generate_from_function(|| limbs_random_up_to_bits(&mut rng, bits));
+        let mut xs = generate_from_function(|| limbs_random_up_to_bits::<u32, _>(&mut rng, bits));
         println!(
             "limbs_random_up_to_bits({}) = {:?}",
             bits,
@@ -55,7 +55,7 @@ fn benchmark_limbs_random_up_to_bits(gm: NoSpecialGenerationMode, limit: usize, 
         "bits",
         &mut [(
             "malachite",
-            &mut (|bits| no_out!(limbs_random_up_to_bits(&mut rng, bits))),
+            &mut (|bits| no_out!(limbs_random_up_to_bits::<u32, _>(&mut rng, bits))),
         )],
     );
 }

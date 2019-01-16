@@ -2,6 +2,7 @@ use common::test_properties;
 use malachite_nz::integer::logic::checked_count_zeros::limbs_count_zeros_neg;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
+use malachite_nz::platform::SignedLimb;
 use malachite_test::inputs::base::{
     negative_signeds, nonempty_vecs_of_unsigned, vecs_of_unsigned_var_3,
 };
@@ -11,6 +12,7 @@ use malachite_test::integer::logic::checked_count_zeros::{
 };
 use std::str::FromStr;
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_count_zeros_neg() {
     let test = |limbs, out| {
@@ -71,7 +73,7 @@ fn checked_count_zeros_properties() {
         assert_eq!((!x).checked_count_ones(), zeros);
     });
 
-    test_properties(negative_signeds::<i32>, |&i| {
+    test_properties(negative_signeds::<SignedLimb>, |&i| {
         assert_eq!(
             Integer::from(i).checked_count_zeros(),
             Some(u64::from(i.count_zeros()))

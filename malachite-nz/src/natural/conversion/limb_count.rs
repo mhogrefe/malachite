@@ -1,7 +1,7 @@
 use natural::Natural::{self, Large, Small};
 
 impl Natural {
-    /// Returns the number of limbs, or base-2<sup>32</sup> digits, of a `Natural`. Zero has 0
+    /// Returns the number of limbs of a `Natural`. Zero has 0
     /// limbs.
     ///
     /// Time: worst case O(1)

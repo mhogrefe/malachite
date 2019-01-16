@@ -1,6 +1,7 @@
 use common::test_properties;
 use malachite_base::misc::Walkable;
 use malachite_nz::integer::Integer;
+use malachite_nz::platform::SignedLimb;
 use malachite_test::inputs::base::signeds_no_min;
 use malachite_test::inputs::integer::integers;
 use malachite_test::inputs::natural::positive_naturals;
@@ -41,7 +42,7 @@ fn integer_decrement_properties() {
         assert_eq!(i, mut_n);
     });
 
-    test_properties(signeds_no_min::<i32>, |&i| {
+    test_properties(signeds_no_min::<SignedLimb>, |&i| {
         let mut mut_i = i;
         mut_i.decrement();
 

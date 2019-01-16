@@ -1,14 +1,16 @@
 use common::test_properties;
+use malachite_base::misc::Max;
 use malachite_base::num::{IsPowerOfTwo, SignificantBits};
 use malachite_nz::natural::arithmetic::is_power_of_two::limbs_is_power_of_two;
 use malachite_nz::natural::Natural;
+use malachite_nz::platform::Limb;
 use malachite_test::common::natural_to_rug_integer;
 use malachite_test::inputs::base::{unsigneds, vecs_of_unsigned_var_1};
 use malachite_test::inputs::natural::naturals;
 use rug;
 use std::str::FromStr;
-use std::u32;
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_is_power_of_two() {
     let test = |limbs, out| {
@@ -23,6 +25,7 @@ fn test_limbs_is_power_of_two() {
     test(&[1, 0, 0, 256], false);
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic(expected = "assertion failed: !limbs.is_empty()")]
 fn limbs_is_power_of_two_fail() {
@@ -68,14 +71,13 @@ fn is_power_of_two_properties() {
         if *x != 0 {
             let trailing_zeros = x.trailing_zeros().unwrap();
             assert_eq!(trailing_zeros == x.significant_bits() - 1, is_power_of_two);
-            if trailing_zeros <= u64::from(u32::MAX) {
-                let trailing_zeros = trailing_zeros as u32;
+            if trailing_zeros <= u64::from(Limb::MAX) {
                 assert_eq!(x >> trailing_zeros == 1, is_power_of_two);
             }
         }
     });
 
-    test_properties(unsigneds::<u32>, |&u| {
+    test_properties(unsigneds::<Limb>, |&u| {
         assert_eq!(u.is_power_of_two(), Natural::from(u).is_power_of_two());
     });
 }

@@ -1,12 +1,13 @@
 use integer::Integer;
+use malachite_base::misc::Max;
 use malachite_base::num::{EqModPowerOfTwo, PrimitiveInteger};
 use natural::Natural::{self, Large, Small};
-use std::u32;
+use platform::Limb;
 
-fn limbs_eq_mod_power_of_two_neg_pos_greater(xs: &[u32], ys: &[u32], pow: u64) -> bool {
+fn limbs_eq_mod_power_of_two_neg_pos_greater(xs: &[Limb], ys: &[Limb], pow: u64) -> bool {
     let xs_len = xs.len();
-    let i = (pow >> u32::LOG_WIDTH) as usize;
-    let small_pow = pow & u64::from(u32::WIDTH_MASK);
+    let i = (pow >> Limb::LOG_WIDTH) as usize;
+    let small_pow = pow & u64::from(Limb::WIDTH_MASK);
     if i > xs_len || i == xs_len && small_pow != 0 {
         false
     } else {
@@ -14,7 +15,7 @@ fn limbs_eq_mod_power_of_two_neg_pos_greater(xs: &[u32], ys: &[u32], pow: u64) -
         let mut y_nonzero_seen = false;
         for j in 0..i {
             let y = if j >= ys_len {
-                u32::MAX
+                Limb::MAX
             } else if y_nonzero_seen {
                 !ys[j]
             } else if ys[j] == 0 {
@@ -32,7 +33,7 @@ fn limbs_eq_mod_power_of_two_neg_pos_greater(xs: &[u32], ys: &[u32], pow: u64) -
         } else {
             // i < xs_len
             let y = if i >= ys_len {
-                u32::MAX
+                Limb::MAX
             } else if y_nonzero_seen {
                 !ys[i]
             } else {
@@ -43,7 +44,7 @@ fn limbs_eq_mod_power_of_two_neg_pos_greater(xs: &[u32], ys: &[u32], pow: u64) -
     }
 }
 
-/// Interpreting two slices of `u32`s as the limbs (in ascending order) of two `Natural`s, returns
+/// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, returns
 /// whether the first `Natural` and the negative of the second natural (equivalently, the negative
 /// of the first `Natural` and the second `Natural`) are equivalent mod two to the power of `pow`;
 /// that is, whether their `pow` least-significant bits are equal.
@@ -73,7 +74,7 @@ fn limbs_eq_mod_power_of_two_neg_pos_greater(xs: &[u32], ys: &[u32], pow: u64) -
 ///     limbs_eq_mod_power_of_two_neg_pos(&[0xabcd_abcd, 0x1234_1234], &[0x5432_5433, 0xedcb_edcb],
 ///     128), false);
 /// ```
-pub fn limbs_eq_mod_power_of_two_neg_pos(xs: &[u32], ys: &[u32], pow: u64) -> bool {
+pub fn limbs_eq_mod_power_of_two_neg_pos(xs: &[Limb], ys: &[Limb], pow: u64) -> bool {
     if xs.len() >= ys.len() {
         limbs_eq_mod_power_of_two_neg_pos_greater(xs, ys, pow)
     } else {
@@ -119,8 +120,8 @@ impl<'a, 'b> EqModPowerOfTwo<&'b Integer> for &'a Integer {
 impl Natural {
     fn eq_mod_power_of_two_neg_pos(&self, other: &Natural, pow: u64) -> bool {
         match (self, other) {
-            (_, &Small(y)) => self.eq_mod_power_of_two_neg_u32(y, pow),
-            (&Small(x), _) => other.eq_mod_power_of_two_neg_u32(x, pow),
+            (_, &Small(y)) => self.eq_mod_power_of_two_neg_limb(y, pow),
+            (&Small(x), _) => other.eq_mod_power_of_two_neg_limb(x, pow),
             (&Large(ref xs), &Large(ref ys)) => limbs_eq_mod_power_of_two_neg_pos(xs, ys, pow),
         }
     }

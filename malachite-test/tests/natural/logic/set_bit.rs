@@ -2,11 +2,13 @@ use common::test_properties;
 use malachite_base::num::{BitAccess, One};
 use malachite_nz::natural::logic::bit_access::{limbs_slice_set_bit, limbs_vec_set_bit};
 use malachite_nz::natural::Natural;
+#[cfg(feature = "32_bit_limbs")]
+use malachite_nz::platform::Limb;
 use malachite_test::common::{
     biguint_to_natural, natural_to_biguint, natural_to_rug_integer, rug_integer_to_natural,
 };
 use malachite_test::inputs::base::{
-    pairs_of_u32_vec_and_small_u64_var_2, pairs_of_unsigned_vec_and_small_unsigned,
+    pairs_of_limb_vec_and_small_u64_var_2, pairs_of_unsigned_vec_and_small_unsigned,
 };
 use malachite_test::inputs::natural::pairs_of_natural_and_small_unsigned;
 use malachite_test::natural::logic::set_bit::num_set_bit;
@@ -14,10 +16,10 @@ use num::BigUint;
 use rug;
 use std::str::FromStr;
 
-//TODO continue deduplication
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 pub fn test_limbs_slice_set_bit() {
-    let test = |limbs: &[u32], index: u64, out_limbs: &[u32]| {
+    let test = |limbs: &[Limb], index: u64, out_limbs: &[Limb]| {
         let mut mut_limbs = limbs.to_vec();
         limbs_slice_set_bit(&mut mut_limbs, index);
         assert_eq!(mut_limbs, out_limbs);
@@ -28,6 +30,7 @@ pub fn test_limbs_slice_set_bit() {
     test(&[3, 1], 33, &[3, 3]);
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic(expected = "index out of bounds: the len is 3 but the index is 3")]
 fn limbs_slice_set_bit_fail() {
@@ -35,9 +38,10 @@ fn limbs_slice_set_bit_fail() {
     limbs_slice_set_bit(&mut mut_limbs, 100);
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 pub fn test_limbs_vec_set_bit() {
-    let test = |limbs: &[u32], index: u64, out_limbs: &[u32]| {
+    let test = |limbs: &[Limb], index: u64, out_limbs: &[Limb]| {
         let mut mut_limbs = limbs.to_vec();
         limbs_vec_set_bit(&mut mut_limbs, index);
         assert_eq!(mut_limbs, out_limbs);
@@ -89,7 +93,7 @@ macro_rules! limbs_set_bit_helper {
 #[test]
 fn limbs_slice_set_bit_properties() {
     test_properties(
-        pairs_of_u32_vec_and_small_u64_var_2,
+        pairs_of_limb_vec_and_small_u64_var_2,
         limbs_set_bit_helper!(limbs_slice_set_bit, limbs, index),
     );
 }

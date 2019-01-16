@@ -1,43 +1,44 @@
+use malachite_base::misc::Max;
 use malachite_base::num::{
     JoinHalves, PrimitiveInteger, SplitInHalf, WrappingAddAssign, WrappingSubAssign,
 };
 use natural::arithmetic::add::limbs_slice_add_same_length_in_place_left;
 use natural::arithmetic::mul::{mpn_mul, mpn_mulmod_bnm1_itch, mpn_mulmod_bnm1_next_size};
 use natural::arithmetic::sub::limbs_sub_same_length_in_place_left;
-use natural::arithmetic::sub_mul_u32::mpn_submul_1;
-use natural::arithmetic::sub_u32::limbs_sub_limb_in_place;
+use natural::arithmetic::sub_limb::limbs_sub_limb_in_place;
+use natural::arithmetic::sub_mul_limb::mpn_submul_1;
 use natural::comparison::ord::limbs_cmp_same_length;
 use natural::logic::not::limbs_not_to_out;
+use platform::{DoubleLimb, Limb};
 use std::cmp::{max, min, Ordering};
-use std::u32;
 
 // will remove
-fn sub_ddmmss(sh: &mut u32, sl: &mut u32, ah: u32, al: u32, bh: u32, bl: u32) {
-    let (hi, lo) = u64::join_halves(ah, al)
-        .wrapping_sub(u64::join_halves(bh, bl))
+fn sub_ddmmss(sh: &mut Limb, sl: &mut Limb, ah: Limb, al: Limb, bh: Limb, bl: Limb) {
+    let (hi, lo) = DoubleLimb::join_halves(ah, al)
+        .wrapping_sub(DoubleLimb::join_halves(bh, bl))
         .split_in_half();
     *sh = hi;
     *sl = lo;
 }
 
 // will remove
-fn udiv_qrnnd(q: &mut u32, r: &mut u32, n_hi: u32, n_lo: u32, d: u32) {
-    let n = u64::join_halves(n_hi, n_lo);
-    let d = u64::from(d);
+fn udiv_qrnnd(q: &mut Limb, r: &mut Limb, n_hi: Limb, n_lo: Limb, d: Limb) {
+    let n = DoubleLimb::join_halves(n_hi, n_lo);
+    let d = DoubleLimb::from(d);
     *r = (n % d).lower_half();
     *q = (n / d).lower_half();
 }
 
 // will remove
-fn invert_limb(invxl: &mut u32, xl: u32) {
+fn invert_limb(invxl: &mut Limb, xl: Limb) {
     assert_ne!(xl, 0);
     let mut _dummy = 0;
-    udiv_qrnnd(invxl, &mut _dummy, !xl, u32::MAX, xl);
+    udiv_qrnnd(invxl, &mut _dummy, !xl, Limb::MAX, xl);
 }
 
 // will remove
-fn umul_ppmm(ph: &mut u32, pl: &mut u32, m1: u32, m2: u32) {
-    let (hi, lo) = (u64::from(m1) * u64::from(m2)).split_in_half();
+fn umul_ppmm(ph: &mut Limb, pl: &mut Limb, m1: Limb, m2: Limb) {
+    let (hi, lo) = (DoubleLimb::from(m1) * DoubleLimb::from(m2)).split_in_half();
     *ph = hi;
     *pl = lo;
 }
@@ -46,14 +47,14 @@ fn umul_ppmm(ph: &mut u32, pl: &mut u32, m1: u32, m2: u32) {
 // checked
 // docs preserved
 // invert_pi1 from gmp-impl.h
-fn invert_pi1(dinv: &mut u32, d1: u32, d0: u32) {
+fn invert_pi1(dinv: &mut Limb, d1: Limb, d0: Limb) {
     let mut v = 0;
     invert_limb(&mut v, d1);
     let mut p = d1.wrapping_mul(v);
     p.wrapping_add_assign(d0);
     if p < d0 {
         v.wrapping_sub_assign(1);
-        let mask = if p >= d1 { u32::MAX } else { 0 };
+        let mask = if p >= d1 { Limb::MAX } else { 0 };
         p.wrapping_sub_assign(d1);
         v.wrapping_add_assign(mask);
         p.wrapping_sub_assign(mask & d1);
@@ -72,9 +73,9 @@ fn invert_pi1(dinv: &mut u32, d1: u32, d0: u32) {
 }
 
 // will remove
-fn add_ssaaaa(sh: &mut u32, sl: &mut u32, ah1: u32, al1: u32, ah2: u32, al2: u32) {
-    let (hi, lo) = u64::join_halves(ah1, al1)
-        .wrapping_add(u64::join_halves(ah2, al2))
+fn add_ssaaaa(sh: &mut Limb, sl: &mut Limb, ah1: Limb, al1: Limb, ah2: Limb, al2: Limb) {
+    let (hi, lo) = DoubleLimb::join_halves(ah1, al1)
+        .wrapping_add(DoubleLimb::join_halves(ah2, al2))
         .split_in_half();
     *sh = hi;
     *sl = lo;
@@ -92,15 +93,15 @@ fn add_ssaaaa(sh: &mut u32, sl: &mut u32, ah1: u32, al1: u32, ah2: u32, al2: u32
 // udiv_qr_3by2 from gmp-impl.h
 #[allow(clippy::too_many_arguments)]
 fn udiv_qr_3by2(
-    q: &mut u32,
-    r1: &mut u32,
-    r0: &mut u32,
-    n2: u32,
-    n1: u32,
-    n0: u32,
-    d1: u32,
-    d0: u32,
-    dinv: u32,
+    q: &mut Limb,
+    r1: &mut Limb,
+    r0: &mut Limb,
+    n2: Limb,
+    n1: Limb,
+    n0: Limb,
+    d1: Limb,
+    d0: Limb,
+    dinv: Limb,
 ) {
     let mut q0 = 0;
     umul_ppmm(q, &mut q0, n2, dinv);
@@ -121,7 +122,7 @@ fn udiv_qr_3by2(
     q.wrapping_add_assign(1);
 
     // Conditionally adjust q and the remainders
-    let mask = if *r1 >= q0 { u32::MAX } else { 0 };
+    let mask = if *r1 >= q0 { Limb::MAX } else { 0 };
     q.wrapping_add_assign(mask);
     let old_r1 = *r1;
     let old_r0 = *r0;
@@ -147,7 +148,7 @@ fn udiv_qr_3by2(
 // 3. np.len() >= 2.
 //
 // mpn_divrem_2 from mpn/generic/divrem_2.c
-pub fn mpn_divrem_2(qp: &mut [u32], np: &mut [u32], dp: &[u32]) -> u32 {
+pub fn mpn_divrem_2(qp: &mut [Limb], np: &mut [Limb], dp: &[Limb]) -> Limb {
     let nn = np.len();
 
     assert_eq!(dp.len(), 2);
@@ -194,7 +195,7 @@ pub fn mpn_divrem_2(qp: &mut [u32], np: &mut [u32], dp: &[u32]) -> u32 {
 // docs preserved
 // Schoolbook division using the Möller-Granlund 3/2 division algorithm.
 // mpn_sbpi1_div_qr from mpn/generic/sbpi1_div_qr.c
-pub fn mpn_sbpi1_div_qr(qp: &mut [u32], np: &mut [u32], dp: &[u32], dinv: u32) -> bool {
+pub fn mpn_sbpi1_div_qr(qp: &mut [Limb], np: &mut [Limb], dp: &[Limb], dinv: Limb) -> bool {
     let nn = np.len();
     let mut dn = dp.len();
 
@@ -223,7 +224,7 @@ pub fn mpn_sbpi1_div_qr(qp: &mut [u32], np: &mut [u32], dp: &[u32], dinv: u32) -
         np_offset -= 1;
         let mut q = 0;
         if n1 == d1 && np[np_offset + 1] == d0 {
-            q = u32::MAX;
+            q = Limb::MAX;
             mpn_submul_1(&mut np[np_offset - dn..], &dp[..dn + 2], q);
             n1 = np[np_offset + 1]; // update n1, last loop's value will now be invalid
         } else {
@@ -277,12 +278,12 @@ const DC_DIV_QR_THRESHOLD: usize = 56;
 // Recursive divide-and-conquer division for arbitrary size operands.
 // mpn_dcpi1_div_qr_n from mpn/generic/dcpi1_div_qr.c
 pub fn mpn_dcpi1_div_qr_n(
-    qp: &mut [u32],
-    np: &mut [u32],
-    dp: &[u32],
-    dinv: u32,
-    tp: &mut [u32],
-) -> u32 {
+    qp: &mut [Limb],
+    np: &mut [Limb],
+    dp: &[Limb],
+    dinv: Limb,
+    tp: &mut [Limb],
+) -> Limb {
     let n = dp.len();
     let lo = n >> 1; // floor(n/2)
     let hi = n - lo; // ceil(n/2)
@@ -377,7 +378,7 @@ pub fn mpn_dcpi1_div_qr_n(
 // docs preserved
 // mpn_dcpi1_div_qr from mpn/generic/dcpi1_div_qr.c
 #[allow(clippy::cyclomatic_complexity)]
-pub fn mpn_dcpi1_div_qr(qp: &mut [u32], np: &mut [u32], dp: &[u32], dinv: u32) -> u32 {
+pub fn mpn_dcpi1_div_qr(qp: &mut [Limb], np: &mut [Limb], dp: &[Limb], dinv: Limb) -> Limb {
     let nn = np.len();
     let dn = dp.len();
     assert!(dn >= 6); // to adhere to mpn_sbpi1_div_qr's limits
@@ -430,7 +431,7 @@ pub fn mpn_dcpi1_div_qr(qp: &mut [u32], np: &mut [u32], dp: &[u32], dinv: u32) -
 
             let mut q = 0;
             if n2 == d1 && n1 == d0 {
-                q = u32::MAX;
+                q = Limb::MAX;
                 let cy = mpn_submul_1(&mut np[np_offset - dn..], &dp[..dn], q);
                 assert_eq!(cy, n2);
             } else {
@@ -656,7 +657,7 @@ pub fn mpn_dcpi1_div_qr(qp: &mut [u32], np: &mut [u32], dp: &[u32], dinv: u32) -
 // (c) qn < dn / 3:       in = qn
 // In all cases we have in <= dn.
 // mpn_mulmod_bnm1_itch from mpn/generic/mu_div_qr.c
-pub fn mpn_mu_div_qr_choose_in(qn: usize, dn: usize, k: u32) -> usize {
+pub fn mpn_mu_div_qr_choose_in(qn: usize, dn: usize, k: Limb) -> usize {
     if k == 0 {
         if qn > dn {
             // Compute an inverse size that is a nice partition of the quotient.
@@ -695,7 +696,7 @@ pub fn mpn_invertappr_itch(n: usize) -> usize {
 // checked
 // docs preserved
 // mpn_mu_div_qr_itch from mpn/generic/mu_div_qr.c
-pub fn mpn_mu_div_qr_itch(nn: usize, dn: usize, mua_k: u32) -> usize {
+pub fn mpn_mu_div_qr_itch(nn: usize, dn: usize, mua_k: Limb) -> usize {
     let in_size = mpn_mu_div_qr_choose_in(nn - dn, dn, mua_k);
     let itch_preinv = mpn_preinv_mu_div_qr_itch(dn, in_size);
     let itch_invapp = mpn_invertappr_itch(in_size + 1) + in_size + 2; // 3 * in_size + 4
@@ -710,7 +711,7 @@ pub fn mpn_mu_div_qr_itch(nn: usize, dn: usize, mua_k: u32) -> usize {
 // Schoolbook division using the Möller-Granlund 3/2 division algorithm, returning approximate
 // quotient. The quotient returned is either correct, or one too large.
 // mpn_sbpi1_divappr_q from mpn/generic/sbpi1_divappr_q.c
-pub fn mpn_sbpi1_divappr_q(qp: &mut [u32], np: &mut [u32], dp: &[u32], dinv: u32) -> u32 {
+pub fn mpn_sbpi1_divappr_q(qp: &mut [Limb], np: &mut [Limb], dp: &[Limb], dinv: Limb) -> Limb {
     let nn = np.len();
     let mut dn = dp.len();
 
@@ -753,7 +754,7 @@ pub fn mpn_sbpi1_divappr_q(qp: &mut [u32], np: &mut [u32], dp: &[u32], dinv: u32
     for _ in 0..(qn - dn - 1) {
         np_offset -= 1;
         if n1 == d1 && np[np_offset + 1] == d0 {
-            q = u32::MAX;
+            q = Limb::MAX;
             mpn_submul_1(
                 &mut np[np_offset - dn..],
                 &dp[dp_offset..dp_offset + dn + 2],
@@ -788,13 +789,13 @@ pub fn mpn_sbpi1_divappr_q(qp: &mut [u32], np: &mut [u32], dp: &[u32], dinv: u32
         qp[qp_offset] = q;
     }
 
-    let mut flag = u32::MAX;
+    let mut flag = Limb::MAX;
     if dn_was_at_least_2 {
         let limit = dn;
         for _ in 0..limit {
             np_offset -= 1;
             if n1 >= (d1 & flag) {
-                q = u32::MAX;
+                q = Limb::MAX;
                 let cy = mpn_submul_1(
                     &mut np[np_offset - dn..],
                     &dp[dp_offset..dp_offset + dn + 2],
@@ -861,7 +862,7 @@ pub fn mpn_sbpi1_divappr_q(qp: &mut [u32], np: &mut [u32], dp: &[u32], dinv: u32
 
         np_offset -= 1;
         if n1 >= (d1 & flag) {
-            q = u32::MAX;
+            q = Limb::MAX;
             let cy = mpn_submul_1(&mut np[np_offset..], &dp[dp_offset..dp_offset + 2], q);
 
             if n1 != cy && n1 < (cy & flag) {
@@ -912,12 +913,12 @@ const DC_DIVAPPR_Q_THRESHOLD: usize = 68;
 // checked
 // mpn_dcpi1_divappr_q_n from mpn/generic/dcpi1_divappr_q.c
 pub fn mpn_dcpi1_divappr_q_n(
-    qp: &mut [u32],
-    np: &mut [u32],
-    dp: &[u32],
-    dinv: u32,
-    tp: &mut [u32],
-) -> u32 {
+    qp: &mut [Limb],
+    np: &mut [Limb],
+    dp: &[Limb],
+    dinv: Limb,
+    tp: &mut [Limb],
+) -> Limb {
     let n = dp.len();
     assert_eq!(np.len(), n);
     let lo = n >> 1; // floor(n / 2)
@@ -979,7 +980,7 @@ pub fn mpn_dcpi1_divappr_q_n(
     };
     if ql != 0 {
         for q in qp[..lo].iter_mut() {
-            *q = u32::MAX;
+            *q = Limb::MAX;
         }
     }
     qh
@@ -992,7 +993,7 @@ pub fn mpn_dcpi1_divappr_q_n(
 // correct, or one too large.
 // mpn_dcpi1_divappr_q from mpn/generic/dcpi1_divappr_q.c
 #[allow(clippy::cyclomatic_complexity)]
-pub fn mpn_dcpi1_divappr_q(qp: &mut [u32], np: &mut [u32], dp: &[u32], dinv: u32) -> u32 {
+pub fn mpn_dcpi1_divappr_q(qp: &mut [Limb], np: &mut [Limb], dp: &[Limb], dinv: Limb) -> Limb {
     let nn = np.len();
     let dn = dp.len();
     assert!(dn >= 6);
@@ -1046,7 +1047,7 @@ pub fn mpn_dcpi1_divappr_q(qp: &mut [u32], np: &mut [u32], dp: &[u32], dinv: u32
             assert!(n2 < d1 || (n2 == d1 && n1 <= d0));
             let mut q = 0;
             if n2 == d1 && n1 == d0 {
-                q = u32::MAX;
+                q = Limb::MAX;
                 let cy = mpn_submul_1(&mut np[np_offset - dn..], &dp[dp_offset - dn..dp_offset], q);
                 assert_eq!(cy, n2);
             } else {
@@ -1246,7 +1247,7 @@ pub fn mpn_dcpi1_divappr_q(qp: &mut [u32], np: &mut [u32], dp: &[u32], dinv: u32
 //   dp * (B ^ n + ip) < B ^ {2n} <= dp * (B ^ n + ip + 1)
 // the function mpn_invert(ip, dp, scratch) should be used instead.
 // mpn_bc_invertappr from mpn/generic/invertappr.c
-pub fn mpn_bc_invertappr(ip: &mut [u32], dp: &[u32], xp: &mut [u32]) -> u32 {
+pub fn mpn_bc_invertappr(ip: &mut [Limb], dp: &[Limb], xp: &mut [Limb]) -> Limb {
     let n = dp.len();
     assert!(n > 0);
     assert!(dp[n - 1].get_highest_bit());
@@ -1259,7 +1260,7 @@ pub fn mpn_bc_invertappr(ip: &mut [u32], dp: &[u32], xp: &mut [u32]) -> u32 {
         let mut i = n;
         loop {
             i -= 1;
-            xp[i] = u32::MAX;
+            xp[i] = Limb::MAX;
             if i == 0 {
                 break;
             }

@@ -1,6 +1,7 @@
 use common::test_properties;
 use malachite_base::num::NotAssign;
 use malachite_nz::integer::Integer;
+use malachite_nz::platform::{Limb, SignedLimb};
 use malachite_test::common::{integer_to_rug_integer, rug_integer_to_integer};
 use malachite_test::inputs::base::signeds;
 use malachite_test::inputs::integer::integers;
@@ -51,10 +52,10 @@ fn not_properties() {
 
         assert_ne!(not, *x);
         assert_eq!(!&not, *x);
-        assert_eq!(*x >= 0, not < 0);
+        assert_eq!(*x >= 0 as Limb, not < 0 as Limb);
     });
 
-    test_properties(signeds::<i32>, |&i| {
+    test_properties(signeds::<SignedLimb>, |&i| {
         assert_eq!(!Integer::from(i), !i);
     });
 

@@ -1,15 +1,17 @@
 use common::test_properties;
 use malachite_nz::natural::logic::not::{limbs_not, limbs_not_in_place, limbs_not_to_out};
 use malachite_nz::natural::Natural;
+use malachite_nz::platform::Limb;
 use malachite_test::common::{natural_to_rug_integer, rug_integer_to_integer};
 use malachite_test::inputs::base::{pairs_of_unsigned_vec_var_3, vecs_of_unsigned};
 use malachite_test::inputs::natural::naturals;
 use rug;
 use std::str::FromStr;
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 pub fn test_limbs_not_and_limbs_not_in_place() {
-    let test = |limbs_in: &[u32], limbs_out: &[u32]| {
+    let test = |limbs_in: &[Limb], limbs_out: &[Limb]| {
         assert_eq!(limbs_not(limbs_in), limbs_out);
 
         let mut mut_limbs = limbs_in.to_vec();
@@ -21,9 +23,10 @@ pub fn test_limbs_not_and_limbs_not_in_place() {
     test(&[0xffff_ffff, 0xffff_fffe, 0xffff_fffd], &[0, 1, 2]);
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 pub fn test_limbs_not_to_out() {
-    let test = |limbs_in: &[u32], limbs_out_before: &[u32], limbs_out_after: &[u32]| {
+    let test = |limbs_in: &[Limb], limbs_out_before: &[Limb], limbs_out_after: &[Limb]| {
         let mut mut_limbs_out = limbs_out_before.to_vec();
         limbs_not_to_out(&mut mut_limbs_out, limbs_in);
         assert_eq!(mut_limbs_out, limbs_out_after);
@@ -37,6 +40,7 @@ pub fn test_limbs_not_to_out() {
     );
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic(expected = "assertion failed: out_limbs.len() >= in_limbs.len()")]
 fn limbs_not_to_out_fail() {
@@ -106,7 +110,7 @@ fn not_properties() {
         assert!(not_alt.is_valid());
         assert_eq!(not_alt, not);
 
-        assert!(not < 0);
+        assert!(not < 0 as Limb);
         assert_ne!(not, *x);
         assert_eq!(!&not, *x);
     });

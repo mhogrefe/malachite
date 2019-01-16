@@ -2,6 +2,7 @@ use common::{test_properties, test_properties_no_special};
 use malachite_base::num::{SignificantBits, Zero};
 use malachite_nz::integer::conversion::to_twos_complement_bits::*;
 use malachite_nz::integer::Integer;
+use malachite_nz::platform::Limb;
 use malachite_test::inputs::base::{small_unsigneds, vecs_of_bool, vecs_of_bool_var_1};
 use malachite_test::inputs::integer::{
     integers, pairs_of_integer_and_small_u64, pairs_of_integer_and_vec_of_bool_var_2,
@@ -373,8 +374,8 @@ fn to_twos_complement_bits_asc_properties() {
             x
         );
         assert_eq!(Integer::from_twos_complement_bits_asc(&bits), *x);
-        if *x != 0 {
-            assert_eq!(*bits.last().unwrap(), *x < 0);
+        if *x != 0 as Limb {
+            assert_eq!(*bits.last().unwrap(), *x < 0 as Limb);
         }
     });
 }
@@ -385,8 +386,8 @@ fn to_twos_complement_bits_desc_properties() {
         let bits = x.to_twos_complement_bits_desc();
         assert_eq!(x.twos_complement_bits().rev().collect::<Vec<bool>>(), bits);
         assert_eq!(Integer::from_twos_complement_bits_desc(&bits), *x);
-        if *x != 0 {
-            assert_eq!(bits[0], *x < 0);
+        if *x != 0 as Limb {
+            assert_eq!(bits[0], *x < 0 as Limb);
         }
     });
 }
@@ -420,7 +421,7 @@ fn twos_complement_bits_properties() {
                 n.to_twos_complement_bits_asc()[u as usize]
             );
         } else {
-            assert_eq!(n.twos_complement_bits()[u], *n < 0);
+            assert_eq!(n.twos_complement_bits()[u], *n < 0 as Limb);
         }
     });
 

@@ -1,11 +1,12 @@
 use integer::Integer;
 use malachite_base::limbs::limbs_test_zero;
 use malachite_base::num::{BitAccess, PrimitiveInteger, WrappingAddAssign, WrappingNegAssign};
-use natural::arithmetic::add_u32::limbs_slice_add_limb_in_place;
-use natural::arithmetic::sub_u32::limbs_sub_limb_in_place;
+use natural::arithmetic::add_limb::limbs_slice_add_limb_in_place;
+use natural::arithmetic::sub_limb::limbs_sub_limb_in_place;
 use natural::Natural::{self, Large, Small};
+use platform::Limb;
 
-/// Interpreting a slice of `u32`s as the limbs (in ascending order) of a `Natural`, performs an
+/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, performs an
 /// action equivalent to taking the two's complement of the limbs and getting the bit at the
 /// specified index. Sufficiently high indices will return `true`. The slice cannot be empty or
 /// contain only zeros.
@@ -28,8 +29,8 @@ use natural::Natural::{self, Large, Small};
 /// assert_eq!(limbs_get_bit_neg(&[0, 0b1011], 35), false);
 /// assert_eq!(limbs_get_bit_neg(&[0, 0b1011], 100), true);
 /// ```
-pub fn limbs_get_bit_neg(limbs: &[u32], index: u64) -> bool {
-    let limb_index = (index >> u32::LOG_WIDTH) as usize;
+pub fn limbs_get_bit_neg(limbs: &[Limb], index: u64) -> bool {
+    let limb_index = (index >> Limb::LOG_WIDTH) as usize;
     if limb_index >= limbs.len() {
         // We're indexing into the infinite suffix of 1s
         true
@@ -39,11 +40,11 @@ pub fn limbs_get_bit_neg(limbs: &[u32], index: u64) -> bool {
         } else {
             !limbs[limb_index]
         };
-        limb.get_bit(index & u64::from(u32::WIDTH_MASK))
+        limb.get_bit(index & u64::from(Limb::WIDTH_MASK))
     }
 }
 
-/// Interpreting a slice of `u32`s as the limbs (in ascending order) of a `Natural`, performs an
+/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, performs an
 /// action equivalent to taking the two's complement of the limbs, setting a bit at the specified
 /// index to `true`, and taking the two's complement again. Indices that are outside the bounds of
 /// the slice will result in no action being taken, since negative numbers in two's complement have
@@ -65,12 +66,12 @@ pub fn limbs_get_bit_neg(limbs: &[u32], index: u64) -> bool {
 /// limbs_set_bit_neg(limbs, 1);
 /// assert_eq!(limbs, &[1, 2, 1]);
 /// ```
-pub fn limbs_set_bit_neg(limbs: &mut [u32], index: u64) {
-    let limb_index = (index >> u32::LOG_WIDTH) as usize;
+pub fn limbs_set_bit_neg(limbs: &mut [Limb], index: u64) {
+    let limb_index = (index >> Limb::LOG_WIDTH) as usize;
     if limb_index >= limbs.len() {
         return;
     }
-    let reduced_index = index & u64::from(u32::WIDTH_MASK);
+    let reduced_index = index & u64::from(Limb::WIDTH_MASK);
     let mut zero_bound = 0;
     // No index upper bound on this loop; we're sure there's a nonzero limb sooner or later.
     while limbs[zero_bound] == 0 {
@@ -83,7 +84,7 @@ pub fn limbs_set_bit_neg(limbs: &mut [u32], index: u64) {
         // boundary limb != 0 here
         *boundary_limb -= 1;
         boundary_limb.clear_bit(reduced_index);
-        // boundary limb != u32::MAX here
+        // boundary limb != Limb::MAX here
         *boundary_limb += 1;
     } else {
         assert!(!limbs_sub_limb_in_place(
@@ -93,7 +94,7 @@ pub fn limbs_set_bit_neg(limbs: &mut [u32], index: u64) {
     }
 }
 
-fn limbs_clear_bit_neg_helper(limbs: &mut [u32], limb_index: usize, reduced_index: u64) -> bool {
+fn limbs_clear_bit_neg_helper(limbs: &mut [Limb], limb_index: usize, reduced_index: u64) -> bool {
     let mut zero_bound = 0;
     // No index upper bound on this loop; we're sure there's a nonzero limb sooner or later.
     while limbs[zero_bound] == 0 {
@@ -114,7 +115,7 @@ fn limbs_clear_bit_neg_helper(limbs: &mut [u32], limb_index: usize, reduced_inde
     false
 }
 
-/// Interpreting a slice of `u32`s as the limbs (in ascending order) of a `Natural`, performs an
+/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, performs an
 /// action equivalent to taking the two's complement of the limbs, setting a bit at the specified
 /// index to `false`, and taking the two's complement again. Inputs that would result in new `true`
 /// bits outside of the slice will cause a panic. The slice cannot be empty or contain only zeros.
@@ -136,9 +137,9 @@ fn limbs_clear_bit_neg_helper(limbs: &mut [u32], limb_index: usize, reduced_inde
 /// limbs_slice_clear_bit_neg(&mut limbs, 0);
 /// assert_eq!(limbs, &[4, 2, 1]);
 /// ```
-pub fn limbs_slice_clear_bit_neg(limbs: &mut [u32], index: u64) {
-    let limb_index = (index >> u32::LOG_WIDTH) as usize;
-    let reduced_index = index & u64::from(u32::WIDTH_MASK);
+pub fn limbs_slice_clear_bit_neg(limbs: &mut [Limb], index: u64) {
+    let limb_index = (index >> Limb::LOG_WIDTH) as usize;
+    let reduced_index = index & u64::from(Limb::WIDTH_MASK);
     if limb_index < limbs.len() {
         if limbs_clear_bit_neg_helper(limbs, limb_index, reduced_index) {
             panic!("Setting bit cannot be done within existing slice");
@@ -148,7 +149,7 @@ pub fn limbs_slice_clear_bit_neg(limbs: &mut [u32], index: u64) {
     }
 }
 
-/// Interpreting a `Vec` of `u32`s as the limbs (in ascending order) of a `Natural`, performs an
+/// Interpreting a `Vec` of `Limb`s as the limbs (in ascending order) of a `Natural`, performs an
 /// action equivalent to taking the two's complement of the limbs, setting a bit at the specified
 /// index to `false`, and taking the two's complement again. Sufficiently high indices will increase
 /// the length of the limbs vector. The slice cannot be empty or contain only zeros.
@@ -169,9 +170,9 @@ pub fn limbs_slice_clear_bit_neg(limbs: &mut [u32], index: u64) {
 /// limbs_vec_clear_bit_neg(&mut limbs, 64);
 /// assert_eq!(limbs, &[0, 0, 0, 1]);
 /// ```
-pub fn limbs_vec_clear_bit_neg(limbs: &mut Vec<u32>, index: u64) {
-    let limb_index = (index >> u32::LOG_WIDTH) as usize;
-    let reduced_index = index & u64::from(u32::WIDTH_MASK);
+pub fn limbs_vec_clear_bit_neg(limbs: &mut Vec<Limb>, index: u64) {
+    let limb_index = (index >> Limb::LOG_WIDTH) as usize;
+    let reduced_index = index & u64::from(Limb::WIDTH_MASK);
     if limb_index < limbs.len() {
         if limbs_clear_bit_neg_helper(limbs, limb_index, reduced_index) {
             limbs.push(1);
@@ -371,7 +372,7 @@ impl Natural {
     // self cannot be zero
     pub(crate) fn get_bit_neg(&self, index: u64) -> bool {
         match *self {
-            Small(small) => index >= u32::WIDTH.into() || small.wrapping_neg().get_bit(index),
+            Small(small) => index >= u64::from(Limb::WIDTH) || small.wrapping_neg().get_bit(index),
             Large(ref limbs) => limbs_get_bit_neg(limbs, index),
         }
     }
@@ -380,7 +381,7 @@ impl Natural {
     fn set_bit_neg(&mut self, index: u64) {
         match *self {
             Small(ref mut small) => {
-                if index < u32::WIDTH.into() {
+                if index < u64::from(Limb::WIDTH) {
                     small.wrapping_neg_assign();
                     small.set_bit(index);
                     small.wrapping_neg_assign();
@@ -399,7 +400,7 @@ impl Natural {
             small,
             limbs,
             {
-                if index < u32::WIDTH.into() {
+                if index < u64::from(Limb::WIDTH) {
                     let mut cleared_small = small.wrapping_neg();
                     cleared_small.clear_bit(index);
                     if cleared_small == 0 {

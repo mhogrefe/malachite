@@ -7,6 +7,7 @@ use malachite_base::num::{
 use malachite_base::round::RoundingMode;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
+use malachite_nz::platform::{Limb, SignedLimb};
 use malachite_test::inputs::base::{pairs_of_signed_and_small_unsigned, unsigneds};
 use malachite_test::inputs::integer::{
     integers, pairs_of_integer_and_small_unsigned, pairs_of_integer_and_small_unsigned_var_1,
@@ -277,9 +278,9 @@ fn mod_power_of_two_properties() {
 
         assert_eq!((n >> u << u) + &result, *n);
         assert!(result < (Natural::ONE << u));
-        assert_eq!(result == 0, n.divisible_by_power_of_two(u));
+        assert_eq!(result == 0 as Limb, n.divisible_by_power_of_two(u));
         assert_eq!((&result).mod_power_of_two(u), result);
-        assert_eq!(n & ((Integer::ONE << u) - 1), result);
+        assert_eq!(n & ((Integer::ONE << u) - 1 as Limb), result);
     });
 
     test_properties(
@@ -341,17 +342,17 @@ fn rem_power_of_two_properties() {
 
         assert_eq!(((n.shr_round(u, RoundingMode::Down) << u) + &result), *n);
         assert!(result.lt_abs(&(Natural::ONE << u)));
-        assert_eq!(result == 0, n.divisible_by_power_of_two(u));
+        assert_eq!(result == 0 as Limb, n.divisible_by_power_of_two(u));
         assert_eq!((&result).rem_power_of_two(u), result);
         assert_eq!(n.abs().mod_power_of_two(u), result.abs());
     });
 
     test_properties(pairs_of_integer_and_small_unsigned_var_1, |&(ref n, u)| {
-        assert_eq!(n.rem_power_of_two(u), 0);
+        assert_eq!(n.rem_power_of_two(u), 0 as Limb);
     });
 
     test_properties(pairs_of_integer_and_small_unsigned_var_2, |&(ref n, u)| {
-        assert_ne!(n.rem_power_of_two(u), 0);
+        assert_ne!(n.rem_power_of_two(u), 0 as Limb);
         assert_eq!(n.rem_power_of_two(u).sign(), n.sign());
     });
 
@@ -366,11 +367,11 @@ fn rem_power_of_two_properties() {
     );
 
     test_properties(integers, |n| {
-        assert_eq!(n.rem_power_of_two(0), 0);
+        assert_eq!(n.rem_power_of_two(0), 0 as Limb);
     });
 
     test_properties(unsigneds, |&u| {
-        assert_eq!(Integer::ZERO.rem_power_of_two(u), 0);
+        assert_eq!(Integer::ZERO.rem_power_of_two(u), 0 as Limb);
     });
 }
 
@@ -390,9 +391,9 @@ fn ceiling_mod_power_of_two_properties() {
         assert_eq!(result_alt, result);
 
         assert_eq!(((n.shr_round(u, RoundingMode::Ceiling) << u) + &result), *n);
-        assert!(result <= 0);
+        assert!(result <= 0 as Limb);
         assert!(-&result <= Natural::ONE << u);
-        assert_eq!(result == 0, n.divisible_by_power_of_two(u));
+        assert_eq!(result == 0 as Limb, n.divisible_by_power_of_two(u));
         assert_eq!((-n).mod_power_of_two(u), -result);
     });
 
@@ -417,23 +418,23 @@ fn ceiling_mod_power_of_two_properties() {
     );
 
     test_properties(pairs_of_integer_and_small_unsigned_var_1, |&(ref n, u)| {
-        assert_eq!(n.ceiling_mod_power_of_two(u), 0);
+        assert_eq!(n.ceiling_mod_power_of_two(u), 0 as Limb);
     });
 
     test_properties(pairs_of_integer_and_small_unsigned_var_2, |&(ref n, u)| {
-        assert_ne!(n.ceiling_mod_power_of_two(u), 0);
+        assert_ne!(n.ceiling_mod_power_of_two(u), 0 as Limb);
     });
 
     test_properties(integers, |n| {
-        assert_eq!(n.ceiling_mod_power_of_two(0), 0);
+        assert_eq!(n.ceiling_mod_power_of_two(0), 0 as Limb);
     });
 
     test_properties(unsigneds, |&u| {
-        assert_eq!(Integer::ZERO.ceiling_mod_power_of_two(u), 0);
+        assert_eq!(Integer::ZERO.ceiling_mod_power_of_two(u), 0 as Limb);
     });
 
     test_properties(
-        pairs_of_signed_and_small_unsigned::<i32, u64>,
+        pairs_of_signed_and_small_unsigned::<SignedLimb, u64>,
         |&(i, pow)| {
             assert_eq!(
                 i.divisible_by_power_of_two(pow),

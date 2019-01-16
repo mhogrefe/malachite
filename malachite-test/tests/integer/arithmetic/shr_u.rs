@@ -6,6 +6,7 @@ use malachite_base::num::{
 };
 use malachite_base::round::RoundingMode;
 use malachite_nz::integer::Integer;
+use malachite_nz::platform::{Limb, SignedLimb};
 use malachite_test::common::{
     bigint_to_integer, integer_to_bigint, integer_to_rug_integer, rug_integer_to_integer,
 };
@@ -25,7 +26,6 @@ use malachite_test::inputs::natural::{
     pairs_of_natural_and_small_unsigned, triples_of_natural_small_unsigned_and_rounding_mode_var_1,
 };
 use rug;
-use std::i32;
 use std::str::FromStr;
 
 macro_rules! tests_and_properties {
@@ -189,20 +189,23 @@ macro_rules! tests_and_properties {
                 },
             );
 
-            test_properties(pairs_of_signed_and_small_unsigned::<i32, $t>, |&(i, j)| {
-                if let Some(sum) = j.checked_add($t::checked_from(i32::WIDTH).unwrap()) {
-                    let shifted = Integer::from(i) >> sum;
-                    if i >= 0 {
-                        assert_eq!(shifted, 0);
-                    } else {
-                        assert_eq!(shifted, -1);
+            test_properties(
+                pairs_of_signed_and_small_unsigned::<SignedLimb, $t>,
+                |&(i, j)| {
+                    if let Some(sum) = j.checked_add($t::checked_from(SignedLimb::WIDTH).unwrap()) {
+                        let shifted = Integer::from(i) >> sum;
+                        if i >= 0 {
+                            assert_eq!(shifted, 0 as Limb);
+                        } else {
+                            assert_eq!(shifted, -1 as SignedLimb);
+                        }
                     }
-                }
 
-                if j < $t::checked_from(i32::WIDTH).unwrap() {
-                    assert_eq!(i >> j, Integer::from(i) >> j);
-                }
-            });
+                    if j < $t::checked_from(SignedLimb::WIDTH).unwrap() {
+                        assert_eq!(i >> j, Integer::from(i) >> j);
+                    }
+                },
+            );
 
             test_properties(
                 triples_of_integer_small_unsigned_and_small_unsigned::<$t, $t>,
@@ -218,7 +221,7 @@ macro_rules! tests_and_properties {
             });
 
             test_properties(unsigneds::<$t>, |&u| {
-                assert_eq!(Integer::ZERO >> u, 0);
+                assert_eq!(Integer::ZERO >> u, 0 as Limb);
             });
 
             test_properties(pairs_of_natural_and_small_unsigned::<$t>, |&(ref n, u)| {
@@ -1232,19 +1235,19 @@ macro_rules! tests_and_properties {
         }
 
         #[test]
-        #[should_panic(expected = "Right shift is not exact: 123 >>= 1")]
+        #[should_panic(expected = "Right shift is not exact")]
         fn $shr_round_assign_u_fail_1() {
-            Integer::from(123u32).shr_round_assign(1 as $t, RoundingMode::Exact);
+            Integer::from(123).shr_round_assign(1 as $t, RoundingMode::Exact);
         }
 
         #[test]
-        #[should_panic(expected = "Right shift is not exact: 123 >>= 100")]
+        #[should_panic(expected = "Right shift is not exact")]
         fn $shr_round_assign_u_fail_2() {
-            Integer::from(123u32).shr_round_assign(100 as $t, RoundingMode::Exact);
+            Integer::from(123).shr_round_assign(100 as $t, RoundingMode::Exact);
         }
 
         #[test]
-        #[should_panic(expected = "Right shift is not exact.")]
+        #[should_panic(expected = "Right shift is not exact")]
         fn $shr_round_assign_u_fail_3() {
             Integer::from_str("1000000000001")
                 .unwrap()
@@ -1252,7 +1255,7 @@ macro_rules! tests_and_properties {
         }
 
         #[test]
-        #[should_panic(expected = "Right shift is not exact.")]
+        #[should_panic(expected = "Right shift is not exact")]
         fn $shr_round_assign_u_fail_4() {
             Integer::from_str("1000000000001")
                 .unwrap()
@@ -1260,19 +1263,19 @@ macro_rules! tests_and_properties {
         }
 
         #[test]
-        #[should_panic(expected = "Right shift is not exact: 123 >>= 1")]
+        #[should_panic(expected = "Right shift is not exact")]
         fn $shr_round_u_fail_1() {
-            Integer::from(123u32).shr_round(1 as $t, RoundingMode::Exact);
+            Integer::from(123).shr_round(1 as $t, RoundingMode::Exact);
         }
 
         #[test]
-        #[should_panic(expected = "Right shift is not exact: 123 >>= 100")]
+        #[should_panic(expected = "Right shift is not exact")]
         fn $shr_round_u_fail_2() {
-            Integer::from(123u32).shr_round(100 as $t, RoundingMode::Exact);
+            Integer::from(123).shr_round(100 as $t, RoundingMode::Exact);
         }
 
         #[test]
-        #[should_panic(expected = "Right shift is not exact.")]
+        #[should_panic(expected = "Right shift is not exact")]
         fn $shr_round_u_fail_3() {
             Integer::from_str("1000000000001")
                 .unwrap()
@@ -1280,7 +1283,7 @@ macro_rules! tests_and_properties {
         }
 
         #[test]
-        #[should_panic(expected = "Right shift is not exact.")]
+        #[should_panic(expected = "Right shift is not exact")]
         fn $shr_round_u_fail_4() {
             Integer::from_str("1000000000001")
                 .unwrap()
@@ -1288,25 +1291,25 @@ macro_rules! tests_and_properties {
         }
 
         #[test]
-        #[should_panic(expected = "Right shift is not exact: 123 >> 1")]
+        #[should_panic(expected = "Right shift is not exact")]
         fn $shr_round_u_ref_fail_1() {
-            (&Integer::from(123u32)).shr_round(1 as $t, RoundingMode::Exact);
+            (&Integer::from(123)).shr_round(1 as $t, RoundingMode::Exact);
         }
 
         #[test]
-        #[should_panic(expected = "Right shift is not exact: 123 >> 100")]
+        #[should_panic(expected = "Right shift is not exact")]
         fn $shr_round_u_ref_fail_2() {
-            (&Integer::from(123u32)).shr_round(100 as $t, RoundingMode::Exact);
+            (&Integer::from(123)).shr_round(100 as $t, RoundingMode::Exact);
         }
 
         #[test]
-        #[should_panic(expected = "Right shift is not exact: 1000000000001 >> 1")]
+        #[should_panic(expected = "Right shift is not exact")]
         fn $shr_round_u_ref_fail_3() {
             (&Integer::from_str("1000000000001").unwrap()).shr_round(1 as $t, RoundingMode::Exact);
         }
 
         #[test]
-        #[should_panic(expected = "Right shift is not exact: 1000000000001 >> 100")]
+        #[should_panic(expected = "Right shift is not exact")]
         fn $shr_round_u_ref_fail_4() {
             (&Integer::from_str("1000000000001").unwrap())
                 .shr_round(100 as $t, RoundingMode::Exact);
@@ -1350,9 +1353,9 @@ macro_rules! tests_and_properties {
                 pairs_of_integer_and_small_unsigned_var_2::<$t>,
                 |&(ref n, u)| {
                     let floor = n.shr_round(u, RoundingMode::Floor);
-                    let ceiling = &floor + 1;
+                    let ceiling = &floor + 1 as Limb;
                     assert_eq!(n.shr_round(u, RoundingMode::Ceiling), ceiling);
-                    if *n >= 0 {
+                    if *n >= 0 as Limb {
                         assert_eq!(n.shr_round(u, RoundingMode::Up), ceiling);
                         assert_eq!(n.shr_round(u, RoundingMode::Down), floor);
                     } else {
@@ -1365,30 +1368,57 @@ macro_rules! tests_and_properties {
             );
 
             test_properties(
-                pairs_of_positive_signed_and_small_unsigned::<i32, $t>,
+                pairs_of_positive_signed_and_small_unsigned::<SignedLimb, $t>,
                 |&(i, u)| {
-                    if let Some(sum) = u.checked_add($t::checked_from(u32::WIDTH - 1).unwrap()) {
-                        assert_eq!(Integer::from(i).shr_round(sum, RoundingMode::Down), 0);
-                        assert_eq!(Integer::from(i).shr_round(sum, RoundingMode::Floor), 0);
-                        assert_eq!(Integer::from(i).shr_round(sum, RoundingMode::Up), 1);
-                        assert_eq!(Integer::from(i).shr_round(sum, RoundingMode::Ceiling), 1);
+                    if let Some(sum) = u.checked_add($t::checked_from(Limb::WIDTH - 1).unwrap()) {
+                        assert_eq!(
+                            Integer::from(i).shr_round(sum, RoundingMode::Down),
+                            0 as Limb
+                        );
+                        assert_eq!(
+                            Integer::from(i).shr_round(sum, RoundingMode::Floor),
+                            0 as Limb
+                        );
+                        assert_eq!(Integer::from(i).shr_round(sum, RoundingMode::Up), 1 as Limb);
+                        assert_eq!(
+                            Integer::from(i).shr_round(sum, RoundingMode::Ceiling),
+                            1 as Limb
+                        );
                         if let Some(sum) = sum.checked_add(1) {
-                            assert_eq!(Integer::from(i).shr_round(sum, RoundingMode::Nearest), 0);
+                            assert_eq!(
+                                Integer::from(i).shr_round(sum, RoundingMode::Nearest),
+                                0 as Limb
+                            );
                         }
                     }
                 },
             );
 
             test_properties(
-                pairs_of_negative_signed_not_min_and_small_unsigned::<i32, $t>,
+                pairs_of_negative_signed_not_min_and_small_unsigned::<SignedLimb, $t>,
                 |&(i, u)| {
-                    if let Some(sum) = u.checked_add($t::checked_from(u32::WIDTH - 1).unwrap()) {
-                        assert_eq!(Integer::from(i).shr_round(sum, RoundingMode::Down), 0);
-                        assert_eq!(Integer::from(i).shr_round(sum, RoundingMode::Floor), -1);
-                        assert_eq!(Integer::from(i).shr_round(sum, RoundingMode::Up), -1);
-                        assert_eq!(Integer::from(i).shr_round(sum, RoundingMode::Ceiling), 0);
+                    if let Some(sum) = u.checked_add($t::checked_from(Limb::WIDTH - 1).unwrap()) {
+                        assert_eq!(
+                            Integer::from(i).shr_round(sum, RoundingMode::Down),
+                            0 as Limb
+                        );
+                        assert_eq!(
+                            Integer::from(i).shr_round(sum, RoundingMode::Floor),
+                            -1 as SignedLimb
+                        );
+                        assert_eq!(
+                            Integer::from(i).shr_round(sum, RoundingMode::Up),
+                            -1 as SignedLimb
+                        );
+                        assert_eq!(
+                            Integer::from(i).shr_round(sum, RoundingMode::Ceiling),
+                            0 as Limb
+                        );
                         if let Some(sum) = sum.checked_add(1) {
-                            assert_eq!(Integer::from(i).shr_round(sum, RoundingMode::Nearest), 0);
+                            assert_eq!(
+                                Integer::from(i).shr_round(sum, RoundingMode::Nearest),
+                                0 as Limb
+                            );
                         }
                     }
                 },
@@ -1399,7 +1429,7 @@ macro_rules! tests_and_properties {
             });
 
             test_properties(pairs_of_unsigned_and_rounding_mode::<$t>, |&(u, rm)| {
-                assert_eq!(Integer::ZERO.shr_round(u, rm), 0);
+                assert_eq!(Integer::ZERO.shr_round(u, rm), 0 as Limb);
             });
 
             test_properties(
@@ -1410,9 +1440,9 @@ macro_rules! tests_and_properties {
             );
 
             test_properties(
-                triples_of_signed_small_unsigned_and_rounding_mode_var_1::<i32, $t>,
+                triples_of_signed_small_unsigned_and_rounding_mode_var_1::<SignedLimb, $t>,
                 |&(n, u, rm)| {
-                    if u < $t::checked_from(i32::WIDTH).unwrap() {
+                    if u < $t::checked_from(SignedLimb::WIDTH).unwrap() {
                         assert_eq!(n.shr_round(u, rm), Integer::from(n).shr_round(u, rm));
                     }
                 },
@@ -1474,22 +1504,22 @@ tests_and_properties!(
 );
 tests_and_properties!(
     u32,
-    test_shr_u32,
-    shr_u32_properties,
-    test_shr_round_u32,
-    shr_round_assign_u32_fail_1,
-    shr_round_assign_u32_fail_2,
-    shr_round_assign_u32_fail_3,
-    shr_round_assign_u32_fail_4,
-    shr_round_u32_fail_1,
-    shr_round_u32_fail_2,
-    shr_round_u32_fail_3,
-    shr_round_u32_fail_4,
-    shr_round_u32_ref_fail_1,
-    shr_round_u32_ref_fail_2,
-    shr_round_u32_ref_fail_3,
-    shr_round_u32_ref_fail_4,
-    shr_round_u32_properties,
+    test_shr_limb,
+    shr_limb_properties,
+    test_shr_round_limb,
+    shr_round_assign_limb_fail_1,
+    shr_round_assign_limb_fail_2,
+    shr_round_assign_limb_fail_3,
+    shr_round_assign_limb_fail_4,
+    shr_round_limb_fail_1,
+    shr_round_limb_fail_2,
+    shr_round_limb_fail_3,
+    shr_round_limb_fail_4,
+    shr_round_limb_ref_fail_1,
+    shr_round_limb_ref_fail_2,
+    shr_round_limb_ref_fail_3,
+    shr_round_limb_ref_fail_4,
+    shr_round_limb_properties,
     u,
     v,
     out,

@@ -1,8 +1,11 @@
 use common::test_properties;
 use malachite_base::misc::CheckedFrom;
+#[cfg(feature = "32_bit_limbs")]
+use malachite_base::misc::Max;
 use malachite_base::num::{BitAccess, BitScan, Zero};
 use malachite_nz::natural::logic::bit_scan::limbs_index_of_next_false_bit;
 use malachite_nz::natural::Natural;
+use malachite_nz::platform::Limb;
 use malachite_test::common::natural_to_rug_integer;
 use malachite_test::inputs::base::{
     pairs_of_unsigned_and_small_unsigned, pairs_of_unsigned_vec_and_small_unsigned, unsigneds,
@@ -11,8 +14,8 @@ use malachite_test::inputs::natural::{naturals, pairs_of_natural_and_small_unsig
 use malachite_test::natural::logic::index_of_next_false_bit::natural_index_of_next_false_bit_alt;
 use rug;
 use std::str::FromStr;
-use std::u32;
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_index_of_next_false_bit() {
     let test = |limbs, u, out| {
@@ -34,8 +37,8 @@ fn test_limbs_index_of_next_false_bit() {
     test(&[0, 0b1011], 34, 34);
     test(&[0, 0b1011], 35, 36);
     test(&[0, 0b1011], 100, 100);
-    test(&[0, 0b1011, 0xffff_fff0, u32::MAX, 1], 64, 64);
-    test(&[0, 0b1011, 0xffff_fff0, u32::MAX, 1], 68, 129);
+    test(&[0, 0b1011, 0xffff_fff0, Limb::MAX, 1], 64, 64);
+    test(&[0, 0b1011, 0xffff_fff0, Limb::MAX, 1], 68, 129);
 }
 
 #[test]
@@ -111,7 +114,7 @@ fn index_of_next_false_bit_properties() {
     });
 
     test_properties(
-        pairs_of_unsigned_and_small_unsigned::<u32, u64>,
+        pairs_of_unsigned_and_small_unsigned::<Limb, u64>,
         |&(u, index)| {
             assert_eq!(
                 Natural::from(u).index_of_next_false_bit(index),

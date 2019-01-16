@@ -5,15 +5,18 @@ use malachite_nz::integer::logic::bit_access::{
 };
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
+#[cfg(feature = "32_bit_limbs")]
+use malachite_nz::platform::Limb;
 use malachite_test::inputs::base::{
-    pairs_of_u32_vec_and_small_u64_var_3, pairs_of_unsigned_vec_and_small_unsigned_var_1,
+    pairs_of_limb_vec_and_small_u64_var_3, pairs_of_unsigned_vec_and_small_unsigned_var_1,
 };
 use malachite_test::inputs::integer::pairs_of_integer_and_small_u64;
 use std::str::FromStr;
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 pub fn test_limbs_slice_clear_bit_neg() {
-    let test = |limbs: &[u32], index: u64, out_limbs: &[u32]| {
+    let test = |limbs: &[Limb], index: u64, out_limbs: &[Limb]| {
         let mut mut_limbs = limbs.to_vec();
         limbs_slice_clear_bit_neg(&mut mut_limbs, index);
         assert_eq!(mut_limbs, out_limbs);
@@ -25,6 +28,7 @@ pub fn test_limbs_slice_clear_bit_neg() {
     test(&[0xffff_fff7], 3, &[0xffff_ffff]);
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic(expected = "Setting bit cannot be done within existing slice")]
 fn limbs_slice_clear_bit_fail_1() {
@@ -32,6 +36,7 @@ fn limbs_slice_clear_bit_fail_1() {
     limbs_slice_clear_bit_neg(&mut mut_limbs, 64);
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic(expected = "Setting bit cannot be done within existing slice")]
 fn limbs_slice_clear_bit_fail_2() {
@@ -39,9 +44,10 @@ fn limbs_slice_clear_bit_fail_2() {
     limbs_slice_clear_bit_neg(&mut mut_limbs, 100);
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 pub fn test_limbs_vec_clear_bit_neg() {
-    let test = |limbs: &[u32], index: u64, out_limbs: &[u32]| {
+    let test = |limbs: &[Limb], index: u64, out_limbs: &[Limb]| {
         let mut mut_limbs = limbs.to_vec();
         limbs_vec_clear_bit_neg(&mut mut_limbs, index);
         assert_eq!(mut_limbs, out_limbs);
@@ -103,7 +109,7 @@ macro_rules! limbs_clear_bit_neg_helper {
 #[test]
 fn limbs_slice_clear_bit_neg_properties() {
     test_properties(
-        pairs_of_u32_vec_and_small_u64_var_3,
+        pairs_of_limb_vec_and_small_u64_var_3,
         limbs_clear_bit_neg_helper!(limbs_slice_clear_bit_neg, limbs, index),
     );
 }

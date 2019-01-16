@@ -1,6 +1,7 @@
 use error::ParseIntegerError;
 use malachite_base::num::{Assign, DivAssignMod, Zero};
 use natural::Natural::{self, Large, Small};
+use platform::Limb;
 use std::fmt::{self, Debug, Display, Formatter};
 use std::str::FromStr;
 
@@ -8,11 +9,11 @@ impl Natural {
     //TODO test
     pub fn assign_str_radix(&mut self, src: &str, radix: i32) -> Result<(), ParseIntegerError> {
         assert!(!src.starts_with('-'));
-        self.assign(0u32);
+        self.assign(Limb::ZERO);
         for c in src.chars() {
-            *self *= radix as u32;
+            *self *= radix as Limb;
             if c >= '0' && c <= '9' {
-                *self += c as u32 - 48;
+                *self += c as Limb - 48;
             }
         }
         Ok(())
@@ -95,7 +96,10 @@ impl fmt::Binary for Natural {
                 write!(f, "{:b}", limbs.last().unwrap())?;
                 let mut i = limbs.len() - 2;
                 loop {
+                    #[cfg(feature = "32_bit_limbs")]
                     let result = write!(f, "{:032b}", limbs[i]);
+                    #[cfg(feature = "64_bit_limbs")]
+                    let result = write!(f, "{:064b}", limbs[i]);
                     if i == 0 {
                         return result;
                     }
@@ -107,14 +111,14 @@ impl fmt::Binary for Natural {
 }
 
 pub mod assign;
-pub mod assign_u32;
-pub mod assign_u64;
+pub mod assign_double_limb;
+pub mod assign_limb;
+pub mod double_limb_from_natural;
 pub mod from_bits;
+pub mod from_double_limb;
+pub mod from_limb;
 pub mod from_limbs;
-pub mod from_u32;
-pub mod from_u64;
 pub mod limb_count;
+pub mod limb_from_natural;
 pub mod to_bits;
 pub mod to_limbs;
-pub mod u32_from_natural;
-pub mod u64_from_natural;

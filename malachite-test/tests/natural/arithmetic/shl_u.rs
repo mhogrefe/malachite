@@ -5,12 +5,14 @@ use malachite_nz::natural::arithmetic::shl_u::{
     limbs_shl, limbs_shl_to_out, limbs_slice_shl_in_place, limbs_vec_shl_in_place,
 };
 use malachite_nz::natural::Natural;
+#[cfg(feature = "32_bit_limbs")]
+use malachite_nz::platform::Limb;
 use malachite_test::common::{
     biguint_to_natural, natural_to_biguint, natural_to_rug_integer, rug_integer_to_natural,
 };
 use malachite_test::inputs::base::{
-    pairs_of_unsigned_vec_and_small_unsigned, pairs_of_unsigned_vec_and_u32_var_1, small_unsigneds,
-    triples_of_unsigned_vec_unsigned_vec_and_u32_var_5,
+    pairs_of_unsigned_vec_and_limb_var_1, pairs_of_unsigned_vec_and_small_unsigned,
+    small_unsigneds, triples_of_unsigned_vec_unsigned_vec_and_limb_var_5,
 };
 use malachite_test::inputs::natural::{
     naturals, pairs_of_natural_and_small_unsigned,
@@ -20,9 +22,10 @@ use num::BigUint;
 use rug;
 use std::str::FromStr;
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_shl_and_limbs_vec_shl_in_place() {
-    let test = |limbs: &[u32], bits: u64, out: &[u32]| {
+    let test = |limbs: &[Limb], bits: u64, out: &[Limb]| {
         assert_eq!(limbs_shl(limbs, bits), out);
 
         let mut limbs = limbs.to_vec();
@@ -40,13 +43,14 @@ fn test_limbs_shl_and_limbs_vec_shl_in_place() {
     test(&[123, 456], 100, &[0, 0, 0, 1_968, 7_296]);
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_shl_to_out() {
-    let test = |limbs_out_before: &[u32],
-                limbs_in: &[u32],
-                bits: u32,
-                carry: u32,
-                limbs_out_after: &[u32]| {
+    let test = |limbs_out_before: &[Limb],
+                limbs_in: &[Limb],
+                bits: Limb,
+                carry: Limb,
+                limbs_out_after: &[Limb]| {
         let mut limbs_out = limbs_out_before.to_vec();
         assert_eq!(limbs_shl_to_out(&mut limbs_out, limbs_in, bits), carry);
         assert_eq!(limbs_out, limbs_out_after);
@@ -70,27 +74,31 @@ fn test_limbs_shl_to_out() {
     );
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic(expected = "assertion failed: out_limbs.len() >= len")]
 fn limbs_shl_to_out_fail_1() {
     limbs_shl_to_out(&mut [10], &[10, 10], 10);
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic(expected = "assertion failed: bits > 0")]
 fn limbs_shl_to_out_fail_2() {
     limbs_shl_to_out(&mut [10, 10, 10], &[123, 456], 0);
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "assertion failed: bits < u32::WIDTH")]
+#[should_panic(expected = "assertion failed: bits < Limb::WIDTH")]
 fn limbs_shl_to_out_fail_3() {
     limbs_shl_to_out(&mut [10, 10, 10], &[123, 456], 100);
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_slice_shl_in_place() {
-    let test = |limbs: &[u32], bits: u32, carry: u32, out: &[u32]| {
+    let test = |limbs: &[Limb], bits: Limb, carry: Limb, out: &[Limb]| {
         let mut limbs = limbs.to_vec();
         assert_eq!(limbs_slice_shl_in_place(&mut limbs, bits), carry);
         assert_eq!(limbs, out);
@@ -102,14 +110,16 @@ fn test_limbs_slice_shl_in_place() {
     test(&[123, 456], 31, 228, &[2_147_483_648, 61]);
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic(expected = "assertion failed: bits > 0")]
 fn limbs_slice_shl_in_place_fail_1() {
     limbs_slice_shl_in_place(&mut [123, 456], 0);
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "assertion failed: bits < u32::WIDTH")]
+#[should_panic(expected = "assertion failed: bits < Limb::WIDTH")]
 fn limbs_slice_shl_in_place_fail_2() {
     limbs_slice_shl_in_place(&mut [123, 456], 100);
 }
@@ -130,7 +140,7 @@ fn limbs_shl_properties() {
 #[test]
 fn limbs_shl_to_out_properties() {
     test_properties(
-        triples_of_unsigned_vec_unsigned_vec_and_u32_var_5,
+        triples_of_unsigned_vec_unsigned_vec_and_limb_var_5,
         |&(ref out_limbs, ref in_limbs, bits)| {
             let mut out_limbs = out_limbs.to_vec();
             let old_out_limbs = out_limbs.clone();
@@ -152,19 +162,22 @@ fn limbs_shl_to_out_properties() {
 
 #[test]
 fn limbs_slice_shl_in_place_properties() {
-    test_properties(pairs_of_unsigned_vec_and_u32_var_1, |&(ref limbs, bits)| {
-        let mut limbs = limbs.to_vec();
-        let old_limbs = limbs.clone();
-        let carry = limbs_slice_shl_in_place(&mut limbs, bits);
-        let n = Natural::from_limbs_asc(&old_limbs) << bits;
-        let mut expected_limbs = n.into_limbs_asc();
-        assert_eq!(carry != 0, expected_limbs.len() == limbs.len() + 1);
-        if carry != 0 {
-            limbs.push(carry);
-        }
-        expected_limbs.resize(limbs.len(), 0);
-        assert_eq!(limbs, expected_limbs);
-    });
+    test_properties(
+        pairs_of_unsigned_vec_and_limb_var_1,
+        |&(ref limbs, bits)| {
+            let mut limbs = limbs.to_vec();
+            let old_limbs = limbs.clone();
+            let carry = limbs_slice_shl_in_place(&mut limbs, bits);
+            let n = Natural::from_limbs_asc(&old_limbs) << bits;
+            let mut expected_limbs = n.into_limbs_asc();
+            assert_eq!(carry != 0, expected_limbs.len() == limbs.len() + 1);
+            if carry != 0 {
+                limbs.push(carry);
+            }
+            expected_limbs.resize(limbs.len(), 0);
+            assert_eq!(limbs, expected_limbs);
+        },
+    );
 }
 
 #[test]
@@ -312,8 +325,8 @@ tests_and_properties!(
 );
 tests_and_properties!(
     u32,
-    test_shl_u32,
-    shl_u32_properties,
+    test_shl_limb,
+    shl_limb_properties,
     u,
     v,
     out,

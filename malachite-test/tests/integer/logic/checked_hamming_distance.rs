@@ -4,7 +4,7 @@ use malachite_nz::integer::logic::checked_hamming_distance::limbs_hamming_distan
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_test::common::integer_to_rug_integer;
-use malachite_test::inputs::base::pairs_of_u32_vec_var_1;
+use malachite_test::inputs::base::pairs_of_limb_vec_var_1;
 use malachite_test::inputs::integer::{
     integers, pairs_of_integers, pairs_of_natural_and_integer, triples_of_natural_integers,
 };
@@ -16,6 +16,7 @@ use malachite_test::integer::logic::checked_hamming_distance::{
 use rug;
 use std::str::FromStr;
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_hamming_distance_neg() {
     let test = |xs, ys, out| {
@@ -27,12 +28,14 @@ fn test_limbs_hamming_distance_neg() {
     test(&[1, 2, 3, 4], &[1, 1, 1], 4);
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic(expected = "index out of bounds: the len is 2 but the index is 2")]
 fn limbs_hamming_distance_neg_fail_1() {
     limbs_hamming_distance_neg(&[0, 0], &[1, 2, 3]);
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic(expected = "index out of bounds: the len is 2 but the index is 2")]
 fn limbs_hamming_distance_neg_fail_2() {
@@ -98,7 +101,7 @@ fn test_checked_hamming_distance() {
 
 #[test]
 fn limbs_hamming_distance_neg_properties() {
-    test_properties(pairs_of_u32_vec_var_1, |&(ref xs, ref ys)| {
+    test_properties(pairs_of_limb_vec_var_1, |&(ref xs, ref ys)| {
         assert_eq!(
             Some(limbs_hamming_distance_neg(xs, ys)),
             (-Natural::from_limbs_asc(xs)).checked_hamming_distance(&-Natural::from_limbs_asc(ys)),

@@ -2,6 +2,7 @@ use common::test_properties;
 use malachite_base::misc::{Max, Walkable};
 use malachite_base::num::{PrimitiveSigned, PrimitiveUnsigned};
 use malachite_test::inputs::base::{signeds_no_max, unsigneds_no_max};
+use rand::Rand;
 
 fn increment_helper_unsigned<T: PrimitiveUnsigned>() {
     let test = |n, out| {
@@ -55,14 +56,14 @@ macro_rules! increment_fail {
 
 increment_fail!(u8, increment_u8_fail);
 increment_fail!(u16, increment_u16_fail);
-increment_fail!(u32, increment_u32_fail);
+increment_fail!(u32, increment_limb_fail);
 increment_fail!(u64, increment_u64_fail);
 increment_fail!(i8, increment_i8_fail);
 increment_fail!(i16, increment_i16_fail);
-increment_fail!(i32, increment_i32_fail);
+increment_fail!(i32, increment_signed_limb_fail);
 increment_fail!(i64, increment_i64_fail);
 
-fn increment_properties_helper_unsigned<T: PrimitiveUnsigned>() {
+fn increment_properties_helper_unsigned<T: PrimitiveUnsigned + Rand>() {
     test_properties(unsigneds_no_max, |&n: &T| {
         let mut mut_n = n;
         mut_n.increment();
@@ -72,7 +73,10 @@ fn increment_properties_helper_unsigned<T: PrimitiveUnsigned>() {
     });
 }
 
-fn increment_properties_helper_signed<T: PrimitiveSigned>() {
+fn increment_properties_helper_signed<T: PrimitiveSigned + Rand>()
+where
+    T::UnsignedOfEqualWidth: Rand,
+{
     test_properties(signeds_no_max, |&n: &T| {
         let mut mut_n = n;
         mut_n.increment();

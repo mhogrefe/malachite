@@ -9,32 +9,32 @@ use malachite_base::num::{ShrRound, ShrRoundAssign};
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_integer_shr_assign_u8);
     register_demo!(registry, demo_integer_shr_assign_u16);
-    register_demo!(registry, demo_integer_shr_assign_u32);
+    register_demo!(registry, demo_integer_shr_assign_limb);
     register_demo!(registry, demo_integer_shr_assign_u64);
 
     register_demo!(registry, demo_integer_shr_u8);
     register_demo!(registry, demo_integer_shr_u16);
-    register_demo!(registry, demo_integer_shr_u32);
+    register_demo!(registry, demo_integer_shr_limb);
     register_demo!(registry, demo_integer_shr_u64);
 
     register_demo!(registry, demo_integer_shr_u8_ref);
     register_demo!(registry, demo_integer_shr_u16_ref);
-    register_demo!(registry, demo_integer_shr_u32_ref);
+    register_demo!(registry, demo_integer_shr_limb_ref);
     register_demo!(registry, demo_integer_shr_u64_ref);
 
     register_demo!(registry, demo_integer_shr_round_assign_u8);
     register_demo!(registry, demo_integer_shr_round_assign_u16);
-    register_demo!(registry, demo_integer_shr_round_assign_u32);
+    register_demo!(registry, demo_integer_shr_round_assign_limb);
     register_demo!(registry, demo_integer_shr_round_assign_u64);
 
     register_demo!(registry, demo_integer_shr_round_u8);
     register_demo!(registry, demo_integer_shr_round_u16);
-    register_demo!(registry, demo_integer_shr_round_u32);
+    register_demo!(registry, demo_integer_shr_round_limb);
     register_demo!(registry, demo_integer_shr_round_u64);
 
     register_demo!(registry, demo_integer_shr_round_u8_ref);
     register_demo!(registry, demo_integer_shr_round_u16_ref);
-    register_demo!(registry, demo_integer_shr_round_u32_ref);
+    register_demo!(registry, demo_integer_shr_round_limb_ref);
     register_demo!(registry, demo_integer_shr_round_u64_ref);
 
     register_bench!(
@@ -50,7 +50,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_bench!(
         registry,
         Large,
-        benchmark_integer_shr_u32_evaluation_strategy
+        benchmark_integer_shr_limb_evaluation_strategy
     );
     register_bench!(
         registry,
@@ -60,7 +60,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
 
     register_bench!(registry, Large, benchmark_integer_shr_round_assign_u8);
     register_bench!(registry, Large, benchmark_integer_shr_round_assign_u16);
-    register_bench!(registry, Large, benchmark_integer_shr_round_assign_u32);
+    register_bench!(registry, Large, benchmark_integer_shr_round_assign_limb);
     register_bench!(registry, Large, benchmark_integer_shr_round_assign_u64);
 
     register_bench!(
@@ -76,7 +76,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_bench!(
         registry,
         Large,
-        benchmark_integer_shr_round_u32_evaluation_strategy
+        benchmark_integer_shr_round_limb_evaluation_strategy
     );
     register_bench!(
         registry,
@@ -87,12 +87,12 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_bench!(
         registry,
         Large,
-        benchmark_integer_shr_assign_u32_library_comparison
+        benchmark_integer_shr_assign_limb_library_comparison
     );
     register_bench!(
         registry,
         Large,
-        benchmark_integer_shr_u32_library_comparison
+        benchmark_integer_shr_limb_library_comparison
     );
 }
 
@@ -268,15 +268,15 @@ demos_and_benches!(
 );
 demos_and_benches!(
     u32,
-    demo_integer_shr_assign_u32,
-    demo_integer_shr_u32,
-    demo_integer_shr_u32_ref,
-    demo_integer_shr_round_assign_u32,
-    demo_integer_shr_round_u32,
-    demo_integer_shr_round_u32_ref,
-    benchmark_integer_shr_u32_evaluation_strategy,
-    benchmark_integer_shr_round_assign_u32,
-    benchmark_integer_shr_round_u32_evaluation_strategy
+    demo_integer_shr_assign_limb,
+    demo_integer_shr_limb,
+    demo_integer_shr_limb_ref,
+    demo_integer_shr_round_assign_limb,
+    demo_integer_shr_round_limb,
+    demo_integer_shr_round_limb_ref,
+    benchmark_integer_shr_limb_evaluation_strategy,
+    benchmark_integer_shr_round_assign_limb,
+    benchmark_integer_shr_round_limb_evaluation_strategy
 );
 demos_and_benches!(
     u64,
@@ -291,7 +291,7 @@ demos_and_benches!(
     benchmark_integer_shr_round_u64_evaluation_strategy
 );
 
-fn benchmark_integer_shr_assign_u32_library_comparison(
+fn benchmark_integer_shr_assign_limb_library_comparison(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,
@@ -312,7 +312,11 @@ fn benchmark_integer_shr_assign_u32_library_comparison(
     );
 }
 
-fn benchmark_integer_shr_u32_library_comparison(gm: GenerationMode, limit: usize, file_name: &str) {
+fn benchmark_integer_shr_limb_library_comparison(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
     m_run_benchmark(
         "Integer >> u32",
         BenchmarkType::LibraryComparison,

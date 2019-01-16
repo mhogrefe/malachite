@@ -69,7 +69,7 @@ fn benchmark_integer_from_sign_and_limbs_asc_evaluation_strategy(
     file_name: &str,
 ) {
     m_run_benchmark(
-        "Integer::from_sign_and_limbs_asc(Ordering, &[u32])",
+        "Integer::from_sign_and_limbs_asc(Ordering, &[Limb])",
         BenchmarkType::EvaluationStrategy,
         pairs_of_ordering_and_vec_of_unsigned_var_1(gm),
         gm.name(),
@@ -79,11 +79,11 @@ fn benchmark_integer_from_sign_and_limbs_asc_evaluation_strategy(
         "limbs.len()",
         &mut [
             (
-                "Integer::from_sign_and_limbs_asc(&[u32])",
+                "Integer::from_sign_and_limbs_asc(&[Limb])",
                 &mut (|(sign, ref limbs)| no_out!(Integer::from_sign_and_limbs_asc(sign, limbs))),
             ),
             (
-                "Integer::from_sign_and_owned_limbs_asc(&[u32])",
+                "Integer::from_sign_and_owned_limbs_asc(&[Limb])",
                 &mut (|(sign, limbs)| no_out!(Integer::from_sign_and_owned_limbs_asc(sign, limbs))),
             ),
         ],
@@ -96,7 +96,7 @@ fn benchmark_integer_from_sign_and_limbs_desc_evaluation_strategy(
     file_name: &str,
 ) {
     m_run_benchmark(
-        "Integer::from_sign_and_limbs_desc(Ordering, &[u32])",
+        "Integer::from_sign_and_limbs_desc(Ordering, &[Limb])",
         BenchmarkType::EvaluationStrategy,
         pairs_of_ordering_and_vec_of_unsigned_var_1(gm),
         gm.name(),
@@ -106,11 +106,11 @@ fn benchmark_integer_from_sign_and_limbs_desc_evaluation_strategy(
         "limbs.len()",
         &mut [
             (
-                "Integer::from_sign_and_limbs_desc(&[u32])",
+                "Integer::from_sign_and_limbs_desc(&[Limb])",
                 &mut (|(sign, ref limbs)| no_out!(Integer::from_sign_and_limbs_desc(sign, limbs))),
             ),
             (
-                "Integer::from_sign_and_owned_limbs_desc(&[u32])",
+                "Integer::from_sign_and_owned_limbs_desc(&[Limb])",
                 &mut (|(sign, limbs)| {
                     no_out!(Integer::from_sign_and_owned_limbs_desc(sign, limbs))
                 }),

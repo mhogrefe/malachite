@@ -1,6 +1,7 @@
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::{signeds_no_max, unsigneds_no_max};
 use malachite_base::num::{PrimitiveSigned, PrimitiveUnsigned};
+use rand::Rand;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_u8_increment);
@@ -21,7 +22,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_bench!(registry, None, benchmark_i64_increment);
 }
 
-fn demo_unsigned_increment<T: PrimitiveUnsigned>(gm: GenerationMode, limit: usize) {
+fn demo_unsigned_increment<T: PrimitiveUnsigned + Rand>(gm: GenerationMode, limit: usize) {
     for mut n in unsigneds_no_max::<T>(gm).take(limit) {
         let n_old = n;
         n.increment();
@@ -29,7 +30,10 @@ fn demo_unsigned_increment<T: PrimitiveUnsigned>(gm: GenerationMode, limit: usiz
     }
 }
 
-fn demo_signed_increment<T: PrimitiveSigned>(gm: GenerationMode, limit: usize) {
+fn demo_signed_increment<T: PrimitiveSigned + Rand>(gm: GenerationMode, limit: usize)
+where
+    T::UnsignedOfEqualWidth: Rand,
+{
     for mut n in signeds_no_max::<T>(gm).take(limit) {
         let n_old = n;
         n.increment();
@@ -37,7 +41,7 @@ fn demo_signed_increment<T: PrimitiveSigned>(gm: GenerationMode, limit: usize) {
     }
 }
 
-fn benchmark_unsigned_increment<T: PrimitiveUnsigned>(
+fn benchmark_unsigned_increment<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,
@@ -55,11 +59,13 @@ fn benchmark_unsigned_increment<T: PrimitiveUnsigned>(
     );
 }
 
-fn benchmark_signed_increment<T: PrimitiveSigned>(
+fn benchmark_signed_increment<T: PrimitiveSigned + Rand>(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,
-) {
+) where
+    T::UnsignedOfEqualWidth: Rand,
+{
     m_run_benchmark(
         &format!("{}.increment()", T::NAME),
         BenchmarkType::Single,

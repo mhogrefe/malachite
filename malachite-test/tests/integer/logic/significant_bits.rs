@@ -1,14 +1,15 @@
 use common::test_properties;
+use malachite_base::misc::Max;
 use malachite_base::num::{Abs, One, PrimitiveInteger, SignificantBits};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
+use malachite_nz::platform::{Limb, SignedLimb};
 use malachite_test::common::{integer_to_bigint, integer_to_rug_integer};
 use malachite_test::inputs::base::signeds;
 use malachite_test::inputs::integer::integers;
 use num::BigInt;
 use rug;
 use std::str::FromStr;
-use std::u32;
 
 #[test]
 fn test_significant_bits() {
@@ -38,15 +39,17 @@ fn significant_bits_properties() {
         );
 
         let x_abs = x.abs();
-        assert_eq!(x_abs <= u32::MAX, significant_bits <= u64::from(u32::WIDTH));
-        if x_abs != 0 {
-            let n = significant_bits as u32;
-            assert!(Natural::ONE << (n - 1) <= x_abs);
-            assert!(x_abs < Natural::ONE << n);
+        assert_eq!(
+            x_abs <= Limb::MAX,
+            significant_bits <= u64::from(Limb::WIDTH)
+        );
+        if x_abs != 0 as Limb {
+            assert!(Natural::ONE << (significant_bits - 1) <= x_abs);
+            assert!(x_abs < Natural::ONE << significant_bits);
         }
     });
 
-    test_properties(signeds::<i32>, |&i| {
+    test_properties(signeds::<SignedLimb>, |&i| {
         assert_eq!(Integer::from(i).significant_bits(), i.significant_bits());
     });
 }

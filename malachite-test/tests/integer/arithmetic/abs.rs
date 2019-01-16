@@ -2,6 +2,7 @@ use common::test_properties;
 use malachite_base::misc::CheckedInto;
 use malachite_base::num::{Abs, AbsAssign, UnsignedAbs};
 use malachite_nz::integer::Integer;
+use malachite_nz::platform::{Limb, SignedDoubleLimb, SignedLimb};
 use malachite_test::common::{
     bigint_to_integer, integer_to_bigint, integer_to_rug_integer, rug_integer_to_integer,
 };
@@ -70,8 +71,8 @@ fn abs_properties() {
         assert!(abs_alt.is_valid());
         assert_eq!(abs_alt, abs);
 
-        assert!(abs >= 0);
-        assert_eq!(abs == *x, *x >= 0);
+        assert!(abs >= 0 as Limb);
+        assert_eq!(abs == *x, *x >= 0 as Limb);
         assert_eq!((&abs).abs(), abs);
 
         let abs_alt = x.clone().unsigned_abs();
@@ -87,7 +88,10 @@ fn abs_properties() {
         assert_eq!(*internal_abs, abs_alt);
     });
 
-    test_properties(signeds::<i32>, |&i| {
-        assert_eq!(Integer::from(i).abs(), Integer::from(i64::from(i).abs()));
+    test_properties(signeds::<SignedLimb>, |&i| {
+        assert_eq!(
+            Integer::from(i).abs(),
+            Integer::from(SignedDoubleLimb::from(i).abs())
+        );
     });
 }

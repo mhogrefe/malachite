@@ -4,17 +4,21 @@ use malachite_nz::natural::arithmetic::mul::{
     _limbs_mul_to_out_basecase, _limbs_mul_to_out_toom_22, _limbs_mul_to_out_toom_22_scratch_size,
     _limbs_mul_to_out_toom_32, _limbs_mul_to_out_toom_32_scratch_size, _limbs_mul_to_out_toom_33,
     _limbs_mul_to_out_toom_33_scratch_size, _limbs_mul_to_out_toom_42,
-    _limbs_mul_to_out_toom_42_scratch_size, _limbs_mul_to_out_toom_43,
-    _limbs_mul_to_out_toom_43_scratch_size, mpn_mul, MUL_TOOM22_THRESHOLD, MUL_TOOM33_THRESHOLD,
+    _limbs_mul_to_out_toom_42_scratch_size, mpn_mul,
+};
+#[cfg(feature = "32_bit_limbs")]
+use malachite_nz::natural::arithmetic::mul::{
+    _limbs_mul_to_out_toom_43, _limbs_mul_to_out_toom_43_scratch_size, MUL_TOOM22_THRESHOLD,
+    MUL_TOOM33_THRESHOLD,
 };
 use malachite_nz::natural::Natural;
+use malachite_nz::platform::{DoubleLimb, Limb};
 use malachite_test::common::{
     biguint_to_natural, natural_to_biguint, natural_to_rug_integer, rug_integer_to_natural,
 };
 use malachite_test::inputs::base::{
     pairs_of_unsigneds, triples_of_unsigned_vec_var_10, triples_of_unsigned_vec_var_11,
     triples_of_unsigned_vec_var_12, triples_of_unsigned_vec_var_13, triples_of_unsigned_vec_var_14,
-    triples_of_unsigned_vec_var_15,
 };
 use malachite_test::inputs::natural::{
     naturals, pairs_of_natural_and_unsigned, pairs_of_naturals, triples_of_naturals,
@@ -23,9 +27,10 @@ use num::BigUint;
 use rug;
 use std::str::FromStr;
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_mul_to_out() {
-    let test = |xs, ys, out_before: &[u32], highest_result_limb, out_after| {
+    let test = |xs, ys, out_before: &[Limb], highest_result_limb, out_after| {
         let mut out = out_before.to_vec();
         _limbs_mul_to_out_basecase(&mut out, xs, ys);
         assert_eq!(out, out_after);
@@ -78,6 +83,7 @@ fn test_limbs_mul_to_out() {
     );
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic(expected = "assertion failed: out_limbs.len() >= xs_len + ys_len")]
 fn limbs_mul_to_out_fail_1() {
@@ -85,6 +91,7 @@ fn limbs_mul_to_out_fail_1() {
     _limbs_mul_to_out_basecase(&mut out, &[6, 7, 8], &[1, 2]);
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic(expected = "assertion failed: xs_len >= ys_len")]
 fn limbs_mul_to_out_fail_2() {
@@ -92,6 +99,7 @@ fn limbs_mul_to_out_fail_2() {
     _limbs_mul_to_out_basecase(&mut out, &[6, 7], &[1, 2, 3]);
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic(expected = "assertion failed: `(left != right)")]
 fn limbs_mul_to_out_fail_3() {
@@ -99,9 +107,10 @@ fn limbs_mul_to_out_fail_3() {
     _limbs_mul_to_out_basecase(&mut out, &[6, 7], &[]);
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_mul_to_out_toom_22() {
-    let test = |xs: Vec<u32>, ys: Vec<u32>, out_before: Vec<u32>, out_after| {
+    let test = |xs: Vec<Limb>, ys: Vec<Limb>, out_before: Vec<Limb>, out_after| {
         let mut scratch = vec![0; _limbs_mul_to_out_toom_22_scratch_size(xs.len())];
         let mut out = out_before.to_vec();
         _limbs_mul_to_out_basecase(&mut out, &xs, &ys);
@@ -214,8 +223,8 @@ fn test_limbs_mul_to_out_toom_22() {
     let mut long_xs = Vec::new();
     let mut long_ys = Vec::new();
     for i in 0..limit {
-        long_xs.push(i as u32 + 1);
-        long_ys.push((limit - i) as u32);
+        long_xs.push(i as Limb + 1);
+        long_ys.push((limit - i) as Limb);
     }
     let long_out_limbs = vec![10; 2 * limit];
     // limbs_mul_to_out_toom_22 in limbs_mul_same_length_to_out_toom_22_recursive
@@ -239,10 +248,10 @@ fn test_limbs_mul_to_out_toom_22() {
     let mut long_xs = Vec::new();
     let mut long_ys = Vec::new();
     for i in 0..limit + 2 {
-        long_xs.push(i as u32 + 1);
+        long_xs.push(i as Limb + 1);
     }
     for i in 0..limit + 1 {
-        long_ys.push((limit + 1 - i) as u32);
+        long_ys.push((limit + 1 - i) as Limb);
     }
     let long_out_limbs = vec![10; 2 * limit + 3];
     // limbs_mul_to_out_toom_22 in limbs_mul_to_out_toom_22_recursive
@@ -268,10 +277,10 @@ fn test_limbs_mul_to_out_toom_22() {
     assert_eq!(MUL_TOOM22_THRESHOLD, 30);
     // xs_len == 76, ys_len == 68 satisfy s > t && t >= MUL_TOOM22_THRESHOLD && 4 * s >= 5 * t
     for i in 0..76 {
-        long_xs.push(i as u32 + 1);
+        long_xs.push(i as Limb + 1);
     }
     for i in 0..68 {
-        long_ys.push((68 - i) as u32);
+        long_ys.push((68 - i) as Limb);
     }
     let long_out_limbs = vec![10; 144];
     // limbs_mul_to_out_toom_32 in limbs_mul_to_out_toom_22_recursive
@@ -296,6 +305,7 @@ fn test_limbs_mul_to_out_toom_22() {
     );
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic(expected = "assertion failed: s > 0 && (s == n || s == n - 1)")]
 fn limbs_mul_to_out_toom_22_fail_1() {
@@ -304,6 +314,7 @@ fn limbs_mul_to_out_toom_22_fail_1() {
     _limbs_mul_to_out_toom_22(&mut out, &[6], &[1], &mut scratch);
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic(expected = "assertion failed: xs_len >= ys_len")]
 fn limbs_mul_to_out_toom_22_fail_2() {
@@ -312,6 +323,7 @@ fn limbs_mul_to_out_toom_22_fail_2() {
     _limbs_mul_to_out_toom_22(&mut out, &[6, 7, 8], &[1, 2, 3, 4], &mut scratch);
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic(expected = "assertion failed: 0 < t && t <= s")]
 fn limbs_mul_to_out_toom_22_fail_3() {
@@ -320,6 +332,7 @@ fn limbs_mul_to_out_toom_22_fail_3() {
     _limbs_mul_to_out_toom_22(&mut out, &[6, 7, 8, 9], &[1, 2], &mut scratch);
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic(expected = "assertion failed: 0 < t && t <= s")]
 fn limbs_mul_to_out_toom_22_fail_4() {
@@ -328,6 +341,7 @@ fn limbs_mul_to_out_toom_22_fail_4() {
     _limbs_mul_to_out_toom_22(&mut out, &[6, 7, 8], &[1, 2], &mut scratch);
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic(expected = "assertion failed: mid <= len")]
 fn limbs_mul_to_out_toom_22_fail_5() {
@@ -336,6 +350,7 @@ fn limbs_mul_to_out_toom_22_fail_5() {
     _limbs_mul_to_out_toom_22(&mut out, &[6, 7, 8], &[1, 2, 3], &mut scratch);
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic(expected = "assertion failed: ys_len >= n")]
 fn limbs_mul_to_out_toom_22_fail_6() {
@@ -344,6 +359,7 @@ fn limbs_mul_to_out_toom_22_fail_6() {
     _limbs_mul_to_out_toom_22(&mut out, &[6, 7, 8], &[], &mut scratch);
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic(expected = "assertion failed: mid <= len")]
 fn limbs_mul_to_out_toom_22_fail_7() {
@@ -352,9 +368,10 @@ fn limbs_mul_to_out_toom_22_fail_7() {
     _limbs_mul_to_out_toom_22(&mut out, &[6, 7, 8], &[1, 2, 3], &mut scratch);
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_mul_to_out_toom_32() {
-    let test = |xs: Vec<u32>, ys: Vec<u32>, out_before: Vec<u32>, out_after| {
+    let test = |xs: Vec<Limb>, ys: Vec<Limb>, out_before: Vec<Limb>, out_after| {
         let mut out = out_before.to_vec();
         _limbs_mul_to_out_basecase(&mut out, &xs, &ys);
         assert_eq!(out, out_after);
@@ -982,6 +999,7 @@ fn test_limbs_mul_to_out_toom_32() {
     );
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic(expected = "assertion failed: ys_len + 2 <= xs_len && xs_len + 6 <= 3 * ys_len")]
 fn limbs_mul_to_out_toom_32_fail_1() {
@@ -990,6 +1008,7 @@ fn limbs_mul_to_out_toom_32_fail_1() {
     _limbs_mul_to_out_toom_32(&mut out, &[6], &[1], &mut scratch);
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic(expected = "assertion failed: xs_len >= ys_len")]
 fn limbs_mul_to_out_toom_32_fail_2() {
@@ -998,6 +1017,7 @@ fn limbs_mul_to_out_toom_32_fail_2() {
     _limbs_mul_to_out_toom_32(&mut out, &[6, 7, 8], &[1, 2, 3, 4], &mut scratch);
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic(expected = "assertion failed: ys_len + 2 <= xs_len && xs_len + 6 <= 3 * ys_len")]
 fn limbs_mul_to_out_toom_32_fail_3() {
@@ -1006,6 +1026,7 @@ fn limbs_mul_to_out_toom_32_fail_3() {
     _limbs_mul_to_out_toom_32(&mut out, &[6, 7, 8, 9, 10], &[1, 2, 3, 4], &mut scratch);
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic(expected = "assertion failed: ys_len + 2 <= xs_len && xs_len + 6 <= 3 * ys_len")]
 fn limbs_mul_to_out_toom_32_fail_4() {
@@ -1014,6 +1035,7 @@ fn limbs_mul_to_out_toom_32_fail_4() {
     _limbs_mul_to_out_toom_32(&mut out, &[6, 7, 8, 9, 10, 11], &[1, 2, 3], &mut scratch);
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic(expected = "assertion failed: ys_len + 2 <= xs_len && xs_len + 6 <= 3 * ys_len")]
 fn limbs_mul_to_out_toom_32_fail_5() {
@@ -1022,6 +1044,7 @@ fn limbs_mul_to_out_toom_32_fail_5() {
     _limbs_mul_to_out_toom_32(&mut out, &[6, 7, 8], &[], &mut scratch);
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic(expected = "assertion failed: out_limbs.len() >= xs_len + ys_len")]
 fn limbs_mul_to_out_toom_32_fail_6() {
@@ -1030,9 +1053,10 @@ fn limbs_mul_to_out_toom_32_fail_6() {
     _limbs_mul_to_out_toom_32(&mut out, &[6, 7, 8, 9, 10, 11], &[1, 2, 3, 4], &mut scratch);
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_mul_to_out_toom_33() {
-    let test = |xs: Vec<u32>, ys: Vec<u32>, out_before: Vec<u32>, out_after| {
+    let test = |xs: Vec<Limb>, ys: Vec<Limb>, out_before: Vec<Limb>, out_after| {
         let mut out = out_before.to_vec();
         _limbs_mul_to_out_basecase(&mut out, &xs, &ys);
         assert_eq!(out, out_after);
@@ -1104,8 +1128,8 @@ fn test_limbs_mul_to_out_toom_33() {
     let mut long_xs = Vec::new();
     let mut long_ys = Vec::new();
     for i in 0..limit {
-        long_xs.push(i as u32 + 1);
-        long_ys.push((limit - i) as u32);
+        long_xs.push(i as Limb + 1);
+        long_ys.push((limit - i) as Limb);
     }
     let long_out_limbs = vec![10; 2 * limit];
     // _limbs_mul_to_out_toom_22 in _limbs_mul_to_out_toom_33_recursive
@@ -1135,8 +1159,8 @@ fn test_limbs_mul_to_out_toom_33() {
     let mut long_xs = Vec::new();
     let mut long_ys = Vec::new();
     for i in 0..limit {
-        long_xs.push(i as u32 + 1);
-        long_ys.push((limit - i) as u32);
+        long_xs.push(i as Limb + 1);
+        long_ys.push((limit - i) as Limb);
     }
     let long_out_limbs = vec![10; 2 * limit];
     // _limbs_mul_to_out_toom_33 in _limbs_mul_to_out_toom_33_recursive
@@ -1211,6 +1235,7 @@ fn test_limbs_mul_to_out_toom_33() {
     );
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic(expected = "index 1 out of range for slice of length 0")]
 fn limbs_mul_to_out_toom_33_fail_1() {
@@ -1219,6 +1244,7 @@ fn limbs_mul_to_out_toom_33_fail_1() {
     _limbs_mul_to_out_toom_33(&mut out, &[6], &[1], &mut scratch);
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic(expected = "assertion failed: xs_len >= ys_len")]
 fn limbs_mul_to_out_toom_33_fail_2() {
@@ -1232,6 +1258,7 @@ fn limbs_mul_to_out_toom_33_fail_2() {
     );
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic(expected = "assertion failed: 0 < t && t <= n")]
 fn limbs_mul_to_out_toom_33_fail_3() {
@@ -1240,6 +1267,7 @@ fn limbs_mul_to_out_toom_33_fail_3() {
     _limbs_mul_to_out_toom_33(&mut out, &[6, 7, 8, 9, 10], &[1, 2, 3, 4], &mut scratch);
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic(expected = "index 2 out of range for slice of length 0")]
 fn limbs_mul_to_out_toom_33_fail_4() {
@@ -1248,6 +1276,7 @@ fn limbs_mul_to_out_toom_33_fail_4() {
     _limbs_mul_to_out_toom_33(&mut out, &[6, 7, 8, 9, 10], &[], &mut scratch);
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic(expected = "assertion failed: out_limbs.len() >= xs_len + ys_len")]
 fn limbs_mul_to_out_toom_33_fail_5() {
@@ -1261,9 +1290,10 @@ fn limbs_mul_to_out_toom_33_fail_5() {
     );
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_mul_to_out_toom_42() {
-    let test = |xs: Vec<u32>, ys: Vec<u32>, out_before: Vec<u32>, out_after| {
+    let test = |xs: Vec<Limb>, ys: Vec<Limb>, out_before: Vec<Limb>, out_after| {
         let mut out = out_before.to_vec();
         _limbs_mul_to_out_basecase(&mut out, &xs, &ys);
         assert_eq!(out, out_after);
@@ -3049,6 +3079,7 @@ fn test_limbs_mul_to_out_toom_42() {
     );
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic(expected = "index 1 out of range for slice of length 0")]
 fn limbs_mul_to_out_toom_42_fail_1() {
@@ -3057,6 +3088,7 @@ fn limbs_mul_to_out_toom_42_fail_1() {
     _limbs_mul_to_out_toom_42(&mut out, &[6], &[1], &mut scratch);
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic(expected = "index 3 out of range for slice of length 2")]
 fn limbs_mul_to_out_toom_42_fail_2() {
@@ -3070,6 +3102,7 @@ fn limbs_mul_to_out_toom_42_fail_2() {
     );
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic(expected = "assertion failed: 0 < s && s <= n")]
 fn limbs_mul_to_out_toom_42_fail_3() {
@@ -3078,6 +3111,7 @@ fn limbs_mul_to_out_toom_42_fail_3() {
     _limbs_mul_to_out_toom_42(&mut out, &[6, 7, 8], &[1, 2], &mut scratch);
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic(expected = "index 2 out of range for slice of length 1")]
 fn limbs_mul_to_out_toom_42_fail_4() {
@@ -3086,6 +3120,7 @@ fn limbs_mul_to_out_toom_42_fail_4() {
     _limbs_mul_to_out_toom_42(&mut out, &[6, 7, 8, 9, 10], &[], &mut scratch);
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic(expected = "assertion failed: out_limbs.len() >= xs_len + ys_len")]
 fn limbs_mul_to_out_toom_42_fail_5() {
@@ -3094,9 +3129,10 @@ fn limbs_mul_to_out_toom_42_fail_5() {
     _limbs_mul_to_out_toom_42(&mut out, &[6, 7, 8, 9], &[1, 2], &mut scratch);
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_mul_to_out_toom_43() {
-    let test = |xs: Vec<u32>, ys: Vec<u32>, out_before: Vec<u32>, out_after| {
+    let test = |xs: Vec<Limb>, ys: Vec<Limb>, out_before: Vec<Limb>, out_after| {
         let mut out = out_before.to_vec();
         _limbs_mul_to_out_basecase(&mut out, &xs, &ys);
         assert_eq!(out, out_after);
@@ -3480,7 +3516,7 @@ fn test_mul() {
     );
 }
 
-fn limbs_mul_basecase_helper(out_limbs: &Vec<u32>, xs: &Vec<u32>, ys: &Vec<u32>) -> Vec<u32> {
+fn limbs_mul_basecase_helper(out_limbs: &Vec<Limb>, xs: &Vec<Limb>, ys: &Vec<Limb>) -> Vec<Limb> {
     let mut out_limbs = out_limbs.to_vec();
     let old_out_limbs = out_limbs.clone();
     _limbs_mul_to_out_basecase(&mut out_limbs, xs, ys);
@@ -3640,7 +3676,7 @@ fn mul_properties() {
     test_properties_custom_scale(
         2_048,
         pairs_of_natural_and_unsigned,
-        |&(ref x, y): &(Natural, u32)| {
+        |&(ref x, y): &(Natural, Limb)| {
             let product = x * Natural::from(y);
             assert_eq!(x * y, product);
             assert_eq!(y * x, product);
@@ -3649,7 +3685,7 @@ fn mul_properties() {
 
     test_properties_custom_scale(
         2_048,
-        pairs_of_natural_and_unsigned::<u32>,
+        pairs_of_natural_and_unsigned::<Limb>,
         |&(ref x, y)| {
             let product = x * Natural::from(y);
             assert_eq!(x * y, product);
@@ -3657,9 +3693,9 @@ fn mul_properties() {
         },
     );
 
-    test_properties_custom_scale(2_048, pairs_of_unsigneds::<u32>, |&(x, y)| {
+    test_properties_custom_scale(2_048, pairs_of_unsigneds::<Limb>, |&(x, y)| {
         assert_eq!(
-            Natural::from(u64::from(x) * u64::from(y)),
+            Natural::from(DoubleLimb::from(x) * DoubleLimb::from(y)),
             Natural::from(x) * Natural::from(y)
         );
     });

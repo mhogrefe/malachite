@@ -1,6 +1,7 @@
 use common::test_properties;
 use malachite_base::num::Zero;
 use malachite_nz::integer::Integer;
+use malachite_nz::platform::{Limb, SignedDoubleLimb, SignedLimb};
 use malachite_test::common::{
     bigint_to_integer, integer_to_bigint, integer_to_rug_integer, rug_integer_to_integer,
 };
@@ -15,37 +16,37 @@ use std::str::FromStr;
 
 #[test]
 fn test_sub() {
-    let test = |u, v, out| {
-        let mut n = Integer::from_str(u).unwrap();
-        n -= Integer::from_str(v).unwrap();
+    let test = |i, j, out| {
+        let mut n = Integer::from_str(i).unwrap();
+        n -= Integer::from_str(j).unwrap();
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let mut n = Integer::from_str(u).unwrap();
-        n -= &Integer::from_str(v).unwrap();
+        let mut n = Integer::from_str(i).unwrap();
+        n -= &Integer::from_str(j).unwrap();
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = Integer::from_str(u).unwrap() - Integer::from_str(v).unwrap();
+        let n = Integer::from_str(i).unwrap() - Integer::from_str(j).unwrap();
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = &Integer::from_str(u).unwrap() - Integer::from_str(v).unwrap();
+        let n = &Integer::from_str(i).unwrap() - Integer::from_str(j).unwrap();
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = Integer::from_str(u).unwrap() - &Integer::from_str(v).unwrap();
+        let n = Integer::from_str(i).unwrap() - &Integer::from_str(j).unwrap();
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = &Integer::from_str(u).unwrap() - &Integer::from_str(v).unwrap();
+        let n = &Integer::from_str(i).unwrap() - &Integer::from_str(j).unwrap();
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = BigInt::from_str(u).unwrap() - BigInt::from_str(v).unwrap();
+        let n = BigInt::from_str(i).unwrap() - BigInt::from_str(j).unwrap();
         assert_eq!(n.to_string(), out);
 
-        let n = rug::Integer::from_str(u).unwrap() - rug::Integer::from_str(v).unwrap();
+        let n = rug::Integer::from_str(i).unwrap() - rug::Integer::from_str(j).unwrap();
         assert_eq!(n.to_string(), out);
     };
     test("0", "0", "0");
@@ -106,7 +107,7 @@ fn sub_properties() {
 
     test_properties(
         pairs_of_integer_and_signed,
-        |&(ref x, y): &(Integer, i32)| {
+        |&(ref x, y): &(Integer, SignedLimb)| {
             let difference = x - Integer::from(y);
             assert_eq!(x - y, difference);
             assert_eq!(y - x, -difference);
@@ -118,15 +119,15 @@ fn sub_properties() {
         assert_eq!(x - Integer::ZERO, *x);
         assert_eq!(Integer::ZERO - x, -x);
         assert_eq!(x - -x, x << 1);
-        assert_eq!(x - x, 0)
+        assert_eq!(x - x, 0 as Limb)
     });
 
-    test_properties(pairs_of_integer_and_unsigned::<u32>, |&(ref x, y)| {
+    test_properties(pairs_of_integer_and_unsigned::<Limb>, |&(ref x, y)| {
         assert_eq!(x - y, x - Integer::from(y));
         assert_eq!(y - x, Integer::from(y) - x);
     });
 
-    test_properties(pairs_of_integer_and_signed::<i32>, |&(ref x, y)| {
+    test_properties(pairs_of_integer_and_signed::<SignedLimb>, |&(ref x, y)| {
         assert_eq!(x - y, x - Integer::from(y));
         assert_eq!(y - x, Integer::from(y) - x);
     });
@@ -135,9 +136,9 @@ fn sub_properties() {
         assert_eq!(x + y, Integer::from(x) + Integer::from(y));
     });
 
-    test_properties(pairs_of_signeds::<i32>, |&(x, y)| {
+    test_properties(pairs_of_signeds::<SignedLimb>, |&(x, y)| {
         assert_eq!(
-            Integer::from(i64::from(x) - i64::from(y)),
+            Integer::from(SignedDoubleLimb::from(x) - SignedDoubleLimb::from(y)),
             Integer::from(x) - Integer::from(y)
         );
     });

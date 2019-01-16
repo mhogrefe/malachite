@@ -5,6 +5,7 @@ use malachite_nz::natural::logic::or::{
     limbs_or_same_length_in_place_left, limbs_or_same_length_to_out, limbs_or_to_out,
 };
 use malachite_nz::natural::Natural;
+use malachite_nz::platform::Limb;
 use malachite_test::common::{
     biguint_to_natural, natural_to_biguint, natural_to_rug_integer, rug_integer_to_natural,
 };
@@ -21,6 +22,7 @@ use rug;
 use std::cmp::max;
 use std::str::FromStr;
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_or_same_length_and_limbs_or_same_length_in_place_left() {
     let test = |xs_before, ys, out| {
@@ -37,12 +39,14 @@ fn test_limbs_or_same_length_and_limbs_or_same_length_in_place_left() {
     test(&[100, 101, 102], &[102, 101, 100], vec![102, 101, 102]);
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic(expected = "assertion failed: `(left == right)`")]
 fn limbs_or_same_length_fail_1() {
     limbs_or_same_length(&[6, 7], &[1, 2, 3]);
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic(expected = "assertion failed: `(left == right)`")]
 fn limbs_or_same_length_in_place_left_fail() {
@@ -50,6 +54,7 @@ fn limbs_or_same_length_in_place_left_fail() {
     limbs_or_same_length_in_place_left(&mut out, &[1, 2, 3]);
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_or() {
     let test = |xs, ys, out| {
@@ -63,9 +68,10 @@ fn test_limbs_or() {
     test(&[100, 101, 102], &[102, 101, 100], vec![102, 101, 102]);
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_or_same_length_to_out() {
-    let test = |xs, ys, out_before: &[u32], out_after| {
+    let test = |xs, ys, out_before: &[Limb], out_after| {
         let mut out = out_before.to_vec();
         limbs_or_same_length_to_out(&mut out, xs, ys);
         assert_eq!(out, out_after);
@@ -82,6 +88,7 @@ fn test_limbs_or_same_length_to_out() {
     );
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic(expected = "assertion failed: `(left == right)`")]
 fn limbs_or_same_length_to_out_fail_1() {
@@ -89,6 +96,7 @@ fn limbs_or_same_length_to_out_fail_1() {
     limbs_or_same_length_to_out(&mut out, &[6, 7], &[1, 2, 3]);
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic(expected = "assertion failed: out_limbs.len() >= len")]
 fn limbs_or_same_length_to_out_fail_2() {
@@ -96,9 +104,10 @@ fn limbs_or_same_length_to_out_fail_2() {
     limbs_or_same_length_to_out(&mut out, &[6, 7], &[1, 2]);
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_or_to_out() {
-    let test = |xs, ys, out_before: &[u32], out_after| {
+    let test = |xs, ys, out_before: &[Limb], out_after| {
         let mut out = out_before.to_vec();
         limbs_or_to_out(&mut out, xs, ys);
         assert_eq!(out, out_after);
@@ -115,6 +124,7 @@ fn test_limbs_or_to_out() {
     );
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic(expected = "assertion failed: out_limbs.len() >= ys_len")]
 fn limbs_or_to_out_fail() {
@@ -122,9 +132,10 @@ fn limbs_or_to_out_fail() {
     limbs_or_to_out(&mut out, &[6, 7], &[1, 2, 3]);
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_or_in_place_left() {
-    let test = |xs_before: &[u32], ys, xs_after| {
+    let test = |xs_before: &[Limb], ys, xs_after| {
         let mut xs = xs_before.to_vec();
         limbs_or_in_place_left(&mut xs, ys);
         assert_eq!(xs, xs_after);
@@ -139,9 +150,10 @@ fn test_limbs_or_in_place_left() {
     test(&[100, 101, 102], &[102, 101, 100], vec![102, 101, 102]);
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_or_in_place_either() {
-    let test = |xs_before: &[u32], ys_before: &[u32], right, xs_after, ys_after| {
+    let test = |xs_before: &[Limb], ys_before: &[Limb], right, xs_after, ys_after| {
         let mut xs = xs_before.to_vec();
         let mut ys = ys_before.to_vec();
         assert_eq!(limbs_or_in_place_either(&mut xs, &mut ys), right);
@@ -226,7 +238,7 @@ fn test_or() {
     test("12345678987654321", "314159265358979", "12347506587071667");
 }
 
-fn limbs_or_helper(f: &mut FnMut(&[u32], &[u32]) -> Vec<u32>, xs: &Vec<u32>, ys: &Vec<u32>) {
+fn limbs_or_helper(f: &mut FnMut(&[Limb], &[Limb]) -> Vec<Limb>, xs: &Vec<Limb>, ys: &Vec<Limb>) {
     assert_eq!(
         Natural::from_owned_limbs_asc(f(xs, ys)),
         Natural::from_limbs_asc(xs) | Natural::from_limbs_asc(ys)
@@ -380,7 +392,7 @@ fn or_properties() {
 
     test_properties(
         pairs_of_natural_and_unsigned,
-        |&(ref x, y): &(Natural, u32)| {
+        |&(ref x, y): &(Natural, Limb)| {
             let result = x | Natural::from(y);
             assert_eq!(x | y, result);
             assert_eq!(y | x, result);
@@ -401,7 +413,7 @@ fn or_properties() {
         assert_eq!((x | y) & z, (x & z) | (y & z));
     });
 
-    test_properties(pairs_of_unsigneds::<u32>, |&(x, y)| {
+    test_properties(pairs_of_unsigneds::<Limb>, |&(x, y)| {
         assert_eq!(Natural::from(x) | Natural::from(y), x | y);
     });
 }

@@ -1,6 +1,7 @@
 use common::test_properties;
 use malachite_base::num::{One, Zero};
 use malachite_nz::integer::Integer;
+use malachite_nz::platform::{Limb, SignedDoubleLimb, SignedLimb};
 use malachite_test::common::{
     bigint_to_integer, integer_to_bigint, integer_to_rug_integer, rug_integer_to_integer,
 };
@@ -146,8 +147,8 @@ fn mul_properties() {
 
     #[allow(unknown_lints, erasing_op)]
     test_properties(integers, |x| {
-        assert_eq!(x * Integer::ZERO, 0);
-        assert_eq!(Integer::ZERO * 0, 0);
+        assert_eq!(x * Integer::ZERO, 0 as Limb);
+        assert_eq!(Integer::ZERO * x, 0 as Limb);
         assert_eq!(x * Integer::ONE, *x);
         assert_eq!(Integer::ONE * x, *x);
         //TODO assert_eq!(x * x, x.pow(2));
@@ -159,13 +160,13 @@ fn mul_properties() {
         assert_eq!((x + y) * z, x * z + y * z);
     });
 
-    test_properties(pairs_of_integer_and_unsigned::<u32>, |&(ref x, y)| {
+    test_properties(pairs_of_integer_and_unsigned::<Limb>, |&(ref x, y)| {
         let product = x * Integer::from(y);
         assert_eq!(x * y, product);
         assert_eq!(y * x, product);
     });
 
-    test_properties(pairs_of_integer_and_signed::<i32>, |&(ref x, y)| {
+    test_properties(pairs_of_integer_and_signed::<SignedLimb>, |&(ref x, y)| {
         let product = x * Integer::from(y);
         assert_eq!(x * y, product);
         assert_eq!(y * x, product);
@@ -175,9 +176,9 @@ fn mul_properties() {
         assert_eq!(x * y, Integer::from(x) * Integer::from(y));
     });
 
-    test_properties(pairs_of_signeds::<i32>, |&(x, y)| {
+    test_properties(pairs_of_signeds::<SignedLimb>, |&(x, y)| {
         assert_eq!(
-            Integer::from(i64::from(x) * i64::from(y)),
+            Integer::from(SignedDoubleLimb::from(x) * SignedDoubleLimb::from(y)),
             Integer::from(x) * Integer::from(y)
         );
     });

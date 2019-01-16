@@ -4,6 +4,7 @@ use malachite_nz::natural::conversion::from_bits::{
     limbs_asc_from_bits_asc, limbs_asc_from_bits_desc,
 };
 use malachite_nz::natural::Natural;
+use malachite_nz::platform::Limb;
 use malachite_test::inputs::base::vecs_of_bool;
 
 #[test]
@@ -27,24 +28,48 @@ fn test_limbs_asc_from_bits_asc() {
         ],
         vec![105],
     );
-    test(
-        &[
-            false, false, false, false, false, false, false, false, false, false, false, false,
-            true, false, false, false, true, false, true, false, false, true, false, true, false,
-            false, true, false, true, false, true, true, false, false, false, true, false, true,
-            true, true,
-        ],
-        vec![3_567_587_328, 232],
-    );
-    test(
-        &[
-            false, false, false, false, false, false, false, false, false, false, false, false,
-            true, false, false, false, true, false, true, false, false, true, false, true, false,
-            false, true, false, true, false, true, true, false, false, false, true, false, true,
-            true, true, false,
-        ],
-        vec![3_567_587_328, 232],
-    );
+    #[cfg(feature = "32_bit_limbs")]
+    {
+        test(
+            &[
+                false, false, false, false, false, false, false, false, false, false, false, false,
+                true, false, false, false, true, false, true, false, false, true, false, true,
+                false, false, true, false, true, false, true, true, false, false, false, true,
+                false, true, true, true,
+            ],
+            vec![3_567_587_328, 232],
+        );
+        test(
+            &[
+                false, false, false, false, false, false, false, false, false, false, false, false,
+                true, false, false, false, true, false, true, false, false, true, false, true,
+                false, false, true, false, true, false, true, true, false, false, false, true,
+                false, true, true, true, false,
+            ],
+            vec![3_567_587_328, 232],
+        );
+    }
+    #[cfg(feature = "64_bit_limbs")]
+    {
+        test(
+            &[
+                false, false, false, false, false, false, false, false, false, false, false, false,
+                true, false, false, false, true, false, true, false, false, true, false, true,
+                false, false, true, false, true, false, true, true, false, false, false, true,
+                false, true, true, true,
+            ],
+            vec![1000000000000],
+        );
+        test(
+            &[
+                false, false, false, false, false, false, false, false, false, false, false, false,
+                true, false, false, false, true, false, true, false, false, true, false, true,
+                false, false, true, false, true, false, true, true, false, false, false, true,
+                false, true, true, true, false,
+            ],
+            vec![1000000000000],
+        );
+    }
 }
 
 #[test]
@@ -68,24 +93,48 @@ fn test_limbs_asc_from_bits_desc() {
         ],
         vec![105],
     );
-    test(
-        &[
-            true, true, true, false, true, false, false, false, true, true, false, true, false,
-            true, false, false, true, false, true, false, false, true, false, true, false, false,
-            false, true, false, false, false, false, false, false, false, false, false, false,
-            false, false,
-        ],
-        vec![3_567_587_328, 232],
-    );
-    test(
-        &[
-            false, true, true, true, false, true, false, false, false, true, true, false, true,
-            false, true, false, false, true, false, true, false, false, true, false, true, false,
-            false, false, true, false, false, false, false, false, false, false, false, false,
-            false, false, false,
-        ],
-        vec![3_567_587_328, 232],
-    );
+    #[cfg(feature = "32_bit_limbs")]
+    {
+        test(
+            &[
+                true, true, true, false, true, false, false, false, true, true, false, true, false,
+                true, false, false, true, false, true, false, false, true, false, true, false,
+                false, false, true, false, false, false, false, false, false, false, false, false,
+                false, false, false,
+            ],
+            vec![3_567_587_328, 232],
+        );
+        test(
+            &[
+                false, true, true, true, false, true, false, false, false, true, true, false, true,
+                false, true, false, false, true, false, true, false, false, true, false, true,
+                false, false, false, true, false, false, false, false, false, false, false, false,
+                false, false, false, false,
+            ],
+            vec![3_567_587_328, 232],
+        );
+    }
+    #[cfg(feature = "64_bit_limbs")]
+    {
+        test(
+            &[
+                true, true, true, false, true, false, false, false, true, true, false, true, false,
+                true, false, false, true, false, true, false, false, true, false, true, false,
+                false, false, true, false, false, false, false, false, false, false, false, false,
+                false, false, false,
+            ],
+            vec![1000000000000],
+        );
+        test(
+            &[
+                false, true, true, true, false, true, false, false, false, true, true, false, true,
+                false, true, false, false, true, false, true, false, false, true, false, true,
+                false, false, false, true, false, false, false, false, false, false, false, false,
+                false, false, false, false,
+            ],
+            vec![1000000000000],
+        );
+    }
 }
 
 #[test]
@@ -176,8 +225,8 @@ fn limbs_asc_from_bits_asc_properties() {
             Natural::from_limbs_asc(&limbs),
             Natural::from_bits_asc(bits)
         );
-        let mut limb_count = bits.len() >> u32::LOG_WIDTH;
-        if limb_count << u32::LOG_WIDTH != bits.len() {
+        let mut limb_count = bits.len() >> Limb::LOG_WIDTH;
+        if limb_count << Limb::LOG_WIDTH != bits.len() {
             limb_count += 1;
         }
         assert_eq!(limbs.len(), limb_count);
@@ -192,8 +241,8 @@ fn limbs_asc_from_bits_desc_properties() {
             Natural::from_limbs_asc(&limbs),
             Natural::from_bits_desc(bits)
         );
-        let mut limb_count = bits.len() >> u32::LOG_WIDTH;
-        if limb_count << u32::LOG_WIDTH != bits.len() {
+        let mut limb_count = bits.len() >> Limb::LOG_WIDTH;
+        if limb_count << Limb::LOG_WIDTH != bits.len() {
             limb_count += 1;
         }
         assert_eq!(limbs.len(), limb_count);

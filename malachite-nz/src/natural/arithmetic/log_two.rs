@@ -2,8 +2,9 @@ use malachite_base::num::{CeilingLogTwo, FloorLogTwo};
 use natural::arithmetic::is_power_of_two::limbs_is_power_of_two;
 use natural::logic::significant_bits::limbs_significant_bits;
 use natural::Natural::{self, Large, Small};
+use platform::Limb;
 
-/// Interpreting a slice of `u32`s as the limbs of a `Natural` in ascending order, returns the floor
+/// Interpreting a slice of `Limb`s as the limbs of a `Natural` in ascending order, returns the floor
 /// of the base-2 logarithm of the `Natural`.
 ///
 /// This function assumes that `limbs` is nonempty and the last (most significant) limb is nonzero.
@@ -22,11 +23,11 @@ use natural::Natural::{self, Large, Small};
 /// assert_eq!(limbs_floor_log_two(&[0b11]), 1);
 /// assert_eq!(limbs_floor_log_two(&[0, 0b1101]), 35);
 /// ```
-pub fn limbs_floor_log_two(limbs: &[u32]) -> u64 {
+pub fn limbs_floor_log_two(limbs: &[Limb]) -> u64 {
     limbs_significant_bits(limbs) - 1
 }
 
-/// Interpreting a slice of `u32`s as the limbs of a `Natural` in ascending order, returns the
+/// Interpreting a slice of `Limb`s as the limbs of a `Natural` in ascending order, returns the
 /// ceiling of the base-2 logarithm of the `Natural`.
 ///
 /// This function assumes that `limbs` is nonempty and the last (most significant) limb is nonzero.
@@ -47,7 +48,7 @@ pub fn limbs_floor_log_two(limbs: &[u32]) -> u64 {
 /// assert_eq!(limbs_ceiling_log_two(&[0b11]), 2);
 /// assert_eq!(limbs_ceiling_log_two(&[0, 0b1101]), 36);
 /// ```
-pub fn limbs_ceiling_log_two(limbs: &[u32]) -> u64 {
+pub fn limbs_ceiling_log_two(limbs: &[Limb]) -> u64 {
     let floor_log_two = limbs_floor_log_two(limbs);
     if limbs_is_power_of_two(limbs) {
         floor_log_two

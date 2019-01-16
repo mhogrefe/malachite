@@ -4,6 +4,7 @@ use malachite_base::num::{BitAccess, PrimitiveInteger, PrimitiveSigned, Primitiv
 use malachite_test::inputs::base::{
     pairs_of_signed_and_u64_width_range_var_1, pairs_of_unsigned_and_u64_width_range,
 };
+use rand::Rand;
 
 fn set_bit_helper_unsigned<T: PrimitiveInteger>() {
     let test = |n: u64, index, out: u64| {
@@ -76,7 +77,7 @@ set_bit_fail_helper!(
 );
 set_bit_fail_helper!(
     u32,
-    set_bit_u32_fail_helper,
+    set_bit_limb_fail_helper,
     "Cannot set bit 100 in non-negative value of width 32"
 );
 set_bit_fail_helper!(
@@ -96,7 +97,7 @@ set_bit_fail_helper!(
 );
 set_bit_fail_helper!(
     i32,
-    set_bit_i32_fail_helper,
+    set_bit_signed_limb_fail_helper,
     "Cannot set bit 100 in non-negative value of width 32"
 );
 set_bit_fail_helper!(
@@ -105,7 +106,7 @@ set_bit_fail_helper!(
     "Cannot set bit 100 in non-negative value of width 64"
 );
 
-fn set_bit_properties_helper_unsigned<T: PrimitiveUnsigned>() {
+fn set_bit_properties_helper_unsigned<T: PrimitiveUnsigned + Rand>() {
     test_properties(pairs_of_unsigned_and_u64_width_range, |&(n, index)| {
         let mut mut_n: T = n;
         mut_n.set_bit(index);
@@ -126,7 +127,10 @@ fn set_bit_properties_helper_unsigned<T: PrimitiveUnsigned>() {
     });
 }
 
-fn set_bit_properties_helper_signed<T: PrimitiveSigned>() {
+fn set_bit_properties_helper_signed<T: PrimitiveSigned + Rand>()
+where
+    T::UnsignedOfEqualWidth: Rand,
+{
     test_properties(pairs_of_signed_and_u64_width_range_var_1, |&(n, index)| {
         let mut mut_n: T = n;
         mut_n.set_bit(index);

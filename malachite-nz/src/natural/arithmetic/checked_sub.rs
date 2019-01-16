@@ -10,7 +10,7 @@ impl Natural {
         } else if self.limb_count() < other.limb_count() {
             true
         } else if let Small(y) = other {
-            self.sub_assign_u32_no_panic(y)
+            self.sub_assign_limb_no_panic(y)
         } else {
             match (&mut (*self), other) {
                 (&mut Large(ref mut xs), Large(ref ys)) => {
@@ -35,7 +35,7 @@ impl Natural {
         } else if self.limb_count() < other.limb_count() {
             true
         } else if let Small(y) = *other {
-            self.sub_assign_u32_no_panic(y)
+            self.sub_assign_limb_no_panic(y)
         } else {
             match (&mut (*self), other) {
                 (&mut Large(ref mut xs), &Large(ref ys)) => {

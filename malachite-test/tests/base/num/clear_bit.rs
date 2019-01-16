@@ -5,6 +5,7 @@ use malachite_base::num::{
 use malachite_test::inputs::base::{
     pairs_of_signed_and_u64_width_range_var_2, pairs_of_unsigned_and_small_unsigned,
 };
+use rand::Rand;
 
 fn clear_bit_helper_unsigned<T: PrimitiveInteger>() {
     let test = |n: u64, index, out: u64| {
@@ -77,7 +78,7 @@ clear_bit_fail_helper!(
 );
 clear_bit_fail_helper!(
     i32,
-    clear_bit_i32_fail_helper,
+    clear_bit_signed_limb_fail_helper,
     "Cannot clear bit 100 in negative value of width 32"
 );
 clear_bit_fail_helper!(
@@ -86,7 +87,7 @@ clear_bit_fail_helper!(
     "Cannot clear bit 100 in negative value of width 64"
 );
 
-fn clear_bit_properties_helper_unsigned<T: PrimitiveUnsigned>() {
+fn clear_bit_properties_helper_unsigned<T: PrimitiveUnsigned + Rand>() {
     test_properties(pairs_of_unsigned_and_small_unsigned, |&(n, index)| {
         let mut mut_n: T = n;
         mut_n.clear_bit(index);
@@ -106,7 +107,10 @@ fn clear_bit_properties_helper_unsigned<T: PrimitiveUnsigned>() {
     });
 }
 
-fn clear_bit_properties_helper_signed<T: PrimitiveSigned>() {
+fn clear_bit_properties_helper_signed<T: PrimitiveSigned + Rand>()
+where
+    T::UnsignedOfEqualWidth: Rand,
+{
     test_properties(pairs_of_signed_and_u64_width_range_var_2, |&(n, index)| {
         let mut mut_n: T = n;
         mut_n.clear_bit(index);

@@ -1,7 +1,8 @@
 use natural::Natural::{self, Large, Small};
+use platform::Limb;
 use std::cmp::Ordering;
 
-/// Interpreting two equal-length slices of `u32`s as the limbs (in ascending order) of two
+/// Interpreting two equal-length slices of `Limb`s as the limbs (in ascending order) of two
 /// `Natural`s, compares the two `Natural`s.
 ///
 /// Equivalent to GMP's `mpn_cmp`.
@@ -25,12 +26,12 @@ use std::cmp::Ordering;
 /// assert_eq!(limbs_cmp_same_length(&[1, 2], &[2, 1]), Ordering::Greater);
 /// assert_eq!(limbs_cmp_same_length(&[1, 2, 3], &[1, 2, 3]), Ordering::Equal);
 /// ```
-pub fn limbs_cmp_same_length(xs: &[u32], ys: &[u32]) -> Ordering {
+pub fn limbs_cmp_same_length(xs: &[Limb], ys: &[Limb]) -> Ordering {
     assert_eq!(xs.len(), ys.len());
     xs.into_iter().rev().cmp(ys.into_iter().rev())
 }
 
-/// Interpreting two slices of `u32`s as the limbs (in ascending order) of two `Natural`s, compares
+/// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, compares
 /// the two `Natural`s. It is assumed that neither limb slice contains trailing zeros.
 ///
 /// Time: worst case O(n)
@@ -49,7 +50,7 @@ pub fn limbs_cmp_same_length(xs: &[u32], ys: &[u32]) -> Ordering {
 /// assert_eq!(limbs_cmp(&[1, 2], &[2, 1, 3]), Ordering::Less);
 /// assert_eq!(limbs_cmp(&[1, 2, 3], &[1, 2, 3]), Ordering::Equal);
 /// ```
-pub fn limbs_cmp(xs: &[u32], ys: &[u32]) -> Ordering {
+pub fn limbs_cmp(xs: &[Limb], ys: &[Limb]) -> Ordering {
     xs.len()
         .cmp(&ys.len())
         .then_with(|| limbs_cmp_same_length(xs, ys))

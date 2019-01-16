@@ -7,6 +7,7 @@ use malachite_test::inputs::base::{
     triples_of_signed_unsigned_width_range_and_bool_var_1,
     triples_of_unsigned_unsigned_width_range_and_bool_var_1,
 };
+use rand::Rand;
 
 fn assign_bit_helper_unsigned<T: PrimitiveInteger>() {
     let test = |n: u64, index, bit, out: u64| {
@@ -91,7 +92,7 @@ macro_rules! assign_bit_fail_helper_signed {
 
 assign_bit_fail_helper_unsigned!(u8, assign_bit_u8_fail_helper);
 assign_bit_fail_helper_unsigned!(u16, assign_bit_u16_fail_helper);
-assign_bit_fail_helper_unsigned!(u32, assign_bit_u32_fail_helper);
+assign_bit_fail_helper_unsigned!(u32, assign_bit_limb_fail_helper);
 assign_bit_fail_helper_unsigned!(u64, assign_bit_u64_fail_helper);
 assign_bit_fail_helper_signed!(i8, assign_bit_i8_fail_1_helper, assign_bit_i8_fail_2_helper);
 assign_bit_fail_helper_signed!(
@@ -101,8 +102,8 @@ assign_bit_fail_helper_signed!(
 );
 assign_bit_fail_helper_signed!(
     i32,
-    assign_bit_i32_fail_1_helper,
-    assign_bit_i32_fail_2_helper
+    assign_bit_signed_limb_fail_1_helper,
+    assign_bit_signed_limb_fail_2_helper
 );
 assign_bit_fail_helper_signed!(
     i64,
@@ -110,7 +111,7 @@ assign_bit_fail_helper_signed!(
     assign_bit_i64_fail_2_helper
 );
 
-fn assign_bit_properties_helper_unsigned<T: PrimitiveUnsigned>() {
+fn assign_bit_properties_helper_unsigned<T: PrimitiveUnsigned + Rand>() {
     test_properties(
         triples_of_unsigned_unsigned_width_range_and_bool_var_1,
         |&(n, index, bit)| {
@@ -120,7 +121,10 @@ fn assign_bit_properties_helper_unsigned<T: PrimitiveUnsigned>() {
     );
 }
 
-fn assign_bit_properties_helper_signed<T: PrimitiveSigned>() {
+fn assign_bit_properties_helper_signed<T: PrimitiveSigned + Rand>()
+where
+    T::UnsignedOfEqualWidth: Rand,
+{
     test_properties(
         triples_of_signed_unsigned_width_range_and_bool_var_1,
         |&(n, index, bit)| {

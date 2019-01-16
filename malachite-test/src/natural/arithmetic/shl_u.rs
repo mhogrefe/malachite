@@ -1,7 +1,7 @@
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::{
-    pairs_of_unsigned_vec_and_small_unsigned, pairs_of_unsigned_vec_and_u32_var_1,
-    triples_of_unsigned_vec_unsigned_vec_and_u32_var_5,
+    pairs_of_unsigned_vec_and_limb_var_1, pairs_of_unsigned_vec_and_small_unsigned,
+    triples_of_unsigned_vec_unsigned_vec_and_limb_var_5,
 };
 use inputs::natural::{
     pairs_of_natural_and_small_unsigned, rm_pairs_of_natural_and_small_unsigned,
@@ -20,17 +20,17 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
 
     register_demo!(registry, demo_natural_shl_assign_u8);
     register_demo!(registry, demo_natural_shl_assign_u16);
-    register_demo!(registry, demo_natural_shl_assign_u32);
+    register_demo!(registry, demo_natural_shl_assign_limb);
     register_demo!(registry, demo_natural_shl_assign_u64);
 
     register_demo!(registry, demo_natural_shl_u8);
     register_demo!(registry, demo_natural_shl_u16);
-    register_demo!(registry, demo_natural_shl_u32);
+    register_demo!(registry, demo_natural_shl_limb);
     register_demo!(registry, demo_natural_shl_u64);
 
     register_demo!(registry, demo_natural_shl_u8_ref);
     register_demo!(registry, demo_natural_shl_u16_ref);
-    register_demo!(registry, demo_natural_shl_u32_ref);
+    register_demo!(registry, demo_natural_shl_limb_ref);
     register_demo!(registry, demo_natural_shl_u64_ref);
 
     register_bench!(registry, Small, benchmark_limbs_shl);
@@ -41,12 +41,12 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_bench!(
         registry,
         Large,
-        benchmark_natural_shl_assign_u32_library_comparison
+        benchmark_natural_shl_assign_limb_library_comparison
     );
     register_bench!(
         registry,
         Large,
-        benchmark_natural_shl_u32_library_comparison
+        benchmark_natural_shl_limb_library_comparison
     );
 
     register_bench!(
@@ -62,7 +62,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_bench!(
         registry,
         Large,
-        benchmark_natural_shl_u32_evaluation_strategy
+        benchmark_natural_shl_limb_evaluation_strategy
     );
     register_bench!(
         registry,
@@ -84,7 +84,7 @@ fn demo_limbs_shl(gm: GenerationMode, limit: usize) {
 
 fn demo_limbs_shl_to_out(gm: GenerationMode, limit: usize) {
     for (out_limbs, in_limbs, bits) in
-        triples_of_unsigned_vec_unsigned_vec_and_u32_var_5(gm).take(limit)
+        triples_of_unsigned_vec_unsigned_vec_and_limb_var_5(gm).take(limit)
     {
         let mut out_limbs = out_limbs.to_vec();
         let mut out_limbs_old = out_limbs.clone();
@@ -97,7 +97,7 @@ fn demo_limbs_shl_to_out(gm: GenerationMode, limit: usize) {
 }
 
 fn demo_limbs_slice_shl_in_place(gm: GenerationMode, limit: usize) {
-    for (limbs, bits) in pairs_of_unsigned_vec_and_u32_var_1(gm).take(limit) {
+    for (limbs, bits) in pairs_of_unsigned_vec_and_limb_var_1(gm).take(limit) {
         let mut limbs = limbs.to_vec();
         let mut limbs_old = limbs.clone();
         let carry = limbs_slice_shl_in_place(&mut limbs, bits);
@@ -193,10 +193,10 @@ demos_and_benches!(
 );
 demos_and_benches!(
     u32,
-    demo_natural_shl_assign_u32,
-    demo_natural_shl_u32,
-    demo_natural_shl_u32_ref,
-    benchmark_natural_shl_u32_evaluation_strategy
+    demo_natural_shl_assign_limb,
+    demo_natural_shl_limb,
+    demo_natural_shl_limb_ref,
+    benchmark_natural_shl_limb_evaluation_strategy
 );
 demos_and_benches!(
     u64,
@@ -227,7 +227,7 @@ fn benchmark_limbs_shl_to_out(gm: GenerationMode, limit: usize, file_name: &str)
     m_run_benchmark(
         "limbs_shl_to_out(&mut [u32], &[u32], u32)",
         BenchmarkType::Single,
-        triples_of_unsigned_vec_unsigned_vec_and_u32_var_5(gm),
+        triples_of_unsigned_vec_unsigned_vec_and_limb_var_5(gm),
         gm.name(),
         limit,
         file_name,
@@ -246,7 +246,7 @@ fn benchmark_limbs_slice_shl_in_place(gm: GenerationMode, limit: usize, file_nam
     m_run_benchmark(
         "limbs_slice_shl_in_place(&mut [u32], u32)",
         BenchmarkType::Single,
-        pairs_of_unsigned_vec_and_u32_var_1(gm),
+        pairs_of_unsigned_vec_and_limb_var_1(gm),
         gm.name(),
         limit,
         file_name,
@@ -276,7 +276,7 @@ fn benchmark_limbs_vec_shl_in_place(gm: GenerationMode, limit: usize, file_name:
     );
 }
 
-fn benchmark_natural_shl_assign_u32_library_comparison(
+fn benchmark_natural_shl_assign_limb_library_comparison(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,
@@ -297,7 +297,11 @@ fn benchmark_natural_shl_assign_u32_library_comparison(
     );
 }
 
-fn benchmark_natural_shl_u32_library_comparison(gm: GenerationMode, limit: usize, file_name: &str) {
+fn benchmark_natural_shl_limb_library_comparison(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
     m_run_benchmark(
         "Natural << u32",
         BenchmarkType::LibraryComparison,

@@ -3,6 +3,7 @@ use inputs::base::pairs_of_unsigned_vec_and_small_unsigned_var_1;
 use inputs::integer::{pairs_of_integer_and_small_u64, rm_pairs_of_integer_and_small_u64};
 use malachite_base::num::BitAccess;
 use malachite_nz::integer::logic::bit_access::limbs_get_bit_neg;
+use malachite_nz::platform::Limb;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limbs_get_bit_neg);
@@ -16,7 +17,8 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
 }
 
 fn demo_limbs_get_bit_neg(gm: GenerationMode, limit: usize) {
-    for (limbs, index) in pairs_of_unsigned_vec_and_small_unsigned_var_1::<u32, u64>(gm).take(limit)
+    for (limbs, index) in
+        pairs_of_unsigned_vec_and_small_unsigned_var_1::<Limb, u64>(gm).take(limit)
     {
         println!(
             "limbs_get_bit_neg({:?}, {}) = {}",
@@ -35,7 +37,7 @@ fn demo_integer_get_bit(gm: GenerationMode, limit: usize) {
 
 fn benchmark_limbs_get_bit_neg(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
-        "limbs_get_bit_neg(&[u32], u64)",
+        "limbs_get_bit_neg(&[Limb], u64)",
         BenchmarkType::Single,
         pairs_of_unsigned_vec_and_small_unsigned_var_1(gm),
         gm.name(),

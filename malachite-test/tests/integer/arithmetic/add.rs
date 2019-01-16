@@ -1,6 +1,7 @@
 use common::test_properties;
 use malachite_base::num::Zero;
 use malachite_nz::integer::Integer;
+use malachite_nz::platform::{Limb, SignedDoubleLimb, SignedLimb};
 use malachite_test::common::{
     bigint_to_integer, integer_to_bigint, integer_to_rug_integer, rug_integer_to_integer,
 };
@@ -107,7 +108,7 @@ fn add_properties() {
 
     test_properties(
         pairs_of_integer_and_signed,
-        |&(ref x, y): &(Integer, i32)| {
+        |&(ref x, y): &(Integer, SignedLimb)| {
             let sum = x + Integer::from(y);
             assert_eq!(x + y, sum);
             assert_eq!(y + x, sum);
@@ -118,20 +119,20 @@ fn add_properties() {
         assert_eq!(x + Integer::ZERO, *x);
         assert_eq!(Integer::ZERO + x, *x);
         assert_eq!(x + x, x << 1);
-        assert_eq!(x + (-x), 0)
+        assert_eq!(x + (-x), 0 as Limb)
     });
 
     test_properties(triples_of_integers, |&(ref x, ref y, ref z)| {
         assert_eq!((x + y) + z, x + (y + z));
     });
 
-    test_properties(pairs_of_integer_and_unsigned::<u32>, |&(ref x, y)| {
+    test_properties(pairs_of_integer_and_unsigned::<Limb>, |&(ref x, y)| {
         let sum = x + Integer::from(y);
         assert_eq!(x + y, sum);
         assert_eq!(y + x, sum);
     });
 
-    test_properties(pairs_of_integer_and_signed::<i32>, |&(ref x, y)| {
+    test_properties(pairs_of_integer_and_signed::<SignedLimb>, |&(ref x, y)| {
         let sum = x + Integer::from(y);
         assert_eq!(x + y, sum);
         assert_eq!(y + x, sum);
@@ -141,9 +142,9 @@ fn add_properties() {
         assert_eq!(x + y, Integer::from(x) + Integer::from(y));
     });
 
-    test_properties(pairs_of_signeds::<i32>, |&(x, y)| {
+    test_properties(pairs_of_signeds::<SignedLimb>, |&(x, y)| {
         assert_eq!(
-            Integer::from(i64::from(x) + i64::from(y)),
+            Integer::from(SignedDoubleLimb::from(x) + SignedDoubleLimb::from(y)),
             Integer::from(x) + Integer::from(y)
         );
     });

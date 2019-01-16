@@ -1,5 +1,3 @@
-extern crate rand;
-
 pub mod chars;
 pub mod limbs;
 #[macro_use]

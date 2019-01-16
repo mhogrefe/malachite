@@ -1,15 +1,17 @@
 use common::test_properties;
+use malachite_base::misc::Max;
 use malachite_base::num::{
     CeilingLogTwo, FloorLogTwo, One, PrimitiveInteger, SignificantBits, Zero,
 };
 use malachite_nz::natural::arithmetic::log_two::{limbs_ceiling_log_two, limbs_floor_log_two};
 use malachite_nz::natural::logic::significant_bits::limbs_significant_bits;
 use malachite_nz::natural::Natural;
+use malachite_nz::platform::Limb;
 use malachite_test::inputs::base::{positive_unsigneds, vecs_of_unsigned_var_1};
 use malachite_test::inputs::natural::positive_naturals;
 use std::str::FromStr;
-use std::u32;
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_floor_log_two() {
     let test = |limbs, out| {
@@ -23,12 +25,14 @@ fn test_limbs_floor_log_two() {
     test(&[0, 0b1101], 35);
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic(expected = "called `Option::unwrap()` on a `None` value")]
 fn limbs_floor_log_two_fail() {
     limbs_floor_log_two(&[]);
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_ceiling_log_two() {
     let test = |limbs, out| {
@@ -42,6 +46,7 @@ fn test_limbs_ceiling_log_two() {
     test(&[0, 0b1101], 36);
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic(expected = "called `Option::unwrap()` on a `None` value")]
 fn limbs_ceiling_log_two_fail() {
@@ -94,7 +99,7 @@ fn ceiling_log_two_fail() {
 fn limbs_floor_log_two_properties() {
     test_properties(vecs_of_unsigned_var_1, |limbs| {
         let floor_log_two = limbs_floor_log_two(limbs);
-        assert_eq!(limbs.len() == 1, floor_log_two < u64::from(u32::WIDTH));
+        assert_eq!(limbs.len() == 1, floor_log_two < u64::from(Limb::WIDTH));
         assert_eq!(floor_log_two, limbs_significant_bits(limbs) - 1);
         assert_eq!(
             floor_log_two,
@@ -109,7 +114,7 @@ fn limbs_ceiling_log_two_properties() {
         let ceiling_log_two = limbs_ceiling_log_two(limbs);
         assert_eq!(
             limbs.len() == 1 || limbs == &[0, 1],
-            ceiling_log_two <= u64::from(u32::WIDTH)
+            ceiling_log_two <= u64::from(Limb::WIDTH)
         );
         assert_eq!(
             ceiling_log_two,
@@ -122,15 +127,15 @@ fn limbs_ceiling_log_two_properties() {
 fn floor_log_two_properties() {
     test_properties(positive_naturals, |x| {
         let floor_log_two = x.floor_log_two();
-        assert_eq!(*x <= u32::MAX, floor_log_two < u64::from(u32::WIDTH));
+        assert_eq!(*x <= Limb::MAX, floor_log_two < u64::from(Limb::WIDTH));
         assert_eq!(floor_log_two, x.significant_bits() - 1);
         assert_eq!(floor_log_two, limbs_floor_log_two(&x.to_limbs_asc()));
-        let n = floor_log_two as u32;
+        let n = floor_log_two as Limb;
         assert!(Natural::ONE << n <= *x);
         assert!(*x < Natural::ONE << (n + 1));
     });
 
-    test_properties(positive_unsigneds::<u32>, |&u| {
+    test_properties(positive_unsigneds::<Limb>, |&u| {
         assert_eq!(u.floor_log_two(), Natural::from(u).floor_log_two());
     });
 }
@@ -139,16 +144,16 @@ fn floor_log_two_properties() {
 fn ceiling_log_two_properties() {
     test_properties(positive_naturals, |x| {
         let ceiling_log_two = x.ceiling_log_two();
-        assert_eq!(*x <= u32::MAX, ceiling_log_two <= u64::from(u32::WIDTH));
+        assert_eq!(*x <= Limb::MAX, ceiling_log_two <= u64::from(Limb::WIDTH));
         assert_eq!(ceiling_log_two, limbs_ceiling_log_two(&x.to_limbs_asc()));
-        let n = ceiling_log_two as u32;
+        let n = ceiling_log_two as Limb;
         if n != 0 {
             assert!(Natural::ONE << (n - 1) < *x);
         }
         assert!(*x <= Natural::ONE << n);
     });
 
-    test_properties(positive_unsigneds::<u32>, |&u| {
+    test_properties(positive_unsigneds::<Limb>, |&u| {
         assert_eq!(u.ceiling_log_two(), Natural::from(u).ceiling_log_two());
     });
 }

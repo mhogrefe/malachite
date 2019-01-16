@@ -15,6 +15,7 @@ use malachite_test::inputs::natural::{
 use rug;
 use std::str::FromStr;
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_eq_mod_power_of_two() {
     let test = |xs, ys, pow, out| {

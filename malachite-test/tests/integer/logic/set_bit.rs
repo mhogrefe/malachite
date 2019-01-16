@@ -4,11 +4,14 @@ use malachite_base::num::{BitAccess, One};
 use malachite_nz::integer::logic::bit_access::limbs_set_bit_neg;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
+use malachite_nz::platform::Limb;
 use malachite_test::inputs::base::pairs_of_unsigned_vec_and_small_unsigned_var_1;
 use malachite_test::inputs::integer::pairs_of_integer_and_small_u64;
 use std::str::FromStr;
+#[cfg(feature = "32_bit_limbs")]
 use std::u32;
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 pub fn test_limbs_set_bit_neg() {
     let test = |limbs: &[u32], index: u64, out_limbs: &[u32]| {
@@ -80,7 +83,7 @@ fn set_bit_properties() {
 
         assert_eq!(n | (Integer::ONE << index), result);
 
-        assert_ne!(result, 0);
+        assert_ne!(result, 0 as Limb);
         assert!(result >= *n);
         if n.get_bit(index) {
             assert_eq!(result, *n);

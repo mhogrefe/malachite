@@ -1,6 +1,7 @@
 use common::test_properties;
 use malachite_base::num::{SaturatingSub, SaturatingSubAssign, Zero};
 use malachite_nz::natural::Natural;
+use malachite_nz::platform::Limb;
 use malachite_test::inputs::base::pairs_of_unsigneds;
 use malachite_test::inputs::natural::{naturals, pairs_of_natural_and_unsigned, pairs_of_naturals};
 use std::str::FromStr;
@@ -99,7 +100,7 @@ fn saturating_sub_properties() {
         assert!(difference + y >= *x);
     });
 
-    test_properties(pairs_of_natural_and_unsigned::<u32>, |&(ref x, y)| {
+    test_properties(pairs_of_natural_and_unsigned::<Limb>, |&(ref x, y)| {
         let difference = x.saturating_sub(Natural::from(y));
         assert_eq!(x.saturating_sub(y), difference);
 
@@ -107,7 +108,7 @@ fn saturating_sub_properties() {
         assert_eq!(SaturatingSub::saturating_sub(y, x), difference);
     });
 
-    test_properties(pairs_of_unsigneds::<u32>, |&(x, y)| {
+    test_properties(pairs_of_unsigneds::<Limb>, |&(x, y)| {
         assert_eq!(
             x.saturating_sub(y),
             Natural::from(x).saturating_sub(Natural::from(y))

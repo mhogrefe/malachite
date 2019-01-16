@@ -1,11 +1,12 @@
 use malachite_base::limbs::limbs_pad_left;
-use malachite_base::misc::WrappingFrom;
+use malachite_base::misc::{CheckedFrom, WrappingFrom};
 use malachite_base::num::PrimitiveInteger;
 use natural::Natural::{self, Large, Small};
+use platform::Limb;
 use std::ops::{Shl, ShlAssign};
 
-/// Interpreting a slice of `u32`s as the limbs (in ascending order) of a `Natural`, returns the
-/// limbs of the `Natural` left-shifted by a `u32`.
+/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
+/// limbs of the `Natural` left-shifted by a `Limb`.
 ///
 /// Time: worst case O(n)
 ///
@@ -22,13 +23,13 @@ use std::ops::{Shl, ShlAssign};
 /// assert_eq!(limbs_shl(&[123, 456], 32), &[0, 123, 456]);
 /// assert_eq!(limbs_shl(&[123, 456], 100), &[0, 0, 0, 1_968, 7_296]);
 /// ```
-pub fn limbs_shl(limbs: &[u32], bits: u64) -> Vec<u32> {
-    let small_bits = u32::wrapping_from(bits) & u32::WIDTH_MASK;
-    let mut shifted_limbs = vec![0; (bits >> u32::LOG_WIDTH) as usize];
+pub fn limbs_shl(limbs: &[Limb], bits: u64) -> Vec<Limb> {
+    let small_bits = u32::wrapping_from(bits) & Limb::WIDTH_MASK;
+    let mut shifted_limbs = vec![0; (bits >> Limb::LOG_WIDTH) as usize];
     if small_bits == 0 {
         shifted_limbs.extend_from_slice(limbs);
     } else {
-        let cobits = u32::WIDTH - small_bits;
+        let cobits = Limb::WIDTH - small_bits;
         let mut remaining_bits = 0;
         for limb in limbs {
             shifted_limbs.push((limb << small_bits) | remaining_bits);
@@ -41,9 +42,9 @@ pub fn limbs_shl(limbs: &[u32], bits: u64) -> Vec<u32> {
     shifted_limbs
 }
 
-/// Interpreting a slice of `u32`s as the limbs (in ascending order) of a `Natural`, writes the
-/// limbs of the `Natural` left-shifted by a `u32` to an output slice. The output slice must be at
-/// least as long as the input slice. The `u32` must be between 1 and 31, inclusive. The carry,
+/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
+/// limbs of the `Natural` left-shifted by a `Limb` to an output slice. The output slice must be at
+/// least as long as the input slice. The `Limb` must be between 1 and 31, inclusive. The carry,
 /// or the bits that are shifted past the width of the input slice, is returned.
 ///
 /// Time: worst case O(n)
@@ -67,12 +68,12 @@ pub fn limbs_shl(limbs: &[u32], bits: u64) -> Vec<u32> {
 /// assert_eq!(limbs_shl_to_out(&mut out_limbs, &[123, 456], 31), 228);
 /// assert_eq!(out_limbs, &[2_147_483_648, 61, 0]);
 /// ```
-pub fn limbs_shl_to_out(out_limbs: &mut [u32], in_limbs: &[u32], bits: u32) -> u32 {
+pub fn limbs_shl_to_out(out_limbs: &mut [Limb], in_limbs: &[Limb], bits: u32) -> Limb {
     let len = in_limbs.len();
     assert!(out_limbs.len() >= len);
     assert!(bits > 0);
-    assert!(bits < u32::WIDTH);
-    let cobits = u32::WIDTH - bits;
+    assert!(bits < Limb::WIDTH);
+    let cobits = Limb::WIDTH - bits;
     let mut remaining_bits = 0;
     for i in 0..len {
         let limb = in_limbs[i];
@@ -82,8 +83,8 @@ pub fn limbs_shl_to_out(out_limbs: &mut [u32], in_limbs: &[u32], bits: u32) -> u
     remaining_bits
 }
 
-/// Interpreting a slice of `u32`s as the limbs (in ascending order) of a `Natural`, writes the
-/// limbs of the `Natural` left-shifted by a `u32` to the input slice. The `u32` must be between 1
+/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
+/// limbs of the `Natural` left-shifted by a `Limb` to the input slice. The `Limb` must be between 1
 /// and 31, inclusive. The carry, or the bits that are shifted past the width of the input slice, is
 /// returned.
 ///
@@ -105,10 +106,10 @@ pub fn limbs_shl_to_out(out_limbs: &mut [u32], in_limbs: &[u32], bits: u32) -> u
 /// assert_eq!(limbs_slice_shl_in_place(&mut limbs, 31), 228);
 /// assert_eq!(limbs, &[2_147_483_648, 61]);
 /// ```
-pub fn limbs_slice_shl_in_place(limbs: &mut [u32], bits: u32) -> u32 {
+pub fn limbs_slice_shl_in_place(limbs: &mut [Limb], bits: u32) -> Limb {
     assert!(bits > 0);
-    assert!(bits < u32::WIDTH);
-    let cobits = u32::WIDTH - bits;
+    assert!(bits < Limb::WIDTH);
+    let cobits = Limb::WIDTH - bits;
     let mut remaining_bits = 0;
     for limb in limbs.iter_mut() {
         let old_limb = *limb;
@@ -118,8 +119,8 @@ pub fn limbs_slice_shl_in_place(limbs: &mut [u32], bits: u32) -> u32 {
     remaining_bits
 }
 
-/// Interpreting a nonempty `Vec` of `u32`s as the limbs (in ascending order) of a `Natural`, writes
-/// the limbs of the `Natural` left-shifted by a `u32` to the input `Vec`.
+/// Interpreting a nonempty `Vec` of `Limb`s as the limbs (in ascending order) of a `Natural`, writes
+/// the limbs of the `Natural` left-shifted by a `Limb` to the input `Vec`.
 ///
 /// Time: worst case O(n)
 ///
@@ -142,14 +143,14 @@ pub fn limbs_slice_shl_in_place(limbs: &mut [u32], bits: u32) -> u32 {
 /// limbs_vec_shl_in_place(&mut limbs, 31);
 /// assert_eq!(limbs, &[2_147_483_648, 61, 228]);
 /// ```
-pub fn limbs_vec_shl_in_place(limbs: &mut Vec<u32>, bits: u64) {
-    let small_bits = u32::wrapping_from(bits) & u32::WIDTH_MASK;
+pub fn limbs_vec_shl_in_place(limbs: &mut Vec<Limb>, bits: u64) {
+    let small_bits = u32::wrapping_from(bits) & Limb::WIDTH_MASK;
     let remaining_bits = if small_bits == 0 {
         0
     } else {
         limbs_slice_shl_in_place(limbs, small_bits)
     };
-    limbs_pad_left(limbs, (bits >> u32::LOG_WIDTH) as usize, 0);
+    limbs_pad_left(limbs, (bits >> Limb::LOG_WIDTH) as usize, 0);
     if remaining_bits != 0 {
         limbs.push(remaining_bits);
     }
@@ -223,8 +224,8 @@ macro_rules! impl_natural_shl_unsigned {
                     Small(small) if other <= $t::wrapping_from(small.leading_zeros()) => {
                         Small(small << other)
                     }
-                    Small(small) => Large(limbs_shl(&[small], u64::from(other))),
-                    Large(ref limbs) => Large(limbs_shl(limbs, u64::from(other))),
+                    Small(small) => Large(limbs_shl(&[small], u64::checked_from(other).unwrap())),
+                    Large(ref limbs) => Large(limbs_shl(limbs, u64::checked_from(other).unwrap())),
                 }
             }
         }
@@ -271,7 +272,7 @@ macro_rules! impl_natural_shl_unsigned {
                         }
                     },
                     {
-                        limbs_vec_shl_in_place(limbs, u64::from(other));
+                        limbs_vec_shl_in_place(limbs, u64::checked_from(other).unwrap());
                     }
                 );
             }
@@ -282,3 +283,4 @@ impl_natural_shl_unsigned!(u8);
 impl_natural_shl_unsigned!(u16);
 impl_natural_shl_unsigned!(u32);
 impl_natural_shl_unsigned!(u64);
+impl_natural_shl_unsigned!(u128);

@@ -4,6 +4,7 @@ use inputs::natural::pairs_of_natural_and_small_unsigned;
 use malachite_base::num::{BitScan, SignificantBits};
 use malachite_nz::natural::logic::bit_scan::limbs_index_of_next_false_bit;
 use malachite_nz::natural::Natural;
+use malachite_nz::platform::Limb;
 use std::iter::repeat;
 
 pub fn natural_index_of_next_false_bit_alt(n: &Natural, u: u64) -> Option<u64> {
@@ -50,9 +51,9 @@ fn demo_natural_index_of_next_false_bit(gm: GenerationMode, limit: usize) {
 
 fn benchmark_limbs_index_of_next_false_bit(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
-        "limbs_index_of_next_false_bit(&[u32], u64)",
+        "limbs_index_of_next_false_bit(&[Limb], u64)",
         BenchmarkType::Single,
-        pairs_of_unsigned_vec_and_small_unsigned::<u32, u64>(gm),
+        pairs_of_unsigned_vec_and_small_unsigned::<Limb, u64>(gm),
         gm.name(),
         limit,
         file_name,

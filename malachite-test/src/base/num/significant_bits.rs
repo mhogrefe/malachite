@@ -1,39 +1,43 @@
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::{signeds, unsigneds};
 use malachite_base::num::{PrimitiveSigned, PrimitiveUnsigned};
+use rand::Rand;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_u8_significant_bits);
     register_demo!(registry, demo_u16_significant_bits);
-    register_demo!(registry, demo_u32_significant_bits);
+    register_demo!(registry, demo_limb_significant_bits);
     register_demo!(registry, demo_u64_significant_bits);
     register_demo!(registry, demo_i8_significant_bits);
     register_demo!(registry, demo_i16_significant_bits);
-    register_demo!(registry, demo_i32_significant_bits);
+    register_demo!(registry, demo_signed_limb_significant_bits);
     register_demo!(registry, demo_i64_significant_bits);
     register_bench!(registry, None, benchmark_u8_significant_bits);
     register_bench!(registry, None, benchmark_u16_significant_bits);
-    register_bench!(registry, None, benchmark_u32_significant_bits);
+    register_bench!(registry, None, benchmark_limb_significant_bits);
     register_bench!(registry, None, benchmark_u64_significant_bits);
     register_bench!(registry, None, benchmark_i8_significant_bits);
     register_bench!(registry, None, benchmark_i16_significant_bits);
-    register_bench!(registry, None, benchmark_i32_significant_bits);
+    register_bench!(registry, None, benchmark_signed_limb_significant_bits);
     register_bench!(registry, None, benchmark_i64_significant_bits);
 }
 
-fn demo_unsigned_significant_bits<T: PrimitiveUnsigned>(gm: GenerationMode, limit: usize) {
+fn demo_unsigned_significant_bits<T: PrimitiveUnsigned + Rand>(gm: GenerationMode, limit: usize) {
     for n in unsigneds::<T>(gm).take(limit) {
         println!("{}.significant_bits() = {}", n, n.significant_bits());
     }
 }
 
-fn demo_signed_significant_bits<T: PrimitiveSigned>(gm: GenerationMode, limit: usize) {
+fn demo_signed_significant_bits<T: PrimitiveSigned + Rand>(gm: GenerationMode, limit: usize)
+where
+    T::UnsignedOfEqualWidth: Rand,
+{
     for n in signeds::<T>(gm).take(limit) {
         println!("{}.significant_bits() = {}", n, n.significant_bits());
     }
 }
 
-fn benchmark_unsigned_significant_bits<T: PrimitiveUnsigned>(
+fn benchmark_unsigned_significant_bits<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,
@@ -51,11 +55,13 @@ fn benchmark_unsigned_significant_bits<T: PrimitiveUnsigned>(
     );
 }
 
-fn benchmark_signed_significant_bits<T: PrimitiveSigned>(
+fn benchmark_signed_significant_bits<T: PrimitiveSigned + Rand>(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,
-) {
+) where
+    <T as PrimitiveSigned>::UnsignedOfEqualWidth: Rand,
+{
     m_run_benchmark(
         &format!("{}.significant_bits()", T::NAME),
         BenchmarkType::Single,
@@ -101,8 +107,8 @@ unsigned!(
 );
 unsigned!(
     u32,
-    demo_u32_significant_bits,
-    benchmark_u32_significant_bits
+    demo_limb_significant_bits,
+    benchmark_limb_significant_bits
 );
 unsigned!(
     u64,
@@ -118,8 +124,8 @@ signed!(
 );
 signed!(
     i32,
-    demo_i32_significant_bits,
-    benchmark_i32_significant_bits
+    demo_signed_limb_significant_bits,
+    benchmark_signed_limb_significant_bits
 );
 signed!(
     i64,

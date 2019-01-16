@@ -2,6 +2,7 @@ use common::test_properties;
 use malachite_base::misc::CheckedFrom;
 use malachite_base::num::{DivisibleByPowerOfTwo, Zero};
 use malachite_nz::integer::Integer;
+use malachite_nz::platform::{Limb, SignedLimb};
 use malachite_test::common::integer_to_rug_integer;
 use malachite_test::inputs::base::{pairs_of_signed_and_small_unsigned, unsigneds};
 use malachite_test::inputs::integer::{
@@ -69,7 +70,7 @@ fn divisible_by_power_of_two_properties() {
             integer_to_rug_integer(x).is_divisible_2pow(u32::checked_from(pow).unwrap()),
             divisible
         );
-        if *x != 0 {
+        if *x != 0 as Limb {
             assert_eq!(x.trailing_zeros().unwrap() >= pow, divisible);
         }
         assert_eq!((-x).divisible_by_power_of_two(pow), divisible);
@@ -82,7 +83,7 @@ fn divisible_by_power_of_two_properties() {
         |&(ref x, pow)| {
             assert!(x.divisible_by_power_of_two(pow));
             assert!(integer_to_rug_integer(x).is_divisible_2pow(u32::checked_from(pow).unwrap()));
-            if *x != 0 {
+            if *x != 0 as Limb {
                 assert!(x.trailing_zeros().unwrap() >= pow);
             }
             assert!((-x).divisible_by_power_of_two(pow));
@@ -95,7 +96,7 @@ fn divisible_by_power_of_two_properties() {
         |&(ref x, pow)| {
             assert!(!x.divisible_by_power_of_two(pow));
             assert!(!integer_to_rug_integer(x).is_divisible_2pow(u32::checked_from(pow).unwrap()));
-            if *x != 0 {
+            if *x != 0 as Limb {
                 assert!(x.trailing_zeros().unwrap() < pow);
             }
             assert!(!(-x).divisible_by_power_of_two(pow));
@@ -112,7 +113,7 @@ fn divisible_by_power_of_two_properties() {
     });
 
     test_properties(
-        pairs_of_signed_and_small_unsigned::<i32, u64>,
+        pairs_of_signed_and_small_unsigned::<SignedLimb, u64>,
         |&(x, pow)| {
             assert_eq!(
                 x.divisible_by_power_of_two(pow),

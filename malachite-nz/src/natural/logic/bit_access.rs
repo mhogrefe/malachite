@@ -1,7 +1,8 @@
 use malachite_base::num::{BitAccess, PrimitiveInteger};
 use natural::Natural::{self, Large, Small};
+use platform::Limb;
 
-/// Interpreting a slice of `u32`s as the limbs (in ascending order) of a `Natural`, gets a bit of
+/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, gets a bit of
 /// the `Natural` at a specified index. Sufficiently high indices will return `false`.
 ///
 /// Time: worst case O(1)
@@ -19,19 +20,19 @@ use natural::Natural::{self, Large, Small};
 /// assert_eq!(limbs_get_bit(&[0, 0b1011], 35), true);
 /// assert_eq!(limbs_get_bit(&[0, 0b1011], 100), false);
 /// ```
-pub fn limbs_get_bit(limbs: &[u32], index: u64) -> bool {
+pub fn limbs_get_bit(limbs: &[Limb], index: u64) -> bool {
     limbs
-        .get((index >> u32::LOG_WIDTH) as usize)
+        .get((index >> Limb::LOG_WIDTH) as usize)
         .map_or(false, |limb| {
-            limb.get_bit(index & u64::from(u32::WIDTH_MASK))
+            limb.get_bit(index & u64::from(Limb::WIDTH_MASK))
         })
 }
 
-fn limbs_set_bit_helper(limbs: &mut [u32], index: u64, limb_index: usize) {
-    limbs[limb_index].set_bit(index & u64::from(u32::WIDTH_MASK));
+fn limbs_set_bit_helper(limbs: &mut [Limb], index: u64, limb_index: usize) {
+    limbs[limb_index].set_bit(index & u64::from(Limb::WIDTH_MASK));
 }
 
-/// Interpreting a slice of `u32`s as the limbs (in ascending order) of a `Natural`, sets a bit of
+/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, sets a bit of
 /// the `Natural` at a specified index to `true`. Indices that are outside the bounds of the slice
 /// will cause a panic.
 ///
@@ -54,11 +55,11 @@ fn limbs_set_bit_helper(limbs: &mut [u32], index: u64, limb_index: usize) {
 /// limbs_slice_set_bit(limbs, 33);
 /// assert_eq!(limbs, &[3, 3]);
 /// ```
-pub fn limbs_slice_set_bit(limbs: &mut [u32], index: u64) {
-    limbs_set_bit_helper(limbs, index, (index >> u32::LOG_WIDTH) as usize);
+pub fn limbs_slice_set_bit(limbs: &mut [Limb], index: u64) {
+    limbs_set_bit_helper(limbs, index, (index >> Limb::LOG_WIDTH) as usize);
 }
 
-/// Interpreting a `Vec` of `u32`s as the limbs (in ascending order) of a `Natural`, sets a bit of
+/// Interpreting a `Vec` of `Limb`s as the limbs (in ascending order) of a `Natural`, sets a bit of
 /// the `Natural` at a specified index to `true`. Sufficiently high indices will increase the length
 /// of the limbs vector.
 ///
@@ -80,15 +81,15 @@ pub fn limbs_slice_set_bit(limbs: &mut [u32], index: u64) {
 /// limbs_vec_set_bit(&mut limbs, 128);
 /// assert_eq!(limbs, &[3, 3, 0, 0, 1]);
 /// ```
-pub fn limbs_vec_set_bit(limbs: &mut Vec<u32>, index: u64) {
-    let limb_index = (index >> u32::LOG_WIDTH) as usize;
+pub fn limbs_vec_set_bit(limbs: &mut Vec<Limb>, index: u64) {
+    let limb_index = (index >> Limb::LOG_WIDTH) as usize;
     if limb_index >= limbs.len() {
         limbs.resize(limb_index + 1, 0);
     }
     limbs_set_bit_helper(limbs, index, limb_index);
 }
 
-/// Interpreting a slice of `u32`s as the limbs (in ascending order) of a `Natural`, sets a bit of
+/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, sets a bit of
 /// the `Natural` at a specified index to `false`. Indices that are outside the bounds of the slice
 /// will result in no action being taken, since there are infinitely many leading zeros.
 ///
@@ -106,10 +107,10 @@ pub fn limbs_vec_set_bit(limbs: &mut Vec<u32>, index: u64) {
 /// limbs_clear_bit(limbs, 1);
 /// assert_eq!(limbs, &[1, 1]);
 /// ```
-pub fn limbs_clear_bit(limbs: &mut [u32], index: u64) {
-    let limb_index = (index >> u32::LOG_WIDTH) as usize;
+pub fn limbs_clear_bit(limbs: &mut [Limb], index: u64) {
+    let limb_index = (index >> Limb::LOG_WIDTH) as usize;
     if limb_index < limbs.len() {
-        limbs[limb_index].clear_bit(index & u64::from(u32::WIDTH_MASK));
+        limbs[limb_index].clear_bit(index & u64::from(Limb::WIDTH_MASK));
     }
 }
 
@@ -204,7 +205,7 @@ impl BitAccess for Natural {
             small,
             limbs,
             {
-                if index < u32::WIDTH.into() {
+                if index < u64::from(Limb::WIDTH) {
                     let mut modified = *small;
                     modified.set_bit(index);
                     Some(modified)

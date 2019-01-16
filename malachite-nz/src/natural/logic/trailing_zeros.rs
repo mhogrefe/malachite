@@ -1,8 +1,9 @@
 use malachite_base::limbs::limbs_leading_zero_limbs;
 use malachite_base::num::PrimitiveInteger;
 use natural::Natural::{self, Large, Small};
+use platform::Limb;
 
-/// Interpreting a slice of `u32`s as the limbs of a `Natural` in ascending order, returns the
+/// Interpreting a slice of `Limb`s as the limbs of a `Natural` in ascending order, returns the
 /// number of trailing zeros in the binary expansion of a `Natural` (equivalently, the multiplicity
 /// of 2 in its prime factorization). The limbs cannot be empty or all zero.
 ///
@@ -22,10 +23,10 @@ use natural::Natural::{self, Large, Small};
 /// assert_eq!(limbs_trailing_zeros(&[4]), 2);
 /// assert_eq!(limbs_trailing_zeros(&[0, 4]), 34);
 /// ```
-pub fn limbs_trailing_zeros(limbs: &[u32]) -> u64 {
+pub fn limbs_trailing_zeros(limbs: &[Limb]) -> u64 {
     let zero_limbs = limbs_leading_zero_limbs(limbs);
     let remaining_zeros = u64::from(limbs[zero_limbs].trailing_zeros());
-    ((zero_limbs as u64) << u32::LOG_WIDTH) + remaining_zeros
+    ((zero_limbs as u64) << Limb::LOG_WIDTH) + remaining_zeros
 }
 
 impl Natural {

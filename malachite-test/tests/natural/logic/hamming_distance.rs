@@ -4,6 +4,7 @@ use malachite_nz::natural::logic::hamming_distance::{
     limbs_hamming_distance, limbs_hamming_distance_same_length,
 };
 use malachite_nz::natural::Natural;
+use malachite_nz::platform::Limb;
 use malachite_test::common::natural_to_rug_integer;
 use malachite_test::inputs::base::{
     pairs_of_unsigned_vec_var_1, pairs_of_unsigned_vec_var_2, pairs_of_unsigneds,
@@ -17,6 +18,7 @@ use malachite_test::natural::logic::hamming_distance::{
 use rug;
 use std::str::FromStr;
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_hamming_distance_same_length() {
     let test = |xs, ys, out| {
@@ -27,12 +29,14 @@ fn test_limbs_hamming_distance_same_length() {
     test(&[1, 1, 1], &[1, 2, 3], 3);
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic(expected = "assertion failed: `(left == right)`")]
 fn limbs_hamming_distance_limb_same_length_fail() {
     limbs_hamming_distance_same_length(&[1], &[1, 2, 3]);
 }
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_hamming_distance() {
     let test = |xs, ys, out| {
@@ -87,9 +91,9 @@ fn test_hamming_distance() {
 }
 
 fn limbs_hamming_distance_helper(
-    f: &mut FnMut(&[u32], &[u32]) -> u64,
-    xs: &Vec<u32>,
-    ys: &Vec<u32>,
+    f: &mut FnMut(&[Limb], &[Limb]) -> u64,
+    xs: &Vec<Limb>,
+    ys: &Vec<Limb>,
 ) {
     assert_eq!(
         f(xs, ys),
@@ -129,7 +133,7 @@ fn hamming_distance_properties() {
 
     test_properties(
         triples_of_natural_natural_and_unsigned,
-        |&(ref a, ref b, c): &(Natural, Natural, u32)| {
+        |&(ref a, ref b, c): &(Natural, Natural, Limb)| {
             assert!(a.hamming_distance(c) <= a.hamming_distance(b) + b.hamming_distance(c));
         },
     );
@@ -144,7 +148,7 @@ fn hamming_distance_properties() {
         assert_eq!(Natural::ZERO.hamming_distance(n), n.count_ones());
     });
 
-    test_properties(pairs_of_unsigneds::<u32>, |&(x, y)| {
+    test_properties(pairs_of_unsigneds::<Limb>, |&(x, y)| {
         assert_eq!(
             Natural::from(x).hamming_distance(&Natural::from(y)),
             x.hamming_distance(y)

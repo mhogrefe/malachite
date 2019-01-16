@@ -1,71 +1,72 @@
 use common::test_properties;
 use malachite_base::num::{NegativeOne, One, SubMul, SubMulAssign, Zero};
 use malachite_nz::integer::Integer;
+use malachite_nz::platform::Limb;
 use malachite_test::inputs::integer::{integers, pairs_of_integers, triples_of_integers};
 use std::str::FromStr;
 
 #[test]
 fn test_sub_mul() {
-    let test = |u, v, w, out| {
-        let mut a = Integer::from_str(u).unwrap();
-        a.sub_mul_assign(Integer::from_str(v).unwrap(), Integer::from_str(w).unwrap());
+    let test = |i, j, k, out| {
+        let mut a = Integer::from_str(i).unwrap();
+        a.sub_mul_assign(Integer::from_str(j).unwrap(), Integer::from_str(k).unwrap());
         assert_eq!(a.to_string(), out);
         assert!(a.is_valid());
 
-        let mut a = Integer::from_str(u).unwrap();
+        let mut a = Integer::from_str(i).unwrap();
         a.sub_mul_assign(
-            Integer::from_str(v).unwrap(),
-            &Integer::from_str(w).unwrap(),
+            Integer::from_str(j).unwrap(),
+            &Integer::from_str(k).unwrap(),
         );
         assert_eq!(a.to_string(), out);
         assert!(a.is_valid());
 
-        let mut a = Integer::from_str(u).unwrap();
+        let mut a = Integer::from_str(i).unwrap();
         a.sub_mul_assign(
-            &Integer::from_str(v).unwrap(),
-            Integer::from_str(w).unwrap(),
+            &Integer::from_str(j).unwrap(),
+            Integer::from_str(k).unwrap(),
         );
         assert_eq!(a.to_string(), out);
         assert!(a.is_valid());
 
-        let mut a = Integer::from_str(u).unwrap();
+        let mut a = Integer::from_str(i).unwrap();
         a.sub_mul_assign(
-            &Integer::from_str(v).unwrap(),
-            &Integer::from_str(w).unwrap(),
+            &Integer::from_str(j).unwrap(),
+            &Integer::from_str(k).unwrap(),
         );
         assert_eq!(a.to_string(), out);
         assert!(a.is_valid());
 
-        let a = Integer::from_str(u)
+        let a = Integer::from_str(i)
             .unwrap()
-            .sub_mul(Integer::from_str(v).unwrap(), Integer::from_str(w).unwrap());
+            .sub_mul(Integer::from_str(j).unwrap(), Integer::from_str(k).unwrap());
         assert_eq!(a.to_string(), out);
         assert!(a.is_valid());
 
-        let a = Integer::from_str(u).unwrap().sub_mul(
-            Integer::from_str(v).unwrap(),
-            &Integer::from_str(w).unwrap(),
+        let a = Integer::from_str(i).unwrap().sub_mul(
+            Integer::from_str(j).unwrap(),
+            &Integer::from_str(k).unwrap(),
         );
         assert_eq!(a.to_string(), out);
         assert!(a.is_valid());
 
-        let a = Integer::from_str(u).unwrap().sub_mul(
-            &Integer::from_str(v).unwrap(),
-            Integer::from_str(w).unwrap(),
+        let a = Integer::from_str(i).unwrap().sub_mul(
+            &Integer::from_str(j).unwrap(),
+            Integer::from_str(k).unwrap(),
         );
         assert_eq!(a.to_string(), out);
         assert!(a.is_valid());
 
-        let a = Integer::from_str(u).unwrap().sub_mul(
-            &Integer::from_str(v).unwrap(),
-            &Integer::from_str(w).unwrap(),
+        let a = Integer::from_str(i).unwrap().sub_mul(
+            &Integer::from_str(j).unwrap(),
+            &Integer::from_str(k).unwrap(),
         );
         assert_eq!(a.to_string(), out);
         assert!(a.is_valid());
 
-        let a = (&Integer::from_str(u).unwrap()).sub_mul(
-            &Integer::from_str(v).unwrap(),
-            &Integer::from_str(w).unwrap(),
+        let a = (&Integer::from_str(i).unwrap()).sub_mul(
+            &Integer::from_str(j).unwrap(),
+            &Integer::from_str(k).unwrap(),
         );
         assert_eq!(a.to_string(), out);
         assert!(a.is_valid());
@@ -315,8 +316,8 @@ fn sub_mul_properties() {
     });
 
     test_properties(integers, |a| {
-        assert_eq!(a.sub_mul(a, &Integer::ONE), 0);
-        assert_eq!(a.sub_mul(&(-a), &Integer::NEGATIVE_ONE), 0);
+        assert_eq!(a.sub_mul(a, &Integer::ONE), 0 as Limb);
+        assert_eq!(a.sub_mul(&(-a), &Integer::NEGATIVE_ONE), 0 as Limb);
     });
 
     test_properties(pairs_of_integers, |&(ref a, ref b)| {
@@ -325,7 +326,7 @@ fn sub_mul_properties() {
         assert_eq!(Integer::ZERO.sub_mul(a, b), -a * b);
         assert_eq!(a.sub_mul(b, &Integer::ZERO), *a);
         assert_eq!(a.sub_mul(b, &Integer::ONE), a - b);
-        assert_eq!((a * b).sub_mul(a, b), 0);
-        assert_eq!((a * b).sub_mul(-a, -b), 0);
+        assert_eq!((a * b).sub_mul(a, b), 0 as Limb);
+        assert_eq!((a * b).sub_mul(-a, -b), 0 as Limb);
     });
 }

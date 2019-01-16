@@ -1,6 +1,7 @@
 use common::test_properties;
 use malachite_base::num::{CheckedSub, Zero};
 use malachite_nz::natural::Natural;
+use malachite_nz::platform::Limb;
 use malachite_test::common::{
     biguint_to_natural, natural_to_biguint, natural_to_rug_integer, rug_integer_to_natural,
 };
@@ -128,7 +129,7 @@ fn checked_sub_properties() {
         }
     });
 
-    test_properties(pairs_of_natural_and_unsigned::<u32>, |&(ref x, y)| {
+    test_properties(pairs_of_natural_and_unsigned::<Limb>, |&(ref x, y)| {
         let difference = x.checked_sub(Natural::from(y));
         assert_eq!(x.checked_sub(y), difference);
 
@@ -136,7 +137,7 @@ fn checked_sub_properties() {
         assert_eq!(CheckedSub::checked_sub(y, x).map(Natural::from), difference);
     });
 
-    test_properties(pairs_of_unsigneds::<u32>, |&(x, y)| {
+    test_properties(pairs_of_unsigneds::<Limb>, |&(x, y)| {
         assert_eq!(
             x.checked_sub(y).map(Natural::from),
             Natural::from(x).checked_sub(Natural::from(y))

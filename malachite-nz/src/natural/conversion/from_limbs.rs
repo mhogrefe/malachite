@@ -1,7 +1,8 @@
 use natural::{Large, Natural, Small};
+use platform::Limb;
 
 // Returns the length of `limbs`, excluding trailing zeros.
-fn limbs_significant_length(limbs: &[u32]) -> usize {
+fn limbs_significant_length(limbs: &[Limb]) -> usize {
     limbs
         .iter()
         .enumerate()
@@ -12,7 +13,7 @@ fn limbs_significant_length(limbs: &[u32]) -> usize {
 }
 
 impl Natural {
-    /// Converts a slice of limbs, or base-2<sup>32</sup> digits, to a `Natural`, in ascending
+    /// Converts a slice of limbs to a `Natural`, in ascending
     /// order, so that less significant limbs have lower indices in the input slice.
     ///
     /// This function borrows `limbs`. If taking ownership of `limbs` is possible,
@@ -35,16 +36,16 @@ impl Natural {
     /// // 10^12 = 232 * 2^32 + 3567587328
     /// assert_eq!(Natural::from_limbs_asc(&[3_567_587_328, 232]).to_string(), "1000000000000");
     /// ```
-    pub fn from_limbs_asc(limbs: &[u32]) -> Natural {
+    pub fn from_limbs_asc(limbs: &[Limb]) -> Natural {
         let significant_length = limbs_significant_length(limbs);
         match significant_length {
-            0 => Small(0u32),
+            0 => Small(0),
             1 => Small(limbs[0]),
             _ => Large(limbs[..significant_length].to_vec()),
         }
     }
 
-    /// Converts a slice of limbs, or base-2<sup>32</sup> digits, to a `Natural`, in descending
+    /// Converts a slice of limbs to a `Natural`, in descending
     /// order, so that less significant limbs have higher indices in the input slice.
     ///
     /// This function borrows `limbs`. If taking ownership of `limbs` is possible,
@@ -67,11 +68,11 @@ impl Natural {
     /// // 10^12 = 232 * 2^32 + 3567587328
     /// assert_eq!(Natural::from_limbs_desc(&[232, 3_567_587_328]).to_string(), "1000000000000");
     /// ```
-    pub fn from_limbs_desc(limbs: &[u32]) -> Natural {
-        Natural::from_limbs_asc(&limbs.iter().cloned().rev().collect::<Vec<u32>>())
+    pub fn from_limbs_desc(limbs: &[Limb]) -> Natural {
+        Natural::from_limbs_asc(&limbs.iter().cloned().rev().collect::<Vec<Limb>>())
     }
 
-    /// Converts a `Vec` of limbs, or base-2<sup>32</sup> digits, to a `Natural`, in ascending
+    /// Converts a `Vec` of limbs to a `Natural`, in ascending
     /// order, so that less significant limbs have lower indices in the input `Vec`.
     ///
     /// This function takes ownership of `limbs`. If it's necessary to borrow `limbs` instead, use
@@ -95,10 +96,10 @@ impl Natural {
     /// assert_eq!(Natural::from_owned_limbs_asc(vec![3567587328, 232]).to_string(),
     ///     "1000000000000");
     /// ```
-    pub fn from_owned_limbs_asc(mut limbs: Vec<u32>) -> Natural {
+    pub fn from_owned_limbs_asc(mut limbs: Vec<Limb>) -> Natural {
         let significant_length = limbs_significant_length(&limbs);
         match significant_length {
-            0 => Small(0u32),
+            0 => Small(0),
             1 => Small(limbs[0]),
             _ => {
                 limbs.truncate(significant_length);
@@ -107,7 +108,7 @@ impl Natural {
         }
     }
 
-    /// Converts a `Vec` of limbs, or base-2<sup>32</sup> digits, to a `Natural`, in descending
+    /// Converts a `Vec` of limbs to a `Natural`, in descending
     /// order, so that less significant limbs have higher indices in the input `Vec`.
     ///
     /// This function takes ownership of `limbs`. If it's necessary to borrow `limbs` instead, use
@@ -131,7 +132,7 @@ impl Natural {
     /// assert_eq!(Natural::from_owned_limbs_desc(vec![232, 3_567_587_328]).to_string(),
     ///     "1000000000000");
     /// ```
-    pub fn from_owned_limbs_desc(mut limbs: Vec<u32>) -> Natural {
+    pub fn from_owned_limbs_desc(mut limbs: Vec<Limb>) -> Natural {
         limbs.reverse();
         Natural::from_owned_limbs_asc(limbs)
     }

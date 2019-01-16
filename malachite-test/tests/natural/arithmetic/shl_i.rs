@@ -2,6 +2,7 @@ use common::test_properties;
 use malachite_base::num::{ShlRound, ShlRoundAssign, Zero};
 use malachite_base::round::RoundingMode;
 use malachite_nz::natural::Natural;
+use malachite_nz::platform::Limb;
 use malachite_test::common::{natural_to_rug_integer, rug_integer_to_natural};
 use malachite_test::inputs::base::{pairs_of_signed_and_rounding_mode, signeds};
 use malachite_test::inputs::natural::{
@@ -145,7 +146,7 @@ macro_rules! tests_and_properties {
             });
 
             test_properties(signeds::<$t>, |&i| {
-                assert_eq!(Natural::ZERO << i, 0);
+                assert_eq!(Natural::ZERO << i, 0 as Limb);
             });
         }
 
@@ -718,19 +719,19 @@ macro_rules! tests_and_properties {
         }
 
         #[test]
-        #[should_panic(expected = "Right shift is not exact: 123 >>= 1")]
+        #[should_panic(expected = "Right shift is not exact")]
         fn $shl_round_assign_i_fail_1() {
             Natural::from(123u32).shl_round_assign(-1 as $t, RoundingMode::Exact);
         }
 
         #[test]
-        #[should_panic(expected = "Right shift is not exact: 123 >>= 100")]
+        #[should_panic(expected = "Right shift is not exact")]
         fn $shl_round_assign_i_fail_2() {
             Natural::from(123u32).shl_round_assign(-100 as $t, RoundingMode::Exact);
         }
 
         #[test]
-        #[should_panic(expected = "Right shift is not exact.")]
+        #[should_panic(expected = "Right shift is not exact")]
         fn $shl_round_assign_i_fail_3() {
             Natural::from_str("1000000000001")
                 .unwrap()
@@ -738,7 +739,7 @@ macro_rules! tests_and_properties {
         }
 
         #[test]
-        #[should_panic(expected = "Right shift is not exact.")]
+        #[should_panic(expected = "Right shift is not exact")]
         fn $shl_round_assign_i_fail_4() {
             Natural::from_str("1000000000001")
                 .unwrap()
@@ -746,19 +747,19 @@ macro_rules! tests_and_properties {
         }
 
         #[test]
-        #[should_panic(expected = "Right shift is not exact: 123 >>= 1")]
+        #[should_panic(expected = "Right shift is not exact")]
         fn $shl_round_i_fail_1() {
             Natural::from(123u32).shl_round(-1 as $t, RoundingMode::Exact);
         }
 
         #[test]
-        #[should_panic(expected = "Right shift is not exact: 123 >>= 100")]
+        #[should_panic(expected = "Right shift is not exact")]
         fn $shl_round_i_fail_2() {
             Natural::from(123u32).shl_round(-100 as $t, RoundingMode::Exact);
         }
 
         #[test]
-        #[should_panic(expected = "Right shift is not exact.")]
+        #[should_panic(expected = "Right shift is not exact")]
         fn $shl_round_i_fail_3() {
             Natural::from_str("1000000000001")
                 .unwrap()
@@ -766,7 +767,7 @@ macro_rules! tests_and_properties {
         }
 
         #[test]
-        #[should_panic(expected = "Right shift is not exact.")]
+        #[should_panic(expected = "Right shift is not exact")]
         fn $shl_round_i_fail_4() {
             Natural::from_str("1000000000001")
                 .unwrap()
@@ -774,25 +775,25 @@ macro_rules! tests_and_properties {
         }
 
         #[test]
-        #[should_panic(expected = "Right shift is not exact: 123 >> 1")]
+        #[should_panic(expected = "Right shift is not exact")]
         fn $shl_round_i_ref_fail_1() {
             (&Natural::from(123u32)).shl_round(-1 as $t, RoundingMode::Exact);
         }
 
         #[test]
-        #[should_panic(expected = "Right shift is not exact: 123 >> 100")]
+        #[should_panic(expected = "Right shift is not exact")]
         fn $shl_round_i_ref_fail_2() {
             (&Natural::from(123u32)).shl_round(-100 as $t, RoundingMode::Exact);
         }
 
         #[test]
-        #[should_panic(expected = "Right shift is not exact: 1000000000001 >> 1")]
+        #[should_panic(expected = "Right shift is not exact")]
         fn $shl_round_i_ref_fail_3() {
             (&Natural::from_str("1000000000001").unwrap()).shl_round(-1 as $t, RoundingMode::Exact);
         }
 
         #[test]
-        #[should_panic(expected = "Right shift is not exact: 1000000000001 >> 100")]
+        #[should_panic(expected = "Right shift is not exact")]
         fn $shl_round_i_ref_fail_4() {
             (&Natural::from_str("1000000000001").unwrap())
                 .shl_round(-100 as $t, RoundingMode::Exact);
@@ -823,7 +824,7 @@ macro_rules! tests_and_properties {
             });
 
             test_properties(pairs_of_signed_and_rounding_mode::<$t>, |&(i, rm)| {
-                assert_eq!(Natural::ZERO.shl_round(i, rm), 0);
+                assert_eq!(Natural::ZERO.shl_round(i, rm), 0 as Limb);
             });
         }
     };
@@ -882,22 +883,22 @@ tests_and_properties!(
 );
 tests_and_properties!(
     i32,
-    test_shl_i32,
-    shl_i32_properties,
-    test_shl_round_i32,
-    shl_round_assign_i32_fail_1,
-    shl_round_assign_i32_fail_2,
-    shl_round_assign_i32_fail_3,
-    shl_round_assign_i32_fail_4,
-    shl_round_i32_fail_1,
-    shl_round_i32_fail_2,
-    shl_round_i32_fail_3,
-    shl_round_i32_fail_4,
-    shl_round_i32_ref_fail_1,
-    shl_round_i32_ref_fail_2,
-    shl_round_i32_ref_fail_3,
-    shl_round_i32_ref_fail_4,
-    shl_round_i32_properties,
+    test_shl_signed_limb,
+    shl_signed_limb_properties,
+    test_shl_round_signed_limb,
+    shl_round_assign_signed_limb_fail_1,
+    shl_round_assign_signed_limb_fail_2,
+    shl_round_assign_signed_limb_fail_3,
+    shl_round_assign_signed_limb_fail_4,
+    shl_round_signed_limb_fail_1,
+    shl_round_signed_limb_fail_2,
+    shl_round_signed_limb_fail_3,
+    shl_round_signed_limb_fail_4,
+    shl_round_signed_limb_ref_fail_1,
+    shl_round_signed_limb_ref_fail_2,
+    shl_round_signed_limb_ref_fail_3,
+    shl_round_signed_limb_ref_fail_4,
+    shl_round_signed_limb_properties,
     i,
     j,
     out,

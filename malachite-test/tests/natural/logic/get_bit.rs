@@ -2,6 +2,7 @@ use common::test_properties;
 use malachite_base::num::{BitAccess, One, SignificantBits};
 use malachite_nz::natural::logic::bit_access::limbs_get_bit;
 use malachite_nz::natural::Natural;
+use malachite_nz::platform::Limb;
 use malachite_test::common::{natural_to_biguint, natural_to_rug_integer};
 use malachite_test::inputs::base::{
     pairs_of_unsigned_and_small_unsigned, pairs_of_unsigned_vec_and_small_unsigned,
@@ -12,9 +13,10 @@ use num::BigUint;
 use rug;
 use std::str::FromStr;
 
+#[cfg(feature = "32_bit_limbs")]
 #[test]
 pub fn test_limbs_get_bit() {
-    let test = |limbs: &[u32], index: u64, out: bool| {
+    let test = |limbs: &[Limb], index: u64, out: bool| {
         assert_eq!(limbs_get_bit(limbs, index), out);
     };
     test(&[1], 0, true);
@@ -83,7 +85,7 @@ fn get_bit_properties() {
     });
 
     test_properties(
-        pairs_of_unsigned_and_small_unsigned::<u32, u64>,
+        pairs_of_unsigned_and_small_unsigned::<Limb, u64>,
         |&(u, index)| {
             assert_eq!(Natural::from(u).get_bit(index), u.get_bit(index));
         },

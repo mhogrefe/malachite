@@ -1,8 +1,9 @@
 use malachite_base::limbs::limbs_test_zero;
 use malachite_base::num::{DivisibleByPowerOfTwo, PrimitiveInteger};
 use natural::Natural::{self, Large, Small};
+use platform::Limb;
 
-/// Interpreting a slice of `u32`s as the limbs of a `Natural` in ascending order, determines
+/// Interpreting a slice of `Limb`s as the limbs of a `Natural` in ascending order, determines
 /// whether that `Natural` is divisible by 2 raised to a given power.
 ///
 /// This function assumes that `limbs` is nonempty and does not only contain zeros.
@@ -23,11 +24,11 @@ use natural::Natural::{self, Large, Small};
 /// assert_eq!(limbs_divisible_by_power_of_two(&[3_567_587_328, 232], 12), true);
 /// assert_eq!(limbs_divisible_by_power_of_two(&[3_567_587_328, 232], 13), false);
 /// ```
-pub fn limbs_divisible_by_power_of_two(limbs: &[u32], pow: u64) -> bool {
-    let zero_limbs = (pow >> u32::LOG_WIDTH) as usize;
+pub fn limbs_divisible_by_power_of_two(limbs: &[Limb], pow: u64) -> bool {
+    let zero_limbs = (pow >> Limb::LOG_WIDTH) as usize;
     zero_limbs < limbs.len()
         && limbs_test_zero(&limbs[..zero_limbs])
-        && limbs[zero_limbs].divisible_by_power_of_two(pow & u64::from(u32::WIDTH_MASK))
+        && limbs[zero_limbs].divisible_by_power_of_two(pow & u64::from(Limb::WIDTH_MASK))
 }
 
 impl<'a> DivisibleByPowerOfTwo for &'a Natural {

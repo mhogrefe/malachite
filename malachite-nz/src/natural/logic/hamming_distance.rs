@@ -1,9 +1,10 @@
 use malachite_base::num::HammingDistance;
 use natural::logic::count_ones::limbs_count_ones;
 use natural::Natural::{self, Large, Small};
+use platform::Limb;
 use std::cmp::Ordering;
 
-/// Interpreting two equal-length slices of `u32`s as the limbs of `Natural`s in ascending order,
+/// Interpreting two equal-length slices of `Limb`s as the limbs of `Natural`s in ascending order,
 /// returns the Hamming distance between them. Both have infinitely many implicit leading zeros.
 ///
 /// Time: worst case O(n)
@@ -22,7 +23,7 @@ use std::cmp::Ordering;
 /// assert_eq!(limbs_hamming_distance_same_length(&[2], &[3]), 1);
 /// assert_eq!(limbs_hamming_distance_same_length(&[1, 1, 1], &[1, 2, 3]), 3);
 /// ```
-pub fn limbs_hamming_distance_same_length(xs: &[u32], ys: &[u32]) -> u64 {
+pub fn limbs_hamming_distance_same_length(xs: &[Limb], ys: &[Limb]) -> u64 {
     assert_eq!(xs.len(), ys.len());
     xs.iter()
         .zip(ys.iter())
@@ -30,7 +31,7 @@ pub fn limbs_hamming_distance_same_length(xs: &[u32], ys: &[u32]) -> u64 {
         .sum()
 }
 
-/// Interpreting two slices of `u32`s as the limbs of `Natural`s in ascending order, returns the
+/// Interpreting two slices of `Limb`s as the limbs of `Natural`s in ascending order, returns the
 /// Hamming distance between them. Both have infinitely many implicit leading zeros.
 ///
 /// Time: worst case O(n)
@@ -46,7 +47,7 @@ pub fn limbs_hamming_distance_same_length(xs: &[u32], ys: &[u32]) -> u64 {
 /// assert_eq!(limbs_hamming_distance(&[1, 2, 3], &[3]), 4);
 /// assert_eq!(limbs_hamming_distance(&[1, 1, 1], &[1, 2, 3]), 3);
 /// ```
-pub fn limbs_hamming_distance(xs: &[u32], ys: &[u32]) -> u64 {
+pub fn limbs_hamming_distance(xs: &[Limb], ys: &[Limb]) -> u64 {
     let xs_len = xs.len();
     let ys_len = ys.len();
     match xs_len.cmp(&ys_len) {

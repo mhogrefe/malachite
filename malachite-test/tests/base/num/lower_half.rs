@@ -1,6 +1,7 @@
 use common::test_properties;
 use malachite_base::num::{JoinHalves, PrimitiveUnsigned, SplitInHalf};
 use malachite_test::inputs::base::unsigneds;
+use rand::Rand;
 use std::{u16, u8};
 
 fn lower_half_helper<T: PrimitiveUnsigned + SplitInHalf>(n: T, out: T::Half)
@@ -21,7 +22,7 @@ pub fn test_lower_half() {
     lower_half_helper(0xabcd_1234u32, 0x1234);
 }
 
-fn lower_half_properties_helper<T: JoinHalves + PrimitiveUnsigned + SplitInHalf>() {
+fn lower_half_properties_helper<T: JoinHalves + PrimitiveUnsigned + SplitInHalf + Rand>() {
     test_properties(unsigneds, |&n: &T| {
         let lower = n.lower_half();
         assert_eq!(T::join_halves(n.upper_half(), lower), n)

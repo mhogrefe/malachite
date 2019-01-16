@@ -3,6 +3,7 @@ use malachite_base::misc::{CheckedFrom, Max};
 use malachite_base::num::{Abs, IsPowerOfTwo, One, PrimitiveSigned, PrimitiveUnsigned, Zero};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
+use malachite_nz::platform::Limb;
 use malachite_test::common::{
     bigint_to_integer, integer_to_bigint, integer_to_rug_integer, rug_integer_to_integer,
 };
@@ -129,7 +130,7 @@ macro_rules! tests_and_properties {
             });
 
             test_properties_no_special(small_unsigneds::<$t>, |&u| {
-                assert_eq!(Integer::ZERO << u, 0);
+                assert_eq!(Integer::ZERO << u, 0 as Limb);
                 assert!(Natural::checked_from(Integer::ONE << u)
                     .unwrap()
                     .is_power_of_two());
@@ -167,8 +168,8 @@ tests_and_properties!(
 );
 tests_and_properties!(
     u32,
-    test_shl_u32,
-    shl_u32_properties,
+    test_shl_limb,
+    shl_limb_properties,
     u,
     v,
     out,

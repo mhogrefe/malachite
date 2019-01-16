@@ -1,6 +1,7 @@
 use common::test_properties;
 use malachite_base::num::{JoinHalves, PrimitiveUnsigned, SplitInHalf, Zero};
 use malachite_test::inputs::base::{pairs_of_unsigneds, unsigneds};
+use rand::Rand;
 use std::{u16, u8};
 
 fn join_halves_helper<T: JoinHalves + PrimitiveUnsigned>(upper: T::Half, lower: T::Half, out: T) {
@@ -20,7 +21,7 @@ pub fn test_join_halves() {
 
 fn join_halves_properties_helper<T: JoinHalves + PrimitiveUnsigned + SplitInHalf>()
 where
-    T::Half: PrimitiveUnsigned,
+    T::Half: PrimitiveUnsigned + Rand,
 {
     test_properties(pairs_of_unsigneds, |&(x, y): &(T::Half, T::Half)| {
         let joined = T::join_halves(x, y);

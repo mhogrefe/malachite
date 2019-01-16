@@ -3,6 +3,7 @@ use malachite_base::num::{PrimitiveInteger, PrimitiveSigned, PrimitiveUnsigned};
 use malachite_test::inputs::base::{
     pairs_of_signed_and_small_unsigned, pairs_of_unsigned_and_small_unsigned, unsigneds,
 };
+use rand::Rand;
 use std::u32;
 
 fn get_bit_helper_unsigned<T: PrimitiveInteger>() {
@@ -58,7 +59,7 @@ pub fn test_get_bit() {
     get_bit_helper_signed::<i64>();
 }
 
-fn get_bit_properties_helper_unsigned<T: PrimitiveUnsigned>() {
+fn get_bit_properties_helper_unsigned<T: PrimitiveUnsigned + Rand>() {
     test_properties(
         pairs_of_unsigned_and_small_unsigned::<T, u64>,
         |&(n, index)| {
@@ -80,7 +81,10 @@ fn get_bit_properties_helper_unsigned<T: PrimitiveUnsigned>() {
     });
 }
 
-fn get_bit_properties_helper_signed<T: PrimitiveSigned>() {
+fn get_bit_properties_helper_signed<T: PrimitiveSigned + Rand>()
+where
+    T::UnsignedOfEqualWidth: Rand,
+{
     test_properties(
         pairs_of_signed_and_small_unsigned,
         |&(n, index): &(T, u64)| {

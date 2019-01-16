@@ -1,7 +1,8 @@
 use natural::Natural::{self, Large, Small};
+use platform::Limb;
 use std::ops::{BitXor, BitXorAssign};
 
-/// Interpreting two equal-length slices of `u32`s as the limbs (in ascending order) of two
+/// Interpreting two equal-length slices of `Limb`s as the limbs (in ascending order) of two
 /// `Natural`s, returns a `Vec` of the limbs of the bitwise xor of the `Natural`s. The length of the
 /// result is the length of one of the input slices.
 ///
@@ -21,12 +22,12 @@ use std::ops::{BitXor, BitXorAssign};
 /// assert_eq!(limbs_xor_same_length(&[6, 7], &[1, 2]), &[7, 5]);
 /// assert_eq!(limbs_xor_same_length(&[100, 101, 102], &[102, 101, 100]), &[2, 0, 2]);
 /// ```
-pub fn limbs_xor_same_length(xs: &[u32], ys: &[u32]) -> Vec<u32> {
+pub fn limbs_xor_same_length(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
     assert_eq!(xs.len(), ys.len());
     xs.iter().zip(ys.iter()).map(|(x, y)| x ^ y).collect()
 }
 
-/// Interpreting two slices of `u32`s as the limbs (in ascending order) of two `Natural`s, returns
+/// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, returns
 /// a `Vec` of the limbs of the bitwise xor of the `Natural`s. The length of the result is the
 /// length of the longer input slice.
 ///
@@ -43,7 +44,7 @@ pub fn limbs_xor_same_length(xs: &[u32], ys: &[u32]) -> Vec<u32> {
 /// assert_eq!(limbs_xor(&[6, 7], &[1, 2, 3]), &[7, 5, 3]);
 /// assert_eq!(limbs_xor(&[100, 101, 102], &[102, 101, 100]), &[2, 0, 2]);
 /// ```
-pub fn limbs_xor(xs: &[u32], ys: &[u32]) -> Vec<u32> {
+pub fn limbs_xor(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
     let xs_len = xs.len();
     let ys_len = ys.len();
     if xs_len >= ys_len {
@@ -57,7 +58,7 @@ pub fn limbs_xor(xs: &[u32], ys: &[u32]) -> Vec<u32> {
     }
 }
 
-/// Interpreting two equal-length slices of `u32`s as the limbs (in ascending order) of two
+/// Interpreting two equal-length slices of `Limb`s as the limbs (in ascending order) of two
 /// `Natural`s, writes the limbs of the bitwise xor of the `Natural`s to an output slice. The output
 /// must be at least as long as one of the input slices.
 ///
@@ -82,7 +83,7 @@ pub fn limbs_xor(xs: &[u32], ys: &[u32]) -> Vec<u32> {
 /// limbs_xor_same_length_to_out(limbs, &[100, 101, 102], &[102, 101, 100]);
 /// assert_eq!(limbs, &[2, 0, 2, 10]);
 /// ```
-pub fn limbs_xor_same_length_to_out(out_limbs: &mut [u32], xs: &[u32], ys: &[u32]) {
+pub fn limbs_xor_same_length_to_out(out_limbs: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
     let len = xs.len();
     assert_eq!(len, ys.len());
     assert!(out_limbs.len() >= len);
@@ -91,7 +92,7 @@ pub fn limbs_xor_same_length_to_out(out_limbs: &mut [u32], xs: &[u32], ys: &[u32
     }
 }
 
-/// Interpreting two slices of `u32`s as the limbs (in ascending order) of two `Natural`s, writes
+/// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, writes
 /// the limbs of the bitwise xor of the `Natural`s to an output slice. The output must be at least
 /// as long as the longer input slice.
 ///
@@ -116,7 +117,7 @@ pub fn limbs_xor_same_length_to_out(out_limbs: &mut [u32], xs: &[u32], ys: &[u32
 /// limbs_xor_to_out(limbs, &[100, 101, 102], &[102, 101, 100]);
 /// assert_eq!(limbs, &[2, 0, 2, 10]);
 /// ```
-pub fn limbs_xor_to_out(out_limbs: &mut [u32], xs: &[u32], ys: &[u32]) {
+pub fn limbs_xor_to_out(out_limbs: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
     let xs_len = xs.len();
     let ys_len = ys.len();
     if xs_len >= ys_len {
@@ -130,7 +131,7 @@ pub fn limbs_xor_to_out(out_limbs: &mut [u32], xs: &[u32], ys: &[u32]) {
     }
 }
 
-/// Interpreting two equal-length slices of `u32`s as the limbs (in ascending order) of two
+/// Interpreting two equal-length slices of `Limb`s as the limbs (in ascending order) of two
 /// `Natural`s, writes the limbs of the bitwise xor of the `Natural`s to the first (left) slice.
 ///
 /// Time: worst case O(n)
@@ -154,14 +155,14 @@ pub fn limbs_xor_to_out(out_limbs: &mut [u32], xs: &[u32], ys: &[u32]) {
 /// limbs_xor_same_length_in_place_left(xs, &[102, 101, 100]);
 /// assert_eq!(xs, &[2, 0, 2]);
 /// ```
-pub fn limbs_xor_same_length_in_place_left(xs: &mut [u32], ys: &[u32]) {
+pub fn limbs_xor_same_length_in_place_left(xs: &mut [Limb], ys: &[Limb]) {
     assert_eq!(xs.len(), ys.len());
     for i in 0..xs.len() {
         xs[i] ^= ys[i];
     }
 }
 
-/// Interpreting a `Vec` of `u32`s and a slice of `u32`s as the limbs (in ascending order) of two
+/// Interpreting a `Vec` of `Limb`s and a slice of `Limb`s as the limbs (in ascending order) of two
 /// `Natural`s, writes the limbs of the bitwise xor of the `Natural`s to the `Vec`. If `ys` is
 /// longer than `xs`, `xs` will be extended.
 ///
@@ -187,7 +188,7 @@ pub fn limbs_xor_same_length_in_place_left(xs: &mut [u32], ys: &[u32]) {
 /// limbs_xor_in_place_left(&mut xs, &[102, 101, 100]);
 /// assert_eq!(xs, &[2, 0, 2]);
 /// ```
-pub fn limbs_xor_in_place_left(xs: &mut Vec<u32>, ys: &[u32]) {
+pub fn limbs_xor_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
     let xs_len = xs.len();
     let ys_len = ys.len();
     if xs_len >= ys_len {
@@ -198,7 +199,7 @@ pub fn limbs_xor_in_place_left(xs: &mut Vec<u32>, ys: &[u32]) {
     }
 }
 
-/// Interpreting two `Vec`s of `u32`s as the limbs (in ascending order) of two `Natural`s, writes
+/// Interpreting two `Vec`s of `Limb`s as the limbs (in ascending order) of two `Natural`s, writes
 /// the limbs of the bitwise xor of the `Natural`s to the longer slice (or the first one, if they
 /// are equally long). Returns a `bool` which is `false` when the output is to the first slice and
 /// `true` when it's to the second slice.
@@ -231,7 +232,7 @@ pub fn limbs_xor_in_place_left(xs: &mut Vec<u32>, ys: &[u32]) {
 /// assert_eq!(xs, &[2, 0, 2]);
 /// assert_eq!(ys, &[102, 101, 100]);
 /// ```
-pub fn limbs_xor_in_place_either(xs: &mut Vec<u32>, ys: &mut Vec<u32>) -> bool {
+pub fn limbs_xor_in_place_either(xs: &mut Vec<Limb>, ys: &mut Vec<Limb>) -> bool {
     let xs_len = xs.len();
     let ys_len = ys.len();
     if xs_len >= ys_len {
