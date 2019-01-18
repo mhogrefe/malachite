@@ -136,7 +136,7 @@ impl Div<Integer> for Limb {
     /// }
     /// ```
     fn div(self, other: Integer) -> Integer {
-        let non_negative = other >= 0 as Limb;
+        let non_negative = other.sign;
         let quotient = self / other.abs;
         if non_negative {
             Integer::from(quotient)
@@ -174,7 +174,7 @@ impl<'a> Div<&'a Integer> for Limb {
     /// ```
     fn div(self, other: &'a Integer) -> Integer {
         let quotient = self / &other.abs;
-        if *other >= 0 as Limb {
+        if other.sign {
             Integer::from(quotient)
         } else {
             -Natural::from(quotient)

@@ -30,9 +30,20 @@ use std::ops::{Add, AddAssign};
 impl Add<SignedLimb> for Integer {
     type Output = Integer;
 
+    #[inline]
     fn add(mut self, other: SignedLimb) -> Integer {
         self += other;
         self
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl Add<i32> for Integer {
+    type Output = Integer;
+
+    #[inline]
+    fn add(self, other: i32) -> Integer {
+        self + SignedLimb::from(other)
     }
 }
 
@@ -87,6 +98,16 @@ impl<'a> Add<SignedLimb> for &'a Integer {
     }
 }
 
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> Add<i32> for &'a Integer {
+    type Output = Integer;
+
+    #[inline]
+    fn add(self, other: i32) -> Integer {
+        self + SignedLimb::from(other)
+    }
+}
+
 /// Adds an `Integer` to a `SignedLimb`, taking the `Integer` by value.
 ///
 /// Time: worst case O(n)
@@ -112,9 +133,20 @@ impl<'a> Add<SignedLimb> for &'a Integer {
 impl Add<Integer> for SignedLimb {
     type Output = Integer;
 
+    #[inline]
     fn add(self, mut other: Integer) -> Integer {
         other.add_assign(self);
         other
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl Add<Integer> for i32 {
+    type Output = Integer;
+
+    #[inline]
+    fn add(self, other: Integer) -> Integer {
+        SignedLimb::from(self) + other
     }
 }
 
@@ -144,8 +176,19 @@ impl Add<Integer> for SignedLimb {
 impl<'a> Add<&'a Integer> for SignedLimb {
     type Output = Integer;
 
+    #[inline]
     fn add(self, other: &'a Integer) -> Integer {
         other + self
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> Add<&'a Integer> for i32 {
+    type Output = Integer;
+
+    #[inline]
+    fn add(self, other: &'a Integer) -> Integer {
+        SignedLimb::from(self) + other
     }
 }
 
@@ -197,5 +240,13 @@ impl AddAssign<SignedLimb> for Integer {
                 abs.assign(abs_other - small_abs);
             }
         }
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl AddAssign<i32> for Integer {
+    #[inline]
+    fn add_assign(&mut self, other: i32) {
+        *self += SignedLimb::from(other);
     }
 }

@@ -69,6 +69,7 @@ impl Add<Integer> for Integer {
 impl<'a> Add<&'a Integer> for Integer {
     type Output = Integer;
 
+    #[inline]
     fn add(mut self, other: &'a Integer) -> Integer {
         self += other;
         self
@@ -103,6 +104,7 @@ impl<'a> Add<&'a Integer> for Integer {
 impl<'a> Add<Integer> for &'a Integer {
     type Output = Integer;
 
+    #[inline]
     fn add(self, mut other: Integer) -> Integer {
         other += self;
         other

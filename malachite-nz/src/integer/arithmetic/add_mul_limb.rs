@@ -40,9 +40,20 @@ use std::cmp::{max, min};
 impl AddMul<Integer, Limb> for Integer {
     type Output = Integer;
 
+    #[inline]
     fn add_mul(mut self, b: Integer, c: Limb) -> Integer {
         self.add_mul_assign(b, c);
         self
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl AddMul<Integer, u32> for Integer {
+    type Output = Integer;
+
+    #[inline]
+    fn add_mul(self, b: Integer, c: u32) -> Integer {
+        self.add_mul(b, Limb::from(c))
     }
 }
 
@@ -72,9 +83,20 @@ impl AddMul<Integer, Limb> for Integer {
 impl<'a> AddMul<&'a Integer, Limb> for Integer {
     type Output = Integer;
 
+    #[inline]
     fn add_mul(mut self, b: &'a Integer, c: Limb) -> Integer {
         self.add_mul_assign(b, c);
         self
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> AddMul<&'a Integer, u32> for Integer {
+    type Output = Integer;
+
+    #[inline]
+    fn add_mul(self, b: &'a Integer, c: u32) -> Integer {
+        self.add_mul(b, Limb::from(c))
     }
 }
 
@@ -104,8 +126,19 @@ impl<'a> AddMul<&'a Integer, Limb> for Integer {
 impl<'a> AddMul<Integer, Limb> for &'a Integer {
     type Output = Integer;
 
+    #[inline]
     fn add_mul(self, b: Integer, c: Limb) -> Integer {
         self.add_mul(&b, c)
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> AddMul<Integer, u32> for &'a Integer {
+    type Output = Integer;
+
+    #[inline]
+    fn add_mul(self, b: Integer, c: u32) -> Integer {
+        self.add_mul(b, Limb::from(c))
     }
 }
 
@@ -167,6 +200,16 @@ impl<'a, 'b> AddMul<&'a Integer, Limb> for &'b Integer {
     }
 }
 
+#[cfg(feature = "64_bit_limbs")]
+impl<'a, 'b> AddMul<&'a Integer, u32> for &'b Integer {
+    type Output = Integer;
+
+    #[inline]
+    fn add_mul(self, b: &'a Integer, c: u32) -> Integer {
+        self.add_mul(b, Limb::from(c))
+    }
+}
+
 /// Adds the product of an `Integer` (b) and a `Limb` (c) to an `Integer` (self), in place, taking b
 /// by value.
 ///
@@ -223,6 +266,14 @@ impl AddMulAssign<Integer, Limb> for Integer {
     }
 }
 
+#[cfg(feature = "64_bit_limbs")]
+impl AddMulAssign<Integer, u32> for Integer {
+    #[inline]
+    fn add_mul_assign(&mut self, b: Integer, c: u32) {
+        self.add_mul_assign(b, Limb::from(c));
+    }
+}
+
 /// Adds the product of an `Integer` (b) and a `Limb` (c) to an `Integer` (self), in place, taking b
 /// by reference.
 ///
@@ -276,6 +327,14 @@ impl<'a> AddMulAssign<&'a Integer, Limb> for Integer {
             }
             large_aorsmul_val(&mut self.sign, &mut self.abs, b.sign, &b.abs, c, true);
         }
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> AddMulAssign<&'a Integer, u32> for Integer {
+    #[inline]
+    fn add_mul_assign(&mut self, b: &'a Integer, c: u32) {
+        self.add_mul_assign(b, Limb::from(c));
     }
 }
 

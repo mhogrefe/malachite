@@ -29,9 +29,20 @@ use std::ops::{Add, AddAssign};
 impl Add<Limb> for Integer {
     type Output = Integer;
 
+    #[inline]
     fn add(mut self, other: Limb) -> Integer {
         self += other;
         self
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl Add<u32> for Integer {
+    type Output = Integer;
+
+    #[inline]
+    fn add(self, other: u32) -> Integer {
+        self + Limb::from(other)
     }
 }
 
@@ -91,6 +102,16 @@ impl<'a> Add<Limb> for &'a Integer {
     }
 }
 
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> Add<u32> for &'a Integer {
+    type Output = Integer;
+
+    #[inline]
+    fn add(self, other: u32) -> Integer {
+        self + Limb::from(other)
+    }
+}
+
 /// Adds an `Integer` to a `Limb`, taking the `Integer` by value.
 ///
 /// Time: worst case O(n)
@@ -116,9 +137,20 @@ impl<'a> Add<Limb> for &'a Integer {
 impl Add<Integer> for Limb {
     type Output = Integer;
 
+    #[inline]
     fn add(self, mut other: Integer) -> Integer {
         other += self;
         other
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl Add<Integer> for u32 {
+    type Output = Integer;
+
+    #[inline]
+    fn add(self, other: Integer) -> Integer {
+        Limb::from(self) + other
     }
 }
 
@@ -148,8 +180,19 @@ impl Add<Integer> for Limb {
 impl<'a> Add<&'a Integer> for Limb {
     type Output = Integer;
 
+    #[inline]
     fn add(self, other: &'a Integer) -> Integer {
         other + self
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> Add<&'a Integer> for u32 {
+    type Output = Integer;
+
+    #[inline]
+    fn add(self, other: &'a Integer) -> Integer {
+        Limb::from(self) + other
     }
 }
 
@@ -202,5 +245,13 @@ impl AddAssign<Limb> for Integer {
                 abs.assign(other - small_abs);
             }
         }
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl AddAssign<u32> for Integer {
+    #[inline]
+    fn add_assign(&mut self, other: u32) {
+        *self += Limb::from(other);
     }
 }

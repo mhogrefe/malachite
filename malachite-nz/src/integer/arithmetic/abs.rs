@@ -31,6 +31,7 @@ use natural::Natural;
 /// }
 /// ```
 impl AbsAssign for Integer {
+    #[inline]
     fn abs_assign(&mut self) {
         self.sign = true;
     }
@@ -59,6 +60,7 @@ impl Abs for Integer {
     ///     assert_eq!(Integer::from(-123).abs().to_string(), "123");
     /// }
     /// ```
+    #[inline]
     fn abs(mut self) -> Integer {
         self.sign = true;
         self
@@ -122,6 +124,7 @@ impl UnsignedAbs for Integer {
     ///     assert_eq!(Integer::from(-123).unsigned_abs().to_string(), "123");
     /// }
     /// ```
+    #[inline]
     fn unsigned_abs(self) -> Natural {
         self.abs
     }
@@ -153,6 +156,7 @@ impl<'a> UnsignedAbs for &'a Integer {
     ///     assert_eq!((&Integer::from(-123)).unsigned_abs().to_string(), "123");
     /// }
     /// ```
+    #[inline]
     fn unsigned_abs(self) -> Natural {
         self.abs.clone()
     }
@@ -180,6 +184,7 @@ impl<'a> UnsignedAbs for &'a Integer {
 /// }
 /// ```
 impl Integer {
+    #[inline]
     pub fn unsigned_abs_ref(&self) -> &Natural {
         &self.abs
     }

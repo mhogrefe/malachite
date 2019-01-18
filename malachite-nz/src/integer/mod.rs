@@ -108,7 +108,7 @@ impl Walkable for Integer {
     /// }
     /// ```
     fn increment(&mut self) {
-        *self += 1 as Limb;
+        *self += 1;
     }
 
     /// Decrements `self`.

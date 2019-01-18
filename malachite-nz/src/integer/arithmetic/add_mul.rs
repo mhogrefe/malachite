@@ -31,6 +31,7 @@ use natural::Natural::{Large, Small};
 impl<'a> AddMul<Integer, Integer> for Integer {
     type Output = Integer;
 
+    #[inline]
     fn add_mul(mut self, b: Integer, c: Integer) -> Integer {
         self.add_mul_assign(b, c);
         self
@@ -65,6 +66,7 @@ impl<'a> AddMul<Integer, Integer> for Integer {
 impl<'a> AddMul<Integer, &'a Integer> for Integer {
     type Output = Integer;
 
+    #[inline]
     fn add_mul(mut self, b: Integer, c: &'a Integer) -> Integer {
         self.add_mul_assign(b, c);
         self
@@ -99,6 +101,7 @@ impl<'a> AddMul<Integer, &'a Integer> for Integer {
 impl<'a> AddMul<&'a Integer, Integer> for Integer {
     type Output = Integer;
 
+    #[inline]
     fn add_mul(mut self, b: &'a Integer, c: Integer) -> Integer {
         self.add_mul_assign(b, c);
         self
@@ -133,6 +136,7 @@ impl<'a> AddMul<&'a Integer, Integer> for Integer {
 impl<'a, 'b> AddMul<&'a Integer, &'b Integer> for Integer {
     type Output = Integer;
 
+    #[inline]
     fn add_mul(mut self, b: &'a Integer, c: &'b Integer) -> Integer {
         self.add_mul_assign(b, c);
         self

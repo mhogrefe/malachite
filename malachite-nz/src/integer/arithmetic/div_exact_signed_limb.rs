@@ -3,6 +3,8 @@ use malachite_base::num::{DivExact, DivExactAssign, UnsignedAbs, Zero};
 use natural::Natural;
 use platform::SignedLimb;
 
+//TODO start adding i32 impls here
+
 impl DivExact<SignedLimb> for Integer {
     type Output = Integer;
 
@@ -33,6 +35,7 @@ impl DivExact<SignedLimb> for Integer {
     ///         "8130081300");
     /// }
     /// ```
+    #[inline]
     fn div_exact(mut self, other: SignedLimb) -> Integer {
         self.div_exact_assign(other);
         self

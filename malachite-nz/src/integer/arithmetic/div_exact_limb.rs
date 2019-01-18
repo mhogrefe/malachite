@@ -33,9 +33,20 @@ impl DivExact<Limb> for Integer {
     ///         "-8130081300");
     /// }
     /// ```
+    #[inline]
     fn div_exact(mut self, other: Limb) -> Integer {
         self.div_exact_assign(other);
         self
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl DivExact<u32> for Integer {
+    type Output = Integer;
+
+    #[inline]
+    fn div_exact(self, other: u32) -> Integer {
+        self.div_exact(Limb::from(other))
     }
 }
 
@@ -82,6 +93,16 @@ impl<'a> DivExact<Limb> for &'a Integer {
     }
 }
 
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> DivExact<u32> for &'a Integer {
+    type Output = Integer;
+
+    #[inline]
+    fn div_exact(self, other: u32) -> Integer {
+        self.div_exact(Limb::from(other))
+    }
+}
+
 impl DivExactAssign<Limb> for Integer {
     /// Divides an `Integer` by a `Limb` in place. The `Integer` must be exactly divisible by the
     /// `Limb`. If it isn't, the behavior of this function is undefined.
@@ -116,6 +137,14 @@ impl DivExactAssign<Limb> for Integer {
     fn div_exact_assign(&mut self, other: Limb) {
         self.abs.div_exact_assign(other);
         self.sign |= self.abs == 0;
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl DivExactAssign<u32> for Integer {
+    #[inline]
+    fn div_exact_assign(&mut self, other: u32) {
+        self.div_exact_assign(Limb::from(other));
     }
 }
 
@@ -155,6 +184,16 @@ impl DivExact<Integer> for Limb {
     }
 }
 
+#[cfg(feature = "64_bit_limbs")]
+impl DivExact<Integer> for u32 {
+    type Output = Integer;
+
+    #[inline]
+    fn div_exact(self, other: Integer) -> Integer {
+        Limb::from(self).div_exact(other)
+    }
+}
+
 impl<'a> DivExact<&'a Integer> for Limb {
     type Output = Integer;
 
@@ -188,5 +227,15 @@ impl<'a> DivExact<&'a Integer> for Limb {
                 abs: Natural::from(abs),
             }
         }
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> DivExact<&'a Integer> for u32 {
+    type Output = Integer;
+
+    #[inline]
+    fn div_exact(self, other: &'a Integer) -> Integer {
+        Limb::from(self).div_exact(other)
     }
 }
