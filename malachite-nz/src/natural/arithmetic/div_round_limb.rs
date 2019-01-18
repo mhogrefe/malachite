@@ -1,5 +1,5 @@
 use malachite_base::num::{
-    BitAccess, DivAssignMod, DivMod, DivRound, DivRoundAssign, Parity, PrimitiveInteger,
+    DivAssignMod, DivMod, DivRound, DivRoundAssign, Parity, PrimitiveInteger,
 };
 use malachite_base::round::RoundingMode;
 use natural::Natural::{self, Large, Small};
@@ -61,7 +61,7 @@ pub fn limbs_limb_div_round_limbs(limb: Limb, limbs: &[Limb], rm: RoundingMode) 
             RoundingMode::Nearest => Some(
                 if limbs.len() == 2
                     && limbs[1] == 1
-                    && limb.get_bit(u64::from(Limb::WIDTH) - 1)
+                    && limb.get_highest_bit()
                     && (limb << 1) > limbs[0]
                 {
                     1

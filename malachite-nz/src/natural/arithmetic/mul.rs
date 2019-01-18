@@ -2058,9 +2058,13 @@ pub fn _limbs_mul_to_out_toom_42(
                 carry += 1;
             }
         } else if as1[n] == 2 {
-            carry = 2 * bs1[n] + mpn_addmul_1(v_1, &bs1[..n], 2);
+            carry = bs1[n]
+                .wrapping_mul(2)
+                .wrapping_add(mpn_addmul_1(v_1, &bs1[..n], 2));
         } else if as1[n] == 3 {
-            carry = 3 * bs1[n] + mpn_addmul_1(v_1, &bs1[..n], 3);
+            carry = bs1[n]
+                .wrapping_mul(3)
+                .wrapping_add(mpn_addmul_1(v_1, &bs1[..n], 3));
         }
         if bs1[n] != 0 && limbs_slice_add_same_length_in_place_left(v_1, &as1[..n]) {
             carry += 1;

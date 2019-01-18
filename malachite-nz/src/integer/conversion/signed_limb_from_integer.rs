@@ -1,6 +1,22 @@
 use integer::Integer;
-use malachite_base::misc::{CheckedFrom, Max, Min, WrappingFrom};
+use malachite_base::misc::{CheckedFrom, WrappingFrom};
+use malachite_base::num::PrimitiveInteger;
+use natural::Natural::Small;
 use platform::{Limb, SignedLimb};
+
+fn integer_fits_in_signed_limb(x: &Integer) -> bool {
+    match *x {
+        Integer {
+            sign: true,
+            abs: Small(x),
+        } => !x.get_highest_bit(),
+        Integer {
+            sign: false,
+            abs: Small(x),
+        } => !x.get_highest_bit() || x == 1 << (Limb::WIDTH - 1),
+        _ => false,
+    }
+}
 
 impl CheckedFrom<Integer> for SignedLimb {
     /// Converts an `Integer` to a `SignedLimb`, taking the `Integer` by value and returning `None` if
@@ -54,7 +70,7 @@ impl<'a> CheckedFrom<&'a Integer> for SignedLimb {
     /// }
     /// ```
     fn checked_from(value: &Integer) -> Option<SignedLimb> {
-        if *value >= SignedLimb::MIN && *value <= SignedLimb::MAX {
+        if integer_fits_in_signed_limb(value) {
             Some(SignedLimb::wrapping_from(value))
         } else {
             None

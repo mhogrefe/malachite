@@ -1,7 +1,7 @@
 use integer::Integer;
 use malachite_base::limbs::limbs_leading_zero_limbs;
 use malachite_base::misc::Max;
-use malachite_base::num::{BitAccess, PrimitiveInteger};
+use malachite_base::num::PrimitiveInteger;
 use natural::arithmetic::add_limb::limbs_slice_add_limb_in_place;
 use natural::conversion::to_limbs::LimbIterator;
 use natural::logic::not::limbs_not_in_place;
@@ -141,7 +141,7 @@ impl<'a> SignExtendedLimbIterator for LimbIterator<'a> {
     const EXTENSION: Limb = 0;
 
     fn needs_sign_extension(&self) -> bool {
-        self[self.limb_count - 1].get_bit(u64::from(Limb::WIDTH) - 1)
+        self[self.limb_count - 1].get_highest_bit()
     }
 }
 
@@ -160,7 +160,7 @@ impl<'a> SignExtendedLimbIterator for NegativeLimbIterator<'a> {
         } else {
             !last_limb
         };
-        !twos_complement_limb.get_bit(u64::from(Limb::WIDTH) - 1)
+        !twos_complement_limb.get_highest_bit()
     }
 }
 

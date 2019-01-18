@@ -1,8 +1,30 @@
 use integer::Integer;
 use malachite_base::misc::{CheckedFrom, WrappingFrom};
-use malachite_base::num::{One, PrimitiveInteger, SignificantBits};
-use natural::Natural;
-use platform::{DoubleLimb, SignedDoubleLimb};
+use malachite_base::num::PrimitiveInteger;
+use natural::Natural::{Large, Small};
+use platform::{DoubleLimb, Limb, SignedDoubleLimb};
+
+fn integer_fits_in_signed_double_limb(x: &Integer) -> bool {
+    match *x {
+        Integer {
+            sign: _,
+            abs: Small(_),
+        } => true,
+        Integer {
+            sign,
+            abs: Large(ref limbs),
+        } => {
+            if limbs.len() > 2 {
+                false
+            } else if sign {
+                !limbs[1].get_highest_bit()
+            } else {
+                // include check for x == SignedDoubleLimb::MIN
+                !limbs[1].get_highest_bit() || limbs[0] == 0 && limbs[1] == 1 << (Limb::WIDTH - 1)
+            }
+        }
+    }
+}
 
 impl CheckedFrom<Integer> for SignedDoubleLimb {
     /// Converts an `Integer` to a `SignedDoubleLimb`, taking the `Integer` by value and returning `None` if
@@ -68,9 +90,7 @@ impl<'a> CheckedFrom<&'a Integer> for SignedDoubleLimb {
     /// }
     /// ```
     fn checked_from(value: &Integer) -> Option<SignedDoubleLimb> {
-        if value.significant_bits() < u64::from(SignedDoubleLimb::WIDTH)
-            || *value == -(Natural::ONE << (SignedDoubleLimb::WIDTH - 1))
-        {
+        if integer_fits_in_signed_double_limb(value) {
             Some(SignedDoubleLimb::wrapping_from(value))
         } else {
             None

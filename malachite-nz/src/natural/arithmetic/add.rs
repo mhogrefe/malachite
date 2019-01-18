@@ -169,7 +169,7 @@ pub fn _limbs_add_to_out_special(xs: &mut [Limb], in_size: usize, ys: &[Limb]) -
     let mut carry = limbs_slice_add_same_length_in_place_left(&mut xs[..in_size], &ys[..in_size]);
     xs[in_size..ys.len()].copy_from_slice(&ys[in_size..]);
     if carry {
-        carry |= limbs_slice_add_limb_in_place(&mut xs[in_size..ys.len()], 1);
+        carry = limbs_slice_add_limb_in_place(&mut xs[in_size..ys.len()], 1);
     }
     carry
 }

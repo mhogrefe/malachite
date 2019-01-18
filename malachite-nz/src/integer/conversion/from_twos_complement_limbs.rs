@@ -2,7 +2,7 @@ use integer::conversion::to_twos_complement_limbs::{
     limbs_twos_complement, limbs_twos_complement_in_place,
 };
 use integer::Integer;
-use malachite_base::num::{BitAccess, PrimitiveInteger, Zero};
+use malachite_base::num::{PrimitiveInteger, Zero};
 use natural::Natural;
 use platform::Limb;
 
@@ -40,7 +40,7 @@ impl Integer {
     pub fn from_twos_complement_limbs_asc(limbs: &[Limb]) -> Integer {
         if limbs.is_empty() {
             Integer::ZERO
-        } else if !limbs.last().unwrap().get_bit(u64::from(Limb::WIDTH) - 1) {
+        } else if !limbs.last().unwrap().get_highest_bit() {
             Natural::from_limbs_asc(limbs).into()
         } else {
             -Natural::from_owned_limbs_asc(limbs_twos_complement(limbs))
@@ -118,7 +118,7 @@ impl Integer {
     pub fn from_owned_twos_complement_limbs_asc(mut limbs: Vec<Limb>) -> Integer {
         if limbs.is_empty() {
             Integer::ZERO
-        } else if !limbs.last().unwrap().get_bit(u64::from(Limb::WIDTH) - 1) {
+        } else if !limbs.last().unwrap().get_highest_bit() {
             Natural::from_owned_limbs_asc(limbs).into()
         } else {
             assert!(!limbs_twos_complement_in_place(&mut limbs));
