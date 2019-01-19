@@ -487,6 +487,7 @@ impl Integer {
     ///     assert_eq!(Integer::from(-105).to_twos_complement_bits_desc(),
     ///         vec![true, false, false, true, false, true, true, true]);
     /// }
+    /// ```
     pub fn to_twos_complement_bits_desc(&self) -> Vec<bool> {
         let mut bits = self.to_twos_complement_bits_asc();
         bits.reverse();

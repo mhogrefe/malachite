@@ -268,9 +268,9 @@ impl<'a> Rem<Limb> for &'a Integer {
 }
 
 impl RemAssign<Limb> for Integer {
-    /// Divides an `Integer` by a `Limb`, replacing the `Integer` by the remainder. The remainder has
-    /// the same sign as the dividend. The remainder has the same sign as the dividend. The quotient
-    /// and remainder satisfy `self` = q * `other` + r and 0 <= |r| < `other`.
+    /// Divides an `Integer` by a `Limb`, replacing the `Integer` by the remainder. The remainder
+    /// has the same sign as the dividend. The remainder has the same sign as the dividend. The
+    /// quotient and remainder satisfy `self` = q * `other` + r and 0 <= |r| < `other`.
     ///
     /// Time: worst case O(n)
     ///

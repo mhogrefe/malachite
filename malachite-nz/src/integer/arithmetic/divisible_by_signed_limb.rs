@@ -3,9 +3,9 @@ use malachite_base::num::{DivisibleBy, UnsignedAbs};
 use platform::SignedLimb;
 
 impl<'a> DivisibleBy<SignedLimb> for &'a Integer {
-    /// Returns whether an `Integer` is divisible by a `SignedLimb`; in other words, whether the `Integer`
-    /// is a multiple of the `SignedLimb`. This means that zero is divisible by any number, including zero;
-    /// but a nonzero number is never divisible by zero.
+    /// Returns whether an `Integer` is divisible by a `SignedLimb`; in other words, whether the
+    /// `Integer` is a multiple of the `SignedLimb`. This means that zero is divisible by any
+    /// number, including zero; but a nonzero number is never divisible by zero.
     ///
     /// This method is more efficient than finding a remainder and checking whether it's zero.
     ///
@@ -35,9 +35,9 @@ impl<'a> DivisibleBy<SignedLimb> for &'a Integer {
 }
 
 impl<'a> DivisibleBy<&'a Integer> for SignedLimb {
-    /// Returns whether a `SignedLimb` is divisible by an `Integer`; in other words, whether the `SignedLimb` is
-    /// a multiple of the `Integer`. This means that zero is divisible by any number, including
-    /// zero; but a nonzero number is never divisible by zero.
+    /// Returns whether a `SignedLimb` is divisible by an `Integer`; in other words, whether the
+    /// `SignedLimb` is a multiple of the `Integer`. This means that zero is divisible by any
+    /// number, including zero; but a nonzero number is never divisible by zero.
     ///
     /// Time: worst case O(1)
     ///

@@ -8,7 +8,7 @@ use malachite_test::inputs::integer::{
     pairs_of_integer_and_signed, triples_of_integer_signed_and_signed,
     triples_of_integer_signed_and_signed_var_1, triples_of_integer_signed_and_signed_var_2,
 };
-use malachite_test::integer::arithmetic::eq_signed_limb_mod_signed_limb::rug_eq_signed_limb_mod_signed_limb;
+use malachite_test::integer::arithmetic::eq_signed_limb_mod_signed_limb::*;
 use rug;
 use std::str::FromStr;
 

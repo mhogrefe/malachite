@@ -7,8 +7,8 @@ use std::ops::{Div, DivAssign};
 impl Div<SignedLimb> for Integer {
     type Output = Integer;
 
-    /// Divides an `Integer` by a `SignedLimb`, taking the `Integer` by value. The quotient is rounded
-    /// towards zero.
+    /// Divides an `Integer` by a `SignedLimb`, taking the `Integer` by value. The quotient is
+    /// rounded towards zero.
     ///
     /// Time: worst case O(n)
     ///
@@ -50,8 +50,8 @@ impl Div<SignedLimb> for Integer {
 impl<'a> Div<SignedLimb> for &'a Integer {
     type Output = Integer;
 
-    /// Divides an `Integer` by a `SignedLimb`, taking the `Integer` by reference. The quotient is rounded
-    /// towards zero.
+    /// Divides an `Integer` by a `SignedLimb`, taking the `Integer` by reference. The quotient is
+    /// rounded towards zero.
     ///
     /// Time: worst case O(n)
     ///
@@ -140,8 +140,8 @@ impl DivAssign<SignedLimb> for Integer {
 impl Div<Integer> for SignedLimb {
     type Output = Integer;
 
-    /// Divides a `SignedLimb` by an `Integer`, taking the `Integer` by value. The quotient is rounded
-    /// towards zero.
+    /// Divides a `SignedLimb` by an `Integer`, taking the `Integer` by value. The quotient is
+    /// rounded towards zero.
     ///
     /// Time: worst case O(1)
     ///
@@ -181,8 +181,8 @@ impl Div<Integer> for SignedLimb {
 impl<'a> Div<&'a Integer> for SignedLimb {
     type Output = Integer;
 
-    /// Divides a `SignedLimb` by an `Integer`, taking the `Integer` by reference. The quotient is rounded
-    /// towards zero.
+    /// Divides a `SignedLimb` by an `Integer`, taking the `Integer` by reference. The quotient is
+    /// rounded towards zero.
     ///
     /// Time: worst case O(1)
     ///

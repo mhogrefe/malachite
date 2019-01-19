@@ -77,9 +77,9 @@ pub fn limbs_invert_limb(limb: Limb) -> Limb {
 }
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
-/// quotient limbs of the `Natural` divided by a `Limb`. The divisor limb cannot be zero and the limb
-/// slice must be nonempty. The `Natural` must be exactly divisible by the `Limb`. If it isn't, the
-/// behavior of this function is undefined.
+/// quotient limbs of the `Natural` divided by a `Limb`. The divisor limb cannot be zero and the
+/// limb slice must be nonempty. The `Natural` must be exactly divisible by the `Limb`. If it isn't,
+/// the behavior of this function is undefined.
 ///
 /// Time: worst case O(n)
 ///
@@ -423,8 +423,8 @@ pub fn _limbs_div_exact_3_in_place_alt(limbs: &mut [Limb]) {
 impl DivExact<Limb> for Natural {
     type Output = Natural;
 
-    /// Divides a `Natural` by a `Limb`, taking the `Natural` by value. The `Natural` must be exactly
-    /// divisible by the `Limb`. If it isn't, the behavior of this function is undefined.
+    /// Divides a `Natural` by a `Limb`, taking the `Natural` by value. The `Natural` must be
+    /// exactly divisible by the `Limb`. If it isn't, the behavior of this function is undefined.
     ///
     /// Time: worst case O(n)
     ///
@@ -599,8 +599,8 @@ impl DivExact<Natural> for Limb {
 impl<'a> DivExact<&'a Natural> for Limb {
     type Output = Limb;
 
-    /// Divides a `Limb` by a `Natural`, taking the `Natural` by reference. The `Limb` must be exactly
-    /// divisible by the `Natural`. If it isn't, the behavior of this function is undefined.
+    /// Divides a `Limb` by a `Natural`, taking the `Natural` by reference. The `Limb` must be
+    /// exactly divisible by the `Natural`. If it isn't, the behavior of this function is undefined.
     ///
     /// Time: worst case O(1)
     ///

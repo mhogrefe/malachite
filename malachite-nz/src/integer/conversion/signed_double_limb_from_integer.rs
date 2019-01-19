@@ -27,8 +27,8 @@ fn integer_fits_in_signed_double_limb(x: &Integer) -> bool {
 }
 
 impl CheckedFrom<Integer> for SignedDoubleLimb {
-    /// Converts an `Integer` to a `SignedDoubleLimb`, taking the `Integer` by value and returning `None` if
-    /// the `Integer` is outside the range of a `SignedDoubleLimb`.
+    /// Converts an `Integer` to a `SignedDoubleLimb`, taking the `Integer` by value and returning
+    /// `None` if the `Integer` is outside the range of a `SignedDoubleLimb`.
     ///
     /// Time: worst case O(1)
     ///
@@ -61,8 +61,8 @@ impl CheckedFrom<Integer> for SignedDoubleLimb {
 }
 
 impl<'a> CheckedFrom<&'a Integer> for SignedDoubleLimb {
-    /// Converts an `Integer` to a `SignedDoubleLimb`, taking the `Integer` by reference and returning `None` if
-    /// the `Integer` is outside the range of a `SignedDoubleLimb`.
+    /// Converts an `Integer` to a `SignedDoubleLimb`, taking the `Integer` by reference and
+    /// returning `None` if the `Integer` is outside the range of a `SignedDoubleLimb`.
     ///
     /// Time: worst case O(1)
     ///
@@ -99,8 +99,8 @@ impl<'a> CheckedFrom<&'a Integer> for SignedDoubleLimb {
 }
 
 impl WrappingFrom<Integer> for SignedDoubleLimb {
-    /// Converts an `Integer` to a `SignedDoubleLimb`, taking the `Integer` by value and wrapping mod
-    /// 2<pow>64</pow>.
+    /// Converts an `Integer` to a `SignedDoubleLimb`, taking the `Integer` by value and wrapping
+    /// mod 2<pow>64</pow>.
     ///
     /// Time: worst case O(1)
     ///
@@ -132,8 +132,8 @@ impl WrappingFrom<Integer> for SignedDoubleLimb {
 }
 
 impl<'a> WrappingFrom<&'a Integer> for SignedDoubleLimb {
-    /// Converts an `Integer` to a `SignedDoubleLimb`, taking the `Integer` by reference and wrapping mod
-    /// 2<pow>64</pow>.
+    /// Converts an `Integer` to a `SignedDoubleLimb`, taking the `Integer` by reference and
+    /// wrapping mod 2<pow>64</pow>.
     ///
     /// Time: worst case O(1)
     ///

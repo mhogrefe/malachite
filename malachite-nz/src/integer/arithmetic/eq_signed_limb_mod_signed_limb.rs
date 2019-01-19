@@ -3,9 +3,9 @@ use malachite_base::num::{EqMod, UnsignedAbs};
 use platform::SignedLimb;
 
 impl<'a> EqMod<SignedLimb, SignedLimb> for &'a Integer {
-    /// Returns whether this `Integer` is equivalent to a `SignedLimb` mod a `SignedLimb` `modulus`; that is,
-    /// whether `self` - other is a multiple of `modulus`. Two numbers are equal to each other mod 0
-    /// iff they are equal.
+    /// Returns whether this `Integer` is equivalent to a `SignedLimb` mod a `SignedLimb` `modulus`;
+    /// that is, whether `self` - other is a multiple of `modulus`. Two numbers are equal to each
+    /// other mod 0 iff they are equal.
     ///
     /// Time: worst case O(n)
     ///
@@ -54,9 +54,9 @@ impl<'a> EqMod<SignedLimb, SignedLimb> for &'a Integer {
 }
 
 impl<'a> EqMod<&'a Integer, SignedLimb> for SignedLimb {
-    /// Returns whether this `SignedLimb` is equivalent to an `Integer` mod a `SignedLimb` `modulus`; that is,
-    /// whether other - `self` is a multiple of `modulus`. Two numbers are equal to each other mod 0
-    /// iff they are equal.
+    /// Returns whether this `SignedLimb` is equivalent to an `Integer` mod a `SignedLimb`
+    /// `modulus`; that is, whether other - `self` is a multiple of `modulus`. Two numbers are equal
+    /// to each other mod 0 iff they are equal.
     ///
     /// Time: worst case O(n)
     ///

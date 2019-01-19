@@ -205,8 +205,8 @@ impl<'a, 'b> AddMul<&'a Natural, Limb> for &'b Natural {
     }
 }
 
-/// Adds the product of a `Natural` (b) and a `Limb` (c) to a `Natural` (self), in place, taking b by
-/// value.
+/// Adds the product of a `Natural` (b) and a `Limb` (c) to a `Natural` (self), in place, taking b
+/// by value.
 ///
 /// Time: worst case O(n)
 ///
@@ -271,8 +271,8 @@ impl AddMulAssign<Natural, Limb> for Natural {
     }
 }
 
-/// Adds the product of a `Natural` (b) and a `Limb` (c) to a `Natural` (self), in place, taking b by
-/// reference.
+/// Adds the product of a `Natural` (b) and a `Limb` (c) to a `Natural` (self), in place, taking b
+/// by reference.
 ///
 /// Time: worst case O(n)
 ///

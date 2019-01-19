@@ -275,8 +275,9 @@ pub fn limbs_div_limb_to_out_mod(
 }
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
-/// limbs of the quotient of the `Natural` and a `Limb` to the input slice and returns the remainder.
-/// The divisor limb cannot be zero and the input limb slice must have at least two elements.
+/// limbs of the quotient of the `Natural` and a `Limb` to the input slice and returns the
+/// remainder. The divisor limb cannot be zero and the input limb slice must have at least two
+/// elements.
 ///
 /// Time: worst case O(n)
 ///
@@ -342,8 +343,8 @@ impl DivMod<Limb> for Natural {
     type DivOutput = Natural;
     type ModOutput = Limb;
 
-    /// Divides a `Natural` by a `Limb`, taking the `Natural` by value and returning the quotient and
-    /// remainder. The quotient is rounded towards negative infinity. The quotient and remainder
+    /// Divides a `Natural` by a `Limb`, taking the `Natural` by value and returning the quotient
+    /// and remainder. The quotient is rounded towards negative infinity. The quotient and remainder
     /// satisfy `self` = q * `other` + r and 0 <= r < `other`.
     ///
     /// Time: worst case O(n)
@@ -375,9 +376,9 @@ impl<'a> DivMod<Limb> for &'a Natural {
     type DivOutput = Natural;
     type ModOutput = Limb;
 
-    /// Divides a `Natural` by a `Limb`, taking the `Natural` by reference and returning the quotient
-    /// and remainder. The quotient is rounded towards negative infinity. The quotient and remainder
-    /// satisfy `self` = q * `other` + r and 0 <= r < `other`. 0 <= r < `other`.
+    /// Divides a `Natural` by a `Limb`, taking the `Natural` by reference and returning the
+    /// quotient and remainder. The quotient is rounded towards negative infinity. The quotient and
+    /// remainder satisfy `self` = q * `other` + r and 0 <= r < `other`. 0 <= r < `other`.
     ///
     /// Time: worst case O(n)
     ///
@@ -470,8 +471,8 @@ impl DivMod<Natural> for Limb {
     type DivOutput = Limb;
     type ModOutput = Limb;
 
-    /// Divides a `Limb` by a `Natural`, taking the `Natural` by value and returning the quotient and
-    /// remainder. The quotient is rounded towards negative infinity. The quotient and remainder
+    /// Divides a `Limb` by a `Natural`, taking the `Natural` by value and returning the quotient
+    /// and remainder. The quotient is rounded towards negative infinity. The quotient and remainder
     /// satisfy `self` = q * `other` + r and 0 <= r < `other`.
     ///
     /// Time: worst case O(1)
@@ -500,9 +501,9 @@ impl<'a> DivMod<&'a Natural> for Limb {
     type DivOutput = Limb;
     type ModOutput = Limb;
 
-    /// Divides a `Limb` by a `Natural`, taking the `Natural` by reference and returning the quotient
-    /// and remainder. The quotient is rounded towards negative infinity. The quotient and remainder
-    /// satisfy `self` = q * `other` + r and 0 <= r < `other`.
+    /// Divides a `Limb` by a `Natural`, taking the `Natural` by reference and returning the
+    /// quotient and remainder. The quotient is rounded towards negative infinity. The quotient and
+    /// remainder satisfy `self` = q * `other` + r and 0 <= r < `other`.
     ///
     /// Time: worst case O(1)
     ///
@@ -569,8 +570,8 @@ impl DivAssignMod<Natural> for Limb {
 impl<'a> DivAssignMod<&'a Natural> for Limb {
     type ModOutput = Limb;
 
-    /// Divides a `Limb` by a `Natural` in place, taking the `Natural` by reference and returning the
-    /// remainder. The quotient is rounded towards negative infinity. The quotient and remainder
+    /// Divides a `Limb` by a `Natural` in place, taking the `Natural` by reference and returning
+    /// the remainder. The quotient is rounded towards negative infinity. The quotient and remainder
     /// satisfy `self` = q * `other` + r and 0 <= r < `other`.
     ///
     /// Time: worst case O(1)
@@ -603,8 +604,8 @@ impl DivRem<Limb> for Natural {
     type DivOutput = Natural;
     type RemOutput = Limb;
 
-    /// Divides a `Natural` by a `Limb`, taking the `Natural` by value and returning the quotient and
-    /// remainder. The quotient is rounded towards negative infinity. The quotient and remainder
+    /// Divides a `Natural` by a `Limb`, taking the `Natural` by value and returning the quotient
+    /// and remainder. The quotient is rounded towards negative infinity. The quotient and remainder
     /// satisfy `self` = q * `other` + r and 0 <= r < `other`. For `Natural`s, rem is equivalent to
     /// mod.
     ///
@@ -636,10 +637,10 @@ impl<'a> DivRem<Limb> for &'a Natural {
     type DivOutput = Natural;
     type RemOutput = Limb;
 
-    /// Divides a `Natural` by a `Limb`, taking the `Natural` by reference and returning the quotient
-    /// and remainder. The quotient is rounded towards negative infinity. The quotient and remainder
-    /// satisfy `self` = q * `other` + r and 0 <= r < `other`. For `Natural`s, rem is equivalent to
-    /// mod.
+    /// Divides a `Natural` by a `Limb`, taking the `Natural` by reference and returning the
+    /// quotient and remainder. The quotient is rounded towards negative infinity. The quotient and
+    /// remainder satisfy `self` = q * `other` + r and 0 <= r < `other`. For `Natural`s, rem is
+    /// equivalent to mod.
     ///
     /// Time: worst case O(n)
     ///
@@ -702,8 +703,8 @@ impl DivRem<Natural> for Limb {
     type DivOutput = Limb;
     type RemOutput = Limb;
 
-    /// Divides a `Limb` by a `Natural`, taking the `Natural` by value and returning the quotient and
-    /// remainder. The quotient is rounded towards negative infinity. The quotient and remainder
+    /// Divides a `Limb` by a `Natural`, taking the `Natural` by value and returning the quotient
+    /// and remainder. The quotient is rounded towards negative infinity. The quotient and remainder
     /// satisfy `self` = q * `other` + r and 0 <= r < `other`. For `Natural`s, rem is equivalent to
     /// mod.
     ///
@@ -733,10 +734,10 @@ impl<'a> DivRem<&'a Natural> for Limb {
     type DivOutput = Limb;
     type RemOutput = Limb;
 
-    /// Divides a `Limb` by a `Natural`, taking the `Natural` by reference and returning the quotient
-    /// and remainder. The quotient is rounded towards negative infinity. The quotient and remainder
-    /// satisfy `self` = q * `other` + r and 0 <= r < `other`. For `Natural`s, rem is equivalent to
-    /// mod.
+    /// Divides a `Limb` by a `Natural`, taking the `Natural` by reference and returning the
+    /// quotient and remainder. The quotient is rounded towards negative infinity. The quotient and
+    /// remainder satisfy `self` = q * `other` + r and 0 <= r < `other`. For `Natural`s, rem is
+    /// equivalent to mod.
     ///
     /// Time: worst case O(1)
     ///
@@ -795,8 +796,8 @@ impl DivAssignRem<Natural> for Limb {
 impl<'a> DivAssignRem<&'a Natural> for Limb {
     type RemOutput = Limb;
 
-    /// Divides a `Limb` by a `Natural` in place, taking the `Natural` by reference and returning the
-    /// remainder. The quotient is rounded towards negative infinity. The quotient and remainder
+    /// Divides a `Limb` by a `Natural` in place, taking the `Natural` by reference and returning
+    /// the remainder. The quotient is rounded towards negative infinity. The quotient and remainder
     /// satisfy `self` = q * `other` + r and 0 <= r < `other`. For `Natural`s, rem is equivalent to
     /// mod.
     ///
@@ -828,9 +829,9 @@ impl CeilingDivNegMod<Limb> for Natural {
     type DivOutput = Natural;
     type ModOutput = Limb;
 
-    /// Divides the `Natural` by a `Limb`, taking the `Natural` by value and returning the ceiling of
-    /// the quotient and the remainder of the negative of the `Natural` divided by the `Limb`. The
-    /// quotient and remainder satisfy `self` = q * `other` - r and 0 <= r < `other`.
+    /// Divides the `Natural` by a `Limb`, taking the `Natural` by value and returning the ceiling
+    /// of the quotient and the remainder of the negative of the `Natural` divided by the `Limb`.
+    /// The quotient and remainder satisfy `self` = q * `other` - r and 0 <= r < `other`.
     ///
     /// Time: worst case O(n)
     ///
@@ -862,8 +863,8 @@ impl<'a> CeilingDivNegMod<Limb> for &'a Natural {
     type ModOutput = Limb;
 
     /// Divides a `Natural` by a `Limb`, taking the `Natural` by reference and returning the ceiling
-    /// of the quotient and the remainder of the negative of the `Natural` divided by the `Limb`. The
-    /// quotient and remainder satisfy `self` = q * `other` - r and 0 <= r < `other`.
+    /// of the quotient and the remainder of the negative of the `Natural` divided by the `Limb`.
+    /// The quotient and remainder satisfy `self` = q * `other` - r and 0 <= r < `other`.
     ///
     /// Time: worst case O(n)
     ///
@@ -970,8 +971,8 @@ impl<'a> CeilingDivNegMod<&'a Natural> for Limb {
     type ModOutput = Natural;
 
     /// Divides a `Limb` by a `Natural`, taking the `Natural` by reference and returning the ceiling
-    /// of the quotient and the remainder of the negative of the `Limb` divided by the `Natural`. The
-    /// quotient and remainder satisfy `self` = q * `other` - r and 0 <= r < `other`.
+    /// of the quotient and the remainder of the negative of the `Limb` divided by the `Natural`.
+    /// The quotient and remainder satisfy `self` = q * `other` - r and 0 <= r < `other`.
     ///
     /// Time: worst case O(n)
     ///

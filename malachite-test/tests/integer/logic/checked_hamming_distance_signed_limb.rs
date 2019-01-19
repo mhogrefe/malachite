@@ -1,7 +1,7 @@
 use common::test_properties;
 use malachite_base::misc::{Max, Min};
 use malachite_base::num::{CheckedHammingDistance, NegativeOne, PrimitiveInteger, Zero};
-use malachite_nz::integer::logic::checked_hamming_distance_signed_limb::limbs_hamming_distance_limb_neg;
+use malachite_nz::integer::logic::checked_hamming_distance_signed_limb::*;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::{Limb, SignedLimb};

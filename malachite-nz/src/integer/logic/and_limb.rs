@@ -37,8 +37,8 @@ impl BitAnd<Limb> for Integer {
     }
 }
 
-/// Takes the bitwise and of an `Integer` and a `Limb`, taking the `Integer` by reference. The output
-/// is a `Limb`.
+/// Takes the bitwise and of an `Integer` and a `Limb`, taking the `Integer` by reference. The
+/// output is a `Limb`.
 ///
 /// Time: worst case O(1)
 ///
@@ -99,8 +99,8 @@ impl BitAnd<Integer> for Limb {
     }
 }
 
-/// Takes the bitwise and of a `Limb` and an `Integer`, taking the `Integer` by reference. The output
-/// is a `Limb`.
+/// Takes the bitwise and of a `Limb` and an `Integer`, taking the `Integer` by reference. The
+/// output is a `Limb`.
 ///
 /// Time: worst case O(1)
 ///

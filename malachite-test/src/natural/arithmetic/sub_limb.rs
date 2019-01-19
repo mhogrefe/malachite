@@ -84,7 +84,8 @@ fn demo_limbs_sub_limb_to_out(gm: GenerationMode, limit: usize) {
         let mut out_limbs_old = out_limbs.clone();
         let borrow = limbs_sub_limb_to_out(&mut out_limbs, &in_limbs, limb);
         println!(
-            "out_limbs := {:?}; limbs_sub_limb_to_out(&mut out_limbs, {:?}, {}) = {}; out_limbs = {:?}",
+            "out_limbs := {:?}; limbs_sub_limb_to_out(&mut out_limbs, {:?}, {}) = {}; \
+             out_limbs = {:?}",
             out_limbs_old, in_limbs, limb, borrow, out_limbs
         );
     }

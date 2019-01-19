@@ -100,7 +100,8 @@ fn benchmark_integer_eq_signed_limb_mod_signed_limb_algorithms(
                 &mut (|(n, i, modulus)| no_out!(n.eq_mod(i, modulus))),
             ),
             (
-                "Integer == SignedLimb || SignedLimb != 0 && Integer.mod(SignedLimb) == SignedLimb.mod(SignedLimb)",
+                "Integer == SignedLimb || SignedLimb != 0 && Integer.mod(SignedLimb) == \
+                 SignedLimb.mod(SignedLimb)",
                 &mut (|(n, i, modulus)| {
                     no_out!(n == i || modulus != 0 && n.mod_op(modulus) == i.mod_op(modulus))
                 }),
@@ -133,7 +134,8 @@ fn benchmark_signed_limb_eq_integer_mod_signed_limb_algorithms(
                 &mut (|(i, ref n, modulus)| no_out!(i.eq_mod(n, modulus))),
             ),
             (
-                "SignedLimb == Integer || SignedLimb != 0 && SignedLimb.mod_op(SignedLimb) == Integer.mod_op(SignedLimb)",
+                "SignedLimb == Integer || SignedLimb != 0 && SignedLimb.mod_op(SignedLimb) == \
+                 Integer.mod_op(SignedLimb)",
                 &mut (|(n, i, modulus)| {
                     no_out!(i == n || modulus != 0 && i.mod_op(modulus) == n.mod_op(modulus))
                 }),

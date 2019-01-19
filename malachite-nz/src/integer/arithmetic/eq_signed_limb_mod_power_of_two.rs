@@ -3,9 +3,9 @@ use malachite_base::num::{EqModPowerOfTwo, UnsignedAbs};
 use platform::SignedLimb;
 
 impl<'a> EqModPowerOfTwo<SignedLimb> for &'a Integer {
-    /// Returns whether this `Integer` is equivalent to a `SignedLimb` mod two to the power of `pow`; that
-    /// is, whether the `pow` least-significant twos-complement bits of the `Integer` and the `SignedLimb`
-    /// are equal.
+    /// Returns whether this `Integer` is equivalent to a `SignedLimb` mod two to the power of
+    /// `pow`; that is, whether the `pow` least-significant twos-complement bits of the `Integer`
+    /// and the `SignedLimb` are equal.
     ///
     /// Time: worst case O(n)
     ///
@@ -42,9 +42,9 @@ impl<'a> EqModPowerOfTwo<SignedLimb> for &'a Integer {
 }
 
 impl<'a> EqModPowerOfTwo<&'a Integer> for SignedLimb {
-    /// Returns whether this `SignedLimb` is equivalent to a `Integer` mod two to the power of `pow`; that
-    /// is, whether the `pow` least-significant twos-complement bits of the `SignedLimb` and the `Integer`
-    /// are equal.
+    /// Returns whether this `SignedLimb` is equivalent to a `Integer` mod two to the power of
+    /// `pow`; that is, whether the `pow` least-significant twos-complement bits of the `SignedLimb`
+    /// and the `Integer` are equal.
     ///
     /// Time: worst case O(n)
     ///

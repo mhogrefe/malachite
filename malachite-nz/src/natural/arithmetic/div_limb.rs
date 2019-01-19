@@ -163,8 +163,8 @@ fn limbs_div_limb_normalized_to_out(
 }
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
-/// quotient limbs of the `Natural` divided by a `Limb`. The divisor limb cannot be zero and the limb
-/// slice must have at least two elements.
+/// quotient limbs of the `Natural` divided by a `Limb`. The divisor limb cannot be zero and the
+/// limb slice must have at least two elements.
 ///
 /// Time: worst case O(n)
 ///

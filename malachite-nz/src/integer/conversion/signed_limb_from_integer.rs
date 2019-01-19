@@ -19,8 +19,8 @@ fn integer_fits_in_signed_limb(x: &Integer) -> bool {
 }
 
 impl CheckedFrom<Integer> for SignedLimb {
-    /// Converts an `Integer` to a `SignedLimb`, taking the `Integer` by value and returning `None` if
-    /// the `Integer` is outside the range of a `SignedLimb`.
+    /// Converts an `Integer` to a `SignedLimb`, taking the `Integer` by value and returning `None`
+    /// if the `Integer` is outside the range of a `SignedLimb`.
     ///
     /// Time: worst case O(1)
     ///
@@ -47,8 +47,8 @@ impl CheckedFrom<Integer> for SignedLimb {
 }
 
 impl<'a> CheckedFrom<&'a Integer> for SignedLimb {
-    /// Converts an `Integer` to a `SignedLimb`, taking the `Integer` by reference and returning `None` if
-    /// the `Integer` is outside the range of a `SignedLimb`.
+    /// Converts an `Integer` to a `SignedLimb`, taking the `Integer` by reference and returning
+    /// `None` if the `Integer` is outside the range of a `SignedLimb`.
     ///
     /// Time: worst case O(1)
     ///

@@ -209,8 +209,8 @@ pub fn limbs_slice_add_same_length_in_place_left(xs: &mut [Limb], ys: &[Limb]) -
     carry
 }
 
-/// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, where the
-/// length of the first slice is greater than or equal to the length of the second, writes the
+/// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, where
+/// the length of the first slice is greater than or equal to the length of the second, writes the
 /// `xs.len()` least-significant limbs of the sum of the `Natural`s to the first (left) slice.
 /// Returns whether there is a carry.
 ///

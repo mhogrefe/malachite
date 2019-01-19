@@ -4,8 +4,8 @@ use malachite_base::num::{AddMul, AddMulAssign, SubMul, SubMulAssign};
 use natural::Natural::Small;
 use platform::Limb;
 
-/// Subs the product of an `Integer` (b) and a `Limb` (c) to an `Integer` (self), taking `self` and b
-/// by value.
+/// Subs the product of an `Integer` (b) and a `Limb` (c) to an `Integer` (self), taking `self` and
+/// b by value.
 ///
 /// Time: worst case O(n)
 ///
@@ -99,8 +99,8 @@ impl<'a> SubMul<Integer, Limb> for &'a Integer {
     }
 }
 
-/// Subs the product of an `Integer` (b) and a `Limb` (c) to an `Integer` (self), taking `self` and b
-/// by reference.
+/// Subs the product of an `Integer` (b) and a `Limb` (c) to an `Integer` (self), taking `self` and
+/// b by reference.
 ///
 /// Time: worst case O(n)
 ///

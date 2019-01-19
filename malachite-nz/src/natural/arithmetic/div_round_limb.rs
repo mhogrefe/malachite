@@ -76,8 +76,8 @@ pub fn limbs_limb_div_round_limbs(limb: Limb, limbs: &[Limb], rm: RoundingMode) 
 impl DivRound<Limb> for Natural {
     type Output = Natural;
 
-    /// Divides a `Natural` by a `Limb` and rounds according to a specified rounding mode, taking the
-    /// `Natural` by value. See the `RoundingMode` documentation for details.
+    /// Divides a `Natural` by a `Limb` and rounds according to a specified rounding mode, taking
+    /// the `Natural` by value. See the `RoundingMode` documentation for details.
     ///
     /// Time: worst case O(n)
     ///
@@ -117,8 +117,8 @@ impl DivRound<Limb> for Natural {
 impl<'a> DivRound<Limb> for &'a Natural {
     type Output = Natural;
 
-    /// Divides a `Natural` by a `Limb` and rounds according to a specified rounding mode, taking the
-    /// `Natural` by reference. See the `RoundingMode` documentation for details.
+    /// Divides a `Natural` by a `Limb` and rounds according to a specified rounding mode, taking
+    /// the `Natural` by reference. See the `RoundingMode` documentation for details.
     ///
     /// Time: worst case O(n)
     ///
@@ -184,8 +184,8 @@ impl<'a> DivRound<Limb> for &'a Natural {
 impl DivRound<Natural> for Limb {
     type Output = Limb;
 
-    /// Divides a `Limb` by a `Natural` and rounds according to a specified rounding mode, taking the
-    /// `Natural` by value. See the `RoundingMode` documentation for details.
+    /// Divides a `Limb` by a `Natural` and rounds according to a specified rounding mode, taking
+    /// the `Natural` by value. See the `RoundingMode` documentation for details.
     ///
     /// Time: worst case O(n)
     ///
@@ -222,8 +222,8 @@ impl DivRound<Natural> for Limb {
 impl<'a> DivRound<&'a Natural> for Limb {
     type Output = Limb;
 
-    /// Divides a `Limb` by a `Natural` and rounds according to a specified rounding mode, taking the
-    /// `Natural` by reference. See the `RoundingMode` documentation for details.
+    /// Divides a `Limb` by a `Natural` and rounds according to a specified rounding mode, taking
+    /// the `Natural` by reference. See the `RoundingMode` documentation for details.
     ///
     /// Time: worst case O(n)
     ///

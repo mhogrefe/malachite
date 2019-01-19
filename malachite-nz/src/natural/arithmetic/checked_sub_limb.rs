@@ -31,8 +31,8 @@ impl Natural {
     }
 }
 
-/// Subtracts a `Limb` from a `Natural`, taking the `Natural` by value. If the `Limb` is greater than
-/// the `Natural`, returns `None`.
+/// Subtracts a `Limb` from a `Natural`, taking the `Natural` by value. If the `Limb` is greater
+/// than the `Natural`, returns `None`.
 ///
 /// Time: worst case O(n)
 ///

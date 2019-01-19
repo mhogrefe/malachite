@@ -4,8 +4,8 @@ use platform::Limb;
 
 impl<'a> DivisibleBy<Limb> for &'a Integer {
     /// Returns whether an `Integer` is divisible by a `Limb`; in other words, whether the `Integer`
-    /// is a multiple of the `Limb`. This means that zero is divisible by any number, including zero;
-    /// but a nonzero number is never divisible by zero.
+    /// is a multiple of the `Limb`. This means that zero is divisible by any number, including
+    /// zero; but a nonzero number is never divisible by zero.
     ///
     /// This method is more efficient than finding a remainder and checking whether it's zero.
     ///
@@ -35,9 +35,9 @@ impl<'a> DivisibleBy<Limb> for &'a Integer {
 }
 
 impl<'a> DivisibleBy<&'a Integer> for Limb {
-    /// Returns whether a `Limb` is divisible by an `Integer`; in other words, whether the `Limb` is a
-    /// multiple of the `Integer`. This means that zero is divisible by any number, including zero;
-    /// but a nonzero number is never divisible by zero.
+    /// Returns whether a `Limb` is divisible by an `Integer`; in other words, whether the `Limb` is
+    /// a multiple of the `Integer`. This means that zero is divisible by any number, including
+    /// zero; but a nonzero number is never divisible by zero.
     ///
     /// Time: worst case O(1)
     ///

@@ -626,7 +626,8 @@ macro_rules! tests_and_properties {
 
                     $shl_library_comparison_properties
 
-                    if $u < (<$t as PrimitiveUnsigned>::SignedOfEqualWidth::MAX.to_unsigned_bitwise()) {
+                    let x = <$t as PrimitiveUnsigned>::SignedOfEqualWidth::MAX;
+                    if $u < x.to_unsigned_bitwise() {
                         let u = $u.to_signed_bitwise();
                         assert_eq!($n >> u, $shifted);
                         assert_eq!($n << -u, $shifted);

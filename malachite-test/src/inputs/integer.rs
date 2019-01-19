@@ -492,7 +492,8 @@ where
     )
 }
 
-// All pairs of `Integer` and nonzero `SignedLimb`, where the `Integer` is not divisible by the `SignedLimb`.
+// All pairs of `Integer` and nonzero `SignedLimb`, where the `Integer` is not divisible by the
+// `SignedLimb`.
 pub fn pairs_of_integer_and_nonzero_signed_limb_var_2(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (Integer, SignedLimb)>> {
@@ -583,7 +584,8 @@ where
     }
 }
 
-// All pairs of `SignedLimb` and positive `Integer` where the `SignedLimb` is not divisible by the `Integer`.
+// All pairs of `SignedLimb` and positive `Integer` where the `SignedLimb` is not divisible by the
+// `Integer`.
 pub fn pairs_of_signed_limb_and_nonzero_integer_var_1(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (SignedLimb, Integer)>> {
@@ -1358,8 +1360,8 @@ where
     )
 }
 
-// All triples of `Integer`, `SignedLimb`, and small `T`, where `U` is unsigned and the `Integer` is not
-// equal to the `SignedLimb` mod 2 to the power of the `T`.
+// All triples of `Integer`, `SignedLimb`, and small `T`, where `U` is unsigned and the `Integer` is
+// not equal to the `SignedLimb` mod 2 to the power of the `T`.
 pub fn triples_of_integer_signed_limb_and_small_unsigned_var_2<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (Integer, SignedLimb, T)>> {
@@ -1718,8 +1720,8 @@ where
 }
 
 // All triples of `Integer`, small `T`, and `RoundingMode`, where `T` is signed, such that if the
-// `SignedLimb` is positive and the `RoundingMode` is `RoundingMode::Exact`, the `Integer` is divisible by
-// 2 to the power of the `T`.
+// `SignedLimb` is positive and the `RoundingMode` is `RoundingMode::Exact`, the `Integer` is
+// divisible by 2 to the power of the `T`.
 pub fn triples_of_integer_small_signed_and_rounding_mode_var_2<T: PrimitiveSigned + Rand>(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (Integer, T, RoundingMode)>>

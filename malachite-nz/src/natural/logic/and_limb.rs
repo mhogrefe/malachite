@@ -24,8 +24,8 @@ pub fn limbs_and_limb(limbs: &[Limb], limb: Limb) -> Limb {
     limbs[0] & limb
 }
 
-/// Takes the bitwise and of a `Natural` and a `Limb`, taking the `Natural` by value. The output is a
-/// `Limb`.
+/// Takes the bitwise and of a `Natural` and a `Limb`, taking the `Natural` by value. The output is
+/// a `Limb`.
 ///
 /// Time: worst case O(1)
 ///
@@ -82,8 +82,8 @@ impl<'a> BitAnd<Limb> for &'a Natural {
     }
 }
 
-/// Takes the bitwise and of a `Limb` and a `Natural`, taking the `Natural` by value. The output is a
-/// `Limb`.
+/// Takes the bitwise and of a `Limb` and a `Natural`, taking the `Natural` by value. The output is
+/// a `Limb`.
 ///
 /// Time: worst case O(1)
 ///

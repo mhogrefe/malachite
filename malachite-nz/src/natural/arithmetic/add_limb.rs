@@ -116,8 +116,8 @@ pub fn limbs_slice_add_limb_in_place<T: PrimitiveUnsigned>(limbs: &mut [T], mut 
     limb != T::ZERO
 }
 
-/// Interpreting a nonempty `Vec` of `Limb`s as the limbs (in ascending order) of a `Natural`, writes
-/// the limbs of the sum of the `Natural` and a `Limb` to the input `Vec`.
+/// Interpreting a nonempty `Vec` of `Limb`s as the limbs (in ascending order) of a `Natural`,
+/// writes the limbs of the sum of the `Natural` and a `Limb` to the input `Vec`.
 ///
 /// Time: worst case O(n)
 ///

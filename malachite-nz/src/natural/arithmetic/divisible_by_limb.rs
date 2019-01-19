@@ -51,8 +51,8 @@ pub fn limbs_divisible_by_limb(limbs: &[Limb], divisor: Limb) -> bool {
 
 impl<'a> DivisibleBy<Limb> for &'a Natural {
     /// Returns whether a `Natural` is divisible by a `Limb`; in other words, whether the `Natural`
-    /// is a multiple of the `Limb`. This means that zero is divisible by any number, including zero;
-    /// but a nonzero number is never divisible by zero.
+    /// is a multiple of the `Limb`. This means that zero is divisible by any number, including
+    /// zero; but a nonzero number is never divisible by zero.
     ///
     /// This method is more efficient than finding a remainder and checking whether it's zero.
     ///
@@ -87,9 +87,9 @@ impl<'a> DivisibleBy<Limb> for &'a Natural {
 }
 
 impl<'a> DivisibleBy<&'a Natural> for Limb {
-    /// Returns whether a `Limb` is divisible by a `Natural`; in other words, whether the `Limb` is a
-    /// multiple of the `Natural`. This means that zero is divisible by any number, including zero;
-    /// but a nonzero number is never divisible by zero.
+    /// Returns whether a `Limb` is divisible by a `Natural`; in other words, whether the `Limb` is
+    /// a multiple of the `Natural`. This means that zero is divisible by any number, including
+    /// zero; but a nonzero number is never divisible by zero.
     ///
     /// Time: worst case O(1)
     ///

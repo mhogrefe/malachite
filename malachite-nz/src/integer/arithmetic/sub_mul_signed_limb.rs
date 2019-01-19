@@ -2,8 +2,8 @@ use integer::Integer;
 use malachite_base::num::{AddMul, AddMulAssign, SubMul, SubMulAssign, UnsignedAbs};
 use platform::{Limb, SignedLimb};
 
-/// Adds the product of an `Integer` (b) and a `SignedLimb` (c) to an `Integer` (self), taking `self` and
-/// b by value.
+/// Adds the product of an `Integer` (b) and a `SignedLimb` (c) to an `Integer` (self), taking
+/// `self` and b by value.
 ///
 /// # Examples
 /// ```
@@ -28,8 +28,8 @@ impl SubMul<Integer, SignedLimb> for Integer {
     }
 }
 
-/// Adds the product of an `Integer` (b) and a `SignedLimb` (c) to an `Integer` (self), taking `self` by
-/// value and b by reference.
+/// Adds the product of an `Integer` (b) and a `SignedLimb` (c) to an `Integer` (self), taking
+/// `self` by value and b by reference.
 ///
 /// # Examples
 /// ```
@@ -54,8 +54,8 @@ impl<'a> SubMul<&'a Integer, SignedLimb> for Integer {
     }
 }
 
-/// Adds the product of an `Integer` (b) and a `SignedLimb` (c) to an `Integer` (self), taking `self` by
-/// reference and b by value.
+/// Adds the product of an `Integer` (b) and a `SignedLimb` (c) to an `Integer` (self), taking
+/// `self` by reference and b by value.
 ///
 /// # Examples
 /// ```
@@ -79,8 +79,8 @@ impl<'a> SubMul<Integer, SignedLimb> for &'a Integer {
     }
 }
 
-/// Adds the product of an `Integer` (b) and a `SignedLimb` (c) to an `Integer` (self), taking `self` and
-/// b by reference.
+/// Adds the product of an `Integer` (b) and a `SignedLimb` (c) to an `Integer` (self), taking
+/// `self` and b by reference.
 ///
 /// # Examples
 /// ```
@@ -108,8 +108,8 @@ impl<'a, 'b> SubMul<&'a Integer, SignedLimb> for &'b Integer {
     }
 }
 
-/// Adds the product of an `Integer` (b) and a `SignedLimb` (c) to an `Integer` (self), in place, taking b
-/// by value.
+/// Adds the product of an `Integer` (b) and a `SignedLimb` (c) to an `Integer` (self), in place,
+/// taking b by value.
 ///
 /// # Examples
 /// ```
@@ -135,8 +135,8 @@ impl SubMulAssign<Integer, SignedLimb> for Integer {
     }
 }
 
-/// Adds the product of an `Integer` (b) and a `SignedLimb` (c) to an `Integer` (self), in place, taking b
-/// by reference.
+/// Adds the product of an `Integer` (b) and a `SignedLimb` (c) to an `Integer` (self), in place,
+/// taking b by reference.
 ///
 /// # Examples
 /// ```

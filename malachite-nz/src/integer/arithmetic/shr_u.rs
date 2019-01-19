@@ -167,6 +167,7 @@ macro_rules! impl_integer_shr_unsigned {
         ///     assert_eq!(Integer::from(0x100u32).shr_round(8u32, RoundingMode::Exact).to_string(),
         ///         "1");
         /// }
+        /// ```
         impl ShrRound<$t> for Integer {
             type Output = Integer;
 
@@ -219,6 +220,7 @@ macro_rules! impl_integer_shr_unsigned {
         ///     assert_eq!((&Integer::from(0x100)).shr_round(8u64, RoundingMode::Exact).to_string(),
         ///         "1");
         /// }
+        /// ```
         impl<'a> ShrRound<$t> for &'a Integer {
             type Output = Integer;
 
@@ -304,6 +306,7 @@ macro_rules! impl_integer_shr_unsigned {
         ///     n.shr_round_assign(8u64, RoundingMode::Exact);
         ///     assert_eq!(n.to_string(), "1");
         /// }
+        /// ```
         impl ShrRoundAssign<$t> for Integer {
             fn shr_round_assign(&mut self, other: $t, rm: RoundingMode) {
                 match *self {

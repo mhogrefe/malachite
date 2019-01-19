@@ -14,8 +14,8 @@ use natural::Natural::{self, Large, Small};
 use platform::Limb;
 use std::cmp::{max, min};
 
-/// Adds the product of an `Integer` (b) and a `Limb` (c) to an `Integer` (self), taking `self` and b
-/// by value.
+/// Adds the product of an `Integer` (b) and a `Limb` (c) to an `Integer` (self), taking `self` and
+/// b by value.
 ///
 /// Time: worst case O(n)
 ///
@@ -142,8 +142,8 @@ impl<'a> AddMul<Integer, u32> for &'a Integer {
     }
 }
 
-/// Adds the product of an `Integer` (b) and a `Limb` (c) to an `Integer` (self), taking `self` and b
-/// by reference.
+/// Adds the product of an `Integer` (b) and a `Limb` (c) to an `Integer` (self), taking `self` and
+/// b by reference.
 ///
 /// Time: worst case O(n)
 ///

@@ -4,8 +4,8 @@ use natural::logic::significant_bits::limbs_significant_bits;
 use natural::Natural::{self, Large, Small};
 use platform::Limb;
 
-/// Interpreting a slice of `Limb`s as the limbs of a `Natural` in ascending order, returns the floor
-/// of the base-2 logarithm of the `Natural`.
+/// Interpreting a slice of `Limb`s as the limbs of a `Natural` in ascending order, returns the
+/// floor of the base-2 logarithm of the `Natural`.
 ///
 /// This function assumes that `limbs` is nonempty and the last (most significant) limb is nonzero.
 ///

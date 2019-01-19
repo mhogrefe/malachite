@@ -9,7 +9,8 @@ impl DivExact<SignedLimb> for Integer {
     type Output = Integer;
 
     /// Divides an `Integer` by a `SignedLimb`, taking the `Integer` by value. The `Integer` must be
-    /// exactly divisible by the `SignedLimb`. If it isn't, the behavior of this function is undefined.
+    /// exactly divisible by the `SignedLimb`. If it isn't, the behavior of this function is
+    /// undefined.
     ///
     /// Time: worst case O(n)
     ///
@@ -45,8 +46,9 @@ impl DivExact<SignedLimb> for Integer {
 impl<'a> DivExact<SignedLimb> for &'a Integer {
     type Output = Integer;
 
-    /// Divides an `Integer` by a `SignedLimb`, taking the `Integer` by reference. The `Integer` must be
-    /// exactly divisible by the `SignedLimb`. If it isn't, the behavior of this function is undefined.
+    /// Divides an `Integer` by a `SignedLimb`, taking the `Integer` by reference. The `Integer`
+    /// must be exactly divisible by the `SignedLimb`. If it isn't, the behavior of this function is
+    /// undefined.
     ///
     /// Time: worst case O(n)
     ///
@@ -86,8 +88,8 @@ impl<'a> DivExact<SignedLimb> for &'a Integer {
 }
 
 impl DivExactAssign<SignedLimb> for Integer {
-    /// Divides an `Integer` by a `SignedLimb` in place. The `Integer` must be exactly divisible by the
-    /// `SignedLimb`. If it isn't, the behavior of this function is undefined.
+    /// Divides an `Integer` by a `SignedLimb` in place. The `Integer` must be exactly divisible by
+    /// the `SignedLimb`. If it isn't, the behavior of this function is undefined.
     ///
     /// Time: worst case O(n)
     ///
@@ -125,8 +127,9 @@ impl DivExactAssign<SignedLimb> for Integer {
 impl DivExact<Integer> for SignedLimb {
     type Output = Integer;
 
-    /// Divides a `SignedLimb` by an `Integer`, taking the `Integer` by value. The `SignedLimb` must be exactly
-    /// divisible by the `Integer`. If it isn't, the behavior of this function is undefined.
+    /// Divides a `SignedLimb` by an `Integer`, taking the `Integer` by value. The `SignedLimb` must
+    /// be exactly divisible by the `Integer`. If it isn't, the behavior of this function is
+    /// undefined.
     ///
     /// Time: worst case O(1)
     ///
@@ -161,8 +164,9 @@ impl DivExact<Integer> for SignedLimb {
 impl<'a> DivExact<&'a Integer> for SignedLimb {
     type Output = Integer;
 
-    /// Divides a `SignedLimb` by an `Integer`, taking the `Integer` by reference. The `SignedLimb` must be
-    /// exactly divisible by the `Integer`. If it isn't, the behavior of this function is undefined.
+    /// Divides a `SignedLimb` by an `Integer`, taking the `Integer` by reference. The `SignedLimb`
+    /// must be exactly divisible by the `Integer`. If it isn't, the behavior of this function is
+    /// undefined.
     ///
     /// Time: worst case O(1)
     ///

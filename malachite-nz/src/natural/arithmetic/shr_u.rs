@@ -109,9 +109,9 @@ fn limbs_shr_round_half_integer_to_even(limbs: &[Limb], bits: u64) -> Vec<Limb> 
 }
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
-/// limbs of the `Natural` right-shifted by a `Limb`, rounding to the `Natural` nearest to the actual
-/// value of `self` divided by 2<sup>`other`</sup>. If the actual value is exactly between two
-/// integers, it is rounded to the even one.
+/// limbs of the `Natural` right-shifted by a `Limb`, rounding to the `Natural` nearest to the
+/// actual value of `self` divided by 2<sup>`other`</sup>. If the actual value is exactly between
+/// two integers, it is rounded to the even one.
 ///
 /// Time: worst case O(n)
 ///
@@ -223,11 +223,11 @@ pub fn limbs_shr_round(limbs: &[Limb], bits: u64, rm: RoundingMode) -> Option<Ve
     }
 }
 
-/// Interpreting a nonempty slice of `Limb`s as the limbs (in ascending order) of a `Natural`, writes
-/// the limbs of the `Natural` right-shifted by a `Limb` to an output slice. The output slice must be
-/// at least as long as the input slice. The `Limb` must be between 1 and 31, inclusive. The carry,
-/// or the bits that are shifted past the width of the input slice, is returned. The input slice
-/// should not only contain zeros.
+/// Interpreting a nonempty slice of `Limb`s as the limbs (in ascending order) of a `Natural`,
+/// writes the limbs of the `Natural` right-shifted by a `Limb` to an output slice. The output slice
+/// must be at least as long as the input slice. The `Limb` must be between 1 and 31, inclusive. The
+/// carry, or the bits that are shifted past the width of the input slice, is returned. The input
+/// slice should not only contain zeros.
 ///
 /// Time: worst case O(n)
 ///
@@ -270,10 +270,10 @@ pub fn limbs_shr_to_out(out_limbs: &mut [Limb], in_limbs: &[Limb], bits: u32) ->
     remaining_bits
 }
 
-/// Interpreting a nonempty slice of `Limb`s as the limbs (in ascending order) of a `Natural`, writes
-/// the limbs of the `Natural` right-shifted by a `Limb` to the input slice. The `Limb` must be
-/// between 1 and 31, inclusive. The carry, or the bits that are shifted past the width of the input
-/// slice, is returned.
+/// Interpreting a nonempty slice of `Limb`s as the limbs (in ascending order) of a `Natural`,
+/// writes the limbs of the `Natural` right-shifted by a `Limb` to the input slice. The `Limb` must
+/// be between 1 and 31, inclusive. The carry, or the bits that are shifted past the width of the
+/// input slice, is returned.
 ///
 /// Time: worst case O(n)
 ///

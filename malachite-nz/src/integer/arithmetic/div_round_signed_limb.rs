@@ -7,8 +7,8 @@ use platform::SignedLimb;
 impl DivRound<SignedLimb> for Integer {
     type Output = Integer;
 
-    /// Divides an `Integer` by a `SignedLimb` and rounds according to a specified rounding mode, taking
-    /// the `Integer` by value. See the `RoundingMode` documentation for details.
+    /// Divides an `Integer` by a `SignedLimb` and rounds according to a specified rounding mode,
+    /// taking the `Integer` by value. See the `RoundingMode` documentation for details.
     ///
     /// Time: worst case O(n)
     ///
@@ -60,8 +60,8 @@ impl DivRound<SignedLimb> for Integer {
 impl<'a> DivRound<SignedLimb> for &'a Integer {
     type Output = Integer;
 
-    /// Divides an `Integer` by a `SignedLimb` and rounds according to a specified rounding mode, taking
-    /// the `Integer` by reference. See the `RoundingMode` documentation for details.
+    /// Divides an `Integer` by a `SignedLimb` and rounds according to a specified rounding mode,
+    /// taking the `Integer` by reference. See the `RoundingMode` documentation for details.
     ///
     /// Time: worst case O(n)
     ///
@@ -135,8 +135,8 @@ impl<'a> DivRound<SignedLimb> for &'a Integer {
 impl DivRound<Integer> for SignedLimb {
     type Output = Integer;
 
-    /// Divides a `SignedLimb` by an `Integer` and rounds according to a specified rounding mode, taking
-    /// the `Integer` by value. See the `RoundingMode` documentation for details.
+    /// Divides a `SignedLimb` by an `Integer` and rounds according to a specified rounding mode,
+    /// taking the `Integer` by value. See the `RoundingMode` documentation for details.
     ///
     /// Time: worst case O(n)
     ///
@@ -191,8 +191,8 @@ impl DivRound<Integer> for SignedLimb {
 impl<'a> DivRound<&'a Integer> for SignedLimb {
     type Output = Integer;
 
-    /// Divides a `SignedLimb` by an `Integer` and rounds according to a specified rounding mode, taking
-    /// the `Integer` by reference. See the `RoundingMode` documentation for details.
+    /// Divides a `SignedLimb` by an `Integer` and rounds according to a specified rounding mode,
+    /// taking the `Integer` by reference. See the `RoundingMode` documentation for details.
     ///
     /// Time: worst case O(n)
     ///
@@ -263,8 +263,8 @@ impl<'a> DivRound<&'a Integer> for SignedLimb {
 }
 
 impl DivRoundAssign<SignedLimb> for Integer {
-    /// Divides an `Integer` by a `SignedLimb` in place and rounds according to a specified rounding mode.
-    /// See the `RoundingMode` documentation for details.
+    /// Divides an `Integer` by a `SignedLimb` in place and rounds according to a specified rounding
+    /// mode. See the `RoundingMode` documentation for details.
     ///
     /// Time: worst case O(n)
     ///

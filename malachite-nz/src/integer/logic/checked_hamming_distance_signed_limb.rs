@@ -20,7 +20,7 @@ use platform::{Limb, SignedLimb};
 ///
 /// # Example
 /// ```
-/// use malachite_nz::integer::logic::checked_hamming_distance_signed_limb::limbs_hamming_distance_limb_neg;
+/// use malachite_nz::integer::logic::checked_hamming_distance_signed_limb::*;
 ///
 /// assert_eq!(limbs_hamming_distance_limb_neg(&[2], 2), 0);
 /// assert_eq!(limbs_hamming_distance_limb_neg(&[1, 1, 1], 1), 2);
@@ -32,11 +32,11 @@ pub fn limbs_hamming_distance_limb_neg(limbs: &[Limb], other_limb: Limb) -> u64 
 }
 
 impl<'a> CheckedHammingDistance<SignedLimb> for &'a Integer {
-    /// Determines the Hamming distance between an `Integer` and a `SignedLimb`. The Integer and `Limb`
-    /// have infinitely many leading zeros or infinitely many leading ones, depending on their
-    /// signs. If they are both non-negative or both negative, the Hamming distance is finite. If
-    /// one is non-negative and the other is negative, the Hamming distance is infinite, so `None`
-    /// is returned.
+    /// Determines the Hamming distance between an `Integer` and a `SignedLimb`. The Integer and
+    /// `Limb` have infinitely many leading zeros or infinitely many leading ones, depending on
+    /// their signs. If they are both non-negative or both negative, the Hamming distance is finite.
+    /// If one is non-negative and the other is negative, the Hamming distance is infinite, so
+    /// `None` is returned.
     ///
     /// Time: worst case O(n)
     ///
@@ -77,11 +77,11 @@ impl<'a> CheckedHammingDistance<SignedLimb> for &'a Integer {
 }
 
 impl<'a> CheckedHammingDistance<&'a Integer> for SignedLimb {
-    /// Determines the Hamming distance between a `SignedLimb` and an `Integer`. The `Integer` and `Limb`
-    /// have infinitely many leading zeros or infinitely many leading ones, depending on their
-    /// signs. If they are both non-negative or both negative, the Hamming distance is finite. If
-    /// one is non-negative and the other is negative, the Hamming distance is infinite, so `None`
-    /// is returned.
+    /// Determines the Hamming distance between a `SignedLimb` and an `Integer`. The `Integer` and
+    /// `Limb` have infinitely many leading zeros or infinitely many leading ones, depending on
+    /// their signs. If they are both non-negative or both negative, the Hamming distance is finite.
+    /// If one is non-negative and the other is negative, the Hamming distance is infinite, so
+    /// `None` is returned.
     ///
     /// Time: worst case O(n)
     ///

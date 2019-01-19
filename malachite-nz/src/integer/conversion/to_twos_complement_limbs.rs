@@ -67,7 +67,6 @@ impl<'a> Iterator for NegativeLimbIterator<'a> {
     /// Time: worst case O(1)
     ///
     /// Additional memory: worst case O(1)
-
     fn size_hint(&self) -> (usize, Option<usize>) {
         (self.limbs.limb_count, Some(self.limbs.limb_count))
     }
@@ -489,6 +488,7 @@ impl Integer {
     ///     assert_eq!((-Integer::trillion()).to_twos_complement_limbs_desc(),
     ///         &[4294967063, 727379968]);
     /// }
+    /// ```
     pub fn to_twos_complement_limbs_desc(&self) -> Vec<Limb> {
         let mut limbs = self.to_twos_complement_limbs_asc();
         limbs.reverse();
@@ -581,6 +581,7 @@ impl Integer {
     ///     assert_eq!((-Integer::trillion()).into_twos_complement_limbs_desc(),
     ///         &[4294967063, 727379968]);
     /// }
+    /// ```
     pub fn into_twos_complement_limbs_desc(self) -> Vec<Limb> {
         let mut limbs = self.into_twos_complement_limbs_asc();
         limbs.reverse();
@@ -657,8 +658,8 @@ impl Integer {
 impl Natural {
     /// Returns a double-ended iterator over the two's complement limbs of the negative of a
     /// `Natural`. The forward order is ascending, so that less significant limbs appear first.
-    /// There may be at most one trailing `Limb::MAX` limb going forward, or leading `Limb::MAX` limb
-    /// going backward. The `Natural` cannot be zero.
+    /// There may be at most one trailing `Limb::MAX` limb going forward, or leading `Limb::MAX`
+    /// limb going backward. The `Natural` cannot be zero.
     ///
     /// Time: worst case O(1)
     ///

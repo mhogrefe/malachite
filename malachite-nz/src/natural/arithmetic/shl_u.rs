@@ -119,8 +119,8 @@ pub fn limbs_slice_shl_in_place(limbs: &mut [Limb], bits: u32) -> Limb {
     remaining_bits
 }
 
-/// Interpreting a nonempty `Vec` of `Limb`s as the limbs (in ascending order) of a `Natural`, writes
-/// the limbs of the `Natural` left-shifted by a `Limb` to the input `Vec`.
+/// Interpreting a nonempty `Vec` of `Limb`s as the limbs (in ascending order) of a `Natural`,
+/// writes the limbs of the `Natural` left-shifted by a `Limb` to the input `Vec`.
 ///
 /// Time: worst case O(n)
 ///

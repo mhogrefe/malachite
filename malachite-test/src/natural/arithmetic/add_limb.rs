@@ -87,7 +87,8 @@ fn demo_limbs_add_limb_to_out(gm: GenerationMode, limit: usize) {
         let mut out_limbs_old = out_limbs.clone();
         let carry = limbs_add_limb_to_out(&mut out_limbs, &in_limbs, limb);
         println!(
-            "out_limbs := {:?}; limbs_add_limb_to_out(&mut out_limbs, {:?}, {}) = {}; out_limbs = {:?}",
+            "out_limbs := {:?}; limbs_add_limb_to_out(&mut out_limbs, {:?}, {}) = {}; \
+             out_limbs = {:?}",
             out_limbs_old, in_limbs, limb, carry, out_limbs
         );
     }

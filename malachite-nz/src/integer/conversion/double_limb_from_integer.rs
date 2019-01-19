@@ -3,8 +3,8 @@ use malachite_base::misc::{CheckedFrom, WrappingFrom};
 use platform::DoubleLimb;
 
 impl CheckedFrom<Integer> for DoubleLimb {
-    /// Converts an `Integer` to a `DoubleLimb`, taking the `Integer` by value and returning `None` if the
-    /// `Integer` is negative or too large.
+    /// Converts an `Integer` to a `DoubleLimb`, taking the `Integer` by value and returning `None`
+    /// if the `Integer` is negative or too large.
     ///
     /// Time: worst case O(1)
     ///
@@ -34,8 +34,8 @@ impl CheckedFrom<Integer> for DoubleLimb {
 }
 
 impl<'a> CheckedFrom<&'a Integer> for DoubleLimb {
-    /// Converts an `Integer` to a `DoubleLimb`, taking the `Integer` by reference and returning `None` if
-    /// the `Integer` is negative or too large.
+    /// Converts an `Integer` to a `DoubleLimb`, taking the `Integer` by reference and returning
+    /// `None` if the `Integer` is negative or too large.
     ///
     /// Time: worst case O(1)
     ///

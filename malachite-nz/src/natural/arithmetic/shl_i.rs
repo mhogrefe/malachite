@@ -168,6 +168,7 @@ macro_rules! impl_natural_shl_signed {
         ///     assert_eq!(Natural::from(123u32).shl_round(100i32, RoundingMode::Exact).to_string(),
         ///         "155921023828072216384094494261248");
         /// }
+        /// ```
         impl ShlRound<$t> for Natural {
             type Output = Natural;
 

@@ -172,10 +172,11 @@ pub fn limbs_sub_same_length_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> bool
     borrow
 }
 
-/// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, subtracts
-/// the second from the first, writing the `xs.len()` limbs of the result to the first (left) slice.
-/// Returns whether there was a borrow left over; that is, whether the second `Natural` was greater
-/// than the first `Natural`. The first slice must be at least as long as the second.
+/// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s,
+/// subtracts the second from the first, writing the `xs.len()` limbs of the result to the first
+/// (left) slice. Returns whether there was a borrow left over; that is, whether the second
+/// `Natural` was greater than the first `Natural`. The first slice must be at least as long as the
+/// second.
 ///
 /// Time: worst case O(n)
 ///
@@ -320,10 +321,10 @@ pub fn _limbs_sub_same_length_with_borrow_in_to_out(
     borrow
 }
 
-/// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, subtracts
-/// the second from the first, and then subtracts a borrow (`false` is 0, `true` is 1), writing the
-/// `xs.len()` limbs of the result to the first (left) slice. Returns whether there was a borrow
-/// left over. The first slice must be at least as long as the second.
+/// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s,
+/// subtracts the second from the first, and then subtracts a borrow (`false` is 0, `true` is 1),
+/// writing the `xs.len()` limbs of the result to the first (left) slice. Returns whether there was
+/// a borrow left over. The first slice must be at least as long as the second.
 ///
 /// Time: worst case O(n)
 ///

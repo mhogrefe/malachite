@@ -163,6 +163,7 @@ pub fn limbs_slice_pos_xor_limb_neg_in_place(limbs: &mut [Limb], limb: Limb) -> 
 /// let mut limbs = vec![2, 0xffff_ffff];
 /// limbs_vec_pos_xor_limb_neg_in_place(&mut limbs, 2);
 /// assert_eq!(limbs, &[0, 0, 1]);
+/// ```
 pub fn limbs_vec_pos_xor_limb_neg_in_place(limbs: &mut Vec<Limb>, limb: Limb) {
     if limbs_slice_pos_xor_limb_neg_in_place(limbs, limb) {
         limbs.push(1);

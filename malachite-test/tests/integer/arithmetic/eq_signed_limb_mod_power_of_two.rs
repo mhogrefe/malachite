@@ -15,7 +15,7 @@ use malachite_test::inputs::integer::{
     triples_of_integer_signed_and_small_unsigned_var_1,
     triples_of_integer_signed_limb_and_small_unsigned_var_2,
 };
-use malachite_test::integer::arithmetic::eq_signed_limb_mod_power_of_two::rug_eq_signed_limb_mod_power_of_two;
+use malachite_test::integer::arithmetic::eq_signed_limb_mod_power_of_two::*;
 use rug;
 use std::str::FromStr;
 

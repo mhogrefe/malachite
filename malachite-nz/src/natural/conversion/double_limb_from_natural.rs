@@ -4,8 +4,8 @@ use natural::Natural::{self, Large, Small};
 use platform::DoubleLimb;
 
 impl CheckedFrom<Natural> for DoubleLimb {
-    /// Converts a `Natural` to a `DoubleLimb`, taking the `Natural` by reference and returning `None` if
-    /// the `Natural` is too large.
+    /// Converts a `Natural` to a `DoubleLimb`, taking the `Natural` by reference and returning
+    /// `None` if the `Natural` is too large.
     ///
     /// Time: worst case O(1)
     ///
@@ -32,8 +32,8 @@ impl CheckedFrom<Natural> for DoubleLimb {
 }
 
 impl<'a> CheckedFrom<&'a Natural> for DoubleLimb {
-    /// Converts a `Natural` to a `DoubleLimb`, taking the `Natural` by reference and returning `None` if
-    /// the `Natural` is too large.
+    /// Converts a `Natural` to a `DoubleLimb`, taking the `Natural` by reference and returning
+    /// `None` if the `Natural` is too large.
     ///
     /// Time: worst case O(1)
     ///

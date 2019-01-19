@@ -85,7 +85,8 @@ fn demo_limbs_neg_or_limb_to_out(gm: GenerationMode, limit: usize) {
         let mut out_limbs_old = out_limbs.clone();
         limbs_neg_or_limb_to_out(&mut out_limbs, &in_limbs, limb);
         println!(
-            "out_limbs := {:?}; limbs_neg_or_limb_to_out(&mut out_limbs, {:?}, {}); out_limbs = {:?}",
+            "out_limbs := {:?}; limbs_neg_or_limb_to_out(&mut out_limbs, {:?}, {}); \
+             out_limbs = {:?}",
             out_limbs_old, in_limbs, limb, out_limbs
         );
     }

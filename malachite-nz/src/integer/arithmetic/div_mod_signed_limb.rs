@@ -10,10 +10,10 @@ impl DivMod<SignedLimb> for Integer {
     type DivOutput = Integer;
     type ModOutput = Integer;
 
-    /// Divides an `Integer` by a `SignedLimb`, taking the `Integer` by value and returning the quotient
-    /// and remainder. The quotient is rounded towards negative infinity, and the remainder has the
-    /// same sign as the divisor. The quotient and remainder satisfy `self` = q * `other` + r and
-    /// 0 <= |r| < |`other`|.
+    /// Divides an `Integer` by a `SignedLimb`, taking the `Integer` by value and returning the
+    /// quotient and remainder. The quotient is rounded towards negative infinity, and the remainder
+    /// has the same sign as the divisor. The quotient and remainder satisfy
+    /// `self` = q * `other` + r and 0 <= |r| < |`other`|.
     ///
     /// Time: worst case O(n)
     ///
@@ -108,9 +108,9 @@ impl<'a> DivMod<SignedLimb> for &'a Integer {
 impl DivAssignMod<SignedLimb> for Integer {
     type ModOutput = Integer;
 
-    /// Divides an `Integer` by a `SignedLimb` in place, returning the remainder. The quotient is rounded
-    /// towards negative infinity, and the remainder has the same sign as the divisor. The quotient
-    /// and remainder satisfy `self` = q * `other` + r and 0 <= |r| < |`other`|.
+    /// Divides an `Integer` by a `SignedLimb` in place, returning the remainder. The quotient is
+    /// rounded towards negative infinity, and the remainder has the same sign as the divisor. The
+    /// quotient and remainder satisfy `self` = q * `other` + r and 0 <= |r| < |`other`|.
     ///
     /// Time: worst case O(n)
     ///
@@ -171,10 +171,10 @@ impl DivMod<Integer> for SignedLimb {
     type DivOutput = Integer;
     type ModOutput = Integer;
 
-    /// Divides a `SignedLimb` by an `Integer`, taking the `Integer` by value and returning the quotient
-    /// and remainder. The quotient is rounded towards negative infinity, and the remainder has the
-    /// same sign as the divisor. The quotient and remainder satisfy `self` = q * `other` + r and
-    /// 0 <= |r| < |`other`|.
+    /// Divides a `SignedLimb` by an `Integer`, taking the `Integer` by value and returning the
+    /// quotient and remainder. The quotient is rounded towards negative infinity, and the remainder
+    /// has the same sign as the divisor. The quotient and remainder satisfy
+    /// `self` = q * `other` + r and 0 <= |r| < |`other`|.
     ///
     /// Time: worst case O(1)
     ///
@@ -279,9 +279,9 @@ impl DivRem<SignedLimb> for Integer {
     type DivOutput = Integer;
     type RemOutput = Integer;
 
-    /// Divides an `Integer` by a `SignedLimb`, taking the `Integer` by value and returning the quotient
-    /// and remainder. The quotient is rounded towards zero and the remainder has the same sign as
-    /// the dividend. The quotient and remainder satisfy `self` = q * `other` + r and
+    /// Divides an `Integer` by a `SignedLimb`, taking the `Integer` by value and returning the
+    /// quotient and remainder. The quotient is rounded towards zero and the remainder has the same
+    /// sign as the dividend. The quotient and remainder satisfy `self` = q * `other` + r and
     /// 0 <= |r| < |`other`|.
     ///
     /// Time: worst case O(n)
@@ -374,9 +374,9 @@ impl<'a> DivRem<SignedLimb> for &'a Integer {
 impl DivAssignRem<SignedLimb> for Integer {
     type RemOutput = Integer;
 
-    /// Divides an `Integer` by a `SignedLimb` in place, returning the remainder. The quotient is rounded
-    /// towards zero and the remainder has the same sign as the dividend. The quotient and remainder
-    /// satisfy `self` = q * `other` + r and 0 <= |r| < |`other`|.
+    /// Divides an `Integer` by a `SignedLimb` in place, returning the remainder. The quotient is
+    /// rounded towards zero and the remainder has the same sign as the dividend. The quotient and
+    /// remainder satisfy `self` = q * `other` + r and 0 <= |r| < |`other`|.
     ///
     /// Time: worst case O(n)
     ///
@@ -430,9 +430,9 @@ impl DivRem<Integer> for SignedLimb {
     type DivOutput = Integer;
     type RemOutput = Integer;
 
-    /// Divides a `SignedLimb` by an `Integer`, taking the `Integer` by value and returning the quotient
-    /// and remainder. The quotient is rounded towards zero and the remainder has the same sign as
-    /// the dividend. The quotient and remainder satisfy `self` = q * `other` + r and
+    /// Divides a `SignedLimb` by an `Integer`, taking the `Integer` by value and returning the
+    /// quotient and remainder. The quotient is rounded towards zero and the remainder has the same
+    /// sign as the dividend. The quotient and remainder satisfy `self` = q * `other` + r and
     /// 0 <= |r| < |`other`|.
     ///
     /// Time: worst case O(1)
@@ -532,10 +532,10 @@ impl CeilingDivMod<SignedLimb> for Integer {
     type DivOutput = Integer;
     type ModOutput = Integer;
 
-    /// Divides an `Integer` by a `SignedLimb`, taking the `Integer` by value and returning the quotient
-    /// and remainder. The quotient is rounded towards positive infinity and the remainder has the
-    /// opposite sign of the divisor. The quotient and remainder satisfy `self` = q * `other` + r
-    /// and 0 <= |r| < |`other`|.
+    /// Divides an `Integer` by a `SignedLimb`, taking the `Integer` by value and returning the
+    /// quotient and remainder. The quotient is rounded towards positive infinity and the remainder
+    /// has the opposite sign of the divisor. The quotient and remainder satisfy
+    /// `self` = q * `other` + r and 0 <= |r| < |`other`|.
     ///
     /// Time: worst case O(n)
     ///
@@ -630,10 +630,10 @@ impl<'a> CeilingDivMod<SignedLimb> for &'a Integer {
 impl CeilingDivAssignMod<SignedLimb> for Integer {
     type ModOutput = Integer;
 
-    /// Divides an `Integer` by a `SignedLimb` in place, taking the quotient and returning the remainder.
-    /// The quotient is rounded towards positive infinity and the remainder has the opposite sign of
-    /// the divisor. The quotient and remainder satisfy `self` = q * `other` + r and
-    /// 0 <= |r| < |`other`|.
+    /// Divides an `Integer` by a `SignedLimb` in place, taking the quotient and returning the
+    /// remainder. The quotient is rounded towards positive infinity and the remainder has the
+    /// opposite sign of the divisor. The quotient and remainder satisfy `self` = q * `other` + r
+    /// and 0 <= |r| < |`other`|.
     ///
     /// Time: worst case O(n)
     ///
@@ -692,10 +692,10 @@ impl CeilingDivMod<Integer> for SignedLimb {
     type DivOutput = Integer;
     type ModOutput = Integer;
 
-    /// Divides a `SignedLimb` by an `Integer`, taking the `Integer` by value and returning the quotient
-    /// and remainder. The quotient is rounded towards positive infinity and the remainder has the
-    /// opposite sign of the divisor. The quotient and remainder satisfy `self` = q * `other` + r
-    /// and 0 <= |r| < |`other`|.
+    /// Divides a `SignedLimb` by an `Integer`, taking the `Integer` by value and returning the
+    /// quotient and remainder. The quotient is rounded towards positive infinity and the remainder
+    /// has the opposite sign of the divisor. The quotient and remainder satisfy
+    /// `self` = q * `other` + r and 0 <= |r| < |`other`|.
     ///
     /// Time: worst case O(n)
     ///
