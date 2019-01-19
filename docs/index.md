@@ -35,7 +35,7 @@ are
   [LGPL-3.0](https://www.gnu.org/licenses/lgpl-3.0.en.html),
   which places some limits on its usage and
   redistribution. This is because much of Malachite's
-  code is derived from GMP, FLINT, and Arb, which are
+  code is derived from GMP, MPFR, FLINT, and Arb, which are
   themselves released under LGPL.
 * Malachite is very much under development, and not yet
   ready for general use. At some point in 2019, when

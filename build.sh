@@ -1,8 +1,7 @@
 #!/bin/bash
-python additional-lints.py &&
 cd malachite-base &&
 cargo update &&
-cargo +nightly fmt &&
+cargo fmt &&
 #cargo +nightly clippy
 cargo test --release &&
 cargo doc &&

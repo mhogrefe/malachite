@@ -958,14 +958,14 @@ fn test_limbs_mul_to_out_toom_43() {
         _limbs_mul_to_out_toom_43(&mut out, &xs, &ys, &mut scratch);
         assert_eq!(out, out_after);
     };
-    // x3n < n
-    // neg == 0
-    // limbs_cmp_same_length(&small_scratch[..n + 1], &bsm1[..n + 1]) != Ordering::Less
+    // n_high < n in _limbs_mul_toom_evaluate_deg_3_poly_in_2_and_neg_2
+    // !v_neg_2_neg in _limbs_mul_toom_evaluate_deg_3_poly_in_2_and_neg_2
+    // limbs_cmp_same_length(small_scratch, bsm1) != Ordering::Less
     // s <= t
-    // (flags.to_u32() & Toom6Flags::Toom6Vm2Neg.to_u32()) == 0
-    // (flags.to_u32() & Toom6Flags::Toom6Vm1Neg.to_u32()) == 0
-    // w0n > n
-    // cy4 <= cy6
+    // !v_neg_2_neg in _limbs_mul_toom_interpolate_6_points
+    // !v_neg_1_neg in _limbs_mul_toom_interpolate_6_points
+    // n_high > n in _limbs_mul_toom_interpolate_6_points
+    // special_carry_1 <= special_carry_2
     test(
         vec![2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
         vec![3, 4, 5, 6, 7, 8, 9, 10, 11],
@@ -975,11 +975,11 @@ fn test_limbs_mul_to_out_toom_43() {
             132, 0,
         ],
     );
-    // x3n >= n
-    // neg != 0
+    // n_high >= n in _limbs_mul_toom_evaluate_deg_3_poly_in_2_and_neg_2
+    // v_neg_2_neg in _limbs_mul_toom_evaluate_deg_3_poly_in_2_and_neg_2
     // t != n
-    // limbs_cmp_same_length(&small_scratch[..n + 1], &bsm1[..n + 1]) == Ordering::Less
-    // bsm1[n] == 0 && limbs_cmp_same_length(&bsm1[..n], &b1[..n]) == Ordering::Less
+    // limbs_cmp_same_length(small_scratch, bsm1) == Ordering::Less
+    // *bsm1_last == 0 && limbs_cmp_same_length(bsm1_init, ys_1) == Ordering::Less
     // s > t
     test(
         vec![2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13],
@@ -990,9 +990,9 @@ fn test_limbs_mul_to_out_toom_43() {
             130, 0,
         ],
     );
-    // (flags.to_u32() & Toom6Flags::Toom6Vm2Neg.to_u32()) != 0
-    // (flags.to_u32() & Toom6Flags::Toom6Vm1Neg.to_u32()) != 0
-    // w0n <= n
+    // v_neg_2_neg in _limbs_mul_toom_interpolate_6_points
+    // v_neg_1_neg in _limbs_mul_toom_interpolate_6_points
+    // n_high <= n in _limbs_mul_toom_interpolate_6_points
     test(
         vec![
             2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
@@ -1004,7 +1004,7 @@ fn test_limbs_mul_to_out_toom_43() {
             1210, 1235, 1236, 1212, 1162, 1085, 980, 846, 682, 487, 260, 0,
         ],
     );
-    // cy4 > cy6
+    // special_carry_1 > special_carry_2
     test(
         vec![
             3785023459, 4249117725, 1551102690, 4239134101, 2264608302, 1455009194, 3261002629,
@@ -1037,6 +1037,71 @@ fn test_limbs_mul_to_out_toom_43() {
             4294963200, 4263643135, 4294967287, 255, 0, 2147483520, 66846728, 4294967280,
             4294967295, 4294967295, 4290789375, 4294967279, 4294967295, 4294967295, 4294967295,
         ],
+    );
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic(expected = "slice index starts at 3 but ends at 1")]
+fn limbs_mul_to_out_toom_43_fail_1() {
+    let mut scratch = vec![0; _limbs_mul_to_out_toom_43_scratch_size(1, 1)];
+    let mut out = vec![10, 10, 10, 10];
+    _limbs_mul_to_out_toom_43(&mut out, &[6], &[1], &mut scratch);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic(expected = "slice index starts at 12 but ends at 11")]
+fn limbs_mul_to_out_toom_43_fail_2() {
+    let mut scratch = vec![0; _limbs_mul_to_out_toom_43_scratch_size(11, 12)];
+    let mut out = vec![10; 23];
+    _limbs_mul_to_out_toom_43(
+        &mut out,
+        &[3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13],
+        &[2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13],
+        &mut scratch,
+    );
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic(expected = "slice index starts at 12 but ends at 9")]
+fn limbs_mul_to_out_toom_43_fail_3() {
+    let mut scratch = vec![0; _limbs_mul_to_out_toom_43_scratch_size(9, 10)];
+    let mut out = vec![10; 19];
+    _limbs_mul_to_out_toom_43(
+        &mut out,
+        &[3, 4, 5, 6, 7, 8, 9, 10, 11],
+        &[2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+        &mut scratch,
+    );
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic(expected = "index 3 out of range for slice of length 0")]
+fn limbs_mul_to_out_toom_43_fail_4() {
+    let mut scratch = vec![0; _limbs_mul_to_out_toom_43_scratch_size(12, 0)];
+    let mut out = vec![10; 12];
+    _limbs_mul_to_out_toom_43(
+        &mut out,
+        &[3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13],
+        &[],
+        &mut scratch,
+    );
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic(expected = "slice index starts at 12 but ends at 10")]
+fn limbs_mul_to_out_toom_43_fail_5() {
+    let mut scratch = vec![0; _limbs_mul_to_out_toom_43_scratch_size(4, 2)];
+    let mut out = vec![10, 10, 10, 10, 10];
+    _limbs_mul_to_out_toom_43(
+        &mut out,
+        &[3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+        &[2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+        &mut scratch,
     );
 }
 
