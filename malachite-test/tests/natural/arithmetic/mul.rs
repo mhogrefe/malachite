@@ -1,14 +1,15 @@
 use common::test_properties_custom_scale;
 use malachite_base::num::{One, Zero};
-use malachite_nz::natural::arithmetic::mul::{
-    _limbs_mul_to_out_basecase, _limbs_mul_to_out_toom_22, _limbs_mul_to_out_toom_22_scratch_size,
-    _limbs_mul_to_out_toom_32, _limbs_mul_to_out_toom_32_scratch_size, _limbs_mul_to_out_toom_33,
+use malachite_nz::natural::arithmetic::mul::toom::{
+    _limbs_mul_to_out_toom_22, _limbs_mul_to_out_toom_22_scratch_size, _limbs_mul_to_out_toom_32,
+    _limbs_mul_to_out_toom_32_scratch_size, _limbs_mul_to_out_toom_33,
     _limbs_mul_to_out_toom_33_scratch_size, _limbs_mul_to_out_toom_42,
     _limbs_mul_to_out_toom_42_scratch_size, _limbs_mul_to_out_toom_43,
-    _limbs_mul_to_out_toom_43_scratch_size, mpn_mul,
+    _limbs_mul_to_out_toom_43_scratch_size,
 };
 #[cfg(feature = "32_bit_limbs")]
-use malachite_nz::natural::arithmetic::mul::{MUL_TOOM22_THRESHOLD, MUL_TOOM33_THRESHOLD};
+use malachite_nz::natural::arithmetic::mul::toom::{MUL_TOOM22_THRESHOLD, MUL_TOOM33_THRESHOLD};
+use malachite_nz::natural::arithmetic::mul::{_limbs_mul_to_out_basecase, limbs_mul_to_out};
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::{DoubleLimb, Limb};
 use malachite_test::common::{
@@ -34,7 +35,7 @@ fn test_limbs_mul_to_out() {
         _limbs_mul_to_out_basecase(&mut out, xs, ys);
         assert_eq!(out, out_after);
         let mut out = out_before.to_vec();
-        assert_eq!(mpn_mul(&mut out, xs, ys), highest_result_limb);
+        assert_eq!(limbs_mul_to_out(&mut out, xs, ys), highest_result_limb);
         assert_eq!(out, out_after);
     };
     test(&[2], &[3], &[10, 10, 10], 0, vec![6, 0, 10]);
@@ -1320,7 +1321,7 @@ fn limbs_mul_to_out_properties() {
         |&(ref out_limbs, ref xs, ref ys)| {
             let expected_out_limbs = limbs_mul_basecase_helper(out_limbs, xs, ys);
             let mut out_limbs = out_limbs.to_vec();
-            let highest_result_limb = mpn_mul(&mut out_limbs, xs, ys);
+            let highest_result_limb = limbs_mul_to_out(&mut out_limbs, xs, ys);
             assert_eq!(highest_result_limb, out_limbs[xs.len() + ys.len() - 1]);
             assert_eq!(out_limbs, expected_out_limbs);
         },

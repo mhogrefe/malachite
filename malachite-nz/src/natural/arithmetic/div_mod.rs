@@ -3,7 +3,7 @@ use malachite_base::num::{
     JoinHalves, PrimitiveInteger, SplitInHalf, WrappingAddAssign, WrappingSubAssign,
 };
 use natural::arithmetic::add::limbs_slice_add_same_length_in_place_left;
-use natural::arithmetic::mul::{mpn_mul, mpn_mulmod_bnm1_itch, mpn_mulmod_bnm1_next_size};
+use natural::arithmetic::mul::{limbs_mul_to_out, mpn_mulmod_bnm1_itch, mpn_mulmod_bnm1_next_size};
 use natural::arithmetic::sub::limbs_sub_same_length_in_place_left;
 use natural::arithmetic::sub_limb::limbs_sub_limb_in_place;
 use natural::arithmetic::sub_mul_limb::mpn_submul_1;
@@ -309,7 +309,7 @@ pub fn mpn_dcpi1_div_qr_n(
         )
     };
 
-    mpn_mul(tp, &qp[lo..lo + hi], &dp[..lo]);
+    limbs_mul_to_out(tp, &qp[lo..lo + hi], &dp[..lo]);
     let mut cy = if limbs_sub_same_length_in_place_left(&mut np[lo..lo + n], &tp[..n]) {
         1
     } else {
@@ -348,7 +348,7 @@ pub fn mpn_dcpi1_div_qr_n(
         mpn_dcpi1_div_qr_n(qp, &mut np[hi..hi + 2 * lo], &dp[hi..hi + lo], dinv, tp)
     };
 
-    mpn_mul(tp, &dp[..hi], &qp[..lo]);
+    limbs_mul_to_out(tp, &dp[..hi], &qp[..lo]);
     let mut cy = if limbs_sub_same_length_in_place_left(&mut np[..n], &tp[..n]) {
         1
     } else {
@@ -502,13 +502,13 @@ pub fn mpn_dcpi1_div_qr(qp: &mut [Limb], np: &mut [Limb], dp: &[Limb], dinv: Lim
 
             if qn != dn {
                 if qn > dn - qn {
-                    mpn_mul(
+                    limbs_mul_to_out(
                         &mut tp,
                         &qp[qp_offset..qp_offset + qn],
                         &dp[dp_offset - dn..dp_offset - qn],
                     );
                 } else {
-                    mpn_mul(
+                    limbs_mul_to_out(
                         &mut tp,
                         &dp[dp_offset - dn..dp_offset - qn],
                         &qp[qp_offset..qp_offset + qn],
@@ -596,13 +596,13 @@ pub fn mpn_dcpi1_div_qr(qp: &mut [Limb], np: &mut [Limb], dp: &[Limb], dinv: Lim
 
         if qn != dn {
             if qn > dn - qn {
-                mpn_mul(
+                limbs_mul_to_out(
                     &mut tp,
                     &qp[qp_offset..qp_offset + qn],
                     &dp[dp_offset - dn..dp_offset - qn],
                 );
             } else {
-                mpn_mul(
+                limbs_mul_to_out(
                     &mut tp,
                     &dp[dp_offset - dn..dp_offset - qn],
                     &qp[qp_offset..qp_offset + qn],
@@ -944,7 +944,7 @@ pub fn mpn_dcpi1_divappr_q_n(
             tp,
         )
     };
-    mpn_mul(tp, &qp[lo..lo + hi], &dp[..lo]);
+    limbs_mul_to_out(tp, &qp[lo..lo + hi], &dp[..lo]);
     let mut cy = if limbs_sub_same_length_in_place_left(&mut np[lo..lo + n], &tp[..n]) {
         1
     } else {
@@ -1118,13 +1118,13 @@ pub fn mpn_dcpi1_divappr_q(qp: &mut [Limb], np: &mut [Limb], dp: &[Limb], dinv: 
 
             if qn != dn {
                 if qn > dn - qn {
-                    mpn_mul(
+                    limbs_mul_to_out(
                         &mut tp,
                         &qp[qp_offset..qp_offset + qn],
                         &dp[dp_offset - dn..dp_offset - qn],
                     );
                 } else {
-                    mpn_mul(
+                    limbs_mul_to_out(
                         &mut tp,
                         &dp[dp_offset - dn..dp_offset - qn],
                         &qp[qp_offset..qp_offset + qn],

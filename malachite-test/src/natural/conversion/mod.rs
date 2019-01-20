@@ -15,17 +15,17 @@ pub mod to_bits;
 pub mod to_limbs;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
-    assign_limb::register(registry);
     #[cfg(feature = "32_bit_limbs")]
     assign_double_limb::register(registry);
+    assign_limb::register(registry);
     clone_and_assign::register(registry);
+    double_limb_from_natural::register(registry);
     from_bits::register(registry);
-    from_limbs::register(registry);
-    from_limb::register(registry);
     from_double_limb::register(registry);
+    from_limb::register(registry);
+    from_limbs::register(registry);
+    limb_from_natural::register(registry);
     serde::register(registry);
     to_bits::register(registry);
     to_limbs::register(registry);
-    limb_from_natural::register(registry);
-    double_limb_from_natural::register(registry);
 }

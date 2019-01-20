@@ -10,6 +10,6 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     eq::register(registry);
     hash::register(registry);
     ord::register(registry);
-    partial_ord_limb::register(registry);
     partial_eq_limb::register(registry);
+    partial_ord_limb::register(registry);
 }

@@ -7,7 +7,7 @@ use malachite_base::num::{
 };
 use malachite_base::round::RoundingMode;
 use malachite_nz::integer::logic::bit_access::limbs_vec_clear_bit_neg;
-use malachite_nz::natural::arithmetic::mul::{
+use malachite_nz::natural::arithmetic::mul::toom::{
     _limbs_mul_to_out_toom_32_input_sizes_valid, _limbs_mul_to_out_toom_33_input_sizes_valid,
     _limbs_mul_to_out_toom_42_input_sizes_valid, _limbs_mul_to_out_toom_43_input_sizes_valid,
 };

@@ -5,13 +5,14 @@ use inputs::base::{
 };
 use inputs::natural::{nrm_pairs_of_naturals, pairs_of_naturals, rm_pairs_of_naturals};
 use malachite_base::num::SignificantBits;
-use malachite_nz::natural::arithmetic::mul::{
-    _limbs_mul_to_out_basecase, _limbs_mul_to_out_toom_22, _limbs_mul_to_out_toom_22_scratch_size,
-    _limbs_mul_to_out_toom_32, _limbs_mul_to_out_toom_32_scratch_size, _limbs_mul_to_out_toom_33,
+use malachite_nz::natural::arithmetic::mul::toom::{
+    _limbs_mul_to_out_toom_22, _limbs_mul_to_out_toom_22_scratch_size, _limbs_mul_to_out_toom_32,
+    _limbs_mul_to_out_toom_32_scratch_size, _limbs_mul_to_out_toom_33,
     _limbs_mul_to_out_toom_33_scratch_size, _limbs_mul_to_out_toom_42,
     _limbs_mul_to_out_toom_42_scratch_size, _limbs_mul_to_out_toom_43,
-    _limbs_mul_to_out_toom_43_scratch_size, mpn_mul,
+    _limbs_mul_to_out_toom_43_scratch_size,
 };
+use malachite_nz::natural::arithmetic::mul::{_limbs_mul_to_out_basecase, limbs_mul_to_out};
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_natural_mul_assign);
@@ -124,7 +125,9 @@ fn benchmark_limbs_mul_to_out_algorithms(gm: GenerationMode, limit: usize, file_
             ),
             (
                 "full",
-                &mut (|(mut out_limbs, xs, ys)| no_out!(mpn_mul(&mut out_limbs, &xs, &ys))),
+                &mut (|(mut out_limbs, xs, ys)| {
+                    no_out!(limbs_mul_to_out(&mut out_limbs, &xs, &ys))
+                }),
             ),
         ],
     );

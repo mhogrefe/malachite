@@ -88,16 +88,16 @@ pub(crate) fn integer_op_limbs(
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     and::register(registry);
-    and_signed_limb::register(registry);
-    and_natural::register(registry);
     and_limb::register(registry);
+    and_natural::register(registry);
+    and_signed_limb::register(registry);
     assign_bit::register(registry);
     checked_count_ones::register(registry);
     checked_count_zeros::register(registry);
     checked_hamming_distance::register(registry);
-    checked_hamming_distance_signed_limb::register(registry);
-    checked_hamming_distance_natural::register(registry);
     checked_hamming_distance_limb::register(registry);
+    checked_hamming_distance_natural::register(registry);
+    checked_hamming_distance_signed_limb::register(registry);
     clear_bit::register(registry);
     flip_bit::register(registry);
     get_bit::register(registry);
@@ -105,13 +105,13 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     index_of_next_true_bit::register(registry);
     not::register(registry);
     or::register(registry);
+    or_limb::register(registry);
     or_natural::register(registry);
     or_signed_limb::register(registry);
-    or_limb::register(registry);
     set_bit::register(registry);
     significant_bits::register(registry);
     trailing_zeros::register(registry);
     xor::register(registry);
-    xor_signed_limb::register(registry);
     xor_limb::register(registry);
+    xor_signed_limb::register(registry);
 }
