@@ -1,15 +1,17 @@
 use common::test_properties_custom_scale;
 use malachite_base::num::{One, Zero};
 use malachite_nz::natural::arithmetic::mul::toom::{
-    _limbs_mul_to_out_toom_22, _limbs_mul_to_out_toom_22_scratch_size, _limbs_mul_to_out_toom_32,
-    _limbs_mul_to_out_toom_32_scratch_size, _limbs_mul_to_out_toom_33,
-    _limbs_mul_to_out_toom_33_scratch_size, _limbs_mul_to_out_toom_42,
-    _limbs_mul_to_out_toom_42_scratch_size, _limbs_mul_to_out_toom_43,
-    _limbs_mul_to_out_toom_43_scratch_size,
+    _limbs_mul_greater_to_out_toom_22, _limbs_mul_greater_to_out_toom_22_scratch_size,
+    _limbs_mul_greater_to_out_toom_32, _limbs_mul_greater_to_out_toom_32_scratch_size,
+    _limbs_mul_greater_to_out_toom_33, _limbs_mul_greater_to_out_toom_33_scratch_size,
+    _limbs_mul_greater_to_out_toom_42, _limbs_mul_greater_to_out_toom_42_scratch_size,
+    _limbs_mul_greater_to_out_toom_43, _limbs_mul_greater_to_out_toom_43_scratch_size,
 };
 #[cfg(feature = "32_bit_limbs")]
 use malachite_nz::natural::arithmetic::mul::toom::{MUL_TOOM22_THRESHOLD, MUL_TOOM33_THRESHOLD};
-use malachite_nz::natural::arithmetic::mul::{_limbs_mul_to_out_basecase, limbs_mul_to_out};
+use malachite_nz::natural::arithmetic::mul::{
+    _limbs_mul_greater_to_out_basecase, limbs_mul_greater_to_out,
+};
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::{DoubleLimb, Limb};
 use malachite_test::common::{
@@ -29,13 +31,16 @@ use std::str::FromStr;
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-fn test_limbs_mul_to_out() {
+fn test_limbs_mul_greater_to_out() {
     let test = |xs, ys, out_before: &[Limb], highest_result_limb, out_after| {
         let mut out = out_before.to_vec();
-        _limbs_mul_to_out_basecase(&mut out, xs, ys);
+        _limbs_mul_greater_to_out_basecase(&mut out, xs, ys);
         assert_eq!(out, out_after);
         let mut out = out_before.to_vec();
-        assert_eq!(limbs_mul_to_out(&mut out, xs, ys), highest_result_limb);
+        assert_eq!(
+            limbs_mul_greater_to_out(&mut out, xs, ys),
+            highest_result_limb
+        );
         assert_eq!(out, out_after);
     };
     test(&[2], &[3], &[10, 10, 10], 0, vec![6, 0, 10]);
@@ -86,37 +91,37 @@ fn test_limbs_mul_to_out() {
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic(expected = "assertion failed: out_limbs.len() >= xs_len + ys_len")]
-fn limbs_mul_to_out_fail_1() {
+fn limbs_mul_greater_to_out_fail_1() {
     let mut out = vec![10, 10, 10, 10];
-    _limbs_mul_to_out_basecase(&mut out, &[6, 7, 8], &[1, 2]);
+    _limbs_mul_greater_to_out_basecase(&mut out, &[6, 7, 8], &[1, 2]);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic(expected = "assertion failed: xs_len >= ys_len")]
-fn limbs_mul_to_out_fail_2() {
+fn limbs_mul_greater_to_out_fail_2() {
     let mut out = vec![10, 10, 10, 10, 10];
-    _limbs_mul_to_out_basecase(&mut out, &[6, 7], &[1, 2, 3]);
+    _limbs_mul_greater_to_out_basecase(&mut out, &[6, 7], &[1, 2, 3]);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic(expected = "assertion failed: `(left != right)")]
-fn limbs_mul_to_out_fail_3() {
+fn limbs_mul_greater_to_out_fail_3() {
     let mut out = vec![10, 10, 10];
-    _limbs_mul_to_out_basecase(&mut out, &[6, 7], &[]);
+    _limbs_mul_greater_to_out_basecase(&mut out, &[6, 7], &[]);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-fn test_limbs_mul_to_out_toom_22() {
+fn test_limbs_mul_greater_to_out_toom_22() {
     let test = |xs: Vec<Limb>, ys: Vec<Limb>, out_before: Vec<Limb>, out_after| {
-        let mut scratch = vec![0; _limbs_mul_to_out_toom_22_scratch_size(xs.len())];
+        let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_22_scratch_size(xs.len())];
         let mut out = out_before.to_vec();
-        _limbs_mul_to_out_basecase(&mut out, &xs, &ys);
+        _limbs_mul_greater_to_out_basecase(&mut out, &xs, &ys);
         assert_eq!(out, out_after);
         let mut out = out_before.to_vec();
-        _limbs_mul_to_out_toom_22(&mut out, &xs, &ys, &mut scratch);
+        _limbs_mul_greater_to_out_toom_22(&mut out, &xs, &ys, &mut scratch);
         assert_eq!(out, out_after);
     };
     // s != n
@@ -167,7 +172,7 @@ fn test_limbs_mul_to_out_toom_22() {
         vec![1, 2, 3, 8, 13, 12, 16, 20, 0],
     );
     // s > t
-    // limbs_mul_to_out_basecase in limbs_mul_to_out_toom_22_recursive
+    // limbs_mul_greater_to_out_basecase in limbs_mul_greater_to_out_toom_22_recursive
     test(
         vec![1, 1, 1, 1],
         vec![1, 2, 3],
@@ -180,7 +185,7 @@ fn test_limbs_mul_to_out_toom_22() {
         vec![10, 10, 10, 10, 10, 10, 10],
         vec![10_200, 20_402, 30_605, 20_402, 10_200, 0, 10],
     );
-    // limbs_mul_to_out_basecase in limbs_mul_same_length_to_out_toom_22_recursive
+    // limbs_mul_greater_to_out_basecase in limbs_mul_same_length_to_out_toom_22_recursive
     test(
         vec![0xffff_ffff, 0xffff_ffff, 0xffff_ffff],
         vec![0xffff_ffff, 0xffff_ffff, 0xffff_ffff],
@@ -227,7 +232,7 @@ fn test_limbs_mul_to_out_toom_22() {
         long_ys.push((limit - i) as Limb);
     }
     let long_out_limbs = vec![10; 2 * limit];
-    // limbs_mul_to_out_toom_22 in limbs_mul_same_length_to_out_toom_22_recursive
+    // limbs_mul_greater_to_out_toom_22 in limbs_mul_same_length_to_out_toom_22_recursive
     test(
         long_xs,
         long_ys,
@@ -254,7 +259,7 @@ fn test_limbs_mul_to_out_toom_22() {
         long_ys.push((limit + 1 - i) as Limb);
     }
     let long_out_limbs = vec![10; 2 * limit + 3];
-    // limbs_mul_to_out_toom_22 in limbs_mul_to_out_toom_22_recursive
+    // limbs_mul_greater_to_out_toom_22 in limbs_mul_greater_to_out_toom_22_recursive
     test(
         long_xs,
         long_ys,
@@ -283,7 +288,7 @@ fn test_limbs_mul_to_out_toom_22() {
         long_ys.push((68 - i) as Limb);
     }
     let long_out_limbs = vec![10; 144];
-    // limbs_mul_to_out_toom_32 in limbs_mul_to_out_toom_22_recursive
+    // limbs_mul_greater_to_out_toom_32 in limbs_mul_greater_to_out_toom_22_recursive
     test(
         long_xs,
         long_ys,
@@ -308,76 +313,77 @@ fn test_limbs_mul_to_out_toom_22() {
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic(expected = "assertion failed: s > 0 && (s == n || s == n - 1)")]
-fn limbs_mul_to_out_toom_22_fail_1() {
+fn limbs_mul_greater_to_out_toom_22_fail_1() {
     let mut scratch = vec![];
     let mut out = vec![10, 10, 10, 10];
-    _limbs_mul_to_out_toom_22(&mut out, &[6], &[1], &mut scratch);
+    _limbs_mul_greater_to_out_toom_22(&mut out, &[6], &[1], &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic(expected = "assertion failed: xs_len >= ys_len")]
-fn limbs_mul_to_out_toom_22_fail_2() {
+fn limbs_mul_greater_to_out_toom_22_fail_2() {
     let mut scratch = vec![];
     let mut out = vec![10, 10, 10, 10, 10, 10, 10];
-    _limbs_mul_to_out_toom_22(&mut out, &[6, 7, 8], &[1, 2, 3, 4], &mut scratch);
+    _limbs_mul_greater_to_out_toom_22(&mut out, &[6, 7, 8], &[1, 2, 3, 4], &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic(expected = "assertion failed: 0 < t && t <= s")]
-fn limbs_mul_to_out_toom_22_fail_3() {
+fn limbs_mul_greater_to_out_toom_22_fail_3() {
     let mut scratch = vec![];
     let mut out = vec![10, 10, 10, 10, 10, 10, 10];
-    _limbs_mul_to_out_toom_22(&mut out, &[6, 7, 8, 9], &[1, 2], &mut scratch);
+    _limbs_mul_greater_to_out_toom_22(&mut out, &[6, 7, 8, 9], &[1, 2], &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic(expected = "assertion failed: 0 < t && t <= s")]
-fn limbs_mul_to_out_toom_22_fail_4() {
+fn limbs_mul_greater_to_out_toom_22_fail_4() {
     let mut scratch = vec![];
     let mut out = vec![10, 10, 10, 10, 10, 10, 10];
-    _limbs_mul_to_out_toom_22(&mut out, &[6, 7, 8], &[1, 2], &mut scratch);
+    _limbs_mul_greater_to_out_toom_22(&mut out, &[6, 7, 8], &[1, 2], &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic(expected = "assertion failed: mid <= len")]
-fn limbs_mul_to_out_toom_22_fail_5() {
+fn limbs_mul_greater_to_out_toom_22_fail_5() {
     let mut scratch = vec![];
     let mut out = vec![10, 10, 10, 10];
-    _limbs_mul_to_out_toom_22(&mut out, &[6, 7, 8], &[1, 2, 3], &mut scratch);
+    _limbs_mul_greater_to_out_toom_22(&mut out, &[6, 7, 8], &[1, 2, 3], &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic(expected = "assertion failed: ys_len >= n")]
-fn limbs_mul_to_out_toom_22_fail_6() {
+fn limbs_mul_greater_to_out_toom_22_fail_6() {
     let mut scratch = vec![];
     let mut out = vec![10, 10, 10, 10];
-    _limbs_mul_to_out_toom_22(&mut out, &[6, 7, 8], &[], &mut scratch);
+    _limbs_mul_greater_to_out_toom_22(&mut out, &[6, 7, 8], &[], &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic(expected = "assertion failed: mid <= len")]
-fn limbs_mul_to_out_toom_22_fail_7() {
+fn limbs_mul_greater_to_out_toom_22_fail_7() {
     let mut scratch = vec![];
     let mut out = vec![10, 10, 10, 10];
-    _limbs_mul_to_out_toom_22(&mut out, &[6, 7, 8], &[1, 2, 3], &mut scratch);
+    _limbs_mul_greater_to_out_toom_22(&mut out, &[6, 7, 8], &[1, 2, 3], &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-fn test_limbs_mul_to_out_toom_32() {
+fn test_limbs_mul_greater_to_out_toom_32() {
     let test = |xs: Vec<Limb>, ys: Vec<Limb>, out_before: Vec<Limb>, out_after| {
         let mut out = out_before.to_vec();
-        _limbs_mul_to_out_basecase(&mut out, &xs, &ys);
+        _limbs_mul_greater_to_out_basecase(&mut out, &xs, &ys);
         assert_eq!(out, out_after);
         let mut out = out_before.to_vec();
-        let mut scratch = vec![0; _limbs_mul_to_out_toom_32_scratch_size(xs.len(), ys.len())];
-        _limbs_mul_to_out_toom_32(&mut out, &xs, &ys, &mut scratch);
+        let mut scratch =
+            vec![0; _limbs_mul_greater_to_out_toom_32_scratch_size(xs.len(), ys.len())];
+        _limbs_mul_greater_to_out_toom_32(&mut out, &xs, &ys, &mut scratch);
         assert_eq!(out, out_after);
     };
     // !(ap1_hi == 0 && limbs_cmp_same_length(ap1, xs1) == Ordering::Less)
@@ -474,67 +480,67 @@ fn test_limbs_mul_to_out_toom_32() {
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic(expected = "assertion failed: ys_len + 2 <= xs_len && xs_len + 6 <= 3 * ys_len")]
-fn limbs_mul_to_out_toom_32_fail_1() {
-    let mut scratch = vec![0; _limbs_mul_to_out_toom_32_scratch_size(1, 1)];
+fn limbs_mul_greater_to_out_toom_32_fail_1() {
+    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_32_scratch_size(1, 1)];
     let mut out = vec![10, 10, 10, 10];
-    _limbs_mul_to_out_toom_32(&mut out, &[6], &[1], &mut scratch);
+    _limbs_mul_greater_to_out_toom_32(&mut out, &[6], &[1], &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic(expected = "assertion failed: xs_len >= ys_len")]
-fn limbs_mul_to_out_toom_32_fail_2() {
-    let mut scratch = vec![0; _limbs_mul_to_out_toom_32_scratch_size(3, 4)];
+fn limbs_mul_greater_to_out_toom_32_fail_2() {
+    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_32_scratch_size(3, 4)];
     let mut out = vec![10, 10, 10, 10, 10, 10, 10];
-    _limbs_mul_to_out_toom_32(&mut out, &[6, 7, 8], &[1, 2, 3, 4], &mut scratch);
+    _limbs_mul_greater_to_out_toom_32(&mut out, &[6, 7, 8], &[1, 2, 3, 4], &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic(expected = "assertion failed: ys_len + 2 <= xs_len && xs_len + 6 <= 3 * ys_len")]
-fn limbs_mul_to_out_toom_32_fail_3() {
-    let mut scratch = vec![0; _limbs_mul_to_out_toom_32_scratch_size(5, 4)];
+fn limbs_mul_greater_to_out_toom_32_fail_3() {
+    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_32_scratch_size(5, 4)];
     let mut out = vec![10, 10, 10, 10, 10, 10, 10, 10, 10];
-    _limbs_mul_to_out_toom_32(&mut out, &[6, 7, 8, 9, 10], &[1, 2, 3, 4], &mut scratch);
+    _limbs_mul_greater_to_out_toom_32(&mut out, &[6, 7, 8, 9, 10], &[1, 2, 3, 4], &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic(expected = "assertion failed: ys_len + 2 <= xs_len && xs_len + 6 <= 3 * ys_len")]
-fn limbs_mul_to_out_toom_32_fail_4() {
-    let mut scratch = vec![0; _limbs_mul_to_out_toom_32_scratch_size(6, 3)];
+fn limbs_mul_greater_to_out_toom_32_fail_4() {
+    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_32_scratch_size(6, 3)];
     let mut out = vec![10, 10, 10, 10, 10, 10, 10, 10, 10];
-    _limbs_mul_to_out_toom_32(&mut out, &[6, 7, 8, 9, 10, 11], &[1, 2, 3], &mut scratch);
+    _limbs_mul_greater_to_out_toom_32(&mut out, &[6, 7, 8, 9, 10, 11], &[1, 2, 3], &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic(expected = "assertion failed: ys_len + 2 <= xs_len && xs_len + 6 <= 3 * ys_len")]
-fn limbs_mul_to_out_toom_32_fail_5() {
-    let mut scratch = vec![0; _limbs_mul_to_out_toom_32_scratch_size(3, 0)];
+fn limbs_mul_greater_to_out_toom_32_fail_5() {
+    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_32_scratch_size(3, 0)];
     let mut out = vec![10, 10, 10, 10];
-    _limbs_mul_to_out_toom_32(&mut out, &[6, 7, 8], &[], &mut scratch);
+    _limbs_mul_greater_to_out_toom_32(&mut out, &[6, 7, 8], &[], &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic(expected = "assertion failed: out_limbs.len() >= xs_len + ys_len")]
-fn limbs_mul_to_out_toom_32_fail_6() {
-    let mut scratch = vec![0; _limbs_mul_to_out_toom_32_scratch_size(6, 4)];
+fn limbs_mul_greater_to_out_toom_32_fail_6() {
+    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_32_scratch_size(6, 4)];
     let mut out = vec![10, 10, 10, 10, 10, 10, 10, 10, 10];
-    _limbs_mul_to_out_toom_32(&mut out, &[6, 7, 8, 9, 10, 11], &[1, 2, 3, 4], &mut scratch);
+    _limbs_mul_greater_to_out_toom_32(&mut out, &[6, 7, 8, 9, 10, 11], &[1, 2, 3, 4], &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-fn test_limbs_mul_to_out_toom_33() {
+fn test_limbs_mul_greater_to_out_toom_33() {
     let test = |xs: Vec<Limb>, ys: Vec<Limb>, out_before: Vec<Limb>, out_after| {
         let mut out = out_before.to_vec();
-        _limbs_mul_to_out_basecase(&mut out, &xs, &ys);
+        _limbs_mul_greater_to_out_basecase(&mut out, &xs, &ys);
         assert_eq!(out, out_after);
         let mut out = out_before.to_vec();
-        let mut scratch = vec![0; _limbs_mul_to_out_toom_33_scratch_size(xs.len())];
-        _limbs_mul_to_out_toom_33(&mut out, &xs, &ys, &mut scratch);
+        let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_33_scratch_size(xs.len())];
+        _limbs_mul_greater_to_out_toom_33(&mut out, &xs, &ys, &mut scratch);
         assert_eq!(out, out_after);
     };
     // carry == 0 && limbs_cmp_same_length(&gp[..n], xs_1) == Ordering::Less
@@ -544,7 +550,7 @@ fn test_limbs_mul_to_out_toom_33() {
     // s <= t
     // !v_neg_1
     // two_r <= k + 1
-    // _limbs_mul_to_out_basecase in _limbs_mul_to_out_toom_33_recursive
+    // _limbs_mul_greater_to_out_basecase in _limbs_mul_greater_to_out_toom_33_recursive
     test(
         vec![2, 3, 4, 5, 6],
         vec![3, 4, 5, 6, 7],
@@ -604,7 +610,7 @@ fn test_limbs_mul_to_out_toom_33() {
         long_ys.push((limit - i) as Limb);
     }
     let long_out_limbs = vec![10; 2 * limit];
-    // _limbs_mul_to_out_toom_22 in _limbs_mul_to_out_toom_33_recursive
+    // _limbs_mul_greater_to_out_toom_22 in _limbs_mul_greater_to_out_toom_33_recursive
     test(
         long_xs,
         long_ys,
@@ -635,7 +641,7 @@ fn test_limbs_mul_to_out_toom_33() {
         long_ys.push((limit - i) as Limb);
     }
     let long_out_limbs = vec![10; 2 * limit];
-    // _limbs_mul_to_out_toom_33 in _limbs_mul_to_out_toom_33_recursive
+    // _limbs_mul_greater_to_out_toom_33 in _limbs_mul_greater_to_out_toom_33_recursive
     test(
         long_xs,
         long_ys,
@@ -710,19 +716,19 @@ fn test_limbs_mul_to_out_toom_33() {
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic(expected = "index 1 out of range for slice of length 0")]
-fn limbs_mul_to_out_toom_33_fail_1() {
-    let mut scratch = vec![0; _limbs_mul_to_out_toom_33_scratch_size(1)];
+fn limbs_mul_greater_to_out_toom_33_fail_1() {
+    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_33_scratch_size(1)];
     let mut out = vec![10, 10, 10, 10];
-    _limbs_mul_to_out_toom_33(&mut out, &[6], &[1], &mut scratch);
+    _limbs_mul_greater_to_out_toom_33(&mut out, &[6], &[1], &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic(expected = "assertion failed: xs_len >= ys_len")]
-fn limbs_mul_to_out_toom_33_fail_2() {
-    let mut scratch = vec![0; _limbs_mul_to_out_toom_33_scratch_size(5)];
+fn limbs_mul_greater_to_out_toom_33_fail_2() {
+    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_33_scratch_size(5)];
     let mut out = vec![10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10];
-    _limbs_mul_to_out_toom_33(
+    _limbs_mul_greater_to_out_toom_33(
         &mut out,
         &[6, 7, 8, 9, 10],
         &[1, 2, 3, 4, 5, 6],
@@ -733,28 +739,28 @@ fn limbs_mul_to_out_toom_33_fail_2() {
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic(expected = "assertion failed: 0 < t && t <= n")]
-fn limbs_mul_to_out_toom_33_fail_3() {
-    let mut scratch = vec![0; _limbs_mul_to_out_toom_33_scratch_size(5)];
+fn limbs_mul_greater_to_out_toom_33_fail_3() {
+    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_33_scratch_size(5)];
     let mut out = vec![10, 10, 10, 10, 10, 10, 10, 10, 10];
-    _limbs_mul_to_out_toom_33(&mut out, &[6, 7, 8, 9, 10], &[1, 2, 3, 4], &mut scratch);
+    _limbs_mul_greater_to_out_toom_33(&mut out, &[6, 7, 8, 9, 10], &[1, 2, 3, 4], &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "index 2 out of range for slice of length 0")]
-fn limbs_mul_to_out_toom_33_fail_4() {
-    let mut scratch = vec![0; _limbs_mul_to_out_toom_33_scratch_size(5)];
+#[should_panic(expected = "called `Option::unwrap()` on a `None` value")]
+fn limbs_mul_greater_to_out_toom_33_fail_4() {
+    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_33_scratch_size(5)];
     let mut out = vec![10, 10, 10, 10, 10];
-    _limbs_mul_to_out_toom_33(&mut out, &[6, 7, 8, 9, 10], &[], &mut scratch);
+    _limbs_mul_greater_to_out_toom_33(&mut out, &[6, 7, 8, 9, 10], &[], &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic(expected = "assertion failed: out_limbs.len() >= xs_len + ys_len")]
-fn limbs_mul_to_out_toom_33_fail_5() {
-    let mut scratch = vec![0; _limbs_mul_to_out_toom_33_scratch_size(6)];
+fn limbs_mul_greater_to_out_toom_33_fail_5() {
+    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_33_scratch_size(6)];
     let mut out = vec![10, 10, 10, 10, 10, 10, 10, 10, 10];
-    _limbs_mul_to_out_toom_33(
+    _limbs_mul_greater_to_out_toom_33(
         &mut out,
         &[6, 7, 8, 9, 10, 11],
         &[1, 2, 3, 4, 5],
@@ -764,14 +770,15 @@ fn limbs_mul_to_out_toom_33_fail_5() {
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-fn test_limbs_mul_to_out_toom_42() {
+fn test_limbs_mul_greater_to_out_toom_42() {
     let test = |xs: Vec<Limb>, ys: Vec<Limb>, out_before: Vec<Limb>, out_after| {
         let mut out = out_before.to_vec();
-        _limbs_mul_to_out_basecase(&mut out, &xs, &ys);
+        _limbs_mul_greater_to_out_basecase(&mut out, &xs, &ys);
         assert_eq!(out, out_after);
         let mut out = out_before.to_vec();
-        let mut scratch = vec![0; _limbs_mul_to_out_toom_42_scratch_size(xs.len(), ys.len())];
-        _limbs_mul_to_out_toom_42(&mut out, &xs, &ys, &mut scratch);
+        let mut scratch =
+            vec![0; _limbs_mul_greater_to_out_toom_42_scratch_size(xs.len(), ys.len())];
+        _limbs_mul_greater_to_out_toom_42(&mut out, &xs, &ys, &mut scratch);
         assert_eq!(out, out_after);
     };
     // v_neg_1_neg
@@ -899,20 +906,20 @@ fn test_limbs_mul_to_out_toom_42() {
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "index 1 out of range for slice of length 0")]
-fn limbs_mul_to_out_toom_42_fail_1() {
-    let mut scratch = vec![0; _limbs_mul_to_out_toom_42_scratch_size(1, 1)];
+#[should_panic(expected = "called `Option::unwrap()` on a `None` value")]
+fn limbs_mul_greater_to_out_toom_42_fail_1() {
+    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_42_scratch_size(1, 1)];
     let mut out = vec![10, 10, 10, 10];
-    _limbs_mul_to_out_toom_42(&mut out, &[6], &[1], &mut scratch);
+    _limbs_mul_greater_to_out_toom_42(&mut out, &[6], &[1], &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "index 3 out of range for slice of length 2")]
-fn limbs_mul_to_out_toom_42_fail_2() {
-    let mut scratch = vec![0; _limbs_mul_to_out_toom_42_scratch_size(5, 6)];
+#[should_panic(expected = "called `Option::unwrap()` on a `None` value")]
+fn limbs_mul_greater_to_out_toom_42_fail_2() {
+    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_42_scratch_size(5, 6)];
     let mut out = vec![10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10];
-    _limbs_mul_to_out_toom_42(
+    _limbs_mul_greater_to_out_toom_42(
         &mut out,
         &[6, 7, 8, 9, 10],
         &[1, 2, 3, 4, 5, 6],
@@ -923,40 +930,41 @@ fn limbs_mul_to_out_toom_42_fail_2() {
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic(expected = "assertion failed: 0 < s && s <= n")]
-fn limbs_mul_to_out_toom_42_fail_3() {
-    let mut scratch = vec![0; _limbs_mul_to_out_toom_42_scratch_size(3, 2)];
+fn limbs_mul_greater_to_out_toom_42_fail_3() {
+    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_42_scratch_size(3, 2)];
     let mut out = vec![10, 10, 10, 10, 10, 10, 10, 10, 10];
-    _limbs_mul_to_out_toom_42(&mut out, &[6, 7, 8], &[1, 2], &mut scratch);
+    _limbs_mul_greater_to_out_toom_42(&mut out, &[6, 7, 8], &[1, 2], &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "index 2 out of range for slice of length 1")]
-fn limbs_mul_to_out_toom_42_fail_4() {
-    let mut scratch = vec![0; _limbs_mul_to_out_toom_42_scratch_size(5, 0)];
+#[should_panic(expected = "called `Option::unwrap()` on a `None` value")]
+fn limbs_mul_greater_to_out_toom_42_fail_4() {
+    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_42_scratch_size(5, 0)];
     let mut out = vec![10, 10, 10, 10, 10];
-    _limbs_mul_to_out_toom_42(&mut out, &[6, 7, 8, 9, 10], &[], &mut scratch);
+    _limbs_mul_greater_to_out_toom_42(&mut out, &[6, 7, 8, 9, 10], &[], &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic(expected = "assertion failed: out_limbs.len() >= xs_len + ys_len")]
-fn limbs_mul_to_out_toom_42_fail_5() {
-    let mut scratch = vec![0; _limbs_mul_to_out_toom_42_scratch_size(4, 2)];
+fn limbs_mul_greater_to_out_toom_42_fail_5() {
+    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_42_scratch_size(4, 2)];
     let mut out = vec![10, 10, 10, 10];
-    _limbs_mul_to_out_toom_42(&mut out, &[6, 7, 8, 9], &[1, 2], &mut scratch);
+    _limbs_mul_greater_to_out_toom_42(&mut out, &[6, 7, 8, 9], &[1, 2], &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-fn test_limbs_mul_to_out_toom_43() {
+fn test_limbs_mul_greater_to_out_toom_43() {
     let test = |xs: Vec<Limb>, ys: Vec<Limb>, out_before: Vec<Limb>, out_after| {
         let mut out = out_before.to_vec();
-        _limbs_mul_to_out_basecase(&mut out, &xs, &ys);
+        _limbs_mul_greater_to_out_basecase(&mut out, &xs, &ys);
         assert_eq!(out, out_after);
         let mut out = out_before.to_vec();
-        let mut scratch = vec![0; _limbs_mul_to_out_toom_43_scratch_size(xs.len(), ys.len())];
-        _limbs_mul_to_out_toom_43(&mut out, &xs, &ys, &mut scratch);
+        let mut scratch =
+            vec![0; _limbs_mul_greater_to_out_toom_43_scratch_size(xs.len(), ys.len())];
+        _limbs_mul_greater_to_out_toom_43(&mut out, &xs, &ys, &mut scratch);
         assert_eq!(out, out_after);
     };
     // n_high < n in _limbs_mul_toom_evaluate_deg_3_poly_in_2_and_neg_2
@@ -1044,19 +1052,19 @@ fn test_limbs_mul_to_out_toom_43() {
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic(expected = "slice index starts at 3 but ends at 1")]
-fn limbs_mul_to_out_toom_43_fail_1() {
-    let mut scratch = vec![0; _limbs_mul_to_out_toom_43_scratch_size(1, 1)];
+fn limbs_mul_greater_to_out_toom_43_fail_1() {
+    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_43_scratch_size(1, 1)];
     let mut out = vec![10, 10, 10, 10];
-    _limbs_mul_to_out_toom_43(&mut out, &[6], &[1], &mut scratch);
+    _limbs_mul_greater_to_out_toom_43(&mut out, &[6], &[1], &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic(expected = "slice index starts at 12 but ends at 11")]
-fn limbs_mul_to_out_toom_43_fail_2() {
-    let mut scratch = vec![0; _limbs_mul_to_out_toom_43_scratch_size(11, 12)];
+fn limbs_mul_greater_to_out_toom_43_fail_2() {
+    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_43_scratch_size(11, 12)];
     let mut out = vec![10; 23];
-    _limbs_mul_to_out_toom_43(
+    _limbs_mul_greater_to_out_toom_43(
         &mut out,
         &[3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13],
         &[2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13],
@@ -1067,10 +1075,10 @@ fn limbs_mul_to_out_toom_43_fail_2() {
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic(expected = "slice index starts at 12 but ends at 9")]
-fn limbs_mul_to_out_toom_43_fail_3() {
-    let mut scratch = vec![0; _limbs_mul_to_out_toom_43_scratch_size(9, 10)];
+fn limbs_mul_greater_to_out_toom_43_fail_3() {
+    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_43_scratch_size(9, 10)];
     let mut out = vec![10; 19];
-    _limbs_mul_to_out_toom_43(
+    _limbs_mul_greater_to_out_toom_43(
         &mut out,
         &[3, 4, 5, 6, 7, 8, 9, 10, 11],
         &[2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
@@ -1080,11 +1088,11 @@ fn limbs_mul_to_out_toom_43_fail_3() {
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "index 3 out of range for slice of length 0")]
-fn limbs_mul_to_out_toom_43_fail_4() {
-    let mut scratch = vec![0; _limbs_mul_to_out_toom_43_scratch_size(12, 0)];
+#[should_panic(expected = "called `Option::unwrap()` on a `None` value")]
+fn limbs_mul_greater_to_out_toom_43_fail_4() {
+    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_43_scratch_size(12, 0)];
     let mut out = vec![10; 12];
-    _limbs_mul_to_out_toom_43(
+    _limbs_mul_greater_to_out_toom_43(
         &mut out,
         &[3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13],
         &[],
@@ -1095,10 +1103,10 @@ fn limbs_mul_to_out_toom_43_fail_4() {
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic(expected = "slice index starts at 12 but ends at 10")]
-fn limbs_mul_to_out_toom_43_fail_5() {
-    let mut scratch = vec![0; _limbs_mul_to_out_toom_43_scratch_size(4, 2)];
+fn limbs_mul_greater_to_out_toom_43_fail_5() {
+    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_43_scratch_size(4, 2)];
     let mut out = vec![10, 10, 10, 10, 10];
-    _limbs_mul_to_out_toom_43(
+    _limbs_mul_greater_to_out_toom_43(
         &mut out,
         &[3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
         &[2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
@@ -1108,14 +1116,15 @@ fn limbs_mul_to_out_toom_43_fail_5() {
 
 #[cfg(feature = "64_bit_limbs")]
 #[test]
-fn test_limbs_mul_to_out_toom_43() {
+fn test_limbs_mul_greater_to_out_toom_43() {
     let test = |xs: Vec<Limb>, ys: Vec<Limb>, out_before: Vec<Limb>, out_after| {
         let mut out = out_before.to_vec();
-        _limbs_mul_to_out_basecase(&mut out, &xs, &ys);
+        _limbs_mul_greater_to_out_basecase(&mut out, &xs, &ys);
         assert_eq!(out, out_after);
         let mut out = out_before.to_vec();
-        let mut scratch = vec![0; _limbs_mul_to_out_toom_43_scratch_size(xs.len(), ys.len())];
-        _limbs_mul_to_out_toom_43(&mut out, &xs, &ys, &mut scratch);
+        let mut scratch =
+            vec![0; _limbs_mul_greater_to_out_toom_43_scratch_size(xs.len(), ys.len())];
+        _limbs_mul_greater_to_out_toom_43(&mut out, &xs, &ys, &mut scratch);
         assert_eq!(out, out_after);
     };
     test(
@@ -1303,7 +1312,7 @@ fn test_mul() {
 fn limbs_mul_basecase_helper(out_limbs: &Vec<Limb>, xs: &Vec<Limb>, ys: &Vec<Limb>) -> Vec<Limb> {
     let mut out_limbs = out_limbs.to_vec();
     let old_out_limbs = out_limbs.clone();
-    _limbs_mul_to_out_basecase(&mut out_limbs, xs, ys);
+    _limbs_mul_greater_to_out_basecase(&mut out_limbs, xs, ys);
     let n = Natural::from_limbs_asc(xs) * Natural::from_limbs_asc(ys);
     let len = xs.len() + ys.len();
     let mut limbs = n.into_limbs_asc();
@@ -1314,14 +1323,14 @@ fn limbs_mul_basecase_helper(out_limbs: &Vec<Limb>, xs: &Vec<Limb>, ys: &Vec<Lim
 }
 
 #[test]
-fn limbs_mul_to_out_properties() {
+fn limbs_mul_greater_to_out_properties() {
     test_properties_custom_scale(
         2_048,
         triples_of_unsigned_vec_var_10,
         |&(ref out_limbs, ref xs, ref ys)| {
             let expected_out_limbs = limbs_mul_basecase_helper(out_limbs, xs, ys);
             let mut out_limbs = out_limbs.to_vec();
-            let highest_result_limb = limbs_mul_to_out(&mut out_limbs, xs, ys);
+            let highest_result_limb = limbs_mul_greater_to_out(&mut out_limbs, xs, ys);
             assert_eq!(highest_result_limb, out_limbs[xs.len() + ys.len() - 1]);
             assert_eq!(out_limbs, expected_out_limbs);
         },
@@ -1329,75 +1338,78 @@ fn limbs_mul_to_out_properties() {
 }
 
 #[test]
-fn limbs_mul_to_out_toom_22_properties() {
+fn limbs_mul_greater_to_out_toom_22_properties() {
     test_properties_custom_scale(
         2_048,
         triples_of_unsigned_vec_var_11,
         |&(ref out_limbs, ref xs, ref ys)| {
             let expected_out_limbs = limbs_mul_basecase_helper(out_limbs, xs, ys);
             let mut out_limbs = out_limbs.to_vec();
-            let mut scratch = vec![0; _limbs_mul_to_out_toom_22_scratch_size(xs.len())];
-            _limbs_mul_to_out_toom_22(&mut out_limbs, xs, ys, &mut scratch);
+            let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_22_scratch_size(xs.len())];
+            _limbs_mul_greater_to_out_toom_22(&mut out_limbs, xs, ys, &mut scratch);
             assert_eq!(out_limbs, expected_out_limbs);
         },
     );
 }
 
 #[test]
-fn limbs_mul_to_out_toom_32_properties() {
+fn limbs_mul_greater_to_out_toom_32_properties() {
     test_properties_custom_scale(
         2_048,
         triples_of_unsigned_vec_var_12,
         |&(ref out_limbs, ref xs, ref ys)| {
             let expected_out_limbs = limbs_mul_basecase_helper(out_limbs, xs, ys);
             let mut out_limbs = out_limbs.to_vec();
-            let mut scratch = vec![0; _limbs_mul_to_out_toom_32_scratch_size(xs.len(), ys.len())];
-            _limbs_mul_to_out_toom_32(&mut out_limbs, xs, ys, &mut scratch);
+            let mut scratch =
+                vec![0; _limbs_mul_greater_to_out_toom_32_scratch_size(xs.len(), ys.len())];
+            _limbs_mul_greater_to_out_toom_32(&mut out_limbs, xs, ys, &mut scratch);
             assert_eq!(out_limbs, expected_out_limbs);
         },
     );
 }
 
 #[test]
-fn limbs_mul_to_out_toom_33_properties() {
+fn limbs_mul_greater_to_out_toom_33_properties() {
     test_properties_custom_scale(
         2_048,
         triples_of_unsigned_vec_var_13,
         |&(ref out_limbs, ref xs, ref ys)| {
             let expected_out_limbs = limbs_mul_basecase_helper(out_limbs, xs, ys);
             let mut out_limbs = out_limbs.to_vec();
-            let mut scratch = vec![0; _limbs_mul_to_out_toom_33_scratch_size(xs.len())];
-            _limbs_mul_to_out_toom_33(&mut out_limbs, xs, ys, &mut scratch);
+            let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_33_scratch_size(xs.len())];
+            _limbs_mul_greater_to_out_toom_33(&mut out_limbs, xs, ys, &mut scratch);
             assert_eq!(out_limbs, expected_out_limbs);
         },
     );
 }
 
 #[test]
-fn limbs_mul_to_out_toom_42_properties() {
+fn limbs_mul_greater_to_out_toom_42_properties() {
     test_properties_custom_scale(
         2_048,
         triples_of_unsigned_vec_var_14,
         |&(ref out_limbs, ref xs, ref ys)| {
             let expected_out_limbs = limbs_mul_basecase_helper(out_limbs, xs, ys);
             let mut out_limbs = out_limbs.to_vec();
-            let mut scratch = vec![0; _limbs_mul_to_out_toom_42_scratch_size(xs.len(), ys.len())];
-            _limbs_mul_to_out_toom_42(&mut out_limbs, xs, ys, &mut scratch);
+            let mut scratch =
+                vec![0; _limbs_mul_greater_to_out_toom_42_scratch_size(xs.len(), ys.len())];
+            _limbs_mul_greater_to_out_toom_42(&mut out_limbs, xs, ys, &mut scratch);
             assert_eq!(out_limbs, expected_out_limbs);
         },
     );
 }
 
 #[test]
-fn limbs_mul_to_out_toom_43_properties() {
+fn limbs_mul_greater_to_out_toom_43_properties() {
     test_properties_custom_scale(
         2_048,
         triples_of_unsigned_vec_var_15,
         |&(ref out_limbs, ref xs, ref ys)| {
             let expected_out_limbs = limbs_mul_basecase_helper(out_limbs, xs, ys);
             let mut out_limbs = out_limbs.to_vec();
-            let mut scratch = vec![0; _limbs_mul_to_out_toom_43_scratch_size(xs.len(), ys.len())];
-            _limbs_mul_to_out_toom_43(&mut out_limbs, xs, ys, &mut scratch);
+            let mut scratch =
+                vec![0; _limbs_mul_greater_to_out_toom_43_scratch_size(xs.len(), ys.len())];
+            _limbs_mul_greater_to_out_toom_43(&mut out_limbs, xs, ys, &mut scratch);
             assert_eq!(out_limbs, expected_out_limbs);
         },
     );

@@ -5,7 +5,7 @@ Malachite is an alternative to Rust's built-in
 eventually provide a large number of mathematical types
 and state-of-the-art algorithms, often ported from
 established open-source libraries like
-[GMP](https://gmplib.org/),
+[GMP](https://gmplib.org/), [MPFR](https://www.mpfr.org/),
 [FLINT](http://www.flintlib.org/), and
 [Arb](http://arblib.org/). Some of its defining features
 are

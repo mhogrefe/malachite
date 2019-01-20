@@ -112,7 +112,7 @@ fn test_limbs_slice_shl_in_place() {
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "assertion failed: bits > 0")]
+#[should_panic(expected = "(left != right)")]
 fn limbs_slice_shl_in_place_fail_1() {
     limbs_slice_shl_in_place(&mut [123, 456], 0);
 }

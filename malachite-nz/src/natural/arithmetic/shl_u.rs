@@ -107,7 +107,7 @@ pub fn limbs_shl_to_out(out_limbs: &mut [Limb], in_limbs: &[Limb], bits: u32) ->
 /// assert_eq!(limbs, &[2_147_483_648, 61]);
 /// ```
 pub fn limbs_slice_shl_in_place(limbs: &mut [Limb], bits: u32) -> Limb {
-    assert!(bits > 0);
+    assert_ne!(bits, 0);
     assert!(bits < Limb::WIDTH);
     let cobits = Limb::WIDTH - bits;
     let mut remaining_bits = 0;

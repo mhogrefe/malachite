@@ -250,7 +250,8 @@ pub fn limbs_div_exact_limb_in_place(limbs: &mut [Limb], divisor: Limb) {
 }
 
 const MAX_OVER_3: Limb = Limb::MAX / 3;
-const LIMB_INVERSE_3: Limb = (MAX_OVER_3 << 1) + 1;
+// This is MODLIMB_INVERSE_3 from gmp-impl.h.
+const MODLIMB_INVERSE_3: Limb = (MAX_OVER_3 << 1) + 1;
 const CEIL_MAX_OVER_3: Limb = MAX_OVER_3 + 1;
 const CEIL_2_MAX_OVER_3: Limb = ((Limb::MAX >> 1) / 3 + 1) | (1 << (Limb::WIDTH - 1));
 
@@ -337,7 +338,7 @@ pub fn _limbs_div_exact_3_to_out_alt(out_limbs: &mut [Limb], in_limbs: &[Limb]) 
     for i in 0..last_index {
         let (difference, carry) = in_limbs[i].overflowing_sub(big_carry);
         big_carry = if carry { 1 } else { 0 };
-        let out_limb = difference.wrapping_mul(LIMB_INVERSE_3);
+        let out_limb = difference.wrapping_mul(MODLIMB_INVERSE_3);
         out_limbs[i] = out_limb;
         if out_limb >= CEIL_MAX_OVER_3 {
             big_carry += 1;
@@ -348,7 +349,7 @@ pub fn _limbs_div_exact_3_to_out_alt(out_limbs: &mut [Limb], in_limbs: &[Limb]) 
     }
     out_limbs[last_index] = in_limbs[last_index]
         .wrapping_sub(big_carry)
-        .wrapping_mul(LIMB_INVERSE_3);
+        .wrapping_mul(MODLIMB_INVERSE_3);
 }
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
@@ -406,7 +407,7 @@ pub fn _limbs_div_exact_3_in_place_alt(limbs: &mut [Limb]) {
     for limb in limbs[..last_index].iter_mut() {
         let (difference, carry) = limb.overflowing_sub(big_carry);
         big_carry = if carry { 1 } else { 0 };
-        let out_limb = difference.wrapping_mul(LIMB_INVERSE_3);
+        let out_limb = difference.wrapping_mul(MODLIMB_INVERSE_3);
         *limb = out_limb;
         if out_limb >= CEIL_MAX_OVER_3 {
             big_carry += 1;
@@ -417,7 +418,7 @@ pub fn _limbs_div_exact_3_in_place_alt(limbs: &mut [Limb]) {
     }
     limbs[last_index] = limbs[last_index]
         .wrapping_sub(big_carry)
-        .wrapping_mul(LIMB_INVERSE_3);
+        .wrapping_mul(MODLIMB_INVERSE_3);
 }
 
 impl DivExact<Limb> for Natural {

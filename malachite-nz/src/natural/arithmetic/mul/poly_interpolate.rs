@@ -1,16 +1,20 @@
-use malachite_base::num::{WrappingAddAssign, WrappingSubAssign};
+use malachite_base::num::{Parity, WrappingAddAssign, WrappingSubAssign};
 use natural::arithmetic::add::{
     limbs_add_same_length_to_out, limbs_slice_add_same_length_in_place_left,
 };
 use natural::arithmetic::add_limb::limbs_slice_add_limb_in_place;
-use natural::arithmetic::div_exact_limb::limbs_div_exact_3_in_place;
+use natural::arithmetic::add_mul_limb::mpn_addmul_1;
+use natural::arithmetic::div_exact_limb::{
+    limbs_div_exact_3_in_place, limbs_div_exact_limb_in_place,
+};
 use natural::arithmetic::shl_u::limbs_shl_to_out;
 use natural::arithmetic::shr_u::limbs_slice_shr_in_place;
 use natural::arithmetic::sub::{
-    _limbs_sub_same_length_in_place_with_overlap, limbs_sub_same_length_in_place_left,
-    limbs_sub_same_length_in_place_right,
+    _limbs_sub_same_length_in_place_with_overlap, limbs_sub_in_place_left,
+    limbs_sub_same_length_in_place_left, limbs_sub_same_length_in_place_right,
 };
 use natural::arithmetic::sub_limb::limbs_sub_limb_in_place;
+use natural::arithmetic::sub_mul_limb::mpn_submul_1;
 use platform::Limb;
 
 /// This is mpn_toom_interpolate_5pts in mpn/generic/toom_interpolate_5pts.c.
@@ -408,4 +412,230 @@ pub(crate) fn _limbs_mul_toom_interpolate_6_points(
         ));
     }
     out_limbs[5 * n + n_high - 1].wrapping_add_assign(embankment);
+}
+
+// mpn_toom_interpolate_7pts -- Interpolate for toom44, 53, 62.
+
+/* Interpolation for toom4, using the evaluation points 0, infinity,
+   1, -1, 2, -2, 1/2. More precisely, we want to compute
+   f(2^(GMP_NUMB_BITS * n)) for a polynomial f of degree 6, given the
+   seven values
+
+     w0 = f(0),
+     w1 = f(-2),
+     w2 = f(1),
+     w3 = f(-1),
+     w4 = f(2)
+     w5 = 64 * f(1/2)
+     w6 = limit at infinity of f(x) / x^6,
+
+   The result is 6*n + w6n limbs. At entry, w0 is stored at {rp, 2n },
+   w2 is stored at { rp + 2n, 2n+1 }, and w6 is stored at { rp + 6n,
+   w6n }. The other values are 2n + 1 limbs each (with most
+   significant limbs small). f(-1) and f(-1/2) may be negative, signs
+   determined by the flag bits. Inputs are destroyed.
+
+   Needs (2*n + 1) limbs of temporary storage.
+*/
+
+const WANT_ASSERT: bool = true;
+
+pub(crate) fn _limbs_mul_toom_interpolate_7_points(
+    rp: &mut [Limb],
+    n: usize,
+    w1_neg: bool,
+    w1: &mut [Limb],
+    w3_neg: bool,
+    w3: &mut [Limb],
+    w4: &mut [Limb],
+    w5: &mut [Limb],
+    w6n: usize,
+    tp: &mut [Limb],
+) {
+    let m = 2 * n + 1;
+    {
+        let (w0, remainder) = rp.split_at_mut(2 * n);
+        let (w2, w6) = remainder.split_at_mut(4 * n);
+
+        assert!(w6n > 0);
+        assert!(w6n <= 2 * n);
+
+        // Using formulas similar to Marco Bodrato's
+        //
+        // W5 = W5 + W4
+        // W1 =(W4 - W1)/2
+        // W4 = W4 - W0
+        // W4 =(W4 - W1)/4 - W6*16
+        // W3 =(W2 - W3)/2
+        // W2 = W2 - W3
+        //
+        // W5 = W5 - W2*65      May be negative.
+        // W2 = W2 - W6 - W0
+        // W5 =(W5 + W2*45)/2   Now >= 0 again.
+        // W4 =(W4 - W2)/3
+        // W2 = W2 - W4
+        //
+        // W1 = W5 - W1         May be negative.
+        // W5 =(W5 - W3*8)/9
+        // W3 = W3 - W5
+        // W1 =(W1/15 + W5)/2   Now >= 0 again.
+        // W5 = W5 - W1
+        //
+        // where W0 = f(0), W1 = f(-2), W2 = f(1), W3 = f(-1),
+        //   W4 = f(2), W5 = f(1/2), W6 = f(infinity),
+        //
+        // Note that most intermediate results are positive; the ones that
+        // may be negative are represented in two's complement. We must
+        // never shift right a value that may be negative, since that would
+        // invalidate the sign bit. On the other hand, divexact by odd
+        // numbers work fine with two's complement.
+        limbs_slice_add_same_length_in_place_left(&mut w5[..m], &w4[..m]);
+        if w1_neg {
+            limbs_slice_add_same_length_in_place_left(&mut w1[..m], &w4[..m]);
+            assert!(w1[0].even());
+            limbs_slice_shr_in_place(&mut w1[..m], 1);
+        } else {
+            limbs_sub_same_length_in_place_right(&w4[..m], &mut w1[..m]);
+            assert!(w1[0].even());
+            limbs_slice_shr_in_place(&mut w1[..m], 1);
+        }
+        limbs_sub_in_place_left(&mut w4[..m], &w0[..2 * n]);
+        limbs_sub_same_length_in_place_left(&mut w4[..m], &w1[..m]);
+        assert_eq!(w4[0] & 3, 0);
+        limbs_slice_shr_in_place(&mut w4[..m], 2); // w4 >= 0
+
+        tp[w6n] = limbs_shl_to_out(tp, &w6[..w6n], 4);
+        limbs_sub_in_place_left(&mut w4[..m], &tp[..w6n + 1]);
+
+        if w3_neg {
+            limbs_slice_add_same_length_in_place_left(&mut w3[..m], &w2[..m]);
+            assert!(w3[0].even());
+            limbs_slice_shr_in_place(&mut w3[..m], 1);
+        } else {
+            limbs_sub_same_length_in_place_right(&w2[..m], &mut w3[..m]);
+            assert!(w3[0].even());
+            limbs_slice_shr_in_place(&mut w3[..m], 1);
+        }
+
+        limbs_sub_same_length_in_place_left(&mut w2[..m], &w3[..m]);
+
+        mpn_submul_1(w5, &w2[..m], 65);
+        limbs_sub_in_place_left(&mut w2[..m], &w6[..w6n]);
+        limbs_sub_in_place_left(&mut w2[..m], &w0[..2 * n]);
+
+        mpn_addmul_1(w5, &w2[..m], 45);
+        assert!(w5[0].even());
+        limbs_slice_shr_in_place(&mut w5[..m], 1);
+        limbs_sub_same_length_in_place_left(&mut w4[..m], &w2[..m]);
+
+        limbs_div_exact_3_in_place(&mut w4[..m]);
+        limbs_sub_same_length_in_place_left(&mut w2[..m], &w4[..m]);
+
+        limbs_sub_same_length_in_place_right(&w5[..m], &mut w1[..m]);
+        limbs_shl_to_out(tp, &w3[..m], 3);
+        limbs_sub_same_length_in_place_left(&mut w5[..m], &tp[..m]);
+        limbs_div_exact_limb_in_place(w5, 9);
+        limbs_sub_same_length_in_place_left(&mut w3[..m], &w5[..m]);
+
+        limbs_div_exact_limb_in_place(w1, 15);
+        limbs_slice_add_same_length_in_place_left(&mut w1[..m], &w5[..m]);
+        assert!(w1[0].even());
+        limbs_slice_shr_in_place(&mut w1[..m], 1); // w1 >= 0 now
+        limbs_sub_same_length_in_place_left(&mut w5[..m], &w1[..m]);
+
+        // These bounds are valid for the 4x4 polynomial product of toom44,
+        // and they are conservative for toom53 and toom62.
+        assert!(w1[2 * n] < 2);
+        assert!(w2[2 * n] < 3);
+        assert!(w3[2 * n] < 4);
+        assert!(w4[2 * n] < 3);
+        assert!(w5[2 * n] < 2);
+    }
+
+    // Addition chain. Note carries and the 2n'th limbs that need to be
+    // added in.
+    //
+    // Special care is needed for w2[2n] and the corresponding carry,
+    // since the "simple" way of adding it all together would overwrite
+    // the limb at wp[2*n] and rp[4*n] (same location) with the sum of
+    // the high half of w3 and the low half of w4.
+    //
+    //         7    6    5    4    3    2    1    0
+    //    |    |    |    |    |    |    |    |    |
+    //                  ||w3 (2n+1)|
+    //             ||w4 (2n+1)|
+    //        ||w5 (2n+1)|        ||w1 (2n+1)|
+    //  + | w6 (w6n)|        ||w2 (2n+1)| w0 (2n) |  (share storage with r)
+    //  -----------------------------------------------
+    //  r |    |    |    |    |    |    |    |    |
+    //        c7   c6   c5   c4   c3                 Carries to propagate
+    //
+    let cy = if limbs_slice_add_same_length_in_place_left(&mut rp[n..n + m], &w1[..m]) {
+        1
+    } else {
+        0
+    };
+    {
+        let w2 = &mut rp[2 * n..];
+        assert!(!limbs_slice_add_limb_in_place(
+            &mut w2[n + 1..2 * n + 1],
+            cy
+        ));
+    }
+    let cy = if limbs_slice_add_same_length_in_place_left(&mut rp[3 * n..4 * n], &w3[..n]) {
+        1
+    } else {
+        0
+    };
+    {
+        let w2 = &mut rp[2 * n..];
+        assert!(!limbs_slice_add_limb_in_place(
+            &mut w3[n..2 * n + 1],
+            w2[2 * n] + cy
+        ));
+    }
+    let cy = if limbs_add_same_length_to_out(&mut rp[4 * n..], &w3[n..2 * n], &w4[..n]) {
+        1
+    } else {
+        0
+    };
+    assert!(!limbs_slice_add_limb_in_place(
+        &mut w4[n..2 * n + 1],
+        w3[2 * n] + cy
+    ));
+    let cy = if limbs_add_same_length_to_out(&mut rp[5 * n..], &w4[n..2 * n], &w5[..n]) {
+        1
+    } else {
+        0
+    };
+    assert!(!limbs_slice_add_limb_in_place(
+        &mut w5[n..2 * n + 1],
+        w4[2 * n] + cy
+    ));
+    if w6n > n + 1 {
+        let cy = if limbs_slice_add_same_length_in_place_left(
+            &mut rp[6 * n..7 * n + 1],
+            &w5[n..2 * n + 1],
+        ) {
+            1
+        } else {
+            0
+        };
+        assert!(!limbs_slice_add_limb_in_place(
+            &mut rp[7 * n + 1..6 * n + w6n],
+            cy
+        ));
+    } else {
+        assert!(!limbs_slice_add_same_length_in_place_left(
+            &mut rp[6 * n..6 * n + w6n],
+            &w5[n..n + w6n]
+        ));
+        if WANT_ASSERT {
+            let mut i = w6n;
+            while i <= n {
+                assert_eq!(w5[n + i], 0);
+                i += 1;
+            }
+        }
+    }
 }

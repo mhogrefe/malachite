@@ -8,8 +8,10 @@ use malachite_base::num::{
 use malachite_base::round::RoundingMode;
 use malachite_nz::integer::logic::bit_access::limbs_vec_clear_bit_neg;
 use malachite_nz::natural::arithmetic::mul::toom::{
-    _limbs_mul_to_out_toom_32_input_sizes_valid, _limbs_mul_to_out_toom_33_input_sizes_valid,
-    _limbs_mul_to_out_toom_42_input_sizes_valid, _limbs_mul_to_out_toom_43_input_sizes_valid,
+    _limbs_mul_greater_to_out_toom_32_input_sizes_valid,
+    _limbs_mul_greater_to_out_toom_33_input_sizes_valid,
+    _limbs_mul_greater_to_out_toom_42_input_sizes_valid,
+    _limbs_mul_greater_to_out_toom_43_input_sizes_valid,
 };
 use malachite_nz::natural::arithmetic::mul_limb::limbs_mul_limb;
 use malachite_nz::platform::{HalfLimb, Limb, SignedHalfLimb, SignedLimb};
@@ -1373,7 +1375,7 @@ pub fn triples_of_unsigned_vec_min_sizes<T: PrimitiveUnsigned + Rand>(
 }
 
 // All triples of `Vec<T>`, where `T` is unsigned and `out_limbs`, `xs`, and `ys` meet the
-// preconditions of `_limbs_mul_to_out_toom_22`.
+// preconditions of `_limbs_mul_greater_to_out_toom_22`.
 pub fn triples_of_unsigned_vec_var_11<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (Vec<T>, Vec<T>, Vec<T>)>> {
@@ -1391,53 +1393,53 @@ pub fn triples_of_unsigned_vec_var_11<T: PrimitiveUnsigned + Rand>(
 }
 
 // All triples of `Vec<T>`, where `T` is unsigned and `out_limbs`, `xs`, and `ys` meet the
-// preconditions of `_limbs_mul_to_out_toom_32`.
+// preconditions of `_limbs_mul_greater_to_out_toom_32`.
 pub fn triples_of_unsigned_vec_var_12<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (Vec<T>, Vec<T>, Vec<T>)>> {
     Box::new(triples_of_unsigned_vec_min_sizes(gm, 10, 6, 4).filter(
         |&(ref out_limbs, ref xs, ref ys)| {
             out_limbs.len() >= xs.len() + ys.len()
-                && _limbs_mul_to_out_toom_32_input_sizes_valid(xs.len(), ys.len())
+                && _limbs_mul_greater_to_out_toom_32_input_sizes_valid(xs.len(), ys.len())
         },
     ))
 }
 
 // All triples of `Vec<T>`, where `T` is unsigned and `out_limbs`, `xs`, and `ys` meet the
-// preconditions of `_limbs_mul_to_out_toom_33`.
+// preconditions of `_limbs_mul_greater_to_out_toom_33`.
 pub fn triples_of_unsigned_vec_var_13<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (Vec<T>, Vec<T>, Vec<T>)>> {
     Box::new(triples_of_unsigned_vec_min_sizes(gm, 10, 5, 5).filter(
         |&(ref out_limbs, ref xs, ref ys)| {
             out_limbs.len() >= xs.len() + ys.len()
-                && _limbs_mul_to_out_toom_33_input_sizes_valid(xs.len(), ys.len())
+                && _limbs_mul_greater_to_out_toom_33_input_sizes_valid(xs.len(), ys.len())
         },
     ))
 }
 
 // All triples of `Vec<T>`, where `T` is unsigned and `out_limbs`, `xs`, and `ys` meet the
-// preconditions of `_limbs_mul_to_out_toom_42`.
+// preconditions of `_limbs_mul_greater_to_out_toom_42`.
 pub fn triples_of_unsigned_vec_var_14<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (Vec<T>, Vec<T>, Vec<T>)>> {
     Box::new(triples_of_unsigned_vec_min_sizes(gm, 6, 4, 2).filter(
         |&(ref out_limbs, ref xs, ref ys)| {
             out_limbs.len() >= xs.len() + ys.len()
-                && _limbs_mul_to_out_toom_42_input_sizes_valid(xs.len(), ys.len())
+                && _limbs_mul_greater_to_out_toom_42_input_sizes_valid(xs.len(), ys.len())
         },
     ))
 }
 
 // All triples of `Vec<T>`, where `T` is unsigned and `out_limbs`, `xs`, and `ys` meet the
-// preconditions of `_limbs_mul_to_out_toom_43`.
+// preconditions of `_limbs_mul_greater_to_out_toom_43`.
 pub fn triples_of_unsigned_vec_var_15<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (Vec<T>, Vec<T>, Vec<T>)>> {
     Box::new(triples_of_unsigned_vec_min_sizes(gm, 19, 11, 8).filter(
         |&(ref out_limbs, ref xs, ref ys)| {
             out_limbs.len() >= xs.len() + ys.len()
-                && _limbs_mul_to_out_toom_43_input_sizes_valid(xs.len(), ys.len())
+                && _limbs_mul_greater_to_out_toom_43_input_sizes_valid(xs.len(), ys.len())
         },
     ))
 }
