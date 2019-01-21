@@ -107,7 +107,6 @@ pub(crate) fn _limbs_mul_toom_interpolate_5_points(
             ));
         }
         let v_inf = &mut c_hi[k - 1..two_r + k - 1];
-        //let (_, v_inf) = remainder.split_at_mut(k);
         // (6) v_2 <- v_2 - 2 * v_inf, (2 1 0 0 0) - 2 * (1 0 0 0 0) = (0 1 0 0 0)
         // result is v_2 >= 0
         saved = v_inf[0]; // Remember v1's highest byte (will be overwritten).
@@ -229,7 +228,7 @@ pub(crate) fn _limbs_mul_toom_interpolate_6_points(
     w1: &mut [Limb],
 ) {
     assert_ne!(n, 0);
-    assert!(2 * n >= n_high && n_high > 0);
+    assert!(2 * n >= n_high && n_high != 0);
     let limit = 2 * n + 1;
     {
         let (w5, w3) = out_limbs.split_at_mut(2 * n); // w5 length: 2 * n
@@ -457,7 +456,7 @@ pub(crate) fn _limbs_mul_toom_interpolate_7_points(
         let (w0, remainder) = rp.split_at_mut(2 * n);
         let (w2, w6) = remainder.split_at_mut(4 * n);
 
-        assert!(w6n > 0);
+        assert_ne!(w6n, 0);
         assert!(w6n <= 2 * n);
 
         // Using formulas similar to Marco Bodrato's

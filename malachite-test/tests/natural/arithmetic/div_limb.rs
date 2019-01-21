@@ -49,7 +49,7 @@ fn limbs_div_limb_fail_1() {
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "assertion failed: divisor > 0")]
+#[should_panic(expected = "assertion failed: `(left != right)")]
 fn limbs_div_limb_fail_2() {
     limbs_div_limb(&[10, 10], 0);
 }
@@ -63,7 +63,7 @@ fn limbs_div_limb_in_place_fail_1() {
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "assertion failed: divisor > 0")]
+#[should_panic(expected = "assertion failed: `(left != right)")]
 fn limbs_div_limb_in_place_fail_2() {
     limbs_div_limb_in_place(&mut [10, 10], 0);
 }
@@ -115,7 +115,7 @@ fn limbs_div_limb_to_out_fail_1() {
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "assertion failed: divisor > 0")]
+#[should_panic(expected = "assertion failed: `(left != right)")]
 fn limbs_div_limb_to_out_fail_2() {
     limbs_div_limb_to_out(&mut [10, 10], &[10, 10], 0);
 }

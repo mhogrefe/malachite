@@ -83,7 +83,7 @@ fn limbs_shl_to_out_fail_1() {
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "assertion failed: bits > 0")]
+#[should_panic(expected = "assertion failed: `(left != right)")]
 fn limbs_shl_to_out_fail_2() {
     limbs_shl_to_out(&mut [10, 10, 10], &[123, 456], 0);
 }

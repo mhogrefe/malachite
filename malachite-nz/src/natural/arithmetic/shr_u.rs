@@ -253,8 +253,8 @@ pub fn limbs_shr_round(limbs: &[Limb], bits: u64, rm: RoundingMode) -> Option<Ve
 /// ```
 pub fn limbs_shr_to_out(out_limbs: &mut [Limb], in_limbs: &[Limb], bits: u32) -> Limb {
     let len = in_limbs.len();
-    assert!(len > 0);
-    assert!(bits > 0);
+    assert_ne!(len, 0);
+    assert_ne!(bits, 0);
     assert!(bits < Limb::WIDTH);
     assert!(out_limbs.len() >= len);
     let cobits = Limb::WIDTH - bits;
@@ -297,10 +297,10 @@ pub fn limbs_shr_to_out(out_limbs: &mut [Limb], in_limbs: &[Limb], bits: u32) ->
 /// assert_eq!(limbs, &[2_147_483_709, 227]);
 /// ```
 pub fn limbs_slice_shr_in_place(limbs: &mut [Limb], bits: u32) -> Limb {
-    assert!(bits > 0);
+    assert_ne!(bits, 0);
     assert!(bits < Limb::WIDTH);
     let len = limbs.len();
-    assert!(len > 0);
+    assert_ne!(len, 0);
     let cobits = Limb::WIDTH - bits;
     let mut high_limb = limbs[0];
     let remaining_bits = high_limb << cobits;

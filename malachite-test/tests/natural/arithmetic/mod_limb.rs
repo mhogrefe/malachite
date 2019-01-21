@@ -49,7 +49,7 @@ fn limbs_mod_limb_fail_1() {
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "assertion failed: divisor > 0")]
+#[should_panic(expected = "assertion failed: `(left != right)")]
 fn limbs_mod_limb_fail_2() {
     limbs_mod_limb(&[10, 10], 0);
 }

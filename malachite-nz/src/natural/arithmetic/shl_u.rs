@@ -71,7 +71,7 @@ pub fn limbs_shl(limbs: &[Limb], bits: u64) -> Vec<Limb> {
 pub fn limbs_shl_to_out(out_limbs: &mut [Limb], in_limbs: &[Limb], bits: u32) -> Limb {
     let len = in_limbs.len();
     assert!(out_limbs.len() >= len);
-    assert!(bits > 0);
+    assert_ne!(bits, 0);
     assert!(bits < Limb::WIDTH);
     let cobits = Limb::WIDTH - bits;
     let mut remaining_bits = 0;

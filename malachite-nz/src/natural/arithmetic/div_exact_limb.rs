@@ -131,9 +131,9 @@ pub fn limbs_div_exact_limb(limbs: &[Limb], divisor: Limb) -> Vec<Limb> {
 /// assert_eq!(out_limbs, &[0x5555_5555, 0x5555_5555, 10, 10]);
 /// ```
 pub fn limbs_div_exact_limb_to_out(out_limbs: &mut [Limb], in_limbs: &[Limb], divisor: Limb) {
-    assert!(divisor > 0);
+    assert_ne!(divisor, 0);
     let len = in_limbs.len();
-    assert!(len > 0);
+    assert_ne!(len, 0);
     assert!(out_limbs.len() >= len);
     if divisor.even() {
         let shift = divisor.trailing_zeros();
@@ -204,9 +204,9 @@ pub fn limbs_div_exact_limb_to_out(out_limbs: &mut [Limb], in_limbs: &[Limb], di
 /// assert_eq!(limbs, &[0x5555_5555, 0x5555_5555]);
 /// ```
 pub fn limbs_div_exact_limb_in_place(limbs: &mut [Limb], divisor: Limb) {
-    assert!(divisor > 0);
+    assert_ne!(divisor, 0);
     let len = limbs.len();
-    assert!(len > 0);
+    assert_ne!(len, 0);
     if divisor.even() {
         let shift = divisor.trailing_zeros();
         let shift_complement = Limb::WIDTH - shift;
@@ -310,7 +310,7 @@ pub fn limbs_div_exact_3(limbs: &[Limb]) -> Vec<Limb> {
 pub fn limbs_div_exact_3_to_out(out_limbs: &mut [Limb], in_limbs: &[Limb]) {
     const MAX_OVER_3_U64: DoubleLimb = MAX_OVER_3 as DoubleLimb;
     let len = in_limbs.len();
-    assert!(len > 0);
+    assert_ne!(len, 0);
     assert!(out_limbs.len() >= len);
     let last_index = len - 1;
     let mut out_limb = 0;
@@ -331,7 +331,7 @@ pub fn limbs_div_exact_3_to_out(out_limbs: &mut [Limb], in_limbs: &[Limb]) {
 // Benchmarks show that this algorithm is always worse than the default.
 pub fn _limbs_div_exact_3_to_out_alt(out_limbs: &mut [Limb], in_limbs: &[Limb]) {
     let len = in_limbs.len();
-    assert!(len > 0);
+    assert_ne!(len, 0);
     assert!(out_limbs.len() >= len);
     let last_index = len - 1;
     let mut big_carry = 0;
@@ -381,7 +381,7 @@ pub fn _limbs_div_exact_3_to_out_alt(out_limbs: &mut [Limb], in_limbs: &[Limb]) 
 pub fn limbs_div_exact_3_in_place(limbs: &mut [Limb]) {
     const MAX_OVER_3_U64: DoubleLimb = MAX_OVER_3 as DoubleLimb;
     let len = limbs.len();
-    assert!(len > 0);
+    assert_ne!(len, 0);
     let last_index = len - 1;
     let mut out_limb = 0;
     for limb in limbs[..last_index].iter_mut() {
@@ -401,7 +401,7 @@ pub fn limbs_div_exact_3_in_place(limbs: &mut [Limb]) {
 // Benchmarks show that this algorithm is always worse than the default.
 pub fn _limbs_div_exact_3_in_place_alt(limbs: &mut [Limb]) {
     let len = limbs.len();
-    assert!(len > 0);
+    assert_ne!(len, 0);
     let last_index = len - 1;
     let mut big_carry = 0;
     for limb in limbs[..last_index].iter_mut() {

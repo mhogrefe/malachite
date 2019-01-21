@@ -234,7 +234,7 @@ pub fn limbs_div_limb_to_out_mod(
     in_limbs: &[Limb],
     mut divisor: Limb,
 ) -> Limb {
-    assert!(divisor > 0);
+    assert_ne!(divisor, 0);
     let len = in_limbs.len();
     assert!(len > 1);
     assert!(out_limbs.len() >= len);
@@ -301,7 +301,7 @@ pub fn limbs_div_limb_to_out_mod(
 /// assert_eq!(limbs, &[0x5555_5555, 0x5555_5555]);
 /// ```
 pub fn limbs_div_limb_in_place_mod(limbs: &mut [Limb], mut divisor: Limb) -> Limb {
-    assert!(divisor > 0);
+    assert_ne!(divisor, 0);
     let len = limbs.len();
     assert!(len > 1);
     let len_minus_1 = len - 1;

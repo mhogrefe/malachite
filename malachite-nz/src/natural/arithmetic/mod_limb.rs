@@ -141,7 +141,7 @@ fn limbs_mod_limb_normalized_shl(
 /// assert_eq!(limbs_mod_limb(&[0xffff_ffff, 0xffff_ffff], 3), 0);
 /// ```
 pub fn limbs_mod_limb(limbs: &[Limb], mut divisor: Limb) -> Limb {
-    assert!(divisor > 0);
+    assert_ne!(divisor, 0);
     let len = limbs.len();
     assert!(len > 1);
     let len_minus_1 = len - 1;

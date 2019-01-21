@@ -9,8 +9,9 @@ use natural::arithmetic::add_mul_limb::mpn_addmul_1;
 use natural::arithmetic::mul::toom::{
     _limbs_mul_greater_to_out_toom_22, _limbs_mul_greater_to_out_toom_32,
     _limbs_mul_greater_to_out_toom_33, _limbs_mul_greater_to_out_toom_33_scratch_size,
-    _limbs_mul_greater_to_out_toom_42, MUL_TOOM22_THRESHOLD, MUL_TOOM33_THRESHOLD,
-    MUL_TOOM33_THRESHOLD_LIMIT, MUL_TOOM44_THRESHOLD,
+    _limbs_mul_greater_to_out_toom_42, _limbs_mul_greater_to_out_toom_44,
+    _limbs_mul_greater_to_out_toom_44_scratch_size, MUL_TOOM22_THRESHOLD, MUL_TOOM33_THRESHOLD,
+    MUL_TOOM33_THRESHOLD_LIMIT, MUL_TOOM44_THRESHOLD, MUL_TOOM6H_THRESHOLD,
 };
 use natural::arithmetic::mul_limb::limbs_mul_limb_to_out;
 use natural::arithmetic::shl_u::{limbs_shl_to_out, limbs_slice_shl_in_place};
@@ -20,6 +21,29 @@ use natural::Natural::{self, Large, Small};
 use platform::Limb;
 use std::cmp::Ordering;
 use std::ops::{Mul, MulAssign};
+
+// This doesn't use `chunks_exact` because sometimes `xs_last` is longer than `n`.
+macro_rules! split_into_chunks {
+    ($xs: expr, $n: expr, $last_chunk_size: ident, [$($xs_i: ident),*], $xs_last: ident) => {
+        let remainder = &$xs;
+        $(
+            let ($xs_i, remainder) = remainder.split_at($n);
+        )*
+        let $xs_last = remainder;
+        let $last_chunk_size = $xs_last.len();
+    }
+}
+
+// This doesn't use `chunks_exact_mut` because sometimes `xs_last` is longer than `n`.
+macro_rules! split_into_chunks_mut {
+    ($xs: expr, $n: expr, [$($xs_i: ident),*], $xs_last: ident) => {
+        let remainder = &mut $xs[..];
+        $(
+            let ($xs_i, remainder) = remainder.split_at_mut($n);
+        )*
+        let $xs_last = remainder;
+    }
+}
 
 //TODO use better algorithms
 
@@ -782,20 +806,14 @@ pub fn limbs_mul_same_length_to_out(out_limbs: &mut [Limb], xs: &[Limb], ys: &[L
     } else if len < MUL_TOOM44_THRESHOLD {
         let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_33_scratch_size(len)];
         _limbs_mul_greater_to_out_toom_33(out_limbs, xs, ys, &mut scratch);
+    } else if len < MUL_TOOM6H_THRESHOLD {
+        let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_44_scratch_size(len)];
+        _limbs_mul_greater_to_out_toom_44(out_limbs, xs, ys, &mut scratch);
     } else {
         //TODO remove
         _limbs_mul_greater_to_out_basecase(out_limbs, xs, ys);
     }
     /*
-    else if (BELOW_THRESHOLD (len, MUL_TOOM6H_THRESHOLD))
-      {
-        mp_ptr ws;
-        TMP_SDECL;
-        TMP_SMARK;
-        ws = TMP_SALLOC_LIMBS (mpn_toom44_mul_itch (len, len));
-        mpn_toom44_mul (out_limbs, xs, len, ys, len, ws);
-        TMP_SFREE;
-      }
     else if (BELOW_THRESHOLD (len, MUL_TOOM8H_THRESHOLD))
       {
         mp_ptr ws;

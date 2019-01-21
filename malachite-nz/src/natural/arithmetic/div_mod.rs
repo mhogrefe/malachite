@@ -1226,7 +1226,7 @@ pub fn mpn_dcpi1_divappr_q(qp: &mut [Limb], np: &mut [Limb], dp: &[Limb], dinv: 
 // mpn_bc_invertappr from mpn/generic/invertappr.c
 pub fn mpn_bc_invertappr(ip: &mut [Limb], dp: &[Limb], xp: &mut [Limb]) -> Limb {
     let n = dp.len();
-    assert!(n > 0);
+    assert_ne!(n, 0);
     assert!(dp[n - 1].get_highest_bit());
 
     // Compute a base value of r limbs.
