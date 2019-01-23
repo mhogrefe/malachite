@@ -22,14 +22,14 @@ fn test_limbs_trailing_zeros() {
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "index out of bounds: the len is 0 but the index is 0")]
+#[should_panic]
 fn limbs_trailing_zeros_fail_1() {
     limbs_trailing_zeros(&[]);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "index out of bounds: the len is 3 but the index is 3")]
+#[should_panic]
 fn limbs_trailing_zeros_fail_2() {
     limbs_trailing_zeros(&[0, 0, 0]);
 }

@@ -41,14 +41,14 @@ fn test_sub_mul_assign_limb() {
 }
 
 #[test]
-#[should_panic(expected = "Natural sub_mul_assign cannot have a negative result")]
+#[should_panic]
 fn sub_mul_assign_fail_1() {
     let mut x = Natural::from_str("123").unwrap();
     x.sub_mul_assign(&Natural::from_str("5").unwrap(), 100);
 }
 
 #[test]
-#[should_panic(expected = "Natural sub_mul_assign cannot have a negative result")]
+#[should_panic]
 fn sub_mul_assign_fail_2() {
     let mut x = Natural::from_str("1000000000000").unwrap();
     x.sub_mul_assign(&Natural::from_str("1000000000000").unwrap(), 100);

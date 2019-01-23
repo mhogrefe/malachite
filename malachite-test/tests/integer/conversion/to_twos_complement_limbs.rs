@@ -62,7 +62,7 @@ pub fn test_limbs_twos_complement_and_maybe_sign_extend_negative_in_place() {
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "assertion failed: !limbs_twos_complement_in_place(limbs)")]
+#[should_panic]
 fn limbs_twos_complement_and_maybe_sign_extend_negative_in_place_fail() {
     let mut mut_limbs = vec![0, 0, 0];
     limbs_twos_complement_and_maybe_sign_extend_negative_in_place(&mut mut_limbs);

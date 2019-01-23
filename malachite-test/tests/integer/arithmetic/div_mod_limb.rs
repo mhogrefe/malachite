@@ -142,19 +142,19 @@ fn test_div_mod_limb() {
 }
 
 #[test]
-#[should_panic(expected = "division by zero")]
+#[should_panic]
 fn div_assign_mod_limb_fail() {
     Integer::from(10).div_assign_mod(0 as Limb);
 }
 
 #[test]
-#[should_panic(expected = "division by zero")]
+#[should_panic]
 fn div_mod_limb_fail() {
     Integer::from(10).div_mod(0 as Limb);
 }
 
 #[test]
-#[should_panic(expected = "division by zero")]
+#[should_panic]
 fn div_mod_limb_ref_fail() {
     (&Integer::from(10)).div_mod(0 as Limb);
 }
@@ -272,19 +272,19 @@ fn test_div_rem_limb() {
 }
 
 #[test]
-#[should_panic(expected = "division by zero")]
+#[should_panic]
 fn div_assign_rem_limb_fail() {
     Integer::from(10).div_assign_rem(0 as Limb);
 }
 
 #[test]
-#[should_panic(expected = "division by zero")]
+#[should_panic]
 fn div_rem_limb_fail() {
     Integer::from(10).div_rem(0 as Limb);
 }
 
 #[test]
-#[should_panic(expected = "division by zero")]
+#[should_panic]
 fn div_rem_limb_ref_fail() {
     (&Integer::from(10)).div_rem(0 as Limb);
 }
@@ -391,19 +391,19 @@ fn test_ceiling_div_mod_limb() {
 }
 
 #[test]
-#[should_panic(expected = "division by zero")]
+#[should_panic]
 fn ceiling_div_assign_mod_limb_fail() {
     Integer::from(10).ceiling_div_assign_mod(0 as Limb);
 }
 
 #[test]
-#[should_panic(expected = "division by zero")]
+#[should_panic]
 fn ceiling_div_mod_limb_fail() {
     Integer::from(10).ceiling_div_mod(0 as Limb);
 }
 
 #[test]
-#[should_panic(expected = "division by zero")]
+#[should_panic]
 fn ceiling_div_mod_limb_ref_fail() {
     (&Integer::from(10)).ceiling_div_mod(0 as Limb);
 }
@@ -447,13 +447,13 @@ fn test_limb_div_mod_integer() {
 }
 
 #[test]
-#[should_panic(expected = "division by zero")]
+#[should_panic]
 fn limb_div_mod_integer_fail() {
     (10 as Limb).div_mod(Integer::ZERO);
 }
 
 #[test]
-#[should_panic(expected = "division by zero")]
+#[should_panic]
 fn limb_div_mod_integer_ref_fail() {
     (10 as Limb).div_mod(&Integer::ZERO);
 }
@@ -495,13 +495,13 @@ fn test_limb_div_rem_integer() {
 }
 
 #[test]
-#[should_panic(expected = "division by zero")]
+#[should_panic]
 fn limb_div_rem_integer_fail() {
     (10 as Limb).div_rem(Integer::ZERO);
 }
 
 #[test]
-#[should_panic(expected = "division by zero")]
+#[should_panic]
 fn limb_div_rem_integer_ref_fail() {
     (10 as Limb).div_rem(&Integer::ZERO);
 }
@@ -545,13 +545,13 @@ fn test_limb_ceiling_div_mod_integer() {
 }
 
 #[test]
-#[should_panic(expected = "division by zero")]
+#[should_panic]
 fn limb_ceiling_div_mod_integer_fail() {
     (10 as Limb).ceiling_div_mod(Integer::ZERO);
 }
 
 #[test]
-#[should_panic(expected = "division by zero")]
+#[should_panic]
 fn limb_ceiling_div_mod_integer_ref_fail() {
     (10 as Limb).ceiling_div_mod(&Integer::ZERO);
 }

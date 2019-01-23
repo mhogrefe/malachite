@@ -30,14 +30,14 @@ fn test_limbs_hamming_distance_neg() {
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "index out of bounds: the len is 2 but the index is 2")]
+#[should_panic]
 fn limbs_hamming_distance_neg_fail_1() {
     limbs_hamming_distance_neg(&[0, 0], &[1, 2, 3]);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "index out of bounds: the len is 2 but the index is 2")]
+#[should_panic]
 fn limbs_hamming_distance_neg_fail_2() {
     limbs_hamming_distance_neg(&[1, 2, 3], &[0, 0]);
 }

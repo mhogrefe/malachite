@@ -52,7 +52,7 @@ fn test_limbs_eq_limb_mod_limb() {
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "limbs.len() > 1")]
+#[should_panic]
 fn limbs_eq_limb_mod_limb_fail() {
     limbs_eq_limb_mod_limb(&[10], 10, 15);
 }

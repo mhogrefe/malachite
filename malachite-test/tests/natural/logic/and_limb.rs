@@ -32,7 +32,7 @@ fn test_limbs_and_limb() {
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "index out of bounds: the len is 0 but the index is 0")]
+#[should_panic]
 fn limbs_and_limb_fail() {
     limbs_and_limb(&[], 10);
 }

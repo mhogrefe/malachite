@@ -70,28 +70,28 @@ fn test_limbs_div_limb_mod_and_limbs_div_limb_in_place_mod() {
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "assertion failed: len > 1")]
+#[should_panic]
 fn limbs_div_limb_mod_fail_1() {
     limbs_div_limb_mod(&[10], 10);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "assertion failed: `(left != right)")]
+#[should_panic]
 fn limbs_div_limb_mod_fail_2() {
     limbs_div_limb_mod(&[10, 10], 0);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "assertion failed: len > 1")]
+#[should_panic]
 fn limbs_div_limb_in_place_mod_fail_1() {
     limbs_div_limb_in_place_mod(&mut [10], 10);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "assertion failed: `(left != right)")]
+#[should_panic]
 fn limbs_div_limb_in_place_mod_fail_2() {
     limbs_div_limb_in_place_mod(&mut [10, 10], 0);
 }
@@ -152,21 +152,21 @@ fn test_limbs_div_limb_to_out_mod() {
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "assertion failed: len > 1")]
+#[should_panic]
 fn limbs_div_limb_to_out_mod_fail_1() {
     limbs_div_limb_to_out_mod(&mut [10], &[10], 10);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "assertion failed: `(left != right)")]
+#[should_panic]
 fn limbs_div_limb_to_out_mod_fail_2() {
     limbs_div_limb_to_out_mod(&mut [10, 10], &[10, 10], 0);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "assertion failed: out_limbs.len() >= len")]
+#[should_panic]
 fn limbs_div_limb_to_out_mod_fail_3() {
     limbs_div_limb_to_out_mod(&mut [10], &[10, 10], 10);
 }
@@ -275,37 +275,37 @@ fn test_div_mod_limb() {
 }
 
 #[test]
-#[should_panic(expected = "division by zero")]
+#[should_panic]
 fn div_assign_mod_limb_fail() {
     Natural::from(10u32).div_assign_mod(0);
 }
 
 #[test]
-#[should_panic(expected = "division by zero")]
+#[should_panic]
 fn div_mod_limb_fail() {
     Natural::from(10u32).div_mod(0);
 }
 
 #[test]
-#[should_panic(expected = "division by zero")]
+#[should_panic]
 fn div_mod_limb_ref_fail() {
     (&Natural::from(10u32)).div_mod(0);
 }
 
 #[test]
-#[should_panic(expected = "division by zero")]
+#[should_panic]
 fn div_assign_rem_limb_fail() {
     Natural::from(10u32).div_assign_rem(0);
 }
 
 #[test]
-#[should_panic(expected = "division by zero")]
+#[should_panic]
 fn div_rem_limb_fail() {
     Natural::from(10u32).div_rem(0);
 }
 
 #[test]
-#[should_panic(expected = "division by zero")]
+#[should_panic]
 fn div_rem_limb_ref_fail() {
     (&Natural::from(10u32)).div_rem(0);
 }
@@ -375,19 +375,19 @@ fn test_ceiling_div_neg_mod_limb() {
 }
 
 #[test]
-#[should_panic(expected = "division by zero")]
+#[should_panic]
 fn ceiling_div_assign_neg_mod_limb_fail() {
     Natural::from(10u32).ceiling_div_assign_neg_mod(0);
 }
 
 #[test]
-#[should_panic(expected = "division by zero")]
+#[should_panic]
 fn ceiling_div_neg_mod_limb_fail() {
     Natural::from(10u32).ceiling_div_neg_mod(0);
 }
 
 #[test]
-#[should_panic(expected = "division by zero")]
+#[should_panic]
 fn ceiling_div_neg_mod_limb_ref_fail() {
     (&Natural::from(10u32)).ceiling_div_neg_mod(0);
 }
@@ -453,49 +453,49 @@ fn test_limb_div_mod_natural() {
 }
 
 #[test]
-#[should_panic(expected = "division by zero")]
+#[should_panic]
 fn limb_div_mod_natural_fail() {
     10.div_mod(Natural::ZERO);
 }
 
 #[test]
-#[should_panic(expected = "division by zero")]
+#[should_panic]
 fn limb_div_mod_natural_ref_fail() {
     10.div_mod(&Natural::ZERO);
 }
 
 #[test]
-#[should_panic(expected = "division by zero")]
+#[should_panic]
 fn limb_div_assign_mod_natural_fail() {
     10.div_assign_mod(Natural::ZERO);
 }
 
 #[test]
-#[should_panic(expected = "division by zero")]
+#[should_panic]
 fn limb_div_assign_mod_natural_ref_fail() {
     10.div_assign_mod(&Natural::ZERO);
 }
 
 #[test]
-#[should_panic(expected = "division by zero")]
+#[should_panic]
 fn limb_div_rem_natural_fail() {
     10.div_rem(Natural::ZERO);
 }
 
 #[test]
-#[should_panic(expected = "division by zero")]
+#[should_panic]
 fn limb_div_rem_natural_ref_fail() {
     10.div_rem(&Natural::ZERO);
 }
 
 #[test]
-#[should_panic(expected = "division by zero")]
+#[should_panic]
 fn limb_div_assign_rem_natural_fail() {
     10.div_assign_rem(Natural::ZERO);
 }
 
 #[test]
-#[should_panic(expected = "division by zero")]
+#[should_panic]
 fn limb_div_assign_rem_natural_ref_fail() {
     10.div_assign_rem(&Natural::ZERO);
 }
@@ -539,25 +539,25 @@ fn test_limb_ceiling_div_neg_mod_natural() {
 }
 
 #[test]
-#[should_panic(expected = "division by zero")]
+#[should_panic]
 fn limb_ceiling_div_assign_neg_mod_natural_fail() {
     10.ceiling_div_assign_neg_mod(Natural::ZERO);
 }
 
 #[test]
-#[should_panic(expected = "division by zero")]
+#[should_panic]
 fn limb_ceiling_div_assign_neg_mod_natural_ref_fail() {
     10.ceiling_div_assign_neg_mod(&Natural::ZERO);
 }
 
 #[test]
-#[should_panic(expected = "division by zero")]
+#[should_panic]
 fn limb_ceiling_div_neg_mod_natural_fail() {
     10.ceiling_div_neg_mod(Natural::ZERO);
 }
 
 #[test]
-#[should_panic(expected = "division by zero")]
+#[should_panic]
 fn limb_ceiling_div_neg_mod_natural_ref_fail() {
     10.ceiling_div_neg_mod(&Natural::ZERO);
 }

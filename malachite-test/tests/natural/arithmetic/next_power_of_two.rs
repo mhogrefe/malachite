@@ -31,21 +31,21 @@ fn test_limbs_next_power_of_two_and_limbs_vec_next_power_of_two_in_place() {
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "called `Option::unwrap()` on a `None` value")]
+#[should_panic]
 fn limbs_next_power_of_two_fail() {
     limbs_next_power_of_two(&[]);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "called `Option::unwrap()` on a `None` value")]
+#[should_panic]
 fn limbs_slice_next_power_of_two_in_place_fail() {
     limbs_slice_next_power_of_two_in_place(&mut []);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "called `Option::unwrap()` on a `None` value")]
+#[should_panic]
 fn limbs_vec_next_power_of_two_in_place_fail() {
     limbs_vec_next_power_of_two_in_place(&mut Vec::new());
 }

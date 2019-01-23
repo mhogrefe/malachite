@@ -67,7 +67,7 @@ fn test_limbs_sub() {
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "assertion failed: xs_len >= ys_len")]
+#[should_panic]
 fn limbs_sub_fail() {
     limbs_sub(&[6, 7], &[1, 2, 3]);
 }
@@ -122,7 +122,7 @@ fn test_limbs_sub_same_length_to_out() {
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "assertion failed: out_limbs.len() >= len")]
+#[should_panic]
 fn limbs_sub_same_length_to_out_fail_1() {
     let mut out = vec![10, 10];
     limbs_sub_same_length_to_out(&mut out, &[6, 7, 8], &[1, 2, 3]);
@@ -130,7 +130,7 @@ fn limbs_sub_same_length_to_out_fail_1() {
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "assertion failed: `(left == right)`")]
+#[should_panic]
 fn limbs_sub_same_length_to_out_fail_2() {
     let mut out = vec![10, 10, 10];
     limbs_sub_same_length_to_out(&mut out, &[6, 7, 8], &[1, 2]);
@@ -194,7 +194,7 @@ fn test_limbs_sub_to_out() {
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "assertion failed: out_limbs.len() >= xs_len")]
+#[should_panic]
 fn limbs_sub_to_out_fail_1() {
     let mut out = vec![10, 10];
     limbs_sub_to_out(&mut out, &[6, 7, 8], &[1, 2]);
@@ -202,7 +202,7 @@ fn limbs_sub_to_out_fail_1() {
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "assertion failed: xs_len >= ys_len")]
+#[should_panic]
 fn limbs_sub_to_out_fail_2() {
     let mut out = vec![10, 10, 10];
     limbs_sub_to_out(&mut out, &[6, 7], &[1, 2, 3]);
@@ -248,7 +248,7 @@ fn test_limbs_sub_same_length_in_place_left() {
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "assertion failed: `(left == right)")]
+#[should_panic]
 fn limbs_sub_same_length_in_place_left_fail() {
     limbs_sub_same_length_in_place_left(&mut [6, 7], &[1, 2, 3]);
 }
@@ -300,7 +300,7 @@ fn test_limbs_sub_in_place_left() {
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "assertion failed: xs_len >= ys_len")]
+#[should_panic]
 fn limbs_sub_in_place_left_fail() {
     limbs_sub_in_place_left(&mut [6, 7], &[1, 2, 3]);
 }
@@ -345,14 +345,14 @@ fn test_limbs_sub_same_length_in_place_right() {
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "assertion failed: `(left == right)")]
+#[should_panic]
 fn limbs_sub_same_length_in_place_right_fail_1() {
     limbs_sub_same_length_in_place_right(&[6, 7], &mut vec![1, 2, 3]);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "assertion failed: `(left == right)")]
+#[should_panic]
 fn limbs_sub_same_length_in_place_right_fail_2() {
     limbs_sub_same_length_in_place_right(&[1, 2], &mut vec![6, 7, 8]);
 }
@@ -404,7 +404,7 @@ fn test_limbs_sub_in_place_right() {
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "assertion failed: xs_len >= ys_len")]
+#[should_panic]
 fn limbs_sub_in_place_right_fail() {
     limbs_sub_in_place_right(&[6, 7], &mut vec![1, 2, 3]);
 }
@@ -487,7 +487,7 @@ fn test_limbs_sub_same_length_with_borrow_in_to_out() {
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "assertion failed: out_limbs.len() >= len")]
+#[should_panic]
 fn limbs_sub_same_length_with_borrow_in_to_out_fail_1() {
     let mut out = vec![10, 10];
     _limbs_sub_same_length_with_borrow_in_to_out(&mut out, &[6, 7, 8], &[1, 2, 3], false);
@@ -495,7 +495,7 @@ fn limbs_sub_same_length_with_borrow_in_to_out_fail_1() {
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "assertion failed: `(left == right)`")]
+#[should_panic]
 fn limbs_sub_same_length_with_borrow_in_to_out_fail_2() {
     let mut out = vec![10, 10, 10];
     _limbs_sub_same_length_with_borrow_in_to_out(&mut out, &[6, 7, 8], &[1, 2], false);
@@ -566,7 +566,7 @@ fn test_limbs_sub_same_length_with_borrow_in_in_place_left() {
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "assertion failed: `(left == right)")]
+#[should_panic]
 fn limbs_sub_same_length_with_borrow_in_in_place_left_fail() {
     _limbs_sub_same_length_with_borrow_in_in_place_left(&mut [6, 7], &[1, 2, 3], false);
 }
@@ -622,35 +622,35 @@ fn test_sub_natural() {
 }
 
 #[test]
-#[should_panic(expected = "Cannot subtract a Natural from a smaller Natural")]
+#[should_panic]
 fn sub_assign_fail() {
     let mut x = Natural::from_str("123").unwrap();
     x -= Natural::from_str("456").unwrap();
 }
 
 #[test]
-#[should_panic(expected = "Cannot subtract a Natural from a smaller Natural")]
+#[should_panic]
 fn sub_assign_ref_fail() {
     let mut x = Natural::from_str("123").unwrap();
     x -= &Natural::from_str("456").unwrap();
 }
 
 #[test]
-#[should_panic(expected = "Cannot subtract a Natural from a smaller Natural")]
+#[should_panic]
 #[allow(unused_must_use)]
 fn sub_fail_1() {
     Natural::from(123u32) - Natural::from(456u32);
 }
 
 #[test]
-#[should_panic(expected = "Cannot subtract a Natural from a smaller Natural")]
+#[should_panic]
 #[allow(unused_must_use)]
 fn sub_fail_2() {
     Natural::from(123u32) - &Natural::from(456u32);
 }
 
 #[test]
-#[should_panic(expected = "Cannot subtract a Natural from a smaller Natural")]
+#[should_panic]
 #[allow(unused_must_use)]
 fn sub_fail_3() {
     &Natural::from(123u32) - Natural::from(456u32);

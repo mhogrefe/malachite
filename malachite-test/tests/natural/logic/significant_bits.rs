@@ -28,7 +28,7 @@ fn test_limbs_significant_bits() {
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "called `Option::unwrap()` on a `None` value")]
+#[should_panic]
 fn limbs_significant_bits_fail() {
     limbs_significant_bits(&[]);
 }

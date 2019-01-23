@@ -43,7 +43,7 @@ fn test_limbs_divisible_by_limb() {
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "limbs.len() > 1")]
+#[should_panic]
 fn limbs_divisible_by_limb_fail() {
     limbs_divisible_by_limb(&[10], 10);
 }

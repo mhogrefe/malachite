@@ -16,14 +16,14 @@ fn test_limbs_delete_left() {
 }
 
 #[test]
-#[should_panic(expected = "assertion failed: delete_size <= limbs.len()")]
+#[should_panic]
 fn delete_left_fail_1() {
     let mut limbs: Vec<u32> = Vec::new();
     limbs_delete_left(&mut limbs, 1);
 }
 
 #[test]
-#[should_panic(expected = "assertion failed: delete_size <= limbs.len()")]
+#[should_panic]
 fn delete_left_fail_2() {
     let mut limbs: Vec<u32> = vec![1, 2, 3];
     limbs_delete_left(&mut limbs, 4);

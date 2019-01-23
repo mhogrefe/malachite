@@ -76,21 +76,21 @@ fn test_limbs_shl_to_out() {
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "assertion failed: out_limbs.len() >= len")]
+#[should_panic]
 fn limbs_shl_to_out_fail_1() {
     limbs_shl_to_out(&mut [10], &[10, 10], 10);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "assertion failed: `(left != right)")]
+#[should_panic]
 fn limbs_shl_to_out_fail_2() {
     limbs_shl_to_out(&mut [10, 10, 10], &[123, 456], 0);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "assertion failed: bits < Limb::WIDTH")]
+#[should_panic]
 fn limbs_shl_to_out_fail_3() {
     limbs_shl_to_out(&mut [10, 10, 10], &[123, 456], 100);
 }
@@ -112,14 +112,14 @@ fn test_limbs_slice_shl_in_place() {
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "(left != right)")]
+#[should_panic]
 fn limbs_slice_shl_in_place_fail_1() {
     limbs_slice_shl_in_place(&mut [123, 456], 0);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "assertion failed: bits < Limb::WIDTH")]
+#[should_panic]
 fn limbs_slice_shl_in_place_fail_2() {
     limbs_slice_shl_in_place(&mut [123, 456], 100);
 }

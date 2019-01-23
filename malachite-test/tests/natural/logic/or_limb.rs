@@ -38,14 +38,14 @@ fn test_limbs_or_limb_and_limbs_or_limb_in_place() {
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "index out of bounds: the len is 0 but the index is 0")]
+#[should_panic]
 fn limbs_or_limb_fail() {
     limbs_or_limb(&[], 10);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "index out of bounds: the len is 0 but the index is 0")]
+#[should_panic]
 fn limbs_or_limb_in_place_fail() {
     limbs_or_limb_in_place(&mut [], 10);
 }
@@ -71,14 +71,14 @@ fn test_limbs_or_limb_to_out() {
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "index out of bounds: the len is 0 but the index is 0")]
+#[should_panic]
 fn limbs_or_limb_to_out_fail_1() {
     limbs_or_limb_to_out(&mut [], &[], 10);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "index 2 out of range for slice of length 1")]
+#[should_panic]
 fn limbs_or_limb_to_out_fail_2() {
     limbs_or_limb_to_out(&mut [10], &[10, 10], 10);
 }

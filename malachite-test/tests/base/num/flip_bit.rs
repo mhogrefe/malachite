@@ -61,7 +61,7 @@ pub fn test_flip_bit() {
 macro_rules! flip_bit_fail_helper_unsigned {
     ($t:ident, $fail:ident) => {
         #[test]
-        #[should_panic(expected = "")]
+        #[should_panic]
         fn $fail() {
             let mut n = $t::from(5u8);
             n.flip_bit(100);
@@ -72,14 +72,14 @@ macro_rules! flip_bit_fail_helper_unsigned {
 macro_rules! flip_bit_fail_helper_signed {
     ($t:ident, $fail_1:ident, $fail_2:ident) => {
         #[test]
-        #[should_panic(expected = "")]
+        #[should_panic]
         fn $fail_1() {
             let mut n = $t::from(5i8);
             n.flip_bit(100);
         }
 
         #[test]
-        #[should_panic(expected = "")]
+        #[should_panic]
         fn $fail_2() {
             let mut n = $t::NEGATIVE_ONE;
             n.flip_bit(100);

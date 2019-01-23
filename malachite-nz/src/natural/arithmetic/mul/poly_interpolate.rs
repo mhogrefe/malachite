@@ -1,6 +1,8 @@
-use malachite_base::num::{Parity, WrappingAddAssign, WrappingSubAssign};
+use malachite_base::limbs::limbs_test_zero;
+use malachite_base::num::{DivisibleByPowerOfTwo, Parity, WrappingAddAssign, WrappingSubAssign};
 use natural::arithmetic::add::{
-    limbs_add_same_length_to_out, limbs_slice_add_same_length_in_place_left,
+    limbs_add_same_length_to_out, limbs_slice_add_greater_in_place_left,
+    limbs_slice_add_same_length_in_place_left,
 };
 use natural::arithmetic::add_limb::limbs_slice_add_limb_in_place;
 use natural::arithmetic::add_mul_limb::mpn_addmul_1;
@@ -413,134 +415,130 @@ pub(crate) fn _limbs_mul_toom_interpolate_6_points(
     out_limbs[5 * n + n_high - 1].wrapping_add_assign(embankment);
 }
 
-// mpn_toom_interpolate_7pts -- Interpolate for toom44, 53, 62.
-
-/* Interpolation for toom4, using the evaluation points 0, infinity,
-   1, -1, 2, -2, 1/2. More precisely, we want to compute
-   f(2^(GMP_NUMB_BITS * n)) for a polynomial f of degree 6, given the
-   seven values
-
-     w0 = f(0),
-     w1 = f(-2),
-     w2 = f(1),
-     w3 = f(-1),
-     w4 = f(2)
-     w5 = 64 * f(1/2)
-     w6 = limit at infinity of f(x) / x^6,
-
-   The result is 6*n + w6n limbs. At entry, w0 is stored at {rp, 2n },
-   w2 is stored at { rp + 2n, 2n+1 }, and w6 is stored at { rp + 6n,
-   w6n }. The other values are 2n + 1 limbs each (with most
-   significant limbs small). f(-1) and f(-1/2) may be negative, signs
-   determined by the flag bits. Inputs are destroyed.
-
-   Needs (2*n + 1) limbs of temporary storage.
-*/
-
 const WANT_ASSERT: bool = true;
 
+/// Interpolation for toom4, using the evaluation points 0, infinity, 1, -1, 2, -2, 1 / 2. More
+/// precisely, we want to compute f(2 ^ (GMP_NUMB_BITS * n)) for a polynomial f of degree 6, given
+/// the seven values
+/// w0 = f(0),
+/// w1 = f(-2),
+/// w2 = f(1),
+/// w3 = f(-1),
+/// w4 = f(2)
+/// w5 = 64 * f(1/2)
+/// w6 = limit at infinity of f(x) / x ^ 6,
+///
+/// The result is 6 * n + n_high limbs. At entry, w0 is stored at {out_limbs, 2 * n}, w2 is stored
+/// at {out_limbs + 2 * n, 2 * n + 1}, and w6 is stored at {out_limbs + 6 * n, n_high}. The other
+/// values are 2 * n + 1 limbs each (with most significant limbs small). f(-1) and f(-1/2) may be
+/// negative, signs determined by the flag bits. Inputs are destroyed.
+///
+/// Needs 2 * n + 1 limbs of temporary storage.
+///
+/// This is mpn_toom_interpolate_7pts from mpn/generic/mpn_toom_interpolate_7pts.c, but the argument
+/// w6n == `n_high` is moved to immediately after `n`.
 pub(crate) fn _limbs_mul_toom_interpolate_7_points(
-    rp: &mut [Limb],
+    out_limbs: &mut [Limb],
     n: usize,
+    n_high: usize,
     w1_neg: bool,
     w1: &mut [Limb],
     w3_neg: bool,
     w3: &mut [Limb],
     w4: &mut [Limb],
     w5: &mut [Limb],
-    w6n: usize,
-    tp: &mut [Limb],
+    scratch: &mut [Limb],
 ) {
     let m = 2 * n + 1;
+    assert_ne!(n_high, 0);
+    assert!(n_high < m);
+    assert_eq!(w1.len(), m);
+    assert_eq!(w3.len(), m);
+    assert_eq!(w4.len(), m);
+    assert_eq!(w5.len(), m);
     {
-        let (w0, remainder) = rp.split_at_mut(2 * n);
+        let (w0, remainder) = out_limbs.split_at_mut(2 * n); // w0 length: 2 * n
         let (w2, w6) = remainder.split_at_mut(4 * n);
-
-        assert_ne!(w6n, 0);
-        assert!(w6n <= 2 * n);
+        let w2 = &mut w2[..m];
+        let w6 = &mut w6[..n_high];
 
         // Using formulas similar to Marco Bodrato's
         //
-        // W5 = W5 + W4
-        // W1 =(W4 - W1)/2
-        // W4 = W4 - W0
-        // W4 =(W4 - W1)/4 - W6*16
-        // W3 =(W2 - W3)/2
-        // W2 = W2 - W3
+        // w5 =  w5 + w4
+        // w1 = (w4 - w1) / 2
+        // w4 =  w4 - w0
+        // w4 = (w4 - w1) / 4 - w6 * 16
+        // w3 = (w2 - w3) / 2
+        // w2 =  w2 - w3
         //
-        // W5 = W5 - W2*65      May be negative.
-        // W2 = W2 - W6 - W0
-        // W5 =(W5 + W2*45)/2   Now >= 0 again.
-        // W4 =(W4 - W2)/3
-        // W2 = W2 - W4
+        // w5 =  w5 - w2 * 65 May be negative.
+        // w2 =  w2 - w6 - w0
+        // w5 = (w5 + w2 * 45) / 2 Now >= 0 again.
+        // w4 = (w4 - w2) / 3
+        // w2 =  w2 - w4
         //
-        // W1 = W5 - W1         May be negative.
-        // W5 =(W5 - W3*8)/9
-        // W3 = W3 - W5
-        // W1 =(W1/15 + W5)/2   Now >= 0 again.
-        // W5 = W5 - W1
+        // w1 =  w5 - w1 May be negative.
+        // w5 = (w5 - w3 * 8) / 9
+        // w3 =  w3 - w5
+        // w1 = (w1 / 15 + w5) / 2 Now >= 0 again.
+        // w5 =  w5 - w1
         //
-        // where W0 = f(0), W1 = f(-2), W2 = f(1), W3 = f(-1),
-        //   W4 = f(2), W5 = f(1/2), W6 = f(infinity),
+        // where w0 = f(0), w1 = f(-2), w2 = f(1), w3 = f(-1),
+        //   w4 = f(2), w5 = f(1/2), w6 = f(infinity),
         //
-        // Note that most intermediate results are positive; the ones that
-        // may be negative are represented in two's complement. We must
-        // never shift right a value that may be negative, since that would
-        // invalidate the sign bit. On the other hand, divexact by odd
-        // numbers work fine with two's complement.
-        limbs_slice_add_same_length_in_place_left(&mut w5[..m], &w4[..m]);
+        // Note that most intermediate results are positive; the ones that may be negative are
+        // represented in two's complement. We must never shift right a value that may be negative,
+        // since that would invalidate the sign bit. On the other hand, divexact by odd numbers
+        // works fine with two's complement.
+        limbs_slice_add_same_length_in_place_left(w5, w4);
         if w1_neg {
-            limbs_slice_add_same_length_in_place_left(&mut w1[..m], &w4[..m]);
-            assert!(w1[0].even());
-            limbs_slice_shr_in_place(&mut w1[..m], 1);
+            limbs_slice_add_same_length_in_place_left(w1, w4);
         } else {
-            limbs_sub_same_length_in_place_right(&w4[..m], &mut w1[..m]);
-            assert!(w1[0].even());
-            limbs_slice_shr_in_place(&mut w1[..m], 1);
+            limbs_sub_same_length_in_place_right(w4, w1);
         }
-        limbs_sub_in_place_left(&mut w4[..m], &w0[..2 * n]);
-        limbs_sub_same_length_in_place_left(&mut w4[..m], &w1[..m]);
-        assert_eq!(w4[0] & 3, 0);
-        limbs_slice_shr_in_place(&mut w4[..m], 2); // w4 >= 0
+        assert!(w1[0].even());
+        limbs_slice_shr_in_place(w1, 1);
+        limbs_sub_in_place_left(w4, w0);
+        limbs_sub_same_length_in_place_left(w4, w1);
+        assert!(w4[0].divisible_by_power_of_two(2));
+        limbs_slice_shr_in_place(w4, 2); // w4 >= 0
 
-        tp[w6n] = limbs_shl_to_out(tp, &w6[..w6n], 4);
-        limbs_sub_in_place_left(&mut w4[..m], &tp[..w6n + 1]);
+        scratch[n_high] = limbs_shl_to_out(scratch, w6, 4);
+        limbs_sub_in_place_left(w4, &scratch[..=n_high]);
 
         if w3_neg {
-            limbs_slice_add_same_length_in_place_left(&mut w3[..m], &w2[..m]);
-            assert!(w3[0].even());
-            limbs_slice_shr_in_place(&mut w3[..m], 1);
+            limbs_slice_add_same_length_in_place_left(w3, w2);
         } else {
-            limbs_sub_same_length_in_place_right(&w2[..m], &mut w3[..m]);
-            assert!(w3[0].even());
-            limbs_slice_shr_in_place(&mut w3[..m], 1);
+            limbs_sub_same_length_in_place_right(w2, w3);
         }
+        assert!(w3[0].even());
+        limbs_slice_shr_in_place(w3, 1);
 
-        limbs_sub_same_length_in_place_left(&mut w2[..m], &w3[..m]);
+        limbs_sub_same_length_in_place_left(w2, w3);
 
-        mpn_submul_1(w5, &w2[..m], 65);
-        limbs_sub_in_place_left(&mut w2[..m], &w6[..w6n]);
-        limbs_sub_in_place_left(&mut w2[..m], &w0[..2 * n]);
+        mpn_submul_1(w5, w2, 65);
+        limbs_sub_in_place_left(w2, w6);
+        limbs_sub_in_place_left(w2, w0);
 
-        mpn_addmul_1(w5, &w2[..m], 45);
+        mpn_addmul_1(w5, w2, 45);
         assert!(w5[0].even());
-        limbs_slice_shr_in_place(&mut w5[..m], 1);
-        limbs_sub_same_length_in_place_left(&mut w4[..m], &w2[..m]);
+        limbs_slice_shr_in_place(w5, 1);
+        limbs_sub_same_length_in_place_left(w4, w2);
 
-        limbs_div_exact_3_in_place(&mut w4[..m]);
-        limbs_sub_same_length_in_place_left(&mut w2[..m], &w4[..m]);
+        limbs_div_exact_3_in_place(w4);
+        limbs_sub_same_length_in_place_left(w2, w4);
 
-        limbs_sub_same_length_in_place_right(&w5[..m], &mut w1[..m]);
-        limbs_shl_to_out(tp, &w3[..m], 3);
-        limbs_sub_same_length_in_place_left(&mut w5[..m], &tp[..m]);
+        limbs_sub_same_length_in_place_right(w5, w1);
+        limbs_shl_to_out(scratch, w3, 3);
+        limbs_sub_same_length_in_place_left(w5, &scratch[..m]);
         limbs_div_exact_limb_in_place(w5, 9);
-        limbs_sub_same_length_in_place_left(&mut w3[..m], &w5[..m]);
+        limbs_sub_same_length_in_place_left(w3, w5);
 
         limbs_div_exact_limb_in_place(w1, 15);
-        limbs_slice_add_same_length_in_place_left(&mut w1[..m], &w5[..m]);
+        limbs_slice_add_same_length_in_place_left(w1, w5);
         assert!(w1[0].even());
-        limbs_slice_shr_in_place(&mut w1[..m], 1); // w1 >= 0 now
-        limbs_sub_same_length_in_place_left(&mut w5[..m], &w1[..m]);
+        limbs_slice_shr_in_place(w1, 1); // w1 >= 0 now
+        limbs_sub_same_length_in_place_left(w5, w1);
 
         // These bounds are valid for the 4x4 polynomial product of toom44,
         // and they are conservative for toom53 and toom62.
@@ -551,90 +549,64 @@ pub(crate) fn _limbs_mul_toom_interpolate_7_points(
         assert!(w5[2 * n] < 2);
     }
 
-    // Addition chain. Note carries and the 2n'th limbs that need to be
-    // added in.
+    // Addition chain. Note carries and the 2n'th limbs that need to be added in.
     //
-    // Special care is needed for w2[2n] and the corresponding carry,
-    // since the "simple" way of adding it all together would overwrite
-    // the limb at wp[2*n] and rp[4*n] (same location) with the sum of
-    // the high half of w3 and the low half of w4.
+    // Special care is needed for w2[2 * n] and the corresponding carry, since the "simple" way of
+    // adding it all together would overwrite the limb at wp[2 * n] and out_limbs[4 * n] (same
+    // location) with the sum of the high half of w3 and the low half of w4.
     //
     //         7    6    5    4    3    2    1    0
     //    |    |    |    |    |    |    |    |    |
     //                  ||w3 (2n+1)|
     //             ||w4 (2n+1)|
     //        ||w5 (2n+1)|        ||w1 (2n+1)|
-    //  + | w6 (w6n)|        ||w2 (2n+1)| w0 (2n) |  (share storage with r)
+    //  +     |w6(n_high)|        ||w2 (2n+1)| w0 (2n) |  (share storage with r)
     //  -----------------------------------------------
     //  r |    |    |    |    |    |    |    |    |
     //        c7   c6   c5   c4   c3                 Carries to propagate
     //
-    let cy = if limbs_slice_add_same_length_in_place_left(&mut rp[n..n + m], &w1[..m]) {
-        1
-    } else {
-        0
-    };
     {
-        let w2 = &mut rp[2 * n..];
-        assert!(!limbs_slice_add_limb_in_place(
-            &mut w2[n + 1..2 * n + 1],
-            cy
-        ));
+        let (out_limbs_lo, out_limbs_hi) = out_limbs[n..].split_at_mut(m);
+        if limbs_slice_add_same_length_in_place_left(out_limbs_lo, w1) {
+            assert!(!limbs_slice_add_limb_in_place(&mut out_limbs_hi[..n], 1));
+        }
     }
-    let cy = if limbs_slice_add_same_length_in_place_left(&mut rp[3 * n..4 * n], &w3[..n]) {
-        1
-    } else {
-        0
-    };
-    {
-        let w2 = &mut rp[2 * n..];
-        assert!(!limbs_slice_add_limb_in_place(
-            &mut w3[n..2 * n + 1],
-            w2[2 * n] + cy
-        ));
+    split_into_chunks_mut!(
+        &mut out_limbs[3 * n..],
+        n,
+        [out_limbs_3, out_limbs_4, out_limbs_5],
+        remainder
+    );
+    let mut addend = out_limbs_4[0];
+    let (w3_lo, w3_hi) = w3.split_at_mut(n);
+    if limbs_slice_add_same_length_in_place_left(out_limbs_3, w3_lo) {
+        addend.wrapping_add_assign(1);
     }
-    let cy = if limbs_add_same_length_to_out(&mut rp[4 * n..], &w3[n..2 * n], &w4[..n]) {
-        1
+    assert!(!limbs_slice_add_limb_in_place(w3_hi, addend));
+    let (w3_hi_last, w3_hi_init) = w3_hi.split_last_mut().unwrap();
+    let mut addend = *w3_hi_last;
+    let (w4_lo, w4_hi) = w4.split_at_mut(n);
+    if limbs_add_same_length_to_out(out_limbs_4, w3_hi_init, w4_lo) {
+        addend += 1;
+    }
+    let (w4_last, w4_init) = w4_hi.split_last_mut().unwrap();
+    assert!(!limbs_slice_add_limb_in_place(w4_init, addend));
+    let mut addend = *w4_last;
+    let (w5_lo, w5_hi) = w5.split_at_mut(n);
+    if limbs_add_same_length_to_out(out_limbs_5, w4_init, w5_lo) {
+        addend += 1;
+    }
+    assert!(!limbs_slice_add_limb_in_place(w5_hi, addend));
+    if n_high > n + 1 {
+        assert!(!limbs_slice_add_greater_in_place_left(remainder, w5_hi));
     } else {
-        0
-    };
-    assert!(!limbs_slice_add_limb_in_place(
-        &mut w4[n..2 * n + 1],
-        w3[2 * n] + cy
-    ));
-    let cy = if limbs_add_same_length_to_out(&mut rp[5 * n..], &w4[n..2 * n], &w5[..n]) {
-        1
-    } else {
-        0
-    };
-    assert!(!limbs_slice_add_limb_in_place(
-        &mut w5[n..2 * n + 1],
-        w4[2 * n] + cy
-    ));
-    if w6n > n + 1 {
-        let cy = if limbs_slice_add_same_length_in_place_left(
-            &mut rp[6 * n..7 * n + 1],
-            &w5[n..2 * n + 1],
-        ) {
-            1
-        } else {
-            0
-        };
-        assert!(!limbs_slice_add_limb_in_place(
-            &mut rp[7 * n + 1..6 * n + w6n],
-            cy
-        ));
-    } else {
+        let (w5_hi_lo, w5_hi_hi) = w5_hi.split_at_mut(n_high);
         assert!(!limbs_slice_add_same_length_in_place_left(
-            &mut rp[6 * n..6 * n + w6n],
-            &w5[n..n + w6n]
+            &mut remainder[..n_high],
+            w5_hi_lo
         ));
-        if WANT_ASSERT {
-            let mut i = w6n;
-            while i <= n {
-                assert_eq!(w5[n + i], 0);
-                i += 1;
-            }
+        if WANT_ASSERT && n + n_high < m {
+            limbs_test_zero(w5_hi_hi);
         }
     }
 }

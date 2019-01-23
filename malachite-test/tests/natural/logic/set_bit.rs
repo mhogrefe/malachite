@@ -32,7 +32,7 @@ pub fn test_limbs_slice_set_bit() {
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "index out of bounds: the len is 3 but the index is 3")]
+#[should_panic]
 fn limbs_slice_set_bit_fail() {
     let mut mut_limbs = vec![1, 2, 3];
     limbs_slice_set_bit(&mut mut_limbs, 100);

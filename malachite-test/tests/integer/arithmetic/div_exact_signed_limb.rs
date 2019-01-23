@@ -147,20 +147,20 @@ fn test_div_exact_signed_limb() {
 }
 
 #[test]
-#[should_panic(expected = "division by zero")]
+#[should_panic]
 fn div_exact_assign_signed_limb_fail() {
     let mut n = Integer::from(10);
     n.div_exact_assign(0 as SignedLimb);
 }
 
 #[test]
-#[should_panic(expected = "division by zero")]
+#[should_panic]
 fn div_exact_signed_limb_fail() {
     Integer::from(10).div_exact(0 as SignedLimb);
 }
 
 #[test]
-#[should_panic(expected = "division by zero")]
+#[should_panic]
 fn div_exact_signed_limb_ref_fail() {
     (&Integer::from(10)).div_exact(0 as SignedLimb);
 }
@@ -218,13 +218,13 @@ fn test_signed_limb_div_exact_integer() {
 }
 
 #[test]
-#[should_panic(expected = "division by zero")]
+#[should_panic]
 fn signed_limb_div_exact_integer_fail() {
     (10 as SignedLimb).div_exact(Integer::ZERO);
 }
 
 #[test]
-#[should_panic(expected = "division by zero")]
+#[should_panic]
 fn signed_limb_div_exact_integer_ref_fail() {
     (10 as SignedLimb).div_exact(&Integer::ZERO);
 }

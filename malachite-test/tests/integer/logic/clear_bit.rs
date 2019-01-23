@@ -30,7 +30,7 @@ pub fn test_limbs_slice_clear_bit_neg() {
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "Setting bit cannot be done within existing slice")]
+#[should_panic]
 fn limbs_slice_clear_bit_fail_1() {
     let mut mut_limbs = vec![0, 0, 0xffff_ffff];
     limbs_slice_clear_bit_neg(&mut mut_limbs, 64);
@@ -38,7 +38,7 @@ fn limbs_slice_clear_bit_fail_1() {
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "Setting bit cannot be done within existing slice")]
+#[should_panic]
 fn limbs_slice_clear_bit_fail_2() {
     let mut mut_limbs = vec![3, 2, 1];
     limbs_slice_clear_bit_neg(&mut mut_limbs, 100);

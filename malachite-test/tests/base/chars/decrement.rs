@@ -18,7 +18,7 @@ fn test_char_decrement() {
 }
 
 #[test]
-#[should_panic(expected = "Cannot decrement char '\\u{0}'")]
+#[should_panic]
 fn char_decrement_fail() {
     let mut c = '\u{0}';
     c.decrement();

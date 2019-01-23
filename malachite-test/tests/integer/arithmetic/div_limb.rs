@@ -94,7 +94,7 @@ fn test_div_limb() {
 }
 
 #[test]
-#[should_panic(expected = "division by zero")]
+#[should_panic]
 fn div_assign_limb_fail() {
     let mut n = Integer::from(10);
     n /= 0 as Limb;
@@ -102,14 +102,14 @@ fn div_assign_limb_fail() {
 
 #[test]
 #[allow(unused_must_use)]
-#[should_panic(expected = "division by zero")]
+#[should_panic]
 fn div_limb_fail() {
     Integer::from(10) / 0 as Limb;
 }
 
 #[test]
 #[allow(unused_must_use)]
-#[should_panic(expected = "division by zero")]
+#[should_panic]
 fn div_limb_ref_fail() {
     &Integer::from(10) / 0 as Limb;
 }
@@ -156,14 +156,14 @@ fn test_limb_div_integer() {
 
 #[test]
 #[allow(unused_must_use)]
-#[should_panic(expected = "division by zero")]
+#[should_panic]
 fn limb_div_integer_fail() {
     10 as Limb / Integer::ZERO;
 }
 
 #[test]
 #[allow(unused_must_use)]
-#[should_panic(expected = "division by zero")]
+#[should_panic]
 fn limb_div_integer_ref_fail() {
     10 as Limb / &Integer::ZERO;
 }

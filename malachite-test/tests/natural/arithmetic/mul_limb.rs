@@ -94,7 +94,7 @@ fn test_limbs_mul_limb_to_out() {
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "assertion failed: out_limbs.len() >= len")]
+#[should_panic]
 fn limbs_mul_limb_to_out_fail() {
     limbs_mul_limb_to_out(&mut [10], &[10, 10], 10);
 }

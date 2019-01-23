@@ -69,7 +69,7 @@ pub fn test_assign_bit() {
 macro_rules! assign_bit_fail_helper_unsigned {
     ($t:ident, $fail:ident) => {
         #[test]
-        #[should_panic(expected = "")]
+        #[should_panic]
         fn $fail() {
             let mut n = $t::checked_from(5).unwrap();
             n.assign_bit(100, true);
@@ -82,7 +82,7 @@ macro_rules! assign_bit_fail_helper_signed {
         assign_bit_fail_helper_unsigned!($t, $fail_1);
 
         #[test]
-        #[should_panic(expected = "")]
+        #[should_panic]
         fn $fail_2() {
             let mut n = $t::NEGATIVE_ONE;
             n.assign_bit(100, false);

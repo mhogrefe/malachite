@@ -46,14 +46,14 @@ fn test_limbs_invert_limb() {
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "assertion failed: limb.odd()")]
+#[should_panic]
 fn limbs_invert_limb_fail_1() {
     limbs_invert_limb(0);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "assertion failed: limb.odd()")]
+#[should_panic]
 fn limbs_invert_limb_fail_2() {
     limbs_invert_limb(2);
 }
@@ -81,28 +81,28 @@ fn test_limbs_div_exact_limb_and_limbs_div_exact_limb_in_place() {
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "assertion failed: `(left != right)")]
+#[should_panic]
 fn limbs_div_exact_limb_fail_1() {
     limbs_div_exact_limb(&[], 10);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "assertion failed: `(left != right)")]
+#[should_panic]
 fn limbs_div_exact_limb_fail_2() {
     limbs_div_exact_limb(&[10, 10], 0);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "assertion failed: `(left != right)")]
+#[should_panic]
 fn limbs_div_exact_limb_in_place_fail_1() {
     limbs_div_exact_limb_in_place(&mut [], 10);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "assertion failed: `(left != right)")]
+#[should_panic]
 fn limbs_div_exact_limb_in_place_fail_2() {
     limbs_div_exact_limb_in_place(&mut [10, 10], 0);
 }
@@ -149,21 +149,21 @@ fn test_limbs_div_exact_limb_to_out() {
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "assertion failed: `(left != right)")]
+#[should_panic]
 fn limbs_div_exact_limb_to_out_fail_1() {
     limbs_div_exact_limb_to_out(&mut [10, 10], &[], 10);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "assertion failed: `(left != right)")]
+#[should_panic]
 fn limbs_div_exact_limb_to_out_fail_2() {
     limbs_div_exact_limb_to_out(&mut [10, 10], &[10, 10], 0);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "assertion failed: out_limbs.len() >= len")]
+#[should_panic]
 fn limbs_div_exact_limb_to_out_fail_3() {
     limbs_div_exact_limb_to_out(&mut [10], &[10, 10], 10);
 }
@@ -193,14 +193,14 @@ fn test_limbs_div_exact_3_and_limbs_div_exact_3_in_place() {
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "assertion failed: `(left != right)")]
+#[should_panic]
 fn limbs_div_exact_3_fail() {
     limbs_div_exact_3(&[]);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "assertion failed: `(left != right)")]
+#[should_panic]
 fn limbs_div_exact_3_in_place_fail() {
     limbs_div_exact_3_in_place(&mut []);
 }
@@ -235,14 +235,14 @@ fn test_limbs_div_exact_3_to_out() {
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "assertion failed: `(left != right)")]
+#[should_panic]
 fn limbs_div_exact_3_to_out_fail_1() {
     limbs_div_exact_3_to_out(&mut [10, 10], &[]);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "assertion failed: out_limbs.len() >= len")]
+#[should_panic]
 fn limbs_div_exact_3_to_out_fail_2() {
     limbs_div_exact_3_to_out(&mut [10], &[10, 10]);
 }
@@ -291,20 +291,20 @@ fn test_div_exact_limb() {
 }
 
 #[test]
-#[should_panic(expected = "division by zero")]
+#[should_panic]
 fn div_exact_assign_limb_fail() {
     let mut n = Natural::from(10u32);
     n.div_exact_assign(0);
 }
 
 #[test]
-#[should_panic(expected = "division by zero")]
+#[should_panic]
 fn div_exact_limb_fail() {
     Natural::from(10u32).div_exact(0);
 }
 
 #[test]
-#[should_panic(expected = "division by zero")]
+#[should_panic]
 fn div_exact_limb_ref_fail() {
     (&Natural::from(10u32)).div_exact(0);
 }
@@ -335,26 +335,26 @@ fn test_limb_div_exact_natural() {
 }
 
 #[test]
-#[should_panic(expected = "division by zero")]
+#[should_panic]
 fn limb_div_exact_natural_fail() {
     10.div_exact(Natural::ZERO);
 }
 
 #[test]
-#[should_panic(expected = "division by zero")]
+#[should_panic]
 fn limb_div_exact_natural_ref_fail() {
     10.div_exact(&Natural::ZERO);
 }
 
 #[test]
-#[should_panic(expected = "division by zero")]
+#[should_panic]
 fn limb_div_exact_assign_natural_fail() {
     let mut n = 10;
     n.div_exact_assign(Natural::ZERO);
 }
 
 #[test]
-#[should_panic(expected = "division by zero")]
+#[should_panic]
 fn limb_div_exact_assign_natural_ref_fail() {
     let mut n = 10;
     n.div_exact_assign(&Natural::ZERO);

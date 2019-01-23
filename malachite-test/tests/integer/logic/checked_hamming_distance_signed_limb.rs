@@ -27,7 +27,7 @@ fn test_limbs_hamming_distance_limb_neg() {
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "index out of bounds: the len is 0 but the index is 0")]
+#[should_panic]
 fn limbs_hamming_distance_limb_neg_fail() {
     limbs_hamming_distance_limb_neg(&[], 5);
 }

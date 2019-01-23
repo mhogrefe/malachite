@@ -123,15 +123,15 @@ pub fn limbs_sub_same_length_to_out(out_limbs: &mut [Limb], xs: &[Limb], ys: &[L
 pub fn limbs_sub_to_out(out_limbs: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> bool {
     let xs_len = xs.len();
     let ys_len = ys.len();
-    assert!(xs_len >= ys_len);
     assert!(out_limbs.len() >= xs_len);
-    let borrow = limbs_sub_same_length_to_out(out_limbs, &xs[..ys_len], ys);
+    let (xs_lo, xs_hi) = xs.split_at(ys_len);
+    let borrow = limbs_sub_same_length_to_out(out_limbs, xs_lo, ys);
     if xs_len == ys_len {
         borrow
     } else if borrow {
-        limbs_sub_limb_to_out(&mut out_limbs[ys_len..], &xs[ys_len..], 1)
+        limbs_sub_limb_to_out(&mut out_limbs[ys_len..], xs_hi, 1)
     } else {
-        out_limbs[ys_len..xs_len].copy_from_slice(&xs[ys_len..]);
+        out_limbs[ys_len..xs_len].copy_from_slice(xs_hi);
         false
     }
 }
@@ -202,12 +202,12 @@ pub fn limbs_sub_same_length_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> bool
 pub fn limbs_sub_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> bool {
     let xs_len = xs.len();
     let ys_len = ys.len();
-    assert!(xs_len >= ys_len);
-    let borrow = limbs_sub_same_length_in_place_left(&mut xs[..ys_len], ys);
+    let (xs_lo, xs_hi) = xs.split_at_mut(ys_len);
+    let borrow = limbs_sub_same_length_in_place_left(xs_lo, ys);
     if xs_len == ys_len {
         borrow
     } else if borrow {
-        limbs_sub_limb_in_place(&mut xs[ys_len..], 1)
+        limbs_sub_limb_in_place(xs_hi, 1)
     } else {
         false
     }
@@ -280,11 +280,12 @@ pub fn limbs_sub_in_place_right(xs: &[Limb], ys: &mut Vec<Limb>) -> bool {
     let xs_len = xs.len();
     let ys_len = ys.len();
     assert!(xs_len >= ys_len);
-    let borrow = limbs_sub_same_length_in_place_right(&xs[..ys_len], ys);
+    let (xs_lo, xs_hi) = xs.split_at(ys_len);
+    let borrow = limbs_sub_same_length_in_place_right(xs_lo, ys);
     if xs_len == ys_len {
         borrow
     } else {
-        ys.extend_from_slice(&xs[ys_len..]);
+        ys.extend_from_slice(xs_hi);
         if borrow {
             limbs_sub_limb_in_place(&mut ys[ys_len..], 1)
         } else {

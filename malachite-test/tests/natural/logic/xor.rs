@@ -41,14 +41,14 @@ fn test_limbs_xor_same_length_and_limbs_xor_same_length_in_place_left() {
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "assertion failed: `(left == right)`")]
+#[should_panic]
 fn limbs_xor_same_length_fail_1() {
     limbs_xor_same_length(&[6, 7], &[1, 2, 3]);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "assertion failed: `(left == right)`")]
+#[should_panic]
 fn limbs_xor_same_length_in_place_left_fail() {
     let mut out = vec![6, 7];
     limbs_xor_same_length_in_place_left(&mut out, &[1, 2, 3]);
@@ -94,7 +94,7 @@ fn test_limbs_xor_same_length_to_out() {
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "assertion failed: `(left == right)`")]
+#[should_panic]
 fn limbs_xor_same_length_to_out_fail_1() {
     let mut out = vec![10, 10, 10, 10];
     limbs_xor_same_length_to_out(&mut out, &[6, 7], &[1, 2, 3]);
@@ -102,7 +102,7 @@ fn limbs_xor_same_length_to_out_fail_1() {
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "assertion failed: out_limbs.len() >= len")]
+#[should_panic]
 fn limbs_xor_same_length_to_out_fail_2() {
     let mut out = vec![10];
     limbs_xor_same_length_to_out(&mut out, &[6, 7], &[1, 2]);
@@ -130,7 +130,7 @@ fn test_limbs_xor_to_out() {
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "assertion failed: out_limbs.len() >= ys_len")]
+#[should_panic]
 fn limbs_xor_to_out_fail() {
     let mut out = vec![10, 10];
     limbs_xor_to_out(&mut out, &[6, 7], &[1, 2, 3]);

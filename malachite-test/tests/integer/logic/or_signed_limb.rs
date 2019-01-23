@@ -31,7 +31,7 @@ fn test_limbs_pos_or_neg_limb() {
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "index out of bounds: the len is 0 but the index is 0")]
+#[should_panic]
 fn limbs_pos_or_neg_limb_fail() {
     limbs_pos_or_neg_limb(&[], 10);
 }
@@ -49,7 +49,7 @@ fn test_limbs_neg_or_neg_limb() {
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "index out of bounds: the len is 0 but the index is 0")]
+#[should_panic]
 fn limbs_neg_or_neg_limb_fail() {
     limbs_neg_or_neg_limb(&[], 10);
 }

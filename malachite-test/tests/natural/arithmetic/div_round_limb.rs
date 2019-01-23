@@ -214,39 +214,39 @@ fn test_div_round_limb() {
 }
 
 #[test]
-#[should_panic(expected = "division by zero")]
+#[should_panic]
 fn div_round_assign_limb_fail_1() {
     let mut n = Natural::from(10u32);
     n.div_round_assign(0, RoundingMode::Floor);
 }
 
 #[test]
-#[should_panic(expected = "Division is not exact")]
+#[should_panic]
 fn div_round_assign_limb_fail_2() {
     let mut n = Natural::from(10u32);
     n.div_round_assign(3, RoundingMode::Exact);
 }
 
 #[test]
-#[should_panic(expected = "division by zero")]
+#[should_panic]
 fn div_round_limb_fail_1() {
     Natural::from(10u32).div_round(0, RoundingMode::Floor);
 }
 
 #[test]
-#[should_panic(expected = "Division is not exact")]
+#[should_panic]
 fn div_round_limb_fail_2() {
     Natural::from(10u32).div_round(3, RoundingMode::Exact);
 }
 
 #[test]
-#[should_panic(expected = "division by zero")]
+#[should_panic]
 fn div_round_limb_ref_fail_1() {
     (&Natural::from(10u32)).div_round(0, RoundingMode::Floor);
 }
 
 #[test]
-#[should_panic(expected = "Division is not exact: 10 / 3")]
+#[should_panic]
 fn div_round_limb_ref_fail_2() {
     (&Natural::from(10u32)).div_round(3, RoundingMode::Exact);
 }
@@ -343,53 +343,53 @@ fn test_limb_div_round_natural() {
 }
 
 #[test]
-#[should_panic(expected = "division by zero")]
+#[should_panic]
 fn limb_div_round_assign_natural_fail_1() {
     let mut n = 10;
     n.div_round_assign(Natural::ZERO, RoundingMode::Floor);
 }
 
 #[test]
-#[should_panic(expected = "Division is not exact")]
+#[should_panic]
 fn limb_div_round_assign_natural_fail_2() {
     let mut n = 10;
     n.div_round_assign(Natural::from(3u32), RoundingMode::Exact);
 }
 
 #[test]
-#[should_panic(expected = "division by zero")]
+#[should_panic]
 fn limb_div_round_assign_natural_ref_fail_1() {
     let mut n = 10;
     n.div_round_assign(&Natural::ZERO, RoundingMode::Floor);
 }
 
 #[test]
-#[should_panic(expected = "Division is not exact")]
+#[should_panic]
 fn limb_div_round_assign_natural_ref_fail_2() {
     let mut n = 10;
     n.div_round_assign(&Natural::from(3u32), RoundingMode::Exact);
 }
 
 #[test]
-#[should_panic(expected = "division by zero")]
+#[should_panic]
 fn limb_div_round_natural_fail_1() {
     10.div_round(Natural::ZERO, RoundingMode::Floor);
 }
 
 #[test]
-#[should_panic(expected = "Division is not exact")]
+#[should_panic]
 fn limb_div_round_natural_fail_2() {
     10.div_round(Natural::from(3u32), RoundingMode::Exact);
 }
 
 #[test]
-#[should_panic(expected = "division by zero")]
+#[should_panic]
 fn limb_div_round_natural_ref_fail_1() {
     10.div_round(&Natural::ZERO, RoundingMode::Floor);
 }
 
 #[test]
-#[should_panic(expected = "Division is not exact: 10 / 3")]
+#[should_panic]
 fn limb_div_round_natural_ref_fail_2() {
     10.div_round(&Natural::from(3u32), RoundingMode::Exact);
 }

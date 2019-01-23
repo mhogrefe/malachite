@@ -85,7 +85,7 @@ fn test_limbs_sub_limb_to_out() {
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "assertion failed: out_limbs.len() >= len")]
+#[should_panic]
 fn limbs_sub_limb_to_out_fail() {
     limbs_sub_limb_to_out(&mut [10], &[10, 10], 10);
 }
@@ -124,7 +124,7 @@ fn test_sub_assign_limb() {
 }
 
 #[test]
-#[should_panic(expected = "Cannot subtract a Limb from a smaller Natural. self: 123, other: 456")]
+#[should_panic]
 fn sub_assign_limb_fail() {
     let mut x = Natural::from_str("123").unwrap();
     x -= 456;
@@ -160,14 +160,14 @@ fn test_sub_limb() {
 }
 
 #[test]
-#[should_panic(expected = "Cannot subtract a Limb from a smaller Natural")]
+#[should_panic]
 #[allow(unused_must_use)]
 fn sub_limb_fail_1() {
     Natural::from(123u32) - 456;
 }
 
 #[test]
-#[should_panic(expected = "Cannot subtract a Limb from a smaller Natural. self: 123, other: 456")]
+#[should_panic]
 #[allow(unused_must_use)]
 fn sub_limb_fail_2() {
     &Natural::from(123u32) - 456;
@@ -189,7 +189,7 @@ fn test_limb_sub_natural() {
 }
 
 #[test]
-#[should_panic(expected = "Cannot subtract a Limb from a smaller Natural. self: 123, other: 456")]
+#[should_panic]
 #[allow(unused_must_use)]
 fn limb_sub_natural_fail() {
     123 - &Natural::from_str("456").unwrap();

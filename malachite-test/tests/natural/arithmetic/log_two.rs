@@ -27,7 +27,7 @@ fn test_limbs_floor_log_two() {
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "called `Option::unwrap()` on a `None` value")]
+#[should_panic]
 fn limbs_floor_log_two_fail() {
     limbs_floor_log_two(&[]);
 }
@@ -48,7 +48,7 @@ fn test_limbs_ceiling_log_two() {
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "called `Option::unwrap()` on a `None` value")]
+#[should_panic]
 fn limbs_ceiling_log_two_fail() {
     limbs_ceiling_log_two(&[]);
 }
@@ -68,7 +68,7 @@ fn test_floor_log_two() {
 }
 
 #[test]
-#[should_panic(expected = "Cannot take the base-2 logarithm of 0.")]
+#[should_panic]
 fn floor_log_two_fail() {
     Natural::ZERO.floor_log_two();
 }
@@ -90,7 +90,7 @@ fn test_ceiling_log_two() {
 }
 
 #[test]
-#[should_panic(expected = "Cannot take the base-2 logarithm of 0.")]
+#[should_panic]
 fn ceiling_log_two_fail() {
     Natural::ZERO.ceiling_log_two();
 }

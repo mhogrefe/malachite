@@ -100,7 +100,7 @@ fn test_limbs_add_same_length_to_out() {
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "assertion failed: `(left == right)`")]
+#[should_panic]
 fn limbs_add_same_length_to_out_fail_1() {
     let mut out = vec![10, 10, 10, 10];
     limbs_add_same_length_to_out(&mut out, &[6, 7], &[1, 2, 3]);
@@ -108,7 +108,7 @@ fn limbs_add_same_length_to_out_fail_1() {
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "assertion failed: out_limbs.len() >= len")]
+#[should_panic]
 fn limbs_add_same_length_to_out_fail_2() {
     let mut out = vec![10];
     limbs_add_same_length_to_out(&mut out, &[6, 7], &[1, 2]);
@@ -188,7 +188,7 @@ fn test_limbs_add_to_out() {
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "assertion failed: out_limbs.len() >= max_len")]
+#[should_panic]
 fn limbs_add_to_out_fail() {
     let mut out = vec![10, 10];
     limbs_add_to_out(&mut out, &[6, 7, 8], &[1, 2]);
@@ -221,7 +221,7 @@ fn test_limbs_slice_add_same_length_in_place_left() {
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "assertion failed: `(left == right)`")]
+#[should_panic]
 fn limbs_slice_add_same_length_in_place_left_fail() {
     let mut out = vec![6, 7];
     limbs_slice_add_same_length_in_place_left(&mut out, &[1, 2, 3]);
@@ -254,7 +254,7 @@ fn test_limbs_slice_add_greater_in_place_left() {
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "assertion failed: xs_len >= ys_len")]
+#[should_panic]
 fn limbs_slice_add_greater_in_place_left_fail() {
     let mut out = vec![6, 7];
     limbs_slice_add_greater_in_place_left(&mut out, &[1, 2, 3]);
@@ -455,7 +455,7 @@ fn test_limbs_add_same_length_with_carry_in_to_out() {
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "assertion failed: `(left == right)`")]
+#[should_panic]
 fn limbs_add_same_length_with_carry_in_to_out_fail_1() {
     let mut out = vec![10, 10, 10, 10];
     _limbs_add_same_length_with_carry_in_to_out(&mut out, &[6, 7], &[1, 2, 3], false);
@@ -463,7 +463,7 @@ fn limbs_add_same_length_with_carry_in_to_out_fail_1() {
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "assertion failed: out_limbs.len() >= len")]
+#[should_panic]
 fn limbs_add_same_length_with_carry_in_to_out_fail_2() {
     let mut out = vec![10];
     _limbs_add_same_length_with_carry_in_to_out(&mut out, &[6, 7], &[1, 2], false);
@@ -514,7 +514,7 @@ fn test_limbs_add_same_length_with_carry_in_in_place_left() {
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "assertion failed: `(left == right)`")]
+#[should_panic]
 fn limbs_add_same_length_with_carry_in_in_place_left_fail() {
     let mut out = vec![6, 7];
     _limbs_add_same_length_with_carry_in_in_place_left(&mut out, &[1, 2, 3], false);

@@ -280,39 +280,39 @@ fn test_div_round_limb() {
 }
 
 #[test]
-#[should_panic(expected = "division by zero")]
+#[should_panic]
 fn div_round_assign_limb_fail_1() {
     let mut n = Integer::from(10);
     n.div_round_assign(0 as Limb, RoundingMode::Floor);
 }
 
 #[test]
-#[should_panic(expected = "Division is not exact")]
+#[should_panic]
 fn div_round_assign_limb_fail_2() {
     let mut n = Integer::from(10);
     n.div_round_assign(3 as Limb, RoundingMode::Exact);
 }
 
 #[test]
-#[should_panic(expected = "division by zero")]
+#[should_panic]
 fn div_round_limb_fail_1() {
     Integer::from(10).div_round(0 as Limb, RoundingMode::Floor);
 }
 
 #[test]
-#[should_panic(expected = "Division is not exact")]
+#[should_panic]
 fn div_round_limb_fail_2() {
     Integer::from(10).div_round(3 as Limb, RoundingMode::Exact);
 }
 
 #[test]
-#[should_panic(expected = "division by zero")]
+#[should_panic]
 fn div_round_limb_ref_fail_1() {
     (&Integer::from(10)).div_round(0 as Limb, RoundingMode::Floor);
 }
 
 #[test]
-#[should_panic(expected = "Division is not exact: 10 / 3")]
+#[should_panic]
 fn div_round_limb_ref_fail_2() {
     (&Integer::from(10)).div_round(3 as Limb, RoundingMode::Exact);
 }
@@ -482,25 +482,25 @@ fn test_limb_div_round_integer() {
 }
 
 #[test]
-#[should_panic(expected = "division by zero")]
+#[should_panic]
 fn limb_div_round_integer_fail_1() {
     (10 as Limb).div_round(Integer::ZERO, RoundingMode::Floor);
 }
 
 #[test]
-#[should_panic(expected = "Division is not exact")]
+#[should_panic]
 fn limb_div_round_integer_fail_2() {
     (10 as Limb).div_round(Integer::from(3), RoundingMode::Exact);
 }
 
 #[test]
-#[should_panic(expected = "division by zero")]
+#[should_panic]
 fn limb_div_round_integer_ref_fail_1() {
     (10 as Limb).div_round(&Integer::ZERO, RoundingMode::Floor);
 }
 
 #[test]
-#[should_panic(expected = "Division is not exact: 10 / 3")]
+#[should_panic]
 fn limb_div_round_integer_ref_fail_2() {
     (10 as Limb).div_round(&Integer::from(3), RoundingMode::Exact);
 }

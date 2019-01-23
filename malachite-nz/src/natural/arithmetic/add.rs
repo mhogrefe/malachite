@@ -238,12 +238,12 @@ pub fn limbs_slice_add_same_length_in_place_left(xs: &mut [Limb], ys: &[Limb]) -
 pub fn limbs_slice_add_greater_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> bool {
     let xs_len = xs.len();
     let ys_len = ys.len();
-    assert!(xs_len >= ys_len);
-    let carry = limbs_slice_add_same_length_in_place_left(&mut xs[..ys_len], ys);
+    let (xs_lo, xs_hi) = xs.split_at_mut(ys_len);
+    let carry = limbs_slice_add_same_length_in_place_left(xs_lo, ys);
     if xs_len == ys_len {
         carry
     } else if carry {
-        limbs_slice_add_limb_in_place(&mut xs[ys_len..], 1)
+        limbs_slice_add_limb_in_place(xs_hi, 1)
     } else {
         false
     }
@@ -279,8 +279,9 @@ pub fn limbs_vec_add_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
     let carry = if xs_len >= ys_len {
         limbs_slice_add_greater_in_place_left(xs, ys)
     } else {
-        let mut carry = limbs_slice_add_same_length_in_place_left(xs, &ys[..xs_len]);
-        xs.extend_from_slice(&ys[xs_len..]);
+        let (ys_lo, ys_hi) = ys.split_at(xs_len);
+        let mut carry = limbs_slice_add_same_length_in_place_left(xs, ys_lo);
+        xs.extend_from_slice(ys_hi);
         if carry {
             carry = limbs_slice_add_limb_in_place(&mut xs[xs_len..], 1);
         }

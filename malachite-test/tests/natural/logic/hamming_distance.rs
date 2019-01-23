@@ -31,7 +31,7 @@ fn test_limbs_hamming_distance_same_length() {
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "assertion failed: `(left == right)`")]
+#[should_panic]
 fn limbs_hamming_distance_limb_same_length_fail() {
     limbs_hamming_distance_same_length(&[1], &[1, 2, 3]);
 }

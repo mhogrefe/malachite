@@ -1235,19 +1235,19 @@ macro_rules! tests_and_properties {
         }
 
         #[test]
-        #[should_panic(expected = "Right shift is not exact")]
+        #[should_panic]
         fn $shr_round_assign_u_fail_1() {
             Integer::from(123).shr_round_assign(1 as $t, RoundingMode::Exact);
         }
 
         #[test]
-        #[should_panic(expected = "Right shift is not exact")]
+        #[should_panic]
         fn $shr_round_assign_u_fail_2() {
             Integer::from(123).shr_round_assign(100 as $t, RoundingMode::Exact);
         }
 
         #[test]
-        #[should_panic(expected = "Right shift is not exact")]
+        #[should_panic]
         fn $shr_round_assign_u_fail_3() {
             Integer::from_str("1000000000001")
                 .unwrap()
@@ -1255,7 +1255,7 @@ macro_rules! tests_and_properties {
         }
 
         #[test]
-        #[should_panic(expected = "Right shift is not exact")]
+        #[should_panic]
         fn $shr_round_assign_u_fail_4() {
             Integer::from_str("1000000000001")
                 .unwrap()
@@ -1263,19 +1263,19 @@ macro_rules! tests_and_properties {
         }
 
         #[test]
-        #[should_panic(expected = "Right shift is not exact")]
+        #[should_panic]
         fn $shr_round_u_fail_1() {
             Integer::from(123).shr_round(1 as $t, RoundingMode::Exact);
         }
 
         #[test]
-        #[should_panic(expected = "Right shift is not exact")]
+        #[should_panic]
         fn $shr_round_u_fail_2() {
             Integer::from(123).shr_round(100 as $t, RoundingMode::Exact);
         }
 
         #[test]
-        #[should_panic(expected = "Right shift is not exact")]
+        #[should_panic]
         fn $shr_round_u_fail_3() {
             Integer::from_str("1000000000001")
                 .unwrap()
@@ -1283,7 +1283,7 @@ macro_rules! tests_and_properties {
         }
 
         #[test]
-        #[should_panic(expected = "Right shift is not exact")]
+        #[should_panic]
         fn $shr_round_u_fail_4() {
             Integer::from_str("1000000000001")
                 .unwrap()
@@ -1291,25 +1291,25 @@ macro_rules! tests_and_properties {
         }
 
         #[test]
-        #[should_panic(expected = "Right shift is not exact")]
+        #[should_panic]
         fn $shr_round_u_ref_fail_1() {
             (&Integer::from(123)).shr_round(1 as $t, RoundingMode::Exact);
         }
 
         #[test]
-        #[should_panic(expected = "Right shift is not exact")]
+        #[should_panic]
         fn $shr_round_u_ref_fail_2() {
             (&Integer::from(123)).shr_round(100 as $t, RoundingMode::Exact);
         }
 
         #[test]
-        #[should_panic(expected = "Right shift is not exact")]
+        #[should_panic]
         fn $shr_round_u_ref_fail_3() {
             (&Integer::from_str("1000000000001").unwrap()).shr_round(1 as $t, RoundingMode::Exact);
         }
 
         #[test]
-        #[should_panic(expected = "Right shift is not exact")]
+        #[should_panic]
         fn $shr_round_u_ref_fail_4() {
             (&Integer::from_str("1000000000001").unwrap())
                 .shr_round(100 as $t, RoundingMode::Exact);

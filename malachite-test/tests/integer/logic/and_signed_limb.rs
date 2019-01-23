@@ -41,7 +41,7 @@ fn test_limbs_pos_and_limb_neg_and_limbs_pos_and_limb_neg_in_place() {
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "index out of bounds: the len is 0 but the index is 0")]
+#[should_panic]
 fn limbs_pos_and_limb_neg_fail() {
     limbs_pos_and_limb_neg(&[], 10);
 }
@@ -62,21 +62,21 @@ fn test_limbs_pos_and_limb_neg_to_out() {
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "index out of bounds: the len is 0 but the index is 0")]
+#[should_panic]
 fn limbs_pos_and_limb_neg_to_out_fail_1() {
     limbs_pos_and_limb_neg_to_out(&mut [], &[], 10);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "assertion failed: out_limbs.len() >= len")]
+#[should_panic]
 fn limbs_pos_and_limb_neg_to_out_fail_2() {
     limbs_pos_and_limb_neg_to_out(&mut [10], &[10, 10], 10);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "index out of bounds: the len is 0 but the index is 0")]
+#[should_panic]
 fn limbs_pos_and_limb_neg_in_place_fail() {
     limbs_pos_and_limb_neg_in_place(&mut [], 10);
 }
@@ -99,7 +99,7 @@ fn test_limbs_neg_and_limb_neg_and_limbs_vec_neg_and_limb_neg_in_place() {
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "assertion failed: mid <= len")]
+#[should_panic]
 fn limbs_neg_and_limb_neg_fail() {
     limbs_neg_and_limb_neg(&[], 10);
 }
@@ -135,14 +135,14 @@ fn test_limbs_neg_and_limb_neg_to_out() {
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "assertion failed: out_limbs.len() >= in_limbs.len()")]
+#[should_panic]
 fn limbs_neg_and_limb_neg_to_out_fail_1() {
     limbs_neg_and_limb_neg_to_out(&mut [1, 2, 3], &[1, 2, 3, 4], 10);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "index out of bounds: the len is 0 but the index is 0")]
+#[should_panic]
 fn limbs_neg_and_limb_neg_to_out_fail_2() {
     limbs_neg_and_limb_neg_to_out(&mut [1, 2, 3], &[], 10);
 }
@@ -166,14 +166,14 @@ fn test_limbs_slice_neg_and_limb_neg_in_place() {
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "assertion failed: mid <= len")]
+#[should_panic]
 fn limbs_slice_neg_and_limb_neg_in_place_fail() {
     limbs_slice_neg_and_limb_neg_in_place(&mut [], 10);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "assertion failed: mid <= len")]
+#[should_panic]
 fn limbs_vec_neg_and_limb_neg_in_place_fail() {
     let mut limbs = vec![];
     limbs_vec_neg_and_limb_neg_in_place(&mut limbs, 10);

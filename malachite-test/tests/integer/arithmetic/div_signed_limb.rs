@@ -155,7 +155,7 @@ fn test_div_signed_limb() {
 }
 
 #[test]
-#[should_panic(expected = "division by zero")]
+#[should_panic]
 fn div_assign_signed_limb_fail() {
     let mut n = Integer::from(10);
     n /= 0 as SignedLimb;
@@ -163,14 +163,14 @@ fn div_assign_signed_limb_fail() {
 
 #[test]
 #[allow(unused_must_use)]
-#[should_panic(expected = "division by zero")]
+#[should_panic]
 fn div_signed_limb_fail() {
     Integer::from(10) / 0 as SignedLimb;
 }
 
 #[test]
 #[allow(unused_must_use)]
-#[should_panic(expected = "division by zero")]
+#[should_panic]
 fn div_signed_limb_ref_fail() {
     &Integer::from(10) / 0 as SignedLimb;
 }
@@ -236,14 +236,14 @@ fn test_signed_limb_div_integer() {
 
 #[test]
 #[allow(unused_must_use)]
-#[should_panic(expected = "division by zero")]
+#[should_panic]
 fn signed_limb_div_integer_fail() {
     10 as SignedLimb / Integer::ZERO;
 }
 
 #[test]
 #[allow(unused_must_use)]
-#[should_panic(expected = "division by zero")]
+#[should_panic]
 fn signed_limb_div_integer_ref_fail() {
     10 as SignedLimb / &Integer::ZERO;
 }

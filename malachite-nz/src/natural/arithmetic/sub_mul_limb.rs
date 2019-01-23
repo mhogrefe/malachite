@@ -14,8 +14,7 @@ pub fn mpn_submul_1(r: &mut [Limb], s1: &[Limb], s2limb: Limb) -> Limb {
     let s2limb_double = DoubleLimb::from(s2limb);
     for i in 0..s1_len {
         let product = DoubleLimb::from(s1[i]) * s2limb_double;
-        let upper = product.upper_half();
-        let mut lower = product.lower_half();
+        let (upper, mut lower) = product.split_in_half();
         lower.wrapping_add_assign(borrow);
         if lower < borrow {
             borrow = upper.wrapping_add(1);

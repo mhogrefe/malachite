@@ -23,7 +23,7 @@ fn test_special_random_natural_below() {
 }
 
 #[test]
-#[should_panic(expected = "Cannot generate a Natural below 0")]
+#[should_panic]
 fn special_random_natural_below_fail() {
     let mut rng = IsaacRng::from_seed(&EXAMPLE_SEED);
     special_random_natural_below(&mut rng, &Natural::ZERO);

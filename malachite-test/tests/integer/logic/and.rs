@@ -49,28 +49,28 @@ fn test_limbs_and_neg_neg_and_limbs_vec_and_neg_neg_in_place_left() {
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "assertion failed: x_i < xs_len")]
+#[should_panic]
 fn limbs_and_neg_neg_fail_1() {
     limbs_and_neg_neg(&[0, 0, 0], &[3]);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "assertion failed: y_i < ys_len")]
+#[should_panic]
 fn limbs_and_neg_neg_fail_2() {
     limbs_and_neg_neg(&[3], &[0, 0, 0]);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "assertion failed: x_i < xs_len")]
+#[should_panic]
 fn limbs_vec_and_neg_neg_in_place_left_fail_1() {
     limbs_vec_and_neg_neg_in_place_left(&mut vec![0, 0, 0], &[3]);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "assertion failed: y_i < ys_len")]
+#[should_panic]
 fn limbs_vec_and_neg_neg_in_place_left_fail_2() {
     limbs_vec_and_neg_neg_in_place_left(&mut vec![3], &[0, 0, 0]);
 }
@@ -153,7 +153,7 @@ fn test_limbs_and_neg_neg_to_out() {
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "assertion failed: x_i < xs_len")]
+#[should_panic]
 fn limbs_and_neg_neg_to_out_fail_1() {
     let mut out = vec![10, 10, 10, 10];
     limbs_and_neg_neg_to_out(&mut out, &[0, 0, 0], &[3]);
@@ -161,7 +161,7 @@ fn limbs_and_neg_neg_to_out_fail_1() {
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "assertion failed: y_i < ys_len")]
+#[should_panic]
 fn limbs_and_neg_neg_to_out_fail_2() {
     let mut out = vec![10, 10, 10, 10];
     limbs_and_neg_neg_to_out(&mut out, &[3], &[0, 0, 0]);
@@ -169,7 +169,7 @@ fn limbs_and_neg_neg_to_out_fail_2() {
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "index 3 out of range for slice of length 2")]
+#[should_panic]
 fn limbs_and_neg_neg_to_out_fail_3() {
     let mut out = vec![10, 10];
     limbs_and_neg_neg_to_out(&mut out, &[6, 7, 8], &[1, 2]);
@@ -177,7 +177,7 @@ fn limbs_and_neg_neg_to_out_fail_3() {
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "index 3 out of range for slice of length 2")]
+#[should_panic]
 fn limbs_and_neg_neg_to_out_fail_4() {
     let mut out = vec![10, 10];
     limbs_and_neg_neg_to_out(&mut out, &[6, 7], &[1, 2, 3]);
@@ -214,21 +214,21 @@ fn test_limbs_slice_and_neg_neg_in_place_left() {
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "assertion failed: x_i < xs_len")]
+#[should_panic]
 fn limbs_slice_and_neg_neg_in_place_left_fail_1() {
     limbs_slice_and_neg_neg_in_place_left(&mut [0, 0, 0], &[3]);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "assertion failed: y_i < ys_len")]
+#[should_panic]
 fn limbs_slice_and_neg_neg_in_place_left_fail_2() {
     limbs_slice_and_neg_neg_in_place_left(&mut [0, 0, 1], &[0, 0, 0]);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "assertion failed: xs_len >= ys_len")]
+#[should_panic]
 fn limbs_slice_and_neg_neg_in_place_left_fail_3() {
     limbs_slice_and_neg_neg_in_place_left(&mut [6, 7], &[1, 2, 3]);
 }
@@ -307,14 +307,14 @@ fn test_limbs_slice_and_neg_neg_in_place_either() {
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "assertion failed: x_i < xs_len")]
+#[should_panic]
 fn limbs_slice_and_neg_neg_in_place_either_fail_1() {
     limbs_slice_and_neg_neg_in_place_either(&mut vec![0, 0, 0], &mut vec![3]);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "assertion failed: x_i < xs_len")]
+#[should_panic]
 fn limbs_slice_and_neg_neg_in_place_either_fail_2() {
     limbs_slice_and_neg_neg_in_place_either(&mut vec![3], &mut vec![0, 0, 0]);
 }
@@ -369,14 +369,14 @@ fn test_limbs_vec_and_neg_neg_in_place_either() {
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "assertion failed: x_i < xs_len")]
+#[should_panic]
 fn limbs_vec_and_neg_neg_in_place_either_fail_1() {
     limbs_vec_and_neg_neg_in_place_either(&mut vec![0, 0, 0], &mut vec![3]);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "assertion failed: x_i < xs_len")]
+#[should_panic]
 fn limbs_vec_and_neg_neg_in_place_either_fail_2() {
     limbs_vec_and_neg_neg_in_place_either(&mut vec![3], &mut vec![0, 0, 0]);
 }

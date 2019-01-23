@@ -76,7 +76,7 @@ fn test_limbs_add_limb_to_out() {
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "assertion failed: out_limbs.len() >= len")]
+#[should_panic]
 fn limbs_add_limb_to_out_fail() {
     limbs_add_limb_to_out(&mut [10], &[10, 10], 10);
 }
@@ -115,7 +115,7 @@ fn test_limbs_vec_add_limb_in_place() {
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "assertion failed: !limbs.is_empty()")]
+#[should_panic]
 fn limbs_vec_add_limb_in_place_fail() {
     limbs_vec_add_limb_in_place(&mut vec![], 10);
 }

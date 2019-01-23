@@ -18,7 +18,7 @@ fn test_char_increment() {
 }
 
 #[test]
-#[should_panic(expected = "Cannot increment char::MAX")]
+#[should_panic]
 fn char_increment_fail() {
     let mut c = char::MAX;
     c.increment();

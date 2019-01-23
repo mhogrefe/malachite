@@ -32,7 +32,7 @@ fn test_limbs_random_up_to_bits() {
 }
 
 #[test]
-#[should_panic(expected = "assertion failed: `(left != right)")]
+#[should_panic]
 fn limbs_random_up_to_bits_fail() {
     let mut rng = IsaacRng::from_seed(&EXAMPLE_SEED);
     limbs_random_up_to_bits::<Limb, _>(&mut rng, 0);

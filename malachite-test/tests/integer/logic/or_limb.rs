@@ -37,14 +37,14 @@ fn test_limbs_neg_or_limb_and_limbs_neg_or_limb_in_place() {
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "index out of bounds: the len is 3 but the index is 3")]
+#[should_panic]
 fn limbs_neg_or_limb_in_place_fail() {
     limbs_neg_or_limb_in_place(&mut [0, 0, 0], 10);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "index out of bounds: the len is 3 but the index is 3")]
+#[should_panic]
 fn limbs_neg_or_limb_fail() {
     limbs_neg_or_limb(&[0, 0, 0], 10);
 }
@@ -72,14 +72,14 @@ fn test_limbs_neg_or_limb_to_out() {
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "index out of bounds: the len is 2 but the index is 2")]
+#[should_panic]
 fn limbs_neg_or_limb_to_out_fail_1() {
     limbs_neg_or_limb_to_out(&mut [10, 10], &[0, 0], 10);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "assertion failed: out_limbs.len() >= len")]
+#[should_panic]
 fn limbs_neg_or_limb_to_out_fail_2() {
     limbs_neg_or_limb_to_out(&mut [10], &[10, 10], 10);
 }

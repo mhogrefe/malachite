@@ -27,7 +27,7 @@ fn test_limbs_is_power_of_two() {
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-#[should_panic(expected = "assertion failed: !limbs.is_empty()")]
+#[should_panic]
 fn limbs_is_power_of_two_fail() {
     limbs_is_power_of_two(&[]);
 }
