@@ -113,7 +113,8 @@ pub(crate) fn _limbs_mul_toom_interpolate_5_points(
         // result is v_2 >= 0
         saved = v_inf[0]; // Remember v1's highest byte (will be overwritten).
         v_inf[0] = v_inf_0; // Set the right value for v_inf_0
-                            // Overwrite unused v_neg_1
+
+        // Overwrite unused v_neg_1
         let mut carry = limbs_shl_to_out(v_neg_1, &mut v_inf[..two_r], 1);
         if limbs_sub_same_length_in_place_left(&mut v_2[..two_r], &v_neg_1[..two_r]) {
             carry += 1;

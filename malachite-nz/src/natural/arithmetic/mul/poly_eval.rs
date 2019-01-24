@@ -1,7 +1,10 @@
+use malachite_base::misc::Max;
+use malachite_base::num::{PrimitiveInteger, WrappingAddAssign};
 use natural::arithmetic::add::{
     _limbs_add_to_out_special, limbs_add_same_length_to_out, limbs_add_to_out,
-    limbs_slice_add_same_length_in_place_left,
+    limbs_slice_add_greater_in_place_left, limbs_slice_add_same_length_in_place_left,
 };
+use natural::arithmetic::add_limb::limbs_add_limb_to_out;
 use natural::arithmetic::shl_u::{limbs_shl_to_out, limbs_slice_shl_in_place};
 use natural::arithmetic::sub::limbs_sub_same_length_to_out;
 use natural::comparison::ord::limbs_cmp_same_length;
@@ -101,4 +104,231 @@ pub(crate) fn _limbs_mul_toom_evaluate_deg_3_poly_in_2_and_neg_2(
     assert!(v_2[n] < 15);
     assert!(v_neg_2[n] < 10);
     v_neg_2_neg
+}
+
+/// Given a `Natural` whose highest limb is `carry` and remaining limbs are `xs`, multiplies the
+/// `Natural` by 4 and adds the `Natural` whose limbs are `ys`. The highest limb of the result is
+/// written back to `carry` and the remaining limbs are written to `out_limbs`.
+///
+/// /// Time: worst case O(n)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = max(`xs.len()`, `ys.len()`)
+///
+/// This is DO_addlsh2 from mpn/generic/toom_eval_pm2.c, with d == `out_limbs`, a == `xs`, and b ==
+/// `ys`.
+fn shl_2_and_add_with_carry_to_out(
+    out_limbs: &mut [Limb],
+    xs: &[Limb],
+    ys: &[Limb],
+    carry: &mut Limb,
+) {
+    *carry <<= 2;
+    *carry += limbs_shl_to_out(out_limbs, xs, 2);
+    if limbs_slice_add_same_length_in_place_left(out_limbs, ys) {
+        *carry += 1;
+    }
+}
+
+/// Given a `Natural` whose highest limb is `carry` and remaining limbs are `limbs`, multiplies the
+/// `Natural` by 4 and adds the `Natural` whose limbs are `out_limbs`. The highest limb of the
+/// result is written back to `carry` and the remaining limbs are written to `out_limbs`.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = `limbs.len()`
+///
+/// This is DO_addlsh2 from mpn/generic/toom_eval_pm2.c, with d == b == `out_limbs` and a ==
+/// `limbs`.
+fn shl_2_and_add_with_carry_in_place_left(
+    out_limbs: &mut [Limb],
+    limbs: &[Limb],
+    carry: &mut Limb,
+) {
+    *carry <<= 2;
+    *carry += limbs_slice_shl_in_place(out_limbs, 2);
+    if limbs_slice_add_same_length_in_place_left(out_limbs, limbs) {
+        *carry += 1;
+    }
+}
+
+// mpn_toom_eval_pm1 -- Evaluate a polynomial in +1 and -1
+// Evaluates a polynomial of degree k > 3, in the points +1 and -1.
+pub(crate) fn _limbs_mul_toom_evaluate_poly_in_1_and_neg_1(
+    xp1: &mut [Limb],
+    xm1: &mut [Limb],
+    k: usize,
+    xp: &[Limb],
+    n: usize,
+    hn: usize,
+    tp: &mut [Limb],
+) -> Limb {
+    assert!(k >= 4);
+    assert_ne!(hn, 0);
+    assert!(hn <= n);
+    assert_eq!(tp.len(), n + 1);
+
+    // The degree k is also the number of full-size coefficients, so
+    // that last coefficient, of size hn, starts at xp + k*n.
+    xp1[n] = if limbs_add_same_length_to_out(xp1, &xp[..n], &xp[2 * n..3 * n]) {
+        1
+    } else {
+        0
+    };
+
+    let mut i = 4;
+    while i < k {
+        assert!(!limbs_slice_add_greater_in_place_left(
+            &mut xp1[..n + 1],
+            &xp[i * n..(i + 1) * n]
+        ));
+        i += 2;
+    }
+
+    tp[n] = if limbs_add_same_length_to_out(tp, &xp[n..2 * n], &xp[3 * n..4 * n]) {
+        1
+    } else {
+        0
+    };
+    let mut i = 5;
+    while i < k {
+        assert!(!limbs_slice_add_greater_in_place_left(
+            &mut tp[..n + 1],
+            &xp[i * n..(i + 1) * n]
+        ));
+        i += 2;
+    }
+
+    if k & 1 != 0 {
+        assert!(!limbs_slice_add_greater_in_place_left(
+            &mut tp[..n + 1],
+            &xp[k * n..k * n + hn]
+        ));
+    } else {
+        assert!(!limbs_slice_add_greater_in_place_left(
+            &mut xp1[..n + 1],
+            &xp[k * n..k * n + hn]
+        ));
+    }
+
+    let neg = if limbs_cmp_same_length(&xp1[..n + 1], &tp[..n + 1]) == Ordering::Less {
+        Limb::MAX
+    } else {
+        0
+    };
+    if neg != 0 {
+        limbs_sub_same_length_to_out(xm1, &tp[..n + 1], &xp1[..n + 1]);
+    } else {
+        limbs_sub_same_length_to_out(xm1, &xp1[..n + 1], &tp[..n + 1]);
+    }
+
+    limbs_slice_add_same_length_in_place_left(&mut xp1[..n + 1], &tp[..n + 1]);
+    let k = k as Limb;
+    assert!(xp1[n] <= k);
+    assert!(xm1[n] <= (k >> 1) + 1);
+    neg
+}
+
+// Evaluates a polynomial of degree 2 < `degree` < GMP_NUMB_BITS, in the points +2 and -2, where
+// each coefficient has width `n` limbs, except the last, which has width `n_high` limbs.
+//
+// This is mpn_toom_eval_pm2 from mpn/generic/toom_eval_pm2.c.
+// TODO continue cleaning
+pub(crate) fn _limbs_mul_toom_evaluate_poly_in_2_and_neg_2(
+    v_2: &mut [Limb],
+    v_neg_2: &mut [Limb],
+    mut degree: u32,
+    poly: &[Limb],
+    n: usize,
+    n_high: usize,
+    scratch: &mut [Limb],
+) -> Limb {
+    assert!(degree > 2);
+    assert!(degree < Limb::WIDTH);
+    assert_ne!(n_high, 0);
+    assert!(n_high <= n);
+
+    // The degree `degree` is also the number of full-size coefficients, so that last coefficient,
+    // of size `n_high`, starts at `poly[degree * n..]`.
+    let degree_u = degree as usize;
+    let mut cy = 0;
+    shl_2_and_add_with_carry_to_out(
+        v_2,
+        &poly[degree_u * n..degree_u * n + n_high],
+        &poly[(degree_u - 2) * n..(degree_u - 2) * n + n_high],
+        &mut cy,
+    );
+    if n_high != n {
+        cy = if limbs_add_limb_to_out(
+            &mut v_2[n_high..],
+            &poly[(degree_u - 2) * n + n_high..(degree_u - 1) * n],
+            cy,
+        ) {
+            1
+        } else {
+            0
+        };
+    }
+    let mut i = degree_u - 4;
+    loop {
+        shl_2_and_add_with_carry_in_place_left(&mut v_2[..n], &poly[i * n..(i + 1) * n], &mut cy);
+        if i <= 2 {
+            break;
+        }
+        i -= 2;
+    }
+    v_2[n] = cy;
+
+    degree.wrapping_add_assign(1);
+
+    cy = 0;
+    shl_2_and_add_with_carry_to_out(
+        scratch,
+        &poly[degree_u * n..(degree_u + 1) * n],
+        &poly[(degree_u - 2) * n..(degree_u - 1) * n],
+        &mut cy,
+    );
+    let mut i = degree_u - 4;
+    loop {
+        shl_2_and_add_with_carry_in_place_left(
+            &mut scratch[..n],
+            &poly[i * n..(i + 1) * n],
+            &mut cy,
+        );
+        if i <= 2 {
+            break;
+        }
+        i -= 2;
+    }
+    scratch[n] = cy;
+
+    let limit = n + 1;
+    if (degree & 1) != 0 {
+        assert_eq!(limbs_slice_shl_in_place(&mut scratch[..limit], 1), 0);
+    } else {
+        assert_eq!(limbs_slice_shl_in_place(&mut v_2[..limit], 1), 0);
+    }
+
+    let mut neg = if limbs_cmp_same_length(&v_2[..limit], &scratch[..limit]) == Ordering::Less {
+        Limb::MAX
+    } else {
+        0
+    };
+
+    if neg != 0 {
+        limbs_sub_same_length_to_out(v_neg_2, &scratch[..limit], &v_2[..limit]);
+    } else {
+        limbs_sub_same_length_to_out(v_neg_2, &v_2[..limit], &scratch[..limit]);
+    }
+
+    limbs_slice_add_same_length_in_place_left(&mut v_2[..limit], &scratch[..limit]);
+
+    assert!(v_2[n] < (1 << (degree + 2)) - 1);
+    assert!(v_neg_2[n] < Limb::from(((1 << (degree + 3)) - 1 - (1 ^ degree & 1)) / 3));
+
+    neg ^= (Limb::from(degree) & 1).wrapping_sub(1);
+    neg
 }

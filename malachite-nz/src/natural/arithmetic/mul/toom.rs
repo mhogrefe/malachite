@@ -14,6 +14,7 @@ use natural::arithmetic::add_mul_limb::mpn_addmul_1;
 use natural::arithmetic::mul::poly_eval::{
     _limbs_mul_toom_evaluate_deg_3_poly_in_1_and_neg_1,
     _limbs_mul_toom_evaluate_deg_3_poly_in_2_and_neg_2,
+    _limbs_mul_toom_evaluate_poly_in_1_and_neg_1, _limbs_mul_toom_evaluate_poly_in_2_and_neg_2,
 };
 use natural::arithmetic::mul::poly_interpolate::{
     _limbs_mul_toom_interpolate_5_points, _limbs_mul_toom_interpolate_6_points,
@@ -1659,4 +1660,174 @@ pub fn _limbs_mul_greater_to_out_toom_44(
         v_half,
         scratch2,
     );
+}
+
+/* Evaluate in: -2, -1, 0, +1, +2, +inf
+
+  <-s-><--n--><--n--><--n--><--n-->
+   ___ ______ ______ ______ ______
+  |a4_|___a3_|___a2_|___a1_|___a0_|
+            |b1|___b0_|
+            <t-><--n-->
+
+  v0  =  a0                  * b0      #   A(0)*B(0)
+  v1  = (a0+ a1+ a2+ a3+  a4)*(b0+ b1) #   A(1)*B(1)      ah  <= 4   bh <= 1
+  vm1 = (a0- a1+ a2- a3+  a4)*(b0- b1) #  A(-1)*B(-1)    |ah| <= 2   bh  = 0
+  v2  = (a0+2a1+4a2+8a3+16a4)*(b0+2b1) #   A(2)*B(2)      ah  <= 30  bh <= 2
+  vm2 = (a0-2a1+4a2-8a3+16a4)*(b0-2b1) #  A(-2)*B(-2)    |ah| <= 20 |bh|<= 1
+  vinf=                   a4 *     b1  # A(inf)*B(inf)
+
+  Some slight optimization in evaluation are taken from the paper:
+  "Towards Optimal Toom-Cook Multiplication for Univariate and
+  Multivariate Polynomials in Characteristic 2 and 0."
+*/
+
+pub fn mpn_toom52_mul(pp: &mut [Limb], ap: &[Limb], bp: &[Limb], scratch: &mut [Limb]) {
+    let an = ap.len();
+    let bn = ap.len();
+    assert!(an >= bn);
+
+    let n = 1 + if 2 * an >= 5 * bn {
+        (an - 1) / 5
+    } else {
+        (bn - 1) >> 1
+    };
+    split_into_chunks!(bp, n, t, [b0], b1);
+
+    let s = an - (n << 2);
+    assert!(0 < s && s <= n);
+    assert!(0 < t && t <= n);
+
+    // Ensures that 5 values of n+1 limbs each fits in the product area.
+    // Borderline cases are an = 32, bn = 8, n = 7, and an = 36, bn = 9,
+    // n = 8.
+    assert!(s + t >= 5);
+
+    // Scratch need is 6 * n + 3 + 1. We need one extra limb, because
+    //  products will overwrite 2n+2 limbs.
+
+    // Compute as2 and asm2.
+    let mut vm1_neg = false;
+    let mut vm2_neg;
+    {
+        split_into_chunks_mut!(pp, n + 1, [bs1, bsm2, bs2, as2, as1], _unused);
+        {
+            let (vm1, scratch_hi) = scratch.split_at_mut(2 * n + 2);
+            split_into_chunks_mut!(scratch_hi, n + 1, [bsm1, asm1, asm2], _unused);
+            vm2_neg = _limbs_mul_toom_evaluate_poly_in_2_and_neg_2(as2, asm2, 4, ap, n, s, asm1);
+
+            // Compute bs1 and bsm1.
+            if t == n {
+                bs1[n] = if limbs_add_to_out(bs1, &b0[..n], &b1[..n]) {
+                    1
+                } else {
+                    0
+                };
+                if limbs_cmp_same_length(&b0[..n], &b1[..n]) == Ordering::Less {
+                    limbs_sub_same_length_to_out(bsm1, &b1[..n], &b0[..n]);
+                    vm1_neg = true;
+                } else {
+                    limbs_sub_same_length_to_out(bsm1, &b0[..n], &b1[..n]);
+                }
+            } else {
+                bs1[n] = if limbs_add_to_out(bs1, &b0[..n], &b1[..t]) {
+                    1
+                } else {
+                    0
+                };
+                if limbs_test_zero(&b0[t..n])
+                    && limbs_cmp_same_length(&b0[..t], &b1[..t]) == Ordering::Less
+                {
+                    limbs_sub_same_length_to_out(bsm1, &b1[..t], &b0[..t]);
+                    limbs_set_zero(&mut bsm1[t..n]);
+                    vm1_neg.not_assign();
+                } else {
+                    limbs_sub_to_out(bsm1, &b0[..n], &b1[..t]);
+                }
+            }
+
+            // Compute bs2 and bsm2, recycling bs1 and bsm1. bs2=bs1+b1; bsm2=bsm1-b1
+            limbs_add_to_out(bs2, &bs1[..n + 1], &b1[..t]);
+            if vm1_neg {
+                bsm2[n] = if limbs_add_to_out(bsm2, &bsm1[..n], &b1[..t]) {
+                    1
+                } else {
+                    0
+                };
+                vm2_neg.not_assign();
+            } else {
+                bsm2[n] = 0;
+                if t == n {
+                    if limbs_cmp_same_length(&bsm1[..n], &b1[..n]) == Ordering::Less {
+                        limbs_sub_same_length_to_out(bsm2, &b1[..n], &bsm1[..n]);
+                        vm2_neg.not_assign();
+                    } else {
+                        limbs_sub_same_length_to_out(bsm2, &bsm1[..n], &b1[..n]);
+                    }
+                } else {
+                    if limbs_test_zero(&bsm1[t..n])
+                        && limbs_cmp_same_length(&bsm1[..t], &b1[..t]) == Ordering::Less
+                    {
+                        limbs_sub_same_length_to_out(bsm2, &b1[..t], &bsm1[..t]);
+                        limbs_set_zero(&mut bsm2[t..n]);
+                        vm2_neg.not_assign();
+                    } else {
+                        limbs_sub_to_out(bsm2, &bsm1[..n], &b1[..t]);
+                    }
+                }
+            }
+
+            // Compute as1 and asm1.
+            if _limbs_mul_toom_evaluate_poly_in_1_and_neg_1(
+                as1,
+                asm1,
+                4,
+                ap,
+                n,
+                s,
+                &mut vm1[..n + 1],
+            ) != 0
+            {
+                vm1_neg.not_assign();
+            }
+
+            assert!(as1[n] <= 4);
+            assert!(bs1[n] <= 1);
+            assert!(asm1[n] <= 2);
+            assert!(as2[n] <= 30);
+            assert!(bs2[n] <= 2);
+            assert!(asm2[n] <= 20);
+            assert!(bsm2[n] <= 1);
+
+            // vm1, 2n+1 limbs
+            limbs_mul_greater_to_out(vm1, &asm1[..n + 1], &bsm1[..n]); // W4
+        }
+        {
+            let (vm2, asm2) = scratch[2 * n + 1..].split_at_mut(2 * n + 3);
+            // vm2, 2n+1 limbs
+            limbs_mul_same_length_to_out(vm2, &asm2[..n + 1], &bsm2[..n + 1]); // W2
+        }
+
+        let v2 = &mut scratch[4 * n + 2..];
+        // v2, 2n+1 limbs
+        limbs_mul_same_length_to_out(v2, &as2[..n + 1], &bs2[..n + 1]); // W1
+    }
+    {
+        let (bs1, remainder) = pp.split_at_mut(2 * n);
+        let (v1, as1) = remainder.split_at_mut(2 * n + 4);
+        // v1, 2n+1 limbs
+        limbs_mul_same_length_to_out(v1, &as1[..n + 1], &bs1[..n + 1]); // W3
+    }
+    {
+        let (v0, vinf) = pp.split_at_mut(5 * n);
+        // vinf, s+t limbs
+        // W0
+        limbs_mul_to_out(vinf, &ap[4 * n..4 * n + s], &b1[..t]);
+
+        // v0, 2n limbs
+        limbs_mul_same_length_to_out(v0, &ap[..n], &bp[..n]); // W5
+    }
+
+    split_into_chunks_mut!(scratch, 2 * n + 1, [vm1, vm2], v2);
+    _limbs_mul_toom_interpolate_6_points(pp, n, t + s, vm1_neg, vm1, vm2_neg != 0, vm2, v2);
 }
