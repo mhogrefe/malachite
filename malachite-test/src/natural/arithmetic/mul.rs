@@ -2,7 +2,7 @@ use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, 
 use inputs::base::{
     triples_of_unsigned_vec_var_10, triples_of_unsigned_vec_var_11, triples_of_unsigned_vec_var_12,
     triples_of_unsigned_vec_var_13, triples_of_unsigned_vec_var_14, triples_of_unsigned_vec_var_15,
-    triples_of_unsigned_vec_var_16,
+    triples_of_unsigned_vec_var_16, triples_of_unsigned_vec_var_17,
 };
 use inputs::natural::{nrm_pairs_of_naturals, pairs_of_naturals, rm_pairs_of_naturals};
 use malachite_base::num::SignificantBits;
@@ -13,6 +13,7 @@ use malachite_nz::natural::arithmetic::mul::toom::{
     _limbs_mul_greater_to_out_toom_42, _limbs_mul_greater_to_out_toom_42_scratch_size,
     _limbs_mul_greater_to_out_toom_43, _limbs_mul_greater_to_out_toom_43_scratch_size,
     _limbs_mul_greater_to_out_toom_44, _limbs_mul_greater_to_out_toom_44_scratch_size,
+    _limbs_mul_greater_to_out_toom_52, _limbs_mul_greater_to_out_toom_52_scratch_size,
 };
 use malachite_nz::natural::arithmetic::mul::{
     _limbs_mul_greater_to_out_basecase, limbs_mul_greater_to_out,
@@ -59,6 +60,11 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
         registry,
         Large,
         benchmark_limbs_mul_greater_to_out_toom_44_algorithms
+    );
+    register_bench!(
+        registry,
+        Large,
+        benchmark_limbs_mul_greater_to_out_toom_52_algorithms
     );
     register_bench!(
         registry,
@@ -342,6 +348,39 @@ fn benchmark_limbs_mul_greater_to_out_toom_44_algorithms(
                     let mut scratch =
                         vec![0; _limbs_mul_greater_to_out_toom_44_scratch_size(xs.len())];
                     _limbs_mul_greater_to_out_toom_44(&mut out_limbs, &xs, &ys, &mut scratch)
+                }),
+            ),
+        ],
+    );
+}
+
+fn benchmark_limbs_mul_greater_to_out_toom_52_algorithms(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "limbs_mul_greater_to_out(&mut [u32], &[u32], &[u32])",
+        BenchmarkType::Algorithms,
+        triples_of_unsigned_vec_var_17(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(_, ref xs, ref ys)| xs.len() + ys.len()),
+        "x.len() + y.len()",
+        &mut [
+            (
+                "basecase",
+                &mut (|(mut out_limbs, xs, ys)| {
+                    _limbs_mul_greater_to_out_basecase(&mut out_limbs, &xs, &ys)
+                }),
+            ),
+            (
+                "Toom52",
+                &mut (|(mut out_limbs, xs, ys)| {
+                    let mut scratch =
+                        vec![0; _limbs_mul_greater_to_out_toom_52_scratch_size(xs.len(), ys.len())];
+                    _limbs_mul_greater_to_out_toom_52(&mut out_limbs, &xs, &ys, &mut scratch)
                 }),
             ),
         ],

@@ -1662,6 +1662,42 @@ pub fn _limbs_mul_greater_to_out_toom_44(
     );
 }
 
+/// This function can be used to determine whether the sizes of the input slices to
+/// `_limbs_mul_greater_to_out_toom_52` are valid.
+pub fn _limbs_mul_greater_to_out_toom_52_input_sizes_valid(xs_len: usize, ys_len: usize) -> bool {
+    if xs_len == 0 || xs_len < ys_len {
+        return false;
+    }
+    let n = 1 + if 2 * xs_len >= 5 * ys_len {
+        (xs_len - 1) / 5
+    } else {
+        (ys_len - 1) >> 1
+    };
+
+    if xs_len < n << 2 {
+        return false;
+    }
+    let s = xs_len - (n << 2);
+    if ys_len < n {
+        return false;
+    }
+    let t = ys_len - n;
+    0 < s && s <= n && 0 < t && t <= n && s + t >= 5
+}
+
+/// This function can be used to determine the length of the input `scratch` slice in
+/// `_limbs_mul_greater_to_out_toom_52`.
+///
+/// This is mpn_toom52_mul_itch from gmp-impl.h.
+pub fn _limbs_mul_greater_to_out_toom_52_scratch_size(xs_len: usize, ys_len: usize) -> usize {
+    let n = 1 + if 2 * xs_len >= 5 * ys_len {
+        (xs_len - 1) / 5
+    } else {
+        (ys_len - 1) >> 1
+    };
+    6 * n + 4
+}
+
 /* Evaluate in: -2, -1, 0, +1, +2, +inf
 
   <-s-><--n--><--n--><--n--><--n-->
@@ -1682,9 +1718,14 @@ pub fn _limbs_mul_greater_to_out_toom_44(
   Multivariate Polynomials in Characteristic 2 and 0."
 */
 
-pub fn mpn_toom52_mul(pp: &mut [Limb], ap: &[Limb], bp: &[Limb], scratch: &mut [Limb]) {
-    let an = ap.len();
-    let bn = ap.len();
+pub fn _limbs_mul_greater_to_out_toom_52(
+    pp: &mut [Limb],
+    xs: &[Limb],
+    ys: &[Limb],
+    scratch: &mut [Limb],
+) {
+    let an = xs.len();
+    let bn = ys.len();
     assert!(an >= bn);
 
     let n = 1 + if 2 * an >= 5 * bn {
@@ -1692,7 +1733,7 @@ pub fn mpn_toom52_mul(pp: &mut [Limb], ap: &[Limb], bp: &[Limb], scratch: &mut [
     } else {
         (bn - 1) >> 1
     };
-    split_into_chunks!(bp, n, t, [b0], b1);
+    split_into_chunks!(ys, n, t, [b0], b1);
 
     let s = an - (n << 2);
     assert!(0 < s && s <= n);
@@ -1714,11 +1755,12 @@ pub fn mpn_toom52_mul(pp: &mut [Limb], ap: &[Limb], bp: &[Limb], scratch: &mut [
         {
             let (vm1, scratch_hi) = scratch.split_at_mut(2 * n + 2);
             split_into_chunks_mut!(scratch_hi, n + 1, [bsm1, asm1, asm2], _unused);
-            vm2_neg = _limbs_mul_toom_evaluate_poly_in_2_and_neg_2(as2, asm2, 4, ap, n, s, asm1);
+            vm2_neg =
+                _limbs_mul_toom_evaluate_poly_in_2_and_neg_2(as2, asm2, 4, xs, n, s, asm1, xs, ys);
 
             // Compute bs1 and bsm1.
             if t == n {
-                bs1[n] = if limbs_add_to_out(bs1, &b0[..n], &b1[..n]) {
+                bs1[n] = if limbs_add_same_length_to_out(bs1, &b0[..n], &b1[..n]) {
                     1
                 } else {
                     0
@@ -1782,10 +1824,12 @@ pub fn mpn_toom52_mul(pp: &mut [Limb], ap: &[Limb], bp: &[Limb], scratch: &mut [
                 as1,
                 asm1,
                 4,
-                ap,
+                xs,
                 n,
                 s,
                 &mut vm1[..n + 1],
+                xs,
+                ys,
             ) != 0
             {
                 vm1_neg.not_assign();
@@ -1822,10 +1866,10 @@ pub fn mpn_toom52_mul(pp: &mut [Limb], ap: &[Limb], bp: &[Limb], scratch: &mut [
         let (v0, vinf) = pp.split_at_mut(5 * n);
         // vinf, s+t limbs
         // W0
-        limbs_mul_to_out(vinf, &ap[4 * n..4 * n + s], &b1[..t]);
+        limbs_mul_to_out(vinf, &xs[4 * n..4 * n + s], &b1[..t]);
 
         // v0, 2n limbs
-        limbs_mul_same_length_to_out(v0, &ap[..n], &bp[..n]); // W5
+        limbs_mul_same_length_to_out(v0, &xs[..n], &ys[..n]); // W5
     }
 
     split_into_chunks_mut!(scratch, 2 * n + 1, [vm1, vm2], v2);
