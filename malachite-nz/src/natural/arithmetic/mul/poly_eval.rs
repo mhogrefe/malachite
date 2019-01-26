@@ -120,7 +120,7 @@ pub(crate) fn _limbs_mul_toom_evaluate_poly_in_1_and_neg_1(
     tp: &mut [Limb], //TODO remove
     xs: &[Limb],
     ys: &[Limb],
-) -> Limb {
+) -> bool {
     assert!(k > 3);
     assert_ne!(hn, 0);
     assert!(hn <= n);
@@ -181,12 +181,8 @@ pub(crate) fn _limbs_mul_toom_evaluate_poly_in_1_and_neg_1(
         ));
     }
 
-    let neg = if limbs_cmp_same_length(&xp1[..n + 1], &tp[..n + 1]) == Ordering::Less {
-        Limb::MAX
-    } else {
-        0
-    };
-    if neg != 0 {
+    let neg = limbs_cmp_same_length(&xp1[..n + 1], &tp[..n + 1]) == Ordering::Less;
+    if neg {
         limbs_sub_same_length_to_out(xm1, &tp[..n + 1], &xp1[..n + 1]);
     } else {
         limbs_sub_same_length_to_out(xm1, &xp1[..n + 1], &tp[..n + 1]);
