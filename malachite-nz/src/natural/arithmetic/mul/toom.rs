@@ -362,6 +362,7 @@ pub fn _limbs_mul_greater_to_out_toom_32_input_sizes_valid(xs_len: usize, ys_len
 ///
 /// This is mpn_toom32_mul from mpn/generic/toom32_mul.c.
 #[allow(unreachable_code)] //TODO remove
+#[allow(clippy::cyclomatic_complexity)]
 pub fn _limbs_mul_greater_to_out_toom_32(
     out_limbs: &mut [Limb],
     xs: &[Limb],
@@ -399,10 +400,11 @@ pub fn _limbs_mul_greater_to_out_toom_32(
             let (ap1, bp1) = out_limbs_lo.split_at_mut(n); // ap1: length n, bp1: length n
 
             // Compute ap1 = xs0 + xs1 + a3, am1 = xs0 - xs1 + a3
-            let mut ap1_hi = 0;
-            if limbs_add_to_out(ap1, xs_0, xs_2) {
-                ap1_hi = 1;
-            }
+            let mut ap1_hi = if limbs_add_to_out(ap1, xs_0, xs_2) {
+                1
+            } else {
+                0
+            };
             if ap1_hi == 0 && limbs_cmp_same_length(ap1, xs_1) == Ordering::Less {
                 assert!(!limbs_sub_same_length_to_out(am1, xs_1, ap1));
                 hi = 0;
@@ -788,10 +790,11 @@ pub fn _limbs_mul_greater_to_out_toom_33(
             }
             as2[n] = carry;
             // Compute bs1 and bsm1.
-            let mut carry = 0;
-            if limbs_add_to_out(gp, ys_0, ys_2) {
-                carry = 1;
-            }
+            let mut carry = if limbs_add_to_out(gp, ys_0, ys_2) {
+                1
+            } else {
+                0
+            };
             bs1[n] = carry;
             if limbs_add_same_length_to_out(bs1, gp, ys_1) {
                 bs1[n] += 1;
@@ -1814,25 +1817,21 @@ pub fn _limbs_mul_greater_to_out_toom_52(
                     *bsm2_last = 1;
                 }
                 v_neg_2_neg.not_assign();
-            } else {
-                if t == n {
-                    if limbs_cmp_same_length(bsm1, ys_1) == Ordering::Less {
-                        limbs_sub_same_length_to_out(bsm2_init, ys_1, bsm1);
-                        v_neg_2_neg.not_assign();
-                    } else {
-                        limbs_sub_same_length_to_out(bsm2_init, bsm1, ys_1);
-                    }
+            } else if t == n {
+                if limbs_cmp_same_length(bsm1, ys_1) == Ordering::Less {
+                    limbs_sub_same_length_to_out(bsm2_init, ys_1, bsm1);
+                    v_neg_2_neg.not_assign();
                 } else {
-                    if limbs_test_zero(&bsm1[t..])
-                        && limbs_cmp_same_length(&bsm1[..t], ys_1) == Ordering::Less
-                    {
-                        limbs_sub_same_length_to_out(bsm2_init, ys_1, &bsm1[..t]);
-                        limbs_set_zero(&mut bsm2_init[t..]);
-                        v_neg_2_neg.not_assign();
-                    } else {
-                        limbs_sub_to_out(bsm2_init, bsm1, ys_1);
-                    }
+                    limbs_sub_same_length_to_out(bsm2_init, bsm1, ys_1);
                 }
+            } else if limbs_test_zero(&bsm1[t..])
+                && limbs_cmp_same_length(&bsm1[..t], ys_1) == Ordering::Less
+            {
+                limbs_sub_same_length_to_out(bsm2_init, ys_1, &bsm1[..t]);
+                limbs_set_zero(&mut bsm2_init[t..]);
+                v_neg_2_neg.not_assign();
+            } else {
+                limbs_sub_to_out(bsm2_init, bsm1, ys_1);
             }
 
             // Compute as1 and asm1.

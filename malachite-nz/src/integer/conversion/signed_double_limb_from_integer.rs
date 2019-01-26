@@ -6,10 +6,7 @@ use platform::{DoubleLimb, Limb, SignedDoubleLimb};
 
 fn integer_fits_in_signed_double_limb(x: &Integer) -> bool {
     match *x {
-        Integer {
-            sign: _,
-            abs: Small(_),
-        } => true,
+        Integer { abs: Small(_), .. } => true,
         Integer {
             sign,
             abs: Large(ref limbs),

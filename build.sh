@@ -2,7 +2,7 @@
 cd malachite-base &&
 cargo update &&
 cargo fmt &&
-#cargo +nightly clippy
+cargo clippy
 cargo test --release &&
 cargo doc &&
 cargo rustc --release -- --emit asm &&

@@ -31,9 +31,20 @@ impl Div<Limb> for Integer {
     ///     assert_eq!((Integer::from(-23) / 10u32).to_string(), "-2");
     /// }
     /// ```
+    #[inline]
     fn div(mut self, other: Limb) -> Integer {
         self /= other;
         self
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl Div<u32> for Integer {
+    type Output = Integer;
+
+    #[inline]
+    fn div(self, other: u32) -> Integer {
+        self / Limb::from(other)
     }
 }
 
@@ -75,6 +86,16 @@ impl<'a> Div<Limb> for &'a Integer {
     }
 }
 
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> Div<u32> for &'a Integer {
+    type Output = Integer;
+
+    #[inline]
+    fn div(self, other: u32) -> Integer {
+        self / Limb::from(other)
+    }
+}
+
 impl DivAssign<Limb> for Integer {
     /// Divides a `Integer` by a `Limb` in place. The quotient is rounded towards zero.
     ///
@@ -107,6 +128,14 @@ impl DivAssign<Limb> for Integer {
     fn div_assign(&mut self, other: Limb) {
         self.abs /= other;
         self.sign |= self.abs == 0;
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl DivAssign<u32> for Integer {
+    #[inline]
+    fn div_assign(&mut self, other: u32) {
+        *self /= Limb::from(other);
     }
 }
 
@@ -146,6 +175,16 @@ impl Div<Integer> for Limb {
     }
 }
 
+#[cfg(feature = "64_bit_limbs")]
+impl Div<Integer> for u32 {
+    type Output = Integer;
+
+    #[inline]
+    fn div(self, other: Integer) -> Integer {
+        Limb::from(self) / other
+    }
+}
+
 impl<'a> Div<&'a Integer> for Limb {
     type Output = Integer;
 
@@ -179,5 +218,15 @@ impl<'a> Div<&'a Integer> for Limb {
         } else {
             -Natural::from(quotient)
         }
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> Div<&'a Integer> for u32 {
+    type Output = Integer;
+
+    #[inline]
+    fn div(self, other: &'a Integer) -> Integer {
+        Limb::from(self) / other
     }
 }

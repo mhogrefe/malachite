@@ -639,7 +639,7 @@ macro_rules! lossy_checked_from_impl_a {
 macro_rules! lossy_checked_from_impl_b {
     ($from:ident, $to:ty) => {
         impl CheckedFrom<$from> for $to {
-            #[allow(unused_comparisons)]
+            #[allow(unused_comparisons, clippy::cast_lossless)]
             #[inline]
             fn checked_from(value: $from) -> Option<$to> {
                 let result = value as $to;

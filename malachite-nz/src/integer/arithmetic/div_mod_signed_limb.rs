@@ -43,9 +43,21 @@ impl DivMod<SignedLimb> for Integer {
     ///     assert_eq!(format!("{:?}", Integer::from(-23).div_mod(-10)), "(2, -3)");
     /// }
     /// ```
+    #[inline]
     fn div_mod(mut self, other: SignedLimb) -> (Integer, Integer) {
         let remainder = self.div_assign_mod(other);
         (self, remainder)
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl DivMod<i32> for Integer {
+    type DivOutput = Integer;
+    type ModOutput = Integer;
+
+    #[inline]
+    fn div_mod(self, other: i32) -> (Integer, Integer) {
+        self.div_mod(SignedLimb::from(other))
     }
 }
 
@@ -102,6 +114,17 @@ impl<'a> DivMod<SignedLimb> for &'a Integer {
                 -Natural::from(remainder)
             },
         )
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> DivMod<i32> for &'a Integer {
+    type DivOutput = Integer;
+    type ModOutput = Integer;
+
+    #[inline]
+    fn div_mod(self, other: i32) -> (Integer, Integer) {
+        self.div_mod(SignedLimb::from(other))
     }
 }
 
@@ -167,6 +190,16 @@ impl DivAssignMod<SignedLimb> for Integer {
     }
 }
 
+#[cfg(feature = "64_bit_limbs")]
+impl DivAssignMod<i32> for Integer {
+    type ModOutput = Integer;
+
+    #[inline]
+    fn div_assign_mod(&mut self, other: i32) -> Integer {
+        self.div_assign_mod(SignedLimb::from(other))
+    }
+}
+
 impl DivMod<Integer> for SignedLimb {
     type DivOutput = Integer;
     type ModOutput = Integer;
@@ -218,6 +251,17 @@ impl DivMod<Integer> for SignedLimb {
                 -remainder
             },
         )
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl DivMod<Integer> for i32 {
+    type DivOutput = Integer;
+    type ModOutput = Integer;
+
+    #[inline]
+    fn div_mod(self, other: Integer) -> (Integer, Integer) {
+        SignedLimb::from(self).div_mod(other)
     }
 }
 
@@ -275,6 +319,17 @@ impl<'a> DivMod<&'a Integer> for SignedLimb {
     }
 }
 
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> DivMod<&'a Integer> for i32 {
+    type DivOutput = Integer;
+    type ModOutput = Integer;
+
+    #[inline]
+    fn div_mod(self, other: &'a Integer) -> (Integer, Integer) {
+        SignedLimb::from(self).div_mod(other)
+    }
+}
+
 impl DivRem<SignedLimb> for Integer {
     type DivOutput = Integer;
     type RemOutput = Integer;
@@ -312,9 +367,21 @@ impl DivRem<SignedLimb> for Integer {
     ///     assert_eq!(format!("{:?}", Integer::from(-23).div_rem(-10)), "(2, -3)");
     /// }
     /// ```
+    #[inline]
     fn div_rem(mut self, other: SignedLimb) -> (Integer, Integer) {
         let remainder = self.div_assign_rem(other);
         (self, remainder)
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl DivRem<i32> for Integer {
+    type DivOutput = Integer;
+    type RemOutput = Integer;
+
+    #[inline]
+    fn div_rem(self, other: i32) -> (Integer, Integer) {
+        self.div_rem(SignedLimb::from(other))
     }
 }
 
@@ -368,6 +435,17 @@ impl<'a> DivRem<SignedLimb> for &'a Integer {
             -Natural::from(remainder)
         };
         (quotient, remainder)
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> DivRem<i32> for &'a Integer {
+    type DivOutput = Integer;
+    type RemOutput = Integer;
+
+    #[inline]
+    fn div_rem(self, other: i32) -> (Integer, Integer) {
+        self.div_rem(SignedLimb::from(other))
     }
 }
 
@@ -426,6 +504,16 @@ impl DivAssignRem<SignedLimb> for Integer {
     }
 }
 
+#[cfg(feature = "64_bit_limbs")]
+impl DivAssignRem<i32> for Integer {
+    type RemOutput = Integer;
+
+    #[inline]
+    fn div_assign_rem(&mut self, other: i32) -> Integer {
+        self.div_assign_rem(SignedLimb::from(other))
+    }
+}
+
 impl DivRem<Integer> for SignedLimb {
     type DivOutput = Integer;
     type RemOutput = Integer;
@@ -474,6 +562,17 @@ impl DivRem<Integer> for SignedLimb {
             -Natural::from(remainder)
         };
         (quotient, remainder)
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl DivRem<Integer> for i32 {
+    type DivOutput = Integer;
+    type RemOutput = Integer;
+
+    #[inline]
+    fn div_rem(self, other: Integer) -> (Integer, Integer) {
+        SignedLimb::from(self).div_mod(other)
     }
 }
 
@@ -528,6 +627,17 @@ impl<'a> DivRem<&'a Integer> for SignedLimb {
     }
 }
 
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> DivRem<&'a Integer> for i32 {
+    type DivOutput = Integer;
+    type RemOutput = Integer;
+
+    #[inline]
+    fn div_rem(self, other: &'a Integer) -> (Integer, Integer) {
+        SignedLimb::from(self).div_mod(other)
+    }
+}
+
 impl CeilingDivMod<SignedLimb> for Integer {
     type DivOutput = Integer;
     type ModOutput = Integer;
@@ -565,9 +675,21 @@ impl CeilingDivMod<SignedLimb> for Integer {
     ///     assert_eq!(format!("{:?}", Integer::from(-23).ceiling_div_mod(-10)), "(3, 7)");
     /// }
     /// ```
+    #[inline]
     fn ceiling_div_mod(mut self, other: SignedLimb) -> (Integer, Integer) {
         let remainder = self.ceiling_div_assign_mod(other);
         (self, remainder)
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl CeilingDivMod<i32> for Integer {
+    type DivOutput = Integer;
+    type ModOutput = Integer;
+
+    #[inline]
+    fn ceiling_div_mod(self, other: i32) -> (Integer, Integer) {
+        self.ceiling_div_mod(SignedLimb::from(other))
     }
 }
 
@@ -624,6 +746,17 @@ impl<'a> CeilingDivMod<SignedLimb> for &'a Integer {
                 Integer::from(remainder)
             },
         )
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> CeilingDivMod<i32> for &'a Integer {
+    type DivOutput = Integer;
+    type ModOutput = Integer;
+
+    #[inline]
+    fn ceiling_div_mod(self, other: i32) -> (Integer, Integer) {
+        self.ceiling_div_mod(SignedLimb::from(other))
     }
 }
 
@@ -688,6 +821,16 @@ impl CeilingDivAssignMod<SignedLimb> for Integer {
     }
 }
 
+#[cfg(feature = "64_bit_limbs")]
+impl CeilingDivAssignMod<i32> for Integer {
+    type ModOutput = Integer;
+
+    #[inline]
+    fn ceiling_div_assign_mod(&mut self, other: i32) -> Integer {
+        self.ceiling_div_assign_mod(SignedLimb::from(other))
+    }
+}
+
 impl CeilingDivMod<Integer> for SignedLimb {
     type DivOutput = Integer;
     type ModOutput = Integer;
@@ -746,6 +889,17 @@ impl CeilingDivMod<Integer> for SignedLimb {
     }
 }
 
+#[cfg(feature = "64_bit_limbs")]
+impl CeilingDivMod<Integer> for i32 {
+    type DivOutput = Integer;
+    type ModOutput = Integer;
+
+    #[inline]
+    fn ceiling_div_mod(self, other: Integer) -> (Integer, Integer) {
+        SignedLimb::from(self).ceiling_div_mod(other)
+    }
+}
+
 impl<'a> CeilingDivMod<&'a Integer> for SignedLimb {
     type DivOutput = Integer;
     type ModOutput = Integer;
@@ -801,5 +955,16 @@ impl<'a> CeilingDivMod<&'a Integer> for SignedLimb {
             Integer::from(remainder)
         };
         (quotient, remainder)
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> CeilingDivMod<&'a Integer> for i32 {
+    type DivOutput = Integer;
+    type ModOutput = Integer;
+
+    #[inline]
+    fn ceiling_div_mod(self, other: &'a Integer) -> (Integer, Integer) {
+        SignedLimb::from(self).ceiling_div_mod(other)
     }
 }

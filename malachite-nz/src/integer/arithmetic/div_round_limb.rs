@@ -4,6 +4,7 @@ use malachite_base::round::RoundingMode;
 use natural::Natural;
 use platform::Limb;
 
+//TODO start adding i32 impls here
 impl DivRound<Limb> for Integer {
     type Output = Integer;
 

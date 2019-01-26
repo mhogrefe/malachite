@@ -20,6 +20,7 @@ use natural::arithmetic::sub_mul_limb::mpn_submul_1;
 use platform::Limb;
 
 /// This is mpn_toom_interpolate_5pts in mpn/generic/toom_interpolate_5pts.c.
+#[allow(clippy::cyclomatic_complexity)]
 pub(crate) fn _limbs_mul_toom_interpolate_5_points(
     c: &mut [Limb],
     v_2: &mut [Limb],
@@ -115,7 +116,7 @@ pub(crate) fn _limbs_mul_toom_interpolate_5_points(
         v_inf[0] = v_inf_0; // Set the right value for v_inf_0
 
         // Overwrite unused v_neg_1
-        let mut carry = limbs_shl_to_out(v_neg_1, &mut v_inf[..two_r], 1);
+        let mut carry = limbs_shl_to_out(v_neg_1, &v_inf[..two_r], 1);
         if limbs_sub_same_length_in_place_left(&mut v_2[..two_r], &v_neg_1[..two_r]) {
             carry += 1;
         }
@@ -220,6 +221,7 @@ pub(crate) fn _limbs_mul_toom_interpolate_5_points(
 ///
 /// This is mpn_toom_interpolate_6pts from mpn/generic/mpn_toom_interpolate_6pts.c, but the argument
 /// w0n == `n_high` is moved to immediately after `n`.
+#[allow(clippy::cyclomatic_complexity, clippy::too_many_arguments)]
 pub(crate) fn _limbs_mul_toom_interpolate_6_points(
     out_limbs: &mut [Limb],
     n: usize,
@@ -320,7 +322,7 @@ pub(crate) fn _limbs_mul_toom_interpolate_6_points(
 
     // w2 -= w0 << 2
     // {w4, 2 * n + 1} is now free and can be overwritten.
-    let mut carry = limbs_shl_to_out(w4, &mut out_limbs[5 * n..5 * n + n_high], 2);
+    let mut carry = limbs_shl_to_out(w4, &out_limbs[5 * n..5 * n + n_high], 2);
     if limbs_sub_same_length_in_place_left(&mut w2[..n_high], &w4[..n_high]) {
         carry += 1;
     }
@@ -438,6 +440,7 @@ const WANT_ASSERT: bool = true;
 ///
 /// This is mpn_toom_interpolate_7pts from mpn/generic/mpn_toom_interpolate_7pts.c, but the argument
 /// w6n == `n_high` is moved to immediately after `n`.
+#[allow(clippy::cyclomatic_complexity, clippy::too_many_arguments)]
 pub(crate) fn _limbs_mul_toom_interpolate_7_points(
     out_limbs: &mut [Limb],
     n: usize,

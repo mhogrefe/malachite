@@ -3,8 +3,6 @@ use malachite_base::num::{DivExact, DivExactAssign, UnsignedAbs, Zero};
 use natural::Natural;
 use platform::SignedLimb;
 
-//TODO start adding i32 impls here
-
 impl DivExact<SignedLimb> for Integer {
     type Output = Integer;
 
@@ -40,6 +38,16 @@ impl DivExact<SignedLimb> for Integer {
     fn div_exact(mut self, other: SignedLimb) -> Integer {
         self.div_exact_assign(other);
         self
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl DivExact<i32> for Integer {
+    type Output = Integer;
+
+    #[inline]
+    fn div_exact(self, other: i32) -> Integer {
+        self.div_exact(SignedLimb::from(other))
     }
 }
 
@@ -87,6 +95,16 @@ impl<'a> DivExact<SignedLimb> for &'a Integer {
     }
 }
 
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> DivExact<i32> for &'a Integer {
+    type Output = Integer;
+
+    #[inline]
+    fn div_exact(self, other: i32) -> Integer {
+        self.div_exact(SignedLimb::from(other))
+    }
+}
+
 impl DivExactAssign<SignedLimb> for Integer {
     /// Divides an `Integer` by a `SignedLimb` in place. The `Integer` must be exactly divisible by
     /// the `SignedLimb`. If it isn't, the behavior of this function is undefined.
@@ -121,6 +139,14 @@ impl DivExactAssign<SignedLimb> for Integer {
     fn div_exact_assign(&mut self, other: SignedLimb) {
         self.abs.div_exact_assign(other.unsigned_abs());
         self.sign = self.sign == (other >= 0) || self.abs == 0
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl DivExactAssign<i32> for Integer {
+    #[inline]
+    fn div_exact_assign(&mut self, other: i32) {
+        self.div_exact_assign(SignedLimb::from(other));
     }
 }
 
@@ -161,6 +187,16 @@ impl DivExact<Integer> for SignedLimb {
     }
 }
 
+#[cfg(feature = "64_bit_limbs")]
+impl DivExact<Integer> for i32 {
+    type Output = Integer;
+
+    #[inline]
+    fn div_exact(self, other: Integer) -> Integer {
+        SignedLimb::from(self).div_exact(other)
+    }
+}
+
 impl<'a> DivExact<&'a Integer> for SignedLimb {
     type Output = Integer;
 
@@ -195,5 +231,15 @@ impl<'a> DivExact<&'a Integer> for SignedLimb {
                 abs: Natural::from(abs),
             }
         }
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> DivExact<&'a Integer> for i32 {
+    type Output = Integer;
+
+    #[inline]
+    fn div_exact(self, other: &'a Integer) -> Integer {
+        SignedLimb::from(self).div_exact(other)
     }
 }

@@ -28,7 +28,7 @@ use std::cmp::Ordering;
 /// ```
 pub fn limbs_cmp_same_length(xs: &[Limb], ys: &[Limb]) -> Ordering {
     assert_eq!(xs.len(), ys.len());
-    xs.into_iter().rev().cmp(ys.into_iter().rev())
+    xs.iter().rev().cmp(ys.iter().rev())
 }
 
 /// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, compares
