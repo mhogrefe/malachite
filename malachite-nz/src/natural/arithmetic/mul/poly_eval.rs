@@ -1,5 +1,4 @@
-use malachite_base::misc::Max;
-use malachite_base::num::{PrimitiveInteger, WrappingSubAssign};
+use malachite_base::num::{NotAssign, Parity, PrimitiveInteger, WrappingSubAssign};
 use natural::arithmetic::add::{
     _limbs_add_to_out_special, limbs_add_same_length_to_out, limbs_add_to_out,
     limbs_slice_add_greater_in_place_left, limbs_slice_add_same_length_in_place_left,
@@ -254,7 +253,7 @@ pub(crate) fn _limbs_mul_toom_evaluate_poly_in_2_and_neg_2(
     scratch: &mut [Limb], //TODO remove
     xs: &[Limb],
     ys: &[Limb],
-) -> Limb {
+) -> bool {
     assert!(degree > 2);
     assert!(degree < Limb::WIDTH);
     assert_ne!(n_high, 0);
@@ -335,13 +334,9 @@ pub(crate) fn _limbs_mul_toom_evaluate_poly_in_2_and_neg_2(
         assert_eq!(limbs_slice_shl_in_place(&mut v_2[..limit], 1), 0);
     }
 
-    let mut neg = if limbs_cmp_same_length(&v_2[..limit], &scratch[..limit]) == Ordering::Less {
-        Limb::MAX
-    } else {
-        0
-    };
+    let mut neg = limbs_cmp_same_length(&v_2[..limit], &scratch[..limit]) == Ordering::Less;
 
-    if neg != 0 {
+    if neg {
         limbs_sub_same_length_to_out(v_neg_2, &scratch[..limit], &v_2[..limit]);
     } else {
         limbs_sub_same_length_to_out(v_neg_2, &v_2[..limit], &scratch[..limit]);
@@ -352,6 +347,8 @@ pub(crate) fn _limbs_mul_toom_evaluate_poly_in_2_and_neg_2(
     assert!(v_2[n] < (1 << (degree + 2)) - 1);
     assert!(v_neg_2[n] < Limb::from(((1 << (degree + 3)) - 1 - (1 ^ degree & 1)) / 3));
 
-    neg ^= (Limb::from(degree) & 1).wrapping_sub(1);
+    if degree.even() {
+        neg.not_assign();
+    }
     neg
 }
