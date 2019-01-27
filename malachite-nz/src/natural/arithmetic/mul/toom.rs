@@ -1899,6 +1899,41 @@ pub fn _limbs_mul_greater_to_out_toom_52(
     );
 }
 
+/// This function can be used to determine whether the sizes of the input slices to
+/// `_limbs_mul_greater_to_out_toom_53` are valid.
+pub fn _limbs_mul_greater_to_out_toom_53_input_sizes_valid(xs_len: usize, ys_len: usize) -> bool {
+    if xs_len == 0 || xs_len < ys_len {
+        return false;
+    }
+    let n = 1 + if 3 * xs_len >= 5 * ys_len {
+        (xs_len - 1) / 5
+    } else {
+        (ys_len - 1) / 3
+    };
+    if xs_len < n << 2 {
+        return false;
+    }
+    let s = xs_len - (n << 2);
+    if ys_len < (n << 1) {
+        return false;
+    }
+    let t = ys_len - (n << 1);
+    0 < s && s <= n && 0 < t && t <= n
+}
+
+/// This function can be used to determine the length of the input `scratch` slice in
+/// `_limbs_mul_greater_to_out_toom_53`.
+///
+/// This is mpn_toom53_mul_itch from gmp-impl.h.
+pub fn _limbs_mul_greater_to_out_toom_53_scratch_size(xs_len: usize, ys_len: usize) -> usize {
+    let n = 1 + if 3 * xs_len >= 5 * ys_len {
+        (xs_len - 1) / 5
+    } else {
+        (ys_len - 1) / 3
+    };
+    10 * (n + 1)
+}
+
 // mpn_toom53_mul -- Multiply {ap,an} and {bp,bn} where an is nominally 5/3
 //  Evaluate in: 0, +1, -1, +2, -2, 1/2, +inf
 
@@ -1928,21 +1963,20 @@ pub fn _limbs_mul_greater_to_out_toom_52(
 /// This is mpn_toom53_mul from mpn/generic/toom53_mul.c.
 pub fn _limbs_mul_greater_to_out_toom_53(
     pp: &mut [Limb],
-    ap: &[Limb],
-    bp: &[Limb],
+    xs: &[Limb],
+    ys: &[Limb],
     scratch: &mut [Limb],
 ) {
-    let an = ap.len();
-    let bn = bp.len();
+    let an = xs.len();
+    let bn = ys.len();
 
     let n = 1 + if 3 * an >= 5 * bn {
         (an - 1) / 5
     } else {
         (bn - 1) / 3
     };
-    split_into_chunks!(ap, n, s, [a0, a1, a2, a3], a4);
-    split_into_chunks!(bp, n, t, [b0, b1], b2);
-
+    split_into_chunks!(xs, n, s, [a0, a1, a2, a3], a4);
+    split_into_chunks!(ys, n, t, [b0, b1], b2);
     assert!(0 < s && s <= n);
     assert!(0 < t && t <= n);
 
@@ -1955,12 +1989,21 @@ pub fn _limbs_mul_greater_to_out_toom_53(
     );
 
     // Compute as1 and asm1.
-    let mut w3_neg =
-        _limbs_mul_toom_evaluate_poly_in_1_and_neg_1(as1, asm1, 4, ap, n, s, pp, ap, bp);
+    let mut w3_neg = _limbs_mul_toom_evaluate_poly_in_1_and_neg_1(
+        as1,
+        asm1,
+        4,
+        xs,
+        n,
+        s,
+        &mut pp[..n + 1],
+        xs,
+        ys,
+    );
 
     // Compute as2 and asm2.
     let mut w1_neg =
-        _limbs_mul_toom_evaluate_poly_in_2_and_neg_2(as2, asm2, 4, ap, n, s, pp, ap, bp);
+        _limbs_mul_toom_evaluate_poly_in_2_and_neg_2(as2, asm2, 4, xs, n, s, pp, xs, ys);
 
     // Compute ash = 16 a0 + 8 a1 + 4 a2 + 2 a3 + a4 = 2*(2*(2*(2*a0 + a1) + a2) + a3) + a4
     let mut cy = limbs_shl_to_out(ash, &a0[..n], 1);
@@ -2039,7 +2082,7 @@ pub fn _limbs_mul_greater_to_out_toom_53(
             &pp[..n + 1]
         ));
     }
-    limbs_sub_same_length_in_place_left(&mut bs2[..n + 1], &pp[..n + 1]);
+    limbs_slice_add_same_length_in_place_left(&mut bs2[..n + 1], &pp[..n + 1]);
 
     // Compute bsh = 4 b0 + 2 b1 + b2 = 2*(2*b0 + b1)+b2.
     let mut cy = limbs_shl_to_out(bsh, &b0[..n], 1);
@@ -2067,17 +2110,21 @@ pub fn _limbs_mul_greater_to_out_toom_53(
     assert!(ash[n] <= 30);
     assert!(bsh[n] <= 6);
 
-    split_into_chunks_mut!(scratch, 2 * n + 1, [v2, vm2, vh, vm1, scratch_out], _unused);
     {
         let (v0, remainder) = pp.split_at_mut(2 * n);
         let (v1, vinf) = remainder.split_at_mut(4 * n);
         // Total scratch need: 10*n+5
 
         // Must be in allocation order, as they overwrite one limb beyond 2n+1.
-        limbs_mul_same_length_to_out(v2, &as2[..n + 1], &bs2[..n + 1]); // v2, 2n+1 limbs
-        limbs_mul_same_length_to_out(vm2, &asm2[..n + 1], &bsm2[..n + 1]); // vm2, 2n+1 limbs
-        limbs_mul_same_length_to_out(vh, &ash[..n + 1], &bsh[..n + 1]); // vh, 2n+1 limbs
+        limbs_mul_same_length_to_out(scratch, &as2[..n + 1], &bs2[..n + 1]); // v2, 2n+1 limbs
 
+        // vm2, 2n+1 limbs
+        limbs_mul_same_length_to_out(&mut scratch[2 * n + 1..], &asm2[..n + 1], &bsm2[..n + 1]);
+
+        // vh, 2n+1 limbs
+        limbs_mul_same_length_to_out(&mut scratch[4 * n + 2..], &ash[..n + 1], &bsh[..n + 1]);
+
+        let vm1 = &mut scratch[6 * n + 3..8 * n + 4];
         // vm1, 2n+1 limbs
         if SMALLER_RECURSION {
             limbs_mul_same_length_to_out(vm1, &asm1[..n], &bsm1[..n]);
@@ -2089,7 +2136,7 @@ pub fn _limbs_mul_greater_to_out_toom_53(
                         0
                     }
             } else if asm1[n] == 2 {
-                2 * bsm1[n] + mpn_addmul_1(&mut vm1[n..], &bsm1[..n], 2)
+                (bsm1[n] << 1) + mpn_addmul_1(&mut vm1[n..], &bsm1[..n], 2)
             } else {
                 0
             };
@@ -2119,9 +2166,9 @@ pub fn _limbs_mul_greater_to_out_toom_53(
                         0
                     }
             } else if as1[n] == 2 {
-                2 * bs1[n] + mpn_addmul_1(&mut v1[n..], &bs1[..n], 2)
+                (bs1[n] << 1) + mpn_addmul_1(&mut v1[n..], &bs1[..n], 2)
             } else if as1[n] != 0 {
-                as1[n] * bs1[n] + mpn_addmul_1(&mut v1[n..], &bs1[..n], as1[n])
+                as1[n].wrapping_mul(bs1[n]) + mpn_addmul_1(&mut v1[n..], &bs1[..n], as1[n])
             } else {
                 0
             };
@@ -2147,6 +2194,7 @@ pub fn _limbs_mul_greater_to_out_toom_53(
         // vinf, s+t limbs
         limbs_mul_to_out(vinf, &a4[..s], &b2[..t]);
     }
+    split_into_chunks_mut!(scratch, 2 * n + 1, [v2, vm2, vh, vm1, scratch_out], _unused);
     _limbs_mul_toom_interpolate_7_points(
         pp,
         n,

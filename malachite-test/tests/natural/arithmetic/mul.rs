@@ -8,6 +8,7 @@ use malachite_nz::natural::arithmetic::mul::toom::{
     _limbs_mul_greater_to_out_toom_43, _limbs_mul_greater_to_out_toom_43_scratch_size,
     _limbs_mul_greater_to_out_toom_44, _limbs_mul_greater_to_out_toom_44_scratch_size,
     _limbs_mul_greater_to_out_toom_52, _limbs_mul_greater_to_out_toom_52_scratch_size,
+    _limbs_mul_greater_to_out_toom_53, _limbs_mul_greater_to_out_toom_53_scratch_size,
 };
 use malachite_nz::natural::arithmetic::mul::{
     _limbs_mul_greater_to_out_basecase, limbs_mul_greater_to_out,
@@ -21,6 +22,7 @@ use malachite_test::inputs::base::{
     pairs_of_unsigneds, triples_of_unsigned_vec_var_10, triples_of_unsigned_vec_var_11,
     triples_of_unsigned_vec_var_12, triples_of_unsigned_vec_var_13, triples_of_unsigned_vec_var_14,
     triples_of_unsigned_vec_var_15, triples_of_unsigned_vec_var_16, triples_of_unsigned_vec_var_17,
+    triples_of_unsigned_vec_var_18,
 };
 use malachite_test::inputs::natural::{
     naturals, pairs_of_natural_and_unsigned, pairs_of_naturals, triples_of_naturals,
@@ -1183,10 +1185,9 @@ fn test_limbs_mul_greater_to_out_toom_52() {
     // (degree & 1) != 0 in _limbs_mul_toom_evaluate_poly_in_2_and_neg_2
     // neg == 0 in _limbs_mul_toom_evaluate_poly_in_2_and_neg_2
     // t != n
-    // !(limbs_test_zero(&b0[t..n]) && limbs_cmp_same_length(&b0[..t], &b1[..t]) == Ordering::Less)
-    // !vm1_neg
-    // !(limbs_test_zero(&bsm1[t..n]) && limbs_cmp_same_length(&bsm1[..t], &b1[..t]) ==
-    //      Ordering::Less)
+    // !(limbs_test_zero(&ys_0[t..]) && limbs_cmp_same_length(&ys_0[..t], ys_1) == Ordering::Less)
+    // !v_neg_1_neg
+    // !(limbs_test_zero(&bsm1[t..]) && limbs_cmp_same_length(&bsm1[..t], ys_1) == Ordering::Less)
     // k & 1 == 0 in _limbs_mul_toom_evaluate_poly_in_1_and_neg_1
     // neg == 0 in _limbs_mul_toom_evaluate_poly_in_1_and_neg_1
     test(
@@ -1206,23 +1207,23 @@ fn test_limbs_mul_greater_to_out_toom_52() {
     );
     // n_high != n in _limbs_mul_toom_evaluate_poly_in_2_and_neg_2
     // t == n
-    // limbs_cmp_same_length(&b0[..n], &b1[..n]) == Ordering::Less
-    // vm1_neg
+    // limbs_cmp_same_length(ys_0, ys_1) == Ordering::Less
+    // v_neg_1_neg
     test(
         vec![0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
         vec![0, 0, 0, 0, 0, 1],
         vec![10; 20],
         vec![0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
     );
-    // limbs_test_zero(&b0[t..n]) && limbs_cmp_same_length(&b0[..t], &b1[..t]) == Ordering::Less
+    // limbs_test_zero(&ys_0[t..]) && limbs_cmp_same_length(&ys_0[..t], ys_1) == Ordering::Less
     test(
         vec![0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
         vec![0, 0, 0, 0, 1],
         vec![10; 20],
         vec![0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
     );
-    // limbs_cmp_same_length(&b0[..n], &b1[..n]) != Ordering::Less
-    // limbs_cmp_same_length(&bsm1[..n], &b1[..n]) == Ordering::Less
+    // limbs_cmp_same_length(ys_0, ys_1) != Ordering::Less
+    // limbs_cmp_same_length(bsm1, ys_1) == Ordering::Less
     test(
         vec![0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
         vec![0, 0, 1, 0, 0, 1],
@@ -1231,7 +1232,7 @@ fn test_limbs_mul_greater_to_out_toom_52() {
     );
     // neg != 0 in _limbs_mul_toom_evaluate_poly_in_2_and_neg_2
     // neg != 0 in _limbs_mul_toom_evaluate_poly_in_1_and_neg_1
-    // _limbs_mul_toom_evaluate_poly_in_1_and_neg_1(as1, asm1, 4, xs, n, s, &mut vm1[..n + 1]) != 0
+    // _limbs_mul_toom_evaluate_poly_in_1_and_neg_1(as1, asm1, 4, xs, n, s, &mut v_neg_1[..m])
     test(
         vec![
             281500646, 1572406350, 108746052, 4056047843, 89307364, 1006007374, 2902260577,
@@ -1247,7 +1248,7 @@ fn test_limbs_mul_greater_to_out_toom_52() {
             3650814344, 1121996596, 3441179979, 3561879910, 1574546788, 1514489709,
         ],
     );
-    // limbs_cmp_same_length(&bsm1[..n], &b1[..n]) != Ordering::Less
+    // limbs_cmp_same_length(bsm1, ys_1) != Ordering::Less
     test(
         vec![
             2331447040, 1003213663, 1873981685, 3371337621, 3796896013, 4144448610, 2569252563,
@@ -1263,8 +1264,7 @@ fn test_limbs_mul_greater_to_out_toom_52() {
             3374007062, 3091178442, 1888125000, 2974781424, 307612679, 174629431,
         ],
     );
-    // limbs_test_zero(&bsm1[t..n]) && limbs_cmp_same_length(&bsm1[..t], &b1[..t]) ==
-    //      Ordering::Less
+    // limbs_test_zero(&bsm1[t..]) && limbs_cmp_same_length(&bsm1[..t], ys_1) == Ordering::Less
     test(
         vec![
             32767, 0, 0, 0, 0, 0, 4294836224, 4294967295, 4294967295, 4294967295, 4294967295,
@@ -1304,6 +1304,158 @@ fn test_limbs_mul_greater_to_out_toom_52() {
         vec![0, 0, 0, 0, 1, 0],
         vec![10; 20],
         vec![0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0],
+    );
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+fn test_limbs_mul_greater_to_out_toom_53() {
+    let test = |xs: Vec<Limb>, ys: Vec<Limb>, out_before: Vec<Limb>, out_after| {
+        let mut out = out_before.to_vec();
+        _limbs_mul_greater_to_out_basecase(&mut out, &xs, &ys);
+        assert_eq!(out, out_after);
+        let mut out = out_before.to_vec();
+        let mut scratch =
+            vec![0; _limbs_mul_greater_to_out_toom_53_scratch_size(xs.len(), ys.len())];
+        _limbs_mul_greater_to_out_toom_53(&mut out, &xs, &ys, &mut scratch);
+        assert_eq!(out, out_after);
+    };
+    // !(bs1[n] == 0 && limbs_cmp_same_length(&bs1[..n], &b1[..n]) == Ordering::Less)
+    // limbs_cmp_same_length(&bs2[..n + 1], &pp[..n + 1]) != Ordering::Less
+    // asm1[n] != 1 && asm1[n] != 2
+    // as1[n] == 0
+    test(
+        vec![2, 3, 4, 5, 6],
+        vec![3, 4, 5],
+        vec![10; 8],
+        vec![6, 17, 34, 46, 58, 49, 30, 0],
+    );
+    // bs1[n] == 0 && limbs_cmp_same_length(&bs1[..n], &b1[..n]) == Ordering::Less
+    // as1[n] == 2
+    // bs1[n] == 1
+    test(
+        vec![611094747, 2426195984, 3948451542, 3575143460, 2163084716],
+        vec![1043494367, 2432724646, 1148376235],
+        vec![10; 8],
+        vec![
+            2911651269, 2135822080, 566305911, 1285474929, 3971527858, 1120629777, 2330897846,
+            578359487,
+        ],
+    );
+    // as1[n] == 1
+    test(
+        vec![83336617, 52963853, 1461131367, 615175494, 2376138249],
+        vec![1085015601, 823246134, 3222784883],
+        vec![10; 8],
+        vec![
+            4003668825, 3129188105, 1975732797, 2019047981, 943873016, 1483316813, 305883771,
+            1782966412,
+        ],
+    );
+    // limbs_cmp_same_length(&bs2[..n + 1], &pp[..n + 1]) == Ordering::Less
+    // as1[n] != 0
+    test(
+        vec![
+            3853679659, 4236745288, 2469732913, 4265854402, 4207372271, 1754370134, 137881047,
+            1325109821, 2212043812, 3074170203,
+        ],
+        vec![
+            1666773246, 4177391250, 4175984066, 2859904653, 3320165100, 314964734,
+        ],
+        vec![10; 16],
+        vec![
+            2336719530, 919351696, 4142757378, 49781824, 1315087108, 2534950116, 2674417418,
+            1178559126, 171926136, 3132896187, 2074730624, 3561766617, 1155879861, 3985534229,
+            380101898, 225439482,
+        ],
+    );
+    // asm1[n] == 1
+    test(
+        vec![4171807709, 1363035595, 2692148345, 3728232161, 2672522097],
+        vec![178202067, 736149219, 623937260],
+        vec![10; 8],
+        vec![
+            2793195559, 2168235304, 1582195836, 18437203, 671570200, 635034059, 2378259056,
+            388241865,
+        ],
+    );
+    // bs1[n] == 2
+    test(
+        vec![361692441, 3665267779, 1770324312, 1221560416, 2810295690],
+        vec![1887715703, 4035171395, 2815003797],
+        vec![10; 8],
+        vec![
+            3298754463, 2516900264, 30373680, 909364693, 729609199, 3973437903, 3392713387,
+            1841921601,
+        ],
+    );
+    // bsm1[n] != 0
+    test(
+        vec![1542637461, 595638956, 1883922642, 2681579369, 2641006916],
+        vec![3723002977, 116606811, 2193352864],
+        vec![10; 8],
+        vec![
+            2246996853, 3232877055, 2347711939, 2476049074, 4132376421, 3855440382, 4040315714,
+            1348708775,
+        ],
+    );
+    // asm1[n] == 2
+    test(
+        vec![4043423637, 312331403, 3088235367, 41162462, 2934893364],
+        vec![2702987034, 4184574368, 2455116868],
+        vec![10; 8],
+        vec![
+            2912448546, 2297161059, 137328692, 115875329, 1975003140, 2441893159, 4034859213,
+            1677662647,
+        ],
+    );
+    test(
+        vec![4194296, 3221225472, 4294967295, 1, 4294934528],
+        vec![0, 4294959104, 4294967295],
+        vec![10; 8],
+        vec![
+            0, 65536, 4294967288, 4196343, 3221209088, 268435455, 4294959106, 4294934527,
+        ],
+    );
+}
+
+#[cfg(feature = "64_bit_limbs")]
+#[test]
+fn test_limbs_mul_greater_to_out_toom_53() {
+    let test = |xs: Vec<Limb>, ys: Vec<Limb>, out_before: Vec<Limb>, out_after| {
+        let mut out = out_before.to_vec();
+        _limbs_mul_greater_to_out_basecase(&mut out, &xs, &ys);
+        assert_eq!(out, out_after);
+        let mut out = out_before.to_vec();
+        let mut scratch =
+            vec![0; _limbs_mul_greater_to_out_toom_53_scratch_size(xs.len(), ys.len())];
+        _limbs_mul_greater_to_out_toom_53(&mut out, &xs, &ys, &mut scratch);
+        assert_eq!(out, out_after);
+    };
+    test(
+        vec![
+            18446744073709551615,
+            18446744073709551615,
+            3,
+            18446744073709551614,
+            18446744073709551615,
+        ],
+        vec![
+            18446744073709551615,
+            18446744073709551615,
+            18446744073709551615,
+        ],
+        vec![10; 8],
+        vec![
+            1,
+            0,
+            18446744073709551612,
+            0,
+            0,
+            3,
+            18446744073709551614,
+            18446744073709551615,
+        ],
     );
 }
 
@@ -1528,6 +1680,22 @@ fn limbs_mul_greater_to_out_toom_52_properties() {
             let mut scratch =
                 vec![0; _limbs_mul_greater_to_out_toom_52_scratch_size(xs.len(), ys.len())];
             _limbs_mul_greater_to_out_toom_52(&mut out_limbs, xs, ys, &mut scratch);
+            assert_eq!(out_limbs, expected_out_limbs);
+        },
+    );
+}
+
+#[test]
+fn limbs_mul_greater_to_out_toom_53_properties() {
+    test_properties_custom_scale(
+        2_048,
+        triples_of_unsigned_vec_var_18,
+        |&(ref out_limbs, ref xs, ref ys)| {
+            let expected_out_limbs = limbs_mul_basecase_helper(out_limbs, xs, ys);
+            let mut out_limbs = out_limbs.to_vec();
+            let mut scratch =
+                vec![0; _limbs_mul_greater_to_out_toom_53_scratch_size(xs.len(), ys.len())];
+            _limbs_mul_greater_to_out_toom_53(&mut out_limbs, xs, ys, &mut scratch);
             assert_eq!(out_limbs, expected_out_limbs);
         },
     );

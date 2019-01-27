@@ -593,8 +593,8 @@ pub(crate) fn _limbs_mul_toom_interpolate_7_points(
     if limbs_add_same_length_to_out(out_limbs_4, w3_hi_init, w4_lo) {
         addend += 1;
     }
+    assert!(!limbs_slice_add_limb_in_place(w4_hi, addend));
     let (w4_last, w4_init) = w4_hi.split_last_mut().unwrap();
-    assert!(!limbs_slice_add_limb_in_place(w4_init, addend));
     let mut addend = *w4_last;
     let (w5_lo, w5_hi) = w5.split_at_mut(n);
     if limbs_add_same_length_to_out(out_limbs_5, w4_init, w5_lo) {
