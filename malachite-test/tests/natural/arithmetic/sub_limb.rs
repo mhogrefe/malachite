@@ -224,23 +224,23 @@ fn limbs_sub_limb_properties() {
 fn limbs_sub_limb_to_out_properties() {
     test_properties(
         triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_1,
-        |&(ref out_limbs, ref in_limbs, limb)| {
-            let mut out_limbs = out_limbs.to_vec();
-            let old_out_limbs = out_limbs.clone();
-            if limbs_sub_limb_to_out(&mut out_limbs, in_limbs, limb) {
+        |&(ref out, ref in_limbs, limb)| {
+            let mut out = out.to_vec();
+            let old_out = out.clone();
+            if limbs_sub_limb_to_out(&mut out, in_limbs, limb) {
                 let n = Integer::from(Natural::from_limbs_asc(in_limbs)) - limb;
                 let len = in_limbs.len();
                 let mut limbs = n.into_twos_complement_limbs_asc();
                 limbs.resize(len, Limb::MAX);
-                assert_eq!(limbs, &out_limbs[..len]);
-                assert_eq!(&out_limbs[len..], &old_out_limbs[len..]);
+                assert_eq!(limbs, &out[..len]);
+                assert_eq!(&out[len..], &old_out[len..]);
             } else {
                 let n = Natural::from_limbs_asc(in_limbs) - limb;
                 let len = in_limbs.len();
                 let mut limbs = n.into_limbs_asc();
                 limbs.resize(len, 0);
-                assert_eq!(limbs, &out_limbs[..len]);
-                assert_eq!(&out_limbs[len..], &old_out_limbs[len..]);
+                assert_eq!(limbs, &out[..len]);
+                assert_eq!(&out[len..], &old_out[len..]);
             }
         },
     );

@@ -686,14 +686,14 @@ fn limbs_sub_properties() {
 
 fn limbs_sub_to_out_helper(
     f: &mut FnMut(&mut [Limb], &[Limb], &[Limb]) -> bool,
-    out_limbs: &Vec<Limb>,
+    out: &Vec<Limb>,
     xs: &Vec<Limb>,
     ys: &Vec<Limb>,
 ) {
-    let mut out_limbs = out_limbs.to_vec();
-    let old_out_limbs = out_limbs.clone();
+    let mut out = out.to_vec();
+    let old_out = out.clone();
     let len = xs.len();
-    let limbs = if f(&mut out_limbs, xs, ys) {
+    let limbs = if f(&mut out, xs, ys) {
         let n = Integer::from(Natural::from_limbs_asc(xs))
             - Integer::from(Natural::from_limbs_asc(ys))
             + (Integer::ONE << (Limb::WIDTH * (len as u32)));
@@ -706,16 +706,16 @@ fn limbs_sub_to_out_helper(
         limbs.resize(len, 0);
         limbs
     };
-    assert_eq!(limbs, &out_limbs[..len]);
-    assert_eq!(&out_limbs[len..], &old_out_limbs[len..]);
+    assert_eq!(limbs, &out[..len]);
+    assert_eq!(&out[len..], &old_out[len..]);
 }
 
 #[test]
 fn limbs_sub_same_length_to_out_properties() {
     test_properties(
         triples_of_unsigned_vec_var_3,
-        |&(ref out_limbs, ref xs, ref ys)| {
-            limbs_sub_to_out_helper(&mut limbs_sub_same_length_to_out, out_limbs, xs, ys);
+        |&(ref out, ref xs, ref ys)| {
+            limbs_sub_to_out_helper(&mut limbs_sub_same_length_to_out, out, xs, ys);
         },
     );
 }
@@ -724,8 +724,8 @@ fn limbs_sub_same_length_to_out_properties() {
 fn limbs_sub_to_out_properties() {
     test_properties(
         triples_of_unsigned_vec_var_9,
-        |&(ref out_limbs, ref xs, ref ys)| {
-            limbs_sub_to_out_helper(&mut limbs_sub_to_out, out_limbs, xs, ys);
+        |&(ref out, ref xs, ref ys)| {
+            limbs_sub_to_out_helper(&mut limbs_sub_to_out, out, xs, ys);
         },
     );
 }
@@ -814,16 +814,12 @@ fn limbs_sub_in_place_right_properties() {
 fn limbs_sub_same_length_with_borrow_in_to_out_properties() {
     test_properties(
         quadruples_of_three_unsigned_vecs_and_bool_var_1,
-        |&(ref out_limbs, ref xs, ref ys, borrow_in)| {
-            let mut out_limbs = out_limbs.to_vec();
-            let old_out_limbs = out_limbs.clone();
+        |&(ref out, ref xs, ref ys, borrow_in)| {
+            let mut out = out.to_vec();
+            let old_out = out.clone();
             let len = xs.len();
-            let limbs = if _limbs_sub_same_length_with_borrow_in_to_out(
-                &mut out_limbs,
-                xs,
-                ys,
-                borrow_in,
-            ) {
+            let limbs = if _limbs_sub_same_length_with_borrow_in_to_out(&mut out, xs, ys, borrow_in)
+            {
                 let mut n = Integer::from(Natural::from_limbs_asc(xs))
                     - Integer::from(Natural::from_limbs_asc(ys))
                     + (Integer::ONE << (Limb::WIDTH * (len as u32)));
@@ -842,8 +838,8 @@ fn limbs_sub_same_length_with_borrow_in_to_out_properties() {
                 limbs.resize(len, 0);
                 limbs
             };
-            assert_eq!(limbs, &out_limbs[..len]);
-            assert_eq!(&out_limbs[len..], &old_out_limbs[len..]);
+            assert_eq!(limbs, &out[..len]);
+            assert_eq!(&out[len..], &old_out[len..]);
         },
     );
 }

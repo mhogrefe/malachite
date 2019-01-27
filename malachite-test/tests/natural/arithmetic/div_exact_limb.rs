@@ -386,16 +386,16 @@ fn limbs_div_exact_limb_properties() {
 fn limbs_div_exact_limb_to_out_properties() {
     test_properties(
         triples_of_limb_vec_limb_vec_and_positive_limb_var_2,
-        |&(ref out_limbs, ref in_limbs, limb)| {
-            let mut out_limbs = out_limbs.to_vec();
-            let old_out_limbs = out_limbs.clone();
-            limbs_div_exact_limb_to_out(&mut out_limbs, in_limbs, limb);
+        |&(ref out, ref in_limbs, limb)| {
+            let mut out = out.to_vec();
+            let old_out = out.clone();
+            limbs_div_exact_limb_to_out(&mut out, in_limbs, limb);
             let len = in_limbs.len();
             assert_eq!(
-                Natural::from_limbs_asc(&out_limbs[..len]),
+                Natural::from_limbs_asc(&out[..len]),
                 Natural::from_limbs_asc(in_limbs).div_exact(limb)
             );
-            assert_eq!(&out_limbs[len..], &old_out_limbs[len..]);
+            assert_eq!(&out[len..], &old_out[len..]);
         },
     );
 }
@@ -430,24 +430,24 @@ fn limbs_div_exact_3_properties() {
 
 #[test]
 fn limbs_div_exact_3_to_out_properties() {
-    test_properties(pairs_of_limb_vec_var_3, |&(ref out_limbs, ref in_limbs)| {
-        let mut out_limbs = out_limbs.to_vec();
-        let old_out_limbs = out_limbs.clone();
-        limbs_div_exact_3_to_out(&mut out_limbs, in_limbs);
+    test_properties(pairs_of_limb_vec_var_3, |&(ref out, ref in_limbs)| {
+        let mut out = out.to_vec();
+        let old_out = out.clone();
+        limbs_div_exact_3_to_out(&mut out, in_limbs);
         let len = in_limbs.len();
         assert_eq!(
-            Natural::from_limbs_asc(&out_limbs[..len]),
+            Natural::from_limbs_asc(&out[..len]),
             Natural::from_limbs_asc(in_limbs).div_exact(3)
         );
-        assert_eq!(&out_limbs[len..], &old_out_limbs[len..]);
+        assert_eq!(&out[len..], &old_out[len..]);
 
-        let mut out_limbs_alt = old_out_limbs.clone();
-        limbs_div_exact_limb_to_out(&mut out_limbs_alt, in_limbs, 3);
-        assert_eq!(out_limbs_alt, out_limbs);
+        let mut out_alt = old_out.clone();
+        limbs_div_exact_limb_to_out(&mut out_alt, in_limbs, 3);
+        assert_eq!(out_alt, out);
 
-        let mut out_limbs_alt = old_out_limbs.clone();
-        _limbs_div_exact_3_to_out_alt(&mut out_limbs_alt, in_limbs);
-        assert_eq!(out_limbs_alt, out_limbs);
+        let mut out_alt = old_out.clone();
+        _limbs_div_exact_3_to_out_alt(&mut out_alt, in_limbs);
+        assert_eq!(out_alt, out);
     });
 }
 

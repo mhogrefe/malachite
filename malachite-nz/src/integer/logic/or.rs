@@ -72,7 +72,7 @@ pub fn limbs_or_neg_neg(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 /// where n = `xs.len() + ys.len()`
 ///
 /// # Panics
-/// Panics if `xs` or `ys` are empty or contain only zeros, or if `out_limbs` is shorter than the
+/// Panics if `xs` or `ys` are empty or contain only zeros, or if `out` is shorter than the
 /// shorter of `xs` and `ys`.
 ///
 /// # Example
@@ -87,36 +87,36 @@ pub fn limbs_or_neg_neg(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 /// limbs_or_neg_neg_to_out(&mut result, &[1, 2, 5], &[100, 200]);
 /// assert_eq!(result, &[1, 0, 10, 10]);
 /// ```
-pub fn limbs_or_neg_neg_to_out(out_limbs: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
+pub fn limbs_or_neg_neg_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
     let xs_len = xs.len();
     let ys_len = ys.len();
-    assert!(out_limbs.len() >= xs_len || out_limbs.len() >= ys_len);
+    assert!(out.len() >= xs_len || out.len() >= ys_len);
     let x_i = limbs_leading_zero_limbs(xs);
     let y_i = limbs_leading_zero_limbs(ys);
     assert!(x_i < xs_len);
     assert!(y_i < ys_len);
     if y_i >= xs_len {
-        out_limbs[..xs_len].copy_from_slice(xs);
+        out[..xs_len].copy_from_slice(xs);
         return;
     } else if x_i >= ys_len {
-        out_limbs[..ys_len].copy_from_slice(ys);
+        out[..ys_len].copy_from_slice(ys);
         return;
     }
     let (min_i, max_i) = if x_i <= y_i { (x_i, y_i) } else { (y_i, x_i) };
-    limbs_set_zero(&mut out_limbs[..min_i]);
+    limbs_set_zero(&mut out[..min_i]);
     if x_i > y_i {
-        out_limbs[y_i..x_i].copy_from_slice(&ys[y_i..x_i]);
+        out[y_i..x_i].copy_from_slice(&ys[y_i..x_i]);
     } else if y_i > x_i {
-        out_limbs[x_i..y_i].copy_from_slice(&xs[x_i..y_i]);
+        out[x_i..y_i].copy_from_slice(&xs[x_i..y_i]);
     }
-    out_limbs[max_i] = if x_i == y_i {
+    out[max_i] = if x_i == y_i {
         ((xs[x_i] - 1) & (ys[y_i] - 1)) + 1
     } else if x_i > y_i {
         (xs[x_i] - 1) & ys[x_i]
     } else {
         xs[y_i] & (ys[y_i] - 1)
     };
-    for (out, (x, y)) in out_limbs[max_i + 1..]
+    for (out, (x, y)) in out[max_i + 1..]
         .iter_mut()
         .zip(xs[max_i + 1..].iter().zip(ys[max_i + 1..].iter()))
     {

@@ -68,27 +68,27 @@ pub fn limbs_sub(xs: &[Limb], ys: &[Limb]) -> (Vec<Limb>, bool) {
 /// where n = `xs.len()` = `ys.len()`
 ///
 /// # Panics
-/// Panics if `out_limbs` is shorter than `xs` or if `xs` and `ys` have different lengths.
+/// Panics if `out` is shorter than `xs` or if `xs` and `ys` have different lengths.
 ///
 /// # Example
 /// ```
 /// use malachite_nz::natural::arithmetic::sub::limbs_sub_same_length_to_out;
 ///
-/// let mut out_limbs = vec![0, 0, 0];
-/// assert_eq!(limbs_sub_same_length_to_out(&mut out_limbs, &[123, 456], &[789, 123]), false);
-/// assert_eq!(out_limbs, &[4_294_966_630, 332, 0]);
+/// let mut out = vec![0, 0, 0];
+/// assert_eq!(limbs_sub_same_length_to_out(&mut out, &[123, 456], &[789, 123]), false);
+/// assert_eq!(out, &[4_294_966_630, 332, 0]);
 ///
-/// let mut out_limbs = vec![0, 0, 0];
-/// assert_eq!(limbs_sub_same_length_to_out(&mut out_limbs, &[123, 456], &[456, 789]), true);
-/// assert_eq!(out_limbs, &[4_294_966_963, 4_294_966_962, 0]);
+/// let mut out = vec![0, 0, 0];
+/// assert_eq!(limbs_sub_same_length_to_out(&mut out, &[123, 456], &[456, 789]), true);
+/// assert_eq!(out, &[4_294_966_963, 4_294_966_962, 0]);
 /// ```
-pub fn limbs_sub_same_length_to_out(out_limbs: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> bool {
+pub fn limbs_sub_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> bool {
     let len = xs.len();
     assert_eq!(len, ys.len());
-    assert!(out_limbs.len() >= len);
+    assert!(out.len() >= len);
     let mut borrow = false;
     for i in 0..len {
-        out_limbs[i] = sub_and_borrow(xs[i], ys[i], &mut borrow);
+        out[i] = sub_and_borrow(xs[i], ys[i], &mut borrow);
     }
     borrow
 }
@@ -106,32 +106,32 @@ pub fn limbs_sub_same_length_to_out(out_limbs: &mut [Limb], xs: &[Limb], ys: &[L
 /// where n = `xs.len()`
 ///
 /// # Panics
-/// Panics if `out_limbs` is shorter than `xs` or if `xs` is shorter than `ys`.
+/// Panics if `out` is shorter than `xs` or if `xs` is shorter than `ys`.
 ///
 /// # Example
 /// ```
 /// use malachite_nz::natural::arithmetic::sub::limbs_sub_to_out;
 ///
-/// let mut out_limbs = vec![0, 0, 0];
-/// assert_eq!(limbs_sub_to_out(&mut out_limbs, &[123, 456], &[789]), false);
-/// assert_eq!(out_limbs, &[4_294_966_630, 455, 0]);
+/// let mut out = vec![0, 0, 0];
+/// assert_eq!(limbs_sub_to_out(&mut out, &[123, 456], &[789]), false);
+/// assert_eq!(out, &[4_294_966_630, 455, 0]);
 ///
-/// let mut out_limbs = vec![0, 0, 0];
-/// assert_eq!(limbs_sub_to_out(&mut out_limbs, &[123, 456], &[456, 789]), true);
-/// assert_eq!(out_limbs, &[4_294_966_963, 4_294_966_962, 0]);
+/// let mut out = vec![0, 0, 0];
+/// assert_eq!(limbs_sub_to_out(&mut out, &[123, 456], &[456, 789]), true);
+/// assert_eq!(out, &[4_294_966_963, 4_294_966_962, 0]);
 /// ```
-pub fn limbs_sub_to_out(out_limbs: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> bool {
+pub fn limbs_sub_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> bool {
     let xs_len = xs.len();
     let ys_len = ys.len();
-    assert!(out_limbs.len() >= xs_len);
+    assert!(out.len() >= xs_len);
     let (xs_lo, xs_hi) = xs.split_at(ys_len);
-    let borrow = limbs_sub_same_length_to_out(out_limbs, xs_lo, ys);
+    let borrow = limbs_sub_same_length_to_out(out, xs_lo, ys);
     if xs_len == ys_len {
         borrow
     } else if borrow {
-        limbs_sub_limb_to_out(&mut out_limbs[ys_len..], xs_hi, 1)
+        limbs_sub_limb_to_out(&mut out[ys_len..], xs_hi, 1)
     } else {
-        out_limbs[ys_len..xs_len].copy_from_slice(xs_hi);
+        out[ys_len..xs_len].copy_from_slice(xs_hi);
         false
     }
 }
@@ -306,18 +306,18 @@ pub fn limbs_sub_in_place_right(xs: &[Limb], ys: &mut Vec<Limb>) -> bool {
 /// where n = `xs.len()` = `ys.len()`
 ///
 /// # Panics
-/// Panics if `out_limbs` is shorter than `xs` or if `xs` and `ys` have different lengths.
+/// Panics if `out` is shorter than `xs` or if `xs` and `ys` have different lengths.
 ///
 /// This is mpn_sub_nc from gmp-impl.h, where rp and up are disjoint.
 pub fn _limbs_sub_same_length_with_borrow_in_to_out(
-    out_limbs: &mut [Limb],
+    out: &mut [Limb],
     xs: &[Limb],
     ys: &[Limb],
     borrow_in: bool,
 ) -> bool {
-    let mut borrow = limbs_sub_same_length_to_out(out_limbs, xs, ys);
+    let mut borrow = limbs_sub_same_length_to_out(out, xs, ys);
     if borrow_in {
-        borrow |= limbs_sub_limb_in_place(&mut out_limbs[..xs.len()], 1);
+        borrow |= limbs_sub_limb_in_place(&mut out[..xs.len()], 1);
     }
     borrow
 }

@@ -51,36 +51,36 @@ pub fn limbs_sub_limb(limbs: &[Limb], mut limb: Limb) -> (Vec<Limb>, bool) {
 /// where n = `limbs.len()`
 ///
 /// # Panics
-/// Panics if `out_limbs` is shorter than `in_limbs`.
+/// Panics if `out` is shorter than `in_limbs`.
 ///
 /// # Example
 /// ```
 /// use malachite_nz::natural::arithmetic::sub_limb::limbs_sub_limb_to_out;
 ///
-/// let mut out_limbs = vec![0, 0, 0];
-/// assert_eq!(limbs_sub_limb_to_out(&mut out_limbs, &[123, 456], 78), false);
-/// assert_eq!(out_limbs, &[45, 456, 0]);
+/// let mut out = vec![0, 0, 0];
+/// assert_eq!(limbs_sub_limb_to_out(&mut out, &[123, 456], 78), false);
+/// assert_eq!(out, &[45, 456, 0]);
 ///
-/// let mut out_limbs = vec![0, 0, 0];
-/// assert_eq!(limbs_sub_limb_to_out(&mut out_limbs, &[123, 456], 789), false);
-/// assert_eq!(out_limbs, &[4_294_966_630, 455, 0]);
+/// let mut out = vec![0, 0, 0];
+/// assert_eq!(limbs_sub_limb_to_out(&mut out, &[123, 456], 789), false);
+/// assert_eq!(out, &[4_294_966_630, 455, 0]);
 ///
-/// let mut out_limbs = vec![0, 0, 0];
-/// assert_eq!(limbs_sub_limb_to_out(&mut out_limbs, &[1], 2), true);
-/// assert_eq!(out_limbs, &[4_294_967_295, 0, 0]);
+/// let mut out = vec![0, 0, 0];
+/// assert_eq!(limbs_sub_limb_to_out(&mut out, &[1], 2), true);
+/// assert_eq!(out, &[4_294_967_295, 0, 0]);
 /// ```
-pub fn limbs_sub_limb_to_out(out_limbs: &mut [Limb], in_limbs: &[Limb], mut limb: Limb) -> bool {
+pub fn limbs_sub_limb_to_out(out: &mut [Limb], in_limbs: &[Limb], mut limb: Limb) -> bool {
     let len = in_limbs.len();
-    assert!(out_limbs.len() >= len);
+    assert!(out.len() >= len);
     for i in 0..len {
         let (difference, overflow) = in_limbs[i].overflowing_sub(limb);
-        out_limbs[i] = difference;
+        out[i] = difference;
         if overflow {
             limb = 1;
         } else {
             limb = 0;
             let copy_index = i + 1;
-            out_limbs[copy_index..len].copy_from_slice(&in_limbs[copy_index..]);
+            out[copy_index..len].copy_from_slice(&in_limbs[copy_index..]);
             break;
         }
     }

@@ -588,17 +588,17 @@ fn limbs_add_properties() {
 fn limbs_add_same_length_to_out_properties() {
     test_properties(
         triples_of_unsigned_vec_var_3,
-        |&(ref out_limbs, ref xs, ref ys)| {
-            let mut out_limbs = out_limbs.to_vec();
-            let old_out_limbs = out_limbs.clone();
-            let carry = limbs_add_same_length_to_out(&mut out_limbs, xs, ys);
+        |&(ref out, ref xs, ref ys)| {
+            let mut out = out.to_vec();
+            let old_out = out.clone();
+            let carry = limbs_add_same_length_to_out(&mut out, xs, ys);
             let n = Natural::from_limbs_asc(xs) + Natural::from_limbs_asc(ys);
             let len = xs.len();
             let mut limbs = n.into_limbs_asc();
             assert_eq!(carry, limbs.len() == len + 1);
             limbs.resize(len, 0);
-            assert_eq!(limbs, &out_limbs[..len]);
-            assert_eq!(&out_limbs[len..], &old_out_limbs[len..]);
+            assert_eq!(limbs, &out[..len]);
+            assert_eq!(&out[len..], &old_out[len..]);
         },
     );
 }
@@ -607,17 +607,17 @@ fn limbs_add_same_length_to_out_properties() {
 fn limbs_add_to_out_properties() {
     test_properties(
         triples_of_unsigned_vec_var_4,
-        |&(ref out_limbs, ref xs, ref ys)| {
-            let mut out_limbs = out_limbs.to_vec();
-            let old_out_limbs = out_limbs.clone();
-            let carry = limbs_add_to_out(&mut out_limbs, xs, ys);
+        |&(ref out, ref xs, ref ys)| {
+            let mut out = out.to_vec();
+            let old_out = out.clone();
+            let carry = limbs_add_to_out(&mut out, xs, ys);
             let n = Natural::from_limbs_asc(xs) + Natural::from_limbs_asc(ys);
             let len = max(xs.len(), ys.len());
             let mut limbs = n.into_limbs_asc();
             assert_eq!(carry, limbs.len() == len + 1);
             limbs.resize(len, 0);
-            assert_eq!(limbs, &out_limbs[..len]);
-            assert_eq!(&out_limbs[len..], &old_out_limbs[len..]);
+            assert_eq!(limbs, &out[..len]);
+            assert_eq!(&out[len..], &old_out[len..]);
         },
     );
 }
@@ -715,11 +715,10 @@ fn limbs_vec_add_in_place_either_properties() {
 fn limbs_add_same_length_with_carry_in_to_out_properties() {
     test_properties(
         quadruples_of_three_unsigned_vecs_and_bool_var_1,
-        |&(ref out_limbs, ref xs, ref ys, carry_in)| {
-            let mut out_limbs = out_limbs.to_vec();
-            let old_out_limbs = out_limbs.clone();
-            let carry =
-                _limbs_add_same_length_with_carry_in_to_out(&mut out_limbs, xs, ys, carry_in);
+        |&(ref out, ref xs, ref ys, carry_in)| {
+            let mut out = out.to_vec();
+            let old_out = out.clone();
+            let carry = _limbs_add_same_length_with_carry_in_to_out(&mut out, xs, ys, carry_in);
             let mut n = Natural::from_limbs_asc(xs) + Natural::from_limbs_asc(ys);
             if carry_in {
                 n += 1;
@@ -728,8 +727,8 @@ fn limbs_add_same_length_with_carry_in_to_out_properties() {
             let mut limbs = n.into_limbs_asc();
             assert_eq!(carry, limbs.len() == len + 1);
             limbs.resize(len, 0);
-            assert_eq!(limbs, &out_limbs[..len]);
-            assert_eq!(&out_limbs[len..], &old_out_limbs[len..]);
+            assert_eq!(limbs, &out[..len]);
+            assert_eq!(&out[len..], &old_out[len..]);
         },
     );
 }

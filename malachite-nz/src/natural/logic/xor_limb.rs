@@ -37,19 +37,19 @@ pub fn limbs_xor_limb(limbs: &[Limb], limb: Limb) -> Vec<Limb> {
 /// where n = `limbs.len()`
 ///
 /// # Panics
-/// Panics if `out_limbs` is shorter than `in_limbs` or if `in_limbs` is empty.
+/// Panics if `out` is shorter than `in_limbs` or if `in_limbs` is empty.
 ///
 /// # Example
 /// ```
 /// use malachite_nz::natural::logic::xor_limb::limbs_xor_limb_to_out;
 ///
-/// let mut out_limbs = vec![0, 0, 0];
-/// limbs_xor_limb_to_out(&mut out_limbs, &[123, 456], 789);
-/// assert_eq!(out_limbs, &[878, 456, 0]);
+/// let mut out = vec![0, 0, 0];
+/// limbs_xor_limb_to_out(&mut out, &[123, 456], 789);
+/// assert_eq!(out, &[878, 456, 0]);
 /// ```
-pub fn limbs_xor_limb_to_out(out_limbs: &mut [Limb], in_limbs: &[Limb], limb: Limb) {
-    out_limbs[..in_limbs.len()].copy_from_slice(in_limbs);
-    limbs_xor_limb_in_place(out_limbs, limb);
+pub fn limbs_xor_limb_to_out(out: &mut [Limb], in_limbs: &[Limb], limb: Limb) {
+    out[..in_limbs.len()].copy_from_slice(in_limbs);
+    limbs_xor_limb_in_place(out, limb);
 }
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the

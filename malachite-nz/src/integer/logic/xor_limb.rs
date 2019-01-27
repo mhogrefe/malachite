@@ -75,11 +75,11 @@ pub fn limbs_neg_xor_limb(limbs: &[Limb], limb: Limb) -> Vec<Limb> {
 ///     true);
 /// assert_eq!(limbs, &[0, 0, 0, 10]);
 /// ```
-pub fn limbs_neg_xor_limb_to_out(out_limbs: &mut [Limb], in_limbs: &[Limb], limb: Limb) -> bool {
+pub fn limbs_neg_xor_limb_to_out(out: &mut [Limb], in_limbs: &[Limb], limb: Limb) -> bool {
     let len = in_limbs.len();
-    assert!(out_limbs.len() >= len);
+    assert!(out.len() >= len);
     if limb == 0 {
-        out_limbs[..len].copy_from_slice(in_limbs);
+        out[..len].copy_from_slice(in_limbs);
         return false;
     }
     let head = in_limbs[0];
@@ -87,16 +87,16 @@ pub fn limbs_neg_xor_limb_to_out(out_limbs: &mut [Limb], in_limbs: &[Limb], limb
     if head != 0 {
         let head = head.wrapping_neg() ^ limb;
         if head == 0 {
-            out_limbs[0] = 0;
-            limbs_add_limb_to_out(&mut out_limbs[1..len], tail, 1)
+            out[0] = 0;
+            limbs_add_limb_to_out(&mut out[1..len], tail, 1)
         } else {
-            out_limbs[0] = head.wrapping_neg();
-            out_limbs[1..len].copy_from_slice(tail);
+            out[0] = head.wrapping_neg();
+            out[1..len].copy_from_slice(tail);
             false
         }
     } else {
-        out_limbs[0] = limb.wrapping_neg();
-        limbs_sub_limb_to_out(&mut out_limbs[1..len], tail, 1);
+        out[0] = limb.wrapping_neg();
+        limbs_sub_limb_to_out(&mut out[1..len], tail, 1);
         false
     }
 }

@@ -57,7 +57,7 @@ pub fn limbs_neg_or_limb(limbs: &[Limb], limb: Limb) -> Vec<Limb> {
 /// where n = `in_limbs.len()`
 ///
 /// # Panics
-/// May panic if `in_limbs` is empty or only contains zeros, or if `out_limbs` is shorter than
+/// May panic if `in_limbs` is empty or only contains zeros, or if `out` is shorter than
 /// `in_limbs`.
 ///
 /// # Example
@@ -72,24 +72,24 @@ pub fn limbs_neg_or_limb(limbs: &[Limb], limb: Limb) -> Vec<Limb> {
 /// limbs_neg_or_limb_to_out(&mut limbs, &[0, 0, 456], 789);
 /// assert_eq!(limbs, &[0xffff_fceb, 0xffff_ffff, 455, 0]);
 /// ```
-pub fn limbs_neg_or_limb_to_out(out_limbs: &mut [Limb], in_limbs: &[Limb], limb: Limb) {
+pub fn limbs_neg_or_limb_to_out(out: &mut [Limb], in_limbs: &[Limb], limb: Limb) {
     let len = in_limbs.len();
-    assert!(out_limbs.len() >= len);
+    assert!(out.len() >= len);
     if limb == 0 {
-        out_limbs[..len].copy_from_slice(in_limbs);
+        out[..len].copy_from_slice(in_limbs);
         return;
     }
     let i = limbs_leading_zero_limbs(in_limbs);
     if i == 0 {
-        out_limbs[0] = (in_limbs[0].wrapping_neg() | limb).wrapping_neg();
-        out_limbs[1..len].copy_from_slice(&in_limbs[1..]);
+        out[0] = (in_limbs[0].wrapping_neg() | limb).wrapping_neg();
+        out[1..len].copy_from_slice(&in_limbs[1..]);
     } else {
-        out_limbs[0] = limb.wrapping_neg();
-        for x in out_limbs[1..i].iter_mut() {
+        out[0] = limb.wrapping_neg();
+        for x in out[1..i].iter_mut() {
             *x = Limb::MAX;
         }
-        out_limbs[i] = in_limbs[i] - 1;
-        out_limbs[i + 1..len].copy_from_slice(&in_limbs[i + 1..]);
+        out[i] = in_limbs[i] - 1;
+        out[i + 1..len].copy_from_slice(&in_limbs[i + 1..]);
     }
 }
 

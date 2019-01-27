@@ -172,16 +172,16 @@ fn limbs_xor_limb_properties() {
 fn limbs_xor_limb_to_out_properties() {
     test_properties(
         triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_2,
-        |&(ref out_limbs, ref in_limbs, limb)| {
-            let mut out_limbs = out_limbs.to_vec();
-            let old_out_limbs = out_limbs.clone();
-            limbs_xor_limb_to_out(&mut out_limbs, in_limbs, limb);
+        |&(ref out, ref in_limbs, limb)| {
+            let mut out = out.to_vec();
+            let old_out = out.clone();
+            limbs_xor_limb_to_out(&mut out, in_limbs, limb);
             let len = in_limbs.len();
             assert_eq!(
-                Natural::from_limbs_asc(&out_limbs[..len]),
+                Natural::from_limbs_asc(&out[..len]),
                 Natural::from_limbs_asc(in_limbs) ^ limb
             );
-            assert_eq!(&out_limbs[len..], &old_out_limbs[len..]);
+            assert_eq!(&out[len..], &old_out[len..]);
         },
     );
 }

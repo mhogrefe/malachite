@@ -141,21 +141,21 @@ fn limbs_shl_properties() {
 fn limbs_shl_to_out_properties() {
     test_properties(
         triples_of_unsigned_vec_unsigned_vec_and_limb_var_5,
-        |&(ref out_limbs, ref in_limbs, bits)| {
-            let mut out_limbs = out_limbs.to_vec();
-            let old_out_limbs = out_limbs.clone();
-            let carry = limbs_shl_to_out(&mut out_limbs, in_limbs, bits);
+        |&(ref out, ref in_limbs, bits)| {
+            let mut out = out.to_vec();
+            let old_out = out.clone();
+            let carry = limbs_shl_to_out(&mut out, in_limbs, bits);
             let n = Natural::from_limbs_asc(in_limbs) << bits;
             let len = in_limbs.len();
             let mut limbs = n.into_limbs_asc();
             assert_eq!(carry != 0, limbs.len() == len + 1);
-            let mut actual_limbs = out_limbs[..len].to_vec();
+            let mut actual_limbs = out[..len].to_vec();
             if carry != 0 {
                 actual_limbs.push(carry);
             }
             limbs.resize(actual_limbs.len(), 0);
             assert_eq!(limbs, actual_limbs);
-            assert_eq!(&out_limbs[len..], &old_out_limbs[len..]);
+            assert_eq!(&out[len..], &old_out[len..]);
         },
     );
 }

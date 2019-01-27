@@ -36,7 +36,7 @@ pub fn limbs_and(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 /// where n = `xs.len()` = `ys.len()`
 ///
 /// # Panics
-/// Panics if `xs` and `ys` have different lengths or if `out_limbs` is too short.
+/// Panics if `xs` and `ys` have different lengths or if `out` is too short.
 ///
 /// # Example
 /// ```
@@ -50,12 +50,12 @@ pub fn limbs_and(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 /// limbs_and_same_length_to_out(&mut out, &[100, 101, 102], &[102, 101, 100]);
 /// assert_eq!(out, &[100, 101, 100, 10]);
 /// ```
-pub fn limbs_and_same_length_to_out(out_limbs: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
+pub fn limbs_and_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
     let len = xs.len();
     assert_eq!(len, ys.len());
-    assert!(out_limbs.len() >= len);
+    assert!(out.len() >= len);
     for i in 0..xs.len() {
-        out_limbs[i] = xs[i] & ys[i];
+        out[i] = xs[i] & ys[i];
     }
 }
 
@@ -70,7 +70,7 @@ pub fn limbs_and_same_length_to_out(out_limbs: &mut [Limb], xs: &[Limb], ys: &[L
 /// where n = max(`xs.len()`, `ys.len()`)
 ///
 /// # Panics
-/// Panics if `out_limbs` is too short.
+/// Panics if `out` is too short.
 ///
 /// # Example
 /// ```
@@ -84,17 +84,17 @@ pub fn limbs_and_same_length_to_out(out_limbs: &mut [Limb], xs: &[Limb], ys: &[L
 /// limbs_and_to_out(&mut out, &[100, 101, 102], &[102, 101, 100]);
 /// assert_eq!(out, &[100, 101, 100, 10]);
 /// ```
-pub fn limbs_and_to_out(out_limbs: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
+pub fn limbs_and_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
     let xs_len = xs.len();
     let ys_len = ys.len();
     if xs_len >= ys_len {
-        assert!(out_limbs.len() >= xs_len);
-        limbs_and_same_length_to_out(out_limbs, &xs[..ys_len], ys);
-        limbs_set_zero(&mut out_limbs[ys_len..xs_len]);
+        assert!(out.len() >= xs_len);
+        limbs_and_same_length_to_out(out, &xs[..ys_len], ys);
+        limbs_set_zero(&mut out[ys_len..xs_len]);
     } else {
-        assert!(out_limbs.len() >= ys_len);
-        limbs_and_same_length_to_out(out_limbs, xs, &ys[..xs_len]);
-        limbs_set_zero(&mut out_limbs[xs_len..ys_len]);
+        assert!(out.len() >= ys_len);
+        limbs_and_same_length_to_out(out, xs, &ys[..xs_len]);
+        limbs_set_zero(&mut out[xs_len..ys_len]);
     }
 }
 

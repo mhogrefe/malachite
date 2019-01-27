@@ -84,7 +84,7 @@ pub fn limbs_or_pos_neg(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 /// where n = `xs.len() + ys.len()`
 ///
 /// # Panics
-/// Panics if `xs` or `ys` are empty or contain only zeros, or if `out_limbs` is shorter than `ys`.
+/// Panics if `xs` or `ys` are empty or contain only zeros, or if `out` is shorter than `ys`.
 ///
 /// # Example
 /// ```
@@ -98,48 +98,48 @@ pub fn limbs_or_pos_neg(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 /// limbs_or_pos_neg_to_out(&mut result, &[1, 2], &[100, 200, 300]);
 /// assert_eq!(result, &[99, 200, 300, 10]);
 /// ```
-pub fn limbs_or_pos_neg_to_out(out_limbs: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
+pub fn limbs_or_pos_neg_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
     let xs_len = xs.len();
     let ys_len = ys.len();
-    assert!(out_limbs.len() >= ys_len);
+    assert!(out.len() >= ys_len);
     let x_i = limbs_leading_zero_limbs(xs);
     let y_i = limbs_leading_zero_limbs(ys);
     assert!(x_i < xs_len);
     assert!(y_i < ys_len);
     if y_i >= xs_len {
-        limbs_set_zero(&mut out_limbs[..x_i]);
-        out_limbs[x_i] = xs[x_i].wrapping_neg();
-        limbs_not_to_out(&mut out_limbs[x_i + 1..xs_len], &xs[x_i + 1..]);
-        for x in out_limbs[xs_len..y_i].iter_mut() {
+        limbs_set_zero(&mut out[..x_i]);
+        out[x_i] = xs[x_i].wrapping_neg();
+        limbs_not_to_out(&mut out[x_i + 1..xs_len], &xs[x_i + 1..]);
+        for x in out[xs_len..y_i].iter_mut() {
             *x = Limb::MAX;
         }
-        out_limbs[y_i] = ys[y_i] - 1;
-        out_limbs[y_i + 1..ys_len].copy_from_slice(&ys[y_i + 1..]);
+        out[y_i] = ys[y_i] - 1;
+        out[y_i + 1..ys_len].copy_from_slice(&ys[y_i + 1..]);
         return;
     } else if x_i >= ys_len {
-        out_limbs[..ys_len].copy_from_slice(ys);
+        out[..ys_len].copy_from_slice(ys);
         return;
     }
     let (min_i, max_i) = if x_i <= y_i { (x_i, y_i) } else { (y_i, x_i) };
-    limbs_set_zero(&mut out_limbs[..min_i]);
+    limbs_set_zero(&mut out[..min_i]);
     if x_i == y_i {
-        out_limbs[x_i] = (!xs[x_i] & (ys[y_i] - 1)) + 1;
+        out[x_i] = (!xs[x_i] & (ys[y_i] - 1)) + 1;
     } else if x_i > y_i {
-        out_limbs[y_i..x_i].copy_from_slice(&ys[y_i..x_i]);
-        out_limbs[x_i] = !xs[x_i] & ys[x_i];
+        out[y_i..x_i].copy_from_slice(&ys[y_i..x_i]);
+        out[x_i] = !xs[x_i] & ys[x_i];
     } else {
-        out_limbs[x_i] = xs[x_i].wrapping_neg();
-        limbs_not_to_out(&mut out_limbs[x_i + 1..y_i], &xs[x_i + 1..y_i]);
-        out_limbs[y_i] = !xs[y_i] & (ys[y_i] - 1);
+        out[x_i] = xs[x_i].wrapping_neg();
+        limbs_not_to_out(&mut out[x_i + 1..y_i], &xs[x_i + 1..y_i]);
+        out[y_i] = !xs[y_i] & (ys[y_i] - 1);
     };
-    for (out, (x, y)) in out_limbs[max_i + 1..]
+    for (out, (x, y)) in out[max_i + 1..]
         .iter_mut()
         .zip(xs[max_i + 1..].iter().zip(ys[max_i + 1..].iter()))
     {
         *out = !x & y;
     }
     if xs_len < ys_len {
-        out_limbs[xs_len..ys_len].copy_from_slice(&ys[xs_len..]);
+        out[xs_len..ys_len].copy_from_slice(&ys[xs_len..]);
     }
 }
 

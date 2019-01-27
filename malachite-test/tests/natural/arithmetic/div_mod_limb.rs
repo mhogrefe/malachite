@@ -579,15 +579,15 @@ fn limbs_div_limb_mod_properties() {
 fn limbs_div_limb_to_out_mod_properties() {
     test_properties(
         triples_of_unsigned_vec_unsigned_vec_and_positive_unsigned_var_1,
-        |&(ref out_limbs, ref in_limbs, limb)| {
-            let mut out_limbs = out_limbs.to_vec();
-            let old_out_limbs = out_limbs.clone();
-            let remainder = limbs_div_limb_to_out_mod(&mut out_limbs, in_limbs, limb);
+        |&(ref out, ref in_limbs, limb)| {
+            let mut out = out.to_vec();
+            let old_out = out.clone();
+            let remainder = limbs_div_limb_to_out_mod(&mut out, in_limbs, limb);
             let (quotient, remainder_alt) = Natural::from_limbs_asc(in_limbs).div_mod(limb);
             assert_eq!(remainder, remainder_alt);
             let len = in_limbs.len();
-            assert_eq!(Natural::from_limbs_asc(&out_limbs[..len]), quotient);
-            assert_eq!(&out_limbs[len..], &old_out_limbs[len..]);
+            assert_eq!(Natural::from_limbs_asc(&out[..len]), quotient);
+            assert_eq!(&out[len..], &old_out[len..]);
         },
     );
 }

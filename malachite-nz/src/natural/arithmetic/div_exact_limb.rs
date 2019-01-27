@@ -116,25 +116,25 @@ pub fn limbs_div_exact_limb(limbs: &[Limb], divisor: Limb) -> Vec<Limb> {
 /// where n = `limbs.len()`
 ///
 /// # Panics
-/// Panics if `out_limbs` is shorter than `in_limbs`, `in_limbs` is empty, or if `divisor` is zero.
+/// Panics if `out` is shorter than `in_limbs`, `in_limbs` is empty, or if `divisor` is zero.
 ///
 /// # Example
 /// ```
 /// use malachite_nz::natural::arithmetic::div_exact_limb::limbs_div_exact_limb_to_out;
 ///
-/// let mut out_limbs = vec![10, 10, 10, 10];
-/// limbs_div_exact_limb_to_out(&mut out_limbs, &[6, 7], 2);
-/// assert_eq!(out_limbs, &[2_147_483_651, 3, 10, 10]);
+/// let mut out = vec![10, 10, 10, 10];
+/// limbs_div_exact_limb_to_out(&mut out, &[6, 7], 2);
+/// assert_eq!(out, &[2_147_483_651, 3, 10, 10]);
 ///
-/// let mut out_limbs = vec![10, 10, 10, 10];
-/// limbs_div_exact_limb_to_out(&mut out_limbs, &[0xffff_ffff, 0xffff_ffff], 3);
-/// assert_eq!(out_limbs, &[0x5555_5555, 0x5555_5555, 10, 10]);
+/// let mut out = vec![10, 10, 10, 10];
+/// limbs_div_exact_limb_to_out(&mut out, &[0xffff_ffff, 0xffff_ffff], 3);
+/// assert_eq!(out, &[0x5555_5555, 0x5555_5555, 10, 10]);
 /// ```
-pub fn limbs_div_exact_limb_to_out(out_limbs: &mut [Limb], in_limbs: &[Limb], divisor: Limb) {
+pub fn limbs_div_exact_limb_to_out(out: &mut [Limb], in_limbs: &[Limb], divisor: Limb) {
     assert_ne!(divisor, 0);
     let len = in_limbs.len();
     assert_ne!(len, 0);
-    assert!(out_limbs.len() >= len);
+    assert!(out.len() >= len);
     if divisor.even() {
         let shift = divisor.trailing_zeros();
         let shift_complement = Limb::WIDTH - shift;
@@ -148,20 +148,20 @@ pub fn limbs_div_exact_limb_to_out(out_limbs: &mut [Limb], in_limbs: &[Limb], di
             previous_in_limb = in_limb;
             let (difference, carry) = shifted_in_limb.overflowing_sub(upper_half);
             let out_limb = difference.wrapping_mul(inverse);
-            out_limbs[i - 1] = out_limb;
+            out[i - 1] = out_limb;
             upper_half =
                 (DoubleLimb::from(out_limb) * DoubleLimb::from(shifted_divisor)).upper_half();
             if carry {
                 upper_half += 1;
             }
         }
-        out_limbs[len - 1] = (previous_in_limb >> shift)
+        out[len - 1] = (previous_in_limb >> shift)
             .wrapping_sub(upper_half)
             .wrapping_mul(inverse);
     } else {
         let inverse = limbs_invert_limb(divisor);
         let mut out_limb = in_limbs[0].wrapping_mul(inverse);
-        out_limbs[0] = out_limb;
+        out[0] = out_limb;
         let mut previous_carry = false;
         for i in 1..len {
             let mut upper_half =
@@ -172,7 +172,7 @@ pub fn limbs_div_exact_limb_to_out(out_limbs: &mut [Limb], in_limbs: &[Limb], di
             let (difference, carry) = in_limbs[i].overflowing_sub(upper_half);
             previous_carry = carry;
             out_limb = difference.wrapping_mul(inverse);
-            out_limbs[i] = out_limb;
+            out[i] = out_limb;
         }
     }
 }
@@ -293,53 +293,53 @@ pub fn limbs_div_exact_3(limbs: &[Limb]) -> Vec<Limb> {
 /// where n = `limbs.len()`
 ///
 /// # Panics
-/// Panics if `out_limbs` is shorter than `in_limbs` or if `in_limbs` is empty.
+/// Panics if `out` is shorter than `in_limbs` or if `in_limbs` is empty.
 ///
 /// # Example
 /// ```
 /// use malachite_nz::natural::arithmetic::div_exact_limb::limbs_div_exact_3_to_out;
 ///
-/// let mut out_limbs = vec![10, 10, 10, 10];
-/// limbs_div_exact_3_to_out(&mut out_limbs, &[8, 7]);
-/// assert_eq!(out_limbs, &[1_431_655_768, 2, 10, 10]);
+/// let mut out = vec![10, 10, 10, 10];
+/// limbs_div_exact_3_to_out(&mut out, &[8, 7]);
+/// assert_eq!(out, &[1_431_655_768, 2, 10, 10]);
 ///
-/// let mut out_limbs = vec![10, 10, 10, 10];
-/// limbs_div_exact_3_to_out(&mut out_limbs, &[0xffff_ffff, 0xffff_ffff]);
-/// assert_eq!(out_limbs, &[0x5555_5555, 0x5555_5555, 10, 10]);
+/// let mut out = vec![10, 10, 10, 10];
+/// limbs_div_exact_3_to_out(&mut out, &[0xffff_ffff, 0xffff_ffff]);
+/// assert_eq!(out, &[0x5555_5555, 0x5555_5555, 10, 10]);
 /// ```
-pub fn limbs_div_exact_3_to_out(out_limbs: &mut [Limb], in_limbs: &[Limb]) {
+pub fn limbs_div_exact_3_to_out(out: &mut [Limb], in_limbs: &[Limb]) {
     const MAX_OVER_3_U64: DoubleLimb = MAX_OVER_3 as DoubleLimb;
     let len = in_limbs.len();
     assert_ne!(len, 0);
-    assert!(out_limbs.len() >= len);
+    assert!(out.len() >= len);
     let last_index = len - 1;
     let mut out_limb = 0;
     for i in 0..last_index {
         let (upper, lower) = (DoubleLimb::from(in_limbs[i]) * MAX_OVER_3_U64).split_in_half();
         let carry = out_limb < lower;
         out_limb.wrapping_sub_assign(lower);
-        out_limbs[i] = out_limb;
+        out[i] = out_limb;
         out_limb.wrapping_sub_assign(upper);
         if carry {
             out_limb.wrapping_sub_assign(1);
         }
     }
     let lower = (DoubleLimb::from(in_limbs[last_index]) * MAX_OVER_3_U64).lower_half();
-    out_limbs[last_index] = out_limb.wrapping_sub(lower);
+    out[last_index] = out_limb.wrapping_sub(lower);
 }
 
 // Benchmarks show that this algorithm is always worse than the default.
-pub fn _limbs_div_exact_3_to_out_alt(out_limbs: &mut [Limb], in_limbs: &[Limb]) {
+pub fn _limbs_div_exact_3_to_out_alt(out: &mut [Limb], in_limbs: &[Limb]) {
     let len = in_limbs.len();
     assert_ne!(len, 0);
-    assert!(out_limbs.len() >= len);
+    assert!(out.len() >= len);
     let last_index = len - 1;
     let mut big_carry = 0;
     for i in 0..last_index {
         let (difference, carry) = in_limbs[i].overflowing_sub(big_carry);
         big_carry = if carry { 1 } else { 0 };
         let out_limb = difference.wrapping_mul(MODLIMB_INVERSE_3);
-        out_limbs[i] = out_limb;
+        out[i] = out_limb;
         if out_limb >= CEIL_MAX_OVER_3 {
             big_carry += 1;
             if out_limb >= CEIL_2_MAX_OVER_3 {
@@ -347,7 +347,7 @@ pub fn _limbs_div_exact_3_to_out_alt(out_limbs: &mut [Limb], in_limbs: &[Limb]) 
             }
         }
     }
-    out_limbs[last_index] = in_limbs[last_index]
+    out[last_index] = in_limbs[last_index]
         .wrapping_sub(big_carry)
         .wrapping_mul(MODLIMB_INVERSE_3);
 }

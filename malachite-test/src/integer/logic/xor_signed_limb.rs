@@ -102,16 +102,16 @@ fn demo_limbs_pos_xor_limb_neg(gm: GenerationMode, limit: usize) {
 }
 
 fn demo_limbs_pos_xor_limb_neg_to_out(gm: GenerationMode, limit: usize) {
-    for (out_limbs, in_limbs, limb) in
+    for (out, in_limbs, limb) in
         triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_2(gm).take(limit)
     {
-        let mut out_limbs = out_limbs.to_vec();
-        let mut out_limbs_old = out_limbs.clone();
-        let carry = limbs_pos_xor_limb_neg_to_out(&mut out_limbs, &in_limbs, limb);
+        let mut out = out.to_vec();
+        let mut out_old = out.clone();
+        let carry = limbs_pos_xor_limb_neg_to_out(&mut out, &in_limbs, limb);
         println!(
-            "out_limbs := {:?}; limbs_pos_xor_limb_neg_to_out(&mut out_limbs, {:?}, {}) = {}; \
-             out_limbs = {:?}",
-            out_limbs_old, in_limbs, limb, carry, out_limbs
+            "out := {:?}; limbs_pos_xor_limb_neg_to_out(&mut out, {:?}, {}) = {}; \
+             out = {:?}",
+            out_old, in_limbs, limb, carry, out
         );
     }
 }
@@ -153,16 +153,16 @@ fn demo_limbs_neg_xor_limb_neg(gm: GenerationMode, limit: usize) {
 }
 
 fn demo_limbs_neg_xor_limb_neg_to_out(gm: GenerationMode, limit: usize) {
-    for (out_limbs, in_limbs, limb) in
+    for (out, in_limbs, limb) in
         triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_3(gm).take(limit)
     {
-        let mut out_limbs = out_limbs.to_vec();
-        let mut out_limbs_old = out_limbs.clone();
-        limbs_neg_xor_limb_neg_to_out(&mut out_limbs, &in_limbs, limb);
+        let mut out = out.to_vec();
+        let mut out_old = out.clone();
+        limbs_neg_xor_limb_neg_to_out(&mut out, &in_limbs, limb);
         println!(
-            "out_limbs := {:?}; limbs_neg_xor_limb_neg_to_out(&mut out_limbs, {:?}, {}) = \
-             out_limbs = {:?}",
-            out_limbs_old, in_limbs, limb, out_limbs
+            "out := {:?}; limbs_neg_xor_limb_neg_to_out(&mut out, {:?}, {}) = \
+             out = {:?}",
+            out_old, in_limbs, limb, out
         );
     }
 }
@@ -243,12 +243,8 @@ fn benchmark_limbs_pos_xor_limb_neg_to_out(gm: GenerationMode, limit: usize, fil
         "in_limbs.len()",
         &mut [(
             "malachite",
-            &mut (|(mut out_limbs, in_limbs, limb)| {
-                no_out!(limbs_pos_xor_limb_neg_to_out(
-                    &mut out_limbs,
-                    &in_limbs,
-                    limb
-                ))
+            &mut (|(mut out, in_limbs, limb)| {
+                no_out!(limbs_pos_xor_limb_neg_to_out(&mut out, &in_limbs, limb))
             }),
         )],
     );
@@ -327,12 +323,8 @@ fn benchmark_limbs_neg_xor_limb_neg_to_out(gm: GenerationMode, limit: usize, fil
         "in_limbs.len()",
         &mut [(
             "malachite",
-            &mut (|(mut out_limbs, in_limbs, limb)| {
-                no_out!(limbs_neg_xor_limb_neg_to_out(
-                    &mut out_limbs,
-                    &in_limbs,
-                    limb
-                ))
+            &mut (|(mut out, in_limbs, limb)| {
+                no_out!(limbs_neg_xor_limb_neg_to_out(&mut out, &in_limbs, limb))
             }),
         )],
     );

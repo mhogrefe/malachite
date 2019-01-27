@@ -554,20 +554,17 @@ fn limbs_xor_pos_neg_properties() {
 
 #[test]
 fn limbs_xor_pos_neg_to_out_properties() {
-    test_properties(
-        triples_of_limb_vec_var_7,
-        |&(ref out_limbs, ref xs, ref ys)| {
-            let mut out_limbs = out_limbs.to_vec();
-            let out_limbs_old = out_limbs.clone();
-            limbs_xor_pos_neg_to_out(&mut out_limbs, xs, ys);
-            let len = max(xs.len(), ys.len());
-            assert_eq!(
-                -Natural::from_limbs_asc(&out_limbs[..len]),
-                Integer::from(Natural::from_limbs_asc(xs)) ^ -Natural::from_limbs_asc(ys)
-            );
-            assert_eq!(&out_limbs[len..], &out_limbs_old[len..]);
-        },
-    );
+    test_properties(triples_of_limb_vec_var_7, |&(ref out, ref xs, ref ys)| {
+        let mut out = out.to_vec();
+        let out_old = out.clone();
+        limbs_xor_pos_neg_to_out(&mut out, xs, ys);
+        let len = max(xs.len(), ys.len());
+        assert_eq!(
+            -Natural::from_limbs_asc(&out[..len]),
+            Integer::from(Natural::from_limbs_asc(xs)) ^ -Natural::from_limbs_asc(ys)
+        );
+        assert_eq!(&out[len..], &out_old[len..]);
+    });
 }
 
 #[test]

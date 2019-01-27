@@ -57,7 +57,7 @@ pub fn limbs_pos_xor_limb_neg(limbs: &[Limb], limb: Limb) -> Vec<Limb> {
 /// where n = `in_limbs.len()`
 ///
 /// # Panics
-/// Panics if `in_limbs` is empty or if `out_limbs` is shorter than `in_limbs`.
+/// Panics if `in_limbs` is empty or if `out` is shorter than `in_limbs`.
 ///
 /// # Example
 /// ```
@@ -75,20 +75,16 @@ pub fn limbs_pos_xor_limb_neg(limbs: &[Limb], limb: Limb) -> Vec<Limb> {
 /// assert_eq!(limbs_pos_xor_limb_neg_to_out(&mut result, &[2, 0xffff_ffff], 2), true);
 /// assert_eq!(result, &[0, 0, 10, 10]);
 /// ```
-pub fn limbs_pos_xor_limb_neg_to_out(
-    out_limbs: &mut [Limb],
-    in_limbs: &[Limb],
-    limb: Limb,
-) -> bool {
+pub fn limbs_pos_xor_limb_neg_to_out(out: &mut [Limb], in_limbs: &[Limb], limb: Limb) -> bool {
     let len = in_limbs.len();
-    assert!(out_limbs.len() >= len);
+    assert!(out.len() >= len);
     let lowest_limb = in_limbs[0] ^ limb;
     if lowest_limb == 0 {
-        out_limbs[0] = 0;
-        limbs_add_limb_to_out(&mut out_limbs[1..len], &in_limbs[1..], 1)
+        out[0] = 0;
+        limbs_add_limb_to_out(&mut out[1..len], &in_limbs[1..], 1)
     } else {
-        out_limbs[0] = lowest_limb.wrapping_neg();
-        out_limbs[1..len].copy_from_slice(&in_limbs[1..]);
+        out[0] = lowest_limb.wrapping_neg();
+        out[1..len].copy_from_slice(&in_limbs[1..]);
         false
     }
 }
@@ -218,7 +214,7 @@ pub fn limbs_neg_xor_limb_neg(limbs: &[Limb], limb: Limb) -> Vec<Limb> {
 /// where n = `in_limbs.len()`
 ///
 /// # Panics
-/// Panics if `in_limbs` is empty or only contains zeros, or if `out_limbs` is shorter than
+/// Panics if `in_limbs` is empty or only contains zeros, or if `out` is shorter than
 /// `in_limbs`.
 ///
 /// # Example
@@ -233,19 +229,15 @@ pub fn limbs_neg_xor_limb_neg(limbs: &[Limb], limb: Limb) -> Vec<Limb> {
 /// limbs_neg_xor_limb_neg_to_out(&mut result, &[1, 2, 3], 4);
 /// assert_eq!(result, &[4294967291, 2, 3, 10]);
 /// ```
-pub fn limbs_neg_xor_limb_neg_to_out(out_limbs: &mut [Limb], in_limbs: &[Limb], limb: Limb) {
+pub fn limbs_neg_xor_limb_neg_to_out(out: &mut [Limb], in_limbs: &[Limb], limb: Limb) {
     let len = in_limbs.len();
-    assert!(out_limbs.len() >= len);
+    assert!(out.len() >= len);
     if in_limbs[0] == 0 {
-        out_limbs[0] = limb;
-        assert!(!limbs_sub_limb_to_out(
-            &mut out_limbs[1..len],
-            &in_limbs[1..],
-            1
-        ));
+        out[0] = limb;
+        assert!(!limbs_sub_limb_to_out(&mut out[1..len], &in_limbs[1..], 1));
     } else {
-        out_limbs[0] = in_limbs[0].wrapping_neg() ^ limb;
-        out_limbs[1..len].copy_from_slice(&in_limbs[1..]);
+        out[0] = in_limbs[0].wrapping_neg() ^ limb;
+        out[1..len].copy_from_slice(&in_limbs[1..]);
     }
 }
 

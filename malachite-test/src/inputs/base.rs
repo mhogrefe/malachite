@@ -1158,10 +1158,8 @@ pub fn pairs_of_limb_vec_var_2<T: PrimitiveUnsigned + Rand>(
 pub fn pairs_of_limb_vec_var_3(gm: GenerationMode) -> Box<Iterator<Item = (Vec<Limb>, Vec<Limb>)>> {
     Box::new(
         pairs_of_unsigned_vec(gm)
-            .map(|(out_limbs, in_limbs)| (out_limbs, limbs_mul_limb(&in_limbs, 3)))
-            .filter(|(ref out_limbs, ref in_limbs)| {
-                out_limbs.len() >= in_limbs.len() && in_limbs.len() > 0
-            }),
+            .map(|(out, in_limbs)| (out, limbs_mul_limb(&in_limbs, 3)))
+            .filter(|(ref out, ref in_limbs)| out.len() >= in_limbs.len() && in_limbs.len() > 0),
     )
 }
 
@@ -1377,113 +1375,113 @@ pub fn triples_of_unsigned_vec_min_sizes<T: PrimitiveUnsigned + Rand>(
     }
 }
 
-// All triples of `Vec<T>`, where `T` is unsigned and `out_limbs`, `xs`, and `ys` meet the
+// All triples of `Vec<T>`, where `T` is unsigned and `out`, `xs`, and `ys` meet the
 // preconditions of `_limbs_mul_greater_to_out_toom_22`.
 pub fn triples_of_unsigned_vec_var_11<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (Vec<T>, Vec<T>, Vec<T>)>> {
-    Box::new(triples_of_unsigned_vec_min_sizes(gm, 3, 3, 1).filter(
-        |&(ref out_limbs, ref xs, ref ys)| {
+    Box::new(
+        triples_of_unsigned_vec_min_sizes(gm, 3, 3, 1).filter(|&(ref out, ref xs, ref ys)| {
             xs.len() >= ys.len()
-                && out_limbs.len() >= xs.len() + ys.len()
+                && out.len() >= xs.len() + ys.len()
                 && if xs.len().even() {
                     xs.len()
                 } else {
                     xs.len() + 1
                 } < 2 * ys.len()
-        },
-    ))
+        }),
+    )
 }
 
-// All triples of `Vec<T>`, where `T` is unsigned and `out_limbs`, `xs`, and `ys` meet the
+// All triples of `Vec<T>`, where `T` is unsigned and `out`, `xs`, and `ys` meet the
 // preconditions of `_limbs_mul_greater_to_out_toom_32`.
 pub fn triples_of_unsigned_vec_var_12<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (Vec<T>, Vec<T>, Vec<T>)>> {
     Box::new(triples_of_unsigned_vec_min_sizes(gm, 10, 6, 4).filter(
-        |&(ref out_limbs, ref xs, ref ys)| {
-            out_limbs.len() >= xs.len() + ys.len()
+        |&(ref out, ref xs, ref ys)| {
+            out.len() >= xs.len() + ys.len()
                 && _limbs_mul_greater_to_out_toom_32_input_sizes_valid(xs.len(), ys.len())
         },
     ))
 }
 
-// All triples of `Vec<T>`, where `T` is unsigned and `out_limbs`, `xs`, and `ys` meet the
+// All triples of `Vec<T>`, where `T` is unsigned and `out`, `xs`, and `ys` meet the
 // preconditions of `_limbs_mul_greater_to_out_toom_33`.
 pub fn triples_of_unsigned_vec_var_13<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (Vec<T>, Vec<T>, Vec<T>)>> {
     Box::new(triples_of_unsigned_vec_min_sizes(gm, 10, 5, 5).filter(
-        |&(ref out_limbs, ref xs, ref ys)| {
-            out_limbs.len() >= xs.len() + ys.len()
+        |&(ref out, ref xs, ref ys)| {
+            out.len() >= xs.len() + ys.len()
                 && _limbs_mul_greater_to_out_toom_33_input_sizes_valid(xs.len(), ys.len())
         },
     ))
 }
 
-// All triples of `Vec<T>`, where `T` is unsigned and `out_limbs`, `xs`, and `ys` meet the
+// All triples of `Vec<T>`, where `T` is unsigned and `out`, `xs`, and `ys` meet the
 // preconditions of `_limbs_mul_greater_to_out_toom_42`.
 pub fn triples_of_unsigned_vec_var_14<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (Vec<T>, Vec<T>, Vec<T>)>> {
-    Box::new(triples_of_unsigned_vec_min_sizes(gm, 6, 4, 2).filter(
-        |&(ref out_limbs, ref xs, ref ys)| {
-            out_limbs.len() >= xs.len() + ys.len()
+    Box::new(
+        triples_of_unsigned_vec_min_sizes(gm, 6, 4, 2).filter(|&(ref out, ref xs, ref ys)| {
+            out.len() >= xs.len() + ys.len()
                 && _limbs_mul_greater_to_out_toom_42_input_sizes_valid(xs.len(), ys.len())
-        },
-    ))
+        }),
+    )
 }
 
-// All triples of `Vec<T>`, where `T` is unsigned and `out_limbs`, `xs`, and `ys` meet the
+// All triples of `Vec<T>`, where `T` is unsigned and `out`, `xs`, and `ys` meet the
 // preconditions of `_limbs_mul_greater_to_out_toom_43`.
 pub fn triples_of_unsigned_vec_var_15<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (Vec<T>, Vec<T>, Vec<T>)>> {
     Box::new(triples_of_unsigned_vec_min_sizes(gm, 19, 11, 8).filter(
-        |&(ref out_limbs, ref xs, ref ys)| {
-            out_limbs.len() >= xs.len() + ys.len()
+        |&(ref out, ref xs, ref ys)| {
+            out.len() >= xs.len() + ys.len()
                 && _limbs_mul_greater_to_out_toom_43_input_sizes_valid(xs.len(), ys.len())
         },
     ))
 }
 
-// All triples of `Vec<T>`, where `T` is unsigned and `out_limbs`, `xs`, and `ys` meet the
+// All triples of `Vec<T>`, where `T` is unsigned and `out`, `xs`, and `ys` meet the
 // preconditions of `_limbs_mul_greater_to_out_toom_44`.
 pub fn triples_of_unsigned_vec_var_16<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (Vec<T>, Vec<T>, Vec<T>)>> {
-    Box::new(triples_of_unsigned_vec_min_sizes(gm, 8, 4, 4).filter(
-        |&(ref out_limbs, ref xs, ref ys)| {
-            out_limbs.len() >= xs.len() + ys.len()
+    Box::new(
+        triples_of_unsigned_vec_min_sizes(gm, 8, 4, 4).filter(|&(ref out, ref xs, ref ys)| {
+            out.len() >= xs.len() + ys.len()
                 && _limbs_mul_greater_to_out_toom_44_input_sizes_valid(xs.len(), ys.len())
-        },
-    ))
+        }),
+    )
 }
 
-// All triples of `Vec<T>`, where `T` is unsigned and `out_limbs`, `xs`, and `ys` meet the
+// All triples of `Vec<T>`, where `T` is unsigned and `out`, `xs`, and `ys` meet the
 // preconditions of `_limbs_mul_greater_to_out_toom_52`.
 pub fn triples_of_unsigned_vec_var_17<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (Vec<T>, Vec<T>, Vec<T>)>> {
     Box::new(triples_of_unsigned_vec_min_sizes(gm, 19, 14, 5).filter(
-        |&(ref out_limbs, ref xs, ref ys)| {
-            out_limbs.len() >= xs.len() + ys.len()
+        |&(ref out, ref xs, ref ys)| {
+            out.len() >= xs.len() + ys.len()
                 && _limbs_mul_greater_to_out_toom_52_input_sizes_valid(xs.len(), ys.len())
         },
     ))
 }
 
-// All triples of `Vec<T>`, where `T` is unsigned and `out_limbs`, `xs`, and `ys` meet the
+// All triples of `Vec<T>`, where `T` is unsigned and `out`, `xs`, and `ys` meet the
 // preconditions of `_limbs_mul_greater_to_out_toom_53`.
 pub fn triples_of_unsigned_vec_var_18<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
 ) -> Box<Iterator<Item = (Vec<T>, Vec<T>, Vec<T>)>> {
-    Box::new(triples_of_unsigned_vec_min_sizes(gm, 8, 5, 3).filter(
-        |&(ref out_limbs, ref xs, ref ys)| {
-            out_limbs.len() >= xs.len() + ys.len()
+    Box::new(
+        triples_of_unsigned_vec_min_sizes(gm, 8, 5, 3).filter(|&(ref out, ref xs, ref ys)| {
+            out.len() >= xs.len() + ys.len()
                 && _limbs_mul_greater_to_out_toom_53_input_sizes_valid(xs.len(), ys.len())
-        },
-    ))
+        }),
+    )
 }
 
 pub fn quadruples_of_three_unsigned_vecs_and_bool<T: PrimitiveUnsigned + Rand>(
@@ -1868,7 +1866,7 @@ pub fn triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_1<T: PrimitiveUnsig
 ) -> Box<Iterator<Item = (Vec<T>, Vec<T>, T)>> {
     Box::new(
         triples_of_unsigned_vec_unsigned_vec_and_unsigned(gm)
-            .filter(|&(ref out_limbs, ref in_limbs, _)| out_limbs.len() >= in_limbs.len()),
+            .filter(|&(ref out, ref in_limbs, _)| out.len() >= in_limbs.len()),
     )
 }
 
@@ -1879,9 +1877,7 @@ pub fn triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_2<T: PrimitiveUnsig
 ) -> Box<Iterator<Item = (Vec<T>, Vec<T>, T)>> {
     Box::new(
         triples_of_unsigned_vec_unsigned_vec_and_unsigned(gm).filter(
-            |&(ref out_limbs, ref in_limbs, _)| {
-                !in_limbs.is_empty() && out_limbs.len() >= in_limbs.len()
-            },
+            |&(ref out, ref in_limbs, _)| !in_limbs.is_empty() && out.len() >= in_limbs.len(),
         ),
     )
 }
@@ -1893,9 +1889,7 @@ pub fn triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_3<T: PrimitiveUnsig
 ) -> Box<Iterator<Item = (Vec<T>, Vec<T>, T)>> {
     Box::new(
         triples_of_unsigned_vec_unsigned_vec_and_unsigned(gm).filter(
-            |&(ref out_limbs, ref in_limbs, _)| {
-                out_limbs.len() >= in_limbs.len() && !limbs_test_zero(in_limbs)
-            },
+            |&(ref out, ref in_limbs, _)| out.len() >= in_limbs.len() && !limbs_test_zero(in_limbs),
         ),
     )
 }
@@ -1933,7 +1927,7 @@ pub fn triples_of_unsigned_vec_unsigned_vec_and_limb_var_5<T: PrimitiveUnsigned 
 ) -> Box<Iterator<Item = (Vec<T>, Vec<T>, u32)>> {
     Box::new(
         triples_of_unsigned_vec_unsigned_vec_and_limb_var_4(gm)
-            .filter(|&(ref out_limbs, ref in_limbs, _)| out_limbs.len() >= in_limbs.len()),
+            .filter(|&(ref out, ref in_limbs, _)| out.len() >= in_limbs.len()),
     )
 }
 
@@ -1944,9 +1938,7 @@ pub fn triples_of_unsigned_vec_unsigned_vec_and_limb_var_6<T: PrimitiveUnsigned 
 ) -> Box<Iterator<Item = (Vec<T>, Vec<T>, u32)>> {
     Box::new(
         triples_of_unsigned_vec_unsigned_vec_and_limb_var_4(gm).filter(
-            |&(ref out_limbs, ref in_limbs, _)| {
-                !in_limbs.is_empty() && out_limbs.len() >= in_limbs.len()
-            },
+            |&(ref out, ref in_limbs, _)| !in_limbs.is_empty() && out.len() >= in_limbs.len(),
         ),
     )
 }
@@ -1960,9 +1952,7 @@ pub fn triples_of_unsigned_vec_unsigned_vec_and_positive_unsigned_var_1<
 ) -> Box<Iterator<Item = (Vec<T>, Vec<T>, T)>> {
     Box::new(
         triples_of_unsigned_vec_unsigned_vec_and_positive_unsigned(gm).filter(
-            |&(ref out_limbs, ref in_limbs, _)| {
-                out_limbs.len() >= in_limbs.len() && in_limbs.len() > 1
-            },
+            |&(ref out, ref in_limbs, _)| out.len() >= in_limbs.len() && in_limbs.len() > 1,
         ),
     )
 }
@@ -1975,10 +1965,8 @@ pub fn triples_of_limb_vec_limb_vec_and_positive_limb_var_2(
 ) -> Box<Iterator<Item = (Vec<Limb>, Vec<Limb>, Limb)>> {
     Box::new(
         triples_of_unsigned_vec_unsigned_vec_and_positive_unsigned(gm)
-            .map(|(out_limbs, in_limbs, limb)| (out_limbs, limbs_mul_limb(&in_limbs, limb), limb))
-            .filter(|(ref out_limbs, ref in_limbs, _)| {
-                out_limbs.len() >= in_limbs.len() && in_limbs.len() > 0
-            }),
+            .map(|(out, in_limbs, limb)| (out, limbs_mul_limb(&in_limbs, limb), limb))
+            .filter(|(ref out, ref in_limbs, _)| out.len() >= in_limbs.len() && in_limbs.len() > 0),
     )
 }
 

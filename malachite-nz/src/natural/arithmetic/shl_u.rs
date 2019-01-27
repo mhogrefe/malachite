@@ -54,30 +54,30 @@ pub fn limbs_shl(limbs: &[Limb], bits: u64) -> Vec<Limb> {
 /// where n = `limbs.len()`
 ///
 /// # Panics
-/// Panics if `out_limbs` is shorter than `in_limbs`, `bits` is 0, or `bits` is greater than 31.
+/// Panics if `out` is shorter than `in_limbs`, `bits` is 0, or `bits` is greater than 31.
 ///
 /// # Example
 /// ```
 /// use malachite_nz::natural::arithmetic::shl_u::limbs_shl_to_out;
 ///
-/// let mut out_limbs = vec![0, 0, 0];
-/// assert_eq!(limbs_shl_to_out(&mut out_limbs, &[123, 456], 1), 0);
-/// assert_eq!(out_limbs, &[246, 912, 0]);
+/// let mut out = vec![0, 0, 0];
+/// assert_eq!(limbs_shl_to_out(&mut out, &[123, 456], 1), 0);
+/// assert_eq!(out, &[246, 912, 0]);
 ///
-/// let mut out_limbs = vec![0, 0, 0];
-/// assert_eq!(limbs_shl_to_out(&mut out_limbs, &[123, 456], 31), 228);
-/// assert_eq!(out_limbs, &[2_147_483_648, 61, 0]);
+/// let mut out = vec![0, 0, 0];
+/// assert_eq!(limbs_shl_to_out(&mut out, &[123, 456], 31), 228);
+/// assert_eq!(out, &[2_147_483_648, 61, 0]);
 /// ```
-pub fn limbs_shl_to_out(out_limbs: &mut [Limb], in_limbs: &[Limb], bits: u32) -> Limb {
+pub fn limbs_shl_to_out(out: &mut [Limb], in_limbs: &[Limb], bits: u32) -> Limb {
     let len = in_limbs.len();
-    assert!(out_limbs.len() >= len);
+    assert!(out.len() >= len);
     assert_ne!(bits, 0);
     assert!(bits < Limb::WIDTH);
     let cobits = Limb::WIDTH - bits;
     let mut remaining_bits = 0;
     for i in 0..len {
         let limb = in_limbs[i];
-        out_limbs[i] = (limb << bits) | remaining_bits;
+        out[i] = (limb << bits) | remaining_bits;
         remaining_bits = limb >> cobits;
     }
     remaining_bits

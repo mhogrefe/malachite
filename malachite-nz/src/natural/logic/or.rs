@@ -69,7 +69,7 @@ pub fn limbs_or(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 /// where n = `xs.len()` = `ys.len()`
 ///
 /// # Panics
-/// Panics if `xs` and `ys` have different lengths or if `out_limbs` is too short.
+/// Panics if `xs` and `ys` have different lengths or if `out` is too short.
 ///
 /// # Example
 /// ```
@@ -83,12 +83,12 @@ pub fn limbs_or(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 /// limbs_or_same_length_to_out(limbs, &[100, 101, 102], &[102, 101, 100]);
 /// assert_eq!(limbs, &[102, 101, 102, 10]);
 /// ```
-pub fn limbs_or_same_length_to_out(out_limbs: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
+pub fn limbs_or_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
     let len = xs.len();
     assert_eq!(len, ys.len());
-    assert!(out_limbs.len() >= len);
+    assert!(out.len() >= len);
     for i in 0..xs.len() {
-        out_limbs[i] = xs[i] | ys[i];
+        out[i] = xs[i] | ys[i];
     }
 }
 
@@ -103,7 +103,7 @@ pub fn limbs_or_same_length_to_out(out_limbs: &mut [Limb], xs: &[Limb], ys: &[Li
 /// where n = max(`xs.len()`, `ys.len()`)
 ///
 /// # Panics
-/// Panics if `out_limbs` is too short.
+/// Panics if `out` is too short.
 ///
 /// # Example
 /// ```
@@ -117,17 +117,17 @@ pub fn limbs_or_same_length_to_out(out_limbs: &mut [Limb], xs: &[Limb], ys: &[Li
 /// limbs_or_to_out(limbs, &[100, 101, 102], &[102, 101, 100]);
 /// assert_eq!(limbs, &[102, 101, 102, 10]);
 /// ```
-pub fn limbs_or_to_out(out_limbs: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
+pub fn limbs_or_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
     let xs_len = xs.len();
     let ys_len = ys.len();
     if xs_len >= ys_len {
-        assert!(out_limbs.len() >= xs_len);
-        limbs_or_same_length_to_out(out_limbs, &xs[..ys_len], ys);
-        out_limbs[ys_len..xs_len].copy_from_slice(&xs[ys_len..]);
+        assert!(out.len() >= xs_len);
+        limbs_or_same_length_to_out(out, &xs[..ys_len], ys);
+        out[ys_len..xs_len].copy_from_slice(&xs[ys_len..]);
     } else {
-        assert!(out_limbs.len() >= ys_len);
-        limbs_or_same_length_to_out(out_limbs, xs, &ys[..xs_len]);
-        out_limbs[xs_len..ys_len].copy_from_slice(&ys[xs_len..]);
+        assert!(out.len() >= ys_len);
+        limbs_or_same_length_to_out(out, xs, &ys[..xs_len]);
+        out[xs_len..ys_len].copy_from_slice(&ys[xs_len..]);
     }
 }
 

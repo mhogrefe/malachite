@@ -16,10 +16,10 @@ use std::str::FromStr;
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 pub fn test_limbs_slice_clear_bit_neg() {
-    let test = |limbs: &[Limb], index: u64, out_limbs: &[Limb]| {
+    let test = |limbs: &[Limb], index: u64, out: &[Limb]| {
         let mut mut_limbs = limbs.to_vec();
         limbs_slice_clear_bit_neg(&mut mut_limbs, index);
-        assert_eq!(mut_limbs, out_limbs);
+        assert_eq!(mut_limbs, out);
     };
     test(&[3, 2, 1], 0, &[4, 2, 1]);
     test(&[0, 0, 3], 32, &[0, 0, 3]);
@@ -47,10 +47,10 @@ fn limbs_slice_clear_bit_fail_2() {
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 pub fn test_limbs_vec_clear_bit_neg() {
-    let test = |limbs: &[Limb], index: u64, out_limbs: &[Limb]| {
+    let test = |limbs: &[Limb], index: u64, out: &[Limb]| {
         let mut mut_limbs = limbs.to_vec();
         limbs_vec_clear_bit_neg(&mut mut_limbs, index);
-        assert_eq!(mut_limbs, out_limbs);
+        assert_eq!(mut_limbs, out);
     };
     test(&[3, 2, 1], 0, &[4, 2, 1]);
     test(&[0, 0, 3], 32, &[0, 0, 3]);

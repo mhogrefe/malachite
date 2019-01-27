@@ -119,7 +119,7 @@ pub fn limbs_xor_pos_neg(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 /// where n = `xs.len() + ys.len()`
 ///
 /// # Panics
-/// Panics if `xs` or `ys` are empty or contain only zeros, or if `out_limbs` is shorter than the
+/// Panics if `xs` or `ys` are empty or contain only zeros, or if `out` is shorter than the
 /// longer of `xs` and `ys`.
 ///
 /// # Example
@@ -134,58 +134,52 @@ pub fn limbs_xor_pos_neg(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 /// limbs_xor_pos_neg_to_out(&mut result, &[1, 2, 5], &[100, 200]);
 /// assert_eq!(result, &[99, 202, 5, 10]);
 /// ```
-pub fn limbs_xor_pos_neg_to_out(out_limbs: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
+pub fn limbs_xor_pos_neg_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
     let xs_len = xs.len();
     let ys_len = ys.len();
-    assert!(out_limbs.len() >= xs_len);
-    assert!(out_limbs.len() >= ys_len);
+    assert!(out.len() >= xs_len);
+    assert!(out.len() >= ys_len);
     let x_i = limbs_leading_zero_limbs(xs);
     let y_i = limbs_leading_zero_limbs(ys);
     assert!(x_i < xs_len);
     assert!(y_i < ys_len);
     if y_i >= xs_len {
-        limbs_set_zero(&mut out_limbs[..x_i]);
-        out_limbs[x_i] = xs[x_i].wrapping_neg();
-        for (out, &x) in out_limbs[x_i + 1..xs_len]
-            .iter_mut()
-            .zip(xs[x_i + 1..].iter())
-        {
+        limbs_set_zero(&mut out[..x_i]);
+        out[x_i] = xs[x_i].wrapping_neg();
+        for (out, &x) in out[x_i + 1..xs_len].iter_mut().zip(xs[x_i + 1..].iter()) {
             *out = !x;
         }
-        for out in out_limbs[xs_len..y_i].iter_mut() {
+        for out in out[xs_len..y_i].iter_mut() {
             *out = Limb::MAX;
         }
-        out_limbs[y_i] = ys[y_i] - 1;
-        out_limbs[y_i + 1..ys_len].copy_from_slice(&ys[y_i + 1..]);
+        out[y_i] = ys[y_i] - 1;
+        out[y_i + 1..ys_len].copy_from_slice(&ys[y_i + 1..]);
         return;
     } else if x_i >= ys_len {
-        out_limbs[..ys_len].copy_from_slice(ys);
-        out_limbs[ys_len..xs_len].copy_from_slice(&xs[ys_len..]);
+        out[..ys_len].copy_from_slice(ys);
+        out[ys_len..xs_len].copy_from_slice(&xs[ys_len..]);
         return;
     }
     let (min_i, max_i) = if x_i <= y_i { (x_i, y_i) } else { (y_i, x_i) };
-    limbs_set_zero(&mut out_limbs[..min_i]);
+    limbs_set_zero(&mut out[..min_i]);
     let mut boundary_limb_seen = false;
     if x_i == y_i {
-        out_limbs[x_i] =
+        out[x_i] =
             limbs_xor_pos_neg_helper(xs[x_i] ^ ys[y_i].wrapping_neg(), &mut boundary_limb_seen);
     } else if x_i > y_i {
         boundary_limb_seen = true;
-        out_limbs[y_i..x_i].copy_from_slice(&ys[y_i..x_i]);
-        out_limbs[x_i] = xs[x_i] ^ ys[x_i];
+        out[y_i..x_i].copy_from_slice(&ys[y_i..x_i]);
+        out[x_i] = xs[x_i] ^ ys[x_i];
     } else {
         boundary_limb_seen = true;
-        out_limbs[x_i] = xs[x_i].wrapping_neg();
-        for (out, &x) in out_limbs[x_i + 1..y_i]
-            .iter_mut()
-            .zip(xs[x_i + 1..y_i].iter())
-        {
+        out[x_i] = xs[x_i].wrapping_neg();
+        for (out, &x) in out[x_i + 1..y_i].iter_mut().zip(xs[x_i + 1..y_i].iter()) {
             *out = !x;
         }
-        out_limbs[y_i] = xs[y_i] ^ (ys[y_i] - 1);
+        out[y_i] = xs[y_i] ^ (ys[y_i] - 1);
     }
     {
-        let xys = out_limbs[max_i + 1..]
+        let xys = out[max_i + 1..]
             .iter_mut()
             .zip(xs[max_i + 1..].iter().zip(ys[max_i + 1..].iter()));
         if boundary_limb_seen {
@@ -205,9 +199,9 @@ pub fn limbs_xor_pos_neg_to_out(out_limbs: &mut [Limb], xs: &[Limb], ys: &[Limb]
             (xs_len, ys_len, &ys[xs_len..])
         };
         if boundary_limb_seen {
-            out_limbs[min_len..max_len].copy_from_slice(zs);
+            out[min_len..max_len].copy_from_slice(zs);
         } else {
-            for (out, &z) in out_limbs[min_len..].iter_mut().zip(zs.iter()) {
+            for (out, &z) in out[min_len..].iter_mut().zip(zs.iter()) {
                 *out = limbs_xor_pos_neg_helper(!z, &mut boundary_limb_seen);
             }
         }
@@ -556,7 +550,7 @@ pub fn limbs_xor_neg_neg(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 /// where n = `xs.len() + ys.len()`
 ///
 /// # Panics
-/// Panics if `xs` or `ys` are empty or contain only zeros, or if `out_limbs` is shorter than the
+/// Panics if `xs` or `ys` are empty or contain only zeros, or if `out` is shorter than the
 /// longer of `xs` and `ys`.
 ///
 /// # Example
@@ -571,47 +565,47 @@ pub fn limbs_xor_neg_neg(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 /// limbs_xor_neg_neg_to_out(&mut result, &[1, 2, 5], &[100, 200]);
 /// assert_eq!(result, &[99, 202, 5, 10]);
 /// ```
-pub fn limbs_xor_neg_neg_to_out(out_limbs: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
+pub fn limbs_xor_neg_neg_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
     let xs_len = xs.len();
     let ys_len = ys.len();
-    assert!(out_limbs.len() >= xs_len);
-    assert!(out_limbs.len() >= ys_len);
+    assert!(out.len() >= xs_len);
+    assert!(out.len() >= ys_len);
     let x_i = limbs_leading_zero_limbs(xs);
     let y_i = limbs_leading_zero_limbs(ys);
     assert!(x_i < xs_len);
     assert!(y_i < ys_len);
     if y_i >= xs_len {
-        assert!(!limbs_sub_to_out(out_limbs, ys, xs));
+        assert!(!limbs_sub_to_out(out, ys, xs));
         return;
     } else if x_i >= ys_len {
-        assert!(!limbs_sub_to_out(out_limbs, xs, ys));
+        assert!(!limbs_sub_to_out(out, xs, ys));
         return;
     }
     let (min_i, max_i) = if x_i <= y_i { (x_i, y_i) } else { (y_i, x_i) };
-    limbs_set_zero(&mut out_limbs[..min_i]);
+    limbs_set_zero(&mut out[..min_i]);
     if x_i == y_i {
-        out_limbs[x_i] = xs[x_i].wrapping_neg() ^ ys[x_i].wrapping_neg();
+        out[x_i] = xs[x_i].wrapping_neg() ^ ys[x_i].wrapping_neg();
     } else {
         let (min_zs, max_zs) = if x_i <= y_i { (xs, ys) } else { (ys, xs) };
-        out_limbs[min_i] = min_zs[min_i].wrapping_neg();
-        for (out, &z) in out_limbs[min_i + 1..max_i]
+        out[min_i] = min_zs[min_i].wrapping_neg();
+        for (out, &z) in out[min_i + 1..max_i]
             .iter_mut()
             .zip(min_zs[min_i + 1..max_i].iter())
         {
             *out = !z;
         }
-        out_limbs[max_i] = (max_zs[max_i] - 1) ^ min_zs[max_i];
+        out[max_i] = (max_zs[max_i] - 1) ^ min_zs[max_i];
     }
-    for (out, (&x, &y)) in out_limbs[max_i + 1..]
+    for (out, (&x, &y)) in out[max_i + 1..]
         .iter_mut()
         .zip(xs[max_i + 1..].iter().zip(ys[max_i + 1..].iter()))
     {
         *out = x ^ y;
     }
     if xs_len > ys_len {
-        out_limbs[ys_len..xs_len].copy_from_slice(&xs[ys_len..]);
+        out[ys_len..xs_len].copy_from_slice(&xs[ys_len..]);
     } else if xs_len < ys_len {
-        out_limbs[xs_len..ys_len].copy_from_slice(&ys[xs_len..]);
+        out[xs_len..ys_len].copy_from_slice(&ys[xs_len..]);
     }
 }
 

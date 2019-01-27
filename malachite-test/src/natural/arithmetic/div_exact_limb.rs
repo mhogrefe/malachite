@@ -112,16 +112,16 @@ fn demo_limbs_div_exact_limb(gm: GenerationMode, limit: usize) {
 }
 
 fn demo_limbs_div_exact_limb_to_out(gm: GenerationMode, limit: usize) {
-    for (out_limbs, in_limbs, limb) in
+    for (out, in_limbs, limb) in
         triples_of_limb_vec_limb_vec_and_positive_limb_var_2(gm).take(limit)
     {
-        let mut out_limbs = out_limbs.to_vec();
-        let mut out_limbs_old = out_limbs.clone();
-        limbs_div_exact_limb_to_out(&mut out_limbs, &in_limbs, limb);
+        let mut out = out.to_vec();
+        let mut out_old = out.clone();
+        limbs_div_exact_limb_to_out(&mut out, &in_limbs, limb);
         println!(
-            "out_limbs := {:?}; limbs_exact_div_limb_to_out(&mut out_limbs, {:?}, {}); \
-             out_limbs = {:?}",
-            out_limbs_old, in_limbs, limb, out_limbs
+            "out := {:?}; limbs_exact_div_limb_to_out(&mut out, {:?}, {}); \
+             out = {:?}",
+            out_old, in_limbs, limb, out
         );
     }
 }
@@ -149,14 +149,14 @@ fn demo_limbs_div_exact_3(gm: GenerationMode, limit: usize) {
 }
 
 fn demo_limbs_div_exact_3_to_out(gm: GenerationMode, limit: usize) {
-    for (out_limbs, in_limbs) in pairs_of_limb_vec_var_3(gm).take(limit) {
-        let mut out_limbs = out_limbs.to_vec();
-        let mut out_limbs_old = out_limbs.clone();
-        limbs_div_exact_3_to_out(&mut out_limbs, &in_limbs);
+    for (out, in_limbs) in pairs_of_limb_vec_var_3(gm).take(limit) {
+        let mut out = out.to_vec();
+        let mut out_old = out.clone();
+        limbs_div_exact_3_to_out(&mut out, &in_limbs);
         println!(
-            "out_limbs := {:?}; limbs_exact_div_3_to_out(&mut out_limbs, {:?}); \
-             out_limbs = {:?}",
-            out_limbs_old, in_limbs, out_limbs
+            "out := {:?}; limbs_exact_div_3_to_out(&mut out, {:?}); \
+             out = {:?}",
+            out_old, in_limbs, out
         );
     }
 }
@@ -267,8 +267,8 @@ fn benchmark_limbs_div_exact_limb_to_out(gm: GenerationMode, limit: usize, file_
         "in_limbs.len()",
         &mut [(
             "malachite",
-            &mut (|(mut out_limbs, in_limbs, limb)| {
-                limbs_div_exact_limb_to_out(&mut out_limbs, &in_limbs, limb)
+            &mut (|(mut out, in_limbs, limb)| {
+                limbs_div_exact_limb_to_out(&mut out, &in_limbs, limb)
             }),
         )],
     );
@@ -325,21 +325,15 @@ fn benchmark_limbs_div_exact_3_to_out_algorithms(
         &mut [
             (
                 "limbs_div_exact_limb_to_out",
-                &mut (|(mut out_limbs, in_limbs)| {
-                    limbs_div_exact_limb_to_out(&mut out_limbs, &in_limbs, 3)
-                }),
+                &mut (|(mut out, in_limbs)| limbs_div_exact_limb_to_out(&mut out, &in_limbs, 3)),
             ),
             (
                 "limbs_div_exact_3_to_out",
-                &mut (|(mut out_limbs, in_limbs)| {
-                    limbs_div_exact_3_to_out(&mut out_limbs, &in_limbs)
-                }),
+                &mut (|(mut out, in_limbs)| limbs_div_exact_3_to_out(&mut out, &in_limbs)),
             ),
             (
                 "_limbs_div_exact_3_to_out_alt",
-                &mut (|(mut out_limbs, in_limbs)| {
-                    _limbs_div_exact_3_to_out_alt(&mut out_limbs, &in_limbs)
-                }),
+                &mut (|(mut out, in_limbs)| _limbs_div_exact_3_to_out_alt(&mut out, &in_limbs)),
             ),
         ],
     );

@@ -96,14 +96,14 @@ fn demo_limbs_and_pos_neg(gm: GenerationMode, limit: usize) {
 }
 
 fn demo_limbs_and_pos_neg_to_out(gm: GenerationMode, limit: usize) {
-    for (ref out_limbs, ref xs, ref ys) in triples_of_limb_vec_var_5(gm).take(limit) {
-        let mut out_limbs = out_limbs.to_vec();
-        let mut out_limbs_old = out_limbs.clone();
-        limbs_and_pos_neg_to_out(&mut out_limbs, xs, ys);
+    for (ref out, ref xs, ref ys) in triples_of_limb_vec_var_5(gm).take(limit) {
+        let mut out = out.to_vec();
+        let mut out_old = out.clone();
+        limbs_and_pos_neg_to_out(&mut out, xs, ys);
         println!(
-            "out_limbs := {:?}; limbs_and_pos_neg_to_out(&mut out_limbs, {:?}, {:?}); \
-             out_limbs = {:?}",
-            out_limbs_old, xs, ys, out_limbs
+            "out := {:?}; limbs_and_pos_neg_to_out(&mut out, {:?}, {:?}); \
+             out = {:?}",
+            out_old, xs, ys, out
         );
     }
 }
@@ -261,9 +261,7 @@ fn benchmark_limbs_and_pos_neg_to_out(gm: GenerationMode, limit: usize, file_nam
         "xs.len()",
         &mut [(
             "malachite",
-            &mut (|(ref mut out_limbs, ref xs, ref ys)| {
-                limbs_and_pos_neg_to_out(out_limbs, xs, ys)
-            }),
+            &mut (|(ref mut out, ref xs, ref ys)| limbs_and_pos_neg_to_out(out, xs, ys)),
         )],
     );
 }

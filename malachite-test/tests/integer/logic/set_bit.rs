@@ -14,10 +14,10 @@ use std::u32;
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 pub fn test_limbs_set_bit_neg() {
-    let test = |limbs: &[u32], index: u64, out_limbs: &[u32]| {
+    let test = |limbs: &[u32], index: u64, out: &[u32]| {
         let mut mut_limbs = limbs.to_vec();
         limbs_set_bit_neg(&mut mut_limbs, index);
-        assert_eq!(mut_limbs, out_limbs);
+        assert_eq!(mut_limbs, out);
     };
     test(&[3, 2, 1], 100, &[3, 2, 1]);
     test(&[0, 0, 0b1101, 0b11], 96, &[0, 0, 0b1101, 0b10]);

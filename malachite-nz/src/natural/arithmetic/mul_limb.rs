@@ -37,17 +37,17 @@ pub fn limbs_mul_limb(limbs: &[Limb], limb: Limb) -> Vec<Limb> {
 }
 
 pub(crate) fn limbs_mul_limb_with_carry_to_out(
-    out_limbs: &mut [Limb],
+    out: &mut [Limb],
     in_limbs: &[Limb],
     limb: Limb,
     mut carry: Limb,
 ) -> Limb {
     let len = in_limbs.len();
-    assert!(out_limbs.len() >= len);
+    assert!(out.len() >= len);
     let limb = DoubleLimb::from(limb);
     for i in 0..len {
         let limb_result = DoubleLimb::from(in_limbs[i]) * limb + DoubleLimb::from(carry);
-        out_limbs[i] = limb_result.lower_half();
+        out[i] = limb_result.lower_half();
         carry = limb_result.upper_half();
     }
     carry
@@ -64,22 +64,22 @@ pub(crate) fn limbs_mul_limb_with_carry_to_out(
 /// where n = `limbs.len()`
 ///
 /// # Panics
-/// Panics if `out_limbs` is shorter than `in_limbs`.
+/// Panics if `out` is shorter than `in_limbs`.
 ///
 /// # Example
 /// ```
 /// use malachite_nz::natural::arithmetic::mul_limb::limbs_mul_limb_to_out;
 ///
-/// let mut out_limbs = vec![0, 0, 0];
-/// assert_eq!(limbs_mul_limb_to_out(&mut out_limbs, &[123, 456], 789), 0);
-/// assert_eq!(out_limbs, &[97_047, 359_784, 0]);
+/// let mut out = vec![0, 0, 0];
+/// assert_eq!(limbs_mul_limb_to_out(&mut out, &[123, 456], 789), 0);
+/// assert_eq!(out, &[97_047, 359_784, 0]);
 ///
-/// let mut out_limbs = vec![0, 0, 0];
-/// assert_eq!(limbs_mul_limb_to_out(&mut out_limbs, &[0xffff_ffff], 2), 1);
-/// assert_eq!(out_limbs, &[4_294_967_294, 0, 0]);
+/// let mut out = vec![0, 0, 0];
+/// assert_eq!(limbs_mul_limb_to_out(&mut out, &[0xffff_ffff], 2), 1);
+/// assert_eq!(out, &[4_294_967_294, 0, 0]);
 /// ```
-pub fn limbs_mul_limb_to_out(out_limbs: &mut [Limb], in_limbs: &[Limb], limb: Limb) -> Limb {
-    limbs_mul_limb_with_carry_to_out(out_limbs, in_limbs, limb, 0)
+pub fn limbs_mul_limb_to_out(out: &mut [Limb], in_limbs: &[Limb], limb: Limb) -> Limb {
+    limbs_mul_limb_with_carry_to_out(out, in_limbs, limb, 0)
 }
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the

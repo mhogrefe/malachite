@@ -73,7 +73,7 @@ pub fn limbs_and_pos_neg(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 /// where n = `xs.len() + ys.len()`
 ///
 /// # Panics
-/// Panics if `xs` or `ys` are empty or contain only zeros, or if `out_limbs` is shorter than `xs`.
+/// Panics if `xs` or `ys` are empty or contain only zeros, or if `out` is shorter than `xs`.
 ///
 /// # Example
 /// ```
@@ -87,37 +87,37 @@ pub fn limbs_and_pos_neg(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 /// limbs_and_pos_neg_to_out(&mut result, &[1, 2, 5], &[100, 200]);
 /// assert_eq!(result, &[0, 2, 5, 10]);
 /// ```
-pub fn limbs_and_pos_neg_to_out(out_limbs: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
+pub fn limbs_and_pos_neg_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
     let xs_len = xs.len();
     let ys_len = ys.len();
-    assert!(out_limbs.len() >= xs_len);
+    assert!(out.len() >= xs_len);
     let x_i = limbs_leading_zero_limbs(xs);
     let y_i = limbs_leading_zero_limbs(ys);
     assert!(x_i < xs_len);
     assert!(y_i < ys_len);
     if y_i >= xs_len {
-        limbs_set_zero(&mut out_limbs[..xs_len]);
+        limbs_set_zero(&mut out[..xs_len]);
         return;
     } else if x_i >= ys_len {
-        out_limbs[..xs_len].copy_from_slice(xs);
+        out[..xs_len].copy_from_slice(xs);
         return;
     }
     let max_i = max(x_i, y_i);
-    limbs_set_zero(&mut out_limbs[..max_i]);
-    out_limbs[max_i] = xs[max_i]
+    limbs_set_zero(&mut out[..max_i]);
+    out[max_i] = xs[max_i]
         & if x_i <= y_i {
             ys[max_i].wrapping_neg()
         } else {
             !ys[max_i]
         };
-    for (z, (x, y)) in out_limbs[max_i + 1..]
+    for (z, (x, y)) in out[max_i + 1..]
         .iter_mut()
         .zip(xs[max_i + 1..].iter().zip(ys[max_i + 1..].iter()))
     {
         *z = x & !y;
     }
     if xs_len > ys_len {
-        out_limbs[ys_len..xs_len].copy_from_slice(&xs[ys_len..]);
+        out[ys_len..xs_len].copy_from_slice(&xs[ys_len..]);
     }
 }
 

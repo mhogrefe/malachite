@@ -96,7 +96,7 @@ fn limbs_div_limb_normalized_in_place(
 
 // high bit of divisor must be set
 fn limbs_div_limb_normalized_to_out(
-    out_limbs: &mut [Limb],
+    out: &mut [Limb],
     in_limbs: &[Limb],
     high_limb: Limb,
     divisor: Limb,
@@ -104,14 +104,14 @@ fn limbs_div_limb_normalized_to_out(
 ) {
     let len = in_limbs.len();
     if len == 1 {
-        out_limbs[0] = div_by_preinversion(high_limb, in_limbs[0], divisor, divisor_inverse);
+        out[0] = div_by_preinversion(high_limb, in_limbs[0], divisor, divisor_inverse);
         return;
     }
     let power_of_two = divisor.wrapping_neg().wrapping_mul(divisor_inverse);
     let (mut quotient_high, mut quotient_low) =
         (DoubleLimb::from(divisor_inverse) * DoubleLimb::from(high_limb)).split_in_half();
     quotient_high.wrapping_add_assign(high_limb);
-    out_limbs[len - 1] = quotient_high;
+    out[len - 1] = quotient_high;
     let (sum, mut big_carry) = DoubleLimb::join_halves(in_limbs[len - 1], in_limbs[len - 2])
         .overflowing_add(DoubleLimb::from(power_of_two) * DoubleLimb::from(high_limb));
     let (mut sum_high, mut sum_low) = sum.split_in_half();
@@ -131,9 +131,9 @@ fn limbs_div_limb_normalized_to_out(
             }
         }
         let (quotient_higher, quotient_high) = quotient.split_in_half();
-        out_limbs[j + 1] = quotient_high;
+        out[j + 1] = quotient_high;
         assert!(!limbs_slice_add_limb_in_place(
-            &mut out_limbs[j + 2..],
+            &mut out[j + 2..],
             quotient_higher
         ));
         let (sum, carry) = DoubleLimb::join_halves(sum_low, in_limbs[j])
@@ -155,11 +155,8 @@ fn limbs_div_limb_normalized_to_out(
     let (quotient_high, quotient_low) = DoubleLimb::join_halves(quotient_high, quotient_low)
         .wrapping_add(DoubleLimb::from(temp))
         .split_in_half();
-    assert!(!limbs_slice_add_limb_in_place(
-        &mut out_limbs[1..],
-        quotient_high
-    ));
-    out_limbs[0] = quotient_low;
+    assert!(!limbs_slice_add_limb_in_place(&mut out[1..], quotient_high));
+    out[0] = quotient_low;
 }
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
@@ -200,31 +197,31 @@ pub fn limbs_div_limb(limbs: &[Limb], divisor: Limb) -> Vec<Limb> {
 /// where n = `limbs.len()`
 ///
 /// # Panics
-/// Panics if `out_limbs` is shorter than `in_limbs`, the length of `in_limbs` is less than 2, or if
+/// Panics if `out` is shorter than `in_limbs`, the length of `in_limbs` is less than 2, or if
 /// `divisor` is zero.
 ///
 /// # Example
 /// ```
 /// use malachite_nz::natural::arithmetic::div_limb::limbs_div_limb_to_out;
 ///
-/// let mut out_limbs = vec![10, 10, 10, 10];
-/// limbs_div_limb_to_out(&mut out_limbs, &[123, 456], 789);
-/// assert_eq!(out_limbs, &[2_482_262_467, 0, 10, 10]);
+/// let mut out = vec![10, 10, 10, 10];
+/// limbs_div_limb_to_out(&mut out, &[123, 456], 789);
+/// assert_eq!(out, &[2_482_262_467, 0, 10, 10]);
 ///
-/// let mut out_limbs = vec![10, 10, 10, 10];
-/// limbs_div_limb_to_out(&mut out_limbs, &[0xffff_ffff, 0xffff_ffff], 3);
-/// assert_eq!(out_limbs, &[0x5555_5555, 0x5555_5555, 10, 10]);
+/// let mut out = vec![10, 10, 10, 10];
+/// limbs_div_limb_to_out(&mut out, &[0xffff_ffff, 0xffff_ffff], 3);
+/// assert_eq!(out, &[0x5555_5555, 0x5555_5555, 10, 10]);
 /// ```
-pub fn limbs_div_limb_to_out(out_limbs: &mut [Limb], in_limbs: &[Limb], mut divisor: Limb) {
+pub fn limbs_div_limb_to_out(out: &mut [Limb], in_limbs: &[Limb], mut divisor: Limb) {
     assert_ne!(divisor, 0);
     let len = in_limbs.len();
     assert!(len > 1);
-    assert!(out_limbs.len() >= len);
+    assert!(out.len() >= len);
     let len_minus_1 = len - 1;
     let mut highest_limb = in_limbs[len_minus_1];
     let bits = divisor.leading_zeros();
     if bits == 0 {
-        out_limbs[len_minus_1] = if highest_limb >= divisor {
+        out[len_minus_1] = if highest_limb >= divisor {
             highest_limb -= divisor;
             1
         } else {
@@ -233,7 +230,7 @@ pub fn limbs_div_limb_to_out(out_limbs: &mut [Limb], in_limbs: &[Limb], mut divi
         let limb_inverse =
             (DoubleLimb::join_halves(!divisor, Limb::MAX) / DoubleLimb::from(divisor)).lower_half();
         limbs_div_limb_normalized_to_out(
-            out_limbs,
+            out,
             &in_limbs[..len_minus_1],
             highest_limb,
             divisor,
@@ -241,14 +238,14 @@ pub fn limbs_div_limb_to_out(out_limbs: &mut [Limb], in_limbs: &[Limb], mut divi
         )
     } else {
         divisor <<= bits;
-        let highest_limb = limbs_shl_to_out(out_limbs, in_limbs, bits);
+        let highest_limb = limbs_shl_to_out(out, in_limbs, bits);
         let limb_inverse =
             (DoubleLimb::join_halves(!divisor, Limb::MAX) / DoubleLimb::from(divisor)).lower_half();
         let (quotient, remainder) =
-            div_mod_by_preinversion(highest_limb, out_limbs[len_minus_1], divisor, limb_inverse);
-        out_limbs[len_minus_1] = quotient;
+            div_mod_by_preinversion(highest_limb, out[len_minus_1], divisor, limb_inverse);
+        out[len_minus_1] = quotient;
         limbs_div_limb_normalized_in_place(
-            &mut out_limbs[..len_minus_1],
+            &mut out[..len_minus_1],
             remainder,
             divisor,
             limb_inverse,

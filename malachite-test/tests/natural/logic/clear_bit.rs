@@ -17,10 +17,10 @@ use std::str::FromStr;
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 pub fn test_limbs_clear_bit() {
-    let test = |limbs: &[Limb], index: u64, out_limbs: &[Limb]| {
+    let test = |limbs: &[Limb], index: u64, out: &[Limb]| {
         let mut mut_limbs = limbs.to_vec();
         limbs_clear_bit(&mut mut_limbs, index);
-        assert_eq!(mut_limbs, out_limbs);
+        assert_eq!(mut_limbs, out);
     };
     test(&[3, 3], 33, &[3, 1]);
     test(&[3, 1], 1, &[1, 1]);

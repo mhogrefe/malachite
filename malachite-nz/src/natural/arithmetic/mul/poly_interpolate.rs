@@ -208,9 +208,9 @@ pub(crate) fn _limbs_mul_toom_interpolate_5_points(
 /// w1 = f(2),
 /// w0 = limit at infinity of f(x) / x^5,
 ///
-/// The result is stored in {out_limbs, 5 * n + n_high}. At entry, w5 is stored at
-/// {out_limbs, 2 * n}, w3 is stored at {out_limbs + 2 * n, 2 * n + 1}, and w0 is stored at
-/// {out_limbs + 5 * n, n_high}. The other values are 2 * n + 1 limbs each (with most significant
+/// The result is stored in {out, 5 * n + n_high}. At entry, w5 is stored at
+/// {out, 2 * n}, w3 is stored at {out + 2 * n, 2 * n + 1}, and w0 is stored at
+/// {out + 5 * n, n_high}. The other values are 2 * n + 1 limbs each (with most significant
 /// limbs small). f(-1) and f(-2) may be negative; signs are passed in. All intermediate results are
 /// positive. Inputs are destroyed.
 ///
@@ -223,7 +223,7 @@ pub(crate) fn _limbs_mul_toom_interpolate_5_points(
 /// w0n == `n_high` is moved to immediately after `n`.
 #[allow(clippy::cyclomatic_complexity, clippy::too_many_arguments)]
 pub(crate) fn _limbs_mul_toom_interpolate_6_points(
-    out_limbs: &mut [Limb],
+    out: &mut [Limb],
     n: usize,
     n_high: usize,
     w4_neg: bool,
@@ -236,7 +236,7 @@ pub(crate) fn _limbs_mul_toom_interpolate_6_points(
     assert!(2 * n >= n_high && n_high != 0);
     let limit = 2 * n + 1;
     {
-        let (w5, w3) = out_limbs.split_at_mut(2 * n); // w5 length: 2 * n
+        let (w5, w3) = out.split_at_mut(2 * n); // w5 length: 2 * n
 
         // Interpolate with sequence:
         // w2 = (w1 - w2) >> 2
@@ -301,11 +301,11 @@ pub(crate) fn _limbs_mul_toom_interpolate_6_points(
     //  1 0 1 0 1 0;
     //  0 0 0 0 0 1]
     //
-    // out_limbs[] prior to operations:
+    // out[] prior to operations:
     //  |_H w0__|_L w0__|______||_H w3__|_L w3__|_H w5__|_L w5__|
     //
     // summation scheme for remaining operations:
-    //  |______________5|n_____4|n_____3|n_____2|n______|n______| out_limbs
+    //  |______________5|n_____4|n_____3|n_____2|n______|n______| out
     //  |_H w0__|_L w0__|______||_H w3__|_L w3__|_H w5__|_L w5__|
     //                 || H w4  | L w4  |
     //         || H w2  | L w2  |
@@ -313,40 +313,36 @@ pub(crate) fn _limbs_mul_toom_interpolate_6_points(
     //             ||-H w1  |-L w1  |
     //          |-H w0  |-L w0 ||-H w2  |-L w2  |
     //
-    if limbs_slice_add_same_length_in_place_left(&mut out_limbs[n..=3 * n], &w4[..limit]) {
+    if limbs_slice_add_same_length_in_place_left(&mut out[n..=3 * n], &w4[..limit]) {
         assert!(!limbs_slice_add_limb_in_place(
-            &mut out_limbs[3 * n + 1..=4 * n],
+            &mut out[3 * n + 1..=4 * n],
             1
         ));
     }
 
     // w2 -= w0 << 2
     // {w4, 2 * n + 1} is now free and can be overwritten.
-    let mut carry = limbs_shl_to_out(w4, &out_limbs[5 * n..5 * n + n_high], 2);
+    let mut carry = limbs_shl_to_out(w4, &out[5 * n..5 * n + n_high], 2);
     if limbs_sub_same_length_in_place_left(&mut w2[..n_high], &w4[..n_high]) {
         carry += 1;
     }
     assert!(!limbs_sub_limb_in_place(&mut w2[n_high..limit], carry));
 
     // w4L = w4L - w2L
-    if limbs_sub_same_length_in_place_left(&mut out_limbs[n..2 * n], &w2[..n]) {
-        assert!(!limbs_sub_limb_in_place(
-            &mut out_limbs[2 * n..2 * n + limit],
-            1
-        ));
+    if limbs_sub_same_length_in_place_left(&mut out[n..2 * n], &w2[..n]) {
+        assert!(!limbs_sub_limb_in_place(&mut out[2 * n..2 * n + limit], 1));
     }
 
-    let carry = if limbs_slice_add_same_length_in_place_left(&mut out_limbs[3 * n..4 * n], &w2[..n])
-    {
+    let carry = if limbs_slice_add_same_length_in_place_left(&mut out[3 * n..4 * n], &w2[..n]) {
         1
     } else {
         0
     };
     // w3H = w3H + w2L
-    let special_carry_1 = out_limbs[4 * n] + carry;
+    let special_carry_1 = out[4 * n] + carry;
     // w1L + w2H
     let mut carry = w2[2 * n];
-    if limbs_add_same_length_to_out(&mut out_limbs[4 * n..], &w1[..n], &w2[n..2 * n]) {
+    if limbs_add_same_length_to_out(&mut out[4 * n..], &w1[..n], &w2[n..2 * n]) {
         carry += 1;
     }
     assert!(!limbs_slice_add_limb_in_place(&mut w1[n..limit], carry));
@@ -354,68 +350,68 @@ pub(crate) fn _limbs_mul_toom_interpolate_6_points(
     let mut special_carry_2 = 0;
     if n_high > n {
         special_carry_2 = w1[2 * n];
-        if limbs_slice_add_same_length_in_place_left(&mut out_limbs[5 * n..6 * n], &w1[n..2 * n]) {
+        if limbs_slice_add_same_length_in_place_left(&mut out[5 * n..6 * n], &w1[n..2 * n]) {
             special_carry_2.wrapping_add_assign(1);
         }
     } else if limbs_slice_add_same_length_in_place_left(
-        &mut out_limbs[5 * n..5 * n + n_high],
+        &mut out[5 * n..5 * n + n_high],
         &w1[n..n + n_high],
     ) {
         special_carry_2 = 1;
     }
 
     // summation scheme for the next operation:
-    //  |...____5|n_____4|n_____3|n_____2|n______|n______| out_limbs
+    //  |...____5|n_____4|n_____3|n_____2|n______|n______| out
     //  |...w0___|_w1_w2_|_H w3__|_L w3__|_H w5__|_L w5__|
     //          ...-w0___|-w1_w2 |
     //
     // if (LIKELY(n_high > n)) the two operands below DO overlap!
     let carry =
-        _limbs_sub_same_length_in_place_with_overlap(&mut out_limbs[2 * n..5 * n + n_high], 2 * n);
+        _limbs_sub_same_length_in_place_with_overlap(&mut out[2 * n..5 * n + n_high], 2 * n);
 
     // embankment is a "dirty trick" to avoid carry/borrow propagation beyond allocated memory
     let embankment;
     {
-        let out_high = &mut out_limbs[5 * n + n_high - 1];
+        let out_high = &mut out[5 * n + n_high - 1];
         embankment = out_high.wrapping_sub(1);
         *out_high = 1;
     }
     if n_high > n {
         if special_carry_1 > special_carry_2 {
             assert!(!limbs_slice_add_limb_in_place(
-                &mut out_limbs[4 * n..5 * n + n_high],
+                &mut out[4 * n..5 * n + n_high],
                 special_carry_1 - special_carry_2
             ));
         } else {
             assert!(!limbs_sub_limb_in_place(
-                &mut out_limbs[4 * n..5 * n + n_high],
+                &mut out[4 * n..5 * n + n_high],
                 special_carry_2 - special_carry_1
             ));
         }
         if carry {
             assert!(!limbs_sub_limb_in_place(
-                &mut out_limbs[3 * n + n_high..5 * n + n_high],
+                &mut out[3 * n + n_high..5 * n + n_high],
                 1
             ));
         }
         assert!(!limbs_slice_add_limb_in_place(
-            &mut out_limbs[6 * n..5 * n + n_high],
+            &mut out[6 * n..5 * n + n_high],
             special_carry_2
         ));
     } else {
         assert!(!limbs_slice_add_limb_in_place(
-            &mut out_limbs[4 * n..5 * n + n_high],
+            &mut out[4 * n..5 * n + n_high],
             special_carry_1
         ));
         if carry {
             special_carry_2.wrapping_add_assign(1);
         }
         assert!(!limbs_sub_limb_in_place(
-            &mut out_limbs[3 * n + n_high..5 * n + n_high],
+            &mut out[3 * n + n_high..5 * n + n_high],
             special_carry_2
         ));
     }
-    out_limbs[5 * n + n_high - 1].wrapping_add_assign(embankment);
+    out[5 * n + n_high - 1].wrapping_add_assign(embankment);
 }
 
 const WANT_ASSERT: bool = true;
@@ -431,8 +427,8 @@ const WANT_ASSERT: bool = true;
 /// w5 = 64 * f(1/2)
 /// w6 = limit at infinity of f(x) / x ^ 6,
 ///
-/// The result is 6 * n + n_high limbs. At entry, w0 is stored at {out_limbs, 2 * n}, w2 is stored
-/// at {out_limbs + 2 * n, 2 * n + 1}, and w6 is stored at {out_limbs + 6 * n, n_high}. The other
+/// The result is 6 * n + n_high limbs. At entry, w0 is stored at {out, 2 * n}, w2 is stored
+/// at {out + 2 * n, 2 * n + 1}, and w6 is stored at {out + 6 * n, n_high}. The other
 /// values are 2 * n + 1 limbs each (with most significant limbs small). f(-1) and f(-1/2) may be
 /// negative, signs determined by the flag bits. Inputs are destroyed.
 ///
@@ -442,7 +438,7 @@ const WANT_ASSERT: bool = true;
 /// w6n == `n_high` is moved to immediately after `n`.
 #[allow(clippy::cyclomatic_complexity, clippy::too_many_arguments)]
 pub(crate) fn _limbs_mul_toom_interpolate_7_points(
-    out_limbs: &mut [Limb],
+    out: &mut [Limb],
     n: usize,
     n_high: usize,
     w1_neg: bool,
@@ -461,7 +457,7 @@ pub(crate) fn _limbs_mul_toom_interpolate_7_points(
     assert_eq!(w4.len(), m);
     assert_eq!(w5.len(), m);
     {
-        let (w0, remainder) = out_limbs.split_at_mut(2 * n); // w0 length: 2 * n
+        let (w0, remainder) = out.split_at_mut(2 * n); // w0 length: 2 * n
         let (w2, w6) = remainder.split_at_mut(4 * n);
         let w2 = &mut w2[..m];
         let w6 = &mut w6[..n_high];
@@ -556,7 +552,7 @@ pub(crate) fn _limbs_mul_toom_interpolate_7_points(
     // Addition chain. Note carries and the 2n'th limbs that need to be added in.
     //
     // Special care is needed for w2[2 * n] and the corresponding carry, since the "simple" way of
-    // adding it all together would overwrite the limb at wp[2 * n] and out_limbs[4 * n] (same
+    // adding it all together would overwrite the limb at wp[2 * n] and out[4 * n] (same
     // location) with the sum of the high half of w3 and the low half of w4.
     //
     //         7    6    5    4    3    2    1    0
@@ -570,34 +566,29 @@ pub(crate) fn _limbs_mul_toom_interpolate_7_points(
     //        c7   c6   c5   c4   c3                 Carries to propagate
     //
     {
-        let (out_limbs_lo, out_limbs_hi) = out_limbs[n..].split_at_mut(m);
-        if limbs_slice_add_same_length_in_place_left(out_limbs_lo, w1) {
-            assert!(!limbs_slice_add_limb_in_place(&mut out_limbs_hi[..n], 1));
+        let (out_lo, out_hi) = out[n..].split_at_mut(m);
+        if limbs_slice_add_same_length_in_place_left(out_lo, w1) {
+            assert!(!limbs_slice_add_limb_in_place(&mut out_hi[..n], 1));
         }
     }
-    split_into_chunks_mut!(
-        &mut out_limbs[3 * n..],
-        n,
-        [out_limbs_3, out_limbs_4, out_limbs_5],
-        remainder
-    );
-    let mut addend = out_limbs_4[0];
+    split_into_chunks_mut!(&mut out[3 * n..], n, [out_3, out_4, out_5], remainder);
+    let mut addend = out_4[0];
     let (w3_lo, w3_hi) = w3.split_at_mut(n);
-    if limbs_slice_add_same_length_in_place_left(out_limbs_3, w3_lo) {
+    if limbs_slice_add_same_length_in_place_left(out_3, w3_lo) {
         addend.wrapping_add_assign(1);
     }
     assert!(!limbs_slice_add_limb_in_place(w3_hi, addend));
     let (w3_hi_last, w3_hi_init) = w3_hi.split_last_mut().unwrap();
     let mut addend = *w3_hi_last;
     let (w4_lo, w4_hi) = w4.split_at_mut(n);
-    if limbs_add_same_length_to_out(out_limbs_4, w3_hi_init, w4_lo) {
+    if limbs_add_same_length_to_out(out_4, w3_hi_init, w4_lo) {
         addend += 1;
     }
     assert!(!limbs_slice_add_limb_in_place(w4_hi, addend));
     let (w4_last, w4_init) = w4_hi.split_last_mut().unwrap();
     let mut addend = *w4_last;
     let (w5_lo, w5_hi) = w5.split_at_mut(n);
-    if limbs_add_same_length_to_out(out_limbs_5, w4_init, w5_lo) {
+    if limbs_add_same_length_to_out(out_5, w4_init, w5_lo) {
         addend += 1;
     }
     assert!(!limbs_slice_add_limb_in_place(w5_hi, addend));

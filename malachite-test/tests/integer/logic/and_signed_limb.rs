@@ -84,12 +84,12 @@ fn limbs_pos_and_limb_neg_in_place_fail() {
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_neg_and_limb_neg_and_limbs_vec_neg_and_limb_neg_in_place() {
-    let test = |limbs: &[Limb], limb: Limb, out_limbs: &[Limb]| {
-        assert_eq!(limbs_neg_and_limb_neg(limbs, limb), out_limbs);
+    let test = |limbs: &[Limb], limb: Limb, out: &[Limb]| {
+        assert_eq!(limbs_neg_and_limb_neg(limbs, limb), out);
 
         let mut limbs = limbs.to_vec();
         limbs_vec_neg_and_limb_neg_in_place(&mut limbs, limb);
-        assert_eq!(limbs, out_limbs);
+        assert_eq!(limbs, out);
     };
     test(&[0, 2], 3, &[0, 2]);
     test(&[1, 1], 3, &[4_294_967_293, 1]);
@@ -107,17 +107,13 @@ fn limbs_neg_and_limb_neg_fail() {
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_neg_and_limb_neg_to_out() {
-    let test = |out_limbs_before: &[Limb],
-                in_limbs: &[Limb],
-                limb: Limb,
-                carry,
-                out_limbs_after: &[Limb]| {
-        let mut out_limbs = out_limbs_before.to_vec();
+    let test = |out_before: &[Limb], in_limbs: &[Limb], limb: Limb, carry, out_after: &[Limb]| {
+        let mut out = out_before.to_vec();
         assert_eq!(
-            limbs_neg_and_limb_neg_to_out(&mut out_limbs, in_limbs, limb),
+            limbs_neg_and_limb_neg_to_out(&mut out, in_limbs, limb),
             carry
         );
-        assert_eq!(out_limbs, out_limbs_after);
+        assert_eq!(out, out_after);
     };
     test(&[0, 0], &[0, 2], 3, false, &[0, 2]);
     test(&[1, 2, 100], &[0, 2, 100], 3, false, &[0, 2, 100]);
@@ -296,17 +292,17 @@ fn limbs_pos_and_limb_neg_properties() {
 fn limbs_pos_and_limb_neg_to_out_properties() {
     test_properties(
         triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_2,
-        |&(ref out_limbs, ref in_limbs, limb)| {
-            let mut out_limbs = out_limbs.to_vec();
-            let old_out_limbs = out_limbs.clone();
-            limbs_pos_and_limb_neg_to_out(&mut out_limbs, in_limbs, limb);
+        |&(ref out, ref in_limbs, limb)| {
+            let mut out = out.to_vec();
+            let old_out = out.clone();
+            limbs_pos_and_limb_neg_to_out(&mut out, in_limbs, limb);
             let n = Integer::from(Natural::from_limbs_asc(in_limbs))
                 & Integer::from_owned_twos_complement_limbs_asc(vec![limb, Limb::MAX]);
             let len = in_limbs.len();
             let mut limbs = Natural::checked_from(n).unwrap().into_limbs_asc();
             limbs.resize(len, 0);
-            assert_eq!(limbs, &out_limbs[..len]);
-            assert_eq!(&out_limbs[len..], &old_out_limbs[len..]);
+            assert_eq!(limbs, &out[..len]);
+            assert_eq!(&out[len..], &old_out[len..]);
         },
     );
 }
@@ -345,18 +341,18 @@ fn limbs_neg_and_limb_neg_properties() {
 fn limbs_neg_and_limb_neg_to_out_properties() {
     test_properties(
         triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_3,
-        |&(ref out_limbs, ref in_limbs, limb)| {
-            let mut out_limbs = out_limbs.to_vec();
-            let old_out_limbs = out_limbs.clone();
-            let carry = limbs_neg_and_limb_neg_to_out(&mut out_limbs, in_limbs, limb);
+        |&(ref out, ref in_limbs, limb)| {
+            let mut out = out.to_vec();
+            let old_out = out.clone();
+            let carry = limbs_neg_and_limb_neg_to_out(&mut out, in_limbs, limb);
             let n = -Natural::from_limbs_asc(in_limbs)
                 & Integer::from_owned_twos_complement_limbs_asc(vec![limb, Limb::MAX]);
             let len = in_limbs.len();
             let mut limbs = Natural::checked_from(-n).unwrap().into_limbs_asc();
             assert_eq!(carry, limbs.len() == len + 1);
             limbs.resize(len, 0);
-            assert_eq!(limbs, &out_limbs[..len]);
-            assert_eq!(&out_limbs[len..], &old_out_limbs[len..]);
+            assert_eq!(limbs, &out[..len]);
+            assert_eq!(&out[len..], &old_out[len..]);
         },
     );
 }

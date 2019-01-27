@@ -66,15 +66,15 @@ fn demo_limbs_div_limb(gm: GenerationMode, limit: usize) {
 }
 
 fn demo_limbs_div_limb_to_out(gm: GenerationMode, limit: usize) {
-    for (out_limbs, in_limbs, limb) in
+    for (out, in_limbs, limb) in
         triples_of_unsigned_vec_unsigned_vec_and_positive_unsigned_var_1(gm).take(limit)
     {
-        let mut out_limbs = out_limbs.to_vec();
-        let mut out_limbs_old = out_limbs.clone();
-        limbs_div_limb_to_out(&mut out_limbs, &in_limbs, limb);
+        let mut out = out.to_vec();
+        let mut out_old = out.clone();
+        limbs_div_limb_to_out(&mut out, &in_limbs, limb);
         println!(
-            "out_limbs := {:?}; limbs_div_limb_to_out(&mut out_limbs, {:?}, {}); out_limbs = {:?}",
-            out_limbs_old, in_limbs, limb, out_limbs
+            "out := {:?}; limbs_div_limb_to_out(&mut out, {:?}, {}); out = {:?}",
+            out_old, in_limbs, limb, out
         );
     }
 }
@@ -171,9 +171,7 @@ fn benchmark_limbs_div_limb_to_out(gm: GenerationMode, limit: usize, file_name: 
         "in_limbs.len()",
         &mut [(
             "malachite",
-            &mut (|(mut out_limbs, in_limbs, limb)| {
-                limbs_div_limb_to_out(&mut out_limbs, &in_limbs, limb)
-            }),
+            &mut (|(mut out, in_limbs, limb)| limbs_div_limb_to_out(&mut out, &in_limbs, limb)),
         )],
     );
 }

@@ -236,37 +236,37 @@ pub fn limbs_shr_round(limbs: &[Limb], bits: u64, rm: RoundingMode) -> Option<Ve
 /// where n = `limbs.len()`
 ///
 /// # Panics
-/// Panics if `in_limbs` is empty, `out_limbs` is shorter than `in_limbs`, `bits` is 0, or `bits` is
+/// Panics if `in_limbs` is empty, `out` is shorter than `in_limbs`, `bits` is 0, or `bits` is
 /// greater than 31.
 ///
 /// # Example
 /// ```
 /// use malachite_nz::natural::arithmetic::shr_u::limbs_shr_to_out;
 ///
-/// let mut out_limbs = vec![0, 0, 0];
-/// assert_eq!(limbs_shr_to_out(&mut out_limbs, &[123, 456], 1), 2_147_483_648);
-/// assert_eq!(out_limbs, &[61, 228, 0]);
+/// let mut out = vec![0, 0, 0];
+/// assert_eq!(limbs_shr_to_out(&mut out, &[123, 456], 1), 2_147_483_648);
+/// assert_eq!(out, &[61, 228, 0]);
 ///
-/// let mut out_limbs = vec![0, 0, 0];
-/// assert_eq!(limbs_shr_to_out(&mut out_limbs, &[122, 455], 1), 0);
-/// assert_eq!(out_limbs, &[2_147_483_709, 227, 0]);
+/// let mut out = vec![0, 0, 0];
+/// assert_eq!(limbs_shr_to_out(&mut out, &[122, 455], 1), 0);
+/// assert_eq!(out, &[2_147_483_709, 227, 0]);
 /// ```
-pub fn limbs_shr_to_out(out_limbs: &mut [Limb], in_limbs: &[Limb], bits: u32) -> Limb {
+pub fn limbs_shr_to_out(out: &mut [Limb], in_limbs: &[Limb], bits: u32) -> Limb {
     let len = in_limbs.len();
     assert_ne!(len, 0);
     assert_ne!(bits, 0);
     assert!(bits < Limb::WIDTH);
-    assert!(out_limbs.len() >= len);
+    assert!(out.len() >= len);
     let cobits = Limb::WIDTH - bits;
     let mut high_limb = in_limbs[0];
     let remaining_bits = high_limb << cobits;
     let mut low_limb = high_limb >> bits;
     for i in 1..len {
         high_limb = in_limbs[i];
-        out_limbs[i - 1] = low_limb | (high_limb << cobits);
+        out[i - 1] = low_limb | (high_limb << cobits);
         low_limb = high_limb >> bits;
     }
-    out_limbs[len - 1] = low_limb;
+    out[len - 1] = low_limb;
     remaining_bits
 }
 

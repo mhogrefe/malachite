@@ -23,8 +23,8 @@ pub fn limbs_not(limbs: &[Limb]) -> Vec<Limb> {
     limbs.iter().map(|limb| !limb).collect()
 }
 
-/// Writes the bitwise not of a slice of limbs to the lowest `in_limbs.len()` limbs of `out_limbs`.
-/// For this to work, `out_limbs` must be at least as long as `in_limbs`.
+/// Writes the bitwise not of a slice of limbs to the lowest `in_limbs.len()` limbs of `out`.
+/// For this to work, `out` must be at least as long as `in_limbs`.
 ///
 /// Time: worst case O(n)
 ///
@@ -33,19 +33,19 @@ pub fn limbs_not(limbs: &[Limb]) -> Vec<Limb> {
 /// where n = `in_limbs.len()`
 ///
 /// # Panics
-/// Panics if `out_limbs` is shorter than `in_limbs`.
+/// Panics if `out` is shorter than `in_limbs`.
 ///
 /// # Example
 /// ```
 /// use malachite_nz::natural::logic::not::limbs_not_to_out;
 ///
-/// let mut out_limbs = [0, 1, 2];
-/// limbs_not_to_out(&mut out_limbs, &[0xffff0000, 0xf0f0f0f0]);
-/// assert_eq!(out_limbs, [0x0000ffff, 0x0f0f0f0f, 2]);
+/// let mut out = [0, 1, 2];
+/// limbs_not_to_out(&mut out, &[0xffff0000, 0xf0f0f0f0]);
+/// assert_eq!(out, [0x0000ffff, 0x0f0f0f0f, 2]);
 /// ```
-pub fn limbs_not_to_out(out_limbs: &mut [Limb], in_limbs: &[Limb]) {
-    assert!(out_limbs.len() >= in_limbs.len());
-    for (x, y) in out_limbs.iter_mut().zip(in_limbs.iter()) {
+pub fn limbs_not_to_out(out: &mut [Limb], in_limbs: &[Limb]) {
+    assert!(out.len() >= in_limbs.len());
+    for (x, y) in out.iter_mut().zip(in_limbs.iter()) {
         *x = !y;
     }
 }

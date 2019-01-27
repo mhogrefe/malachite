@@ -78,7 +78,7 @@ pub fn limbs_add(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 /// where n = `xs.len()` = `ys.len()`
 ///
 /// # Panics
-/// Panics if `xs` and `ys` have different lengths or if `out_limbs` is too short.
+/// Panics if `xs` and `ys` have different lengths or if `out` is too short.
 ///
 /// # Example
 /// ```
@@ -92,13 +92,13 @@ pub fn limbs_add(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 /// assert_eq!(limbs_add_same_length_to_out(limbs, &[100, 101, 0xffff_ffff], &[102, 101, 2]), true);
 /// assert_eq!(limbs, &[202, 202, 1, 10]);
 /// ```
-pub fn limbs_add_same_length_to_out(out_limbs: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> bool {
+pub fn limbs_add_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> bool {
     let len = xs.len();
     assert_eq!(len, ys.len());
-    assert!(out_limbs.len() >= len);
+    assert!(out.len() >= len);
     let mut carry = false;
     for i in 0..len {
-        out_limbs[i] = add_and_carry(xs[i], ys[i], &mut carry);
+        out[i] = add_and_carry(xs[i], ys[i], &mut carry);
     }
     carry
 }
@@ -115,7 +115,7 @@ pub fn limbs_add_same_length_to_out(out_limbs: &mut [Limb], xs: &[Limb], ys: &[L
 /// where n = max(`xs.len()`, `ys.len()`)
 ///
 /// # Panics
-/// Panics if `out_limbs` is too short.
+/// Panics if `out` is too short.
 ///
 /// # Example
 /// ```
@@ -129,7 +129,7 @@ pub fn limbs_add_same_length_to_out(out_limbs: &mut [Limb], xs: &[Limb], ys: &[L
 /// assert_eq!(limbs_add_to_out(limbs, &[100, 101, 0xffff_ffff], &[102, 101, 2]), true);
 /// assert_eq!(limbs, &[202, 202, 1, 10]);
 /// ```
-pub fn limbs_add_to_out(out_limbs: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> bool {
+pub fn limbs_add_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> bool {
     let xs_len = xs.len();
     let ys_len = ys.len();
     let (min_len, max_len) = if xs_len <= ys_len {
@@ -137,21 +137,21 @@ pub fn limbs_add_to_out(out_limbs: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> boo
     } else {
         (ys_len, xs_len)
     };
-    assert!(out_limbs.len() >= max_len);
-    let carry = limbs_add_same_length_to_out(out_limbs, &xs[..min_len], &ys[..min_len]);
+    assert!(out.len() >= max_len);
+    let carry = limbs_add_same_length_to_out(out, &xs[..min_len], &ys[..min_len]);
     if xs_len == ys_len {
         carry
     } else if xs_len > ys_len {
         if carry {
-            limbs_add_limb_to_out(&mut out_limbs[ys_len..], &xs[ys_len..], 1)
+            limbs_add_limb_to_out(&mut out[ys_len..], &xs[ys_len..], 1)
         } else {
-            out_limbs[ys_len..xs_len].copy_from_slice(&xs[ys_len..]);
+            out[ys_len..xs_len].copy_from_slice(&xs[ys_len..]);
             false
         }
     } else if carry {
-        limbs_add_limb_to_out(&mut out_limbs[xs_len..], &ys[xs_len..], 1)
+        limbs_add_limb_to_out(&mut out[xs_len..], &ys[xs_len..], 1)
     } else {
-        out_limbs[xs_len..ys_len].copy_from_slice(&ys[xs_len..]);
+        out[xs_len..ys_len].copy_from_slice(&ys[xs_len..]);
         false
     }
 }
@@ -393,18 +393,18 @@ pub fn limbs_vec_add_in_place_either(xs: &mut Vec<Limb>, ys: &mut Vec<Limb>) -> 
 /// where n = `xs.len()` = `ys.len()`
 ///
 /// # Panics
-/// Panics if `xs` and `ys` have different lengths or if `out_limbs` is too short.
+/// Panics if `xs` and `ys` have different lengths or if `out` is too short.
 ///
 /// This is mpn_add_nc from gmp-impl.h, where rp and up are disjoint.
 pub fn _limbs_add_same_length_with_carry_in_to_out(
-    out_limbs: &mut [Limb],
+    out: &mut [Limb],
     xs: &[Limb],
     ys: &[Limb],
     carry_in: bool,
 ) -> bool {
-    let mut carry = limbs_add_same_length_to_out(out_limbs, xs, ys);
+    let mut carry = limbs_add_same_length_to_out(out, xs, ys);
     if carry_in {
-        carry |= limbs_slice_add_limb_in_place(&mut out_limbs[..xs.len()], 1);
+        carry |= limbs_slice_add_limb_in_place(&mut out[..xs.len()], 1);
     }
     carry
 }

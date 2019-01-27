@@ -196,7 +196,7 @@ pub(crate) fn _limbs_mul_toom_evaluate_poly_in_1_and_neg_1(
 
 /// Given a `Natural` whose highest limb is `carry` and remaining limbs are `xs`, multiplies the
 /// `Natural` by 4 and adds the `Natural` whose limbs are `ys`. The highest limb of the result is
-/// written back to `carry` and the remaining limbs are written to `out_limbs`.
+/// written back to `carry` and the remaining limbs are written to `out`.
 ///
 /// Time: worst case O(n)
 ///
@@ -204,17 +204,12 @@ pub(crate) fn _limbs_mul_toom_evaluate_poly_in_1_and_neg_1(
 ///
 /// where n = max(`xs.len()`, `ys.len()`)
 ///
-/// This is DO_addlsh2 from mpn/generic/toom_eval_pm2.c, with d == `out_limbs`, a == `xs`, and b ==
+/// This is DO_addlsh2 from mpn/generic/toom_eval_pm2.c, with d == `out`, a == `xs`, and b ==
 /// `ys`.
-fn shl_2_and_add_with_carry_to_out(
-    out_limbs: &mut [Limb],
-    xs: &[Limb],
-    ys: &[Limb],
-    carry: &mut Limb,
-) {
+fn shl_2_and_add_with_carry_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb], carry: &mut Limb) {
     *carry <<= 2;
-    *carry += limbs_shl_to_out(out_limbs, xs, 2);
-    if limbs_slice_add_same_length_in_place_left(&mut out_limbs[..ys.len()], ys) {
+    *carry += limbs_shl_to_out(out, xs, 2);
+    if limbs_slice_add_same_length_in_place_left(&mut out[..ys.len()], ys) {
         *carry += 1;
     }
 }

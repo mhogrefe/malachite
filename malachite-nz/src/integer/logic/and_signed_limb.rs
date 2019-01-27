@@ -44,7 +44,7 @@ pub fn limbs_pos_and_limb_neg(limbs: &[Limb], limb: Limb) -> Vec<Limb> {
 /// where n = `in_limbs.len()`
 ///
 /// # Panics
-/// Panics if `in_limbs` is empty or if `out_limbs` is shorter than `in_limbs`.
+/// Panics if `in_limbs` is empty or if `out` is shorter than `in_limbs`.
 ///
 /// # Example
 /// ```
@@ -58,11 +58,11 @@ pub fn limbs_pos_and_limb_neg(limbs: &[Limb], limb: Limb) -> Vec<Limb> {
 /// limbs_pos_and_limb_neg_to_out(&mut result, &[123, 456], 789);
 /// assert_eq!(result, &[17, 456, 10, 10]);
 /// ```
-pub fn limbs_pos_and_limb_neg_to_out(out_limbs: &mut [Limb], in_limbs: &[Limb], limb: Limb) {
+pub fn limbs_pos_and_limb_neg_to_out(out: &mut [Limb], in_limbs: &[Limb], limb: Limb) {
     let len = in_limbs.len();
-    assert!(out_limbs.len() >= len);
-    out_limbs[0] = in_limbs[0] & limb;
-    out_limbs[1..len].copy_from_slice(&in_limbs[1..]);
+    assert!(out.len() >= len);
+    out[0] = in_limbs[0] & limb;
+    out[1..len].copy_from_slice(&in_limbs[1..]);
 }
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of an `Integer`, writes the
@@ -135,7 +135,7 @@ pub fn limbs_neg_and_limb_neg(limbs: &[Limb], limb: Limb) -> Vec<Limb> {
 /// where n = `in_limbs.len()`
 ///
 /// # Panics
-/// Panics if `in_limbs` is empty or if `out_limbs` is shorter than `in_limbs`.
+/// Panics if `in_limbs` is empty or if `out` is shorter than `in_limbs`.
 ///
 /// # Example
 /// ```
@@ -158,23 +158,19 @@ pub fn limbs_neg_and_limb_neg(limbs: &[Limb], limb: Limb) -> Vec<Limb> {
 ///         true);
 /// assert_eq!(result, &[0, 0]);
 /// ```
-pub fn limbs_neg_and_limb_neg_to_out(
-    out_limbs: &mut [Limb],
-    in_limbs: &[Limb],
-    limb: Limb,
-) -> bool {
-    assert!(out_limbs.len() >= in_limbs.len());
+pub fn limbs_neg_and_limb_neg_to_out(out: &mut [Limb], in_limbs: &[Limb], limb: Limb) -> bool {
+    assert!(out.len() >= in_limbs.len());
     if in_limbs[0] == 0 {
-        out_limbs[..in_limbs.len()].copy_from_slice(in_limbs);
+        out[..in_limbs.len()].copy_from_slice(in_limbs);
         false
     } else {
         let result_head = in_limbs[0].wrapping_neg() & limb;
         if result_head == 0 {
-            out_limbs[0] = 0;
-            limbs_add_limb_to_out(&mut out_limbs[1..], &in_limbs[1..], 1)
+            out[0] = 0;
+            limbs_add_limb_to_out(&mut out[1..], &in_limbs[1..], 1)
         } else {
-            out_limbs[0] = result_head.wrapping_neg();
-            out_limbs[1..in_limbs.len()].copy_from_slice(&in_limbs[1..]);
+            out[0] = result_head.wrapping_neg();
+            out[1..in_limbs.len()].copy_from_slice(&in_limbs[1..]);
             false
         }
     }

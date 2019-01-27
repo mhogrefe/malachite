@@ -17,10 +17,10 @@ use std::str::FromStr;
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 pub fn test_limbs_maybe_sign_extend_non_negative_in_place() {
-    let test = |limbs: &[Limb], out_limbs: &[Limb]| {
+    let test = |limbs: &[Limb], out: &[Limb]| {
         let mut mut_limbs = limbs.to_vec();
         limbs_maybe_sign_extend_non_negative_in_place(&mut mut_limbs);
-        assert_eq!(mut_limbs, out_limbs);
+        assert_eq!(mut_limbs, out);
     };
     test(&[], &[]);
     test(&[1, 2, 3], &[1, 2, 3]);
@@ -30,18 +30,18 @@ pub fn test_limbs_maybe_sign_extend_non_negative_in_place() {
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 pub fn test_limbs_twos_complement_in_place() {
-    let test = |limbs: &[Limb], out_limbs: &[Limb], carry: bool| {
+    let test = |limbs: &[Limb], out: &[Limb], carry: bool| {
         let mut mut_limbs = limbs.to_vec();
         assert_eq!(limbs_twos_complement_in_place(&mut mut_limbs), carry);
-        assert_eq!(mut_limbs, out_limbs);
+        assert_eq!(mut_limbs, out);
 
         let mut mut_limbs = limbs.to_vec();
         assert_eq!(limbs_twos_complement_in_place_alt_1(&mut mut_limbs), carry);
-        assert_eq!(mut_limbs, out_limbs);
+        assert_eq!(mut_limbs, out);
 
         let mut mut_limbs = limbs.to_vec();
         assert_eq!(limbs_twos_complement_in_place_alt_2(&mut mut_limbs), carry);
-        assert_eq!(mut_limbs, out_limbs);
+        assert_eq!(mut_limbs, out);
     };
     test(&[], &[], true);
     test(&[1, 2, 3], &[0xffff_ffff, 0xffff_fffd, 0xffff_fffc], false);
@@ -51,10 +51,10 @@ pub fn test_limbs_twos_complement_in_place() {
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 pub fn test_limbs_twos_complement_and_maybe_sign_extend_negative_in_place() {
-    let test = |limbs: &[Limb], out_limbs: &[Limb]| {
+    let test = |limbs: &[Limb], out: &[Limb]| {
         let mut mut_limbs = limbs.to_vec();
         limbs_twos_complement_and_maybe_sign_extend_negative_in_place(&mut mut_limbs);
-        assert_eq!(mut_limbs, out_limbs);
+        assert_eq!(mut_limbs, out);
     };
     test(&[1, 2, 3], &[0xffff_ffff, 0xffff_fffd, 0xffff_fffc]);
     test(&[0, 0xffff_ffff], &[0, 1, 0xffff_ffff]);
