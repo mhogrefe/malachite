@@ -1,10 +1,13 @@
 use malachite_base::limbs::limbs_test_zero;
-use malachite_base::num::{DivisibleByPowerOfTwo, Parity, WrappingAddAssign, WrappingSubAssign};
+use malachite_base::num::{
+    DivisibleByPowerOfTwo, Parity, PrimitiveInteger, UnsignedAbs, WrappingAddAssign,
+    WrappingSubAssign,
+};
 use natural::arithmetic::add::{
     limbs_add_same_length_to_out, limbs_slice_add_greater_in_place_left,
     limbs_slice_add_same_length_in_place_left,
 };
-use natural::arithmetic::add_limb::limbs_slice_add_limb_in_place;
+use natural::arithmetic::add_limb::{limbs_add_limb_to_out, limbs_slice_add_limb_in_place};
 use natural::arithmetic::add_mul_limb::mpn_addmul_1;
 use natural::arithmetic::div_exact_limb::{
     limbs_div_exact_3_in_place, limbs_div_exact_limb_in_place,
@@ -14,10 +17,11 @@ use natural::arithmetic::shr_u::limbs_slice_shr_in_place;
 use natural::arithmetic::sub::{
     _limbs_sub_same_length_in_place_with_overlap, limbs_sub_in_place_left,
     limbs_sub_same_length_in_place_left, limbs_sub_same_length_in_place_right,
+    limbs_sub_same_length_to_out,
 };
 use natural::arithmetic::sub_limb::limbs_sub_limb_in_place;
 use natural::arithmetic::sub_mul_limb::mpn_submul_1;
-use platform::Limb;
+use platform::{Limb, SignedLimb};
 
 /// This is mpn_toom_interpolate_5pts in mpn/generic/toom_interpolate_5pts.c.
 #[allow(clippy::cyclomatic_complexity)]
@@ -603,5 +607,210 @@ pub(crate) fn _limbs_mul_toom_interpolate_7_points(
         if WANT_ASSERT && n + n_high < m {
             limbs_test_zero(w5_hi_hi);
         }
+    }
+}
+
+// This is DO_mpn_sublsh_n from mpn/generic/mpn_toom_interpolate_8pts.c.
+fn do_mpn_sublsh_n(dst: &mut [Limb], src: &[Limb], n: usize, s: u32, ws: &mut [Limb]) -> Limb {
+    let carry = limbs_shl_to_out(ws, &src[..n], s);
+    carry
+        + if limbs_sub_same_length_in_place_left(&mut dst[..n], &ws[..n]) {
+            1
+        } else {
+            0
+        }
+}
+
+// This is not a correct definition, it assumes no carry
+// Thus is DO_mpn_subrsh from mpn/generic/mpn_toom_interpolate_8pts.c.
+fn do_mpn_subrsh(dst: &mut [Limb], nd: usize, src: &[Limb], ns: usize, s: u32, ws: &mut [Limb]) {
+    //mp_limb_t __cy;
+    assert!(!limbs_sub_limb_in_place(&mut dst[..nd], src[0] >> s));
+    let carry = do_mpn_sublsh_n(dst, &src[1..], ns - 1, Limb::WIDTH - s, ws);
+    assert!(!limbs_sub_limb_in_place(&mut dst[ns - 1..nd], carry));
+}
+
+// mpn_toom_interpolate_8pts -- Interpolate for toom54, 63, 72.
+/* Interpolation for Toom-4.5 (or Toom-4), using the evaluation
+   points: infinity(4.5 only), 4, -4, 2, -2, 1, -1, 0. More precisely,
+   we want to compute f(2^(GMP_NUMB_BITS * n)) for a polynomial f of
+   degree 7 (or 6), given the 8 (rsp. 7) values:
+
+     r1 = limit at infinity of f(x) / x^7,
+     r2 = f(4),
+     r3 = f(-4),
+     r4 = f(2),
+     r5 = f(-2),
+     r6 = f(1),
+     r7 = f(-1),
+     r8 = f(0).
+
+   All couples of the form f(n),f(-n) must be already mixed with
+   toom_couple_handling(f(n),...,f(-n),...)
+
+   The result is stored in {pp, spt + 7*n (or 6*n)}.
+   At entry, r8 is stored at {pp, 2n},
+   r5 is stored at {pp + 3n, 3n + 1}.
+
+   The other values are 2n+... limbs each (with most significant limbs small).
+
+   All intermediate results are positive.
+   Inputs are destroyed.
+*/
+
+/// This is mpn_toom_interpolate_8pts from mpn/generic/mpn_toom_interpolate_8pts.c, but the argument
+/// spt == `n_high` is moved to immediately after `n`.
+pub(crate) fn _limbs_mul_toom_interpolate_8_points(
+    pp: &mut [Limb],
+    n: usize,
+    spt: usize,
+    r3: &mut [Limb],
+    r7: &mut [Limb],
+    ws: &mut [Limb],
+) {
+    //TODO r5 length should be 3 * n + 1, r1 length should be spt
+    let (pp_lo, remainder) = pp.split_at_mut(3 * n);
+    let (r5, r1) = remainder.split_at_mut(4 * n);
+
+    // Interpolation
+    do_mpn_subrsh(&mut r3[n..], 2 * n + 1, pp_lo, 2 * n, 4, ws);
+    let cy = do_mpn_sublsh_n(r3, r1, spt, 12, ws);
+    assert!(!limbs_sub_limb_in_place(&mut r3[spt..3 * n + 1], cy));
+
+    do_mpn_subrsh(&mut r5[n..], 2 * n + 1, pp_lo, 2 * n, 2, ws);
+    let cy = do_mpn_sublsh_n(r5, r1, spt, 6, ws);
+    assert!(!limbs_sub_limb_in_place(&mut r5[spt..3 * n + 1], cy));
+
+    r7[3 * n] -= if limbs_sub_same_length_in_place_left(&mut r7[n..3 * n], &pp_lo[..2 * n]) {
+        1
+    } else {
+        0
+    };
+    let cy = if limbs_sub_same_length_in_place_left(&mut r7[..spt], &r1[..spt]) {
+        1
+    } else {
+        0
+    };
+    assert!(!limbs_sub_limb_in_place(&mut r7[spt..3 * n + 1], cy));
+
+    assert!(!limbs_sub_same_length_in_place_left(
+        &mut r3[..3 * n + 1],
+        &r5[..3 * n + 1]
+    ));
+    assert_eq!(limbs_slice_shr_in_place(&mut r3[..3 * n + 1], 2), 0);
+    assert!(!limbs_sub_same_length_in_place_left(
+        &mut r5[..3 * n + 1],
+        &r7[..3 * n + 1]
+    ));
+    assert!(!limbs_sub_same_length_in_place_left(
+        &mut r3[..3 * n + 1],
+        &r5[..3 * n + 1]
+    ));
+    limbs_div_exact_limb_in_place(&mut r3[..3 * n + 1], 45);
+    limbs_div_exact_3_in_place(&mut r5[..3 * n + 1]);
+    assert_eq!(do_mpn_sublsh_n(r5, r3, 3 * n + 1, 2, ws), 0);
+
+    // last interpolation steps are mixed with recomposition */
+    // Recomposition
+    //
+    //pp[] prior to operations:
+    // |_H r1|_L r1|____||_H r5|_M_r5|_L r5|_____|_H r8|_L r8|pp
+    //
+    //summation scheme for remaining operations:
+    // |____8|n___7|n___6|n___5|n___4|n___3|n___2|n____|n____|pp
+    // |_H r1|_L r1|____||_H*r5|_M r5|_L r5|_____|_H_r8|_L r8|pp
+    //  ||_H r3|_M r3|_L*r3|
+    //              ||_H_r7|_M_r7|_L_r7|
+    //          ||-H r3|-M r3|-L*r3|
+    //              ||-H*r5|-M_r5|-L_r5|
+    //
+    // Hr8+Lr7-Lr5
+    let mut cy: SignedLimb =
+        if limbs_slice_add_same_length_in_place_left(&mut pp_lo[n..2 * n], &r7[..n]) {
+            1
+        } else {
+            0
+        };
+    cy -= if limbs_sub_same_length_in_place_left(&mut pp_lo[n..2 * n], &r5[..n]) {
+        1
+    } else {
+        0
+    };
+    if cy < 0 {
+        assert!(!limbs_sub_limb_in_place(&mut r7[n..3 * n + 1], 1));
+    } else {
+        assert!(!limbs_slice_add_limb_in_place(
+            &mut r7[n..3 * n + 1],
+            cy.unsigned_abs()
+        ));
+    }
+
+    // Mr7-Mr5
+    let cy = if limbs_sub_same_length_to_out(&mut pp_lo[2 * n..], &r7[n..2 * n], &r5[n..2 * n]) {
+        1
+    } else {
+        0
+    };
+    assert!(!limbs_sub_limb_in_place(&mut r7[2 * n..3 * n + 1], cy));
+
+    // Hr7+Lr5
+    let mut cy: SignedLimb =
+        if limbs_slice_add_same_length_in_place_left(&mut r5[..n + 1], &r7[2 * n..3 * n + 1]) {
+            1
+        } else {
+            0
+        };
+    // Hr5+Lr3
+    r5[3 * n] += if limbs_slice_add_same_length_in_place_left(&mut r5[2 * n..3 * n], &r3[..n]) {
+        1
+    } else {
+        0
+    };
+    // Hr7-Hr5+Lr5-Lr3
+    {
+        let (r5_lo, r5_hi) = r5.split_at_mut(2 * n);
+        cy -= if limbs_sub_same_length_in_place_left(&mut r5_lo[..n + 1], &r5_hi[..n + 1]) {
+            1
+        } else {
+            0
+        };
+    }
+    if cy < 0 {
+        assert!(!limbs_sub_limb_in_place(&mut r5[n + 1..3 * n + 1], 1));
+    } else {
+        assert!(!limbs_slice_add_limb_in_place(
+            &mut r5[n + 1..3 * n + 1],
+            cy.unsigned_abs()
+        ));
+    }
+
+    // Mr5-Mr3,Hr5-Hr3
+    assert!(limbs_sub_same_length_in_place_left(
+        &mut r5[n..3 * n + 1],
+        &r3[n..3 * n + 1]
+    ));
+
+    let r5_3n = r5[3 * n];
+    let cy = if limbs_add_limb_to_out(&mut r5[3 * n..], &r3[n..2 * n], r5_3n) {
+        1
+    } else {
+        0
+    };
+    assert!(!limbs_slice_add_limb_in_place(
+        &mut r3[2 * n..3 * n + 1],
+        cy
+    ));
+    let cy = if limbs_slice_add_same_length_in_place_left(&mut r1[..2 * n], &r3[2 * n..3 * n]) {
+        1
+    } else {
+        0
+    };
+    if spt != n {
+        assert!(!limbs_slice_add_limb_in_place(
+            &mut r1[n..spt],
+            cy + r3[3 * n]
+        ));
+    } else {
+        assert_eq!(r3[3 * n] + cy, 0);
     }
 }

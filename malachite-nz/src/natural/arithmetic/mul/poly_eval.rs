@@ -347,3 +347,69 @@ pub(crate) fn _limbs_mul_toom_evaluate_poly_in_2_and_neg_2(
     }
     neg
 }
+
+// Evaluates a polynomial of degree k > 2, in the points +2^shift and -2^shift.
+// This is mpn_toom_eval_pm2exp from mpn/generic/toom_eval_pm2exp.c.
+pub(crate) fn _limbs_mul_toom_evaluate_poly_in_2_pow_and_neg_2_pow(
+    xp2: &mut [Limb],
+    xm2: &mut [Limb],
+    k: u32,
+    xp: &[Limb],
+    n: usize,
+    hn: usize,
+    shift: u32,
+    tp: &mut [Limb],
+) -> bool {
+    assert!(k >= 3);
+    assert!(shift * k < Limb::WIDTH);
+    assert_ne!(hn, 0);
+    assert!(hn <= n);
+    let k_u = k as usize;
+
+    // The degree k is also the number of full-size coefficients, so
+    // that last coefficient, of size hn, starts at xp + k*n.
+    xp2[n] = limbs_shl_to_out(tp, &xp[2 * n..3 * n], 2 * shift);
+    xp2[n] += if limbs_add_same_length_to_out(xp2, &xp[..n], &tp[..n]) {
+        1
+    } else {
+        0
+    };
+    let mut i = 4;
+    while i < k_u {
+        xp2[n] += limbs_shl_to_out(tp, &xp[i * n..(i + 1) * n], (i as u32) * shift);
+        xp2[n] += if limbs_slice_add_same_length_in_place_left(&mut xp2[..n], &tp[..n]) {
+            1
+        } else {
+            0
+        };
+        i += 2;
+    }
+
+    tp[n] = limbs_shl_to_out(tp, &xp[n..2 * n], shift);
+    let mut i = 3;
+    while i < k_u {
+        tp[n] += limbs_shl_to_out(xm2, &xp[i * n..(i + 1) * n], (i as u32) * shift);
+        tp[n] += if limbs_slice_add_same_length_in_place_left(&mut tp[..n], &xm2[..n]) {
+            1
+        } else {
+            0
+        };
+        i += 2;
+    }
+
+    xm2[hn] = limbs_shl_to_out(xm2, &xp[k_u * n..k_u * n + hn], k * shift);
+    if k.odd() {
+        limbs_slice_add_greater_in_place_left(&mut tp[..n + 1], &xm2[..hn + 1]);
+    } else {
+        limbs_slice_add_greater_in_place_left(&mut xp2[..n + 1], &xm2[..hn + 1]);
+    }
+
+    let neg = limbs_cmp_same_length(&xp2[..n + 1], &tp[..n + 1]) == Ordering::Less;
+    if neg {
+        limbs_sub_same_length_to_out(xm2, &tp[..n + 1], &xp2[..n + 1]);
+    } else {
+        limbs_sub_same_length_to_out(xm2, &xp2[..n + 1], &tp[..n + 1]);
+    }
+    limbs_slice_add_same_length_in_place_left(&mut xp2[..n + 1], &tp[..n + 1]);
+    return neg;
+}
