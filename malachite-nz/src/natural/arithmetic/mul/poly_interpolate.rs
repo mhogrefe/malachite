@@ -624,7 +624,6 @@ fn do_mpn_sublsh_n(dst: &mut [Limb], src: &[Limb], n: usize, s: u32, ws: &mut [L
 // This is not a correct definition, it assumes no carry
 // Thus is DO_mpn_subrsh from mpn/generic/mpn_toom_interpolate_8pts.c.
 fn do_mpn_subrsh(dst: &mut [Limb], nd: usize, src: &[Limb], ns: usize, s: u32, ws: &mut [Limb]) {
-    //mp_limb_t __cy;
     assert!(!limbs_sub_limb_in_place(&mut dst[..nd], src[0] >> s));
     let carry = do_mpn_sublsh_n(dst, &src[1..], ns - 1, Limb::WIDTH - s, ws);
     assert!(!limbs_sub_limb_in_place(&mut dst[ns - 1..nd], carry));
@@ -785,7 +784,7 @@ pub(crate) fn _limbs_mul_toom_interpolate_8_points(
     }
 
     // Mr5-Mr3,Hr5-Hr3
-    assert!(limbs_sub_same_length_in_place_left(
+    assert!(!limbs_sub_same_length_in_place_left(
         &mut r5[n..3 * n + 1],
         &r3[n..3 * n + 1]
     ));
@@ -800,7 +799,7 @@ pub(crate) fn _limbs_mul_toom_interpolate_8_points(
         &mut r3[2 * n..3 * n + 1],
         cy
     ));
-    let cy = if limbs_slice_add_same_length_in_place_left(&mut r1[..2 * n], &r3[2 * n..3 * n]) {
+    let cy = if limbs_slice_add_same_length_in_place_left(&mut r1[..n], &r3[2 * n..3 * n]) {
         1
     } else {
         0

@@ -411,5 +411,5 @@ pub(crate) fn _limbs_mul_toom_evaluate_poly_in_2_pow_and_neg_2_pow(
         limbs_sub_same_length_to_out(xm2, &xp2[..n + 1], &tp[..n + 1]);
     }
     limbs_slice_add_same_length_in_place_left(&mut xp2[..n + 1], &tp[..n + 1]);
-    return neg;
+    neg
 }

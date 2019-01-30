@@ -8,6 +8,7 @@ use malachite_base::num::{
 use malachite_base::round::RoundingMode;
 use malachite_nz::integer::logic::bit_access::limbs_vec_clear_bit_neg;
 use malachite_nz::natural::arithmetic::mul::toom::{
+    _limbs_mul_greater_to_out_toom_22_input_sizes_valid,
     _limbs_mul_greater_to_out_toom_32_input_sizes_valid,
     _limbs_mul_greater_to_out_toom_33_input_sizes_valid,
     _limbs_mul_greater_to_out_toom_42_input_sizes_valid,
@@ -15,6 +16,7 @@ use malachite_nz::natural::arithmetic::mul::toom::{
     _limbs_mul_greater_to_out_toom_44_input_sizes_valid,
     _limbs_mul_greater_to_out_toom_52_input_sizes_valid,
     _limbs_mul_greater_to_out_toom_53_input_sizes_valid,
+    _limbs_mul_greater_to_out_toom_54_input_sizes_valid,
 };
 use malachite_nz::natural::arithmetic::mul_limb::limbs_mul_limb;
 use malachite_nz::platform::{HalfLimb, Limb, SignedHalfLimb, SignedLimb};
@@ -356,6 +358,17 @@ pub fn pairs_of_small_usize_and_unsigned<T: PrimitiveUnsigned + Rand>(
             &EXAMPLE_SEED,
             &(|seed| u32s_geometric(seed, scale).map(|u| u as usize)),
             &(|seed| special_random_unsigned(seed)),
+        )),
+    }
+}
+
+pub fn pairs_of_small_usizes(gm: NoSpecialGenerationMode) -> Box<Iterator<Item = (usize, usize)>> {
+    match gm {
+        NoSpecialGenerationMode::Exhaustive => permute_1_2(Box::new(exhaustive_pairs_from_single(
+            exhaustive_unsigned::<u32>().map(|u| u as usize),
+        ))),
+        NoSpecialGenerationMode::Random(scale) => Box::new(random_pairs_from_single(
+            u32s_geometric(&EXAMPLE_SEED, scale).map(|u| u as usize),
         )),
     }
 }
@@ -1382,13 +1395,8 @@ pub fn triples_of_unsigned_vec_var_11<T: PrimitiveUnsigned + Rand>(
 ) -> Box<Iterator<Item = (Vec<T>, Vec<T>, Vec<T>)>> {
     Box::new(
         triples_of_unsigned_vec_min_sizes(gm, 3, 3, 1).filter(|&(ref out, ref xs, ref ys)| {
-            xs.len() >= ys.len()
-                && out.len() >= xs.len() + ys.len()
-                && if xs.len().even() {
-                    xs.len()
-                } else {
-                    xs.len() + 1
-                } < 2 * ys.len()
+            out.len() >= xs.len() + ys.len()
+                && _limbs_mul_greater_to_out_toom_22_input_sizes_valid(xs.len(), ys.len())
         }),
     )
 }
@@ -1482,6 +1490,19 @@ pub fn triples_of_unsigned_vec_var_18<T: PrimitiveUnsigned + Rand>(
                 && _limbs_mul_greater_to_out_toom_53_input_sizes_valid(xs.len(), ys.len())
         }),
     )
+}
+
+// All triples of `Vec<T>`, where `T` is unsigned and `out`, `xs`, and `ys` meet the
+// preconditions of `_limbs_mul_greater_to_out_toom_54`.
+pub fn triples_of_unsigned_vec_var_19<T: PrimitiveUnsigned + Rand>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (Vec<T>, Vec<T>, Vec<T>)>> {
+    Box::new(triples_of_unsigned_vec_min_sizes(gm, 25, 14, 11).filter(
+        |&(ref out, ref xs, ref ys)| {
+            out.len() >= xs.len() + ys.len()
+                && _limbs_mul_greater_to_out_toom_54_input_sizes_valid(xs.len(), ys.len())
+        },
+    ))
 }
 
 pub fn quadruples_of_three_unsigned_vecs_and_bool<T: PrimitiveUnsigned + Rand>(

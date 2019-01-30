@@ -58,7 +58,8 @@ pub const MUL_TOOM33_THRESHOLD_LIMIT: usize = MUL_TOOM33_THRESHOLD;
 //   {pp,n+off} <- {pp,n}+{np,n}*2^{off*GMP_NUMB_BITS}
 // This is mpn_toom_couple_handling from mpn/generic/toom_couple_handling.c. The argmuemt `n` is
 // excluded as it is just the length of np.
-fn mpn_toom_couple_handling(
+/// This is mpn_toom_couple_handling from mpn/generic/toom_couple_handling.c.
+fn _limbs_toom_couple_handling(
     pp: &mut [Limb],
     np: &mut [Limb],
     nsign: bool,
@@ -163,6 +164,21 @@ fn _limbs_mul_greater_to_out_toom_22_recursive(
     }
 }
 
+/// This function can be used to determine whether the sizes of the input slices to
+/// `_limbs_mul_greater_to_out_toom_22` are valid.
+pub fn _limbs_mul_greater_to_out_toom_22_input_sizes_valid(xs_len: usize, ys_len: usize) -> bool {
+    if ys_len == 0 || xs_len < ys_len {
+        return false;
+    }
+    let s = xs_len >> 1;
+    let n = xs_len - s;
+    if ys_len < n {
+        return false;
+    }
+    let t = ys_len - n;
+    s > 0 && (s == n || s == n - 1) && 0 < t && t <= s
+}
+
 /// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, writes
 /// the `xs.len() + ys.len()` least-significant limbs of the product of the `Natural`s to an output
 /// slice. A "scratch" slice is provided for the algorithm to use. An upper bound for the number of
@@ -170,10 +186,8 @@ fn _limbs_mul_greater_to_out_toom_22_recursive(
 /// following restrictions on the input slices must be met:
 /// 1. `out`.len() >= `xs`.len() + `ys`.len()
 /// 2. `xs`.len() >= `ys`.len()
-/// 3. `xs`.len() > 2
-/// 4. ys.len() > 0
-/// 5a. If xs.len() is even, xs.len() < 2 * ys.len()
-/// 5b. If xs.len() is odd, xs.len() + 1 < 2 * ys.len()
+/// 3. Others; see `_limbs_mul_greater_to_out_toom_22_input_sizes_valid`. The gist is that `xs` must
+/// be less than twice as long as `ys`.
 ///
 /// This uses the Toom-22, aka Toom-2, aka Karatsuba algorithm.
 ///
@@ -2239,16 +2253,43 @@ pub fn _limbs_mul_greater_to_out_toom_53(
     );
 }
 
-// Toom-4.5, the splitting 5x4 unbalanced version.
-// Evaluate in: infinity, +4, -4, +2, -2, +1, -1, 0.
+/// This function can be used to determine whether the sizes of the input slices to
+/// `_limbs_mul_greater_to_out_toom_54` are valid.
+pub fn _limbs_mul_greater_to_out_toom_54_input_sizes_valid(xs_len: usize, ys_len: usize) -> bool {
+    if xs_len == 0 || xs_len < ys_len {
+        return false;
+    }
+    // Decomposition
+    let n = 1 + if 4 * xs_len >= 5 * ys_len {
+        (xs_len - 1) / 5
+    } else {
+        (ys_len - 1) / 4
+    };
+    if xs_len < (n << 2) {
+        return false;
+    }
+    let s = xs_len - (n << 2);
+    if ys_len < 3 * n {
+        return false;
+    }
+    let t = ys_len - 3 * n;
+    0 < s && s <= n && 0 < t && t <= n && s + t >= n && s + t > 4 && n > 2
+}
 
-//<--s-><--n--><--n--><--n--><--n-->
-// ____ ______ ______ ______ ______
-//|_a4_|__a3__|__a2__|__a1__|__a0__|
-//    |b3_|__b2__|__b1__|__b0__|
-//    <-t-><--n--><--n--><--n-->
+/// This function can be used to determine the length of the input `scratch` slice in
+/// `_limbs_mul_greater_to_out_toom_54`.
+///
+/// This is mpn_toom54_mul_itch from gmp-impl.h.
+pub fn _limbs_mul_greater_to_out_toom_54_scratch_size(xs_len: usize, ys_len: usize) -> usize {
+    let n = 1
+        + (if 4 * xs_len >= 5 * ys_len {
+            (xs_len - 1) / 5
+        } else {
+            (ys_len - 1) / 4
+        });
+    9 * n + 3
+}
 
-//
 // This is TOOM_54_MUL_N_REC from from mpn/generic/toom54_mul.c.
 fn _limbs_mul_same_length_to_out_toom_54_recursive(p: &mut [Limb], a: &[Limb], b: &[Limb]) {
     limbs_mul_same_length_to_out(p, a, b);
@@ -2259,17 +2300,25 @@ fn _limbs_mul_to_out_toom_54_recursive(p: &mut [Limb], a: &[Limb], b: &[Limb]) {
     limbs_mul_greater_to_out(p, a, b);
 }
 
+/// Toom-4.5, the splitting 5x4 unbalanced version.
+/// Evaluate in: infinity, +4, -4, +2, -2, +1, -1, 0.
+///
+///<--s-><--n--><--n--><--n--><--n-->
+/// ____ ______ ______ ______ ______
+///|_a4_|__a3__|__a2__|__a1__|__a0__|
+///        |b3_|__b2__|__b1__|__b0__|
+///        <-t-><--n--><--n--><--n-->
+///
+///
 /// This is mpn_toom54_mul from mpn/generic/toom54_mul.c.
 pub fn _limbs_mul_greater_to_out_toom_54(
     pp: &mut [Limb],
-    ap: &[Limb],
-    bp: &[Limb],
+    xs: &[Limb],
+    ys: &[Limb],
     scratch: &mut [Limb],
 ) {
-    // mp_size_t n, s, t;
-    // int sign;
-    let an = ap.len();
-    let bn = bp.len();
+    let an = xs.len();
+    let bn = ys.len();
     assert!(an >= bn);
 
     // Decomposition
@@ -2278,10 +2327,10 @@ pub fn _limbs_mul_greater_to_out_toom_54(
     } else {
         (bn - 1) / 4
     };
-    let a4 = &ap[4 * n..];
-    let b3 = &bp[3 * n..];
+    let a4 = &xs[4 * n..];
+    let b3 = &ys[3 * n..];
 
-    let s = an - 4 * n;
+    let s = an - (n << 2);
     let t = bn - 3 * n;
 
     assert!(0 < s && s <= n);
@@ -2291,17 +2340,7 @@ pub fn _limbs_mul_greater_to_out_toom_54(
     assert!(s + t > 4);
     assert!(n > 2);
 
-    //#define   r8    pp                /* 2n   */
-    //#define   r7    scratch                /* 3n+1 */
-    //#define   r5    (pp + 3*n)            /* 3n+1 */
-    //#define   v0    (pp + 3*n)            /* n+1 */
-    //#define   v1    (pp + 4*n+1)            /* n+1 */
-    //#define   v2    (pp + 5*n+2)            /* n+1 */
-    //#define   v3    (pp + 6*n+3)            /* n+1 */
-    //#define   r3    (scratch + 3 * n + 1)        /* 3n+1 */
-    //#define   r1    (pp + 7*n)            /* s+t <= 2*n */
-    //#define   ws    (scratch + 6 * n + 2)        /* ??? */
-    let sign;
+    let neg_2_sign;
     split_into_chunks_mut!(scratch, 3 * n + 1, [r7, r3], ws);
     {
         let (pp_lo, pp_hi) = pp.split_at_mut(3 * n);
@@ -2311,33 +2350,55 @@ pub fn _limbs_mul_greater_to_out_toom_54(
         // Evaluation and recursive calls
         // $pm4$
         let neg_2_pow_sign =
-            _limbs_mul_toom_evaluate_poly_in_2_pow_and_neg_2_pow(v2, v0, 4, ap, n, s, 2, pp_lo)
+            _limbs_mul_toom_evaluate_poly_in_2_pow_and_neg_2_pow(v2, v0, 4, xs, n, s, 2, pp_lo)
                 ^ _limbs_mul_toom_evaluate_poly_in_2_pow_and_neg_2_pow(
-                    v3, v1, 3, bp, n, t, 2, pp_lo,
+                    v3, v1, 3, ys, n, t, 2, pp_lo,
                 );
         // A(-4)*B(-4)
         _limbs_mul_same_length_to_out_toom_54_recursive(pp_lo, &v0[..n + 1], &v1[..n + 1]);
         // A(+4)*B(+4)
         _limbs_mul_same_length_to_out_toom_54_recursive(r3, &v2[..n + 1], &v3[..n + 1]);
-        mpn_toom_couple_handling(r3, &mut pp_lo[..2 * n + 1], neg_2_pow_sign, n, 2, 4);
+        _limbs_toom_couple_handling(r3, &mut pp_lo[..2 * n + 1], neg_2_pow_sign, n, 2, 4);
 
         // $pm1$
-        let neg_1_sign =
-            _limbs_mul_toom_evaluate_poly_in_1_and_neg_1(v2, v0, 4, ap, n, s, pp_lo, ap, bp)
-                ^ _limbs_mul_toom_evaluate_deg_3_poly_in_1_and_neg_1(v3, v1, bp, n, t, pp_lo);
+        let neg_1_sign = _limbs_mul_toom_evaluate_poly_in_1_and_neg_1(
+            v2,
+            v0,
+            4,
+            xs,
+            n,
+            s,
+            &mut pp_lo[..n + 1],
+            xs,
+            ys,
+        ) ^ _limbs_mul_toom_evaluate_deg_3_poly_in_1_and_neg_1(
+            v3,
+            v1,
+            ys,
+            n,
+            t,
+            &mut pp_lo[..n + 1],
+        );
         // A(-1)*B(-1)
         _limbs_mul_same_length_to_out_toom_54_recursive(pp_lo, &v0[..n + 1], &v1[..n + 1]);
         // A(1)*B(1)
         _limbs_mul_same_length_to_out_toom_54_recursive(r7, &v2[..n + 1], &v3[..n + 1]);
-        mpn_toom_couple_handling(r7, &mut pp_lo[..2 * n + 1], neg_1_sign, n, 0, 0);
+        _limbs_toom_couple_handling(r7, &mut pp_lo[..2 * n + 1], neg_1_sign, n, 0, 0);
 
         // $pm2$
-        sign = _limbs_mul_toom_evaluate_poly_in_2_and_neg_2(v2, v0, 4, ap, n, s, pp_lo, ap, bp)
-            ^ _limbs_mul_toom_evaluate_deg_3_poly_in_2_and_neg_2(v3, v1, bp, n, t, pp_lo);
+        neg_2_sign =
+            _limbs_mul_toom_evaluate_poly_in_2_and_neg_2(v2, v0, 4, xs, n, s, pp_lo, xs, ys)
+                ^ _limbs_mul_toom_evaluate_deg_3_poly_in_2_and_neg_2(
+                    v3,
+                    v1,
+                    ys,
+                    n,
+                    t,
+                    &mut pp_lo[..n + 1],
+                );
         // A(-2)*B(-2)
         _limbs_mul_same_length_to_out_toom_54_recursive(pp_lo, &v0[..n + 1], &v1[..n + 1]);
     }
-    //#define   r5    (pp + 3*n)            /* 3n+1 */
     {
         let (r5, remainder) = pp[3 * n..].split_at_mut(2 * n + 2);
         let (v2, v3) = remainder.split_at_mut(n + 1);
@@ -2346,13 +2407,13 @@ pub fn _limbs_mul_greater_to_out_toom_54(
     }
     {
         let (pp_lo, r5) = pp.split_at_mut(3 * n);
-        mpn_toom_couple_handling(r5, &mut pp_lo[..2 * n + 1], sign, n, 1, 2);
+        _limbs_toom_couple_handling(r5, &mut pp_lo[..2 * n + 1], neg_2_sign, n, 1, 2);
     }
 
     // A(0)*B(0)
-    _limbs_mul_same_length_to_out_toom_54_recursive(pp, &ap[..n], &bp[..n]);
+    _limbs_mul_same_length_to_out_toom_54_recursive(pp, &xs[..n], &ys[..n]);
 
-    /* Infinity */
+    // Infinity
     if s > t {
         _limbs_mul_to_out_toom_54_recursive(&mut pp[7 * n..], &a4[..s], &b3[..t]);
     } else {
