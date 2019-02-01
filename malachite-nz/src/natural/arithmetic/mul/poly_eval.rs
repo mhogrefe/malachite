@@ -1,4 +1,6 @@
-use malachite_base::num::{NotAssign, Parity, PrimitiveInteger, WrappingSubAssign};
+use malachite_base::num::{
+    NotAssign, Parity, PrimitiveInteger, WrappingAddAssign, WrappingSubAssign,
+};
 use natural::arithmetic::add::{
     _limbs_add_to_out_special, limbs_add_same_length_to_out, limbs_add_to_out,
     limbs_slice_add_greater_in_place_left, limbs_slice_add_same_length_in_place_left,
@@ -216,7 +218,8 @@ fn shl_2_and_add_with_carry_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb], c
 
 /// Given a `Natural` whose highest limb is `carry` and remaining limbs are `xs`, multiplies the
 /// `Natural` by 4 and adds the `Natural` whose limbs are `ys`. The highest limb of the result is
-/// written back to `carry` and the remaining limbs are written to `xs`.
+/// written back to `carry` and the remaining limbs are written to `xs`. `xs` and `ys` must have the
+/// same length.
 ///
 /// Time: worst case O(n)
 ///
@@ -348,68 +351,82 @@ pub(crate) fn _limbs_mul_toom_evaluate_poly_in_2_and_neg_2(
     neg
 }
 
-// Evaluates a polynomial of degree k > 2, in the points +2^shift and -2^shift.
-// This is mpn_toom_eval_pm2exp from mpn/generic/toom_eval_pm2exp.c.
+/// Evaluates a polynomial of degree `degree` > 2, in the points 2 ^ shift and -2 ^ shift, where
+/// each coefficient has width `n` limbs, except the last, which has width `n_high` limbs.
+///
+/// This is mpn_toom_eval_pm2exp from mpn/generic/toom_eval_pm2exp.c.
 pub(crate) fn _limbs_mul_toom_evaluate_poly_in_2_pow_and_neg_2_pow(
-    xp2: &mut [Limb],
-    xm2: &mut [Limb],
-    k: u32,
-    xp: &[Limb],
+    v_2_pow: &mut [Limb],
+    v_neg_2_pow: &mut [Limb],
+    degree: u32,
+    poly: &[Limb],
     n: usize,
-    hn: usize,
+    n_high: usize,
     shift: u32,
-    tp: &mut [Limb],
+    scratch: &mut [Limb],
 ) -> bool {
-    assert!(k >= 3);
-    assert!(shift * k < Limb::WIDTH);
-    assert_ne!(hn, 0);
-    assert!(hn <= n);
-    let k_u = k as usize;
+    assert!(degree >= 3);
+    assert!(shift * degree < Limb::WIDTH);
+    assert_ne!(n_high, 0);
+    assert!(n_high <= n);
+    assert_eq!(scratch.len(), n + 1);
+    assert_eq!(v_2_pow.len(), n + 1);
+    let degree_u = degree as usize;
+    let mut coefficients = Vec::with_capacity(degree_u + 1);
+    let mut lower_index;
+    let mut upper_index = 0;
+    for _ in 0..degree {
+        lower_index = upper_index;
+        upper_index += n;
+        coefficients.push(&poly[lower_index..upper_index]);
+    }
+    coefficients.push(&poly[upper_index..]);
+    {
+        let (scratch_last, scratch_init) = scratch.split_last_mut().unwrap();
+        let (v_2_pow_last, v_2_pow_init) = v_2_pow.split_last_mut().unwrap();
+        // The degree `degree` is also the number of full-size coefficients, so that the last
+        // coefficient, of size `n_high`, starts at `poly + degree * n`.
+        *v_2_pow_last = limbs_shl_to_out(scratch_init, coefficients[2], shift << 1);
+        if limbs_add_same_length_to_out(v_2_pow_init, coefficients[0], scratch_init) {
+            v_2_pow_last.wrapping_add_assign(1);
+        }
+        let mut i = 4;
+        while i < degree_u {
+            v_2_pow_last.wrapping_add_assign(limbs_shl_to_out(
+                scratch_init,
+                coefficients[i],
+                (i as u32) * shift,
+            ));
+            if limbs_slice_add_same_length_in_place_left(v_2_pow_init, scratch_init) {
+                v_2_pow_last.wrapping_add_assign(1);
+            }
+            i += 2;
+        }
 
-    // The degree k is also the number of full-size coefficients, so
-    // that last coefficient, of size hn, starts at xp + k*n.
-    xp2[n] = limbs_shl_to_out(tp, &xp[2 * n..3 * n], 2 * shift);
-    xp2[n] += if limbs_add_same_length_to_out(xp2, &xp[..n], &tp[..n]) {
-        1
+        *scratch_last = limbs_shl_to_out(scratch_init, coefficients[1], shift);
+        let mut i = 3;
+        while i < degree_u {
+            *scratch_last += limbs_shl_to_out(v_neg_2_pow, coefficients[i], (i as u32) * shift);
+            if limbs_slice_add_same_length_in_place_left(scratch_init, &v_neg_2_pow[..n]) {
+                scratch_last.wrapping_add_assign(1);
+            }
+            i += 2;
+        }
+    }
+
+    v_neg_2_pow[n_high] = limbs_shl_to_out(v_neg_2_pow, coefficients[degree_u], degree * shift);
+    if degree.even() {
+        limbs_slice_add_greater_in_place_left(v_2_pow, &v_neg_2_pow[..n_high + 1]);
     } else {
-        0
-    };
-    let mut i = 4;
-    while i < k_u {
-        xp2[n] += limbs_shl_to_out(tp, &xp[i * n..(i + 1) * n], (i as u32) * shift);
-        xp2[n] += if limbs_slice_add_same_length_in_place_left(&mut xp2[..n], &tp[..n]) {
-            1
-        } else {
-            0
-        };
-        i += 2;
+        limbs_slice_add_greater_in_place_left(scratch, &v_neg_2_pow[..n_high + 1]);
     }
 
-    tp[n] = limbs_shl_to_out(tp, &xp[n..2 * n], shift);
-    let mut i = 3;
-    while i < k_u {
-        tp[n] += limbs_shl_to_out(xm2, &xp[i * n..(i + 1) * n], (i as u32) * shift);
-        tp[n] += if limbs_slice_add_same_length_in_place_left(&mut tp[..n], &xm2[..n]) {
-            1
-        } else {
-            0
-        };
-        i += 2;
-    }
-
-    xm2[hn] = limbs_shl_to_out(xm2, &xp[k_u * n..k_u * n + hn], k * shift);
-    if k.odd() {
-        limbs_slice_add_greater_in_place_left(&mut tp[..n + 1], &xm2[..hn + 1]);
+    let v_neg_2_pow_neg = limbs_cmp_same_length(v_2_pow, scratch) == Ordering::Less;
+    if v_neg_2_pow_neg {
+        limbs_sub_same_length_to_out(v_neg_2_pow, scratch, v_2_pow);
     } else {
-        limbs_slice_add_greater_in_place_left(&mut xp2[..n + 1], &xm2[..hn + 1]);
+        limbs_sub_same_length_to_out(v_neg_2_pow, v_2_pow, scratch);
     }
-
-    let neg = limbs_cmp_same_length(&xp2[..n + 1], &tp[..n + 1]) == Ordering::Less;
-    if neg {
-        limbs_sub_same_length_to_out(xm2, &tp[..n + 1], &xp2[..n + 1]);
-    } else {
-        limbs_sub_same_length_to_out(xm2, &xp2[..n + 1], &tp[..n + 1]);
-    }
-    limbs_slice_add_same_length_in_place_left(&mut xp2[..n + 1], &tp[..n + 1]);
-    neg
+    limbs_slice_add_same_length_in_place_left(v_2_pow, scratch);
+    v_neg_2_pow_neg
 }
