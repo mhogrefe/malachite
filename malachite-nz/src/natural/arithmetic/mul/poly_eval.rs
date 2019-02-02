@@ -165,12 +165,6 @@ pub(crate) fn _limbs_mul_toom_evaluate_poly_in_1_and_neg_1(
     }
 
     if k & 1 != 0 {
-        if *xs.last().unwrap() != 0 && *ys.last().unwrap() != 0 {
-            panic!(
-                "k & 1 != 0 in _limbs_mul_toom_evaluate_poly_in_1_and_neg_1: {:?} {:?}",
-                xs, ys
-            );
-        }
         assert!(!limbs_slice_add_greater_in_place_left(
             &mut tp[..n + 1],
             &xp[k * n..k * n + hn]
@@ -248,9 +242,7 @@ pub(crate) fn _limbs_mul_toom_evaluate_poly_in_2_and_neg_2(
     poly: &[Limb],
     n: usize,
     n_high: usize,
-    scratch: &mut [Limb], //TODO remove
-    xs: &[Limb],
-    ys: &[Limb],
+    scratch: &mut [Limb],
 ) -> bool {
     assert!(degree > 2);
     assert!(degree < Limb::WIDTH);
@@ -298,12 +290,6 @@ pub(crate) fn _limbs_mul_toom_evaluate_poly_in_2_and_neg_2(
         &mut cy,
     );
     if degree_u >= 4 {
-        if *xs.last().unwrap() != 0 && *ys.last().unwrap() != 0 {
-            panic!(
-                "degree_u >= 4 in _limbs_mul_toom_evaluate_poly_in_2_and_neg_2: {:?} {:?}",
-                xs, ys
-            );
-        }
         let mut i = degree_u - 4;
         loop {
             shl_2_and_add_with_carry_in_place_left(
@@ -323,12 +309,6 @@ pub(crate) fn _limbs_mul_toom_evaluate_poly_in_2_and_neg_2(
     if (degree & 1) != 0 {
         assert_eq!(limbs_slice_shl_in_place(&mut scratch[..limit], 1), 0);
     } else {
-        if *xs.last().unwrap() != 0 && *ys.last().unwrap() != 0 {
-            panic!(
-                "(degree & 1) == 0 in _limbs_mul_toom_evaluate_poly_in_2_and_neg_2: {:?} {:?}",
-                xs, ys
-            );
-        }
         assert_eq!(limbs_slice_shl_in_place(&mut v_2[..limit], 1), 0);
     }
 

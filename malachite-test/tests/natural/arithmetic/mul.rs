@@ -10,6 +10,7 @@ use malachite_nz::natural::arithmetic::mul::toom::{
     _limbs_mul_greater_to_out_toom_52, _limbs_mul_greater_to_out_toom_52_scratch_size,
     _limbs_mul_greater_to_out_toom_53, _limbs_mul_greater_to_out_toom_53_scratch_size,
     _limbs_mul_greater_to_out_toom_54, _limbs_mul_greater_to_out_toom_54_scratch_size,
+    _limbs_mul_greater_to_out_toom_62, _limbs_mul_greater_to_out_toom_62_scratch_size,
 };
 use malachite_nz::natural::arithmetic::mul::{
     _limbs_mul_greater_to_out_basecase, limbs_mul_greater_to_out,
@@ -23,7 +24,7 @@ use malachite_test::inputs::base::{
     pairs_of_unsigneds, triples_of_unsigned_vec_var_10, triples_of_unsigned_vec_var_11,
     triples_of_unsigned_vec_var_12, triples_of_unsigned_vec_var_13, triples_of_unsigned_vec_var_14,
     triples_of_unsigned_vec_var_15, triples_of_unsigned_vec_var_16, triples_of_unsigned_vec_var_17,
-    triples_of_unsigned_vec_var_18, triples_of_unsigned_vec_var_19,
+    triples_of_unsigned_vec_var_18, triples_of_unsigned_vec_var_19, triples_of_unsigned_vec_var_20,
 };
 use malachite_test::inputs::natural::{
     naturals, pairs_of_natural_and_unsigned, pairs_of_naturals, triples_of_naturals,
@@ -1583,16 +1584,16 @@ fn test_limbs_mul_greater_to_out_toom_54() {
         _limbs_mul_greater_to_out_toom_54(&mut out, &xs, &ys, &mut scratch);
         assert_eq!(out, out_after);
     };
-    // k.even() in _limbs_mul_toom_evaluate_poly_in_2_pow_and_neg_2_pow
-    // !neg in _limbs_mul_toom_evaluate_poly_in_2_pow_and_neg_2_pow
-    // k.odd() in _limbs_mul_toom_evaluate_poly_in_2_pow_and_neg_2_pow
-    // !nsign in _limbs_toom_couple_handling
-    // ps != 0 in _limbs_toom_couple_handling
-    // ns != 0 in _limbs_toom_couple_handling
+    // degree.even() in _limbs_mul_toom_evaluate_poly_in_2_pow_and_neg_2_pow
+    // !v_neg_2_pow_neg in _limbs_mul_toom_evaluate_poly_in_2_pow_and_neg_2_pow
+    // degree.odd() in _limbs_mul_toom_evaluate_poly_in_2_pow_and_neg_2_pow
+    // !y_sign in _limbs_toom_couple_handling
+    // y_shift != 0 in _limbs_toom_couple_handling
+    // x_shift != 0 in _limbs_toom_couple_handling
     // s > t
-    // cy >= 0, first time, in _limbs_mul_toom_interpolate_8_points
-    // cy >= 0, second time, in _limbs_mul_toom_interpolate_8_points
-    // spt != n in _limbs_mul_toom_interpolate_8_points
+    // carry_1 && !carry_2, first time, in _limbs_mul_toom_interpolate_8_points
+    // carry_1 && !carry_2, second time, in _limbs_mul_toom_interpolate_8_points
+    // s_plus_t != n in _limbs_mul_toom_interpolate_8_points
     test(
         vec![2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16],
         vec![3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13],
@@ -1602,8 +1603,8 @@ fn test_limbs_mul_greater_to_out_toom_54() {
             882, 833, 760, 662, 538, 387, 208, 0,
         ],
     );
-    // neg in _limbs_mul_toom_evaluate_poly_in_2_pow_and_neg_2_pow
-    // nsign in _limbs_toom_couple_handling
+    // v_neg_2_pow_neg in _limbs_mul_toom_evaluate_poly_in_2_pow_and_neg_2_pow
+    // y_sign in _limbs_toom_couple_handling
     // s <= t
     test(
         vec![0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
@@ -1613,7 +1614,7 @@ fn test_limbs_mul_greater_to_out_toom_54() {
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0,
         ],
     );
-    // cy < 0, first time, in _limbs_mul_toom_interpolate_8_points
+    // !carry_1 && carry_2, first time, in _limbs_mul_toom_interpolate_8_points
     test(
         vec![
             281500646, 1572406350, 108746052, 4056047843, 89307364, 1006007374, 2902260577,
@@ -1631,7 +1632,7 @@ fn test_limbs_mul_greater_to_out_toom_54() {
             3773463966, 3902311612, 4169089467, 614631841, 1314987876,
         ],
     );
-    // spt == n in _limbs_mul_toom_interpolate_8_points
+    // s_plus_t == n in _limbs_mul_toom_interpolate_8_points
     test(
         vec![
             1372428912, 2999825770, 3824933735, 1252466299, 1644332514, 577056155, 267504800,
@@ -1654,7 +1655,7 @@ fn test_limbs_mul_greater_to_out_toom_54() {
             774831877, 3808631269, 3720895601, 1034939105, 474724830,
         ],
     );
-    // cy < 0, second time, in _limbs_mul_toom_interpolate_8_points
+    // !carry_1 && carry_2, second time, in _limbs_mul_toom_interpolate_8_points
     test(
         vec![
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4294967280, 4294967295, 4294967295, 4294967295,
@@ -1668,6 +1669,169 @@ fn test_limbs_mul_greater_to_out_toom_54() {
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4294934544, 4294967295, 4294967295, 8191, 2047,
             4294965248, 4294967295, 134217215, 0, 4290773120, 1073741823, 4286578688, 4294967279,
             262143, 4227858432, 4294967295,
+        ],
+    );
+}
+
+//TODO toom54 failure tests
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+fn test_limbs_mul_greater_to_out_toom_62() {
+    let test = |xs: Vec<Limb>, ys: Vec<Limb>, out_before: Vec<Limb>, out_after| {
+        let mut out = out_before.to_vec();
+        _limbs_mul_greater_to_out_basecase(&mut out, &xs, &ys);
+        assert_eq!(out, out_after);
+        let mut out = out_before.to_vec();
+        let mut scratch =
+            vec![0; _limbs_mul_greater_to_out_toom_62_scratch_size(xs.len(), ys.len())];
+        _limbs_mul_greater_to_out_toom_62(&mut out, &xs, &ys, &mut scratch);
+        assert_eq!(out, out_after);
+    };
+    // k & 1 != 0 in _limbs_mul_toom_evaluate_poly_in_1_and_neg_1
+    // degree_u >= 4 in _limbs_mul_toom_evaluate_poly_in_2_and_neg_2
+    // (degree & 1) == 0 in _limbs_mul_toom_evaluate_poly_in_2_and_neg_2
+    // t == n
+    // limbs_cmp_same_length(&b0[..n], &b1[..n]) == Ordering::Less
+    // w3_neg_b
+    // as1[n] == 0
+    test(
+        vec![2, 3, 4, 5, 6, 7],
+        vec![3, 4],
+        vec![10; 8],
+        vec![6, 17, 24, 31, 38, 45, 28, 0],
+    );
+    // limbs_cmp_same_length(&b0[..n], &b1[..n]) != Ordering::Less
+    // !w3_neg_b
+    // t >= n
+    // limbs_cmp_same_length(&bsm1[..n], &b1[..n]) == Ordering::Less
+    test(
+        vec![0, 0, 0, 0, 0, 1],
+        vec![1, 1],
+        vec![10; 8],
+        vec![0, 0, 0, 0, 0, 1, 1, 0],
+    );
+    // limbs_cmp_same_length(&bsm1[..n], &b1[..n]) != Ordering::Less
+    test(
+        vec![0, 0, 0, 0, 0, 1],
+        vec![2, 1],
+        vec![10; 8],
+        vec![0, 0, 0, 0, 0, 2, 1, 0],
+    );
+    // t != n
+    // !(limbs_test_zero(&b0[t..n]) && limbs_cmp_same_length(&b0[..t], &b1[..t]) == Ordering::Less)
+    // t < n
+    // !(limbs_test_zero(&bsm1[t..n]) &&
+    //      limbs_cmp_same_length(&bsm1[..t], &b1[..t]) == Ordering::Less)
+    // as1[n] == 2
+    test(
+        vec![
+            2291585918, 1380546066, 1861205162, 1395600128, 1509813785, 1715266614, 3251195596,
+            3140058077, 1998653517, 3140019184, 2534426976,
+        ],
+        vec![2477133296, 625749873, 3687467688],
+        vec![10; 14],
+        vec![
+            869772320, 253774892, 3270059412, 1629301906, 333315526, 1485838973, 1182872659,
+            3973435471, 3570040059, 138616924, 3845622124, 4243476600, 2488800838, 2175946157,
+        ],
+    );
+    // as1[n] > 2
+    test(
+        vec![
+            706760835, 4153647095, 3843998199, 2077172825, 1158686949, 3157624247,
+        ],
+        vec![708497006, 797041707],
+        vec![10; 8],
+        vec![
+            3596223050, 1899342498, 3768933007, 59388593, 2997914214, 150267535, 1848145862,
+            585978436,
+        ],
+    );
+    // as1[n] == 1
+    test(
+        vec![
+            1817453168, 96871997, 3927306877, 3090061646, 3474317652, 437148773, 439538568,
+            324686794, 772632617, 1424328970, 580538580,
+        ],
+        vec![4158498322, 3126677346, 655989538],
+        vec![10; 14],
+        vec![
+            4142861280, 2093741387, 1223409636, 3430701278, 154561385, 1065478559, 1434432315,
+            1709306376, 2647162930, 2288715437, 510829208, 3519993529, 1581992297, 88668250,
+        ],
+    );
+    // bs1[n] != 0
+    test(
+        vec![
+            478149678, 4026802122, 1384639138, 368837837, 183900171, 785221208,
+        ],
+        vec![1458158767, 4167624669],
+        vec![10; 8],
+        vec![
+            1921854322, 141249793, 673006993, 2183916852, 295623924, 3471440317, 3387755993,
+            761939975,
+        ],
+    );
+    // asm1[n] == 1
+    test(
+        vec![
+            760464004, 3698115579, 1282981837, 2124133062, 1943175022, 3815903204,
+        ],
+        vec![2302225798, 423133196],
+        vec![10; 8],
+        vec![
+            1718420760, 4288660832, 1043184986, 2518603664, 1668853787, 1047988481, 4101944437,
+            375936580,
+        ],
+    );
+    // asm1[n] == 2
+    test(
+        vec![
+            486320673, 3488920730, 3556919186, 380261964, 1609664786, 3382076763, 3478178414,
+            1464325754, 2543330707, 3900552438, 1432199477,
+        ],
+        vec![1190326122, 1081384689, 2610845505, 3919894794],
+        vec![10; 15],
+        vec![
+            3164946602, 4284198222, 380177155, 837655879, 3034889727, 3503063664, 3315274214,
+            3998279880, 2501466635, 3524441, 312561544, 2480833439, 3092764257, 1045878247,
+            1307127829,
+        ],
+    );
+    // limbs_test_zero(&b0[t..n]) && limbs_cmp_same_length(&b0[..t], &b1[..t]) == Ordering::Less
+    test(
+        vec![
+            4294967295, 4294967295, 4294967295, 4294967295, 4294967295, 4294967295, 4294967295,
+            4294967295, 4294967295, 4294967295, 4294967295, 4294967295, 4294967295, 4294967295,
+            4294967295, 4294967295, 4294967295, 31, 0, 0, 0, 0, 0, 4294967232, 4294967295,
+            4294967295, 4294967295, 4294967295, 4294967295, 4294967295, 4294967295, 4294967295,
+            4294967295, 4294967295, 4294967295, 4294967295,
+        ],
+        vec![
+            4294967295, 63, 0, 0, 0, 0, 4227858432, 4294967295, 4294967295, 4294967295, 4294967295,
+        ],
+        vec![10; 47],
+        vec![
+            1, 4294967232, 4294967295, 4294967295, 4294967295, 4294967295, 67108863, 0, 0, 0, 0,
+            4294967295, 4294967295, 4294967295, 4294967295, 4294967295, 4294967295, 4294967263,
+            2047, 0, 0, 0, 0, 2147483712, 4294963199, 4294967295, 4294967295, 4294967295, 31, 0, 1,
+            0, 0, 0, 4294967232, 4294967295, 4294967294, 63, 0, 0, 0, 0, 4227858432, 4294967295,
+            4294967295, 4294967295, 4294967295,
+        ],
+    );
+    // limbs_test_zero(&bsm1[t..n]) && limbs_cmp_same_length(&bsm1[..t], &b1[..t]) == Ordering::Less
+    test(
+        vec![
+            1073741823, 0, 0, 0, 0, 0, 0, 0, 4290772992, 4294967295, 4294967295, 4294967295,
+            4294967295, 4294967295, 4294967295, 4294967295, 4294967295,
+        ],
+        vec![4293918720, 4294967295, 0, 268435448, 4294443008],
+        vec![10; 22],
+        vec![
+            1048576, 4294705152, 1073741822, 4026531848, 67633149, 1073610751, 0, 0, 0, 1024,
+            4290772992, 33554431, 4294705152, 4290773503, 4294967295, 4294967295, 4294967295,
+            4293918719, 4294967295, 0, 268435448, 4294443008,
         ],
     );
 }
@@ -1925,6 +2089,22 @@ fn limbs_mul_greater_to_out_toom_54_properties() {
             let mut scratch =
                 vec![0; _limbs_mul_greater_to_out_toom_54_scratch_size(xs.len(), ys.len())];
             _limbs_mul_greater_to_out_toom_54(&mut out, xs, ys, &mut scratch);
+            assert_eq!(out, expected_out);
+        },
+    );
+}
+
+#[test]
+fn limbs_mul_greater_to_out_toom_62_properties() {
+    test_properties_custom_scale(
+        2_048,
+        triples_of_unsigned_vec_var_20,
+        |&(ref out, ref xs, ref ys)| {
+            let expected_out = limbs_mul_basecase_helper(out, xs, ys);
+            let mut out = out.to_vec();
+            let mut scratch =
+                vec![0; _limbs_mul_greater_to_out_toom_62_scratch_size(xs.len(), ys.len())];
+            _limbs_mul_greater_to_out_toom_62(&mut out, xs, ys, &mut scratch);
             assert_eq!(out, expected_out);
         },
     );
