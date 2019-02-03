@@ -34,6 +34,14 @@ impl<'a> DivisibleBy<SignedLimb> for &'a Integer {
     }
 }
 
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> DivisibleBy<i32> for &'a Integer {
+    #[inline]
+    fn divisible_by(self, other: i32) -> bool {
+        self.divisible_by(SignedLimb::from(other))
+    }
+}
+
 impl<'a> DivisibleBy<&'a Integer> for SignedLimb {
     /// Returns whether a `SignedLimb` is divisible by an `Integer`; in other words, whether the
     /// `SignedLimb` is a multiple of the `Integer`. This means that zero is divisible by any
@@ -59,5 +67,13 @@ impl<'a> DivisibleBy<&'a Integer> for SignedLimb {
     /// ```
     fn divisible_by(self, other: &'a Integer) -> bool {
         self.unsigned_abs().divisible_by(&other.abs)
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> DivisibleBy<&'a Integer> for i32 {
+    #[inline]
+    fn divisible_by(self, other: &'a Integer) -> bool {
+        SignedLimb::from(self).divisible_by(other)
     }
 }

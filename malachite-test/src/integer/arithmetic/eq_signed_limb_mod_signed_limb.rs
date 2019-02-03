@@ -1,15 +1,16 @@
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::integer::{
     rm_triples_of_integer_signed_and_signed, triples_of_integer_signed_and_signed,
-    triples_of_signed_integer_and_signed,
+    triples_of_signed_integer_and_signed, triples_of_signed_signed_and_integer,
 };
 use malachite_base::num::{DivisibleBy, EqMod, Mod, SignificantBits};
-use malachite_nz::platform::SignedLimb;
+use malachite_nz::platform::{Limb, SignedLimb};
 use rug;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_integer_eq_signed_limb_mod_signed_limb);
     register_demo!(registry, demo_signed_limb_eq_integer_mod_signed_limb);
+    register_demo!(registry, demo_signed_limb_eq_signed_limb_mod_integer);
     register_bench!(
         registry,
         Large,
@@ -24,6 +25,11 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
         registry,
         Large,
         benchmark_signed_limb_eq_integer_mod_signed_limb_algorithms
+    );
+    register_bench!(
+        registry,
+        Large,
+        benchmark_signed_limb_eq_signed_limb_mod_integer_algorithms
     );
 }
 
@@ -47,6 +53,16 @@ fn demo_signed_limb_eq_integer_mod_signed_limb(gm: GenerationMode, limit: usize)
             println!("{} is equal to {} mod {}", i, n, modulus);
         } else {
             println!("{} is not equal to {} mod {}", i, n, modulus);
+        }
+    }
+}
+
+fn demo_signed_limb_eq_signed_limb_mod_integer(gm: GenerationMode, limit: usize) {
+    for (i, j, modulus) in triples_of_signed_signed_and_integer::<SignedLimb>(gm).take(limit) {
+        if i.eq_mod(j, &modulus) {
+            println!("{} is equal to {} mod {}", i, j, modulus);
+        } else {
+            println!("{} is not equal to {} mod {}", i, j, modulus);
         }
     }
 }
@@ -138,6 +154,38 @@ fn benchmark_signed_limb_eq_integer_mod_signed_limb_algorithms(
                  Integer.mod_op(SignedLimb)",
                 &mut (|(n, i, modulus)| {
                     no_out!(i == n || modulus != 0 && i.mod_op(modulus) == n.mod_op(modulus))
+                }),
+            ),
+        ],
+    );
+}
+
+fn benchmark_signed_limb_eq_signed_limb_mod_integer_algorithms(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "SignedLimb.eq_mod(SignedLimb, &Integer)",
+        BenchmarkType::Algorithms,
+        triples_of_signed_signed_and_integer::<SignedLimb>(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(_, ref n, _)| n.significant_bits() as usize),
+        "n.significant_bits()",
+        &mut [
+            (
+                "Limb.eq_mod(SignedLimb, &Integer)",
+                &mut (|(i, j, ref modulus)| no_out!(i.eq_mod(j, modulus))),
+            ),
+            (
+                "SignedLimb == SignedLimb || Integer != 0 && SignedLimb.mod_op(&Integer) == \
+                 SignedLimb.mod_op(&Integer)",
+                &mut (|(i, j, modulus)| {
+                    no_out!(
+                        i == j || modulus != 0 as Limb && i.mod_op(&modulus) == j.mod_op(&modulus)
+                    )
                 }),
             ),
         ],

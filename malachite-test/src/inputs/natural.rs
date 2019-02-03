@@ -702,6 +702,17 @@ fn random_triples_of_primitive_natural_and_primitive<T: PrimitiveInteger + Rand>
     ))
 }
 
+fn random_triples_of_primitive_primitive_and_natural<T: PrimitiveInteger + Rand>(
+    scale: u32,
+) -> Box<Iterator<Item = (T, T, Natural)>> {
+    Box::new(random_triples(
+        &EXAMPLE_SEED,
+        &(|seed| random(seed)),
+        &(|seed| random(seed)),
+        &(|seed| random_naturals(seed, scale)),
+    ))
+}
+
 fn random_triples_of_natural_primitive_and_primitive<T: PrimitiveInteger + Rand>(
     scale: u32,
 ) -> Box<Iterator<Item = (Natural, T, T)>> {
@@ -811,6 +822,25 @@ pub fn triples_of_natural_natural_and_small_unsigned_var_2<T: PrimitiveUnsigned 
         triples_of_natural_natural_and_small_unsigned::<T>(gm)
             .filter(|&(ref x, ref y, pow)| !x.eq_mod_power_of_two(y, pow.checked_into().unwrap())),
     )
+}
+
+pub fn triples_of_unsigned_unsigned_and_natural<T: PrimitiveUnsigned + Rand>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (T, T, Natural)>> {
+    match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_triples(
+            exhaustive_unsigned(),
+            exhaustive_unsigned(),
+            exhaustive_naturals(),
+        )),
+        GenerationMode::Random(scale) => random_triples_of_primitive_primitive_and_natural(scale),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_unsigned(seed)),
+            &(|seed| special_random_unsigned(seed)),
+            &(|seed| special_random_naturals(seed, scale)),
+        )),
+    }
 }
 
 pub fn triples_of_natural_unsigned_and_unsigned<T: PrimitiveUnsigned + Rand>(

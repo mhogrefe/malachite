@@ -37,13 +37,20 @@ impl Div<SignedLimb> for Integer {
     ///     assert_eq!((Integer::from(-23) / -10i32).to_string(), "2");
     /// }
     /// ```
-    fn div(self, other: SignedLimb) -> Integer {
-        let quotient = self.abs / other.unsigned_abs();
-        if (other >= 0) == self.sign {
-            Integer::from(quotient)
-        } else {
-            -quotient
-        }
+    #[inline]
+    fn div(mut self, other: SignedLimb) -> Integer {
+        self /= other;
+        self
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl Div<i32> for Integer {
+    type Output = Integer;
+
+    #[inline]
+    fn div(self, other: i32) -> Integer {
+        self / SignedLimb::from(other)
     }
 }
 
@@ -87,6 +94,16 @@ impl<'a> Div<SignedLimb> for &'a Integer {
         } else {
             -quotient
         }
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> Div<i32> for &'a Integer {
+    type Output = Integer;
+
+    #[inline]
+    fn div(self, other: i32) -> Integer {
+        self / SignedLimb::from(other)
     }
 }
 
@@ -137,6 +154,14 @@ impl DivAssign<SignedLimb> for Integer {
     }
 }
 
+#[cfg(feature = "64_bit_limbs")]
+impl DivAssign<i32> for Integer {
+    #[inline]
+    fn div_assign(&mut self, other: i32) {
+        *self /= SignedLimb::from(other);
+    }
+}
+
 impl Div<Integer> for SignedLimb {
     type Output = Integer;
 
@@ -178,6 +203,16 @@ impl Div<Integer> for SignedLimb {
     }
 }
 
+#[cfg(feature = "64_bit_limbs")]
+impl Div<Integer> for i32 {
+    type Output = Integer;
+
+    #[inline]
+    fn div(self, other: Integer) -> Integer {
+        SignedLimb::from(self) / other
+    }
+}
+
 impl<'a> Div<&'a Integer> for SignedLimb {
     type Output = Integer;
 
@@ -216,5 +251,15 @@ impl<'a> Div<&'a Integer> for SignedLimb {
         } else {
             -Natural::from(quotient)
         }
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> Div<&'a Integer> for i32 {
+    type Output = Integer;
+
+    #[inline]
+    fn div(self, other: &'a Integer) -> Integer {
+        SignedLimb::from(self) / other
     }
 }

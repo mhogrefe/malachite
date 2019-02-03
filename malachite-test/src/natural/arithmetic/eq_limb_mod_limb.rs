@@ -4,6 +4,7 @@ use inputs::base::triples_of_unsigned_vec_unsigned_and_positive_unsigned_var_1;
 use inputs::natural::rm_triples_of_natural_unsigned_and_unsigned;
 use inputs::natural::{
     triples_of_natural_unsigned_and_unsigned, triples_of_unsigned_natural_and_unsigned,
+    triples_of_unsigned_unsigned_and_natural,
 };
 use malachite_base::num::{EqMod, SignificantBits};
 use malachite_nz::natural::arithmetic::eq_limb_mod_limb::{
@@ -16,6 +17,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limbs_eq_limb_mod_limb);
     register_demo!(registry, demo_natural_eq_limb_mod_limb);
     register_demo!(registry, demo_limb_eq_natural_mod_limb);
+    register_demo!(registry, demo_limb_eq_limb_mod_natural);
     register_bench!(registry, Small, benchmark_limbs_eq_limb_mod_limb_algorithms);
     #[cfg(feature = "32_bit_limbs")]
     register_bench!(
@@ -32,6 +34,11 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
         registry,
         Large,
         benchmark_limb_eq_natural_mod_limb_algorithms
+    );
+    register_bench!(
+        registry,
+        Large,
+        benchmark_limb_eq_limb_mod_natural_algorithms
     );
 }
 
@@ -65,6 +72,16 @@ fn demo_limb_eq_natural_mod_limb(gm: GenerationMode, limit: usize) {
             println!("{} is equal to {} mod {}", u, n, modulus);
         } else {
             println!("{} is not equal to {} mod {}", u, n, modulus);
+        }
+    }
+}
+
+fn demo_limb_eq_limb_mod_natural(gm: GenerationMode, limit: usize) {
+    for (u, v, modulus) in triples_of_unsigned_unsigned_and_natural::<Limb>(gm).take(limit) {
+        if u.eq_mod(v, &modulus) {
+            println!("{} is equal to {} mod {}", u, v, modulus);
+        } else {
+            println!("{} is not equal to {} mod {}", u, v, modulus);
         }
     }
 }
@@ -187,6 +204,35 @@ fn benchmark_limb_eq_natural_mod_limb_algorithms(
                 "Limb == Natural || Limb != 0 && Limb % Limb == Natural % Limb",
                 &mut (|(n, u, modulus)| {
                     no_out!(u == n || modulus != 0 && u % modulus == n % modulus)
+                }),
+            ),
+        ],
+    );
+}
+
+fn benchmark_limb_eq_limb_mod_natural_algorithms(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "Limb.eq_mod(Limb, &Natural)",
+        BenchmarkType::Algorithms,
+        triples_of_unsigned_unsigned_and_natural::<Limb>(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(_, ref n, _)| n.significant_bits() as usize),
+        "n.significant_bits()",
+        &mut [
+            (
+                "Limb.eq_mod(Limb, &Natural)",
+                &mut (|(u, v, ref modulus)| no_out!(u.eq_mod(v, modulus))),
+            ),
+            (
+                "Limb == Limb || Natural != 0 && Limb % &Natural == Limb % &Natural",
+                &mut (|(u, v, modulus)| {
+                    no_out!(u == v || modulus != 0 && u % &modulus == v % &modulus)
                 }),
             ),
         ],

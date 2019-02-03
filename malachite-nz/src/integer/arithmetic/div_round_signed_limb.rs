@@ -51,9 +51,20 @@ impl DivRound<SignedLimb> for Integer {
     ///     assert_eq!(Integer::from(-14).div_round(-4i32, RoundingMode::Nearest).to_string(), "4");
     /// }
     /// ```
+    #[inline]
     fn div_round(mut self, other: SignedLimb, rm: RoundingMode) -> Integer {
         self.div_round_assign(other, rm);
         self
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl DivRound<i32> for Integer {
+    type Output = Integer;
+
+    #[inline]
+    fn div_round(self, other: i32, rm: RoundingMode) -> Integer {
+        self.div_round(SignedLimb::from(other), rm)
     }
 }
 
@@ -132,6 +143,16 @@ impl<'a> DivRound<SignedLimb> for &'a Integer {
     }
 }
 
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> DivRound<i32> for &'a Integer {
+    type Output = Integer;
+
+    #[inline]
+    fn div_round(self, other: i32, rm: RoundingMode) -> Integer {
+        self.div_round(SignedLimb::from(other), rm)
+    }
+}
+
 impl DivRound<Integer> for SignedLimb {
     type Output = Integer;
 
@@ -183,8 +204,19 @@ impl DivRound<Integer> for SignedLimb {
     ///         "4");
     /// }
     /// ```
+    #[inline]
     fn div_round(self, other: Integer, rm: RoundingMode) -> Integer {
         self.div_round(&other, rm)
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl DivRound<Integer> for i32 {
+    type Output = Integer;
+
+    #[inline]
+    fn div_round(self, other: Integer, rm: RoundingMode) -> Integer {
+        SignedLimb::from(self).div_round(other, rm)
     }
 }
 
@@ -259,6 +291,16 @@ impl<'a> DivRound<&'a Integer> for SignedLimb {
                 abs: Natural::from(abs),
             }
         }
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> DivRound<&'a Integer> for i32 {
+    type Output = Integer;
+
+    #[inline]
+    fn div_round(self, other: &'a Integer, rm: RoundingMode) -> Integer {
+        SignedLimb::from(self).div_round(other, rm)
     }
 }
 
@@ -363,5 +405,13 @@ impl DivRoundAssign<SignedLimb> for Integer {
             self.abs.div_round_assign(other.unsigned_abs(), -rm)
         }
         self.sign = result_sign || self.abs == 0;
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl DivRoundAssign<i32> for Integer {
+    #[inline]
+    fn div_round_assign(&mut self, other: i32, rm: RoundingMode) {
+        self.div_round_assign(SignedLimb::from(other), rm)
     }
 }

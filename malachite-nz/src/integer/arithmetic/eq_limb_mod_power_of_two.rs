@@ -5,6 +5,8 @@ use natural::arithmetic::divisible_by_power_of_two::limbs_divisible_by_power_of_
 use natural::Natural::{self, Large, Small};
 use platform::Limb;
 
+//TODO continue 32-bit impls for 64-bit build
+
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns
 /// whether the negative of the `Natural` is equivalent to a limb mod two to the power of `pow`;
 /// that is, whether the `pow` least-significant bits of the negative of the `Natural` and the limb

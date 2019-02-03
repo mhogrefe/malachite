@@ -988,6 +988,17 @@ fn random_triples_of_primitive_integer_and_primitive<T: PrimitiveInteger + Rand>
     ))
 }
 
+fn random_triples_of_primitive_primitive_and_integer<T: PrimitiveInteger + Rand>(
+    scale: u32,
+) -> Box<Iterator<Item = (T, T, Integer)>> {
+    Box::new(random_triples(
+        &EXAMPLE_SEED,
+        &(|seed| random(seed)),
+        &(|seed| random(seed)),
+        &(|seed| random_integers(seed, scale)),
+    ))
+}
+
 fn random_triples_of_integer_primitive_and_primitive<T: PrimitiveInteger + Rand>(
     scale: u32,
 ) -> Box<Iterator<Item = (Integer, T, T)>> {
@@ -1091,6 +1102,47 @@ pub fn triples_of_integer_unsigned_and_unsigned_var_2<T: PrimitiveUnsigned + Ran
             !n.eq_mod(u, modulus)
         }),
     )
+}
+
+pub fn triples_of_unsigned_unsigned_and_integer<T: PrimitiveUnsigned + Rand>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (T, T, Integer)>> {
+    match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_triples(
+            exhaustive_unsigned(),
+            exhaustive_unsigned(),
+            exhaustive_integers(),
+        )),
+        GenerationMode::Random(scale) => random_triples_of_primitive_primitive_and_integer(scale),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_unsigned(seed)),
+            &(|seed| special_random_unsigned(seed)),
+            &(|seed| special_random_integers(seed, scale)),
+        )),
+    }
+}
+
+pub fn triples_of_signed_signed_and_integer<T: PrimitiveSigned + Rand>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (T, T, Integer)>>
+where
+    T::UnsignedOfEqualWidth: Rand,
+{
+    match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_triples(
+            exhaustive_signed(),
+            exhaustive_signed(),
+            exhaustive_integers(),
+        )),
+        GenerationMode::Random(scale) => random_triples_of_primitive_primitive_and_integer(scale),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_signed(seed)),
+            &(|seed| special_random_signed(seed)),
+            &(|seed| special_random_integers(seed, scale)),
+        )),
+    }
 }
 
 pub fn triples_of_integer_signed_and_signed<T: PrimitiveSigned + Rand>(

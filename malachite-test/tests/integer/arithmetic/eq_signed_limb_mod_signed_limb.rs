@@ -1,12 +1,13 @@
 use common::test_properties;
-use malachite_base::num::{DivisibleBy, EqMod, Mod, Zero};
+use malachite_base::num::{DivisibleBy, EqMod, Mod, NegativeOne, One, Zero};
 use malachite_nz::integer::Integer;
-use malachite_nz::platform::SignedLimb;
+use malachite_nz::platform::{Limb, SignedLimb};
 use malachite_test::common::integer_to_rug_integer;
 use malachite_test::inputs::base::{pairs_of_signeds, triples_of_signeds};
 use malachite_test::inputs::integer::{
     pairs_of_integer_and_signed, triples_of_integer_signed_and_signed,
     triples_of_integer_signed_and_signed_var_1, triples_of_integer_signed_and_signed_var_2,
+    triples_of_signed_signed_and_integer,
 };
 use malachite_test::integer::arithmetic::eq_signed_limb_mod_signed_limb::*;
 use rug;
@@ -112,8 +113,8 @@ fn test_eq_signed_limb_mod_signed_limb() {
     test("12345678987654321", 321, -1_000, true);
     test("12345678987654321", 322, -1_000, false);
 
-    test("-1", 1, 2, true);
-    test("-1", 2, 2, false);
+    test("-1", 1, -2, true);
+    test("-1", 2, -2, false);
     test("-13", 27, -10, true);
     test("-13", 28, -10, false);
     test("-13", 11, -1, true);
@@ -158,6 +159,130 @@ fn test_eq_signed_limb_mod_signed_limb() {
     test("-1000000000001", -1, -8_192, false);
     test("-12345678987654321", -321, -1_000, true);
     test("-12345678987654321", -322, -1_000, false);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+fn test_signed_limb_eq_signed_limb_mod_integer() {
+    let test = |i: i32, j, modulus, out| {
+        assert_eq!(i.eq_mod(j, &Integer::from_str(modulus).unwrap()), out);
+    };
+    test(0, 0, "0", true);
+    test(0, 1, "0", false);
+    test(57, 57, "0", true);
+    test(57, 58, "0", false);
+    test(57, 57, "1000000000000", true);
+    test(57, 58, "1000000000000", false);
+    test(0, 256, "256", true);
+    test(0, 256, "512", false);
+    test(13, 23, "10", true);
+    test(13, 24, "10", false);
+    test(13, 21, "1", true);
+    test(13, 21, "2", true);
+    test(13, 21, "4", true);
+    test(13, 21, "8", true);
+    test(13, 21, "16", false);
+    test(13, 21, "3", false);
+
+    test(-1, 1, "2", true);
+    test(-1, 2, "2", false);
+    test(-57, 57, "0", false);
+    test(-57, 57, "1000000000000", false);
+    test(-57, 58, "1000000000000", false);
+    test(-13, 27, "10", true);
+    test(-13, 28, "10", false);
+    test(-13, 11, "1", true);
+    test(-13, 11, "2", true);
+    test(-13, 11, "4", true);
+    test(-13, 11, "8", true);
+    test(-13, 11, "16", false);
+    test(-13, 11, "3", true);
+    test(-13, 10, "3", false);
+
+    test(0, -1, "0", false);
+    test(1, -1, "2", true);
+    test(1, -2, "2", false);
+    test(57, -57, "0", false);
+    test(57, -57, "1000000000000", false);
+    test(57, -58, "1000000000000", false);
+    test(0, -256, "256", true);
+    test(0, -256, "512", false);
+    test(13, -27, "10", true);
+    test(13, -28, "10", false);
+    test(13, -11, "1", true);
+    test(13, -11, "2", true);
+    test(13, -11, "4", true);
+    test(13, -11, "8", true);
+    test(13, -11, "16", false);
+    test(13, -11, "3", true);
+    test(13, -10, "3", false);
+
+    test(-57, -57, "0", true);
+    test(-57, -58, "0", false);
+    test(-57, -57, "1000000000000", true);
+    test(-57, -58, "1000000000000", false);
+    test(-13, -23, "10", true);
+    test(-13, -24, "10", false);
+    test(-13, -21, "1", true);
+    test(-13, -21, "2", true);
+    test(-13, -21, "4", true);
+    test(-13, -21, "8", true);
+    test(-13, -21, "16", false);
+    test(-13, -21, "3", false);
+
+    test(0, 256, "-256", true);
+    test(0, 256, "-512", false);
+    test(57, 57, "-1000000000000", true);
+    test(57, 58, "-1000000000000", false);
+    test(13, 23, "-10", true);
+    test(13, 24, "-10", false);
+    test(13, 21, "-1", true);
+    test(13, 21, "-2", true);
+    test(13, 21, "-4", true);
+    test(13, 21, "-8", true);
+    test(13, 21, "-16", false);
+    test(13, 21, "-3", false);
+
+    test(-1, 1, "-2", true);
+    test(-1, 2, "-2", false);
+    test(-57, 57, "-1000000000000", false);
+    test(-57, 58, "-1000000000000", false);
+    test(-13, 27, "-10", true);
+    test(-13, 28, "-10", false);
+    test(-13, 11, "-1", true);
+    test(-13, 11, "-2", true);
+    test(-13, 11, "-4", true);
+    test(-13, 11, "-8", true);
+    test(-13, 11, "-16", false);
+    test(-13, 11, "-3", true);
+    test(-13, 10, "-3", false);
+
+    test(1, -1, "-2", true);
+    test(1, -2, "-2", false);
+    test(57, -57, "-1000000000000", false);
+    test(57, -58, "-1000000000000", false);
+    test(0, -256, "-256", true);
+    test(0, -256, "-512", false);
+    test(13, -27, "-10", true);
+    test(13, -28, "-10", false);
+    test(13, -11, "-1", true);
+    test(13, -11, "-2", true);
+    test(13, -11, "-4", true);
+    test(13, -11, "-8", true);
+    test(13, -11, "-16", false);
+    test(13, -11, "-3", true);
+    test(13, -10, "-3", false);
+
+    test(-13, -23, "-10", true);
+    test(-13, -24, "-10", false);
+    test(-57, -57, "-1000000000000", true);
+    test(-57, -58, "-1000000000000", false);
+    test(-13, -21, "-1", true);
+    test(-13, -21, "-2", true);
+    test(-13, -21, "-4", true);
+    test(-13, -21, "-8", true);
+    test(-13, -21, "-16", false);
+    test(-13, -21, "-3", false);
 }
 
 #[test]
@@ -237,5 +362,42 @@ fn eq_signed_limb_mod_signed_limb_properties() {
 
     test_properties(triples_of_signeds::<SignedLimb>, |&(n, i, modulus)| {
         assert_eq!(n.eq_mod(i, modulus), Integer::from(n).eq_mod(i, modulus));
+    });
+}
+
+#[test]
+fn signed_limb_eq_signed_limb_mod_integer_properties() {
+    test_properties(
+        triples_of_signed_signed_and_integer,
+        |&(i, j, ref modulus): &(SignedLimb, SignedLimb, Integer)| {
+            let equal = i.eq_mod(j, modulus);
+            assert_eq!(j.eq_mod(i, modulus), equal);
+            assert_eq!(
+                i == j || *modulus != 0 as Limb && i.mod_op(modulus) == j.mod_op(modulus),
+                equal
+            );
+
+            //TODO assert_eq!(Integer::from(i).eq_mod(j, modulus), equal);
+        },
+    );
+
+    test_properties(pairs_of_integer_and_signed::<SignedLimb>, |&(ref n, i)| {
+        assert_eq!(i.eq_mod(0, n), i.divisible_by(n));
+        assert_eq!(0.eq_mod(i, n), i.divisible_by(n));
+        assert!(i.eq_mod(i, n));
+    });
+
+    test_properties(pairs_of_signeds::<SignedLimb>, |&(i, j)| {
+        assert!(i.eq_mod(j, &Integer::ONE));
+        assert!(j.eq_mod(i, &Integer::ONE));
+        assert!(i.eq_mod(j, &Integer::NEGATIVE_ONE));
+        assert!(j.eq_mod(i, &Integer::NEGATIVE_ONE));
+        assert_eq!(i.eq_mod(j, &Integer::ZERO), i == j);
+        assert_eq!(j.eq_mod(i, &Integer::ZERO), i == j);
+    });
+
+    test_properties(triples_of_signeds::<SignedLimb>, |&(i, j, modulus)| {
+        let equal = i.eq_mod(j, modulus);
+        assert_eq!(EqMod::eq_mod(i, j, &Integer::from(modulus)), equal);
     });
 }

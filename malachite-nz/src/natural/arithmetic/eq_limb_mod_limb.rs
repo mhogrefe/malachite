@@ -154,3 +154,37 @@ impl<'a> EqMod<&'a Natural, Limb> for Limb {
         other.eq_mod(self, modulus)
     }
 }
+
+impl<'a> EqMod<Limb, &'a Natural> for Limb {
+    /// Returns whether this `Limb` is equivalent to a `Limb` mod a `Natural` `modulus`; that is,
+    /// whether other - `self` is a multiple of `modulus`. Two numbers are equal to each other mod 0
+    /// iff they are equal.
+    ///
+    /// Time: worst case O(n)
+    ///
+    /// Additional memory: worst case O(1)
+    ///
+    /// where n = `other.significant_bits()`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::EqMod;
+    /// use malachite_nz::natural::Natural;
+    /// use std::str::FromStr;
+    ///
+    /// fn main() {
+    ///     assert_eq!(21.eq_mod(8, &Natural::from(13u32)), true);
+    ///     assert_eq!(21.eq_mod(21, &Natural::from_str("12345678987654321").unwrap()), true);
+    ///     assert_eq!(21.eq_mod(22, &Natural::from_str("12345678987654321").unwrap()), false);
+    /// }
+    /// ```
+    fn eq_mod(self, other: Limb, modulus: &'a Natural) -> bool {
+        match *modulus {
+            Small(small) => self.eq_mod(other, small),
+            Large(_) => self == other,
+        }
+    }
+}

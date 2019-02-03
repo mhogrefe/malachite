@@ -1,5 +1,5 @@
 use common::test_properties;
-use malachite_base::num::{DivisibleBy, EqMod, Zero};
+use malachite_base::num::{DivisibleBy, EqMod, One, Zero};
 use malachite_nz::natural::arithmetic::eq_limb_mod_limb::{
     _combined_limbs_eq_limb_mod_limb, limbs_eq_limb_mod_limb,
 };
@@ -15,6 +15,7 @@ use malachite_test::inputs::base::{
 use malachite_test::inputs::natural::{
     pairs_of_natural_and_unsigned, triples_of_natural_limb_and_limb_var_2,
     triples_of_natural_unsigned_and_unsigned, triples_of_natural_unsigned_and_unsigned_var_1,
+    triples_of_unsigned_unsigned_and_natural,
 };
 #[cfg(feature = "32_bit_limbs")]
 use rug;
@@ -89,6 +90,30 @@ fn test_eq_limb_mod_limb() {
     test("1000000000001", 1, 8_192, false);
     test("12345678987654321", 321, 1_000, true);
     test("12345678987654321", 322, 1_000, false);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+fn test_limb_eq_limb_mod_natural() {
+    let test = |u: u32, v, modulus, out| {
+        assert_eq!(u.eq_mod(v, &Natural::from_str(modulus).unwrap()), out);
+    };
+    test(0, 0, "0", true);
+    test(0, 1, "0", false);
+    test(57, 57, "0", true);
+    test(57, 58, "0", false);
+    test(57, 57, "1000000000000", true);
+    test(57, 58, "1000000000000", false);
+    test(0, 256, "256", true);
+    test(0, 256, "512", false);
+    test(13, 23, "10", true);
+    test(13, 24, "10", false);
+    test(13, 21, "1", true);
+    test(13, 21, "2", true);
+    test(13, 21, "4", true);
+    test(13, 21, "8", true);
+    test(13, 21, "16", false);
+    test(13, 21, "3", false);
 }
 
 #[test]
@@ -172,5 +197,37 @@ fn eq_limb_mod_limb_properties() {
         let equal = u.eq_mod(v, modulus);
         assert_eq!(Natural::from(u).eq_mod(v, modulus), equal);
         assert_eq!(EqMod::eq_mod(u, &Natural::from(v), modulus), equal);
+    });
+}
+
+#[test]
+fn limb_eq_limb_mod_natural_properties() {
+    test_properties(
+        triples_of_unsigned_unsigned_and_natural,
+        |&(u, v, ref modulus): &(Limb, Limb, Natural)| {
+            let equal = u.eq_mod(v, modulus);
+            assert_eq!(v.eq_mod(u, modulus), equal);
+            assert_eq!(u == v || *modulus != 0 && u % modulus == v % modulus, equal);
+
+            //TODO assert_eq!(Natural::from(u).eq_mod(v, modulus), equal);
+        },
+    );
+
+    test_properties(pairs_of_natural_and_unsigned::<Limb>, |&(ref n, u)| {
+        assert_eq!(u.eq_mod(0, n), u.divisible_by(n));
+        assert_eq!(0.eq_mod(u, n), u.divisible_by(n));
+        assert!(u.eq_mod(u, n));
+    });
+
+    test_properties(pairs_of_unsigneds::<Limb>, |&(u, v)| {
+        assert!(u.eq_mod(v, &Natural::ONE));
+        assert!(v.eq_mod(u, &Natural::ONE));
+        assert_eq!(u.eq_mod(v, &Natural::ZERO), u == v);
+        assert_eq!(v.eq_mod(u, &Natural::ZERO), u == v);
+    });
+
+    test_properties(triples_of_unsigneds::<Limb>, |&(u, v, modulus)| {
+        let equal = u.eq_mod(v, modulus);
+        assert_eq!(EqMod::eq_mod(u, v, &Natural::from(modulus)), equal);
     });
 }
