@@ -163,15 +163,12 @@ pub fn limbs_add_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> bool {
 // limbs_add_to_out(&mut xs[..12], &xs[..7], &ys[0..10])
 // if the latter were allowed.
 pub fn _limbs_add_to_out_special(xs: &mut [Limb], in_size: usize, ys: &[Limb]) -> bool {
-    assert!(in_size <= xs.len());
-    assert!(in_size <= ys.len());
-    assert!(xs.len() >= ys.len());
-    let mut carry = limbs_slice_add_same_length_in_place_left(&mut xs[..in_size], &ys[..in_size]);
-    xs[in_size..ys.len()].copy_from_slice(&ys[in_size..]);
-    if carry {
-        carry = limbs_slice_add_limb_in_place(&mut xs[in_size..ys.len()], 1);
-    }
-    carry
+    let ys_len = ys.len();
+    assert!(xs.len() >= ys_len);
+    assert!(in_size <= ys_len);
+    xs[in_size..ys_len].copy_from_slice(&ys[in_size..]);
+    limbs_slice_add_same_length_in_place_left(&mut xs[..in_size], &ys[..in_size])
+        && limbs_slice_add_limb_in_place(&mut xs[in_size..ys_len], 1)
 }
 
 /// Interpreting two equal-length slices of `Limb`s as the limbs (in ascending order) of two

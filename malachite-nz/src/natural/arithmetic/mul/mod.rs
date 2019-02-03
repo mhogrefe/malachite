@@ -591,7 +591,7 @@ pub fn mpn_mulmod_bnm1_itch(rn: usize, an: usize, bn: usize) -> usize {
         }
 }
 
-//TODO tune
+// In GMP this is hardcoded to 500
 pub const MUL_BASECASE_MAX_UN: usize = 500;
 
 /// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, writes

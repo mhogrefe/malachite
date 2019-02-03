@@ -5,8 +5,8 @@ use malachite_base::num::{
     WrappingSubAssign,
 };
 use natural::arithmetic::add::{
-    _limbs_add_same_length_with_carry_in_in_place_left, limbs_add_same_length_to_out,
-    limbs_add_to_out, limbs_slice_add_greater_in_place_left,
+    _limbs_add_same_length_with_carry_in_in_place_left, _limbs_add_to_out_special,
+    limbs_add_same_length_to_out, limbs_add_to_out, limbs_slice_add_greater_in_place_left,
     limbs_slice_add_same_length_in_place_left,
 };
 use natural::arithmetic::add_limb::{limbs_add_limb_to_out, limbs_slice_add_limb_in_place};
@@ -1389,7 +1389,6 @@ pub fn _limbs_mul_greater_to_out_toom_43(
     );
 }
 
-//TODO tune
 const TOOM44_MAYBE_MUL_BASECASE: bool =
     TUNE_PROGRAM_BUILD || MUL_TOOM44_THRESHOLD < 4 * MUL_TOOM22_THRESHOLD;
 const TOOM44_MAYBE_MUL_TOOM22: bool =
@@ -2480,6 +2479,7 @@ pub fn _limbs_mul_greater_to_out_toom_62(
 ) {
     let xs_len = xs.len();
     let ys_len = ys.len();
+    assert!(xs_len >= ys_len);
     let n = 1 + if xs_len >= 3 * ys_len {
         (xs_len - 1) / 6
     } else {
@@ -2685,4 +2685,217 @@ pub fn _limbs_mul_greater_to_out_toom_62(
         v_half,
         scratch_out,
     );
+}
+
+/// Stores |{ap,n}-{bp,n}| in {rp,n}, returns the sign.
+///
+/// This is abs_sub_n from mpn/generic/toom63_mul.c.
+fn abs_sub_n(rp: &mut [Limb], ap: &[Limb], bp: &[Limb]) -> bool {
+    let n = ap.len();
+    assert_eq!(bp.len(), n);
+    for i in (0..n).rev() {
+        let x = ap[i];
+        let y = bp[i];
+        if x != y {
+            let n = i + 1;
+            if x > y {
+                limbs_sub_same_length_to_out(rp, &ap[..n], &bp[..n]);
+                return false;
+            } else {
+                limbs_sub_same_length_to_out(rp, &ap[..n], &bp[..n]);
+                return true;
+            }
+        }
+        rp[n] = 0;
+    }
+    false
+}
+
+/// This is abs_sub_add_n from mpn/generic/toom63_mul.c.
+fn abs_sub_add_n(rm: &mut [Limb], rp: &mut [Limb], rs: &[Limb]) -> bool {
+    let result = abs_sub_n(rm, rp, rs);
+    assert!(!limbs_slice_add_same_length_in_place_left(rp, rs));
+    result
+}
+
+/// This is TOOM63_MUL_N_REC from mpn/generic/toom63_mul.c.
+fn _limbs_mul_same_length_to_out_toom_63_recursive(p: &mut [Limb], a: &[Limb], b: &[Limb]) {
+    limbs_mul_same_length_to_out(p, a, b);
+}
+
+/// This is TOOM63_MUL_REC from mpn/generic/toom63_mul.c.
+fn _limbs_mul_to_out_toom_63_recursive(p: &mut [Limb], a: &[Limb], b: &[Limb]) {
+    limbs_mul_greater_to_out(p, a, b);
+}
+
+/// Toom-4.5, the splitting 6x3 unbalanced version.
+/// Evaluate in: infinity, +4, -4, +2, -2, +1, -1, 0.
+///
+///<--s-><--n--><--n--><--n--><--n--><--n-->
+/// ____ ______ ______ ______ ______ ______
+///|_a5_|__a4__|__a3__|__a2__|__a1__|__a0__|
+///          |b2_|__b1__|__b0__|
+///          <-t-><--n--><--n-->
+///
+/// This is mpn_toom63_mul from mpn/generic/toom63_mul.c.
+pub fn _limbs_mul_greater_to_out_toom_63(
+    pp: &mut [Limb],
+    ap: &[Limb],
+    bp: &[Limb],
+    scratch: &mut [Limb],
+) {
+    let an = ap.len();
+    let bn = bp.len();
+    assert!(an >= bn);
+    let n = 1 + if an >= 2 * bn {
+        (an - 1) / 6
+    } else {
+        (bn - 1) / 3
+    };
+
+    // Decomposition
+    let a5 = &ap[5 * n..];
+    split_into_chunks!(bp, n, _unused, [b0, b1, b2], _unused);
+
+    let s = an - 5 * n;
+    let t = bn - (n << 1);
+
+    assert!(0 < s && s <= n);
+    assert!(0 < t && t <= n);
+    assert!(s + t >= n);
+    assert!(s + t > 4);
+    assert!(n > 2);
+
+    // Alloc also 3n+1 limbs for ws... mpn_toom_interpolate_8pts may
+    // need all of them, when DO_mpn_sublsh_n usea a scratch  */
+    // if (scratch == NULL) scratch = TMP_SALLOC_LIMBS (9 * n + 3); */
+    // Evaluation and recursive calls
+    // $pm4$
+    split_into_chunks_mut!(scratch, 3 * n + 1, [r7, r3], ws);
+    let mut sign;
+    {
+        let (r8, remainder) = pp.split_at_mut(3 * n);
+        split_into_chunks_mut!(remainder, n + 1, [v0, v1, v2, v3], _unused);
+        sign = _limbs_mul_toom_evaluate_poly_in_2_pow_and_neg_2_pow(
+            v2,
+            v0,
+            5,
+            ap,
+            n,
+            2,
+            &mut r8[..n + 1],
+        );
+        r8[n] = limbs_shl_to_out(r8, &b1[..n], 2); // 4b1
+        v3[t] = limbs_shl_to_out(v3, &b2[..t], 4); // 16b2
+        if n == t {
+            // 16b2+b0
+            let (v3_last, v3_init) = v3.split_last_mut().unwrap();
+            v3_last.wrapping_add_assign(
+                if limbs_slice_add_same_length_in_place_left(v3_init, &b0[..n]) {
+                    1
+                } else {
+                    0
+                },
+            );
+        } else {
+            v3[n] = if _limbs_add_to_out_special(v3, t + 1, &b0[..n]) {
+                1
+            } else {
+                0
+            }; // 16b2+b0
+        }
+        sign ^= abs_sub_add_n(&mut v1[..n + 1], &mut v3[..n + 1], &r8[..n + 1]);
+        // A(-4)*B(-4)
+        _limbs_mul_same_length_to_out_toom_63_recursive(r8, &v0[..n + 1], &v1[..n + 1]);
+        // A(+4)*B(+4)
+        _limbs_mul_same_length_to_out_toom_63_recursive(r3, &v2[..n + 1], &v3[..n + 1]);
+        _limbs_toom_couple_handling(r3, &mut r8[..2 * n + 1], sign, n, 2, 4);
+
+        // $pm1$
+        sign = _limbs_mul_toom_evaluate_poly_in_1_and_neg_1(
+            v2,
+            v0,
+            5,
+            ap,
+            n,
+            s,
+            &mut r8[..n + 1],
+            ap,
+            bp,
+        );
+        // Compute bs1 and bsm1. Code taken from toom33
+        let mut cy = if limbs_add_to_out(ws, &b0[..n], &b2[..t]) {
+            1
+        } else {
+            0
+        };
+        v3[n] = cy
+            + if limbs_add_same_length_to_out(v3, &ws[..n], &b1[..n]) {
+                1
+            } else {
+                0
+            };
+        if cy == 0 && limbs_cmp_same_length(&ws[..n], &b1[..n]) == Ordering::Less {
+            limbs_sub_same_length_to_out(v1, &b1[..n], &ws[..n]);
+            v1[n] = 0;
+            sign.not_assign();
+        } else {
+            cy.wrapping_sub_assign(if limbs_sub_same_length_to_out(v1, &ws[..n], &b1[..n]) {
+                1
+            } else {
+                0
+            });
+            v1[n] = cy;
+        }
+        // A(-1)*B(-1)
+        _limbs_mul_same_length_to_out_toom_63_recursive(r8, &v0[..n + 1], &v1[..n + 1]);
+        // A(1)*B(1)
+        _limbs_mul_same_length_to_out_toom_63_recursive(r7, &v2[..n + 1], &v3[..n + 1]);
+        _limbs_toom_couple_handling(r7, &mut r8[..2 * n + 1], sign, n, 0, 0);
+
+        // $pm2$
+        sign = _limbs_mul_toom_evaluate_poly_in_2_and_neg_2(v2, v0, 5, ap, n, &mut r8[..n + 1]);
+        r8[n] = limbs_shl_to_out(r8, &b1[..n], 1); // 2b1
+        v3[t] = limbs_shl_to_out(v3, &b2[..t], 2); // 4b2
+        if n == t {
+            // 4b2+b0
+            let (v3_last, v3_init) = v3.split_last_mut().unwrap();
+            v3_last.wrapping_add_assign(
+                if limbs_slice_add_same_length_in_place_left(v3_init, &b0[..n]) {
+                    1
+                } else {
+                    0
+                },
+            );
+        } else {
+            // 4b2+b0
+            v3[n] = if _limbs_add_to_out_special(v3, t + 1, &b0[..n]) {
+                1
+            } else {
+                0
+            };
+        }
+        sign ^= abs_sub_add_n(&mut v1[..n + 1], &mut v3[..n + 1], &r8[..n + 1]);
+        _limbs_mul_to_out_toom_63_recursive(r8, &v0[..n + 1], &v1[..n + 1]); // A(-2)*B(-2)
+    }
+    {
+        let (r8, remainder) = pp.split_at_mut(3 * n);
+        let (r5, remainder) = remainder.split_at_mut(2 * n + 2);
+        let (v2, v3) = remainder.split_at_mut(n + 1);
+        _limbs_mul_to_out_toom_63_recursive(r5, &v2[..n + 1], &v3[..n + 1]); // A(+2)*B(+2)
+        _limbs_toom_couple_handling(r5, &mut r8[..2 * n + 1], sign, n, 1, 2);
+
+        // A(0)*B(0)
+        _limbs_mul_same_length_to_out_toom_63_recursive(r8, &ap[..n], &bp[..n]);
+    }
+    // Infinity
+    {
+        let r1 = &mut pp[7 * n..];
+        if s > t {
+            _limbs_mul_to_out_toom_63_recursive(r1, &a5[..s], &b2[..t]);
+        } else {
+            _limbs_mul_to_out_toom_63_recursive(r1, &b2[..t], &a5[..s]);
+        }
+    }
+    _limbs_mul_toom_interpolate_8_points(pp, n, s + t, r3, r7, ws);
 }
