@@ -11,6 +11,7 @@ use malachite_nz::natural::arithmetic::mul::toom::{
     _limbs_mul_greater_to_out_toom_53, _limbs_mul_greater_to_out_toom_53_scratch_size,
     _limbs_mul_greater_to_out_toom_54, _limbs_mul_greater_to_out_toom_54_scratch_size,
     _limbs_mul_greater_to_out_toom_62, _limbs_mul_greater_to_out_toom_62_scratch_size,
+    _limbs_mul_greater_to_out_toom_63, _limbs_mul_greater_to_out_toom_63_scratch_size,
 };
 use malachite_nz::natural::arithmetic::mul::{
     _limbs_mul_greater_to_out_basecase, limbs_mul_greater_to_out,
@@ -25,6 +26,7 @@ use malachite_test::inputs::base::{
     triples_of_unsigned_vec_var_12, triples_of_unsigned_vec_var_13, triples_of_unsigned_vec_var_14,
     triples_of_unsigned_vec_var_15, triples_of_unsigned_vec_var_16, triples_of_unsigned_vec_var_17,
     triples_of_unsigned_vec_var_18, triples_of_unsigned_vec_var_19, triples_of_unsigned_vec_var_20,
+    triples_of_unsigned_vec_var_21,
 };
 use malachite_test::inputs::natural::{
     naturals, pairs_of_natural_and_unsigned, pairs_of_naturals, triples_of_naturals,
@@ -1121,6 +1123,26 @@ fn test_limbs_mul_greater_to_out_toom_44() {
     );
 }
 
+#[cfg(feature = "64_bit_limbs")]
+#[test]
+fn test_limbs_mul_greater_to_out_toom_44() {
+    let test = |xs: Vec<Limb>, ys: Vec<Limb>, out_before: Vec<Limb>, out_after| {
+        let mut out = out_before.to_vec();
+        _limbs_mul_greater_to_out_basecase(&mut out, &xs, &ys);
+        assert_eq!(out, out_after);
+        let mut out = out_before.to_vec();
+        let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_44_scratch_size(xs.len())];
+        _limbs_mul_greater_to_out_toom_44(&mut out, &xs, &ys, &mut scratch);
+        assert_eq!(out, out_after);
+    };
+    test(
+        vec![2, 3, 4, 5],
+        vec![3, 4, 5, 6],
+        vec![10; 8],
+        vec![6, 17, 34, 58, 58, 49, 30, 0],
+    );
+}
+
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
@@ -1780,6 +1802,7 @@ fn test_limbs_mul_greater_to_out_toom_62() {
         assert_eq!(out, out_after);
     };
     // k & 1 != 0 in _limbs_mul_toom_evaluate_poly_in_1_and_neg_1
+    // k > 4 in _limbs_mul_toom_evaluate_poly_in_1_and_neg_1
     // degree_u >= 5 in _limbs_mul_toom_evaluate_poly_in_2_and_neg_2
     // degree.odd() in _limbs_mul_toom_evaluate_poly_in_2_and_neg_2
     // t == n
@@ -1983,6 +2006,184 @@ fn limbs_mul_greater_to_out_toom_62_fail_6() {
     let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_62_scratch_size(6, 0)];
     let mut out = vec![10; 6];
     _limbs_mul_greater_to_out_toom_62(&mut out, &[3, 4, 5, 6, 7, 8], &[], &mut scratch);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+fn test_limbs_mul_greater_to_out_toom_63() {
+    let test = |xs: Vec<Limb>, ys: Vec<Limb>, out_before: Vec<Limb>, out_after| {
+        let mut out = out_before.to_vec();
+        _limbs_mul_greater_to_out_basecase(&mut out, &xs, &ys);
+        assert_eq!(out, out_after);
+        let mut out = out_before.to_vec();
+        let mut scratch =
+            vec![0; _limbs_mul_greater_to_out_toom_63_scratch_size(xs.len(), ys.len())];
+        _limbs_mul_greater_to_out_toom_63(&mut out, &xs, &ys, &mut scratch);
+        assert_eq!(out, out_after);
+    };
+    // n == t
+    // !(cy == 0 && limbs_cmp_same_length(&ws[..n], &b1[..n]) == Ordering::Less)
+    // s <= t
+    test(
+        vec![2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18],
+        vec![3, 4, 5, 6, 7, 8, 9, 10, 11],
+        vec![10; 26],
+        vec![
+            6, 17, 34, 58, 90, 131, 182, 244, 318, 381, 444, 507, 570, 633, 696, 759, 822, 828,
+            812, 773, 710, 622, 508, 367, 198, 0,
+        ],
+    );
+    // n != t
+    test(
+        vec![
+            3047748962, 2284186344, 3132866461, 2331447040, 1003213663, 1873981685, 3371337621,
+            3796896013, 4144448610, 2569252563, 2859304641, 1027973602, 3158196152, 4058699545,
+            2002924383, 3295505824, 695758308, 544681384, 3452307839, 1190734708, 4232023153,
+            451772934, 673919865, 2022672425, 3493426012, 1142609332, 477542383, 1304798841,
+            461115870, 3268103575, 2243523508,
+        ],
+        vec![
+            3987208830, 1336657961, 2605546090, 1112778759, 2243645577, 3695113963, 637209276,
+            527642657, 1586863943, 2178788843, 4128924923, 574016400, 118333022, 3019059425,
+            3734056582, 3974475640, 958936732,
+        ],
+        vec![10; 48],
+        vec![
+            901282364, 4131825926, 550521101, 4239081984, 354957348, 2987335611, 2947836402,
+            1594339509, 1900787939, 3942224706, 1915750189, 2686147736, 455238733, 595779993,
+            992449470, 225135268, 4216025815, 112446550, 2736130746, 1015352940, 1166343395,
+            3559470539, 2787138552, 3128535813, 2203140859, 3479459112, 599923700, 684443693,
+            1557326194, 1699057519, 2198150417, 2196463130, 1973109458, 3642841764, 426750624,
+            1438683694, 42406461, 1444651840, 2152704621, 722727455, 3882030279, 205951250,
+            838845869, 2997862064, 779154540, 1753953589, 1791445120, 500911172,
+        ],
+    );
+    test(
+        vec![
+            2547108010, 2828666778, 3252702258, 3885923576, 2331974758, 730724707, 1528859315,
+            4288784328, 3677151116, 445199233, 3304488688, 3566979465, 3541025426, 2491779846,
+            3112990742, 2583249486, 3403111749, 1930721237, 3428792463, 2896462048, 2985885576,
+            1819460734, 21206096, 3560441846, 987100555, 2844904275, 84854892, 1268249628,
+            3963306788, 3338670067, 2504599089, 65588657, 321493327, 4249673617, 4150876068,
+            721566898,
+        ],
+        vec![
+            2339094549, 568841948, 757218994, 54206328, 2888117240, 1758638903, 3215886938,
+            2041086168, 259363425, 3740850804, 3272104239, 3101597497, 4170226346, 1487680512,
+            2997309052, 1761169487, 680164259, 104354801, 3642294827, 2001649447,
+        ],
+        vec![10; 56],
+        vec![
+            4156749298, 1238334534, 3541686335, 400023669, 3354392679, 146448234, 338562445,
+            2541647274, 3476105410, 3869729511, 2592129633, 1524174755, 2864342013, 3189404137,
+            2408966423, 1748955694, 848863232, 2061232865, 2863992687, 1780371599, 1814973544,
+            4129152748, 1067034680, 3960771432, 1978132071, 249147649, 4113633238, 3331366833,
+            103867284, 4274561406, 24372440, 1874890180, 2262704206, 4185039557, 1493676561,
+            3605651563, 184712156, 1714079946, 3695806969, 3114374817, 2698021971, 2617815992,
+            3374318018, 2710182754, 2217042831, 3166354273, 3526471084, 2282901181, 17853137,
+            2805842653, 2980411632, 2879849003, 22987084, 2408312078, 212023482, 336282883,
+        ],
+    );
+    // cy == 0 && limbs_cmp_same_length(&ws[..n], &b1[..n]) == Ordering::Less
+    // s > t
+    test(
+        vec![
+            275320572, 2678313698, 1997150503, 1718206458, 3389415001, 1347098060, 423205500,
+            1228674579, 1683636524, 1761485682, 3886555164, 1343770739, 3728441996, 3386212640,
+            4218849286, 3154177905, 383775865, 685210915, 2915358388, 356527607, 1399377005,
+            2203631586, 3950305635, 4107289625,
+        ],
+        vec![
+            343872945, 2028904125, 1525417887, 867188532, 3911999830, 2139706847, 3256484706,
+            961423019, 1530068826, 3577946967,
+        ],
+        vec![10; 34],
+        vec![
+            367134780, 454511356, 740068730, 2466817027, 444007987, 2116910983, 3588258390,
+            4148666142, 241899205, 3037479671, 967522541, 1695514557, 3417684811, 1755587152,
+            57889847, 1893598444, 894827452, 1259092281, 343759711, 417669929, 4250137916,
+            2931151486, 4137704826, 1616987343, 118402896, 3476900958, 3144858924, 799089809,
+            2899882887, 413231425, 2515242049, 142267098, 1727945779, 3421601015,
+        ],
+    );
+}
+
+#[cfg(feature = "64_bit_limbs")]
+#[test]
+fn test_limbs_mul_greater_to_out_toom_63() {
+    let test = |xs: Vec<Limb>, ys: Vec<Limb>, out_before: Vec<Limb>, out_after| {
+        let mut out = out_before.to_vec();
+        _limbs_mul_greater_to_out_basecase(&mut out, &xs, &ys);
+        assert_eq!(out, out_after);
+        let mut out = out_before.to_vec();
+        let mut scratch =
+            vec![0; _limbs_mul_greater_to_out_toom_63_scratch_size(xs.len(), ys.len())];
+        _limbs_mul_greater_to_out_toom_63(&mut out, &xs, &ys, &mut scratch);
+        assert_eq!(out, out_after);
+    };
+    test(
+        vec![
+            6746486103788831552,
+            2922469023463657485,
+            7190781201699911122,
+            6369274278675525514,
+            11602031538822447399,
+            18146097755068799938,
+            10715195159596301824,
+            1582667531232164822,
+            17310503547119278200,
+            11108448614311336701,
+            16131384432757080248,
+            10724146198461527790,
+            17486718158725257827,
+            6011711000953739951,
+            12044019786490872751,
+            12126819472937875768,
+            11736689834584491812,
+            2624631955548590096,
+        ],
+        vec![
+            8718882040837103283,
+            12513261442998616191,
+            3363599670593686195,
+            2576001491054566526,
+            8476413363242630098,
+            11800520882738943180,
+            15256756628116724015,
+            15102633230716809194,
+            4752404995807312312,
+        ],
+        vec![10; 27],
+        vec![
+            11055708298853713344,
+            11718134630995530406,
+            1540454672309197922,
+            2461234873920328802,
+            12156343925049526190,
+            7669775936281025739,
+            5569544286309952271,
+            1251802631971472159,
+            7852335389754101252,
+            16331287242162052217,
+            16922468211499817236,
+            1090055930057904858,
+            4774304109866833132,
+            2115064630415334045,
+            3041714142401192073,
+            5249251501654981623,
+            6324653539847586925,
+            7895228639492924348,
+            13455067205957702368,
+            1142009976612635724,
+            13095096323291438869,
+            4348574203955863428,
+            8491467291307697179,
+            3535832683825156722,
+            3832291870552829557,
+            16965222076837711040,
+            676179707804463061,
+        ],
+    );
 }
 
 #[test]
@@ -2254,6 +2455,22 @@ fn limbs_mul_greater_to_out_toom_62_properties() {
             let mut scratch =
                 vec![0; _limbs_mul_greater_to_out_toom_62_scratch_size(xs.len(), ys.len())];
             _limbs_mul_greater_to_out_toom_62(&mut out, xs, ys, &mut scratch);
+            assert_eq!(out, expected_out);
+        },
+    );
+}
+
+#[test]
+fn limbs_mul_greater_to_out_toom_63_properties() {
+    test_properties_custom_scale(
+        2_048,
+        triples_of_unsigned_vec_var_21,
+        |&(ref out, ref xs, ref ys)| {
+            let expected_out = limbs_mul_basecase_helper(out, xs, ys);
+            let mut out = out.to_vec();
+            let mut scratch =
+                vec![0; _limbs_mul_greater_to_out_toom_63_scratch_size(xs.len(), ys.len())];
+            _limbs_mul_greater_to_out_toom_63(&mut out, xs, ys, &mut scratch);
             assert_eq!(out, expected_out);
         },
     );

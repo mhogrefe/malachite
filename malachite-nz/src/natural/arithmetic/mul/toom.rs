@@ -39,15 +39,15 @@ use platform::{Limb, SignedLimb};
 use std::cmp::Ordering;
 
 //TODO tune all
-pub const MUL_TOOM22_THRESHOLD: usize = 30;
-pub const MUL_TOOM33_THRESHOLD: usize = 100;
-pub const MUL_TOOM44_THRESHOLD: usize = 300;
-pub const MUL_TOOM6H_THRESHOLD: usize = 350;
-pub const MUL_TOOM8H_THRESHOLD: usize = 450;
-pub const MUL_TOOM32_TO_TOOM43_THRESHOLD: usize = 100;
-pub const MUL_TOOM32_TO_TOOM53_THRESHOLD: usize = 110;
-pub const MUL_TOOM42_TO_TOOM53_THRESHOLD: usize = 100;
-pub const MUL_TOOM42_TO_TOOM63_THRESHOLD: usize = 110;
+pub const MUL_TOOM22_THRESHOLD: usize = 20;
+pub const MUL_TOOM33_THRESHOLD: usize = 65;
+pub const MUL_TOOM44_THRESHOLD: usize = 166;
+pub const MUL_TOOM6H_THRESHOLD: usize = 256;
+pub const MUL_TOOM8H_THRESHOLD: usize = 333;
+pub const MUL_TOOM32_TO_TOOM43_THRESHOLD: usize = 108;
+pub const MUL_TOOM32_TO_TOOM53_THRESHOLD: usize = 122;
+pub const MUL_TOOM42_TO_TOOM53_THRESHOLD: usize = 105;
+pub const MUL_TOOM42_TO_TOOM63_THRESHOLD: usize = 114;
 pub const MUL_TOOM33_THRESHOLD_LIMIT: usize = MUL_TOOM33_THRESHOLD;
 
 /// Helper function for high degree Toom-Cook algorithms.
@@ -108,8 +108,8 @@ pub fn _limbs_mul_greater_to_out_toom_22_scratch_size(xs_len: usize) -> usize {
 }
 
 // TODO make these compiler flags?
-pub const TUNE_PROGRAM_BUILD: bool = true;
-pub const WANT_FAT_BINARY: bool = false;
+pub const TUNE_PROGRAM_BUILD: bool = false;
+pub const WANT_FAT_BINARY: bool = true;
 
 pub const TOOM22_MAYBE_MUL_TOOM22: bool =
     TUNE_PROGRAM_BUILD || WANT_FAT_BINARY || MUL_TOOM33_THRESHOLD >= 2 * MUL_TOOM22_THRESHOLD;
@@ -559,7 +559,7 @@ pub fn _limbs_mul_greater_to_out_toom_32(
     //
     // Since we store y0 at the same location as the low half of x0 + x2, we need to do the middle
     // sum first.
-    hi = out[2 * n].to_signed_bitwise();
+    let mut hi = out[2 * n].to_signed_bitwise();
     let mut scratch_high = scratch[2 * n];
     if limbs_add_same_length_to_out(&mut out[2 * n..], &scratch[..n], &scratch[n..2 * n]) {
         scratch_high += 1;
@@ -624,6 +624,7 @@ pub fn _limbs_mul_greater_to_out_toom_32(
     //             +--------+
     //
     // We must take into account the carry from Hx0 - Lx3.
+    let mut hi;
     {
         split_into_chunks_mut!(out, n, [out_0, out_1, out_2], out_3);
         let carry = limbs_sub_same_length_in_place_left(out_1, &out_3[..n]);
@@ -1389,33 +1390,12 @@ pub fn _limbs_mul_greater_to_out_toom_43(
     );
 }
 
-const TOOM44_MAYBE_MUL_BASECASE: bool =
-    TUNE_PROGRAM_BUILD || MUL_TOOM44_THRESHOLD < 4 * MUL_TOOM22_THRESHOLD;
-const TOOM44_MAYBE_MUL_TOOM22: bool =
-    TUNE_PROGRAM_BUILD || MUL_TOOM44_THRESHOLD < 4 * MUL_TOOM33_THRESHOLD;
-const TOOM44_MAYBE_MUL_TOOM44: bool =
-    TUNE_PROGRAM_BUILD || MUL_TOOM6H_THRESHOLD >= 4 * MUL_TOOM44_THRESHOLD;
-
 /// A helper function for `_limbs_mul_greater_to_out_toom_44`.
 ///
 /// This is TOOM44_MUL_N_REC from mpn/generic/toom22_mul.c.
-fn _limbs_mul_same_length_to_out_toom_44_recursive(
-    out: &mut [Limb],
-    xs: &[Limb],
-    ys: &[Limb],
-    scratch: &mut [Limb],
-) {
-    let n = xs.len();
-    assert_eq!(ys.len(), n);
-    if TOOM44_MAYBE_MUL_BASECASE && n < MUL_TOOM22_THRESHOLD {
-        _limbs_mul_greater_to_out_basecase(out, xs, ys);
-    } else if TOOM44_MAYBE_MUL_TOOM22 && n < MUL_TOOM33_THRESHOLD {
-        _limbs_mul_greater_to_out_toom_22(out, xs, ys, scratch);
-    } else if !TOOM44_MAYBE_MUL_TOOM44 || n < MUL_TOOM44_THRESHOLD {
-        _limbs_mul_greater_to_out_toom_33(out, xs, ys, scratch);
-    } else {
-        _limbs_mul_greater_to_out_toom_44(out, xs, ys, scratch);
-    }
+fn _limbs_mul_same_length_to_out_toom_44_recursive(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
+    // The GMP TOOM44_MUL_N_REC doesn't work for small input sizes, like xs_len == ys_len == 4.
+    limbs_mul_same_length_to_out(out, xs, ys);
 }
 
 /// This function can be used to determine whether the sizes of the input slices to
@@ -1553,12 +1533,11 @@ pub fn _limbs_mul_greater_to_out_toom_44(
             }
 
             // v_2, 2 * n + 1 limbs
-            _limbs_mul_same_length_to_out_toom_44_recursive(v_2, &apx[..n + 1], bpx, scratch2);
+            _limbs_mul_same_length_to_out_toom_44_recursive(v_2, &apx[..n + 1], bpx);
         }
         {
             // v_neg_2 length: 6 * n + 4
-            let (v_neg_2, scratch2) = scratch[m..].split_at_mut(6 * n + 4);
-            _limbs_mul_same_length_to_out_toom_44_recursive(v_neg_2, amx, bmx, scratch2);
+            _limbs_mul_same_length_to_out_toom_44_recursive(&mut scratch[m..], amx, bmx);
 
             // Compute apx = 8 * xs_0 + 4 * xs_1 + 2 * xs_2 + xs_3 =
             // (((2 * xs_0 + xs_1) * 2 + xs_2) * 2 + xs_3
@@ -1602,7 +1581,7 @@ pub fn _limbs_mul_greater_to_out_toom_44(
             let (v_half, scratch2) = scratch[2 * m..].split_at_mut(4 * n + 3);
 
             // v_half, 2 * n + 1 limbs
-            _limbs_mul_same_length_to_out_toom_44_recursive(v_half, apx, bpx, scratch2);
+            _limbs_mul_same_length_to_out_toom_44_recursive(v_half, apx, bpx);
 
             // Compute apx = xs_0 + xs_1 + xs_2 + xs_3 and amx = xs_0 - xs_1 + xs_2 - xs_3.
             w3_neg = _limbs_mul_toom_evaluate_deg_3_poly_in_1_and_neg_1(
@@ -1624,37 +1603,26 @@ pub fn _limbs_mul_greater_to_out_toom_44(
                 w3_neg.not_assign();
             }
         }
-        // v_neg_1 length: m + 1
-        let (v_neg_1, scratch2) = scratch[3 * m..].split_at_mut(m + 1);
-
         // v_neg_1, 2 * n + 1 limbs
-        _limbs_mul_same_length_to_out_toom_44_recursive(v_neg_1, amx, bmx, scratch2);
+        _limbs_mul_same_length_to_out_toom_44_recursive(&mut scratch[3 * m..], amx, bmx);
     }
     {
-        let scratch2 = &mut scratch[8 * n + 5..];
-        {
-            let (apx, remainder) = out.split_at_mut(2 * n); // apx length: 2 * n
-            let (v_1, bpx) = remainder.split_at_mut(m + 1); // v_1 length: m + 1
+        let (apx, remainder) = out.split_at_mut(2 * n); // apx length: 2 * n
+        let (v_1, bpx) = remainder.split_at_mut(m + 1); // v_1 length: m + 1
 
-            // Clobbers amx, bmx.
-            // v_1, 2 * n + 1 limbs
-            _limbs_mul_same_length_to_out_toom_44_recursive(
-                v_1,
-                &apx[..n + 1],
-                &bpx[..n + 1],
-                scratch2,
-            );
-        }
-        {
-            let (v_0, v_inf) = out.split_at_mut(2 * n); // v_0 length: 2 * n
-            let v_inf = &mut v_inf[4 * n..];
-            _limbs_mul_same_length_to_out_toom_44_recursive(v_0, xs_0, ys_0, scratch2);
-            if s > t {
-                limbs_mul_greater_to_out(v_inf, xs_3, ys_3);
-            } else {
-                // v_inf, s + t limbs
-                _limbs_mul_same_length_to_out_toom_44_recursive(v_inf, xs_3, ys_3, scratch2);
-            }
+        // Clobbers amx, bmx.
+        // v_1, 2 * n + 1 limbs
+        _limbs_mul_same_length_to_out_toom_44_recursive(v_1, &apx[..n + 1], &bpx[..n + 1]);
+    }
+    {
+        let (v_0, v_inf) = out.split_at_mut(2 * n); // v_0 length: 2 * n
+        let v_inf = &mut v_inf[4 * n..];
+        _limbs_mul_same_length_to_out_toom_44_recursive(v_0, xs_0, ys_0);
+        if s > t {
+            limbs_mul_greater_to_out(v_inf, xs_3, ys_3);
+        } else {
+            // v_inf, s + t limbs
+            _limbs_mul_same_length_to_out_toom_44_recursive(v_inf, xs_3, ys_3);
         }
     }
     split_into_chunks_mut!(scratch, m, [v_2, v_neg_2, v_half], remainder);
@@ -2702,11 +2670,11 @@ fn abs_sub_n(rp: &mut [Limb], ap: &[Limb], bp: &[Limb]) -> bool {
                 limbs_sub_same_length_to_out(rp, &ap[..n], &bp[..n]);
                 return false;
             } else {
-                limbs_sub_same_length_to_out(rp, &ap[..n], &bp[..n]);
+                limbs_sub_same_length_to_out(rp, &bp[..n], &ap[..n]);
                 return true;
             }
         }
-        rp[n] = 0;
+        rp[i] = 0;
     }
     false
 }
@@ -2716,6 +2684,35 @@ fn abs_sub_add_n(rm: &mut [Limb], rp: &mut [Limb], rs: &[Limb]) -> bool {
     let result = abs_sub_n(rm, rp, rs);
     assert!(!limbs_slice_add_same_length_in_place_left(rp, rs));
     result
+}
+
+/// This function can be used to determine whether the sizes of the input slices to
+/// `_limbs_mul_greater_to_out_toom_63` are valid.
+pub fn _limbs_mul_greater_to_out_toom_63_input_sizes_valid(xs_len: usize, ys_len: usize) -> bool {
+    if xs_len == 0 || xs_len < ys_len {
+        return false;
+    }
+    let n = 1 + if xs_len >= 2 * ys_len {
+        (xs_len - 1) / 6
+    } else {
+        (ys_len - 1) / 3
+    };
+    let s = xs_len.saturating_sub(5 * n);
+    let t = ys_len.saturating_sub(n << 1);
+    0 < s && s <= n && 0 < t && t <= n && s + t >= n && s + t > 4 && n > 2
+}
+
+/// This function can be used to determine the length of the input `scratch` slice in
+/// `_limbs_mul_greater_to_out_toom_63`.
+///
+/// This is mpn_toom63_mul_itch from gmp-impl.h.
+pub fn _limbs_mul_greater_to_out_toom_63_scratch_size(xs_len: usize, ys_len: usize) -> usize {
+    let n = 1 + if xs_len >= 2 * ys_len {
+        (xs_len - 1) / 6
+    } else {
+        (ys_len - 1) / 3
+    };
+    9 * n + 3
 }
 
 /// This is TOOM63_MUL_N_REC from mpn/generic/toom63_mul.c.
@@ -2731,21 +2728,21 @@ fn _limbs_mul_to_out_toom_63_recursive(p: &mut [Limb], a: &[Limb], b: &[Limb]) {
 /// Toom-4.5, the splitting 6x3 unbalanced version.
 /// Evaluate in: infinity, +4, -4, +2, -2, +1, -1, 0.
 ///
-///<--s-><--n--><--n--><--n--><--n--><--n-->
-/// ____ ______ ______ ______ ______ ______
-///|_a5_|__a4__|__a3__|__a2__|__a1__|__a0__|
-///          |b2_|__b1__|__b0__|
-///          <-t-><--n--><--n-->
+/// <--s-><--n--><--n--><--n--><--n--><--n-->
+///  ________________________________________
+/// |_a5_|__a4__|__a3__|__a2__|__a1__|__a0__|
+///                       |b2_|__b1__|__b0__|
+///                       <-t-><--n--><--n-->
 ///
 /// This is mpn_toom63_mul from mpn/generic/toom63_mul.c.
 pub fn _limbs_mul_greater_to_out_toom_63(
     pp: &mut [Limb],
-    ap: &[Limb],
-    bp: &[Limb],
+    xs: &[Limb],
+    ys: &[Limb],
     scratch: &mut [Limb],
 ) {
-    let an = ap.len();
-    let bn = bp.len();
+    let an = xs.len();
+    let bn = ys.len();
     assert!(an >= bn);
     let n = 1 + if an >= 2 * bn {
         (an - 1) / 6
@@ -2754,8 +2751,8 @@ pub fn _limbs_mul_greater_to_out_toom_63(
     };
 
     // Decomposition
-    let a5 = &ap[5 * n..];
-    split_into_chunks!(bp, n, _unused, [b0, b1, b2], _unused);
+    let a5 = &xs[5 * n..];
+    split_into_chunks!(ys, n, _unused, [b0, b1], b2);
 
     let s = an - 5 * n;
     let t = bn - (n << 1);
@@ -2780,7 +2777,7 @@ pub fn _limbs_mul_greater_to_out_toom_63(
             v2,
             v0,
             5,
-            ap,
+            xs,
             n,
             2,
             &mut r8[..n + 1],
@@ -2788,7 +2785,7 @@ pub fn _limbs_mul_greater_to_out_toom_63(
         r8[n] = limbs_shl_to_out(r8, &b1[..n], 2); // 4b1
         v3[t] = limbs_shl_to_out(v3, &b2[..t], 4); // 16b2
         if n == t {
-            // 16b2+b0
+            // 16b2 + b0
             let (v3_last, v3_init) = v3.split_last_mut().unwrap();
             v3_last.wrapping_add_assign(
                 if limbs_slice_add_same_length_in_place_left(v3_init, &b0[..n]) {
@@ -2804,10 +2801,10 @@ pub fn _limbs_mul_greater_to_out_toom_63(
                 0
             }; // 16b2+b0
         }
-        sign ^= abs_sub_add_n(&mut v1[..n + 1], &mut v3[..n + 1], &r8[..n + 1]);
-        // A(-4)*B(-4)
+        sign ^= abs_sub_add_n(v1, &mut v3[..n + 1], &r8[..n + 1]);
+        // A(-4) * B(-4)
         _limbs_mul_same_length_to_out_toom_63_recursive(r8, &v0[..n + 1], &v1[..n + 1]);
-        // A(+4)*B(+4)
+        // A(+4) * B(+4)
         _limbs_mul_same_length_to_out_toom_63_recursive(r3, &v2[..n + 1], &v3[..n + 1]);
         _limbs_toom_couple_handling(r3, &mut r8[..2 * n + 1], sign, n, 2, 4);
 
@@ -2816,12 +2813,12 @@ pub fn _limbs_mul_greater_to_out_toom_63(
             v2,
             v0,
             5,
-            ap,
+            xs,
             n,
             s,
             &mut r8[..n + 1],
-            ap,
-            bp,
+            xs,
+            ys,
         );
         // Compute bs1 and bsm1. Code taken from toom33
         let mut cy = if limbs_add_to_out(ws, &b0[..n], &b2[..t]) {
@@ -2847,14 +2844,14 @@ pub fn _limbs_mul_greater_to_out_toom_63(
             });
             v1[n] = cy;
         }
-        // A(-1)*B(-1)
+        // A(-1) * B(-1)
         _limbs_mul_same_length_to_out_toom_63_recursive(r8, &v0[..n + 1], &v1[..n + 1]);
-        // A(1)*B(1)
+        // A(1) * B(1)
         _limbs_mul_same_length_to_out_toom_63_recursive(r7, &v2[..n + 1], &v3[..n + 1]);
         _limbs_toom_couple_handling(r7, &mut r8[..2 * n + 1], sign, n, 0, 0);
 
         // $pm2$
-        sign = _limbs_mul_toom_evaluate_poly_in_2_and_neg_2(v2, v0, 5, ap, n, &mut r8[..n + 1]);
+        sign = _limbs_mul_toom_evaluate_poly_in_2_and_neg_2(v2, v0, 5, xs, n, &mut r8[..n + 1]);
         r8[n] = limbs_shl_to_out(r8, &b1[..n], 1); // 2b1
         v3[t] = limbs_shl_to_out(v3, &b2[..t], 2); // 4b2
         if n == t {
@@ -2875,18 +2872,22 @@ pub fn _limbs_mul_greater_to_out_toom_63(
                 0
             };
         }
-        sign ^= abs_sub_add_n(&mut v1[..n + 1], &mut v3[..n + 1], &r8[..n + 1]);
-        _limbs_mul_to_out_toom_63_recursive(r8, &v0[..n + 1], &v1[..n + 1]); // A(-2)*B(-2)
+        sign ^= abs_sub_add_n(v1, &mut v3[..n + 1], &r8[..n + 1]);
+        // A(-2)*B(-2)
+        _limbs_mul_same_length_to_out_toom_63_recursive(r8, &v0[..n + 1], &v1[..n + 1]);
     }
     {
-        let (r8, remainder) = pp.split_at_mut(3 * n);
-        let (r5, remainder) = remainder.split_at_mut(2 * n + 2);
-        let (v2, v3) = remainder.split_at_mut(n + 1);
-        _limbs_mul_to_out_toom_63_recursive(r5, &v2[..n + 1], &v3[..n + 1]); // A(+2)*B(+2)
+        let (r8, r5) = pp.split_at_mut(3 * n);
+        {
+            let (r5, remainder) = r5.split_at_mut(2 * n + 2);
+            let (v2, v3) = remainder.split_at_mut(n + 1);
+            // A(+2)*B(+2)
+            _limbs_mul_same_length_to_out_toom_63_recursive(r5, &v2[..n + 1], &v3[..n + 1]);
+        }
         _limbs_toom_couple_handling(r5, &mut r8[..2 * n + 1], sign, n, 1, 2);
 
-        // A(0)*B(0)
-        _limbs_mul_same_length_to_out_toom_63_recursive(r8, &ap[..n], &bp[..n]);
+        // A(0) * B(0)
+        _limbs_mul_same_length_to_out_toom_63_recursive(r8, &xs[..n], &ys[..n]);
     }
     // Infinity
     {

@@ -6,12 +6,16 @@ use natural::arithmetic::add::{
 };
 use natural::arithmetic::add_limb::limbs_slice_add_limb_in_place;
 use natural::arithmetic::add_mul_limb::mpn_addmul_1;
+use natural::arithmetic::mul::fft::{mpn_fft_best_k, mpn_fft_next_size, MUL_FFT_THRESHOLD};
 use natural::arithmetic::mul::toom::{
     _limbs_mul_greater_to_out_toom_22, _limbs_mul_greater_to_out_toom_32,
     _limbs_mul_greater_to_out_toom_33, _limbs_mul_greater_to_out_toom_33_scratch_size,
-    _limbs_mul_greater_to_out_toom_42, _limbs_mul_greater_to_out_toom_44,
-    _limbs_mul_greater_to_out_toom_44_scratch_size, MUL_TOOM22_THRESHOLD, MUL_TOOM33_THRESHOLD,
-    MUL_TOOM33_THRESHOLD_LIMIT, MUL_TOOM44_THRESHOLD, MUL_TOOM6H_THRESHOLD,
+    _limbs_mul_greater_to_out_toom_42, _limbs_mul_greater_to_out_toom_43,
+    _limbs_mul_greater_to_out_toom_44, _limbs_mul_greater_to_out_toom_44_scratch_size,
+    _limbs_mul_greater_to_out_toom_53, _limbs_mul_greater_to_out_toom_63, MUL_TOOM22_THRESHOLD,
+    MUL_TOOM32_TO_TOOM43_THRESHOLD, MUL_TOOM32_TO_TOOM53_THRESHOLD, MUL_TOOM33_THRESHOLD,
+    MUL_TOOM33_THRESHOLD_LIMIT, MUL_TOOM42_TO_TOOM53_THRESHOLD, MUL_TOOM42_TO_TOOM63_THRESHOLD,
+    MUL_TOOM44_THRESHOLD, MUL_TOOM6H_THRESHOLD,
 };
 use natural::arithmetic::mul_limb::limbs_mul_limb_to_out;
 use natural::arithmetic::sub::limbs_sub_same_length_to_out;
@@ -88,469 +92,8 @@ pub fn mpn_bc_mulmod_bnp1(rp: &mut [Limb], ap: &[Limb], bp: &[Limb], tp: &mut [L
 
 //TODO PASTE A
 
-//TODO test
-// checked
-// docs preserved
-// Returns smallest possible number of limbs >= pl for a fft of size 2 ^ k, i.e. smallest multiple
-// of 2 ^ k >= pl.
-// mpn_fft_next_size from mpn/generic/mul-fft.c
-pub fn mpn_fft_next_size(mut pl: usize, k: u32) -> usize {
-    pl = 1 + ((pl - 1) >> k); // ceil(pl / 2 ^ k)
-    pl << k
-}
-
-struct FFTTableNK {
-    n: u32,
-    k: u32,
-}
-
-const FFT_TABLE3_SIZE: usize = 193;
-
-//TODO tune!!
-// from mpn/*/*/gmp-mparam.h
-const MUL_FFT_TABLE3: [FFTTableNK; FFT_TABLE3_SIZE] = [
-    FFTTableNK { n: 372, k: 5 },
-    FFTTableNK { n: 17, k: 6 },
-    FFTTableNK { n: 9, k: 5 },
-    FFTTableNK { n: 19, k: 6 },
-    FFTTableNK { n: 21, k: 7 },
-    FFTTableNK { n: 11, k: 6 },
-    FFTTableNK { n: 23, k: 7 },
-    FFTTableNK { n: 12, k: 6 },
-    FFTTableNK { n: 25, k: 7 },
-    FFTTableNK { n: 21, k: 8 },
-    FFTTableNK { n: 11, k: 7 },
-    FFTTableNK { n: 24, k: 8 },
-    FFTTableNK { n: 13, k: 7 },
-    FFTTableNK { n: 27, k: 8 },
-    FFTTableNK { n: 15, k: 7 },
-    FFTTableNK { n: 31, k: 8 },
-    FFTTableNK { n: 17, k: 7 },
-    FFTTableNK { n: 35, k: 8 },
-    FFTTableNK { n: 19, k: 7 },
-    FFTTableNK { n: 39, k: 8 },
-    FFTTableNK { n: 21, k: 9 },
-    FFTTableNK { n: 11, k: 8 },
-    FFTTableNK { n: 27, k: 9 },
-    FFTTableNK { n: 15, k: 8 },
-    FFTTableNK { n: 35, k: 9 },
-    FFTTableNK { n: 19, k: 8 },
-    FFTTableNK { n: 41, k: 9 },
-    FFTTableNK { n: 23, k: 8 },
-    FFTTableNK { n: 47, k: 9 },
-    FFTTableNK { n: 27, k: 10 },
-    FFTTableNK { n: 15, k: 9 },
-    FFTTableNK { n: 39, k: 10 },
-    FFTTableNK { n: 23, k: 9 },
-    FFTTableNK { n: 51, k: 11 },
-    FFTTableNK { n: 15, k: 10 },
-    FFTTableNK { n: 31, k: 9 },
-    FFTTableNK { n: 67, k: 10 },
-    FFTTableNK { n: 39, k: 9 },
-    FFTTableNK { n: 83, k: 10 },
-    FFTTableNK { n: 47, k: 9 },
-    FFTTableNK { n: 95, k: 10 },
-    FFTTableNK { n: 55, k: 11 },
-    FFTTableNK { n: 31, k: 10 },
-    FFTTableNK { n: 79, k: 11 },
-    FFTTableNK { n: 47, k: 10 },
-    FFTTableNK { n: 95, k: 12 },
-    FFTTableNK { n: 31, k: 11 },
-    FFTTableNK { n: 63, k: 10 },
-    FFTTableNK { n: 127, k: 9 },
-    FFTTableNK { n: 255, k: 10 },
-    FFTTableNK { n: 135, k: 9 },
-    FFTTableNK { n: 271, k: 11 },
-    FFTTableNK { n: 79, k: 10 },
-    FFTTableNK { n: 159, k: 9 },
-    FFTTableNK { n: 319, k: 10 },
-    FFTTableNK { n: 167, k: 11 },
-    FFTTableNK { n: 95, k: 10 },
-    FFTTableNK { n: 191, k: 9 },
-    FFTTableNK { n: 383, k: 10 },
-    FFTTableNK { n: 207, k: 11 },
-    FFTTableNK { n: 111, k: 12 },
-    FFTTableNK { n: 63, k: 11 },
-    FFTTableNK { n: 127, k: 10 },
-    FFTTableNK { n: 271, k: 9 },
-    FFTTableNK { n: 543, k: 11 },
-    FFTTableNK { n: 143, k: 10 },
-    FFTTableNK { n: 287, k: 9 },
-    FFTTableNK { n: 575, k: 10 },
-    FFTTableNK { n: 303, k: 11 },
-    FFTTableNK { n: 159, k: 10 },
-    FFTTableNK { n: 319, k: 12 },
-    FFTTableNK { n: 95, k: 11 },
-    FFTTableNK { n: 191, k: 10 },
-    FFTTableNK { n: 383, k: 11 },
-    FFTTableNK { n: 207, k: 10 },
-    FFTTableNK { n: 415, k: 11 },
-    FFTTableNK { n: 223, k: 13 },
-    FFTTableNK { n: 63, k: 12 },
-    FFTTableNK { n: 127, k: 11 },
-    FFTTableNK { n: 271, k: 10 },
-    FFTTableNK { n: 543, k: 11 },
-    FFTTableNK { n: 287, k: 10 },
-    FFTTableNK { n: 575, k: 11 },
-    FFTTableNK { n: 303, k: 12 },
-    FFTTableNK { n: 159, k: 11 },
-    FFTTableNK { n: 319, k: 10 },
-    FFTTableNK { n: 639, k: 11 },
-    FFTTableNK { n: 351, k: 12 },
-    FFTTableNK { n: 191, k: 11 },
-    FFTTableNK { n: 415, k: 12 },
-    FFTTableNK { n: 223, k: 11 },
-    FFTTableNK { n: 479, k: 13 },
-    FFTTableNK { n: 127, k: 12 },
-    FFTTableNK { n: 255, k: 11 },
-    FFTTableNK { n: 543, k: 12 },
-    FFTTableNK { n: 287, k: 11 },
-    FFTTableNK { n: 575, k: 12 },
-    FFTTableNK { n: 351, k: 11 },
-    FFTTableNK { n: 703, k: 13 },
-    FFTTableNK { n: 191, k: 12 },
-    FFTTableNK { n: 415, k: 11 },
-    FFTTableNK { n: 831, k: 12 },
-    FFTTableNK { n: 479, k: 14 },
-    FFTTableNK { n: 127, k: 13 },
-    FFTTableNK { n: 255, k: 12 },
-    FFTTableNK { n: 575, k: 13 },
-    FFTTableNK { n: 319, k: 12 },
-    FFTTableNK { n: 703, k: 13 },
-    FFTTableNK { n: 383, k: 12 },
-    FFTTableNK { n: 831, k: 13 },
-    FFTTableNK { n: 447, k: 12 },
-    FFTTableNK { n: 959, k: 14 },
-    FFTTableNK { n: 255, k: 13 },
-    FFTTableNK { n: 511, k: 12 },
-    FFTTableNK { n: 1_023, k: 13 },
-    FFTTableNK { n: 575, k: 12 },
-    FFTTableNK { n: 1_215, k: 13 },
-    FFTTableNK { n: 639, k: 12 },
-    FFTTableNK { n: 1_279, k: 13 },
-    FFTTableNK { n: 703, k: 14 },
-    FFTTableNK { n: 383, k: 13 },
-    FFTTableNK { n: 831, k: 12 },
-    FFTTableNK { n: 1_663, k: 13 },
-    FFTTableNK { n: 959, k: 15 },
-    FFTTableNK { n: 255, k: 14 },
-    FFTTableNK { n: 511, k: 13 },
-    FFTTableNK { n: 1_087, k: 12 },
-    FFTTableNK { n: 2_175, k: 13 },
-    FFTTableNK { n: 1_215, k: 14 },
-    FFTTableNK { n: 639, k: 13 },
-    FFTTableNK { n: 1_343, k: 12 },
-    FFTTableNK { n: 2_687, k: 13 },
-    FFTTableNK { n: 1_407, k: 14 },
-    FFTTableNK { n: 767, k: 13 },
-    FFTTableNK { n: 1_535, k: 12 },
-    FFTTableNK { n: 3_199, k: 13 },
-    FFTTableNK { n: 1_663, k: 14 },
-    FFTTableNK { n: 895, k: 15 },
-    FFTTableNK { n: 511, k: 14 },
-    FFTTableNK { n: 1_023, k: 13 },
-    FFTTableNK { n: 2_175, k: 14 },
-    FFTTableNK { n: 1_151, k: 13 },
-    FFTTableNK { n: 2_303, k: 12 },
-    FFTTableNK { n: 4_607, k: 13 },
-    FFTTableNK { n: 2_431, k: 12 },
-    FFTTableNK { n: 4_863, k: 14 },
-    FFTTableNK { n: 1_279, k: 13 },
-    FFTTableNK { n: 2_687, k: 14 },
-    FFTTableNK { n: 1_407, k: 15 },
-    FFTTableNK { n: 767, k: 14 },
-    FFTTableNK { n: 1_535, k: 13 },
-    FFTTableNK { n: 3_199, k: 14 },
-    FFTTableNK { n: 1_663, k: 13 },
-    FFTTableNK { n: 3_327, k: 12 },
-    FFTTableNK { n: 6_655, k: 13 },
-    FFTTableNK { n: 3_455, k: 12 },
-    FFTTableNK { n: 6_911, k: 14 },
-    FFTTableNK { n: 1_791, k: 16 },
-    FFTTableNK { n: 511, k: 15 },
-    FFTTableNK { n: 1_023, k: 14 },
-    FFTTableNK { n: 2_175, k: 13 },
-    FFTTableNK { n: 4_351, k: 12 },
-    FFTTableNK { n: 8_703, k: 14 },
-    FFTTableNK { n: 2_303, k: 13 },
-    FFTTableNK { n: 4_607, k: 14 },
-    FFTTableNK { n: 2_431, k: 13 },
-    FFTTableNK { n: 4_863, k: 15 },
-    FFTTableNK { n: 1_279, k: 14 },
-    FFTTableNK { n: 2_815, k: 13 },
-    FFTTableNK { n: 5_631, k: 14 },
-    FFTTableNK { n: 2_943, k: 13 },
-    FFTTableNK { n: 5_887, k: 12 },
-    FFTTableNK { n: 11_775, k: 15 },
-    FFTTableNK { n: 1_535, k: 14 },
-    FFTTableNK { n: 3_199, k: 13 },
-    FFTTableNK { n: 6_399, k: 14 },
-    FFTTableNK { n: 3_327, k: 13 },
-    FFTTableNK { n: 6_655, k: 14 },
-    FFTTableNK { n: 3_455, k: 13 },
-    FFTTableNK { n: 6_911, k: 15 },
-    FFTTableNK { n: 1_791, k: 14 },
-    FFTTableNK { n: 3_583, k: 13 },
-    FFTTableNK { n: 7_167, k: 14 },
-    FFTTableNK { n: 3_839, k: 13 },
-    FFTTableNK { n: 7_679, k: 16 },
-    FFTTableNK { n: 65_536, k: 17 },
-    FFTTableNK { n: 131_072, k: 18 },
-    FFTTableNK { n: 262_144, k: 19 },
-    FFTTableNK { n: 524_288, k: 20 },
-    FFTTableNK {
-        n: 1_048_576,
-        k: 21,
-    },
-    FFTTableNK {
-        n: 2_097_152,
-        k: 22,
-    },
-    FFTTableNK {
-        n: 4_194_304,
-        k: 23,
-    },
-    FFTTableNK {
-        n: 8_388_608,
-        k: 24,
-    },
-];
-
-// from mpn/*/*/gmp-mparam.h
-const SQR_FFT_TABLE3: [FFTTableNK; FFT_TABLE3_SIZE] = [
-    FFTTableNK { n: 340, k: 5 },
-    FFTTableNK { n: 15, k: 6 },
-    FFTTableNK { n: 8, k: 5 },
-    FFTTableNK { n: 17, k: 6 },
-    FFTTableNK { n: 9, k: 5 },
-    FFTTableNK { n: 19, k: 6 },
-    FFTTableNK { n: 21, k: 7 },
-    FFTTableNK { n: 11, k: 6 },
-    FFTTableNK { n: 23, k: 7 },
-    FFTTableNK { n: 12, k: 6 },
-    FFTTableNK { n: 25, k: 7 },
-    FFTTableNK { n: 21, k: 8 },
-    FFTTableNK { n: 11, k: 7 },
-    FFTTableNK { n: 24, k: 8 },
-    FFTTableNK { n: 13, k: 7 },
-    FFTTableNK { n: 27, k: 8 },
-    FFTTableNK { n: 15, k: 7 },
-    FFTTableNK { n: 31, k: 8 },
-    FFTTableNK { n: 17, k: 7 },
-    FFTTableNK { n: 35, k: 8 },
-    FFTTableNK { n: 21, k: 9 },
-    FFTTableNK { n: 11, k: 8 },
-    FFTTableNK { n: 27, k: 9 },
-    FFTTableNK { n: 15, k: 8 },
-    FFTTableNK { n: 35, k: 9 },
-    FFTTableNK { n: 19, k: 8 },
-    FFTTableNK { n: 41, k: 9 },
-    FFTTableNK { n: 23, k: 8 },
-    FFTTableNK { n: 47, k: 9 },
-    FFTTableNK { n: 27, k: 10 },
-    FFTTableNK { n: 15, k: 9 },
-    FFTTableNK { n: 39, k: 10 },
-    FFTTableNK { n: 23, k: 9 },
-    FFTTableNK { n: 51, k: 11 },
-    FFTTableNK { n: 15, k: 10 },
-    FFTTableNK { n: 31, k: 9 },
-    FFTTableNK { n: 67, k: 10 },
-    FFTTableNK { n: 39, k: 9 },
-    FFTTableNK { n: 79, k: 10 },
-    FFTTableNK { n: 47, k: 9 },
-    FFTTableNK { n: 95, k: 10 },
-    FFTTableNK { n: 55, k: 11 },
-    FFTTableNK { n: 31, k: 10 },
-    FFTTableNK { n: 79, k: 11 },
-    FFTTableNK { n: 47, k: 10 },
-    FFTTableNK { n: 95, k: 12 },
-    FFTTableNK { n: 31, k: 11 },
-    FFTTableNK { n: 63, k: 10 },
-    FFTTableNK { n: 127, k: 9 },
-    FFTTableNK { n: 255, k: 8 },
-    FFTTableNK { n: 511, k: 9 },
-    FFTTableNK { n: 271, k: 8 },
-    FFTTableNK { n: 543, k: 11 },
-    FFTTableNK { n: 79, k: 9 },
-    FFTTableNK { n: 319, k: 8 },
-    FFTTableNK { n: 639, k: 10 },
-    FFTTableNK { n: 175, k: 11 },
-    FFTTableNK { n: 95, k: 10 },
-    FFTTableNK { n: 191, k: 9 },
-    FFTTableNK { n: 383, k: 10 },
-    FFTTableNK { n: 207, k: 9 },
-    FFTTableNK { n: 415, k: 12 },
-    FFTTableNK { n: 63, k: 11 },
-    FFTTableNK { n: 127, k: 10 },
-    FFTTableNK { n: 271, k: 9 },
-    FFTTableNK { n: 543, k: 10 },
-    FFTTableNK { n: 287, k: 9 },
-    FFTTableNK { n: 575, k: 10 },
-    FFTTableNK { n: 303, k: 9 },
-    FFTTableNK { n: 607, k: 10 },
-    FFTTableNK { n: 319, k: 9 },
-    FFTTableNK { n: 639, k: 11 },
-    FFTTableNK { n: 175, k: 12 },
-    FFTTableNK { n: 95, k: 11 },
-    FFTTableNK { n: 191, k: 10 },
-    FFTTableNK { n: 383, k: 11 },
-    FFTTableNK { n: 207, k: 10 },
-    FFTTableNK { n: 415, k: 13 },
-    FFTTableNK { n: 63, k: 12 },
-    FFTTableNK { n: 127, k: 11 },
-    FFTTableNK { n: 271, k: 10 },
-    FFTTableNK { n: 543, k: 11 },
-    FFTTableNK { n: 287, k: 10 },
-    FFTTableNK { n: 575, k: 11 },
-    FFTTableNK { n: 303, k: 10 },
-    FFTTableNK { n: 607, k: 11 },
-    FFTTableNK { n: 319, k: 10 },
-    FFTTableNK { n: 639, k: 11 },
-    FFTTableNK { n: 351, k: 12 },
-    FFTTableNK { n: 191, k: 11 },
-    FFTTableNK { n: 415, k: 12 },
-    FFTTableNK { n: 223, k: 11 },
-    FFTTableNK { n: 479, k: 13 },
-    FFTTableNK { n: 127, k: 12 },
-    FFTTableNK { n: 255, k: 11 },
-    FFTTableNK { n: 543, k: 12 },
-    FFTTableNK { n: 287, k: 11 },
-    FFTTableNK { n: 607, k: 12 },
-    FFTTableNK { n: 319, k: 11 },
-    FFTTableNK { n: 639, k: 12 },
-    FFTTableNK { n: 351, k: 13 },
-    FFTTableNK { n: 191, k: 12 },
-    FFTTableNK { n: 415, k: 11 },
-    FFTTableNK { n: 831, k: 12 },
-    FFTTableNK { n: 479, k: 14 },
-    FFTTableNK { n: 127, k: 13 },
-    FFTTableNK { n: 255, k: 12 },
-    FFTTableNK { n: 607, k: 13 },
-    FFTTableNK { n: 319, k: 12 },
-    FFTTableNK { n: 703, k: 13 },
-    FFTTableNK { n: 383, k: 12 },
-    FFTTableNK { n: 831, k: 13 },
-    FFTTableNK { n: 447, k: 12 },
-    FFTTableNK { n: 959, k: 14 },
-    FFTTableNK { n: 255, k: 13 },
-    FFTTableNK { n: 511, k: 12 },
-    FFTTableNK { n: 1_023, k: 13 },
-    FFTTableNK { n: 575, k: 12 },
-    FFTTableNK { n: 1_215, k: 13 },
-    FFTTableNK { n: 639, k: 12 },
-    FFTTableNK { n: 1_279, k: 13 },
-    FFTTableNK { n: 703, k: 14 },
-    FFTTableNK { n: 383, k: 13 },
-    FFTTableNK { n: 831, k: 12 },
-    FFTTableNK { n: 1_663, k: 13 },
-    FFTTableNK { n: 959, k: 15 },
-    FFTTableNK { n: 255, k: 14 },
-    FFTTableNK { n: 511, k: 13 },
-    FFTTableNK { n: 1_087, k: 12 },
-    FFTTableNK { n: 2_175, k: 13 },
-    FFTTableNK { n: 1_215, k: 14 },
-    FFTTableNK { n: 639, k: 13 },
-    FFTTableNK { n: 1_343, k: 12 },
-    FFTTableNK { n: 2_687, k: 13 },
-    FFTTableNK { n: 1_407, k: 12 },
-    FFTTableNK { n: 2_815, k: 14 },
-    FFTTableNK { n: 767, k: 13 },
-    FFTTableNK { n: 1_535, k: 12 },
-    FFTTableNK { n: 3_199, k: 13 },
-    FFTTableNK { n: 1_663, k: 14 },
-    FFTTableNK { n: 895, k: 15 },
-    FFTTableNK { n: 511, k: 14 },
-    FFTTableNK { n: 1_023, k: 13 },
-    FFTTableNK { n: 2_175, k: 14 },
-    FFTTableNK { n: 1_151, k: 13 },
-    FFTTableNK { n: 2_303, k: 12 },
-    FFTTableNK { n: 4_607, k: 13 },
-    FFTTableNK { n: 2_431, k: 12 },
-    FFTTableNK { n: 4_863, k: 14 },
-    FFTTableNK { n: 1_279, k: 13 },
-    FFTTableNK { n: 2_687, k: 14 },
-    FFTTableNK { n: 1_407, k: 15 },
-    FFTTableNK { n: 767, k: 14 },
-    FFTTableNK { n: 1_535, k: 13 },
-    FFTTableNK { n: 3_199, k: 14 },
-    FFTTableNK { n: 1_663, k: 13 },
-    FFTTableNK { n: 3_327, k: 12 },
-    FFTTableNK { n: 6_655, k: 13 },
-    FFTTableNK { n: 3_455, k: 14 },
-    FFTTableNK { n: 1_791, k: 16 },
-    FFTTableNK { n: 511, k: 15 },
-    FFTTableNK { n: 1_023, k: 14 },
-    FFTTableNK { n: 2_175, k: 13 },
-    FFTTableNK { n: 4_351, k: 12 },
-    FFTTableNK { n: 8_703, k: 14 },
-    FFTTableNK { n: 2_303, k: 13 },
-    FFTTableNK { n: 4_607, k: 14 },
-    FFTTableNK { n: 2_431, k: 13 },
-    FFTTableNK { n: 4_863, k: 15 },
-    FFTTableNK { n: 1_279, k: 14 },
-    FFTTableNK { n: 2_815, k: 13 },
-    FFTTableNK { n: 5_631, k: 14 },
-    FFTTableNK { n: 2_943, k: 13 },
-    FFTTableNK { n: 5_887, k: 12 },
-    FFTTableNK { n: 11_775, k: 15 },
-    FFTTableNK { n: 1_535, k: 14 },
-    FFTTableNK { n: 3_199, k: 13 },
-    FFTTableNK { n: 6_399, k: 14 },
-    FFTTableNK { n: 3_327, k: 13 },
-    FFTTableNK { n: 6_655, k: 14 },
-    FFTTableNK { n: 3_455, k: 15 },
-    FFTTableNK { n: 1_791, k: 14 },
-    FFTTableNK { n: 3_583, k: 13 },
-    FFTTableNK { n: 7_167, k: 14 },
-    FFTTableNK { n: 3_839, k: 16 },
-    FFTTableNK { n: 65_536, k: 17 },
-    FFTTableNK { n: 131_072, k: 18 },
-    FFTTableNK { n: 262_144, k: 19 },
-    FFTTableNK { n: 524_288, k: 20 },
-    FFTTableNK {
-        n: 1_048_576,
-        k: 21,
-    },
-    FFTTableNK {
-        n: 2_097_152,
-        k: 22,
-    },
-    FFTTableNK {
-        n: 4_194_304,
-        k: 23,
-    },
-    FFTTableNK {
-        n: 8_388_608,
-        k: 24,
-    },
-];
-
-const MPN_FFT_TABLE_3: [[FFTTableNK; FFT_TABLE3_SIZE]; 2] = [MUL_FFT_TABLE3, SQR_FFT_TABLE3];
-
-//TODO test
-// checked
-// docs preserved
-// Find the best k to use for a mod 2 ^ (m * Limb::WIDTH) + 1 FFT for m >= n. We have sqr = 0 if for
-// a multiply, sqr = 1 for a square.
-// mpn_fft_best_k from mpn/generic/mul-fft.c, mpn_fft_table3 variant
-pub fn mpn_fft_best_k(n: usize, sqr: usize) -> u32 {
-    let fft_tab = &MPN_FFT_TABLE_3[sqr];
-    let mut last_k = fft_tab[0].k;
-    let mut tab = 1;
-    loop {
-        let tab_n = fft_tab[tab].n;
-        let thres = tab_n << last_k;
-        if n <= thres as usize {
-            break;
-        }
-        last_k = fft_tab[tab].k;
-        tab += 1;
-    }
-    last_k
-}
-
 //TODO tune
-const MULMOD_BNM1_THRESHOLD: usize = 16;
+const MULMOD_BNM1_THRESHOLD: usize = 13;
 const MUL_FFT_MODF_THRESHOLD: usize = MUL_TOOM33_THRESHOLD * 3;
 
 //TODO test
@@ -687,9 +230,13 @@ pub fn limbs_mul_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) 
     }*/
 }
 
-//TODO test
+// This is TOOM44_OK from mpn/generic/mul.c.
+fn toom44_ok(an: usize, bn: usize) -> bool {
+    12 + 3 * an < 4 * bn
+}
+
 // Multiply two natural numbers.
-// mpn_mul from mpn/generic/mul.c
+// This is mpn_mul from mpn/generic/mul.c.
 pub fn limbs_mul_greater_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> Limb {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -710,9 +257,6 @@ pub fn limbs_mul_greater_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> L
         _limbs_mul_greater_to_out_basecase(out, xs, ys);
     } else if ys_len < MUL_TOOM33_THRESHOLD {
         let toom_x2_scratch_size = 9 * ys_len / 2 + Limb::WIDTH as usize * 2;
-        // toom_22_scratch_size((5 * ys_len - 1) / 4) <= toom_x2_scratch_size
-        // toom_32_scratch_size((7 * ys_len - 1) / 4, ys_len) <= toom_x2_scratch_size
-        // toom_42_scratch_size(3 * ys_len - 1, ys_len) <= toom_x2_scratch_size
         let mut scratch = vec![0; toom_x2_scratch_size];
         if xs_len >= 3 * ys_len {
             _limbs_mul_greater_to_out_toom_42(out, &xs[..ys_len << 1], ys, &mut scratch);
@@ -790,9 +334,116 @@ pub fn limbs_mul_greater_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> L
         } else {
             _limbs_mul_greater_to_out_toom_42(out, xs, ys, &mut scratch);
         }
-    //TODO PASTE C
+    } else if (xs_len + ys_len) >> 1 < MUL_FFT_THRESHOLD || 3 * ys_len < MUL_FFT_THRESHOLD {
+        // Handle the largest operands that are not in the FFT range. The 2nd
+        // condition makes very unbalanced operands avoid the FFT code (except
+        // perhaps as coefficient products of the Toom code.
+
+        if ys_len < MUL_TOOM44_THRESHOLD || !toom44_ok(xs_len, ys_len) {
+            // Use ToomX3 variants
+            let toom_x3_scratch_size = 4 * ys_len + Limb::WIDTH as usize;
+            let mut scratch = vec![0; toom_x3_scratch_size];
+            if 2 * xs_len >= 5 * ys_len {
+                // The maximum ws usage is for the mpn_mul result.
+                let mut ws = vec![0; 7 * ys_len >> 1];
+                if ys_len < MUL_TOOM42_TO_TOOM63_THRESHOLD {
+                    _limbs_mul_greater_to_out_toom_42(out, &xs[..2 * ys_len], ys, &mut scratch);
+                } else {
+                    _limbs_mul_greater_to_out_toom_63(out, &xs[..2 * ys_len], ys, &mut scratch);
+                }
+                let mut xs_len = xs_len - 2 * ys_len;
+                let mut xs_offset = 2 * ys_len;
+                let mut out_offset = 2 * ys_len;
+
+                while 2 * xs_len >= 5 * ys_len
+                // xs_len >= 2.5vn
+                {
+                    if ys_len < MUL_TOOM42_TO_TOOM63_THRESHOLD {
+                        _limbs_mul_greater_to_out_toom_42(
+                            &mut ws,
+                            &xs[xs_offset..2 * ys_len + xs_offset],
+                            ys,
+                            &mut scratch,
+                        );
+                    } else {
+                        _limbs_mul_greater_to_out_toom_63(
+                            &mut ws,
+                            &xs[xs_offset..2 * ys_len + xs_offset],
+                            ys,
+                            &mut scratch,
+                        );
+                    }
+                    xs_len -= 2 * ys_len;
+                    xs_offset += 2 * ys_len;
+                    let cy = if limbs_slice_add_same_length_in_place_left(
+                        &mut out[out_offset..out_offset + ys_len],
+                        &ws[..ys_len],
+                    ) {
+                        1
+                    } else {
+                        0
+                    };
+                    out[out_offset + ys_len..out_offset + 3 * ys_len]
+                        .copy_from_slice(&ws[ys_len..3 * ys_len]);
+                    assert!(!limbs_slice_add_limb_in_place(
+                        &mut out[out_offset + ys_len..],
+                        cy
+                    ));
+                    out_offset += 2 * ys_len;
+                }
+                // ys_len / 2 <= xs_len < 2.5vn
+                limbs_mul_to_out(&mut ws, &xs[xs_offset..], ys);
+                let cy = if limbs_slice_add_same_length_in_place_left(
+                    &mut out[out_offset..out_offset + ys_len],
+                    &ws[..ys_len],
+                ) {
+                    1
+                } else {
+                    0
+                };
+                out[out_offset + ys_len..out_offset + xs_len + ys_len]
+                    .copy_from_slice(&ws[ys_len..xs_len + ys_len]);
+                assert!(!limbs_slice_add_limb_in_place(
+                    &mut out[out_offset + ys_len..],
+                    cy
+                ));
+            } else {
+                if 6 * xs_len < 7 * ys_len {
+                    _limbs_mul_greater_to_out_toom_33(out, xs, ys, &mut scratch);
+                } else if 2 * xs_len < 3 * ys_len {
+                    if ys_len < MUL_TOOM32_TO_TOOM43_THRESHOLD {
+                        _limbs_mul_greater_to_out_toom_32(out, xs, ys, &mut scratch);
+                    } else {
+                        _limbs_mul_greater_to_out_toom_43(out, xs, ys, &mut scratch);
+                    }
+                } else if 6 * xs_len < 11 * ys_len {
+                    if 4 * xs_len < 7 * ys_len {
+                        if ys_len < MUL_TOOM32_TO_TOOM53_THRESHOLD {
+                            _limbs_mul_greater_to_out_toom_32(out, xs, ys, &mut scratch);
+                        } else {
+                            _limbs_mul_greater_to_out_toom_53(out, xs, ys, &mut scratch);
+                        }
+                    } else {
+                        if ys_len < MUL_TOOM42_TO_TOOM53_THRESHOLD {
+                            _limbs_mul_greater_to_out_toom_42(out, xs, ys, &mut scratch);
+                        } else {
+                            _limbs_mul_greater_to_out_toom_53(out, xs, ys, &mut scratch);
+                        }
+                    }
+                } else {
+                    if ys_len < MUL_TOOM42_TO_TOOM63_THRESHOLD {
+                        _limbs_mul_greater_to_out_toom_42(out, xs, ys, &mut scratch);
+                    } else {
+                        _limbs_mul_greater_to_out_toom_63(out, xs, ys, &mut scratch);
+                    }
+                }
+            }
+        } else {
+            //TODO replace with > toom63
+            _limbs_mul_greater_to_out_basecase(out, xs, ys);
+        }
     } else {
-        //TODO remove
+        //TODO replace with FFT
         _limbs_mul_greater_to_out_basecase(out, xs, ys);
     }
     out[xs_len + ys_len - 1]
@@ -1133,6 +784,7 @@ impl Natural {
     }
 }
 
+pub mod fft;
 pub mod poly_eval;
 pub mod poly_interpolate;
 pub mod toom;

@@ -272,7 +272,7 @@ pub fn mpn_sbpi1_div_qr(qp: &mut [Limb], np: &mut [Limb], dp: &[Limb], dinv: Lim
 }
 
 //TODO tune
-const DC_DIV_QR_THRESHOLD: usize = 56;
+const DC_DIV_QR_THRESHOLD: usize = 51;
 
 //TODO test
 // checked
@@ -891,7 +891,7 @@ pub fn mpn_sbpi1_divappr_q(qp: &mut [Limb], np: &mut [Limb], dp: &[Limb], dinv: 
 
 //TODO tune
 const MAYBE_DCP1_DIVAPPR: bool = true;
-const DC_DIVAPPR_Q_THRESHOLD: usize = 68;
+const DC_DIVAPPR_Q_THRESHOLD: usize = 171;
 
 //TODO test
 // docs preserved

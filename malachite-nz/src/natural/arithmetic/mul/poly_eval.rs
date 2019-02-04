@@ -146,7 +146,7 @@ pub(crate) fn _limbs_mul_toom_evaluate_poly_in_1_and_neg_1(
     while i < k {
         if *xs.last().unwrap() != 0 && *ys.last().unwrap() != 0 {
             panic!(
-                "i < k in _limbs_mul_toom_evaluate_poly_in_1_and_neg_1: {:?} {:?}",
+                "k > 5 in _limbs_mul_toom_evaluate_poly_in_1_and_neg_1: {:?} {:?}",
                 xs, ys
             );
         }

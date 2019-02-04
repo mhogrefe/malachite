@@ -8,7 +8,7 @@ use platform::Limb;
 
 // must be >= 1
 //TODO tune
-const BMOD_1_TO_MOD_1_THRESHOLD: usize = 10;
+const BMOD_1_TO_MOD_1_THRESHOLD: usize = 29;
 
 // Benchmarks show that this is never faster than just calling `limbs_divisible_by_limb`.
 //
