@@ -2,7 +2,6 @@ use malachite_base::misc::Max;
 use malachite_base::num::PrimitiveInteger;
 use natural::arithmetic::add::{
     limbs_add_same_length_to_out, limbs_slice_add_greater_in_place_left,
-    limbs_slice_add_same_length_in_place_left,
 };
 use natural::arithmetic::add_limb::limbs_slice_add_limb_in_place;
 use natural::arithmetic::add_mul_limb::mpn_addmul_1;
@@ -246,14 +245,13 @@ pub fn limbs_mul_greater_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> L
     if xs_len == ys_len {
         //TODO if xs as *const [Limb] == ys as *const [Limb] {
         //TODO     mpn_sqr(out, xs, xs_len);
-        //TODO     mpn_mul_n(out, xs, ys);
         //TODO } else {
         //TODO     mpn_mul_n(out, xs, ys);
         //TODO }
         limbs_mul_same_length_to_out(out, xs, ys);
     } else if ys_len < MUL_TOOM22_THRESHOLD {
-        // plain schoolbook multiplication. Unless xs_len is very large, or else if have an
-        // applicable mpn_mul_N, perform basecase multiply directly.
+        // Plain schoolbook multiplication. Unless xs_len is very large, or else if
+        // `limbs_mul_same_length_to_out` applies, perform basecase multiply directly.
         _limbs_mul_greater_to_out_basecase(out, xs, ys);
     } else if ys_len < MUL_TOOM33_THRESHOLD {
         let toom_x2_scratch_size = 9 * ys_len / 2 + Limb::WIDTH as usize * 2;
@@ -262,71 +260,33 @@ pub fn limbs_mul_greater_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> L
             _limbs_mul_greater_to_out_toom_42(out, &xs[..ys_len << 1], ys, &mut scratch);
             let two_ys_len = ys_len + ys_len;
             let three_ys_len = two_ys_len + ys_len;
-            // The maximum scratch2 usage is for the mpn_mul result.
+            // The maximum `scratch2` usage is for the `_limbs_mul_greater_to_out_toom_x2` result.
             let mut scratch2 = vec![0; two_ys_len << 1];
-            let mut xs_len = xs_len - two_ys_len;
-            let mut xs_offset = two_ys_len;
+            let mut xs = &xs[two_ys_len..];
             let mut out_offset = two_ys_len;
-            while xs_len >= three_ys_len {
-                _limbs_mul_greater_to_out_toom_42(
-                    &mut scratch2,
-                    &xs[xs_offset..xs_offset + two_ys_len],
-                    ys,
-                    &mut scratch,
-                );
-                xs_len -= two_ys_len;
-                xs_offset += two_ys_len;
-                let carry = limbs_slice_add_same_length_in_place_left(
-                    &mut out[out_offset..out_offset + ys_len],
-                    &scratch2[..ys_len],
-                );
-                out[out_offset + ys_len..out_offset + three_ys_len]
-                    .copy_from_slice(&scratch2[ys_len..three_ys_len]);
-                if carry {
-                    assert!(!limbs_slice_add_limb_in_place(
-                        &mut out[out_offset + ys_len..],
-                        1
-                    ));
-                }
+            while xs.len() >= three_ys_len {
+                let out = &mut out[out_offset..];
+                let (xs_lo, xs_hi) = xs.split_at(two_ys_len);
+                _limbs_mul_greater_to_out_toom_42(&mut scratch2, xs_lo, ys, &mut scratch);
+                let (scratch2_lo, scratch2_hi) = scratch2.split_at(ys_len);
+                out[ys_len..three_ys_len].copy_from_slice(&scratch2_hi[..two_ys_len]);
+                assert!(!limbs_slice_add_greater_in_place_left(out, scratch2_lo));
+                xs = xs_hi;
                 out_offset += two_ys_len;
             }
-
+            let xs_len = xs.len();
+            let out = &mut out[out_offset..];
             // ys_len <= xs_len < 3 * ys_len
             if 4 * xs_len < 5 * ys_len {
-                _limbs_mul_greater_to_out_toom_22(
-                    &mut scratch2,
-                    &xs[xs_offset..],
-                    ys,
-                    &mut scratch,
-                );
+                _limbs_mul_greater_to_out_toom_22(&mut scratch2, xs, ys, &mut scratch);
             } else if 4 * xs_len < 7 * ys_len {
-                _limbs_mul_greater_to_out_toom_32(
-                    &mut scratch2,
-                    &xs[xs_offset..],
-                    ys,
-                    &mut scratch,
-                );
+                _limbs_mul_greater_to_out_toom_32(&mut scratch2, xs, ys, &mut scratch);
             } else {
-                _limbs_mul_greater_to_out_toom_42(
-                    &mut scratch2,
-                    &xs[xs_offset..],
-                    ys,
-                    &mut scratch,
-                );
+                _limbs_mul_greater_to_out_toom_42(&mut scratch2, xs, ys, &mut scratch);
             }
-
-            let carry = limbs_slice_add_same_length_in_place_left(
-                &mut out[out_offset..out_offset + ys_len],
-                &scratch2[..ys_len],
-            );
-            out[out_offset + ys_len..out_offset + ys_len + xs_len]
-                .copy_from_slice(&scratch2[ys_len..ys_len + xs_len]);
-            if carry {
-                assert!(!limbs_slice_add_limb_in_place(
-                    &mut out[out_offset + ys_len..],
-                    1
-                ));
-            }
+            let (scratch2_lo, scratch2_hi) = scratch2.split_at(ys_len);
+            out[ys_len..ys_len + xs_len].copy_from_slice(&scratch2_hi[..xs_len]);
+            assert!(!limbs_slice_add_greater_in_place_left(out, scratch2_lo));
         } else if 4 * xs_len < 5 * ys_len {
             _limbs_mul_greater_to_out_toom_22(out, xs, ys, &mut scratch);
         } else if 4 * xs_len < 7 * ys_len {
@@ -335,78 +295,46 @@ pub fn limbs_mul_greater_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> L
             _limbs_mul_greater_to_out_toom_42(out, xs, ys, &mut scratch);
         }
     } else if (xs_len + ys_len) >> 1 < MUL_FFT_THRESHOLD || 3 * ys_len < MUL_FFT_THRESHOLD {
-        // Handle the largest operands that are not in the FFT range. The 2nd
-        // condition makes very unbalanced operands avoid the FFT code (except
-        // perhaps as coefficient products of the Toom code.
-
+        // Handle the largest operands that are not in the FFT range. The 2nd condition makes very
+        // unbalanced operands avoid the FFT code (except perhaps as coefficient products of the
+        // Toom code).
         if ys_len < MUL_TOOM44_THRESHOLD || !toom44_ok(xs_len, ys_len) {
             // Use ToomX3 variants
             let toom_x3_scratch_size = 4 * ys_len + Limb::WIDTH as usize;
             let mut scratch = vec![0; toom_x3_scratch_size];
             if 2 * xs_len >= 5 * ys_len {
-                // The maximum ws usage is for the mpn_mul result.
-                let mut ws = vec![0; 7 * ys_len >> 1];
+                // The maximum scratch2 usage is for the `limbs_mul_to_out` result.
+                let mut scratch2 = vec![0; 7 * ys_len >> 1];
                 if ys_len < MUL_TOOM42_TO_TOOM63_THRESHOLD {
                     _limbs_mul_greater_to_out_toom_42(out, &xs[..2 * ys_len], ys, &mut scratch);
                 } else {
                     _limbs_mul_greater_to_out_toom_63(out, &xs[..2 * ys_len], ys, &mut scratch);
                 }
-                let mut xs_len = xs_len - 2 * ys_len;
-                let mut xs_offset = 2 * ys_len;
+                let two_ys_len = ys_len + ys_len;
+                let mut xs = &xs[two_ys_len..];
                 let mut out_offset = 2 * ys_len;
-
-                while 2 * xs_len >= 5 * ys_len
-                // xs_len >= 2.5vn
-                {
+                // xs_len >= 2.5 * ys_len
+                while 2 * xs.len() >= 5 * ys_len {
+                    let out = &mut out[out_offset..];
+                    let (xs_lo, xs_hi) = xs.split_at(two_ys_len);
                     if ys_len < MUL_TOOM42_TO_TOOM63_THRESHOLD {
-                        _limbs_mul_greater_to_out_toom_42(
-                            &mut ws,
-                            &xs[xs_offset..2 * ys_len + xs_offset],
-                            ys,
-                            &mut scratch,
-                        );
+                        _limbs_mul_greater_to_out_toom_42(&mut scratch2, xs_lo, ys, &mut scratch);
                     } else {
-                        _limbs_mul_greater_to_out_toom_63(
-                            &mut ws,
-                            &xs[xs_offset..2 * ys_len + xs_offset],
-                            ys,
-                            &mut scratch,
-                        );
+                        _limbs_mul_greater_to_out_toom_63(&mut scratch2, xs_lo, ys, &mut scratch);
                     }
-                    xs_len -= 2 * ys_len;
-                    xs_offset += 2 * ys_len;
-                    let cy = if limbs_slice_add_same_length_in_place_left(
-                        &mut out[out_offset..out_offset + ys_len],
-                        &ws[..ys_len],
-                    ) {
-                        1
-                    } else {
-                        0
-                    };
-                    out[out_offset + ys_len..out_offset + 3 * ys_len]
-                        .copy_from_slice(&ws[ys_len..3 * ys_len]);
-                    assert!(!limbs_slice_add_limb_in_place(
-                        &mut out[out_offset + ys_len..],
-                        cy
-                    ));
-                    out_offset += 2 * ys_len;
+                    let (scratch2_lo, scratch2_hi) = scratch2.split_at(ys_len);
+                    out[ys_len..ys_len + two_ys_len].copy_from_slice(&scratch2_hi[..two_ys_len]);
+                    assert!(!limbs_slice_add_greater_in_place_left(out, scratch2_lo));
+                    xs = xs_hi;
+                    out_offset += two_ys_len;
                 }
+                let xs_len = xs.len();
+                let out = &mut out[out_offset..];
                 // ys_len / 2 <= xs_len < 2.5vn
-                limbs_mul_to_out(&mut ws, &xs[xs_offset..], ys);
-                let cy = if limbs_slice_add_same_length_in_place_left(
-                    &mut out[out_offset..out_offset + ys_len],
-                    &ws[..ys_len],
-                ) {
-                    1
-                } else {
-                    0
-                };
-                out[out_offset + ys_len..out_offset + xs_len + ys_len]
-                    .copy_from_slice(&ws[ys_len..xs_len + ys_len]);
-                assert!(!limbs_slice_add_limb_in_place(
-                    &mut out[out_offset + ys_len..],
-                    cy
-                ));
+                limbs_mul_to_out(&mut scratch2, xs, ys);
+                let (scratch2_lo, scratch2_hi) = scratch2.split_at(ys_len);
+                out[ys_len..xs_len + ys_len].copy_from_slice(&scratch2_hi[..xs_len]);
+                assert!(!limbs_slice_add_greater_in_place_left(out, scratch2_lo));
             } else {
                 if 6 * xs_len < 7 * ys_len {
                     _limbs_mul_greater_to_out_toom_33(out, xs, ys, &mut scratch);
@@ -458,30 +386,30 @@ pub fn limbs_mul_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> Limb {
 }
 
 //TODO update docs
-// 1 < v.len() < MUL_TOOM22_THRESHOLD < MUL_BASECASE_MAX_UN < u.len()
+// 1 < ys.len() < MUL_TOOM22_THRESHOLD < MUL_BASECASE_MAX_UN < xs.len()
 //
 // This is currently not measurably better than just basecase.
-fn limbs_mul_greater_to_out_basecase_mem_opt(prod: &mut [Limb], u: &[Limb], v: &[Limb]) {
-    let u_len = u.len();
-    let v_len = v.len();
-    assert!(1 < v_len);
-    assert!(v_len < MUL_TOOM22_THRESHOLD);
+fn limbs_mul_greater_to_out_basecase_mem_opt(prod: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
+    let xs_len = xs.len();
+    let ys_len = ys.len();
+    assert!(1 < ys_len);
+    assert!(ys_len < MUL_TOOM22_THRESHOLD);
     assert!(MUL_TOOM22_THRESHOLD < MUL_BASECASE_MAX_UN);
-    assert!(MUL_BASECASE_MAX_UN < u_len);
+    assert!(MUL_BASECASE_MAX_UN < xs_len);
     let mut triangle_buffer = [0; MUL_TOOM22_THRESHOLD];
     let mut offset = 0;
-    for chunk in u.chunks(MUL_BASECASE_MAX_UN) {
-        if chunk.len() >= v_len {
-            _limbs_mul_greater_to_out_basecase(&mut prod[offset..], chunk, v);
+    for chunk in xs.chunks(MUL_BASECASE_MAX_UN) {
+        if chunk.len() >= ys_len {
+            _limbs_mul_greater_to_out_basecase(&mut prod[offset..], chunk, ys);
         } else {
-            _limbs_mul_greater_to_out_basecase(&mut prod[offset..], v, chunk);
+            _limbs_mul_greater_to_out_basecase(&mut prod[offset..], ys, chunk);
         }
         if offset != 0 {
-            limbs_slice_add_greater_in_place_left(&mut prod[offset..], &triangle_buffer[..v_len]);
+            limbs_slice_add_greater_in_place_left(&mut prod[offset..], &triangle_buffer[..ys_len]);
         }
         offset += MUL_BASECASE_MAX_UN;
-        if offset < u_len {
-            triangle_buffer[..v_len].copy_from_slice(&prod[offset..offset + v_len]);
+        if offset < xs_len {
+            triangle_buffer[..ys_len].copy_from_slice(&prod[offset..offset + ys_len]);
         }
     }
 }

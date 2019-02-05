@@ -230,44 +230,34 @@ fn shl_2_and_add_with_carry_in_place_left(xs: &mut [Limb], ys: &[Limb], carry: &
 pub(crate) fn _limbs_mul_toom_evaluate_poly_in_2_and_neg_2(
     v_2: &mut [Limb],
     v_neg_2: &mut [Limb],
-    degree: u32,
+    degree: usize,
     poly: &[Limb],
     n: usize,
     scratch: &mut [Limb],
 ) -> bool {
     assert!(degree > 3);
-    assert!(degree < Limb::WIDTH);
+    assert!(degree < Limb::WIDTH as usize);
     assert_eq!(v_2.len(), n + 1);
     assert_eq!(scratch.len(), n + 1);
 
     // The degree `degree` is also the number of full-size coefficients, so that last coefficient,
     // of size `n_high`, starts at `poly[degree * n..]`.
-    let degree_u = degree as usize;
-    let mut coefficients = Vec::with_capacity(degree_u + 1);
-    let mut lower_index;
-    let mut upper_index = 0;
-    for _ in 0..degree {
-        lower_index = upper_index;
-        upper_index += n;
-        coefficients.push(&poly[lower_index..upper_index]);
-    }
-    let highest_coefficient = &poly[upper_index..];
-    let n_high = highest_coefficient.len();
-    assert!(n_high <= n);
-    coefficients.push(highest_coefficient);
+    let coefficients: Vec<&[Limb]> = poly.chunks(n).collect();
+    assert_eq!(coefficients.len(), degree + 1);
+    let n_high = coefficients[degree].len();
     {
         let (v_2_last, v_2_init) = v_2.split_last_mut().unwrap();
         let mut carry = 0;
         shl_2_and_add_with_carry_to_out(
             v_2_init,
-            coefficients[degree_u],
-            &coefficients[degree_u - 2][..n_high],
+            coefficients[degree],
+            &coefficients[degree - 2][..n_high],
             &mut carry,
         );
         if n_high != n {
             carry = if limbs_add_limb_to_out(
                 &mut v_2_init[n_high..],
-                &coefficients[degree_u - 2][n_high..],
+                &coefficients[degree - 2][n_high..],
                 carry,
             ) {
                 1
@@ -275,7 +265,7 @@ pub(crate) fn _limbs_mul_toom_evaluate_poly_in_2_and_neg_2(
                 0
             };
         }
-        let mut i = degree_u - 4;
+        let mut i = degree - 4;
         loop {
             shl_2_and_add_with_carry_in_place_left(v_2_init, coefficients[i], &mut carry);
             if i < 2 {
@@ -290,12 +280,12 @@ pub(crate) fn _limbs_mul_toom_evaluate_poly_in_2_and_neg_2(
         let mut carry = 0;
         shl_2_and_add_with_carry_to_out(
             scratch_init,
-            coefficients[degree_u - 1],
-            coefficients[degree_u - 3],
+            coefficients[degree - 1],
+            coefficients[degree - 3],
             &mut carry,
         );
-        if degree_u >= 5 {
-            let mut i = degree_u - 5;
+        if degree >= 5 {
+            let mut i = degree - 5;
             loop {
                 shl_2_and_add_with_carry_in_place_left(scratch_init, coefficients[i], &mut carry);
                 if i < 2 {
@@ -339,29 +329,19 @@ pub(crate) fn _limbs_mul_toom_evaluate_poly_in_2_and_neg_2(
 pub(crate) fn _limbs_mul_toom_evaluate_poly_in_2_pow_and_neg_2_pow(
     v_2_pow: &mut [Limb],
     v_neg_2_pow: &mut [Limb],
-    degree: u32,
+    degree: usize,
     poly: &[Limb],
     n: usize,
     shift: u32,
     scratch: &mut [Limb],
 ) -> bool {
     assert!(degree >= 3);
-    assert!(shift * degree < Limb::WIDTH);
+    assert!(shift * (degree as u32) < Limb::WIDTH);
     assert_eq!(scratch.len(), n + 1);
     assert_eq!(v_2_pow.len(), n + 1);
-    let degree_u = degree as usize;
-    let mut coefficients = Vec::with_capacity(degree_u + 1);
-    let mut lower_index;
-    let mut upper_index = 0;
-    for _ in 0..degree {
-        lower_index = upper_index;
-        upper_index += n;
-        coefficients.push(&poly[lower_index..upper_index]);
-    }
-    let highest_coefficient = &poly[upper_index..];
-    let n_high = highest_coefficient.len();
-    assert!(n_high <= n);
-    coefficients.push(highest_coefficient);
+    let coefficients: Vec<&[Limb]> = poly.chunks(n).collect();
+    assert_eq!(coefficients.len(), degree + 1);
+    let n_high = coefficients[degree].len();
     {
         let (scratch_last, scratch_init) = scratch.split_last_mut().unwrap();
         let (v_2_pow_last, v_2_pow_init) = v_2_pow.split_last_mut().unwrap();
@@ -372,7 +352,7 @@ pub(crate) fn _limbs_mul_toom_evaluate_poly_in_2_pow_and_neg_2_pow(
             v_2_pow_last.wrapping_add_assign(1);
         }
         let mut i = 4;
-        while i < degree_u {
+        while i < degree {
             v_2_pow_last.wrapping_add_assign(limbs_shl_to_out(
                 scratch_init,
                 coefficients[i],
@@ -386,7 +366,7 @@ pub(crate) fn _limbs_mul_toom_evaluate_poly_in_2_pow_and_neg_2_pow(
 
         *scratch_last = limbs_shl_to_out(scratch_init, coefficients[1], shift);
         let mut i = 3;
-        while i < degree_u {
+        while i < degree {
             *scratch_last += limbs_shl_to_out(v_neg_2_pow, coefficients[i], (i as u32) * shift);
             if limbs_slice_add_same_length_in_place_left(scratch_init, &v_neg_2_pow[..n]) {
                 scratch_last.wrapping_add_assign(1);
@@ -395,7 +375,8 @@ pub(crate) fn _limbs_mul_toom_evaluate_poly_in_2_pow_and_neg_2_pow(
         }
     }
 
-    v_neg_2_pow[n_high] = limbs_shl_to_out(v_neg_2_pow, coefficients[degree_u], degree * shift);
+    v_neg_2_pow[n_high] =
+        limbs_shl_to_out(v_neg_2_pow, coefficients[degree], degree as u32 * shift);
     if degree.even() {
         limbs_slice_add_greater_in_place_left(v_2_pow, &v_neg_2_pow[..n_high + 1]);
     } else {
