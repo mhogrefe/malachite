@@ -133,9 +133,6 @@ pub fn mpn_mulmod_bnm1_itch(rn: usize, an: usize, bn: usize) -> usize {
         }
 }
 
-// In GMP this is hardcoded to 500
-pub const MUL_BASECASE_MAX_UN: usize = 500;
-
 /// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, writes
 /// the `xs.len() + ys.len()` least-significant limbs of the product of the `Natural`s to an output
 /// slice. The output must be at least as long as `xs.len() + ys.len()`, `xs` must be as least as
@@ -163,14 +160,12 @@ pub fn _limbs_mul_greater_to_out_basecase(out: &mut [Limb], xs: &[Limb], ys: &[L
     assert_ne!(ys_len, 0);
     assert!(xs_len >= ys_len);
     assert!(out.len() >= xs_len + ys_len);
-
     // We first multiply by the low order limb. This result can be stored, not added, to out.
-    // We also avoid a loop for zeroing this way.
     out[xs_len] = limbs_mul_limb_to_out(out, xs, ys[0]);
-
     // Now accumulate the product of xs and the next higher limb from ys.
     for i in 1..ys_len {
-        out[xs_len + i] = mpn_addmul_1(&mut out[i..], xs, ys[i]);
+        let out = &mut out[i..];
+        out[xs_len] = mpn_addmul_1(out, xs, ys[i]);
     }
 }
 
@@ -258,7 +253,7 @@ pub fn limbs_mul_greater_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> L
         let mut scratch = vec![0; toom_x2_scratch_size];
         if xs_len >= 3 * ys_len {
             _limbs_mul_greater_to_out_toom_42(out, &xs[..ys_len << 1], ys, &mut scratch);
-            let two_ys_len = ys_len + ys_len;
+            let two_ys_len = ys_len << 1;
             let three_ys_len = two_ys_len + ys_len;
             // The maximum `scratch2` usage is for the `_limbs_mul_greater_to_out_toom_x2` result.
             let mut scratch2 = vec![0; two_ys_len << 1];
@@ -310,9 +305,9 @@ pub fn limbs_mul_greater_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> L
                 } else {
                     _limbs_mul_greater_to_out_toom_63(out, &xs[..2 * ys_len], ys, &mut scratch);
                 }
-                let two_ys_len = ys_len + ys_len;
+                let two_ys_len = ys_len << 1;
                 let mut xs = &xs[two_ys_len..];
-                let mut out_offset = 2 * ys_len;
+                let mut out_offset = two_ys_len;
                 // xs_len >= 2.5 * ys_len
                 while 2 * xs.len() >= 5 * ys_len {
                     let out = &mut out[out_offset..];
@@ -330,7 +325,7 @@ pub fn limbs_mul_greater_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> L
                 }
                 let xs_len = xs.len();
                 let out = &mut out[out_offset..];
-                // ys_len / 2 <= xs_len < 2.5vn
+                // ys_len / 2 <= xs_len < 2.5 * ys_len
                 limbs_mul_to_out(&mut scratch2, xs, ys);
                 let (scratch2_lo, scratch2_hi) = scratch2.split_at(ys_len);
                 out[ys_len..xs_len + ys_len].copy_from_slice(&scratch2_hi[..xs_len]);
@@ -385,11 +380,14 @@ pub fn limbs_mul_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> Limb {
     }
 }
 
+// In GMP this is hardcoded to 500
+pub const MUL_BASECASE_MAX_UN: usize = 500;
+
 //TODO update docs
 // 1 < ys.len() < MUL_TOOM22_THRESHOLD < MUL_BASECASE_MAX_UN < xs.len()
 //
 // This is currently not measurably better than just basecase.
-fn limbs_mul_greater_to_out_basecase_mem_opt(prod: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
+fn limbs_mul_greater_to_out_basecase_mem_opt(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
     let xs_len = xs.len();
     let ys_len = ys.len();
     assert!(1 < ys_len);
@@ -399,17 +397,19 @@ fn limbs_mul_greater_to_out_basecase_mem_opt(prod: &mut [Limb], xs: &[Limb], ys:
     let mut triangle_buffer = [0; MUL_TOOM22_THRESHOLD];
     let mut offset = 0;
     for chunk in xs.chunks(MUL_BASECASE_MAX_UN) {
+        let mut out = &mut out[offset..];
         if chunk.len() >= ys_len {
-            _limbs_mul_greater_to_out_basecase(&mut prod[offset..], chunk, ys);
+            _limbs_mul_greater_to_out_basecase(out, chunk, ys);
         } else {
-            _limbs_mul_greater_to_out_basecase(&mut prod[offset..], ys, chunk);
+            _limbs_mul_greater_to_out_basecase(out, ys, chunk);
         }
         if offset != 0 {
-            limbs_slice_add_greater_in_place_left(&mut prod[offset..], &triangle_buffer[..ys_len]);
+            limbs_slice_add_greater_in_place_left(out, &triangle_buffer[..ys_len]);
         }
         offset += MUL_BASECASE_MAX_UN;
         if offset < xs_len {
-            triangle_buffer[..ys_len].copy_from_slice(&prod[offset..offset + ys_len]);
+            triangle_buffer[..ys_len]
+                .copy_from_slice(&out[MUL_BASECASE_MAX_UN..MUL_BASECASE_MAX_UN + ys_len]);
         }
     }
 }
