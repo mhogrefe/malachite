@@ -11,15 +11,18 @@ use natural::arithmetic::add::{
 };
 use natural::arithmetic::add_limb::{limbs_add_limb_to_out, limbs_slice_add_limb_in_place};
 use natural::arithmetic::add_mul_limb::mpn_addmul_1;
+use natural::arithmetic::mul::fft::MUL_FFT_THRESHOLD;
 use natural::arithmetic::mul::poly_eval::{
     _limbs_mul_toom_evaluate_deg_3_poly_in_1_and_neg_1,
     _limbs_mul_toom_evaluate_deg_3_poly_in_2_and_neg_2,
     _limbs_mul_toom_evaluate_poly_in_1_and_neg_1, _limbs_mul_toom_evaluate_poly_in_2_and_neg_2,
+    _limbs_mul_toom_evaluate_poly_in_2_neg_pow_and_neg_2_neg_pow,
     _limbs_mul_toom_evaluate_poly_in_2_pow_and_neg_2_pow,
 };
 use natural::arithmetic::mul::poly_interpolate::{
-    _limbs_mul_toom_interpolate_5_points, _limbs_mul_toom_interpolate_6_points,
-    _limbs_mul_toom_interpolate_7_points, _limbs_mul_toom_interpolate_8_points,
+    _limbs_mul_toom_interpolate_12_points, _limbs_mul_toom_interpolate_5_points,
+    _limbs_mul_toom_interpolate_6_points, _limbs_mul_toom_interpolate_7_points,
+    _limbs_mul_toom_interpolate_8_points,
 };
 use natural::arithmetic::mul::{
     _limbs_mul_greater_to_out_basecase, limbs_mul_greater_to_out, limbs_mul_same_length_to_out,
@@ -36,7 +39,7 @@ use natural::arithmetic::sub::{
 use natural::arithmetic::sub_limb::limbs_sub_limb_in_place;
 use natural::comparison::ord::limbs_cmp_same_length;
 use platform::{Limb, SignedLimb};
-use std::cmp::Ordering;
+use std::cmp::{max, Ordering};
 
 //TODO tune all
 pub const MUL_TOOM22_THRESHOLD: usize = 20;
@@ -2910,4 +2913,391 @@ pub fn _limbs_mul_greater_to_out_toom_63(
         }
     }
     _limbs_mul_toom_interpolate_8_points(out, n, s + t, r3, r7, scratch2);
+}
+
+const TOOM_6H_MAYBE_MUL_BASECASE: bool =
+    TUNE_PROGRAM_BUILD || MUL_TOOM6H_THRESHOLD < 6 * MUL_TOOM22_THRESHOLD;
+const TOOM_6H_MAYBE_MUL_TOOM22: bool =
+    TUNE_PROGRAM_BUILD || MUL_TOOM6H_THRESHOLD < 6 * MUL_TOOM33_THRESHOLD;
+const TOOM_6H_MAYBE_MUL_TOOM33: bool =
+    TUNE_PROGRAM_BUILD || MUL_TOOM6H_THRESHOLD < 6 * MUL_TOOM44_THRESHOLD;
+const TOOM_6H_MAYBE_MUL_TOOM6H: bool =
+    TUNE_PROGRAM_BUILD || MUL_FFT_THRESHOLD >= 6 * MUL_TOOM6H_THRESHOLD;
+
+// This is TOOM6H_MUL_N_REC from mpn/generic/toom6h_mul.c and f is true.
+fn _limbs_mul_same_length_to_out_toom_6h_recursive_f_true(
+    p: &mut [Limb],
+    a: &[Limb],
+    b: &[Limb],
+    p2: &mut [Limb],
+    a2: &[Limb],
+    b2: &[Limb],
+    ws: &mut [Limb],
+) {
+    let n = a.len();
+    assert_eq!(b.len(), n);
+    assert_eq!(a2.len(), n);
+    assert_eq!(b2.len(), n);
+    if TOOM_6H_MAYBE_MUL_BASECASE && n < MUL_TOOM22_THRESHOLD {
+        _limbs_mul_greater_to_out_basecase(p, a, b);
+        _limbs_mul_greater_to_out_basecase(p2, a2, b2);
+    } else if TOOM_6H_MAYBE_MUL_TOOM22 && n < MUL_TOOM33_THRESHOLD {
+        _limbs_mul_greater_to_out_toom_22(p, a, b, ws);
+        _limbs_mul_greater_to_out_toom_22(p2, a2, b2, ws);
+    } else if TOOM_6H_MAYBE_MUL_TOOM33 && n < MUL_TOOM44_THRESHOLD {
+        _limbs_mul_greater_to_out_toom_33(p, a, b, ws);
+        _limbs_mul_greater_to_out_toom_33(p2, a2, b2, ws);
+    } else if !TOOM_6H_MAYBE_MUL_TOOM6H || n < MUL_TOOM6H_THRESHOLD {
+        _limbs_mul_greater_to_out_toom_44(p, a, b, ws);
+        _limbs_mul_greater_to_out_toom_44(p2, a2, b2, ws);
+    } else {
+        _limbs_mul_greater_to_out_toom_6h(p, a, b, ws);
+        _limbs_mul_greater_to_out_toom_6h(p2, a2, b2, ws);
+    }
+}
+
+// This is TOOM6H_MUL_N_REC from mpn/generic/toom6h_mul.c, where a is &p2[..a2.len()],
+// b = &p2[a2.len()..], and f is true.
+fn _limbs_mul_same_length_to_out_toom_6h_recursive_f_true_and_p2_is_a_cat_b(
+    p: &mut [Limb],
+    p2: &mut [Limb],
+    a2: &[Limb],
+    b2: &[Limb],
+    ws: &mut [Limb],
+) {
+    let n = a2.len();
+    assert_eq!(b2.len(), n);
+    if TOOM_6H_MAYBE_MUL_BASECASE && n < MUL_TOOM22_THRESHOLD {
+        _limbs_mul_greater_to_out_basecase(p, &p2[..n], &p2[n..]);
+        _limbs_mul_greater_to_out_basecase(p2, a2, b2);
+    } else if TOOM_6H_MAYBE_MUL_TOOM22 && n < MUL_TOOM33_THRESHOLD {
+        _limbs_mul_greater_to_out_toom_22(p, &p2[..n], &p2[n..], ws);
+        _limbs_mul_greater_to_out_toom_22(p2, a2, b2, ws);
+    } else if TOOM_6H_MAYBE_MUL_TOOM33 && n < MUL_TOOM44_THRESHOLD {
+        _limbs_mul_greater_to_out_toom_33(p, &p2[..n], &p2[n..], ws);
+        _limbs_mul_greater_to_out_toom_33(p2, a2, b2, ws);
+    } else if !TOOM_6H_MAYBE_MUL_TOOM6H || n < MUL_TOOM6H_THRESHOLD {
+        _limbs_mul_greater_to_out_toom_44(p, &p2[..n], &p2[n..], ws);
+        _limbs_mul_greater_to_out_toom_44(p2, a2, b2, ws);
+    } else {
+        _limbs_mul_greater_to_out_toom_6h(p, &p2[..n], &p2[n..], ws);
+        _limbs_mul_greater_to_out_toom_6h(p2, a2, b2, ws);
+    }
+}
+
+// This is TOOM6H_MUL_N_REC from mpn/generic/toom6h_mul.c when f is false.
+fn _limbs_mul_same_length_to_out_toom_6h_recursive_f_false(
+    p: &mut [Limb],
+    a: &[Limb],
+    b: &[Limb],
+    ws: &mut [Limb],
+) {
+    let n = a.len();
+    assert_eq!(b.len(), n);
+    if TOOM_6H_MAYBE_MUL_BASECASE && n < MUL_TOOM22_THRESHOLD {
+        _limbs_mul_greater_to_out_basecase(p, a, b);
+    } else if TOOM_6H_MAYBE_MUL_TOOM22 && n < MUL_TOOM33_THRESHOLD {
+        _limbs_mul_greater_to_out_toom_22(p, a, b, ws);
+    } else if TOOM_6H_MAYBE_MUL_TOOM33 && n < MUL_TOOM44_THRESHOLD {
+        _limbs_mul_greater_to_out_toom_33(p, a, b, ws);
+    } else if !TOOM_6H_MAYBE_MUL_TOOM6H || n < MUL_TOOM6H_THRESHOLD {
+        _limbs_mul_greater_to_out_toom_44(p, a, b, ws);
+    } else {
+        _limbs_mul_greater_to_out_toom_6h(p, a, b, ws);
+    }
+}
+
+// This is TOOM6H_MUL_REC from mpn/generic/toom6h_mul.c.
+fn _limbs_mul_to_out_toom_6h_recursive(p: &mut [Limb], a: &[Limb], b: &[Limb]) {
+    limbs_mul_greater_to_out(p, a, b);
+}
+
+// TODO make this a constant once possible
+fn mul_toom6h_min() -> usize {
+    if MUL_TOOM6H_THRESHOLD > MUL_TOOM44_THRESHOLD {
+        MUL_TOOM6H_THRESHOLD
+    } else {
+        MUL_TOOM44_THRESHOLD
+    }
+}
+
+fn mpn_toom6_mul_n_itch(n: usize) -> usize {
+    (n - mul_toom6h_min()) * 2
+        + max(
+            mul_toom6h_min() * 2 + Limb::WIDTH as usize * 6,
+            _limbs_mul_greater_to_out_toom_44_scratch_size(mul_toom6h_min()),
+        )
+}
+
+/// This function can be used to determine the length of the input `scratch` slice in
+/// `_limbs_mul_greater_to_out_toom_6h`.
+///
+/// This is mpn_toom6h_mul_itch from gmp-impl.h.
+pub fn _limbs_mul_greater_to_out_toom_6h_scratch_size(an: usize, bn: usize) -> usize {
+    let estimated_n = (an + bn) / 10 + 1;
+    mpn_toom6_mul_n_itch(estimated_n * 6)
+}
+
+fn mpn_toom4_sqr_itch(an: usize) -> usize {
+    3 * an + Limb::WIDTH as usize
+}
+
+//TODO tune
+const SQR_TOOM6_THRESHOLD: usize = 351;
+
+fn mpn_toom6_sqr_itch(n: usize) -> usize {
+    (n - SQR_TOOM6_THRESHOLD) * 2
+        + max(
+            SQR_TOOM6_THRESHOLD * 2 + Limb::WIDTH as usize * 6,
+            mpn_toom4_sqr_itch(SQR_TOOM6_THRESHOLD),
+        )
+}
+
+/// Toom-6.5 , compute the product {pp,an+bn} <- {ap,an} * {bp,bn}
+/// With: an >= bn >= 46, an*6 <  bn * 17.
+/// It _may_ work with bn<=46 and bn*17 < an*6 < bn*18
+///
+/// Evaluate in: infinity, +4, -4, +2, -2, +1, -1, +1/2, -1/2, +1/4, -1/4, 0.
+///
+/// Estimate on needed scratch:
+/// S(n) <= (n+5)6*10+4+MAX(S((n+5)6),1+2*(n+5)6),
+/// since n>42; S(n) <= ceil(log(n)/log(6))*(10+4)+n*126 < n*2 + lg2(n)*6
+///
+/// Implementation of the multiplication algorithm for Toom-Cook 6.5-way.
+pub fn _limbs_mul_greater_to_out_toom_6h(
+    pp: &mut [Limb],
+    ap: &[Limb],
+    bp: &[Limb],
+    scratch: &mut [Limb],
+) {
+    //mp_size_t n, s, t;
+    //int p, q, half;
+    //int sign;
+    let an = ap.len();
+    let bn = bp.len();
+    assert!(an >= bn);
+
+    // Decomposition
+    // Can not handle too much unbalance
+    assert!(bn >= 42);
+    assert!(an * 3 < bn * 8 || bn >= 46 && an * 6 < bn * 17);
+
+    // Limit num/den is a rational number between
+    // (12/11)^(log(4)/log(2*4-1)) and (12/11)^(log(6)/log(2*6-1))
+    const LIMIT_NUMERATOR: usize = 18;
+    const LIMIT_DENOMINATOR: usize = 17;
+
+    let n;
+    let mut p;
+    let mut q;
+    let mut half;
+    let mut s;
+    let mut t;
+    if an * LIMIT_DENOMINATOR < LIMIT_NUMERATOR * bn
+    // is 6*... < 6*...
+    {
+        n = 1 + (an - 1) / 6;
+        p = 5;
+        q = 5;
+        half = false;
+        s = an - 5 * n;
+        t = bn - 5 * n;
+    } else {
+        if an * 5 * LIMIT_NUMERATOR < LIMIT_DENOMINATOR * 7 * bn {
+            p = 7;
+            q = 6;
+        } else if an * 5 * LIMIT_DENOMINATOR < LIMIT_NUMERATOR * 7 * bn {
+            p = 7;
+            q = 5;
+        } else if an * LIMIT_NUMERATOR < LIMIT_DENOMINATOR * 2 * bn
+        // is 4*... < 8*...
+        {
+            p = 8;
+            q = 5;
+        } else if an * LIMIT_DENOMINATOR < LIMIT_NUMERATOR * 2 * bn
+        // is 4*... < 8*...
+        {
+            p = 8;
+            q = 4;
+        } else {
+            p = 9;
+            q = 4;
+        }
+
+        half = ((p ^ q) & 1) != 0;
+        n = 1 + if q * an >= p * bn {
+            (an - 1) / p
+        } else {
+            (bn - 1) / q
+        };
+        p -= 1;
+        q -= 1;
+
+        s = an - p * n;
+        t = bn - q * n;
+
+        // With LIMIT = 16/15, the following recover is needed only if bn<=73
+        if half {
+            // Recover from badly chosen splitting
+            if s < 1 {
+                p -= 1;
+                s += n;
+                half = false;
+            } else if t < 1 {
+                q -= 1;
+                t += n;
+                half = false;
+            }
+        }
+    }
+
+    assert!(0 < s && s <= n);
+    assert!(0 < t && t <= n);
+    assert!(half || s + t > 3);
+    assert!(n > 2);
+
+    /// Alloc also 3n+1 limbs for wsi... toom_interpolate_12pts may
+    /// need all of them
+    assert!(12 * n + 6 <= _limbs_mul_greater_to_out_toom_6h_scratch_size(an, bn));
+    assert!(12 * n + 6 <= mpn_toom6_sqr_itch(n * 6));
+
+    let final_sign;
+    split_into_chunks_mut!(scratch, 3 * n + 1, [r5, r3, r1], wsi);
+    {
+        let (pp_lo, remainder) = pp.split_at_mut(3 * n);
+        let (r4, remainder) = remainder.split_at_mut(4 * n);
+        split_into_chunks_mut!(remainder, n + 1, [v0, v1], v2);
+        let (v3, wse) = wsi.split_at_mut(n + 1);
+        // Evaluation and recursive calls
+        // $pm1/2$
+        let sign = _limbs_mul_toom_evaluate_poly_in_2_neg_pow_and_neg_2_neg_pow(
+            v2, v0, p, ap, n, s, 1, pp_lo,
+        ) ^ _limbs_mul_toom_evaluate_poly_in_2_neg_pow_and_neg_2_neg_pow(
+            v3, v1, q, bp, n, t, 1, pp_lo,
+        );
+        // A(-1/2)*B(-1/2)*2^.
+        // A(+1/2)*B(+1/2)*2^.
+        _limbs_mul_same_length_to_out_toom_6h_recursive_f_true(
+            pp_lo,
+            &v0[..n + 1],
+            &v1[..n + 1],
+            r5,
+            &v2[..n + 1],
+            &v3[..n + 1],
+            wse,
+        );
+        _limbs_toom_couple_handling(
+            r5,
+            &mut pp_lo[..2 * n + 1],
+            sign,
+            n,
+            1 + if half { 1 } else { 0 },
+            if half { 1 } else { 0 },
+        );
+
+        // $pm1$
+        let mut sign =
+            _limbs_mul_toom_evaluate_poly_in_1_and_neg_1(v2, v0, p, ap, n, s, pp_lo, ap, bp);
+        if q == 3 {
+            sign ^= _limbs_mul_toom_evaluate_deg_3_poly_in_1_and_neg_1(v3, v1, bp, n, pp_lo);
+        } else {
+            sign ^=
+                _limbs_mul_toom_evaluate_poly_in_1_and_neg_1(v3, v1, q, bp, n, t, pp_lo, ap, bp);
+        }
+        // A(-1)*B(-1)
+        // A(1)*B(1)
+        _limbs_mul_same_length_to_out_toom_6h_recursive_f_true(
+            pp_lo,
+            &v0[..n + 1],
+            &v1[..n + 1],
+            r3,
+            &v2[..n + 1],
+            &v3[..n + 1],
+            wse,
+        );
+        _limbs_toom_couple_handling(r3, &mut pp_lo[..2 * n + 1], sign, n, 0, 0);
+
+        // $pm4$
+        let sign = _limbs_mul_toom_evaluate_poly_in_2_pow_and_neg_2_pow(v2, v0, p, ap, n, 2, pp_lo)
+            ^ _limbs_mul_toom_evaluate_poly_in_2_pow_and_neg_2_pow(v3, v1, q, bp, n, 2, pp_lo);
+        // A(-4)*B(-4)
+        _limbs_mul_same_length_to_out_toom_6h_recursive_f_true(
+            pp_lo,
+            &v0[..n + 1],
+            &v1[..n + 1],
+            r1,
+            &v2[..n + 1],
+            &v3[..n + 1],
+            wse,
+        ); /* A(+4)*B(+4) */
+        _limbs_toom_couple_handling(r1, &mut pp_lo[..2 * n + 1], sign, n, 2, 4);
+
+        // $pm1/4$
+        let sign = _limbs_mul_toom_evaluate_poly_in_2_neg_pow_and_neg_2_neg_pow(
+            v2, v0, p, ap, n, s, 2, pp_lo,
+        ) ^ _limbs_mul_toom_evaluate_poly_in_2_neg_pow_and_neg_2_neg_pow(
+            v3, v1, q, bp, n, t, 2, pp_lo,
+        );
+        // A(-1/4)*B(-1/4)*4^.
+        // A(+1/4)*B(+1/4)*4^.
+        _limbs_mul_same_length_to_out_toom_6h_recursive_f_true(
+            pp_lo,
+            &v0[..n + 1],
+            &v1[..n + 1],
+            r4,
+            &v2[..n + 1],
+            &v3[..n + 1],
+            wse,
+        );
+        _limbs_toom_couple_handling(
+            r4,
+            &mut pp_lo[..2 * n + 1],
+            sign,
+            n,
+            2 * (1 + if half { 1 } else { 0 }),
+            2 * (if half { 1 } else { 0 }),
+        );
+
+        // $pm2$
+        final_sign = _limbs_mul_toom_evaluate_poly_in_2_and_neg_2(v2, v0, p, ap, n, pp_lo)
+            ^ _limbs_mul_toom_evaluate_poly_in_2_and_neg_2(v3, v1, q, bp, n, pp_lo);
+    }
+    {
+        // A(-2)*B(-2) */ /* A(+2)*B(+2)
+        let (pp_lo, r2) = pp.split_at_mut(7 * n);
+        {
+            let (r2_v1, v2) = r2.split_at_mut(2 * n + 2);
+            let (v3, wse) = wsi.split_at_mut(n + 1);
+            _limbs_mul_same_length_to_out_toom_6h_recursive_f_true_and_p2_is_a_cat_b(
+                pp_lo,
+                r2_v1,
+                &v2[..n + 1],
+                &v3[..n + 1],
+                wse,
+            );
+        }
+        _limbs_toom_couple_handling(r2, &mut pp_lo[..2 * n + 1], final_sign, n, 1, 2);
+    }
+
+    // A(0)*B(0)
+    _limbs_mul_same_length_to_out_toom_6h_recursive_f_false(pp, &ap[..n], &bp[..n], wsi);
+
+    // Infinity
+    if half {
+        if s > t {
+            _limbs_mul_to_out_toom_6h_recursive(
+                &mut pp[11 * n..],
+                &ap[p * n..p * n + s],
+                &bp[q * n..q * n + t],
+            );
+        } else {
+            _limbs_mul_to_out_toom_6h_recursive(
+                &mut pp[11 * n..],
+                &bp[q * n..q * n + t],
+                &ap[p * n..p * n + s],
+            );
+        }
+    }
+
+    _limbs_mul_toom_interpolate_12_points(pp, r1, r3, r5, n, s + t, half, wsi);
 }

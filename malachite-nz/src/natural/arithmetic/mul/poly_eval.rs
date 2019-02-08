@@ -4,6 +4,7 @@ use natural::arithmetic::add::{
     limbs_slice_add_greater_in_place_left, limbs_slice_add_same_length_in_place_left,
 };
 use natural::arithmetic::add_limb::limbs_add_limb_to_out;
+use natural::arithmetic::add_mul_limb::mpn_addmul_1;
 use natural::arithmetic::shl_u::{limbs_shl_to_out, limbs_slice_shl_in_place};
 use natural::arithmetic::sub::limbs_sub_same_length_to_out;
 use natural::comparison::ord::limbs_cmp_same_length;
@@ -390,4 +391,57 @@ pub(crate) fn _limbs_mul_toom_evaluate_poly_in_2_pow_and_neg_2_pow(
     }
     limbs_slice_add_same_length_in_place_left(v_2_pow, scratch);
     v_neg_2_pow_neg
+}
+
+/// Evaluate a polynomial in +2^-k and -2^-k
+/// Evaluates a polynomial of degree k >= 3.
+/// This is mpn_toom_eval_pm2rexp from mpn/generic/toom_eval_pm2rexp.c.
+pub fn _limbs_mul_toom_evaluate_poly_in_2_neg_pow_and_neg_2_neg_pow(
+    rp: &mut [Limb],
+    rm: &mut [Limb],
+    q: usize,
+    ap: &[Limb],
+    n: usize,
+    t: usize,
+    s: usize,
+    ws: &mut [Limb],
+) -> bool {
+    // {ap,q*n+t} -> {rp,n+1} {rm,n+1} , with {ws, n+1}
+    assert!(n >= t);
+    assert_ne!(s, 0); // or _eval_pm1 should be used
+    assert!(q > 1);
+    assert!(s * q < Limb::WIDTH as usize);
+    rp[n] = limbs_shl_to_out(rp, &ap[..n], (s * q) as u32);
+    ws[n] = limbs_shl_to_out(ws, &ap[n..2 * n], (s * (q - 1)) as u32);
+    if (q & 1) != 0 {
+        assert!(!limbs_slice_add_greater_in_place_left(
+            &mut ws[..n + 1],
+            &ap[n * q..(n * q) + t]
+        ));
+        let carry = mpn_addmul_1(rp, &ap[n * (q - 1)..n * q], 1 << s);
+        rp[n].wrapping_add_assign(carry);
+    } else {
+        assert!(!limbs_slice_add_greater_in_place_left(
+            &mut rp[..n + 1],
+            &ap[n * q..(n * q) + t]
+        ));
+    }
+    for i in 2..q - 1 {
+        let carry = mpn_addmul_1(rp, &ap[n * i..(n + 1) * i], 1 << (s * (q - i)));
+        rp[n].wrapping_add_assign(carry);
+        let carry = mpn_addmul_1(ws, &ap[n * i..(n + 1) * i], 1 << (s * (q - i)));
+        ws[n].wrapping_add_assign(carry);
+    }
+
+    let neg = limbs_cmp_same_length(&rp[..n + 1], &ws[..n + 1]) == Ordering::Less;
+    if neg {
+        limbs_sub_same_length_to_out(rm, &ws[..n + 1], &rp[..n + 1]);
+    } else {
+        limbs_sub_same_length_to_out(rm, &rp[..n + 1], &ws[..n + 1]);
+    }
+    assert!(!limbs_slice_add_same_length_in_place_left(
+        &mut rp[..n + 1],
+        &ws[..n + 1]
+    ));
+    neg
 }
