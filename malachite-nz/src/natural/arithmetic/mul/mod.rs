@@ -11,10 +11,12 @@ use natural::arithmetic::mul::toom::{
     _limbs_mul_greater_to_out_toom_33, _limbs_mul_greater_to_out_toom_33_scratch_size,
     _limbs_mul_greater_to_out_toom_42, _limbs_mul_greater_to_out_toom_43,
     _limbs_mul_greater_to_out_toom_44, _limbs_mul_greater_to_out_toom_44_scratch_size,
-    _limbs_mul_greater_to_out_toom_53, _limbs_mul_greater_to_out_toom_63, MUL_TOOM22_THRESHOLD,
-    MUL_TOOM32_TO_TOOM43_THRESHOLD, MUL_TOOM32_TO_TOOM53_THRESHOLD, MUL_TOOM33_THRESHOLD,
-    MUL_TOOM33_THRESHOLD_LIMIT, MUL_TOOM42_TO_TOOM53_THRESHOLD, MUL_TOOM42_TO_TOOM63_THRESHOLD,
-    MUL_TOOM44_THRESHOLD, MUL_TOOM6H_THRESHOLD,
+    _limbs_mul_greater_to_out_toom_53, _limbs_mul_greater_to_out_toom_63,
+    _limbs_mul_greater_to_out_toom_6h, _limbs_mul_same_length_to_out_toom_6h_scratch_size,
+    MUL_TOOM22_THRESHOLD, MUL_TOOM32_TO_TOOM43_THRESHOLD, MUL_TOOM32_TO_TOOM53_THRESHOLD,
+    MUL_TOOM33_THRESHOLD, MUL_TOOM33_THRESHOLD_LIMIT, MUL_TOOM42_TO_TOOM53_THRESHOLD,
+    MUL_TOOM42_TO_TOOM63_THRESHOLD, MUL_TOOM44_THRESHOLD, MUL_TOOM6H_THRESHOLD,
+    MUL_TOOM8H_THRESHOLD,
 };
 use natural::arithmetic::mul_limb::limbs_mul_limb_to_out;
 use natural::arithmetic::sub::limbs_sub_same_length_to_out;
@@ -193,20 +195,14 @@ pub fn limbs_mul_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) 
     } else if len < MUL_TOOM6H_THRESHOLD {
         let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_44_scratch_size(len)];
         _limbs_mul_greater_to_out_toom_44(out, xs, ys, &mut scratch);
+    } else if len < MUL_TOOM8H_THRESHOLD {
+        let mut scratch = vec![0; _limbs_mul_same_length_to_out_toom_6h_scratch_size(len)];
+        _limbs_mul_greater_to_out_toom_6h(out, xs, ys, &mut scratch);
     } else {
         //TODO remove
         _limbs_mul_greater_to_out_basecase(out, xs, ys);
     }
     /*
-    else if (BELOW_THRESHOLD (len, MUL_TOOM8H_THRESHOLD))
-      {
-        mp_ptr ws;
-        TMP_SDECL;
-        TMP_SMARK;
-        ws = TMP_SALLOC_LIMBS (mpn_toom6_mul_n_itch (len));
-        mpn_toom6h_mul (out, xs, len, ys, len, ws);
-        TMP_SFREE;
-      }
     else if (BELOW_THRESHOLD (len, MUL_FFT_THRESHOLD))
       {
         mp_ptr ws;

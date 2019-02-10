@@ -4,7 +4,6 @@ use natural::arithmetic::add::{
     limbs_slice_add_greater_in_place_left, limbs_slice_add_same_length_in_place_left,
 };
 use natural::arithmetic::add_limb::limbs_add_limb_to_out;
-use natural::arithmetic::add_mul_limb::mpn_addmul_1;
 use natural::arithmetic::shl_u::{limbs_shl_to_out, limbs_slice_shl_in_place};
 use natural::arithmetic::sub::limbs_sub_same_length_to_out;
 use natural::comparison::ord::limbs_cmp_same_length;
@@ -112,9 +111,7 @@ pub(crate) fn _limbs_mul_toom_evaluate_poly_in_1_and_neg_1(
     xp: &[Limb],
     n: usize,
     hn: usize,
-    tp: &mut [Limb], //TODO remove
-    xs: &[Limb],
-    ys: &[Limb],
+    tp: &mut [Limb],
 ) -> bool {
     assert!(k > 3);
     assert_ne!(hn, 0);
@@ -145,12 +142,6 @@ pub(crate) fn _limbs_mul_toom_evaluate_poly_in_1_and_neg_1(
     };
     let mut i = 5;
     while i < k {
-        if *xs.last().unwrap() != 0 && *ys.last().unwrap() != 0 {
-            panic!(
-                "k > 5 in _limbs_mul_toom_evaluate_poly_in_1_and_neg_1: {:?} {:?}",
-                xs, ys
-            );
-        }
         assert!(!limbs_slice_add_greater_in_place_left(
             &mut tp[..n + 1],
             &xp[i * n..(i + 1) * n]
@@ -236,7 +227,7 @@ pub(crate) fn _limbs_mul_toom_evaluate_poly_in_2_and_neg_2(
     n: usize,
     scratch: &mut [Limb],
 ) -> bool {
-    assert!(degree > 3);
+    assert!(degree >= 3);
     assert!(degree < Limb::WIDTH as usize);
     assert_eq!(v_2.len(), n + 1);
     assert_eq!(scratch.len(), n + 1);
@@ -266,13 +257,15 @@ pub(crate) fn _limbs_mul_toom_evaluate_poly_in_2_and_neg_2(
                 0
             };
         }
-        let mut i = degree - 4;
-        loop {
-            shl_2_and_add_with_carry_in_place_left(v_2_init, coefficients[i], &mut carry);
-            if i < 2 {
-                break;
+        if degree >= 4 {
+            let mut i = degree - 4;
+            loop {
+                shl_2_and_add_with_carry_in_place_left(v_2_init, coefficients[i], &mut carry);
+                if i < 2 {
+                    break;
+                }
+                i -= 2;
             }
-            i -= 2;
         }
         *v_2_last = carry;
     }
@@ -393,6 +386,17 @@ pub(crate) fn _limbs_mul_toom_evaluate_poly_in_2_pow_and_neg_2_pow(
     v_neg_2_pow_neg
 }
 
+// This is DO_mpn_addlsh_n from mpn/generic/toom_eval_pm2rexp.c.
+pub(crate) fn do_mpn_addlsh_n(dst: &mut [Limb], src: &[Limb], s: usize, ws: &mut [Limb]) -> Limb {
+    let n = src.len();
+    let cy = limbs_shl_to_out(ws, src, s as u32);
+    cy + if limbs_slice_add_same_length_in_place_left(&mut dst[..n], &mut ws[..n]) {
+        1
+    } else {
+        0
+    }
+}
+
 /// Evaluate a polynomial in +2^-k and -2^-k
 /// Evaluates a polynomial of degree k >= 3.
 /// This is mpn_toom_eval_pm2rexp from mpn/generic/toom_eval_pm2rexp.c.
@@ -416,21 +420,24 @@ pub fn _limbs_mul_toom_evaluate_poly_in_2_neg_pow_and_neg_2_neg_pow(
     if (q & 1) != 0 {
         assert!(!limbs_slice_add_greater_in_place_left(
             &mut ws[..n + 1],
-            &ap[n * q..(n * q) + t]
+            &ap[n * q..n * q + t]
         ));
-        let carry = mpn_addmul_1(rp, &ap[n * (q - 1)..n * q], 1 << s);
+        let carry = do_mpn_addlsh_n(rp, &ap[n * (q - 1)..n * q], s, rm);
         rp[n].wrapping_add_assign(carry);
     } else {
         assert!(!limbs_slice_add_greater_in_place_left(
             &mut rp[..n + 1],
-            &ap[n * q..(n * q) + t]
+            &ap[n * q..n * q + t]
         ));
     }
-    for i in 2..q - 1 {
-        let carry = mpn_addmul_1(rp, &ap[n * i..(n + 1) * i], 1 << (s * (q - i)));
+    let mut i = 2;
+    while i < q - 1 {
+        let carry = do_mpn_addlsh_n(rp, &ap[n * i..n * (i + 1)], s * (q - i), rm);
         rp[n].wrapping_add_assign(carry);
-        let carry = mpn_addmul_1(ws, &ap[n * i..(n + 1) * i], 1 << (s * (q - i)));
+        i += 1;
+        let carry = do_mpn_addlsh_n(ws, &ap[n * i..n * (i + 1)], s * (q - i), rm);
         ws[n].wrapping_add_assign(carry);
+        i += 1;
     }
 
     let neg = limbs_cmp_same_length(&rp[..n + 1], &ws[..n + 1]) == Ordering::Less;

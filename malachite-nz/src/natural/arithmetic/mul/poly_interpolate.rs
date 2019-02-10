@@ -13,6 +13,7 @@ use natural::arithmetic::add_mul_limb::mpn_addmul_1;
 use natural::arithmetic::div_exact_limb::{
     limbs_div_exact_3_in_place, limbs_div_exact_limb_in_place,
 };
+use natural::arithmetic::mul::poly_eval::do_mpn_addlsh_n;
 use natural::arithmetic::shl_u::limbs_shl_to_out;
 use natural::arithmetic::shr_u::limbs_slice_shr_in_place;
 use natural::arithmetic::sub::{
@@ -23,6 +24,7 @@ use natural::arithmetic::sub::{
 use natural::arithmetic::sub_limb::limbs_sub_limb_in_place;
 use natural::arithmetic::sub_mul_limb::mpn_submul_1;
 use platform::{DoubleLimb, Limb};
+use std::mem::swap;
 
 /// This is mpn_toom_interpolate_5pts in mpn/generic/toom_interpolate_5pts.c.
 #[allow(clippy::cyclomatic_complexity)]
@@ -802,6 +804,12 @@ fn mpn_divexact_by255_in_place(dst: &mut [Limb]) -> Limb {
     255 & mpn_bdiv_dbm1c_in_place(dst, Limb::MAX / 255, 0)
 }
 
+//TODO tune
+const AORSMUL_FASTER_AORS_AORSLSH: bool = false;
+const AORSMUL_FASTER_2AORSLSH: bool = false;
+const AORSMUL_FASTER_3AORSLSH: bool = false;
+const AORSMUL_FASTER_AORS_2AORSLSH: bool = false;
+
 /// Interpolation for Toom-6.5 (or Toom-6), using the evaluation
 /// points: infinity(6.5 only), +-4, +-2, +-1, +-1/4, +-1/2, 0. More precisely,
 /// we want to compute f(2^(GMP_NUMB_BITS * n)) for a polynomial f of
@@ -830,25 +838,26 @@ fn mpn_divexact_by255_in_place(dst: &mut [Limb]) -> Limb {
 /// Inputs are destroyed.
 ///
 /// This is mpn_toom_interpolate_12pts from mpn/generic/mpn_toom_interpolate_12pts.c.
-pub fn _limbs_mul_toom_interpolate_12_points(
+pub fn _limbs_mul_toom_interpolate_12_points<'a>(
     pp: &mut [Limb],
-    r1: &mut [Limb],
+    mut r1: &'a mut [Limb],
     r3: &mut [Limb],
-    r5: &mut [Limb],
+    mut r5: &'a mut [Limb],
     n: usize,
     spt: usize,
     half: bool,
-    wsi: &mut [Limb],
+    mut wsi: &'a mut [Limb],
 ) {
     let n3 = 3 * n;
     let n3p1 = n3 + 1;
     {
         let (pp_lo, remainder) = pp.split_at_mut(3 * n);
         let pp_lo = &mut pp_lo[..2 * n];
-        split_into_chunks_mut!(remainder, 4 * n, [r4, r2], r0);
+        let (r4, r2) = remainder.split_at_mut(4 * n);
 
         // Interpolation
         if half {
+            let (r2, r0) = r2.split_at_mut(4 * n);
             let cy = if limbs_sub_same_length_in_place_left(&mut r3[..spt], &r0[..spt]) {
                 1
             } else {
@@ -871,18 +880,18 @@ pub fn _limbs_mul_toom_interpolate_12_points(
 
         assert!(!limbs_add_same_length_to_out(wsi, &r1[..n3p1], &r4[..n3p1]));
         limbs_sub_same_length_in_place_left(&mut r4[..n3p1], &r1[..n3p1]); // can be negative
-        r1.swap_with_slice(wsi);
+        swap(&mut r1, &mut wsi);
 
         let carry = shl_and_sub_same_length(&mut r5[n..], pp_lo, 10, wsi);
         r5[n3].wrapping_sub_assign(carry);
         shl_and_sub(&mut r2[n..3 * n + 1], pp_lo, 2, wsi);
 
         limbs_sub_same_length_to_out(wsi, &r5[..n3p1], &r2[..n3p1]); // can be negative
-        assert!(!limbs_sub_same_length_in_place_left(
+        assert!(!limbs_slice_add_same_length_in_place_left(
             &mut r2[..n3p1],
             &r5[..n3p1]
         ));
-        r5.swap_with_slice(wsi);
+        swap(&mut r5, &mut wsi);
 
         let carry = if limbs_sub_same_length_in_place_left(&mut r3[n..3 * n], pp_lo) {
             1
@@ -890,9 +899,12 @@ pub fn _limbs_mul_toom_interpolate_12_points(
             0
         };
         r3[n3].wrapping_sub_assign(carry);
-
-        limbs_sub_same_length_in_place_left(&mut r4[..n3p1], &r5[..n3p1]); // can be negative
-        shl_and_sub_same_length(r4, &r5[..n3p1], 8, wsi); // can be negative
+        if AORSMUL_FASTER_AORS_AORSLSH {
+            mpn_submul_1(r4, &r5[..n3p1], 257); // can be negative
+        } else {
+            limbs_sub_same_length_in_place_left(&mut r4[..n3p1], &r5[..n3p1]); // can be negative
+            shl_and_sub_same_length(r4, &r5[..n3p1], 8, wsi); // can be negative
+        }
 
         // A division by 2835x4 follows. Warning: the operand can be negative!
         limbs_div_exact_limb_in_place(&mut r4[..n3p1], 2_835 << 2);
@@ -900,23 +912,35 @@ pub fn _limbs_mul_toom_interpolate_12_points(
             r4[n3] |= Limb::MAX << (Limb::WIDTH - 2);
         }
 
-        shl_and_sub_same_length(r5, &r4[..n3p1], 2, wsi); // can be negative
-        shl_and_sub_same_length(r5, &r4[..n3p1], 6, wsi); // can give a carry
+        if AORSMUL_FASTER_2AORSLSH {
+            mpn_addmul_1(r5, &r4[..n3p1], 60); // can be negative
+        } else {
+            shl_and_sub_same_length(r5, &r4[..n3p1], 2, wsi); // can be negative
+            do_mpn_addlsh_n(r5, &r4[..n3p1], 6, wsi); // can give a carry
+        }
         mpn_divexact_by255_in_place(&mut r5[..n3p1]);
 
         assert_eq!(shl_and_sub_same_length(r2, &r3[..n3p1], 5, wsi), 0);
-        assert_eq!(shl_and_sub_same_length(r1, &r2[..n3p1], 6, wsi), 0);
-        assert_eq!(shl_and_sub_same_length(r1, &r2[..n3p1], 5, wsi), 0);
-        assert_eq!(shl_and_sub_same_length(r1, &r2[..n3p1], 2, wsi), 0);
+        if AORSMUL_FASTER_3AORSLSH {
+            assert_eq!(mpn_submul_1(r1, &r2[..n3p1], 100), 0);
+        } else {
+            assert_eq!(shl_and_sub_same_length(r1, &r2[..n3p1], 6, wsi), 0);
+            assert_eq!(shl_and_sub_same_length(r1, &r2[..n3p1], 5, wsi), 0);
+            assert_eq!(shl_and_sub_same_length(r1, &r2[..n3p1], 2, wsi), 0);
+        }
         assert_eq!(shl_and_sub_same_length(r1, &r3[..n3p1], 9, wsi), 0);
         limbs_div_exact_limb_in_place(&mut r1[..n3p1], 42_525);
 
-        assert!(limbs_sub_same_length_in_place_left(
-            &mut r2[..n3p1],
-            &r1[..n3p1]
-        ));
-        assert_eq!(shl_and_sub_same_length(r2, &r1[..n3p1], 5, wsi), 0);
-        assert_eq!(shl_and_sub_same_length(r2, &r1[..n3p1], 8, wsi), 0);
+        if AORSMUL_FASTER_AORS_2AORSLSH {
+            assert_eq!(mpn_submul_1(r2, &r1[..n3p1], 225), 0);
+        } else {
+            assert!(!limbs_sub_same_length_in_place_left(
+                &mut r2[..n3p1],
+                &r1[..n3p1]
+            ));
+            assert_eq!(do_mpn_addlsh_n(r2, &r1[..n3p1], 5, wsi), 0);
+            assert_eq!(shl_and_sub_same_length(r2, &r1[..n3p1], 8, wsi), 0);
+        }
         limbs_div_exact_limb_in_place(&mut r2[..n3p1], 9 << 2);
 
         assert!(!limbs_sub_same_length_in_place_left(

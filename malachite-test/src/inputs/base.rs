@@ -19,6 +19,7 @@ use malachite_nz::natural::arithmetic::mul::toom::{
     _limbs_mul_greater_to_out_toom_54_input_sizes_valid,
     _limbs_mul_greater_to_out_toom_62_input_sizes_valid,
     _limbs_mul_greater_to_out_toom_63_input_sizes_valid,
+    _limbs_mul_greater_to_out_toom_6h_input_sizes_valid,
 };
 use malachite_nz::natural::arithmetic::mul_limb::limbs_mul_limb;
 use malachite_nz::platform::{HalfLimb, Limb, SignedHalfLimb, SignedLimb};
@@ -1529,6 +1530,19 @@ pub fn triples_of_unsigned_vec_var_21<T: PrimitiveUnsigned + Rand>(
         |&(ref out, ref xs, ref ys)| {
             out.len() >= xs.len() + ys.len()
                 && _limbs_mul_greater_to_out_toom_63_input_sizes_valid(xs.len(), ys.len())
+        },
+    ))
+}
+
+// All triples of `Vec<T>`, where `T` is unsigned and `out`, `xs`, and `ys` meet the
+// preconditions of `_limbs_mul_greater_to_out_toom_6h`.
+pub fn triples_of_unsigned_vec_var_22<T: PrimitiveUnsigned + Rand>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (Vec<T>, Vec<T>, Vec<T>)>> {
+    Box::new(triples_of_unsigned_vec_min_sizes(gm, 84, 42, 42).filter(
+        |&(ref out, ref xs, ref ys)| {
+            out.len() >= xs.len() + ys.len()
+                && _limbs_mul_greater_to_out_toom_6h_input_sizes_valid(xs.len(), ys.len())
         },
     ))
 }

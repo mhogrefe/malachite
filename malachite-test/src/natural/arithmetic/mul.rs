@@ -7,7 +7,7 @@ use inputs::base::{
     triples_of_unsigned_vec_var_12, triples_of_unsigned_vec_var_13, triples_of_unsigned_vec_var_14,
     triples_of_unsigned_vec_var_15, triples_of_unsigned_vec_var_16, triples_of_unsigned_vec_var_17,
     triples_of_unsigned_vec_var_18, triples_of_unsigned_vec_var_19, triples_of_unsigned_vec_var_20,
-    triples_of_unsigned_vec_var_21,
+    triples_of_unsigned_vec_var_21, triples_of_unsigned_vec_var_22,
 };
 use inputs::natural::{nrm_pairs_of_naturals, pairs_of_naturals, rm_pairs_of_naturals};
 use malachite_base::num::SignificantBits;
@@ -33,7 +33,9 @@ use malachite_nz::natural::arithmetic::mul::toom::{
     _limbs_mul_greater_to_out_toom_62_input_sizes_valid,
     _limbs_mul_greater_to_out_toom_62_scratch_size, _limbs_mul_greater_to_out_toom_63,
     _limbs_mul_greater_to_out_toom_63_input_sizes_valid,
-    _limbs_mul_greater_to_out_toom_63_scratch_size,
+    _limbs_mul_greater_to_out_toom_63_scratch_size, _limbs_mul_greater_to_out_toom_6h,
+    _limbs_mul_greater_to_out_toom_6h_input_sizes_valid,
+    _limbs_mul_greater_to_out_toom_6h_scratch_size,
 };
 use malachite_nz::natural::arithmetic::mul::{
     _limbs_mul_greater_to_out_basecase, limbs_mul_greater_to_out,
@@ -83,6 +85,10 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_ns_demo!(
         registry,
         demo_limbs_mul_greater_to_out_toom_63_input_sizes_valid
+    );
+    register_ns_demo!(
+        registry,
+        demo_limbs_mul_greater_to_out_toom_6h_input_sizes_valid
     );
     register_demo!(registry, demo_natural_mul_assign);
     register_demo!(registry, demo_natural_mul_assign_ref);
@@ -149,6 +155,11 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
         registry,
         Large,
         benchmark_limbs_mul_greater_to_out_toom_63_algorithms
+    );
+    register_bench!(
+        registry,
+        Large,
+        benchmark_limbs_mul_greater_to_out_toom_6h_algorithms
     );
     register_bench!(
         registry,
@@ -315,6 +326,20 @@ fn demo_limbs_mul_greater_to_out_toom_63_input_sizes_valid(
             x,
             y,
             _limbs_mul_greater_to_out_toom_63_input_sizes_valid(x, y)
+        );
+    }
+}
+
+fn demo_limbs_mul_greater_to_out_toom_6h_input_sizes_valid(
+    gm: NoSpecialGenerationMode,
+    limit: usize,
+) {
+    for (x, y) in pairs_of_small_usizes(gm).take(limit) {
+        println!(
+            "_limbs_mul_greater_to_out_toom_6h_input_sizes_valid({}, {}) = {}",
+            x,
+            y,
+            _limbs_mul_greater_to_out_toom_6h_input_sizes_valid(x, y)
         );
     }
 }
@@ -725,6 +750,37 @@ fn benchmark_limbs_mul_greater_to_out_toom_63_algorithms(
                     let mut scratch =
                         vec![0; _limbs_mul_greater_to_out_toom_63_scratch_size(xs.len(), ys.len())];
                     _limbs_mul_greater_to_out_toom_63(&mut out, &xs, &ys, &mut scratch)
+                }),
+            ),
+        ],
+    );
+}
+
+fn benchmark_limbs_mul_greater_to_out_toom_6h_algorithms(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "_limbs_mul_greater_to_out_toom_6h(&mut [u32], &[u32], &[u32])",
+        BenchmarkType::Algorithms,
+        triples_of_unsigned_vec_var_22(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(_, ref xs, ref ys)| xs.len() + ys.len()),
+        "x.len() + y.len()",
+        &mut [
+            (
+                "basecase",
+                &mut (|(mut out, xs, ys)| _limbs_mul_greater_to_out_basecase(&mut out, &xs, &ys)),
+            ),
+            (
+                "Toom6h",
+                &mut (|(mut out, xs, ys)| {
+                    let mut scratch =
+                        vec![0; _limbs_mul_greater_to_out_toom_6h_scratch_size(xs.len(), ys.len())];
+                    _limbs_mul_greater_to_out_toom_6h(&mut out, &xs, &ys, &mut scratch)
                 }),
             ),
         ],
