@@ -41,9 +41,20 @@ impl Mod<SignedLimb> for Integer {
     ///     assert_eq!(Integer::from(-23).mod_op(-10i32).to_string(), "-3");
     /// }
     /// ```
+    #[inline]
     fn mod_op(mut self, other: SignedLimb) -> Integer {
         self.mod_assign(other);
         self
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl Mod<i32> for Integer {
+    type Output = Integer;
+
+    #[inline]
+    fn mod_op(self, other: i32) -> Integer {
+        self.mod_op(SignedLimb::from(other))
     }
 }
 
@@ -93,6 +104,16 @@ impl<'a> Mod<SignedLimb> for &'a Integer {
         } else {
             -Natural::from(remainder)
         }
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> Mod<i32> for &'a Integer {
+    type Output = Integer;
+
+    #[inline]
+    fn mod_op(self, other: i32) -> Integer {
+        self.mod_op(SignedLimb::from(other))
     }
 }
 
@@ -147,6 +168,14 @@ impl ModAssign<SignedLimb> for Integer {
     }
 }
 
+#[cfg(feature = "64_bit_limbs")]
+impl ModAssign<i32> for Integer {
+    #[inline]
+    fn mod_assign(&mut self, other: i32) {
+        self.mod_assign(SignedLimb::from(other));
+    }
+}
+
 impl Mod<Integer> for SignedLimb {
     type Output = Integer;
 
@@ -191,6 +220,16 @@ impl Mod<Integer> for SignedLimb {
         } else {
             -remainder
         }
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl Mod<Integer> for i32 {
+    type Output = Integer;
+
+    #[inline]
+    fn mod_op(self, other: Integer) -> Integer {
+        SignedLimb::from(self).mod_op(other)
     }
 }
 
@@ -241,6 +280,16 @@ impl<'a> Mod<&'a Integer> for SignedLimb {
     }
 }
 
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> Mod<&'a Integer> for i32 {
+    type Output = Integer;
+
+    #[inline]
+    fn mod_op(self, other: &'a Integer) -> Integer {
+        SignedLimb::from(self).mod_op(other)
+    }
+}
+
 impl Rem<SignedLimb> for Integer {
     type Output = Integer;
 
@@ -275,9 +324,20 @@ impl Rem<SignedLimb> for Integer {
     ///     assert_eq!((Integer::from(-23) % -10i32).to_string(), "-3");
     /// }
     /// ```
+    #[inline]
     fn rem(mut self, other: SignedLimb) -> Integer {
         self %= other;
         self
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl Rem<i32> for Integer {
+    type Output = Integer;
+
+    #[inline]
+    fn rem(self, other: i32) -> Integer {
+        self % SignedLimb::from(other)
     }
 }
 
@@ -321,6 +381,16 @@ impl<'a> Rem<SignedLimb> for &'a Integer {
         } else {
             -Natural::from(&self.abs % other.unsigned_abs())
         }
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> Rem<i32> for &'a Integer {
+    type Output = Integer;
+
+    #[inline]
+    fn rem(self, other: i32) -> Integer {
+        self % SignedLimb::from(other)
     }
 }
 
@@ -370,6 +440,14 @@ impl RemAssign<SignedLimb> for Integer {
     }
 }
 
+#[cfg(feature = "64_bit_limbs")]
+impl RemAssign<i32> for Integer {
+    #[inline]
+    fn rem_assign(&mut self, other: i32) {
+        *self %= SignedLimb::from(other);
+    }
+}
+
 impl Rem<Integer> for SignedLimb {
     type Output = Integer;
 
@@ -408,6 +486,16 @@ impl Rem<Integer> for SignedLimb {
         } else {
             -Natural::from(self.unsigned_abs() % other.abs)
         }
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl Rem<Integer> for i32 {
+    type Output = Integer;
+
+    #[inline]
+    fn rem(self, other: Integer) -> Integer {
+        SignedLimb::from(self) % other
     }
 }
 
@@ -453,6 +541,16 @@ impl<'a> Rem<&'a Integer> for SignedLimb {
     }
 }
 
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> Rem<&'a Integer> for i32 {
+    type Output = Integer;
+
+    #[inline]
+    fn rem(self, other: &'a Integer) -> Integer {
+        SignedLimb::from(self) % other
+    }
+}
+
 impl CeilingMod<SignedLimb> for Integer {
     type Output = Integer;
 
@@ -488,9 +586,20 @@ impl CeilingMod<SignedLimb> for Integer {
     ///     assert_eq!(Integer::from(-23).ceiling_mod(-10i32).to_string(), "7");
     /// }
     /// ```
+    #[inline]
     fn ceiling_mod(mut self, other: SignedLimb) -> Integer {
         self.ceiling_mod_assign(other);
         self
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl CeilingMod<i32> for Integer {
+    type Output = Integer;
+
+    #[inline]
+    fn ceiling_mod(self, other: i32) -> Integer {
+        self.ceiling_mod(SignedLimb::from(other))
     }
 }
 
@@ -540,6 +649,16 @@ impl<'a> CeilingMod<SignedLimb> for &'a Integer {
         } else {
             Integer::from(remainder)
         }
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> CeilingMod<i32> for &'a Integer {
+    type Output = Integer;
+
+    #[inline]
+    fn ceiling_mod(self, other: i32) -> Integer {
+        self.ceiling_mod(SignedLimb::from(other))
     }
 }
 
@@ -594,6 +713,14 @@ impl CeilingModAssign<SignedLimb> for Integer {
     }
 }
 
+#[cfg(feature = "64_bit_limbs")]
+impl CeilingModAssign<i32> for Integer {
+    #[inline]
+    fn ceiling_mod_assign(&mut self, other: i32) {
+        self.ceiling_mod_assign(SignedLimb::from(other));
+    }
+}
+
 impl CeilingMod<Integer> for SignedLimb {
     type Output = Integer;
 
@@ -643,6 +770,16 @@ impl CeilingMod<Integer> for SignedLimb {
     }
 }
 
+#[cfg(feature = "64_bit_limbs")]
+impl CeilingMod<Integer> for i32 {
+    type Output = Integer;
+
+    #[inline]
+    fn ceiling_mod(self, other: Integer) -> Integer {
+        SignedLimb::from(self).ceiling_mod(other)
+    }
+}
+
 impl<'a> CeilingMod<&'a Integer> for SignedLimb {
     type Output = Integer;
 
@@ -689,5 +826,15 @@ impl<'a> CeilingMod<&'a Integer> for SignedLimb {
         } else {
             Integer::from(remainder)
         }
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> CeilingMod<&'a Integer> for i32 {
+    type Output = Integer;
+
+    #[inline]
+    fn ceiling_mod(self, other: &'a Integer) -> Integer {
+        SignedLimb::from(self).ceiling_mod(other)
     }
 }

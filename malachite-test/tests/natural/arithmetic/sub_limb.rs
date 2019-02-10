@@ -163,14 +163,14 @@ fn test_sub_limb() {
 #[should_panic]
 #[allow(unused_must_use)]
 fn sub_limb_fail_1() {
-    Natural::from(123u32) - 456;
+    Natural::from(123u32) - 456 as Limb;
 }
 
 #[test]
 #[should_panic]
 #[allow(unused_must_use)]
 fn sub_limb_fail_2() {
-    &Natural::from(123u32) - 456;
+    &Natural::from(123u32) - 456 as Limb;
 }
 
 #[test]
@@ -339,7 +339,7 @@ fn sub_limb_properties() {
 
     #[allow(unknown_lints, identity_op)]
     test_properties(naturals, |n| {
-        assert_eq!(n - 0, *n);
+        assert_eq!(n - 0 as Limb, *n);
     });
 
     test_properties(unsigneds, |&u: &Limb| {

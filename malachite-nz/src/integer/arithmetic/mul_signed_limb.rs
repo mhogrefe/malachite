@@ -3,6 +3,7 @@ use malachite_base::num::{Assign, NotAssign, UnsignedAbs, Zero};
 use platform::{Limb, SignedLimb};
 use std::ops::{Mul, MulAssign};
 
+//TODO continue 32-bit impls for 64-bit build
 /// Multiplies an `Integer` by an `i32`, taking the `Integer` by value.
 ///
 /// Time: worst case O(n)

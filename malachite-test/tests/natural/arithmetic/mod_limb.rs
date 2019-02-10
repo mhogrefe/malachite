@@ -234,27 +234,27 @@ fn test_limb_mod_natural() {
 #[allow(unused_must_use)]
 #[should_panic]
 fn limb_rem_natural_fail() {
-    10 % Natural::ZERO;
+    10 as Limb % Natural::ZERO;
 }
 
 #[test]
 #[allow(unused_must_use)]
 #[should_panic]
 fn limb_rem_natural_ref_fail() {
-    10 % &Natural::ZERO;
+    10 as Limb % &Natural::ZERO;
 }
 
 #[test]
 #[should_panic]
 fn limb_rem_assign_natural_fail() {
-    let mut n = 10;
+    let mut n: Limb = 10;
     n %= Natural::ZERO;
 }
 
 #[test]
 #[should_panic]
 fn limb_rem_assign_natural_ref_fail() {
-    let mut n = 10;
+    let mut n: Limb = 10;
     n %= &Natural::ZERO;
 }
 
@@ -311,13 +311,13 @@ fn test_limb_neg_mod_natural() {
 #[test]
 #[should_panic]
 fn limb_neg_mod_natural_fail() {
-    10.neg_mod(Natural::ZERO);
+    (10 as Limb).neg_mod(Natural::ZERO);
 }
 
 #[test]
 #[should_panic]
 fn limb_neg_mod_natural_ref_fail() {
-    10.neg_mod(&Natural::ZERO);
+    (10 as Limb).neg_mod(&Natural::ZERO);
 }
 
 #[test]

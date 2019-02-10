@@ -41,6 +41,14 @@ impl<'a> EqModPowerOfTwo<SignedLimb> for &'a Integer {
     }
 }
 
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> EqModPowerOfTwo<i32> for &'a Integer {
+    #[inline]
+    fn eq_mod_power_of_two(self, other: i32, pow: u64) -> bool {
+        self.eq_mod_power_of_two(SignedLimb::from(other), pow)
+    }
+}
+
 impl<'a> EqModPowerOfTwo<&'a Integer> for SignedLimb {
     /// Returns whether this `SignedLimb` is equivalent to a `Integer` mod two to the power of
     /// `pow`; that is, whether the `pow` least-significant twos-complement bits of the `SignedLimb`
@@ -68,7 +76,16 @@ impl<'a> EqModPowerOfTwo<&'a Integer> for SignedLimb {
     ///     assert_eq!((-0b10011).eq_mod_power_of_two(&Integer::from(0b10101), 4), false);
     /// }
     /// ```
+    #[inline]
     fn eq_mod_power_of_two(self, other: &'a Integer, pow: u64) -> bool {
         other.eq_mod_power_of_two(self, pow)
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> EqModPowerOfTwo<&'a Integer> for i32 {
+    #[inline]
+    fn eq_mod_power_of_two(self, other: &'a Integer, pow: u64) -> bool {
+        SignedLimb::from(self).eq_mod_power_of_two(other, pow)
     }
 }

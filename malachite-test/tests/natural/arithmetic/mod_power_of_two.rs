@@ -251,7 +251,7 @@ fn mod_power_of_two_and_rem_power_of_two_properties() {
         assert!(result < (Natural::ONE << u));
         assert_eq!(result == 0, n.divisible_by_power_of_two(u));
         assert_eq!((&result).mod_power_of_two(u), result);
-        assert_eq!(n & ((Natural::ONE << u) - 1), result);
+        assert_eq!(n & ((Natural::ONE << u) - 1 as Limb), result);
     });
 
     test_properties(

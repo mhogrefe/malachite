@@ -54,6 +54,14 @@ impl<'a> EqMod<SignedLimb, SignedLimb> for &'a Integer {
     }
 }
 
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> EqMod<i32, i32> for &'a Integer {
+    #[inline]
+    fn eq_mod(self, other: i32, modulus: i32) -> bool {
+        self.eq_mod(SignedLimb::from(other), SignedLimb::from(modulus))
+    }
+}
+
 impl<'a> EqMod<&'a Integer, SignedLimb> for SignedLimb {
     /// Returns whether this `SignedLimb` is equivalent to an `Integer` mod a `SignedLimb`
     /// `modulus`; that is, whether other - `self` is a multiple of `modulus`. Two numbers are equal
@@ -94,8 +102,17 @@ impl<'a> EqMod<&'a Integer, SignedLimb> for SignedLimb {
     ///     assert_eq!((-322).eq_mod(&Integer::from_str("-987654321").unwrap(), -1_000i32), false);
     /// }
     /// ```
+    #[inline]
     fn eq_mod(self, other: &'a Integer, modulus: SignedLimb) -> bool {
         other.eq_mod(self, modulus)
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> EqMod<&'a Integer, i32> for i32 {
+    #[inline]
+    fn eq_mod(self, other: &'a Integer, modulus: i32) -> bool {
+        SignedLimb::from(self).eq_mod(other, SignedLimb::from(modulus))
     }
 }
 
@@ -148,6 +165,14 @@ impl<'a> EqMod<SignedLimb, &'a Integer> for SignedLimb {
                 .abs
                 .limb_eq_neg_limb_mod_natural(self.unsigned_abs(), other.unsigned_abs())
         }
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> EqMod<i32, &'a Integer> for i32 {
+    #[inline]
+    fn eq_mod(self, other: i32, modulus: &'a Integer) -> bool {
+        SignedLimb::from(self).eq_mod(SignedLimb::from(other), modulus)
     }
 }
 

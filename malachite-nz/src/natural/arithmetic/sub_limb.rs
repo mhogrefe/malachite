@@ -159,6 +159,16 @@ impl Sub<Limb> for Natural {
     }
 }
 
+#[cfg(feature = "64_bit_limbs")]
+impl Sub<u32> for Natural {
+    type Output = Natural;
+
+    #[inline]
+    fn sub(self, other: u32) -> Natural {
+        self - Limb::from(other)
+    }
+}
+
 /// Subtracts a `Limb` from a `Natural`, taking the `Natural` by reference. Panics if the `Limb` is
 /// greater than the `Natural`.
 ///
@@ -187,6 +197,16 @@ impl<'a> Sub<Limb> for &'a Natural {
         self.checked_sub(other).unwrap_or_else(|| {
             sub_panic(self, other);
         })
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> Sub<u32> for &'a Natural {
+    type Output = Natural;
+
+    #[inline]
+    fn sub(self, other: u32) -> Natural {
+        self - Limb::from(other)
     }
 }
 

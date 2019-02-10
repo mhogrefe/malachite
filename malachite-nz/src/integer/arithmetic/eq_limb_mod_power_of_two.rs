@@ -5,8 +5,6 @@ use natural::arithmetic::divisible_by_power_of_two::limbs_divisible_by_power_of_
 use natural::Natural::{self, Large, Small};
 use platform::Limb;
 
-//TODO continue 32-bit impls for 64-bit build
-
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns
 /// whether the negative of the `Natural` is equivalent to a limb mod two to the power of `pow`;
 /// that is, whether the `pow` least-significant bits of the negative of the `Natural` and the limb
@@ -82,6 +80,14 @@ impl<'a> EqModPowerOfTwo<Limb> for &'a Integer {
     }
 }
 
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> EqModPowerOfTwo<u32> for &'a Integer {
+    #[inline]
+    fn eq_mod_power_of_two(self, other: u32, pow: u64) -> bool {
+        self.eq_mod_power_of_two(Limb::from(other), pow)
+    }
+}
+
 impl<'a> EqModPowerOfTwo<&'a Integer> for Limb {
     /// Returns whether this `Limb` is equivalent to a `Integer` mod two to the power of `pow`; that
     /// is, whether the `pow` least-significant twos-complement bits of the `Limb` and the `Integer`
@@ -107,8 +113,17 @@ impl<'a> EqModPowerOfTwo<&'a Integer> for Limb {
     ///     assert_eq!(0b10101u32.eq_mod_power_of_two(&Integer::from(-0b10011), 4), false);
     /// }
     /// ```
+    #[inline]
     fn eq_mod_power_of_two(self, other: &'a Integer, pow: u64) -> bool {
         other.eq_mod_power_of_two(self, pow)
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> EqModPowerOfTwo<&'a Integer> for u32 {
+    #[inline]
+    fn eq_mod_power_of_two(self, other: &'a Integer, pow: u64) -> bool {
+        Limb::from(self).eq_mod_power_of_two(other, pow)
     }
 }
 

@@ -1,5 +1,6 @@
 use integer::Integer;
 use malachite_base::num::NotAssign;
+use platform::Limb;
 use std::ops::Not;
 
 /// Returns the bitwise complement of an `Integer`, as if it were represented in two's complement,
@@ -74,7 +75,7 @@ impl<'a> Not for &'a Integer {
                 ref abs,
             } => Integer {
                 sign: true,
-                abs: abs - 1,
+                abs: abs - 1 as Limb,
             },
         }
     }
