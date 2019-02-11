@@ -1,8 +1,7 @@
 use malachite_base::limbs::limbs_test_zero;
 use malachite_base::misc::Max;
 use malachite_base::num::{
-    DivisibleByPowerOfTwo, Parity, PrimitiveInteger, SplitInHalf, WrappingAddAssign,
-    WrappingSubAssign,
+    DivisibleByPowerOfTwo, Parity, PrimitiveInteger, WrappingAddAssign, WrappingSubAssign,
 };
 use natural::arithmetic::add::{
     limbs_add_same_length_to_out, limbs_slice_add_greater_in_place_left,
@@ -13,7 +12,8 @@ use natural::arithmetic::add_mul_limb::mpn_addmul_1;
 use natural::arithmetic::div_exact_limb::{
     limbs_div_exact_3_in_place, limbs_div_exact_limb_in_place,
 };
-use natural::arithmetic::mul::poly_eval::do_mpn_addlsh_n;
+use natural::arithmetic::div_limb::limbs_div_divisor_of_limb_max_with_carry_in_place;
+use natural::arithmetic::mul::poly_eval::shl_and_add_same_length_in_place_left;
 use natural::arithmetic::shl_u::limbs_shl_to_out;
 use natural::arithmetic::shr_u::limbs_slice_shr_in_place;
 use natural::arithmetic::sub::{
@@ -23,7 +23,7 @@ use natural::arithmetic::sub::{
 };
 use natural::arithmetic::sub_limb::limbs_sub_limb_in_place;
 use natural::arithmetic::sub_mul_limb::mpn_submul_1;
-use platform::{DoubleLimb, Limb};
+use platform::Limb;
 use std::mem::swap;
 
 /// This is mpn_toom_interpolate_5pts in mpn/generic/toom_interpolate_5pts.c.
@@ -762,46 +762,8 @@ pub(crate) fn _limbs_mul_toom_interpolate_8_points(
     }
 }
 
-fn umul_ppmm(ph: &mut Limb, pl: &mut Limb, m1: Limb, m2: Limb) {
-    let (hi, lo) = (DoubleLimb::from(m1) * DoubleLimb::from(m2)).split_in_half();
-    *ph = hi;
-    *pl = lo;
-}
-
-// This is mpn_bdiv_dbm1c from gmp-impl.h.
-pub fn mpn_bdiv_dbm1c(qp: &mut [Limb], ap: &[Limb], bd: Limb, mut h: Limb) -> Limb {
-    let n = ap.len();
-    for i in 0..n {
-        let a = ap[i];
-        let mut p1 = 0;
-        let mut p0 = 0;
-        umul_ppmm(&mut p1, &mut p0, a, bd);
-        let cy = if h < p0 { 1 } else { 0 };
-        h = h.wrapping_sub(p0);
-        qp[i] = h;
-        h = h.wrapping_sub(p1).wrapping_sub(cy);
-    }
-    h
-}
-
-// This is mpn_bdiv_dbm1c from gmp-impl.h.
-fn mpn_bdiv_dbm1c_in_place(qp: &mut [Limb], bd: Limb, mut h: Limb) -> Limb {
-    let n = qp.len();
-    for i in 0..n {
-        let a = qp[i];
-        let mut p1 = 0;
-        let mut p0 = 0;
-        umul_ppmm(&mut p1, &mut p0, a, bd);
-        let cy = if h < p0 { 1 } else { 0 };
-        h = h.wrapping_sub(p0);
-        qp[i] = h;
-        h = h.wrapping_sub(p1).wrapping_sub(cy);
-    }
-    h
-}
-
-fn mpn_divexact_by255_in_place(dst: &mut [Limb]) -> Limb {
-    255 & mpn_bdiv_dbm1c_in_place(dst, Limb::MAX / 255, 0)
+fn limbs_div_255_in_place(xs: &mut [Limb]) {
+    limbs_div_divisor_of_limb_max_with_carry_in_place(xs, Limb::MAX / 255, 0);
 }
 
 //TODO tune
@@ -810,274 +772,234 @@ const AORSMUL_FASTER_2AORSLSH: bool = false;
 const AORSMUL_FASTER_3AORSLSH: bool = false;
 const AORSMUL_FASTER_AORS_2AORSLSH: bool = false;
 
-/// Interpolation for Toom-6.5 (or Toom-6), using the evaluation
-/// points: infinity(6.5 only), +-4, +-2, +-1, +-1/4, +-1/2, 0. More precisely,
-/// we want to compute f(2^(GMP_NUMB_BITS * n)) for a polynomial f of
-/// degree 11 (or 10), given the 12 (rsp. 11) values:
+/// Interpolation for Toom-6.5 (or Toom-6), using the evaluation points:
+/// Infinity(6.5 only), +-4, +-2, +-1, +-1/4, +-1/2, 0.
 ///
-///   r0 = limit at infinity of f(x) / x^7,
+/// More precisely, we want to compute f(2 ^ (`Limb::WIDTH` * n)) for a polynomial f of degree 11
+/// (or 10), given the 12 (resp. 11) values:
+///
+///   r0 = limit at infinity of f(x) / x ^ 7,
 ///   r1 = f(4),f(-4),
 ///   r2 = f(2),f(-2),
 ///   r3 = f(1),f(-1),
-///   r4 = f(1/4),f(-1/4),
-///   r5 = f(1/2),f(-1/2),
+///   r4 = f(1 / 4),f(-1 / 4),
+///   r5 = f(1 / 2),f(-1 / 2),
 ///   r6 = f(0).
 ///
 /// All couples of the form f(n),f(-n) must be already mixed with
-/// toom_couple_handling(f(n),...,f(-n),...)
+/// toom_couple_handling(f(n), ..., f(-n),...)
 ///
-/// The result is stored in {pp, spt + 7*n (or 6*n)}.
-/// At entry, r6 is stored at {pp, 2n},
-/// r4 is stored at {pp + 3n, 3n + 1}.
-/// r2 is stored at {pp + 7n, 3n + 1}.
-/// r0 is stored at {pp +11n, spt}.
+/// The result is stored in {out, s_plus_t + 7 * n (or 6 * n)}.
+/// At entry, r6 is stored at {out, 2 * n},
+/// r4 is stored at {out +  3 * n, 3 * n + 1}.
+/// r2 is stored at {out +  7 * n, 3 * n + 1}.
+/// r0 is stored at {out + 11 * n, s_plus_t}.
 ///
-/// The other values are 3n+1 limbs each (with most significant limbs small).
+/// The other values are 3 * n + 1 limbs each (with most significant limbs small).
 ///
-/// Negative intermediate results are stored two-complemented.
-/// Inputs are destroyed.
+/// Negative intermediate results are stored two-complemented. Inputs are destroyed.
 ///
 /// This is mpn_toom_interpolate_12pts from mpn/generic/mpn_toom_interpolate_12pts.c.
 pub fn _limbs_mul_toom_interpolate_12_points<'a>(
-    pp: &mut [Limb],
+    out: &mut [Limb],
     mut r1: &'a mut [Limb],
     r3: &mut [Limb],
     mut r5: &'a mut [Limb],
     n: usize,
-    spt: usize,
+    s_plus_t: usize,
     half: bool,
-    mut wsi: &'a mut [Limb],
+    mut scratch: &'a mut [Limb],
 ) {
-    let n3 = 3 * n;
-    let n3p1 = n3 + 1;
+    let limit = 3 * n + 1;
+    assert_eq!(r1.len(), limit);
+    assert_eq!(r3.len(), limit);
+    assert_eq!(r5.len(), limit);
     {
-        let (pp_lo, remainder) = pp.split_at_mut(3 * n);
-        let pp_lo = &mut pp_lo[..2 * n];
+        let (out_lo, remainder) = out.split_at_mut(3 * n);
+        let out_lo = &mut out_lo[..2 * n];
         let (r4, r2) = remainder.split_at_mut(4 * n);
-
+        let r4 = &mut r4[..limit];
         // Interpolation
         if half {
             let (r2, r0) = r2.split_at_mut(4 * n);
-            let cy = if limbs_sub_same_length_in_place_left(&mut r3[..spt], &r0[..spt]) {
-                1
-            } else {
-                0
-            };
-            assert!(!limbs_sub_limb_in_place(&mut r3[spt..n3p1], cy));
+            let r0 = &mut r0[..s_plus_t];
+            let (r3_lo, r3_hi) = r3.split_at_mut(s_plus_t);
+            if limbs_sub_same_length_in_place_left(r3_lo, r0) {
+                assert!(!limbs_sub_limb_in_place(r3_hi, 1));
+            }
 
-            let cy = shl_and_sub_same_length(r2, &r0[..spt], 10, wsi);
-            assert!(!limbs_sub_limb_in_place(&mut r2[spt..n3p1], cy));
-            shl_and_sub(&mut r5[..n3p1], &r0[..spt], 2, wsi);
+            let carry = shl_and_sub_same_length(r2, r0, 10, scratch);
+            assert!(!limbs_sub_limb_in_place(&mut r2[s_plus_t..limit], carry));
+            shl_and_sub(r5, r0, 2, scratch);
 
-            let cy = shl_and_sub_same_length(r1, &r0[..spt], 20, wsi);
-            assert!(!limbs_sub_limb_in_place(&mut r1[spt..n3p1], cy));
-            shl_and_sub(&mut r4[..n3p1], &r0[..spt], 4, wsi);
+            let carry = shl_and_sub_same_length(r1, r0, 20, scratch);
+            assert!(!limbs_sub_limb_in_place(&mut r1[s_plus_t..], carry));
+            shl_and_sub(r4, r0, 4, scratch);
         };
+        let r2 = &mut r2[..limit];
+        let carry = shl_and_sub_same_length(&mut r4[n..], out_lo, 20, scratch);
+        r4.last_mut().unwrap().wrapping_sub_assign(carry);
+        shl_and_sub(&mut r1[n..], out_lo, 4, scratch);
 
-        let carry = shl_and_sub_same_length(&mut r4[n..], pp_lo, 20, wsi);
-        r4[n3].wrapping_sub_assign(carry);
-        shl_and_sub(&mut r1[n..3 * n + 1], pp_lo, 4, wsi);
+        assert!(!limbs_add_same_length_to_out(scratch, r1, r4));
+        limbs_sub_same_length_in_place_left(r4, r1); // can be negative
+        swap(&mut r1, &mut scratch);
+        let r1 = &mut r1[..limit];
 
-        assert!(!limbs_add_same_length_to_out(wsi, &r1[..n3p1], &r4[..n3p1]));
-        limbs_sub_same_length_in_place_left(&mut r4[..n3p1], &r1[..n3p1]); // can be negative
-        swap(&mut r1, &mut wsi);
+        let carry = shl_and_sub_same_length(&mut r5[n..], out_lo, 10, scratch);
+        r5.last_mut().unwrap().wrapping_sub_assign(carry);
+        shl_and_sub(&mut r2[n..], out_lo, 2, scratch);
 
-        let carry = shl_and_sub_same_length(&mut r5[n..], pp_lo, 10, wsi);
-        r5[n3].wrapping_sub_assign(carry);
-        shl_and_sub(&mut r2[n..3 * n + 1], pp_lo, 2, wsi);
-
-        limbs_sub_same_length_to_out(wsi, &r5[..n3p1], &r2[..n3p1]); // can be negative
-        assert!(!limbs_slice_add_same_length_in_place_left(
-            &mut r2[..n3p1],
-            &r5[..n3p1]
-        ));
-        swap(&mut r5, &mut wsi);
-
-        let carry = if limbs_sub_same_length_in_place_left(&mut r3[n..3 * n], pp_lo) {
-            1
-        } else {
-            0
-        };
-        r3[n3].wrapping_sub_assign(carry);
+        limbs_sub_same_length_to_out(scratch, r5, r2); // can be negative
+        assert!(!limbs_slice_add_same_length_in_place_left(r2, r5));
+        swap(&mut r5, &mut scratch);
+        {
+            let (r3_last, r3_init) = r3.split_last_mut().unwrap();
+            if limbs_sub_same_length_in_place_left(&mut r3_init[n..], out_lo) {
+                r3_last.wrapping_sub_assign(1);
+            }
+        }
         if AORSMUL_FASTER_AORS_AORSLSH {
-            mpn_submul_1(r4, &r5[..n3p1], 257); // can be negative
+            mpn_submul_1(r4, r5, 257); // can be negative
         } else {
-            limbs_sub_same_length_in_place_left(&mut r4[..n3p1], &r5[..n3p1]); // can be negative
-            shl_and_sub_same_length(r4, &r5[..n3p1], 8, wsi); // can be negative
+            limbs_sub_same_length_in_place_left(r4, r5); // can be negative
+            shl_and_sub_same_length(r4, r5, 8, scratch); // can be negative
         }
 
-        // A division by 2835x4 follows. Warning: the operand can be negative!
-        limbs_div_exact_limb_in_place(&mut r4[..n3p1], 2_835 << 2);
-        if (r4[n3] & (Limb::MAX << (Limb::WIDTH - 3))) != 0 {
-            r4[n3] |= Limb::MAX << (Limb::WIDTH - 2);
+        // A division by 2835 * 4 follows. Warning: the operand can be negative!
+        limbs_div_exact_limb_in_place(r4, 2_835 << 2);
+        {
+            let r4_last = r4.last_mut().unwrap();
+            if (*r4_last & (Limb::MAX << (Limb::WIDTH - 3))) != 0 {
+                *r4_last |= Limb::MAX << (Limb::WIDTH - 2);
+            }
         }
 
         if AORSMUL_FASTER_2AORSLSH {
-            mpn_addmul_1(r5, &r4[..n3p1], 60); // can be negative
+            mpn_addmul_1(r5, r4, 60); // can be negative
         } else {
-            shl_and_sub_same_length(r5, &r4[..n3p1], 2, wsi); // can be negative
-            do_mpn_addlsh_n(r5, &r4[..n3p1], 6, wsi); // can give a carry
+            shl_and_sub_same_length(r5, r4, 2, scratch); // can be negative
+            shl_and_add_same_length_in_place_left(r5, r4, 6, scratch); // can give a carry
         }
-        mpn_divexact_by255_in_place(&mut r5[..n3p1]);
+        limbs_div_255_in_place(r5);
 
-        assert_eq!(shl_and_sub_same_length(r2, &r3[..n3p1], 5, wsi), 0);
+        assert_eq!(shl_and_sub_same_length(r2, r3, 5, scratch), 0);
         if AORSMUL_FASTER_3AORSLSH {
-            assert_eq!(mpn_submul_1(r1, &r2[..n3p1], 100), 0);
+            assert_eq!(mpn_submul_1(r1, r2, 100), 0);
         } else {
-            assert_eq!(shl_and_sub_same_length(r1, &r2[..n3p1], 6, wsi), 0);
-            assert_eq!(shl_and_sub_same_length(r1, &r2[..n3p1], 5, wsi), 0);
-            assert_eq!(shl_and_sub_same_length(r1, &r2[..n3p1], 2, wsi), 0);
+            assert_eq!(shl_and_sub_same_length(r1, r2, 6, scratch), 0);
+            assert_eq!(shl_and_sub_same_length(r1, r2, 5, scratch), 0);
+            assert_eq!(shl_and_sub_same_length(r1, r2, 2, scratch), 0);
         }
-        assert_eq!(shl_and_sub_same_length(r1, &r3[..n3p1], 9, wsi), 0);
-        limbs_div_exact_limb_in_place(&mut r1[..n3p1], 42_525);
+        assert_eq!(shl_and_sub_same_length(r1, r3, 9, scratch), 0);
+        limbs_div_exact_limb_in_place(r1, 42_525);
 
         if AORSMUL_FASTER_AORS_2AORSLSH {
-            assert_eq!(mpn_submul_1(r2, &r1[..n3p1], 225), 0);
+            assert_eq!(mpn_submul_1(r2, r1, 225), 0);
         } else {
-            assert!(!limbs_sub_same_length_in_place_left(
-                &mut r2[..n3p1],
-                &r1[..n3p1]
-            ));
-            assert_eq!(do_mpn_addlsh_n(r2, &r1[..n3p1], 5, wsi), 0);
-            assert_eq!(shl_and_sub_same_length(r2, &r1[..n3p1], 8, wsi), 0);
+            assert!(!limbs_sub_same_length_in_place_left(r2, r1));
+            assert_eq!(shl_and_add_same_length_in_place_left(r2, r1, 5, scratch), 0);
+            assert_eq!(shl_and_sub_same_length(r2, r1, 8, scratch), 0);
         }
-        limbs_div_exact_limb_in_place(&mut r2[..n3p1], 9 << 2);
+        limbs_div_exact_limb_in_place(r2, 9 << 2);
 
-        assert!(!limbs_sub_same_length_in_place_left(
-            &mut r3[..n3p1],
-            &r2[..n3p1]
-        ));
+        assert!(!limbs_sub_same_length_in_place_left(r3, r2));
 
-        limbs_sub_same_length_in_place_right(&r2[..n3p1], &mut r4[..n3p1]);
-        assert_eq!(limbs_slice_shr_in_place(&mut r4[..n3p1], 1), 0);
-        assert!(!limbs_sub_same_length_in_place_left(
-            &mut r2[..n3p1],
-            &r4[..n3p1]
-        ));
+        limbs_sub_same_length_in_place_right(r2, r4);
+        assert_eq!(limbs_slice_shr_in_place(r4, 1), 0);
+        assert!(!limbs_sub_same_length_in_place_left(r2, r4));
     }
+    let r1 = &mut r1[..limit];
 
-    limbs_slice_add_same_length_in_place_left(&mut r5[..n3p1], &r1[..n3p1]);
-    assert_eq!(limbs_slice_shr_in_place(&mut r5[..n3p1], 1), 0);
+    limbs_slice_add_same_length_in_place_left(r5, r1);
+    assert_eq!(limbs_slice_shr_in_place(r5, 1), 0);
 
     // Last interpolation steps...
-    assert!(!limbs_sub_same_length_in_place_left(
-        &mut r3[..n3p1],
-        &r1[..n3p1]
-    ));
-    assert!(!limbs_sub_same_length_in_place_left(
-        &mut r1[..n3p1],
-        &r5[..n3p1]
-    ));
+    assert!(!limbs_sub_same_length_in_place_left(r3, r1));
+    assert!(!limbs_sub_same_length_in_place_left(r1, r5));
     // ...could be mixed with recomposition
     // ||H-r5|M-r5|L-r5|   ||H-r1|M-r1|L-r1|
     //
     // Recomposition
     //
-    // pp[] prior to operations:
-    // |M r0|L r0|___||H r2|M r2|L r2|___||H r4|M r4|L r4|____|H_r6|L r6|pp
+    // out[] prior to operations:
+    // |M r0|L r0|___||H r2|M r2|L r2|___||H r4|M r4|L r4|____|H_r6|L r6|out
     //
-    // summation scheme for remaining operations:
-    // |__12|n_11|n_10|n__9|n__8|n__7|n__6|n__5|n__4|n__3|n__2|n___|n___|pp
-    // |M r0|L r0|___||H r2|M r2|L r2|___||H r4|M r4|L r4|____|H_r6|L r6|pp
+    // Summation scheme for remaining operations:
+    // |__12|n_11|n_10|n__9|n__8|n__7|n__6|n__5|n__4|n__3|n__2|n___|n___|out
+    // |M r0|L r0|___||H r2|M r2|L r2|___||H r4|M r4|L r4|____|H_r6|L r6|out
     // ||H r1|M r1|L r1|   ||H r3|M r3|L r3|   ||H_r5|M_r5|L_r5|
-    let mut cy = if limbs_slice_add_same_length_in_place_left(&mut pp[n..2 * n], &r5[..n]) {
-        1
-    } else {
-        0
-    };
-    cy = if limbs_add_limb_to_out(&mut pp[n << 1..], &r5[n..n << 1], cy) {
-        1
-    } else {
-        0
-    };
-    assert!(!limbs_slice_add_limb_in_place(
-        &mut r5[2 * n..3 * n + 1],
-        cy
-    ));
-    cy = r5[n3].wrapping_add(
-        if limbs_slice_add_same_length_in_place_left(&mut pp[n3..n3 + n], &r5[2 * n..3 * n]) {
-            1
+    {
+        split_into_chunks_mut!(out, n, [_unused, out_1, out_2, out_3], out_4);
+        split_into_chunks_mut!(r5, n, [r5_0, r5_1], r5_2);
+        if limbs_slice_add_same_length_in_place_left(out_1, r5_0) {
+            if limbs_add_limb_to_out(out_2, r5_1, 1) {
+                assert!(!limbs_slice_add_limb_in_place(r5_2, 1));
+            }
         } else {
-            0
-        },
-    );
-    assert!(!limbs_slice_add_limb_in_place(
-        &mut pp[n3 + n..n3 + 3 * n + 1],
-        cy
-    ));
-
-    let carry = if limbs_slice_add_same_length_in_place_left(&mut pp[5 * n..6 * n], &r3[..n]) {
-        1
-    } else {
-        0
-    };
-    pp[2 * n3].wrapping_add_assign(carry);
-    let x = pp[2 * n3];
-    cy = if limbs_add_limb_to_out(&mut pp[2 * n3..], &r3[n..2 * n], x) {
-        1
-    } else {
-        0
-    };
-    assert!(!limbs_slice_add_limb_in_place(
-        &mut r3[2 * n..3 * n + 1],
-        cy
-    ));
-    cy = r3[n3].wrapping_add(
-        if limbs_slice_add_same_length_in_place_left(&mut pp[7 * n..8 * n], &r3[2 * n..3 * n]) {
-            1
-        } else {
-            0
-        },
-    );
-    assert!(!limbs_slice_add_limb_in_place(
-        &mut pp[8 * n..10 * n + 1],
-        cy
-    ));
-
-    let carry = if limbs_slice_add_same_length_in_place_left(&mut pp[9 * n..10 * n], &r1[..n]) {
-        1
-    } else {
-        0
-    };
-    pp[10 * n].wrapping_add_assign(carry);
-    if half {
-        let x = pp[10 * n];
-        cy = if limbs_add_limb_to_out(&mut pp[10 * n..], &r1[n..2 * n], x) {
-            1
-        } else {
-            0
-        };
+            out_2.copy_from_slice(r5_1);
+        }
+        let (r5_last, r5_2) = r5_2.split_last_mut().unwrap();
+        let mut carry = *r5_last;
+        if limbs_slice_add_same_length_in_place_left(out_3, r5_2) {
+            carry.wrapping_add_assign(1);
+        }
         assert!(!limbs_slice_add_limb_in_place(
-            &mut r1[2 * n..3 * n + 1],
-            cy
+            &mut out_4[..2 * n + 1],
+            carry
         ));
-        if spt > n {
-            cy = r1[n3].wrapping_add(
-                if limbs_slice_add_same_length_in_place_left(
-                    &mut pp[11 * n..12 * n],
-                    &r1[2 * n..3 * n],
-                ) {
-                    1
-                } else {
-                    0
-                },
-            );
+    }
+    {
+        split_into_chunks_mut!(&mut out[5 * n..], n, [out_5, out_6, out_7], out_8);
+        split_into_chunks_mut!(r3, n, [r3_0, r3_1], r3_2);
+        if limbs_slice_add_same_length_in_place_left(out_5, r3_0) {
+            out_6[0].wrapping_add_assign(1);
+        }
+        let out_6_first = out_6[0];
+        if limbs_add_limb_to_out(out_6, r3_1, out_6_first) {
+            assert!(!limbs_slice_add_limb_in_place(r3_2, 1));
+        }
+        let (r3_last, r3_2) = r3_2.split_last_mut().unwrap();
+        let mut carry = *r3_last;
+        if limbs_slice_add_same_length_in_place_left(out_7, r3_2) {
+            carry.wrapping_add_assign(1);
+        }
+        assert!(!limbs_slice_add_limb_in_place(
+            &mut out_8[..2 * n + 1],
+            carry
+        ));
+    }
+    let (out_9, out_10) = out[9 * n..].split_at_mut(n);
+    let (r1_0, r1_1) = r1.split_at_mut(n);
+    if limbs_slice_add_same_length_in_place_left(out_9, r1_0) {
+        out_10[0].wrapping_add_assign(1);
+    }
+    if half {
+        let (out_10, out_11) = out_10.split_at_mut(n);
+        let (r1_1, r1_2) = r1_1.split_at_mut(n);
+        let out_10_first = out_10[0];
+        if limbs_add_limb_to_out(out_10, r1_1, out_10_first) {
+            assert!(!limbs_slice_add_limb_in_place(r1_2, 1));
+        }
+        if s_plus_t > n {
+            let (out_11, out_12) = out_11.split_at_mut(n);
+            let (r1_last, r1_2) = r1_2.split_last_mut().unwrap();
+            let mut carry = *r1_last;
+            if limbs_slice_add_same_length_in_place_left(out_11, &r1_2) {
+                carry.wrapping_add_assign(1);
+            }
             assert!(!limbs_slice_add_limb_in_place(
-                &mut pp[4 * n3..4 * n3 + spt - n],
-                cy
+                &mut out_12[..s_plus_t - n],
+                carry
             ));
         } else {
             assert!(!limbs_slice_add_same_length_in_place_left(
-                &mut pp[11 * n..11 * n + spt],
-                &r1[2 * n..2 * n + spt]
+                &mut out_11[..s_plus_t],
+                &r1_2[..s_plus_t]
             ));
         }
     } else {
-        let x = pp[10 * n];
-        assert!(!limbs_add_limb_to_out(
-            &mut pp[10 * n..],
-            &r1[n..n + spt],
-            x
-        ));
+        let x = out_10[0];
+        assert!(!limbs_add_limb_to_out(out_10, &r1_1[..s_plus_t], x));
     }
 }

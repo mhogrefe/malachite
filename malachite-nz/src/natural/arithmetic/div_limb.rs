@@ -10,6 +10,53 @@ use std::ops::{Div, DivAssign};
 // These functions are adapted from udiv_qrnnd_preinv, mpn_div_qr_1n_pi1, and mpn_div_qr_1 in GMP
 // 6.1.2.
 
+/// Divide an number by a divisor of B - 1, where B is the limb base.
+///
+/// This is mpn_bdiv_dbm1c from mpn.generic/bdiv_dbm1c.c.h.
+/// TODO test
+pub fn limbs_div_divisor_of_limb_max_with_carry_to_out(
+    out: &mut [Limb],
+    xs: &[Limb],
+    divisor: Limb,
+    mut carry: Limb,
+) -> Limb {
+    let divisor = DoubleLimb::from(divisor);
+    for (out_limb, &x) in out.iter_mut().zip(xs.iter()) {
+        let (hi, lo) = (DoubleLimb::from(x) * divisor).split_in_half();
+        let inner_carry = carry < lo;
+        carry.wrapping_sub_assign(lo);
+        *out_limb = carry;
+        carry.wrapping_sub_assign(hi);
+        if inner_carry {
+            carry.wrapping_sub_assign(1);
+        }
+    }
+    carry
+}
+
+/// Divide an number by a divisor of B - 1, where B is the limb base.
+///
+/// This is mpn_bdiv_dbm1c from mpn.generic/bdiv_dbm1c.c, where qp == ap.
+/// TODO test
+pub fn limbs_div_divisor_of_limb_max_with_carry_in_place(
+    xs: &mut [Limb],
+    divisor: Limb,
+    mut carry: Limb,
+) -> Limb {
+    let divisor = DoubleLimb::from(divisor);
+    for x in xs.iter_mut() {
+        let (hi, lo) = (DoubleLimb::from(*x) * divisor).split_in_half();
+        let inner_carry = carry < lo;
+        carry.wrapping_sub_assign(lo);
+        *x = carry;
+        carry.wrapping_sub_assign(hi);
+        if inner_carry {
+            carry.wrapping_sub_assign(1);
+        }
+    }
+    carry
+}
+
 fn div_by_preinversion(n_high: Limb, n_low: Limb, divisor: Limb, divisor_inverse: Limb) -> Limb {
     let (mut quotient_high, quotient_low) = (DoubleLimb::from(n_high)
         * DoubleLimb::from(divisor_inverse))

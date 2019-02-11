@@ -1,13 +1,15 @@
 use malachite_base::misc::Max;
 use malachite_base::num::{
     DivExact, DivExactAssign, ModPowerOfTwo, Parity, PrimitiveInteger, SplitInHalf,
-    WrappingSubAssign,
+};
+use natural::arithmetic::div_limb::{
+    limbs_div_divisor_of_limb_max_with_carry_in_place,
+    limbs_div_divisor_of_limb_max_with_carry_to_out,
 };
 use natural::Natural::{self, Large, Small};
 use platform::{DoubleLimb, Limb};
 
-// These functions are adapted from mpn_divexact_1, mpn_bdiv_dbm1c, and
-// mpn_divexact_by3c in GMP 6.1.2.
+// These functions are adapted from mpn_divexact_1 and mpn_divexact_by3c in GMP 6.1.2.
 
 const INVERT_LIMB_TABLE_LOG_SIZE: u64 = 7;
 
@@ -293,7 +295,7 @@ pub fn limbs_div_exact_3(limbs: &[Limb]) -> Vec<Limb> {
 /// where n = `limbs.len()`
 ///
 /// # Panics
-/// Panics if `out` is shorter than `in_limbs` or if `in_limbs` is empty.
+/// Panics if `out` is shorter than `xs` or if `xs` is empty.
 ///
 /// # Example
 /// ```
@@ -307,25 +309,12 @@ pub fn limbs_div_exact_3(limbs: &[Limb]) -> Vec<Limb> {
 /// limbs_div_exact_3_to_out(&mut out, &[0xffff_ffff, 0xffff_ffff]);
 /// assert_eq!(out, &[0x5555_5555, 0x5555_5555, 10, 10]);
 /// ```
-pub fn limbs_div_exact_3_to_out(out: &mut [Limb], in_limbs: &[Limb]) {
-    const MAX_OVER_3_U64: DoubleLimb = MAX_OVER_3 as DoubleLimb;
-    let len = in_limbs.len();
-    assert_ne!(len, 0);
-    assert!(out.len() >= len);
-    let last_index = len - 1;
-    let mut out_limb = 0;
-    for i in 0..last_index {
-        let (upper, lower) = (DoubleLimb::from(in_limbs[i]) * MAX_OVER_3_U64).split_in_half();
-        let carry = out_limb < lower;
-        out_limb.wrapping_sub_assign(lower);
-        out[i] = out_limb;
-        out_limb.wrapping_sub_assign(upper);
-        if carry {
-            out_limb.wrapping_sub_assign(1);
-        }
-    }
-    let lower = (DoubleLimb::from(in_limbs[last_index]) * MAX_OVER_3_U64).lower_half();
-    out[last_index] = out_limb.wrapping_sub(lower);
+pub fn limbs_div_exact_3_to_out(out: &mut [Limb], xs: &[Limb]) {
+    assert!(out.len() >= xs.len());
+    let (xs_last, xs_init) = xs.split_last().unwrap();
+    let out_limb = limbs_div_divisor_of_limb_max_with_carry_to_out(out, xs_init, MAX_OVER_3, 0);
+    let lower = (DoubleLimb::from(*xs_last) * DoubleLimb::from(MAX_OVER_3)).lower_half();
+    out[xs.len() - 1] = out_limb.wrapping_sub(lower);
 }
 
 // Benchmarks show that this algorithm is always worse than the default.
@@ -378,24 +367,11 @@ pub fn _limbs_div_exact_3_to_out_alt(out: &mut [Limb], in_limbs: &[Limb]) {
 /// limbs_div_exact_3_in_place(&mut limbs);
 /// assert_eq!(limbs, &[0x5555_5555, 0x5555_5555]);
 /// ```
-pub fn limbs_div_exact_3_in_place(limbs: &mut [Limb]) {
-    const MAX_OVER_3_U64: DoubleLimb = MAX_OVER_3 as DoubleLimb;
-    let len = limbs.len();
-    assert_ne!(len, 0);
-    let last_index = len - 1;
-    let mut out_limb = 0;
-    for limb in limbs[..last_index].iter_mut() {
-        let (upper, lower) = (DoubleLimb::from(*limb) * MAX_OVER_3_U64).split_in_half();
-        let carry = out_limb < lower;
-        out_limb.wrapping_sub_assign(lower);
-        *limb = out_limb;
-        out_limb.wrapping_sub_assign(upper);
-        if carry {
-            out_limb.wrapping_sub_assign(1);
-        }
-    }
-    let lower = (DoubleLimb::from(limbs[last_index]) * MAX_OVER_3_U64).lower_half();
-    limbs[last_index] = out_limb.wrapping_sub(lower);
+pub fn limbs_div_exact_3_in_place(xs: &mut [Limb]) {
+    let (xs_last, xs_init) = xs.split_last_mut().unwrap();
+    let out_limb = limbs_div_divisor_of_limb_max_with_carry_in_place(xs_init, MAX_OVER_3, 0);
+    let lower = (DoubleLimb::from(*xs_last) * DoubleLimb::from(MAX_OVER_3)).lower_half();
+    *xs_last = out_limb.wrapping_sub(lower);
 }
 
 // Benchmarks show that this algorithm is always worse than the default.

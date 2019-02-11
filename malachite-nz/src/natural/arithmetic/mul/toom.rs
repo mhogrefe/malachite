@@ -16,8 +16,8 @@ use natural::arithmetic::mul::poly_eval::{
     _limbs_mul_toom_evaluate_deg_3_poly_in_1_and_neg_1,
     _limbs_mul_toom_evaluate_deg_3_poly_in_2_and_neg_2,
     _limbs_mul_toom_evaluate_poly_in_1_and_neg_1, _limbs_mul_toom_evaluate_poly_in_2_and_neg_2,
-    _limbs_mul_toom_evaluate_poly_in_2_neg_pow_and_neg_2_neg_pow,
     _limbs_mul_toom_evaluate_poly_in_2_pow_and_neg_2_pow,
+    _limbs_mul_toom_evaluate_poly_in_2_pow_neg_and_neg_2_pow_neg,
 };
 use natural::arithmetic::mul::poly_interpolate::{
     _limbs_mul_toom_interpolate_12_points, _limbs_mul_toom_interpolate_5_points,
@@ -1276,14 +1276,14 @@ pub fn _limbs_mul_greater_to_out_toom_43(
 
     // Total scratch need is 6 * n + 4; we allocate one extra limb, because products will overwrite
     // 2 * n + 2 limbs.
-    let m = n + 1;
+    let limit = n + 1;
     let mut v_neg_1_neg = false;
     let mut v_neg_2_neg = false;
     {
-        split_into_chunks_mut!(out, m, [bs1, bsm2, bs2, as2], as1);
-        let as1 = &mut as1[..m]; // as1 length: n + 1
+        split_into_chunks_mut!(out, limit, [bs1, bsm2, bs2, as2], as1);
+        let as1 = &mut as1[..limit]; // as1 length: n + 1
         {
-            split_into_chunks_mut!(&mut scratch[2 * n + 2..], m, [bsm1, asm1], asm2);
+            split_into_chunks_mut!(&mut scratch[2 * n + 2..], limit, [bsm1, asm1], asm2);
 
             // Compute as2 and asm2.
             if _limbs_mul_toom_evaluate_deg_3_poly_in_2_and_neg_2(as2, asm2, xs, n, asm1) {
@@ -1307,7 +1307,7 @@ pub fn _limbs_mul_greater_to_out_toom_43(
         }
         scratch[n] = carry;
 
-        split_into_chunks_mut!(scratch, m, [small_scratch, _unused, bsm1, asm1], asm2);
+        split_into_chunks_mut!(scratch, limit, [small_scratch, _unused, bsm1, asm1], asm2);
         limbs_add_same_length_to_out(bs2, small_scratch, bsm1);
         if limbs_cmp_same_length(small_scratch, bsm1) == Ordering::Less {
             limbs_sub_same_length_to_out(bsm2, bsm1, small_scratch);
@@ -1350,27 +1350,27 @@ pub fn _limbs_mul_greater_to_out_toom_43(
     }
 
     {
-        let (v_neg_1, remainder) = scratch.split_at_mut(2 * m); // v_neg_1 length: 2 * n + 2
-        let (bsm1, asm1) = remainder.split_at_mut(m); // bsm1 length: m
-                                                      // v_neg_1, 2 * n + 1 limbs
-        limbs_mul_same_length_to_out(v_neg_1, &asm1[..m], bsm1); // W4
+        let (v_neg_1, remainder) = scratch.split_at_mut(2 * limit); // v_neg_1 length: 2 * n + 2
+        let (bsm1, asm1) = remainder.split_at_mut(limit); // bsm1 length: limit
+                                                          // v_neg_1, 2 * n + 1 limbs
+        limbs_mul_same_length_to_out(v_neg_1, &asm1[..limit], bsm1); // W4
     }
     {
         // v_neg_2 length: 2 * n + 3
         let (v_neg_2, asm2) = scratch[2 * n + 1..].split_at_mut(2 * n + 3);
         // v_neg_2, 2 * n + 1 limbs
-        limbs_mul_same_length_to_out(v_neg_2, &asm2[..m], &out[m..2 * m]); // W2
+        limbs_mul_same_length_to_out(v_neg_2, &asm2[..limit], &out[limit..2 * limit]); // W2
     }
     {
-        let (bs2, as2) = out[2 * m..].split_at_mut(m); // bs2 length: n + 1
-                                                       // v_neg_2, 2 * n + 1 limbs
-        limbs_mul_same_length_to_out(&mut scratch[4 * n + 2..], &as2[..m], bs2); // W1
+        let (bs2, as2) = out[2 * limit..].split_at_mut(limit); // bs2 length: n + 1
+                                                               // v_neg_2, 2 * n + 1 limbs
+        limbs_mul_same_length_to_out(&mut scratch[4 * n + 2..], &as2[..limit], bs2); // W1
     }
     {
         let (bs1, remainder) = out.split_at_mut(2 * n); // bs1 length: 2 * n
         let (v_1, as1) = remainder.split_at_mut(2 * n + 4); // v_1 length: 2 * n + 4
                                                             // v_1, 2 * n + 1 limbs
-        limbs_mul_same_length_to_out(v_1, &as1[..m], &bs1[..m]); // W3
+        limbs_mul_same_length_to_out(v_1, &as1[..limit], &bs1[..limit]); // W3
     }
     {
         let v_inf = &mut out[5 * n..];
@@ -1489,7 +1489,7 @@ pub fn _limbs_mul_greater_to_out_toom_44(
     assert!(xs_len >= ys_len);
 
     let n = (xs_len + 3) >> 2;
-    let m = 2 * n + 1;
+    let limit = 2 * n + 1;
     split_into_chunks!(xs, n, s, [xs_0, xs_1, xs_2], xs_3);
     split_into_chunks!(ys, n, t, [ys_0, ys_1, ys_2], ys_3);
 
@@ -1540,7 +1540,7 @@ pub fn _limbs_mul_greater_to_out_toom_44(
         }
         {
             // v_neg_2 length: 6 * n + 4
-            _limbs_mul_same_length_to_out_toom_44_recursive(&mut scratch[m..], amx, bmx);
+            _limbs_mul_same_length_to_out_toom_44_recursive(&mut scratch[limit..], amx, bmx);
 
             // Compute apx = 8 * xs_0 + 4 * xs_1 + 2 * xs_2 + xs_3 =
             // (((2 * xs_0 + xs_1) * 2 + xs_2) * 2 + xs_3
@@ -1581,7 +1581,7 @@ pub fn _limbs_mul_greater_to_out_toom_44(
         }
         {
             // v_half length: 4 * n + 3
-            let (v_half, scratch2) = scratch[2 * m..].split_at_mut(4 * n + 3);
+            let (v_half, scratch2) = scratch[2 * limit..].split_at_mut(4 * n + 3);
 
             // v_half, 2 * n + 1 limbs
             _limbs_mul_same_length_to_out_toom_44_recursive(v_half, apx, bpx);
@@ -1607,11 +1607,11 @@ pub fn _limbs_mul_greater_to_out_toom_44(
             }
         }
         // v_neg_1, 2 * n + 1 limbs
-        _limbs_mul_same_length_to_out_toom_44_recursive(&mut scratch[3 * m..], amx, bmx);
+        _limbs_mul_same_length_to_out_toom_44_recursive(&mut scratch[3 * limit..], amx, bmx);
     }
     {
         let (apx, remainder) = out.split_at_mut(2 * n); // apx length: 2 * n
-        let (v_1, bpx) = remainder.split_at_mut(m + 1); // v_1 length: m + 1
+        let (v_1, bpx) = remainder.split_at_mut(limit + 1); // v_1 length: limit + 1
 
         // Clobbers amx, bmx.
         // v_1, 2 * n + 1 limbs
@@ -1628,9 +1628,9 @@ pub fn _limbs_mul_greater_to_out_toom_44(
             _limbs_mul_same_length_to_out_toom_44_recursive(v_inf, xs_3, ys_3);
         }
     }
-    split_into_chunks_mut!(scratch, m, [v_2, v_neg_2, v_half], remainder);
-    let (v_neg_1, scratch2) = remainder.split_at_mut(m + 1);
-    let v_neg_1 = &mut v_neg_1[..m];
+    split_into_chunks_mut!(scratch, limit, [v_2, v_neg_2, v_half], remainder);
+    let (v_neg_1, scratch2) = remainder.split_at_mut(limit + 1);
+    let v_neg_1 = &mut v_neg_1[..limit];
     _limbs_mul_toom_interpolate_7_points(
         out,
         n,
@@ -1807,15 +1807,8 @@ pub fn _limbs_mul_greater_to_out_toom_52(
             }
 
             // Compute as1 and asm1.
-            if _limbs_mul_toom_evaluate_poly_in_1_and_neg_1(
-                as1,
-                asm1,
-                4,
-                xs,
-                n,
-                s,
-                &mut v_neg_1[..m],
-            ) {
+            if _limbs_mul_toom_evaluate_poly_in_1_and_neg_1(as1, asm1, 4, xs, n, &mut v_neg_1[..m])
+            {
                 v_neg_1_neg.not_assign();
             }
 
@@ -1967,7 +1960,7 @@ pub fn _limbs_mul_greater_to_out_toom_53(
     {
         let out_lo = &mut out[..n + 1];
         // Compute as1 and asm1.
-        v_neg_1_neg = _limbs_mul_toom_evaluate_poly_in_1_and_neg_1(as1, asm1, 4, xs, n, s, out_lo);
+        v_neg_1_neg = _limbs_mul_toom_evaluate_poly_in_1_and_neg_1(as1, asm1, 4, xs, n, out_lo);
 
         // Compute as2 and asm2.
         v_neg_2_neg = _limbs_mul_toom_evaluate_poly_in_2_and_neg_2(as2, asm2, 4, xs, n, out_lo);
@@ -2313,7 +2306,7 @@ pub fn _limbs_mul_greater_to_out_toom_54(
 
         // 1, -1
         let neg_1_sign =
-            _limbs_mul_toom_evaluate_poly_in_1_and_neg_1(v2, v0, 4, xs, n, s, &mut out_lo[..n + 1])
+            _limbs_mul_toom_evaluate_poly_in_1_and_neg_1(v2, v0, 4, xs, n, &mut out_lo[..n + 1])
                 != _limbs_mul_toom_evaluate_deg_3_poly_in_1_and_neg_1(
                     v3,
                     v1,
@@ -2450,11 +2443,11 @@ pub fn _limbs_mul_greater_to_out_toom_62(
     assert!(0 < s && s <= n);
     assert!(0 < t && t <= n);
 
-    let m = n + 1;
+    let limit = n + 1;
     let mut scratch2 = vec![0; 10 * n + 9];
     split_into_chunks_mut!(
         scratch2,
-        m,
+        limit,
         [as1, asm1, as2, asm2, ash, bs1, bs2, bsm2, bsh],
         bsm1
     );
@@ -2463,8 +2456,8 @@ pub fn _limbs_mul_greater_to_out_toom_62(
     let v_neg_1_neg_a;
     let v_neg_2_neg_a;
     {
-        let out = &mut out[..m];
-        v_neg_1_neg_a = _limbs_mul_toom_evaluate_poly_in_1_and_neg_1(as1, asm1, 5, xs, n, s, out);
+        let out = &mut out[..limit];
+        v_neg_1_neg_a = _limbs_mul_toom_evaluate_poly_in_1_and_neg_1(as1, asm1, 5, xs, n, out);
 
         // Compute as2 and asm2.
         v_neg_2_neg_a = _limbs_mul_toom_evaluate_poly_in_2_and_neg_2(as2, asm2, 5, xs, n, out);
@@ -2815,7 +2808,7 @@ pub fn _limbs_mul_greater_to_out_toom_63(
 
         // $pm1$
         v_neg_2_neg =
-            _limbs_mul_toom_evaluate_poly_in_1_and_neg_1(v2, v0, 5, xs, n, s, &mut r8[..n + 1]);
+            _limbs_mul_toom_evaluate_poly_in_1_and_neg_1(v2, v0, 5, xs, n, &mut r8[..n + 1]);
         // Compute bs1 and bsm1. Code taken from toom33
         let scratch2_lo = &mut scratch2[..n];
         {
@@ -3223,14 +3216,26 @@ pub fn _limbs_mul_greater_to_out_toom_6h(
     {
         let (pp_lo, remainder) = pp.split_at_mut(3 * n);
         let (r4, remainder) = remainder.split_at_mut(4 * n);
-        split_into_chunks_mut!(remainder, n + 1, [v0, v1], v2);
+        split_into_chunks_mut!(remainder, n + 1, [v0, v1, v2], _unused);
         let (v3, wse) = wsi.split_at_mut(n + 1);
         // Evaluation and recursive calls
         // $pm1/2$
-        let sign = _limbs_mul_toom_evaluate_poly_in_2_neg_pow_and_neg_2_neg_pow(
-            v2, v0, p, ap, n, s, 1, pp_lo,
-        ) ^ _limbs_mul_toom_evaluate_poly_in_2_neg_pow_and_neg_2_neg_pow(
-            v3, v1, q, bp, n, t, 1, pp_lo,
+        let sign = _limbs_mul_toom_evaluate_poly_in_2_pow_neg_and_neg_2_pow_neg(
+            v2,
+            v0,
+            p,
+            ap,
+            n,
+            1,
+            &mut pp_lo[..n + 1],
+        ) ^ _limbs_mul_toom_evaluate_poly_in_2_pow_neg_and_neg_2_pow_neg(
+            v3,
+            v1,
+            q,
+            bp,
+            n,
+            1,
+            &mut pp_lo[..n + 1],
         );
         // A(-1/2)*B(-1/2)*2^.
         // A(+1/2)*B(+1/2)*2^.
@@ -3254,7 +3259,7 @@ pub fn _limbs_mul_greater_to_out_toom_6h(
 
         // $pm1$
         let mut sign =
-            _limbs_mul_toom_evaluate_poly_in_1_and_neg_1(v2, v0, p, ap, n, s, &mut pp_lo[..n + 1]);
+            _limbs_mul_toom_evaluate_poly_in_1_and_neg_1(v2, v0, p, ap, n, &mut pp_lo[..n + 1]);
         if q == 3 {
             sign ^= _limbs_mul_toom_evaluate_deg_3_poly_in_1_and_neg_1(
                 v3,
@@ -3264,15 +3269,8 @@ pub fn _limbs_mul_greater_to_out_toom_6h(
                 &mut pp_lo[..n + 1],
             );
         } else {
-            sign ^= _limbs_mul_toom_evaluate_poly_in_1_and_neg_1(
-                v3,
-                v1,
-                q,
-                bp,
-                n,
-                t,
-                &mut pp_lo[..n + 1],
-            );
+            sign ^=
+                _limbs_mul_toom_evaluate_poly_in_1_and_neg_1(v3, v1, q, bp, n, &mut pp_lo[..n + 1]);
         }
         // A(-1)*B(-1)
         // A(1)*B(1)
@@ -3318,10 +3316,22 @@ pub fn _limbs_mul_greater_to_out_toom_6h(
         _limbs_toom_couple_handling(r1, &mut pp_lo[..2 * n + 1], sign, n, 2, 4);
 
         // $pm1/4$
-        let sign = _limbs_mul_toom_evaluate_poly_in_2_neg_pow_and_neg_2_neg_pow(
-            v2, v0, p, ap, n, s, 2, pp_lo,
-        ) ^ _limbs_mul_toom_evaluate_poly_in_2_neg_pow_and_neg_2_neg_pow(
-            v3, v1, q, bp, n, t, 2, pp_lo,
+        let sign = _limbs_mul_toom_evaluate_poly_in_2_pow_neg_and_neg_2_pow_neg(
+            v2,
+            v0,
+            p,
+            ap,
+            n,
+            2,
+            &mut pp_lo[..n + 1],
+        ) ^ _limbs_mul_toom_evaluate_poly_in_2_pow_neg_and_neg_2_pow_neg(
+            v3,
+            v1,
+            q,
+            bp,
+            n,
+            2,
+            &mut pp_lo[..n + 1],
         );
         // A(-1/4)*B(-1/4)*4^.
         // A(+1/4)*B(+1/4)*4^.
