@@ -156,8 +156,8 @@ pub(crate) fn _limbs_mul_toom_evaluate_poly_in_1_and_neg_1(
             coefficients[degree]
         ));
     }
-    let v_1_neg = limbs_cmp_same_length(v_1, scratch) == Ordering::Less;
-    if v_1_neg {
+    let v_neg_1_neg = limbs_cmp_same_length(v_1, scratch) == Ordering::Less;
+    if v_neg_1_neg {
         limbs_sub_same_length_to_out(v_neg_1, scratch, v_1);
     } else {
         limbs_sub_same_length_to_out(v_neg_1, v_1, scratch);
@@ -166,7 +166,7 @@ pub(crate) fn _limbs_mul_toom_evaluate_poly_in_1_and_neg_1(
     let degree = degree as Limb;
     assert!(v_1[n] <= degree);
     assert!(v_neg_1[n] <= (degree >> 1) + 1);
-    v_1_neg
+    v_neg_1_neg
 }
 
 /// Given a `Natural` whose highest limb is `carry` and remaining limbs are `xs`, multiplies the
@@ -395,14 +395,14 @@ pub(crate) fn _limbs_mul_toom_evaluate_poly_in_2_pow_and_neg_2_pow(
 /// where n = `ys.len()`
 ///
 /// This is DO_mpn_addlsh_n from mpn/generic/toom_eval_pm2rexp.c.
-pub(crate) fn shl_and_add_same_length_in_place_left(
+pub(crate) fn _limbs_shl_and_add_same_length_in_place_left(
     xs: &mut [Limb],
     ys: &[Limb],
     shift: u32,
     scratch: &mut [Limb],
 ) -> Limb {
     let n = ys.len();
-    let mut carry = limbs_shl_to_out(scratch, ys, shift as u32);
+    let mut carry = limbs_shl_to_out(scratch, ys, shift);
     if limbs_slice_add_same_length_in_place_left(&mut xs[..n], &mut scratch[..n]) {
         carry.wrapping_add_assign(1);
     }
@@ -442,7 +442,7 @@ pub(crate) fn _limbs_mul_toom_evaluate_poly_in_2_pow_neg_and_neg_2_pow_neg(
             scratch,
             coefficients[degree],
         ));
-        let carry = shl_and_add_same_length_in_place_left(
+        let carry = _limbs_shl_and_add_same_length_in_place_left(
             v_2_pow_neg,
             coefficients[degree - 1],
             shift,
@@ -453,7 +453,7 @@ pub(crate) fn _limbs_mul_toom_evaluate_poly_in_2_pow_neg_and_neg_2_pow_neg(
     let mut i = 2;
     let mut local_shift = shift * (degree_u32 - 2);
     while i < degree - 1 {
-        let carry = shl_and_add_same_length_in_place_left(
+        let carry = _limbs_shl_and_add_same_length_in_place_left(
             v_2_pow_neg,
             coefficients[i],
             local_shift,
@@ -462,7 +462,7 @@ pub(crate) fn _limbs_mul_toom_evaluate_poly_in_2_pow_neg_and_neg_2_pow_neg(
         v_2_pow_neg[n].wrapping_add_assign(carry);
         i += 1;
         local_shift -= shift;
-        let carry = shl_and_add_same_length_in_place_left(
+        let carry = _limbs_shl_and_add_same_length_in_place_left(
             scratch,
             coefficients[i],
             local_shift,

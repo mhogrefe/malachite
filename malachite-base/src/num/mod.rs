@@ -1889,6 +1889,33 @@ impl Parity for usize {
     }
 }
 
+impl ModPowerOfTwo for usize {
+    type Output = usize;
+
+    #[inline]
+    fn mod_power_of_two(self, pow: u64) -> usize {
+        if self == 0 || pow >= u64::from(0usize.trailing_zeros()) {
+            self
+        } else {
+            self & ((1 << pow) - 1)
+        }
+    }
+}
+
+impl DivisibleByPowerOfTwo for usize {
+    #[inline]
+    fn divisible_by_power_of_two(self, pow: u64) -> bool {
+        self.mod_power_of_two(pow) == 0
+    }
+}
+
+impl EqModPowerOfTwo<usize> for usize {
+    #[inline]
+    fn eq_mod_power_of_two(self, other: usize, pow: u64) -> bool {
+        (self ^ other).divisible_by_power_of_two(pow)
+    }
+}
+
 impl Parity for isize {
     #[inline]
     fn even(self) -> bool {
