@@ -13,6 +13,7 @@ use malachite_nz::natural::arithmetic::mul::toom::{
     _limbs_mul_greater_to_out_toom_62, _limbs_mul_greater_to_out_toom_62_scratch_size,
     _limbs_mul_greater_to_out_toom_63, _limbs_mul_greater_to_out_toom_63_scratch_size,
     _limbs_mul_greater_to_out_toom_6h, _limbs_mul_greater_to_out_toom_6h_scratch_size,
+    _limbs_mul_greater_to_out_toom_8h, _limbs_mul_greater_to_out_toom_8h_scratch_size,
 };
 use malachite_nz::natural::arithmetic::mul::{
     _limbs_mul_greater_to_out_basecase, limbs_mul_greater_to_out,
@@ -27,7 +28,7 @@ use malachite_test::inputs::base::{
     triples_of_unsigned_vec_var_12, triples_of_unsigned_vec_var_13, triples_of_unsigned_vec_var_14,
     triples_of_unsigned_vec_var_15, triples_of_unsigned_vec_var_16, triples_of_unsigned_vec_var_17,
     triples_of_unsigned_vec_var_18, triples_of_unsigned_vec_var_19, triples_of_unsigned_vec_var_20,
-    triples_of_unsigned_vec_var_21, triples_of_unsigned_vec_var_22,
+    triples_of_unsigned_vec_var_21, triples_of_unsigned_vec_var_22, triples_of_unsigned_vec_var_23,
 };
 use malachite_test::inputs::natural::{
     naturals, pairs_of_natural_and_unsigned, pairs_of_naturals, triples_of_naturals,
@@ -2558,6 +2559,225 @@ fn limbs_mul_greater_to_out_toom_6h_fail_6() {
     _limbs_mul_greater_to_out_toom_6h(&mut out, &xs, &[], &mut scratch);
 }
 
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+fn test_limbs_mul_greater_to_out_toom_8h() {
+    let test = |xs: Vec<Limb>, ys: Vec<Limb>, out_before: Vec<Limb>| {
+        let mut out = out_before.to_vec();
+        _limbs_mul_greater_to_out_basecase(&mut out, &xs, &ys);
+        let out_after = out;
+        let mut out = out_before.to_vec();
+        let mut scratch =
+            vec![0; _limbs_mul_greater_to_out_toom_8h_scratch_size(xs.len(), ys.len())];
+        _limbs_mul_greater_to_out_toom_8h(&mut out, &xs, &ys, &mut scratch);
+        assert_eq!(out, out_after);
+    };
+    test(series(2, 86), series(3, 86), vec![10; 172]);
+}
+
+#[cfg(feature = "64_bit_limbs")]
+#[test]
+fn test_limbs_mul_greater_to_out_toom_8h() {
+    let test = |xs: Vec<Limb>, ys: Vec<Limb>, out_before: Vec<Limb>| {
+        let mut out = out_before.to_vec();
+        _limbs_mul_greater_to_out_basecase(&mut out, &xs, &ys);
+        let out_after = out;
+        let mut out = out_before.to_vec();
+        let mut scratch =
+            vec![0; _limbs_mul_greater_to_out_toom_8h_scratch_size(xs.len(), ys.len())];
+        _limbs_mul_greater_to_out_toom_8h(&mut out, &xs, &ys, &mut scratch);
+        assert_eq!(out, out_after);
+    };
+    test(series(2, 86), series(3, 86), vec![10; 172]);
+    let xs = vec![
+        4161517722334671206,
+        271035878974614969,
+        8768264966582261304,
+        8206956804546718361,
+        10016740860128464264,
+        2943682457917422384,
+        10577659840261915262,
+        12098681961003341371,
+        2525073961085508373,
+        6868684266500244649,
+        509821878609210517,
+        4263249474085213536,
+        2307565444887817803,
+        12419028787241261317,
+        1281995004584322618,
+        13869993964458308221,
+        4485392892470363180,
+        3274613913599014818,
+        13075432300049036016,
+        14042578030952079199,
+        13098932791585915075,
+        10142506622182970580,
+        7251838551095799764,
+        17051632328075633635,
+        14834683551906590335,
+        18022997779550454484,
+        13851155116066438974,
+        3279920275984726839,
+        12575373964173554443,
+        15489604937489489906,
+        12630529117895897413,
+        9562379919499143009,
+        1417878505992996127,
+        2188363987094684136,
+        4744951957683006311,
+        12112952790370550632,
+        313413052918057660,
+        952838993607855174,
+        5933080761807357068,
+        5875775551766205334,
+        10228588026136726855,
+        13111641204516926240,
+        10636665232562365918,
+        11359964631071199362,
+        5929704785320756798,
+        7890881054270407934,
+        4884891330151666074,
+        11055829837821054078,
+        13707765469312479203,
+        8153558212434726394,
+        17445193585880639275,
+        6568289716541023323,
+        8041757936108402209,
+        11089742802624534358,
+        9104866424438942973,
+        3236275382520001400,
+        9213626463300221545,
+        5359296447813232573,
+        2888775200925828643,
+        1504166968227419931,
+        14327007717613163305,
+        11802896026004225094,
+        12726419078417922871,
+        13309155468447837337,
+        8586421913645886721,
+        53962250520164792,
+        10299535356260218467,
+        16946113957982976032,
+        2902460381404773190,
+        14757465720632393328,
+        4285719983639600380,
+        8437230965528545912,
+        5716398831975234496,
+        1373020012523386515,
+        3326027605041066746,
+        17656221602314109866,
+        5927567778944922379,
+        7395768072445629410,
+        11551011221061348004,
+        13862329630891761456,
+        3443745263810155735,
+        497965567194021216,
+        13073929868627981515,
+        9340721263069758697,
+        16189911797862953019,
+        17331477506134450185,
+        18441976800868209749,
+        3733349995001197864,
+        6937510789920909911,
+        10459182483341515090,
+        16282716012969111817,
+        3142838808933013004,
+        176169927348158611,
+        11447076894000834768,
+    ];
+    let ys = vec![
+        3898028307372664956,
+        17056541935478225194,
+        14004255653437064260,
+        5500365157672511509,
+        15774417221201329293,
+        3229812365626959565,
+        1542674716041014040,
+        7356251598468809943,
+        18181760582149085284,
+        6447899299954117957,
+        15228766707939040914,
+        15272444333081468110,
+        8256864946368840840,
+        15131537266446006793,
+        15615697223616434527,
+        18149135087211146951,
+        6359898540214993921,
+        11306735121000975748,
+        10447887135010383963,
+        12772438236294882417,
+        17631737056955710770,
+        8945404460793598129,
+        8945720889114856152,
+        3648711115155303988,
+        4353348842999127960,
+        2258094147328762698,
+        17154005505580115535,
+        13882701371593165208,
+        1610163839528654069,
+        15350954595089578211,
+        2071555476679360064,
+        7797386300145290156,
+        12827100752536039252,
+        9294676638100895403,
+        13194197740670114341,
+        9490868657650122292,
+        13133123495028388830,
+        12350221742051084451,
+        12424378851382358824,
+        9807292823459903392,
+        10987641767148832341,
+        10914994897211362878,
+        828242546480310184,
+        18006801931269403354,
+        3042908768715701160,
+        8117699035539485321,
+        11944855102415629844,
+        7384949013429384602,
+        11066738683960763872,
+        14686958392900209441,
+        16412025437157422416,
+        1334344044228684681,
+        1631366399820348565,
+        18062594111889109095,
+        5175299421808157128,
+        16616812968596909641,
+        797326939277169478,
+        14593183003025528412,
+        3580961852669434633,
+        2104948106588459323,
+        14322976299272137248,
+        3536903766355663369,
+        6932211742640251008,
+        17616766237027326857,
+        1477865108082927148,
+        7817082715310166375,
+        16183969129154492111,
+        18146981620947356859,
+        11618268397687338183,
+        15294321769160092821,
+        2447614867702883346,
+        15261926111061449320,
+        4029723450982123355,
+        7820711996327940306,
+        6188156586792352365,
+        15703528769184364862,
+        6698415575574578533,
+        7770946582061166480,
+        3543987370105940918,
+        8845414905041844753,
+        13110356713999163167,
+        12862812457872444435,
+        10749027774576978236,
+        17822296942008093229,
+        13898152040175560707,
+        1879212271519144526,
+        5428215269251527991,
+    ];
+    let out_len = xs.len() + ys.len();
+    test(xs, ys, vec![10; out_len]);
+}
+
 #[test]
 fn test_mul() {
     let test = |u, v, out| {
@@ -2859,6 +3079,22 @@ fn limbs_mul_greater_to_out_toom_6h_properties() {
             let mut scratch =
                 vec![0; _limbs_mul_greater_to_out_toom_6h_scratch_size(xs.len(), ys.len())];
             _limbs_mul_greater_to_out_toom_6h(&mut out, xs, ys, &mut scratch);
+            assert_eq!(out, expected_out);
+        },
+    );
+}
+
+#[test]
+fn limbs_mul_greater_to_out_toom_8h_properties() {
+    test_properties_custom_scale(
+        2_048,
+        triples_of_unsigned_vec_var_23,
+        |&(ref out, ref xs, ref ys)| {
+            let expected_out = limbs_mul_basecase_helper(out, xs, ys);
+            let mut out = out.to_vec();
+            let mut scratch =
+                vec![0; _limbs_mul_greater_to_out_toom_8h_scratch_size(xs.len(), ys.len())];
+            _limbs_mul_greater_to_out_toom_8h(&mut out, xs, ys, &mut scratch);
             assert_eq!(out, expected_out);
         },
     );

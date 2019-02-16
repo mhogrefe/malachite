@@ -637,6 +637,22 @@ fn _limbs_shl_and_sub(xs: &mut [Limb], ys: &[Limb], shift: u32, scratch: &mut [L
     assert!(!limbs_sub_limb_in_place(&mut xs[ys.len() - 1..], carry));
 }
 
+fn _limbs_shl_and_sub_special(
+    xs_lo: &mut [Limb],
+    xs_hi: &mut [Limb],
+    ys: &[Limb],
+    shift: u32,
+    scratch: &mut [Limb],
+) {
+    if limbs_sub_limb_in_place(xs_lo, ys[0] >> shift) {
+        assert!(!limbs_sub_limb_in_place(xs_hi, 1));
+    }
+    let carry = _limbs_shl_and_sub_same_length(xs_lo, &ys[1..], Limb::WIDTH - shift, scratch);
+    if limbs_sub_limb_in_place(&mut xs_lo[ys.len() - 1..], carry) {
+        assert!(!limbs_sub_limb_in_place(xs_hi, 1));
+    }
+}
+
 /// Interpolation for Toom-4.5 (or Toom-4), using the evaluation points: infinity(4.5 only), 4, -4,
 /// 2, -2, 1, -1, 0. More precisely, we want to compute f(2 ^ (`Limb::WIDTH` * n)) for a polynomial
 /// f of degree 7 (or 6), given the 8 (rsp. 7) values:
@@ -1019,7 +1035,7 @@ pub fn _limbs_mul_toom_interpolate_12_points<'a>(
 #[cfg(feature = "32_bit_limbs")]
 const CORRECTED_WIDTH: u32 = 42 - Limb::WIDTH;
 #[cfg(feature = "64_bit_limbs")]
-const CORRECTED_WIDTH: u32 = 42; // should never be used
+const CORRECTED_WIDTH: u32 = 42;
 
 /// Interpolation for the algorithm Toom-Cook 8.5-way.
 /// Interpolation for Toom-8.5 (or Toom-8), using the evaluation
@@ -1068,11 +1084,13 @@ pub fn _limbs_mul_toom_interpolate_16_points<'a>(
     let n3 = 3 * n;
     let n3p1 = n3 + 1;
     assert!(spt <= 2 * n);
+    assert_eq!(r7.len(), n3p1);
     {
         let (pp_lo, remainder) = pp.split_at_mut(n3);
-        split_into_chunks_mut!(remainder, 4 * n, [r6, r4, r2], r0);
+        split_into_chunks_mut!(remainder, 4 * n, [r6, r4], r2);
         // Interpolation
         if half {
+            let (r2, r0) = r2.split_at_mut(4 * n);
             let cy = if limbs_sub_same_length_in_place_left(&mut r4[..spt], &r0[..spt]) {
                 1
             } else {
@@ -1089,22 +1107,19 @@ pub fn _limbs_mul_toom_interpolate_16_points<'a>(
             _limbs_shl_and_sub(&mut r5[..n3p1], &r0[..spt], 4, wsi);
 
             if BIT_CORRECTION {
-                let mut cy =
+                let cy =
                     _limbs_shl_and_sub_same_length(&mut r1[1..], &r0[..spt], CORRECTED_WIDTH, wsi);
                 limbs_sub_limb_in_place(&mut r1[spt + 1..n3p1], cy);
-                // FIXME: assumes r7[n3p1] is writable (it is if r5 follows).
-                cy = r7[n3p1];
-                r7[n3p1] = 0x80;
-                _limbs_shl_and_sub(&mut r7[..n3p1 + 1], &r0[..spt], 6, wsi);
-                // FIXME: assumes r7[n3p1] is writable.
-                r7[n3p1] = cy;
+                let cy = r5[0];
+                r5[0] = 0x80;
+                _limbs_shl_and_sub_special(r7, &mut r5[..1], &r0[..spt], 6, wsi);
+                r5[0] = cy;
             } else {
-                let cy = _limbs_shl_and_sub_same_length(r1, &r0[..spt], 42, wsi);
+                let cy = _limbs_shl_and_sub_same_length(r1, &r0[..spt], CORRECTED_WIDTH, wsi);
                 assert!(!limbs_sub_limb_in_place(&mut r1[spt..n3p1], cy));
                 _limbs_shl_and_sub(&mut r7[..n3p1], &r0[..spt], 6, wsi);
             }
         }
-
         {
             let (r5_lo, r5_hi) = r5.split_at_mut(n3);
             r5_hi[0].wrapping_sub_assign(_limbs_shl_and_sub_same_length(
@@ -1122,7 +1137,6 @@ pub fn _limbs_mul_toom_interpolate_16_points<'a>(
             &r5[..n3p1]
         ));
         swap(&mut r5, &mut wsi);
-
         {
             let (r6_lo, r6_hi) = r6.split_at_mut(n3);
             r6_hi[0].wrapping_sub_assign(_limbs_shl_and_sub_same_length(
@@ -1140,7 +1154,7 @@ pub fn _limbs_mul_toom_interpolate_16_points<'a>(
 
         if BIT_CORRECTION {
             _limbs_shl_and_sub_same_length(&mut r7[n + 1..], &pp_lo[..2 * n], CORRECTED_WIDTH, wsi);
-            assert!(limbs_sub_limb_in_place(
+            assert!(!limbs_sub_limb_in_place(
                 &mut r1[n..3 * n + 1],
                 pp_lo[0] >> 6
             ));
@@ -1152,7 +1166,8 @@ pub fn _limbs_mul_toom_interpolate_16_points<'a>(
             );
             limbs_sub_limb_in_place(&mut r1[3 * n - 1..3 * n + 1], cy);
         } else {
-            let cy = _limbs_shl_and_sub_same_length(&mut r7[n..], &pp_lo[..2 * n], 42, wsi);
+            let cy =
+                _limbs_shl_and_sub_same_length(&mut r7[n..], &pp_lo[..2 * n], CORRECTED_WIDTH, wsi);
             r7[n3].wrapping_sub_assign(cy);
             _limbs_shl_and_sub(&mut r1[n..3 * n + 1], &pp_lo[..2 * n], 6, wsi);
         }
@@ -1177,7 +1192,6 @@ pub fn _limbs_mul_toom_interpolate_16_points<'a>(
             _limbs_shl_and_sub_same_length(r5, &r6[..n3p1], 2, wsi); // can be negative
             _limbs_shl_and_sub_same_length(r5, &r6[..n3p1], 10, wsi); // can be negative
         }
-
         mpn_submul_1(r7, &r5[..n3p1], 1_300); // can be negative
         if AORSMUL_FASTER_3AORSLSH {
             mpn_submul_1(r7, &r6[..n3p1], 1_052_688); // can be negative
@@ -1207,7 +1221,8 @@ pub fn _limbs_mul_toom_interpolate_16_points<'a>(
         if AORSMUL_FASTER_2AORSLSH {
             mpn_addmul_1(r6, &r5[..n3p1], 240); // can be negative
         } else {
-            _limbs_shl_and_sub_same_length(r6, &r5[..n3p1], 8, wsi); // can give a carry
+            // can give a carry
+            _limbs_shl_and_add_same_length_in_place_left(r6, &r5[..n3p1], 8, wsi);
             _limbs_shl_and_sub_same_length(r6, &r5[..n3p1], 4, wsi); // can be negative
         }
         // A division by 255x4 follows. Warning: the operand can be negative!
@@ -1237,7 +1252,10 @@ pub fn _limbs_mul_toom_interpolate_16_points<'a>(
                 &mut r3[..n3p1],
                 &r1[..n3p1]
             ));
-            assert_eq!(_limbs_shl_and_sub_same_length(r3, &r1[..n3p1], 7, wsi), 0);
+            assert_eq!(
+                _limbs_shl_and_add_same_length_in_place_left(r3, &r1[..n3p1], 7, wsi),
+                0
+            );
             assert_eq!(_limbs_shl_and_sub_same_length(r3, &r1[..n3p1], 12, wsi), 0);
         }
         assert_eq!(mpn_submul_1(r3, &r2[..n3p1], 900), 0);
@@ -1397,11 +1415,14 @@ pub fn _limbs_mul_toom_interpolate_16_points<'a>(
                     0
                 },
             );
-            assert!(!limbs_slice_add_limb_in_place(&mut pp[16 * n..spt], cy));
+            assert!(!limbs_slice_add_limb_in_place(
+                &mut pp[16 * n..15 * n + spt],
+                cy
+            ));
         } else {
             assert!(!limbs_slice_add_same_length_in_place_left(
                 &mut pp[15 * n..15 * n + spt],
-                &r1[2 * n + spt..]
+                &r1[2 * n..2 * n + spt]
             ));
         }
     } else {
