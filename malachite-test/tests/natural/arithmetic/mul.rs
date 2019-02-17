@@ -2572,9 +2572,10 @@ fn test_limbs_mul_greater_to_out_toom_8h() {
         _limbs_mul_greater_to_out_toom_8h(&mut out, &xs, &ys, &mut scratch);
         assert_eq!(out, out_after);
     };
-    // an == bn || an * (TOOM_8H_LIMIT_DENOMINATOR >> 1) < TOOM_8H_LIMIT_NUMERATOR * (bn >> 1)
-    // !(Limb::WIDTH > 12 * 3 && q == 3)
-    // (r6[n3] & (Limb::MAX << (Limb::WIDTH - 3))) != 0 in _limbs_mul_toom_interpolate_16_points
+    // xs_len == ys_len
+    //        || xs_len * (TOOM_8H_LIMIT_DENOMINATOR >> 1) < TOOM_8H_LIMIT_NUMERATOR * (ys_len >> 1)
+    // !(Limb::WIDTH > 36 && q == 3)
+    // r6_last.leading_zeros() < 3 in _limbs_mul_toom_interpolate_16_points
     // !half in _limbs_mul_toom_interpolate_16_points
     test(series(2, 86), series(3, 86), vec![10; 172]);
     let xs = vec![
@@ -2607,7 +2608,7 @@ fn test_limbs_mul_greater_to_out_toom_8h() {
         3607511108, 2863853568, 1611642161, 1312857772, 1839433327, 567060478, 3139863681,
     ];
     let out_len = xs.len() + ys.len();
-    // (r5[n3] & (Limb::MAX << (Limb::WIDTH - 7))) != 0 in _limbs_mul_toom_interpolate_16_points
+    // r5_last.leading_zeros() < 7 in _limbs_mul_toom_interpolate_16_points
     test(xs, ys, vec![10; out_len]);
     let xs = vec![
         3998843185, 3237409891, 364765898, 887299373, 875693912, 790653310, 1949338310, 309040598,
@@ -2642,11 +2643,11 @@ fn test_limbs_mul_greater_to_out_toom_8h() {
     ];
     let out_len = xs.len() + ys.len();
     // !(an == bn || an * (TOOM_8H_LIMIT_DENOMINATOR >> 1) < TOOM_8H_LIMIT_NUMERATOR * (bn >> 1))
-    // an * 13 < 16 * bn
+    // xs_len * 13 < 16 * ys_len
     // half
     // s <= t
     // half in _limbs_mul_toom_interpolate_16_points
-    // spt > n in _limbs_mul_toom_interpolate_16_points
+    // s_plus_t > n in _limbs_mul_toom_interpolate_16_points
     test(xs, ys, vec![10; out_len]);
     let xs = vec![
         2456061149, 2562918666, 2903450513, 1994190773, 99234624, 3722083920, 4262323306,
@@ -2682,7 +2683,7 @@ fn test_limbs_mul_greater_to_out_toom_8h() {
     ];
     let out_len = xs.len() + ys.len();
     // s > t
-    // spt <= n in _limbs_mul_toom_interpolate_16_points
+    // s_plus_t <= n in _limbs_mul_toom_interpolate_16_points
     test(xs, ys, vec![10; out_len]);
     let xs = vec![
         2166912886, 3021127478, 1088026295, 863338925, 1902617744, 2706401163, 3211745137,
@@ -2750,8 +2751,9 @@ fn test_limbs_mul_greater_to_out_toom_8h() {
         2165764832,
     ];
     let out_len = xs.len() + ys.len();
-    // Limb::WIDTH <= 9 * 3 ||
-    //      an * (TOOM_8H_LIMIT_DENOMINATOR >> 1) < (TOOM_8H_LIMIT_NUMERATOR / 7 * 9) * (bn >> 1)
+    // Limb::WIDTH <= 9 * 3
+    //            || xs_len * (TOOM_8H_LIMIT_DENOMINATOR >> 1)
+    //                < (TOOM_8H_LIMIT_NUMERATOR / 7 * 9) * (ys_len >> 1)
     test(xs, ys, vec![10; out_len]);
     let xs = vec![
         4119986492, 3769784140, 1016845783, 1462133596, 4070906664, 3720888633, 4162266585,
@@ -2825,7 +2827,7 @@ fn test_limbs_mul_greater_to_out_toom_8h() {
         1296900550,
     ];
     let out_len = xs.len() + ys.len();
-    // an * 10 < 33 * (bn >> 1)
+    // xs_len * 10 < 33 * (ys_len >> 1)
     test(xs, ys, vec![10; out_len]);
     let xs = vec![
         2699110155, 1597521691, 470373633, 1547603733, 1114505968, 121868046, 1203637014,
@@ -2866,8 +2868,9 @@ fn test_limbs_mul_greater_to_out_toom_8h() {
         2726878536, 4276109446,
     ];
     let out_len = xs.len() + ys.len();
-    // Limb::WIDTH <= 10 * 3 ||
-    //      an * (TOOM_8H_LIMIT_DENOMINATOR / 5) < (TOOM_8H_LIMIT_NUMERATOR / 3) * bn
+    // Limb::WIDTH <= 10 * 3
+    //            || xs_len * (TOOM_8H_LIMIT_DENOMINATOR / 5) <
+    //      (TOOM_8H_LIMIT_NUMERATOR / 3) * ys_len
     test(xs, ys, vec![10; out_len]);
     let xs = vec![
         561532292, 1489901668, 253691236, 2318497628, 4251899866, 2953100123, 2461942387,
@@ -2910,7 +2913,7 @@ fn test_limbs_mul_greater_to_out_toom_8h() {
         660499678, 4213349264, 915065087, 44382277, 1138965336, 3728412916,
     ];
     let out_len = xs.len() + ys.len();
-    // an * 6 < 13 * bn
+    // xs_len * 6 < 13 * ys_len
     test(xs, ys, vec![10; out_len]);
     let xs = vec![
         2628750713, 2361938253, 4208887130, 2080756349, 672997060, 2130716095, 4212789307,
@@ -2958,7 +2961,7 @@ fn test_limbs_mul_greater_to_out_toom_8h() {
         1088854315,
     ];
     let out_len = xs.len() + ys.len();
-    // Limb::WIDTH <= 11 * 3 || an * 4 < 9 * bn
+    // Limb::WIDTH <= 11 * 3 || xs_len * 4 < 9 * ys_len
     test(xs, ys, vec![10; out_len]);
 }
 
@@ -3163,6 +3166,69 @@ fn test_limbs_mul_greater_to_out_toom_8h() {
     ];
     let out_len = xs.len() + ys.len();
     test(xs, ys, vec![10; out_len]);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_mul_greater_to_out_toom_8h_fail_1() {
+    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_8h_scratch_size(1, 1)];
+    let mut out = vec![10; 4];
+    _limbs_mul_greater_to_out_toom_8h(&mut out, &[6], &[1], &mut scratch);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_mul_greater_to_out_toom_8h_fail_2() {
+    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_8h_scratch_size(85, 86)];
+    let mut out = vec![10; 171];
+    let xs = series(3, 85);
+    let ys = series(3, 86);
+    _limbs_mul_greater_to_out_toom_8h(&mut out, &xs, &ys, &mut scratch);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_mul_greater_to_out_toom_8h_fail_3() {
+    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_8h_scratch_size(86, 85)];
+    let mut out = vec![10; 171];
+    let xs = series(3, 86);
+    let ys = series(3, 85);
+    _limbs_mul_greater_to_out_toom_8h(&mut out, &xs, &ys, &mut scratch);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_mul_greater_to_out_toom_8h_fail_4() {
+    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_8h_scratch_size(85, 85)];
+    let mut out = vec![10; 170];
+    let xs = series(3, 85);
+    let ys = series(3, 85);
+    _limbs_mul_greater_to_out_toom_8h(&mut out, &xs, &ys, &mut scratch);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_mul_greater_to_out_toom_8h_fail_5() {
+    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_8h_scratch_size(86, 86)];
+    let mut out = vec![10; 171];
+    let xs = series(3, 86);
+    let ys = series(3, 86);
+    _limbs_mul_greater_to_out_toom_8h(&mut out, &xs, &ys, &mut scratch);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_mul_greater_to_out_toom_8h_fail_6() {
+    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_8h_scratch_size(86, 0)];
+    let mut out = vec![10; 86];
+    let xs = series(3, 42);
+    _limbs_mul_greater_to_out_toom_8h(&mut out, &xs, &[], &mut scratch);
 }
 
 #[test]

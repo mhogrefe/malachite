@@ -638,18 +638,19 @@ fn _limbs_shl_and_sub(xs: &mut [Limb], ys: &[Limb], shift: u32, scratch: &mut [L
 }
 
 fn _limbs_shl_and_sub_special(
-    xs_lo: &mut [Limb],
-    xs_hi: &mut [Limb],
+    xs_init: &mut [Limb],
+    xs_last: &mut Limb,
     ys: &[Limb],
     shift: u32,
     scratch: &mut [Limb],
 ) {
-    if limbs_sub_limb_in_place(xs_lo, ys[0] >> shift) {
-        assert!(!limbs_sub_limb_in_place(xs_hi, 1));
+    let (ys_first, ys_tail) = ys.split_first().unwrap();
+    if limbs_sub_limb_in_place(xs_init, *ys_first >> shift) {
+        *xs_last = xs_last.checked_sub(1).unwrap();
     }
-    let carry = _limbs_shl_and_sub_same_length(xs_lo, &ys[1..], Limb::WIDTH - shift, scratch);
-    if limbs_sub_limb_in_place(&mut xs_lo[ys.len() - 1..], carry) {
-        assert!(!limbs_sub_limb_in_place(xs_hi, 1));
+    let carry = _limbs_shl_and_sub_same_length(xs_init, ys_tail, Limb::WIDTH - shift, scratch);
+    if limbs_sub_limb_in_place(&mut xs_init[ys_tail.len()..], carry) {
+        *xs_last = xs_last.checked_sub(1).unwrap();
     }
 }
 
@@ -800,16 +801,16 @@ const AORSMUL_FASTER_AORS_2AORSLSH: bool = false;
 /// More precisely, we want to compute f(2 ^ (`Limb::WIDTH` * n)) for a polynomial f of degree 11
 /// (or 10), given the 12 (resp. 11) values:
 ///
-///   r0 = limit at infinity of f(x) / x ^ 7,
-///   r1 = f(4),f(-4),
-///   r2 = f(2),f(-2),
-///   r3 = f(1),f(-1),
-///   r4 = f(1 / 4),f(-1 / 4),
-///   r5 = f(1 / 2),f(-1 / 2),
-///   r6 = f(0).
+/// r0 = limit at infinity of f(x) / x ^ 7,
+/// r1 = f(4),f(-4),
+/// r2 = f(2),f(-2),
+/// r3 = f(1),f(-1),
+/// r4 = f(1 / 4), f(-1 / 4),
+/// r5 = f(1 / 2), f(-1 / 2),
+/// r6 = f(0).
 ///
 /// All couples of the form f(n),f(-n) must be already mixed with
-/// toom_couple_handling(f(n), ..., f(-n),...)
+/// `_limbs_toom_couple_handling`(f(n), ..., f(-n),...)
 ///
 /// The result is stored in {out, s_plus_t + 7 * n (or 6 * n)}.
 /// At entry, r6 is stored at {out, 2 * n},
@@ -954,47 +955,43 @@ pub fn _limbs_mul_toom_interpolate_12_points<'a>(
     // |__12|n_11|n_10|n__9|n__8|n__7|n__6|n__5|n__4|n__3|n__2|n___|n___|out
     // |M r0|L r0|___||H r2|M r2|L r2|___||H r4|M r4|L r4|____|H_r6|L r6|out
     // ||H r1|M r1|L r1|   ||H r3|M r3|L r3|   ||H_r5|M_r5|L_r5|
-    {
-        split_into_chunks_mut!(out, n, [_unused, out_1, out_2, out_3], out_4);
-        split_into_chunks_mut!(r5, n, [r5_0, r5_1], r5_2);
-        if limbs_slice_add_same_length_in_place_left(out_1, r5_0) {
-            if limbs_add_limb_to_out(out_2, r5_1, 1) {
-                assert!(!limbs_slice_add_limb_in_place(r5_2, 1));
-            }
-        } else {
-            out_2.copy_from_slice(r5_1);
+    split_into_chunks_mut!(out, n, [_unused, out_1, out_2, out_3], out_4);
+    split_into_chunks_mut!(r5, n, [r5_0, r5_1], r5_2);
+    if limbs_slice_add_same_length_in_place_left(out_1, r5_0) {
+        if limbs_add_limb_to_out(out_2, r5_1, 1) {
+            assert!(!limbs_slice_add_limb_in_place(r5_2, 1));
         }
-        let (r5_last, r5_2) = r5_2.split_last_mut().unwrap();
-        let mut carry = *r5_last;
-        if limbs_slice_add_same_length_in_place_left(out_3, r5_2) {
-            carry.wrapping_add_assign(1);
-        }
-        assert!(!limbs_slice_add_limb_in_place(
-            &mut out_4[..2 * n + 1],
-            carry
-        ));
+    } else {
+        out_2.copy_from_slice(r5_1);
     }
-    {
-        split_into_chunks_mut!(&mut out[5 * n..], n, [out_5, out_6, out_7], out_8);
-        split_into_chunks_mut!(r3, n, [r3_0, r3_1], r3_2);
-        if limbs_slice_add_same_length_in_place_left(out_5, r3_0) {
-            out_6[0].wrapping_add_assign(1);
-        }
-        let out_6_first = out_6[0];
-        if limbs_add_limb_to_out(out_6, r3_1, out_6_first) {
-            assert!(!limbs_slice_add_limb_in_place(r3_2, 1));
-        }
-        let (r3_last, r3_2) = r3_2.split_last_mut().unwrap();
-        let mut carry = *r3_last;
-        if limbs_slice_add_same_length_in_place_left(out_7, r3_2) {
-            carry.wrapping_add_assign(1);
-        }
-        assert!(!limbs_slice_add_limb_in_place(
-            &mut out_8[..2 * n + 1],
-            carry
-        ));
+    let (r5_last, r5_2) = r5_2.split_last_mut().unwrap();
+    let mut carry = *r5_last;
+    if limbs_slice_add_same_length_in_place_left(out_3, r5_2) {
+        carry.wrapping_add_assign(1);
     }
-    let (out_9, out_10) = out[9 * n..].split_at_mut(n);
+    assert!(!limbs_slice_add_limb_in_place(
+        &mut out_4[..2 * n + 1],
+        carry
+    ));
+    split_into_chunks_mut!(out_4, n, [_unused, out_5, out_6, out_7], out_8);
+    split_into_chunks_mut!(r3, n, [r3_0, r3_1], r3_2);
+    if limbs_slice_add_same_length_in_place_left(out_5, r3_0) {
+        out_6[0].wrapping_add_assign(1);
+    }
+    let out_6_first = out_6[0];
+    if limbs_add_limb_to_out(out_6, r3_1, out_6_first) {
+        assert!(!limbs_slice_add_limb_in_place(r3_2, 1));
+    }
+    let (r3_last, r3_2) = r3_2.split_last_mut().unwrap();
+    let mut carry = *r3_last;
+    if limbs_slice_add_same_length_in_place_left(out_7, r3_2) {
+        carry.wrapping_add_assign(1);
+    }
+    assert!(!limbs_slice_add_limb_in_place(
+        &mut out_8[..2 * n + 1],
+        carry
+    ));
+    split_into_chunks_mut!(out_8, n, [_unused, out_9], out_10);
     let (r1_0, r1_1) = r1.split_at_mut(n);
     if limbs_slice_add_same_length_in_place_left(out_9, r1_0) {
         out_10[0].wrapping_add_assign(1);
@@ -1037,32 +1034,31 @@ const CORRECTED_WIDTH: u32 = 42 - Limb::WIDTH;
 #[cfg(feature = "64_bit_limbs")]
 const CORRECTED_WIDTH: u32 = 42;
 
-/// Interpolation for the algorithm Toom-Cook 8.5-way.
-/// Interpolation for Toom-8.5 (or Toom-8), using the evaluation
-/// points: infinity(8.5 only), +-8, +-4, +-2, +-1, +-1/4, +-1/2,
-/// +-1/8, 0. More precisely, we want to compute
-/// f(2^(GMP_NUMB_BITS * n)) for a polynomial f of degree 15 (or
-/// 14), given the 16 (rsp. 15) values:
+/// Interpolation for Toom-8.5 (or Toom-8), using the evaluation points:
+/// Infinity(8.5 only), +-8, +-4, +-2, +-1, +-1/4, +-1/2, +-1/8, 0.
 ///
-///   r0 = limit at infinity of f(x) / x^7,
-///   r1 = f(8),f(-8),
-///   r2 = f(4),f(-4),
-///   r3 = f(2),f(-2),
-///   r4 = f(1),f(-1),
-///   r5 = f(1/4),f(-1/4),
-///   r6 = f(1/2),f(-1/2),
-///   r7 = f(1/8),f(-1/8),
-///   r8 = f(0).
+/// More precisely, we want to compute f(2 ^ (`Limb::WIDTH` * n)) for a polynomial f of degree 15
+/// (or 14), given the 16 (rsp. 15) values:
+///
+/// r0 = limit at infinity of f(x) / x ^ 7,
+/// r1 = f(8), f(-8),
+/// r2 = f(4), f(-4),
+/// r3 = f(2), f(-2),
+/// r4 = f(1), f(-1),
+/// r5 = f(1/4), f(-1/4),
+/// r6 = f(1/2), f(-1/2),
+/// r7 = f(1/8), f(-1/8),
+/// r8 = f(0).
 ///
 /// All couples of the form f(n),f(-n) must be already mixed with
 /// toom_couple_handling(f(n),...,f(-n),...)
 ///
-/// The result is stored in {out, s_plus_t + 7*n (or 8*n)}.
-/// At entry, r8 is stored at {out, 2n},
-/// r6 is stored at {out + 3n, 3n + 1}.
-/// r4 is stored at {out + 7n, 3n + 1}.
-/// r2 is stored at {out +11n, 3n + 1}.
-/// r0 is stored at {out +15n, s_plus_t}.
+/// The result is stored in {out, s_plus_t + 7 * n (or 8 * n)}.
+/// At entry, r8 is stored at {out, 2 * n},
+/// r6 is stored at {out + 3 * n, 3 * n + 1}.
+/// r4 is stored at {out + 7 * n, 3 * n + 1}.
+/// r2 is stored at {out + 11 * n, 3 * n + 1}.
+/// r0 is stored at {out + 15 * n, s_plus_t}.
 ///
 /// The other values are 3 * n + 1 limbs each (with most significant limbs small).
 ///
@@ -1089,15 +1085,18 @@ pub fn _limbs_mul_toom_interpolate_16_points<'a>(
     assert_eq!(scratch.len(), m);
     {
         let (pp_lo, remainder) = out.split_at_mut(3 * n);
-        split_into_chunks_mut!(remainder, 4 * n, [r6, r4], r2);
+        let pp_lo = &mut pp_lo[..n << 1];
+        split_into_chunks_mut!(remainder, n << 2, [r6, r4], r2);
         let r4 = &mut r4[..m];
         let r6 = &mut r6[..m];
         // Interpolation
         if half {
-            let (r2, r0) = r2.split_at_mut(4 * n);
+            let (r2, r0) = r2.split_at_mut(n << 2);
             let r0 = &mut r0[..s_plus_t];
-            if limbs_sub_same_length_in_place_left(&mut r4[..s_plus_t], r0) {
-                assert!(!limbs_sub_limb_in_place(&mut r4[s_plus_t..], 1));
+            let r2 = &mut r2[..m];
+            let (r4_lo, r4_hi) = r4.split_at_mut(s_plus_t);
+            if limbs_sub_same_length_in_place_left(r4_lo, r0) {
+                assert!(!limbs_sub_limb_in_place(r4_hi, 1));
             }
 
             let carry = _limbs_shl_and_sub_same_length(r3, r0, 14, scratch);
@@ -1105,17 +1104,18 @@ pub fn _limbs_mul_toom_interpolate_16_points<'a>(
             _limbs_shl_and_sub(r6, r0, 2, scratch);
 
             let carry = _limbs_shl_and_sub_same_length(r2, r0, 28, scratch);
-            assert!(!limbs_sub_limb_in_place(&mut r2[s_plus_t..m], carry));
+            assert!(!limbs_sub_limb_in_place(&mut r2[s_plus_t..], carry));
             _limbs_shl_and_sub(r5, r0, 4, scratch);
 
             if BIT_CORRECTION {
                 let carry =
                     _limbs_shl_and_sub_same_length(&mut r1[1..], r0, CORRECTED_WIDTH, scratch);
                 limbs_sub_limb_in_place(&mut r1[s_plus_t + 1..], carry);
-                let carry = r5[0];
-                r5[0] = 0x80;
-                _limbs_shl_and_sub_special(r7, &mut r5[..1], r0, 6, scratch);
-                r5[0] = carry;
+                let r5_first = r5.first_mut().unwrap();
+                let carry = *r5_first;
+                *r5_first = 0x80;
+                _limbs_shl_and_sub_special(r7, r5_first, r0, 6, scratch);
+                *r5_first = carry;
             } else {
                 let carry = _limbs_shl_and_sub_same_length(r1, r0, CORRECTED_WIDTH, scratch);
                 assert!(!limbs_sub_limb_in_place(&mut r1[s_plus_t..], carry));
@@ -1124,58 +1124,40 @@ pub fn _limbs_mul_toom_interpolate_16_points<'a>(
         }
         let r2 = &mut r2[..m];
         {
-            let (r5_last, r5_init) = r5.split_last_mut().unwrap();
-            r5_last.wrapping_sub_assign(_limbs_shl_and_sub_same_length(
-                &mut r5_init[n..],
-                &pp_lo[..2 * n],
-                28,
-                scratch,
-            ));
+            let (r5_last, r5_init) = r5[n..].split_last_mut().unwrap();
+            r5_last
+                .wrapping_sub_assign(_limbs_shl_and_sub_same_length(r5_init, pp_lo, 28, scratch));
         }
-        _limbs_shl_and_sub(&mut r2[n..], &pp_lo[..2 * n], 4, scratch);
+        _limbs_shl_and_sub(&mut r2[n..], pp_lo, 4, scratch);
 
         limbs_sub_same_length_to_out(scratch, r5, r2); // can be negative
         assert!(!limbs_slice_add_same_length_in_place_left(r2, r5));
         swap(&mut r5, &mut scratch);
         {
-            let (r6_last, r6_init) = r6.split_last_mut().unwrap();
-            r6_last.wrapping_sub_assign(_limbs_shl_and_sub_same_length(
-                &mut r6_init[n..],
-                &pp_lo[..2 * n],
-                14,
-                scratch,
-            ));
+            let (r6_last, r6_init) = r6[n..].split_last_mut().unwrap();
+            r6_last
+                .wrapping_sub_assign(_limbs_shl_and_sub_same_length(r6_init, pp_lo, 14, scratch));
         }
-        _limbs_shl_and_sub(&mut r3[n..], &pp_lo[..2 * n], 2, scratch);
+        _limbs_shl_and_sub(&mut r3[n..], pp_lo, 2, scratch);
 
         assert!(!limbs_add_same_length_to_out(scratch, r3, r6));
         limbs_sub_same_length_in_place_left(r6, r3); // can be negative
         swap(&mut r3, &mut scratch);
-
-        if BIT_CORRECTION {
-            _limbs_shl_and_sub_same_length(
-                &mut r7[n + 1..],
-                &pp_lo[..2 * n],
-                CORRECTED_WIDTH,
-                scratch,
-            );
-            assert!(!limbs_sub_limb_in_place(&mut r1[n..], pp_lo[0] >> 6));
-            let carry = _limbs_shl_and_sub_same_length(
-                &mut r1[n..],
-                &pp_lo[1..2 * n],
-                Limb::WIDTH - 6,
-                scratch,
-            );
-            limbs_sub_limb_in_place(&mut r1[3 * n - 1..], carry);
-        } else {
-            let carry = _limbs_shl_and_sub_same_length(
-                &mut r7[n..],
-                &pp_lo[..2 * n],
-                CORRECTED_WIDTH,
-                scratch,
-            );
-            r7.last_mut().unwrap().wrapping_sub_assign(carry);
-            _limbs_shl_and_sub(&mut r1[n..], &pp_lo[..2 * n], 6, scratch);
+        {
+            let r1 = &mut r1[n..];
+            if BIT_CORRECTION {
+                _limbs_shl_and_sub_same_length(&mut r7[n + 1..], pp_lo, CORRECTED_WIDTH, scratch);
+                let (pp_lo_first, pp_lo_tail) = pp_lo.split_first().unwrap();
+                assert!(!limbs_sub_limb_in_place(r1, pp_lo_first >> 6));
+                let carry =
+                    _limbs_shl_and_sub_same_length(r1, pp_lo_tail, Limb::WIDTH - 6, scratch);
+                limbs_sub_limb_in_place(&mut r1[2 * n - 1..], carry);
+            } else {
+                let carry =
+                    _limbs_shl_and_sub_same_length(&mut r7[n..], pp_lo, CORRECTED_WIDTH, scratch);
+                r7.last_mut().unwrap().wrapping_sub_assign(carry);
+                _limbs_shl_and_sub(r1, pp_lo, 6, scratch);
+            }
         }
         // can be negative
         limbs_sub_same_length_to_out(scratch, r7, r1);
@@ -1183,8 +1165,8 @@ pub fn _limbs_mul_toom_interpolate_16_points<'a>(
         limbs_slice_add_same_length_in_place_left(r1, r7);
         swap(&mut r7, &mut scratch);
         {
-            let (r4_last, r4_init) = r4.split_last_mut().unwrap();
-            if limbs_sub_same_length_in_place_left(&mut r4_init[n..], &pp_lo[..2 * n]) {
+            let (r4_last, r4_init) = r4[n..].split_last_mut().unwrap();
+            if limbs_sub_same_length_in_place_left(r4_init, pp_lo) {
                 r4_last.wrapping_sub_assign(1);
             }
         }
@@ -1209,8 +1191,11 @@ pub fn _limbs_mul_toom_interpolate_16_points<'a>(
         mpn_submul_1(r5, r7, 12_567_555);
         // A division by 2835x64 follows. Warning: the operand can be negative!
         limbs_div_exact_limb_in_place(r5, 2_835 << 6);
-        if (r5[3 * n] & (Limb::MAX << (Limb::WIDTH - 7))) != 0 {
-            r5[3 * n] |= Limb::MAX << (Limb::WIDTH - 6);
+        {
+            let r5_last = r5.last_mut().unwrap();
+            if r5_last.leading_zeros() < 7 {
+                *r5_last |= Limb::MAX << (Limb::WIDTH - 6);
+            }
         }
 
         if AORSMUL_FASTER_AORS_AORSLSH {
@@ -1229,8 +1214,11 @@ pub fn _limbs_mul_toom_interpolate_16_points<'a>(
         }
         // A division by 255x4 follows. Warning: the operand can be negative!
         limbs_div_exact_limb_in_place(r6, 255 << 2);
-        if (r6[3 * n] & (Limb::MAX << (Limb::WIDTH - 3))) != 0 {
-            r6[3 * n] |= Limb::MAX << (Limb::WIDTH - 2);
+        {
+            let r6_last = r6.last_mut().unwrap();
+            if r6_last.leading_zeros() < 3 {
+                *r6_last |= Limb::MAX << (Limb::WIDTH - 2);
+            }
         }
 
         assert_eq!(_limbs_shl_and_sub_same_length(r3, r4, 7, scratch), 0);
@@ -1277,8 +1265,10 @@ pub fn _limbs_mul_toom_interpolate_16_points<'a>(
         assert!(!limbs_sub_same_length_in_place_left(r1, r7));
     }
 
-    // Last interpolation steps could be mixed with recomposition
-    //||H-r7|M-r7|L-r7|   ||H-r5|M-r5|L-r5|
+    // Last interpolation steps could be mixed with recomposition.
+    //
+    // ||H-r7|M-r7|L-r7|   ||H-r5|M-r5|L-r5|
+    //
     // Recomposition
     //
     // out[] prior to operations:
@@ -1288,86 +1278,85 @@ pub fn _limbs_mul_toom_interpolate_16_points<'a>(
     // |__16|n_15|n_14|n_13|n_12|n_11|n_10|n__9|n__8|n__7|n__6|n__5|n__4|n__3|n__2|n___|n___|out
     // |M r0|L r0|___||H r2|M r2|L r2|___||H r4|M r4|L r4|___||H r6|M r6|L r6|____|H_r8|L r8|out
     // ||H r1|M r1|L r1|   ||H r3|M r3|L r3|   ||H_r5|M_r5|L_r5|   ||H r7|M r7|L r7|
-    //
-    if limbs_slice_add_same_length_in_place_left(&mut out[n..2 * n], &r7[..n]) {
-        if limbs_add_limb_to_out(&mut out[2 * n..], &r7[n..2 * n], 1) {
-            assert!(!limbs_slice_add_limb_in_place(&mut r7[2 * n..], 1));
+    split_into_chunks_mut!(out, n, [_unused, out_1, out_2, out_3], out_4);
+    split_into_chunks_mut!(r7, n, [r7_0, r7_1], r7_2);
+    if limbs_slice_add_same_length_in_place_left(out_1, r7_0) {
+        if limbs_add_limb_to_out(out_2, r7_1, 1) {
+            assert!(!limbs_slice_add_limb_in_place(r7_2, 1));
         }
     } else {
-        out[2 * n..3 * n].copy_from_slice(&r7[n..2 * n]);
+        out_2.copy_from_slice(r7_1);
     }
-    let mut carry = r7[3 * n];
-    if limbs_slice_add_same_length_in_place_left(&mut out[3 * n..4 * n], &r7[2 * n..3 * n]) {
+    let (r7_last, r7_2) = r7_2.split_last_mut().unwrap();
+    let mut carry = *r7_last;
+    if limbs_slice_add_same_length_in_place_left(out_3, r7_2) {
         carry.wrapping_add_assign(1);
     }
-    assert!(!limbs_slice_add_limb_in_place(
-        &mut out[4 * n..6 * n + 1],
-        carry
-    ));
-
-    if limbs_slice_add_same_length_in_place_left(&mut out[5 * n..6 * n], &r5[..n]) {
-        out[6 * n].wrapping_add_assign(1);
+    assert!(!limbs_slice_add_limb_in_place(out_4, carry));
+    split_into_chunks_mut!(out_4, n, [_unused, out_5, out_6, out_7], out_8);
+    split_into_chunks_mut!(r5, n, [r5_0, r5_1], r5_2);
+    if limbs_slice_add_same_length_in_place_left(out_5, r5_0) {
+        out_6[0].wrapping_add_assign(1);
     }
-    let x = out[6 * n];
-    if limbs_add_limb_to_out(&mut out[6 * n..7 * n], &r5[n..2 * n], x) {
-        assert!(!limbs_slice_add_limb_in_place(&mut r5[2 * n..], 1));
+    let out_6_first = out_6[0];
+    if limbs_add_limb_to_out(out_6, r5_1, out_6_first) {
+        assert!(!limbs_slice_add_limb_in_place(r5_2, 1));
     }
-    let mut carry = r5[3 * n];
-    if limbs_slice_add_same_length_in_place_left(&mut out[7 * n..8 * n], &r5[2 * n..3 * n]) {
+    let (r5_last, r5_2) = r5_2.split_last_mut().unwrap();
+    let mut carry = *r5_last;
+    if limbs_slice_add_same_length_in_place_left(out_7, r5_2) {
         carry.wrapping_add_assign(1);
     }
-    assert!(!limbs_slice_add_limb_in_place(
-        &mut out[8 * n..10 * n + 1],
-        carry
-    ));
-
-    if limbs_slice_add_same_length_in_place_left(&mut out[9 * n..10 * n], &r3[..n]) {
-        out[10 * n].wrapping_add_assign(1);
+    assert!(!limbs_slice_add_limb_in_place(out_8, carry));
+    split_into_chunks_mut!(out_8, n, [_unused, out_9, out_10, out_11], out_12);
+    split_into_chunks_mut!(r3, n, [r3_0, r3_1], r3_2);
+    if limbs_slice_add_same_length_in_place_left(out_9, r3_0) {
+        out_10[0].wrapping_add_assign(1);
     }
-    let x = out[10 * n];
-    if limbs_add_limb_to_out(&mut out[10 * n..], &r3[n..2 * n], x) {
-        assert!(!limbs_slice_add_limb_in_place(&mut r3[2 * n..], 1));
+    let out_10_first = out_10[0];
+    if limbs_add_limb_to_out(out_10, r3_1, out_10_first) {
+        assert!(!limbs_slice_add_limb_in_place(r3_2, 1));
     }
-    let mut carry = r3[3 * n];
-    if limbs_slice_add_same_length_in_place_left(&mut out[11 * n..12 * n], &r3[2 * n..3 * n]) {
+    let (r3_last, r3_2) = r3_2.split_last_mut().unwrap();
+    let mut carry = *r3_last;
+    if limbs_slice_add_same_length_in_place_left(out_11, r3_2) {
         carry.wrapping_add_assign(1);
     }
-    assert!(!limbs_slice_add_limb_in_place(
-        &mut out[12 * n..14 * n + 1],
-        carry
-    ));
-    if limbs_slice_add_same_length_in_place_left(&mut out[13 * n..14 * n], &r1[..n]) {
-        out[14 * n].wrapping_add_assign(1);
+    assert!(!limbs_slice_add_limb_in_place(out_12, carry));
+    split_into_chunks_mut!(out_12, n, [_unused, out_13], out_14);
+    let (r1_0, r1_1) = r1.split_at_mut(n);
+    if limbs_slice_add_same_length_in_place_left(out_13, r1_0) {
+        out_14[0].wrapping_add_assign(1);
     }
+    let out_14_first = out_14[0];
     if half {
-        let x = out[14 * n];
-        if limbs_add_limb_to_out(&mut out[14 * n..], &r1[n..2 * n], x) {
-            assert!(!limbs_slice_add_limb_in_place(&mut r1[2 * n..], 1));
+        let (out_14, out_15) = out_14.split_at_mut(n);
+        let (r1_1, r1_2) = r1_1.split_at_mut(n);
+        if limbs_add_limb_to_out(out_14, r1_1, out_14_first) {
+            assert!(!limbs_slice_add_limb_in_place(r1_2, 1));
         }
         if s_plus_t > n {
-            let mut carry = r1[3 * n];
-            if limbs_slice_add_same_length_in_place_left(
-                &mut out[15 * n..16 * n],
-                &r1[2 * n..3 * n],
-            ) {
+            let (out_15, out_16) = out_15.split_at_mut(n);
+            let (r1_last, r1_2) = r1_2.split_last_mut().unwrap();
+            let mut carry = *r1_last;
+            if limbs_slice_add_same_length_in_place_left(out_15, r1_2) {
                 carry.wrapping_add_assign(1);
             }
             assert!(!limbs_slice_add_limb_in_place(
-                &mut out[16 * n..15 * n + s_plus_t],
+                &mut out_16[..s_plus_t - n],
                 carry
             ));
         } else {
             assert!(!limbs_slice_add_same_length_in_place_left(
-                &mut out[15 * n..15 * n + s_plus_t],
-                &r1[2 * n..2 * n + s_plus_t]
+                &mut out_15[..s_plus_t],
+                &r1_2[..s_plus_t]
             ));
         }
     } else {
-        let x = out[14 * n];
         assert!(!limbs_add_limb_to_out(
-            &mut out[14 * n..14 * n + s_plus_t],
-            &r1[n..n + s_plus_t],
-            x
+            &mut out_14[..s_plus_t],
+            &r1_1[..s_plus_t],
+            out_14_first
         ));
     }
 }
