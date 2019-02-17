@@ -56,42 +56,6 @@ pub const MUL_TOOM42_TO_TOOM53_THRESHOLD: usize = 105;
 pub const MUL_TOOM42_TO_TOOM63_THRESHOLD: usize = 114;
 pub const MUL_TOOM33_THRESHOLD_LIMIT: usize = MUL_TOOM33_THRESHOLD;
 
-fn _limbs_toom_couple_handling_special(
-    pp: &mut [Limb],
-    n: usize,
-    np: &mut [Limb],
-    nsign: bool,
-    off: usize,
-    ps: u32,
-    ns: u32,
-) {
-    if nsign {
-        limbs_sub_same_length_in_place_right(&pp[..n], &mut np[..n]);
-        limbs_slice_shr_in_place(&mut np[..n], 1);
-    } else {
-        limbs_slice_add_same_length_in_place_left(&mut np[..n], &pp[..n]);
-        limbs_slice_shr_in_place(&mut np[..n], 1);
-    }
-    limbs_sub_same_length_in_place_left(&mut pp[..n], &np[..n]);
-    if ps > 0 {
-        limbs_slice_shr_in_place(&mut pp[..n], ps);
-    }
-    if ns > 0 {
-        limbs_slice_shr_in_place(&mut np[..n], ns);
-    }
-    pp[n] = if limbs_slice_add_same_length_in_place_left(&mut pp[off..n], &np[..n - off]) {
-        1
-    } else {
-        0
-    };
-    let last_pp = pp[n];
-    assert!(!limbs_add_limb_to_out(
-        &mut pp[n..],
-        &np[n - off..n],
-        last_pp
-    ));
-}
-
 /// Helper function for high degree Toom-Cook algorithms.
 ///
 /// Gets {`xs`, `n`} and (`y_sign` ? -1 : 1) * {`ys`, `n`}. Computes at once:
@@ -3594,140 +3558,135 @@ pub fn _limbs_mul_greater_to_out_toom_8h(
     let first_sign;
     let final_sign;
     {
-        split_into_chunks_mut!(scratch, 3 * n + 1, [r7, _unused, _unused, _unused], wsi);
-        let (v3, wse) = wsi.split_at_mut(n + 1);
-        let (pp_lo, remainder) = pp.split_at_mut(3 * n);
-        let (_, remainder) = remainder.split_at_mut(4 * n);
-        let (_, remainder) = remainder.split_at_mut(4 * n);
-        split_into_chunks_mut!(remainder, n + 1, [v0, v1, v2], _unused);
-        // 1/8, -1/8
-        first_sign = _limbs_mul_toom_evaluate_poly_in_2_pow_neg_and_neg_2_pow_neg(
-            v2,
-            v0,
-            p,
-            ap,
-            n,
-            3,
-            &mut pp_lo[..n + 1],
-        ) ^ _limbs_mul_toom_evaluate_poly_in_2_pow_neg_and_neg_2_pow_neg(
-            v3,
-            v1,
-            q,
-            bp,
-            n,
-            3,
-            &mut pp_lo[..n + 1],
-        );
-        // A(-1/8)*B(-1/8)*8^.
-        // A(+1/8)*B(+1/8)*8^.
-        _limbs_mul_same_length_to_out_toom_8h_recursive(pp_lo, &v0[..n + 1], &v1[..n + 1], wse);
-        _limbs_mul_same_length_to_out_toom_8h_recursive(r7, &v2[..n + 1], &v3[..n + 1], wse);
-    }
-    let limit = if BIT_CORRECTION { 2 * n + 2 } else { 2 * n + 1 };
-    _limbs_toom_couple_handling_special(
-        scratch,
-        limit,
-        pp,
-        first_sign,
-        n,
-        3 * (1 + if half { 1 } else { 0 }),
-        3 * (if half { 1 } else { 0 }),
-    );
-    let another_sign;
-    {
-        split_into_chunks_mut!(scratch, 3 * n + 1, [_unused, r5, r3, r1], wsi);
-        let (v3, wse) = wsi.split_at_mut(n + 1);
-        let (pp_lo, remainder) = pp.split_at_mut(3 * n);
-        let (_unused, remainder) = remainder.split_at_mut(4 * n);
-        let (_unused, remainder) = remainder.split_at_mut(4 * n);
-        split_into_chunks_mut!(remainder, n + 1, [v0, v1, v2], _unused);
-        // 1/4, -1/4
-        let sign = _limbs_mul_toom_evaluate_poly_in_2_pow_neg_and_neg_2_pow_neg(
-            v2,
-            v0,
-            p,
-            ap,
-            n,
-            2,
-            &mut pp_lo[..n + 1],
-        ) ^ _limbs_mul_toom_evaluate_poly_in_2_pow_neg_and_neg_2_pow_neg(
-            v3,
-            v1,
-            q,
-            bp,
-            n,
-            2,
-            &mut pp_lo[..n + 1],
-        );
-        // A(-1/4)*B(-1/4)*4^.
-        // A(+1/4)*B(+1/4)*4^.
-        _limbs_mul_same_length_to_out_toom_8h_recursive(pp_lo, &v0[..n + 1], &v1[..n + 1], wse);
-        _limbs_mul_same_length_to_out_toom_8h_recursive(r5, &v2[..n + 1], &v3[..n + 1], wse);
-        _limbs_toom_couple_handling(
-            r5,
-            &mut pp_lo[..2 * n + 1],
-            sign,
-            n,
-            2 * (1 + if half { 1 } else { 0 }),
-            2 * (if half { 1 } else { 0 }),
-        );
-
-        // 2, -2
-        let sign =
-            _limbs_mul_toom_evaluate_poly_in_2_and_neg_2(v2, v0, p, ap, n, &mut pp_lo[..n + 1])
-                ^ _limbs_mul_toom_evaluate_poly_in_2_and_neg_2(
-                    v3,
-                    v1,
-                    q,
-                    bp,
-                    n,
-                    &mut pp_lo[..n + 1],
-                );
-        // A(-2)*B(-2)
-        // A(+2)*B(+2)
-        _limbs_mul_same_length_to_out_toom_8h_recursive(pp_lo, &v0[..n + 1], &v1[..n + 1], wse);
-        _limbs_mul_same_length_to_out_toom_8h_recursive(r3, &v2[..n + 1], &v3[..n + 1], wse);
-        _limbs_toom_couple_handling(r3, &mut pp_lo[..2 * n + 1], sign, n, 1, 2);
-
-        // 8, -8
-        another_sign = _limbs_mul_toom_evaluate_poly_in_2_pow_and_neg_2_pow(
-            v2,
-            v0,
-            p,
-            ap,
-            n,
-            3,
-            &mut pp_lo[..n + 1],
-        ) ^ _limbs_mul_toom_evaluate_poly_in_2_pow_and_neg_2_pow(
-            v3,
-            v1,
-            q,
-            bp,
-            n,
-            3,
-            &mut pp_lo[..n + 1],
-        );
-        // A(-8)*B(-8)
-        // (+8)*B(+8)
-        _limbs_mul_same_length_to_out_toom_8h_recursive(pp_lo, &v0[..n + 1], &v1[..n + 1], wse);
-        _limbs_mul_same_length_to_out_toom_8h_recursive(r1, &v2[..n + 1], &v3[..n + 1], wse);
-    }
-    _limbs_toom_couple_handling_special(
-        &mut scratch[9 * n + 3..],
-        limit,
-        pp,
-        another_sign,
-        n,
-        3,
-        6,
-    );
-    split_into_chunks_mut!(scratch, 3 * n + 1, [r7, r5, r3, r1], wsi);
-    {
-        let (v3, wse) = wsi.split_at_mut(n + 1);
         let (pp_lo, remainder) = pp.split_at_mut(3 * n);
         let (r6, remainder) = remainder.split_at_mut(4 * n);
         let (r4, remainder) = remainder.split_at_mut(4 * n);
         split_into_chunks_mut!(remainder, n + 1, [v0, v1, v2], _unused);
+        {
+            split_into_chunks_mut!(scratch, 3 * n + 1, [r7, _unused, _unused, _unused], wsi);
+            let (v3, wse) = wsi.split_at_mut(n + 1);
+            // 1/8, -1/8
+            first_sign = _limbs_mul_toom_evaluate_poly_in_2_pow_neg_and_neg_2_pow_neg(
+                v2,
+                v0,
+                p,
+                ap,
+                n,
+                3,
+                &mut pp_lo[..n + 1],
+            ) ^ _limbs_mul_toom_evaluate_poly_in_2_pow_neg_and_neg_2_pow_neg(
+                v3,
+                v1,
+                q,
+                bp,
+                n,
+                3,
+                &mut pp_lo[..n + 1],
+            );
+            // A(-1/8)*B(-1/8)*8^.
+            // A(+1/8)*B(+1/8)*8^.
+            _limbs_mul_same_length_to_out_toom_8h_recursive(pp_lo, &v0[..n + 1], &v1[..n + 1], wse);
+            _limbs_mul_same_length_to_out_toom_8h_recursive(r7, &v2[..n + 1], &v3[..n + 1], wse);
+        }
+        let limit = if BIT_CORRECTION { 2 * n + 2 } else { 2 * n + 1 };
+        _limbs_toom_couple_handling(
+            scratch,
+            &mut pp_lo[..limit],
+            first_sign,
+            n,
+            3 * (1 + if half { 1 } else { 0 }),
+            3 * (if half { 1 } else { 0 }),
+        );
+        let another_sign;
+        {
+            split_into_chunks_mut!(scratch, 3 * n + 1, [_unused, r5, r3, r1], wsi);
+            let (v3, wse) = wsi.split_at_mut(n + 1);
+            // 1/4, -1/4
+            let sign = _limbs_mul_toom_evaluate_poly_in_2_pow_neg_and_neg_2_pow_neg(
+                v2,
+                v0,
+                p,
+                ap,
+                n,
+                2,
+                &mut pp_lo[..n + 1],
+            ) ^ _limbs_mul_toom_evaluate_poly_in_2_pow_neg_and_neg_2_pow_neg(
+                v3,
+                v1,
+                q,
+                bp,
+                n,
+                2,
+                &mut pp_lo[..n + 1],
+            );
+            // A(-1/4)*B(-1/4)*4^.
+            // A(+1/4)*B(+1/4)*4^.
+            _limbs_mul_same_length_to_out_toom_8h_recursive(pp_lo, &v0[..n + 1], &v1[..n + 1], wse);
+            _limbs_mul_same_length_to_out_toom_8h_recursive(r5, &v2[..n + 1], &v3[..n + 1], wse);
+            _limbs_toom_couple_handling(
+                r5,
+                &mut pp_lo[..2 * n + 1],
+                sign,
+                n,
+                2 * (1 + if half { 1 } else { 0 }),
+                2 * (if half { 1 } else { 0 }),
+            );
+
+            // 2, -2
+            let sign =
+                _limbs_mul_toom_evaluate_poly_in_2_and_neg_2(v2, v0, p, ap, n, &mut pp_lo[..n + 1])
+                    ^ _limbs_mul_toom_evaluate_poly_in_2_and_neg_2(
+                        v3,
+                        v1,
+                        q,
+                        bp,
+                        n,
+                        &mut pp_lo[..n + 1],
+                    );
+            // A(-2)*B(-2)
+            // A(+2)*B(+2)
+            _limbs_mul_same_length_to_out_toom_8h_recursive(pp_lo, &v0[..n + 1], &v1[..n + 1], wse);
+            _limbs_mul_same_length_to_out_toom_8h_recursive(r3, &v2[..n + 1], &v3[..n + 1], wse);
+            _limbs_toom_couple_handling(r3, &mut pp_lo[..2 * n + 1], sign, n, 1, 2);
+
+            // 8, -8
+            another_sign = _limbs_mul_toom_evaluate_poly_in_2_pow_and_neg_2_pow(
+                v2,
+                v0,
+                p,
+                ap,
+                n,
+                3,
+                &mut pp_lo[..n + 1],
+            ) ^ _limbs_mul_toom_evaluate_poly_in_2_pow_and_neg_2_pow(
+                v3,
+                v1,
+                q,
+                bp,
+                n,
+                3,
+                &mut pp_lo[..n + 1],
+            );
+            // A(-8)*B(-8)
+            // (+8)*B(+8)
+            _limbs_mul_same_length_to_out_toom_8h_recursive(pp_lo, &v0[..n + 1], &v1[..n + 1], wse);
+            _limbs_mul_same_length_to_out_toom_8h_recursive(r1, &v2[..n + 1], &v3[..n + 1], wse);
+        }
+        _limbs_toom_couple_handling(
+            &mut scratch[9 * n + 3..],
+            &mut pp_lo[..limit],
+            another_sign,
+            n,
+            3,
+            6,
+        );
+        split_into_chunks_mut!(
+            scratch,
+            3 * n + 1,
+            [_unused, _unused, _unused, _unused],
+            wsi
+        );
+        let (v3, wse) = wsi.split_at_mut(n + 1);
         // 1/2, -1/2
         let sign = _limbs_mul_toom_evaluate_poly_in_2_pow_neg_and_neg_2_pow_neg(
             v2,
@@ -3802,6 +3761,7 @@ pub fn _limbs_mul_greater_to_out_toom_8h(
         // A(+4)*B(+4)
         _limbs_mul_same_length_to_out_toom_8h_recursive(pp_lo, &v0[..n + 1], &v1[..n + 1], wse);
     }
+    split_into_chunks_mut!(scratch, 3 * n + 1, [r7, r5, r3, r1], wsi);
     {
         let (v3, wse) = wsi.split_at_mut(n + 1);
         let (r2, v2) = pp[11 * n..].split_at_mut(2 * n + 2);
@@ -3824,5 +3784,15 @@ pub fn _limbs_mul_greater_to_out_toom_8h(
             _limbs_mul_to_out_toom_8h_recursive(r0, &bp[q * n..q * n + t], &ap[p * n..p * n + s]);
         }
     }
-    _limbs_mul_toom_interpolate_16_points(pp, r1, r3, r5, r7, n, s + t, half, wsi);
+    _limbs_mul_toom_interpolate_16_points(
+        pp,
+        r1,
+        r3,
+        r5,
+        r7,
+        n,
+        s + t,
+        half,
+        &mut wsi[..3 * n + 1],
+    );
 }
