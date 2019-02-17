@@ -3,7 +3,6 @@ use malachite_base::num::{Assign, NotAssign, UnsignedAbs, Zero};
 use platform::{Limb, SignedLimb};
 use std::ops::{Mul, MulAssign};
 
-//TODO continue 32-bit impls for 64-bit build
 /// Multiplies an `Integer` by an `i32`, taking the `Integer` by value.
 ///
 /// Time: worst case O(n)
@@ -30,9 +29,20 @@ use std::ops::{Mul, MulAssign};
 impl Mul<SignedLimb> for Integer {
     type Output = Integer;
 
+    #[inline]
     fn mul(mut self, other: SignedLimb) -> Integer {
         self *= other;
         self
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl Mul<i32> for Integer {
+    type Output = Integer;
+
+    #[inline]
+    fn mul(self, other: i32) -> Integer {
+        self * SignedLimb::from(other)
     }
 }
 
@@ -74,6 +84,16 @@ impl<'a> Mul<SignedLimb> for &'a Integer {
     }
 }
 
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> Mul<i32> for &'a Integer {
+    type Output = Integer;
+
+    #[inline]
+    fn mul(self, other: i32) -> Integer {
+        self * SignedLimb::from(other)
+    }
+}
+
 /// Multiplies a `SignedLimb` by an `Integer`, taking the `Integer` by value.
 ///
 /// Time: worst case O(n)
@@ -100,9 +120,20 @@ impl<'a> Mul<SignedLimb> for &'a Integer {
 impl Mul<Integer> for SignedLimb {
     type Output = Integer;
 
+    #[inline]
     fn mul(self, mut other: Integer) -> Integer {
         other *= self;
         other
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl Mul<Integer> for i32 {
+    type Output = Integer;
+
+    #[inline]
+    fn mul(self, other: Integer) -> Integer {
+        SignedLimb::from(self) * other
     }
 }
 
@@ -132,8 +163,19 @@ impl Mul<Integer> for SignedLimb {
 impl<'a> Mul<&'a Integer> for SignedLimb {
     type Output = Integer;
 
+    #[inline]
     fn mul(self, other: &'a Integer) -> Integer {
         other * self
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> Mul<&'a Integer> for i32 {
+    type Output = Integer;
+
+    #[inline]
+    fn mul(self, other: &'a Integer) -> Integer {
+        SignedLimb::from(self) * other
     }
 }
 
@@ -172,5 +214,13 @@ impl MulAssign<SignedLimb> for Integer {
                 self.sign.not_assign();
             }
         }
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl MulAssign<i32> for Integer {
+    #[inline]
+    fn mul_assign(&mut self, other: i32) {
+        *self *= SignedLimb::from(other);
     }
 }

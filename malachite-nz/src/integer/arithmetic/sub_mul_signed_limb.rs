@@ -22,9 +22,20 @@ use platform::{Limb, SignedLimb};
 impl SubMul<Integer, SignedLimb> for Integer {
     type Output = Integer;
 
+    #[inline]
     fn sub_mul(mut self, b: Integer, c: SignedLimb) -> Integer {
         self.sub_mul_assign(b, c);
         self
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl SubMul<Integer, i32> for Integer {
+    type Output = Integer;
+
+    #[inline]
+    fn sub_mul(self, b: Integer, c: i32) -> Integer {
+        self.sub_mul(b, SignedLimb::from(c))
     }
 }
 
@@ -48,9 +59,20 @@ impl SubMul<Integer, SignedLimb> for Integer {
 impl<'a> SubMul<&'a Integer, SignedLimb> for Integer {
     type Output = Integer;
 
+    #[inline]
     fn sub_mul(mut self, b: &'a Integer, c: SignedLimb) -> Integer {
         self.sub_mul_assign(b, c);
         self
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> SubMul<&'a Integer, i32> for Integer {
+    type Output = Integer;
+
+    #[inline]
+    fn sub_mul(self, b: &'a Integer, c: i32) -> Integer {
+        self.sub_mul(b, SignedLimb::from(c))
     }
 }
 
@@ -74,8 +96,19 @@ impl<'a> SubMul<&'a Integer, SignedLimb> for Integer {
 impl<'a> SubMul<Integer, SignedLimb> for &'a Integer {
     type Output = Integer;
 
+    #[inline]
     fn sub_mul(self, b: Integer, c: SignedLimb) -> Integer {
         self.sub_mul(&b, c)
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> SubMul<Integer, i32> for &'a Integer {
+    type Output = Integer;
+
+    #[inline]
+    fn sub_mul(self, b: Integer, c: i32) -> Integer {
+        self.sub_mul(b, SignedLimb::from(c))
     }
 }
 
@@ -108,6 +141,16 @@ impl<'a, 'b> SubMul<&'a Integer, SignedLimb> for &'b Integer {
     }
 }
 
+#[cfg(feature = "64_bit_limbs")]
+impl<'a, 'b> SubMul<&'a Integer, i32> for &'b Integer {
+    type Output = Integer;
+
+    #[inline]
+    fn sub_mul(self, b: &'a Integer, c: i32) -> Integer {
+        self.sub_mul(b, SignedLimb::from(c))
+    }
+}
+
 /// Adds the product of an `Integer` (b) and a `SignedLimb` (c) to an `Integer` (self), in place,
 /// taking b by value.
 ///
@@ -130,6 +173,7 @@ impl<'a, 'b> SubMul<&'a Integer, SignedLimb> for &'b Integer {
 /// }
 /// ```
 impl SubMulAssign<Integer, SignedLimb> for Integer {
+    #[inline]
     fn sub_mul_assign(&mut self, b: Integer, c: SignedLimb) {
         self.sub_mul_assign(&b, c);
     }
@@ -163,5 +207,13 @@ impl<'a> SubMulAssign<&'a Integer, SignedLimb> for Integer {
         } else {
             self.add_mul_assign(b, c.unsigned_abs())
         }
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl SubMulAssign<Integer, i32> for Integer {
+    #[inline]
+    fn sub_mul_assign(&mut self, b: Integer, c: i32) {
+        self.sub_mul_assign(b, SignedLimb::from(c));
     }
 }

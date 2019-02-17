@@ -31,6 +31,7 @@ use natural::Natural::{Large, Small};
 impl<'a> SubMul<Integer, Integer> for Integer {
     type Output = Integer;
 
+    #[inline]
     fn sub_mul(mut self, b: Integer, c: Integer) -> Integer {
         self.sub_mul_assign(b, c);
         self
@@ -65,6 +66,7 @@ impl<'a> SubMul<Integer, Integer> for Integer {
 impl<'a> SubMul<Integer, &'a Integer> for Integer {
     type Output = Integer;
 
+    #[inline]
     fn sub_mul(mut self, b: Integer, c: &'a Integer) -> Integer {
         self.sub_mul_assign(b, c);
         self
@@ -99,6 +101,7 @@ impl<'a> SubMul<Integer, &'a Integer> for Integer {
 impl<'a> SubMul<&'a Integer, Integer> for Integer {
     type Output = Integer;
 
+    #[inline]
     fn sub_mul(mut self, b: &'a Integer, c: Integer) -> Integer {
         self.sub_mul_assign(b, c);
         self
@@ -133,6 +136,7 @@ impl<'a> SubMul<&'a Integer, Integer> for Integer {
 impl<'a, 'b> SubMul<&'a Integer, &'b Integer> for Integer {
     type Output = Integer;
 
+    #[inline]
     fn sub_mul(mut self, b: &'a Integer, c: &'b Integer) -> Integer {
         self.sub_mul_assign(b, c);
         self

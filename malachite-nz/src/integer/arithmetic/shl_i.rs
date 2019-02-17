@@ -38,6 +38,7 @@ macro_rules! impl_integer_shl_signed {
         impl Shl<$t> for Integer {
             type Output = Integer;
 
+            #[inline]
             fn shl(mut self, other: $t) -> Integer {
                 self <<= other;
                 self
@@ -184,6 +185,7 @@ macro_rules! impl_integer_shl_signed {
         impl ShlRound<$t> for Integer {
             type Output = Integer;
 
+            #[inline]
             fn shl_round(mut self, other: $t, rm: RoundingMode) -> Integer {
                 self.shl_round_assign(other, rm);
                 self

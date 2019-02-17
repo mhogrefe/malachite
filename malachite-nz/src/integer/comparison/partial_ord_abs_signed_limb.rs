@@ -34,6 +34,14 @@ impl PartialOrdAbs<SignedLimb> for Integer {
     }
 }
 
+#[cfg(feature = "64_bit_limbs")]
+impl PartialOrdAbs<i32> for Integer {
+    #[inline]
+    fn partial_cmp_abs(&self, other: &i32) -> Option<Ordering> {
+        self.partial_cmp_abs(&SignedLimb::from(*other))
+    }
+}
+
 /// Compares the absolute value of a `SignedLimb` to the absolute value of an `Integer`.
 ///
 /// Time: worst case O(1)
@@ -62,5 +70,13 @@ impl PartialOrdAbs<SignedLimb> for Integer {
 impl PartialOrdAbs<Integer> for SignedLimb {
     fn partial_cmp_abs(&self, other: &Integer) -> Option<Ordering> {
         self.unsigned_abs().partial_cmp(&other.abs)
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl PartialOrdAbs<Integer> for i32 {
+    #[inline]
+    fn partial_cmp_abs(&self, other: &Integer) -> Option<Ordering> {
+        SignedLimb::from(*self).partial_cmp_abs(other)
     }
 }

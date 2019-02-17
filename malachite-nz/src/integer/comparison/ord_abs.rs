@@ -26,6 +26,7 @@ use std::cmp::Ordering;
 /// }
 /// ```
 impl PartialOrdAbs for Integer {
+    #[inline]
     fn partial_cmp_abs(&self, other: &Integer) -> Option<Ordering> {
         Some(self.cmp_abs(other))
     }

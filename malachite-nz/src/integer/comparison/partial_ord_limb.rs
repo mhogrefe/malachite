@@ -31,6 +31,14 @@ impl PartialOrd<Limb> for Integer {
     }
 }
 
+#[cfg(feature = "64_bit_limbs")]
+impl PartialOrd<u32> for Integer {
+    #[inline]
+    fn partial_cmp(&self, other: &u32) -> Option<Ordering> {
+        self.partial_cmp(&Limb::from(*other))
+    }
+}
+
 /// Compares a `Limb` to an `Integer`.
 ///
 /// Time: worst case O(1)
@@ -57,5 +65,13 @@ impl PartialOrd<Integer> for Limb {
         } else {
             Some(Ordering::Greater)
         }
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl PartialOrd<Integer> for u32 {
+    #[inline]
+    fn partial_cmp(&self, other: &Integer) -> Option<Ordering> {
+        Limb::from(*self).partial_cmp(other)
     }
 }

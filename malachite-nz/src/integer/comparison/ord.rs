@@ -19,6 +19,7 @@ use std::cmp::Ordering;
 /// assert!(Integer::from(-123) >= Integer::from(-124));
 /// ```
 impl PartialOrd for Integer {
+    #[inline]
     fn partial_cmp(&self, other: &Integer) -> Option<Ordering> {
         Some(self.cmp(other))
     }

@@ -20,6 +20,14 @@ impl PartialEq<Limb> for Integer {
     }
 }
 
+#[cfg(feature = "64_bit_limbs")]
+impl PartialEq<u32> for Integer {
+    #[inline]
+    fn eq(&self, other: &u32) -> bool {
+        *self == Limb::from(*other)
+    }
+}
+
 /// Determines whether a `Limb` is equal to an `Integer`.
 ///
 /// Time: worst case O(1)
@@ -36,5 +44,13 @@ impl PartialEq<Limb> for Integer {
 impl PartialEq<Integer> for Limb {
     fn eq(&self, other: &Integer) -> bool {
         other.sign && other.abs == *self
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl PartialEq<Integer> for u32 {
+    #[inline]
+    fn eq(&self, other: &Integer) -> bool {
+        Limb::from(*self) == *other
     }
 }

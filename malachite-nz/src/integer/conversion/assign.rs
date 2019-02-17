@@ -1,6 +1,7 @@
 use integer::Integer;
 use malachite_base::num::Assign;
 
+//TODO continue 32-bit impls for 64-bit build
 /// Assigns an `Integer` to another `Integer`, taking the `Integer` on the RHS by value.
 ///
 /// Time: worst case O(1)

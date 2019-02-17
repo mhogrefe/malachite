@@ -38,6 +38,14 @@ impl PartialOrd<SignedLimb> for Integer {
     }
 }
 
+#[cfg(feature = "64_bit_limbs")]
+impl PartialOrd<i32> for Integer {
+    #[inline]
+    fn partial_cmp(&self, other: &i32) -> Option<Ordering> {
+        self.partial_cmp(&SignedLimb::from(*other))
+    }
+}
+
 /// Compares a `SignedLimb` to `self`.
 ///
 /// Time: worst case O(1)
@@ -70,5 +78,13 @@ impl PartialOrd<Integer> for SignedLimb {
         } else {
             other.abs.partial_cmp(&self.unsigned_abs())
         }
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl PartialOrd<Integer> for i32 {
+    #[inline]
+    fn partial_cmp(&self, other: &Integer) -> Option<Ordering> {
+        SignedLimb::from(*self).partial_cmp(other)
     }
 }

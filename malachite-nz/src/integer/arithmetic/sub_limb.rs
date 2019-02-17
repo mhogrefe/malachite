@@ -24,9 +24,20 @@ use std::ops::{Sub, SubAssign};
 impl Sub<Limb> for Integer {
     type Output = Integer;
 
+    #[inline]
     fn sub(mut self, other: Limb) -> Integer {
         self -= other;
         self
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl Sub<u32> for Integer {
+    type Output = Integer;
+
+    #[inline]
+    fn sub(self, other: u32) -> Integer {
+        self - Limb::from(other)
     }
 }
 
@@ -83,6 +94,16 @@ impl<'a> Sub<Limb> for &'a Integer {
     }
 }
 
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> Sub<u32> for &'a Integer {
+    type Output = Integer;
+
+    #[inline]
+    fn sub(self, other: u32) -> Integer {
+        self - Limb::from(other)
+    }
+}
+
 /// Subtracts an `Integer` from a `Limb`, taking the `Integer` by value.
 ///
 /// Time: worst case O(n)
@@ -108,6 +129,16 @@ impl Sub<Integer> for Limb {
     }
 }
 
+#[cfg(feature = "64_bit_limbs")]
+impl Sub<Integer> for u32 {
+    type Output = Integer;
+
+    #[inline]
+    fn sub(self, other: Integer) -> Integer {
+        Limb::from(self) - other
+    }
+}
+
 /// Subtracts an `Integer` from a `Limb`, taking the `Integer` by reference.
 ///
 /// Time: worst case O(n)
@@ -130,6 +161,16 @@ impl<'a> Sub<&'a Integer> for Limb {
 
     fn sub(self, other: &'a Integer) -> Integer {
         -(other - self)
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> Sub<&'a Integer> for u32 {
+    type Output = Integer;
+
+    #[inline]
+    fn sub(self, other: &'a Integer) -> Integer {
+        Limb::from(self) - other
     }
 }
 
@@ -183,5 +224,13 @@ impl SubAssign<Limb> for Integer {
                 abs.assign(other - small_abs);
             }
         }
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl SubAssign<u32> for Integer {
+    #[inline]
+    fn sub_assign(&mut self, other: u32) {
+        *self -= Limb::from(other);
     }
 }

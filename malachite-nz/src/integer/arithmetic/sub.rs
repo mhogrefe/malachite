@@ -31,6 +31,7 @@ use std::ops::{Sub, SubAssign};
 impl Sub<Integer> for Integer {
     type Output = Integer;
 
+    #[inline]
     fn sub(mut self, other: Integer) -> Integer {
         self -= other;
         self
@@ -65,6 +66,7 @@ impl Sub<Integer> for Integer {
 impl<'a> Sub<&'a Integer> for Integer {
     type Output = Integer;
 
+    #[inline]
     fn sub(mut self, other: &'a Integer) -> Integer {
         self -= other;
         self

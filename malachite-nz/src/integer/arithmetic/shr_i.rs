@@ -36,6 +36,7 @@ macro_rules! impl_integer_shr_signed {
         impl Shr<$t> for Integer {
             type Output = Integer;
 
+            #[inline]
             fn shr(mut self, other: $t) -> Integer {
                 self >>= other;
                 self
@@ -182,6 +183,7 @@ macro_rules! impl_integer_shr_signed {
         impl ShrRound<$t> for Integer {
             type Output = Integer;
 
+            #[inline]
             fn shr_round(mut self, other: $t, rm: RoundingMode) -> Integer {
                 self.shr_round_assign(other, rm);
                 self

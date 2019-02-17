@@ -30,9 +30,20 @@ use platform::Limb;
 impl SubMul<Integer, Limb> for Integer {
     type Output = Integer;
 
+    #[inline]
     fn sub_mul(mut self, b: Integer, c: Limb) -> Integer {
         self.sub_mul_assign(b, c);
         self
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl SubMul<Integer, u32> for Integer {
+    type Output = Integer;
+
+    #[inline]
+    fn sub_mul(self, b: Integer, c: u32) -> Integer {
+        self.sub_mul(b, Limb::from(c))
     }
 }
 
@@ -62,9 +73,20 @@ impl SubMul<Integer, Limb> for Integer {
 impl<'a> SubMul<&'a Integer, Limb> for Integer {
     type Output = Integer;
 
+    #[inline]
     fn sub_mul(mut self, b: &'a Integer, c: Limb) -> Integer {
         self.sub_mul_assign(b, c);
         self
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> SubMul<&'a Integer, u32> for Integer {
+    type Output = Integer;
+
+    #[inline]
+    fn sub_mul(self, b: &'a Integer, c: u32) -> Integer {
+        self.sub_mul(b, Limb::from(c))
     }
 }
 
@@ -94,8 +116,19 @@ impl<'a> SubMul<&'a Integer, Limb> for Integer {
 impl<'a> SubMul<Integer, Limb> for &'a Integer {
     type Output = Integer;
 
+    #[inline]
     fn sub_mul(self, b: Integer, c: Limb) -> Integer {
         self.sub_mul(&b, c)
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> SubMul<Integer, u32> for &'a Integer {
+    type Output = Integer;
+
+    #[inline]
+    fn sub_mul(self, b: Integer, c: u32) -> Integer {
+        self.sub_mul(b, Limb::from(c))
     }
 }
 
@@ -159,6 +192,16 @@ impl<'a, 'b> SubMul<&'a Integer, Limb> for &'b Integer {
     }
 }
 
+#[cfg(feature = "64_bit_limbs")]
+impl<'a, 'b> SubMul<&'a Integer, u32> for &'b Integer {
+    type Output = Integer;
+
+    #[inline]
+    fn sub_mul(self, b: &'a Integer, c: u32) -> Integer {
+        self.sub_mul(b, Limb::from(c))
+    }
+}
+
 /// Subs the product of an `Integer` (b) and a `Limb` (c) to an `Integer` (self), in place, taking b
 /// by value.
 ///
@@ -215,6 +258,14 @@ impl SubMulAssign<Integer, Limb> for Integer {
     }
 }
 
+#[cfg(feature = "64_bit_limbs")]
+impl SubMulAssign<Integer, u32> for Integer {
+    #[inline]
+    fn sub_mul_assign(&mut self, b: Integer, c: u32) {
+        self.sub_mul_assign(b, Limb::from(c));
+    }
+}
+
 /// Subs the product of an `Integer` (b) and a `Limb` (c) to an `Integer` (self), in place, taking b
 /// by reference.
 ///
@@ -267,5 +318,13 @@ impl<'a> SubMulAssign<&'a Integer, Limb> for Integer {
             }
             large_aorsmul_val(&mut self.sign, &mut self.abs, b.sign, &b.abs, c, false);
         }
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> SubMulAssign<&'a Integer, u32> for Integer {
+    #[inline]
+    fn sub_mul_assign(&mut self, b: &'a Integer, c: u32) {
+        self.sub_mul_assign(b, Limb::from(c));
     }
 }
