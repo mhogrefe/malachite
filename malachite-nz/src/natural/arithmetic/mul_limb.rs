@@ -78,6 +78,7 @@ pub(crate) fn limbs_mul_limb_with_carry_to_out(
 /// assert_eq!(limbs_mul_limb_to_out(&mut out, &[0xffff_ffff], 2), 1);
 /// assert_eq!(out, &[4_294_967_294, 0, 0]);
 /// ```
+#[inline]
 pub fn limbs_mul_limb_to_out(out: &mut [Limb], in_limbs: &[Limb], limb: Limb) -> Limb {
     limbs_mul_limb_with_carry_to_out(out, in_limbs, limb, 0)
 }

@@ -589,6 +589,7 @@ impl<'a> MulAssign<&'a Natural> for Natural {
 }
 
 pub mod fft;
+pub mod mul_mod;
 pub mod poly_eval;
 pub mod poly_interpolate;
 pub mod toom;

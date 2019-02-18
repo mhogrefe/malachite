@@ -454,7 +454,7 @@ fn benchmark_limbs_mul_greater_to_out_basecase_mem_opt_algorithms(
     m_run_benchmark(
         "limbs_mul_greater_to_out_basecase_mem_opt(&mut [u32], &[u32], &[u32])",
         BenchmarkType::Algorithms,
-        triples_of_unsigned_vec_var_17(gm.with_scale(32_768)),
+        triples_of_unsigned_vec_var_10(gm.with_scale(512)),
         gm.name(),
         limit,
         file_name,

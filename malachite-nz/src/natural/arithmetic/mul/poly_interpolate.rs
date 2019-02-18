@@ -206,7 +206,7 @@ pub(crate) fn _limbs_mul_toom_interpolate_5_points(
 }
 
 /// Interpolation for Toom-3.5, using the evaluation points infinity, 1, -1, 2, -2. More precisely,
-/// we want to compute f(2 ^ (GMP_NUMB_BITS * n)) for a polynomial f of degree 5, given the six
+/// we want to compute f(2 ^ (`Limb::WIDTH` * n)) for a polynomial f of degree 5, given the six
 /// values
 ///
 /// w5 = f(0),
@@ -1225,7 +1225,7 @@ pub fn _limbs_mul_toom_interpolate_16_points<'a>(
         assert_eq!(_limbs_shl_and_sub_same_length(r2, r4, 13, scratch), 0);
         assert_eq!(mpn_submul_1(r2, r3, 400), 0);
 
-        // If GMP_NUMB_BITS < 42 next operations on r1 can give a carry!
+        // If `Limb::WIDTH` < 42 next operations on r1 can give a carry!
         _limbs_shl_and_sub_same_length(r1, r4, 19, scratch);
         mpn_submul_1(r1, r2, 1_428);
         mpn_submul_1(r1, r3, 112_896);

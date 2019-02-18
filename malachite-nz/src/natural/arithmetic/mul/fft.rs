@@ -1,9 +1,6 @@
-use malachite_base::misc::Max;
-use natural::arithmetic::add::limbs_add_same_length_to_out;
-use natural::arithmetic::add_limb::limbs_slice_add_limb_in_place;
-use natural::arithmetic::mul::limbs_mul_same_length_to_out;
-use natural::arithmetic::mul::toom::MUL_TOOM33_THRESHOLD;
-use natural::arithmetic::sub::limbs_sub_same_length_to_out;
+use natural::arithmetic::mul::mul_mod::{
+    mpn_mulmod_bnm1, mpn_mulmod_bnm1_itch, mpn_mulmod_bnm1_next_size,
+};
 use platform::Limb;
 
 //TODO tune
@@ -14,7 +11,7 @@ pub const MUL_FFT_THRESHOLD: usize = 4_736;
 // docs preserved
 // Returns smallest possible number of limbs >= pl for a fft of size 2 ^ k, i.e. smallest multiple
 // of 2 ^ k >= pl.
-// mpn_fft_next_size from mpn/generic/mul-fft.c
+// This is mpn_fft_next_size from mpn/generic/mul-fft.c.
 pub fn mpn_fft_next_size(mut pl: usize, k: u32) -> usize {
     pl = 1 + ((pl - 1) >> k); // ceil(pl / 2 ^ k)
     pl << k
@@ -480,10 +477,6 @@ pub fn mpn_fft_mul(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
     mpn_nussbaumer_mul(out, xs, ys);
 }
 
-//TODO tune
-const MULMOD_BNM1_THRESHOLD: usize = 13;
-const MUL_FFT_MODF_THRESHOLD: usize = MUL_TOOM33_THRESHOLD * 3;
-
 // This is mpn_nussbaumer_mul from mpn/generic/mpn_nussbaumer_mul.c.
 fn mpn_nussbaumer_mul(pp: &mut [Limb], ap: &[Limb], bp: &[Limb]) {
     let an = ap.len();
@@ -497,106 +490,39 @@ fn mpn_nussbaumer_mul(pp: &mut [Limb], ap: &[Limb], bp: &[Limb]) {
     mpn_mulmod_bnm1(pp, rn, ap, bp, &mut tp);
 }
 
-//TODO test
-// This is mpn_mulmod_bnm1_next_size from mpn/generic/mulmod_bnm1.c.
-pub(crate) fn mpn_mulmod_bnm1_next_size(n: usize) -> usize {
-    if n < MULMOD_BNM1_THRESHOLD {
-        return n;
-    } else if n < 4 * (MULMOD_BNM1_THRESHOLD - 1) + 1 {
-        return (n + (2 - 1)) & 2_usize.wrapping_neg();
-    } else if n < 8 * (MULMOD_BNM1_THRESHOLD - 1) + 1 {
-        return (n + (4 - 1)) & 4_usize.wrapping_neg();
-    }
-    let nh = (n + 1) >> 1;
-    if nh < MUL_FFT_MODF_THRESHOLD {
-        (n + (8 - 1)) & 8_usize.wrapping_neg()
-    } else {
-        2 * mpn_fft_next_size(nh, mpn_fft_best_k(nh, false))
-    }
-}
-
-//TODO test
-// This is mpn_mulmod_bnm1_itch from gmp-impl.h.
-pub(crate) fn mpn_mulmod_bnm1_itch(rn: usize, an: usize, bn: usize) -> usize {
-    let n = rn >> 1;
-    rn + 4
-        + if an > n {
-            if bn > n {
-                rn
-            } else {
-                n
-            }
-        } else {
-            0
+// Initialize l[i][j] with bitrev(j)
+//TODO make not pub
+// This is mpn_fft_initl from mpn/generic/mul_fft.c.
+pub fn mpn_fft_initl(l: &mut [&mut [u32]], k: usize) {
+    l[0][0] = 0;
+    let mut i = 1;
+    let mut big_k = 1;
+    while i <= k {
+        for j in 0..big_k {
+            l[i][j] = 2 * l[i - 1][j];
+            l[i][big_k + j] = 1 + l[i][j];
         }
+        i += 1;
+        big_k <<= 1;
+    }
 }
 
-// First k to use for an FFT modF multiply.  A modF FFT is an order
-// log(2^k)/log(2^(k-1)) algorithm, so k=3 is merely 1.5 like Karatsuba,
-// whereas k=4 is 1.33 which is faster than toom3 at 1.485.
+// return the lcm of a and 2^k
 //TODO make not pub
-pub const FFT_FIRST_K: u32 = 4;
-
-// docs preserved
-// Multiplication mod B ^ n - 1.
-//
-// Computes {rp, MIN(rn,an+bn)} <- {ap,an} * {bp,bn} Mod(B ^ rn-1)
-//
-// The result is expected to be 0 if and only if one of the operands already is. Otherwise the class
-// [0] Mod(B ^ rn - 1) is represented by B ^ rn - 1. This should not be a problem if mulmod_bnm1 is
-// used to combine results and obtain a natural number when one knows in advance that the final
-// value is less than B ^ rn - 1. Moreover it should not be a problem if mulmod_bnm1 is used to
-// compute the full product with an + bn <= rn, because this condition implies
-// (B ^ an - 1)(B ^ bn - 1) < (B ^ rn - 1) .
-//
-// Requires 0 < bn <= an <= rn and an + bn > rn / 2
-// Scratch need: rn + (need for recursive call OR rn + 4). This gives
-// S(n) <= rn + MAX (rn + 4, S(n / 2)) <= 2 * rn + 4
-//
-// This is mpn_mulmod_bnm1 from mpn/generic/mulmod_bnm1.c.
-pub fn mpn_mulmod_bnm1(_rp: &mut [Limb], _rn: usize, _ap: &[Limb], _bp: &[Limb], _tp: &mut [Limb]) {
-    unimplemented!();
+// This is mpn_mul_fft_lcm from mpn/generic/mul_fft.c.
+pub fn mpn_mul_fft_lcm(mut a: u32, mut k: u32) -> u32 {
+    let l = k;
+    while a % 2 == 0 && k > 0 {
+        a >>= 1;
+        k -= 1;
+    }
+    a << l
 }
 
-// Inputs are ap and bp; output is rp, with ap, bp and rp all the same length, computation is mod
-// B ^ rn - 1, and values are semi-normalised; zero is represented as either 0 or B ^ n - 1. Needs a
-// scratch of 2rn limbs at tp.
-// This is mpn_bc_mulmod_bnm1 from mpn/generic/mulmod_bnm1.c.
-pub fn mpn_bc_mulmod_bnm1(rp: &mut [Limb], ap: &[Limb], bp: &[Limb], tp: &mut [Limb]) {
-    let rn = ap.len();
-    assert_ne!(rn, 0);
-    limbs_mul_same_length_to_out(tp, ap, bp);
-    let cy = if limbs_add_same_length_to_out(rp, &tp[..rn], &tp[rn..2 * rn]) {
-        1
-    } else {
-        0
-    };
-    // If cy == 1, then the value of rp is at most B ^ rn - 2, so there can be no overflow when
-    // adding in the carry.
-    limbs_slice_add_limb_in_place(&mut rp[..rn], cy);
-}
-
-// Inputs are ap and bp; output is rp, with ap, bp and rp all the same length, in semi-normalised
-// representation, computation is mod B ^ rn + 1. Needs a scratch area of 2rn + 2 limbs at tp.
-// Output is normalised.
-// This is mpn_bc_mulmod_bnp1 from mpn/generic/mulmod_bnm1.c.
-//TODO make not pub
-pub fn mpn_bc_mulmod_bnp1(rp: &mut [Limb], ap: &[Limb], bp: &[Limb], rn: usize, tp: &mut [Limb]) {
-    assert_ne!(0, rn);
-    limbs_mul_same_length_to_out(tp, &ap[..rn + 1], &bp[..rn + 1]);
-    assert_eq!(tp[2 * rn + 1], 0);
-    assert!(tp[2 * rn] < Limb::MAX);
-    let cy = tp[2 * rn]
-        + if limbs_sub_same_length_to_out(rp, &tp[..rn], &tp[rn..2 * rn]) {
-            1
-        } else {
-            0
-        };
-    rp[rn] = 0;
-    assert!(!limbs_slice_add_limb_in_place(&mut rp[..rn + 1], cy));
-}
+//TODO do mpn_fft_mul_2exp_modF next
 
 //TODO make not pub
+// This is mpn_mul_fft from mpn/generic/mul_fft.c.
 pub fn mpn_mul_fft(xp: &mut [Limb], _n: usize, ap1: &[Limb], bp1: &[Limb], _k: u32) -> Limb {
     let anp = ap1.len();
     let bnp = bp1.len();
