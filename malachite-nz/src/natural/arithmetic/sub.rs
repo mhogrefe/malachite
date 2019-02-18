@@ -350,6 +350,20 @@ pub fn _limbs_sub_same_length_with_borrow_in_in_place_left(
 }
 
 //TODO test
+/// This is mpn_sub_nc from gmp-impl.h, where rp is the same as vp.
+pub fn _limbs_sub_same_length_with_borrow_in_place_right(
+    xs: &[Limb],
+    ys: &mut [Limb],
+    borrow_in: bool,
+) -> bool {
+    let mut borrow = limbs_sub_same_length_in_place_right(xs, ys);
+    if borrow_in {
+        borrow |= limbs_sub_limb_in_place(&mut ys[..xs.len()], 1);
+    }
+    borrow
+}
+
+//TODO test
 pub fn _limbs_sub_same_length_in_place_with_overlap(
     xs: &mut [Limb],
     input_start_index: usize,

@@ -1,11 +1,7 @@
-use malachite_base::misc::Max;
 use malachite_base::num::PrimitiveInteger;
-use natural::arithmetic::add::{
-    limbs_add_same_length_to_out, limbs_slice_add_greater_in_place_left,
-};
-use natural::arithmetic::add_limb::limbs_slice_add_limb_in_place;
+use natural::arithmetic::add::limbs_slice_add_greater_in_place_left;
 use natural::arithmetic::add_mul_limb::mpn_addmul_1;
-use natural::arithmetic::mul::fft::{mpn_fft_best_k, mpn_fft_next_size, MUL_FFT_THRESHOLD};
+use natural::arithmetic::mul::fft::MUL_FFT_THRESHOLD;
 use natural::arithmetic::mul::toom::{
     _limbs_mul_greater_to_out_toom_22, _limbs_mul_greater_to_out_toom_32,
     _limbs_mul_greater_to_out_toom_33, _limbs_mul_greater_to_out_toom_33_scratch_size,
@@ -21,7 +17,6 @@ use natural::arithmetic::mul::toom::{
     MUL_TOOM44_THRESHOLD, MUL_TOOM6H_THRESHOLD, MUL_TOOM8H_THRESHOLD,
 };
 use natural::arithmetic::mul_limb::limbs_mul_limb_to_out;
-use natural::arithmetic::sub::limbs_sub_same_length_to_out;
 use natural::Natural::{self, Large, Small};
 use platform::Limb;
 use std::ops::{Mul, MulAssign};
@@ -47,94 +42,6 @@ macro_rules! split_into_chunks_mut {
         )*
         let $xs_last = remainder;
     }
-}
-
-//TODO use better algorithms
-
-//TODO test
-// docs preserved
-// Inputs are ap and bp; output is rp, with ap, bp and rp all the same length, computation is mod
-// B ^ rn - 1, and values are semi-normalised; zero is represented as either 0 or B ^ n - 1. Needs a
-// scratch of 2rn limbs at tp.
-// mpn_bc_mulmod_bnm1 from mpn/generic/mulmod_bnm1.c
-pub fn mpn_bc_mulmod_bnm1(rp: &mut [Limb], ap: &[Limb], bp: &[Limb], tp: &mut [Limb]) {
-    let rn = ap.len();
-    assert_ne!(rn, 0);
-    limbs_mul_same_length_to_out(tp, ap, bp);
-    let cy = if limbs_add_same_length_to_out(rp, &tp[..rn], &tp[rn..2 * rn]) {
-        1
-    } else {
-        0
-    };
-    // If cy == 1, then the value of rp is at most B ^ rn - 2, so there can be no overflow when
-    // adding in the carry.
-    limbs_slice_add_limb_in_place(&mut rp[..rn], cy);
-}
-
-//TODO test
-// docs preserved
-// Inputs are ap and bp; output is rp, with ap, bp and rp all the same length, in semi-normalised
-// representation, computation is mod B ^ rn + 1. Needs a scratch area of 2rn + 2 limbs at tp.
-// Output is normalised.
-// mpn_bc_mulmod_bnp1 from mpn/generic/mulmod_bnm1.c
-pub fn mpn_bc_mulmod_bnp1(rp: &mut [Limb], ap: &[Limb], bp: &[Limb], tp: &mut [Limb]) {
-    let rn = ap.len() - 1;
-    assert_ne!(rn, 0);
-    limbs_mul_same_length_to_out(tp, ap, bp);
-    assert_eq!(tp[2 * rn + 1], 0);
-    assert!(tp[2 * rn] < Limb::MAX);
-    let cy = tp[2 * rn]
-        + if limbs_sub_same_length_to_out(rp, &tp[..rn], &tp[rn..2 * rn]) {
-            1
-        } else {
-            0
-        };
-    rp[rn] = 0;
-    limbs_slice_add_limb_in_place(&mut rp[..=rn], cy);
-}
-
-//TODO PASTE A
-
-//TODO tune
-const MULMOD_BNM1_THRESHOLD: usize = 13;
-const MUL_FFT_MODF_THRESHOLD: usize = MUL_TOOM33_THRESHOLD * 3;
-
-//TODO test
-// checked
-// docs preserved
-// mpn_mulmod_bnm1_next_size from mpn/generic/mulmod_bnm1.c
-pub fn mpn_mulmod_bnm1_next_size(n: usize) -> usize {
-    if n < MULMOD_BNM1_THRESHOLD {
-        return n;
-    } else if n < 4 * (MULMOD_BNM1_THRESHOLD - 1) + 1 {
-        return (n + (2 - 1)) & 2_usize.wrapping_neg();
-    } else if n < 8 * (MULMOD_BNM1_THRESHOLD - 1) + 1 {
-        return (n + (4 - 1)) & 4_usize.wrapping_neg();
-    }
-    let nh = (n + 1) >> 1;
-    if nh < MUL_FFT_MODF_THRESHOLD {
-        (n + (8 - 1)) & 8_usize.wrapping_neg()
-    } else {
-        2 * mpn_fft_next_size(nh, mpn_fft_best_k(nh, 0))
-    }
-}
-
-//TODO test
-// checked
-// docs preserved
-// mpn_mulmod_bnm1_itch from gmp-impl.h
-pub fn mpn_mulmod_bnm1_itch(rn: usize, an: usize, bn: usize) -> usize {
-    let n = rn >> 1;
-    rn + 4
-        + if an > n {
-            if bn > n {
-                rn
-            } else {
-                n
-            }
-        } else {
-            0
-        }
 }
 
 /// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, writes
@@ -383,7 +290,7 @@ pub const MUL_BASECASE_MAX_UN: usize = 500;
 // 1 < ys.len() < MUL_TOOM22_THRESHOLD < MUL_BASECASE_MAX_UN < xs.len()
 //
 // This is currently not measurably better than just basecase.
-fn limbs_mul_greater_to_out_basecase_mem_opt(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
+fn limbs_mul_greater_to_out_basecase_mem_opt_helper(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
     let xs_len = xs.len();
     let ys_len = ys.len();
     assert!(1 < ys_len);
@@ -411,14 +318,14 @@ fn limbs_mul_greater_to_out_basecase_mem_opt(out: &mut [Limb], xs: &[Limb], ys: 
 }
 
 //TODO update docs
-fn limbs_mul_greater_to_out_basecase_or_mem_opt(prod: &mut [Limb], u: &[Limb], v: &[Limb]) {
-    let u_len = u.len();
-    let v_len = v.len();
-    assert!(u_len >= v_len);
-    if v_len > 1 && v_len < MUL_TOOM22_THRESHOLD && u.len() > MUL_BASECASE_MAX_UN {
-        limbs_mul_greater_to_out_basecase_mem_opt(prod, u, v)
+pub fn _limbs_mul_greater_to_out_basecase_mem_opt(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
+    let xs_len = xs.len();
+    let ys_len = ys.len();
+    assert!(xs_len >= ys_len);
+    if ys_len > 1 && ys_len < MUL_TOOM22_THRESHOLD && xs.len() > MUL_BASECASE_MAX_UN {
+        limbs_mul_greater_to_out_basecase_mem_opt_helper(out, xs, ys)
     } else {
-        _limbs_mul_greater_to_out_basecase(prod, u, v);
+        _limbs_mul_greater_to_out_basecase(out, xs, ys);
     }
 }
 
@@ -434,16 +341,6 @@ pub fn limbs_mul(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
     } else {
         limbs_mul_greater(ys, xs)
     }
-}
-
-fn limbs_mul_basecase_mem_opt(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
-    let mut product_limbs = vec![0; xs.len() + ys.len()];
-    if xs.len() >= ys.len() {
-        limbs_mul_greater_to_out_basecase_or_mem_opt(&mut product_limbs, xs, ys);
-    } else {
-        limbs_mul_greater_to_out_basecase_or_mem_opt(&mut product_limbs, ys, xs);
-    }
-    product_limbs
 }
 
 /// Multiplies a `Natural` by a `Natural`, taking both `Natural`s by value.
@@ -684,23 +581,6 @@ impl<'a> MulAssign<&'a Natural> for Natural {
                 (&mut Large(ref mut xs), &Large(ref ys)) => {
                     *xs = limbs_mul(xs, ys);
                 }
-                _ => unreachable!(),
-            }
-            self.trim();
-        }
-    }
-}
-
-impl Natural {
-    pub fn _mul_assign_basecase_mem_opt(&mut self, mut other: Natural) {
-        if let Small(y) = other {
-            *self *= y;
-        } else if let Small(x) = *self {
-            other *= x;
-            *self = other;
-        } else {
-            match (&mut (*self), other) {
-                (&mut Large(ref mut xs), Large(ref ys)) => *xs = limbs_mul_basecase_mem_opt(xs, ys),
                 _ => unreachable!(),
             }
             self.trim();

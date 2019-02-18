@@ -16,7 +16,8 @@ use malachite_nz::natural::arithmetic::mul::toom::{
     _limbs_mul_greater_to_out_toom_8h, _limbs_mul_greater_to_out_toom_8h_scratch_size,
 };
 use malachite_nz::natural::arithmetic::mul::{
-    _limbs_mul_greater_to_out_basecase, limbs_mul_greater_to_out,
+    _limbs_mul_greater_to_out_basecase, _limbs_mul_greater_to_out_basecase_mem_opt,
+    limbs_mul_greater_to_out,
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::{DoubleLimb, Limb};
@@ -3244,11 +3245,6 @@ fn test_mul() {
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let mut n = Natural::from_str(u).unwrap();
-        n._mul_assign_basecase_mem_opt(Natural::from_str(v).unwrap());
-        assert_eq!(n.to_string(), out);
-        assert!(n.is_valid());
-
         let n = Natural::from_str(u).unwrap() * Natural::from_str(v).unwrap();
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
@@ -3338,11 +3334,14 @@ fn limbs_mul_greater_to_out_properties() {
     test_properties_custom_scale(
         2_048,
         triples_of_unsigned_vec_var_10,
-        |&(ref out, ref xs, ref ys)| {
-            let expected_out = limbs_mul_basecase_helper(out, xs, ys);
-            let mut out = out.to_vec();
+        |&(ref out_before, ref xs, ref ys)| {
+            let expected_out = limbs_mul_basecase_helper(out_before, xs, ys);
+            let mut out = out_before.to_vec();
             let highest_result_limb = limbs_mul_greater_to_out(&mut out, xs, ys);
             assert_eq!(highest_result_limb, out[xs.len() + ys.len() - 1]);
+            assert_eq!(out, expected_out);
+            let mut out = out_before.to_vec();
+            _limbs_mul_greater_to_out_basecase_mem_opt(&mut out, xs, ys);
             assert_eq!(out, expected_out);
         },
     );
@@ -3577,15 +3576,6 @@ fn mul_properties() {
         mut_x *= y;
         assert_eq!(mut_x, product);
         assert!(mut_x.is_valid());
-
-        let mut mut_x = x.clone();
-        mut_x._mul_assign_basecase_mem_opt(y.clone());
-        assert!(mut_x.is_valid());
-        assert_eq!(mut_x, product);
-
-        let mut mut_x = natural_to_rug_integer(x);
-        mut_x *= natural_to_rug_integer(y);
-        assert_eq!(rug_integer_to_natural(&mut_x), product);
 
         assert_eq!(
             biguint_to_natural(&(natural_to_biguint(x) * natural_to_biguint(y))),

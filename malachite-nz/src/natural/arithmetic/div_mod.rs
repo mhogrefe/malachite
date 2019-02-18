@@ -3,9 +3,8 @@ use malachite_base::num::{
     JoinHalves, PrimitiveInteger, SplitInHalf, WrappingAddAssign, WrappingSubAssign,
 };
 use natural::arithmetic::add::limbs_slice_add_same_length_in_place_left;
-use natural::arithmetic::mul::{
-    limbs_mul_greater_to_out, limbs_mul_to_out, mpn_mulmod_bnm1_itch, mpn_mulmod_bnm1_next_size,
-};
+use natural::arithmetic::mul::fft::{mpn_mulmod_bnm1_itch, mpn_mulmod_bnm1_next_size};
+use natural::arithmetic::mul::{limbs_mul_greater_to_out, limbs_mul_to_out};
 use natural::arithmetic::sub::limbs_sub_same_length_in_place_left;
 use natural::arithmetic::sub_limb::limbs_sub_limb_in_place;
 use natural::arithmetic::sub_mul_limb::mpn_submul_1;

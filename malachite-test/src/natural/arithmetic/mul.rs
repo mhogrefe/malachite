@@ -10,7 +10,7 @@ use inputs::base::{
     triples_of_unsigned_vec_var_21, triples_of_unsigned_vec_var_22, triples_of_unsigned_vec_var_23,
 };
 use inputs::natural::{nrm_pairs_of_naturals, pairs_of_naturals, rm_pairs_of_naturals};
-use malachite_base::num::SignificantBits;
+use malachite_base::num::{PrimitiveInteger, SignificantBits};
 use malachite_nz::natural::arithmetic::mul::toom::{
     _limbs_mul_greater_to_out_toom_22, _limbs_mul_greater_to_out_toom_22_input_sizes_valid,
     _limbs_mul_greater_to_out_toom_22_scratch_size, _limbs_mul_greater_to_out_toom_32,
@@ -40,8 +40,10 @@ use malachite_nz::natural::arithmetic::mul::toom::{
     _limbs_mul_greater_to_out_toom_8h_scratch_size,
 };
 use malachite_nz::natural::arithmetic::mul::{
-    _limbs_mul_greater_to_out_basecase, limbs_mul_greater_to_out,
+    _limbs_mul_greater_to_out_basecase, _limbs_mul_greater_to_out_basecase_mem_opt,
+    limbs_mul_greater_to_out,
 };
+use malachite_nz::platform::Limb;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_ns_demo!(
@@ -106,6 +108,11 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
         registry,
         Large,
         benchmark_limbs_mul_greater_to_out_algorithms
+    );
+    register_bench!(
+        registry,
+        Large,
+        benchmark_limbs_mul_greater_to_out_basecase_mem_opt_algorithms
     );
     register_bench!(
         registry,
@@ -177,7 +184,6 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
         Large,
         benchmark_natural_mul_assign_library_comparison
     );
-    register_bench!(registry, Large, benchmark_natural_mul_assign_algorithms);
     register_bench!(
         registry,
         Large,
@@ -421,7 +427,7 @@ fn benchmark_limbs_mul_greater_to_out_algorithms(
     m_run_benchmark(
         "limbs_mul_greater_to_out(&mut [u32], &[u32], &[u32])",
         BenchmarkType::Algorithms,
-        triples_of_unsigned_vec_var_10(gm),
+        triples_of_unsigned_vec_var_10(gm.with_scale(2_048)),
         gm.name(),
         limit,
         file_name,
@@ -435,6 +441,35 @@ fn benchmark_limbs_mul_greater_to_out_algorithms(
             (
                 "full",
                 &mut (|(mut out, xs, ys)| no_out!(limbs_mul_greater_to_out(&mut out, &xs, &ys))),
+            ),
+        ],
+    );
+}
+
+fn benchmark_limbs_mul_greater_to_out_basecase_mem_opt_algorithms(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "limbs_mul_greater_to_out_basecase_mem_opt(&mut [u32], &[u32], &[u32])",
+        BenchmarkType::Algorithms,
+        triples_of_unsigned_vec_var_17(gm.with_scale(32_768)),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(_, ref xs, ref ys)| xs.len() + ys.len()),
+        "x.len() + y.len()",
+        &mut [
+            (
+                "limbs_mul_greater_to_out_basecase",
+                &mut (|(mut out, xs, ys)| _limbs_mul_greater_to_out_basecase(&mut out, &xs, &ys)),
+            ),
+            (
+                "limbs_mul_greater_to_out_basecase_mem_opt",
+                &mut (|(mut out, xs, ys)| {
+                    _limbs_mul_greater_to_out_basecase_mem_opt(&mut out, &xs, &ys)
+                }),
             ),
         ],
     );
@@ -851,7 +886,7 @@ fn benchmark_natural_mul_assign_library_comparison(
     m_run_benchmark(
         "Natural *= Natural",
         BenchmarkType::LibraryComparison,
-        rm_pairs_of_naturals(gm),
+        rm_pairs_of_naturals(gm.with_scale(2_048 * Limb::WIDTH)),
         gm.name(),
         limit,
         file_name,
@@ -860,26 +895,6 @@ fn benchmark_natural_mul_assign_library_comparison(
         &mut [
             ("malachite", &mut (|(_, (mut x, y))| x *= y)),
             ("rug", &mut (|((mut x, y), _)| x *= y)),
-        ],
-    );
-}
-
-fn benchmark_natural_mul_assign_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
-        "Natural *= Natural",
-        BenchmarkType::Algorithms,
-        pairs_of_naturals(gm),
-        gm.name(),
-        limit,
-        file_name,
-        &(|&(ref x, ref y)| (x.significant_bits() + y.significant_bits()) as usize),
-        "x.significant_bits() + y.significant_bits()",
-        &mut [
-            ("basecase", &mut (|(mut x, y)| no_out!(x *= y))),
-            (
-                "basecase memory-optimized",
-                &mut (|(mut x, y)| no_out!(x._mul_assign_basecase_mem_opt(y))),
-            ),
         ],
     );
 }
@@ -909,7 +924,7 @@ fn benchmark_natural_mul_library_comparison(gm: GenerationMode, limit: usize, fi
     m_run_benchmark(
         "Natural * Natural",
         BenchmarkType::LibraryComparison,
-        nrm_pairs_of_naturals(gm),
+        nrm_pairs_of_naturals(gm.with_scale(2_048 * Limb::WIDTH)),
         gm.name(),
         limit,
         file_name,

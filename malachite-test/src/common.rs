@@ -223,6 +223,14 @@ impl GenerationMode {
             GenerationMode::SpecialRandom(_) => "special_random",
         }
     }
+
+    pub fn with_scale(self, scale: u32) -> GenerationMode {
+        match self {
+            GenerationMode::Exhaustive => GenerationMode::Exhaustive,
+            GenerationMode::Random(_) => GenerationMode::Random(scale),
+            GenerationMode::SpecialRandom(_) => GenerationMode::SpecialRandom(scale),
+        }
+    }
 }
 
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
