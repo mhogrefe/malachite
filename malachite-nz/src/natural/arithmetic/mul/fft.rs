@@ -1,7 +1,21 @@
+use malachite_base::limbs::limbs_set_zero;
+use malachite_base::num::{NotAssign, PrimitiveInteger, WrappingSubAssign};
+use natural::arithmetic::add::{
+    limbs_slice_add_greater_in_place_left, limbs_slice_add_same_length_in_place_left,
+};
+use natural::arithmetic::add_limb::limbs_slice_add_limb_in_place;
 use natural::arithmetic::mul::mul_mod::{
     mpn_mulmod_bnm1, mpn_mulmod_bnm1_itch, mpn_mulmod_bnm1_next_size,
 };
-use platform::Limb;
+use natural::arithmetic::shl_u::limbs_shl_to_out;
+use natural::arithmetic::shl_u::mpn_lshiftc;
+use natural::arithmetic::sub::{
+    limbs_sub_in_place_left, limbs_sub_same_length_in_place_left, limbs_sub_same_length_to_out,
+    limbs_sub_to_out,
+};
+use natural::arithmetic::sub_limb::limbs_sub_limb_in_place;
+use natural::logic::not::limbs_not_to_out;
+use platform::{Limb, SignedLimb};
 
 //TODO tune
 pub const MUL_FFT_THRESHOLD: usize = 4_736;
@@ -473,6 +487,7 @@ pub fn mpn_fft_best_k(n: usize, sqr: bool) -> u32 {
 }
 
 // This is mpn_fft_mul from gmp-impl.h.
+#[inline]
 pub fn mpn_fft_mul(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
     mpn_nussbaumer_mul(out, xs, ys);
 }
@@ -519,7 +534,253 @@ pub fn mpn_mul_fft_lcm(mut a: u32, mut k: u32) -> u32 {
     a << l
 }
 
-//TODO do mpn_fft_mul_2exp_modF next
+// r <- a*2^d mod 2^(n*`Limb::WIDTH`)+1 with a = {a, n+1}
+// Assumes a is semi-normalized, i.e. a[n] <= 1.
+// r and a must have n+1 limbs, and not overlap.
+// TODO make not pub
+// This is mpn_fft_mul_2exp_modF from mpn/generic/mul_fft.c.
+pub fn mpn_fft_mul_2exp_mod_f(r: &mut [Limb], a: &[Limb], d: u32, n: usize) {
+    let sh = d % Limb::WIDTH;
+    let mut m = (d / Limb::WIDTH) as usize;
+
+    // negate
+    if m >= n {
+        // r[0..m-1]  <-- lshift(a[n-m]..a[n-1], sh)
+        // r[m..n-1]  <-- -lshift(a[0]..a[n-m-1],  sh)
+
+        m -= n;
+        let mut cc;
+        let mut rd;
+        if sh != 0 {
+            // no out shift below since a[n] <= 1
+            limbs_shl_to_out(r, &a[n - m..n + 1], sh);
+            rd = r[m];
+            cc = mpn_lshiftc(&mut r[m..], &a[..n - m], sh);
+        } else {
+            r[..m].copy_from_slice(&a[n - m..n]);
+            rd = a[n];
+            limbs_not_to_out(&mut r[m..], &a[..n - m]);
+            cc = 0;
+        }
+
+        // add cc to r[0], and add rd to r[m]
+        // now add 1 in r[m], subtract 1 in r[n], i.e. add 1 in r[0]
+        r[n] = 0;
+        // cc < 2^sh <= 2^(Limb::WIDTH`-1) thus no overflow here
+        cc += 1;
+        limbs_slice_add_limb_in_place(r, cc);
+        rd += 1;
+        // rd might overflow when sh=Limb::WIDTH`-1
+        cc = if rd == 0 { 1 } else { rd };
+        limbs_slice_add_limb_in_place(&mut r[m + if rd == 0 { 1 } else { 0 }..], cc);
+    } else {
+        let mut cc;
+        let rd;
+        // r[0..m-1]  <-- -lshift(a[n-m]..a[n-1], sh)
+        // r[m..n-1]  <-- lshift(a[0]..a[n-m-1],  sh)
+        if sh != 0 {
+            // no out bits below since a[n] <= 1
+            mpn_lshiftc(r, &a[n - m..n + 1], sh);
+            rd = !r[m];
+            // {r, m+1} = {a+n-m, m+1} << sh
+            cc = limbs_shl_to_out(&mut r[m..], &a[..n - m], sh); // {r+m, n-m} = {a, n-m}<<sh
+        } else {
+            // r[m] is not used below, but we save a test for m=0
+            limbs_not_to_out(r, &a[n - m..n + 1]);
+            rd = a[n];
+            r[m..n].copy_from_slice(&a[..n - m]);
+            cc = 0;
+        }
+
+        // now complement {r, m}, subtract cc from r[0], subtract rd from r[m]
+        // if m=0 we just have r[0]=a[n] << sh
+        if m != 0 {
+            // now add 1 in r[0], subtract 1 in r[m]
+            // then add 1 to r[0]
+            if cc == 0 {
+                cc = if limbs_slice_add_limb_in_place(&mut r[..n], 1) {
+                    1
+                } else {
+                    0
+                };
+            } else {
+                cc -= 1;
+            }
+            cc = if limbs_sub_limb_in_place(&mut r[..m], cc) {
+                1
+            } else {
+                0
+            } + 1;
+            // add 1 to cc instead of rd since rd might overflow
+        }
+
+        // now subtract cc and rd from r[m..n]
+        let (r_last, r_init) = r[..n + 1].split_last_mut().unwrap();
+        *r_last = (if limbs_sub_limb_in_place(&mut r_init[m..], cc) {
+            1 as Limb
+        } else {
+            0
+        })
+        .wrapping_neg();
+        r_last.wrapping_sub_assign(if limbs_sub_limb_in_place(&mut r_init[m..], rd) {
+            1
+        } else {
+            0
+        });
+        if r_last.get_highest_bit() {
+            *r_last = if limbs_slice_add_limb_in_place(r_init, 1) {
+                1
+            } else {
+                0
+            };
+        }
+    }
+}
+
+// store in A[0..nprime] the first M bits from {n, nl},
+// in A[nprime+1..] the following M bits, ...
+// Assumes M is a multiple of GMP_NUMB_BITS (M = l * GMP_NUMB_BITS).
+// T must have space for at least (nprime + 1) limbs.
+// We must have nl <= 2*K*l.
+// TODO make not pub
+// This is mpn_mul_fft_decompose from mpn/generic/mul_fft.c.
+pub fn mpn_mul_fft_decompose(
+    a: &mut [Limb],
+    ap: &mut [&mut [Limb]],
+    k: usize,
+    nprime: usize,
+    n: &[Limb],
+    mut nl: usize,
+    l: usize,
+    mp: u32,
+    t: &mut [Limb],
+) {
+    let kl = k * l;
+
+    // normalize {n, nl} mod 2^(Kl*GMP_NUMB_BITS)+1
+    let mut n_is_tmp = false;
+    let mut n_offset = 0;
+    let mut cy: SignedLimb;
+    let mut tmp;
+    if nl > kl {
+        let mut dif = nl - kl;
+        tmp = vec![0; kl + 1];
+
+        if dif > kl {
+            let mut subp = false;
+            cy = if limbs_sub_same_length_to_out(&mut tmp, &n[..kl], &n[kl..2 * kl]) {
+                1
+            } else {
+                0
+            };
+            n_offset = 2 * kl;
+            dif -= kl;
+
+            // now dif > 0
+            while dif > kl {
+                if subp {
+                    cy += if limbs_sub_same_length_in_place_left(
+                        &mut tmp[..kl],
+                        &n[n_offset..n_offset + kl],
+                    ) {
+                        1
+                    } else {
+                        0
+                    };
+                } else {
+                    cy -= if limbs_slice_add_same_length_in_place_left(
+                        &mut tmp[..kl],
+                        &n[n_offset..n_offset + kl],
+                    ) {
+                        1
+                    } else {
+                        0
+                    };
+                }
+                subp.not_assign();
+                n_offset += kl;
+                dif -= kl;
+            }
+            // now dif <= Kl
+            if subp {
+                cy += if limbs_sub_in_place_left(&mut tmp[..kl], &n[n_offset..n_offset + dif]) {
+                    1
+                } else {
+                    0
+                };
+            } else {
+                cy -= if limbs_slice_add_greater_in_place_left(
+                    &mut tmp[..kl],
+                    &n[n_offset..n_offset + dif],
+                ) {
+                    1
+                } else {
+                    0
+                };
+            }
+            if cy >= 0 {
+                cy = if limbs_slice_add_limb_in_place(&mut tmp[..kl], cy as Limb) {
+                    1
+                } else {
+                    0
+                };
+            } else {
+                cy = if limbs_sub_limb_in_place(&mut tmp[..kl], -cy as Limb) {
+                    1
+                } else {
+                    0
+                };
+            }
+        } else {
+            // dif <= Kl, i.e. nl <= 2 * Kl
+            cy = if limbs_sub_to_out(&mut tmp, &n[..kl], &n[kl..kl + dif]) {
+                1
+            } else {
+                0
+            };
+            cy = if limbs_slice_add_limb_in_place(&mut tmp[..kl], cy as Limb) {
+                1
+            } else {
+                0
+            };
+        }
+        tmp[kl] = cy as Limb;
+        nl = kl + 1;
+        n_is_tmp = true;
+    } else {
+        tmp = Vec::with_capacity(0);
+    }
+    let mut tmp_offset = 0;
+    let mut a_offset = 0;
+    for i in 0..k {
+        //TODO make sure this really needs to be a copy
+        ap[i].copy_from_slice(&a[a_offset..]);
+        // store the next M bits of n into A[0..nprime]
+        // nl is the number of remaining limbs
+        if nl > 0 {
+            let j = if l <= nl && i < k - 1 { l } else { nl }; // store j next limbs
+            nl -= j;
+            if n_is_tmp {
+                t[..j].copy_from_slice(&tmp[tmp_offset..tmp_offset + j]);
+            } else {
+                t[..j].copy_from_slice(&n[n_offset..n_offset + j]);
+            }
+            limbs_set_zero(&mut t[j..nprime + 1]);
+            if n_is_tmp {
+                tmp_offset += l;
+            } else {
+                n_offset += l;
+            }
+            mpn_fft_mul_2exp_mod_f(&mut a[a_offset..], t, i as u32 * mp, nprime);
+        } else {
+            limbs_set_zero(&mut a[a_offset..a_offset + nprime + 1]);
+        }
+        a_offset += nprime + 1;
+    }
+    assert_eq!(nl, 0);
+}
+
+//TODO mpn_fft_add_modF and mpn_fft_sub_modF next
 
 //TODO make not pub
 // This is mpn_mul_fft from mpn/generic/mul_fft.c.
