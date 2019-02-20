@@ -886,7 +886,7 @@ fn benchmark_natural_mul_assign_library_comparison(
     m_run_benchmark(
         "Natural *= Natural",
         BenchmarkType::LibraryComparison,
-        rm_pairs_of_naturals(gm.with_scale(2_048 * Limb::WIDTH)),
+        rm_pairs_of_naturals(gm.with_scale(16 * Limb::WIDTH)),
         gm.name(),
         limit,
         file_name,
@@ -924,7 +924,7 @@ fn benchmark_natural_mul_library_comparison(gm: GenerationMode, limit: usize, fi
     m_run_benchmark(
         "Natural * Natural",
         BenchmarkType::LibraryComparison,
-        nrm_pairs_of_naturals(gm.with_scale(2_048 * Limb::WIDTH)),
+        nrm_pairs_of_naturals(gm.with_scale(16 * Limb::WIDTH)),
         gm.name(),
         limit,
         file_name,

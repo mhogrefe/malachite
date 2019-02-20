@@ -1,14 +1,17 @@
 use malachite_base::limbs::limbs_set_zero;
-use malachite_base::num::{NotAssign, PrimitiveInteger, WrappingSubAssign};
+use malachite_base::num::{NotAssign, PrimitiveInteger, UnsignedAbs, WrappingSubAssign};
+use natural::arithmetic::add::limbs_add_same_length_to_out;
 use natural::arithmetic::add::{
     limbs_slice_add_greater_in_place_left, limbs_slice_add_same_length_in_place_left,
 };
+use natural::arithmetic::add_limb::limbs_add_limb_to_out;
 use natural::arithmetic::add_limb::limbs_slice_add_limb_in_place;
 use natural::arithmetic::mul::mul_mod::{
     mpn_mulmod_bnm1, mpn_mulmod_bnm1_itch, mpn_mulmod_bnm1_next_size,
 };
 use natural::arithmetic::shl_u::limbs_shl_to_out;
 use natural::arithmetic::shl_u::mpn_lshiftc;
+use natural::arithmetic::sub::limbs_sub_same_length_in_place_right;
 use natural::arithmetic::sub::{
     limbs_sub_in_place_left, limbs_sub_same_length_in_place_left, limbs_sub_same_length_to_out,
     limbs_sub_to_out,
@@ -537,9 +540,8 @@ pub fn mpn_mul_fft_lcm(mut a: u32, mut k: u32) -> u32 {
 // r <- a*2^d mod 2^(n*`Limb::WIDTH`)+1 with a = {a, n+1}
 // Assumes a is semi-normalized, i.e. a[n] <= 1.
 // r and a must have n+1 limbs, and not overlap.
-// TODO make not pub
 // This is mpn_fft_mul_2exp_modF from mpn/generic/mul_fft.c.
-pub fn mpn_fft_mul_2exp_mod_f(r: &mut [Limb], a: &[Limb], d: u32, n: usize) {
+fn mpn_fft_mul_2exp_mod_f(r: &mut [Limb], a: &[Limb], d: u32, n: usize) {
     let sh = d % Limb::WIDTH;
     let mut m = (d / Limb::WIDTH) as usize;
 
@@ -780,7 +782,285 @@ pub fn mpn_mul_fft_decompose(
     assert_eq!(nl, 0);
 }
 
-//TODO mpn_fft_add_modF and mpn_fft_sub_modF next
+// r <- a+b mod 2^(n*GMP_NUMB_BITS)+1.
+// Assumes a and b are semi-normalized.
+// TODO make not pub
+// This is mpn_fft_add_modF from mpn/generic/mul_fft.c, where r and a are disjoint.
+pub fn mpn_fft_add_mod_f(r: &mut [Limb], a: &[Limb], b: &[Limb], n: usize) {
+    let c = a[n].wrapping_add(b[n]).wrapping_add(
+        if limbs_add_same_length_to_out(r, &a[..n], &b[..n]) {
+            1
+        } else {
+            0
+        },
+    );
+    // 0 <= c <= 3
+    if c > 1 {
+        r[n] = 1; // r[n] - c = 1
+        assert!(!limbs_sub_limb_in_place(&mut r[..n + 1], c - 1));
+    } else {
+        r[n] = c;
+    }
+}
+
+// This is mpn_fft_add_modF from mpn/generic/mul_fft.c, where r == a.
+fn mpn_fft_add_mod_f_in_place_left(a: &mut [Limb], b: &[Limb], n: usize) {
+    let c = a[n].wrapping_add(b[n]).wrapping_add(
+        if limbs_slice_add_same_length_in_place_left(&mut a[..n], &b[..n]) {
+            1
+        } else {
+            0
+        },
+    );
+    // 0 <= c <= 3
+    if c > 1 {
+        a[n] = 1; // r[n] - c = 1
+        assert!(!limbs_sub_limb_in_place(&mut a[..n + 1], c - 1));
+    } else {
+        a[n] = c;
+    }
+}
+
+// r <- a-b mod 2^(n*GMP_NUMB_BITS)+1.
+// Assumes a and b are semi-normalized.
+// TODO make not pub
+// This is mpn_fft_sub_modF from mpn/generic/mul_fft.c.
+pub fn mpn_fft_sub_mod_f(r: &mut [Limb], a: &[Limb], b: &[Limb], n: usize) {
+    let c = a[n].wrapping_sub(b[n]).wrapping_sub(
+        if limbs_sub_same_length_to_out(r, &a[..n], &b[..n]) {
+            1
+        } else {
+            0
+        },
+    );
+    // -2 <= c <= 1
+    if c.get_highest_bit() {
+        r[n] = 0;
+        assert!(!limbs_slice_add_limb_in_place(
+            &mut r[..n + 1],
+            c.wrapping_neg()
+        ));
+    } else {
+        r[n] = c;
+    }
+}
+
+// input: A[0] ... A[inc*(K-1)] are residues mod 2^N+1 where
+//    N=n*GMP_NUMB_BITS, and 2^omega is a primitive root mod 2^N+1
+// output: A[inc*l[k][i]] <- \sum (2^omega)^(ij) A[inc*j] mod 2^N+1
+// TODO make not pub
+// This is mpn_fft_fft from mpn/generic/mul_fft.c, but this `ll` is (GMP `ll`) - 1
+pub fn mpn_fft_fft(
+    ap: &mut [&mut [Limb]],
+    k: usize,
+    ll: &[&[u32]],
+    omega: u32,
+    n: usize,
+    inc: usize,
+    tp: &mut [Limb],
+) {
+    if k == 2 {
+        tp[..n + 1].copy_from_slice(&ap[0][..n + 1]);
+        {
+            let (ap_first, ap_tail) = ap.split_first_mut().unwrap();
+            limbs_slice_add_same_length_in_place_left(
+                &mut ap_first[..n + 1],
+                &ap_tail[inc - 1][..n + 1],
+            );
+        }
+        let cy = limbs_sub_same_length_in_place_right(&tp[..n + 1], &mut ap[inc][..n + 1]);
+        // can be 2 or 3
+        if ap[0][n] > 1 {
+            let x = ap[0][n] - 1;
+            ap[0][n] = 1 - if limbs_sub_limb_in_place(&mut ap[0][..n], x) {
+                1
+            } else {
+                0
+            };
+        }
+        // Ap[inc][n] can be -1 or -2
+        if cy {
+            let x = (!ap[inc][n]).wrapping_add(1);
+            ap[inc][n] = if limbs_slice_add_limb_in_place(&mut ap[inc][..n], x) {
+                1
+            } else {
+                0
+            };
+        }
+    } else {
+        let k2 = k >> 1;
+        let mut lki = 1;
+
+        mpn_fft_fft(ap, k2, ll, 2 * omega, n, inc * 2, tp);
+        mpn_fft_fft(&mut ap[inc..], k2, ll, 2 * omega, n, inc * 2, tp);
+        let mut ap_offset = 0;
+        //  A[2*j*inc]   <- A[2*j*inc] + omega^l[k][2*j*inc] A[(2j+1)inc]
+        // A[(2j+1)inc] <- A[2*j*inc] + omega^l[k][(2j+1)inc] A[(2j+1)inc]
+        for _ in 0..k2 {
+            /* Ap[inc] <- Ap[0] + Ap[inc] * 2^(lk[1] * omega)
+            Ap[0]   <- Ap[0] + Ap[inc] * 2^(lk[0] * omega) */
+            mpn_fft_mul_2exp_mod_f(tp, ap[ap_offset + inc], ll[lki][0].wrapping_mul(omega), n);
+            {
+                let (ap_lo, ap_hi) = ap.split_at_mut(ap_offset + inc);
+                mpn_fft_sub_mod_f(ap_hi[0], ap_lo[ap_offset], tp, n);
+            }
+            mpn_fft_add_mod_f_in_place_left(ap[ap_offset], tp, n);
+            lki += 2;
+            ap_offset += 2 * inc;
+        }
+    }
+}
+
+// input: A^[l[k][0]] A^[l[k][1]] ... A^[l[k][K-1]]
+// output: K*A[0] K*A[K-1] ... K*A[1].
+// Assumes the Ap[] are pseudo-normalized, i.e. 0 <= Ap[][n] <= 1.
+// This condition is also fulfilled at exit.
+// TODO make not pub
+// This is mpn_fft_fftinv from mpn/generic/mul_fft.c.
+pub fn mpn_fft_fftinv(ap: &mut [&mut [Limb]], k: usize, omega: u32, n: usize, tp: &mut [Limb]) {
+    if k == 2 {
+        tp[..n + 1].copy_from_slice(&ap[0][..n + 1]);
+        {
+            let (ap_first, ap_tail) = ap.split_first_mut().unwrap();
+            limbs_slice_add_same_length_in_place_left(&mut ap_first[..n + 1], &ap_tail[0][..n + 1]);
+        }
+        let cy = limbs_sub_same_length_in_place_right(&tp[..n + 1], &mut ap[1][..n + 1]);
+        // can be 2 or 3
+        if ap[0][n] > 1 {
+            let x = ap[0][n] - 1;
+            ap[0][n] = 1 - if limbs_sub_limb_in_place(&mut ap[0][..n], x) {
+                1
+            } else {
+                0
+            };
+        }
+        // Ap[1][n] can be -1 or -2
+        if cy {
+            let x = (!ap[1][n]).wrapping_add(1);
+            ap[1][n] = if limbs_slice_add_limb_in_place(&mut ap[1][..n], x) {
+                1
+            } else {
+                0
+            };
+        }
+    } else {
+        let k2 = k >> 1;
+        mpn_fft_fftinv(ap, k2, 2 * omega, n, tp);
+        mpn_fft_fftinv(&mut ap[k2..], k2, 2 * omega, n, tp);
+        // A[j]     <- A[j] + omega^j A[j+K/2]
+        // A[j+K/2] <- A[j] + omega^(j+K/2) A[j+K/2]
+        let mut ap_offset = 0;
+        for j in 0..k2 as u32 {
+            // Ap[K2] <- Ap[0] + Ap[K2] * 2^((j + K2) * omega)
+            // Ap[0]  <- Ap[0] + Ap[K2] * 2^(j * omega)
+            mpn_fft_mul_2exp_mod_f(tp, ap[ap_offset + k2], j * omega, n);
+            {
+                let (ap_lo, ap_hi) = ap.split_at_mut(ap_offset + k2);
+                mpn_fft_sub_mod_f(ap_hi[0], ap_lo[ap_offset], tp, n);
+            }
+            mpn_fft_add_mod_f_in_place_left(ap[ap_offset], tp, n);
+            ap_offset += 1;
+        }
+    }
+}
+
+// Given ap[0..n] with ap[n]<=1, reduce it modulo 2^(n*GMP_NUMB_BITS)+1,
+// by subtracting that modulus if necessary.
+//
+// If ap[0..n] is exactly 2^(n*GMP_NUMB_BITS) then mpn_sub_1 produces a
+// borrow and the limbs must be zeroed out again.  This will occur very
+// infrequently.
+// This is mpn_fft_normalize from mpn/generic/mul_fft.c.
+fn mpn_fft_normalize(ap: &mut [Limb], n: usize) {
+    if ap[n] != 0 {
+        assert!(!limbs_sub_limb_in_place(&mut ap[..n + 1], 1));
+        if ap[n] == 0 {
+            // This happens with very low probability; we have yet to trigger it,
+            // and thereby make sure this code is correct.
+            limbs_set_zero(&mut ap[..n]);
+            ap[n] = 1;
+        } else {
+            ap[n] = 0;
+        }
+    }
+}
+
+// R <- A/2^k mod 2^(n*GMP_NUMB_BITS)+1
+// TODO make not pub
+// This is mpn_fft_div_2exp_modF from mpn/generic/mul_fft.c.
+pub fn mpn_fft_div_2exp_mod_f(r: &mut [Limb], a: &[Limb], k: u32, n: usize) {
+    let i = 2 * n as u32 * Limb::WIDTH - k;
+    mpn_fft_mul_2exp_mod_f(r, a, i, n);
+    // 1/2^k = 2^(2nL-k) mod 2^(n*GMP_NUMB_BITS)+1
+    // normalize so that R < 2^(n*GMP_NUMB_BITS)+1
+    mpn_fft_normalize(r, n);
+}
+
+// {rp,n} <- {ap,an} mod 2^(n*GMP_NUMB_BITS)+1, n <= an <= 3*n.
+// Returns carry out, i.e. 1 iff {ap,an} = -1 mod 2^(n*GMP_NUMB_BITS)+1,
+// then {rp,n}=0.
+// TODO make not pub
+// This is mpn_fft_norm_modF from mpn/generic/mul_fft.c.
+pub fn mpn_fft_norm_mod_f(rp: &mut [Limb], n: usize, ap: &[Limb], an: usize) -> Limb {
+    assert!(n <= an && an <= 3 * n);
+    let m = an - 2 * n;
+    let l;
+    let mut rpn: SignedLimb;
+    if m > 0 {
+        l = n;
+        // add {ap, m} and {ap+2n, m} in {rp, m}
+        let cc = if limbs_add_same_length_to_out(rp, &ap[..m], &ap[2 * n..2 * n + m]) {
+            1
+        } else {
+            0
+        };
+        // copy {ap+m, n-m} to {rp+m, n-m}
+        rpn = if limbs_add_limb_to_out(&mut rp[m..n], &ap[m..n], cc) {
+            1
+        } else {
+            0
+        };
+    } else {
+        l = an - n; // l <= n
+        rp[..n].copy_from_slice(&ap[..n]);
+        rpn = 0;
+    }
+    // remains to subtract {ap+n, l} from {rp, n+1}
+    let cc = if limbs_sub_same_length_in_place_left(&mut rp[..l], &ap[n..n + l]) {
+        1
+    } else {
+        0
+    };
+    rpn -= if limbs_sub_limb_in_place(&mut rp[l..n], cc) {
+        1
+    } else {
+        0
+    };
+    // necessarily rpn = -1
+    if rpn < 0 {
+        if limbs_slice_add_limb_in_place(&mut rp[..n], 1) {
+            1
+        } else {
+            0
+        }
+    } else {
+        rpn.unsigned_abs()
+    }
+}
+
+// TODO implement, make not pub
+// This is mpn_fft_mul_modF_K from mpn/generic/mul_fft.c, where ap != bp
+pub fn mpn_fft_mul_mod_f_k(_ap: &mut [&mut [Limb]], _bp: &mut [&mut [Limb]], _n: usize, _k: usize) {
+    unimplemented!();
+}
+
+// TODO implement, make not pub
+// This is mpn_fft_mul_modF_K from mpn/generic/mul_fft.c, where ap == bp
+pub fn mpn_fft_mul_mod_f_k_sqr(_ap: &mut [&mut [Limb]], _n: usize, _k: usize) {
+    unimplemented!();
+}
+
+//TODO do mpn_fft_mul_modF_K next
 
 //TODO make not pub
 // This is mpn_mul_fft from mpn/generic/mul_fft.c.

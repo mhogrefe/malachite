@@ -22,7 +22,6 @@ cargo fmt &&
 #cargo +nightly clippy
 cargo test --release &&
 cargo test --release --features 64_bit_limbs --no-default-features &&
-#cargo run --release -- exhaustive 100000 all &&
 cargo rustc --release --lib -- --emit asm &&
 cd .. &&
 python additional-lints.py

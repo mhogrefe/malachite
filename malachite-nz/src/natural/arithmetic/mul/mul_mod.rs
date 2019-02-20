@@ -77,7 +77,13 @@ const FFT_FIRST_K: u32 = 4;
 // S(n) <= rn + MAX (rn + 4, S(n / 2)) <= 2 * rn + 4
 //
 // This is mpn_mulmod_bnm1 from mpn/generic/mulmod_bnm1.c.
-pub fn mpn_mulmod_bnm1(rp: &mut [Limb], rn: usize, ap: &[Limb], bp: &[Limb], tp: &mut [Limb]) {
+pub(crate) fn mpn_mulmod_bnm1(
+    rp: &mut [Limb],
+    rn: usize,
+    ap: &[Limb],
+    bp: &[Limb],
+    tp: &mut [Limb],
+) {
     let an = ap.len();
     let bn = bp.len();
     assert_ne!(0, bn);
@@ -340,7 +346,7 @@ pub fn mpn_mulmod_bnm1(rp: &mut [Limb], rn: usize, ap: &[Limb], bp: &[Limb], tp:
 // B ^ rn - 1, and values are semi-normalised; zero is represented as either 0 or B ^ n - 1. Needs a
 // scratch of 2rn limbs at tp.
 // This is mpn_bc_mulmod_bnm1 from mpn/generic/mulmod_bnm1.c.
-pub fn mpn_bc_mulmod_bnm1(rp: &mut [Limb], ap: &[Limb], bp: &[Limb], tp: &mut [Limb]) {
+fn mpn_bc_mulmod_bnm1(rp: &mut [Limb], ap: &[Limb], bp: &[Limb], tp: &mut [Limb]) {
     let rn = ap.len();
     assert_ne!(rn, 0);
     limbs_mul_same_length_to_out(tp, ap, bp);
