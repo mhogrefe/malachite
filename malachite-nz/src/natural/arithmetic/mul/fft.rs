@@ -17,8 +17,10 @@ use natural::arithmetic::sub::{
     limbs_sub_to_out,
 };
 use natural::arithmetic::sub_limb::limbs_sub_limb_in_place;
+use natural::comparison::ord::limbs_cmp_same_length;
 use natural::logic::not::limbs_not_to_out;
 use platform::{Limb, SignedLimb};
+use std::cmp::Ordering;
 
 //TODO tune
 pub const MUL_FFT_THRESHOLD: usize = 4_736;
@@ -541,9 +543,9 @@ pub fn mpn_mul_fft_lcm(mut a: u32, mut k: u32) -> u32 {
 // Assumes a is semi-normalized, i.e. a[n] <= 1.
 // r and a must have n+1 limbs, and not overlap.
 // This is mpn_fft_mul_2exp_modF from mpn/generic/mul_fft.c.
-fn mpn_fft_mul_2exp_mod_f(r: &mut [Limb], a: &[Limb], d: u32, n: usize) {
-    let sh = d % Limb::WIDTH;
-    let mut m = (d / Limb::WIDTH) as usize;
+fn mpn_fft_mul_2exp_mod_f(r: &mut [Limb], a: &[Limb], d: usize, n: usize) {
+    let sh = d as u32 % Limb::WIDTH;
+    let mut m = d / Limb::WIDTH as usize;
 
     // negate
     if m >= n {
@@ -654,7 +656,7 @@ pub fn mpn_mul_fft_decompose(
     n: &[Limb],
     mut nl: usize,
     l: usize,
-    mp: u32,
+    mp: usize,
     t: &mut [Limb],
 ) {
     let kl = k * l;
@@ -773,7 +775,7 @@ pub fn mpn_mul_fft_decompose(
             } else {
                 n_offset += l;
             }
-            mpn_fft_mul_2exp_mod_f(&mut a[a_offset..], t, i as u32 * mp, nprime);
+            mpn_fft_mul_2exp_mod_f(&mut a[a_offset..], t, i * mp, nprime);
         } else {
             limbs_set_zero(&mut a[a_offset..a_offset + nprime + 1]);
         }
@@ -848,13 +850,12 @@ pub fn mpn_fft_sub_mod_f(r: &mut [Limb], a: &[Limb], b: &[Limb], n: usize) {
 // input: A[0] ... A[inc*(K-1)] are residues mod 2^N+1 where
 //    N=n*GMP_NUMB_BITS, and 2^omega is a primitive root mod 2^N+1
 // output: A[inc*l[k][i]] <- \sum (2^omega)^(ij) A[inc*j] mod 2^N+1
-// TODO make not pub
 // This is mpn_fft_fft from mpn/generic/mul_fft.c, but this `ll` is (GMP `ll`) - 1
-pub fn mpn_fft_fft(
+fn mpn_fft_fft(
     ap: &mut [&mut [Limb]],
     k: usize,
-    ll: &[&[u32]],
-    omega: u32,
+    ll: &[&[usize]],
+    omega: usize,
     n: usize,
     inc: usize,
     tp: &mut [Limb],
@@ -915,9 +916,8 @@ pub fn mpn_fft_fft(
 // output: K*A[0] K*A[K-1] ... K*A[1].
 // Assumes the Ap[] are pseudo-normalized, i.e. 0 <= Ap[][n] <= 1.
 // This condition is also fulfilled at exit.
-// TODO make not pub
 // This is mpn_fft_fftinv from mpn/generic/mul_fft.c.
-pub fn mpn_fft_fftinv(ap: &mut [&mut [Limb]], k: usize, omega: u32, n: usize, tp: &mut [Limb]) {
+fn mpn_fft_fftinv(ap: &mut [&mut [Limb]], k: usize, omega: usize, n: usize, tp: &mut [Limb]) {
     if k == 2 {
         tp[..n + 1].copy_from_slice(&ap[0][..n + 1]);
         {
@@ -950,7 +950,7 @@ pub fn mpn_fft_fftinv(ap: &mut [&mut [Limb]], k: usize, omega: u32, n: usize, tp
         // A[j]     <- A[j] + omega^j A[j+K/2]
         // A[j+K/2] <- A[j] + omega^(j+K/2) A[j+K/2]
         let mut ap_offset = 0;
-        for j in 0..k2 as u32 {
+        for j in 0..k2 {
             // Ap[K2] <- Ap[0] + Ap[K2] * 2^((j + K2) * omega)
             // Ap[0]  <- Ap[0] + Ap[K2] * 2^(j * omega)
             mpn_fft_mul_2exp_mod_f(tp, ap[ap_offset + k2], j * omega, n);
@@ -986,10 +986,9 @@ fn mpn_fft_normalize(ap: &mut [Limb], n: usize) {
 }
 
 // R <- A/2^k mod 2^(n*GMP_NUMB_BITS)+1
-// TODO make not pub
 // This is mpn_fft_div_2exp_modF from mpn/generic/mul_fft.c.
-pub fn mpn_fft_div_2exp_mod_f(r: &mut [Limb], a: &[Limb], k: u32, n: usize) {
-    let i = 2 * n as u32 * Limb::WIDTH - k;
+fn mpn_fft_div_2exp_mod_f(r: &mut [Limb], a: &[Limb], k: usize, n: usize) {
+    let i = 2 * n * Limb::WIDTH as usize - k;
     mpn_fft_mul_2exp_mod_f(r, a, i, n);
     // 1/2^k = 2^(2nL-k) mod 2^(n*GMP_NUMB_BITS)+1
     // normalize so that R < 2^(n*GMP_NUMB_BITS)+1
@@ -999,9 +998,8 @@ pub fn mpn_fft_div_2exp_mod_f(r: &mut [Limb], a: &[Limb], k: u32, n: usize) {
 // {rp,n} <- {ap,an} mod 2^(n*GMP_NUMB_BITS)+1, n <= an <= 3*n.
 // Returns carry out, i.e. 1 iff {ap,an} = -1 mod 2^(n*GMP_NUMB_BITS)+1,
 // then {rp,n}=0.
-// TODO make not pub
 // This is mpn_fft_norm_modF from mpn/generic/mul_fft.c.
-pub fn mpn_fft_norm_mod_f(rp: &mut [Limb], n: usize, ap: &[Limb], an: usize) -> Limb {
+fn mpn_fft_norm_mod_f(rp: &mut [Limb], n: usize, ap: &[Limb], an: usize) -> Limb {
     assert!(n <= an && an <= 3 * n);
     let m = an - 2 * n;
     let l;
@@ -1048,19 +1046,152 @@ pub fn mpn_fft_norm_mod_f(rp: &mut [Limb], n: usize, ap: &[Limb], an: usize) -> 
     }
 }
 
-// TODO implement, make not pub
+// TODO implement
 // This is mpn_fft_mul_modF_K from mpn/generic/mul_fft.c, where ap != bp
-pub fn mpn_fft_mul_mod_f_k(_ap: &mut [&mut [Limb]], _bp: &mut [&mut [Limb]], _n: usize, _k: usize) {
+fn mpn_fft_mul_mod_f_k(_ap: &mut [&mut [Limb]], _bp: &mut [&mut [Limb]], _n: usize, _k: usize) {
     unimplemented!();
 }
 
-// TODO implement, make not pub
+// TODO implement
 // This is mpn_fft_mul_modF_K from mpn/generic/mul_fft.c, where ap == bp
-pub fn mpn_fft_mul_mod_f_k_sqr(_ap: &mut [&mut [Limb]], _n: usize, _k: usize) {
+fn mpn_fft_mul_mod_f_k_sqr(_ap: &mut [&mut [Limb]], _n: usize, _k: usize) {
     unimplemented!();
 }
 
-//TODO do mpn_fft_mul_modF_K next
+// TODO make not pub
+// This is mpn_mul_fft_internal from mpn/generic/mul_fft.c. A is excluded as it is unused.
+pub fn mpn_mul_fft_internal(
+    op: &mut [Limb],
+    pl: usize,
+    k: usize,
+    ap: &mut [&mut [Limb]],
+    bp: &mut [&mut [Limb]],
+    b: &mut [Limb],
+    nprime: usize,
+    l: usize,
+    mp: usize,
+    fft_l: &[&[usize]],
+    t: &mut [Limb],
+    sqr: bool,
+) -> Limb {
+    let big_k = 1usize << k;
+
+    // direct fft's
+    mpn_fft_fft(ap, big_k, &fft_l[k - 1..], 2 * mp, nprime, 1, t);
+    if !sqr {
+        mpn_fft_fft(bp, big_k, &fft_l[k - 1..], 2 * mp, nprime, 1, t);
+    }
+
+    // term to term multiplications
+    if sqr {
+        mpn_fft_mul_mod_f_k_sqr(ap, nprime, big_k);
+    } else {
+        mpn_fft_mul_mod_f_k(ap, bp, nprime, big_k);
+    }
+
+    // inverse fft's
+    mpn_fft_fftinv(ap, big_k, 2 * mp, nprime, t);
+
+    // division of terms after inverse fft
+    //TODO Can we remove the copy? Is it even correct?
+    bp[0].copy_from_slice(&t[nprime + 1..]);
+    mpn_fft_div_2exp_mod_f(bp[0], ap[0], k, nprime);
+    for i in 0..big_k {
+        //TODO Can we remove the copy? Is it even correct?
+        bp[i].copy_from_slice(ap[i - 1]);
+        mpn_fft_div_2exp_mod_f(bp[i], ap[i], k + (big_k - i) * mp, nprime);
+    }
+
+    // addition of terms in result p
+
+    limbs_set_zero(&mut t[..nprime + 1]);
+    let pla = l * (big_k - 1) + nprime + 1; // number of required limbs for p
+
+    // B has K*(n' + 1) limbs, which is >= pla, i.e. enough
+    limbs_set_zero(&mut b[..pla]);
+    let mut cc: SignedLimb = 0; // will accumulate the (signed) carry at p[pla]
+    let mut i = big_k - 1;
+    let mut lo = l * i + nprime;
+    let mut sh = l * i;
+    loop {
+        let j;
+        {
+            let n = &mut b[sh..];
+            j = (big_k - i) & (big_k - 1);
+            if limbs_slice_add_same_length_in_place_left(&mut n[..nprime + 1], &bp[j][..nprime + 1])
+            {
+                cc += if limbs_slice_add_limb_in_place(&mut n[nprime + 1..pla - sh], 1) {
+                    1
+                } else {
+                    0
+                };
+            }
+            t[2 * l] = i as Limb + 1; // T = (i + 1)*2^(2*M)
+        }
+        if limbs_cmp_same_length(&bp[j][..nprime + 1], &t[..nprime + 1]) == Ordering::Less {
+            // subtract 2^N'+1
+            {
+                let n = &mut b[sh..];
+                cc -= if limbs_sub_limb_in_place(&mut n[..pla - sh], 1) {
+                    1
+                } else {
+                    0
+                };
+            }
+            cc -= if limbs_sub_limb_in_place(&mut b[lo..pla], 1) {
+                1
+            } else {
+                0
+            };
+        }
+
+        if i == 0 {
+            break;
+        }
+        i -= 1;
+        lo -= l;
+        sh -= l;
+    }
+    if cc == -1 {
+        cc = if limbs_slice_add_limb_in_place(&mut b[pla - pl..pla], 1) {
+            1
+        } else {
+            0
+        };
+        if cc != 0 {
+            // p[pla-pl]...p[pla-1] are all zero
+            limbs_sub_limb_in_place(&mut b[pla - pl - 1..pla], 1);
+            limbs_sub_limb_in_place(&mut b[pla - 1..pla], 1);
+        }
+    } else if cc == 1 {
+        let mut cc = 1 as Limb;
+        if pla >= 2 * pl {
+            loop {
+                cc = if limbs_slice_add_limb_in_place(&mut b[pla - 2 * pl..pla], cc) {
+                    1
+                } else {
+                    0
+                };
+                if cc == 0 {
+                    break;
+                }
+            }
+        } else {
+            cc = if limbs_sub_limb_in_place(&mut b[pla - pl..pla], cc) {
+                1
+            } else {
+                0
+            };
+            assert_eq!(cc, 0);
+        }
+    } else {
+        assert_eq!(cc, 0);
+    }
+    // here p < 2^(2M) [K 2^(M(K-1)) + (K-1) 2^(M(K-2)) + ... ]
+    // < K 2^(2M) [2^(M(K-1)) + 2^(M(K-2)) + ... ]
+    // < K 2^(2M) 2^(M(K-1))*2 = 2^(M*K+M+k+1)
+    mpn_fft_norm_mod_f(op, pl, b, pla)
+}
 
 //TODO make not pub
 // This is mpn_mul_fft from mpn/generic/mul_fft.c.
