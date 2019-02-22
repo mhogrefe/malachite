@@ -19,7 +19,7 @@ use platform::Limb;
 
 //TODO tune
 const MULMOD_BNM1_THRESHOLD: usize = 13;
-const MUL_FFT_MODF_THRESHOLD: usize = MUL_TOOM33_THRESHOLD * 3;
+pub(crate) const MUL_FFT_MODF_THRESHOLD: usize = MUL_TOOM33_THRESHOLD * 3;
 
 //TODO test
 // This is mpn_mulmod_bnm1_next_size from mpn/generic/mulmod_bnm1.c.
@@ -188,7 +188,7 @@ pub(crate) fn mpn_mulmod_bnm1(
             if n < MUL_FFT_MODF_THRESHOLD {
                 k = 0;
             } else {
-                k = mpn_fft_best_k(n, false);
+                k = mpn_fft_best_k(n, false) as u32;
                 let mut mask = (1 << k) - 1;
                 while (n & mask) != 0 {
                     k -= 1;

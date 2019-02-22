@@ -6,11 +6,13 @@ use natural::arithmetic::add::{
 };
 use natural::arithmetic::add_limb::limbs_add_limb_to_out;
 use natural::arithmetic::add_limb::limbs_slice_add_limb_in_place;
+use natural::arithmetic::mul::limbs_mul_same_length_to_out;
 use natural::arithmetic::mul::mul_mod::{
-    mpn_mulmod_bnm1, mpn_mulmod_bnm1_itch, mpn_mulmod_bnm1_next_size,
+    mpn_mulmod_bnm1, mpn_mulmod_bnm1_itch, mpn_mulmod_bnm1_next_size, MUL_FFT_MODF_THRESHOLD,
 };
 use natural::arithmetic::shl_u::limbs_shl_to_out;
 use natural::arithmetic::shl_u::mpn_lshiftc;
+use natural::arithmetic::square::SQR_TOOM3_THRESHOLD;
 use natural::arithmetic::sub::limbs_sub_same_length_in_place_right;
 use natural::arithmetic::sub::{
     limbs_sub_in_place_left, limbs_sub_same_length_in_place_left, limbs_sub_same_length_to_out,
@@ -20,10 +22,11 @@ use natural::arithmetic::sub_limb::limbs_sub_limb_in_place;
 use natural::comparison::ord::limbs_cmp_same_length;
 use natural::logic::not::limbs_not_to_out;
 use platform::{Limb, SignedLimb};
-use std::cmp::Ordering;
+use std::cmp::{max, Ordering};
 
 //TODO tune
 pub const MUL_FFT_THRESHOLD: usize = 4_736;
+const SQR_FFT_MODF_THRESHOLD: usize = SQR_TOOM3_THRESHOLD * 3;
 
 //TODO test
 // checked
@@ -31,14 +34,14 @@ pub const MUL_FFT_THRESHOLD: usize = 4_736;
 // Returns smallest possible number of limbs >= pl for a fft of size 2 ^ k, i.e. smallest multiple
 // of 2 ^ k >= pl.
 // This is mpn_fft_next_size from mpn/generic/mul-fft.c.
-pub fn mpn_fft_next_size(mut pl: usize, k: u32) -> usize {
+pub fn mpn_fft_next_size(mut pl: usize, k: usize) -> usize {
     pl = 1 + ((pl - 1) >> k); // ceil(pl / 2 ^ k)
     pl << k
 }
 
 struct FFTTableNK {
-    n: u32,
-    k: u32,
+    n: usize,
+    k: usize,
 }
 
 const MUL_FFT_TABLE3_SIZE: usize = 208;
@@ -471,7 +474,7 @@ const SQR_FFT_TABLE3: [FFTTableNK; SQR_FFT_TABLE3_SIZE] = [
 // Find the best k to use for a mod 2 ^ (m * Limb::WIDTH) + 1 FFT for m >= n. We have sqr = 0 if for
 // a multiply, sqr = 1 for a square.
 // mpn_fft_best_k from mpn/generic/mul-fft.c, mpn_fft_table3 variant
-pub fn mpn_fft_best_k(n: usize, sqr: bool) -> u32 {
+pub(crate) fn mpn_fft_best_k(n: usize, sqr: bool) -> usize {
     let fft_tab: &[FFTTableNK] = if sqr {
         &SQR_FFT_TABLE3
     } else {
@@ -511,9 +514,8 @@ fn mpn_nussbaumer_mul(pp: &mut [Limb], ap: &[Limb], bp: &[Limb]) {
 }
 
 // Initialize l[i][j] with bitrev(j)
-//TODO make not pub
 // This is mpn_fft_initl from mpn/generic/mul_fft.c.
-pub fn mpn_fft_initl(l: &mut [&mut [u32]], k: usize) {
+fn mpn_fft_initl(l: &mut [&mut [usize]], k: usize) {
     l[0][0] = 0;
     let mut i = 1;
     let mut big_k = 1;
@@ -646,9 +648,8 @@ fn mpn_fft_mul_2exp_mod_f(r: &mut [Limb], a: &[Limb], d: usize, n: usize) {
 // Assumes M is a multiple of GMP_NUMB_BITS (M = l * GMP_NUMB_BITS).
 // T must have space for at least (nprime + 1) limbs.
 // We must have nl <= 2*K*l.
-// TODO make not pub
 // This is mpn_mul_fft_decompose from mpn/generic/mul_fft.c.
-pub fn mpn_mul_fft_decompose(
+fn mpn_mul_fft_decompose(
     a: &mut [Limb],
     ap: &mut [&mut [Limb]],
     k: usize,
@@ -1046,16 +1047,258 @@ fn mpn_fft_norm_mod_f(rp: &mut [Limb], n: usize, ap: &[Limb], an: usize) -> Limb
     }
 }
 
-// TODO implement
-// This is mpn_fft_mul_modF_K from mpn/generic/mul_fft.c, where ap != bp
-fn mpn_fft_mul_mod_f_k(_ap: &mut [&mut [Limb]], _bp: &mut [&mut [Limb]], _n: usize, _k: usize) {
-    unimplemented!();
+// This is mpn_fft_mul_modF_K from mpn/generic/mul_fft.c, where ap != bp.
+fn mpn_fft_mul_mod_f_k(ap: &mut [&mut [Limb]], bp: &mut [&mut [Limb]], n: usize, big_k: usize) {
+    if n >= MUL_FFT_MODF_THRESHOLD {
+        let k = mpn_fft_best_k(n, false);
+        let k2 = 1 << k;
+        assert_eq!(n & (k2 - 1), 0);
+        let max_lk = max(k2, Limb::WIDTH as usize);
+        let m2 = n * Limb::WIDTH as usize >> k;
+        let l = n >> k;
+        let mut big_nprime2 = (2 * m2 + k + 2 + max_lk) / max_lk * max_lk;
+        // Nprime2 = ceil((2*M2+k+3)/maxLK)*maxLK
+        let mut nprime2 = big_nprime2 / Limb::WIDTH as usize;
+
+        // we should ensure that nprime2 is a multiple of the next K
+        if nprime2 >= MUL_FFT_MODF_THRESHOLD {
+            //mp_size_t K3;
+            loop {
+                let k3 = 1 << mpn_fft_best_k(nprime2, false);
+                if nprime2 & (k3 - 1) == 0 {
+                    break;
+                }
+                nprime2 = (nprime2 + k3 - 1) & k3.wrapping_neg();
+                big_nprime2 = nprime2 * Limb::WIDTH as usize;
+                // warning: since nprime2 changed, K3 may change too!
+            }
+        }
+        assert!(nprime2 < n); // otherwise we'll loop
+
+        let mp2 = big_nprime2 >> k;
+
+        let mut big_ap: Vec<&mut [Limb]> = Vec::with_capacity(k2);
+        let mut big_bp: Vec<&mut [Limb]> = Vec::with_capacity(k2);
+        for _ in 0..k2 {
+            big_ap.push(&mut []);
+            big_bp.push(&mut []);
+        }
+        let mut a = vec![0; 2 * (nprime2 + 1) << k];
+        let mut t = vec![0; 2 * (nprime2 + 1)];
+        let mut tmp = vec![0; 2 << k];
+        let mut remainder: &mut [usize] = &mut tmp;
+        let mut fft_l = Vec::with_capacity(k + 1);
+        for i in 0..k + 1 {
+            // force remainder to move rather than be borrowed
+            let (tmp_lo, tmp_hi) = { remainder }.split_at_mut(1 << i);
+            fft_l.push(tmp_lo);
+            remainder = tmp_hi;
+        }
+        mpn_fft_initl(&mut fft_l, k);
+        let mut api = 0;
+        let mut bpi = 0;
+        let immut_fft_l: Vec<&[usize]> = fft_l.into_iter().map(|row| &*row).collect();
+        for _ in 0..big_k {
+            mpn_fft_normalize(ap[api], n);
+            mpn_fft_normalize(bp[bpi], n);
+            mpn_mul_fft_decompose(
+                &mut a,
+                &mut big_ap,
+                k2,
+                nprime2,
+                ap[api],
+                (l << k) + 1,
+                l,
+                mp2,
+                &mut t,
+            );
+            mpn_mul_fft_decompose(
+                &mut a[..(nprime2 + 1) << k],
+                &mut big_bp,
+                k2,
+                nprime2,
+                bp[bpi],
+                (l << k) + 1,
+                l,
+                mp2,
+                &mut t,
+            );
+            let cy = mpn_mul_fft_internal(
+                ap[api],
+                n,
+                k,
+                &mut big_ap,
+                &mut big_bp,
+                &mut a[..(nprime2 + 1) << k],
+                nprime2,
+                l,
+                mp2,
+                &immut_fft_l,
+                &mut t,
+                false,
+            );
+            ap[api][n] = cy;
+            api += 1;
+            bpi += 1;
+        }
+    } else {
+        let n2 = 2 * n;
+        let mut tp = vec![0; n2];
+        let mut api = 0;
+        let mut bpi = 0;
+        for _ in 0..big_k {
+            let a = &mut ap[api];
+            let b = &mut bp[bpi];
+            api += 1;
+            bpi += 1;
+            limbs_mul_same_length_to_out(&mut tp, &b[..n], &a[..n]);
+            let mut cc = if a[n] != 0 {
+                if limbs_slice_add_same_length_in_place_left(&mut tp[n..2 * n], &b[..n]) {
+                    1
+                } else {
+                    0
+                }
+            } else {
+                0
+            };
+            if b[n] != 0 {
+                cc += if limbs_sub_same_length_in_place_left(&mut tp[n..2 * n], &a[..n]) {
+                    1
+                } else {
+                    0
+                } + a[n];
+            }
+            if cc != 0 {
+                assert!(!limbs_slice_add_limb_in_place(&mut tp[..n2], cc));
+            }
+            a[n] = if limbs_sub_same_length_to_out(a, &tp[..n], &tp[n..2 * n])
+                && limbs_slice_add_limb_in_place(&mut a[..n], 1)
+            {
+                1
+            } else {
+                0
+            };
+        }
+    }
 }
 
-// TODO implement
-// This is mpn_fft_mul_modF_K from mpn/generic/mul_fft.c, where ap == bp
-fn mpn_fft_mul_mod_f_k_sqr(_ap: &mut [&mut [Limb]], _n: usize, _k: usize) {
-    unimplemented!();
+// This is mpn_fft_mul_modF_K from mpn/generic/mul_fft.c.
+fn mpn_fft_mul_mod_f_k_sqr(ap: &mut [&mut [Limb]], n: usize, big_k: usize) {
+    if n >= SQR_FFT_MODF_THRESHOLD {
+        let k = mpn_fft_best_k(n, false);
+        let k2 = 1 << k;
+        assert_eq!(n & (k2 - 1), 0);
+        let max_lk = max(k2, Limb::WIDTH as usize);
+        let m2 = n * Limb::WIDTH as usize >> k;
+        let l = n >> k;
+        let mut big_nprime2 = (2 * m2 + k + 2 + max_lk) / max_lk * max_lk;
+        // Nprime2 = ceil((2*M2+k+3)/maxLK)*maxLK
+        let mut nprime2 = big_nprime2 / Limb::WIDTH as usize;
+
+        // we should ensure that nprime2 is a multiple of the next K
+        if nprime2 >= SQR_FFT_MODF_THRESHOLD {
+            //mp_size_t K3;
+            loop {
+                let k3 = 1 << mpn_fft_best_k(nprime2, true);
+                if nprime2 & (k3 - 1) == 0 {
+                    break;
+                }
+                nprime2 = (nprime2 + k3 - 1) & k3.wrapping_neg();
+                big_nprime2 = nprime2 * Limb::WIDTH as usize;
+                // warning: since nprime2 changed, K3 may change too!
+            }
+        }
+        assert!(nprime2 < n); // otherwise we'll loop
+
+        let mp2 = big_nprime2 >> k;
+
+        let mut big_ap: Vec<&mut [Limb]> = Vec::with_capacity(k2);
+        let mut big_bp: Vec<&mut [Limb]> = Vec::with_capacity(k2);
+        for _ in 0..k2 {
+            big_ap.push(&mut []);
+            big_bp.push(&mut []);
+        }
+        let mut a = vec![0; 2 * (nprime2 + 1) << k];
+        let mut t = vec![0; 2 * (nprime2 + 1)];
+        let mut tmp = vec![0; 2 << k];
+        let mut remainder: &mut [usize] = &mut tmp;
+        let mut fft_l = Vec::with_capacity(k + 1);
+        for i in 0..k + 1 {
+            // force remainder to move rather than be borrowed
+            let (tmp_lo, tmp_hi) = { remainder }.split_at_mut(1 << i);
+            fft_l.push(tmp_lo);
+            remainder = tmp_hi;
+        }
+        mpn_fft_initl(&mut fft_l, k);
+        let mut api = 0;
+        let immut_fft_l: Vec<&[usize]> = fft_l.into_iter().map(|row| &*row).collect();
+        for _ in 0..big_k {
+            mpn_fft_normalize(ap[api], n);
+            mpn_mul_fft_decompose(
+                &mut a,
+                &mut big_ap,
+                k2,
+                nprime2,
+                ap[api],
+                (l << k) + 1,
+                l,
+                mp2,
+                &mut t,
+            );
+            let cy = mpn_mul_fft_internal(
+                ap[api],
+                n,
+                k,
+                &mut big_ap,
+                &mut big_bp,
+                &mut a[..(nprime2 + 1) << k],
+                nprime2,
+                l,
+                mp2,
+                &immut_fft_l,
+                &mut t,
+                true,
+            );
+            ap[api][n] = cy;
+            api += 1;
+        }
+    } else {
+        let n2 = 2 * n;
+        let mut tp = vec![0; n2];
+        let mut api = 0;
+        for _ in 0..big_k {
+            let a = &mut ap[api];
+            api += 1;
+            //TODO use square
+            limbs_mul_same_length_to_out(&mut tp, &a[..n], &a[..n]);
+            let mut cc = if a[n] != 0 {
+                if limbs_slice_add_same_length_in_place_left(&mut tp[n..2 * n], &a[..n]) {
+                    1
+                } else {
+                    0
+                }
+            } else {
+                0
+            };
+            if a[n] != 0 {
+                cc += if limbs_sub_same_length_in_place_left(&mut tp[n..2 * n], &a[..n]) {
+                    1
+                } else {
+                    0
+                } + a[n];
+            }
+            if cc != 0 {
+                assert!(!limbs_slice_add_limb_in_place(&mut tp[..n2], cc));
+            }
+            a[n] = if limbs_sub_same_length_to_out(a, &tp[..n], &tp[n..2 * n])
+                && limbs_slice_add_limb_in_place(&mut a[..n], 1)
+            {
+                1
+            } else {
+                0
+            };
+        }
+    }
 }
 
 // TODO make not pub

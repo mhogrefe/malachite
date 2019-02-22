@@ -8,7 +8,9 @@ fn _limbs_square_to_out_toom_4_scratch_size(xs_len: usize) -> usize {
 }
 
 //TODO tune
+pub(crate) const SQR_TOOM3_THRESHOLD: usize = 93;
 const SQR_TOOM6_THRESHOLD: usize = 351;
+const SQR_TOOM8_THRESHOLD: usize = 454;
 
 // This is mpn_toom6_sqr_itch from gmp-impl.h.
 pub(crate) fn _limbs_square_to_out_toom_6_scratch_size(n: usize) -> usize {
@@ -20,9 +22,6 @@ pub(crate) fn _limbs_square_to_out_toom_6_scratch_size(n: usize) -> usize {
     assert!(itch >= 0);
     itch as usize
 }
-
-//TODO tune
-const SQR_TOOM8_THRESHOLD: usize = 454;
 
 // This is mpn_toom8_sqr_itch from gmp-impl.h.
 pub(crate) fn _limbs_square_to_out_toom_8_scratch_size(n: usize) -> usize {
