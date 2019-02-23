@@ -25,7 +25,7 @@ use platform::{Limb, SignedLimb};
 use std::cmp::{max, Ordering};
 
 //TODO tune
-pub const MUL_FFT_THRESHOLD: usize = 4_736;
+pub(crate) const MUL_FFT_THRESHOLD: usize = 4_736;
 const SQR_FFT_MODF_THRESHOLD: usize = SQR_TOOM3_THRESHOLD * 3;
 
 //TODO test
@@ -34,7 +34,7 @@ const SQR_FFT_MODF_THRESHOLD: usize = SQR_TOOM3_THRESHOLD * 3;
 // Returns smallest possible number of limbs >= pl for a fft of size 2 ^ k, i.e. smallest multiple
 // of 2 ^ k >= pl.
 // This is mpn_fft_next_size from mpn/generic/mul-fft.c.
-pub fn mpn_fft_next_size(mut pl: usize, k: usize) -> usize {
+pub(crate) fn mpn_fft_next_size(mut pl: usize, k: usize) -> usize {
     pl = 1 + ((pl - 1) >> k); // ceil(pl / 2 ^ k)
     pl << k
 }
@@ -496,7 +496,7 @@ pub(crate) fn mpn_fft_best_k(n: usize, sqr: bool) -> usize {
 
 // This is mpn_fft_mul from gmp-impl.h.
 #[inline]
-pub fn mpn_fft_mul(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
+pub fn _limbs_mul_greater_to_out_fft(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
     mpn_nussbaumer_mul(out, xs, ys);
 }
 
@@ -530,9 +530,8 @@ fn mpn_fft_initl(l: &mut [&mut [usize]], k: usize) {
 }
 
 // return the lcm of a and 2^k
-//TODO make not pub
 // This is mpn_mul_fft_lcm from mpn/generic/mul_fft.c.
-pub fn mpn_mul_fft_lcm(mut a: u32, mut k: u32) -> u32 {
+fn mpn_mul_fft_lcm(mut a: usize, mut k: usize) -> usize {
     let l = k;
     while a % 2 == 0 && k > 0 {
         a >>= 1;
@@ -785,27 +784,6 @@ fn mpn_mul_fft_decompose(
     assert_eq!(nl, 0);
 }
 
-// r <- a+b mod 2^(n*GMP_NUMB_BITS)+1.
-// Assumes a and b are semi-normalized.
-// TODO make not pub
-// This is mpn_fft_add_modF from mpn/generic/mul_fft.c, where r and a are disjoint.
-pub fn mpn_fft_add_mod_f(r: &mut [Limb], a: &[Limb], b: &[Limb], n: usize) {
-    let c = a[n].wrapping_add(b[n]).wrapping_add(
-        if limbs_add_same_length_to_out(r, &a[..n], &b[..n]) {
-            1
-        } else {
-            0
-        },
-    );
-    // 0 <= c <= 3
-    if c > 1 {
-        r[n] = 1; // r[n] - c = 1
-        assert!(!limbs_sub_limb_in_place(&mut r[..n + 1], c - 1));
-    } else {
-        r[n] = c;
-    }
-}
-
 // This is mpn_fft_add_modF from mpn/generic/mul_fft.c, where r == a.
 fn mpn_fft_add_mod_f_in_place_left(a: &mut [Limb], b: &[Limb], n: usize) {
     let c = a[n].wrapping_add(b[n]).wrapping_add(
@@ -826,9 +804,8 @@ fn mpn_fft_add_mod_f_in_place_left(a: &mut [Limb], b: &[Limb], n: usize) {
 
 // r <- a-b mod 2^(n*GMP_NUMB_BITS)+1.
 // Assumes a and b are semi-normalized.
-// TODO make not pub
 // This is mpn_fft_sub_modF from mpn/generic/mul_fft.c.
-pub fn mpn_fft_sub_mod_f(r: &mut [Limb], a: &[Limb], b: &[Limb], n: usize) {
+fn mpn_fft_sub_mod_f(r: &mut [Limb], a: &[Limb], b: &[Limb], n: usize) {
     let c = a[n].wrapping_sub(b[n]).wrapping_sub(
         if limbs_sub_same_length_to_out(r, &a[..n], &b[..n]) {
             1
@@ -1301,9 +1278,8 @@ fn mpn_fft_mul_mod_f_k_sqr(ap: &mut [&mut [Limb]], n: usize, big_k: usize) {
     }
 }
 
-// TODO make not pub
 // This is mpn_mul_fft_internal from mpn/generic/mul_fft.c. A is excluded as it is unused.
-pub fn mpn_mul_fft_internal(
+fn mpn_mul_fft_internal(
     op: &mut [Limb],
     pl: usize,
     k: usize,
@@ -1436,11 +1412,108 @@ pub fn mpn_mul_fft_internal(
     mpn_fft_norm_mod_f(op, pl, b, pla)
 }
 
-//TODO make not pub
 // This is mpn_mul_fft from mpn/generic/mul_fft.c.
-pub fn mpn_mul_fft(xp: &mut [Limb], _n: usize, ap1: &[Limb], bp1: &[Limb], _k: u32) -> Limb {
-    let anp = ap1.len();
-    let bnp = bp1.len();
-    //TODO implement
-    xp[anp + bnp - 1]
+pub(crate) fn mpn_mul_fft(op: &mut [Limb], pl: usize, n: &[Limb], m: &[Limb], k: usize) -> Limb {
+    let nl = n.len();
+    let ml = m.len();
+    //int i;
+    //mp_size_t K, maxLK;
+    //mp_size_t N, Nprime, nprime, M, Mp, l;
+    //mp_ptr *Ap, *Bp, A, T, B;
+    //int **fft_l, *tmp;
+    let sqr = n as *const [Limb] == m as *const [Limb];
+    assert_eq!(mpn_fft_next_size(pl, k), pl);
+
+    let big_n = pl * Limb::WIDTH as usize;
+    let mut tmp = vec![0; 2 << k];
+    let mut remainder: &mut [usize] = &mut tmp;
+    let mut fft_l = Vec::with_capacity(k + 1);
+    for i in 0..k + 1 {
+        // force remainder to move rather than be borrowed
+        let (tmp_lo, tmp_hi) = { remainder }.split_at_mut(1 << i);
+        fft_l.push(tmp_lo);
+        remainder = tmp_hi;
+    }
+    mpn_fft_initl(&mut fft_l, k);
+    let big_k = 1 << k;
+    let big_m = big_n >> k; // N = 2^k M
+    let l = 1 + (big_m - 1) / Limb::WIDTH as usize;
+    let max_lk = mpn_mul_fft_lcm(Limb::WIDTH as usize, k); // lcm (GMP_NUMB_BITS, 2^k)
+
+    let mut big_nprime = (1 + (2 * big_m + k + 2) / max_lk) * max_lk;
+    // Nprime = ceil((2*M+k+3)/maxLK)*maxLK;
+    let mut nprime = big_nprime / Limb::WIDTH as usize;
+    // we should ensure that recursively, nprime is a multiple of the next big_k
+    if nprime
+        >= if sqr {
+            SQR_FFT_MODF_THRESHOLD
+        } else {
+            MUL_FFT_MODF_THRESHOLD
+        }
+    {
+        loop {
+            let k2 = 1 << mpn_fft_best_k(nprime, sqr);
+            if (nprime & (k2 - 1)) == 0 {
+                break;
+            }
+            nprime = (nprime + k2 - 1) & k2.wrapping_neg();
+            big_nprime = nprime * Limb::WIDTH as usize;
+            // warning: since nprime changed, K2 may change too!
+        }
+    }
+    assert!(nprime < pl); // otherwise we'll loop
+
+    let mut t = vec![0; 2 * (nprime + 1)];
+    let mp = big_nprime >> k;
+
+    let mut a = vec![0; big_k * (nprime + 1)];
+    let mut ap: Vec<&mut [Limb]> = Vec::with_capacity(big_k);
+    for _ in 0..big_k {
+        ap.push(&mut []);
+    }
+    mpn_mul_fft_decompose(&mut a, &mut ap, big_k, nprime, n, nl, l, mp, &mut t);
+    let immut_fft_l: Vec<&[usize]> = fft_l.into_iter().map(|row| &*row).collect();
+    if sqr {
+        let pla = l * (big_k - 1) + nprime + 1; // number of required limbs for p
+        let mut b = vec![0; pla];
+        let mut bp: Vec<&mut [Limb]> = Vec::with_capacity(big_k);
+        for _ in 0..big_k {
+            bp.push(&mut []);
+        }
+        mpn_mul_fft_internal(
+            op,
+            pl,
+            k,
+            &mut ap,
+            &mut bp,
+            &mut b,
+            nprime,
+            l,
+            mp,
+            &immut_fft_l,
+            &mut t,
+            sqr,
+        )
+    } else {
+        let mut b = vec![0; big_k * (nprime + 1)];
+        let mut bp: Vec<&mut [Limb]> = Vec::with_capacity(big_k);
+        for _ in 0..big_k {
+            bp.push(&mut []);
+        }
+        mpn_mul_fft_decompose(&mut b, &mut bp, big_k, nprime, m, ml, l, mp, &mut t);
+        mpn_mul_fft_internal(
+            op,
+            pl,
+            k,
+            &mut ap,
+            &mut bp,
+            &mut b,
+            nprime,
+            l,
+            mp,
+            &immut_fft_l,
+            &mut t,
+            sqr,
+        )
+    }
 }

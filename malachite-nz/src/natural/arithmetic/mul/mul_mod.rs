@@ -58,7 +58,7 @@ pub(crate) fn mpn_mulmod_bnm1_itch(rn: usize, an: usize, bn: usize) -> usize {
 // First k to use for an FFT modF multiply.  A modF FFT is an order
 // log(2^k)/log(2^(k-1)) algorithm, so k=3 is merely 1.5 like Karatsuba,
 // whereas k=4 is 1.33 which is faster than toom3 at 1.485.
-const FFT_FIRST_K: u32 = 4;
+const FFT_FIRST_K: usize = 4;
 
 // docs preserved
 // Multiplication mod B ^ n - 1.
@@ -188,7 +188,7 @@ pub(crate) fn mpn_mulmod_bnm1(
             if n < MUL_FFT_MODF_THRESHOLD {
                 k = 0;
             } else {
-                k = mpn_fft_best_k(n, false) as u32;
+                k = mpn_fft_best_k(n, false);
                 let mut mask = (1 << k) - 1;
                 while (n & mask) != 0 {
                     k -= 1;
