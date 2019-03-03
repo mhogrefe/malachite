@@ -6,7 +6,6 @@ use natural::arithmetic::add::{
 };
 use natural::arithmetic::add_limb::limbs_slice_add_limb_in_place;
 use natural::arithmetic::mul::fft::{mpn_fft_best_k, mpn_fft_next_size, mpn_mul_fft};
-use natural::arithmetic::mul::toom::MUL_TOOM33_THRESHOLD;
 use natural::arithmetic::mul::{limbs_mul_greater_to_out, limbs_mul_same_length_to_out};
 use natural::arithmetic::shr_u::limbs_slice_shr_in_place;
 use natural::arithmetic::sub::limbs_sub_same_length_in_place_left;
@@ -18,8 +17,8 @@ use natural::arithmetic::sub_limb::limbs_sub_limb_in_place;
 use platform::Limb;
 
 //TODO tune
-const MULMOD_BNM1_THRESHOLD: usize = 13;
-pub(crate) const MUL_FFT_MODF_THRESHOLD: usize = MUL_TOOM33_THRESHOLD * 3;
+pub(crate) const MULMOD_BNM1_THRESHOLD: usize = 13;
+pub(crate) const MUL_FFT_MODF_THRESHOLD: usize = 396;
 
 //TODO test
 // This is mpn_mulmod_bnm1_next_size from mpn/generic/mulmod_bnm1.c.
@@ -77,13 +76,7 @@ const FFT_FIRST_K: usize = 4;
 // S(n) <= rn + MAX (rn + 4, S(n / 2)) <= 2 * rn + 4
 //
 // This is mpn_mulmod_bnm1 from mpn/generic/mulmod_bnm1.c.
-pub(crate) fn mpn_mulmod_bnm1(
-    rp: &mut [Limb],
-    rn: usize,
-    ap: &[Limb],
-    bp: &[Limb],
-    tp: &mut [Limb],
-) {
+pub fn mpn_mulmod_bnm1(rp: &mut [Limb], rn: usize, ap: &[Limb], bp: &[Limb], tp: &mut [Limb]) {
     let an = ap.len();
     let bn = bp.len();
     assert_ne!(0, bn);
@@ -121,11 +114,8 @@ pub(crate) fn mpn_mulmod_bnm1(
         // and crt together as
         //
         // x = -xp * B^n + (B^n + 1) * [ (xp + xm)/2 mod (B^n-1)]
-        let (a0, a1) = ap.split_at(n);
-        let (b0, b1) = bp.split_at(n);
-
-        // #define sp1 (tp + 2*n + 2)
         if an > n {
+            let (a0, a1) = ap.split_at(n);
             let cy = if limbs_add_to_out(tp, &a0[..n], &a1[..an - n]) {
                 1
             } else {
@@ -133,6 +123,7 @@ pub(crate) fn mpn_mulmod_bnm1(
             };
             assert!(!limbs_slice_add_limb_in_place(&mut tp[..n], cy));
             if bn > n {
+                let (b0, b1) = bp.split_at(n);
                 let cy = if limbs_add_to_out(&mut tp[n..], &b0[..n], &b1[..bn - n]) {
                     1
                 } else {
@@ -143,10 +134,10 @@ pub(crate) fn mpn_mulmod_bnm1(
                 mpn_mulmod_bnm1(rp, n, tp_0, tp_1, tp_2);
             } else {
                 let (tp_lo, tp_hi) = tp.split_at_mut(n);
-                mpn_mulmod_bnm1(rp, n, tp_lo, &b0[..bn], tp_hi);
+                mpn_mulmod_bnm1(rp, n, tp_lo, &bp[..bn], tp_hi);
             }
         } else {
-            mpn_mulmod_bnm1(rp, n, &a0[..an], &b0[..bn], tp);
+            mpn_mulmod_bnm1(rp, n, &ap[..an], &bp[..bn], tp);
         }
         {
             let mut bp1_is_b0 = true;
@@ -154,7 +145,7 @@ pub(crate) fn mpn_mulmod_bnm1(
             let mut ap1_is_a0 = true;
             let mut anp = an;
             if an > n {
-                //ap1 = sp1;
+                let (a0, a1) = ap.split_at(n);
                 ap1_is_a0 = false;
                 let cy = if limbs_sub_to_out(&mut tp[2 * n + 2..], &a0[..n], &a1[..an - n]) {
                     1
@@ -167,8 +158,9 @@ pub(crate) fn mpn_mulmod_bnm1(
                     cy
                 ));
                 anp = n + tp[3 * n + 2] as usize;
+
                 if bn > n {
-                    // bp1 = &sp1[n + 1..];
+                    let (b0, b1) = bp.split_at(n);
                     bp1_is_b0 = false;
                     let cy = if limbs_sub_to_out(&mut tp[3 * n + 3..], &b0[..n], &b1[..bn - n]) {
                         1
@@ -177,7 +169,7 @@ pub(crate) fn mpn_mulmod_bnm1(
                     };
                     tp[4 * n + 3] = 0;
                     assert!(!limbs_slice_add_limb_in_place(
-                        &mut tp[3 * n + 3..4 * n + 3],
+                        &mut tp[3 * n + 3..4 * n + 4],
                         cy
                     ));
                     bnp = n + tp[4 * n + 3] as usize;
@@ -198,15 +190,15 @@ pub(crate) fn mpn_mulmod_bnm1(
             if k >= FFT_FIRST_K {
                 if bp1_is_b0 {
                     if ap1_is_a0 {
-                        tp[n] = mpn_mul_fft(tp, n, &a0[..anp], &b0[..bnp], k);
+                        tp[n] = mpn_mul_fft(tp, n, &ap[..anp], &bp[..bnp], k);
                     } else {
                         let (tp_lo, tp_hi) = tp.split_at_mut(2 * n + 2);
-                        tp_lo[n] = mpn_mul_fft(tp_lo, n, &tp_hi[..anp], &b0[..bnp], k);
+                        tp_lo[n] = mpn_mul_fft(tp_lo, n, &tp_hi[..anp], &bp[..bnp], k);
                     }
                 } else {
                     if ap1_is_a0 {
                         let (tp_lo, tp_hi) = tp.split_at_mut(3 * n + 3);
-                        tp_lo[n] = mpn_mul_fft(tp_lo, n, &a0[..anp], &tp_hi[..bnp], k);
+                        tp_lo[n] = mpn_mul_fft(tp_lo, n, &ap[..anp], &tp_hi[..bnp], k);
                     } else {
                         let (tp_lo, tp_hi) = tp.split_at_mut(2 * n + 2);
                         tp_lo[n] =
@@ -218,10 +210,10 @@ pub(crate) fn mpn_mulmod_bnm1(
                 assert!(anp + bnp > n);
                 assert!(anp >= bnp);
                 if ap1_is_a0 {
-                    limbs_mul_greater_to_out(tp, &a0[..anp], &b0[..bnp]);
+                    limbs_mul_greater_to_out(tp, &ap[..anp], &bp[..bnp]);
                 } else {
                     let (tp_lo, tp_hi) = tp.split_at_mut(2 * n + 2);
-                    limbs_mul_greater_to_out(tp_lo, &tp_hi[..anp], &b0[..bnp]);
+                    limbs_mul_greater_to_out(tp_lo, &tp_hi[..anp], &bp[..bnp]);
                 }
                 anp = anp + bnp - n;
                 assert!(anp <= n || tp[2 * n] == 0);
@@ -238,25 +230,15 @@ pub(crate) fn mpn_mulmod_bnm1(
                 tp[n] = 0;
                 assert!(!limbs_slice_add_limb_in_place(&mut tp[..n + 1], cy));
             } else {
-                if bp1_is_b0 {
-                    if ap1_is_a0 {
-                        mpn_bc_mulmod_bnp1_tp_is_rp(tp, a0, b0, n);
-                    } else {
-                        let (tp_lo, tp_hi) = tp.split_at_mut(2 * n + 2);
-                        mpn_bc_mulmod_bnp1_tp_is_rp(tp_lo, tp_hi, b0, n);
-                    }
+                if ap1_is_a0 {
+                    let (tp_lo, tp_hi) = tp.split_at_mut(3 * n + 3);
+                    mpn_bc_mulmod_bnp1_tp_is_rp(tp_lo, ap, tp_hi, n);
                 } else {
-                    if ap1_is_a0 {
-                        let (tp_lo, tp_hi) = tp.split_at_mut(3 * n + 3);
-                        mpn_bc_mulmod_bnp1_tp_is_rp(tp_lo, a0, tp_hi, n);
-                    } else {
-                        let (tp_lo, tp_hi) = tp.split_at_mut(2 * n + 2);
-                        mpn_bc_mulmod_bnp1_tp_is_rp(tp_lo, tp_hi, &tp_hi[n + 1..], n);
-                    }
+                    let (tp_lo, tp_hi) = tp.split_at_mut(2 * n + 2);
+                    mpn_bc_mulmod_bnp1_tp_is_rp(tp_lo, tp_hi, &tp_hi[n + 1..], n);
                 }
             }
         }
-
         //  Here the CRT recomposition begins.
         //
         // xm <- (tp + xm)/2 = (tp + xm)B^n/2 mod (B^n-1)

@@ -7,6 +7,7 @@ use malachite_base::num::{
 };
 use malachite_base::round::RoundingMode;
 use malachite_nz::integer::logic::bit_access::limbs_vec_clear_bit_neg;
+use malachite_nz::natural::arithmetic::mul::fft::*;
 use malachite_nz::natural::arithmetic::mul::toom::{
     _limbs_mul_greater_to_out_toom_22_input_sizes_valid,
     _limbs_mul_greater_to_out_toom_32_input_sizes_valid,
@@ -1557,6 +1558,19 @@ pub fn triples_of_unsigned_vec_var_23<T: PrimitiveUnsigned + Rand>(
         |&(ref out, ref xs, ref ys)| {
             out.len() >= xs.len() + ys.len()
                 && _limbs_mul_greater_to_out_toom_8h_input_sizes_valid(xs.len(), ys.len())
+        },
+    ))
+}
+
+// Some triples of `Vec<T>`, where `T` is unsigned and `out`, `xs`, and `ys` would trigger the
+// actual FFT code of `_limbs_mul_greater_to_out_fft`.
+pub fn triples_of_unsigned_vec_var_24<T: PrimitiveUnsigned + Rand>(
+    gm: GenerationMode,
+) -> Box<Iterator<Item = (Vec<T>, Vec<T>, Vec<T>)>> {
+    Box::new(triples_of_unsigned_vec_min_sizes(gm, 30, 15, 15).filter(
+        |&(ref out, ref xs, ref ys)| {
+            out.len() >= xs.len() + ys.len()
+                && _limbs_mul_greater_to_out_fft_input_sizes_threshold(xs.len(), ys.len())
         },
     ))
 }

@@ -11,6 +11,9 @@ use inputs::base::{
 };
 use inputs::natural::{nrm_pairs_of_naturals, pairs_of_naturals, rm_pairs_of_naturals};
 use malachite_base::num::{PrimitiveInteger, SignificantBits};
+use malachite_nz::natural::arithmetic::mul::fft::{
+    _limbs_mul_greater_to_out_fft, _limbs_mul_greater_to_out_fft_input_sizes_threshold,
+};
 use malachite_nz::natural::arithmetic::mul::toom::{
     _limbs_mul_greater_to_out_toom_22, _limbs_mul_greater_to_out_toom_22_input_sizes_valid,
     _limbs_mul_greater_to_out_toom_22_scratch_size, _limbs_mul_greater_to_out_toom_32,
@@ -98,6 +101,10 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
         registry,
         demo_limbs_mul_greater_to_out_toom_8h_input_sizes_valid
     );
+    register_ns_demo!(
+        registry,
+        demo_limbs_mul_greater_to_out_fft_input_sizes_threshold
+    );
     register_demo!(registry, demo_natural_mul_assign);
     register_demo!(registry, demo_natural_mul_assign_ref);
     register_demo!(registry, demo_natural_mul);
@@ -178,6 +185,11 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
         registry,
         Large,
         benchmark_limbs_mul_greater_to_out_toom_8h_algorithms
+    );
+    register_bench!(
+        registry,
+        Large,
+        benchmark_limbs_mul_greater_to_out_fft_algorithms
     );
     register_bench!(
         registry,
@@ -371,6 +383,20 @@ fn demo_limbs_mul_greater_to_out_toom_8h_input_sizes_valid(
             x,
             y,
             _limbs_mul_greater_to_out_toom_8h_input_sizes_valid(x, y)
+        );
+    }
+}
+
+fn demo_limbs_mul_greater_to_out_fft_input_sizes_threshold(
+    gm: NoSpecialGenerationMode,
+    limit: usize,
+) {
+    for (x, y) in pairs_of_small_usizes(gm).take(limit) {
+        println!(
+            "_limbs_mul_greater_to_out_fft_input_sizes_threshold({}, {}) = {}",
+            x,
+            y,
+            _limbs_mul_greater_to_out_fft_input_sizes_threshold(x, y)
         );
     }
 }
@@ -873,6 +899,33 @@ fn benchmark_limbs_mul_greater_to_out_toom_8h_algorithms(
                         vec![0; _limbs_mul_greater_to_out_toom_8h_scratch_size(xs.len(), ys.len())];
                     _limbs_mul_greater_to_out_toom_8h(&mut out, &xs, &ys, &mut scratch)
                 }),
+            ),
+        ],
+    );
+}
+
+fn benchmark_limbs_mul_greater_to_out_fft_algorithms(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "_limbs_mul_greater_to_out_fft(&mut [u32], &[u32], &[u32])",
+        BenchmarkType::Algorithms,
+        triples_of_unsigned_vec_var_10(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(_, ref xs, ref ys)| xs.len() + ys.len()),
+        "x.len() + y.len()",
+        &mut [
+            (
+                "basecase",
+                &mut (|(mut out, xs, ys)| _limbs_mul_greater_to_out_fft(&mut out, &xs, &ys)),
+            ),
+            (
+                "FFT",
+                &mut (|(mut out, xs, ys)| _limbs_mul_greater_to_out_fft(&mut out, &xs, &ys)),
             ),
         ],
     );
