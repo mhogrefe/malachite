@@ -109,7 +109,7 @@ fn _limbs_toom_couple_handling(
 /// The actual scratch size returned is a quicker-to-compute upper bound.
 ///
 /// This is mpn_toom22_mul_itch from gmp-impl.h.
-pub fn _limbs_mul_greater_to_out_toom_22_scratch_size(xs_len: usize) -> usize {
+pub const fn _limbs_mul_greater_to_out_toom_22_scratch_size(xs_len: usize) -> usize {
     2 * (xs_len + Limb::WIDTH as usize)
 }
 
@@ -3278,7 +3278,7 @@ pub fn _limbs_mul_greater_to_out_toom_8h_input_sizes_valid(xs_len: usize, ys_len
     if !(ys_len >= 86
         && xs_len <= ys_len * 4
         && (Limb::WIDTH > 11 * 3 || xs_len * 4 <= ys_len * 11)
-        && (Limb::WIDTH > 10 * 3 || xs_len * 1 <= ys_len * 2)
+        && (Limb::WIDTH > 10 * 3 || xs_len <= ys_len * 2)
         && (Limb::WIDTH > 9 * 3 || xs_len * 2 <= ys_len * 3))
     {
         return false;
@@ -3484,7 +3484,7 @@ pub fn _limbs_mul_greater_to_out_toom_8h(
     // Can not handle too much unbalance
     assert!(xs_len <= ys_len * 4);
     assert!(Limb::WIDTH > 11 * 3 || xs_len * 4 <= ys_len * 11);
-    assert!(Limb::WIDTH > 10 * 3 || xs_len * 1 <= ys_len * 2);
+    assert!(Limb::WIDTH > 10 * 3 || xs_len <= ys_len * 2);
     assert!(Limb::WIDTH > 9 * 3 || xs_len * 2 <= ys_len * 3);
 
     let n;

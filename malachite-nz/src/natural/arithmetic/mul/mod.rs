@@ -1,15 +1,16 @@
 use malachite_base::num::PrimitiveInteger;
 use natural::arithmetic::add::limbs_slice_add_greater_in_place_left;
 use natural::arithmetic::add_mul_limb::mpn_addmul_1;
-use natural::arithmetic::mul::fft::MUL_FFT_THRESHOLD;
+use natural::arithmetic::mul::fft::{_limbs_mul_greater_to_out_fft, MUL_FFT_THRESHOLD};
 use natural::arithmetic::mul::toom::{
-    _limbs_mul_greater_to_out_toom_22, _limbs_mul_greater_to_out_toom_32,
-    _limbs_mul_greater_to_out_toom_33, _limbs_mul_greater_to_out_toom_33_scratch_size,
-    _limbs_mul_greater_to_out_toom_42, _limbs_mul_greater_to_out_toom_43,
-    _limbs_mul_greater_to_out_toom_44, _limbs_mul_greater_to_out_toom_44_scratch_size,
-    _limbs_mul_greater_to_out_toom_53, _limbs_mul_greater_to_out_toom_63,
-    _limbs_mul_greater_to_out_toom_6h, _limbs_mul_greater_to_out_toom_6h_scratch_size,
-    _limbs_mul_greater_to_out_toom_8h, _limbs_mul_greater_to_out_toom_8h_scratch_size,
+    _limbs_mul_greater_to_out_toom_22, _limbs_mul_greater_to_out_toom_22_scratch_size,
+    _limbs_mul_greater_to_out_toom_32, _limbs_mul_greater_to_out_toom_33,
+    _limbs_mul_greater_to_out_toom_33_scratch_size, _limbs_mul_greater_to_out_toom_42,
+    _limbs_mul_greater_to_out_toom_43, _limbs_mul_greater_to_out_toom_44,
+    _limbs_mul_greater_to_out_toom_44_scratch_size, _limbs_mul_greater_to_out_toom_53,
+    _limbs_mul_greater_to_out_toom_63, _limbs_mul_greater_to_out_toom_6h,
+    _limbs_mul_greater_to_out_toom_6h_scratch_size, _limbs_mul_greater_to_out_toom_8h,
+    _limbs_mul_greater_to_out_toom_8h_scratch_size,
     _limbs_mul_same_length_to_out_toom_6h_scratch_size,
     _limbs_mul_same_length_to_out_toom_8h_scratch_size, MUL_TOOM22_THRESHOLD,
     MUL_TOOM32_TO_TOOM43_THRESHOLD, MUL_TOOM32_TO_TOOM53_THRESHOLD, MUL_TOOM33_THRESHOLD,
@@ -91,11 +92,10 @@ pub fn limbs_mul_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) 
     if len < MUL_TOOM22_THRESHOLD {
         _limbs_mul_greater_to_out_basecase(out, xs, ys);
     } else if len < MUL_TOOM33_THRESHOLD {
-        // TODO once const fn is stable, make this
-        // _limbs_mul_greater_to_out_toom_22_scratch_size(MUL_TOOM33_THRESHOLD_LIMIT - 1)
-
         // Allocate workspace of fixed size on stack: fast!
-        let scratch = &mut [0; 2 * (MUL_TOOM33_THRESHOLD_LIMIT - 1 + Limb::WIDTH as usize)];
+        let scratch = &mut [0; _limbs_mul_greater_to_out_toom_22_scratch_size(
+            MUL_TOOM33_THRESHOLD_LIMIT - 1,
+        )];
         assert!(MUL_TOOM33_THRESHOLD <= MUL_TOOM33_THRESHOLD_LIMIT);
         _limbs_mul_greater_to_out_toom_22(out, xs, ys, scratch);
     } else if len < MUL_TOOM44_THRESHOLD {
@@ -112,8 +112,7 @@ pub fn limbs_mul_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) 
         _limbs_mul_greater_to_out_toom_8h(out, xs, ys, &mut scratch);
     } else {
         // The current FFT code allocates its own space. That should probably change.
-        //TODO mpn_fft_mul (out, xs, len, ys, len);
-        _limbs_mul_greater_to_out_basecase(out, xs, ys);
+        _limbs_mul_greater_to_out_fft(out, xs, ys);
     }
 }
 
@@ -269,8 +268,7 @@ pub fn limbs_mul_greater_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> L
             }
         }
     } else {
-        //TODO replace with FFT
-        _limbs_mul_greater_to_out_basecase(out, xs, ys);
+        _limbs_mul_greater_to_out_fft(out, xs, ys);
     }
     out[xs_len + ys_len - 1]
 }

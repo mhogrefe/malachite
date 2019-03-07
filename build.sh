@@ -20,6 +20,7 @@ cd ../malachite-test &&
 cargo update &&
 cargo fmt &&
 #cargo +nightly clippy
+python extra-tests.py
 cargo test --release &&
 cargo test --release --features 64_bit_limbs --no-default-features &&
 cargo rustc --release --lib -- --emit asm &&

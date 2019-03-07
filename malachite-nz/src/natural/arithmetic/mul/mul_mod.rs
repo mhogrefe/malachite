@@ -230,16 +230,12 @@ pub fn mpn_mulmod_bnm1(rp: &mut [Limb], rn: usize, ap: &[Limb], bp: &[Limb], tp:
                 tp[n] = 0;
                 assert!(!limbs_slice_add_limb_in_place(&mut tp[..n + 1], cy));
             } else {
-                if ap1_is_a0 {
-                    let (tp_lo, tp_hi) = tp.split_at_mut(3 * n + 3);
-                    mpn_bc_mulmod_bnp1_tp_is_rp(tp_lo, ap, tp_hi, n);
-                } else {
-                    let (tp_lo, tp_hi) = tp.split_at_mut(2 * n + 2);
-                    mpn_bc_mulmod_bnp1_tp_is_rp(tp_lo, tp_hi, &tp_hi[n + 1..], n);
-                }
+                assert!(!ap1_is_a0);
+                let (tp_lo, tp_hi) = tp.split_at_mut(2 * n + 2);
+                mpn_bc_mulmod_bnp1_tp_is_rp(tp_lo, tp_hi, &tp_hi[n + 1..], n);
             }
         }
-        //  Here the CRT recomposition begins.
+        // Here the CRT recomposition begins.
         //
         // xm <- (tp + xm)/2 = (tp + xm)B^n/2 mod (B^n-1)
         // Division by 2 is a bitwise rotation.

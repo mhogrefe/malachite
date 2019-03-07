@@ -921,7 +921,7 @@ fn benchmark_limbs_mul_greater_to_out_fft_algorithms(
         &mut [
             (
                 "basecase",
-                &mut (|(mut out, xs, ys)| _limbs_mul_greater_to_out_fft(&mut out, &xs, &ys)),
+                &mut (|(mut out, xs, ys)| _limbs_mul_greater_to_out_basecase(&mut out, &xs, &ys)),
             ),
             (
                 "FFT",

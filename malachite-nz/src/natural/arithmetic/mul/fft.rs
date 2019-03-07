@@ -1,9 +1,9 @@
 use malachite_base::limbs::limbs_set_zero;
-use malachite_base::num::{NotAssign, Parity, PrimitiveInteger, UnsignedAbs, WrappingSubAssign};
-use natural::arithmetic::add::limbs_add_same_length_to_out;
-use natural::arithmetic::add::{
-    limbs_slice_add_greater_in_place_left, limbs_slice_add_same_length_in_place_left,
+use malachite_base::num::{
+    Parity, PrimitiveInteger, UnsignedAbs, WrappingAddAssign, WrappingSubAssign,
 };
+use natural::arithmetic::add::limbs_add_same_length_to_out;
+use natural::arithmetic::add::limbs_slice_add_same_length_in_place_left;
 use natural::arithmetic::add_limb::limbs_add_limb_to_out;
 use natural::arithmetic::add_limb::limbs_slice_add_limb_in_place;
 use natural::arithmetic::mul::limbs_mul_same_length_to_out;
@@ -16,8 +16,7 @@ use natural::arithmetic::shl_u::mpn_lshiftc;
 use natural::arithmetic::square::SQR_TOOM3_THRESHOLD;
 use natural::arithmetic::sub::limbs_sub_same_length_in_place_right;
 use natural::arithmetic::sub::{
-    limbs_sub_in_place_left, limbs_sub_same_length_in_place_left, limbs_sub_same_length_to_out,
-    limbs_sub_to_out,
+    limbs_sub_same_length_in_place_left, limbs_sub_same_length_to_out, limbs_sub_to_out,
 };
 use natural::arithmetic::sub_limb::limbs_sub_limb_in_place;
 use natural::comparison::ord::limbs_cmp_same_length;
@@ -556,7 +555,6 @@ fn mpn_mul_fft_lcm(mut a: usize, mut k: usize) -> usize {
 fn mpn_fft_mul_2exp_mod_f(r: &mut [Limb], a: &[Limb], d: usize, n: usize) {
     let sh = d as u32 % Limb::WIDTH;
     let mut m = d / Limb::WIDTH as usize;
-
     // negate
     if m >= n {
         // r[0..m-1]  <-- lshift(a[n-m]..a[n-1], sh)
@@ -583,7 +581,7 @@ fn mpn_fft_mul_2exp_mod_f(r: &mut [Limb], a: &[Limb], d: usize, n: usize) {
         // cc < 2^sh <= 2^(Limb::WIDTH`-1) thus no overflow here
         cc += 1;
         limbs_slice_add_limb_in_place(r, cc);
-        rd += 1;
+        rd.wrapping_add_assign(1);
         // rd might overflow when sh=Limb::WIDTH`-1
         cc = if rd == 0 { 1 } else { rd };
         limbs_slice_add_limb_in_place(&mut r[m + if rd == 0 { 1 } else { 0 }..], cc);
@@ -655,7 +653,7 @@ fn mpn_fft_mul_2exp_mod_f(r: &mut [Limb], a: &[Limb], d: usize, n: usize) {
 // in A[nprime+1..] the following M bits, ...
 // Assumes M is a multiple of GMP_NUMB_BITS (M = l * GMP_NUMB_BITS).
 // T must have space for at least (nprime + 1) limbs.
-// We must have nl <= 2*K*l.
+// We must have nl <= 2*k*l.
 // This is mpn_mul_fft_decompose from mpn/generic/mul_fft.c.
 fn mpn_mul_fft_decompose<'a>(
     a: &'a mut [Limb],
@@ -675,87 +673,22 @@ fn mpn_mul_fft_decompose<'a>(
     let mut cy: SignedLimb;
     let mut tmp;
     if nl > kl {
-        let mut dif = nl - kl;
+        let dif = nl - kl;
         tmp = vec![0; kl + 1];
-
-        if dif > kl {
-            let mut subp = false;
-            cy = if limbs_sub_same_length_to_out(&mut tmp, &n[..kl], &n[kl..2 * kl]) {
-                1
-            } else {
-                0
-            };
-            n_offset = 2 * kl;
-            dif -= kl;
-
-            // now dif > 0
-            while dif > kl {
-                if subp {
-                    cy += if limbs_sub_same_length_in_place_left(
-                        &mut tmp[..kl],
-                        &n[n_offset..n_offset + kl],
-                    ) {
-                        1
-                    } else {
-                        0
-                    };
-                } else {
-                    cy -= if limbs_slice_add_same_length_in_place_left(
-                        &mut tmp[..kl],
-                        &n[n_offset..n_offset + kl],
-                    ) {
-                        1
-                    } else {
-                        0
-                    };
-                }
-                subp.not_assign();
-                n_offset += kl;
-                dif -= kl;
-            }
-            // now dif <= Kl
-            if subp {
-                cy += if limbs_sub_in_place_left(&mut tmp[..kl], &n[n_offset..n_offset + dif]) {
-                    1
-                } else {
-                    0
-                };
-            } else {
-                cy -= if limbs_slice_add_greater_in_place_left(
-                    &mut tmp[..kl],
-                    &n[n_offset..n_offset + dif],
-                ) {
-                    1
-                } else {
-                    0
-                };
-            }
-            if cy >= 0 {
-                cy = if limbs_slice_add_limb_in_place(&mut tmp[..kl], cy as Limb) {
-                    1
-                } else {
-                    0
-                };
-            } else {
-                cy = if limbs_sub_limb_in_place(&mut tmp[..kl], -cy as Limb) {
-                    1
-                } else {
-                    0
-                };
-            }
+        // dif > kl -> nl - k * l > k * l -> nl > 2 * k * l, which violates the precondition
+        // nl <= 2 * k * l. So dif > kl cannot happen.
+        assert!(dif <= kl);
+        // dif <= Kl, i.e. nl <= 2 * Kl
+        cy = if limbs_sub_to_out(&mut tmp, &n[..kl], &n[kl..kl + dif]) {
+            1
         } else {
-            // dif <= Kl, i.e. nl <= 2 * Kl
-            cy = if limbs_sub_to_out(&mut tmp, &n[..kl], &n[kl..kl + dif]) {
-                1
-            } else {
-                0
-            };
-            cy = if limbs_slice_add_limb_in_place(&mut tmp[..kl], cy as Limb) {
-                1
-            } else {
-                0
-            };
-        }
+            0
+        };
+        cy = if limbs_slice_add_limb_in_place(&mut tmp[..kl], cy as Limb) {
+            1
+        } else {
+            0
+        };
         tmp[kl] = cy as Limb;
         nl = kl + 1;
         n_is_tmp = true;
@@ -840,7 +773,7 @@ fn mpn_fft_sub_mod_f(r: &mut [Limb], a: &[Limb], b: &[Limb], n: usize) {
 //    N=n*GMP_NUMB_BITS, and 2^omega is a primitive root mod 2^N+1
 // output: A[inc*l[k][i]] <- \sum (2^omega)^(ij) A[inc*j] mod 2^N+1
 // This is mpn_fft_fft from mpn/generic/mul_fft.c.
-fn mpn_fft_fft(
+pub fn mpn_fft_fft(
     ap: &mut [&mut [Limb]],
     k: usize,
     ll: &[&[usize]],
@@ -921,7 +854,7 @@ fn mpn_fft_fft(
 // Assumes the Ap[] are pseudo-normalized, i.e. 0 <= Ap[][n] <= 1.
 // This condition is also fulfilled at exit.
 // This is mpn_fft_fftinv from mpn/generic/mul_fft.c.
-fn mpn_fft_fftinv(ap: &mut [&mut [Limb]], k: usize, omega: usize, n: usize, tp: &mut [Limb]) {
+pub fn mpn_fft_fftinv(ap: &mut [&mut [Limb]], k: usize, omega: usize, n: usize, tp: &mut [Limb]) {
     if k == 2 {
         tp[..n + 1].copy_from_slice(&ap[0][..n + 1]);
         {
@@ -992,6 +925,7 @@ fn mpn_fft_normalize(ap: &mut [Limb], n: usize) {
 // R <- A/2^k mod 2^(n*GMP_NUMB_BITS)+1
 // This is mpn_fft_div_2exp_modF from mpn/generic/mul_fft.c.
 fn mpn_fft_div_2exp_mod_f(r: &mut [Limb], a: &[Limb], k: usize, n: usize) {
+    assert!(r.len() >= n + 1);
     let i = 2 * n * Limb::WIDTH as usize - k;
     mpn_fft_mul_2exp_mod_f(r, a, i, n);
     // 1/2^k = 2^(2nL-k) mod 2^(n*GMP_NUMB_BITS)+1
@@ -1003,7 +937,7 @@ fn mpn_fft_div_2exp_mod_f(r: &mut [Limb], a: &[Limb], k: usize, n: usize) {
 // Returns carry out, i.e. 1 iff {ap,an} = -1 mod 2^(n*GMP_NUMB_BITS)+1,
 // then {rp,n}=0.
 // This is mpn_fft_norm_modF from mpn/generic/mul_fft.c.
-fn mpn_fft_norm_mod_f(rp: &mut [Limb], n: usize, ap: &[Limb], an: usize) -> Limb {
+pub fn mpn_fft_norm_mod_f(rp: &mut [Limb], n: usize, ap: &[Limb], an: usize) -> Limb {
     assert!(n <= an && an <= 3 * n);
     let m = an as isize - 2 * n as isize;
     let l;
@@ -1066,7 +1000,6 @@ fn mpn_fft_mul_mod_f_k(ap: &mut [&mut [Limb]], bp: &mut [&mut [Limb]], n: usize,
 
         // we should ensure that nprime2 is a multiple of the next K
         if nprime2 >= MUL_FFT_MODF_THRESHOLD {
-            //mp_size_t K3;
             loop {
                 let k3 = 1 << mpn_fft_best_k(nprime2, false);
                 if nprime2 & (k3 - 1) == 0 {
@@ -1265,7 +1198,7 @@ fn mpn_fft_mul_mod_f_k_sqr(ap: &mut [&mut [Limb]], n: usize, big_k: usize) {
 }
 
 // This is mpn_mul_fft_internal from mpn/generic/mul_fft.c. A is excluded as it is unused.
-fn mpn_mul_fft_internal(
+pub fn mpn_mul_fft_internal(
     op: &mut [Limb],
     pl: usize,
     k: usize,
@@ -1387,6 +1320,7 @@ fn mpn_mul_fft_internal(
             limbs_sub_limb_in_place(&mut b[pla - 1..pla], 1);
         }
     } else if cc == 1 {
+        // This branch is untested!
         let mut cc = 1 as Limb;
         if pla >= 2 * pl {
             loop {
