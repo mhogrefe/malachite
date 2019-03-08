@@ -3,7 +3,10 @@ use malachite_base::num::{
     JoinHalves, PrimitiveInteger, SplitInHalf, WrappingAddAssign, WrappingSubAssign,
 };
 use natural::arithmetic::add::limbs_slice_add_same_length_in_place_left;
-use natural::arithmetic::mul::mul_mod::{mpn_mulmod_bnm1_itch, mpn_mulmod_bnm1_next_size};
+use natural::arithmetic::mul::mul_mod::{
+    _limbs_mul_mod_limb_width_to_n_minus_1_next_size,
+    _limbs_mul_mod_limb_width_to_n_minus_1_scratch_size,
+};
 use natural::arithmetic::mul::{limbs_mul_greater_to_out, limbs_mul_to_out};
 use natural::arithmetic::sub::limbs_sub_same_length_in_place_left;
 use natural::arithmetic::sub_limb::limbs_sub_limb_in_place;
@@ -663,8 +666,8 @@ pub fn mpn_mu_div_qr_choose_in(qn: usize, dn: usize, k: Limb) -> usize {
 // docs preserved
 // mpn_preinv_mu_div_qr_itch from mpn/generic/mu_div_qr.c
 pub fn mpn_preinv_mu_div_qr_itch(dn: usize, in_size: usize) -> usize {
-    let itch_local = mpn_mulmod_bnm1_next_size(dn + 1);
-    let itch_out = mpn_mulmod_bnm1_itch(itch_local, dn, in_size);
+    let itch_local = _limbs_mul_mod_limb_width_to_n_minus_1_next_size(dn + 1);
+    let itch_out = _limbs_mul_mod_limb_width_to_n_minus_1_scratch_size(itch_local, dn, in_size);
     itch_local + itch_out
 }
 

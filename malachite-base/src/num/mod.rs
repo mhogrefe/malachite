@@ -1928,6 +1928,64 @@ impl Parity for isize {
     }
 }
 
+impl ShrRound<u32> for usize {
+    type Output = usize;
+
+    fn shr_round(self, other: u32, rm: RoundingMode) -> usize {
+        if other == 0 || self == 0 {
+            return self;
+        }
+        let width = u32::wrapping_from(0usize.trailing_zeros());
+        match rm {
+            RoundingMode::Down | RoundingMode::Floor if other >= width => 0,
+            RoundingMode::Down | RoundingMode::Floor => self >> other,
+            RoundingMode::Up | RoundingMode::Ceiling if other >= width => 1,
+            RoundingMode::Up | RoundingMode::Ceiling => {
+                let shifted = self >> other;
+                if shifted << other == self {
+                    shifted
+                } else {
+                    shifted + 1
+                }
+            }
+            RoundingMode::Nearest
+                if other == width && self > (1 << (0usize.trailing_zeros() - 1)) =>
+            {
+                1
+            }
+            RoundingMode::Nearest if other >= width => 0,
+            RoundingMode::Nearest => {
+                let mostly_shifted = self >> (other - 1);
+                if mostly_shifted.even() {
+                    // round down
+                    mostly_shifted >> 1
+                } else if mostly_shifted << (other - 1) != self {
+                    // round up
+                    (mostly_shifted >> 1) + 1
+                } else {
+                    // result is half-integer; round to even
+                    let shifted = mostly_shifted >> 1;
+                    if shifted.even() {
+                        shifted
+                    } else {
+                        shifted + 1
+                    }
+                }
+            }
+            RoundingMode::Exact if other >= width => {
+                panic!("Right shift is not exact: {} >> {}", self, other);
+            }
+            RoundingMode::Exact => {
+                let shifted = self >> other;
+                if shifted << other != self {
+                    panic!("Right shift is not exact: {} >> {}", self, other);
+                }
+                shifted
+            }
+        }
+    }
+}
+
 //TODO docs
 macro_rules! unsigned_traits {
     ($t:ident, $log_width:expr) => {

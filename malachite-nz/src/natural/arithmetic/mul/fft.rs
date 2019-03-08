@@ -8,7 +8,8 @@ use natural::arithmetic::add_limb::limbs_add_limb_to_out;
 use natural::arithmetic::add_limb::limbs_slice_add_limb_in_place;
 use natural::arithmetic::mul::limbs_mul_same_length_to_out;
 use natural::arithmetic::mul::mul_mod::{
-    mpn_mulmod_bnm1, mpn_mulmod_bnm1_itch, mpn_mulmod_bnm1_next_size, MULMOD_BNM1_THRESHOLD,
+    _limbs_mul_mod_limb_width_to_n_minus_1, _limbs_mul_mod_limb_width_to_n_minus_1_next_size,
+    _limbs_mul_mod_limb_width_to_n_minus_1_scratch_size, MULMOD_BNM1_THRESHOLD,
     MUL_FFT_MODF_THRESHOLD,
 };
 use natural::arithmetic::shl_u::limbs_shl_to_out;
@@ -28,7 +29,7 @@ pub fn _limbs_mul_greater_to_out_fft_input_sizes_threshold(xs_len: usize, ys_len
     if xs_len == 0 || xs_len < ys_len {
         return false;
     }
-    let rn = mpn_mulmod_bnm1_next_size(xs_len + ys_len);
+    let rn = _limbs_mul_mod_limb_width_to_n_minus_1_next_size(xs_len + ys_len);
     rn.even() && rn >= MULMOD_BNM1_THRESHOLD
 }
 
@@ -516,9 +517,9 @@ fn mpn_nussbaumer_mul(pp: &mut [Limb], ap: &[Limb], bp: &[Limb]) {
     assert_ne!(bn, 0);
 
     //TODO special case for squaring
-    let rn = mpn_mulmod_bnm1_next_size(an + bn);
-    let mut tp = vec![0; mpn_mulmod_bnm1_itch(rn, an, bn)];
-    mpn_mulmod_bnm1(pp, rn, ap, bp, &mut tp);
+    let rn = _limbs_mul_mod_limb_width_to_n_minus_1_next_size(an + bn);
+    let mut tp = vec![0; _limbs_mul_mod_limb_width_to_n_minus_1_scratch_size(rn, an, bn)];
+    _limbs_mul_mod_limb_width_to_n_minus_1(pp, rn, ap, bp, &mut tp);
 }
 
 // Initialize l[i][j] with bitrev(j)
