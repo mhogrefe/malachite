@@ -4028,9 +4028,9 @@ fn test_limbs_mul_greater_to_out_fft() {
         assert_eq!(out, out_after);
     };
     // n < MULMOD_BNM1_THRESHOLD in _limbs_mul_mod_limb_width_to_n_minus_1_next_size
-    // (rn & 1) != 0 || rn < MULMOD_BNM1_THRESHOLD in _limbs_mul_mod_limb_width_to_n_minus_1
-    // bn < rn in _limbs_mul_mod_limb_width_to_n_minus_1
-    // an + bn <= rn in _limbs_mul_mod_limb_width_to_n_minus_1
+    // n.odd() || n < MULMOD_BNM1_THRESHOLD in _limbs_mul_mod_limb_width_to_n_minus_1
+    // ys_len < n in _limbs_mul_mod_limb_width_to_n_minus_1
+    // xs_len + ys_len <= n in _limbs_mul_mod_limb_width_to_n_minus_1
     test(vec![2], vec![3], vec![10; 2]);
     test(series(2, 3), series(3, 3), vec![10; 6]);
     let xs = vec![
@@ -4099,22 +4099,22 @@ fn test_limbs_mul_greater_to_out_fft() {
         875964411, 3988200888, 1056372570, 3344850714,
     ];
     let out_len = xs.len() + ys.len();
-    // nh < MUL_FFT_MODF_THRESHOLD in _limbs_mul_mod_limb_width_to_n_minus_1_next_size
-    // !((rn & 1) != 0 || rn < MULMOD_BNM1_THRESHOLD) in _limbs_mul_mod_limb_width_to_n_minus_1
-    // an > n in _limbs_mul_mod_limb_width_to_n_minus_1
-    // bn <= n in _limbs_mul_mod_limb_width_to_n_minus_1
-    // bn > n in _limbs_mul_mod_limb_width_to_n_minus_1
-    // bn >= rn in _limbs_mul_mod_limb_width_to_n_minus_1
-    // n < MUL_FFT_MODF_THRESHOLD in _limbs_mul_mod_limb_width_to_n_minus_1
-    // k < FFT_FIRST_K and !bp1_is_b0 in _limbs_mul_mod_limb_width_to_n_minus_1
-    // k < FFT_FIRST_K and !ap1_is_a0 in _limbs_mul_mod_limb_width_to_n_minus_1
-    // an + bn >= rn in _limbs_mul_mod_limb_width_to_n_minus_1
-    // k >= FFT_FIRST_K and bp1_is_b0 in _limbs_mul_mod_limb_width_to_n_minus_1
-    // k < FFT_FIRST_K and bp1_is_b0 in _limbs_mul_mod_limb_width_to_n_minus_1
-    // an + bn < rn in _limbs_mul_mod_limb_width_to_n_minus_1
+    // ceiling_half_n < MUL_FFT_MODF_THRESHOLD in _limbs_mul_mod_limb_width_to_n_minus_1_next_size
+    // !(n.odd() || n < MULMOD_BNM1_THRESHOLD) in _limbs_mul_mod_limb_width_to_n_minus_1
+    // xs_len > half_n in _limbs_mul_mod_limb_width_to_n_minus_1
+    // ys_len <= half_n in _limbs_mul_mod_limb_width_to_n_minus_1
+    // ys_len > half_n in _limbs_mul_mod_limb_width_to_n_minus_1
+    // ys_len >= n in _limbs_mul_mod_limb_width_to_n_minus_1
+    // half_n < MUL_FFT_MODF_THRESHOLD in _limbs_mul_mod_limb_width_to_n_minus_1
+    // k < FFT_FIRST_K and !bp1_is_ys_0 in _limbs_mul_mod_limb_width_to_n_minus_1
+    // k < FFT_FIRST_K and !ap1_is_xs_0 in _limbs_mul_mod_limb_width_to_n_minus_1
+    // xs_len + ys_len >= n in _limbs_mul_mod_limb_width_to_n_minus_1
+    // k >= FFT_FIRST_K and bp1_is_ys_0 in _limbs_mul_mod_limb_width_to_n_minus_1
+    // k < FFT_FIRST_K and bp1_is_ys_0 in _limbs_mul_mod_limb_width_to_n_minus_1
+    // xs_len + ys_len < n in _limbs_mul_mod_limb_width_to_n_minus_1
     test(xs, ys, vec![10; out_len]);
-    // n < 4 * (MULMOD_BNM1_THRESHOLD - 1) + 1 in _limbs_mul_mod_limb_width_to_n_minus_1_next_size
-    // an + bn > rn in _limbs_mul_mod_limb_width_to_n_minus_1
+    // n <= (MULMOD_BNM1_THRESHOLD - 1) << 2 in _limbs_mul_mod_limb_width_to_n_minus_1_next_size
+    // xs_len + ys_len > n in _limbs_mul_mod_limb_width_to_n_minus_1
     test(
         vec![
             823938137, 1528271032, 3754017422, 3733650953, 1787749760, 2772188495, 3146748967,
@@ -4125,7 +4125,7 @@ fn test_limbs_mul_greater_to_out_fft() {
         ],
         vec![10; 17],
     );
-    // an <= n in _limbs_mul_mod_limb_width_to_n_minus_1
+    // xs_len <= half_n in _limbs_mul_mod_limb_width_to_n_minus_1
     test(
         vec![
             2085137171, 1117546275, 1886156676, 98424960, 2074093393, 2154503198, 189860005,
@@ -4146,7 +4146,7 @@ fn test_limbs_mul_greater_to_out_fft() {
     ];
     let ys = vec![1970030099];
     let out_len = xs.len() + ys.len();
-    // n < 8 * (MULMOD_BNM1_THRESHOLD - 1) + 1 in _limbs_mul_mod_limb_width_to_n_minus_1_next_size
+    // n <= (MULMOD_BNM1_THRESHOLD - 1) << 3 in _limbs_mul_mod_limb_width_to_n_minus_1_next_size
     test(xs, ys, vec![10; out_len]);
     let xs = vec![
         2543408782, 1266633745, 2743231472, 2766403608, 438908947, 3460789749, 3630408044,
@@ -4280,11 +4280,11 @@ fn test_limbs_mul_greater_to_out_fft() {
         2059617606, 1784567797, 1574115227, 81854142, 3500164071, 509026907,
     ];
     let out_len = xs.len() + ys.len();
-    // nh >= MUL_FFT_MODF_THRESHOLD in _limbs_mul_mod_limb_width_to_n_minus_1_next_size
-    // n >= MUL_FFT_MODF_THRESHOLD in _limbs_mul_mod_limb_width_to_n_minus_1
+    // ceiling_half_n >= MUL_FFT_MODF_THRESHOLD in _limbs_mul_mod_limb_width_to_n_minus_1_next_size
+    // half_n >= MUL_FFT_MODF_THRESHOLD in _limbs_mul_mod_limb_width_to_n_minus_1
     // k >= FFT_FIRST_K in _limbs_mul_mod_limb_width_to_n_minus_1
-    // k >= FFT_FIRST_K and bp1_is_b0 in _limbs_mul_mod_limb_width_to_n_minus_1
-    // k >= FFT_FIRST_K and !ap1_is_a0 in _limbs_mul_mod_limb_width_to_n_minus_1
+    // k >= FFT_FIRST_K and bp1_is_ys_0 in _limbs_mul_mod_limb_width_to_n_minus_1
+    // k >= FFT_FIRST_K and !ap1_is_xs_0 in _limbs_mul_mod_limb_width_to_n_minus_1
     // nl <= kl in mpn_mul_fft_decompose
     // nl > 0 in mpn_mul_fft_decompose
     // !n_is_tmp in mpn_mul_fft_decompose
@@ -4582,7 +4582,7 @@ fn test_limbs_mul_greater_to_out_fft() {
         2437519330, 1543197978,
     ];
     let out_len = xs.len() + ys.len();
-    // k >= FFT_FIRST_K and ap1_is_a0 in _limbs_mul_mod_limb_width_to_n_minus_1
+    // k >= FFT_FIRST_K and ap1_is_xs_0 in _limbs_mul_mod_limb_width_to_n_minus_1
     test(xs, ys, vec![10; out_len]);
     let xs = vec![
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,

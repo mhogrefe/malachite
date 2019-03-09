@@ -1928,14 +1928,14 @@ impl Parity for isize {
     }
 }
 
-impl ShrRound<u32> for usize {
+impl ShrRound<u64> for usize {
     type Output = usize;
 
-    fn shr_round(self, other: u32, rm: RoundingMode) -> usize {
+    fn shr_round(self, other: u64, rm: RoundingMode) -> usize {
         if other == 0 || self == 0 {
             return self;
         }
-        let width = u32::wrapping_from(0usize.trailing_zeros());
+        let width = u64::wrapping_from(0usize.trailing_zeros());
         match rm {
             RoundingMode::Down | RoundingMode::Floor if other >= width => 0,
             RoundingMode::Down | RoundingMode::Floor => self >> other,
