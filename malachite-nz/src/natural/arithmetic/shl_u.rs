@@ -157,41 +157,32 @@ pub fn limbs_vec_shl_in_place(limbs: &mut Vec<Limb>, bits: u64) {
 }
 
 // mpn_lshiftc -- Shift left low level with complement.
-// Shift U (pointed to by up and n limbs long) cnt bits to the left
-// and store the n least significant limbs of the result at rp.
+// Shift U (pointed to by xs and n limbs long) bits bits to the left
+// and store the n least significant limbs of the result at out.
 // Return the bits shifted out from the most significant limb.
 //
 // Argument constraints:
-// 1. 0 < cnt < GMP_NUMB_BITS.
-// 2. If the result is to be written over the input, rp must be >= up.
+// 1. 0 < bits < GMP_NUMB_BITS.
+// 2. If the result is to be written over the input, out must be >= xs.
 //
 // TODO test
 // This is mpn_lshiftc from mpn/generic/mpn_lshiftc.
-pub fn mpn_lshiftc(rp: &mut [Limb], up: &[Limb], cnt: u32) -> Limb {
-    let n = up.len();
-
-    assert!(n >= 1);
-    assert!(cnt >= 1);
-    assert!(cnt < Limb::WIDTH);
-
-    let mut up_offset = n;
-    let mut rp_offset = n;
-
-    let tnc = Limb::WIDTH - cnt;
-    up_offset -= 1;
-    let mut low_limb = up[up_offset];
-    let retval = low_limb >> tnc;
-    let mut high_limb = low_limb << cnt;
-    for _ in 1..n {
-        up_offset -= 1;
-        low_limb = up[up_offset];
-        rp_offset -= 1;
-        rp[rp_offset] = !(high_limb | (low_limb >> tnc));
-        high_limb = low_limb << cnt;
+pub fn limbs_shl_with_complement(out: &mut [Limb], xs: &[Limb], bits: u32) -> Limb {
+    let n = xs.len();
+    assert_ne!(n, 0);
+    assert_ne!(bits, 0);
+    assert!(bits < Limb::WIDTH);
+    let cobits = Limb::WIDTH - bits;
+    let mut low_limb = *xs.last().unwrap();
+    let remaining_bits = low_limb >> cobits;
+    let mut high_limb = low_limb << bits;
+    for i in (1..n).rev() {
+        low_limb = xs[i - 1];
+        out[i] = !(high_limb | (low_limb >> cobits));
+        high_limb = low_limb << bits;
     }
-    rp_offset -= 1;
-    rp[rp_offset] = !high_limb;
-    retval
+    out[0] = !high_limb;
+    remaining_bits
 }
 
 macro_rules! impl_natural_shl_unsigned {
