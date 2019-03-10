@@ -255,27 +255,33 @@ pub fn _limbs_mul_mod_limb_width_to_n_minus_1(
             if k >= FFT_FIRST_K {
                 if bp1_is_ys_0 {
                     if ap1_is_xs_0 {
-                        scratch[half_n] = mpn_mul_fft(scratch, half_n, xs, ys, k);
+                        scratch[half_n] = if mpn_mul_fft(scratch, half_n, xs, ys, k) {
+                            1
+                        } else {
+                            0
+                        };
                     } else {
                         let (scratch_lo, scratch_hi) = scratch.split_at_mut(2 * m);
                         scratch_lo[half_n] =
-                            mpn_mul_fft(scratch_lo, half_n, &scratch_hi[..anp], ys, k);
+                            if mpn_mul_fft(scratch_lo, half_n, &scratch_hi[..anp], ys, k) {
+                                1
+                            } else {
+                                0
+                            };
                     }
                 } else {
-                    if ap1_is_xs_0 {
-                        let (scratch_lo, scratch_hi) = scratch.split_at_mut(3 * m);
-                        scratch_lo[half_n] =
-                            mpn_mul_fft(scratch_lo, half_n, xs, &scratch_hi[..bnp], k);
+                    let (scratch_lo, scratch_hi) = scratch.split_at_mut(2 * m);
+                    scratch_lo[half_n] = if mpn_mul_fft(
+                        scratch_lo,
+                        half_n,
+                        if ap1_is_xs_0 { xs } else { &scratch_hi[..anp] },
+                        &scratch_hi[m..bnp + m],
+                        k,
+                    ) {
+                        1
                     } else {
-                        let (scratch_lo, scratch_hi) = scratch.split_at_mut(2 * m);
-                        scratch_lo[half_n] = mpn_mul_fft(
-                            scratch_lo,
-                            half_n,
-                            &scratch_hi[..anp],
-                            &scratch_hi[m..bnp + m],
-                            k,
-                        );
-                    }
+                        0
+                    };
                 }
             } else if bp1_is_ys_0 {
                 assert!(anp + bnp <= 2 * half_n + 1);

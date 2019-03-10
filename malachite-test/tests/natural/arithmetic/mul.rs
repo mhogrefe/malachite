@@ -3,7 +3,7 @@ use malachite_base::num::{One, Zero};
 use malachite_nz::natural::arithmetic::mul::fft::_limbs_mul_greater_to_out_fft;
 #[cfg(feature = "64_bit_limbs")]
 use malachite_nz::natural::arithmetic::mul::fft::{
-    mpn_fft_fft, mpn_fft_fftinv, mpn_fft_norm_mod_f, mpn_mul_fft_internal,
+    _limbs_fft_mul_normalize_mod_f, _limbs_mul_fft, _limbs_mul_fft_inverse, mpn_mul_fft_internal,
 };
 #[cfg(feature = "64_bit_limbs")]
 use malachite_nz::natural::arithmetic::mul::mul_mod::_limbs_mul_mod_limb_width_to_n_minus_1;
@@ -4293,9 +4293,9 @@ fn test_limbs_mul_greater_to_out_fft() {
     // m < n and sh != 0 in mpn_fft_mul_2exp_mod_f
     // m != 0 in mpn_fft_mul_2exp_mod_f
     // nl <= 0 in mpn_mul_fft_decompose
-    // k != 2 in mpn_fft_fft
-    // k == 2 in mpn_fft_fft
-    // cy in mpn_fft_fft
+    // k != 2 in _limbs_mul_fft
+    // k == 2 in _limbs_mul_fft
+    // cy in _limbs_mul_fft
     // c.get_highest_bit() in mpn_fft_sub_mod_f
     // c <= 1 in mpn_fft_add_mod_f_in_place_left
     // !c.get_highest_bit() in mpn_fft_sub_mod_f
@@ -4303,9 +4303,9 @@ fn test_limbs_mul_greater_to_out_fft() {
     // n < MUL_FFT_MODF_THRESHOLD in mpn_fft_mul_mod_f_k
     // cc != 0 in mpn_fft_mul_mod_f_k
     // b[n] != 0 in mpn_fft_mul_mod_f_k
-    // k != 2 in mpn_fft_fftinv
-    // k == 2 in mpn_fft_fftinv
-    // cy in mpn_fft_fftinv
+    // k != 2 in _limbs_mul_fft_inverse
+    // k == 2 in _limbs_mul_fft_inverse
+    // cy in _limbs_mul_fft_inverse
     // m >= n in mpn_fft_mul_2exp_mod_f
     // m >= n and sh != 0 in mpn_fft_mul_2exp_mod_f
     // ap[n] == 0 before sub in mpn_fft_normalize
@@ -4313,8 +4313,8 @@ fn test_limbs_mul_greater_to_out_fft() {
     // limbs_cmp_same_length(&bp[j][..nprime + 1], t_lo) ==
     //      Ordering::Greater in mpn_mul_fft_internal
     // |cc| != 1 in mpn_mul_fft_internal
-    // m <= 0 in mpn_fft_norm_mod_f
-    // rpn >= 0 in mpn_fft_norm_mod_f
+    // m <= 0 in _limbs_fft_mul_normalize_mod_f
+    // rpn >= 0 in _limbs_fft_mul_normalize_mod_f
     test(xs, ys, vec![10; out_len]);
     let xs = vec![
         536845695, 2558806929, 1489289365, 3329304370, 2717810433, 1612861178, 3032334508,
@@ -5219,7 +5219,7 @@ fn test_limbs_mul_greater_to_out_fft() {
     // Test the following with MUL_FFT_MODF_THRESHOLD = 4
 
     // cc != 0 in mpn_mul_fft_internal
-    // rpn < 0 in mpn_fft_norm_mod_f
+    // rpn < 0 in _limbs_fft_mul_normalize_mod_f
     let xs = vec![
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -10191,7 +10191,7 @@ fn test_limbs_mul_greater_to_out_fft() {
 
 #[cfg(feature = "64_bit_limbs")]
 #[test]
-fn test_mpn_fft_fft() {
+fn test_limbs_mul_fft() {
     let test = |ap_before: Vec<Vec<Limb>>,
                 k: usize,
                 ll: Vec<Vec<usize>>,
@@ -10209,7 +10209,7 @@ fn test_mpn_fft_fft() {
         }
         let ll: Vec<&[usize]> = ll.iter().map(|row| row.as_slice()).collect();
         let mut tp = tp_before.clone();
-        mpn_fft_fft(&mut ap, k, &ll, ll_offset, omega, n, inc, &mut tp);
+        _limbs_mul_fft(&mut ap, k, &ll, ll_offset, omega, n, inc, &mut tp);
         assert_eq!(ap.len(), ap_after.len());
         assert!(
             ap.iter()
@@ -10220,7 +10220,7 @@ fn test_mpn_fft_fft() {
         );
         assert_eq!(tp, tp_after);
     };
-    // ap[0][n] > 1 in mpn_fft_fft
+    // ap[0][n] > 1 in _limbs_mul_fft
     test(
         vec![vec![0, 0, 2], vec![0, 0, 0]],
         2,
@@ -10240,7 +10240,7 @@ fn test_mpn_fft_fft() {
 
 #[cfg(feature = "64_bit_limbs")]
 #[test]
-fn test_mpn_fft_fftinv() {
+fn test_limbs_mul_fft_inverse() {
     let test = |ap_before: Vec<Vec<Limb>>,
                 k: usize,
                 omega: usize,
@@ -10254,7 +10254,7 @@ fn test_mpn_fft_fftinv() {
             ap.push(a);
         }
         let mut tp = tp_before.clone();
-        mpn_fft_fftinv(&mut ap, k, omega, n, &mut tp);
+        _limbs_mul_fft_inverse(&mut ap, k, omega, n, &mut tp);
         assert_eq!(ap.len(), ap_after.len());
         assert!(
             ap.iter()
@@ -10265,7 +10265,7 @@ fn test_mpn_fft_fftinv() {
         );
         assert_eq!(tp, tp_after);
     };
-    // ap[0][n] > 1 in mpn_fft_fftinv
+    // ap[0][n] > 1 in _limbs_mul_fft_inverse
     test(
         vec![vec![0, 0, 2], vec![0, 0, 0]],
         2,
@@ -10282,18 +10282,17 @@ fn test_mpn_fft_fftinv() {
 
 #[cfg(feature = "64_bit_limbs")]
 #[test]
-fn test_mpn_fft_norm_mod_f() {
-    let test = |rp_before: Vec<Limb>, n: usize, ap: Vec<Limb>, an: usize, rp_after: Vec<Limb>| {
+fn test_limbs_fft_mul_normalize_mod_f() {
+    let test = |rp_before: Vec<Limb>, n: usize, ap: Vec<Limb>, rp_after: Vec<Limb>| {
         let mut rp = rp_before.clone();
-        mpn_fft_norm_mod_f(&mut rp, n, &ap, an);
+        _limbs_fft_mul_normalize_mod_f(&mut rp, n, &ap);
         assert_eq!(rp, rp_after);
     };
-    // m > 0 in mpn_fft_norm_mod_f
+    // m > 0 in _limbs_fft_mul_normalize_mod_f
     test(
         vec![1, 2, 3],
         2,
         vec![4, 5, 6, 7, 8],
-        5,
         vec![7, 18446744073709551614, 3],
     );
 }
