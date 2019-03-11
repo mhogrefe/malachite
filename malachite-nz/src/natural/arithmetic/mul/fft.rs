@@ -597,7 +597,7 @@ fn _limbs_mul_fft_sub_mod_f_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb], n
 // This is mpn_fft_mul_2exp_modF from mpn/generic/mul_fft.c.
 fn _limbs_mul_fft_shl_mod_f_to_out(out: &mut [Limb], xs: &[Limb], bits: usize, n: usize) {
     let small_bits = bits as u32 & Limb::WIDTH_MASK;
-    let mut shift_limbs = bits / Limb::WIDTH as usize;
+    let mut shift_limbs = bits >> Limb::LOG_WIDTH as usize;
     // negate
     if shift_limbs >= n {
         // out[0..shift_limbs-1]  <-- lshift(xs[n-shift_limbs]..xs[n-1], small_bits)
@@ -697,8 +697,7 @@ fn _limbs_mul_fft_shl_mod_f_to_out(out: &mut [Limb], xs: &[Limb], bits: usize, n
 // This is mpn_fft_div_2exp_modF from mpn/generic/mul_fft.c.
 fn _limbs_mul_fft_shr_mod_f_to_out(out: &mut [Limb], xs: &[Limb], bits: usize, n: usize) {
     assert!(out.len() >= n + 1);
-    let i = 2 * n * Limb::WIDTH as usize - bits;
-    _limbs_mul_fft_shl_mod_f_to_out(out, xs, i, n);
+    _limbs_mul_fft_shl_mod_f_to_out(out, xs, (n << (Limb::LOG_WIDTH + 1)) - bits, n);
     // 1/2^bits = 2^(2nL-bits) mod 2^(n*GMP_NUMB_BITS)+1
     // normalize so that R < 2^(n*GMP_NUMB_BITS)+1
     _limbs_mul_fft_normalize(out, n);
@@ -936,97 +935,89 @@ pub fn _limbs_fft_mul_normalize_mod_f(out: &mut [Limb], n: usize, xs: &[Limb]) -
     }
 }
 
-// This is mpn_fft_mul_modF_K from mpn/generic/mul_fft.c, where ap != bp.
-fn mpn_fft_mul_mod_f_k(ap: &mut [&mut [Limb]], bp: &mut [&mut [Limb]], n: usize, big_k: usize) {
+// This is mpn_fft_mul_modF_K from mpn/generic/mul_fft.c, where ap != bp. K is omitted because it is
+// unused; it is just the length of `xss` and `yss`.
+fn _limbs_fft_mul_mul_mod_f_k(xss: &mut [&mut [Limb]], yss: &mut [&mut [Limb]], n: usize) {
     if n >= MUL_FFT_MODF_THRESHOLD {
         let k = _limbs_mul_fft_best_k(n, false);
-        let k2 = 1 << k;
-        assert_eq!(n & (k2 - 1), 0);
-        let max_lk = max(k2, Limb::WIDTH as usize);
-        let m2 = n * Limb::WIDTH as usize >> k;
-        let l = n >> k;
-        let mut big_nprime2 = (2 * m2 + k + 2 + max_lk) / max_lk * max_lk;
-        // Nprime2 = ceil((2*M2+k+3)/maxLK)*maxLK
-        let mut nprime2 = big_nprime2 / Limb::WIDTH as usize;
+        let two_pow_k = 1 << k;
+        assert_eq!(n & (two_pow_k - 1), 0);
+        let max_k_pow_2_width = max(two_pow_k, Limb::WIDTH as usize);
+        let m = n << Limb::LOG_WIDTH >> k;
+        let p = n >> k;
+        let mut q = (2 * m + k + 2 + max_k_pow_2_width) / max_k_pow_2_width * max_k_pow_2_width;
+        // r = ceil((2 * m + k + 3) / max_k_pow_2_width) * max_k_pow_2_width
+        let mut r = q >> Limb::LOG_WIDTH;
 
-        // we should ensure that nprime2 is a multiple of the next K
-        if nprime2 >= MUL_FFT_MODF_THRESHOLD {
+        // we should ensure that r is a multiple of the next K
+        if r >= MUL_FFT_MODF_THRESHOLD {
             loop {
-                let k3 = 1 << _limbs_mul_fft_best_k(nprime2, false);
-                if nprime2 & (k3 - 1) == 0 {
+                let two_pow_best_k = 1 << _limbs_mul_fft_best_k(r, false);
+                if r & (two_pow_best_k - 1) == 0 {
                     break;
                 }
-                nprime2 = (nprime2 + k3 - 1) & k3.wrapping_neg();
-                big_nprime2 = nprime2 * Limb::WIDTH as usize;
-                // warning: since nprime2 changed, K3 may change too!
+                r = (r + two_pow_best_k - 1) & two_pow_best_k.wrapping_neg();
+                q = r << Limb::LOG_WIDTH;
+                // warning: since r changed, K3 may change too!
             }
         }
-        assert!(nprime2 < n); // otherwise we'll loop
-
-        let mp2 = big_nprime2 >> k;
-
-        let mut a = vec![0; 2 * (nprime2 + 1) << k];
-        let (a, b) = a.split_at_mut((nprime2 + 1) << k);
-        let mut t = vec![0; 2 * (nprime2 + 1)];
-        let mut tmp = vec![0; 2 << k];
-        let bit_reverse_table = _limbs_mul_fft_bit_reverse_table(&mut tmp, k);
-        let mut api = 0;
-        let mut bpi = 0;
-        for _ in 0..big_k {
-            _limbs_mul_fft_normalize(ap[api], n);
-            _limbs_mul_fft_normalize(bp[bpi], n);
-            let mut big_ap =
-                _limbs_mul_fft_decompose(a, k2, nprime2, &ap[api][..(l << k) + 1], l, mp2, &mut t);
-            _limbs_mul_fft_decompose(b, k2, nprime2, &bp[bpi][..(l << k) + 1], l, mp2, &mut t);
-            let cy = mpn_mul_fft_internal(
-                ap[api],
+        assert!(r < n); // otherwise we'll loop
+        let q_shifted = q >> k;
+        let s = r + 1;
+        let mut a = vec![0; s << (k + 1)];
+        let (a, b) = a.split_at_mut(s << k);
+        let mut scratch = vec![0; s << 1];
+        let mut scratch2 = vec![0; 2 << k];
+        let bit_reverse_table = _limbs_mul_fft_bit_reverse_table(&mut scratch2, k);
+        for (xs, ys) in xss.iter_mut().zip(yss.iter_mut()) {
+            _limbs_mul_fft_normalize(xs, n);
+            _limbs_mul_fft_normalize(ys, n);
+            let mut residues =
+                _limbs_mul_fft_decompose(a, two_pow_k, r, xs, p, q_shifted, &mut scratch);
+            _limbs_mul_fft_decompose(b, two_pow_k, r, ys, p, q_shifted, &mut scratch);
+            xs[n] = if mpn_mul_fft_internal(
+                xs,
                 n,
                 k,
-                big_ap,
+                residues,
                 b,
-                nprime2,
-                l,
-                mp2,
+                r,
+                p,
+                q_shifted,
                 &bit_reverse_table,
-                &mut t,
+                &mut scratch,
                 false,
-            );
-            ap[api][n] = if cy { 1 } else { 0 };
-            api += 1;
-            bpi += 1;
-        }
-    } else {
-        let n2 = 2 * n;
-        let mut tp = vec![0; n2];
-        let mut api = 0;
-        let mut bpi = 0;
-        for _ in 0..big_k {
-            let a = &mut ap[api];
-            let b = &mut bp[bpi];
-            api += 1;
-            bpi += 1;
-            limbs_mul_same_length_to_out(&mut tp, &b[..n], &a[..n]);
-            let mut cc = if a[n] != 0 {
-                if limbs_slice_add_same_length_in_place_left(&mut tp[n..2 * n], &b[..n]) {
-                    1
-                } else {
-                    0
-                }
+            ) {
+                1
             } else {
                 0
             };
-            if b[n] != 0 {
-                cc += if limbs_slice_add_same_length_in_place_left(&mut tp[n..2 * n], &a[..n]) {
-                    1
-                } else {
-                    0
-                } + a[n];
+        }
+    } else {
+        let mut scratch = vec![0; n << 1];
+        for (xs, ys) in xss.iter_mut().zip(yss.iter_mut()) {
+            let (xs_last, xs_init) = xs.split_last_mut().unwrap();
+            let (ys_last, ys_init) = ys.split_last_mut().unwrap();
+            limbs_mul_same_length_to_out(&mut scratch, ys_init, xs_init);
+            let mut carry = 0;
+            {
+                let scratch_hi = &mut scratch[n..];
+                if *xs_last != 0 && limbs_slice_add_same_length_in_place_left(scratch_hi, ys_init) {
+                    carry = 1;
+                }
+                if *ys_last != 0 {
+                    if limbs_slice_add_same_length_in_place_left(scratch_hi, xs_init) {
+                        carry += 1;
+                    }
+                    carry.wrapping_add_assign(*xs_last);
+                }
             }
-            if cc != 0 {
-                assert!(!limbs_slice_add_limb_in_place(&mut tp[..n2], cc));
+            if carry != 0 {
+                assert!(!limbs_slice_add_limb_in_place(&mut scratch, carry));
             }
-            a[n] = if limbs_sub_same_length_to_out(a, &tp[..n], &tp[n..2 * n])
-                && limbs_slice_add_limb_in_place(&mut a[..n], 1)
+            let (scratch_lo, scratch_hi) = scratch.split_at(n);
+            *xs_last = if limbs_sub_same_length_to_out(xs_init, scratch_lo, scratch_hi)
+                && limbs_slice_add_limb_in_place(xs_init, 1)
             {
                 1
             } else {
@@ -1036,98 +1027,88 @@ fn mpn_fft_mul_mod_f_k(ap: &mut [&mut [Limb]], bp: &mut [&mut [Limb]], n: usize,
     }
 }
 
-// This is mpn_fft_mul_modF_K from mpn/generic/mul_fft.c.
-fn mpn_fft_mul_mod_f_k_sqr(ap: &mut [&mut [Limb]], n: usize, big_k: usize) {
+// This is mpn_fft_mul_modF_K from mpn/generic/mul_fft.c, where ap == bp. K is omitted because it is
+// unused; it is just the length of `xss`.
+fn _limbs_fft_mul_mul_mod_f_k_square(xss: &mut [&mut [Limb]], n: usize) {
     if n >= SQR_FFT_MODF_THRESHOLD {
         let k = _limbs_mul_fft_best_k(n, false);
-        let k2 = 1 << k;
-        assert_eq!(n & (k2 - 1), 0);
-        let max_lk = max(k2, Limb::WIDTH as usize);
-        let m2 = n * Limb::WIDTH as usize >> k;
-        let l = n >> k;
-        let mut big_nprime2 = (2 * m2 + k + 2 + max_lk) / max_lk * max_lk;
-        // Nprime2 = ceil((2*M2+k+3)/maxLK)*maxLK
-        let mut nprime2 = big_nprime2 / Limb::WIDTH as usize;
+        let two_pow_k = 1 << k;
+        assert_eq!(n & (two_pow_k - 1), 0);
+        let max_k_pow_2_width = max(two_pow_k, Limb::WIDTH as usize);
+        let m = n << Limb::LOG_WIDTH >> k;
+        let p = n >> k;
+        let mut q = (2 * m + k + 2 + max_k_pow_2_width) / max_k_pow_2_width * max_k_pow_2_width;
+        // r = ceil((2 * m + k + 3) / max_k_pow_2_width) * max_k_pow_2_width
+        let mut r = q >> Limb::LOG_WIDTH;
 
-        // we should ensure that nprime2 is a multiple of the next K
-        if nprime2 >= SQR_FFT_MODF_THRESHOLD {
-            //mp_size_t K3;
+        // we should ensure that r is a multiple of the next K
+        if r >= SQR_FFT_MODF_THRESHOLD {
             loop {
-                let k3 = 1 << _limbs_mul_fft_best_k(nprime2, true);
-                if nprime2 & (k3 - 1) == 0 {
+                let two_pow_best_k = 1 << _limbs_mul_fft_best_k(r, true);
+                if r & (two_pow_best_k - 1) == 0 {
                     break;
                 }
-                nprime2 = (nprime2 + k3 - 1) & k3.wrapping_neg();
-                big_nprime2 = nprime2 * Limb::WIDTH as usize;
-                // warning: since nprime2 changed, K3 may change too!
+                r = (r + two_pow_best_k - 1) & two_pow_best_k.wrapping_neg();
+                q = r << Limb::LOG_WIDTH;
+                // warning: since r changed, K3 may change too!
             }
         }
-        assert!(nprime2 < n); // otherwise we'll loop
-
-        let mp2 = big_nprime2 >> k;
-        let mut a = vec![0; 2 * (nprime2 + 1) << k];
-        let (a_lo, a_hi) = a.split_at_mut((nprime2 + 1) << k);
-        let mut t = vec![0; 2 * (nprime2 + 1)];
-        let mut tmp = vec![0; 2 << k];
-        let bit_reverse_table = _limbs_mul_fft_bit_reverse_table(&mut tmp, k);
-        let mut api = 0;
-        for _ in 0..big_k {
-            _limbs_mul_fft_normalize(ap[api], n);
-            let mut big_ap = _limbs_mul_fft_decompose(
-                a_lo,
-                k2,
-                nprime2,
-                &ap[api][..(l << k) + 1],
-                l,
-                mp2,
-                &mut t,
-            );
-            let cy = mpn_mul_fft_internal(
-                ap[api],
+        assert!(r < n); // otherwise we'll loop
+        let q_shifted = q >> k;
+        let s = r + 1;
+        let mut a = vec![0; s << (k + 1)];
+        let (a_lo, a_hi) = a.split_at_mut(s << k);
+        let mut scratch = vec![0; s << 1];
+        let mut scratch2 = vec![0; 2 << k];
+        let bit_reverse_table = _limbs_mul_fft_bit_reverse_table(&mut scratch2, k);
+        for xs in xss.iter_mut() {
+            _limbs_mul_fft_normalize(xs, n);
+            let mut residues =
+                _limbs_mul_fft_decompose(a_lo, two_pow_k, r, xs, p, q_shifted, &mut scratch);
+            xs[n] = if mpn_mul_fft_internal(
+                xs,
                 n,
                 k,
-                big_ap,
+                residues,
                 a_hi,
-                nprime2,
-                l,
-                mp2,
+                r,
+                p,
+                q_shifted,
                 &bit_reverse_table,
-                &mut t,
+                &mut scratch,
                 true,
-            );
-            ap[api][n] = if cy { 1 } else { 0 };
-            api += 1;
-        }
-    } else {
-        let n2 = 2 * n;
-        let mut tp = vec![0; n2];
-        let mut api = 0;
-        for _ in 0..big_k {
-            let a = &mut ap[api];
-            api += 1;
-            //TODO use square
-            limbs_mul_same_length_to_out(&mut tp, &a[..n], &a[..n]);
-            let mut cc = if a[n] != 0 {
-                if limbs_slice_add_same_length_in_place_left(&mut tp[n..2 * n], &a[..n]) {
-                    1
-                } else {
-                    0
-                }
+            ) {
+                1
             } else {
                 0
             };
-            if a[n] != 0 {
-                cc += if limbs_slice_add_same_length_in_place_left(&mut tp[n..2 * n], &a[..n]) {
-                    1
-                } else {
-                    0
-                } + a[n];
+        }
+    } else {
+        let mut scratch = vec![0; n << 1];
+        for xs in xss.iter_mut() {
+            let (xs_last, xs_init) = xs.split_last_mut().unwrap();
+            //TODO use square
+            limbs_mul_same_length_to_out(&mut scratch, xs_init, xs_init);
+            let mut carry = 0;
+            {
+                let scratch_hi = &mut scratch[n..];
+                if *xs_last != 0 {
+                    //TODO use addmul
+                    if limbs_slice_add_same_length_in_place_left(scratch_hi, xs_init) {
+                        carry = 1;
+                    }
+                    if limbs_slice_add_same_length_in_place_left(scratch_hi, xs_init) {
+                        carry += 1;
+                    }
+                    carry.wrapping_add_assign(*xs_last);
+                }
             }
-            if cc != 0 {
-                assert!(!limbs_slice_add_limb_in_place(&mut tp[..n2], cc));
+            if carry != 0 {
+                assert!(!limbs_slice_add_limb_in_place(&mut scratch, carry));
             }
-            a[n] = if limbs_sub_same_length_to_out(a, &tp[..n], &tp[n..2 * n])
-                && limbs_slice_add_limb_in_place(&mut a[..n], 1)
+            let (scratch_lo, scratch_hi) = scratch.split_at(n);
+            *xs_last = if limbs_sub_same_length_to_out(xs_init, scratch_lo, scratch_hi)
+                && limbs_slice_add_limb_in_place(xs_init, 1)
             {
                 1
             } else {
@@ -1169,9 +1150,9 @@ pub fn mpn_mul_fft_internal(
 
         // term to term multiplications
         if sqr {
-            mpn_fft_mul_mod_f_k_sqr(&mut ap, nprime, big_k);
+            _limbs_fft_mul_mul_mod_f_k_square(&mut ap, nprime);
         } else {
-            mpn_fft_mul_mod_f_k(&mut ap, &mut bp, nprime, big_k);
+            _limbs_fft_mul_mul_mod_f_k(&mut ap, &mut bp, nprime);
         }
     }
 
@@ -1297,16 +1278,16 @@ pub(crate) fn mpn_mul_fft(op: &mut [Limb], pl: usize, n: &[Limb], m: &[Limb], k:
     let sqr = n as *const [Limb] == m as *const [Limb];
     assert_eq!(mpn_fft_next_size(pl, k), pl);
 
-    let big_n = pl * Limb::WIDTH as usize;
+    let big_n = pl << Limb::LOG_WIDTH;
     let big_k = 1 << k;
     let big_m = big_n >> k; // N = 2^k M
-    let l = 1 + (big_m - 1) / Limb::WIDTH as usize;
+    let l = 1 + (big_m - 1) >> Limb::LOG_WIDTH;
     // lcm(GMP_NUMB_BITS, 2^k)
     let max_lk = _limbs_mul_fft_lcm_of_a_and_two_pow_k(Limb::WIDTH as usize, k);
 
     let mut big_nprime = (1 + (2 * big_m + k + 2) / max_lk) * max_lk;
     // Nprime = ceil((2*M+k+3)/maxLK)*maxLK;
-    let mut nprime = big_nprime / Limb::WIDTH as usize;
+    let mut nprime = big_nprime >> Limb::LOG_WIDTH;
     // we should ensure that recursively, nprime is a multiple of the next big_k
     if nprime
         >= if sqr {
@@ -1321,7 +1302,7 @@ pub(crate) fn mpn_mul_fft(op: &mut [Limb], pl: usize, n: &[Limb], m: &[Limb], k:
                 break;
             }
             nprime = (nprime + k2 - 1) & k2.wrapping_neg();
-            big_nprime = nprime * Limb::WIDTH as usize;
+            big_nprime = nprime << Limb::LOG_WIDTH as usize;
             // warning: since nprime changed, K2 may change too!
         }
     }
