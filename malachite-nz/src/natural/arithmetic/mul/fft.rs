@@ -23,7 +23,7 @@ use natural::arithmetic::sub::{
 use natural::arithmetic::sub_limb::limbs_sub_limb_in_place;
 use natural::comparison::ord::limbs_cmp_same_length;
 use natural::logic::not::limbs_not_to_out;
-use platform::{Limb, SignedLimb};
+use platform::Limb;
 use std::cmp::{max, Ordering};
 
 //TODO tune
@@ -520,13 +520,13 @@ fn _limbs_mul_fft_bit_reverse_table(mut scratch: &mut [usize], k: usize) -> Vec<
         scratch = scratch_hi;
     }
     table[0][0] = 0;
-    let mut big_k = 1;
+    let mut shift = 1;
     for i in 1..=k {
-        for j in 0..big_k {
+        for j in 0..shift {
             table[i][j] = table[i - 1][j] << 1;
-            table[i][big_k + j] = table[i][j] + 1;
+            table[i][shift + j] = table[i][j] + 1;
         }
-        big_k <<= 1;
+        shift <<= 1;
     }
     table.into_iter().map(|row| &*row).collect()
 }
@@ -914,7 +914,7 @@ pub fn _limbs_mul_fft_inverse(
 // Returns carry out, i.e. 1 iff {xs,an} = -1 mod 2^(n*GMP_NUMB_BITS)+1,
 // then {out,n}=0.
 // This is mpn_fft_norm_modF from mpn/generic/mul_fft.c.
-pub fn _limbs_fft_mul_normalize_mod_f(out: &mut [Limb], n: usize, xs: &[Limb]) -> bool {
+pub fn _limbs_mul_fft_normalize_mod_f(out: &mut [Limb], n: usize, xs: &[Limb]) -> bool {
     let xs_len = xs.len();
     assert!(n <= xs_len && xs_len <= 3 * n);
     let out = &mut out[..n];
@@ -937,7 +937,7 @@ pub fn _limbs_fft_mul_normalize_mod_f(out: &mut [Limb], n: usize, xs: &[Limb]) -
 
 // This is mpn_fft_mul_modF_K from mpn/generic/mul_fft.c, where ap != bp. K is omitted because it is
 // unused; it is just the length of `xss` and `yss`.
-fn _limbs_fft_mul_mul_mod_f_k(xss: &mut [&mut [Limb]], yss: &mut [&mut [Limb]], n: usize) {
+fn _limbs_mul_fft_mul_mod_f_k(xss: &mut [&mut [Limb]], yss: &mut [&mut [Limb]], n: usize) {
     if n >= MUL_FFT_MODF_THRESHOLD {
         let k = _limbs_mul_fft_best_k(n, false);
         let two_pow_k = 1 << k;
@@ -975,7 +975,7 @@ fn _limbs_fft_mul_mul_mod_f_k(xss: &mut [&mut [Limb]], yss: &mut [&mut [Limb]], 
             let mut residues =
                 _limbs_mul_fft_decompose(a, two_pow_k, r, xs, p, q_shifted, &mut scratch);
             _limbs_mul_fft_decompose(b, two_pow_k, r, ys, p, q_shifted, &mut scratch);
-            xs[n] = if mpn_mul_fft_internal(
+            xs[n] = if _limbs_mul_fft_internal(
                 xs,
                 n,
                 k,
@@ -1029,7 +1029,7 @@ fn _limbs_fft_mul_mul_mod_f_k(xss: &mut [&mut [Limb]], yss: &mut [&mut [Limb]], 
 
 // This is mpn_fft_mul_modF_K from mpn/generic/mul_fft.c, where ap == bp. K is omitted because it is
 // unused; it is just the length of `xss`.
-fn _limbs_fft_mul_mul_mod_f_k_square(xss: &mut [&mut [Limb]], n: usize) {
+fn _limbs_mul_fft_mul_mod_f_k_square(xss: &mut [&mut [Limb]], n: usize) {
     if n >= SQR_FFT_MODF_THRESHOLD {
         let k = _limbs_mul_fft_best_k(n, false);
         let two_pow_k = 1 << k;
@@ -1065,7 +1065,7 @@ fn _limbs_fft_mul_mul_mod_f_k_square(xss: &mut [&mut [Limb]], n: usize) {
             _limbs_mul_fft_normalize(xs, n);
             let mut residues =
                 _limbs_mul_fft_decompose(a_lo, two_pow_k, r, xs, p, q_shifted, &mut scratch);
-            xs[n] = if mpn_mul_fft_internal(
+            xs[n] = if _limbs_mul_fft_internal(
                 xs,
                 n,
                 k,
@@ -1119,156 +1119,131 @@ fn _limbs_fft_mul_mul_mod_f_k_square(xss: &mut [&mut [Limb]], n: usize) {
 }
 
 // This is mpn_mul_fft_internal from mpn/generic/mul_fft.c. A is excluded as it is unused.
-pub fn mpn_mul_fft_internal(
-    op: &mut [Limb],
-    pl: usize,
+pub fn _limbs_mul_fft_internal(
+    out: &mut [Limb],
+    p: usize,
     k: usize,
-    mut ap: Vec<&mut [Limb]>,
-    b: &mut [Limb],
-    nprime: usize,
-    l: usize,
-    mp: usize,
-    fft_l: &[&[usize]],
-    t: &mut [Limb],
-    sqr: bool,
+    mut xss: Vec<&mut [Limb]>,
+    ys: &mut [Limb],
+    width_minus_one: usize,
+    a: usize,
+    omega: usize,
+    bit_reverse_table: &[&[usize]],
+    scratch: &mut [Limb],
+    square: bool,
 ) -> bool {
-    let big_k = 1usize << k;
-    {
-        let mut bp = Vec::with_capacity(big_k);
-        let mut remainder: &mut [Limb] = b;
-        for _ in 0..big_k {
-            // force remainder to move rather than be borrowed
-            let (b_lo, b_hi) = { remainder }.split_at_mut(nprime + 1);
-            bp.push(b_lo);
-            remainder = b_hi;
-        }
-        // direct fft's
-        _limbs_mul_fft(&mut ap, big_k, fft_l, k, 2 * mp, nprime, 1, t);
-        if !sqr {
-            _limbs_mul_fft(&mut bp, big_k, fft_l, k, 2 * mp, nprime, 1, t);
-        }
-
+    let two_pow_k = 1usize << k;
+    let twice_omega = omega << 1;
+    let width = width_minus_one + 1;
+    // direct fft's
+    _limbs_mul_fft(
+        &mut xss,
+        two_pow_k,
+        bit_reverse_table,
+        k,
+        twice_omega,
+        width_minus_one,
+        1,
+        scratch,
+    );
+    if square {
         // term to term multiplications
-        if sqr {
-            _limbs_fft_mul_mul_mod_f_k_square(&mut ap, nprime);
-        } else {
-            _limbs_fft_mul_mul_mod_f_k(&mut ap, &mut bp, nprime);
+        _limbs_mul_fft_mul_mod_f_k_square(&mut xss, width_minus_one);
+    } else {
+        let mut yss = Vec::with_capacity(two_pow_k);
+        let mut remainder: &mut [Limb] = ys;
+        for _ in 0..two_pow_k {
+            // force remainder to move rather than be borrowed
+            let (ys_lo, ys_hi) = { remainder }.split_at_mut(width);
+            yss.push(ys_lo);
+            remainder = ys_hi;
         }
+        _limbs_mul_fft(
+            &mut yss,
+            two_pow_k,
+            bit_reverse_table,
+            k,
+            twice_omega,
+            width_minus_one,
+            1,
+            scratch,
+        );
+        // term to term multiplications
+        _limbs_mul_fft_mul_mod_f_k(&mut xss, &mut yss, width_minus_one);
     }
-
     // inverse fft's
-    _limbs_mul_fft_inverse(&mut ap, big_k, 2 * mp, nprime, t);
-
+    _limbs_mul_fft_inverse(&mut xss, two_pow_k, twice_omega, width_minus_one, scratch);
     // division of terms after inverse fft
-    let mut bp = Vec::with_capacity(big_k);
-    let (t_lo, t_hi) = t.split_at_mut(nprime + 1);
-    bp.push(t_hi);
-    _limbs_mul_fft_shr_mod_f_to_out(&mut bp[0], &mut ap[0], k, nprime);
-
-    for i in 1..big_k {
-        let (ap_lo, ap_hi) = ap.split_at_mut(i);
+    let mut yss = Vec::with_capacity(two_pow_k);
+    let (scratch_lo, scratch_hi) = scratch.split_at_mut(width);
+    yss.push(scratch_hi);
+    _limbs_mul_fft_shr_mod_f_to_out(&mut yss[0], &mut xss[0], k, width_minus_one);
+    for i in 1..two_pow_k {
+        let (xss_lo, yss_hi) = xss.split_at_mut(i);
         _limbs_mul_fft_shr_mod_f_to_out(
-            &mut ap_lo[i - 1],
-            &mut ap_hi[0],
-            k + (big_k - i) * mp,
-            nprime,
+            &mut xss_lo[i - 1],
+            &mut yss_hi[0],
+            k + (two_pow_k - i) * omega,
+            width_minus_one,
         );
     }
-    bp.extend(ap.drain(..big_k - 1));
+    yss.extend(xss.drain(..two_pow_k - 1));
 
     // addition of terms in result p
-    limbs_set_zero(t_lo);
-    let pla = l * (big_k - 1) + nprime + 1; // number of required limbs for p
-
-    // B has K*(n' + 1) limbs, which is >= pla, i.e. enough
-    limbs_set_zero(&mut b[..pla]);
-    let mut cc: SignedLimb = 0; // will accumulate the (signed) carry at p[pla]
-    let mut i = big_k - 1;
-    let mut lo = l * i + nprime;
-    let mut sh = l * i;
-    loop {
-        let j;
+    limbs_set_zero(scratch_lo);
+    let q = a * (two_pow_k - 1) + width; // number of required limbs for p
+    let ys = &mut ys[..q];
+    // B has K*width limbs, which is >= q, i.e. enough
+    limbs_set_zero(ys);
+    let mut carry = 0i32; // will accumulate the (signed) carry at p[q]
+    let mut sh = a * two_pow_k;
+    let mut lo = sh + width_minus_one;
+    for i in (0..two_pow_k).rev() {
+        lo -= a;
+        sh -= a;
+        let j = (two_pow_k - i) & (two_pow_k - 1);
+        if limbs_slice_add_same_length_in_place_left(&mut ys[sh..sh + width], &yss[j])
+            && limbs_slice_add_limb_in_place(&mut ys[sh + width..], 1)
         {
-            let n = &mut b[sh..];
-            j = (big_k - i) & (big_k - 1);
-            if limbs_slice_add_same_length_in_place_left(&mut n[..nprime + 1], &bp[j][..nprime + 1])
-            {
-                cc += if limbs_slice_add_limb_in_place(&mut n[nprime + 1..pla - sh], 1) {
-                    1
-                } else {
-                    0
-                };
-            }
-            if 2 * l < t_lo.len() {
-                t_lo[2 * l] = i as Limb + 1; // T = (i + 1)*2^(2*M)
-            } else {
-                bp[0][2 * l - t_lo.len()] = i as Limb + 1; // T = (i + 1)*2^(2*M)
-            }
+            carry += 1;
         }
-        if limbs_cmp_same_length(&bp[j][..nprime + 1], t_lo) == Ordering::Greater {
+        if 2 * a < width {
+            scratch_lo[2 * a] = i as Limb + 1; // T = (i + 1)*2^(2*M)
+        } else {
+            yss[0][2 * a - width] = i as Limb + 1; // T = (i + 1)*2^(2*M)
+        }
+        if limbs_cmp_same_length(&yss[j], scratch_lo) == Ordering::Greater {
             // subtract 2^N'+1
-            {
-                let n = &mut b[sh..];
-                cc -= if limbs_sub_limb_in_place(&mut n[..pla - sh], 1) {
-                    1
-                } else {
-                    0
-                };
+            if limbs_sub_limb_in_place(&mut ys[sh..], 1) {
+                carry -= 1;
             }
-            cc -= if limbs_sub_limb_in_place(&mut b[lo..pla], 1) {
-                1
-            } else {
-                0
-            };
+            if limbs_sub_limb_in_place(&mut ys[lo..], 1) {
+                carry -= 1;
+            }
         }
-
-        if i == 0 {
-            break;
-        }
-        i -= 1;
-        lo -= l;
-        sh -= l;
     }
-    if cc == -1 {
-        cc = if limbs_slice_add_limb_in_place(&mut b[pla - pl..pla], 1) {
-            1
-        } else {
-            0
-        };
-        if cc != 0 {
-            // p[pla-pl]...p[pla-1] are all zero
-            limbs_sub_limb_in_place(&mut b[pla - pl - 1..pla], 1);
-            limbs_sub_limb_in_place(&mut b[pla - 1..pla], 1);
+    if carry == -1 {
+        let ys = &mut ys[q - p - 1..];
+        if limbs_slice_add_limb_in_place(&mut ys[1..], 1) {
+            // p[q-p]...p[q-1] are all zero
+            limbs_sub_limb_in_place(ys, 1);
+            limbs_sub_limb_in_place(&mut ys[p..], 1);
         }
-    } else if cc == 1 {
+    } else if carry == 1 {
         // This branch is untested!
-        let mut cc = 1 as Limb;
-        if pla >= 2 * pl {
-            loop {
-                cc = if limbs_slice_add_limb_in_place(&mut b[pla - 2 * pl..pla], cc) {
-                    1
-                } else {
-                    0
-                };
-                if cc == 0 {
-                    break;
-                }
-            }
+        if q >= 2 * p {
+            let ys = &mut ys[q - 2 * p..];
+            while limbs_slice_add_limb_in_place(ys, 1) {}
         } else {
-            cc = if limbs_sub_limb_in_place(&mut b[pla - pl..pla], cc) {
-                1
-            } else {
-                0
-            };
-            assert_eq!(cc, 0);
+            assert!(!limbs_sub_limb_in_place(&mut ys[q - p..], 1));
         }
     } else {
-        assert_eq!(cc, 0);
+        assert_eq!(carry, 0);
     }
     // here p < 2^(2M) [K 2^(M(K-1)) + (K-1) 2^(M(K-2)) + ... ]
     // < K 2^(2M) [2^(M(K-1)) + 2^(M(K-2)) + ... ]
     // < K 2^(2M) 2^(M(K-1))*2 = 2^(M*K+M+k+1)
-    _limbs_fft_mul_normalize_mod_f(op, pl, &b[..pla])
+    _limbs_mul_fft_normalize_mod_f(out, p, ys)
 }
 
 // This is mpn_mul_fft from mpn/generic/mul_fft.c.
@@ -1317,7 +1292,7 @@ pub(crate) fn mpn_mul_fft(op: &mut [Limb], pl: usize, n: &[Limb], m: &[Limb], k:
     if sqr {
         let pla = l * (big_k - 1) + nprime + 1; // number of required limbs for p
         let mut b = vec![0; pla];
-        mpn_mul_fft_internal(
+        _limbs_mul_fft_internal(
             op,
             pl,
             k,
@@ -1333,7 +1308,7 @@ pub(crate) fn mpn_mul_fft(op: &mut [Limb], pl: usize, n: &[Limb], m: &[Limb], k:
     } else {
         let mut b = vec![0; big_k * (nprime + 1)];
         _limbs_mul_fft_decompose(&mut b, big_k, nprime, &m[..ml], l, mp, &mut t);
-        mpn_mul_fft_internal(
+        _limbs_mul_fft_internal(
             op,
             pl,
             k,
