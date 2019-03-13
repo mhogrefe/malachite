@@ -3,7 +3,8 @@ use malachite_base::num::{One, Zero};
 use malachite_nz::natural::arithmetic::mul::fft::_limbs_mul_greater_to_out_fft;
 #[cfg(feature = "64_bit_limbs")]
 use malachite_nz::natural::arithmetic::mul::fft::{
-    _limbs_mul_fft, _limbs_mul_fft_internal, _limbs_mul_fft_inverse, _limbs_mul_fft_normalize_mod_f,
+    _limbs_mul_fft_fft, _limbs_mul_fft_internal, _limbs_mul_fft_inverse,
+    _limbs_mul_fft_normalize_mod_f,
 };
 #[cfg(feature = "64_bit_limbs")]
 use malachite_nz::natural::arithmetic::mul::mul_mod::_limbs_mul_mod_limb_width_to_n_minus_1;
@@ -4293,9 +4294,9 @@ fn test_limbs_mul_greater_to_out_fft() {
     // m < n and sh != 0 in mpn_fft_mul_2exp_mod_f
     // m != 0 in mpn_fft_mul_2exp_mod_f
     // nl <= 0 in mpn_mul_fft_decompose
-    // k != 2 in _limbs_mul_fft
-    // k == 2 in _limbs_mul_fft
-    // cy in _limbs_mul_fft
+    // k != 2 in _limbs_mul_fft_fft
+    // k == 2 in _limbs_mul_fft_fft
+    // cy in _limbs_mul_fft_fft
     // c.get_highest_bit() in mpn_fft_sub_mod_f
     // c <= 1 in mpn_fft_add_mod_f_in_place_left
     // !c.get_highest_bit() in mpn_fft_sub_mod_f
@@ -10191,7 +10192,7 @@ fn test_limbs_mul_greater_to_out_fft() {
 
 #[cfg(feature = "64_bit_limbs")]
 #[test]
-fn test_limbs_mul_fft() {
+fn test_limbs_mul_fft_fft() {
     let test = |ap_before: Vec<Vec<Limb>>,
                 k: usize,
                 ll: Vec<Vec<usize>>,
@@ -10209,7 +10210,7 @@ fn test_limbs_mul_fft() {
         }
         let ll: Vec<&[usize]> = ll.iter().map(|row| row.as_slice()).collect();
         let mut tp = tp_before.clone();
-        _limbs_mul_fft(&mut ap, k, &ll, ll_offset, omega, n, inc, &mut tp);
+        _limbs_mul_fft_fft(&mut ap, k, &ll, ll_offset, omega, n, inc, &mut tp);
         assert_eq!(ap.len(), ap_after.len());
         assert!(
             ap.iter()
@@ -10220,7 +10221,7 @@ fn test_limbs_mul_fft() {
         );
         assert_eq!(tp, tp_after);
     };
-    // ap[0][n] > 1 in _limbs_mul_fft
+    // ap[0][n] > 1 in _limbs_mul_fft_fft
     test(
         vec![vec![0, 0, 2], vec![0, 0, 0]],
         2,
@@ -10305,7 +10306,7 @@ fn test_limbs_mul_fft_internal() {
                 k: usize,
                 ap_before: Vec<Vec<Limb>>,
                 b_before: Vec<Limb>,
-                nprime: usize,
+                width: usize,
                 l: usize,
                 mp: usize,
                 fft_l: Vec<Vec<usize>>,
@@ -10324,7 +10325,7 @@ fn test_limbs_mul_fft_internal() {
         let fft_l: Vec<&[usize]> = fft_l.iter().map(|row| row.as_slice()).collect();
         let mut t = t_before.clone();
         _limbs_mul_fft_internal(
-            &mut op, pl, k, ap, &mut b, nprime, l, mp, &fft_l, &mut t, sqr,
+            &mut op, pl, k, ap, &mut b, width, l, mp, &fft_l, &mut t, sqr,
         );
         assert_eq!(op, op_after);
         assert_eq!(b, b_after);
@@ -10336,7 +10337,7 @@ fn test_limbs_mul_fft_internal() {
         1,
         vec![vec![4, 5, 6], vec![7, 8, 9]],
         vec![10, 11, 12, 13, 14, 15],
-        2,
+        3,
         2,
         3,
         vec![vec![0], vec![1, 2], vec![3, 4, 5, 6]],
