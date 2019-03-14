@@ -695,23 +695,21 @@ fn _limbs_mul_fft_shl_mod_f_to_out(out: &mut [Limb], xs: &[Limb], bits: usize, n
     }
 }
 
-//TODO continue comments
 // out <- xs / 2<sup>bits</sup> mod 2<sup>n * Limb::WIDTH</sup> + 1
 //
 // This is mpn_fft_div_2exp_modF from mpn/generic/mul_fft.c.
 fn _limbs_mul_fft_shr_mod_f_to_out(out: &mut [Limb], xs: &[Limb], bits: usize, n: usize) {
     assert!(out.len() >= n + 1);
     _limbs_mul_fft_shl_mod_f_to_out(out, xs, (n << (Limb::LOG_WIDTH + 1)) - bits, n);
-    // 1/2^bits = 2^(2nL-bits) mod 2^(n*GMP_NUMB_BITS)+1
-    // normalize so that R < 2^(n*GMP_NUMB_BITS)+1
+    // 1 / 2 ^ bits = 2 ^ (2 * n * L - bits) mod 2 ^ (n * Limb::WIDTH) + 1
+    // normalize so that out < 2 ^ (n * Limb::WIDTH) + 1
     _limbs_mul_fft_normalize(out, n);
 }
 
-// store in A[0..width - 1] the first M bits from {xs, len},
-// in A[width..] the following M bits, ...
-// Assumes M is a multiple of GMP_NUMB_BITS (M = n * GMP_NUMB_BITS).
-// T must have space for at least `width` limbs.
-// We must have xs.len() <= 2 * k * n.
+// store in A[0..width - 1] the first m bits from xs[..len], in A[width..] the following m bits.
+// Assumes m is a multiple of Limb::WIDTH (M = n * Limb::WIDTH). T must have space for at least
+// `width` limbs. We must have xs.len() <= 2 * k * n.
+//
 // This is mpn_mul_fft_decompose from mpn/generic/mul_fft.c. nl is omitted as it is just the length
 // of n (here, xs). nprime is `width` - 1.
 fn _limbs_mul_fft_decompose<'a>(
@@ -754,7 +752,7 @@ fn _limbs_mul_fft_decompose<'a>(
         // force remainder to move rather than be borrowed
         let (a_lo, a_hi) = { remainder }.split_at_mut(width);
         remainder = a_hi;
-        // store the next M bits of xs into A[0..width_minus_one]
+        // store the next m bits of xs into a[0..width_minus_one]
         // len is the number of remaining limbs
         if len == 0 {
             limbs_set_zero(a_lo);
@@ -774,9 +772,11 @@ fn _limbs_mul_fft_decompose<'a>(
     a_table
 }
 
-// input: A[0] ... A[increment*(K-1)] are residues mod 2^N+1 where
-//    N=n*GMP_NUMB_BITS, and 2^omega is a primitive root mod 2^N+1
-// output: A[increment*l[k][i]] <- \sum (2^omega)^(ij) A[increment*j] mod 2^N+1
+// input: xss[0] ... xss[increment * (k - 1)] are residues mod 2 ^ N + 1 where N = n * Limb::WIDTH,
+// and 2 ^ omega is a primitive root mod 2 ^ N + 1.
+// output: xss[increment * bit_reverse_table[k][i]] <-
+//      sum (2 ^ omega) ^ (i * j) xss[increment * j] mod 2 ^ N + 1
+//
 // This is mpn_fft_fft from mpn/generic/mul_fft.c.
 pub fn _limbs_mul_fft_fft(
     xss: &mut [&mut [Limb]],
@@ -804,7 +804,7 @@ pub fn _limbs_mul_fft_fft(
                 };
             }
         }
-        // Ap[increment][n] can be -1 or -2
+        // xss[increment][n] can be -1 or -2
         if limbs_sub_same_length_in_place_right(&scratch[..n + 1], &mut xss[increment]) {
             let (xss_increment_last, xss_increment_init) = xss[increment].split_last_mut().unwrap();
             *xss_increment_last = if limbs_slice_add_limb_in_place(
@@ -841,13 +841,15 @@ pub fn _limbs_mul_fft_fft(
             twice_increment,
             scratch,
         );
-        //  A[2*j*increment]   <- A[2*j*increment] + omega^l[k][2*j*increment] A[(2j+1)increment]
-        // A[(2j+1)increment] <- A[2*j*increment] + omega^l[k][(2j+1)increment] A[(2j+1)increment]
+        // xss[2 * i * increment] <- xss[2 * j * increment] +
+        //      omega ^ bit_reverse_table[k][2 * j * increment] * xss[(2 * j + 1) * increment]
+        // xss[(2 * j + 1) * increment] <- xss[2 * j * increment] +
+        //      omega ^ l[k][(2 * j + 1) * increment] * xss[(2 * j + 1) * increment]
         let bit_reverse_row = bit_reverse_table[bit_reverse_table_offset];
         let mut xss_offset = 0;
         for i in 0..half_k {
-            // Ap[increment] <- Ap[0] + Ap[increment] * 2^(lk[1] * omega)
-            // Ap[0]   <- Ap[0] + Ap[increment] * 2^(lk[0] * omega)
+            // xss[increment] <- xss[0] + xss[increment] * 2 ^ (bit_reverse_row[1] * omega)
+            // xss[0] <- xss[0] + xss[increment] * 2 ^ (bit_reverse_row[0] * omega)
             let (xss_lo, xss_hi) = xss.split_at_mut(xss_offset + increment);
             _limbs_mul_fft_shl_mod_f_to_out(
                 scratch,
@@ -862,10 +864,12 @@ pub fn _limbs_mul_fft_fft(
     }
 }
 
-// input: A^[l[k][0]] A^[l[k][1]] ... A^[l[k][K-1]]
-// output: K*A[0] K*A[K-1] ... K*A[1].
-// Assumes the Ap[] are pseudo-normalized, i.e. 0 <= Ap[][n] <= 1.
-// This condition is also fulfilled at exit.
+// input: xs ^ bit_reverse_table[k][0], xs ^ bit_reverse_table[k][1], ...,
+//      xs ^ bit_reverse_table[k][K-1]
+// output: k * xss[0], k * xss[k - 1], ..., k * xss[1].
+// Assumes the xss are pseudo-normalized, i.e. 0 <= xss[][n] <= 1. This condition is also fulfilled
+// at exit.
+//
 // This is mpn_fft_fftinv from mpn/generic/mul_fft.c.
 pub fn _limbs_mul_fft_inverse(
     xss: &mut [&mut [Limb]],
@@ -901,11 +905,11 @@ pub fn _limbs_mul_fft_inverse(
         let twice_omega = omega << 1;
         _limbs_mul_fft_inverse(xss, half_k, twice_omega, n, scratch);
         _limbs_mul_fft_inverse(&mut xss[half_k..], half_k, twice_omega, n, scratch);
-        // A[i]     <- A[i] + omega^i A[i+K/2]
-        // A[i+K/2] <- A[i] + omega^(i+K/2) A[i+K/2]
+        // xss[i] <- xss[i] + omega ^ i * xss[i + k / 2]
+        // xss[i + k / 2] <- xss[i] + omega ^ (i + k / 2) * xss[i + k / 2]
         for i in 0..half_k {
-            // Ap[K2] <- Ap[0] + Ap[K2] * 2^((i + K2) * omega)
-            // Ap[0]  <- Ap[0] + Ap[K2] * 2^(i * omega)
+            // xss[k / 2] <- Ap[0] + Ap[k / 2] * 2 ^ ((i + k / 2) * omega)
+            // xss[0] <- xss[0] + xss[K2] * 2 ^ (i * omega)
             let (xss_lo, xss_hi) = xss.split_at_mut(half_k + i);
             _limbs_mul_fft_shl_mod_f_to_out(scratch, xss_hi[0], i * omega, n);
             _limbs_mul_fft_sub_mod_f_to_out(xss_hi[0], xss_lo[i], scratch, n);
@@ -914,17 +918,17 @@ pub fn _limbs_mul_fft_inverse(
     }
 }
 
-// {out,n} <- {xs,an} mod 2^(n*GMP_NUMB_BITS)+1, n <= an <= 3*n.
-// Returns carry out, i.e. 1 iff {xs,an} = -1 mod 2^(n*GMP_NUMB_BITS)+1,
-// then {out,n}=0.
+// out[..n] <- xs[..an] mod 2 ^ (n * Limb::WIDTH) + 1, n <= an <= 3 * n.
+// Returns carry out, i.e. 1 iff xs[..an] == -1 mod 2 ^ (n * Limb::WIDTH) + 1, then out[..n] = 0.
+//
 // This is mpn_fft_norm_modF from mpn/generic/mul_fft.c.
 pub fn _limbs_mul_fft_normalize_mod_f(out: &mut [Limb], n: usize, xs: &[Limb]) -> bool {
     let xs_len = xs.len();
     assert!(n <= xs_len && xs_len <= 3 * n);
     let out = &mut out[..n];
     if xs_len >= 2 * n {
-        // add {xs, m} and {xs+2n, m} in {out, m}
-        // copy {xs+m, n-m} to {out+m, n-m}
+        // add xs[..m] and xs[2 * n..2 * n + m] in out[..m]
+        // copy xs[m..n] to out[m..n]
         split_into_chunks!(xs, n, _unused, [xs_0, xs_1], xs_2);
         if limbs_add_to_out(out, xs_0, xs_2) {
             limbs_sub_same_length_in_place_left(out, xs_1);
@@ -954,7 +958,7 @@ fn _limbs_mul_fft_mul_mod_f_k(xss: &mut [&mut [Limb]], yss: &mut [&mut [Limb]], 
         // r = ceil((2 * m + k + 3) / max_two_pow_k_width) * max_two_pow_k_width
         let mut r = q >> Limb::LOG_WIDTH;
 
-        // we should ensure that r is a multiple of the next K
+        // we should ensure that r is a multiple of the next k
         if r >= MUL_FFT_MODF_THRESHOLD {
             loop {
                 let two_pow_best_k = 1 << _limbs_mul_fft_best_k(r, false);
@@ -963,7 +967,7 @@ fn _limbs_mul_fft_mul_mod_f_k(xss: &mut [&mut [Limb]], yss: &mut [&mut [Limb]], 
                 }
                 r = (r + two_pow_best_k - 1) & two_pow_best_k.wrapping_neg();
                 q = r << Limb::LOG_WIDTH;
-                // warning: since r changed, K3 may change too!
+                // warning: since r changed, two_pow_best_k may change too!
             }
         }
         assert!(r < n); // otherwise we'll loop
@@ -1046,7 +1050,7 @@ fn _limbs_mul_fft_mul_mod_f_k_square(xss: &mut [&mut [Limb]], n: usize) {
         // r = ceil((2 * m + k + 3) / max_k_pow_2_width) * max_k_pow_2_width
         let mut r = q >> Limb::LOG_WIDTH;
 
-        // we should ensure that r is a multiple of the next K
+        // we should ensure that r is a multiple of the next k
         if r >= SQR_FFT_MODF_THRESHOLD {
             loop {
                 let two_pow_best_k = 1 << _limbs_mul_fft_best_k(r, true);
@@ -1055,7 +1059,7 @@ fn _limbs_mul_fft_mul_mod_f_k_square(xss: &mut [&mut [Limb]], n: usize) {
                 }
                 r = (r + two_pow_best_k - 1) & two_pow_best_k.wrapping_neg();
                 q = r << Limb::LOG_WIDTH;
-                // warning: since r changed, K3 may change too!
+                // warning: since r changed, two_pow_best_k may change too!
             }
         }
         assert!(r < n); // otherwise we'll loop
@@ -1141,7 +1145,7 @@ pub fn _limbs_mul_fft_internal(
     let two_pow_k = 1usize << k;
     let twice_omega = omega << 1;
     let width_minus_one = width - 1;
-    // direct fft's
+    // direct FFTs
     _limbs_mul_fft_fft(
         &mut xss,
         two_pow_k,
@@ -1177,7 +1181,7 @@ pub fn _limbs_mul_fft_internal(
         // term to term multiplications
         _limbs_mul_fft_mul_mod_f_k(&mut xss, &mut yss, width_minus_one);
     }
-    // inverse fft's
+    // inverse FFTs
     _limbs_mul_fft_inverse(&mut xss, two_pow_k, twice_omega, width_minus_one, scratch);
     // division of terms after inverse fft
     let mut yss = Vec::with_capacity(two_pow_k);
@@ -1199,7 +1203,7 @@ pub fn _limbs_mul_fft_internal(
     limbs_set_zero(scratch_lo);
     let q = a * (two_pow_k - 1) + width; // number of required limbs for p
     let ys = &mut ys[..q];
-    // B has K*width limbs, which is >= q, i.e. enough
+    // B has k * width limbs, which is >= q, i.e. enough
     limbs_set_zero(ys);
     let mut carry = 0i32; // will accumulate the (signed) carry at p[q]
     let mut sh = a * two_pow_k;
@@ -1213,13 +1217,15 @@ pub fn _limbs_mul_fft_internal(
         {
             carry += 1;
         }
+        // scratch = (i + 1) * 2 ^ (2 * M)
+        let i_plus_one = i as Limb + 1;
         if 2 * a < width {
-            scratch_lo[2 * a] = i as Limb + 1; // T = (i + 1)*2^(2*M)
+            scratch_lo[2 * a] = i_plus_one;
         } else {
-            yss[0][2 * a - width] = i as Limb + 1; // T = (i + 1)*2^(2*M)
+            yss[0][2 * a - width] = i_plus_one;
         }
         if limbs_cmp_same_length(&yss[j], scratch_lo) == Ordering::Greater {
-            // subtract 2^N'+1
+            // subtract 2 ^ N' + 1
             if limbs_sub_limb_in_place(&mut ys[sh..], 1) {
                 carry -= 1;
             }
@@ -1231,7 +1237,7 @@ pub fn _limbs_mul_fft_internal(
     if carry == -1 {
         let ys = &mut ys[q - p - 1..];
         if limbs_slice_add_limb_in_place(&mut ys[1..], 1) {
-            // p[q-p]...p[q-1] are all zero
+            // p[q - p], ..., p[q - 1] are all zero
             limbs_sub_limb_in_place(ys, 1);
             limbs_sub_limb_in_place(&mut ys[p..], 1);
         }
@@ -1246,9 +1252,9 @@ pub fn _limbs_mul_fft_internal(
     } else {
         assert_eq!(carry, 0);
     }
-    // here p < 2^(2M) [K 2^(M(K-1)) + (K-1) 2^(M(K-2)) + ... ]
-    // < K 2^(2M) [2^(M(K-1)) + 2^(M(K-2)) + ... ]
-    // < K 2^(2M) 2^(M(K-1))*2 = 2^(M*K+M+k+1)
+    // here p < 2 ^ (2 * m) * [k * 2 ^ (m(k - 1)) + (k - 1) * 2 ^ (m * (k - 2)) + ...]
+    // < k * 2 ^ (2 * m) * [2 ^ (m * (k - 1)) + 2 ^ (m * (k - 2)) + ...]
+    // < k * 2 ^ (2 * m) * 2 ^ (m * (k - 1)) * 2 = 2 ^ (m * k + m + k + 1)
     _limbs_mul_fft_normalize_mod_f(out, p, ys)
 }
 
@@ -1264,15 +1270,14 @@ pub(crate) fn _limbs_mul_fft(
     assert_eq!(mpn_fft_next_size(p, k), p);
     let n = p << Limb::LOG_WIDTH;
     let two_pow_k = 1 << k;
-    let m = n >> k; // N = 2^k M
+    let m = n >> k; // n == 2 ^ k * m
     let a = 1 + ((m - 1) >> Limb::LOG_WIDTH);
-    // lcm(GMP_NUMB_BITS, 2^k)
+    // LCM(Limb::WIDTH, 2 ^ k)
     let lcm_with_two_pow_k = _limbs_mul_fft_lcm_of_a_and_two_pow_k(Limb::WIDTH as usize, k);
-
     let mut big_width_minus_one = (1 + (2 * m + k + 2) / lcm_with_two_pow_k) * lcm_with_two_pow_k;
-    // Nprime = ceil((2*M+k+3)/maxLK)*maxLK;
+    // width - 1 = ceil((2 * m + k + 3) / lcm_with_two_pow_k) * lcm_with_two_pow_k;
     let mut width_minus_one = big_width_minus_one >> Limb::LOG_WIDTH;
-    // we should ensure that recursively, width_minus_one is a multiple of the next two_pow_k
+    // We should ensure that recursively, width_minus_one is a multiple of the next two_pow_k.
     if width_minus_one
         >= if square {
             SQR_FFT_MODF_THRESHOLD
