@@ -160,9 +160,20 @@ pub fn limbs_neg_or_limb_in_place(limbs: &mut [Limb], limb: Limb) {
 impl BitOr<Limb> for Integer {
     type Output = Integer;
 
+    #[inline]
     fn bitor(mut self, other: Limb) -> Integer {
         self |= other;
         self
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl BitOr<u32> for Integer {
+    type Output = Integer;
+
+    #[inline]
+    fn bitor(self, other: u32) -> Integer {
+        self | Limb::from(other)
     }
 }
 
@@ -203,6 +214,16 @@ impl<'a> BitOr<Limb> for &'a Integer {
     }
 }
 
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> BitOr<u32> for &'a Integer {
+    type Output = Integer;
+
+    #[inline]
+    fn bitor(self, other: u32) -> Integer {
+        self | Limb::from(other)
+    }
+}
+
 /// Takes the bitwise or of a `Limb` and an `Integer`, taking the `Integer` by value.
 ///
 /// Time: worst case O(n)
@@ -228,8 +249,19 @@ impl<'a> BitOr<Limb> for &'a Integer {
 impl BitOr<Integer> for Limb {
     type Output = Integer;
 
+    #[inline]
     fn bitor(self, other: Integer) -> Integer {
         other | self
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl BitOr<Integer> for u32 {
+    type Output = Integer;
+
+    #[inline]
+    fn bitor(self, other: Integer) -> Integer {
+        Limb::from(self) | other
     }
 }
 
@@ -260,6 +292,16 @@ impl<'a> BitOr<&'a Integer> for Limb {
 
     fn bitor(self, other: &'a Integer) -> Integer {
         other | self
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> BitOr<&'a Integer> for u32 {
+    type Output = Integer;
+
+    #[inline]
+    fn bitor(self, other: &'a Integer) -> Integer {
+        Limb::from(self) | other
     }
 }
 
@@ -295,6 +337,14 @@ impl BitOrAssign<Limb> for Integer {
         } else {
             self.abs.or_assign_neg_limb_pos(other);
         }
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl BitOrAssign<u32> for Integer {
+    #[inline]
+    fn bitor_assign(&mut self, other: u32) {
+        *self |= Limb::from(other);
     }
 }
 

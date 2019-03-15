@@ -41,6 +41,7 @@ impl CheckedFrom<Integer> for SignedLimb {
     ///     assert_eq!(format!("{:?}", i32::checked_from(-Integer::trillion())), "None");
     /// }
     /// ```
+    #[inline]
     fn checked_from(value: Integer) -> Option<SignedLimb> {
         SignedLimb::checked_from(&value)
     }
@@ -78,6 +79,14 @@ impl<'a> CheckedFrom<&'a Integer> for SignedLimb {
     }
 }
 
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> CheckedFrom<&'a Integer> for i32 {
+    #[inline]
+    fn checked_from(value: &Integer) -> Option<i32> {
+        SignedLimb::checked_from(value).and_then(i32::checked_from)
+    }
+}
+
 impl WrappingFrom<Integer> for SignedLimb {
     /// Converts an `Integer` to a `SignedLimb`, taking the `Integer` by reference and wrapping mod
     /// 2<sup>32</sup>.
@@ -101,6 +110,7 @@ impl WrappingFrom<Integer> for SignedLimb {
     ///     assert_eq!(i32::wrapping_from(-Integer::trillion()).to_string(), "727379968");
     /// }
     /// ```
+    #[inline]
     fn wrapping_from(value: Integer) -> SignedLimb {
         SignedLimb::wrapping_from(&value)
     }
@@ -131,5 +141,13 @@ impl<'a> WrappingFrom<&'a Integer> for SignedLimb {
     /// ```
     fn wrapping_from(value: &Integer) -> SignedLimb {
         Limb::wrapping_from(value) as SignedLimb
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> WrappingFrom<&'a Integer> for i32 {
+    #[inline]
+    fn wrapping_from(value: &Integer) -> i32 {
+        i32::wrapping_from(SignedLimb::wrapping_from(value))
     }
 }

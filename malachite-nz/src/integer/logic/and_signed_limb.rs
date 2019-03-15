@@ -295,9 +295,20 @@ pub fn limbs_vec_neg_and_limb_neg_in_place(limbs: &mut Vec<Limb>, limb: Limb) {
 impl BitAnd<SignedLimb> for Integer {
     type Output = Integer;
 
+    #[inline]
     fn bitand(mut self, other: SignedLimb) -> Integer {
         self &= other;
         self
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl BitAnd<i32> for Integer {
+    type Output = Integer;
+
+    #[inline]
+    fn bitand(self, other: i32) -> Integer {
+        self & SignedLimb::from(other)
     }
 }
 
@@ -350,6 +361,16 @@ impl<'a> BitAnd<SignedLimb> for &'a Integer {
     }
 }
 
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> BitAnd<i32> for &'a Integer {
+    type Output = Integer;
+
+    #[inline]
+    fn bitand(self, other: i32) -> Integer {
+        self & SignedLimb::from(other)
+    }
+}
+
 /// Takes the bitwise and of a `SignedLimb` and an `Integer`, taking the `Integer` by value.
 ///
 /// Time: worst case O(n)
@@ -379,8 +400,19 @@ impl<'a> BitAnd<SignedLimb> for &'a Integer {
 impl BitAnd<Integer> for SignedLimb {
     type Output = Integer;
 
+    #[inline]
     fn bitand(self, other: Integer) -> Integer {
         other & self
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl BitAnd<Integer> for i32 {
+    type Output = Integer;
+
+    #[inline]
+    fn bitand(self, other: Integer) -> Integer {
+        SignedLimb::from(self) & other
     }
 }
 
@@ -413,8 +445,19 @@ impl BitAnd<Integer> for SignedLimb {
 impl<'a> BitAnd<&'a Integer> for SignedLimb {
     type Output = Integer;
 
+    #[inline]
     fn bitand(self, other: &'a Integer) -> Integer {
         other & self
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> BitAnd<&'a Integer> for i32 {
+    type Output = Integer;
+
+    #[inline]
+    fn bitand(self, other: &'a Integer) -> Integer {
+        SignedLimb::from(self) & other
     }
 }
 
@@ -452,6 +495,14 @@ impl BitAndAssign<SignedLimb> for Integer {
         } else {
             self.abs.and_assign_neg_limb_neg(Limb::wrapping_from(other));
         }
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl BitAndAssign<i32> for Integer {
+    #[inline]
+    fn bitand_assign(&mut self, other: i32) {
+        *self &= SignedLimb::from(other);
     }
 }
 

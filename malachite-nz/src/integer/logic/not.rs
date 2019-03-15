@@ -29,6 +29,7 @@ use std::ops::Not;
 impl Not for Integer {
     type Output = Integer;
 
+    #[inline]
     fn not(mut self) -> Integer {
         self.not_assign();
         self

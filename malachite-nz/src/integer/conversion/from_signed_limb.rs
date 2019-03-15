@@ -25,13 +25,10 @@ impl From<SignedLimb> for Integer {
     }
 }
 
-//TODO test
 #[cfg(feature = "64_bit_limbs")]
 impl From<i32> for Integer {
+    #[inline]
     fn from(i: i32) -> Integer {
-        Integer {
-            sign: i >= 0,
-            abs: Natural::from(i.unsigned_abs()),
-        }
+        Integer::from(SignedLimb::from(i))
     }
 }

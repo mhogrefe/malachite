@@ -340,6 +340,7 @@ pub fn limbs_or_neg_neg_in_place_either(xs: &mut [Limb], ys: &mut [Limb]) -> boo
 impl BitOr<Integer> for Integer {
     type Output = Integer;
 
+    #[inline]
     fn bitor(mut self, other: Integer) -> Integer {
         self |= other;
         self
@@ -366,6 +367,7 @@ impl BitOr<Integer> for Integer {
 impl<'a> BitOr<&'a Integer> for Integer {
     type Output = Integer;
 
+    #[inline]
     fn bitor(mut self, other: &'a Integer) -> Integer {
         self |= other;
         self
@@ -392,6 +394,7 @@ impl<'a> BitOr<&'a Integer> for Integer {
 impl<'a> BitOr<Integer> for &'a Integer {
     type Output = Integer;
 
+    #[inline]
     fn bitor(self, mut other: Integer) -> Integer {
         other |= self;
         other

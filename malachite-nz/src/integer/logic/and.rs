@@ -425,6 +425,7 @@ pub fn limbs_vec_and_neg_neg_in_place_either(xs: &mut Vec<Limb>, ys: &mut Vec<Li
 impl BitAnd<Integer> for Integer {
     type Output = Integer;
 
+    #[inline]
     fn bitand(mut self, other: Integer) -> Integer {
         self &= other;
         self
@@ -451,6 +452,7 @@ impl BitAnd<Integer> for Integer {
 impl<'a> BitAnd<&'a Integer> for Integer {
     type Output = Integer;
 
+    #[inline]
     fn bitand(mut self, other: &'a Integer) -> Integer {
         self &= other;
         self
@@ -478,6 +480,7 @@ impl<'a> BitAnd<&'a Integer> for Integer {
 impl<'a> BitAnd<Integer> for &'a Integer {
     type Output = Integer;
 
+    #[inline]
     fn bitand(self, mut other: Integer) -> Integer {
         other &= self;
         other

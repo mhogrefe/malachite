@@ -305,9 +305,20 @@ pub fn limbs_neg_xor_limb_neg_in_place(limbs: &mut [Limb], limb: Limb) {
 impl BitXor<SignedLimb> for Integer {
     type Output = Integer;
 
+    #[inline]
     fn bitxor(mut self, other: SignedLimb) -> Integer {
         self ^= other;
         self
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl BitXor<i32> for Integer {
+    type Output = Integer;
+
+    #[inline]
+    fn bitxor(self, other: i32) -> Integer {
+        self ^ SignedLimb::from(other)
     }
 }
 
@@ -357,6 +368,16 @@ impl<'a> BitXor<SignedLimb> for &'a Integer {
     }
 }
 
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> BitXor<i32> for &'a Integer {
+    type Output = Integer;
+
+    #[inline]
+    fn bitxor(self, other: i32) -> Integer {
+        self ^ SignedLimb::from(other)
+    }
+}
+
 /// Takes the bitwise xor of a `SignedLimb` and an `Integer`, taking the `Integer` by value.
 ///
 /// Time: worst case O(n)
@@ -386,8 +407,19 @@ impl<'a> BitXor<SignedLimb> for &'a Integer {
 impl BitXor<Integer> for SignedLimb {
     type Output = Integer;
 
+    #[inline]
     fn bitxor(self, other: Integer) -> Integer {
         other ^ self
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl BitXor<Integer> for i32 {
+    type Output = Integer;
+
+    #[inline]
+    fn bitxor(self, other: Integer) -> Integer {
+        SignedLimb::from(self) ^ other
     }
 }
 
@@ -420,8 +452,19 @@ impl BitXor<Integer> for SignedLimb {
 impl<'a> BitXor<&'a Integer> for SignedLimb {
     type Output = Integer;
 
+    #[inline]
     fn bitxor(self, other: &'a Integer) -> Integer {
         other ^ self
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> BitXor<&'a Integer> for i32 {
+    type Output = Integer;
+
+    #[inline]
+    fn bitxor(self, other: &'a Integer) -> Integer {
+        SignedLimb::from(self) ^ other
     }
 }
 
@@ -461,6 +504,14 @@ impl BitXorAssign<SignedLimb> for Integer {
             self.sign = true;
             self.abs.xor_assign_neg_limb_neg(u_other);
         }
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl BitXorAssign<i32> for Integer {
+    #[inline]
+    fn bitxor_assign(&mut self, other: i32) {
+        *self ^= SignedLimb::from(other);
     }
 }
 

@@ -366,6 +366,7 @@ pub fn limbs_or_pos_neg_in_place_right(xs: &[Limb], ys: &mut [Limb]) {
 impl BitOr<Natural> for Integer {
     type Output = Integer;
 
+    #[inline]
     fn bitor(mut self, other: Natural) -> Integer {
         self |= other;
         self
@@ -392,6 +393,7 @@ impl BitOr<Natural> for Integer {
 impl<'a> BitOr<&'a Natural> for Integer {
     type Output = Integer;
 
+    #[inline]
     fn bitor(mut self, other: &'a Natural) -> Integer {
         self |= other;
         self
@@ -561,6 +563,7 @@ impl<'a> BitOrAssign<&'a Natural> for Integer {
 impl BitOr<Integer> for Natural {
     type Output = Integer;
 
+    #[inline]
     fn bitor(self, other: Integer) -> Integer {
         other | self
     }
@@ -586,6 +589,7 @@ impl BitOr<Integer> for Natural {
 impl<'a> BitOr<&'a Integer> for Natural {
     type Output = Integer;
 
+    #[inline]
     fn bitor(self, other: &'a Integer) -> Integer {
         other | self
     }
@@ -611,6 +615,7 @@ impl<'a> BitOr<&'a Integer> for Natural {
 impl<'a> BitOr<Integer> for &'a Natural {
     type Output = Integer;
 
+    #[inline]
     fn bitor(self, other: Integer) -> Integer {
         other | self
     }
@@ -636,6 +641,7 @@ impl<'a> BitOr<Integer> for &'a Natural {
 impl<'a, 'b> BitOr<&'a Integer> for &'b Natural {
     type Output = Integer;
 
+    #[inline]
     fn bitor(self, other: &'a Integer) -> Integer {
         other | self
     }

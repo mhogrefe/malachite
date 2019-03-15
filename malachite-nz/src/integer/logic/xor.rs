@@ -756,6 +756,7 @@ pub fn limbs_xor_neg_neg_in_place_either(xs: &mut [Limb], ys: &mut [Limb]) -> bo
 impl BitXor<Integer> for Integer {
     type Output = Integer;
 
+    #[inline]
     fn bitxor(mut self, other: Integer) -> Integer {
         self ^= other;
         self
@@ -781,6 +782,7 @@ impl BitXor<Integer> for Integer {
 impl<'a> BitXor<&'a Integer> for Integer {
     type Output = Integer;
 
+    #[inline]
     fn bitxor(mut self, other: &'a Integer) -> Integer {
         self ^= other;
         self
@@ -807,6 +809,7 @@ impl<'a> BitXor<&'a Integer> for Integer {
 impl<'a> BitXor<Integer> for &'a Integer {
     type Output = Integer;
 
+    #[inline]
     fn bitxor(self, mut other: Integer) -> Integer {
         other ^= self;
         other

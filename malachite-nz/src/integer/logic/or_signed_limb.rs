@@ -79,9 +79,20 @@ pub fn limbs_neg_or_neg_limb(limbs: &[Limb], limb: Limb) -> Limb {
 impl BitOr<SignedLimb> for Integer {
     type Output = Integer;
 
+    #[inline]
     fn bitor(mut self, other: SignedLimb) -> Integer {
         self |= other;
         self
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl BitOr<i32> for Integer {
+    type Output = Integer;
+
+    #[inline]
+    fn bitor(self, other: i32) -> Integer {
+        self | SignedLimb::from(other)
     }
 }
 
@@ -133,6 +144,16 @@ impl<'a> BitOr<SignedLimb> for &'a Integer {
     }
 }
 
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> BitOr<i32> for &'a Integer {
+    type Output = Integer;
+
+    #[inline]
+    fn bitor(self, other: i32) -> Integer {
+        self | SignedLimb::from(other)
+    }
+}
+
 /// Takes the bitwise or of a `SignedLimb` or an `Integer`, taking the `Integer` by value.
 ///
 /// Time: worst case O(n)
@@ -162,8 +183,19 @@ impl<'a> BitOr<SignedLimb> for &'a Integer {
 impl BitOr<Integer> for SignedLimb {
     type Output = Integer;
 
+    #[inline]
     fn bitor(self, other: Integer) -> Integer {
         other | self
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl BitOr<Integer> for i32 {
+    type Output = Integer;
+
+    #[inline]
+    fn bitor(self, other: Integer) -> Integer {
+        SignedLimb::from(self) | other
     }
 }
 
@@ -197,8 +229,19 @@ impl BitOr<Integer> for SignedLimb {
 impl<'a> BitOr<&'a Integer> for SignedLimb {
     type Output = Integer;
 
+    #[inline]
     fn bitor(self, other: &'a Integer) -> Integer {
         other | self
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> BitOr<&'a Integer> for i32 {
+    type Output = Integer;
+
+    #[inline]
+    fn bitor(self, other: &'a Integer) -> Integer {
+        SignedLimb::from(self) | other
     }
 }
 
@@ -239,6 +282,14 @@ impl BitOrAssign<SignedLimb> for Integer {
         } else {
             self.abs.or_assign_neg_limb_neg(other);
         }
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl BitOrAssign<i32> for Integer {
+    #[inline]
+    fn bitor_assign(&mut self, other: i32) {
+        *self |= SignedLimb::from(other);
     }
 }
 

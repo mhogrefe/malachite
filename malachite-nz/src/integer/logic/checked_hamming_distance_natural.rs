@@ -71,6 +71,7 @@ impl<'a, 'b> CheckedHammingDistance<&'a Integer> for &'b Natural {
     ///     assert_eq!(Natural::from(123u32).checked_hamming_distance(&Integer::from(-105)), None);
     /// }
     /// ```
+    #[inline]
     fn checked_hamming_distance(self, other: &Integer) -> Option<u64> {
         other.checked_hamming_distance(self)
     }

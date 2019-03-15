@@ -28,3 +28,11 @@ impl Assign<Limb> for Integer {
         self.abs.assign(other);
     }
 }
+
+#[cfg(feature = "64_bit_limbs")]
+impl Assign<u32> for Integer {
+    #[inline]
+    fn assign(&mut self, other: u32) {
+        self.assign(Limb::from(other));
+    }
+}

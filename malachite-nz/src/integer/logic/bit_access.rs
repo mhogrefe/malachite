@@ -1,5 +1,5 @@
 use integer::Integer;
-use malachite_base::limbs::limbs_test_zero;
+use malachite_base::limbs::{limbs_leading_zero_limbs, limbs_test_zero};
 use malachite_base::num::{BitAccess, PrimitiveInteger, WrappingAddAssign, WrappingNegAssign};
 use natural::arithmetic::add_limb::limbs_slice_add_limb_in_place;
 use natural::arithmetic::sub_limb::limbs_sub_limb_in_place;
@@ -72,11 +72,7 @@ pub fn limbs_set_bit_neg(limbs: &mut [Limb], index: u64) {
         return;
     }
     let reduced_index = index & u64::from(Limb::WIDTH_MASK);
-    let mut zero_bound = 0;
-    // No index upper bound on this loop; we're sure there's a nonzero limb sooner or later.
-    while limbs[zero_bound] == 0 {
-        zero_bound += 1;
-    }
+    let zero_bound = limbs_leading_zero_limbs(limbs);
     if limb_index > zero_bound {
         limbs[limb_index].clear_bit(reduced_index);
     } else if limb_index == zero_bound {
@@ -95,11 +91,7 @@ pub fn limbs_set_bit_neg(limbs: &mut [Limb], index: u64) {
 }
 
 fn limbs_clear_bit_neg_helper(limbs: &mut [Limb], limb_index: usize, reduced_index: u64) -> bool {
-    let mut zero_bound = 0;
-    // No index upper bound on this loop; we're sure there's a nonzero limb sooner or later.
-    while limbs[zero_bound] == 0 {
-        zero_bound += 1;
-    }
+    let zero_bound = limbs_leading_zero_limbs(limbs);
     if limb_index > zero_bound {
         limbs[limb_index].set_bit(reduced_index);
     } else if limb_index == zero_bound {

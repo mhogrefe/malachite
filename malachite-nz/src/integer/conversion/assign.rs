@@ -1,7 +1,6 @@
 use integer::Integer;
 use malachite_base::num::Assign;
 
-//TODO continue 32-bit impls for 64-bit build
 /// Assigns an `Integer` to another `Integer`, taking the `Integer` on the RHS by value.
 ///
 /// Time: worst case O(1)
@@ -23,6 +22,7 @@ use malachite_base::num::Assign;
 /// }
 /// ```
 impl Assign<Integer> for Integer {
+    #[inline]
     fn assign(&mut self, other: Integer) {
         *self = other;
     }
@@ -51,6 +51,7 @@ impl Assign<Integer> for Integer {
 /// }
 /// ```
 impl<'a> Assign<&'a Integer> for Integer {
+    #[inline]
     fn assign(&mut self, other: &'a Integer) {
         self.clone_from(other);
     }

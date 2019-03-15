@@ -40,6 +40,14 @@ impl<'a> CheckedHammingDistance<Limb> for &'a Integer {
     }
 }
 
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> CheckedHammingDistance<u32> for &'a Integer {
+    #[inline]
+    fn checked_hamming_distance(self, other: u32) -> Option<u64> {
+        self.checked_hamming_distance(Limb::from(other))
+    }
+}
+
 impl<'a> CheckedHammingDistance<&'a Integer> for Limb {
     /// Determines the Hamming distance between a `Limb` and an `Integer`. The `Limb` has infinitely
     /// many leading zeros. If the `Integer` is non-negative, it also has infinitely many leading
@@ -69,7 +77,16 @@ impl<'a> CheckedHammingDistance<&'a Integer> for Limb {
     ///     assert_eq!(0u32.checked_hamming_distance(&(Integer::NEGATIVE_ONE << 100u32)), None);
     /// }
     /// ```
+    #[inline]
     fn checked_hamming_distance(self, other: &'a Integer) -> Option<u64> {
         other.checked_hamming_distance(self)
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> CheckedHammingDistance<&'a Integer> for u32 {
+    #[inline]
+    fn checked_hamming_distance(self, other: &'a Integer) -> Option<u64> {
+        Limb::from(self).checked_hamming_distance(other)
     }
 }

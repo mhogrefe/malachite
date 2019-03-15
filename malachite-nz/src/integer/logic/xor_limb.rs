@@ -197,9 +197,20 @@ pub fn limbs_vec_neg_xor_limb_in_place(limbs: &mut Vec<Limb>, limb: Limb) {
 impl BitXor<Limb> for Integer {
     type Output = Integer;
 
+    #[inline]
     fn bitxor(mut self, other: Limb) -> Integer {
         self ^= other;
         self
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl BitXor<u32> for Integer {
+    type Output = Integer;
+
+    #[inline]
+    fn bitxor(self, other: u32) -> Integer {
+        self ^ Limb::from(other)
     }
 }
 
@@ -240,6 +251,16 @@ impl<'a> BitXor<Limb> for &'a Integer {
     }
 }
 
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> BitXor<u32> for &'a Integer {
+    type Output = Integer;
+
+    #[inline]
+    fn bitxor(self, other: u32) -> Integer {
+        self ^ Limb::from(other)
+    }
+}
+
 /// Takes the bitwise xor of a `Limb` and an `Integer`, taking the `Integer` by value.
 ///
 /// Time: worst case O(n)
@@ -265,8 +286,19 @@ impl<'a> BitXor<Limb> for &'a Integer {
 impl BitXor<Integer> for Limb {
     type Output = Integer;
 
+    #[inline]
     fn bitxor(self, other: Integer) -> Integer {
         other ^ self
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl BitXor<Integer> for u32 {
+    type Output = Integer;
+
+    #[inline]
+    fn bitxor(self, other: Integer) -> Integer {
+        Limb::from(self) ^ other
     }
 }
 
@@ -295,8 +327,19 @@ impl BitXor<Integer> for Limb {
 impl<'a> BitXor<&'a Integer> for Limb {
     type Output = Integer;
 
+    #[inline]
     fn bitxor(self, other: &'a Integer) -> Integer {
         other ^ self
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> BitXor<&'a Integer> for u32 {
+    type Output = Integer;
+
+    #[inline]
+    fn bitxor(self, other: &'a Integer) -> Integer {
+        Limb::from(self) ^ other
     }
 }
 
@@ -331,6 +374,14 @@ impl BitXorAssign<Limb> for Integer {
         } else {
             self.abs.xor_assign_neg_limb_pos(other);
         }
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl BitXorAssign<u32> for Integer {
+    #[inline]
+    fn bitxor_assign(&mut self, other: u32) {
+        *self ^= Limb::from(other);
     }
 }
 

@@ -470,6 +470,7 @@ impl<'a> BitAndAssign<&'a Natural> for Integer {
 impl BitAnd<Integer> for Natural {
     type Output = Natural;
 
+    #[inline]
     fn bitand(self, other: Integer) -> Natural {
         other & self
     }
@@ -495,6 +496,7 @@ impl BitAnd<Integer> for Natural {
 impl<'a> BitAnd<&'a Integer> for Natural {
     type Output = Natural;
 
+    #[inline]
     fn bitand(self, other: &'a Integer) -> Natural {
         other & self
     }
@@ -520,6 +522,7 @@ impl<'a> BitAnd<&'a Integer> for Natural {
 impl<'a> BitAnd<Integer> for &'a Natural {
     type Output = Natural;
 
+    #[inline]
     fn bitand(self, other: Integer) -> Natural {
         other & self
     }
@@ -545,6 +548,7 @@ impl<'a> BitAnd<Integer> for &'a Natural {
 impl<'a, 'b> BitAnd<&'a Integer> for &'b Natural {
     type Output = Natural;
 
+    #[inline]
     fn bitand(self, other: &'a Integer) -> Natural {
         other & self
     }

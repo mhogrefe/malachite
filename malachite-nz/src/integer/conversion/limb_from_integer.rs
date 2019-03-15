@@ -25,6 +25,7 @@ impl CheckedFrom<Integer> for Limb {
     ///     assert_eq!(format!("{:?}", u32::checked_from(-Integer::trillion())), "None");
     /// }
     /// ```
+    #[inline]
     fn checked_from(value: Integer) -> Option<Limb> {
         Limb::checked_from(&value)
     }
@@ -64,6 +65,14 @@ impl<'a> CheckedFrom<&'a Integer> for Limb {
     }
 }
 
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> CheckedFrom<&'a Integer> for u32 {
+    #[inline]
+    fn checked_from(value: &Integer) -> Option<u32> {
+        Limb::checked_from(value).and_then(u32::checked_from)
+    }
+}
+
 impl WrappingFrom<Integer> for Limb {
     /// Converts an `Integer` to a `Limb`, taking the `Integer` by value and wrapping mod
     /// 2<sup>32</sup>.
@@ -87,6 +96,7 @@ impl WrappingFrom<Integer> for Limb {
     ///     assert_eq!(u32::wrapping_from(-Integer::trillion()), 727379968);
     /// }
     /// ```
+    #[inline]
     fn wrapping_from(value: Integer) -> Limb {
         Limb::wrapping_from(&value)
     }
@@ -129,33 +139,10 @@ impl<'a> WrappingFrom<&'a Integer> for Limb {
     }
 }
 
-//TODO test
-#[cfg(feature = "64_bit_limbs")]
-impl<'a> CheckedFrom<&'a Integer> for u32 {
-    fn checked_from(value: &Integer) -> Option<u32> {
-        match *value {
-            Integer { sign: false, .. } => None,
-            Integer {
-                sign: true,
-                ref abs,
-            } => u32::checked_from(abs),
-        }
-    }
-}
-
-//TODO test
 #[cfg(feature = "64_bit_limbs")]
 impl<'a> WrappingFrom<&'a Integer> for u32 {
+    #[inline]
     fn wrapping_from(value: &Integer) -> u32 {
-        match *value {
-            Integer {
-                sign: true,
-                ref abs,
-            } => u32::wrapping_from(abs),
-            Integer {
-                sign: false,
-                ref abs,
-            } => u32::wrapping_from(abs).wrapping_neg(),
-        }
+        u32::wrapping_from(Limb::wrapping_from(value))
     }
 }

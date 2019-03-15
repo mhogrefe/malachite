@@ -28,6 +28,7 @@ impl CheckedFrom<Integer> for DoubleLimb {
     ///         u64::checked_from(Integer::from_str("-1000000000000000000000").unwrap())), "None");
     /// }
     /// ```
+    #[inline]
     fn checked_from(value: Integer) -> Option<DoubleLimb> {
         DoubleLimb::checked_from(&value)
     }
@@ -98,6 +99,7 @@ impl WrappingFrom<Integer> for DoubleLimb {
     ///         14570924054025338880);
     /// }
     /// ```
+    #[inline]
     fn wrapping_from(value: Integer) -> DoubleLimb {
         DoubleLimb::wrapping_from(&value)
     }

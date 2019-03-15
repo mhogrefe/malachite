@@ -52,6 +52,7 @@ impl CheckedFrom<Integer> for SignedDoubleLimb {
     ///         "None");
     /// }
     /// ```
+    #[inline]
     fn checked_from(value: Integer) -> Option<SignedDoubleLimb> {
         SignedDoubleLimb::checked_from(&value)
     }
@@ -123,6 +124,7 @@ impl WrappingFrom<Integer> for SignedDoubleLimb {
     ///         -2003764205206896640);
     /// }
     /// ```
+    #[inline]
     fn wrapping_from(value: Integer) -> SignedDoubleLimb {
         SignedDoubleLimb::wrapping_from(&value)
     }
