@@ -2,9 +2,10 @@ use malachite_base::num::{EqModPowerOfTwo, PrimitiveInteger};
 use natural::arithmetic::divisible_by_power_of_two::limbs_divisible_by_power_of_two;
 use natural::Natural::{self, Large, Small};
 use platform::Limb;
+use std::cmp::Ordering;
 
 // xs.len() == ys.len()
-fn limbs_eq_mod_power_of_two_equal(xs: &[Limb], ys: &[Limb], pow: u64) -> bool {
+fn limbs_eq_mod_power_of_two_same_length(xs: &[Limb], ys: &[Limb], pow: u64) -> bool {
     let i = (pow >> Limb::LOG_WIDTH) as usize;
     let len = xs.len();
     if i >= len {
@@ -58,14 +59,10 @@ fn limbs_eq_mod_power_of_two_greater(xs: &[Limb], ys: &[Limb], pow: u64) -> bool
 ///         false);
 /// ```
 pub fn limbs_eq_mod_power_of_two(xs: &[Limb], ys: &[Limb], pow: u64) -> bool {
-    let xs_len = xs.len();
-    let ys_len = ys.len();
-    if xs_len == ys_len {
-        limbs_eq_mod_power_of_two_equal(xs, ys, pow)
-    } else if xs_len > ys_len {
-        limbs_eq_mod_power_of_two_greater(xs, ys, pow)
-    } else {
-        limbs_eq_mod_power_of_two_greater(ys, xs, pow)
+    match xs.len().cmp(&ys.len()) {
+        Ordering::Equal => limbs_eq_mod_power_of_two_same_length(xs, ys, pow),
+        Ordering::Less => limbs_eq_mod_power_of_two_greater(ys, xs, pow),
+        Ordering::Greater => limbs_eq_mod_power_of_two_greater(xs, ys, pow),
     }
 }
 

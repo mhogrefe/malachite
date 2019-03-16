@@ -1144,9 +1144,9 @@ pub trait PrimitiveFloat:
     const MIN_EXPONENT: i32 = Self::MIN_NORMAL_EXPONENT - (Self::MANTISSA_WIDTH as i32);
     const MAX_EXPONENT: u32 = (1 << (Self::EXPONENT_WIDTH - 1)) - 1;
 
-    const INFINITY: Self;
-    const NEG_INFINITY: Self;
-    const NEG_ZERO: Self;
+    const POSITIVE_INFINITY: Self;
+    const NEGATIVE_INFINITY: Self;
+    const NEGATIVE_ZERO: Self;
     const NAN: Self;
     const MAX_FINITE: Self;
     const MIN_FINITE: Self;
@@ -2894,9 +2894,9 @@ macro_rules! float_traits {
             type SignedOfEqualWidth = <$ut as PrimitiveUnsigned>::SignedOfEqualWidth;
             const MANTISSA_WIDTH: u32 = std::$t::MANTISSA_DIGITS - 1;
 
-            const INFINITY: Self = std::$t::INFINITY;
-            const NEG_INFINITY: Self = std::$t::NEG_INFINITY;
-            const NEG_ZERO: Self = -0.0;
+            const POSITIVE_INFINITY: Self = std::$t::INFINITY;
+            const NEGATIVE_INFINITY: Self = std::$t::NEG_INFINITY;
+            const NEGATIVE_ZERO: Self = -0.0;
             const NAN: Self = std::$t::NAN;
             const MAX_FINITE: Self = std::$t::MAX;
             const MIN_FINITE: Self = std::$t::MIN;
@@ -2950,11 +2950,11 @@ macro_rules! float_traits {
         impl_named!($t);
 
         impl Min for $t {
-            const MIN: $t = $t::NEG_INFINITY;
+            const MIN: $t = $t::NEGATIVE_INFINITY;
         }
 
         impl Max for $t {
-            const MAX: $t = $t::INFINITY;
+            const MAX: $t = $t::POSITIVE_INFINITY;
         }
 
         impl NegAssign for $t {

@@ -16,7 +16,7 @@ use malachite_test::inputs::base::{
 };
 use malachite_test::inputs::natural::{
     naturals, pairs_of_limb_and_positive_natural_var_2, pairs_of_natural_and_limb_var_3,
-    pairs_of_natural_and_positive_limb_var_1, pairs_of_natural_var_1_and_3,
+    pairs_of_natural_and_positive_limb_var_1, pairs_of_natural_var_1_and_3, positive_naturals,
 };
 use malachite_test::natural::arithmetic::div_exact_limb::rug_div_exact_limb;
 use rug;
@@ -332,6 +332,7 @@ fn test_limb_div_exact_natural() {
     test(369, "123", 3);
     test(4_294_967_295, "1", 4_294_967_295);
     test(4_294_967_295, "4294967295", 1);
+    test(0, "1000000000000", 0);
 }
 
 #[test]
@@ -554,6 +555,10 @@ fn div_exact_limb_properties() {
 
     test_properties(naturals, |n| {
         assert_eq!(n.div_exact(1), *n);
+    });
+
+    test_properties(positive_naturals, |n| {
+        assert_eq!(0.div_exact(n), 0);
     });
 
     test_properties(positive_unsigneds, |&u: &Limb| {

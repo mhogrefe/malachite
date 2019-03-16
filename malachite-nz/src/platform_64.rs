@@ -4,3 +4,4 @@ pub type DoubleLimb = u128;
 pub type SignedLimb = i64;
 pub type SignedHalfLimb = i32;
 pub type SignedDoubleLimb = i128;
+pub type FloatWithLimbWidth = f64;

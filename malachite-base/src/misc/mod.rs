@@ -1,9 +1,10 @@
+use round::RoundingMode;
+
 pub trait CheckedFrom<T>: Sized {
     fn checked_from(value: T) -> Option<Self>;
 }
 
 pub trait CheckedInto<T> {
-    /// Performs the conversion.
     fn checked_into(self) -> Option<T>;
 }
 
@@ -22,7 +23,6 @@ pub trait WrappingFrom<T>: Sized {
 }
 
 pub trait WrappingInto<T>: Sized {
-    /// Performs the conversion.
     fn wrapping_into(self) -> T;
 }
 
@@ -41,7 +41,6 @@ pub trait BitwiseFrom<T>: Sized {
 }
 
 pub trait BitwiseInto<T>: Sized {
-    /// Performs the conversion.
     fn bitwise_into(self) -> T;
 }
 
@@ -52,6 +51,24 @@ where
     #[inline]
     fn bitwise_into(self) -> U {
         U::bitwise_from(self)
+    }
+}
+
+pub trait RoundingFrom<T>: Sized {
+    fn rounding_from(value: T, rm: RoundingMode) -> Self;
+}
+
+pub trait RoundingInto<T>: Sized {
+    fn rounding_into(self, rm: RoundingMode) -> T;
+}
+
+impl<T, U> RoundingInto<U> for T
+where
+    U: RoundingFrom<T>,
+{
+    #[inline]
+    fn rounding_into(self, rm: RoundingMode) -> U {
+        U::rounding_from(self, rm)
     }
 }
 
