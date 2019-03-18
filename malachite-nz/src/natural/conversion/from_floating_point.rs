@@ -9,6 +9,10 @@ use natural::Natural;
 ///
 /// Additional memory: worst case O(1)
 ///
+/// # Panics
+/// Panics if `value` is NaN or infinite, if it would round to a negative integer, or if the
+/// rounding mode is exact and `value` is not an integer.
+///
 /// # Example
 /// ```
 /// extern crate malachite_base;
@@ -66,5 +70,17 @@ where
             }
             n
         }
+    }
+}
+
+impl From<f32> for Natural {
+    fn from(value: f32) -> Self {
+        Natural::rounding_from(value, RoundingMode::Nearest)
+    }
+}
+
+impl From<f64> for Natural {
+    fn from(value: f64) -> Self {
+        Natural::rounding_from(value, RoundingMode::Nearest)
     }
 }

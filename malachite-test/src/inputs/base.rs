@@ -32,6 +32,9 @@ use rust_wheels::iterators::common::EXAMPLE_SEED;
 use rust_wheels::iterators::general::{random, range_increasing};
 use rust_wheels::iterators::integers_geometric::{positive_u32s_geometric, u32s_geometric};
 use rust_wheels::iterators::orderings::{exhaustive_orderings, random_orderings};
+use rust_wheels::iterators::primitive_floats::{
+    exhaustive_primitive_floats, random_primitive_floats, special_random_f32s, special_random_f64s,
+};
 use rust_wheels::iterators::primitive_ints::{
     exhaustive_natural_signed, exhaustive_negative_signed, exhaustive_nonzero_signed,
     exhaustive_positive, exhaustive_signed, exhaustive_unsigned, random_natural_signed,
@@ -138,6 +141,28 @@ where
 {
     Box::new(signeds(gm).filter(|&i| i != T::MIN))
 }
+
+macro_rules! float_gen {
+    ($f: ident, $special_random: ident, $floats: ident, $floats_var_1: ident) => {
+        pub fn $floats(gm: GenerationMode) -> It<$f> {
+            match gm {
+                GenerationMode::Exhaustive => Box::new(exhaustive_primitive_floats()),
+                GenerationMode::Random(_) => Box::new(random_primitive_floats(&EXAMPLE_SEED)),
+                GenerationMode::SpecialRandom(scale) => {
+                    Box::new($special_random(&EXAMPLE_SEED, scale))
+                }
+            }
+        }
+
+        // All floats that are not NaN, not infinite, and are greater than or equal to -0.5.
+        pub fn $floats_var_1(gm: GenerationMode) -> It<$f> {
+            Box::new($floats(gm).filter(|&f| !f.is_nan() && !f.is_infinite() && f >= -0.5))
+        }
+    };
+}
+
+float_gen!(f32, special_random_f32s, f32s, f32s_var_1);
+float_gen!(f64, special_random_f64s, f64s, f64s_var_1);
 
 pub fn pairs_of_unsigneds<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,

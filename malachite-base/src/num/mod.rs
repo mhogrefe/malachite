@@ -1121,6 +1121,7 @@ pub trait PrimitiveFloat:
     + Named
     + Neg<Output = Self>
     + NegAssign
+    + NegativeOne
     + One
     + PartialEq<Self>
     + PartialOrd<Self>
@@ -1131,6 +1132,7 @@ pub trait PrimitiveFloat:
     + Sub<Output = Self>
     + SubAssign<Self>
     + Sum<Self>
+    + Two
     + UpperExp
     + Zero
 {
@@ -1177,6 +1179,12 @@ pub trait PrimitiveFloat:
         (mantissa, exponent)
     }
 
+    fn adjusted_exponent(self) -> u32 {
+        let bits = self.to_bits();
+        let exponent: u32 = (bits >> Self::MANTISSA_WIDTH).checked_into().unwrap();
+        exponent.mod_power_of_two(Self::EXPONENT_WIDTH.into())
+    }
+
     fn from_adjusted_mantissa_and_exponent(
         mantissa: Self::UnsignedOfEqualWidth,
         exponent: u32,
@@ -1185,6 +1193,11 @@ pub trait PrimitiveFloat:
             (Self::UnsignedOfEqualWidth::checked_from(exponent).unwrap() << Self::MANTISSA_WIDTH)
                 + mantissa,
         )
+    }
+
+    fn exponent(self) -> i32 {
+        i32::checked_from(self.adjusted_exponent()).unwrap()
+            - i32::checked_from(Self::MAX_EXPONENT).unwrap()
     }
 }
 
