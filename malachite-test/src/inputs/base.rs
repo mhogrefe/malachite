@@ -2,6 +2,7 @@ use common::{GenerationMode, NoSpecialGenerationMode};
 use inputs::common::{permute_1_2, permute_1_3_2, reshape_2_1_to_3};
 use malachite_base::chars::NUMBER_OF_CHARS;
 use malachite_base::limbs::limbs_test_zero;
+use malachite_base::misc::CheckedFrom;
 use malachite_base::num::{
     BitAccess, Parity, PrimitiveInteger, PrimitiveSigned, PrimitiveUnsigned, UnsignedAbs,
 };
@@ -24,6 +25,7 @@ use malachite_nz::natural::arithmetic::mul::toom::{
     _limbs_mul_greater_to_out_toom_8h_input_sizes_valid,
 };
 use malachite_nz::natural::arithmetic::mul_limb::limbs_mul_limb;
+use malachite_nz::natural::Natural;
 use malachite_nz::platform::{HalfLimb, Limb, SignedHalfLimb, SignedLimb};
 use rand::Rand;
 use rust_wheels::iterators::bools::exhaustive_bools;
@@ -143,7 +145,14 @@ where
 }
 
 macro_rules! float_gen {
-    ($f: ident, $special_random: ident, $floats: ident, $floats_var_1: ident) => {
+    (
+        $f: ident,
+        $special_random: ident,
+        $floats: ident,
+        $floats_var_1: ident,
+        $pairs_of_float_and_rounding_mode: ident,
+        $pairs_of_float_and_rounding_mode_var_1: ident
+    ) => {
         pub fn $floats(gm: GenerationMode) -> It<$f> {
             match gm {
                 GenerationMode::Exhaustive => Box::new(exhaustive_primitive_floats()),
@@ -158,11 +167,65 @@ macro_rules! float_gen {
         pub fn $floats_var_1(gm: GenerationMode) -> It<$f> {
             Box::new($floats(gm).filter(|&f| !f.is_nan() && !f.is_infinite() && f >= -0.5))
         }
+
+        pub fn $pairs_of_float_and_rounding_mode(gm: GenerationMode) -> It<($f, RoundingMode)> {
+            match gm {
+                GenerationMode::Exhaustive => Box::new(lex_pairs(
+                    exhaustive_primitive_floats(),
+                    exhaustive_rounding_modes(),
+                )),
+                GenerationMode::Random(_) => Box::new(random_pairs(
+                    &EXAMPLE_SEED,
+                    &(|seed| random_primitive_floats(seed)),
+                    &(|seed| random_rounding_modes(seed)),
+                )),
+                GenerationMode::SpecialRandom(scale) => Box::new(random_pairs(
+                    &EXAMPLE_SEED,
+                    &(|seed| $special_random(seed, scale)),
+                    &(|seed| random_rounding_modes(seed)),
+                )),
+            }
+        }
+
+        // All pairs of float and `RoundingMode` that are acceptable to pass into
+        // `Natural::rounding_from`.
+        pub fn $pairs_of_float_and_rounding_mode_var_1(
+            gm: GenerationMode,
+        ) -> It<($f, RoundingMode)> {
+            Box::new($pairs_of_float_and_rounding_mode(gm).filter(|&(f, rm)| {
+                if rm == RoundingMode::Exact {
+                    return Natural::checked_from(f).is_some();
+                }
+                if f.is_nan() || f.is_infinite() {
+                    return false;
+                }
+                match rm {
+                    RoundingMode::Floor | RoundingMode::Up => f >= 0.0,
+                    RoundingMode::Down | RoundingMode::Ceiling => f > -1.0,
+                    RoundingMode::Nearest => f >= -0.5,
+                    _ => unreachable!(),
+                }
+            }))
+        }
     };
 }
 
-float_gen!(f32, special_random_f32s, f32s, f32s_var_1);
-float_gen!(f64, special_random_f64s, f64s, f64s_var_1);
+float_gen!(
+    f32,
+    special_random_f32s,
+    f32s,
+    f32s_var_1,
+    pairs_of_f32_and_rounding_mode,
+    pairs_of_f32_and_rounding_mode_var_1
+);
+float_gen!(
+    f64,
+    special_random_f64s,
+    f64s,
+    f64s_var_1,
+    pairs_of_f64_and_rounding_mode,
+    pairs_of_f64_and_rounding_mode_var_1
+);
 
 pub fn pairs_of_unsigneds<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
