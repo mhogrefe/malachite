@@ -23,6 +23,7 @@ impl CheckedFrom<Natural> for Limb {
     ///     assert_eq!(format!("{:?}", u32::checked_from(Natural::trillion())), "None");
     /// }
     /// ```
+    #[inline]
     fn checked_from(value: Natural) -> Option<Limb> {
         Limb::checked_from(&value)
     }
@@ -78,6 +79,7 @@ impl WrappingFrom<Natural> for Limb {
     ///     assert_eq!(u32::wrapping_from(Natural::trillion()), 3567587328);
     /// }
     /// ```
+    #[inline]
     fn wrapping_from(value: Natural) -> Limb {
         Limb::wrapping_from(&value)
     }
@@ -112,17 +114,33 @@ impl<'a> WrappingFrom<&'a Natural> for Limb {
     }
 }
 
-//TODO test
+#[cfg(feature = "64_bit_limbs")]
+impl CheckedFrom<Natural> for u32 {
+    #[inline]
+    fn checked_from(value: Natural) -> Option<u32> {
+        u64::checked_from(value).and_then(u32::checked_from)
+    }
+}
+
 #[cfg(feature = "64_bit_limbs")]
 impl<'a> CheckedFrom<&'a Natural> for u32 {
+    #[inline]
     fn checked_from(value: &Natural) -> Option<u32> {
         u64::checked_from(value).and_then(u32::checked_from)
     }
 }
 
-//TODO test
+#[cfg(feature = "64_bit_limbs")]
+impl WrappingFrom<Natural> for u32 {
+    #[inline]
+    fn wrapping_from(value: Natural) -> u32 {
+        u32::wrapping_from(u64::wrapping_from(value))
+    }
+}
+
 #[cfg(feature = "64_bit_limbs")]
 impl<'a> WrappingFrom<&'a Natural> for u32 {
+    #[inline]
     fn wrapping_from(value: &Natural) -> u32 {
         u32::wrapping_from(u64::wrapping_from(value))
     }

@@ -14,15 +14,16 @@ use platform::Limb;
 /// assert_eq!(Natural::from(123u32).to_string(), "123");
 /// ```
 impl From<Limb> for Natural {
+    #[inline]
     fn from(u: Limb) -> Natural {
         Small(u)
     }
 }
 
-//TODO test
 #[cfg(feature = "64_bit_limbs")]
 impl From<u32> for Natural {
+    #[inline]
     fn from(u: u32) -> Natural {
-        Small(u64::from(u))
+        Natural::from(Limb::from(u))
     }
 }

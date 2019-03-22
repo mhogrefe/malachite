@@ -1145,6 +1145,9 @@ pub trait PrimitiveFloat:
     const MIN_NORMAL_EXPONENT: i32 = -((1 << (Self::EXPONENT_WIDTH - 1)) - 2);
     const MIN_EXPONENT: i32 = Self::MIN_NORMAL_EXPONENT - (Self::MANTISSA_WIDTH as i32);
     const MAX_EXPONENT: u32 = (1 << (Self::EXPONENT_WIDTH - 1)) - 1;
+    const MIN_POSITIVE: Self;
+    const MAX_SUBNORMAL: Self;
+    const MIN_POSITIVE_NORMAL: Self;
 
     const POSITIVE_INFINITY: Self;
     const NEGATIVE_INFINITY: Self;
@@ -2900,7 +2903,13 @@ macro_rules! signed_traits {
 
 //TODO docs
 macro_rules! float_traits {
-    ($t:ident, $ut:ident) => {
+    (
+        $t: ident,
+        $ut: ident,
+        $min_positive: expr,
+        $max_subnormal: expr,
+        $min_positive_normal: expr
+    ) => {
         //TODO docs
         impl PrimitiveFloat for $t {
             type UnsignedOfEqualWidth = $ut;
@@ -2913,6 +2922,9 @@ macro_rules! float_traits {
             const NAN: Self = std::$t::NAN;
             const MAX_FINITE: Self = std::$t::MAX;
             const MIN_FINITE: Self = std::$t::MIN;
+            const MIN_POSITIVE: Self = $min_positive;
+            const MAX_SUBNORMAL: Self = $max_subnormal;
+            const MIN_POSITIVE_NORMAL: Self = $min_positive_normal;
 
             #[inline]
             fn is_nan(self) -> bool {
@@ -3107,8 +3119,14 @@ signed_traits!(i32, u32, 5);
 signed_traits!(i64, u64, 6);
 signed_traits!(i128, u128, 7);
 
-float_traits!(f32, u32);
-float_traits!(f64, u64);
+float_traits!(f32, u32, 1.0e-45, 1.1754942e-38, 1.1754944e-38);
+float_traits!(
+    f64,
+    u64,
+    5.0e-324,
+    2.225073858507201e-308,
+    2.2250738585072014e-308
+);
 
 pub trait AbsAssign {
     fn abs_assign(&mut self);

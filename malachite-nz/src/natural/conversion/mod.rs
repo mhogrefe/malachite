@@ -114,6 +114,7 @@ pub mod assign;
 pub mod assign_double_limb;
 pub mod assign_limb;
 pub mod double_limb_from_natural;
+pub mod floating_point_from_natural;
 pub mod from_bits;
 pub mod from_double_limb;
 pub mod from_floating_point;
