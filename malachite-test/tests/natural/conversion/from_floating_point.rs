@@ -29,6 +29,8 @@ fn test_rounding_from_f32() {
     );
     test(1.0e20, RoundingMode::Exact, "100000002004087734272");
     test(1.23e20, RoundingMode::Exact, "122999999650278146048");
+    test(1.6777216e7, RoundingMode::Exact, "16777216");
+    test(1.6777218e7, RoundingMode::Exact, "16777218");
     test(123.1, RoundingMode::Floor, "123");
     test(123.1, RoundingMode::Down, "123");
     test(123.1, RoundingMode::Ceiling, "124");
@@ -127,6 +129,16 @@ fn test_rounding_from_f64() {
     test(1.23e100, RoundingMode::Exact,
         "123000000000000008366862950845375853795062237854139353014252897832358837028676639186389822\
         00322686976");
+    test(
+        9.007199254740992e15,
+        RoundingMode::Exact,
+        "9007199254740992",
+    );
+    test(
+        9.007199254740994e15,
+        RoundingMode::Exact,
+        "9007199254740994",
+    );
     test(123.1, RoundingMode::Floor, "123");
     test(123.1, RoundingMode::Down, "123");
     test(123.1, RoundingMode::Ceiling, "124");

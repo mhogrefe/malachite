@@ -47,7 +47,9 @@ macro_rules! float_impls {
                         RoundingMode::Exact => {
                             panic!("Value cannot be represented exactly as an {}", $f::NAME)
                         }
-                        RoundingMode::Floor | RoundingMode::Down => $f::MAX_FINITE,
+                        RoundingMode::Floor | RoundingMode::Down | RoundingMode::Nearest => {
+                            $f::MAX_FINITE
+                        }
                         _ => $f::POSITIVE_INFINITY,
                     };
                 }

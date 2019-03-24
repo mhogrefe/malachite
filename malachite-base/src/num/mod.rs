@@ -1148,13 +1148,13 @@ pub trait PrimitiveFloat:
     const MIN_POSITIVE: Self;
     const MAX_SUBNORMAL: Self;
     const MIN_POSITIVE_NORMAL: Self;
-
     const POSITIVE_INFINITY: Self;
     const NEGATIVE_INFINITY: Self;
     const NEGATIVE_ZERO: Self;
     const NAN: Self;
     const MAX_FINITE: Self;
     const MIN_FINITE: Self;
+    const SMALLEST_UNREPRESENTABLE_UINT: Self::UnsignedOfEqualWidth;
 
     fn is_nan(self) -> bool;
 
@@ -2925,6 +2925,7 @@ macro_rules! float_traits {
             const MIN_POSITIVE: Self = $min_positive;
             const MAX_SUBNORMAL: Self = $max_subnormal;
             const MIN_POSITIVE_NORMAL: Self = $min_positive_normal;
+            const SMALLEST_UNREPRESENTABLE_UINT: $ut = (1 << (Self::MANTISSA_WIDTH + 1)) + 1;
 
             #[inline]
             fn is_nan(self) -> bool {
@@ -3119,13 +3120,13 @@ signed_traits!(i32, u32, 5);
 signed_traits!(i64, u64, 6);
 signed_traits!(i128, u128, 7);
 
-float_traits!(f32, u32, 1.0e-45, 1.1754942e-38, 1.1754944e-38);
+float_traits!(f32, u32, 1.0e-45, 1.175_494_2e-38, 1.175_494_4e-38);
 float_traits!(
     f64,
     u64,
     5.0e-324,
-    2.225073858507201e-308,
-    2.2250738585072014e-308
+    2.225_073_858_507_201e-308,
+    2.225_073_858_507_201_4e-308
 );
 
 pub trait AbsAssign {
