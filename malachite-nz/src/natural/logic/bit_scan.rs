@@ -47,12 +47,11 @@ pub fn limbs_index_of_next_false_bit(limbs: &[Limb], starting_index: u64) -> u64
             .iter()
             .take_while(|&&y| y == Limb::MAX)
             .count();
-    let result_offset = false_index << Limb::LOG_WIDTH;
-    (if false_index == limbs.len() {
-        result_offset
-    } else {
-        result_offset + (!limbs[false_index]).trailing_zeros() as usize
-    }) as u64
+    let mut result_offset = false_index << Limb::LOG_WIDTH;
+    if false_index != limbs.len() {
+        result_offset += (!limbs[false_index]).trailing_zeros() as usize;
+    }
+    result_offset as u64
 }
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, finds the

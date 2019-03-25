@@ -15,7 +15,7 @@ macro_rules! float_impls {
         ///
         /// # Panics
         /// Panics if `value` is NaN or infinite, if it would round to a negative integer, or if the
-        /// rounding mode is exact and `value` is not an integer.
+        /// rounding mode is `Exact` and `value` is not an integer.
         ///
         /// # Example
         /// ```
