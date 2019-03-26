@@ -1,4 +1,5 @@
 use common::{integer_to_bigint, integer_to_rug_integer, natural_to_rug_integer, GenerationMode};
+use inputs::base::It;
 use inputs::common::{reshape_1_2_to_3, reshape_2_1_to_3};
 use malachite_base::misc::CheckedFrom;
 use malachite_base::num::{
@@ -40,7 +41,7 @@ use rust_wheels::iterators::tuples::{
 use rust_wheels::iterators::vecs::exhaustive_fixed_size_vecs_from_single;
 use std::ops::{Add, Mul, Shl, Shr};
 
-pub fn integers(gm: GenerationMode) -> Box<Iterator<Item = Integer>> {
+pub fn integers(gm: GenerationMode) -> It<Integer> {
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_integers()),
         GenerationMode::Random(scale) => Box::new(random_integers(&EXAMPLE_SEED, scale)),
@@ -50,19 +51,19 @@ pub fn integers(gm: GenerationMode) -> Box<Iterator<Item = Integer>> {
     }
 }
 
-pub fn rm_integers(gm: GenerationMode) -> Box<Iterator<Item = (rug::Integer, Integer)>> {
+pub fn rm_integers(gm: GenerationMode) -> It<(rug::Integer, Integer)> {
     Box::new(integers(gm).map(|n| (integer_to_rug_integer(&n), n)))
 }
 
-pub fn nm_integers(gm: GenerationMode) -> Box<Iterator<Item = (BigInt, Integer)>> {
+pub fn nm_integers(gm: GenerationMode) -> It<(BigInt, Integer)> {
     Box::new(integers(gm).map(|n| (integer_to_bigint(&n), n)))
 }
 
-pub fn nrm_integers(gm: GenerationMode) -> Box<Iterator<Item = (BigInt, rug::Integer, Integer)>> {
+pub fn nrm_integers(gm: GenerationMode) -> It<(BigInt, rug::Integer, Integer)> {
     Box::new(integers(gm).map(|n| (integer_to_bigint(&n), integer_to_rug_integer(&n), n)))
 }
 
-pub fn nonzero_integers(gm: GenerationMode) -> Box<Iterator<Item = Integer>> {
+pub fn nonzero_integers(gm: GenerationMode) -> It<Integer> {
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_nonzero_integers()),
         GenerationMode::Random(scale) => Box::new(random_nonzero_integers(&EXAMPLE_SEED, scale)),
@@ -72,7 +73,7 @@ pub fn nonzero_integers(gm: GenerationMode) -> Box<Iterator<Item = Integer>> {
     }
 }
 
-pub fn pairs_of_integers(gm: GenerationMode) -> Box<Iterator<Item = (Integer, Integer)>> {
+pub fn pairs_of_integers(gm: GenerationMode) -> It<(Integer, Integer)> {
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_pairs_from_single(exhaustive_integers())),
         GenerationMode::Random(scale) => Box::new(random_pairs_from_single(random_integers(
@@ -87,7 +88,7 @@ pub fn pairs_of_integers(gm: GenerationMode) -> Box<Iterator<Item = (Integer, In
 
 pub fn rm_pairs_of_integers(
     gm: GenerationMode,
-) -> Box<Iterator<Item = ((rug::Integer, rug::Integer), (Integer, Integer))>> {
+) -> It<((rug::Integer, rug::Integer), (Integer, Integer))> {
     Box::new(pairs_of_integers(gm).map(|(x, y)| {
         (
             (integer_to_rug_integer(&x), integer_to_rug_integer(&y)),
@@ -116,9 +117,7 @@ pub fn nrm_pairs_of_integers(
     }))
 }
 
-pub fn triples_of_integers(
-    gm: GenerationMode,
-) -> Box<Iterator<Item = (Integer, Integer, Integer)>> {
+pub fn triples_of_integers(gm: GenerationMode) -> It<(Integer, Integer, Integer)> {
     match gm {
         GenerationMode::Exhaustive => {
             Box::new(exhaustive_triples_from_single(exhaustive_integers()))
@@ -133,7 +132,7 @@ pub fn triples_of_integers(
     }
 }
 
-pub fn natural_integers(gm: GenerationMode) -> Box<Iterator<Item = Integer>> {
+pub fn natural_integers(gm: GenerationMode) -> It<Integer> {
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_natural_integers()),
         GenerationMode::Random(scale) => Box::new(random_natural_integers(&EXAMPLE_SEED, scale)),
@@ -143,9 +142,7 @@ pub fn natural_integers(gm: GenerationMode) -> Box<Iterator<Item = Integer>> {
     }
 }
 
-pub fn triples_of_natural_integers(
-    gm: GenerationMode,
-) -> Box<Iterator<Item = (Integer, Integer, Integer)>> {
+pub fn triples_of_natural_integers(gm: GenerationMode) -> It<(Integer, Integer, Integer)> {
     match gm {
         GenerationMode::Exhaustive => {
             Box::new(exhaustive_triples_from_single(exhaustive_natural_integers()))
@@ -161,7 +158,7 @@ pub fn triples_of_natural_integers(
 
 fn random_pairs_of_integer_and_primitive<T: PrimitiveInteger + Rand>(
     scale: u32,
-) -> Box<Iterator<Item = (Integer, T)>> {
+) -> It<(Integer, T)> {
     Box::new(random_pairs(
         &EXAMPLE_SEED,
         &(|seed| random_integers(seed, scale)),
@@ -171,7 +168,7 @@ fn random_pairs_of_integer_and_primitive<T: PrimitiveInteger + Rand>(
 
 fn random_pairs_of_primitive_and_integer<T: PrimitiveInteger + Rand>(
     scale: u32,
-) -> Box<Iterator<Item = (T, Integer)>> {
+) -> It<(T, Integer)> {
     Box::new(random_pairs(
         &EXAMPLE_SEED,
         &(|seed| random(seed)),
@@ -181,7 +178,7 @@ fn random_pairs_of_primitive_and_integer<T: PrimitiveInteger + Rand>(
 
 pub fn pairs_of_integer_and_signed<T: PrimitiveSigned + Rand>(
     gm: GenerationMode,
-) -> Box<Iterator<Item = (Integer, T)>>
+) -> It<(Integer, T)>
 where
     T::UnsignedOfEqualWidth: Rand,
 {
@@ -200,7 +197,7 @@ where
 
 pub fn nm_pairs_of_integer_and_signed<T: PrimitiveSigned + Rand>(
     gm: GenerationMode,
-) -> Box<Iterator<Item = ((BigInt, T), (Integer, T))>>
+) -> It<((BigInt, T), (Integer, T))>
 where
     T::UnsignedOfEqualWidth: Rand,
 {
@@ -209,7 +206,7 @@ where
 
 pub fn rm_pairs_of_integer_and_signed<T: PrimitiveSigned + Rand>(
     gm: GenerationMode,
-) -> Box<Iterator<Item = ((rug::Integer, T), (Integer, T))>>
+) -> It<((rug::Integer, T), (Integer, T))>
 where
     T::UnsignedOfEqualWidth: Rand,
 {
@@ -220,7 +217,7 @@ where
 
 pub fn nrm_pairs_of_integer_and_signed<T: PrimitiveSigned + Rand>(
     gm: GenerationMode,
-) -> Box<Iterator<Item = ((BigInt, T), (rug::Integer, T), (Integer, T))>>
+) -> It<((BigInt, T), (rug::Integer, T), (Integer, T))>
 where
     T::UnsignedOfEqualWidth: Rand,
 {
@@ -235,7 +232,7 @@ where
 
 pub fn pairs_of_signed_and_integer<T: PrimitiveSigned + Rand>(
     gm: GenerationMode,
-) -> Box<Iterator<Item = (T, Integer)>>
+) -> It<(T, Integer)>
 where
     T::UnsignedOfEqualWidth: Rand,
 {
@@ -254,7 +251,7 @@ where
 
 pub fn rm_pairs_of_signed_and_integer<T: PrimitiveSigned + Rand>(
     gm: GenerationMode,
-) -> Box<Iterator<Item = ((T, rug::Integer), (T, Integer))>>
+) -> It<((T, rug::Integer), (T, Integer))>
 where
     T::UnsignedOfEqualWidth: Rand,
 {
@@ -265,7 +262,7 @@ where
 
 pub fn pairs_of_integer_and_unsigned<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
-) -> Box<Iterator<Item = (Integer, T)>> {
+) -> It<(Integer, T)> {
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_pairs(
             exhaustive_integers(),
@@ -282,7 +279,7 @@ pub fn pairs_of_integer_and_unsigned<T: PrimitiveUnsigned + Rand>(
 
 pub fn rm_pairs_of_integer_and_unsigned<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
-) -> Box<Iterator<Item = ((rug::Integer, T), (Integer, T))>> {
+) -> It<((rug::Integer, T), (Integer, T))> {
     Box::new(
         pairs_of_integer_and_unsigned(gm).map(|(x, y)| ((integer_to_rug_integer(&x), y), (x, y))),
     )
@@ -290,13 +287,13 @@ pub fn rm_pairs_of_integer_and_unsigned<T: PrimitiveUnsigned + Rand>(
 
 pub fn nm_pairs_of_integer_and_unsigned<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
-) -> Box<Iterator<Item = ((BigInt, T), (Integer, T))>> {
+) -> It<((BigInt, T), (Integer, T))> {
     Box::new(pairs_of_integer_and_unsigned(gm).map(|(x, y)| ((integer_to_bigint(&x), y), (x, y))))
 }
 
 pub fn nrm_pairs_of_integer_and_unsigned<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
-) -> Box<Iterator<Item = ((BigInt, T), (rug::Integer, T), (Integer, T))>> {
+) -> It<((BigInt, T), (rug::Integer, T), (Integer, T))> {
     Box::new(pairs_of_integer_and_unsigned(gm).map(|(x, y)| {
         (
             (integer_to_bigint(&x), y),
@@ -308,7 +305,7 @@ pub fn nrm_pairs_of_integer_and_unsigned<T: PrimitiveUnsigned + Rand>(
 
 pub fn pairs_of_integer_and_positive_unsigned<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
-) -> Box<Iterator<Item = (Integer, T)>> {
+) -> It<(Integer, T)> {
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_pairs(
             exhaustive_integers(),
@@ -329,7 +326,7 @@ pub fn pairs_of_integer_and_positive_unsigned<T: PrimitiveUnsigned + Rand>(
 
 pub fn rm_pairs_of_integer_and_positive_unsigned<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
-) -> Box<Iterator<Item = ((rug::Integer, T), (Integer, T))>> {
+) -> It<((rug::Integer, T), (Integer, T))> {
     Box::new(
         pairs_of_integer_and_positive_unsigned(gm)
             .map(|(x, y)| ((integer_to_rug_integer(&x), y), (x, y))),
@@ -338,7 +335,7 @@ pub fn rm_pairs_of_integer_and_positive_unsigned<T: PrimitiveUnsigned + Rand>(
 
 pub fn nrm_pairs_of_integer_and_positive_unsigned<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
-) -> Box<Iterator<Item = ((BigInt, T), (rug::Integer, T), (Integer, T))>> {
+) -> It<((BigInt, T), (rug::Integer, T), (Integer, T))> {
     Box::new(pairs_of_integer_and_positive_unsigned(gm).map(|(x, y)| {
         (
             (integer_to_bigint(&x), y),
@@ -350,7 +347,7 @@ pub fn nrm_pairs_of_integer_and_positive_unsigned<T: PrimitiveUnsigned + Rand>(
 
 pub fn nm_pairs_of_integer_and_positive_unsigned<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
-) -> Box<Iterator<Item = ((BigInt, T), (Integer, T))>> {
+) -> It<((BigInt, T), (Integer, T))> {
     Box::new(
         pairs_of_integer_and_positive_unsigned(gm)
             .map(|(x, y)| ((integer_to_bigint(&x), y), (x, y))),
@@ -359,7 +356,7 @@ pub fn nm_pairs_of_integer_and_positive_unsigned<T: PrimitiveUnsigned + Rand>(
 
 pub fn pairs_of_integer_and_nonzero_signed<T: PrimitiveSigned + Rand>(
     gm: GenerationMode,
-) -> Box<Iterator<Item = (Integer, T)>>
+) -> It<(Integer, T)>
 where
     T::UnsignedOfEqualWidth: Rand,
 {
@@ -383,7 +380,7 @@ where
 
 pub fn rm_pairs_of_integer_and_nonzero_signed<T: PrimitiveSigned + Rand>(
     gm: GenerationMode,
-) -> Box<Iterator<Item = ((rug::Integer, T), (Integer, T))>>
+) -> It<((rug::Integer, T), (Integer, T))>
 where
     T::UnsignedOfEqualWidth: Rand,
 {
@@ -395,7 +392,7 @@ where
 
 pub fn nrm_pairs_of_integer_and_nonzero_signed<T: PrimitiveSigned + Rand>(
     gm: GenerationMode,
-) -> Box<Iterator<Item = ((BigInt, T), (rug::Integer, T), (Integer, T))>>
+) -> It<((BigInt, T), (rug::Integer, T), (Integer, T))>
 where
     T::UnsignedOfEqualWidth: Rand,
 {
@@ -410,7 +407,7 @@ where
 
 pub fn nm_pairs_of_integer_and_nonzero_signed<T: PrimitiveSigned + Rand>(
     gm: GenerationMode,
-) -> Box<Iterator<Item = ((BigInt, T), (Integer, T))>>
+) -> It<((BigInt, T), (Integer, T))>
 where
     T::UnsignedOfEqualWidth: Rand,
 {
@@ -420,15 +417,13 @@ where
 }
 
 // All triples of `Integer` and positive `Limb` where the `Integer` is divisible by the `T`.
-pub fn pairs_of_integer_and_positive_limb_var_1(
-    gm: GenerationMode,
-) -> Box<Iterator<Item = (Integer, Limb)>> {
+pub fn pairs_of_integer_and_positive_limb_var_1(gm: GenerationMode) -> It<(Integer, Limb)> {
     Box::new(pairs_of_integer_and_positive_unsigned(gm).map(|(n, u)| (n * u, u)))
 }
 
 pub fn nrm_pairs_of_integer_and_positive_limb_var_1(
     gm: GenerationMode,
-) -> Box<Iterator<Item = ((BigInt, Limb), (rug::Integer, Limb), (Integer, Limb))>> {
+) -> It<((BigInt, Limb), (rug::Integer, Limb), (Integer, Limb))> {
     Box::new(pairs_of_integer_and_positive_limb_var_1(gm).map(|(x, y)| {
         (
             (integer_to_bigint(&x), y),
@@ -439,15 +434,13 @@ pub fn nrm_pairs_of_integer_and_positive_limb_var_1(
 }
 
 // All pairs of `Integer` and positive `Limb`, where the `Integer` is not divisible by the `Limb`.
-pub fn pairs_of_integer_and_positive_limb_var_2(
-    gm: GenerationMode,
-) -> Box<Iterator<Item = (Integer, Limb)>> {
+pub fn pairs_of_integer_and_positive_limb_var_2(gm: GenerationMode) -> It<(Integer, Limb)> {
     Box::new(pairs_of_integer_and_positive_unsigned(gm).filter(|&(ref n, u)| !n.divisible_by(u)))
 }
 
 pub fn pairs_of_unsigned_and_integer<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
-) -> Box<Iterator<Item = (T, Integer)>> {
+) -> It<(T, Integer)> {
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_pairs(
             exhaustive_unsigned(),
@@ -466,7 +459,7 @@ pub fn pairs_of_unsigned_and_integer<T: PrimitiveUnsigned + Rand>(
 // the `T`.
 pub fn pairs_of_integer_and_nonzero_signed_limb_var_1<T: PrimitiveSigned + Rand>(
     gm: GenerationMode,
-) -> Box<Iterator<Item = (Integer, T)>>
+) -> It<(Integer, T)>
 where
     T::UnsignedOfEqualWidth: Rand,
     Integer: Mul<T, Output = Integer>,
@@ -476,7 +469,7 @@ where
 
 pub fn nrm_pairs_of_integer_and_nonzero_signed_limb_var_1<T: PrimitiveSigned + Rand>(
     gm: GenerationMode,
-) -> Box<Iterator<Item = ((BigInt, T), (rug::Integer, T), (Integer, T))>>
+) -> It<((BigInt, T), (rug::Integer, T), (Integer, T))>
 where
     T::UnsignedOfEqualWidth: Rand,
     Integer: Mul<T, Output = Integer>,
@@ -496,13 +489,13 @@ where
 // `SignedLimb`.
 pub fn pairs_of_integer_and_nonzero_signed_limb_var_2(
     gm: GenerationMode,
-) -> Box<Iterator<Item = (Integer, SignedLimb)>> {
+) -> It<(Integer, SignedLimb)> {
     Box::new(pairs_of_integer_and_nonzero_signed(gm).filter(|&(ref n, i)| !n.divisible_by(i)))
 }
 
 pub fn nrm_pairs_of_unsigned_and_integer<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
-) -> Box<Iterator<Item = ((T, BigInt), (T, rug::Integer), (T, Integer))>> {
+) -> It<((T, BigInt), (T, rug::Integer), (T, Integer))> {
     Box::new(pairs_of_unsigned_and_integer(gm).map(|(x, y)| {
         (
             (x, integer_to_bigint(&y)),
@@ -514,7 +507,7 @@ pub fn nrm_pairs_of_unsigned_and_integer<T: PrimitiveUnsigned + Rand>(
 
 pub fn rm_pairs_of_unsigned_and_integer<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
-) -> Box<Iterator<Item = ((T, rug::Integer), (T, Integer))>> {
+) -> It<((T, rug::Integer), (T, Integer))> {
     Box::new(
         pairs_of_unsigned_and_integer(gm).map(|(x, y)| ((x, integer_to_rug_integer(&y)), (x, y))),
     )
@@ -522,7 +515,7 @@ pub fn rm_pairs_of_unsigned_and_integer<T: PrimitiveUnsigned + Rand>(
 
 pub fn pairs_of_unsigned_and_nonzero_integer<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
-) -> Box<Iterator<Item = (T, Integer)>> {
+) -> It<(T, Integer)> {
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_pairs(
             exhaustive_unsigned(),
@@ -542,18 +535,14 @@ pub fn pairs_of_unsigned_and_nonzero_integer<T: PrimitiveUnsigned + Rand>(
 }
 
 // All pairs of `Limb` and positive `Integer` where the `Limb` is not divisible by the `Integer`.
-pub fn pairs_of_limb_and_nonzero_integer_var_1(
-    gm: GenerationMode,
-) -> Box<Iterator<Item = (Limb, Integer)>> {
+pub fn pairs_of_limb_and_nonzero_integer_var_1(gm: GenerationMode) -> It<(Limb, Integer)> {
     Box::new(
         pairs_of_unsigned_and_nonzero_integer::<Limb>(gm).filter(|&(u, ref n)| !u.divisible_by(n)),
     )
 }
 
 // All pairs of `Limb` and nonzero `Integer` where the `Limb` is divisible by the `Integer`.
-pub fn pairs_of_limb_and_nonzero_integer_var_2(
-    gm: GenerationMode,
-) -> Box<Iterator<Item = (Limb, Integer)>> {
+pub fn pairs_of_limb_and_nonzero_integer_var_2(gm: GenerationMode) -> It<(Limb, Integer)> {
     Box::new(
         pairs_of_unsigned_and_nonzero_integer::<Limb>(gm)
             .filter_map(|(u, n)| Limb::checked_from(u * (&n).abs()).map(|u| (u, n))),
@@ -562,7 +551,7 @@ pub fn pairs_of_limb_and_nonzero_integer_var_2(
 
 pub fn pairs_of_signed_and_nonzero_integer<T: PrimitiveSigned + Rand>(
     gm: GenerationMode,
-) -> Box<Iterator<Item = (T, Integer)>>
+) -> It<(T, Integer)>
 where
     T::UnsignedOfEqualWidth: Rand,
 {
@@ -588,7 +577,7 @@ where
 // `Integer`.
 pub fn pairs_of_signed_limb_and_nonzero_integer_var_1(
     gm: GenerationMode,
-) -> Box<Iterator<Item = (SignedLimb, Integer)>> {
+) -> It<(SignedLimb, Integer)> {
     Box::new(
         pairs_of_signed_and_nonzero_integer::<SignedLimb>(gm)
             .filter(|&(i, ref n)| !i.divisible_by(n)),
@@ -599,7 +588,7 @@ pub fn pairs_of_signed_limb_and_nonzero_integer_var_1(
 // `Integer`.
 pub fn pairs_of_signed_limb_and_nonzero_integer_var_2(
     gm: GenerationMode,
-) -> Box<Iterator<Item = (SignedLimb, Integer)>> {
+) -> It<(SignedLimb, Integer)> {
     Box::new(
         pairs_of_signed_and_nonzero_integer::<SignedLimb>(gm)
             .filter_map(|(i, n)| SignedLimb::checked_from(i * (&n).abs()).map(|i| (i, n))),
@@ -608,7 +597,7 @@ pub fn pairs_of_signed_limb_and_nonzero_integer_var_2(
 
 pub fn pairs_of_natural_integer_and_unsigned<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
-) -> Box<Iterator<Item = (Integer, T)>> {
+) -> It<(Integer, T)> {
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_pairs(
             exhaustive_natural_integers(),
@@ -629,7 +618,7 @@ pub fn pairs_of_natural_integer_and_unsigned<T: PrimitiveUnsigned + Rand>(
 
 fn random_triples_of_integer_integer_and_primitive<T: PrimitiveInteger + Rand>(
     scale: u32,
-) -> Box<Iterator<Item = (Integer, Integer, T)>> {
+) -> It<(Integer, Integer, T)> {
     Box::new(random_triples(
         &EXAMPLE_SEED,
         &(|seed| random_integers(seed, scale)),
@@ -640,7 +629,7 @@ fn random_triples_of_integer_integer_and_primitive<T: PrimitiveInteger + Rand>(
 
 pub fn triples_of_integer_integer_and_signed<T: PrimitiveSigned + Rand>(
     gm: GenerationMode,
-) -> Box<Iterator<Item = (Integer, Integer, T)>>
+) -> It<(Integer, Integer, T)>
 where
     T::UnsignedOfEqualWidth: Rand,
 {
@@ -662,7 +651,7 @@ where
 
 pub fn triples_of_integer_integer_and_unsigned<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
-) -> Box<Iterator<Item = (Integer, Integer, T)>> {
+) -> It<(Integer, Integer, T)> {
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_triples(
             exhaustive_integers(),
@@ -681,7 +670,7 @@ pub fn triples_of_integer_integer_and_unsigned<T: PrimitiveUnsigned + Rand>(
 
 pub fn triples_of_natural_integer_unsigned_and_unsigned<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
-) -> Box<Iterator<Item = (Integer, T, T)>> {
+) -> It<(Integer, T, T)> {
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_triples(
             exhaustive_natural_integers(),
@@ -705,7 +694,7 @@ pub fn triples_of_natural_integer_unsigned_and_unsigned<T: PrimitiveUnsigned + R
 
 pub fn triples_of_natural_integer_natural_signed_and_natural_signed<T: PrimitiveSigned + Rand>(
     gm: GenerationMode,
-) -> Box<Iterator<Item = (Integer, T, T)>>
+) -> It<(Integer, T, T)>
 where
     T::UnsignedOfEqualWidth: Rand,
 {
@@ -732,7 +721,7 @@ where
 
 pub fn triples_of_natural_integer_natural_integer_and_natural_signed<T: PrimitiveSigned + Rand>(
     gm: GenerationMode,
-) -> Box<Iterator<Item = (Integer, Integer, T)>>
+) -> It<(Integer, Integer, T)>
 where
     T::UnsignedOfEqualWidth: Rand,
 {
@@ -757,13 +746,13 @@ where
     }
 }
 
-fn log_pairs_of_integer_and_unsigned<T: PrimitiveUnsigned>() -> Box<Iterator<Item = (Integer, T)>> {
+fn log_pairs_of_integer_and_unsigned<T: PrimitiveUnsigned>() -> It<(Integer, T)> {
     Box::new(log_pairs(exhaustive_integers(), exhaustive_unsigned()))
 }
 
 pub fn pairs_of_integer_and_small_unsigned<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
-) -> Box<Iterator<Item = (Integer, T)>> {
+) -> It<(Integer, T)> {
     match gm {
         GenerationMode::Exhaustive => log_pairs_of_integer_and_unsigned(),
         GenerationMode::Random(scale) => Box::new(random_pairs(
@@ -781,7 +770,7 @@ pub fn pairs_of_integer_and_small_unsigned<T: PrimitiveUnsigned + Rand>(
 
 pub fn rm_pairs_of_integer_and_small_unsigned<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
-) -> Box<Iterator<Item = ((rug::Integer, T), (Integer, T))>> {
+) -> It<((rug::Integer, T), (Integer, T))> {
     Box::new(
         pairs_of_integer_and_small_unsigned(gm)
             .map(|(x, y)| ((integer_to_rug_integer(&x), y), (x, y))),
@@ -792,7 +781,7 @@ pub fn rm_pairs_of_integer_and_small_unsigned<T: PrimitiveUnsigned + Rand>(
 // power of the `T`.
 pub fn pairs_of_integer_and_small_unsigned_var_1<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
-) -> Box<Iterator<Item = (Integer, T)>>
+) -> It<(Integer, T)>
 where
     Integer: Shl<T, Output = Integer>,
 {
@@ -803,14 +792,14 @@ where
 // the power of the `T`.
 pub fn pairs_of_integer_and_small_unsigned_var_2<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
-) -> Box<Iterator<Item = (Integer, T)>> {
+) -> It<(Integer, T)> {
     Box::new(
         pairs_of_integer_and_small_unsigned::<T>(gm)
             .filter(|&(ref n, u)| !n.divisible_by_power_of_two(u.checked_into().unwrap())),
     )
 }
 
-pub fn pairs_of_integer_and_small_u64(gm: GenerationMode) -> Box<Iterator<Item = (Integer, u64)>> {
+pub fn pairs_of_integer_and_small_u64(gm: GenerationMode) -> It<(Integer, u64)> {
     match gm {
         GenerationMode::Exhaustive => log_pairs_of_integer_and_unsigned(),
         GenerationMode::Random(scale) => Box::new(random_pairs(
@@ -828,7 +817,7 @@ pub fn pairs_of_integer_and_small_u64(gm: GenerationMode) -> Box<Iterator<Item =
 
 pub fn rm_pairs_of_integer_and_small_u64(
     gm: GenerationMode,
-) -> Box<Iterator<Item = ((rug::Integer, u64), (Integer, u64))>> {
+) -> It<((rug::Integer, u64), (Integer, u64))> {
     Box::new(
         pairs_of_integer_and_small_u64(gm).map(|(x, y)| ((integer_to_rug_integer(&x), y), (x, y))),
     )
@@ -836,13 +825,13 @@ pub fn rm_pairs_of_integer_and_small_u64(
 
 pub fn nm_pairs_of_integer_and_small_u64(
     gm: GenerationMode,
-) -> Box<Iterator<Item = ((BigInt, u64), (Integer, u64))>> {
+) -> It<((BigInt, u64), (Integer, u64))> {
     Box::new(pairs_of_integer_and_small_u64(gm).map(|(x, y)| ((integer_to_bigint(&x), y), (x, y))))
 }
 
 pub fn nrm_pairs_of_integer_and_small_u64(
     gm: GenerationMode,
-) -> Box<Iterator<Item = ((BigInt, u64), (rug::Integer, u64), (Integer, u64))>> {
+) -> It<((BigInt, u64), (rug::Integer, u64), (Integer, u64))> {
     Box::new(pairs_of_integer_and_small_u64(gm).map(|(x, y)| {
         (
             (integer_to_bigint(&x), y),
@@ -852,9 +841,7 @@ pub fn nrm_pairs_of_integer_and_small_u64(
     }))
 }
 
-pub fn pairs_of_integer_and_small_usize(
-    gm: GenerationMode,
-) -> Box<Iterator<Item = (Integer, usize)>> {
+pub fn pairs_of_integer_and_small_usize(gm: GenerationMode) -> It<(Integer, usize)> {
     Box::new(pairs_of_integer_and_small_unsigned::<u64>(gm).map(|(n, u)| (n, u as usize)))
 }
 
@@ -863,7 +850,7 @@ pub fn triples_of_integer_small_unsigned_and_small_unsigned<
     U: PrimitiveUnsigned + Rand,
 >(
     gm: GenerationMode,
-) -> Box<Iterator<Item = (Integer, T, U)>> {
+) -> It<(Integer, T, U)> {
     match gm {
         GenerationMode::Exhaustive => reshape_1_2_to_3(Box::new(log_pairs(
             exhaustive_integers(),
@@ -886,7 +873,7 @@ pub fn triples_of_integer_small_unsigned_and_small_unsigned<
 
 pub fn triples_of_integer_integer_and_positive_unsigned<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
-) -> Box<Iterator<Item = (Integer, Integer, T)>> {
+) -> It<(Integer, Integer, T)> {
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_triples(
             exhaustive_integers(),
@@ -910,7 +897,7 @@ pub fn triples_of_integer_integer_and_positive_unsigned<T: PrimitiveUnsigned + R
 
 pub fn triples_of_integer_integer_and_nonzero_signed<T: PrimitiveSigned + Rand>(
     gm: GenerationMode,
-) -> Box<Iterator<Item = (Integer, Integer, T)>>
+) -> It<(Integer, Integer, T)>
 where
     T::UnsignedOfEqualWidth: Rand,
 {
@@ -935,13 +922,13 @@ where
     }
 }
 
-fn log_pairs_of_integer_and_signed<T: PrimitiveSigned>() -> Box<Iterator<Item = (Integer, T)>> {
+fn log_pairs_of_integer_and_signed<T: PrimitiveSigned>() -> It<(Integer, T)> {
     Box::new(log_pairs(exhaustive_integers(), exhaustive_signed()))
 }
 
 pub fn pairs_of_integer_and_small_signed<T: PrimitiveSigned + Rand>(
     gm: GenerationMode,
-) -> Box<Iterator<Item = (Integer, T)>> {
+) -> It<(Integer, T)> {
     match gm {
         GenerationMode::Exhaustive => log_pairs_of_integer_and_signed(),
         GenerationMode::Random(scale) => Box::new(random_pairs(
@@ -959,7 +946,7 @@ pub fn pairs_of_integer_and_small_signed<T: PrimitiveSigned + Rand>(
 
 pub fn rm_pairs_of_integer_and_small_signed<T: PrimitiveSigned + Rand>(
     gm: GenerationMode,
-) -> Box<Iterator<Item = ((rug::Integer, T), (Integer, T))>> {
+) -> It<((rug::Integer, T), (Integer, T))> {
     Box::new(
         pairs_of_integer_and_small_signed(gm)
             .map(|(x, y)| ((integer_to_rug_integer(&x), y), (x, y))),
@@ -968,7 +955,7 @@ pub fn rm_pairs_of_integer_and_small_signed<T: PrimitiveSigned + Rand>(
 
 fn random_triples_of_integer_primitive_and_integer<T: PrimitiveInteger + Rand>(
     scale: u32,
-) -> Box<Iterator<Item = (Integer, T, Integer)>> {
+) -> It<(Integer, T, Integer)> {
     Box::new(random_triples(
         &EXAMPLE_SEED,
         &(|seed| random_integers(seed, scale)),
@@ -979,7 +966,7 @@ fn random_triples_of_integer_primitive_and_integer<T: PrimitiveInteger + Rand>(
 
 fn random_triples_of_primitive_integer_and_primitive<T: PrimitiveInteger + Rand>(
     scale: u32,
-) -> Box<Iterator<Item = (T, Integer, T)>> {
+) -> It<(T, Integer, T)> {
     Box::new(random_triples(
         &EXAMPLE_SEED,
         &(|seed| random(seed)),
@@ -990,7 +977,7 @@ fn random_triples_of_primitive_integer_and_primitive<T: PrimitiveInteger + Rand>
 
 fn random_triples_of_primitive_primitive_and_integer<T: PrimitiveInteger + Rand>(
     scale: u32,
-) -> Box<Iterator<Item = (T, T, Integer)>> {
+) -> It<(T, T, Integer)> {
     Box::new(random_triples(
         &EXAMPLE_SEED,
         &(|seed| random(seed)),
@@ -1001,7 +988,7 @@ fn random_triples_of_primitive_primitive_and_integer<T: PrimitiveInteger + Rand>
 
 fn random_triples_of_integer_primitive_and_primitive<T: PrimitiveInteger + Rand>(
     scale: u32,
-) -> Box<Iterator<Item = (Integer, T, T)>> {
+) -> It<(Integer, T, T)> {
     Box::new(random_triples(
         &EXAMPLE_SEED,
         &(|seed| random_integers(seed, scale)),
@@ -1012,7 +999,7 @@ fn random_triples_of_integer_primitive_and_primitive<T: PrimitiveInteger + Rand>
 
 pub fn triples_of_integer_unsigned_and_integer<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
-) -> Box<Iterator<Item = (Integer, T, Integer)>> {
+) -> It<(Integer, T, Integer)> {
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_triples(
             exhaustive_integers(),
@@ -1031,7 +1018,7 @@ pub fn triples_of_integer_unsigned_and_integer<T: PrimitiveUnsigned + Rand>(
 
 pub fn triples_of_unsigned_integer_and_unsigned<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
-) -> Box<Iterator<Item = (T, Integer, T)>> {
+) -> It<(T, Integer, T)> {
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_triples(
             exhaustive_unsigned(),
@@ -1050,7 +1037,7 @@ pub fn triples_of_unsigned_integer_and_unsigned<T: PrimitiveUnsigned + Rand>(
 
 pub fn triples_of_integer_unsigned_and_unsigned<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
-) -> Box<Iterator<Item = (Integer, T, T)>> {
+) -> It<(Integer, T, T)> {
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_triples(
             exhaustive_integers(),
@@ -1069,7 +1056,7 @@ pub fn triples_of_integer_unsigned_and_unsigned<T: PrimitiveUnsigned + Rand>(
 
 pub fn rm_triples_of_integer_unsigned_and_unsigned<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
-) -> Box<Iterator<Item = ((rug::Integer, T, T), (Integer, T, T))>> {
+) -> It<((rug::Integer, T, T), (Integer, T, T))> {
     Box::new(
         triples_of_integer_unsigned_and_unsigned(gm)
             .map(|(x, y, z)| ((integer_to_rug_integer(&x), y, z), (x, y, z))),
@@ -1080,7 +1067,7 @@ pub fn rm_triples_of_integer_unsigned_and_unsigned<T: PrimitiveUnsigned + Rand>(
 // `T` mod the second `T`.
 pub fn triples_of_integer_unsigned_and_unsigned_var_1<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
-) -> Box<Iterator<Item = (Integer, T, T)>>
+) -> It<(Integer, T, T)>
 where
     Integer: Mul<T, Output = Integer> + Add<T, Output = Integer>,
 {
@@ -1094,7 +1081,7 @@ where
 // first `T` mod the second `T`.
 pub fn triples_of_integer_unsigned_and_unsigned_var_2<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
-) -> Box<Iterator<Item = (Integer, T, T)>> {
+) -> It<(Integer, T, T)> {
     Box::new(
         triples_of_integer_unsigned_and_unsigned::<T>(gm).filter(|&(ref n, u, modulus)| {
             let u: Limb = u.checked_into().unwrap();
@@ -1106,7 +1093,7 @@ pub fn triples_of_integer_unsigned_and_unsigned_var_2<T: PrimitiveUnsigned + Ran
 
 pub fn triples_of_unsigned_unsigned_and_integer<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
-) -> Box<Iterator<Item = (T, T, Integer)>> {
+) -> It<(T, T, Integer)> {
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_triples(
             exhaustive_unsigned(),
@@ -1125,7 +1112,7 @@ pub fn triples_of_unsigned_unsigned_and_integer<T: PrimitiveUnsigned + Rand>(
 
 pub fn triples_of_signed_signed_and_integer<T: PrimitiveSigned + Rand>(
     gm: GenerationMode,
-) -> Box<Iterator<Item = (T, T, Integer)>>
+) -> It<(T, T, Integer)>
 where
     T::UnsignedOfEqualWidth: Rand,
 {
@@ -1147,7 +1134,7 @@ where
 
 pub fn triples_of_integer_signed_and_signed<T: PrimitiveSigned + Rand>(
     gm: GenerationMode,
-) -> Box<Iterator<Item = (Integer, T, T)>>
+) -> It<(Integer, T, T)>
 where
     T::UnsignedOfEqualWidth: Rand,
 {
@@ -1169,7 +1156,7 @@ where
 
 pub fn rm_triples_of_integer_signed_and_signed<T: PrimitiveSigned + Rand>(
     gm: GenerationMode,
-) -> Box<Iterator<Item = ((rug::Integer, T, T), (Integer, T, T))>>
+) -> It<((rug::Integer, T, T), (Integer, T, T))>
 where
     T::UnsignedOfEqualWidth: Rand,
 {
@@ -1183,7 +1170,7 @@ where
 // `T` mod the second `T`.
 pub fn triples_of_integer_signed_and_signed_var_1<T: PrimitiveSigned + Rand>(
     gm: GenerationMode,
-) -> Box<Iterator<Item = (Integer, T, T)>>
+) -> It<(Integer, T, T)>
 where
     Integer: Mul<T, Output = Integer> + Add<T, Output = Integer>,
     T::UnsignedOfEqualWidth: Rand,
@@ -1198,7 +1185,7 @@ where
 // first `T` mod the second `T`.
 pub fn triples_of_integer_signed_and_signed_var_2<T: PrimitiveSigned + Rand>(
     gm: GenerationMode,
-) -> Box<Iterator<Item = (Integer, T, T)>>
+) -> It<(Integer, T, T)>
 where
     T::UnsignedOfEqualWidth: Rand,
 {
@@ -1213,7 +1200,7 @@ where
 
 pub fn triples_of_integer_signed_and_integer<T: PrimitiveSigned + Rand>(
     gm: GenerationMode,
-) -> Box<Iterator<Item = (Integer, T, Integer)>>
+) -> It<(Integer, T, Integer)>
 where
     T::UnsignedOfEqualWidth: Rand,
 {
@@ -1235,7 +1222,7 @@ where
 
 pub fn triples_of_signed_integer_and_signed<T: PrimitiveSigned + Rand>(
     gm: GenerationMode,
-) -> Box<Iterator<Item = (T, Integer, T)>>
+) -> It<(T, Integer, T)>
 where
     T::UnsignedOfEqualWidth: Rand,
 {
@@ -1260,7 +1247,7 @@ pub fn triples_of_integer_unsigned_and_small_unsigned<
     U: PrimitiveUnsigned + Rand,
 >(
     gm: GenerationMode,
-) -> Box<Iterator<Item = (Integer, T, U)>> {
+) -> It<(Integer, T, U)> {
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_triples(
             exhaustive_integers(),
@@ -1287,7 +1274,7 @@ pub fn rm_triples_of_integer_unsigned_and_small_unsigned<
     U: PrimitiveUnsigned + Rand,
 >(
     gm: GenerationMode,
-) -> Box<Iterator<Item = ((rug::Integer, T, U), (Integer, T, U))>> {
+) -> It<((rug::Integer, T, U), (Integer, T, U))> {
     Box::new(
         triples_of_integer_unsigned_and_small_unsigned(gm)
             .map(|(x, y, z)| ((integer_to_rug_integer(&x), y, z), (x, y, z))),
@@ -1301,7 +1288,7 @@ pub fn triples_of_integer_unsigned_and_small_unsigned_var_1<
     U: PrimitiveUnsigned + Rand,
 >(
     gm: GenerationMode,
-) -> Box<Iterator<Item = (Integer, T, U)>>
+) -> It<(Integer, T, U)>
 where
     Integer: Shl<U, Output = Integer> + Add<T, Output = Integer>,
 {
@@ -1315,7 +1302,7 @@ where
 // equal to the `Limb` mod 2 to the power of the `T`.
 pub fn triples_of_integer_limb_and_small_unsigned_var_2<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
-) -> Box<Iterator<Item = (Integer, Limb, T)>> {
+) -> It<(Integer, Limb, T)> {
     Box::new(
         triples_of_integer_unsigned_and_small_unsigned::<Limb, T>(gm)
             .filter(|&(ref n, u, pow)| !n.eq_mod_power_of_two(u, pow.checked_into().unwrap())),
@@ -1327,7 +1314,7 @@ pub fn triples_of_unsigned_integer_and_small_unsigned<
     U: PrimitiveUnsigned + Rand,
 >(
     gm: GenerationMode,
-) -> Box<Iterator<Item = (T, Integer, U)>> {
+) -> It<(T, Integer, U)> {
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_triples(
             exhaustive_unsigned(),
@@ -1354,7 +1341,7 @@ pub fn triples_of_integer_signed_and_small_unsigned<
     U: PrimitiveUnsigned + Rand,
 >(
     gm: GenerationMode,
-) -> Box<Iterator<Item = (Integer, T, U)>>
+) -> It<(Integer, T, U)>
 where
     T::UnsignedOfEqualWidth: Rand,
 {
@@ -1384,7 +1371,7 @@ pub fn rm_triples_of_integer_signed_and_small_unsigned<
     U: PrimitiveUnsigned + Rand,
 >(
     gm: GenerationMode,
-) -> Box<Iterator<Item = ((rug::Integer, T, U), (Integer, T, U))>>
+) -> It<((rug::Integer, T, U), (Integer, T, U))>
 where
     T::UnsignedOfEqualWidth: Rand,
 {
@@ -1401,7 +1388,7 @@ pub fn triples_of_integer_signed_and_small_unsigned_var_1<
     U: PrimitiveUnsigned + Rand,
 >(
     gm: GenerationMode,
-) -> Box<Iterator<Item = (Integer, T, U)>>
+) -> It<(Integer, T, U)>
 where
     Integer: Shl<U, Output = Integer> + Add<T, Output = Integer>,
     T::UnsignedOfEqualWidth: Rand,
@@ -1416,7 +1403,7 @@ where
 // not equal to the `SignedLimb` mod 2 to the power of the `T`.
 pub fn triples_of_integer_signed_limb_and_small_unsigned_var_2<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
-) -> Box<Iterator<Item = (Integer, SignedLimb, T)>> {
+) -> It<(Integer, SignedLimb, T)> {
     Box::new(
         triples_of_integer_signed_and_small_unsigned::<SignedLimb, T>(gm)
             .filter(|&(ref n, i, pow)| !n.eq_mod_power_of_two(i, pow.checked_into().unwrap())),
@@ -1428,7 +1415,7 @@ pub fn triples_of_signed_integer_and_small_unsigned<
     U: PrimitiveUnsigned + Rand,
 >(
     gm: GenerationMode,
-) -> Box<Iterator<Item = (T, Integer, U)>>
+) -> It<(T, Integer, U)>
 where
     T::UnsignedOfEqualWidth: Rand,
 {
@@ -1453,9 +1440,7 @@ where
     }
 }
 
-pub fn pairs_of_integer_and_natural(
-    gm: GenerationMode,
-) -> Box<Iterator<Item = (Integer, Natural)>> {
+pub fn pairs_of_integer_and_natural(gm: GenerationMode) -> It<(Integer, Natural)> {
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_pairs(
             exhaustive_integers(),
@@ -1476,7 +1461,7 @@ pub fn pairs_of_integer_and_natural(
 
 pub fn rm_pairs_of_integer_and_natural(
     gm: GenerationMode,
-) -> Box<Iterator<Item = ((rug::Integer, rug::Integer), (Integer, Natural))>> {
+) -> It<((rug::Integer, rug::Integer), (Integer, Natural))> {
     Box::new(pairs_of_integer_and_natural(gm).map(|(x, y)| {
         (
             (integer_to_rug_integer(&x), natural_to_rug_integer(&y)),
@@ -1485,9 +1470,7 @@ pub fn rm_pairs_of_integer_and_natural(
     }))
 }
 
-pub fn pairs_of_natural_and_integer(
-    gm: GenerationMode,
-) -> Box<Iterator<Item = (Natural, Integer)>> {
+pub fn pairs_of_natural_and_integer(gm: GenerationMode) -> It<(Natural, Integer)> {
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_pairs(
             exhaustive_naturals(),
@@ -1508,7 +1491,7 @@ pub fn pairs_of_natural_and_integer(
 
 pub fn rm_pairs_of_natural_and_integer(
     gm: GenerationMode,
-) -> Box<Iterator<Item = ((rug::Integer, rug::Integer), (Natural, Integer))>> {
+) -> It<((rug::Integer, rug::Integer), (Natural, Integer))> {
     Box::new(pairs_of_natural_and_integer(gm).map(|(x, y)| {
         (
             (natural_to_rug_integer(&x), integer_to_rug_integer(&y)),
@@ -1517,9 +1500,7 @@ pub fn rm_pairs_of_natural_and_integer(
     }))
 }
 
-pub fn pairs_of_natural_and_natural_integer(
-    gm: GenerationMode,
-) -> Box<Iterator<Item = (Natural, Integer)>> {
+pub fn pairs_of_natural_and_natural_integer(gm: GenerationMode) -> It<(Natural, Integer)> {
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_pairs(
             exhaustive_naturals(),
@@ -1540,7 +1521,7 @@ pub fn pairs_of_natural_and_natural_integer(
 
 pub fn rm_pairs_of_natural_and_natural_integer(
     gm: GenerationMode,
-) -> Box<Iterator<Item = ((rug::Integer, rug::Integer), (Natural, Integer))>> {
+) -> It<((rug::Integer, rug::Integer), (Natural, Integer))> {
     Box::new(pairs_of_natural_and_natural_integer(gm).map(|(x, y)| {
         (
             (natural_to_rug_integer(&x), integer_to_rug_integer(&y)),
@@ -1551,7 +1532,7 @@ pub fn rm_pairs_of_natural_and_natural_integer(
 
 pub fn triples_of_integer_natural_and_integer(
     gm: GenerationMode,
-) -> Box<Iterator<Item = (Integer, Natural, Integer)>> {
+) -> It<(Integer, Natural, Integer)> {
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_triples(
             exhaustive_integers(),
@@ -1575,7 +1556,7 @@ pub fn triples_of_integer_natural_and_integer(
 
 pub fn triples_of_natural_integer_and_natural(
     gm: GenerationMode,
-) -> Box<Iterator<Item = (Natural, Integer, Natural)>> {
+) -> It<(Natural, Integer, Natural)> {
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_triples(
             exhaustive_naturals(),
@@ -1599,7 +1580,7 @@ pub fn triples_of_natural_integer_and_natural(
 
 pub fn triples_of_integer_integer_and_small_unsigned<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
-) -> Box<Iterator<Item = (Integer, Integer, T)>> {
+) -> It<(Integer, Integer, T)> {
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_triples(
             exhaustive_integers(),
@@ -1623,7 +1604,7 @@ pub fn triples_of_integer_integer_and_small_unsigned<T: PrimitiveUnsigned + Rand
 
 pub fn rm_triples_of_integer_integer_and_small_unsigned<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
-) -> Box<Iterator<Item = ((rug::Integer, rug::Integer, T), (Integer, Integer, T))>> {
+) -> It<((rug::Integer, rug::Integer, T), (Integer, Integer, T))> {
     Box::new(
         triples_of_integer_integer_and_small_unsigned(gm).map(|(x, y, z)| {
             (
@@ -1638,7 +1619,7 @@ pub fn rm_triples_of_integer_integer_and_small_unsigned<T: PrimitiveUnsigned + R
 // equal mod 2 to the power of the `T`.
 pub fn triples_of_integer_integer_and_small_unsigned_var_1<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
-) -> Box<Iterator<Item = (Integer, Integer, T)>>
+) -> It<(Integer, Integer, T)>
 where
     Integer: Shl<T, Output = Integer>,
 {
@@ -1652,16 +1633,14 @@ where
 // not equal mod 2 to the power of the `T`.
 pub fn triples_of_integer_integer_and_small_unsigned_var_2<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
-) -> Box<Iterator<Item = (Integer, Integer, T)>> {
+) -> It<(Integer, Integer, T)> {
     Box::new(
         triples_of_integer_integer_and_small_unsigned::<T>(gm)
             .filter(|&(ref x, ref y, pow)| !x.eq_mod_power_of_two(y, pow.checked_into().unwrap())),
     )
 }
 
-pub fn triples_of_integer_small_u64_and_bool(
-    gm: GenerationMode,
-) -> Box<Iterator<Item = (Integer, u64, bool)>> {
+pub fn triples_of_integer_small_u64_and_bool(gm: GenerationMode) -> It<(Integer, u64, bool)> {
     match gm {
         GenerationMode::Exhaustive => reshape_2_1_to_3(Box::new(lex_pairs(
             exhaustive_pairs(exhaustive_integers(), exhaustive_unsigned()),
@@ -1684,16 +1663,14 @@ pub fn triples_of_integer_small_u64_and_bool(
 
 pub fn rm_triples_of_integer_small_u64_and_bool(
     gm: GenerationMode,
-) -> Box<Iterator<Item = ((rug::Integer, u64, bool), (Integer, u64, bool))>> {
+) -> It<((rug::Integer, u64, bool), (Integer, u64, bool))> {
     Box::new(
         triples_of_integer_small_u64_and_bool(gm)
             .map(|(x, y, z)| ((integer_to_rug_integer(&x), y, z), (x, y, z))),
     )
 }
 
-pub fn pairs_of_integer_and_rounding_mode(
-    gm: GenerationMode,
-) -> Box<Iterator<Item = (Integer, RoundingMode)>> {
+pub fn pairs_of_integer_and_rounding_mode(gm: GenerationMode) -> It<(Integer, RoundingMode)> {
     match gm {
         GenerationMode::Exhaustive => Box::new(lex_pairs(
             exhaustive_integers(),
@@ -1714,7 +1691,7 @@ pub fn pairs_of_integer_and_rounding_mode(
 
 pub fn pairs_of_nonzero_integer_and_rounding_mode(
     gm: GenerationMode,
-) -> Box<Iterator<Item = (Integer, RoundingMode)>> {
+) -> It<(Integer, RoundingMode)> {
     match gm {
         GenerationMode::Exhaustive => Box::new(lex_pairs(
             exhaustive_nonzero_integers(),
@@ -1735,7 +1712,7 @@ pub fn pairs_of_nonzero_integer_and_rounding_mode(
 
 fn triples_of_integer_small_signed_and_rounding_mode<T: PrimitiveSigned + Rand>(
     gm: GenerationMode,
-) -> Box<Iterator<Item = (Integer, T, RoundingMode)>> {
+) -> It<(Integer, T, RoundingMode)> {
     match gm {
         GenerationMode::Exhaustive => reshape_2_1_to_3(Box::new(lex_pairs(
             log_pairs_of_integer_and_signed(),
@@ -1761,7 +1738,7 @@ fn triples_of_integer_small_signed_and_rounding_mode<T: PrimitiveSigned + Rand>(
 // to the power of the negative of the `T`.
 pub fn triples_of_integer_small_signed_and_rounding_mode_var_1<T: PrimitiveSigned + Rand>(
     gm: GenerationMode,
-) -> Box<Iterator<Item = (Integer, T, RoundingMode)>>
+) -> It<(Integer, T, RoundingMode)>
 where
     Integer: Shr<T, Output = Integer>,
 {
@@ -1776,7 +1753,7 @@ where
 // divisible by 2 to the power of the `T`.
 pub fn triples_of_integer_small_signed_and_rounding_mode_var_2<T: PrimitiveSigned + Rand>(
     gm: GenerationMode,
-) -> Box<Iterator<Item = (Integer, T, RoundingMode)>>
+) -> It<(Integer, T, RoundingMode)>
 where
     Integer: Shl<T, Output = Integer>,
 {
@@ -1788,7 +1765,7 @@ where
 
 fn triples_of_integer_small_unsigned_and_rounding_mode<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
-) -> Box<Iterator<Item = (Integer, T, RoundingMode)>> {
+) -> It<(Integer, T, RoundingMode)> {
     match gm {
         GenerationMode::Exhaustive => reshape_2_1_to_3(Box::new(lex_pairs(
             log_pairs_of_integer_and_unsigned(),
@@ -1813,7 +1790,7 @@ fn triples_of_integer_small_unsigned_and_rounding_mode<T: PrimitiveUnsigned + Ra
 // `RoundingMode` is `RoundingMode::Exact`, the `Integer` is divisible by 2 to the power of the `T`.
 pub fn triples_of_integer_small_unsigned_and_rounding_mode_var_1<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
-) -> Box<Iterator<Item = (Integer, T, RoundingMode)>>
+) -> It<(Integer, T, RoundingMode)>
 where
     Integer: Shl<T, Output = Integer>,
 {
@@ -1829,7 +1806,7 @@ where
 }
 
 struct RandomIntegerAndVecOfBoolVar1 {
-    integers: Box<Iterator<Item = Integer>>,
+    integers: It<Integer>,
     rng: Box<IsaacRng>,
 }
 
@@ -1868,9 +1845,7 @@ fn special_random_pairs_of_integer_and_vec_of_bool_var_1(
 
 // All pairs of `Integer` and `Vec<bool>` where the length of the `Vec` is equal to the twos'
 // complement limb count of the `Integer` (including sign extension limbs, if necessary).
-pub fn pairs_of_integer_and_vec_of_bool_var_1(
-    gm: GenerationMode,
-) -> Box<Iterator<Item = (Integer, Vec<bool>)>> {
+pub fn pairs_of_integer_and_vec_of_bool_var_1(gm: GenerationMode) -> It<(Integer, Vec<bool>)> {
     match gm {
         GenerationMode::Exhaustive => {
             let f = move |i: &Integer| {
@@ -1892,7 +1867,7 @@ pub fn pairs_of_integer_and_vec_of_bool_var_1(
 }
 
 struct RandomIntegerAndVecOfBoolVar2 {
-    integers: Box<Iterator<Item = Integer>>,
+    integers: It<Integer>,
     rng: Box<IsaacRng>,
 }
 
@@ -1931,9 +1906,7 @@ fn special_random_pairs_of_integer_and_vec_of_bool_var_2(
 
 // All pairs of `Integer` and `Vec<bool>` where the length of the `Vec` is equal to the two's
 // complement bit count of the `Integer`.
-pub fn pairs_of_integer_and_vec_of_bool_var_2(
-    gm: GenerationMode,
-) -> Box<Iterator<Item = (Integer, Vec<bool>)>> {
+pub fn pairs_of_integer_and_vec_of_bool_var_2(gm: GenerationMode) -> It<(Integer, Vec<bool>)> {
     match gm {
         GenerationMode::Exhaustive => {
             let f = move |n: &Integer| {
@@ -1956,7 +1929,7 @@ pub fn pairs_of_integer_and_vec_of_bool_var_2(
 
 pub fn quadruples_of_integer_integer_integer_and_small_unsigned<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
-) -> Box<Iterator<Item = (Integer, Integer, Integer, T)>> {
+) -> It<(Integer, Integer, Integer, T)> {
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_quadruples(
             exhaustive_integers(),
@@ -1983,7 +1956,7 @@ pub fn quadruples_of_integer_integer_integer_and_small_unsigned<T: PrimitiveUnsi
 
 fn triples_of_integer_positive_unsigned_and_rounding_mode<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
-) -> Box<Iterator<Item = (Integer, T, RoundingMode)>> {
+) -> It<(Integer, T, RoundingMode)> {
     match gm {
         GenerationMode::Exhaustive => reshape_2_1_to_3(Box::new(lex_pairs(
             exhaustive_pairs(exhaustive_integers(), exhaustive_positive()),
@@ -2008,7 +1981,7 @@ fn triples_of_integer_positive_unsigned_and_rounding_mode<T: PrimitiveUnsigned +
 // `RoundingMode` is `RoundingMode::Exact`, the `Integer` is divisible by the `T`.
 pub fn triples_of_integer_positive_unsigned_and_rounding_mode_var_1<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
-) -> Box<Iterator<Item = (Integer, T, RoundingMode)>>
+) -> It<(Integer, T, RoundingMode)>
 where
     Integer: Mul<T, Output = Integer>,
 {
@@ -2025,7 +1998,7 @@ where
 
 fn triples_of_unsigned_nonzero_integer_and_rounding_mode<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
-) -> Box<Iterator<Item = (T, Integer, RoundingMode)>> {
+) -> It<(T, Integer, RoundingMode)> {
     match gm {
         GenerationMode::Exhaustive => reshape_2_1_to_3(Box::new(lex_pairs(
             exhaustive_pairs(exhaustive_unsigned(), exhaustive_nonzero_integers()),
@@ -2050,7 +2023,7 @@ fn triples_of_unsigned_nonzero_integer_and_rounding_mode<T: PrimitiveUnsigned + 
 // `RoundingMode` is `RoundingMode::Exact`, the `T` is divisible by the `Integer`.
 pub fn triples_of_unsigned_nonzero_integer_and_rounding_mode_var_1<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
-) -> Box<Iterator<Item = (T, Integer, RoundingMode)>>
+) -> It<(T, Integer, RoundingMode)>
 where
     T: Mul<Integer, Output = Integer>,
     T: CheckedFrom<Integer>,
@@ -2068,7 +2041,7 @@ where
 
 fn triples_of_integer_nonzero_signed_and_rounding_mode<T: PrimitiveSigned + Rand>(
     gm: GenerationMode,
-) -> Box<Iterator<Item = (Integer, T, RoundingMode)>>
+) -> It<(Integer, T, RoundingMode)>
 where
     T::UnsignedOfEqualWidth: Rand,
 {
@@ -2096,7 +2069,7 @@ where
 // `RoundingMode` is `RoundingMode::Exact`, the `Integer` is divisible by the `T`.
 pub fn triples_of_integer_nonzero_signed_and_rounding_mode_var_1<T: PrimitiveSigned + Rand>(
     gm: GenerationMode,
-) -> Box<Iterator<Item = (Integer, T, RoundingMode)>>
+) -> It<(Integer, T, RoundingMode)>
 where
     Integer: Mul<T, Output = Integer>,
     T::UnsignedOfEqualWidth: Rand,
@@ -2114,7 +2087,7 @@ where
 
 fn triples_of_signed_nonzero_integer_and_rounding_mode<T: PrimitiveSigned + Rand>(
     gm: GenerationMode,
-) -> Box<Iterator<Item = (T, Integer, RoundingMode)>>
+) -> It<(T, Integer, RoundingMode)>
 where
     T::UnsignedOfEqualWidth: Rand,
 {
@@ -2142,7 +2115,7 @@ where
 // `RoundingMode` is `RoundingMode::Exact`, the `T` is divisible by the `Integer`.
 pub fn triples_of_signed_nonzero_integer_and_rounding_mode_var_1<T: PrimitiveSigned + Rand>(
     gm: GenerationMode,
-) -> Box<Iterator<Item = (T, Integer, RoundingMode)>>
+) -> It<(T, Integer, RoundingMode)>
 where
     T: Mul<Integer, Output = Integer>,
     T: CheckedFrom<Integer>,

@@ -5,6 +5,7 @@ pub mod assign_double_limb;
 pub mod assign_limb;
 pub mod clone_and_assign;
 pub mod double_limb_from_natural;
+pub mod floating_point_from_natural;
 pub mod from_bits;
 pub mod from_double_limb;
 pub mod from_floating_point;
@@ -21,6 +22,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     assign_limb::register(registry);
     clone_and_assign::register(registry);
     double_limb_from_natural::register(registry);
+    floating_point_from_natural::register(registry);
     from_bits::register(registry);
     from_double_limb::register(registry);
     from_floating_point::register(registry);
