@@ -1,5 +1,5 @@
 use common::{natural_to_biguint, natural_to_rug_integer, GenerationMode};
-use inputs::base::{pairs_of_unsigneds, It};
+use inputs::base::{f32s, f64s, pairs_of_unsigneds, It};
 use inputs::common::{reshape_1_2_to_3, reshape_2_1_to_3};
 use malachite_base::misc::{CheckedFrom, CheckedInto};
 use malachite_base::num::{
@@ -1036,7 +1036,12 @@ pub fn pairs_of_positive_natural_and_rounding_mode(
 macro_rules! float_gen {
     (
         $f: ident,
-        $pairs_of_natural_and_rounding_mode_var_1: ident
+        $floats: ident,
+        $pairs_of_natural_and_rounding_mode_var_1: ident,
+        $naturals_exactly_equal_to_float: ident,
+        $floats_exactly_equal_to_natural: ident,
+        $naturals_not_exactly_equal_to_float: ident,
+        $floats_var_2: ident
     ) => {
         pub fn $pairs_of_natural_and_rounding_mode_var_1(
             gm: GenerationMode,
@@ -1047,11 +1052,47 @@ macro_rules! float_gen {
                 }),
             )
         }
+
+        pub fn $naturals_exactly_equal_to_float(gm: GenerationMode) -> It<Natural> {
+            Box::new(naturals(gm).filter(|n| $f::checked_from(n).is_some()))
+        }
+
+        pub fn $floats_exactly_equal_to_natural(gm: GenerationMode) -> It<$f> {
+            Box::new(naturals(gm).flat_map($f::checked_from))
+        }
+
+        //TODO fix
+        pub fn $naturals_not_exactly_equal_to_float(gm: GenerationMode) -> It<Natural> {
+            Box::new(naturals(gm).filter(|n| $f::checked_from(n).is_none()))
+        }
+
+        // floats that are positive, not infinite, not NaN, and not exactly equal to a Natural.
+        pub fn $floats_var_2(gm: GenerationMode) -> It<$f> {
+            Box::new($floats(gm).filter(|&f| {
+                !f.is_nan() && !f.is_infinite() && f > 0.0 && Natural::checked_from(f).is_none()
+            }))
+        }
     };
 }
 
-float_gen!(f32, pairs_of_natural_and_rounding_mode_var_1_f32);
-float_gen!(f64, pairs_of_natural_and_rounding_mode_var_1_f64);
+float_gen!(
+    f32,
+    f32s,
+    pairs_of_natural_and_rounding_mode_var_1_f32,
+    naturals_exactly_equal_to_f32,
+    f32s_exactly_equal_to_natural,
+    naturals_not_exactly_equal_to_f32,
+    f32s_var_2
+);
+float_gen!(
+    f64,
+    f64s,
+    pairs_of_natural_and_rounding_mode_var_1_f64,
+    naturals_exactly_equal_to_f64,
+    f64s_exactly_equal_to_natural,
+    naturals_not_exactly_equal_to_f64,
+    f64s_var_2
+);
 
 fn triples_of_natural_small_signed_and_rounding_mode<T: PrimitiveSigned + Rand>(
     gm: GenerationMode,

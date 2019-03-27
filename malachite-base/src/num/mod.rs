@@ -1134,6 +1134,7 @@ pub trait PrimitiveFloat:
     + Sum<Self>
     + Two
     + UpperExp
+    + Walkable
     + Zero
 {
     type UnsignedOfEqualWidth: PrimitiveUnsigned;
@@ -1173,6 +1174,14 @@ pub trait PrimitiveFloat:
     fn to_bits(self) -> Self::UnsignedOfEqualWidth;
 
     fn from_bits(v: Self::UnsignedOfEqualWidth) -> Self;
+
+    fn abs_negative_zeros(self) -> Self;
+
+    fn abs_assign_negative_zeros(&mut self);
+
+    fn to_ordered_representation(self) -> Self::UnsignedOfEqualWidth;
+
+    fn from_ordered_representation(n: Self::UnsignedOfEqualWidth) -> Self;
 
     fn to_adjusted_mantissa_and_exponent(self) -> (Self::UnsignedOfEqualWidth, u32) {
         let bits = self.to_bits();
@@ -2971,6 +2980,43 @@ macro_rules! float_traits {
             fn from_bits(v: $ut) -> $t {
                 $t::from_bits(v)
             }
+
+            fn abs_negative_zeros(self) -> $t {
+                if self == 0.0 {
+                    0.0
+                } else {
+                    self
+                }
+            }
+
+            fn abs_assign_negative_zeros(&mut self) {
+                if *self == 0.0 {
+                    *self = 0.0;
+                }
+            }
+
+            fn to_ordered_representation(self) -> $ut {
+                if self.is_nan() {
+                    panic!("float cannot be NaN.");
+                }
+                if self >= 0.0 {
+                    (1 << ($ut::WIDTH - 1)) + self.abs_negative_zeros().to_bits()
+                } else {
+                    (1 << ($ut::WIDTH - 1)) - (-self).to_bits()
+                }
+            }
+
+            fn from_ordered_representation(n: $ut) -> $t {
+                let f = if n.get_highest_bit() {
+                    $t::from_bits(n - (1 << ($ut::WIDTH - 1)))
+                } else {
+                    -$t::from_bits((1 << ($ut::WIDTH - 1)) - n)
+                };
+                if f.is_nan() {
+                    panic!("invalid ordered representation");
+                }
+                f
+            }
         }
 
         impl_named!($t);
@@ -2987,6 +3033,24 @@ macro_rules! float_traits {
             #[inline]
             fn neg_assign(&mut self) {
                 *self = -*self;
+            }
+        }
+
+        impl Walkable for $t {
+            fn increment(&mut self) {
+                self.abs_assign_negative_zeros();
+                if *self == $t::POSITIVE_INFINITY {
+                    panic!("Can't increment positive infinity");
+                }
+                *self = $t::from_ordered_representation(self.to_ordered_representation() + 1);
+            }
+
+            fn decrement(&mut self) {
+                self.abs_assign_negative_zeros();
+                if *self == $t::NEGATIVE_INFINITY {
+                    panic!("Can't decrement positive infinity");
+                }
+                *self = $t::from_ordered_representation(self.to_ordered_representation() - 1);
             }
         }
     };

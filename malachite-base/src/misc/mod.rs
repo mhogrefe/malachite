@@ -125,7 +125,7 @@ macro_rules! impl_named {
 /// and have the property that if a < b, b is reachable from a by a finite number of increments and
 /// a is reachable from b by a finite number of decrements. If the type has a maximum value,
 /// incrementing it should panic; if it has a minimum value, decrementing it should panic.
-pub trait Walkable: Eq + Ord {
+pub trait Walkable: PartialEq + PartialOrd {
     /// Changes `self` to the smallest value greater than its old value. Panics if no greater value
     /// exists.
     fn increment(&mut self);
