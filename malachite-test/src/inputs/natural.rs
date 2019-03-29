@@ -3,8 +3,8 @@ use inputs::base::{f32s, f64s, pairs_of_unsigneds, It};
 use inputs::common::{reshape_1_2_to_3, reshape_2_1_to_3};
 use malachite_base::misc::{CheckedFrom, CheckedInto};
 use malachite_base::num::{
-    DivisibleBy, DivisibleByPowerOfTwo, EqMod, EqModPowerOfTwo, PrimitiveInteger, PrimitiveSigned,
-    PrimitiveUnsigned, SignificantBits,
+    DivisibleBy, DivisibleByPowerOfTwo, EqMod, EqModPowerOfTwo, PrimitiveFloat, PrimitiveInteger,
+    PrimitiveSigned, PrimitiveUnsigned, SignificantBits,
 };
 use malachite_base::round::RoundingMode;
 use malachite_nz::natural::Natural;
@@ -19,7 +19,8 @@ use rust_wheels::iterators::general::random;
 use rust_wheels::iterators::integers_geometric::{i32s_geometric, u32s_geometric};
 use rust_wheels::iterators::naturals::{
     exhaustive_naturals, exhaustive_positive_naturals, random_naturals, random_positive_naturals,
-    special_random_naturals, special_random_positive_naturals,
+    random_range_up_natural, range_up_increasing_natural, special_random_naturals,
+    special_random_positive_naturals, special_random_range_up_natural,
 };
 use rust_wheels::iterators::primitive_ints::{
     exhaustive_positive, exhaustive_signed, exhaustive_unsigned, random_positive_unsigned,
@@ -1041,7 +1042,8 @@ macro_rules! float_gen {
         $naturals_exactly_equal_to_float: ident,
         $floats_exactly_equal_to_natural: ident,
         $naturals_not_exactly_equal_to_float: ident,
-        $floats_var_2: ident
+        $floats_var_2: ident,
+        $floats_var_3: ident
     ) => {
         pub fn $pairs_of_natural_and_rounding_mode_var_1(
             gm: GenerationMode,
@@ -1061,15 +1063,36 @@ macro_rules! float_gen {
             Box::new(naturals(gm).flat_map($f::checked_from))
         }
 
-        //TODO fix
         pub fn $naturals_not_exactly_equal_to_float(gm: GenerationMode) -> It<Natural> {
-            Box::new(naturals(gm).filter(|n| $f::checked_from(n).is_none()))
+            let n = Natural::from($f::SMALLEST_UNREPRESENTABLE_UINT);
+            let xs: It<Natural> = match gm {
+                GenerationMode::Exhaustive => Box::new(range_up_increasing_natural(n)),
+                GenerationMode::Random(scale) => {
+                    Box::new(random_range_up_natural(&EXAMPLE_SEED, scale, n))
+                }
+                GenerationMode::SpecialRandom(scale) => {
+                    Box::new(special_random_range_up_natural(&EXAMPLE_SEED, scale, n))
+                }
+            };
+            Box::new(xs.filter(|n| $f::checked_from(n).is_none()))
         }
 
         // floats that are positive, not infinite, not NaN, and not exactly equal to a Natural.
         pub fn $floats_var_2(gm: GenerationMode) -> It<$f> {
             Box::new($floats(gm).filter(|&f| {
                 !f.is_nan() && !f.is_infinite() && f > 0.0 && Natural::checked_from(f).is_none()
+            }))
+        }
+
+        // positive floats exactly in between two adjacent Naturals.
+        pub fn $floats_var_3(gm: GenerationMode) -> It<$f> {
+            Box::new($floats_exactly_equal_to_natural(gm).flat_map(|f| {
+                let f_plus_half = f + 0.5;
+                if Natural::checked_from(f_plus_half).is_some() {
+                    None
+                } else {
+                    Some(f_plus_half)
+                }
             }))
         }
     };
@@ -1082,7 +1105,8 @@ float_gen!(
     naturals_exactly_equal_to_f32,
     f32s_exactly_equal_to_natural,
     naturals_not_exactly_equal_to_f32,
-    f32s_var_2
+    f32s_var_2,
+    f32s_var_3
 );
 float_gen!(
     f64,
@@ -1091,7 +1115,8 @@ float_gen!(
     naturals_exactly_equal_to_f64,
     f64s_exactly_equal_to_natural,
     naturals_not_exactly_equal_to_f64,
-    f64s_var_2
+    f64s_var_2,
+    f64s_var_3
 );
 
 fn triples_of_natural_small_signed_and_rounding_mode<T: PrimitiveSigned + Rand>(
