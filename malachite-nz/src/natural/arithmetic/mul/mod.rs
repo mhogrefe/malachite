@@ -370,6 +370,7 @@ pub fn limbs_mul(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 impl Mul<Natural> for Natural {
     type Output = Natural;
 
+    #[inline]
     fn mul(mut self, other: Natural) -> Natural {
         self *= other;
         self
@@ -406,6 +407,7 @@ impl Mul<Natural> for Natural {
 impl<'a> Mul<&'a Natural> for Natural {
     type Output = Natural;
 
+    #[inline]
     fn mul(mut self, other: &'a Natural) -> Natural {
         self *= other;
         self
@@ -442,6 +444,7 @@ impl<'a> Mul<&'a Natural> for Natural {
 impl<'a> Mul<Natural> for &'a Natural {
     type Output = Natural;
 
+    #[inline]
     fn mul(self, mut other: Natural) -> Natural {
         other *= self;
         other

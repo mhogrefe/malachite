@@ -491,6 +491,7 @@ impl Add<Natural> for Natural {
 impl<'a> Add<&'a Natural> for Natural {
     type Output = Natural;
 
+    #[inline]
     fn add(mut self, other: &'a Natural) -> Natural {
         self += other;
         self
@@ -524,6 +525,7 @@ impl<'a> Add<&'a Natural> for Natural {
 impl<'a> Add<Natural> for &'a Natural {
     type Output = Natural;
 
+    #[inline]
     fn add(self, mut other: Natural) -> Natural {
         other += self;
         other

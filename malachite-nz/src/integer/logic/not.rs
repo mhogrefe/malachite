@@ -69,7 +69,7 @@ impl<'a> Not for &'a Integer {
                 ref abs,
             } => Integer {
                 sign: false,
-                abs: abs + 1,
+                abs: abs + 1 as Limb,
             },
             Integer {
                 sign: false,
@@ -117,7 +117,7 @@ impl NotAssign for Integer {
     fn not_assign(&mut self) {
         if self.sign {
             self.sign = false;
-            self.abs += 1;
+            self.abs += 1 as Limb;
         } else {
             self.sign = true;
             self.abs -= 1;

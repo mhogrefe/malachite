@@ -721,7 +721,7 @@ fn limbs_add_same_length_with_carry_in_to_out_properties() {
             let carry = _limbs_add_same_length_with_carry_in_to_out(&mut out, xs, ys, carry_in);
             let mut n = Natural::from_limbs_asc(xs) + Natural::from_limbs_asc(ys);
             if carry_in {
-                n += 1;
+                n += 1 as Limb;
             }
             let len = xs.len();
             let mut limbs = n.into_limbs_asc();
@@ -743,7 +743,7 @@ fn limbs_add_same_length_with_carry_in_in_place_left_properties() {
             let carry = _limbs_add_same_length_with_carry_in_in_place_left(&mut xs, ys, carry_in);
             let mut n = Natural::from_owned_limbs_asc(xs_old) + Natural::from_limbs_asc(ys);
             if carry_in {
-                n += 1;
+                n += 1 as Limb;
             }
             let len = xs.len();
             let mut limbs = n.into_limbs_asc();

@@ -43,7 +43,7 @@ fn make_string(i: &Natural, radix: i32, to_upper: bool) -> String {
     while i_cloned != Natural::ZERO {
         cs.push(
             i_cloned
-                .div_assign_mod(10)
+                .div_assign_mod(10 as Limb)
                 .to_string()
                 .chars()
                 .next()

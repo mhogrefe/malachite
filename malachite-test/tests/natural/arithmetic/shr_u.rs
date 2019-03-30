@@ -1303,7 +1303,7 @@ macro_rules! tests_and_properties {
                 pairs_of_natural_and_small_unsigned_var_2::<$t>,
                 |&(ref n, u)| {
                     let down = n.shr_round(u, RoundingMode::Down);
-                    let up = &down + 1;
+                    let up = &down + 1 as Limb;
                     assert_eq!(n.shr_round(u, RoundingMode::Up), up);
                     assert_eq!(n.shr_round(u, RoundingMode::Floor), down);
                     assert_eq!(n.shr_round(u, RoundingMode::Ceiling), up);

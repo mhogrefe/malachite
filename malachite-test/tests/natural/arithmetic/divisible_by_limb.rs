@@ -196,11 +196,11 @@ fn divisible_by_limb_properties() {
     });
 
     test_properties(naturals, |n| {
-        assert!(n.divisible_by(1));
+        assert!(n.divisible_by(1 as Limb));
     });
 
     test_properties(positive_naturals, |n| {
-        assert!(!n.divisible_by(0));
+        assert!(!n.divisible_by(0 as Limb));
     });
 
     test_properties(positive_unsigneds, |&u: &Limb| {

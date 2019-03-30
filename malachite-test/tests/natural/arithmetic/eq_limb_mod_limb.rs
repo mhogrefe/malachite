@@ -179,7 +179,7 @@ fn eq_limb_mod_limb_properties() {
         },
     );
 
-    test_properties(pairs_of_natural_and_unsigned, |&(ref n, u)| {
+    test_properties(pairs_of_natural_and_unsigned::<Limb>, |&(ref n, u)| {
         assert!(n.eq_mod(u, 1));
         assert!(u.eq_mod(n, 1));
         assert_eq!(n.eq_mod(0, u), n.divisible_by(u));

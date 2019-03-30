@@ -87,6 +87,14 @@ impl<'a> DivisibleBy<Limb> for &'a Natural {
     }
 }
 
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> DivisibleBy<u32> for &'a Natural {
+    #[inline]
+    fn divisible_by(self, other: u32) -> bool {
+        self.divisible_by(Limb::from(other))
+    }
+}
+
 impl<'a> DivisibleBy<&'a Natural> for Limb {
     /// Returns whether a `Limb` is divisible by a `Natural`; in other words, whether the `Limb` is
     /// a multiple of the `Natural`. This means that zero is divisible by any number, including
@@ -117,5 +125,13 @@ impl<'a> DivisibleBy<&'a Natural> for Limb {
             (x, &Small(small)) => x.divisible_by(small),
             (_, &Large(_)) => false,
         }
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> DivisibleBy<&'a Natural> for u32 {
+    #[inline]
+    fn divisible_by(self, other: &'a Natural) -> bool {
+        Limb::from(self).divisible_by(other)
     }
 }

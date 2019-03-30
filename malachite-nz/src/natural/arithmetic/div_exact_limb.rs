@@ -1,4 +1,6 @@
 use malachite_base::misc::Max;
+#[cfg(feature = "64_bit_limbs")]
+use malachite_base::misc::WrappingFrom;
 use malachite_base::num::{
     DivExact, DivExactAssign, ModPowerOfTwo, Parity, PrimitiveInteger, SplitInHalf,
 };
@@ -427,9 +429,20 @@ impl DivExact<Limb> for Natural {
     ///         "8130081300");
     /// }
     /// ```
+    #[inline]
     fn div_exact(mut self, other: Limb) -> Natural {
         self.div_exact_assign(other);
         self
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl DivExact<u32> for Natural {
+    type Output = Natural;
+
+    #[inline]
+    fn div_exact(self, other: u32) -> Natural {
+        self.div_exact(Limb::from(other))
     }
 }
 
@@ -482,6 +495,16 @@ impl<'a> DivExact<Limb> for &'a Natural {
                 }
             }
         }
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> DivExact<u32> for &'a Natural {
+    type Output = Natural;
+
+    #[inline]
+    fn div_exact(self, other: u32) -> Natural {
+        self.div_exact(Limb::from(other))
     }
 }
 
@@ -538,6 +561,14 @@ impl DivExactAssign<Limb> for Natural {
     }
 }
 
+#[cfg(feature = "64_bit_limbs")]
+impl DivExactAssign<u32> for Natural {
+    #[inline]
+    fn div_exact_assign(&mut self, other: u32) {
+        self.div_exact_assign(Limb::from(other));
+    }
+}
+
 impl DivExact<Natural> for Limb {
     type Output = Limb;
 
@@ -572,6 +603,16 @@ impl DivExact<Natural> for Limb {
                 _ => unreachable!(),
             }
         }
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl DivExact<Natural> for u32 {
+    type Output = u32;
+
+    #[inline]
+    fn div_exact(self, other: Natural) -> u32 {
+        u32::wrapping_from(Limb::from(self).div_exact(other))
     }
 }
 
@@ -612,6 +653,16 @@ impl<'a> DivExact<&'a Natural> for Limb {
     }
 }
 
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> DivExact<&'a Natural> for u32 {
+    type Output = u32;
+
+    #[inline]
+    fn div_exact(self, other: &'a Natural) -> u32 {
+        u32::wrapping_from(Limb::from(self).div_exact(other))
+    }
+}
+
 impl DivExactAssign<Natural> for Limb {
     /// Divides a `Limb` by a `Natural` in place, taking the `Natural` by value. The `Limb` must be
     /// exactly divisible by the `Natural`. If it isn't, the behavior of this function is undefined.
@@ -635,8 +686,17 @@ impl DivExactAssign<Natural> for Limb {
     ///     assert_eq!(n, 3);
     /// }
     /// ```
+    #[inline]
     fn div_exact_assign(&mut self, other: Natural) {
         self.div_exact_assign(&other);
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl DivExactAssign<Natural> for u32 {
+    #[inline]
+    fn div_exact_assign(&mut self, other: Natural) {
+        *self = self.div_exact(other);
     }
 }
 
@@ -664,6 +724,14 @@ impl<'a> DivExactAssign<&'a Natural> for Limb {
     ///     assert_eq!(n, 3);
     /// }
     /// ```
+    fn div_exact_assign(&mut self, other: &'a Natural) {
+        *self = self.div_exact(other);
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> DivExactAssign<&'a Natural> for u32 {
+    #[inline]
     fn div_exact_assign(&mut self, other: &'a Natural) {
         *self = self.div_exact(other);
     }

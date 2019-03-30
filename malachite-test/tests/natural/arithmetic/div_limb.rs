@@ -183,21 +183,21 @@ fn test_div_limb() {
 #[should_panic]
 fn div_assign_limb_fail() {
     let mut n = Natural::from(10u32);
-    n /= 0;
+    n /= 0 as Limb;
 }
 
 #[test]
 #[allow(unused_must_use)]
 #[should_panic]
 fn div_limb_fail() {
-    Natural::from(10u32) / 0;
+    Natural::from(10u32) / 0 as Limb;
 }
 
 #[test]
 #[allow(unused_must_use)]
 #[should_panic]
 fn div_limb_ref_fail() {
-    &Natural::from(10u32) / 0;
+    &Natural::from(10u32) / 0 as Limb;
 }
 
 #[test]
@@ -233,27 +233,27 @@ fn test_limb_div_natural() {
 #[allow(unused_must_use)]
 #[should_panic]
 fn limb_div_natural_fail() {
-    10 / Natural::ZERO;
+    10 as Limb / Natural::ZERO;
 }
 
 #[test]
 #[allow(unused_must_use)]
 #[should_panic]
 fn limb_div_natural_ref_fail() {
-    10 / &Natural::ZERO;
+    10 as Limb / &Natural::ZERO;
 }
 
 #[test]
 #[should_panic]
 fn limb_div_assign_natural_fail() {
-    let mut n = 10;
+    let mut n: Limb = 10;
     n /= Natural::ZERO;
 }
 
 #[test]
 #[should_panic]
 fn limb_div_assign_natural_ref_fail() {
-    let mut n = 10;
+    let mut n: Limb = 10;
     n /= &Natural::ZERO;
 }
 
@@ -376,14 +376,17 @@ fn div_limb_properties() {
         },
     );
 
-    test_properties(pairs_of_unsigned_and_positive_unsigned, |&(x, y)| {
-        let quotient = x / y;
-        assert_eq!(quotient, Natural::from(x) / y);
-        assert_eq!(quotient, x / Natural::from(y));
-    });
+    test_properties(
+        pairs_of_unsigned_and_positive_unsigned::<Limb>,
+        |&(x, y)| {
+            let quotient = x / y;
+            assert_eq!(quotient, Natural::from(x) / y);
+            assert_eq!(quotient, x / Natural::from(y));
+        },
+    );
 
     test_properties(naturals, |n| {
-        assert_eq!(n / 1, *n);
+        assert_eq!(n / 1 as Limb, *n);
     });
 
     test_properties(positive_unsigneds, |&u: &Limb| {

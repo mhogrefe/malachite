@@ -217,38 +217,38 @@ fn test_div_round_limb() {
 #[should_panic]
 fn div_round_assign_limb_fail_1() {
     let mut n = Natural::from(10u32);
-    n.div_round_assign(0, RoundingMode::Floor);
+    n.div_round_assign(0 as Limb, RoundingMode::Floor);
 }
 
 #[test]
 #[should_panic]
 fn div_round_assign_limb_fail_2() {
     let mut n = Natural::from(10u32);
-    n.div_round_assign(3, RoundingMode::Exact);
+    n.div_round_assign(3 as Limb, RoundingMode::Exact);
 }
 
 #[test]
 #[should_panic]
 fn div_round_limb_fail_1() {
-    Natural::from(10u32).div_round(0, RoundingMode::Floor);
+    Natural::from(10u32).div_round(0 as Limb, RoundingMode::Floor);
 }
 
 #[test]
 #[should_panic]
 fn div_round_limb_fail_2() {
-    Natural::from(10u32).div_round(3, RoundingMode::Exact);
+    Natural::from(10u32).div_round(3 as Limb, RoundingMode::Exact);
 }
 
 #[test]
 #[should_panic]
 fn div_round_limb_ref_fail_1() {
-    (&Natural::from(10u32)).div_round(0, RoundingMode::Floor);
+    (&Natural::from(10u32)).div_round(0 as Limb, RoundingMode::Floor);
 }
 
 #[test]
 #[should_panic]
 fn div_round_limb_ref_fail_2() {
-    (&Natural::from(10u32)).div_round(3, RoundingMode::Exact);
+    (&Natural::from(10u32)).div_round(3 as Limb, RoundingMode::Exact);
 }
 
 #[test]
@@ -345,53 +345,53 @@ fn test_limb_div_round_natural() {
 #[test]
 #[should_panic]
 fn limb_div_round_assign_natural_fail_1() {
-    let mut n = 10;
+    let mut n: Limb = 10;
     n.div_round_assign(Natural::ZERO, RoundingMode::Floor);
 }
 
 #[test]
 #[should_panic]
 fn limb_div_round_assign_natural_fail_2() {
-    let mut n = 10;
+    let mut n: Limb = 10;
     n.div_round_assign(Natural::from(3u32), RoundingMode::Exact);
 }
 
 #[test]
 #[should_panic]
 fn limb_div_round_assign_natural_ref_fail_1() {
-    let mut n = 10;
+    let mut n: Limb = 10;
     n.div_round_assign(&Natural::ZERO, RoundingMode::Floor);
 }
 
 #[test]
 #[should_panic]
 fn limb_div_round_assign_natural_ref_fail_2() {
-    let mut n = 10;
+    let mut n: Limb = 10;
     n.div_round_assign(&Natural::from(3u32), RoundingMode::Exact);
 }
 
 #[test]
 #[should_panic]
 fn limb_div_round_natural_fail_1() {
-    10.div_round(Natural::ZERO, RoundingMode::Floor);
+    (10 as Limb).div_round(Natural::ZERO, RoundingMode::Floor);
 }
 
 #[test]
 #[should_panic]
 fn limb_div_round_natural_fail_2() {
-    10.div_round(Natural::from(3u32), RoundingMode::Exact);
+    (10 as Limb).div_round(Natural::from(3u32), RoundingMode::Exact);
 }
 
 #[test]
 #[should_panic]
 fn limb_div_round_natural_ref_fail_1() {
-    10.div_round(&Natural::ZERO, RoundingMode::Floor);
+    (10 as Limb).div_round(&Natural::ZERO, RoundingMode::Floor);
 }
 
 #[test]
 #[should_panic]
 fn limb_div_round_natural_ref_fail_2() {
-    10.div_round(&Natural::from(3u32), RoundingMode::Exact);
+    (10 as Limb).div_round(&Natural::from(3u32), RoundingMode::Exact);
 }
 
 #[test]
@@ -475,7 +475,7 @@ fn div_round_limb_properties() {
     // TODO test using Rationals
     test_properties(pairs_of_natural_and_positive_limb_var_2, |&(ref n, u)| {
         let down = n.div_round(u, RoundingMode::Down);
-        let up = &down + 1;
+        let up = &down + 1 as Limb;
         assert_eq!(n.div_round(u, RoundingMode::Up), up);
         assert_eq!(n.div_round(u, RoundingMode::Floor), down);
         assert_eq!(n.div_round(u, RoundingMode::Ceiling), up);
@@ -484,13 +484,13 @@ fn div_round_limb_properties() {
     });
 
     test_properties(pairs_of_natural_and_rounding_mode, |&(ref n, rm)| {
-        assert_eq!(n.div_round(1, rm), *n);
+        assert_eq!(n.div_round(1 as Limb, rm), *n);
     });
 
     test_properties(
         pairs_of_positive_natural_and_rounding_mode,
         |&(ref n, rm)| {
-            assert_eq!(0.div_round(n, rm), 0);
+            assert_eq!((0 as Limb).div_round(n, rm), 0);
         },
     );
 

@@ -70,6 +70,14 @@ impl<'a> EqModPowerOfTwo<Limb> for &'a Natural {
     }
 }
 
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> EqModPowerOfTwo<u32> for &'a Natural {
+    #[inline]
+    fn eq_mod_power_of_two(self, other: u32, pow: u64) -> bool {
+        self.eq_mod_power_of_two(Limb::from(other), pow)
+    }
+}
+
 impl<'a> EqModPowerOfTwo<&'a Natural> for Limb {
     /// Returns whether this `Limb` is equivalent to a `Natural` mod two to the power of `pow`; that
     /// is, whether the `pow` least-significant bits of the `Limb` and the `Natural` are equal.
@@ -99,5 +107,13 @@ impl<'a> EqModPowerOfTwo<&'a Natural> for Limb {
             Small(small) => self.eq_mod_power_of_two(small, pow),
             Large(ref limbs) => limbs_eq_limb_mod_power_of_two(limbs, self, pow),
         }
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> EqModPowerOfTwo<&'a Natural> for u32 {
+    #[inline]
+    fn eq_mod_power_of_two(self, other: &'a Natural, pow: u64) -> bool {
+        Limb::from(self).eq_mod_power_of_two(other, pow)
     }
 }

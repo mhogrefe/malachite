@@ -1,3 +1,5 @@
+#[cfg(feature = "64_bit_limbs")]
+use malachite_base::misc::WrappingFrom;
 use malachite_base::num::{
     DivAssignMod, DivMod, DivRound, DivRoundAssign, Parity, PrimitiveInteger,
 };
@@ -108,9 +110,20 @@ impl DivRound<Limb> for Natural {
     ///     assert_eq!(Natural::from(14u32).div_round(4, RoundingMode::Nearest).to_string(), "4");
     /// }
     /// ```
+    #[inline]
     fn div_round(mut self, other: Limb, rm: RoundingMode) -> Natural {
         self.div_round_assign(other, rm);
         self
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl DivRound<u32> for Natural {
+    type Output = Natural;
+
+    #[inline]
+    fn div_round(self, other: u32, rm: RoundingMode) -> Natural {
+        self.div_round(Limb::from(other), rm)
     }
 }
 
@@ -161,13 +174,13 @@ impl<'a> DivRound<Limb> for &'a Natural {
             let (quotient, remainder) = self.div_mod(other);
             match rm {
                 _ if remainder == 0 => quotient,
-                RoundingMode::Up | RoundingMode::Ceiling => quotient + 1,
+                RoundingMode::Up | RoundingMode::Ceiling => quotient + 1 as Limb,
                 RoundingMode::Nearest => {
                     let shifted_other = other >> 1;
                     if remainder > shifted_other
                         || remainder == shifted_other && other.even() && quotient.odd()
                     {
-                        quotient + 1
+                        quotient + 1 as Limb
                     } else {
                         quotient
                     }
@@ -178,6 +191,16 @@ impl<'a> DivRound<Limb> for &'a Natural {
                 _ => unreachable!(),
             }
         }
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> DivRound<u32> for &'a Natural {
+    type Output = Natural;
+
+    #[inline]
+    fn div_round(self, other: u32, rm: RoundingMode) -> Natural {
+        self.div_round(Limb::from(other), rm)
     }
 }
 
@@ -214,8 +237,19 @@ impl DivRound<Natural> for Limb {
     ///     assert_eq!(14.div_round(Natural::from(4u32), RoundingMode::Nearest), 4);
     /// }
     /// ```
+    #[inline]
     fn div_round(self, other: Natural, rm: RoundingMode) -> Limb {
         self.div_round(&other, rm)
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl DivRound<Natural> for u32 {
+    type Output = u32;
+
+    #[inline]
+    fn div_round(self, other: Natural, rm: RoundingMode) -> u32 {
+        u32::wrapping_from(Limb::from(self).div_round(other, rm))
     }
 }
 
@@ -265,6 +299,16 @@ impl<'a> DivRound<&'a Natural> for Limb {
                 }
             }
         }
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> DivRound<&'a Natural> for u32 {
+    type Output = u32;
+
+    #[inline]
+    fn div_round(self, other: &'a Natural, rm: RoundingMode) -> u32 {
+        u32::wrapping_from(Limb::from(self).div_round(other, rm))
     }
 }
 
@@ -332,13 +376,13 @@ impl DivRoundAssign<Limb> for Natural {
             let remainder = self.div_assign_mod(other);
             match rm {
                 _ if remainder == 0 => {}
-                RoundingMode::Up | RoundingMode::Ceiling => *self += 1,
+                RoundingMode::Up | RoundingMode::Ceiling => *self += 1 as Limb,
                 RoundingMode::Nearest => {
                     let shifted_other = other >> 1;
                     if remainder > shifted_other
                         || remainder == shifted_other && other.even() && self.odd()
                     {
-                        *self += 1;
+                        *self += 1 as Limb;
                     }
                 }
                 RoundingMode::Exact => {
@@ -347,6 +391,14 @@ impl DivRoundAssign<Limb> for Natural {
                 _ => {}
             }
         }
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl DivRoundAssign<u32> for Natural {
+    #[inline]
+    fn div_round_assign(&mut self, other: u32, rm: RoundingMode) {
+        self.div_round_assign(Limb::from(other), rm)
     }
 }
 
@@ -405,8 +457,17 @@ impl DivRoundAssign<Natural> for Limb {
     ///     assert_eq!(n, 4);
     /// }
     /// ```
+    #[inline]
     fn div_round_assign(&mut self, other: Natural, rm: RoundingMode) {
         self.div_round_assign(&other, rm);
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl DivRoundAssign<Natural> for u32 {
+    #[inline]
+    fn div_round_assign(&mut self, other: Natural, rm: RoundingMode) {
+        *self = self.div_round(other, rm);
     }
 }
 
@@ -465,6 +526,15 @@ impl<'a> DivRoundAssign<&'a Natural> for Limb {
     ///     assert_eq!(n, 4);
     /// }
     /// ```
+    #[inline]
+    fn div_round_assign(&mut self, other: &'a Natural, rm: RoundingMode) {
+        *self = self.div_round(other, rm);
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> DivRoundAssign<&'a Natural> for u32 {
+    #[inline]
     fn div_round_assign(&mut self, other: &'a Natural, rm: RoundingMode) {
         *self = self.div_round(other, rm);
     }

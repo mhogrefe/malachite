@@ -1,4 +1,6 @@
 use malachite_base::misc::Max;
+#[cfg(feature = "64_bit_limbs")]
+use malachite_base::misc::WrappingFrom;
 use malachite_base::num::{DivRem, JoinHalves, SplitInHalf, WrappingAddAssign, WrappingSubAssign};
 use natural::arithmetic::add_limb::limbs_slice_add_limb_in_place;
 use natural::arithmetic::div_mod_limb::div_mod_by_preinversion;
@@ -383,9 +385,20 @@ impl Div<Limb> for Natural {
     /// // 2 * 10 + 3 = 23
     /// assert_eq!((Natural::from(23u32) / 10).to_string(), "2");
     /// ```
+    #[inline]
     fn div(mut self, other: Limb) -> Natural {
         self /= other;
         self
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl Div<u32> for Natural {
+    type Output = Natural;
+
+    #[inline]
+    fn div(self, other: u32) -> Natural {
+        self / Limb::from(other)
     }
 }
 
@@ -426,6 +439,16 @@ impl<'a> Div<Limb> for &'a Natural {
     }
 }
 
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> Div<u32> for &'a Natural {
+    type Output = Natural;
+
+    #[inline]
+    fn div(self, other: u32) -> Natural {
+        self / Limb::from(other)
+    }
+}
+
 impl DivAssign<Limb> for Natural {
     /// Divides a `Natural` by a `Limb` in place. The quotient is rounded towards negative infinity.
     ///
@@ -460,6 +483,14 @@ impl DivAssign<Limb> for Natural {
     }
 }
 
+#[cfg(feature = "64_bit_limbs")]
+impl DivAssign<u32> for Natural {
+    #[inline]
+    fn div_assign(&mut self, other: u32) {
+        *self /= Limb::from(other);
+    }
+}
+
 impl Div<Natural> for Limb {
     type Output = Limb;
 
@@ -486,6 +517,16 @@ impl Div<Natural> for Limb {
                 Large(_) => 0,
             }
         }
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl Div<Natural> for u32 {
+    type Output = u32;
+
+    #[inline]
+    fn div(self, other: Natural) -> u32 {
+        u32::wrapping_from(Limb::from(self) / other)
     }
 }
 
@@ -518,6 +559,16 @@ impl<'a> Div<&'a Natural> for Limb {
     }
 }
 
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> Div<&'a Natural> for u32 {
+    type Output = u32;
+
+    #[inline]
+    fn div(self, other: &'a Natural) -> u32 {
+        u32::wrapping_from(Limb::from(self) / other)
+    }
+}
+
 impl DivAssign<Natural> for Limb {
     /// Divides a `Limb` by a `Natural` in place, taking the `Natural` by value. The quotient is
     /// rounded towards negative infinity.
@@ -535,8 +586,17 @@ impl DivAssign<Natural> for Limb {
     /// n /= Natural::from(10u32);
     /// assert_eq!(n, 2);
     /// ```
+    #[inline]
     fn div_assign(&mut self, other: Natural) {
         *self /= &other;
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl DivAssign<Natural> for u32 {
+    #[inline]
+    fn div_assign(&mut self, other: Natural) {
+        *self = u32::wrapping_from(Limb::from(*self) / other);
     }
 }
 
@@ -557,8 +617,17 @@ impl<'a> DivAssign<&'a Natural> for Limb {
     /// n /= &Natural::from(10u32);
     /// assert_eq!(n, 2);
     /// ```
+    #[inline]
     fn div_assign(&mut self, other: &'a Natural) {
         *self = *self / other;
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> DivAssign<&'a Natural> for u32 {
+    #[inline]
+    fn div_assign(&mut self, other: &'a Natural) {
+        *self = u32::wrapping_from(Limb::from(*self) / other);
     }
 }
 

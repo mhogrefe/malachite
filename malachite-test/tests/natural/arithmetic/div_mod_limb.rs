@@ -277,37 +277,37 @@ fn test_div_mod_limb() {
 #[test]
 #[should_panic]
 fn div_assign_mod_limb_fail() {
-    Natural::from(10u32).div_assign_mod(0);
+    Natural::from(10u32).div_assign_mod(0 as Limb);
 }
 
 #[test]
 #[should_panic]
 fn div_mod_limb_fail() {
-    Natural::from(10u32).div_mod(0);
+    Natural::from(10u32).div_mod(0 as Limb);
 }
 
 #[test]
 #[should_panic]
 fn div_mod_limb_ref_fail() {
-    (&Natural::from(10u32)).div_mod(0);
+    (&Natural::from(10u32)).div_mod(0 as Limb);
 }
 
 #[test]
 #[should_panic]
 fn div_assign_rem_limb_fail() {
-    Natural::from(10u32).div_assign_rem(0);
+    Natural::from(10u32).div_assign_rem(0 as Limb);
 }
 
 #[test]
 #[should_panic]
 fn div_rem_limb_fail() {
-    Natural::from(10u32).div_rem(0);
+    Natural::from(10u32).div_rem(0 as Limb);
 }
 
 #[test]
 #[should_panic]
 fn div_rem_limb_ref_fail() {
-    (&Natural::from(10u32)).div_rem(0);
+    (&Natural::from(10u32)).div_rem(0 as Limb);
 }
 
 #[test]
@@ -377,19 +377,19 @@ fn test_ceiling_div_neg_mod_limb() {
 #[test]
 #[should_panic]
 fn ceiling_div_assign_neg_mod_limb_fail() {
-    Natural::from(10u32).ceiling_div_assign_neg_mod(0);
+    Natural::from(10u32).ceiling_div_assign_neg_mod(0 as Limb);
 }
 
 #[test]
 #[should_panic]
 fn ceiling_div_neg_mod_limb_fail() {
-    Natural::from(10u32).ceiling_div_neg_mod(0);
+    Natural::from(10u32).ceiling_div_neg_mod(0 as Limb);
 }
 
 #[test]
 #[should_panic]
 fn ceiling_div_neg_mod_limb_ref_fail() {
-    (&Natural::from(10u32)).ceiling_div_neg_mod(0);
+    (&Natural::from(10u32)).ceiling_div_neg_mod(0 as Limb);
 }
 
 #[test]
@@ -455,49 +455,49 @@ fn test_limb_div_mod_natural() {
 #[test]
 #[should_panic]
 fn limb_div_mod_natural_fail() {
-    10.div_mod(Natural::ZERO);
+    (10 as Limb).div_mod(Natural::ZERO);
 }
 
 #[test]
 #[should_panic]
 fn limb_div_mod_natural_ref_fail() {
-    10.div_mod(&Natural::ZERO);
+    (10 as Limb).div_mod(&Natural::ZERO);
 }
 
 #[test]
 #[should_panic]
 fn limb_div_assign_mod_natural_fail() {
-    10.div_assign_mod(Natural::ZERO);
+    (10 as Limb).div_assign_mod(Natural::ZERO);
 }
 
 #[test]
 #[should_panic]
 fn limb_div_assign_mod_natural_ref_fail() {
-    10.div_assign_mod(&Natural::ZERO);
+    (10 as Limb).div_assign_mod(&Natural::ZERO);
 }
 
 #[test]
 #[should_panic]
 fn limb_div_rem_natural_fail() {
-    10.div_rem(Natural::ZERO);
+    (10 as Limb).div_rem(Natural::ZERO);
 }
 
 #[test]
 #[should_panic]
 fn limb_div_rem_natural_ref_fail() {
-    10.div_rem(&Natural::ZERO);
+    (10 as Limb).div_rem(&Natural::ZERO);
 }
 
 #[test]
 #[should_panic]
 fn limb_div_assign_rem_natural_fail() {
-    10.div_assign_rem(Natural::ZERO);
+    (10 as Limb).div_assign_rem(Natural::ZERO);
 }
 
 #[test]
 #[should_panic]
 fn limb_div_assign_rem_natural_ref_fail() {
-    10.div_assign_rem(&Natural::ZERO);
+    (10 as Limb).div_assign_rem(&Natural::ZERO);
 }
 
 #[test]
@@ -541,25 +541,25 @@ fn test_limb_ceiling_div_neg_mod_natural() {
 #[test]
 #[should_panic]
 fn limb_ceiling_div_assign_neg_mod_natural_fail() {
-    10.ceiling_div_assign_neg_mod(Natural::ZERO);
+    (10 as Limb).ceiling_div_assign_neg_mod(Natural::ZERO);
 }
 
 #[test]
 #[should_panic]
 fn limb_ceiling_div_assign_neg_mod_natural_ref_fail() {
-    10.ceiling_div_assign_neg_mod(&Natural::ZERO);
+    (10 as Limb).ceiling_div_assign_neg_mod(&Natural::ZERO);
 }
 
 #[test]
 #[should_panic]
 fn limb_ceiling_div_neg_mod_natural_fail() {
-    10.ceiling_div_neg_mod(Natural::ZERO);
+    (10 as Limb).ceiling_div_neg_mod(Natural::ZERO);
 }
 
 #[test]
 #[should_panic]
 fn limb_ceiling_div_neg_mod_natural_ref_fail() {
-    10.ceiling_div_neg_mod(&Natural::ZERO);
+    (10 as Limb).ceiling_div_neg_mod(&Natural::ZERO);
 }
 
 #[test]
@@ -754,7 +754,7 @@ fn div_mod_limb_properties() {
     );
 
     test_properties(naturals, |n| {
-        let (q, r) = n.div_mod(1);
+        let (q, r) = n.div_mod(1 as Limb);
         assert_eq!(q, *n);
         assert_eq!(r, 0);
     });
@@ -872,7 +872,7 @@ fn ceiling_div_neg_mod_limb_properties() {
     );
 
     test_properties(naturals, |n| {
-        let (q, r) = n.ceiling_div_neg_mod(1);
+        let (q, r) = n.ceiling_div_neg_mod(1 as Limb);
         assert_eq!(q, *n);
         assert_eq!(r, 0);
     });

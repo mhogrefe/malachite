@@ -45,9 +45,20 @@ pub fn mpn_addmul_1(r: &mut [Limb], s1: &[Limb], s2limb: Limb) -> Limb {
 impl AddMul<Natural, Limb> for Natural {
     type Output = Natural;
 
+    #[inline]
     fn add_mul(mut self, b: Natural, c: Limb) -> Natural {
         self.add_mul_assign(b, c);
         self
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl AddMul<Natural, u32> for Natural {
+    type Output = Natural;
+
+    #[inline]
+    fn add_mul(self, b: Natural, c: u32) -> Natural {
+        self.add_mul(b, Limb::from(c))
     }
 }
 
@@ -77,9 +88,20 @@ impl AddMul<Natural, Limb> for Natural {
 impl<'a> AddMul<&'a Natural, Limb> for Natural {
     type Output = Natural;
 
+    #[inline]
     fn add_mul(mut self, b: &'a Natural, c: Limb) -> Natural {
         self.add_mul_assign(b, c);
         self
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> AddMul<&'a Natural, u32> for Natural {
+    type Output = Natural;
+
+    #[inline]
+    fn add_mul(self, b: &'a Natural, c: u32) -> Natural {
+        self.add_mul(b, Limb::from(c))
     }
 }
 
@@ -144,6 +166,16 @@ impl<'a> AddMul<Natural, Limb> for &'a Natural {
     }
 }
 
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> AddMul<Natural, u32> for &'a Natural {
+    type Output = Natural;
+
+    #[inline]
+    fn add_mul(self, b: Natural, c: u32) -> Natural {
+        self.add_mul(b, Limb::from(c))
+    }
+}
+
 /// Adds the product of a `Natural` (b) and a `Limb` (c) to a `Natural` (self), taking `self` and b
 /// by reference.
 ///
@@ -202,6 +234,16 @@ impl<'a, 'b> AddMul<&'a Natural, Limb> for &'b Natural {
             }
         }
         Large(result_limbs)
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl<'a, 'b> AddMul<&'a Natural, u32> for &'b Natural {
+    type Output = Natural;
+
+    #[inline]
+    fn add_mul(self, b: &'a Natural, c: u32) -> Natural {
+        self.add_mul(b, Limb::from(c))
     }
 }
 
@@ -271,6 +313,14 @@ impl AddMulAssign<Natural, Limb> for Natural {
     }
 }
 
+#[cfg(feature = "64_bit_limbs")]
+impl AddMulAssign<Natural, u32> for Natural {
+    #[inline]
+    fn add_mul_assign(&mut self, b: Natural, c: u32) {
+        self.add_mul_assign(b, Limb::from(c));
+    }
+}
+
 /// Adds the product of a `Natural` (b) and a `Limb` (c) to a `Natural` (self), in place, taking b
 /// by reference.
 ///
@@ -334,5 +384,13 @@ impl<'a> AddMulAssign<&'a Natural, Limb> for Natural {
                 }
             }
         }
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> AddMulAssign<&'a Natural, u32> for Natural {
+    #[inline]
+    fn add_mul_assign(&mut self, b: &'a Natural, c: u32) {
+        self.add_mul_assign(b, Limb::from(c));
     }
 }

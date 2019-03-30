@@ -124,6 +124,14 @@ impl<'a> EqMod<Limb, Limb> for &'a Natural {
     }
 }
 
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> EqMod<u32, u32> for &'a Natural {
+    #[inline]
+    fn eq_mod(self, other: u32, modulus: u32) -> bool {
+        self.eq_mod(Limb::from(other), Limb::from(modulus))
+    }
+}
+
 impl<'a> EqMod<&'a Natural, Limb> for Limb {
     /// Returns whether this `Limb` is equivalent to a `Natural` mod a `Limb` `modulus`; that is,
     /// whether other - `self` is a multiple of `modulus`. Two numbers are equal to each other mod 0
@@ -150,8 +158,17 @@ impl<'a> EqMod<&'a Natural, Limb> for Limb {
     ///     assert_eq!(322.eq_mod(&Natural::from_str("12345678987654321").unwrap(), 1_000), false);
     /// }
     /// ```
+    #[inline]
     fn eq_mod(self, other: &'a Natural, modulus: Limb) -> bool {
         other.eq_mod(self, modulus)
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> EqMod<&'a Natural, u32> for u32 {
+    #[inline]
+    fn eq_mod(self, other: &'a Natural, modulus: u32) -> bool {
+        Limb::from(self).eq_mod(other, Limb::from(modulus))
     }
 }
 
@@ -186,5 +203,13 @@ impl<'a> EqMod<Limb, &'a Natural> for Limb {
             Small(small) => self.eq_mod(other, small),
             Large(_) => self == other,
         }
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> EqMod<u32, &'a Natural> for u32 {
+    #[inline]
+    fn eq_mod(self, other: u32, modulus: &'a Natural) -> bool {
+        Limb::from(self).eq_mod(Limb::from(other), modulus)
     }
 }

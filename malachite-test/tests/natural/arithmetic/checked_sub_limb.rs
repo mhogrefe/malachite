@@ -155,9 +155,9 @@ fn sub_limb_properties() {
 
     #[allow(unknown_lints, identity_op)]
     test_properties(naturals, |n| {
-        assert_eq!((n.checked_sub(0)).as_ref(), Some(n));
+        assert_eq!((n.checked_sub(0 as Limb)).as_ref(), Some(n));
         if *n != 0 {
-            assert!((0.checked_sub(n)).is_none());
+            assert!(CheckedSub::checked_sub(0 as Limb, n).is_none());
         }
     });
 

@@ -329,7 +329,7 @@ fn benchmark_natural_div_round_limb_ceiling_algorithms(
     m_run_benchmark(
         "Natural.div_round(Limb, RoundingMode::Ceiling)",
         BenchmarkType::Algorithms,
-        pairs_of_natural_and_positive_unsigned(gm),
+        pairs_of_natural_and_positive_unsigned::<Limb>(gm),
         gm.name(),
         limit,
         file_name,

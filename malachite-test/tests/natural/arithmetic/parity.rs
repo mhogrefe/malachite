@@ -38,9 +38,9 @@ fn test_odd() {
 fn even_properties() {
     test_properties(naturals, |x| {
         let even = x.even();
-        assert_eq!(x.divisible_by(2), even);
+        assert_eq!(x.divisible_by(2 as Limb), even);
         assert_eq!(!x.odd(), even);
-        assert_eq!((x + 1).odd(), even);
+        assert_eq!((x + 1 as Limb).odd(), even);
     });
 
     test_properties(unsigneds::<Limb>, |&u| {
@@ -52,9 +52,9 @@ fn even_properties() {
 fn odd_properties() {
     test_properties(naturals, |x| {
         let odd = x.odd();
-        assert_eq!(!x.divisible_by(2), odd);
+        assert_eq!(!x.divisible_by(2 as Limb), odd);
         assert_eq!(!x.even(), odd);
-        assert_eq!((x + 1).even(), odd);
+        assert_eq!((x + 1 as Limb).even(), odd);
     });
 
     test_properties(unsigneds::<Limb>, |&u| {

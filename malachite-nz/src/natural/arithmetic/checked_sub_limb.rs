@@ -1,4 +1,6 @@
 use malachite_base::misc::CheckedFrom;
+#[cfg(feature = "64_bit_limbs")]
+use malachite_base::misc::WrappingFrom;
 use malachite_base::num::CheckedSub;
 use natural::arithmetic::sub_limb::{limbs_sub_limb, limbs_sub_limb_in_place};
 use natural::Natural::{self, Large, Small};
@@ -28,13 +30,6 @@ impl Natural {
         }
         self.trim();
         false
-    }
-
-    // self -= other, return borrow
-    #[cfg(feature = "64_bit_limbs")]
-    #[inline]
-    pub(crate) fn sub_assign_limb_no_panic_u32(&mut self, other: u32) -> bool {
-        self.sub_assign_limb_no_panic(Limb::from(other))
     }
 }
 
@@ -79,12 +74,9 @@ impl CheckedSub<Limb> for Natural {
 impl CheckedSub<u32> for Natural {
     type Output = Natural;
 
-    fn checked_sub(mut self, other: u32) -> Option<Natural> {
-        if self.sub_assign_limb_no_panic_u32(other) {
-            None
-        } else {
-            Some(self)
-        }
+    #[inline]
+    fn checked_sub(self, other: u32) -> Option<Natural> {
+        self.checked_sub(Limb::from(other))
     }
 }
 
@@ -136,6 +128,16 @@ impl<'a> CheckedSub<Limb> for &'a Natural {
     }
 }
 
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> CheckedSub<u32> for &'a Natural {
+    type Output = Natural;
+
+    #[inline]
+    fn checked_sub(self, other: u32) -> Option<Natural> {
+        self.checked_sub(Limb::from(other))
+    }
+}
+
 impl CheckedSub<Natural> for Limb {
     type Output = Limb;
 
@@ -162,8 +164,19 @@ impl CheckedSub<Natural> for Limb {
     ///     assert_eq!(123.checked_sub(Natural::trillion()), None);
     /// }
     /// ```
+    #[inline]
     fn checked_sub(self, other: Natural) -> Option<Limb> {
         CheckedSub::checked_sub(self, &other)
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl CheckedSub<Natural> for u32 {
+    type Output = u32;
+
+    #[inline]
+    fn checked_sub(self, other: Natural) -> Option<u32> {
+        CheckedSub::checked_sub(Limb::from(self), other).map(u32::wrapping_from)
     }
 }
 
@@ -193,7 +206,18 @@ impl<'a> CheckedSub<&'a Natural> for Limb {
     ///     assert_eq!(123.checked_sub(&Natural::trillion()), None);
     /// }
     /// ```
+    #[inline]
     fn checked_sub(self, other: &'a Natural) -> Option<Limb> {
         Limb::checked_from(other).and_then(|x| self.checked_sub(x))
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> CheckedSub<&'a Natural> for u32 {
+    type Output = u32;
+
+    #[inline]
+    fn checked_sub(self, other: &'a Natural) -> Option<u32> {
+        CheckedSub::checked_sub(Limb::from(self), other).map(u32::wrapping_from)
     }
 }

@@ -38,6 +38,7 @@ use std::cmp::{max, Ordering};
 impl<'a> AddMul<Natural, Natural> for Natural {
     type Output = Natural;
 
+    #[inline]
     fn add_mul(mut self, b: Natural, c: Natural) -> Natural {
         self.add_mul_assign(b, c);
         self
@@ -72,6 +73,7 @@ impl<'a> AddMul<Natural, Natural> for Natural {
 impl<'a> AddMul<Natural, &'a Natural> for Natural {
     type Output = Natural;
 
+    #[inline]
     fn add_mul(mut self, b: Natural, c: &'a Natural) -> Natural {
         self.add_mul_assign(b, c);
         self
@@ -106,6 +108,7 @@ impl<'a> AddMul<Natural, &'a Natural> for Natural {
 impl<'a> AddMul<&'a Natural, Natural> for Natural {
     type Output = Natural;
 
+    #[inline]
     fn add_mul(mut self, b: &'a Natural, c: Natural) -> Natural {
         self.add_mul_assign(b, c);
         self
@@ -140,6 +143,7 @@ impl<'a> AddMul<&'a Natural, Natural> for Natural {
 impl<'a, 'b> AddMul<&'a Natural, &'b Natural> for Natural {
     type Output = Natural;
 
+    #[inline]
     fn add_mul(mut self, b: &'a Natural, c: &'b Natural) -> Natural {
         self.add_mul_assign(b, c);
         self

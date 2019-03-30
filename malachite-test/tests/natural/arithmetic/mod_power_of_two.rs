@@ -353,7 +353,7 @@ fn neg_mod_power_of_two_properties() {
     test_properties(pairs_of_natural_and_small_unsigned_var_2, |&(ref n, u)| {
         let m = n.neg_mod_power_of_two(u);
         assert_ne!(m, 0);
-        assert_eq!((((n >> u) + 1) << u) - &m, *n);
+        assert_eq!((((n >> u) + 1 as Limb) << u) - &m, *n);
         assert_eq!(n.mod_power_of_two(u) + m, Natural::ONE << u);
     });
 

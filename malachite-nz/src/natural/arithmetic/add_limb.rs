@@ -172,9 +172,20 @@ pub fn limbs_vec_add_limb_in_place(limbs: &mut Vec<Limb>, limb: Limb) {
 impl Add<Limb> for Natural {
     type Output = Natural;
 
+    #[inline]
     fn add(mut self, other: Limb) -> Natural {
         self += other;
         self
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl Add<u32> for Natural {
+    type Output = Natural;
+
+    #[inline]
+    fn add(self, other: u32) -> Natural {
+        self + Limb::from(other)
     }
 }
 
@@ -217,6 +228,16 @@ impl<'a> Add<Limb> for &'a Natural {
     }
 }
 
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> Add<u32> for &'a Natural {
+    type Output = Natural;
+
+    #[inline]
+    fn add(self, other: u32) -> Natural {
+        self + Limb::from(other)
+    }
+}
+
 /// Adds a `Natural` to a `Limb`, taking the `Natural` by value.
 ///
 /// Time: worst case O(n)
@@ -242,9 +263,20 @@ impl<'a> Add<Limb> for &'a Natural {
 impl Add<Natural> for Limb {
     type Output = Natural;
 
+    #[inline]
     fn add(self, mut other: Natural) -> Natural {
         other += self;
         other
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl Add<Natural> for u32 {
+    type Output = Natural;
+
+    #[inline]
+    fn add(self, other: Natural) -> Natural {
+        Limb::from(self) + other
     }
 }
 
@@ -273,8 +305,19 @@ impl Add<Natural> for Limb {
 impl<'a> Add<&'a Natural> for Limb {
     type Output = Natural;
 
+    #[inline]
     fn add(self, other: &'a Natural) -> Natural {
         other + self
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> Add<&'a Natural> for u32 {
+    type Output = Natural;
+
+    #[inline]
+    fn add(self, other: &'a Natural) -> Natural {
+        Limb::from(self) + other
     }
 }
 
@@ -315,5 +358,13 @@ impl AddAssign<Limb> for Natural {
         mutate_with_possible_promotion!(self, small, limbs, { small.checked_add(other) }, {
             limbs_vec_add_limb_in_place(limbs, other);
         });
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl AddAssign<u32> for Natural {
+    #[inline]
+    fn add_assign(&mut self, other: u32) {
+        *self += Limb::from(other);
     }
 }

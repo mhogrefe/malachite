@@ -410,8 +410,11 @@ fn benchmark_natural_div_exact_assign_3_algorithms(
         &(|ref n| n.significant_bits() as usize),
         "n.significant_bits()",
         &mut [
-            ("ordinary division", &mut (|mut x| x /= 3)),
-            ("exact division", &mut (|mut x| x.div_exact_assign(3))),
+            ("ordinary division", &mut (|mut x| x /= 3 as Limb)),
+            (
+                "exact division",
+                &mut (|mut x| x.div_exact_assign(3 as Limb)),
+            ),
             (
                 "exact division no special case 3",
                 &mut (|mut x| x._div_exact_assign_no_special_case_3(3)),
@@ -480,8 +483,8 @@ fn benchmark_natural_div_exact_ref_3_algorithms(gm: GenerationMode, limit: usize
         &(|ref n| n.significant_bits() as usize),
         "n.significant_bits()",
         &mut [
-            ("ordinary division", &mut (|x| no_out!(x / 3))),
-            ("exact division", &mut (|x| no_out!(x.div_exact(3)))),
+            ("ordinary division", &mut (|x| no_out!(x / 3 as Limb))),
+            ("exact division", &mut (|x| no_out!(x.div_exact(3 as Limb)))),
             (
                 "exact division no special case 3",
                 &mut (|x| no_out!(x._div_exact_no_special_case_3(3))),

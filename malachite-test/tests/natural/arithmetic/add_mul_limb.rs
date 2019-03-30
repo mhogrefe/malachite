@@ -110,7 +110,7 @@ fn add_mul_limb_properties() {
     );
 
     test_properties(pairs_of_naturals, |&(ref a, ref b)| {
-        assert_eq!(a.add_mul(b, 0), *a);
-        assert_eq!(a.add_mul(b, 1), a + b);
+        assert_eq!(a.add_mul(b, 0 as Limb), *a);
+        assert_eq!(a.add_mul(b, 1 as Limb), a + b);
     });
 }

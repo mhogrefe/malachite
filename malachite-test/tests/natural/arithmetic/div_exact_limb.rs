@@ -294,19 +294,19 @@ fn test_div_exact_limb() {
 #[should_panic]
 fn div_exact_assign_limb_fail() {
     let mut n = Natural::from(10u32);
-    n.div_exact_assign(0);
+    n.div_exact_assign(0 as Limb);
 }
 
 #[test]
 #[should_panic]
 fn div_exact_limb_fail() {
-    Natural::from(10u32).div_exact(0);
+    Natural::from(10u32).div_exact(0 as Limb);
 }
 
 #[test]
 #[should_panic]
 fn div_exact_limb_ref_fail() {
-    (&Natural::from(10u32)).div_exact(0);
+    (&Natural::from(10u32)).div_exact(0 as Limb);
 }
 
 #[test]
@@ -338,26 +338,26 @@ fn test_limb_div_exact_natural() {
 #[test]
 #[should_panic]
 fn limb_div_exact_natural_fail() {
-    10.div_exact(Natural::ZERO);
+    (10 as Limb).div_exact(Natural::ZERO);
 }
 
 #[test]
 #[should_panic]
 fn limb_div_exact_natural_ref_fail() {
-    10.div_exact(&Natural::ZERO);
+    (10 as Limb).div_exact(&Natural::ZERO);
 }
 
 #[test]
 #[should_panic]
 fn limb_div_exact_assign_natural_fail() {
-    let mut n = 10;
+    let mut n: Limb = 10;
     n.div_exact_assign(Natural::ZERO);
 }
 
 #[test]
 #[should_panic]
 fn limb_div_exact_assign_natural_ref_fail() {
-    let mut n = 10;
+    let mut n: Limb = 10;
     n.div_exact_assign(&Natural::ZERO);
 }
 
@@ -425,7 +425,10 @@ fn limbs_div_exact_3_properties() {
             Natural::from_owned_limbs_asc(limbs_div_exact_limb(limbs, 3)),
             quotient_limbs,
         );
-        assert_eq!(Natural::from_limbs_asc(limbs).div_exact(3), quotient_limbs);
+        assert_eq!(
+            Natural::from_limbs_asc(limbs).div_exact(3 as Limb),
+            quotient_limbs
+        );
     });
 }
 
@@ -438,7 +441,7 @@ fn limbs_div_exact_3_to_out_properties() {
         let len = in_limbs.len();
         assert_eq!(
             Natural::from_limbs_asc(&out[..len]),
-            Natural::from_limbs_asc(in_limbs).div_exact(3)
+            Natural::from_limbs_asc(in_limbs).div_exact(3 as Limb)
         );
         assert_eq!(&out[len..], &old_out[len..]);
 
@@ -460,7 +463,7 @@ fn limbs_div_exact_3_in_place_properties() {
         limbs_div_exact_3_in_place(&mut limbs);
         assert_eq!(
             Natural::from_limbs_asc(&limbs),
-            Natural::from_limbs_asc(&old_limbs).div_exact(3)
+            Natural::from_limbs_asc(&old_limbs).div_exact(3 as Limb)
         );
 
         let mut limbs_alt = old_limbs.clone();
@@ -554,11 +557,11 @@ fn div_exact_limb_properties() {
     });
 
     test_properties(naturals, |n| {
-        assert_eq!(n.div_exact(1), *n);
+        assert_eq!(n.div_exact(1 as Limb), *n);
     });
 
     test_properties(positive_naturals, |n| {
-        assert_eq!(0.div_exact(n), 0);
+        assert_eq!((0 as Limb).div_exact(n), 0);
     });
 
     test_properties(positive_unsigneds, |&u: &Limb| {

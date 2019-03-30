@@ -126,11 +126,11 @@ fn eq_limb_mod_power_of_two_properties() {
 
     test_properties(pairs_of_natural_and_small_unsigned, |&(ref n, pow)| {
         assert_eq!(
-            n.eq_mod_power_of_two(0, pow),
+            n.eq_mod_power_of_two(0 as Limb, pow),
             n.divisible_by_power_of_two(pow)
         );
         assert_eq!(
-            0.eq_mod_power_of_two(n, pow),
+            (0 as Limb).eq_mod_power_of_two(n, pow),
             n.divisible_by_power_of_two(pow)
         );
     });
