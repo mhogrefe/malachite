@@ -82,12 +82,16 @@ macro_rules! float_impls {
                         _ => $f::POSITIVE_INFINITY,
                     };
                 }
-                let exponent = value.floor_log_two();
+                let mut exponent = value.floor_log_two();
                 let shift = i32::checked_from(exponent).unwrap()
                     - i32::checked_from($f::MANTISSA_WIDTH).unwrap();
                 value.shr_round_assign(shift, rm);
                 let mut mantissa =
-                    <$f as PrimitiveFloat>::UnsignedOfEqualWidth::wrapping_from(value);
+                    <$f as PrimitiveFloat>::UnsignedOfEqualWidth::checked_from(value).unwrap();
+                if mantissa.get_bit(u64::from($f::MANTISSA_WIDTH + 1)) {
+                    exponent += 1;
+                    mantissa >>= 1;
+                }
                 mantissa.clear_bit(u64::from($f::MANTISSA_WIDTH));
                 let exponent = u32::wrapping_from(exponent) + $f::MAX_EXPONENT;
                 $f::from_adjusted_mantissa_and_exponent(mantissa, exponent)
@@ -145,12 +149,17 @@ macro_rules! float_impls {
                         _ => $f::POSITIVE_INFINITY,
                     };
                 }
-                let exponent = value.floor_log_two();
+                let mut exponent = value.floor_log_two();
                 let shift = i32::checked_from(exponent).unwrap()
                     - i32::checked_from($f::MANTISSA_WIDTH).unwrap();
-                let mut mantissa = <$f as PrimitiveFloat>::UnsignedOfEqualWidth::wrapping_from(
+                let mut mantissa = <$f as PrimitiveFloat>::UnsignedOfEqualWidth::checked_from(
                     value.shr_round(shift, rm),
-                );
+                )
+                .unwrap();
+                if mantissa.get_bit(u64::from($f::MANTISSA_WIDTH + 1)) {
+                    exponent += 1;
+                    mantissa >>= 1;
+                }
                 mantissa.clear_bit(u64::from($f::MANTISSA_WIDTH));
                 let exponent = u32::wrapping_from(exponent) + $f::MAX_EXPONENT;
                 $f::from_adjusted_mantissa_and_exponent(mantissa, exponent)

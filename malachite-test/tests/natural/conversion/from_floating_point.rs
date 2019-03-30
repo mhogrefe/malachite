@@ -456,7 +456,6 @@ macro_rules! float_properties {
                 assert_eq!(n, Natural::rounding_from(f, RoundingMode::Down));
                 assert_eq!(n, Natural::rounding_from(f, RoundingMode::Up));
                 assert_eq!(n, Natural::rounding_from(f, RoundingMode::Nearest));
-                assert_eq!(n, Natural::rounding_from(f, RoundingMode::Exact));
                 assert_eq!($f::rounding_from(n, RoundingMode::Exact), f);
             });
 
@@ -467,9 +466,9 @@ macro_rules! float_properties {
                 assert_eq!(n_ceiling, Natural::rounding_from(f, RoundingMode::Ceiling));
                 assert_eq!(n_floor, Natural::rounding_from(f, RoundingMode::Down));
                 assert_eq!(n_ceiling, Natural::rounding_from(f, RoundingMode::Up));
-                let n_nearest = Natural::rounding_from(f, RoundingMode::Up);
+                let n_nearest = Natural::rounding_from(f, RoundingMode::Nearest);
                 assert!(n_nearest == n_floor || n_nearest == n_ceiling);
-                assert_ne!($f::from(n_floor), f);
+                assert_ne!($f::from(n_nearest), f);
             });
 
             test_properties($floats_var_3, |&f| {

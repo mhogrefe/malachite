@@ -1,7 +1,7 @@
 use common::{natural_to_biguint, natural_to_rug_integer, GenerationMode};
 use inputs::base::{f32s, f64s, pairs_of_unsigneds, It};
 use inputs::common::{reshape_1_2_to_3, reshape_2_1_to_3};
-use malachite_base::misc::{CheckedFrom, CheckedInto};
+use malachite_base::misc::{CheckedFrom, CheckedInto, RoundingFrom, Walkable};
 use malachite_base::num::{
     DivisibleBy, DivisibleByPowerOfTwo, EqMod, EqModPowerOfTwo, PrimitiveFloat, PrimitiveInteger,
     PrimitiveSigned, PrimitiveUnsigned, SignificantBits,
@@ -1043,7 +1043,8 @@ macro_rules! float_gen {
         $floats_exactly_equal_to_natural: ident,
         $naturals_not_exactly_equal_to_float: ident,
         $floats_var_2: ident,
-        $floats_var_3: ident
+        $floats_var_3: ident,
+        $naturals_var_2: ident
     ) => {
         pub fn $pairs_of_natural_and_rounding_mode_var_1(
             gm: GenerationMode,
@@ -1095,6 +1096,30 @@ macro_rules! float_gen {
                 }
             }))
         }
+
+        // Naturals exactly in between two adjacent floats.
+        pub fn $naturals_var_2(gm: GenerationMode) -> It<Natural> {
+            Box::new($naturals_not_exactly_equal_to_float(gm).flat_map(|n| {
+                let f_below = $f::rounding_from(&n, RoundingMode::Floor);
+                let on_below = Natural::checked_from(f_below);
+                if on_below.is_none() {
+                    return None;
+                }
+                let n_below = on_below.unwrap();
+                let mut f_above = f_below;
+                f_above.increment();
+                let on_above = Natural::checked_from(f_above);
+                if on_above.is_none() {
+                    return None;
+                }
+                let n_above = on_above.unwrap();
+                if n_above - &n == &n - n_below {
+                    Some(n)
+                } else {
+                    None
+                }
+            }))
+        }
     };
 }
 
@@ -1106,7 +1131,8 @@ float_gen!(
     f32s_exactly_equal_to_natural,
     naturals_not_exactly_equal_to_f32,
     f32s_var_2,
-    f32s_var_3
+    f32s_var_3,
+    naturals_var_2_f32
 );
 float_gen!(
     f64,
@@ -1116,7 +1142,8 @@ float_gen!(
     f64s_exactly_equal_to_natural,
     naturals_not_exactly_equal_to_f64,
     f64s_var_2,
-    f64s_var_3
+    f64s_var_3,
+    naturals_var_2_f64
 );
 
 fn triples_of_natural_small_signed_and_rounding_mode<T: PrimitiveSigned + Rand>(
