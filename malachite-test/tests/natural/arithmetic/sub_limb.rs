@@ -127,7 +127,7 @@ fn test_sub_assign_limb() {
 #[should_panic]
 fn sub_assign_limb_fail() {
     let mut x = Natural::from_str("123").unwrap();
-    x -= 456;
+    x -= 456 as Limb;
 }
 
 #[test]
@@ -192,7 +192,7 @@ fn test_limb_sub_natural() {
 #[should_panic]
 #[allow(unused_must_use)]
 fn limb_sub_natural_fail() {
-    123 - &Natural::from_str("456").unwrap();
+    123 as Limb - &Natural::from_str("456").unwrap();
 }
 
 #[test]

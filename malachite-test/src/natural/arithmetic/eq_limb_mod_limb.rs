@@ -160,7 +160,7 @@ fn benchmark_natural_eq_limb_mod_limb_algorithms(
     m_run_benchmark(
         "Natural.eq_mod(Limb, Limb)",
         BenchmarkType::Algorithms,
-        triples_of_natural_unsigned_and_unsigned(gm),
+        triples_of_natural_unsigned_and_unsigned::<Limb>(gm),
         gm.name(),
         limit,
         file_name,

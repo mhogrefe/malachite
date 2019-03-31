@@ -51,7 +51,7 @@ pub fn rm_naturals(gm: GenerationMode) -> It<(rug::Integer, Natural)> {
 
 // All `Natural` multiples of 3.
 pub fn naturals_var_1(gm: GenerationMode) -> It<Natural> {
-    Box::new(naturals(gm).map(|n| n * 3))
+    Box::new(naturals(gm).map(|n| n * 3 as Limb))
 }
 
 // All pairs of `Natural` multiples of 3, and `3`.

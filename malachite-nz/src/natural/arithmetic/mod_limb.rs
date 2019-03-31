@@ -1,6 +1,6 @@
-#[cfg(feature = "64_bit_limbs")]
-use malachite_base::misc::CheckedFrom;
 use malachite_base::misc::Max;
+#[cfg(feature = "64_bit_limbs")]
+use malachite_base::misc::WrappingFrom;
 use malachite_base::num::{
     JoinHalves, Mod, ModAssign, NegMod, NegModAssign, PrimitiveInteger, SplitInHalf,
     WrappingAddAssign, WrappingSubAssign, Zero,
@@ -8,8 +8,6 @@ use malachite_base::num::{
 use natural::Natural::{self, Large, Small};
 use platform::{DoubleLimb, Limb};
 use std::ops::{Rem, RemAssign};
-
-//TODO continue 32-bit impls
 
 // These functions are adapted from udiv_qrnnd_preinv, mpn_div_qr_1n_pi1, and mpn_div_qr_1 in GMP
 // 6.1.2.
@@ -204,8 +202,19 @@ impl Mod<Limb> for Natural {
     ///     assert_eq!(Natural::from(23u32).mod_op(10), 3);
     /// }
     /// ```
+    #[inline]
     fn mod_op(self, other: Limb) -> Limb {
         self % other
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl Mod<u32> for Natural {
+    type Output = u32;
+
+    #[inline]
+    fn mod_op(self, other: u32) -> u32 {
+        u32::wrapping_from(self.mod_op(Limb::from(other)))
     }
 }
 
@@ -234,8 +243,19 @@ impl<'a> Mod<Limb> for &'a Natural {
     ///     assert_eq!((&Natural::from(23u32)).mod_op(10), 3);
     /// }
     /// ```
+    #[inline]
     fn mod_op(self, other: Limb) -> Limb {
         self % other
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> Mod<u32> for &'a Natural {
+    type Output = u32;
+
+    #[inline]
+    fn mod_op(self, other: u32) -> u32 {
+        u32::wrapping_from(self.mod_op(Limb::from(other)))
     }
 }
 
@@ -264,8 +284,17 @@ impl ModAssign<Limb> for Natural {
     ///     assert_eq!(x.to_string(), "3");
     /// }
     /// ```
+    #[inline]
     fn mod_assign(&mut self, other: Limb) {
         *self %= other;
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl ModAssign<u32> for Natural {
+    #[inline]
+    fn mod_assign(&mut self, other: u32) {
+        self.mod_assign(Limb::from(other));
     }
 }
 
@@ -292,8 +321,19 @@ impl Mod<Natural> for Limb {
     ///     assert_eq!(23.mod_op(Natural::from(10u32)), 3);
     /// }
     /// ```
+    #[inline]
     fn mod_op(self, other: Natural) -> Limb {
         self % other
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl Mod<Natural> for u32 {
+    type Output = u32;
+
+    #[inline]
+    fn mod_op(self, other: Natural) -> u32 {
+        u32::wrapping_from(Limb::from(self).mod_op(other))
     }
 }
 
@@ -320,8 +360,19 @@ impl<'a> Mod<&'a Natural> for Limb {
     ///     assert_eq!(23.mod_op(&Natural::from(10u32)), 3);
     /// }
     /// ```
+    #[inline]
     fn mod_op(self, other: &'a Natural) -> Limb {
         self % other
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> Mod<&'a Natural> for u32 {
+    type Output = u32;
+
+    #[inline]
+    fn mod_op(self, other: &'a Natural) -> u32 {
+        u32::wrapping_from(Limb::from(self).mod_op(other))
     }
 }
 
@@ -349,8 +400,17 @@ impl ModAssign<Natural> for Limb {
     ///     assert_eq!(n, 3);
     /// }
     /// ```
+    #[inline]
     fn mod_assign(&mut self, other: Natural) {
         *self %= other;
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl ModAssign<Natural> for u32 {
+    #[inline]
+    fn mod_assign(&mut self, other: Natural) {
+        *self = self.mod_op(other);
     }
 }
 
@@ -378,8 +438,17 @@ impl<'a> ModAssign<&'a Natural> for Limb {
     ///     assert_eq!(n, 3);
     /// }
     /// ```
+    #[inline]
     fn mod_assign(&mut self, other: &'a Natural) {
         *self %= other;
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> ModAssign<&'a Natural> for u32 {
+    #[inline]
+    fn mod_assign(&mut self, other: &'a Natural) {
+        *self = self.mod_op(other);
     }
 }
 
@@ -408,8 +477,19 @@ impl Rem<Limb> for Natural {
     ///     assert_eq!(Natural::from(23u32) % 10, 3);
     /// }
     /// ```
+    #[inline]
     fn rem(self, other: Limb) -> Limb {
         &self % other
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl Rem<u32> for Natural {
+    type Output = u32;
+
+    #[inline]
+    fn rem(self, other: u32) -> u32 {
+        u32::wrapping_from(self % Limb::from(other))
     }
 }
 
@@ -447,6 +527,16 @@ impl<'a> Rem<Limb> for &'a Natural {
                 Large(ref limbs) => limbs_mod_limb(limbs, other),
             }
         }
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> Rem<u32> for &'a Natural {
+    type Output = u32;
+
+    #[inline]
+    fn rem(self, other: u32) -> u32 {
+        u32::wrapping_from(self % Limb::from(other))
     }
 }
 
@@ -491,6 +581,14 @@ impl RemAssign<Limb> for Natural {
     }
 }
 
+#[cfg(feature = "64_bit_limbs")]
+impl RemAssign<u32> for Natural {
+    #[inline]
+    fn rem_assign(&mut self, other: u32) {
+        *self %= Limb::from(other);
+    }
+}
+
 impl Rem<Natural> for Limb {
     type Output = Limb;
 
@@ -514,6 +612,7 @@ impl Rem<Natural> for Limb {
     ///     assert_eq!(23 % Natural::from(10u32), 3);
     /// }
     /// ```
+    #[inline]
     fn rem(self, other: Natural) -> Limb {
         self % &other
     }
@@ -525,7 +624,7 @@ impl Rem<Natural> for u32 {
 
     #[inline]
     fn rem(self, other: Natural) -> u32 {
-        self % &other
+        u32::wrapping_from(Limb::from(self) % other)
     }
 }
 
@@ -572,7 +671,7 @@ impl<'a> Rem<&'a Natural> for u32 {
 
     #[inline]
     fn rem(self, other: &'a Natural) -> u32 {
-        u32::checked_from(Limb::from(self) % other).unwrap()
+        u32::wrapping_from(Limb::from(self) % other)
     }
 }
 
@@ -599,6 +698,7 @@ impl RemAssign<Natural> for Limb {
     ///     assert_eq!(n, 3);
     /// }
     /// ```
+    #[inline]
     fn rem_assign(&mut self, other: Natural) {
         *self %= &other;
     }
@@ -608,7 +708,7 @@ impl RemAssign<Natural> for Limb {
 impl RemAssign<Natural> for u32 {
     #[inline]
     fn rem_assign(&mut self, other: Natural) {
-        *self %= &other;
+        *self = *self % other
     }
 }
 
@@ -635,6 +735,7 @@ impl<'a> RemAssign<&'a Natural> for Limb {
     ///     assert_eq!(n, 3);
     /// }
     /// ```
+    #[inline]
     fn rem_assign(&mut self, other: &'a Natural) {
         *self = *self % other;
     }
@@ -674,8 +775,19 @@ impl NegMod<Limb> for Natural {
     ///     assert_eq!(Natural::from(23u32).neg_mod(10), 7);
     /// }
     /// ```
+    #[inline]
     fn neg_mod(self, other: Limb) -> Limb {
         (&self).neg_mod(other)
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl NegMod<u32> for Natural {
+    type Output = u32;
+
+    #[inline]
+    fn neg_mod(self, other: u32) -> u32 {
+        u32::wrapping_from(self.neg_mod(Limb::from(other)))
     }
 }
 
@@ -715,6 +827,16 @@ impl<'a> NegMod<Limb> for &'a Natural {
     }
 }
 
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> NegMod<u32> for &'a Natural {
+    type Output = u32;
+
+    #[inline]
+    fn neg_mod(self, other: u32) -> u32 {
+        u32::wrapping_from(self.neg_mod(Limb::from(other)))
+    }
+}
+
 impl NegModAssign<Limb> for Natural {
     /// Divides the negative of a `Natural` by a `Limb`, replacing the `Natural` by the remainder.
     /// The quotient and remainder satisfy `self` = q * `other` - r and 0 <= r < `other`.
@@ -740,8 +862,17 @@ impl NegModAssign<Limb> for Natural {
     ///     assert_eq!(x.to_string(), "7");
     /// }
     /// ```
+    #[inline]
     fn neg_mod_assign(&mut self, other: Limb) {
         *self = Small((&*self).neg_mod(other));
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl NegModAssign<u32> for Natural {
+    #[inline]
+    fn neg_mod_assign(&mut self, other: u32) {
+        self.neg_mod_assign(Limb::from(other))
     }
 }
 
@@ -785,13 +916,9 @@ impl NegMod<Natural> for Limb {
 impl NegMod<Natural> for u32 {
     type Output = Natural;
 
+    #[inline]
     fn neg_mod(self, other: Natural) -> Natural {
-        let rem = self % &other;
-        if rem == 0 {
-            Natural::ZERO
-        } else {
-            other - rem
-        }
+        Limb::from(self).neg_mod(other)
     }
 }
 
@@ -835,13 +962,9 @@ impl<'a> NegMod<&'a Natural> for Limb {
 impl<'a> NegMod<&'a Natural> for u32 {
     type Output = Natural;
 
+    #[inline]
     fn neg_mod(self, other: &'a Natural) -> Natural {
-        let rem = self % other;
-        if rem == 0 {
-            Natural::ZERO
-        } else {
-            other - rem
-        }
+        Limb::from(self).neg_mod(other)
     }
 }
 

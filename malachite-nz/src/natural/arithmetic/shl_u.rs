@@ -213,6 +213,7 @@ macro_rules! impl_natural_shl_unsigned {
         impl Shl<$t> for Natural {
             type Output = Natural;
 
+            #[inline]
             fn shl(mut self, other: $t) -> Natural {
                 self <<= other;
                 self

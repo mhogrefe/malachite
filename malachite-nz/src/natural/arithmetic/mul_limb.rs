@@ -164,9 +164,20 @@ pub fn limbs_vec_mul_limb_in_place(limbs: &mut Vec<Limb>, limb: Limb) {
 impl Mul<Limb> for Natural {
     type Output = Natural;
 
+    #[inline]
     fn mul(mut self, other: Limb) -> Natural {
         self *= other;
         self
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl Mul<u32> for Natural {
+    type Output = Natural;
+
+    #[inline]
+    fn mul(self, other: u32) -> Natural {
+        self * Limb::from(other)
     }
 }
 
@@ -217,6 +228,16 @@ impl<'a> Mul<Limb> for &'a Natural {
     }
 }
 
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> Mul<u32> for &'a Natural {
+    type Output = Natural;
+
+    #[inline]
+    fn mul(self, other: u32) -> Natural {
+        self * Limb::from(other)
+    }
+}
+
 /// Multiplies a `Limb` by a `Natural`, taking the `Natural` by value.
 ///
 /// Time: worst case O(n)
@@ -242,9 +263,20 @@ impl<'a> Mul<Limb> for &'a Natural {
 impl Mul<Natural> for Limb {
     type Output = Natural;
 
+    #[inline]
     fn mul(self, mut other: Natural) -> Natural {
         other *= self;
         other
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl Mul<Natural> for u32 {
+    type Output = Natural;
+
+    #[inline]
+    fn mul(self, other: Natural) -> Natural {
+        Limb::from(self) * other
     }
 }
 
@@ -273,8 +305,19 @@ impl Mul<Natural> for Limb {
 impl<'a> Mul<&'a Natural> for Limb {
     type Output = Natural;
 
+    #[inline]
     fn mul(self, other: &'a Natural) -> Natural {
         other * self
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> Mul<&'a Natural> for u32 {
+    type Output = Natural;
+
+    #[inline]
+    fn mul(self, other: &'a Natural) -> Natural {
+        Limb::from(self) * other
     }
 }
 
@@ -319,5 +362,13 @@ impl MulAssign<Limb> for Natural {
         mutate_with_possible_promotion!(self, small, limbs, { small.checked_mul(other) }, {
             limbs_vec_mul_limb_in_place(limbs, other);
         });
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl MulAssign<u32> for Natural {
+    #[inline]
+    fn mul_assign(&mut self, other: u32) {
+        *self *= Limb::from(other);
     }
 }

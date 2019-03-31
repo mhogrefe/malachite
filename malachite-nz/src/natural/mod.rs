@@ -160,7 +160,7 @@ impl Walkable for Natural {
     /// }
     /// ```
     fn decrement(&mut self) {
-        *self -= 1;
+        *self -= 1 as Limb;
     }
 }
 

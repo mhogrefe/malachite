@@ -11,7 +11,7 @@ use std::str::FromStr;
 
 #[test]
 fn test_sub_mul_assign_limb() {
-    let test = |u, v, c, out: &str| {
+    let test = |u, v, c: Limb, out: &str| {
         let mut n = Natural::from_str(u).unwrap();
         n.sub_mul_assign(&Natural::from_str(v).unwrap(), c);
         assert_eq!(n.to_string(), out);
@@ -44,14 +44,14 @@ fn test_sub_mul_assign_limb() {
 #[should_panic]
 fn sub_mul_assign_fail_1() {
     let mut x = Natural::from_str("123").unwrap();
-    x.sub_mul_assign(&Natural::from_str("5").unwrap(), 100);
+    x.sub_mul_assign(&Natural::from_str("5").unwrap(), 100 as Limb);
 }
 
 #[test]
 #[should_panic]
 fn sub_mul_assign_fail_2() {
     let mut x = Natural::from_str("1000000000000").unwrap();
-    x.sub_mul_assign(&Natural::from_str("1000000000000").unwrap(), 100);
+    x.sub_mul_assign(&Natural::from_str("1000000000000").unwrap(), 100 as Limb);
 }
 
 #[test]
@@ -123,7 +123,7 @@ fn sub_mul_limb_properties() {
     );
 
     test_properties(naturals, |n| {
-        assert_eq!(n.sub_mul(n, 1), Some(Natural::ZERO));
+        assert_eq!(n.sub_mul(n, 1 as Limb), Some(Natural::ZERO));
     });
 
     test_properties(
@@ -136,7 +136,7 @@ fn sub_mul_limb_properties() {
     );
 
     test_properties(pairs_of_naturals, |&(ref a, ref b)| {
-        assert_eq!(a.sub_mul(b, 0).as_ref(), Some(a));
-        assert_eq!(a.sub_mul(b, 1), a.checked_sub(b));
+        assert_eq!(a.sub_mul(b, 0 as Limb).as_ref(), Some(a));
+        assert_eq!(a.sub_mul(b, 1 as Limb), a.checked_sub(b));
     });
 }

@@ -104,39 +104,39 @@ fn test_mod_limb() {
 #[should_panic]
 fn rem_assign_limb_fail() {
     let mut n = Natural::from(10u32);
-    n %= 0;
+    n %= 0 as Limb;
 }
 
 #[test]
 #[allow(unused_must_use)]
 #[should_panic]
 fn rem_limb_fail() {
-    Natural::from(10u32) % 0;
+    Natural::from(10u32) % 0 as Limb;
 }
 
 #[test]
 #[allow(unused_must_use)]
 #[should_panic]
 fn rem_limb_ref_fail() {
-    &Natural::from(10u32) % 0;
+    &Natural::from(10u32) % 0 as Limb;
 }
 
 #[test]
 #[should_panic]
 fn mod_assign_limb_fail() {
-    Natural::from(10u32).mod_assign(0);
+    Natural::from(10u32).mod_assign(0 as Limb);
 }
 
 #[test]
 #[should_panic]
 fn mod_limb_fail() {
-    Natural::from(10u32).mod_op(0);
+    Natural::from(10u32).mod_op(0 as Limb);
 }
 
 #[test]
 #[should_panic]
 fn mod_limb_ref_fail() {
-    (&Natural::from(10u32)).mod_op(0);
+    (&Natural::from(10u32)).mod_op(0 as Limb);
 }
 
 #[test]
@@ -177,19 +177,19 @@ fn test_neg_mod_limb() {
 #[test]
 #[should_panic]
 fn neg_mod_assign_limb_fail() {
-    Natural::from(10u32).neg_mod_assign(0);
+    Natural::from(10u32).neg_mod_assign(0 as Limb);
 }
 
 #[test]
 #[should_panic]
 fn neg_mod_limb_fail() {
-    Natural::from(10u32).neg_mod(0);
+    Natural::from(10u32).neg_mod(0 as Limb);
 }
 
 #[test]
 #[should_panic]
 fn neg_mod_limb_ref_fail() {
-    (&Natural::from(10u32)).neg_mod(0);
+    (&Natural::from(10u32)).neg_mod(0 as Limb);
 }
 
 #[test]
@@ -261,26 +261,26 @@ fn limb_rem_assign_natural_ref_fail() {
 #[test]
 #[should_panic]
 fn limb_mod_natural_fail() {
-    10.mod_op(Natural::ZERO);
+    (10 as Limb).mod_op(Natural::ZERO);
 }
 
 #[test]
 #[should_panic]
 fn limb_mod_natural_ref_fail() {
-    10.mod_op(&Natural::ZERO);
+    (10 as Limb).mod_op(&Natural::ZERO);
 }
 
 #[test]
 #[should_panic]
 fn limb_mod_assign_natural_fail() {
-    let mut n = 10;
+    let mut n: Limb = 10;
     n.mod_assign(Natural::ZERO);
 }
 
 #[test]
 #[should_panic]
 fn limb_mod_assign_natural_ref_fail() {
-    let mut n = 10;
+    let mut n: Limb = 10;
     n.mod_assign(&Natural::ZERO);
 }
 
@@ -421,14 +421,17 @@ fn mod_limb_properties() {
         },
     );
 
-    test_properties(pairs_of_unsigned_and_positive_unsigned, |&(x, y)| {
-        let result = x % y;
-        assert_eq!(result, Natural::from(x) % y);
-        assert_eq!(result, x % Natural::from(y));
-    });
+    test_properties(
+        pairs_of_unsigned_and_positive_unsigned::<Limb>,
+        |&(x, y)| {
+            let result = x % y;
+            assert_eq!(result, Natural::from(x) % y);
+            assert_eq!(result, x % Natural::from(y));
+        },
+    );
 
     test_properties(naturals, |n| {
-        assert_eq!(n % 1, 0);
+        assert_eq!(n % 1 as Limb, 0);
     });
 
     test_properties(positive_unsigneds, |&u: &Limb| {
@@ -441,7 +444,7 @@ fn mod_limb_properties() {
     });
 
     test_properties(
-        triples_of_natural_natural_and_positive_unsigned,
+        triples_of_natural_natural_and_positive_unsigned::<Limb>,
         |&(ref x, ref y, u)| {
             assert_eq!(
                 (x + y) % u,
@@ -522,7 +525,7 @@ fn neg_mod_limb_properties() {
     );
 
     test_properties(naturals, |n| {
-        assert_eq!(n.neg_mod(1), 0);
+        assert_eq!(n.neg_mod(1 as Limb), 0);
     });
 
     test_properties(positive_unsigneds, |&u: &Limb| {
@@ -533,7 +536,7 @@ fn neg_mod_limb_properties() {
     });
 
     test_properties(
-        triples_of_natural_natural_and_positive_unsigned,
+        triples_of_natural_natural_and_positive_unsigned::<Limb>,
         |&(ref x, ref y, u)| {
             assert_eq!(
                 (x + y).neg_mod(u),

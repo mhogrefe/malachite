@@ -92,8 +92,8 @@ fn saturating_sub_limb_properties() {
     );
 
     test_properties(naturals, |n| {
-        assert_eq!(n.saturating_sub(0), *n);
-        assert_eq!(0.saturating_sub(n), 0);
+        assert_eq!(n.saturating_sub(0 as Limb), *n);
+        assert_eq!(SaturatingSub::saturating_sub(0 as Limb, n), 0);
     });
 
     test_properties(pairs_of_unsigneds::<Limb>, |&(x, y)| {

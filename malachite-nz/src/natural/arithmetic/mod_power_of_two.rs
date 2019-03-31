@@ -168,6 +168,7 @@ impl ModPowerOfTwo for Natural {
     ///     assert_eq!(Natural::from(1611u32).mod_power_of_two(4).to_string(), "11");
     /// }
     /// ```
+    #[inline]
     fn mod_power_of_two(mut self, other: u64) -> Natural {
         self.mod_power_of_two_assign(other);
         self
@@ -277,6 +278,7 @@ impl RemPowerOfTwo for Natural {
     ///     assert_eq!(Natural::from(1611u32).rem_power_of_two(4).to_string(), "11");
     /// }
     /// ```
+    #[inline]
     fn rem_power_of_two(self, other: u64) -> Natural {
         self.mod_power_of_two(other)
     }
@@ -307,6 +309,7 @@ impl<'a> RemPowerOfTwo for &'a Natural {
     ///     assert_eq!((&Natural::from(1611u32)).rem_power_of_two(4).to_string(), "11");
     /// }
     /// ```
+    #[inline]
     fn rem_power_of_two(self, other: u64) -> Natural {
         self.mod_power_of_two(other)
     }
@@ -339,6 +342,7 @@ impl RemPowerOfTwoAssign for Natural {
     ///     assert_eq!(x.to_string(), "11");
     /// }
     /// ```
+    #[inline]
     fn rem_power_of_two_assign(&mut self, other: u64) {
         self.mod_power_of_two_assign(other);
     }
@@ -371,6 +375,7 @@ impl NegModPowerOfTwo for Natural {
     ///     assert_eq!(Natural::from(1611u32).neg_mod_power_of_two(4).to_string(), "5");
     /// }
     /// ```
+    #[inline]
     fn neg_mod_power_of_two(mut self, other: u64) -> Natural {
         self.neg_mod_power_of_two_assign(other);
         self

@@ -120,7 +120,7 @@ impl NotAssign for Integer {
             self.abs += 1 as Limb;
         } else {
             self.sign = true;
-            self.abs -= 1;
+            self.abs -= 1 as Limb;
         }
     }
 }

@@ -715,6 +715,7 @@ macro_rules! impl_natural_shr_unsigned {
         impl Shr<$t> for Natural {
             type Output = Natural;
 
+            #[inline]
             fn shr(mut self, other: $t) -> Natural {
                 self >>= other;
                 self
@@ -851,6 +852,7 @@ macro_rules! impl_natural_shr_unsigned {
         impl ShrRound<$t> for Natural {
             type Output = Natural;
 
+            #[inline]
             fn shr_round(mut self, other: $t, rm: RoundingMode) -> Natural {
                 self.shr_round_assign(other, rm);
                 self

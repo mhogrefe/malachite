@@ -175,6 +175,7 @@ impl NextPowerOfTwo for Natural {
     ///     assert_eq!(Natural::trillion().next_power_of_two().to_string(), "1099511627776");
     /// }
     /// ```
+    #[inline]
     fn next_power_of_two(mut self) -> Natural {
         self.next_power_of_two_assign();
         self

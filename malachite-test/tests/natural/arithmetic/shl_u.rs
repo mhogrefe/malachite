@@ -5,7 +5,6 @@ use malachite_nz::natural::arithmetic::shl_u::{
     limbs_shl, limbs_shl_to_out, limbs_slice_shl_in_place, limbs_vec_shl_in_place,
 };
 use malachite_nz::natural::Natural;
-#[cfg(feature = "32_bit_limbs")]
 use malachite_nz::platform::Limb;
 use malachite_test::common::{
     biguint_to_natural, natural_to_biguint, natural_to_rug_integer, rug_integer_to_natural,
@@ -289,7 +288,7 @@ macro_rules! tests_and_properties {
             #[allow(unknown_lints, identity_op)]
             test_properties(naturals, |n| {
                 assert_eq!(n << $t::ZERO, *n);
-                assert_eq!(n << $t::ONE, n * 2);
+                assert_eq!(n << $t::ONE, n * 2 as Limb);
             });
 
             test_properties_no_special(small_unsigneds::<$t>, |&u| {

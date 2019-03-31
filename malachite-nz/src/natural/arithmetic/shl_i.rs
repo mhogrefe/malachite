@@ -35,6 +35,7 @@ macro_rules! impl_natural_shl_signed {
         impl Shl<$t> for Natural {
             type Output = Natural;
 
+            #[inline]
             fn shl(mut self, other: $t) -> Natural {
                 self <<= other;
                 self
@@ -172,6 +173,7 @@ macro_rules! impl_natural_shl_signed {
         impl ShlRound<$t> for Natural {
             type Output = Natural;
 
+            #[inline]
             fn shl_round(mut self, other: $t, rm: RoundingMode) -> Natural {
                 self.shl_round_assign(other, rm);
                 self

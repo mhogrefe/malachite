@@ -866,7 +866,7 @@ fn limbs_sub_same_length_with_borrow_in_in_place_left_properties() {
                 Natural::from_owned_limbs_asc(xs_old) - Natural::from_limbs_asc(ys)
             };
             if borrow_in {
-                expected_result -= 1;
+                expected_result -= 1 as Limb;
             }
             assert_eq!(n, expected_result);
         },

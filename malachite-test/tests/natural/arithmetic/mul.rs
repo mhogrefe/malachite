@@ -16804,7 +16804,7 @@ fn mul_properties() {
     #[allow(unknown_lints, erasing_op)]
     test_properties_custom_scale(2_048, naturals, |x| {
         assert_eq!(x * Natural::ZERO, 0);
-        assert_eq!(Natural::ZERO * 0, 0);
+        assert_eq!(Natural::ZERO * x, 0);
         assert_eq!(x * Natural::ONE, *x);
         assert_eq!(Natural::ONE * x, *x);
         //TODO assert_eq!(x * x, x.pow(2));

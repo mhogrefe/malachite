@@ -3,41 +3,41 @@ use natural::arithmetic::add_mul::mpz_aorsmul;
 use natural::arithmetic::sub_mul_limb::sub_mul_assign_limb_helper;
 use natural::Natural::{self, Large, Small};
 
-/// Subtracts the product of a `Natural` (b) and a `Natural` (c) from a `Natural` (self), taking
-/// `self` by value and b and c by reference.
-///
-/// Time: worst case O(m+np)
-///
-/// Additional memory: worst case O(np)
-///
-/// where m = `a.significant_bits()`,
-///       n = `b.significant_bits()`
-///       p = `c.significant_bits()`
-///
-/// # Panics
-/// Panics if `b * c` is greater than `self`.
-///
-/// # Examples
-/// ```
-/// extern crate malachite_base;
-/// extern crate malachite_nz;
-///
-/// use malachite_base::num::SubMul;
-/// use malachite_nz::natural::Natural;
-///
-/// fn main() {
-///     assert_eq!(format!("{:?}", Natural::from(20u32)
-///         .sub_mul(&Natural::from(3u32), &Natural::from(4u32))),
-///         "Some(8)");
-///     assert_eq!(Natural::from(10u32).sub_mul(&Natural::from(3u32), &Natural::from(4u32)),
-///         None);
-///     assert_eq!(format!("{:?}", Natural::trillion().sub_mul(&Natural::from(0x1_0000u32),
-///         &Natural::from(0x1_0000u32))), "Some(995705032704)");
-/// }
-/// ```
 impl<'a, 'b> SubMul<&'a Natural, &'b Natural> for Natural {
     type Output = Option<Natural>;
 
+    /// Subtracts the product of a `Natural` (b) and a `Natural` (c) from a `Natural` (self), taking
+    /// `self` by value and b and c by reference.
+    ///
+    /// Time: worst case O(m+np)
+    ///
+    /// Additional memory: worst case O(np)
+    ///
+    /// where m = `a.significant_bits()`,
+    ///       n = `b.significant_bits()`
+    ///       p = `c.significant_bits()`
+    ///
+    /// # Panics
+    /// Panics if `b * c` is greater than `self`.
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::SubMul;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// fn main() {
+    ///     assert_eq!(format!("{:?}", Natural::from(20u32)
+    ///         .sub_mul(&Natural::from(3u32), &Natural::from(4u32))),
+    ///         "Some(8)");
+    ///     assert_eq!(Natural::from(10u32).sub_mul(&Natural::from(3u32), &Natural::from(4u32)),
+    ///         None);
+    ///     assert_eq!(format!("{:?}", Natural::trillion().sub_mul(&Natural::from(0x1_0000u32),
+    ///         &Natural::from(0x1_0000u32))), "Some(995705032704)");
+    /// }
+    /// ```
     fn sub_mul(mut self, b: &'a Natural, c: &'b Natural) -> Option<Natural> {
         if sub_mul_assign_helper(&mut self, b, c) {
             None
@@ -47,38 +47,38 @@ impl<'a, 'b> SubMul<&'a Natural, &'b Natural> for Natural {
     }
 }
 
-/// Subtracts the product of a `Natural` (b) and a `Natural` (c) from a `Natural` (self), taking
-/// `self`, b, and c by reference.
-///
-/// Time: worst case O(m+np)
-///
-/// Additional memory: worst case O(np)
-///
-/// where m = `a.significant_bits()`,
-///       n = `b.significant_bits()`
-///       p = `c.significant_bits()`
-///
-/// # Examples
-/// ```
-/// extern crate malachite_base;
-/// extern crate malachite_nz;
-///
-/// use malachite_base::num::SubMul;
-/// use malachite_nz::natural::Natural;
-///
-/// fn main() {
-///     assert_eq!(format!("{:?}", (&Natural::from(20u32))
-///         .sub_mul(&Natural::from(3u32), &Natural::from(4u32))),
-///         "Some(8)");
-///     assert_eq!((&Natural::from(10u32)).sub_mul(&Natural::from(3u32), &Natural::from(4u32)),
-///         None);
-///     assert_eq!(format!("{:?}", (&Natural::trillion()).sub_mul(&Natural::from(0x1_0000u32),
-///         &Natural::from(0x1_0000u32))), "Some(995705032704)");
-/// }
-/// ```
 impl<'a, 'b, 'c> SubMul<&'a Natural, &'b Natural> for &'c Natural {
     type Output = Option<Natural>;
 
+    /// Subtracts the product of a `Natural` (b) and a `Natural` (c) from a `Natural` (self), taking
+    /// `self`, b, and c by reference.
+    ///
+    /// Time: worst case O(m+np)
+    ///
+    /// Additional memory: worst case O(np)
+    ///
+    /// where m = `a.significant_bits()`,
+    ///       n = `b.significant_bits()`
+    ///       p = `c.significant_bits()`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::SubMul;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// fn main() {
+    ///     assert_eq!(format!("{:?}", (&Natural::from(20u32))
+    ///         .sub_mul(&Natural::from(3u32), &Natural::from(4u32))),
+    ///         "Some(8)");
+    ///     assert_eq!((&Natural::from(10u32)).sub_mul(&Natural::from(3u32), &Natural::from(4u32)),
+    ///         None);
+    ///     assert_eq!(format!("{:?}", (&Natural::trillion()).sub_mul(&Natural::from(0x1_0000u32),
+    ///         &Natural::from(0x1_0000u32))), "Some(995705032704)");
+    /// }
+    /// ```
     fn sub_mul(self, b: &'a Natural, c: &'b Natural) -> Option<Natural> {
         if let Small(small_b) = *b {
             self.sub_mul(c, small_b)
