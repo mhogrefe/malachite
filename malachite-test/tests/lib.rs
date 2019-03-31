@@ -118,6 +118,7 @@ pub mod integer {
         pub mod clone_and_assign;
         pub mod double_limb_from_integer;
         pub mod from_double_limb;
+        pub mod from_floating_point;
         pub mod from_limb;
         pub mod from_natural;
         pub mod from_sign_and_limbs;
