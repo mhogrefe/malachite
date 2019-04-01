@@ -1710,6 +1710,46 @@ pub fn pairs_of_nonzero_integer_and_rounding_mode(
     }
 }
 
+macro_rules! float_gen {
+    (
+        $f: ident,
+        $pairs_of_integer_and_rounding_mode_var_1: ident,
+        $integers_exactly_equal_to_float: ident,
+        $floats_exactly_equal_to_integer: ident,
+    ) => {
+        pub fn $pairs_of_integer_and_rounding_mode_var_1(
+            gm: GenerationMode,
+        ) -> It<(Integer, RoundingMode)> {
+            Box::new(
+                pairs_of_integer_and_rounding_mode(gm).filter(|&(ref n, rm)| {
+                    rm != RoundingMode::Exact || $f::checked_from(n).is_some()
+                }),
+            )
+        }
+
+        pub fn $integers_exactly_equal_to_float(gm: GenerationMode) -> It<Integer> {
+            Box::new(integers(gm).filter(|n| $f::checked_from(n).is_some()))
+        }
+
+        pub fn $floats_exactly_equal_to_integer(gm: GenerationMode) -> It<$f> {
+            Box::new(integers(gm).flat_map($f::checked_from))
+        }
+    };
+}
+
+float_gen!(
+    f32,
+    pairs_of_integer_and_rounding_mode_var_1_f32,
+    integers_exactly_equal_to_f32,
+    f32s_exactly_equal_to_integer,
+);
+float_gen!(
+    f64,
+    pairs_of_integer_and_rounding_mode_var_1_f64,
+    integers_exactly_equal_to_f64,
+    f64s_exactly_equal_to_integer,
+);
+
 fn triples_of_integer_small_signed_and_rounding_mode<T: PrimitiveSigned + Rand>(
     gm: GenerationMode,
 ) -> It<(Integer, T, RoundingMode)> {

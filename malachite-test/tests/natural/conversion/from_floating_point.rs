@@ -5,8 +5,8 @@ use malachite_base::round::RoundingMode;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 use malachite_test::inputs::base::{
-    f32s_var_1, f64s_var_1, pairs_of_f32_and_rounding_mode_var_1,
-    pairs_of_f64_and_rounding_mode_var_1,
+    f32s_var_1, f64s_var_1, pairs_of_finite_f32_and_rounding_mode_var_1,
+    pairs_of_finite_f64_and_rounding_mode_var_1,
 };
 use malachite_test::inputs::natural::{
     f32s_exactly_equal_to_natural, f32s_var_2, f32s_var_3, f64s_exactly_equal_to_natural,
@@ -537,7 +537,7 @@ macro_rules! float_properties {
 
 float_properties!(
     f32,
-    pairs_of_f32_and_rounding_mode_var_1,
+    pairs_of_finite_f32_and_rounding_mode_var_1,
     f32s_exactly_equal_to_natural,
     f32s_var_1,
     f32s_var_2,
@@ -548,7 +548,7 @@ float_properties!(
 );
 float_properties!(
     f64,
-    pairs_of_f64_and_rounding_mode_var_1,
+    pairs_of_finite_f64_and_rounding_mode_var_1,
     f64s_exactly_equal_to_natural,
     f64s_var_1,
     f64s_var_2,

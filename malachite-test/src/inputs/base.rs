@@ -35,7 +35,9 @@ use rust_wheels::iterators::general::{random, range_increasing};
 use rust_wheels::iterators::integers_geometric::{positive_u32s_geometric, u32s_geometric};
 use rust_wheels::iterators::orderings::{exhaustive_orderings, random_orderings};
 use rust_wheels::iterators::primitive_floats::{
-    exhaustive_primitive_floats, random_primitive_floats, special_random_f32s, special_random_f64s,
+    exhaustive_finite_primitive_floats, exhaustive_primitive_floats,
+    random_finite_primitive_floats, random_primitive_floats, special_random_f32s,
+    special_random_f64s, special_random_finite_f32s, special_random_finite_f64s,
 };
 use rust_wheels::iterators::primitive_ints::{
     exhaustive_natural_signed, exhaustive_negative_signed, exhaustive_nonzero_signed,
@@ -148,10 +150,13 @@ macro_rules! float_gen {
     (
         $f: ident,
         $special_random: ident,
+        $special_random_finite: ident,
         $floats: ident,
+        $finite_floats: ident,
         $floats_var_1: ident,
-        $pairs_of_float_and_rounding_mode: ident,
-        $pairs_of_float_and_rounding_mode_var_1: ident
+        $pairs_of_finite_float_and_rounding_mode: ident,
+        $pairs_of_finite_float_and_rounding_mode_var_1: ident,
+        $pairs_of_finite_float_and_rounding_mode_var_2: ident
     ) => {
         pub fn $floats(gm: GenerationMode) -> It<$f> {
             match gm {
@@ -163,49 +168,74 @@ macro_rules! float_gen {
             }
         }
 
+        pub fn $finite_floats(gm: GenerationMode) -> It<$f> {
+            match gm {
+                GenerationMode::Exhaustive => Box::new(exhaustive_finite_primitive_floats()),
+                GenerationMode::Random(_) => {
+                    Box::new(random_finite_primitive_floats(&EXAMPLE_SEED))
+                }
+                GenerationMode::SpecialRandom(scale) => {
+                    Box::new($special_random_finite(&EXAMPLE_SEED, scale))
+                }
+            }
+        }
+
         // All floats that are not NaN, not infinite, and are greater than or equal to -0.5.
         pub fn $floats_var_1(gm: GenerationMode) -> It<$f> {
             Box::new($floats(gm).filter(|&f| !f.is_nan() && !f.is_infinite() && f >= -0.5))
         }
 
-        pub fn $pairs_of_float_and_rounding_mode(gm: GenerationMode) -> It<($f, RoundingMode)> {
+        pub fn $pairs_of_finite_float_and_rounding_mode(
+            gm: GenerationMode,
+        ) -> It<($f, RoundingMode)> {
             match gm {
                 GenerationMode::Exhaustive => Box::new(lex_pairs(
-                    exhaustive_primitive_floats(),
+                    exhaustive_finite_primitive_floats(),
                     exhaustive_rounding_modes(),
                 )),
                 GenerationMode::Random(_) => Box::new(random_pairs(
                     &EXAMPLE_SEED,
-                    &(|seed| random_primitive_floats(seed)),
+                    &(|seed| random_finite_primitive_floats(seed)),
                     &(|seed| random_rounding_modes(seed)),
                 )),
                 GenerationMode::SpecialRandom(scale) => Box::new(random_pairs(
                     &EXAMPLE_SEED,
-                    &(|seed| $special_random(seed, scale)),
+                    &(|seed| $special_random_finite(seed, scale)),
                     &(|seed| random_rounding_modes(seed)),
                 )),
             }
         }
 
-        // All pairs of float and `RoundingMode` that are acceptable to pass into
+        // All pairs of finite float and `RoundingMode` that are acceptable to pass into
         // `Natural::rounding_from`.
-        pub fn $pairs_of_float_and_rounding_mode_var_1(
+        pub fn $pairs_of_finite_float_and_rounding_mode_var_1(
             gm: GenerationMode,
         ) -> It<($f, RoundingMode)> {
-            Box::new($pairs_of_float_and_rounding_mode(gm).filter(|&(f, rm)| {
-                if rm == RoundingMode::Exact {
-                    return Natural::checked_from(f).is_some();
-                }
-                if f.is_nan() || f.is_infinite() {
-                    return false;
-                }
-                match rm {
-                    RoundingMode::Floor | RoundingMode::Up => f >= 0.0,
-                    RoundingMode::Down | RoundingMode::Ceiling => f > -1.0,
-                    RoundingMode::Nearest => f >= -0.5,
-                    _ => unreachable!(),
-                }
-            }))
+            Box::new(
+                $pairs_of_finite_float_and_rounding_mode(gm).filter(|&(f, rm)| {
+                    if rm == RoundingMode::Exact {
+                        return Natural::checked_from(f).is_some();
+                    }
+                    match rm {
+                        RoundingMode::Floor | RoundingMode::Up => f >= 0.0,
+                        RoundingMode::Down | RoundingMode::Ceiling => f > -1.0,
+                        RoundingMode::Nearest => f >= -0.5,
+                        _ => unreachable!(),
+                    }
+                }),
+            )
+        }
+
+        // All pairs of finite float and `RoundingMode` that are acceptable to pass into
+        // `Integer::rounding_from`.
+        pub fn $pairs_of_finite_float_and_rounding_mode_var_2(
+            gm: GenerationMode,
+        ) -> It<($f, RoundingMode)> {
+            Box::new(
+                $pairs_of_finite_float_and_rounding_mode(gm).filter(|&(f, rm)| {
+                    rm != RoundingMode::Exact || Natural::checked_from(f).is_some()
+                }),
+            )
         }
     };
 }
@@ -213,18 +243,24 @@ macro_rules! float_gen {
 float_gen!(
     f32,
     special_random_f32s,
+    special_random_finite_f32s,
     f32s,
+    finite_f32s,
     f32s_var_1,
-    pairs_of_f32_and_rounding_mode,
-    pairs_of_f32_and_rounding_mode_var_1
+    pairs_of_finite_f32_and_rounding_mode,
+    pairs_of_finite_f32_and_rounding_mode_var_1,
+    pairs_of_finite_f32_and_rounding_mode_var_2
 );
 float_gen!(
     f64,
     special_random_f64s,
+    special_random_finite_f64s,
     f64s,
+    finite_f64s,
     f64s_var_1,
-    pairs_of_f64_and_rounding_mode,
-    pairs_of_f64_and_rounding_mode_var_1
+    pairs_of_finite_f64_and_rounding_mode,
+    pairs_of_finite_f64_and_rounding_mode_var_1,
+    pairs_of_finite_f64_and_rounding_mode_var_2
 );
 
 pub fn pairs_of_unsigneds<T: PrimitiveUnsigned + Rand>(gm: GenerationMode) -> It<(T, T)> {

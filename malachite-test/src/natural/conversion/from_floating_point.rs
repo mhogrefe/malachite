@@ -1,7 +1,7 @@
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::{
-    f32s, f32s_var_1, f64s, f64s_var_1, pairs_of_f32_and_rounding_mode_var_1,
-    pairs_of_f64_and_rounding_mode_var_1,
+    f32s, f32s_var_1, f64s, f64s_var_1, pairs_of_finite_f32_and_rounding_mode_var_1,
+    pairs_of_finite_f64_and_rounding_mode_var_1,
 };
 use malachite_base::misc::{CheckedFrom, RoundingFrom};
 use malachite_base::num::PrimitiveFloat;
@@ -121,7 +121,7 @@ float_demos_and_benches!(
     f32,
     f32s,
     f32s_var_1,
-    pairs_of_f32_and_rounding_mode_var_1,
+    pairs_of_finite_f32_and_rounding_mode_var_1,
     demo_natural_rounding_from_f32,
     demo_natural_from_f32,
     demo_natural_checked_from_f32,
@@ -134,7 +134,7 @@ float_demos_and_benches!(
     f64,
     f64s,
     f64s_var_1,
-    pairs_of_f64_and_rounding_mode_var_1,
+    pairs_of_finite_f64_and_rounding_mode_var_1,
     demo_natural_rounding_from_f64,
     demo_natural_from_f64,
     demo_natural_checked_from_f64,

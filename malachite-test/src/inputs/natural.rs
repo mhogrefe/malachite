@@ -1,5 +1,5 @@
 use common::{natural_to_biguint, natural_to_rug_integer, GenerationMode};
-use inputs::base::{f32s, f64s, pairs_of_unsigneds, It};
+use inputs::base::{finite_f32s, finite_f64s, pairs_of_unsigneds, It};
 use inputs::common::{reshape_1_2_to_3, reshape_2_1_to_3};
 use malachite_base::misc::{CheckedFrom, CheckedInto, RoundingFrom, Walkable};
 use malachite_base::num::{
@@ -1037,7 +1037,7 @@ pub fn pairs_of_positive_natural_and_rounding_mode(
 macro_rules! float_gen {
     (
         $f: ident,
-        $floats: ident,
+        $finite_floats: ident,
         $pairs_of_natural_and_rounding_mode_var_1: ident,
         $naturals_exactly_equal_to_float: ident,
         $floats_exactly_equal_to_natural: ident,
@@ -1050,7 +1050,7 @@ macro_rules! float_gen {
             gm: GenerationMode,
         ) -> It<(Natural, RoundingMode)> {
             Box::new(
-                pairs_of_positive_natural_and_rounding_mode(gm).filter(|&(ref n, rm)| {
+                pairs_of_natural_and_rounding_mode(gm).filter(|&(ref n, rm)| {
                     rm != RoundingMode::Exact || $f::checked_from(n).is_some()
                 }),
             )
@@ -1080,9 +1080,7 @@ macro_rules! float_gen {
 
         // floats that are positive, not infinite, not NaN, and not exactly equal to a Natural.
         pub fn $floats_var_2(gm: GenerationMode) -> It<$f> {
-            Box::new($floats(gm).filter(|&f| {
-                !f.is_nan() && !f.is_infinite() && f > 0.0 && Natural::checked_from(f).is_none()
-            }))
+            Box::new($finite_floats(gm).filter(|&f| f > 0.0 && Natural::checked_from(f).is_none()))
         }
 
         // positive floats exactly in between two adjacent Naturals.
@@ -1125,7 +1123,7 @@ macro_rules! float_gen {
 
 float_gen!(
     f32,
-    f32s,
+    finite_f32s,
     pairs_of_natural_and_rounding_mode_var_1_f32,
     naturals_exactly_equal_to_f32,
     f32s_exactly_equal_to_natural,
@@ -1136,7 +1134,7 @@ float_gen!(
 );
 float_gen!(
     f64,
-    f64s,
+    finite_f64s,
     pairs_of_natural_and_rounding_mode_var_1_f64,
     naturals_exactly_equal_to_f64,
     f64s_exactly_equal_to_natural,
