@@ -292,7 +292,7 @@ macro_rules! tests_and_properties {
             });
 
             test_properties_no_special(small_unsigneds::<$t>, |&u| {
-                assert_eq!(Natural::ZERO << u, 0);
+                assert_eq!(Natural::ZERO << u, 0 as Limb);
                 assert!((Natural::ONE << u).is_power_of_two());
             });
         }

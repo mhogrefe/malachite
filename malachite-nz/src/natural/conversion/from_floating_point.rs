@@ -2,6 +2,7 @@ use malachite_base::misc::{CheckedFrom, RoundingFrom};
 use malachite_base::num::{BitAccess, DivisibleByPowerOfTwo, PrimitiveFloat, ShlRound, Zero};
 use malachite_base::round::RoundingMode;
 use natural::Natural;
+use platform::Limb;
 
 macro_rules! float_impls {
     ($f: ident) => {
@@ -68,7 +69,7 @@ macro_rules! float_impls {
                         i32::checked_from(exponent).unwrap() + $f::MIN_EXPONENT - 1,
                         if value_negative { -rm } else { rm },
                     );
-                    if value_negative && n != 0 {
+                    if value_negative && n != 0 as Limb {
                         panic!("Result is negative and cannot be converted to a Natural");
                     }
                     n
@@ -172,7 +173,7 @@ macro_rules! float_impls {
                         return None;
                     }
                     let n = Natural::from(mantissa) << exponent;
-                    if value_negative && n != 0 {
+                    if value_negative && n != 0 as Limb {
                         None
                     } else {
                         Some(n)

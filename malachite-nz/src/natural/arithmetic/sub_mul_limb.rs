@@ -109,7 +109,7 @@ impl<'a, 'b> SubMul<&'a Natural, Limb> for &'b Natural {
     /// }
     /// ```
     fn sub_mul(self, b: &'a Natural, c: Limb) -> Option<Natural> {
-        if c == 0 || *b == 0 {
+        if c == 0 || *b == 0 as Limb {
             return Some(self.clone());
         }
         let a_limb_count = self.limb_count();
@@ -200,7 +200,7 @@ impl<'a> SubMulAssign<&'a Natural, u32> for Natural {
 }
 
 pub(crate) fn sub_mul_assign_limb_helper(a: &mut Natural, b: &Natural, c: Limb) -> bool {
-    if c == 0 || *b == 0 {
+    if c == 0 || *b == 0 as Limb {
         return false;
     }
     if let Small(small_b) = *b {

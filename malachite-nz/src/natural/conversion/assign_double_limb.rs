@@ -23,6 +23,7 @@ use platform::DoubleLimb;
 /// }
 /// ```
 impl Assign<DoubleLimb> for Natural {
+    #[inline]
     fn assign(&mut self, other: DoubleLimb) {
         *self = Natural::from(other);
     }

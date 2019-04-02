@@ -7,7 +7,6 @@ use malachite_nz::integer::logic::and_natural::{
 };
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
-#[cfg(feature = "32_bit_limbs")]
 use malachite_nz::platform::Limb;
 use malachite_test::common::{
     integer_to_rug_integer, natural_to_rug_integer, rug_integer_to_integer,
@@ -395,14 +394,14 @@ fn and_natural_properties() {
     });
 
     test_properties(integers, |x| {
-        assert_eq!(x & Natural::ZERO, 0);
-        assert_eq!(Natural::ZERO & x, 0);
+        assert_eq!(x & Natural::ZERO, 0 as Limb);
+        assert_eq!(Natural::ZERO & x, 0 as Limb);
         assert_eq!(x & x, *x);
     });
 
     test_properties(naturals, |x| {
-        assert_eq!(x & Integer::ZERO, 0);
-        assert_eq!(Integer::ZERO & x, 0);
+        assert_eq!(x & Integer::ZERO, 0 as Limb);
+        assert_eq!(Integer::ZERO & x, 0 as Limb);
         assert_eq!(x & Integer::from(x), *x);
         assert_eq!(Integer::from(x) & x, *x);
         assert_eq!(x & !x, Integer::ZERO);

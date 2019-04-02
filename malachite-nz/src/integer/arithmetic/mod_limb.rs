@@ -367,7 +367,7 @@ impl RemAssign<Limb> for Integer {
     /// ```
     fn rem_assign(&mut self, other: Limb) {
         self.abs.rem_assign(other);
-        self.sign |= self.abs == 0;
+        self.sign |= self.abs == 0 as Limb;
     }
 }
 
@@ -674,7 +674,7 @@ impl CeilingModAssign<Limb> for Integer {
         } else {
             self.abs.mod_assign(other);
         }
-        self.sign = self.abs == 0;
+        self.sign = self.abs == 0 as Limb;
     }
 }
 

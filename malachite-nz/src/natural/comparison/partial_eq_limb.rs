@@ -23,6 +23,14 @@ impl PartialEq<Limb> for Natural {
     }
 }
 
+#[cfg(feature = "64_bit_limbs")]
+impl PartialEq<u32> for Natural {
+    #[inline]
+    fn eq(&self, other: &u32) -> bool {
+        PartialEq::eq(self, &Limb::from(*other))
+    }
+}
+
 /// Determines whether a `Limb` is equal to a `Natural`.
 ///
 /// Time: worst case O(1)
@@ -42,5 +50,12 @@ impl PartialEq<Natural> for Limb {
             Small(y) => y == *self,
             Large(_) => false,
         }
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl PartialEq<Natural> for u32 {
+    fn eq(&self, other: &Natural) -> bool {
+        PartialEq::eq(&Limb::from(*self), other)
     }
 }

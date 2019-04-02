@@ -565,9 +565,9 @@ fn div_exact_limb_properties() {
     });
 
     test_properties(positive_unsigneds, |&u: &Limb| {
-        assert_eq!(Natural::ZERO.div_exact(u), 0);
+        assert_eq!(Natural::ZERO.div_exact(u), 0 as Limb);
         assert_eq!(u.div_exact(Natural::ONE), u);
         assert_eq!(u.div_exact(Natural::from(u)), 1);
-        assert_eq!(Natural::from(u).div_exact(u), 1);
+        assert_eq!(Natural::from(u).div_exact(u), 1 as Limb);
     });
 }

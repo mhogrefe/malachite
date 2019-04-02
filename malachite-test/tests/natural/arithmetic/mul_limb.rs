@@ -283,7 +283,7 @@ fn mul_limb_properties() {
                 product
             );
 
-            if *n != 0 && u != 0 {
+            if *n != 0 as Limb && u != 0 {
                 assert!(product >= *n);
                 assert!(product >= u);
             }
@@ -304,8 +304,8 @@ fn mul_limb_properties() {
 
     #[allow(unknown_lints, erasing_op, identity_op)]
     test_properties(naturals, |n| {
-        assert_eq!(n * 0 as Limb, 0);
-        assert_eq!(0 as Limb * n, 0);
+        assert_eq!(n * 0 as Limb, 0 as Limb);
+        assert_eq!(0 as Limb * n, 0 as Limb);
         assert_eq!(n * 1 as Limb, *n);
         assert_eq!(1 as Limb * n, *n);
         assert_eq!(n * 2 as Limb, n << 1);
@@ -313,8 +313,8 @@ fn mul_limb_properties() {
     });
 
     test_properties(unsigneds, |&u: &Limb| {
-        assert_eq!(Natural::ZERO * u, 0);
-        assert_eq!(u * Natural::ZERO, 0);
+        assert_eq!(Natural::ZERO * u, 0 as Limb);
+        assert_eq!(u * Natural::ZERO, 0 as Limb);
         assert_eq!(Natural::ONE * u, u);
         assert_eq!(u * Natural::ONE, u);
     });

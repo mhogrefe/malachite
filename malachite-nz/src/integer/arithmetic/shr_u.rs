@@ -1,6 +1,7 @@
 use integer::Integer;
 use malachite_base::num::{ShrRound, ShrRoundAssign, Zero};
 use malachite_base::round::RoundingMode;
+use platform::Limb;
 use std::ops::{Shr, ShrAssign};
 
 macro_rules! impl_integer_shr_unsigned {
@@ -75,7 +76,7 @@ macro_rules! impl_integer_shr_unsigned {
                         ref abs,
                     } => {
                         let abs_shifted = abs.shr_round(other, RoundingMode::Ceiling);
-                        if abs_shifted == 0 {
+                        if abs_shifted == 0 as Limb {
                             Integer::ZERO
                         } else {
                             Integer {
@@ -119,7 +120,7 @@ macro_rules! impl_integer_shr_unsigned {
                         ref mut abs,
                     } => {
                         abs.shr_round_assign(other, RoundingMode::Ceiling);
-                        if *abs == 0 {
+                        if *abs == 0 as Limb {
                             self.sign = true;
                         }
                     }
@@ -240,7 +241,7 @@ macro_rules! impl_integer_shr_unsigned {
                         ref abs,
                     } => {
                         let abs_shifted = abs.shr_round(other, -rm);
-                        if abs_shifted == 0 {
+                        if abs_shifted == 0 as Limb {
                             Integer::ZERO
                         } else {
                             Integer {
@@ -323,7 +324,7 @@ macro_rules! impl_integer_shr_unsigned {
                         ref mut abs,
                     } => {
                         abs.shr_round_assign(other, -rm);
-                        if *abs == 0 {
+                        if *abs == 0 as Limb {
                             self.sign = true;
                         }
                     }

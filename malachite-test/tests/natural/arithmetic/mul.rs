@@ -16768,7 +16768,7 @@ fn mul_properties() {
         //TODO assert_eq!((product / x).unwrap(), *y);
         //TODO assert_eq!((product / y).unwrap(), *x);
 
-        if *x != 0 && *y != 0 {
+        if *x != 0 as Limb && *y != 0 as Limb {
             assert!(product >= *x);
             assert!(product >= *y);
         }
@@ -16803,8 +16803,8 @@ fn mul_properties() {
 
     #[allow(unknown_lints, erasing_op)]
     test_properties_custom_scale(2_048, naturals, |x| {
-        assert_eq!(x * Natural::ZERO, 0);
-        assert_eq!(Natural::ZERO * x, 0);
+        assert_eq!(x * Natural::ZERO, 0 as Limb);
+        assert_eq!(Natural::ZERO * x, 0 as Limb);
         assert_eq!(x * Natural::ONE, *x);
         assert_eq!(Natural::ONE * x, *x);
         //TODO assert_eq!(x * x, x.pow(2));

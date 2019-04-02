@@ -22,6 +22,7 @@ use natural::Natural;
 /// }
 /// ```
 impl Assign<Natural> for Natural {
+    #[inline]
     fn assign(&mut self, other: Natural) {
         *self = other;
     }
@@ -50,6 +51,7 @@ impl Assign<Natural> for Natural {
 /// }
 /// ```
 impl<'a> Assign<&'a Natural> for Natural {
+    #[inline]
     fn assign(&mut self, other: &'a Natural) {
         self.clone_from(other);
     }

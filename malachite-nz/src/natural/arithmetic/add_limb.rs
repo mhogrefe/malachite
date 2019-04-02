@@ -351,7 +351,7 @@ impl AddAssign<Limb> for Natural {
         if other == 0 {
             return;
         }
-        if *self == 0 {
+        if *self == 0 as Limb {
             self.assign(other);
             return;
         }

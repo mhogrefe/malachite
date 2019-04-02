@@ -207,7 +207,10 @@ fn limb_eq_limb_mod_natural_properties() {
         |&(u, v, ref modulus): &(Limb, Limb, Natural)| {
             let equal = u.eq_mod(v, modulus);
             assert_eq!(v.eq_mod(u, modulus), equal);
-            assert_eq!(u == v || *modulus != 0 && u % modulus == v % modulus, equal);
+            assert_eq!(
+                u == v || *modulus != 0 as Limb && u % modulus == v % modulus,
+                equal
+            );
 
             //TODO assert_eq!(Natural::from(u).eq_mod(v, modulus), equal);
         },

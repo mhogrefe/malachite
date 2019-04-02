@@ -72,14 +72,14 @@ fn get_bit_properties() {
         assert_eq!(num_get_bit(&natural_to_biguint(n), index), bit);
         assert_eq!(natural_to_rug_integer(n).get_bit(index as u32), bit);
 
-        assert_eq!(n & (Natural::ONE << index) != 0, bit);
+        assert_eq!(n & (Natural::ONE << index) != 0 as Limb, bit);
         assert_ne!((!n).get_bit(index), bit);
     });
 
     test_properties(naturals, |n| {
         let significant_bits = n.significant_bits();
         assert!(!n.get_bit(significant_bits));
-        if *n != 0 {
+        if *n != 0 as Limb {
             assert!(n.get_bit(significant_bits - 1));
         }
     });

@@ -749,7 +749,7 @@ macro_rules! impl_natural_shr_unsigned {
             type Output = Natural;
 
             fn shr(self, other: $t) -> Natural {
-                if other == 0 || *self == 0 {
+                if other == 0 || *self == 0 as Limb {
                     return self.clone();
                 }
                 match *self {
@@ -785,7 +785,7 @@ macro_rules! impl_natural_shr_unsigned {
         /// ```
         impl ShrAssign<$t> for Natural {
             fn shr_assign(&mut self, other: $t) {
-                if other == 0 || *self == 0 {
+                if other == 0 || *self == 0 as Limb {
                     return;
                 }
                 match *self {
@@ -908,7 +908,7 @@ macro_rules! impl_natural_shr_unsigned {
             type Output = Natural;
 
             fn shr_round(self, other: $t, rm: RoundingMode) -> Natural {
-                if other == 0 || *self == 0 {
+                if other == 0 || *self == 0 as Limb {
                     return self.clone();
                 }
                 match *self {
@@ -987,7 +987,7 @@ macro_rules! impl_natural_shr_unsigned {
         /// }
         impl ShrRoundAssign<$t> for Natural {
             fn shr_round_assign(&mut self, other: $t, rm: RoundingMode) {
-                if other == 0 || *self == 0 {
+                if other == 0 || *self == 0 as Limb {
                     return;
                 }
                 match *self {

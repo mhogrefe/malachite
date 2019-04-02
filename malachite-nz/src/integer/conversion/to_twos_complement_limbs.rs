@@ -665,7 +665,7 @@ impl Natural {
     ///
     /// Additional memory: worst case O(1)
     fn negative_limbs(&self) -> NegativeLimbIterator {
-        assert_ne!(*self, 0, "Cannot get negative limbs of 0.");
+        assert_ne!(*self, 0 as Limb, "Cannot get negative limbs of 0.");
         NegativeLimbIterator {
             limbs: self.limbs(),
             first_nonzero_index: None,

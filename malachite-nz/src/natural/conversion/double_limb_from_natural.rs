@@ -26,6 +26,7 @@ impl CheckedFrom<Natural> for DoubleLimb {
     ///         u64::checked_from(Natural::from_str("1000000000000000000000").unwrap())), "None");
     /// }
     /// ```
+    #[inline]
     fn checked_from(value: Natural) -> Option<DoubleLimb> {
         DoubleLimb::checked_from(&value)
     }
@@ -88,6 +89,7 @@ impl WrappingFrom<Natural> for DoubleLimb {
     ///         3875820019684212736);
     /// }
     /// ```
+    #[inline]
     fn wrapping_from(value: Natural) -> DoubleLimb {
         DoubleLimb::wrapping_from(&value)
     }

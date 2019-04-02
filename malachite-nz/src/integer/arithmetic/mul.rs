@@ -1,4 +1,5 @@
 use integer::Integer;
+use platform::Limb;
 use std::ops::{Mul, MulAssign};
 
 /// Multiplies an `Integer` by an `Integer`, taking both `Integer`s by value.
@@ -143,7 +144,7 @@ impl<'a, 'b> Mul<&'a Integer> for &'b Integer {
     fn mul(self, other: &'a Integer) -> Integer {
         let product_abs = &self.abs * &other.abs;
         Integer {
-            sign: product_abs == 0 || self.sign == other.sign,
+            sign: product_abs == 0 as Limb || self.sign == other.sign,
             abs: product_abs,
         }
     }
@@ -179,7 +180,7 @@ impl<'a, 'b> Mul<&'a Integer> for &'b Integer {
 impl MulAssign<Integer> for Integer {
     fn mul_assign(&mut self, other: Integer) {
         self.abs *= other.abs;
-        self.sign = self.abs == 0 || self.sign == other.sign;
+        self.sign = self.abs == 0 as Limb || self.sign == other.sign;
     }
 }
 
@@ -213,6 +214,6 @@ impl MulAssign<Integer> for Integer {
 impl<'a> MulAssign<&'a Integer> for Integer {
     fn mul_assign(&mut self, other: &'a Integer) {
         self.abs *= &other.abs;
-        self.sign = self.abs == 0 || self.sign == other.sign;
+        self.sign = self.abs == 0 as Limb || self.sign == other.sign;
     }
 }

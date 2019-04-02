@@ -150,7 +150,7 @@ impl DivAssignMod<Limb> for Integer {
             self.abs.div_assign_mod(other)
         } else {
             let remainder = self.abs.ceiling_div_assign_neg_mod(other);
-            if self.abs == 0 {
+            if self.abs == 0 as Limb {
                 self.sign = true;
             }
             remainder
@@ -409,7 +409,7 @@ impl DivAssignRem<Limb> for Integer {
         if self.sign {
             Integer::from(remainder)
         } else {
-            if self.abs == 0 {
+            if self.abs == 0 as Limb {
                 self.sign = true;
             }
             -Natural::from(remainder)
@@ -620,7 +620,7 @@ impl<'a> CeilingDivMod<Limb> for &'a Integer {
         };
         (
             Integer {
-                sign: self.sign || quotient == 0,
+                sign: self.sign || quotient == 0 as Limb,
                 abs: quotient,
             },
             -Natural::from(remainder),
@@ -678,7 +678,7 @@ impl CeilingDivAssignMod<Limb> for Integer {
         } else {
             self.abs.div_assign_mod(other)
         });
-        self.sign |= self.abs == 0;
+        self.sign |= self.abs == 0 as Limb;
         remainder
     }
 }

@@ -21,7 +21,7 @@ impl Integer {
     /// Returns true iff `self` is valid. To be valid, its absolute value must be valid, and if the
     /// absolute value is zero, the sign must be true. All Integers must be valid.
     pub fn is_valid(&self) -> bool {
-        self.abs.is_valid() && (self.sign || self.abs != 0)
+        self.abs.is_valid() && (self.sign || self.abs != 0 as Limb)
     }
 
     pub fn trillion() -> Integer {

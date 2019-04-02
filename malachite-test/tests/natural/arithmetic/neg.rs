@@ -1,6 +1,7 @@
 use common::test_properties;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
+use malachite_nz::platform::Limb;
 use malachite_test::common::{
     bigint_to_integer, natural_to_biguint, natural_to_rug_integer, rug_integer_to_integer,
 };
@@ -44,7 +45,7 @@ fn neg_properties() {
         assert_eq!(bigint_to_integer(&neg_num(natural_to_biguint(x))), neg);
 
         assert_eq!(-Integer::from(x), neg);
-        assert_eq!(neg == *x, *x == 0);
+        assert_eq!(neg == *x, *x == 0 as Limb);
         assert_eq!(-neg, *x);
     });
 }

@@ -1,7 +1,7 @@
 use integer::Integer;
 use malachite_base::num::UnsignedAbs;
 use natural::Natural;
-use platform::SignedLimb;
+use platform::{Limb, SignedLimb};
 use std::ops::{Div, DivAssign};
 
 impl Div<SignedLimb> for Integer {
@@ -148,7 +148,7 @@ impl DivAssign<SignedLimb> for Integer {
     fn div_assign(&mut self, other: SignedLimb) {
         self.abs /= other.unsigned_abs();
         self.sign ^= other < 0;
-        if !self.sign && self.abs == 0 {
+        if !self.sign && self.abs == 0 as Limb {
             self.sign = true;
         }
     }

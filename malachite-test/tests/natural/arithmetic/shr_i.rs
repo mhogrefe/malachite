@@ -2,6 +2,7 @@ use common::test_properties;
 use malachite_base::num::{ShrRound, ShrRoundAssign, Zero};
 use malachite_base::round::RoundingMode;
 use malachite_nz::natural::Natural;
+use malachite_nz::platform::Limb;
 use malachite_test::common::{natural_to_rug_integer, rug_integer_to_natural};
 use malachite_test::inputs::base::{pairs_of_signed_and_rounding_mode, signeds};
 use malachite_test::inputs::natural::{
@@ -147,7 +148,7 @@ macro_rules! tests_and_properties {
             });
 
             test_properties(signeds::<$t>, |&i| {
-                assert_eq!(Natural::ZERO >> i, 0);
+                assert_eq!(Natural::ZERO >> i, 0 as Limb);
             });
         }
 
@@ -826,7 +827,7 @@ macro_rules! tests_and_properties {
             });
 
             test_properties(pairs_of_signed_and_rounding_mode::<$t>, |&(i, rm)| {
-                assert_eq!(Natural::ZERO.shr_round(i, rm), 0);
+                assert_eq!(Natural::ZERO.shr_round(i, rm), 0 as Limb);
             });
         }
     };

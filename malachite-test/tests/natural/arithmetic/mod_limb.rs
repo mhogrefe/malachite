@@ -529,8 +529,8 @@ fn neg_mod_limb_properties() {
     });
 
     test_properties(positive_unsigneds, |&u: &Limb| {
-        assert_eq!(u.neg_mod(Natural::ONE), 0);
-        assert_eq!(u.neg_mod(Natural::from(u)), 0);
+        assert_eq!(u.neg_mod(Natural::ONE), 0 as Limb);
+        assert_eq!(u.neg_mod(Natural::from(u)), 0 as Limb);
         assert_eq!(Natural::ZERO.neg_mod(u), 0);
         assert_eq!(Natural::ONE.neg_mod(u), u - 1);
     });

@@ -127,7 +127,7 @@ impl DivAssign<Limb> for Integer {
     /// ```
     fn div_assign(&mut self, other: Limb) {
         self.abs /= other;
-        self.sign |= self.abs == 0;
+        self.sign |= self.abs == 0 as Limb;
     }
 }
 

@@ -4,9 +4,10 @@ use inputs::natural::naturals;
 use malachite_base::num::SignificantBits;
 use malachite_nz::natural::logic::trailing_zeros::limbs_trailing_zeros;
 use malachite_nz::natural::Natural;
+use malachite_nz::platform::Limb;
 
 pub fn natural_trailing_zeros_alt(n: &Natural) -> Option<u64> {
-    if *n == 0 {
+    if *n == 0 as Limb {
         None
     } else {
         Some(n.bits().take_while(|&b| !b).count() as u64)

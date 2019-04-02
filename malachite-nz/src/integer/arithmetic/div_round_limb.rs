@@ -102,7 +102,7 @@ impl<'a> DivRound<Limb> for &'a Integer {
         } else {
             (&self.abs).div_round(other, -rm)
         };
-        if abs == 0 {
+        if abs == 0 as Limb {
             Integer::ZERO
         } else {
             Integer {
@@ -303,7 +303,7 @@ impl DivRoundAssign<Limb> for Integer {
         } else {
             self.abs.div_round_assign(other, -rm)
         }
-        if !self.sign && self.abs == 0 {
+        if !self.sign && self.abs == 0 as Limb {
             self.sign = true;
         }
     }

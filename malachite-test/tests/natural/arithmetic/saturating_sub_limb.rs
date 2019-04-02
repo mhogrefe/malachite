@@ -73,7 +73,7 @@ fn saturating_sub_limb_properties() {
             assert_eq!(difference_alt, difference);
 
             let reverse_difference = SaturatingSub::saturating_sub(u, n);
-            assert!(difference == 0 || reverse_difference == 0);
+            assert!(difference == 0 as Limb || reverse_difference == 0);
 
             let reverse_difference_alt = SaturatingSub::saturating_sub(u, n.clone());
             assert_eq!(reverse_difference_alt, reverse_difference);
@@ -107,6 +107,6 @@ fn saturating_sub_limb_properties() {
 
     test_properties(unsigneds, |&u: &Limb| {
         assert_eq!(SaturatingSub::saturating_sub(u, &Natural::ZERO), u);
-        assert_eq!(Natural::ZERO.saturating_sub(u), 0);
+        assert_eq!(Natural::ZERO.saturating_sub(u), 0 as Limb);
     });
 }

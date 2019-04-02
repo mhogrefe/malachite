@@ -74,6 +74,7 @@ pub fn limbs_cmp(xs: &[Limb], ys: &[Limb]) -> Ordering {
 /// assert!(Natural::from(123u32) <= Natural::from(124u32));
 /// ```
 impl PartialOrd for Natural {
+    #[inline]
     fn partial_cmp(&self, other: &Natural) -> Option<Ordering> {
         Some(self.cmp(other))
     }

@@ -183,7 +183,7 @@ impl<'a, 'b, 'c> AddMul<&'a Natural, &'b Natural> for &'c Natural {
             self.add_mul(c, small_b)
         } else if let Small(small_c) = *c {
             self.add_mul(b, small_c)
-        } else if *self == 0 {
+        } else if *self == 0 as Limb {
             b * c
         } else {
             let mut result = {
@@ -246,7 +246,7 @@ impl AddMulAssign<Natural, Natural> for Natural {
             self.add_mul_assign(c, small_b);
         } else if let Small(small_c) = c {
             self.add_mul_assign(b, small_c);
-        } else if *self == 0 {
+        } else if *self == 0 as Limb {
             *self = b * c;
         } else {
             {
@@ -307,7 +307,7 @@ impl<'a> AddMulAssign<Natural, &'a Natural> for Natural {
             self.add_mul_assign(c, small_b);
         } else if let Small(small_c) = *c {
             self.add_mul_assign(b, small_c);
-        } else if *self == 0 {
+        } else if *self == 0 as Limb {
             *self = b * c;
         } else {
             {
@@ -368,7 +368,7 @@ impl<'a> AddMulAssign<&'a Natural, Natural> for Natural {
             self.add_mul_assign(c, small_b);
         } else if let Small(small_c) = c {
             self.add_mul_assign(b, small_c);
-        } else if *self == 0 {
+        } else if *self == 0 as Limb {
             *self = b * c;
         } else {
             {
@@ -429,7 +429,7 @@ impl<'a, 'b> AddMulAssign<&'a Natural, &'b Natural> for Natural {
             self.add_mul_assign(c, small_b);
         } else if let Small(small_c) = *c {
             self.add_mul_assign(b, small_c);
-        } else if *self == 0 {
+        } else if *self == 0 as Limb {
             *self = b * c;
         } else {
             {

@@ -179,7 +179,7 @@ impl<'a> EqMod<i32, &'a Integer> for i32 {
 impl Natural {
     // y cannot be zero.
     fn limb_eq_neg_limb_mod_natural(&self, x: Limb, y: Limb) -> bool {
-        *self != 0
+        *self != 0 as Limb
             && match *self {
                 Small(small) => x % small == y.neg_mod(small),
                 Large(_) => false,

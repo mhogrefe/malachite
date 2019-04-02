@@ -89,11 +89,11 @@ fn saturating_sub_properties() {
         assert!(difference_alt.is_valid());
 
         let reverse_difference = y.saturating_sub(x);
-        if difference > 0 {
-            assert_eq!(reverse_difference, 0);
+        if difference > 0 as Limb {
+            assert_eq!(reverse_difference, 0 as Limb);
         }
-        if reverse_difference > 0 {
-            assert_eq!(difference, 0);
+        if reverse_difference > 0 as Limb {
+            assert_eq!(difference, 0 as Limb);
         }
 
         assert!(difference <= *x);

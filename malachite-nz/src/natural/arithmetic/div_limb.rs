@@ -509,7 +509,7 @@ impl Div<Natural> for Limb {
     /// assert_eq!(23 / Natural::from(10u32), 2);
     /// ```
     fn div(self, other: Natural) -> Limb {
-        if other == 0 {
+        if other == 0 as Limb {
             panic!("division by zero");
         } else {
             match other {
@@ -548,7 +548,7 @@ impl<'a> Div<&'a Natural> for Limb {
     /// assert_eq!(23 / &Natural::from(10u32), 2);
     /// ```
     fn div(self, other: &'a Natural) -> Limb {
-        if *other == 0 {
+        if *other == 0 as Limb {
             panic!("division by zero");
         } else {
             match *other {

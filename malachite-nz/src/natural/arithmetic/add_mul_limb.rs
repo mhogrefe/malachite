@@ -132,7 +132,7 @@ impl<'a> AddMul<Natural, Limb> for &'a Natural {
     type Output = Natural;
 
     fn add_mul(self, b: Natural, c: Limb) -> Natural {
-        if c == 0 || b == 0 {
+        if c == 0 || b == 0 as Limb {
             return self.clone();
         }
         if c == 1 {
@@ -203,7 +203,7 @@ impl<'a, 'b> AddMul<&'a Natural, Limb> for &'b Natural {
     type Output = Natural;
 
     fn add_mul(self, b: &'a Natural, c: Limb) -> Natural {
-        if c == 0 || *b == 0 {
+        if c == 0 || *b == 0 as Limb {
             return self.clone();
         }
         if c == 1 {
@@ -276,7 +276,7 @@ impl<'a, 'b> AddMul<&'a Natural, u32> for &'b Natural {
 /// ```
 impl AddMulAssign<Natural, Limb> for Natural {
     fn add_mul_assign(&mut self, b: Natural, c: Limb) {
-        if c == 0 || b == 0 {
+        if c == 0 || b == 0 as Limb {
             return;
         }
         if c == 1 {
@@ -350,7 +350,7 @@ impl AddMulAssign<Natural, u32> for Natural {
 /// ```
 impl<'a> AddMulAssign<&'a Natural, Limb> for Natural {
     fn add_mul_assign(&mut self, b: &'a Natural, c: Limb) {
-        if c == 0 || *b == 0 {
+        if c == 0 || *b == 0 as Limb {
             return;
         }
         if c == 1 {

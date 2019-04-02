@@ -7,6 +7,7 @@ use natural::arithmetic::divisible_by_power_of_two::limbs_divisible_by_power_of_
 use natural::logic::bit_scan::limbs_index_of_next_false_bit;
 use natural::logic::significant_bits::limbs_significant_bits;
 use natural::Natural::{self, Large, Small};
+use platform::Limb;
 use std::cmp::Ordering;
 
 macro_rules! float_impls {
@@ -68,7 +69,7 @@ macro_rules! float_impls {
         /// ```
         impl RoundingFrom<Natural> for $f {
             fn rounding_from(mut value: Natural, rm: RoundingMode) -> $f {
-                if value == 0 {
+                if value == 0 as Limb {
                     return 0.0;
                 }
                 if !$leq_max_finite_float(&value) {
@@ -135,7 +136,7 @@ macro_rules! float_impls {
         /// ```
         impl<'a> RoundingFrom<&'a Natural> for $f {
             fn rounding_from(value: &'a Natural, rm: RoundingMode) -> $f {
-                if *value == 0 {
+                if *value == 0 as Limb {
                     return 0.0;
                 }
                 if !$leq_max_finite_float(&value) {
@@ -254,7 +255,7 @@ macro_rules! float_impls {
         /// ```
         impl CheckedFrom<Natural> for $f {
             fn checked_from(mut value: Natural) -> Option<$f> {
-                if value == 0 {
+                if value == 0 as Limb {
                     return Some(0.0);
                 }
                 if !$leq_max_finite_float(&value) {
@@ -304,7 +305,7 @@ macro_rules! float_impls {
         /// ```
         impl<'a> CheckedFrom<&'a Natural> for $f {
             fn checked_from(value: &'a Natural) -> Option<$f> {
-                if *value == 0 {
+                if *value == 0 as Limb {
                     return Some(0.0);
                 }
                 if !$leq_max_finite_float(&value) {

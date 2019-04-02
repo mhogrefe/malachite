@@ -497,9 +497,9 @@ fn div_round_limb_properties() {
     test_properties(
         pairs_of_positive_unsigned_and_rounding_mode::<Limb>,
         |&(u, rm)| {
-            assert_eq!(Natural::ZERO.div_round(u, rm), 0);
+            assert_eq!(Natural::ZERO.div_round(u, rm), 0 as Limb);
             assert_eq!(u.div_round(Natural::from(u), rm), 1);
-            assert_eq!(Natural::from(u).div_round(u, rm), 1);
+            assert_eq!(Natural::from(u).div_round(u, rm), 1 as Limb);
         },
     );
 

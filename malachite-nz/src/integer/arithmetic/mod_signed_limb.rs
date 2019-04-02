@@ -3,7 +3,7 @@ use malachite_base::num::{
     CeilingMod, CeilingModAssign, Mod, ModAssign, NegMod, NegModAssign, UnsignedAbs,
 };
 use natural::Natural;
-use platform::SignedLimb;
+use platform::{Limb, SignedLimb};
 use std::ops::{Rem, RemAssign};
 
 impl Mod<SignedLimb> for Integer {
@@ -164,7 +164,7 @@ impl ModAssign<SignedLimb> for Integer {
         } else {
             self.abs.neg_mod_assign(other.unsigned_abs());
         }
-        self.sign = other >= 0 || self.abs == 0;
+        self.sign = other >= 0 || self.abs == 0 as Limb;
     }
 }
 
@@ -436,7 +436,7 @@ impl RemAssign<SignedLimb> for Integer {
     /// ```
     fn rem_assign(&mut self, other: SignedLimb) {
         self.abs %= other.unsigned_abs();
-        self.sign |= self.abs == 0;
+        self.sign |= self.abs == 0 as Limb;
     }
 }
 
@@ -709,7 +709,7 @@ impl CeilingModAssign<SignedLimb> for Integer {
         } else {
             self.abs %= other.unsigned_abs();
         };
-        self.sign = other < 0 || self.abs == 0;
+        self.sign = other < 0 || self.abs == 0 as Limb;
     }
 }
 

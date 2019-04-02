@@ -249,7 +249,7 @@ fn mod_power_of_two_and_rem_power_of_two_properties() {
 
         assert_eq!((n >> u << u) + &result, *n);
         assert!(result < (Natural::ONE << u));
-        assert_eq!(result == 0, n.divisible_by_power_of_two(u));
+        assert_eq!(result == 0 as Limb, n.divisible_by_power_of_two(u));
         assert_eq!((&result).mod_power_of_two(u), result);
         assert_eq!(n & ((Natural::ONE << u) - 1 as Limb), result);
     });
@@ -269,11 +269,11 @@ fn mod_power_of_two_and_rem_power_of_two_properties() {
     );
 
     test_properties(pairs_of_natural_and_small_unsigned_var_1, |&(ref n, u)| {
-        assert_eq!(n.mod_power_of_two(u), 0);
+        assert_eq!(n.mod_power_of_two(u), 0 as Limb);
     });
 
     test_properties(pairs_of_natural_and_small_unsigned_var_2, |&(ref n, u)| {
-        assert_ne!(n.mod_power_of_two(u), 0);
+        assert_ne!(n.mod_power_of_two(u), 0 as Limb);
         assert_eq!(
             n.mod_power_of_two(u) + n.neg_mod_power_of_two(u),
             Natural::ONE << u
@@ -301,11 +301,11 @@ fn mod_power_of_two_and_rem_power_of_two_properties() {
     );
 
     test_properties(naturals, |n| {
-        assert_eq!(n.mod_power_of_two(0), 0);
+        assert_eq!(n.mod_power_of_two(0), 0 as Limb);
     });
 
     test_properties(unsigneds, |&u| {
-        assert_eq!(Natural::ZERO.mod_power_of_two(u), 0);
+        assert_eq!(Natural::ZERO.mod_power_of_two(u), 0 as Limb);
     });
 }
 
@@ -327,7 +327,7 @@ fn neg_mod_power_of_two_properties() {
 
         assert_eq!((n.shr_round(u, RoundingMode::Ceiling) << u) - &result, *n);
         assert!(result < (Natural::ONE << u));
-        assert_eq!(result == 0, n.divisible_by_power_of_two(u));
+        assert_eq!(result == 0 as Limb, n.divisible_by_power_of_two(u));
         assert_eq!((&result).neg_mod_power_of_two(u), n.mod_power_of_two(u));
         assert_eq!((-n).mod_power_of_two(u), result);
     });
@@ -347,21 +347,21 @@ fn neg_mod_power_of_two_properties() {
     );
 
     test_properties(pairs_of_natural_and_small_unsigned_var_1, |&(ref n, u)| {
-        assert_eq!(n.neg_mod_power_of_two(u), 0);
+        assert_eq!(n.neg_mod_power_of_two(u), 0 as Limb);
     });
 
     test_properties(pairs_of_natural_and_small_unsigned_var_2, |&(ref n, u)| {
         let m = n.neg_mod_power_of_two(u);
-        assert_ne!(m, 0);
+        assert_ne!(m, 0 as Limb);
         assert_eq!((((n >> u) + 1 as Limb) << u) - &m, *n);
         assert_eq!(n.mod_power_of_two(u) + m, Natural::ONE << u);
     });
 
     test_properties(naturals, |n| {
-        assert_eq!(n.neg_mod_power_of_two(0), 0);
+        assert_eq!(n.neg_mod_power_of_two(0), 0 as Limb);
     });
 
     test_properties(unsigneds, |&u| {
-        assert_eq!(Natural::ZERO.neg_mod_power_of_two(u), 0);
+        assert_eq!(Natural::ZERO.neg_mod_power_of_two(u), 0 as Limb);
     });
 }

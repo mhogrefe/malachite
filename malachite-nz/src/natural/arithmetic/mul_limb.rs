@@ -207,7 +207,7 @@ impl<'a> Mul<Limb> for &'a Natural {
     type Output = Natural;
 
     fn mul(self, other: Limb) -> Natural {
-        if *self == 0 || other == 0 {
+        if *self == 0 as Limb || other == 0 {
             return Natural::ZERO;
         }
         if other == 1 {
@@ -348,14 +348,14 @@ impl<'a> Mul<&'a Natural> for u32 {
 /// ```
 impl MulAssign<Limb> for Natural {
     fn mul_assign(&mut self, other: Limb) {
-        if *self == 0 || other == 0 {
+        if *self == 0 as Limb || other == 0 {
             self.assign(Limb::ZERO);
             return;
         }
         if other == 1 {
             return;
         }
-        if *self == 1 {
+        if *self == 1 as Limb {
             self.assign(other);
             return;
         }

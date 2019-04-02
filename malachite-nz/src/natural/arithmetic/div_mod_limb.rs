@@ -565,9 +565,9 @@ impl<'a> DivMod<&'a Natural> for Limb {
     /// }
     /// ```
     fn div_mod(self, other: &'a Natural) -> (Limb, Limb) {
-        if *other == 0 {
+        if *other == 0 as Limb {
             panic!("division by zero");
-        } else if *other == 1 {
+        } else if *other == 1 as Limb {
             (self, 0)
         } else {
             match *other {

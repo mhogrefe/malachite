@@ -28,7 +28,7 @@ fn limb_count_properties() {
     test_properties(naturals, |x| {
         let limb_count = x.limb_count();
         assert_eq!(*x <= Limb::MAX, x.limb_count() <= 1);
-        if *x != 0 {
+        if *x != 0 as Limb {
             let n = limb_count as Limb;
             assert!(Natural::ONE << ((n - 1) << Limb::LOG_WIDTH) <= *x);
             assert!(*x < Natural::ONE << (n << Limb::LOG_WIDTH));

@@ -1,11 +1,12 @@
 use malachite_base::num::{CheckedSub, Zero};
 use natural::arithmetic::sub::{limbs_sub, limbs_sub_in_place_left, limbs_sub_in_place_right};
 use natural::Natural::{self, Large, Small};
+use platform::Limb;
 
 impl Natural {
     // self -= other, return borrow
     pub(crate) fn sub_assign_no_panic(&mut self, other: Natural) -> bool {
-        if other == 0 {
+        if other == 0 as Limb {
             false
         } else if self.limb_count() < other.limb_count() {
             true
@@ -27,7 +28,7 @@ impl Natural {
 
     // self -= &other, return borrow
     pub(crate) fn sub_assign_ref_no_panic(&mut self, other: &Natural) -> bool {
-        if *other == 0 {
+        if *other == 0 as Limb {
             false
         } else if self as *const Natural == other as *const Natural {
             *self = Small(0);

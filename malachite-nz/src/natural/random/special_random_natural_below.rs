@@ -1,6 +1,7 @@
 use malachite_base::num::{IsPowerOfTwo, SignificantBits};
 use natural::random::special_random_natural_up_to_bits::special_random_natural_up_to_bits;
 use natural::Natural;
+use platform::Limb;
 use rand::Rng;
 
 /// Returns a random `Natural` sampled from [0, `n`). The `Natural` will typically have long runs of
@@ -38,7 +39,7 @@ use rand::Rng;
 /// }
 /// ```
 pub fn special_random_natural_below<R: Rng>(rng: &mut R, n: &Natural) -> Natural {
-    assert_ne!(*n, 0, "Cannot generate a Natural below 0");
+    assert_ne!(*n, 0 as Limb, "Cannot generate a Natural below 0");
     if n.is_power_of_two() {
         special_random_natural_up_to_bits(rng, n.significant_bits() - 1)
     } else {

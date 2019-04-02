@@ -67,8 +67,8 @@ fn trailing_zeros_properties() {
     test_properties(naturals, |x| {
         let trailing_zeros = x.trailing_zeros();
         assert_eq!(natural_trailing_zeros_alt(x), trailing_zeros);
-        assert_eq!(trailing_zeros.is_none(), *x == 0);
-        if *x != 0 {
+        assert_eq!(trailing_zeros.is_none(), *x == 0 as Limb);
+        if *x != 0 as Limb {
             let trailing_zeros = trailing_zeros.unwrap();
             if trailing_zeros <= u64::from(Limb::MAX) {
                 assert!((x >> trailing_zeros).odd());

@@ -652,9 +652,9 @@ impl<'a> Rem<&'a Natural> for Limb {
     /// }
     /// ```
     fn rem(self, other: &'a Natural) -> Limb {
-        if *other == 0 {
+        if *other == 0 as Limb {
             panic!("division by zero");
-        } else if *other == 1 {
+        } else if *other == 1 as Limb {
             0
         } else {
             match *other {

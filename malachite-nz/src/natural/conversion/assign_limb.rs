@@ -23,7 +23,16 @@ use platform::Limb;
 /// }
 /// ```
 impl Assign<Limb> for Natural {
+    #[inline]
     fn assign(&mut self, other: Limb) {
         *self = Small(other);
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl Assign<u32> for Natural {
+    #[inline]
+    fn assign(&mut self, other: u32) {
+        self.assign(Limb::from(other))
     }
 }

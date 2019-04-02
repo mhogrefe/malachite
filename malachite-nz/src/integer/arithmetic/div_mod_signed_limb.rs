@@ -4,7 +4,7 @@ use malachite_base::num::{
     DivAssignRem, DivMod, DivRem, UnsignedAbs,
 };
 use natural::Natural;
-use platform::SignedLimb;
+use platform::{Limb, SignedLimb};
 
 impl DivMod<SignedLimb> for Integer {
     type DivOutput = Integer;
@@ -177,7 +177,7 @@ impl DivAssignMod<SignedLimb> for Integer {
             self.abs.div_assign_mod(other.unsigned_abs())
         } else {
             let remainder = self.abs.ceiling_div_assign_neg_mod(other.unsigned_abs());
-            if self.abs != 0 {
+            if self.abs != 0 as Limb {
                 self.sign = false;
             }
             remainder
@@ -499,7 +499,7 @@ impl DivAssignRem<SignedLimb> for Integer {
         } else {
             -Natural::from(remainder)
         };
-        self.sign = self.sign == (other >= 0) || self.abs == 0;
+        self.sign = self.sign == (other >= 0) || self.abs == 0 as Limb;
         remainder
     }
 }
@@ -810,7 +810,7 @@ impl CeilingDivAssignMod<SignedLimb> for Integer {
             self.abs.ceiling_div_assign_neg_mod(other.unsigned_abs())
         } else {
             let remainder = self.abs.div_assign_mod(other.unsigned_abs());
-            self.sign = self.abs == 0;
+            self.sign = self.abs == 0 as Limb;
             remainder
         };
         if other >= 0 {

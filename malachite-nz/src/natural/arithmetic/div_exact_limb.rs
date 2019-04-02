@@ -593,7 +593,7 @@ impl DivExact<Natural> for Limb {
     /// }
     /// ```
     fn div_exact(self, other: Natural) -> Limb {
-        if other == 0 {
+        if other == 0 as Limb {
             panic!("division by zero");
         } else if self == 0 {
             0
@@ -640,7 +640,7 @@ impl<'a> DivExact<&'a Natural> for Limb {
     /// }
     /// ```
     fn div_exact(self, other: &'a Natural) -> Limb {
-        if *other == 0 {
+        if *other == 0 as Limb {
             panic!("division by zero");
         } else if self == 0 {
             0

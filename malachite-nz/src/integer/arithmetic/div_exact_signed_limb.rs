@@ -1,7 +1,7 @@
 use integer::Integer;
 use malachite_base::num::{DivExact, DivExactAssign, UnsignedAbs, Zero};
 use natural::Natural;
-use platform::SignedLimb;
+use platform::{Limb, SignedLimb};
 
 impl DivExact<SignedLimb> for Integer {
     type Output = Integer;
@@ -84,7 +84,7 @@ impl<'a> DivExact<SignedLimb> for &'a Integer {
     /// ```
     fn div_exact(self, other: SignedLimb) -> Integer {
         let abs = (&self.abs).div_exact(other.unsigned_abs());
-        if abs == 0 {
+        if abs == 0 as Limb {
             Integer::ZERO
         } else {
             Integer {
@@ -138,7 +138,7 @@ impl DivExactAssign<SignedLimb> for Integer {
     /// ```
     fn div_exact_assign(&mut self, other: SignedLimb) {
         self.abs.div_exact_assign(other.unsigned_abs());
-        self.sign = self.sign == (other >= 0) || self.abs == 0
+        self.sign = self.sign == (other >= 0) || self.abs == 0 as Limb
     }
 }
 

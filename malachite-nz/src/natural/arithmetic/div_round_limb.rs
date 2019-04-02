@@ -287,7 +287,7 @@ impl<'a> DivRound<&'a Natural> for Limb {
     /// }
     /// ```
     fn div_round(self, other: &'a Natural, rm: RoundingMode) -> Limb {
-        if *other == 0 {
+        if *other == 0 as Limb {
             panic!("division by zero");
         } else {
             match *other {

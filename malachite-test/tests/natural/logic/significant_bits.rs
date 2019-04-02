@@ -75,7 +75,7 @@ fn significant_bits_properties() {
             significant_bits
         );
         assert_eq!(*x <= Limb::MAX, significant_bits <= u64::from(Limb::WIDTH));
-        if *x != 0 {
+        if *x != 0 as Limb {
             assert_eq!(significant_bits, x.floor_log_two() + 1);
             assert_eq!(significant_bits, limbs_significant_bits(&x.to_limbs_asc()));
             assert!(Natural::ONE << (significant_bits - 1) <= *x);

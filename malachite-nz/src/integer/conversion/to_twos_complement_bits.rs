@@ -552,7 +552,7 @@ impl Natural {
     ///
     /// Additional memory: worst case O(1)
     fn negative_bits(&self) -> NegativeBitIterator {
-        assert_ne!(*self, 0, "Cannot get negative bits of 0.");
+        assert_ne!(*self, 0 as Limb, "Cannot get negative bits of 0.");
         let bits = self.bits();
         NegativeBitIterator {
             bits,

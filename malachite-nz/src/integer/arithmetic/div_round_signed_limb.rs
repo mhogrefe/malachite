@@ -2,7 +2,7 @@ use integer::Integer;
 use malachite_base::num::{DivRound, DivRoundAssign, UnsignedAbs, Zero};
 use malachite_base::round::RoundingMode;
 use natural::Natural;
-use platform::SignedLimb;
+use platform::{Limb, SignedLimb};
 
 impl DivRound<SignedLimb> for Integer {
     type Output = Integer;
@@ -132,7 +132,7 @@ impl<'a> DivRound<SignedLimb> for &'a Integer {
         } else {
             (&self.abs).div_round(other.unsigned_abs(), -rm)
         };
-        if abs == 0 {
+        if abs == 0 as Limb {
             Integer::ZERO
         } else {
             Integer {
@@ -404,7 +404,7 @@ impl DivRoundAssign<SignedLimb> for Integer {
         } else {
             self.abs.div_round_assign(other.unsigned_abs(), -rm)
         }
-        self.sign = result_sign || self.abs == 0;
+        self.sign = result_sign || self.abs == 0 as Limb;
     }
 }
 

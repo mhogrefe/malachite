@@ -2,7 +2,6 @@ use common::test_properties;
 use malachite_base::num::{BitAccess, One};
 use malachite_nz::natural::logic::bit_access::{limbs_slice_set_bit, limbs_vec_set_bit};
 use malachite_nz::natural::Natural;
-#[cfg(feature = "32_bit_limbs")]
 use malachite_nz::platform::Limb;
 use malachite_test::common::{
     biguint_to_natural, natural_to_biguint, natural_to_rug_integer, rug_integer_to_natural,
@@ -128,7 +127,7 @@ fn set_bit_properties() {
 
         assert_eq!(n | (Natural::ONE << index), result);
 
-        assert_ne!(result, 0);
+        assert_ne!(result, 0 as Limb);
         assert!(result >= *n);
         if n.get_bit(index) {
             assert_eq!(result, *n);

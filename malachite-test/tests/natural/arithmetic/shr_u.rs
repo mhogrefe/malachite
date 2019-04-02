@@ -639,7 +639,7 @@ macro_rules! tests_and_properties {
                 pairs_of_unsigned_and_small_unsigned::<Limb, $t>,
                 |&(u, v)| {
                     if let Some(shift) = v.checked_add($t::checked_from(Limb::WIDTH).unwrap()) {
-                        assert_eq!(Natural::from(u) >> shift, 0);
+                        assert_eq!(Natural::from(u) >> shift, 0 as Limb);
                     }
 
                     if v < $t::checked_from(Limb::WIDTH).unwrap() {
@@ -663,7 +663,7 @@ macro_rules! tests_and_properties {
             });
 
             test_properties(unsigneds::<$t>, |&u| {
-                assert_eq!(Natural::ZERO >> u, 0);
+                assert_eq!(Natural::ZERO >> u, 0 as Limb);
             });
         }
 
@@ -1316,14 +1316,17 @@ macro_rules! tests_and_properties {
                 pairs_of_positive_unsigned_and_small_unsigned::<Limb, $t>,
                 |&(u, v)| {
                     if let Some(shift) = v.checked_add($t::checked_from(Limb::WIDTH).unwrap()) {
-                        assert_eq!(Natural::from(u).shr_round(shift, RoundingMode::Down), 0);
-                        assert_eq!(Natural::from(u).shr_round(shift, RoundingMode::Floor), 0);
-                        assert_eq!(Natural::from(u).shr_round(shift, RoundingMode::Up), 1);
-                        assert_eq!(Natural::from(u).shr_round(shift, RoundingMode::Ceiling), 1);
+                        assert_eq!(Natural::from(u).shr_round(shift, RoundingMode::Down),
+                            0 as Limb);
+                        assert_eq!(Natural::from(u).shr_round(shift, RoundingMode::Floor),
+                            0 as Limb);
+                        assert_eq!(Natural::from(u).shr_round(shift, RoundingMode::Up), 1 as Limb);
+                        assert_eq!(Natural::from(u).shr_round(shift, RoundingMode::Ceiling),
+                            1 as Limb);
                         if let Some(extra_shift) = shift.checked_add(1) {
                             assert_eq!(
                                 Natural::from(u).shr_round(extra_shift, RoundingMode::Nearest),
-                                0
+                                0 as Limb
                             );
                         }
                     }
@@ -1336,7 +1339,7 @@ macro_rules! tests_and_properties {
             });
 
             test_properties(pairs_of_unsigned_and_rounding_mode::<$t>, |&(u, rm)| {
-                assert_eq!(Natural::ZERO.shr_round(u, rm), 0);
+                assert_eq!(Natural::ZERO.shr_round(u, rm), 0 as Limb);
             });
 
             test_properties(

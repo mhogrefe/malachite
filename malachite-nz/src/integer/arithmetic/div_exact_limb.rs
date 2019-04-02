@@ -82,7 +82,7 @@ impl<'a> DivExact<Limb> for &'a Integer {
     /// ```
     fn div_exact(self, other: Limb) -> Integer {
         let abs = (&self.abs).div_exact(other);
-        if abs == 0 {
+        if abs == 0 as Limb {
             Integer::ZERO
         } else {
             Integer {
@@ -136,7 +136,7 @@ impl DivExactAssign<Limb> for Integer {
     /// ```
     fn div_exact_assign(&mut self, other: Limb) {
         self.abs.div_exact_assign(other);
-        self.sign |= self.abs == 0;
+        self.sign |= self.abs == 0 as Limb;
     }
 }
 

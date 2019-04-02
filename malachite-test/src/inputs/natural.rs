@@ -1396,7 +1396,7 @@ pub fn pairs_of_natural_and_vec_of_bool_var_1(gm: GenerationMode) -> It<(Natural
 pub fn pairs_of_positive_natural_and_vec_of_bool_var_1(
     gm: GenerationMode,
 ) -> It<(Natural, Vec<bool>)> {
-    Box::new(pairs_of_natural_and_vec_of_bool_var_1(gm).filter(|&(ref n, _)| *n != 0))
+    Box::new(pairs_of_natural_and_vec_of_bool_var_1(gm).filter(|&(ref n, _)| *n != 0 as Limb))
 }
 
 struct RandomNaturalAndVecOfBoolVar2 {

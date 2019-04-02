@@ -522,7 +522,7 @@ impl Natural {
     }
 
     pub(crate) fn and_assign_neg_limb_neg(&mut self, other: Limb) {
-        if *self == 0 {
+        if *self == 0 as Limb {
             return;
         }
         mutate_with_possible_promotion!(

@@ -232,7 +232,7 @@ fn benchmark_limb_eq_limb_mod_natural_algorithms(
             (
                 "Limb == Limb || Natural != 0 && Limb % &Natural == Limb % &Natural",
                 &mut (|(u, v, modulus)| {
-                    no_out!(u == v || modulus != 0 && u % &modulus == v % &modulus)
+                    no_out!(u == v || modulus != 0 as Limb && u % &modulus == v % &modulus)
                 }),
             ),
         ],

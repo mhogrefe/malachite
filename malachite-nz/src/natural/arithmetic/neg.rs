@@ -1,5 +1,6 @@
 use integer::Integer;
 use natural::Natural;
+use platform::Limb;
 use std::ops::Neg;
 
 /// Returns the negative of a `Natural`, taking the `Natural` by value and returning an `Integer`.
@@ -25,7 +26,7 @@ impl Neg for Natural {
     type Output = Integer;
 
     fn neg(self) -> Integer {
-        if self == 0 {
+        if self == 0 as Limb {
             Integer {
                 sign: true,
                 abs: self,
@@ -65,7 +66,7 @@ impl<'a> Neg for &'a Natural {
     type Output = Integer;
 
     fn neg(self) -> Integer {
-        if *self == 0 {
+        if *self == 0 as Limb {
             Integer {
                 sign: true,
                 abs: self.clone(),

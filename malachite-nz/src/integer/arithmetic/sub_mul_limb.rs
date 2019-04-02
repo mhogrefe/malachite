@@ -172,7 +172,7 @@ impl<'a, 'b> SubMul<&'a Integer, Limb> for &'b Integer {
             if let Small(a) = self.abs {
                 if a == 0 {
                     return Integer {
-                        sign: b.abs == 0,
+                        sign: b.abs == 0 as Limb,
                         abs: &b.abs * c,
                     };
                 } else if let Small(small_b) = b.abs {
@@ -237,7 +237,7 @@ impl SubMulAssign<Integer, Limb> for Integer {
         } else {
             if let Small(a) = self.abs {
                 if a == 0 {
-                    self.sign = b.abs == 0;
+                    self.sign = b.abs == 0 as Limb;
                     self.abs = b.abs * c;
                     return;
                 } else if let Small(small_b) = b.abs {
@@ -302,7 +302,7 @@ impl<'a> SubMulAssign<&'a Integer, Limb> for Integer {
             if let Small(a) = self.abs {
                 if a == 0 {
                     self.abs = &b.abs * c;
-                    self.sign = b.abs == 0;
+                    self.sign = b.abs == 0 as Limb;
                     return;
                 } else if let Small(small_b) = b.abs {
                     if small_b == 0 {

@@ -68,11 +68,11 @@ fn is_power_of_two_properties() {
     test_properties(naturals, |x| {
         let is_power_of_two = x.is_power_of_two();
         assert_eq!(natural_to_rug_integer(x).is_power_of_two(), is_power_of_two);
-        if *x != 0 {
+        if *x != 0 as Limb {
             let trailing_zeros = x.trailing_zeros().unwrap();
             assert_eq!(trailing_zeros == x.significant_bits() - 1, is_power_of_two);
             if trailing_zeros <= u64::from(Limb::MAX) {
-                assert_eq!(x >> trailing_zeros == 1, is_power_of_two);
+                assert_eq!(x >> trailing_zeros == 1 as Limb, is_power_of_two);
             }
         }
     });

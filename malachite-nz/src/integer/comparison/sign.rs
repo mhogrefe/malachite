@@ -1,5 +1,6 @@
 use integer::Integer;
 use malachite_base::num::Sign;
+use platform::Limb;
 use std::cmp::Ordering;
 
 impl Sign for Integer {
@@ -27,7 +28,7 @@ impl Sign for Integer {
     /// ```
     fn sign(&self) -> Ordering {
         if self.sign {
-            if self.abs == 0 {
+            if self.abs == 0 as Limb {
                 Ordering::Equal
             } else {
                 Ordering::Greater

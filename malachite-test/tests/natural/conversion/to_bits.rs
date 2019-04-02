@@ -1,6 +1,7 @@
 use common::{test_properties, test_properties_no_special};
 use malachite_base::num::{SignificantBits, Zero};
 use malachite_nz::natural::Natural;
+use malachite_nz::platform::Limb;
 use malachite_test::inputs::base::small_unsigneds;
 use malachite_test::inputs::natural::{
     naturals, pairs_of_natural_and_small_unsigned, pairs_of_natural_and_vec_of_bool_var_2,
@@ -164,7 +165,7 @@ fn to_limbs_asc_properties() {
         let bits = x.to_bits_asc();
         assert_eq!(x.bits().collect::<Vec<bool>>(), bits);
         assert_eq!(Natural::from_bits_asc(&bits), *x);
-        if *x != 0 {
+        if *x != 0 as Limb {
             assert_ne!(*bits.last().unwrap(), false);
         }
     });
@@ -176,7 +177,7 @@ fn to_bits_desc_properties() {
         let bits = x.to_bits_desc();
         assert_eq!(x.bits().rev().collect::<Vec<bool>>(), bits);
         assert_eq!(Natural::from_bits_desc(&bits), *x);
-        if *x != 0 {
+        if *x != 0 as Limb {
             assert_ne!(bits[0], false);
         }
     });

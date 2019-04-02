@@ -390,12 +390,12 @@ fn div_limb_properties() {
     });
 
     test_properties(positive_unsigneds, |&u: &Limb| {
-        assert_eq!(Natural::ZERO / u, 0);
+        assert_eq!(Natural::ZERO / u, 0 as Limb);
         if u > 1 {
             assert_eq!(1 / u, 0);
         }
         assert_eq!(u / Natural::ONE, u);
         assert_eq!(u / Natural::from(u), 1);
-        assert_eq!(Natural::from(u) / u, 1);
+        assert_eq!(Natural::from(u) / u, 1 as Limb);
     });
 }

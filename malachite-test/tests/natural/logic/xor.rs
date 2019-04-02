@@ -387,7 +387,7 @@ fn xor_properties() {
     test_properties(naturals, |x| {
         assert_eq!(x ^ Natural::ZERO, *x);
         assert_eq!(Natural::ZERO ^ x, *x);
-        assert_eq!(x ^ x, 0);
+        assert_eq!(x ^ x, 0 as Limb);
     });
 
     test_properties(triples_of_naturals, |&(ref x, ref y, ref z)| {
