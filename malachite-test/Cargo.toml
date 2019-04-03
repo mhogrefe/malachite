@@ -21,6 +21,7 @@ default = ["32_bit_limbs"]
 malachite-base = { path = "../malachite-base" }
 malachite-nz = { path = "../malachite-nz", default-features = false, features = ["serde"] }
 rust-wheels = { path = "../../rust-wheels", default-features = false }
+itertools = "0.7.8"
 num = "0.2.0"
 rand = "0.3.0"
 serde = "^1.0.0"

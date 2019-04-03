@@ -1,10 +1,11 @@
 use common::{integer_to_bigint, integer_to_rug_integer, natural_to_rug_integer, GenerationMode};
-use inputs::base::It;
+use inputs::base::{finite_f32s, finite_f64s, It};
 use inputs::common::{reshape_1_2_to_3, reshape_2_1_to_3};
-use malachite_base::misc::CheckedFrom;
+use itertools::Itertools;
+use malachite_base::misc::{CheckedFrom, RoundingFrom, Walkable};
 use malachite_base::num::{
-    Abs, DivisibleBy, DivisibleByPowerOfTwo, EqMod, EqModPowerOfTwo, PrimitiveInteger,
-    PrimitiveSigned, PrimitiveUnsigned,
+    Abs, DivisibleBy, DivisibleByPowerOfTwo, EqMod, EqModPowerOfTwo, PrimitiveFloat,
+    PrimitiveInteger, PrimitiveSigned, PrimitiveUnsigned,
 };
 use malachite_base::round::RoundingMode;
 use malachite_nz::integer::Integer;
@@ -16,15 +17,17 @@ use rug;
 use rust_wheels::iterators::bools::exhaustive_bools;
 use rust_wheels::iterators::common::{scramble, EXAMPLE_SEED};
 use rust_wheels::iterators::dependent_pairs::dependent_pairs;
-use rust_wheels::iterators::general::random;
+use rust_wheels::iterators::general::{random, Random};
 use rust_wheels::iterators::integers::{
     exhaustive_integers, exhaustive_natural_integers, exhaustive_nonzero_integers, random_integers,
-    random_natural_integers, random_nonzero_integers, special_random_integers,
-    special_random_natural_integers, special_random_nonzero_integers,
+    random_natural_integers, random_nonzero_integers, range_down_decreasing_integer,
+    range_up_increasing_integer, special_random_integers, special_random_natural_integers,
+    special_random_nonzero_integers,
 };
 use rust_wheels::iterators::integers_geometric::{i32s_geometric, u32s_geometric};
 use rust_wheels::iterators::naturals::{
-    exhaustive_naturals, random_naturals, special_random_naturals,
+    exhaustive_naturals, random_naturals, random_range_up_natural, special_random_naturals,
+    special_random_range_up_natural,
 };
 use rust_wheels::iterators::primitive_ints::{
     exhaustive_natural_signed, exhaustive_nonzero_signed, exhaustive_positive, exhaustive_signed,
@@ -1713,9 +1716,17 @@ pub fn pairs_of_nonzero_integer_and_rounding_mode(
 macro_rules! float_gen {
     (
         $f: ident,
+        $finite_floats: ident,
         $pairs_of_integer_and_rounding_mode_var_1: ident,
         $integers_exactly_equal_to_float: ident,
+        $integers_not_exactly_equal_to_float: ident,
         $floats_exactly_equal_to_integer: ident,
+        $random_integers_not_exactly_equal_to_float_s: ident,
+        $random_integers_not_exactly_equal_to_float_f: ident,
+        $special_random_integers_not_exactly_equal_to_float: ident,
+        $floats_var_4: ident,
+        $floats_var_5: ident,
+        $integers_var_1: ident
     ) => {
         pub fn $pairs_of_integer_and_rounding_mode_var_1(
             gm: GenerationMode,
@@ -1734,20 +1745,139 @@ macro_rules! float_gen {
         pub fn $floats_exactly_equal_to_integer(gm: GenerationMode) -> It<$f> {
             Box::new(integers(gm).flat_map($f::checked_from))
         }
+
+        struct $random_integers_not_exactly_equal_to_float_s {
+            sign_gen: Random<bool>,
+            abs_gen: It<Natural>,
+        }
+
+        impl Iterator for $random_integers_not_exactly_equal_to_float_s {
+            type Item = Integer;
+
+            fn next(&mut self) -> Option<Integer> {
+                if self.sign_gen.next().unwrap() {
+                    self.abs_gen.next().map(Integer::from)
+                } else {
+                    self.abs_gen.next().map(|n| -n)
+                }
+            }
+        }
+
+        fn $random_integers_not_exactly_equal_to_float_f(
+            scale: u32,
+        ) -> $random_integers_not_exactly_equal_to_float_s {
+            let n = Natural::from($f::SMALLEST_UNREPRESENTABLE_UINT);
+            $random_integers_not_exactly_equal_to_float_s {
+                sign_gen: random(&scramble(&EXAMPLE_SEED, "sign")),
+                abs_gen: Box::new(random_range_up_natural(
+                    &scramble(&EXAMPLE_SEED, "abs"),
+                    scale,
+                    n,
+                )),
+            }
+        }
+
+        fn $special_random_integers_not_exactly_equal_to_float(
+            scale: u32,
+        ) -> $random_integers_not_exactly_equal_to_float_s {
+            let n = Natural::from($f::SMALLEST_UNREPRESENTABLE_UINT);
+            $random_integers_not_exactly_equal_to_float_s {
+                sign_gen: random(&scramble(&EXAMPLE_SEED, "sign")),
+                abs_gen: Box::new(special_random_range_up_natural(
+                    &scramble(&EXAMPLE_SEED, "abs"),
+                    scale,
+                    n,
+                )),
+            }
+        }
+
+        pub fn $integers_not_exactly_equal_to_float(gm: GenerationMode) -> It<Integer> {
+            let n = Natural::from($f::SMALLEST_UNREPRESENTABLE_UINT);
+            let xs: It<Integer> = match gm {
+                GenerationMode::Exhaustive => Box::new(
+                    range_up_increasing_integer(Integer::from(&n))
+                        .interleave(range_down_decreasing_integer(-n)),
+                ),
+                GenerationMode::Random(scale) => {
+                    Box::new($random_integers_not_exactly_equal_to_float_f(scale))
+                }
+                GenerationMode::SpecialRandom(scale) => {
+                    Box::new($special_random_integers_not_exactly_equal_to_float(scale))
+                }
+            };
+            Box::new(xs.filter(|n| $f::checked_from(n).is_none()))
+        }
+
+        // finite floats that are not exactly equal to an Integer.
+        pub fn $floats_var_4(gm: GenerationMode) -> It<$f> {
+            Box::new($finite_floats(gm).filter(|&f| Integer::checked_from(f).is_none()))
+        }
+
+        // positive floats exactly in between two adjacent Integers.
+        pub fn $floats_var_5(gm: GenerationMode) -> It<$f> {
+            Box::new($floats_exactly_equal_to_integer(gm).flat_map(|f| {
+                let f_plus_half = f + 0.5;
+                if Integer::checked_from(f_plus_half).is_some() {
+                    None
+                } else {
+                    Some(f_plus_half)
+                }
+            }))
+        }
+
+        // Integers exactly in between two adjacent floats.
+        pub fn $integers_var_1(gm: GenerationMode) -> It<Integer> {
+            Box::new($integers_not_exactly_equal_to_float(gm).flat_map(|n| {
+                let f_below = $f::rounding_from(&n, RoundingMode::Floor);
+                let on_below = Integer::checked_from(f_below);
+                if on_below.is_none() {
+                    return None;
+                }
+                let n_below = on_below.unwrap();
+                let mut f_above = f_below;
+                f_above.increment();
+                let on_above = Integer::checked_from(f_above);
+                if on_above.is_none() {
+                    return None;
+                }
+                let n_above = on_above.unwrap();
+                if n_above - &n == &n - n_below {
+                    Some(n)
+                } else {
+                    None
+                }
+            }))
+        }
     };
 }
 
 float_gen!(
     f32,
+    finite_f32s,
     pairs_of_integer_and_rounding_mode_var_1_f32,
     integers_exactly_equal_to_f32,
+    integers_not_exactly_equal_to_f32,
     f32s_exactly_equal_to_integer,
+    RandomIntegersNotExactlyEqualToF32,
+    random_integers_not_exactly_equal_to_f32,
+    special_random_integers_not_exactly_equal_to_f32,
+    f32s_var_4,
+    f32s_var_5,
+    integers_var_1_f32
 );
 float_gen!(
     f64,
+    finite_f64s,
     pairs_of_integer_and_rounding_mode_var_1_f64,
     integers_exactly_equal_to_f64,
+    integers_not_exactly_equal_to_f64,
     f64s_exactly_equal_to_integer,
+    RandomIntegersNotExactlyEqualToF64,
+    random_integers_not_exactly_equal_to_f64,
+    special_random_integers_not_exactly_equal_to_f64,
+    f64s_var_4,
+    f64s_var_5,
+    integers_var_1_f64
 );
 
 fn triples_of_integer_small_signed_and_rounding_mode<T: PrimitiveSigned + Rand>(
