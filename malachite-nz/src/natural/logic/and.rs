@@ -281,6 +281,7 @@ pub fn limbs_and_in_place_either(xs: &mut [Limb], ys: &mut [Limb]) -> bool {
 impl BitAnd<Natural> for Natural {
     type Output = Natural;
 
+    #[inline]
     fn bitand(mut self, other: Natural) -> Natural {
         self &= other;
         self
@@ -307,6 +308,7 @@ impl BitAnd<Natural> for Natural {
 impl<'a> BitAnd<&'a Natural> for Natural {
     type Output = Natural;
 
+    #[inline]
     fn bitand(mut self, other: &'a Natural) -> Natural {
         self &= other;
         self
@@ -333,6 +335,7 @@ impl<'a> BitAnd<&'a Natural> for Natural {
 impl<'a> BitAnd<Natural> for &'a Natural {
     type Output = Natural;
 
+    #[inline]
     fn bitand(self, mut other: Natural) -> Natural {
         other &= self;
         other

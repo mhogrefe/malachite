@@ -99,9 +99,20 @@ pub fn limbs_or_limb_in_place(limbs: &mut [Limb], limb: Limb) {
 impl BitOr<Limb> for Natural {
     type Output = Natural;
 
+    #[inline]
     fn bitor(mut self, other: Limb) -> Natural {
         self |= other;
         self
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl BitOr<u32> for Natural {
+    type Output = Natural;
+
+    #[inline]
+    fn bitor(self, other: u32) -> Natural {
+        self | Limb::from(other)
     }
 }
 
@@ -139,6 +150,16 @@ impl<'a> BitOr<Limb> for &'a Natural {
     }
 }
 
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> BitOr<u32> for &'a Natural {
+    type Output = Natural;
+
+    #[inline]
+    fn bitor(self, other: u32) -> Natural {
+        self | Limb::from(other)
+    }
+}
+
 /// Takes the bitwise or of a `Limb` and a `Natural`, taking the `Natural` by value.
 ///
 /// Time: worst case O(1)
@@ -163,8 +184,19 @@ impl<'a> BitOr<Limb> for &'a Natural {
 impl BitOr<Natural> for Limb {
     type Output = Natural;
 
+    #[inline]
     fn bitor(self, other: Natural) -> Natural {
         other | self
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl BitOr<Natural> for u32 {
+    type Output = Natural;
+
+    #[inline]
+    fn bitor(self, other: Natural) -> Natural {
+        Limb::from(self) | other
     }
 }
 
@@ -194,8 +226,19 @@ impl BitOr<Natural> for Limb {
 impl<'a> BitOr<&'a Natural> for Limb {
     type Output = Natural;
 
+    #[inline]
     fn bitor(self, other: &'a Natural) -> Natural {
         other | self
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> BitOr<&'a Natural> for u32 {
+    type Output = Natural;
+
+    #[inline]
+    fn bitor(self, other: &'a Natural) -> Natural {
+        Limb::from(self) | other
     }
 }
 
@@ -228,5 +271,13 @@ impl BitOrAssign<Limb> for Natural {
             Small(ref mut small) => *small |= other,
             Large(ref mut limbs) => limbs_or_limb_in_place(limbs, other),
         }
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl BitOrAssign<u32> for Natural {
+    #[inline]
+    fn bitor_assign(&mut self, other: u32) {
+        *self |= Limb::from(other);
     }
 }

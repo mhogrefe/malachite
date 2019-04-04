@@ -95,7 +95,7 @@ fn hamming_distance_limb_properties() {
     );
 
     test_properties(naturals, |n| {
-        assert_eq!(n.hamming_distance(0), n.count_ones());
+        assert_eq!(n.hamming_distance(0 as Limb), n.count_ones());
     });
 
     test_properties(unsigneds, |&u: &Limb| {

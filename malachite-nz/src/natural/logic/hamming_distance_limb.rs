@@ -60,6 +60,14 @@ impl<'a> HammingDistance<Limb> for &'a Natural {
     }
 }
 
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> HammingDistance<u32> for &'a Natural {
+    #[inline]
+    fn hamming_distance(self, other: u32) -> u64 {
+        self.hamming_distance(Limb::from(other))
+    }
+}
+
 impl<'a> HammingDistance<&'a Natural> for Limb {
     /// Determines the Hamming distance between a `Limb` and a `Natural`. Both have infinitely many
     /// implicit leading zeros.
@@ -85,7 +93,16 @@ impl<'a> HammingDistance<&'a Natural> for Limb {
     ///     assert_eq!(0.hamming_distance(&(Natural::ONE << 100u32)), 1);
     /// }
     /// ```
+    #[inline]
     fn hamming_distance(self, other: &'a Natural) -> u64 {
         other.hamming_distance(self)
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> HammingDistance<&'a Natural> for u32 {
+    #[inline]
+    fn hamming_distance(self, other: &'a Natural) -> u64 {
+        Limb::from(self).hamming_distance(other)
     }
 }

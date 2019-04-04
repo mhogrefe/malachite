@@ -53,6 +53,16 @@ impl BitAnd<Limb> for Natural {
     }
 }
 
+#[cfg(feature = "64_bit_limbs")]
+impl BitAnd<u32> for Natural {
+    type Output = u32;
+
+    #[inline]
+    fn bitand(self, other: u32) -> u32 {
+        u32::wrapping_from(self & Limb::from(other))
+    }
+}
+
 /// Takes the bitwise and of a `Natural` and a `Limb`, taking the `Natural` by reference. The output
 /// is a `Limb`.
 ///
@@ -82,6 +92,16 @@ impl<'a> BitAnd<Limb> for &'a Natural {
     }
 }
 
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> BitAnd<u32> for &'a Natural {
+    type Output = u32;
+
+    #[inline]
+    fn bitand(self, other: u32) -> u32 {
+        u32::wrapping_from(self & Limb::from(other))
+    }
+}
+
 /// Takes the bitwise and of a `Limb` and a `Natural`, taking the `Natural` by value. The output is
 /// a `Limb`.
 ///
@@ -106,8 +126,19 @@ impl<'a> BitAnd<Limb> for &'a Natural {
 impl BitAnd<Natural> for Limb {
     type Output = Limb;
 
+    #[inline]
     fn bitand(self, other: Natural) -> Limb {
         other & self
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl BitAnd<Natural> for u32 {
+    type Output = u32;
+
+    #[inline]
+    fn bitand(self, other: Natural) -> u32 {
+        u32::wrapping_from(Limb::from(self) & other)
     }
 }
 
@@ -135,8 +166,19 @@ impl BitAnd<Natural> for Limb {
 impl<'a> BitAnd<&'a Natural> for Limb {
     type Output = Limb;
 
+    #[inline]
     fn bitand(self, other: &'a Natural) -> Limb {
         other & self
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> BitAnd<&'a Natural> for u32 {
+    type Output = u32;
+
+    #[inline]
+    fn bitand(self, other: &'a Natural) -> u32 {
+        u32::wrapping_from(Limb::from(self) & other)
     }
 }
 
@@ -158,8 +200,17 @@ impl<'a> BitAnd<&'a Natural> for Limb {
 /// assert_eq!(x, 0xf0f0_f0f0);
 /// ```
 impl BitAndAssign<Limb> for Natural {
+    #[inline]
     fn bitand_assign(&mut self, other: Limb) {
         *self = Small(&*self & other);
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl BitAndAssign<u32> for Natural {
+    #[inline]
+    fn bitand_assign(&mut self, other: u32) {
+        *self &= Limb::from(other);
     }
 }
 
@@ -181,8 +232,17 @@ impl BitAndAssign<Limb> for Natural {
 /// assert_eq!(x, 0xf0f0_f0f0);
 /// ```
 impl BitAndAssign<Natural> for Limb {
+    #[inline]
     fn bitand_assign(&mut self, other: Natural) {
         *self = *self & other;
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl BitAndAssign<Natural> for u32 {
+    #[inline]
+    fn bitand_assign(&mut self, other: Natural) {
+        *self = u32::wrapping_from(Limb::from(*self) & other)
     }
 }
 
@@ -204,7 +264,16 @@ impl BitAndAssign<Natural> for Limb {
 /// assert_eq!(x, 0xf0f0_f0f0);
 /// ```
 impl<'a> BitAndAssign<&'a Natural> for Limb {
+    #[inline]
     fn bitand_assign(&mut self, other: &'a Natural) {
         *self = *self & other;
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> BitAndAssign<&'a Natural> for u32 {
+    #[inline]
+    fn bitand_assign(&mut self, other: &'a Natural) {
+        *self = u32::wrapping_from(Limb::from(*self) & other)
     }
 }

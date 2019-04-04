@@ -262,6 +262,7 @@ pub fn limbs_xor_in_place_either(xs: &mut Vec<Limb>, ys: &mut Vec<Limb>) -> bool
 impl BitXor<Natural> for Natural {
     type Output = Natural;
 
+    #[inline]
     fn bitxor(mut self, other: Natural) -> Natural {
         self ^= other;
         self
@@ -287,6 +288,7 @@ impl BitXor<Natural> for Natural {
 impl<'a> BitXor<&'a Natural> for Natural {
     type Output = Natural;
 
+    #[inline]
     fn bitxor(mut self, other: &'a Natural) -> Natural {
         self ^= other;
         self
@@ -312,6 +314,7 @@ impl<'a> BitXor<&'a Natural> for Natural {
 impl<'a> BitXor<Natural> for &'a Natural {
     type Output = Natural;
 
+    #[inline]
     fn bitxor(self, mut other: Natural) -> Natural {
         other ^= self;
         other

@@ -99,9 +99,20 @@ pub fn limbs_xor_limb_in_place(limbs: &mut [Limb], limb: Limb) {
 impl BitXor<Limb> for Natural {
     type Output = Natural;
 
+    #[inline]
     fn bitxor(mut self, other: Limb) -> Natural {
         self ^= other;
         self
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl BitXor<u32> for Natural {
+    type Output = Natural;
+
+    #[inline]
+    fn bitxor(self, other: u32) -> Natural {
+        self ^ Limb::from(other)
     }
 }
 
@@ -139,6 +150,16 @@ impl<'a> BitXor<Limb> for &'a Natural {
     }
 }
 
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> BitXor<u32> for &'a Natural {
+    type Output = Natural;
+
+    #[inline]
+    fn bitxor(self, other: u32) -> Natural {
+        self ^ Limb::from(other)
+    }
+}
+
 /// Takes the bitwise xor of a `Limb` and a `Natural`, taking the `Natural` by value.
 ///
 /// Time: worst case O(1)
@@ -163,8 +184,19 @@ impl<'a> BitXor<Limb> for &'a Natural {
 impl BitXor<Natural> for Limb {
     type Output = Natural;
 
+    #[inline]
     fn bitxor(self, other: Natural) -> Natural {
         other ^ self
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl BitXor<Natural> for u32 {
+    type Output = Natural;
+
+    #[inline]
+    fn bitxor(self, other: Natural) -> Natural {
+        Limb::from(self) ^ other
     }
 }
 
@@ -194,8 +226,19 @@ impl BitXor<Natural> for Limb {
 impl<'a> BitXor<&'a Natural> for Limb {
     type Output = Natural;
 
+    #[inline]
     fn bitxor(self, other: &'a Natural) -> Natural {
         other ^ self
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> BitXor<&'a Natural> for u32 {
+    type Output = Natural;
+
+    #[inline]
+    fn bitxor(self, other: &'a Natural) -> Natural {
+        Limb::from(self) ^ other
     }
 }
 
@@ -227,5 +270,13 @@ impl BitXorAssign<Limb> for Natural {
             Small(ref mut small) => *small ^= other,
             Large(ref mut limbs) => limbs_xor_limb_in_place(limbs, other),
         }
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl BitXorAssign<u32> for Natural {
+    #[inline]
+    fn bitxor_assign(&mut self, other: u32) {
+        *self ^= Limb::from(other);
     }
 }

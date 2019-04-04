@@ -263,6 +263,7 @@ pub fn limbs_or_in_place_either(xs: &mut Vec<Limb>, ys: &mut Vec<Limb>) -> bool 
 impl BitOr<Natural> for Natural {
     type Output = Natural;
 
+    #[inline]
     fn bitor(mut self, other: Natural) -> Natural {
         self |= other;
         self
@@ -289,6 +290,7 @@ impl BitOr<Natural> for Natural {
 impl<'a> BitOr<&'a Natural> for Natural {
     type Output = Natural;
 
+    #[inline]
     fn bitor(mut self, other: &'a Natural) -> Natural {
         self |= other;
         self
@@ -315,6 +317,7 @@ impl<'a> BitOr<&'a Natural> for Natural {
 impl<'a> BitOr<Natural> for &'a Natural {
     type Output = Natural;
 
+    #[inline]
     fn bitor(self, mut other: Natural) -> Natural {
         other |= self;
         other
