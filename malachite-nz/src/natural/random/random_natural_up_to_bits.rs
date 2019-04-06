@@ -15,6 +15,8 @@ use rand::{Rand, Rng};
 ///
 /// where n = `bits`
 ///
+/// This is mpn_random from mpn/generic/random.c.
+///
 /// # Panics
 /// Panics if `bits` is zero.
 ///

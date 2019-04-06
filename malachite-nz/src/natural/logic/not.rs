@@ -12,6 +12,8 @@ use std::ops::Not;
 ///
 /// where n = `limbs.len()`
 ///
+/// This is mpn_com from mpn/generic/com.c where rp is returned.
+///
 /// # Example
 /// ```
 /// use malachite_nz::natural::logic::not::limbs_not;
@@ -31,6 +33,8 @@ pub fn limbs_not(limbs: &[Limb]) -> Vec<Limb> {
 /// Additional memory: worst case O(1)
 ///
 /// where n = `in_limbs.len()`
+///
+/// This is mpn_com from mpn/generic/com.c where rp != up.
 ///
 /// # Panics
 /// Panics if `out` is shorter than `in_limbs`.
@@ -57,6 +61,8 @@ pub fn limbs_not_to_out(out: &mut [Limb], in_limbs: &[Limb]) {
 /// Additional memory: worst case O(1)
 ///
 /// where n = `limbs.len()`
+///
+/// This is mpn_com from mpn/generic/com.c where rp == up.
 ///
 /// # Example
 /// ```

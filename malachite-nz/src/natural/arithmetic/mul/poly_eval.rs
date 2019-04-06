@@ -13,6 +13,12 @@ use std::cmp::Ordering;
 /// Evaluate a degree-3 polynomial in +1 and -1, where each coefficient has width `n` limbs, except
 /// the last, which has width `n_high` limbs.
 ///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = `n`
+///
 /// This is mpn_toom_eval_dgr3_pm1 in mpn/generic/toom_eval_dgr3_pm1.c.
 pub(crate) fn _limbs_mul_toom_evaluate_deg_3_poly_in_1_and_neg_1(
     v_1: &mut [Limb],
@@ -53,6 +59,13 @@ pub(crate) fn _limbs_mul_toom_evaluate_deg_3_poly_in_1_and_neg_1(
 /// the last, which has width `n_high` limbs.
 ///
 /// Needs n + 1 limbs of temporary storage.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = `n`
+///
 /// This is mpn_toom_eval_dgr3_pm2 from mpn/generic/toom_eval_dg3_pm2.c.
 pub(crate) fn _limbs_mul_toom_evaluate_deg_3_poly_in_2_and_neg_2(
     v_2: &mut [Limb],
@@ -101,6 +114,12 @@ pub(crate) fn _limbs_mul_toom_evaluate_deg_3_poly_in_2_and_neg_2(
 
 /// Evaluates a polynomial of degree 3 < `degree` < `Limb::WIDTH`, in the points +1 and -1, where
 /// each coefficient has width `n` limbs, except the last, which has width `n_high` limbs.
+///
+/// Time: worst case O(m)
+///
+/// Additional memory: worst case O(1)
+///
+/// where m = `n` * `degree`
 ///
 /// This is mpn_toom_eval_pm1 from mpn/generic/toom_eval_pm1.c.
 pub(crate) fn _limbs_mul_toom_evaluate_poly_in_1_and_neg_1(
@@ -209,10 +228,16 @@ fn shl_2_and_add_with_carry_in_place_left(xs: &mut [Limb], ys: &[Limb], carry: &
     }
 }
 
-// Evaluates a polynomial of degree 3 < `degree` < `Limb::WIDTH`, in the points +2 and -2, where
-// each coefficient has width `n` limbs, except the last, which has width `n_high` limbs.
-//
-// This is mpn_toom_eval_pm2 from mpn/generic/toom_eval_pm2.c.
+/// Evaluates a polynomial of degree 3 < `degree` < `Limb::WIDTH`, in the points +2 and -2, where
+/// each coefficient has width `n` limbs, except the last, which has width `n_high` limbs.
+///
+/// Time: worst case O(m)
+///
+/// Additional memory: worst case O(1)
+///
+/// where m = `n` * `degree`
+///
+/// This is mpn_toom_eval_pm2 from mpn/generic/toom_eval_pm2.c.
 pub(crate) fn _limbs_mul_toom_evaluate_poly_in_2_and_neg_2(
     v_2: &mut [Limb],
     v_neg_2: &mut [Limb],
@@ -313,6 +338,12 @@ pub(crate) fn _limbs_mul_toom_evaluate_poly_in_2_and_neg_2(
 /// Evaluates a polynomial of degree `degree` > 2, in the points 2 ^ `shift` and -2 ^ `shift`, where
 /// each coefficient has width `n` limbs, except the last, which has width `n_high` limbs.
 ///
+/// Time: worst case O(m)
+///
+/// Additional memory: worst case O(1)
+///
+/// where m = `n` * `degree`
+///
 /// This is mpn_toom_eval_pm2exp from mpn/generic/toom_eval_pm2exp.c.
 pub(crate) fn _limbs_mul_toom_evaluate_poly_in_2_pow_and_neg_2_pow(
     v_2_pow: &mut [Limb],
@@ -411,6 +442,12 @@ pub(crate) fn _limbs_shl_and_add_same_length_in_place_left(
 
 /// Evaluates a polynomial of degree `degree` > 2, in the points 2 ^ -`shift` and -2 ^ -`shift`,
 /// where each coefficient has width `n` limbs, except the last, which has width `n_high` limbs.
+///
+/// Time: worst case O(m)
+///
+/// Additional memory: worst case O(1)
+///
+/// where m = `n` * `degree`
 ///
 /// This is mpn_toom_eval_pm2rexp from mpn/generic/toom_eval_pm2rexp.c.
 pub(crate) fn _limbs_mul_toom_evaluate_poly_in_2_pow_neg_and_neg_2_pow_neg(

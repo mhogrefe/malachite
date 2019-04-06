@@ -13,6 +13,8 @@ use platform::Limb;
 ///
 /// where n = `limbs.len()`
 ///
+/// This is mpn_scan0 from mpn/generic/scan0.c.
+///
 /// # Example
 /// ```
 /// use malachite_nz::natural::logic::bit_scan::limbs_index_of_next_false_bit;
@@ -64,6 +66,8 @@ pub fn limbs_index_of_next_false_bit(limbs: &[Limb], starting_index: u64) -> u64
 /// Additional memory: worst case O(1)
 ///
 /// where n = `limbs.len()`
+///
+/// This is mpn_scan1 from mpn/generic/scan1.c.
 ///
 /// # Example
 /// ```

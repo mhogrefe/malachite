@@ -12,6 +12,8 @@ use std::ops::{BitOr, BitOrAssign};
 ///
 /// where n = `xs.len()` = `ys.len()`
 ///
+/// This is mpn_ior_n from gmp-impl.h where rp is returned.
+///
 /// # Panics
 /// Panics if `xs` and `ys` have different lengths.
 ///
@@ -30,6 +32,8 @@ pub fn limbs_or_same_length(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 /// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, returns
 /// a `Vec` of the limbs of the bitwise or of the `Natural`s. The length of the result is the length
 /// of the longer input slice.
+///
+/// This is mpz_ior from mpz/ior.c where res is returned and both inputs are non-negative.
 ///
 /// Time: worst case O(n)
 ///
@@ -68,6 +72,8 @@ pub fn limbs_or(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 ///
 /// where n = `xs.len()` = `ys.len()`
 ///
+/// This is mpn_ior_n from gmp-impl.h.
+///
 /// # Panics
 /// Panics if `xs` and `ys` have different lengths or if `out` is too short.
 ///
@@ -101,6 +107,8 @@ pub fn limbs_or_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
 /// Additional memory: worst case O(1)
 ///
 /// where n = max(`xs.len()`, `ys.len()`)
+///
+/// This is mpz_ior from mpz/ior.c where both inputs are non-negative.
 ///
 /// # Panics
 /// Panics if `out` is too short.
@@ -140,6 +148,8 @@ pub fn limbs_or_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
 ///
 /// where n = `xs.len()` = `ys.len()`
 ///
+/// This is mpn_ior_n from gmp-impl.h where rp == up.
+///
 /// # Panics
 /// Panics if `xs` and `ys` have different lengths.
 ///
@@ -171,6 +181,8 @@ pub fn limbs_or_same_length_in_place_left(xs: &mut [Limb], ys: &[Limb]) {
 /// Additional memory: worst case O(n)
 ///
 /// where n = `ys.len()`
+///
+/// This is mpz_ior from mpz/ior.c where res == op1 and both inputs are non-negative.
 ///
 /// # Example
 /// ```
@@ -209,6 +221,9 @@ pub fn limbs_or_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
 /// Additional memory: worst case O(1)
 ///
 /// where n = min(`xs.len`, `ys.len()`)
+///
+/// This is mpz_ior from mpz/ior.c where both inputs are non-negative and the result is written to
+/// the longer input slice.
 ///
 /// # Example
 /// ```

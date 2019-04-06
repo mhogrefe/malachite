@@ -27,6 +27,12 @@ use natural::arithmetic::sub_mul_limb::mpn_submul_1;
 use platform::Limb;
 use std::mem::swap;
 
+/// Time: worst case O(k)
+///
+/// Additional memory: worst case O(1)
+///
+/// where k = `k`
+///
 /// This is mpn_toom_interpolate_5pts in mpn/generic/toom_interpolate_5pts.c.
 #[allow(clippy::cyclomatic_complexity)]
 pub(crate) fn _limbs_mul_toom_interpolate_5_points(
@@ -226,6 +232,12 @@ pub(crate) fn _limbs_mul_toom_interpolate_5_points(
 /// Optimal Toom-Cook Matrices". Some slight variations were introduced: adaptation to "gmp
 /// instruction set", and a final saving of an operation by interlacing interpolation and
 /// recomposition phases.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = `n`
 ///
 /// This is mpn_toom_interpolate_6pts from mpn/generic/mpn_toom_interpolate_6pts.c, but the argument
 /// w0n == `n_high` is moved to immediately after `n`.
@@ -442,6 +454,12 @@ const WANT_ASSERT: bool = true;
 ///
 /// Needs 2 * n + 1 limbs of temporary storage.
 ///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = `n`
+///
 /// This is mpn_toom_interpolate_7pts from mpn/generic/mpn_toom_interpolate_7pts.c, but the argument
 /// w6n == `n_high` is moved to immediately after `n`.
 #[allow(clippy::cyclomatic_complexity, clippy::too_many_arguments)]
@@ -613,7 +631,13 @@ pub(crate) fn _limbs_mul_toom_interpolate_7_points(
     }
 }
 
-// This is DO_mpn_sublsh_n from mpn/generic/mpn_toom_interpolate_8pts.c.
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = `ys.len()`
+///
+/// This is DO_mpn_sublsh_n from mpn/generic/mpn_toom_interpolate_8pts.c.
 fn _limbs_shl_and_sub_same_length(
     xs: &mut [Limb],
     ys: &[Limb],
@@ -630,7 +654,13 @@ fn _limbs_shl_and_sub_same_length(
     carry
 }
 
-// This is DO_mpn_subrsh from mpn/generic/mpn_toom_interpolate_8pts.c.
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = max(`xs.len()`, `ys.len()`)
+///
+/// This is DO_mpn_subrsh from mpn/generic/mpn_toom_interpolate_8pts.c.
 fn _limbs_shl_and_sub(xs: &mut [Limb], ys: &[Limb], shift: u32, scratch: &mut [Limb]) {
     assert!(!limbs_sub_limb_in_place(xs, ys[0] >> shift));
     let carry = _limbs_shl_and_sub_same_length(xs, &ys[1..], Limb::WIDTH - shift, scratch);
@@ -676,6 +706,12 @@ fn _limbs_shl_and_sub_special(
 /// The other values are 2 * `n` + ... limbs each (with most significant limbs small).
 ///
 /// All intermediate results are positive. Inputs are destroyed.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = `n`
 ///
 /// This is mpn_toom_interpolate_8pts from mpn/generic/mpn_toom_interpolate_8pts.c, but the argument
 /// spt == `s_plus_t` is moved to immediately after `n`.
@@ -785,6 +821,11 @@ pub(crate) fn _limbs_mul_toom_interpolate_8_points(
     }
 }
 
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = `xs.len()`
 fn limbs_div_255_in_place(xs: &mut [Limb]) {
     limbs_div_divisor_of_limb_max_with_carry_in_place(xs, Limb::MAX / 255, 0);
 }
@@ -821,6 +862,12 @@ const AORSMUL_FASTER_AORS_2AORSLSH: bool = false;
 /// The other values are 3 * n + 1 limbs each (with most significant limbs small).
 ///
 /// Negative intermediate results are stored two-complemented. Inputs are destroyed.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = `n`
 ///
 /// This is mpn_toom_interpolate_12pts from mpn/generic/mpn_toom_interpolate_12pts.c.
 pub fn _limbs_mul_toom_interpolate_12_points<'a>(
@@ -1063,6 +1110,12 @@ const CORRECTED_WIDTH: u32 = 42;
 /// The other values are 3 * n + 1 limbs each (with most significant limbs small).
 ///
 /// Negative intermediate results are stored two-complemented. Inputs are destroyed.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = `n`
 ///
 /// This is mpn_toom_interpolate_16pts from mpn/generic/mpn_toom_interpolate_16pts.c.
 pub fn _limbs_mul_toom_interpolate_16_points<'a>(

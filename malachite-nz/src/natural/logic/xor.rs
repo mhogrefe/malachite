@@ -12,6 +12,8 @@ use std::ops::{BitXor, BitXorAssign};
 ///
 /// where n = `xs.len()` = `ys.len()`
 ///
+/// This is mpn_xor_n from gmp-impl.h where rp is returned.
+///
 /// # Panics
 /// Panics if `xs` and `ys` have different lengths.
 ///
@@ -36,6 +38,8 @@ pub fn limbs_xor_same_length(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 /// Additional memory: worst case O(n)
 ///
 /// where n = max(`xs.len()`, `ys.len()`)
+///
+/// This is mpz_xor from mpz/xor.c where res is returned and both inputs are non-negative.
 ///
 /// # Example
 /// ```
@@ -71,6 +75,8 @@ pub fn limbs_xor(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 /// # Panics
 /// Panics if `xs` and `ys` have different lengths or if `out` is too short.
 ///
+/// This is mpn_xor_n from gmp-impl.h.
+///
 /// # Example
 /// ```
 /// use malachite_nz::natural::logic::xor::limbs_xor_same_length_to_out;
@@ -104,6 +110,8 @@ pub fn limbs_xor_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) 
 ///
 /// # Panics
 /// Panics if `out` is too short.
+///
+/// This is mpz_xor from mpz/xor.c where both inputs are non-negative.
 ///
 /// # Example
 /// ```
@@ -140,6 +148,8 @@ pub fn limbs_xor_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
 ///
 /// where n = `xs.len()` = `ys.len()`
 ///
+/// This is mpn_xor_n from gmp-impl.h where rp == up.
+///
 /// # Panics
 /// Panics if `xs` and `ys` have different lengths.
 ///
@@ -171,6 +181,8 @@ pub fn limbs_xor_same_length_in_place_left(xs: &mut [Limb], ys: &[Limb]) {
 /// Additional memory: worst case O(n)
 ///
 /// where n = `ys.len()`
+///
+/// This is mpz_xor from mpz/xor.c where res == op1 and both inputs are non-negative.
 ///
 /// # Example
 /// ```
@@ -209,6 +221,9 @@ pub fn limbs_xor_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
 /// Additional memory: worst case O(n)
 ///
 /// where n = min(`xs.len`, `ys.len()`)
+///
+/// This is mpz_xor from mpz/xor.c where both inputs are non-negative and the result is written to
+/// the longer input slice.
 ///
 /// # Example
 /// ```

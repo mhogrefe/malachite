@@ -19,6 +19,8 @@ use std::cmp::max;
 ///
 /// where n = `bits`
 ///
+/// This is mpn_random2 from mpn/generic/random2.c.
+///
 /// # Panics
 /// Panics if `bits` is zero.
 ///

@@ -12,6 +12,8 @@ use platform::Limb;
 ///
 /// Additional memory: worst case O(1)
 ///
+/// This is mpz_sizeinbase from mpz/sizeinbase.c where base == 2.
+///
 /// # Panics
 /// Panics if `limbs` is empty.
 ///

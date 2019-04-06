@@ -9,6 +9,8 @@ use platform::Limb;
 ///
 /// Additional memory: worst case O(1)
 ///
+/// This is mpz_tstbit from mpz/tstbit.c, where the input is non-negative.
+///
 /// # Example
 /// ```
 /// use malachite_nz::natural::logic::bit_access::limbs_get_bit;
@@ -40,6 +42,9 @@ fn limbs_set_bit_helper(limbs: &mut [Limb], index: u64, limb_index: usize) {
 ///
 /// Additional memory: worst case O(1)
 ///
+/// This is mpz_setbit from mpz/setbit.c, where the d is non-negative and bit_idx small enough that
+/// no additional memory needs to be given to d.
+///
 /// # Panics
 /// Panics if `index` >= `limbs.len()` * 32.
 ///
@@ -66,6 +71,8 @@ pub fn limbs_slice_set_bit(limbs: &mut [Limb], index: u64) {
 /// Time: worst case O(`index`)
 ///
 /// Additional memory: worst case O(`index`)
+///
+/// This is mpz_setbit from mpz/setbit.c, where the d is non-negative.
 ///
 /// # Example
 /// ```
@@ -96,6 +103,8 @@ pub fn limbs_vec_set_bit(limbs: &mut Vec<Limb>, index: u64) {
 /// Time: worst case O(1)
 ///
 /// Additional memory: worst case O(1)
+///
+/// This is mpz_clrbit from mpz/clrbit.c, where the d is non-negative.
 ///
 /// # Example
 /// ```

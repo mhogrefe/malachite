@@ -13,6 +13,9 @@ use std::cmp::Ordering;
 ///
 /// where n = `xs.len()` = `ys.len()`
 ///
+/// This is mpz_hamdist from mpz/hamdist.c, where both arguments are non-negative and have the same
+/// length.
+///
 /// # Panics
 /// Panics if `xs` and `ys` have different lengths.
 ///
@@ -39,6 +42,8 @@ pub fn limbs_hamming_distance_same_length(xs: &[Limb], ys: &[Limb]) -> u64 {
 /// Additional memory: worst case O(1)
 ///
 /// where n = max(`xs.len()`, `ys.len()`)
+///
+/// This is mpz_hamdist from mpz/hamdist.c, where both arguments are non-negative.
 ///
 /// # Example
 /// ```
