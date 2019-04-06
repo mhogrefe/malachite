@@ -164,6 +164,7 @@ pub mod integer {
         pub mod trailing_zeros;
         pub mod xor;
         pub mod xor_limb;
+        pub mod xor_natural;
         pub mod xor_signed_limb;
     }
 }

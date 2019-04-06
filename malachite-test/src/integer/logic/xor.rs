@@ -5,8 +5,7 @@ use integer::logic::{integer_op_bits, integer_op_limbs};
 use malachite_base::num::SignificantBits;
 use malachite_nz::integer::logic::xor::{
     limbs_xor_neg_neg, limbs_xor_neg_neg_in_place_either, limbs_xor_neg_neg_in_place_left,
-    limbs_xor_neg_neg_to_out, limbs_xor_pos_neg, limbs_xor_pos_neg_in_place_either,
-    limbs_xor_pos_neg_in_place_left, limbs_xor_pos_neg_in_place_right, limbs_xor_pos_neg_to_out,
+    limbs_xor_neg_neg_to_out,
 };
 use malachite_nz::integer::Integer;
 use std::cmp::max;
@@ -20,11 +19,6 @@ pub fn integer_xor_alt_2(x: &Integer, y: &Integer) -> Integer {
 }
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
-    register_demo!(registry, demo_limbs_xor_pos_neg);
-    register_demo!(registry, demo_limbs_xor_pos_neg_to_out);
-    register_demo!(registry, demo_limbs_xor_pos_neg_in_place_left);
-    register_demo!(registry, demo_limbs_xor_pos_neg_in_place_right);
-    register_demo!(registry, demo_limbs_xor_pos_neg_in_place_either);
     register_demo!(registry, demo_limbs_xor_neg_neg);
     register_demo!(registry, demo_limbs_xor_neg_neg_to_out);
     register_demo!(registry, demo_limbs_xor_neg_neg_in_place_left);
@@ -35,11 +29,6 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_integer_xor_val_ref);
     register_demo!(registry, demo_integer_xor_ref_val);
     register_demo!(registry, demo_integer_xor_ref_ref);
-    register_bench!(registry, Small, benchmark_limbs_xor_pos_neg);
-    register_bench!(registry, Small, benchmark_limbs_xor_pos_neg_to_out);
-    register_bench!(registry, Small, benchmark_limbs_xor_pos_neg_in_place_left);
-    register_bench!(registry, Small, benchmark_limbs_xor_pos_neg_in_place_right);
-    register_bench!(registry, Small, benchmark_limbs_xor_pos_neg_in_place_either);
     register_bench!(registry, Small, benchmark_limbs_xor_neg_neg);
     register_bench!(registry, Small, benchmark_limbs_xor_neg_neg_to_out);
     register_bench!(registry, Small, benchmark_limbs_xor_neg_neg_in_place_left);
@@ -57,69 +46,6 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_bench!(registry, Large, benchmark_integer_xor_library_comparison);
     register_bench!(registry, Large, benchmark_integer_xor_algorithms);
     register_bench!(registry, Large, benchmark_integer_xor_evaluation_strategy);
-}
-
-fn demo_limbs_xor_pos_neg(gm: GenerationMode, limit: usize) {
-    for (ref xs, ref ys) in pairs_of_limb_vec_var_1(gm).take(limit) {
-        println!(
-            "limbs_xor_pos_neg({:?}, {:?}) = {:?}",
-            xs,
-            ys,
-            limbs_xor_pos_neg(xs, ys)
-        );
-    }
-}
-
-fn demo_limbs_xor_pos_neg_to_out(gm: GenerationMode, limit: usize) {
-    for (ref out, ref xs, ref ys) in triples_of_limb_vec_var_7(gm).take(limit) {
-        let mut out = out.to_vec();
-        let mut out_old = out.clone();
-        limbs_xor_pos_neg_to_out(&mut out, xs, ys);
-        println!(
-            "out := {:?}; limbs_xor_pos_neg_to_out(&mut out, {:?}, {:?}); \
-             out = {:?}",
-            out_old, xs, ys, out
-        );
-    }
-}
-
-fn demo_limbs_xor_pos_neg_in_place_left(gm: GenerationMode, limit: usize) {
-    for (ref xs, ref ys) in pairs_of_limb_vec_var_1(gm).take(limit) {
-        let mut xs = xs.to_vec();
-        let mut xs_old = xs.clone();
-        limbs_xor_pos_neg_in_place_left(&mut xs, ys);
-        println!(
-            "xs := {:?}; limbs_xor_pos_neg_in_place_left(&mut xs, {:?}); xs = {:?}",
-            xs_old, ys, xs
-        );
-    }
-}
-
-fn demo_limbs_xor_pos_neg_in_place_right(gm: GenerationMode, limit: usize) {
-    for (ref xs, ref ys) in pairs_of_limb_vec_var_1(gm).take(limit) {
-        let mut ys = ys.to_vec();
-        let mut ys_old = ys.clone();
-        limbs_xor_pos_neg_in_place_right(xs, &mut ys);
-        println!(
-            "ys := {:?}; limbs_xor_pos_neg_in_place_right({:?}, &mut ys); ys = {:?}",
-            xs, ys_old, ys
-        );
-    }
-}
-
-fn demo_limbs_xor_pos_neg_in_place_either(gm: GenerationMode, limit: usize) {
-    for (ref xs, ref ys) in pairs_of_limb_vec_var_1(gm).take(limit) {
-        let mut xs = xs.to_vec();
-        let mut xs_old = xs.clone();
-        let mut ys = ys.to_vec();
-        let mut ys_old = ys.clone();
-        let b = limbs_xor_pos_neg_in_place_either(&mut xs, &mut ys);
-        println!(
-            "xs := {:?}; ys := {:?}; limbs_xor_pos_neg_in_place_either(&mut xs, &mut ys) = {}; \
-             xs = {:?}; ys = {:?}",
-            xs_old, ys_old, b, xs, ys
-        );
-    }
 }
 
 fn demo_limbs_xor_neg_neg(gm: GenerationMode, limit: usize) {
@@ -215,91 +141,6 @@ fn demo_integer_xor_ref_ref(gm: GenerationMode, limit: usize) {
     for (x, y) in pairs_of_integers(gm).take(limit) {
         println!("&{} ^ &{} = {}", x, y, &x ^ &y);
     }
-}
-
-fn benchmark_limbs_xor_pos_neg(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
-        "limbs_xor_pos_neg(&[Limb], &[Limb])",
-        BenchmarkType::Single,
-        pairs_of_limb_vec_var_1(gm),
-        gm.name(),
-        limit,
-        file_name,
-        &(|&(ref xs, ref ys)| max(xs.len(), ys.len())),
-        "max(xs.len(), ys.len())",
-        &mut [(
-            "malachite",
-            &mut (|(ref xs, ref ys)| no_out!(limbs_xor_pos_neg(xs, ys))),
-        )],
-    );
-}
-
-fn benchmark_limbs_xor_pos_neg_to_out(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
-        "limbs_xor_pos_neg_to_out(&mut [Limb], &[Limb], &[Limb])",
-        BenchmarkType::Single,
-        triples_of_limb_vec_var_7(gm),
-        gm.name(),
-        limit,
-        file_name,
-        &(|&(_, ref xs, ref ys)| max(xs.len(), ys.len())),
-        "max(xs.len(), ys.len())",
-        &mut [(
-            "malachite",
-            &mut (|(ref mut out, ref xs, ref ys)| limbs_xor_pos_neg_to_out(out, xs, ys)),
-        )],
-    );
-}
-
-fn benchmark_limbs_xor_pos_neg_in_place_left(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
-        "limbs_xor_pos_neg_in_place_left(&mut Vec<Limb>, &[Limb])",
-        BenchmarkType::Single,
-        pairs_of_limb_vec_var_1(gm),
-        gm.name(),
-        limit,
-        file_name,
-        &(|&(ref xs, ref ys)| max(xs.len(), ys.len())),
-        "max(xs.len(), ys.len())",
-        &mut [(
-            "malachite",
-            &mut (|(ref mut xs, ref ys)| no_out!(limbs_xor_pos_neg_in_place_left(xs, ys))),
-        )],
-    );
-}
-
-fn benchmark_limbs_xor_pos_neg_in_place_right(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
-        "limbs_xor_pos_neg_in_place_right(&[Limb], &mut Vec<Limb>)",
-        BenchmarkType::Single,
-        pairs_of_limb_vec_var_1(gm),
-        gm.name(),
-        limit,
-        file_name,
-        &(|&(ref xs, ref ys)| max(xs.len(), ys.len())),
-        "max(xs.len(), ys.len())",
-        &mut [(
-            "malachite",
-            &mut (|(ref xs, ref mut ys)| no_out!(limbs_xor_pos_neg_in_place_right(xs, ys))),
-        )],
-    );
-}
-
-fn benchmark_limbs_xor_pos_neg_in_place_either(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
-        "limbs_xor_pos_neg_in_place_either(&mut [Limb], &mut [Limb])",
-        BenchmarkType::Single,
-        pairs_of_limb_vec_var_1(gm),
-        gm.name(),
-        limit,
-        file_name,
-        &(|&(ref xs, ref ys)| max(xs.len(), ys.len())),
-        "max(xs.len(), ys.len())",
-        &mut [(
-            "malachite",
-            &mut (|(ref mut xs, ref mut ys)| no_out!(limbs_xor_pos_neg_in_place_either(xs, ys))),
-        )],
-    );
 }
 
 fn benchmark_limbs_xor_neg_neg(gm: GenerationMode, limit: usize, file_name: &str) {

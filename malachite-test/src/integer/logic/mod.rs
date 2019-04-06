@@ -30,6 +30,7 @@ pub mod significant_bits;
 pub mod trailing_zeros;
 pub mod xor;
 pub mod xor_limb;
+pub mod xor_natural;
 pub mod xor_signed_limb;
 
 pub(crate) fn integer_op_bits(
@@ -113,5 +114,6 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     trailing_zeros::register(registry);
     xor::register(registry);
     xor_limb::register(registry);
+    xor_natural::register(registry);
     xor_signed_limb::register(registry);
 }
