@@ -2,8 +2,9 @@ use common::test_properties;
 use malachite_base::num::Zero;
 use malachite_nz::natural::arithmetic::add::{
     _limbs_add_same_length_with_carry_in_in_place_left,
-    _limbs_add_same_length_with_carry_in_to_out, limbs_add, limbs_add_same_length_to_out,
-    limbs_add_to_out, limbs_slice_add_greater_in_place_left, limbs_slice_add_in_place_either,
+    _limbs_add_same_length_with_carry_in_to_out, _limbs_add_to_out_aliased, limbs_add,
+    limbs_add_greater, limbs_add_greater_to_out, limbs_add_same_length_to_out, limbs_add_to_out,
+    limbs_slice_add_greater_in_place_left, limbs_slice_add_in_place_either,
     limbs_slice_add_same_length_in_place_left, limbs_vec_add_in_place_either,
     limbs_vec_add_in_place_left,
 };
@@ -15,8 +16,9 @@ use malachite_test::common::{
 use malachite_test::inputs::base::{
     pairs_of_unsigned_vec, pairs_of_unsigned_vec_var_1, pairs_of_unsigned_vec_var_3,
     pairs_of_unsigneds, quadruples_of_three_unsigned_vecs_and_bool_var_1,
-    triples_of_two_unsigned_vecs_and_bool_var_1, triples_of_unsigned_vec_var_3,
-    triples_of_unsigned_vec_var_4,
+    triples_of_two_unsigned_vecs_and_bool_var_1,
+    triples_of_unsigned_vec_usize_and_unsigned_vec_var_1, triples_of_unsigned_vec_var_3,
+    triples_of_unsigned_vec_var_4, triples_of_unsigned_vec_var_9,
 };
 use malachite_test::inputs::natural::{
     naturals, pairs_of_natural_and_unsigned, pairs_of_naturals, triples_of_naturals,
@@ -25,6 +27,31 @@ use num::BigUint;
 use rug;
 use std::cmp::max;
 use std::str::FromStr;
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+fn test_limbs_add_greater() {
+    let test = |xs, ys, out| {
+        assert_eq!(limbs_add_greater(xs, ys), out);
+    };
+    test(&[], &[], vec![]);
+    test(&[2], &[], vec![2]);
+    test(&[2], &[3], vec![5]);
+    test(&[1, 1, 1], &[1, 2, 3], vec![2, 3, 4]);
+    test(&[1, 2, 3], &[6, 7], vec![7, 9, 3]);
+    test(&[100, 101, 102], &[102, 101, 100], vec![202, 202, 202]);
+    test(&[0xffff_ffff, 3], &[1], vec![0, 4]);
+    test(&[0xffff_ffff], &[1], vec![0, 1]);
+    test(&[1], &[0xffff_ffff], vec![0, 1]);
+    test(&[0xffff_ffff], &[0xffff_ffff], vec![0xffff_fffe, 1]);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn test_limbs_add_greater_fail() {
+    limbs_add_greater(&[6, 7], &[1, 2, 3]);
+}
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
@@ -49,6 +76,78 @@ fn test_limbs_add_and_limbs_vec_add_in_place_left() {
     test(&[0xffff_ffff], &[1], vec![0, 1]);
     test(&[1], &[0xffff_ffff], vec![0, 1]);
     test(&[0xffff_ffff], &[0xffff_ffff], vec![0xffff_fffe, 1]);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+fn test_limbs_add_greater_to_out() {
+    let test = |xs, ys, out_before: &[Limb], carry, out_after| {
+        let mut out = out_before.to_vec();
+        assert_eq!(limbs_add_greater_to_out(&mut out, xs, ys), carry);
+        assert_eq!(out, out_after);
+    };
+    test(&[], &[], &[0, 0], false, vec![0, 0]);
+    test(&[2], &[], &[0, 0], false, vec![2, 0]);
+    test(&[2], &[3], &[0, 0], false, vec![5, 0]);
+    test(
+        &[1, 1, 1],
+        &[1, 2, 3],
+        &[5, 5, 5, 5],
+        false,
+        vec![2, 3, 4, 5],
+    );
+    test(&[1, 2, 3], &[6, 7], &[0, 0, 0], false, vec![7, 9, 3]);
+    test(
+        &[100, 101, 102],
+        &[102, 101, 100],
+        &[10, 10, 10, 10],
+        false,
+        vec![202, 202, 202, 10],
+    );
+    test(
+        &[0xffff_ffff, 3],
+        &[1],
+        &[10, 10, 10, 10],
+        false,
+        vec![0, 4, 10, 10],
+    );
+    test(
+        &[0xffff_ffff],
+        &[1],
+        &[10, 10, 10, 10],
+        true,
+        vec![0, 10, 10, 10],
+    );
+    test(
+        &[1],
+        &[0xffff_ffff],
+        &[10, 10, 10, 10],
+        true,
+        vec![0, 10, 10, 10],
+    );
+    test(
+        &[0xffff_ffff],
+        &[0xffff_ffff],
+        &[10, 10, 10, 10],
+        true,
+        vec![0xffff_fffe, 10, 10, 10],
+    );
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_add_greater_to_out_fail_1() {
+    let mut out = vec![10, 10, 10, 10];
+    limbs_add_greater_to_out(&mut out, &[6, 7], &[1, 2, 3]);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_add_greater_to_out_fail_2() {
+    let mut out = vec![10];
+    limbs_add_greater_to_out(&mut out, &[6, 7], &[1, 2]);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -192,6 +291,38 @@ fn test_limbs_add_to_out() {
 fn limbs_add_to_out_fail() {
     let mut out = vec![10, 10];
     limbs_add_to_out(&mut out, &[6, 7, 8], &[1, 2]);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+fn test_limbs_add_to_out_aliased() {
+    let test = |xs_before: &[Limb], in_size, ys: &[Limb], carry, xs_after| {
+        let mut xs = xs_before.to_vec();
+        assert_eq!(_limbs_add_to_out_aliased(&mut xs, in_size, ys), carry);
+        assert_eq!(xs, xs_after);
+    };
+    test(&[], 0, &[], false, vec![]);
+    test(&[1, 2, 3], 0, &[4, 5], false, vec![4, 5, 3]);
+    test(&[1, 2, 3], 1, &[4, 5], false, vec![5, 5, 3]);
+    test(&[1, 2, 3], 2, &[4, 5], false, vec![5, 7, 3]);
+    test(&[1, 1, 3], 1, &[0xffff_ffff, 5], false, vec![0, 6, 3]);
+    test(&[1, 1, 3], 1, &[0xffff_ffff], true, vec![0, 1, 3]);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_add_to_out_aliased_fail_1() {
+    let mut out = vec![6, 7];
+    _limbs_add_to_out_aliased(&mut out, 1, &[1, 2, 3]);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_add_to_out_aliased_fail_2() {
+    let mut out = vec![6, 7, 8, 9];
+    _limbs_add_to_out_aliased(&mut out, 4, &[1, 2, 3]);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -574,14 +705,60 @@ fn test_add() {
     );
 }
 
+fn limbs_add_helper(f: &Fn(&[Limb], &[Limb]) -> Vec<Limb>, xs: &Vec<Limb>, ys: &Vec<Limb>) {
+    assert_eq!(
+        Natural::from_owned_limbs_asc(f(xs, ys)),
+        Natural::from_limbs_asc(xs) + Natural::from_limbs_asc(ys)
+    );
+}
+
+#[test]
+fn limbs_add_greater_properties() {
+    test_properties(pairs_of_unsigned_vec_var_3, |&(ref xs, ref ys)| {
+        limbs_add_helper(&limbs_add_greater, xs, ys);
+    });
+}
+
 #[test]
 fn limbs_add_properties() {
     test_properties(pairs_of_unsigned_vec, |&(ref xs, ref ys)| {
-        assert_eq!(
-            Natural::from_owned_limbs_asc(limbs_add(xs, ys)),
-            Natural::from_limbs_asc(xs) + Natural::from_limbs_asc(ys)
-        );
+        limbs_add_helper(&limbs_add, xs, ys);
     });
+}
+
+fn limbs_add_to_out_helper(
+    f: &mut FnMut(&mut [Limb], &[Limb], &[Limb]) -> bool,
+    out_len: &Fn(usize, usize) -> usize,
+    out: &Vec<Limb>,
+    xs: &Vec<Limb>,
+    ys: &Vec<Limb>,
+) {
+    let mut out = out.to_vec();
+    let old_out = out.clone();
+    let carry = f(&mut out, xs, ys);
+    let n = Natural::from_limbs_asc(xs) + Natural::from_limbs_asc(ys);
+    let len = out_len(xs.len(), ys.len());
+    let mut limbs = n.into_limbs_asc();
+    assert_eq!(carry, limbs.len() == len + 1);
+    limbs.resize(len, 0);
+    assert_eq!(limbs, &out[..len]);
+    assert_eq!(&out[len..], &old_out[len..]);
+}
+
+#[test]
+fn limbs_add_greater_to_out_properties() {
+    test_properties(
+        triples_of_unsigned_vec_var_9,
+        |&(ref out, ref xs, ref ys)| {
+            limbs_add_to_out_helper(
+                &mut limbs_add_greater_to_out,
+                &|xs_len, _| xs_len,
+                out,
+                xs,
+                ys,
+            );
+        },
+    );
 }
 
 #[test]
@@ -589,16 +766,13 @@ fn limbs_add_same_length_to_out_properties() {
     test_properties(
         triples_of_unsigned_vec_var_3,
         |&(ref out, ref xs, ref ys)| {
-            let mut out = out.to_vec();
-            let old_out = out.clone();
-            let carry = limbs_add_same_length_to_out(&mut out, xs, ys);
-            let n = Natural::from_limbs_asc(xs) + Natural::from_limbs_asc(ys);
-            let len = xs.len();
-            let mut limbs = n.into_limbs_asc();
-            assert_eq!(carry, limbs.len() == len + 1);
-            limbs.resize(len, 0);
-            assert_eq!(limbs, &out[..len]);
-            assert_eq!(&out[len..], &old_out[len..]);
+            limbs_add_to_out_helper(
+                &mut limbs_add_same_length_to_out,
+                &|xs_len, _| xs_len,
+                out,
+                xs,
+                ys,
+            );
         },
     );
 }
@@ -608,16 +782,36 @@ fn limbs_add_to_out_properties() {
     test_properties(
         triples_of_unsigned_vec_var_4,
         |&(ref out, ref xs, ref ys)| {
-            let mut out = out.to_vec();
-            let old_out = out.clone();
-            let carry = limbs_add_to_out(&mut out, xs, ys);
-            let n = Natural::from_limbs_asc(xs) + Natural::from_limbs_asc(ys);
-            let len = max(xs.len(), ys.len());
+            limbs_add_to_out_helper(&mut limbs_add_to_out, &max, out, xs, ys);
+        },
+    );
+}
+
+#[test]
+fn limbs_add_to_out_aliased_properties() {
+    test_properties(
+        triples_of_unsigned_vec_usize_and_unsigned_vec_var_1,
+        |&(ref xs, in_size, ref ys)| {
+            let mut xs = xs.to_vec();
+            let xs_old = xs.clone();
+            let carry = _limbs_add_to_out_aliased(&mut xs, in_size, ys);
+            let n = Natural::from_limbs_asc(&xs_old[..in_size]) + Natural::from_limbs_asc(ys);
             let mut limbs = n.into_limbs_asc();
-            assert_eq!(carry, limbs.len() == len + 1);
-            limbs.resize(len, 0);
-            assert_eq!(limbs, &out[..len]);
-            assert_eq!(&out[len..], &old_out[len..]);
+            let ys_len = ys.len();
+            if limbs.len() < ys_len {
+                limbs.resize(ys_len, 0);
+            }
+            assert_eq!(
+                Natural::from_limbs_asc(&xs[..ys_len]),
+                Natural::from_limbs_asc(&limbs[..ys_len]),
+            );
+            if carry {
+                assert_eq!(limbs.len(), ys_len + 1);
+                assert_eq!(*limbs.last().unwrap(), 1);
+            } else {
+                assert_eq!(limbs.len(), ys_len);
+            }
+            assert_eq!(&xs[ys_len..], &xs_old[ys_len..]);
         },
     );
 }

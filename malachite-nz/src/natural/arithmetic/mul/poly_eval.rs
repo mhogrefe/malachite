@@ -1,6 +1,6 @@
 use malachite_base::num::{NotAssign, Parity, PrimitiveInteger, WrappingAddAssign};
 use natural::arithmetic::add::{
-    _limbs_add_to_out_special, limbs_add_same_length_to_out, limbs_add_to_out,
+    _limbs_add_to_out_aliased, limbs_add_same_length_to_out, limbs_add_to_out,
     limbs_slice_add_greater_in_place_left, limbs_slice_add_same_length_in_place_left,
 };
 use natural::arithmetic::add_limb::limbs_add_limb_to_out;
@@ -87,7 +87,7 @@ pub(crate) fn _limbs_mul_toom_evaluate_deg_3_poly_in_2_and_neg_2(
         }
         if n_high < n {
             scratch_init[n_high] = limbs_shl_to_out(scratch_init, poly_3, 2);
-            *scratch_last = if _limbs_add_to_out_special(scratch_init, n_high + 1, poly_1) {
+            *scratch_last = if _limbs_add_to_out_aliased(scratch_init, n_high + 1, poly_1) {
                 1
             } else {
                 0

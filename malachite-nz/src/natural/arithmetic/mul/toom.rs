@@ -5,7 +5,7 @@ use malachite_base::num::{
     WrappingAddAssign, WrappingSubAssign,
 };
 use natural::arithmetic::add::{
-    _limbs_add_same_length_with_carry_in_in_place_left, _limbs_add_to_out_special,
+    _limbs_add_same_length_with_carry_in_in_place_left, _limbs_add_to_out_aliased,
     limbs_add_same_length_to_out, limbs_add_to_out, limbs_slice_add_greater_in_place_left,
     limbs_slice_add_same_length_in_place_left,
 };
@@ -2928,7 +2928,7 @@ pub fn _limbs_mul_greater_to_out_toom_63(
                 }
             } else {
                 // 16 * ys_2 + ys_0
-                *v3_last = if _limbs_add_to_out_special(v3_init, t + 1, ys_0) {
+                *v3_last = if _limbs_add_to_out_aliased(v3_init, t + 1, ys_0) {
                     1
                 } else {
                     0
@@ -2990,7 +2990,7 @@ pub fn _limbs_mul_greater_to_out_toom_63(
             }
         } else {
             // 4 * ys_2 + ys_0
-            v3[n] = if _limbs_add_to_out_special(v3, t + 1, ys_0) {
+            v3[n] = if _limbs_add_to_out_aliased(v3, t + 1, ys_0) {
                 1
             } else {
                 0

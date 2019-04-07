@@ -2,7 +2,6 @@ use malachite_base::num::OverflowingAddAssign;
 use natural::arithmetic::add_limb::{limbs_add_limb_to_out, limbs_slice_add_limb_in_place};
 use natural::Natural::{self, Large, Small};
 use platform::Limb;
-use std::cmp::max;
 use std::ops::{Add, AddAssign};
 
 fn add_and_carry(x: Limb, y: Limb, carry: &mut bool) -> Limb {
@@ -16,16 +15,47 @@ fn add_and_carry(x: Limb, y: Limb, carry: &mut bool) -> Limb {
     sum
 }
 
-// xs.len() >= ys_len
-fn limbs_add_helper(
-    xs: &[Limb],
-    ys_len: usize,
-    mut result_limbs: Vec<Limb>,
-    carry: bool,
-) -> Vec<Limb> {
-    result_limbs.extend_from_slice(&xs[ys_len..]);
-    if carry && limbs_slice_add_limb_in_place(&mut result_limbs[ys_len..], 1) {
-        result_limbs.push(1);
+/// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, where
+/// the first slice is at least as long as the second, returns a `Vec` of the limbs of the sum of
+/// the `Natural`s.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(n)
+///
+/// where n = `xs.len()`
+///
+/// This is mpn_add from gmp.h, where the first input is at least as long as the second, and the
+/// output is returned.
+///
+/// # Panics
+/// Panics if `xs` is shorter than `ys`.
+///
+/// # Example
+/// ```
+/// use malachite_nz::natural::arithmetic::add::limbs_add_greater;
+///
+/// assert_eq!(limbs_add_greater(&[1, 2, 3], &[6, 7]), &[7, 9, 3]);
+/// assert_eq!(limbs_add_greater(&[100, 101, 0xffff_ffff], &[102, 101, 2]), &[202, 202, 1, 1]);
+/// ```
+pub fn limbs_add_greater(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
+    let xs_len = xs.len();
+    let ys_len = ys.len();
+    assert!(xs_len >= ys_len);
+    let mut result_limbs = Vec::with_capacity(xs_len);
+    let mut carry = false;
+    for (&x, &y) in xs.iter().zip(ys.iter()) {
+        result_limbs.push(add_and_carry(x, y, &mut carry));
+    }
+    if xs_len == ys_len {
+        if carry {
+            result_limbs.push(1);
+        }
+    } else {
+        result_limbs.extend_from_slice(&xs[ys_len..]);
+        if carry && limbs_slice_add_limb_in_place(&mut result_limbs[ys_len..], 1) {
+            result_limbs.push(1);
+        }
     }
     result_limbs
 }
@@ -39,6 +69,8 @@ fn limbs_add_helper(
 ///
 /// where n = max(`xs.len()`, `ys.len()`)
 ///
+/// This is mpn_add_n from gmp.h, where the output is returned.
+///
 /// # Example
 /// ```
 /// use malachite_nz::natural::arithmetic::add::limbs_add;
@@ -47,22 +79,10 @@ fn limbs_add_helper(
 /// assert_eq!(limbs_add(&[100, 101, 0xffff_ffff], &[102, 101, 2]), &[202, 202, 1, 1]);
 /// ```
 pub fn limbs_add(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
-    let xs_len = xs.len();
-    let ys_len = ys.len();
-    let mut result_limbs = Vec::with_capacity(max(xs_len, ys_len));
-    let mut carry = false;
-    for (&x, &y) in xs.iter().zip(ys.iter()) {
-        result_limbs.push(add_and_carry(x, y, &mut carry));
-    }
-    if xs_len == ys_len {
-        if carry {
-            result_limbs.push(1);
-        }
-        result_limbs
-    } else if xs_len > ys_len {
-        limbs_add_helper(xs, ys_len, result_limbs, carry)
+    if xs.len() >= ys.len() {
+        limbs_add_greater(xs, ys)
     } else {
-        limbs_add_helper(ys, xs_len, result_limbs, carry)
+        limbs_add_greater(ys, xs)
     }
 }
 
@@ -76,6 +96,8 @@ pub fn limbs_add(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 /// Additional memory: worst case O(1)
 ///
 /// where n = `xs.len()` = `ys.len()`
+///
+/// This is mpn_add_n from gmp.h.
 ///
 /// # Panics
 /// Panics if `xs` and `ys` have different lengths or if `out` is too short.
@@ -103,6 +125,50 @@ pub fn limbs_add_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) 
     carry
 }
 
+/// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, where
+/// the first slice is at least as long as the second, writes the `xs.len()` least-significant limbs
+/// of the sum of the `Natural`s to an output slice. The output must be at least as long as `xs`.
+/// Returns whether there is a carry.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = `xs.len()`
+///
+/// This is mpn_add from gmp.h, where the first input is at least as long as the second.
+///
+/// # Panics
+/// Panics if `xs` is shorter than `ys` or if `out` is too short.
+///
+/// # Example
+/// ```
+/// use malachite_nz::natural::arithmetic::add::limbs_add_greater_to_out;
+///
+/// let limbs = &mut [10, 10, 10, 10];
+/// assert_eq!(limbs_add_greater_to_out(limbs, &[1, 2, 3], &[6, 7]), false);
+/// assert_eq!(limbs, &[7, 9, 3, 10]);
+///
+/// let limbs = &mut [10, 10, 10, 10];
+/// assert_eq!(limbs_add_greater_to_out(limbs, &[100, 101, 0xffff_ffff], &[102, 101, 2]), true);
+/// assert_eq!(limbs, &[202, 202, 1, 10]);
+/// ```
+pub fn limbs_add_greater_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> bool {
+    let xs_len = xs.len();
+    let ys_len = ys.len();
+    assert!(xs_len >= ys_len);
+    assert!(out.len() >= xs_len);
+    let carry = limbs_add_same_length_to_out(out, &xs[..ys_len], ys);
+    if xs_len == ys_len {
+        carry
+    } else if carry {
+        limbs_add_limb_to_out(&mut out[ys_len..], &xs[ys_len..], 1)
+    } else {
+        out[ys_len..xs_len].copy_from_slice(&xs[ys_len..]);
+        false
+    }
+}
+
 /// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, writes
 /// the `max(xs.len(), ys.len())` least-significant limbs of the sum of the `Natural`s to an output
 /// slice. The output must be at least as long as the longer input slice. Returns whether there is a
@@ -113,6 +179,8 @@ pub fn limbs_add_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) 
 /// Additional memory: worst case O(1)
 ///
 /// where n = max(`xs.len()`, `ys.len()`)
+///
+/// This is mpn_add from gmp.h.
 ///
 /// # Panics
 /// Panics if `out` is too short.
@@ -130,39 +198,35 @@ pub fn limbs_add_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) 
 /// assert_eq!(limbs, &[202, 202, 1, 10]);
 /// ```
 pub fn limbs_add_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> bool {
-    let xs_len = xs.len();
-    let ys_len = ys.len();
-    let (min_len, max_len) = if xs_len <= ys_len {
-        (xs_len, ys_len)
+    if xs.len() >= ys.len() {
+        limbs_add_greater_to_out(out, xs, ys)
     } else {
-        (ys_len, xs_len)
-    };
-    assert!(out.len() >= max_len);
-    let carry = limbs_add_same_length_to_out(out, &xs[..min_len], &ys[..min_len]);
-    if xs_len == ys_len {
-        carry
-    } else if xs_len > ys_len {
-        if carry {
-            limbs_add_limb_to_out(&mut out[ys_len..], &xs[ys_len..], 1)
-        } else {
-            out[ys_len..xs_len].copy_from_slice(&xs[ys_len..]);
-            false
-        }
-    } else if carry {
-        limbs_add_limb_to_out(&mut out[xs_len..], &ys[xs_len..], 1)
-    } else {
-        out[xs_len..ys_len].copy_from_slice(&ys[xs_len..]);
-        false
+        limbs_add_greater_to_out(out, ys, xs)
     }
 }
 
-//TODO test
-// e.g.
-// _limbs_add_to_out_special(&mut xs[..12], 7, &ys[0..10])
-// is equivalent to
-// limbs_add_to_out(&mut xs[..12], &xs[..7], &ys[0..10])
-// if the latter were allowed.
-pub fn _limbs_add_to_out_special(xs: &mut [Limb], in_size: usize, ys: &[Limb]) -> bool {
+/// Given two slices of `Limb`s as the limbs `xs` and `ys`, where `xs` is at least as long as `ys`
+/// and `in_size` is no greater than `ys.len()`, writes the `ys.len()` lowest limbs of the sum of
+/// `xs[..in_size]` and `ys` to `xs`. Returns whether there is a carry.
+///
+/// For example,
+/// `_limbs_add_to_out_aliased(&mut xs[..12], 7, &ys[0..10])`
+/// would be equivalent to
+/// `limbs_add_to_out(&mut xs[..12], &xs[..7], &ys[0..10])`
+/// although the latter expression is not allowed because `xs` cannot be borrowed in that way.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = max(`xs.len()`, `ys.len()`)
+///
+/// This is mpn_add from gmp.h, where the second argument is at least as long as the first and the
+/// output pointer is the same as the first input pointer.
+///
+/// # Panics
+/// Panics if `xs` is shorter than `ys` or `in_size` is greater than `ys.len()`.
+pub fn _limbs_add_to_out_aliased(xs: &mut [Limb], in_size: usize, ys: &[Limb]) -> bool {
     let ys_len = ys.len();
     assert!(xs.len() >= ys_len);
     assert!(in_size <= ys_len);
@@ -180,6 +244,8 @@ pub fn _limbs_add_to_out_special(xs: &mut [Limb], in_size: usize, ys: &[Limb]) -
 /// Additional memory: worst case O(1)
 ///
 /// where n = `xs.len()` = `ys.len()`
+///
+/// This is mpn_add_n from gmp.h, where the output is written to the first input.
 ///
 /// # Panics
 /// Panics if `xs` and `ys` have different lengths.
@@ -216,6 +282,9 @@ pub fn limbs_slice_add_same_length_in_place_left(xs: &mut [Limb], ys: &[Limb]) -
 /// Additional memory: worst case O(1)
 ///
 /// where n = `xs.len()`
+///
+/// This is mpn_add from gmp.h, where the first input is at least as long as the second, and the
+/// output is written to the first input.
 ///
 /// # Panics
 /// Panics if `xs` is shorter than `ys`.
@@ -254,6 +323,9 @@ pub fn limbs_slice_add_greater_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> bo
 /// Additional memory: worst case O(m)
 ///
 /// where n = max(`xs.len()`, `ys.len()`), m = max(1, ys.len() - xs.len())
+///
+/// This is mpz_add from mpz/aors.h, where both inputs are non-negative and the output is written to
+/// the first input.
 ///
 /// # Panics
 /// Panics if `xs` and `ys` have different lengths.
@@ -301,6 +373,8 @@ pub fn limbs_vec_add_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
 ///
 /// where n = max(`xs.len`, `ys.len()`)
 ///
+/// This is mpn_add from gmp.h, where the output is written to the longer input.
+///
 /// # Example
 /// ```
 /// use malachite_nz::natural::arithmetic::add::limbs_slice_add_in_place_either;
@@ -341,6 +415,9 @@ pub fn limbs_slice_add_in_place_either(xs: &mut Vec<Limb>, ys: &mut Vec<Limb>) -
 /// Additional memory: worst case O(1)
 ///
 /// where n = max(`xs.len`, `ys.len()`)
+///
+/// This is mpz_add from mpz/aors.h, where both inputs are non-negative and the output is written to
+/// the longer input.
 ///
 /// # Example
 /// ```

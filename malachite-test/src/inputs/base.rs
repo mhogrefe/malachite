@@ -2286,6 +2286,41 @@ pub fn triples_of_unsigned_vec_unsigned_and_small_unsigned_var_2<
     }
 }
 
+fn triples_of_unsigned_vec_usize_and_unsigned_vec<T: PrimitiveUnsigned + Rand>(
+    gm: GenerationMode,
+) -> It<(Vec<T>, usize, Vec<T>)> {
+    match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_triples(
+            exhaustive_vecs(exhaustive_unsigned()),
+            exhaustive_unsigned::<u64>().map(|u| u as usize),
+            exhaustive_vecs(exhaustive_unsigned()),
+        )),
+        GenerationMode::Random(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| random_vecs(seed, scale, &(|seed_2| random(seed_2)))),
+            &(|seed| u32s_geometric(seed, scale).map(|u| u as usize)),
+            &(|seed| random_vecs(seed, scale, &(|seed_2| random(seed_2)))),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_unsigned_vecs(seed, scale)),
+            &(|seed| u32s_geometric(seed, scale).map(|u| u as usize)),
+            &(|seed| special_random_unsigned_vecs(seed, scale)),
+        )),
+    }
+}
+
+// All triples of `Vec<T>`, usize, and `Vec<T>`, where `T` is unsigned, the first `Vec` is at least
+// as long as the second, and the `usize` is no greater than the length of the second `Vec`.
+pub fn triples_of_unsigned_vec_usize_and_unsigned_vec_var_1<T: PrimitiveUnsigned + Rand>(
+    gm: GenerationMode,
+) -> It<(Vec<T>, usize, Vec<T>)> {
+    Box::new(
+        triples_of_unsigned_vec_usize_and_unsigned_vec(gm)
+            .filter(|&(ref xs, y, ref zs)| xs.len() >= zs.len() && y <= zs.len()),
+    )
+}
+
 fn triples_of_unsigned_vec_small_unsigned_and_rounding_mode<
     T: PrimitiveUnsigned + Rand,
     U: PrimitiveUnsigned,

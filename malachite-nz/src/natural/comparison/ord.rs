@@ -5,13 +5,13 @@ use std::cmp::Ordering;
 /// Interpreting two equal-length slices of `Limb`s as the limbs (in ascending order) of two
 /// `Natural`s, compares the two `Natural`s.
 ///
-/// Equivalent to GMP's `mpn_cmp`.
-///
 /// Time: worst case O(n)
 ///
 /// Additional memory: worst case O(1)
 ///
 /// where n = `xs.len()` = `ys.len()`
+///
+/// This is mpn_cmp from gmp.h.
 ///
 /// # Panics
 /// Panics if `xs` and `ys` have different lengths.

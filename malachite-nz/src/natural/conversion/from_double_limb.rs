@@ -16,11 +16,11 @@ use platform::DoubleLimb;
 /// ```
 impl From<DoubleLimb> for Natural {
     fn from(u: DoubleLimb) -> Natural {
-        let (hi, lo) = u.split_in_half();
-        if hi == 0 {
-            Small(lo)
+        let (upper, lower) = u.split_in_half();
+        if upper == 0 {
+            Small(lower)
         } else {
-            Large(vec![lo, hi])
+            Large(vec![lower, upper])
         }
     }
 }
