@@ -149,6 +149,7 @@ pub mod arithmetic {
     pub mod add_mul;
     pub mod add_mul_limb;
     pub mod add_mul_signed_limb;
+    pub mod add_natural;
     pub mod add_signed_limb;
     pub mod div_exact_limb;
     pub mod div_exact_signed_limb;
