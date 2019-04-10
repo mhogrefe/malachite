@@ -8,7 +8,7 @@ use natural::arithmetic::add::{
     limbs_slice_add_same_length_in_place_left,
 };
 use natural::arithmetic::add_limb::{limbs_add_limb_to_out, limbs_slice_add_limb_in_place};
-use natural::arithmetic::add_mul_limb::mpn_addmul_1;
+use natural::arithmetic::add_mul_limb::limbs_slice_add_mul_limb_greater_in_place_left;
 use natural::arithmetic::div_exact_limb::{
     limbs_div_exact_3_in_place, limbs_div_exact_limb_in_place,
 };
@@ -546,7 +546,7 @@ pub(crate) fn _limbs_mul_toom_interpolate_7_points(
         limbs_sub_in_place_left(w2, w6);
         limbs_sub_in_place_left(w2, w0);
 
-        mpn_addmul_1(w5, w2, 45);
+        limbs_slice_add_mul_limb_greater_in_place_left(w5, w2, 45);
         assert!(w5[0].even());
         limbs_slice_shr_in_place(w5, 1);
         limbs_sub_same_length_in_place_left(w4, w2);
@@ -946,7 +946,7 @@ pub fn _limbs_mul_toom_interpolate_12_points<'a>(
         }
 
         if AORSMUL_FASTER_2AORSLSH {
-            mpn_addmul_1(r5, r4, 60); // can be negative
+            limbs_slice_add_mul_limb_greater_in_place_left(r5, r4, 60); // can be negative
         } else {
             _limbs_shl_and_sub_same_length(r5, r4, 2, scratch); // can be negative
             _limbs_shl_and_add_same_length_in_place_left(r5, r4, 6, scratch); // can give a carry
@@ -1259,7 +1259,7 @@ pub fn _limbs_mul_toom_interpolate_16_points<'a>(
             _limbs_shl_and_sub_same_length(r6, r7, 12, scratch); // can be negative
         }
         if AORSMUL_FASTER_2AORSLSH {
-            mpn_addmul_1(r6, r5, 240); // can be negative
+            limbs_slice_add_mul_limb_greater_in_place_left(r6, r5, 240); // can be negative
         } else {
             // can give a carry
             _limbs_shl_and_add_same_length_in_place_left(r6, r5, 8, scratch);

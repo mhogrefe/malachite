@@ -5,7 +5,7 @@ use malachite_base::num::{
     AddMul, AddMulAssign, NegAssign, NotAssign, WrappingAddAssign, WrappingSubAssign,
 };
 use natural::arithmetic::add_limb::limbs_slice_add_limb_in_place;
-use natural::arithmetic::add_mul_limb::mpn_addmul_1;
+use natural::arithmetic::add_mul_limb::limbs_slice_add_mul_limb_greater_in_place_left;
 use natural::arithmetic::mul_limb::{limbs_mul_limb_to_out, limbs_mul_limb_with_carry_to_out};
 use natural::arithmetic::sub_limb::limbs_sub_limb_in_place;
 use natural::arithmetic::sub_mul_limb::mpn_submul_1;
@@ -421,7 +421,7 @@ pub(crate) fn mpz_aorsmul_1(
 
     if sub {
         // addmul of absolute values
-        let mut cy = mpn_addmul_1(w, &x[..min_size], y);
+        let mut cy = limbs_slice_add_mul_limb_greater_in_place_left(w, &x[..min_size], y);
         let mut dsize = xsize as isize - wsize as isize;
         if dsize != 0 {
             let cy2 = if dsize > 0 {

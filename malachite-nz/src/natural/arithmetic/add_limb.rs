@@ -12,6 +12,8 @@ use std::ops::{Add, AddAssign};
 ///
 /// where n = `limbs.len()`
 ///
+/// This is mpn_add_1 from gmp.h, where the result is returned.
+///
 /// # Example
 /// ```
 /// use malachite_nz::natural::arithmetic::add_limb::limbs_add_limb;
@@ -49,6 +51,8 @@ pub fn limbs_add_limb(limbs: &[Limb], mut limb: Limb) -> Vec<Limb> {
 /// Additional memory: worst case O(1)
 ///
 /// where n = `limbs.len()`
+///
+/// This is mpn_add_1 from gmp.h.
 ///
 /// # Panics
 /// Panics if `out` is shorter than `in_limbs`.
@@ -93,6 +97,8 @@ pub fn limbs_add_limb_to_out(out: &mut [Limb], in_limbs: &[Limb], mut limb: Limb
 ///
 /// where n = `limbs.len()`
 ///
+/// This is mpn_add_1 from gmp.h, where the result is written to the input slice.
+///
 /// # Example
 /// ```
 /// use malachite_nz::natural::arithmetic::add_limb::limbs_slice_add_limb_in_place;
@@ -124,6 +130,8 @@ pub fn limbs_slice_add_limb_in_place<T: PrimitiveUnsigned>(limbs: &mut [T], mut 
 /// Additional memory: worst case O(1)
 ///
 /// where n = `limbs.len()`
+///
+/// This is mpz_add_ui from mpz/aors_ui.h where the input is non-negative.
 ///
 /// # Panics
 /// Panics if `limbs` is empty.

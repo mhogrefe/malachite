@@ -10,7 +10,7 @@ use natural::arithmetic::add::{
     limbs_slice_add_same_length_in_place_left,
 };
 use natural::arithmetic::add_limb::{limbs_add_limb_to_out, limbs_slice_add_limb_in_place};
-use natural::arithmetic::add_mul_limb::mpn_addmul_1;
+use natural::arithmetic::add_mul_limb::limbs_slice_add_mul_limb_greater_in_place_left;
 use natural::arithmetic::mul::fft::MUL_FFT_THRESHOLD;
 use natural::arithmetic::mul::poly_eval::{
     _limbs_mul_toom_evaluate_deg_3_poly_in_1_and_neg_1,
@@ -540,7 +540,7 @@ pub fn _limbs_mul_greater_to_out_toom_32(
                     carry += 1;
                 }
             } else if ap1_hi == 2 {
-                carry = mpn_addmul_1(&mut scratch[n..], bp1, 2);
+                carry = limbs_slice_add_mul_limb_greater_in_place_left(&mut scratch[n..], bp1, 2);
                 if bp1_hi {
                     carry += 2;
                 }
@@ -992,14 +992,15 @@ pub fn _limbs_mul_greater_to_out_toom_33(
                     carry += 1;
                 }
             } else if *as1_last != 0 {
-                carry = 2 * bs1[n] + mpn_addmul_1(&mut v_1[n..], &bs1[..n], 2);
+                carry = 2 * bs1[n]
+                    + limbs_slice_add_mul_limb_greater_in_place_left(&mut v_1[n..], &bs1[..n], 2);
             }
             if bs1[n] == 1 {
                 if limbs_slice_add_same_length_in_place_left(&mut v_1[n..2 * n], as1_init) {
                     carry += 1;
                 }
             } else if bs1[n] != 0 {
-                carry += mpn_addmul_1(&mut v_1[n..], as1_init, 2);
+                carry += limbs_slice_add_mul_limb_greater_in_place_left(&mut v_1[n..], as1_init, 2);
             }
             v_1[2 * n] = carry;
         } else {
@@ -1225,13 +1226,13 @@ pub fn _limbs_mul_greater_to_out_toom_42(
                 carry += 1;
             }
         } else if as1[n] == 2 {
-            carry = bs1[n]
-                .wrapping_mul(2)
-                .wrapping_add(mpn_addmul_1(v_1, &bs1[..n], 2));
+            carry = bs1[n].wrapping_mul(2).wrapping_add(
+                limbs_slice_add_mul_limb_greater_in_place_left(v_1, &bs1[..n], 2),
+            );
         } else if as1[n] == 3 {
-            carry = bs1[n]
-                .wrapping_mul(3)
-                .wrapping_add(mpn_addmul_1(v_1, &bs1[..n], 3));
+            carry = bs1[n].wrapping_mul(3).wrapping_add(
+                limbs_slice_add_mul_limb_greater_in_place_left(v_1, &bs1[..n], 3),
+            );
         }
         if bs1[n] != 0 && limbs_slice_add_same_length_in_place_left(v_1, &as1[..n]) {
             carry += 1;
@@ -2180,7 +2181,14 @@ pub fn _limbs_mul_greater_to_out_toom_53(
                             carry.wrapping_add_assign(1)
                         }
                     }
-                    2 => carry = (*bsm1_last << 1) + mpn_addmul_1(v_neg_1_init_hi, bsm1_init, 2),
+                    2 => {
+                        carry = (*bsm1_last << 1)
+                            + limbs_slice_add_mul_limb_greater_in_place_left(
+                                v_neg_1_init_hi,
+                                bsm1_init,
+                                2,
+                            )
+                    }
                     _ => {}
                 }
                 if *bsm1_last != 0
@@ -2213,11 +2221,18 @@ pub fn _limbs_mul_greater_to_out_toom_53(
                         carry.wrapping_add_assign(1);
                     }
                 }
-                2 => carry = (*bs1_last << 1) + mpn_addmul_1(&mut v_1[n..], bs1_init, 2),
+                2 => {
+                    carry = (*bs1_last << 1)
+                        + limbs_slice_add_mul_limb_greater_in_place_left(&mut v_1[n..], bs1_init, 2)
+                }
                 0 => {}
                 _ => {
                     carry = as1_last.wrapping_mul(*bs1_last)
-                        + mpn_addmul_1(&mut v_1[n..], bs1_init, *as1_last)
+                        + limbs_slice_add_mul_limb_greater_in_place_left(
+                            &mut v_1[n..],
+                            bs1_init,
+                            *as1_last,
+                        )
                 }
             }
             if *bs1_last == 1
@@ -2225,7 +2240,8 @@ pub fn _limbs_mul_greater_to_out_toom_53(
             {
                 carry.wrapping_add_assign(1);
             } else if *bs1_last == 2 {
-                carry += mpn_addmul_1(&mut v_1[n..2 * n], as1_init, 2);
+                carry +=
+                    limbs_slice_add_mul_limb_greater_in_place_left(&mut v_1[n..2 * n], as1_init, 2);
             }
             v_1[2 * n] = carry;
         } else {
@@ -2696,7 +2712,7 @@ pub fn _limbs_mul_greater_to_out_toom_62(
     {
         let (v_neg_1_last, v_neg_1_hi) = v_neg_1[n..p].split_last_mut().unwrap();
         *v_neg_1_last = if *asm1_last == 2 {
-            mpn_addmul_1(v_neg_1_hi, bsm1, 2)
+            limbs_slice_add_mul_limb_greater_in_place_left(v_neg_1_hi, bsm1, 2)
         } else if *asm1_last == 1 && limbs_slice_add_same_length_in_place_left(v_neg_1_hi, bsm1) {
             1
         } else {
@@ -2717,9 +2733,15 @@ pub fn _limbs_mul_greater_to_out_toom_62(
                 }
                 carry
             }
-            2 => (*bs1_last << 1) + mpn_addmul_1(v_1_hi, bs1_init, 2),
+            2 => {
+                (*bs1_last << 1)
+                    + limbs_slice_add_mul_limb_greater_in_place_left(v_1_hi, bs1_init, 2)
+            }
             0 => 0,
-            _ => as1_last.wrapping_mul(*bs1_last) + mpn_addmul_1(v_1_hi, bs1_init, *as1_last),
+            _ => {
+                as1_last.wrapping_mul(*bs1_last)
+                    + limbs_slice_add_mul_limb_greater_in_place_left(v_1_hi, bs1_init, *as1_last)
+            }
         };
         if *bs1_last != 0 && limbs_slice_add_same_length_in_place_left(v_1_hi, as1_init) {
             *v_1_last += 1;

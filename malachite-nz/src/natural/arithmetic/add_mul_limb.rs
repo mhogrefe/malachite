@@ -1,22 +1,80 @@
 use malachite_base::num::{AddMul, AddMulAssign, PrimitiveInteger, SplitInHalf};
 use natural::arithmetic::add_limb::limbs_slice_add_limb_in_place;
-use natural::Natural::{self, Large, Small};
+use natural::arithmetic::mul_limb::limbs_mul_limb_to_out;
+use natural::Natural::{self, Large};
 use platform::{DoubleLimb, Limb};
 
-// Multiply s1 and s2limb, and add the s1.len() least significant limbs of the product to r and
-// write the result to r. Return the most significant limb of the product, plus carry-out from the
-// addition. r.len() >= s1.len()
-pub fn mpn_addmul_1(r: &mut [Limb], s1: &[Limb], s2limb: Limb) -> Limb {
-    let s1_len = s1.len();
-    assert!(r.len() >= s1_len);
+pub fn limbs_add_mul_limb(xs: &[Limb], ys: &[Limb], limb: Limb) -> Vec<Limb> {
+    //TODO fix
+    let mut xs = xs.to_vec();
+    limbs_vec_add_mul_limb_in_place_left(&mut xs, ys, limb);
+    xs
+}
+
+// Multiply ys and limb, and add the ys.len() least significant limbs of the product to xs and
+// write the result to xs. Return the most significant limb of the product, plus carry-out from the
+// addition. xs.len() >= ys.len()
+pub fn limbs_slice_add_mul_limb_greater_in_place_left(
+    xs: &mut [Limb],
+    ys: &[Limb],
+    limb: Limb,
+) -> Limb {
+    let xs_len = ys.len();
+    assert!(xs.len() >= xs_len);
     let mut carry = 0;
-    let s2limb_double = DoubleLimb::from(s2limb);
-    for i in 0..s1_len {
-        let limb_result = DoubleLimb::from(r[i]) + DoubleLimb::from(s1[i]) * s2limb_double + carry;
-        r[i] = limb_result.lower_half();
+    let limb_double = DoubleLimb::from(limb);
+    for i in 0..xs_len {
+        let limb_result = DoubleLimb::from(xs[i]) + DoubleLimb::from(ys[i]) * limb_double + carry;
+        xs[i] = limb_result.lower_half();
         carry = limb_result >> Limb::WIDTH;
     }
     carry as Limb
+}
+
+// xs.len() > 0, ys.len() > 0, limb != 0
+pub fn limbs_vec_add_mul_limb_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb], limb: Limb) {
+    if xs.len() >= ys.len() {
+        limbs_vec_add_mul_limb_greater_in_place_left(xs, ys, limb);
+    } else {
+        limbs_vec_add_mul_limb_smaller_in_place_left(xs, ys, limb);
+    }
+}
+
+// ys.len() > 0, xs.len() >= ys.len(), limb != 0
+fn limbs_vec_add_mul_limb_greater_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb], limb: Limb) {
+    let carry = limbs_slice_add_mul_limb_greater_in_place_left(xs, ys, limb);
+    let ys_len = ys.len();
+    if xs.len() == ys_len {
+        if carry != 0 {
+            xs.push(carry);
+        }
+    } else if limbs_slice_add_limb_in_place(&mut xs[ys_len..], carry) {
+        xs.push(1);
+    }
+}
+
+// xs.len() > 0, xs.len() < ys.len(), limb != 0
+fn limbs_vec_add_mul_limb_smaller_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb], limb: Limb) {
+    let xs_len = xs.len();
+    let (ys_lo, ys_hi) = ys.split_at(xs_len);
+    xs.resize(ys.len(), 0);
+    let mut carry;
+    {
+        let (xs_lo, xs_hi) = xs.split_at_mut(xs_len);
+        carry = limbs_mul_limb_to_out(xs_hi, ys_hi, limb);
+        let inner_carry = limbs_slice_add_mul_limb_greater_in_place_left(xs_lo, ys_lo, limb);
+        if inner_carry != 0 && limbs_slice_add_limb_in_place(xs_hi, inner_carry) {
+            carry += 1;
+        }
+    }
+    if carry != 0 {
+        xs.push(carry);
+    }
+}
+
+pub fn limbs_vec_add_mul_limb_in_place_right(xs: &[Limb], ys: &mut Vec<Limb>, limb: Limb) {
+    //TODO fix
+    *ys = limbs_add_mul_limb(xs, &*ys, limb);
 }
 
 /// Adds the product of a `Natural` (b) and a `Limb` (c) to a `Natural` (self), taking `self` and b
@@ -131,38 +189,26 @@ impl<'a> AddMul<&'a Natural, u32> for Natural {
 impl<'a> AddMul<Natural, Limb> for &'a Natural {
     type Output = Natural;
 
-    fn add_mul(self, b: Natural, c: Limb) -> Natural {
+    fn add_mul(self, mut b: Natural, c: Limb) -> Natural {
         if c == 0 || b == 0 as Limb {
             return self.clone();
         }
         if c == 1 {
             return self + b;
         }
-        if let Small(small_b) = b {
-            if let Some(product) = small_b.checked_mul(c) {
-                return self + product;
+        let fallback = match (self, &mut b) {
+            (Large(ref a_limbs), Large(ref mut b_limbs)) => {
+                limbs_vec_add_mul_limb_in_place_right(a_limbs, b_limbs, c);
+                false
             }
-        }
-        let mut result_limbs = self.to_limbs_asc();
-        let a_len = result_limbs.len();
-        let b_len = b.limb_count() as usize;
-        if a_len < b_len {
-            result_limbs.resize(b_len, 0);
-        }
-        let carry = match b {
-            Small(small) => mpn_addmul_1(&mut result_limbs, &[small], c),
-            Large(ref b_limbs) => mpn_addmul_1(&mut result_limbs, b_limbs, c),
+            _ => true,
         };
-        if carry != 0 {
-            if a_len > b_len {
-                if limbs_slice_add_limb_in_place(&mut result_limbs[b_len..], carry) {
-                    result_limbs.push(1);
-                }
-            } else {
-                result_limbs.push(carry);
-            }
+        if fallback {
+            self + b * c
+        } else {
+            b.trim();
+            b
         }
-        Large(result_limbs)
     }
 }
 
@@ -209,31 +255,14 @@ impl<'a, 'b> AddMul<&'a Natural, Limb> for &'b Natural {
         if c == 1 {
             return self + b;
         }
-        if let Small(small_b) = *b {
-            if let Some(product) = small_b.checked_mul(c) {
-                return self + product;
+        match (self, b) {
+            (Large(ref a_limbs), Large(ref b_limbs)) => {
+                let mut result = Large(limbs_add_mul_limb(a_limbs, b_limbs, c));
+                result.trim();
+                result
             }
+            _ => self + b * c,
         }
-        let mut result_limbs = self.to_limbs_asc();
-        let a_len = result_limbs.len();
-        let b_len = b.limb_count() as usize;
-        if a_len < b_len {
-            result_limbs.resize(b_len, 0);
-        }
-        let carry = match *b {
-            Small(small) => mpn_addmul_1(&mut result_limbs, &[small], c),
-            Large(ref b_limbs) => mpn_addmul_1(&mut result_limbs, b_limbs, c),
-        };
-        if carry != 0 {
-            if a_len > b_len {
-                if limbs_slice_add_limb_in_place(&mut result_limbs[b_len..], carry) {
-                    result_limbs.push(1);
-                }
-            } else {
-                result_limbs.push(carry);
-            }
-        }
-        Large(result_limbs)
     }
 }
 
@@ -283,32 +312,17 @@ impl AddMulAssign<Natural, Limb> for Natural {
             *self += b;
             return;
         }
-        if let Small(small_b) = b {
-            if let Some(product) = small_b.checked_mul(c) {
-                *self += product;
-                return;
+        let fallback = match (&mut *self, &b) {
+            (&mut Large(ref mut a_limbs), &Large(ref b_limbs)) => {
+                limbs_vec_add_mul_limb_in_place_left(a_limbs, b_limbs, c);
+                false
             }
-        }
-        {
-            let self_limbs = self.promote_in_place();
-            let a_len = self_limbs.len();
-            let b_len = b.limb_count() as usize;
-            if a_len < b_len {
-                self_limbs.resize(b_len, 0);
-            }
-            let carry = match b {
-                Small(small) => mpn_addmul_1(self_limbs, &[small], c),
-                Large(ref b_limbs) => mpn_addmul_1(self_limbs, b_limbs, c),
-            };
-            if carry != 0 {
-                if a_len > b_len {
-                    if limbs_slice_add_limb_in_place(&mut self_limbs[b_len..], carry) {
-                        self_limbs.push(1);
-                    }
-                } else {
-                    self_limbs.push(carry);
-                }
-            }
+            _ => true,
+        };
+        if fallback {
+            *self += b * c;
+        } else {
+            self.trim();
         }
     }
 }
@@ -357,32 +371,17 @@ impl<'a> AddMulAssign<&'a Natural, Limb> for Natural {
             *self += b;
             return;
         }
-        if let Small(small_b) = *b {
-            if let Some(product) = small_b.checked_mul(c) {
-                *self += product;
-                return;
+        let fallback = match (&mut *self, b) {
+            (&mut Large(ref mut a_limbs), &Large(ref b_limbs)) => {
+                limbs_vec_add_mul_limb_in_place_left(a_limbs, b_limbs, c);
+                false
             }
-        }
-        {
-            let self_limbs = self.promote_in_place();
-            let a_len = self_limbs.len();
-            let b_len = b.limb_count() as usize;
-            if a_len < b_len {
-                self_limbs.resize(b_len, 0);
-            }
-            let carry = match *b {
-                Small(small) => mpn_addmul_1(self_limbs, &[small], c),
-                Large(ref b_limbs) => mpn_addmul_1(self_limbs, b_limbs, c),
-            };
-            if carry != 0 {
-                if a_len > b_len {
-                    if limbs_slice_add_limb_in_place(&mut self_limbs[b_len..], carry) {
-                        self_limbs.push(1);
-                    }
-                } else {
-                    self_limbs.push(carry);
-                }
-            }
+            _ => true,
+        };
+        if fallback {
+            *self += b * c;
+        } else {
+            self.trim();
         }
     }
 }
