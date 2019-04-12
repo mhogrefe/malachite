@@ -46,7 +46,9 @@ fn limbs_hamming_distance_neg_helper(xs: &[Limb], ys: &[Limb], xs_i: usize, ys_i
         return distance + limbs_count_zeros_neg(&ys[xs_len..]);
     }
     if xs_len < ys_i {
-        return distance + limbs_count_zeros(&xs[xs_i + 1..]) + limbs_count_zeros_neg(&ys[xs_len..]);
+        return distance
+            + limbs_count_zeros(&xs[xs_i + 1..])
+            + limbs_count_zeros_neg(&ys[xs_len..]);
     }
     distance += limbs_count_zeros(&xs[xs_i + 1..ys_i]);
     if xs_len == ys_i {

@@ -1,14 +1,19 @@
 use malachite_base::num::{AddMul, AddMulAssign, PrimitiveInteger, SplitInHalf};
 use natural::arithmetic::add_limb::limbs_slice_add_limb_in_place;
-use natural::arithmetic::mul_limb::limbs_mul_limb_to_out;
+use natural::arithmetic::mul_limb::{limbs_mul_limb_to_out, limbs_slice_mul_limb_in_place};
 use natural::Natural::{self, Large};
 use platform::{DoubleLimb, Limb};
 
 pub fn limbs_add_mul_limb(xs: &[Limb], ys: &[Limb], limb: Limb) -> Vec<Limb> {
-    //TODO fix
-    let mut xs = xs.to_vec();
-    limbs_vec_add_mul_limb_in_place_left(&mut xs, ys, limb);
-    xs
+    let mut result;
+    if xs.len() >= ys.len() {
+        result = xs.to_vec();
+        limbs_vec_add_mul_limb_greater_in_place_left(&mut result, ys, limb);
+    } else {
+        result = ys.to_vec();
+        limbs_vec_add_mul_limb_smaller_in_place_right(xs, &mut result, limb);
+    }
+    result
 }
 
 // Multiply ys and limb, and add the ys.len() least significant limbs of the product to xs and
@@ -19,13 +24,30 @@ pub fn limbs_slice_add_mul_limb_greater_in_place_left(
     ys: &[Limb],
     limb: Limb,
 ) -> Limb {
+    let ys_len = ys.len();
+    assert!(xs.len() >= ys_len);
+    let mut carry = 0;
+    let limb_double = DoubleLimb::from(limb);
+    for i in 0..ys_len {
+        let limb_result = DoubleLimb::from(xs[i]) + DoubleLimb::from(ys[i]) * limb_double + carry;
+        xs[i] = limb_result.lower_half();
+        carry = limb_result >> Limb::WIDTH;
+    }
+    carry as Limb
+}
+
+pub fn limbs_slice_add_mul_limb_same_length_in_place_right(
+    xs: &[Limb],
+    ys: &mut [Limb],
+    limb: Limb,
+) -> Limb {
     let xs_len = ys.len();
-    assert!(xs.len() >= xs_len);
+    assert_eq!(ys.len(), xs_len);
     let mut carry = 0;
     let limb_double = DoubleLimb::from(limb);
     for i in 0..xs_len {
         let limb_result = DoubleLimb::from(xs[i]) + DoubleLimb::from(ys[i]) * limb_double + carry;
-        xs[i] = limb_result.lower_half();
+        ys[i] = limb_result.lower_half();
         carry = limb_result >> Limb::WIDTH;
     }
     carry as Limb
@@ -44,12 +66,12 @@ pub fn limbs_vec_add_mul_limb_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb], lim
 fn limbs_vec_add_mul_limb_greater_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb], limb: Limb) {
     let carry = limbs_slice_add_mul_limb_greater_in_place_left(xs, ys, limb);
     let ys_len = ys.len();
-    if xs.len() == ys_len {
-        if carry != 0 {
+    if carry != 0 {
+        if xs.len() == ys_len {
             xs.push(carry);
+        } else if limbs_slice_add_limb_in_place(&mut xs[ys_len..], carry) {
+            xs.push(1);
         }
-    } else if limbs_slice_add_limb_in_place(&mut xs[ys_len..], carry) {
-        xs.push(1);
     }
 }
 
@@ -73,8 +95,55 @@ fn limbs_vec_add_mul_limb_smaller_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb],
 }
 
 pub fn limbs_vec_add_mul_limb_in_place_right(xs: &[Limb], ys: &mut Vec<Limb>, limb: Limb) {
-    //TODO fix
-    *ys = limbs_add_mul_limb(xs, &*ys, limb);
+    if xs.len() >= ys.len() {
+        limbs_vec_add_mul_limb_greater_in_place_right(xs, ys, limb);
+    } else {
+        limbs_vec_add_mul_limb_smaller_in_place_right(xs, ys, limb);
+    }
+}
+
+// ys.len() > 0, xs.len() >= ys.len(), limb != 0
+fn limbs_vec_add_mul_limb_greater_in_place_right(xs: &[Limb], ys: &mut Vec<Limb>, limb: Limb) {
+    let ys_len = ys.len();
+    let carry = limbs_slice_add_mul_limb_same_length_in_place_right(&xs[..ys_len], ys, limb);
+    ys.extend_from_slice(&xs[ys_len..]);
+    if carry != 0 {
+        if xs.len() == ys_len {
+            ys.push(carry);
+        } else if limbs_slice_add_limb_in_place(&mut ys[ys_len..], carry) {
+            ys.push(1);
+        }
+    }
+}
+
+// xs.len() > 0, xs.len() < ys.len(), limb != 0
+fn limbs_vec_add_mul_limb_smaller_in_place_right(xs: &[Limb], ys: &mut Vec<Limb>, limb: Limb) {
+    let mut carry;
+    {
+        let (ys_lo, ys_hi) = ys.split_at_mut(xs.len());
+        carry = limbs_slice_mul_limb_in_place(ys_hi, limb);
+        let inner_carry = limbs_slice_add_mul_limb_same_length_in_place_right(xs, ys_lo, limb);
+        if inner_carry != 0 && limbs_slice_add_limb_in_place(ys_hi, inner_carry) {
+            carry += 1;
+        }
+    }
+    if carry != 0 {
+        ys.push(carry);
+    }
+}
+
+pub fn limbs_vec_add_mul_limb_in_place_either(
+    xs: &mut Vec<Limb>,
+    ys: &mut Vec<Limb>,
+    limb: Limb,
+) -> bool {
+    if xs.len() >= ys.len() {
+        limbs_vec_add_mul_limb_greater_in_place_left(xs, ys, limb);
+        false
+    } else {
+        limbs_vec_add_mul_limb_smaller_in_place_right(xs, ys, limb);
+        true
+    }
 }
 
 /// Adds the product of a `Natural` (b) and a `Limb` (c) to a `Natural` (self), taking `self` and b
@@ -206,7 +275,6 @@ impl<'a> AddMul<Natural, Limb> for &'a Natural {
         if fallback {
             self + b * c
         } else {
-            b.trim();
             b
         }
     }
@@ -257,9 +325,7 @@ impl<'a, 'b> AddMul<&'a Natural, Limb> for &'b Natural {
         }
         match (self, b) {
             (Large(ref a_limbs), Large(ref b_limbs)) => {
-                let mut result = Large(limbs_add_mul_limb(a_limbs, b_limbs, c));
-                result.trim();
-                result
+                Large(limbs_add_mul_limb(a_limbs, b_limbs, c))
             }
             _ => self + b * c,
         }
@@ -304,7 +370,7 @@ impl<'a, 'b> AddMul<&'a Natural, u32> for &'b Natural {
 /// }
 /// ```
 impl AddMulAssign<Natural, Limb> for Natural {
-    fn add_mul_assign(&mut self, b: Natural, c: Limb) {
+    fn add_mul_assign(&mut self, mut b: Natural, c: Limb) {
         if c == 0 || b == 0 as Limb {
             return;
         }
@@ -312,17 +378,17 @@ impl AddMulAssign<Natural, Limb> for Natural {
             *self += b;
             return;
         }
-        let fallback = match (&mut *self, &b) {
-            (&mut Large(ref mut a_limbs), &Large(ref b_limbs)) => {
-                limbs_vec_add_mul_limb_in_place_left(a_limbs, b_limbs, c);
-                false
-            }
-            _ => true,
+        let (fallback, right) = match (&mut *self, &mut b) {
+            (&mut Large(ref mut a_limbs), &mut Large(ref mut b_limbs)) => (
+                false,
+                limbs_vec_add_mul_limb_in_place_either(a_limbs, b_limbs, c),
+            ),
+            _ => (true, false),
         };
         if fallback {
             *self += b * c;
-        } else {
-            self.trim();
+        } else if right {
+            *self = b;
         }
     }
 }
@@ -380,8 +446,6 @@ impl<'a> AddMulAssign<&'a Natural, Limb> for Natural {
         };
         if fallback {
             *self += b * c;
-        } else {
-            self.trim();
         }
     }
 }
