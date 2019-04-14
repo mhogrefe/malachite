@@ -4,6 +4,27 @@ use natural::arithmetic::mul_limb::{limbs_mul_limb_to_out, limbs_slice_mul_limb_
 use natural::Natural::{self, Large};
 use platform::{DoubleLimb, Limb};
 
+/// Given the limbs of two `Natural`s a and b, and a limb c, returns the limbs of a + b * c. `xs`
+/// and `ys` should be nonempty and have no trailing zeros, and `limb` should be nonzero. The result
+/// will have no trailing zeros.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(n)
+///
+/// where n = max(`xs.len()`, `ys.len()`)
+///
+/// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, where w and x are positive, sub is positive, and w
+/// is returned instead of overwriting the first input.
+///
+/// # Example
+/// ```
+/// use malachite_nz::natural::arithmetic::add_mul_limb::limbs_add_mul_limb;
+///
+/// assert_eq!(limbs_add_mul_limb(&[123, 456], &[123], 4), &[615, 456]);
+/// assert_eq!(limbs_add_mul_limb(&[123], &[0, 123], 4), &[123, 492]);
+/// assert_eq!(limbs_add_mul_limb(&[123, 456], &[0, 123], 0xffff_ffff), &[123, 333, 123]);
+/// ```
 pub fn limbs_add_mul_limb(xs: &[Limb], ys: &[Limb], limb: Limb) -> Vec<Limb> {
     let mut result;
     if xs.len() >= ys.len() {
@@ -16,9 +37,41 @@ pub fn limbs_add_mul_limb(xs: &[Limb], ys: &[Limb], limb: Limb) -> Vec<Limb> {
     result
 }
 
-// Multiply ys and limb, and add the ys.len() least significant limbs of the product to xs and
-// write the result to xs. Return the most significant limb of the product, plus carry-out from the
-// addition. xs.len() >= ys.len()
+/// Given the limbs of two `Natural`s a and b, and a limb c, computes a + b * c. The lowest
+/// `ys.len()` limbs of the result are written to `xs`, and the highest limb of b * c, plus the
+/// carry-out from the addition, is returned. `xs` must be at least as long as `ys`.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = `ys.len()`
+///
+/// This is mpn_addmul_1 from mpn/generic/addmul_1.c.
+///
+/// # Panics
+/// Panics if `xs` is shorter than `ys`.
+///
+/// # Example
+/// ```
+/// use malachite_nz::natural::arithmetic::add_mul_limb::*;
+///
+/// let xs = &mut [123, 456];
+/// assert_eq!(limbs_slice_add_mul_limb_greater_in_place_left(xs, &[123], 4), 0);
+/// assert_eq!(xs, &[615, 456]);
+///
+/// let xs = &mut [123, 456];
+/// assert_eq!(limbs_slice_add_mul_limb_greater_in_place_left(xs, &[123], 0xffff_ffff), 123);
+/// assert_eq!(xs, &[0, 456]);
+///
+/// let xs = &mut [123, 0];
+/// assert_eq!(limbs_slice_add_mul_limb_greater_in_place_left(xs, &[0, 123], 4), 0);
+/// assert_eq!(xs, &[123, 492]);
+///
+/// let xs = &mut [123, 456];
+/// assert_eq!(limbs_slice_add_mul_limb_greater_in_place_left(xs, &[0, 123], 0xffff_ffff), 123);
+/// assert_eq!(xs, &[123, 333]);
+/// ```
 pub fn limbs_slice_add_mul_limb_greater_in_place_left(
     xs: &mut [Limb],
     ys: &[Limb],
@@ -36,12 +89,42 @@ pub fn limbs_slice_add_mul_limb_greater_in_place_left(
     carry as Limb
 }
 
+/// Given the limbs of two `Natural`s a and b, and a limb c, computes a + b * c. The lowest limbs of
+/// the result are written to `ys` and the highest limb is returned. `xs` must have the same length
+/// as `ys`.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = `xs.len()` = `ys.len()`
+///
+/// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, where w and x are positive and have the same
+/// lengths, sub is positive, the lowest limbs of the result are written to the second input rather
+/// than the first, and the highest limb is returned.
+///
+/// # Panics
+/// Panics if `xs` and `ys` have different lengths.
+///
+/// # Example
+/// ```
+/// use malachite_nz::natural::arithmetic::add_mul_limb::*;
+///
+/// let ys = &mut [0, 123];
+/// assert_eq!(limbs_slice_add_mul_limb_same_length_in_place_right(&[123, 0], ys, 4), 0);
+/// assert_eq!(ys, &[123, 492]);
+///
+/// let ys = &mut [0, 123];
+/// assert_eq!(limbs_slice_add_mul_limb_same_length_in_place_right(&[123, 456], ys, 0xffff_ffff),
+///         123);
+/// assert_eq!(ys, &[123, 333]);
+/// ```
 pub fn limbs_slice_add_mul_limb_same_length_in_place_right(
     xs: &[Limb],
     ys: &mut [Limb],
     limb: Limb,
 ) -> Limb {
-    let xs_len = ys.len();
+    let xs_len = xs.len();
     assert_eq!(ys.len(), xs_len);
     let mut carry = 0;
     let limb_double = DoubleLimb::from(limb);
@@ -53,12 +136,58 @@ pub fn limbs_slice_add_mul_limb_same_length_in_place_right(
     carry as Limb
 }
 
-// xs.len() > 0, ys.len() > 0, limb != 0
+/// Given the limbs of two `Natural`s a and b, and a limb c, writes the limbs of a + b * c to the
+/// first (left) input, corresponding to the limbs of a. `xs` and `ys` should be nonempty and have
+/// no trailing zeros, and `limb` should be nonzero. The result will have no trailing zeros.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(m)
+///
+/// where n = max(`xs.len()`, `ys.len()`)
+///       m = max(1, `ys.len()` - `xs.len()`)
+///
+/// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, where w and x are positive and sub is positive.
+///
+/// # Example
+/// ```
+/// use malachite_nz::natural::arithmetic::add_mul_limb::limbs_vec_add_mul_limb_in_place_left;
+///
+/// let mut xs = vec![123, 456];
+/// limbs_vec_add_mul_limb_in_place_left(&mut xs, &[123], 4);
+/// assert_eq!(xs, &[615, 456]);
+///
+/// let mut xs = vec![123, 456];
+/// limbs_vec_add_mul_limb_in_place_left(&mut xs, &[123], 0xffff_ffff);
+/// assert_eq!(xs, &[0, 579]);
+///
+/// let mut xs = vec![123];
+/// limbs_vec_add_mul_limb_in_place_left(&mut xs, &[0, 123], 4);
+/// assert_eq!(xs, &[123, 492]);
+///
+/// let mut xs = vec![123, 456];
+/// limbs_vec_add_mul_limb_in_place_left(&mut xs, &[0, 123], 0xffff_ffff);
+/// assert_eq!(xs, &[123, 333, 123]);
+/// ```
 pub fn limbs_vec_add_mul_limb_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb], limb: Limb) {
-    if xs.len() >= ys.len() {
+    let xs_len = xs.len();
+    if xs_len >= ys.len() {
         limbs_vec_add_mul_limb_greater_in_place_left(xs, ys, limb);
     } else {
-        limbs_vec_add_mul_limb_smaller_in_place_left(xs, ys, limb);
+        let (ys_lo, ys_hi) = ys.split_at(xs_len);
+        xs.resize(ys.len(), 0);
+        let mut carry;
+        {
+            let (xs_lo, xs_hi) = xs.split_at_mut(xs_len);
+            carry = limbs_mul_limb_to_out(xs_hi, ys_hi, limb);
+            let inner_carry = limbs_slice_add_mul_limb_greater_in_place_left(xs_lo, ys_lo, limb);
+            if inner_carry != 0 && limbs_slice_add_limb_in_place(xs_hi, inner_carry) {
+                carry += 1;
+            }
+        }
+        if carry != 0 {
+            xs.push(carry);
+        }
     }
 }
 
@@ -75,44 +204,54 @@ fn limbs_vec_add_mul_limb_greater_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb],
     }
 }
 
-// xs.len() > 0, xs.len() < ys.len(), limb != 0
-fn limbs_vec_add_mul_limb_smaller_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb], limb: Limb) {
-    let xs_len = xs.len();
-    let (ys_lo, ys_hi) = ys.split_at(xs_len);
-    xs.resize(ys.len(), 0);
-    let mut carry;
-    {
-        let (xs_lo, xs_hi) = xs.split_at_mut(xs_len);
-        carry = limbs_mul_limb_to_out(xs_hi, ys_hi, limb);
-        let inner_carry = limbs_slice_add_mul_limb_greater_in_place_left(xs_lo, ys_lo, limb);
-        if inner_carry != 0 && limbs_slice_add_limb_in_place(xs_hi, inner_carry) {
-            carry += 1;
-        }
-    }
-    if carry != 0 {
-        xs.push(carry);
-    }
-}
-
+/// Given the limbs of two `Natural`s a and b, and a limb c, writes the limbs of a + b * c to the
+/// second (right) input, corresponding to the limbs of b. `xs` and `ys` should be nonempty and have
+/// no trailing zeros, and `limb` should be nonzero. The result will have no trailing zeros.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(m)
+///
+/// where n = max(`xs.len()`, `ys.len()`)
+///       m = max(1, `xs.len()` - `ys.len()`)
+///
+/// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, where w and x are positive, sub is positive, and the
+/// result is written to the second input rather than the first.
+///
+/// # Example
+/// ```
+/// use malachite_nz::natural::arithmetic::add_mul_limb::limbs_vec_add_mul_limb_in_place_right;
+///
+/// let mut ys = vec![123];
+/// limbs_vec_add_mul_limb_in_place_right(&[123, 456], &mut ys, 4);
+/// assert_eq!(ys, &[615, 456]);
+///
+/// let mut ys = vec![123];
+/// limbs_vec_add_mul_limb_in_place_right(&[123, 456], &mut ys, 0xffff_ffff);
+/// assert_eq!(ys, &[0, 579]);
+///
+/// let mut ys = vec![0, 123];
+/// limbs_vec_add_mul_limb_in_place_right(&[123], &mut ys, 4);
+/// assert_eq!(ys, &[123, 492]);
+///
+/// let mut ys = vec![0, 123];
+/// limbs_vec_add_mul_limb_in_place_right(&[123, 456], &mut ys, 0xffff_ffff);
+/// assert_eq!(ys, &[123, 333, 123]);
+/// ```
 pub fn limbs_vec_add_mul_limb_in_place_right(xs: &[Limb], ys: &mut Vec<Limb>, limb: Limb) {
-    if xs.len() >= ys.len() {
-        limbs_vec_add_mul_limb_greater_in_place_right(xs, ys, limb);
+    let ys_len = ys.len();
+    if xs.len() >= ys_len {
+        let carry = limbs_slice_add_mul_limb_same_length_in_place_right(&xs[..ys_len], ys, limb);
+        ys.extend_from_slice(&xs[ys_len..]);
+        if carry != 0 {
+            if xs.len() == ys_len {
+                ys.push(carry);
+            } else if limbs_slice_add_limb_in_place(&mut ys[ys_len..], carry) {
+                ys.push(1);
+            }
+        }
     } else {
         limbs_vec_add_mul_limb_smaller_in_place_right(xs, ys, limb);
-    }
-}
-
-// ys.len() > 0, xs.len() >= ys.len(), limb != 0
-fn limbs_vec_add_mul_limb_greater_in_place_right(xs: &[Limb], ys: &mut Vec<Limb>, limb: Limb) {
-    let ys_len = ys.len();
-    let carry = limbs_slice_add_mul_limb_same_length_in_place_right(&xs[..ys_len], ys, limb);
-    ys.extend_from_slice(&xs[ys_len..]);
-    if carry != 0 {
-        if xs.len() == ys_len {
-            ys.push(carry);
-        } else if limbs_slice_add_limb_in_place(&mut ys[ys_len..], carry) {
-            ys.push(1);
-        }
     }
 }
 
@@ -132,6 +271,48 @@ fn limbs_vec_add_mul_limb_smaller_in_place_right(xs: &[Limb], ys: &mut Vec<Limb>
     }
 }
 
+/// Given the limbs of two `Natural`s a and b, and a limb c, writes the limbs of a + b * c to
+/// whichever input is longer. If the result is written to the first input, `false` is returned; if
+/// to the second, `true` is returned. `xs` and `ys` should be nonempty and have no trailing zeros,
+/// and `limb` should be nonzero. The result will have no trailing zeros.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = max(`xs.len()`, `ys.len()`)
+///
+/// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, where w and x are positive, sub is positive, and the
+/// result is written to the longer input.
+///
+/// # Example
+/// ```
+/// use malachite_nz::natural::arithmetic::add_mul_limb::limbs_vec_add_mul_limb_in_place_either;
+///
+/// let mut xs = vec![123, 456];
+/// let mut ys = vec![123];
+/// assert_eq!(limbs_vec_add_mul_limb_in_place_either(&mut xs, &mut ys, 4), false);
+/// assert_eq!(xs, &[615, 456]);
+/// assert_eq!(ys, &[123]);
+///
+/// let mut xs = vec![123, 456];
+/// let mut ys = vec![123];
+/// assert_eq!(limbs_vec_add_mul_limb_in_place_either(&mut xs, &mut ys, 0xffff_ffff), false);
+/// assert_eq!(xs, &[0, 579]);
+/// assert_eq!(ys, &[123]);
+///
+/// let mut xs = vec![123];
+/// let mut ys = vec![0, 123];
+/// assert_eq!(limbs_vec_add_mul_limb_in_place_either(&mut xs, &mut ys, 4), true);
+/// assert_eq!(xs, &[123]);
+/// assert_eq!(ys, &[123, 492]);
+///
+/// let mut xs = vec![123, 456];
+/// let mut ys = vec![0, 123];
+/// assert_eq!(limbs_vec_add_mul_limb_in_place_either(&mut xs, &mut ys, 0xffff_ffff), false);
+/// assert_eq!(xs, &[123, 333, 123]);
+/// assert_eq!(ys, &[0, 123]);
+/// ```
 pub fn limbs_vec_add_mul_limb_in_place_either(
     xs: &mut Vec<Limb>,
     ys: &mut Vec<Limb>,

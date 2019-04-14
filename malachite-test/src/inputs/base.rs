@@ -2107,6 +2107,17 @@ pub fn triples_of_unsigned_vec_unsigned_vec_and_limb_var_6<T: PrimitiveUnsigned 
     )
 }
 
+// All triples of `Vec<T>`, `Vec<T>`, and `T` where `T` is unsigned and the `Vec`s have the same
+// length.
+pub fn triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_7<T: PrimitiveUnsigned + Rand>(
+    gm: GenerationMode,
+) -> It<(Vec<T>, Vec<T>, T)> {
+    Box::new(
+        triples_of_unsigned_vec_unsigned_vec_and_unsigned(gm)
+            .filter(|&(ref xs, ref ys, _)| xs.len() == ys.len()),
+    )
+}
+
 // All triples of `Vec<T>`, `Vec<T>`, and `T` where `T` is unsigned, the first `Vec` is at least as
 // long as the second, and the length of the second `Vec` is greater than 1.
 pub fn triples_of_unsigned_vec_unsigned_vec_and_positive_unsigned_var_1<
@@ -2131,6 +2142,25 @@ pub fn triples_of_limb_vec_limb_vec_and_positive_limb_var_2(
         triples_of_unsigned_vec_unsigned_vec_and_positive_unsigned(gm)
             .map(|(out, in_limbs, limb)| (out, limbs_mul_limb(&in_limbs, limb), limb))
             .filter(|(ref out, ref in_limbs, _)| out.len() >= in_limbs.len() && in_limbs.len() > 0),
+    )
+}
+
+// All triples of `Vec<T>`, `Vec<T>`, and positive `T`, where `T` is unsigned and the `Vec`s are
+// nonempty and have no trailing zeros.
+pub fn triples_of_unsigned_vec_unsigned_vec_and_positive_unsigned_var_3<
+    T: PrimitiveUnsigned + Rand,
+>(
+    gm: GenerationMode,
+) -> It<(Vec<T>, Vec<T>, T)> {
+    Box::new(
+        triples_of_unsigned_vec_unsigned_vec_and_positive_unsigned(gm).filter(
+            |&(ref xs, ref ys, _)| {
+                !xs.is_empty()
+                    && !ys.is_empty()
+                    && *xs.last().unwrap() != T::ZERO
+                    && *ys.last().unwrap() != T::ZERO
+            },
+        ),
     )
 }
 
