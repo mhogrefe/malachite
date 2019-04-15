@@ -1643,6 +1643,79 @@ pub fn triples_of_integer_integer_and_small_unsigned_var_2<T: PrimitiveUnsigned 
     )
 }
 
+pub fn triples_of_integer_natural_and_small_unsigned<T: PrimitiveUnsigned + Rand>(
+    gm: GenerationMode,
+) -> It<(Integer, Natural, T)> {
+    match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_triples(
+            exhaustive_integers(),
+            exhaustive_naturals(),
+            exhaustive_unsigned(),
+        )),
+        GenerationMode::Random(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| random_integers(seed, scale)),
+            &(|seed| random_naturals(seed, scale)),
+            &(|seed| u32s_geometric(seed, scale).flat_map(T::checked_from)),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_integers(seed, scale)),
+            &(|seed| special_random_naturals(seed, scale)),
+            &(|seed| u32s_geometric(seed, scale).flat_map(T::checked_from)),
+        )),
+    }
+}
+
+// All triples of `Integer`, `Natural`, and small `T`, where `T` is unsigned and the `Integer`s are
+// equal mod 2 to the power of the `T`.
+pub fn triples_of_integer_natural_and_small_unsigned_var_1<T: PrimitiveUnsigned + Rand>(
+    gm: GenerationMode,
+) -> It<(Integer, Natural, T)>
+where
+    Integer: Shl<T, Output = Integer>,
+{
+    Box::new(
+        triples_of_integer_natural_and_small_unsigned(gm)
+            .map(|(x, y, pow)| ((x << pow) + &y, y, pow)),
+    )
+}
+
+// All triples of `Integer`, `Natural`, and small `T`, where `T` is unsigned and the `Integer`s are
+// not equal mod 2 to the power of the `T`.
+pub fn triples_of_integer_natural_and_small_unsigned_var_2<T: PrimitiveUnsigned + Rand>(
+    gm: GenerationMode,
+) -> It<(Integer, Natural, T)> {
+    Box::new(
+        triples_of_integer_natural_and_small_unsigned::<T>(gm)
+            .filter(|&(ref x, ref y, pow)| !x.eq_mod_power_of_two(y, pow.checked_into().unwrap())),
+    )
+}
+
+pub fn triples_of_natural_integer_and_small_unsigned<T: PrimitiveUnsigned + Rand>(
+    gm: GenerationMode,
+) -> It<(Natural, Integer, T)> {
+    match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_triples(
+            exhaustive_naturals(),
+            exhaustive_integers(),
+            exhaustive_unsigned(),
+        )),
+        GenerationMode::Random(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| random_naturals(seed, scale)),
+            &(|seed| random_integers(seed, scale)),
+            &(|seed| u32s_geometric(seed, scale).flat_map(T::checked_from)),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_naturals(seed, scale)),
+            &(|seed| special_random_integers(seed, scale)),
+            &(|seed| u32s_geometric(seed, scale).flat_map(T::checked_from)),
+        )),
+    }
+}
+
 pub fn triples_of_integer_small_u64_and_bool(gm: GenerationMode) -> It<(Integer, u64, bool)> {
     match gm {
         GenerationMode::Exhaustive => reshape_2_1_to_3(Box::new(lex_pairs(

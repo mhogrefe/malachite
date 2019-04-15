@@ -22,6 +22,7 @@ pub mod divisible_by_signed_limb;
 pub mod eq_limb_mod_limb;
 pub mod eq_limb_mod_power_of_two;
 pub mod eq_mod_power_of_two;
+pub mod eq_natural_mod_power_of_two;
 pub mod eq_signed_limb_mod_power_of_two;
 pub mod eq_signed_limb_mod_signed_limb;
 pub mod mod_limb;
@@ -66,6 +67,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     eq_limb_mod_limb::register(registry);
     eq_limb_mod_power_of_two::register(registry);
     eq_mod_power_of_two::register(registry);
+    eq_natural_mod_power_of_two::register(registry);
     eq_signed_limb_mod_power_of_two::register(registry);
     eq_signed_limb_mod_signed_limb::register(registry);
     mod_limb::register(registry);
