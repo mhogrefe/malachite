@@ -3,11 +3,13 @@ use common::{
     ScaleType,
 };
 use inputs::base::{
-    pairs_of_small_usizes, triples_of_unsigned_vec_var_10, triples_of_unsigned_vec_var_11,
-    triples_of_unsigned_vec_var_12, triples_of_unsigned_vec_var_13, triples_of_unsigned_vec_var_14,
-    triples_of_unsigned_vec_var_15, triples_of_unsigned_vec_var_16, triples_of_unsigned_vec_var_17,
-    triples_of_unsigned_vec_var_18, triples_of_unsigned_vec_var_19, triples_of_unsigned_vec_var_20,
-    triples_of_unsigned_vec_var_21, triples_of_unsigned_vec_var_22, triples_of_unsigned_vec_var_23,
+    pairs_of_small_usizes, pairs_of_unsigned_vec_var_4, pairs_of_unsigned_vec_var_5,
+    triples_of_unsigned_vec_var_10, triples_of_unsigned_vec_var_11, triples_of_unsigned_vec_var_12,
+    triples_of_unsigned_vec_var_13, triples_of_unsigned_vec_var_14, triples_of_unsigned_vec_var_15,
+    triples_of_unsigned_vec_var_16, triples_of_unsigned_vec_var_17, triples_of_unsigned_vec_var_18,
+    triples_of_unsigned_vec_var_19, triples_of_unsigned_vec_var_20, triples_of_unsigned_vec_var_21,
+    triples_of_unsigned_vec_var_22, triples_of_unsigned_vec_var_23, triples_of_unsigned_vec_var_25,
+    triples_of_unsigned_vec_var_26,
 };
 use inputs::natural::{nrm_pairs_of_naturals, pairs_of_naturals, rm_pairs_of_naturals};
 use malachite_base::num::{PrimitiveInteger, SignificantBits};
@@ -43,12 +45,17 @@ use malachite_nz::natural::arithmetic::mul::toom::{
     _limbs_mul_greater_to_out_toom_8h_scratch_size,
 };
 use malachite_nz::natural::arithmetic::mul::{
-    _limbs_mul_greater_to_out_basecase, _limbs_mul_greater_to_out_basecase_mem_opt,
-    limbs_mul_greater_to_out,
+    _limbs_mul_greater_to_out_basecase, _limbs_mul_greater_to_out_basecase_mem_opt, limbs_mul,
+    limbs_mul_greater, limbs_mul_greater_to_out, limbs_mul_same_length_to_out, limbs_mul_to_out,
 };
 use malachite_nz::platform::Limb;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
+    register_demo!(registry, demo_limbs_mul_greater);
+    register_demo!(registry, demo_limbs_mul);
+    register_demo!(registry, demo_limbs_mul_same_length_to_out);
+    register_demo!(registry, demo_limbs_mul_greater_to_out);
+    register_demo!(registry, demo_limbs_mul_to_out);
     register_ns_demo!(
         registry,
         demo_limbs_mul_greater_to_out_toom_22_input_sizes_valid
@@ -111,11 +118,15 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_natural_mul_val_ref);
     register_demo!(registry, demo_natural_mul_ref_val);
     register_demo!(registry, demo_natural_mul_ref_ref);
+    register_bench!(registry, Small, benchmark_limbs_mul_greater);
+    register_bench!(registry, Small, benchmark_limbs_mul);
+    register_bench!(registry, Small, benchmark_limbs_mul_same_length_to_out);
     register_bench!(
         registry,
         Large,
         benchmark_limbs_mul_greater_to_out_algorithms
     );
+    register_bench!(registry, Small, benchmark_limbs_mul_to_out);
     register_bench!(
         registry,
         Large,
@@ -203,6 +214,62 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     );
     register_bench!(registry, Large, benchmark_natural_mul_library_comparison);
     register_bench!(registry, Large, benchmark_natural_mul_evaluation_strategy);
+}
+
+fn demo_limbs_mul_greater(gm: GenerationMode, limit: usize) {
+    for (xs, ys) in pairs_of_unsigned_vec_var_4(gm).take(limit) {
+        println!(
+            "limbs_mul_greater({:?}, {:?}) = {:?}",
+            xs,
+            ys,
+            limbs_mul_greater(&xs, &ys)
+        );
+    }
+}
+
+fn demo_limbs_mul(gm: GenerationMode, limit: usize) {
+    for (xs, ys) in pairs_of_unsigned_vec_var_5(gm).take(limit) {
+        println!("limbs_mul({:?}, {:?}) = {:?}", xs, ys, limbs_mul(&xs, &ys));
+    }
+}
+
+fn demo_limbs_mul_same_length_to_out(gm: GenerationMode, limit: usize) {
+    for (xs, ys, zs) in triples_of_unsigned_vec_var_25(gm).take(limit) {
+        let mut xs = xs.to_vec();
+        let xs_old = xs.clone();
+        limbs_mul_same_length_to_out(&mut xs, &ys, &zs);
+        println!(
+            "limbs_out := {:?}; limbs_mul_same_length_to_out(&mut limbs_out, {:?}, {:?}); \
+             limbs_out = {:?}",
+            xs_old, ys, zs, xs
+        );
+    }
+}
+
+fn demo_limbs_mul_greater_to_out(gm: GenerationMode, limit: usize) {
+    for (xs, ys, zs) in triples_of_unsigned_vec_var_10(gm).take(limit) {
+        let mut xs = xs.to_vec();
+        let xs_old = xs.clone();
+        let carry = limbs_mul_greater_to_out(&mut xs, &ys, &zs);
+        println!(
+            "limbs_out := {:?}; limbs_mul_greater_to_out(&mut limbs_out, {:?}, {:?}) = \
+             {}; limbs_out = {:?}",
+            xs_old, ys, zs, carry, xs
+        );
+    }
+}
+
+fn demo_limbs_mul_to_out(gm: GenerationMode, limit: usize) {
+    for (xs, ys, zs) in triples_of_unsigned_vec_var_26(gm).take(limit) {
+        let mut xs = xs.to_vec();
+        let xs_old = xs.clone();
+        let carry = limbs_mul_to_out(&mut xs, &ys, &zs);
+        println!(
+            "limbs_out := {:?}; limbs_mul_to_out(&mut limbs_out, {:?}, {:?}) = {}; \
+             limbs_out = {:?}",
+            xs_old, ys, zs, carry, xs
+        );
+    }
 }
 
 fn demo_limbs_mul_greater_to_out_toom_22_input_sizes_valid(
@@ -445,6 +512,54 @@ fn demo_natural_mul_ref_ref(gm: GenerationMode, limit: usize) {
     }
 }
 
+fn benchmark_limbs_mul_greater(gm: GenerationMode, limit: usize, file_name: &str) {
+    m_run_benchmark(
+        "limbs_mul_greater(&[u32], &[u32])",
+        BenchmarkType::Single,
+        pairs_of_unsigned_vec_var_4(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(ref xs, ref ys)| xs.len() + ys.len()),
+        "x.len() + y.len()",
+        &mut [(
+            "malachite",
+            &mut (|(xs, ys)| no_out!(limbs_mul_greater(&xs, &ys))),
+        )],
+    );
+}
+
+fn benchmark_limbs_mul(gm: GenerationMode, limit: usize, file_name: &str) {
+    m_run_benchmark(
+        "limbs_mul(&[u32], &[u32])",
+        BenchmarkType::Single,
+        pairs_of_unsigned_vec_var_5(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(ref xs, ref ys)| xs.len() + ys.len()),
+        "x.len() + y.len()",
+        &mut [("malachite", &mut (|(xs, ys)| no_out!(limbs_mul(&xs, &ys))))],
+    );
+}
+
+fn benchmark_limbs_mul_same_length_to_out(gm: GenerationMode, limit: usize, file_name: &str) {
+    m_run_benchmark(
+        "limbs_mul_same_length_to_out(&mut [Limb], &[Limb], &[Limb])",
+        BenchmarkType::Single,
+        triples_of_unsigned_vec_var_25(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(_, ref xs, _)| xs.len()),
+        "xs.len() = ys.len()",
+        &mut [(
+            "malachite",
+            &mut (|(mut xs, ys, zs)| limbs_mul_same_length_to_out(&mut xs, &ys, &zs)),
+        )],
+    );
+}
+
 fn benchmark_limbs_mul_greater_to_out_algorithms(
     gm: GenerationMode,
     limit: usize,
@@ -469,6 +584,23 @@ fn benchmark_limbs_mul_greater_to_out_algorithms(
                 &mut (|(mut out, xs, ys)| no_out!(limbs_mul_greater_to_out(&mut out, &xs, &ys))),
             ),
         ],
+    );
+}
+
+fn benchmark_limbs_mul_to_out(gm: GenerationMode, limit: usize, file_name: &str) {
+    m_run_benchmark(
+        "limbs_mul_to_out(&mut [Limb], &[Limb], &[Limb])",
+        BenchmarkType::Single,
+        triples_of_unsigned_vec_var_26(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(_, ref xs, ref ys)| xs.len() + ys.len()),
+        "xs.len() + ys.len()",
+        &mut [(
+            "malachite",
+            &mut (|(mut out, xs, ys)| no_out!(limbs_mul_to_out(&mut out, &xs, &ys))),
+        )],
     );
 }
 

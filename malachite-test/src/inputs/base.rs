@@ -1238,6 +1238,24 @@ pub fn pairs_of_unsigned_vec_var_3<T: PrimitiveUnsigned + Rand>(
     Box::new(pairs_of_unsigned_vec(gm).filter(|&(ref xs, ref ys)| xs.len() >= ys.len()))
 }
 
+// All pairs of `Vec<T>`, where `T` is unsigned and first `Vec` is at least as long as the second,
+// and neither `Vec` is empty.
+pub fn pairs_of_unsigned_vec_var_4<T: PrimitiveUnsigned + Rand>(
+    gm: GenerationMode,
+) -> It<(Vec<T>, Vec<T>)> {
+    Box::new(
+        pairs_of_unsigned_vec(gm)
+            .filter(|&(ref xs, ref ys)| !ys.is_empty() && xs.len() >= ys.len()),
+    )
+}
+
+// All pairs of `Vec<T>`, where `T` is unsigned and neither `Vec` is empty.
+pub fn pairs_of_unsigned_vec_var_5<T: PrimitiveUnsigned + Rand>(
+    gm: GenerationMode,
+) -> It<(Vec<T>, Vec<T>)> {
+    Box::new(pairs_of_unsigned_vec(gm).filter(|&(ref xs, ref ys)| !xs.is_empty() && !ys.is_empty()))
+}
+
 // All pairs of `Vec<T>` where `T` is unsigned and both elements are nonempty and don't only contain
 // zeros.
 pub fn pairs_of_limb_vec_var_1<T: PrimitiveUnsigned + Rand>(
@@ -1653,6 +1671,29 @@ pub fn triples_of_unsigned_vec_var_24<T: PrimitiveUnsigned + Rand>(
                 && _limbs_mul_greater_to_out_fft_input_sizes_threshold(xs.len(), ys.len())
         },
     ))
+}
+
+// All triples of `Vec<T>`, where `T` is unsigned, `xs` and `ys` are nonempty and have the same
+// lengths, and `out` is at least twice as long as `xs`.
+pub fn triples_of_unsigned_vec_var_25<T: PrimitiveUnsigned + Rand>(
+    gm: GenerationMode,
+) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
+    Box::new(
+        triples_of_unsigned_vec_min_sizes(gm, 2, 1, 1).filter(|&(ref out, ref xs, ref ys)| {
+            xs.len() == ys.len() && out.len() >= xs.len() + ys.len()
+        }),
+    )
+}
+
+// All triples of `Vec<T>`, where `T` is unsigned, `xs` and `ys` are nonempty, and `out.len()` is at
+// least `xs.len() + ys.len()`.
+pub fn triples_of_unsigned_vec_var_26<T: PrimitiveUnsigned + Rand>(
+    gm: GenerationMode,
+) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
+    Box::new(
+        triples_of_unsigned_vec_min_sizes(gm, 2, 1, 1)
+            .filter(|&(ref out, ref xs, ref ys)| out.len() >= xs.len() + ys.len()),
+    )
 }
 
 pub fn quadruples_of_three_unsigned_vecs_and_bool<T: PrimitiveUnsigned + Rand>(

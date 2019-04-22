@@ -3453,6 +3453,10 @@ pub fn _limbs_mul_greater_to_out_toom_6h(
 const TOOM_8H_LIMIT_NUMERATOR: usize = 21;
 const TOOM_8H_LIMIT_DENOMINATOR: usize = 20;
 
+/// Time: worst case O(1)
+///
+/// Additional memory: worst case O(1)
+///
 /// This function can be used to determine whether the sizes of the input slices to
 /// `_limbs_mul_greater_to_out_toom_8h` are valid.
 pub fn _limbs_mul_greater_to_out_toom_8h_input_sizes_valid(xs_len: usize, ys_len: usize) -> bool {
@@ -3477,52 +3481,57 @@ pub fn _limbs_mul_greater_to_out_toom_8h_input_sizes_valid(xs_len: usize, ys_len
     if xs_len == ys_len
         || xs_len * (TOOM_8H_LIMIT_DENOMINATOR >> 1) < TOOM_8H_LIMIT_NUMERATOR * (ys_len >> 1)
     {
-        // 8 * ... < 8 * ...
+        // xs_len == ys_len || xs_len < 21 / 20 * ys_len, !half
+        // This is the slowest variation
         half = false;
         n = 1 + ((xs_len - 1) >> 3);
         s = xs_len as isize - 7 * n as isize;
         t = ys_len as isize - 7 * n as isize;
     } else {
         if xs_len * 13 < 16 * ys_len {
-            // xs_len * 7 * TOOM_8H_LIMIT_NUMERATOR<TOOM_8H_LIMIT_DENOMINATOR * 9 * ys_len
+            // xs_len < 16 / 13 * ys_len, half
             p = 9;
             q = 8;
         } else if Limb::WIDTH <= 9 * 3
             || xs_len * (TOOM_8H_LIMIT_DENOMINATOR >> 1)
                 < (TOOM_8H_LIMIT_NUMERATOR / 7 * 9) * (ys_len >> 1)
         {
+            // Limb::WIDTH <= 27 || xs_len < 27 / 20 * ys_len, !half
             p = 9;
             q = 7;
         } else if xs_len * 10 < 33 * (ys_len >> 1) {
-            // (xs_len*3*TOOM_8H_LIMIT_NUMERATOR<TOOM_8H_LIMIT_DENOMINATOR*5*ys_len)
+            // xs_len < 33 / 20 * ys_len, half
             p = 10;
             q = 7;
         } else if Limb::WIDTH <= 10 * 3
             || xs_len * (TOOM_8H_LIMIT_DENOMINATOR / 5) < (TOOM_8H_LIMIT_NUMERATOR / 3) * ys_len
         {
+            // Limb::WIDTH <= 30 || xs_len < 7 / 4 * ys_len, !half
             p = 10;
             q = 6;
         } else if xs_len * 6 < 13 * ys_len {
-            // xs_len * 5 * TOOM_8H_LIMIT_NUMERATOR < TOOM_8H_LIMIT_DENOMINATOR * 11 * ys_len
+            // xs_len < 13 / 6 * ys_len, half
             p = 11;
             q = 6;
         } else if Limb::WIDTH <= 11 * 3 || xs_len * 4 < 9 * ys_len {
+            // Limb::WIDTH <= 33 || xs_len < 9 / 4 * ys_len, !half
             p = 11;
             q = 5;
         } else if xs_len * (TOOM_8H_LIMIT_NUMERATOR / 3) < TOOM_8H_LIMIT_DENOMINATOR * ys_len {
-            // 4 * ... < 12 * ...
+            // xs_len < 20 / 7 * ys_len, half
             p = 12;
             q = 5;
         } else if Limb::WIDTH <= 12 * 3 || xs_len * 9 < 28 * ys_len {
-            // 4 * ... < 12 * ...
+            // Limb::WIDTH <= 36 || xs_len < 28 / 9 * ys_len, !half
             p = 12;
             q = 4;
         } else {
+            // half
             p = 13;
             q = 4;
         }
 
-        half = ((p + q) & 1) != 0;
+        half = !p.eq_mod_power_of_two(q, 1);
         n = 1 + if q * xs_len >= p * ys_len {
             (xs_len - 1) / p
         } else {
@@ -3574,7 +3583,11 @@ const TOOM_8H_MAYBE_MUL_TOOM44: bool =
 const TOOM_8H_MAYBE_MUL_TOOM8H: bool =
     TUNE_PROGRAM_BUILD || MUL_FFT_THRESHOLD >= 8 * MUL_TOOM8H_THRESHOLD;
 
-// This is TOOM8H_MUL_N_REC from mpn/generic/toom8h_mul.c when f is false.
+/// Time: O(n<sup>log<sub>7</sub>(15)</sup>)
+///
+/// Additional memory: TODO
+///
+/// This is TOOM8H_MUL_N_REC from mpn/generic/toom8h_mul.c when f is false.
 fn _limbs_mul_same_length_to_out_toom_8h_recursive(
     out: &mut [Limb],
     xs: &[Limb],
@@ -3598,13 +3611,15 @@ fn _limbs_mul_same_length_to_out_toom_8h_recursive(
     }
 }
 
-// This is TOOM8H_MUL_REC from mpn/generic/toom8h_mul.c.
+/// //TODO complexity
+///
+/// This is TOOM8H_MUL_REC from mpn/generic/toom8h_mul.c.
 fn _limbs_mul_to_out_toom_8h_recursive(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
     limbs_mul_greater_to_out(out, xs, ys);
 }
 
-// TODO make this a constant once possible
-// This is MUL_TOOM8H_MIN from gmp-impl.h.
+/// TODO make this a constant once possible
+/// This is MUL_TOOM8H_MIN from gmp-impl.h.
 fn _limbs_mul_toom_8h_min_threshold() -> usize {
     max(MUL_TOOM8H_THRESHOLD, _limbs_mul_toom_6h_min_threshold())
 }
@@ -3622,6 +3637,10 @@ pub(crate) fn _limbs_mul_same_length_to_out_toom_8h_scratch_size(n: usize) -> us
 
 /// This function can be used to determine the length of the input `scratch` slice in
 /// `_limbs_mul_greater_to_out_toom_6h`.
+///
+/// Time: worst case O(1)
+///
+/// Additional memory: worst case O(1)
 ///
 /// This is mpn_toom8h_mul_itch from gmp-impl.h.
 pub fn _limbs_mul_greater_to_out_toom_8h_scratch_size(xs_len: usize, ys_len: usize) -> usize {
@@ -3643,7 +3662,7 @@ pub fn _limbs_mul_greater_to_out_toom_8h_scratch_size(xs_len: usize, ys_len: usi
 /// Evaluate in: Infinity, 8, -8, 4, -4, 2, -2, 1, -1, 1 / 2, -1 / 2, 1 / 4, -1 / 4, 1 / 8, -1 / 8,
 /// 0.
 ///
-/// Time: TODO
+/// Time: O(n<sup>log<sub>7</sub>(15)</sup>), but this assumes worst-possible splitting
 ///
 /// Additional memory: TODO
 ///
@@ -3681,7 +3700,8 @@ pub fn _limbs_mul_greater_to_out_toom_8h(
     if xs_len == ys_len
         || xs_len * (TOOM_8H_LIMIT_DENOMINATOR >> 1) < TOOM_8H_LIMIT_NUMERATOR * (ys_len >> 1)
     {
-        // 8 * ... < 8 * ...
+        // xs_len == ys_len || xs_len < 21 / 20 * ys_len, !half
+        // This is the slowest variation
         half = false;
         n = 1 + ((xs_len - 1) >> 3);
         p = 7;
@@ -3690,45 +3710,49 @@ pub fn _limbs_mul_greater_to_out_toom_8h(
         t = ys_len as isize - 7 * n as isize;
     } else {
         if xs_len * 13 < 16 * ys_len {
-            // xs_len * 7 * TOOM_8H_LIMIT_NUMERATOR < TOOM_8H_LIMIT_DENOMINATOR * 9 * ys_len
+            // xs_len < 16 / 13 * ys_len, half
             p = 9;
             q = 8;
         } else if Limb::WIDTH <= 9 * 3
             || xs_len * (TOOM_8H_LIMIT_DENOMINATOR >> 1)
                 < (TOOM_8H_LIMIT_NUMERATOR / 7 * 9) * (ys_len >> 1)
         {
+            // Limb::WIDTH <= 27 || xs_len < 27 / 20 * ys_len, !half
             p = 9;
             q = 7;
         } else if xs_len * 10 < 33 * (ys_len >> 1) {
-            // xs_len * 3 * TOOM_8H_LIMIT_NUMERATOR < TOOM_8H_LIMIT_DENOMINATOR * 5 * ys_len
+            // xs_len < 33 / 20 * ys_len, half
             p = 10;
             q = 7;
         } else if Limb::WIDTH <= 10 * 3
             || xs_len * (TOOM_8H_LIMIT_DENOMINATOR / 5) < (TOOM_8H_LIMIT_NUMERATOR / 3) * ys_len
         {
+            // Limb::WIDTH <= 30 || xs_len < 7 / 4 * ys_len, !half
             p = 10;
             q = 6;
         } else if xs_len * 6 < 13 * ys_len {
-            // xs_len * 5 * TOOM_8H_LIMIT_NUMERATOR < TOOM_8H_LIMIT_DENOMINATOR * 11 * ys_len
+            // xs_len < 13 / 6 * ys_len, half
             p = 11;
             q = 6;
         } else if Limb::WIDTH <= 11 * 3 || xs_len * 4 < 9 * ys_len {
+            // Limb::WIDTH <= 33 || xs_len < 9 / 4 * ys_len, !half
             p = 11;
             q = 5;
         } else if xs_len * (TOOM_8H_LIMIT_NUMERATOR / 3) < TOOM_8H_LIMIT_DENOMINATOR * ys_len {
-            // 4 * ... < 12 * ...
+            // xs_len < 20 / 7 * ys_len, half
             p = 12;
             q = 5;
         } else if Limb::WIDTH <= 12 * 3 || xs_len * 9 < 28 * ys_len {
-            // 4 * ... < 12 * ...
+            // Limb::WIDTH <= 36 || xs_len < 28 / 9 * ys_len, !half
             p = 12;
             q = 4;
         } else {
+            // half
             p = 13;
             q = 4;
         }
 
-        half = ((p + q) & 1) != 0;
+        half = !p.eq_mod_power_of_two(q, 1);
         n = 1 + if q * xs_len >= p * ys_len {
             (xs_len - 1) / p
         } else {

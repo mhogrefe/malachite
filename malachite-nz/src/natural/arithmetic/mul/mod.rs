@@ -45,45 +45,97 @@ macro_rules! split_into_chunks_mut {
     }
 }
 
-/// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, writes
-/// the `xs.len() + ys.len()` least-significant limbs of the product of the `Natural`s to an output
-/// slice. The output must be at least as long as `xs.len() + ys.len()`, `xs` must be as least as
-/// long as `ys`, and `ys` cannot be empty. Returns the result limb at index
-/// `xs.len() + ys.len() - 1` (which may be zero).
+/// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, returns
+/// the limbs of the product of the `Natural`s. `xs` must be as least as long as `ys` and `ys`
+/// cannot be empty.
 ///
-/// This uses the basecase, quadratic, schoolbook algorithm, and it is most critical code for
-/// multiplication. All multiplies rely on this, both small and huge. Small ones arrive here
-/// immediately, and huge ones arrive here as this is the base case for Karatsuba's recursive
-/// algorithm.
+/// Time: O(n * log(n) * log(log(n)))
 ///
-/// Time: worst case O(n<sup>2</sup>)
+/// Additional memory: TODO
 ///
-/// Additional memory: worst case O(1)
-///
-/// where n = `xs.len()` + `ys.len()`
+/// where n = `xs.len()`
 ///
 /// # Panics
-/// Panics if `out` is too short, `xs` is shorter than `ys`, or `ys` is empty.
+/// Panics if `xs` is shorter than `ys` or `ys` is empty.
 ///
-/// This is mpn_mul_basecase from mpn/generic/mul_basecase.c.
-pub fn _limbs_mul_greater_to_out_basecase(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
-    let xs_len = xs.len();
-    let ys_len = ys.len();
-    assert_ne!(ys_len, 0);
-    assert!(xs_len >= ys_len);
-    assert!(out.len() >= xs_len + ys_len);
-    // We first multiply by the low order limb. This result can be stored, not added, to out.
-    out[xs_len] = limbs_mul_limb_to_out(out, xs, ys[0]);
-    // Now accumulate the product of xs and the next higher limb from ys.
-    for i in 1..ys_len {
-        let out = &mut out[i..];
-        out[xs_len] = limbs_slice_add_mul_limb_greater_in_place_left(out, xs, ys[i]);
+/// # Example
+/// ```
+/// use malachite_nz::natural::arithmetic::mul::limbs_mul_greater;
+/// use malachite_nz::platform::Limb;
+///
+/// assert_eq!(limbs_mul_greater(&[1, 2, 3], &[6, 7]), &[6, 19, 32, 21, 0]);
+/// assert_eq!(limbs_mul_greater(&[100, 101, 0xffff_ffff], &[102, 101, 2]),
+///         &[10200, 20402, 10299, 203, 99, 2]);
+/// ```
+///
+/// This is mpn_mul from mpn/generic/mul.c where prodp is returned.
+pub fn limbs_mul_greater(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
+    let mut product_limbs = vec![0; xs.len() + ys.len()];
+    limbs_mul_greater_to_out(&mut product_limbs, xs, ys);
+    product_limbs
+}
+
+/// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, returns
+/// the limbs of the product of the `Natural`s. Neither slice can be empty.
+///
+/// Time: O(n * log(n) * log(log(n)))
+///
+/// Additional memory: TODO
+///
+/// where n = max(`xs.len()`, `ys.len()`)
+///
+/// # Panics
+/// Panics if either slice is empty.
+///
+/// # Example
+/// ```
+/// use malachite_nz::natural::arithmetic::mul::limbs_mul;
+/// use malachite_nz::platform::Limb;
+///
+/// assert_eq!(limbs_mul(&[6, 7], &[1, 2, 3]), &[6, 19, 32, 21, 0]);
+/// assert_eq!(limbs_mul(&[100, 101, 0xffff_ffff], &[102, 101, 2]),
+///         &[10200, 20402, 10299, 203, 99, 2]);
+/// ```
+///
+/// This is mpn_mul from mpn/generic/mul.c where un may be less than vn and prodp is returned.
+pub fn limbs_mul(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
+    if xs.len() >= ys.len() {
+        limbs_mul_greater(xs, ys)
+    } else {
+        limbs_mul_greater(ys, xs)
     }
 }
 
-//TODO test
-// multiply natural numbers.
-// mpn_mul_n from mpn/generic/mul_n.c
+/// Interpreting two equal-length slices of `Limb`s as the limbs (in ascending order) of two
+/// `Natural`s, writes the `2 * xs.len()` least-significant limbs of the product of the `Natural`s
+/// to an output slice. The output must be at least as long as `2 * xs.len()`, `xs` must be as long
+/// as `ys`, and neither slice can be empty. Returns the result limb at index `2 * xs.len() - 1`
+/// (which may be zero).
+///
+/// Time: O(n * log(n) * log(log(n)))
+///
+/// Additional memory: TODO
+///
+/// where n = `xs.len()`
+///
+/// # Panics
+/// Panics if `out` is too short, `xs` and `ys` have different lengths, or either slice is empty.
+///
+/// # Example
+/// ```
+/// use malachite_nz::natural::arithmetic::mul::limbs_mul_same_length_to_out;
+/// use malachite_nz::platform::Limb;
+///
+/// let limbs: &mut [Limb] = &mut [10; 4];
+/// limbs_mul_same_length_to_out(limbs, &[1, 2], &[6, 7]);
+/// assert_eq!(limbs, &[6, 19, 14, 0]);
+///
+/// let limbs: &mut [Limb] = &mut [10; 6];
+/// limbs_mul_same_length_to_out(limbs, &[100, 101, 0xffff_ffff], &[102, 101, 2]);
+/// assert_eq!(limbs, &[10200, 20402, 10299, 203, 99, 2]);
+/// ```
+///
+/// This is mpn_mul_n from mpn/generic/mul_n.c.
 pub fn limbs_mul_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
     let len = xs.len();
     assert_eq!(ys.len(), len);
@@ -121,8 +173,36 @@ fn toom44_ok(xs_len: usize, ys_len: usize) -> bool {
     12 + 3 * xs_len < 4 * ys_len
 }
 
-// Multiply two natural numbers.
-// This is mpn_mul from mpn/generic/mul.c.
+/// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, writes
+/// the `xs.len() + ys.len()` least-significant limbs of the product of the `Natural`s to an output
+/// slice. The output must be at least as long as `xs.len() + ys.len()`, `xs` must be as least as
+/// long as `ys`, and `ys` cannot be empty. Returns the result limb at index
+/// `xs.len() + ys.len() - 1` (which may be zero).
+///
+/// Time: O(n * log(n) * log(log(n)))
+///
+/// Additional memory: TODO
+///
+/// where n = `xs.len()`
+///
+/// # Panics
+/// Panics if `out` is too short, `xs` is shorter than `ys`, or `ys` is empty.
+///
+/// # Example
+/// ```
+/// use malachite_nz::natural::arithmetic::mul::limbs_mul_greater_to_out;
+/// use malachite_nz::platform::Limb;
+///
+/// let limbs: &mut [Limb] = &mut [10; 5];
+/// assert_eq!(limbs_mul_greater_to_out(limbs, &[1, 2, 3], &[6, 7]), 0);
+/// assert_eq!(limbs, &[6, 19, 32, 21, 0]);
+///
+/// let limbs: &mut [Limb] = &mut [10; 6];
+/// assert_eq!(limbs_mul_greater_to_out(limbs, &[100, 101, 0xffff_ffff], &[102, 101, 2]), 2);
+/// assert_eq!(limbs, &[10200, 20402, 10299, 203, 99, 2]);
+/// ```
+///
+/// This is mpn_mul from mpn/generic/mul.c.
 pub fn limbs_mul_greater_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> Limb {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -273,6 +353,35 @@ pub fn limbs_mul_greater_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> L
     out[xs_len + ys_len - 1]
 }
 
+/// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, writes
+/// the `xs.len() + ys.len()` least-significant limbs of the product of the `Natural`s to an output
+/// slice. The output must be at least as long as `xs.len() + ys.len()`, and neither slice can be
+/// empty. Returns the result limb at index `xs.len() + ys.len() - 1` (which may be zero).
+///
+/// Time: O(n * log(n) * log(log(n)))
+///
+/// Additional memory: TODO
+///
+/// where n = max(`xs.len()`, `ys.len()`)
+///
+/// # Panics
+/// Panics if `out` is too short or either slice is empty.
+///
+/// # Example
+/// ```
+/// use malachite_nz::natural::arithmetic::mul::limbs_mul_to_out;
+/// use malachite_nz::platform::Limb;
+///
+/// let limbs: &mut [Limb] = &mut [10; 5];
+/// assert_eq!(limbs_mul_to_out(limbs, &[6, 7], &[1, 2, 3]), 0);
+/// assert_eq!(limbs, &[6, 19, 32, 21, 0]);
+///
+/// let limbs: &mut [Limb] = &mut [10; 6];
+/// assert_eq!(limbs_mul_to_out(limbs, &[100, 101, 0xffff_ffff], &[102, 101, 2]), 2);
+/// assert_eq!(limbs, &[10200, 20402, 10299, 203, 99, 2]);
+/// ```
+///
+/// This is mpn_mul from mpn/generic/mul.c where un may be less than vn.
 pub fn limbs_mul_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> Limb {
     if xs.len() >= ys.len() {
         limbs_mul_greater_to_out(out, xs, ys)
@@ -281,20 +390,53 @@ pub fn limbs_mul_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> Limb {
     }
 }
 
+/// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, writes
+/// the `xs.len() + ys.len()` least-significant limbs of the product of the `Natural`s to an output
+/// slice. The output must be at least as long as `xs.len() + ys.len()`, `xs` must be as least as
+/// long as `ys`, and `ys` cannot be empty. Returns the result limb at index
+/// `xs.len() + ys.len() - 1` (which may be zero).
+///
+/// This uses the basecase, quadratic, schoolbook algorithm, and it is most critical code for
+/// multiplication. All multiplies rely on this, both small and huge. Small ones arrive here
+/// immediately, and huge ones arrive here as this is the base case for Karatsuba's recursive
+/// algorithm.
+///
+/// Time: worst case O(n<sup>2</sup>)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = `xs.len()` + `ys.len()`
+///
+/// # Panics
+/// Panics if `out` is too short, `xs` is shorter than `ys`, or `ys` is empty.
+///
+/// This is mpn_mul_basecase from mpn/generic/mul_basecase.c.
+pub fn _limbs_mul_greater_to_out_basecase(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
+    let xs_len = xs.len();
+    let ys_len = ys.len();
+    assert_ne!(ys_len, 0);
+    assert!(xs_len >= ys_len);
+    assert!(out.len() >= xs_len + ys_len);
+    // We first multiply by the low order limb. This result can be stored, not added, to out.
+    out[xs_len] = limbs_mul_limb_to_out(out, xs, ys[0]);
+    // Now accumulate the product of xs and the next higher limb from ys.
+    for i in 1..ys_len {
+        let out = &mut out[i..];
+        out[xs_len] = limbs_slice_add_mul_limb_greater_in_place_left(out, xs, ys[i]);
+    }
+}
+
 // In GMP this is hardcoded to 500
 pub const MUL_BASECASE_MAX_UN: usize = 500;
 
-//TODO update docs
-// 1 < ys.len() < MUL_TOOM22_THRESHOLD < MUL_BASECASE_MAX_UN < xs.len()
-//
-// This is currently not measurably better than just basecase.
+// We must have 1 < ys.len() < MUL_TOOM22_THRESHOLD < MUL_BASECASE_MAX_UN < xs.len().
 fn limbs_mul_greater_to_out_basecase_mem_opt_helper(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
     let xs_len = xs.len();
     let ys_len = ys.len();
-    assert!(1 < ys_len);
+    assert!(ys_len > 1);
     assert!(ys_len < MUL_TOOM22_THRESHOLD);
     assert!(MUL_TOOM22_THRESHOLD < MUL_BASECASE_MAX_UN);
-    assert!(MUL_BASECASE_MAX_UN < xs_len);
+    assert!(xs_len > MUL_BASECASE_MAX_UN);
     let mut triangle_buffer = [0; MUL_TOOM22_THRESHOLD];
     let mut offset = 0;
     for chunk in xs.chunks(MUL_BASECASE_MAX_UN) {
@@ -315,7 +457,8 @@ fn limbs_mul_greater_to_out_basecase_mem_opt_helper(out: &mut [Limb], xs: &[Limb
     }
 }
 
-//TODO update docs
+/// A version of `limbs_mul_greater_to_out_basecase` that attempts to be more efficient by
+/// increasing cache locality. It is currently not measurably better than ordinary basecase.
 pub fn _limbs_mul_greater_to_out_basecase_mem_opt(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -324,20 +467,6 @@ pub fn _limbs_mul_greater_to_out_basecase_mem_opt(out: &mut [Limb], xs: &[Limb],
         limbs_mul_greater_to_out_basecase_mem_opt_helper(out, xs, ys)
     } else {
         _limbs_mul_greater_to_out_basecase(out, xs, ys);
-    }
-}
-
-pub fn limbs_mul_greater(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
-    let mut product_limbs = vec![0; xs.len() + ys.len()];
-    limbs_mul_greater_to_out(&mut product_limbs, xs, ys);
-    product_limbs
-}
-
-pub fn limbs_mul(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
-    if xs.len() >= ys.len() {
-        limbs_mul_greater(xs, ys)
-    } else {
-        limbs_mul_greater(ys, xs)
     }
 }
 

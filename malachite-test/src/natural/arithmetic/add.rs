@@ -282,7 +282,7 @@ fn benchmark_limbs_add_same_length_to_out(gm: GenerationMode, limit: usize, file
         gm.name(),
         limit,
         file_name,
-        &(|&(_, ref ys, _)| ys.len()),
+        &(|&(_, ref xs, _)| xs.len()),
         "xs.len() = ys.len()",
         &mut [(
             "malachite",
@@ -299,7 +299,7 @@ fn benchmark_limbs_add_greater_to_out(gm: GenerationMode, limit: usize, file_nam
         gm.name(),
         limit,
         file_name,
-        &(|&(_, ref ys, _)| ys.len()),
+        &(|&(_, ref xs, _)| xs.len()),
         "xs.len()",
         &mut [(
             "malachite",
