@@ -75,6 +75,7 @@ pub mod integer {
         pub mod mod_signed_limb;
         pub mod mul;
         pub mod mul_limb;
+        pub mod mul_natural;
         pub mod mul_signed_limb;
         pub mod neg;
         pub mod parity;

@@ -103,7 +103,6 @@ impl<'a> Add<&'a Natural> for Integer {
 impl<'a> Add<Natural> for &'a Integer {
     type Output = Integer;
 
-    #[inline]
     fn add(self, mut other: Natural) -> Integer {
         if self.sign {
             other += &self.abs;

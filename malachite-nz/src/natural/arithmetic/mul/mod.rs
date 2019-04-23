@@ -472,12 +472,11 @@ pub fn _limbs_mul_greater_to_out_basecase_mem_opt(out: &mut [Limb], xs: &[Limb],
 
 /// Multiplies a `Natural` by a `Natural`, taking both `Natural`s by value.
 ///
-/// Time: worst case O(m * n)
+/// Time: worst case O(n * log(n) * log(log(n)))
 ///
-/// Additional memory: worst case O(m + n)
+/// Additional memory: worst case TODO
 ///
-/// where m = `self.significant_bits()`,
-///       n = `other.significant_bits()`
+/// where n = `self.significant_bits()` + `other.significant_bits()`
 ///
 /// # Examples
 /// ```
@@ -509,12 +508,11 @@ impl Mul<Natural> for Natural {
 /// Multiplies a `Natural` by a `Natural`, taking the left `Natural` by value and the right
 /// `Natural` by reference.
 ///
-/// Time: worst case O(m * n)
+/// Time: worst case O(n * log(n) * log(log(n)))
 ///
-/// Additional memory: worst case O(m + n)
+/// Additional memory: worst case TODO
 ///
-/// where m = `self.significant_bits()`,
-///       n = `other.significant_bits()`
+/// where n = `self.significant_bits()` + `other.significant_bits()`
 ///
 /// # Examples
 /// ```
@@ -546,12 +544,11 @@ impl<'a> Mul<&'a Natural> for Natural {
 /// Multiplies a `Natural` by a `Natural`, taking the left `Natural` by reference and the right
 /// `Natural` by value.
 ///
-/// Time: worst case O(m * n)
+/// Time: worst case O(n * log(n) * log(log(n)))
 ///
-/// Additional memory: worst case O(m + n)
+/// Additional memory: worst case TODO
 ///
-/// where m = `self.significant_bits()`,
-///       n = `other.significant_bits()`
+/// where n = `self.significant_bits()` + `other.significant_bits()`
 ///
 /// # Examples
 /// ```
@@ -582,12 +579,11 @@ impl<'a> Mul<Natural> for &'a Natural {
 
 /// Multiplies a `Natural` by a `Natural`, taking both `Natural`s by reference.
 ///
-/// Time: worst case O(m * n)
+/// Time: worst case O(n * log(n) * log(log(n)))
 ///
-/// Additional memory: worst case O(m + n)
+/// Additional memory: worst case TODO
 ///
-/// where m = `self.significant_bits()`,
-///       n = `other.significant_bits()`
+/// where n = `self.significant_bits()` + `other.significant_bits()`
 ///
 /// # Examples
 /// ```
@@ -629,12 +625,11 @@ impl<'a, 'b> Mul<&'a Natural> for &'b Natural {
 
 /// Multiplies a `Natural` by a `Natural` in place, taking the `Natural` on the RHS by value.
 ///
-/// Time: worst case O(m * n)
+/// Time: worst case O(n * log(n) * log(log(n)))
 ///
-/// Additional memory: worst case O(m + n)
+/// Additional memory: worst case TODO
 ///
-/// where m = `self.significant_bits()`,
-///       n = `other.significant_bits()`
+/// where n = `self.significant_bits()` + `other.significant_bits()`
 ///
 /// # Examples
 /// ```
@@ -675,12 +670,11 @@ impl MulAssign<Natural> for Natural {
 
 /// Multiplies a `Natural` by a `Natural` in place, taking the `Natural` on the RHS by reference.
 ///
-/// Time: worst case O(m * n)
+/// Time: worst case O(n * log(n) * log(log(n)))
 ///
-/// Additional memory: worst case O(m + n)
+/// Additional memory: worst case TODO
 ///
-/// where m = `self.significant_bits()`,
-///       n = `other.significant_bits()`
+/// where n = `self.significant_bits()` + `other.significant_bits()`
 ///
 /// # Examples
 /// ```

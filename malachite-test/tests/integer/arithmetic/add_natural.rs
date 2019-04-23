@@ -7,7 +7,7 @@ use malachite_test::common::{
     integer_to_rug_integer, natural_to_rug_integer, rug_integer_to_integer,
 };
 use malachite_test::inputs::integer::{
-    integers, pairs_of_integer_and_natural, pairs_of_integer_and_unsigned, triples_of_integers,
+    integers, pairs_of_integer_and_natural, pairs_of_integer_and_unsigned,
 };
 use malachite_test::inputs::natural::naturals;
 use rug;
@@ -125,10 +125,6 @@ fn add_natural_properties() {
     test_properties(integers, |x| {
         assert_eq!(x + Natural::ZERO, *x);
         assert_eq!(Natural::ZERO + x, *x);
-    });
-
-    test_properties(triples_of_integers, |&(ref x, ref y, ref z)| {
-        assert_eq!((x + y) + z, x + (y + z));
     });
 
     test_properties(pairs_of_integer_and_unsigned::<Limb>, |&(ref x, y)| {
