@@ -249,6 +249,23 @@ pub fn limbs_sub_same_length_in_place_right(xs: &[Limb], ys: &mut [Limb]) -> boo
     borrow
 }
 
+//TODO test
+pub fn limbs_sub_less_in_place_right(xs: &[Limb], ys: &mut [Limb], len: usize) -> bool {
+    let xs_len = xs.len();
+    assert!(xs_len <= ys.len());
+    let (xs_lo, xs_hi) = xs.split_at(len);
+    let (ys_lo, ys_hi) = ys.split_at_mut(len);
+    let borrow = limbs_sub_same_length_in_place_right(xs_lo, ys_lo);
+    if xs_len == len {
+        borrow
+    } else if borrow {
+        limbs_sub_limb_to_out(ys_hi, xs_hi, 1)
+    } else {
+        ys_hi[..xs_len - len].copy_from_slice(xs_hi);
+        false
+    }
+}
+
 /// Interpreting a of `Limb`s and a `Vec` of `Limb`s as the limbs (in ascending order) of two
 /// `Natural`s, subtracts the second from the first, writing the `xs.len()` limbs of the result to
 /// the `Vec`, possibly extending the `Vec`'s length. Returns whether there was a borrow left over;

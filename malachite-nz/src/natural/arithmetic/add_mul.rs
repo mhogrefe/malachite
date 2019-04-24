@@ -1,14 +1,14 @@
-use integer::arithmetic::add_mul_limb::mpz_aorsmul_1;
 use malachite_base::limbs::limbs_test_zero;
 use malachite_base::num::{AddMul, AddMulAssign, NotAssign};
-use natural::arithmetic::add::limbs_slice_add_greater_in_place_left;
-use natural::arithmetic::mul::limbs_mul_greater_to_out;
-use natural::arithmetic::sub::{limbs_sub_in_place_left, limbs_sub_same_length_in_place_right};
-use natural::arithmetic::sub_limb::limbs_sub_limb_to_out;
+use natural::arithmetic::add::{limbs_add_greater, limbs_slice_add_greater_in_place_left};
+use natural::arithmetic::add_mul_limb::limbs_vec_add_mul_limb_in_place_left;
+use natural::arithmetic::mul::{limbs_mul_greater_to_out, limbs_mul_to_out};
+use natural::arithmetic::sub::{limbs_sub_in_place_left, limbs_sub_less_in_place_right};
 use natural::comparison::ord::limbs_cmp;
 use natural::Natural::{self, Large, Small};
 use platform::Limb;
 use std::cmp::{max, Ordering};
+use std::mem::swap;
 
 /// Adds the product of a `Natural` (b) and a `Natural` (c) to a `Natural` (self), taking `self`, b,
 /// and c by value.
@@ -179,34 +179,21 @@ impl<'a, 'b, 'c> AddMul<&'a Natural, &'b Natural> for &'c Natural {
     type Output = Natural;
 
     fn add_mul(self, b: &'a Natural, c: &'b Natural) -> Natural {
-        if let Small(small_b) = *b {
+        if let Small(small_a) = *self {
+            b * c + small_a
+        } else if let Small(small_b) = *b {
             self.add_mul(c, small_b)
         } else if let Small(small_c) = *c {
             self.add_mul(b, small_c)
-        } else if *self == 0 as Limb {
-            b * c
         } else {
-            let mut result = {
-                let mut result_limbs = self.to_limbs_asc();
-                if let Large(ref c_limbs) = *c {
-                    let mut self_sign = false;
-                    if let Large(ref b_limbs) = *b {
-                        mpz_aorsmul(
-                            &mut self_sign,
-                            &mut result_limbs,
-                            false,
-                            b_limbs,
-                            false,
-                            c_limbs,
-                            true,
-                        );
+            if let Large(ref a_limbs) = *self {
+                if let Large(ref b_limbs) = *b {
+                    if let Large(ref c_limbs) = *c {
+                        return Large(limbs_add_mul(a_limbs, b_limbs, c_limbs));
                     }
-                    assert!(!self_sign);
                 }
-                Large(result_limbs)
-            };
-            result.trim();
-            result
+            }
+            unreachable!();
         }
     }
 }
@@ -249,25 +236,12 @@ impl AddMulAssign<Natural, Natural> for Natural {
         } else if *self == 0 as Limb {
             *self = b * c;
         } else {
-            {
-                let self_limbs = self.promote_in_place();
+            let self_limbs = self.promote_in_place();
+            if let Large(ref b_limbs) = b {
                 if let Large(ref c_limbs) = c {
-                    let mut self_sign = false;
-                    if let Large(ref b_limbs) = b {
-                        mpz_aorsmul(
-                            &mut self_sign,
-                            self_limbs,
-                            false,
-                            b_limbs,
-                            false,
-                            c_limbs,
-                            true,
-                        );
-                    }
-                    assert!(!self_sign);
+                    limbs_add_mul_in_place_left(self_limbs, b_limbs, c_limbs);
                 }
             }
-            self.trim();
         }
     }
 }
@@ -310,25 +284,12 @@ impl<'a> AddMulAssign<Natural, &'a Natural> for Natural {
         } else if *self == 0 as Limb {
             *self = b * c;
         } else {
-            {
-                let self_limbs = self.promote_in_place();
+            let self_limbs = self.promote_in_place();
+            if let Large(ref b_limbs) = b {
                 if let Large(ref c_limbs) = *c {
-                    let mut self_sign = false;
-                    if let Large(ref b_limbs) = b {
-                        mpz_aorsmul(
-                            &mut self_sign,
-                            self_limbs,
-                            false,
-                            b_limbs,
-                            false,
-                            c_limbs,
-                            true,
-                        );
-                    }
-                    assert!(!self_sign);
+                    limbs_add_mul_in_place_left(self_limbs, b_limbs, c_limbs);
                 }
             }
-            self.trim();
         }
     }
 }
@@ -371,25 +332,12 @@ impl<'a> AddMulAssign<&'a Natural, Natural> for Natural {
         } else if *self == 0 as Limb {
             *self = b * c;
         } else {
-            {
-                let self_limbs = self.promote_in_place();
+            let self_limbs = self.promote_in_place();
+            if let Large(ref b_limbs) = *b {
                 if let Large(ref c_limbs) = c {
-                    let mut self_sign = false;
-                    if let Large(ref b_limbs) = *b {
-                        mpz_aorsmul(
-                            &mut self_sign,
-                            self_limbs,
-                            false,
-                            b_limbs,
-                            false,
-                            c_limbs,
-                            true,
-                        );
-                    }
-                    assert!(!self_sign);
+                    limbs_add_mul_in_place_left(self_limbs, b_limbs, c_limbs);
                 }
             }
-            self.trim();
         }
     }
 }
@@ -432,50 +380,55 @@ impl<'a, 'b> AddMulAssign<&'a Natural, &'b Natural> for Natural {
         } else if *self == 0 as Limb {
             *self = b * c;
         } else {
-            {
-                let self_limbs = self.promote_in_place();
+            let self_limbs = self.promote_in_place();
+            if let Large(ref b_limbs) = *b {
                 if let Large(ref c_limbs) = *c {
-                    let mut self_sign = false;
-                    if let Large(ref b_limbs) = *b {
-                        mpz_aorsmul(
-                            &mut self_sign,
-                            self_limbs,
-                            false,
-                            b_limbs,
-                            false,
-                            c_limbs,
-                            true,
-                        );
-                    }
-                    assert!(!self_sign);
+                    limbs_add_mul_in_place_left(self_limbs, b_limbs, c_limbs);
                 }
             }
-            self.trim();
         }
     }
 }
 
-// expecting x and y both with non-zero high limbs
-fn mpn_cmp_twosizes_lt(x: &[Limb], y: &[Limb]) -> bool {
-    limbs_cmp(x, y) == Ordering::Less
-}
-
-fn mpn_sub_aba(a: &mut [Limb], b: &[Limb], len: usize) -> bool {
-    let s1_len = b.len();
-    assert!(s1_len >= len);
-    assert!(a.len() >= s1_len);
-    let borrow = limbs_sub_same_length_in_place_right(&b[..len], &mut a[..len]);
-    if s1_len == len {
-        borrow
-    } else if borrow {
-        limbs_sub_limb_to_out(&mut a[len..], &b[len..], 1)
+// ys.len() > 1, zs.len() > 1, xs.len() > 0
+pub fn limbs_add_mul(xs: &[Limb], ys: &[Limb], zs: &[Limb]) -> Vec<Limb> {
+    let xs_len = xs.len();
+    let mut product_size = ys.len() + zs.len();
+    let mut product = vec![0; product_size];
+    if limbs_mul_to_out(&mut product, ys, zs) == 0 {
+        product_size -= 1;
+        product.pop();
+    }
+    assert_ne!(*product.last().unwrap(), 0);
+    if xs_len >= product_size {
+        limbs_add_greater(xs, &product)
     } else {
-        a[len..s1_len].copy_from_slice(&b[len..]);
-        false
+        if limbs_slice_add_greater_in_place_left(&mut product, xs) {
+            product.push(1);
+        }
+        product
     }
 }
 
-#[allow(unknown_lints, clippy::many_single_char_names)]
+// ys.len() > 1, zs.len() > 1, xs.len() > 0
+pub fn limbs_add_mul_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb], zs: &[Limb]) {
+    let xs_len = xs.len();
+    let mut product_size = ys.len() + zs.len();
+    let mut product = vec![0; product_size];
+    if limbs_mul_to_out(&mut product, ys, zs) == 0 {
+        product_size -= 1;
+        product.pop();
+    }
+    assert_ne!(*product.last().unwrap(), 0);
+    if xs_len < product_size {
+        swap(xs, &mut product);
+    }
+    if limbs_slice_add_greater_in_place_left(xs, &product) {
+        xs.push(1);
+    }
+}
+
+//TODO remove
 pub(crate) fn mpz_aorsmul(
     w_sign: &mut bool,
     w: &mut Vec<Limb>,
@@ -497,7 +450,7 @@ pub(crate) fn mpz_aorsmul(
     sub ^= y_sign;
     // use mpn_addmul_1/mpn_submul_1 if possible
     if y_sign && ysize == 1 {
-        mpz_aorsmul_1(w_sign, w, x_sign, x, y[0], sub);
+        limbs_vec_add_mul_limb_in_place_left(w, x, y[0]);
         return;
     }
     sub ^= x_sign;
@@ -539,11 +492,11 @@ pub(crate) fn mpz_aorsmul(
             };
             w[wsize] = c;
         }
-    } else if mpn_cmp_twosizes_lt(&w[..wsize], &t[..tsize]) {
+    } else if limbs_cmp(&w[..wsize], &t[..tsize]) == Ordering::Less {
         if tsize != 0 {
             w_sign.not_assign();
         }
-        assert!(!mpn_sub_aba(w, &t[..tsize], wsize));
+        assert!(!limbs_sub_less_in_place_right(&t[..tsize], w, wsize));
     } else {
         assert!(!limbs_sub_in_place_left(&mut w[..wsize], &t[..tsize]));
     }
