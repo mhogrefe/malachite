@@ -21,7 +21,11 @@ use std::cmp::min;
 pub(crate) const MULMOD_BNM1_THRESHOLD: usize = 13;
 pub(crate) const MUL_FFT_MODF_THRESHOLD: usize = 396;
 
-// This is mpn_mulmod_bnm1_next_size from mpn/generic/mulmod_bnm1.c.
+/// Time: O(1)
+///
+/// Additional memory: O(1)
+///
+/// This is mpn_mulmod_bnm1_next_size from mpn/generic/mulmod_bnm1.c.
 pub(crate) fn _limbs_mul_mod_limb_width_to_n_minus_1_next_size(n: usize) -> usize {
     if n < MULMOD_BNM1_THRESHOLD {
         n
@@ -39,7 +43,11 @@ pub(crate) fn _limbs_mul_mod_limb_width_to_n_minus_1_next_size(n: usize) -> usiz
     }
 }
 
-// This is mpn_mulmod_bnm1_itch from gmp-impl.h.
+/// Time: O(1)
+///
+/// Additional memory: O(1)
+///
+/// This is mpn_mulmod_bnm1_itch from gmp-impl.h.
 pub(crate) fn _limbs_mul_mod_limb_width_to_n_minus_1_scratch_size(
     n: usize,
     xs_len: usize,
@@ -63,9 +71,11 @@ pub(crate) fn _limbs_mul_mod_limb_width_to_n_minus_1_scratch_size(
 /// `Limb::WIDTH`<sup>n</sup> - 1. The limbs of the result are written to `out`. `out` should have
 /// length at least n, and `scratch` at least 2 * n. This is the basecase algorithm.
 ///
-/// Time: TODO
+/// Time: O(n * log(n) * log(log(n)))
 ///
 /// Additional memory: TODO
+///
+/// where n = `xs.len()`
 ///
 /// # Panics
 /// Panics if `xs` and `ys` have different lengths, if `out` or `scratch` are too short, or if the
@@ -93,9 +103,11 @@ fn _limbs_mul_mod_limb_width_to_n_minus_1_basecase(
 /// two `Natural`s, multiplies the `Natural`s mod `Limb::WIDTH`<sup>n</sup> + 1. The limbs of the
 /// result are written to `out`, which should have length at least 2 * n + 2.
 ///
-/// Time: TODO
+/// Time: O(n * log(n) * log(log(n)))
 ///
 /// Additional memory: TODO
+///
+/// where n = `n`
 ///
 /// # Panics
 /// Panics if `xs`, `ys`, or `out` are too short, or if n is zero.
@@ -145,9 +157,11 @@ const FFT_FIRST_K: usize = 4;
 /// Scratch need: n + (need for recursive call OR n + 4). This gives
 /// S(n) <= n + MAX (n + 4, S(n / 2)) <= 2 * n + 4
 ///
-/// Time: TODO
+/// Time: O(n * log(n) * log(log(n)))
 ///
 /// Additional memory: TODO
+///
+/// where n = `xs.len()`
 ///
 /// # Panics
 /// Panics if `xs` is shorter than `ys`, if `ys` is empty, is `xs` is longer than n, or if `out` or

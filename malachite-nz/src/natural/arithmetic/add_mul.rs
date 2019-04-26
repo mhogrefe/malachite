@@ -13,9 +13,9 @@ use std::mem::swap;
 /// Adds the product of a `Natural` (b) and a `Natural` (c) to a `Natural` (self), taking `self`, b,
 /// and c by value.
 ///
-/// Time: worst case O(m+np)
+/// Time: TODO
 ///
-/// Additional memory: worst case O(np)
+/// Additional memory: TODO
 ///
 /// where m = `a.significant_bits()`,
 ///       n = `b.significant_bits()`
@@ -48,9 +48,9 @@ impl<'a> AddMul<Natural, Natural> for Natural {
 /// Adds the product of a `Natural` (b) and a `Natural` (c) to a `Natural` (self), taking `self` and
 /// b by value and c by reference.
 ///
-/// Time: worst case O(m+np)
+/// Time: TODO
 ///
-/// Additional memory: worst case O(np)
+/// Additional memory: TODO
 ///
 /// where m = `a.significant_bits()`,
 ///       n = `b.significant_bits()`
@@ -83,9 +83,9 @@ impl<'a> AddMul<Natural, &'a Natural> for Natural {
 /// Adds the product of a `Natural` (b) and a `Natural` (c) to a `Natural` (self), taking `self` and
 /// c by value and b by reference.
 ///
-/// Time: worst case O(m+np)
+/// Time: TODO
 ///
-/// Additional memory: worst case O(np)
+/// Additional memory: TODO
 ///
 /// where m = `a.significant_bits()`,
 ///       n = `b.significant_bits()`
@@ -118,9 +118,9 @@ impl<'a> AddMul<&'a Natural, Natural> for Natural {
 /// Adds the product of a `Natural` (b) and a `Natural` (c) to a `Natural` (self), taking `self` by
 /// value and b and c by reference.
 ///
-/// Time: worst case O(m+np)
+/// Time: TODO
 ///
-/// Additional memory: worst case O(np)
+/// Additional memory: TODO
 ///
 /// where m = `a.significant_bits()`,
 ///       n = `b.significant_bits()`
@@ -153,9 +153,9 @@ impl<'a, 'b> AddMul<&'a Natural, &'b Natural> for Natural {
 /// Adds the product of a `Natural` (b) and a `Natural` (c) to a `Natural` (self), taking `self`, b,
 /// and c by reference.
 ///
-/// Time: worst case O(m+np)
+/// Time: TODO
 ///
-/// Additional memory: worst case O(np)
+/// Additional memory: TODO
 ///
 /// where m = `a.significant_bits()`,
 ///       n = `b.significant_bits()`
@@ -201,9 +201,9 @@ impl<'a, 'b, 'c> AddMul<&'a Natural, &'b Natural> for &'c Natural {
 /// Adds the product of a `Natural` (b) and a `Natural` (c) to a `Natural` (self), in place, taking
 /// b and c by value.
 ///
-/// Time: worst case O(m+np)
+/// Time: TODO
 ///
-/// Additional memory: worst case O(np)
+/// Additional memory: TODO
 ///
 /// where m = `a.significant_bits()`,
 ///       n = `b.significant_bits()`
@@ -249,9 +249,9 @@ impl AddMulAssign<Natural, Natural> for Natural {
 /// Adds the product of a `Natural` (b) and a `Natural` (c) to a `Natural` (self), in place, taking
 /// b by value and c by reference.
 ///
-/// Time: worst case O(m+np)
+/// Time: TODO
 ///
-/// Additional memory: worst case O(np)
+/// Additional memory: TODO
 ///
 /// where m = `a.significant_bits()`,
 ///       n = `b.significant_bits()`
@@ -297,9 +297,9 @@ impl<'a> AddMulAssign<Natural, &'a Natural> for Natural {
 /// Adds the product of a `Natural` (b) and a `Natural` (c) to a `Natural` (self), in place, taking
 /// b by reference and c by value.
 ///
-/// Time: worst case O(m+np)
+/// Time: TODO
 ///
-/// Additional memory: worst case O(np)
+/// Additional memory: TODO
 ///
 /// where m = `a.significant_bits()`,
 ///       n = `b.significant_bits()`
@@ -345,9 +345,9 @@ impl<'a> AddMulAssign<&'a Natural, Natural> for Natural {
 /// Adds the product of a `Natural` (b) and a `Natural` (c) to a `Natural` (self), in place, taking
 /// b and c by reference.
 ///
-/// Time: worst case O(m+np)
+/// Time: TODO
 ///
-/// Additional memory: worst case O(np)
+/// Additional memory: TODO
 ///
 /// where m = `a.significant_bits()`,
 ///       n = `b.significant_bits()`
@@ -390,7 +390,29 @@ impl<'a, 'b> AddMulAssign<&'a Natural, &'b Natural> for Natural {
     }
 }
 
-// ys.len() > 1, zs.len() > 1, xs.len() > 0
+/// Given the limbs `xs`, `ys` and `zs` of three `Natural`s a, b, and c, returns the limbs of
+/// a + b * c. `xs` should be nonempty and `ys` and `zs` should have length at least 2. None of the
+/// slices should have any trailing zeros. The result will have no trailing zeros.
+///
+/// Time: TODO
+///
+/// Additional memory: TODO
+///
+/// This is mpz_aorsmul from mpz/aorsmul.c, where w, x, and y are positive, sub is positive, and w
+/// is returned instead of overwriting the first input.
+///
+/// # Panics
+/// Panics if `ys` or `zs` are empty.
+///
+/// # Example
+/// ```
+/// use malachite_nz::natural::arithmetic::add_mul::limbs_add_mul;
+///
+/// assert_eq!(limbs_add_mul(&[123, 456], &[123, 789], &[321, 654]),
+///         &[39606, 334167, 516006]);
+/// assert_eq!(limbs_add_mul(&[123, 456, 789, 987, 654], &[123, 789], &[321, 654]),
+///         &[39606, 334167, 516795, 987, 654]);
+/// ```
 pub fn limbs_add_mul(xs: &[Limb], ys: &[Limb], zs: &[Limb]) -> Vec<Limb> {
     let xs_len = xs.len();
     let mut product_size = ys.len() + zs.len();
@@ -410,7 +432,32 @@ pub fn limbs_add_mul(xs: &[Limb], ys: &[Limb], zs: &[Limb]) -> Vec<Limb> {
     }
 }
 
-// ys.len() > 1, zs.len() > 1, xs.len() > 0
+/// Given the limbs `xs`, `ys` and `zs` of three `Natural`s a, b, and c, computes a + b * c. The
+/// limbs of the result are written to `xs`. `xs` should be nonempty and `ys` and `zs` should have
+/// length at least 2. None of the slices should have any trailing zeros. The result will have no
+/// trailing zeros.
+///
+/// Time: TODO
+///
+/// Additional memory: TODO
+///
+/// This is mpz_aorsmul from mpz/aorsmul.c, where w, x, and y are positive and sub is positive.
+///
+/// # Panics
+/// Panics if `ys` or `zs` are empty.
+///
+/// # Example
+/// ```
+/// use malachite_nz::natural::arithmetic::add_mul::limbs_add_mul_in_place_left;
+///
+/// let mut xs = vec![123, 456];
+/// limbs_add_mul_in_place_left(&mut xs, &[123, 789], &[321, 654]);
+/// assert_eq!(xs, &[39606, 334167, 516006]);
+///
+/// let mut xs = vec![123, 456, 789, 987, 654];
+/// limbs_add_mul_in_place_left(&mut xs, &[123, 789], &[321, 654]);
+/// assert_eq!(xs, &[39606, 334167, 516795, 987, 654]);
+/// ```
 pub fn limbs_add_mul_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb], zs: &[Limb]) {
     let xs_len = xs.len();
     let mut product_size = ys.len() + zs.len();

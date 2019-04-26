@@ -1,10 +1,14 @@
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
+use inputs::base::triples_of_unsigned_vec_var_27;
 use inputs::natural::triples_of_naturals;
 use malachite_base::num::SignificantBits;
 use malachite_base::num::{AddMul, AddMulAssign};
+use malachite_nz::natural::arithmetic::add_mul::{limbs_add_mul, limbs_add_mul_in_place_left};
 use malachite_nz::natural::Natural;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
+    register_demo!(registry, demo_limbs_add_mul);
+    register_demo!(registry, demo_limbs_add_mul_in_place_left);
     register_demo!(registry, demo_natural_add_mul_assign);
     register_demo!(registry, demo_natural_add_mul_assign_val_ref);
     register_demo!(registry, demo_natural_add_mul_assign_ref_val);
@@ -14,6 +18,8 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_natural_add_mul_val_ref_val);
     register_demo!(registry, demo_natural_add_mul_val_ref_ref);
     register_demo!(registry, demo_natural_add_mul_ref_ref_ref);
+    register_bench!(registry, Small, benchmark_limbs_add_mul);
+    register_bench!(registry, Small, benchmark_limbs_add_mul_in_place_left);
     register_bench!(
         registry,
         Large,
@@ -61,6 +67,29 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
         Large,
         benchmark_natural_add_mul_ref_ref_ref_algorithms
     );
+}
+
+fn demo_limbs_add_mul(gm: GenerationMode, limit: usize) {
+    for (a, b, c) in triples_of_unsigned_vec_var_27(gm).take(limit) {
+        println!(
+            "limbs_add_mul({:?}, {:?}, {:?}) = {:?}",
+            a,
+            b,
+            c,
+            limbs_add_mul(&a, &b, &c),
+        );
+    }
+}
+
+fn demo_limbs_add_mul_in_place_left(gm: GenerationMode, limit: usize) {
+    for (mut a, b, c) in triples_of_unsigned_vec_var_27(gm).take(limit) {
+        let a_old = a.clone();
+        limbs_add_mul_in_place_left(&mut a, &b, &c);
+        println!(
+            "a := {:?}; limbs_add_mul_in_place_left(&mut a, {:?}, {:?}); a = {:?}",
+            a_old, b, c, a,
+        );
+    }
 }
 
 fn demo_natural_add_mul_assign(gm: GenerationMode, limit: usize) {
@@ -171,6 +200,40 @@ fn demo_natural_add_mul_ref_ref_ref(gm: GenerationMode, limit: usize) {
             (&a).add_mul(&b, &c)
         );
     }
+}
+
+fn benchmark_limbs_add_mul(gm: GenerationMode, limit: usize, file_name: &str) {
+    m_run_benchmark(
+        "limbs_add_mul(&[Limb], &[Limb], &[Limb])",
+        BenchmarkType::Single,
+        triples_of_unsigned_vec_var_27(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(ref a, ref b, ref c)| max!(a.len(), b.len(), c.len())),
+        "max(a.len(), b.len())",
+        &mut [(
+            "malachite",
+            &mut (|(a, b, c)| no_out!(limbs_add_mul(&a, &b, &c))),
+        )],
+    );
+}
+
+fn benchmark_limbs_add_mul_in_place_left(gm: GenerationMode, limit: usize, file_name: &str) {
+    m_run_benchmark(
+        "limbs_add_mul_in_place_left(&mut [Limb], &[Limb], &[Limb])",
+        BenchmarkType::Single,
+        triples_of_unsigned_vec_var_27(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(ref a, ref b, ref c)| max!(a.len(), b.len(), c.len())),
+        "max(a.len(), b.len())",
+        &mut [(
+            "malachite",
+            &mut (|(mut a, b, c)| no_out!(limbs_add_mul_in_place_left(&mut a, &b, &c))),
+        )],
+    );
 }
 
 fn bucketing_function(t: &(Natural, Natural, Natural)) -> usize {

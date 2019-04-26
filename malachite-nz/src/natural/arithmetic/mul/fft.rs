@@ -504,7 +504,11 @@ pub(crate) fn _limbs_mul_fft_best_k(n: usize, square: bool) -> usize {
     last_k
 }
 
-/// //TODO complexity
+/// Time: O(n * log(n) * log(log(n)))
+///
+/// Additional memory: TODO
+///
+/// where n = `xs.len()`
 ///
 /// This is mpn_fft_mul from gmp-impl.h and mpn_nussbaumer_mul from
 ///     mpn/generic/mpn_nussbaumer_mul.c.
@@ -823,6 +827,10 @@ fn _limbs_mul_fft_decompose<'a>(
 /// output: xss[increment * bit_reverse_table[k][i]] <-
 ///      sum (2 ^ omega) ^ (i * j) xss[increment * j] mod 2 ^ N + 1
 ///
+/// Time: TODO
+///
+/// Additional memory: worst case O(1)
+///
 /// This is mpn_fft_fft from mpn/generic/mul_fft.c.
 pub fn _limbs_mul_fft_fft(
     xss: &mut [&mut [Limb]],
@@ -910,13 +918,17 @@ pub fn _limbs_mul_fft_fft(
     }
 }
 
-// input: xs ^ bit_reverse_table[k][0], xs ^ bit_reverse_table[k][1], ...,
-//      xs ^ bit_reverse_table[k][K-1]
-// output: k * xss[0], k * xss[k - 1], ..., k * xss[1].
-// Assumes the xss are pseudo-normalized, i.e. 0 <= xss[][n] <= 1. This condition is also fulfilled
-// at exit.
-//
-// This is mpn_fft_fftinv from mpn/generic/mul_fft.c.
+/// input: xs ^ bit_reverse_table[k][0], xs ^ bit_reverse_table[k][1], ...,
+///      xs ^ bit_reverse_table[k][K-1]
+/// output: k * xss[0], k * xss[k - 1], ..., k * xss[1].
+/// Assumes the xss are pseudo-normalized, i.e. 0 <= xss[][n] <= 1. This condition is also fulfilled
+/// at exit.
+///
+/// Time: TODO
+///
+/// Additional memory: worst case O(1)
+///
+/// This is mpn_fft_fftinv from mpn/generic/mul_fft.c.
 pub fn _limbs_mul_fft_inverse(
     xss: &mut [&mut [Limb]],
     k: usize,
@@ -964,10 +976,16 @@ pub fn _limbs_mul_fft_inverse(
     }
 }
 
-// out[..n] <- xs[..an] mod 2 ^ (n * Limb::WIDTH) + 1, n <= an <= 3 * n.
-// Returns carry out, i.e. 1 iff xs[..an] == -1 mod 2 ^ (n * Limb::WIDTH) + 1, then out[..n] = 0.
-//
-// This is mpn_fft_norm_modF from mpn/generic/mul_fft.c.
+/// out[..n] <- xs[..an] mod 2 ^ (n * Limb::WIDTH) + 1, n <= an <= 3 * n.
+/// Returns carry out, i.e. 1 iff xs[..an] == -1 mod 2 ^ (n * Limb::WIDTH) + 1, then out[..n] = 0.
+///
+/// Time: O(n)
+///
+/// Additional memory: O(1)
+///
+/// where n = `n`
+///
+/// This is mpn_fft_norm_modF from mpn/generic/mul_fft.c.
 pub fn _limbs_mul_fft_normalize_mod_f(out: &mut [Limb], n: usize, xs: &[Limb]) -> bool {
     let xs_len = xs.len();
     assert!(n <= xs_len && xs_len <= 3 * n);
