@@ -114,7 +114,7 @@ fn add_natural_properties() {
             sum
         );
         assert_eq!(&sum - x, *y);
-        //TODO assert_eq!(sum - y, *x);
+        assert_eq!(sum - y, *x);
     });
 
     test_properties(naturals, |x| {

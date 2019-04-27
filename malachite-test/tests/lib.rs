@@ -88,6 +88,7 @@ pub mod integer {
         pub mod sub_mul;
         pub mod sub_mul_limb;
         pub mod sub_mul_signed_limb;
+        pub mod sub_natural;
         pub mod sub_signed_limb;
     }
     pub mod basic {

@@ -43,6 +43,7 @@ pub mod sub_limb;
 pub mod sub_mul;
 pub mod sub_mul_limb;
 pub mod sub_mul_signed_limb;
+pub mod sub_natural;
 pub mod sub_signed_limb;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
@@ -86,8 +87,9 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     shr_u::register(registry);
     sub::register(registry);
     sub_limb::register(registry);
-    sub_signed_limb::register(registry);
     sub_mul::register(registry);
     sub_mul_limb::register(registry);
     sub_mul_signed_limb::register(registry);
+    sub_natural::register(registry);
+    sub_signed_limb::register(registry);
 }

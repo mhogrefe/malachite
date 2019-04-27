@@ -127,8 +127,8 @@ impl<'a> Sub<Integer> for &'a Integer {
 ///     assert_eq!((&Integer::ZERO - &Integer::from(123)).to_string(), "-123");
 ///     assert_eq!((&Integer::from(123) - &Integer::ZERO).to_string(), "123");
 ///     assert_eq!((&Integer::from(456) - &Integer::from(-123)).to_string(), "579");
-///     assert_eq!((&(-Integer::trillion()) - &(-Integer::trillion() * 2)).to_string(),
-///         "1000000000000");
+///     let x: Integer = &-Integer::trillion() - &(-Integer::trillion() * 2);
+///     assert_eq!(x.to_string(), "1000000000000");
 /// }
 /// ```
 impl<'a, 'b> Sub<&'a Integer> for &'b Integer {
