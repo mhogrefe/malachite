@@ -1,10 +1,12 @@
-use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::base::pairs_of_unsigneds;
+use std::cmp::max;
+
 use malachite_base::named::Named;
 use malachite_base::num::traits::{JoinHalves, SignificantBits};
 use malachite_base::num::unsigneds::PrimitiveUnsigned;
 use rand::Rand;
-use std::cmp::max;
+
+use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
+use inputs::base::pairs_of_unsigneds;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_u16_join_halves);

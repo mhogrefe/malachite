@@ -1,9 +1,11 @@
+use std::str::FromStr;
+
 use malachite_base::crement::Crementable;
 use malachite_base::named::Named;
 use malachite_base::num::traits::{NegativeOne, One, Two, Zero};
+
 use natural::Natural::{self, Small};
 use platform::Limb;
-use std::str::FromStr;
 
 /// An integer.
 ///

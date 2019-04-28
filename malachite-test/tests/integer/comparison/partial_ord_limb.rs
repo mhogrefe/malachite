@@ -1,6 +1,12 @@
-use common::test_properties;
+use std::cmp::Ordering;
+use std::str::FromStr;
+
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::Limb;
+use num::BigInt;
+use rug;
+
+use common::test_properties;
 use malachite_test::common::{integer_to_bigint, integer_to_rug_integer};
 use malachite_test::inputs::base::pairs_of_unsigneds;
 use malachite_test::inputs::integer::{
@@ -9,10 +15,6 @@ use malachite_test::inputs::integer::{
 };
 use malachite_test::inputs::natural::pairs_of_natural_and_unsigned;
 use malachite_test::integer::comparison::partial_ord_limb::num_partial_cmp_limb;
-use num::BigInt;
-use rug;
-use std::cmp::Ordering;
-use std::str::FromStr;
 
 #[test]
 fn test_partial_ord_limb() {

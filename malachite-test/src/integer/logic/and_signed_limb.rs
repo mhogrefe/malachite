@@ -1,3 +1,12 @@
+use malachite_base::num::traits::SignificantBits;
+use malachite_nz::integer::logic::and_signed_limb::{
+    limbs_neg_and_limb_neg, limbs_neg_and_limb_neg_to_out, limbs_pos_and_limb_neg,
+    limbs_pos_and_limb_neg_in_place, limbs_pos_and_limb_neg_to_out,
+    limbs_slice_neg_and_limb_neg_in_place, limbs_vec_neg_and_limb_neg_in_place,
+};
+use malachite_nz::integer::Integer;
+use malachite_nz::platform::SignedLimb;
+
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::{
     pairs_of_limb_vec_and_limb_var_1, pairs_of_nonempty_unsigned_vec_and_unsigned,
@@ -8,14 +17,6 @@ use inputs::integer::{pairs_of_integer_and_signed, pairs_of_signed_and_integer};
 #[cfg(feature = "32_bit_limbs")]
 use inputs::integer::{rm_pairs_of_integer_and_signed, rm_pairs_of_signed_and_integer};
 use integer::logic::and::{integer_and_alt_1, integer_and_alt_2};
-use malachite_base::num::traits::SignificantBits;
-use malachite_nz::integer::logic::and_signed_limb::{
-    limbs_neg_and_limb_neg, limbs_neg_and_limb_neg_to_out, limbs_pos_and_limb_neg,
-    limbs_pos_and_limb_neg_in_place, limbs_pos_and_limb_neg_to_out,
-    limbs_slice_neg_and_limb_neg_in_place, limbs_vec_neg_and_limb_neg_in_place,
-};
-use malachite_nz::integer::Integer;
-use malachite_nz::platform::SignedLimb;
 
 pub fn integer_and_signed_limb_alt_1(n: &Integer, i: SignedLimb) -> Integer {
     integer_and_alt_1(n, &Integer::from(i))

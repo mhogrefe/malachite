@@ -1,7 +1,8 @@
-use integer::Integer;
 use malachite_base::limbs::limbs_leading_zero_limbs;
 use malachite_base::num::integers::PrimitiveInteger;
 use malachite_base::num::traits::BitScan;
+
+use integer::Integer;
 use natural::logic::bit_scan::{limbs_index_of_next_false_bit, limbs_index_of_next_true_bit};
 use natural::Natural::{self, Large, Small};
 use platform::Limb;

@@ -1,5 +1,6 @@
-use integer::Integer;
 use malachite_base::num::traits::DivisibleBy;
+
+use integer::Integer;
 use platform::Limb;
 
 impl<'a> DivisibleBy<Limb> for &'a Integer {

@@ -1,15 +1,17 @@
+use std::cmp::max;
+
+use malachite_base::num::traits::SignificantBits;
+use malachite_nz::integer::logic::or_natural::{
+    limbs_or_pos_neg, limbs_or_pos_neg_in_place_right, limbs_or_pos_neg_to_out,
+    limbs_slice_or_pos_neg_in_place_left, limbs_vec_or_pos_neg_in_place_left,
+};
+
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::{pairs_of_limb_vec_var_1, triples_of_limb_vec_var_6};
 use inputs::integer::{
     pairs_of_integer_and_natural, pairs_of_natural_and_integer, rm_pairs_of_integer_and_natural,
     rm_pairs_of_natural_and_integer,
 };
-use malachite_base::num::traits::SignificantBits;
-use malachite_nz::integer::logic::or_natural::{
-    limbs_or_pos_neg, limbs_or_pos_neg_in_place_right, limbs_or_pos_neg_to_out,
-    limbs_slice_or_pos_neg_in_place_left, limbs_vec_or_pos_neg_in_place_left,
-};
-use std::cmp::max;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limbs_or_pos_neg);

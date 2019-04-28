@@ -1,4 +1,5 @@
-use common::test_properties;
+use std::str::FromStr;
+
 use malachite_base::comparison::Max;
 use malachite_base::num::integers::PrimitiveInteger;
 use malachite_base::num::traits::{CeilingLogTwo, FloorLogTwo, One, SignificantBits, Zero};
@@ -6,9 +7,10 @@ use malachite_nz::natural::arithmetic::log_two::{limbs_ceiling_log_two, limbs_fl
 use malachite_nz::natural::logic::significant_bits::limbs_significant_bits;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
+
+use common::test_properties;
 use malachite_test::inputs::base::{positive_unsigneds, vecs_of_unsigned_var_1};
 use malachite_test::inputs::natural::positive_naturals;
-use std::str::FromStr;
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]

@@ -1,5 +1,6 @@
-use integer::Integer;
 use malachite_base::num::traits::{CheckedHammingDistance, HammingDistance};
+
+use integer::Integer;
 use platform::Limb;
 
 impl<'a> CheckedHammingDistance<Limb> for &'a Integer {

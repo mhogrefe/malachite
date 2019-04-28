@@ -1,4 +1,5 @@
-use common::test_properties;
+use std::str::FromStr;
+
 use malachite_base::num::traits::{NegativeOne, Zero};
 use malachite_nz::integer::logic::or_limb::{
     limbs_neg_or_limb, limbs_neg_or_limb_in_place, limbs_neg_or_limb_to_out,
@@ -7,6 +8,10 @@ use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::{Limb, SignedLimb};
 #[cfg(feature = "32_bit_limbs")]
+use rug::{self, Assign};
+
+use common::test_properties;
+#[cfg(feature = "32_bit_limbs")]
 use malachite_test::common::{integer_to_rug_integer, rug_integer_to_integer};
 use malachite_test::inputs::base::{
     pairs_of_limb_vec_and_limb_var_1, triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_3,
@@ -14,9 +19,6 @@ use malachite_test::inputs::base::{
 };
 use malachite_test::inputs::integer::{integers, pairs_of_integer_and_unsigned};
 use malachite_test::integer::logic::or_limb::{integer_or_limb_alt_1, integer_or_limb_alt_2};
-#[cfg(feature = "32_bit_limbs")]
-use rug::{self, Assign};
-use std::str::FromStr;
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]

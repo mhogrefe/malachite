@@ -1,5 +1,6 @@
-use integer::Integer;
 use malachite_base::num::traits::{Abs, AbsAssign, UnsignedAbs};
+
+use integer::Integer;
 use natural::Natural;
 
 /// Replaces an `Integer` with its absolute value.

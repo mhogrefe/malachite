@@ -1,12 +1,14 @@
-use common::test_properties;
+use std::u32;
+
 use malachite_base::num::integers::PrimitiveInteger;
 use malachite_base::num::signeds::PrimitiveSigned;
 use malachite_base::num::unsigneds::PrimitiveUnsigned;
+use rand::Rand;
+
+use common::test_properties;
 use malachite_test::inputs::base::{
     pairs_of_signed_and_small_unsigned, pairs_of_unsigned_and_small_unsigned, unsigneds,
 };
-use rand::Rand;
-use std::u32;
 
 fn get_bit_helper_unsigned<T: PrimitiveInteger>() {
     let test = |n: u64, index, out| {

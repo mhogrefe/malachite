@@ -1,7 +1,9 @@
-use integer::Integer;
-use malachite_base::num::traits::{PartialOrdAbs, UnsignedAbs};
-use platform::SignedLimb;
 use std::cmp::Ordering;
+
+use malachite_base::num::traits::{PartialOrdAbs, UnsignedAbs};
+
+use integer::Integer;
+use platform::SignedLimb;
 
 /// Compares the absolute value of an `Integer` to the absolute value of a `SignedLimb`.
 ///

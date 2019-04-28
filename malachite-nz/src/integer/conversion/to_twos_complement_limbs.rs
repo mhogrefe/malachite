@@ -1,7 +1,8 @@
-use integer::Integer;
 use malachite_base::comparison::Max;
 use malachite_base::limbs::limbs_leading_zero_limbs;
 use malachite_base::num::integers::PrimitiveInteger;
+
+use integer::Integer;
 use natural::arithmetic::add_limb::limbs_slice_add_limb_in_place;
 use natural::conversion::to_limbs::LimbIterator;
 use natural::logic::not::limbs_not_in_place;

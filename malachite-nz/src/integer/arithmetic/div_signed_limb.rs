@@ -1,8 +1,10 @@
-use integer::Integer;
+use std::ops::{Div, DivAssign};
+
 use malachite_base::num::traits::UnsignedAbs;
+
+use integer::Integer;
 use natural::Natural;
 use platform::{Limb, SignedLimb};
-use std::ops::{Div, DivAssign};
 
 impl Div<SignedLimb> for Integer {
     type Output = Integer;

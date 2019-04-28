@@ -1,5 +1,6 @@
-use integer::Integer;
 use malachite_base::num::traits::{AddMul, AddMulAssign, SubMul, SubMulAssign, UnsignedAbs};
+
+use integer::Integer;
 use platform::{Limb, SignedLimb};
 
 /// Adds the product of an `Integer` (b) and a `SignedLimb` (c) to an `Integer` (self), taking

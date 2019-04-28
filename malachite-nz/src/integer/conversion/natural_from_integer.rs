@@ -1,5 +1,6 @@
-use integer::Integer;
 use malachite_base::conversion::CheckedFrom;
+
+use integer::Integer;
 use natural::Natural;
 
 impl CheckedFrom<Integer> for Natural {

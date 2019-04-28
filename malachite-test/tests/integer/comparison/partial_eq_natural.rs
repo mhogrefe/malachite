@@ -1,11 +1,13 @@
-use common::test_properties;
+use std::str::FromStr;
+
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
+use rug;
+
+use common::test_properties;
 use malachite_test::common::{integer_to_rug_integer, natural_to_rug_integer};
 use malachite_test::inputs::integer::pairs_of_integer_and_natural;
 use malachite_test::inputs::natural::pairs_of_naturals;
-use rug;
-use std::str::FromStr;
 
 #[test]
 fn test_integer_partial_eq_natural() {

@@ -1,9 +1,11 @@
-use integer::Integer;
+use std::ops::{Add, AddAssign};
+
 use malachite_base::conversion::CheckedFrom;
 use malachite_base::num::traits::{Assign, NotAssign, UnsignedAbs};
+
+use integer::Integer;
 use natural::Natural;
 use platform::{Limb, SignedLimb};
-use std::ops::{Add, AddAssign};
 
 /// Adds a `SignedLimb` to an `Integer`, taking the `Integer` by value.
 ///

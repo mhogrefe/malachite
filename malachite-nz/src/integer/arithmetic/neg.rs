@@ -1,7 +1,9 @@
-use integer::Integer;
-use malachite_base::num::traits::{NegAssign, NotAssign, Zero};
-use platform::Limb;
 use std::ops::Neg;
+
+use malachite_base::num::traits::{NegAssign, NotAssign, Zero};
+
+use integer::Integer;
+use platform::Limb;
 
 /// Returns the negative of an `Integer`, taking the `Integer` by value.
 ///

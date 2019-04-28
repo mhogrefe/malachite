@@ -1,8 +1,9 @@
-use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::integer::integers;
 use malachite_base::num::traits::SignificantBits;
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::Limb;
+
+use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
+use inputs::integer::integers;
 
 pub fn integer_trailing_zeros_alt(n: &Integer) -> Option<u64> {
     if *n == 0 as Limb {

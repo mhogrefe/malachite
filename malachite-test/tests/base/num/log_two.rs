@@ -1,9 +1,11 @@
-use common::test_properties;
+use std::{u16, u32, u64, u8};
+
 use malachite_base::num::traits::{CeilingLogTwo, FloorLogTwo, Zero};
 use malachite_base::num::unsigneds::PrimitiveUnsigned;
-use malachite_test::inputs::base::positive_unsigneds;
 use rand::Rand;
-use std::{u16, u32, u64, u8};
+
+use common::test_properties;
+use malachite_test::inputs::base::positive_unsigneds;
 
 fn floor_log_two_helper_unsigned<T: PrimitiveUnsigned>(max: u64) {
     let test = |n, out| {

@@ -1,9 +1,11 @@
-use integer::Integer;
-use malachite_base::limbs::{limbs_leading_zero_limbs, limbs_set_zero};
-use natural::Natural::{self, Large, Small};
-use platform::Limb;
 use std::cmp::max;
 use std::ops::{BitOr, BitOrAssign};
+
+use malachite_base::limbs::{limbs_leading_zero_limbs, limbs_set_zero};
+
+use integer::Integer;
+use natural::Natural::{self, Large, Small};
+use platform::Limb;
 
 /// Interpreting two slices of `Limb`s as the limbs (in ascending order) of the negatives of two
 /// `Integer`s, returns the limbs of the bitwise or of the `Integer`s. `xs` and `ys` may not be

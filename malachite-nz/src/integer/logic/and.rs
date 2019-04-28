@@ -1,9 +1,11 @@
-use integer::Integer;
-use malachite_base::limbs::{limbs_leading_zero_limbs, limbs_set_zero};
-use natural::Natural::{self, Large, Small};
-use platform::Limb;
 use std::cmp::max;
 use std::ops::{BitAnd, BitAndAssign};
+
+use malachite_base::limbs::{limbs_leading_zero_limbs, limbs_set_zero};
+
+use integer::Integer;
+use natural::Natural::{self, Large, Small};
+use platform::Limb;
 
 fn limbs_and_neg_neg_helper(input: Limb, boundary_limb_seen: &mut bool) -> Limb {
     if *boundary_limb_seen {

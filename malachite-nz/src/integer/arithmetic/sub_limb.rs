@@ -1,9 +1,11 @@
-use integer::Integer;
+use std::ops::{Sub, SubAssign};
+
 use malachite_base::conversion::CheckedFrom;
 use malachite_base::num::traits::{Assign, NegAssign};
+
+use integer::Integer;
 use natural::Natural;
 use platform::Limb;
-use std::ops::{Sub, SubAssign};
 
 /// Subtracts a `Limb` from an `Integer`, taking the `Integer` by value.
 ///

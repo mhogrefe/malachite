@@ -1,5 +1,6 @@
-use integer::Integer;
 use malachite_base::num::traits::Assign;
+
+use integer::Integer;
 
 /// Assigns an `Integer` to another `Integer`, taking the `Integer` on the RHS by value.
 ///

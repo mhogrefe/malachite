@@ -1,7 +1,9 @@
-use integer::Integer;
-use malachite_base::num::traits::PartialOrdAbs;
-use platform::Limb;
 use std::cmp::Ordering;
+
+use malachite_base::num::traits::PartialOrdAbs;
+
+use integer::Integer;
+use platform::Limb;
 
 /// Compares the absolute value of an `Integer` to a `Limb`.
 ///

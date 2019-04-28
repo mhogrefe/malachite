@@ -1,10 +1,11 @@
-use common::test_properties;
 use malachite_base::comparison::Min;
 use malachite_base::crement::Crementable;
 use malachite_base::num::signeds::PrimitiveSigned;
 use malachite_base::num::unsigneds::PrimitiveUnsigned;
-use malachite_test::inputs::base::{positive_unsigneds, signeds_no_min};
 use rand::Rand;
+
+use common::test_properties;
+use malachite_test::inputs::base::{positive_unsigneds, signeds_no_min};
 
 fn decrement_helper_unsigned<T: PrimitiveUnsigned>() {
     let test = |n, out| {

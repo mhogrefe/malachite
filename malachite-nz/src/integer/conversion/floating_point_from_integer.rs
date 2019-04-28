@@ -1,6 +1,7 @@
-use integer::Integer;
 use malachite_base::conversion::{CheckedFrom, RoundingFrom};
 use malachite_base::round::RoundingMode;
+
+use integer::Integer;
 
 macro_rules! float_impls {
     ($f: ident) => {

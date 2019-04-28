@@ -1,10 +1,11 @@
+use malachite_base::conversion::{CheckedFrom, WrappingFrom};
+use malachite_base::num::traits::SignificantBits;
+use malachite_nz::platform::Limb;
+
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::natural::naturals;
 #[cfg(feature = "32_bit_limbs")]
 use inputs::natural::rm_naturals;
-use malachite_base::conversion::{CheckedFrom, WrappingFrom};
-use malachite_base::num::traits::SignificantBits;
-use malachite_nz::platform::Limb;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limb_checked_from_natural);

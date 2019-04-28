@@ -1,7 +1,8 @@
 extern crate malachite_test;
 
-use malachite_test::common::{get_gm, get_no_special_gm, DemoBenchRegistry, ScaleType};
 use std::env;
+
+use malachite_test::common::{get_gm, get_no_special_gm, DemoBenchRegistry, ScaleType};
 
 pub fn main() {
     let args: Vec<String> = env::args().collect();

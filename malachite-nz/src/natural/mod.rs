@@ -1,11 +1,13 @@
+use std::str::FromStr;
+
 use malachite_base::comparison::Min;
 use malachite_base::crement::Crementable;
 use malachite_base::limbs::limbs_trailing_zero_limbs;
 use malachite_base::named::Named;
 use malachite_base::num::traits::{One, Two, Zero};
+
 use natural::Natural::*;
 use platform::Limb;
-use std::str::FromStr;
 
 /// A natural (non-negative) integer.
 ///

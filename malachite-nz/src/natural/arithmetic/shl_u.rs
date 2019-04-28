@@ -1,9 +1,11 @@
+use std::ops::{Shl, ShlAssign};
+
 use malachite_base::conversion::{CheckedFrom, WrappingFrom};
 use malachite_base::limbs::limbs_pad_left;
 use malachite_base::num::integers::PrimitiveInteger;
+
 use natural::Natural::{self, Large, Small};
 use platform::Limb;
-use std::ops::{Shl, ShlAssign};
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
 /// limbs of the `Natural` left-shifted by a `Limb`.

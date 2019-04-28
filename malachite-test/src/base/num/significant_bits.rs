@@ -1,8 +1,9 @@
-use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::base::{signeds, unsigneds};
 use malachite_base::num::signeds::PrimitiveSigned;
 use malachite_base::num::unsigneds::PrimitiveUnsigned;
 use rand::Rand;
+
+use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
+use inputs::base::{signeds, unsigneds};
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_u8_significant_bits);

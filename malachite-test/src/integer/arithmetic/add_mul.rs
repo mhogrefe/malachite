@@ -1,7 +1,8 @@
-use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::integer::triples_of_integers;
 use malachite_base::num::traits::{AddMul, AddMulAssign, SignificantBits};
 use malachite_nz::integer::Integer;
+
+use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
+use inputs::integer::triples_of_integers;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_integer_add_mul_assign);

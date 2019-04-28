@@ -1,6 +1,5 @@
-use common::{integer_to_bigint, integer_to_rug_integer, natural_to_rug_integer, GenerationMode};
-use inputs::base::{finite_f32s, finite_f64s, It};
-use inputs::common::{reshape_1_2_to_3, reshape_2_1_to_3};
+use std::ops::{Add, Mul, Shl, Shr};
+
 use itertools::Itertools;
 use malachite_base::conversion::{CheckedFrom, RoundingFrom};
 use malachite_base::crement::Crementable;
@@ -46,7 +45,10 @@ use rust_wheels::iterators::tuples::{
     random_quadruples, random_triples, random_triples_from_single,
 };
 use rust_wheels::iterators::vecs::exhaustive_fixed_size_vecs_from_single;
-use std::ops::{Add, Mul, Shl, Shr};
+
+use common::{integer_to_bigint, integer_to_rug_integer, natural_to_rug_integer, GenerationMode};
+use inputs::base::{finite_f32s, finite_f64s, It};
+use inputs::common::{reshape_1_2_to_3, reshape_2_1_to_3};
 
 pub fn integers(gm: GenerationMode) -> It<Integer> {
     match gm {

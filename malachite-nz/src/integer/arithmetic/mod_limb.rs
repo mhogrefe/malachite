@@ -1,12 +1,14 @@
-use integer::Integer;
+use std::ops::{Rem, RemAssign};
+
 #[cfg(feature = "64_bit_limbs")]
 use malachite_base::conversion::CheckedFrom;
 use malachite_base::num::traits::{
     CeilingMod, CeilingModAssign, Mod, ModAssign, NegMod, NegModAssign,
 };
+
+use integer::Integer;
 use natural::Natural;
 use platform::Limb;
-use std::ops::{Rem, RemAssign};
 
 impl Mod<Limb> for Integer {
     type Output = Limb;

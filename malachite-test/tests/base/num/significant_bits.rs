@@ -1,10 +1,12 @@
-use common::test_properties;
+use std::{i16, i32, i64, i8, u16, u32, u64, u8};
+
 use malachite_base::num::integers::PrimitiveInteger;
 use malachite_base::num::signeds::PrimitiveSigned;
 use malachite_base::num::unsigneds::PrimitiveUnsigned;
-use malachite_test::inputs::base::{signeds, unsigneds};
 use rand::Rand;
-use std::{i16, i32, i64, i8, u16, u32, u64, u8};
+
+use common::test_properties;
+use malachite_test::inputs::base::{signeds, unsigneds};
 
 fn significant_bits_helper_common<T: PrimitiveInteger>() {
     let test = |n, out| {

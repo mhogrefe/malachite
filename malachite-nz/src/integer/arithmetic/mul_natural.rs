@@ -1,7 +1,8 @@
+use std::ops::{Mul, MulAssign};
+
 use integer::Integer;
 use natural::Natural;
 use platform::Limb;
-use std::ops::{Mul, MulAssign};
 
 /// Multiplies an `Integer` by a `Natural`, taking both by value.
 ///

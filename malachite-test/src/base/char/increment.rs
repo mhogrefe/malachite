@@ -1,9 +1,10 @@
+use malachite_base::chars::char_to_contiguous_range;
+use malachite_base::crement::Crementable;
+
 use common::{
     m_run_benchmark, BenchmarkType, DemoBenchRegistry, NoSpecialGenerationMode, ScaleType,
 };
 use inputs::base::chars_not_max;
-use malachite_base::chars::char_to_contiguous_range;
-use malachite_base::crement::Crementable;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_ns_demo!(registry, demo_char_increment);

@@ -1,7 +1,8 @@
-use integer::Integer;
 use malachite_base::limbs::{limbs_leading_zero_limbs, limbs_test_zero};
 use malachite_base::num::integers::PrimitiveInteger;
 use malachite_base::num::traits::{BitAccess, WrappingAddAssign, WrappingNegAssign};
+
+use integer::Integer;
 use natural::arithmetic::add_limb::limbs_slice_add_limb_in_place;
 use natural::arithmetic::sub_limb::limbs_sub_limb_in_place;
 use natural::Natural::{self, Large, Small};

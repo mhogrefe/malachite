@@ -1,10 +1,12 @@
+use std::fmt::Display;
+use std::ops::{Sub, SubAssign};
+
 #[cfg(feature = "64_bit_limbs")]
 use malachite_base::conversion::WrappingFrom;
 use malachite_base::num::traits::{CheckedSub, OverflowingSubAssign};
+
 use natural::Natural;
 use platform::Limb;
-use std::fmt::Display;
-use std::ops::{Sub, SubAssign};
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, subtracts the
 /// `Limb` from the `Natural`. Returns a pair consisting of the limbs of the result, and whether

@@ -1,9 +1,5 @@
-use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::base::{
-    pairs_of_unsigned_vec, pairs_of_unsigned_vec_var_1, triples_of_unsigned_vec_var_3,
-    triples_of_unsigned_vec_var_4,
-};
-use inputs::natural::{nrm_pairs_of_naturals, pairs_of_naturals, rm_pairs_of_naturals};
+use std::cmp::{max, min};
+
 use malachite_base::num::traits::SignificantBits;
 use malachite_nz::natural::logic::and::{
     limbs_and, limbs_and_in_place_either, limbs_and_same_length_to_out, limbs_and_to_out,
@@ -11,8 +7,14 @@ use malachite_nz::natural::logic::and::{
     limbs_vec_and_in_place_left,
 };
 use malachite_nz::natural::Natural;
+
+use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
+use inputs::base::{
+    pairs_of_unsigned_vec, pairs_of_unsigned_vec_var_1, triples_of_unsigned_vec_var_3,
+    triples_of_unsigned_vec_var_4,
+};
+use inputs::natural::{nrm_pairs_of_naturals, pairs_of_naturals, rm_pairs_of_naturals};
 use natural::logic::{natural_op_bits, natural_op_limbs};
-use std::cmp::{max, min};
 
 pub fn natural_and_alt_1(x: &Natural, y: &Natural) -> Natural {
     natural_op_bits(&|a, b| a && b, x, y)

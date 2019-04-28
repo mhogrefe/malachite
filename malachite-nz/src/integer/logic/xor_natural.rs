@@ -1,13 +1,15 @@
-use integer::Integer;
-use malachite_base::comparison::Max;
-use malachite_base::limbs::{limbs_leading_zero_limbs, limbs_set_zero};
-use malachite_base::num::traits::WrappingNegAssign;
-use natural::logic::not::limbs_not_in_place;
-use natural::Natural::{self, Large, Small};
-use platform::Limb;
 use std::cmp::max;
 use std::iter::repeat;
 use std::ops::{BitXor, BitXorAssign};
+
+use malachite_base::comparison::Max;
+use malachite_base::limbs::{limbs_leading_zero_limbs, limbs_set_zero};
+use malachite_base::num::traits::WrappingNegAssign;
+
+use integer::Integer;
+use natural::logic::not::limbs_not_in_place;
+use natural::Natural::{self, Large, Small};
+use platform::Limb;
 
 fn limbs_xor_pos_neg_helper(input: Limb, boundary_limb_seen: &mut bool) -> Limb {
     if *boundary_limb_seen {

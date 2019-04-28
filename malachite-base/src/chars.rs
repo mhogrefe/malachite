@@ -1,5 +1,6 @@
-use crement::Crementable;
 use std::char;
+
+use crement::Crementable;
 
 // The number of Unicode scalar values, or 1,112,064.
 pub const NUMBER_OF_CHARS: u32 = (1 << 20) + (1 << 16) - SURROGATE_RANGE_SIZE;

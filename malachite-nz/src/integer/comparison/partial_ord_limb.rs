@@ -1,6 +1,7 @@
+use std::cmp::Ordering;
+
 use integer::Integer;
 use platform::Limb;
-use std::cmp::Ordering;
 
 /// Compares an `Integer` to a `Limb`.
 ///

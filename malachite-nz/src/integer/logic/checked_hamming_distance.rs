@@ -1,12 +1,14 @@
-use integer::logic::checked_count_zeros::limbs_count_zeros_neg;
-use integer::Integer;
+use std::cmp::Ordering;
+
 use malachite_base::limbs::limbs_leading_zero_limbs;
 use malachite_base::num::traits::{CheckedHammingDistance, HammingDistance};
+
+use integer::logic::checked_count_zeros::limbs_count_zeros_neg;
+use integer::Integer;
 use natural::logic::count_ones::limbs_count_ones;
 use natural::logic::hamming_distance::limbs_hamming_distance_same_length;
 use natural::Natural::{self, Large, Small};
 use platform::Limb;
-use std::cmp::Ordering;
 
 fn limbs_count_zeros(limbs: &[Limb]) -> u64 {
     limbs.iter().map(|limb| u64::from(limb.count_zeros())).sum()

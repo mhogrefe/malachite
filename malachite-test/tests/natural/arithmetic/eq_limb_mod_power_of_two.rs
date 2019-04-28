@@ -1,8 +1,12 @@
-use common::test_properties;
+use std::str::FromStr;
+
 use malachite_base::num::traits::{DivisibleByPowerOfTwo, EqModPowerOfTwo, ModPowerOfTwo, Zero};
 use malachite_nz::natural::arithmetic::eq_limb_mod_power_of_two::limbs_eq_limb_mod_power_of_two;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
+use rug;
+
+use common::test_properties;
 use malachite_test::common::natural_to_rug_integer;
 use malachite_test::inputs::base::{
     pairs_of_unsigned_and_small_unsigned, triples_of_unsigned_unsigned_and_small_unsigned,
@@ -15,8 +19,6 @@ use malachite_test::inputs::natural::{
     triples_of_natural_unsigned_and_small_unsigned_var_1,
 };
 use malachite_test::natural::arithmetic::eq_limb_mod_power_of_two::rug_eq_limb_mod_power_of_two;
-use rug;
-use std::str::FromStr;
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]

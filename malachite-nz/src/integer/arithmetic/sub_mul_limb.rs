@@ -1,6 +1,7 @@
+use malachite_base::num::traits::{AddMul, AddMulAssign, SubMul, SubMulAssign};
+
 use integer::arithmetic::add_mul_limb::{large_aorsmul_ref, large_aorsmul_val};
 use integer::Integer;
-use malachite_base::num::traits::{AddMul, AddMulAssign, SubMul, SubMulAssign};
 use natural::Natural::Small;
 use platform::Limb;
 

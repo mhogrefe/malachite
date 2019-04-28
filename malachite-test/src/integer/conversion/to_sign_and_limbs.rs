@@ -1,6 +1,7 @@
+use malachite_base::num::traits::SignificantBits;
+
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::integer::integers;
-use malachite_base::num::traits::SignificantBits;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_integer_to_sign_and_limbs_asc);

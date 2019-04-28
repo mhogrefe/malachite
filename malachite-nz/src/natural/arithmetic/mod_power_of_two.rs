@@ -1,9 +1,10 @@
-use integer::conversion::to_twos_complement_limbs::limbs_twos_complement_in_place;
 use malachite_base::num::integers::PrimitiveInteger;
 use malachite_base::num::traits::{
     Assign, ModPowerOfTwo, ModPowerOfTwoAssign, NegModPowerOfTwo, NegModPowerOfTwoAssign,
     RemPowerOfTwo, RemPowerOfTwoAssign, Zero,
 };
+
+use integer::conversion::to_twos_complement_limbs::limbs_twos_complement_in_place;
 use natural::Natural::{self, Large, Small};
 use platform::Limb;
 

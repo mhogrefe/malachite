@@ -1,3 +1,10 @@
+use malachite_base::num::traits::SignificantBits;
+use malachite_nz::integer::logic::or_limb::{
+    limbs_neg_or_limb, limbs_neg_or_limb_in_place, limbs_neg_or_limb_to_out,
+};
+use malachite_nz::integer::Integer;
+use malachite_nz::platform::Limb;
+
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::{
     pairs_of_limb_vec_and_limb_var_1, triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_3,
@@ -6,12 +13,6 @@ use inputs::integer::{pairs_of_integer_and_unsigned, pairs_of_unsigned_and_integ
 #[cfg(feature = "32_bit_limbs")]
 use inputs::integer::{rm_pairs_of_integer_and_unsigned, rm_pairs_of_unsigned_and_integer};
 use integer::logic::or::{integer_or_alt_1, integer_or_alt_2};
-use malachite_base::num::traits::SignificantBits;
-use malachite_nz::integer::logic::or_limb::{
-    limbs_neg_or_limb, limbs_neg_or_limb_in_place, limbs_neg_or_limb_to_out,
-};
-use malachite_nz::integer::Integer;
-use malachite_nz::platform::Limb;
 
 pub fn integer_or_limb_alt_1(n: &Integer, i: Limb) -> Integer {
     integer_or_alt_1(n, &Integer::from(i))

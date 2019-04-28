@@ -1,7 +1,8 @@
-use integer::Integer;
-use platform::Limb;
 use std::mem::swap;
 use std::ops::{Add, AddAssign};
+
+use integer::Integer;
+use platform::Limb;
 
 /// Adds an `Integer` to an `Integer`, taking both `Integer`s by value.
 ///

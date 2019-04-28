@@ -1,7 +1,9 @@
-use integer::Integer;
-use malachite_base::num::traits::PartialOrdAbs;
-use natural::Natural;
 use std::cmp::Ordering;
+
+use malachite_base::num::traits::PartialOrdAbs;
+
+use integer::Integer;
+use natural::Natural;
 
 /// Compares the absolute value of an `Integer` to the absolute value of a `Natural`.
 ///

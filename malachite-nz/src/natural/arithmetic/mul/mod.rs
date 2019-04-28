@@ -1,4 +1,7 @@
+use std::ops::{Mul, MulAssign};
+
 use malachite_base::num::integers::PrimitiveInteger;
+
 use natural::arithmetic::add::limbs_slice_add_greater_in_place_left;
 use natural::arithmetic::add_mul_limb::limbs_slice_add_mul_limb_greater_in_place_left;
 use natural::arithmetic::mul::fft::{_limbs_mul_greater_to_out_fft, MUL_FFT_THRESHOLD};
@@ -20,7 +23,6 @@ use natural::arithmetic::mul::toom::{
 use natural::arithmetic::mul_limb::limbs_mul_limb_to_out;
 use natural::Natural::{self, Large, Small};
 use platform::Limb;
-use std::ops::{Mul, MulAssign};
 
 // This doesn't use `chunks_exact` because sometimes `xs_last` is longer than `n`.
 macro_rules! split_into_chunks {

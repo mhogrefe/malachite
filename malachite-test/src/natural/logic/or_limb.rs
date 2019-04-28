@@ -1,3 +1,11 @@
+use malachite_base::num::traits::SignificantBits;
+use malachite_nz::natural::logic::or_limb::{
+    limbs_or_limb, limbs_or_limb_in_place, limbs_or_limb_to_out,
+};
+use malachite_nz::natural::Natural;
+use malachite_nz::platform::Limb;
+use num::BigUint;
+
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::{
     pairs_of_nonempty_unsigned_vec_and_unsigned,
@@ -11,14 +19,7 @@ use inputs::natural::{
     rm_pairs_of_unsigned_and_natural,
 };
 use inputs::natural::{pairs_of_natural_and_unsigned, pairs_of_unsigned_and_natural};
-use malachite_base::num::traits::SignificantBits;
-use malachite_nz::natural::logic::or_limb::{
-    limbs_or_limb, limbs_or_limb_in_place, limbs_or_limb_to_out,
-};
-use malachite_nz::natural::Natural;
-use malachite_nz::platform::Limb;
 use natural::logic::or::{natural_or_alt_1, natural_or_alt_2};
-use num::BigUint;
 
 pub fn natural_or_limb_alt_1(n: &Natural, u: Limb) -> Natural {
     natural_or_alt_1(n, &Natural::from(u))

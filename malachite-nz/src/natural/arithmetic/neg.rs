@@ -1,7 +1,8 @@
+use std::ops::Neg;
+
 use integer::Integer;
 use natural::Natural;
 use platform::Limb;
-use std::ops::Neg;
 
 /// Returns the negative of a `Natural`, taking the `Natural` by value and returning an `Integer`.
 ///

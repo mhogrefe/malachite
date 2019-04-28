@@ -1,4 +1,6 @@
-use common::test_properties;
+#[cfg(feature = "32_bit_limbs")]
+use std::str::FromStr;
+
 use malachite_base::num::traits::{DivisibleBy, EqMod, One, Zero};
 use malachite_nz::natural::arithmetic::eq_limb_mod_limb::{
     _combined_limbs_eq_limb_mod_limb, limbs_eq_limb_mod_limb,
@@ -6,6 +8,10 @@ use malachite_nz::natural::arithmetic::eq_limb_mod_limb::{
 use malachite_nz::natural::arithmetic::mod_limb::limbs_mod_limb;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
+#[cfg(feature = "32_bit_limbs")]
+use rug;
+
+use common::test_properties;
 #[cfg(feature = "32_bit_limbs")]
 use malachite_test::common::natural_to_rug_integer;
 use malachite_test::inputs::base::{
@@ -17,10 +23,6 @@ use malachite_test::inputs::natural::{
     triples_of_natural_unsigned_and_unsigned, triples_of_natural_unsigned_and_unsigned_var_1,
     triples_of_unsigned_unsigned_and_natural,
 };
-#[cfg(feature = "32_bit_limbs")]
-use rug;
-#[cfg(feature = "32_bit_limbs")]
-use std::str::FromStr;
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]

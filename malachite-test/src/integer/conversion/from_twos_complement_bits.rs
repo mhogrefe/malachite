@@ -1,6 +1,7 @@
+use malachite_nz::integer::Integer;
+
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::vecs_of_bool;
-use malachite_nz::integer::Integer;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_integer_from_twos_complement_bits_asc);

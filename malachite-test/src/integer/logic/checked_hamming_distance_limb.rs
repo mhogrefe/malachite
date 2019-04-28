@@ -1,10 +1,12 @@
-use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::integer::{pairs_of_integer_and_unsigned, pairs_of_unsigned_and_integer};
+use std::iter::repeat;
+
 use malachite_base::num::traits::{CheckedHammingDistance, HammingDistance, SignificantBits};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-use std::iter::repeat;
+
+use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
+use inputs::integer::{pairs_of_integer_and_unsigned, pairs_of_unsigned_and_integer};
 
 pub fn integer_checked_hamming_distance_limb_alt_1(n: &Integer, u: Limb) -> Option<u64> {
     if *n < 0 as Limb {

@@ -1,5 +1,6 @@
-use integer::Integer;
 use malachite_base::conversion::{CheckedFrom, WrappingFrom};
+
+use integer::Integer;
 use platform::Limb;
 
 impl CheckedFrom<Integer> for Limb {

@@ -1,4 +1,5 @@
-use common::{test_properties, test_properties_no_special};
+use std::str::FromStr;
+
 use malachite_base::comparison::Max;
 use malachite_base::num::signeds::PrimitiveSigned;
 use malachite_base::num::traits::{IsPowerOfTwo, One, Zero};
@@ -8,6 +9,10 @@ use malachite_nz::natural::arithmetic::shl_u::{
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
+use num::BigUint;
+use rug;
+
+use common::{test_properties, test_properties_no_special};
 use malachite_test::common::{
     biguint_to_natural, natural_to_biguint, natural_to_rug_integer, rug_integer_to_natural,
 };
@@ -19,9 +24,6 @@ use malachite_test::inputs::natural::{
     naturals, pairs_of_natural_and_small_unsigned,
     triples_of_natural_small_unsigned_and_small_unsigned,
 };
-use num::BigUint;
-use rug;
-use std::str::FromStr;
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]

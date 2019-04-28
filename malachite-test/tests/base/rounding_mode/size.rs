@@ -1,5 +1,6 @@
-use malachite_base::round::RoundingMode;
 use std::mem::size_of;
+
+use malachite_base::round::RoundingMode;
 
 #[test]
 fn test_size() {

@@ -1,3 +1,12 @@
+use std::cmp::max;
+
+use malachite_base::num::traits::SignificantBits;
+use malachite_nz::integer::logic::xor_natural::{
+    limbs_xor_pos_neg, limbs_xor_pos_neg_in_place_either, limbs_xor_pos_neg_in_place_left,
+    limbs_xor_pos_neg_in_place_right, limbs_xor_pos_neg_to_out,
+};
+use malachite_nz::integer::Integer;
+
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::{pairs_of_limb_vec_var_1, triples_of_limb_vec_var_7};
 use inputs::integer::{
@@ -5,13 +14,6 @@ use inputs::integer::{
     rm_pairs_of_natural_and_integer,
 };
 use integer::logic::{integer_op_bits, integer_op_limbs};
-use malachite_base::num::traits::SignificantBits;
-use malachite_nz::integer::logic::xor_natural::{
-    limbs_xor_pos_neg, limbs_xor_pos_neg_in_place_either, limbs_xor_pos_neg_in_place_left,
-    limbs_xor_pos_neg_in_place_right, limbs_xor_pos_neg_to_out,
-};
-use malachite_nz::integer::Integer;
-use std::cmp::max;
 
 pub fn integer_xor_alt_1(x: &Integer, y: &Integer) -> Integer {
     integer_op_bits(&|a, b| a ^ b, x, y)

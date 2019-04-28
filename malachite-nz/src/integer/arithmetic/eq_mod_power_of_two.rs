@@ -1,5 +1,6 @@
-use integer::Integer;
 use malachite_base::num::traits::EqModPowerOfTwo;
+
+use integer::Integer;
 
 impl<'a, 'b> EqModPowerOfTwo<&'b Integer> for &'a Integer {
     /// Returns whether two `Integer`s are equivalent mod two to the power of `pow`; that is,

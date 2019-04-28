@@ -1,5 +1,6 @@
-use integer::Integer;
 use std::cmp::Ordering;
+
+use integer::Integer;
 
 /// Compares an `Integer` to another `Integer`.
 ///

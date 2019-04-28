@@ -1,3 +1,6 @@
+use std::cmp::Ordering;
+use std::num::ParseIntError;
+
 use comparison::{Max, Min};
 use conversion::WrappingFrom;
 use crement::Crementable;
@@ -23,8 +26,6 @@ use num::traits::{
     WrappingShr, WrappingSub, WrappingSubAssign, Zero,
 };
 use round::RoundingMode;
-use std::cmp::Ordering;
-use std::num::ParseIntError;
 
 //TODO docs
 pub trait PrimitiveUnsigned:
@@ -35,7 +36,6 @@ pub trait PrimitiveUnsigned:
     + FloorLogTwo
     + From<u8>
     + FromU32Slice
-    + Into<u128>
     + IsPowerOfTwo
     + ModPowerOfTwo<Output = Self>
     + ModPowerOfTwoAssign
@@ -601,11 +601,35 @@ impl PrimitiveUnsigned for u128 {
     }
 }
 
+impl PrimitiveUnsigned for usize {
+    type SignedOfEqualWidth = isize;
+
+    #[inline]
+    fn to_signed_bitwise(self) -> isize {
+        self as isize
+    }
+
+    #[inline]
+    fn to_signed_checked(self) -> Option<isize> {
+        if self <= isize::MAX as usize {
+            Some(self as isize)
+        } else {
+            None
+        }
+    }
+
+    #[inline]
+    fn from_signed_bitwise(i: isize) -> usize {
+        i as usize
+    }
+}
+
 unsigned_traits!(u8, 3);
 unsigned_traits!(u16, 4);
 unsigned_traits!(u32, 5);
 unsigned_traits!(u64, 6);
 unsigned_traits!(u128, 7);
+unsigned_traits!(usize, 0usize.trailing_zeros().trailing_zeros());
 
 /// Implements the constants 0, 1, and 2 for unsigned primitive integers.
 macro_rules! impl01_unsigned {
@@ -851,26 +875,37 @@ round_shift_unsigned_unsigned!(u8, u16);
 round_shift_unsigned_unsigned!(u8, u32);
 round_shift_unsigned_unsigned!(u8, u64);
 round_shift_unsigned_unsigned!(u8, u128);
+round_shift_unsigned_unsigned!(u8, usize);
 round_shift_unsigned_unsigned!(u16, u8);
 round_shift_unsigned_unsigned!(u16, u16);
 round_shift_unsigned_unsigned!(u16, u32);
 round_shift_unsigned_unsigned!(u16, u64);
 round_shift_unsigned_unsigned!(u16, u128);
+round_shift_unsigned_unsigned!(u16, usize);
 round_shift_unsigned_unsigned!(u32, u8);
 round_shift_unsigned_unsigned!(u32, u16);
 round_shift_unsigned_unsigned!(u32, u32);
 round_shift_unsigned_unsigned!(u32, u64);
 round_shift_unsigned_unsigned!(u32, u128);
+round_shift_unsigned_unsigned!(u32, usize);
 round_shift_unsigned_unsigned!(u64, u8);
 round_shift_unsigned_unsigned!(u64, u16);
 round_shift_unsigned_unsigned!(u64, u32);
 round_shift_unsigned_unsigned!(u64, u64);
 round_shift_unsigned_unsigned!(u64, u128);
+round_shift_unsigned_unsigned!(u64, usize);
 round_shift_unsigned_unsigned!(u128, u8);
 round_shift_unsigned_unsigned!(u128, u16);
 round_shift_unsigned_unsigned!(u128, u32);
 round_shift_unsigned_unsigned!(u128, u64);
 round_shift_unsigned_unsigned!(u128, u128);
+round_shift_unsigned_unsigned!(u128, usize);
+round_shift_unsigned_unsigned!(usize, u8);
+round_shift_unsigned_unsigned!(usize, u16);
+round_shift_unsigned_unsigned!(usize, u32);
+round_shift_unsigned_unsigned!(usize, u64);
+round_shift_unsigned_unsigned!(usize, u128);
+round_shift_unsigned_unsigned!(usize, usize);
 
 //TODO doc and test
 impl FromU32Slice for u32 {
@@ -975,5 +1010,17 @@ impl FromU32Slice for u128 {
             );
             i += 4;
         }
+    }
+}
+
+//TODO doc and test
+impl FromU32Slice for usize {
+    #[inline]
+    fn from_u32_slice(_slice: &[u32]) -> Self {
+        unimplemented!()
+    }
+
+    fn copy_from_u32_slice(_out_slice: &mut [usize], _in_slice: &[u32]) {
+        unimplemented!()
     }
 }

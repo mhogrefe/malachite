@@ -1,13 +1,15 @@
-use common::test_properties;
+use std::cmp::Ordering;
+use std::str::FromStr;
+
 use malachite_base::comparison::Max;
 use malachite_base::conversion::{CheckedFrom, WrappingFrom};
 use malachite_base::num::integers::PrimitiveInteger;
 use malachite_base::num::traits::{ModPowerOfTwo, Sign, SignificantBits};
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::{DoubleLimb, Limb};
+
+use common::test_properties;
 use malachite_test::inputs::integer::integers;
-use std::cmp::Ordering;
-use std::str::FromStr;
 
 #[test]
 fn test_double_limb_checked_from_integer() {

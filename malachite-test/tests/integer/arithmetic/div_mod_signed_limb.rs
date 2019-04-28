@@ -1,4 +1,5 @@
-use common::test_properties;
+use std::str::FromStr;
+
 use malachite_base::num::traits::{
     CeilingDivAssignMod, CeilingDivMod, CeilingMod, DivAssignMod, DivAssignRem, DivMod, DivRem,
     DivRound, Mod, NegativeOne, One, PartialOrdAbs, UnsignedAbs, Zero,
@@ -6,6 +7,10 @@ use malachite_base::num::traits::{
 use malachite_base::round::RoundingMode;
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::{Limb, SignedLimb};
+use num::BigInt;
+use rug;
+
+use common::test_properties;
 use malachite_test::common::{
     bigint_to_integer, integer_to_bigint, integer_to_rug_integer, rug_integer_to_integer,
 };
@@ -18,9 +23,6 @@ use malachite_test::integer::arithmetic::div_mod_signed_limb::{
     num_div_mod_signed_limb, num_div_rem_signed_limb, rug_ceiling_div_mod_signed_limb,
     rug_div_mod_signed_limb, rug_div_rem_signed_limb,
 };
-use num::BigInt;
-use rug;
-use std::str::FromStr;
 
 #[test]
 fn test_div_mod_signed_limb() {

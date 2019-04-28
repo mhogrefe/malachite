@@ -1,10 +1,11 @@
-use common::test_properties;
 use malachite_base::conversion::{CheckedFrom, RoundingFrom};
 use malachite_base::num::floats::PrimitiveFloat;
 use malachite_base::num::traits::Parity;
 use malachite_base::round::RoundingMode;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
+
+use common::test_properties;
 use malachite_test::inputs::base::{
     f32s_var_1, f64s_var_1, pairs_of_finite_f32_and_rounding_mode_var_1,
     pairs_of_finite_f64_and_rounding_mode_var_1,

@@ -1,7 +1,10 @@
+use std::cmp::min;
+
 use malachite_base::comparison::Max;
 use malachite_base::limbs::limbs_test_zero;
 use malachite_base::num::integers::PrimitiveInteger;
 use malachite_base::num::traits::Parity;
+
 use natural::arithmetic::add::{
     limbs_add_same_length_to_out, limbs_add_to_out, limbs_slice_add_same_length_in_place_left,
 };
@@ -16,7 +19,6 @@ use natural::arithmetic::sub::{
 };
 use natural::arithmetic::sub_limb::limbs_sub_limb_in_place;
 use platform::Limb;
-use std::cmp::min;
 
 //TODO tune
 pub(crate) const MULMOD_BNM1_THRESHOLD: usize = 13;

@@ -1,7 +1,8 @@
-use integer::Integer;
 use malachite_base::comparison::Max;
 use malachite_base::num::integers::PrimitiveInteger;
 use malachite_base::num::traits::EqModPowerOfTwo;
+
+use integer::Integer;
 use natural::Natural::{self, Large, Small};
 use platform::Limb;
 

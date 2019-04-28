@@ -1,7 +1,9 @@
-use integer::Integer;
-use malachite_base::num::traits::Sign;
-use platform::Limb;
 use std::cmp::Ordering;
+
+use malachite_base::num::traits::Sign;
+
+use integer::Integer;
+use platform::Limb;
 
 impl Integer {
     /// Returns the sign and limbs of a `Natural`. The sign is

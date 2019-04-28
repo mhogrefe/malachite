@@ -1,12 +1,13 @@
+use malachite_base::conversion::CheckedFrom;
+use malachite_base::num::traits::SignificantBits;
+use malachite_nz::integer::Integer;
+use malachite_nz::platform::Limb;
+
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::integer::{pairs_of_integer_and_unsigned, pairs_of_unsigned_and_integer};
 #[cfg(feature = "32_bit_limbs")]
 use inputs::integer::{rm_pairs_of_integer_and_unsigned, rm_pairs_of_unsigned_and_integer};
 use integer::logic::and::{integer_and_alt_1, integer_and_alt_2};
-use malachite_base::conversion::CheckedFrom;
-use malachite_base::num::traits::SignificantBits;
-use malachite_nz::integer::Integer;
-use malachite_nz::platform::Limb;
 
 pub fn integer_and_limb_alt_1(n: &Integer, u: Limb) -> Limb {
     Limb::checked_from(integer_and_alt_1(n, &Integer::from(u))).unwrap()

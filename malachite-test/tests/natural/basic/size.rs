@@ -1,5 +1,6 @@
-use malachite_nz::natural::Natural;
 use std::mem::size_of;
+
+use malachite_nz::natural::Natural;
 
 #[test]
 fn test_size() {

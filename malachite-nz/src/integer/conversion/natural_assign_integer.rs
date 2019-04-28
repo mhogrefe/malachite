@@ -1,7 +1,9 @@
-use integer::Integer;
-use malachite_base::num::traits::{Assign, Sign};
-use natural::Natural;
 use std::cmp::Ordering;
+
+use malachite_base::num::traits::{Assign, Sign};
+
+use integer::Integer;
+use natural::Natural;
 
 /// Assigns an `Integer` to a `Natural`, taking the `Integer` by value.
 ///

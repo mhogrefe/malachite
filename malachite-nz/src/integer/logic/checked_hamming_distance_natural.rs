@@ -1,5 +1,6 @@
-use integer::Integer;
 use malachite_base::num::traits::{CheckedHammingDistance, HammingDistance};
+
+use integer::Integer;
 use natural::Natural;
 
 impl<'a, 'b> CheckedHammingDistance<&'a Natural> for &'b Integer {

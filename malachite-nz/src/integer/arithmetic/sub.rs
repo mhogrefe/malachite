@@ -1,8 +1,10 @@
-use integer::Integer;
-use malachite_base::num::traits::{NegAssign, NotAssign, Zero};
-use platform::Limb;
 use std::mem::swap;
 use std::ops::{Sub, SubAssign};
+
+use malachite_base::num::traits::{NegAssign, NotAssign, Zero};
+
+use integer::Integer;
+use platform::Limb;
 
 /// Subtracts an `Integer` from an `Integer`, taking both `Integer`s by value.
 ///

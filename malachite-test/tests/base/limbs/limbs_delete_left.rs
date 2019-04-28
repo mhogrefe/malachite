@@ -1,5 +1,6 @@
-use common::test_properties;
 use malachite_base::limbs::limbs_delete_left;
+
+use common::test_properties;
 use malachite_test::inputs::base::{pairs_of_unsigned_vec_and_small_usize_var_1, vecs_of_unsigned};
 
 #[test]

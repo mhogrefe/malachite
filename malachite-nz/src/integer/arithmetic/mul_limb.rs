@@ -1,7 +1,9 @@
-use integer::Integer;
-use malachite_base::num::traits::{Assign, Zero};
-use platform::Limb;
 use std::ops::{Mul, MulAssign};
+
+use malachite_base::num::traits::{Assign, Zero};
+
+use integer::Integer;
+use platform::Limb;
 
 impl Mul<Limb> for Integer {
     type Output = Integer;

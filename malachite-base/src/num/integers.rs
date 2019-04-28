@@ -1,3 +1,12 @@
+use std::fmt::{Binary, Debug, Display, LowerHex, Octal, UpperHex};
+use std::hash::Hash;
+use std::iter::{Product, Sum};
+use std::ops::{
+    Add, AddAssign, BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign, Div, DivAssign,
+    Mul, MulAssign, Not, Rem, RemAssign, Shl, ShlAssign, Shr, ShrAssign, Sub, SubAssign,
+};
+use std::str::FromStr;
+
 use comparison::{Max, Min};
 use conversion::{CheckedFrom, CheckedInto, WrappingFrom, WrappingInto};
 use crement::Crementable;
@@ -19,14 +28,6 @@ use num::traits::{
 };
 use num::unsigneds::PrimitiveUnsigned;
 use round::RoundingMode;
-use std::fmt::{Binary, Debug, Display, LowerHex, Octal, UpperHex};
-use std::hash::Hash;
-use std::iter::{Product, Sum};
-use std::ops::{
-    Add, AddAssign, BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign, Div, DivAssign,
-    Mul, MulAssign, Not, Rem, RemAssign, Shl, ShlAssign, Shr, ShrAssign, Sub, SubAssign,
-};
-use std::str::FromStr;
 
 //TODO docs
 pub trait PrimitiveInteger:
@@ -953,51 +954,73 @@ round_shift_primitive_signed!(u8, i16);
 round_shift_primitive_signed!(u8, i32);
 round_shift_primitive_signed!(u8, i64);
 round_shift_primitive_signed!(u8, i128);
+round_shift_primitive_signed!(u8, isize);
 round_shift_primitive_signed!(u16, i8);
 round_shift_primitive_signed!(u16, i16);
 round_shift_primitive_signed!(u16, i32);
 round_shift_primitive_signed!(u16, i64);
 round_shift_primitive_signed!(u16, i128);
+round_shift_primitive_signed!(u16, isize);
 round_shift_primitive_signed!(u32, i8);
 round_shift_primitive_signed!(u32, i16);
 round_shift_primitive_signed!(u32, i32);
 round_shift_primitive_signed!(u32, i64);
 round_shift_primitive_signed!(u32, i128);
+round_shift_primitive_signed!(u32, isize);
 round_shift_primitive_signed!(u64, i8);
 round_shift_primitive_signed!(u64, i16);
 round_shift_primitive_signed!(u64, i32);
 round_shift_primitive_signed!(u64, i64);
 round_shift_primitive_signed!(u64, i128);
+round_shift_primitive_signed!(u64, isize);
 round_shift_primitive_signed!(u128, i8);
 round_shift_primitive_signed!(u128, i16);
 round_shift_primitive_signed!(u128, i32);
 round_shift_primitive_signed!(u128, i64);
 round_shift_primitive_signed!(u128, i128);
+round_shift_primitive_signed!(u128, isize);
+round_shift_primitive_signed!(usize, i8);
+round_shift_primitive_signed!(usize, i16);
+round_shift_primitive_signed!(usize, i32);
+round_shift_primitive_signed!(usize, i64);
+round_shift_primitive_signed!(usize, i128);
+round_shift_primitive_signed!(usize, isize);
 round_shift_primitive_signed!(i8, i8);
 round_shift_primitive_signed!(i8, i16);
 round_shift_primitive_signed!(i8, i32);
 round_shift_primitive_signed!(i8, i64);
 round_shift_primitive_signed!(i8, i128);
+round_shift_primitive_signed!(i8, isize);
 round_shift_primitive_signed!(i16, i8);
 round_shift_primitive_signed!(i16, i16);
 round_shift_primitive_signed!(i16, i32);
 round_shift_primitive_signed!(i16, i64);
 round_shift_primitive_signed!(i16, i128);
+round_shift_primitive_signed!(i16, isize);
 round_shift_primitive_signed!(i32, i8);
 round_shift_primitive_signed!(i32, i16);
 round_shift_primitive_signed!(i32, i32);
 round_shift_primitive_signed!(i32, i64);
 round_shift_primitive_signed!(i32, i128);
+round_shift_primitive_signed!(i32, isize);
 round_shift_primitive_signed!(i64, i8);
 round_shift_primitive_signed!(i64, i16);
 round_shift_primitive_signed!(i64, i32);
 round_shift_primitive_signed!(i64, i64);
 round_shift_primitive_signed!(i64, i128);
+round_shift_primitive_signed!(i64, isize);
 round_shift_primitive_signed!(i128, i8);
 round_shift_primitive_signed!(i128, i16);
 round_shift_primitive_signed!(i128, i32);
 round_shift_primitive_signed!(i128, i64);
 round_shift_primitive_signed!(i128, i128);
+round_shift_primitive_signed!(i128, isize);
+round_shift_primitive_signed!(isize, i8);
+round_shift_primitive_signed!(isize, i16);
+round_shift_primitive_signed!(isize, i32);
+round_shift_primitive_signed!(isize, i64);
+round_shift_primitive_signed!(isize, i128);
+round_shift_primitive_signed!(isize, isize);
 
 macro_rules! round_shift_signed_unsigned {
     ($t:ident, $u:ident) => {
@@ -1034,23 +1057,34 @@ round_shift_signed_unsigned!(i8, u16);
 round_shift_signed_unsigned!(i8, u32);
 round_shift_signed_unsigned!(i8, u64);
 round_shift_signed_unsigned!(i8, u128);
+round_shift_signed_unsigned!(i8, usize);
 round_shift_signed_unsigned!(i16, u8);
 round_shift_signed_unsigned!(i16, u16);
 round_shift_signed_unsigned!(i16, u32);
 round_shift_signed_unsigned!(i16, u64);
 round_shift_signed_unsigned!(i16, u128);
+round_shift_signed_unsigned!(i16, usize);
 round_shift_signed_unsigned!(i32, u8);
 round_shift_signed_unsigned!(i32, u16);
 round_shift_signed_unsigned!(i32, u32);
 round_shift_signed_unsigned!(i32, u64);
 round_shift_signed_unsigned!(i32, u128);
+round_shift_signed_unsigned!(i32, usize);
 round_shift_signed_unsigned!(i64, u8);
 round_shift_signed_unsigned!(i64, u16);
 round_shift_signed_unsigned!(i64, u32);
 round_shift_signed_unsigned!(i64, u64);
 round_shift_signed_unsigned!(i64, u128);
+round_shift_signed_unsigned!(i64, usize);
 round_shift_signed_unsigned!(i128, u8);
 round_shift_signed_unsigned!(i128, u16);
 round_shift_signed_unsigned!(i128, u32);
 round_shift_signed_unsigned!(i128, u64);
 round_shift_signed_unsigned!(i128, u128);
+round_shift_signed_unsigned!(i128, usize);
+round_shift_signed_unsigned!(isize, u8);
+round_shift_signed_unsigned!(isize, u16);
+round_shift_signed_unsigned!(isize, u32);
+round_shift_signed_unsigned!(isize, u64);
+round_shift_signed_unsigned!(isize, u128);
+round_shift_signed_unsigned!(isize, usize);

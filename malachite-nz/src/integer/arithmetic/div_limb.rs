@@ -1,7 +1,8 @@
+use std::ops::{Div, DivAssign};
+
 use integer::Integer;
 use natural::Natural;
 use platform::Limb;
-use std::ops::{Div, DivAssign};
 
 impl Div<Limb> for Integer {
     type Output = Integer;

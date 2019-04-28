@@ -1,3 +1,6 @@
+use malachite_base::num::traits::{DivRem, SignificantBits};
+use malachite_nz::platform::Limb;
+
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 #[cfg(feature = "64_bit_limbs")]
 use inputs::integer::nm_pairs_of_integer_and_positive_unsigned;
@@ -6,8 +9,6 @@ use inputs::integer::nrm_pairs_of_integer_and_positive_unsigned;
 use inputs::integer::{
     pairs_of_integer_and_positive_unsigned, pairs_of_unsigned_and_nonzero_integer,
 };
-use malachite_base::num::traits::{DivRem, SignificantBits};
-use malachite_nz::platform::Limb;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_integer_div_assign_limb);

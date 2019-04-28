@@ -1,10 +1,12 @@
-use integer::Integer;
+use std::ops::{Rem, RemAssign};
+
 use malachite_base::num::traits::{
     CeilingMod, CeilingModAssign, Mod, ModAssign, NegMod, NegModAssign, UnsignedAbs,
 };
+
+use integer::Integer;
 use natural::Natural;
 use platform::{Limb, SignedLimb};
-use std::ops::{Rem, RemAssign};
 
 impl Mod<SignedLimb> for Integer {
     type Output = Integer;

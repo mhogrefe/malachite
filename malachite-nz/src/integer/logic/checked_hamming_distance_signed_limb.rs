@@ -1,6 +1,7 @@
+use malachite_base::num::traits::{CheckedHammingDistance, HammingDistance, UnsignedAbs};
+
 use integer::logic::checked_count_zeros::limbs_count_zeros_neg;
 use integer::Integer;
-use malachite_base::num::traits::{CheckedHammingDistance, HammingDistance, UnsignedAbs};
 use natural::Natural::{self, Large, Small};
 use platform::{Limb, SignedLimb};
 

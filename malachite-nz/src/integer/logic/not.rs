@@ -1,7 +1,9 @@
-use integer::Integer;
-use malachite_base::num::traits::NotAssign;
-use platform::Limb;
 use std::ops::Not;
+
+use malachite_base::num::traits::NotAssign;
+
+use integer::Integer;
+use platform::Limb;
 
 /// Returns the bitwise complement of an `Integer`, as if it were represented in two's complement,
 /// taking the `Integer` by value.

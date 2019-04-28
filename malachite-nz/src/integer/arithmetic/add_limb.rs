@@ -1,8 +1,10 @@
-use integer::Integer;
+use std::ops::{Add, AddAssign};
+
 use malachite_base::conversion::CheckedFrom;
 use malachite_base::num::traits::Assign;
+
+use integer::Integer;
 use platform::Limb;
-use std::ops::{Add, AddAssign};
 
 /// Adds a `Limb` to an `Integer`, taking the `Integer` by value.
 ///

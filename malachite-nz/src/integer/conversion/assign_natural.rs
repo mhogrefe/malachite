@@ -1,5 +1,6 @@
-use integer::Integer;
 use malachite_base::num::traits::Assign;
+
+use integer::Integer;
 use natural::Natural;
 
 /// Assigns a `Natural` to an `Integer`, taking the `Natural` by value.

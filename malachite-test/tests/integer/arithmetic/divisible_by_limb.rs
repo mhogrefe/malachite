@@ -1,8 +1,14 @@
-use common::test_properties;
+use std::str::FromStr;
+
 use malachite_base::num::traits::{DivisibleBy, One, Zero};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
+use num::BigInt;
+#[cfg(feature = "32_bit_limbs")]
+use rug;
+
+use common::test_properties;
 use malachite_test::common::integer_to_bigint;
 #[cfg(feature = "32_bit_limbs")]
 use malachite_test::common::integer_to_rug_integer;
@@ -14,10 +20,6 @@ use malachite_test::inputs::integer::{
 };
 use malachite_test::inputs::natural::pairs_of_natural_and_unsigned;
 use malachite_test::integer::arithmetic::divisible_by_limb::num_divisible_by_limb;
-use num::BigInt;
-#[cfg(feature = "32_bit_limbs")]
-use rug;
-use std::str::FromStr;
 
 #[test]
 fn test_divisible_by_limb() {

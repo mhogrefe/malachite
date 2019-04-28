@@ -1,9 +1,11 @@
+use std::cmp::max;
+
+use malachite_base::num::traits::{BitAccess, SignificantBits};
+use malachite_nz::integer::logic::bit_access::limbs_set_bit_neg;
+
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::pairs_of_unsigned_vec_and_small_unsigned_var_1;
 use inputs::integer::pairs_of_integer_and_small_u64;
-use malachite_base::num::traits::{BitAccess, SignificantBits};
-use malachite_nz::integer::logic::bit_access::limbs_set_bit_neg;
-use std::cmp::max;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limbs_set_bit_neg);

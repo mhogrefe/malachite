@@ -1,8 +1,14 @@
-use common::test_properties;
+use std::str::FromStr;
+
 use malachite_base::num::traits::{DivRem, NegativeOne, One, PartialOrdAbs, Zero};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::{Limb, SignedLimb};
+use num::BigInt;
+#[cfg(feature = "32_bit_limbs")]
+use rug;
+
+use common::test_properties;
 use malachite_test::common::{bigint_to_integer, integer_to_bigint};
 #[cfg(feature = "32_bit_limbs")]
 use malachite_test::common::{integer_to_rug_integer, rug_integer_to_integer};
@@ -12,10 +18,6 @@ use malachite_test::inputs::integer::{
     pairs_of_unsigned_and_nonzero_integer,
 };
 use malachite_test::inputs::natural::pairs_of_natural_and_positive_unsigned;
-use num::BigInt;
-#[cfg(feature = "32_bit_limbs")]
-use rug;
-use std::str::FromStr;
 
 #[test]
 fn test_div_limb() {

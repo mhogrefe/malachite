@@ -1,5 +1,6 @@
 use malachite_base::conversion::{CheckedFrom, WrappingFrom};
 use malachite_base::num::traits::JoinHalves;
+
 use natural::Natural::{self, Large, Small};
 use platform::DoubleLimb;
 

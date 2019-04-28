@@ -1,7 +1,10 @@
+use std::cmp::{max, Ordering};
+
 use malachite_base::limbs::limbs_set_zero;
 use malachite_base::num::integers::PrimitiveInteger;
 use malachite_base::num::traits::{One, Parity, ShrRound, WrappingAddAssign, WrappingSubAssign};
 use malachite_base::round::RoundingMode;
+
 use natural::arithmetic::add::limbs_add_to_out;
 use natural::arithmetic::add::limbs_slice_add_same_length_in_place_left;
 use natural::arithmetic::add_limb::limbs_slice_add_limb_in_place;
@@ -14,16 +17,14 @@ use natural::arithmetic::mul::mul_mod::{
 use natural::arithmetic::shl_u::limbs_shl_to_out;
 use natural::arithmetic::shl_u::limbs_shl_with_complement;
 use natural::arithmetic::square::SQR_TOOM3_THRESHOLD;
-use natural::arithmetic::sub::limbs_sub_same_length_in_place_right;
 use natural::arithmetic::sub::{
-    limbs_sub_in_place_left, limbs_sub_same_length_in_place_left, limbs_sub_same_length_to_out,
-    limbs_sub_to_out,
+    limbs_sub_in_place_left, limbs_sub_same_length_in_place_left,
+    limbs_sub_same_length_in_place_right, limbs_sub_same_length_to_out, limbs_sub_to_out,
 };
 use natural::arithmetic::sub_limb::limbs_sub_limb_in_place;
 use natural::comparison::ord::limbs_cmp_same_length;
 use natural::logic::not::limbs_not_to_out;
 use platform::Limb;
-use std::cmp::{max, Ordering};
 
 //TODO tune
 pub(crate) const MUL_FFT_THRESHOLD: usize = 4_736;

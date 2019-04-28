@@ -1,6 +1,5 @@
-use common::{natural_to_biguint, natural_to_rug_integer, GenerationMode};
-use inputs::base::{finite_f32s, finite_f64s, pairs_of_unsigneds, It};
-use inputs::common::{reshape_1_2_to_3, reshape_2_1_to_3};
+use std::ops::{Add, Mul, Shl, Shr};
+
 use malachite_base::conversion::{CheckedFrom, CheckedInto, RoundingFrom};
 use malachite_base::crement::Crementable;
 use malachite_base::num::floats::PrimitiveFloat;
@@ -37,7 +36,10 @@ use rust_wheels::iterators::tuples::{
     random_quadruples, random_triples, random_triples_from_single,
 };
 use rust_wheels::iterators::vecs::exhaustive_fixed_size_vecs_from_single;
-use std::ops::{Add, Mul, Shl, Shr};
+
+use common::{natural_to_biguint, natural_to_rug_integer, GenerationMode};
+use inputs::base::{finite_f32s, finite_f64s, pairs_of_unsigneds, It};
+use inputs::common::{reshape_1_2_to_3, reshape_2_1_to_3};
 
 pub fn naturals(gm: GenerationMode) -> It<Natural> {
     match gm {

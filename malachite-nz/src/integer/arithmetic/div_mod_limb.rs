@@ -1,10 +1,11 @@
-use integer::Integer;
 #[cfg(feature = "64_bit_limbs")]
 use malachite_base::conversion::CheckedFrom;
 use malachite_base::num::traits::{
     CeilingDivAssignMod, CeilingDivAssignNegMod, CeilingDivMod, CeilingDivNegMod, DivAssignMod,
     DivAssignRem, DivMod, DivRem,
 };
+
+use integer::Integer;
 use natural::Natural;
 use platform::Limb;
 

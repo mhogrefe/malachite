@@ -1,4 +1,5 @@
 use malachite_base::num::traits::Assign;
+
 use natural::Natural;
 
 /// Assigns a `Natural` to another `Natural`, taking the `Natural` on the RHS by value.

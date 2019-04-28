@@ -1,9 +1,11 @@
-use common::test_properties;
-use malachite_base::num::traits::{JoinHalves, SplitInHalf, Zero};
-use malachite_base::num::unsigneds::PrimitiveUnsigned;
-use malachite_test::inputs::base::{pairs_of_unsigneds, unsigneds};
-use rand::Rand;
 use std::{u16, u8};
+
+use malachite_base::num::integers::PrimitiveInteger;
+use malachite_base::num::traits::{JoinHalves, SplitInHalf};
+use malachite_base::num::unsigneds::PrimitiveUnsigned;
+
+use common::test_properties;
+use malachite_test::inputs::base::{pairs_of_unsigneds, unsigneds};
 
 fn join_halves_helper<T: JoinHalves + PrimitiveUnsigned>(upper: T::Half, lower: T::Half, out: T) {
     assert_eq!(T::join_halves(upper, lower), out);
@@ -20,25 +22,24 @@ pub fn test_join_halves() {
     join_halves_helper(0xabcd, 0x1234, 0xabcd_1234u32);
 }
 
-fn join_halves_properties_helper<T: JoinHalves + PrimitiveUnsigned + SplitInHalf>()
-where
-    T::Half: PrimitiveUnsigned + Rand,
-{
-    test_properties(pairs_of_unsigneds, |&(x, y): &(T::Half, T::Half)| {
-        let joined = T::join_halves(x, y);
-        assert_eq!(x.into() * (1 << (T::WIDTH >> 1)) + y.into(), joined.into());
-        assert_eq!(joined.upper_half(), x);
-        assert_eq!(joined.lower_half(), y);
-    });
+macro_rules! join_halves_properties_helper {
+    ($t: ident, $ht: ident) => {
+        test_properties(pairs_of_unsigneds, |&(x, y): &($ht, $ht)| {
+            let joined = $t::join_halves(x, y);
+            assert_eq!(($t::from(x) << ($t::WIDTH >> 1)) + $t::from(y), joined);
+            assert_eq!(joined.upper_half(), x);
+            assert_eq!(joined.lower_half(), y);
+        });
 
-    test_properties(unsigneds, |&x: &T::Half| {
-        assert_eq!(T::join_halves(T::Half::ZERO, x).into(), x.into());
-    });
+        test_properties(unsigneds, |&x: &$ht| {
+            assert_eq!($t::join_halves(0, x), $t::from(x));
+        });
+    };
 }
 
 #[test]
 fn join_halves_properties() {
-    join_halves_properties_helper::<u16>();
-    join_halves_properties_helper::<u32>();
-    join_halves_properties_helper::<u64>();
+    join_halves_properties_helper!(u16, u8);
+    join_halves_properties_helper!(u32, u16);
+    join_halves_properties_helper!(u64, u32);
 }

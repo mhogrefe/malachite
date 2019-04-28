@@ -1,6 +1,8 @@
-use malachite_base::num::integers::PrimitiveInteger;
-use platform::Limb;
 use std::cmp::max;
+
+use malachite_base::num::integers::PrimitiveInteger;
+
+use platform::Limb;
 
 // This is mpn_toom4_sqr_itch from gmp-impl.h.
 fn _limbs_square_to_out_toom_4_scratch_size(xs_len: usize) -> usize {

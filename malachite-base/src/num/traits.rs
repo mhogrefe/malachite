@@ -1,6 +1,7 @@
-use round::RoundingMode;
 use std::cmp::Ordering;
 use std::num::ParseIntError;
+
+use round::RoundingMode;
 
 /// Converts a string slice in a given base to a value.
 ///

@@ -1,5 +1,6 @@
-use integer::Integer;
 use malachite_base::num::traits::{EqModPowerOfTwo, UnsignedAbs};
+
+use integer::Integer;
 use platform::SignedLimb;
 
 impl<'a> EqModPowerOfTwo<SignedLimb> for &'a Integer {

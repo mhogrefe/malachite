@@ -1,9 +1,11 @@
+use std::cmp::Ordering;
+
 use malachite_base::num::integers::PrimitiveInteger;
 use malachite_base::num::traits::EqModPowerOfTwo;
+
 use natural::arithmetic::divisible_by_power_of_two::limbs_divisible_by_power_of_two;
 use natural::Natural::{self, Large, Small};
 use platform::Limb;
-use std::cmp::Ordering;
 
 // xs.len() == ys.len()
 fn limbs_eq_mod_power_of_two_same_length(xs: &[Limb], ys: &[Limb], pow: u64) -> bool {

@@ -1,5 +1,6 @@
-use integer::Integer;
 use malachite_base::num::traits::{EqMod, NegMod};
+
+use integer::Integer;
 use natural::arithmetic::eq_limb_mod_limb::limbs_eq_limb_mod_limb;
 use natural::Natural::{self, Large, Small};
 use platform::Limb;

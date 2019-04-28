@@ -1,8 +1,10 @@
+use std::ops::{Shr, ShrAssign};
+
 use malachite_base::num::signeds::PrimitiveSigned;
 use malachite_base::num::traits::{ShrRound, ShrRoundAssign, UnsignedAbs};
 use malachite_base::round::RoundingMode;
+
 use natural::Natural;
-use std::ops::{Shr, ShrAssign};
 
 macro_rules! impl_natural_shr_signed {
     ($t:ident) => {

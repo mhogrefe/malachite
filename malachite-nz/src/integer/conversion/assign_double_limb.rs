@@ -1,5 +1,6 @@
-use integer::Integer;
 use malachite_base::num::traits::Assign;
+
+use integer::Integer;
 use platform::DoubleLimb;
 
 /// Assigns a `DoubleLimb` to to an `Integer`.

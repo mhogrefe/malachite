@@ -1,9 +1,11 @@
-use integer::Integer;
-use malachite_base::num::traits::{Assign, NegAssign, NotAssign};
-use natural::Natural;
-use platform::Limb;
 use std::mem::swap;
 use std::ops::{Sub, SubAssign};
+
+use malachite_base::num::traits::{Assign, NegAssign, NotAssign};
+
+use integer::Integer;
+use natural::Natural;
+use platform::Limb;
 
 /// Subtracts a `Natural` from an `Integer`, taking both inputs by value.
 ///

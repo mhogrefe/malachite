@@ -1,9 +1,11 @@
-use integer::Integer;
-use malachite_base::num::traits::Assign;
-use natural::Natural;
-use platform::Limb;
 use std::mem::swap;
 use std::ops::{Add, AddAssign};
+
+use malachite_base::num::traits::Assign;
+
+use integer::Integer;
+use natural::Natural;
+use platform::Limb;
 
 /// Adds a `Natural` to an `Integer`, taking both by value.
 ///

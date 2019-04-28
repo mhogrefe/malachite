@@ -1,8 +1,10 @@
-use integer::Integer;
+use std::cmp::Ordering;
+
 use malachite_base::num::signeds::PrimitiveSigned;
 use malachite_base::num::traits::UnsignedAbs;
+
+use integer::Integer;
 use platform::{Limb, SignedLimb};
-use std::cmp::Ordering;
 
 /// Compares `self` to a `SignedLimb`.
 ///

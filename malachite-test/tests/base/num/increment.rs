@@ -1,10 +1,11 @@
-use common::test_properties;
 use malachite_base::comparison::Max;
 use malachite_base::crement::Crementable;
 use malachite_base::num::signeds::PrimitiveSigned;
 use malachite_base::num::unsigneds::PrimitiveUnsigned;
-use malachite_test::inputs::base::{signeds_no_max, unsigneds_no_max};
 use rand::Rand;
+
+use common::test_properties;
+use malachite_test::inputs::base::{signeds_no_max, unsigneds_no_max};
 
 fn increment_helper_unsigned<T: PrimitiveUnsigned>() {
     let test = |n, out| {

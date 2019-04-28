@@ -1,9 +1,11 @@
-use integer::Integer;
+use std::ops::Index;
+
 use malachite_base::num::traits::{BitAccess, NotAssign};
+
+use integer::Integer;
 use natural::conversion::to_bits::BitIterator;
 use natural::Natural;
 use platform::Limb;
-use std::ops::Index;
 
 /// A double-ended iterator over the two's complement bits of the negative of a `Natural`. The
 /// forward order is ascending (least-significant first). There may be at most one implicit

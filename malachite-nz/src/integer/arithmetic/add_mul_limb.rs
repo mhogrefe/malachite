@@ -1,9 +1,12 @@
-use integer::Integer;
+use std::cmp::{max, min};
+
 use malachite_base::comparison::Max;
 use malachite_base::limbs::limbs_test_zero;
 use malachite_base::num::traits::{
     AddMul, AddMulAssign, NegAssign, NotAssign, WrappingAddAssign, WrappingSubAssign,
 };
+
+use integer::Integer;
 use natural::arithmetic::add_limb::limbs_slice_add_limb_in_place;
 use natural::arithmetic::add_mul_limb::limbs_slice_add_mul_limb_greater_in_place_left;
 use natural::arithmetic::mul_limb::{limbs_mul_limb_to_out, limbs_mul_limb_with_carry_to_out};
@@ -12,7 +15,6 @@ use natural::arithmetic::sub_mul_limb::mpn_submul_1;
 use natural::logic::not::limbs_not_in_place;
 use natural::Natural::{self, Large, Small};
 use platform::Limb;
-use std::cmp::{max, min};
 
 /// Adds the product of an `Integer` (b) and a `Limb` (c) to an `Integer` (self), taking `self` and
 /// b by value.

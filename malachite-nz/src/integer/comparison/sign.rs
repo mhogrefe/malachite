@@ -1,7 +1,9 @@
-use integer::Integer;
-use malachite_base::num::traits::Sign;
-use platform::Limb;
 use std::cmp::Ordering;
+
+use malachite_base::num::traits::Sign;
+
+use integer::Integer;
+use platform::Limb;
 
 impl Sign for Integer {
     /// Returns the sign of an `Integer`. Interpret the result as the result of a comparison to

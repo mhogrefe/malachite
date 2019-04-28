@@ -1,6 +1,7 @@
+use std::ops::{Mul, MulAssign};
+
 use integer::Integer;
 use platform::Limb;
-use std::ops::{Mul, MulAssign};
 
 /// Multiplies an `Integer` by an `Integer`, taking both `Integer`s by value.
 ///

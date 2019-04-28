@@ -1,10 +1,11 @@
-use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::base::nonempty_vecs_of_unsigned;
-use inputs::integer::integers;
 use malachite_base::num::traits::SignificantBits;
 use malachite_nz::integer::logic::checked_count_zeros::limbs_count_zeros_neg;
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::Limb;
+
+use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
+use inputs::base::nonempty_vecs_of_unsigned;
+use inputs::integer::integers;
 
 pub fn integer_checked_count_zeros_alt_1(n: &Integer) -> Option<u64> {
     if *n < 0 as Limb {

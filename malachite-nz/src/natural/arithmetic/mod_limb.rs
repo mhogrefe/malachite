@@ -1,3 +1,5 @@
+use std::ops::{Rem, RemAssign};
+
 use malachite_base::comparison::Max;
 #[cfg(feature = "64_bit_limbs")]
 use malachite_base::conversion::WrappingFrom;
@@ -6,9 +8,9 @@ use malachite_base::num::traits::{
     JoinHalves, Mod, ModAssign, NegMod, NegModAssign, SplitInHalf, WrappingAddAssign,
     WrappingSubAssign, Zero,
 };
+
 use natural::Natural::{self, Large, Small};
 use platform::{DoubleLimb, Limb};
-use std::ops::{Rem, RemAssign};
 
 // These functions are adapted from udiv_qrnnd_preinv, mpn_div_qr_1n_pi1, and mpn_div_qr_1 in GMP
 // 6.1.2.

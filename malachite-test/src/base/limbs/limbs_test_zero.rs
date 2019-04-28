@@ -1,6 +1,7 @@
+use malachite_base::limbs::limbs_test_zero;
+
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::vecs_of_unsigned;
-use malachite_base::limbs::limbs_test_zero;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limbs_test_zero);

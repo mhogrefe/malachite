@@ -1,7 +1,9 @@
-use integer::Integer;
-use malachite_base::num::traits::{Assign, NotAssign, UnsignedAbs, Zero};
-use platform::{Limb, SignedLimb};
 use std::ops::{Mul, MulAssign};
+
+use malachite_base::num::traits::{Assign, NotAssign, UnsignedAbs, Zero};
+
+use integer::Integer;
+use platform::{Limb, SignedLimb};
 
 /// Multiplies an `Integer` by an `i32`, taking the `Integer` by value.
 ///

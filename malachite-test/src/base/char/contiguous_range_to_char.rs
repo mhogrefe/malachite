@@ -1,6 +1,7 @@
+use malachite_base::chars::contiguous_range_to_char;
+
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::unsigneds;
-use malachite_base::chars::contiguous_range_to_char;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_contiguous_range_to_char);

@@ -1,13 +1,15 @@
-use integer::Integer;
-use malachite_base::comparison::Max;
-use malachite_base::limbs::{limbs_leading_zero_limbs, limbs_set_zero};
-use malachite_base::num::traits::WrappingNegAssign;
-use natural::logic::not::{limbs_not_in_place, limbs_not_to_out};
-use natural::Natural::{self, Large, Small};
-use platform::Limb;
 use std::cmp::max;
 use std::iter::repeat;
 use std::ops::{BitOr, BitOrAssign};
+
+use malachite_base::comparison::Max;
+use malachite_base::limbs::{limbs_leading_zero_limbs, limbs_set_zero};
+use malachite_base::num::traits::WrappingNegAssign;
+
+use integer::Integer;
+use natural::logic::not::{limbs_not_in_place, limbs_not_to_out};
+use natural::Natural::{self, Large, Small};
+use platform::Limb;
 
 /// Interpreting two slices of `Limb`s as the limbs (in ascending order) of one `Integer` and the
 /// negative of another, returns the limbs of the bitwise or of the `Integer`s. `xs` and `ys` may

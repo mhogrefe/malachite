@@ -1,8 +1,9 @@
-use integer::Integer;
 use malachite_base::num::traits::{
     CeilingDivAssignMod, CeilingDivAssignNegMod, CeilingDivMod, CeilingDivNegMod, DivAssignMod,
     DivAssignRem, DivMod, DivRem, UnsignedAbs,
 };
+
+use integer::Integer;
 use natural::Natural;
 use platform::{Limb, SignedLimb};
 

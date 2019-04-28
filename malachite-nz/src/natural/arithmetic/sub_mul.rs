@@ -1,4 +1,5 @@
 use malachite_base::num::traits::{SubMul, SubMulAssign};
+
 use natural::arithmetic::add_mul::mpz_aorsmul;
 use natural::arithmetic::sub_mul_limb::sub_mul_assign_limb_helper;
 use natural::Natural::{self, Large, Small};

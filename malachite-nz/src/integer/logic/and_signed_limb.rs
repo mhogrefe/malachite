@@ -1,10 +1,12 @@
-use integer::Integer;
+use std::ops::{BitAnd, BitAndAssign};
+
 use malachite_base::conversion::WrappingFrom;
 use malachite_base::num::traits::{UnsignedAbs, WrappingNegAssign};
+
+use integer::Integer;
 use natural::arithmetic::add_limb::{limbs_add_limb_to_out, limbs_slice_add_limb_in_place};
 use natural::Natural::{self, Large, Small};
 use platform::{Limb, SignedLimb};
-use std::ops::{BitAnd, BitAndAssign};
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of an `Integer`, returns the
 /// limbs of the bitwise and of the `Integer` and a negative number whose lowest limb is given by

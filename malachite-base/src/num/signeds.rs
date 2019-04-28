@@ -1,3 +1,7 @@
+use std::cmp::Ordering;
+use std::num::ParseIntError;
+use std::ops::Neg;
+
 use comparison::{Max, Min};
 use conversion::CheckedFrom;
 use crement::Crementable;
@@ -21,9 +25,6 @@ use num::traits::{
 };
 use num::unsigneds::PrimitiveUnsigned;
 use round::RoundingMode;
-use std::cmp::Ordering;
-use std::num::ParseIntError;
-use std::ops::Neg;
 
 //TODO docs
 pub trait PrimitiveSigned:
@@ -32,7 +33,6 @@ pub trait PrimitiveSigned:
     + CeilingModAssign
     + CheckedAbs<Output = Self>
     + From<i8>
-    + Into<i128>
     + Neg<Output = Self>
     + NegAssign
     + NegativeOne
@@ -524,6 +524,7 @@ signed_traits!(i16, u16, 4);
 signed_traits!(i32, u32, 5);
 signed_traits!(i64, u64, 6);
 signed_traits!(i128, u128, 7);
+signed_traits!(isize, usize, 0usize.trailing_zeros().trailing_zeros());
 
 /// Implements the constants 0, 1, 2, and -1 for signed primitive integers.
 macro_rules! impl01_signed {

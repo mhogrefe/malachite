@@ -1,13 +1,15 @@
-use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::base::pairs_of_limb_vec_var_1;
-use inputs::integer::{pairs_of_integers, rm_pairs_of_integers};
+use std::cmp::max;
+use std::iter::repeat;
+
 use malachite_base::comparison::Max;
 use malachite_base::num::traits::{CheckedHammingDistance, HammingDistance, SignificantBits};
 use malachite_nz::integer::logic::checked_hamming_distance::limbs_hamming_distance_neg;
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::Limb;
-use std::cmp::max;
-use std::iter::repeat;
+
+use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
+use inputs::base::pairs_of_limb_vec_var_1;
+use inputs::integer::{pairs_of_integers, rm_pairs_of_integers};
 
 pub fn integer_checked_hamming_distance_alt_1(x: &Integer, y: &Integer) -> Option<u64> {
     let negative = *x < 0 as Limb;

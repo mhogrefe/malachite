@@ -1,11 +1,13 @@
-use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::base::pairs_of_unsigned_vec_and_small_unsigned;
-use inputs::natural::pairs_of_natural_and_small_unsigned;
+use std::iter::repeat;
+
 use malachite_base::num::traits::{BitScan, SignificantBits};
 use malachite_nz::natural::logic::bit_scan::limbs_index_of_next_false_bit;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-use std::iter::repeat;
+
+use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
+use inputs::base::pairs_of_unsigned_vec_and_small_unsigned;
+use inputs::natural::pairs_of_natural_and_small_unsigned;
 
 pub fn natural_index_of_next_false_bit_alt(n: &Natural, u: u64) -> Option<u64> {
     for (i, bit) in n.bits().chain(repeat(false)).enumerate().skip(u as usize) {

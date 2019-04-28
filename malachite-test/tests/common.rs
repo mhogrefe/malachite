@@ -1,9 +1,10 @@
 extern crate malachite_test; // TODO why is this needed?
 
-use malachite_test::common::{GenerationMode, NoSpecialGenerationMode};
 use std::cmp::Ordering;
 use std::fmt::Debug;
 use std::str::FromStr;
+
+use malachite_test::common::{GenerationMode, NoSpecialGenerationMode};
 
 pub const SMALL_LIMIT: usize = 1_000;
 pub const LARGE_LIMIT: usize = 10_000;

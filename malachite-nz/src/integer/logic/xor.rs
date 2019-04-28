@@ -1,13 +1,15 @@
-use integer::Integer;
+use std::ops::{BitXor, BitXorAssign};
+
 use malachite_base::limbs::{limbs_leading_zero_limbs, limbs_set_zero};
 use malachite_base::num::traits::WrappingNegAssign;
+
+use integer::Integer;
 use natural::arithmetic::sub::{
     limbs_sub, limbs_sub_in_place_left, limbs_sub_in_place_right, limbs_sub_to_out,
 };
 use natural::logic::not::limbs_not_in_place;
 use natural::Natural::{self, Large, Small};
 use platform::Limb;
-use std::ops::{BitXor, BitXorAssign};
 
 /// Interpreting two slices of `Limb`s as the limbs (in ascending order) of the negatives of two
 /// `Integer`s, returns the limbs of the bitwise xor of the `Integer`s. `xs` and `ys` may not be

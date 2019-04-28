@@ -1,8 +1,9 @@
-use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::base::unsigneds;
 use malachite_base::num::traits::SplitInHalf;
 use malachite_base::num::unsigneds::PrimitiveUnsigned;
 use rand::Rand;
+
+use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
+use inputs::base::unsigneds;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_u16_split_in_half);

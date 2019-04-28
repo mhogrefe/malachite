@@ -1,8 +1,10 @@
-use integer::Integer;
+use std::ops::{BitAnd, BitAndAssign};
+
 use malachite_base::conversion::WrappingFrom;
+
+use integer::Integer;
 use natural::Natural::{self, Small};
 use platform::Limb;
-use std::ops::{BitAnd, BitAndAssign};
 
 /// Takes the bitwise and of an `Integer` and a `Limb`, taking the `Integer` by value. The output is
 /// a `Limb`.

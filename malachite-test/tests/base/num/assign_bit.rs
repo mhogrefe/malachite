@@ -1,14 +1,15 @@
-use common::test_properties;
 use malachite_base::conversion::CheckedFrom;
 use malachite_base::num::integers::PrimitiveInteger;
 use malachite_base::num::signeds::PrimitiveSigned;
 use malachite_base::num::traits::{BitAccess, NegativeOne};
 use malachite_base::num::unsigneds::PrimitiveUnsigned;
+use rand::Rand;
+
+use common::test_properties;
 use malachite_test::inputs::base::{
     triples_of_signed_unsigned_width_range_and_bool_var_1,
     triples_of_unsigned_unsigned_width_range_and_bool_var_1,
 };
-use rand::Rand;
 
 fn assign_bit_helper_unsigned<T: PrimitiveInteger>() {
     let test = |n: u64, index, bit, out: u64| {

@@ -1,13 +1,14 @@
-use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::integer::{
-    rm_triples_of_integer_signed_and_small_unsigned, triples_of_integer_signed_and_small_unsigned,
-    triples_of_signed_integer_and_small_unsigned,
-};
 use malachite_base::conversion::CheckedFrom;
 use malachite_base::num::traits::{EqModPowerOfTwo, ModPowerOfTwo, SignificantBits};
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::SignedLimb;
 use rug;
+
+use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
+use inputs::integer::{
+    rm_triples_of_integer_signed_and_small_unsigned, triples_of_integer_signed_and_small_unsigned,
+    triples_of_signed_integer_and_small_unsigned,
+};
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_integer_eq_signed_limb_mod_power_of_two);

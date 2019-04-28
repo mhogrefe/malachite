@@ -1,9 +1,11 @@
-use integer::Integer;
+use std::cmp::Ordering;
+
 use malachite_base::limbs::limbs_test_zero;
 use malachite_base::num::traits::Zero;
+
+use integer::Integer;
 use natural::Natural;
 use platform::Limb;
-use std::cmp::Ordering;
 
 impl Integer {
     /// Converts a sign and a slice of limbs to an `Integer`. The

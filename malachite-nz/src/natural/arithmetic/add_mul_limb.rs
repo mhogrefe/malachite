@@ -1,5 +1,6 @@
 use malachite_base::num::integers::PrimitiveInteger;
 use malachite_base::num::traits::{AddMul, AddMulAssign, SplitInHalf};
+
 use natural::arithmetic::add_limb::limbs_slice_add_limb_in_place;
 use natural::arithmetic::mul_limb::{limbs_mul_limb_to_out, limbs_slice_mul_limb_in_place};
 use natural::Natural::{self, Large};

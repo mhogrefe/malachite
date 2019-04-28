@@ -1,5 +1,6 @@
-use integer::Integer;
 use std::ops::{Shl, ShlAssign};
+
+use integer::Integer;
 
 macro_rules! impl_integer_shl_unsigned {
     ($t:ident) => {

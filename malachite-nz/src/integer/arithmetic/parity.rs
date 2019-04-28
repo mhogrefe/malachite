@@ -1,5 +1,6 @@
-use integer::Integer;
 use malachite_base::num::traits::Parity;
+
+use integer::Integer;
 
 impl<'a> Parity for &'a Integer {
     /// Determines whether `self` is even.

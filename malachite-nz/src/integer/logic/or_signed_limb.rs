@@ -1,8 +1,10 @@
-use integer::Integer;
+use std::ops::{BitOr, BitOrAssign};
+
 use malachite_base::conversion::WrappingFrom;
+
+use integer::Integer;
 use natural::Natural::{self, Large, Small};
 use platform::{Limb, SignedLimb};
-use std::ops::{BitOr, BitOrAssign};
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of an `Integer`, returns the
 /// negative of the bitwise or of the `Integer` and a negative number whose lowest limb is given by

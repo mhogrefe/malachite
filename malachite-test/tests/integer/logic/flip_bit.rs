@@ -1,10 +1,12 @@
-use common::test_properties;
+use std::str::FromStr;
+
 use malachite_base::num::traits::{BitAccess, One};
 use malachite_nz::integer::Integer;
+use rug;
+
+use common::test_properties;
 use malachite_test::common::{integer_to_rug_integer, rug_integer_to_integer};
 use malachite_test::inputs::integer::pairs_of_integer_and_small_u64;
-use rug;
-use std::str::FromStr;
 
 #[test]
 fn test_flip_bit() {

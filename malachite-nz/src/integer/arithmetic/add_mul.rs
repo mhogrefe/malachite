@@ -1,5 +1,6 @@
-use integer::Integer;
 use malachite_base::num::traits::{AddMul, AddMulAssign, NotAssign, SubMul, SubMulAssign};
+
+use integer::Integer;
 use natural::arithmetic::add_mul::mpz_aorsmul;
 use natural::Natural::{Large, Small};
 

@@ -1,5 +1,6 @@
-use integer::Integer;
 use malachite_base::num::traits::{Assign, UnsignedAbs};
+
+use integer::Integer;
 use platform::SignedDoubleLimb;
 
 /// Assigns a `SignedDoubleLimb` to an `Integer`.

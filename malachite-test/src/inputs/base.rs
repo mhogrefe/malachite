@@ -1,5 +1,7 @@
-use common::{GenerationMode, NoSpecialGenerationMode};
-use inputs::common::{permute_1_2, permute_1_3_2, reshape_2_1_to_3};
+use std::char;
+use std::cmp::Ordering;
+use std::ops::{Shl, Shr};
+
 use malachite_base::chars::NUMBER_OF_CHARS;
 use malachite_base::conversion::CheckedFrom;
 use malachite_base::limbs::limbs_test_zero;
@@ -61,9 +63,9 @@ use rust_wheels::iterators::vecs::{
     special_random_bool_vecs, special_random_unsigned_vecs,
     special_random_unsigned_vecs_min_length,
 };
-use std::char;
-use std::cmp::Ordering;
-use std::ops::{Shl, Shr};
+
+use common::{GenerationMode, NoSpecialGenerationMode};
+use inputs::common::{permute_1_2, permute_1_3_2, reshape_2_1_to_3};
 
 pub(crate) type It<T> = Box<Iterator<Item = T>>;
 

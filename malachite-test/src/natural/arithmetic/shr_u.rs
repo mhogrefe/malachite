@@ -1,3 +1,15 @@
+use std::cmp::max;
+
+use malachite_base::named::Named;
+use malachite_base::num::integers::PrimitiveInteger;
+use malachite_base::num::traits::{ShrRound, ShrRoundAssign};
+use malachite_nz::natural::arithmetic::shr_u::{
+    limbs_shr, limbs_shr_exact, limbs_shr_round, limbs_shr_round_to_nearest, limbs_shr_round_up,
+    limbs_shr_to_out, limbs_slice_shr_in_place, limbs_vec_shr_exact_in_place,
+    limbs_vec_shr_in_place, limbs_vec_shr_round_in_place, limbs_vec_shr_round_to_nearest_in_place,
+    limbs_vec_shr_round_up_in_place,
+};
+
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::{
     pairs_of_unsigned_vec_and_limb_var_2, pairs_of_unsigned_vec_and_small_unsigned,
@@ -9,16 +21,6 @@ use inputs::natural::{
     pairs_of_natural_and_small_unsigned, rm_pairs_of_natural_and_small_unsigned,
     triples_of_natural_small_unsigned_and_rounding_mode_var_1,
 };
-use malachite_base::named::Named;
-use malachite_base::num::integers::PrimitiveInteger;
-use malachite_base::num::traits::{ShrRound, ShrRoundAssign};
-use malachite_nz::natural::arithmetic::shr_u::{
-    limbs_shr, limbs_shr_exact, limbs_shr_round, limbs_shr_round_to_nearest, limbs_shr_round_up,
-    limbs_shr_to_out, limbs_slice_shr_in_place, limbs_vec_shr_exact_in_place,
-    limbs_vec_shr_in_place, limbs_vec_shr_round_in_place, limbs_vec_shr_round_to_nearest_in_place,
-    limbs_vec_shr_round_up_in_place,
-};
-use std::cmp::max;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limbs_shr);

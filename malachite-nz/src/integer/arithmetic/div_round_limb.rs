@@ -1,6 +1,7 @@
-use integer::Integer;
 use malachite_base::num::traits::{DivRound, DivRoundAssign, Zero};
 use malachite_base::round::RoundingMode;
+
+use integer::Integer;
 use natural::Natural;
 use platform::Limb;
 

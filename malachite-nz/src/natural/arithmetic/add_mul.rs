@@ -1,5 +1,9 @@
+use std::cmp::{max, Ordering};
+use std::mem::swap;
+
 use malachite_base::limbs::limbs_test_zero;
 use malachite_base::num::traits::{AddMul, AddMulAssign, NotAssign};
+
 use natural::arithmetic::add::{limbs_add_greater, limbs_slice_add_greater_in_place_left};
 use natural::arithmetic::add_mul_limb::limbs_vec_add_mul_limb_in_place_left;
 use natural::arithmetic::mul::{limbs_mul_greater_to_out, limbs_mul_to_out};
@@ -7,8 +11,6 @@ use natural::arithmetic::sub::{limbs_sub_in_place_left, limbs_sub_less_in_place_
 use natural::comparison::ord::limbs_cmp;
 use natural::Natural::{self, Large, Small};
 use platform::Limb;
-use std::cmp::{max, Ordering};
-use std::mem::swap;
 
 /// Adds the product of a `Natural` (b) and a `Natural` (c) to a `Natural` (self), taking `self`, b,
 /// and c by value.

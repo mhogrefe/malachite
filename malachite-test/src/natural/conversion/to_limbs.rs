@@ -1,7 +1,8 @@
-use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::natural::{naturals, pairs_of_natural_and_small_usize};
 use malachite_base::num::traits::SignificantBits;
 use malachite_nz::platform::Limb;
+
+use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
+use inputs::natural::{naturals, pairs_of_natural_and_small_usize};
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_natural_to_limbs_asc);
