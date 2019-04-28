@@ -1,6 +1,6 @@
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::natural::positive_naturals;
-use malachite_base::num::SignificantBits;
+use malachite_base::num::traits::SignificantBits;
 use malachite_nz::natural::random::random_natural_below::random_natural_below;
 use rand::{IsaacRng, SeedableRng};
 use rust_wheels::iterators::adaptors::{generate_from_function, to_limited_string};

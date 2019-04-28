@@ -1,6 +1,6 @@
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::natural::{naturals, pairs_of_natural_and_small_usize};
-use malachite_base::num::SignificantBits;
+use malachite_base::num::traits::SignificantBits;
 use malachite_nz::platform::Limb;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {

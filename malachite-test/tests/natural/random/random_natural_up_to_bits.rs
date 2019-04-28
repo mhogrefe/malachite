@@ -1,5 +1,5 @@
 use common::test_properties_no_special;
-use malachite_base::num::SignificantBits;
+use malachite_base::num::traits::SignificantBits;
 #[cfg(feature = "64_bit_limbs")]
 use malachite_nz::natural::random::random_natural_up_to_bits::_transform_32_to_64_bit_limbs;
 use malachite_nz::natural::random::random_natural_up_to_bits::{

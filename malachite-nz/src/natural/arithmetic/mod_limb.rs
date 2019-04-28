@@ -1,9 +1,10 @@
-use malachite_base::misc::Max;
+use malachite_base::comparison::Max;
 #[cfg(feature = "64_bit_limbs")]
-use malachite_base::misc::WrappingFrom;
-use malachite_base::num::{
-    JoinHalves, Mod, ModAssign, NegMod, NegModAssign, PrimitiveInteger, SplitInHalf,
-    WrappingAddAssign, WrappingSubAssign, Zero,
+use malachite_base::conversion::WrappingFrom;
+use malachite_base::num::integers::PrimitiveInteger;
+use malachite_base::num::traits::{
+    JoinHalves, Mod, ModAssign, NegMod, NegModAssign, SplitInHalf, WrappingAddAssign,
+    WrappingSubAssign, Zero,
 };
 use natural::Natural::{self, Large, Small};
 use platform::{DoubleLimb, Limb};
@@ -194,7 +195,7 @@ impl Mod<Limb> for Natural {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::Mod;
+    /// use malachite_base::num::traits::Mod;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
@@ -235,7 +236,7 @@ impl<'a> Mod<Limb> for &'a Natural {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::Mod;
+    /// use malachite_base::num::traits::Mod;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
@@ -274,7 +275,7 @@ impl ModAssign<Limb> for Natural {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::ModAssign;
+    /// use malachite_base::num::traits::ModAssign;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
@@ -313,7 +314,7 @@ impl Mod<Natural> for Limb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::Mod;
+    /// use malachite_base::num::traits::Mod;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
@@ -352,7 +353,7 @@ impl<'a> Mod<&'a Natural> for Limb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::Mod;
+    /// use malachite_base::num::traits::Mod;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
@@ -390,7 +391,7 @@ impl ModAssign<Natural> for Limb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::ModAssign;
+    /// use malachite_base::num::traits::ModAssign;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
@@ -428,7 +429,7 @@ impl<'a> ModAssign<&'a Natural> for Limb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::ModAssign;
+    /// use malachite_base::num::traits::ModAssign;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
@@ -767,7 +768,7 @@ impl NegMod<Limb> for Natural {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::NegMod;
+    /// use malachite_base::num::traits::NegMod;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
@@ -809,7 +810,7 @@ impl<'a> NegMod<Limb> for &'a Natural {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::NegMod;
+    /// use malachite_base::num::traits::NegMod;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
@@ -852,7 +853,7 @@ impl NegModAssign<Limb> for Natural {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::NegModAssign;
+    /// use malachite_base::num::traits::NegModAssign;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
@@ -894,7 +895,7 @@ impl NegMod<Natural> for Limb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::NegMod;
+    /// use malachite_base::num::traits::NegMod;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
@@ -940,7 +941,7 @@ impl<'a> NegMod<&'a Natural> for Limb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::NegMod;
+    /// use malachite_base::num::traits::NegMod;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {

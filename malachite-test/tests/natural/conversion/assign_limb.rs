@@ -1,6 +1,6 @@
 use common::test_properties;
-use malachite_base::misc::Max;
-use malachite_base::num::Assign;
+use malachite_base::comparison::Max;
+use malachite_base::num::traits::Assign;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 use malachite_test::common::{

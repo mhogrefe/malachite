@@ -10,7 +10,7 @@ use inputs::natural::{
     rm_pairs_of_natural_and_limb_var_1,
 };
 use inputs::natural::{pairs_of_limb_and_natural_var_1, pairs_of_natural_and_limb_var_1};
-use malachite_base::num::SignificantBits;
+use malachite_base::num::traits::SignificantBits;
 use malachite_nz::natural::arithmetic::sub_limb::{
     limbs_sub_limb, limbs_sub_limb_in_place, limbs_sub_limb_to_out,
 };

@@ -1,5 +1,6 @@
 use integer::Integer;
-use malachite_base::num::{PrimitiveSigned, UnsignedAbs};
+use malachite_base::num::signeds::PrimitiveSigned;
+use malachite_base::num::traits::UnsignedAbs;
 use platform::{Limb, SignedLimb};
 use std::cmp::Ordering;
 

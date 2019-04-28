@@ -16,7 +16,7 @@ use std::ops::{Add, AddAssign};
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::Zero;
+/// use malachite_base::num::traits::Zero;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {
@@ -55,7 +55,7 @@ impl Add<Integer> for Integer {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::Zero;
+/// use malachite_base::num::traits::Zero;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {
@@ -90,7 +90,7 @@ impl<'a> Add<&'a Integer> for Integer {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::Zero;
+/// use malachite_base::num::traits::Zero;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {
@@ -124,7 +124,7 @@ impl<'a> Add<Integer> for &'a Integer {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::Zero;
+/// use malachite_base::num::traits::Zero;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {
@@ -201,7 +201,7 @@ impl<'a, 'b> Add<&'a Integer> for &'b Integer {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::Zero;
+/// use malachite_base::num::traits::Zero;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {
@@ -265,7 +265,7 @@ impl AddAssign<Integer> for Integer {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::Zero;
+/// use malachite_base::num::traits::Zero;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {

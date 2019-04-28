@@ -2,8 +2,8 @@ use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, 
 use inputs::integer::integers;
 #[cfg(feature = "32_bit_limbs")]
 use inputs::integer::rm_integers;
-use malachite_base::misc::{CheckedFrom, WrappingFrom};
-use malachite_base::num::SignificantBits;
+use malachite_base::conversion::{CheckedFrom, WrappingFrom};
+use malachite_base::num::traits::SignificantBits;
 use malachite_nz::platform::Limb;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {

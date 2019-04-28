@@ -1,7 +1,9 @@
 use integer::Integer;
 #[cfg(feature = "64_bit_limbs")]
-use malachite_base::misc::CheckedFrom;
-use malachite_base::num::{CeilingMod, CeilingModAssign, Mod, ModAssign, NegMod, NegModAssign};
+use malachite_base::conversion::CheckedFrom;
+use malachite_base::num::traits::{
+    CeilingMod, CeilingModAssign, Mod, ModAssign, NegMod, NegModAssign,
+};
 use natural::Natural;
 use platform::Limb;
 use std::ops::{Rem, RemAssign};
@@ -24,7 +26,7 @@ impl Mod<Limb> for Integer {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::Mod;
+    /// use malachite_base::num::traits::Mod;
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {
@@ -72,7 +74,7 @@ impl<'a> Mod<Limb> for &'a Integer {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::Mod;
+    /// use malachite_base::num::traits::Mod;
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {
@@ -118,7 +120,7 @@ impl ModAssign<Limb> for Integer {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::ModAssign;
+    /// use malachite_base::num::traits::ModAssign;
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {
@@ -167,7 +169,7 @@ impl Mod<Integer> for Limb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::Mod;
+    /// use malachite_base::num::traits::Mod;
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {
@@ -213,7 +215,7 @@ impl<'a> Mod<&'a Integer> for Limb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::Mod;
+    /// use malachite_base::num::traits::Mod;
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {
@@ -395,7 +397,7 @@ impl Rem<Integer> for Limb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::DivRem;
+    /// use malachite_base::num::traits::DivRem;
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {
@@ -437,7 +439,7 @@ impl<'a> Rem<&'a Integer> for Limb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::DivRem;
+    /// use malachite_base::num::traits::DivRem;
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {
@@ -561,7 +563,7 @@ impl CeilingMod<Limb> for Integer {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::CeilingMod;
+    /// use malachite_base::num::traits::CeilingMod;
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {
@@ -607,7 +609,7 @@ impl<'a> CeilingMod<Limb> for &'a Integer {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::CeilingMod;
+    /// use malachite_base::num::traits::CeilingMod;
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {
@@ -653,7 +655,7 @@ impl CeilingModAssign<Limb> for Integer {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::CeilingModAssign;
+    /// use malachite_base::num::traits::CeilingModAssign;
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {
@@ -704,7 +706,7 @@ impl CeilingMod<Integer> for Limb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::CeilingMod;
+    /// use malachite_base::num::traits::CeilingMod;
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {
@@ -755,7 +757,7 @@ impl<'a> CeilingMod<&'a Integer> for Limb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::CeilingMod;
+    /// use malachite_base::num::traits::CeilingMod;
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {

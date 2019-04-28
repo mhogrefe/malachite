@@ -1,6 +1,7 @@
 use common::{test_properties, test_properties_no_special};
-use malachite_base::misc::Max;
-use malachite_base::num::{PrimitiveInteger, Sign, Zero};
+use malachite_base::comparison::Max;
+use malachite_base::num::integers::PrimitiveInteger;
+use malachite_base::num::traits::{Sign, Zero};
 use malachite_nz::integer::conversion::to_twos_complement_limbs::*;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;

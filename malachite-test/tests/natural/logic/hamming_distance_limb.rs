@@ -1,6 +1,6 @@
 use common::test_properties;
-use malachite_base::misc::Max;
-use malachite_base::num::{CheckedHammingDistance, HammingDistance, Zero};
+use malachite_base::comparison::Max;
+use malachite_base::num::traits::{CheckedHammingDistance, HammingDistance, Zero};
 use malachite_nz::natural::logic::hamming_distance_limb::limbs_hamming_distance_limb;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;

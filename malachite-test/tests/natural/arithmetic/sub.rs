@@ -1,6 +1,8 @@
 use common::test_properties;
-use malachite_base::misc::{CheckedFrom, Max};
-use malachite_base::num::{One, PrimitiveInteger, Zero};
+use malachite_base::comparison::Max;
+use malachite_base::conversion::CheckedFrom;
+use malachite_base::num::integers::PrimitiveInteger;
+use malachite_base::num::traits::{One, Zero};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::arithmetic::sub::{
     _limbs_sub_same_length_with_borrow_in_in_place_left,

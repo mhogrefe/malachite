@@ -1,6 +1,6 @@
 use common::test_properties;
-use malachite_base::misc::CheckedFrom;
-use malachite_base::num::{BitAccess, BitScan, NegativeOne, Zero};
+use malachite_base::conversion::CheckedFrom;
+use malachite_base::num::traits::{BitAccess, BitScan, NegativeOne, Zero};
 use malachite_nz::integer::logic::bit_scan::limbs_index_of_next_false_bit_neg;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;

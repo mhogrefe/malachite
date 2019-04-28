@@ -1,5 +1,7 @@
 use common::test_properties;
-use malachite_base::num::{CeilingDivNegMod, DivRound, DivRoundAssign, DivisibleBy, One, Zero};
+use malachite_base::num::traits::{
+    CeilingDivNegMod, DivRound, DivRoundAssign, DivisibleBy, One, Zero,
+};
 use malachite_base::round::RoundingMode;
 use malachite_nz::natural::arithmetic::div_round_limb::limbs_limb_div_round_limbs;
 use malachite_nz::natural::Natural;

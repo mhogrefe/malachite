@@ -4,7 +4,7 @@ use inputs::natural::nm_pairs_of_natural_and_unsigned;
 #[cfg(feature = "32_bit_limbs")]
 use inputs::natural::{nrm_pairs_of_natural_and_unsigned, rm_pairs_of_unsigned_and_natural};
 use inputs::natural::{pairs_of_natural_and_unsigned, pairs_of_unsigned_and_natural};
-use malachite_base::num::{CheckedSub, SignificantBits};
+use malachite_base::num::traits::{CheckedSub, SignificantBits};
 use malachite_nz::platform::Limb;
 use natural::comparison::partial_ord_limb::num_partial_cmp_limb;
 use num::BigUint;

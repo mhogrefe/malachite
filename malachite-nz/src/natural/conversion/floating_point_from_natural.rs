@@ -1,6 +1,8 @@
-use malachite_base::misc::{CheckedFrom, Named, RoundingFrom, WrappingFrom};
-use malachite_base::num::{
-    BitAccess, DivisibleByPowerOfTwo, FloorLogTwo, PrimitiveFloat, ShrRound, ShrRoundAssign,
+use malachite_base::conversion::{CheckedFrom, RoundingFrom, WrappingFrom};
+use malachite_base::named::Named;
+use malachite_base::num::floats::PrimitiveFloat;
+use malachite_base::num::traits::{
+    BitAccess, DivisibleByPowerOfTwo, FloorLogTwo, ShrRound, ShrRoundAssign,
 };
 use malachite_base::round::RoundingMode;
 use natural::arithmetic::divisible_by_power_of_two::limbs_divisible_by_power_of_two;
@@ -50,7 +52,7 @@ macro_rules! float_impls {
         /// extern crate malachite_base;
         /// extern crate malachite_nz;
         ///
-        /// use malachite_base::misc::RoundingFrom;
+        /// use malachite_base::conversion::RoundingFrom;
         /// use malachite_base::round::RoundingMode;
         /// use malachite_nz::natural::Natural;
         /// use std::str::FromStr;
@@ -117,7 +119,7 @@ macro_rules! float_impls {
         /// extern crate malachite_base;
         /// extern crate malachite_nz;
         ///
-        /// use malachite_base::misc::RoundingFrom;
+        /// use malachite_base::conversion::RoundingFrom;
         /// use malachite_base::round::RoundingMode;
         /// use malachite_nz::natural::Natural;
         /// use std::str::FromStr;
@@ -239,7 +241,7 @@ macro_rules! float_impls {
         /// extern crate malachite_base;
         /// extern crate malachite_nz;
         ///
-        /// use malachite_base::misc::CheckedFrom;
+        /// use malachite_base::conversion::CheckedFrom;
         /// use malachite_nz::natural::Natural;
         /// use std::str::FromStr;
         ///
@@ -289,7 +291,7 @@ macro_rules! float_impls {
         /// extern crate malachite_base;
         /// extern crate malachite_nz;
         ///
-        /// use malachite_base::misc::CheckedFrom;
+        /// use malachite_base::conversion::CheckedFrom;
         /// use malachite_nz::natural::Natural;
         /// use std::str::FromStr;
         ///

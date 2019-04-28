@@ -1,4 +1,4 @@
-use malachite_base::num::{IsPowerOfTwo, SignificantBits};
+use malachite_base::num::traits::{IsPowerOfTwo, SignificantBits};
 use natural::random::random_natural_up_to_bits::random_natural_up_to_bits;
 use natural::Natural;
 use platform::Limb;

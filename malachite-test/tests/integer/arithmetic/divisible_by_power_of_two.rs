@@ -1,6 +1,6 @@
 use common::test_properties;
-use malachite_base::misc::CheckedFrom;
-use malachite_base::num::{DivisibleByPowerOfTwo, Zero};
+use malachite_base::conversion::CheckedFrom;
+use malachite_base::num::traits::{DivisibleByPowerOfTwo, Zero};
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::{Limb, SignedLimb};
 use malachite_test::common::integer_to_rug_integer;

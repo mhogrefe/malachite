@@ -1,6 +1,6 @@
 use common::test_properties;
-use malachite_base::num::NotAssign;
-use malachite_base::num::{BitAccess, One};
+use malachite_base::num::traits::NotAssign;
+use malachite_base::num::traits::{BitAccess, One};
 use malachite_nz::integer::logic::bit_access::limbs_set_bit_neg;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;

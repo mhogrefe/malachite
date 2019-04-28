@@ -1,4 +1,4 @@
-use malachite_base::num::PrimitiveInteger;
+use malachite_base::num::integers::PrimitiveInteger;
 use platform::Limb;
 use std::cmp::max;
 

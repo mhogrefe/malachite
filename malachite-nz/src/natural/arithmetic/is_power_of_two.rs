@@ -1,5 +1,5 @@
 use malachite_base::limbs::limbs_test_zero;
-use malachite_base::num::IsPowerOfTwo;
+use malachite_base::num::traits::IsPowerOfTwo;
 use natural::Natural::{self, Large, Small};
 use platform::Limb;
 
@@ -45,7 +45,7 @@ impl<'a> IsPowerOfTwo for &'a Natural {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::{IsPowerOfTwo, Zero};
+    /// use malachite_base::num::traits::{IsPowerOfTwo, Zero};
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
     ///

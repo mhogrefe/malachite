@@ -1,5 +1,5 @@
 use common::test_properties;
-use malachite_base::misc::CheckedFrom;
+use malachite_base::conversion::CheckedFrom;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_test::inputs::natural::naturals;

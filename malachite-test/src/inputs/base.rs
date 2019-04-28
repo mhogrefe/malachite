@@ -1,11 +1,12 @@
 use common::{GenerationMode, NoSpecialGenerationMode};
 use inputs::common::{permute_1_2, permute_1_3_2, reshape_2_1_to_3};
 use malachite_base::chars::NUMBER_OF_CHARS;
+use malachite_base::conversion::CheckedFrom;
 use malachite_base::limbs::limbs_test_zero;
-use malachite_base::misc::CheckedFrom;
-use malachite_base::num::{
-    BitAccess, Parity, PrimitiveInteger, PrimitiveSigned, PrimitiveUnsigned, UnsignedAbs,
-};
+use malachite_base::num::integers::PrimitiveInteger;
+use malachite_base::num::signeds::PrimitiveSigned;
+use malachite_base::num::traits::{BitAccess, Parity, UnsignedAbs};
+use malachite_base::num::unsigneds::PrimitiveUnsigned;
 use malachite_base::round::RoundingMode;
 use malachite_nz::integer::logic::bit_access::limbs_vec_clear_bit_neg;
 use malachite_nz::natural::arithmetic::mul::fft::*;

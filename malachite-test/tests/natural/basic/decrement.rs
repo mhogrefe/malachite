@@ -1,6 +1,6 @@
 use common::test_properties;
-use malachite_base::misc::Walkable;
-use malachite_base::num::Zero;
+use malachite_base::crement::Crementable;
+use malachite_base::num::traits::Zero;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 use malachite_test::inputs::base::positive_unsigneds;

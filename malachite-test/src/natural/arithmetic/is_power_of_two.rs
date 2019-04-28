@@ -1,7 +1,7 @@
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::vecs_of_unsigned_var_1;
 use inputs::natural::{naturals, rm_naturals};
-use malachite_base::num::{IsPowerOfTwo, SignificantBits};
+use malachite_base::num::traits::{IsPowerOfTwo, SignificantBits};
 use malachite_nz::natural::arithmetic::is_power_of_two::limbs_is_power_of_two;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {

@@ -1,6 +1,8 @@
 use common::test_properties;
-use malachite_base::misc::{CheckedFrom, Max, WrappingFrom};
-use malachite_base::num::{ModPowerOfTwo, PrimitiveInteger, SignificantBits};
+use malachite_base::comparison::Max;
+use malachite_base::conversion::{CheckedFrom, WrappingFrom};
+use malachite_base::num::integers::PrimitiveInteger;
+use malachite_base::num::traits::{ModPowerOfTwo, SignificantBits};
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 #[cfg(feature = "32_bit_limbs")]

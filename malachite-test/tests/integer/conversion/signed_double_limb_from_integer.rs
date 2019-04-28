@@ -1,8 +1,9 @@
 use common::test_properties;
-use malachite_base::misc::{CheckedFrom, Max, Min, WrappingFrom};
-use malachite_base::num::{
-    ModPowerOfTwo, One, PrimitiveInteger, PrimitiveUnsigned, SignificantBits,
-};
+use malachite_base::comparison::{Max, Min};
+use malachite_base::conversion::{CheckedFrom, WrappingFrom};
+use malachite_base::num::integers::PrimitiveInteger;
+use malachite_base::num::traits::{ModPowerOfTwo, One, SignificantBits};
+use malachite_base::num::unsigneds::PrimitiveUnsigned;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::{DoubleLimb, SignedDoubleLimb, SignedLimb};

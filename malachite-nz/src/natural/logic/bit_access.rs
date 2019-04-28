@@ -1,4 +1,5 @@
-use malachite_base::num::{BitAccess, PrimitiveInteger};
+use malachite_base::num::integers::PrimitiveInteger;
+use malachite_base::num::traits::BitAccess;
 use natural::Natural::{self, Large, Small};
 use platform::Limb;
 
@@ -131,8 +132,8 @@ pub fn limbs_clear_bit(limbs: &mut [Limb], index: u64) {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::BitAccess;
-/// use malachite_base::num::Zero;
+/// use malachite_base::num::traits::BitAccess;
+/// use malachite_base::num::traits::Zero;
 /// use malachite_nz::natural::Natural;
 ///
 /// fn main() {
@@ -166,7 +167,7 @@ impl BitAccess for Natural {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::BitAccess;
+    /// use malachite_base::num::traits::BitAccess;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
@@ -196,8 +197,8 @@ impl BitAccess for Natural {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::BitAccess;
-    /// use malachite_base::num::Zero;
+    /// use malachite_base::num::traits::BitAccess;
+    /// use malachite_base::num::traits::Zero;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
@@ -240,7 +241,7 @@ impl BitAccess for Natural {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::BitAccess;
+    /// use malachite_base::num::traits::BitAccess;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {

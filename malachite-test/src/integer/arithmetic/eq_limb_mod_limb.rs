@@ -6,7 +6,7 @@ use inputs::integer::{
     triples_of_integer_unsigned_and_unsigned, triples_of_unsigned_integer_and_unsigned,
     triples_of_unsigned_unsigned_and_integer,
 };
-use malachite_base::num::{DivisibleBy, EqMod, Mod, SignificantBits};
+use malachite_base::num::traits::{DivisibleBy, EqMod, Mod, SignificantBits};
 use malachite_nz::integer::arithmetic::eq_limb_mod_limb::limbs_eq_neg_limb_mod_limb;
 use malachite_nz::platform::Limb;
 

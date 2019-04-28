@@ -1,8 +1,8 @@
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::pairs_of_limb_vec_and_positive_limb_var_1;
 use inputs::integer::{pairs_of_integer_and_signed, pairs_of_signed_and_integer};
-use malachite_base::misc::Max;
-use malachite_base::num::{CheckedHammingDistance, HammingDistance, SignificantBits};
+use malachite_base::comparison::Max;
+use malachite_base::num::traits::{CheckedHammingDistance, HammingDistance, SignificantBits};
 use malachite_nz::integer::logic::checked_hamming_distance_signed_limb::*;
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::{Limb, SignedLimb};

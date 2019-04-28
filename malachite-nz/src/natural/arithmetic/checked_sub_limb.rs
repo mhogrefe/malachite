@@ -1,7 +1,7 @@
-use malachite_base::misc::CheckedFrom;
+use malachite_base::conversion::CheckedFrom;
 #[cfg(feature = "64_bit_limbs")]
-use malachite_base::misc::WrappingFrom;
-use malachite_base::num::CheckedSub;
+use malachite_base::conversion::WrappingFrom;
+use malachite_base::num::traits::CheckedSub;
 use natural::arithmetic::sub_limb::{limbs_sub_limb, limbs_sub_limb_in_place};
 use natural::Natural::{self, Large, Small};
 use platform::Limb;
@@ -23,7 +23,7 @@ impl CheckedSub<Limb> for Natural {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::{CheckedSub, Zero};
+    /// use malachite_base::num::traits::{CheckedSub, Zero};
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
@@ -70,7 +70,7 @@ impl<'a> CheckedSub<Limb> for &'a Natural {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::{CheckedSub, Zero};
+    /// use malachite_base::num::traits::{CheckedSub, Zero};
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
@@ -126,7 +126,7 @@ impl CheckedSub<Natural> for Limb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::{CheckedSub, Zero};
+    /// use malachite_base::num::traits::{CheckedSub, Zero};
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
@@ -168,7 +168,7 @@ impl<'a> CheckedSub<&'a Natural> for Limb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::{CheckedSub, Zero};
+    /// use malachite_base::num::traits::{CheckedSub, Zero};
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {

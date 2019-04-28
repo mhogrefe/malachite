@@ -1,7 +1,8 @@
 use common::test_properties;
-use malachite_base::num::{
-    BitAccess, NegativeOne, PrimitiveInteger, PrimitiveSigned, PrimitiveUnsigned,
-};
+use malachite_base::num::integers::PrimitiveInteger;
+use malachite_base::num::signeds::PrimitiveSigned;
+use malachite_base::num::traits::{BitAccess, NegativeOne};
+use malachite_base::num::unsigneds::PrimitiveUnsigned;
 use malachite_test::inputs::base::{
     pairs_of_signed_and_u64_width_range_var_2, pairs_of_unsigned_and_small_unsigned,
 };

@@ -1,5 +1,5 @@
 use integer::Integer;
-use malachite_base::misc::CheckedFrom;
+use malachite_base::conversion::CheckedFrom;
 use natural::Natural;
 
 impl CheckedFrom<Integer> for Natural {
@@ -15,7 +15,7 @@ impl CheckedFrom<Integer> for Natural {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::misc::CheckedFrom;
+    /// use malachite_base::conversion::CheckedFrom;
     /// use malachite_nz::integer::Integer;
     /// use malachite_nz::natural::Natural;
     ///
@@ -50,7 +50,7 @@ impl<'a> CheckedFrom<&'a Integer> for Natural {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::misc::CheckedFrom;
+    /// use malachite_base::conversion::CheckedFrom;
     /// use malachite_nz::integer::Integer;
     /// use malachite_nz::natural::Natural;
     ///

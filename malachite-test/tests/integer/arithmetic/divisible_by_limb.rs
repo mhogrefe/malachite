@@ -1,5 +1,5 @@
 use common::test_properties;
-use malachite_base::num::{DivisibleBy, One, Zero};
+use malachite_base::num::traits::{DivisibleBy, One, Zero};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;

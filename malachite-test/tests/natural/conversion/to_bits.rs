@@ -1,5 +1,5 @@
 use common::{test_properties, test_properties_no_special};
-use malachite_base::num::{SignificantBits, Zero};
+use malachite_base::num::traits::{SignificantBits, Zero};
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 use malachite_test::inputs::base::small_unsigneds;

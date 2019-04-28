@@ -4,7 +4,7 @@ use inputs::integer::nm_pairs_of_integer_and_unsigned;
 #[cfg(feature = "32_bit_limbs")]
 use inputs::integer::nrm_pairs_of_integer_and_unsigned;
 use inputs::integer::{pairs_of_integer_and_unsigned, pairs_of_unsigned_and_integer};
-use malachite_base::num::{DivisibleBy, SignificantBits};
+use malachite_base::num::traits::{DivisibleBy, SignificantBits};
 use malachite_nz::platform::Limb;
 use num::{BigInt, Integer, Zero};
 

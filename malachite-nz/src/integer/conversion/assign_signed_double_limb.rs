@@ -1,5 +1,5 @@
 use integer::Integer;
-use malachite_base::num::{Assign, UnsignedAbs};
+use malachite_base::num::traits::{Assign, UnsignedAbs};
 use platform::SignedDoubleLimb;
 
 /// Assigns a `SignedDoubleLimb` to an `Integer`.
@@ -13,7 +13,7 @@ use platform::SignedDoubleLimb;
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::Assign;
+/// use malachite_base::num::traits::Assign;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {

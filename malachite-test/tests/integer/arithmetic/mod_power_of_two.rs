@@ -1,5 +1,5 @@
 use common::test_properties;
-use malachite_base::num::{
+use malachite_base::num::traits::{
     Abs, CeilingModPowerOfTwo, CeilingModPowerOfTwoAssign, DivisibleByPowerOfTwo, ModPowerOfTwo,
     ModPowerOfTwoAssign, One, PartialOrdAbs, RemPowerOfTwo, RemPowerOfTwoAssign, ShrRound, Sign,
     Zero,

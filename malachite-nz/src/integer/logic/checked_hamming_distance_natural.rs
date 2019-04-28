@@ -1,5 +1,5 @@
 use integer::Integer;
-use malachite_base::num::{CheckedHammingDistance, HammingDistance};
+use malachite_base::num::traits::{CheckedHammingDistance, HammingDistance};
 use natural::Natural;
 
 impl<'a, 'b> CheckedHammingDistance<&'a Natural> for &'b Integer {
@@ -19,7 +19,7 @@ impl<'a, 'b> CheckedHammingDistance<&'a Natural> for &'b Integer {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::CheckedHammingDistance;
+    /// use malachite_base::num::traits::CheckedHammingDistance;
     /// use malachite_nz::integer::Integer;
     /// use malachite_nz::natural::Natural;
     ///
@@ -58,7 +58,7 @@ impl<'a, 'b> CheckedHammingDistance<&'a Integer> for &'b Natural {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::CheckedHammingDistance;
+    /// use malachite_base::num::traits::CheckedHammingDistance;
     /// use malachite_nz::integer::Integer;
     /// use malachite_nz::natural::Natural;
     ///

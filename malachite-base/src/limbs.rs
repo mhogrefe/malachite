@@ -1,4 +1,4 @@
-use num::PrimitiveUnsigned;
+use num::unsigneds::PrimitiveUnsigned;
 
 //TODO test other unsigned besides u32
 /// Tests whether all limbs in a slice are equal to 0.
@@ -106,6 +106,7 @@ pub fn limbs_leading_zero_limbs<T: PrimitiveUnsigned>(limbs: &[T]) -> usize {
     limbs.iter().take_while(|&&limb| limb == T::ZERO).count()
 }
 
+//TODO docs and tests
 pub fn limbs_trailing_zero_limbs<T: PrimitiveUnsigned>(limbs: &[T]) -> usize {
     limbs
         .iter()

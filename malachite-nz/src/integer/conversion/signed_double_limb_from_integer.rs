@@ -1,6 +1,6 @@
 use integer::Integer;
-use malachite_base::misc::{CheckedFrom, WrappingFrom};
-use malachite_base::num::PrimitiveInteger;
+use malachite_base::conversion::{CheckedFrom, WrappingFrom};
+use malachite_base::num::integers::PrimitiveInteger;
 use natural::Natural::{Large, Small};
 use platform::{DoubleLimb, Limb, SignedDoubleLimb};
 
@@ -36,7 +36,7 @@ impl CheckedFrom<Integer> for SignedDoubleLimb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::misc::CheckedFrom;
+    /// use malachite_base::conversion::CheckedFrom;
     /// use malachite_nz::integer::Integer;
     /// use std::str::FromStr;
     ///
@@ -71,7 +71,7 @@ impl<'a> CheckedFrom<&'a Integer> for SignedDoubleLimb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::misc::CheckedFrom;
+    /// use malachite_base::conversion::CheckedFrom;
     /// use malachite_nz::integer::Integer;
     /// use std::str::FromStr;
     ///
@@ -109,7 +109,7 @@ impl WrappingFrom<Integer> for SignedDoubleLimb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::misc::WrappingFrom;
+    /// use malachite_base::conversion::WrappingFrom;
     /// use malachite_nz::integer::Integer;
     /// use std::str::FromStr;
     ///
@@ -143,7 +143,7 @@ impl<'a> WrappingFrom<&'a Integer> for SignedDoubleLimb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::misc::WrappingFrom;
+    /// use malachite_base::conversion::WrappingFrom;
     /// use malachite_nz::integer::Integer;
     /// use std::str::FromStr;
     ///

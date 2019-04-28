@@ -1,8 +1,7 @@
 use common::test_properties;
-use malachite_base::misc::Max;
-use malachite_base::num::{
-    DivisibleByPowerOfTwo, EqModPowerOfTwo, ModPowerOfTwo, PrimitiveInteger, Zero,
-};
+use malachite_base::comparison::Max;
+use malachite_base::num::integers::PrimitiveInteger;
+use malachite_base::num::traits::{DivisibleByPowerOfTwo, EqModPowerOfTwo, ModPowerOfTwo, Zero};
 use malachite_nz::integer::arithmetic::eq_limb_mod_power_of_two::limbs_eq_mod_power_of_two_neg_limb;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;

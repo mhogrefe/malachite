@@ -1,6 +1,6 @@
 use integer::Integer;
 use malachite_base::limbs::limbs_test_zero;
-use malachite_base::num::Zero;
+use malachite_base::num::traits::Zero;
 use natural::Natural;
 use platform::Limb;
 use std::cmp::Ordering;

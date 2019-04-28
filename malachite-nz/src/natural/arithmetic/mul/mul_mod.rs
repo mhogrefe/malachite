@@ -1,6 +1,7 @@
+use malachite_base::comparison::Max;
 use malachite_base::limbs::limbs_test_zero;
-use malachite_base::misc::Max;
-use malachite_base::num::{Parity, PrimitiveInteger};
+use malachite_base::num::integers::PrimitiveInteger;
+use malachite_base::num::traits::Parity;
 use natural::arithmetic::add::{
     limbs_add_same_length_to_out, limbs_add_to_out, limbs_slice_add_same_length_in_place_left,
 };

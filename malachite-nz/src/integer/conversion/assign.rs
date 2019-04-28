@@ -1,5 +1,5 @@
 use integer::Integer;
-use malachite_base::num::Assign;
+use malachite_base::num::traits::Assign;
 
 /// Assigns an `Integer` to another `Integer`, taking the `Integer` on the RHS by value.
 ///
@@ -12,7 +12,7 @@ use malachite_base::num::Assign;
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::Assign;
+/// use malachite_base::num::traits::Assign;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {
@@ -41,7 +41,7 @@ impl Assign<Integer> for Integer {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::Assign;
+/// use malachite_base::num::traits::Assign;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {

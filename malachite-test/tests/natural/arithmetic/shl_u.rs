@@ -1,6 +1,8 @@
 use common::{test_properties, test_properties_no_special};
-use malachite_base::misc::Max;
-use malachite_base::num::{IsPowerOfTwo, One, PrimitiveSigned, PrimitiveUnsigned, Zero};
+use malachite_base::comparison::Max;
+use malachite_base::num::signeds::PrimitiveSigned;
+use malachite_base::num::traits::{IsPowerOfTwo, One, Zero};
+use malachite_base::num::unsigneds::PrimitiveUnsigned;
 use malachite_nz::natural::arithmetic::shl_u::{
     limbs_shl, limbs_shl_to_out, limbs_slice_shl_in_place, limbs_vec_shl_in_place,
 };

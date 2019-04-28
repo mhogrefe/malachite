@@ -1,6 +1,7 @@
 use common::test_properties;
-use malachite_base::misc::{CheckedFrom, Max};
-use malachite_base::num::Zero;
+use malachite_base::comparison::Max;
+use malachite_base::conversion::CheckedFrom;
+use malachite_base::num::traits::Zero;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::arithmetic::sub_limb::{
     limbs_sub_limb, limbs_sub_limb_in_place, limbs_sub_limb_to_out,

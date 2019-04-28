@@ -1,5 +1,5 @@
 use common::test_properties;
-use malachite_base::misc::Walkable;
+use malachite_base::crement::Crementable;
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::SignedLimb;
 use malachite_test::inputs::base::signeds_no_min;

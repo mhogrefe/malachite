@@ -4,8 +4,8 @@ use inputs::natural::{
     rm_triples_of_natural_unsigned_and_small_unsigned,
     triples_of_natural_unsigned_and_small_unsigned, triples_of_unsigned_natural_and_small_unsigned,
 };
-use malachite_base::misc::CheckedFrom;
-use malachite_base::num::{EqModPowerOfTwo, ModPowerOfTwo, SignificantBits};
+use malachite_base::conversion::CheckedFrom;
+use malachite_base::num::traits::{EqModPowerOfTwo, ModPowerOfTwo, SignificantBits};
 use malachite_nz::natural::arithmetic::eq_limb_mod_power_of_two::limbs_eq_limb_mod_power_of_two;
 use malachite_nz::platform::Limb;
 use rug;

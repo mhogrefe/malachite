@@ -1,5 +1,5 @@
 use integer::Integer;
-use malachite_base::misc::{CheckedFrom, RoundingFrom};
+use malachite_base::conversion::{CheckedFrom, RoundingFrom};
 use malachite_base::round::RoundingMode;
 
 macro_rules! float_impls {
@@ -29,7 +29,7 @@ macro_rules! float_impls {
         /// extern crate malachite_base;
         /// extern crate malachite_nz;
         ///
-        /// use malachite_base::misc::RoundingFrom;
+        /// use malachite_base::conversion::RoundingFrom;
         /// use malachite_base::round::RoundingMode;
         /// use malachite_nz::integer::Integer;
         /// use std::str::FromStr;
@@ -85,7 +85,7 @@ macro_rules! float_impls {
         /// extern crate malachite_base;
         /// extern crate malachite_nz;
         ///
-        /// use malachite_base::misc::RoundingFrom;
+        /// use malachite_base::conversion::RoundingFrom;
         /// use malachite_base::round::RoundingMode;
         /// use malachite_nz::integer::Integer;
         /// use std::str::FromStr;
@@ -200,7 +200,7 @@ macro_rules! float_impls {
         /// extern crate malachite_base;
         /// extern crate malachite_nz;
         ///
-        /// use malachite_base::misc::CheckedFrom;
+        /// use malachite_base::conversion::CheckedFrom;
         /// use malachite_nz::integer::Integer;
         /// use std::str::FromStr;
         ///
@@ -233,7 +233,7 @@ macro_rules! float_impls {
         /// extern crate malachite_base;
         /// extern crate malachite_nz;
         ///
-        /// use malachite_base::misc::CheckedFrom;
+        /// use malachite_base::conversion::CheckedFrom;
         /// use malachite_nz::integer::Integer;
         /// use std::str::FromStr;
         ///

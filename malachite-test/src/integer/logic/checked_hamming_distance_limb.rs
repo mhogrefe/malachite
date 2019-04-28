@@ -1,6 +1,6 @@
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::integer::{pairs_of_integer_and_unsigned, pairs_of_unsigned_and_integer};
-use malachite_base::num::{CheckedHammingDistance, HammingDistance, SignificantBits};
+use malachite_base::num::traits::{CheckedHammingDistance, HammingDistance, SignificantBits};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;

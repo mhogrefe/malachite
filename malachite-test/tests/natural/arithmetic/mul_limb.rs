@@ -1,5 +1,5 @@
 use common::test_properties;
-use malachite_base::num::{DivMod, One, Zero};
+use malachite_base::num::traits::{DivMod, One, Zero};
 use malachite_nz::natural::arithmetic::mul_limb::{
     limbs_mul_limb, limbs_mul_limb_to_out, limbs_slice_mul_limb_in_place,
     limbs_vec_mul_limb_in_place,

@@ -1,6 +1,6 @@
 use common::test_properties;
-use malachite_base::misc::CheckedFrom;
-use malachite_base::num::{NegativeOne, Zero};
+use malachite_base::conversion::CheckedFrom;
+use malachite_base::num::traits::{NegativeOne, Zero};
 use malachite_nz::integer::logic::xor::{
     limbs_xor_neg_neg, limbs_xor_neg_neg_in_place_either, limbs_xor_neg_neg_in_place_left,
     limbs_xor_neg_neg_to_out,

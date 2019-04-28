@@ -1,7 +1,9 @@
-use malachite_base::misc::Max;
+use malachite_base::comparison::Max;
 #[cfg(feature = "64_bit_limbs")]
-use malachite_base::misc::WrappingFrom;
-use malachite_base::num::{DivRem, JoinHalves, SplitInHalf, WrappingAddAssign, WrappingSubAssign};
+use malachite_base::conversion::WrappingFrom;
+use malachite_base::num::traits::{
+    DivRem, JoinHalves, SplitInHalf, WrappingAddAssign, WrappingSubAssign,
+};
 use natural::arithmetic::add_limb::limbs_slice_add_limb_in_place;
 use natural::arithmetic::div_mod_limb::div_mod_by_preinversion;
 use natural::arithmetic::shl_u::{limbs_shl_to_out, limbs_slice_shl_in_place};

@@ -1,4 +1,5 @@
-use malachite_base::num::{AddMul, AddMulAssign, PrimitiveInteger, SplitInHalf};
+use malachite_base::num::integers::PrimitiveInteger;
+use malachite_base::num::traits::{AddMul, AddMulAssign, SplitInHalf};
 use natural::arithmetic::add_limb::limbs_slice_add_limb_in_place;
 use natural::arithmetic::mul_limb::{limbs_mul_limb_to_out, limbs_slice_mul_limb_in_place};
 use natural::Natural::{self, Large};
@@ -341,7 +342,7 @@ pub fn limbs_vec_add_mul_limb_in_place_either(
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::AddMul;
+/// use malachite_base::num::traits::AddMul;
 /// use malachite_nz::natural::Natural;
 ///
 /// fn main() {
@@ -384,7 +385,7 @@ impl AddMul<Natural, u32> for Natural {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::AddMul;
+/// use malachite_base::num::traits::AddMul;
 /// use malachite_nz::natural::Natural;
 ///
 /// fn main() {
@@ -427,7 +428,7 @@ impl<'a> AddMul<&'a Natural, u32> for Natural {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::AddMul;
+/// use malachite_base::num::traits::AddMul;
 /// use malachite_nz::natural::Natural;
 ///
 /// fn main() {
@@ -485,7 +486,7 @@ impl<'a> AddMul<Natural, u32> for &'a Natural {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::AddMul;
+/// use malachite_base::num::traits::AddMul;
 /// use malachite_nz::natural::Natural;
 ///
 /// fn main() {
@@ -537,7 +538,7 @@ impl<'a, 'b> AddMul<&'a Natural, u32> for &'b Natural {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::AddMulAssign;
+/// use malachite_base::num::traits::AddMulAssign;
 /// use malachite_nz::natural::Natural;
 ///
 /// fn main() {
@@ -596,7 +597,7 @@ impl AddMulAssign<Natural, u32> for Natural {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::AddMulAssign;
+/// use malachite_base::num::traits::AddMulAssign;
 /// use malachite_nz::natural::Natural;
 ///
 /// fn main() {

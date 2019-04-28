@@ -1,4 +1,6 @@
-use malachite_base::num::{DivisibleByPowerOfTwo, EqMod, Parity, SplitInHalf, WrappingAddAssign};
+use malachite_base::num::traits::{
+    DivisibleByPowerOfTwo, EqMod, Parity, SplitInHalf, WrappingAddAssign,
+};
 use natural::arithmetic::div_exact_limb::limbs_invert_limb;
 use natural::arithmetic::mod_limb::limbs_mod_limb;
 use natural::Natural::{self, Large, Small};
@@ -105,7 +107,7 @@ impl<'a> EqMod<Limb, Limb> for &'a Natural {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::EqMod;
+    /// use malachite_base::num::traits::EqMod;
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
     ///
@@ -148,7 +150,7 @@ impl<'a> EqMod<&'a Natural, Limb> for Limb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::EqMod;
+    /// use malachite_base::num::traits::EqMod;
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
     ///
@@ -188,7 +190,7 @@ impl<'a> EqMod<Limb, &'a Natural> for Limb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::EqMod;
+    /// use malachite_base::num::traits::EqMod;
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
     ///

@@ -7,7 +7,7 @@ use inputs::integer::{
     pairs_of_integer_and_nonzero_signed, triples_of_integer_nonzero_signed_and_rounding_mode_var_1,
     triples_of_signed_nonzero_integer_and_rounding_mode_var_1,
 };
-use malachite_base::num::{CeilingDivMod, DivRound, DivRoundAssign, SignificantBits};
+use malachite_base::num::traits::{CeilingDivMod, DivRound, DivRoundAssign, SignificantBits};
 use malachite_base::round::RoundingMode;
 use malachite_nz::platform::SignedLimb;
 use num::{BigInt, Integer};

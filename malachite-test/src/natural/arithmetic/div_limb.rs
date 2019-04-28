@@ -10,7 +10,7 @@ use inputs::natural::nrm_pairs_of_natural_and_positive_unsigned;
 use inputs::natural::{
     pairs_of_natural_and_positive_unsigned, pairs_of_unsigned_and_positive_natural,
 };
-use malachite_base::num::{DivRem, SignificantBits};
+use malachite_base::num::traits::{DivRem, SignificantBits};
 use malachite_nz::natural::arithmetic::div_limb::{
     limbs_div_limb, limbs_div_limb_in_place, limbs_div_limb_to_out,
 };

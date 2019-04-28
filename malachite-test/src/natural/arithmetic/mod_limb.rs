@@ -7,7 +7,7 @@ use inputs::natural::{
 use inputs::natural::{
     pairs_of_natural_and_positive_unsigned, pairs_of_unsigned_and_positive_natural,
 };
-use malachite_base::num::{
+use malachite_base::num::traits::{
     CeilingDivNegMod, DivMod, Mod, ModAssign, NegMod, NegModAssign, SignificantBits,
 };
 use malachite_nz::natural::arithmetic::mod_limb::limbs_mod_limb;

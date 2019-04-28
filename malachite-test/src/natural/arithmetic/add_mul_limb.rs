@@ -5,7 +5,7 @@ use inputs::base::{
     triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_7,
 };
 use inputs::natural::triples_of_natural_natural_and_unsigned;
-use malachite_base::num::{AddMul, AddMulAssign, SignificantBits};
+use malachite_base::num::traits::{AddMul, AddMulAssign, SignificantBits};
 use malachite_nz::natural::arithmetic::add_mul_limb::{
     limbs_add_mul_limb, limbs_slice_add_mul_limb_greater_in_place_left,
     limbs_slice_add_mul_limb_same_length_in_place_right, limbs_vec_add_mul_limb_in_place_either,

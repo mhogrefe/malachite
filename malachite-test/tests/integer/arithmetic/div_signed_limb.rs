@@ -1,5 +1,5 @@
 use common::test_properties;
-use malachite_base::num::{DivRem, NegativeOne, One, PartialOrdAbs, Zero};
+use malachite_base::num::traits::{DivRem, NegativeOne, One, PartialOrdAbs, Zero};
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::{Limb, SignedLimb};
 use malachite_test::common::{bigint_to_integer, integer_to_bigint};

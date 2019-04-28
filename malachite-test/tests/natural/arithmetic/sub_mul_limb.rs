@@ -1,6 +1,6 @@
 use common::test_properties;
-use malachite_base::num::{CheckedSub, SubMul, SubMulAssign};
-use malachite_base::num::{One, Zero};
+use malachite_base::num::traits::{CheckedSub, SubMul, SubMulAssign};
+use malachite_base::num::traits::{One, Zero};
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 use malachite_test::inputs::natural::{

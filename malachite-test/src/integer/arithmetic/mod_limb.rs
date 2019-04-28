@@ -8,7 +8,7 @@ use inputs::integer::{
 use inputs::integer::{
     pairs_of_integer_and_positive_unsigned, pairs_of_unsigned_and_nonzero_integer,
 };
-use malachite_base::num::{
+use malachite_base::num::traits::{
     CeilingDivMod, CeilingMod, CeilingModAssign, DivMod, Mod, ModAssign, SignificantBits,
 };
 use malachite_nz::platform::Limb;

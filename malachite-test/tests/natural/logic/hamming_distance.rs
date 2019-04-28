@@ -1,5 +1,5 @@
 use common::test_properties;
-use malachite_base::num::{CheckedHammingDistance, HammingDistance, Zero};
+use malachite_base::num::traits::{CheckedHammingDistance, HammingDistance, Zero};
 use malachite_nz::natural::logic::hamming_distance::{
     limbs_hamming_distance, limbs_hamming_distance_same_length,
 };

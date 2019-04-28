@@ -1,6 +1,6 @@
 use common::{test_properties, test_properties_custom_scale};
-use malachite_base::misc::Max;
-use malachite_base::num::{One, Zero};
+use malachite_base::comparison::Max;
+use malachite_base::num::traits::{One, Zero};
 use malachite_nz::natural::arithmetic::mul::fft::_limbs_mul_greater_to_out_fft;
 #[cfg(feature = "64_bit_limbs")]
 use malachite_nz::natural::arithmetic::mul::fft::{

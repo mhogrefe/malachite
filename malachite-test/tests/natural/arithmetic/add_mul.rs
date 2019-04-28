@@ -1,5 +1,5 @@
 use common::test_properties;
-use malachite_base::num::{AddMul, AddMulAssign, One, Zero};
+use malachite_base::num::traits::{AddMul, AddMulAssign, One, Zero};
 use malachite_nz::natural::arithmetic::add_mul::{limbs_add_mul, limbs_add_mul_in_place_left};
 use malachite_nz::natural::Natural;
 #[cfg(feature = "32_bit_limbs")]

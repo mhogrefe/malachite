@@ -1,6 +1,7 @@
 use common::test_properties;
-use malachite_base::misc::{CheckedFrom, Max};
-use malachite_base::num::{CheckedSub, Zero};
+use malachite_base::comparison::Max;
+use malachite_base::conversion::CheckedFrom;
+use malachite_base::num::traits::{CheckedSub, Zero};
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 use malachite_test::common::{biguint_to_natural, natural_to_biguint};

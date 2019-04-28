@@ -2,8 +2,8 @@ use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, 
 use inputs::integer::{
     rm_triples_of_integer_integer_and_small_unsigned, triples_of_integer_integer_and_small_unsigned,
 };
-use malachite_base::misc::CheckedFrom;
-use malachite_base::num::{EqModPowerOfTwo, ModPowerOfTwo, SignificantBits};
+use malachite_base::conversion::CheckedFrom;
+use malachite_base::num::traits::{EqModPowerOfTwo, ModPowerOfTwo, SignificantBits};
 use std::cmp::{max, min};
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {

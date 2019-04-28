@@ -2,11 +2,15 @@ use common::{integer_to_bigint, integer_to_rug_integer, natural_to_rug_integer, 
 use inputs::base::{finite_f32s, finite_f64s, It};
 use inputs::common::{reshape_1_2_to_3, reshape_2_1_to_3};
 use itertools::Itertools;
-use malachite_base::misc::{CheckedFrom, RoundingFrom, Walkable};
-use malachite_base::num::{
-    Abs, DivisibleBy, DivisibleByPowerOfTwo, EqMod, EqModPowerOfTwo, PrimitiveFloat,
-    PrimitiveInteger, PrimitiveSigned, PrimitiveUnsigned,
+use malachite_base::conversion::{CheckedFrom, RoundingFrom};
+use malachite_base::crement::Crementable;
+use malachite_base::num::floats::PrimitiveFloat;
+use malachite_base::num::integers::PrimitiveInteger;
+use malachite_base::num::signeds::PrimitiveSigned;
+use malachite_base::num::traits::{
+    Abs, DivisibleBy, DivisibleByPowerOfTwo, EqMod, EqModPowerOfTwo,
 };
+use malachite_base::num::unsigneds::PrimitiveUnsigned;
 use malachite_base::round::RoundingMode;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;

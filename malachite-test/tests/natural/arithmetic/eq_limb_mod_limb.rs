@@ -1,5 +1,5 @@
 use common::test_properties;
-use malachite_base::num::{DivisibleBy, EqMod, One, Zero};
+use malachite_base::num::traits::{DivisibleBy, EqMod, One, Zero};
 use malachite_nz::natural::arithmetic::eq_limb_mod_limb::{
     _combined_limbs_eq_limb_mod_limb, limbs_eq_limb_mod_limb,
 };

@@ -1,4 +1,4 @@
-use malachite_base::misc::{CheckedFrom, WrappingFrom};
+use malachite_base::conversion::{CheckedFrom, WrappingFrom};
 use natural::Natural::{self, Large, Small};
 use platform::Limb;
 
@@ -15,7 +15,7 @@ impl CheckedFrom<Natural> for Limb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::misc::CheckedFrom;
+    /// use malachite_base::conversion::CheckedFrom;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
@@ -42,7 +42,7 @@ impl<'a> CheckedFrom<&'a Natural> for Limb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::misc::CheckedFrom;
+    /// use malachite_base::conversion::CheckedFrom;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
@@ -71,7 +71,7 @@ impl WrappingFrom<Natural> for Limb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::misc::WrappingFrom;
+    /// use malachite_base::conversion::WrappingFrom;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
@@ -98,7 +98,7 @@ impl<'a> WrappingFrom<&'a Natural> for Limb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::misc::WrappingFrom;
+    /// use malachite_base::conversion::WrappingFrom;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {

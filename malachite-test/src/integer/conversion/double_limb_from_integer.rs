@@ -1,7 +1,7 @@
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::integer::integers;
-use malachite_base::misc::{CheckedFrom, WrappingFrom};
-use malachite_base::num::SignificantBits;
+use malachite_base::conversion::{CheckedFrom, WrappingFrom};
+use malachite_base::num::traits::SignificantBits;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_u64_checked_from_integer);

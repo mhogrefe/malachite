@@ -3,8 +3,8 @@ use inputs::base::{
     f32s, f32s_var_1, f64s, f64s_var_1, pairs_of_finite_f32_and_rounding_mode_var_1,
     pairs_of_finite_f64_and_rounding_mode_var_1,
 };
-use malachite_base::misc::{CheckedFrom, RoundingFrom};
-use malachite_base::num::PrimitiveFloat;
+use malachite_base::conversion::{CheckedFrom, RoundingFrom};
+use malachite_base::num::floats::PrimitiveFloat;
 use malachite_nz::natural::Natural;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {

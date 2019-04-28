@@ -1,7 +1,7 @@
 use integer::Integer;
 #[cfg(feature = "64_bit_limbs")]
-use malachite_base::misc::CheckedFrom;
-use malachite_base::num::{
+use malachite_base::conversion::CheckedFrom;
+use malachite_base::num::traits::{
     CeilingDivAssignMod, CeilingDivAssignNegMod, CeilingDivMod, CeilingDivNegMod, DivAssignMod,
     DivAssignRem, DivMod, DivRem,
 };
@@ -28,7 +28,7 @@ impl DivMod<Limb> for Integer {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::DivMod;
+    /// use malachite_base::num::traits::DivMod;
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {
@@ -78,7 +78,7 @@ impl<'a> DivMod<Limb> for &'a Integer {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::DivMod;
+    /// use malachite_base::num::traits::DivMod;
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {
@@ -130,7 +130,7 @@ impl DivAssignMod<Limb> for Integer {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::DivAssignMod;
+    /// use malachite_base::num::traits::DivAssignMod;
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {
@@ -186,7 +186,7 @@ impl DivMod<Integer> for Limb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::DivMod;
+    /// use malachite_base::num::traits::DivMod;
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {
@@ -237,7 +237,7 @@ impl<'a> DivMod<&'a Integer> for Limb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::DivMod;
+    /// use malachite_base::num::traits::DivMod;
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {
@@ -290,7 +290,7 @@ impl DivRem<Limb> for Integer {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::DivRem;
+    /// use malachite_base::num::traits::DivRem;
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {
@@ -339,7 +339,7 @@ impl<'a> DivRem<Limb> for &'a Integer {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::DivRem;
+    /// use malachite_base::num::traits::DivRem;
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {
@@ -389,7 +389,7 @@ impl DivAssignRem<Limb> for Integer {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::DivAssignRem;
+    /// use malachite_base::num::traits::DivAssignRem;
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {
@@ -444,7 +444,7 @@ impl DivRem<Integer> for Limb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::DivRem;
+    /// use malachite_base::num::traits::DivRem;
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {
@@ -497,7 +497,7 @@ impl<'a> DivRem<&'a Integer> for Limb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::DivRem;
+    /// use malachite_base::num::traits::DivRem;
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {
@@ -552,7 +552,7 @@ impl CeilingDivMod<Limb> for Integer {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::CeilingDivMod;
+    /// use malachite_base::num::traits::CeilingDivMod;
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {
@@ -601,7 +601,7 @@ impl<'a> CeilingDivMod<Limb> for &'a Integer {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::CeilingDivMod;
+    /// use malachite_base::num::traits::CeilingDivMod;
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {
@@ -657,7 +657,7 @@ impl CeilingDivAssignMod<Limb> for Integer {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::CeilingDivAssignMod;
+    /// use malachite_base::num::traits::CeilingDivAssignMod;
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {
@@ -713,7 +713,7 @@ impl CeilingDivMod<Integer> for Limb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::CeilingDivMod;
+    /// use malachite_base::num::traits::CeilingDivMod;
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {
@@ -766,7 +766,7 @@ impl<'a> CeilingDivMod<&'a Integer> for Limb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::CeilingDivMod;
+    /// use malachite_base::num::traits::CeilingDivMod;
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {

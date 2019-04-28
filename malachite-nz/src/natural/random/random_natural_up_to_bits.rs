@@ -1,6 +1,7 @@
 #[cfg(feature = "64_bit_limbs")]
-use malachite_base::num::JoinHalves;
-use malachite_base::num::{ModPowerOfTwo, PrimitiveUnsigned, ShrRound, Zero};
+use malachite_base::num::traits::JoinHalves;
+use malachite_base::num::traits::{ModPowerOfTwo, ShrRound, Zero};
+use malachite_base::num::unsigneds::PrimitiveUnsigned;
 use malachite_base::round::RoundingMode;
 use natural::Natural;
 use rand::{Rand, Rng};

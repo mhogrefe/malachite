@@ -1,5 +1,5 @@
 use common::test_properties;
-use malachite_base::num::Zero;
+use malachite_base::num::traits::Zero;
 use malachite_nz::natural::logic::and_limb::limbs_and_limb;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;

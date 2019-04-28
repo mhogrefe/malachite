@@ -1,4 +1,4 @@
-use malachite_base::num::HammingDistance;
+use malachite_base::num::traits::HammingDistance;
 use natural::logic::count_ones::limbs_count_ones;
 use natural::Natural::{self, Large, Small};
 use platform::Limb;
@@ -42,7 +42,7 @@ impl<'a> HammingDistance<Limb> for &'a Natural {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::{HammingDistance, One, Zero};
+    /// use malachite_base::num::traits::{HammingDistance, One, Zero};
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
@@ -83,7 +83,7 @@ impl<'a> HammingDistance<&'a Natural> for Limb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::{HammingDistance, One, Zero};
+    /// use malachite_base::num::traits::{HammingDistance, One, Zero};
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {

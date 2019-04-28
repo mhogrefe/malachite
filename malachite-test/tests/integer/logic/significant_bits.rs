@@ -1,6 +1,7 @@
 use common::test_properties;
-use malachite_base::misc::Max;
-use malachite_base::num::{Abs, One, PrimitiveInteger, SignificantBits};
+use malachite_base::comparison::Max;
+use malachite_base::num::integers::PrimitiveInteger;
+use malachite_base::num::traits::{Abs, One, SignificantBits};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::{Limb, SignedLimb};

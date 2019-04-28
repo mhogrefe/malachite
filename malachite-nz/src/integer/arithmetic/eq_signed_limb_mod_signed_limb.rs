@@ -1,5 +1,5 @@
 use integer::Integer;
-use malachite_base::num::{EqMod, NegMod, UnsignedAbs};
+use malachite_base::num::traits::{EqMod, NegMod, UnsignedAbs};
 use natural::Natural::{self, Large, Small};
 use platform::{Limb, SignedLimb};
 
@@ -19,7 +19,7 @@ impl<'a> EqMod<SignedLimb, SignedLimb> for &'a Integer {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::EqMod;
+    /// use malachite_base::num::traits::EqMod;
     /// use malachite_nz::integer::Integer;
     /// use std::str::FromStr;
     ///
@@ -78,7 +78,7 @@ impl<'a> EqMod<&'a Integer, SignedLimb> for SignedLimb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::EqMod;
+    /// use malachite_base::num::traits::EqMod;
     /// use malachite_nz::integer::Integer;
     /// use std::str::FromStr;
     ///
@@ -132,7 +132,7 @@ impl<'a> EqMod<SignedLimb, &'a Integer> for SignedLimb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::EqMod;
+    /// use malachite_base::num::traits::EqMod;
     /// use malachite_nz::integer::Integer;
     /// use std::str::FromStr;
     ///

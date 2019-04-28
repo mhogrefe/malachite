@@ -5,7 +5,7 @@ use inputs::natural::nm_pairs_of_natural_and_unsigned;
 #[cfg(feature = "32_bit_limbs")]
 use inputs::natural::nrm_pairs_of_natural_and_unsigned;
 use inputs::natural::{pairs_of_natural_and_unsigned, pairs_of_unsigned_and_natural};
-use malachite_base::num::{DivisibleBy, SignificantBits};
+use malachite_base::num::traits::{DivisibleBy, SignificantBits};
 use malachite_nz::natural::arithmetic::divisible_by_limb::{
     _combined_limbs_divisible_by_limb, limbs_divisible_by_limb,
 };

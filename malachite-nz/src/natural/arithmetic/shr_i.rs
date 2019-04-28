@@ -1,4 +1,5 @@
-use malachite_base::num::{PrimitiveSigned, ShrRound, ShrRoundAssign, UnsignedAbs};
+use malachite_base::num::signeds::PrimitiveSigned;
+use malachite_base::num::traits::{ShrRound, ShrRoundAssign, UnsignedAbs};
 use malachite_base::round::RoundingMode;
 use natural::Natural;
 use std::ops::{Shr, ShrAssign};
@@ -17,7 +18,7 @@ macro_rules! impl_natural_shr_signed {
         /// extern crate malachite_base;
         /// extern crate malachite_nz;
         ///
-        /// use malachite_base::num::Zero;
+        /// use malachite_base::num::traits::Zero;
         /// use malachite_nz::natural::Natural;
         ///
         /// fn main() {
@@ -52,7 +53,7 @@ macro_rules! impl_natural_shr_signed {
         /// extern crate malachite_base;
         /// extern crate malachite_nz;
         ///
-        /// use malachite_base::num::Zero;
+        /// use malachite_base::num::traits::Zero;
         /// use malachite_nz::natural::Natural;
         ///
         /// fn main() {
@@ -89,7 +90,7 @@ macro_rules! impl_natural_shr_signed {
         /// extern crate malachite_base;
         /// extern crate malachite_nz;
         ///
-        /// use malachite_base::num::One;
+        /// use malachite_base::num::traits::One;
         /// use malachite_nz::natural::Natural;
         ///
         /// fn main() {
@@ -138,7 +139,7 @@ macro_rules! impl_natural_shr_signed {
         /// extern crate malachite_nz;
         ///
         /// use malachite_base::round::RoundingMode;
-        /// use malachite_base::num::{ShrRound, Zero};
+        /// use malachite_base::num::traits::{ShrRound, Zero};
         /// use malachite_nz::natural::Natural;
         ///
         /// fn main() {
@@ -197,7 +198,7 @@ macro_rules! impl_natural_shr_signed {
         /// extern crate malachite_nz;
         ///
         /// use malachite_base::round::RoundingMode;
-        /// use malachite_base::num::{ShrRound, Zero};
+        /// use malachite_base::num::traits::{ShrRound, Zero};
         /// use malachite_nz::natural::Natural;
         ///
         /// fn main() {
@@ -258,7 +259,7 @@ macro_rules! impl_natural_shr_signed {
         /// extern crate malachite_nz;
         ///
         /// use malachite_base::round::RoundingMode;
-        /// use malachite_base::num::{One, ShrRoundAssign};
+        /// use malachite_base::num::traits::{One, ShrRoundAssign};
         /// use malachite_nz::natural::Natural;
         ///
         /// fn main() {

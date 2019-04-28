@@ -1,4 +1,4 @@
-use misc::Walkable;
+use crement::Crementable;
 use std::char;
 
 // The number of Unicode scalar values, or 1,112,064.
@@ -73,7 +73,7 @@ pub fn contiguous_range_to_char(u: u32) -> Option<char> {
     }
 }
 
-impl Walkable for char {
+impl Crementable for char {
     /// Increments this `char`, skipping over the surrogate range.
     ///
     /// Time: worst case O(1)
@@ -85,7 +85,7 @@ impl Walkable for char {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::misc::Walkable;
+    /// use malachite_base::crement::Crementable;
     ///
     /// let mut c = '\u{0}';
     /// c.increment();
@@ -111,7 +111,7 @@ impl Walkable for char {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::misc::Walkable;
+    /// use malachite_base::crement::Crementable;
     ///
     /// let mut c = '\u{1}';
     /// c.decrement();
@@ -128,5 +128,27 @@ impl Walkable for char {
         } else {
             *self = contiguous_range_to_char(char_to_contiguous_range(*self) - 1).unwrap();
         }
+    }
+}
+
+//TODO test
+pub fn digit_to_char(i: u32) -> Option<char> {
+    if i < 10 {
+        char::from_u32(i + 48)
+    } else if i < 36 {
+        char::from_u32(i + 87)
+    } else {
+        None
+    }
+}
+
+//TODO test
+pub fn char_to_digit(c: char) -> Option<u32> {
+    if c >= '0' && c <= '9' {
+        Some(c as u32 - 48)
+    } else if c >= 'a' && c <= 'z' {
+        Some(c as u32 - 87)
+    } else {
+        None
     }
 }

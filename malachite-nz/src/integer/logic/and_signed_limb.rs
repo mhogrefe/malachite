@@ -1,6 +1,6 @@
 use integer::Integer;
-use malachite_base::misc::WrappingFrom;
-use malachite_base::num::{UnsignedAbs, WrappingNegAssign};
+use malachite_base::conversion::WrappingFrom;
+use malachite_base::num::traits::{UnsignedAbs, WrappingNegAssign};
 use natural::arithmetic::add_limb::{limbs_add_limb_to_out, limbs_slice_add_limb_in_place};
 use natural::Natural::{self, Large, Small};
 use platform::{Limb, SignedLimb};
@@ -278,7 +278,7 @@ pub fn limbs_vec_neg_and_limb_neg_in_place(limbs: &mut Vec<Limb>, limb: Limb) {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::Zero;
+/// use malachite_base::num::traits::Zero;
 /// use malachite_nz::integer::Integer;
 /// use std::str::FromStr;
 ///
@@ -324,7 +324,7 @@ impl BitAnd<i32> for Integer {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::Zero;
+/// use malachite_base::num::traits::Zero;
 /// use malachite_nz::integer::Integer;
 /// use std::str::FromStr;
 ///
@@ -383,7 +383,7 @@ impl<'a> BitAnd<i32> for &'a Integer {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::Zero;
+/// use malachite_base::num::traits::Zero;
 /// use malachite_nz::integer::Integer;
 /// use std::str::FromStr;
 ///
@@ -428,7 +428,7 @@ impl BitAnd<Integer> for i32 {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::Zero;
+/// use malachite_base::num::traits::Zero;
 /// use malachite_nz::integer::Integer;
 /// use std::str::FromStr;
 ///
@@ -474,7 +474,7 @@ impl<'a> BitAnd<&'a Integer> for i32 {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::NegativeOne;
+/// use malachite_base::num::traits::NegativeOne;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {

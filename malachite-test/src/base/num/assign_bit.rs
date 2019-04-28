@@ -3,7 +3,8 @@ use inputs::base::{
     triples_of_signed_unsigned_width_range_and_bool_var_1,
     triples_of_unsigned_unsigned_width_range_and_bool_var_1,
 };
-use malachite_base::num::{PrimitiveSigned, PrimitiveUnsigned};
+use malachite_base::num::signeds::PrimitiveSigned;
+use malachite_base::num::unsigneds::PrimitiveUnsigned;
 use rand::Rand;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {

@@ -1,6 +1,6 @@
 use integer::Integer;
-use malachite_base::misc::CheckedFrom;
-use malachite_base::num::{Assign, NegAssign, NotAssign, UnsignedAbs};
+use malachite_base::conversion::CheckedFrom;
+use malachite_base::num::traits::{Assign, NegAssign, NotAssign, UnsignedAbs};
 use natural::Natural;
 use platform::{Limb, SignedLimb};
 use std::ops::{Sub, SubAssign};
@@ -17,7 +17,7 @@ use std::ops::{Sub, SubAssign};
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::Zero;
+/// use malachite_base::num::traits::Zero;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {
@@ -60,7 +60,7 @@ impl Sub<i32> for Integer {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::Zero;
+/// use malachite_base::num::traits::Zero;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {
@@ -123,7 +123,7 @@ impl<'a> Sub<i32> for &'a Integer {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::Zero;
+/// use malachite_base::num::traits::Zero;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {
@@ -165,7 +165,7 @@ impl Sub<Integer> for i32 {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::Zero;
+/// use malachite_base::num::traits::Zero;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {
@@ -206,7 +206,7 @@ impl<'a> Sub<&'a Integer> for i32 {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::Zero;
+/// use malachite_base::num::traits::Zero;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {

@@ -6,7 +6,7 @@ use inputs::base::{
 use inputs::natural::{
     nrm_pairs_of_naturals_var_1, pairs_of_naturals_var_1, rm_pairs_of_naturals_var_1,
 };
-use malachite_base::num::SignificantBits;
+use malachite_base::num::traits::SignificantBits;
 use malachite_nz::natural::arithmetic::sub::{
     limbs_sub, limbs_sub_in_place_left, limbs_sub_in_place_right,
     limbs_sub_same_length_in_place_left, limbs_sub_same_length_in_place_right,

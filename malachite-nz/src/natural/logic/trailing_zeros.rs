@@ -1,5 +1,5 @@
 use malachite_base::limbs::limbs_leading_zero_limbs;
-use malachite_base::num::PrimitiveInteger;
+use malachite_base::num::integers::PrimitiveInteger;
 use natural::Natural::{self, Large, Small};
 use platform::Limb;
 
@@ -44,7 +44,7 @@ impl Natural {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::Zero;
+    /// use malachite_base::num::traits::Zero;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {

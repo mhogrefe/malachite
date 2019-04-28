@@ -3,7 +3,7 @@ use inputs::integer::{
     nrm_pairs_of_integer_and_nonzero_signed_limb_var_1,
     pairs_of_integer_and_nonzero_signed_limb_var_1, pairs_of_signed_limb_and_nonzero_integer_var_2,
 };
-use malachite_base::num::{DivExact, DivExactAssign, SignificantBits};
+use malachite_base::num::traits::{DivExact, DivExactAssign, SignificantBits};
 use malachite_nz::platform::SignedLimb;
 use rug;
 

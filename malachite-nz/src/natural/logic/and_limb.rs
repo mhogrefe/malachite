@@ -1,4 +1,4 @@
-use malachite_base::misc::WrappingFrom;
+use malachite_base::conversion::WrappingFrom;
 use natural::Natural::{self, Small};
 use platform::Limb;
 use std::ops::{BitAnd, BitAndAssign};
@@ -35,7 +35,7 @@ pub fn limbs_and_limb(limbs: &[Limb], limb: Limb) -> Limb {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::Zero;
+/// use malachite_base::num::traits::Zero;
 /// use malachite_nz::natural::Natural;
 ///
 /// fn main() {
@@ -74,7 +74,7 @@ impl BitAnd<u32> for Natural {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::Zero;
+/// use malachite_base::num::traits::Zero;
 /// use malachite_nz::natural::Natural;
 ///
 /// fn main() {
@@ -113,7 +113,7 @@ impl<'a> BitAnd<u32> for &'a Natural {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::Zero;
+/// use malachite_base::num::traits::Zero;
 /// use malachite_nz::natural::Natural;
 ///
 /// fn main() {
@@ -153,7 +153,7 @@ impl BitAnd<Natural> for u32 {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::Zero;
+/// use malachite_base::num::traits::Zero;
 /// use malachite_nz::natural::Natural;
 ///
 /// fn main() {

@@ -1,5 +1,5 @@
 use common::test_properties;
-use malachite_base::num::{BitAccess, NotAssign, One};
+use malachite_base::num::traits::{BitAccess, NotAssign, One};
 use malachite_nz::integer::logic::bit_access::{
     limbs_slice_clear_bit_neg, limbs_vec_clear_bit_neg,
 };

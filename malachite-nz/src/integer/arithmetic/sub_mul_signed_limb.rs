@@ -1,5 +1,5 @@
 use integer::Integer;
-use malachite_base::num::{AddMul, AddMulAssign, SubMul, SubMulAssign, UnsignedAbs};
+use malachite_base::num::traits::{AddMul, AddMulAssign, SubMul, SubMulAssign, UnsignedAbs};
 use platform::{Limb, SignedLimb};
 
 /// Adds the product of an `Integer` (b) and a `SignedLimb` (c) to an `Integer` (self), taking
@@ -10,7 +10,7 @@ use platform::{Limb, SignedLimb};
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::SubMul;
+/// use malachite_base::num::traits::SubMul;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {
@@ -47,7 +47,7 @@ impl SubMul<Integer, i32> for Integer {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::SubMul;
+/// use malachite_base::num::traits::SubMul;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {
@@ -84,7 +84,7 @@ impl<'a> SubMul<&'a Integer, i32> for Integer {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::SubMul;
+/// use malachite_base::num::traits::SubMul;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {
@@ -120,7 +120,7 @@ impl<'a> SubMul<Integer, i32> for &'a Integer {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::SubMul;
+/// use malachite_base::num::traits::SubMul;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {
@@ -159,7 +159,7 @@ impl<'a, 'b> SubMul<&'a Integer, i32> for &'b Integer {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::SubMulAssign;
+/// use malachite_base::num::traits::SubMulAssign;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {
@@ -187,7 +187,7 @@ impl SubMulAssign<Integer, SignedLimb> for Integer {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::SubMulAssign;
+/// use malachite_base::num::traits::SubMulAssign;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {

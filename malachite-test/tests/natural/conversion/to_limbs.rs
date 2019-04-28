@@ -1,7 +1,7 @@
 use common::{test_properties, test_properties_no_special};
 #[cfg(feature = "32_bit_limbs")]
-use malachite_base::misc::Max;
-use malachite_base::num::Zero;
+use malachite_base::comparison::Max;
+use malachite_base::num::traits::Zero;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 use malachite_test::inputs::base::small_usizes;

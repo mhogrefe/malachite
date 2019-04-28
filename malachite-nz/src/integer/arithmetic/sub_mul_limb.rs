@@ -1,6 +1,6 @@
 use integer::arithmetic::add_mul_limb::{large_aorsmul_ref, large_aorsmul_val};
 use integer::Integer;
-use malachite_base::num::{AddMul, AddMulAssign, SubMul, SubMulAssign};
+use malachite_base::num::traits::{AddMul, AddMulAssign, SubMul, SubMulAssign};
 use natural::Natural::Small;
 use platform::Limb;
 
@@ -18,7 +18,7 @@ use platform::Limb;
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::SubMul;
+/// use malachite_base::num::traits::SubMul;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {
@@ -61,7 +61,7 @@ impl SubMul<Integer, u32> for Integer {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::SubMul;
+/// use malachite_base::num::traits::SubMul;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {
@@ -104,7 +104,7 @@ impl<'a> SubMul<&'a Integer, u32> for Integer {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::SubMul;
+/// use malachite_base::num::traits::SubMul;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {
@@ -146,7 +146,7 @@ impl<'a> SubMul<Integer, u32> for &'a Integer {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::SubMul;
+/// use malachite_base::num::traits::SubMul;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {
@@ -216,7 +216,7 @@ impl<'a, 'b> SubMul<&'a Integer, u32> for &'b Integer {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::SubMulAssign;
+/// use malachite_base::num::traits::SubMulAssign;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {
@@ -280,7 +280,7 @@ impl SubMulAssign<Integer, u32> for Integer {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::SubMulAssign;
+/// use malachite_base::num::traits::SubMulAssign;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {

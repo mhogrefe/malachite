@@ -1,6 +1,6 @@
 use common::test_properties;
-use malachite_base::misc::Max;
-use malachite_base::num::{NegativeOne, Zero};
+use malachite_base::comparison::Max;
+use malachite_base::num::traits::{NegativeOne, Zero};
 use malachite_nz::integer::logic::or_signed_limb::{limbs_neg_or_neg_limb, limbs_pos_or_neg_limb};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;

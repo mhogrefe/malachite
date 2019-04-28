@@ -1,4 +1,5 @@
-use malachite_base::num::{ModPowerOfTwo, PrimitiveUnsigned, SaturatingSubAssign, ShrRound, Zero};
+use malachite_base::num::traits::{ModPowerOfTwo, SaturatingSubAssign, ShrRound, Zero};
+use malachite_base::num::unsigneds::PrimitiveUnsigned;
 use malachite_base::round::RoundingMode;
 use natural::arithmetic::add_limb::limbs_slice_add_limb_in_place;
 #[cfg(feature = "64_bit_limbs")]

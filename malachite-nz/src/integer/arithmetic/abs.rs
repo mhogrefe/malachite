@@ -1,5 +1,5 @@
 use integer::Integer;
-use malachite_base::num::{Abs, AbsAssign, UnsignedAbs};
+use malachite_base::num::traits::{Abs, AbsAssign, UnsignedAbs};
 use natural::Natural;
 
 /// Replaces an `Integer` with its absolute value.
@@ -13,7 +13,7 @@ use natural::Natural;
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::{AbsAssign, Zero};
+/// use malachite_base::num::traits::{AbsAssign, Zero};
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {
@@ -51,7 +51,7 @@ impl Abs for Integer {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::{Abs, Zero};
+    /// use malachite_base::num::traits::{Abs, Zero};
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {
@@ -83,7 +83,7 @@ impl<'a> Abs for &'a Integer {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::{Abs, Zero};
+    /// use malachite_base::num::traits::{Abs, Zero};
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {
@@ -115,7 +115,7 @@ impl UnsignedAbs for Integer {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::{UnsignedAbs, Zero};
+    /// use malachite_base::num::traits::{UnsignedAbs, Zero};
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {
@@ -147,7 +147,7 @@ impl<'a> UnsignedAbs for &'a Integer {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::{UnsignedAbs, Zero};
+    /// use malachite_base::num::traits::{UnsignedAbs, Zero};
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {
@@ -174,7 +174,7 @@ impl<'a> UnsignedAbs for &'a Integer {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::Zero;
+/// use malachite_base::num::traits::Zero;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {

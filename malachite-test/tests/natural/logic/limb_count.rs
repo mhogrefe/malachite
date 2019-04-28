@@ -1,6 +1,7 @@
 use common::test_properties;
-use malachite_base::misc::Max;
-use malachite_base::num::{One, PrimitiveInteger};
+use malachite_base::comparison::Max;
+use malachite_base::num::integers::PrimitiveInteger;
+use malachite_base::num::traits::One;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 use malachite_test::inputs::base::unsigneds;

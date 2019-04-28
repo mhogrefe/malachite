@@ -11,7 +11,7 @@ use inputs::natural::{
     rm_pairs_of_unsigned_and_natural,
 };
 use inputs::natural::{pairs_of_natural_and_unsigned, pairs_of_unsigned_and_natural};
-use malachite_base::num::SignificantBits;
+use malachite_base::num::traits::SignificantBits;
 use malachite_nz::natural::logic::xor_limb::{
     limbs_xor_limb, limbs_xor_limb_in_place, limbs_xor_limb_to_out,
 };

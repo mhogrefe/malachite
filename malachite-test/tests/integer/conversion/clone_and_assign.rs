@@ -1,5 +1,5 @@
 use common::test_properties;
-use malachite_base::num::Assign;
+use malachite_base::num::traits::Assign;
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::SignedLimb;
 use malachite_test::common::{

@@ -1,7 +1,7 @@
 use common::test_properties;
 #[cfg(feature = "32_bit_limbs")]
-use malachite_base::misc::CheckedFrom;
-use malachite_base::num::{DivisibleByPowerOfTwo, EqModPowerOfTwo, ModPowerOfTwo, Zero};
+use malachite_base::conversion::CheckedFrom;
+use malachite_base::num::traits::{DivisibleByPowerOfTwo, EqModPowerOfTwo, ModPowerOfTwo, Zero};
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::{Limb, SignedLimb};
 #[cfg(feature = "32_bit_limbs")]

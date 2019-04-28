@@ -1,8 +1,10 @@
 use common::test_properties;
-use malachite_base::misc::{CheckedFrom, Max};
-use malachite_base::num::{
-    PrimitiveInteger, PrimitiveSigned, PrimitiveUnsigned, ShrRound, ShrRoundAssign, Zero,
-};
+use malachite_base::comparison::Max;
+use malachite_base::conversion::CheckedFrom;
+use malachite_base::num::integers::PrimitiveInteger;
+use malachite_base::num::signeds::PrimitiveSigned;
+use malachite_base::num::traits::{ShrRound, ShrRoundAssign, Zero};
+use malachite_base::num::unsigneds::PrimitiveUnsigned;
 use malachite_base::round::RoundingMode;
 use malachite_nz::natural::arithmetic::shr_u::{
     limbs_shr, limbs_shr_exact, limbs_shr_round, limbs_shr_round_to_nearest, limbs_shr_round_up,

@@ -2,7 +2,7 @@ use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, 
 use inputs::integer::{
     rm_triples_of_integer_small_u64_and_bool, triples_of_integer_small_u64_and_bool,
 };
-use malachite_base::num::{BitAccess, SignificantBits};
+use malachite_base::num::traits::{BitAccess, SignificantBits};
 use std::cmp::max;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {

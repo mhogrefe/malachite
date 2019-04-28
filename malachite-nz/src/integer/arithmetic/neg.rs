@@ -1,5 +1,5 @@
 use integer::Integer;
-use malachite_base::num::{NegAssign, NotAssign, Zero};
+use malachite_base::num::traits::{NegAssign, NotAssign, Zero};
 use platform::Limb;
 use std::ops::Neg;
 
@@ -14,7 +14,7 @@ use std::ops::Neg;
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::Zero;
+/// use malachite_base::num::traits::Zero;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {
@@ -47,7 +47,7 @@ impl Neg for Integer {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::Zero;
+/// use malachite_base::num::traits::Zero;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {
@@ -82,7 +82,7 @@ impl<'a> Neg for &'a Integer {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::{NegAssign, Zero};
+/// use malachite_base::num::traits::{NegAssign, Zero};
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {

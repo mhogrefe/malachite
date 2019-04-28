@@ -1,5 +1,5 @@
 use integer::Integer;
-use malachite_base::num::{EqModPowerOfTwo, UnsignedAbs};
+use malachite_base::num::traits::{EqModPowerOfTwo, UnsignedAbs};
 use platform::SignedLimb;
 
 impl<'a> EqModPowerOfTwo<SignedLimb> for &'a Integer {
@@ -18,7 +18,7 @@ impl<'a> EqModPowerOfTwo<SignedLimb> for &'a Integer {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::{EqModPowerOfTwo, Zero};
+    /// use malachite_base::num::traits::{EqModPowerOfTwo, Zero};
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {
@@ -65,7 +65,7 @@ impl<'a> EqModPowerOfTwo<&'a Integer> for SignedLimb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::{EqModPowerOfTwo, Zero};
+    /// use malachite_base::num::traits::{EqModPowerOfTwo, Zero};
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {

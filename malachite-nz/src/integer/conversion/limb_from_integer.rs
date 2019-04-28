@@ -1,5 +1,5 @@
 use integer::Integer;
-use malachite_base::misc::{CheckedFrom, WrappingFrom};
+use malachite_base::conversion::{CheckedFrom, WrappingFrom};
 use platform::Limb;
 
 impl CheckedFrom<Integer> for Limb {
@@ -15,7 +15,7 @@ impl CheckedFrom<Integer> for Limb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::misc::CheckedFrom;
+    /// use malachite_base::conversion::CheckedFrom;
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {
@@ -44,7 +44,7 @@ impl<'a> CheckedFrom<&'a Integer> for Limb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::misc::CheckedFrom;
+    /// use malachite_base::conversion::CheckedFrom;
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {
@@ -86,7 +86,7 @@ impl WrappingFrom<Integer> for Limb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::misc::WrappingFrom;
+    /// use malachite_base::conversion::WrappingFrom;
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {
@@ -115,7 +115,7 @@ impl<'a> WrappingFrom<&'a Integer> for Limb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::misc::WrappingFrom;
+    /// use malachite_base::conversion::WrappingFrom;
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {

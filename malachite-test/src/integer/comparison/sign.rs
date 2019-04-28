@@ -1,6 +1,6 @@
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::integer::{integers, nrm_integers};
-use malachite_base::num::{Sign, SignificantBits};
+use malachite_base::num::traits::{Sign, SignificantBits};
 use num::bigint::Sign as NumSign;
 use num::BigInt;
 use std::cmp::Ordering;

@@ -1,8 +1,8 @@
 #[cfg(feature = "32_bit_limbs")]
 use common::test_properties;
+use malachite_base::comparison::Max;
 #[cfg(feature = "32_bit_limbs")]
-use malachite_base::misc::CheckedFrom;
-use malachite_base::misc::Max;
+use malachite_base::conversion::CheckedFrom;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::DoubleLimb;
 #[cfg(feature = "32_bit_limbs")]

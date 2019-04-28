@@ -1,5 +1,5 @@
 use malachite_base::limbs::{limbs_set_zero, limbs_test_zero};
-use malachite_base::num::{NextPowerOfTwo, NextPowerOfTwoAssign};
+use malachite_base::num::traits::{NextPowerOfTwo, NextPowerOfTwoAssign};
 use natural::Natural::{self, Large, Small};
 use platform::Limb;
 
@@ -166,7 +166,7 @@ impl NextPowerOfTwo for Natural {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::{NextPowerOfTwo, Zero};
+    /// use malachite_base::num::traits::{NextPowerOfTwo, Zero};
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
@@ -199,7 +199,7 @@ impl<'a> NextPowerOfTwo for &'a Natural {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::{NextPowerOfTwo, Zero};
+    /// use malachite_base::num::traits::{NextPowerOfTwo, Zero};
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
@@ -234,7 +234,7 @@ impl NextPowerOfTwoAssign for Natural {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::{NextPowerOfTwoAssign, Zero};
+    /// use malachite_base::num::traits::{NextPowerOfTwoAssign, Zero};
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {

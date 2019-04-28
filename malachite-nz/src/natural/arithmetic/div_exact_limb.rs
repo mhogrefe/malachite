@@ -1,9 +1,8 @@
-use malachite_base::misc::Max;
+use malachite_base::comparison::Max;
 #[cfg(feature = "64_bit_limbs")]
-use malachite_base::misc::WrappingFrom;
-use malachite_base::num::{
-    DivExact, DivExactAssign, ModPowerOfTwo, Parity, PrimitiveInteger, SplitInHalf,
-};
+use malachite_base::conversion::WrappingFrom;
+use malachite_base::num::integers::PrimitiveInteger;
+use malachite_base::num::traits::{DivExact, DivExactAssign, ModPowerOfTwo, Parity, SplitInHalf};
 use natural::arithmetic::div_limb::{
     limbs_div_divisor_of_limb_max_with_carry_in_place,
     limbs_div_divisor_of_limb_max_with_carry_to_out,
@@ -434,7 +433,7 @@ impl DivExact<Limb> for Natural {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::DivExact;
+    /// use malachite_base::num::traits::DivExact;
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
     ///
@@ -481,7 +480,7 @@ impl<'a> DivExact<Limb> for &'a Natural {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::DivExact;
+    /// use malachite_base::num::traits::DivExact;
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
     ///
@@ -541,7 +540,7 @@ impl DivExactAssign<Limb> for Natural {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::DivExactAssign;
+    /// use malachite_base::num::traits::DivExactAssign;
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
     ///
@@ -602,7 +601,7 @@ impl DivExact<Natural> for Limb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::DivExact;
+    /// use malachite_base::num::traits::DivExact;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
@@ -649,7 +648,7 @@ impl<'a> DivExact<&'a Natural> for Limb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::DivExact;
+    /// use malachite_base::num::traits::DivExact;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
@@ -694,7 +693,7 @@ impl DivExactAssign<Natural> for Limb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::DivExactAssign;
+    /// use malachite_base::num::traits::DivExactAssign;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
@@ -732,7 +731,7 @@ impl<'a> DivExactAssign<&'a Natural> for Limb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::DivExactAssign;
+    /// use malachite_base::num::traits::DivExactAssign;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {

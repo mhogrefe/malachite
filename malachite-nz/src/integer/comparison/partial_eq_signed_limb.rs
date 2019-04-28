@@ -1,5 +1,5 @@
 use integer::Integer;
-use malachite_base::num::UnsignedAbs;
+use malachite_base::num::traits::UnsignedAbs;
 use platform::SignedLimb;
 
 /// Determines whether an `Integer` is equal to a `SignedLimb`.

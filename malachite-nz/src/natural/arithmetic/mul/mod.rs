@@ -1,4 +1,4 @@
-use malachite_base::num::PrimitiveInteger;
+use malachite_base::num::integers::PrimitiveInteger;
 use natural::arithmetic::add::limbs_slice_add_greater_in_place_left;
 use natural::arithmetic::add_mul_limb::limbs_slice_add_mul_limb_greater_in_place_left;
 use natural::arithmetic::mul::fft::{_limbs_mul_greater_to_out_fft, MUL_FFT_THRESHOLD};
@@ -483,7 +483,7 @@ pub fn _limbs_mul_greater_to_out_basecase_mem_opt(out: &mut [Limb], xs: &[Limb],
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::{One, Zero};
+/// use malachite_base::num::traits::{One, Zero};
 /// use malachite_nz::natural::Natural;
 /// use std::str::FromStr;
 ///
@@ -519,7 +519,7 @@ impl Mul<Natural> for Natural {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::{One, Zero};
+/// use malachite_base::num::traits::{One, Zero};
 /// use malachite_nz::natural::Natural;
 /// use std::str::FromStr;
 ///
@@ -555,7 +555,7 @@ impl<'a> Mul<&'a Natural> for Natural {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::{One, Zero};
+/// use malachite_base::num::traits::{One, Zero};
 /// use malachite_nz::natural::Natural;
 /// use std::str::FromStr;
 ///
@@ -590,7 +590,7 @@ impl<'a> Mul<Natural> for &'a Natural {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::{One, Zero};
+/// use malachite_base::num::traits::{One, Zero};
 /// use malachite_nz::natural::Natural;
 /// use std::str::FromStr;
 ///
@@ -636,7 +636,7 @@ impl<'a, 'b> Mul<&'a Natural> for &'b Natural {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::One;
+/// use malachite_base::num::traits::One;
 /// use malachite_nz::natural::Natural;
 /// use std::str::FromStr;
 ///
@@ -681,7 +681,7 @@ impl MulAssign<Natural> for Natural {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::One;
+/// use malachite_base::num::traits::One;
 /// use malachite_nz::natural::Natural;
 /// use std::str::FromStr;
 ///

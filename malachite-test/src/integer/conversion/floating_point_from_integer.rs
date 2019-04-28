@@ -3,8 +3,9 @@ use inputs::integer::{
     integers, pairs_of_integer_and_rounding_mode_var_1_f32,
     pairs_of_integer_and_rounding_mode_var_1_f64,
 };
-use malachite_base::misc::{CheckedFrom, Named, RoundingFrom};
-use malachite_base::num::SignificantBits;
+use malachite_base::conversion::{CheckedFrom, RoundingFrom};
+use malachite_base::named::Named;
+use malachite_base::num::traits::SignificantBits;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_f32_rounding_from_integer);

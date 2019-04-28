@@ -1,7 +1,7 @@
 use integer::logic::checked_count_zeros::limbs_count_zeros_neg;
 use integer::Integer;
 use malachite_base::limbs::limbs_leading_zero_limbs;
-use malachite_base::num::{CheckedHammingDistance, HammingDistance};
+use malachite_base::num::traits::{CheckedHammingDistance, HammingDistance};
 use natural::logic::count_ones::limbs_count_ones;
 use natural::logic::hamming_distance::limbs_hamming_distance_same_length;
 use natural::Natural::{self, Large, Small};
@@ -113,7 +113,7 @@ impl<'a, 'b> CheckedHammingDistance<&'a Integer> for &'b Integer {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::CheckedHammingDistance;
+    /// use malachite_base::num::traits::CheckedHammingDistance;
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {

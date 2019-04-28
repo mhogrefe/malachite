@@ -1,4 +1,5 @@
-use malachite_base::num::{EqModPowerOfTwo, PrimitiveInteger};
+use malachite_base::num::integers::PrimitiveInteger;
+use malachite_base::num::traits::EqModPowerOfTwo;
 use natural::arithmetic::divisible_by_power_of_two::limbs_divisible_by_power_of_two;
 use natural::Natural::{self, Large, Small};
 use platform::Limb;
@@ -53,7 +54,7 @@ impl<'a> EqModPowerOfTwo<Limb> for &'a Natural {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::{EqModPowerOfTwo, Zero};
+    /// use malachite_base::num::traits::{EqModPowerOfTwo, Zero};
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
@@ -93,7 +94,7 @@ impl<'a> EqModPowerOfTwo<&'a Natural> for Limb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::{EqModPowerOfTwo, Zero};
+    /// use malachite_base::num::traits::{EqModPowerOfTwo, Zero};
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {

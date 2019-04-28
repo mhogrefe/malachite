@@ -6,8 +6,8 @@ use inputs::base::{
 use inputs::natural::{
     pairs_of_natural_and_small_unsigned, rm_pairs_of_natural_and_small_unsigned,
 };
-use malachite_base::misc::Named;
-use malachite_base::num::PrimitiveInteger;
+use malachite_base::named::Named;
+use malachite_base::num::integers::PrimitiveInteger;
 use malachite_nz::natural::arithmetic::shl_u::{
     limbs_shl, limbs_shl_to_out, limbs_slice_shl_in_place, limbs_vec_shl_in_place,
 };

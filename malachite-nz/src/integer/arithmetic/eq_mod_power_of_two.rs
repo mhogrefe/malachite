@@ -1,5 +1,5 @@
 use integer::Integer;
-use malachite_base::num::EqModPowerOfTwo;
+use malachite_base::num::traits::EqModPowerOfTwo;
 
 impl<'a, 'b> EqModPowerOfTwo<&'b Integer> for &'a Integer {
     /// Returns whether two `Integer`s are equivalent mod two to the power of `pow`; that is,
@@ -16,7 +16,7 @@ impl<'a, 'b> EqModPowerOfTwo<&'b Integer> for &'a Integer {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::{EqModPowerOfTwo, Zero};
+    /// use malachite_base::num::traits::{EqModPowerOfTwo, Zero};
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {

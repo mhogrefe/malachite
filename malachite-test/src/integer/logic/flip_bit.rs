@@ -1,6 +1,6 @@
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::integer::{pairs_of_integer_and_small_u64, rm_pairs_of_integer_and_small_u64};
-use malachite_base::num::{BitAccess, SignificantBits};
+use malachite_base::num::traits::{BitAccess, SignificantBits};
 use std::cmp::max;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {

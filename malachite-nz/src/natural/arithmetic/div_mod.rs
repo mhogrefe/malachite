@@ -1,7 +1,6 @@
-use malachite_base::misc::Max;
-use malachite_base::num::{
-    JoinHalves, PrimitiveInteger, SplitInHalf, WrappingAddAssign, WrappingSubAssign,
-};
+use malachite_base::comparison::Max;
+use malachite_base::num::integers::PrimitiveInteger;
+use malachite_base::num::traits::{JoinHalves, SplitInHalf, WrappingAddAssign, WrappingSubAssign};
 use natural::arithmetic::add::limbs_slice_add_same_length_in_place_left;
 use natural::arithmetic::mul::mul_mod::{
     _limbs_mul_mod_limb_width_to_n_minus_1_next_size,

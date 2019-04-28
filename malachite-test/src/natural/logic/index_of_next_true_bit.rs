@@ -1,7 +1,7 @@
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::pairs_of_unsigned_vec_and_small_unsigned;
 use inputs::natural::pairs_of_natural_and_small_unsigned;
-use malachite_base::num::{BitScan, SignificantBits};
+use malachite_base::num::traits::{BitScan, SignificantBits};
 use malachite_nz::natural::logic::bit_scan::limbs_index_of_next_true_bit;
 use malachite_nz::natural::Natural;
 

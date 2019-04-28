@@ -1,5 +1,5 @@
 use integer::Integer;
-use malachite_base::num::{DivRound, DivRoundAssign, UnsignedAbs, Zero};
+use malachite_base::num::traits::{DivRound, DivRoundAssign, UnsignedAbs, Zero};
 use malachite_base::round::RoundingMode;
 use natural::Natural;
 use platform::{Limb, SignedLimb};
@@ -21,7 +21,7 @@ impl DivRound<SignedLimb> for Integer {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::DivRound;
+    /// use malachite_base::num::traits::DivRound;
     /// use malachite_base::round::RoundingMode;
     /// use malachite_nz::integer::Integer;
     ///
@@ -85,7 +85,7 @@ impl<'a> DivRound<SignedLimb> for &'a Integer {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::DivRound;
+    /// use malachite_base::num::traits::DivRound;
     /// use malachite_base::round::RoundingMode;
     /// use malachite_nz::integer::Integer;
     ///
@@ -170,7 +170,7 @@ impl DivRound<Integer> for SignedLimb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::DivRound;
+    /// use malachite_base::num::traits::DivRound;
     /// use malachite_base::round::RoundingMode;
     /// use malachite_nz::integer::Integer;
     ///
@@ -237,7 +237,7 @@ impl<'a> DivRound<&'a Integer> for SignedLimb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::DivRound;
+    /// use malachite_base::num::traits::DivRound;
     /// use malachite_base::round::RoundingMode;
     /// use malachite_nz::integer::Integer;
     ///
@@ -319,7 +319,7 @@ impl DivRoundAssign<SignedLimb> for Integer {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::DivRoundAssign;
+    /// use malachite_base::num::traits::DivRoundAssign;
     /// use malachite_base::round::RoundingMode;
     /// use malachite_nz::integer::Integer;
     ///

@@ -2,7 +2,7 @@ use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, 
 use inputs::base::{pairs_of_limb_vec_var_1, triples_of_limb_vec_var_7};
 use inputs::integer::{pairs_of_integers, rm_pairs_of_integers};
 use integer::logic::{integer_op_bits, integer_op_limbs};
-use malachite_base::num::SignificantBits;
+use malachite_base::num::traits::SignificantBits;
 use malachite_nz::integer::logic::xor::{
     limbs_xor_neg_neg, limbs_xor_neg_neg_in_place_either, limbs_xor_neg_neg_in_place_left,
     limbs_xor_neg_neg_to_out,

@@ -1,4 +1,5 @@
-use malachite_base::num::{NotAssign, Parity, PrimitiveInteger, WrappingAddAssign};
+use malachite_base::num::integers::PrimitiveInteger;
+use malachite_base::num::traits::{NotAssign, Parity, WrappingAddAssign};
 use natural::arithmetic::add::{
     _limbs_add_to_out_aliased, limbs_add_same_length_to_out, limbs_add_to_out,
     limbs_slice_add_greater_in_place_left, limbs_slice_add_same_length_in_place_left,

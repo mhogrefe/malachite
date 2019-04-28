@@ -1,6 +1,9 @@
 use common::{test_properties, test_properties_no_special};
-use malachite_base::misc::{CheckedFrom, Max};
-use malachite_base::num::{Abs, IsPowerOfTwo, One, PrimitiveSigned, PrimitiveUnsigned, Zero};
+use malachite_base::comparison::Max;
+use malachite_base::conversion::CheckedFrom;
+use malachite_base::num::signeds::PrimitiveSigned;
+use malachite_base::num::traits::{Abs, IsPowerOfTwo, One, Zero};
+use malachite_base::num::unsigneds::PrimitiveUnsigned;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;

@@ -2,7 +2,7 @@ use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, 
 use inputs::natural::{
     triples_of_natural_natural_and_limb_var_1, triples_of_natural_natural_and_unsigned,
 };
-use malachite_base::num::{CheckedSub, SignificantBits, SubMul, SubMulAssign};
+use malachite_base::num::traits::{CheckedSub, SignificantBits, SubMul, SubMulAssign};
 use malachite_nz::platform::Limb;
 use std::cmp::max;
 

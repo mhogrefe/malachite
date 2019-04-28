@@ -12,7 +12,8 @@ use inputs::base::{
     triples_of_unsigned_vec_var_26,
 };
 use inputs::natural::{nrm_pairs_of_naturals, pairs_of_naturals, rm_pairs_of_naturals};
-use malachite_base::num::{PrimitiveInteger, SignificantBits};
+use malachite_base::num::integers::PrimitiveInteger;
+use malachite_base::num::traits::SignificantBits;
 use malachite_nz::natural::arithmetic::mul::fft::{
     _limbs_mul_greater_to_out_fft, _limbs_mul_greater_to_out_fft_input_sizes_threshold,
 };

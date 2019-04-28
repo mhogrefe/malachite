@@ -1,8 +1,8 @@
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::triples_of_unsigned_vec_var_27;
 use inputs::natural::triples_of_naturals;
-use malachite_base::num::SignificantBits;
-use malachite_base::num::{AddMul, AddMulAssign};
+use malachite_base::num::traits::SignificantBits;
+use malachite_base::num::traits::{AddMul, AddMulAssign};
 use malachite_nz::natural::arithmetic::add_mul::{limbs_add_mul, limbs_add_mul_in_place_left};
 use malachite_nz::natural::Natural;
 

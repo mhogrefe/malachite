@@ -85,7 +85,7 @@ pub fn limbs_xor_limb_in_place(limbs: &mut [Limb], limb: Limb) {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::Zero;
+/// use malachite_base::num::traits::Zero;
 /// use malachite_nz::natural::Natural;
 /// use std::str::FromStr;
 ///
@@ -128,7 +128,7 @@ impl BitXor<u32> for Natural {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::Zero;
+/// use malachite_base::num::traits::Zero;
 /// use malachite_nz::natural::Natural;
 /// use std::str::FromStr;
 ///
@@ -170,7 +170,7 @@ impl<'a> BitXor<u32> for &'a Natural {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::Zero;
+/// use malachite_base::num::traits::Zero;
 /// use malachite_nz::natural::Natural;
 /// use std::str::FromStr;
 ///
@@ -212,7 +212,7 @@ impl BitXor<Natural> for u32 {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::Zero;
+/// use malachite_base::num::traits::Zero;
 /// use malachite_nz::natural::Natural;
 /// use std::str::FromStr;
 ///

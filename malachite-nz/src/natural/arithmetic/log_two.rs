@@ -1,4 +1,4 @@
-use malachite_base::num::{CeilingLogTwo, FloorLogTwo};
+use malachite_base::num::traits::{CeilingLogTwo, FloorLogTwo};
 use natural::arithmetic::is_power_of_two::limbs_is_power_of_two;
 use natural::logic::significant_bits::limbs_significant_bits;
 use natural::Natural::{self, Large, Small};
@@ -72,7 +72,7 @@ impl<'a> FloorLogTwo for &'a Natural {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::FloorLogTwo;
+    /// use malachite_base::num::traits::FloorLogTwo;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
@@ -105,7 +105,7 @@ impl<'a> CeilingLogTwo for &'a Natural {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::CeilingLogTwo;
+    /// use malachite_base::num::traits::CeilingLogTwo;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {

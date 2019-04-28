@@ -1,5 +1,5 @@
 use common::test_properties;
-use malachite_base::num::{CheckedHammingDistance, HammingDistance, NegativeOne, Zero};
+use malachite_base::num::traits::{CheckedHammingDistance, HammingDistance, NegativeOne, Zero};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_test::inputs::integer::integers;

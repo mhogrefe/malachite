@@ -1,6 +1,6 @@
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::integer::{pairs_of_integer_and_unsigned, pairs_of_unsigned_and_integer};
-use malachite_base::num::{PartialOrdAbs, SignificantBits};
+use malachite_base::num::traits::{PartialOrdAbs, SignificantBits};
 use malachite_nz::platform::Limb;
 use std::cmp::Ordering;
 

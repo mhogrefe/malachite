@@ -1,5 +1,5 @@
 use common::test_properties;
-use malachite_base::num::Zero;
+use malachite_base::num::traits::Zero;
 use malachite_nz::natural::logic::xor::{
     limbs_xor, limbs_xor_in_place_either, limbs_xor_in_place_left, limbs_xor_same_length,
     limbs_xor_same_length_in_place_left, limbs_xor_same_length_to_out, limbs_xor_to_out,

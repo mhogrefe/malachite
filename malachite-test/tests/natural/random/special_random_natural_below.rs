@@ -1,5 +1,5 @@
 use common::test_properties;
-use malachite_base::num::Zero;
+use malachite_base::num::traits::Zero;
 use malachite_nz::natural::random::special_random_natural_below::special_random_natural_below;
 use malachite_nz::natural::Natural;
 use malachite_test::inputs::natural::positive_naturals;

@@ -1,6 +1,6 @@
 use common::test_properties;
-use malachite_base::misc::Max;
-use malachite_base::num::{IsPowerOfTwo, SignificantBits};
+use malachite_base::comparison::Max;
+use malachite_base::num::traits::{IsPowerOfTwo, SignificantBits};
 use malachite_nz::natural::arithmetic::is_power_of_two::limbs_is_power_of_two;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;

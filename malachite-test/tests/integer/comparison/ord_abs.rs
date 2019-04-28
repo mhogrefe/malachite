@@ -1,5 +1,5 @@
 use common::{test_custom_cmp_helper, test_properties};
-use malachite_base::num::{Abs, OrdAbs, PartialOrdAbs};
+use malachite_base::num::traits::{Abs, OrdAbs, PartialOrdAbs};
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::SignedLimb;
 use malachite_test::common::integer_to_rug_integer;

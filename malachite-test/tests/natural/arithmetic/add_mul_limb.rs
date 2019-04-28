@@ -1,5 +1,5 @@
 use common::test_properties;
-use malachite_base::num::{AddMul, AddMulAssign, One, Zero};
+use malachite_base::num::traits::{AddMul, AddMulAssign, One, Zero};
 use malachite_nz::natural::arithmetic::add_mul_limb::{
     limbs_add_mul_limb, limbs_slice_add_mul_limb_greater_in_place_left,
     limbs_slice_add_mul_limb_same_length_in_place_right, limbs_vec_add_mul_limb_in_place_either,

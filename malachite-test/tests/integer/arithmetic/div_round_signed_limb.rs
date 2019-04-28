@@ -1,5 +1,5 @@
 use common::test_properties;
-use malachite_base::num::{
+use malachite_base::num::traits::{
     CeilingDivMod, DivRound, DivRoundAssign, NegativeOne, One, PartialOrdAbs, Zero,
 };
 use malachite_base::round::RoundingMode;

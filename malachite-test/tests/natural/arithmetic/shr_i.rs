@@ -1,5 +1,5 @@
 use common::test_properties;
-use malachite_base::num::{ShrRound, ShrRoundAssign, Zero};
+use malachite_base::num::traits::{ShrRound, ShrRoundAssign, Zero};
 use malachite_base::round::RoundingMode;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;

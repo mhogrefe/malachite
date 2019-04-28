@@ -1,5 +1,5 @@
 use common::test_properties;
-use malachite_base::num::{Abs, PartialOrdAbs};
+use malachite_base::num::traits::{Abs, PartialOrdAbs};
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::Limb;
 use malachite_test::inputs::base::pairs_of_unsigneds;

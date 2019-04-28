@@ -1,5 +1,5 @@
 use integer::Integer;
-use malachite_base::num::UnsignedAbs;
+use malachite_base::num::traits::UnsignedAbs;
 use natural::Natural;
 use platform::{Limb, SignedLimb};
 use std::ops::{Div, DivAssign};

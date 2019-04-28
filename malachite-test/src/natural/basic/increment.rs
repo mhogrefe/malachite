@@ -1,7 +1,7 @@
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::natural::naturals;
-use malachite_base::misc::Walkable;
-use malachite_base::num::SignificantBits;
+use malachite_base::crement::Crementable;
+use malachite_base::num::traits::SignificantBits;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_natural_increment);

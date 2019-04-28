@@ -1,5 +1,5 @@
 use integer::Integer;
-use malachite_base::num::Sign;
+use malachite_base::num::traits::Sign;
 use platform::Limb;
 use std::cmp::Ordering;
 
@@ -16,7 +16,7 @@ impl Sign for Integer {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::{Sign, Zero};
+    /// use malachite_base::num::traits::{Sign, Zero};
     /// use malachite_nz::integer::Integer;
     /// use std::cmp::Ordering;
     ///

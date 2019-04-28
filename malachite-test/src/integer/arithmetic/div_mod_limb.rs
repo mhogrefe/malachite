@@ -3,7 +3,7 @@ use inputs::integer::{
     nrm_pairs_of_integer_and_positive_unsigned, pairs_of_integer_and_positive_unsigned,
     pairs_of_unsigned_and_nonzero_integer, rm_pairs_of_integer_and_positive_unsigned,
 };
-use malachite_base::num::{
+use malachite_base::num::traits::{
     CeilingDivAssignMod, CeilingDivMod, CeilingMod, DivAssignMod, DivAssignRem, DivMod, DivRem,
     DivRound, Mod, SignificantBits,
 };

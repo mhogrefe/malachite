@@ -1,8 +1,7 @@
 use common::test_properties;
-use malachite_base::misc::Max;
-use malachite_base::num::{
-    CeilingLogTwo, FloorLogTwo, One, PrimitiveInteger, SignificantBits, Zero,
-};
+use malachite_base::comparison::Max;
+use malachite_base::num::integers::PrimitiveInteger;
+use malachite_base::num::traits::{CeilingLogTwo, FloorLogTwo, One, SignificantBits, Zero};
 use malachite_nz::natural::arithmetic::log_two::{limbs_ceiling_log_two, limbs_floor_log_two};
 use malachite_nz::natural::logic::significant_bits::limbs_significant_bits;
 use malachite_nz::natural::Natural;

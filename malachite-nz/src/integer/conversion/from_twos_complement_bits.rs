@@ -1,6 +1,7 @@
 use integer::conversion::to_twos_complement_limbs::limbs_twos_complement_in_place;
 use integer::Integer;
-use malachite_base::num::{PrimitiveInteger, Zero};
+use malachite_base::num::integers::PrimitiveInteger;
+use malachite_base::num::traits::Zero;
 use natural::conversion::from_bits::{limbs_asc_from_bits_asc, limbs_asc_from_bits_desc};
 use natural::Natural;
 use platform::Limb;

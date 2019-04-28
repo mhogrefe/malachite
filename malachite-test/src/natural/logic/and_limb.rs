@@ -6,8 +6,8 @@ use inputs::natural::{
     rm_pairs_of_unsigned_and_natural,
 };
 use inputs::natural::{pairs_of_natural_and_unsigned, pairs_of_unsigned_and_natural};
-use malachite_base::misc::CheckedFrom;
-use malachite_base::num::SignificantBits;
+use malachite_base::conversion::CheckedFrom;
+use malachite_base::num::traits::SignificantBits;
 use malachite_nz::natural::logic::and_limb::limbs_and_limb;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;

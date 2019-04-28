@@ -1,6 +1,6 @@
 use common::test_properties;
-use malachite_base::misc::CheckedFrom;
-use malachite_base::num::{
+use malachite_base::conversion::CheckedFrom;
+use malachite_base::num::traits::{
     CeilingDivNegMod, DivMod, Mod, ModAssign, NegMod, NegModAssign, One, Zero,
 };
 use malachite_nz::natural::arithmetic::mod_limb::limbs_mod_limb;

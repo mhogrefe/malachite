@@ -1,5 +1,6 @@
 use malachite_base::limbs::limbs_test_zero;
-use malachite_base::num::{DivisibleByPowerOfTwo, PrimitiveInteger};
+use malachite_base::num::integers::PrimitiveInteger;
+use malachite_base::num::traits::DivisibleByPowerOfTwo;
 use natural::Natural::{self, Large, Small};
 use platform::Limb;
 
@@ -47,7 +48,7 @@ impl<'a> DivisibleByPowerOfTwo for &'a Natural {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::{DivisibleByPowerOfTwo, Zero};
+    /// use malachite_base::num::traits::{DivisibleByPowerOfTwo, Zero};
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {

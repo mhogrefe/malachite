@@ -1,7 +1,7 @@
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::vecs_of_unsigned_var_1;
 use inputs::natural::positive_naturals;
-use malachite_base::num::{CeilingLogTwo, FloorLogTwo, SignificantBits};
+use malachite_base::num::traits::{CeilingLogTwo, FloorLogTwo, SignificantBits};
 use malachite_nz::natural::arithmetic::log_two::{limbs_ceiling_log_two, limbs_floor_log_two};
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {

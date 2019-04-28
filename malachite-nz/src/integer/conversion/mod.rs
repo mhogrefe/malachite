@@ -1,6 +1,6 @@
 use error::ParseIntegerError;
 use integer::Integer;
-use malachite_base::num::Zero;
+use malachite_base::num::traits::Zero;
 use std::fmt::{self, Binary, Debug, Display, Formatter, Write};
 use std::str::FromStr;
 

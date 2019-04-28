@@ -1,5 +1,6 @@
 use common::test_properties;
-use malachite_base::misc::{CheckedFrom, Max};
+use malachite_base::comparison::Max;
+use malachite_base::conversion::CheckedFrom;
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::Limb;
 use malachite_test::common::{bigint_to_integer, rug_integer_to_integer};

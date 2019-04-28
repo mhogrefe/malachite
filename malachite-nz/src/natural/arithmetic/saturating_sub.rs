@@ -1,4 +1,4 @@
-use malachite_base::num::{CheckedSub, SaturatingSub, SaturatingSubAssign, Zero};
+use malachite_base::num::traits::{CheckedSub, SaturatingSub, SaturatingSubAssign, Zero};
 use natural::Natural;
 
 /// Subtracts a `Natural` from a `Natural`, taking both `Natural`s by value. If the second `Natural`
@@ -15,7 +15,7 @@ use natural::Natural;
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::{SaturatingSub, Zero};
+/// use malachite_base::num::traits::{SaturatingSub, Zero};
 /// use malachite_nz::natural::Natural;
 ///
 /// fn main() {
@@ -48,7 +48,7 @@ impl SaturatingSub<Natural> for Natural {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::{SaturatingSub, Zero};
+/// use malachite_base::num::traits::{SaturatingSub, Zero};
 /// use malachite_nz::natural::Natural;
 ///
 /// fn main() {
@@ -81,7 +81,7 @@ impl<'a> SaturatingSub<&'a Natural> for Natural {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::{SaturatingSub, Zero};
+/// use malachite_base::num::traits::{SaturatingSub, Zero};
 /// use malachite_nz::natural::Natural;
 ///
 /// fn main() {
@@ -115,7 +115,7 @@ impl<'a> SaturatingSub<Natural> for &'a Natural {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::{SaturatingSub, Zero};
+/// use malachite_base::num::traits::{SaturatingSub, Zero};
 /// use malachite_nz::natural::Natural;
 ///
 /// fn main() {
@@ -152,7 +152,7 @@ impl<'a, 'b> SaturatingSub<&'a Natural> for &'b Natural {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::{SaturatingSubAssign, Zero};
+/// use malachite_base::num::traits::{SaturatingSubAssign, Zero};
 /// use malachite_nz::natural::Natural;
 ///
 /// fn main() {
@@ -198,7 +198,7 @@ impl SaturatingSubAssign<Natural> for Natural {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::{SaturatingSubAssign, Zero};
+/// use malachite_base::num::traits::{SaturatingSubAssign, Zero};
 /// use malachite_nz::natural::Natural;
 ///
 /// fn main() {

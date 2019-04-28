@@ -1,5 +1,5 @@
 use integer::Integer;
-use malachite_base::num::{DivExact, DivExactAssign, UnsignedAbs, Zero};
+use malachite_base::num::traits::{DivExact, DivExactAssign, UnsignedAbs, Zero};
 use natural::Natural;
 use platform::{Limb, SignedLimb};
 
@@ -21,7 +21,7 @@ impl DivExact<SignedLimb> for Integer {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::DivExact;
+    /// use malachite_base::num::traits::DivExact;
     /// use malachite_nz::integer::Integer;
     /// use std::str::FromStr;
     ///
@@ -69,7 +69,7 @@ impl<'a> DivExact<SignedLimb> for &'a Integer {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::DivExact;
+    /// use malachite_base::num::traits::DivExact;
     /// use malachite_nz::integer::Integer;
     /// use std::str::FromStr;
     ///
@@ -120,7 +120,7 @@ impl DivExactAssign<SignedLimb> for Integer {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::DivExactAssign;
+    /// use malachite_base::num::traits::DivExactAssign;
     /// use malachite_nz::integer::Integer;
     /// use std::str::FromStr;
     ///
@@ -166,7 +166,7 @@ impl DivExact<Integer> for SignedLimb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::DivExact;
+    /// use malachite_base::num::traits::DivExact;
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {
@@ -213,7 +213,7 @@ impl<'a> DivExact<&'a Integer> for SignedLimb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::DivExact;
+    /// use malachite_base::num::traits::DivExact;
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {

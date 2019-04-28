@@ -1,5 +1,5 @@
 use common::test_properties;
-use malachite_base::num::{
+use malachite_base::num::traits::{
     CeilingDivMod, CeilingMod, CeilingModAssign, DivMod, DivRem, Mod, ModAssign, NegativeOne, One,
     PartialOrdAbs, UnsignedAbs, Zero,
 };

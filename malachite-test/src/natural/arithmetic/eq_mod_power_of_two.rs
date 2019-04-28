@@ -3,8 +3,8 @@ use inputs::base::triples_of_unsigned_vec_unsigned_vec_and_small_unsigned_var_1;
 use inputs::natural::{
     rm_triples_of_natural_natural_and_small_unsigned, triples_of_natural_natural_and_small_unsigned,
 };
-use malachite_base::misc::CheckedFrom;
-use malachite_base::num::{EqModPowerOfTwo, ModPowerOfTwo, SignificantBits};
+use malachite_base::conversion::CheckedFrom;
+use malachite_base::num::traits::{EqModPowerOfTwo, ModPowerOfTwo, SignificantBits};
 use malachite_nz::natural::arithmetic::eq_mod_power_of_two::limbs_eq_mod_power_of_two;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {

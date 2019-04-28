@@ -1,5 +1,5 @@
-use malachite_base::num::{CheckedSub, SplitInHalf};
-use malachite_base::num::{SubMul, SubMulAssign, WrappingAddAssign};
+use malachite_base::num::traits::{CheckedSub, SplitInHalf};
+use malachite_base::num::traits::{SubMul, SubMulAssign, WrappingAddAssign};
 use natural::arithmetic::sub_limb::limbs_sub_limb_in_place;
 use natural::Natural::{self, Large, Small};
 use platform::{DoubleLimb, Limb};
@@ -48,7 +48,7 @@ impl<'a> SubMul<&'a Natural, Limb> for Natural {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::SubMul;
+    /// use malachite_base::num::traits::SubMul;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
@@ -96,7 +96,7 @@ impl<'a, 'b> SubMul<&'a Natural, Limb> for &'b Natural {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::SubMul;
+    /// use malachite_base::num::traits::SubMul;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
@@ -171,7 +171,7 @@ impl<'a> SubMulAssign<&'a Natural, Limb> for Natural {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::SubMulAssign;
+    /// use malachite_base::num::traits::SubMulAssign;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {

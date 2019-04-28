@@ -1,6 +1,6 @@
 use common::test_properties;
-use malachite_base::misc::Min;
-use malachite_base::num::{NegativeOne, One, Zero};
+use malachite_base::comparison::Min;
+use malachite_base::num::traits::{NegativeOne, One, Zero};
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::{Limb, SignedDoubleLimb, SignedLimb};
 use malachite_test::common::{bigint_to_integer, integer_to_bigint};

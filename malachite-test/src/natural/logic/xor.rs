@@ -4,7 +4,7 @@ use inputs::base::{
     triples_of_unsigned_vec_var_4,
 };
 use inputs::natural::{nrm_pairs_of_naturals, pairs_of_naturals, rm_pairs_of_naturals};
-use malachite_base::num::SignificantBits;
+use malachite_base::num::traits::SignificantBits;
 use malachite_nz::natural::logic::xor::{
     limbs_xor, limbs_xor_in_place_either, limbs_xor_in_place_left, limbs_xor_same_length,
     limbs_xor_same_length_in_place_left, limbs_xor_same_length_to_out, limbs_xor_to_out,

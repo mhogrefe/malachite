@@ -10,7 +10,7 @@ use inputs::integer::{
     triples_of_integer_positive_unsigned_and_rounding_mode_var_1,
     triples_of_unsigned_nonzero_integer_and_rounding_mode_var_1,
 };
-use malachite_base::num::{CeilingDivMod, DivRound, DivRoundAssign, SignificantBits};
+use malachite_base::num::traits::{CeilingDivMod, DivRound, DivRoundAssign, SignificantBits};
 use malachite_base::round::RoundingMode;
 use malachite_nz::platform::Limb;
 use num::{BigInt, Integer};

@@ -1,6 +1,6 @@
 use common::test_properties;
 #[cfg(feature = "32_bit_limbs")]
-use malachite_base::misc::Max;
+use malachite_base::comparison::Max;
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::Limb;
 use malachite_test::inputs::integer::integers;

@@ -5,7 +5,7 @@ use inputs::base::{
     triples_of_unsigned_vec_var_4, triples_of_unsigned_vec_var_9,
 };
 use inputs::natural::{nrm_pairs_of_naturals, pairs_of_naturals, rm_pairs_of_naturals};
-use malachite_base::num::SignificantBits;
+use malachite_base::num::traits::SignificantBits;
 use malachite_nz::natural::arithmetic::add::{
     _limbs_add_to_out_aliased, limbs_add, limbs_add_greater, limbs_add_greater_to_out,
     limbs_add_same_length_to_out, limbs_add_to_out, limbs_slice_add_greater_in_place_left,

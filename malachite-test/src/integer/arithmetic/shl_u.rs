@@ -2,7 +2,7 @@ use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, 
 use inputs::integer::{
     pairs_of_integer_and_small_unsigned, rm_pairs_of_integer_and_small_unsigned,
 };
-use malachite_base::misc::Named;
+use malachite_base::named::Named;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_integer_shl_assign_u8);

@@ -1,5 +1,6 @@
-use malachite_base::misc::{Named, Walkable};
-use malachite_base::num::{NegativeOne, One, Two, Zero};
+use malachite_base::crement::Crementable;
+use malachite_base::named::Named;
+use malachite_base::num::traits::{NegativeOne, One, Two, Zero};
 use natural::Natural::{self, Small};
 use platform::Limb;
 use std::str::FromStr;
@@ -80,7 +81,7 @@ impl NegativeOne for Integer {
 /// Implement `Named` for `Integer`.
 impl_named!(Integer);
 
-impl Walkable for Integer {
+impl Crementable for Integer {
     /// Increments `self`.
     ///
     /// Time: worst case O(n)
@@ -94,7 +95,7 @@ impl Walkable for Integer {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::misc::Walkable;
+    /// use malachite_base::crement::Crementable;
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {
@@ -124,7 +125,7 @@ impl Walkable for Integer {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::misc::Walkable;
+    /// use malachite_base::crement::Crementable;
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {

@@ -1,5 +1,5 @@
 use common::test_properties;
-use malachite_base::num::{OrdAbs, PartialOrdAbs};
+use malachite_base::num::traits::{OrdAbs, PartialOrdAbs};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_test::common::{integer_to_rug_integer, natural_to_rug_integer};

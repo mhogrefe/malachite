@@ -3,8 +3,8 @@ use inputs::integer::{pairs_of_integer_and_unsigned, pairs_of_unsigned_and_integ
 #[cfg(feature = "32_bit_limbs")]
 use inputs::integer::{rm_pairs_of_integer_and_unsigned, rm_pairs_of_unsigned_and_integer};
 use integer::logic::and::{integer_and_alt_1, integer_and_alt_2};
-use malachite_base::misc::CheckedFrom;
-use malachite_base::num::SignificantBits;
+use malachite_base::conversion::CheckedFrom;
+use malachite_base::num::traits::SignificantBits;
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::Limb;
 

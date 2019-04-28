@@ -1,6 +1,6 @@
 use common::test_properties_no_limit_exhaustive_no_special;
 use malachite_base::chars::{CHAR_JUST_ABOVE_SURROGATES, CHAR_JUST_BELOW_SURROGATES};
-use malachite_base::misc::Walkable;
+use malachite_base::crement::Crementable;
 use malachite_test::inputs::base::chars_not_max;
 use std::char;
 

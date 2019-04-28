@@ -1,5 +1,5 @@
 use common::test_properties;
-use malachite_base::num::{BitAccess, One, SignificantBits};
+use malachite_base::num::traits::{BitAccess, One, SignificantBits};
 use malachite_nz::integer::logic::bit_access::limbs_get_bit_neg;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;

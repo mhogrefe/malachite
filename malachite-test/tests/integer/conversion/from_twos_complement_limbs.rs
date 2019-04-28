@@ -1,7 +1,8 @@
 use common::test_properties;
+use malachite_base::comparison::Max;
 use malachite_base::limbs::limbs_delete_left;
-use malachite_base::misc::Max;
-use malachite_base::num::{PrimitiveInteger, Sign};
+use malachite_base::num::integers::PrimitiveInteger;
+use malachite_base::num::traits::Sign;
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::Limb;
 use malachite_test::inputs::base::vecs_of_unsigned;

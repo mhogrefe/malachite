@@ -1,5 +1,5 @@
 use common::test_properties;
-use malachite_base::num::{DivExact, DivExactAssign, DivRound, NegativeOne, One, Zero};
+use malachite_base::num::traits::{DivExact, DivExactAssign, DivRound, NegativeOne, One, Zero};
 use malachite_base::round::RoundingMode;
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::{Limb, SignedDoubleLimb, SignedLimb};

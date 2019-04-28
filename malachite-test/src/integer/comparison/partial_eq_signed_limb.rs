@@ -3,7 +3,7 @@ use inputs::integer::{
     nrm_pairs_of_integer_and_signed, pairs_of_integer_and_signed, pairs_of_signed_and_integer,
     rm_pairs_of_signed_and_integer,
 };
-use malachite_base::num::SignificantBits;
+use malachite_base::num::traits::SignificantBits;
 use malachite_nz::platform::SignedLimb;
 use num::BigInt;
 

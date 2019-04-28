@@ -1,5 +1,5 @@
 use integer::Integer;
-use malachite_base::num::DivisibleBy;
+use malachite_base::num::traits::DivisibleBy;
 use platform::Limb;
 
 impl<'a> DivisibleBy<Limb> for &'a Integer {
@@ -20,7 +20,7 @@ impl<'a> DivisibleBy<Limb> for &'a Integer {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::{DivisibleBy, Zero};
+    /// use malachite_base::num::traits::{DivisibleBy, Zero};
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {
@@ -56,7 +56,7 @@ impl<'a> DivisibleBy<&'a Integer> for Limb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::{DivisibleBy, Zero};
+    /// use malachite_base::num::traits::{DivisibleBy, Zero};
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {

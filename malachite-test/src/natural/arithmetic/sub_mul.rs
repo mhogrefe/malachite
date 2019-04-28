@@ -1,7 +1,7 @@
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::natural::{triples_of_naturals, triples_of_naturals_var_1};
-use malachite_base::num::SignificantBits;
-use malachite_base::num::{CheckedSub, SubMul, SubMulAssign};
+use malachite_base::num::traits::SignificantBits;
+use malachite_base::num::traits::{CheckedSub, SubMul, SubMulAssign};
 use malachite_nz::natural::Natural;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {

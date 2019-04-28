@@ -1,6 +1,6 @@
+use malachite_base::conversion::{CheckedFrom, WrappingFrom};
 use malachite_base::limbs::limbs_pad_left;
-use malachite_base::misc::{CheckedFrom, WrappingFrom};
-use malachite_base::num::PrimitiveInteger;
+use malachite_base::num::integers::PrimitiveInteger;
 use natural::Natural::{self, Large, Small};
 use platform::Limb;
 use std::ops::{Shl, ShlAssign};
@@ -200,7 +200,7 @@ macro_rules! impl_natural_shl_unsigned {
         /// extern crate malachite_base;
         /// extern crate malachite_nz;
         ///
-        /// use malachite_base::num::Zero;
+        /// use malachite_base::num::traits::Zero;
         /// use malachite_nz::natural::Natural;
         ///
         /// fn main() {
@@ -233,7 +233,7 @@ macro_rules! impl_natural_shl_unsigned {
         /// extern crate malachite_base;
         /// extern crate malachite_nz;
         ///
-        /// use malachite_base::num::Zero;
+        /// use malachite_base::num::traits::Zero;
         /// use malachite_nz::natural::Natural;
         ///
         /// fn main() {
@@ -273,7 +273,7 @@ macro_rules! impl_natural_shl_unsigned {
         /// extern crate malachite_base;
         /// extern crate malachite_nz;
         ///
-        /// use malachite_base::num::One;
+        /// use malachite_base::num::traits::One;
         /// use malachite_nz::natural::Natural;
         ///
         /// fn main() {

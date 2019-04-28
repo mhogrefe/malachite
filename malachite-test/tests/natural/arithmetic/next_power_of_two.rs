@@ -1,5 +1,7 @@
 use common::test_properties;
-use malachite_base::num::{CeilingLogTwo, IsPowerOfTwo, NextPowerOfTwo, NextPowerOfTwoAssign, One};
+use malachite_base::num::traits::{
+    CeilingLogTwo, IsPowerOfTwo, NextPowerOfTwo, NextPowerOfTwoAssign, One,
+};
 use malachite_nz::natural::arithmetic::next_power_of_two::{
     limbs_next_power_of_two, limbs_slice_next_power_of_two_in_place,
     limbs_vec_next_power_of_two_in_place,

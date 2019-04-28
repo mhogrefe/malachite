@@ -1,6 +1,6 @@
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::integer::triples_of_integer_integer_and_signed;
-use malachite_base::num::{SignificantBits, SubMul, SubMulAssign};
+use malachite_base::num::traits::{SignificantBits, SubMul, SubMulAssign};
 use malachite_nz::platform::SignedLimb;
 use std::cmp::max;
 

@@ -5,7 +5,7 @@ use inputs::integer::{
     rm_pairs_of_natural_and_integer,
 };
 use integer::logic::{integer_op_bits, integer_op_limbs};
-use malachite_base::num::SignificantBits;
+use malachite_base::num::traits::SignificantBits;
 use malachite_nz::integer::logic::xor_natural::{
     limbs_xor_pos_neg, limbs_xor_pos_neg_in_place_either, limbs_xor_pos_neg_in_place_left,
     limbs_xor_pos_neg_in_place_right, limbs_xor_pos_neg_to_out,

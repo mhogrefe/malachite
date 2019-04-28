@@ -1,6 +1,7 @@
 use common::test_properties;
-use malachite_base::misc::{CheckedFrom, RoundingFrom};
-use malachite_base::num::{Parity, PrimitiveFloat};
+use malachite_base::conversion::{CheckedFrom, RoundingFrom};
+use malachite_base::num::floats::PrimitiveFloat;
+use malachite_base::num::traits::Parity;
 use malachite_base::round::RoundingMode;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;

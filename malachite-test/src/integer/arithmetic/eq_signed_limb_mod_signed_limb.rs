@@ -3,7 +3,7 @@ use inputs::integer::{
     rm_triples_of_integer_signed_and_signed, triples_of_integer_signed_and_signed,
     triples_of_signed_integer_and_signed, triples_of_signed_signed_and_integer,
 };
-use malachite_base::num::{DivisibleBy, EqMod, Mod, SignificantBits};
+use malachite_base::num::traits::{DivisibleBy, EqMod, Mod, SignificantBits};
 use malachite_nz::platform::{Limb, SignedLimb};
 use rug;
 

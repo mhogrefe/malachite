@@ -2,11 +2,10 @@ extern crate serde;
 extern crate serde_json;
 
 use common::test_properties;
+use malachite_base::strings::string_is_subset;
 use malachite_nz::natural::Natural;
 use malachite_test::inputs::natural::naturals;
 use std::str::FromStr;
-
-use rust_wheels::prim_utils::string_utils::string_is_subset;
 
 //TODO just use a simple hex string (or base64)
 

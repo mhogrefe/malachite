@@ -1,6 +1,8 @@
+use malachite_base::comparison::Min;
+use malachite_base::crement::Crementable;
 use malachite_base::limbs::limbs_trailing_zero_limbs;
-use malachite_base::misc::{Min, Named, Walkable};
-use malachite_base::num::{One, Two, Zero};
+use malachite_base::named::Named;
+use malachite_base::num::traits::{One, Two, Zero};
 use natural::Natural::*;
 use platform::Limb;
 use std::str::FromStr;
@@ -109,7 +111,7 @@ impl Min for Natural {
 /// Implement `Named` for `Natural`.
 impl_named!(Natural);
 
-impl Walkable for Natural {
+impl Crementable for Natural {
     /// Increments `self`.
     ///
     /// Time: worst case O(n)
@@ -123,7 +125,7 @@ impl Walkable for Natural {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::misc::Walkable;
+    /// use malachite_base::crement::Crementable;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
@@ -150,7 +152,7 @@ impl Walkable for Natural {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::misc::Walkable;
+    /// use malachite_base::crement::Crementable;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {

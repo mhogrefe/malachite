@@ -1,5 +1,5 @@
 use integer::Integer;
-use malachite_base::num::Assign;
+use malachite_base::num::traits::Assign;
 use natural::Natural;
 
 /// Assigns a `Natural` to an `Integer`, taking the `Natural` by value.
@@ -16,7 +16,7 @@ use natural::Natural;
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::Assign;
+/// use malachite_base::num::traits::Assign;
 /// use malachite_nz::integer::Integer;
 /// use malachite_nz::natural::Natural;
 ///
@@ -49,7 +49,7 @@ impl Assign<Natural> for Integer {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::Assign;
+/// use malachite_base::num::traits::Assign;
 /// use malachite_nz::integer::Integer;
 /// use malachite_nz::natural::Natural;
 ///

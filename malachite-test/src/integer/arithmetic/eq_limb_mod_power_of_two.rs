@@ -4,7 +4,7 @@ use inputs::integer::{
     rm_triples_of_integer_unsigned_and_small_unsigned,
     triples_of_integer_unsigned_and_small_unsigned, triples_of_unsigned_integer_and_small_unsigned,
 };
-use malachite_base::num::{EqModPowerOfTwo, ModPowerOfTwo, SignificantBits};
+use malachite_base::num::traits::{EqModPowerOfTwo, ModPowerOfTwo, SignificantBits};
 use malachite_nz::integer::arithmetic::eq_limb_mod_power_of_two::limbs_eq_mod_power_of_two_neg_limb;
 use malachite_nz::platform::Limb;
 use natural::arithmetic::eq_limb_mod_power_of_two::rug_eq_limb_mod_power_of_two;

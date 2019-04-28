@@ -1,5 +1,5 @@
 use integer::Integer;
-use malachite_base::num::Parity;
+use malachite_base::num::traits::Parity;
 
 impl<'a> Parity for &'a Integer {
     /// Determines whether `self` is even.
@@ -13,7 +13,7 @@ impl<'a> Parity for &'a Integer {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::{Parity, Zero};
+    /// use malachite_base::num::traits::{Parity, Zero};
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {
@@ -41,7 +41,7 @@ impl<'a> Parity for &'a Integer {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::{Parity, Zero};
+    /// use malachite_base::num::traits::{Parity, Zero};
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {

@@ -1,5 +1,5 @@
 use common::test_properties;
-use malachite_base::num::IsPowerOfTwo;
+use malachite_base::num::traits::IsPowerOfTwo;
 use malachite_nz::natural::logic::count_ones::limbs_count_ones;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;

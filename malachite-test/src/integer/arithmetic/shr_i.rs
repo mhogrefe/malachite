@@ -3,8 +3,8 @@ use inputs::integer::{
     pairs_of_integer_and_small_signed, rm_pairs_of_integer_and_small_signed,
     triples_of_integer_small_signed_and_rounding_mode_var_2,
 };
-use malachite_base::misc::Named;
-use malachite_base::num::{ShrRound, ShrRoundAssign};
+use malachite_base::named::Named;
+use malachite_base::num::traits::{ShrRound, ShrRoundAssign};
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_integer_shr_assign_i8);

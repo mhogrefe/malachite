@@ -2,7 +2,7 @@ use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, 
 use inputs::integer::{
     nrm_pairs_of_integer_and_signed, pairs_of_integer_and_signed, pairs_of_signed_and_integer,
 };
-use malachite_base::num::{DivisibleBy, SignificantBits};
+use malachite_base::num::traits::{DivisibleBy, SignificantBits};
 use malachite_nz::platform::SignedLimb;
 use num::{BigInt, Integer, Zero};
 use rug;

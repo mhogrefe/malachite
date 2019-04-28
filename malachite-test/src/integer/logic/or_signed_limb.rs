@@ -4,7 +4,7 @@ use inputs::integer::{pairs_of_integer_and_signed, pairs_of_signed_and_integer};
 #[cfg(feature = "32_bit_limbs")]
 use inputs::integer::{rm_pairs_of_integer_and_signed, rm_pairs_of_signed_and_integer};
 use integer::logic::or::{integer_or_alt_1, integer_or_alt_2};
-use malachite_base::num::SignificantBits;
+use malachite_base::num::traits::SignificantBits;
 use malachite_nz::integer::logic::or_signed_limb::{limbs_neg_or_neg_limb, limbs_pos_or_neg_limb};
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::SignedLimb;

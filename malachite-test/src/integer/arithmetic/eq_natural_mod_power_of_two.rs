@@ -3,7 +3,7 @@ use inputs::base::triples_of_unsigned_vec_unsigned_vec_and_small_unsigned_var_1;
 use inputs::integer::{
     triples_of_integer_natural_and_small_unsigned, triples_of_natural_integer_and_small_unsigned,
 };
-use malachite_base::num::{EqModPowerOfTwo, ModPowerOfTwo, SignificantBits};
+use malachite_base::num::traits::{EqModPowerOfTwo, ModPowerOfTwo, SignificantBits};
 use malachite_nz::integer::arithmetic::eq_natural_mod_power_of_two::*;
 use std::cmp::{max, min};
 

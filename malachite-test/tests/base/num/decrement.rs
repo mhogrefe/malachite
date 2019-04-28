@@ -1,6 +1,8 @@
 use common::test_properties;
-use malachite_base::misc::{Min, Walkable};
-use malachite_base::num::{PrimitiveSigned, PrimitiveUnsigned};
+use malachite_base::comparison::Min;
+use malachite_base::crement::Crementable;
+use malachite_base::num::signeds::PrimitiveSigned;
+use malachite_base::num::unsigneds::PrimitiveUnsigned;
 use malachite_test::inputs::base::{positive_unsigneds, signeds_no_min};
 use rand::Rand;
 

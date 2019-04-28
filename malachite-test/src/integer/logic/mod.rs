@@ -1,5 +1,5 @@
 use common::DemoBenchRegistry;
-use malachite_base::misc::Max;
+use malachite_base::comparison::Max;
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::Limb;
 use std::iter::repeat;

@@ -1,8 +1,7 @@
 #[cfg(feature = "64_bit_limbs")]
-use malachite_base::misc::WrappingFrom;
-use malachite_base::num::{
-    DivAssignMod, DivMod, DivRound, DivRoundAssign, Parity, PrimitiveInteger,
-};
+use malachite_base::conversion::WrappingFrom;
+use malachite_base::num::integers::PrimitiveInteger;
+use malachite_base::num::traits::{DivAssignMod, DivMod, DivRound, DivRoundAssign, Parity};
 use malachite_base::round::RoundingMode;
 use natural::Natural::{self, Large, Small};
 use platform::Limb;
@@ -92,7 +91,7 @@ impl DivRound<Limb> for Natural {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::DivRound;
+    /// use malachite_base::num::traits::DivRound;
     /// use malachite_base::round::RoundingMode;
     /// use malachite_nz::natural::Natural;
     ///
@@ -144,7 +143,7 @@ impl<'a> DivRound<Limb> for &'a Natural {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::DivRound;
+    /// use malachite_base::num::traits::DivRound;
     /// use malachite_base::round::RoundingMode;
     /// use malachite_nz::natural::Natural;
     ///
@@ -221,7 +220,7 @@ impl DivRound<Natural> for Limb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::DivRound;
+    /// use malachite_base::num::traits::DivRound;
     /// use malachite_base::round::RoundingMode;
     /// use malachite_nz::natural::Natural;
     ///
@@ -270,7 +269,7 @@ impl<'a> DivRound<&'a Natural> for Limb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::DivRound;
+    /// use malachite_base::num::traits::DivRound;
     /// use malachite_base::round::RoundingMode;
     /// use malachite_nz::natural::Natural;
     ///
@@ -327,7 +326,7 @@ impl DivRoundAssign<Limb> for Natural {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::DivRoundAssign;
+    /// use malachite_base::num::traits::DivRoundAssign;
     /// use malachite_base::round::RoundingMode;
     /// use malachite_nz::natural::Natural;
     ///
@@ -415,7 +414,7 @@ impl DivRoundAssign<Natural> for Limb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::DivRoundAssign;
+    /// use malachite_base::num::traits::DivRoundAssign;
     /// use malachite_base::round::RoundingMode;
     /// use malachite_nz::natural::Natural;
     ///
@@ -484,7 +483,7 @@ impl<'a> DivRoundAssign<&'a Natural> for Limb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::DivRoundAssign;
+    /// use malachite_base::num::traits::DivRoundAssign;
     /// use malachite_base::round::RoundingMode;
     /// use malachite_nz::natural::Natural;
     ///

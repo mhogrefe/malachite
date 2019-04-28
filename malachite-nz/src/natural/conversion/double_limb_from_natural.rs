@@ -1,5 +1,5 @@
-use malachite_base::misc::{CheckedFrom, WrappingFrom};
-use malachite_base::num::JoinHalves;
+use malachite_base::conversion::{CheckedFrom, WrappingFrom};
+use malachite_base::num::traits::JoinHalves;
 use natural::Natural::{self, Large, Small};
 use platform::DoubleLimb;
 
@@ -16,7 +16,7 @@ impl CheckedFrom<Natural> for DoubleLimb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::misc::CheckedFrom;
+    /// use malachite_base::conversion::CheckedFrom;
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
     ///
@@ -45,7 +45,7 @@ impl<'a> CheckedFrom<&'a Natural> for DoubleLimb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::misc::CheckedFrom;
+    /// use malachite_base::conversion::CheckedFrom;
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
     ///
@@ -79,7 +79,7 @@ impl WrappingFrom<Natural> for DoubleLimb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::misc::WrappingFrom;
+    /// use malachite_base::conversion::WrappingFrom;
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
     ///
@@ -108,7 +108,7 @@ impl<'a> WrappingFrom<&'a Natural> for DoubleLimb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::misc::WrappingFrom;
+    /// use malachite_base::conversion::WrappingFrom;
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
     ///

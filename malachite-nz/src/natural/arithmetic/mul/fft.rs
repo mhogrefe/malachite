@@ -1,7 +1,6 @@
 use malachite_base::limbs::limbs_set_zero;
-use malachite_base::num::{
-    One, Parity, PrimitiveInteger, ShrRound, WrappingAddAssign, WrappingSubAssign,
-};
+use malachite_base::num::integers::PrimitiveInteger;
+use malachite_base::num::traits::{One, Parity, ShrRound, WrappingAddAssign, WrappingSubAssign};
 use malachite_base::round::RoundingMode;
 use natural::arithmetic::add::limbs_add_to_out;
 use natural::arithmetic::add::limbs_slice_add_same_length_in_place_left;
@@ -1260,10 +1259,10 @@ pub fn _limbs_mul_fft_internal(
     yss.push(scratch_hi);
     _limbs_mul_fft_shr_mod_f_to_out(&mut yss[0], &mut xss[0], k);
     for i in 1..two_pow_k {
-        let (xss_lo, yss_hi) = xss.split_at_mut(i);
+        let (xss_lo, xss_hi) = xss.split_at_mut(i);
         _limbs_mul_fft_shr_mod_f_to_out(
             &mut xss_lo[i - 1],
-            &mut yss_hi[0],
+            &mut xss_hi[0],
             k + (two_pow_k - i) * omega,
         );
     }

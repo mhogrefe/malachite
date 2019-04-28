@@ -1,6 +1,8 @@
 use common::test_properties;
-use malachite_base::misc::{CheckedFrom, RoundingFrom, Walkable};
-use malachite_base::num::{Parity, PrimitiveFloat};
+use malachite_base::conversion::{CheckedFrom, RoundingFrom};
+use malachite_base::crement::Crementable;
+use malachite_base::num::floats::PrimitiveFloat;
+use malachite_base::num::traits::Parity;
 use malachite_base::round::RoundingMode;
 use malachite_nz::integer::Integer;
 use malachite_test::inputs::integer::{

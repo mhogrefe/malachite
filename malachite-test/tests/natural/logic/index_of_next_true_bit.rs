@@ -1,6 +1,6 @@
 use common::test_properties;
-use malachite_base::misc::CheckedFrom;
-use malachite_base::num::{BitAccess, BitScan, SignificantBits, Zero};
+use malachite_base::conversion::CheckedFrom;
+use malachite_base::num::traits::{BitAccess, BitScan, SignificantBits, Zero};
 use malachite_nz::natural::logic::bit_scan::limbs_index_of_next_true_bit;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;

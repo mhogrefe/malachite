@@ -1,5 +1,5 @@
 use integer::Integer;
-use malachite_base::num::DivisibleByPowerOfTwo;
+use malachite_base::num::traits::DivisibleByPowerOfTwo;
 
 impl<'a> DivisibleByPowerOfTwo for &'a Integer {
     /// Returns whether `self` is divisible by 2<sup>`pow`</sup>. If `self` is 0, the result is
@@ -17,7 +17,7 @@ impl<'a> DivisibleByPowerOfTwo for &'a Integer {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::{DivisibleByPowerOfTwo, Zero};
+    /// use malachite_base::num::traits::{DivisibleByPowerOfTwo, Zero};
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {

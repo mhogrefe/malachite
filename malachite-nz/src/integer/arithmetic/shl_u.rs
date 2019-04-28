@@ -14,7 +14,7 @@ macro_rules! impl_integer_shl_unsigned {
         /// extern crate malachite_base;
         /// extern crate malachite_nz;
         ///
-        /// use malachite_base::num::Zero;
+        /// use malachite_base::num::traits::Zero;
         /// use malachite_nz::integer::Integer;
         ///
         /// fn main() {
@@ -50,7 +50,7 @@ macro_rules! impl_integer_shl_unsigned {
         /// extern crate malachite_base;
         /// extern crate malachite_nz;
         ///
-        /// use malachite_base::num::Zero;
+        /// use malachite_base::num::traits::Zero;
         /// use malachite_nz::integer::Integer;
         ///
         /// fn main() {
@@ -85,7 +85,7 @@ macro_rules! impl_integer_shl_unsigned {
         /// extern crate malachite_base;
         /// extern crate malachite_nz;
         ///
-        /// use malachite_base::num::{NegativeOne, One};
+        /// use malachite_base::num::traits::{NegativeOne, One};
         /// use malachite_nz::integer::Integer;
         ///
         /// fn main() {

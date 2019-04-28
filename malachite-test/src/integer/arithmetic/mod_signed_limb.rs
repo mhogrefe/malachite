@@ -6,7 +6,7 @@ use inputs::integer::{
     nrm_pairs_of_integer_and_nonzero_signed, rm_pairs_of_integer_and_nonzero_signed,
 };
 use inputs::integer::{pairs_of_integer_and_nonzero_signed, pairs_of_signed_and_nonzero_integer};
-use malachite_base::num::{
+use malachite_base::num::traits::{
     CeilingDivMod, CeilingMod, CeilingModAssign, DivMod, Mod, ModAssign, SignificantBits,
 };
 use malachite_nz::platform::SignedLimb;

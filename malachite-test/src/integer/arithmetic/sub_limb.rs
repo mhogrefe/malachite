@@ -7,7 +7,7 @@ use inputs::integer::{
     rm_pairs_of_unsigned_and_integer,
 };
 use inputs::integer::{pairs_of_integer_and_unsigned, pairs_of_unsigned_and_integer};
-use malachite_base::num::SignificantBits;
+use malachite_base::num::traits::SignificantBits;
 use malachite_nz::platform::Limb;
 use num::BigInt;
 

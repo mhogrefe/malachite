@@ -1,7 +1,7 @@
 use integer::Integer;
+use malachite_base::comparison::Max;
 use malachite_base::limbs::{limbs_leading_zero_limbs, limbs_set_zero};
-use malachite_base::misc::Max;
-use malachite_base::num::WrappingNegAssign;
+use malachite_base::num::traits::WrappingNegAssign;
 use natural::logic::not::{limbs_not_in_place, limbs_not_to_out};
 use natural::Natural::{self, Large, Small};
 use platform::Limb;
@@ -485,7 +485,7 @@ impl<'a, 'b> BitOr<&'a Natural> for &'b Integer {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::Zero;
+/// use malachite_base::num::traits::Zero;
 /// use malachite_nz::integer::Integer;
 /// use malachite_nz::natural::Natural;
 ///
@@ -521,7 +521,7 @@ impl BitOrAssign<Natural> for Integer {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::Zero;
+/// use malachite_base::num::traits::Zero;
 /// use malachite_nz::integer::Integer;
 /// use malachite_nz::natural::Natural;
 ///

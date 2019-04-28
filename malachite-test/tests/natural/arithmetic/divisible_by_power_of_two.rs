@@ -1,6 +1,6 @@
 use common::test_properties;
-use malachite_base::misc::CheckedFrom;
-use malachite_base::num::{DivisibleByPowerOfTwo, Zero};
+use malachite_base::conversion::CheckedFrom;
+use malachite_base::num::traits::{DivisibleByPowerOfTwo, Zero};
 use malachite_nz::natural::arithmetic::divisible_by_power_of_two::limbs_divisible_by_power_of_two;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;

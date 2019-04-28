@@ -3,8 +3,8 @@ use inputs::integer::{
     rm_triples_of_integer_signed_and_small_unsigned, triples_of_integer_signed_and_small_unsigned,
     triples_of_signed_integer_and_small_unsigned,
 };
-use malachite_base::misc::CheckedFrom;
-use malachite_base::num::{EqModPowerOfTwo, ModPowerOfTwo, SignificantBits};
+use malachite_base::conversion::CheckedFrom;
+use malachite_base::num::traits::{EqModPowerOfTwo, ModPowerOfTwo, SignificantBits};
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::SignedLimb;
 use rug;

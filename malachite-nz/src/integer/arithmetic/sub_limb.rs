@@ -1,6 +1,6 @@
 use integer::Integer;
-use malachite_base::misc::CheckedFrom;
-use malachite_base::num::{Assign, NegAssign};
+use malachite_base::conversion::CheckedFrom;
+use malachite_base::num::traits::{Assign, NegAssign};
 use natural::Natural;
 use platform::Limb;
 use std::ops::{Sub, SubAssign};

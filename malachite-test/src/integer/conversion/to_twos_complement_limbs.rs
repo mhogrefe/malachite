@@ -1,8 +1,8 @@
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::{vecs_of_unsigned, vecs_of_unsigned_var_3};
 use inputs::integer::{integers, pairs_of_integer_and_small_usize};
-use malachite_base::misc::Max;
-use malachite_base::num::{SignificantBits, WrappingNegAssign};
+use malachite_base::comparison::Max;
+use malachite_base::num::traits::{SignificantBits, WrappingNegAssign};
 use malachite_nz::integer::conversion::to_twos_complement_limbs::*;
 use malachite_nz::natural::arithmetic::sub_limb::limbs_sub_limb_in_place;
 use malachite_nz::natural::logic::not::limbs_not_in_place;

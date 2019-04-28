@@ -1,5 +1,6 @@
 use common::test_properties;
-use malachite_base::num::{JoinHalves, PrimitiveUnsigned, SplitInHalf};
+use malachite_base::num::traits::{JoinHalves, SplitInHalf};
+use malachite_base::num::unsigneds::PrimitiveUnsigned;
 use malachite_test::inputs::base::unsigneds;
 use rand::Rand;
 use std::{u16, u8};

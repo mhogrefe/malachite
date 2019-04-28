@@ -1,6 +1,6 @@
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::natural::pairs_of_naturals;
-use malachite_base::num::{SaturatingSub, SaturatingSubAssign, SignificantBits};
+use malachite_base::num::traits::{SaturatingSub, SaturatingSubAssign, SignificantBits};
 use std::cmp::max;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {

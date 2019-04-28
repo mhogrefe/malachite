@@ -3,7 +3,7 @@ use inputs::base::{
     pairs_of_limb_vec_and_small_u64_var_2, pairs_of_unsigned_vec_and_small_unsigned,
 };
 use inputs::natural::{nm_pairs_of_natural_and_small_u64, pairs_of_natural_and_small_unsigned};
-use malachite_base::num::BitAccess;
+use malachite_base::num::traits::BitAccess;
 use malachite_nz::natural::logic::bit_access::{limbs_slice_set_bit, limbs_vec_set_bit};
 use num::{BigUint, One};
 

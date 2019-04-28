@@ -1,5 +1,5 @@
 use common::test_properties;
-use malachite_base::num::{NegativeOne, Zero};
+use malachite_base::num::traits::{NegativeOne, Zero};
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::Limb;
 #[cfg(feature = "32_bit_limbs")]

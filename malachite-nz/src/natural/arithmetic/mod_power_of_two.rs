@@ -1,7 +1,8 @@
 use integer::conversion::to_twos_complement_limbs::limbs_twos_complement_in_place;
-use malachite_base::num::{
+use malachite_base::num::integers::PrimitiveInteger;
+use malachite_base::num::traits::{
     Assign, ModPowerOfTwo, ModPowerOfTwoAssign, NegModPowerOfTwo, NegModPowerOfTwoAssign,
-    PrimitiveInteger, RemPowerOfTwo, RemPowerOfTwoAssign, Zero,
+    RemPowerOfTwo, RemPowerOfTwoAssign, Zero,
 };
 use natural::Natural::{self, Large, Small};
 use platform::Limb;
@@ -157,7 +158,7 @@ impl ModPowerOfTwo for Natural {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::ModPowerOfTwo;
+    /// use malachite_base::num::traits::ModPowerOfTwo;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
@@ -190,7 +191,7 @@ impl<'a> ModPowerOfTwo for &'a Natural {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::ModPowerOfTwo;
+    /// use malachite_base::num::traits::ModPowerOfTwo;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
@@ -225,7 +226,7 @@ impl ModPowerOfTwoAssign for Natural {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::ModPowerOfTwoAssign;
+    /// use malachite_base::num::traits::ModPowerOfTwoAssign;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
@@ -267,7 +268,7 @@ impl RemPowerOfTwo for Natural {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::RemPowerOfTwo;
+    /// use malachite_base::num::traits::RemPowerOfTwo;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
@@ -299,7 +300,7 @@ impl<'a> RemPowerOfTwo for &'a Natural {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::RemPowerOfTwo;
+    /// use malachite_base::num::traits::RemPowerOfTwo;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
@@ -327,7 +328,7 @@ impl RemPowerOfTwoAssign for Natural {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::RemPowerOfTwoAssign;
+    /// use malachite_base::num::traits::RemPowerOfTwoAssign;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
@@ -364,7 +365,7 @@ impl NegModPowerOfTwo for Natural {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::NegModPowerOfTwo;
+    /// use malachite_base::num::traits::NegModPowerOfTwo;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
@@ -398,7 +399,7 @@ impl<'a> NegModPowerOfTwo for &'a Natural {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::NegModPowerOfTwo;
+    /// use malachite_base::num::traits::NegModPowerOfTwo;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
@@ -447,7 +448,7 @@ impl NegModPowerOfTwoAssign for Natural {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::NegModPowerOfTwoAssign;
+    /// use malachite_base::num::traits::NegModPowerOfTwoAssign;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {

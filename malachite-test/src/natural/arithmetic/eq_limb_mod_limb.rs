@@ -6,7 +6,7 @@ use inputs::natural::{
     triples_of_natural_unsigned_and_unsigned, triples_of_unsigned_natural_and_unsigned,
     triples_of_unsigned_unsigned_and_natural,
 };
-use malachite_base::num::{EqMod, SignificantBits};
+use malachite_base::num::traits::{EqMod, SignificantBits};
 use malachite_nz::natural::arithmetic::eq_limb_mod_limb::{
     _combined_limbs_eq_limb_mod_limb, limbs_eq_limb_mod_limb,
 };

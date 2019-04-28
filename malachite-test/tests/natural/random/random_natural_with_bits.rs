@@ -1,5 +1,5 @@
 use common::test_properties_no_special;
-use malachite_base::num::SignificantBits;
+use malachite_base::num::traits::SignificantBits;
 use malachite_nz::natural::random::random_natural_with_bits::random_natural_with_bits;
 use malachite_test::inputs::base::small_unsigneds;
 use rand::{IsaacRng, SeedableRng, StdRng};
