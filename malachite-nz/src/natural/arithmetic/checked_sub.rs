@@ -3,83 +3,6 @@ use natural::arithmetic::sub::{limbs_sub, limbs_sub_in_place_left, limbs_sub_in_
 use natural::Natural::{self, Large, Small};
 use platform::Limb;
 
-impl Natural {
-    // self -= other, return borrow
-    pub(crate) fn sub_assign_no_panic(&mut self, other: Natural) -> bool {
-        if other == 0 as Limb {
-            false
-        } else if self.limb_count() < other.limb_count() {
-            true
-        } else if let Small(y) = other {
-            self.sub_assign_limb_no_panic(y)
-        } else {
-            match (&mut (*self), other) {
-                (&mut Large(ref mut xs), Large(ref ys)) => {
-                    if limbs_sub_in_place_left(xs, ys) {
-                        return true;
-                    }
-                }
-                _ => unreachable!(),
-            }
-            self.trim();
-            false
-        }
-    }
-
-    // self -= &other, return borrow
-    pub(crate) fn sub_assign_ref_no_panic(&mut self, other: &Natural) -> bool {
-        if *other == 0 as Limb {
-            false
-        } else if self as *const Natural == other as *const Natural {
-            *self = Small(0);
-            false
-        } else if self.limb_count() < other.limb_count() {
-            true
-        } else if let Small(y) = *other {
-            self.sub_assign_limb_no_panic(y)
-        } else {
-            match (&mut (*self), other) {
-                (&mut Large(ref mut xs), &Large(ref ys)) => {
-                    if limbs_sub_in_place_left(xs, ys) {
-                        return true;
-                    }
-                }
-                _ => unreachable!(),
-            }
-            self.trim();
-            false
-        }
-    }
-
-    // self = &other - self, return borrow
-    pub(crate) fn sub_right_assign_no_panic(&mut self, other: &Natural) -> bool {
-        if self as *const Natural == other as *const Natural {
-            *self = Small(0);
-            false
-        } else if self.limb_count() > other.limb_count() {
-            true
-        } else if let Small(y) = *self {
-            if let Some(result) = other.checked_sub(y) {
-                *self = result;
-                false
-            } else {
-                true
-            }
-        } else {
-            match (&mut (*self), other) {
-                (&mut Large(ref mut xs), &Large(ref ys)) => {
-                    if limbs_sub_in_place_right(ys, xs) {
-                        return true;
-                    }
-                }
-                _ => unreachable!(),
-            }
-            self.trim();
-            false
-        }
-    }
-}
-
 /// Subtracts a `Natural` from a `Natural`, taking both `Natural`s by value. If the second `Natural`
 /// is greater than the first, returns `None`.
 ///
@@ -243,6 +166,83 @@ impl<'a, 'b> CheckedSub<&'a Natural> for &'b Natural {
                     }
                 }
             }
+        }
+    }
+}
+
+impl Natural {
+    // self -= other, return borrow
+    pub(crate) fn sub_assign_no_panic(&mut self, other: Natural) -> bool {
+        if other == 0 as Limb {
+            false
+        } else if self.limb_count() < other.limb_count() {
+            true
+        } else if let Small(y) = other {
+            self.sub_assign_limb_no_panic(y)
+        } else {
+            match (&mut (*self), other) {
+                (&mut Large(ref mut xs), Large(ref ys)) => {
+                    if limbs_sub_in_place_left(xs, ys) {
+                        return true;
+                    }
+                }
+                _ => unreachable!(),
+            }
+            self.trim();
+            false
+        }
+    }
+
+    // self -= &other, return borrow
+    pub(crate) fn sub_assign_ref_no_panic(&mut self, other: &Natural) -> bool {
+        if *other == 0 as Limb {
+            false
+        } else if self as *const Natural == other as *const Natural {
+            *self = Small(0);
+            false
+        } else if self.limb_count() < other.limb_count() {
+            true
+        } else if let Small(y) = *other {
+            self.sub_assign_limb_no_panic(y)
+        } else {
+            match (&mut (*self), other) {
+                (&mut Large(ref mut xs), &Large(ref ys)) => {
+                    if limbs_sub_in_place_left(xs, ys) {
+                        return true;
+                    }
+                }
+                _ => unreachable!(),
+            }
+            self.trim();
+            false
+        }
+    }
+
+    // self = &other - self, return borrow
+    pub(crate) fn sub_right_assign_no_panic(&mut self, other: &Natural) -> bool {
+        if self as *const Natural == other as *const Natural {
+            *self = Small(0);
+            false
+        } else if self.limb_count() > other.limb_count() {
+            true
+        } else if let Small(y) = *self {
+            if let Some(result) = other.checked_sub(y) {
+                *self = result;
+                false
+            } else {
+                true
+            }
+        } else {
+            match (&mut (*self), other) {
+                (&mut Large(ref mut xs), &Large(ref ys)) => {
+                    if limbs_sub_in_place_right(ys, xs) {
+                        return true;
+                    }
+                }
+                _ => unreachable!(),
+            }
+            self.trim();
+            false
         }
     }
 }

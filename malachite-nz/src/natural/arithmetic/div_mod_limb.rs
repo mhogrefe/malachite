@@ -10,9 +10,13 @@ use natural::arithmetic::shl_u::{limbs_shl_to_out, limbs_slice_shl_in_place};
 use natural::Natural::{self, Large, Small};
 use platform::{DoubleLimb, Limb};
 
-// These functions are adapted from udiv_qrnnd_preinv, mpn_div_qr_1n_pi1, and mpn_div_qr_1 in GMP
-// 6.1.2.
+//TODO Consider using mpn_divrem_1 instead of mpn_div_qr_1
 
+/// Time: O(1)
+///
+/// Additional memory: O(1)
+///
+/// This is udiv_qrnnd_preinv from gmp-impl.h.
 pub(crate) fn div_mod_by_preinversion(
     n_high: Limb,
     n_low: Limb,
@@ -35,7 +39,16 @@ pub(crate) fn div_mod_by_preinversion(
     (quotient_high, remainder)
 }
 
-// high bit of divisor must be set
+/// The high bit of `divisor` must be set.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = `limbs.len()`
+///
+/// This is mpn_div_qr_1n_pi1 from mpn/generic/div_qr_1n_pi1.c with DIV_QR_1N_METHOD == 2, where
+/// qp == up.
 fn limbs_div_limb_normalized_in_place_mod(
     limbs: &mut [Limb],
     high_limb: Limb,
@@ -106,7 +119,15 @@ fn limbs_div_limb_normalized_in_place_mod(
     remainder
 }
 
-// high bit of divisor must be set
+/// The high bit of `divisor` must be set.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(n)
+///
+/// where n = `limbs.len()`
+///
+/// This is mpn_div_qr_1n_pi1 from mpn/generic/div_qr_1n_pi1.c with DIV_QR_1N_METHOD == 2.
 fn limbs_div_limb_normalized_to_out_mod(
     out: &mut [Limb],
     in_limbs: &[Limb],
@@ -195,6 +216,8 @@ fn limbs_div_limb_normalized_to_out_mod(
 /// assert_eq!(limbs_div_limb_mod(&[0xffff_ffff, 0xffff_ffff], 3),
 ///     (vec![0x5555_5555, 0x5555_5555], 0));
 /// ```
+///
+/// This is mpn_div_qr_1 from mpn/generic/div_qr_1.c where the both results are returned.
 pub fn limbs_div_limb_mod(limbs: &[Limb], divisor: Limb) -> (Vec<Limb>, Limb) {
     let mut quotient_limbs = vec![0; limbs.len()];
     let remainder = limbs_div_limb_to_out_mod(&mut quotient_limbs, limbs, divisor);
@@ -228,6 +251,8 @@ pub fn limbs_div_limb_mod(limbs: &[Limb], divisor: Limb) -> (Vec<Limb>, Limb) {
 /// assert_eq!(limbs_div_limb_to_out_mod(&mut out, &[0xffff_ffff, 0xffff_ffff], 3), 0);
 /// assert_eq!(out, &[0x5555_5555, 0x5555_5555, 10, 10]);
 /// ```
+///
+/// This is mpn_div_qr_1 from mpn/generic/div_qr_1.c.
 pub fn limbs_div_limb_to_out_mod(out: &mut [Limb], in_limbs: &[Limb], mut divisor: Limb) -> Limb {
     assert_ne!(divisor, 0);
     let len = in_limbs.len();
@@ -295,6 +320,8 @@ pub fn limbs_div_limb_to_out_mod(out: &mut [Limb], in_limbs: &[Limb], mut diviso
 /// assert_eq!(limbs_div_limb_in_place_mod(&mut limbs, 3), 0);
 /// assert_eq!(limbs, &[0x5555_5555, 0x5555_5555]);
 /// ```
+///
+/// This is mpn_div_qr_1 from mpn/generic/div_qr_1.c where qp == up.
 pub fn limbs_div_limb_in_place_mod(limbs: &mut [Limb], mut divisor: Limb) -> Limb {
     assert_ne!(divisor, 0);
     let len = limbs.len();

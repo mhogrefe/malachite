@@ -6,33 +6,6 @@ use natural::arithmetic::sub_limb::{limbs_sub_limb, limbs_sub_limb_in_place};
 use natural::Natural::{self, Large, Small};
 use platform::Limb;
 
-impl Natural {
-    // self -= other, return borrow
-    pub(crate) fn sub_assign_limb_no_panic(&mut self, other: Limb) -> bool {
-        if other == 0 {
-            return false;
-        }
-        match *self {
-            Small(ref mut small) => {
-                return match small.checked_sub(other) {
-                    Some(difference) => {
-                        *small = difference;
-                        false
-                    }
-                    None => true,
-                };
-            }
-            Large(ref mut limbs) => {
-                if limbs_sub_limb_in_place(limbs, other) {
-                    return true;
-                }
-            }
-        }
-        self.trim();
-        false
-    }
-}
-
 impl CheckedSub<Limb> for Natural {
     type Output = Natural;
 
@@ -219,5 +192,32 @@ impl<'a> CheckedSub<&'a Natural> for u32 {
     #[inline]
     fn checked_sub(self, other: &'a Natural) -> Option<u32> {
         CheckedSub::checked_sub(Limb::from(self), other).map(u32::wrapping_from)
+    }
+}
+
+impl Natural {
+    // self -= other, return borrow
+    pub(crate) fn sub_assign_limb_no_panic(&mut self, other: Limb) -> bool {
+        if other == 0 {
+            return false;
+        }
+        match *self {
+            Small(ref mut small) => {
+                return match small.checked_sub(other) {
+                    Some(difference) => {
+                        *small = difference;
+                        false
+                    }
+                    None => true,
+                };
+            }
+            Large(ref mut limbs) => {
+                if limbs_sub_limb_in_place(limbs, other) {
+                    return true;
+                }
+            }
+        }
+        self.trim();
+        false
     }
 }

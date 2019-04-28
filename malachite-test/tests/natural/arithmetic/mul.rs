@@ -16436,7 +16436,6 @@ fn test_limbs_mul_fft_fft() {
                 ll: Vec<Vec<usize>>,
                 ll_offset: usize,
                 omega: usize,
-                n: usize,
                 inc: usize,
                 tp_before: Vec<Limb>,
                 ap_after: Vec<Vec<Limb>>,
@@ -16448,7 +16447,7 @@ fn test_limbs_mul_fft_fft() {
         }
         let ll: Vec<&[usize]> = ll.iter().map(|row| row.as_slice()).collect();
         let mut tp = tp_before.clone();
-        _limbs_mul_fft_fft(&mut ap, k, &ll, ll_offset, omega, n, inc, &mut tp);
+        _limbs_mul_fft_fft(&mut ap, k, &ll, ll_offset, omega, inc, &mut tp);
         assert_eq!(ap.len(), ap_after.len());
         assert!(
             ap.iter()
@@ -16466,7 +16465,6 @@ fn test_limbs_mul_fft_fft() {
         vec![vec![0], vec![1, 2], vec![3, 4, 5, 6]],
         1,
         2,
-        2,
         1,
         vec![1, 2, 3],
         vec![vec![Limb::MAX, Limb::MAX, 0], vec![0, 0, 2]],
@@ -16480,7 +16478,6 @@ fn test_limbs_mul_fft_inverse() {
     let test = |ap_before: Vec<Vec<Limb>>,
                 k: usize,
                 omega: usize,
-                n: usize,
                 tp_before: Vec<Limb>,
                 ap_after: Vec<Vec<Limb>>,
                 tp_after: Vec<Limb>| {
@@ -16490,7 +16487,7 @@ fn test_limbs_mul_fft_inverse() {
             ap.push(a);
         }
         let mut tp = tp_before.clone();
-        _limbs_mul_fft_inverse(&mut ap, k, omega, n, &mut tp);
+        _limbs_mul_fft_inverse(&mut ap, k, omega, &mut tp);
         assert_eq!(ap.len(), ap_after.len());
         assert!(
             ap.iter()
@@ -16504,7 +16501,6 @@ fn test_limbs_mul_fft_inverse() {
     // *xss_0_last > 1 in _limbs_mul_fft_inverse
     test(
         vec![vec![0, 0, 2], vec![0, 0, 0]],
-        2,
         2,
         2,
         vec![1, 2, 3],
@@ -16538,7 +16534,6 @@ fn test_limbs_mul_fft_internal() {
                 k: usize,
                 ap_before: Vec<Vec<Limb>>,
                 b_before: Vec<Limb>,
-                width: usize,
                 l: usize,
                 mp: usize,
                 fft_l: Vec<Vec<usize>>,
@@ -16556,9 +16551,7 @@ fn test_limbs_mul_fft_internal() {
         let mut b = b_before.clone();
         let fft_l: Vec<&[usize]> = fft_l.iter().map(|row| row.as_slice()).collect();
         let mut t = t_before.clone();
-        _limbs_mul_fft_internal(
-            &mut op, pl, k, ap, &mut b, width, l, mp, &fft_l, &mut t, sqr,
-        );
+        _limbs_mul_fft_internal(&mut op, pl, k, ap, &mut b, l, mp, &fft_l, &mut t, sqr);
         assert_eq!(op, op_after);
         assert_eq!(b, b_after);
         assert_eq!(t, t_after);
@@ -16569,7 +16562,6 @@ fn test_limbs_mul_fft_internal() {
         1,
         vec![vec![4, 5, 6], vec![7, 8, 9]],
         vec![10, 11, 12, 13, 14, 15],
-        3,
         2,
         3,
         vec![vec![0], vec![1, 2], vec![3, 4, 5, 6]],

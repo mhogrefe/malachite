@@ -11,8 +11,6 @@ use natural::arithmetic::div_limb::{
 use natural::Natural::{self, Large, Small};
 use platform::{DoubleLimb, Limb};
 
-// These functions are adapted from mpn_divexact_1 and mpn_divexact_by3c in GMP 6.1.2.
-
 const INVERT_LIMB_TABLE_LOG_SIZE: u64 = 7;
 
 const INVERT_LIMB_TABLE_SIZE: usize = 1 << INVERT_LIMB_TABLE_LOG_SIZE;
@@ -29,7 +27,7 @@ const INVERT_LIMB_TABLE: [u8; INVERT_LIMB_TABLE_SIZE] = [
     0x21, 0xCB, 0xED, 0xD7, 0x59, 0xC3, 0xE5, 0x0F, 0x11, 0x3B, 0x5D, 0xC7, 0x49, 0x33, 0x55, 0xFF,
 ];
 
-/// Tests that INVERT_LIMB_TABLE is correct.
+/// Tests that `INVERT_LIMB_TABLE` is correct.
 ///
 /// # Examples
 /// ```
@@ -101,6 +99,8 @@ pub fn limbs_invert_limb(limb: Limb) -> Limb {
 /// assert_eq!(limbs_div_exact_limb(&[6, 7], 2), &[2_147_483_651, 3]);
 /// assert_eq!(limbs_div_exact_limb(&[0xffff_ffff, 0xffff_ffff], 3), &[0x5555_5555, 0x5555_5555]);
 /// ```
+///
+/// This is mpn_divexact_1 from mpn/generic/dive_1.c where the result is returned.
 pub fn limbs_div_exact_limb(limbs: &[Limb], divisor: Limb) -> Vec<Limb> {
     let mut quotient = vec![0; limbs.len()];
     limbs_div_exact_limb_to_out(&mut quotient, limbs, divisor);
@@ -134,6 +134,8 @@ pub fn limbs_div_exact_limb(limbs: &[Limb], divisor: Limb) -> Vec<Limb> {
 /// limbs_div_exact_limb_to_out(&mut out, &[0xffff_ffff, 0xffff_ffff], 3);
 /// assert_eq!(out, &[0x5555_5555, 0x5555_5555, 10, 10]);
 /// ```
+///
+/// This is mpn_divexact_1 from mpn/generic/dive_1.c.
 pub fn limbs_div_exact_limb_to_out(out: &mut [Limb], in_limbs: &[Limb], divisor: Limb) {
     assert_ne!(divisor, 0);
     let len = in_limbs.len();
@@ -207,6 +209,8 @@ pub fn limbs_div_exact_limb_to_out(out: &mut [Limb], in_limbs: &[Limb], divisor:
 /// limbs_div_exact_limb_in_place(&mut limbs, 3);
 /// assert_eq!(limbs, &[0x5555_5555, 0x5555_5555]);
 /// ```
+///
+/// This is mpn_divexact_1 from mpn/generic/dive_1.c where dst == src.
 pub fn limbs_div_exact_limb_in_place(limbs: &mut [Limb], divisor: Limb) {
     assert_ne!(divisor, 0);
     let len = limbs.len();
@@ -279,6 +283,9 @@ const CEIL_2_MAX_OVER_3: Limb = ((Limb::MAX >> 1) / 3 + 1) | (1 << (Limb::WIDTH 
 /// assert_eq!(limbs_div_exact_3(&[8, 7]), &[1_431_655_768, 2]);
 /// assert_eq!(limbs_div_exact_3(&[0xffff_ffff, 0xffff_ffff]), &[0x5555_5555, 0x5555_5555]);
 /// ```
+///
+/// This is mpn_divexact_by3c from mpn/generic diveby3.c with DIVEXACT_BY3_METHOD == 0 and no
+/// carry-in, where the result is returned.
 pub fn limbs_div_exact_3(limbs: &[Limb]) -> Vec<Limb> {
     let mut quotient = vec![0; limbs.len()];
     limbs_div_exact_3_to_out(&mut quotient, limbs);
@@ -311,6 +318,9 @@ pub fn limbs_div_exact_3(limbs: &[Limb]) -> Vec<Limb> {
 /// limbs_div_exact_3_to_out(&mut out, &[0xffff_ffff, 0xffff_ffff]);
 /// assert_eq!(out, &[0x5555_5555, 0x5555_5555, 10, 10]);
 /// ```
+///
+/// This is mpn_divexact_by3c from mpn/generic diveby3.c with DIVEXACT_BY3_METHOD == 0, no carry-in,
+/// and no return value.
 pub fn limbs_div_exact_3_to_out(out: &mut [Limb], xs: &[Limb]) {
     assert!(out.len() >= xs.len());
     let (xs_last, xs_init) = xs.split_last().unwrap();
@@ -319,7 +329,10 @@ pub fn limbs_div_exact_3_to_out(out: &mut [Limb], xs: &[Limb]) {
     out[xs.len() - 1] = out_limb.wrapping_sub(lower);
 }
 
-// Benchmarks show that this algorithm is always worse than the default.
+/// Benchmarks show that this algorithm is always worse than the default.
+///
+/// This is mpn_divexact_by3c from mpn/generic diveby3.c with DIVEXACT_BY3_METHOD == 1, no carry-in,
+/// and no return value.
 pub fn _limbs_div_exact_3_to_out_alt(out: &mut [Limb], in_limbs: &[Limb]) {
     let len = in_limbs.len();
     assert_ne!(len, 0);
@@ -369,6 +382,8 @@ pub fn _limbs_div_exact_3_to_out_alt(out: &mut [Limb], in_limbs: &[Limb]) {
 /// limbs_div_exact_3_in_place(&mut limbs);
 /// assert_eq!(limbs, &[0x5555_5555, 0x5555_5555]);
 /// ```
+/// This is mpn_divexact_by3c from mpn/generic diveby3.c with DIVEXACT_BY3_METHOD == 0, no carry-in,
+/// and no return value, where rp == up.
 pub fn limbs_div_exact_3_in_place(xs: &mut [Limb]) {
     let (xs_last, xs_init) = xs.split_last_mut().unwrap();
     let out_limb = limbs_div_divisor_of_limb_max_with_carry_in_place(xs_init, MAX_OVER_3, 0);
@@ -376,7 +391,10 @@ pub fn limbs_div_exact_3_in_place(xs: &mut [Limb]) {
     *xs_last = out_limb.wrapping_sub(lower);
 }
 
-// Benchmarks show that this algorithm is always worse than the default.
+/// Benchmarks show that this algorithm is always worse than the default.
+///
+/// This is mpn_divexact_by3c from mpn/generic diveby3.c with DIVEXACT_BY3_METHOD == 1, no carry-in,
+/// and no return value, where rp == up.
 pub fn _limbs_div_exact_3_in_place_alt(limbs: &mut [Limb]) {
     let len = limbs.len();
     assert_ne!(len, 0);
