@@ -2,7 +2,9 @@ use std::str::FromStr;
 
 use malachite_base::num::traits::{DivRem, One, Zero};
 use malachite_nz::natural::arithmetic::div_limb::{
-    limbs_div_limb, limbs_div_limb_in_place, limbs_div_limb_to_out,
+    limbs_div_divisor_of_limb_max_with_carry_in_place,
+    limbs_div_divisor_of_limb_max_with_carry_to_out, limbs_div_limb, limbs_div_limb_in_place,
+    limbs_div_limb_to_out,
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
@@ -16,7 +18,9 @@ use malachite_test::common::{biguint_to_natural, natural_to_biguint};
 use malachite_test::common::{natural_to_rug_integer, rug_integer_to_natural};
 use malachite_test::inputs::base::{
     pairs_of_unsigned_and_positive_unsigned, pairs_of_unsigned_vec_and_positive_unsigned_var_1,
-    positive_unsigneds, triples_of_unsigned_vec_unsigned_vec_and_positive_unsigned_var_1,
+    positive_unsigneds, quadruples_of_limb_vec_limb_vec_limb_and_limb_var_2,
+    triples_of_limb_vec_limb_and_limb_var_1,
+    triples_of_unsigned_vec_unsigned_vec_and_positive_unsigned_var_1,
 };
 use malachite_test::inputs::natural::{
     naturals, pairs_of_natural_and_positive_limb_var_1, pairs_of_natural_and_positive_unsigned,
@@ -302,6 +306,30 @@ fn limbs_div_limb_in_place_properties() {
                 Natural::from_owned_limbs_asc(limbs),
                 Natural::from_limbs_asc(&old_limbs) / limb
             );
+        },
+    );
+}
+
+#[test]
+fn limbs_div_divisor_of_limb_max_with_carry_to_out_properties() {
+    test_properties(
+        quadruples_of_limb_vec_limb_vec_limb_and_limb_var_2,
+        |&(ref out, ref xs, divisor, carry)| {
+            //TODO figure out what to test
+            let mut out = out.to_vec();
+            limbs_div_divisor_of_limb_max_with_carry_to_out(&mut out, xs, divisor, carry);
+        },
+    );
+}
+
+#[test]
+fn limbs_div_divisor_of_limb_max_with_carry_in_place_properties() {
+    test_properties(
+        triples_of_limb_vec_limb_and_limb_var_1,
+        |&(ref xs, divisor, carry)| {
+            //TODO figure out what to test
+            let mut xs = xs.to_vec();
+            limbs_div_divisor_of_limb_max_with_carry_in_place(&mut xs, divisor, carry);
         },
     );
 }

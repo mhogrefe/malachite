@@ -1,12 +1,15 @@
 use malachite_base::num::traits::{DivRem, SignificantBits};
 use malachite_nz::natural::arithmetic::div_limb::{
-    limbs_div_limb, limbs_div_limb_in_place, limbs_div_limb_to_out,
+    limbs_div_divisor_of_limb_max_with_carry_in_place,
+    limbs_div_divisor_of_limb_max_with_carry_to_out, limbs_div_limb, limbs_div_limb_in_place,
+    limbs_div_limb_to_out,
 };
 use malachite_nz::platform::Limb;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::{
     pairs_of_unsigned_vec_and_positive_unsigned_var_1,
+    quadruples_of_limb_vec_limb_vec_limb_and_limb_var_2, triples_of_limb_vec_limb_and_limb_var_1,
     triples_of_unsigned_vec_unsigned_vec_and_positive_unsigned_var_1,
 };
 #[cfg(feature = "64_bit_limbs")]
@@ -21,6 +24,14 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limbs_div_limb);
     register_demo!(registry, demo_limbs_div_limb_to_out);
     register_demo!(registry, demo_limbs_div_limb_in_place);
+    register_demo!(
+        registry,
+        demo_limbs_div_divisor_of_limb_max_with_carry_to_out
+    );
+    register_demo!(
+        registry,
+        demo_limbs_div_divisor_of_limb_max_with_carry_in_place
+    );
     register_demo!(registry, demo_natural_div_assign_limb);
     register_demo!(registry, demo_natural_div_limb);
     register_demo!(registry, demo_natural_div_limb_ref);
@@ -31,6 +42,16 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_bench!(registry, Small, benchmark_limbs_div_limb);
     register_bench!(registry, Small, benchmark_limbs_div_limb_to_out);
     register_bench!(registry, Small, benchmark_limbs_div_limb_in_place);
+    register_bench!(
+        registry,
+        Small,
+        benchmark_limbs_div_divisor_of_limb_max_with_carry_to_out
+    );
+    register_bench!(
+        registry,
+        Small,
+        benchmark_limbs_div_divisor_of_limb_max_with_carry_in_place
+    );
     register_bench!(registry, Large, benchmark_natural_div_assign_limb);
     register_bench!(
         registry,
@@ -88,6 +109,35 @@ fn demo_limbs_div_limb_in_place(gm: GenerationMode, limit: usize) {
         println!(
             "limbs := {:?}; limbs_div_limb_in_place(&mut limbs, {}); limbs = {:?}",
             limbs_old, limb, limbs
+        );
+    }
+}
+
+fn demo_limbs_div_divisor_of_limb_max_with_carry_to_out(gm: GenerationMode, limit: usize) {
+    for (out, xs, divisor, mut carry) in
+        quadruples_of_limb_vec_limb_vec_limb_and_limb_var_2(gm).take(limit)
+    {
+        let mut out = out.to_vec();
+        let mut out_old = out.clone();
+        let carry_out =
+            limbs_div_divisor_of_limb_max_with_carry_to_out(&mut out, &xs, divisor, carry);
+        println!(
+            "out := {:?}; limbs_div_divisor_of_limb_max_with_carry_to_out(&mut out, {:?}, {}, {}) \
+             = {}; out = {:?}",
+            out_old, xs, divisor, carry, carry_out, out
+        );
+    }
+}
+
+fn demo_limbs_div_divisor_of_limb_max_with_carry_in_place(gm: GenerationMode, limit: usize) {
+    for (xs, divisor, mut carry) in triples_of_limb_vec_limb_and_limb_var_1(gm).take(limit) {
+        let mut xs = xs.to_vec();
+        let mut xs_old = xs.clone();
+        let carry_out = limbs_div_divisor_of_limb_max_with_carry_in_place(&mut xs, divisor, carry);
+        println!(
+            "xs := {:?}; limbs_div_divisor_of_limb_max_with_carry_in_place(&mut xs, {}, {}) = {}; \
+             xs = {:?}",
+            xs_old, divisor, carry, carry_out, xs
         );
     }
 }
@@ -190,6 +240,56 @@ fn benchmark_limbs_div_limb_in_place(gm: GenerationMode, limit: usize, file_name
         &mut [(
             "malachite",
             &mut (|(mut limbs, limb)| limbs_div_limb_in_place(&mut limbs, limb)),
+        )],
+    );
+}
+
+fn benchmark_limbs_div_divisor_of_limb_max_with_carry_to_out(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "limbs_div_divisor_of_limb_max_with_carry_to_out(&mut [Limb], &[Limb], Limb, Limb)",
+        BenchmarkType::Single,
+        quadruples_of_limb_vec_limb_vec_limb_and_limb_var_2(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(_, ref xs, _, _)| xs.len()),
+        "xs.len()",
+        &mut [(
+            "malachite",
+            &mut (|(mut out, xs, divisor, carry)| {
+                no_out!(limbs_div_divisor_of_limb_max_with_carry_to_out(
+                    &mut out, &xs, divisor, carry
+                ))
+            }),
+        )],
+    );
+}
+
+fn benchmark_limbs_div_divisor_of_limb_max_with_carry_in_place(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "limbs_div_divisor_of_limb_max_with_carry_in_place(&mut [Limb], Limb)",
+        BenchmarkType::Single,
+        triples_of_limb_vec_limb_and_limb_var_1(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(ref xs, _, _)| xs.len()),
+        "limbs.len()",
+        &mut [(
+            "malachite",
+            &mut (|(mut xs, divisor, carry)| {
+                no_out!(limbs_div_divisor_of_limb_max_with_carry_in_place(
+                    &mut xs, divisor, carry
+                ))
+            }),
         )],
     );
 }

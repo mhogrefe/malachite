@@ -34,7 +34,7 @@ use rand::Rand;
 use rust_wheels::iterators::bools::exhaustive_bools;
 use rust_wheels::iterators::chars::exhaustive_chars;
 use rust_wheels::iterators::common::EXAMPLE_SEED;
-use rust_wheels::iterators::general::{random, range_increasing};
+use rust_wheels::iterators::general::{random, random_from_vector, range_increasing};
 use rust_wheels::iterators::integers_geometric::{positive_u32s_geometric, u32s_geometric};
 use rust_wheels::iterators::orderings::{exhaustive_orderings, random_orderings};
 use rust_wheels::iterators::primitive_floats::{
@@ -65,7 +65,9 @@ use rust_wheels::iterators::vecs::{
 };
 
 use common::{GenerationMode, NoSpecialGenerationMode};
-use inputs::common::{permute_1_2, permute_1_3_2, reshape_2_1_to_3};
+use inputs::common::{
+    permute_1_2_4_3, permute_1_3_2, permute_2_1, reshape_2_1_to_3, reshape_3_1_to_4,
+};
 
 pub(crate) type It<T> = Box<Iterator<Item = T>>;
 
@@ -462,7 +464,7 @@ pub fn pairs_of_small_usize_and_unsigned<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
 ) -> It<(usize, T)> {
     match gm {
-        GenerationMode::Exhaustive => permute_1_2(Box::new(log_pairs(
+        GenerationMode::Exhaustive => permute_2_1(Box::new(log_pairs(
             exhaustive_unsigned(),
             exhaustive_unsigned::<u32>().map(|u| u as usize),
         ))),
@@ -481,7 +483,7 @@ pub fn pairs_of_small_usize_and_unsigned<T: PrimitiveUnsigned + Rand>(
 
 pub fn pairs_of_small_usizes(gm: NoSpecialGenerationMode) -> It<(usize, usize)> {
     match gm {
-        NoSpecialGenerationMode::Exhaustive => permute_1_2(Box::new(exhaustive_pairs_from_single(
+        NoSpecialGenerationMode::Exhaustive => permute_2_1(Box::new(exhaustive_pairs_from_single(
             exhaustive_unsigned::<u32>().map(|u| u as usize),
         ))),
         NoSpecialGenerationMode::Random(scale) => Box::new(random_pairs_from_single(
@@ -1751,11 +1753,98 @@ pub fn quadruples_of_three_unsigned_vecs_and_bool_var_1<T: PrimitiveUnsigned + R
     )
 }
 
+#[cfg(feature = "32_bit_limbs")]
+const PRIME_FACTORS_OF_LIMB_MAX: &[Limb] = &[3, 5, 17, 257, 65_537];
+#[cfg(feature = "64_bit_limbs")]
+const PRIME_FACTORS_OF_LIMB_MAX: &[Limb] = &[3, 5, 17, 257, 641, 65_537, 6_700_417];
+
+// TODO use a more generic solution
+fn factors_of_limb_max() -> Vec<Limb> {
+    let mut factors = Vec::new();
+    for i in (0 as Limb)..(1 << PRIME_FACTORS_OF_LIMB_MAX.len()) {
+        let mut factor = 1;
+        for (index, bit) in Natural::from(i).bits().enumerate() {
+            if bit {
+                factor *= PRIME_FACTORS_OF_LIMB_MAX[index];
+            }
+        }
+        factors.push(factor);
+    }
+    factors
+}
+
+// All quadruples of `Vec<Limb>`, `Vec<Limb>`, `Limb`, and `Limb` where the first limb is a divisor
+// of `Limb::MAX`.
+fn quadruples_of_limb_vec_limb_vec_limb_and_limb_var_1(
+    gm: GenerationMode,
+) -> It<(Vec<Limb>, Vec<Limb>, Limb, Limb)> {
+    match gm {
+        GenerationMode::Exhaustive => permute_1_2_4_3(reshape_3_1_to_4(Box::new(sqrt_pairs(
+            exhaustive_triples(
+                exhaustive_vecs(exhaustive_unsigned()),
+                exhaustive_vecs(exhaustive_unsigned()),
+                exhaustive_unsigned(),
+            ),
+            factors_of_limb_max().into_iter(),
+        )))),
+        GenerationMode::Random(scale) => Box::new(random_quadruples(
+            &EXAMPLE_SEED,
+            &(|seed| random_vecs(seed, scale, &(|seed_2| random(seed_2)))),
+            &(|seed| random_vecs(seed, scale, &(|seed_2| random(seed_2)))),
+            &(|seed| random_from_vector(seed, factors_of_limb_max())),
+            &(|seed| random(seed)),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_quadruples(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_unsigned_vecs(seed, scale)),
+            &(|seed| special_random_unsigned_vecs(seed, scale)),
+            &(|seed| random_from_vector(seed, factors_of_limb_max())),
+            &(|seed| special_random_unsigned(seed)),
+        )),
+    }
+}
+
+// All quadruples of `Vec<Limb>`, `Vec<Limb>`, `Limb`, and `Limb` where the first slice is at least
+// as long as the second and the first limb is a divisor of `Limb::MAX`.
+pub fn quadruples_of_limb_vec_limb_vec_limb_and_limb_var_2(
+    gm: GenerationMode,
+) -> It<(Vec<Limb>, Vec<Limb>, Limb, Limb)> {
+    Box::new(
+        quadruples_of_limb_vec_limb_vec_limb_and_limb_var_1(gm)
+            .filter(|&(ref out, ref xs, _, _)| out.len() >= xs.len()),
+    )
+}
+
+// All triples of `Vec<Limb>`, `Limb`, and `Limb` where the first limb is a divisor of `Limb::MAX`.
+pub fn triples_of_limb_vec_limb_and_limb_var_1(gm: GenerationMode) -> It<(Vec<Limb>, Limb, Limb)> {
+    match gm {
+        GenerationMode::Exhaustive => permute_1_3_2(reshape_2_1_to_3(Box::new(sqrt_pairs(
+            exhaustive_pairs(
+                exhaustive_vecs(exhaustive_unsigned()),
+                exhaustive_unsigned(),
+            ),
+            factors_of_limb_max().into_iter(),
+        )))),
+        GenerationMode::Random(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| random_vecs(seed, scale, &(|seed_2| random(seed_2)))),
+            &(|seed| random_from_vector(seed, factors_of_limb_max())),
+            &(|seed| random(seed)),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_unsigned_vecs(seed, scale)),
+            &(|seed| random_from_vector(seed, factors_of_limb_max())),
+            &(|seed| special_random_unsigned(seed)),
+        )),
+    }
+}
+
 fn pairs_of_ordering_and_vec_of_unsigned<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
 ) -> It<(Ordering, Vec<T>)> {
     match gm {
-        GenerationMode::Exhaustive => permute_1_2(Box::new(lex_pairs(
+        GenerationMode::Exhaustive => permute_2_1(Box::new(lex_pairs(
             exhaustive_vecs(exhaustive_unsigned()),
             exhaustive_orderings(),
         ))),

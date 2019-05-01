@@ -5,8 +5,7 @@ use malachite_base::num::integers::PrimitiveInteger;
 use malachite_base::num::traits::{One, Parity, ShrRound, WrappingAddAssign, WrappingSubAssign};
 use malachite_base::round::RoundingMode;
 
-use natural::arithmetic::add::limbs_add_to_out;
-use natural::arithmetic::add::limbs_slice_add_same_length_in_place_left;
+use natural::arithmetic::add::{limbs_add_to_out, limbs_slice_add_same_length_in_place_left};
 use natural::arithmetic::add_limb::limbs_slice_add_limb_in_place;
 use natural::arithmetic::mul::limbs_mul_same_length_to_out;
 use natural::arithmetic::mul::mul_mod::{
@@ -14,8 +13,7 @@ use natural::arithmetic::mul::mul_mod::{
     _limbs_mul_mod_limb_width_to_n_minus_1_scratch_size, MULMOD_BNM1_THRESHOLD,
     MUL_FFT_MODF_THRESHOLD,
 };
-use natural::arithmetic::shl_u::limbs_shl_to_out;
-use natural::arithmetic::shl_u::limbs_shl_with_complement;
+use natural::arithmetic::shl_u::{limbs_shl_to_out, limbs_shl_with_complement};
 use natural::arithmetic::square::SQR_TOOM3_THRESHOLD;
 use natural::arithmetic::sub::{
     limbs_sub_in_place_left, limbs_sub_same_length_in_place_left,
@@ -651,6 +649,8 @@ fn _limbs_mul_fft_sub_mod_f_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
 ///
 /// Additional memory: worst case O(1)
 ///
+/// where n = `xs.len()`
+///
 /// This is mpn_fft_mul_2exp_modF from mpn/generic/mul_fft.c.
 fn _limbs_mul_fft_shl_mod_f_to_out(out: &mut [Limb], xs: &[Limb], bits: usize) {
     let n = xs.len() - 1;
@@ -756,6 +756,8 @@ fn _limbs_mul_fft_shl_mod_f_to_out(out: &mut [Limb], xs: &[Limb], bits: usize) {
 ///
 /// Additional memory: worst case O(1)
 ///
+/// where n = `xs.len()`
+///
 /// This is mpn_fft_div_2exp_modF from mpn/generic/mul_fft.c.
 fn _limbs_mul_fft_shr_mod_f_to_out(out: &mut [Limb], xs: &[Limb], bits: usize) {
     _limbs_mul_fft_shl_mod_f_to_out(out, xs, ((xs.len() - 1) << (Limb::LOG_WIDTH + 1)) - bits);
@@ -841,9 +843,11 @@ fn _limbs_mul_fft_decompose<'a>(
 /// output: xss[increment * bit_reverse_table[k][i]] <-
 ///      sum (2 ^ omega) ^ (i * j) xss[increment * j] mod 2 ^ N + 1
 ///
-/// Time: TODO
+/// Time: O(n * log(n) * log(log(n))), assuming k = O(log(n))
 ///
 /// Additional memory: worst case O(1)
+///
+/// where n = `xss[0].len()`
 ///
 /// This is mpn_fft_fft from mpn/generic/mul_fft.c.
 pub fn _limbs_mul_fft_fft(
@@ -934,9 +938,11 @@ pub fn _limbs_mul_fft_fft(
 /// Assumes the xss are pseudo-normalized, i.e. 0 <= xss[][n] <= 1. This condition is also fulfilled
 /// at exit.
 ///
-/// Time: TODO
+/// Time: O(n * log(n) * log(log(n))), assuming k = O(log(n))
 ///
 /// Additional memory: worst case O(1)
+///
+/// where n = `xss[0].len()`
 ///
 /// This is mpn_fft_fftinv from mpn/generic/mul_fft.c.
 pub fn _limbs_mul_fft_inverse(
@@ -1016,8 +1022,14 @@ pub fn _limbs_mul_fft_normalize_mod_f(out: &mut [Limb], n: usize, xs: &[Limb]) -
     }
 }
 
-// This is mpn_fft_mul_modF_K from mpn/generic/mul_fft.c, where ap != bp. K is omitted because it is
-// unused; it is just the length of `xss` and `yss`.
+/// Time: TODO
+///
+/// Additional memory: O(n * log(n))
+///
+/// where n = `xss[i].len()` (each slice in `xss` should have the same length)
+///
+/// This is mpn_fft_mul_modF_K from mpn/generic/mul_fft.c, where ap != bp. K is omitted because it
+/// is unused; it is just the length of `xss` and `yss`.
 fn _limbs_mul_fft_mul_mod_f_k(xss: &mut [&mut [Limb]], yss: &mut [&mut [Limb]]) {
     let n = xss[0].len() - 1;
     if n >= MUL_FFT_MODF_THRESHOLD {
@@ -1047,6 +1059,7 @@ fn _limbs_mul_fft_mul_mod_f_k(xss: &mut [&mut [Limb]], yss: &mut [&mut [Limb]]) 
         assert!(r < n); // otherwise we'll loop
         let q_shifted = q >> k;
         let s = r + 1;
+        // a.len() is n * log(n)
         let mut a = vec![0; s << (k + 1)];
         let (a, b) = a.split_at_mut(s << k);
         let mut scratch = vec![0; s << 1];
@@ -1109,8 +1122,14 @@ fn _limbs_mul_fft_mul_mod_f_k(xss: &mut [&mut [Limb]], yss: &mut [&mut [Limb]]) 
     }
 }
 
-// This is mpn_fft_mul_modF_K from mpn/generic/mul_fft.c, where ap == bp. K is omitted because it is
-// unused; it is just the length of `xss`.
+/// Time: TODO
+///
+/// Additional memory: O(n * log(n))
+///
+/// where n = `xss[i].len()` (each slice in `xss` should have the same length)
+///
+/// This is mpn_fft_mul_modF_K from mpn/generic/mul_fft.c, where ap == bp. K is omitted because it
+/// is unused; it is just the length of `xss`.
 fn _limbs_mul_fft_mul_mod_f_k_square(xss: &mut [&mut [Limb]]) {
     let n = xss[0].len() - 1;
     if n >= SQR_FFT_MODF_THRESHOLD {
@@ -1139,6 +1158,7 @@ fn _limbs_mul_fft_mul_mod_f_k_square(xss: &mut [&mut [Limb]]) {
         assert!(r < n); // otherwise we'll loop
         let q_shifted = q >> k;
         let s = r + 1;
+        // a.len() is O(n * log(n))
         let mut a = vec![0; s << (k + 1)];
         let (a_lo, a_hi) = a.split_at_mut(s << k);
         let mut scratch = vec![0; s << 1];
@@ -1200,8 +1220,14 @@ fn _limbs_mul_fft_mul_mod_f_k_square(xss: &mut [&mut [Limb]]) {
     }
 }
 
-// This is mpn_mul_fft_internal from mpn/generic/mul_fft.c. A is excluded as it is unused. nprime is
-// `xss[0].len()` - 1.
+/// Time: TODO
+///
+/// Additional memory: O(n * log(n))
+///
+/// where n = `xss[i].len()` (each slice in `xss` should have the same length)
+///
+/// This is mpn_mul_fft_internal from mpn/generic/mul_fft.c. A is excluded as it is unused. nprime
+/// is `xss[0].len()` - 1.
 pub fn _limbs_mul_fft_internal(
     out: &mut [Limb],
     p: usize,

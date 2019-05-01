@@ -18,14 +18,23 @@ use platform::{DoubleLimb, Limb};
 
 /// Divide an number by a divisor of B - 1, where B is the limb base.
 ///
-/// This is mpn_bdiv_dbm1c from mpn.generic/bdiv_dbm1c.c.h.
-/// TODO test
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = `xs.len()`
+///
+/// # Panics
+/// Panics if `out` is shorter than `xs`.
+///
+/// This is mpn_bdiv_dbm1c from mpn/generic/bdiv_dbm1c.c.
 pub fn limbs_div_divisor_of_limb_max_with_carry_to_out(
     out: &mut [Limb],
     xs: &[Limb],
     divisor: Limb,
     mut carry: Limb,
 ) -> Limb {
+    assert!(out.len() >= xs.len());
     let divisor = DoubleLimb::from(divisor);
     for (out_limb, &x) in out.iter_mut().zip(xs.iter()) {
         let (hi, lo) = (DoubleLimb::from(x) * divisor).split_in_half();
@@ -42,8 +51,13 @@ pub fn limbs_div_divisor_of_limb_max_with_carry_to_out(
 
 /// Divide an number by a divisor of B - 1, where B is the limb base.
 ///
-/// This is mpn_bdiv_dbm1c from mpn.generic/bdiv_dbm1c.c, where qp == ap.
-/// TODO test
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = `xs.len()`
+///
+/// This is mpn_bdiv_dbm1c from mpn/generic/bdiv_dbm1c.c, where qp == ap.
 pub fn limbs_div_divisor_of_limb_max_with_carry_in_place(
     xs: &mut [Limb],
     divisor: Limb,
@@ -63,6 +77,11 @@ pub fn limbs_div_divisor_of_limb_max_with_carry_in_place(
     carry
 }
 
+/// Time: O(1)
+///
+/// Additional memory: O(1)
+///
+/// This is udiv_qrnnd_preinv from gmp-impl.h, but not computing the remainder.
 fn div_by_preinversion(n_high: Limb, n_low: Limb, divisor: Limb, divisor_inverse: Limb) -> Limb {
     let (mut quotient_high, quotient_low) = (DoubleLimb::from(n_high)
         * DoubleLimb::from(divisor_inverse))
@@ -79,7 +98,16 @@ fn div_by_preinversion(n_high: Limb, n_low: Limb, divisor: Limb, divisor_inverse
     quotient_high
 }
 
-// high bit of divisor must be set
+/// The high bit of `divisor` must be set.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = `limbs.len()`
+///
+/// This is mpn_div_qr_1n_pi1 from mpn/generic/div_qr_1n_pi1.c with DIV_QR_1N_METHOD == 2, where
+/// qp == up, but not computing the remainder.
 fn limbs_div_limb_normalized_in_place(
     limbs: &mut [Limb],
     high_limb: Limb,
@@ -147,7 +175,16 @@ fn limbs_div_limb_normalized_in_place(
     limbs[0] = quotient_low;
 }
 
-// high bit of divisor must be set
+/// The high bit of `divisor` must be set.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(n)
+///
+/// where n = `limbs.len()`
+///
+/// This is mpn_div_qr_1n_pi1 from mpn/generic/div_qr_1n_pi1.c with DIV_QR_1N_METHOD == 2, but not
+/// computing the remainder.
 fn limbs_div_limb_normalized_to_out(
     out: &mut [Limb],
     in_limbs: &[Limb],
@@ -635,6 +672,11 @@ impl<'a> DivAssign<&'a Natural> for u32 {
     }
 }
 
+/// Divides using the naive (schoolbook) algorithm.
+///
+/// Time: worst case O(1)
+///
+/// Additional memory: worst case O(1)
 fn _limbs_div_in_place_naive(limbs: &mut [Limb], limb: Limb) {
     let limb = DoubleLimb::from(limb);
     let mut upper = 0;
