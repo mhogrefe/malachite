@@ -131,25 +131,3 @@ impl Crementable for char {
         }
     }
 }
-
-//TODO test
-pub fn digit_to_char(i: u32) -> Option<char> {
-    if i < 10 {
-        char::from_u32(i + 48)
-    } else if i < 36 {
-        char::from_u32(i + 87)
-    } else {
-        None
-    }
-}
-
-//TODO test
-pub fn char_to_digit(c: char) -> Option<u32> {
-    if c >= '0' && c <= '9' {
-        Some(c as u32 - 48)
-    } else if c >= 'a' && c <= 'z' {
-        Some(c as u32 - 87)
-    } else {
-        None
-    }
-}

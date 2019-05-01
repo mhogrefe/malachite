@@ -8,6 +8,9 @@ extern crate rust_wheels;
 
 pub mod common;
 pub mod base {
+    pub mod bools {
+        pub mod not_assign;
+    }
     pub mod chars {
         pub mod char_to_contiguous_range;
         pub mod contiguous_range_to_char;

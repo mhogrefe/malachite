@@ -69,6 +69,13 @@ use inputs::common::{
     permute_1_2_4_3, permute_1_3_2, permute_2_1, reshape_2_1_to_3, reshape_3_1_to_4,
 };
 
+pub fn bools(gm: NoSpecialGenerationMode) -> It<bool> {
+    match gm {
+        NoSpecialGenerationMode::Exhaustive => Box::new(exhaustive_bools()),
+        NoSpecialGenerationMode::Random(_) => Box::new(random(&EXAMPLE_SEED)),
+    }
+}
+
 pub(crate) type It<T> = Box<Iterator<Item = T>>;
 
 pub fn unsigneds<T: PrimitiveUnsigned + Rand>(gm: GenerationMode) -> It<T> {
