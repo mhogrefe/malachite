@@ -5,15 +5,15 @@ use natural::arithmetic::mod_limb::limbs_mod_limb;
 use natural::Natural::{self, Large, Small};
 use platform::Limb;
 
-// These functions are adapted from mpz_divisible_ui_p in GMP 6.1.2.
-
 // must be >= 1
 //TODO tune
 const BMOD_1_TO_MOD_1_THRESHOLD: usize = 29;
 
-// Benchmarks show that this is never faster than just calling `limbs_divisible_by_limb`.
-//
-// limbs.len() must be greater than 1; divisor must be nonzero.
+/// Benchmarks show that this is never faster than just calling `limbs_divisible_by_limb`.
+///
+/// limbs.len() must be greater than 1; divisor must be nonzero.
+///
+/// This is mpz_divisible_ui_p from mpz/divis_ui.c, where a is non-negative.
 pub fn _combined_limbs_divisible_by_limb(limbs: &[Limb], divisor: Limb) -> bool {
     if limbs.len() <= BMOD_1_TO_MOD_1_THRESHOLD {
         limbs_divisible_by_limb(limbs, divisor)
@@ -40,6 +40,9 @@ pub fn _combined_limbs_divisible_by_limb(limbs: &[Limb], divisor: Limb) -> bool 
 /// assert_eq!(limbs_divisible_by_limb(&[333, 333], 3), true);
 /// assert_eq!(limbs_divisible_by_limb(&[332, 333], 3), false);
 /// ```
+///
+/// This is mpz_divisible_ui_p from mpz/divis_ui.c, where a is non-negative and the ABOVE_THRESHOLD
+/// branch is excluded.
 pub fn limbs_divisible_by_limb(limbs: &[Limb], divisor: Limb) -> bool {
     assert!(limbs.len() > 1);
     if divisor.even() {

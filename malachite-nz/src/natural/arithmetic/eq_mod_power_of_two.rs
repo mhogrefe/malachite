@@ -61,6 +61,8 @@ fn limbs_eq_mod_power_of_two_greater(xs: &[Limb], ys: &[Limb], pow: u64) -> bool
 /// assert_eq!(limbs_eq_mod_power_of_two(&[0b1111011, 0b111001000], &[0b1111011, 0b111101000], 100),
 ///         false);
 /// ```
+///
+/// This is mpz_congruent_2exp_p from mpz/cong_2exp.c, where a and c are non-negative.
 pub fn limbs_eq_mod_power_of_two(xs: &[Limb], ys: &[Limb], pow: u64) -> bool {
     match xs.len().cmp(&ys.len()) {
         Ordering::Equal => limbs_eq_mod_power_of_two_same_length(xs, ys, pow),

@@ -7,23 +7,12 @@ use natural::arithmetic::mod_limb::limbs_mod_limb;
 use natural::Natural::{self, Large, Small};
 use platform::{DoubleLimb, Limb};
 
-// These functions are adapted from mpz_congruent_ui_p and mpn_modexact_1c_odd in GMP 6.1.2.
-
 // must be >= 1
 const BMOD_1_TO_MOD_1_THRESHOLD: usize = 10;
 
-// Benchmarks show that this is never faster than just calling `limbs_eq_limb_mod_limb`.
-//
-// limbs.len() must be greater than 1; modulus must be nonzero.
-pub fn _combined_limbs_eq_limb_mod_limb(limbs: &[Limb], limb: Limb, modulus: Limb) -> bool {
-    if limbs.len() < BMOD_1_TO_MOD_1_THRESHOLD {
-        limbs_mod_limb(limbs, modulus) == limb % modulus
-    } else {
-        limbs_eq_limb_mod_limb(limbs, limb, modulus)
-    }
-}
-
-// limbs.len() must be greater than 1; divisor must be odd.
+/// limbs.len() must be greater than 1; divisor must be odd.
+///
+/// This is mpn_modexact_1c_odd from mpn/generic/mode1o.c.
 pub(crate) fn limbs_mod_exact_odd_limb(limbs: &[Limb], divisor: Limb, mut carry: Limb) -> Limb {
     let len = limbs.len();
     let inverse = limbs_invert_limb(divisor);
@@ -53,6 +42,19 @@ pub(crate) fn limbs_mod_exact_odd_limb(limbs: &[Limb], divisor: Limb, mut carry:
     }
 }
 
+/// Benchmarks show that this is never faster than just calling `limbs_eq_limb_mod_limb`.
+///
+/// limbs.len() must be greater than 1; modulus must be nonzero.
+///
+/// This is mpz_congruent_ui_p from mpz/cong_ui.c where a is non-negative.
+pub fn _combined_limbs_eq_limb_mod_limb(limbs: &[Limb], limb: Limb, modulus: Limb) -> bool {
+    if limbs.len() < BMOD_1_TO_MOD_1_THRESHOLD {
+        limbs_mod_limb(limbs, modulus) == limb % modulus
+    } else {
+        limbs_eq_limb_mod_limb(limbs, limb, modulus)
+    }
+}
+
 /// Interpreting a slice of `Limb`s as the limbs of a `Natural` in ascending order, determines
 /// whether that `Natural` is equal to a limb mod a given `Limb` modulus.
 ///
@@ -75,6 +77,9 @@ pub(crate) fn limbs_mod_exact_odd_limb(limbs: &[Limb], divisor: Limb, mut carry:
 /// assert_eq!(limbs_eq_limb_mod_limb(&[6, 7], 3, 2), false);
 /// assert_eq!(limbs_eq_limb_mod_limb(&[100, 101, 102], 1_238, 10), true);
 /// ```
+///
+/// This is mpz_congruent_ui_p from mpz/cong_ui.c where a is non-negative and the ABOVE_THRESHOLD
+/// branch is excluded.
 pub fn limbs_eq_limb_mod_limb(limbs: &[Limb], limb: Limb, modulus: Limb) -> bool {
     assert!(limbs.len() > 1);
     let remainder = if modulus.even() {

@@ -26,6 +26,8 @@ use platform::Limb;
 /// assert_eq!(limbs_significant_bits(&[0b11]), 2);
 /// assert_eq!(limbs_significant_bits(&[0, 0b1101]), 36);
 /// ```
+///
+/// This is mpz_sizeinbase from mpz/sizeinbase.c, where x is non-negative and base is 2.
 pub fn limbs_significant_bits(limbs: &[Limb]) -> u64 {
     ((limbs.len() as u64 - 1) << Limb::LOG_WIDTH) + limbs.last().unwrap().significant_bits()
 }
