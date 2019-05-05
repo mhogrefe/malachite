@@ -8,6 +8,8 @@ use integer::conversion::to_twos_complement_limbs::limbs_twos_complement_in_plac
 use natural::Natural::{self, Large, Small};
 use platform::Limb;
 
+//TODO clean
+
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
 /// limbs of the `Natural` mod two raised to `pow`. Equivalently, retains only the least-significant
 /// `pow` bits.

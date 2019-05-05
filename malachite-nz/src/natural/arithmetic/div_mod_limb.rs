@@ -218,7 +218,7 @@ fn limbs_div_limb_normalized_to_out_mod(
 ///     (vec![0x5555_5555, 0x5555_5555], 0));
 /// ```
 ///
-/// This is mpn_div_qr_1 from mpn/generic/div_qr_1.c where the both results are returned.
+/// This is mpn_div_qr_1 from mpn/generic/div_qr_1.c where both results are returned.
 pub fn limbs_div_limb_mod(limbs: &[Limb], divisor: Limb) -> (Vec<Limb>, Limb) {
     let mut quotient_limbs = vec![0; limbs.len()];
     let remainder = limbs_div_limb_to_out_mod(&mut quotient_limbs, limbs, divisor);

@@ -269,6 +269,9 @@ fn limbs_div_limb_normalized_to_out(
 /// assert_eq!(limbs_div_limb(&[123, 456], 789), &[2_482_262_467, 0]);
 /// assert_eq!(limbs_div_limb(&[0xffff_ffff, 0xffff_ffff], 3), &[0x5555_5555, 0x5555_5555]);
 /// ```
+///
+/// This is mpn_div_qr_1 from mpn/generic/div_qr_1.c, where the quotient is returned, but not
+/// computing the remainder.
 pub fn limbs_div_limb(limbs: &[Limb], divisor: Limb) -> Vec<Limb> {
     let mut quotient_limbs = vec![0; limbs.len()];
     limbs_div_limb_to_out(&mut quotient_limbs, limbs, divisor);
@@ -302,6 +305,8 @@ pub fn limbs_div_limb(limbs: &[Limb], divisor: Limb) -> Vec<Limb> {
 /// limbs_div_limb_to_out(&mut out, &[0xffff_ffff, 0xffff_ffff], 3);
 /// assert_eq!(out, &[0x5555_5555, 0x5555_5555, 10, 10]);
 /// ```
+///
+/// This is mpn_div_qr_1 from mpn/generic/div_qr_1.c, but not computing the remainder.
 pub fn limbs_div_limb_to_out(out: &mut [Limb], in_limbs: &[Limb], mut divisor: Limb) {
     assert_ne!(divisor, 0);
     let len = in_limbs.len();
@@ -368,6 +373,9 @@ pub fn limbs_div_limb_to_out(out: &mut [Limb], in_limbs: &[Limb], mut divisor: L
 /// limbs_div_limb_in_place(&mut limbs, 3);
 /// assert_eq!(limbs, &[0x5555_5555, 0x5555_5555]);
 /// ```
+///
+/// This is mpn_div_qr_1 from mpn/generic/div_qr_1.c, where qp == up, but not computing the
+/// remainder.
 pub fn limbs_div_limb_in_place(limbs: &mut [Limb], mut divisor: Limb) {
     assert_ne!(divisor, 0);
     let len = limbs.len();

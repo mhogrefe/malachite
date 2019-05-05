@@ -12,10 +12,14 @@ use malachite_base::num::traits::{
 use natural::Natural::{self, Large, Small};
 use platform::{DoubleLimb, Limb};
 
-// TODO clean
 // These functions are adapted from udiv_qrnnd_preinv, mpn_div_qr_1n_pi1, and mpn_div_qr_1 in GMP
 // 6.1.2.
 
+/// Time: O(1)
+///
+/// Additional memory: O(1)
+///
+/// This is udiv_qrnnd_preinv from gmp-impl.h, but not computing the quotient.
 pub(crate) fn mod_by_preinversion(
     n_high: Limb,
     n_low: Limb,
@@ -36,7 +40,16 @@ pub(crate) fn mod_by_preinversion(
     remainder
 }
 
-// high bit of divisor must be set
+/// The high bit of `divisor` must be set.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = `limbs.len()`
+///
+/// This is mpn_div_qr_1n_pi1 from mpn/generic/div_qr_1n_pi1.c with DIV_QR_1N_METHOD == 2, but not
+/// computing the quotient.
 fn limbs_mod_limb_normalized(
     limbs: &[Limb],
     high_limb: Limb,
@@ -74,7 +87,16 @@ fn limbs_mod_limb_normalized(
     mod_by_preinversion(sum_high, sum_low, divisor, divisor_inverse)
 }
 
-// high bit of divisor must be set
+/// The high bit of `divisor` must be set.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = `limbs.len()`
+///
+/// This is mpn_div_qr_1n_pi1 from mpn/generic/div_qr_1n_pi1.c with DIV_QR_1N_METHOD == 2, but not
+/// computing the quotient, and where the input is left-shifted by `bits`.
 fn limbs_mod_limb_normalized_shl(
     limbs: &[Limb],
     high_limb: Limb,
@@ -146,6 +168,9 @@ fn limbs_mod_limb_normalized_shl(
 /// assert_eq!(limbs_mod_limb(&[123, 456], 789), 636);
 /// assert_eq!(limbs_mod_limb(&[0xffff_ffff, 0xffff_ffff], 3), 0);
 /// ```
+///
+/// This is mpn_div_qr_1 from mpn/generic/div_qr_1.c where the quotient is not computed and the
+/// remainder is returned.
 pub fn limbs_mod_limb(limbs: &[Limb], mut divisor: Limb) -> Limb {
     assert_ne!(divisor, 0);
     let len = limbs.len();

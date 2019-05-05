@@ -26,6 +26,8 @@ use platform::Limb;
 /// assert_eq!(limbs_divisible_by_power_of_two(&[3_567_587_328, 232], 12), true);
 /// assert_eq!(limbs_divisible_by_power_of_two(&[3_567_587_328, 232], 13), false);
 /// ```
+///
+/// This is mpz_divisible_2exp_p from mpz/divis_2exp.c, where a is non-negative.
 pub fn limbs_divisible_by_power_of_two(limbs: &[Limb], pow: u64) -> bool {
     let zero_limbs = (pow >> Limb::LOG_WIDTH) as usize;
     zero_limbs < limbs.len()
