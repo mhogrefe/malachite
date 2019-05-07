@@ -1,3 +1,4 @@
+use malachite_base::conversion::WrappingFrom;
 use malachite_base::num::signeds::PrimitiveSigned;
 use malachite_base::num::unsigneds::PrimitiveUnsigned;
 use rand::Rand;
@@ -37,6 +38,7 @@ fn demo_unsigned_clear_bit<T: PrimitiveUnsigned + Rand>(gm: GenerationMode, limi
 fn demo_signed_clear_bit<T: PrimitiveSigned + Rand>(gm: GenerationMode, limit: usize)
 where
     T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
     for (mut n, index) in pairs_of_signed_and_u64_width_range_var_2::<T>(gm).take(limit) {
         let n_old = n;
@@ -69,6 +71,7 @@ fn benchmark_signed_clear_bit<T: PrimitiveSigned + Rand>(
     file_name: &str,
 ) where
     T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
     m_run_benchmark(
         &format!("{}.clear_bit(u64)", T::NAME),

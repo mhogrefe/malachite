@@ -1,5 +1,6 @@
 use std::{i16, i32, i64, i8, u16, u32, u64, u8};
 
+use malachite_base::conversion::WrappingFrom;
 use malachite_base::num::integers::PrimitiveInteger;
 use malachite_base::num::signeds::PrimitiveSigned;
 use malachite_base::num::unsigneds::PrimitiveUnsigned;
@@ -72,6 +73,7 @@ fn significant_bits_properties_helper_unsigned<T: PrimitiveUnsigned + Rand>() {
 fn significant_bits_properties_helper_signed<T: PrimitiveSigned + Rand>()
 where
     T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
     test_properties(signeds, |&n: &T| {
         let significant_bits = n.significant_bits();

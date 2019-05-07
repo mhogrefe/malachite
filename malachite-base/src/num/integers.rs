@@ -14,7 +14,6 @@ use conversion::{
 };
 use crement::Crementable;
 use named::Named;
-use num::signeds::PrimitiveSigned;
 use num::traits::{
     BitAccess, BitScan, CheckedAdd, CheckedDiv, CheckedMul, CheckedNeg, CheckedRem, CheckedShl,
     CheckedShr, CheckedSub, CountOnes, CountZeros, DivAssignMod, DivAssignRem, DivExact,
@@ -29,7 +28,6 @@ use num::traits::{
     WrappingDiv, WrappingDivAssign, WrappingMul, WrappingMulAssign, WrappingNeg, WrappingNegAssign,
     WrappingRem, WrappingRemAssign, WrappingShl, WrappingShr, WrappingSub, WrappingSubAssign, Zero,
 };
-use num::unsigneds::PrimitiveUnsigned;
 use round::RoundingMode;
 
 //TODO docs
@@ -977,7 +975,7 @@ macro_rules! round_shift_primitive_signed {
             #[inline]
             fn shl_round(self, other: $u, rm: RoundingMode) -> $t {
                 if other >= 0 {
-                    self << other.to_unsigned_bitwise()
+                    self << $u::wrapping_from(other)
                 } else {
                     self.shr_round(other.unsigned_abs(), rm)
                 }
@@ -988,7 +986,7 @@ macro_rules! round_shift_primitive_signed {
             #[inline]
             fn shl_round_assign(&mut self, other: $u, rm: RoundingMode) {
                 if other >= 0 {
-                    *self <<= other.to_unsigned_bitwise();
+                    *self <<= $u::wrapping_from(other);
                 } else {
                     self.shr_round_assign(other.unsigned_abs(), rm);
                 }
@@ -1001,7 +999,7 @@ macro_rules! round_shift_primitive_signed {
             #[inline]
             fn shr_round(self, other: $u, rm: RoundingMode) -> $t {
                 if other >= 0 {
-                    self.shr_round(other.to_unsigned_bitwise(), rm)
+                    self.shr_round($u::wrapping_from(other), rm)
                 } else {
                     self << other.unsigned_abs()
                 }
@@ -1012,7 +1010,7 @@ macro_rules! round_shift_primitive_signed {
             #[inline]
             fn shr_round_assign(&mut self, other: $u, rm: RoundingMode) {
                 if other >= 0 {
-                    self.shr_round_assign(other.to_unsigned_bitwise(), rm);
+                    self.shr_round_assign($u::wrapping_from(other), rm);
                 } else {
                     *self <<= other.unsigned_abs()
                 }
@@ -1101,7 +1099,7 @@ macro_rules! round_shift_signed_unsigned {
             fn shr_round(self, other: $u, rm: RoundingMode) -> $t {
                 let abs = self.unsigned_abs();
                 if self >= 0 {
-                    abs.shr_round(other, rm).to_signed_bitwise()
+                    $t::wrapping_from(abs.shr_round(other, rm))
                 } else {
                     let abs_shifted = abs.shr_round(other, -rm);
                     if abs_shifted == 0 {
@@ -1109,7 +1107,7 @@ macro_rules! round_shift_signed_unsigned {
                     } else if abs_shifted == $t::MIN.unsigned_abs() {
                         $t::MIN
                     } else {
-                        -abs_shifted.to_signed_bitwise()
+                        -$t::wrapping_from(abs_shifted)
                     }
                 }
             }

@@ -96,24 +96,6 @@ where
     }
 }
 
-pub trait BitwiseFrom<T>: Sized {
-    fn bitwise_from(value: T) -> Self;
-}
-
-pub trait BitwiseInto<T>: Sized {
-    fn bitwise_into(self) -> T;
-}
-
-impl<T, U> BitwiseInto<U> for T
-where
-    U: BitwiseFrom<T>,
-{
-    #[inline]
-    fn bitwise_into(self) -> U {
-        U::bitwise_from(self)
-    }
-}
-
 pub trait RoundingFrom<T>: Sized {
     fn rounding_from(value: T, rm: RoundingMode) -> Self;
 }

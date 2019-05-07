@@ -126,7 +126,7 @@ pub fn limbs_clear_bit(limbs: &mut [Limb], index: u64) {
 }
 
 /// Provides functions for accessing and modifying the `index`th bit of a `Natural`, or the
-/// coefficient of 2^<pow>`index`</pow> in its binary expansion.
+/// coefficient of 2^<sup>`index`</sup> in its binary expansion.
 ///
 /// # Examples
 /// ```

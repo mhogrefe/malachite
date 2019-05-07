@@ -76,7 +76,7 @@ impl<'a> CheckedFrom<&'a Integer> for u32 {
 
 impl WrappingFrom<Integer> for Limb {
     /// Converts an `Integer` to a `Limb`, taking the `Integer` by value and wrapping mod
-    /// 2<sup>32</sup>.
+    /// 2<sup>`Limb::WIDTH`</sup>.
     ///
     /// Time: worst case O(1)
     ///
@@ -105,7 +105,7 @@ impl WrappingFrom<Integer> for Limb {
 
 impl<'a> WrappingFrom<&'a Integer> for Limb {
     /// Converts an `Integer` to a `Limb`, taking the `Integer` by reference and wrapping mod
-    /// 2<sup>32</sup>.
+    /// 2<sup>`Limb::WIDTH`</sup>.
     ///
     /// Time: worst case O(1)
     ///

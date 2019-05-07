@@ -178,7 +178,7 @@ pub fn limbs_vec_clear_bit_neg(limbs: &mut Vec<Limb>, index: u64) {
 }
 
 /// Provides functions for accessing and modifying the `index`th bit of a `Natural`, or the
-/// coefficient of 2^<pow>`index`</pow> in its binary expansion.
+/// coefficient of 2^<sup>`index`</sup> in its binary expansion.
 ///
 /// Negative integers are treated as though they are represented in two's complement.
 ///
@@ -227,7 +227,7 @@ pub fn limbs_vec_clear_bit_neg(limbs: &mut Vec<Limb>, index: u64) {
 /// ```
 impl BitAccess for Integer {
     /// Determines whether the `index`th bit of an `Integer`, or the coefficient of
-    /// 2<pow>`index`</pow> in its binary expansion, is 0 or 1. `false` means 0, `true` means 1.
+    /// 2<sup>`index`</sup> in its binary expansion, is 0 or 1. `false` means 0, `true` means 1.
     ///
     /// Negative integers are treated as though they are represented in two's complement.
     ///
@@ -271,7 +271,7 @@ impl BitAccess for Integer {
         }
     }
 
-    /// Sets the `index`th bit of a `Integer`, or the coefficient of 2<pow>`index`</pow> in its
+    /// Sets the `index`th bit of a `Integer`, or the coefficient of 2<sup>`index`</sup> in its
     /// binary expansion, to 1.
     ///
     /// Negative integers are treated as though they are represented in two's complement.
@@ -316,7 +316,7 @@ impl BitAccess for Integer {
         }
     }
 
-    /// Sets the `index`th bit of a `Integer`, or the coefficient of 2<pow>`index`</pow> in its
+    /// Sets the `index`th bit of a `Integer`, or the coefficient of 2<sup>`index`</sup> in its
     /// binary expansion, to 0.
     ///
     /// Negative integers are treated as though they are represented in two's complement.

@@ -78,7 +78,7 @@ impl<'a> CheckedFrom<&'a Natural> for u32 {
 
 impl WrappingFrom<Natural> for Limb {
     /// Converts a `Natural` to a `Limb`, taking the `Natural` by value and wrapping mod
-    /// 2<sup>32</sup>.
+    /// 2<sup>`Limb::WIDTH`</sup>.
     ///
     /// Time: worst case O(1)
     ///
@@ -113,7 +113,7 @@ impl WrappingFrom<Natural> for u32 {
 
 impl<'a> WrappingFrom<&'a Natural> for Limb {
     /// Converts a `Natural` to a `Limb`, taking the `Natural` by reference and wrapping mod
-    /// 2<sup>32</sup>.
+    /// 2<sup>`Limb::WIDTH`</sup>.
     ///
     /// Time: worst case O(1)
     ///
@@ -222,7 +222,7 @@ impl<'a> SaturatingFrom<&'a Natural> for u32 {
 
 impl OverflowingFrom<Natural> for Limb {
     /// Converts a `Natural` to a `Limb`, taking the `Natural` by reference and wrapping mod
-    /// 2<sup>32</sup>. The returned boolean value indicates whether wrapping occurred.
+    /// 2<sup>`Limb::WIDTH`</sup>. The returned boolean value indicates whether wrapping occurred.
     ///
     /// Time: worst case O(1)
     ///
@@ -258,7 +258,7 @@ impl OverflowingFrom<Natural> for u32 {
 
 impl<'a> OverflowingFrom<&'a Natural> for Limb {
     /// Converts a `Natural` to a `Limb`, taking the `Natural` by reference and wrapping mod
-    /// 2<sup>32</sup>. The returned boolean value indicates whether wrapping occurred.
+    /// 2<sup>`Limb::WIDTH`</sup>. The returned boolean value indicates whether wrapping occurred.
     ///
     /// Time: worst case O(1)
     ///

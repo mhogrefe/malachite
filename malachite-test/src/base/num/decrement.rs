@@ -1,3 +1,4 @@
+use malachite_base::conversion::WrappingFrom;
 use malachite_base::num::signeds::PrimitiveSigned;
 use malachite_base::num::unsigneds::PrimitiveUnsigned;
 use rand::Rand;
@@ -35,6 +36,7 @@ fn demo_unsigned_decrement<T: PrimitiveUnsigned + Rand>(gm: GenerationMode, limi
 fn demo_signed_decrement<T: PrimitiveSigned + Rand>(gm: GenerationMode, limit: usize)
 where
     T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
     for mut n in signeds_no_min::<T>(gm).take(limit) {
         let n_old = n;
@@ -67,6 +69,7 @@ fn benchmark_signed_decrement<T: PrimitiveSigned + Rand>(
     file_name: &str,
 ) where
     T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
     m_run_benchmark(
         &format!("{}.decrement()", T::NAME),

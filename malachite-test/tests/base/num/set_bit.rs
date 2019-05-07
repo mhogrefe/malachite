@@ -1,4 +1,4 @@
-use malachite_base::conversion::CheckedFrom;
+use malachite_base::conversion::{CheckedFrom, WrappingFrom};
 use malachite_base::num::integers::PrimitiveInteger;
 use malachite_base::num::signeds::PrimitiveSigned;
 use malachite_base::num::traits::BitAccess;
@@ -134,6 +134,7 @@ fn set_bit_properties_helper_unsigned<T: PrimitiveUnsigned + Rand>() {
 fn set_bit_properties_helper_signed<T: PrimitiveSigned + Rand>()
 where
     T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
     test_properties(pairs_of_signed_and_u64_width_range_var_1, |&(n, index)| {
         let mut mut_n: T = n;

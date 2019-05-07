@@ -3,7 +3,7 @@ use std::num::ParseIntError;
 use std::ops::Neg;
 
 use comparison::{Max, Min};
-use conversion::CheckedFrom;
+use conversion::{CheckedFrom, WrappingFrom};
 use crement::Crementable;
 use named::Named;
 use num::integers::PrimitiveInteger;
@@ -43,10 +43,6 @@ pub trait PrimitiveSigned:
     + WrappingAbs<Output = Self>
 {
     type UnsignedOfEqualWidth: PrimitiveUnsigned;
-
-    fn to_unsigned_bitwise(self) -> Self::UnsignedOfEqualWidth;
-
-    fn from_unsigned_bitwise(u: Self::UnsignedOfEqualWidth) -> Self;
 }
 
 //TODO docs
@@ -61,16 +57,6 @@ macro_rules! signed_traits {
         //TODO docs
         impl PrimitiveSigned for $t {
             type UnsignedOfEqualWidth = $ut;
-
-            #[inline]
-            fn to_unsigned_bitwise(self) -> Self::UnsignedOfEqualWidth {
-                self as $ut
-            }
-
-            #[inline]
-            fn from_unsigned_bitwise(u: Self::UnsignedOfEqualWidth) -> Self {
-                u as $t
-            }
         }
 
         impl OrdAbs for $t {
@@ -372,7 +358,7 @@ macro_rules! signed_traits {
         impl DivisibleByPowerOfTwo for $t {
             #[inline]
             fn divisible_by_power_of_two(self, pow: u64) -> bool {
-                self.to_unsigned_bitwise().divisible_by_power_of_two(pow)
+                $ut::wrapping_from(self).divisible_by_power_of_two(pow)
             }
         }
 

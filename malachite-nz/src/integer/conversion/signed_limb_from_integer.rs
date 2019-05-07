@@ -90,7 +90,7 @@ impl<'a> CheckedFrom<&'a Integer> for i32 {
 
 impl WrappingFrom<Integer> for SignedLimb {
     /// Converts an `Integer` to a `SignedLimb`, taking the `Integer` by reference and wrapping mod
-    /// 2<sup>32</sup>.
+    /// 2<sup>`Limb::WIDTH`</sup>.
     ///
     /// Time: worst case O(1)
     ///
@@ -119,7 +119,7 @@ impl WrappingFrom<Integer> for SignedLimb {
 
 impl<'a> WrappingFrom<&'a Integer> for SignedLimb {
     /// Converts an `Integer` to a `SignedLimb`, taking the `Integer` by reference and wrapping mod
-    /// 2<sup>32</sup>.
+    /// 2<sup>`Limb::WIDTH`</sup>.
     ///
     /// Time: worst case O(1)
     ///

@@ -1,7 +1,7 @@
 use std::ops::{Add, Mul, Shl, Shr};
 
 use itertools::Itertools;
-use malachite_base::conversion::{CheckedFrom, RoundingFrom};
+use malachite_base::conversion::{CheckedFrom, RoundingFrom, WrappingFrom};
 use malachite_base::crement::Crementable;
 use malachite_base::num::floats::PrimitiveFloat;
 use malachite_base::num::integers::PrimitiveInteger;
@@ -190,6 +190,7 @@ pub fn pairs_of_integer_and_signed<T: PrimitiveSigned + Rand>(
 ) -> It<(Integer, T)>
 where
     T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
     match gm {
         GenerationMode::Exhaustive => {
@@ -209,6 +210,7 @@ pub fn nm_pairs_of_integer_and_signed<T: PrimitiveSigned + Rand>(
 ) -> It<((BigInt, T), (Integer, T))>
 where
     T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
     Box::new(pairs_of_integer_and_signed(gm).map(|(x, y)| ((integer_to_bigint(&x), y), (x, y))))
 }
@@ -218,6 +220,7 @@ pub fn rm_pairs_of_integer_and_signed<T: PrimitiveSigned + Rand>(
 ) -> It<((rug::Integer, T), (Integer, T))>
 where
     T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
     Box::new(
         pairs_of_integer_and_signed(gm).map(|(x, y)| ((integer_to_rug_integer(&x), y), (x, y))),
@@ -229,6 +232,7 @@ pub fn nrm_pairs_of_integer_and_signed<T: PrimitiveSigned + Rand>(
 ) -> It<((BigInt, T), (rug::Integer, T), (Integer, T))>
 where
     T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
     Box::new(pairs_of_integer_and_signed(gm).map(|(x, y)| {
         (
@@ -244,6 +248,7 @@ pub fn pairs_of_signed_and_integer<T: PrimitiveSigned + Rand>(
 ) -> It<(T, Integer)>
 where
     T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
     match gm {
         GenerationMode::Exhaustive => {
@@ -263,6 +268,7 @@ pub fn rm_pairs_of_signed_and_integer<T: PrimitiveSigned + Rand>(
 ) -> It<((T, rug::Integer), (T, Integer))>
 where
     T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
     Box::new(
         pairs_of_signed_and_integer(gm).map(|(x, y)| ((x, integer_to_rug_integer(&y)), (x, y))),
@@ -368,6 +374,7 @@ pub fn pairs_of_integer_and_nonzero_signed<T: PrimitiveSigned + Rand>(
 ) -> It<(Integer, T)>
 where
     T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_pairs(
@@ -392,6 +399,7 @@ pub fn rm_pairs_of_integer_and_nonzero_signed<T: PrimitiveSigned + Rand>(
 ) -> It<((rug::Integer, T), (Integer, T))>
 where
     T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
     Box::new(
         pairs_of_integer_and_nonzero_signed(gm)
@@ -404,6 +412,7 @@ pub fn nrm_pairs_of_integer_and_nonzero_signed<T: PrimitiveSigned + Rand>(
 ) -> It<((BigInt, T), (rug::Integer, T), (Integer, T))>
 where
     T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
     Box::new(pairs_of_integer_and_nonzero_signed(gm).map(|(x, y)| {
         (
@@ -419,6 +428,7 @@ pub fn nm_pairs_of_integer_and_nonzero_signed<T: PrimitiveSigned + Rand>(
 ) -> It<((BigInt, T), (Integer, T))>
 where
     T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
     Box::new(
         pairs_of_integer_and_nonzero_signed(gm).map(|(x, y)| ((integer_to_bigint(&x), y), (x, y))),
@@ -471,6 +481,7 @@ pub fn pairs_of_integer_and_nonzero_signed_limb_var_1<T: PrimitiveSigned + Rand>
 ) -> It<(Integer, T)>
 where
     T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
     Integer: Mul<T, Output = Integer>,
 {
     Box::new(pairs_of_integer_and_nonzero_signed(gm).map(|(n, i)| (n * i, i)))
@@ -481,6 +492,7 @@ pub fn nrm_pairs_of_integer_and_nonzero_signed_limb_var_1<T: PrimitiveSigned + R
 ) -> It<((BigInt, T), (rug::Integer, T), (Integer, T))>
 where
     T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
     Integer: Mul<T, Output = Integer>,
 {
     Box::new(
@@ -563,6 +575,7 @@ pub fn pairs_of_signed_and_nonzero_integer<T: PrimitiveSigned + Rand>(
 ) -> It<(T, Integer)>
 where
     T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_pairs(
@@ -641,6 +654,7 @@ pub fn triples_of_integer_integer_and_signed<T: PrimitiveSigned + Rand>(
 ) -> It<(Integer, Integer, T)>
 where
     T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_triples(
@@ -706,6 +720,7 @@ pub fn triples_of_natural_integer_natural_signed_and_natural_signed<T: Primitive
 ) -> It<(Integer, T, T)>
 where
     T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_triples(
@@ -733,6 +748,7 @@ pub fn triples_of_natural_integer_natural_integer_and_natural_signed<T: Primitiv
 ) -> It<(Integer, Integer, T)>
 where
     T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_triples(
@@ -909,6 +925,7 @@ pub fn triples_of_integer_integer_and_nonzero_signed<T: PrimitiveSigned + Rand>(
 ) -> It<(Integer, Integer, T)>
 where
     T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_triples(
@@ -1124,6 +1141,7 @@ pub fn triples_of_signed_signed_and_integer<T: PrimitiveSigned + Rand>(
 ) -> It<(T, T, Integer)>
 where
     T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_triples(
@@ -1146,6 +1164,7 @@ pub fn triples_of_integer_signed_and_signed<T: PrimitiveSigned + Rand>(
 ) -> It<(Integer, T, T)>
 where
     T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_triples(
@@ -1168,6 +1187,7 @@ pub fn rm_triples_of_integer_signed_and_signed<T: PrimitiveSigned + Rand>(
 ) -> It<((rug::Integer, T, T), (Integer, T, T))>
 where
     T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
     Box::new(
         triples_of_integer_signed_and_signed(gm)
@@ -1183,6 +1203,7 @@ pub fn triples_of_integer_signed_and_signed_var_1<T: PrimitiveSigned + Rand>(
 where
     Integer: Mul<T, Output = Integer> + Add<T, Output = Integer>,
     T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
     Box::new(
         triples_of_integer_signed_and_signed(gm)
@@ -1197,6 +1218,7 @@ pub fn triples_of_integer_signed_and_signed_var_2<T: PrimitiveSigned + Rand>(
 ) -> It<(Integer, T, T)>
 where
     T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
     Box::new(
         triples_of_integer_signed_and_signed::<T>(gm).filter(|&(ref n, i, modulus)| {
@@ -1212,6 +1234,7 @@ pub fn triples_of_integer_signed_and_integer<T: PrimitiveSigned + Rand>(
 ) -> It<(Integer, T, Integer)>
 where
     T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_triples(
@@ -1234,6 +1257,7 @@ pub fn triples_of_signed_integer_and_signed<T: PrimitiveSigned + Rand>(
 ) -> It<(T, Integer, T)>
 where
     T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_triples(
@@ -1353,6 +1377,7 @@ pub fn triples_of_integer_signed_and_small_unsigned<
 ) -> It<(Integer, T, U)>
 where
     T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_triples(
@@ -1383,6 +1408,7 @@ pub fn rm_triples_of_integer_signed_and_small_unsigned<
 ) -> It<((rug::Integer, T, U), (Integer, T, U))>
 where
     T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
     Box::new(
         triples_of_integer_signed_and_small_unsigned(gm)
@@ -1401,6 +1427,7 @@ pub fn triples_of_integer_signed_and_small_unsigned_var_1<
 where
     Integer: Shl<U, Output = Integer> + Add<T, Output = Integer>,
     T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
     Box::new(
         triples_of_integer_signed_and_small_unsigned(gm)
@@ -1427,6 +1454,7 @@ pub fn triples_of_signed_integer_and_small_unsigned<
 ) -> It<(T, Integer, U)>
 where
     T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_triples(
@@ -2293,6 +2321,7 @@ fn triples_of_integer_nonzero_signed_and_rounding_mode<T: PrimitiveSigned + Rand
 ) -> It<(Integer, T, RoundingMode)>
 where
     T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
     match gm {
         GenerationMode::Exhaustive => reshape_2_1_to_3(Box::new(lex_pairs(
@@ -2322,6 +2351,7 @@ pub fn triples_of_integer_nonzero_signed_and_rounding_mode_var_1<T: PrimitiveSig
 where
     Integer: Mul<T, Output = Integer>,
     T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
     Box::new(
         triples_of_integer_nonzero_signed_and_rounding_mode::<T>(gm).map(|(n, i, rm)| {
@@ -2339,6 +2369,7 @@ fn triples_of_signed_nonzero_integer_and_rounding_mode<T: PrimitiveSigned + Rand
 ) -> It<(T, Integer, RoundingMode)>
 where
     T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
     match gm {
         GenerationMode::Exhaustive => reshape_2_1_to_3(Box::new(lex_pairs(
@@ -2369,6 +2400,7 @@ where
     T: Mul<Integer, Output = Integer>,
     T: CheckedFrom<Integer>,
     T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
     Box::new(
         triples_of_signed_nonzero_integer_and_rounding_mode::<T>(gm).filter_map(|(i, n, rm)| {

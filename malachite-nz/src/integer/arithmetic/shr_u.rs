@@ -141,7 +141,7 @@ macro_rules! impl_integer_shr_unsigned {
         ///
         /// # Panics
         /// Panics if `rm` is `RoundingMode::Exact`
-        /// but `self` is not divisible by 2<pow>`other`</pow>.
+        /// but `self` is not divisible by 2<sup>`other`</sup>.
         ///
         /// # Examples
         /// ```
@@ -194,7 +194,7 @@ macro_rules! impl_integer_shr_unsigned {
         ///
         /// # Panics
         /// Panics if `rm` is `RoundingMode::Exact` but `self` is not divisible by
-        /// 2<pow>`other`</pow>.
+        /// 2<sup>`other`</sup>.
         ///
         /// # Examples
         /// ```
@@ -267,7 +267,7 @@ macro_rules! impl_integer_shr_unsigned {
         ///
         /// # Panics
         /// Panics if `rm` is `RoundingMode::Exact` but `self` is not divisible by
-        /// 2<pow>`other`</pow>.
+        /// 2<sup>`other`</sup>.
         ///
         /// # Examples
         /// ```

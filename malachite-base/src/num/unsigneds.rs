@@ -49,11 +49,7 @@ pub trait PrimitiveUnsigned:
 {
     type SignedOfEqualWidth: PrimitiveSigned;
 
-    fn to_signed_bitwise(self) -> Self::SignedOfEqualWidth;
-
     fn to_signed_checked(self) -> Option<Self::SignedOfEqualWidth>;
-
-    fn from_signed_bitwise(i: Self::SignedOfEqualWidth) -> Self;
 }
 
 //TODO docs
@@ -490,11 +486,6 @@ impl PrimitiveUnsigned for u8 {
     type SignedOfEqualWidth = i8;
 
     #[inline]
-    fn to_signed_bitwise(self) -> i8 {
-        self as i8
-    }
-
-    #[inline]
     fn to_signed_checked(self) -> Option<i8> {
         if self <= i8::MAX as u8 {
             Some(self as i8)
@@ -502,20 +493,10 @@ impl PrimitiveUnsigned for u8 {
             None
         }
     }
-
-    #[inline]
-    fn from_signed_bitwise(i: i8) -> u8 {
-        i as u8
-    }
 }
 
 impl PrimitiveUnsigned for u16 {
     type SignedOfEqualWidth = i16;
-
-    #[inline]
-    fn to_signed_bitwise(self) -> i16 {
-        self as i16
-    }
 
     #[inline]
     fn to_signed_checked(self) -> Option<i16> {
@@ -525,20 +506,10 @@ impl PrimitiveUnsigned for u16 {
             None
         }
     }
-
-    #[inline]
-    fn from_signed_bitwise(i: i16) -> u16 {
-        i as u16
-    }
 }
 
 impl PrimitiveUnsigned for u32 {
     type SignedOfEqualWidth = i32;
-
-    #[inline]
-    fn to_signed_bitwise(self) -> i32 {
-        self as i32
-    }
 
     #[inline]
     fn to_signed_checked(self) -> Option<i32> {
@@ -548,20 +519,10 @@ impl PrimitiveUnsigned for u32 {
             None
         }
     }
-
-    #[inline]
-    fn from_signed_bitwise(i: i32) -> u32 {
-        i as u32
-    }
 }
 
 impl PrimitiveUnsigned for u64 {
     type SignedOfEqualWidth = i64;
-
-    #[inline]
-    fn to_signed_bitwise(self) -> i64 {
-        self as i64
-    }
 
     #[inline]
     fn to_signed_checked(self) -> Option<i64> {
@@ -571,20 +532,10 @@ impl PrimitiveUnsigned for u64 {
             None
         }
     }
-
-    #[inline]
-    fn from_signed_bitwise(i: i64) -> u64 {
-        i as u64
-    }
 }
 
 impl PrimitiveUnsigned for u128 {
     type SignedOfEqualWidth = i128;
-
-    #[inline]
-    fn to_signed_bitwise(self) -> i128 {
-        self as i128
-    }
 
     #[inline]
     fn to_signed_checked(self) -> Option<i128> {
@@ -594,20 +545,10 @@ impl PrimitiveUnsigned for u128 {
             None
         }
     }
-
-    #[inline]
-    fn from_signed_bitwise(i: i128) -> u128 {
-        i as u128
-    }
 }
 
 impl PrimitiveUnsigned for usize {
     type SignedOfEqualWidth = isize;
-
-    #[inline]
-    fn to_signed_bitwise(self) -> isize {
-        self as isize
-    }
 
     #[inline]
     fn to_signed_checked(self) -> Option<isize> {
@@ -616,11 +557,6 @@ impl PrimitiveUnsigned for usize {
         } else {
             None
         }
-    }
-
-    #[inline]
-    fn from_signed_bitwise(i: isize) -> usize {
-        i as usize
     }
 }
 

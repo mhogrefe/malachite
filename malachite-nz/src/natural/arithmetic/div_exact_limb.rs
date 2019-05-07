@@ -47,8 +47,9 @@ pub fn test_invert_limb_table() {
     }
 }
 
-/// Finds the inverse of a `Limb` mod 2<sup>32</sup>; given x, returns y such that
-/// x * y === 1 mod 2<sup>32</sup>. This inverse only exists for odd `Limb`s, so `limb` must be odd.
+/// Finds the inverse of a `Limb` mod 2<sup>`Limb::WIDTH`</sup>; given x, returns y such that
+/// x * y === 1 mod 2<sup>`Limb::WIDTH`</sup>. This inverse only exists for odd `Limb`s, so `limb`
+/// must be odd.
 ///
 /// Time: worst case O(1)
 ///

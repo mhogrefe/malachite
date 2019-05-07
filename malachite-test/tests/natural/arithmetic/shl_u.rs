@@ -1,7 +1,7 @@
 use std::str::FromStr;
 
 use malachite_base::comparison::Max;
-use malachite_base::num::signeds::PrimitiveSigned;
+use malachite_base::conversion::WrappingFrom;
 use malachite_base::num::traits::{IsPowerOfTwo, One, Zero};
 use malachite_base::num::unsigneds::PrimitiveUnsigned;
 use malachite_nz::natural::arithmetic::shl_u::{
@@ -273,8 +273,8 @@ macro_rules! tests_and_properties {
                 assert_eq!($shifted, $n * (Natural::ONE << $u));
                 assert_eq!(&$shifted >> $u, *$n);
 
-                if $u < (<$t as PrimitiveUnsigned>::SignedOfEqualWidth::MAX.to_unsigned_bitwise()) {
-                    let u = $u.to_signed_bitwise();
+                if $u < $t::wrapping_from(<$t as PrimitiveUnsigned>::SignedOfEqualWidth::MAX) {
+                    let u = <$t as PrimitiveUnsigned>::SignedOfEqualWidth::wrapping_from($u);
                     assert_eq!($n << u, $shifted);
                     assert_eq!($n >> -u, $shifted);
                 }

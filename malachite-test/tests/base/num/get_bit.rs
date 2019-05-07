@@ -1,5 +1,6 @@
 use std::u32;
 
+use malachite_base::conversion::WrappingFrom;
 use malachite_base::num::integers::PrimitiveInteger;
 use malachite_base::num::signeds::PrimitiveSigned;
 use malachite_base::num::unsigneds::PrimitiveUnsigned;
@@ -88,6 +89,7 @@ fn get_bit_properties_helper_unsigned<T: PrimitiveUnsigned + Rand>() {
 fn get_bit_properties_helper_signed<T: PrimitiveSigned + Rand>()
 where
     T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
     test_properties(
         pairs_of_signed_and_small_unsigned,

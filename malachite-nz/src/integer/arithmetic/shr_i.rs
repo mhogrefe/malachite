@@ -1,10 +1,11 @@
 use std::ops::{Shr, ShrAssign};
 
-use malachite_base::num::signeds::PrimitiveSigned;
+use malachite_base::conversion::WrappingFrom;
 use malachite_base::num::traits::{ShrRound, ShrRoundAssign, UnsignedAbs};
 use malachite_base::round::RoundingMode;
 
 use integer::Integer;
+use platform::Limb;
 
 macro_rules! impl_integer_shr_signed {
     ($t:ident) => {
@@ -79,7 +80,7 @@ macro_rules! impl_integer_shr_signed {
 
             fn shr(self, other: $t) -> Integer {
                 if other >= 0 {
-                    self >> other.to_unsigned_bitwise()
+                    self >> Limb::wrapping_from(other)
                 } else {
                     self << other.unsigned_abs()
                 }
@@ -126,7 +127,7 @@ macro_rules! impl_integer_shr_signed {
         impl ShrAssign<$t> for Integer {
             fn shr_assign(&mut self, other: $t) {
                 if other >= 0 {
-                    *self >>= other.to_unsigned_bitwise();
+                    *self >>= Limb::wrapping_from(other);
                 } else {
                     *self <<= other.unsigned_abs();
                 }
@@ -145,7 +146,7 @@ macro_rules! impl_integer_shr_signed {
         ///
         /// # Panics
         /// Panics if `other` is positive and `rm` is `RoundingMode::Exact` but `self` is not
-        /// divisible by 2<pow>`other`</pow>.
+        /// divisible by 2<sup>`other`</sup>.
         ///
         /// # Examples
         /// ```
@@ -205,7 +206,7 @@ macro_rules! impl_integer_shr_signed {
         ///
         /// # Panics
         /// Panics if `other` is positive and `rm` is `RoundingMode::Exact` but `self` is not
-        /// divisible by 2<pow>`other`</pow>.
+        /// divisible by 2<sup>`other`</sup>.
         ///
         /// # Examples
         /// ```
@@ -248,7 +249,7 @@ macro_rules! impl_integer_shr_signed {
 
             fn shr_round(self, other: $t, rm: RoundingMode) -> Integer {
                 if other >= 0 {
-                    self.shr_round(other.to_unsigned_bitwise(), rm)
+                    self.shr_round(Limb::wrapping_from(other), rm)
                 } else {
                     self << other.unsigned_abs()
                 }
@@ -267,7 +268,7 @@ macro_rules! impl_integer_shr_signed {
         ///
         /// # Panics
         /// Panics if `other` is positive and `rm` is `RoundingMode::Exact` but `self` is not
-        /// divisible by 2<pow>`other`</pow>.
+        /// divisible by 2<sup>`other`</sup>.
         ///
         /// # Examples
         /// ```
@@ -322,7 +323,7 @@ macro_rules! impl_integer_shr_signed {
         impl ShrRoundAssign<$t> for Integer {
             fn shr_round_assign(&mut self, other: $t, rm: RoundingMode) {
                 if other >= 0 {
-                    self.shr_round_assign(other.to_unsigned_bitwise(), rm);
+                    self.shr_round_assign(Limb::wrapping_from(other), rm);
                 } else {
                     *self <<= other.unsigned_abs();
                 }

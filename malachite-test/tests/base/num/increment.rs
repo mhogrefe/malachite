@@ -1,4 +1,5 @@
 use malachite_base::comparison::Max;
+use malachite_base::conversion::WrappingFrom;
 use malachite_base::crement::Crementable;
 use malachite_base::num::signeds::PrimitiveSigned;
 use malachite_base::num::unsigneds::PrimitiveUnsigned;
@@ -79,6 +80,7 @@ fn increment_properties_helper_unsigned<T: PrimitiveUnsigned + Rand>() {
 fn increment_properties_helper_signed<T: PrimitiveSigned + Rand>()
 where
     T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
     test_properties(signeds_no_max, |&n: &T| {
         let mut mut_n = n;

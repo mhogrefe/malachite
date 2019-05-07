@@ -1,9 +1,8 @@
 use std::str::FromStr;
 
 use malachite_base::comparison::Max;
-use malachite_base::conversion::CheckedFrom;
+use malachite_base::conversion::{CheckedFrom, WrappingFrom};
 use malachite_base::num::integers::PrimitiveInteger;
-use malachite_base::num::signeds::PrimitiveSigned;
 use malachite_base::num::traits::{ShrRound, ShrRoundAssign, Zero};
 use malachite_base::num::unsigneds::PrimitiveUnsigned;
 use malachite_base::round::RoundingMode;
@@ -630,9 +629,8 @@ macro_rules! tests_and_properties {
 
                     $shl_library_comparison_properties
 
-                    let x = <$t as PrimitiveUnsigned>::SignedOfEqualWidth::MAX;
-                    if $u < x.to_unsigned_bitwise() {
-                        let u = $u.to_signed_bitwise();
+                    if $u < $t::wrapping_from(<$t as PrimitiveUnsigned>::SignedOfEqualWidth::MAX) {
+                        let u = <$t as PrimitiveUnsigned>::SignedOfEqualWidth::wrapping_from($u);
                         assert_eq!($n >> u, $shifted);
                         assert_eq!($n << -u, $shifted);
                     }

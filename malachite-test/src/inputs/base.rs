@@ -3,7 +3,7 @@ use std::cmp::Ordering;
 use std::ops::{Shl, Shr};
 
 use malachite_base::chars::NUMBER_OF_CHARS;
-use malachite_base::conversion::CheckedFrom;
+use malachite_base::conversion::{CheckedFrom, WrappingFrom};
 use malachite_base::limbs::limbs_test_zero;
 use malachite_base::num::integers::PrimitiveInteger;
 use malachite_base::num::signeds::PrimitiveSigned;
@@ -38,7 +38,7 @@ use rust_wheels::iterators::general::{random, random_from_vector, range_increasi
 use rust_wheels::iterators::integers_geometric::{positive_u32s_geometric, u32s_geometric};
 use rust_wheels::iterators::orderings::{exhaustive_orderings, random_orderings};
 use rust_wheels::iterators::primitive_floats::{
-    exhaustive_finite_primitive_floats, exhaustive_primitive_floats,
+    exhaustive_f32s, exhaustive_f64s, exhaustive_finite_f32s, exhaustive_finite_f64s,
     random_finite_primitive_floats, random_primitive_floats, special_random_f32s,
     special_random_f64s, special_random_finite_f32s, special_random_finite_f64s,
 };
@@ -89,6 +89,7 @@ pub fn unsigneds<T: PrimitiveUnsigned + Rand>(gm: GenerationMode) -> It<T> {
 pub fn signeds<T: PrimitiveSigned + Rand>(gm: GenerationMode) -> It<T>
 where
     T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_signed()),
@@ -110,6 +111,7 @@ pub fn positive_unsigneds<T: PrimitiveUnsigned + Rand>(gm: GenerationMode) -> It
 pub fn nonzero_signeds<T: PrimitiveSigned + Rand>(gm: GenerationMode) -> It<T>
 where
     T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_nonzero_signed()),
@@ -121,6 +123,7 @@ where
 pub fn natural_signeds<T: PrimitiveSigned + Rand>(gm: GenerationMode) -> It<T>
 where
     T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_natural_signed()),
@@ -132,6 +135,7 @@ where
 pub fn negative_signeds<T: PrimitiveSigned + Rand>(gm: GenerationMode) -> It<T>
 where
     T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_negative_signed()),
@@ -147,6 +151,7 @@ pub fn unsigneds_no_max<T: PrimitiveUnsigned + Rand>(gm: GenerationMode) -> It<T
 pub fn signeds_no_max<T: PrimitiveSigned + Rand>(gm: GenerationMode) -> It<T>
 where
     T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
     Box::new(signeds(gm).filter(|&i| i != T::MAX))
 }
@@ -154,6 +159,7 @@ where
 pub fn signeds_no_min<T: PrimitiveSigned + Rand>(gm: GenerationMode) -> It<T>
 where
     T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
     Box::new(signeds(gm).filter(|&i| i != T::MIN))
 }
@@ -161,6 +167,8 @@ where
 macro_rules! float_gen {
     (
         $f: ident,
+        $exhaustive: ident,
+        $exhaustive_finite: ident,
         $special_random: ident,
         $special_random_finite: ident,
         $floats: ident,
@@ -172,7 +180,7 @@ macro_rules! float_gen {
     ) => {
         pub fn $floats(gm: GenerationMode) -> It<$f> {
             match gm {
-                GenerationMode::Exhaustive => Box::new(exhaustive_primitive_floats()),
+                GenerationMode::Exhaustive => Box::new($exhaustive()),
                 GenerationMode::Random(_) => Box::new(random_primitive_floats(&EXAMPLE_SEED)),
                 GenerationMode::SpecialRandom(scale) => {
                     Box::new($special_random(&EXAMPLE_SEED, scale))
@@ -182,7 +190,7 @@ macro_rules! float_gen {
 
         pub fn $finite_floats(gm: GenerationMode) -> It<$f> {
             match gm {
-                GenerationMode::Exhaustive => Box::new(exhaustive_finite_primitive_floats()),
+                GenerationMode::Exhaustive => Box::new($exhaustive_finite()),
                 GenerationMode::Random(_) => {
                     Box::new(random_finite_primitive_floats(&EXAMPLE_SEED))
                 }
@@ -201,10 +209,9 @@ macro_rules! float_gen {
             gm: GenerationMode,
         ) -> It<($f, RoundingMode)> {
             match gm {
-                GenerationMode::Exhaustive => Box::new(lex_pairs(
-                    exhaustive_finite_primitive_floats(),
-                    exhaustive_rounding_modes(),
-                )),
+                GenerationMode::Exhaustive => {
+                    Box::new(lex_pairs($exhaustive_finite(), exhaustive_rounding_modes()))
+                }
                 GenerationMode::Random(_) => Box::new(random_pairs(
                     &EXAMPLE_SEED,
                     &(|seed| random_finite_primitive_floats(seed)),
@@ -254,6 +261,8 @@ macro_rules! float_gen {
 
 float_gen!(
     f32,
+    exhaustive_f32s,
+    exhaustive_finite_f32s,
     special_random_f32s,
     special_random_finite_f32s,
     f32s,
@@ -265,6 +274,8 @@ float_gen!(
 );
 float_gen!(
     f64,
+    exhaustive_f64s,
+    exhaustive_finite_f64s,
     special_random_f64s,
     special_random_finite_f64s,
     f64s,
@@ -294,6 +305,7 @@ pub fn pairs_of_unsigneds_var_1<T: PrimitiveUnsigned + Rand>(gm: GenerationMode)
 pub fn pairs_of_signeds<T: PrimitiveSigned + Rand>(gm: GenerationMode) -> It<(T, T)>
 where
     T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_pairs_from_single(exhaustive_signed())),
@@ -307,6 +319,7 @@ where
 pub fn triples_of_signeds<T: PrimitiveSigned + Rand>(gm: GenerationMode) -> It<(T, T, T)>
 where
     T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_triples_from_single(exhaustive_signed())),
@@ -322,6 +335,7 @@ pub fn pairs_of_signed_and_nonzero_signed<T: PrimitiveSigned + Rand>(
 ) -> It<(T, T)>
 where
     T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_pairs(
@@ -535,6 +549,7 @@ pub fn pairs_of_positive_signed_and_small_unsigned<
 ) -> It<(T, U)>
 where
     T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
     match gm {
         GenerationMode::Exhaustive => log_pairs_of_positive_primitive_and_unsigned(),
@@ -560,6 +575,7 @@ pub fn pairs_of_signed_and_small_unsigned<T: PrimitiveSigned + Rand, U: Primitiv
 ) -> It<(T, U)>
 where
     T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
     match gm {
         GenerationMode::Exhaustive => sqrt_pairs_of_signed_and_unsigned(),
@@ -609,6 +625,7 @@ pub fn pairs_of_signed_and_u64_width_range<T: PrimitiveSigned + Rand>(
 ) -> It<(T, u64)>
 where
     T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
     match gm {
         GenerationMode::Exhaustive => Box::new(lex_pairs(
@@ -631,6 +648,7 @@ pub fn pairs_of_signed_and_u64_width_range_var_1<T: PrimitiveSigned + Rand>(
 ) -> It<(T, u64)>
 where
     T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
     Box::new(
         pairs_of_signed_and_small_unsigned(gm)
@@ -645,6 +663,7 @@ pub fn pairs_of_signed_and_u64_width_range_var_2<T: PrimitiveSigned + Rand>(
 ) -> It<(T, u64)>
 where
     T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
     Box::new(
         pairs_of_signed_and_small_unsigned(gm)
@@ -690,6 +709,7 @@ pub fn pairs_of_signed_and_positive_unsigned<
 ) -> It<(T, U)>
 where
     T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
     match gm {
         GenerationMode::Exhaustive => {
@@ -726,6 +746,7 @@ pub fn pairs_of_unsigned_and_nonzero_signed<
 ) -> It<(T, U)>
 where
     U::UnsignedOfEqualWidth: Rand,
+    U: WrappingFrom<<U as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_pairs(
@@ -800,6 +821,7 @@ pub fn triples_of_signed_unsigned_width_range_and_bool_var_1<
 ) -> It<(T, U, bool)>
 where
     T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
     let unfiltered: It<(T, U, bool)> = match gm {
         GenerationMode::Exhaustive => reshape_2_1_to_3(Box::new(lex_pairs(
@@ -832,6 +854,7 @@ pub fn pairs_of_negative_signed_not_min_and_small_unsigned<
 ) -> It<(T, U)>
 where
     T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
     match gm {
         GenerationMode::Exhaustive => Box::new(log_pairs(
@@ -859,6 +882,7 @@ pub fn triples_of_signed_signed_and_small_unsigned<
 ) -> It<(T, T, U)>
 where
     T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
     match gm {
         GenerationMode::Exhaustive => Box::new(reshape_2_1_to_3(Box::new(sqrt_pairs(
@@ -992,6 +1016,7 @@ pub fn pairs_of_signed_and_rounding_mode<T: PrimitiveSigned + Rand>(
 ) -> It<(T, RoundingMode)>
 where
     T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
     match gm {
         GenerationMode::Exhaustive => {
@@ -1011,6 +1036,7 @@ pub fn pairs_of_nonzero_signed_and_rounding_mode<T: PrimitiveSigned + Rand>(
 ) -> It<(T, RoundingMode)>
 where
     T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
     match gm {
         GenerationMode::Exhaustive => Box::new(lex_pairs(
@@ -1079,6 +1105,7 @@ fn triples_of_signed_nonzero_signed_and_rounding_mode<T: PrimitiveSigned + Rand>
 ) -> It<(T, T, RoundingMode)>
 where
     T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
     match gm {
         GenerationMode::Exhaustive => reshape_2_1_to_3(Box::new(lex_pairs(
@@ -2645,6 +2672,7 @@ fn triples_of_signed_small_unsigned_and_rounding_mode<
 ) -> It<(T, U, RoundingMode)>
 where
     T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
     match gm {
         GenerationMode::Exhaustive => reshape_2_1_to_3(Box::new(lex_pairs(
@@ -2678,6 +2706,7 @@ where
     T: Shl<U, Output = T>,
     T: Shr<U, Output = T>,
     T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
     Box::new(
         triples_of_signed_small_unsigned_and_rounding_mode(gm).filter_map(|(n, u, rm)| {

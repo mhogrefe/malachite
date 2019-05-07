@@ -4,7 +4,6 @@ use malachite_base::comparison::{Max, Min};
 use malachite_base::conversion::{CheckedFrom, WrappingFrom};
 use malachite_base::num::integers::PrimitiveInteger;
 use malachite_base::num::traits::{ModPowerOfTwo, One, SignificantBits};
-use malachite_base::num::unsigneds::PrimitiveUnsigned;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::{DoubleLimb, SignedDoubleLimb, SignedLimb};
@@ -151,9 +150,9 @@ fn signed_double_limb_wrapping_from_integer_properties() {
         assert_eq!(-result, SignedDoubleLimb::wrapping_from(&-x));
         assert_eq!(
             result,
-            DoubleLimb::checked_from(&x.mod_power_of_two(DoubleLimb::WIDTH.into()))
-                .unwrap()
-                .to_signed_bitwise()
+            SignedDoubleLimb::wrapping_from(
+                DoubleLimb::checked_from(&x.mod_power_of_two(DoubleLimb::WIDTH.into())).unwrap()
+            )
         );
     });
 }

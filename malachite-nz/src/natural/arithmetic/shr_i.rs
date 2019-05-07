@@ -1,10 +1,11 @@
 use std::ops::{Shr, ShrAssign};
 
-use malachite_base::num::signeds::PrimitiveSigned;
+use malachite_base::conversion::WrappingFrom;
 use malachite_base::num::traits::{ShrRound, ShrRoundAssign, UnsignedAbs};
 use malachite_base::round::RoundingMode;
 
 use natural::Natural;
+use platform::Limb;
 
 macro_rules! impl_natural_shr_signed {
     ($t:ident) => {
@@ -73,7 +74,7 @@ macro_rules! impl_natural_shr_signed {
 
             fn shr(self, other: $t) -> Natural {
                 if other >= 0 {
-                    self >> other.to_unsigned_bitwise()
+                    self >> Limb::wrapping_from(other)
                 } else {
                     self << other.unsigned_abs()
                 }
@@ -114,7 +115,7 @@ macro_rules! impl_natural_shr_signed {
         impl ShrAssign<$t> for Natural {
             fn shr_assign(&mut self, other: $t) {
                 if other >= 0 {
-                    *self >>= other.to_unsigned_bitwise();
+                    *self >>= Limb::wrapping_from(other);
                 } else {
                     *self <<= other.unsigned_abs();
                 }
@@ -234,7 +235,7 @@ macro_rules! impl_natural_shr_signed {
 
             fn shr_round(self, other: $t, rm: RoundingMode) -> Natural {
                 if other >= 0 {
-                    self.shr_round(other.to_unsigned_bitwise(), rm)
+                    self.shr_round(Limb::wrapping_from(other), rm)
                 } else {
                     self << other.unsigned_abs()
                 }
@@ -307,7 +308,7 @@ macro_rules! impl_natural_shr_signed {
         impl ShrRoundAssign<$t> for Natural {
             fn shr_round_assign(&mut self, other: $t, rm: RoundingMode) {
                 if other >= 0 {
-                    self.shr_round_assign(other.to_unsigned_bitwise(), rm);
+                    self.shr_round_assign(Limb::wrapping_from(other), rm);
                 } else {
                     *self <<= other.unsigned_abs()
                 }

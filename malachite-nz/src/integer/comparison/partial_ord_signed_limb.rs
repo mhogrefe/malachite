@@ -1,6 +1,6 @@
 use std::cmp::Ordering;
 
-use malachite_base::num::signeds::PrimitiveSigned;
+use malachite_base::conversion::WrappingFrom;
 use malachite_base::num::traits::UnsignedAbs;
 
 use integer::Integer;
@@ -29,7 +29,7 @@ impl PartialOrd<SignedLimb> for Integer {
     fn partial_cmp(&self, other: &SignedLimb) -> Option<Ordering> {
         if self.sign {
             if *other >= 0 {
-                self.abs.partial_cmp(&(other.to_unsigned_bitwise()))
+                self.abs.partial_cmp(&Limb::wrapping_from(*other))
             } else {
                 Some(Ordering::Greater)
             }

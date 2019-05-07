@@ -74,7 +74,7 @@ impl<'a> CheckedFrom<&'a Integer> for DoubleLimb {
 
 impl WrappingFrom<Integer> for DoubleLimb {
     /// Converts an `Integer` to a `DoubleLimb`, taking the `Integer` by value and wrapping mod
-    /// 2<pow>64</pow>.
+    /// 2<sup>`DoubleLimb::WIDTH`</sup>.
     ///
     /// Time: worst case O(1)
     ///
@@ -108,7 +108,7 @@ impl WrappingFrom<Integer> for DoubleLimb {
 
 impl<'a> WrappingFrom<&'a Integer> for DoubleLimb {
     /// Converts an `Integer` to a `DoubleLimb`, taking the `Integer` by reference and wrapping mod
-    /// 2<pow>64</pow>.
+    /// 2<sup>`DoubleLimb::WIDTH`</sup>.
     ///
     /// Time: worst case O(1)
     ///

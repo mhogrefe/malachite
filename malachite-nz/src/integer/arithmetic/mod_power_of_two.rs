@@ -48,7 +48,7 @@ impl<'a> ModPowerOfTwo for &'a Integer {
     type Output = Natural;
 
     /// Takes a `Integer` mod a power of 2, taking the `Integer` by reference. In other words,
-    /// returns r, where `self` = q * 2<pow>`other`</pow> + r and 0 <= r < 2<pow>`other`</pow>.
+    /// returns r, where `self` = q * 2<sup>`other`</sup> + r and 0 <= r < 2<sup>`other`</sup>.
     ///
     /// Unlike rem_power_of_two_ref, this function always returns a non-negative number.
     ///
@@ -82,7 +82,7 @@ impl<'a> ModPowerOfTwo for &'a Integer {
 
 impl ModPowerOfTwoAssign for Integer {
     /// Takes a `Integer` mod a power of 2 in place. In other words, replaces `self` with r, where
-    /// `self` = q * 2<pow>`other`</pow> + r and 0 <= r < 2<pow>`other`</pow>.
+    /// `self` = q * 2<sup>`other`</sup> + r and 0 <= r < 2<sup>`other`</sup>.
     ///
     /// Unlike rem_power_of_two_assign, this function always assigns a non-negative number.
     ///
@@ -124,8 +124,8 @@ impl RemPowerOfTwo for Integer {
     type Output = Integer;
 
     /// Takes a `Integer` rem a power of 2, taking the `Integer` by value. In other words, returns
-    /// r, where `self` = q * 2<pow>`other`</pow> + r, r == 0 or (sgn(r) == sgn(`self`)), and
-    /// 0 <= |r| < 2<pow>`other`</pow>.
+    /// r, where `self` = q * 2<sup>`other`</sup> + r, r == 0 or (sgn(r) == sgn(`self`)), and
+    /// 0 <= |r| < 2<sup>`other`</sup>.
     ///
     /// Unlike `mod_power_of_two`, this function always returns zero or a number with the same sign
     /// as `self`.
@@ -163,8 +163,8 @@ impl<'a> RemPowerOfTwo for &'a Integer {
     type Output = Integer;
 
     /// Takes a `Integer` rem a power of 2, taking the `Integer` by reference. In other words,
-    /// returns r, where `self` = q * 2<pow>`other`</pow> + r, (r == 0 or sgn(r) == sgn(`self`)),
-    /// and 0 <= |r| < 2<pow>`other`</pow>.
+    /// returns r, where `self` = q * 2<sup>`other`</sup> + r, (r == 0 or sgn(r) == sgn(`self`)),
+    /// and 0 <= |r| < 2<sup>`other`</sup>.
     ///
     /// Unlike `mod_power_of_two_ref, this function always returns zero or a number with the same
     /// sign as `self`.
@@ -199,8 +199,8 @@ impl<'a> RemPowerOfTwo for &'a Integer {
 
 impl RemPowerOfTwoAssign for Integer {
     /// Takes a `Integer` rem a power of 2 in place. In other words, replaces `self` with r, where
-    /// `self` = q * 2<pow>`other`</pow> + r, (r == 0 or sgn(r) == sgn(`self`)), and
-    /// 0 <= |r| < 2<pow>`other`</pow>.
+    /// `self` = q * 2<sup>`other`</sup> + r, (r == 0 or sgn(r) == sgn(`self`)), and
+    /// 0 <= |r| < 2<sup>`other`</sup>.
     ///
     /// Unlike `mod_power_of_two_assign, this function does never changes the sign of `self`, except
     /// possibly to set `self` to 0.
@@ -241,7 +241,7 @@ impl CeilingModPowerOfTwo for Integer {
     type Output = Integer;
 
     /// Takes a `Integer` ceiling-mod a power of 2, taking the `Integer` by value. In other words,
-    /// returns r, where `self` = q * 2<pow>`other`</pow> + r and 0 <= -r < 2<pow>`other`</pow>.
+    /// returns r, where `self` = q * 2<sup>`other`</sup> + r and 0 <= -r < 2<sup>`other`</sup>.
     ///
     /// Time: worst case O(`other`)
     ///
@@ -280,8 +280,8 @@ impl<'a> CeilingModPowerOfTwo for &'a Integer {
     type Output = Integer;
 
     /// Takes a `Integer` ceiling-mod a power of 2, taking the `Integer` by reference. In other
-    /// words, returns r, where `self` = q * 2<pow>`other`</pow> + r and
-    /// 0 <= -r < 2<pow>`other`</pow>.
+    /// words, returns r, where `self` = q * 2<sup>`other`</sup> + r and
+    /// 0 <= -r < 2<sup>`other`</sup>.
     ///
     /// Time: worst case O(`other`)
     ///
@@ -317,7 +317,7 @@ impl<'a> CeilingModPowerOfTwo for &'a Integer {
 
 impl CeilingModPowerOfTwoAssign for Integer {
     /// Takes a `Integer` ceiling-mod a power of 2 in place. In other words, replaces `self` with r,
-    /// where `self` = q * 2<pow>`other`</pow> + r and 0 <= -r < 2<pow>`other`</pow>.
+    /// where `self` = q * 2<sup>`other`</sup> + r and 0 <= -r < 2<sup>`other`</sup>.
     ///
     /// Time: worst case O(`other`)
     ///

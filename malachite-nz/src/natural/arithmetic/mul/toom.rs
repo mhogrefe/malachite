@@ -1,13 +1,11 @@
 use std::cmp::{max, Ordering};
 
-use malachite_base::conversion::CheckedFrom;
+use malachite_base::conversion::{CheckedFrom, WrappingFrom};
 use malachite_base::limbs::{limbs_set_zero, limbs_test_zero};
 use malachite_base::num::integers::PrimitiveInteger;
-use malachite_base::num::signeds::PrimitiveSigned;
 use malachite_base::num::traits::{
     EqModPowerOfTwo, NotAssign, WrappingAddAssign, WrappingSubAssign,
 };
-use malachite_base::num::unsigneds::PrimitiveUnsigned;
 
 use natural::arithmetic::add::{
     _limbs_add_same_length_with_carry_in_in_place_left, _limbs_add_to_out_aliased,
@@ -562,7 +560,7 @@ pub fn _limbs_mul_greater_to_out_toom_32(
             }
         }
     }
-    out[2 * n] = hi.to_unsigned_bitwise();
+    out[2 * n] = Limb::wrapping_from(hi);
 
     // v1 <-- (v1 + vm1) / 2 = x0 + x2
     {
@@ -601,7 +599,7 @@ pub fn _limbs_mul_greater_to_out_toom_32(
     //
     // Since we store y0 at the same location as the low half of x0 + x2, we need to do the middle
     // sum first.
-    let mut hi = out[2 * n].to_signed_bitwise();
+    let mut hi = SignedLimb::wrapping_from(out[2 * n]);
     let mut scratch_high = scratch[2 * n];
     if limbs_add_same_length_to_out(&mut out[2 * n..], &scratch[..n], &scratch[n..2 * n]) {
         scratch_high += 1;
@@ -621,7 +619,7 @@ pub fn _limbs_mul_greater_to_out_toom_32(
         }
         assert!(!limbs_slice_add_limb_in_place(
             &mut scratch[n..2 * n + 1],
-            hi.to_unsigned_bitwise()
+            Limb::wrapping_from(hi)
         ));
     } else {
         let carry = limbs_sub_same_length_in_place_left(&mut scratch[..n], &out[..n]);
@@ -636,7 +634,7 @@ pub fn _limbs_mul_greater_to_out_toom_32(
         }
         assert!(!limbs_sub_limb_in_place(
             &mut scratch[n..2 * n + 1],
-            hi.to_unsigned_bitwise()
+            Limb::wrapping_from(hi)
         ));
     }
 
@@ -670,7 +668,7 @@ pub fn _limbs_mul_greater_to_out_toom_32(
     {
         split_into_chunks_mut!(out, n, [out_0, out_1, out_2], out_3);
         let carry = limbs_sub_same_length_in_place_left(out_1, &out_3[..n]);
-        hi = scratch[2 * n].to_signed_bitwise();
+        hi = SignedLimb::wrapping_from(scratch[2 * n]);
         if carry {
             hi.wrapping_add_assign(1);
         }
