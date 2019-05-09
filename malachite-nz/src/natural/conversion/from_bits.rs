@@ -1,3 +1,4 @@
+use malachite_base::conversion::WrappingFrom;
 use malachite_base::num::integers::PrimitiveInteger;
 use malachite_base::num::traits::BitAccess;
 
@@ -32,7 +33,7 @@ pub fn limbs_asc_from_bits_asc(bits: &[bool]) -> Vec<Limb> {
         return Vec::new();
     }
     let mut limb_count = bits.len() >> Limb::LOG_WIDTH;
-    let remainder = bits.len() & (Limb::WIDTH_MASK as usize);
+    let remainder = bits.len() & usize::wrapping_from(Limb::WIDTH_MASK);
     if remainder != 0 {
         limb_count += 1;
     }
@@ -81,7 +82,7 @@ pub fn limbs_asc_from_bits_desc(bits: &[bool]) -> Vec<Limb> {
         return Vec::new();
     }
     let mut limb_count = bits.len() >> Limb::LOG_WIDTH;
-    let remainder = bits.len() & (Limb::WIDTH_MASK as usize);
+    let remainder = bits.len() & usize::wrapping_from(Limb::WIDTH_MASK);
     if remainder != 0 {
         limb_count += 1;
     }
@@ -91,7 +92,7 @@ pub fn limbs_asc_from_bits_desc(bits: &[bool]) -> Vec<Limb> {
     let mut i = if remainder == 0 {
         width_minus_one
     } else {
-        remainder as u64 - 1
+        u64::wrapping_from(remainder) - 1
     };
     for &bit in bits {
         if bit {

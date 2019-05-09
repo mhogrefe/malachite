@@ -1,3 +1,4 @@
+use malachite_base::conversion::CheckedFrom;
 #[cfg(feature = "64_bit_limbs")]
 use malachite_base::num::traits::JoinHalves;
 use malachite_base::num::traits::{ModPowerOfTwo, ShrRound, Zero};
@@ -46,7 +47,7 @@ pub fn limbs_random_up_to_bits<T: PrimitiveUnsigned + Rand, R: Rng>(
     assert_ne!(bits, 0);
     let remainder_bits = bits.mod_power_of_two(u64::from(T::LOG_WIDTH));
     let limb_count = bits.shr_round(T::LOG_WIDTH, RoundingMode::Ceiling);
-    let mut limbs: Vec<T> = Vec::with_capacity(limb_count as usize);
+    let mut limbs: Vec<T> = Vec::with_capacity(usize::checked_from(limb_count).unwrap());
     for _ in 0..limb_count {
         limbs.push(rng.gen());
     }

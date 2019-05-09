@@ -1,3 +1,4 @@
+use malachite_base::conversion::CheckedFrom;
 use malachite_base::num::integers::PrimitiveInteger;
 use malachite_base::num::traits::BitAccess;
 
@@ -26,7 +27,7 @@ use platform::Limb;
 /// ```
 pub fn limbs_get_bit(limbs: &[Limb], index: u64) -> bool {
     limbs
-        .get((index >> Limb::LOG_WIDTH) as usize)
+        .get(usize::checked_from(index >> Limb::LOG_WIDTH).unwrap())
         .map_or(false, |limb| {
             limb.get_bit(index & u64::from(Limb::WIDTH_MASK))
         })
@@ -63,7 +64,11 @@ fn limbs_set_bit_helper(limbs: &mut [Limb], index: u64, limb_index: usize) {
 /// assert_eq!(limbs, &[3, 3]);
 /// ```
 pub fn limbs_slice_set_bit(limbs: &mut [Limb], index: u64) {
-    limbs_set_bit_helper(limbs, index, (index >> Limb::LOG_WIDTH) as usize);
+    limbs_set_bit_helper(
+        limbs,
+        index,
+        usize::checked_from(index >> Limb::LOG_WIDTH).unwrap(),
+    );
 }
 
 /// Interpreting a `Vec` of `Limb`s as the limbs (in ascending order) of a `Natural`, sets a bit of
@@ -91,7 +96,7 @@ pub fn limbs_slice_set_bit(limbs: &mut [Limb], index: u64) {
 /// assert_eq!(limbs, &[3, 3, 0, 0, 1]);
 /// ```
 pub fn limbs_vec_set_bit(limbs: &mut Vec<Limb>, index: u64) {
-    let limb_index = (index >> Limb::LOG_WIDTH) as usize;
+    let limb_index = usize::checked_from(index >> Limb::LOG_WIDTH).unwrap();
     if limb_index >= limbs.len() {
         limbs.resize(limb_index + 1, 0);
     }
@@ -119,7 +124,7 @@ pub fn limbs_vec_set_bit(limbs: &mut Vec<Limb>, index: u64) {
 /// assert_eq!(limbs, &[1, 1]);
 /// ```
 pub fn limbs_clear_bit(limbs: &mut [Limb], index: u64) {
-    let limb_index = (index >> Limb::LOG_WIDTH) as usize;
+    let limb_index = usize::checked_from(index >> Limb::LOG_WIDTH).unwrap();
     if limb_index < limbs.len() {
         limbs[limb_index].clear_bit(index & u64::from(Limb::WIDTH_MASK));
     }

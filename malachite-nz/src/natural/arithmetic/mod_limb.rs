@@ -12,9 +12,6 @@ use malachite_base::num::traits::{
 use natural::Natural::{self, Large, Small};
 use platform::{DoubleLimb, Limb};
 
-// These functions are adapted from udiv_qrnnd_preinv, mpn_div_qr_1n_pi1, and mpn_div_qr_1 in GMP
-// 6.1.2.
-
 /// Time: O(1)
 ///
 /// Additional memory: O(1)

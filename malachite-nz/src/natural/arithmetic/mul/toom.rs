@@ -721,7 +721,7 @@ pub fn _limbs_mul_greater_to_out_toom_32(
 ///
 /// This is mpn_toom33_mul_itch from gmp-impl.h.
 pub fn _limbs_mul_greater_to_out_toom_33_scratch_size(xs_len: usize) -> usize {
-    3 * xs_len + Limb::WIDTH as usize
+    3 * xs_len + usize::wrapping_from(Limb::WIDTH)
 }
 
 pub const TOOM33_MAYBE_MUL_BASECASE: bool =
@@ -1496,7 +1496,7 @@ pub fn _limbs_mul_greater_to_out_toom_44_input_sizes_valid(xs_len: usize, ys_len
 ///
 /// This is mpn_toom44_mul_itch from gmp-impl.h.
 pub fn _limbs_mul_greater_to_out_toom_44_scratch_size(xs_len: usize) -> usize {
-    3 * xs_len + Limb::WIDTH as usize
+    3 * xs_len + usize::wrapping_from(Limb::WIDTH)
 }
 
 /// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, writes
@@ -3080,8 +3080,8 @@ pub fn _limbs_mul_greater_to_out_toom_6h_input_sizes_valid(xs_len: usize, ys_len
         // xs.len() < 18 / 17 * ys.len()
         n = 1 + (xs_len - 1) / 6;
         half = false;
-        s = xs_len as isize - (5 * n) as isize;
-        t = ys_len as isize - (5 * n) as isize;
+        s = isize::checked_from(xs_len).unwrap() - (5 * n) as isize;
+        t = isize::checked_from(ys_len).unwrap() - (5 * n) as isize;
     } else {
         if xs_len * 5 * TOOM_6H_LIMIT_NUMERATOR < TOOM_6H_LIMIT_DENOMINATOR * 7 * ys_len {
             // xs.len() < 119 / 90 * ys.len()
@@ -3115,24 +3115,24 @@ pub fn _limbs_mul_greater_to_out_toom_6h_input_sizes_valid(xs_len: usize, ys_len
         p -= 1;
         q -= 1;
 
-        s = xs_len as isize - (p * n) as isize;
-        t = ys_len as isize - (q * n) as isize;
+        s = isize::checked_from(xs_len).unwrap() - (p * n) as isize;
+        t = isize::checked_from(ys_len).unwrap() - (q * n) as isize;
         if half {
             // Recover from-badly chosen splitting
             if s < 1 {
-                s += n as isize;
+                s += isize::checked_from(n).unwrap();
                 half = false;
             } else if t < 1 {
-                t += n as isize;
+                t += isize::checked_from(n).unwrap();
                 half = false;
             }
         }
     }
     let limit = 12 * n + 6;
     0 < s
-        && s <= n as isize
+        && s <= isize::checked_from(n).unwrap()
         && 0 < t
-        && t <= n as isize
+        && t <= isize::checked_from(n).unwrap()
         && (half || s + t > 3)
         && n > 2
         && limit <= _limbs_mul_greater_to_out_toom_6h_scratch_size(xs_len, ys_len)
@@ -3195,13 +3195,13 @@ fn _limbs_mul_toom_6h_min_threshold() -> usize {
 ///
 /// This is mpn_toom6_mul_n_itch from gmp-impl.h.
 pub(crate) fn _limbs_mul_same_length_to_out_toom_6h_scratch_size(n: usize) -> usize {
-    let itch = (n as isize - _limbs_mul_toom_6h_min_threshold() as isize) * 2
-        + max(
-            _limbs_mul_toom_6h_min_threshold() * 2 + Limb::WIDTH as usize * 6,
+    let itch = (isize::checked_from(n).unwrap() - _limbs_mul_toom_6h_min_threshold() as isize) * 2
+        + isize::checked_from(max(
+            _limbs_mul_toom_6h_min_threshold() * 2 + usize::wrapping_from(Limb::WIDTH) * 6,
             _limbs_mul_greater_to_out_toom_44_scratch_size(_limbs_mul_toom_6h_min_threshold()),
-        ) as isize;
-    assert!(itch >= 0);
-    itch as usize
+        ))
+        .unwrap();
+    usize::checked_from(itch).unwrap()
 }
 
 /// This function can be used to determine the length of the input `scratch` slice in
@@ -3268,8 +3268,8 @@ pub fn _limbs_mul_greater_to_out_toom_6h(
         p = 5;
         q = 5;
         half = false;
-        s = xs_len as isize - (5 * n) as isize;
-        t = ys_len as isize - (5 * n) as isize;
+        s = isize::checked_from(xs_len).unwrap() - (5 * n) as isize;
+        t = isize::checked_from(ys_len).unwrap() - (5 * n) as isize;
     } else {
         if xs_len * 5 * TOOM_6H_LIMIT_NUMERATOR < TOOM_6H_LIMIT_DENOMINATOR * 7 * ys_len {
             // xs.len() < 119 / 90 * ys.len(), half
@@ -3303,30 +3303,30 @@ pub fn _limbs_mul_greater_to_out_toom_6h(
         p -= 1;
         q -= 1;
 
-        s = xs_len as isize - (p * n) as isize;
-        t = ys_len as isize - (q * n) as isize;
+        s = isize::checked_from(xs_len).unwrap() - (p * n) as isize;
+        t = isize::checked_from(ys_len).unwrap() - (q * n) as isize;
 
         // With LIMIT = 16 / 15, the following recovery is needed only if `ys_len` <= 73.
         if half {
             // Recover from badly-chosen splitting
             if s < 1 {
                 p -= 1;
-                s += n as isize;
+                s += isize::checked_from(n).unwrap();
                 half = false;
             } else if t < 1 {
                 q -= 1;
-                t += n as isize;
+                t += isize::checked_from(n).unwrap();
                 half = false;
             }
         }
     }
 
-    assert!(0 < s && s <= n as isize);
-    assert!(0 < t && t <= n as isize);
+    assert!(0 < s && s <= isize::checked_from(n).unwrap());
+    assert!(0 < t && t <= isize::checked_from(n).unwrap());
     assert!(half || s + t > 3);
     assert!(n > 2);
-    let s = s as usize;
-    let t = t as usize;
+    let s = usize::checked_from(s).unwrap();
+    let t = usize::checked_from(t).unwrap();
     let m = n + 1;
     let r = 2 * n + 1;
 
@@ -3487,8 +3487,8 @@ pub fn _limbs_mul_greater_to_out_toom_8h_input_sizes_valid(xs_len: usize, ys_len
         // This is the slowest variation
         half = false;
         n = 1 + ((xs_len - 1) >> 3);
-        s = xs_len as isize - 7 * n as isize;
-        t = ys_len as isize - 7 * n as isize;
+        s = isize::checked_from(xs_len).unwrap() - 7 * isize::checked_from(n).unwrap();
+        t = isize::checked_from(ys_len).unwrap() - 7 * isize::checked_from(n).unwrap();
     } else {
         if xs_len * 13 < 16 * ys_len {
             // xs_len < 16 / 13 * ys_len, half
@@ -3542,25 +3542,25 @@ pub fn _limbs_mul_greater_to_out_toom_8h_input_sizes_valid(xs_len: usize, ys_len
         p -= 1;
         q -= 1;
 
-        s = xs_len as isize - (p * n) as isize;
-        t = ys_len as isize - (q * n) as isize;
+        s = isize::checked_from(xs_len).unwrap() - (p * n) as isize;
+        t = isize::checked_from(ys_len).unwrap() - (q * n) as isize;
 
         if half {
             // Recover from badly chosen splitting
             if s < 1 {
-                s += n as isize;
+                s += isize::checked_from(n).unwrap();
                 half = false;
             } else if t < 1 {
-                t += n as isize;
+                t += isize::checked_from(n).unwrap();
                 half = false;
             }
         }
     }
     let limit = 15 * n + 6;
     0 < s
-        && s <= n as isize
+        && s <= isize::checked_from(n).unwrap()
         && 0 < t
-        && t <= n as isize
+        && t <= isize::checked_from(n).unwrap()
         && (half || s + t > 3)
         && n > 2
         && limit <= _limbs_mul_greater_to_out_toom_8h_scratch_size(xs_len, ys_len)
@@ -3628,13 +3628,15 @@ fn _limbs_mul_toom_8h_min_threshold() -> usize {
 
 // This is mpn_toom8_mul_n_itch from gmp-impl.h.
 pub(crate) fn _limbs_mul_same_length_to_out_toom_8h_scratch_size(n: usize) -> usize {
-    let itch = ((n as isize * 15) >> 3) - ((_limbs_mul_toom_8h_min_threshold() as isize * 15) >> 3)
-        + max(
-            ((_limbs_mul_toom_8h_min_threshold() * 15) >> 3) + Limb::WIDTH as usize * 6,
+    let itch = ((isize::checked_from(n).unwrap() * 15) >> 3)
+        - ((_limbs_mul_toom_8h_min_threshold() as isize * 15) >> 3)
+        + isize::checked_from(max(
+            ((_limbs_mul_toom_8h_min_threshold() * 15) >> 3)
+                + usize::wrapping_from(Limb::WIDTH) * 6,
             _limbs_mul_same_length_to_out_toom_6h_scratch_size(_limbs_mul_toom_8h_min_threshold()),
-        ) as isize;
-    assert!(itch >= 0);
-    itch as usize
+        ))
+        .unwrap();
+    usize::checked_from(itch).unwrap()
 }
 
 /// This function can be used to determine the length of the input `scratch` slice in
@@ -3708,8 +3710,8 @@ pub fn _limbs_mul_greater_to_out_toom_8h(
         n = 1 + ((xs_len - 1) >> 3);
         p = 7;
         q = 7;
-        s = xs_len as isize - 7 * n as isize;
-        t = ys_len as isize - 7 * n as isize;
+        s = isize::checked_from(xs_len).unwrap() - 7 * isize::checked_from(n).unwrap();
+        t = isize::checked_from(ys_len).unwrap() - 7 * isize::checked_from(n).unwrap();
     } else {
         if xs_len * 13 < 16 * ys_len {
             // xs_len < 16 / 13 * ys_len, half
@@ -3763,29 +3765,29 @@ pub fn _limbs_mul_greater_to_out_toom_8h(
         p -= 1;
         q -= 1;
 
-        s = xs_len as isize - (p * n) as isize;
-        t = ys_len as isize - (q * n) as isize;
+        s = isize::checked_from(xs_len).unwrap() - (p * n) as isize;
+        t = isize::checked_from(ys_len).unwrap() - (q * n) as isize;
 
         if half {
             // Recover from badly chosen splitting
             if s < 1 {
                 p -= 1;
-                s += n as isize;
+                s += isize::checked_from(n).unwrap();
                 half = false;
             } else if t < 1 {
                 q -= 1;
-                t += n as isize;
+                t += isize::checked_from(n).unwrap();
                 half = false;
             }
         }
     }
 
-    assert!(0 < s && s <= n as isize);
-    assert!(0 < t && t <= n as isize);
+    assert!(0 < s && s <= isize::checked_from(n).unwrap());
+    assert!(0 < t && t <= isize::checked_from(n).unwrap());
     assert!(half || s + t > 3);
     assert!(n > 2);
-    let s = s as usize;
-    let t = t as usize;
+    let s = usize::checked_from(s).unwrap();
+    let t = usize::checked_from(t).unwrap();
     let m = n + 1;
     let r = 3 * n + 1;
 

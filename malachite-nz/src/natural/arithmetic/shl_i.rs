@@ -323,3 +323,5 @@ impl_natural_shl_signed!(i8);
 impl_natural_shl_signed!(i16);
 impl_natural_shl_signed!(i32);
 impl_natural_shl_signed!(i64);
+impl_natural_shl_signed!(i128);
+impl_natural_shl_signed!(isize);

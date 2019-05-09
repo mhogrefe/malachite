@@ -38,7 +38,7 @@ use platform::Limb;
 /// assert_eq!(limbs_shr(&[4_294_967_295, 4_294_967_295], 32), &[4_294_967_295]);
 /// ```
 pub fn limbs_shr(limbs: &[Limb], bits: u64) -> Vec<Limb> {
-    let limbs_to_delete = (bits >> Limb::LOG_WIDTH) as usize;
+    let limbs_to_delete = usize::checked_from(bits >> Limb::LOG_WIDTH).unwrap();
     if limbs_to_delete >= limbs.len() {
         Vec::new()
     } else {
@@ -77,7 +77,7 @@ pub fn limbs_shr(limbs: &[Limb], bits: u64) -> Vec<Limb> {
 /// assert_eq!(limbs_shr_round_up(&[4_294_967_295, 4_294_967_295], 32), &[0, 1]);
 /// ```
 pub fn limbs_shr_round_up(limbs: &[Limb], bits: u64) -> Vec<Limb> {
-    let limbs_to_delete = (bits >> Limb::LOG_WIDTH) as usize;
+    let limbs_to_delete = usize::checked_from(bits >> Limb::LOG_WIDTH).unwrap();
     if limbs_to_delete >= limbs.len() {
         vec![1]
     } else {
@@ -95,7 +95,7 @@ pub fn limbs_shr_round_up(limbs: &[Limb], bits: u64) -> Vec<Limb> {
 }
 
 fn limbs_shr_round_half_integer_to_even(limbs: &[Limb], bits: u64) -> Vec<Limb> {
-    let limbs_to_delete = (bits >> Limb::LOG_WIDTH) as usize;
+    let limbs_to_delete = usize::checked_from(bits >> Limb::LOG_WIDTH).unwrap();
     if limbs_to_delete >= limbs.len() {
         Vec::new()
     } else {
@@ -375,7 +375,7 @@ pub fn limbs_slice_shr_in_place(limbs: &mut [Limb], bits: u32) -> Limb {
 /// assert_eq!(limbs, &[4_294_967_295]);
 /// ```
 pub fn limbs_vec_shr_in_place(limbs: &mut Vec<Limb>, bits: u64) {
-    let limbs_to_delete = (bits >> Limb::LOG_WIDTH) as usize;
+    let limbs_to_delete = usize::checked_from(bits >> Limb::LOG_WIDTH).unwrap();
     if limbs_to_delete >= limbs.len() {
         limbs.clear();
     } else {
@@ -446,7 +446,7 @@ pub fn limbs_vec_shr_in_place(limbs: &mut Vec<Limb>, bits: u64) {
 /// assert_eq!(limbs, &[0, 1]);
 /// ```
 pub fn limbs_vec_shr_round_up_in_place(limbs: &mut Vec<Limb>, bits: u64) {
-    let limbs_to_delete = (bits >> Limb::LOG_WIDTH) as usize;
+    let limbs_to_delete = usize::checked_from(bits >> Limb::LOG_WIDTH).unwrap();
     if limbs_to_delete >= limbs.len() {
         limbs.truncate(1);
         limbs[0] = 1;
@@ -464,7 +464,7 @@ pub fn limbs_vec_shr_round_up_in_place(limbs: &mut Vec<Limb>, bits: u64) {
 }
 
 fn limbs_vec_shr_round_half_integer_to_even_in_place(limbs: &mut Vec<Limb>, bits: u64) {
-    let limbs_to_delete = (bits >> Limb::LOG_WIDTH) as usize;
+    let limbs_to_delete = usize::checked_from(bits >> Limb::LOG_WIDTH).unwrap();
     if limbs_to_delete >= limbs.len() {
         limbs.clear();
     } else {
@@ -1018,3 +1018,4 @@ impl_natural_shr_unsigned!(u16);
 impl_natural_shr_unsigned!(u32);
 impl_natural_shr_unsigned!(u64);
 impl_natural_shr_unsigned!(u128);
+impl_natural_shr_unsigned!(usize);

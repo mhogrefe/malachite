@@ -1,5 +1,6 @@
 use std::cmp::Ordering;
 
+use malachite_base::conversion::{CheckedFrom, WrappingFrom};
 use malachite_base::num::integers::PrimitiveInteger;
 use malachite_base::num::traits::{NotAssign, Parity, WrappingAddAssign};
 
@@ -185,7 +186,7 @@ pub(crate) fn _limbs_mul_toom_evaluate_poly_in_1_and_neg_1(
         limbs_sub_same_length_to_out(v_neg_1, v_1, scratch);
     }
     limbs_slice_add_same_length_in_place_left(v_1, scratch);
-    let degree = degree as Limb;
+    let degree = Limb::checked_from(degree).unwrap();
     assert!(v_1[n] <= degree);
     assert!(v_neg_1[n] <= (degree >> 1) + 1);
     v_neg_1_neg
@@ -250,7 +251,7 @@ pub(crate) fn _limbs_mul_toom_evaluate_poly_in_2_and_neg_2(
     scratch: &mut [Limb],
 ) -> bool {
     assert!(degree >= 3);
-    assert!(degree < Limb::WIDTH as usize);
+    assert!(degree < usize::wrapping_from(Limb::WIDTH));
     assert_eq!(v_2.len(), n + 1);
     assert_eq!(scratch.len(), n + 1);
 
@@ -358,7 +359,7 @@ pub(crate) fn _limbs_mul_toom_evaluate_poly_in_2_pow_and_neg_2_pow(
     scratch: &mut [Limb],
 ) -> bool {
     assert!(degree >= 3);
-    let degree_u32 = degree as u32;
+    let degree_u32 = u32::checked_from(degree).unwrap();
     assert!(shift * degree_u32 < Limb::WIDTH);
     assert_eq!(v_2_pow.len(), n + 1);
     assert_eq!(scratch.len(), n + 1);
@@ -464,7 +465,7 @@ pub(crate) fn _limbs_mul_toom_evaluate_poly_in_2_pow_neg_and_neg_2_pow_neg(
 ) -> bool {
     assert_ne!(shift, 0); // or `_limbs_mul_toom_evaluate_poly_in_1_and_neg_1` should be used
     assert!(degree > 1);
-    let degree_u32 = degree as u32;
+    let degree_u32 = u32::checked_from(degree).unwrap();
     assert_eq!(v_2_pow_neg.len(), n + 1);
     assert_eq!(scratch.len(), n + 1);
     let coefficients: Vec<&[Limb]> = poly.chunks(n).collect();

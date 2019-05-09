@@ -268,8 +268,7 @@ macro_rules! float_impls {
                 let exponent = value.floor_log_two();
                 let shift = i32::checked_from(exponent).unwrap()
                     - i32::checked_from($f::MANTISSA_WIDTH).unwrap();
-                if shift >= 0 && !value.divisible_by_power_of_two(u64::checked_from(shift).unwrap())
-                {
+                if shift >= 0 && !value.divisible_by_power_of_two(u64::wrapping_from(shift)) {
                     return None;
                 }
                 value >>= shift;
@@ -318,8 +317,7 @@ macro_rules! float_impls {
                 let exponent = value.floor_log_two();
                 let shift = i32::checked_from(exponent).unwrap()
                     - i32::checked_from($f::MANTISSA_WIDTH).unwrap();
-                if shift >= 0 && !value.divisible_by_power_of_two(u64::checked_from(shift).unwrap())
-                {
+                if shift >= 0 && !value.divisible_by_power_of_two(u64::wrapping_from(shift)) {
                     return None;
                 }
                 let mut mantissa =

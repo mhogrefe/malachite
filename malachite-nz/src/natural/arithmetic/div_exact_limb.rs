@@ -1,4 +1,5 @@
 use malachite_base::comparison::Max;
+use malachite_base::conversion::CheckedFrom;
 #[cfg(feature = "64_bit_limbs")]
 use malachite_base::conversion::WrappingFrom;
 use malachite_base::num::integers::PrimitiveInteger;
@@ -37,7 +38,7 @@ const INVERT_LIMB_TABLE: [u8; INVERT_LIMB_TABLE_SIZE] = [
 /// ```
 pub fn test_invert_limb_table() {
     for (i, &inverse) in INVERT_LIMB_TABLE.iter().enumerate() {
-        let value = ((i as u8) << 1) + 1;
+        let value = (u8::checked_from(i).unwrap() << 1) + 1;
         let product = value.wrapping_mul(inverse);
         assert_eq!(
             product, 1,
@@ -70,7 +71,7 @@ pub fn test_invert_limb_table() {
 pub fn limbs_invert_limb(limb: Limb) -> Limb {
     assert!(limb.odd());
     let index = (limb >> 1).mod_power_of_two(INVERT_LIMB_TABLE_LOG_SIZE);
-    let mut inverse: Limb = INVERT_LIMB_TABLE[index as usize].into();
+    let mut inverse: Limb = INVERT_LIMB_TABLE[usize::checked_from(index).unwrap()].into();
     inverse = (inverse << 1).wrapping_sub((inverse * inverse).wrapping_mul(limb));
     inverse = (inverse << 1).wrapping_sub(inverse.wrapping_mul(inverse).wrapping_mul(limb));
     if cfg!(feature = "64_bit_limbs") {

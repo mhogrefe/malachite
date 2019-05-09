@@ -340,3 +340,4 @@ impl_integer_shr_unsigned!(u16);
 impl_integer_shr_unsigned!(u32);
 impl_integer_shr_unsigned!(u64);
 impl_integer_shr_unsigned!(u128);
+impl_integer_shr_unsigned!(usize);

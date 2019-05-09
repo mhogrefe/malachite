@@ -141,7 +141,7 @@ impl<'a> WrappingFrom<&'a Integer> for SignedLimb {
     /// }
     /// ```
     fn wrapping_from(value: &Integer) -> SignedLimb {
-        Limb::wrapping_from(value) as SignedLimb
+        SignedLimb::wrapping_from(Limb::wrapping_from(value))
     }
 }
 

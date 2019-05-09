@@ -1,5 +1,7 @@
-use malachite_base::num::traits::{CheckedSub, SplitInHalf};
-use malachite_base::num::traits::{SubMul, SubMulAssign, WrappingAddAssign};
+use malachite_base::conversion::CheckedFrom;
+use malachite_base::num::traits::{
+    CheckedSub, SplitInHalf, SubMul, SubMulAssign, WrappingAddAssign,
+};
 
 use natural::arithmetic::sub_limb::limbs_sub_limb_in_place;
 use natural::Natural::{self, Large, Small};
@@ -131,7 +133,10 @@ impl<'a, 'b> SubMul<&'a Natural, Limb> for &'b Natural {
             if a_limb_count == b_limb_count {
                 borrow != 0
             } else {
-                limbs_sub_limb_in_place(&mut a_limbs[b_limb_count as usize..], borrow)
+                limbs_sub_limb_in_place(
+                    &mut a_limbs[usize::checked_from(b_limb_count).unwrap()..],
+                    borrow,
+                )
             }
         };
         if nonzero_borrow {
@@ -223,7 +228,10 @@ pub(crate) fn sub_mul_assign_limb_helper(a: &mut Natural, b: &Natural, c: Limb) 
         if a_limb_count == b_limb_count {
             borrow != 0
         } else {
-            limbs_sub_limb_in_place(&mut a_limbs[b_limb_count as usize..], borrow)
+            limbs_sub_limb_in_place(
+                &mut a_limbs[usize::checked_from(b_limb_count).unwrap()..],
+                borrow,
+            )
         }
     };
     if !nonzero_borrow {

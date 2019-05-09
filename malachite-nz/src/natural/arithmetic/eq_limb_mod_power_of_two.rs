@@ -1,3 +1,4 @@
+use malachite_base::conversion::CheckedFrom;
 use malachite_base::num::integers::PrimitiveInteger;
 use malachite_base::num::traits::EqModPowerOfTwo;
 
@@ -29,7 +30,7 @@ use platform::Limb;
 /// assert_eq!(limbs_eq_limb_mod_power_of_two(&[0b1111011, 0b111001000], 0b1111011, 100), false);
 /// ```
 pub fn limbs_eq_limb_mod_power_of_two(limbs: &[Limb], limb: Limb, pow: u64) -> bool {
-    let i = (pow >> Limb::LOG_WIDTH) as usize;
+    let i = usize::checked_from(pow >> Limb::LOG_WIDTH).unwrap();
     if i >= limbs.len() {
         false
     } else if i == 0 {

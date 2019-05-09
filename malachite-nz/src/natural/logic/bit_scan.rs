@@ -1,4 +1,5 @@
 use malachite_base::comparison::Max;
+use malachite_base::conversion::{CheckedFrom, WrappingFrom};
 use malachite_base::limbs::limbs_leading_zero_limbs;
 use malachite_base::num::integers::PrimitiveInteger;
 use malachite_base::num::traits::BitScan;
@@ -31,7 +32,7 @@ use platform::Limb;
 /// assert_eq!(limbs_index_of_next_false_bit(&[0, 0b1011], 100), 100);
 /// ```
 pub fn limbs_index_of_next_false_bit(limbs: &[Limb], starting_index: u64) -> u64 {
-    let starting_limb_index = (starting_index >> Limb::LOG_WIDTH) as usize;
+    let starting_limb_index = usize::checked_from(starting_index >> Limb::LOG_WIDTH).unwrap();
     if starting_limb_index >= limbs.len() {
         return starting_index;
     }
@@ -39,11 +40,11 @@ pub fn limbs_index_of_next_false_bit(limbs: &[Limb], starting_index: u64) -> u64
         .index_of_next_false_bit(starting_index & u64::from(Limb::WIDTH_MASK))
     {
         if result != u64::from(Limb::WIDTH) {
-            return ((starting_limb_index as u64) << Limb::LOG_WIDTH) + result;
+            return (u64::wrapping_from(starting_limb_index) << Limb::LOG_WIDTH) + result;
         }
     }
     if starting_limb_index == limbs.len() - 1 {
-        return (limbs.len() as u64) << Limb::LOG_WIDTH;
+        return u64::wrapping_from(limbs.len()) << Limb::LOG_WIDTH;
     }
     let false_index = starting_limb_index
         + 1
@@ -53,9 +54,9 @@ pub fn limbs_index_of_next_false_bit(limbs: &[Limb], starting_index: u64) -> u64
             .count();
     let mut result_offset = false_index << Limb::LOG_WIDTH;
     if false_index != limbs.len() {
-        result_offset += (!limbs[false_index]).trailing_zeros() as usize;
+        result_offset += usize::wrapping_from((!limbs[false_index]).trailing_zeros());
     }
-    result_offset as u64
+    u64::wrapping_from(result_offset)
 }
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, finds the
@@ -86,14 +87,14 @@ pub fn limbs_index_of_next_false_bit(limbs: &[Limb], starting_index: u64) -> u64
 /// assert_eq!(limbs_index_of_next_true_bit(&[0, 0b1011], 100), None);
 /// ```
 pub fn limbs_index_of_next_true_bit(limbs: &[Limb], starting_index: u64) -> Option<u64> {
-    let starting_limb_index = (starting_index >> Limb::LOG_WIDTH) as usize;
+    let starting_limb_index = usize::checked_from(starting_index >> Limb::LOG_WIDTH).unwrap();
     if starting_limb_index >= limbs.len() {
         return None;
     }
     if let Some(result) = limbs[starting_limb_index]
         .index_of_next_true_bit(starting_index & u64::from(Limb::WIDTH_MASK))
     {
-        return Some(((starting_limb_index as u64) << Limb::LOG_WIDTH) + result);
+        return Some((u64::wrapping_from(starting_limb_index) << Limb::LOG_WIDTH) + result);
     }
     if starting_limb_index == limbs.len() - 1 {
         return None;
@@ -103,8 +104,12 @@ pub fn limbs_index_of_next_true_bit(limbs: &[Limb], starting_index: u64) -> Opti
     if true_index == limbs.len() {
         None
     } else {
-        let result_offset = true_index << Limb::LOG_WIDTH;
-        Some((result_offset + limbs[true_index].trailing_zeros() as usize) as u64)
+        let result_offset = u64::wrapping_from(true_index) << Limb::LOG_WIDTH;
+        Some(
+            result_offset
+                .checked_add(u64::from(limbs[true_index].trailing_zeros()))
+                .unwrap(),
+        )
     }
 }
 

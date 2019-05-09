@@ -1579,3 +1579,29 @@ tests_and_properties!(
     shifted,
     {}
 );
+tests_and_properties!(
+    usize,
+    test_shr_usize,
+    shr_usize_properties,
+    test_shr_round_usize,
+    shr_round_assign_usize_fail_1,
+    shr_round_assign_usize_fail_2,
+    shr_round_assign_usize_fail_3,
+    shr_round_assign_usize_fail_4,
+    shr_round_usize_fail_1,
+    shr_round_usize_fail_2,
+    shr_round_usize_fail_3,
+    shr_round_usize_fail_4,
+    shr_round_usize_ref_fail_1,
+    shr_round_usize_ref_fail_2,
+    shr_round_usize_ref_fail_3,
+    shr_round_usize_ref_fail_4,
+    shr_round_usize_properties,
+    u,
+    v,
+    out,
+    {},
+    n,
+    shifted,
+    {}
+);

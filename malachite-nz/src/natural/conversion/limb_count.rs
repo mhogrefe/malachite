@@ -1,3 +1,5 @@
+use malachite_base::conversion::WrappingFrom;
+
 use natural::Natural::{self, Large, Small};
 
 impl Natural {
@@ -26,7 +28,7 @@ impl Natural {
         match *self {
             Small(0) => 0,
             Small(_) => 1,
-            Large(ref limbs) => limbs.len() as u64,
+            Large(ref limbs) => u64::wrapping_from(limbs.len()),
         }
     }
 }

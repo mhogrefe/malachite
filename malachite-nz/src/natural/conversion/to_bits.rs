@@ -1,5 +1,6 @@
 use std::ops::Index;
 
+use malachite_base::conversion::CheckedFrom;
 use malachite_base::num::integers::PrimitiveInteger;
 use malachite_base::num::traits::{BitAccess, SignificantBits};
 
@@ -107,7 +108,7 @@ impl<'a> Iterator for BitIterator<'a> {
     /// }
     /// ```
     fn size_hint(&self) -> (usize, Option<usize>) {
-        let significant_bits = self.significant_bits as usize;
+        let significant_bits = usize::checked_from(self.significant_bits).unwrap();
         (significant_bits, Some(significant_bits))
     }
 }
@@ -249,7 +250,7 @@ impl Natural {
             return bits;
         }
         let limbs = self.limbs();
-        let last_index = self.limb_count() as usize - 1;
+        let last_index = usize::checked_from(self.limb_count()).unwrap() - 1;
         let mut last = limbs[last_index];
         for limb in limbs.take(last_index) {
             for i in 0..Limb::WIDTH.into() {

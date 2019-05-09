@@ -1,4 +1,5 @@
 use malachite_base::comparison::Max;
+use malachite_base::conversion::CheckedFrom;
 use malachite_base::num::integers::PrimitiveInteger;
 use malachite_base::num::traits::EqModPowerOfTwo;
 
@@ -8,7 +9,7 @@ use platform::Limb;
 
 fn limbs_eq_mod_power_of_two_neg_pos_greater(xs: &[Limb], ys: &[Limb], pow: u64) -> bool {
     let xs_len = xs.len();
-    let i = (pow >> Limb::LOG_WIDTH) as usize;
+    let i = usize::checked_from(pow >> Limb::LOG_WIDTH).unwrap();
     let small_pow = pow & u64::from(Limb::WIDTH_MASK);
     if i > xs_len || i == xs_len && small_pow != 0 {
         false

@@ -10,33 +10,39 @@ use inputs::natural::{
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_natural_shl_assign_i8);
     register_demo!(registry, demo_natural_shl_assign_i16);
-    register_demo!(registry, demo_natural_shl_assign_signed_limb);
+    register_demo!(registry, demo_natural_shl_assign_i32);
     register_demo!(registry, demo_natural_shl_assign_i64);
+    register_demo!(registry, demo_natural_shl_assign_isize);
 
     register_demo!(registry, demo_natural_shl_i8);
     register_demo!(registry, demo_natural_shl_i16);
-    register_demo!(registry, demo_natural_shl_signed_limb);
+    register_demo!(registry, demo_natural_shl_i32);
     register_demo!(registry, demo_natural_shl_i64);
+    register_demo!(registry, demo_natural_shl_isize);
 
     register_demo!(registry, demo_natural_shl_i8_ref);
     register_demo!(registry, demo_natural_shl_i16_ref);
-    register_demo!(registry, demo_natural_shl_signed_limb_ref);
+    register_demo!(registry, demo_natural_shl_i32_ref);
     register_demo!(registry, demo_natural_shl_i64_ref);
+    register_demo!(registry, demo_natural_shl_isize_ref);
 
     register_demo!(registry, demo_natural_shl_round_assign_i8);
     register_demo!(registry, demo_natural_shl_round_assign_i16);
-    register_demo!(registry, demo_natural_shl_round_assign_signed_limb);
+    register_demo!(registry, demo_natural_shl_round_assign_i32);
     register_demo!(registry, demo_natural_shl_round_assign_i64);
+    register_demo!(registry, demo_natural_shl_round_assign_isize);
 
     register_demo!(registry, demo_natural_shl_round_i8);
     register_demo!(registry, demo_natural_shl_round_i16);
-    register_demo!(registry, demo_natural_shl_round_signed_limb);
+    register_demo!(registry, demo_natural_shl_round_i32);
     register_demo!(registry, demo_natural_shl_round_i64);
+    register_demo!(registry, demo_natural_shl_round_isize);
 
     register_demo!(registry, demo_natural_shl_round_i8_ref);
     register_demo!(registry, demo_natural_shl_round_i16_ref);
-    register_demo!(registry, demo_natural_shl_round_signed_limb_ref);
+    register_demo!(registry, demo_natural_shl_round_i32_ref);
     register_demo!(registry, demo_natural_shl_round_i64_ref);
+    register_demo!(registry, demo_natural_shl_round_isize_ref);
 
     register_bench!(
         registry,
@@ -51,22 +57,24 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_bench!(
         registry,
         Large,
-        benchmark_natural_shl_signed_limb_evaluation_strategy
+        benchmark_natural_shl_i32_evaluation_strategy
     );
     register_bench!(
         registry,
         Large,
         benchmark_natural_shl_i64_evaluation_strategy
     );
-
-    register_bench!(registry, Large, benchmark_natural_shl_round_assign_i8);
-    register_bench!(registry, Large, benchmark_natural_shl_round_assign_i16);
     register_bench!(
         registry,
         Large,
-        benchmark_natural_shl_round_assign_signed_limb
+        benchmark_natural_shl_isize_evaluation_strategy
     );
+
+    register_bench!(registry, Large, benchmark_natural_shl_round_assign_i8);
+    register_bench!(registry, Large, benchmark_natural_shl_round_assign_i16);
+    register_bench!(registry, Large, benchmark_natural_shl_round_assign_i32);
     register_bench!(registry, Large, benchmark_natural_shl_round_assign_i64);
+    register_bench!(registry, Large, benchmark_natural_shl_round_assign_isize);
 
     register_bench!(
         registry,
@@ -81,23 +89,28 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_bench!(
         registry,
         Large,
-        benchmark_natural_shl_round_signed_limb_evaluation_strategy
+        benchmark_natural_shl_round_i32_evaluation_strategy
     );
     register_bench!(
         registry,
         Large,
         benchmark_natural_shl_round_i64_evaluation_strategy
     );
+    register_bench!(
+        registry,
+        Large,
+        benchmark_natural_shl_round_isize_evaluation_strategy
+    );
 
     register_bench!(
         registry,
         Large,
-        benchmark_natural_shl_assign_signed_limb_library_comparison
+        benchmark_natural_shl_assign_i32_library_comparison
     );
     register_bench!(
         registry,
         Large,
-        benchmark_natural_shl_signed_limb_library_comparison
+        benchmark_natural_shl_i32_library_comparison
     );
 }
 
@@ -279,15 +292,15 @@ demos_and_benches!(
 );
 demos_and_benches!(
     i32,
-    demo_natural_shl_assign_signed_limb,
-    demo_natural_shl_signed_limb,
-    demo_natural_shl_signed_limb_ref,
-    demo_natural_shl_round_assign_signed_limb,
-    demo_natural_shl_round_signed_limb,
-    demo_natural_shl_round_signed_limb_ref,
-    benchmark_natural_shl_signed_limb_evaluation_strategy,
-    benchmark_natural_shl_round_assign_signed_limb,
-    benchmark_natural_shl_round_signed_limb_evaluation_strategy
+    demo_natural_shl_assign_i32,
+    demo_natural_shl_i32,
+    demo_natural_shl_i32_ref,
+    demo_natural_shl_round_assign_i32,
+    demo_natural_shl_round_i32,
+    demo_natural_shl_round_i32_ref,
+    benchmark_natural_shl_i32_evaluation_strategy,
+    benchmark_natural_shl_round_assign_i32,
+    benchmark_natural_shl_round_i32_evaluation_strategy
 );
 demos_and_benches!(
     i64,
@@ -301,8 +314,20 @@ demos_and_benches!(
     benchmark_natural_shl_round_assign_i64,
     benchmark_natural_shl_round_i64_evaluation_strategy
 );
+demos_and_benches!(
+    isize,
+    demo_natural_shl_assign_isize,
+    demo_natural_shl_isize,
+    demo_natural_shl_isize_ref,
+    demo_natural_shl_round_assign_isize,
+    demo_natural_shl_round_isize,
+    demo_natural_shl_round_isize_ref,
+    benchmark_natural_shl_isize_evaluation_strategy,
+    benchmark_natural_shl_round_assign_isize,
+    benchmark_natural_shl_round_isize_evaluation_strategy
+);
 
-fn benchmark_natural_shl_assign_signed_limb_library_comparison(
+fn benchmark_natural_shl_assign_i32_library_comparison(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,
@@ -323,11 +348,7 @@ fn benchmark_natural_shl_assign_signed_limb_library_comparison(
     );
 }
 
-fn benchmark_natural_shl_signed_limb_library_comparison(
-    gm: GenerationMode,
-    limit: usize,
-    file_name: &str,
-) {
+fn benchmark_natural_shl_i32_library_comparison(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "Natural << i32",
         BenchmarkType::LibraryComparison,

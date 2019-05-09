@@ -80,7 +80,7 @@ macro_rules! signed_traits {
 
             #[inline]
             fn unsigned_abs(self) -> $ut {
-                $t::wrapping_abs(self) as $ut
+                $ut::wrapping_from($t::wrapping_abs(self))
             }
         }
 

@@ -48,14 +48,16 @@ pub trait PrimitiveUnsigned:
     + RemPowerOfTwoAssign
 {
     type SignedOfEqualWidth: PrimitiveSigned;
-
-    fn to_signed_checked(self) -> Option<Self::SignedOfEqualWidth>;
 }
 
 //TODO docs
 macro_rules! unsigned_traits {
-    ($t:ident, $log_width:expr) => {
+    ($t:ident, $s:ident, $log_width:expr) => {
         integer_traits!($t, $log_width);
+
+        impl PrimitiveUnsigned for $t {
+            type SignedOfEqualWidth = $s;
+        }
 
         impl OrdAbs for $t {
             #[inline]
@@ -481,91 +483,12 @@ macro_rules! unsigned_traits {
     };
 }
 
-//TODO docs
-impl PrimitiveUnsigned for u8 {
-    type SignedOfEqualWidth = i8;
-
-    #[inline]
-    fn to_signed_checked(self) -> Option<i8> {
-        if self <= i8::MAX as u8 {
-            Some(self as i8)
-        } else {
-            None
-        }
-    }
-}
-
-impl PrimitiveUnsigned for u16 {
-    type SignedOfEqualWidth = i16;
-
-    #[inline]
-    fn to_signed_checked(self) -> Option<i16> {
-        if self <= i16::MAX as u16 {
-            Some(self as i16)
-        } else {
-            None
-        }
-    }
-}
-
-impl PrimitiveUnsigned for u32 {
-    type SignedOfEqualWidth = i32;
-
-    #[inline]
-    fn to_signed_checked(self) -> Option<i32> {
-        if self <= i32::MAX as u32 {
-            Some(self as i32)
-        } else {
-            None
-        }
-    }
-}
-
-impl PrimitiveUnsigned for u64 {
-    type SignedOfEqualWidth = i64;
-
-    #[inline]
-    fn to_signed_checked(self) -> Option<i64> {
-        if self <= i64::MAX as u64 {
-            Some(self as i64)
-        } else {
-            None
-        }
-    }
-}
-
-impl PrimitiveUnsigned for u128 {
-    type SignedOfEqualWidth = i128;
-
-    #[inline]
-    fn to_signed_checked(self) -> Option<i128> {
-        if self <= i128::MAX as u128 {
-            Some(self as i128)
-        } else {
-            None
-        }
-    }
-}
-
-impl PrimitiveUnsigned for usize {
-    type SignedOfEqualWidth = isize;
-
-    #[inline]
-    fn to_signed_checked(self) -> Option<isize> {
-        if self <= isize::MAX as usize {
-            Some(self as isize)
-        } else {
-            None
-        }
-    }
-}
-
-unsigned_traits!(u8, 3);
-unsigned_traits!(u16, 4);
-unsigned_traits!(u32, 5);
-unsigned_traits!(u64, 6);
-unsigned_traits!(u128, 7);
-unsigned_traits!(usize, 0usize.trailing_zeros().trailing_zeros());
+unsigned_traits!(u8, i8, 3);
+unsigned_traits!(u16, i16, 4);
+unsigned_traits!(u32, i32, 5);
+unsigned_traits!(u64, i64, 6);
+unsigned_traits!(u128, i128, 7);
+unsigned_traits!(usize, isize, 0usize.trailing_zeros().trailing_zeros());
 
 /// Implements the constants 0, 1, and 2 for unsigned primitive integers.
 macro_rules! impl01_unsigned {
@@ -665,7 +588,7 @@ macro_rules! impl_halves_unsigned {
             /// ```
             #[inline]
             fn lower_half(&self) -> Self::Half {
-                *self as $ht
+                $ht::wrapping_from(*self)
             }
 
             /// Extracts the upper, or most significant half, of and unsigned integer.
@@ -685,7 +608,7 @@ macro_rules! impl_halves_unsigned {
             /// ```
             #[inline]
             fn upper_half(&self) -> Self::Half {
-                (self >> $ht::WIDTH) as $ht
+                $ht::wrapping_from(self >> $ht::WIDTH)
             }
         }
     };
@@ -844,27 +767,11 @@ round_shift_unsigned_unsigned!(usize, u128);
 round_shift_unsigned_unsigned!(usize, usize);
 
 //TODO doc and test
-impl FromU32Slice for u32 {
-    #[inline]
-    fn from_u32_slice(slice: &[u32]) -> Self {
-        assert!(!slice.is_empty());
-        slice[0]
-    }
-
-    #[inline]
-    fn copy_from_u32_slice(out_slice: &mut [u32], in_slice: &[u32]) {
-        let out_len = out_slice.len();
-        assert!(out_len >= in_slice.len());
-        out_slice.copy_from_slice(&in_slice[..out_len]);
-    }
-}
-
-//TODO doc and test
 impl FromU32Slice for u8 {
     #[inline]
     fn from_u32_slice(slice: &[u32]) -> Self {
         assert!(!slice.is_empty());
-        slice[0] as u8
+        u8::wrapping_from(slice[0])
     }
 
     fn copy_from_u32_slice(out_slice: &mut [u8], in_slice: &[u32]) {
@@ -889,7 +796,7 @@ impl FromU32Slice for u16 {
     #[inline]
     fn from_u32_slice(slice: &[u32]) -> Self {
         assert!(!slice.is_empty());
-        slice[0] as u16
+        u16::wrapping_from(slice[0])
     }
 
     fn copy_from_u32_slice(out_slice: &mut [u16], in_slice: &[u32]) {
@@ -902,6 +809,22 @@ impl FromU32Slice for u16 {
             out_slice[i + 1] = upper;
             i += 2;
         }
+    }
+}
+
+//TODO doc and test
+impl FromU32Slice for u32 {
+    #[inline]
+    fn from_u32_slice(slice: &[u32]) -> Self {
+        assert!(!slice.is_empty());
+        slice[0]
+    }
+
+    #[inline]
+    fn copy_from_u32_slice(out_slice: &mut [u32], in_slice: &[u32]) {
+        let out_len = out_slice.len();
+        assert!(out_len >= in_slice.len());
+        out_slice.copy_from_slice(&in_slice[..out_len]);
     }
 }
 
@@ -952,11 +875,33 @@ impl FromU32Slice for u128 {
 //TODO doc and test
 impl FromU32Slice for usize {
     #[inline]
-    fn from_u32_slice(_slice: &[u32]) -> Self {
-        unimplemented!()
+    fn from_u32_slice(slice: &[u32]) -> Self {
+        match usize::WIDTH {
+            u32::WIDTH => usize::wrapping_from(u32::from_u32_slice(slice)),
+            u64::WIDTH => usize::wrapping_from(u64::from_u32_slice(slice)),
+            _ => panic!("unexpected usize size: {}", usize::WIDTH),
+        }
     }
 
-    fn copy_from_u32_slice(_out_slice: &mut [usize], _in_slice: &[u32]) {
-        unimplemented!()
+    fn copy_from_u32_slice(out_slice: &mut [usize], in_slice: &[u32]) {
+        match usize::WIDTH {
+            u32::WIDTH => {
+                let out_len = out_slice.len();
+                assert!(out_len >= in_slice.len());
+                for (out, &x) in out_slice.iter_mut().zip(in_slice.iter()) {
+                    *out = usize::wrapping_from(x);
+                }
+            }
+            u64::WIDTH => {
+                let out_len = out_slice.len();
+                assert!(out_len >= in_slice.len() >> 1);
+                let mut i = 0;
+                for out in out_slice.iter_mut() {
+                    *out = usize::wrapping_from(u64::join_halves(in_slice[i + 1], in_slice[i]));
+                    i += 2;
+                }
+            }
+            _ => panic!("unexpected usize size: {}", usize::WIDTH),
+        }
     }
 }

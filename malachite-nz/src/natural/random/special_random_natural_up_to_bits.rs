@@ -1,5 +1,6 @@
 use std::cmp::max;
 
+use malachite_base::conversion::CheckedFrom;
 use malachite_base::num::traits::{ModPowerOfTwo, SaturatingSubAssign, ShrRound, Zero};
 use malachite_base::num::unsigneds::PrimitiveUnsigned;
 use malachite_base::round::RoundingMode;
@@ -39,9 +40,9 @@ use natural::Natural;
 ///     let seed: &[_] = &[1, 2, 3, 4];
 ///     let mut rng: StdRng = SeedableRng::from_seed(seed);
 ///     assert_eq!(limbs_special_random_up_to_bits::<u32, _>(&mut rng, 4), &[5]);
-///     assert_eq!(limbs_special_random_up_to_bits::<u32, _>(&mut rng, 10), &[1019]);
+///     assert_eq!(limbs_special_random_up_to_bits::<u32, _>(&mut rng, 10), &[1020]);
 ///     assert_eq!(limbs_special_random_up_to_bits::<u32, _>(&mut rng, 100),
-///         &[0, 4294965248, 4294967295, 15]);
+///         &[3940351, 4294965248, 4292870144, 15]);
 /// }
 /// ```
 pub fn limbs_special_random_up_to_bits<T: PrimitiveUnsigned, R: Rng>(
@@ -52,25 +53,26 @@ pub fn limbs_special_random_up_to_bits<T: PrimitiveUnsigned, R: Rng>(
     let remainder_bits = bits.mod_power_of_two(u64::from(T::LOG_WIDTH));
     let limb_count = bits.shr_round(T::LOG_WIDTH, RoundingMode::Ceiling);
     // Initialize the value to all binary 1s; later we'll remove chunks to create blocks of 0s.
-    let mut limbs = vec![T::MAX; limb_count as usize];
+    let mut limbs = vec![T::MAX; usize::checked_from(limb_count).unwrap()];
     // max_chunk_size may be as low as max(1, bits / 4) or as high as bits. The actual chunk size
     // will be between 1 and max_chunk_size, inclusive.
-    let max_chunk_size = max(1, (bits / (rng.gen_range(0, 4) + 1)) as u32);
+    let max_chunk_size = max(1, bits / (rng.gen_range(0, 4) + 1));
     let chunk_size_range = Range::new(1, max_chunk_size + 1);
     // Start i at a random position in the highest limb.
-    let mut i = ((limb_count as u32) << T::LOG_WIDTH) - rng.gen_range(0, T::WIDTH);
+    let mut i = (limb_count << T::LOG_WIDTH) - u64::from(rng.gen_range(0, T::WIDTH));
     loop {
         let mut chunk_size = chunk_size_range.ind_sample(rng);
         i.saturating_sub_assign(chunk_size);
         if i == 0 {
             break;
         }
-        limbs[(i >> T::LOG_WIDTH) as usize].clear_bit(u64::from(i & T::WIDTH_MASK));
+        limbs[usize::checked_from(i >> T::LOG_WIDTH).unwrap()]
+            .clear_bit(i & u64::from(T::WIDTH_MASK));
         chunk_size = chunk_size_range.ind_sample(rng);
         i.saturating_sub_assign(chunk_size);
         limbs_slice_add_limb_in_place(
-            &mut limbs[(i >> T::LOG_WIDTH) as usize..],
-            T::ONE << (i & T::WIDTH_MASK),
+            &mut limbs[usize::checked_from(i >> T::LOG_WIDTH).unwrap()..],
+            T::ONE << (i & u64::from(T::WIDTH_MASK)),
         );
         if i == 0 {
             break;
@@ -107,9 +109,9 @@ pub fn limbs_special_random_up_to_bits<T: PrimitiveUnsigned, R: Rng>(
 ///     let seed: &[_] = &[1, 2, 3, 4];
 ///     let mut rng: StdRng = SeedableRng::from_seed(seed);
 ///     assert_eq!(format!("{:b}", special_random_natural_up_to_bits(&mut rng, 4)), "101");
-///     assert_eq!(format!("{:b}", special_random_natural_up_to_bits(&mut rng, 10)), "1111111011");
+///     assert_eq!(format!("{:b}", special_random_natural_up_to_bits(&mut rng, 10)), "1111111100");
 ///     assert_eq!(format!("{:b}", special_random_natural_up_to_bits(&mut rng, 80)),
-///         "11111111100000000000000000000000000000000000000000000000000000000000000000000000");
+///         "10000000000000000000010000000000000000000001111111111111111111100011111111111111");
 /// }
 /// ```
 #[cfg(feature = "32_bit_limbs")]

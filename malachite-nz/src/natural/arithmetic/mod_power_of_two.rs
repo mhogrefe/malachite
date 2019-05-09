@@ -1,3 +1,4 @@
+use malachite_base::conversion::CheckedFrom;
 use malachite_base::num::integers::PrimitiveInteger;
 use malachite_base::num::traits::{
     Assign, ModPowerOfTwo, ModPowerOfTwoAssign, NegModPowerOfTwo, NegModPowerOfTwoAssign,
@@ -7,8 +8,6 @@ use malachite_base::num::traits::{
 use integer::conversion::to_twos_complement_limbs::limbs_twos_complement_in_place;
 use natural::Natural::{self, Large, Small};
 use platform::Limb;
-
-//TODO clean
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
 /// limbs of the `Natural` mod two raised to `pow`. Equivalently, retains only the least-significant
@@ -26,13 +25,16 @@ use platform::Limb;
 /// assert_eq!(limbs_mod_power_of_two(&[123, 456], 33), &[123, 0]);
 /// assert_eq!(limbs_mod_power_of_two(&[123, 456], 40), &[123, 200]);
 /// ```
+///
+/// This is mpz_tdiv_r_2exp from mpz/tdiv_r_2exp.c, where in is non-negative and the result is
+/// returned.
 pub fn limbs_mod_power_of_two(limbs: &[Limb], pow: u64) -> Vec<Limb> {
     if pow == 0 {
         return Vec::new();
     }
     let result_limb_count = pow >> Limb::LOG_WIDTH;
     let leftover_bits = pow & u64::from(Limb::WIDTH_MASK);
-    let result_limb_count = result_limb_count as usize;
+    let result_limb_count = usize::checked_from(result_limb_count).unwrap();
     if result_limb_count >= limbs.len() {
         return limbs.to_vec();
     }
@@ -67,6 +69,8 @@ pub fn limbs_mod_power_of_two(limbs: &[Limb], pow: u64) -> Vec<Limb> {
 /// limbs_mod_power_of_two_in_place(&mut limbs, 40);
 /// assert_eq!(limbs, &[123, 200]);
 /// ```
+///
+/// This is mpz_tdiv_r_2exp from mpz/tdiv_r_2exp.c, where in is non-negative and res == in.
 pub fn limbs_mod_power_of_two_in_place(limbs: &mut Vec<Limb>, pow: u64) {
     if pow == 0 {
         limbs.clear();
@@ -77,7 +81,7 @@ pub fn limbs_mod_power_of_two_in_place(limbs: &mut Vec<Limb>, pow: u64) {
     if leftover_bits != 0 {
         new_limb_count += 1;
     }
-    let new_limb_count = new_limb_count as usize;
+    let new_limb_count = usize::checked_from(new_limb_count).unwrap();
     if new_limb_count > limbs.len() {
         return;
     }
@@ -103,6 +107,9 @@ pub fn limbs_mod_power_of_two_in_place(limbs: &mut Vec<Limb>, pow: u64) {
 /// assert_eq!(limbs_neg_mod_power_of_two(&[123, 456], 33), &[4_294_967_173, 1]);
 /// assert_eq!(limbs_neg_mod_power_of_two(&[123, 456], 40), &[4_294_967_173, 55]);
 /// ```
+///
+/// This is mpz_tdiv_r_2exp from mpz/tdiv_r_2exp.c, where in is negative and the result is returned.
+/// `limbs` are the limbs of -in.
 pub fn limbs_neg_mod_power_of_two(limbs: &[Limb], pow: u64) -> Vec<Limb> {
     let mut result_limbs = limbs.to_vec();
     limbs_neg_mod_power_of_two_in_place(&mut result_limbs, pow);
@@ -133,8 +140,11 @@ pub fn limbs_neg_mod_power_of_two(limbs: &[Limb], pow: u64) -> Vec<Limb> {
 /// limbs_neg_mod_power_of_two_in_place(&mut limbs, 40);
 /// assert_eq!(limbs, &[4_294_967_173, 55]);
 /// ```
+///
+/// This is mpz_tdiv_r_2exp from mpz/tdiv_r_2exp.c, where in is negative and res == in. `limbs` are
+/// the limbs of -in.
 pub fn limbs_neg_mod_power_of_two_in_place(limbs: &mut Vec<Limb>, pow: u64) {
-    let mut new_limb_count = (pow >> Limb::LOG_WIDTH) as usize;
+    let mut new_limb_count = usize::checked_from(pow >> Limb::LOG_WIDTH).unwrap();
     let leftover_bits = pow & u64::from(Limb::WIDTH_MASK);
     if leftover_bits != 0 {
         new_limb_count += 1;

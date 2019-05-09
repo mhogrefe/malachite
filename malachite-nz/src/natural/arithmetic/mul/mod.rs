@@ -1,5 +1,6 @@
 use std::ops::{Mul, MulAssign};
 
+use malachite_base::conversion::WrappingFrom;
 use malachite_base::num::integers::PrimitiveInteger;
 
 use natural::arithmetic::add::limbs_slice_add_greater_in_place_left;
@@ -223,7 +224,7 @@ pub fn limbs_mul_greater_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> L
         // `limbs_mul_same_length_to_out` applies, perform basecase multiply directly.
         _limbs_mul_greater_to_out_basecase(out, xs, ys);
     } else if ys_len < MUL_TOOM33_THRESHOLD {
-        let toom_x2_scratch_size = 9 * ys_len / 2 + Limb::WIDTH as usize * 2;
+        let toom_x2_scratch_size = 9 * ys_len / 2 + usize::wrapping_from(Limb::WIDTH) * 2;
         let mut scratch = vec![0; toom_x2_scratch_size];
         if xs_len >= 3 * ys_len {
             _limbs_mul_greater_to_out_toom_42(out, &xs[..ys_len << 1], ys, &mut scratch);
@@ -269,7 +270,7 @@ pub fn limbs_mul_greater_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> L
         // Toom code).
         if ys_len < MUL_TOOM44_THRESHOLD || !toom44_ok(xs_len, ys_len) {
             // Use ToomX3 variants
-            let toom_x3_scratch_size = 4 * ys_len + Limb::WIDTH as usize;
+            let toom_x3_scratch_size = 4 * ys_len + usize::wrapping_from(Limb::WIDTH);
             let mut scratch = vec![0; toom_x3_scratch_size];
             if 2 * xs_len >= 5 * ys_len {
                 // The maximum scratch2 usage is for the `limbs_mul_to_out` result.

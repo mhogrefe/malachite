@@ -160,6 +160,6 @@ impl<'a> WrappingFrom<&'a Integer> for SignedDoubleLimb {
     /// }
     /// ```
     fn wrapping_from(value: &Integer) -> SignedDoubleLimb {
-        DoubleLimb::wrapping_from(value) as SignedDoubleLimb
+        SignedDoubleLimb::wrapping_from(DoubleLimb::wrapping_from(value))
     }
 }

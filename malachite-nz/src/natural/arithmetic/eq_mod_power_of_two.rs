@@ -1,5 +1,6 @@
 use std::cmp::Ordering;
 
+use malachite_base::conversion::{CheckedFrom, WrappingFrom};
 use malachite_base::num::integers::PrimitiveInteger;
 use malachite_base::num::traits::EqModPowerOfTwo;
 
@@ -9,7 +10,7 @@ use platform::Limb;
 
 // xs.len() == ys.len()
 fn limbs_eq_mod_power_of_two_same_length(xs: &[Limb], ys: &[Limb], pow: u64) -> bool {
-    let i = (pow >> Limb::LOG_WIDTH) as usize;
+    let i = usize::checked_from(pow >> Limb::LOG_WIDTH).unwrap();
     let len = xs.len();
     if i >= len {
         xs == ys
@@ -20,7 +21,7 @@ fn limbs_eq_mod_power_of_two_same_length(xs: &[Limb], ys: &[Limb], pow: u64) -> 
 
 // xs.len() > ys.len()
 fn limbs_eq_mod_power_of_two_greater(xs: &[Limb], ys: &[Limb], pow: u64) -> bool {
-    let i = (pow >> Limb::LOG_WIDTH) as usize;
+    let i = usize::checked_from(pow >> Limb::LOG_WIDTH).unwrap();
     let xs_len = xs.len();
     let ys_len = ys.len();
     if i >= xs_len {
@@ -29,7 +30,7 @@ fn limbs_eq_mod_power_of_two_greater(xs: &[Limb], ys: &[Limb], pow: u64) -> bool
         &xs[..ys_len] == ys
             && limbs_divisible_by_power_of_two(
                 &xs[ys_len..],
-                pow - u64::from(Limb::WIDTH) * ys_len as u64,
+                pow - u64::from(Limb::WIDTH) * u64::wrapping_from(ys_len),
             )
     } else {
         xs[..i] == ys[..i] && xs[i].eq_mod_power_of_two(ys[i], pow & u64::from(Limb::WIDTH_MASK))

@@ -1,3 +1,4 @@
+use malachite_base::conversion::CheckedFrom;
 use malachite_base::limbs::{limbs_leading_zero_limbs, limbs_test_zero};
 use malachite_base::num::integers::PrimitiveInteger;
 use malachite_base::num::traits::{BitAccess, WrappingAddAssign, WrappingNegAssign};
@@ -32,7 +33,7 @@ use platform::Limb;
 /// assert_eq!(limbs_get_bit_neg(&[0, 0b1011], 100), true);
 /// ```
 pub fn limbs_get_bit_neg(limbs: &[Limb], index: u64) -> bool {
-    let limb_index = (index >> Limb::LOG_WIDTH) as usize;
+    let limb_index = usize::checked_from(index >> Limb::LOG_WIDTH).unwrap();
     if limb_index >= limbs.len() {
         // We're indexing into the infinite suffix of 1s
         true
@@ -69,7 +70,7 @@ pub fn limbs_get_bit_neg(limbs: &[Limb], index: u64) -> bool {
 /// assert_eq!(limbs, &[1, 2, 1]);
 /// ```
 pub fn limbs_set_bit_neg(limbs: &mut [Limb], index: u64) {
-    let limb_index = (index >> Limb::LOG_WIDTH) as usize;
+    let limb_index = usize::checked_from(index >> Limb::LOG_WIDTH).unwrap();
     if limb_index >= limbs.len() {
         return;
     }
@@ -132,7 +133,7 @@ fn limbs_clear_bit_neg_helper(limbs: &mut [Limb], limb_index: usize, reduced_ind
 /// assert_eq!(limbs, &[4, 2, 1]);
 /// ```
 pub fn limbs_slice_clear_bit_neg(limbs: &mut [Limb], index: u64) {
-    let limb_index = (index >> Limb::LOG_WIDTH) as usize;
+    let limb_index = usize::checked_from(index >> Limb::LOG_WIDTH).unwrap();
     let reduced_index = index & u64::from(Limb::WIDTH_MASK);
     if limb_index < limbs.len() {
         if limbs_clear_bit_neg_helper(limbs, limb_index, reduced_index) {
@@ -165,7 +166,7 @@ pub fn limbs_slice_clear_bit_neg(limbs: &mut [Limb], index: u64) {
 /// assert_eq!(limbs, &[0, 0, 0, 1]);
 /// ```
 pub fn limbs_vec_clear_bit_neg(limbs: &mut Vec<Limb>, index: u64) {
-    let limb_index = (index >> Limb::LOG_WIDTH) as usize;
+    let limb_index = usize::checked_from(index >> Limb::LOG_WIDTH).unwrap();
     let reduced_index = index & u64::from(Limb::WIDTH_MASK);
     if limb_index < limbs.len() {
         if limbs_clear_bit_neg_helper(limbs, limb_index, reduced_index) {

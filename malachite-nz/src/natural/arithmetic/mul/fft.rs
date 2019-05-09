@@ -1,5 +1,6 @@
 use std::cmp::{max, Ordering};
 
+use malachite_base::conversion::{CheckedFrom, WrappingFrom};
 use malachite_base::limbs::limbs_set_zero;
 use malachite_base::num::integers::PrimitiveInteger;
 use malachite_base::num::traits::{One, Parity, ShrRound, WrappingAddAssign, WrappingSubAssign};
@@ -46,7 +47,7 @@ pub fn _limbs_mul_greater_to_out_fft_input_sizes_threshold(xs_len: usize, ys_len
 ///
 /// This is mpn_fft_next_size from mpn/generic/mul-fft.c.
 pub(crate) fn mpn_fft_next_size(pl: usize, k: usize) -> usize {
-    pl.shr_round(k as u64, RoundingMode::Ceiling) << k
+    pl.shr_round(u64::wrapping_from(k), RoundingMode::Ceiling) << k
 }
 
 struct FFTTableNK {
@@ -494,7 +495,7 @@ pub(crate) fn _limbs_mul_fft_best_k(n: usize, square: bool) -> usize {
     let mut last_k = fft_table[0].k;
     for entry in &fft_table[1..] {
         let threshold = entry.n << last_k;
-        if n <= threshold as usize {
+        if n <= usize::checked_from(threshold).unwrap() {
             break;
         }
         last_k = entry.k;
@@ -559,7 +560,7 @@ fn _limbs_mul_fft_bit_reverse_table(mut scratch: &mut [usize], k: usize) -> Vec<
 ///
 /// This is mpn_mul_fft_lcm from mpn/generic/mul_fft.c.
 fn _limbs_mul_fft_lcm_of_a_and_two_pow_k(a: usize, k: usize) -> usize {
-    a << k.saturating_sub(a.trailing_zeros() as usize)
+    a << k.saturating_sub(usize::checked_from(a.trailing_zeros()).unwrap())
 }
 
 /// Given xs with xs[n] <= 1, reduce it modulo 2<sup>n * Limb::WIDTH</sup> + 1, by subtracting that
@@ -654,8 +655,8 @@ fn _limbs_mul_fft_sub_mod_f_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
 /// This is mpn_fft_mul_2exp_modF from mpn/generic/mul_fft.c.
 fn _limbs_mul_fft_shl_mod_f_to_out(out: &mut [Limb], xs: &[Limb], bits: usize) {
     let n = xs.len() - 1;
-    let small_bits = bits as u32 & Limb::WIDTH_MASK;
-    let mut shift_limbs = bits >> Limb::LOG_WIDTH as usize;
+    let small_bits = u32::wrapping_from(bits) & Limb::WIDTH_MASK;
+    let mut shift_limbs = bits >> usize::wrapping_from(Limb::LOG_WIDTH);
     // negate
     if shift_limbs >= n {
         // out[0..shift_limbs - 1]  <-- xs[n - shift_limbs..n - 1] << small_bits
@@ -1036,7 +1037,7 @@ fn _limbs_mul_fft_mul_mod_f_k(xss: &mut [&mut [Limb]], yss: &mut [&mut [Limb]]) 
         let k = _limbs_mul_fft_best_k(n, false);
         let two_pow_k = 1 << k;
         assert_eq!(n & (two_pow_k - 1), 0);
-        let max_two_pow_k_width = max(two_pow_k, Limb::WIDTH as usize);
+        let max_two_pow_k_width = max(two_pow_k, usize::wrapping_from(Limb::WIDTH));
         let m = n << Limb::LOG_WIDTH >> k;
         let p = n >> k;
         let mut q =
@@ -1136,7 +1137,7 @@ fn _limbs_mul_fft_mul_mod_f_k_square(xss: &mut [&mut [Limb]]) {
         let k = _limbs_mul_fft_best_k(n, false);
         let two_pow_k = 1 << k;
         assert_eq!(n & (two_pow_k - 1), 0);
-        let max_k_pow_2_width = max(two_pow_k, Limb::WIDTH as usize);
+        let max_k_pow_2_width = max(two_pow_k, usize::wrapping_from(Limb::WIDTH));
         let m = n << Limb::LOG_WIDTH >> k;
         let p = n >> k;
         let mut q = (2 * m + k + 2 + max_k_pow_2_width) / max_k_pow_2_width * max_k_pow_2_width;
@@ -1314,7 +1315,7 @@ pub fn _limbs_mul_fft_internal(
             carry += 1;
         }
         // scratch = (i + 1) * 2 ^ (2 * M)
-        let i_plus_one = i as Limb + 1;
+        let i_plus_one = Limb::checked_from(i).unwrap() + 1;
         if 2 * a < width {
             scratch_lo[2 * a] = i_plus_one;
         } else {
@@ -1369,7 +1370,8 @@ pub(crate) fn _limbs_mul_fft(
     let m = n >> k; // n == 2 ^ k * m
     let a = 1 + ((m - 1) >> Limb::LOG_WIDTH);
     // LCM(Limb::WIDTH, 2 ^ k)
-    let lcm_with_two_pow_k = _limbs_mul_fft_lcm_of_a_and_two_pow_k(Limb::WIDTH as usize, k);
+    let lcm_with_two_pow_k =
+        _limbs_mul_fft_lcm_of_a_and_two_pow_k(usize::wrapping_from(Limb::WIDTH), k);
     let mut big_width_minus_one = (1 + (2 * m + k + 2) / lcm_with_two_pow_k) * lcm_with_two_pow_k;
     // width - 1 = ceil((2 * m + k + 3) / lcm_with_two_pow_k) * lcm_with_two_pow_k;
     let mut width_minus_one = big_width_minus_one >> Limb::LOG_WIDTH;
@@ -1387,7 +1389,7 @@ pub(crate) fn _limbs_mul_fft(
                 break;
             }
             width_minus_one = (width_minus_one + shifted_k - 1) & shifted_k.wrapping_neg();
-            big_width_minus_one = width_minus_one << Limb::LOG_WIDTH as usize;
+            big_width_minus_one = width_minus_one << usize::wrapping_from(Limb::LOG_WIDTH);
             // warning: since width_minus_one changed, shifted_k may change too!
         }
     }

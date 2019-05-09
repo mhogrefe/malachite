@@ -1,6 +1,7 @@
 use std::cmp::min;
 
 use malachite_base::comparison::Max;
+use malachite_base::conversion::{CheckedFrom, WrappingFrom};
 use malachite_base::limbs::limbs_test_zero;
 use malachite_base::num::integers::PrimitiveInteger;
 use malachite_base::num::traits::Parity;
@@ -248,7 +249,7 @@ pub fn _limbs_mul_mod_limb_width_to_n_minus_1(
                 if carry {
                     assert!(!limbs_slice_add_limb_in_place(scratch_2, 1));
                 }
-                anp = half_n + *scratch_2.last_mut().unwrap() as usize;
+                anp = half_n + usize::checked_from(*scratch_2.last_mut().unwrap()).unwrap();
 
                 if !bp1_is_ys_0 {
                     let (ys_0, ys_1) = ys.split_at(half_n);
@@ -257,7 +258,7 @@ pub fn _limbs_mul_mod_limb_width_to_n_minus_1(
                     if carry {
                         assert!(!limbs_slice_add_limb_in_place(scratch_3, 1));
                     }
-                    bnp = half_n + *scratch_3.last_mut().unwrap() as usize;
+                    bnp = half_n + usize::checked_from(*scratch_3.last_mut().unwrap()).unwrap();
                 }
             }
 
@@ -266,7 +267,7 @@ pub fn _limbs_mul_mod_limb_width_to_n_minus_1(
             } else {
                 min(
                     _limbs_mul_fft_best_k(half_n, false),
-                    half_n.trailing_zeros() as usize,
+                    usize::wrapping_from(half_n.trailing_zeros()),
                 )
             };
             if k >= FFT_FIRST_K {

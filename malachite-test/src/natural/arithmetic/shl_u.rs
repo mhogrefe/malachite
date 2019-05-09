@@ -21,18 +21,21 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
 
     register_demo!(registry, demo_natural_shl_assign_u8);
     register_demo!(registry, demo_natural_shl_assign_u16);
-    register_demo!(registry, demo_natural_shl_assign_limb);
+    register_demo!(registry, demo_natural_shl_assign_u32);
     register_demo!(registry, demo_natural_shl_assign_u64);
+    register_demo!(registry, demo_natural_shl_assign_usize);
 
     register_demo!(registry, demo_natural_shl_u8);
     register_demo!(registry, demo_natural_shl_u16);
-    register_demo!(registry, demo_natural_shl_limb);
+    register_demo!(registry, demo_natural_shl_u32);
     register_demo!(registry, demo_natural_shl_u64);
+    register_demo!(registry, demo_natural_shl_usize);
 
     register_demo!(registry, demo_natural_shl_u8_ref);
     register_demo!(registry, demo_natural_shl_u16_ref);
-    register_demo!(registry, demo_natural_shl_limb_ref);
+    register_demo!(registry, demo_natural_shl_u32_ref);
     register_demo!(registry, demo_natural_shl_u64_ref);
+    register_demo!(registry, demo_natural_shl_usize_ref);
 
     register_bench!(registry, Small, benchmark_limbs_shl);
     register_bench!(registry, Small, benchmark_limbs_shl_to_out);
@@ -42,12 +45,12 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_bench!(
         registry,
         Large,
-        benchmark_natural_shl_assign_limb_library_comparison
+        benchmark_natural_shl_assign_u32_library_comparison
     );
     register_bench!(
         registry,
         Large,
-        benchmark_natural_shl_limb_library_comparison
+        benchmark_natural_shl_u32_library_comparison
     );
 
     register_bench!(
@@ -63,12 +66,17 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_bench!(
         registry,
         Large,
-        benchmark_natural_shl_limb_evaluation_strategy
+        benchmark_natural_shl_u32_evaluation_strategy
     );
     register_bench!(
         registry,
         Large,
         benchmark_natural_shl_u64_evaluation_strategy
+    );
+    register_bench!(
+        registry,
+        Large,
+        benchmark_natural_shl_usize_evaluation_strategy
     );
 }
 
@@ -193,10 +201,10 @@ demos_and_benches!(
 );
 demos_and_benches!(
     u32,
-    demo_natural_shl_assign_limb,
-    demo_natural_shl_limb,
-    demo_natural_shl_limb_ref,
-    benchmark_natural_shl_limb_evaluation_strategy
+    demo_natural_shl_assign_u32,
+    demo_natural_shl_u32,
+    demo_natural_shl_u32_ref,
+    benchmark_natural_shl_u32_evaluation_strategy
 );
 demos_and_benches!(
     u64,
@@ -204,6 +212,13 @@ demos_and_benches!(
     demo_natural_shl_u64,
     demo_natural_shl_u64_ref,
     benchmark_natural_shl_u64_evaluation_strategy
+);
+demos_and_benches!(
+    usize,
+    demo_natural_shl_assign_usize,
+    demo_natural_shl_usize,
+    demo_natural_shl_usize_ref,
+    benchmark_natural_shl_usize_evaluation_strategy
 );
 
 fn benchmark_limbs_shl(gm: GenerationMode, limit: usize, file_name: &str) {
@@ -274,7 +289,7 @@ fn benchmark_limbs_vec_shl_in_place(gm: GenerationMode, limit: usize, file_name:
     );
 }
 
-fn benchmark_natural_shl_assign_limb_library_comparison(
+fn benchmark_natural_shl_assign_u32_library_comparison(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,
@@ -295,11 +310,7 @@ fn benchmark_natural_shl_assign_limb_library_comparison(
     );
 }
 
-fn benchmark_natural_shl_limb_library_comparison(
-    gm: GenerationMode,
-    limit: usize,
-    file_name: &str,
-) {
+fn benchmark_natural_shl_u32_library_comparison(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "Natural << u32",
         BenchmarkType::LibraryComparison,

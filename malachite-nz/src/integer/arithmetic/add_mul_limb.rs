@@ -1,6 +1,7 @@
 use std::cmp::{max, min};
 
 use malachite_base::comparison::Max;
+use malachite_base::conversion::WrappingFrom;
 use malachite_base::limbs::limbs_test_zero;
 use malachite_base::num::traits::{
     AddMul, AddMulAssign, NegAssign, NotAssign, WrappingAddAssign, WrappingSubAssign,
@@ -424,12 +425,12 @@ pub(crate) fn mpz_aorsmul_1(
     if sub {
         // addmul of absolute values
         let mut cy = limbs_slice_add_mul_limb_greater_in_place_left(w, &x[..min_size], y);
-        let mut dsize = xsize as isize - wsize as isize;
+        let mut dsize = isize::wrapping_from(xsize) - isize::wrapping_from(wsize);
         if dsize != 0 {
             let cy2 = if dsize > 0 {
                 limbs_mul_limb_to_out(
                     &mut w[min_size..],
-                    &x[min_size..min_size + dsize as usize],
+                    &x[min_size..min_size + usize::wrapping_from(dsize)],
                     y,
                 )
             } else {
@@ -437,14 +438,16 @@ pub(crate) fn mpz_aorsmul_1(
                 0
             };
             cy = cy2
-                + if limbs_slice_add_limb_in_place(&mut w[min_size..min_size + dsize as usize], cy)
-                {
+                + if limbs_slice_add_limb_in_place(
+                    &mut w[min_size..min_size + usize::wrapping_from(dsize)],
+                    cy,
+                ) {
                     1
                 } else {
                     0
                 };
         }
-        let dsize = dsize as usize;
+        let dsize = usize::wrapping_from(dsize);
         w[min_size + dsize] = cy;
     } else {
         // submul of absolute values

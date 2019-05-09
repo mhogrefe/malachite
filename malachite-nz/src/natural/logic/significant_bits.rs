@@ -1,3 +1,4 @@
+use malachite_base::conversion::WrappingFrom;
 use malachite_base::num::integers::PrimitiveInteger;
 use malachite_base::num::traits::SignificantBits;
 
@@ -29,7 +30,8 @@ use platform::Limb;
 ///
 /// This is mpz_sizeinbase from mpz/sizeinbase.c, where x is non-negative and base is 2.
 pub fn limbs_significant_bits(limbs: &[Limb]) -> u64 {
-    ((limbs.len() as u64 - 1) << Limb::LOG_WIDTH) + limbs.last().unwrap().significant_bits()
+    ((u64::wrapping_from(limbs.len()) - 1) << Limb::LOG_WIDTH)
+        + limbs.last().unwrap().significant_bits()
 }
 
 impl<'a> SignificantBits for &'a Natural {

@@ -338,3 +338,4 @@ impl_integer_shl_signed!(i16);
 impl_integer_shl_signed!(i32);
 impl_integer_shl_signed!(i64);
 impl_integer_shl_signed!(i128);
+impl_integer_shl_signed!(isize);

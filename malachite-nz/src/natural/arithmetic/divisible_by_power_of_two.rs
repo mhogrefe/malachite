@@ -1,3 +1,4 @@
+use malachite_base::conversion::CheckedFrom;
 use malachite_base::limbs::limbs_test_zero;
 use malachite_base::num::integers::PrimitiveInteger;
 use malachite_base::num::traits::DivisibleByPowerOfTwo;
@@ -29,7 +30,7 @@ use platform::Limb;
 ///
 /// This is mpz_divisible_2exp_p from mpz/divis_2exp.c, where a is non-negative.
 pub fn limbs_divisible_by_power_of_two(limbs: &[Limb], pow: u64) -> bool {
-    let zero_limbs = (pow >> Limb::LOG_WIDTH) as usize;
+    let zero_limbs = usize::checked_from(pow >> Limb::LOG_WIDTH).unwrap();
     zero_limbs < limbs.len()
         && limbs_test_zero(&limbs[..zero_limbs])
         && limbs[zero_limbs].divisible_by_power_of_two(pow & u64::from(Limb::WIDTH_MASK))

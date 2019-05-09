@@ -27,7 +27,7 @@ use platform::Limb;
 /// ```
 pub fn limbs_shl(limbs: &[Limb], bits: u64) -> Vec<Limb> {
     let small_bits = u32::wrapping_from(bits) & Limb::WIDTH_MASK;
-    let mut shifted_limbs = vec![0; (bits >> Limb::LOG_WIDTH) as usize];
+    let mut shifted_limbs = vec![0; usize::checked_from(bits >> Limb::LOG_WIDTH).unwrap()];
     if small_bits == 0 {
         shifted_limbs.extend_from_slice(limbs);
     } else {
@@ -152,7 +152,11 @@ pub fn limbs_vec_shl_in_place(limbs: &mut Vec<Limb>, bits: u64) {
     } else {
         limbs_slice_shl_in_place(limbs, small_bits)
     };
-    limbs_pad_left(limbs, (bits >> Limb::LOG_WIDTH) as usize, 0);
+    limbs_pad_left(
+        limbs,
+        usize::checked_from(bits >> Limb::LOG_WIDTH).unwrap(),
+        0,
+    );
     if remaining_bits != 0 {
         limbs.push(remaining_bits);
     }
@@ -316,3 +320,4 @@ impl_natural_shl_unsigned!(u16);
 impl_natural_shl_unsigned!(u32);
 impl_natural_shl_unsigned!(u64);
 impl_natural_shl_unsigned!(u128);
+impl_natural_shl_unsigned!(usize);

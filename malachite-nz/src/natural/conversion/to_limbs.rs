@@ -1,5 +1,7 @@
 use std::ops::Index;
 
+use malachite_base::conversion::CheckedFrom;
+
 use natural::Natural::{self, Large, Small};
 use platform::Limb;
 
@@ -56,7 +58,7 @@ impl<'a> Iterator for LimbIterator<'a> {
         if self.some_remaining {
             let limb = match *self.n {
                 Small(small) => small,
-                Large(ref limbs) => limbs[self.i as usize],
+                Large(ref limbs) => limbs[usize::checked_from(self.i).unwrap()],
             };
             if self.i == self.j {
                 self.some_remaining = false;
@@ -126,7 +128,7 @@ impl<'a> DoubleEndedIterator for LimbIterator<'a> {
         if self.some_remaining {
             let limb = match *self.n {
                 Small(small) => small,
-                Large(ref limbs) => limbs[self.j as usize],
+                Large(ref limbs) => limbs[usize::checked_from(self.j).unwrap()],
             };
             if self.j == self.i {
                 self.some_remaining = false;
@@ -375,7 +377,7 @@ impl Natural {
         let limb_count = self.limb_count();
         LimbIterator {
             n: self,
-            limb_count: limb_count as usize,
+            limb_count: usize::checked_from(limb_count).unwrap(),
             some_remaining: limb_count != 0,
             i: 0,
             j: limb_count.saturating_sub(1),

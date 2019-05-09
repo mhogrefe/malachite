@@ -1,6 +1,7 @@
 use std::cmp::{max, min, Ordering};
 
 use malachite_base::comparison::Max;
+use malachite_base::conversion::CheckedFrom;
 use malachite_base::num::integers::PrimitiveInteger;
 use malachite_base::num::traits::{JoinHalves, SplitInHalf, WrappingAddAssign, WrappingSubAssign};
 
@@ -549,7 +550,7 @@ pub fn mpn_dcpi1_div_qr(qp: &mut [Limb], np: &mut [Limb], dp: &[Limb], dinv: Lim
             }
         }
 
-        let mut qn = (nn - dn - qn) as isize;
+        let mut qn = isize::checked_from(nn - dn - qn).unwrap();
         assert!(qn >= 0);
         loop {
             qp_offset -= dn;
@@ -561,7 +562,7 @@ pub fn mpn_dcpi1_div_qr(qp: &mut [Limb], np: &mut [Limb], dp: &[Limb], dinv: Lim
                 dinv,
                 &mut tp,
             );
-            qn -= dn as isize;
+            qn -= isize::checked_from(dn).unwrap();
             if qn <= 0 {
                 break;
             }
@@ -658,7 +659,7 @@ pub fn mpn_mu_div_qr_choose_in(qn: usize, dn: usize, k: Limb) -> usize {
         }
     } else {
         let xn = min(dn, qn);
-        (xn - 1) / (k as usize) + 1
+        (xn - 1) / usize::checked_from(k).unwrap() + 1
     }
 }
 

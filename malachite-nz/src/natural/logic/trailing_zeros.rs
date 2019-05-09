@@ -1,3 +1,4 @@
+use malachite_base::conversion::WrappingFrom;
 use malachite_base::limbs::limbs_leading_zero_limbs;
 use malachite_base::num::integers::PrimitiveInteger;
 
@@ -27,7 +28,7 @@ use platform::Limb;
 pub fn limbs_trailing_zeros(limbs: &[Limb]) -> u64 {
     let zero_limbs = limbs_leading_zero_limbs(limbs);
     let remaining_zeros = u64::from(limbs[zero_limbs].trailing_zeros());
-    ((zero_limbs as u64) << Limb::LOG_WIDTH) + remaining_zeros
+    (u64::wrapping_from(zero_limbs) << Limb::LOG_WIDTH) + remaining_zeros
 }
 
 impl Natural {

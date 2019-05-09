@@ -380,3 +380,15 @@ tests_and_properties!(
     shifted,
     {}
 );
+tests_and_properties!(
+    usize,
+    test_shl_usize,
+    shl_usize_properties,
+    u,
+    v,
+    out,
+    {},
+    n,
+    shifted,
+    {}
+);

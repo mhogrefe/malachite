@@ -1,4 +1,5 @@
 use malachite_base::comparison::Max;
+use malachite_base::conversion::{CheckedFrom, WrappingFrom};
 use malachite_base::limbs::limbs_leading_zero_limbs;
 use malachite_base::num::integers::PrimitiveInteger;
 
@@ -44,17 +45,17 @@ impl<'a> Iterator for NegativeLimbIterator<'a> {
     ///
     /// Additional memory: worst case O(1)
     fn next(&mut self) -> Option<Limb> {
-        let previous_i = self.limbs.i as u64;
+        let previous_i = u64::wrapping_from(self.limbs.i);
         self.limbs.next().map(|limb| {
             if let Some(first_nonzero_index) = self.first_nonzero_index {
-                if previous_i <= first_nonzero_index as u64 {
+                if previous_i <= u64::wrapping_from(first_nonzero_index) {
                     limb.wrapping_neg()
                 } else {
                     !limb
                 }
             } else {
                 if limb != 0 {
-                    self.first_nonzero_index = Some(previous_i as usize);
+                    self.first_nonzero_index = Some(usize::checked_from(previous_i).unwrap());
                 }
                 limb.wrapping_neg()
             }
@@ -84,7 +85,7 @@ impl<'a> DoubleEndedIterator for NegativeLimbIterator<'a> {
     ///
     /// where n = `self.significant_bits()`
     fn next_back(&mut self) -> Option<Limb> {
-        let previous_j = self.limbs.j as u64;
+        let previous_j = self.limbs.j;
         self.limbs.next_back().map(|limb| {
             if self.first_nonzero_index.is_none() {
                 let mut i = 0;
@@ -94,7 +95,7 @@ impl<'a> DoubleEndedIterator for NegativeLimbIterator<'a> {
                 self.first_nonzero_index = Some(i);
             }
             let first_nonzero_index = self.first_nonzero_index.unwrap();
-            if previous_j <= first_nonzero_index as u64 {
+            if previous_j <= u64::wrapping_from(first_nonzero_index) {
                 limb.wrapping_neg()
             } else {
                 !limb

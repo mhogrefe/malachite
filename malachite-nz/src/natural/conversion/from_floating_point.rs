@@ -1,4 +1,4 @@
-use malachite_base::conversion::{CheckedFrom, RoundingFrom};
+use malachite_base::conversion::{CheckedFrom, RoundingFrom, WrappingFrom};
 use malachite_base::num::floats::PrimitiveFloat;
 use malachite_base::num::traits::{BitAccess, DivisibleByPowerOfTwo, ShlRound, Zero};
 use malachite_base::round::RoundingMode;
@@ -169,8 +169,7 @@ macro_rules! float_impls {
                     mantissa.set_bit(u64::from($f::MANTISSA_WIDTH));
                     let exponent = i32::checked_from(exponent).unwrap() + $f::MIN_EXPONENT - 1;
                     if exponent < 0
-                        && !mantissa
-                            .divisible_by_power_of_two(u64::checked_from(-exponent).unwrap())
+                        && !mantissa.divisible_by_power_of_two(u64::wrapping_from(-exponent))
                     {
                         return None;
                     }
