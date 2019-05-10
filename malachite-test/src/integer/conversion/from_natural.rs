@@ -1,3 +1,4 @@
+use malachite_base::conversion::CheckedFrom;
 use malachite_base::num::traits::SignificantBits;
 use malachite_nz::integer::Integer;
 
@@ -39,7 +40,7 @@ fn benchmark_integer_from_natural_evaluation_strategy(
         gm.name(),
         limit,
         file_name,
-        &(|n| n.significant_bits() as usize),
+        &(|n| usize::checked_from(n.significant_bits()).unwrap()),
         "n.significant_bits()",
         &mut [
             (

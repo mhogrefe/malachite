@@ -1,3 +1,4 @@
+use malachite_base::conversion::CheckedFrom;
 use malachite_base::num::traits::SignificantBits;
 use malachite_nz::natural::random::random_natural_below::random_natural_below;
 use rand::{IsaacRng, SeedableRng};
@@ -33,7 +34,7 @@ fn benchmark_natural_random_natural_below(gm: GenerationMode, limit: usize, file
         gm.name(),
         limit,
         file_name,
-        &(|n| n.significant_bits() as usize),
+        &(|n| usize::checked_from(n.significant_bits()).unwrap()),
         "n.significant_bits()",
         &mut [(
             "malachite",

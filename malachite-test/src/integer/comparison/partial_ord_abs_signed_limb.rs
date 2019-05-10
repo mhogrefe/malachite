@@ -1,5 +1,6 @@
 use std::cmp::Ordering;
 
+use malachite_base::conversion::CheckedFrom;
 use malachite_base::num::traits::{PartialOrdAbs, SignificantBits};
 use malachite_nz::platform::SignedLimb;
 
@@ -53,7 +54,7 @@ fn benchmark_integer_partial_cmp_abs_signed_limb(
         gm.name(),
         limit,
         file_name,
-        &(|&(ref n, _)| n.significant_bits() as usize),
+        &(|&(ref n, _)| usize::checked_from(n.significant_bits()).unwrap()),
         "n.significant_bits()",
         &mut [("malachite", &mut (|(x, y)| no_out!(x.partial_cmp_abs(&y))))],
     );
@@ -71,7 +72,7 @@ fn benchmark_signed_limb_partial_cmp_abs_integer(
         gm.name(),
         limit,
         file_name,
-        &(|&(_, ref n)| n.significant_bits() as usize),
+        &(|&(_, ref n)| usize::checked_from(n.significant_bits()).unwrap()),
         "n.significant_bits()",
         &mut [("malachite", &mut (|(x, y)| no_out!(x.partial_cmp_abs(&y))))],
     );

@@ -1,5 +1,6 @@
 use std::cmp::{max, min};
 
+use malachite_base::conversion::CheckedFrom;
 use malachite_base::num::traits::SignificantBits;
 use malachite_nz::natural::arithmetic::sub::{
     limbs_sub, limbs_sub_in_place_left, limbs_sub_in_place_right,
@@ -320,7 +321,9 @@ fn benchmark_natural_sub_assign_library_comparison(
         gm.name(),
         limit,
         file_name,
-        &(|&(_, (ref x, ref y))| max(x.significant_bits(), y.significant_bits()) as usize),
+        &(|&(_, (ref x, ref y))| {
+            usize::checked_from(max(x.significant_bits(), y.significant_bits())).unwrap()
+        }),
         "max(x.significant_bits(), y.significant_bits())",
         &mut [
             ("malachite", &mut (|(_, (mut x, y))| x -= y)),
@@ -341,7 +344,9 @@ fn benchmark_natural_sub_assign_evaluation_strategy(
         gm.name(),
         limit,
         file_name,
-        &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),
+        &(|&(ref x, ref y)| {
+            usize::checked_from(max(x.significant_bits(), y.significant_bits())).unwrap()
+        }),
         "max(x.significant_bits(), y.significant_bits())",
         &mut [
             ("Natural -= Natural", &mut (|(mut x, y)| x -= y)),
@@ -358,7 +363,9 @@ fn benchmark_natural_sub_library_comparison(gm: GenerationMode, limit: usize, fi
         gm.name(),
         limit,
         file_name,
-        &(|&(_, _, (ref x, ref y))| max(x.significant_bits(), y.significant_bits()) as usize),
+        &(|&(_, _, (ref x, ref y))| {
+            usize::checked_from(max(x.significant_bits(), y.significant_bits())).unwrap()
+        }),
         "max(x.significant_bits(), y.significant_bits())",
         &mut [
             ("malachite", &mut (|(_, _, (x, y))| no_out!(x - y))),
@@ -376,7 +383,9 @@ fn benchmark_natural_sub_evaluation_strategy(gm: GenerationMode, limit: usize, f
         gm.name(),
         limit,
         file_name,
-        &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),
+        &(|&(ref x, ref y)| {
+            usize::checked_from(max(x.significant_bits(), y.significant_bits())).unwrap()
+        }),
         "max(x.significant_bits(), y.significant_bits())",
         &mut [
             ("Natural - Natural", &mut (|(x, y)| no_out!(x - y))),

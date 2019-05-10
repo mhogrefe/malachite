@@ -1,5 +1,6 @@
 use std::cmp::Ordering;
 
+use malachite_base::conversion::CheckedFrom;
 use malachite_base::num::traits::{CheckedSub, SignificantBits};
 use malachite_nz::platform::Limb;
 use num::BigUint;
@@ -107,7 +108,7 @@ fn benchmark_natural_checked_sub_limb_library_comparison(
         gm.name(),
         limit,
         file_name,
-        &(|&(_, _, (ref n, _))| n.significant_bits() as usize),
+        &(|&(_, _, (ref n, _))| usize::checked_from(n.significant_bits()).unwrap()),
         "n.significant_bits()",
         &mut [
             (
@@ -139,7 +140,7 @@ fn benchmark_natural_checked_sub_limb_library_comparison(
         gm.name(),
         limit,
         file_name,
-        &(|&(_, (ref n, _))| n.significant_bits() as usize),
+        &(|&(_, (ref n, _))| usize::checked_from(n.significant_bits()).unwrap()),
         "n.significant_bits()",
         &mut [
             ("malachite", &mut (|(_, (x, y))| no_out!(x.checked_sub(y)))),
@@ -163,7 +164,7 @@ fn benchmark_natural_checked_sub_limb_evaluation_strategy(
         gm.name(),
         limit,
         file_name,
-        &(|&(ref n, _)| n.significant_bits() as usize),
+        &(|&(ref n, _)| usize::checked_from(n.significant_bits()).unwrap()),
         "n.significant_bits()",
         &mut [
             (
@@ -191,7 +192,7 @@ fn benchmark_limb_checked_sub_natural_library_comparison(
         gm.name(),
         limit,
         file_name,
-        &(|&(_, (_, ref n))| n.significant_bits() as usize),
+        &(|&(_, (_, ref n))| usize::checked_from(n.significant_bits()).unwrap()),
         "n.significant_bits()",
         &mut [
             (
@@ -215,7 +216,7 @@ fn benchmark_limb_checked_sub_natural_evaluation_strategy(
         gm.name(),
         limit,
         file_name,
-        &(|&(_, ref n)| n.significant_bits() as usize),
+        &(|&(_, ref n)| usize::checked_from(n.significant_bits()).unwrap()),
         "n.significant_bits()",
         &mut [
             (

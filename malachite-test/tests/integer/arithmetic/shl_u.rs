@@ -183,10 +183,10 @@ tests_and_properties!(
         let n = rug::Integer::from_str(u).unwrap() << v;
         assert_eq!(n.to_string(), out);
 
-        let n = BigInt::from_str(u).unwrap() << v as usize;
+        let n = BigInt::from_str(u).unwrap() << usize::checked_from(v).unwrap();
         assert_eq!(n.to_string(), out);
 
-        let n = &BigInt::from_str(u).unwrap() << v as usize;
+        let n = &BigInt::from_str(u).unwrap() << usize::checked_from(v).unwrap();
         assert_eq!(n.to_string(), out);
     },
     n,
@@ -197,11 +197,11 @@ tests_and_properties!(
         assert_eq!(rug_integer_to_integer(&rug_n), shifted);
 
         assert_eq!(
-            bigint_to_integer(&(&integer_to_bigint(n) << u as usize)),
+            bigint_to_integer(&(&integer_to_bigint(n) << usize::checked_from(u).unwrap())),
             shifted
         );
         assert_eq!(
-            bigint_to_integer(&(integer_to_bigint(n) << u as usize)),
+            bigint_to_integer(&(integer_to_bigint(n) << usize::checked_from(u).unwrap())),
             shifted
         );
 

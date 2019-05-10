@@ -74,7 +74,7 @@ fn benchmark_integer_eq_signed_limb_mod_power_of_two_library_comparison(
         gm.name(),
         limit,
         file_name,
-        &(|&(_, (ref n, _, _))| n.significant_bits() as usize),
+        &(|&(_, (ref n, _, _))| usize::checked_from(n.significant_bits()).unwrap()),
         "n.significant_bits()",
         &mut [
             (
@@ -103,7 +103,7 @@ fn benchmark_integer_eq_signed_limb_mod_power_of_two_algorithms(
         gm.name(),
         limit,
         file_name,
-        &(|(ref n, _, _)| n.significant_bits() as usize),
+        &(|(ref n, _, _)| usize::checked_from(n.significant_bits()).unwrap()),
         "n.significant_bits()",
         &mut [
             (
@@ -132,7 +132,7 @@ fn benchmark_signed_limb_eq_integer_mod_power_of_two(
         gm.name(),
         limit,
         file_name,
-        &(|(_, ref n, _)| n.significant_bits() as usize),
+        &(|(_, ref n, _)| usize::checked_from(n.significant_bits()).unwrap()),
         "n.significant_bits()",
         &mut [(
             "SignedLimb.eq_mod_power_of_two(&Integer, u64)",

@@ -608,10 +608,6 @@ pub fn nrm_pairs_of_natural_and_small_unsigned(
     }))
 }
 
-pub fn pairs_of_natural_and_small_usize(gm: GenerationMode) -> It<(Natural, usize)> {
-    Box::new(pairs_of_natural_and_small_unsigned(gm).map(|(n, u): (Natural, u64)| (n, u as usize)))
-}
-
 pub fn triples_of_natural_small_unsigned_and_small_unsigned<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
 ) -> It<(Natural, T, T)> {

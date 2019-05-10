@@ -1,5 +1,6 @@
 use std::cmp::max;
 
+use malachite_base::conversion::CheckedFrom;
 use malachite_base::num::traits::{SignificantBits, SubMul, SubMulAssign};
 use malachite_nz::platform::SignedLimb;
 
@@ -129,7 +130,9 @@ fn benchmark_integer_sub_mul_assign_signed_limb_evaluation_strategy(
         gm.name(),
         limit,
         file_name,
-        &(|&(ref a, ref b, _)| max(a.significant_bits(), b.significant_bits()) as usize),
+        &(|&(ref a, ref b, _)| {
+            usize::checked_from(max(a.significant_bits(), b.significant_bits())).unwrap()
+        }),
         "max(a.significant_bits(), b.significant_bits())",
         &mut [
             (
@@ -156,7 +159,9 @@ fn benchmark_integer_sub_mul_assign_signed_limb_algorithms(
         gm.name(),
         limit,
         file_name,
-        &(|&(ref a, ref b, _)| max(a.significant_bits(), b.significant_bits()) as usize),
+        &(|&(ref a, ref b, _)| {
+            usize::checked_from(max(a.significant_bits(), b.significant_bits())).unwrap()
+        }),
         "max(a.significant_bits(), b.significant_bits())",
         &mut [
             (
@@ -183,7 +188,9 @@ fn benchmark_integer_sub_mul_assign_signed_limb_ref_algorithms(
         gm.name(),
         limit,
         file_name,
-        &(|&(ref a, ref b, _)| max(a.significant_bits(), b.significant_bits()) as usize),
+        &(|&(ref a, ref b, _)| {
+            usize::checked_from(max(a.significant_bits(), b.significant_bits())).unwrap()
+        }),
         "max(a.significant_bits(), b.significant_bits())",
         &mut [
             (
@@ -210,7 +217,9 @@ fn benchmark_integer_sub_mul_signed_limb_evaluation_strategy(
         gm.name(),
         limit,
         file_name,
-        &(|&(ref a, ref b, _)| max(a.significant_bits(), b.significant_bits()) as usize),
+        &(|&(ref a, ref b, _)| {
+            usize::checked_from(max(a.significant_bits(), b.significant_bits())).unwrap()
+        }),
         "max(a.significant_bits(), b.significant_bits())",
         &mut [
             (
@@ -245,7 +254,9 @@ fn benchmark_integer_sub_mul_signed_limb_algorithms(
         gm.name(),
         limit,
         file_name,
-        &(|&(ref a, ref b, _)| max(a.significant_bits(), b.significant_bits()) as usize),
+        &(|&(ref a, ref b, _)| {
+            usize::checked_from(max(a.significant_bits(), b.significant_bits())).unwrap()
+        }),
         "max(a.significant_bits(), b.significant_bits())",
         &mut [
             (
@@ -272,7 +283,9 @@ fn benchmark_integer_sub_mul_signed_limb_val_ref_algorithms(
         gm.name(),
         limit,
         file_name,
-        &(|&(ref a, ref b, _)| max(a.significant_bits(), b.significant_bits()) as usize),
+        &(|&(ref a, ref b, _)| {
+            usize::checked_from(max(a.significant_bits(), b.significant_bits())).unwrap()
+        }),
         "max(a.significant_bits(), b.significant_bits())",
         &mut [
             (
@@ -299,7 +312,9 @@ fn benchmark_integer_sub_mul_signed_limb_ref_val_algorithms(
         gm.name(),
         limit,
         file_name,
-        &(|&(ref a, ref b, _)| max(a.significant_bits(), b.significant_bits()) as usize),
+        &(|&(ref a, ref b, _)| {
+            usize::checked_from(max(a.significant_bits(), b.significant_bits())).unwrap()
+        }),
         "max(a.significant_bits(), b.significant_bits())",
         &mut [
             (
@@ -326,7 +341,9 @@ fn benchmark_integer_sub_mul_signed_limb_ref_ref_algorithms(
         gm.name(),
         limit,
         file_name,
-        &(|&(ref a, ref b, _)| max(a.significant_bits(), b.significant_bits()) as usize),
+        &(|&(ref a, ref b, _)| {
+            usize::checked_from(max(a.significant_bits(), b.significant_bits())).unwrap()
+        }),
         "max(a.significant_bits(), b.significant_bits())",
         &mut [
             (

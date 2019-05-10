@@ -1,4 +1,5 @@
 use malachite_base::chars::char_to_contiguous_range;
+use malachite_base::conversion::WrappingFrom;
 use malachite_base::crement::Crementable;
 
 use common::{
@@ -27,7 +28,7 @@ fn benchmark_char_decrement(gm: NoSpecialGenerationMode, limit: usize, file_name
         gm.name(),
         limit,
         file_name,
-        &(|&c| char_to_contiguous_range(c) as usize),
+        &(|&c| usize::wrapping_from(char_to_contiguous_range(c))),
         "char_to_contiguous_range(char)",
         &mut [("malachite", &mut (|mut c| c.decrement()))],
     );

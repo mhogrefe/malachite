@@ -42,7 +42,7 @@ fn benchmark_integer_divisible_by_power_of_two_library_comparison(
         gm.name(),
         limit,
         file_name,
-        &(|&(_, (ref n, _))| n.significant_bits() as usize),
+        &(|&(_, (ref n, _))| usize::checked_from(n.significant_bits()).unwrap()),
         "n.significant_bits()",
         &mut [
             (
@@ -71,7 +71,7 @@ fn benchmark_integer_divisible_by_power_of_two_algorithms(
         gm.name(),
         limit,
         file_name,
-        &(|&(ref n, _)| n.significant_bits() as usize),
+        &(|&(ref n, _)| usize::checked_from(n.significant_bits()).unwrap()),
         "n.significant_bits()",
         &mut [
             (

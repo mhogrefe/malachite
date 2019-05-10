@@ -1,7 +1,7 @@
 use std::cmp::{max, Ordering};
 
-use malachite_base::num::traits::PartialOrdAbs;
-use malachite_base::num::traits::SignificantBits;
+use malachite_base::conversion::CheckedFrom;
+use malachite_base::num::traits::{PartialOrdAbs, SignificantBits};
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::integer::{
@@ -56,7 +56,9 @@ fn benchmark_integer_partial_cmp_abs_natural_library_comparison(
         gm.name(),
         limit,
         file_name,
-        &(|&(_, (ref x, ref y))| max(x.significant_bits(), y.significant_bits()) as usize),
+        &(|&(_, (ref x, ref y))| {
+            usize::checked_from(max(x.significant_bits(), y.significant_bits())).unwrap()
+        }),
         "max(x.significant_bits(), y.significant_bits())",
         &mut [
             (
@@ -80,7 +82,9 @@ fn benchmark_natural_partial_cmp_abs_integer_library_comparison(
         gm.name(),
         limit,
         file_name,
-        &(|&(_, (ref x, ref y))| max(x.significant_bits(), y.significant_bits()) as usize),
+        &(|&(_, (ref x, ref y))| {
+            usize::checked_from(max(x.significant_bits(), y.significant_bits())).unwrap()
+        }),
         "max(x.significant_bits(), y.significant_bits())",
         &mut [
             (

@@ -1,6 +1,7 @@
 #[cfg(feature = "32_bit_limbs")]
 use std::str::FromStr;
 
+use malachite_base::conversion::CheckedFrom;
 use malachite_base::num::traits::{BitAccess, One};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::logic::bit_access::limbs_clear_bit;
@@ -39,7 +40,7 @@ fn test_clear_bit() {
         assert!(n.is_valid());
 
         let mut n = rug::Integer::from_str(u).unwrap();
-        n.set_bit(index as u32, false);
+        n.set_bit(u32::checked_from(index).unwrap(), false);
         assert_eq!(n.to_string(), out);
     };
     test("0", 10, "0");
@@ -75,7 +76,7 @@ fn clear_bit_properties() {
         let result = mut_n;
 
         let mut rug_n = natural_to_rug_integer(n);
-        rug_n.set_bit(index as u32, false);
+        rug_n.set_bit(u32::checked_from(index).unwrap(), false);
         assert_eq!(rug_integer_to_natural(&rug_n), result);
 
         let mut mut_n = n.clone();

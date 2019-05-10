@@ -1,3 +1,4 @@
+use malachite_base::conversion::CheckedFrom;
 use malachite_base::num::traits::SignificantBits;
 use malachite_nz::integer::Integer;
 use num::BigInt;
@@ -32,7 +33,7 @@ fn benchmark_integer_from_u64_library_comparison(
         gm.name(),
         limit,
         file_name,
-        &(|&u| u.significant_bits() as usize),
+        &(|&u| usize::checked_from(u.significant_bits()).unwrap()),
         "u.significant_bits()",
         &mut [
             ("malachite", &mut (|u| no_out!(Integer::from(u)))),

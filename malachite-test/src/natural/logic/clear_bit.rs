@@ -1,3 +1,4 @@
+use malachite_base::conversion::CheckedFrom;
 use malachite_base::num::traits::BitAccess;
 use malachite_nz::natural::logic::bit_access::limbs_clear_bit;
 
@@ -39,7 +40,7 @@ fn benchmark_limbs_clear_bit(gm: GenerationMode, limit: usize, file_name: &str) 
         gm.name(),
         limit,
         file_name,
-        &(|&(_, index)| index as usize),
+        &(|&(_, index)| usize::checked_from(index).unwrap()),
         "index",
         &mut [(
             "malachite",
@@ -56,7 +57,7 @@ fn benchmark_natural_clear_bit(gm: GenerationMode, limit: usize, file_name: &str
         gm.name(),
         limit,
         file_name,
-        &(|&(_, index)| index as usize),
+        &(|&(_, index)| usize::checked_from(index).unwrap()),
         "index",
         &mut [("malachite", &mut (|(mut n, index)| n.clear_bit(index)))],
     );

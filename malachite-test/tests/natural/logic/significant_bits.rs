@@ -1,6 +1,7 @@
 use std::str::FromStr;
 
 use malachite_base::comparison::Max;
+use malachite_base::conversion::WrappingFrom;
 use malachite_base::num::integers::PrimitiveInteger;
 use malachite_base::num::traits::{FloorLogTwo, One, SignificantBits};
 use malachite_nz::natural::arithmetic::log_two::limbs_floor_log_two;
@@ -40,7 +41,10 @@ fn limbs_significant_bits_fail() {
 fn test_significant_bits() {
     let test = |n, out| {
         assert_eq!(Natural::from_str(n).unwrap().significant_bits(), out);
-        assert_eq!(BigUint::from_str(n).unwrap().bits() as u64, out);
+        assert_eq!(
+            u64::wrapping_from(BigUint::from_str(n).unwrap().bits()),
+            out
+        );
         assert_eq!(
             u64::from(rug::Integer::from_str(n).unwrap().significant_bits()),
             out
@@ -72,7 +76,10 @@ fn limbs_significant_bits_properties() {
 fn significant_bits_properties() {
     test_properties(naturals, |x| {
         let significant_bits = x.significant_bits();
-        assert_eq!(natural_to_biguint(x).bits() as u64, significant_bits);
+        assert_eq!(
+            u64::wrapping_from(natural_to_biguint(x).bits()),
+            significant_bits
+        );
         assert_eq!(
             u64::from(natural_to_rug_integer(x).significant_bits()),
             significant_bits

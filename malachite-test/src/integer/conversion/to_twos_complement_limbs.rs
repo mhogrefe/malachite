@@ -1,4 +1,5 @@
 use malachite_base::comparison::Max;
+use malachite_base::conversion::CheckedFrom;
 use malachite_base::num::traits::{SignificantBits, WrappingNegAssign};
 use malachite_nz::integer::conversion::to_twos_complement_limbs::*;
 use malachite_nz::natural::arithmetic::sub_limb::limbs_sub_limb_in_place;
@@ -7,7 +8,7 @@ use malachite_nz::platform::Limb;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::{vecs_of_unsigned, vecs_of_unsigned_var_3};
-use inputs::integer::{integers, pairs_of_integer_and_small_usize};
+use inputs::integer::{integers, pairs_of_integer_and_small_unsigned};
 
 pub fn limbs_twos_complement_in_place_alt_1(limbs: &mut [Limb]) -> bool {
     let i = limbs.iter().cloned().take_while(|&x| x == 0).count();
@@ -175,7 +176,7 @@ fn demo_integer_twos_complement_limbs_rev(gm: GenerationMode, limit: usize) {
 }
 
 fn demo_integer_twos_complement_limbs_get(gm: GenerationMode, limit: usize) {
-    for (n, i) in pairs_of_integer_and_small_usize(gm).take(limit) {
+    for (n, i) in pairs_of_integer_and_small_unsigned(gm).take(limit) {
         println!(
             "twos_complement_limbs({}).get({}) = {:?}",
             n,
@@ -273,7 +274,7 @@ fn benchmark_integer_to_twos_complement_limbs_asc_evaluation_strategy(
         gm.name(),
         limit,
         file_name,
-        &(|n| n.significant_bits() as usize),
+        &(|n| usize::checked_from(n.significant_bits()).unwrap()),
         "n.significant_bits()",
         &mut [
             (
@@ -305,7 +306,7 @@ fn benchmark_integer_to_twos_complement_limbs_desc_evaluation_strategy(
         gm.name(),
         limit,
         file_name,
-        &(|n| n.significant_bits() as usize),
+        &(|n| usize::checked_from(n.significant_bits()).unwrap()),
         "n.significant_bits()",
         &mut [
             (
@@ -332,11 +333,11 @@ fn benchmark_integer_twos_complement_limbs_get_algorithms(
     m_run_benchmark(
         "Integer.twos_complement_limbs().get()",
         BenchmarkType::Algorithms,
-        pairs_of_integer_and_small_usize(gm),
+        pairs_of_integer_and_small_unsigned(gm),
         gm.name(),
         limit,
         file_name,
-        &(|&(ref n, _)| n.significant_bits() as usize),
+        &(|&(ref n, _)| usize::checked_from(n.significant_bits()).unwrap()),
         "n.significant_bits()",
         &mut [
             (

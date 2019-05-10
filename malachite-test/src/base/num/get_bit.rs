@@ -1,4 +1,4 @@
-use malachite_base::conversion::WrappingFrom;
+use malachite_base::conversion::{CheckedFrom, WrappingFrom};
 use malachite_base::num::signeds::PrimitiveSigned;
 use malachite_base::num::unsigneds::PrimitiveUnsigned;
 use rand::Rand;
@@ -53,7 +53,7 @@ fn benchmark_unsigned_get_bit<T: PrimitiveUnsigned + Rand>(
         gm.name(),
         limit,
         file_name,
-        &(|&(_, index)| index as usize),
+        &(|&(_, index)| usize::checked_from(index).unwrap()),
         "index",
         &mut [("malachite", &mut (|(n, index)| no_out!(n.get_bit(index))))],
     );
@@ -74,7 +74,7 @@ fn benchmark_signed_get_bit<T: PrimitiveSigned + Rand>(
         gm.name(),
         limit,
         file_name,
-        &(|&(_, index)| index as usize),
+        &(|&(_, index)| usize::checked_from(index).unwrap()),
         "index",
         &mut [("malachite", &mut (|(n, index)| no_out!(n.get_bit(index))))],
     );

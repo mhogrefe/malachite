@@ -1,5 +1,5 @@
-use malachite_base::num::traits::SignificantBits;
-use malachite_base::num::traits::{CheckedSub, SubMul, SubMulAssign};
+use malachite_base::conversion::CheckedFrom;
+use malachite_base::num::traits::{CheckedSub, SignificantBits, SubMul, SubMulAssign};
 use malachite_nz::natural::Natural;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
@@ -58,11 +58,12 @@ fn demo_natural_sub_mul_ref(gm: GenerationMode, limit: usize) {
 }
 
 fn bucketing_function(t: &(Natural, Natural, Natural)) -> usize {
-    max!(
+    usize::checked_from(max!(
         t.0.significant_bits(),
         t.1.significant_bits(),
         t.2.significant_bits()
-    ) as usize
+    ))
+    .unwrap()
 }
 
 const BUCKETING_LABEL: &str = "max(a.significant_bits(), b.significant_bits(), \

@@ -443,10 +443,6 @@ pub fn small_positive_unsigneds<T: PrimitiveUnsigned + Rand>(gm: NoSpecialGenera
     }
 }
 
-pub fn small_usizes(gm: NoSpecialGenerationMode) -> It<usize> {
-    Box::new(small_unsigneds::<u64>(gm).map(|u| u as usize))
-}
-
 fn sqrt_pairs_of_unsigneds<T: PrimitiveUnsigned, U: PrimitiveUnsigned>() -> It<(T, U)> {
     Box::new(sqrt_pairs(exhaustive_unsigned(), exhaustive_unsigned()))
 }
@@ -487,16 +483,16 @@ pub fn pairs_of_small_usize_and_unsigned<T: PrimitiveUnsigned + Rand>(
     match gm {
         GenerationMode::Exhaustive => permute_2_1(Box::new(log_pairs(
             exhaustive_unsigned(),
-            exhaustive_unsigned::<u32>().map(|u| u as usize),
+            exhaustive_unsigned(),
         ))),
         GenerationMode::Random(scale) => Box::new(random_pairs(
             &EXAMPLE_SEED,
-            &(|seed| u32s_geometric(seed, scale).map(|u| u as usize)),
+            &(|seed| u32s_geometric(seed, scale).map(usize::wrapping_from)),
             &(|seed| random(seed)),
         )),
         GenerationMode::SpecialRandom(scale) => Box::new(random_pairs(
             &EXAMPLE_SEED,
-            &(|seed| u32s_geometric(seed, scale).map(|u| u as usize)),
+            &(|seed| u32s_geometric(seed, scale).map(usize::wrapping_from)),
             &(|seed| special_random_unsigned(seed)),
         )),
     }
@@ -505,10 +501,10 @@ pub fn pairs_of_small_usize_and_unsigned<T: PrimitiveUnsigned + Rand>(
 pub fn pairs_of_small_usizes(gm: NoSpecialGenerationMode) -> It<(usize, usize)> {
     match gm {
         NoSpecialGenerationMode::Exhaustive => permute_2_1(Box::new(exhaustive_pairs_from_single(
-            exhaustive_unsigned::<u32>().map(|u| u as usize),
+            exhaustive_unsigned(),
         ))),
         NoSpecialGenerationMode::Random(scale) => Box::new(random_pairs_from_single(
-            u32s_geometric(&EXAMPLE_SEED, scale).map(|u| u as usize),
+            u32s_geometric(&EXAMPLE_SEED, scale).map(usize::wrapping_from),
         )),
     }
 }
@@ -1919,40 +1915,19 @@ pub fn triples_of_unsigned_vec_small_usize_and_unsigned<T: PrimitiveUnsigned + R
     match gm {
         GenerationMode::Exhaustive => permute_1_3_2(reshape_2_1_to_3(Box::new(log_pairs(
             exhaustive_pairs_of_unsigned_vec_and_unsigned(),
-            exhaustive_unsigned::<u32>().map(|u| u as usize),
+            exhaustive_unsigned::<u32>().map(usize::wrapping_from),
         )))),
         GenerationMode::Random(scale) => Box::new(random_triples(
             &EXAMPLE_SEED,
             &(|seed| random_vecs(seed, scale, &(|seed_2| random(seed_2)))),
-            &(|seed| u32s_geometric(seed, scale).map(|u| u as usize)),
+            &(|seed| u32s_geometric(seed, scale).map(usize::wrapping_from)),
             &(|seed| random(seed)),
         )),
         GenerationMode::SpecialRandom(scale) => Box::new(random_triples(
             &EXAMPLE_SEED,
             &(|seed| special_random_unsigned_vecs(seed, scale)),
-            &(|seed| u32s_geometric(seed, scale).map(|u| u as usize)),
+            &(|seed| u32s_geometric(seed, scale).map(usize::wrapping_from)),
             &(|seed| special_random_unsigned(seed)),
-        )),
-    }
-}
-
-fn pairs_of_unsigned_vec_and_small_usize<T: PrimitiveUnsigned + Rand>(
-    gm: GenerationMode,
-) -> It<(Vec<T>, usize)> {
-    match gm {
-        GenerationMode::Exhaustive => Box::new(log_pairs(
-            exhaustive_vecs(exhaustive_unsigned()),
-            exhaustive_unsigned::<u32>().map(|u| u as usize),
-        )),
-        GenerationMode::Random(scale) => Box::new(random_pairs(
-            &EXAMPLE_SEED,
-            &(|seed| random_vecs(seed, scale, &(|seed_2| random(seed_2)))),
-            &(|seed| u32s_geometric(seed, scale).map(|u| u as usize)),
-        )),
-        GenerationMode::SpecialRandom(scale) => Box::new(random_pairs(
-            &EXAMPLE_SEED,
-            &(|seed| special_random_unsigned_vecs(seed, scale)),
-            &(|seed| u32s_geometric(seed, scale).map(|u| u as usize)),
         )),
     }
 }
@@ -1962,7 +1937,7 @@ fn pairs_of_unsigned_vec_and_small_usize<T: PrimitiveUnsigned + Rand>(
 pub fn pairs_of_unsigned_vec_and_small_usize_var_1<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
 ) -> It<(Vec<T>, usize)> {
-    Box::new(pairs_of_unsigned_vec_and_small_usize(gm).filter(|&(ref xs, u)| u <= xs.len()))
+    Box::new(pairs_of_unsigned_vec_and_small_unsigned(gm).filter(|&(ref xs, u)| u <= xs.len()))
 }
 
 pub fn pairs_of_unsigned_vec_and_unsigned<T: PrimitiveUnsigned + Rand>(
@@ -2100,8 +2075,9 @@ pub fn pairs_of_unsigned_vec_and_small_unsigned_var_1<
 // the `Vec`.
 pub fn pairs_of_limb_vec_and_small_u64_var_2(gm: GenerationMode) -> It<(Vec<Limb>, u64)> {
     Box::new(
-        pairs_of_unsigned_vec_and_small_unsigned(gm)
-            .filter(|&(ref limbs, index)| index < (limbs.len() as u64) << Limb::LOG_WIDTH),
+        pairs_of_unsigned_vec_and_small_unsigned(gm).filter(|&(ref limbs, index)| {
+            index < u64::wrapping_from(limbs.len()) << Limb::LOG_WIDTH
+        }),
     )
 }
 
@@ -2503,19 +2479,19 @@ fn triples_of_unsigned_vec_usize_and_unsigned_vec<T: PrimitiveUnsigned + Rand>(
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_triples(
             exhaustive_vecs(exhaustive_unsigned()),
-            exhaustive_unsigned::<u64>().map(|u| u as usize),
+            exhaustive_unsigned::<u64>().map(usize::wrapping_from),
             exhaustive_vecs(exhaustive_unsigned()),
         )),
         GenerationMode::Random(scale) => Box::new(random_triples(
             &EXAMPLE_SEED,
             &(|seed| random_vecs(seed, scale, &(|seed_2| random(seed_2)))),
-            &(|seed| u32s_geometric(seed, scale).map(|u| u as usize)),
+            &(|seed| u32s_geometric(seed, scale).map(usize::wrapping_from)),
             &(|seed| random_vecs(seed, scale, &(|seed_2| random(seed_2)))),
         )),
         GenerationMode::SpecialRandom(scale) => Box::new(random_triples(
             &EXAMPLE_SEED,
             &(|seed| special_random_unsigned_vecs(seed, scale)),
-            &(|seed| u32s_geometric(seed, scale).map(|u| u as usize)),
+            &(|seed| u32s_geometric(seed, scale).map(usize::wrapping_from)),
             &(|seed| special_random_unsigned_vecs(seed, scale)),
         )),
     }

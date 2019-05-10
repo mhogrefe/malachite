@@ -1,5 +1,6 @@
 use std::iter::repeat;
 
+use malachite_base::conversion::CheckedFrom;
 use malachite_base::num::traits::{HammingDistance, SignificantBits};
 use malachite_nz::natural::logic::hamming_distance_limb::limbs_hamming_distance_limb;
 use malachite_nz::natural::Natural;
@@ -110,7 +111,7 @@ fn benchmark_natural_hamming_distance_limb_algorithms(
         gm.name(),
         limit,
         file_name,
-        &(|&(ref n, _)| n.significant_bits() as usize),
+        &(|&(ref n, _)| usize::checked_from(n.significant_bits()).unwrap()),
         "n.significant_bits()",
         &mut [
             (
@@ -137,7 +138,7 @@ fn benchmark_limb_hamming_distance_natural(gm: GenerationMode, limit: usize, fil
         gm.name(),
         limit,
         file_name,
-        &(|&(_, ref n)| n.significant_bits() as usize),
+        &(|&(_, ref n)| usize::checked_from(n.significant_bits()).unwrap()),
         "n.significant_bits()",
         &mut [(
             "default",

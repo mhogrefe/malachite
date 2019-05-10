@@ -3,14 +3,15 @@ use std::str::FromStr;
 
 #[cfg(feature = "32_bit_limbs")]
 use malachite_base::comparison::Max;
+use malachite_base::conversion::CheckedFrom;
 use malachite_base::num::traits::Zero;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 
 use common::{test_properties, test_properties_no_special};
-use malachite_test::inputs::base::small_usizes;
+use malachite_test::inputs::base::small_unsigneds;
 use malachite_test::inputs::natural::{
-    naturals, pairs_of_natural_and_small_usize, pairs_of_natural_and_vec_of_bool_var_1,
+    naturals, pairs_of_natural_and_small_unsigned, pairs_of_natural_and_vec_of_bool_var_1,
 };
 
 #[cfg(feature = "32_bit_limbs")]
@@ -112,7 +113,7 @@ fn to_limbs_desc_properties() {
 #[test]
 fn limbs_properties() {
     test_properties(naturals, |n| {
-        let limb_count = n.limb_count() as usize;
+        let limb_count = usize::checked_from(n.limb_count()).unwrap();
         assert_eq!(n.limbs().size_hint(), (limb_count, Some(limb_count)));
     });
 
@@ -136,15 +137,15 @@ fn limbs_properties() {
         },
     );
 
-    test_properties(pairs_of_natural_and_small_usize, |&(ref n, u)| {
-        if u < n.limb_count() as usize {
+    test_properties(pairs_of_natural_and_small_unsigned, |&(ref n, u)| {
+        if u < usize::checked_from(n.limb_count()).unwrap() {
             assert_eq!(n.limbs()[u], n.to_limbs_asc()[u]);
         } else {
             assert_eq!(n.limbs()[u], 0);
         }
     });
 
-    test_properties_no_special(small_usizes, |&u| {
+    test_properties_no_special(small_unsigneds, |&u| {
         assert_eq!(Natural::ZERO.limbs()[u], 0);
     });
 }

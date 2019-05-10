@@ -1,3 +1,4 @@
+use malachite_base::conversion::CheckedFrom;
 use malachite_nz::natural::random::random_natural_up_to_bits::{
     limbs_random_up_to_bits, random_natural_up_to_bits,
 };
@@ -52,7 +53,7 @@ fn benchmark_limbs_random_up_to_bits(gm: NoSpecialGenerationMode, limit: usize, 
         gm.name(),
         limit,
         file_name,
-        &(|&bits| bits as usize),
+        &(|&bits| usize::checked_from(bits).unwrap()),
         "bits",
         &mut [(
             "malachite",
@@ -74,7 +75,7 @@ fn benchmark_natural_random_natural_up_to_bits(
         gm.name(),
         limit,
         file_name,
-        &(|&bits| bits as usize),
+        &(|&bits| usize::checked_from(bits).unwrap()),
         "bits",
         &mut [(
             "malachite",

@@ -1,5 +1,6 @@
 use std::cmp::max;
 
+use malachite_base::conversion::CheckedFrom;
 use malachite_base::named::Named;
 use malachite_base::num::traits::{JoinHalves, SignificantBits};
 use malachite_base::num::unsigneds::PrimitiveUnsigned;
@@ -53,7 +54,7 @@ fn benchmark_unsigned_join_halves<T: JoinHalves + PrimitiveUnsigned>(
         gm.name(),
         limit,
         file_name,
-        &(|&(x, y)| max(x.significant_bits(), y.significant_bits()) as usize),
+        &(|&(x, y)| usize::checked_from(max(x.significant_bits(), y.significant_bits())).unwrap()),
         "max(x.significant_bits(), y.significant_bits())",
         &mut [("malachite", &mut (|(x, y)| no_out!(T::join_halves(x, y))))],
     );

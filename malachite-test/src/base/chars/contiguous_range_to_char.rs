@@ -1,4 +1,5 @@
 use malachite_base::chars::contiguous_range_to_char;
+use malachite_base::conversion::WrappingFrom;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::unsigneds;
@@ -26,7 +27,7 @@ fn benchmark_contiguous_range_to_char(gm: GenerationMode, limit: usize, file_nam
         gm.name(),
         limit,
         file_name,
-        &(|&i| i as usize),
+        &(|&i| usize::wrapping_from(i)),
         "i",
         &mut [("malachite", &mut (|i| no_out!(contiguous_range_to_char(i))))],
     );

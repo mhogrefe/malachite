@@ -1,3 +1,4 @@
+use malachite_base::conversion::CheckedFrom;
 use malachite_base::num::traits::{
     CeilingDivAssignMod, CeilingDivMod, CeilingMod, DivAssignMod, DivAssignRem, DivMod, DivRem,
     DivRound, Mod, SignificantBits,
@@ -250,7 +251,7 @@ fn benchmark_integer_div_assign_mod_limb(gm: GenerationMode, limit: usize, file_
         gm.name(),
         limit,
         file_name,
-        &(|&(ref n, _)| n.significant_bits() as usize),
+        &(|&(ref n, _)| usize::checked_from(n.significant_bits()).unwrap()),
         "n.significant_bits()",
         &mut [(
             "malachite",
@@ -272,7 +273,7 @@ fn benchmark_integer_div_mod_limb_library_comparison(
         gm.name(),
         limit,
         file_name,
-        &(|&(_, _, (ref n, _))| n.significant_bits() as usize),
+        &(|&(_, _, (ref n, _))| usize::checked_from(n.significant_bits()).unwrap()),
         "n.significant_bits()",
         &mut [
             ("malachite", &mut (|(_, _, (x, y))| no_out!(x.div_mod(y)))),
@@ -296,7 +297,7 @@ fn benchmark_integer_div_mod_limb_algorithms(gm: GenerationMode, limit: usize, f
         gm.name(),
         limit,
         file_name,
-        &(|&(ref n, _)| n.significant_bits() as usize),
+        &(|&(ref n, _)| usize::checked_from(n.significant_bits()).unwrap()),
         "n.significant_bits()",
         &mut [
             ("standard", &mut (|(x, y)| no_out!(x.div_mod(y)))),
@@ -323,7 +324,7 @@ fn benchmark_integer_div_mod_limb_evaluation_strategy(
         gm.name(),
         limit,
         file_name,
-        &(|&(ref n, _)| n.significant_bits() as usize),
+        &(|&(ref n, _)| usize::checked_from(n.significant_bits()).unwrap()),
         "n.significant_bits()",
         &mut [
             (
@@ -346,7 +347,7 @@ fn benchmark_integer_div_assign_rem_limb(gm: GenerationMode, limit: usize, file_
         gm.name(),
         limit,
         file_name,
-        &(|&(ref n, _)| n.significant_bits() as usize),
+        &(|&(ref n, _)| usize::checked_from(n.significant_bits()).unwrap()),
         "n.significant_bits()",
         &mut [(
             "malachite",
@@ -367,7 +368,7 @@ fn benchmark_integer_div_rem_limb_library_comparison(
         gm.name(),
         limit,
         file_name,
-        &(|&(_, _, (ref n, _))| n.significant_bits() as usize),
+        &(|&(_, _, (ref n, _))| usize::checked_from(n.significant_bits()).unwrap()),
         "n.significant_bits()",
         &mut [
             ("malachite", &mut (|(_, _, (x, y))| no_out!(x.div_rem(y)))),
@@ -391,7 +392,7 @@ fn benchmark_integer_div_rem_limb_algorithms(gm: GenerationMode, limit: usize, f
         gm.name(),
         limit,
         file_name,
-        &(|&(ref n, _)| n.significant_bits() as usize),
+        &(|&(ref n, _)| usize::checked_from(n.significant_bits()).unwrap()),
         "n.significant_bits()",
         &mut [
             ("standard", &mut (|(x, y)| no_out!(x.div_rem(y)))),
@@ -418,7 +419,7 @@ fn benchmark_integer_div_rem_limb_evaluation_strategy(
         gm.name(),
         limit,
         file_name,
-        &(|&(ref n, _)| n.significant_bits() as usize),
+        &(|&(ref n, _)| usize::checked_from(n.significant_bits()).unwrap()),
         "n.significant_bits()",
         &mut [
             (
@@ -445,7 +446,7 @@ fn benchmark_integer_ceiling_div_mod_limb_library_comparison(
         gm.name(),
         limit,
         file_name,
-        &(|&(_, (ref n, _))| n.significant_bits() as usize),
+        &(|&(_, (ref n, _))| usize::checked_from(n.significant_bits()).unwrap()),
         "n.significant_bits()",
         &mut [
             (
@@ -472,7 +473,7 @@ fn benchmark_integer_ceiling_div_mod_limb_algorithms(
         gm.name(),
         limit,
         file_name,
-        &(|&(ref n, _)| n.significant_bits() as usize),
+        &(|&(ref n, _)| usize::checked_from(n.significant_bits()).unwrap()),
         "n.significant_bits()",
         &mut [
             ("standard", &mut (|(x, y)| no_out!(x.ceiling_div_mod(y)))),
@@ -498,7 +499,7 @@ fn benchmark_integer_ceiling_div_mod_limb_evaluation_strategy(
         gm.name(),
         limit,
         file_name,
-        &(|&(ref n, _)| n.significant_bits() as usize),
+        &(|&(ref n, _)| usize::checked_from(n.significant_bits()).unwrap()),
         "n.significant_bits()",
         &mut [
             (
@@ -525,7 +526,7 @@ fn benchmark_limb_div_mod_integer_evaluation_strategy(
         gm.name(),
         limit,
         file_name,
-        &(|&(_, ref n)| n.significant_bits() as usize),
+        &(|&(_, ref n)| usize::checked_from(n.significant_bits()).unwrap()),
         "n.significant_bits()",
         &mut [
             (
@@ -552,7 +553,7 @@ fn benchmark_limb_div_rem_integer_evaluation_strategy(
         gm.name(),
         limit,
         file_name,
-        &(|&(_, ref n)| n.significant_bits() as usize),
+        &(|&(_, ref n)| usize::checked_from(n.significant_bits()).unwrap()),
         "n.significant_bits()",
         &mut [
             (
@@ -579,7 +580,7 @@ fn benchmark_limb_ceiling_div_mod_integer_evaluation_strategy(
         gm.name(),
         limit,
         file_name,
-        &(|&(_, ref n)| n.significant_bits() as usize),
+        &(|&(_, ref n)| usize::checked_from(n.significant_bits()).unwrap()),
         "n.significant_bits()",
         &mut [
             (

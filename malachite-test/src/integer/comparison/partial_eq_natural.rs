@@ -1,5 +1,6 @@
 use std::cmp::max;
 
+use malachite_base::conversion::CheckedFrom;
 use malachite_base::num::traits::SignificantBits;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
@@ -55,7 +56,9 @@ fn benchmark_integer_partial_eq_natural_library_comparison(
         gm.name(),
         limit,
         file_name,
-        &(|&(_, (ref x, ref y))| max(x.significant_bits(), y.significant_bits()) as usize),
+        &(|&(_, (ref x, ref y))| {
+            usize::checked_from(max(x.significant_bits(), y.significant_bits())).unwrap()
+        }),
         "max(x.significant_bits(), y.significant_bits())",
         &mut [
             ("malachite", &mut (|(_, (x, y))| no_out!(x == y))),
@@ -76,7 +79,9 @@ fn benchmark_natural_partial_eq_integer_library_comparison(
         gm.name(),
         limit,
         file_name,
-        &(|&(_, (ref x, ref y))| max(x.significant_bits(), y.significant_bits()) as usize),
+        &(|&(_, (ref x, ref y))| {
+            usize::checked_from(max(x.significant_bits(), y.significant_bits())).unwrap()
+        }),
         "max(x.significant_bits(), y.significant_bits())",
         &mut [
             ("malachite", &mut (|(_, (x, y))| no_out!(x == y))),

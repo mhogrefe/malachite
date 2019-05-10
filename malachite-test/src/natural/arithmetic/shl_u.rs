@@ -1,8 +1,10 @@
+use malachite_base::conversion::CheckedFrom;
 use malachite_base::named::Named;
 use malachite_base::num::integers::PrimitiveInteger;
 use malachite_nz::natural::arithmetic::shl_u::{
     limbs_shl, limbs_shl_to_out, limbs_slice_shl_in_place, limbs_vec_shl_in_place,
 };
+use malachite_nz::platform::Limb;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::{
@@ -169,7 +171,7 @@ macro_rules! demos_and_benches {
                 gm.name(),
                 limit,
                 file_name,
-                &(|&(_, other)| other as usize),
+                &(|&(_, other)| usize::checked_from(other).unwrap()),
                 "other",
                 &mut [
                     (
@@ -229,8 +231,8 @@ fn benchmark_limbs_shl(gm: GenerationMode, limit: usize, file_name: &str) {
         gm.name(),
         limit,
         file_name,
-        &(|&(ref limbs, bits)| limbs.len() + (bits / u64::from(u32::WIDTH)) as usize),
-        "limbs.len() + bits / u32::WIDTH",
+        &(|&(ref limbs, bits)| limbs.len() + usize::checked_from(bits >> Limb::LOG_WIDTH).unwrap()),
+        "limbs.len() + bits / Limb::WIDTH",
         &mut [(
             "malachite",
             &mut (|(limbs, bits)| no_out!(limbs_shl(&limbs, bits))),
@@ -280,7 +282,7 @@ fn benchmark_limbs_vec_shl_in_place(gm: GenerationMode, limit: usize, file_name:
         gm.name(),
         limit,
         file_name,
-        &(|&(ref limbs, bits)| limbs.len() + (bits / u64::from(u32::WIDTH)) as usize),
+        &(|&(ref limbs, bits)| limbs.len() + usize::checked_from(bits >> Limb::LOG_WIDTH).unwrap()),
         "limbs.len()",
         &mut [(
             "malachite",
@@ -301,7 +303,7 @@ fn benchmark_natural_shl_assign_u32_library_comparison(
         gm.name(),
         limit,
         file_name,
-        &(|&(_, (_, other))| other as usize),
+        &(|&(_, (_, other))| usize::checked_from(other).unwrap()),
         "other",
         &mut [
             ("malachite", &mut (|(_, (mut x, y))| x <<= y)),
@@ -318,7 +320,7 @@ fn benchmark_natural_shl_u32_library_comparison(gm: GenerationMode, limit: usize
         gm.name(),
         limit,
         file_name,
-        &(|&(_, (_, other))| other as usize),
+        &(|&(_, (_, other))| usize::checked_from(other).unwrap()),
         "other",
         &mut [
             ("malachite", &mut (|(_, (x, y))| no_out!(x << y))),

@@ -1,3 +1,4 @@
+use malachite_base::conversion::CheckedFrom;
 use malachite_base::num::traits::SignificantBits;
 use malachite_nz::platform::Limb;
 use num::BigInt;
@@ -59,7 +60,7 @@ fn benchmark_integer_partial_eq_limb_library_comparison(
         gm.name(),
         limit,
         file_name,
-        &(|&(_, _, (ref n, _))| n.significant_bits() as usize),
+        &(|&(_, _, (ref n, _))| usize::checked_from(n.significant_bits()).unwrap()),
         "n.significant_bits()",
         &mut [
             ("malachite", &mut (|(_, _, (x, y))| no_out!(x == y))),
@@ -84,7 +85,7 @@ fn benchmark_limb_partial_eq_integer_library_comparison(
         gm.name(),
         limit,
         file_name,
-        &(|&(_, (_, ref n))| n.significant_bits() as usize),
+        &(|&(_, (_, ref n))| usize::checked_from(n.significant_bits()).unwrap()),
         "n.significant_bits()",
         &mut [
             ("malachite", &mut (|(_, (x, y))| no_out!(x == y))),

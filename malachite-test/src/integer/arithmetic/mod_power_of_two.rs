@@ -1,3 +1,4 @@
+use malachite_base::conversion::CheckedFrom;
 use malachite_base::num::traits::{
     CeilingModPowerOfTwo, CeilingModPowerOfTwoAssign, ModPowerOfTwo, ModPowerOfTwoAssign,
     RemPowerOfTwo, RemPowerOfTwoAssign,
@@ -150,7 +151,7 @@ fn benchmark_integer_mod_power_of_two_assign(gm: GenerationMode, limit: usize, f
         gm.name(),
         limit,
         file_name,
-        &(|&(_, index)| index as usize),
+        &(|&(_, index)| usize::checked_from(index).unwrap()),
         "index",
         &mut [(
             "malachite",
@@ -171,7 +172,7 @@ fn benchmark_integer_mod_power_of_two_evaluation_strategy(
         gm.name(),
         limit,
         file_name,
-        &(|&(_, index)| index as usize),
+        &(|&(_, index)| usize::checked_from(index).unwrap()),
         "index",
         &mut [
             (
@@ -194,7 +195,7 @@ fn benchmark_integer_rem_power_of_two_assign(gm: GenerationMode, limit: usize, f
         gm.name(),
         limit,
         file_name,
-        &(|&(_, index)| index as usize),
+        &(|&(_, index)| usize::checked_from(index).unwrap()),
         "index",
         &mut [(
             "malachite",
@@ -215,7 +216,7 @@ fn benchmark_integer_rem_power_of_two_evaluation_strategy(
         gm.name(),
         limit,
         file_name,
-        &(|&(_, index)| index as usize),
+        &(|&(_, index)| usize::checked_from(index).unwrap()),
         "index",
         &mut [
             (
@@ -242,7 +243,7 @@ fn benchmark_integer_ceiling_mod_power_of_two_assign(
         gm.name(),
         limit,
         file_name,
-        &(|&(_, index)| index as usize),
+        &(|&(_, index)| usize::checked_from(index).unwrap()),
         "index",
         &mut [(
             "malachite",
@@ -263,7 +264,7 @@ fn benchmark_integer_ceiling_mod_power_of_two_evaluation_strategy(
         gm.name(),
         limit,
         file_name,
-        &(|&(_, index)| index as usize),
+        &(|&(_, index)| usize::checked_from(index).unwrap()),
         "index",
         &mut [
             (

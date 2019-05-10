@@ -1,3 +1,4 @@
+use malachite_base::conversion::{CheckedFrom, WrappingFrom};
 use malachite_base::num::traits::SignificantBits;
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::Limb;
@@ -7,7 +8,9 @@ use inputs::integer::integers;
 
 pub fn integer_checked_count_ones_alt_1(n: &Integer) -> Option<u64> {
     if *n >= 0 as Limb {
-        Some(n.twos_complement_bits().filter(|&b| b).count() as u64)
+        Some(u64::wrapping_from(
+            n.twos_complement_bits().filter(|&b| b).count(),
+        ))
     } else {
         None
     }
@@ -52,7 +55,7 @@ fn benchmark_integer_checked_count_ones_algorithms(
         gm.name(),
         limit,
         file_name,
-        &(|n| n.significant_bits() as usize),
+        &(|n| usize::checked_from(n.significant_bits()).unwrap()),
         "n.significant_bits()",
         &mut [
             ("default", &mut (|n| no_out!(n.checked_count_ones()))),

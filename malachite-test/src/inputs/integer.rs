@@ -866,10 +866,6 @@ pub fn nrm_pairs_of_integer_and_small_u64(
     }))
 }
 
-pub fn pairs_of_integer_and_small_usize(gm: GenerationMode) -> It<(Integer, usize)> {
-    Box::new(pairs_of_integer_and_small_unsigned::<u64>(gm).map(|(n, u)| (n, u as usize)))
-}
-
 pub fn triples_of_integer_small_unsigned_and_small_unsigned<
     T: PrimitiveUnsigned + Rand,
     U: PrimitiveUnsigned + Rand,
@@ -2127,7 +2123,7 @@ pub fn pairs_of_integer_and_vec_of_bool_var_1(gm: GenerationMode) -> It<(Integer
         GenerationMode::Exhaustive => {
             let f = move |i: &Integer| {
                 exhaustive_fixed_size_vecs_from_single(
-                    i.to_twos_complement_limbs_asc().len() as u64,
+                    u64::wrapping_from(i.to_twos_complement_limbs_asc().len()),
                     exhaustive_bools(),
                 )
             };
@@ -2188,7 +2184,7 @@ pub fn pairs_of_integer_and_vec_of_bool_var_2(gm: GenerationMode) -> It<(Integer
         GenerationMode::Exhaustive => {
             let f = move |n: &Integer| {
                 exhaustive_fixed_size_vecs_from_single(
-                    n.to_twos_complement_bits_asc().len() as u64,
+                    u64::wrapping_from(n.to_twos_complement_bits_asc().len()),
                     exhaustive_bools(),
                 )
             };

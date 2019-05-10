@@ -1,4 +1,4 @@
-use malachite_base::conversion::WrappingFrom;
+use malachite_base::conversion::{CheckedFrom, WrappingFrom};
 use malachite_base::num::signeds::PrimitiveSigned;
 use malachite_base::num::unsigneds::PrimitiveUnsigned;
 use rand::Rand;
@@ -57,7 +57,7 @@ fn benchmark_unsigned_increment<T: PrimitiveUnsigned + Rand>(
         gm.name(),
         limit,
         file_name,
-        &(|&n| n.significant_bits() as usize),
+        &(|&n| usize::checked_from(n.significant_bits()).unwrap()),
         "index",
         &mut [("malachite", &mut (|mut n| n.increment()))],
     );
@@ -78,7 +78,7 @@ fn benchmark_signed_increment<T: PrimitiveSigned + Rand>(
         gm.name(),
         limit,
         file_name,
-        &(|&n| n.significant_bits() as usize),
+        &(|&n| usize::checked_from(n.significant_bits()).unwrap()),
         "index",
         &mut [("malachite", &mut (|mut n| n.increment()))],
     );

@@ -58,7 +58,7 @@ fn benchmark_limbs_eq_mod_power_of_two(gm: GenerationMode, limit: usize, file_na
         gm.name(),
         limit,
         file_name,
-        &(|&(ref xs, ref ys, pow)| min!(pow as usize, xs.len(), ys.len())),
+        &(|&(ref xs, ref ys, pow)| min!(usize::checked_from(pow).unwrap(), xs.len(), ys.len())),
         "min(pow, xs.len(), ys.len())",
         &mut [(
             "malachite",
@@ -79,7 +79,7 @@ fn benchmark_natural_eq_mod_power_of_two_library_comparison(
         gm.name(),
         limit,
         file_name,
-        &(|&(_, (ref n, _, _))| n.significant_bits() as usize),
+        &(|&(_, (ref n, _, _))| usize::checked_from(n.significant_bits()).unwrap()),
         "n.significant_bits()",
         &mut [
             (
@@ -108,7 +108,9 @@ fn benchmark_natural_eq_mod_power_of_two_algorithms(
         gm.name(),
         limit,
         file_name,
-        &(|&(ref x, ref y, pow)| min!(pow, x.significant_bits(), y.significant_bits()) as usize),
+        &(|&(ref x, ref y, pow)| {
+            usize::checked_from(min!(pow, x.significant_bits(), y.significant_bits())).unwrap()
+        }),
         "min(pow, x.significant_bits(), y.significant_bits())",
         &mut [
             (

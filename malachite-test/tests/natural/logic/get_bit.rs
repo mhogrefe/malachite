@@ -1,5 +1,6 @@
 use std::str::FromStr;
 
+use malachite_base::conversion::CheckedFrom;
 use malachite_base::num::traits::{BitAccess, One, SignificantBits};
 use malachite_nz::natural::logic::bit_access::limbs_get_bit;
 use malachite_nz::natural::Natural;
@@ -40,7 +41,9 @@ pub fn test_get_bit() {
         assert_eq!(Natural::from_str(n).unwrap().get_bit(index), out);
         assert_eq!(num_get_bit(&BigUint::from_str(n).unwrap(), index), out);
         assert_eq!(
-            rug::Integer::from_str(n).unwrap().get_bit(index as u32),
+            rug::Integer::from_str(n)
+                .unwrap()
+                .get_bit(u32::checked_from(index).unwrap()),
             out
         );
     };
@@ -72,7 +75,10 @@ fn get_bit_properties() {
     test_properties(pairs_of_natural_and_small_unsigned, |&(ref n, index)| {
         let bit = n.get_bit(index);
         assert_eq!(num_get_bit(&natural_to_biguint(n), index), bit);
-        assert_eq!(natural_to_rug_integer(n).get_bit(index as u32), bit);
+        assert_eq!(
+            natural_to_rug_integer(n).get_bit(u32::checked_from(index).unwrap()),
+            bit
+        );
 
         assert_eq!(n & (Natural::ONE << index) != 0 as Limb, bit);
         assert_ne!((!n).get_bit(index), bit);

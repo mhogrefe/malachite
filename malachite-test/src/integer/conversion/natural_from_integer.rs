@@ -48,7 +48,7 @@ fn benchmark_natural_checked_from_integer_evaluation_strategy(
         gm.name(),
         limit,
         file_name,
-        &(|n| n.significant_bits() as usize),
+        &(|n| usize::checked_from(n.significant_bits()).unwrap()),
         "n.significant_bits()",
         &mut [
             (

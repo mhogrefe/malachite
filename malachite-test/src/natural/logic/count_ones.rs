@@ -1,3 +1,4 @@
+use malachite_base::conversion::{CheckedFrom, WrappingFrom};
 use malachite_base::num::traits::SignificantBits;
 use malachite_nz::natural::logic::count_ones::limbs_count_ones;
 use malachite_nz::natural::Natural;
@@ -7,7 +8,7 @@ use inputs::base::vecs_of_unsigned;
 use inputs::natural::naturals;
 
 pub fn natural_count_ones_alt_1(n: &Natural) -> u64 {
-    n.bits().filter(|&b| b).count() as u64
+    u64::wrapping_from(n.bits().filter(|&b| b).count())
 }
 
 pub fn natural_count_ones_alt_2(n: &Natural) -> u64 {
@@ -62,7 +63,7 @@ fn benchmark_natural_count_ones_algorithms(gm: GenerationMode, limit: usize, fil
         gm.name(),
         limit,
         file_name,
-        &(|n| n.significant_bits() as usize),
+        &(|n| usize::checked_from(n.significant_bits()).unwrap()),
         "n.significant_bits()",
         &mut [
             ("default", &mut (|n| no_out!(n.count_ones()))),

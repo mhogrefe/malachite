@@ -1,3 +1,4 @@
+use malachite_base::conversion::{CheckedFrom, WrappingFrom};
 use malachite_base::num::traits::SignificantBits;
 use malachite_nz::natural::logic::trailing_zeros::limbs_trailing_zeros;
 use malachite_nz::natural::Natural;
@@ -11,7 +12,7 @@ pub fn natural_trailing_zeros_alt(n: &Natural) -> Option<u64> {
     if *n == 0 as Limb {
         None
     } else {
-        Some(n.bits().take_while(|&b| !b).count() as u64)
+        Some(u64::wrapping_from(n.bits().take_while(|&b| !b).count()))
     }
 }
 
@@ -63,7 +64,7 @@ fn benchmark_natural_trailing_zeros_algorithms(gm: GenerationMode, limit: usize,
         gm.name(),
         limit,
         file_name,
-        &(|n| n.significant_bits() as usize),
+        &(|n| usize::checked_from(n.significant_bits()).unwrap()),
         "n.significant_bits()",
         &mut [
             ("default", &mut (|n| no_out!(n.trailing_zeros()))),

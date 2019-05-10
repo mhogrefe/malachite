@@ -1,3 +1,4 @@
+use malachite_base::conversion::CheckedFrom;
 use malachite_base::num::traits::{Abs, AbsAssign, SignificantBits, UnsignedAbs};
 use num::Signed;
 
@@ -68,7 +69,7 @@ fn benchmark_integer_abs_assign(gm: GenerationMode, limit: usize, file_name: &st
         gm.name(),
         limit,
         file_name,
-        &(|n| n.significant_bits() as usize),
+        &(|n| usize::checked_from(n.significant_bits()).unwrap()),
         "n.significant_bits()",
         &mut [("malachite", &mut (|mut n| n.abs_assign()))],
     );
@@ -82,7 +83,7 @@ fn benchmark_integer_abs_library_comparison(gm: GenerationMode, limit: usize, fi
         gm.name(),
         limit,
         file_name,
-        &(|&(_, _, ref n)| n.significant_bits() as usize),
+        &(|&(_, _, ref n)| usize::checked_from(n.significant_bits()).unwrap()),
         "n.significant_bits()",
         &mut [
             ("malachite", &mut (|(_, _, n)| no_out!(n.abs()))),
@@ -100,7 +101,7 @@ fn benchmark_integer_abs_evaluation_strategy(gm: GenerationMode, limit: usize, f
         gm.name(),
         limit,
         file_name,
-        &(|n| n.significant_bits() as usize),
+        &(|n| usize::checked_from(n.significant_bits()).unwrap()),
         "n.significant_bits()",
         &mut [
             ("Integer.abs()", &mut (|n| no_out!(n.abs()))),
@@ -117,7 +118,7 @@ fn benchmark_integer_unsigned_abs(gm: GenerationMode, limit: usize, file_name: &
         gm.name(),
         limit,
         file_name,
-        &(|n| n.significant_bits() as usize),
+        &(|n| usize::checked_from(n.significant_bits()).unwrap()),
         "n.significant_bits()",
         &mut [("malachite", &mut (|n| no_out!(n.unsigned_abs())))],
     );
@@ -135,7 +136,7 @@ fn benchmark_integer_unsigned_abs_evaluation_strategy(
         gm.name(),
         limit,
         file_name,
-        &(|n| n.significant_bits() as usize),
+        &(|n| usize::checked_from(n.significant_bits()).unwrap()),
         "n.significant_bits()",
         &mut [
             (

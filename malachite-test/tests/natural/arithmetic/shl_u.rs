@@ -1,7 +1,7 @@
 use std::str::FromStr;
 
 use malachite_base::comparison::Max;
-use malachite_base::conversion::WrappingFrom;
+use malachite_base::conversion::{CheckedFrom, WrappingFrom};
 use malachite_base::num::traits::{IsPowerOfTwo, One, Zero};
 use malachite_base::num::unsigneds::PrimitiveUnsigned;
 use malachite_nz::natural::arithmetic::shl_u::{
@@ -341,10 +341,10 @@ tests_and_properties!(
         let n = rug::Integer::from_str(u).unwrap() << v;
         assert_eq!(n.to_string(), out);
 
-        let n = BigUint::from_str(u).unwrap() << v as usize;
+        let n = BigUint::from_str(u).unwrap() << usize::checked_from(v).unwrap();
         assert_eq!(n.to_string(), out);
 
-        let n = &BigUint::from_str(u).unwrap() << v as usize;
+        let n = &BigUint::from_str(u).unwrap() << usize::checked_from(v).unwrap();
         assert_eq!(n.to_string(), out);
     },
     n,
@@ -355,11 +355,11 @@ tests_and_properties!(
         assert_eq!(rug_integer_to_natural(&rug_n), shifted);
 
         assert_eq!(
-            biguint_to_natural(&(&natural_to_biguint(n) << u as usize)),
+            biguint_to_natural(&(&natural_to_biguint(n) << usize::checked_from(u).unwrap())),
             shifted
         );
         assert_eq!(
-            biguint_to_natural(&(natural_to_biguint(n) << u as usize)),
+            biguint_to_natural(&(natural_to_biguint(n) << usize::checked_from(u).unwrap())),
             shifted
         );
         assert_eq!(

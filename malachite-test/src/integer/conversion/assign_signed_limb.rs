@@ -1,3 +1,4 @@
+use malachite_base::conversion::CheckedFrom;
 use malachite_base::num::traits::{Assign, SignificantBits};
 use malachite_nz::platform::SignedLimb;
 use num::BigInt;
@@ -39,7 +40,7 @@ fn benchmark_integer_assign_signed_limb_library_comparison(
         gm.name(),
         limit,
         file_name,
-        &(|&(_, _, (ref n, _))| n.significant_bits() as usize),
+        &(|&(_, _, (ref n, _))| usize::checked_from(n.significant_bits()).unwrap()),
         "n.significant_bits()",
         &mut [
             ("malachite", &mut (|(_, _, (mut x, y))| x.assign(y))),

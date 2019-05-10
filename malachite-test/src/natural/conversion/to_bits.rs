@@ -1,3 +1,4 @@
+use malachite_base::conversion::CheckedFrom;
 use malachite_base::num::traits::SignificantBits;
 use malachite_nz::platform::Limb;
 
@@ -62,7 +63,7 @@ fn benchmark_natural_bits_evaluation_strategy(gm: GenerationMode, limit: usize, 
         gm.name(),
         limit,
         file_name,
-        &(|n| n.significant_bits() as usize),
+        &(|n| usize::checked_from(n.significant_bits()).unwrap()),
         "n.significant_bits()",
         &mut [
             ("Natural.to_bits_asc()", &mut (|n| no_out!(n.to_bits_asc()))),
@@ -87,7 +88,7 @@ fn benchmark_natural_bits_rev_evaluation_strategy(
         gm.name(),
         limit,
         file_name,
-        &(|n| n.significant_bits() as usize),
+        &(|n| usize::checked_from(n.significant_bits()).unwrap()),
         "n.significant_bits()",
         &mut [
             (
@@ -110,7 +111,7 @@ fn benchmark_natural_bits_size_hint(gm: GenerationMode, limit: usize, file_name:
         gm.name(),
         limit,
         file_name,
-        &(|n| n.significant_bits() as usize),
+        &(|n| usize::checked_from(n.significant_bits()).unwrap()),
         "n.significant_bits()",
         &mut [(
             "Natural.bits().size_hint()",

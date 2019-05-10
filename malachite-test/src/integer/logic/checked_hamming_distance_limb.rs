@@ -1,5 +1,6 @@
 use std::iter::repeat;
 
+use malachite_base::conversion::{CheckedFrom, WrappingFrom};
 use malachite_base::num::traits::{CheckedHammingDistance, HammingDistance, SignificantBits};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
@@ -34,7 +35,7 @@ pub fn integer_checked_hamming_distance_limb_alt_2(n: &Integer, u: Limb) -> Opti
     }
     let u = Natural::from(u);
     let limb_zip: Box<Iterator<Item = (Limb, Limb)>> =
-        if n.twos_complement_limbs().count() as u64 >= u.limb_count() {
+        if u64::wrapping_from(n.twos_complement_limbs().count()) >= u.limb_count() {
             Box::new(n.twos_complement_limbs().zip(u.limbs().chain(repeat(0))))
         } else {
             Box::new(n.twos_complement_limbs().chain(repeat(0)).zip(u.limbs()))
@@ -95,7 +96,7 @@ fn benchmark_integer_checked_hamming_distance_limb_algorithms(
         gm.name(),
         limit,
         file_name,
-        &(|&(ref n, _)| n.significant_bits() as usize),
+        &(|&(ref n, _)| usize::checked_from(n.significant_bits()).unwrap()),
         "n.significant_bits()",
         &mut [
             (
@@ -130,7 +131,7 @@ fn benchmark_limb_checked_hamming_distance_integer(
         gm.name(),
         limit,
         file_name,
-        &(|&(_, ref n)| n.significant_bits() as usize),
+        &(|&(_, ref n)| usize::checked_from(n.significant_bits()).unwrap()),
         "n.significant_bits()",
         &mut [(
             "default",

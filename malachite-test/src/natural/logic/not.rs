@@ -1,3 +1,4 @@
+use malachite_base::conversion::CheckedFrom;
 use malachite_base::num::traits::SignificantBits;
 use malachite_nz::natural::logic::not::{limbs_not, limbs_not_in_place, limbs_not_to_out};
 
@@ -66,7 +67,7 @@ fn benchmark_limbs_not(gm: GenerationMode, limit: usize, file_name: &str) {
         gm.name(),
         limit,
         file_name,
-        &(|limbs| limbs.len() as usize),
+        &(|limbs| limbs.len()),
         "limbs.len()",
         &mut [("malachite", &mut (|limbs| no_out!(limbs_not(&limbs))))],
     );
@@ -80,7 +81,7 @@ fn benchmark_limbs_not_to_out(gm: GenerationMode, limit: usize, file_name: &str)
         gm.name(),
         limit,
         file_name,
-        &(|&(_, ref limbs_in)| limbs_in.len() as usize),
+        &(|&(_, ref limbs_in)| limbs_in.len()),
         "limbs_in.len()",
         &mut [(
             "malachite",
@@ -97,7 +98,7 @@ fn benchmark_limbs_not_in_place(gm: GenerationMode, limit: usize, file_name: &st
         gm.name(),
         limit,
         file_name,
-        &(|limbs| limbs.len() as usize),
+        &(|limbs| limbs.len()),
         "limbs.len()",
         &mut [(
             "malachite",
@@ -114,7 +115,7 @@ fn benchmark_natural_not_library_comparison(gm: GenerationMode, limit: usize, fi
         gm.name(),
         limit,
         file_name,
-        &(|&(_, ref n)| n.significant_bits() as usize),
+        &(|&(_, ref n)| usize::checked_from(n.significant_bits()).unwrap()),
         "n.significant_bits()",
         &mut [
             ("malachite", &mut (|(_, n)| no_out!(!n))),
@@ -131,7 +132,7 @@ fn benchmark_natural_not_evaluation_strategy(gm: GenerationMode, limit: usize, f
         gm.name(),
         limit,
         file_name,
-        &(|n| n.significant_bits() as usize),
+        &(|n| usize::checked_from(n.significant_bits()).unwrap()),
         "n.significant_bits()",
         &mut [
             ("-Natural", &mut (|n| no_out!(!n))),

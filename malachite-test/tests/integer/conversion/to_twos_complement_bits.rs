@@ -1,5 +1,6 @@
 use std::str::FromStr;
 
+use malachite_base::conversion::CheckedFrom;
 use malachite_base::num::traits::{SignificantBits, Zero};
 use malachite_nz::integer::conversion::to_twos_complement_bits::*;
 use malachite_nz::integer::Integer;
@@ -420,7 +421,7 @@ fn twos_complement_bits_properties() {
         if u < n.significant_bits() {
             assert_eq!(
                 n.twos_complement_bits()[u],
-                n.to_twos_complement_bits_asc()[u as usize]
+                n.to_twos_complement_bits_asc()[usize::checked_from(u).unwrap()]
             );
         } else {
             assert_eq!(n.twos_complement_bits()[u], *n < 0 as Limb);

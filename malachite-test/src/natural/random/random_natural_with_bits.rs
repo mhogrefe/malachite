@@ -1,3 +1,4 @@
+use malachite_base::conversion::CheckedFrom;
 use malachite_nz::natural::random::random_natural_with_bits::random_natural_with_bits;
 use rand::{IsaacRng, SeedableRng};
 use rust_wheels::iterators::adaptors::{generate_from_function, to_limited_string};
@@ -38,7 +39,7 @@ fn benchmark_natural_random_natural_with_bits(
         gm.name(),
         limit,
         file_name,
-        &(|&bits| bits as usize),
+        &(|&bits| usize::checked_from(bits).unwrap()),
         "bits",
         &mut [(
             "malachite",

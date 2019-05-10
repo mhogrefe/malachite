@@ -46,7 +46,7 @@ fn benchmark_integer_eq_mod_power_of_two_library_comparison(
         gm.name(),
         limit,
         file_name,
-        &(|&(_, (ref n, _, _))| n.significant_bits() as usize),
+        &(|&(_, (ref n, _, _))| usize::checked_from(n.significant_bits()).unwrap()),
         "n.significant_bits()",
         &mut [
             (
@@ -76,7 +76,7 @@ fn benchmark_integer_eq_mod_power_of_two_algorithms(
         limit,
         file_name,
         &(|&(ref x, ref y, pow)| {
-            min(pow, max(x.significant_bits(), y.significant_bits())) as usize
+            usize::checked_from(min(pow, max(x.significant_bits(), y.significant_bits()))).unwrap()
         }),
         "min(pow, max(x.significant_bits(), y.significant_bits()))",
         &mut [

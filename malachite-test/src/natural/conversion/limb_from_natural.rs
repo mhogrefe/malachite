@@ -139,7 +139,7 @@ fn benchmark_limb_checked_from_natural_library_comparison(
         gm.name(),
         limit,
         file_name,
-        &(|&(_, ref n)| n.significant_bits() as usize),
+        &(|&(_, ref n)| usize::checked_from(n.significant_bits()).unwrap()),
         "n.significant_bits()",
         &mut [
             ("malachite", &mut (|(_, n)| no_out!(Limb::checked_from(&n)))),
@@ -160,7 +160,7 @@ fn benchmark_limb_checked_from_natural_evaluation_strategy(
         gm.name(),
         limit,
         file_name,
-        &(|ref n| n.significant_bits() as usize),
+        &(|ref n| usize::checked_from(n.significant_bits()).unwrap()),
         "n.significant_bits()",
         &mut [
             (
@@ -188,7 +188,7 @@ fn benchmark_limb_wrapping_from_natural_library_comparison(
         gm.name(),
         limit,
         file_name,
-        &(|&(_, ref n)| n.significant_bits() as usize),
+        &(|&(_, ref n)| usize::checked_from(n.significant_bits()).unwrap()),
         "n.significant_bits()",
         &mut [
             (
@@ -212,7 +212,7 @@ fn benchmark_limb_wrapping_from_natural_evaluation_strategy(
         gm.name(),
         limit,
         file_name,
-        &(|ref n| n.significant_bits() as usize),
+        &(|ref n| usize::checked_from(n.significant_bits()).unwrap()),
         "n.significant_bits()",
         &mut [
             (
@@ -239,7 +239,7 @@ fn benchmark_limb_saturating_from_natural_evaluation_strategy(
         gm.name(),
         limit,
         file_name,
-        &(|ref n| n.significant_bits() as usize),
+        &(|ref n| usize::checked_from(n.significant_bits()).unwrap()),
         "n.significant_bits()",
         &mut [
             (
@@ -266,7 +266,7 @@ fn benchmark_limb_overflowing_from_natural_evaluation_strategy(
         gm.name(),
         limit,
         file_name,
-        &(|ref n| n.significant_bits() as usize),
+        &(|ref n| usize::checked_from(n.significant_bits()).unwrap()),
         "n.significant_bits()",
         &mut [
             (

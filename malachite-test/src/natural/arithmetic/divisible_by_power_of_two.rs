@@ -55,7 +55,7 @@ fn benchmark_limbs_divisible_by_power_of_two(gm: GenerationMode, limit: usize, f
         gm.name(),
         limit,
         file_name,
-        &(|&(ref limbs, pow)| min(pow as usize, limbs.len())),
+        &(|&(ref limbs, pow)| min(usize::checked_from(pow).unwrap(), limbs.len())),
         "min(pow, limbs.len())",
         &mut [(
             "malachite",
@@ -76,7 +76,7 @@ fn benchmark_natural_divisible_by_power_of_two_library_comparison(
         gm.name(),
         limit,
         file_name,
-        &(|&(_, (ref n, _))| n.significant_bits() as usize),
+        &(|&(_, (ref n, _))| usize::checked_from(n.significant_bits()).unwrap()),
         "n.significant_bits()",
         &mut [
             (
@@ -105,7 +105,7 @@ fn benchmark_natural_divisible_by_power_of_two_algorithms(
         gm.name(),
         limit,
         file_name,
-        &(|&(ref n, pow)| min(pow, n.significant_bits()) as usize),
+        &(|&(ref n, pow)| usize::checked_from(min(pow, n.significant_bits())).unwrap()),
         "min(pow, n.significant_bits())",
         &mut [
             (

@@ -1,3 +1,4 @@
+use malachite_base::conversion::CheckedFrom;
 use malachite_base::num::traits::{NextPowerOfTwo, NextPowerOfTwoAssign, SignificantBits};
 use malachite_nz::natural::arithmetic::next_power_of_two::{
     limbs_next_power_of_two, limbs_slice_next_power_of_two_in_place,
@@ -165,7 +166,7 @@ fn benchmark_natural_next_power_of_two_assign(gm: GenerationMode, limit: usize, 
         gm.name(),
         limit,
         file_name,
-        &(|ref n| n.significant_bits() as usize),
+        &(|ref n| usize::checked_from(n.significant_bits()).unwrap()),
         "n.significant_bits()",
         &mut [("malachite", &mut (|mut n| n.next_power_of_two_assign()))],
     );
@@ -183,7 +184,7 @@ fn benchmark_natural_next_power_of_two_library_comparison(
         gm.name(),
         limit,
         file_name,
-        &(|&(_, ref n)| n.significant_bits() as usize),
+        &(|&(_, ref n)| usize::checked_from(n.significant_bits()).unwrap()),
         "n.significant_bits()",
         &mut [
             ("malachite", &mut (|(_, n)| no_out!(n.next_power_of_two()))),
@@ -204,7 +205,7 @@ fn benchmark_natural_next_power_of_two_evaluation_strategy(
         gm.name(),
         limit,
         file_name,
-        &(|ref n| n.significant_bits() as usize),
+        &(|ref n| usize::checked_from(n.significant_bits()).unwrap()),
         "n.significant_bits()",
         &mut [
             (

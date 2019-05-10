@@ -1,5 +1,6 @@
 use std::str::FromStr;
 
+use malachite_base::conversion::CheckedFrom;
 use malachite_base::num::traits::BitAccess;
 use malachite_nz::natural::Natural;
 use rug;
@@ -17,7 +18,7 @@ fn test_assign_bit() {
         assert!(n.is_valid());
 
         let mut n = rug::Integer::from_str(u).unwrap();
-        n.set_bit(index as u32, bit);
+        n.set_bit(u32::checked_from(index).unwrap(), bit);
         assert_eq!(n.to_string(), out);
     };
     test("0", 10, true, "1024");
@@ -56,7 +57,7 @@ fn assign_bit_properties() {
             let result = mut_n;
 
             let mut rug_n = natural_to_rug_integer(n);
-            rug_n.set_bit(index as u32, bit);
+            rug_n.set_bit(u32::checked_from(index).unwrap(), bit);
             assert_eq!(rug_integer_to_natural(&rug_n), result);
         },
     );

@@ -1,3 +1,4 @@
+use malachite_base::conversion::CheckedFrom;
 use malachite_base::named::Named;
 use malachite_base::num::traits::{ShrRound, ShrRoundAssign};
 
@@ -202,7 +203,7 @@ macro_rules! demos_and_benches {
                 gm.name(),
                 limit,
                 file_name,
-                &(|&(_, other)| other as usize),
+                &(|&(_, other)| usize::checked_from(other).unwrap()),
                 "other",
                 &mut [
                     (
@@ -229,7 +230,7 @@ macro_rules! demos_and_benches {
                 gm.name(),
                 limit,
                 file_name,
-                &(|&(_, other, _)| other as usize),
+                &(|&(_, other, _)| usize::checked_from(other).unwrap()),
                 "other",
                 &mut [(
                     "malachite",
@@ -250,7 +251,7 @@ macro_rules! demos_and_benches {
                 gm.name(),
                 limit,
                 file_name,
-                &(|&(_, other, _)| other as usize),
+                &(|&(_, other, _)| usize::checked_from(other).unwrap()),
                 "other",
                 &mut [
                     (
@@ -339,7 +340,7 @@ fn benchmark_natural_shr_assign_i32_library_comparison(
         gm.name(),
         limit,
         file_name,
-        &(|&(_, (_, other))| other as usize),
+        &(|&(_, (_, other))| usize::checked_from(other).unwrap()),
         "other",
         &mut [
             ("malachite", &mut (|(_, (mut x, y))| x >>= y)),
@@ -356,7 +357,7 @@ fn benchmark_natural_shr_i32_library_comparison(gm: GenerationMode, limit: usize
         gm.name(),
         limit,
         file_name,
-        &(|&(_, (_, other))| other as usize),
+        &(|&(_, (_, other))| usize::checked_from(other).unwrap()),
         "other",
         &mut [
             ("malachite", &mut (|(_, (x, y))| no_out!(x >> y))),

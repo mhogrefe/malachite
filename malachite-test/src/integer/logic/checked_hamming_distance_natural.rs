@@ -1,5 +1,6 @@
 use std::cmp::max;
 
+use malachite_base::conversion::CheckedFrom;
 use malachite_base::num::traits::{CheckedHammingDistance, SignificantBits};
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
@@ -54,7 +55,9 @@ fn benchmark_integer_checked_hamming_distance_natural(
         gm.name(),
         limit,
         file_name,
-        &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),
+        &(|&(ref x, ref y)| {
+            usize::checked_from(max(x.significant_bits(), y.significant_bits())).unwrap()
+        }),
         "max(x.significant_bits(), y.significant_bits())",
         &mut [(
             "malachite",
@@ -75,7 +78,9 @@ fn benchmark_natural_checked_hamming_distance_integer(
         gm.name(),
         limit,
         file_name,
-        &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),
+        &(|&(ref x, ref y)| {
+            usize::checked_from(max(x.significant_bits(), y.significant_bits())).unwrap()
+        }),
         "max(x.significant_bits(), y.significant_bits())",
         &mut [(
             "malachite",

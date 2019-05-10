@@ -1,5 +1,6 @@
 use std::cmp::{max, Ordering};
 
+use malachite_base::conversion::CheckedFrom;
 use malachite_base::num::traits::SignificantBits;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
@@ -28,7 +29,9 @@ fn benchmark_integer_cmp_library_comparison(gm: GenerationMode, limit: usize, fi
         gm.name(),
         limit,
         file_name,
-        &(|&(_, _, (ref x, ref y))| max(x.significant_bits(), y.significant_bits()) as usize),
+        &(|&(_, _, (ref x, ref y))| {
+            usize::checked_from(max(x.significant_bits(), y.significant_bits())).unwrap()
+        }),
         "max(x.significant_bits(), y.significant_bits())",
         &mut [
             ("malachite", &mut (|(_, _, (x, y))| no_out!(x.cmp(&y)))),

@@ -1,3 +1,4 @@
+use malachite_base::conversion::CheckedFrom;
 use malachite_base::num::traits::{SaturatingSub, SaturatingSubAssign, SignificantBits};
 use malachite_nz::platform::Limb;
 
@@ -112,7 +113,7 @@ fn benchmark_natural_saturating_sub_assign_limb(gm: GenerationMode, limit: usize
         gm.name(),
         limit,
         file_name,
-        &(|&(ref n, _)| n.significant_bits() as usize),
+        &(|&(ref n, _)| usize::checked_from(n.significant_bits()).unwrap()),
         "n.significant_bits()",
         &mut [("malachite", &mut (|(mut x, y)| x.saturating_sub_assign(y)))],
     );
@@ -130,7 +131,7 @@ fn benchmark_natural_saturating_sub_limb_evaluation_strategy(
         gm.name(),
         limit,
         file_name,
-        &(|&(ref n, _)| n.significant_bits() as usize),
+        &(|&(ref n, _)| usize::checked_from(n.significant_bits()).unwrap()),
         "n.significant_bits()",
         &mut [
             (
@@ -157,7 +158,7 @@ fn benchmark_limb_saturating_sub_assign_natural_evaluation_strategy(
         gm.name(),
         limit,
         file_name,
-        &(|&(_, ref n)| n.significant_bits() as usize),
+        &(|&(_, ref n)| usize::checked_from(n.significant_bits()).unwrap()),
         "n.significant_bits()",
         &mut [
             (
@@ -184,7 +185,7 @@ fn benchmark_limb_saturating_sub_natural_evaluation_strategy(
         gm.name(),
         limit,
         file_name,
-        &(|&(_, ref n)| n.significant_bits() as usize),
+        &(|&(_, ref n)| usize::checked_from(n.significant_bits()).unwrap()),
         "n.significant_bits()",
         &mut [
             (

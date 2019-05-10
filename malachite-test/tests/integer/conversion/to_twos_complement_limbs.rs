@@ -3,6 +3,7 @@ use std::cmp::Ordering;
 use std::str::FromStr;
 
 use malachite_base::comparison::Max;
+use malachite_base::conversion::CheckedFrom;
 use malachite_base::num::integers::PrimitiveInteger;
 use malachite_base::num::traits::{Sign, Zero};
 use malachite_nz::integer::conversion::to_twos_complement_limbs::*;
@@ -11,9 +12,9 @@ use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 
 use common::{test_properties, test_properties_no_special};
-use malachite_test::inputs::base::{small_usizes, vecs_of_unsigned, vecs_of_unsigned_var_3};
+use malachite_test::inputs::base::{small_unsigneds, vecs_of_unsigned, vecs_of_unsigned_var_3};
 use malachite_test::inputs::integer::{
-    integers, pairs_of_integer_and_small_usize, pairs_of_integer_and_vec_of_bool_var_1,
+    integers, pairs_of_integer_and_small_unsigned, pairs_of_integer_and_vec_of_bool_var_1,
 };
 use malachite_test::integer::conversion::to_twos_complement_limbs::*;
 
@@ -313,8 +314,8 @@ fn twos_complement_limbs_properties() {
         },
     );
 
-    test_properties(pairs_of_integer_and_small_usize, |&(ref n, u)| {
-        if u < n.unsigned_abs_ref().limb_count() as usize {
+    test_properties(pairs_of_integer_and_small_unsigned, |&(ref n, u)| {
+        if u < usize::checked_from(n.unsigned_abs_ref().limb_count()).unwrap() {
             assert_eq!(
                 n.twos_complement_limbs().get(u),
                 n.to_twos_complement_limbs_asc()[u]
@@ -327,7 +328,7 @@ fn twos_complement_limbs_properties() {
         }
     });
 
-    test_properties_no_special(small_usizes, |&u| {
+    test_properties_no_special(small_unsigneds, |&u| {
         assert_eq!(Integer::ZERO.twos_complement_limbs().get(u), 0);
     });
 }

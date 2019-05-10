@@ -1,3 +1,4 @@
+use malachite_base::conversion::{CheckedFrom, WrappingFrom};
 use malachite_base::num::traits::{BitScan, SignificantBits};
 use malachite_nz::natural::logic::bit_scan::limbs_index_of_next_true_bit;
 use malachite_nz::natural::Natural;
@@ -7,9 +8,9 @@ use inputs::base::pairs_of_unsigned_vec_and_small_unsigned;
 use inputs::natural::pairs_of_natural_and_small_unsigned;
 
 pub fn natural_index_of_next_true_bit_alt(n: &Natural, u: u64) -> Option<u64> {
-    for (i, bit) in n.bits().enumerate().skip(u as usize) {
+    for (i, bit) in n.bits().enumerate().skip(usize::checked_from(u).unwrap()) {
         if bit {
-            return Some(i as u64);
+            return Some(u64::wrapping_from(i));
         }
     }
     None
@@ -77,7 +78,7 @@ fn benchmark_natural_index_of_next_true_bit_algorithms(
         gm.name(),
         limit,
         file_name,
-        &(|&(ref n, _)| n.significant_bits() as usize),
+        &(|&(ref n, _)| usize::checked_from(n.significant_bits()).unwrap()),
         "n.significant_bits()",
         &mut [
             (

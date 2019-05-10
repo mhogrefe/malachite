@@ -1,3 +1,4 @@
+use malachite_base::conversion::CheckedFrom;
 use malachite_base::num::traits::{DivisibleBy, EqMod, Mod, SignificantBits};
 use malachite_nz::platform::{Limb, SignedLimb};
 use rug;
@@ -80,7 +81,7 @@ fn benchmark_integer_eq_signed_limb_mod_signed_limb_library_comparison(
         gm.name(),
         limit,
         file_name,
-        &(|&(_, (ref n, _, _))| n.significant_bits() as usize),
+        &(|&(_, (ref n, _, _))| usize::checked_from(n.significant_bits()).unwrap()),
         "n.significant_bits()",
         &mut [
             (
@@ -109,7 +110,7 @@ fn benchmark_integer_eq_signed_limb_mod_signed_limb_algorithms(
         gm.name(),
         limit,
         file_name,
-        &(|&(ref n, _, _)| n.significant_bits() as usize),
+        &(|&(ref n, _, _)| usize::checked_from(n.significant_bits()).unwrap()),
         "n.significant_bits()",
         &mut [
             (
@@ -143,7 +144,7 @@ fn benchmark_signed_limb_eq_integer_mod_signed_limb_algorithms(
         gm.name(),
         limit,
         file_name,
-        &(|&(_, ref n, _)| n.significant_bits() as usize),
+        &(|&(_, ref n, _)| usize::checked_from(n.significant_bits()).unwrap()),
         "n.significant_bits()",
         &mut [
             (
@@ -173,7 +174,7 @@ fn benchmark_signed_limb_eq_signed_limb_mod_integer_algorithms(
         gm.name(),
         limit,
         file_name,
-        &(|&(_, ref n, _)| n.significant_bits() as usize),
+        &(|&(_, ref n, _)| usize::checked_from(n.significant_bits()).unwrap()),
         "n.significant_bits()",
         &mut [
             (

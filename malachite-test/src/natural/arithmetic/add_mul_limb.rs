@@ -1,5 +1,6 @@
 use std::cmp::max;
 
+use malachite_base::conversion::CheckedFrom;
 use malachite_base::num::traits::{AddMul, AddMulAssign, SignificantBits};
 use malachite_nz::natural::arithmetic::add_mul_limb::{
     limbs_add_mul_limb, limbs_slice_add_mul_limb_greater_in_place_left,
@@ -382,7 +383,9 @@ fn benchmark_natural_add_mul_assign_limb_evaluation_strategy(
         gm.name(),
         limit,
         file_name,
-        &(|&(ref a, ref b, _)| max(a.significant_bits(), b.significant_bits()) as usize),
+        &(|&(ref a, ref b, _)| {
+            usize::checked_from(max(a.significant_bits(), b.significant_bits())).unwrap()
+        }),
         "max(a.significant_bits(), b.significant_bits())",
         &mut [
             (
@@ -409,7 +412,9 @@ fn benchmark_natural_add_mul_assign_limb_algorithms(
         gm.name(),
         limit,
         file_name,
-        &(|&(ref a, ref b, _)| max(a.significant_bits(), b.significant_bits()) as usize),
+        &(|&(ref a, ref b, _)| {
+            usize::checked_from(max(a.significant_bits(), b.significant_bits())).unwrap()
+        }),
         "max(a.significant_bits(), b.significant_bits())",
         &mut [
             (
@@ -436,7 +441,9 @@ fn benchmark_natural_add_mul_assign_limb_ref_algorithms(
         gm.name(),
         limit,
         file_name,
-        &(|&(ref a, ref b, _)| max(a.significant_bits(), b.significant_bits()) as usize),
+        &(|&(ref a, ref b, _)| {
+            usize::checked_from(max(a.significant_bits(), b.significant_bits())).unwrap()
+        }),
         "max(a.significant_bits(), b.significant_bits())",
         &mut [
             (
@@ -463,7 +470,9 @@ fn benchmark_natural_add_mul_limb_evaluation_strategy(
         gm.name(),
         limit,
         file_name,
-        &(|&(ref a, ref b, _)| max(a.significant_bits(), b.significant_bits()) as usize),
+        &(|&(ref a, ref b, _)| {
+            usize::checked_from(max(a.significant_bits(), b.significant_bits())).unwrap()
+        }),
         "max(a.significant_bits(), b.significant_bits())",
         &mut [
             (
@@ -494,7 +503,9 @@ fn benchmark_natural_add_mul_limb_algorithms(gm: GenerationMode, limit: usize, f
         gm.name(),
         limit,
         file_name,
-        &(|&(ref a, ref b, _)| max(a.significant_bits(), b.significant_bits()) as usize),
+        &(|&(ref a, ref b, _)| {
+            usize::checked_from(max(a.significant_bits(), b.significant_bits())).unwrap()
+        }),
         "max(a.significant_bits(), b.significant_bits())",
         &mut [
             (
@@ -521,7 +532,9 @@ fn benchmark_natural_add_mul_limb_val_ref_algorithms(
         gm.name(),
         limit,
         file_name,
-        &(|&(ref a, ref b, _)| max(a.significant_bits(), b.significant_bits()) as usize),
+        &(|&(ref a, ref b, _)| {
+            usize::checked_from(max(a.significant_bits(), b.significant_bits())).unwrap()
+        }),
         "max(a.significant_bits(), b.significant_bits())",
         &mut [
             (
@@ -548,7 +561,9 @@ fn benchmark_natural_add_mul_limb_ref_val_algorithms(
         gm.name(),
         limit,
         file_name,
-        &(|&(ref a, ref b, _)| max(a.significant_bits(), b.significant_bits()) as usize),
+        &(|&(ref a, ref b, _)| {
+            usize::checked_from(max(a.significant_bits(), b.significant_bits())).unwrap()
+        }),
         "max(a.significant_bits(), b.significant_bits())",
         &mut [
             (
@@ -575,7 +590,9 @@ fn benchmark_natural_add_mul_limb_ref_ref_algorithms(
         gm.name(),
         limit,
         file_name,
-        &(|&(ref a, ref b, _)| max(a.significant_bits(), b.significant_bits()) as usize),
+        &(|&(ref a, ref b, _)| {
+            usize::checked_from(max(a.significant_bits(), b.significant_bits())).unwrap()
+        }),
         "max(a.significant_bits(), b.significant_bits())",
         &mut [
             (

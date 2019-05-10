@@ -1,5 +1,6 @@
 use std::cmp::max;
 
+use malachite_base::conversion::CheckedFrom;
 use malachite_base::num::traits::{SaturatingSub, SaturatingSubAssign, SignificantBits};
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
@@ -104,7 +105,9 @@ fn benchmark_natural_saturating_sub_assign_evaluation_strategy(
         gm.name(),
         limit,
         file_name,
-        &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),
+        &(|&(ref x, ref y)| {
+            usize::checked_from(max(x.significant_bits(), y.significant_bits())).unwrap()
+        }),
         "max(x.significant_bits(), y.significant_bits())",
         &mut [
             (
@@ -131,7 +134,9 @@ fn benchmark_natural_saturating_sub_evaluation_strategy(
         gm.name(),
         limit,
         file_name,
-        &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),
+        &(|&(ref x, ref y)| {
+            usize::checked_from(max(x.significant_bits(), y.significant_bits())).unwrap()
+        }),
         "max(x.significant_bits(), y.significant_bits())",
         &mut [
             (

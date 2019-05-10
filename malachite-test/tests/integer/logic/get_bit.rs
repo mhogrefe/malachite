@@ -1,5 +1,6 @@
 use std::str::FromStr;
 
+use malachite_base::conversion::CheckedFrom;
 use malachite_base::num::traits::{BitAccess, One, SignificantBits};
 use malachite_nz::integer::logic::bit_access::limbs_get_bit_neg;
 use malachite_nz::integer::Integer;
@@ -44,7 +45,9 @@ pub fn test_get_bit() {
     let test = |n, index, out| {
         assert_eq!(Integer::from_str(n).unwrap().get_bit(index), out);
         assert_eq!(
-            rug::Integer::from_str(n).unwrap().get_bit(index as u32),
+            rug::Integer::from_str(n)
+                .unwrap()
+                .get_bit(u32::checked_from(index).unwrap()),
             out
         );
     };
@@ -94,7 +97,10 @@ fn limbs_get_bit_neg_properties() {
 fn get_bit_properties() {
     test_properties(pairs_of_integer_and_small_u64, |&(ref n, index)| {
         let bit = n.get_bit(index);
-        assert_eq!(integer_to_rug_integer(n).get_bit(index as u32), bit);
+        assert_eq!(
+            integer_to_rug_integer(n).get_bit(u32::checked_from(index).unwrap()),
+            bit
+        );
 
         assert_eq!(n & (Integer::ONE << index) != 0 as Limb, bit);
         assert_eq!(!(!n).get_bit(index), bit);

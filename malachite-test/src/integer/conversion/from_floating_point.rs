@@ -1,4 +1,4 @@
-use malachite_base::conversion::{CheckedFrom, RoundingFrom};
+use malachite_base::conversion::{CheckedFrom, RoundingFrom, WrappingFrom};
 use malachite_base::num::floats::PrimitiveFloat;
 use malachite_nz::integer::Integer;
 
@@ -75,7 +75,7 @@ macro_rules! float_demos_and_benches {
                 gm.name(),
                 limit,
                 file_name,
-                &(|&(f, _)| f.adjusted_exponent() as usize),
+                &(|&(f, _)| usize::wrapping_from(f.adjusted_exponent())),
                 "f.adjusted_exponent()",
                 &mut [(
                     "malachite",
@@ -92,7 +92,7 @@ macro_rules! float_demos_and_benches {
                 gm.name(),
                 limit,
                 file_name,
-                &(|&f| f.adjusted_exponent() as usize),
+                &(|&f| usize::wrapping_from(f.adjusted_exponent())),
                 "f.adjusted_exponent()",
                 &mut [("malachite", &mut (|f| no_out!(Integer::from(f))))],
             );
@@ -110,7 +110,7 @@ macro_rules! float_demos_and_benches {
                 gm.name(),
                 limit,
                 file_name,
-                &(|&f| f.adjusted_exponent() as usize),
+                &(|&f| usize::wrapping_from(f.adjusted_exponent())),
                 "f.adjusted_exponent()",
                 &mut [("malachite", &mut (|f| no_out!(Integer::checked_from(f))))],
             );

@@ -1,5 +1,6 @@
 use std::cmp::max;
 
+use malachite_base::conversion::CheckedFrom;
 use malachite_base::num::traits::{BitAccess, SignificantBits};
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
@@ -39,7 +40,7 @@ fn benchmark_integer_assign_bit_library_comparison(
         gm.name(),
         limit,
         file_name,
-        &(|&(_, (ref n, index, _))| max(n.significant_bits(), index) as usize),
+        &(|&(_, (ref n, index, _))| usize::checked_from(max(n.significant_bits(), index)).unwrap()),
         "max(n.significant_bits(), index)",
         &mut [
             (
@@ -48,7 +49,9 @@ fn benchmark_integer_assign_bit_library_comparison(
             ),
             (
                 "rug",
-                &mut (|((mut n, index, bit), _)| no_out!(n.set_bit(index as u32, bit))),
+                &mut (|((mut n, index, bit), _)| {
+                    no_out!(n.set_bit(u32::checked_from(index).unwrap(), bit))
+                }),
             ),
         ],
     );

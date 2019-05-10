@@ -1,8 +1,9 @@
+use malachite_base::conversion::CheckedFrom;
 use malachite_base::num::traits::SignificantBits;
 use malachite_nz::platform::Limb;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::natural::{naturals, pairs_of_natural_and_small_usize};
+use inputs::natural::{naturals, pairs_of_natural_and_small_unsigned};
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_natural_to_limbs_asc);
@@ -70,7 +71,7 @@ fn demo_natural_limbs_size_hint(gm: GenerationMode, limit: usize) {
 }
 
 fn demo_natural_limbs_index(gm: GenerationMode, limit: usize) {
-    for (n, i) in pairs_of_natural_and_small_usize(gm).take(limit) {
+    for (n, i) in pairs_of_natural_and_small_unsigned(gm).take(limit) {
         println!("limbs({})[{}] = {:?}", n, i, n.limbs()[i]);
     }
 }
@@ -84,7 +85,7 @@ fn benchmark_natural_limbs_evaluation_strategy(gm: GenerationMode, limit: usize,
         gm.name(),
         limit,
         file_name,
-        &(|n| n.significant_bits() as usize),
+        &(|n| usize::checked_from(n.significant_bits()).unwrap()),
         "n.significant_bits()",
         &mut [
             (
@@ -116,7 +117,7 @@ fn benchmark_natural_limbs_rev_evaluation_strategy(
         gm.name(),
         limit,
         file_name,
-        &(|n| n.significant_bits() as usize),
+        &(|n| usize::checked_from(n.significant_bits()).unwrap()),
         "n.significant_bits()",
         &mut [
             (
@@ -143,7 +144,7 @@ fn benchmark_natural_limbs_size_hint(gm: GenerationMode, limit: usize, file_name
         gm.name(),
         limit,
         file_name,
-        &(|n| n.significant_bits() as usize),
+        &(|n| usize::checked_from(n.significant_bits()).unwrap()),
         "n.significant_bits()",
         &mut [(
             "Natural.limbs().size_hint()",
@@ -156,11 +157,11 @@ fn benchmark_natural_limbs_index_algorithms(gm: GenerationMode, limit: usize, fi
     m_run_benchmark(
         "Natural.limbs().index()",
         BenchmarkType::Algorithms,
-        pairs_of_natural_and_small_usize(gm),
+        pairs_of_natural_and_small_unsigned(gm),
         gm.name(),
         limit,
         file_name,
-        &(|&(ref n, _)| n.significant_bits() as usize),
+        &(|&(ref n, _)| usize::checked_from(n.significant_bits()).unwrap()),
         "n.significant_bits()",
         &mut [
             ("Natural.limbs()[u]", &mut (|(n, u)| no_out!(n.limbs()[u]))),

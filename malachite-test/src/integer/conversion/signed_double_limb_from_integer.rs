@@ -67,7 +67,7 @@ fn benchmark_i64_checked_from_integer_evaluation_strategy(
         gm.name(),
         limit,
         file_name,
-        &(|ref n| n.significant_bits() as usize),
+        &(|ref n| usize::checked_from(n.significant_bits()).unwrap()),
         "n.significant_bits()",
         &mut [
             (
@@ -94,7 +94,7 @@ fn benchmark_i64_wrapping_from_integer_evaluation_strategy(
         gm.name(),
         limit,
         file_name,
-        &(|ref n| n.significant_bits() as usize),
+        &(|ref n| usize::checked_from(n.significant_bits()).unwrap()),
         "n.significant_bits()",
         &mut [
             (

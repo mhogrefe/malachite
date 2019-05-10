@@ -1,3 +1,4 @@
+use malachite_base::conversion::CheckedFrom;
 use malachite_base::num::unsigneds::PrimitiveUnsigned;
 use rand::Rand;
 
@@ -47,7 +48,7 @@ fn benchmark_unsigned_floor_log_two<T: PrimitiveUnsigned + Rand>(
         gm.name(),
         limit,
         file_name,
-        &(|&n| n.significant_bits() as usize),
+        &(|&n| usize::checked_from(n.significant_bits()).unwrap()),
         "index",
         &mut [("malachite", &mut (|n| no_out!(n.floor_log_two())))],
     );
@@ -65,7 +66,7 @@ fn benchmark_unsigned_ceiling_log_two<T: PrimitiveUnsigned + Rand>(
         gm.name(),
         limit,
         file_name,
-        &(|&n| n.significant_bits() as usize),
+        &(|&n| usize::checked_from(n.significant_bits()).unwrap()),
         "index",
         &mut [("malachite", &mut (|n| no_out!(n.ceiling_log_two())))],
     );

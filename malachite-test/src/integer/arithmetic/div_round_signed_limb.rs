@@ -1,3 +1,4 @@
+use malachite_base::conversion::CheckedFrom;
 use malachite_base::num::traits::{CeilingDivMod, DivRound, DivRoundAssign, SignificantBits};
 use malachite_base::round::RoundingMode;
 use malachite_nz::platform::SignedLimb;
@@ -143,7 +144,7 @@ fn benchmark_integer_div_round_assign_signed_limb(
         gm.name(),
         limit,
         file_name,
-        &(|&(ref n, _, _)| n.significant_bits() as usize),
+        &(|&(ref n, _, _)| usize::checked_from(n.significant_bits()).unwrap()),
         "n.significant_bits()",
         &mut [(
             "malachite",
@@ -165,7 +166,7 @@ fn benchmark_integer_div_round_signed_limb_down_library_comparison(
         gm.name(),
         limit,
         file_name,
-        &(|&(_, (ref n, _))| n.significant_bits() as usize),
+        &(|&(_, (ref n, _))| usize::checked_from(n.significant_bits()).unwrap()),
         "n.significant_bits()",
         &mut [
             (
@@ -190,7 +191,7 @@ fn benchmark_integer_div_round_signed_limb_floor_library_comparison(
         gm.name(),
         limit,
         file_name,
-        &(|&(_, _, (ref n, _))| n.significant_bits() as usize),
+        &(|&(_, _, (ref n, _))| usize::checked_from(n.significant_bits()).unwrap()),
         "n.significant_bits()",
         &mut [
             (
@@ -219,7 +220,7 @@ fn benchmark_integer_div_round_signed_limb_ceiling_library_comparison(
         gm.name(),
         limit,
         file_name,
-        &(|&(_, (ref n, _))| n.significant_bits() as usize),
+        &(|&(_, (ref n, _))| usize::checked_from(n.significant_bits()).unwrap()),
         "n.significant_bits()",
         &mut [
             (
@@ -243,7 +244,7 @@ fn benchmark_integer_div_round_signed_limb_ceiling_algorithms(
         gm.name(),
         limit,
         file_name,
-        &(|&(ref n, _)| n.significant_bits() as usize),
+        &(|&(ref n, _)| usize::checked_from(n.significant_bits()).unwrap()),
         "n.significant_bits()",
         &mut [
             (
@@ -270,7 +271,7 @@ fn benchmark_integer_div_round_signed_limb_evaluation_strategy(
         gm.name(),
         limit,
         file_name,
-        &(|&(ref n, _, _)| n.significant_bits() as usize),
+        &(|&(ref n, _, _)| usize::checked_from(n.significant_bits()).unwrap()),
         "n.significant_bits()",
         &mut [
             (
@@ -297,7 +298,7 @@ fn benchmark_signed_limb_div_round_integer_evaluation_strategy(
         gm.name(),
         limit,
         file_name,
-        &(|&(_, ref n, _)| n.significant_bits() as usize),
+        &(|&(_, ref n, _)| usize::checked_from(n.significant_bits()).unwrap()),
         "n.significant_bits()",
         &mut [
             (

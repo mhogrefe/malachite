@@ -1544,11 +1544,11 @@ tests_and_properties!(
         );
 
         assert_eq!(
-            bigint_to_integer(&(&integer_to_bigint(n) >> u as usize)),
+            bigint_to_integer(&(&integer_to_bigint(n) >> usize::checked_from(u).unwrap())),
             shifted
         );
         assert_eq!(
-            bigint_to_integer(&(integer_to_bigint(n) >> u as usize)),
+            bigint_to_integer(&(integer_to_bigint(n) >> usize::checked_from(u).unwrap())),
             shifted
         );
     }

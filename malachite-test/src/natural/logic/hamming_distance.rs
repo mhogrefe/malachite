@@ -1,6 +1,7 @@
 use std::cmp::max;
 use std::iter::repeat;
 
+use malachite_base::conversion::CheckedFrom;
 use malachite_base::num::traits::{HammingDistance, SignificantBits};
 use malachite_nz::natural::logic::hamming_distance::{
     limbs_hamming_distance, limbs_hamming_distance_same_length,
@@ -147,7 +148,9 @@ fn benchmark_natural_hamming_distance_library_comparison(
         gm.name(),
         limit,
         file_name,
-        &(|&(_, (ref x, ref y))| max(x.significant_bits(), y.significant_bits()) as usize),
+        &(|&(_, (ref x, ref y))| {
+            usize::checked_from(max(x.significant_bits(), y.significant_bits())).unwrap()
+        }),
         "max(x.significant_bits(), y.significant_bits())",
         &mut [
             (
@@ -174,7 +177,9 @@ fn benchmark_natural_hamming_distance_algorithms(
         gm.name(),
         limit,
         file_name,
-        &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),
+        &(|&(ref x, ref y)| {
+            usize::checked_from(max(x.significant_bits(), y.significant_bits())).unwrap()
+        }),
         "max(x.significant_bits(), y.significant_bits())",
         &mut [
             ("default", &mut (|(x, y)| no_out!(x.hamming_distance(&y)))),

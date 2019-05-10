@@ -1,5 +1,6 @@
 use std::cmp::{max, min};
 
+use malachite_base::conversion::CheckedFrom;
 use malachite_base::num::traits::{EqModPowerOfTwo, ModPowerOfTwo, SignificantBits};
 use malachite_nz::integer::arithmetic::eq_natural_mod_power_of_two::*;
 
@@ -72,7 +73,7 @@ fn benchmark_limbs_eq_mod_power_of_two_neg_pos(gm: GenerationMode, limit: usize,
         gm.name(),
         limit,
         file_name,
-        &(|&(ref xs, ref ys, pow)| min(pow as usize, max(xs.len(), ys.len()))),
+        &(|&(ref xs, ref ys, pow)| min(usize::checked_from(pow).unwrap(), max(xs.len(), ys.len()))),
         "min(pow, max(xs.len(), ys.len()))",
         &mut [(
             "malachite",
@@ -94,7 +95,7 @@ fn benchmark_integer_eq_natural_mod_power_of_two_algorithms(
         limit,
         file_name,
         &(|&(ref x, ref y, pow)| {
-            min(pow, max(x.significant_bits(), y.significant_bits())) as usize
+            usize::checked_from(min(pow, max(x.significant_bits(), y.significant_bits()))).unwrap()
         }),
         "min(pow, max(x.significant_bits(), y.significant_bits()))",
         &mut [
@@ -125,7 +126,7 @@ fn benchmark_natural_eq_integer_mod_power_of_two_algorithms(
         limit,
         file_name,
         &(|&(ref x, ref y, pow)| {
-            min(pow, max(x.significant_bits(), y.significant_bits())) as usize
+            usize::checked_from(min(pow, max(x.significant_bits(), y.significant_bits()))).unwrap()
         }),
         "min(pow, max(x.significant_bits(), y.significant_bits()))",
         &mut [

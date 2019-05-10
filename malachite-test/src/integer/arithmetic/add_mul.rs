@@ -1,3 +1,4 @@
+use malachite_base::conversion::CheckedFrom;
 use malachite_base::num::traits::{AddMul, AddMulAssign, SignificantBits};
 use malachite_nz::integer::Integer;
 
@@ -174,11 +175,12 @@ fn demo_integer_add_mul_ref_ref_ref(gm: GenerationMode, limit: usize) {
 }
 
 fn bucketing_function(t: &(Integer, Integer, Integer)) -> usize {
-    max!(
+    usize::checked_from(max!(
         t.0.significant_bits(),
         t.1.significant_bits(),
         t.2.significant_bits()
-    ) as usize
+    ))
+    .unwrap()
 }
 
 const BUCKETING_LABEL: &str = "max(a.significant_bits(), b.significant_bits(), \

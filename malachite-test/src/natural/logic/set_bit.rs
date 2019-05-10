@@ -1,3 +1,4 @@
+use malachite_base::conversion::CheckedFrom;
 use malachite_base::num::traits::BitAccess;
 use malachite_nz::natural::logic::bit_access::{limbs_slice_set_bit, limbs_vec_set_bit};
 use num::{BigUint, One};
@@ -22,7 +23,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
 }
 
 pub fn num_set_bit(x: &mut BigUint, index: u64) {
-    *x = x.clone() | (BigUint::one() << index as usize);
+    *x = x.clone() | (BigUint::one() << usize::checked_from(index).unwrap());
 }
 
 fn demo_limbs_slice_set_bit(gm: GenerationMode, limit: usize) {
@@ -63,7 +64,7 @@ fn benchmark_limbs_slice_set_bit(gm: GenerationMode, limit: usize, file_name: &s
         gm.name(),
         limit,
         file_name,
-        &(|&(_, index)| index as usize),
+        &(|&(_, index)| usize::checked_from(index).unwrap()),
         "index",
         &mut [(
             "malachite",
@@ -80,7 +81,7 @@ fn benchmark_limbs_vec_set_bit(gm: GenerationMode, limit: usize, file_name: &str
         gm.name(),
         limit,
         file_name,
-        &(|&(_, index)| index as usize),
+        &(|&(_, index)| usize::checked_from(index).unwrap()),
         "index",
         &mut [(
             "malachite",
@@ -97,7 +98,7 @@ fn benchmark_natural_set_bit_library_comparison(gm: GenerationMode, limit: usize
         gm.name(),
         limit,
         file_name,
-        &(|&(_, (_, index))| index as usize),
+        &(|&(_, (_, index))| usize::checked_from(index).unwrap()),
         "index",
         &mut [
             ("malachite", &mut (|(_, (mut n, index))| n.set_bit(index))),

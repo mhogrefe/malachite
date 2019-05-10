@@ -1,3 +1,4 @@
+use malachite_base::conversion::CheckedFrom;
 use malachite_base::num::traits::SignificantBits;
 use malachite_nz::integer::logic::xor_signed_limb::{
     limbs_neg_xor_limb_neg, limbs_neg_xor_limb_neg_in_place, limbs_neg_xor_limb_neg_to_out,
@@ -361,7 +362,7 @@ fn benchmark_integer_xor_assign_signed_limb_library_comparison(
         gm.name(),
         limit,
         file_name,
-        &(|&(_, (ref n, _))| n.significant_bits() as usize),
+        &(|&(_, (ref n, _))| usize::checked_from(n.significant_bits()).unwrap()),
         "n.significant_bits()",
         &mut [
             ("malachite", &mut (|(_, (mut x, y))| x ^= y)),
@@ -379,7 +380,7 @@ fn benchmark_integer_xor_assign_signed_limb(gm: GenerationMode, limit: usize, fi
         gm.name(),
         limit,
         file_name,
-        &(|&(ref n, _)| n.significant_bits() as usize),
+        &(|&(ref n, _)| usize::checked_from(n.significant_bits()).unwrap()),
         "n.significant_bits()",
         &mut [("malachite", &mut (|(mut x, y)| x ^= y))],
     );
@@ -398,7 +399,7 @@ fn benchmark_integer_xor_signed_limb_library_comparison(
         gm.name(),
         limit,
         file_name,
-        &(|&(_, (ref n, _))| n.significant_bits() as usize),
+        &(|&(_, (ref n, _))| usize::checked_from(n.significant_bits()).unwrap()),
         "n.significant_bits()",
         &mut [
             ("malachite", &mut (|(_, (x, y))| no_out!(&x ^ y))),
@@ -419,7 +420,7 @@ fn benchmark_integer_xor_signed_limb_evaluation_strategy(
         gm.name(),
         limit,
         file_name,
-        &(|&(ref n, _)| n.significant_bits() as usize),
+        &(|&(ref n, _)| usize::checked_from(n.significant_bits()).unwrap()),
         "n.significant_bits()",
         &mut [
             ("Integer ^ SignedLimb", &mut (|(x, y)| no_out!(x ^ y))),
@@ -436,7 +437,7 @@ fn benchmark_integer_xor_signed_limb_algorithms(gm: GenerationMode, limit: usize
         gm.name(),
         limit,
         file_name,
-        &(|&(ref n, _)| n.significant_bits() as usize),
+        &(|&(ref n, _)| usize::checked_from(n.significant_bits()).unwrap()),
         "n.significant_bits()",
         &mut [
             ("default", &mut (|(x, y)| no_out!(&x ^ y))),
@@ -465,7 +466,7 @@ fn benchmark_signed_limb_xor_integer_library_comparison(
         gm.name(),
         limit,
         file_name,
-        &(|&(_, (_, ref n))| n.significant_bits() as usize),
+        &(|&(_, (_, ref n))| usize::checked_from(n.significant_bits()).unwrap()),
         "n.significant_bits()",
         &mut [
             ("malachite", &mut (|(_, (x, y))| no_out!(x ^ &y))),
@@ -486,7 +487,7 @@ fn benchmark_signed_limb_xor_integer_evaluation_strategy(
         gm.name(),
         limit,
         file_name,
-        &(|&(_, ref n)| n.significant_bits() as usize),
+        &(|&(_, ref n)| usize::checked_from(n.significant_bits()).unwrap()),
         "n.significant_bits()",
         &mut [
             ("SignedLimb ^ Integer", &mut (|(x, y)| no_out!(x ^ y))),

@@ -1,3 +1,4 @@
+use malachite_base::conversion::CheckedFrom;
 use malachite_base::num::traits::BitAccess;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
@@ -34,13 +35,15 @@ fn benchmark_natural_flip_bit_library_comparison(
         gm.name(),
         limit,
         file_name,
-        &(|&(_, (_, index))| index as usize),
+        &(|&(_, (_, index))| usize::checked_from(index).unwrap()),
         "n.significant_bits()",
         &mut [
             ("malachite", &mut (|(_, (mut n, index))| n.flip_bit(index))),
             (
                 "rug",
-                &mut (|((mut n, index), _)| no_out!(n.toggle_bit(index as u32))),
+                &mut (|((mut n, index), _)| {
+                    no_out!(n.toggle_bit(u32::checked_from(index).unwrap()))
+                }),
             ),
         ],
     );

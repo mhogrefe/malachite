@@ -1,6 +1,7 @@
 use std::str::FromStr;
 
 use malachite_base::comparison::Max;
+use malachite_base::conversion::WrappingFrom;
 use malachite_base::num::integers::PrimitiveInteger;
 use malachite_base::num::traits::{Abs, One, SignificantBits};
 use malachite_nz::integer::Integer;
@@ -18,7 +19,7 @@ use malachite_test::inputs::integer::integers;
 fn test_significant_bits() {
     let test = |n, out| {
         assert_eq!(Integer::from_str(n).unwrap().significant_bits(), out);
-        assert_eq!(BigInt::from_str(n).unwrap().bits() as u64, out);
+        assert_eq!(u64::wrapping_from(BigInt::from_str(n).unwrap().bits()), out);
         assert_eq!(
             u64::from(rug::Integer::from_str(n).unwrap().significant_bits()),
             out
@@ -35,7 +36,10 @@ fn test_significant_bits() {
 fn significant_bits_properties() {
     test_properties(integers, |x| {
         let significant_bits = x.significant_bits();
-        assert_eq!(integer_to_bigint(x).bits() as u64, significant_bits);
+        assert_eq!(
+            u64::wrapping_from(integer_to_bigint(x).bits()),
+            significant_bits
+        );
         assert_eq!(
             u64::from(integer_to_rug_integer(x).significant_bits()),
             significant_bits

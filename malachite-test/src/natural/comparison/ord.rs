@@ -1,5 +1,6 @@
 use std::cmp::{min, Ordering};
 
+use malachite_base::conversion::CheckedFrom;
 use malachite_base::num::traits::SignificantBits;
 use malachite_nz::natural::comparison::ord::{limbs_cmp, limbs_cmp_same_length};
 
@@ -82,7 +83,9 @@ fn benchmark_natural_cmp_library_comparison(gm: GenerationMode, limit: usize, fi
         gm.name(),
         limit,
         file_name,
-        &(|&(_, _, (ref x, ref y))| min(x.significant_bits(), y.significant_bits()) as usize),
+        &(|&(_, _, (ref x, ref y))| {
+            usize::checked_from(min(x.significant_bits(), y.significant_bits())).unwrap()
+        }),
         "min(x.significant_bits(), y.significant_bits())",
         &mut [
             ("malachite", &mut (|(_, _, (x, y))| no_out!(x.cmp(&y)))),

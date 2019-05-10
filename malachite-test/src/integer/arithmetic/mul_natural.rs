@@ -1,3 +1,4 @@
+use malachite_base::conversion::CheckedFrom;
 use malachite_base::num::traits::SignificantBits;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
@@ -133,7 +134,9 @@ fn benchmark_integer_mul_natural_assign_library_comparison(
         gm.name(),
         limit,
         file_name,
-        &(|&(_, (ref x, ref y))| (x.significant_bits() + y.significant_bits()) as usize),
+        &(|&(_, (ref x, ref y))| {
+            usize::checked_from(x.significant_bits() + y.significant_bits()).unwrap()
+        }),
         "x.significant_bits() + y.significant_bits()",
         &mut [
             ("malachite", &mut (|(_, (mut x, y))| x *= y)),
@@ -154,7 +157,9 @@ fn benchmark_integer_mul_natural_assign_evaluation_strategy(
         gm.name(),
         limit,
         file_name,
-        &(|&(ref x, ref y)| (x.significant_bits() + y.significant_bits()) as usize),
+        &(|&(ref x, ref y)| {
+            usize::checked_from(x.significant_bits() + y.significant_bits()).unwrap()
+        }),
         "x.significant_bits() + y.significant_bits()",
         &mut [
             ("Integer *= Natural", &mut (|(mut x, y)| no_out!(x *= y))),
@@ -175,7 +180,9 @@ fn benchmark_integer_mul_natural_library_comparison(
         gm.name(),
         limit,
         file_name,
-        &(|&(_, (ref x, ref y))| (x.significant_bits() + y.significant_bits()) as usize),
+        &(|&(_, (ref x, ref y))| {
+            usize::checked_from(x.significant_bits() + y.significant_bits()).unwrap()
+        }),
         "x.significant_bits() + y.significant_bits()",
         &mut [
             ("malachite", &mut (|(_, (x, y))| no_out!(x * y))),
@@ -196,7 +203,9 @@ fn benchmark_integer_mul_natural_evaluation_strategy(
         gm.name(),
         limit,
         file_name,
-        &(|&(ref x, ref y)| (x.significant_bits() + y.significant_bits()) as usize),
+        &(|&(ref x, ref y)| {
+            usize::checked_from(x.significant_bits() + y.significant_bits()).unwrap()
+        }),
         "x.significant_bits() + y.significant_bits()",
         &mut [
             ("Integer * Natural", &mut (|(x, y)| no_out!(x * y))),
@@ -219,7 +228,9 @@ fn benchmark_natural_mul_integer_library_comparison(
         gm.name(),
         limit,
         file_name,
-        &(|&(_, (ref x, ref y))| (x.significant_bits() + y.significant_bits()) as usize),
+        &(|&(_, (ref x, ref y))| {
+            usize::checked_from(x.significant_bits() + y.significant_bits()).unwrap()
+        }),
         "x.significant_bits() + y.significant_bits()",
         &mut [
             ("malachite", &mut (|(_, (x, y))| no_out!(x * y))),
@@ -240,7 +251,9 @@ fn benchmark_natural_mul_integer_evaluation_strategy(
         gm.name(),
         limit,
         file_name,
-        &(|&(ref x, ref y)| (x.significant_bits() + y.significant_bits()) as usize),
+        &(|&(ref x, ref y)| {
+            usize::checked_from(x.significant_bits() + y.significant_bits()).unwrap()
+        }),
         "x.significant_bits() + y.significant_bits()",
         &mut [
             ("Natural * Integer", &mut (|(x, y)| no_out!(x * y))),

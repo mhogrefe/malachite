@@ -1,7 +1,7 @@
 use std::str::FromStr;
 
 use malachite_base::comparison::Max;
-use malachite_base::conversion::CheckedFrom;
+use malachite_base::conversion::{CheckedFrom, WrappingFrom};
 use malachite_base::num::integers::PrimitiveInteger;
 use malachite_base::num::traits::{One, Zero};
 use malachite_nz::integer::Integer;
@@ -673,14 +673,14 @@ fn sub_fail_4() {
 fn limbs_sub_properties() {
     test_properties(pairs_of_unsigned_vec_var_3, |&(ref xs, ref ys)| {
         let (limbs, borrow) = limbs_sub(xs, ys);
-        let len = limbs.len() as u32;
+        let len = limbs.len();
         let n = Natural::from_owned_limbs_asc(limbs);
         if borrow {
             assert_eq!(
                 n,
                 Integer::from(Natural::from_limbs_asc(xs))
                     - Integer::from(Natural::from_limbs_asc(ys))
-                    + (Integer::ONE << (Limb::WIDTH * len))
+                    + (Integer::ONE << (usize::wrapping_from(Limb::WIDTH) * len))
             );
         } else {
             assert_eq!(n, Natural::from_limbs_asc(xs) - Natural::from_limbs_asc(ys));
@@ -700,7 +700,7 @@ fn limbs_sub_to_out_helper(
     let limbs = if f(&mut out, xs, ys) {
         let n = Integer::from(Natural::from_limbs_asc(xs))
             - Integer::from(Natural::from_limbs_asc(ys))
-            + (Integer::ONE << (Limb::WIDTH * (len as u32)));
+            + (Integer::ONE << (usize::wrapping_from(Limb::WIDTH) * len));
         let mut limbs = Natural::checked_from(n).unwrap().into_limbs_asc();
         limbs.resize(len, Limb::MAX);
         limbs
@@ -741,7 +741,7 @@ fn limbs_sub_in_place_left_helper(
 ) {
     let mut xs = xs.to_vec();
     let xs_old = xs.clone();
-    let len = xs.len() as u32;
+    let len = xs.len();
     let borrow = f(&mut xs, ys);
     let n = Natural::from_owned_limbs_asc(xs);
     if borrow {
@@ -749,7 +749,7 @@ fn limbs_sub_in_place_left_helper(
             n,
             Integer::from(Natural::from_owned_limbs_asc(xs_old))
                 - Integer::from(Natural::from_limbs_asc(ys))
-                + (Integer::ONE << (Limb::WIDTH * len))
+                + (Integer::ONE << (usize::wrapping_from(Limb::WIDTH) * len))
         );
     } else {
         assert_eq!(
@@ -778,7 +778,6 @@ macro_rules! limbs_sub_in_place_right_helper {
         |&(ref $xs, ref $ys)| {
             let mut ys = $ys.to_vec();
             let ys_old = $ys.clone();
-            let len = $xs.len() as u32;
             let borrow = $f($xs, &mut ys);
             let n = Natural::from_limbs_asc(&ys);
             if borrow {
@@ -786,7 +785,7 @@ macro_rules! limbs_sub_in_place_right_helper {
                     n,
                     Integer::from(Natural::from_limbs_asc($xs))
                         - Integer::from(Natural::from_owned_limbs_asc(ys_old))
-                        + (Integer::ONE << (Limb::WIDTH * len))
+                        + (Integer::ONE << (usize::wrapping_from(Limb::WIDTH) * $xs.len()))
                 );
             } else {
                 assert_eq!(
@@ -826,7 +825,7 @@ fn limbs_sub_same_length_with_borrow_in_to_out_properties() {
             {
                 let mut n = Integer::from(Natural::from_limbs_asc(xs))
                     - Integer::from(Natural::from_limbs_asc(ys))
-                    + (Integer::ONE << (Limb::WIDTH * (len as u32)));
+                    + (Integer::ONE << (usize::wrapping_from(Limb::WIDTH) * len));
                 if borrow_in {
                     n -= 1 as Limb;
                 }
@@ -855,7 +854,7 @@ fn limbs_sub_same_length_with_borrow_in_in_place_left_properties() {
         |&(ref xs, ref ys, borrow_in)| {
             let mut xs = xs.to_vec();
             let xs_old = xs.clone();
-            let len = xs.len() as u32;
+            let len = xs.len();
             let borrow =
                 _limbs_sub_same_length_with_borrow_in_in_place_left(&mut xs, ys, borrow_in);
             let n = Natural::from_owned_limbs_asc(xs);
@@ -863,7 +862,7 @@ fn limbs_sub_same_length_with_borrow_in_in_place_left_properties() {
                 Natural::checked_from(
                     Integer::from(Natural::from_owned_limbs_asc(xs_old))
                         - Integer::from(Natural::from_limbs_asc(ys))
-                        + (Integer::ONE << (Limb::WIDTH * len)),
+                        + (Integer::ONE << (usize::wrapping_from(Limb::WIDTH) * len)),
                 )
                 .unwrap()
             } else {

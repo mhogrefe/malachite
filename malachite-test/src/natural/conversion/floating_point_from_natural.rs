@@ -113,7 +113,7 @@ macro_rules! float_demos_and_benches {
                 gm.name(),
                 limit,
                 file_name,
-                &(|&(ref n, _)| n.significant_bits() as usize),
+                &(|&(ref n, _)| usize::checked_from(n.significant_bits()).unwrap()),
                 "n.significant_bits()",
                 &mut [
                     (
@@ -136,7 +136,7 @@ macro_rules! float_demos_and_benches {
                 gm.name(),
                 limit,
                 file_name,
-                &(|ref n| n.significant_bits() as usize),
+                &(|ref n| usize::checked_from(n.significant_bits()).unwrap()),
                 "n.significant_bits()",
                 &mut [
                     (
@@ -163,7 +163,7 @@ macro_rules! float_demos_and_benches {
                 gm.name(),
                 limit,
                 file_name,
-                &(|ref n| n.significant_bits() as usize),
+                &(|ref n| usize::checked_from(n.significant_bits()).unwrap()),
                 "n.significant_bits()",
                 &mut [
                     (

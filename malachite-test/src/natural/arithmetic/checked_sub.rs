@@ -1,6 +1,7 @@
 use std::cmp::max;
 use std::ops::Sub;
 
+use malachite_base::conversion::CheckedFrom;
 use malachite_base::num::traits::{CheckedSub, SignificantBits};
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
@@ -76,7 +77,9 @@ fn benchmark_natural_checked_sub_library_comparison(
         gm.name(),
         limit,
         file_name,
-        &(|&(_, _, (ref x, ref y))| max(x.significant_bits(), y.significant_bits()) as usize),
+        &(|&(_, _, (ref x, ref y))| {
+            usize::checked_from(max(x.significant_bits(), y.significant_bits())).unwrap()
+        }),
         "max(x.significant_bits(), y.significant_bits())",
         &mut [
             (
@@ -101,7 +104,9 @@ fn benchmark_natural_checked_sub_evaluation_strategy(
         gm.name(),
         limit,
         file_name,
-        &(|&(ref x, ref y)| max(x.significant_bits(), y.significant_bits()) as usize),
+        &(|&(ref x, ref y)| {
+            usize::checked_from(max(x.significant_bits(), y.significant_bits())).unwrap()
+        }),
         "max(x.significant_bits(), y.significant_bits())",
         &mut [
             (

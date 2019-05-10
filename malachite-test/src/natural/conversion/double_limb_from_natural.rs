@@ -132,7 +132,7 @@ fn benchmark_double_limb_checked_from_natural_evaluation_strategy(
         gm.name(),
         limit,
         file_name,
-        &(|ref n| n.significant_bits() as usize),
+        &(|ref n| usize::checked_from(n.significant_bits()).unwrap()),
         "n.significant_bits()",
         &mut [
             (
@@ -159,7 +159,7 @@ fn benchmark_double_limb_wrapping_from_natural_evaluation_strategy(
         gm.name(),
         limit,
         file_name,
-        &(|ref n| n.significant_bits() as usize),
+        &(|ref n| usize::checked_from(n.significant_bits()).unwrap()),
         "n.significant_bits()",
         &mut [
             (
@@ -186,7 +186,7 @@ fn benchmark_double_limb_saturating_from_natural_evaluation_strategy(
         gm.name(),
         limit,
         file_name,
-        &(|ref n| n.significant_bits() as usize),
+        &(|ref n| usize::checked_from(n.significant_bits()).unwrap()),
         "n.significant_bits()",
         &mut [
             (
@@ -213,7 +213,7 @@ fn benchmark_double_limb_overflowing_from_natural_evaluation_strategy(
         gm.name(),
         limit,
         file_name,
-        &(|ref n| n.significant_bits() as usize),
+        &(|ref n| usize::checked_from(n.significant_bits()).unwrap()),
         "n.significant_bits()",
         &mut [
             (

@@ -1,5 +1,6 @@
 use std::cmp::max;
 
+use malachite_base::conversion::CheckedFrom;
 use malachite_base::num::traits::{CheckedSub, SignificantBits, SubMul, SubMulAssign};
 use malachite_nz::platform::Limb;
 
@@ -70,7 +71,9 @@ fn benchmark_natural_sub_mul_assign_limb_algorithms(
         gm.name(),
         limit,
         file_name,
-        &(|&(ref a, ref b, _)| max(a.significant_bits(), b.significant_bits()) as usize),
+        &(|&(ref a, ref b, _)| {
+            usize::checked_from(max(a.significant_bits(), b.significant_bits())).unwrap()
+        }),
         "max(a.significant_bits(), b.significant_bits())",
         &mut [
             (
@@ -97,7 +100,9 @@ fn benchmark_natural_sub_mul_limb_evaluation_strategy(
         gm.name(),
         limit,
         file_name,
-        &(|&(ref a, ref b, _)| max(a.significant_bits(), b.significant_bits()) as usize),
+        &(|&(ref a, ref b, _)| {
+            usize::checked_from(max(a.significant_bits(), b.significant_bits())).unwrap()
+        }),
         "max(a.significant_bits(), b.significant_bits())",
         &mut [
             (
@@ -120,7 +125,9 @@ fn benchmark_natural_sub_mul_limb_algorithms(gm: GenerationMode, limit: usize, f
         gm.name(),
         limit,
         file_name,
-        &(|&(ref a, ref b, _)| max(a.significant_bits(), b.significant_bits()) as usize),
+        &(|&(ref a, ref b, _)| {
+            usize::checked_from(max(a.significant_bits(), b.significant_bits())).unwrap()
+        }),
         "max(a.significant_bits(), b.significant_bits())",
         &mut [
             (
@@ -147,7 +154,9 @@ fn benchmark_natural_sub_mul_limb_ref_algorithms(
         gm.name(),
         limit,
         file_name,
-        &(|&(ref a, ref b, _)| max(a.significant_bits(), b.significant_bits()) as usize),
+        &(|&(ref a, ref b, _)| {
+            usize::checked_from(max(a.significant_bits(), b.significant_bits())).unwrap()
+        }),
         "max(a.significant_bits(), b.significant_bits())",
         &mut [
             (
