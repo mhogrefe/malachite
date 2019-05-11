@@ -1,4 +1,4 @@
-use malachite_base::conversion::{CheckedFrom, WrappingFrom};
+use malachite_base::conversion::{CheckedFrom, OverflowingFrom, SaturatingFrom, WrappingFrom};
 use malachite_base::num::traits::SignificantBits;
 use malachite_nz::platform::Limb;
 
@@ -12,6 +12,10 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limb_checked_from_integer_ref);
     register_demo!(registry, demo_limb_wrapping_from_integer);
     register_demo!(registry, demo_limb_wrapping_from_integer_ref);
+    register_demo!(registry, demo_limb_saturating_from_integer);
+    register_demo!(registry, demo_limb_saturating_from_integer_ref);
+    register_demo!(registry, demo_limb_overflowing_from_integer);
+    register_demo!(registry, demo_limb_overflowing_from_integer_ref);
     #[cfg(feature = "32_bit_limbs")]
     register_bench!(
         registry,
@@ -23,6 +27,11 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
         Large,
         benchmark_limb_checked_from_integer_evaluation_strategy
     );
+    register_bench!(
+        registry,
+        Large,
+        benchmark_limb_checked_from_integer_algorithms
+    );
     #[cfg(feature = "32_bit_limbs")]
     register_bench!(
         registry,
@@ -33,6 +42,26 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
         registry,
         Large,
         benchmark_limb_wrapping_from_integer_evaluation_strategy
+    );
+    register_bench!(
+        registry,
+        Large,
+        benchmark_limb_wrapping_from_integer_algorithms
+    );
+    register_bench!(
+        registry,
+        Large,
+        benchmark_limb_saturating_from_integer_evaluation_strategy
+    );
+    register_bench!(
+        registry,
+        Large,
+        benchmark_limb_overflowing_from_integer_evaluation_strategy
+    );
+    register_bench!(
+        registry,
+        Large,
+        benchmark_limb_overflowing_from_integer_algorithms
     );
 }
 
@@ -67,6 +96,48 @@ fn demo_limb_wrapping_from_integer(gm: GenerationMode, limit: usize) {
 fn demo_limb_wrapping_from_integer_ref(gm: GenerationMode, limit: usize) {
     for n in integers(gm).take(limit) {
         println!("Limb::wrapping_from(&{}) = {}", n, Limb::wrapping_from(&n));
+    }
+}
+
+fn demo_limb_saturating_from_integer(gm: GenerationMode, limit: usize) {
+    for n in integers(gm).take(limit) {
+        let n_clone = n.clone();
+        println!(
+            "Limb::saturating_from({}) = {}",
+            n_clone,
+            Limb::saturating_from(n)
+        );
+    }
+}
+
+fn demo_limb_saturating_from_integer_ref(gm: GenerationMode, limit: usize) {
+    for n in integers(gm).take(limit) {
+        println!(
+            "Limb::saturating_from(&{}) = {}",
+            n,
+            Limb::saturating_from(&n)
+        );
+    }
+}
+
+fn demo_limb_overflowing_from_integer(gm: GenerationMode, limit: usize) {
+    for n in integers(gm).take(limit) {
+        let n_clone = n.clone();
+        println!(
+            "Limb::overflowing_from({}) = {:?}",
+            n_clone,
+            Limb::overflowing_from(n)
+        );
+    }
+}
+
+fn demo_limb_overflowing_from_integer_ref(gm: GenerationMode, limit: usize) {
+    for n in integers(gm).take(limit) {
+        println!(
+            "Limb::overflowing_from(&{}) = {:?}",
+            n,
+            Limb::overflowing_from(&n)
+        );
     }
 }
 
@@ -119,6 +190,37 @@ fn benchmark_limb_checked_from_integer_evaluation_strategy(
     );
 }
 
+fn benchmark_limb_checked_from_integer_algorithms(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "Limb::checked_from(Integer)",
+        BenchmarkType::Algorithms,
+        integers(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|ref n| usize::checked_from(n.significant_bits()).unwrap()),
+        "n.significant_bits()",
+        &mut [
+            ("standard", &mut (|n| no_out!(Limb::checked_from(n)))),
+            (
+                "using overflowing_from",
+                &mut (|n| {
+                    let (value, overflow) = Limb::overflowing_from(n);
+                    if overflow {
+                        None
+                    } else {
+                        Some(value)
+                    };
+                }),
+            ),
+        ],
+    );
+}
+
 #[cfg(feature = "32_bit_limbs")]
 fn benchmark_limb_wrapping_from_integer_library_comparison(
     gm: GenerationMode,
@@ -166,6 +268,110 @@ fn benchmark_limb_wrapping_from_integer_evaluation_strategy(
             (
                 "Limb::wrapping_from(&Integer)",
                 &mut (|n| no_out!(Limb::wrapping_from(&n))),
+            ),
+        ],
+    );
+}
+
+fn benchmark_limb_wrapping_from_integer_algorithms(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "Limb::wrapping_from(Integer)",
+        BenchmarkType::Algorithms,
+        integers(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|ref n| usize::checked_from(n.significant_bits()).unwrap()),
+        "n.significant_bits()",
+        &mut [
+            ("standard", &mut (|n| no_out!(Limb::wrapping_from(n)))),
+            (
+                "using overflowing_from",
+                &mut (|n| {
+                    Limb::overflowing_from(n).0;
+                }),
+            ),
+        ],
+    );
+}
+
+fn benchmark_limb_saturating_from_integer_evaluation_strategy(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "Limb::saturating_from(Integer)",
+        BenchmarkType::EvaluationStrategy,
+        integers(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|ref n| usize::checked_from(n.significant_bits()).unwrap()),
+        "n.significant_bits()",
+        &mut [
+            (
+                "Limb::saturating_from(Integer)",
+                &mut (|n| no_out!(Limb::saturating_from(n))),
+            ),
+            (
+                "Limb::saturating_from(&Integer)",
+                &mut (|n| no_out!(Limb::saturating_from(&n))),
+            ),
+        ],
+    );
+}
+
+fn benchmark_limb_overflowing_from_integer_evaluation_strategy(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "Limb::overflowing_from(Integer)",
+        BenchmarkType::EvaluationStrategy,
+        integers(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|ref n| usize::checked_from(n.significant_bits()).unwrap()),
+        "n.significant_bits()",
+        &mut [
+            (
+                "Limb::overflowing_from(Integer)",
+                &mut (|n| no_out!(Limb::overflowing_from(n))),
+            ),
+            (
+                "Limb::overflowing_from(&Integer)",
+                &mut (|n| no_out!(Limb::overflowing_from(&n))),
+            ),
+        ],
+    );
+}
+
+fn benchmark_limb_overflowing_from_integer_algorithms(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "Limb::overflowing_from(Integer)",
+        BenchmarkType::Algorithms,
+        integers(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|ref n| usize::checked_from(n.significant_bits()).unwrap()),
+        "n.significant_bits()",
+        &mut [
+            ("standard", &mut (|n| no_out!(Limb::overflowing_from(n)))),
+            (
+                "using checked_from and wrapping_from",
+                &mut (|n| no_out!((Limb::wrapping_from(&n), Limb::checked_from(n).is_none()))),
             ),
         ],
     );

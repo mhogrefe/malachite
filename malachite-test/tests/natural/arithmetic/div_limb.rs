@@ -18,7 +18,7 @@ use malachite_test::common::{biguint_to_natural, natural_to_biguint};
 use malachite_test::common::{natural_to_rug_integer, rug_integer_to_natural};
 use malachite_test::inputs::base::{
     pairs_of_unsigned_and_positive_unsigned, pairs_of_unsigned_vec_and_positive_unsigned_var_1,
-    positive_unsigneds, quadruples_of_limb_vec_limb_vec_limb_and_limb_var_2,
+    positive_unsigneds, quadruples_of_limb_vec_limb_vec_limb_and_limb_var_3,
     triples_of_limb_vec_limb_and_limb_var_1,
     triples_of_unsigned_vec_unsigned_vec_and_positive_unsigned_var_1,
 };
@@ -313,7 +313,7 @@ fn limbs_div_limb_in_place_properties() {
 #[test]
 fn limbs_div_divisor_of_limb_max_with_carry_to_out_properties() {
     test_properties(
-        quadruples_of_limb_vec_limb_vec_limb_and_limb_var_2,
+        quadruples_of_limb_vec_limb_vec_limb_and_limb_var_3,
         |&(ref out, ref xs, divisor, carry)| {
             //TODO figure out what to test
             let mut out = out.to_vec();

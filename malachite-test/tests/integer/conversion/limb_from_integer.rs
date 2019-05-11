@@ -2,9 +2,9 @@ use std::cmp::Ordering;
 use std::str::FromStr;
 
 use malachite_base::comparison::Max;
-use malachite_base::conversion::{CheckedFrom, WrappingFrom};
+use malachite_base::conversion::{CheckedFrom, OverflowingFrom, SaturatingFrom, WrappingFrom};
 use malachite_base::num::integers::PrimitiveInteger;
-use malachite_base::num::traits::{ModPowerOfTwo, Sign, SignificantBits};
+use malachite_base::num::traits::{ModPowerOfTwo, PartialOrdAbs, Sign, SignificantBits};
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::Limb;
 #[cfg(feature = "32_bit_limbs")]
@@ -74,6 +74,66 @@ fn test_limb_wrapping_from_integer() {
 }
 
 #[test]
+fn test_limb_saturating_from_integer() {
+    let test = |n, out| {
+        assert_eq!(Limb::saturating_from(Integer::from_str(n).unwrap()), out);
+        assert_eq!(Limb::saturating_from(&Integer::from_str(n).unwrap()), out);
+    };
+    test("0", 0);
+    test("123", 123);
+    #[cfg(feature = "32_bit_limbs")]
+    {
+        test("-123", 0);
+        test("1000000000000", 4_294_967_295);
+        test("-1000000000000", 0);
+        test("4294967296", 4_294_967_295);
+        test("4294967297", 4_294_967_295);
+        test("-4294967296", 0);
+        test("-4294967295", 0);
+    }
+    #[cfg(feature = "64_bit_limbs")]
+    {
+        test("-123", 0);
+        test("1000000000000", 1_000_000_000_000);
+        test("-1000000000000", 0);
+        test("18446744073709551616", 18_446_744_073_709_551_615);
+        test("18446744073709551617", 18_446_744_073_709_551_615);
+        test("-18446744073709551616", 0);
+        test("-18446744073709551615", 0);
+    }
+}
+
+#[test]
+fn test_limb_overflowing_from_integer() {
+    let test = |n, out| {
+        assert_eq!(Limb::overflowing_from(Integer::from_str(n).unwrap()), out);
+        assert_eq!(Limb::overflowing_from(&Integer::from_str(n).unwrap()), out);
+    };
+    test("0", (0, false));
+    test("123", (123, false));
+    #[cfg(feature = "32_bit_limbs")]
+    {
+        test("-123", (4_294_967_173, true));
+        test("1000000000000", (3_567_587_328, true));
+        test("-1000000000000", (727_379_968, true));
+        test("4294967296", (0, true));
+        test("4294967297", (1, true));
+        test("-4294967296", (0, true));
+        test("-4294967295", (1, true));
+    }
+    #[cfg(feature = "64_bit_limbs")]
+    {
+        test("-123", (18446744073709551493, true));
+        test("1000000000000", (1000000000000, false));
+        test("-1000000000000", (18446743073709551616, true));
+        test("18446744073709551616", (0, true));
+        test("18446744073709551617", (1, true));
+        test("-18446744073709551616", (0, true));
+        test("-18446744073709551615", (1, true));
+    }
+}
+
+#[test]
 fn limb_checked_from_integer_properties() {
     test_properties(integers, |x| {
         let result = Limb::checked_from(x);
@@ -100,6 +160,28 @@ fn limb_wrapping_from_integer_properties() {
         assert_eq!(
             result,
             Limb::checked_from(&x.mod_power_of_two(Limb::WIDTH.into())).unwrap()
+        );
+    });
+}
+
+#[test]
+fn limb_saturating_from_integer_properties() {
+    test_properties(integers, |x| {
+        let result = Limb::saturating_from(x);
+        assert_eq!(Limb::saturating_from(x.clone()), result);
+        assert!(result.le_abs(x));
+        assert_eq!(result == *x, Limb::checked_from(x).is_some());
+    });
+}
+
+#[test]
+fn limb_overflowing_from_integer_properties() {
+    test_properties(integers, |x| {
+        let result = Limb::overflowing_from(x);
+        assert_eq!(Limb::overflowing_from(x.clone()), result);
+        assert_eq!(
+            result,
+            (Limb::wrapping_from(x), Limb::checked_from(x).is_none())
         );
     });
 }

@@ -66,7 +66,8 @@ use rust_wheels::iterators::vecs::{
 
 use common::{GenerationMode, NoSpecialGenerationMode};
 use inputs::common::{
-    permute_1_2_4_3, permute_1_3_2, permute_2_1, reshape_2_1_to_3, reshape_3_1_to_4,
+    permute_1_2_4_3, permute_1_3_2, permute_2_1, reshape_2_1_to_3, reshape_2_2_to_4,
+    reshape_3_1_to_4,
 };
 
 pub fn bools(gm: NoSpecialGenerationMode) -> It<bool> {
@@ -1803,9 +1804,45 @@ fn factors_of_limb_max() -> Vec<Limb> {
     factors
 }
 
+fn quadruples_of_unsigned_vec_unsigned_vec_unsigned_and_unsigned<T: PrimitiveUnsigned + Rand>(
+    gm: GenerationMode,
+) -> It<(Vec<T>, Vec<T>, T, T)> {
+    reshape_2_2_to_4(match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_pairs(
+            exhaustive_pairs_from_single(exhaustive_vecs(exhaustive_unsigned())),
+            exhaustive_pairs_from_single(exhaustive_unsigned()),
+        )),
+        GenerationMode::Random(scale) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| {
+                random_pairs_from_single(random_vecs(seed, scale, &(|seed_2| random(seed_2))))
+            }),
+            &(|seed| random_pairs_from_single(random(seed))),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| random_pairs_from_single(special_random_unsigned_vecs(seed, scale))),
+            &(|seed| random_pairs_from_single(special_random_unsigned(seed))),
+        )),
+    })
+}
+
+// All quadruples of `Vec<Limb>`, `Vec<Limb>`, `Limb`, and `Limb`, where the first `Vec` is at least
+// as long as the second.
+pub fn quadruples_of_unsigned_vec_unsigned_vec_unsigned_and_unsigned_var_1<
+    T: PrimitiveUnsigned + Rand,
+>(
+    gm: GenerationMode,
+) -> It<(Vec<T>, Vec<T>, T, T)> {
+    Box::new(
+        quadruples_of_unsigned_vec_unsigned_vec_unsigned_and_unsigned(gm)
+            .filter(|&(ref xs, ref ys, _, _)| xs.len() >= ys.len()),
+    )
+}
+
 // All quadruples of `Vec<Limb>`, `Vec<Limb>`, `Limb`, and `Limb` where the first limb is a divisor
 // of `Limb::MAX`.
-fn quadruples_of_limb_vec_limb_vec_limb_and_limb_var_1(
+fn quadruples_of_limb_vec_limb_vec_limb_and_limb_var_2(
     gm: GenerationMode,
 ) -> It<(Vec<Limb>, Vec<Limb>, Limb, Limb)> {
     match gm {
@@ -1836,11 +1873,11 @@ fn quadruples_of_limb_vec_limb_vec_limb_and_limb_var_1(
 
 // All quadruples of `Vec<Limb>`, `Vec<Limb>`, `Limb`, and `Limb` where the first slice is at least
 // as long as the second and the first limb is a divisor of `Limb::MAX`.
-pub fn quadruples_of_limb_vec_limb_vec_limb_and_limb_var_2(
+pub fn quadruples_of_limb_vec_limb_vec_limb_and_limb_var_3(
     gm: GenerationMode,
 ) -> It<(Vec<Limb>, Vec<Limb>, Limb, Limb)> {
     Box::new(
-        quadruples_of_limb_vec_limb_vec_limb_and_limb_var_1(gm)
+        quadruples_of_limb_vec_limb_vec_limb_and_limb_var_2(gm)
             .filter(|&(ref out, ref xs, _, _)| out.len() >= xs.len()),
     )
 }

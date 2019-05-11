@@ -27,6 +27,11 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
         Large,
         benchmark_limb_checked_from_natural_evaluation_strategy
     );
+    register_bench!(
+        registry,
+        Large,
+        benchmark_limb_checked_from_natural_algorithms
+    );
     #[cfg(feature = "32_bit_limbs")]
     register_bench!(
         registry,
@@ -41,12 +46,22 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_bench!(
         registry,
         Large,
+        benchmark_limb_wrapping_from_natural_algorithms
+    );
+    register_bench!(
+        registry,
+        Large,
         benchmark_limb_saturating_from_natural_evaluation_strategy
     );
     register_bench!(
         registry,
         Large,
         benchmark_limb_overflowing_from_natural_evaluation_strategy
+    );
+    register_bench!(
+        registry,
+        Large,
+        benchmark_limb_overflowing_from_natural_algorithms
     );
 }
 
@@ -175,6 +190,37 @@ fn benchmark_limb_checked_from_natural_evaluation_strategy(
     );
 }
 
+fn benchmark_limb_checked_from_natural_algorithms(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "Limb::checked_from(Natural)",
+        BenchmarkType::Algorithms,
+        naturals(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|ref n| usize::checked_from(n.significant_bits()).unwrap()),
+        "n.significant_bits()",
+        &mut [
+            ("standard", &mut (|n| no_out!(Limb::checked_from(n)))),
+            (
+                "using overflowing_from",
+                &mut (|n| {
+                    let (value, overflow) = Limb::overflowing_from(n);
+                    if overflow {
+                        None
+                    } else {
+                        Some(value)
+                    };
+                }),
+            ),
+        ],
+    );
+}
+
 #[cfg(feature = "32_bit_limbs")]
 fn benchmark_limb_wrapping_from_natural_library_comparison(
     gm: GenerationMode,
@@ -222,6 +268,32 @@ fn benchmark_limb_wrapping_from_natural_evaluation_strategy(
             (
                 "Limb::wrapping_from(&Natural)",
                 &mut (|n| no_out!(Limb::wrapping_from(&n))),
+            ),
+        ],
+    );
+}
+
+fn benchmark_limb_wrapping_from_natural_algorithms(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "Limb::wrapping_from(Natural)",
+        BenchmarkType::Algorithms,
+        naturals(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|ref n| usize::checked_from(n.significant_bits()).unwrap()),
+        "n.significant_bits()",
+        &mut [
+            ("standard", &mut (|n| no_out!(Limb::wrapping_from(n)))),
+            (
+                "using overflowing_from",
+                &mut (|n| {
+                    Limb::overflowing_from(n).0;
+                }),
             ),
         ],
     );
@@ -276,6 +348,30 @@ fn benchmark_limb_overflowing_from_natural_evaluation_strategy(
             (
                 "Limb::overflowing_from(&Natural)",
                 &mut (|n| no_out!(Limb::overflowing_from(&n))),
+            ),
+        ],
+    );
+}
+
+fn benchmark_limb_overflowing_from_natural_algorithms(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "Limb::overflowing_from(Natural)",
+        BenchmarkType::Algorithms,
+        naturals(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|ref n| usize::checked_from(n.significant_bits()).unwrap()),
+        "n.significant_bits()",
+        &mut [
+            ("standard", &mut (|n| no_out!(Limb::overflowing_from(n)))),
+            (
+                "using checked_from and wrapping_from",
+                &mut (|n| no_out!((Limb::wrapping_from(&n), Limb::checked_from(n).is_none()))),
             ),
         ],
     );

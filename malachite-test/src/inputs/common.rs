@@ -16,6 +16,12 @@ pub fn reshape_3_1_to_4<A: 'static, B: 'static, C: 'static, D: 'static>(
     Box::new(it.map(|((a, b, c), d)| (a, b, c, d)))
 }
 
+pub fn reshape_2_2_to_4<A: 'static, B: 'static, C: 'static, D: 'static>(
+    it: Box<Iterator<Item = ((A, B), (C, D))>>,
+) -> Box<Iterator<Item = (A, B, C, D)>> {
+    Box::new(it.map(|((a, b), (c, d))| (a, b, c, d)))
+}
+
 pub fn permute_2_1<A: 'static, B: 'static>(
     it: Box<Iterator<Item = (A, B)>>,
 ) -> Box<Iterator<Item = (B, A)>> {

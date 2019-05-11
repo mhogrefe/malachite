@@ -1,27 +1,7 @@
-use std::{char, u32};
-
-use malachite_base::chars::{
-    char_to_contiguous_range, contiguous_range_to_char, CHAR_JUST_ABOVE_SURROGATES,
-    CHAR_JUST_BELOW_SURROGATES, NUMBER_OF_CHARS,
-};
+use malachite_base::chars::{char_to_contiguous_range, contiguous_range_to_char, NUMBER_OF_CHARS};
 
 use common::{test_properties, test_properties_no_special};
 use malachite_test::inputs::base::{pairs_of_limbs_range_1, u32s_range_1, unsigneds};
-
-#[test]
-fn test_contiguous_range_to_char() {
-    let test = |u, out| {
-        assert_eq!(contiguous_range_to_char(u), out);
-    };
-    test(0, Some('\u{0}'));
-    test(97, Some('a'));
-    test(65, Some('A'));
-    test(55_295, Some(CHAR_JUST_BELOW_SURROGATES));
-    test(55_296, Some(CHAR_JUST_ABOVE_SURROGATES));
-    test(1_112_063, Some(char::MAX));
-    test(1_112_064, None);
-    test(u32::MAX, None);
-}
 
 #[test]
 fn contiguous_range_to_char_properties() {

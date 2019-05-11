@@ -23,6 +23,8 @@ use platform::{DoubleLimb, Limb};
 /// assert_eq!(limbs_mul_limb(&[0xffff_ffff, 5], 2), &[4_294_967_294, 11]);
 /// assert_eq!(limbs_mul_limb(&[0xffff_ffff], 2), &[4_294_967_294, 1]);
 /// ```
+///
+/// This is mpn_mul_1 from mpn/generic/mul_1.c, where the result is returned.
 pub fn limbs_mul_limb(limbs: &[Limb], limb: Limb) -> Vec<Limb> {
     let mut carry = 0;
     let limb = DoubleLimb::from(limb);
@@ -38,7 +40,34 @@ pub fn limbs_mul_limb(limbs: &[Limb], limb: Limb) -> Vec<Limb> {
     result_limbs
 }
 
-pub(crate) fn limbs_mul_limb_with_carry_to_out(
+/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
+/// limbs of the product of the `Natural` and a `Limb`, plus a carry, to an output slice. The output
+/// slice must be at least as long as the input slice. Returns the carry.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = `limbs.len()`
+///
+/// # Panics
+/// Panics if `out` is shorter than `in_limbs`.
+///
+/// # Example
+/// ```
+/// use malachite_nz::natural::arithmetic::mul_limb::limbs_mul_limb_with_carry_to_out;
+///
+/// let mut out = vec![0, 0, 0];
+/// assert_eq!(limbs_mul_limb_with_carry_to_out(&mut out, &[123, 456], 789, 10), 0);
+/// assert_eq!(out, &[97_057, 359_784, 0]);
+///
+/// let mut out = vec![0, 0, 0];
+/// assert_eq!(limbs_mul_limb_with_carry_to_out(&mut out, &[0xffff_ffff], 2, 3), 2);
+/// assert_eq!(out, &[1, 0, 0]);
+/// ```
+///
+/// This is mul_1c from gmp-impl.h.
+pub fn limbs_mul_limb_with_carry_to_out(
     out: &mut [Limb],
     in_limbs: &[Limb],
     limb: Limb,
@@ -57,7 +86,7 @@ pub(crate) fn limbs_mul_limb_with_carry_to_out(
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
 /// limbs of the product of the `Natural` and a `Limb` to an output slice. The output slice must be
-/// at least as long as the input slice. Returns the 32-bit carry.
+/// at least as long as the input slice. Returns the carry.
 ///
 /// Time: worst case O(n)
 ///
@@ -80,13 +109,15 @@ pub(crate) fn limbs_mul_limb_with_carry_to_out(
 /// assert_eq!(limbs_mul_limb_to_out(&mut out, &[0xffff_ffff], 2), 1);
 /// assert_eq!(out, &[4_294_967_294, 0, 0]);
 /// ```
+///
+/// This is mpn_mul_1 from mpn/generic/mul_1.c.
 #[inline]
 pub fn limbs_mul_limb_to_out(out: &mut [Limb], in_limbs: &[Limb], limb: Limb) -> Limb {
     limbs_mul_limb_with_carry_to_out(out, in_limbs, limb, 0)
 }
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
-/// limbs of the product of the `Natural` and a `Limb` to the input slice. Returns the 32-bit carry.
+/// limbs of the product of the `Natural` and a `Limb` to the input slice. Returns the carry.
 ///
 /// Time: worst case O(n)
 ///
@@ -104,6 +135,8 @@ pub fn limbs_mul_limb_to_out(out: &mut [Limb], in_limbs: &[Limb], limb: Limb) ->
 /// assert_eq!(limbs_slice_mul_limb_in_place(&mut limbs, 2), 1);
 /// assert_eq!(limbs, &[4_294_967_294]);
 /// ```
+///
+/// This is mpn_mul_1 from mpn/generic/mul_1.c, where rp == up.
 pub fn limbs_slice_mul_limb_in_place(limbs: &mut [Limb], limb: Limb) -> Limb {
     let mut carry = 0;
     let limb = DoubleLimb::from(limb);
@@ -134,6 +167,9 @@ pub fn limbs_slice_mul_limb_in_place(limbs: &mut [Limb], limb: Limb) -> Limb {
 /// limbs_vec_mul_limb_in_place(&mut limbs, 2);
 /// assert_eq!(limbs, &[4_294_967_294, 1]);
 /// ```
+///
+/// This is mpn_mul_1 from mpn/generic/mul_1.c, where the rp == up and instead of returning the
+/// carry, it is appended to rp.
 pub fn limbs_vec_mul_limb_in_place(limbs: &mut Vec<Limb>, limb: Limb) {
     let carry = limbs_slice_mul_limb_in_place(limbs, limb);
     if carry != 0 {

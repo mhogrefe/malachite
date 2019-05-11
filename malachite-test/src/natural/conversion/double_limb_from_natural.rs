@@ -22,7 +22,17 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_bench!(
         registry,
         Large,
+        benchmark_double_limb_checked_from_natural_algorithms
+    );
+    register_bench!(
+        registry,
+        Large,
         benchmark_double_limb_wrapping_from_natural_evaluation_strategy
+    );
+    register_bench!(
+        registry,
+        Large,
+        benchmark_double_limb_wrapping_from_natural_algorithms
     );
     register_bench!(
         registry,
@@ -33,6 +43,11 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
         registry,
         Large,
         benchmark_double_limb_overflowing_from_natural_evaluation_strategy
+    );
+    register_bench!(
+        registry,
+        Large,
+        benchmark_double_limb_overflowing_from_natural_algorithms
     );
 }
 
@@ -147,6 +162,37 @@ fn benchmark_double_limb_checked_from_natural_evaluation_strategy(
     );
 }
 
+fn benchmark_double_limb_checked_from_natural_algorithms(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "DoubleLimb::checked_from(Natural)",
+        BenchmarkType::Algorithms,
+        naturals(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|ref n| usize::checked_from(n.significant_bits()).unwrap()),
+        "n.significant_bits()",
+        &mut [
+            ("standard", &mut (|n| no_out!(DoubleLimb::checked_from(n)))),
+            (
+                "using overflowing_from",
+                &mut (|n| {
+                    let (value, overflow) = DoubleLimb::overflowing_from(n);
+                    if overflow {
+                        None
+                    } else {
+                        Some(value)
+                    };
+                }),
+            ),
+        ],
+    );
+}
+
 fn benchmark_double_limb_wrapping_from_natural_evaluation_strategy(
     gm: GenerationMode,
     limit: usize,
@@ -169,6 +215,32 @@ fn benchmark_double_limb_wrapping_from_natural_evaluation_strategy(
             (
                 "DoubleLimb::wrapping_from(&Natural)",
                 &mut (|n| no_out!(DoubleLimb::wrapping_from(&n))),
+            ),
+        ],
+    );
+}
+
+fn benchmark_double_limb_wrapping_from_natural_algorithms(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "DoubleLimb::wrapping_from(Natural)",
+        BenchmarkType::Algorithms,
+        naturals(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|ref n| usize::checked_from(n.significant_bits()).unwrap()),
+        "n.significant_bits()",
+        &mut [
+            ("standard", &mut (|n| no_out!(DoubleLimb::wrapping_from(n)))),
+            (
+                "using overflowing_from",
+                &mut (|n| {
+                    DoubleLimb::overflowing_from(n).0;
+                }),
             ),
         ],
     );
@@ -223,6 +295,38 @@ fn benchmark_double_limb_overflowing_from_natural_evaluation_strategy(
             (
                 "DoubleLimb::overflowing_from(&Natural)",
                 &mut (|n| no_out!(DoubleLimb::overflowing_from(&n))),
+            ),
+        ],
+    );
+}
+
+fn benchmark_double_limb_overflowing_from_natural_algorithms(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "DoubleLimb::overflowing_from(Natural)",
+        BenchmarkType::Algorithms,
+        naturals(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|ref n| usize::checked_from(n.significant_bits()).unwrap()),
+        "n.significant_bits()",
+        &mut [
+            (
+                "standard",
+                &mut (|n| no_out!(DoubleLimb::overflowing_from(n))),
+            ),
+            (
+                "using checked_from and wrapping_from",
+                &mut (|n| {
+                    no_out!((
+                        DoubleLimb::wrapping_from(&n),
+                        DoubleLimb::checked_from(n).is_none()
+                    ))
+                }),
             ),
         ],
     );

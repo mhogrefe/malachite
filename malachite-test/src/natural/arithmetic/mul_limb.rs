@@ -1,15 +1,17 @@
 use malachite_base::conversion::CheckedFrom;
 use malachite_base::num::traits::SignificantBits;
 use malachite_nz::natural::arithmetic::mul_limb::{
-    limbs_mul_limb, limbs_mul_limb_to_out, limbs_slice_mul_limb_in_place,
-    limbs_vec_mul_limb_in_place,
+    limbs_mul_limb, limbs_mul_limb_to_out, limbs_mul_limb_with_carry_to_out,
+    limbs_slice_mul_limb_in_place, limbs_vec_mul_limb_in_place,
 };
 use malachite_nz::platform::Limb;
 use num::BigUint;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::{
-    pairs_of_unsigned_vec_and_unsigned, triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_1,
+    pairs_of_unsigned_vec_and_unsigned,
+    quadruples_of_unsigned_vec_unsigned_vec_unsigned_and_unsigned_var_1,
+    triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_1,
 };
 #[cfg(feature = "64_bit_limbs")]
 use inputs::natural::nm_pairs_of_natural_and_unsigned;
@@ -23,6 +25,7 @@ use inputs::natural::{pairs_of_natural_and_unsigned, pairs_of_unsigned_and_natur
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limbs_mul_limb);
     register_demo!(registry, demo_limbs_mul_limb_to_out);
+    register_demo!(registry, demo_limbs_mul_limb_with_carry_to_out);
     register_demo!(registry, demo_limbs_slice_mul_limb_in_place);
     register_demo!(registry, demo_limbs_vec_mul_limb_in_place);
     register_demo!(registry, demo_natural_mul_assign_limb);
@@ -76,6 +79,21 @@ fn demo_limbs_mul_limb(gm: GenerationMode, limit: usize) {
     }
 }
 
+fn demo_limbs_mul_limb_with_carry_to_out(gm: GenerationMode, limit: usize) {
+    for (out, in_limbs, limb, carry) in
+        quadruples_of_unsigned_vec_unsigned_vec_unsigned_and_unsigned_var_1(gm).take(limit)
+    {
+        let mut out = out.to_vec();
+        let mut out_old = out.clone();
+        let carry_out = limbs_mul_limb_with_carry_to_out(&mut out, &in_limbs, limb, carry);
+        println!(
+            "out := {:?}; limbs_mul_limb_with_carry_to_out(&mut out, {:?}, {}, {}) = {}; \
+             out = {:?}",
+            out_old, in_limbs, limb, carry, carry_out, out
+        );
+    }
+}
+
 fn demo_limbs_mul_limb_to_out(gm: GenerationMode, limit: usize) {
     for (out, in_limbs, limb) in
         triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_1(gm).take(limit)
@@ -84,8 +102,7 @@ fn demo_limbs_mul_limb_to_out(gm: GenerationMode, limit: usize) {
         let mut out_old = out.clone();
         let carry = limbs_mul_limb_to_out(&mut out, &in_limbs, limb);
         println!(
-            "out := {:?}; limbs_mul_limb_to_out(&mut out, {:?}, {}) = {}; out = \
-             {:?}",
+            "out := {:?}; limbs_mul_limb_to_out(&mut out, {:?}, {}) = {}; out = {:?}",
             out_old, in_limbs, limb, carry, out
         );
     }
