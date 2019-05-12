@@ -1,7 +1,6 @@
 use std::ops::{Mul, MulAssign};
 
-use malachite_base::num::traits::SplitInHalf;
-use malachite_base::num::traits::{Assign, Zero};
+use malachite_base::num::traits::{Assign, SplitInHalf, Zero};
 
 use natural::Natural::{self, Large, Small};
 use platform::{DoubleLimb, Limb};

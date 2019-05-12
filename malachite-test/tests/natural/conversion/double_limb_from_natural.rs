@@ -142,6 +142,7 @@ fn double_limb_checked_from_natural_properties() {
         } else {
             assert!(result.is_none());
         }
+        assert_eq!(result.is_none(), DoubleLimb::overflowing_from(x).1)
     });
 }
 
@@ -154,6 +155,7 @@ fn double_limb_wrapping_from_natural_properties() {
             DoubleLimb::checked_from((&x).mod_power_of_two(DoubleLimb::WIDTH.into())).unwrap(),
             result,
         );
+        assert_eq!(result, DoubleLimb::overflowing_from(x).0);
     });
 }
 

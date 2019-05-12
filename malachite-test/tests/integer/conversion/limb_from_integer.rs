@@ -146,6 +146,7 @@ fn limb_checked_from_integer_properties() {
         } else {
             assert!(result.is_none());
         }
+        assert_eq!(result.is_none(), Limb::overflowing_from(x).1)
     });
 }
 
@@ -161,6 +162,7 @@ fn limb_wrapping_from_integer_properties() {
             result,
             Limb::checked_from(&x.mod_power_of_two(Limb::WIDTH.into())).unwrap()
         );
+        assert_eq!(result, Limb::overflowing_from(x).0);
     });
 }
 

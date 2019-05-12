@@ -1,6 +1,15 @@
+use malachite_base::comparison::Min;
 use malachite_base::num::traits::{One, Two, Zero};
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
+
+#[test]
+fn test_min() {
+    let min = Natural::MIN;
+    assert!(min.is_valid());
+    assert_eq!(min, 0 as Limb);
+    assert_eq!(min.to_string(), "0");
+}
 
 #[test]
 fn test_zero() {

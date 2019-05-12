@@ -1,4 +1,4 @@
-use malachite_base::conversion::{CheckedFrom, WrappingFrom};
+use malachite_base::conversion::{CheckedFrom, OverflowingFrom, SaturatingFrom, WrappingFrom};
 
 use integer::Integer;
 use platform::DoubleLimb;
@@ -144,6 +144,153 @@ impl<'a> WrappingFrom<&'a Integer> for DoubleLimb {
                 sign: false,
                 ref abs,
             } => DoubleLimb::wrapping_from(abs).wrapping_neg(),
+        }
+    }
+}
+
+impl SaturatingFrom<Integer> for DoubleLimb {
+    /// Converts an `Integer` to a `DoubleLimb`, taking the `Integer` by value. If the `Integer` is
+    /// too large to fit in a `DoubleLimb`, `DoubleLimb::MAX` is returned. If it is negative, 0 is
+    /// returned.
+    ///
+    /// Time: worst case O(1)
+    ///
+    /// Additional memory: worst case O(1)
+    ///
+    /// # Example
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::conversion::SaturatingFrom;
+    /// use malachite_nz::integer::Integer;
+    /// use std::str::FromStr;
+    ///
+    /// fn main() {
+    ///     assert_eq!(u64::saturating_from(Integer::from(123)), 123);
+    ///     assert_eq!(u64::saturating_from(Integer::from(-123)), 0);
+    ///     assert_eq!(
+    ///         u64::saturating_from(Integer::from_str("1000000000000000000000").unwrap()),
+    ///         18446744073709551615);
+    ///     assert_eq!(u64::saturating_from(Integer::from_str("-1000000000000000000000").unwrap()),
+    ///         0);
+    /// }
+    /// ```
+    fn saturating_from(value: Integer) -> DoubleLimb {
+        DoubleLimb::saturating_from(&value)
+    }
+}
+
+impl<'a> SaturatingFrom<&'a Integer> for DoubleLimb {
+    /// Converts an `Integer` to a `DoubleLimb`, taking the `Integer` by reference. If the `Integer`
+    /// is too large to fit in a `DoubleLimb`, `DoubleLimb::MAX` is returned. If it is negative, 0
+    /// is returned.
+    ///
+    /// Time: worst case O(1)
+    ///
+    /// Additional memory: worst case O(1)
+    ///
+    /// # Example
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::conversion::SaturatingFrom;
+    /// use malachite_nz::integer::Integer;
+    /// use std::str::FromStr;
+    ///
+    /// fn main() {
+    ///     assert_eq!(u64::saturating_from(&Integer::from(123)), 123);
+    ///     assert_eq!(u64::saturating_from(&Integer::from(-123)), 0);
+    ///     assert_eq!(
+    ///         u64::saturating_from(&Integer::from_str("1000000000000000000000").unwrap()),
+    ///         18446744073709551615);
+    ///     assert_eq!(u64::saturating_from(&Integer::from_str("-1000000000000000000000").unwrap()),
+    ///         0);
+    /// }
+    /// ```
+    fn saturating_from(value: &Integer) -> DoubleLimb {
+        match *value {
+            Integer {
+                sign: true,
+                ref abs,
+            } => DoubleLimb::saturating_from(abs),
+            _ => 0,
+        }
+    }
+}
+
+impl OverflowingFrom<Integer> for DoubleLimb {
+    /// Converts an `Integer` to a `DoubleLimb`, taking the `Integer` by value and wrapping mod
+    /// 2<sup>`Limb::WIDTH`</sup>. The returned boolean value indicates whether wrapping occurred.
+    ///
+    /// Time: worst case O(1)
+    ///
+    /// Additional memory: worst case O(1)
+    ///
+    /// # Example
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::conversion::OverflowingFrom;
+    /// use malachite_nz::integer::Integer;
+    /// use std::str::FromStr;
+    ///
+    /// fn main() {
+    ///     assert_eq!(u64::overflowing_from(Integer::from(123)), (123, false));
+    ///     assert_eq!(u64::overflowing_from(Integer::from(-123)), (18446744073709551493, true));
+    ///     assert_eq!(
+    ///         u64::overflowing_from(Integer::from_str("1000000000000000000000").unwrap()),
+    ///         (3875820019684212736, true));
+    ///     assert_eq!(
+    ///         u64::overflowing_from(Integer::from_str("-1000000000000000000000").unwrap()),
+    ///         (14570924054025338880, true));
+    /// }
+    /// ```
+    fn overflowing_from(value: Integer) -> (DoubleLimb, bool) {
+        DoubleLimb::overflowing_from(&value)
+    }
+}
+
+impl<'a> OverflowingFrom<&'a Integer> for DoubleLimb {
+    /// Converts an `Integer` to a `DoubleLimb`, taking the `Integer` by reference and wrapping mod
+    /// 2<sup>`Limb::WIDTH`</sup>. The returned boolean value indicates whether wrapping occurred.
+    ///
+    /// Time: worst case O(1)
+    ///
+    /// Additional memory: worst case O(1)
+    ///
+    /// # Example
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::conversion::OverflowingFrom;
+    /// use malachite_nz::integer::Integer;
+    /// use std::str::FromStr;
+    ///
+    /// fn main() {
+    ///     assert_eq!(u64::overflowing_from(&Integer::from(123)), (123, false));
+    ///     assert_eq!(u64::overflowing_from(&Integer::from(-123)), (18446744073709551493, true));
+    ///     assert_eq!(
+    ///         u64::overflowing_from(&Integer::from_str("1000000000000000000000").unwrap()),
+    ///         (3875820019684212736, true));
+    ///     assert_eq!(
+    ///         u64::overflowing_from(&Integer::from_str("-1000000000000000000000").unwrap()),
+    ///         (14570924054025338880, true));
+    /// }
+    /// ```
+    fn overflowing_from(value: &Integer) -> (DoubleLimb, bool) {
+        match *value {
+            Integer {
+                sign: true,
+                ref abs,
+            } => DoubleLimb::overflowing_from(abs),
+            Integer {
+                sign: false,
+                ref abs,
+            } => (DoubleLimb::wrapping_from(abs).wrapping_neg(), true),
         }
     }
 }

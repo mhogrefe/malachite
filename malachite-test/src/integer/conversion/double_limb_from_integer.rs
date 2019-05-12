@@ -1,67 +1,147 @@
-use malachite_base::conversion::{CheckedFrom, WrappingFrom};
+use malachite_base::conversion::{CheckedFrom, OverflowingFrom, SaturatingFrom, WrappingFrom};
 use malachite_base::num::traits::SignificantBits;
+use malachite_nz::platform::DoubleLimb;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::integer::integers;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
-    register_demo!(registry, demo_u64_checked_from_integer);
-    register_demo!(registry, demo_u64_checked_from_integer_ref);
-    register_demo!(registry, demo_u64_wrapping_from_integer);
-    register_demo!(registry, demo_u64_wrapping_from_integer_ref);
+    register_demo!(registry, demo_double_limb_checked_from_integer);
+    register_demo!(registry, demo_double_limb_checked_from_integer_ref);
+    register_demo!(registry, demo_double_limb_wrapping_from_integer);
+    register_demo!(registry, demo_double_limb_wrapping_from_integer_ref);
+    register_demo!(registry, demo_double_limb_saturating_from_integer);
+    register_demo!(registry, demo_double_limb_saturating_from_integer_ref);
+    register_demo!(registry, demo_double_limb_overflowing_from_integer);
+    register_demo!(registry, demo_double_limb_overflowing_from_integer_ref);
     register_bench!(
         registry,
         Large,
-        benchmark_u64_checked_from_integer_evaluation_strategy
+        benchmark_double_limb_checked_from_integer_evaluation_strategy
     );
     register_bench!(
         registry,
         Large,
-        benchmark_u64_wrapping_from_integer_evaluation_strategy
+        benchmark_double_limb_checked_from_integer_algorithms
+    );
+    register_bench!(
+        registry,
+        Large,
+        benchmark_double_limb_wrapping_from_integer_evaluation_strategy
+    );
+    register_bench!(
+        registry,
+        Large,
+        benchmark_double_limb_wrapping_from_integer_algorithms
+    );
+    register_bench!(
+        registry,
+        Large,
+        benchmark_double_limb_saturating_from_integer_evaluation_strategy
+    );
+    register_bench!(
+        registry,
+        Large,
+        benchmark_double_limb_overflowing_from_integer_evaluation_strategy
+    );
+    register_bench!(
+        registry,
+        Large,
+        benchmark_double_limb_overflowing_from_integer_algorithms
     );
 }
 
-fn demo_u64_checked_from_integer(gm: GenerationMode, limit: usize) {
+fn demo_double_limb_checked_from_integer(gm: GenerationMode, limit: usize) {
     for n in integers(gm).take(limit) {
         let n_clone = n.clone();
         println!(
-            "u64::checked_from({}) = {:?}",
+            "DoubleLimb::checked_from({}) = {:?}",
             n_clone,
-            u64::checked_from(n)
+            DoubleLimb::checked_from(n)
         );
     }
 }
 
-fn demo_u64_checked_from_integer_ref(gm: GenerationMode, limit: usize) {
+fn demo_double_limb_checked_from_integer_ref(gm: GenerationMode, limit: usize) {
     for n in integers(gm).take(limit) {
-        println!("u64::checked_from(&{}) = {:?}", n, u64::checked_from(&n));
-    }
-}
-
-fn demo_u64_wrapping_from_integer(gm: GenerationMode, limit: usize) {
-    for n in integers(gm).take(limit) {
-        let n_clone = n.clone();
         println!(
-            "u64::wrapping_from({}) = {}",
-            n_clone,
-            u64::wrapping_from(n)
+            "DoubleLimb::checked_from(&{}) = {:?}",
+            n,
+            DoubleLimb::checked_from(&n)
         );
     }
 }
 
-fn demo_u64_wrapping_from_integer_ref(gm: GenerationMode, limit: usize) {
+fn demo_double_limb_wrapping_from_integer(gm: GenerationMode, limit: usize) {
     for n in integers(gm).take(limit) {
-        println!("u64::wrapping_from(&{}) = {}", n, u64::wrapping_from(&n));
+        let n_clone = n.clone();
+        println!(
+            "DoubleLimb::wrapping_from({}) = {}",
+            n_clone,
+            DoubleLimb::wrapping_from(n)
+        );
     }
 }
 
-fn benchmark_u64_checked_from_integer_evaluation_strategy(
+fn demo_double_limb_wrapping_from_integer_ref(gm: GenerationMode, limit: usize) {
+    for n in integers(gm).take(limit) {
+        println!(
+            "DoubleLimb::wrapping_from(&{}) = {}",
+            n,
+            DoubleLimb::wrapping_from(&n)
+        );
+    }
+}
+
+fn demo_double_limb_saturating_from_integer(gm: GenerationMode, limit: usize) {
+    for n in integers(gm).take(limit) {
+        let n_clone = n.clone();
+        println!(
+            "DoubleLimb::saturating_from({}) = {}",
+            n_clone,
+            DoubleLimb::saturating_from(n)
+        );
+    }
+}
+
+fn demo_double_limb_saturating_from_integer_ref(gm: GenerationMode, limit: usize) {
+    for n in integers(gm).take(limit) {
+        println!(
+            "DoubleLimb::saturating_from(&{}) = {}",
+            n,
+            DoubleLimb::saturating_from(&n)
+        );
+    }
+}
+
+fn demo_double_limb_overflowing_from_integer(gm: GenerationMode, limit: usize) {
+    for n in integers(gm).take(limit) {
+        let n_clone = n.clone();
+        println!(
+            "DoubleLimb::overflowing_from({}) = {:?}",
+            n_clone,
+            DoubleLimb::overflowing_from(n)
+        );
+    }
+}
+
+fn demo_double_limb_overflowing_from_integer_ref(gm: GenerationMode, limit: usize) {
+    for n in integers(gm).take(limit) {
+        println!(
+            "DoubleLimb::overflowing_from(&{}) = {:?}",
+            n,
+            DoubleLimb::overflowing_from(&n)
+        );
+    }
+}
+
+fn benchmark_double_limb_checked_from_integer_evaluation_strategy(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,
 ) {
     m_run_benchmark(
-        "u64::checked_from(Integer)",
+        "DoubleLimb::checked_from(Integer)",
         BenchmarkType::EvaluationStrategy,
         integers(gm),
         gm.name(),
@@ -71,24 +151,55 @@ fn benchmark_u64_checked_from_integer_evaluation_strategy(
         "n.significant_bits()",
         &mut [
             (
-                "u64::checked_from(Integer)",
-                &mut (|n| no_out!(u64::checked_from(n))),
+                "DoubleLimb::checked_from(Integer)",
+                &mut (|n| no_out!(DoubleLimb::checked_from(n))),
             ),
             (
-                "u64::checked_from(&Integer)",
-                &mut (|n| no_out!(u64::checked_from(&n))),
+                "DoubleLimb::checked_from(&Integer)",
+                &mut (|n| no_out!(DoubleLimb::checked_from(&n))),
             ),
         ],
     );
 }
 
-fn benchmark_u64_wrapping_from_integer_evaluation_strategy(
+fn benchmark_double_limb_checked_from_integer_algorithms(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,
 ) {
     m_run_benchmark(
-        "u64::wrapping_from(Integer)",
+        "DoubleLimb::checked_from(Integer)",
+        BenchmarkType::Algorithms,
+        integers(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|ref n| usize::checked_from(n.significant_bits()).unwrap()),
+        "n.significant_bits()",
+        &mut [
+            ("standard", &mut (|n| no_out!(DoubleLimb::checked_from(n)))),
+            (
+                "using overflowing_from",
+                &mut (|n| {
+                    let (value, overflow) = DoubleLimb::overflowing_from(n);
+                    if overflow {
+                        None
+                    } else {
+                        Some(value)
+                    };
+                }),
+            ),
+        ],
+    );
+}
+
+fn benchmark_double_limb_wrapping_from_integer_evaluation_strategy(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "DoubleLimb::wrapping_from(Integer)",
         BenchmarkType::EvaluationStrategy,
         integers(gm),
         gm.name(),
@@ -98,12 +209,124 @@ fn benchmark_u64_wrapping_from_integer_evaluation_strategy(
         "n.significant_bits()",
         &mut [
             (
-                "u64::wrapping_from(Integer)",
-                &mut (|n| no_out!(u64::wrapping_from(n))),
+                "DoubleLimb::wrapping_from(Integer)",
+                &mut (|n| no_out!(DoubleLimb::wrapping_from(n))),
             ),
             (
-                "u64::wrapping_from(&Integer)",
-                &mut (|n| no_out!(u64::wrapping_from(&n))),
+                "DoubleLimb::wrapping_from(&Integer)",
+                &mut (|n| no_out!(DoubleLimb::wrapping_from(&n))),
+            ),
+        ],
+    );
+}
+
+fn benchmark_double_limb_wrapping_from_integer_algorithms(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "DoubleLimb::wrapping_from(Integer)",
+        BenchmarkType::Algorithms,
+        integers(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|ref n| usize::checked_from(n.significant_bits()).unwrap()),
+        "n.significant_bits()",
+        &mut [
+            ("standard", &mut (|n| no_out!(DoubleLimb::wrapping_from(n)))),
+            (
+                "using overflowing_from",
+                &mut (|n| {
+                    DoubleLimb::overflowing_from(n).0;
+                }),
+            ),
+        ],
+    );
+}
+
+fn benchmark_double_limb_saturating_from_integer_evaluation_strategy(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "DoubleLimb::saturating_from(Integer)",
+        BenchmarkType::EvaluationStrategy,
+        integers(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|ref n| usize::checked_from(n.significant_bits()).unwrap()),
+        "n.significant_bits()",
+        &mut [
+            (
+                "DoubleLimb::saturating_from(Integer)",
+                &mut (|n| no_out!(DoubleLimb::saturating_from(n))),
+            ),
+            (
+                "DoubleLimb::saturating_from(&Integer)",
+                &mut (|n| no_out!(DoubleLimb::saturating_from(&n))),
+            ),
+        ],
+    );
+}
+
+fn benchmark_double_limb_overflowing_from_integer_evaluation_strategy(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "DoubleLimb::overflowing_from(Integer)",
+        BenchmarkType::EvaluationStrategy,
+        integers(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|ref n| usize::checked_from(n.significant_bits()).unwrap()),
+        "n.significant_bits()",
+        &mut [
+            (
+                "DoubleLimb::overflowing_from(Integer)",
+                &mut (|n| no_out!(DoubleLimb::overflowing_from(n))),
+            ),
+            (
+                "DoubleLimb::overflowing_from(&Integer)",
+                &mut (|n| no_out!(DoubleLimb::overflowing_from(&n))),
+            ),
+        ],
+    );
+}
+
+fn benchmark_double_limb_overflowing_from_integer_algorithms(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "DoubleLimb::overflowing_from(Integer)",
+        BenchmarkType::Algorithms,
+        integers(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|ref n| usize::checked_from(n.significant_bits()).unwrap()),
+        "n.significant_bits()",
+        &mut [
+            (
+                "standard",
+                &mut (|n| no_out!(DoubleLimb::overflowing_from(n))),
+            ),
+            (
+                "using checked_from and wrapping_from",
+                &mut (|n| {
+                    no_out!((
+                        DoubleLimb::wrapping_from(&n),
+                        DoubleLimb::checked_from(n).is_none()
+                    ))
+                }),
             ),
         ],
     );

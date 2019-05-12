@@ -1,5 +1,6 @@
 use std::char;
 
+use comparison::{Max, Min};
 use crement::Crementable;
 
 // The number of Unicode scalar values, or 1,112,064.
@@ -74,6 +75,24 @@ pub fn contiguous_range_to_char(u: u32) -> Option<char> {
     }
 }
 
+/// The minimum value of a `'\u{0}'`.
+///
+/// Time: worst case O(1)
+///
+/// Additional memory: worst case O(1)
+impl Min for char {
+    const MIN: char = '\u{0}';
+}
+
+/// The maximum value of a `char`, `'\u{10ffff}'`.
+///
+/// Time: worst case O(1)
+///
+/// Additional memory: worst case O(1)
+impl Max for char {
+    const MAX: char = std::char::MAX;
+}
+
 impl Crementable for char {
     /// Increments this `char`, skipping over the surrogate range.
     ///
@@ -124,8 +143,8 @@ impl Crementable for char {
     /// ```
     #[allow(clippy::panic_params)]
     fn decrement(&mut self) {
-        if *self == '\u{0}' {
-            panic!("Cannot decrement char '\\u{0}'");
+        if *self == char::MIN {
+            panic!("Cannot decrement char '{}'", *self);
         } else {
             *self = contiguous_range_to_char(char_to_contiguous_range(*self) - 1).unwrap();
         }

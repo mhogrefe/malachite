@@ -1,9 +1,6 @@
 use num::unsigneds::PrimitiveUnsigned;
 
-//TODO test other unsigned besides u32
 /// Tests whether all limbs in a slice are equal to 0.
-///
-/// Equivalent to GMP's `mpn_zero_p`.
 ///
 /// Time: worst case O(n)
 ///
@@ -18,14 +15,13 @@ use num::unsigneds::PrimitiveUnsigned;
 /// assert!(limbs_test_zero::<u32>(&[0, 0, 0]));
 /// assert!(!limbs_test_zero::<u32>(&[0, 1, 0]));
 /// ```
+///
+/// This is mpn_zero_p from gmp.h.
 pub fn limbs_test_zero<T: PrimitiveUnsigned>(limbs: &[T]) -> bool {
     limbs.iter().all(|&limb| limb == T::ZERO)
 }
 
 /// Sets all limbs in a slice to 0.
-///
-/// Equivalent to GMP's `mpn_zero`. Note that this is needed less often in Malachite than in GMP,
-/// since Malachite generally initializes new memory with zeros.
 ///
 /// Time: worst case O(n)
 ///
@@ -41,6 +37,9 @@ pub fn limbs_test_zero<T: PrimitiveUnsigned>(limbs: &[T]) -> bool {
 /// limbs_set_zero::<u32>(&mut limbs[1..4]);
 /// assert_eq!(limbs, [1, 0, 0, 0, 5]);
 /// ```
+///
+/// This is mpn_zero from mpn/generic/zero.c. Note that this is needed less often in Malachite than
+/// in GMP, since Malachite generally initializes new memory with zeros.
 pub fn limbs_set_zero<T: PrimitiveUnsigned>(limbs: &mut [T]) {
     for limb in limbs.iter_mut() {
         *limb = T::ZERO;
@@ -101,12 +100,40 @@ pub fn limbs_delete_left<T: PrimitiveUnsigned>(limbs: &mut Vec<T>, delete_size: 
     limbs.truncate(remaining_size);
 }
 
-//TODO docs and tests
+/// Counts the number of zero limbs that a slice starts with.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = `limbs.len()`
+///
+/// # Examples
+/// ```
+/// use malachite_base::limbs::limbs_leading_zero_limbs;
+///
+/// assert_eq!(limbs_leading_zero_limbs(&[1u32, 2, 3]), 0);
+/// assert_eq!(limbs_leading_zero_limbs(&[0u32, 0, 0, 1, 2, 3]), 3);
+/// ```
 pub fn limbs_leading_zero_limbs<T: PrimitiveUnsigned>(limbs: &[T]) -> usize {
     limbs.iter().take_while(|&&limb| limb == T::ZERO).count()
 }
 
-//TODO docs and tests
+/// Counts the number of zero limbs that a slice ends with.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = `limbs.len()`
+///
+/// # Examples
+/// ```
+/// use malachite_base::limbs::limbs_trailing_zero_limbs;
+///
+/// assert_eq!(limbs_trailing_zero_limbs(&[1u32, 2, 3]), 0);
+/// assert_eq!(limbs_trailing_zero_limbs(&[1u32, 2, 3, 0, 0, 0]), 3);
+/// ```
 pub fn limbs_trailing_zero_limbs<T: PrimitiveUnsigned>(limbs: &[T]) -> usize {
     limbs
         .iter()

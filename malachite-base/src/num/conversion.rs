@@ -1,5 +1,5 @@
 use comparison::{Max, Min};
-use conversion::{CheckedFrom, OverflowingFrom, SaturatingFrom, WrappingFrom};
+use conversion::{CheckedFrom, ConvertibleFrom, OverflowingFrom, SaturatingFrom, WrappingFrom};
 
 macro_rules! identity_conversion {
     ($t:ty) => {
@@ -28,6 +28,13 @@ macro_rules! identity_conversion {
             #[inline]
             fn overflowing_from(value: $t) -> ($t, bool) {
                 (value, false)
+            }
+        }
+
+        impl ConvertibleFrom<$t> for $t {
+            #[inline]
+            fn convertible_from(_: $t) -> bool {
+                true
             }
         }
     };
@@ -62,6 +69,13 @@ macro_rules! lossless_conversion {
                 (value.into(), false)
             }
         }
+
+        impl ConvertibleFrom<$a> for $b {
+            #[inline]
+            fn convertible_from(_: $a) -> bool {
+                true
+            }
+        }
     };
 }
 
@@ -72,7 +86,7 @@ macro_rules! lossy_conversion {
             #[inline]
             fn checked_from(value: $a) -> Option<$b> {
                 let result = value as $b;
-                if (result < 0) == (value < 0) && result as $a == value {
+                if (result >= 0) == (value >= 0) && result as $a == value {
                     Some(result)
                 } else {
                     None
@@ -111,11 +125,20 @@ macro_rules! lossy_conversion {
             #[inline]
             fn overflowing_from(value: $a) -> ($b, bool) {
                 let result = value as $b;
-                if (result < 0) == (value < 0) && result as $a == value {
+                if (result >= 0) == (value >= 0) && result as $a == value {
                     (result, false)
                 } else {
                     (result, true)
                 }
+            }
+        }
+
+        impl ConvertibleFrom<$a> for $b {
+            #[allow(unused_comparisons, clippy::cast_lossless)]
+            #[inline]
+            fn convertible_from(value: $a) -> bool {
+                let result = value as $b;
+                (result >= 0) == (value >= 0) && result as $a == value
             }
         }
     };

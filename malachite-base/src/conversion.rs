@@ -1,6 +1,7 @@
 use round::RoundingMode;
 
 /// This trait defines a conversion from another type. If the conversion fails, `None` is returned.
+/// If `CheckedFrom` is implemented, it usually makes sense to implement `ConvertibleFrom` as well.
 pub trait CheckedFrom<T>: Sized {
     fn checked_from(value: T) -> Option<Self>;
 }
@@ -96,10 +97,15 @@ where
     }
 }
 
+/// This trait defines a conversion from another type, where the conversion is made according to a
+/// specified `RoundingMode`.
 pub trait RoundingFrom<T>: Sized {
     fn rounding_from(value: T, rm: RoundingMode) -> Self;
 }
 
+/// This trait defines a conversion to another type, where the conversion is made according to a
+/// specified `RoundingMode`. It is recommended that this trait is not implemented directly; it is
+/// automatically implemented when `OverflowingFrom` is implemented.
 pub trait RoundingInto<T>: Sized {
     fn rounding_into(self, rm: RoundingMode) -> T;
 }
@@ -112,4 +118,11 @@ where
     fn rounding_into(self, rm: RoundingMode) -> U {
         U::rounding_from(self, rm)
     }
+}
+
+/// This trait provides a function that tests whether a value of type `T` is convertible into a
+/// value of type `Self`. If `ConvertibleFrom<T>` for `Self` is implemented, it usually makes sense
+/// to implement `CheckedFrom` for `T` as well.
+pub trait ConvertibleFrom<T> {
+    fn convertible_from(value: T) -> bool;
 }
