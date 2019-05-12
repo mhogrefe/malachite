@@ -27,6 +27,8 @@ use platform::Limb;
 /// assert_eq!(limbs_shl(&[123, 456], 32), &[0, 123, 456]);
 /// assert_eq!(limbs_shl(&[123, 456], 100), &[0, 0, 0, 1_968, 7_296]);
 /// ```
+///
+/// This is mpn_lshift from mpn/generic/lshift.c, where the result is returned.
 pub fn limbs_shl(limbs: &[Limb], bits: u64) -> Vec<Limb> {
     let small_bits = u32::wrapping_from(bits) & Limb::WIDTH_MASK;
     let mut shifted_limbs = vec![0; usize::checked_from(bits >> Limb::LOG_WIDTH).unwrap()];
@@ -58,7 +60,8 @@ pub fn limbs_shl(limbs: &[Limb], bits: u64) -> Vec<Limb> {
 /// where n = `limbs.len()`
 ///
 /// # Panics
-/// Panics if `out` is shorter than `in_limbs`, `bits` is 0, or `bits` is greater than 31.
+/// Panics if `out` is shorter than `in_limbs`, `bits` is 0, or `bits` is greater than or equal to
+/// `Limb::WIDTH`.
 ///
 /// # Example
 /// ```
@@ -72,6 +75,8 @@ pub fn limbs_shl(limbs: &[Limb], bits: u64) -> Vec<Limb> {
 /// assert_eq!(limbs_shl_to_out(&mut out, &[123, 456], 31), 228);
 /// assert_eq!(out, &[2_147_483_648, 61, 0]);
 /// ```
+///
+/// This is mpn_lshift from mpn/generic/lshift.c.
 pub fn limbs_shl_to_out(out: &mut [Limb], in_limbs: &[Limb], bits: u32) -> Limb {
     let len = in_limbs.len();
     assert!(out.len() >= len);
@@ -110,6 +115,8 @@ pub fn limbs_shl_to_out(out: &mut [Limb], in_limbs: &[Limb], bits: u32) -> Limb 
 /// assert_eq!(limbs_slice_shl_in_place(&mut limbs, 31), 228);
 /// assert_eq!(limbs, &[2_147_483_648, 61]);
 /// ```
+///
+/// This is mpn_lshift from mpn/generic/lshift.c, where rp == up.
 pub fn limbs_slice_shl_in_place(limbs: &mut [Limb], bits: u32) -> Limb {
     assert_ne!(bits, 0);
     assert!(bits < Limb::WIDTH);
@@ -147,6 +154,8 @@ pub fn limbs_slice_shl_in_place(limbs: &mut [Limb], bits: u32) -> Limb {
 /// limbs_vec_shl_in_place(&mut limbs, 31);
 /// assert_eq!(limbs, &[2_147_483_648, 61, 228]);
 /// ```
+///
+/// This is mpn_lshift from mpn/generic/lshift.c, where rp == up and the carry is appended to rp.
 pub fn limbs_vec_shl_in_place(limbs: &mut Vec<Limb>, bits: u64) {
     let small_bits = u32::wrapping_from(bits) & Limb::WIDTH_MASK;
     let remaining_bits = if small_bits == 0 {
@@ -164,18 +173,49 @@ pub fn limbs_vec_shl_in_place(limbs: &mut Vec<Limb>, bits: u64) {
     }
 }
 
-// mpn_lshiftc -- Shift left low level with complement.
-// Shift U (pointed to by xs and n limbs long) bits bits to the left
-// and store the n least significant limbs of the result at out.
-// Return the bits shifted out from the most significant limb.
-//
-// Argument constraints:
-// 1. 0 < bits < GMP_NUMB_BITS.
-// 2. If the result is to be written over the input, out must be >= xs.
-//
-// TODO test
-// This is mpn_lshiftc from mpn/generic/mpn_lshiftc.
-pub fn limbs_shl_with_complement(out: &mut [Limb], xs: &[Limb], bits: u32) -> Limb {
+/// mpn_lshiftc -- Shift left low level with complement.
+/// Shift U (pointed to by xs and n limbs long) bits bits to the left
+/// and store the n least significant limbs of the result at out.
+/// Return the bits shifted out from the most significant limb.
+///
+/// Argument constraints:
+/// 1. 0 < bits < GMP_NUMB_BITS.
+/// 2. If the result is to be written over the input, out must be >= xs.
+///
+/// TODO test
+///
+///
+/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
+/// limbs of the `Natural` left-shifted by a `Limb`, and complemented, to an output slice. The
+/// output slice must be at least as long as the input slice. The `Limb` must be between 1 and 31,
+/// inclusive. The carry, or the bits that are shifted past the width of the input slice, is
+/// returned. The carry is not complemented.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = `limbs.len()`
+///
+/// # Panics
+/// Panics if `out` is shorter than `in_limbs`, `in_limbs` is empty, `bits` is 0, or `bits` is
+/// greater than or equal to `Limb::WIDTH`.
+///
+/// # Example
+/// ```
+/// use malachite_nz::natural::arithmetic::shl_u::limbs_shl_with_complement_to_out;
+///
+/// let mut out = vec![0, 0, 0];
+/// assert_eq!(limbs_shl_with_complement_to_out(&mut out, &[123, 456], 1), 0);
+/// assert_eq!(out, &[4294967049, 4294966383, 0]);
+///
+/// let mut out = vec![0, 0, 0];
+/// assert_eq!(limbs_shl_with_complement_to_out(&mut out, &[123, 456], 31), 228);
+/// assert_eq!(out, &[2147483647, 4294967234, 0]);
+/// ```
+///
+/// This is mpn_lshiftc from mpn/generic/mpn_lshiftc.
+pub fn limbs_shl_with_complement_to_out(out: &mut [Limb], xs: &[Limb], bits: u32) -> Limb {
     let n = xs.len();
     assert_ne!(n, 0);
     assert_ne!(bits, 0);

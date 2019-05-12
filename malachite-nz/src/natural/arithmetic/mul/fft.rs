@@ -14,7 +14,7 @@ use natural::arithmetic::mul::mul_mod::{
     _limbs_mul_mod_limb_width_to_n_minus_1_scratch_size, MULMOD_BNM1_THRESHOLD,
     MUL_FFT_MODF_THRESHOLD,
 };
-use natural::arithmetic::shl_u::{limbs_shl_to_out, limbs_shl_with_complement};
+use natural::arithmetic::shl_u::{limbs_shl_to_out, limbs_shl_with_complement_to_out};
 use natural::arithmetic::square::SQR_TOOM3_THRESHOLD;
 use natural::arithmetic::sub::{
     limbs_sub_in_place_left, limbs_sub_same_length_in_place_left,
@@ -673,7 +673,7 @@ fn _limbs_mul_fft_shl_mod_f_to_out(out: &mut [Limb], xs: &[Limb], bits: usize) {
             // no out shift below since xs[n] <= 1
             limbs_shl_to_out(out, &xs_hi[..shift_limbs + 1], small_bits);
             carry2 = out[shift_limbs];
-            limbs_shl_with_complement(&mut out[shift_limbs..], xs_lo, small_bits)
+            limbs_shl_with_complement_to_out(&mut out[shift_limbs..], xs_lo, small_bits)
         };
 
         // add carry to out[0], and add carry2 to out[shift_limbs]
@@ -696,7 +696,7 @@ fn _limbs_mul_fft_shl_mod_f_to_out(out: &mut [Limb], xs: &[Limb], bits: usize) {
         let (xs_lo, xs_hi) = xs.split_at(n - shift_limbs);
         let mut carry = if small_bits != 0 {
             // no out bits below since xs[n] <= 1
-            limbs_shl_with_complement(out, &xs_hi[..shift_limbs + 1], small_bits);
+            limbs_shl_with_complement_to_out(out, &xs_hi[..shift_limbs + 1], small_bits);
             carry2 = !out[shift_limbs];
             // out[..shift_limbs + 1] = xs[n - shift_limbs, n + 1] << small_bits
             // out[shift_limbs..n] = xs[n - shift_limbs..] << small_bits

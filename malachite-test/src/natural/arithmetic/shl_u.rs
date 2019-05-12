@@ -2,14 +2,17 @@ use malachite_base::conversion::CheckedFrom;
 use malachite_base::named::Named;
 use malachite_base::num::integers::PrimitiveInteger;
 use malachite_nz::natural::arithmetic::shl_u::{
-    limbs_shl, limbs_shl_to_out, limbs_slice_shl_in_place, limbs_vec_shl_in_place,
+    limbs_shl, limbs_shl_to_out, limbs_shl_with_complement_to_out, limbs_slice_shl_in_place,
+    limbs_vec_shl_in_place,
 };
+use malachite_nz::natural::logic::not::limbs_not_in_place;
 use malachite_nz::platform::Limb;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::{
     pairs_of_unsigned_vec_and_limb_var_1, pairs_of_unsigned_vec_and_small_unsigned,
     triples_of_unsigned_vec_unsigned_vec_and_limb_var_5,
+    triples_of_unsigned_vec_unsigned_vec_and_limb_var_6,
 };
 use inputs::natural::{
     pairs_of_natural_and_small_unsigned, rm_pairs_of_natural_and_small_unsigned,
@@ -20,6 +23,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limbs_shl_to_out);
     register_demo!(registry, demo_limbs_slice_shl_in_place);
     register_demo!(registry, demo_limbs_vec_shl_in_place);
+    register_demo!(registry, demo_limbs_shl_with_complement_to_out);
 
     register_demo!(registry, demo_natural_shl_assign_u8);
     register_demo!(registry, demo_natural_shl_assign_u16);
@@ -43,6 +47,11 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_bench!(registry, Small, benchmark_limbs_shl_to_out);
     register_bench!(registry, Small, benchmark_limbs_slice_shl_in_place);
     register_bench!(registry, Small, benchmark_limbs_vec_shl_in_place);
+    register_bench!(
+        registry,
+        Small,
+        benchmark_limbs_shl_with_complement_to_out_algorithms
+    );
 
     register_bench!(
         registry,
@@ -126,6 +135,19 @@ fn demo_limbs_vec_shl_in_place(gm: GenerationMode, limit: usize) {
         println!(
             "limbs := {:?}; limbs_vec_shl_in_place(&mut limbs, {}); limbs = {:?}",
             limbs_old, bits, limbs
+        );
+    }
+}
+
+fn demo_limbs_shl_with_complement_to_out(gm: GenerationMode, limit: usize) {
+    for (out, in_limbs, bits) in triples_of_unsigned_vec_unsigned_vec_and_limb_var_6(gm).take(limit)
+    {
+        let mut out = out.to_vec();
+        let mut out_old = out.clone();
+        let carry = limbs_shl_with_complement_to_out(&mut out, &in_limbs, bits);
+        println!(
+            "out := {:?}; limbs_shl_with_complement_to_out(&mut out, {:?}, {}) = {}; out = {:?}",
+            out_old, in_limbs, bits, carry, out
         );
     }
 }
@@ -325,6 +347,38 @@ fn benchmark_natural_shl_u32_library_comparison(gm: GenerationMode, limit: usize
         &mut [
             ("malachite", &mut (|(_, (x, y))| no_out!(x << y))),
             ("rug", &mut (|((x, y), _)| no_out!(x << y))),
+        ],
+    );
+}
+
+fn benchmark_limbs_shl_with_complement_to_out_algorithms(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "limbs_shl_with_complement_to_out(&mut [u32], &[u32], u32)",
+        BenchmarkType::Algorithms,
+        triples_of_unsigned_vec_unsigned_vec_and_limb_var_6(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(_, ref in_limbs, _)| in_limbs.len()),
+        "in_limbs.len()",
+        &mut [
+            (
+                "standard",
+                &mut (|(mut out, in_limbs, bits)| {
+                    no_out!(limbs_shl_with_complement_to_out(&mut out, &in_limbs, bits))
+                }),
+            ),
+            (
+                "limbs_shl_to_out and limbs_not_in_place",
+                &mut (|(mut out, in_limbs, bits)| {
+                    limbs_shl_to_out(&mut out, &in_limbs, bits);
+                    limbs_not_in_place(&mut out);
+                }),
+            ),
         ],
     );
 }

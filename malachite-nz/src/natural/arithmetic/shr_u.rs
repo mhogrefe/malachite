@@ -37,6 +37,8 @@ use platform::Limb;
 /// assert_eq!(limbs_shr(&[4_294_967_295, 1], 1), &[4_294_967_295, 0]);
 /// assert_eq!(limbs_shr(&[4_294_967_295, 4_294_967_295], 32), &[4_294_967_295]);
 /// ```
+///
+/// This is mpn_rshift from mpn/generic/rshift.c, where the result is returned.
 pub fn limbs_shr(limbs: &[Limb], bits: u64) -> Vec<Limb> {
     let limbs_to_delete = usize::checked_from(bits >> Limb::LOG_WIDTH).unwrap();
     if limbs_to_delete >= limbs.len() {
@@ -76,6 +78,9 @@ pub fn limbs_shr(limbs: &[Limb], bits: u64) -> Vec<Limb> {
 /// assert_eq!(limbs_shr_round_up(&[4_294_967_295, 1], 1), &[0, 1]);
 /// assert_eq!(limbs_shr_round_up(&[4_294_967_295, 4_294_967_295], 32), &[0, 1]);
 /// ```
+///
+/// This is cfdiv_q_2exp from mpz/cfdiv_q_2exp.c, where u is non-negative, dir == 1, and the result
+/// is returned.
 pub fn limbs_shr_round_up(limbs: &[Limb], bits: u64) -> Vec<Limb> {
     let limbs_to_delete = usize::checked_from(bits >> Limb::LOG_WIDTH).unwrap();
     if limbs_to_delete >= limbs.len() {
@@ -240,7 +245,7 @@ pub fn limbs_shr_round(limbs: &[Limb], bits: u64, rm: RoundingMode) -> Option<Ve
 ///
 /// # Panics
 /// Panics if `in_limbs` is empty, `out` is shorter than `in_limbs`, `bits` is 0, or `bits` is
-/// greater than 31.
+/// greater than or equal to `Limb::WIDTH`.
 ///
 /// # Example
 /// ```
@@ -254,6 +259,8 @@ pub fn limbs_shr_round(limbs: &[Limb], bits: u64, rm: RoundingMode) -> Option<Ve
 /// assert_eq!(limbs_shr_to_out(&mut out, &[122, 455], 1), 0);
 /// assert_eq!(out, &[2_147_483_709, 227, 0]);
 /// ```
+///
+/// This is mpn_rshift from mpn/generic/rshift.c.
 pub fn limbs_shr_to_out(out: &mut [Limb], in_limbs: &[Limb], bits: u32) -> Limb {
     let len = in_limbs.len();
     assert_ne!(len, 0);
@@ -285,7 +292,7 @@ pub fn limbs_shr_to_out(out: &mut [Limb], in_limbs: &[Limb], bits: u32) -> Limb 
 /// where n = `limbs.len()`
 ///
 /// # Panics
-/// Panics if `in_limbs` is empty, `bits` is 0, or `bits` is greater than 31.
+/// Panics if `in_limbs` is empty, `bits` is 0, or `bits` is greater than or equal to `Limb::WIDTH`.
 ///
 /// # Example
 /// ```
@@ -299,6 +306,8 @@ pub fn limbs_shr_to_out(out: &mut [Limb], in_limbs: &[Limb], bits: u32) -> Limb 
 /// assert_eq!(limbs_slice_shr_in_place(&mut limbs, 1), 0);
 /// assert_eq!(limbs, &[2_147_483_709, 227]);
 /// ```
+///
+/// This is mpn_rshift from mpn/generic/rshift.c, where the rp == up.
 pub fn limbs_slice_shr_in_place(limbs: &mut [Limb], bits: u32) -> Limb {
     assert_ne!(bits, 0);
     assert!(bits < Limb::WIDTH);
@@ -374,6 +383,9 @@ pub fn limbs_slice_shr_in_place(limbs: &mut [Limb], bits: u32) -> Limb {
 /// limbs_vec_shr_in_place(&mut limbs, 32);
 /// assert_eq!(limbs, &[4_294_967_295]);
 /// ```
+///
+/// This is mpn_rshift from mpn/generic/rshift.c, where rp == up and if cnt is sufficiently large,
+/// limbs are removed from rp.
 pub fn limbs_vec_shr_in_place(limbs: &mut Vec<Limb>, bits: u64) {
     let limbs_to_delete = usize::checked_from(bits >> Limb::LOG_WIDTH).unwrap();
     if limbs_to_delete >= limbs.len() {
@@ -445,6 +457,8 @@ pub fn limbs_vec_shr_in_place(limbs: &mut Vec<Limb>, bits: u64) {
 /// limbs_vec_shr_round_up_in_place(&mut limbs, 32);
 /// assert_eq!(limbs, &[0, 1]);
 /// ```
+///
+/// This is cfdiv_q_2exp from mpz/cfdiv_q_2exp.c, where u is non-negative, dir == 1, and w == u.
 pub fn limbs_vec_shr_round_up_in_place(limbs: &mut Vec<Limb>, bits: u64) {
     let limbs_to_delete = usize::checked_from(bits >> Limb::LOG_WIDTH).unwrap();
     if limbs_to_delete >= limbs.len() {
