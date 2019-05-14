@@ -191,7 +191,7 @@ fn signed_limb_wrapping_from_integer_properties() {
 }
 
 #[test]
-fn limb_saturating_from_integer_properties() {
+fn signed_limb_saturating_from_integer_properties() {
     test_properties(integers, |x| {
         let result = SignedLimb::saturating_from(x);
         assert_eq!(SignedLimb::saturating_from(x.clone()), result);
@@ -201,7 +201,7 @@ fn limb_saturating_from_integer_properties() {
 }
 
 #[test]
-fn limb_overflowing_from_integer_properties() {
+fn signed_limb_overflowing_from_integer_properties() {
     test_properties(integers, |x| {
         let result = SignedLimb::overflowing_from(x);
         assert_eq!(SignedLimb::overflowing_from(x.clone()), result);

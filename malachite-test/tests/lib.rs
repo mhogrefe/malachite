@@ -40,12 +40,17 @@ pub mod base {
         pub mod split_in_half;
         pub mod upper_half;
     }
-    pub mod rounding_mode {
+    pub mod rounding_modes {
         pub mod clone;
         pub mod eq;
         pub mod hash;
         pub mod neg;
         pub mod size;
+    }
+    pub mod strings {
+        pub mod string_is_subset;
+        pub mod string_nub;
+        pub mod string_sort;
     }
 }
 pub mod integer {

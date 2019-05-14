@@ -1,6 +1,6 @@
 use malachite_base::conversion::CheckedFrom;
 use malachite_base::named::Named;
-use malachite_base::num::traits::{ShrRound, ShrRoundAssign};
+use malachite_base::num::traits::{ShrRound, ShrRoundAssign, UnsignedAbs};
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::integer::{
@@ -203,8 +203,8 @@ macro_rules! demos_and_benches {
                 gm.name(),
                 limit,
                 file_name,
-                &(|&(_, other)| usize::checked_from(other).unwrap()),
-                "other",
+                &(|&(_, other)| usize::checked_from(other.unsigned_abs()).unwrap()),
+                "|other|",
                 &mut [
                     (
                         &format!("Integer >> {}", $t::NAME),
@@ -230,8 +230,8 @@ macro_rules! demos_and_benches {
                 gm.name(),
                 limit,
                 file_name,
-                &(|&(_, other, _)| usize::checked_from(other).unwrap()),
-                "other",
+                &(|&(_, other, _)| usize::checked_from(other.unsigned_abs()).unwrap()),
+                "|other|",
                 &mut [(
                     "malachite",
                     &mut (|(mut x, y, rm)| x.shr_round_assign(y, rm)),
@@ -251,8 +251,8 @@ macro_rules! demos_and_benches {
                 gm.name(),
                 limit,
                 file_name,
-                &(|&(_, other, _)| usize::checked_from(other).unwrap()),
-                "other",
+                &(|&(_, other, _)| usize::checked_from(other.unsigned_abs()).unwrap()),
+                "|other|",
                 &mut [
                     (
                         &format!("Integer.shr_round({}, RoundingMode)", $t::NAME),
@@ -340,8 +340,8 @@ fn benchmark_integer_shr_assign_i32_library_comparison(
         gm.name(),
         limit,
         file_name,
-        &(|&(_, (_, other))| usize::checked_from(other).unwrap()),
-        "other",
+        &(|&(_, (_, other))| usize::checked_from(other.unsigned_abs()).unwrap()),
+        "|other|",
         &mut [
             ("malachite", &mut (|(_, (mut x, y))| x >>= y)),
             ("rug", &mut (|((mut x, y), _)| x >>= y)),
@@ -357,8 +357,8 @@ fn benchmark_integer_shr_i32_library_comparison(gm: GenerationMode, limit: usize
         gm.name(),
         limit,
         file_name,
-        &(|&(_, (_, other))| usize::checked_from(other).unwrap()),
-        "other",
+        &(|&(_, (_, other))| usize::checked_from(other.unsigned_abs()).unwrap()),
+        "|other|",
         &mut [
             ("malachite", &mut (|(_, (x, y))| no_out!(x >> y))),
             ("rug", &mut (|((x, y), _)| no_out!(x >> y))),

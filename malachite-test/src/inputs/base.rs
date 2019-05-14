@@ -32,7 +32,7 @@ use malachite_nz::natural::Natural;
 use malachite_nz::platform::{HalfLimb, Limb, SignedHalfLimb, SignedLimb};
 use rand::Rand;
 use rust_wheels::iterators::bools::exhaustive_bools;
-use rust_wheels::iterators::chars::exhaustive_chars;
+use rust_wheels::iterators::chars::{exhaustive_ascii_chars, exhaustive_chars, random_ascii_chars};
 use rust_wheels::iterators::common::EXAMPLE_SEED;
 use rust_wheels::iterators::general::{random, random_from_vector, range_increasing};
 use rust_wheels::iterators::integers_geometric::{positive_u32s_geometric, u32s_geometric};
@@ -52,6 +52,9 @@ use rust_wheels::iterators::primitive_ints::{
     special_random_unsigned,
 };
 use rust_wheels::iterators::rounding_modes::{exhaustive_rounding_modes, random_rounding_modes};
+use rust_wheels::iterators::strings::{
+    exhaustive_strings, exhaustive_strings_with_chars, random_strings, random_strings_with_chars,
+};
 use rust_wheels::iterators::tuples::{
     exhaustive_pairs, exhaustive_pairs_from_single, exhaustive_quadruples, exhaustive_triples,
     exhaustive_triples_from_single, lex_pairs, lex_triples, log_pairs, random_pairs,
@@ -2737,4 +2740,46 @@ where
             }
         }),
     )
+}
+
+pub fn strings(gm: NoSpecialGenerationMode) -> It<String> {
+    match gm {
+        NoSpecialGenerationMode::Exhaustive => Box::new(exhaustive_strings()),
+        NoSpecialGenerationMode::Random(scale) => Box::new(random_strings(&EXAMPLE_SEED, scale)),
+    }
+}
+
+pub fn ascii_strings(gm: NoSpecialGenerationMode) -> It<String> {
+    match gm {
+        NoSpecialGenerationMode::Exhaustive => {
+            Box::new(exhaustive_strings_with_chars(exhaustive_ascii_chars()))
+        }
+        NoSpecialGenerationMode::Random(scale) => {
+            Box::new(random_strings_with_chars(&EXAMPLE_SEED, scale, &|seed| {
+                random_ascii_chars(seed)
+            }))
+        }
+    }
+}
+
+pub fn pairs_of_strings(gm: NoSpecialGenerationMode) -> It<(String, String)> {
+    match gm {
+        NoSpecialGenerationMode::Exhaustive => {
+            Box::new(exhaustive_pairs_from_single(exhaustive_strings()))
+        }
+        NoSpecialGenerationMode::Random(scale) => Box::new(random_pairs_from_single(
+            random_strings(&EXAMPLE_SEED, scale),
+        )),
+    }
+}
+
+pub fn pairs_of_ascii_strings(gm: NoSpecialGenerationMode) -> It<(String, String)> {
+    match gm {
+        NoSpecialGenerationMode::Exhaustive => Box::new(exhaustive_pairs_from_single(
+            exhaustive_strings_with_chars(exhaustive_ascii_chars()),
+        )),
+        NoSpecialGenerationMode::Random(scale) => Box::new(random_pairs_from_single(
+            random_strings_with_chars(&EXAMPLE_SEED, scale, &|seed| random_ascii_chars(seed)),
+        )),
+    }
 }
