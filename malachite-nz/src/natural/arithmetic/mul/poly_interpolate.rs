@@ -22,8 +22,8 @@ use natural::arithmetic::mul::toom::BIT_CORRECTION;
 use natural::arithmetic::shl_u::limbs_shl_to_out;
 use natural::arithmetic::shr_u::limbs_slice_shr_in_place;
 use natural::arithmetic::sub::{
-    _limbs_sub_same_length_in_place_with_overlap, limbs_sub_in_place_left,
-    limbs_sub_same_length_in_place_left, limbs_sub_same_length_in_place_right,
+    limbs_sub_in_place_left, limbs_sub_same_length_in_place_left,
+    limbs_sub_same_length_in_place_right, limbs_sub_same_length_in_place_with_overlap,
     limbs_sub_same_length_to_out,
 };
 use natural::arithmetic::sub_limb::limbs_sub_limb_in_place;
@@ -389,8 +389,7 @@ pub(crate) fn _limbs_mul_toom_interpolate_6_points(
     //          ...-w0___|-w1_w2 |
     //
     // if (LIKELY(n_high > n)) the two operands below DO overlap!
-    let carry =
-        _limbs_sub_same_length_in_place_with_overlap(&mut out[2 * n..5 * n + n_high], 2 * n);
+    let carry = limbs_sub_same_length_in_place_with_overlap(&mut out[2 * n..5 * n + n_high], 2 * n);
 
     // embankment is a "dirty trick" to avoid carry/borrow propagation beyond allocated memory
     let embankment;

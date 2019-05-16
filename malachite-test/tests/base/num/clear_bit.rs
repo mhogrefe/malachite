@@ -59,9 +59,9 @@ pub fn test_clear_bit() {
 }
 
 macro_rules! clear_bit_fail_helper {
-    ($t:ident, $fail:ident, $err:expr) => {
+    ($t:ident, $fail:ident) => {
         #[test]
-        #[should_panic(expected = $err)]
+        #[should_panic]
         fn $fail() {
             let mut n = $t::NEGATIVE_ONE;
             n.clear_bit(100);
@@ -69,26 +69,10 @@ macro_rules! clear_bit_fail_helper {
     };
 }
 
-clear_bit_fail_helper!(
-    i8,
-    clear_bit_i8_fail_helper,
-    "Cannot clear bit 100 in negative value of width 8"
-);
-clear_bit_fail_helper!(
-    i16,
-    clear_bit_i16_fail_helper,
-    "Cannot clear bit 100 in negative value of width 16"
-);
-clear_bit_fail_helper!(
-    i32,
-    clear_bit_signed_limb_fail_helper,
-    "Cannot clear bit 100 in negative value of width 32"
-);
-clear_bit_fail_helper!(
-    i64,
-    clear_bit_i64_fail_helper,
-    "Cannot clear bit 100 in negative value of width 64"
-);
+clear_bit_fail_helper!(i8, clear_bit_i8_fail_helper);
+clear_bit_fail_helper!(i16, clear_bit_i16_fail_helper);
+clear_bit_fail_helper!(i32, clear_bit_i32_fail_helper);
+clear_bit_fail_helper!(i64, clear_bit_i64_fail_helper);
 
 fn clear_bit_properties_helper_unsigned<T: PrimitiveUnsigned + Rand>() {
     test_properties(pairs_of_unsigned_and_small_unsigned, |&(n, index)| {

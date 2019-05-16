@@ -1,10 +1,10 @@
-use std::fmt::Display;
 use std::ops::{Sub, SubAssign};
 
 #[cfg(feature = "64_bit_limbs")]
 use malachite_base::conversion::WrappingFrom;
 use malachite_base::num::traits::{CheckedSub, OverflowingSubAssign};
 
+use natural::arithmetic::sub::sub_panic;
 use natural::Natural;
 use platform::Limb;
 
@@ -26,6 +26,8 @@ use platform::Limb;
 /// assert_eq!(limbs_sub_limb(&[123, 456], 789), (vec![4_294_966_630, 455], false));
 /// assert_eq!(limbs_sub_limb(&[1], 2), (vec![4_294_967_295], true));
 /// ```
+///
+/// This is mpn_sub_1 from gmp.h, where the result is returned.
 pub fn limbs_sub_limb(limbs: &[Limb], mut limb: Limb) -> (Vec<Limb>, bool) {
     let len = limbs.len();
     let mut result_limbs = Vec::with_capacity(len);
@@ -73,6 +75,8 @@ pub fn limbs_sub_limb(limbs: &[Limb], mut limb: Limb) -> (Vec<Limb>, bool) {
 /// assert_eq!(limbs_sub_limb_to_out(&mut out, &[1], 2), true);
 /// assert_eq!(out, &[4_294_967_295, 0, 0]);
 /// ```
+///
+/// This is mpn_sub_1 from gmp.h.
 pub fn limbs_sub_limb_to_out(out: &mut [Limb], in_limbs: &[Limb], mut limb: Limb) -> bool {
     let len = in_limbs.len();
     assert!(out.len() >= len);
@@ -115,6 +119,8 @@ pub fn limbs_sub_limb_to_out(out: &mut [Limb], in_limbs: &[Limb], mut limb: Limb
 /// assert_eq!(limbs_sub_limb_in_place(&mut limbs, 2), true);
 /// assert_eq!(limbs, &[4_294_967_295]);
 /// ```
+///
+/// This is mpn_add_1 from gmp.h, where the result is written to the input slice.
 pub fn limbs_sub_limb_in_place(limbs: &mut [Limb], mut limb: Limb) -> bool {
     for x in limbs.iter_mut() {
         if x.overflowing_sub_assign(limb) {
@@ -124,13 +130,6 @@ pub fn limbs_sub_limb_in_place(limbs: &mut [Limb], mut limb: Limb) -> bool {
         }
     }
     limb != 0
-}
-
-fn sub_panic<S: Display, T: Display>(x: S, y: T) -> ! {
-    panic!(
-        "Cannot subtract a Limb from a smaller Natural. self: {}, other: {}",
-        x, y
-    );
 }
 
 impl Sub<Limb> for Natural {

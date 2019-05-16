@@ -5,7 +5,7 @@ use malachite_base::num::traits::WrappingNegAssign;
 
 use integer::Integer;
 use natural::arithmetic::sub::{
-    limbs_sub, limbs_sub_in_place_left, limbs_sub_in_place_right, limbs_sub_to_out,
+    limbs_sub, limbs_sub_in_place_left, limbs_sub_to_out, limbs_vec_sub_in_place_right,
 };
 use natural::logic::not::limbs_not_in_place;
 use natural::Natural::{self, Large, Small};
@@ -200,7 +200,7 @@ pub fn limbs_xor_neg_neg_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
     assert!(x_i < xs_len);
     assert!(y_i < ys_len);
     if y_i >= xs_len {
-        assert!(!limbs_sub_in_place_right(ys, xs));
+        assert!(!limbs_vec_sub_in_place_right(ys, xs));
         return;
     } else if x_i >= ys_len {
         assert!(!limbs_sub_in_place_left(xs, ys));

@@ -15,8 +15,6 @@ use platform::Limb;
 ///
 /// where n = `limbs.len()`
 ///
-/// This is mpn_add_1 from gmp.h, where the result is returned.
-///
 /// # Example
 /// ```
 /// use malachite_nz::natural::arithmetic::add_limb::limbs_add_limb;
@@ -25,6 +23,8 @@ use platform::Limb;
 /// assert_eq!(limbs_add_limb(&[0xffff_ffff, 5], 2), &[1, 6]);
 /// assert_eq!(limbs_add_limb(&[0xffff_ffff], 2), &[1, 1]);
 /// ```
+///
+/// This is mpn_add_1 from gmp.h, where the result is returned.
 pub fn limbs_add_limb(limbs: &[Limb], mut limb: Limb) -> Vec<Limb> {
     let len = limbs.len();
     let mut result_limbs = Vec::with_capacity(len);
@@ -55,8 +55,6 @@ pub fn limbs_add_limb(limbs: &[Limb], mut limb: Limb) -> Vec<Limb> {
 ///
 /// where n = `limbs.len()`
 ///
-/// This is mpn_add_1 from gmp.h.
-///
 /// # Panics
 /// Panics if `out` is shorter than `in_limbs`.
 ///
@@ -72,6 +70,8 @@ pub fn limbs_add_limb(limbs: &[Limb], mut limb: Limb) -> Vec<Limb> {
 /// assert_eq!(limbs_add_limb_to_out(&mut out, &[0xffff_ffff], 2), true);
 /// assert_eq!(out, &[1, 0, 0]);
 /// ```
+///
+/// This is mpn_add_1 from gmp.h.
 pub fn limbs_add_limb_to_out(out: &mut [Limb], in_limbs: &[Limb], mut limb: Limb) -> bool {
     let len = in_limbs.len();
     assert!(out.len() >= len);
@@ -100,8 +100,6 @@ pub fn limbs_add_limb_to_out(out: &mut [Limb], in_limbs: &[Limb], mut limb: Limb
 ///
 /// where n = `limbs.len()`
 ///
-/// This is mpn_add_1 from gmp.h, where the result is written to the input slice.
-///
 /// # Example
 /// ```
 /// use malachite_nz::natural::arithmetic::add_limb::limbs_slice_add_limb_in_place;
@@ -114,6 +112,8 @@ pub fn limbs_add_limb_to_out(out: &mut [Limb], in_limbs: &[Limb], mut limb: Limb
 /// assert_eq!(limbs_slice_add_limb_in_place::<u32>(&mut limbs, 2), true);
 /// assert_eq!(limbs, &[1]);
 /// ```
+///
+/// This is mpn_add_1 from gmp.h, where the result is written to the input slice.
 pub fn limbs_slice_add_limb_in_place<T: PrimitiveUnsigned>(limbs: &mut [T], mut limb: T) -> bool {
     for x in limbs.iter_mut() {
         if x.overflowing_add_assign(limb) {
@@ -134,8 +134,6 @@ pub fn limbs_slice_add_limb_in_place<T: PrimitiveUnsigned>(limbs: &mut [T], mut 
 ///
 /// where n = `limbs.len()`
 ///
-/// This is mpz_add_ui from mpz/aors_ui.h where the input is non-negative.
-///
 /// # Panics
 /// Panics if `limbs` is empty.
 ///
@@ -151,6 +149,8 @@ pub fn limbs_slice_add_limb_in_place<T: PrimitiveUnsigned>(limbs: &mut [T], mut 
 /// limbs_vec_add_limb_in_place(&mut limbs, 2);
 /// assert_eq!(limbs, &[1, 1]);
 /// ```
+///
+/// This is mpz_add_ui from mpz/aors_ui.h where the input is non-negative.
 pub fn limbs_vec_add_limb_in_place(limbs: &mut Vec<Limb>, limb: Limb) {
     assert!(!limbs.is_empty());
     if limbs_slice_add_limb_in_place(limbs, limb) {

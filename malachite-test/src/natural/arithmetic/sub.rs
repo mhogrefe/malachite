@@ -3,15 +3,17 @@ use std::cmp::{max, min};
 use malachite_base::conversion::CheckedFrom;
 use malachite_base::num::traits::SignificantBits;
 use malachite_nz::natural::arithmetic::sub::{
-    limbs_sub, limbs_sub_in_place_left, limbs_sub_in_place_right,
+    limbs_slice_sub_in_place_right, limbs_sub, limbs_sub_in_place_left,
     limbs_sub_same_length_in_place_left, limbs_sub_same_length_in_place_right,
-    limbs_sub_same_length_to_out, limbs_sub_to_out,
+    limbs_sub_same_length_in_place_with_overlap, limbs_sub_same_length_to_out, limbs_sub_to_out,
+    limbs_vec_sub_in_place_right,
 };
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::{
-    pairs_of_unsigned_vec_var_1, pairs_of_unsigned_vec_var_3, triples_of_unsigned_vec_var_3,
-    triples_of_unsigned_vec_var_9,
+    pairs_of_unsigned_vec_and_small_usize_var_1, pairs_of_unsigned_vec_var_1,
+    pairs_of_unsigned_vec_var_3, triples_of_unsigned_vec_unsigned_and_small_usize_var_1,
+    triples_of_unsigned_vec_var_3, triples_of_unsigned_vec_var_9,
 };
 use inputs::natural::{
     nrm_pairs_of_naturals_var_1, pairs_of_naturals_var_1, rm_pairs_of_naturals_var_1,
@@ -24,7 +26,9 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limbs_sub_same_length_in_place_left);
     register_demo!(registry, demo_limbs_sub_in_place_left);
     register_demo!(registry, demo_limbs_sub_same_length_in_place_right);
-    register_demo!(registry, demo_limbs_sub_in_place_right);
+    register_demo!(registry, demo_limbs_slice_sub_in_place_right);
+    register_demo!(registry, demo_limbs_vec_sub_in_place_right);
+    register_demo!(registry, demo_limbs_sub_same_length_in_place_with_overlap);
     register_demo!(registry, demo_natural_sub_assign);
     register_demo!(registry, demo_natural_sub_assign_ref);
     register_demo!(registry, demo_natural_sub);
@@ -45,7 +49,13 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
         Small,
         benchmark_limbs_sub_same_length_in_place_right
     );
-    register_bench!(registry, Small, benchmark_limbs_sub_in_place_right);
+    register_bench!(registry, Small, benchmark_limbs_slice_sub_in_place_right);
+    register_bench!(registry, Small, benchmark_limbs_vec_sub_in_place_right);
+    register_bench!(
+        registry,
+        Small,
+        benchmark_limbs_sub_same_length_in_place_with_overlap
+    );
     register_bench!(
         registry,
         Large,
@@ -128,14 +138,38 @@ fn demo_limbs_sub_same_length_in_place_right(gm: GenerationMode, limit: usize) {
     }
 }
 
-fn demo_limbs_sub_in_place_right(gm: GenerationMode, limit: usize) {
+fn demo_limbs_slice_sub_in_place_right(gm: GenerationMode, limit: usize) {
+    for (xs, ys, len) in triples_of_unsigned_vec_unsigned_and_small_usize_var_1(gm).take(limit) {
+        let mut ys = ys.to_vec();
+        let ys_old = ys.clone();
+        let borrow = limbs_slice_sub_in_place_right(&xs, &mut ys, len);
+        println!(
+            "ys := {:?}; limbs_slice_sub_in_place_right({:?}, &mut ys, {}) = {}; ys = {:?}",
+            ys_old, xs, len, borrow, ys
+        );
+    }
+}
+
+fn demo_limbs_vec_sub_in_place_right(gm: GenerationMode, limit: usize) {
     for (xs, ys) in pairs_of_unsigned_vec_var_3(gm).take(limit) {
         let mut ys = ys.to_vec();
         let ys_old = ys.clone();
-        let borrow = limbs_sub_in_place_right(&xs, &mut ys);
+        let borrow = limbs_vec_sub_in_place_right(&xs, &mut ys);
         println!(
-            "ys := {:?}; limbs_sub_in_place_right({:?}, &mut ys) = {}; ys = {:?}",
+            "ys := {:?}; limbs_vec_sub_in_place_right({:?}, &mut ys) = {}; ys = {:?}",
             ys_old, xs, borrow, ys
+        );
+    }
+}
+
+fn demo_limbs_sub_same_length_in_place_with_overlap(gm: GenerationMode, limit: usize) {
+    for (xs, right_start) in pairs_of_unsigned_vec_and_small_usize_var_1(gm).take(limit) {
+        let mut xs = xs.to_vec();
+        let xs_old = xs.clone();
+        let borrow = limbs_sub_same_length_in_place_with_overlap(&mut xs, right_start);
+        println!(
+            "xs := {:?}; limbs_sub_same_length_in_place_with_overlap(&mut xs, {}) = {}; xs = {:?}",
+            xs_old, right_start, borrow, xs
         );
     }
 }
@@ -292,9 +326,26 @@ fn benchmark_limbs_sub_same_length_in_place_right(
     );
 }
 
-fn benchmark_limbs_sub_in_place_right(gm: GenerationMode, limit: usize, file_name: &str) {
+fn benchmark_limbs_slice_sub_in_place_right(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
-        "limbs_sub_in_place_right(&Vec<u32>, &[u32])",
+        "limbs_slice_sub_in_place_right(&[u32], &mut [u32], usize)",
+        BenchmarkType::Single,
+        triples_of_unsigned_vec_unsigned_and_small_usize_var_1(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(ref xs, ref ys, _)| min(xs.len(), ys.len())),
+        "min(xs.len(), ys.len())",
+        &mut [(
+            "malachite",
+            &mut (|(xs, mut ys, len)| no_out!(limbs_slice_sub_in_place_right(&xs, &mut ys, len))),
+        )],
+    );
+}
+
+fn benchmark_limbs_vec_sub_in_place_right(gm: GenerationMode, limit: usize, file_name: &str) {
+    m_run_benchmark(
+        "limbs_vec_sub_in_place_right(&[u32], &mut Vec<u32>)",
         BenchmarkType::Single,
         pairs_of_unsigned_vec_var_3(gm),
         gm.name(),
@@ -304,7 +355,33 @@ fn benchmark_limbs_sub_in_place_right(gm: GenerationMode, limit: usize, file_nam
         "min(xs.len(), ys.len())",
         &mut [(
             "malachite",
-            &mut (|(xs, mut ys)| no_out!(limbs_sub_in_place_right(&xs, &mut ys))),
+            &mut (|(xs, mut ys)| no_out!(limbs_vec_sub_in_place_right(&xs, &mut ys))),
+        )],
+    );
+}
+
+fn benchmark_limbs_sub_same_length_in_place_with_overlap(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "limbs_sub_same_length_in_place_with_overlap(&mut [u32], usize)",
+        BenchmarkType::Single,
+        pairs_of_unsigned_vec_and_small_usize_var_1(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(ref xs, _)| xs.len()),
+        "xs.len()",
+        &mut [(
+            "malachite",
+            &mut (|(mut xs, right_start)| {
+                no_out!(limbs_sub_same_length_in_place_with_overlap(
+                    &mut xs,
+                    right_start
+                ))
+            }),
         )],
     );
 }

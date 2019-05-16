@@ -39,6 +39,8 @@ fn sub_and_borrow(x: Limb, y: Limb, borrow: &mut bool) -> Limb {
 /// assert_eq!(limbs_sub(&[123, 456], &[789]), (vec![4_294_966_630, 455], false));
 /// assert_eq!(limbs_sub(&[123, 456], &[456, 789]), (vec![4_294_966_963, 4_294_966_962], true));
 /// ```
+///
+/// This is mpn_sub from gmp.h, where the output is returned.
 pub fn limbs_sub(xs: &[Limb], ys: &[Limb]) -> (Vec<Limb>, bool) {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -84,6 +86,8 @@ pub fn limbs_sub(xs: &[Limb], ys: &[Limb]) -> (Vec<Limb>, bool) {
 /// assert_eq!(limbs_sub_same_length_to_out(&mut out, &[123, 456], &[456, 789]), true);
 /// assert_eq!(out, &[4_294_966_963, 4_294_966_962, 0]);
 /// ```
+///
+/// This is mpn_sub_n from gmp.h.
 pub fn limbs_sub_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> bool {
     let len = xs.len();
     assert_eq!(len, ys.len());
@@ -122,6 +126,8 @@ pub fn limbs_sub_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) 
 /// assert_eq!(limbs_sub_to_out(&mut out, &[123, 456], &[456, 789]), true);
 /// assert_eq!(out, &[4_294_966_963, 4_294_966_962, 0]);
 /// ```
+///
+/// This is mpn_sub from gmp.h.
 pub fn limbs_sub_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> bool {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -164,6 +170,8 @@ pub fn limbs_sub_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> bool {
 /// assert_eq!(limbs_sub_same_length_in_place_left(xs, &[456, 789]), true);
 /// assert_eq!(xs, &[4_294_966_963, 4_294_966_962]);
 /// ```
+///
+/// This is mpn_sub_n from gmp.h, where the output is written to the first input.
 pub fn limbs_sub_same_length_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> bool {
     let len = xs.len();
     assert_eq!(len, ys.len());
@@ -201,6 +209,8 @@ pub fn limbs_sub_same_length_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> bool
 /// assert_eq!(limbs_sub_in_place_left(xs, &[456, 789]), true);
 /// assert_eq!(xs, &[4_294_966_963, 4_294_966_962]);
 /// ```
+///
+/// This is mpn_sub from gmp.h, where the output is written to the first input.
 pub fn limbs_sub_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> bool {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -241,6 +251,8 @@ pub fn limbs_sub_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> bool {
 /// assert_eq!(limbs_sub_same_length_in_place_right(&[123, 456], ys), true);
 /// assert_eq!(ys, &[4_294_966_963, 4_294_966_962]);
 /// ```
+///
+/// This is mpn_sub_n from gmp.h, where the output is written to the second input.
 pub fn limbs_sub_same_length_in_place_right(xs: &[Limb], ys: &mut [Limb]) -> bool {
     let len = ys.len();
     assert_eq!(xs.len(), len);
@@ -251,10 +263,38 @@ pub fn limbs_sub_same_length_in_place_right(xs: &[Limb], ys: &mut [Limb]) -> boo
     borrow
 }
 
-//TODO test
-pub fn limbs_sub_less_in_place_right(xs: &[Limb], ys: &mut [Limb], len: usize) -> bool {
+/// Given two equal-length slices `xs` and `ys`, computes the difference between the `Natural`s
+/// whose limbs are `xs` and `&ys[..len]`, and writes the limbs of the result to `ys`. Returns
+/// whether there was a borrow left over; that is, whether the second `Natural` was greater than the
+/// first `Natural`.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = `xs.len()` = `ys.len()`
+///
+/// # Panics
+/// Panics if `xs` and `ys` have different lengths or if `len` is greater than `xs.len()`.
+///
+/// # Example
+/// ```
+/// use malachite_nz::natural::arithmetic::sub::limbs_slice_sub_in_place_right;
+///
+/// let ys = &mut [789, 123];
+/// assert_eq!(limbs_slice_sub_in_place_right(&[123, 456], ys, 2), false);
+/// assert_eq!(ys, &[4_294_966_630, 332]);
+///
+/// let ys = &mut [789, 123];
+/// assert_eq!(limbs_slice_sub_in_place_right(&[123, 456], ys, 1), false);
+/// assert_eq!(ys, &[4_294_966_630, 455]);
+/// ```
+///
+/// This is mpn_sub_n from gmp.h, where the output is written to the second input (which has `len`
+/// limbs) and the second input has enough space past `len` to accomodate the output.
+pub fn limbs_slice_sub_in_place_right(xs: &[Limb], ys: &mut [Limb], len: usize) -> bool {
     let xs_len = xs.len();
-    assert!(xs_len <= ys.len());
+    assert_eq!(xs_len, ys.len());
     let (xs_lo, xs_hi) = xs.split_at(len);
     let (ys_lo, ys_hi) = ys.split_at_mut(len);
     let borrow = limbs_sub_same_length_in_place_right(xs_lo, ys_lo);
@@ -263,7 +303,7 @@ pub fn limbs_sub_less_in_place_right(xs: &[Limb], ys: &mut [Limb], len: usize) -
     } else if borrow {
         limbs_sub_limb_to_out(ys_hi, xs_hi, 1)
     } else {
-        ys_hi[..xs_len - len].copy_from_slice(xs_hi);
+        ys_hi.copy_from_slice(xs_hi);
         false
     }
 }
@@ -285,17 +325,17 @@ pub fn limbs_sub_less_in_place_right(xs: &[Limb], ys: &mut [Limb], len: usize) -
 ///
 /// # Example
 /// ```
-/// use malachite_nz::natural::arithmetic::sub::limbs_sub_in_place_right;
+/// use malachite_nz::natural::arithmetic::sub::limbs_vec_sub_in_place_right;
 ///
 /// let mut ys = vec![789];
-/// assert_eq!(limbs_sub_in_place_right(&[123, 456], &mut ys), false);
+/// assert_eq!(limbs_vec_sub_in_place_right(&[123, 456], &mut ys), false);
 /// assert_eq!(ys, &[4_294_966_630, 455]);
 ///
 /// let mut ys = vec![456, 789];
-/// assert_eq!(limbs_sub_in_place_right(&[123, 456], &mut ys), true);
+/// assert_eq!(limbs_vec_sub_in_place_right(&[123, 456], &mut ys), true);
 /// assert_eq!(ys, &[4_294_966_963, 4_294_966_962]);
 /// ```
-pub fn limbs_sub_in_place_right(xs: &[Limb], ys: &mut Vec<Limb>) -> bool {
+pub fn limbs_vec_sub_in_place_right(xs: &[Limb], ys: &mut Vec<Limb>) -> bool {
     let xs_len = xs.len();
     let ys_len = ys.len();
     assert!(xs_len >= ys_len);
@@ -311,6 +351,45 @@ pub fn limbs_sub_in_place_right(xs: &[Limb], ys: &mut Vec<Limb>) -> bool {
             false
         }
     }
+}
+
+/// Given a slice `xs`, computes the difference between the `Natural`s whose limbs are
+/// `&xs[..xs.len() - right_start]` and `&xs[right_start..]`, and writes the limbs of the result to
+/// `&xs[..xs.len() - right_start]`. Returns whether there was a borrow left over; that is, whether
+/// the second `Natural` was greater than the first `Natural`. As implied by the name, the input
+/// slices may overlap.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = `xs.len()` - `right_start`
+///
+/// # Panics
+/// Panics if `right_start` is greater than `xs.len()`.
+///
+/// # Example
+/// ```
+/// use malachite_nz::natural::arithmetic::sub::limbs_sub_same_length_in_place_with_overlap;
+///
+/// let xs: &mut [u32] = &mut [4, 3, 2, 1];
+/// assert_eq!(limbs_sub_same_length_in_place_with_overlap(xs, 1), false);
+/// assert_eq!(xs, &[1, 1, 1, 1]);
+///
+/// let xs: &mut [u32] = &mut [4, 3, 2, 1];
+/// assert_eq!(limbs_sub_same_length_in_place_with_overlap(xs, 3), false);
+/// assert_eq!(xs, &[3, 3, 2, 1]);
+/// ```
+///
+/// This is mpn_sub_n from gmp.h, where the output is written to the first input, and the two inputs
+/// are possibly-overlapping subslices of a single slice.
+pub fn limbs_sub_same_length_in_place_with_overlap(xs: &mut [Limb], right_start: usize) -> bool {
+    let len = xs.len() - right_start;
+    let mut borrow = false;
+    for i in 0..len {
+        xs[i] = sub_and_borrow(xs[i], xs[i + right_start], &mut borrow);
+    }
+    borrow
 }
 
 /// Interpreting a two equal-length slices of `Limb`s as the limbs (in ascending order) of two
@@ -341,10 +420,10 @@ pub fn _limbs_sub_same_length_with_borrow_in_to_out(
     borrow
 }
 
-/// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s,
-/// subtracts the second from the first, and then subtracts a borrow (`false` is 0, `true` is 1),
-/// writing the `xs.len()` limbs of the result to the first (left) slice. Returns whether there was
-/// a borrow left over. The first slice must be at least as long as the second.
+/// Interpreting two equal-length slices of `Limb`s as the limbs (in ascending order) of two
+/// `Natural`s, subtracts the second from the first, and then subtracts a borrow (`false` is 0,
+/// `true` is 1), writing the `xs.len()` limbs of the result to the first (left) slice. Return
+/// whether there was a borrow left over.
 ///
 /// Time: worst case O(n)
 ///
@@ -353,7 +432,7 @@ pub fn _limbs_sub_same_length_with_borrow_in_to_out(
 /// where n = `xs.len()`
 ///
 /// # Panics
-/// Panics if `xs` is shorter than `ys`.
+/// Panics if `xs` and `ys` have different lengths.
 ///
 /// This is mpn_sub_nc from gmp-impl.h, where rp is the same as up.
 pub fn _limbs_sub_same_length_with_borrow_in_in_place_left(
@@ -368,9 +447,22 @@ pub fn _limbs_sub_same_length_with_borrow_in_in_place_left(
     borrow
 }
 
-//TODO test
+/// Interpreting two equal-length slices of `Limb`s as the limbs (in ascending order) of two
+/// `Natural`s, subtracts the second from the first, and then subtracts a borrow (`false` is 0,
+/// `true` is 1), writing the `xs.len()` limbs of the result to the second (right) slice. Returns
+/// whether there was a borrow left over.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = `xs.len()`
+///
+/// # Panics
+/// Panics if `xs` and `ys` have different lengths.
+///
 /// This is mpn_sub_nc from gmp-impl.h, where rp is the same as vp.
-pub fn _limbs_sub_same_length_with_borrow_in_place_right(
+pub fn _limbs_sub_same_length_with_borrow_in_in_place_right(
     xs: &[Limb],
     ys: &mut [Limb],
     borrow_in: bool,
@@ -382,22 +474,9 @@ pub fn _limbs_sub_same_length_with_borrow_in_place_right(
     borrow
 }
 
-//TODO test
-pub fn _limbs_sub_same_length_in_place_with_overlap(
-    xs: &mut [Limb],
-    input_start_index: usize,
-) -> bool {
-    let len = xs.len() - input_start_index;
-    let mut borrow = false;
-    for i in 0..len {
-        xs[i] = sub_and_borrow(xs[i], xs[i + input_start_index], &mut borrow);
-    }
-    borrow
-}
-
-fn sub_panic<S: Display, T: Display>(x: S, y: T) -> ! {
+pub(crate) fn sub_panic<S: Display, T: Display>(x: S, y: T) -> ! {
     panic!(
-        "Cannot subtract a Natural from a smaller Natural. self: {}, other: {}",
+        "Cannot subtract a number from a smaller number. self: {}, other: {}",
         x, y
     );
 }

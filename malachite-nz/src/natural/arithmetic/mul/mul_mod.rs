@@ -15,7 +15,7 @@ use natural::arithmetic::mul::{limbs_mul_greater_to_out, limbs_mul_same_length_t
 use natural::arithmetic::shr_u::limbs_slice_shr_in_place;
 use natural::arithmetic::sub::limbs_sub_same_length_in_place_left;
 use natural::arithmetic::sub::{
-    _limbs_sub_same_length_with_borrow_in_place_right, limbs_sub_in_place_left,
+    _limbs_sub_same_length_with_borrow_in_in_place_right, limbs_sub_in_place_left,
     limbs_sub_same_length_to_out, limbs_sub_to_out,
 };
 use natural::arithmetic::sub_limb::limbs_sub_limb_in_place;
@@ -384,7 +384,7 @@ pub fn _limbs_mul_mod_limb_width_to_n_minus_1(
                 limbs_sub_same_length_to_out(out_hi, &out_lo[..a], &scratch[..a])
             };
             let mut carry = scratch[half_n];
-            if _limbs_sub_same_length_with_borrow_in_place_right(
+            if _limbs_sub_same_length_with_borrow_in_in_place_right(
                 &out[a..n - half_n],
                 &mut scratch[a..n - half_n],
                 bool_carry,

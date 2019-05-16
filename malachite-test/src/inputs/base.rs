@@ -1175,16 +1175,21 @@ pub fn triples_of_unsigned_unsigned_and_small_unsigned<
     }
 }
 
-pub fn vecs_of_unsigned<T: PrimitiveUnsigned + Rand>(gm: GenerationMode) -> It<Vec<T>> {
+fn vecs_of_unsigned_with_seed<T: PrimitiveUnsigned + Rand>(
+    gm: GenerationMode,
+    seed: &[u32],
+) -> It<Vec<T>> {
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_vecs(exhaustive_unsigned())),
         GenerationMode::Random(scale) => {
-            Box::new(random_vecs(&EXAMPLE_SEED, scale, &(|seed| random(seed))))
+            Box::new(random_vecs(seed, scale, &(|seed_2| random(seed_2))))
         }
-        GenerationMode::SpecialRandom(scale) => {
-            Box::new(special_random_unsigned_vecs(&EXAMPLE_SEED, scale))
-        }
+        GenerationMode::SpecialRandom(scale) => Box::new(special_random_unsigned_vecs(seed, scale)),
     }
+}
+
+pub fn vecs_of_unsigned<T: PrimitiveUnsigned + Rand>(gm: GenerationMode) -> It<Vec<T>> {
+    vecs_of_unsigned_with_seed(gm, &EXAMPLE_SEED)
 }
 
 //TODO use vecs_at_least
@@ -1246,15 +1251,26 @@ pub fn pairs_of_unsigned_vec<T: PrimitiveUnsigned + Rand>(
     }
 }
 
+fn pairs_of_unsigned_vec_var_1_with_seed<T: PrimitiveUnsigned + Rand>(
+    gm: GenerationMode,
+    seed: &[u32],
+) -> It<(Vec<T>, Vec<T>)> {
+    Box::new(
+        vecs_of_unsigned_with_seed(gm, seed)
+            .filter(|xs| xs.len().even())
+            .map(|xs| {
+                let half_length = xs.len() >> 1;
+                (xs[..half_length].to_vec(), xs[half_length..].to_vec())
+            }),
+    )
+}
+
 // All pairs of `Vec<T>` where `T` is unsigned and the two components of the pair have the same
 // length.
 pub fn pairs_of_unsigned_vec_var_1<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
 ) -> It<(Vec<T>, Vec<T>)> {
-    Box::new(vecs_of_unsigned(gm).filter(|xs| xs.len().even()).map(|xs| {
-        let half_length = xs.len() >> 1;
-        (xs[..half_length].to_vec(), xs[half_length..].to_vec())
-    }))
+    pairs_of_unsigned_vec_var_1_with_seed(gm, &EXAMPLE_SEED)
 }
 
 // All pairs of `Vec<T>`, where `T` is unsigned and the last `T`s of both `Vec`s are nonzero.
@@ -1326,7 +1342,7 @@ pub fn pairs_of_limb_vec_var_3(gm: GenerationMode) -> It<(Vec<Limb>, Vec<Limb>)>
     )
 }
 
-fn pairs_of_two_unsigned_vec_and_bool<T: PrimitiveUnsigned + Rand>(
+fn pairs_of_unsigned_vec_and_bool<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
 ) -> It<(Vec<T>, bool)> {
     match gm {
@@ -1353,7 +1369,7 @@ pub fn triples_of_two_unsigned_vecs_and_bool_var_1<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
 ) -> It<(Vec<T>, Vec<T>, bool)> {
     Box::new(
-        pairs_of_two_unsigned_vec_and_bool(gm)
+        pairs_of_unsigned_vec_and_bool(gm)
             .filter(|(xs, _)| xs.len().even())
             .map(|(xs, b)| {
                 let half_length = xs.len() >> 1;
@@ -2406,6 +2422,30 @@ pub fn triples_of_unsigned_vec_unsigned_vec_and_small_unsigned_var_1<
             },
         ),
     )
+}
+
+// All triples of `Vec<T>`, `Vec<T>`, and small unsigned, where `T` is unsigned, the second `Vec` is
+// as long as the first, and the `usize` is less than or equal to the length of the first `Vec`.
+pub fn triples_of_unsigned_vec_unsigned_and_small_usize_var_1<T: PrimitiveUnsigned + Rand>(
+    gm: GenerationMode,
+) -> It<(Vec<T>, Vec<T>, usize)> {
+    let ts: It<((Vec<T>, Vec<T>), usize)> = match gm {
+        GenerationMode::Exhaustive => Box::new(sqrt_pairs(
+            pairs_of_unsigned_vec_var_1(gm),
+            exhaustive_unsigned(),
+        )),
+        GenerationMode::Random(scale) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| pairs_of_unsigned_vec_var_1_with_seed(gm, seed)),
+            &(|seed| u32s_geometric(seed, scale).flat_map(usize::checked_from)),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| pairs_of_unsigned_vec_var_1_with_seed(gm, seed)),
+            &(|seed| u32s_geometric(seed, scale).flat_map(usize::checked_from)),
+        )),
+    };
+    reshape_2_1_to_3(Box::new(ts.filter(|&((ref xs, _), len)| len <= xs.len())))
 }
 
 // All triples of `Vec<T>`, T, and `T`, where `T` is unsigned, the second `T` is positive, the `Vec`

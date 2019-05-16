@@ -7,7 +7,7 @@ use malachite_base::num::traits::{AddMul, AddMulAssign, NotAssign};
 use natural::arithmetic::add::{limbs_add_greater, limbs_slice_add_greater_in_place_left};
 use natural::arithmetic::add_mul_limb::limbs_vec_add_mul_limb_in_place_left;
 use natural::arithmetic::mul::{limbs_mul_greater_to_out, limbs_mul_to_out};
-use natural::arithmetic::sub::{limbs_sub_in_place_left, limbs_sub_less_in_place_right};
+use natural::arithmetic::sub::{limbs_slice_sub_in_place_right, limbs_sub_in_place_left};
 use natural::comparison::ord::limbs_cmp;
 use natural::Natural::{self, Large, Small};
 use platform::Limb;
@@ -545,7 +545,11 @@ pub(crate) fn mpz_aorsmul(
         if tsize != 0 {
             w_sign.not_assign();
         }
-        assert!(!limbs_sub_less_in_place_right(&t[..tsize], w, wsize));
+        assert!(!limbs_slice_sub_in_place_right(
+            &t[..tsize],
+            &mut w[..tsize],
+            wsize
+        ));
     } else {
         assert!(!limbs_sub_in_place_left(&mut w[..wsize], &t[..tsize]));
     }

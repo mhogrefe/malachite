@@ -1,6 +1,6 @@
 use malachite_base::num::traits::{CheckedSub, Zero};
 
-use natural::arithmetic::sub::{limbs_sub, limbs_sub_in_place_left, limbs_sub_in_place_right};
+use natural::arithmetic::sub::{limbs_sub, limbs_sub_in_place_left, limbs_vec_sub_in_place_right};
 use natural::Natural::{self, Large, Small};
 use platform::Limb;
 
@@ -236,7 +236,7 @@ impl Natural {
         } else {
             match (&mut (*self), other) {
                 (&mut Large(ref mut xs), &Large(ref ys)) => {
-                    if limbs_sub_in_place_right(ys, xs) {
+                    if limbs_vec_sub_in_place_right(ys, xs) {
                         return true;
                     }
                 }

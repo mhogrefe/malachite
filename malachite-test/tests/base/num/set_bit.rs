@@ -59,9 +59,9 @@ pub fn test_set_bit() {
 }
 
 macro_rules! set_bit_fail_helper {
-    ($t:ident, $fail:ident, $err:expr) => {
+    ($t:ident, $fail:ident) => {
         #[test]
-        #[should_panic(expected = $err)]
+        #[should_panic]
         fn $fail() {
             let mut n = $t::checked_from(5).unwrap();
             n.set_bit(100);
@@ -69,46 +69,14 @@ macro_rules! set_bit_fail_helper {
     };
 }
 
-set_bit_fail_helper!(
-    u8,
-    set_bit_u8_fail_helper,
-    "Cannot set bit 100 in non-negative value of width 8"
-);
-set_bit_fail_helper!(
-    u16,
-    set_bit_u16_fail_helper,
-    "Cannot set bit 100 in non-negative value of width 16"
-);
-set_bit_fail_helper!(
-    u32,
-    set_bit_limb_fail_helper,
-    "Cannot set bit 100 in non-negative value of width 32"
-);
-set_bit_fail_helper!(
-    u64,
-    set_bit_u64_fail_helper,
-    "Cannot set bit 100 in non-negative value of width 64"
-);
-set_bit_fail_helper!(
-    i8,
-    set_bit_i8_fail_helper,
-    "Cannot set bit 100 in non-negative value of width 8"
-);
-set_bit_fail_helper!(
-    i16,
-    set_bit_i16_fail_helper,
-    "Cannot set bit 100 in non-negative value of width 16"
-);
-set_bit_fail_helper!(
-    i32,
-    set_bit_signed_limb_fail_helper,
-    "Cannot set bit 100 in non-negative value of width 32"
-);
-set_bit_fail_helper!(
-    i64,
-    set_bit_i64_fail_helper,
-    "Cannot set bit 100 in non-negative value of width 64"
-);
+set_bit_fail_helper!(u8, set_bit_u8_fail_helper);
+set_bit_fail_helper!(u16, set_bit_u16_fail_helper);
+set_bit_fail_helper!(u32, set_bit_u32_fail_helper);
+set_bit_fail_helper!(u64, set_bit_u64_fail_helper);
+set_bit_fail_helper!(i8, set_bit_i8_fail_helper);
+set_bit_fail_helper!(i16, set_bit_i16_fail_helper);
+set_bit_fail_helper!(i32, set_bit_i32_fail_helper);
+set_bit_fail_helper!(i64, set_bit_i64_fail_helper);
 
 fn set_bit_properties_helper_unsigned<T: PrimitiveUnsigned + Rand>() {
     test_properties(pairs_of_unsigned_and_u64_width_range, |&(n, index)| {

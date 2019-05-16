@@ -51,10 +51,7 @@ pub fn test_bits_vec_to_twos_complement_bits_negative() {
 }
 
 #[test]
-#[should_panic(
-    expected = "assertion failed: !bits_slice_to_twos_complement_bits_negative\
-                (bits)"
-)]
+#[should_panic]
 fn bits_vec_to_twos_complement_bits_negative_fail() {
     let mut mut_bits = vec![false, false];
     bits_vec_to_twos_complement_bits_negative(&mut mut_bits);

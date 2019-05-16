@@ -27,9 +27,6 @@ fn add_and_carry(x: Limb, y: Limb, carry: &mut bool) -> Limb {
 ///
 /// where n = `xs.len()`
 ///
-/// This is mpn_add from gmp.h, where the first input is at least as long as the second, and the
-/// output is returned.
-///
 /// # Panics
 /// Panics if `xs` is shorter than `ys`.
 ///
@@ -40,6 +37,9 @@ fn add_and_carry(x: Limb, y: Limb, carry: &mut bool) -> Limb {
 /// assert_eq!(limbs_add_greater(&[1, 2, 3], &[6, 7]), &[7, 9, 3]);
 /// assert_eq!(limbs_add_greater(&[100, 101, 0xffff_ffff], &[102, 101, 2]), &[202, 202, 1, 1]);
 /// ```
+///
+/// This is mpn_add from gmp.h, where the first input is at least as long as the second, and the
+/// output is returned.
 pub fn limbs_add_greater(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -71,8 +71,6 @@ pub fn limbs_add_greater(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 ///
 /// where n = max(`xs.len()`, `ys.len()`)
 ///
-/// This is mpn_add_n from gmp.h, where the output is returned.
-///
 /// # Example
 /// ```
 /// use malachite_nz::natural::arithmetic::add::limbs_add;
@@ -80,6 +78,8 @@ pub fn limbs_add_greater(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 /// assert_eq!(limbs_add(&[6, 7], &[1, 2, 3]), &[7, 9, 3]);
 /// assert_eq!(limbs_add(&[100, 101, 0xffff_ffff], &[102, 101, 2]), &[202, 202, 1, 1]);
 /// ```
+///
+/// This is mpn_add from gmp.h, where the output is returned.
 pub fn limbs_add(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
     if xs.len() >= ys.len() {
         limbs_add_greater(xs, ys)
@@ -99,8 +99,6 @@ pub fn limbs_add(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 ///
 /// where n = `xs.len()` = `ys.len()`
 ///
-/// This is mpn_add_n from gmp.h.
-///
 /// # Panics
 /// Panics if `xs` and `ys` have different lengths or if `out` is too short.
 ///
@@ -116,6 +114,8 @@ pub fn limbs_add(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 /// assert_eq!(limbs_add_same_length_to_out(limbs, &[100, 101, 0xffff_ffff], &[102, 101, 2]), true);
 /// assert_eq!(limbs, &[202, 202, 1, 10]);
 /// ```
+///
+/// This is mpn_add_n from gmp.h.
 pub fn limbs_add_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> bool {
     let len = xs.len();
     assert_eq!(len, ys.len());
@@ -138,8 +138,6 @@ pub fn limbs_add_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) 
 ///
 /// where n = `xs.len()`
 ///
-/// This is mpn_add from gmp.h, where the first input is at least as long as the second.
-///
 /// # Panics
 /// Panics if `xs` is shorter than `ys` or if `out` is too short.
 ///
@@ -155,6 +153,8 @@ pub fn limbs_add_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) 
 /// assert_eq!(limbs_add_greater_to_out(limbs, &[100, 101, 0xffff_ffff], &[102, 101, 2]), true);
 /// assert_eq!(limbs, &[202, 202, 1, 10]);
 /// ```
+///
+/// This is mpn_add from gmp.h, where the first input is at least as long as the second.
 pub fn limbs_add_greater_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> bool {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -182,8 +182,6 @@ pub fn limbs_add_greater_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> b
 ///
 /// where n = max(`xs.len()`, `ys.len()`)
 ///
-/// This is mpn_add from gmp.h.
-///
 /// # Panics
 /// Panics if `out` is too short.
 ///
@@ -199,6 +197,8 @@ pub fn limbs_add_greater_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> b
 /// assert_eq!(limbs_add_to_out(limbs, &[100, 101, 0xffff_ffff], &[102, 101, 2]), true);
 /// assert_eq!(limbs, &[202, 202, 1, 10]);
 /// ```
+///
+/// This is mpn_add from gmp.h.
 pub fn limbs_add_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> bool {
     if xs.len() >= ys.len() {
         limbs_add_greater_to_out(out, xs, ys)
@@ -223,11 +223,11 @@ pub fn limbs_add_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> bool {
 ///
 /// where n = max(`xs.len()`, `ys.len()`)
 ///
-/// This is mpn_add from gmp.h, where the second argument is at least as long as the first and the
-/// output pointer is the same as the first input pointer.
-///
 /// # Panics
 /// Panics if `xs` is shorter than `ys` or `in_size` is greater than `ys.len()`.
+///
+/// This is mpn_add from gmp.h, where the second argument is at least as long as the first and the
+/// output pointer is the same as the first input pointer.
 pub fn _limbs_add_to_out_aliased(xs: &mut [Limb], in_size: usize, ys: &[Limb]) -> bool {
     let ys_len = ys.len();
     assert!(xs.len() >= ys_len);
@@ -247,8 +247,6 @@ pub fn _limbs_add_to_out_aliased(xs: &mut [Limb], in_size: usize, ys: &[Limb]) -
 ///
 /// where n = `xs.len()` = `ys.len()`
 ///
-/// This is mpn_add_n from gmp.h, where the output is written to the first input.
-///
 /// # Panics
 /// Panics if `xs` and `ys` have different lengths.
 ///
@@ -264,6 +262,8 @@ pub fn _limbs_add_to_out_aliased(xs: &mut [Limb], in_size: usize, ys: &[Limb]) -
 /// assert_eq!(limbs_slice_add_same_length_in_place_left(xs, &[102, 101, 2]), true);
 /// assert_eq!(xs, &[202, 202, 1]);
 /// ```
+///
+/// This is mpn_add_n from gmp.h, where the output is written to the first input.
 pub fn limbs_slice_add_same_length_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> bool {
     let xs_len = xs.len();
     assert_eq!(xs_len, ys.len());
@@ -285,9 +285,6 @@ pub fn limbs_slice_add_same_length_in_place_left(xs: &mut [Limb], ys: &[Limb]) -
 ///
 /// where n = `xs.len()`
 ///
-/// This is mpn_add from gmp.h, where the first input is at least as long as the second, and the
-/// output is written to the first input.
-///
 /// # Panics
 /// Panics if `xs` is shorter than `ys`.
 ///
@@ -303,6 +300,9 @@ pub fn limbs_slice_add_same_length_in_place_left(xs: &mut [Limb], ys: &[Limb]) -
 /// assert_eq!(limbs_slice_add_greater_in_place_left(xs, &[102, 101, 2]), true);
 /// assert_eq!(xs, &[202, 202, 1]);
 /// ```
+///
+/// This is mpn_add from gmp.h, where the first input is at least as long as the second, and the
+/// output is written to the first input.
 pub fn limbs_slice_add_greater_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> bool {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -326,9 +326,6 @@ pub fn limbs_slice_add_greater_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> bo
 ///
 /// where n = max(`xs.len()`, `ys.len()`), m = max(1, ys.len() - xs.len())
 ///
-/// This is mpz_add from mpz/aors.h, where both inputs are non-negative and the output is written to
-/// the first input.
-///
 /// # Panics
 /// Panics if `xs` and `ys` have different lengths.
 ///
@@ -344,6 +341,9 @@ pub fn limbs_slice_add_greater_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> bo
 /// limbs_vec_add_in_place_left(&mut xs, &[102, 101, 2]);
 /// assert_eq!(xs, &[202, 202, 1, 1]);
 /// ```
+///
+/// This is mpz_add from mpz/aors.h, where both inputs are non-negative and the output is written to
+/// the first input.
 pub fn limbs_vec_add_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -375,8 +375,6 @@ pub fn limbs_vec_add_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
 ///
 /// where n = max(`xs.len`, `ys.len()`)
 ///
-/// This is mpn_add from gmp.h, where the output is written to the longer input.
-///
 /// # Example
 /// ```
 /// use malachite_nz::natural::arithmetic::add::limbs_slice_add_in_place_either;
@@ -399,6 +397,8 @@ pub fn limbs_vec_add_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
 /// assert_eq!(xs, &[202, 202, 1]);
 /// assert_eq!(ys, &[102, 101, 2]);
 /// ```
+///
+/// This is mpn_add from gmp.h, where the output is written to the longer input.
 pub fn limbs_slice_add_in_place_either(xs: &mut Vec<Limb>, ys: &mut Vec<Limb>) -> (bool, bool) {
     if xs.len() >= ys.len() {
         (false, limbs_slice_add_greater_in_place_left(xs, ys))
@@ -417,9 +417,6 @@ pub fn limbs_slice_add_in_place_either(xs: &mut Vec<Limb>, ys: &mut Vec<Limb>) -
 /// Additional memory: worst case O(1)
 ///
 /// where n = max(`xs.len`, `ys.len()`)
-///
-/// This is mpz_add from mpz/aors.h, where both inputs are non-negative and the output is written to
-/// the longer input.
 ///
 /// # Example
 /// ```
@@ -443,6 +440,9 @@ pub fn limbs_slice_add_in_place_either(xs: &mut Vec<Limb>, ys: &mut Vec<Limb>) -
 /// assert_eq!(xs, &[202, 202, 1, 1]);
 /// assert_eq!(ys, &[102, 101, 2]);
 /// ```
+///
+/// This is mpz_add from mpz/aors.h, where both inputs are non-negative and the output is written to
+/// the longer input.
 pub fn limbs_vec_add_in_place_either(xs: &mut Vec<Limb>, ys: &mut Vec<Limb>) -> bool {
     if xs.len() >= ys.len() {
         if limbs_slice_add_greater_in_place_left(xs, ys) {
