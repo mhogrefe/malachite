@@ -144,7 +144,9 @@ fn limbs_shr_round_half_integer_to_even(limbs: &[Limb], bits: u64) -> Vec<Limb> 
 /// assert_eq!(limbs_shr_round_to_nearest(&[4_294_967_295, 4_294_967_295], 32), &[0, 1]);
 /// ```
 pub fn limbs_shr_round_to_nearest(limbs: &[Limb], bits: u64) -> Vec<Limb> {
-    if !limbs_get_bit(limbs, bits - 1) {
+    if bits == 0 {
+        limbs.to_vec()
+    } else if !limbs_get_bit(limbs, bits - 1) {
         limbs_shr(limbs, bits)
     } else if !limbs_divisible_by_power_of_two(limbs, bits - 1) {
         limbs_shr_round_up(limbs, bits)
@@ -553,7 +555,8 @@ fn limbs_vec_shr_round_half_integer_to_even_in_place(limbs: &mut Vec<Limb>, bits
 /// assert_eq!(limbs, &[0, 1]);
 /// ```
 pub fn limbs_vec_shr_round_to_nearest_in_place(limbs: &mut Vec<Limb>, bits: u64) {
-    if !limbs_get_bit(limbs, bits - 1) {
+    if bits == 0 {
+    } else if !limbs_get_bit(limbs, bits - 1) {
         limbs_vec_shr_in_place(limbs, bits)
     } else if !limbs_divisible_by_power_of_two(limbs, bits - 1) {
         limbs_vec_shr_round_up_in_place(limbs, bits)

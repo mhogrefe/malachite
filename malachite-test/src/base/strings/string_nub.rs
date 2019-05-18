@@ -8,7 +8,7 @@ use inputs::base::{ascii_strings, strings};
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_ns_demo!(registry, demo_string_nub);
     register_ns_demo!(registry, demo_ascii_string_nub);
-    register_ns_bench!(registry, None, benchmark_string_nub);
+    register_ns_bench!(registry, Large, benchmark_string_nub);
 }
 
 fn demo_string_nub(gm: NoSpecialGenerationMode, limit: usize) {

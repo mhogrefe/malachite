@@ -7,11 +7,11 @@ use inputs::integer::integers;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_natural_checked_from_integer);
-    register_demo!(registry, demo_natural_checked_from_ref_integer);
+    register_demo!(registry, demo_natural_checked_from_integer_ref);
     register_demo!(registry, demo_natural_saturating_from_integer);
-    register_demo!(registry, demo_natural_saturating_from_ref_integer);
+    register_demo!(registry, demo_natural_saturating_from_integer_ref);
     register_demo!(registry, demo_natural_convertible_from_integer);
-    register_demo!(registry, demo_natural_convertible_from_ref_integer);
+    register_demo!(registry, demo_natural_convertible_from_integer_ref);
     register_bench!(
         registry,
         Large,
@@ -45,7 +45,7 @@ fn demo_natural_checked_from_integer(gm: GenerationMode, limit: usize) {
     }
 }
 
-fn demo_natural_checked_from_ref_integer(gm: GenerationMode, limit: usize) {
+fn demo_natural_checked_from_integer_ref(gm: GenerationMode, limit: usize) {
     for n in integers(gm).take(limit) {
         println!(
             "Natural::checked_from(&{}) = {:?}",
@@ -66,7 +66,7 @@ fn demo_natural_saturating_from_integer(gm: GenerationMode, limit: usize) {
     }
 }
 
-fn demo_natural_saturating_from_ref_integer(gm: GenerationMode, limit: usize) {
+fn demo_natural_saturating_from_integer_ref(gm: GenerationMode, limit: usize) {
     for n in integers(gm).take(limit) {
         println!(
             "Natural::saturating_from(&{}) = {}",
@@ -91,7 +91,7 @@ fn demo_natural_convertible_from_integer(gm: GenerationMode, limit: usize) {
     }
 }
 
-fn demo_natural_convertible_from_ref_integer(gm: GenerationMode, limit: usize) {
+fn demo_natural_convertible_from_integer_ref(gm: GenerationMode, limit: usize) {
     for n in integers(gm).take(limit) {
         println!(
             "{} is {}convertible to a Natural",

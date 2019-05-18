@@ -8,7 +8,7 @@ use inputs::base::{pairs_of_ascii_strings, pairs_of_strings};
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_ns_demo!(registry, demo_string_is_subset);
     register_ns_demo!(registry, demo_ascii_string_is_subset);
-    register_ns_bench!(registry, None, benchmark_string_is_subset);
+    register_ns_bench!(registry, Large, benchmark_string_is_subset);
 }
 
 fn demo_string_is_subset(gm: NoSpecialGenerationMode, limit: usize) {

@@ -1,5 +1,7 @@
 use malachite_base::comparison::Max;
-use malachite_base::conversion::{CheckedFrom, OverflowingFrom, SaturatingFrom, WrappingFrom};
+use malachite_base::conversion::{
+    CheckedFrom, ConvertibleFrom, OverflowingFrom, SaturatingFrom, WrappingFrom,
+};
 
 use natural::Natural::{self, Large, Small};
 use platform::Limb;
@@ -292,5 +294,79 @@ impl<'a> OverflowingFrom<&'a Natural> for u32 {
         let (result, overflow_1) = Limb::overflowing_from(value);
         let (result, overflow_2) = u32::overflowing_from(result);
         (result, overflow_1 || overflow_2)
+    }
+}
+
+impl ConvertibleFrom<Natural> for Limb {
+    /// Determines whether a `Natural` can be converted to a `Limb`. Takes the `Natural` by value.
+    ///
+    /// Time: worst case O(1)
+    ///
+    /// Additional memory: worst case O(1)
+    ///
+    /// # Example
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::conversion::ConvertibleFrom;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// fn main() {
+    ///     assert_eq!(u32::convertible_from(Natural::from(123u32)), true);
+    ///     assert_eq!(u32::convertible_from(Natural::trillion()), false);
+    /// }
+    /// ```
+    #[inline]
+    fn convertible_from(value: Natural) -> bool {
+        Limb::convertible_from(&value)
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl ConvertibleFrom<Natural> for u32 {
+    #[inline]
+    fn convertible_from(value: Natural) -> bool {
+        u32::convertible_from(&value)
+    }
+}
+
+impl<'a> ConvertibleFrom<&'a Natural> for Limb {
+    /// Determines whether a `Natural` can be converted to a `Limb`. Takes the `Natural` by
+    /// reference.
+    ///
+    /// Time: worst case O(1)
+    ///
+    /// Additional memory: worst case O(1)
+    ///
+    /// # Example
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::conversion::ConvertibleFrom;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// fn main() {
+    ///     assert_eq!(u32::convertible_from(&Natural::from(123u32)), true);
+    ///     assert_eq!(u32::convertible_from(&Natural::trillion()), false);
+    /// }
+    /// ```
+    fn convertible_from(value: &Natural) -> bool {
+        match *value {
+            Small(_) => true,
+            Large(_) => false,
+        }
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> ConvertibleFrom<&'a Natural> for u32 {
+    #[inline]
+    fn convertible_from(value: &Natural) -> bool {
+        match *value {
+            Small(small) => u32::convertible_from(small),
+            Large(_) => false,
+        }
     }
 }

@@ -1,5 +1,7 @@
 use malachite_base::comparison::Max;
-use malachite_base::conversion::{CheckedFrom, OverflowingFrom, SaturatingFrom, WrappingFrom};
+use malachite_base::conversion::{
+    CheckedFrom, ConvertibleFrom, OverflowingFrom, SaturatingFrom, WrappingFrom,
+};
 use malachite_base::num::traits::JoinHalves;
 
 use natural::Natural::{self, Large, Small};
@@ -249,6 +251,66 @@ impl<'a> OverflowingFrom<&'a Natural> for DoubleLimb {
                 DoubleLimb::join_halves(limbs[1], limbs[0]),
                 limbs.len() != 2,
             ),
+        }
+    }
+}
+
+impl ConvertibleFrom<Natural> for DoubleLimb {
+    /// Determines whether a `Natural` can be converted to a `DoubleLimb`. Takes the `Natural` by
+    /// value.
+    ///
+    /// Time: worst case O(1)
+    ///
+    /// Additional memory: worst case O(1)
+    ///
+    /// # Example
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::conversion::ConvertibleFrom;
+    /// use malachite_nz::natural::Natural;
+    /// use std::str::FromStr;
+    ///
+    /// fn main() {
+    ///     assert_eq!(u64::convertible_from(Natural::from(123u32)), true);
+    ///     assert_eq!(u64::convertible_from(Natural::from_str("1000000000000000000000").unwrap()),
+    ///         false);
+    /// }
+    /// ```
+    #[inline]
+    fn convertible_from(value: Natural) -> bool {
+        DoubleLimb::convertible_from(&value)
+    }
+}
+
+impl<'a> ConvertibleFrom<&'a Natural> for DoubleLimb {
+    /// Determines whether a `Natural` can be converted to a `DoubleLimb`. Takes the `Natural` by
+    /// reference.
+    ///
+    /// Time: worst case O(1)
+    ///
+    /// Additional memory: worst case O(1)
+    ///
+    /// # Example
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::conversion::ConvertibleFrom;
+    /// use malachite_nz::natural::Natural;
+    /// use std::str::FromStr;
+    ///
+    /// fn main() {
+    ///     assert_eq!(u64::convertible_from(&Natural::from(123u32)), true);
+    ///     assert_eq!(u64::convertible_from(&Natural::from_str("1000000000000000000000").unwrap()),
+    ///         false);
+    /// }
+    /// ```
+    fn convertible_from(value: &Natural) -> bool {
+        match *value {
+            Small(_) => true,
+            Large(ref limbs) => limbs.len() == 2,
         }
     }
 }

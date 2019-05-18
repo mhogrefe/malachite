@@ -2802,6 +2802,22 @@ pub fn ascii_strings(gm: NoSpecialGenerationMode) -> It<String> {
     }
 }
 
+pub const ROUNDING_MODE_CHARS: &str = "CDEFNUacegilnoprstwx";
+
+// All `Strings` with characters that appear in the `String` representations of `RoundingMode`s
+pub fn strings_var_1(gm: NoSpecialGenerationMode) -> It<String> {
+    match gm {
+        NoSpecialGenerationMode::Exhaustive => {
+            Box::new(exhaustive_strings_with_chars(ROUNDING_MODE_CHARS.chars()))
+        }
+        NoSpecialGenerationMode::Random(scale) => {
+            Box::new(random_strings_with_chars(&EXAMPLE_SEED, scale, &|seed| {
+                random_from_vector(seed, ROUNDING_MODE_CHARS.chars().collect())
+            }))
+        }
+    }
+}
+
 pub fn pairs_of_strings(gm: NoSpecialGenerationMode) -> It<(String, String)> {
     match gm {
         NoSpecialGenerationMode::Exhaustive => {

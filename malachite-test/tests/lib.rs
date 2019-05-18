@@ -42,7 +42,9 @@ pub mod base {
     }
     pub mod rounding_modes {
         pub mod clone;
+        pub mod display;
         pub mod eq;
+        pub mod from_str;
         pub mod hash;
         pub mod neg;
         pub mod size;

@@ -21,6 +21,11 @@ pub mod limbs {
     pub mod limbs_test_zero;
     pub mod limbs_trailing_zero_limbs;
 }
+pub mod round {
+    pub mod display;
+    pub mod from_str;
+    pub mod neg;
+}
 pub mod strings {
     pub mod string_is_subset;
     pub mod string_nub;

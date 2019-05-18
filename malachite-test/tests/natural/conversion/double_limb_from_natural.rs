@@ -1,7 +1,9 @@
 use std::str::FromStr;
 
 use malachite_base::comparison::Max;
-use malachite_base::conversion::{CheckedFrom, OverflowingFrom, SaturatingFrom, WrappingFrom};
+use malachite_base::conversion::{
+    CheckedFrom, ConvertibleFrom, OverflowingFrom, SaturatingFrom, WrappingFrom,
+};
 use malachite_base::num::integers::PrimitiveInteger;
 use malachite_base::num::traits::{ModPowerOfTwo, SignificantBits};
 use malachite_nz::natural::Natural;
@@ -132,6 +134,34 @@ fn test_double_limb_overflowing_from_natural() {
 }
 
 #[test]
+fn test_double_limb_convertible_from_natural() {
+    let test = |n, out| {
+        assert_eq!(
+            DoubleLimb::convertible_from(Natural::from_str(n).unwrap()),
+            out
+        );
+        assert_eq!(
+            DoubleLimb::convertible_from(&Natural::from_str(n).unwrap()),
+            out
+        );
+    };
+    test("0", true);
+    test("123", true);
+    #[cfg(feature = "32_bit_limbs")]
+    {
+        test("1000000000000000000000", false);
+        test("18446744073709551615", true);
+        test("18446744073709551616", false);
+    }
+    #[cfg(feature = "64_bit_limbs")]
+    {
+        test("1000000000000000000000", true);
+        test("340282366920938463463374607431768211455", true);
+        test("340282366920938463463374607431768211456", false);
+    }
+}
+
+#[test]
 fn double_limb_checked_from_natural_properties() {
     test_properties(naturals, |x| {
         let result = DoubleLimb::checked_from(x);
@@ -184,5 +214,15 @@ fn double_limb_overflowing_from_natural_properties() {
                 DoubleLimb::checked_from(x).is_none()
             )
         );
+        assert_eq!(result.1, !DoubleLimb::convertible_from(x));
+    });
+}
+
+#[test]
+fn double_limb_convertible_from_natural_properties() {
+    test_properties(naturals, |x| {
+        let convertible = DoubleLimb::convertible_from(x.clone());
+        assert_eq!(DoubleLimb::convertible_from(x), convertible);
+        assert_eq!(convertible, *x <= Natural::from(DoubleLimb::MAX));
     });
 }

@@ -53,9 +53,10 @@ pub fn string_nub(s: &str) -> String {
 ///
 /// Time: worst case O(n)
 ///
-/// Additional memory: worst case O(n)
+/// Additional memory: worst case O(m)
 ///
-/// where n = `s.len()` + `t.len()`
+/// where n = `s.len()` + `t.len()`,
+///       m = `t.len()`
 ///
 /// # Examples
 /// ```
@@ -67,7 +68,6 @@ pub fn string_nub(s: &str) -> String {
 /// assert_eq!(string_is_subset("j", "Mississippi"), false);
 /// ```
 pub fn string_is_subset(s: &str, t: &str) -> bool {
-    let s_chars: HashSet<char> = s.chars().collect();
     let t_chars: HashSet<char> = t.chars().collect();
-    s_chars.is_subset(&t_chars)
+    s.chars().all(|c| t_chars.contains(&c))
 }

@@ -66,23 +66,55 @@ impl Neg for RoundingMode {
 }
 
 impl Display for RoundingMode {
+    /// Converts a `RoundingMode` to a `String`.
+    ///
+    /// Time: worst case O(1)
+    ///
+    /// Additional memory: worst case O(1)
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::round::RoundingMode;
+    ///
+    /// assert_eq!(RoundingMode::Down.to_string(), "Down");
+    /// assert_eq!(RoundingMode::Up.to_string(), "Up");
+    /// assert_eq!(RoundingMode::Floor.to_string(), "Floor");
+    /// assert_eq!(RoundingMode::Ceiling.to_string(), "Ceiling");
+    /// assert_eq!(RoundingMode::Nearest.to_string(), "Nearest");
+    /// assert_eq!(RoundingMode::Exact.to_string(), "Exact");
+    /// ```
     #[inline]
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
         f.write_str(&format!("{:?}", self))
     }
 }
 
-#[derive(Clone, Debug, Eq, Hash, PartialEq)]
-pub struct ParseRoundingModeError {
-    pub input: String,
-}
-
-//TODO test
 impl FromStr for RoundingMode {
-    type Err = ParseRoundingModeError;
+    type Err = String;
 
+    /// Converts a `String` to a `RoundingMode`.
+    ///
+    /// Time: worst case O(n)
+    ///
+    /// Additional memory: worst case O(n)
+    ///
+    /// where n = `src.len()`
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::round::RoundingMode;
+    /// use std::str::FromStr;
+    ///
+    /// assert_eq!(RoundingMode::from_str("Down"), Ok(RoundingMode::Down));
+    /// assert_eq!(RoundingMode::from_str("Up"), Ok(RoundingMode::Up));
+    /// assert_eq!(RoundingMode::from_str("Floor"), Ok(RoundingMode::Floor));
+    /// assert_eq!(RoundingMode::from_str("Ceiling"), Ok(RoundingMode::Ceiling));
+    /// assert_eq!(RoundingMode::from_str("Nearest"), Ok(RoundingMode::Nearest));
+    /// assert_eq!(RoundingMode::from_str("Exact"), Ok(RoundingMode::Exact));
+    /// assert_eq!(RoundingMode::from_str("abc"), Err("abc".to_string()));
+    /// ```
     #[inline]
-    fn from_str(src: &str) -> Result<Self, Self::Err> {
+    fn from_str(src: &str) -> Result<RoundingMode, String> {
         match src {
             "Down" => Ok(RoundingMode::Down),
             "Up" => Ok(RoundingMode::Up),
@@ -90,9 +122,7 @@ impl FromStr for RoundingMode {
             "Ceiling" => Ok(RoundingMode::Ceiling),
             "Nearest" => Ok(RoundingMode::Nearest),
             "Exact" => Ok(RoundingMode::Exact),
-            _ => Err(ParseRoundingModeError {
-                input: src.to_owned(),
-            }),
+            _ => Err(src.to_owned()),
         }
     }
 }
