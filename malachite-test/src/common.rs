@@ -267,7 +267,7 @@ pub fn m_run_benchmark<'a, I: Iterator>(
         return;
     }
     let title = match benchmark_type {
-        BenchmarkType::Single => title.to_owned(),
+        BenchmarkType::Single => title.to_string(),
         BenchmarkType::LibraryComparison => format!("{} library comparison", title),
         BenchmarkType::EvaluationStrategy => format!("{} evaluation strategy", title),
         BenchmarkType::Algorithms => format!("{} algorithms", title),

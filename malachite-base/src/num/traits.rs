@@ -697,6 +697,22 @@ pub trait SubMul<B, C> {
     fn sub_mul(self, b: B, c: C) -> Self::Output;
 }
 
+pub trait CheckedSubMul<B, C> {
+    type Output;
+
+    fn checked_sub_mul(self, b: B, c: C) -> Option<Self::Output>;
+}
+
+pub trait SaturatingSubMulAssign<B, C> {
+    fn saturating_sub_mul_assign(&mut self, b: B, c: C);
+}
+
+pub trait SaturatingSubMul<B, C> {
+    type Output;
+
+    fn saturating_sub_mul(self, b: B, c: C) -> Self::Output;
+}
+
 pub trait PartialOrdAbs<Rhs: ?Sized = Self>: PartialEq<Rhs> {
     fn partial_cmp_abs(&self, other: &Rhs) -> Option<Ordering>;
 

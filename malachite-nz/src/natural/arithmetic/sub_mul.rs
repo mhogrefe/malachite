@@ -1,8 +1,13 @@
-use malachite_base::num::traits::{SubMul, SubMulAssign};
+use std::fmt::Display;
+
+use malachite_base::num::traits::{CheckedSubMul, SubMul, SubMulAssign};
 
 use natural::arithmetic::add_mul::mpz_aorsmul;
-use natural::arithmetic::sub_mul_limb::sub_mul_assign_limb_helper;
 use natural::Natural::{self, Large, Small};
+
+pub(crate) fn sub_mul_panic<S: Display, T: Display, U: Display>(a: S, b: T, c: U) -> ! {
+    panic!("Cannot perform sub_mul. a: {}, b: {}, c: {}", a, b, c);
+}
 
 impl<'a, 'b> SubMul<&'a Natural, &'b Natural> for Natural {
     type Output = Option<Natural>;
@@ -82,9 +87,9 @@ impl<'a, 'b, 'c> SubMul<&'a Natural, &'b Natural> for &'c Natural {
     /// ```
     fn sub_mul(self, b: &'a Natural, c: &'b Natural) -> Option<Natural> {
         if let Small(small_b) = *b {
-            self.sub_mul(c, small_b)
+            self.checked_sub_mul(c, small_b)
         } else if let Small(small_c) = *c {
-            self.sub_mul(b, small_c)
+            self.checked_sub_mul(b, small_c)
         } else if self.limb_count() < b.limb_count() + c.limb_count() - 1 {
             None
         } else {
@@ -152,9 +157,9 @@ impl<'a, 'b> SubMulAssign<&'a Natural, &'b Natural> for Natural {
 
 fn sub_mul_assign_helper(a: &mut Natural, b: &Natural, c: &Natural) -> bool {
     if let Small(small_b) = *b {
-        sub_mul_assign_limb_helper(a, c, small_b)
+        a.sub_mul_assign_limb_no_panic(c, small_b)
     } else if let Small(small_c) = *c {
-        sub_mul_assign_limb_helper(a, b, small_c)
+        a.sub_mul_assign_limb_no_panic(b, small_c)
     } else if a.limb_count() < b.limb_count() + c.limb_count() - 1 {
         true
     } else {

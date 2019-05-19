@@ -122,7 +122,7 @@ impl FromStr for RoundingMode {
             "Ceiling" => Ok(RoundingMode::Ceiling),
             "Nearest" => Ok(RoundingMode::Nearest),
             "Exact" => Ok(RoundingMode::Exact),
-            _ => Err(src.to_owned()),
+            _ => Err(src.to_string()),
         }
     }
 }

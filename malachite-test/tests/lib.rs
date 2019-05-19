@@ -192,6 +192,7 @@ pub mod natural {
         pub mod add_mul_limb;
         pub mod checked_sub;
         pub mod checked_sub_limb;
+        pub mod checked_sub_mul_limb;
         pub mod div_exact_limb;
         pub mod div_limb;
         pub mod div_mod_limb;
@@ -212,6 +213,7 @@ pub mod natural {
         pub mod parity;
         pub mod saturating_sub;
         pub mod saturating_sub_limb;
+        pub mod saturating_sub_mul_limb;
         pub mod shl_i;
         pub mod shl_u;
         pub mod shr_i;

@@ -50,8 +50,8 @@ pub fn limbs_shl(limbs: &[Limb], bits: u64) -> Vec<Limb> {
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
 /// limbs of the `Natural` left-shifted by a `Limb` to an output slice. The output slice must be at
-/// least as long as the input slice. The `Limb` must be between 1 and 31, inclusive. The carry,
-/// or the bits that are shifted past the width of the input slice, is returned.
+/// least as long as the input slice. The `Limb` must be between 1 and `Limb::WIDTH` - 1, inclusive.
+/// The carry, or the bits that are shifted past the width of the input slice, is returned.
 ///
 /// Time: worst case O(n)
 ///
@@ -94,8 +94,8 @@ pub fn limbs_shl_to_out(out: &mut [Limb], in_limbs: &[Limb], bits: u32) -> Limb 
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
 /// limbs of the `Natural` left-shifted by a `Limb` to the input slice. The `Limb` must be between 1
-/// and 31, inclusive. The carry, or the bits that are shifted past the width of the input slice, is
-/// returned.
+/// and `Limb::WIDTH` - 1, inclusive. The carry, or the bits that are shifted past the width of the
+/// input slice, is returned.
 ///
 /// Time: worst case O(n)
 ///
@@ -187,9 +187,9 @@ pub fn limbs_vec_shl_in_place(limbs: &mut Vec<Limb>, bits: u64) {
 ///
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
 /// limbs of the `Natural` left-shifted by a `Limb`, and complemented, to an output slice. The
-/// output slice must be at least as long as the input slice. The `Limb` must be between 1 and 31,
-/// inclusive. The carry, or the bits that are shifted past the width of the input slice, is
-/// returned. The carry is not complemented.
+/// output slice must be at least as long as the input slice. The `Limb` must be between 1 and
+/// `Limb::WIDTH` - 1, inclusive. The carry, or the bits that are shifted past the width of the
+/// input slice, is returned. The carry is not complemented.
 ///
 /// Time: worst case O(n)
 ///

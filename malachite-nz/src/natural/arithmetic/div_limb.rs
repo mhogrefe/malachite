@@ -13,9 +13,6 @@ use natural::arithmetic::shl_u::{limbs_shl_to_out, limbs_slice_shl_in_place};
 use natural::Natural::{self, Large, Small};
 use platform::{DoubleLimb, Limb};
 
-// These functions are adapted from udiv_qrnnd_preinv, mpn_div_qr_1n_pi1, and mpn_div_qr_1 in GMP
-// 6.1.2.
-
 /// Divide an number by a divisor of B - 1, where B is the limb base.
 ///
 /// Time: worst case O(n)

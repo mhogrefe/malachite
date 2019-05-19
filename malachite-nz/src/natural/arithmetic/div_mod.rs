@@ -13,7 +13,7 @@ use natural::arithmetic::mul::mul_mod::{
 use natural::arithmetic::mul::{limbs_mul_greater_to_out, limbs_mul_to_out};
 use natural::arithmetic::sub::limbs_sub_same_length_in_place_left;
 use natural::arithmetic::sub_limb::limbs_sub_limb_in_place;
-use natural::arithmetic::sub_mul_limb::mpn_submul_1;
+use natural::arithmetic::sub_mul_limb::limbs_sub_mul_limb_greater_in_place_left;
 use natural::comparison::ord::limbs_cmp_same_length;
 use natural::logic::not::limbs_not_to_out;
 use platform::{DoubleLimb, Limb};
@@ -231,7 +231,7 @@ pub fn mpn_sbpi1_div_qr(qp: &mut [Limb], np: &mut [Limb], dp: &[Limb], dinv: Lim
         let mut q = 0;
         if n1 == d1 && np[np_offset + 1] == d0 {
             q = Limb::MAX;
-            mpn_submul_1(&mut np[np_offset - dn..], &dp[..dn + 2], q);
+            limbs_sub_mul_limb_greater_in_place_left(&mut np[np_offset - dn..], &dp[..dn + 2], q);
             n1 = np[np_offset + 1]; // update n1, last loop's value will now be invalid
         } else {
             let mut n0 = 0;
@@ -247,7 +247,8 @@ pub fn mpn_sbpi1_div_qr(qp: &mut [Limb], np: &mut [Limb], dp: &[Limb], dinv: Lim
                 d0,
                 dinv,
             );
-            let mut cy = mpn_submul_1(&mut np[np_offset - dn..], &dp[..dn], q);
+            let mut cy =
+                limbs_sub_mul_limb_greater_in_place_left(&mut np[np_offset - dn..], &dp[..dn], q);
             let cy1 = if n0 < cy { 1 } else { 0 };
             n0.wrapping_sub_assign(cy);
             cy = if n1 < cy1 { 1 } else { 0 };
@@ -438,7 +439,11 @@ pub fn mpn_dcpi1_div_qr(qp: &mut [Limb], np: &mut [Limb], dp: &[Limb], dinv: Lim
             let mut q = 0;
             if n2 == d1 && n1 == d0 {
                 q = Limb::MAX;
-                let cy = mpn_submul_1(&mut np[np_offset - dn..], &dp[..dn], q);
+                let cy = limbs_sub_mul_limb_greater_in_place_left(
+                    &mut np[np_offset - dn..],
+                    &dp[..dn],
+                    q,
+                );
                 assert_eq!(cy, n2);
             } else {
                 let old_n1 = n1;
@@ -446,7 +451,7 @@ pub fn mpn_dcpi1_div_qr(qp: &mut [Limb], np: &mut [Limb], dp: &[Limb], dinv: Lim
                 udiv_qr_3by2(&mut q, &mut n1, &mut n0, n2, old_n1, old_n0, d1, d0, dinv);
 
                 if dn > 2 {
-                    let mut cy = mpn_submul_1(
+                    let mut cy = limbs_sub_mul_limb_greater_in_place_left(
                         &mut np[np_offset - dn..],
                         &dp[dp_offset - dn..dp_offset - 2],
                         q,
@@ -744,7 +749,7 @@ pub fn mpn_sbpi1_divappr_q(qp: &mut [Limb], np: &mut [Limb], dp: &[Limb], dinv: 
         np_offset -= 1;
         if n1 == d1 && np[np_offset + 1] == d0 {
             q = Limb::MAX;
-            mpn_submul_1(
+            limbs_sub_mul_limb_greater_in_place_left(
                 &mut np[np_offset - dn..],
                 &dp[dp_offset..dp_offset + dn + 2],
                 q,
@@ -753,7 +758,11 @@ pub fn mpn_sbpi1_divappr_q(qp: &mut [Limb], np: &mut [Limb], dp: &[Limb], dinv: 
         } else {
             let old_n1 = n1;
             udiv_qr_3by2(&mut q, &mut n1, &mut n0, old_n1, np[1], np[0], d1, d0, dinv);
-            let mut cy = mpn_submul_1(&mut np[np_offset - dn..], &dp[dp_offset..dp_offset + dn], q);
+            let mut cy = limbs_sub_mul_limb_greater_in_place_left(
+                &mut np[np_offset - dn..],
+                &dp[dp_offset..dp_offset + dn],
+                q,
+            );
             let cy1 = if n0 < cy { 1 } else { 0 };
             n0.wrapping_sub_assign(cy);
             cy = if n1 < cy1 { 1 } else { 0 };
@@ -785,7 +794,7 @@ pub fn mpn_sbpi1_divappr_q(qp: &mut [Limb], np: &mut [Limb], dp: &[Limb], dinv: 
             np_offset -= 1;
             if n1 >= (d1 & flag) {
                 q = Limb::MAX;
-                let cy = mpn_submul_1(
+                let cy = limbs_sub_mul_limb_greater_in_place_left(
                     &mut np[np_offset - dn..],
                     &dp[dp_offset..dp_offset + dn + 2],
                     q,
@@ -816,7 +825,7 @@ pub fn mpn_sbpi1_divappr_q(qp: &mut [Limb], np: &mut [Limb], dp: &[Limb], dinv: 
                     dinv,
                 );
 
-                let mut cy = mpn_submul_1(
+                let mut cy = limbs_sub_mul_limb_greater_in_place_left(
                     &mut np[np_offset - dn..np_offset],
                     &dp[dp_offset..dp_offset + dn],
                     q,
@@ -852,7 +861,11 @@ pub fn mpn_sbpi1_divappr_q(qp: &mut [Limb], np: &mut [Limb], dp: &[Limb], dinv: 
         np_offset -= 1;
         if n1 >= (d1 & flag) {
             q = Limb::MAX;
-            let cy = mpn_submul_1(&mut np[np_offset..], &dp[dp_offset..dp_offset + 2], q);
+            let cy = limbs_sub_mul_limb_greater_in_place_left(
+                &mut np[np_offset..],
+                &dp[dp_offset..dp_offset + 2],
+                q,
+            );
 
             if n1 != cy && n1 < (cy & flag) {
                 q.wrapping_sub_assign(1);
@@ -1037,7 +1050,11 @@ pub fn mpn_dcpi1_divappr_q(qp: &mut [Limb], np: &mut [Limb], dp: &[Limb], dinv: 
             let mut q = 0;
             if n2 == d1 && n1 == d0 {
                 q = Limb::MAX;
-                let cy = mpn_submul_1(&mut np[np_offset - dn..], &dp[dp_offset - dn..dp_offset], q);
+                let cy = limbs_sub_mul_limb_greater_in_place_left(
+                    &mut np[np_offset - dn..],
+                    &dp[dp_offset - dn..dp_offset],
+                    q,
+                );
                 assert_eq!(cy, n2);
             } else {
                 let old_n1 = n1;
@@ -1046,7 +1063,7 @@ pub fn mpn_dcpi1_divappr_q(qp: &mut [Limb], np: &mut [Limb], dp: &[Limb], dinv: 
 
                 if dn > 2 {
                     //mp_limb_t cy, cy1;
-                    let mut cy = mpn_submul_1(
+                    let mut cy = limbs_sub_mul_limb_greater_in_place_left(
                         &mut np[np_offset - dn..],
                         &dp[dp_offset - dn..dp_offset - 2],
                         q,
