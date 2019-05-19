@@ -1,4 +1,6 @@
-use malachite_base::conversion::{CheckedFrom, OverflowingFrom, SaturatingFrom, WrappingFrom};
+use malachite_base::conversion::{
+    CheckedFrom, ConvertibleFrom, OverflowingFrom, SaturatingFrom, WrappingFrom,
+};
 
 use integer::Integer;
 use platform::DoubleLimb;
@@ -292,5 +294,71 @@ impl<'a> OverflowingFrom<&'a Integer> for DoubleLimb {
                 ref abs,
             } => (DoubleLimb::wrapping_from(abs).wrapping_neg(), true),
         }
+    }
+}
+
+impl ConvertibleFrom<Integer> for DoubleLimb {
+    /// Determines whether an `Integer` can be converted to a `DoubleLimb`. Takes the `Integer` by
+    /// value.
+    ///
+    /// Time: worst case O(1)
+    ///
+    /// Additional memory: worst case O(1)
+    ///
+    /// # Example
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::conversion::ConvertibleFrom;
+    /// use malachite_nz::integer::Integer;
+    /// use std::str::FromStr;
+    ///
+    /// fn main() {
+    ///     assert_eq!(u64::convertible_from(Integer::from(123)), true);
+    ///     assert_eq!(u64::convertible_from(Integer::from(-123)), false);
+    ///     assert_eq!(
+    ///         u64::convertible_from(Integer::from_str("1000000000000000000000").unwrap()), false);
+    ///     assert_eq!(
+    ///         u64::convertible_from(Integer::from_str("-1000000000000000000000").unwrap()),
+    ///         false);
+    /// }
+    /// ```
+    #[inline]
+    fn convertible_from(value: Integer) -> bool {
+        DoubleLimb::convertible_from(&value)
+    }
+}
+
+impl<'a> ConvertibleFrom<&'a Integer> for DoubleLimb {
+    /// Determines whether an `Integer` can be converted to a `DoubleLimb`. Takes the `Integer` by
+    /// reference.
+    ///
+    /// Time: worst case O(1)
+    ///
+    /// Additional memory: worst case O(1)
+    ///
+    /// # Example
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::conversion::ConvertibleFrom;
+    /// use malachite_nz::integer::Integer;
+    /// use std::str::FromStr;
+    ///
+    /// fn main() {
+    ///     assert_eq!(u64::convertible_from(&Integer::from(123)), true);
+    ///     assert_eq!(u64::convertible_from(&Integer::from(-123)), false);
+    ///     assert_eq!(
+    ///         u64::convertible_from(&Integer::from_str("1000000000000000000000").unwrap()),
+    ///         false);
+    ///     assert_eq!(
+    ///         u64::convertible_from(&Integer::from_str("-1000000000000000000000").unwrap()),
+    ///         false);
+    /// }
+    /// ```
+    fn convertible_from(value: &Integer) -> bool {
+        value.sign && DoubleLimb::convertible_from(&value.abs)
     }
 }

@@ -1,4 +1,6 @@
-use malachite_base::conversion::{CheckedFrom, OverflowingFrom, SaturatingFrom, WrappingFrom};
+use malachite_base::conversion::{
+    CheckedFrom, ConvertibleFrom, OverflowingFrom, SaturatingFrom, WrappingFrom,
+};
 
 use integer::Integer;
 use platform::Limb;
@@ -308,5 +310,77 @@ impl<'a> OverflowingFrom<&'a Integer> for u32 {
         let (result, overflow_1) = Limb::overflowing_from(value);
         let (result, overflow_2) = u32::overflowing_from(result);
         (result, overflow_1 || overflow_2)
+    }
+}
+
+impl ConvertibleFrom<Integer> for Limb {
+    /// Determines whether an `Integer` can be converted to a `Limb`. Takes the `Integer` by value.
+    ///
+    /// Time: worst case O(1)
+    ///
+    /// Additional memory: worst case O(1)
+    ///
+    /// # Example
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::conversion::ConvertibleFrom;
+    /// use malachite_nz::integer::Integer;
+    ///
+    /// fn main() {
+    ///     assert_eq!(u32::convertible_from(Integer::from(123)), true);
+    ///     assert_eq!(u32::convertible_from(Integer::from(-123)), false);
+    ///     assert_eq!(u32::convertible_from(Integer::trillion()), false);
+    ///     assert_eq!(u32::convertible_from(-Integer::trillion()), false);
+    /// }
+    /// ```
+    #[inline]
+    fn convertible_from(value: Integer) -> bool {
+        Limb::convertible_from(&value)
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl ConvertibleFrom<Integer> for u32 {
+    #[inline]
+    fn convertible_from(value: Integer) -> bool {
+        u32::convertible_from(&value)
+    }
+}
+
+impl<'a> ConvertibleFrom<&'a Integer> for Limb {
+    /// Determines whether an `Integer` can be converted to a `Limb`. Takes the `Integer` by
+    /// reference.
+    ///
+    /// Time: worst case O(1)
+    ///
+    /// Additional memory: worst case O(1)
+    ///
+    /// # Example
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::conversion::ConvertibleFrom;
+    /// use malachite_nz::integer::Integer;
+    ///
+    /// fn main() {
+    ///     assert_eq!(u32::convertible_from(&Integer::from(123)), true);
+    ///     assert_eq!(u32::convertible_from(&Integer::from(-123)), false);
+    ///     assert_eq!(u32::convertible_from(&Integer::trillion()), false);
+    ///     assert_eq!(u32::convertible_from(&-Integer::trillion()), false);
+    /// }
+    /// ```
+    fn convertible_from(value: &Integer) -> bool {
+        value.sign && Limb::convertible_from(&value.abs)
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> ConvertibleFrom<&'a Integer> for u32 {
+    #[inline]
+    fn convertible_from(value: &Integer) -> bool {
+        value.sign && u32::convertible_from(&value.abs)
     }
 }

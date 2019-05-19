@@ -1,4 +1,6 @@
-use malachite_base::conversion::{CheckedFrom, OverflowingFrom, SaturatingFrom, WrappingFrom};
+use malachite_base::conversion::{
+    CheckedFrom, ConvertibleFrom, OverflowingFrom, SaturatingFrom, WrappingFrom,
+};
 use malachite_base::num::traits::SignificantBits;
 use malachite_nz::platform::DoubleLimb;
 
@@ -14,6 +16,8 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_double_limb_saturating_from_integer_ref);
     register_demo!(registry, demo_double_limb_overflowing_from_integer);
     register_demo!(registry, demo_double_limb_overflowing_from_integer_ref);
+    register_demo!(registry, demo_double_limb_convertible_from_integer);
+    register_demo!(registry, demo_double_limb_convertible_from_integer_ref);
     register_bench!(
         registry,
         Large,
@@ -48,6 +52,16 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
         registry,
         Large,
         benchmark_double_limb_overflowing_from_integer_algorithms
+    );
+    register_bench!(
+        registry,
+        Large,
+        benchmark_double_limb_convertible_from_integer_evaluation_strategy
+    );
+    register_bench!(
+        registry,
+        Large,
+        benchmark_double_limb_convertible_from_integer_algorithms
     );
 }
 
@@ -131,6 +145,35 @@ fn demo_double_limb_overflowing_from_integer_ref(gm: GenerationMode, limit: usiz
             "DoubleLimb::overflowing_from(&{}) = {:?}",
             n,
             DoubleLimb::overflowing_from(&n)
+        );
+    }
+}
+
+fn demo_double_limb_convertible_from_integer(gm: GenerationMode, limit: usize) {
+    for n in integers(gm).take(limit) {
+        let n_clone = n.clone();
+        println!(
+            "{} is {}convertible to a DoubleLimb",
+            n_clone,
+            if DoubleLimb::convertible_from(n) {
+                ""
+            } else {
+                "not "
+            },
+        );
+    }
+}
+
+fn demo_double_limb_convertible_from_integer_ref(gm: GenerationMode, limit: usize) {
+    for n in integers(gm).take(limit) {
+        println!(
+            "{} is {}convertible to a DoubleLimb",
+            n,
+            if DoubleLimb::convertible_from(&n) {
+                ""
+            } else {
+                "not "
+            },
         );
     }
 }
@@ -327,6 +370,60 @@ fn benchmark_double_limb_overflowing_from_integer_algorithms(
                         DoubleLimb::checked_from(n).is_none()
                     ))
                 }),
+            ),
+        ],
+    );
+}
+
+fn benchmark_double_limb_convertible_from_integer_evaluation_strategy(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "DoubleLimb::convertible_from(Integer)",
+        BenchmarkType::EvaluationStrategy,
+        integers(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|n| usize::checked_from(n.significant_bits()).unwrap()),
+        "n.significant_bits()",
+        &mut [
+            (
+                "DoubleLimb::convertible_from(Integer)",
+                &mut (|n| no_out!(DoubleLimb::convertible_from(n))),
+            ),
+            (
+                "DoubleLimb::convertible_from(&Integer)",
+                &mut (|n| no_out!(DoubleLimb::convertible_from(&n))),
+            ),
+        ],
+    );
+}
+
+fn benchmark_double_limb_convertible_from_integer_algorithms(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "DoubleLimb::convertible_from(Integer)",
+        BenchmarkType::Algorithms,
+        integers(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|n| usize::checked_from(n.significant_bits()).unwrap()),
+        "n.significant_bits()",
+        &mut [
+            (
+                "standard",
+                &mut (|n| no_out!(DoubleLimb::convertible_from(n))),
+            ),
+            (
+                "using checked_from",
+                &mut (|n| no_out!(DoubleLimb::checked_from(n).is_some())),
             ),
         ],
     );

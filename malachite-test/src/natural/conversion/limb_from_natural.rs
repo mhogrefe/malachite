@@ -426,7 +426,7 @@ fn benchmark_limb_convertible_from_natural_evaluation_strategy(
     file_name: &str,
 ) {
     m_run_benchmark(
-        "Limb::convertible_from(Integer)",
+        "Limb::convertible_from(Natural)",
         BenchmarkType::EvaluationStrategy,
         naturals(gm),
         gm.name(),

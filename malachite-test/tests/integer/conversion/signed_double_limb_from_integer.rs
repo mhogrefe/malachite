@@ -291,7 +291,7 @@ fn signed_double_limb_wrapping_from_integer_properties() {
     test_properties(integers, |x| {
         let result = SignedDoubleLimb::wrapping_from(x);
         assert_eq!(SignedDoubleLimb::wrapping_from(x.clone()), result);
-        assert_eq!(-result, SignedDoubleLimb::wrapping_from(&-x));
+        assert_eq!(result.wrapping_neg(), SignedDoubleLimb::wrapping_from(&-x));
         assert_eq!(
             result,
             SignedDoubleLimb::wrapping_from(

@@ -2,7 +2,9 @@ use std::cmp::Ordering;
 use std::str::FromStr;
 
 use malachite_base::comparison::Max;
-use malachite_base::conversion::{CheckedFrom, OverflowingFrom, SaturatingFrom, WrappingFrom};
+use malachite_base::conversion::{
+    CheckedFrom, ConvertibleFrom, OverflowingFrom, SaturatingFrom, WrappingFrom,
+};
 use malachite_base::num::integers::PrimitiveInteger;
 use malachite_base::num::traits::{ModPowerOfTwo, PartialOrdAbs, Sign, SignificantBits};
 use malachite_nz::integer::Integer;
@@ -134,6 +136,36 @@ fn test_limb_overflowing_from_integer() {
 }
 
 #[test]
+fn test_limb_convertible_from_integer() {
+    let test = |n, out| {
+        assert_eq!(Limb::convertible_from(Integer::from_str(n).unwrap()), out);
+        assert_eq!(Limb::convertible_from(&Integer::from_str(n).unwrap()), out);
+    };
+    test("0", true);
+    test("123", true);
+    #[cfg(feature = "32_bit_limbs")]
+    {
+        test("-123", false);
+        test("1000000000000", false);
+        test("-1000000000000", false);
+        test("4294967296", false);
+        test("4294967297", false);
+        test("-4294967296", false);
+        test("-4294967295", false);
+    }
+    #[cfg(feature = "64_bit_limbs")]
+    {
+        test("-123", false);
+        test("1000000000000", true);
+        test("-1000000000000", false);
+        test("18446744073709551616", false);
+        test("18446744073709551617", false);
+        test("-18446744073709551616", false);
+        test("-18446744073709551615", false);
+    }
+}
+
+#[test]
 fn limb_checked_from_integer_properties() {
     test_properties(integers, |x| {
         let result = Limb::checked_from(x);
@@ -185,5 +217,15 @@ fn limb_overflowing_from_integer_properties() {
             result,
             (Limb::wrapping_from(x), Limb::checked_from(x).is_none())
         );
+        assert_eq!(result.1, !Limb::convertible_from(x));
+    });
+}
+
+#[test]
+fn limb_convertible_from_integer_properties() {
+    test_properties(integers, |x| {
+        let convertible = Limb::convertible_from(x.clone());
+        assert_eq!(Limb::convertible_from(x), convertible);
+        assert_eq!(convertible, *x >= 0 && *x <= Limb::MAX);
     });
 }

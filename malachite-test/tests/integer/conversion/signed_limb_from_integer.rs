@@ -179,7 +179,7 @@ fn signed_limb_wrapping_from_integer_properties() {
         assert_eq!(SignedLimb::wrapping_from(x.clone()), result);
         #[cfg(feature = "32_bit_limbs")]
         assert_eq!(integer_to_rug_integer(x).to_i32_wrapping(), result);
-        assert_eq!(-result, SignedLimb::wrapping_from(&-x));
+        assert_eq!(result.wrapping_neg(), SignedLimb::wrapping_from(&-x));
         assert_eq!(
             result,
             SignedLimb::wrapping_from(
