@@ -16,9 +16,6 @@ use platform::{DoubleLimb, Limb};
 ///
 /// where n = max(`xs.len()`, `ys.len()`)
 ///
-/// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, where w and x are positive, sub is positive, and w
-/// is returned instead of overwriting the first input.
-///
 /// # Example
 /// ```
 /// use malachite_nz::natural::arithmetic::add_mul_limb::limbs_add_mul_limb;
@@ -27,6 +24,9 @@ use platform::{DoubleLimb, Limb};
 /// assert_eq!(limbs_add_mul_limb(&[123], &[0, 123], 4), &[123, 492]);
 /// assert_eq!(limbs_add_mul_limb(&[123, 456], &[0, 123], 0xffff_ffff), &[123, 333, 123]);
 /// ```
+///
+/// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, where w and x are positive, sub is positive, and w
+/// is returned instead of overwriting the first input.
 pub fn limbs_add_mul_limb(xs: &[Limb], ys: &[Limb], limb: Limb) -> Vec<Limb> {
     let mut result;
     if xs.len() >= ys.len() {
@@ -48,8 +48,6 @@ pub fn limbs_add_mul_limb(xs: &[Limb], ys: &[Limb], limb: Limb) -> Vec<Limb> {
 /// Additional memory: worst case O(1)
 ///
 /// where n = `ys.len()`
-///
-/// This is mpn_addmul_1 from mpn/generic/addmul_1.c.
 ///
 /// # Panics
 /// Panics if `xs` is shorter than `ys`.
@@ -74,6 +72,9 @@ pub fn limbs_add_mul_limb(xs: &[Limb], ys: &[Limb], limb: Limb) -> Vec<Limb> {
 /// assert_eq!(limbs_slice_add_mul_limb_greater_in_place_left(xs, &[0, 123], 0xffff_ffff), 123);
 /// assert_eq!(xs, &[123, 333]);
 /// ```
+///
+/// This is mpn_addmul_1 from mpn/generic/addmul_1.c, but where the first input may be longer than
+/// the second.
 pub fn limbs_slice_add_mul_limb_greater_in_place_left(
     xs: &mut [Limb],
     ys: &[Limb],
@@ -101,10 +102,6 @@ pub fn limbs_slice_add_mul_limb_greater_in_place_left(
 ///
 /// where n = `xs.len()` = `ys.len()`
 ///
-/// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, where w and x are positive and have the same
-/// lengths, sub is positive, the lowest limbs of the result are written to the second input rather
-/// than the first, and the highest limb is returned.
-///
 /// # Panics
 /// Panics if `xs` and `ys` have different lengths.
 ///
@@ -121,6 +118,10 @@ pub fn limbs_slice_add_mul_limb_greater_in_place_left(
 ///         123);
 /// assert_eq!(ys, &[123, 333]);
 /// ```
+///
+/// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, where w and x are positive and have the same
+/// lengths, sub is positive, the lowest limbs of the result are written to the second input rather
+/// than the first, and the highest limb is returned.
 pub fn limbs_slice_add_mul_limb_same_length_in_place_right(
     xs: &[Limb],
     ys: &mut [Limb],
@@ -149,8 +150,6 @@ pub fn limbs_slice_add_mul_limb_same_length_in_place_right(
 /// where n = max(`xs.len()`, `ys.len()`)
 ///       m = max(1, `ys.len()` - `xs.len()`)
 ///
-/// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, where w and x are positive and sub is positive.
-///
 /// # Example
 /// ```
 /// use malachite_nz::natural::arithmetic::add_mul_limb::limbs_vec_add_mul_limb_in_place_left;
@@ -171,6 +170,8 @@ pub fn limbs_slice_add_mul_limb_same_length_in_place_right(
 /// limbs_vec_add_mul_limb_in_place_left(&mut xs, &[0, 123], 0xffff_ffff);
 /// assert_eq!(xs, &[123, 333, 123]);
 /// ```
+///
+/// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, where w and x are positive and sub is positive.
 pub fn limbs_vec_add_mul_limb_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb], limb: Limb) {
     let xs_len = xs.len();
     if xs_len >= ys.len() {
@@ -217,9 +218,6 @@ fn limbs_vec_add_mul_limb_greater_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb],
 /// where n = max(`xs.len()`, `ys.len()`)
 ///       m = max(1, `xs.len()` - `ys.len()`)
 ///
-/// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, where w and x are positive, sub is positive, and the
-/// result is written to the second input rather than the first.
-///
 /// # Example
 /// ```
 /// use malachite_nz::natural::arithmetic::add_mul_limb::limbs_vec_add_mul_limb_in_place_right;
@@ -240,6 +238,9 @@ fn limbs_vec_add_mul_limb_greater_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb],
 /// limbs_vec_add_mul_limb_in_place_right(&[123, 456], &mut ys, 0xffff_ffff);
 /// assert_eq!(ys, &[123, 333, 123]);
 /// ```
+///
+/// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, where w and x are positive, sub is positive, and the
+/// result is written to the second input rather than the first.
 pub fn limbs_vec_add_mul_limb_in_place_right(xs: &[Limb], ys: &mut Vec<Limb>, limb: Limb) {
     let ys_len = ys.len();
     if xs.len() >= ys_len {
@@ -284,9 +285,6 @@ fn limbs_vec_add_mul_limb_smaller_in_place_right(xs: &[Limb], ys: &mut Vec<Limb>
 ///
 /// where n = max(`xs.len()`, `ys.len()`)
 ///
-/// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, where w and x are positive, sub is positive, and the
-/// result is written to the longer input.
-///
 /// # Example
 /// ```
 /// use malachite_nz::natural::arithmetic::add_mul_limb::limbs_vec_add_mul_limb_in_place_either;
@@ -315,6 +313,9 @@ fn limbs_vec_add_mul_limb_smaller_in_place_right(xs: &[Limb], ys: &mut Vec<Limb>
 /// assert_eq!(xs, &[123, 333, 123]);
 /// assert_eq!(ys, &[0, 123]);
 /// ```
+///
+/// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, where w and x are positive, sub is positive, and the
+/// result is written to the longer input.
 pub fn limbs_vec_add_mul_limb_in_place_either(
     xs: &mut Vec<Limb>,
     ys: &mut Vec<Limb>,

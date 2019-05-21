@@ -27,7 +27,7 @@ use natural::arithmetic::sub::{
     limbs_sub_same_length_to_out,
 };
 use natural::arithmetic::sub_limb::limbs_sub_limb_in_place;
-use natural::arithmetic::sub_mul_limb::limbs_sub_mul_limb_greater_in_place_left;
+use natural::arithmetic::sub_mul_limb::limbs_sub_mul_limb_same_length_in_place_left;
 use platform::Limb;
 
 /// Time: worst case O(k)
@@ -544,7 +544,7 @@ pub(crate) fn _limbs_mul_toom_interpolate_7_points(
 
         limbs_sub_same_length_in_place_left(w2, w3);
 
-        limbs_sub_mul_limb_greater_in_place_left(w5, w2, 65);
+        limbs_sub_mul_limb_same_length_in_place_left(w5, w2, 65);
         limbs_sub_in_place_left(w2, w6);
         limbs_sub_in_place_left(w2, w0);
 
@@ -932,7 +932,7 @@ pub fn _limbs_mul_toom_interpolate_12_points<'a>(
             }
         }
         if AORSMUL_FASTER_AORS_AORSLSH {
-            limbs_sub_mul_limb_greater_in_place_left(r4, r5, 257); // can be negative
+            limbs_sub_mul_limb_same_length_in_place_left(r4, r5, 257); // can be negative
         } else {
             limbs_sub_same_length_in_place_left(r4, r5); // can be negative
             _limbs_shl_and_sub_same_length(r4, r5, 8, scratch); // can be negative
@@ -957,7 +957,7 @@ pub fn _limbs_mul_toom_interpolate_12_points<'a>(
 
         assert_eq!(_limbs_shl_and_sub_same_length(r2, r3, 5, scratch), 0);
         if AORSMUL_FASTER_3AORSLSH {
-            assert_eq!(limbs_sub_mul_limb_greater_in_place_left(r1, r2, 100), 0);
+            assert_eq!(limbs_sub_mul_limb_same_length_in_place_left(r1, r2, 100), 0);
         } else {
             assert_eq!(_limbs_shl_and_sub_same_length(r1, r2, 6, scratch), 0);
             assert_eq!(_limbs_shl_and_sub_same_length(r1, r2, 5, scratch), 0);
@@ -967,7 +967,7 @@ pub fn _limbs_mul_toom_interpolate_12_points<'a>(
         limbs_div_exact_limb_in_place(r1, 42_525);
 
         if AORSMUL_FASTER_AORS_2AORSLSH {
-            assert_eq!(limbs_sub_mul_limb_greater_in_place_left(r2, r1, 225), 0);
+            assert_eq!(limbs_sub_mul_limb_same_length_in_place_left(r2, r1, 225), 0);
         } else {
             assert!(!limbs_sub_same_length_in_place_left(r2, r1));
             assert_eq!(
@@ -1226,14 +1226,14 @@ pub fn _limbs_mul_toom_interpolate_16_points<'a>(
             }
         }
         if AORSMUL_FASTER_2AORSLSH {
-            limbs_sub_mul_limb_greater_in_place_left(r5, r6, 1_028); // can be negative
+            limbs_sub_mul_limb_same_length_in_place_left(r5, r6, 1_028); // can be negative
         } else {
             _limbs_shl_and_sub_same_length(r5, r6, 2, scratch); // can be negative
             _limbs_shl_and_sub_same_length(r5, r6, 10, scratch); // can be negative
         }
-        limbs_sub_mul_limb_greater_in_place_left(r7, r5, 1_300); // can be negative
+        limbs_sub_mul_limb_same_length_in_place_left(r7, r5, 1_300); // can be negative
         if AORSMUL_FASTER_3AORSLSH {
-            limbs_sub_mul_limb_greater_in_place_left(r7, r6, 1_052_688); // can be negative
+            limbs_sub_mul_limb_same_length_in_place_left(r7, r6, 1_052_688); // can be negative
         } else {
             _limbs_shl_and_sub_same_length(r7, r6, 4, scratch); // can be negative
             _limbs_shl_and_sub_same_length(r7, r6, 12, scratch); // can be negative
@@ -1243,7 +1243,7 @@ pub fn _limbs_mul_toom_interpolate_16_points<'a>(
         limbs_div_255_in_place(r7);
 
         // can be negative
-        limbs_sub_mul_limb_greater_in_place_left(r5, r7, 12_567_555);
+        limbs_sub_mul_limb_same_length_in_place_left(r5, r7, 12_567_555);
         // A division by 2835x64 follows. Warning: the operand can be negative!
         limbs_div_exact_limb_in_place(r5, 2_835 << 6);
         {
@@ -1254,7 +1254,7 @@ pub fn _limbs_mul_toom_interpolate_16_points<'a>(
         }
 
         if AORSMUL_FASTER_AORS_AORSLSH {
-            limbs_sub_mul_limb_greater_in_place_left(r6, r7, 4_095); // can be negative
+            limbs_sub_mul_limb_same_length_in_place_left(r6, r7, 4_095); // can be negative
         } else {
             // can give a carry
             limbs_slice_add_same_length_in_place_left(r6, r7);
@@ -1278,23 +1278,26 @@ pub fn _limbs_mul_toom_interpolate_16_points<'a>(
 
         assert_eq!(_limbs_shl_and_sub_same_length(r3, r4, 7, scratch), 0);
         assert_eq!(_limbs_shl_and_sub_same_length(r2, r4, 13, scratch), 0);
-        assert_eq!(limbs_sub_mul_limb_greater_in_place_left(r2, r3, 400), 0);
+        assert_eq!(limbs_sub_mul_limb_same_length_in_place_left(r2, r3, 400), 0);
 
         // If `Limb::WIDTH` < 42 next operations on r1 can give a carry!
         _limbs_shl_and_sub_same_length(r1, r4, 19, scratch);
-        limbs_sub_mul_limb_greater_in_place_left(r1, r2, 1_428);
-        limbs_sub_mul_limb_greater_in_place_left(r1, r3, 112_896);
+        limbs_sub_mul_limb_same_length_in_place_left(r1, r2, 1_428);
+        limbs_sub_mul_limb_same_length_in_place_left(r1, r3, 112_896);
         limbs_div_exact_limb_in_place(r1, 182_712_915);
         limbs_div_255_in_place(r1);
 
         assert_eq!(
-            limbs_sub_mul_limb_greater_in_place_left(r2, r1, 15_181_425),
+            limbs_sub_mul_limb_same_length_in_place_left(r2, r1, 15_181_425),
             0
         );
         limbs_div_exact_limb_in_place(r2, 42_525 << 4);
 
         if AORSMUL_FASTER_AORS_2AORSLSH {
-            assert_eq!(limbs_sub_mul_limb_greater_in_place_left(r3, r1, 3_969), 0);
+            assert_eq!(
+                limbs_sub_mul_limb_same_length_in_place_left(r3, r1, 3_969),
+                0
+            );
         } else {
             assert!(!limbs_sub_same_length_in_place_left(r3, r1));
             assert_eq!(
@@ -1303,7 +1306,7 @@ pub fn _limbs_mul_toom_interpolate_16_points<'a>(
             );
             assert_eq!(_limbs_shl_and_sub_same_length(r3, r1, 12, scratch), 0);
         }
-        assert_eq!(limbs_sub_mul_limb_greater_in_place_left(r3, r2, 900), 0);
+        assert_eq!(limbs_sub_mul_limb_same_length_in_place_left(r3, r2, 900), 0);
         limbs_div_exact_limb_in_place(r3, 9 << 4);
 
         assert!(!limbs_sub_same_length_in_place_left(r4, r1));

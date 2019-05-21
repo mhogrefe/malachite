@@ -157,9 +157,9 @@ impl<'a, 'b> SubMulAssign<&'a Natural, &'b Natural> for Natural {
 
 fn sub_mul_assign_helper(a: &mut Natural, b: &Natural, c: &Natural) -> bool {
     if let Small(small_b) = *b {
-        a.sub_mul_assign_limb_no_panic(c, small_b)
+        a.sub_mul_assign_limb_ref_no_panic(c, small_b)
     } else if let Small(small_c) = *c {
-        a.sub_mul_assign_limb_no_panic(b, small_c)
+        a.sub_mul_assign_limb_ref_no_panic(b, small_c)
     } else if a.limb_count() < b.limb_count() + c.limb_count() - 1 {
         true
     } else {

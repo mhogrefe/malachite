@@ -216,7 +216,7 @@ impl SaturatingSubMulAssign<Natural, Limb> for Natural {
     /// }
     /// ```
     fn saturating_sub_mul_assign(&mut self, b: Natural, c: Limb) {
-        if self.sub_mul_assign_limb_no_panic(&b, c) {
+        if self.sub_mul_assign_limb_ref_no_panic(&b, c) {
             *self = Natural::ZERO;
         }
     }
@@ -263,7 +263,7 @@ impl<'a> SaturatingSubMulAssign<&'a Natural, Limb> for Natural {
     /// }
     /// ```
     fn saturating_sub_mul_assign(&mut self, b: &'a Natural, c: Limb) {
-        if self.sub_mul_assign_limb_no_panic(b, c) {
+        if self.sub_mul_assign_limb_ref_no_panic(b, c) {
             *self = Natural::ZERO;
         }
     }
