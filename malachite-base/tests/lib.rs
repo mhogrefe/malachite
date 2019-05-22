@@ -21,6 +21,15 @@ pub mod limbs {
     pub mod limbs_test_zero;
     pub mod limbs_trailing_zero_limbs;
 }
+pub mod num {
+    pub mod conversion {
+        pub mod checked_from;
+        pub mod convertible_from;
+        pub mod overflowing_from;
+        pub mod saturating_from;
+        pub mod wrapping_from;
+    }
+}
 pub mod round {
     pub mod display;
     pub mod from_str;

@@ -1,24 +1,12 @@
 use malachite_base::comparison::Min;
-use malachite_base::conversion::{CheckedFrom, OverflowingFrom, SaturatingFrom, WrappingFrom};
+use malachite_base::conversion::{
+    CheckedFrom, ConvertibleFrom, OverflowingFrom, SaturatingFrom, WrappingFrom,
+};
 use malachite_base::num::integers::PrimitiveInteger;
 
 use integer::Integer;
 use natural::Natural::Small;
 use platform::{Limb, SignedLimb};
-
-fn integer_fits_in_signed_limb(x: &Integer) -> bool {
-    match *x {
-        Integer {
-            sign: true,
-            abs: Small(x),
-        } => !x.get_highest_bit(),
-        Integer {
-            sign: false,
-            abs: Small(x),
-        } => !x.get_highest_bit() || x == 1 << (Limb::WIDTH - 1),
-        _ => false,
-    }
-}
 
 impl CheckedFrom<Integer> for SignedLimb {
     /// Converts an `Integer` to a `SignedLimb`, taking the `Integer` by value and returning `None`
@@ -73,7 +61,7 @@ impl<'a> CheckedFrom<&'a Integer> for SignedLimb {
     /// }
     /// ```
     fn checked_from(value: &Integer) -> Option<SignedLimb> {
-        if integer_fits_in_signed_limb(value) {
+        if SignedLimb::convertible_from(value) {
             Some(SignedLimb::wrapping_from(value))
         } else {
             None
@@ -308,7 +296,7 @@ impl<'a> OverflowingFrom<&'a Integer> for SignedLimb {
     fn overflowing_from(value: &Integer) -> (SignedLimb, bool) {
         (
             SignedLimb::wrapping_from(value),
-            !integer_fits_in_signed_limb(value),
+            !SignedLimb::convertible_from(value),
         )
     }
 }
@@ -320,5 +308,98 @@ impl<'a> OverflowingFrom<&'a Integer> for i32 {
         let (result, overflow_1) = SignedLimb::overflowing_from(value);
         let (result, overflow_2) = i32::overflowing_from(result);
         (result, overflow_1 || overflow_2)
+    }
+}
+
+impl ConvertibleFrom<Integer> for SignedLimb {
+    /// Determines whether an `Integer` can be converted to a `SignedLimb`. Takes the `Integer` by
+    /// value.
+    ///
+    /// Time: worst case O(1)
+    ///
+    /// Additional memory: worst case O(1)
+    ///
+    /// # Example
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::conversion::ConvertibleFrom;
+    /// use malachite_nz::integer::Integer;
+    ///
+    /// fn main() {
+    ///     assert_eq!(i32::convertible_from(Integer::from(123)), true);
+    ///     assert_eq!(i32::convertible_from(Integer::from(-123)), true);
+    ///     assert_eq!(i32::convertible_from(Integer::trillion()), false);
+    ///     assert_eq!(i32::convertible_from(-Integer::trillion()), false);
+    /// }
+    /// ```
+    #[inline]
+    fn convertible_from(value: Integer) -> bool {
+        SignedLimb::convertible_from(&value)
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl ConvertibleFrom<Integer> for i32 {
+    #[inline]
+    fn convertible_from(value: Integer) -> bool {
+        i32::convertible_from(&value)
+    }
+}
+
+impl<'a> ConvertibleFrom<&'a Integer> for SignedLimb {
+    /// Determines whether an `Integer` can be converted to a `SignedLimb`. Takes the `Integer` by
+    /// reference.
+    ///
+    /// Time: worst case O(1)
+    ///
+    /// Additional memory: worst case O(1)
+    ///
+    /// # Example
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::conversion::ConvertibleFrom;
+    /// use malachite_nz::integer::Integer;
+    ///
+    /// fn main() {
+    ///     assert_eq!(i32::convertible_from(&Integer::from(123)), true);
+    ///     assert_eq!(i32::convertible_from(&Integer::from(-123)), true);
+    ///     assert_eq!(i32::convertible_from(&Integer::trillion()), false);
+    ///     assert_eq!(i32::convertible_from(&-Integer::trillion()), false);
+    /// }
+    /// ```
+    fn convertible_from(value: &Integer) -> bool {
+        match *value {
+            Integer {
+                sign: true,
+                abs: Small(small),
+            } => !small.get_highest_bit(),
+            Integer {
+                sign: false,
+                abs: Small(small),
+            } => !small.get_highest_bit() || small == 1 << (Limb::WIDTH - 1),
+            _ => false,
+        }
+    }
+}
+
+#[cfg(feature = "64_bit_limbs")]
+impl<'a> ConvertibleFrom<&'a Integer> for i32 {
+    #[inline]
+    fn convertible_from(value: &Integer) -> bool {
+        match *value {
+            Integer {
+                sign: true,
+                abs: Small(small),
+            } => i32::convertible_from(small),
+            Integer {
+                sign: false,
+                abs: Small(small),
+            } => small.leading_zeros() > u32::WIDTH || small == 1 << (u32::WIDTH - 1),
+            _ => false,
+        }
     }
 }

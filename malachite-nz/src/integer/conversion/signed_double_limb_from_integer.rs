@@ -1,29 +1,12 @@
 use malachite_base::comparison::Min;
-use malachite_base::conversion::{CheckedFrom, OverflowingFrom, SaturatingFrom, WrappingFrom};
+use malachite_base::conversion::{
+    CheckedFrom, ConvertibleFrom, OverflowingFrom, SaturatingFrom, WrappingFrom,
+};
 use malachite_base::num::integers::PrimitiveInteger;
 
 use integer::Integer;
 use natural::Natural::{Large, Small};
 use platform::{DoubleLimb, Limb, SignedDoubleLimb};
-
-fn integer_fits_in_signed_double_limb(x: &Integer) -> bool {
-    match *x {
-        Integer { abs: Small(_), .. } => true,
-        Integer {
-            sign,
-            abs: Large(ref limbs),
-        } => {
-            if limbs.len() > 2 {
-                false
-            } else if sign {
-                !limbs[1].get_highest_bit()
-            } else {
-                // include check for x == SignedDoubleLimb::MIN
-                !limbs[1].get_highest_bit() || limbs[0] == 0 && limbs[1] == 1 << (Limb::WIDTH - 1)
-            }
-        }
-    }
-}
 
 impl CheckedFrom<Integer> for SignedDoubleLimb {
     /// Converts an `Integer` to a `SignedDoubleLimb`, taking the `Integer` by value and returning
@@ -90,7 +73,7 @@ impl<'a> CheckedFrom<&'a Integer> for SignedDoubleLimb {
     /// }
     /// ```
     fn checked_from(value: &Integer) -> Option<SignedDoubleLimb> {
-        if integer_fits_in_signed_double_limb(value) {
+        if SignedDoubleLimb::convertible_from(value) {
             Some(SignedDoubleLimb::wrapping_from(value))
         } else {
             None
@@ -315,7 +298,90 @@ impl<'a> OverflowingFrom<&'a Integer> for SignedDoubleLimb {
     fn overflowing_from(value: &Integer) -> (SignedDoubleLimb, bool) {
         (
             SignedDoubleLimb::wrapping_from(value),
-            !integer_fits_in_signed_double_limb(value),
+            !SignedDoubleLimb::convertible_from(value),
         )
+    }
+}
+
+impl ConvertibleFrom<Integer> for SignedDoubleLimb {
+    /// Determines whether an `Integer` can be converted to a `SignedDoubleLimb`. Takes the
+    /// `Integer` by value.
+    ///
+    /// Time: worst case O(1)
+    ///
+    /// Additional memory: worst case O(1)
+    ///
+    /// # Example
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::conversion::ConvertibleFrom;
+    /// use malachite_nz::integer::Integer;
+    /// use std::str::FromStr;
+    ///
+    /// fn main() {
+    ///     assert_eq!(i64::convertible_from(Integer::from(123)), true);
+    ///     assert_eq!(i64::convertible_from(Integer::from(-123)), true);
+    ///     assert_eq!(
+    ///         i64::convertible_from(Integer::from_str("1000000000000000000000000").unwrap()),
+    ///         false);
+    ///     assert_eq!(
+    ///         i64::convertible_from(Integer::from_str("-1000000000000000000000000").unwrap()),
+    ///         false);
+    /// }
+    /// ```
+    #[inline]
+    fn convertible_from(value: Integer) -> bool {
+        SignedDoubleLimb::convertible_from(&value)
+    }
+}
+
+impl<'a> ConvertibleFrom<&'a Integer> for SignedDoubleLimb {
+    /// Determines whether an `Integer` can be converted to a `SignedDoubleLimb`. Takes the
+    /// `Integer` by reference.
+    ///
+    /// Time: worst case O(1)
+    ///
+    /// Additional memory: worst case O(1)
+    ///
+    /// # Example
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::conversion::ConvertibleFrom;
+    /// use malachite_nz::integer::Integer;
+    /// use std::str::FromStr;
+    ///
+    /// fn main() {
+    ///     assert_eq!(i64::convertible_from(&Integer::from(123)), true);
+    ///     assert_eq!(i64::convertible_from(&Integer::from(-123)), true);
+    ///     assert_eq!(
+    ///         i64::convertible_from(&Integer::from_str("1000000000000000000000000").unwrap()),
+    ///         false);
+    ///     assert_eq!(
+    ///         i64::convertible_from(&Integer::from_str("-1000000000000000000000000").unwrap()),
+    ///         false);
+    /// }
+    /// ```
+    fn convertible_from(value: &Integer) -> bool {
+        match *value {
+            Integer { abs: Small(_), .. } => true,
+            Integer {
+                sign,
+                abs: Large(ref limbs),
+            } => {
+                if limbs.len() > 2 {
+                    false
+                } else if sign {
+                    !limbs[1].get_highest_bit()
+                } else {
+                    // include check for x == SignedDoubleLimb::MIN
+                    !limbs[1].get_highest_bit()
+                        || limbs[0] == 0 && limbs[1] == 1 << (Limb::WIDTH - 1)
+                }
+            }
+        }
     }
 }

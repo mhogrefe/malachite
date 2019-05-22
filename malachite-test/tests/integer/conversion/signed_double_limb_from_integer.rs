@@ -1,7 +1,9 @@
 use std::str::FromStr;
 
 use malachite_base::comparison::{Max, Min};
-use malachite_base::conversion::{CheckedFrom, OverflowingFrom, SaturatingFrom, WrappingFrom};
+use malachite_base::conversion::{
+    CheckedFrom, ConvertibleFrom, OverflowingFrom, SaturatingFrom, WrappingFrom,
+};
 use malachite_base::num::integers::PrimitiveInteger;
 use malachite_base::num::traits::{ModPowerOfTwo, One, PartialOrdAbs, SignificantBits};
 use malachite_nz::integer::Integer;
@@ -270,6 +272,51 @@ fn test_signed_double_limb_overflowing_from_integer() {
 }
 
 #[test]
+fn test_signed_double_limb_convertible_from_integer() {
+    let test = |n, out| {
+        assert_eq!(
+            SignedDoubleLimb::convertible_from(Integer::from_str(n).unwrap()),
+            out
+        );
+        assert_eq!(
+            SignedDoubleLimb::convertible_from(&Integer::from_str(n).unwrap()),
+            out
+        );
+    };
+    test("0", true);
+    test("123", true);
+    test("-123", true);
+    test("1000000000000", true);
+    test("-1000000000000", true);
+    #[cfg(feature = "32_bit_limbs")]
+    {
+        test("1000000000000000000000", false);
+        test("-1000000000000000000000", false);
+        test("2147483647", true);
+        test("2147483648", true);
+        test("-2147483648", true);
+        test("-2147483649", true);
+        test("9223372036854775807", true);
+        test("9223372036854775808", false);
+        test("-9223372036854775808", true);
+        test("-9223372036854775809", false);
+    }
+    #[cfg(feature = "64_bit_limbs")]
+    {
+        test("1000000000000000000000", true);
+        test("-1000000000000000000000", true);
+        test("9223372036854775807", true);
+        test("9223372036854775808", true);
+        test("-9223372036854775808", true);
+        test("-9223372036854775809", true);
+        test("170141183460469231731687303715884105727", true);
+        test("170141183460469231731687303715884105728", false);
+        test("-170141183460469231731687303715884105728", true);
+        test("-170141183460469231731687303715884105729", false);
+    }
+}
+
+#[test]
 fn signed_double_limb_checked_from_integer_properties() {
     test_properties(integers, |x| {
         let result = SignedDoubleLimb::checked_from(x);
@@ -324,6 +371,20 @@ fn signed_double_limb_overflowing_from_integer_properties() {
                 SignedDoubleLimb::wrapping_from(x),
                 SignedDoubleLimb::checked_from(x).is_none()
             )
+        );
+        assert_eq!(result.1, !SignedDoubleLimb::convertible_from(x));
+    });
+}
+
+#[test]
+fn signed_double_limb_convertible_from_integer_properties() {
+    test_properties(integers, |x| {
+        let convertible = SignedDoubleLimb::convertible_from(x.clone());
+        assert_eq!(SignedDoubleLimb::convertible_from(x), convertible);
+        assert_eq!(
+            convertible,
+            *x >= Integer::from(SignedDoubleLimb::MIN)
+                && *x <= Integer::from(SignedDoubleLimb::MAX)
         );
     });
 }
