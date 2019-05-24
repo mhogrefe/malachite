@@ -1,5 +1,4 @@
-use std::str::FromStr;
-
+use common::test_properties;
 use malachite_base::num::traits::{CheckedSubMul, One, SubMul, SubMulAssign, Zero};
 use malachite_nz::natural::arithmetic::sub_mul_limb::{
     limbs_sub_mul_limb_greater, limbs_sub_mul_limb_greater_in_place_left,
@@ -8,8 +7,6 @@ use malachite_nz::natural::arithmetic::sub_mul_limb::{
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-
-use common::test_properties;
 use malachite_test::inputs::base::{
     triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_1,
     triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_7,
@@ -18,6 +15,7 @@ use malachite_test::inputs::natural::{
     naturals, pairs_of_natural_and_limb_var_1, pairs_of_naturals_var_1,
     triples_of_natural_natural_and_limb_var_1,
 };
+use std::str::FromStr;
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
@@ -405,7 +403,7 @@ fn sub_mul_limb_properties() {
             assert_eq!(result_alt, result);
 
             assert_eq!(a - b * c, result);
-            assert_eq!(a.sub_mul(b, &Natural::from(c)).unwrap(), result);
+            assert_eq!(a.sub_mul(b, &Natural::from(c)), result);
             assert_eq!(a.checked_sub_mul(b, c), Some(result))
         },
     );

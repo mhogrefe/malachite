@@ -1,5 +1,4 @@
-use std::str::FromStr;
-
+use common::test_properties;
 use malachite_base::comparison::Max;
 use malachite_base::conversion::{
     CheckedFrom, ConvertibleFrom, OverflowingFrom, SaturatingFrom, WrappingFrom,
@@ -9,12 +8,11 @@ use malachite_base::num::traits::{ModPowerOfTwo, SignificantBits};
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 #[cfg(feature = "32_bit_limbs")]
-use rug;
-
-use common::test_properties;
-#[cfg(feature = "32_bit_limbs")]
 use malachite_test::common::natural_to_rug_integer;
 use malachite_test::inputs::natural::naturals;
+#[cfg(feature = "32_bit_limbs")]
+use rug;
+use std::str::FromStr;
 
 #[test]
 fn test_limb_checked_from_natural() {

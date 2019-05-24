@@ -1,6 +1,4 @@
-use std::cmp::Ordering;
-use std::str::FromStr;
-
+use common::test_properties;
 use malachite_base::comparison::Max;
 use malachite_base::conversion::{
     CheckedFrom, ConvertibleFrom, OverflowingFrom, SaturatingFrom, WrappingFrom,
@@ -10,9 +8,9 @@ use malachite_base::num::traits::{ModPowerOfTwo, PartialOrdAbs, Sign, Significan
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::{DoubleLimb, Limb};
-
-use common::test_properties;
 use malachite_test::inputs::integer::integers;
+use std::cmp::Ordering;
+use std::str::FromStr;
 
 #[test]
 fn test_double_limb_checked_from_integer() {

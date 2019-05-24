@@ -1,14 +1,9 @@
-use std::str::FromStr;
-
+use common::test_properties;
 #[cfg(feature = "32_bit_limbs")]
 use malachite_base::conversion::CheckedFrom;
 use malachite_base::num::traits::{DivisibleByPowerOfTwo, EqModPowerOfTwo, ModPowerOfTwo, Zero};
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::{Limb, SignedLimb};
-#[cfg(feature = "32_bit_limbs")]
-use rug;
-
-use common::test_properties;
 #[cfg(feature = "32_bit_limbs")]
 use malachite_test::common::integer_to_rug_integer;
 use malachite_test::inputs::base::triples_of_signed_signed_and_small_unsigned;
@@ -22,6 +17,9 @@ use malachite_test::inputs::integer::{
     triples_of_integer_unsigned_and_small_unsigned,
 };
 use malachite_test::inputs::natural::triples_of_natural_natural_and_small_unsigned;
+#[cfg(feature = "32_bit_limbs")]
+use rug;
+use std::str::FromStr;
 
 #[test]
 fn test_eq_mod_power_of_two() {

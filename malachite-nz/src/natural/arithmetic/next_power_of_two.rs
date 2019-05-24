@@ -1,6 +1,5 @@
 use malachite_base::limbs::{limbs_set_zero, limbs_test_zero};
 use malachite_base::num::traits::{NextPowerOfTwo, NextPowerOfTwoAssign};
-
 use natural::Natural::{self, Large, Small};
 use platform::Limb;
 

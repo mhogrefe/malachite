@@ -1,9 +1,5 @@
-use std::cmp::{max, Ordering};
-use std::mem::swap;
-
 use malachite_base::limbs::limbs_test_zero;
 use malachite_base::num::traits::{AddMul, AddMulAssign, NotAssign};
-
 use natural::arithmetic::add::{limbs_add_greater, limbs_slice_add_greater_in_place_left};
 use natural::arithmetic::add_mul_limb::limbs_vec_add_mul_limb_in_place_left;
 use natural::arithmetic::mul::{limbs_mul_greater_to_out, limbs_mul_to_out};
@@ -11,6 +7,8 @@ use natural::arithmetic::sub::{limbs_slice_sub_in_place_right, limbs_sub_in_plac
 use natural::comparison::ord::limbs_cmp;
 use natural::Natural::{self, Large, Small};
 use platform::Limb;
+use std::cmp::{max, Ordering};
+use std::mem::swap;
 
 /// Given the limbs `xs`, `ys` and `zs` of three `Natural`s a, b, and c, returns the limbs of
 /// a + b * c. `xs` should be nonempty and `ys` and `zs` should have length at least 2. None of the

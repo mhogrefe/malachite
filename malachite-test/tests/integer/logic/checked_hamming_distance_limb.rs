@@ -1,18 +1,16 @@
-use std::str::FromStr;
-
+use common::test_properties;
 use malachite_base::comparison::Max;
 use malachite_base::num::integers::PrimitiveInteger;
 use malachite_base::num::traits::{CheckedHammingDistance, HammingDistance, Zero};
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::Limb;
-
-use common::test_properties;
 use malachite_test::inputs::base::unsigneds;
 use malachite_test::inputs::integer::{
     integers, pairs_of_integer_and_unsigned, triples_of_natural_integer_unsigned_and_unsigned,
 };
 use malachite_test::inputs::natural::pairs_of_natural_and_unsigned;
 use malachite_test::integer::logic::checked_hamming_distance_limb::*;
+use std::str::FromStr;
 
 #[test]
 fn test_checked_hamming_distance_limb() {

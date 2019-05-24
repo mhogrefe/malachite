@@ -1,12 +1,9 @@
-use std::cmp::{max, Ordering};
-
 use malachite_base::conversion::{CheckedFrom, WrappingFrom};
 use malachite_base::limbs::{limbs_set_zero, limbs_test_zero};
 use malachite_base::num::integers::PrimitiveInteger;
 use malachite_base::num::traits::{
     EqModPowerOfTwo, NotAssign, WrappingAddAssign, WrappingSubAssign,
 };
-
 use natural::arithmetic::add::{
     _limbs_add_same_length_with_carry_in_in_place_left, _limbs_add_to_out_aliased,
     limbs_add_same_length_to_out, limbs_add_to_out, limbs_slice_add_greater_in_place_left,
@@ -45,6 +42,7 @@ use natural::arithmetic::sub::{
 use natural::arithmetic::sub_limb::limbs_sub_limb_in_place;
 use natural::comparison::ord::limbs_cmp_same_length;
 use platform::{Limb, SignedLimb};
+use std::cmp::{max, Ordering};
 
 //TODO tune all
 pub const MUL_TOOM22_THRESHOLD: usize = 20;

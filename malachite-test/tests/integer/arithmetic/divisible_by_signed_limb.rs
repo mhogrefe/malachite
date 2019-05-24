@@ -1,12 +1,7 @@
-use std::str::FromStr;
-
+use common::test_properties;
 use malachite_base::num::traits::{DivisibleBy, One, UnsignedAbs, Zero};
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::{Limb, SignedLimb};
-use num::BigInt;
-use rug;
-
-use common::test_properties;
 use malachite_test::common::{integer_to_bigint, integer_to_rug_integer};
 use malachite_test::inputs::base::{nonzero_signeds, pairs_of_signeds};
 use malachite_test::inputs::integer::{
@@ -17,6 +12,9 @@ use malachite_test::inputs::integer::{
 use malachite_test::integer::arithmetic::divisible_by_signed_limb::{
     num_divisible_by_signed_limb, rug_divisible_by_signed_limb,
 };
+use num::BigInt;
+use rug;
+use std::str::FromStr;
 
 #[test]
 fn test_divisible_by_signed_limb() {

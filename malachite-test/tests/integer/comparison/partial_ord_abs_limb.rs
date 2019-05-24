@@ -1,17 +1,15 @@
-use std::cmp::Ordering;
-use std::str::FromStr;
-
+use common::test_properties;
 use malachite_base::num::traits::{Abs, PartialOrdAbs};
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::Limb;
-
-use common::test_properties;
 use malachite_test::inputs::base::pairs_of_unsigneds;
 use malachite_test::inputs::integer::{
     pairs_of_integer_and_unsigned, triples_of_integer_unsigned_and_integer,
     triples_of_unsigned_integer_and_unsigned,
 };
 use malachite_test::inputs::natural::pairs_of_natural_and_unsigned;
+use std::cmp::Ordering;
+use std::str::FromStr;
 
 #[test]
 fn test_partial_ord_limb_abs() {

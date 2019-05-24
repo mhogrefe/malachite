@@ -1,7 +1,6 @@
-use std::ops::{BitXor, BitXorAssign};
-
 use natural::Natural::{self, Large, Small};
 use platform::Limb;
+use std::ops::{BitXor, BitXorAssign};
 
 /// Interpreting two equal-length slices of `Limb`s as the limbs (in ascending order) of two
 /// `Natural`s, returns a `Vec` of the limbs of the bitwise xor of the `Natural`s. The length of the

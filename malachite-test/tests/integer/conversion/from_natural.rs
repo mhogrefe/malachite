@@ -1,11 +1,9 @@
-use std::str::FromStr;
-
+use common::test_properties;
 use malachite_base::conversion::CheckedFrom;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
-
-use common::test_properties;
 use malachite_test::inputs::natural::naturals;
+use std::str::FromStr;
 
 #[test]
 fn test_from_natural() {

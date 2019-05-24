@@ -1,3 +1,7 @@
+use common::{
+    m_run_benchmark, BenchmarkType, DemoBenchRegistry, NoSpecialGenerationMode, ScaleType,
+};
+use inputs::base::{small_positive_unsigneds, small_unsigneds};
 use malachite_base::conversion::CheckedFrom;
 use malachite_nz::natural::random::random_natural_up_to_bits::{
     limbs_random_up_to_bits, random_natural_up_to_bits,
@@ -7,11 +11,6 @@ use rust_wheels::iterators::adaptors::{
     generate_from_function, to_limited_string, to_limited_string_debug,
 };
 use rust_wheels::iterators::common::EXAMPLE_SEED;
-
-use common::{
-    m_run_benchmark, BenchmarkType, DemoBenchRegistry, NoSpecialGenerationMode, ScaleType,
-};
-use inputs::base::{small_positive_unsigneds, small_unsigneds};
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_ns_demo!(registry, demo_limbs_random_up_to_bits);

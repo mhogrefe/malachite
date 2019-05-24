@@ -5,7 +5,6 @@ use malachite_base::num::traits::{
     CeilingDivAssignNegMod, CeilingDivNegMod, DivAssignMod, DivAssignRem, DivMod, DivRem,
     JoinHalves, SplitInHalf, WrappingAddAssign, WrappingSubAssign, Zero,
 };
-
 use natural::arithmetic::add_limb::limbs_slice_add_limb_in_place;
 use natural::arithmetic::shl_u::{limbs_shl_to_out, limbs_slice_shl_in_place};
 use natural::Natural::{self, Large, Small};

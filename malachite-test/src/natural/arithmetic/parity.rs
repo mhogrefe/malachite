@@ -1,8 +1,7 @@
-use malachite_base::conversion::CheckedFrom;
-use malachite_base::num::traits::{Parity, SignificantBits};
-
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::natural::naturals;
+use malachite_base::conversion::CheckedFrom;
+use malachite_base::num::traits::{Parity, SignificantBits};
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_natural_even);

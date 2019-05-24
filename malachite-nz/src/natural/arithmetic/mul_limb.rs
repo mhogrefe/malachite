@@ -1,9 +1,7 @@
-use std::ops::{Mul, MulAssign};
-
 use malachite_base::num::traits::{Assign, SplitInHalf, Zero};
-
 use natural::Natural::{self, Large, Small};
 use platform::{DoubleLimb, Limb};
+use std::ops::{Mul, MulAssign};
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
 /// limbs of the product of the `Natural` and a `Limb`.

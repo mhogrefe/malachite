@@ -1,13 +1,9 @@
-use std::str::FromStr;
-
+#[cfg(feature = "32_bit_limbs")]
+use common::test_properties;
 use malachite_base::comparison::Max;
 use malachite_base::num::traits::Assign;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::{DoubleLimb, Limb};
-use num::BigUint;
-
-#[cfg(feature = "32_bit_limbs")]
-use common::test_properties;
 #[cfg(feature = "32_bit_limbs")]
 use malachite_test::common::{biguint_to_natural, natural_to_biguint};
 #[cfg(feature = "32_bit_limbs")]
@@ -16,6 +12,8 @@ use malachite_test::inputs::base::pairs_of_unsigneds;
 use malachite_test::inputs::natural::pairs_of_natural_and_unsigned;
 #[cfg(feature = "32_bit_limbs")]
 use malachite_test::natural::conversion::assign_double_limb::num_assign_double_limb;
+use num::BigUint;
+use std::str::FromStr;
 
 #[cfg(feature = "64_bit_limbs")]
 fn num_assign_double_limb(x: &mut BigUint, u: DoubleLimb) {

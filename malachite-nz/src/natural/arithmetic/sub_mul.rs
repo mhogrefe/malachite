@@ -1,27 +1,20 @@
-use std::fmt::Display;
-
 use malachite_base::num::traits::{CheckedSubMul, SubMul, SubMulAssign};
-
-use natural::arithmetic::add_mul::mpz_aorsmul;
-use natural::Natural::{self, Large, Small};
+use natural::Natural;
+use std::fmt::Display;
 
 pub(crate) fn sub_mul_panic<S: Display, T: Display, U: Display>(a: S, b: T, c: U) -> ! {
     panic!("Cannot perform sub_mul. a: {}, b: {}, c: {}", a, b, c);
 }
 
-impl<'a, 'b> SubMul<&'a Natural, &'b Natural> for Natural {
-    type Output = Option<Natural>;
+impl SubMul<Natural, Natural> for Natural {
+    type Output = Natural;
 
     /// Subtracts the product of a `Natural` (b) and a `Natural` (c) from a `Natural` (self), taking
-    /// `self` by value and b and c by reference.
+    /// `self`, b, and c by value.
     ///
-    /// Time: worst case O(m+np)
+    /// Time: TODO
     ///
-    /// Additional memory: worst case O(np)
-    ///
-    /// where m = `a.significant_bits()`,
-    ///       n = `b.significant_bits()`
-    ///       p = `c.significant_bits()`
+    /// Additional memory: TODO
     ///
     /// # Panics
     /// Panics if `b * c` is greater than `self`.
@@ -35,37 +28,31 @@ impl<'a, 'b> SubMul<&'a Natural, &'b Natural> for Natural {
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
-    ///     assert_eq!(format!("{:?}", Natural::from(20u32)
-    ///         .sub_mul(&Natural::from(3u32), &Natural::from(4u32))),
-    ///         "Some(8)");
-    ///     assert_eq!(Natural::from(10u32).sub_mul(&Natural::from(3u32), &Natural::from(4u32)),
-    ///         None);
-    ///     assert_eq!(format!("{:?}", Natural::trillion().sub_mul(&Natural::from(0x1_0000u32),
-    ///         &Natural::from(0x1_0000u32))), "Some(995705032704)");
+    ///     assert_eq!(
+    ///         Natural::from(20u32).sub_mul(Natural::from(3u32), Natural::from(4u32))
+    ///         .to_string(), "8");
+    ///     assert_eq!(Natural::trillion().sub_mul(
+    ///         Natural::from(0x1_0000u32), Natural::from(0x1_0000u32)).to_string(),
+    ///         "995705032704");
     /// }
     /// ```
-    fn sub_mul(mut self, b: &'a Natural, c: &'b Natural) -> Option<Natural> {
-        if sub_mul_assign_helper(&mut self, b, c) {
-            None
-        } else {
-            Some(self)
-        }
+    fn sub_mul(self, b: Natural, c: Natural) -> Natural {
+        self.sub_mul(&b, &c)
     }
 }
 
-impl<'a, 'b, 'c> SubMul<&'a Natural, &'b Natural> for &'c Natural {
-    type Output = Option<Natural>;
+impl<'a> SubMul<Natural, &'a Natural> for Natural {
+    type Output = Natural;
 
     /// Subtracts the product of a `Natural` (b) and a `Natural` (c) from a `Natural` (self), taking
-    /// `self`, b, and c by reference.
+    /// `self` and b by value and c by reference.
     ///
-    /// Time: worst case O(m+np)
+    /// Time: TODO
     ///
-    /// Additional memory: worst case O(np)
+    /// Additional memory: TODO
     ///
-    /// where m = `a.significant_bits()`,
-    ///       n = `b.significant_bits()`
-    ///       p = `c.significant_bits()`
+    /// # Panics
+    /// Panics if `b * c` is greater than `self`.
     ///
     /// # Examples
     /// ```
@@ -76,114 +63,261 @@ impl<'a, 'b, 'c> SubMul<&'a Natural, &'b Natural> for &'c Natural {
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
-    ///     assert_eq!(format!("{:?}", (&Natural::from(20u32))
-    ///         .sub_mul(&Natural::from(3u32), &Natural::from(4u32))),
-    ///         "Some(8)");
-    ///     assert_eq!((&Natural::from(10u32)).sub_mul(&Natural::from(3u32), &Natural::from(4u32)),
-    ///         None);
-    ///     assert_eq!(format!("{:?}", (&Natural::trillion()).sub_mul(&Natural::from(0x1_0000u32),
-    ///         &Natural::from(0x1_0000u32))), "Some(995705032704)");
+    ///     assert_eq!(
+    ///         Natural::from(20u32).sub_mul(Natural::from(3u32), &Natural::from(4u32))
+    ///         .to_string(), "8");
+    ///     assert_eq!(Natural::trillion().sub_mul(
+    ///         Natural::from(0x1_0000u32), &Natural::from(0x1_0000u32)).to_string(),
+    ///         "995705032704");
     /// }
     /// ```
-    fn sub_mul(self, b: &'a Natural, c: &'b Natural) -> Option<Natural> {
-        if let Small(small_b) = *b {
-            self.checked_sub_mul(c, small_b)
-        } else if let Small(small_c) = *c {
-            self.checked_sub_mul(b, small_c)
-        } else if self.limb_count() < b.limb_count() + c.limb_count() - 1 {
-            None
-        } else {
-            let mut self_limbs = self.to_limbs_asc();
-            if let Large(ref c_limbs) = *c {
-                let mut self_sign = false;
-                if let Large(ref b_limbs) = *b {
-                    mpz_aorsmul(
-                        &mut self_sign,
-                        &mut self_limbs,
-                        false,
-                        b_limbs,
-                        false,
-                        c_limbs,
-                        false,
-                    );
-                }
-                if self_sign {
-                    return None;
-                }
-            }
-            let mut result = Large(self_limbs);
-            result.trim();
-            Some(result)
-        }
+    fn sub_mul(self, b: Natural, c: &'a Natural) -> Natural {
+        self.sub_mul(&b, c)
     }
 }
 
-/// Subtracts the product of a `Natural` (b) and a `Natural` (c) from a `Natural` (self), in place,
-/// taking b and c by reference.
-///
-/// Time: worst case O(m+np)
-///
-/// Additional memory: worst case O(np)
-///
-/// where m = `a.significant_bits()`,
-///       n = `b.significant_bits()`
-///       p = `c.significant_bits()`
-///
-/// # Examples
-/// ```
-/// extern crate malachite_base;
-/// extern crate malachite_nz;
-///
-/// use malachite_base::num::traits::SubMulAssign;
-/// use malachite_nz::natural::Natural;
-///
-/// fn main() {
-///     let mut x = Natural::from(20u32);
-///     x.sub_mul_assign(&Natural::from(3u32), &Natural::from(4u32));
-///     assert_eq!(x, 8);
-///
-///     let mut x = Natural::trillion();
-///     x.sub_mul_assign(&Natural::from(0x1_0000u32), &Natural::from(0x1_0000u32));
-///     assert_eq!(x.to_string(), "995705032704");
-/// }
-/// ```
+impl<'a> SubMul<&'a Natural, Natural> for Natural {
+    type Output = Natural;
+
+    /// Subtracts the product of a `Natural` (b) and a `Natural` (c) from a `Natural` (self), taking
+    /// `self` and c value and b by reference.
+    ///
+    /// Time: TODO
+    ///
+    /// Additional memory: TODO
+    ///
+    /// # Panics
+    /// Panics if `b * c` is greater than `self`.
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::traits::SubMul;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// fn main() {
+    ///     assert_eq!(
+    ///         Natural::from(20u32).sub_mul(&Natural::from(3u32), Natural::from(4u32))
+    ///         .to_string(), "8");
+    ///     assert_eq!(Natural::trillion().sub_mul(
+    ///         &Natural::from(0x1_0000u32), Natural::from(0x1_0000u32)).to_string(),
+    ///         "995705032704");
+    /// }
+    /// ```
+    fn sub_mul(self, b: &'a Natural, c: Natural) -> Natural {
+        self.sub_mul(b, &c)
+    }
+}
+
+impl<'a, 'b> SubMul<&'a Natural, &'b Natural> for Natural {
+    type Output = Natural;
+
+    /// Subtracts the product of a `Natural` (b) and a `Natural` (c) from a `Natural` (self), taking
+    /// `self` by value and b and c by reference.
+    ///
+    /// Time: TODO
+    ///
+    /// Additional memory: TODO
+    ///
+    /// # Panics
+    /// Panics if `b * c` is greater than `self`.
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::traits::SubMul;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// fn main() {
+    ///     assert_eq!(
+    ///         Natural::from(20u32).sub_mul(&Natural::from(3u32), &Natural::from(4u32))
+    ///         .to_string(), "8");
+    ///     assert_eq!(Natural::trillion().sub_mul(
+    ///         &Natural::from(0x1_0000u32), &Natural::from(0x1_0000u32)).to_string(),
+    ///         "995705032704");
+    /// }
+    /// ```
+    fn sub_mul(self, b: &'a Natural, c: &'b Natural) -> Natural {
+        self.checked_sub_mul(b, c)
+            .expect("Natural sub_mul_assign cannot have a negative result")
+    }
+}
+
+impl<'a, 'b, 'c> SubMul<&'a Natural, &'b Natural> for &'c Natural {
+    type Output = Natural;
+
+    /// Subtracts the product of a `Natural` (b) and a `Natural` (c) from a `Natural` (self), taking
+    /// `self`, b, and c by reference.
+    ///
+    /// Time: TODO
+    ///
+    /// Additional memory: TODO
+    ///
+    /// # Panics
+    /// Panics if `b * c` is greater than `self`.
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::traits::SubMul;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// fn main() {
+    ///     assert_eq!(
+    ///         (&Natural::from(20u32)).sub_mul(&Natural::from(3u32), &Natural::from(4u32))
+    ///         .to_string(), "8");
+    ///     assert_eq!((&Natural::trillion()).sub_mul(
+    ///         &Natural::from(0x1_0000u32), &Natural::from(0x1_0000u32)).to_string(),
+    ///         "995705032704");
+    /// }
+    /// ```
+    fn sub_mul(self, b: &'a Natural, c: &'b Natural) -> Natural {
+        self.checked_sub_mul(b, c).unwrap_or_else(|| {
+            sub_mul_panic(self, b, c);
+        })
+    }
+}
+
+impl SubMulAssign<Natural, Natural> for Natural {
+    /// Subtracts the product of a `Natural` (b) and a `Natural` (c) from a `Natural` (self), in
+    /// place, taking b and c by value.
+    ///
+    /// Time: TODO
+    ///
+    /// Additional memory: TODO
+    ///
+    /// # Panics
+    /// Panics if `b * c` is greater than `self`.
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::traits::SubMulAssign;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// fn main() {
+    ///     let mut x = Natural::from(20u32);
+    ///     x.sub_mul_assign(Natural::from(3u32), Natural::from(4u32));
+    ///     assert_eq!(x, 8);
+    ///
+    ///     let mut x = Natural::trillion();
+    ///     x.sub_mul_assign(Natural::from(0x1_0000u32), Natural::from(0x1_0000u32));
+    ///     assert_eq!(x.to_string(), "995705032704");
+    /// }
+    /// ```
+    fn sub_mul_assign(&mut self, b: Natural, c: Natural) {
+        self.sub_mul_assign(&b, &c);
+    }
+}
+
+impl<'a> SubMulAssign<Natural, &'a Natural> for Natural {
+    /// Subtracts the product of a `Natural` (b) and a `Natural` (c) from a `Natural` (self), in
+    /// place, taking b by value and c by reference.
+    ///
+    /// Time: TODO
+    ///
+    /// Additional memory: TODO
+    ///
+    /// # Panics
+    /// Panics if `b * c` is greater than `self`.
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::traits::SubMulAssign;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// fn main() {
+    ///     let mut x = Natural::from(20u32);
+    ///     x.sub_mul_assign(Natural::from(3u32), &Natural::from(4u32));
+    ///     assert_eq!(x, 8);
+    ///
+    ///     let mut x = Natural::trillion();
+    ///     x.sub_mul_assign(Natural::from(0x1_0000u32), &Natural::from(0x1_0000u32));
+    ///     assert_eq!(x.to_string(), "995705032704");
+    /// }
+    /// ```
+    fn sub_mul_assign(&mut self, b: Natural, c: &'a Natural) {
+        self.sub_mul_assign(&b, c);
+    }
+}
+
+impl<'a> SubMulAssign<&'a Natural, Natural> for Natural {
+    /// Subtracts the product of a `Natural` (b) and a `Natural` (c) from a `Natural` (self), in
+    /// place, taking b by reference and c by value.
+    ///
+    /// Time: TODO
+    ///
+    /// Additional memory: TODO
+    ///
+    /// # Panics
+    /// Panics if `b * c` is greater than `self`.
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::traits::SubMulAssign;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// fn main() {
+    ///     let mut x = Natural::from(20u32);
+    ///     x.sub_mul_assign(&Natural::from(3u32), Natural::from(4u32));
+    ///     assert_eq!(x, 8);
+    ///
+    ///     let mut x = Natural::trillion();
+    ///     x.sub_mul_assign(&Natural::from(0x1_0000u32), Natural::from(0x1_0000u32));
+    ///     assert_eq!(x.to_string(), "995705032704");
+    /// }
+    /// ```
+    fn sub_mul_assign(&mut self, b: &'a Natural, c: Natural) {
+        self.sub_mul_assign(b, &c);
+    }
+}
+
 impl<'a, 'b> SubMulAssign<&'a Natural, &'b Natural> for Natural {
+    /// Subtracts the product of a `Natural` (b) and a `Natural` (c) from a `Natural` (self), in
+    /// place, taking b and c by reference.
+    ///
+    /// Time: TODO
+    ///
+    /// Additional memory: TODO
+    ///
+    /// # Panics
+    /// Panics if `b * c` is greater than `self`.
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::traits::SubMulAssign;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// fn main() {
+    ///     let mut x = Natural::from(20u32);
+    ///     x.sub_mul_assign(&Natural::from(3u32), &Natural::from(4u32));
+    ///     assert_eq!(x, 8);
+    ///
+    ///     let mut x = Natural::trillion();
+    ///     x.sub_mul_assign(&Natural::from(0x1_0000u32), &Natural::from(0x1_0000u32));
+    ///     assert_eq!(x.to_string(), "995705032704");
+    /// }
+    /// ```
     fn sub_mul_assign(&mut self, b: &'a Natural, c: &'b Natural) {
-        if sub_mul_assign_helper(self, b, c) {
+        if self.sub_mul_assign_no_panic(b, c) {
             panic!("Natural sub_mul_assign cannot have a negative result");
         }
-    }
-}
-
-fn sub_mul_assign_helper(a: &mut Natural, b: &Natural, c: &Natural) -> bool {
-    if let Small(small_b) = *b {
-        a.sub_mul_assign_limb_ref_no_panic(c, small_b)
-    } else if let Small(small_c) = *c {
-        a.sub_mul_assign_limb_ref_no_panic(b, small_c)
-    } else if a.limb_count() < b.limb_count() + c.limb_count() - 1 {
-        true
-    } else {
-        {
-            let a_limbs = a.promote_in_place();
-            if let Large(ref c_limbs) = *c {
-                let mut self_sign = false;
-                if let Large(ref b_limbs) = *b {
-                    mpz_aorsmul(
-                        &mut self_sign,
-                        a_limbs,
-                        false,
-                        b_limbs,
-                        false,
-                        c_limbs,
-                        false,
-                    );
-                }
-                if self_sign {
-                    return true;
-                }
-            }
-        }
-        a.trim();
-        false
     }
 }

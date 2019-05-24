@@ -1,13 +1,12 @@
-use malachite_base::conversion::CheckedFrom;
-use malachite_base::num::traits::{DivExact, DivExactAssign, SignificantBits};
-use malachite_nz::platform::Limb;
-use rug;
-
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::integer::{
     nrm_pairs_of_integer_and_positive_limb_var_1, pairs_of_integer_and_positive_limb_var_1,
     pairs_of_limb_and_nonzero_integer_var_2,
 };
+use malachite_base::conversion::CheckedFrom;
+use malachite_base::num::traits::{DivExact, DivExactAssign, SignificantBits};
+use malachite_nz::platform::Limb;
+use rug;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_integer_div_exact_assign_limb);

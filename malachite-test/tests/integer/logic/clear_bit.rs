@@ -1,5 +1,4 @@
-use std::str::FromStr;
-
+use common::test_properties;
 use malachite_base::num::traits::{BitAccess, NotAssign, One};
 use malachite_nz::integer::logic::bit_access::{
     limbs_slice_clear_bit_neg, limbs_vec_clear_bit_neg,
@@ -8,12 +7,11 @@ use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 #[cfg(feature = "32_bit_limbs")]
 use malachite_nz::platform::Limb;
-
-use common::test_properties;
 use malachite_test::inputs::base::{
     pairs_of_limb_vec_and_small_u64_var_3, pairs_of_unsigned_vec_and_small_unsigned_var_1,
 };
 use malachite_test::inputs::integer::pairs_of_integer_and_small_u64;
+use std::str::FromStr;
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]

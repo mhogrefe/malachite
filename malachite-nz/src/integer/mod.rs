@@ -80,7 +80,7 @@ impl NegativeOne for Integer {
     };
 }
 
-/// Implement `Named` for `Integer`.
+// Implement `Named` for `Integer`.
 impl_named!(Integer);
 
 impl Crementable for Integer {

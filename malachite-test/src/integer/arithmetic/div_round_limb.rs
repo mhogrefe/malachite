@@ -1,11 +1,3 @@
-use malachite_base::conversion::CheckedFrom;
-use malachite_base::num::traits::{CeilingDivMod, DivRound, DivRoundAssign, SignificantBits};
-use malachite_base::round::RoundingMode;
-use malachite_nz::platform::Limb;
-use num::{BigInt, Integer};
-#[cfg(feature = "32_bit_limbs")]
-use rug::ops::DivRounding;
-
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 #[cfg(feature = "64_bit_limbs")]
 use inputs::integer::nm_pairs_of_integer_and_positive_unsigned;
@@ -18,6 +10,13 @@ use inputs::integer::{
     triples_of_integer_positive_unsigned_and_rounding_mode_var_1,
     triples_of_unsigned_nonzero_integer_and_rounding_mode_var_1,
 };
+use malachite_base::conversion::CheckedFrom;
+use malachite_base::num::traits::{CeilingDivMod, DivRound, DivRoundAssign, SignificantBits};
+use malachite_base::round::RoundingMode;
+use malachite_nz::platform::Limb;
+use num::{BigInt, Integer};
+#[cfg(feature = "32_bit_limbs")]
+use rug::ops::DivRounding;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_integer_div_round_assign_limb);

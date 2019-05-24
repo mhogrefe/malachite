@@ -1,5 +1,4 @@
-use std::str::FromStr;
-
+use common::test_properties;
 use malachite_base::comparison::Max;
 use malachite_base::num::integers::PrimitiveInteger;
 use malachite_base::num::traits::{DivisibleByPowerOfTwo, EqModPowerOfTwo, ModPowerOfTwo, Zero};
@@ -7,9 +6,6 @@ use malachite_nz::integer::arithmetic::eq_limb_mod_power_of_two::limbs_eq_mod_po
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-use rug;
-
-use common::test_properties;
 use malachite_test::common::integer_to_rug_integer;
 use malachite_test::inputs::base::{
     pairs_of_unsigned_and_small_unsigned, triples_of_unsigned_unsigned_and_small_unsigned,
@@ -23,6 +19,8 @@ use malachite_test::inputs::integer::{
 };
 use malachite_test::inputs::natural::triples_of_natural_unsigned_and_small_unsigned;
 use malachite_test::natural::arithmetic::eq_limb_mod_power_of_two::rug_eq_limb_mod_power_of_two;
+use rug;
+use std::str::FromStr;
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]

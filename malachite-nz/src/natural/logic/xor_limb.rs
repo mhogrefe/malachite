@@ -1,7 +1,6 @@
-use std::ops::{BitXor, BitXorAssign};
-
 use natural::Natural::{self, Large, Small};
 use platform::Limb;
+use std::ops::{BitXor, BitXorAssign};
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
 /// limbs of the bitwise xor of the `Natural` and a `Limb`. `limbs` cannot be empty.

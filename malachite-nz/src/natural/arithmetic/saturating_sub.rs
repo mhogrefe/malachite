@@ -1,5 +1,4 @@
 use malachite_base::num::traits::{CheckedSub, SaturatingSub, SaturatingSubAssign, Zero};
-
 use natural::Natural;
 
 /// Subtracts a `Natural` from a `Natural`, taking both `Natural`s by value. If the second `Natural`

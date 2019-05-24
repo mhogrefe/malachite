@@ -1,3 +1,10 @@
+use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
+use inputs::base::pairs_of_unsigned_vec_and_positive_unsigned_var_1;
+#[cfg(feature = "64_bit_limbs")]
+use inputs::natural::nm_pairs_of_natural_and_unsigned;
+#[cfg(feature = "32_bit_limbs")]
+use inputs::natural::nrm_pairs_of_natural_and_unsigned;
+use inputs::natural::{pairs_of_natural_and_unsigned, pairs_of_unsigned_and_natural};
 use malachite_base::conversion::CheckedFrom;
 use malachite_base::num::traits::{DivisibleBy, SignificantBits};
 use malachite_nz::natural::arithmetic::divisible_by_limb::{
@@ -6,14 +13,6 @@ use malachite_nz::natural::arithmetic::divisible_by_limb::{
 use malachite_nz::natural::arithmetic::mod_limb::limbs_mod_limb;
 use malachite_nz::platform::Limb;
 use num::{BigUint, Integer, Zero};
-
-use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::base::pairs_of_unsigned_vec_and_positive_unsigned_var_1;
-#[cfg(feature = "64_bit_limbs")]
-use inputs::natural::nm_pairs_of_natural_and_unsigned;
-#[cfg(feature = "32_bit_limbs")]
-use inputs::natural::nrm_pairs_of_natural_and_unsigned;
-use inputs::natural::{pairs_of_natural_and_unsigned, pairs_of_unsigned_and_natural};
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limbs_divisible_by_limb);

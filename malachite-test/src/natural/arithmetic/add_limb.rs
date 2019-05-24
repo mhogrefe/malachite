@@ -1,12 +1,3 @@
-use malachite_base::conversion::CheckedFrom;
-use malachite_base::num::traits::SignificantBits;
-use malachite_nz::natural::arithmetic::add_limb::{
-    limbs_add_limb, limbs_add_limb_to_out, limbs_slice_add_limb_in_place,
-    limbs_vec_add_limb_in_place,
-};
-use malachite_nz::platform::Limb;
-use num::BigUint;
-
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::{
     pairs_of_nonempty_unsigned_vec_and_unsigned, pairs_of_unsigned_vec_and_unsigned,
@@ -20,6 +11,14 @@ use inputs::natural::{
     rm_pairs_of_unsigned_and_natural,
 };
 use inputs::natural::{pairs_of_natural_and_unsigned, pairs_of_unsigned_and_natural};
+use malachite_base::conversion::CheckedFrom;
+use malachite_base::num::traits::SignificantBits;
+use malachite_nz::natural::arithmetic::add_limb::{
+    limbs_add_limb, limbs_add_limb_to_out, limbs_slice_add_limb_in_place,
+    limbs_vec_add_limb_in_place,
+};
+use malachite_nz::platform::Limb;
+use num::BigUint;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limbs_add_limb);

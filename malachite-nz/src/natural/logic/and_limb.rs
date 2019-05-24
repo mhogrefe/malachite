@@ -1,9 +1,7 @@
-use std::ops::{BitAnd, BitAndAssign};
-
 use malachite_base::conversion::WrappingFrom;
-
 use natural::Natural::{self, Small};
 use platform::Limb;
+use std::ops::{BitAnd, BitAndAssign};
 
 /// Interpreting a slice of `u32`s as the limbs (in ascending order) of a `Natural`, returns the
 /// bitwise and of the `Natural` and a `u32`. The slice cannot be empty.

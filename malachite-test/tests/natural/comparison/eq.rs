@@ -1,12 +1,11 @@
+use common::{test_eq_helper, test_properties};
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-use num::BigUint;
-use rug;
-
-use common::{test_eq_helper, test_properties};
 use malachite_test::common::{natural_to_biguint, natural_to_rug_integer};
 use malachite_test::inputs::base::pairs_of_unsigneds;
 use malachite_test::inputs::natural::{naturals, pairs_of_naturals, triples_of_naturals};
+use num::BigUint;
+use rug;
 
 #[test]
 fn test_eq() {

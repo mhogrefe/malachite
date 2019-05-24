@@ -1,6 +1,4 @@
-use std::cmp::Ordering;
-use std::str::FromStr;
-
+use common::test_properties;
 use malachite_base::comparison::Max;
 use malachite_base::conversion::{
     CheckedFrom, ConvertibleFrom, OverflowingFrom, SaturatingFrom, WrappingFrom,
@@ -10,12 +8,12 @@ use malachite_base::num::traits::{ModPowerOfTwo, PartialOrdAbs, Sign, Significan
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::Limb;
 #[cfg(feature = "32_bit_limbs")]
-use rug;
-
-use common::test_properties;
-#[cfg(feature = "32_bit_limbs")]
 use malachite_test::common::integer_to_rug_integer;
 use malachite_test::inputs::integer::integers;
+#[cfg(feature = "32_bit_limbs")]
+use rug;
+use std::cmp::Ordering;
+use std::str::FromStr;
 
 #[test]
 fn test_limb_checked_from_integer() {

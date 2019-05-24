@@ -1,7 +1,6 @@
 use malachite_base::num::traits::{
     CheckedSubMul, SplitInHalf, SubMul, SubMulAssign, WrappingAddAssign,
 };
-
 use natural::arithmetic::sub_limb::limbs_sub_limb_in_place;
 use natural::arithmetic::sub_mul::sub_mul_panic;
 use natural::Natural;
@@ -291,7 +290,8 @@ impl SubMul<Natural, Limb> for Natural {
     /// }
     /// ```
     fn sub_mul(self, b: Natural, c: Limb) -> Natural {
-        self.checked_sub_mul(b, c).expect("Cannot perform sub_mul")
+        self.checked_sub_mul(b, c)
+            .expect("Natural sub_mul_assign cannot have a negative result")
     }
 }
 
@@ -335,7 +335,8 @@ impl<'a> SubMul<&'a Natural, Limb> for Natural {
     /// }
     /// ```
     fn sub_mul(self, b: &'a Natural, c: Limb) -> Natural {
-        self.checked_sub_mul(b, c).expect("Cannot perform sub_mul")
+        self.checked_sub_mul(b, c)
+            .expect("Natural sub_mul_assign cannot have a negative result")
     }
 }
 
@@ -379,7 +380,8 @@ impl<'a> SubMul<Natural, Limb> for &'a Natural {
     /// }
     /// ```
     fn sub_mul(self, b: Natural, c: Limb) -> Natural {
-        self.checked_sub_mul(b, c).expect("Cannot perform sub_mul")
+        self.checked_sub_mul(b, c)
+            .expect("Natural sub_mul_assign cannot have a negative result")
     }
 }
 

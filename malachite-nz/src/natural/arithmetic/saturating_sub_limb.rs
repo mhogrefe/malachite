@@ -1,7 +1,6 @@
 #[cfg(feature = "64_bit_limbs")]
 use malachite_base::conversion::WrappingFrom;
 use malachite_base::num::traits::{CheckedSub, SaturatingSub, SaturatingSubAssign, Zero};
-
 use natural::Natural;
 use platform::Limb;
 

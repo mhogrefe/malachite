@@ -1,15 +1,13 @@
-use std::str::FromStr;
-
-use malachite_base::num::traits::{CheckedSub, CheckedSubMul, SubMul};
+use common::test_properties;
+use malachite_base::num::traits::{CheckedSub, CheckedSubMul};
 use malachite_base::num::traits::{One, Zero};
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-
-use common::test_properties;
 use malachite_test::inputs::natural::{
     naturals, pairs_of_natural_and_unsigned, pairs_of_naturals,
     triples_of_natural_natural_and_unsigned,
 };
+use std::str::FromStr;
 
 #[test]
 fn test_checked_sub_mul_limb() {
@@ -89,8 +87,7 @@ fn checked_sub_mul_limb_properties() {
             assert_eq!(result_alt, result);
 
             assert_eq!(a.checked_sub(b * c), result);
-            //TODO remove ref
-            assert_eq!(a.sub_mul(b, &Natural::from(c)), result);
+            assert_eq!(a.checked_sub_mul(b, &Natural::from(c)), result);
         },
     );
 

@@ -1,10 +1,9 @@
-use malachite_base::conversion::CheckedFrom;
-use malachite_base::num::traits::{DivisibleByPowerOfTwo, SignificantBits};
-
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::integer::{
     pairs_of_integer_and_small_unsigned, rm_pairs_of_integer_and_small_unsigned,
 };
+use malachite_base::conversion::CheckedFrom;
+use malachite_base::num::traits::{DivisibleByPowerOfTwo, SignificantBits};
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_integer_divisible_by_power_of_two);

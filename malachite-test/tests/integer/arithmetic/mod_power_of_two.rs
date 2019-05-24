@@ -1,6 +1,4 @@
-use std::cmp::min;
-use std::str::FromStr;
-
+use common::test_properties;
 use malachite_base::num::traits::{
     Abs, CeilingModPowerOfTwo, CeilingModPowerOfTwoAssign, DivisibleByPowerOfTwo, ModPowerOfTwo,
     ModPowerOfTwoAssign, One, PartialOrdAbs, RemPowerOfTwo, RemPowerOfTwoAssign, ShrRound, Sign,
@@ -10,8 +8,6 @@ use malachite_base::round::RoundingMode;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::{Limb, SignedLimb};
-
-use common::test_properties;
 use malachite_test::inputs::base::{pairs_of_signed_and_small_unsigned, unsigneds};
 use malachite_test::inputs::integer::{
     integers, pairs_of_integer_and_small_unsigned, pairs_of_integer_and_small_unsigned_var_1,
@@ -19,6 +15,8 @@ use malachite_test::inputs::integer::{
     triples_of_integer_small_unsigned_and_small_unsigned,
 };
 use malachite_test::inputs::natural::pairs_of_natural_and_small_unsigned;
+use std::cmp::min;
+use std::str::FromStr;
 
 #[test]
 fn test_mod_power_of_two() {

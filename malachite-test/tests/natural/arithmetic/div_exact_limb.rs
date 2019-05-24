@@ -1,5 +1,4 @@
-use std::str::FromStr;
-
+use common::test_properties;
 use malachite_base::num::traits::{DivExact, DivExactAssign, DivRound, One, Zero};
 use malachite_base::round::RoundingMode;
 use malachite_nz::natural::arithmetic::div_exact_limb::{
@@ -9,9 +8,6 @@ use malachite_nz::natural::arithmetic::div_exact_limb::{
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-use rug;
-
-use common::test_properties;
 use malachite_test::common::{natural_to_rug_integer, rug_integer_to_natural};
 use malachite_test::inputs::base::{
     odd_limbs, pairs_of_limb_and_positive_limb_var_1, pairs_of_limb_vec_and_positive_limb_var_2,
@@ -23,6 +19,8 @@ use malachite_test::inputs::natural::{
     pairs_of_natural_and_positive_limb_var_1, pairs_of_natural_var_1_and_3, positive_naturals,
 };
 use malachite_test::natural::arithmetic::div_exact_limb::rug_div_exact_limb;
+use rug;
+use std::str::FromStr;
 
 #[test]
 fn test_invert_limb_table() {

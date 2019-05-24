@@ -1,6 +1,4 @@
-use std::cmp::max;
-use std::str::FromStr;
-
+use common::test_properties;
 use malachite_base::conversion::CheckedFrom;
 use malachite_base::num::traits::{NegativeOne, Zero};
 use malachite_nz::integer::logic::xor::{
@@ -10,9 +8,6 @@ use malachite_nz::integer::logic::xor::{
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::{Limb, SignedLimb};
-use rug;
-
-use common::test_properties;
 use malachite_test::common::{integer_to_rug_integer, rug_integer_to_integer};
 use malachite_test::inputs::base::{
     pairs_of_limb_vec_var_1, pairs_of_signeds, triples_of_limb_vec_var_7,
@@ -22,6 +17,9 @@ use malachite_test::inputs::integer::{
 };
 use malachite_test::inputs::natural::pairs_of_naturals;
 use malachite_test::integer::logic::xor::{integer_xor_alt_1, integer_xor_alt_2};
+use rug;
+use std::cmp::max;
+use std::str::FromStr;
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]

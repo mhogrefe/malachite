@@ -1,8 +1,3 @@
-use malachite_base::conversion::CheckedFrom;
-use malachite_base::num::traits::SignificantBits;
-use malachite_nz::platform::SignedLimb;
-use num::BigInt;
-
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 #[cfg(feature = "64_bit_limbs")]
 use inputs::integer::nm_pairs_of_integer_and_signed;
@@ -11,6 +6,10 @@ use inputs::integer::{
     nrm_pairs_of_integer_and_signed, rm_pairs_of_integer_and_signed, rm_pairs_of_signed_and_integer,
 };
 use inputs::integer::{pairs_of_integer_and_signed, pairs_of_signed_and_integer};
+use malachite_base::conversion::CheckedFrom;
+use malachite_base::num::traits::SignificantBits;
+use malachite_nz::platform::SignedLimb;
+use num::BigInt;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_integer_sub_assign_signed_limb);

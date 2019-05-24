@@ -1,12 +1,10 @@
-use std::ops::Index;
-
 use malachite_base::conversion::CheckedFrom;
 use malachite_base::num::integers::PrimitiveInteger;
 use malachite_base::num::traits::{BitAccess, SignificantBits};
-
 use natural::conversion::to_limbs::LimbIterator;
 use natural::Natural;
 use platform::Limb;
+use std::ops::Index;
 
 /// A double-ended iterator over the bits of a `Natural`. The forward order is ascending (least-
 /// significant first). The iterator does not iterate over the implicit leading false bits.

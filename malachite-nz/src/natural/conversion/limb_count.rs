@@ -1,5 +1,4 @@
 use malachite_base::conversion::WrappingFrom;
-
 use natural::Natural::{self, Large, Small};
 
 impl Natural {

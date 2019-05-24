@@ -1,11 +1,10 @@
+use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
+use inputs::base::vecs_of_unsigned;
+use inputs::natural::naturals;
 use malachite_base::conversion::{CheckedFrom, WrappingFrom};
 use malachite_base::num::traits::SignificantBits;
 use malachite_nz::natural::logic::count_ones::limbs_count_ones;
 use malachite_nz::natural::Natural;
-
-use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::base::vecs_of_unsigned;
-use inputs::natural::naturals;
 
 pub fn natural_count_ones_alt_1(n: &Natural) -> u64 {
     u64::wrapping_from(n.bits().filter(|&b| b).count())

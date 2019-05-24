@@ -1,16 +1,14 @@
-use std::cmp::max;
-
 use malachite_base::conversion::CheckedFrom;
 use malachite_base::num::traits::{ModPowerOfTwo, SaturatingSubAssign, ShrRound, Zero};
 use malachite_base::num::unsigneds::PrimitiveUnsigned;
 use malachite_base::round::RoundingMode;
-use rand::distributions::{IndependentSample, Range};
-use rand::Rng;
-
 use natural::arithmetic::add_limb::limbs_slice_add_limb_in_place;
 #[cfg(feature = "64_bit_limbs")]
 use natural::random::random_natural_up_to_bits::_transform_32_to_64_bit_limbs;
 use natural::Natural;
+use rand::distributions::{IndependentSample, Range};
+use rand::Rng;
+use std::cmp::max;
 
 /// Returns a slice of `T`s representing a random `Natural` with up to `bits` bits; equivalently,
 /// returns the limbs of a random `Natural` sampled from [0, 2<sup>`bits`</sup>). The `Natural` will

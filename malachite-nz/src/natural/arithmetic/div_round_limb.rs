@@ -3,7 +3,6 @@ use malachite_base::conversion::WrappingFrom;
 use malachite_base::num::integers::PrimitiveInteger;
 use malachite_base::num::traits::{DivAssignMod, DivMod, DivRound, DivRoundAssign, Parity};
 use malachite_base::round::RoundingMode;
-
 use natural::Natural::{self, Large, Small};
 use platform::Limb;
 

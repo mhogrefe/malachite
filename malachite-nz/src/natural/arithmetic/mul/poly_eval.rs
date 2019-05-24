@@ -1,9 +1,6 @@
-use std::cmp::Ordering;
-
 use malachite_base::conversion::{CheckedFrom, WrappingFrom};
 use malachite_base::num::integers::PrimitiveInteger;
 use malachite_base::num::traits::{NotAssign, Parity, WrappingAddAssign};
-
 use natural::arithmetic::add::{
     _limbs_add_to_out_aliased, limbs_add_same_length_to_out, limbs_add_to_out,
     limbs_slice_add_greater_in_place_left, limbs_slice_add_same_length_in_place_left,
@@ -13,6 +10,7 @@ use natural::arithmetic::shl_u::{limbs_shl_to_out, limbs_slice_shl_in_place};
 use natural::arithmetic::sub::limbs_sub_same_length_to_out;
 use natural::comparison::ord::limbs_cmp_same_length;
 use platform::Limb;
+use std::cmp::Ordering;
 
 /// Evaluate a degree-3 polynomial in +1 and -1, where each coefficient has width `n` limbs, except
 /// the last, which has width `n_high` limbs.

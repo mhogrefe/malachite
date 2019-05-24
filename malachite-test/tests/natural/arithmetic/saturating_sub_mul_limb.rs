@@ -1,16 +1,14 @@
-use std::str::FromStr;
-
+use common::test_properties;
 use malachite_base::num::traits::{
     One, SaturatingSub, SaturatingSubMul, SaturatingSubMulAssign, Zero,
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-
-use common::test_properties;
 use malachite_test::inputs::natural::{
     naturals, pairs_of_natural_and_unsigned, pairs_of_naturals,
     triples_of_natural_natural_and_unsigned,
 };
+use std::str::FromStr;
 
 #[test]
 fn test_sub_mul_limb() {
@@ -106,7 +104,7 @@ fn saturating_sub_mul_limb_properties() {
             assert_eq!(result_alt, result);
 
             assert_eq!(a.saturating_sub(b * c), result);
-            //TODO assert_eq!(a.saturating_sub_mul(b, &Natural::from(c)).unwrap(), result);
+            assert_eq!(a.saturating_sub_mul(b, &Natural::from(c)), result);
             assert!(result <= *a);
         },
     );

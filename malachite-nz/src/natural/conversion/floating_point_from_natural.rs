@@ -1,5 +1,3 @@
-use std::cmp::Ordering;
-
 use malachite_base::conversion::{CheckedFrom, RoundingFrom, WrappingFrom};
 use malachite_base::named::Named;
 use malachite_base::num::floats::PrimitiveFloat;
@@ -7,12 +5,12 @@ use malachite_base::num::traits::{
     BitAccess, DivisibleByPowerOfTwo, FloorLogTwo, ShrRound, ShrRoundAssign,
 };
 use malachite_base::round::RoundingMode;
-
 use natural::arithmetic::divisible_by_power_of_two::limbs_divisible_by_power_of_two;
 use natural::logic::bit_scan::limbs_index_of_next_false_bit;
 use natural::logic::significant_bits::limbs_significant_bits;
 use natural::Natural::{self, Large, Small};
 use platform::Limb;
+use std::cmp::Ordering;
 
 macro_rules! float_impls {
     ($f: ident, $leq_max_finite_float: ident) => {

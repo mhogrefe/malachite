@@ -2,7 +2,6 @@ use malachite_base::conversion::{CheckedFrom, RoundingFrom, WrappingFrom};
 use malachite_base::num::floats::PrimitiveFloat;
 use malachite_base::num::traits::{BitAccess, DivisibleByPowerOfTwo, ShlRound, Zero};
 use malachite_base::round::RoundingMode;
-
 use natural::Natural;
 use platform::Limb;
 

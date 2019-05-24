@@ -1,14 +1,12 @@
-use std::str::FromStr;
-
+use common::test_properties;
 use malachite_base::num::traits::{AddMul, AddMulAssign, NegativeOne, One, Zero};
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::Limb;
-
-use common::test_properties;
 use malachite_test::inputs::integer::{
     integers, pairs_of_integer_and_unsigned, pairs_of_integers,
     triples_of_integer_integer_and_unsigned,
 };
+use std::str::FromStr;
 
 #[test]
 fn test_add_mul_limb() {

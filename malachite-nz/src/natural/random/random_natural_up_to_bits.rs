@@ -4,9 +4,8 @@ use malachite_base::num::traits::JoinHalves;
 use malachite_base::num::traits::{ModPowerOfTwo, ShrRound, Zero};
 use malachite_base::num::unsigneds::PrimitiveUnsigned;
 use malachite_base::round::RoundingMode;
-use rand::{Rand, Rng};
-
 use natural::Natural;
+use rand::{Rand, Rng};
 
 /// Returns a slice of `Limb`s representing a random `Natural` with up to `bits` bits; equivalently,
 /// returns the limbs of a random `Natural` uniformly sampled from [0, 2<sup>`bits`</sup>). There

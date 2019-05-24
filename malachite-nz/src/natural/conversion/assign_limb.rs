@@ -1,5 +1,4 @@
 use malachite_base::num::traits::Assign;
-
 use natural::Natural::{self, Small};
 use platform::Limb;
 

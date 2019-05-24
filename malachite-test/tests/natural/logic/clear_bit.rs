@@ -1,21 +1,19 @@
-#[cfg(feature = "32_bit_limbs")]
-use std::str::FromStr;
-
+use common::test_properties;
 use malachite_base::conversion::CheckedFrom;
 use malachite_base::num::traits::{BitAccess, One};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::logic::bit_access::limbs_clear_bit;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-#[cfg(feature = "32_bit_limbs")]
-use rug;
-
-use common::test_properties;
 use malachite_test::common::{natural_to_rug_integer, rug_integer_to_natural};
 use malachite_test::inputs::base::{
     pairs_of_unsigned_and_small_unsigned, pairs_of_unsigned_vec_and_small_unsigned,
 };
 use malachite_test::inputs::natural::pairs_of_natural_and_small_unsigned;
+#[cfg(feature = "32_bit_limbs")]
+use rug;
+#[cfg(feature = "32_bit_limbs")]
+use std::str::FromStr;
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]

@@ -1,14 +1,12 @@
-use std::str::FromStr;
-
+use common::test_properties;
 use malachite_base::comparison::Max;
 use malachite_base::conversion::CheckedFrom;
 use malachite_base::num::traits::{SaturatingSub, SaturatingSubAssign, Zero};
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-
-use common::test_properties;
 use malachite_test::inputs::base::{pairs_of_unsigneds, unsigneds};
 use malachite_test::inputs::natural::{naturals, pairs_of_natural_and_unsigned};
+use std::str::FromStr;
 
 #[test]
 fn test_saturating_sub_limb() {

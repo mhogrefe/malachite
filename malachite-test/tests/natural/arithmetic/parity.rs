@@ -1,12 +1,10 @@
-use std::str::FromStr;
-
+use common::test_properties;
 use malachite_base::num::traits::{DivisibleBy, Parity};
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-
-use common::test_properties;
 use malachite_test::inputs::base::unsigneds;
 use malachite_test::inputs::natural::naturals;
+use std::str::FromStr;
 
 #[test]
 fn test_even() {

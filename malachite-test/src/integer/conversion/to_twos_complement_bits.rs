@@ -1,11 +1,10 @@
+use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
+use inputs::base::{vecs_of_bool, vecs_of_bool_var_1};
+use inputs::integer::{integers, pairs_of_integer_and_small_u64};
 use malachite_base::conversion::CheckedFrom;
 use malachite_base::num::traits::SignificantBits;
 use malachite_nz::integer::conversion::to_twos_complement_bits::*;
 use malachite_nz::platform::Limb;
-
-use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::base::{vecs_of_bool, vecs_of_bool_var_1};
-use inputs::integer::{integers, pairs_of_integer_and_small_u64};
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_bits_to_twos_complement_bits_non_negative);

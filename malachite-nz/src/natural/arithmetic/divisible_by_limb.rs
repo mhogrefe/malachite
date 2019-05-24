@@ -1,5 +1,4 @@
 use malachite_base::num::traits::{DivisibleBy, DivisibleByPowerOfTwo, Parity};
-
 use natural::arithmetic::eq_limb_mod_limb::limbs_mod_exact_odd_limb;
 use natural::arithmetic::mod_limb::limbs_mod_limb;
 use natural::Natural::{self, Large, Small};

@@ -1,11 +1,9 @@
-use std::ops::{Shl, ShlAssign};
-
 use malachite_base::conversion::{CheckedFrom, WrappingFrom};
 use malachite_base::limbs::limbs_pad_left;
 use malachite_base::num::integers::PrimitiveInteger;
-
 use natural::Natural::{self, Large, Small};
 use platform::Limb;
+use std::ops::{Shl, ShlAssign};
 
 //TODO clean
 

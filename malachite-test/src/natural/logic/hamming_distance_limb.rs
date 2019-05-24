@@ -1,14 +1,12 @@
-use std::iter::repeat;
-
+use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
+use inputs::base::pairs_of_nonempty_unsigned_vec_and_unsigned;
+use inputs::natural::{pairs_of_natural_and_unsigned, pairs_of_unsigned_and_natural};
 use malachite_base::conversion::CheckedFrom;
 use malachite_base::num::traits::{HammingDistance, SignificantBits};
 use malachite_nz::natural::logic::hamming_distance_limb::limbs_hamming_distance_limb;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-
-use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::base::pairs_of_nonempty_unsigned_vec_and_unsigned;
-use inputs::natural::{pairs_of_natural_and_unsigned, pairs_of_unsigned_and_natural};
+use std::iter::repeat;
 
 pub fn natural_hamming_distance_limb_alt_1(n: &Natural, u: Limb) -> u64 {
     let u = Natural::from(u);

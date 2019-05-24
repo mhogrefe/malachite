@@ -1,8 +1,3 @@
-use malachite_base::conversion::CheckedFrom;
-use malachite_base::num::traits::{DivisibleBy, EqMod, Mod, SignificantBits};
-use malachite_nz::integer::arithmetic::eq_limb_mod_limb::limbs_eq_neg_limb_mod_limb;
-use malachite_nz::platform::Limb;
-
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::triples_of_unsigned_vec_unsigned_and_positive_unsigned_var_1;
 #[cfg(feature = "32_bit_limbs")]
@@ -11,6 +6,10 @@ use inputs::integer::{
     triples_of_integer_unsigned_and_unsigned, triples_of_unsigned_integer_and_unsigned,
     triples_of_unsigned_unsigned_and_integer,
 };
+use malachite_base::conversion::CheckedFrom;
+use malachite_base::num::traits::{DivisibleBy, EqMod, Mod, SignificantBits};
+use malachite_nz::integer::arithmetic::eq_limb_mod_limb::limbs_eq_neg_limb_mod_limb;
+use malachite_nz::platform::Limb;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limbs_eq_neg_limb_mod_limb);

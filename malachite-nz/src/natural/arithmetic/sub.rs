@@ -1,11 +1,9 @@
-use std::fmt::Display;
-use std::ops::{Sub, SubAssign};
-
 use malachite_base::num::traits::{CheckedSub, OverflowingSubAssign};
-
 use natural::arithmetic::sub_limb::{limbs_sub_limb_in_place, limbs_sub_limb_to_out};
 use natural::Natural;
 use platform::Limb;
+use std::fmt::Display;
+use std::ops::{Sub, SubAssign};
 
 fn sub_and_borrow(x: Limb, y: Limb, borrow: &mut bool) -> Limb {
     let (mut difference, overflow) = x.overflowing_sub(y);

@@ -1,15 +1,13 @@
-#[cfg(feature = "32_bit_limbs")]
-use std::str::FromStr;
-
+use common::test_properties;
 use malachite_base::comparison::Max;
 use malachite_base::num::integers::PrimitiveInteger;
 use malachite_base::num::traits::One;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-
-use common::test_properties;
 use malachite_test::inputs::base::unsigneds;
 use malachite_test::inputs::natural::naturals;
+#[cfg(feature = "32_bit_limbs")]
+use std::str::FromStr;
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]

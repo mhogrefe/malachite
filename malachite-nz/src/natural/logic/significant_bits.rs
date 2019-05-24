@@ -1,7 +1,6 @@
 use malachite_base::conversion::WrappingFrom;
 use malachite_base::num::integers::PrimitiveInteger;
 use malachite_base::num::traits::SignificantBits;
-
 use natural::Natural::{self, Large, Small};
 use platform::Limb;
 

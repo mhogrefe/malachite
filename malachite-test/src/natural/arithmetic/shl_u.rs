@@ -1,13 +1,3 @@
-use malachite_base::conversion::CheckedFrom;
-use malachite_base::named::Named;
-use malachite_base::num::integers::PrimitiveInteger;
-use malachite_nz::natural::arithmetic::shl_u::{
-    limbs_shl, limbs_shl_to_out, limbs_shl_with_complement_to_out, limbs_slice_shl_in_place,
-    limbs_vec_shl_in_place,
-};
-use malachite_nz::natural::logic::not::limbs_not_in_place;
-use malachite_nz::platform::Limb;
-
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::{
     pairs_of_unsigned_vec_and_limb_var_1, pairs_of_unsigned_vec_and_small_unsigned,
@@ -17,6 +7,15 @@ use inputs::base::{
 use inputs::natural::{
     pairs_of_natural_and_small_unsigned, rm_pairs_of_natural_and_small_unsigned,
 };
+use malachite_base::conversion::CheckedFrom;
+use malachite_base::named::Named;
+use malachite_base::num::integers::PrimitiveInteger;
+use malachite_nz::natural::arithmetic::shl_u::{
+    limbs_shl, limbs_shl_to_out, limbs_shl_with_complement_to_out, limbs_slice_shl_in_place,
+    limbs_vec_shl_in_place,
+};
+use malachite_nz::natural::logic::not::limbs_not_in_place;
+use malachite_nz::platform::Limb;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limbs_shl);

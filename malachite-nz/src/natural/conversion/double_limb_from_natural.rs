@@ -3,7 +3,6 @@ use malachite_base::conversion::{
     CheckedFrom, ConvertibleFrom, OverflowingFrom, SaturatingFrom, WrappingFrom,
 };
 use malachite_base::num::traits::JoinHalves;
-
 use natural::Natural::{self, Large, Small};
 use platform::DoubleLimb;
 

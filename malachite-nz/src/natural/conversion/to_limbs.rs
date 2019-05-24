@@ -1,9 +1,7 @@
-use std::ops::Index;
-
 use malachite_base::conversion::CheckedFrom;
-
 use natural::Natural::{self, Large, Small};
 use platform::Limb;
+use std::ops::Index;
 
 /// A double-ended iterator over the limbs of a `Natural`. The forward order is ascending (least-
 /// significant first). The iterator does not iterate over the implicit leading zero limbs.

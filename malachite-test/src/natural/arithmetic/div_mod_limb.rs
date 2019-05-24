@@ -1,16 +1,3 @@
-use malachite_base::conversion::CheckedFrom;
-use malachite_base::num::traits::{
-    CeilingDivAssignNegMod, CeilingDivNegMod, DivAssignMod, DivAssignRem, DivMod, DivRem, DivRound,
-    NegMod, SignificantBits,
-};
-use malachite_base::round::RoundingMode;
-use malachite_nz::natural::arithmetic::div_mod_limb::{
-    limbs_div_limb_in_place_mod, limbs_div_limb_mod, limbs_div_limb_to_out_mod,
-};
-use malachite_nz::platform::Limb;
-use num::{BigUint, Integer, ToPrimitive};
-use rug;
-
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::{
     pairs_of_unsigned_vec_and_positive_unsigned_var_1,
@@ -23,6 +10,18 @@ use inputs::natural::{
 use inputs::natural::{
     pairs_of_natural_and_positive_unsigned, pairs_of_unsigned_and_positive_natural,
 };
+use malachite_base::conversion::CheckedFrom;
+use malachite_base::num::traits::{
+    CeilingDivAssignNegMod, CeilingDivNegMod, DivAssignMod, DivAssignRem, DivMod, DivRem, DivRound,
+    NegMod, SignificantBits,
+};
+use malachite_base::round::RoundingMode;
+use malachite_nz::natural::arithmetic::div_mod_limb::{
+    limbs_div_limb_in_place_mod, limbs_div_limb_mod, limbs_div_limb_to_out_mod,
+};
+use malachite_nz::platform::Limb;
+use num::{BigUint, Integer, ToPrimitive};
+use rug;
 
 // For `Natural`s, `mod` is equivalent to `rem`.
 

@@ -1,12 +1,7 @@
-use std::str::FromStr;
-
+use common::test_properties;
 use malachite_base::num::traits::Zero;
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::{Limb, SignedDoubleLimb, SignedLimb};
-use num::BigInt;
-use rug;
-
-use common::test_properties;
 use malachite_test::common::{
     bigint_to_integer, integer_to_bigint, integer_to_rug_integer, rug_integer_to_integer,
 };
@@ -15,6 +10,9 @@ use malachite_test::inputs::integer::{
     integers, pairs_of_integer_and_signed, pairs_of_integer_and_unsigned, pairs_of_integers,
 };
 use malachite_test::inputs::natural::pairs_of_naturals_var_1;
+use num::BigInt;
+use rug;
+use std::str::FromStr;
 
 #[test]
 fn test_sub() {
