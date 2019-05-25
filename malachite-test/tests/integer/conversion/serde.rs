@@ -1,11 +1,13 @@
 extern crate serde;
 extern crate serde_json;
 
-use common::test_properties;
+use std::str::FromStr;
+
 use malachite_base::strings::string_is_subset;
 use malachite_nz::integer::Integer;
+
+use common::test_properties;
 use malachite_test::inputs::integer::integers;
-use std::str::FromStr;
 
 #[test]
 fn test_serde() {

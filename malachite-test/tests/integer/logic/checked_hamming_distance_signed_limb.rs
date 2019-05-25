@@ -1,4 +1,5 @@
-use common::test_properties;
+use std::str::FromStr;
+
 use malachite_base::comparison::{Max, Min};
 use malachite_base::num::integers::PrimitiveInteger;
 use malachite_base::num::traits::{CheckedHammingDistance, NegativeOne, Zero};
@@ -6,13 +7,14 @@ use malachite_nz::integer::logic::checked_hamming_distance_signed_limb::*;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::{Limb, SignedLimb};
+
+use common::test_properties;
 use malachite_test::inputs::base::{pairs_of_limb_vec_and_positive_limb_var_1, signeds};
 use malachite_test::inputs::integer::{
     integers, pairs_of_integer_and_signed,
     triples_of_natural_integer_natural_signed_and_natural_signed,
 };
 use malachite_test::integer::logic::checked_hamming_distance_signed_limb::*;
-use std::str::FromStr;
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]

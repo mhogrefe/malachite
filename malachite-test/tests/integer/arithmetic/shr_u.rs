@@ -1,4 +1,5 @@
-use common::test_properties;
+use std::str::FromStr;
+
 use malachite_base::comparison::Max;
 use malachite_base::conversion::{CheckedFrom, WrappingFrom};
 use malachite_base::num::integers::PrimitiveInteger;
@@ -7,6 +8,9 @@ use malachite_base::num::unsigneds::PrimitiveUnsigned;
 use malachite_base::round::RoundingMode;
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::{Limb, SignedLimb};
+use rug;
+
+use common::test_properties;
 use malachite_test::common::{
     bigint_to_integer, integer_to_bigint, integer_to_rug_integer, rug_integer_to_integer,
 };
@@ -25,8 +29,6 @@ use malachite_test::inputs::integer::{
 use malachite_test::inputs::natural::{
     pairs_of_natural_and_small_unsigned, triples_of_natural_small_unsigned_and_rounding_mode_var_1,
 };
-use rug;
-use std::str::FromStr;
 
 macro_rules! tests_and_properties {
     (

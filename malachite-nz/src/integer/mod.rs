@@ -16,7 +16,8 @@ use platform::Limb;
 #[derive(Clone, Hash, Eq, PartialEq)]
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
 pub struct Integer {
-    pub(crate) sign: bool, // whether the Integer is non-negative
+    // whether the Integer is non-negative
+    pub(crate) sign: bool,
     pub(crate) abs: Natural,
 }
 
@@ -192,6 +193,7 @@ pub mod arithmetic {
     pub mod sub_natural;
     pub mod sub_signed_limb;
 }
+
 pub mod comparison {
     pub mod ord;
     pub mod ord_abs;
@@ -206,7 +208,9 @@ pub mod comparison {
     pub mod partial_ord_signed_limb;
     pub mod sign;
 }
+
 pub mod conversion;
+
 pub mod logic {
     pub mod and;
     pub mod and_limb;

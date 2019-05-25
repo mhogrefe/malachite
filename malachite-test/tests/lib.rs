@@ -7,16 +7,19 @@ extern crate rug;
 extern crate rust_wheels;
 
 pub mod common;
+
 pub mod base {
     pub mod bools {
         pub mod not_assign;
     }
+
     pub mod chars {
         pub mod char_to_contiguous_range;
         pub mod contiguous_range_to_char;
         pub mod decrement;
         pub mod increment;
     }
+
     pub mod limbs {
         pub mod limbs_delete_left;
         pub mod limbs_leading_zero_limbs;
@@ -25,7 +28,16 @@ pub mod base {
         pub mod limbs_test_zero;
         pub mod limbs_trailing_zero_limbs;
     }
+
     pub mod num {
+        pub mod conversion {
+            pub mod checked_from;
+            pub mod convertible_from;
+            pub mod overflowing_from;
+            pub mod saturating_from;
+            pub mod wrapping_from;
+        }
+
         pub mod assign_bit;
         pub mod clear_bit;
         pub mod decrement;
@@ -40,6 +52,7 @@ pub mod base {
         pub mod split_in_half;
         pub mod upper_half;
     }
+
     pub mod rounding_modes {
         pub mod clone;
         pub mod display;
@@ -49,12 +62,14 @@ pub mod base {
         pub mod neg;
         pub mod size;
     }
+
     pub mod strings {
         pub mod string_is_subset;
         pub mod string_nub;
         pub mod string_sort;
     }
 }
+
 pub mod integer {
     pub mod arithmetic {
         pub mod abs;
@@ -103,12 +118,14 @@ pub mod integer {
         pub mod sub_natural;
         pub mod sub_signed_limb;
     }
+
     pub mod basic {
         pub mod constants;
         pub mod decrement;
         pub mod increment;
         pub mod size;
     }
+
     pub mod comparison {
         pub mod eq;
         pub mod hash;
@@ -125,6 +142,7 @@ pub mod integer {
         pub mod partial_ord_signed_limb;
         pub mod sign;
     }
+
     pub mod conversion {
         pub mod assign_double_limb;
         pub mod assign_limb;
@@ -153,6 +171,7 @@ pub mod integer {
         pub mod to_twos_complement_bits;
         pub mod to_twos_complement_limbs;
     }
+
     pub mod logic {
         pub mod and;
         pub mod and_limb;
@@ -184,6 +203,7 @@ pub mod integer {
         pub mod xor_signed_limb;
     }
 }
+
 pub mod natural {
     pub mod arithmetic {
         pub mod add;
@@ -225,12 +245,14 @@ pub mod natural {
         pub mod sub_mul;
         pub mod sub_mul_limb;
     }
+
     pub mod basic {
         pub mod constants;
         pub mod decrement;
         pub mod increment;
         pub mod size;
     }
+
     pub mod comparison {
         pub mod eq;
         pub mod hash;
@@ -238,6 +260,7 @@ pub mod natural {
         pub mod partial_eq_limb;
         pub mod partial_ord_limb;
     }
+
     pub mod conversion {
         pub mod assign_double_limb;
         pub mod assign_limb;
@@ -254,6 +277,7 @@ pub mod natural {
         pub mod to_bits;
         pub mod to_limbs;
     }
+
     pub mod logic {
         pub mod and;
         pub mod and_limb;
@@ -276,6 +300,7 @@ pub mod natural {
         pub mod xor;
         pub mod xor_limb;
     }
+
     pub mod random {
         pub mod random_natural_below;
         pub mod random_natural_up_to_bits;

@@ -1,15 +1,17 @@
+use std::ops::{Div, DivAssign};
+
 use malachite_base::comparison::Max;
 #[cfg(feature = "64_bit_limbs")]
 use malachite_base::conversion::WrappingFrom;
 use malachite_base::num::traits::{
     DivRem, JoinHalves, SplitInHalf, WrappingAddAssign, WrappingSubAssign,
 };
+
 use natural::arithmetic::add_limb::limbs_slice_add_limb_in_place;
 use natural::arithmetic::div_mod_limb::div_mod_by_preinversion;
 use natural::arithmetic::shl_u::{limbs_shl_to_out, limbs_slice_shl_in_place};
 use natural::Natural::{self, Large, Small};
 use platform::{DoubleLimb, Limb};
-use std::ops::{Div, DivAssign};
 
 /// Divide an number by a divisor of B - 1, where B is the limb base.
 ///
@@ -142,7 +144,7 @@ fn limbs_div_limb_normalized_in_place(
         limbs[j + 1] = quotient_high;
         assert!(!limbs_slice_add_limb_in_place(
             &mut limbs[j + 2..],
-            quotient_higher
+            quotient_higher,
         ));
         let (sum, carry) = DoubleLimb::join_halves(sum_low, limbs[j])
             .overflowing_add(DoubleLimb::from(sum_high) * DoubleLimb::from(power_of_two));
@@ -165,7 +167,7 @@ fn limbs_div_limb_normalized_in_place(
         .split_in_half();
     assert!(!limbs_slice_add_limb_in_place(
         &mut limbs[1..],
-        quotient_high
+        quotient_high,
     ));
     limbs[0] = quotient_low;
 }
@@ -219,7 +221,7 @@ fn limbs_div_limb_normalized_to_out(
         out[j + 1] = quotient_high;
         assert!(!limbs_slice_add_limb_in_place(
             &mut out[j + 2..],
-            quotient_higher
+            quotient_higher,
         ));
         let (sum, carry) = DoubleLimb::join_halves(sum_low, in_limbs[j])
             .overflowing_add(DoubleLimb::from(sum_high) * DoubleLimb::from(power_of_two));

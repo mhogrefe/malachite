@@ -1,6 +1,7 @@
 use malachite_base::num::traits::{
     DivisibleByPowerOfTwo, EqMod, Parity, SplitInHalf, WrappingAddAssign,
 };
+
 use natural::arithmetic::div_exact_limb::limbs_invert_limb;
 use natural::arithmetic::mod_limb::limbs_mod_limb;
 use natural::Natural::{self, Large, Small};

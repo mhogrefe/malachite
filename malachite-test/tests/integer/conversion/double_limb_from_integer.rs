@@ -1,4 +1,6 @@
-use common::test_properties;
+use std::cmp::Ordering;
+use std::str::FromStr;
+
 use malachite_base::comparison::Max;
 use malachite_base::conversion::{
     CheckedFrom, ConvertibleFrom, OverflowingFrom, SaturatingFrom, WrappingFrom,
@@ -8,9 +10,9 @@ use malachite_base::num::traits::{ModPowerOfTwo, PartialOrdAbs, Sign, Significan
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::{DoubleLimb, Limb};
+
+use common::test_properties;
 use malachite_test::inputs::integer::integers;
-use std::cmp::Ordering;
-use std::str::FromStr;
 
 #[test]
 fn test_double_limb_checked_from_integer() {
@@ -305,7 +307,7 @@ fn double_limb_saturating_from_integer_properties() {
         assert_eq!(DoubleLimb::saturating_from(x.clone()), result);
         let result = Natural::from(result);
         assert!(result.le_abs(x));
-        assert_eq!(result == *x, DoubleLimb::checked_from(x).is_some());
+        assert_eq!(result == *x, DoubleLimb::convertible_from(x));
     });
 }
 
@@ -318,10 +320,9 @@ fn double_limb_overflowing_from_integer_properties() {
             result,
             (
                 DoubleLimb::wrapping_from(x),
-                DoubleLimb::checked_from(x).is_none()
+                !DoubleLimb::convertible_from(x)
             )
         );
-        assert_eq!(result.1, !DoubleLimb::convertible_from(x));
     });
 }
 

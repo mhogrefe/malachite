@@ -1,8 +1,10 @@
+use std::ops::{Add, AddAssign};
+
 use malachite_base::num::traits::OverflowingAddAssign;
+
 use natural::arithmetic::add_limb::{limbs_add_limb_to_out, limbs_slice_add_limb_in_place};
 use natural::Natural::{self, Large, Small};
 use platform::Limb;
-use std::ops::{Add, AddAssign};
 
 fn add_and_carry(x: Limb, y: Limb, carry: &mut bool) -> Limb {
     let (mut sum, overflow) = x.overflowing_add(y);

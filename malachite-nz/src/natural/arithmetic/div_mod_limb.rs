@@ -5,6 +5,7 @@ use malachite_base::num::traits::{
     CeilingDivAssignNegMod, CeilingDivNegMod, DivAssignMod, DivAssignRem, DivMod, DivRem,
     JoinHalves, SplitInHalf, WrappingAddAssign, WrappingSubAssign, Zero,
 };
+
 use natural::arithmetic::add_limb::limbs_slice_add_limb_in_place;
 use natural::arithmetic::shl_u::{limbs_shl_to_out, limbs_slice_shl_in_place};
 use natural::Natural::{self, Large, Small};
@@ -90,7 +91,7 @@ fn limbs_div_limb_normalized_in_place_mod(
         limbs[j + 1] = quotient_high;
         assert!(!limbs_slice_add_limb_in_place(
             &mut limbs[j + 2..],
-            quotient_higher
+            quotient_higher,
         ));
         let (sum, carry) = DoubleLimb::join_halves(sum_low, limbs[j])
             .overflowing_add(DoubleLimb::from(sum_high) * DoubleLimb::from(power_of_two));
@@ -113,7 +114,7 @@ fn limbs_div_limb_normalized_in_place_mod(
         .split_in_half();
     assert!(!limbs_slice_add_limb_in_place(
         &mut limbs[1..],
-        quotient_high
+        quotient_high,
     ));
     limbs[0] = quotient_low;
     remainder
@@ -169,7 +170,7 @@ fn limbs_div_limb_normalized_to_out_mod(
         out[j + 1] = quotient_high;
         assert!(!limbs_slice_add_limb_in_place(
             &mut out[j + 2..],
-            quotient_higher
+            quotient_higher,
         ));
         let (sum, carry) = DoubleLimb::join_halves(sum_low, in_limbs[j])
             .overflowing_add(DoubleLimb::from(sum_high) * DoubleLimb::from(power_of_two));

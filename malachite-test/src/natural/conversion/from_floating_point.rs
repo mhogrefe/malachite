@@ -3,7 +3,7 @@ use inputs::base::{
     f32s, f32s_var_1, f64s, f64s_var_1, pairs_of_finite_f32_and_rounding_mode_var_1,
     pairs_of_finite_f64_and_rounding_mode_var_1,
 };
-use malachite_base::conversion::{CheckedFrom, RoundingFrom, WrappingFrom};
+use malachite_base::conversion::{CheckedFrom, ConvertibleFrom, RoundingFrom, WrappingFrom};
 use malachite_base::num::floats::PrimitiveFloat;
 use malachite_nz::natural::Natural;
 
@@ -14,12 +14,24 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_natural_from_f64);
     register_demo!(registry, demo_natural_checked_from_f32);
     register_demo!(registry, demo_natural_checked_from_f64);
+    register_demo!(registry, demo_natural_convertible_from_f32);
+    register_demo!(registry, demo_natural_convertible_from_f64);
     register_bench!(registry, Small, benchmark_natural_rounding_from_f32);
     register_bench!(registry, Small, benchmark_natural_rounding_from_f64);
     register_bench!(registry, Small, benchmark_natural_from_f32);
     register_bench!(registry, Small, benchmark_natural_from_f64);
     register_bench!(registry, Small, benchmark_natural_checked_from_f32);
     register_bench!(registry, Small, benchmark_natural_checked_from_f64);
+    register_bench!(
+        registry,
+        Small,
+        benchmark_natural_convertible_from_f32_algorithms
+    );
+    register_bench!(
+        registry,
+        Small,
+        benchmark_natural_convertible_from_f64_algorithms
+    );
 }
 
 macro_rules! float_demos_and_benches {
@@ -31,9 +43,11 @@ macro_rules! float_demos_and_benches {
         $demo_natural_rounding_from_float: ident,
         $demo_natural_from_float: ident,
         $demo_natural_checked_from_float: ident,
+        $demo_natural_convertible_from_float: ident,
         $benchmark_natural_rounding_from_float: ident,
         $benchmark_natural_from_float: ident,
         $benchmark_natural_checked_from_float: ident,
+        $benchmark_natural_convertible_from_float_algorithms: ident,
     ) => {
         fn $demo_natural_rounding_from_float(gm: GenerationMode, limit: usize) {
             for (f, rm) in $pairs_of_float_and_rounding_mode_var_1(gm).take(limit) {
@@ -58,6 +72,20 @@ macro_rules! float_demos_and_benches {
                     "Natural::checked_from({:?}) = {:?}",
                     f,
                     Natural::checked_from(f)
+                );
+            }
+        }
+
+        fn $demo_natural_convertible_from_float(gm: GenerationMode, limit: usize) {
+            for f in $floats(gm).take(limit) {
+                println!(
+                    "{} is {}convertible to a Natural",
+                    f,
+                    if Natural::convertible_from(f) {
+                        ""
+                    } else {
+                        "not "
+                    },
                 );
             }
         }
@@ -114,6 +142,30 @@ macro_rules! float_demos_and_benches {
                 &mut [("malachite", &mut (|f| no_out!(Natural::checked_from(f))))],
             );
         }
+
+        fn $benchmark_natural_convertible_from_float_algorithms(
+            gm: GenerationMode,
+            limit: usize,
+            file_name: &str,
+        ) {
+            m_run_benchmark(
+                &format!("Natural::convertible_from({})", stringify!($f)),
+                BenchmarkType::Algorithms,
+                $floats(gm),
+                gm.name(),
+                limit,
+                file_name,
+                &(|&f| usize::wrapping_from(f.adjusted_exponent())),
+                "f.adjusted_exponent()",
+                &mut [
+                    ("standard", &mut (|f| no_out!(Natural::convertible_from(f)))),
+                    (
+                        "using checked_from",
+                        &mut (|f| no_out!(Natural::checked_from(f).is_some())),
+                    ),
+                ],
+            );
+        }
     };
 }
 
@@ -125,9 +177,11 @@ float_demos_and_benches!(
     demo_natural_rounding_from_f32,
     demo_natural_from_f32,
     demo_natural_checked_from_f32,
+    demo_natural_convertible_from_f32,
     benchmark_natural_rounding_from_f32,
     benchmark_natural_from_f32,
     benchmark_natural_checked_from_f32,
+    benchmark_natural_convertible_from_f32_algorithms,
 );
 
 float_demos_and_benches!(
@@ -138,7 +192,9 @@ float_demos_and_benches!(
     demo_natural_rounding_from_f64,
     demo_natural_from_f64,
     demo_natural_checked_from_f64,
+    demo_natural_convertible_from_f64,
     benchmark_natural_rounding_from_f64,
     benchmark_natural_from_f64,
     benchmark_natural_checked_from_f64,
+    benchmark_natural_convertible_from_f64_algorithms,
 );

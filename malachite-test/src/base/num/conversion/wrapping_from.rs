@@ -252,7 +252,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_bench!(registry, None, benchmark_isize_wrapping_from_isize);
 }
 
-fn demo_wrapping_from_unsigned<T: PrimitiveUnsigned + Rand, U: Display>(
+fn demo_wrapping_from_unsigned<T: PrimitiveUnsigned + Rand, U: Display + Named>(
     gm: GenerationMode,
     limit: usize,
 ) where
@@ -261,14 +261,14 @@ fn demo_wrapping_from_unsigned<T: PrimitiveUnsigned + Rand, U: Display>(
     for u in unsigneds::<T>(gm).take(limit) {
         println!(
             "{}::wrapping_from({}) = {}",
-            T::NAME,
+            U::NAME,
             u,
             U::wrapping_from(u)
         );
     }
 }
 
-fn demo_wrapping_from_signed<T: PrimitiveSigned + Rand, U: Display>(
+fn demo_wrapping_from_signed<T: PrimitiveSigned + Rand, U: Display + Named>(
     gm: GenerationMode,
     limit: usize,
 ) where
@@ -279,7 +279,7 @@ fn demo_wrapping_from_signed<T: PrimitiveSigned + Rand, U: Display>(
     for i in signeds::<T>(gm).take(limit) {
         println!(
             "{}::wrapping_from({}) = {}",
-            T::NAME,
+            U::NAME,
             i,
             U::wrapping_from(i)
         );

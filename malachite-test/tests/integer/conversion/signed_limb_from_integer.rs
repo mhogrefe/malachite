@@ -1,4 +1,5 @@
-use common::test_properties;
+use std::str::FromStr;
+
 use malachite_base::comparison::{Max, Min};
 use malachite_base::conversion::{
     CheckedFrom, ConvertibleFrom, OverflowingFrom, SaturatingFrom, WrappingFrom,
@@ -8,11 +9,12 @@ use malachite_base::num::traits::{ModPowerOfTwo, PartialOrdAbs};
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::{Limb, SignedLimb};
 #[cfg(feature = "32_bit_limbs")]
+use rug;
+
+use common::test_properties;
+#[cfg(feature = "32_bit_limbs")]
 use malachite_test::common::integer_to_rug_integer;
 use malachite_test::inputs::integer::integers;
-#[cfg(feature = "32_bit_limbs")]
-use rug;
-use std::str::FromStr;
 
 #[test]
 fn test_signed_limb_checked_from_integer() {
@@ -231,7 +233,7 @@ fn signed_limb_saturating_from_integer_properties() {
         let result = SignedLimb::saturating_from(x);
         assert_eq!(SignedLimb::saturating_from(x.clone()), result);
         assert!(result.le_abs(x));
-        assert_eq!(result == *x, SignedLimb::checked_from(x).is_some());
+        assert_eq!(result == *x, SignedLimb::convertible_from(x));
     });
 }
 
@@ -244,10 +246,9 @@ fn signed_limb_overflowing_from_integer_properties() {
             result,
             (
                 SignedLimb::wrapping_from(x),
-                SignedLimb::checked_from(x).is_none()
+                !SignedLimb::convertible_from(x)
             )
         );
-        assert_eq!(result.1, !SignedLimb::convertible_from(x));
     });
 }
 

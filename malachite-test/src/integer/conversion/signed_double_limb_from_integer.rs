@@ -377,11 +377,11 @@ fn benchmark_signed_double_limb_overflowing_from_integer_algorithms(
                 &mut (|n| no_out!(SignedDoubleLimb::overflowing_from(n))),
             ),
             (
-                "using checked_from and wrapping_from",
+                "using wrapping_from and convertible_from",
                 &mut (|n| {
                     no_out!((
                         SignedDoubleLimb::wrapping_from(&n),
-                        SignedDoubleLimb::checked_from(n).is_none()
+                        !SignedDoubleLimb::convertible_from(n)
                     ))
                 }),
             ),

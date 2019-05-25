@@ -1,8 +1,10 @@
-use malachite_base::limbs::limbs_set_zero;
-use natural::Natural::{self, Large, Small};
-use platform::Limb;
 use std::cmp::Ordering;
 use std::ops::{BitAnd, BitAndAssign};
+
+use malachite_base::limbs::limbs_set_zero;
+
+use natural::Natural::{self, Large, Small};
+use platform::Limb;
 
 /// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, returns
 /// a `Vec` of the limbs of the bitwise and of the `Natural`s. The length of the result is the

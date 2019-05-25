@@ -1,4 +1,5 @@
-use common::{test_properties, test_properties_custom_scale};
+use std::str::FromStr;
+
 use malachite_base::comparison::Max;
 use malachite_base::num::traits::{One, Zero};
 use malachite_nz::natural::arithmetic::mul::fft::_limbs_mul_greater_to_out_fft;
@@ -30,6 +31,10 @@ use malachite_nz::natural::arithmetic::mul::{
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::{DoubleLimb, Limb};
+use num::BigUint;
+use rug;
+
+use common::{test_properties, test_properties_custom_scale};
 use malachite_test::common::{
     biguint_to_natural, natural_to_biguint, natural_to_rug_integer, rug_integer_to_natural,
 };
@@ -45,9 +50,6 @@ use malachite_test::inputs::base::{
 use malachite_test::inputs::natural::{
     naturals, pairs_of_natural_and_unsigned, pairs_of_naturals, triples_of_naturals,
 };
-use num::BigUint;
-use rug;
-use std::str::FromStr;
 
 fn series(start: Limb, len: usize) -> Vec<Limb> {
     (start..start + len as Limb).collect()

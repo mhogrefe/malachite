@@ -1,4 +1,6 @@
-use common::test_properties;
+use std::cmp::max;
+use std::str::FromStr;
+
 use malachite_base::num::traits::Zero;
 use malachite_nz::natural::logic::and::{
     limbs_and, limbs_and_in_place_either, limbs_and_same_length_to_out, limbs_and_to_out,
@@ -7,6 +9,10 @@ use malachite_nz::natural::logic::and::{
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
+use num::BigUint;
+use rug;
+
+use common::test_properties;
 use malachite_test::common::{
     biguint_to_natural, natural_to_biguint, natural_to_rug_integer, rug_integer_to_natural,
 };
@@ -18,10 +24,6 @@ use malachite_test::inputs::natural::{
     naturals, pairs_of_natural_and_unsigned, pairs_of_naturals, triples_of_naturals,
 };
 use malachite_test::natural::logic::and::{natural_and_alt_1, natural_and_alt_2};
-use num::BigUint;
-use rug;
-use std::cmp::max;
-use std::str::FromStr;
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
@@ -208,7 +210,7 @@ fn test_and() {
         assert_eq!(
             natural_and_alt_1(
                 &Natural::from_str(u).unwrap(),
-                &Natural::from_str(v).unwrap()
+                &Natural::from_str(v).unwrap(),
             )
             .to_string(),
             out
@@ -216,7 +218,7 @@ fn test_and() {
         assert_eq!(
             natural_and_alt_2(
                 &Natural::from_str(u).unwrap(),
-                &Natural::from_str(v).unwrap()
+                &Natural::from_str(v).unwrap(),
             )
             .to_string(),
             out

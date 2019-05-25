@@ -412,8 +412,8 @@ fn benchmark_limb_overflowing_from_natural_algorithms(
         &mut [
             ("standard", &mut (|n| no_out!(Limb::overflowing_from(n)))),
             (
-                "using checked_from and wrapping_from",
-                &mut (|n| no_out!((Limb::wrapping_from(&n), Limb::checked_from(n).is_none()))),
+                "using wrapping_from and convertible_from",
+                &mut (|n| no_out!((Limb::wrapping_from(&n), !Limb::convertible_from(n)))),
             ),
         ],
     );

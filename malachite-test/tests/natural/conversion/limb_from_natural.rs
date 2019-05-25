@@ -1,4 +1,5 @@
-use common::test_properties;
+use std::str::FromStr;
+
 use malachite_base::comparison::Max;
 use malachite_base::conversion::{
     CheckedFrom, ConvertibleFrom, OverflowingFrom, SaturatingFrom, WrappingFrom,
@@ -8,11 +9,12 @@ use malachite_base::num::traits::{ModPowerOfTwo, SignificantBits};
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 #[cfg(feature = "32_bit_limbs")]
+use rug;
+
+use common::test_properties;
+#[cfg(feature = "32_bit_limbs")]
 use malachite_test::common::natural_to_rug_integer;
 use malachite_test::inputs::natural::naturals;
-#[cfg(feature = "32_bit_limbs")]
-use rug;
-use std::str::FromStr;
 
 #[test]
 fn test_limb_checked_from_natural() {
@@ -166,7 +168,7 @@ fn limb_saturating_from_natural_properties() {
         let result = Limb::saturating_from(x);
         assert_eq!(Limb::saturating_from(x.clone()), result);
         assert!(result <= *x);
-        assert_eq!(result == *x, Limb::checked_from(x).is_some());
+        assert_eq!(result == *x, Limb::convertible_from(x));
     });
 }
 
@@ -175,11 +177,7 @@ fn limb_overflowing_from_natural_properties() {
     test_properties(naturals, |x| {
         let result = Limb::overflowing_from(x);
         assert_eq!(Limb::overflowing_from(x.clone()), result);
-        assert_eq!(
-            result,
-            (Limb::wrapping_from(x), Limb::checked_from(x).is_none())
-        );
-        assert_eq!(result.1, !Limb::convertible_from(x));
+        assert_eq!(result, (Limb::wrapping_from(x), !Limb::convertible_from(x)));
     });
 }
 

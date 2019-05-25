@@ -1,4 +1,7 @@
-use common::{test_properties, test_properties_no_special};
+use std::cmp::Ordering;
+#[cfg(feature = "32_bit_limbs")]
+use std::str::FromStr;
+
 use malachite_base::comparison::Max;
 use malachite_base::conversion::CheckedFrom;
 use malachite_base::num::integers::PrimitiveInteger;
@@ -7,14 +10,13 @@ use malachite_nz::integer::conversion::to_twos_complement_limbs::*;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
+
+use common::{test_properties, test_properties_no_special};
 use malachite_test::inputs::base::{small_unsigneds, vecs_of_unsigned, vecs_of_unsigned_var_3};
 use malachite_test::inputs::integer::{
     integers, pairs_of_integer_and_small_unsigned, pairs_of_integer_and_vec_of_bool_var_1,
 };
 use malachite_test::integer::conversion::to_twos_complement_limbs::*;
-use std::cmp::Ordering;
-#[cfg(feature = "32_bit_limbs")]
-use std::str::FromStr;
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]

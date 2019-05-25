@@ -1,8 +1,12 @@
-use common::test_properties;
+use std::str::FromStr;
+
 use malachite_base::num::traits::{CheckedHammingDistance, HammingDistance, NegativeOne, Zero};
 use malachite_nz::integer::logic::checked_hamming_distance::limbs_hamming_distance_neg;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
+use rug;
+
+use common::test_properties;
 use malachite_test::common::integer_to_rug_integer;
 use malachite_test::inputs::base::pairs_of_limb_vec_var_1;
 use malachite_test::inputs::integer::{
@@ -13,8 +17,6 @@ use malachite_test::integer::logic::checked_hamming_distance::{
     integer_checked_hamming_distance_alt_1, integer_checked_hamming_distance_alt_2,
     rug_checked_hamming_distance,
 };
-use rug;
-use std::str::FromStr;
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
@@ -54,21 +56,21 @@ fn test_checked_hamming_distance() {
         assert_eq!(
             integer_checked_hamming_distance_alt_1(
                 &Integer::from_str(x).unwrap(),
-                &Integer::from_str(y).unwrap()
+                &Integer::from_str(y).unwrap(),
             ),
             out
         );
         assert_eq!(
             integer_checked_hamming_distance_alt_2(
                 &Integer::from_str(x).unwrap(),
-                &Integer::from_str(y).unwrap()
+                &Integer::from_str(y).unwrap(),
             ),
             out
         );
         assert_eq!(
             rug_checked_hamming_distance(
                 &rug::Integer::from_str(x).unwrap(),
-                &rug::Integer::from_str(y).unwrap()
+                &rug::Integer::from_str(y).unwrap(),
             ),
             out
         );

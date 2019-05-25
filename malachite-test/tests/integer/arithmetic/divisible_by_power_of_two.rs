@@ -1,8 +1,12 @@
-use common::test_properties;
+use std::str::FromStr;
+
 use malachite_base::conversion::CheckedFrom;
 use malachite_base::num::traits::{DivisibleByPowerOfTwo, Zero};
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::{Limb, SignedLimb};
+use rug;
+
+use common::test_properties;
 use malachite_test::common::integer_to_rug_integer;
 use malachite_test::inputs::base::{pairs_of_signed_and_small_unsigned, unsigneds};
 use malachite_test::inputs::integer::{
@@ -10,8 +14,6 @@ use malachite_test::inputs::integer::{
     pairs_of_integer_and_small_unsigned_var_2,
 };
 use malachite_test::inputs::natural::pairs_of_natural_and_small_unsigned;
-use rug;
-use std::str::FromStr;
 
 #[test]
 fn test_divisible_by_power_of_two() {

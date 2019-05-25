@@ -1,7 +1,8 @@
-use malachite_base::conversion::{CheckedFrom, RoundingFrom, WrappingFrom};
+use malachite_base::conversion::{CheckedFrom, ConvertibleFrom, RoundingFrom, WrappingFrom};
 use malachite_base::num::floats::PrimitiveFloat;
 use malachite_base::num::traits::{BitAccess, DivisibleByPowerOfTwo, ShlRound, Zero};
 use malachite_base::round::RoundingMode;
+
 use natural::Natural;
 use platform::Limb;
 
@@ -164,7 +165,6 @@ macro_rules! float_impls {
                     Some(Natural::ZERO)
                 } else {
                     let (mut mantissa, exponent) = value.to_adjusted_mantissa_and_exponent();
-                    let value_negative = value < 0.0;
                     mantissa.set_bit(u64::from($f::MANTISSA_WIDTH));
                     let exponent = i32::checked_from(exponent).unwrap() + $f::MIN_EXPONENT - 1;
                     if exponent < 0
@@ -173,11 +173,67 @@ macro_rules! float_impls {
                         return None;
                     }
                     let n = Natural::from(mantissa) << exponent;
-                    if value_negative && n != 0 as Limb {
+                    if value < 0.0 && n != 0 as Limb {
                         None
                     } else {
                         Some(n)
                     }
+                }
+            }
+        }
+
+        /// Determines whether a `f32` or `f64` can be exactly converted to a `Natural`.
+        ///
+        /// Time: worst case O(1)
+        ///
+        /// Additional memory: worst case O(1)
+        ///
+        /// # Example
+        /// ```
+        /// extern crate malachite_base;
+        /// extern crate malachite_nz;
+        ///
+        /// use malachite_base::conversion::ConvertibleFrom;
+        /// use malachite_base::num::floats::PrimitiveFloat;
+        /// use malachite_nz::natural::Natural;
+        ///
+        /// fn main() {
+        ///     assert_eq!(Natural::convertible_from(f64::NAN), false);
+        ///     assert_eq!(Natural::convertible_from(f64::POSITIVE_INFINITY), false);
+        ///     assert_eq!(Natural::convertible_from(f64::NEGATIVE_INFINITY), false);
+        ///     assert_eq!(Natural::convertible_from(0.0), true);
+        ///     assert_eq!(Natural::convertible_from(-0.0), true);
+        ///     assert_eq!(Natural::convertible_from(123.0), true);
+        ///     assert_eq!(Natural::convertible_from(1.0e9), true);
+        ///     assert_eq!(Natural::convertible_from(4294967295.0), true);
+        ///     assert_eq!(Natural::convertible_from(4294967296.0), true);
+        ///     assert_eq!(Natural::convertible_from(1.0e100), true);
+        ///     assert_eq!(Natural::convertible_from(123.1), false);
+        ///     assert_eq!(Natural::convertible_from(123.9), false);
+        ///     assert_eq!(Natural::convertible_from(123.5), false);
+        ///     assert_eq!(Natural::convertible_from(124.5), false);
+        ///     assert_eq!(Natural::convertible_from(-0.499), false);
+        ///     assert_eq!(Natural::convertible_from(-0.5), false);
+        ///     assert_eq!(Natural::convertible_from(-123.0), false);
+        /// }
+        /// ```
+        impl ConvertibleFrom<$f> for Natural {
+            fn convertible_from(value: $f) -> bool {
+                if value.is_nan() || value.is_infinite() {
+                    false
+                } else if value == 0.0 {
+                    true
+                } else {
+                    let (mut mantissa, exponent) = value.to_adjusted_mantissa_and_exponent();
+                    mantissa.set_bit(u64::from($f::MANTISSA_WIDTH));
+                    let exponent = i32::checked_from(exponent).unwrap() + $f::MIN_EXPONENT - 1;
+                    if exponent < 0
+                        && !mantissa.divisible_by_power_of_two(u64::wrapping_from(-exponent))
+                    {
+                        return false;
+                    }
+                    let n = Natural::from(mantissa) << exponent;
+                    value > 0.0 || n == 0 as Limb
                 }
             }
         }

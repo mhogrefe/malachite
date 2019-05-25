@@ -240,7 +240,7 @@ fn test_or() {
         assert_eq!(
             integer_or_alt_1(
                 &Integer::from_str(u).unwrap(),
-                &Integer::from_str(v).unwrap()
+                &Integer::from_str(v).unwrap(),
             )
             .to_string(),
             out
@@ -248,7 +248,7 @@ fn test_or() {
         assert_eq!(
             integer_or_alt_2(
                 &Integer::from_str(u).unwrap(),
-                &Integer::from_str(v).unwrap()
+                &Integer::from_str(v).unwrap(),
             )
             .to_string(),
             out

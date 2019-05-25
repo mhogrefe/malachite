@@ -1,6 +1,9 @@
+use std::cmp::Ordering;
+
 use malachite_base::conversion::{CheckedFrom, WrappingFrom};
 use malachite_base::num::integers::PrimitiveInteger;
 use malachite_base::num::traits::{NotAssign, Parity, WrappingAddAssign};
+
 use natural::arithmetic::add::{
     _limbs_add_to_out_aliased, limbs_add_same_length_to_out, limbs_add_to_out,
     limbs_slice_add_greater_in_place_left, limbs_slice_add_same_length_in_place_left,
@@ -10,7 +13,6 @@ use natural::arithmetic::shl_u::{limbs_shl_to_out, limbs_slice_shl_in_place};
 use natural::arithmetic::sub::limbs_sub_same_length_to_out;
 use natural::comparison::ord::limbs_cmp_same_length;
 use platform::Limb;
-use std::cmp::Ordering;
 
 /// Evaluate a degree-3 polynomial in +1 and -1, where each coefficient has width `n` limbs, except
 /// the last, which has width `n_high` limbs.
@@ -162,19 +164,19 @@ pub(crate) fn _limbs_mul_toom_evaluate_poly_in_1_and_neg_1(
     while i < degree {
         assert!(!limbs_slice_add_greater_in_place_left(
             scratch,
-            coefficients[i]
+            coefficients[i],
         ));
         i += 2;
     }
     if degree.even() {
         assert!(!limbs_slice_add_greater_in_place_left(
             v_1,
-            coefficients[degree]
+            coefficients[degree],
         ));
     } else {
         assert!(!limbs_slice_add_greater_in_place_left(
             scratch,
-            coefficients[degree]
+            coefficients[degree],
         ));
     }
     let v_neg_1_neg = limbs_cmp_same_length(v_1, scratch) == Ordering::Less;
@@ -474,7 +476,7 @@ pub(crate) fn _limbs_mul_toom_evaluate_poly_in_2_pow_neg_and_neg_2_pow_neg(
     if degree.even() {
         assert!(!limbs_slice_add_greater_in_place_left(
             v_2_pow_neg,
-            coefficients[degree]
+            coefficients[degree],
         ));
     } else {
         assert!(!limbs_slice_add_greater_in_place_left(
@@ -519,7 +521,7 @@ pub(crate) fn _limbs_mul_toom_evaluate_poly_in_2_pow_neg_and_neg_2_pow_neg(
     }
     assert!(!limbs_slice_add_same_length_in_place_left(
         v_2_pow_neg,
-        scratch
+        scratch,
     ));
     v_2_pow_neg_neg
 }

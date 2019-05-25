@@ -1,17 +1,19 @@
-use common::test_properties;
+use std::str::FromStr;
+
 use malachite_base::conversion::{CheckedFrom, RoundingFrom};
 use malachite_base::crement::Crementable;
 use malachite_base::num::floats::PrimitiveFloat;
 use malachite_base::num::traits::{NegativeOne, One, Parity, Two, Zero};
 use malachite_base::round::RoundingMode;
 use malachite_nz::natural::Natural;
+
+use common::test_properties;
 use malachite_test::inputs::natural::{
     naturals, naturals_exactly_equal_to_f32, naturals_exactly_equal_to_f64,
     naturals_not_exactly_equal_to_f32, naturals_not_exactly_equal_to_f64, naturals_var_2_f32,
     naturals_var_2_f64, pairs_of_natural_and_rounding_mode_var_1_f32,
     pairs_of_natural_and_rounding_mode_var_1_f64,
 };
-use std::str::FromStr;
 
 //TODO move
 #[test]
@@ -347,7 +349,7 @@ fn f64_rounding_from_natural_fail_1() {
         6327668781715404589535143824642343213268894641827684675467035375169860499105765512820762454\
         9009038932894407586850845513394230458323690322294816580855933212334827479782620414472316873\
         8177180919299881250404026184124858367").unwrap(),
-    RoundingMode::Exact);
+                       RoundingMode::Exact);
 }
 
 #[test]
@@ -358,7 +360,7 @@ fn f64_rounding_from_natural_fail_2() {
         6327668781715404589535143824642343213268894641827684675467035375169860499105765512820762454\
         9009038932894407586850845513394230458323690322294816580855933212334827479782620414472316873\
         8177180919299881250404026184124858369").unwrap(),
-    RoundingMode::Exact);
+                       RoundingMode::Exact);
 }
 
 #[test]
@@ -619,10 +621,12 @@ macro_rules! float_properties {
             });
 
             test_properties($naturals_not_exactly_equal_to_float, |n| {
+                //TODO convertible
                 assert!($f::checked_from(n).is_none());
             });
 
             test_properties($naturals_var_2, |n| {
+                //TODO convertible
                 assert!($f::checked_from(n).is_none());
             });
         }

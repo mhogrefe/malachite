@@ -1,12 +1,14 @@
-use common::test_properties;
+use std::str::FromStr;
+
 use malachite_base::num::traits::{AddMul, AddMulAssign, One, Zero};
 use malachite_nz::natural::arithmetic::add_mul::{limbs_add_mul, limbs_add_mul_in_place_left};
 use malachite_nz::natural::Natural;
 #[cfg(feature = "32_bit_limbs")]
 use malachite_nz::platform::Limb;
+
+use common::test_properties;
 use malachite_test::inputs::base::triples_of_unsigned_vec_var_27;
 use malachite_test::inputs::natural::{pairs_of_naturals, triples_of_naturals};
-use std::str::FromStr;
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]

@@ -1,6 +1,7 @@
 use malachite_base::conversion::CheckedFrom;
 use malachite_base::num::integers::PrimitiveInteger;
 use malachite_base::num::traits::BitAccess;
+
 use natural::Natural::{self, Large, Small};
 use platform::Limb;
 

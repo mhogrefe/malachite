@@ -1,4 +1,5 @@
 use malachite_base::num::traits::{CheckedSubMul, SaturatingSubMul, SaturatingSubMulAssign, Zero};
+
 use natural::Natural;
 
 impl SaturatingSubMul<Natural, Natural> for Natural {

@@ -2,6 +2,7 @@ use malachite_base::conversion::CheckedFrom;
 #[cfg(feature = "64_bit_limbs")]
 use malachite_base::conversion::WrappingFrom;
 use malachite_base::num::traits::CheckedSub;
+
 use natural::arithmetic::sub_limb::{limbs_sub_limb, limbs_sub_limb_in_place};
 use natural::Natural::{self, Large, Small};
 use platform::Limb;

@@ -1,13 +1,15 @@
-use common::test_properties;
+use std::str::FromStr;
+
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
+use num::BigUint;
+use rug;
+
+use common::test_properties;
 use malachite_test::common::{natural_to_biguint, natural_to_rug_integer};
 use malachite_test::inputs::base::pairs_of_unsigneds;
 use malachite_test::inputs::natural::pairs_of_natural_and_unsigned;
 use malachite_test::natural::comparison::partial_eq_limb::num_partial_eq_limb;
-use num::BigUint;
-use rug;
-use std::str::FromStr;
 
 #[test]
 fn test_partial_eq_limb() {

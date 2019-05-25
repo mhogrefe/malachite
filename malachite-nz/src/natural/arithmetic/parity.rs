@@ -1,4 +1,5 @@
 use malachite_base::num::traits::Parity;
+
 use natural::Natural::{self, Large, Small};
 
 impl<'a> Parity for &'a Natural {

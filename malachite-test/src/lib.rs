@@ -18,12 +18,14 @@ extern crate rust_wheels;
 #[macro_use]
 pub mod common;
 pub mod hash;
+
 pub mod inputs {
     pub mod base;
     pub mod common;
     pub mod integer;
     pub mod natural;
 }
+
 pub mod base;
 pub mod integer;
 pub mod natural;

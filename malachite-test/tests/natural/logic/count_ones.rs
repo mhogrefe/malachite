@@ -1,14 +1,16 @@
-use common::test_properties;
+use std::str::FromStr;
+
 use malachite_base::num::traits::IsPowerOfTwo;
 use malachite_nz::natural::logic::count_ones::limbs_count_ones;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
+
+use common::test_properties;
 use malachite_test::inputs::base::{unsigneds, vecs_of_unsigned};
 use malachite_test::inputs::natural::naturals;
 use malachite_test::natural::logic::count_ones::{
     natural_count_ones_alt_1, natural_count_ones_alt_2,
 };
-use std::str::FromStr;
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]

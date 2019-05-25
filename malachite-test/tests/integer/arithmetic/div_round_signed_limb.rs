@@ -1,10 +1,16 @@
-use common::test_properties;
+use std::str::FromStr;
+
 use malachite_base::num::traits::{
     CeilingDivMod, DivRound, DivRoundAssign, NegativeOne, One, PartialOrdAbs, Zero,
 };
 use malachite_base::round::RoundingMode;
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::{Limb, SignedLimb};
+use num::BigInt;
+#[cfg(feature = "32_bit_limbs")]
+use rug::{self, ops::DivRounding};
+
+use common::test_properties;
 use malachite_test::common::{bigint_to_integer, integer_to_bigint};
 #[cfg(feature = "32_bit_limbs")]
 use malachite_test::common::{integer_to_rug_integer, rug_integer_to_integer};
@@ -20,10 +26,6 @@ use malachite_test::inputs::integer::{
     triples_of_signed_nonzero_integer_and_rounding_mode_var_1,
 };
 use malachite_test::integer::arithmetic::div_round_signed_limb::num_div_round_signed_limb_floor;
-use num::BigInt;
-#[cfg(feature = "32_bit_limbs")]
-use rug::{self, ops::DivRounding};
-use std::str::FromStr;
 
 #[test]
 fn test_div_round_signed_limb() {

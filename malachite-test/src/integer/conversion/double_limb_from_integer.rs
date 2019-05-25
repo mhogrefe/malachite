@@ -362,11 +362,11 @@ fn benchmark_double_limb_overflowing_from_integer_algorithms(
                 &mut (|n| no_out!(DoubleLimb::overflowing_from(n))),
             ),
             (
-                "using checked_from and wrapping_from",
+                "using wrapping_from and convertible_from",
                 &mut (|n| {
                     no_out!((
                         DoubleLimb::wrapping_from(&n),
-                        DoubleLimb::checked_from(n).is_none()
+                        !DoubleLimb::convertible_from(n)
                     ))
                 }),
             ),

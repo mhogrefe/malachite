@@ -1,8 +1,10 @@
-use common::test_properties;
+use std::str::FromStr;
+
 use malachite_base::num::traits::{CheckedSub, CheckedSubMul, One, Zero};
 use malachite_nz::natural::Natural;
+
+use common::test_properties;
 use malachite_test::inputs::natural::{naturals, pairs_of_naturals, triples_of_naturals};
-use std::str::FromStr;
 
 #[test]
 fn test_checked_sub_mul() {

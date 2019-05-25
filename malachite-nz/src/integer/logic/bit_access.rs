@@ -88,7 +88,7 @@ pub fn limbs_set_bit_neg(limbs: &mut [Limb], index: u64) {
     } else {
         assert!(!limbs_sub_limb_in_place(
             &mut limbs[limb_index..],
-            1 << reduced_index
+            1 << reduced_index,
         ));
     }
 }

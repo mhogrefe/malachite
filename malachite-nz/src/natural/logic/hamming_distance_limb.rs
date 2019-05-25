@@ -1,4 +1,5 @@
 use malachite_base::num::traits::HammingDistance;
+
 use natural::logic::count_ones::limbs_count_ones;
 use natural::Natural::{self, Large, Small};
 use platform::Limb;

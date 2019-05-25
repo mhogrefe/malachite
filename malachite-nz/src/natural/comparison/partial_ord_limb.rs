@@ -1,6 +1,7 @@
+use std::cmp::Ordering;
+
 use natural::Natural::{self, Large, Small};
 use platform::Limb;
-use std::cmp::Ordering;
 
 /// Compares a `Natural` to a `Limb`.
 ///

@@ -228,12 +228,15 @@ pub mod arithmetic {
     pub mod sub_mul;
     pub mod sub_mul_limb;
 }
+
 pub mod conversion;
+
 pub mod comparison {
     pub mod ord;
     pub mod partial_eq_limb;
     pub mod partial_ord_limb;
 }
+
 pub mod logic {
     pub mod and;
     pub mod and_limb;
@@ -250,6 +253,7 @@ pub mod logic {
     pub mod xor;
     pub mod xor_limb;
 }
+
 pub mod random {
     pub mod random_natural_below;
     pub mod random_natural_up_to_bits;

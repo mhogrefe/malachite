@@ -1,6 +1,7 @@
 use malachite_base::num::traits::{
     CheckedSubMul, SplitInHalf, SubMul, SubMulAssign, WrappingAddAssign,
 };
+
 use natural::arithmetic::sub_limb::limbs_sub_limb_in_place;
 use natural::arithmetic::sub_mul::sub_mul_panic;
 use natural::Natural;

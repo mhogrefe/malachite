@@ -1,9 +1,12 @@
+use std::cmp::{max, Ordering};
+
 use malachite_base::conversion::{CheckedFrom, WrappingFrom};
 use malachite_base::limbs::{limbs_set_zero, limbs_test_zero};
 use malachite_base::num::integers::PrimitiveInteger;
 use malachite_base::num::traits::{
     EqModPowerOfTwo, NotAssign, WrappingAddAssign, WrappingSubAssign,
 };
+
 use natural::arithmetic::add::{
     _limbs_add_same_length_with_carry_in_in_place_left, _limbs_add_to_out_aliased,
     limbs_add_same_length_to_out, limbs_add_to_out, limbs_slice_add_greater_in_place_left,
@@ -42,7 +45,6 @@ use natural::arithmetic::sub::{
 use natural::arithmetic::sub_limb::limbs_sub_limb_in_place;
 use natural::comparison::ord::limbs_cmp_same_length;
 use platform::{Limb, SignedLimb};
-use std::cmp::{max, Ordering};
 
 //TODO tune all
 pub const MUL_TOOM22_THRESHOLD: usize = 20;
@@ -352,12 +354,12 @@ pub fn _limbs_mul_greater_to_out_toom_22(
     }
     assert!(!limbs_slice_add_limb_in_place(
         &mut out[2 * n..2 * n + s + t],
-        carry2
+        carry2,
     ));
     if carry <= 2 {
         assert!(!limbs_slice_add_limb_in_place(
             &mut out[3 * n..2 * n + s + t],
-            carry
+            carry,
         ));
     } else {
         assert!(!limbs_sub_limb_in_place(&mut out[3 * n..2 * n + s + t], 1));
@@ -604,7 +606,7 @@ pub fn _limbs_mul_greater_to_out_toom_32(
     }
     assert!(!limbs_slice_add_limb_in_place(
         &mut scratch[n..2 * n + 1],
-        scratch_high
+        scratch_high,
     ));
 
     if v_neg_1_neg {
@@ -617,7 +619,7 @@ pub fn _limbs_mul_greater_to_out_toom_32(
         }
         assert!(!limbs_slice_add_limb_in_place(
             &mut scratch[n..2 * n + 1],
-            Limb::wrapping_from(hi)
+            Limb::wrapping_from(hi),
         ));
     } else {
         let carry = limbs_sub_same_length_in_place_left(&mut scratch[..n], &out[..n]);
@@ -632,7 +634,7 @@ pub fn _limbs_mul_greater_to_out_toom_32(
         }
         assert!(!limbs_sub_limb_in_place(
             &mut scratch[n..2 * n + 1],
-            Limb::wrapping_from(hi)
+            Limb::wrapping_from(hi),
         ));
     }
 
@@ -694,12 +696,12 @@ pub fn _limbs_mul_greater_to_out_toom_32(
             panic!("hi < 0 second time: {:?} {:?}", xs, ys);
             assert!(!limbs_sub_limb_in_place(
                 out_hi,
-                Limb::checked_from(-hi).unwrap()
+                Limb::checked_from(-hi).unwrap(),
             ));
         } else {
             assert!(!limbs_slice_add_limb_in_place(
                 out_hi,
-                Limb::checked_from(hi).unwrap()
+                Limb::checked_from(hi).unwrap(),
             ));
         }
     } else {

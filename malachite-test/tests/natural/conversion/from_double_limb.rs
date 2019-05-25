@@ -1,15 +1,16 @@
-#[cfg(feature = "32_bit_limbs")]
-use common::test_properties;
 use malachite_base::comparison::Max;
 #[cfg(feature = "32_bit_limbs")]
 use malachite_base::conversion::CheckedFrom;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::DoubleLimb;
+use num::BigUint;
+
+#[cfg(feature = "32_bit_limbs")]
+use common::test_properties;
 #[cfg(feature = "32_bit_limbs")]
 use malachite_test::common::biguint_to_natural;
 #[cfg(feature = "32_bit_limbs")]
 use malachite_test::inputs::base::unsigneds;
-use num::BigUint;
 
 #[test]
 fn test_from_double_limb() {

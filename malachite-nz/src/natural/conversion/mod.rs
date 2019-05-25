@@ -1,9 +1,11 @@
-use error::ParseIntegerError;
-use malachite_base::num::traits::{Assign, DivAssignMod, Zero};
-use natural::Natural::{self, Large, Small};
-use platform::Limb;
 use std::fmt::{self, Debug, Display, Formatter};
 use std::str::FromStr;
+
+use malachite_base::num::traits::{Assign, DivAssignMod, Zero};
+
+use error::ParseIntegerError;
+use natural::Natural::{self, Large, Small};
+use platform::Limb;
 
 impl Natural {
     //TODO test

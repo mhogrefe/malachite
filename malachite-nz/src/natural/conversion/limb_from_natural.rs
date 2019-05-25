@@ -2,6 +2,7 @@ use malachite_base::comparison::Max;
 use malachite_base::conversion::{
     CheckedFrom, ConvertibleFrom, OverflowingFrom, SaturatingFrom, WrappingFrom,
 };
+
 use natural::Natural::{self, Large, Small};
 use platform::Limb;
 

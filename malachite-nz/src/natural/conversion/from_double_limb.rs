@@ -1,4 +1,5 @@
 use malachite_base::num::traits::SplitInHalf;
+
 use natural::Natural::{self, Large, Small};
 use platform::DoubleLimb;
 

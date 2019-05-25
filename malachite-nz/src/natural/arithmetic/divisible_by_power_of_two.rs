@@ -2,6 +2,7 @@ use malachite_base::conversion::CheckedFrom;
 use malachite_base::limbs::limbs_test_zero;
 use malachite_base::num::integers::PrimitiveInteger;
 use malachite_base::num::traits::DivisibleByPowerOfTwo;
+
 use natural::Natural::{self, Large, Small};
 use platform::Limb;
 

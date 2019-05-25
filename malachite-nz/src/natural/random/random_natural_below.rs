@@ -1,8 +1,9 @@
 use malachite_base::num::traits::{IsPowerOfTwo, SignificantBits};
+use rand::Rng;
+
 use natural::random::random_natural_up_to_bits::random_natural_up_to_bits;
 use natural::Natural;
 use platform::Limb;
-use rand::Rng;
 
 /// Returns a random `Natural` uniformly sampled from [0, `n`).
 ///

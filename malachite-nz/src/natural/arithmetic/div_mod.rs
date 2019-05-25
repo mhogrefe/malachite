@@ -1,7 +1,10 @@
+use std::cmp::{max, min, Ordering};
+
 use malachite_base::comparison::Max;
 use malachite_base::conversion::CheckedFrom;
 use malachite_base::num::integers::PrimitiveInteger;
 use malachite_base::num::traits::{JoinHalves, SplitInHalf, WrappingAddAssign, WrappingSubAssign};
+
 use natural::arithmetic::add::limbs_slice_add_same_length_in_place_left;
 use natural::arithmetic::mul::mul_mod::{
     _limbs_mul_mod_limb_width_to_n_minus_1_next_size,
@@ -14,7 +17,6 @@ use natural::arithmetic::sub_mul_limb::limbs_sub_mul_limb_same_length_in_place_l
 use natural::comparison::ord::limbs_cmp_same_length;
 use natural::logic::not::limbs_not_to_out;
 use platform::{DoubleLimb, Limb};
-use std::cmp::{max, min, Ordering};
 
 // will remove
 fn sub_ddmmss(sh: &mut Limb, sl: &mut Limb, ah: Limb, al: Limb, bh: Limb, bl: Limb) {
@@ -427,7 +429,7 @@ pub fn mpn_dcpi1_div_qr(qp: &mut [Limb], np: &mut [Limb], dp: &[Limb], dinv: Lim
                 //TODO
                 assert!(!limbs_sub_same_length_in_place_left(
                     &mut np[np_offset - dn + 1..=np_offset],
-                    &dp[dp_offset - dn..dp_offset]
+                    &dp[dp_offset - dn..dp_offset],
                 ));
             }
 
@@ -1040,7 +1042,7 @@ pub fn mpn_dcpi1_divappr_q(qp: &mut [Limb], np: &mut [Limb], dp: &[Limb], dinv: 
             if qh != 0 {
                 assert!(!limbs_sub_same_length_in_place_left(
                     &mut np[np_offset - dn + 1..=np_offset],
-                    &dp[dp_offset - dn..dp_offset]
+                    &dp[dp_offset - dn..dp_offset],
                 ));
             }
 

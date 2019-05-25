@@ -1,17 +1,19 @@
-use common::test_properties;
+use std::str::FromStr;
+
 use malachite_base::conversion::{CheckedFrom, RoundingFrom};
 use malachite_base::crement::Crementable;
 use malachite_base::num::floats::PrimitiveFloat;
 use malachite_base::num::traits::Parity;
 use malachite_base::round::RoundingMode;
 use malachite_nz::integer::Integer;
+
+use common::test_properties;
 use malachite_test::inputs::integer::{
     integers, integers_exactly_equal_to_f32, integers_exactly_equal_to_f64,
     integers_not_exactly_equal_to_f32, integers_not_exactly_equal_to_f64, integers_var_1_f32,
     integers_var_1_f64, pairs_of_integer_and_rounding_mode_var_1_f32,
     pairs_of_integer_and_rounding_mode_var_1_f64,
 };
-use std::str::FromStr;
 
 #[test]
 fn test_f32_rounding_from_integer() {
@@ -538,7 +540,7 @@ fn f64_rounding_from_integer_fail_1() {
         6327668781715404589535143824642343213268894641827684675467035375169860499105765512820762454\
         9009038932894407586850845513394230458323690322294816580855933212334827479782620414472316873\
         8177180919299881250404026184124858367").unwrap(),
-    RoundingMode::Exact);
+                       RoundingMode::Exact);
 }
 
 #[test]
@@ -549,7 +551,7 @@ fn f64_rounding_from_integer_fail_2() {
         6327668781715404589535143824642343213268894641827684675467035375169860499105765512820762454\
         9009038932894407586850845513394230458323690322294816580855933212334827479782620414472316873\
         8177180919299881250404026184124858369").unwrap(),
-    RoundingMode::Exact);
+                       RoundingMode::Exact);
 }
 
 #[test]
@@ -910,10 +912,12 @@ macro_rules! float_properties {
             });
 
             test_properties($integers_not_exactly_equal_to_float, |n| {
+                //TODO convertible
                 assert!($f::checked_from(n).is_none());
             });
 
             test_properties($integers_var_1, |n| {
+                //TODO convertible
                 assert!($f::checked_from(n).is_none());
             });
         }

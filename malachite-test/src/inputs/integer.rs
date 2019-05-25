@@ -1836,12 +1836,14 @@ macro_rules! float_gen {
         ) -> It<(Integer, RoundingMode)> {
             Box::new(
                 pairs_of_integer_and_rounding_mode(gm).filter(|&(ref n, rm)| {
+                    //TODO convertible
                     rm != RoundingMode::Exact || $f::checked_from(n).is_some()
                 }),
             )
         }
 
         pub fn $integers_exactly_equal_to_float(gm: GenerationMode) -> It<Integer> {
+            //TODO convertible
             Box::new(integers(gm).filter(|n| $f::checked_from(n).is_some()))
         }
 
@@ -1908,11 +1910,13 @@ macro_rules! float_gen {
                     Box::new($special_random_integers_not_exactly_equal_to_float(scale))
                 }
             };
+            //TODO convertible
             Box::new(xs.filter(|n| $f::checked_from(n).is_none()))
         }
 
         // finite floats that are not exactly equal to an Integer.
         pub fn $floats_var_4(gm: GenerationMode) -> It<$f> {
+            //TODO convertible
             Box::new($finite_floats(gm).filter(|&f| Integer::checked_from(f).is_none()))
         }
 
@@ -1920,6 +1924,7 @@ macro_rules! float_gen {
         pub fn $floats_var_5(gm: GenerationMode) -> It<$f> {
             Box::new($floats_exactly_equal_to_integer(gm).flat_map(|f| {
                 let f_plus_half = f + 0.5;
+                //TODO convertible
                 if Integer::checked_from(f_plus_half).is_some() {
                     None
                 } else {

@@ -1,6 +1,6 @@
 use std::ops::{Add, Mul, Shl, Shr};
 
-use malachite_base::conversion::{CheckedFrom, CheckedInto, RoundingFrom};
+use malachite_base::conversion::{CheckedFrom, CheckedInto, ConvertibleFrom, RoundingFrom};
 use malachite_base::crement::Crementable;
 use malachite_base::num::floats::PrimitiveFloat;
 use malachite_base::num::integers::PrimitiveInteger;
@@ -1053,12 +1053,14 @@ macro_rules! float_gen {
         ) -> It<(Natural, RoundingMode)> {
             Box::new(
                 pairs_of_natural_and_rounding_mode(gm).filter(|&(ref n, rm)| {
+                    //TODO convertible
                     rm != RoundingMode::Exact || $f::checked_from(n).is_some()
                 }),
             )
         }
 
         pub fn $naturals_exactly_equal_to_float(gm: GenerationMode) -> It<Natural> {
+            //TODO convertible
             Box::new(naturals(gm).filter(|n| $f::checked_from(n).is_some()))
         }
 
@@ -1077,12 +1079,13 @@ macro_rules! float_gen {
                     Box::new(special_random_range_up_natural(&EXAMPLE_SEED, scale, n))
                 }
             };
+            //TODO convertible
             Box::new(xs.filter(|n| $f::checked_from(n).is_none()))
         }
 
         // floats that are positive, not infinite, not NaN, and not exactly equal to a Natural.
         pub fn $floats_var_2(gm: GenerationMode) -> It<$f> {
-            Box::new($finite_floats(gm).filter(|&f| f > 0.0 && Natural::checked_from(f).is_none()))
+            Box::new($finite_floats(gm).filter(|&f| f > 0.0 && !Natural::convertible_from(f)))
         }
 
         // positive floats exactly in between two adjacent Naturals.

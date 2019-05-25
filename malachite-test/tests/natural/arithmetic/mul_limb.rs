@@ -1,4 +1,5 @@
-use common::test_properties;
+use std::str::FromStr;
+
 use malachite_base::num::traits::{DivMod, One, Zero};
 use malachite_nz::natural::arithmetic::mul_limb::{
     limbs_mul_limb, limbs_mul_limb_to_out, limbs_mul_limb_with_carry_to_out,
@@ -6,6 +7,11 @@ use malachite_nz::natural::arithmetic::mul_limb::{
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::{DoubleLimb, Limb};
+use num::BigUint;
+#[cfg(feature = "32_bit_limbs")]
+use rug::{self, Assign};
+
+use common::test_properties;
 use malachite_test::common::{biguint_to_natural, natural_to_biguint};
 #[cfg(feature = "32_bit_limbs")]
 use malachite_test::common::{natural_to_rug_integer, rug_integer_to_natural};
@@ -16,10 +22,6 @@ use malachite_test::inputs::base::{
 };
 use malachite_test::inputs::natural::{naturals, pairs_of_natural_and_unsigned};
 use malachite_test::natural::arithmetic::mul_limb::num_mul_limb;
-use num::BigUint;
-#[cfg(feature = "32_bit_limbs")]
-use rug::{self, Assign};
-use std::str::FromStr;
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]

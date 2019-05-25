@@ -1,6 +1,8 @@
-use malachite_base::num::traits::{CheckedSubMul, SubMul, SubMulAssign};
-use natural::Natural;
 use std::fmt::Display;
+
+use malachite_base::num::traits::{CheckedSubMul, SubMul, SubMulAssign};
+
+use natural::Natural;
 
 pub(crate) fn sub_mul_panic<S: Display, T: Display, U: Display>(a: S, b: T, c: U) -> ! {
     panic!("Cannot perform sub_mul. a: {}, b: {}, c: {}", a, b, c);

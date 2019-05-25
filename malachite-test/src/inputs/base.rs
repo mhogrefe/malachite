@@ -3,7 +3,7 @@ use std::cmp::Ordering;
 use std::ops::{Shl, Shr};
 
 use malachite_base::chars::NUMBER_OF_CHARS;
-use malachite_base::conversion::{CheckedFrom, WrappingFrom};
+use malachite_base::conversion::{CheckedFrom, ConvertibleFrom, WrappingFrom};
 use malachite_base::limbs::limbs_test_zero;
 use malachite_base::num::integers::PrimitiveInteger;
 use malachite_base::num::signeds::PrimitiveSigned;
@@ -237,7 +237,7 @@ macro_rules! float_gen {
             Box::new(
                 $pairs_of_finite_float_and_rounding_mode(gm).filter(|&(f, rm)| {
                     if rm == RoundingMode::Exact {
-                        return Natural::checked_from(f).is_some();
+                        return Natural::convertible_from(f);
                     }
                     match rm {
                         RoundingMode::Floor | RoundingMode::Up => f >= 0.0,
@@ -589,6 +589,7 @@ where
 }
 
 type ItU<T> = It<(T, u64)>;
+
 fn exhaustive_pairs_of_unsigned_and_u64_width_range<T: PrimitiveUnsigned + Rand>() -> ItU<T> {
     Box::new(lex_pairs(
         exhaustive_unsigned(),
@@ -965,6 +966,7 @@ pub fn triples_of_rounding_modes(
 }
 
 type ItR<T> = It<(T, RoundingMode)>;
+
 fn random_pairs_of_primitive_and_rounding_mode<T: PrimitiveInteger + Rand>() -> ItR<T> {
     Box::new(random_pairs(
         &EXAMPLE_SEED,

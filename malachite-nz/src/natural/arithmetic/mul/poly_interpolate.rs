@@ -1,9 +1,12 @@
+use std::mem::swap;
+
 use malachite_base::comparison::Max;
 use malachite_base::limbs::limbs_test_zero;
 use malachite_base::num::integers::PrimitiveInteger;
 use malachite_base::num::traits::{
     DivisibleByPowerOfTwo, Parity, WrappingAddAssign, WrappingSubAssign,
 };
+
 use natural::arithmetic::add::{
     limbs_add_same_length_to_out, limbs_slice_add_greater_in_place_left,
     limbs_slice_add_same_length_in_place_left,
@@ -26,7 +29,6 @@ use natural::arithmetic::sub::{
 use natural::arithmetic::sub_limb::limbs_sub_limb_in_place;
 use natural::arithmetic::sub_mul_limb::limbs_sub_mul_limb_same_length_in_place_left;
 use platform::Limb;
-use std::mem::swap;
 
 /// Time: worst case O(k)
 ///
@@ -121,7 +123,7 @@ pub(crate) fn _limbs_mul_toom_interpolate_5_points(
             // Memory allocated for v_neg_1 is now free, it can be recycled
             assert!(!limbs_slice_add_limb_in_place(
                 &mut c_hi[..two_r + k - 1],
-                1
+                1,
             ));
         }
         let v_inf = &mut c_hi[k - 1..two_r + k - 1];
@@ -162,7 +164,7 @@ pub(crate) fn _limbs_mul_toom_interpolate_5_points(
             // 2n-(5k+1) = 2r-k-1
             assert!(!limbs_slice_add_limb_in_place(
                 &mut c_hi[..two_r - k - 1],
-                1
+                1,
             ));
         }
     } else {
@@ -171,7 +173,7 @@ pub(crate) fn _limbs_mul_toom_interpolate_5_points(
         // two_r < k + 1 so k + two_r < two_k, the size of v_2
         assert!(!limbs_slice_add_same_length_in_place_left(
             &mut c[4 * k..4 * k + two_r],
-            &v_2[k..k + two_r]
+            &v_2[k..k + two_r],
         ));
     }
     let carry;
@@ -337,7 +339,7 @@ pub(crate) fn _limbs_mul_toom_interpolate_6_points(
     if limbs_slice_add_same_length_in_place_left(&mut out[n..=3 * n], &w4[..m]) {
         assert!(!limbs_slice_add_limb_in_place(
             &mut out[3 * n + 1..=4 * n],
-            1
+            1,
         ));
     }
 
@@ -400,35 +402,35 @@ pub(crate) fn _limbs_mul_toom_interpolate_6_points(
         if special_carry_1 > special_carry_2 {
             assert!(!limbs_slice_add_limb_in_place(
                 &mut out[4 * n..5 * n + n_high],
-                special_carry_1 - special_carry_2
+                special_carry_1 - special_carry_2,
             ));
         } else {
             assert!(!limbs_sub_limb_in_place(
                 &mut out[4 * n..5 * n + n_high],
-                special_carry_2 - special_carry_1
+                special_carry_2 - special_carry_1,
             ));
         }
         if carry {
             assert!(!limbs_sub_limb_in_place(
                 &mut out[3 * n + n_high..5 * n + n_high],
-                1
+                1,
             ));
         }
         assert!(!limbs_slice_add_limb_in_place(
             &mut out[6 * n..5 * n + n_high],
-            special_carry_2
+            special_carry_2,
         ));
     } else {
         assert!(!limbs_slice_add_limb_in_place(
             &mut out[4 * n..5 * n + n_high],
-            special_carry_1
+            special_carry_1,
         ));
         if carry {
             special_carry_2.wrapping_add_assign(1);
         }
         assert!(!limbs_sub_limb_in_place(
             &mut out[3 * n + n_high..5 * n + n_high],
-            special_carry_2
+            special_carry_2,
         ));
     }
     out[5 * n + n_high - 1].wrapping_add_assign(embankment);
@@ -623,7 +625,7 @@ pub(crate) fn _limbs_mul_toom_interpolate_7_points(
         let (w5_hi_lo, w5_hi_hi) = w5_hi.split_at_mut(n_high);
         assert!(!limbs_slice_add_same_length_in_place_left(
             &mut remainder[..n_high],
-            w5_hi_lo
+            w5_hi_lo,
         ));
         if WANT_ASSERT && n + n_high < m {
             limbs_test_zero(w5_hi_hi);
@@ -1018,7 +1020,7 @@ pub fn _limbs_mul_toom_interpolate_12_points<'a>(
     }
     assert!(!limbs_slice_add_limb_in_place(
         &mut out_4[..2 * n + 1],
-        carry
+        carry,
     ));
     split_into_chunks_mut!(out_4, n, [_unused, out_5, out_6, out_7], out_8);
     split_into_chunks_mut!(r3, n, [r3_0, r3_1], r3_2);
@@ -1036,7 +1038,7 @@ pub fn _limbs_mul_toom_interpolate_12_points<'a>(
     }
     assert!(!limbs_slice_add_limb_in_place(
         &mut out_8[..2 * n + 1],
-        carry
+        carry,
     ));
     split_into_chunks_mut!(out_8, n, [_unused, out_9], out_10);
     let (r1_0, r1_1) = r1.split_at_mut(n);
@@ -1059,19 +1061,19 @@ pub fn _limbs_mul_toom_interpolate_12_points<'a>(
             }
             assert!(!limbs_slice_add_limb_in_place(
                 &mut out_12[..s_plus_t - n],
-                carry
+                carry,
             ));
         } else {
             assert!(!limbs_slice_add_same_length_in_place_left(
                 &mut out_11[..s_plus_t],
-                &r1_2[..s_plus_t]
+                &r1_2[..s_plus_t],
             ));
         }
     } else {
         assert!(!limbs_add_limb_to_out(
             out_10,
             &r1_1[..s_plus_t],
-            out_10_first
+            out_10_first,
         ));
     }
 }
@@ -1403,19 +1405,19 @@ pub fn _limbs_mul_toom_interpolate_16_points<'a>(
             }
             assert!(!limbs_slice_add_limb_in_place(
                 &mut out_16[..s_plus_t - n],
-                carry
+                carry,
             ));
         } else {
             assert!(!limbs_slice_add_same_length_in_place_left(
                 &mut out_15[..s_plus_t],
-                &r1_2[..s_plus_t]
+                &r1_2[..s_plus_t],
             ));
         }
     } else {
         assert!(!limbs_add_limb_to_out(
             &mut out_14[..s_plus_t],
             &r1_1[..s_plus_t],
-            out_14_first
+            out_14_first,
         ));
     }
 }
