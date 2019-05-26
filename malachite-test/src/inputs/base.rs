@@ -1767,6 +1767,21 @@ pub fn triples_of_unsigned_vec_var_27<T: PrimitiveUnsigned + Rand>(
     )
 }
 
+// All triples of `Vec<T>`, where `T` is unsigned, `ys` and `zs` have at least two elements, `xs`
+// has at least `ys.len() + zs.len() - 1` elements, and no slice has trailing zeros.
+pub fn triples_of_unsigned_vec_var_28<T: PrimitiveUnsigned + Rand>(
+    gm: GenerationMode,
+) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
+    Box::new(
+        triples_of_unsigned_vec_min_sizes(gm, 3, 2, 2).filter(|&(ref xs, ref ys, ref zs)| {
+            xs.len() >= ys.len() + zs.len() - 1
+                && *xs.last().unwrap() != T::ZERO
+                && *ys.last().unwrap() != T::ZERO
+                && *zs.last().unwrap() != T::ZERO
+        }),
+    )
+}
+
 pub fn quadruples_of_three_unsigned_vecs_and_bool<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
 ) -> It<(Vec<T>, Vec<T>, Vec<T>, bool)> {

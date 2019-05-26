@@ -210,7 +210,7 @@ impl SaturatingSubMulAssign<Natural, Natural> for Natural {
     /// }
     /// ```
     fn saturating_sub_mul_assign(&mut self, b: Natural, c: Natural) {
-        if self.sub_mul_assign_no_panic(&b, &c) {
+        if self.sub_mul_assign_no_panic(b, c) {
             *self = Natural::ZERO;
         }
     }
@@ -249,7 +249,7 @@ impl<'a> SaturatingSubMulAssign<Natural, &'a Natural> for Natural {
     /// }
     /// ```
     fn saturating_sub_mul_assign(&mut self, b: Natural, c: &'a Natural) {
-        if self.sub_mul_assign_no_panic(&b, c) {
+        if self.sub_mul_assign_val_ref_no_panic(b, c) {
             *self = Natural::ZERO;
         }
     }
@@ -288,7 +288,7 @@ impl<'a> SaturatingSubMulAssign<&'a Natural, Natural> for Natural {
     /// }
     /// ```
     fn saturating_sub_mul_assign(&mut self, b: &'a Natural, c: Natural) {
-        if self.sub_mul_assign_no_panic(b, &c) {
+        if self.sub_mul_assign_ref_val_no_panic(b, c) {
             *self = Natural::ZERO;
         }
     }
@@ -327,7 +327,7 @@ impl<'a, 'b> SaturatingSubMulAssign<&'a Natural, &'b Natural> for Natural {
     /// }
     /// ```
     fn saturating_sub_mul_assign(&mut self, b: &'a Natural, c: &'b Natural) {
-        if self.sub_mul_assign_no_panic(b, c) {
+        if self.sub_mul_assign_ref_ref_no_panic(b, c) {
             *self = Natural::ZERO;
         }
     }

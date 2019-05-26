@@ -1,12 +1,89 @@
 use std::str::FromStr;
 
-use malachite_base::num::traits::{CheckedSub, One, SubMul, SubMulAssign, Zero};
+use malachite_base::num::traits::{CheckedSub, CheckedSubMul, One, SubMul, SubMulAssign, Zero};
+use malachite_nz::natural::arithmetic::sub_mul::{limbs_sub_mul, limbs_sub_mul_in_place_left};
 use malachite_nz::natural::Natural;
+#[cfg(feature = "32_bit_limbs")]
+use malachite_nz::platform::Limb;
 
 use common::test_properties;
+use malachite_test::inputs::base::triples_of_unsigned_vec_var_28;
 use malachite_test::inputs::natural::{
     naturals, pairs_of_naturals, pairs_of_naturals_var_1, triples_of_naturals_var_1,
 };
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+fn test_limbs_sub_mul_and_limbs_sub_mul_in_place_left() {
+    let test = |xs_before: &[Limb], ys: &[Limb], zs: &[Limb], result: Option<Vec<Limb>>| {
+        assert_eq!(limbs_sub_mul(xs_before, ys, zs), result);
+        let mut xs = xs_before.to_vec();
+        let result_alt = if limbs_sub_mul_in_place_left(&mut xs, ys, zs) {
+            None
+        } else {
+            Some(xs)
+        };
+        assert_eq!(result, result_alt);
+    };
+    test(&[123, 456, 789], &[123, 789], &[321, 654], None);
+    test(
+        &[123, 456, 789, 1],
+        &[123, 789],
+        &[321, 654],
+        Some(vec![4294927936, 4294634040, 4294452078, 0]),
+    );
+    test(
+        &[123, 456, 789, 987, 654],
+        &[123, 789],
+        &[321, 654],
+        Some(vec![4294927936, 4294634040, 4294452078, 986, 654]),
+    );
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_sub_mul_fail_1() {
+    limbs_sub_mul(&[10, 10, 10], &[10], &[10, 10]);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_sub_mul_fail_2() {
+    limbs_sub_mul(&[10, 10, 10], &[10, 10], &[10]);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_sub_mul_fail_3() {
+    limbs_sub_mul(&[10, 10], &[10, 10], &[10, 10]);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_sub_mul_in_place_left_fail_1() {
+    let xs = &mut [10, 10, 10];
+    limbs_sub_mul_in_place_left(xs, &[10], &[10, 10]);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_sub_mul_in_place_left_fail_2() {
+    let xs = &mut [10, 10, 10];
+    limbs_sub_mul_in_place_left(xs, &[10, 10], &[10]);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_sub_mul_in_place_left_fail_3() {
+    let xs = &mut [10, 10];
+    limbs_sub_mul_in_place_left(xs, &[10, 10], &[10, 10]);
+}
 
 #[test]
 fn test_sub_mul() {
@@ -270,6 +347,36 @@ fn sub_mul_ref_ref_ref_fail_2() {
         &Natural::from_str("1000000000000").unwrap(),
         &Natural::from_str("100").unwrap(),
     );
+}
+
+#[test]
+fn limbs_sub_mul_properties() {
+    test_properties(triples_of_unsigned_vec_var_28, |&(ref a, ref b, ref c)| {
+        let expected = limbs_sub_mul(a, b, c).map(Natural::from_owned_limbs_asc);
+        assert_eq!(
+            expected,
+            Natural::from_limbs_asc(a)
+                .checked_sub_mul(Natural::from_limbs_asc(b), Natural::from_limbs_asc(c))
+        );
+    });
+}
+
+#[test]
+fn limbs_sub_mul_in_place_left_properties() {
+    test_properties(triples_of_unsigned_vec_var_28, |&(ref a, ref b, ref c)| {
+        let a_old = a;
+        let mut a = a.to_vec();
+        let expected = if limbs_sub_mul_in_place_left(&mut a, b, c) {
+            None
+        } else {
+            Some(Natural::from_owned_limbs_asc(a))
+        };
+        assert_eq!(
+            expected,
+            Natural::from_limbs_asc(a_old)
+                .checked_sub_mul(Natural::from_limbs_asc(b), Natural::from_limbs_asc(c))
+        );
+    });
 }
 
 #[test]

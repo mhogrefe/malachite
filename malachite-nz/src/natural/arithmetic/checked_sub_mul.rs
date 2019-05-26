@@ -1,6 +1,6 @@
 use malachite_base::num::traits::CheckedSubMul;
 
-use natural::arithmetic::add_mul::mpz_aorsmul;
+use natural::arithmetic::sub_mul::{limbs_sub_mul, limbs_sub_mul_in_place_left};
 use natural::Natural::{self, Large, Small};
 
 impl CheckedSubMul<Natural, Natural> for Natural {
@@ -34,8 +34,12 @@ impl CheckedSubMul<Natural, Natural> for Natural {
     ///         Natural::from(0x1_0000u32), Natural::from(0x1_0000u32))), "Some(995705032704)");
     /// }
     /// ```
-    fn checked_sub_mul(self, b: Natural, c: Natural) -> Option<Natural> {
-        self.checked_sub_mul(&b, &c)
+    fn checked_sub_mul(mut self, b: Natural, c: Natural) -> Option<Natural> {
+        if self.sub_mul_assign_no_panic(b, c) {
+            None
+        } else {
+            Some(self)
+        }
     }
 }
 
@@ -70,8 +74,12 @@ impl<'a> CheckedSubMul<Natural, &'a Natural> for Natural {
     ///         Natural::from(0x1_0000u32), &Natural::from(0x1_0000u32))), "Some(995705032704)");
     /// }
     /// ```
-    fn checked_sub_mul(self, b: Natural, c: &'a Natural) -> Option<Natural> {
-        self.checked_sub_mul(&b, c)
+    fn checked_sub_mul(mut self, b: Natural, c: &'a Natural) -> Option<Natural> {
+        if self.sub_mul_assign_val_ref_no_panic(b, c) {
+            None
+        } else {
+            Some(self)
+        }
     }
 }
 
@@ -106,8 +114,12 @@ impl<'a> CheckedSubMul<&'a Natural, Natural> for Natural {
     ///         &Natural::from(0x1_0000u32), Natural::from(0x1_0000u32))), "Some(995705032704)");
     /// }
     /// ```
-    fn checked_sub_mul(self, b: &'a Natural, c: Natural) -> Option<Natural> {
-        self.checked_sub_mul(b, &c)
+    fn checked_sub_mul(mut self, b: &'a Natural, c: Natural) -> Option<Natural> {
+        if self.sub_mul_assign_ref_val_no_panic(b, c) {
+            None
+        } else {
+            Some(self)
+        }
     }
 }
 
@@ -143,7 +155,7 @@ impl<'a, 'b> CheckedSubMul<&'a Natural, &'b Natural> for Natural {
     /// }
     /// ```
     fn checked_sub_mul(mut self, b: &'a Natural, c: &'b Natural) -> Option<Natural> {
-        if self.sub_mul_assign_no_panic(b, c) {
+        if self.sub_mul_assign_ref_ref_no_panic(b, c) {
             None
         } else {
             Some(self)
@@ -187,33 +199,76 @@ impl<'a, 'b, 'c> CheckedSubMul<&'a Natural, &'b Natural> for &'c Natural {
         } else if self.limb_count() < b.limb_count() + c.limb_count() - 1 {
             None
         } else {
-            let mut self_limbs = self.to_limbs_asc();
-            if let Large(ref c_limbs) = *c {
-                let mut self_sign = false;
+            if let Large(ref a_limbs) = *self {
                 if let Large(ref b_limbs) = *b {
-                    mpz_aorsmul(
-                        &mut self_sign,
-                        &mut self_limbs,
-                        false,
-                        b_limbs,
-                        false,
-                        c_limbs,
-                        false,
-                    );
-                }
-                if self_sign {
-                    return None;
+                    if let Large(ref c_limbs) = *c {
+                        return limbs_sub_mul(a_limbs, b_limbs, c_limbs).map(|result_limbs| {
+                            let mut result = Large(result_limbs);
+                            result.trim();
+                            result
+                        });
+                    }
                 }
             }
-            let mut result = Large(self_limbs);
-            result.trim();
-            Some(result)
+            unreachable!();
         }
     }
 }
 
 impl Natural {
-    pub(crate) fn sub_mul_assign_no_panic(&mut self, b: &Natural, c: &Natural) -> bool {
+    fn sub_mul_assign_helper(&mut self, b: &Natural, c: &Natural) -> bool {
+        {
+            if let Large(ref mut a_limbs) = *self {
+                if let Large(ref b_limbs) = *b {
+                    if let Large(ref c_limbs) = *c {
+                        if limbs_sub_mul_in_place_left(a_limbs, b_limbs, c_limbs) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        self.trim();
+        false
+    }
+
+    pub(crate) fn sub_mul_assign_no_panic(&mut self, b: Natural, c: Natural) -> bool {
+        if let Small(small_b) = b {
+            self.sub_mul_assign_limb_no_panic(c, small_b)
+        } else if let Small(small_c) = c {
+            self.sub_mul_assign_limb_no_panic(b, small_c)
+        } else if self.limb_count() < b.limb_count() + c.limb_count() - 1 {
+            true
+        } else {
+            self.sub_mul_assign_helper(&b, &c)
+        }
+    }
+
+    pub(crate) fn sub_mul_assign_val_ref_no_panic(&mut self, b: Natural, c: &Natural) -> bool {
+        if let Small(small_b) = b {
+            self.sub_mul_assign_limb_ref_no_panic(c, small_b)
+        } else if let Small(small_c) = *c {
+            self.sub_mul_assign_limb_no_panic(b, small_c)
+        } else if self.limb_count() < b.limb_count() + c.limb_count() - 1 {
+            true
+        } else {
+            self.sub_mul_assign_helper(&b, c)
+        }
+    }
+
+    pub(crate) fn sub_mul_assign_ref_val_no_panic(&mut self, b: &Natural, c: Natural) -> bool {
+        if let Small(small_b) = *b {
+            self.sub_mul_assign_limb_no_panic(c, small_b)
+        } else if let Small(small_c) = c {
+            self.sub_mul_assign_limb_ref_no_panic(b, small_c)
+        } else if self.limb_count() < b.limb_count() + c.limb_count() - 1 {
+            true
+        } else {
+            self.sub_mul_assign_helper(b, &c)
+        }
+    }
+
+    pub(crate) fn sub_mul_assign_ref_ref_no_panic(&mut self, b: &Natural, c: &Natural) -> bool {
         if let Small(small_b) = *b {
             self.sub_mul_assign_limb_ref_no_panic(c, small_b)
         } else if let Small(small_c) = *c {
@@ -221,28 +276,7 @@ impl Natural {
         } else if self.limb_count() < b.limb_count() + c.limb_count() - 1 {
             true
         } else {
-            {
-                let a_limbs = self.promote_in_place();
-                if let Large(ref c_limbs) = *c {
-                    let mut self_sign = false;
-                    if let Large(ref b_limbs) = *b {
-                        mpz_aorsmul(
-                            &mut self_sign,
-                            a_limbs,
-                            false,
-                            b_limbs,
-                            false,
-                            c_limbs,
-                            false,
-                        );
-                    }
-                    if self_sign {
-                        return true;
-                    }
-                }
-            }
-            self.trim();
-            false
+            self.sub_mul_assign_helper(b, c)
         }
     }
 }

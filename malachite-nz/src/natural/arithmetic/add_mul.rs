@@ -20,9 +20,6 @@ use platform::Limb;
 ///
 /// Additional memory: TODO
 ///
-/// This is mpz_aorsmul from mpz/aorsmul.c, where w, x, and y are positive, sub is positive, and w
-/// is returned instead of overwriting the first input.
-///
 /// # Panics
 /// Panics if `ys` or `zs` are empty.
 ///
@@ -35,6 +32,9 @@ use platform::Limb;
 /// assert_eq!(limbs_add_mul(&[123, 456, 789, 987, 654], &[123, 789], &[321, 654]),
 ///         &[39606, 334167, 516795, 987, 654]);
 /// ```
+///
+/// This is mpz_aorsmul from mpz/aorsmul.c, where w, x, and y are positive, sub is positive, and w
+/// is returned instead of overwriting the first input.
 pub fn limbs_add_mul(xs: &[Limb], ys: &[Limb], zs: &[Limb]) -> Vec<Limb> {
     let xs_len = xs.len();
     let mut product_size = ys.len() + zs.len();
@@ -63,8 +63,6 @@ pub fn limbs_add_mul(xs: &[Limb], ys: &[Limb], zs: &[Limb]) -> Vec<Limb> {
 ///
 /// Additional memory: TODO
 ///
-/// This is mpz_aorsmul from mpz/aorsmul.c, where w, x, and y are positive and sub is positive.
-///
 /// # Panics
 /// Panics if `ys` or `zs` are empty.
 ///
@@ -80,6 +78,8 @@ pub fn limbs_add_mul(xs: &[Limb], ys: &[Limb], zs: &[Limb]) -> Vec<Limb> {
 /// limbs_add_mul_in_place_left(&mut xs, &[123, 789], &[321, 654]);
 /// assert_eq!(xs, &[39606, 334167, 516795, 987, 654]);
 /// ```
+///
+/// This is mpz_aorsmul from mpz/aorsmul.c, where w, x, and y are positive and sub is positive.
 pub fn limbs_add_mul_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb], zs: &[Limb]) {
     let xs_len = xs.len();
     let mut product_size = ys.len() + zs.len();

@@ -159,7 +159,7 @@ macro_rules! float_impls {
         /// ```
         impl CheckedFrom<$f> for Natural {
             fn checked_from(value: $f) -> Option<Natural> {
-                if value.is_nan() || value.is_infinite() {
+                if value.is_nan() || value.is_infinite() || value < 0.0 {
                     None
                 } else if value == 0.0 {
                     Some(Natural::ZERO)
@@ -167,16 +167,12 @@ macro_rules! float_impls {
                     let (mut mantissa, exponent) = value.to_adjusted_mantissa_and_exponent();
                     mantissa.set_bit(u64::from($f::MANTISSA_WIDTH));
                     let exponent = i32::checked_from(exponent).unwrap() + $f::MIN_EXPONENT - 1;
-                    if exponent < 0
-                        && !mantissa.divisible_by_power_of_two(u64::wrapping_from(-exponent))
+                    if exponent >= 0
+                        || mantissa.divisible_by_power_of_two(u64::wrapping_from(-exponent))
                     {
-                        return None;
-                    }
-                    let n = Natural::from(mantissa) << exponent;
-                    if value < 0.0 && n != 0 as Limb {
-                        None
+                        Some(Natural::from(mantissa) << exponent)
                     } else {
-                        Some(n)
+                        None
                     }
                 }
             }
@@ -219,7 +215,7 @@ macro_rules! float_impls {
         /// ```
         impl ConvertibleFrom<$f> for Natural {
             fn convertible_from(value: $f) -> bool {
-                if value.is_nan() || value.is_infinite() {
+                if value.is_nan() || value.is_infinite() || value < 0.0 {
                     false
                 } else if value == 0.0 {
                     true
@@ -227,13 +223,8 @@ macro_rules! float_impls {
                     let (mut mantissa, exponent) = value.to_adjusted_mantissa_and_exponent();
                     mantissa.set_bit(u64::from($f::MANTISSA_WIDTH));
                     let exponent = i32::checked_from(exponent).unwrap() + $f::MIN_EXPONENT - 1;
-                    if exponent < 0
-                        && !mantissa.divisible_by_power_of_two(u64::wrapping_from(-exponent))
-                    {
-                        return false;
-                    }
-                    let n = Natural::from(mantissa) << exponent;
-                    value > 0.0 || n == 0 as Limb
+                    exponent >= 0
+                        || mantissa.divisible_by_power_of_two(u64::wrapping_from(-exponent))
                 }
             }
         }

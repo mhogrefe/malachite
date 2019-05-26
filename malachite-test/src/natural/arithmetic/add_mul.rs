@@ -211,7 +211,7 @@ fn benchmark_limbs_add_mul(gm: GenerationMode, limit: usize, file_name: &str) {
         limit,
         file_name,
         &(|&(ref a, ref b, ref c)| max!(a.len(), b.len(), c.len())),
-        "max(a.len(), b.len())",
+        "max(a.len(), b.len(), c.len())",
         &mut [(
             "malachite",
             &mut (|(a, b, c)| no_out!(limbs_add_mul(&a, &b, &c))),
@@ -228,7 +228,7 @@ fn benchmark_limbs_add_mul_in_place_left(gm: GenerationMode, limit: usize, file_
         limit,
         file_name,
         &(|&(ref a, ref b, ref c)| max!(a.len(), b.len(), c.len())),
-        "max(a.len(), b.len())",
+        "max(a.len(), b.len(), c.len())",
         &mut [(
             "malachite",
             &mut (|(mut a, b, c)| no_out!(limbs_add_mul_in_place_left(&mut a, &b, &c))),

@@ -1,6 +1,6 @@
 use std::cmp::Ordering;
 
-use malachite_base::conversion::{CheckedFrom, RoundingFrom, WrappingFrom};
+use malachite_base::conversion::{CheckedFrom, ConvertibleFrom, RoundingFrom, WrappingFrom};
 use malachite_base::named::Named;
 use malachite_base::num::floats::PrimitiveFloat;
 use malachite_base::num::traits::{
@@ -15,21 +15,21 @@ use natural::Natural::{self, Large, Small};
 use platform::Limb;
 
 macro_rules! float_impls {
-    ($f: ident, $leq_max_finite_float: ident) => {
-        // Returns whether `n` <= `$f::MAX_FINITE`.
-        fn $leq_max_finite_float(n: &Natural) -> bool {
+    ($f: ident, $gt_max_finite_float: ident) => {
+        // Returns whether `n` > `$f::MAX_FINITE`.
+        fn $gt_max_finite_float(n: &Natural) -> bool {
             match *n {
-                Small(_) => true,
+                Small(_) => false,
                 Large(ref limbs) => {
                     const MAX_WIDTH: u64 = $f::MAX_EXPONENT as u64 + 1;
                     match limbs_significant_bits(limbs).cmp(&MAX_WIDTH) {
-                        Ordering::Less => true,
-                        Ordering::Greater => false,
+                        Ordering::Less => false,
+                        Ordering::Greater => true,
                         Ordering::Equal => {
                             const TRAILING_ZEROS_OF_MAX: u64 =
                                 ($f::MAX_EXPONENT - $f::MANTISSA_WIDTH) as u64;
-                            limbs_index_of_next_false_bit(limbs, TRAILING_ZEROS_OF_MAX) < MAX_WIDTH
-                                || limbs_divisible_by_power_of_two(limbs, TRAILING_ZEROS_OF_MAX)
+                            limbs_index_of_next_false_bit(limbs, TRAILING_ZEROS_OF_MAX) >= MAX_WIDTH
+                                && !limbs_divisible_by_power_of_two(limbs, TRAILING_ZEROS_OF_MAX)
                         }
                     }
                 }
@@ -76,7 +76,7 @@ macro_rules! float_impls {
                 if value == 0 as Limb {
                     return 0.0;
                 }
-                if !$leq_max_finite_float(&value) {
+                if $gt_max_finite_float(&value) {
                     return match rm {
                         RoundingMode::Exact => {
                             panic!("Value cannot be represented exactly as an {}", $f::NAME)
@@ -143,7 +143,7 @@ macro_rules! float_impls {
                 if *value == 0 as Limb {
                     return 0.0;
                 }
-                if !$leq_max_finite_float(&value) {
+                if $gt_max_finite_float(value) {
                     return match rm {
                         RoundingMode::Exact => {
                             panic!("Value cannot be represented exactly as an {}", $f::NAME)
@@ -262,7 +262,7 @@ macro_rules! float_impls {
                 if value == 0 as Limb {
                     return Some(0.0);
                 }
-                if !$leq_max_finite_float(&value) {
+                if $gt_max_finite_float(&value) {
                     return None;
                 }
                 let exponent = value.floor_log_two();
@@ -311,7 +311,7 @@ macro_rules! float_impls {
                 if *value == 0 as Limb {
                     return Some(0.0);
                 }
-                if !$leq_max_finite_float(&value) {
+                if $gt_max_finite_float(value) {
                     return None;
                 }
                 let exponent = value.floor_log_two();
@@ -327,8 +327,79 @@ macro_rules! float_impls {
                 Some($f::from_adjusted_mantissa_and_exponent(mantissa, exponent))
             }
         }
+
+        /// Determines whether a `Natural` can be exactly converted to a `f32` or `f64`. The
+        /// `Natural` is taken by value.
+        ///
+        /// Time: worst case O(1)
+        ///
+        /// Additional memory: worst case O(1)
+        ///
+        /// # Example
+        /// ```
+        /// extern crate malachite_base;
+        /// extern crate malachite_nz;
+        ///
+        /// use malachite_base::conversion::ConvertibleFrom;
+        /// use malachite_nz::natural::Natural;
+        /// use std::str::FromStr;
+        ///
+        /// fn main() {
+        ///     assert_eq!(f32::convertible_from(Natural::from_str("123").unwrap()), true);
+        ///     assert_eq!(f32::convertible_from(Natural::from_str("1000000000").unwrap()), true);
+        ///     assert_eq!(f32::convertible_from(Natural::from_str("1000000001").unwrap()), false);
+        ///     assert_eq!(f32::convertible_from(
+        ///         Natural::from_str("10000000000000000000000000000000000000000000000000000")
+        ///         .unwrap()), false);
+        /// }
+        /// ```
+        impl ConvertibleFrom<Natural> for $f {
+            #[inline]
+            fn convertible_from(value: Natural) -> bool {
+                $f::convertible_from(&value)
+            }
+        }
+
+        /// Determines whether a `Natural` can be exactly converted to a `f32` or `f64`. The
+        /// `Natural` is taken by reference.
+        ///
+        /// Time: worst case O(1)
+        ///
+        /// Additional memory: worst case O(1)
+        ///
+        /// # Example
+        /// ```
+        /// extern crate malachite_base;
+        /// extern crate malachite_nz;
+        ///
+        /// use malachite_base::conversion::ConvertibleFrom;
+        /// use malachite_nz::natural::Natural;
+        /// use std::str::FromStr;
+        ///
+        /// fn main() {
+        ///     assert_eq!(f32::convertible_from(&Natural::from_str("123").unwrap()), true);
+        ///     assert_eq!(f32::convertible_from(&Natural::from_str("1000000000").unwrap()), true);
+        ///     assert_eq!(f32::convertible_from(&Natural::from_str("1000000001").unwrap()), false);
+        ///     assert_eq!(f32::convertible_from(
+        ///         &Natural::from_str("10000000000000000000000000000000000000000000000000000")
+        ///         .unwrap()), false);
+        /// }
+        /// ```
+        impl<'a> ConvertibleFrom<&'a Natural> for $f {
+            fn convertible_from(value: &'a Natural) -> bool {
+                if *value == 0 as Limb {
+                    return true;
+                }
+                if $gt_max_finite_float(&value) {
+                    return false;
+                }
+                let shift = i32::checked_from(value.floor_log_two()).unwrap()
+                    - i32::checked_from($f::MANTISSA_WIDTH).unwrap();
+                shift < 0 || value.divisible_by_power_of_two(u64::wrapping_from(shift))
+            }
+        }
     };
 }
 
-float_impls!(f32, leq_max_finite_f32);
-float_impls!(f64, leq_max_finite_f64);
+float_impls!(f32, gt_max_finite_f32);
+float_impls!(f64, gt_max_finite_f64);
