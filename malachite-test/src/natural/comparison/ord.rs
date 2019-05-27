@@ -1,10 +1,12 @@
-use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::base::{pairs_of_unsigned_vec_var_1, pairs_of_unsigned_vec_var_2};
-use inputs::natural::{nrm_pairs_of_naturals, pairs_of_naturals};
+use std::cmp::{min, Ordering};
+
 use malachite_base::conversion::CheckedFrom;
 use malachite_base::num::traits::SignificantBits;
 use malachite_nz::natural::comparison::ord::{limbs_cmp, limbs_cmp_same_length};
-use std::cmp::{min, Ordering};
+
+use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
+use inputs::base::{pairs_of_unsigned_vec_var_1, pairs_of_unsigned_vec_var_2};
+use inputs::natural::{nrm_pairs_of_naturals, pairs_of_naturals};
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limbs_cmp_same_length);

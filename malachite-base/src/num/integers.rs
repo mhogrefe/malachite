@@ -15,22 +15,23 @@ use conversion::{
 use crement::Crementable;
 use named::Named;
 use num::traits::{
-    BitAccess, BitScan, CheckedAdd, CheckedDiv, CheckedMul, CheckedNeg, CheckedRem, CheckedShl,
-    CheckedShr, CheckedSub, CountOnes, CountZeros, DivAssignMod, DivAssignRem, DivExact,
-    DivExactAssign, DivMod, DivRem, DivRound, DivRoundAssign, DivisibleBy, DivisibleByPowerOfTwo,
-    Endian, EqMod, EqModPowerOfTwo, HammingDistance, LeadingZeros, Mod, ModAssign, NotAssign, One,
-    OrdAbs, OverflowingAdd, OverflowingAddAssign, OverflowingDiv, OverflowingDivAssign,
-    OverflowingMul, OverflowingMulAssign, OverflowingNeg, OverflowingNegAssign, OverflowingRem,
+    BitAccess, BitScan, CheckedAdd, CheckedDiv, CheckedMul, CheckedNeg, CheckedRem, CheckedSub,
+    CountOnes, CountZeros, DivAssignMod, DivAssignRem, DivExact, DivExactAssign, DivMod, DivRem,
+    DivRound, DivRoundAssign, DivisibleBy, DivisibleByPowerOfTwo, Endian, EqMod, EqModPowerOfTwo,
+    HammingDistance, LeadingZeros, Mod, ModAssign, NotAssign, One, OrdAbs, OverflowingAdd,
+    OverflowingAddAssign, OverflowingDiv, OverflowingDivAssign, OverflowingMul,
+    OverflowingMulAssign, OverflowingNeg, OverflowingNegAssign, OverflowingRem,
     OverflowingRemAssign, OverflowingShl, OverflowingShr, OverflowingSub, Parity, PartialOrdAbs,
     Pow, RotateLeft, RotateRight, SaturatingAdd, SaturatingAddAssign, SaturatingMul,
     SaturatingMulAssign, SaturatingSub, SaturatingSubAssign, ShlRound, ShlRoundAssign, ShrRound,
-    ShrRoundAssign, SignificantBits, TrailingZeros, UnsignedAbs, WrappingAdd, WrappingAddAssign,
-    WrappingDiv, WrappingDivAssign, WrappingMul, WrappingMulAssign, WrappingNeg, WrappingNegAssign,
-    WrappingRem, WrappingRemAssign, WrappingShl, WrappingShr, WrappingSub, WrappingSubAssign, Zero,
+    ShrRoundAssign, SignificantBits, TrailingZeros, TrueCheckedShl, TrueCheckedShr, UnsignedAbs,
+    WrappingAdd, WrappingAddAssign, WrappingDiv, WrappingDivAssign, WrappingMul, WrappingMulAssign,
+    WrappingNeg, WrappingNegAssign, WrappingRem, WrappingRemAssign, WrappingShl, WrappingShr,
+    WrappingSub, WrappingSubAssign, Zero,
 };
 use round::RoundingMode;
 
-//TODO docs
+/// This trait defines functions on primitive integral types: uxx, ixx, usize, and isize.
 pub trait PrimitiveInteger:
     'static
     + Add<Output = Self>
@@ -73,8 +74,6 @@ pub trait PrimitiveInteger:
     + CheckedMul<Output = Self>
     + CheckedNeg<Output = Self>
     + CheckedRem<Output = Self>
-    + CheckedShl<Output = Self>
-    + CheckedShr<Output = Self>
     + CheckedSub<Output = Self>
     + Clone
     + Copy
@@ -282,6 +281,8 @@ pub trait PrimitiveInteger:
     + SubAssign<Self>
     + Sum<Self>
     + TrailingZeros
+    + TrueCheckedShl<Output = Self>
+    + TrueCheckedShr<Output = Self>
     + UpperHex
     + Crementable
     + WrappingAdd<Output = Self>
@@ -324,31 +325,58 @@ pub trait PrimitiveInteger:
     + WrappingSubAssign
     + Zero
 {
-    const LOG_WIDTH: u32;
-    const WIDTH: u32 = 1 << Self::LOG_WIDTH;
+    /// The number of bits of `Self`.
+    const WIDTH: u32;
+
+    /// The base-2 logarithm of the number of bits of `Self`. Instead of `n / WIDTH`, use
+    /// `n >> LOG_WIDTH`.
+    ///
+    /// Note that this value is correct for all of the built-in primitive integer types, but it will
+    /// not be correct for custom types with a non-power-of-two `WIDTH`. For such implementations
+    /// `LOG_WIDTH` should not be used.
+    const LOG_WIDTH: u32 = Self::WIDTH.trailing_zeros();
+
+    /// A mask that consists of `LOG_WIDTH` bits. Instead of `n % WIDTH`, use `n & WIDTH_MASK`.
+    ///
+    /// Note that this value is correct for all of the built-in primitive integer types, but it will
+    /// not be correct for custom types with a non-power-of-two `WIDTH`. For such implementations
+    /// `WIDTH_MASK` should not be used.
     const WIDTH_MASK: u32 = Self::WIDTH - 1;
 
-    //TODO test
+    /// Gets the most-significant bit of `Self`. For signed integers, this is the sign bit.
+    ///
+    /// Time: worst case O(1)
+    ///
+    /// Additional memory: worst case O(1)
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::integers::PrimitiveInteger;
+    ///
+    /// assert_eq!(123u32.get_highest_bit(), false);
+    /// assert_eq!(4_000_000_000u32.get_highest_bit(), true);
+    /// assert_eq!(2_000_000_000i32.get_highest_bit(), false);
+    /// assert_eq!((-2_000_000_000i32).get_highest_bit(), true);
+    /// ```
+    #[inline]
     fn get_highest_bit(&self) -> bool {
         self.get_bit(u64::from(Self::WIDTH - 1))
     }
 }
 
-//TODO docs
+/// This macro defines trait implementations that are the same for unsigned and signed types.
 macro_rules! integer_traits {
-    ($t:ident, $log_width:expr) => {
-        //TODO docs
+    ($t:ident, $width:expr) => {
+        /// # Examples
+        /// ```
+        /// use malachite_base::num::integers::PrimitiveInteger;
+        ///
+        /// assert_eq!(u32::WIDTH, 32);
+        /// assert_eq!(u32::LOG_WIDTH, 5);
+        /// assert_eq!(u32::WIDTH_MASK, 0x1f);
+        /// ```
         impl PrimitiveInteger for $t {
-            const LOG_WIDTH: u32 = $log_width;
-        }
-
-        impl_named!($t);
-
-        impl PartialOrdAbs<$t> for $t {
-            #[inline]
-            fn partial_cmp_abs(&self, other: &$t) -> Option<Ordering> {
-                Some(self.cmp_abs(other))
-            }
+            const WIDTH: u32 = $width;
         }
 
         impl FromStrRadix for $t {
@@ -427,6 +455,15 @@ macro_rules! integer_traits {
             }
         }
 
+        impl_named!($t);
+
+        impl PartialOrdAbs<$t> for $t {
+            #[inline]
+            fn partial_cmp_abs(&self, other: &$t) -> Option<Ordering> {
+                Some(self.cmp_abs(other))
+            }
+        }
+
         impl CheckedAdd<$t> for $t {
             type Output = $t;
 
@@ -481,23 +518,7 @@ macro_rules! integer_traits {
             }
         }
 
-        impl CheckedShl for $t {
-            type Output = $t;
-
-            #[inline]
-            fn checked_shl(self, rhs: u32) -> Option<$t> {
-                $t::checked_shl(self, rhs)
-            }
-        }
-
-        impl CheckedShr for $t {
-            type Output = $t;
-
-            #[inline]
-            fn checked_shr(self, rhs: u32) -> Option<$t> {
-                $t::checked_shr(self, rhs)
-            }
-        }
+        //TODO continue with checked_pow
 
         impl SaturatingAdd<$t> for $t {
             type Output = $t;

@@ -1,12 +1,14 @@
+use std::cmp::min;
+
+use malachite_base::conversion::CheckedFrom;
+use malachite_base::num::traits::{DivisibleByPowerOfTwo, SignificantBits};
+use malachite_nz::natural::arithmetic::divisible_by_power_of_two::limbs_divisible_by_power_of_two;
+
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::pairs_of_unsigned_vec_and_small_unsigned_var_1;
 use inputs::natural::{
     pairs_of_natural_and_small_unsigned, rm_pairs_of_natural_and_small_unsigned,
 };
-use malachite_base::conversion::CheckedFrom;
-use malachite_base::num::traits::{DivisibleByPowerOfTwo, SignificantBits};
-use malachite_nz::natural::arithmetic::divisible_by_power_of_two::limbs_divisible_by_power_of_two;
-use std::cmp::min;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limbs_divisible_by_power_of_two);

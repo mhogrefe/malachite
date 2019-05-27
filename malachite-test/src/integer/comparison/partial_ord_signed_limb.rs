@@ -1,13 +1,15 @@
+use std::cmp::Ordering;
+
+use malachite_base::conversion::CheckedFrom;
+use malachite_base::num::traits::SignificantBits;
+use malachite_nz::platform::SignedLimb;
+use num::BigInt;
+
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::integer::{
     nrm_pairs_of_integer_and_signed, pairs_of_integer_and_signed, pairs_of_signed_and_integer,
     rm_pairs_of_signed_and_integer,
 };
-use malachite_base::conversion::CheckedFrom;
-use malachite_base::num::traits::SignificantBits;
-use malachite_nz::platform::SignedLimb;
-use num::BigInt;
-use std::cmp::Ordering;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_integer_partial_cmp_signed_limb);

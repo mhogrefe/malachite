@@ -1,8 +1,9 @@
-use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::integer::integers;
 use malachite_base::conversion::{CheckedFrom, ConvertibleFrom, SaturatingFrom};
 use malachite_base::num::traits::SignificantBits;
 use malachite_nz::natural::Natural;
+
+use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
+use inputs::integer::integers;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_natural_checked_from_integer);

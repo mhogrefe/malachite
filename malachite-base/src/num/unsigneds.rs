@@ -9,21 +9,21 @@ use num::integers::PrimitiveInteger;
 use num::signeds::PrimitiveSigned;
 use num::traits::{
     BitAccess, BitScan, CeilingDivAssignNegMod, CeilingDivNegMod, CeilingLogTwo, CheckedAdd,
-    CheckedDiv, CheckedMul, CheckedNeg, CheckedNextPowerOfTwo, CheckedRem, CheckedShl, CheckedShr,
-    CheckedSub, CountOnes, CountZeros, DivAssignMod, DivAssignRem, DivExact, DivExactAssign,
-    DivMod, DivRem, DivRound, DivRoundAssign, DivisibleBy, DivisibleByPowerOfTwo, Endian, EqMod,
-    EqModPowerOfTwo, FloorLogTwo, FromStrRadix, FromU32Slice, HammingDistance, HasHalf,
-    IsPowerOfTwo, JoinHalves, LeadingZeros, Mod, ModAssign, ModPowerOfTwo, ModPowerOfTwoAssign,
-    NegMod, NegModAssign, NextPowerOfTwo, NextPowerOfTwoAssign, NotAssign, One, OrdAbs,
-    OverflowingAdd, OverflowingAddAssign, OverflowingDiv, OverflowingDivAssign, OverflowingMul,
+    CheckedDiv, CheckedMul, CheckedNeg, CheckedNextPowerOfTwo, CheckedRem, CheckedSub, CountOnes,
+    CountZeros, DivAssignMod, DivAssignRem, DivExact, DivExactAssign, DivMod, DivRem, DivRound,
+    DivRoundAssign, DivisibleBy, DivisibleByPowerOfTwo, Endian, EqMod, EqModPowerOfTwo,
+    FloorLogTwo, FromStrRadix, FromU32Slice, HammingDistance, HasHalf, IsPowerOfTwo, JoinHalves,
+    LeadingZeros, Mod, ModAssign, ModPowerOfTwo, ModPowerOfTwoAssign, NegMod, NegModAssign,
+    NextPowerOfTwo, NextPowerOfTwoAssign, NotAssign, One, OrdAbs, OverflowingAdd,
+    OverflowingAddAssign, OverflowingDiv, OverflowingDivAssign, OverflowingMul,
     OverflowingMulAssign, OverflowingNeg, OverflowingNegAssign, OverflowingRem,
     OverflowingRemAssign, OverflowingShl, OverflowingShr, OverflowingSub, OverflowingSubAssign,
     Parity, PartialOrdAbs, Pow, RemPowerOfTwo, RemPowerOfTwoAssign, RotateLeft, RotateRight,
     SaturatingAdd, SaturatingAddAssign, SaturatingMul, SaturatingMulAssign, SaturatingSub,
     SaturatingSubAssign, ShrRound, ShrRoundAssign, SignificantBits, SplitInHalf, TrailingZeros,
-    Two, WrappingAdd, WrappingAddAssign, WrappingDiv, WrappingDivAssign, WrappingMul,
-    WrappingMulAssign, WrappingNeg, WrappingNegAssign, WrappingRem, WrappingRemAssign, WrappingShl,
-    WrappingShr, WrappingSub, WrappingSubAssign, Zero,
+    TrueCheckedShl, TrueCheckedShr, Two, WrappingAdd, WrappingAddAssign, WrappingDiv,
+    WrappingDivAssign, WrappingMul, WrappingMulAssign, WrappingNeg, WrappingNegAssign, WrappingRem,
+    WrappingRemAssign, WrappingShl, WrappingShr, WrappingSub, WrappingSubAssign, Zero,
 };
 use round::RoundingMode;
 
@@ -52,8 +52,8 @@ pub trait PrimitiveUnsigned:
 
 //TODO docs
 macro_rules! unsigned_traits {
-    ($t:ident, $s:ident, $log_width:expr) => {
-        integer_traits!($t, $log_width);
+    ($t:ident, $s:ident, $width:expr) => {
+        integer_traits!($t, $width);
 
         impl PrimitiveUnsigned for $t {
             type SignedOfEqualWidth = $s;
@@ -480,15 +480,36 @@ macro_rules! unsigned_traits {
                 }
             }
         }
+
+        impl TrueCheckedShl for $t {
+            type Output = $t;
+
+            fn true_checked_shl(self, rhs: u32) -> Option<$t> {
+                let result = self << rhs;
+                if result >> rhs == self {
+                    Some(result)
+                } else {
+                    None
+                }
+            }
+        }
+
+        impl TrueCheckedShr for $t {
+            type Output = $t;
+
+            fn true_checked_shr(self, _rhs: u32) -> Option<$t> {
+                unimplemented!();
+            }
+        }
     };
 }
 
-unsigned_traits!(u8, i8, 3);
-unsigned_traits!(u16, i16, 4);
-unsigned_traits!(u32, i32, 5);
-unsigned_traits!(u64, i64, 6);
-unsigned_traits!(u128, i128, 7);
-unsigned_traits!(usize, isize, 0usize.trailing_zeros().trailing_zeros());
+unsigned_traits!(u8, i8, 8);
+unsigned_traits!(u16, i16, 16);
+unsigned_traits!(u32, i32, 32);
+unsigned_traits!(u64, i64, 64);
+unsigned_traits!(u128, i128, 128);
+unsigned_traits!(usize, isize, 0usize.trailing_zeros());
 
 /// Implements the constants 0, 1, and 2 for unsigned primitive integers.
 macro_rules! impl01_unsigned {

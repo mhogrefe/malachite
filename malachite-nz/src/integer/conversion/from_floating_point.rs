@@ -1,4 +1,4 @@
-use malachite_base::conversion::{CheckedFrom, RoundingFrom};
+use malachite_base::conversion::{CheckedFrom, ConvertibleFrom, RoundingFrom};
 use malachite_base::round::RoundingMode;
 
 use integer::Integer;
@@ -159,6 +159,47 @@ macro_rules! float_impls {
                     sign: value >= 0.0,
                     abs: n,
                 })
+            }
+        }
+
+        /// Determines whether an `f32` or `f64` can be exactly converted to an `Integer`.
+        ///
+        /// Time: worst case O(1)
+        ///
+        /// Additional memory: worst case O(1)
+        ///
+        /// # Example
+        /// ```
+        /// extern crate malachite_base;
+        /// extern crate malachite_nz;
+        ///
+        /// use malachite_base::conversion::ConvertibleFrom;
+        /// use malachite_base::num::floats::PrimitiveFloat;
+        /// use malachite_nz::integer::Integer;
+        ///
+        /// fn main() {
+        ///     assert_eq!(Integer::convertible_from(f64::NAN), false);
+        ///     assert_eq!(Integer::convertible_from(f64::POSITIVE_INFINITY), false);
+        ///     assert_eq!(Integer::convertible_from(f64::NEGATIVE_INFINITY), false);
+        ///     assert_eq!(Integer::convertible_from(0.0), true);
+        ///     assert_eq!(Integer::convertible_from(-0.0), true);
+        ///     assert_eq!(Integer::convertible_from(123.0), true);
+        ///     assert_eq!(Integer::convertible_from(-123.0), true);
+        ///     assert_eq!(Integer::convertible_from(1.0e9), true);
+        ///     assert_eq!(Integer::convertible_from(4294967295.0), true);
+        ///     assert_eq!(Integer::convertible_from(4294967296.0), true);
+        ///     assert_eq!(Integer::convertible_from(1.0e100), true);
+        ///     assert_eq!(Integer::convertible_from(123.1), false);
+        ///     assert_eq!(Integer::convertible_from(123.9), false);
+        ///     assert_eq!(Integer::convertible_from(123.5), false);
+        ///     assert_eq!(Integer::convertible_from(124.5), false);
+        ///     assert_eq!(Integer::convertible_from(-0.499), false);
+        ///     assert_eq!(Integer::convertible_from(-0.5), false);
+        /// }
+        /// ```
+        impl ConvertibleFrom<$f> for Integer {
+            fn convertible_from(value: $f) -> bool {
+                Natural::convertible_from(value.abs())
             }
         }
     };

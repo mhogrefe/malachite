@@ -178,7 +178,7 @@ macro_rules! float_impls {
             }
         }
 
-        /// Determines whether a `f32` or `f64` can be exactly converted to a `Natural`.
+        /// Determines whether an `f32` or `f64` can be exactly converted to a `Natural`.
         ///
         /// Time: worst case O(1)
         ///

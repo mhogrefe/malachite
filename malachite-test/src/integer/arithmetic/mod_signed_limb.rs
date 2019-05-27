@@ -1,11 +1,3 @@
-use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-#[cfg(feature = "64_bit_limbs")]
-use inputs::integer::nm_pairs_of_integer_and_nonzero_signed;
-#[cfg(feature = "32_bit_limbs")]
-use inputs::integer::{
-    nrm_pairs_of_integer_and_nonzero_signed, rm_pairs_of_integer_and_nonzero_signed,
-};
-use inputs::integer::{pairs_of_integer_and_nonzero_signed, pairs_of_signed_and_nonzero_integer};
 use malachite_base::conversion::CheckedFrom;
 use malachite_base::num::traits::{
     CeilingDivMod, CeilingMod, CeilingModAssign, DivMod, Mod, ModAssign, SignificantBits,
@@ -14,6 +6,15 @@ use malachite_nz::platform::SignedLimb;
 use num::{BigInt, Integer};
 #[cfg(feature = "32_bit_limbs")]
 use rug::ops::RemRounding;
+
+use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
+#[cfg(feature = "64_bit_limbs")]
+use inputs::integer::nm_pairs_of_integer_and_nonzero_signed;
+#[cfg(feature = "32_bit_limbs")]
+use inputs::integer::{
+    nrm_pairs_of_integer_and_nonzero_signed, rm_pairs_of_integer_and_nonzero_signed,
+};
+use inputs::integer::{pairs_of_integer_and_nonzero_signed, pairs_of_signed_and_nonzero_integer};
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_integer_rem_assign_signed_limb);

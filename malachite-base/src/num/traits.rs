@@ -119,20 +119,6 @@ pub trait CheckedNeg {
     fn checked_neg(self) -> Option<Self::Output>;
 }
 
-/// Checked shift left. Computes `self << rhs`, returning `None` if there is no valid result.
-pub trait CheckedShl {
-    type Output;
-
-    fn checked_shl(self, rhs: u32) -> Option<Self::Output>;
-}
-
-/// Checked shift right. Computes `self >> rhs`, returning `None` if there is no valid result.
-pub trait CheckedShr {
-    type Output;
-
-    fn checked_shr(self, rhs: u32) -> Option<Self::Output>;
-}
-
 /// Saturating addition. Computes `self + rhs`, saturating at the numeric bounds instead of
 /// overflowing.
 pub trait SaturatingAdd<RHS = Self> {
@@ -869,6 +855,20 @@ pub trait ShlRoundAssign<Rhs = Self> {
 
 pub trait ShrRoundAssign<Rhs = Self> {
     fn shr_round_assign(&mut self, rhs: Rhs, rm: RoundingMode);
+}
+
+/// Checked shift left. Computes `self << rhs`, returning `None` if there is no valid result.
+pub trait TrueCheckedShl {
+    type Output;
+
+    fn true_checked_shl(self, rhs: u32) -> Option<Self::Output>;
+}
+
+/// Checked shift right. Computes `self >> rhs`, returning `None` if there is no valid result.
+pub trait TrueCheckedShr {
+    type Output;
+
+    fn true_checked_shr(self, rhs: u32) -> Option<Self::Output>;
 }
 
 //TODO doc and test

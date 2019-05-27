@@ -1,14 +1,5 @@
-use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::base::{
-    pairs_of_unsigned_vec_and_limb_var_2, pairs_of_unsigned_vec_and_small_unsigned,
-    pairs_of_unsigned_vec_and_small_unsigned_var_1,
-    triples_of_unsigned_vec_small_unsigned_and_rounding_mode_var_1,
-    triples_of_unsigned_vec_unsigned_vec_and_limb_var_6,
-};
-use inputs::natural::{
-    pairs_of_natural_and_small_unsigned, rm_pairs_of_natural_and_small_unsigned,
-    triples_of_natural_small_unsigned_and_rounding_mode_var_1,
-};
+use std::cmp::max;
+
 use malachite_base::conversion::{CheckedFrom, WrappingFrom};
 use malachite_base::named::Named;
 use malachite_base::num::integers::PrimitiveInteger;
@@ -20,7 +11,18 @@ use malachite_nz::natural::arithmetic::shr_u::{
     limbs_vec_shr_round_up_in_place,
 };
 use malachite_nz::platform::Limb;
-use std::cmp::max;
+
+use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
+use inputs::base::{
+    pairs_of_unsigned_vec_and_limb_var_2, pairs_of_unsigned_vec_and_small_unsigned,
+    pairs_of_unsigned_vec_and_small_unsigned_var_1,
+    triples_of_unsigned_vec_small_unsigned_and_rounding_mode_var_1,
+    triples_of_unsigned_vec_unsigned_vec_and_limb_var_6,
+};
+use inputs::natural::{
+    pairs_of_natural_and_small_unsigned, rm_pairs_of_natural_and_small_unsigned,
+    triples_of_natural_small_unsigned_and_rounding_mode_var_1,
+};
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limbs_shr);

@@ -1,3 +1,14 @@
+use std::cmp::{max, min};
+
+use malachite_base::conversion::CheckedFrom;
+use malachite_base::num::traits::SignificantBits;
+use malachite_nz::natural::arithmetic::sub::{
+    limbs_slice_sub_in_place_right, limbs_sub, limbs_sub_in_place_left,
+    limbs_sub_same_length_in_place_left, limbs_sub_same_length_in_place_right,
+    limbs_sub_same_length_in_place_with_overlap, limbs_sub_same_length_to_out, limbs_sub_to_out,
+    limbs_vec_sub_in_place_right,
+};
+
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::{
     pairs_of_unsigned_vec_and_small_usize_var_1, pairs_of_unsigned_vec_var_1,
@@ -7,15 +18,6 @@ use inputs::base::{
 use inputs::natural::{
     nrm_pairs_of_naturals_var_1, pairs_of_naturals_var_1, rm_pairs_of_naturals_var_1,
 };
-use malachite_base::conversion::CheckedFrom;
-use malachite_base::num::traits::SignificantBits;
-use malachite_nz::natural::arithmetic::sub::{
-    limbs_slice_sub_in_place_right, limbs_sub, limbs_sub_in_place_left,
-    limbs_sub_same_length_in_place_left, limbs_sub_same_length_in_place_right,
-    limbs_sub_same_length_in_place_with_overlap, limbs_sub_same_length_to_out, limbs_sub_to_out,
-    limbs_vec_sub_in_place_right,
-};
-use std::cmp::{max, min};
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limbs_sub);

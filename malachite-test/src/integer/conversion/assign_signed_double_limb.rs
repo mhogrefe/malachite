@@ -1,8 +1,9 @@
-use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::integer::{nm_pairs_of_integer_and_signed, pairs_of_integer_and_signed};
 use malachite_base::conversion::CheckedFrom;
 use malachite_base::num::traits::{Assign, SignificantBits};
 use num::BigInt;
+
+use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
+use inputs::integer::{nm_pairs_of_integer_and_signed, pairs_of_integer_and_signed};
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_integer_assign_i64);

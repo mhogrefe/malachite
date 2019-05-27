@@ -10,18 +10,19 @@ use num::integers::PrimitiveInteger;
 use num::traits::{
     Abs, BitAccess, BitScan, CeilingDivAssignMod, CeilingDivMod, CeilingDivNegMod, CeilingMod,
     CeilingModAssign, CheckedAbs, CheckedAdd, CheckedDiv, CheckedMul, CheckedNeg, CheckedRem,
-    CheckedShl, CheckedShr, CheckedSub, CountOnes, CountZeros, DivAssignMod, DivAssignRem,
-    DivExact, DivExactAssign, DivMod, DivRem, DivRound, DivRoundAssign, DivisibleBy,
-    DivisibleByPowerOfTwo, Endian, EqMod, EqModPowerOfTwo, FromStrRadix, HammingDistance,
-    LeadingZeros, Mod, ModAssign, NegAssign, NegMod, NegativeOne, NotAssign, One, OrdAbs,
-    OverflowingAbs, OverflowingAdd, OverflowingAddAssign, OverflowingDiv, OverflowingDivAssign,
-    OverflowingMul, OverflowingMulAssign, OverflowingNeg, OverflowingNegAssign, OverflowingRem,
+    CheckedSub, CountOnes, CountZeros, DivAssignMod, DivAssignRem, DivExact, DivExactAssign,
+    DivMod, DivRem, DivRound, DivRoundAssign, DivisibleBy, DivisibleByPowerOfTwo, Endian, EqMod,
+    EqModPowerOfTwo, FromStrRadix, HammingDistance, LeadingZeros, Mod, ModAssign, NegAssign,
+    NegMod, NegativeOne, NotAssign, One, OrdAbs, OverflowingAbs, OverflowingAdd,
+    OverflowingAddAssign, OverflowingDiv, OverflowingDivAssign, OverflowingMul,
+    OverflowingMulAssign, OverflowingNeg, OverflowingNegAssign, OverflowingRem,
     OverflowingRemAssign, OverflowingShl, OverflowingShr, OverflowingSub, OverflowingSubAssign,
     Parity, PartialOrdAbs, Pow, RotateLeft, RotateRight, SaturatingAdd, SaturatingAddAssign,
     SaturatingMul, SaturatingMulAssign, SaturatingSub, SaturatingSubAssign, Sign, SignificantBits,
-    TrailingZeros, Two, UnsignedAbs, WrappingAbs, WrappingAdd, WrappingAddAssign, WrappingDiv,
-    WrappingDivAssign, WrappingMul, WrappingMulAssign, WrappingNeg, WrappingNegAssign, WrappingRem,
-    WrappingRemAssign, WrappingShl, WrappingShr, WrappingSub, WrappingSubAssign, Zero,
+    TrailingZeros, TrueCheckedShl, TrueCheckedShr, Two, UnsignedAbs, WrappingAbs, WrappingAdd,
+    WrappingAddAssign, WrappingDiv, WrappingDivAssign, WrappingMul, WrappingMulAssign, WrappingNeg,
+    WrappingNegAssign, WrappingRem, WrappingRemAssign, WrappingShl, WrappingShr, WrappingSub,
+    WrappingSubAssign, Zero,
 };
 use num::unsigneds::PrimitiveUnsigned;
 use round::RoundingMode;
@@ -502,15 +503,31 @@ macro_rules! signed_traits {
                 }
             }
         }
+
+        impl TrueCheckedShl for $t {
+            type Output = $t;
+
+            fn true_checked_shl(self, _rhs: u32) -> Option<$t> {
+                unimplemented!();
+            }
+        }
+
+        impl TrueCheckedShr for $t {
+            type Output = $t;
+
+            fn true_checked_shr(self, _rhs: u32) -> Option<$t> {
+                unimplemented!();
+            }
+        }
     };
 }
 
-signed_traits!(i8, u8, 3);
-signed_traits!(i16, u16, 4);
-signed_traits!(i32, u32, 5);
-signed_traits!(i64, u64, 6);
-signed_traits!(i128, u128, 7);
-signed_traits!(isize, usize, 0usize.trailing_zeros().trailing_zeros());
+signed_traits!(i8, u8, 8);
+signed_traits!(i16, u16, 16);
+signed_traits!(i32, u32, 32);
+signed_traits!(i64, u64, 64);
+signed_traits!(i128, u128, 128);
+signed_traits!(isize, usize, 0usize.trailing_zeros());
 
 /// Implements the constants 0, 1, 2, and -1 for signed primitive integers.
 macro_rules! impl01_signed {

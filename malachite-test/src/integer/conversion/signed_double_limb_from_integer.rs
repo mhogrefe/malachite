@@ -1,10 +1,11 @@
-use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::integer::integers;
 use malachite_base::conversion::{
     CheckedFrom, ConvertibleFrom, OverflowingFrom, SaturatingFrom, WrappingFrom,
 };
 use malachite_base::num::traits::SignificantBits;
 use malachite_nz::platform::SignedDoubleLimb;
+
+use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
+use inputs::integer::integers;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_signed_double_limb_checked_from_integer);

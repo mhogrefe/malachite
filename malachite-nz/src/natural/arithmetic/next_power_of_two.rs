@@ -1,17 +1,8 @@
 use malachite_base::limbs::{limbs_set_zero, limbs_test_zero};
-use malachite_base::num::traits::{NextPowerOfTwo, NextPowerOfTwoAssign};
+use malachite_base::num::traits::{NextPowerOfTwo, NextPowerOfTwoAssign, TrueCheckedShl};
 
 use natural::Natural::{self, Large, Small};
 use platform::Limb;
-
-fn checked_shl_1(u: Limb) -> Option<Limb> {
-    let result = u << 1;
-    if result >> 1 == u {
-        Some(result)
-    } else {
-        None
-    }
-}
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
 /// limbs of the smallest integer power of 2 greater than or equal to the `Natural`.
@@ -41,7 +32,7 @@ pub fn limbs_next_power_of_two(limbs: &[Limb]) -> Vec<Limb> {
     if let Some(limb) = last_limb.checked_next_power_of_two() {
         result_limbs = vec![0; limbs.len() - 1];
         if limb == *last_limb && !limbs_test_zero(&limbs[..limbs.len() - 1]) {
-            if let Some(limb) = checked_shl_1(limb) {
+            if let Some(limb) = limb.true_checked_shl(1) {
                 result_limbs.push(limb)
             } else {
                 result_limbs.push(0);
@@ -94,7 +85,7 @@ pub fn limbs_slice_next_power_of_two_in_place(limbs: &mut [Limb]) -> bool {
     if let Some(limb) = last_limb.checked_next_power_of_two() {
         if limb == *last_limb && !limbs_test_zero(init) {
             limbs_set_zero(init);
-            if let Some(limb) = checked_shl_1(limb) {
+            if let Some(limb) = limb.true_checked_shl(1) {
                 *last_limb = limb;
                 false
             } else {

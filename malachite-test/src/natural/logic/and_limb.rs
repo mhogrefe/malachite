@@ -1,3 +1,10 @@
+use malachite_base::conversion::CheckedFrom;
+use malachite_base::num::traits::SignificantBits;
+use malachite_nz::natural::logic::and_limb::limbs_and_limb;
+use malachite_nz::natural::Natural;
+use malachite_nz::platform::Limb;
+use num::{BigUint, ToPrimitive};
+
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::pairs_of_nonempty_unsigned_vec_and_unsigned;
 #[cfg(feature = "32_bit_limbs")]
@@ -6,13 +13,7 @@ use inputs::natural::{
     rm_pairs_of_unsigned_and_natural,
 };
 use inputs::natural::{pairs_of_natural_and_unsigned, pairs_of_unsigned_and_natural};
-use malachite_base::conversion::CheckedFrom;
-use malachite_base::num::traits::SignificantBits;
-use malachite_nz::natural::logic::and_limb::limbs_and_limb;
-use malachite_nz::natural::Natural;
-use malachite_nz::platform::Limb;
 use natural::logic::and::{natural_and_alt_1, natural_and_alt_2};
-use num::{BigUint, ToPrimitive};
 
 pub fn natural_and_limb_alt_1(n: &Natural, u: Limb) -> Limb {
     Limb::checked_from(natural_and_alt_1(n, &Natural::from(u))).unwrap()

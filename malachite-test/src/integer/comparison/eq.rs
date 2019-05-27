@@ -1,8 +1,10 @@
-use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::integer::{nrm_pairs_of_integers, pairs_of_integers};
+use std::cmp::max;
+
 use malachite_base::conversion::CheckedFrom;
 use malachite_base::num::traits::SignificantBits;
-use std::cmp::max;
+
+use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
+use inputs::integer::{nrm_pairs_of_integers, pairs_of_integers};
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_integer_eq);

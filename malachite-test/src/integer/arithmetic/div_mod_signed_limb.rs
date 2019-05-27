@@ -1,8 +1,3 @@
-use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::integer::{
-    nrm_pairs_of_integer_and_nonzero_signed, pairs_of_integer_and_nonzero_signed,
-    pairs_of_signed_and_nonzero_integer, rm_pairs_of_integer_and_nonzero_signed,
-};
 use malachite_base::conversion::CheckedFrom;
 use malachite_base::num::traits::{
     CeilingDivAssignMod, CeilingDivMod, CeilingMod, DivAssignMod, DivAssignRem, DivMod, DivRem,
@@ -12,6 +7,12 @@ use malachite_base::round::RoundingMode;
 use malachite_nz::platform::SignedLimb;
 use num::{BigInt, Integer};
 use rug;
+
+use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
+use inputs::integer::{
+    nrm_pairs_of_integer_and_nonzero_signed, pairs_of_integer_and_nonzero_signed,
+    pairs_of_signed_and_nonzero_integer, rm_pairs_of_integer_and_nonzero_signed,
+};
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_integer_div_assign_mod_signed_limb);

@@ -1,9 +1,11 @@
-use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::natural::triples_of_natural_natural_and_unsigned;
+use std::cmp::max;
+
 use malachite_base::conversion::CheckedFrom;
 use malachite_base::num::traits::{SaturatingSubMul, SaturatingSubMulAssign, SignificantBits};
 use malachite_nz::platform::Limb;
-use std::cmp::max;
+
+use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
+use inputs::natural::triples_of_natural_natural_and_unsigned;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_natural_saturating_sub_mul_assign_limb);

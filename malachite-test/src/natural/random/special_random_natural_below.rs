@@ -1,11 +1,12 @@
-use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::natural::positive_naturals;
 use malachite_base::conversion::CheckedFrom;
 use malachite_base::num::traits::SignificantBits;
 use malachite_nz::natural::random::special_random_natural_below::special_random_natural_below;
 use rand::{IsaacRng, SeedableRng};
 use rust_wheels::iterators::adaptors::{generate_from_function, to_limited_string_binary};
 use rust_wheels::iterators::common::EXAMPLE_SEED;
+
+use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
+use inputs::natural::positive_naturals;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_natural_special_random_natural_below);

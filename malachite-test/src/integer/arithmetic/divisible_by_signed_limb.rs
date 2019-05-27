@@ -1,12 +1,13 @@
-use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::integer::{
-    nrm_pairs_of_integer_and_signed, pairs_of_integer_and_signed, pairs_of_signed_and_integer,
-};
 use malachite_base::conversion::CheckedFrom;
 use malachite_base::num::traits::{DivisibleBy, SignificantBits};
 use malachite_nz::platform::SignedLimb;
 use num::{BigInt, Integer, Zero};
 use rug;
+
+use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
+use inputs::integer::{
+    nrm_pairs_of_integer_and_signed, pairs_of_integer_and_signed, pairs_of_signed_and_integer,
+};
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_integer_divisible_by_signed_limb);

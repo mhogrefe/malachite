@@ -1,10 +1,11 @@
-use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::base::unsigneds;
 use malachite_base::conversion::CheckedFrom;
 use malachite_base::num::traits::SignificantBits;
 use malachite_nz::natural::Natural;
 use num::BigUint;
 use rug;
+
+use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
+use inputs::base::unsigneds;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_natural_from_limb);

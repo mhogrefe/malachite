@@ -22,12 +22,18 @@ pub mod limbs {
     pub mod limbs_trailing_zero_limbs;
 }
 pub mod num {
+    pub mod basic {
+        pub mod constants;
+    }
     pub mod conversion {
         pub mod checked_from;
         pub mod convertible_from;
         pub mod overflowing_from;
         pub mod saturating_from;
         pub mod wrapping_from;
+    }
+    pub mod logic {
+        pub mod get_highest_bit;
     }
 }
 pub mod round {

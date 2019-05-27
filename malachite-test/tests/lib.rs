@@ -38,6 +38,10 @@ pub mod base {
             pub mod wrapping_from;
         }
 
+        pub mod logic {
+            pub mod get_highest_bit;
+        }
+
         pub mod assign_bit;
         pub mod clear_bit;
         pub mod decrement;

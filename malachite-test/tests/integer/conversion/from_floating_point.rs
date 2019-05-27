@@ -1,4 +1,4 @@
-use malachite_base::conversion::{CheckedFrom, RoundingFrom};
+use malachite_base::conversion::{CheckedFrom, ConvertibleFrom, RoundingFrom};
 use malachite_base::num::floats::PrimitiveFloat;
 use malachite_base::num::traits::Parity;
 use malachite_base::round::RoundingMode;
@@ -516,6 +516,94 @@ fn test_checked_from_f64() {
         3168738177180919299881250404026184124858368)");
 }
 
+#[test]
+fn test_convertible_from_f32() {
+    let test = |f: f32, out| {
+        assert_eq!(Integer::convertible_from(f), out);
+    };
+    test(f32::NAN, false);
+    test(f32::POSITIVE_INFINITY, false);
+    test(f32::NEGATIVE_INFINITY, false);
+    test(0.0, true);
+    test(-0.0, true);
+    test(123.0, true);
+    test(-123.0, true);
+    test(1.0e9, true);
+    test(-1.0e9, true);
+    test(4294967295.0, true);
+    test(-4294967295.0, true);
+    test(4294967296.0, true);
+    test(-4294967296.0, true);
+    test(18446744073709551615.0, true);
+    test(-18446744073709551615.0, true);
+    test(18446744073709551616.0, true);
+    test(-18446744073709551616.0, true);
+    test(1.0e20, true);
+    test(-1.0e20, true);
+    test(1.23e20, true);
+    test(-1.23e20, true);
+    test(123.1, false);
+    test(-123.1, false);
+    test(123.5, false);
+    test(-123.5, false);
+    test(124.5, false);
+    test(-124.5, false);
+    test(f32::MIN_POSITIVE, false);
+    test(-f32::MIN_POSITIVE, false);
+    test(f32::MAX_SUBNORMAL, false);
+    test(-f32::MAX_SUBNORMAL, false);
+    test(f32::MIN_POSITIVE_NORMAL, false);
+    test(-f32::MIN_POSITIVE_NORMAL, false);
+    test(f32::MAX_FINITE, true);
+    test(f32::MIN_FINITE, true);
+}
+
+#[test]
+fn test_convertible_from_f64() {
+    let test = |f: f64, out| {
+        assert_eq!(Integer::convertible_from(f), out);
+    };
+    test(f64::NAN, false);
+    test(f64::POSITIVE_INFINITY, false);
+    test(f64::NEGATIVE_INFINITY, false);
+    test(0.0, true);
+    test(-0.0, true);
+    test(123.0, true);
+    test(-123.0, true);
+    test(1.0e9, true);
+    test(-1.0e9, true);
+    test(4294967295.0, true);
+    test(-4294967295.0, true);
+    test(4294967296.0, true);
+    test(-4294967296.0, true);
+    test(18446744073709551615.0, true);
+    test(-18446744073709551615.0, true);
+    test(18446744073709551616.0, true);
+    test(-18446744073709551616.0, true);
+    test(1.0e20, true);
+    test(-1.0e20, true);
+    test(1.23e20, true);
+    test(-1.23e20, true);
+    test(1.0e100, true);
+    test(-1.0e100, true);
+    test(1.23e100, true);
+    test(-1.23e100, true);
+    test(123.1, false);
+    test(-123.1, false);
+    test(123.5, false);
+    test(-123.5, false);
+    test(124.5, false);
+    test(-124.5, false);
+    test(f64::MIN_POSITIVE, false);
+    test(-f64::MIN_POSITIVE, false);
+    test(f64::MAX_SUBNORMAL, false);
+    test(-f64::MAX_SUBNORMAL, false);
+    test(f64::MIN_POSITIVE_NORMAL, false);
+    test(-f64::MIN_POSITIVE_NORMAL, false);
+    test(f64::MAX_FINITE, true);
+    test(f64::MIN_FINITE, true);
+}
+
 macro_rules! float_properties {
     (
         $f: ident,
@@ -526,7 +614,8 @@ macro_rules! float_properties {
         $floats_var_5: ident,
         $rounding_from_float_properties: ident,
         $from_float_properties: ident,
-        $checked_from_float_properties: ident
+        $checked_from_float_properties: ident,
+        $convertible_from_float_properties: ident,
     ) => {
         #[test]
         fn $rounding_from_float_properties() {
@@ -619,13 +708,30 @@ macro_rules! float_properties {
             });
 
             test_properties($floats_var_4, |&f| {
-                //TODO convertible
                 assert!(Integer::checked_from(f).is_none());
             });
 
             test_properties($floats_var_5, |&f| {
-                //TODO convertible
                 assert!(Integer::checked_from(f).is_none());
+            });
+        }
+
+        #[test]
+        fn $convertible_from_float_properties() {
+            test_properties($finite_floats, |&f| {
+                Integer::convertible_from(f);
+            });
+
+            test_properties($floats_exactly_equal_to_integer, |&f| {
+                assert!(Integer::convertible_from(f));
+            });
+
+            test_properties($floats_var_4, |&f| {
+                assert!(!Integer::convertible_from(f));
+            });
+
+            test_properties($floats_var_5, |&f| {
+                assert!(!Integer::convertible_from(f));
             });
         }
     };
@@ -640,7 +746,8 @@ float_properties!(
     f32s_var_5,
     rounding_from_f32_properties,
     from_f32_properties,
-    checked_from_f32_properties
+    checked_from_f32_properties,
+    convertible_from_f32_properties,
 );
 float_properties!(
     f64,
@@ -651,5 +758,6 @@ float_properties!(
     f64s_var_5,
     rounding_from_f64_properties,
     from_f64_properties,
-    checked_from_f64_properties
+    checked_from_f64_properties,
+    convertible_from_f64_properties,
 );
