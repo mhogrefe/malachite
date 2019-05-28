@@ -31,6 +31,9 @@ use platform::Limb;
 /// assert_eq!(limbs_or_pos_neg(&[1, 2], &[100, 200]), &[99, 200]);
 /// assert_eq!(limbs_or_pos_neg(&[1, 2], &[100, 200, 300]), &[99, 200, 300]);
 /// ```
+///
+/// This is mpz_ior from mpz/ior.c where res is returned, the first input is positive, and the
+/// second is negative.
 pub fn limbs_or_pos_neg(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -100,6 +103,8 @@ pub fn limbs_or_pos_neg(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 /// limbs_or_pos_neg_to_out(&mut result, &[1, 2], &[100, 200, 300]);
 /// assert_eq!(result, &[99, 200, 300, 10]);
 /// ```
+///
+/// This is mpz_ior from mpz/ior.c where the first input is positive and the second is negative.
 pub fn limbs_or_pos_neg_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -172,6 +177,9 @@ pub fn limbs_or_pos_neg_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
 /// assert_eq!(limbs_slice_or_pos_neg_in_place_left(&mut xs, &[100, 200, 300]), true);
 /// assert_eq!(xs, &[99, 200]);
 /// ```
+///
+/// This is mpz_ior from mpz/ior.c where res == op1, the first input is positive and the second is
+/// negative, and the length of op1 is not changed; instead, a carry is returned.
 pub fn limbs_slice_or_pos_neg_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> bool {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -238,6 +246,9 @@ pub fn limbs_slice_or_pos_neg_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> boo
 /// limbs_vec_or_pos_neg_in_place_left(&mut xs, &[100, 200, 300]);
 /// assert_eq!(xs, &[99, 200, 300]);
 /// ```
+///
+/// This is mpz_ior from mpz/ior.c where res == op1 and the first input is positive and the second
+/// is negative.
 pub fn limbs_vec_or_pos_neg_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -309,6 +320,9 @@ pub fn limbs_vec_or_pos_neg_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
 /// limbs_or_pos_neg_in_place_right(&[100, 200], &mut ys);
 /// assert_eq!(ys, &[1, 2, 5]);
 /// ```
+///
+/// This is mpz_ior from mpz/ior.c where res == op2 and the first input is positive and the second
+/// is negative.
 pub fn limbs_or_pos_neg_in_place_right(xs: &[Limb], ys: &mut [Limb]) {
     let xs_len = xs.len();
     let ys_len = ys.len();

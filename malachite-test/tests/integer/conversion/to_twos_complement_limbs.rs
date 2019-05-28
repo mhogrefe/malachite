@@ -20,6 +20,16 @@ use malachite_test::integer::conversion::to_twos_complement_limbs::*;
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
+pub fn test_limbs_twos_complement() {
+    let test = |limbs: &[Limb], out: &[Limb]| {
+        assert_eq!(limbs_twos_complement(limbs), out);
+    };
+    test(&[1, 2, 3], &[0xffff_ffff, 0xffff_fffd, 0xffff_fffc]);
+    test(&[0xffff_ffff, 0xffff_fffd, 0xffff_fffc], &[1, 2, 3]);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
 pub fn test_limbs_maybe_sign_extend_non_negative_in_place() {
     let test = |limbs: &[Limb], out: &[Limb]| {
         let mut mut_limbs = limbs.to_vec();
@@ -49,6 +59,7 @@ pub fn test_limbs_twos_complement_in_place() {
     };
     test(&[], &[], true);
     test(&[1, 2, 3], &[0xffff_ffff, 0xffff_fffd, 0xffff_fffc], false);
+    test(&[0xffff_ffff, 0xffff_fffd, 0xffff_fffc], &[1, 2, 3], false);
     test(&[0, 0, 0], &[0, 0, 0], true);
 }
 
@@ -61,6 +72,10 @@ pub fn test_limbs_twos_complement_and_maybe_sign_extend_negative_in_place() {
         assert_eq!(mut_limbs, out);
     };
     test(&[1, 2, 3], &[0xffff_ffff, 0xffff_fffd, 0xffff_fffc]);
+    test(
+        &[0xffff_ffff, 0xffff_fffd, 0xffff_fffc],
+        &[1, 2, 3, 0xffff_ffff],
+    );
     test(&[0, 0xffff_ffff], &[0, 1, 0xffff_ffff]);
 }
 
@@ -180,6 +195,17 @@ fn test_twos_complement_limbs_desc() {
     test("-18446744073709551615", vec![Limb::MAX, 0, 1]);
     test("18446744073709551616", vec![1, 0, 0]);
     test("-18446744073709551616", vec![Limb::MAX, 0, 0]);
+}
+
+#[test]
+fn limbs_twos_complement_properties() {
+    test_properties(vecs_of_unsigned_var_3, |limbs| {
+        let out_limbs = limbs_twos_complement(limbs);
+        if *limbs.last().unwrap() != 0 && out_limbs.last().unwrap().get_highest_bit() {
+            let n = -Natural::from_limbs_asc(limbs);
+            assert_eq!(n.to_twos_complement_limbs_asc(), out_limbs);
+        }
+    });
 }
 
 #[test]

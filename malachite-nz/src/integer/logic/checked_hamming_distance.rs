@@ -30,17 +30,17 @@ fn limbs_hamming_distance_neg_leading_limbs_helper(xs: &[Limb], ys: &[Limb], i: 
     }
 }
 
-// xs: nnnnnnnb000
-// ys:   nnb000000
-//
-// or
-//
-// xs:   nnnnnb000
-// ys: nnnnb000000
-//
-// where 0 is a zero limb, n is a nonzero limb, and b is the boundary (least-significant) nonzero
-// limb. xs_i and ys_i are the indices of the boundary limbs in xs and ys. xs_i < ys_i but xs may be
-// shorter, longer, or the same length as ys.
+/// xs: nnnnnnnb000
+/// ys:   nnb000000
+///
+/// or
+///
+/// xs:   nnnnnb000
+/// ys: nnnnb000000
+///
+/// where 0 is a zero limb, n is a nonzero limb, and b is the boundary (least-significant) nonzero
+/// limb. xs_i and ys_i are the indices of the boundary limbs in xs and ys. xs_i < ys_i but xs may
+/// be shorter, longer, or the same length as ys.
 fn limbs_hamming_distance_neg_helper(xs: &[Limb], ys: &[Limb], xs_i: usize, ys_i: usize) -> u64 {
     let mut distance = u64::from(xs[xs_i].wrapping_neg().count_ones());
     let xs_len = xs.len();
@@ -83,6 +83,9 @@ fn limbs_hamming_distance_neg_helper(xs: &[Limb], ys: &[Limb], xs_i: usize, ys_i
 /// assert_eq!(limbs_hamming_distance_neg(&[2], &[3]), 2);
 /// assert_eq!(limbs_hamming_distance_neg(&[1, 1, 1], &[1, 2, 3]), 3);
 /// ```
+///
+/// This is mpz_hamdist from mpz/hamdist.c, where both arguments are negative and have the same
+/// length.
 pub fn limbs_hamming_distance_neg(xs: &[Limb], ys: &[Limb]) -> u64 {
     let xs_i = limbs_leading_zero_limbs(xs);
     let ys_i = limbs_leading_zero_limbs(ys);

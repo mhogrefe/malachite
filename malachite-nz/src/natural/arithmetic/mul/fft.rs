@@ -1355,6 +1355,12 @@ pub fn _limbs_mul_fft_internal(
     _limbs_mul_fft_normalize_mod_f(out, p, ys)
 }
 
+/// Time: TODO
+///
+/// Additional memory: O(p * log(p))
+///
+/// assuming k = O(log(p)), xs.len() = O(p).
+///
 // This is mpn_mul_fft from mpn/generic/mul_fft.c.
 pub(crate) fn _limbs_mul_fft(
     out: &mut [Limb],
@@ -1373,7 +1379,6 @@ pub(crate) fn _limbs_mul_fft(
     let lcm_with_two_pow_k =
         _limbs_mul_fft_lcm_of_a_and_two_pow_k(usize::wrapping_from(Limb::WIDTH), k);
     let mut big_width_minus_one = (1 + (2 * m + k + 2) / lcm_with_two_pow_k) * lcm_with_two_pow_k;
-    // width - 1 = ceil((2 * m + k + 3) / lcm_with_two_pow_k) * lcm_with_two_pow_k;
     let mut width_minus_one = big_width_minus_one >> Limb::LOG_WIDTH;
     // We should ensure that recursively, width_minus_one is a multiple of the next two_pow_k.
     if width_minus_one
@@ -1393,17 +1398,24 @@ pub(crate) fn _limbs_mul_fft(
             // warning: since width_minus_one changed, shifted_k may change too!
         }
     }
+    // width = O(log(p))
     let width = width_minus_one + 1;
     assert!(width_minus_one < p); // otherwise we'll loop
+                                  // O(log(p)) memory
     let mut scratch = vec![0; width << 1];
     let mp = big_width_minus_one >> k;
+    // O(p * log(p)) memory
     let mut xss_scratch = vec![0; two_pow_k * width];
+    // O(p) memory
     let xss = _limbs_mul_fft_decompose(&mut xss_scratch, two_pow_k, width, xs, a, mp, &mut scratch);
+    // O(p) memory
     let mut table_scratch = vec![0; 2 << k];
+    // O(p) memory
     let bit_reverse_table = _limbs_mul_fft_bit_reverse_table(&mut table_scratch, k);
     if square {
         let q = a * (two_pow_k - 1) + width; // number of required limbs for p
         let mut ys_residues = vec![0; q];
+        // O(log(p) * log(log(p))) memory
         _limbs_mul_fft_internal(
             out,
             p,
@@ -1418,7 +1430,9 @@ pub(crate) fn _limbs_mul_fft(
         )
     } else {
         let mut ys_residues = vec![0; two_pow_k * width];
+        // O(p) memory
         _limbs_mul_fft_decompose(&mut ys_residues, two_pow_k, width, ys, a, mp, &mut scratch);
+        // O(log(p) * log(log(p))) memory
         _limbs_mul_fft_internal(
             out,
             p,

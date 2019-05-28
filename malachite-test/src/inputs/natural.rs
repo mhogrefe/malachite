@@ -1052,16 +1052,13 @@ macro_rules! float_gen {
             gm: GenerationMode,
         ) -> It<(Natural, RoundingMode)> {
             Box::new(
-                pairs_of_natural_and_rounding_mode(gm).filter(|&(ref n, rm)| {
-                    //TODO convertible
-                    rm != RoundingMode::Exact || $f::checked_from(n).is_some()
-                }),
+                pairs_of_natural_and_rounding_mode(gm)
+                    .filter(|&(ref n, rm)| rm != RoundingMode::Exact || $f::convertible_from(n)),
             )
         }
 
         pub fn $naturals_exactly_equal_to_float(gm: GenerationMode) -> It<Natural> {
-            //TODO convertible
-            Box::new(naturals(gm).filter(|n| $f::checked_from(n).is_some()))
+            Box::new(naturals(gm).filter(|n| $f::convertible_from(n)))
         }
 
         pub fn $floats_exactly_equal_to_natural(gm: GenerationMode) -> It<$f> {
@@ -1079,8 +1076,7 @@ macro_rules! float_gen {
                     Box::new(special_random_range_up_natural(&EXAMPLE_SEED, scale, n))
                 }
             };
-            //TODO convertible
-            Box::new(xs.filter(|n| $f::checked_from(n).is_none()))
+            Box::new(xs.filter(|n| !$f::convertible_from(n)))
         }
 
         // floats that are positive, not infinite, not NaN, and not exactly equal to a Natural.

@@ -27,6 +27,8 @@ use platform::Limb;
 /// assert_eq!(limbs_eq_neg_limb_mod_limb(&[6, 7], 3, 2), false);
 /// assert_eq!(limbs_eq_neg_limb_mod_limb(&[100, 101, 102], 1_232, 10), true);
 /// ```
+///
+/// This is mpz_congruent_ui_p from mpz/cong_ui.c where a is negative.
 pub fn limbs_eq_neg_limb_mod_limb(limbs: &[Limb], limb: Limb, modulus: Limb) -> bool {
     limbs_eq_limb_mod_limb(limbs, limb.neg_mod(modulus), modulus)
 }

@@ -10,6 +10,122 @@ use natural::logic::not::limbs_not_in_place;
 use natural::Natural;
 use platform::Limb;
 
+/// Given the limbs of the absolute value of an `Integer`, in ascending order, returns the two's
+/// complement limbs. The input limbs should not be all zero.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(n)
+///
+/// where n = `limbs.len()`
+///
+/// # Examples
+/// ```
+/// use malachite_nz::integer::conversion::to_twos_complement_limbs::limbs_twos_complement;
+///
+/// assert_eq!(limbs_twos_complement(&[1, 2, 3]), &[0xffff_ffff, 0xffff_fffd, 0xffff_fffc]);
+/// assert_eq!(limbs_twos_complement(&[0xffff_ffff, 0xffff_fffd, 0xffff_fffc]), &[1, 2, 3]);
+/// ```
+pub fn limbs_twos_complement(limbs: &[Limb]) -> Vec<Limb> {
+    let i = limbs_leading_zero_limbs(limbs);
+    let mut result_limbs = vec![0; i];
+    if i != limbs.len() {
+        result_limbs.push(limbs[i].wrapping_neg());
+        for limb in &limbs[i + 1..] {
+            result_limbs.push(!limb);
+        }
+    }
+    result_limbs
+}
+
+/// Given the limbs of a non-negative `Integer`, in ascending order, checks whether the most
+/// significant bit is `false`; if it isn't, appends an extra zero bit. This way the `Integer`'s
+/// non-negativity is preserved in its limbs.
+///
+/// Time: worst case O(1)
+///
+/// Additional memory: worst case O(1)
+///
+/// # Examples
+/// ```
+/// use malachite_nz::integer::conversion::to_twos_complement_limbs::*;
+///
+/// let mut limbs = vec![1, 2, 3];
+/// limbs_maybe_sign_extend_non_negative_in_place(&mut limbs);
+/// assert_eq!(limbs, &[1, 2, 3]);
+///
+/// let mut limbs = vec![1, 2, 0xffff_ffff];
+/// limbs_maybe_sign_extend_non_negative_in_place(&mut limbs);
+/// assert_eq!(limbs, &[1, 2, 0xffff_ffff, 0]);
+/// ```
+pub fn limbs_maybe_sign_extend_non_negative_in_place(limbs: &mut Vec<Limb>) {
+    if !limbs.is_empty() && limbs.last().unwrap().get_highest_bit() {
+        // Sign-extend with an extra 0 limb to indicate a positive Integer
+        limbs.push(0);
+    }
+}
+
+/// Given the limbs of the absolute value of an `Integer`, in ascending order, converts the limbs to
+/// two's complement. Returns whether there is a carry left over from the two's complement
+/// conversion process.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = `limbs.len()`
+///
+/// # Examples
+/// ```
+/// use malachite_nz::integer::conversion::to_twos_complement_limbs::*;
+///
+/// let mut limbs = &mut [1, 2, 3];
+/// assert!(!limbs_twos_complement_in_place(limbs));
+/// assert_eq!(limbs, &[0xffff_ffff, 0xffff_fffd, 0xffff_fffc]);
+///
+/// let mut limbs = &mut [0, 0, 0];
+/// assert!(limbs_twos_complement_in_place(limbs));
+/// assert_eq!(limbs, &[0, 0, 0]);
+/// ```
+pub fn limbs_twos_complement_in_place(limbs: &mut [Limb]) -> bool {
+    limbs_not_in_place(limbs);
+    limbs_slice_add_limb_in_place(limbs, 1)
+}
+
+/// Given the limbs of the absolute value of a negative `Integer`, in ascending order, converts the
+/// limbs to two's complement and checks whether the most significant bit is `true`; if it isn't,
+/// appends an extra `Limb::MAX` bit. This way the `Integer`'s negativity is preserved in its limbs.
+/// The limbs cannot be empty or contain only zeros.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = `limbs.len()`
+///
+/// # Panics
+/// Panics if `limbs` contains only zeros.
+///
+/// # Examples
+/// ```
+/// use malachite_nz::integer::conversion::to_twos_complement_limbs::*;
+///
+/// let mut limbs = vec![1, 2, 3];
+/// limbs_twos_complement_and_maybe_sign_extend_negative_in_place(&mut limbs);
+/// assert_eq!(limbs, &[0xffff_ffff, 0xffff_fffd, 0xffff_fffc]);
+///
+/// let mut limbs = vec![0, 0xffff_ffff];
+/// limbs_twos_complement_and_maybe_sign_extend_negative_in_place(&mut limbs);
+/// assert_eq!(limbs, &[0, 1, 0xffff_ffff]);
+/// ```
+pub fn limbs_twos_complement_and_maybe_sign_extend_negative_in_place(limbs: &mut Vec<Limb>) {
+    assert!(!limbs_twos_complement_in_place(limbs));
+    if !limbs.last().unwrap().get_highest_bit() {
+        // Sign-extend with an extra !0 limb to indicate a negative Integer
+        limbs.push(Limb::MAX);
+    }
+}
+
 /// A double-ended iterator over the two's complement limbs of the negative of a `Natural`. The
 /// forward order is ascending (least-significant first). There may be at most one implicit
 /// most-significant `Limb::MAX` limb.
@@ -300,107 +416,6 @@ impl<'a> DoubleEndedIterator for TwosComplementLimbIterator<'a> {
                 limbs.iterate_backward(extension_checked)
             }
         }
-    }
-}
-
-pub fn limbs_twos_complement(limbs: &[Limb]) -> Vec<Limb> {
-    let i = limbs_leading_zero_limbs(limbs);
-    let mut result_limbs = vec![0; i];
-    if i != limbs.len() {
-        result_limbs.push(limbs[i].wrapping_neg());
-        for limb in &limbs[i + 1..] {
-            result_limbs.push(!limb);
-        }
-    }
-    result_limbs
-}
-
-/// Given the limbs of a non-negative `Integer`, in ascending order,
-/// checks whether the most significant bit is `false`; if it isn't, appends an extra zero bit. This
-/// way the `Integer`'s non-negativity is preserved in its limbs.
-///
-/// Time: worst case O(1)
-///
-/// Additional memory: worst case O(1)
-///
-/// # Examples
-/// ```
-/// use malachite_nz::integer::conversion::to_twos_complement_limbs::*;
-///
-/// let mut limbs = vec![1, 2, 3];
-/// limbs_maybe_sign_extend_non_negative_in_place(&mut limbs);
-/// assert_eq!(limbs, &[1, 2, 3]);
-///
-/// let mut limbs = vec![1, 2, 0xffff_ffff];
-/// limbs_maybe_sign_extend_non_negative_in_place(&mut limbs);
-/// assert_eq!(limbs, &[1, 2, 0xffff_ffff, 0]);
-/// ```
-pub fn limbs_maybe_sign_extend_non_negative_in_place(limbs: &mut Vec<Limb>) {
-    if !limbs.is_empty() && limbs.last().unwrap().get_highest_bit() {
-        // Sign-extend with an extra 0 limb to indicate a positive Integer
-        limbs.push(0);
-    }
-}
-
-/// Given the limbs of the absolute value of an `Integer`, in
-/// ascending order, converts the limbs to two's complement. Returns whether there is a carry left
-/// over from the two's complement conversion process.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `limbs.len()`
-///
-/// # Examples
-/// ```
-/// use malachite_nz::integer::conversion::to_twos_complement_limbs::*;
-///
-/// let mut limbs = &mut [1, 2, 3];
-/// assert!(!limbs_twos_complement_in_place(limbs));
-/// assert_eq!(limbs, &[0xffff_ffff, 0xffff_fffd, 0xffff_fffc]);
-///
-/// let mut limbs = &mut [0, 0, 0];
-/// assert!(limbs_twos_complement_in_place(limbs));
-/// assert_eq!(limbs, &[0, 0, 0]);
-/// ```
-pub fn limbs_twos_complement_in_place(limbs: &mut [Limb]) -> bool {
-    limbs_not_in_place(limbs);
-    limbs_slice_add_limb_in_place(limbs, 1)
-}
-
-/// Given the limbs of the absolute value of a negative `Integer`,
-/// in ascending order, converts the limbs to two's complement and checks whether the most
-/// significant bit is `true`; if it isn't, appends an extra `Limb::MAX` bit. This way the
-/// `Integer`'s negativity is preserved in its limbs. The limbs cannot be empty or contain only
-/// zeros.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `limbs.len()`
-///
-/// # Panics
-/// Panics if `limbs` contains only zeros.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::integer::conversion::to_twos_complement_limbs::*;
-///
-/// let mut limbs = vec![1, 2, 3];
-/// limbs_twos_complement_and_maybe_sign_extend_negative_in_place(&mut limbs);
-/// assert_eq!(limbs, &[0xffff_ffff, 0xffff_fffd, 0xffff_fffc]);
-///
-/// let mut limbs = vec![0, 0xffff_ffff];
-/// limbs_twos_complement_and_maybe_sign_extend_negative_in_place(&mut limbs);
-/// assert_eq!(limbs, &[0, 1, 0xffff_ffff]);
-/// ```
-pub fn limbs_twos_complement_and_maybe_sign_extend_negative_in_place(limbs: &mut Vec<Limb>) {
-    assert!(!limbs_twos_complement_in_place(limbs));
-    if !limbs.last().unwrap().get_highest_bit() {
-        // Sign-extend with an extra !0 limb to indicate a negative Integer
-        limbs.push(Limb::MAX);
     }
 }
 

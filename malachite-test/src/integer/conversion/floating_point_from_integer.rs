@@ -1,4 +1,4 @@
-use malachite_base::conversion::{CheckedFrom, RoundingFrom};
+use malachite_base::conversion::{CheckedFrom, ConvertibleFrom, RoundingFrom};
 use malachite_base::named::Named;
 use malachite_base::num::traits::SignificantBits;
 
@@ -21,12 +21,26 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_f64_checked_from_integer);
     register_demo!(registry, demo_f32_checked_from_integer_ref);
     register_demo!(registry, demo_f64_checked_from_integer_ref);
+    register_demo!(registry, demo_f32_convertible_from_integer);
+    register_demo!(registry, demo_f64_convertible_from_integer);
+    register_demo!(registry, demo_f32_convertible_from_integer_ref);
+    register_demo!(registry, demo_f64_convertible_from_integer_ref);
     register_bench!(registry, Small, benchmark_f32_rounding_from_integer);
     register_bench!(registry, Small, benchmark_f64_rounding_from_integer);
     register_bench!(registry, Small, benchmark_f32_from_integer);
     register_bench!(registry, Small, benchmark_f64_from_integer);
     register_bench!(registry, Small, benchmark_f32_checked_from_integer);
     register_bench!(registry, Small, benchmark_f64_checked_from_integer);
+    register_bench!(
+        registry,
+        Small,
+        benchmark_f32_convertible_from_integer_evaluation_strategy
+    );
+    register_bench!(
+        registry,
+        Small,
+        benchmark_f64_convertible_from_integer_evaluation_strategy
+    );
 }
 
 macro_rules! float_demos_and_benches {
@@ -39,9 +53,12 @@ macro_rules! float_demos_and_benches {
         $demo_float_from_integer_ref: ident,
         $demo_float_checked_from_integer: ident,
         $demo_float_checked_from_integer_ref: ident,
+        $demo_float_convertible_from_integer: ident,
+        $demo_float_convertible_from_integer_ref: ident,
         $benchmark_float_rounding_from_integer: ident,
         $benchmark_float_from_integer: ident,
         $benchmark_float_checked_from_integer: ident,
+        $benchmark_float_convertible_from_integer_evaluation_strategy: ident,
     ) => {
         fn $demo_float_rounding_from_integer(gm: GenerationMode, limit: usize) {
             for (n, rm) in $pairs_of_integer_and_rounding_mode_var_1(gm).take(limit) {
@@ -97,6 +114,28 @@ macro_rules! float_demos_and_benches {
                     $f::NAME,
                     n.clone(),
                     $f::checked_from(n)
+                );
+            }
+        }
+
+        fn $demo_float_convertible_from_integer(gm: GenerationMode, limit: usize) {
+            for n in integers(gm).take(limit) {
+                println!(
+                    "{} is {}convertible to an {}",
+                    n.clone(),
+                    if $f::convertible_from(n) { "" } else { "not " },
+                    $f::NAME
+                );
+            }
+        }
+
+        fn $demo_float_convertible_from_integer_ref(gm: GenerationMode, limit: usize) {
+            for n in integers(gm).take(limit) {
+                println!(
+                    "&{} is {}convertible to an {}",
+                    n,
+                    if $f::convertible_from(&n) { "" } else { "not " },
+                    $f::NAME
                 );
             }
         }
@@ -177,6 +216,33 @@ macro_rules! float_demos_and_benches {
                 ],
             );
         }
+
+        fn $benchmark_float_convertible_from_integer_evaluation_strategy(
+            gm: GenerationMode,
+            limit: usize,
+            file_name: &str,
+        ) {
+            m_run_benchmark(
+                &format!("{}::convertible_from(Integer)", stringify!($f)),
+                BenchmarkType::EvaluationStrategy,
+                integers(gm),
+                gm.name(),
+                limit,
+                file_name,
+                &(|ref n| usize::checked_from(n.significant_bits()).unwrap()),
+                "n.significant_bits()",
+                &mut [
+                    (
+                        &format!("{}::convertible_from(Integer)", stringify!($f)),
+                        &mut (|n| no_out!($f::convertible_from(n))),
+                    ),
+                    (
+                        &format!("{}::convertible_from(&Integer)", stringify!($f)),
+                        &mut (|n| no_out!($f::convertible_from(&n))),
+                    ),
+                ],
+            );
+        }
     };
 }
 
@@ -189,9 +255,12 @@ float_demos_and_benches!(
     demo_f32_from_integer_ref,
     demo_f32_checked_from_integer,
     demo_f32_checked_from_integer_ref,
+    demo_f32_convertible_from_integer,
+    demo_f32_convertible_from_integer_ref,
     benchmark_f32_rounding_from_integer,
     benchmark_f32_from_integer,
     benchmark_f32_checked_from_integer,
+    benchmark_f32_convertible_from_integer_evaluation_strategy,
 );
 
 float_demos_and_benches!(
@@ -203,7 +272,10 @@ float_demos_and_benches!(
     demo_f64_from_integer_ref,
     demo_f64_checked_from_integer,
     demo_f64_checked_from_integer_ref,
+    demo_f64_convertible_from_integer,
+    demo_f64_convertible_from_integer_ref,
     benchmark_f64_rounding_from_integer,
     benchmark_f64_from_integer,
     benchmark_f64_checked_from_integer,
+    benchmark_f64_convertible_from_integer_evaluation_strategy,
 );

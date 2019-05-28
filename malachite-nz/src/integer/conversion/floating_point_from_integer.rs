@@ -1,4 +1,4 @@
-use malachite_base::conversion::{CheckedFrom, RoundingFrom};
+use malachite_base::conversion::{CheckedFrom, ConvertibleFrom, RoundingFrom};
 use malachite_base::round::RoundingMode;
 
 use integer::Integer;
@@ -251,6 +251,69 @@ macro_rules! float_impls {
         impl<'a> CheckedFrom<&'a Integer> for $f {
             fn checked_from(value: &'a Integer) -> Option<$f> {
                 $f::checked_from(&value.abs).map(|f| if value.sign { f } else { -f })
+            }
+        }
+
+        /// Determines whether an `Integer` can be exactly converted to an `f32` or `f64`. The
+        /// `Integer` is taken by value.
+        ///
+        /// Time: worst case O(1)
+        ///
+        /// Additional memory: worst case O(1)
+        ///
+        /// # Example
+        /// ```
+        /// extern crate malachite_base;
+        /// extern crate malachite_nz;
+        ///
+        /// use malachite_base::conversion::ConvertibleFrom;
+        /// use malachite_nz::integer::Integer;
+        /// use std::str::FromStr;
+        ///
+        /// fn main() {
+        ///     assert_eq!(f32::convertible_from(Integer::from_str("123").unwrap()), true);
+        ///     assert_eq!(f32::convertible_from(Integer::from_str("-1000000000").unwrap()), true);
+        ///     assert_eq!(f32::convertible_from(Integer::from_str("1000000001").unwrap()), false);
+        ///     assert_eq!(f32::convertible_from(
+        ///         Integer::from_str("-10000000000000000000000000000000000000000000000000000")
+        ///         .unwrap()), false);
+        /// }
+        /// ```
+        impl ConvertibleFrom<Integer> for $f {
+            #[inline]
+            fn convertible_from(value: Integer) -> bool {
+                $f::convertible_from(&value)
+            }
+        }
+
+        /// Determines whether an `Integer` can be exactly converted to an `f32` or `f64`. The
+        /// `Integer` is taken by reference.
+        ///
+        /// Time: worst case O(1)
+        ///
+        /// Additional memory: worst case O(1)
+        ///
+        /// # Example
+        /// ```
+        /// extern crate malachite_base;
+        /// extern crate malachite_nz;
+        ///
+        /// use malachite_base::conversion::ConvertibleFrom;
+        /// use malachite_nz::integer::Integer;
+        /// use std::str::FromStr;
+        ///
+        /// fn main() {
+        ///     assert_eq!(f32::convertible_from(&Integer::from_str("123").unwrap()), true);
+        ///     assert_eq!(f32::convertible_from(&Integer::from_str("-1000000000").unwrap()), true);
+        ///     assert_eq!(f32::convertible_from(&Integer::from_str("1000000001").unwrap()), false);
+        ///     assert_eq!(f32::convertible_from(
+        ///         &Integer::from_str("-10000000000000000000000000000000000000000000000000000")
+        ///         .unwrap()), false);
+        /// }
+        /// ```
+        impl<'a> ConvertibleFrom<&'a Integer> for $f {
+            fn convertible_from(value: &'a Integer) -> bool {
+                $f::convertible_from(&value.abs)
             }
         }
     };

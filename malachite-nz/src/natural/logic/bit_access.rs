@@ -45,8 +45,8 @@ fn limbs_set_bit_helper(limbs: &mut [Limb], index: u64, limb_index: usize) {
 ///
 /// Additional memory: worst case O(1)
 ///
-/// This is mpz_setbit from mpz/setbit.c, where the d is non-negative and bit_idx small enough that
-/// no additional memory needs to be given to d.
+/// This is mpz_setbit from mpz/setbit.c, where d is non-negative and bit_idx small enough that no
+/// additional memory needs to be given to d.
 ///
 /// # Panics
 /// Panics if `index` >= `limbs.len()` * 32.
@@ -79,7 +79,7 @@ pub fn limbs_slice_set_bit(limbs: &mut [Limb], index: u64) {
 ///
 /// Additional memory: worst case O(`index`)
 ///
-/// This is mpz_setbit from mpz/setbit.c, where the d is non-negative.
+/// This is mpz_setbit from mpz/setbit.c, where d is non-negative.
 ///
 /// # Example
 /// ```
@@ -111,7 +111,7 @@ pub fn limbs_vec_set_bit(limbs: &mut Vec<Limb>, index: u64) {
 ///
 /// Additional memory: worst case O(1)
 ///
-/// This is mpz_clrbit from mpz/clrbit.c, where the d is non-negative.
+/// This is mpz_clrbit from mpz/clrbit.c, where d is non-negative.
 ///
 /// # Example
 /// ```

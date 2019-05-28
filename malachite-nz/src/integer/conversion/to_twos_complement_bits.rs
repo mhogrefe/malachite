@@ -8,6 +8,101 @@ use natural::conversion::to_bits::BitIterator;
 use natural::Natural;
 use platform::Limb;
 
+/// Given the bits of a non-negative `Integer`, in ascending order, checks whether the most
+/// significant bit is `false`; if it isn't, appends an extra `false` bit. This way the `Integer`'s
+/// non-negativity is preserved in its bits.
+///
+/// Time: worst case O(1)
+///
+/// Additional memory: worst case O(1)
+///
+/// # Examples
+/// ```
+/// use malachite_nz::integer::conversion::to_twos_complement_bits::*;
+///
+/// let mut bits = vec![false, true, false];
+/// bits_to_twos_complement_bits_non_negative(&mut bits);
+/// assert_eq!(bits, &[false, true, false]);
+///
+/// let mut bits = vec![true, false, true];
+/// bits_to_twos_complement_bits_non_negative(&mut bits);
+/// assert_eq!(bits, &[true, false, true, false]);
+/// ```
+pub fn bits_to_twos_complement_bits_non_negative(bits: &mut Vec<bool>) {
+    if !bits.is_empty() && *bits.last().unwrap() {
+        // Sign-extend with an extra false bit to indicate a positive Integer
+        bits.push(false);
+    }
+}
+
+/// Given the bits of the absolute value of a negative `Integer`, in ascending order, converts the
+/// bits to two's complement. Returns whether there is a carry left over from the two's complement
+/// conversion process.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = `bits.len()`
+///
+/// # Examples
+/// ```
+/// use malachite_nz::integer::conversion::to_twos_complement_bits::*;
+///
+/// let mut bits = &mut [true, false, true];
+/// assert!(!bits_slice_to_twos_complement_bits_negative(bits));
+/// assert_eq!(bits, &[true, true, false]);
+///
+/// let mut bits = &mut [false, false, false];
+/// assert!(bits_slice_to_twos_complement_bits_negative(bits));
+/// assert_eq!(bits, &[false, false, false]);
+/// ```
+pub fn bits_slice_to_twos_complement_bits_negative(bits: &mut [bool]) -> bool {
+    let mut true_seen = false;
+    for bit in bits.iter_mut() {
+        if true_seen {
+            bit.not_assign();
+        } else if *bit {
+            true_seen = true;
+        }
+    }
+    !true_seen
+}
+
+/// Given the bits of the absolute value of a negative `Integer`, in ascending order, converts the
+/// bits to two's complement and checks whether the most significant bit is `true`; if it isn't,
+/// appends an extra `true` bit. This way the `Integer`'s negativity is preserved in its bits. The
+/// bits cannot be empty or contain only `false`s.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = `bits.len()`
+///
+/// # Panics
+/// Panics if `bits` contains only `false`s.
+///
+/// # Examples
+/// ```
+/// use malachite_nz::integer::conversion::to_twos_complement_bits::*;
+///
+/// let mut bits = vec![true, false, false];
+/// bits_vec_to_twos_complement_bits_negative(&mut bits);
+/// assert_eq!(bits, &[true, true, true]);
+///
+/// let mut bits = vec![true, false, true];
+/// bits_vec_to_twos_complement_bits_negative(&mut bits);
+/// assert_eq!(bits, &[true, true, false, true]);
+/// ```
+pub fn bits_vec_to_twos_complement_bits_negative(bits: &mut Vec<bool>) {
+    assert!(!bits_slice_to_twos_complement_bits_negative(bits));
+    if !bits.is_empty() && !bits.last().unwrap() {
+        // Sign-extend with an extra true bit to indicate a negative Integer
+        bits.push(true);
+    }
+}
+
 /// A double-ended iterator over the two's complement bits of the negative of a `Natural`. The
 /// forward order is ascending (least-significant first). There may be at most one implicit
 /// most-significant `true` bit.
@@ -314,101 +409,6 @@ impl<'a> Index<u64> for TwosComplementBitIterator<'a> {
         } else {
             &false
         }
-    }
-}
-
-/// Given the bits of a non-negative `Integer`, in ascending order, checks whether the most
-/// significant bit is `false`; if it isn't, appends an extra `false` bit. This way the `Integer`'s
-/// non-negativity is preserved in its bits.
-///
-/// Time: worst case O(1)
-///
-/// Additional memory: worst case O(1)
-///
-/// # Examples
-/// ```
-/// use malachite_nz::integer::conversion::to_twos_complement_bits::*;
-///
-/// let mut bits = vec![false, true, false];
-/// bits_to_twos_complement_bits_non_negative(&mut bits);
-/// assert_eq!(bits, &[false, true, false]);
-///
-/// let mut bits = vec![true, false, true];
-/// bits_to_twos_complement_bits_non_negative(&mut bits);
-/// assert_eq!(bits, &[true, false, true, false]);
-/// ```
-pub fn bits_to_twos_complement_bits_non_negative(bits: &mut Vec<bool>) {
-    if !bits.is_empty() && *bits.last().unwrap() {
-        // Sign-extend with an extra false bit to indicate a positive Integer
-        bits.push(false);
-    }
-}
-
-/// Given the bits of the absolute value of a negative `Integer`, in ascending order, converts the
-/// bits to two's complement. Returns whether there is a carry left over from the two's complement
-/// conversion process.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `bits.len()`
-///
-/// # Examples
-/// ```
-/// use malachite_nz::integer::conversion::to_twos_complement_bits::*;
-///
-/// let mut bits = &mut [true, false, true];
-/// assert!(!bits_slice_to_twos_complement_bits_negative(bits));
-/// assert_eq!(bits, &[true, true, false]);
-///
-/// let mut bits = &mut [false, false, false];
-/// assert!(bits_slice_to_twos_complement_bits_negative(bits));
-/// assert_eq!(bits, &[false, false, false]);
-/// ```
-pub fn bits_slice_to_twos_complement_bits_negative(bits: &mut [bool]) -> bool {
-    let mut true_seen = false;
-    for bit in bits.iter_mut() {
-        if true_seen {
-            bit.not_assign();
-        } else if *bit {
-            true_seen = true;
-        }
-    }
-    !true_seen
-}
-
-/// Given the bits of the absolute value of a negative `Integer`, in ascending order, converts the
-/// bits to two's complement and checks whether the most significant bit is `true`; if it isn't,
-/// appends an extra `true` bit. This way the `Integer`'s negativity is preserved in its bits. The
-/// bits cannot be empty or contain only `false`s.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `bits.len()`
-///
-/// # Panics
-/// Panics if `bits` contains only `false`s.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::integer::conversion::to_twos_complement_bits::*;
-///
-/// let mut bits = vec![true, false, false];
-/// bits_vec_to_twos_complement_bits_negative(&mut bits);
-/// assert_eq!(bits, &[true, true, true]);
-///
-/// let mut bits = vec![true, false, true];
-/// bits_vec_to_twos_complement_bits_negative(&mut bits);
-/// assert_eq!(bits, &[true, true, false, true]);
-/// ```
-pub fn bits_vec_to_twos_complement_bits_negative(bits: &mut Vec<bool>) {
-    assert!(!bits_slice_to_twos_complement_bits_negative(bits));
-    if !bits.is_empty() && !bits.last().unwrap() {
-        // Sign-extend with an extra true bit to indicate a negative Integer
-        bits.push(true);
     }
 }
 

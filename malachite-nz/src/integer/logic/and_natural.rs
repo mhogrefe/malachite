@@ -28,6 +28,9 @@ use platform::Limb;
 /// assert_eq!(limbs_and_pos_neg(&[1, 2], &[100, 200]), &[0, 2]);
 /// assert_eq!(limbs_and_pos_neg(&[1, 2, 5], &[100, 200]), &[0, 2, 5]);
 /// ```
+///
+/// This is mpz_and from mpz/and.c where res is returned, the first input is positive, and the
+/// second is negative.
 pub fn limbs_and_pos_neg(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -89,6 +92,8 @@ pub fn limbs_and_pos_neg(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 /// limbs_and_pos_neg_to_out(&mut result, &[1, 2, 5], &[100, 200]);
 /// assert_eq!(result, &[0, 2, 5, 10]);
 /// ```
+///
+/// This is mpz_and from mpz/and.c where the first input is positive and the second is negative.
 pub fn limbs_and_pos_neg_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -148,6 +153,9 @@ pub fn limbs_and_pos_neg_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
 /// limbs_and_pos_neg_in_place_left(&mut xs, &[100, 200]);
 /// assert_eq!(xs, &[0, 2, 5]);
 /// ```
+///
+/// This is mpz_and from mpz/and.c where res == op1, the first input is positive, and the second is
+/// negative.
 pub fn limbs_and_pos_neg_in_place_left(xs: &mut [Limb], ys: &[Limb]) {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -201,6 +209,9 @@ pub fn limbs_and_pos_neg_in_place_left(xs: &mut [Limb], ys: &[Limb]) {
 /// // The result is missing the most-significant limb, which is 5
 /// assert_eq!(ys, &[0, 2]);
 /// ```
+///
+/// This is mpz_and from mpz/and.c where res == op2, the first input is positive, the second is
+/// negative, and the length of op2 is not changed; instead, a carry is returned.
 pub fn limbs_slice_and_pos_neg_in_place_right(xs: &[Limb], ys: &mut [Limb]) {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -257,6 +268,9 @@ pub fn limbs_slice_and_pos_neg_in_place_right(xs: &[Limb], ys: &mut [Limb]) {
 /// limbs_vec_and_pos_neg_in_place_right(&[100, 200], &mut ys);
 /// assert_eq!(ys, &[100, 200]);
 /// ```
+///
+/// This is mpz_and from mpz/and.c where res == op2, the first input is positive and the second is
+/// negative.
 pub fn limbs_vec_and_pos_neg_in_place_right(xs: &[Limb], ys: &mut Vec<Limb>) {
     limbs_slice_and_pos_neg_in_place_right(xs, ys);
     let xs_len = xs.len();

@@ -209,7 +209,7 @@ impl Integer {
     /// ```
     pub fn from_sign_and_owned_limbs_desc(sign: Ordering, limbs: Vec<Limb>) -> Integer {
         assert_eq!(
-            limbs.iter().all(|&limb| limb == 0),
+            limbs_test_zero(&limbs),
             sign == Ordering::Equal,
             "sign should be Equal iff limbs only contains zeros. sign: {:?}, limbs: {:?}",
             sign,

@@ -31,6 +31,7 @@ pub fn limbs_twos_complement_in_place_alt_2(limbs: &mut [Limb]) -> bool {
 }
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
+    register_demo!(registry, demo_limbs_twos_complement);
     register_demo!(registry, demo_limbs_maybe_sign_extend_non_negative_in_place);
     register_demo!(registry, demo_limbs_twos_complement_in_place);
     register_demo!(
@@ -44,6 +45,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_integer_twos_complement_limbs);
     register_demo!(registry, demo_integer_twos_complement_limbs_rev);
     register_demo!(registry, demo_integer_twos_complement_limbs_get);
+    register_bench!(registry, Small, benchmark_limbs_twos_complement);
     register_bench!(
         registry,
         Small,
@@ -74,6 +76,16 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
         Large,
         benchmark_integer_twos_complement_limbs_get_algorithms
     );
+}
+
+fn demo_limbs_twos_complement(gm: GenerationMode, limit: usize) {
+    for limbs in vecs_of_unsigned_var_3(gm).take(limit) {
+        println!(
+            "limbs_twos_complement({:?}) = {:?}",
+            limbs,
+            limbs_twos_complement(&limbs)
+        );
+    }
 }
 
 fn demo_limbs_maybe_sign_extend_non_negative_in_place(gm: GenerationMode, limit: usize) {
@@ -184,6 +196,23 @@ fn demo_integer_twos_complement_limbs_get(gm: GenerationMode, limit: usize) {
             n.twos_complement_limbs().get(i)
         );
     }
+}
+
+fn benchmark_limbs_twos_complement(gm: GenerationMode, limit: usize, file_name: &str) {
+    m_run_benchmark(
+        "limbs_twos_complement(&[Limb])",
+        BenchmarkType::Single,
+        vecs_of_unsigned_var_3(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|limbs| limbs.len()),
+        "index",
+        &mut [(
+            "malachite",
+            &mut (|ref limbs| no_out!(limbs_twos_complement(limbs))),
+        )],
+    );
 }
 
 fn benchmark_limbs_maybe_sign_extend_non_negative_in_place(

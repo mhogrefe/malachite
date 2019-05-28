@@ -7,7 +7,7 @@ use natural::arithmetic::mod_limb::limbs_mod_limb;
 use natural::Natural::{self, Large, Small};
 use platform::{DoubleLimb, Limb};
 
-// must be >= 1
+// must be > 0
 const BMOD_1_TO_MOD_1_THRESHOLD: usize = 10;
 
 /// limbs.len() must be greater than 1; divisor must be odd.

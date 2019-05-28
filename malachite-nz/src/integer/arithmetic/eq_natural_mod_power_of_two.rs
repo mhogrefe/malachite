@@ -77,6 +77,8 @@ fn limbs_eq_mod_power_of_two_neg_pos_greater(xs: &[Limb], ys: &[Limb], pow: u64)
 ///     limbs_eq_mod_power_of_two_neg_pos(&[0xabcd_abcd, 0x1234_1234], &[0x5432_5433, 0xedcb_edcb],
 ///     128), false);
 /// ```
+///
+/// This is mpz_congruent_2exp_p from mpz/cong_2exp.c, where a is negative and c is positive.
 pub fn limbs_eq_mod_power_of_two_neg_pos(xs: &[Limb], ys: &[Limb], pow: u64) -> bool {
     if xs.len() >= ys.len() {
         limbs_eq_mod_power_of_two_neg_pos_greater(xs, ys, pow)

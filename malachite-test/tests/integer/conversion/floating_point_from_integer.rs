@@ -1,6 +1,6 @@
 use std::str::FromStr;
 
-use malachite_base::conversion::{CheckedFrom, RoundingFrom};
+use malachite_base::conversion::{CheckedFrom, ConvertibleFrom, RoundingFrom};
 use malachite_base::crement::Crementable;
 use malachite_base::num::floats::PrimitiveFloat;
 use malachite_base::num::traits::Parity;
@@ -777,6 +777,110 @@ fn test_f64_checked_from_integer() {
         38177180919299881250404026184124858369", None);
 }
 
+#[test]
+fn test_f32_convertible_from_integer() {
+    let test = |n: &str, out| {
+        assert_eq!(f32::convertible_from(Integer::from_str(n).unwrap()), out);
+    };
+    test("3", true);
+    test("-3", true);
+    test("123", true);
+    test("-123", true);
+    test("0", true);
+    test("1000000000", true);
+    test("-1000000000", true);
+    test("16777216", true);
+    test("-16777216", true);
+    test("16777218", true);
+    test("-16777218", true);
+    test("16777217", false);
+    test("-16777217", false);
+    test("33554432", true);
+    test("-33554432", true);
+    test("33554436", true);
+    test("-33554436", true);
+    test("33554433", false);
+    test("-33554433", false);
+    test("33554434", false);
+    test("-33554434", false);
+    test("33554435", false);
+    test("-33554435", false);
+    test("340282346638528859811704183484516925439", false);
+    test("-340282346638528859811704183484516925439", false);
+    test("340282346638528859811704183484516925440", true);
+    test("-340282346638528859811704183484516925440", true);
+    test("340282346638528859811704183484516925441", false);
+    test("-340282346638528859811704183484516925441", false);
+    test(
+        "10000000000000000000000000000000000000000000000000000",
+        false,
+    );
+    test(
+        "-10000000000000000000000000000000000000000000000000000",
+        false,
+    );
+}
+
+#[test]
+fn test_f64_convertible_from_integer() {
+    let test = |n: &str, out| {
+        assert_eq!(f64::convertible_from(Integer::from_str(n).unwrap()), out);
+    };
+    test("3", true);
+    test("-3", true);
+    test("123", true);
+    test("-123", true);
+    test("0", true);
+    test("1000000000", true);
+    test("-1000000000", true);
+    test("9007199254740992", true);
+    test("-9007199254740992", true);
+    test("9007199254740994", true);
+    test("-9007199254740994", true);
+    test("9007199254740993", false);
+    test("-9007199254740993", false);
+    test("18014398509481984", true);
+    test("-18014398509481984", true);
+    test("18014398509481988", true);
+    test("-18014398509481988", true);
+    test("18014398509481985", false);
+    test("-18014398509481985", false);
+    test("18014398509481986", false);
+    test("-18014398509481986", false);
+    test("18014398509481987", false);
+    test("-18014398509481987", false);
+    test(
+        "179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558\
+        6327668781715404589535143824642343213268894641827684675467035375169860499105765512820762454\
+        9009038932894407586850845513394230458323690322294816580855933212334827479782620414472316873\
+        8177180919299881250404026184124858367", false);
+    test(
+        "-17976931348623157081452742373170435679807056752584499659891747680315726078002853876058955\
+        8632766878171540458953514382464234321326889464182768467546703537516986049910576551282076245\
+        4900903893289440758685084551339423045832369032229481658085593321233482747978262041447231687\
+        38177180919299881250404026184124858367", false);
+    test(
+        "179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558\
+        6327668781715404589535143824642343213268894641827684675467035375169860499105765512820762454\
+        9009038932894407586850845513394230458323690322294816580855933212334827479782620414472316873\
+        8177180919299881250404026184124858368", true);
+    test(
+        "-17976931348623157081452742373170435679807056752584499659891747680315726078002853876058955\
+        8632766878171540458953514382464234321326889464182768467546703537516986049910576551282076245\
+        4900903893289440758685084551339423045832369032229481658085593321233482747978262041447231687\
+        38177180919299881250404026184124858368", true);
+    test(
+        "179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558\
+        6327668781715404589535143824642343213268894641827684675467035375169860499105765512820762454\
+        9009038932894407586850845513394230458323690322294816580855933212334827479782620414472316873\
+        8177180919299881250404026184124858369", false);
+    test(
+        "-17976931348623157081452742373170435679807056752584499659891747680315726078002853876058955\
+        8632766878171540458953514382464234321326889464182768467546703537516986049910576551282076245\
+        4900903893289440758685084551339423045832369032229481658085593321233482747978262041447231687\
+        38177180919299881250404026184124858369", false);
+}
+
 macro_rules! float_properties {
     (
         $f: ident,
@@ -786,7 +890,8 @@ macro_rules! float_properties {
         $integers_var_1: ident,
         $float_rounding_from_integer_properties: ident,
         $float_from_integer_properties: ident,
-        $float_checked_from_integer_properties: ident
+        $float_checked_from_integer_properties: ident,
+        $float_convertible_from_integer_properties: ident,
     ) => {
         #[test]
         fn $float_rounding_from_integer_properties() {
@@ -912,13 +1017,30 @@ macro_rules! float_properties {
             });
 
             test_properties($integers_not_exactly_equal_to_float, |n| {
-                //TODO convertible
                 assert!($f::checked_from(n).is_none());
             });
 
             test_properties($integers_var_1, |n| {
-                //TODO convertible
                 assert!($f::checked_from(n).is_none());
+            });
+        }
+
+        #[test]
+        fn $float_convertible_from_integer_properties() {
+            test_properties(integers, |n| {
+                $f::convertible_from(n);
+            });
+
+            test_properties($integers_exactly_equal_to_float, |n| {
+                assert!($f::convertible_from(n));
+            });
+
+            test_properties($integers_not_exactly_equal_to_float, |n| {
+                assert!(!$f::convertible_from(n));
+            });
+
+            test_properties($integers_var_1, |n| {
+                assert!(!$f::convertible_from(n));
             });
         }
     };
@@ -932,7 +1054,8 @@ float_properties!(
     integers_var_1_f32,
     f32_rounding_from_integer_properties,
     f32_from_integer_properties,
-    f32_checked_from_integer_properties
+    f32_checked_from_integer_properties,
+    f32_convertible_from_integer_properties,
 );
 float_properties!(
     f64,
@@ -942,5 +1065,6 @@ float_properties!(
     integers_var_1_f64,
     f64_rounding_from_integer_properties,
     f64_from_integer_properties,
-    f64_checked_from_integer_properties
+    f64_checked_from_integer_properties,
+    f64_convertible_from_integer_properties,
 );

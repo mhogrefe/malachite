@@ -12,7 +12,7 @@ use malachite_test::inputs::base::vecs_of_unsigned;
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-fn test_from_from_twos_complement_limbs_asc() {
+fn test_from_twos_complement_limbs_asc() {
     let test = |limbs: &[Limb], out| {
         let x = Integer::from_twos_complement_limbs_asc(limbs);
         assert_eq!(x.to_string(), out);
