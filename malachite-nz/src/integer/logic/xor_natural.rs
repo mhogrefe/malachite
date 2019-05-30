@@ -4,7 +4,7 @@ use std::ops::{BitXor, BitXorAssign};
 
 use malachite_base::comparison::Max;
 use malachite_base::limbs::{limbs_leading_zero_limbs, limbs_set_zero};
-use malachite_base::num::traits::WrappingNegAssign;
+use malachite_base::num::arithmetic::traits::WrappingNegAssign;
 
 use integer::Integer;
 use natural::logic::not::limbs_not_in_place;
@@ -630,7 +630,7 @@ impl<'a, 'b> BitXor<&'a Natural> for &'b Integer {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::traits::Zero;
+/// use malachite_base::num::basic::traits::Zero;
 /// use malachite_nz::integer::Integer;
 /// use malachite_nz::natural::Natural;
 ///
@@ -666,7 +666,7 @@ impl BitXorAssign<Natural> for Integer {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::traits::Zero;
+/// use malachite_base::num::basic::traits::Zero;
 /// use malachite_nz::integer::Integer;
 /// use malachite_nz::natural::Natural;
 ///

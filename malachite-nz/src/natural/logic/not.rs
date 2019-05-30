@@ -1,6 +1,6 @@
 use std::ops::Not;
 
-use malachite_base::num::traits::NotAssign;
+use malachite_base::num::logic::traits::NotAssign;
 
 use integer::Integer;
 use natural::Natural;
@@ -95,7 +95,7 @@ pub fn limbs_not_in_place(limbs: &mut [Limb]) {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::traits::Zero;
+/// use malachite_base::num::basic::traits::Zero;
 /// use malachite_nz::natural::Natural;
 ///
 /// fn main() {
@@ -128,7 +128,7 @@ impl Not for Natural {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::traits::Zero;
+/// use malachite_base::num::basic::traits::Zero;
 /// use malachite_nz::natural::Natural;
 ///
 /// fn main() {

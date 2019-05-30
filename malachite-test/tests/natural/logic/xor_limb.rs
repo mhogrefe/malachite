@@ -1,6 +1,6 @@
 use std::str::FromStr;
 
-use malachite_base::num::traits::Zero;
+use malachite_base::num::basic::traits::Zero;
 use malachite_nz::natural::logic::xor_limb::{
     limbs_xor_limb, limbs_xor_limb_in_place, limbs_xor_limb_to_out,
 };

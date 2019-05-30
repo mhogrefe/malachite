@@ -1,4 +1,4 @@
-use malachite_base::num::integers::PrimitiveInteger;
+use malachite_base::num::basic::integers::PrimitiveInteger;
 
 #[test]
 pub fn test_get_highest_bit() {

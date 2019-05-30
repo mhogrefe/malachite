@@ -7,13 +7,14 @@ use std::ops::{
 use std::str::FromStr;
 
 use comparison::{Max, Min};
-use conversion::{CheckedFrom, CheckedInto};
 use crement::Crementable;
 use named::Named;
-use num::integers::PrimitiveInteger;
-use num::signeds::PrimitiveSigned;
-use num::traits::{ModPowerOfTwo, NegAssign, NegativeOne, One, Two, Zero};
-use num::unsigneds::PrimitiveUnsigned;
+use num::arithmetic::traits::{ModPowerOfTwo, NegAssign};
+use num::basic::integers::PrimitiveInteger;
+use num::basic::signeds::PrimitiveSigned;
+use num::basic::traits::{NegativeOne, One, Two, Zero};
+use num::basic::unsigneds::PrimitiveUnsigned;
+use num::conversion::traits::{CheckedFrom, CheckedInto};
 
 //TODO docs
 pub trait PrimitiveFloat:

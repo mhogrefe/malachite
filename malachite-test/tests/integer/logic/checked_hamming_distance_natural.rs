@@ -1,6 +1,7 @@
 use std::str::FromStr;
 
-use malachite_base::num::traits::{CheckedHammingDistance, HammingDistance, NegativeOne, Zero};
+use malachite_base::num::basic::traits::{NegativeOne, Zero};
+use malachite_base::num::logic::traits::{CheckedHammingDistance, HammingDistance};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 

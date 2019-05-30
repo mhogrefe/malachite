@@ -1,8 +1,9 @@
-use malachite_base::conversion::CheckedFrom;
+use malachite_base::num::arithmetic::traits::{ModPowerOfTwo, ShrRound};
+use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base::num::conversion::traits::CheckedFrom;
 #[cfg(feature = "64_bit_limbs")]
-use malachite_base::num::traits::JoinHalves;
-use malachite_base::num::traits::{ModPowerOfTwo, ShrRound, Zero};
-use malachite_base::num::unsigneds::PrimitiveUnsigned;
+use malachite_base::num::conversion::traits::JoinHalves;
 use malachite_base::round::RoundingMode;
 use rand::{Rand, Rng};
 

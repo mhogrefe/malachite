@@ -1,7 +1,7 @@
 use std::fmt::Display;
 use std::ops::{Sub, SubAssign};
 
-use malachite_base::num::traits::{CheckedSub, OverflowingSubAssign};
+use malachite_base::num::arithmetic::traits::{CheckedSub, OverflowingSubAssign};
 
 use natural::arithmetic::sub_limb::{limbs_sub_limb_in_place, limbs_sub_limb_to_out};
 use natural::Natural;
@@ -494,7 +494,7 @@ pub(crate) fn sub_panic<S: Display, T: Display>(x: S, y: T) -> ! {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::traits::Zero;
+/// use malachite_base::num::basic::traits::Zero;
 /// use malachite_nz::natural::Natural;
 ///
 /// fn main() {
@@ -526,7 +526,7 @@ impl Sub<Natural> for Natural {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::traits::Zero;
+/// use malachite_base::num::basic::traits::Zero;
 /// use malachite_nz::natural::Natural;
 ///
 /// fn main() {
@@ -558,7 +558,7 @@ impl<'a> Sub<&'a Natural> for Natural {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::traits::Zero;
+/// use malachite_base::num::basic::traits::Zero;
 /// use malachite_nz::natural::Natural;
 ///
 /// fn main() {
@@ -589,7 +589,7 @@ impl<'a> Sub<Natural> for &'a Natural {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::traits::Zero;
+/// use malachite_base::num::basic::traits::Zero;
 /// use malachite_nz::natural::Natural;
 ///
 /// fn main() {

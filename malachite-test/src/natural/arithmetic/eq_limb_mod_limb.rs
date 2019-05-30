@@ -1,5 +1,6 @@
-use malachite_base::conversion::CheckedFrom;
-use malachite_base::num::traits::{EqMod, SignificantBits};
+use malachite_base::num::arithmetic::traits::EqMod;
+use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::natural::arithmetic::eq_limb_mod_limb::{
     _combined_limbs_eq_limb_mod_limb, limbs_eq_limb_mod_limb,
 };

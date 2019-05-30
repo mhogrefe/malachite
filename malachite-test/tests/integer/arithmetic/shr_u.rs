@@ -1,10 +1,12 @@
 use std::str::FromStr;
 
 use malachite_base::comparison::Max;
-use malachite_base::conversion::{CheckedFrom, WrappingFrom};
-use malachite_base::num::integers::PrimitiveInteger;
-use malachite_base::num::traits::{PartialOrdAbs, ShrRound, ShrRoundAssign, Zero};
-use malachite_base::num::unsigneds::PrimitiveUnsigned;
+use malachite_base::num::arithmetic::traits::{ShrRound, ShrRoundAssign};
+use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base::num::comparison::traits::PartialOrdAbs;
+use malachite_base::num::conversion::traits::{CheckedFrom, WrappingFrom};
 use malachite_base::round::RoundingMode;
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::{Limb, SignedLimb};

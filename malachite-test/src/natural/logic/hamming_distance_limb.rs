@@ -1,7 +1,7 @@
 use std::iter::repeat;
 
-use malachite_base::conversion::CheckedFrom;
-use malachite_base::num::traits::{HammingDistance, SignificantBits};
+use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::logic::traits::{HammingDistance, SignificantBits};
 use malachite_nz::natural::logic::hamming_distance_limb::limbs_hamming_distance_limb;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;

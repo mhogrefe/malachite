@@ -15,7 +15,7 @@ impl Integer {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::Zero;
+    /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {

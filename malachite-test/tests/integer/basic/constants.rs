@@ -1,4 +1,4 @@
-use malachite_base::num::traits::{NegativeOne, One, Two, Zero};
+use malachite_base::num::basic::traits::{NegativeOne, One, Two, Zero};
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::{Limb, SignedLimb};
 

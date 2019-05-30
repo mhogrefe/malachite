@@ -1,7 +1,7 @@
 use std::ops::Index;
 
-use malachite_base::conversion::CheckedFrom;
-use malachite_base::num::traits::{BitAccess, NotAssign};
+use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::logic::traits::{BitAccess, NotAssign};
 
 use integer::Integer;
 use natural::conversion::to_bits::BitIterator;
@@ -276,7 +276,7 @@ impl<'a> Iterator for TwosComplementBitIterator<'a> {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::Zero;
+    /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {
@@ -324,7 +324,7 @@ impl<'a> DoubleEndedIterator for TwosComplementBitIterator<'a> {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::Zero;
+    /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {
@@ -376,7 +376,7 @@ impl<'a> Index<u64> for TwosComplementBitIterator<'a> {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::Zero;
+    /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {
@@ -433,7 +433,7 @@ impl Integer {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::Zero;
+    /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {
@@ -478,7 +478,7 @@ impl Integer {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::Zero;
+    /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {
@@ -513,7 +513,7 @@ impl Integer {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::Zero;
+    /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {

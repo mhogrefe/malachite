@@ -1,8 +1,10 @@
 use std::str::FromStr;
 
 use malachite_base::comparison::Max;
-use malachite_base::num::integers::PrimitiveInteger;
-use malachite_base::num::traits::{CeilingLogTwo, FloorLogTwo, One, SignificantBits, Zero};
+use malachite_base::num::arithmetic::traits::{CeilingLogTwo, FloorLogTwo};
+use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::basic::traits::{One, Zero};
+use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::natural::arithmetic::log_two::{limbs_ceiling_log_two, limbs_floor_log_two};
 use malachite_nz::natural::logic::significant_bits::limbs_significant_bits;
 use malachite_nz::natural::Natural;

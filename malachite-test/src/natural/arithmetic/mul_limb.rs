@@ -1,5 +1,5 @@
-use malachite_base::conversion::CheckedFrom;
-use malachite_base::num::traits::SignificantBits;
+use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::natural::arithmetic::mul_limb::{
     limbs_mul_limb, limbs_mul_limb_to_out, limbs_mul_limb_with_carry_to_out,
     limbs_slice_mul_limb_in_place, limbs_vec_mul_limb_in_place,

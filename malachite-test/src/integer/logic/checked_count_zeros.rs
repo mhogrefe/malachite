@@ -1,5 +1,5 @@
-use malachite_base::conversion::{CheckedFrom, WrappingFrom};
-use malachite_base::num::traits::SignificantBits;
+use malachite_base::num::conversion::traits::{CheckedFrom, WrappingFrom};
+use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::integer::logic::checked_count_zeros::limbs_count_zeros_neg;
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::Limb;

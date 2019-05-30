@@ -2,8 +2,8 @@
 use std::str::FromStr;
 
 use malachite_base::comparison::Max;
-use malachite_base::num::integers::PrimitiveInteger;
-use malachite_base::num::traits::One;
+use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::basic::traits::One;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 

@@ -1,8 +1,8 @@
 use std::str::FromStr;
 
 use malachite_base::comparison::Max;
-use malachite_base::conversion::CheckedFrom;
-use malachite_base::num::traits::Zero;
+use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::arithmetic::sub_limb::{
     limbs_sub_limb, limbs_sub_limb_in_place, limbs_sub_limb_to_out,

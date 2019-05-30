@@ -1,6 +1,6 @@
 use std::str::FromStr;
 
-use malachite_base::num::traits::Assign;
+use malachite_base::num::conversion::traits::Assign;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 use num::BigUint;

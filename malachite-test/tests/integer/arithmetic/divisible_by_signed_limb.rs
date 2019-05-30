@@ -1,6 +1,7 @@
 use std::str::FromStr;
 
-use malachite_base::num::traits::{DivisibleBy, One, UnsignedAbs, Zero};
+use malachite_base::num::arithmetic::traits::{DivisibleBy, UnsignedAbs};
+use malachite_base::num::basic::traits::{One, Zero};
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::{Limb, SignedLimb};
 use num::BigInt;

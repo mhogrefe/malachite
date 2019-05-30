@@ -1,5 +1,5 @@
-use malachite_base::conversion::CheckedFrom;
-use malachite_base::num::traits::{Assign, SignificantBits};
+use malachite_base::num::conversion::traits::{Assign, CheckedFrom};
+use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::platform::Limb;
 use num::BigUint;
 use rug::Assign as rug_assign;

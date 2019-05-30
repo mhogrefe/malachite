@@ -1,6 +1,6 @@
 use std::ops::{BitAnd, BitAndAssign};
 
-use malachite_base::conversion::WrappingFrom;
+use malachite_base::num::conversion::traits::WrappingFrom;
 
 use integer::Integer;
 use natural::Natural::{self, Small};
@@ -17,7 +17,7 @@ use platform::Limb;
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::traits::Zero;
+/// use malachite_base::num::basic::traits::Zero;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {
@@ -60,7 +60,7 @@ impl BitAnd<u32> for Integer {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::traits::Zero;
+/// use malachite_base::num::basic::traits::Zero;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {
@@ -103,7 +103,7 @@ impl<'a> BitAnd<u32> for &'a Integer {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::traits::Zero;
+/// use malachite_base::num::basic::traits::Zero;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {
@@ -143,7 +143,7 @@ impl BitAnd<Integer> for u32 {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::traits::Zero;
+/// use malachite_base::num::basic::traits::Zero;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {
@@ -183,7 +183,7 @@ impl<'a> BitAnd<&'a Integer> for u32 {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::traits::NegativeOne;
+/// use malachite_base::num::basic::traits::NegativeOne;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {
@@ -225,7 +225,7 @@ impl BitAndAssign<u32> for Integer {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::traits::NegativeOne;
+/// use malachite_base::num::basic::traits::NegativeOne;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {
@@ -263,7 +263,7 @@ impl BitAndAssign<Integer> for u32 {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::traits::NegativeOne;
+/// use malachite_base::num::basic::traits::NegativeOne;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {

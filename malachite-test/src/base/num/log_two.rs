@@ -1,5 +1,5 @@
-use malachite_base::conversion::CheckedFrom;
-use malachite_base::num::unsigneds::PrimitiveUnsigned;
+use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base::num::conversion::traits::CheckedFrom;
 use rand::Rand;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};

@@ -1,4 +1,4 @@
-use malachite_base::conversion::{
+use malachite_base::num::conversion::traits::{
     CheckedFrom, ConvertibleFrom, OverflowingFrom, SaturatingFrom, WrappingFrom,
 };
 
@@ -18,7 +18,7 @@ impl CheckedFrom<Integer> for DoubleLimb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::conversion::CheckedFrom;
+    /// use malachite_base::num::conversion::traits::CheckedFrom;
     /// use malachite_nz::integer::Integer;
     /// use std::str::FromStr;
     ///
@@ -50,7 +50,7 @@ impl<'a> CheckedFrom<&'a Integer> for DoubleLimb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::conversion::CheckedFrom;
+    /// use malachite_base::num::conversion::traits::CheckedFrom;
     /// use malachite_nz::integer::Integer;
     /// use std::str::FromStr;
     ///
@@ -87,7 +87,7 @@ impl WrappingFrom<Integer> for DoubleLimb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::conversion::WrappingFrom;
+    /// use malachite_base::num::conversion::traits::WrappingFrom;
     /// use malachite_nz::integer::Integer;
     /// use std::str::FromStr;
     ///
@@ -121,7 +121,7 @@ impl<'a> WrappingFrom<&'a Integer> for DoubleLimb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::conversion::WrappingFrom;
+    /// use malachite_base::num::conversion::traits::WrappingFrom;
     /// use malachite_nz::integer::Integer;
     /// use std::str::FromStr;
     ///
@@ -164,7 +164,7 @@ impl SaturatingFrom<Integer> for DoubleLimb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::conversion::SaturatingFrom;
+    /// use malachite_base::num::conversion::traits::SaturatingFrom;
     /// use malachite_nz::integer::Integer;
     /// use std::str::FromStr;
     ///
@@ -197,7 +197,7 @@ impl<'a> SaturatingFrom<&'a Integer> for DoubleLimb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::conversion::SaturatingFrom;
+    /// use malachite_base::num::conversion::traits::SaturatingFrom;
     /// use malachite_nz::integer::Integer;
     /// use std::str::FromStr;
     ///
@@ -235,7 +235,7 @@ impl OverflowingFrom<Integer> for DoubleLimb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::conversion::OverflowingFrom;
+    /// use malachite_base::num::conversion::traits::OverflowingFrom;
     /// use malachite_nz::integer::Integer;
     /// use std::str::FromStr;
     ///
@@ -268,7 +268,7 @@ impl<'a> OverflowingFrom<&'a Integer> for DoubleLimb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::conversion::OverflowingFrom;
+    /// use malachite_base::num::conversion::traits::OverflowingFrom;
     /// use malachite_nz::integer::Integer;
     /// use std::str::FromStr;
     ///
@@ -310,7 +310,7 @@ impl ConvertibleFrom<Integer> for DoubleLimb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::conversion::ConvertibleFrom;
+    /// use malachite_base::num::conversion::traits::ConvertibleFrom;
     /// use malachite_nz::integer::Integer;
     /// use std::str::FromStr;
     ///
@@ -343,7 +343,7 @@ impl<'a> ConvertibleFrom<&'a Integer> for DoubleLimb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::conversion::ConvertibleFrom;
+    /// use malachite_base::num::conversion::traits::ConvertibleFrom;
     /// use malachite_nz::integer::Integer;
     /// use std::str::FromStr;
     ///

@@ -1,5 +1,5 @@
 use malachite_base::comparison::Min;
-use malachite_base::num::traits::{One, Two, Zero};
+use malachite_base::num::basic::traits::{One, Two, Zero};
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 

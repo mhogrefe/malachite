@@ -1,7 +1,7 @@
 use std::cmp::Ordering;
 use std::str::FromStr;
 
-use malachite_base::num::traits::{OrdAbs, PartialOrdAbs};
+use malachite_base::num::comparison::traits::{OrdAbs, PartialOrdAbs};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 

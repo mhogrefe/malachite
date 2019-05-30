@@ -1,4 +1,4 @@
-use num::unsigneds::PrimitiveUnsigned;
+use num::basic::unsigneds::PrimitiveUnsigned;
 
 /// Tests whether all limbs in a slice are equal to 0.
 ///

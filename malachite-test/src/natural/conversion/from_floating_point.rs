@@ -1,4 +1,6 @@
-use malachite_base::conversion::{CheckedFrom, ConvertibleFrom, RoundingFrom, WrappingFrom};
+use malachite_base::num::conversion::traits::{
+    CheckedFrom, ConvertibleFrom, RoundingFrom, WrappingFrom,
+};
 use malachite_base::num::floats::PrimitiveFloat;
 use malachite_nz::natural::Natural;
 

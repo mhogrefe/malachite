@@ -1,5 +1,5 @@
-use malachite_base::conversion::CheckedFrom;
-use malachite_base::num::traits::SignificantBits;
+use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::integer::logic::or_signed_limb::{limbs_neg_or_neg_limb, limbs_pos_or_neg_limb};
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::SignedLimb;

@@ -1,7 +1,8 @@
-use malachite_base::conversion::CheckedFrom;
-use malachite_base::num::traits::{
-    CeilingDivNegMod, DivMod, Mod, ModAssign, NegMod, NegModAssign, SignificantBits,
+use malachite_base::num::arithmetic::traits::{
+    CeilingDivNegMod, DivMod, Mod, ModAssign, NegMod, NegModAssign,
 };
+use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::natural::arithmetic::mod_limb::limbs_mod_limb;
 use malachite_nz::platform::Limb;
 use num::{BigUint, ToPrimitive};

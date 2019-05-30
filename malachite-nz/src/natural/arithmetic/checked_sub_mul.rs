@@ -1,4 +1,4 @@
-use malachite_base::num::traits::CheckedSubMul;
+use malachite_base::num::arithmetic::traits::CheckedSubMul;
 
 use natural::arithmetic::sub_mul::{limbs_sub_mul, limbs_sub_mul_in_place_left};
 use natural::Natural::{self, Large, Small};
@@ -21,7 +21,7 @@ impl CheckedSubMul<Natural, Natural> for Natural {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::CheckedSubMul;
+    /// use malachite_base::num::arithmetic::traits::CheckedSubMul;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
@@ -61,7 +61,7 @@ impl<'a> CheckedSubMul<Natural, &'a Natural> for Natural {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::CheckedSubMul;
+    /// use malachite_base::num::arithmetic::traits::CheckedSubMul;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
@@ -101,7 +101,7 @@ impl<'a> CheckedSubMul<&'a Natural, Natural> for Natural {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::CheckedSubMul;
+    /// use malachite_base::num::arithmetic::traits::CheckedSubMul;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
@@ -141,7 +141,7 @@ impl<'a, 'b> CheckedSubMul<&'a Natural, &'b Natural> for Natural {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::CheckedSubMul;
+    /// use malachite_base::num::arithmetic::traits::CheckedSubMul;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
@@ -178,7 +178,7 @@ impl<'a, 'b, 'c> CheckedSubMul<&'a Natural, &'b Natural> for &'c Natural {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::CheckedSubMul;
+    /// use malachite_base::num::arithmetic::traits::CheckedSubMul;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {

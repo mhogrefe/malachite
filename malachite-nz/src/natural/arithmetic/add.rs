@@ -1,6 +1,6 @@
 use std::ops::{Add, AddAssign};
 
-use malachite_base::num::traits::OverflowingAddAssign;
+use malachite_base::num::arithmetic::traits::OverflowingAddAssign;
 
 use natural::arithmetic::add_limb::{limbs_add_limb_to_out, limbs_slice_add_limb_in_place};
 use natural::Natural::{self, Large, Small};
@@ -524,7 +524,7 @@ pub fn _limbs_add_same_length_with_carry_in_in_place_left(
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::traits::Zero;
+/// use malachite_base::num::basic::traits::Zero;
 /// use malachite_nz::natural::Natural;
 ///
 /// fn main() {
@@ -557,7 +557,7 @@ impl Add<Natural> for Natural {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::traits::Zero;
+/// use malachite_base::num::basic::traits::Zero;
 /// use malachite_nz::natural::Natural;
 ///
 /// fn main() {
@@ -591,7 +591,7 @@ impl<'a> Add<&'a Natural> for Natural {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::traits::Zero;
+/// use malachite_base::num::basic::traits::Zero;
 /// use malachite_nz::natural::Natural;
 ///
 /// fn main() {
@@ -624,7 +624,7 @@ impl<'a> Add<Natural> for &'a Natural {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::traits::Zero;
+/// use malachite_base::num::basic::traits::Zero;
 /// use malachite_nz::natural::Natural;
 ///
 /// fn main() {
@@ -664,7 +664,7 @@ impl<'a, 'b> Add<&'a Natural> for &'b Natural {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::traits::Zero;
+/// use malachite_base::num::basic::traits::Zero;
 /// use malachite_nz::natural::Natural;
 ///
 /// fn main() {
@@ -705,7 +705,7 @@ impl AddAssign<Natural> for Natural {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::traits::Zero;
+/// use malachite_base::num::basic::traits::Zero;
 /// use malachite_nz::natural::Natural;
 ///
 /// fn main() {

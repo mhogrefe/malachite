@@ -1,4 +1,4 @@
-use malachite_base::num::traits::Parity;
+use malachite_base::num::arithmetic::traits::Parity;
 
 use natural::Natural::{self, Large, Small};
 
@@ -14,7 +14,8 @@ impl<'a> Parity for &'a Natural {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::{Parity, Zero};
+    /// use malachite_base::num::arithmetic::traits::Parity;
+    /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
@@ -43,7 +44,8 @@ impl<'a> Parity for &'a Natural {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::{Parity, Zero};
+    /// use malachite_base::num::arithmetic::traits::Parity;
+    /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {

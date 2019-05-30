@@ -1,6 +1,7 @@
 use std::str::FromStr;
 
-use malachite_base::num::traits::{CheckedSub, Zero};
+use malachite_base::num::arithmetic::traits::CheckedSub;
+use malachite_base::num::basic::traits::Zero;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 use num::BigUint;

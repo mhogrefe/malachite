@@ -1,6 +1,6 @@
 use malachite_base::chars::char_to_contiguous_range;
-use malachite_base::conversion::WrappingFrom;
 use malachite_base::crement::Crementable;
+use malachite_base::num::conversion::traits::WrappingFrom;
 
 use common::{
     m_run_benchmark, BenchmarkType, DemoBenchRegistry, NoSpecialGenerationMode, ScaleType,

@@ -1,6 +1,6 @@
-use malachite_base::conversion::{CheckedFrom, ConvertibleFrom, RoundingFrom};
 use malachite_base::named::Named;
-use malachite_base::num::traits::SignificantBits;
+use malachite_base::num::conversion::traits::{CheckedFrom, ConvertibleFrom, RoundingFrom};
+use malachite_base::num::logic::traits::SignificantBits;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::natural::{

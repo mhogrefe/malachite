@@ -1,4 +1,4 @@
-use malachite_base::num::traits::BitAccess;
+use malachite_base::num::logic::traits::BitAccess;
 use rand::Rng;
 
 use natural::random::special_random_natural_up_to_bits::special_random_natural_up_to_bits;

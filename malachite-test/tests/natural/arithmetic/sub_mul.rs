@@ -1,6 +1,7 @@
 use std::str::FromStr;
 
-use malachite_base::num::traits::{CheckedSub, CheckedSubMul, One, SubMul, SubMulAssign, Zero};
+use malachite_base::num::arithmetic::traits::{CheckedSub, CheckedSubMul, SubMul, SubMulAssign};
+use malachite_base::num::basic::traits::{One, Zero};
 use malachite_nz::natural::arithmetic::sub_mul::{limbs_sub_mul, limbs_sub_mul_in_place_left};
 use malachite_nz::natural::Natural;
 #[cfg(feature = "32_bit_limbs")]

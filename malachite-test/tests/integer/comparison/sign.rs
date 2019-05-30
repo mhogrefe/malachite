@@ -1,7 +1,7 @@
 use std::cmp::Ordering;
 use std::str::FromStr;
 
-use malachite_base::num::traits::Sign;
+use malachite_base::num::arithmetic::traits::Sign;
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::{Limb, SignedLimb};
 use num::BigInt;

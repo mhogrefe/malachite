@@ -3,12 +3,13 @@ use std::cmp::Ordering;
 use std::ops::{Shl, Shr};
 
 use malachite_base::chars::NUMBER_OF_CHARS;
-use malachite_base::conversion::{CheckedFrom, ConvertibleFrom, WrappingFrom};
 use malachite_base::limbs::limbs_test_zero;
-use malachite_base::num::integers::PrimitiveInteger;
-use malachite_base::num::signeds::PrimitiveSigned;
-use malachite_base::num::traits::{BitAccess, Parity, UnsignedAbs};
-use malachite_base::num::unsigneds::PrimitiveUnsigned;
+use malachite_base::num::arithmetic::traits::{Parity, UnsignedAbs};
+use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::basic::signeds::PrimitiveSigned;
+use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base::num::conversion::traits::{CheckedFrom, ConvertibleFrom, WrappingFrom};
+use malachite_base::num::logic::traits::BitAccess;
 use malachite_base::round::RoundingMode;
 use malachite_nz::integer::logic::bit_access::limbs_vec_clear_bit_neg;
 use malachite_nz::natural::arithmetic::mul::fft::*;

@@ -1,4 +1,7 @@
-use malachite_base::num::traits::{CheckedSubMul, SaturatingSubMul, SaturatingSubMulAssign, Zero};
+use malachite_base::num::arithmetic::traits::{
+    CheckedSubMul, SaturatingSubMul, SaturatingSubMulAssign,
+};
+use malachite_base::num::basic::traits::Zero;
 
 use natural::Natural;
 
@@ -19,7 +22,7 @@ impl SaturatingSubMul<Natural, Natural> for Natural {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::SaturatingSubMul;
+    /// use malachite_base::num::arithmetic::traits::SaturatingSubMul;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
@@ -54,7 +57,7 @@ impl<'a> SaturatingSubMul<Natural, &'a Natural> for Natural {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::SaturatingSubMul;
+    /// use malachite_base::num::arithmetic::traits::SaturatingSubMul;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
@@ -89,7 +92,7 @@ impl<'a> SaturatingSubMul<&'a Natural, Natural> for Natural {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::SaturatingSubMul;
+    /// use malachite_base::num::arithmetic::traits::SaturatingSubMul;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
@@ -124,7 +127,7 @@ impl<'a, 'b> SaturatingSubMul<&'a Natural, &'b Natural> for Natural {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::SaturatingSubMul;
+    /// use malachite_base::num::arithmetic::traits::SaturatingSubMul;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
@@ -159,7 +162,7 @@ impl<'a, 'b, 'c> SaturatingSubMul<&'b Natural, &'c Natural> for &'a Natural {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::SaturatingSubMul;
+    /// use malachite_base::num::arithmetic::traits::SaturatingSubMul;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
@@ -192,7 +195,7 @@ impl SaturatingSubMulAssign<Natural, Natural> for Natural {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::SaturatingSubMulAssign;
+    /// use malachite_base::num::arithmetic::traits::SaturatingSubMulAssign;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
@@ -231,7 +234,7 @@ impl<'a> SaturatingSubMulAssign<Natural, &'a Natural> for Natural {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::SaturatingSubMulAssign;
+    /// use malachite_base::num::arithmetic::traits::SaturatingSubMulAssign;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
@@ -270,7 +273,7 @@ impl<'a> SaturatingSubMulAssign<&'a Natural, Natural> for Natural {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::SaturatingSubMulAssign;
+    /// use malachite_base::num::arithmetic::traits::SaturatingSubMulAssign;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
@@ -309,7 +312,7 @@ impl<'a, 'b> SaturatingSubMulAssign<&'a Natural, &'b Natural> for Natural {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::SaturatingSubMulAssign;
+    /// use malachite_base::num::arithmetic::traits::SaturatingSubMulAssign;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {

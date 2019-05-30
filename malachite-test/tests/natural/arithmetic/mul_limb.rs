@@ -1,6 +1,7 @@
 use std::str::FromStr;
 
-use malachite_base::num::traits::{DivMod, One, Zero};
+use malachite_base::num::arithmetic::traits::DivMod;
+use malachite_base::num::basic::traits::{One, Zero};
 use malachite_nz::natural::arithmetic::mul_limb::{
     limbs_mul_limb, limbs_mul_limb_to_out, limbs_mul_limb_with_carry_to_out,
     limbs_slice_mul_limb_in_place, limbs_vec_mul_limb_in_place,

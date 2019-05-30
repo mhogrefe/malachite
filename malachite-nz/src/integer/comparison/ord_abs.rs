@@ -1,6 +1,6 @@
 use std::cmp::Ordering;
 
-use malachite_base::num::traits::{OrdAbs, PartialOrdAbs};
+use malachite_base::num::comparison::traits::{OrdAbs, PartialOrdAbs};
 
 use integer::Integer;
 
@@ -17,7 +17,7 @@ use integer::Integer;
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::traits::PartialOrdAbs;
+/// use malachite_base::num::comparison::traits::PartialOrdAbs;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {

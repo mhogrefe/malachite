@@ -1,5 +1,5 @@
-use malachite_base::conversion::CheckedFrom;
-use malachite_base::num::traits::BitAccess;
+use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::logic::traits::BitAccess;
 use malachite_nz::natural::logic::bit_access::limbs_get_bit;
 use num::{BigUint, One, Zero};
 

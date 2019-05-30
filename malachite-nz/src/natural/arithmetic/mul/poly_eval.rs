@@ -1,8 +1,9 @@
 use std::cmp::Ordering;
 
-use malachite_base::conversion::{CheckedFrom, WrappingFrom};
-use malachite_base::num::integers::PrimitiveInteger;
-use malachite_base::num::traits::{NotAssign, Parity, WrappingAddAssign};
+use malachite_base::num::arithmetic::traits::{Parity, WrappingAddAssign};
+use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::conversion::traits::{CheckedFrom, WrappingFrom};
+use malachite_base::num::logic::traits::NotAssign;
 
 use natural::arithmetic::add::{
     _limbs_add_to_out_aliased, limbs_add_same_length_to_out, limbs_add_to_out,

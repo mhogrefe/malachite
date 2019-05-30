@@ -1,6 +1,6 @@
 use std::str::FromStr;
 
-use malachite_base::num::traits::{NegativeOne, Zero};
+use malachite_base::num::basic::traits::{NegativeOne, Zero};
 use malachite_nz::integer::logic::or_limb::{
     limbs_neg_or_limb, limbs_neg_or_limb_in_place, limbs_neg_or_limb_to_out,
 };

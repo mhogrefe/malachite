@@ -1,6 +1,6 @@
 use comparison::{Max, Min};
 use crement::Crementable;
-use num::traits::NotAssign;
+use num::logic::traits::NotAssign;
 
 impl NotAssign for bool {
     /// Replaces a `bool` with its negation.
@@ -11,7 +11,7 @@ impl NotAssign for bool {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::traits::NotAssign;
+    /// use malachite_base::num::logic::traits::NotAssign;
     ///
     /// let mut b = false;
     /// b.not_assign();

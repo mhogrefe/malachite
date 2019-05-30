@@ -1,6 +1,6 @@
 use std::ops::{BitXor, BitXorAssign};
 
-use malachite_base::conversion::WrappingFrom;
+use malachite_base::num::conversion::traits::WrappingFrom;
 
 use integer::Integer;
 use natural::arithmetic::add_limb::{
@@ -290,7 +290,7 @@ pub fn limbs_neg_xor_limb_neg_in_place(limbs: &mut [Limb], limb: Limb) {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::traits::Zero;
+/// use malachite_base::num::basic::traits::Zero;
 /// use malachite_nz::integer::Integer;
 /// use std::str::FromStr;
 ///
@@ -336,7 +336,7 @@ impl BitXor<i32> for Integer {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::traits::Zero;
+/// use malachite_base::num::basic::traits::Zero;
 /// use malachite_nz::integer::Integer;
 /// use std::str::FromStr;
 ///
@@ -392,7 +392,7 @@ impl<'a> BitXor<i32> for &'a Integer {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::traits::Zero;
+/// use malachite_base::num::basic::traits::Zero;
 /// use malachite_nz::integer::Integer;
 /// use std::str::FromStr;
 ///
@@ -437,7 +437,7 @@ impl BitXor<Integer> for i32 {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::traits::Zero;
+/// use malachite_base::num::basic::traits::Zero;
 /// use malachite_nz::integer::Integer;
 /// use std::str::FromStr;
 ///

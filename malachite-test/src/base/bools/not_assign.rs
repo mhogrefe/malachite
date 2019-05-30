@@ -1,4 +1,4 @@
-use malachite_base::num::traits::NotAssign;
+use malachite_base::num::logic::traits::NotAssign;
 
 use common::{
     m_run_benchmark, BenchmarkType, DemoBenchRegistry, NoSpecialGenerationMode, ScaleType,

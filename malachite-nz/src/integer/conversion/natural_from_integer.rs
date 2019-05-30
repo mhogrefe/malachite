@@ -1,5 +1,5 @@
-use malachite_base::conversion::{CheckedFrom, ConvertibleFrom, SaturatingFrom};
-use malachite_base::num::traits::Zero;
+use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::conversion::traits::{CheckedFrom, ConvertibleFrom, SaturatingFrom};
 
 use integer::Integer;
 use natural::Natural;
@@ -17,7 +17,7 @@ impl CheckedFrom<Integer> for Natural {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::conversion::CheckedFrom;
+    /// use malachite_base::num::conversion::traits::CheckedFrom;
     /// use malachite_nz::integer::Integer;
     /// use malachite_nz::natural::Natural;
     ///
@@ -52,7 +52,7 @@ impl<'a> CheckedFrom<&'a Integer> for Natural {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::conversion::CheckedFrom;
+    /// use malachite_base::num::conversion::traits::CheckedFrom;
     /// use malachite_nz::integer::Integer;
     /// use malachite_nz::natural::Natural;
     ///
@@ -88,7 +88,7 @@ impl SaturatingFrom<Integer> for Natural {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::conversion::SaturatingFrom;
+    /// use malachite_base::num::conversion::traits::SaturatingFrom;
     /// use malachite_nz::integer::Integer;
     /// use malachite_nz::natural::Natural;
     ///
@@ -120,7 +120,7 @@ impl<'a> SaturatingFrom<&'a Integer> for Natural {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::conversion::SaturatingFrom;
+    /// use malachite_base::num::conversion::traits::SaturatingFrom;
     /// use malachite_nz::integer::Integer;
     /// use malachite_nz::natural::Natural;
     ///
@@ -155,7 +155,7 @@ impl ConvertibleFrom<Integer> for Natural {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::conversion::ConvertibleFrom;
+    /// use malachite_base::num::conversion::traits::ConvertibleFrom;
     /// use malachite_nz::integer::Integer;
     /// use malachite_nz::natural::Natural;
     ///
@@ -185,7 +185,7 @@ impl<'a> ConvertibleFrom<&'a Integer> for Natural {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::conversion::ConvertibleFrom;
+    /// use malachite_base::num::conversion::traits::ConvertibleFrom;
     /// use malachite_nz::integer::Integer;
     /// use malachite_nz::natural::Natural;
     ///

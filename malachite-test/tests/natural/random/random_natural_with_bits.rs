@@ -1,4 +1,4 @@
-use malachite_base::num::traits::SignificantBits;
+use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::natural::random::random_natural_with_bits::random_natural_with_bits;
 use rand::{IsaacRng, SeedableRng, StdRng};
 use rust_wheels::iterators::common::EXAMPLE_SEED;

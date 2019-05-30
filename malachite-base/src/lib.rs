@@ -1,7 +1,6 @@
 pub mod bools;
 pub mod chars;
 pub mod comparison;
-pub mod conversion;
 pub mod crement;
 pub mod limbs;
 #[macro_use]

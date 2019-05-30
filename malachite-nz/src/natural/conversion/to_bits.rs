@@ -1,8 +1,8 @@
 use std::ops::Index;
 
-use malachite_base::conversion::CheckedFrom;
-use malachite_base::num::integers::PrimitiveInteger;
-use malachite_base::num::traits::{BitAccess, SignificantBits};
+use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::logic::traits::{BitAccess, SignificantBits};
 
 use natural::conversion::to_limbs::LimbIterator;
 use natural::Natural;
@@ -44,7 +44,7 @@ impl<'a> Iterator for BitIterator<'a> {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::Zero;
+    /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
@@ -99,7 +99,7 @@ impl<'a> Iterator for BitIterator<'a> {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::Zero;
+    /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
@@ -126,7 +126,7 @@ impl<'a> DoubleEndedIterator for BitIterator<'a> {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::Zero;
+    /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
@@ -190,7 +190,7 @@ impl<'a> Index<u64> for BitIterator<'a> {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::Zero;
+    /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
@@ -234,7 +234,7 @@ impl Natural {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::Zero;
+    /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
@@ -278,7 +278,7 @@ impl Natural {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::Zero;
+    /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
@@ -328,7 +328,7 @@ impl Natural {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::Zero;
+    /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {

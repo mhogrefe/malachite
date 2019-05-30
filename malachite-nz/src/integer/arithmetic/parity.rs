@@ -1,4 +1,4 @@
-use malachite_base::num::traits::Parity;
+use malachite_base::num::arithmetic::traits::Parity;
 
 use integer::Integer;
 
@@ -14,7 +14,8 @@ impl<'a> Parity for &'a Integer {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::{Parity, Zero};
+    /// use malachite_base::num::arithmetic::traits::Parity;;
+    /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {
@@ -42,7 +43,8 @@ impl<'a> Parity for &'a Integer {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::{Parity, Zero};
+    /// use malachite_base::num::arithmetic::traits::Parity;;
+    /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {

@@ -1,15 +1,17 @@
 use std::ops::{Add, Mul, Shl, Shr};
 
 use itertools::Itertools;
-use malachite_base::conversion::{CheckedFrom, ConvertibleFrom, RoundingFrom, WrappingFrom};
 use malachite_base::crement::Crementable;
-use malachite_base::num::floats::PrimitiveFloat;
-use malachite_base::num::integers::PrimitiveInteger;
-use malachite_base::num::signeds::PrimitiveSigned;
-use malachite_base::num::traits::{
+use malachite_base::num::arithmetic::traits::{
     Abs, DivisibleBy, DivisibleByPowerOfTwo, EqMod, EqModPowerOfTwo,
 };
-use malachite_base::num::unsigneds::PrimitiveUnsigned;
+use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::basic::signeds::PrimitiveSigned;
+use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base::num::conversion::traits::{
+    CheckedFrom, ConvertibleFrom, RoundingFrom, WrappingFrom,
+};
+use malachite_base::num::floats::PrimitiveFloat;
 use malachite_base::round::RoundingMode;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;

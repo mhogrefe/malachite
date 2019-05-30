@@ -1,7 +1,7 @@
 use std::str::FromStr;
 
-use malachite_base::conversion::CheckedFrom;
-use malachite_base::num::traits::{NegativeOne, Zero};
+use malachite_base::num::basic::traits::{NegativeOne, Zero};
+use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_nz::integer::logic::xor_limb::{
     limbs_neg_xor_limb, limbs_neg_xor_limb_to_out, limbs_slice_neg_xor_limb_in_place,
     limbs_vec_neg_xor_limb_in_place,

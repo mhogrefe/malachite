@@ -149,7 +149,7 @@ pub fn limbs_neg_or_limb_in_place(limbs: &mut [Limb], limb: Limb) {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::traits::Zero;
+/// use malachite_base::num::basic::traits::Zero;
 /// use malachite_nz::integer::Integer;
 /// use std::str::FromStr;
 ///
@@ -191,7 +191,7 @@ impl BitOr<u32> for Integer {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::traits::Zero;
+/// use malachite_base::num::basic::traits::Zero;
 /// use malachite_nz::integer::Integer;
 /// use std::str::FromStr;
 ///
@@ -238,7 +238,7 @@ impl<'a> BitOr<u32> for &'a Integer {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::traits::Zero;
+/// use malachite_base::num::basic::traits::Zero;
 /// use malachite_nz::integer::Integer;
 /// use std::str::FromStr;
 ///
@@ -279,7 +279,7 @@ impl BitOr<Integer> for u32 {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::traits::Zero;
+/// use malachite_base::num::basic::traits::Zero;
 /// use malachite_nz::integer::Integer;
 /// use std::str::FromStr;
 ///
@@ -320,7 +320,7 @@ impl<'a> BitOr<&'a Integer> for u32 {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::traits::Zero;
+/// use malachite_base::num::basic::traits::Zero;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {

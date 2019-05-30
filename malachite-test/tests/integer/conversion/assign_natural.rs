@@ -1,6 +1,6 @@
 use std::str::FromStr;
 
-use malachite_base::num::traits::Assign;
+use malachite_base::num::conversion::traits::Assign;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use rug;

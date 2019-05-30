@@ -1,8 +1,8 @@
 use malachite_base::comparison::Min;
-use malachite_base::conversion::{
+use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::conversion::traits::{
     CheckedFrom, ConvertibleFrom, OverflowingFrom, SaturatingFrom, WrappingFrom,
 };
-use malachite_base::num::integers::PrimitiveInteger;
 
 use integer::Integer;
 use natural::Natural::{Large, Small};
@@ -21,7 +21,7 @@ impl CheckedFrom<Integer> for SignedDoubleLimb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::conversion::CheckedFrom;
+    /// use malachite_base::num::conversion::traits::CheckedFrom;
     /// use malachite_nz::integer::Integer;
     /// use std::str::FromStr;
     ///
@@ -56,7 +56,7 @@ impl<'a> CheckedFrom<&'a Integer> for SignedDoubleLimb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::conversion::CheckedFrom;
+    /// use malachite_base::num::conversion::traits::CheckedFrom;
     /// use malachite_nz::integer::Integer;
     /// use std::str::FromStr;
     ///
@@ -94,7 +94,7 @@ impl WrappingFrom<Integer> for SignedDoubleLimb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::conversion::WrappingFrom;
+    /// use malachite_base::num::conversion::traits::WrappingFrom;
     /// use malachite_nz::integer::Integer;
     /// use std::str::FromStr;
     ///
@@ -128,7 +128,7 @@ impl<'a> WrappingFrom<&'a Integer> for SignedDoubleLimb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::conversion::WrappingFrom;
+    /// use malachite_base::num::conversion::traits::WrappingFrom;
     /// use malachite_nz::integer::Integer;
     /// use std::str::FromStr;
     ///
@@ -162,7 +162,7 @@ impl SaturatingFrom<Integer> for SignedDoubleLimb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::conversion::SaturatingFrom;
+    /// use malachite_base::num::conversion::traits::SaturatingFrom;
     /// use malachite_nz::integer::Integer;
     /// use std::str::FromStr;
     ///
@@ -196,7 +196,7 @@ impl<'a> SaturatingFrom<&'a Integer> for SignedDoubleLimb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::conversion::SaturatingFrom;
+    /// use malachite_base::num::conversion::traits::SaturatingFrom;
     /// use malachite_nz::integer::Integer;
     /// use std::str::FromStr;
     ///
@@ -246,7 +246,7 @@ impl OverflowingFrom<Integer> for SignedDoubleLimb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::conversion::OverflowingFrom;
+    /// use malachite_base::num::conversion::traits::OverflowingFrom;
     /// use malachite_nz::integer::Integer;
     /// use std::str::FromStr;
     ///
@@ -280,7 +280,7 @@ impl<'a> OverflowingFrom<&'a Integer> for SignedDoubleLimb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::conversion::OverflowingFrom;
+    /// use malachite_base::num::conversion::traits::OverflowingFrom;
     /// use malachite_nz::integer::Integer;
     /// use std::str::FromStr;
     ///
@@ -316,7 +316,7 @@ impl ConvertibleFrom<Integer> for SignedDoubleLimb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::conversion::ConvertibleFrom;
+    /// use malachite_base::num::conversion::traits::ConvertibleFrom;
     /// use malachite_nz::integer::Integer;
     /// use std::str::FromStr;
     ///
@@ -350,7 +350,7 @@ impl<'a> ConvertibleFrom<&'a Integer> for SignedDoubleLimb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::conversion::ConvertibleFrom;
+    /// use malachite_base::num::conversion::traits::ConvertibleFrom;
     /// use malachite_nz::integer::Integer;
     /// use std::str::FromStr;
     ///

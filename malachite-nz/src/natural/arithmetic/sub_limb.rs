@@ -1,8 +1,8 @@
 use std::ops::{Sub, SubAssign};
 
+use malachite_base::num::arithmetic::traits::{CheckedSub, OverflowingSubAssign};
 #[cfg(feature = "64_bit_limbs")]
-use malachite_base::conversion::WrappingFrom;
-use malachite_base::num::traits::{CheckedSub, OverflowingSubAssign};
+use malachite_base::num::conversion::traits::WrappingFrom;
 
 use natural::arithmetic::sub::sub_panic;
 use natural::Natural;
@@ -269,7 +269,7 @@ impl Sub<Natural> for Limb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::Zero;
+    /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
@@ -313,7 +313,7 @@ impl<'a> Sub<&'a Natural> for Limb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::Zero;
+    /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
@@ -355,7 +355,7 @@ impl SubAssign<Natural> for Limb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::Zero;
+    /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
@@ -401,7 +401,7 @@ impl<'a> SubAssign<&'a Natural> for Limb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::Zero;
+    /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {

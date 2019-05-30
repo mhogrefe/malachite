@@ -1,4 +1,5 @@
-use malachite_base::num::traits::{CheckedSub, Zero};
+use malachite_base::num::arithmetic::traits::CheckedSub;
+use malachite_base::num::basic::traits::Zero;
 
 use natural::arithmetic::sub::{limbs_sub, limbs_sub_in_place_left, limbs_vec_sub_in_place_right};
 use natural::Natural::{self, Large, Small};
@@ -18,7 +19,8 @@ use platform::Limb;
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::traits::{CheckedSub, Zero};
+/// use malachite_base::num::arithmetic::traits::CheckedSub;
+/// use malachite_base::num::basic::traits::Zero;
 /// use malachite_nz::natural::Natural;
 ///
 /// fn main() {
@@ -56,7 +58,8 @@ impl CheckedSub<Natural> for Natural {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::traits::{CheckedSub, Zero};
+/// use malachite_base::num::arithmetic::traits::CheckedSub;
+/// use malachite_base::num::basic::traits::Zero;
 /// use malachite_nz::natural::Natural;
 ///
 /// fn main() {
@@ -94,7 +97,8 @@ impl<'a> CheckedSub<&'a Natural> for Natural {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::traits::{CheckedSub, Zero};
+/// use malachite_base::num::arithmetic::traits::CheckedSub;
+/// use malachite_base::num::basic::traits::Zero;
 /// use malachite_nz::natural::Natural;
 ///
 /// fn main() {
@@ -133,7 +137,8 @@ impl<'a> CheckedSub<Natural> for &'a Natural {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::traits::{CheckedSub, Zero};
+/// use malachite_base::num::arithmetic::traits::CheckedSub;
+/// use malachite_base::num::basic::traits::Zero;
 /// use malachite_nz::natural::Natural;
 ///
 /// fn main() {

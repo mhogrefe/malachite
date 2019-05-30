@@ -1,8 +1,8 @@
 use std::str::FromStr;
 
-use malachite_base::num::traits::{
-    CeilingDivMod, DivRound, DivRoundAssign, NegativeOne, One, PartialOrdAbs, Zero,
-};
+use malachite_base::num::arithmetic::traits::{CeilingDivMod, DivRound, DivRoundAssign};
+use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
+use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::round::RoundingMode;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;

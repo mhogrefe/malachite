@@ -1,8 +1,10 @@
 use std::fmt::Debug;
 
-use malachite_base::conversion::{CheckedFrom, ConvertibleFrom, SaturatingFrom, WrappingFrom};
-use malachite_base::num::signeds::PrimitiveSigned;
-use malachite_base::num::unsigneds::PrimitiveUnsigned;
+use malachite_base::num::basic::signeds::PrimitiveSigned;
+use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base::num::conversion::traits::{
+    CheckedFrom, ConvertibleFrom, SaturatingFrom, WrappingFrom,
+};
 use rand::Rand;
 
 use common::test_properties;

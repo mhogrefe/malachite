@@ -1,6 +1,6 @@
 use std::ops::Not;
 
-use malachite_base::num::traits::NotAssign;
+use malachite_base::num::logic::traits::NotAssign;
 
 use integer::Integer;
 use platform::Limb;
@@ -19,7 +19,7 @@ use platform::Limb;
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::traits::Zero;
+/// use malachite_base::num::basic::traits::Zero;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {
@@ -52,7 +52,7 @@ impl Not for Integer {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::traits::Zero;
+/// use malachite_base::num::basic::traits::Zero;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {
@@ -98,7 +98,8 @@ impl<'a> Not for &'a Integer {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::traits::{NotAssign, Zero};
+/// use malachite_base::num::basic::traits::Zero;
+/// use malachite_base::num::logic::traits::NotAssign;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {

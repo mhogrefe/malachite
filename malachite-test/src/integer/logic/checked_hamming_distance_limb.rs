@@ -1,7 +1,9 @@
 use std::iter::repeat;
 
-use malachite_base::conversion::{CheckedFrom, WrappingFrom};
-use malachite_base::num::traits::{CheckedHammingDistance, HammingDistance, SignificantBits};
+use malachite_base::num::conversion::traits::{CheckedFrom, WrappingFrom};
+use malachite_base::num::logic::traits::{
+    CheckedHammingDistance, HammingDistance, SignificantBits,
+};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;

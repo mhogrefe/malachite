@@ -1,7 +1,7 @@
 use std::cmp::Ordering;
 
 use malachite_base::limbs::limbs_test_zero;
-use malachite_base::num::traits::Zero;
+use malachite_base::num::basic::traits::Zero;
 
 use integer::Integer;
 use natural::Natural;

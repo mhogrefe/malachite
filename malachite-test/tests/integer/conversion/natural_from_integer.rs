@@ -1,6 +1,6 @@
 use std::str::FromStr;
 
-use malachite_base::conversion::{CheckedFrom, ConvertibleFrom, SaturatingFrom};
+use malachite_base::num::conversion::traits::{CheckedFrom, ConvertibleFrom, SaturatingFrom};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;

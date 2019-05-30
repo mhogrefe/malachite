@@ -1,9 +1,10 @@
 use std::ops::{Shr, ShrAssign};
 
-use malachite_base::conversion::{CheckedFrom, WrappingFrom};
 use malachite_base::limbs::{limbs_delete_left, limbs_test_zero};
-use malachite_base::num::integers::PrimitiveInteger;
-use malachite_base::num::traits::{Parity, ShrRound, ShrRoundAssign, Zero};
+use malachite_base::num::arithmetic::traits::{Parity, ShrRound, ShrRoundAssign};
+use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::conversion::traits::{CheckedFrom, WrappingFrom};
 use malachite_base::round::RoundingMode;
 
 use natural::arithmetic::add_limb::limbs_vec_add_limb_in_place;
@@ -723,7 +724,7 @@ macro_rules! impl_natural_shr_unsigned {
         /// extern crate malachite_base;
         /// extern crate malachite_nz;
         ///
-        /// use malachite_base::num::traits::Zero;
+        /// use malachite_base::num::basic::traits::Zero;
         /// use malachite_nz::natural::Natural;
         ///
         /// fn main() {
@@ -756,7 +757,7 @@ macro_rules! impl_natural_shr_unsigned {
         /// extern crate malachite_base;
         /// extern crate malachite_nz;
         ///
-        /// use malachite_base::num::traits::Zero;
+        /// use malachite_base::num::basic::traits::Zero;
         /// use malachite_nz::natural::Natural;
         ///
         /// fn main() {
@@ -846,7 +847,7 @@ macro_rules! impl_natural_shr_unsigned {
         /// extern crate malachite_nz;
         ///
         /// use malachite_base::round::RoundingMode;
-        /// use malachite_base::num::traits::ShrRound;
+        /// use malachite_base::num::arithmetic::traits::ShrRound;
         /// use malachite_nz::natural::Natural;
         ///
         /// fn main() {
@@ -901,7 +902,7 @@ macro_rules! impl_natural_shr_unsigned {
         /// extern crate malachite_nz;
         ///
         /// use malachite_base::round::RoundingMode;
-        /// use malachite_base::num::traits::ShrRound;
+        /// use malachite_base::num::arithmetic::traits::ShrRound;
         /// use malachite_nz::natural::Natural;
         ///
         /// fn main() {
@@ -969,7 +970,7 @@ macro_rules! impl_natural_shr_unsigned {
         /// extern crate malachite_nz;
         ///
         /// use malachite_base::round::RoundingMode;
-        /// use malachite_base::num::traits::ShrRoundAssign;
+        /// use malachite_base::num::arithmetic::traits::ShrRoundAssign;
         /// use malachite_nz::natural::Natural;
         ///
         /// fn main() {

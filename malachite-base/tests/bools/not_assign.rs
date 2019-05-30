@@ -1,4 +1,4 @@
-use malachite_base::num::traits::NotAssign;
+use malachite_base::num::logic::traits::NotAssign;
 
 #[test]
 fn test_bool_not_assign() {

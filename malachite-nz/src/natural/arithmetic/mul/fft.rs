@@ -1,9 +1,12 @@
 use std::cmp::{max, Ordering};
 
-use malachite_base::conversion::{CheckedFrom, WrappingFrom};
 use malachite_base::limbs::limbs_set_zero;
-use malachite_base::num::integers::PrimitiveInteger;
-use malachite_base::num::traits::{One, Parity, ShrRound, WrappingAddAssign, WrappingSubAssign};
+use malachite_base::num::arithmetic::traits::{
+    Parity, ShrRound, WrappingAddAssign, WrappingSubAssign,
+};
+use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::basic::traits::One;
+use malachite_base::num::conversion::traits::{CheckedFrom, WrappingFrom};
 use malachite_base::round::RoundingMode;
 
 use natural::arithmetic::add::{limbs_add_to_out, limbs_slice_add_same_length_in_place_left};

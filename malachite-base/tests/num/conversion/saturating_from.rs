@@ -1,7 +1,7 @@
 use std::fmt::Debug;
 
 use malachite_base::comparison::{Max, Min};
-use malachite_base::conversion::SaturatingFrom;
+use malachite_base::num::conversion::traits::SaturatingFrom;
 
 #[test]
 pub fn test_saturating_from() {

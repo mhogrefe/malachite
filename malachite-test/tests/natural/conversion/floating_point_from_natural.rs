@@ -1,9 +1,10 @@
 use std::str::FromStr;
 
-use malachite_base::conversion::{CheckedFrom, ConvertibleFrom, RoundingFrom};
 use malachite_base::crement::Crementable;
+use malachite_base::num::arithmetic::traits::Parity;
+use malachite_base::num::basic::traits::{NegativeOne, One, Two, Zero};
+use malachite_base::num::conversion::traits::{CheckedFrom, ConvertibleFrom, RoundingFrom};
 use malachite_base::num::floats::PrimitiveFloat;
-use malachite_base::num::traits::{NegativeOne, One, Parity, Two, Zero};
 use malachite_base::round::RoundingMode;
 use malachite_nz::natural::Natural;
 

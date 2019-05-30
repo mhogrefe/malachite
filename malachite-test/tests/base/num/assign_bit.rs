@@ -1,8 +1,9 @@
-use malachite_base::conversion::{CheckedFrom, WrappingFrom};
-use malachite_base::num::integers::PrimitiveInteger;
-use malachite_base::num::signeds::PrimitiveSigned;
-use malachite_base::num::traits::{BitAccess, NegativeOne};
-use malachite_base::num::unsigneds::PrimitiveUnsigned;
+use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::basic::signeds::PrimitiveSigned;
+use malachite_base::num::basic::traits::NegativeOne;
+use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base::num::conversion::traits::{CheckedFrom, WrappingFrom};
+use malachite_base::num::logic::traits::BitAccess;
 use rand::Rand;
 
 use common::test_properties;

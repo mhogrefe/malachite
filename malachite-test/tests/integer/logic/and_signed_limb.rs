@@ -1,8 +1,8 @@
 use std::str::FromStr;
 
 use malachite_base::comparison::Max;
-use malachite_base::conversion::CheckedFrom;
-use malachite_base::num::traits::{NegativeOne, Zero};
+use malachite_base::num::basic::traits::{NegativeOne, Zero};
+use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_nz::integer::logic::and_signed_limb::{
     limbs_neg_and_limb_neg, limbs_neg_and_limb_neg_to_out, limbs_pos_and_limb_neg,
     limbs_pos_and_limb_neg_in_place, limbs_pos_and_limb_neg_to_out,

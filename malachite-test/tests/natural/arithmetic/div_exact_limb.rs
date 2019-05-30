@@ -1,6 +1,7 @@
 use std::str::FromStr;
 
-use malachite_base::num::traits::{DivExact, DivExactAssign, DivRound, One, Zero};
+use malachite_base::num::arithmetic::traits::{DivExact, DivExactAssign, DivRound};
+use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::round::RoundingMode;
 use malachite_nz::natural::arithmetic::div_exact_limb::{
     self, _limbs_div_exact_3_in_place_alt, _limbs_div_exact_3_to_out_alt, limbs_div_exact_3,

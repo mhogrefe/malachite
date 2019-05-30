@@ -1,9 +1,10 @@
 use std::str::FromStr;
 
-use malachite_base::conversion::CheckedFrom;
-use malachite_base::num::traits::{
-    CeilingDivNegMod, DivMod, Mod, ModAssign, NegMod, NegModAssign, One, Zero,
+use malachite_base::num::arithmetic::traits::{
+    CeilingDivNegMod, DivMod, Mod, ModAssign, NegMod, NegModAssign,
 };
+use malachite_base::num::basic::traits::{One, Zero};
+use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_nz::natural::arithmetic::mod_limb::limbs_mod_limb;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;

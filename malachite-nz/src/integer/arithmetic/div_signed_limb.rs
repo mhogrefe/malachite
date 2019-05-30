@@ -1,6 +1,6 @@
 use std::ops::{Div, DivAssign};
 
-use malachite_base::num::traits::UnsignedAbs;
+use malachite_base::num::arithmetic::traits::UnsignedAbs;
 
 use integer::Integer;
 use natural::Natural;

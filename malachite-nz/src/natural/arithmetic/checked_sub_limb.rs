@@ -1,7 +1,7 @@
-use malachite_base::conversion::CheckedFrom;
+use malachite_base::num::arithmetic::traits::CheckedSub;
+use malachite_base::num::conversion::traits::CheckedFrom;
 #[cfg(feature = "64_bit_limbs")]
-use malachite_base::conversion::WrappingFrom;
-use malachite_base::num::traits::CheckedSub;
+use malachite_base::num::conversion::traits::WrappingFrom;
 
 use natural::arithmetic::sub_limb::{limbs_sub_limb, limbs_sub_limb_in_place};
 use natural::Natural::{self, Large, Small};
@@ -24,7 +24,8 @@ impl CheckedSub<Limb> for Natural {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::{CheckedSub, Zero};
+    /// use malachite_base::num::arithmetic::traits::CheckedSub;
+    /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
@@ -71,7 +72,8 @@ impl<'a> CheckedSub<Limb> for &'a Natural {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::{CheckedSub, Zero};
+    /// use malachite_base::num::arithmetic::traits::CheckedSub;
+    /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
@@ -127,7 +129,8 @@ impl CheckedSub<Natural> for Limb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::{CheckedSub, Zero};
+    /// use malachite_base::num::arithmetic::traits::CheckedSub;
+    /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
@@ -169,7 +172,8 @@ impl<'a> CheckedSub<&'a Natural> for Limb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::{CheckedSub, Zero};
+    /// use malachite_base::num::arithmetic::traits::CheckedSub;
+    /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {

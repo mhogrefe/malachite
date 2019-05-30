@@ -1,5 +1,6 @@
-use malachite_base::conversion::CheckedFrom;
-use malachite_base::num::traits::{DivExact, DivExactAssign, SignificantBits};
+use malachite_base::num::arithmetic::traits::{DivExact, DivExactAssign};
+use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::platform::SignedLimb;
 use rug;
 

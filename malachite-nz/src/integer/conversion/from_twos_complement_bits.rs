@@ -1,5 +1,5 @@
-use malachite_base::num::integers::PrimitiveInteger;
-use malachite_base::num::traits::Zero;
+use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::basic::traits::Zero;
 
 use integer::conversion::to_twos_complement_limbs::limbs_twos_complement_in_place;
 use integer::Integer;

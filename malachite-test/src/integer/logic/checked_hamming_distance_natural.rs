@@ -1,7 +1,7 @@
 use std::cmp::max;
 
-use malachite_base::conversion::CheckedFrom;
-use malachite_base::num::traits::{CheckedHammingDistance, SignificantBits};
+use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::logic::traits::{CheckedHammingDistance, SignificantBits};
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::integer::{pairs_of_integer_and_natural, pairs_of_natural_and_integer};

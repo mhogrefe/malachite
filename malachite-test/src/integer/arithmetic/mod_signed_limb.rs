@@ -1,7 +1,8 @@
-use malachite_base::conversion::CheckedFrom;
-use malachite_base::num::traits::{
-    CeilingDivMod, CeilingMod, CeilingModAssign, DivMod, Mod, ModAssign, SignificantBits,
+use malachite_base::num::arithmetic::traits::{
+    CeilingDivMod, CeilingMod, CeilingModAssign, DivMod, Mod, ModAssign,
 };
+use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::platform::SignedLimb;
 use num::{BigInt, Integer};
 #[cfg(feature = "32_bit_limbs")]

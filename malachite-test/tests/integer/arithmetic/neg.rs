@@ -1,6 +1,6 @@
 use std::str::FromStr;
 
-use malachite_base::num::traits::NegAssign;
+use malachite_base::num::arithmetic::traits::NegAssign;
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::{Limb, SignedLimb};
 use num::BigInt;

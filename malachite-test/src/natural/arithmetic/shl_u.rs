@@ -1,6 +1,6 @@
-use malachite_base::conversion::CheckedFrom;
 use malachite_base::named::Named;
-use malachite_base::num::integers::PrimitiveInteger;
+use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_nz::natural::arithmetic::shl_u::{
     limbs_shl, limbs_shl_to_out, limbs_shl_with_complement_to_out, limbs_slice_shl_in_place,
     limbs_vec_shl_in_place,

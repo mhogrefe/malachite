@@ -3,9 +3,10 @@ use std::cmp::Ordering;
 use std::str::FromStr;
 
 use malachite_base::comparison::Max;
-use malachite_base::conversion::CheckedFrom;
-use malachite_base::num::integers::PrimitiveInteger;
-use malachite_base::num::traits::{Sign, Zero};
+use malachite_base::num::arithmetic::traits::Sign;
+use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_nz::integer::conversion::to_twos_complement_limbs::*;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;

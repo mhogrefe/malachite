@@ -1,6 +1,7 @@
 use std::str::FromStr;
 
-use malachite_base::num::traits::{DivExact, DivExactAssign, DivRound, NegativeOne, One, Zero};
+use malachite_base::num::arithmetic::traits::{DivExact, DivExactAssign, DivRound};
+use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
 use malachite_base::round::RoundingMode;
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::{Limb, SignedDoubleLimb, SignedLimb};

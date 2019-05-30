@@ -1,7 +1,7 @@
 use std::cmp::max;
 use std::str::FromStr;
 
-use malachite_base::num::traits::Zero;
+use malachite_base::num::basic::traits::Zero;
 use malachite_nz::natural::logic::or::{
     limbs_or, limbs_or_in_place_either, limbs_or_in_place_left, limbs_or_same_length,
     limbs_or_same_length_in_place_left, limbs_or_same_length_to_out, limbs_or_to_out,

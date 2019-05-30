@@ -1,7 +1,9 @@
 use std::mem::swap;
 use std::ops::{Sub, SubAssign};
 
-use malachite_base::num::traits::{NegAssign, NotAssign, Zero};
+use malachite_base::num::arithmetic::traits::NegAssign;
+use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::logic::traits::NotAssign;
 
 use integer::Integer;
 use platform::Limb;
@@ -19,7 +21,7 @@ use platform::Limb;
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::traits::Zero;
+/// use malachite_base::num::basic::traits::Zero;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {
@@ -54,7 +56,7 @@ impl Sub<Integer> for Integer {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::traits::Zero;
+/// use malachite_base::num::basic::traits::Zero;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {
@@ -89,7 +91,7 @@ impl<'a> Sub<&'a Integer> for Integer {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::traits::Zero;
+/// use malachite_base::num::basic::traits::Zero;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {
@@ -122,7 +124,7 @@ impl<'a> Sub<Integer> for &'a Integer {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::traits::Zero;
+/// use malachite_base::num::basic::traits::Zero;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {
@@ -199,7 +201,7 @@ impl<'a, 'b> Sub<&'a Integer> for &'b Integer {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::traits::Zero;
+/// use malachite_base::num::basic::traits::Zero;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {
@@ -265,7 +267,7 @@ impl SubAssign<Integer> for Integer {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::traits::Zero;
+/// use malachite_base::num::basic::traits::Zero;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {

@@ -1,4 +1,6 @@
-use malachite_base::num::traits::{AddMul, AddMulAssign, SubMul, SubMulAssign, UnsignedAbs};
+use malachite_base::num::arithmetic::traits::{
+    AddMul, AddMulAssign, SubMul, SubMulAssign, UnsignedAbs,
+};
 
 use integer::Integer;
 use platform::{Limb, SignedLimb};
@@ -17,7 +19,7 @@ use platform::{Limb, SignedLimb};
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::traits::AddMul;
+/// use malachite_base::num::arithmetic::traits::AddMul;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {
@@ -60,7 +62,7 @@ impl AddMul<Integer, i32> for Integer {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::traits::AddMul;
+/// use malachite_base::num::arithmetic::traits::AddMul;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {
@@ -103,7 +105,7 @@ impl<'a> AddMul<&'a Integer, i32> for Integer {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::traits::AddMul;
+/// use malachite_base::num::arithmetic::traits::AddMul;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {
@@ -145,7 +147,7 @@ impl<'a> AddMul<Integer, i32> for &'a Integer {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::traits::AddMul;
+/// use malachite_base::num::arithmetic::traits::AddMul;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {
@@ -190,7 +192,7 @@ impl<'a, 'b> AddMul<&'a Integer, i32> for &'b Integer {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::traits::AddMulAssign;
+/// use malachite_base::num::arithmetic::traits::AddMulAssign;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {
@@ -232,7 +234,7 @@ impl AddMulAssign<Integer, i32> for Integer {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::traits::AddMulAssign;
+/// use malachite_base::num::arithmetic::traits::AddMulAssign;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {

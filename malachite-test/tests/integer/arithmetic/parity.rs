@@ -1,6 +1,6 @@
 use std::str::FromStr;
 
-use malachite_base::num::traits::Parity;
+use malachite_base::num::arithmetic::traits::Parity;
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::{Limb, SignedLimb};
 

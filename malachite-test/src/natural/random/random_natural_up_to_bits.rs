@@ -1,4 +1,4 @@
-use malachite_base::conversion::CheckedFrom;
+use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_nz::natural::random::random_natural_up_to_bits::{
     limbs_random_up_to_bits, random_natural_up_to_bits,
 };

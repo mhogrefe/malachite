@@ -1,7 +1,7 @@
 use std::mem::swap;
 use std::ops::{Add, AddAssign};
 
-use malachite_base::num::traits::Assign;
+use malachite_base::num::conversion::traits::Assign;
 
 use integer::Integer;
 use natural::Natural;
@@ -20,7 +20,7 @@ use platform::Limb;
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::traits::Zero;
+/// use malachite_base::num::basic::traits::Zero;
 /// use malachite_nz::integer::Integer;
 /// use malachite_nz::natural::Natural;
 ///
@@ -55,7 +55,7 @@ impl Add<Natural> for Integer {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::traits::Zero;
+/// use malachite_base::num::basic::traits::Zero;
 /// use malachite_nz::integer::Integer;
 /// use malachite_nz::natural::Natural;
 ///
@@ -90,7 +90,7 @@ impl<'a> Add<&'a Natural> for Integer {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::traits::Zero;
+/// use malachite_base::num::basic::traits::Zero;
 /// use malachite_nz::integer::Integer;
 /// use malachite_nz::natural::Natural;
 ///
@@ -132,7 +132,7 @@ impl<'a> Add<Natural> for &'a Integer {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::traits::Zero;
+/// use malachite_base::num::basic::traits::Zero;
 /// use malachite_nz::integer::Integer;
 /// use malachite_nz::natural::Natural;
 ///
@@ -196,7 +196,7 @@ impl<'a, 'b> Add<&'a Natural> for &'b Integer {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::traits::Zero;
+/// use malachite_base::num::basic::traits::Zero;
 /// use malachite_nz::integer::Integer;
 /// use malachite_nz::natural::Natural;
 ///
@@ -256,7 +256,7 @@ impl AddAssign<Natural> for Integer {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::traits::Zero;
+/// use malachite_base::num::basic::traits::Zero;
 /// use malachite_nz::integer::Integer;
 /// use malachite_nz::natural::Natural;
 ///
@@ -315,7 +315,7 @@ impl<'a> AddAssign<&'a Natural> for Integer {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::traits::Zero;
+/// use malachite_base::num::basic::traits::Zero;
 /// use malachite_nz::integer::Integer;
 /// use malachite_nz::natural::Natural;
 ///
@@ -349,7 +349,7 @@ impl Add<Integer> for Natural {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::traits::Zero;
+/// use malachite_base::num::basic::traits::Zero;
 /// use malachite_nz::integer::Integer;
 /// use malachite_nz::natural::Natural;
 ///
@@ -383,7 +383,7 @@ impl<'a> Add<&'a Integer> for Natural {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::traits::Zero;
+/// use malachite_base::num::basic::traits::Zero;
 /// use malachite_nz::integer::Integer;
 /// use malachite_nz::natural::Natural;
 ///
@@ -417,7 +417,7 @@ impl<'a> Add<Integer> for &'a Natural {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::traits::Zero;
+/// use malachite_base::num::basic::traits::Zero;
 /// use malachite_nz::integer::Integer;
 /// use malachite_nz::natural::Natural;
 ///

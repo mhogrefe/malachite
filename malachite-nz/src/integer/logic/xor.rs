@@ -1,7 +1,7 @@
 use std::ops::{BitXor, BitXorAssign};
 
 use malachite_base::limbs::{limbs_leading_zero_limbs, limbs_set_zero};
-use malachite_base::num::traits::WrappingNegAssign;
+use malachite_base::num::arithmetic::traits::WrappingNegAssign;
 
 use integer::Integer;
 use natural::arithmetic::sub::{
@@ -414,7 +414,7 @@ impl<'a, 'b> BitXor<&'a Integer> for &'b Integer {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::traits::NegativeOne;
+/// use malachite_base::num::basic::traits::NegativeOne;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {
@@ -457,7 +457,7 @@ impl BitXorAssign<Integer> for Integer {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::traits::NegativeOne;
+/// use malachite_base::num::basic::traits::NegativeOne;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {

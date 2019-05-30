@@ -1,4 +1,4 @@
-use malachite_base::num::traits::EqModPowerOfTwo;
+use malachite_base::num::arithmetic::traits::EqModPowerOfTwo;
 
 use integer::Integer;
 
@@ -17,7 +17,8 @@ impl<'a, 'b> EqModPowerOfTwo<&'b Integer> for &'a Integer {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::{EqModPowerOfTwo, Zero};
+    /// use malachite_base::num::arithmetic::traits::EqModPowerOfTwo;
+    /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {

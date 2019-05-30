@@ -1,7 +1,8 @@
 use std::cmp::max;
 
-use malachite_base::conversion::CheckedFrom;
-use malachite_base::num::traits::{AddMul, AddMulAssign, SignificantBits};
+use malachite_base::num::arithmetic::traits::{AddMul, AddMulAssign};
+use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::platform::Limb;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};

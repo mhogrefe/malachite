@@ -1,7 +1,7 @@
 use std::ops::{Mul, MulAssign};
 
-use malachite_base::conversion::WrappingFrom;
-use malachite_base::num::integers::PrimitiveInteger;
+use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::conversion::traits::WrappingFrom;
 
 use natural::arithmetic::add::limbs_slice_add_greater_in_place_left;
 use natural::arithmetic::add_mul_limb::limbs_slice_add_mul_limb_greater_in_place_left;
@@ -486,7 +486,7 @@ pub fn _limbs_mul_greater_to_out_basecase_mem_opt(out: &mut [Limb], xs: &[Limb],
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::traits::{One, Zero};
+/// use malachite_base::num::basic::traits::{One, Zero};
 /// use malachite_nz::natural::Natural;
 /// use std::str::FromStr;
 ///
@@ -522,7 +522,7 @@ impl Mul<Natural> for Natural {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::traits::{One, Zero};
+/// use malachite_base::num::basic::traits::{One, Zero};
 /// use malachite_nz::natural::Natural;
 /// use std::str::FromStr;
 ///
@@ -558,7 +558,7 @@ impl<'a> Mul<&'a Natural> for Natural {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::traits::{One, Zero};
+/// use malachite_base::num::basic::traits::{One, Zero};
 /// use malachite_nz::natural::Natural;
 /// use std::str::FromStr;
 ///
@@ -593,7 +593,7 @@ impl<'a> Mul<Natural> for &'a Natural {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::traits::{One, Zero};
+/// use malachite_base::num::basic::traits::{One, Zero};
 /// use malachite_nz::natural::Natural;
 /// use std::str::FromStr;
 ///
@@ -639,7 +639,7 @@ impl<'a, 'b> Mul<&'a Natural> for &'b Natural {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::traits::One;
+/// use malachite_base::num::basic::traits::One;
 /// use malachite_nz::natural::Natural;
 /// use std::str::FromStr;
 ///
@@ -684,7 +684,7 @@ impl MulAssign<Natural> for Natural {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::traits::One;
+/// use malachite_base::num::basic::traits::One;
 /// use malachite_nz::natural::Natural;
 /// use std::str::FromStr;
 ///

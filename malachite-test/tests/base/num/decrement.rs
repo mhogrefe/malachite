@@ -1,8 +1,8 @@
 use malachite_base::comparison::Min;
-use malachite_base::conversion::WrappingFrom;
 use malachite_base::crement::Crementable;
-use malachite_base::num::signeds::PrimitiveSigned;
-use malachite_base::num::unsigneds::PrimitiveUnsigned;
+use malachite_base::num::basic::signeds::PrimitiveSigned;
+use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base::num::conversion::traits::WrappingFrom;
 use rand::Rand;
 
 use common::test_properties;

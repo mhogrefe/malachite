@@ -2,10 +2,10 @@ use std::mem::swap;
 
 use malachite_base::comparison::Max;
 use malachite_base::limbs::limbs_test_zero;
-use malachite_base::num::integers::PrimitiveInteger;
-use malachite_base::num::traits::{
+use malachite_base::num::arithmetic::traits::{
     DivisibleByPowerOfTwo, Parity, WrappingAddAssign, WrappingSubAssign,
 };
+use malachite_base::num::basic::integers::PrimitiveInteger;
 
 use natural::arithmetic::add::{
     limbs_add_same_length_to_out, limbs_slice_add_greater_in_place_left,

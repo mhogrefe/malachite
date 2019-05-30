@@ -1,6 +1,7 @@
 use std::cmp::Ordering;
 
-use malachite_base::num::traits::{PartialOrdAbs, UnsignedAbs};
+use malachite_base::num::arithmetic::traits::UnsignedAbs;
+use malachite_base::num::comparison::traits::PartialOrdAbs;
 
 use integer::Integer;
 use platform::SignedLimb;
@@ -16,7 +17,7 @@ use platform::SignedLimb;
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::traits::PartialOrdAbs;
+/// use malachite_base::num::comparison::traits::PartialOrdAbs;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {
@@ -55,7 +56,7 @@ impl PartialOrdAbs<i32> for Integer {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::traits::PartialOrdAbs;
+/// use malachite_base::num::comparison::traits::PartialOrdAbs;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {

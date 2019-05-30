@@ -1,6 +1,7 @@
 use std::ops::{Shr, ShrAssign};
 
-use malachite_base::num::traits::{ShrRound, ShrRoundAssign, Zero};
+use malachite_base::num::arithmetic::traits::{ShrRound, ShrRoundAssign};
+use malachite_base::num::basic::traits::Zero;
 use malachite_base::round::RoundingMode;
 
 use integer::Integer;
@@ -20,7 +21,7 @@ macro_rules! impl_integer_shr_unsigned {
         /// extern crate malachite_base;
         /// extern crate malachite_nz;
         ///
-        /// use malachite_base::num::traits::Zero;
+        /// use malachite_base::num::basic::traits::Zero;
         /// use malachite_nz::integer::Integer;
         ///
         /// fn main() {
@@ -52,7 +53,7 @@ macro_rules! impl_integer_shr_unsigned {
         /// extern crate malachite_base;
         /// extern crate malachite_nz;
         ///
-        /// use malachite_base::num::traits::Zero;
+        /// use malachite_base::num::basic::traits::Zero;
         /// use malachite_nz::integer::Integer;
         ///
         /// fn main() {
@@ -149,7 +150,7 @@ macro_rules! impl_integer_shr_unsigned {
         /// extern crate malachite_nz;
         ///
         /// use malachite_base::round::RoundingMode;
-        /// use malachite_base::num::traits::ShrRound;
+        /// use malachite_base::num::arithmetic::traits::ShrRound;
         /// use malachite_nz::integer::Integer;
         ///
         /// fn main() {
@@ -202,7 +203,7 @@ macro_rules! impl_integer_shr_unsigned {
         /// extern crate malachite_nz;
         ///
         /// use malachite_base::round::RoundingMode;
-        /// use malachite_base::num::traits::ShrRound;
+        /// use malachite_base::num::arithmetic::traits::ShrRound;
         /// use malachite_nz::integer::Integer;
         ///
         /// fn main() {
@@ -275,7 +276,7 @@ macro_rules! impl_integer_shr_unsigned {
         /// extern crate malachite_nz;
         ///
         /// use malachite_base::round::RoundingMode;
-        /// use malachite_base::num::traits::ShrRoundAssign;
+        /// use malachite_base::num::arithmetic::traits::ShrRoundAssign;
         /// use malachite_nz::integer::Integer;
         ///
         /// fn main() {

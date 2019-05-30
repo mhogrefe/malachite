@@ -1,6 +1,7 @@
 use std::str::FromStr;
 
-use malachite_base::num::traits::{AddMul, AddMulAssign, NegativeOne, One, Zero};
+use malachite_base::num::arithmetic::traits::{AddMul, AddMulAssign};
+use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::{Limb, SignedLimb};
 

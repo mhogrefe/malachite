@@ -1,4 +1,4 @@
-use malachite_base::num::traits::{CheckedHammingDistance, HammingDistance};
+use malachite_base::num::logic::traits::{CheckedHammingDistance, HammingDistance};
 
 use integer::Integer;
 use platform::Limb;
@@ -20,7 +20,8 @@ impl<'a> CheckedHammingDistance<Limb> for &'a Integer {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::{CheckedHammingDistance, NegativeOne, One, Zero};
+    /// use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
+    /// use malachite_base::num::logic::traits::CheckedHammingDistance;
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {
@@ -66,7 +67,8 @@ impl<'a> CheckedHammingDistance<&'a Integer> for Limb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::{CheckedHammingDistance, NegativeOne, One, Zero};
+    /// use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
+    /// use malachite_base::num::logic::traits::CheckedHammingDistance;
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {

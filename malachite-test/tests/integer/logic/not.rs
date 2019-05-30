@@ -1,6 +1,6 @@
 use std::str::FromStr;
 
-use malachite_base::num::traits::NotAssign;
+use malachite_base::num::logic::traits::NotAssign;
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::{Limb, SignedLimb};
 use rug;

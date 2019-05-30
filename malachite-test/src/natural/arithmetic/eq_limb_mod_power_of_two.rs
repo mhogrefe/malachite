@@ -1,7 +1,8 @@
 use std::cmp::min;
 
-use malachite_base::conversion::CheckedFrom;
-use malachite_base::num::traits::{EqModPowerOfTwo, ModPowerOfTwo, SignificantBits};
+use malachite_base::num::arithmetic::traits::{EqModPowerOfTwo, ModPowerOfTwo};
+use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::natural::arithmetic::eq_limb_mod_power_of_two::limbs_eq_limb_mod_power_of_two;
 use malachite_nz::platform::Limb;
 use rug;

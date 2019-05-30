@@ -1,7 +1,7 @@
 use std::cmp::max;
 use std::str::FromStr;
 
-use malachite_base::num::traits::Zero;
+use malachite_base::num::basic::traits::Zero;
 use malachite_nz::natural::arithmetic::add::{
     _limbs_add_same_length_with_carry_in_in_place_left,
     _limbs_add_same_length_with_carry_in_to_out, _limbs_add_to_out_aliased, limbs_add,

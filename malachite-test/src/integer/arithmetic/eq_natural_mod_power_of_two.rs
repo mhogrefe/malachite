@@ -1,7 +1,8 @@
 use std::cmp::{max, min};
 
-use malachite_base::conversion::CheckedFrom;
-use malachite_base::num::traits::{EqModPowerOfTwo, ModPowerOfTwo, SignificantBits};
+use malachite_base::num::arithmetic::traits::{EqModPowerOfTwo, ModPowerOfTwo};
+use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::integer::arithmetic::eq_natural_mod_power_of_two::*;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};

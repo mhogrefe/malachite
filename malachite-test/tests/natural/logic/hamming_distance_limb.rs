@@ -1,7 +1,8 @@
 use std::str::FromStr;
 
 use malachite_base::comparison::Max;
-use malachite_base::num::traits::{CheckedHammingDistance, HammingDistance, Zero};
+use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::logic::traits::{CheckedHammingDistance, HammingDistance};
 use malachite_nz::natural::logic::hamming_distance_limb::limbs_hamming_distance_limb;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;

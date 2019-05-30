@@ -1,4 +1,5 @@
-use malachite_base::num::traits::{IsPowerOfTwo, SignificantBits};
+use malachite_base::num::arithmetic::traits::IsPowerOfTwo;
+use malachite_base::num::logic::traits::SignificantBits;
 use rand::Rng;
 
 use natural::random::special_random_natural_up_to_bits::special_random_natural_up_to_bits;

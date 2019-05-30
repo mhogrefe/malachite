@@ -1,5 +1,6 @@
-use malachite_base::conversion::CheckedFrom;
-use malachite_base::num::traits::{DivExact, DivExactAssign, SignificantBits};
+use malachite_base::num::arithmetic::traits::{DivExact, DivExactAssign};
+use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::natural::arithmetic::div_exact_limb::{
     _limbs_div_exact_3_in_place_alt, _limbs_div_exact_3_to_out_alt, limbs_div_exact_3,
     limbs_div_exact_3_in_place, limbs_div_exact_3_to_out, limbs_div_exact_limb,

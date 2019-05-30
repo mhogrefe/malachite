@@ -1,5 +1,6 @@
-use malachite_base::conversion::CheckedFrom;
-use malachite_base::num::traits::{AddMul, AddMulAssign, SignificantBits};
+use malachite_base::num::arithmetic::traits::{AddMul, AddMulAssign};
+use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::natural::arithmetic::add_mul::{limbs_add_mul, limbs_add_mul_in_place_left};
 use malachite_nz::natural::Natural;
 

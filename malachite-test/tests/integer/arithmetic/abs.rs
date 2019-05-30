@@ -1,7 +1,7 @@
 use std::str::FromStr;
 
-use malachite_base::conversion::CheckedInto;
-use malachite_base::num::traits::{Abs, AbsAssign, UnsignedAbs};
+use malachite_base::num::arithmetic::traits::{Abs, AbsAssign, UnsignedAbs};
+use malachite_base::num::conversion::traits::CheckedInto;
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::{Limb, SignedDoubleLimb, SignedLimb};
 use num::{BigInt, Signed};

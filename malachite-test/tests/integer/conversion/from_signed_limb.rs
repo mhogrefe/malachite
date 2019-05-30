@@ -1,5 +1,5 @@
 use malachite_base::comparison::{Max, Min};
-use malachite_base::conversion::CheckedFrom;
+use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::SignedLimb;
 use num::BigInt;

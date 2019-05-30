@@ -1,4 +1,4 @@
-use malachite_base::num::traits::DivisibleByPowerOfTwo;
+use malachite_base::num::arithmetic::traits::DivisibleByPowerOfTwo;
 
 use integer::Integer;
 
@@ -18,7 +18,8 @@ impl<'a> DivisibleByPowerOfTwo for &'a Integer {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::{DivisibleByPowerOfTwo, Zero};
+    /// use malachite_base::num::arithmetic::traits::DivisibleByPowerOfTwo;
+    /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {

@@ -1,7 +1,7 @@
 use std::cmp::max;
 
-use malachite_base::conversion::CheckedFrom;
-use malachite_base::num::traits::{BitAccess, SignificantBits};
+use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::logic::traits::{BitAccess, SignificantBits};
 use malachite_nz::integer::logic::bit_access::{
     limbs_slice_clear_bit_neg, limbs_vec_clear_bit_neg,
 };

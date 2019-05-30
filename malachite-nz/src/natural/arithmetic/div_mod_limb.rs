@@ -1,10 +1,12 @@
 use malachite_base::comparison::Max;
-#[cfg(feature = "64_bit_limbs")]
-use malachite_base::conversion::WrappingFrom;
-use malachite_base::num::traits::{
+use malachite_base::num::arithmetic::traits::{
     CeilingDivAssignNegMod, CeilingDivNegMod, DivAssignMod, DivAssignRem, DivMod, DivRem,
-    JoinHalves, SplitInHalf, WrappingAddAssign, WrappingSubAssign, Zero,
+    WrappingAddAssign, WrappingSubAssign,
 };
+use malachite_base::num::basic::traits::Zero;
+#[cfg(feature = "64_bit_limbs")]
+use malachite_base::num::conversion::traits::WrappingFrom;
+use malachite_base::num::conversion::traits::{JoinHalves, SplitInHalf};
 
 use natural::arithmetic::add_limb::limbs_slice_add_limb_in_place;
 use natural::arithmetic::shl_u::{limbs_shl_to_out, limbs_slice_shl_in_place};
@@ -381,7 +383,7 @@ impl DivMod<Limb> for Natural {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::DivMod;
+    /// use malachite_base::num::arithmetic::traits::DivMod;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
@@ -427,7 +429,7 @@ impl<'a> DivMod<Limb> for &'a Natural {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::DivMod;
+    /// use malachite_base::num::arithmetic::traits::DivMod;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
@@ -487,7 +489,7 @@ impl DivAssignMod<Limb> for Natural {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::DivAssignMod;
+    /// use malachite_base::num::arithmetic::traits::DivAssignMod;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
@@ -541,7 +543,7 @@ impl DivMod<Natural> for Limb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::DivMod;
+    /// use malachite_base::num::arithmetic::traits::DivMod;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
@@ -584,7 +586,7 @@ impl<'a> DivMod<&'a Natural> for Limb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::DivMod;
+    /// use malachite_base::num::arithmetic::traits::DivMod;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
@@ -634,7 +636,7 @@ impl DivAssignMod<Natural> for Limb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::DivAssignMod;
+    /// use malachite_base::num::arithmetic::traits::DivAssignMod;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
@@ -678,7 +680,7 @@ impl<'a> DivAssignMod<&'a Natural> for Limb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::DivAssignMod;
+    /// use malachite_base::num::arithmetic::traits::DivAssignMod;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
@@ -728,7 +730,7 @@ impl DivRem<Limb> for Natural {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::DivRem;
+    /// use malachite_base::num::arithmetic::traits::DivRem;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
@@ -773,7 +775,7 @@ impl<'a> DivRem<Limb> for &'a Natural {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::DivRem;
+    /// use malachite_base::num::arithmetic::traits::DivRem;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
@@ -816,7 +818,7 @@ impl DivAssignRem<Limb> for Natural {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::DivAssignRem;
+    /// use malachite_base::num::arithmetic::traits::DivAssignRem;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
@@ -860,7 +862,7 @@ impl DivRem<Natural> for Limb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::DivRem;
+    /// use malachite_base::num::arithmetic::traits::DivRem;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
@@ -903,7 +905,7 @@ impl<'a> DivRem<&'a Natural> for Limb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::DivRem;
+    /// use malachite_base::num::arithmetic::traits::DivRem;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
@@ -945,7 +947,7 @@ impl DivAssignRem<Natural> for Limb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::DivAssignRem;
+    /// use malachite_base::num::arithmetic::traits::DivAssignRem;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
@@ -988,7 +990,7 @@ impl<'a> DivAssignRem<&'a Natural> for Limb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::DivAssignRem;
+    /// use malachite_base::num::arithmetic::traits::DivAssignRem;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
@@ -1033,7 +1035,7 @@ impl CeilingDivNegMod<Limb> for Natural {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::CeilingDivNegMod;
+    /// use malachite_base::num::arithmetic::traits::CeilingDivNegMod;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
@@ -1079,7 +1081,7 @@ impl<'a> CeilingDivNegMod<Limb> for &'a Natural {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::CeilingDivNegMod;
+    /// use malachite_base::num::arithmetic::traits::CeilingDivNegMod;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
@@ -1127,7 +1129,7 @@ impl CeilingDivAssignNegMod<Limb> for Natural {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::CeilingDivAssignNegMod;
+    /// use malachite_base::num::arithmetic::traits::CeilingDivAssignNegMod;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
@@ -1176,7 +1178,7 @@ impl CeilingDivNegMod<Natural> for Limb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::CeilingDivNegMod;
+    /// use malachite_base::num::arithmetic::traits::CeilingDivNegMod;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
@@ -1221,7 +1223,7 @@ impl<'a> CeilingDivNegMod<&'a Natural> for Limb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::CeilingDivNegMod;
+    /// use malachite_base::num::arithmetic::traits::CeilingDivNegMod;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
@@ -1269,7 +1271,7 @@ impl CeilingDivAssignNegMod<Natural> for Limb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::CeilingDivAssignNegMod;
+    /// use malachite_base::num::arithmetic::traits::CeilingDivAssignNegMod;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
@@ -1316,7 +1318,7 @@ impl<'a> CeilingDivAssignNegMod<&'a Natural> for Limb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::CeilingDivAssignNegMod;
+    /// use malachite_base::num::arithmetic::traits::CeilingDivAssignNegMod;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {

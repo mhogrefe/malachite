@@ -2,7 +2,7 @@ use std::str::FromStr;
 
 use malachite_base::crement::Crementable;
 use malachite_base::named::Named;
-use malachite_base::num::traits::{NegativeOne, One, Two, Zero};
+use malachite_base::num::basic::traits::{NegativeOne, One, Two, Zero};
 
 use natural::Natural::{self, Small};
 use platform::Limb;

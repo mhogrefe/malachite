@@ -1,8 +1,8 @@
 use std::cmp::Ordering;
 
-use malachite_base::conversion::{CheckedFrom, WrappingFrom};
-use malachite_base::num::integers::PrimitiveInteger;
-use malachite_base::num::traits::EqModPowerOfTwo;
+use malachite_base::num::arithmetic::traits::EqModPowerOfTwo;
+use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::conversion::traits::{CheckedFrom, WrappingFrom};
 
 use natural::arithmetic::divisible_by_power_of_two::limbs_divisible_by_power_of_two;
 use natural::Natural::{self, Large, Small};
@@ -87,7 +87,8 @@ impl<'a, 'b> EqModPowerOfTwo<&'b Natural> for &'a Natural {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::{EqModPowerOfTwo, Zero};
+    /// use malachite_base::num::arithmetic::traits::EqModPowerOfTwo;
+    /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {

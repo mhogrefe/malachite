@@ -1,6 +1,7 @@
 use std::ops::{Mul, MulAssign};
 
-use malachite_base::num::traits::{Assign, SplitInHalf, Zero};
+use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::conversion::traits::{Assign, SplitInHalf};
 
 use natural::Natural::{self, Large, Small};
 use platform::{DoubleLimb, Limb};
@@ -188,7 +189,7 @@ pub fn limbs_vec_mul_limb_in_place(limbs: &mut Vec<Limb>, limb: Limb) {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::traits::Zero;
+/// use malachite_base::num::basic::traits::Zero;
 /// use malachite_nz::natural::Natural;
 ///
 /// fn main() {
@@ -230,7 +231,7 @@ impl Mul<u32> for Natural {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::traits::Zero;
+/// use malachite_base::num::basic::traits::Zero;
 /// use malachite_nz::natural::Natural;
 ///
 /// fn main() {
@@ -287,7 +288,7 @@ impl<'a> Mul<u32> for &'a Natural {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::traits::Zero;
+/// use malachite_base::num::basic::traits::Zero;
 /// use malachite_nz::natural::Natural;
 ///
 /// fn main() {
@@ -329,7 +330,7 @@ impl Mul<Natural> for u32 {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::traits::Zero;
+/// use malachite_base::num::basic::traits::Zero;
 /// use malachite_nz::natural::Natural;
 ///
 /// fn main() {
@@ -371,7 +372,7 @@ impl<'a> Mul<&'a Natural> for u32 {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::traits::One;
+/// use malachite_base::num::basic::traits::One;
 /// use malachite_nz::natural::Natural;
 ///
 /// fn main() {

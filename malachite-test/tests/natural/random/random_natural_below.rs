@@ -1,6 +1,6 @@
 use std::str::FromStr;
 
-use malachite_base::num::traits::Zero;
+use malachite_base::num::basic::traits::Zero;
 use malachite_nz::natural::random::random_natural_below::random_natural_below;
 use malachite_nz::natural::Natural;
 use rand::{IsaacRng, SeedableRng, StdRng};

@@ -1,8 +1,9 @@
 use std::cmp::max;
 
-use malachite_base::conversion::CheckedFrom;
-use malachite_base::num::traits::{ModPowerOfTwo, SaturatingSubAssign, ShrRound, Zero};
-use malachite_base::num::unsigneds::PrimitiveUnsigned;
+use malachite_base::num::arithmetic::traits::{ModPowerOfTwo, SaturatingSubAssign, ShrRound};
+use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_base::round::RoundingMode;
 use rand::distributions::{IndependentSample, Range};
 use rand::Rng;

@@ -1,13 +1,14 @@
 use std::ops::{Rem, RemAssign};
 
 use malachite_base::comparison::Max;
-#[cfg(feature = "64_bit_limbs")]
-use malachite_base::conversion::WrappingFrom;
-use malachite_base::num::integers::PrimitiveInteger;
-use malachite_base::num::traits::{
-    JoinHalves, Mod, ModAssign, NegMod, NegModAssign, SplitInHalf, WrappingAddAssign,
-    WrappingSubAssign, Zero,
+use malachite_base::num::arithmetic::traits::{
+    Mod, ModAssign, NegMod, NegModAssign, WrappingAddAssign, WrappingSubAssign,
 };
+use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::basic::traits::Zero;
+#[cfg(feature = "64_bit_limbs")]
+use malachite_base::num::conversion::traits::WrappingFrom;
+use malachite_base::num::conversion::traits::{JoinHalves, SplitInHalf};
 
 use natural::Natural::{self, Large, Small};
 use platform::{DoubleLimb, Limb};
@@ -220,7 +221,7 @@ impl Mod<Limb> for Natural {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::Mod;
+    /// use malachite_base::num::arithmetic::traits::Mod;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
@@ -261,7 +262,7 @@ impl<'a> Mod<Limb> for &'a Natural {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::Mod;
+    /// use malachite_base::num::arithmetic::traits::Mod;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
@@ -300,7 +301,7 @@ impl ModAssign<Limb> for Natural {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::ModAssign;
+    /// use malachite_base::num::arithmetic::traits::ModAssign;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
@@ -339,7 +340,7 @@ impl Mod<Natural> for Limb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::Mod;
+    /// use malachite_base::num::arithmetic::traits::Mod;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
@@ -378,7 +379,7 @@ impl<'a> Mod<&'a Natural> for Limb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::Mod;
+    /// use malachite_base::num::arithmetic::traits::Mod;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
@@ -416,7 +417,7 @@ impl ModAssign<Natural> for Limb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::ModAssign;
+    /// use malachite_base::num::arithmetic::traits::ModAssign;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
@@ -454,7 +455,7 @@ impl<'a> ModAssign<&'a Natural> for Limb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::ModAssign;
+    /// use malachite_base::num::arithmetic::traits::ModAssign;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
@@ -793,7 +794,7 @@ impl NegMod<Limb> for Natural {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::NegMod;
+    /// use malachite_base::num::arithmetic::traits::NegMod;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
@@ -835,7 +836,7 @@ impl<'a> NegMod<Limb> for &'a Natural {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::NegMod;
+    /// use malachite_base::num::arithmetic::traits::NegMod;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
@@ -878,7 +879,7 @@ impl NegModAssign<Limb> for Natural {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::NegModAssign;
+    /// use malachite_base::num::arithmetic::traits::NegModAssign;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
@@ -920,7 +921,7 @@ impl NegMod<Natural> for Limb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::NegMod;
+    /// use malachite_base::num::arithmetic::traits::NegMod;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
@@ -966,7 +967,7 @@ impl<'a> NegMod<&'a Natural> for Limb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::NegMod;
+    /// use malachite_base::num::arithmetic::traits::NegMod;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {

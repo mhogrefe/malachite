@@ -1,6 +1,6 @@
 use std::str::FromStr;
 
-use malachite_base::num::traits::{DivisibleBy, Parity};
+use malachite_base::num::arithmetic::traits::{DivisibleBy, Parity};
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 

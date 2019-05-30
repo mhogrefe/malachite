@@ -1,7 +1,7 @@
 use std::cmp::max;
 
-use malachite_base::conversion::CheckedFrom;
-use malachite_base::num::traits::SignificantBits;
+use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::integer::logic::xor_natural::{
     limbs_xor_pos_neg, limbs_xor_pos_neg_in_place_either, limbs_xor_pos_neg_in_place_left,
     limbs_xor_pos_neg_in_place_right, limbs_xor_pos_neg_to_out,

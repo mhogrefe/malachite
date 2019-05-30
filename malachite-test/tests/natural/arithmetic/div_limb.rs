@@ -1,6 +1,7 @@
 use std::str::FromStr;
 
-use malachite_base::num::traits::{DivRem, One, Zero};
+use malachite_base::num::arithmetic::traits::DivRem;
+use malachite_base::num::basic::traits::{One, Zero};
 use malachite_nz::natural::arithmetic::div_limb::{
     limbs_div_divisor_of_limb_max_with_carry_in_place,
     limbs_div_divisor_of_limb_max_with_carry_to_out, limbs_div_limb, limbs_div_limb_in_place,

@@ -17,7 +17,7 @@ use platform::Limb;
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::traits::{One, Zero};
+/// use malachite_base::num::basic::traits::{One, Zero};
 /// use malachite_nz::integer::Integer;
 /// use std::str::FromStr;
 ///
@@ -53,7 +53,7 @@ impl Mul<Integer> for Integer {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::traits::{One, Zero};
+/// use malachite_base::num::basic::traits::{One, Zero};
 /// use malachite_nz::integer::Integer;
 /// use std::str::FromStr;
 ///
@@ -90,7 +90,7 @@ impl<'a> Mul<&'a Integer> for Integer {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::traits::{One, Zero};
+/// use malachite_base::num::basic::traits::{One, Zero};
 /// use malachite_nz::integer::Integer;
 /// use std::str::FromStr;
 ///
@@ -126,7 +126,7 @@ impl<'a> Mul<Integer> for &'a Integer {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::traits::{One, Zero};
+/// use malachite_base::num::basic::traits::{One, Zero};
 /// use malachite_nz::integer::Integer;
 /// use std::str::FromStr;
 ///
@@ -165,7 +165,7 @@ impl<'a, 'b> Mul<&'a Integer> for &'b Integer {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::traits::NegativeOne;
+/// use malachite_base::num::basic::traits::NegativeOne;
 /// use malachite_nz::integer::Integer;
 /// use std::str::FromStr;
 ///
@@ -199,7 +199,7 @@ impl MulAssign<Integer> for Integer {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::traits::NegativeOne;
+/// use malachite_base::num::basic::traits::NegativeOne;
 /// use malachite_nz::integer::Integer;
 /// use std::str::FromStr;
 ///

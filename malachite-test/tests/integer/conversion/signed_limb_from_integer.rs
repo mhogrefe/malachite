@@ -1,11 +1,12 @@
 use std::str::FromStr;
 
 use malachite_base::comparison::{Max, Min};
-use malachite_base::conversion::{
+use malachite_base::num::arithmetic::traits::ModPowerOfTwo;
+use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::comparison::traits::PartialOrdAbs;
+use malachite_base::num::conversion::traits::{
     CheckedFrom, ConvertibleFrom, OverflowingFrom, SaturatingFrom, WrappingFrom,
 };
-use malachite_base::num::integers::PrimitiveInteger;
-use malachite_base::num::traits::{ModPowerOfTwo, PartialOrdAbs};
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::{Limb, SignedLimb};
 #[cfg(feature = "32_bit_limbs")]

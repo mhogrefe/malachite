@@ -1,6 +1,6 @@
 use malachite_base::comparison::{Max, Min};
 #[cfg(feature = "32_bit_limbs")]
-use malachite_base::conversion::CheckedFrom;
+use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::SignedDoubleLimb;
 use num::BigInt;

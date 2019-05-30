@@ -1,8 +1,8 @@
-use malachite_base::conversion::CheckedFrom;
-use malachite_base::num::traits::{
+use malachite_base::num::arithmetic::traits::{
     CeilingModPowerOfTwo, CeilingModPowerOfTwoAssign, ModPowerOfTwo, ModPowerOfTwoAssign,
     RemPowerOfTwo, RemPowerOfTwoAssign,
 };
+use malachite_base::num::conversion::traits::CheckedFrom;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::integer::pairs_of_integer_and_small_unsigned;

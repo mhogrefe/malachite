@@ -1,9 +1,9 @@
 use std::fmt::Display;
 
-use malachite_base::conversion::{CheckedFrom, ConvertibleFrom, WrappingFrom};
 use malachite_base::named::Named;
-use malachite_base::num::signeds::PrimitiveSigned;
-use malachite_base::num::unsigneds::PrimitiveUnsigned;
+use malachite_base::num::basic::signeds::PrimitiveSigned;
+use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base::num::conversion::traits::{CheckedFrom, ConvertibleFrom, WrappingFrom};
 use rand::Rand;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};

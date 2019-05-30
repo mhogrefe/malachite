@@ -1,4 +1,5 @@
-use malachite_base::num::traits::{Assign, CheckedSub, CheckedSubMul};
+use malachite_base::num::arithmetic::traits::{CheckedSub, CheckedSubMul};
+use malachite_base::num::conversion::traits::Assign;
 
 use natural::arithmetic::sub_mul_limb::{
     limbs_sub_mul_limb_greater, limbs_sub_mul_limb_greater_in_place_left,
@@ -24,7 +25,7 @@ impl CheckedSubMul<Natural, Limb> for Natural {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::CheckedSubMul;
+    /// use malachite_base::num::arithmetic::traits::CheckedSubMul;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
@@ -75,7 +76,7 @@ impl<'a> CheckedSubMul<&'a Natural, Limb> for Natural {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::CheckedSubMul;
+    /// use malachite_base::num::arithmetic::traits::CheckedSubMul;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
@@ -126,7 +127,7 @@ impl<'a> CheckedSubMul<Natural, Limb> for &'a Natural {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::CheckedSubMul;
+    /// use malachite_base::num::arithmetic::traits::CheckedSubMul;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
@@ -177,7 +178,7 @@ impl<'a, 'b> CheckedSubMul<&'a Natural, Limb> for &'b Natural {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::CheckedSubMul;
+    /// use malachite_base::num::arithmetic::traits::CheckedSubMul;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {

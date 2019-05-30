@@ -1,6 +1,7 @@
 use std::str::FromStr;
 
-use malachite_base::num::traits::{SaturatingSub, SaturatingSubAssign, Zero};
+use malachite_base::num::arithmetic::traits::{SaturatingSub, SaturatingSubAssign};
+use malachite_base::num::basic::traits::Zero;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 

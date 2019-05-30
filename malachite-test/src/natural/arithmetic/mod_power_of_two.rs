@@ -1,8 +1,8 @@
-use malachite_base::conversion::CheckedFrom;
-use malachite_base::num::traits::{
+use malachite_base::num::arithmetic::traits::{
     ModPowerOfTwo, ModPowerOfTwoAssign, NegModPowerOfTwo, NegModPowerOfTwoAssign, RemPowerOfTwo,
     RemPowerOfTwoAssign,
 };
+use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_nz::natural::arithmetic::mod_power_of_two::{
     limbs_mod_power_of_two, limbs_mod_power_of_two_in_place, limbs_neg_mod_power_of_two,
     limbs_neg_mod_power_of_two_in_place,

@@ -1,7 +1,8 @@
 use std::cmp::Ordering;
 
-use malachite_base::conversion::CheckedFrom;
-use malachite_base::num::traits::{PartialOrdAbs, SignificantBits};
+use malachite_base::num::comparison::traits::PartialOrdAbs;
+use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::platform::SignedLimb;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};

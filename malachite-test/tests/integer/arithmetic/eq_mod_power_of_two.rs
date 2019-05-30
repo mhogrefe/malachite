@@ -1,8 +1,11 @@
 use std::str::FromStr;
 
+use malachite_base::num::arithmetic::traits::{
+    DivisibleByPowerOfTwo, EqModPowerOfTwo, ModPowerOfTwo,
+};
+use malachite_base::num::basic::traits::Zero;
 #[cfg(feature = "32_bit_limbs")]
-use malachite_base::conversion::CheckedFrom;
-use malachite_base::num::traits::{DivisibleByPowerOfTwo, EqModPowerOfTwo, ModPowerOfTwo, Zero};
+use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::{Limb, SignedLimb};
 #[cfg(feature = "32_bit_limbs")]

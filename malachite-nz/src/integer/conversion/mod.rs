@@ -1,7 +1,7 @@
 use std::fmt::{self, Binary, Debug, Display, Formatter, Write};
 use std::str::FromStr;
 
-use malachite_base::num::traits::Zero;
+use malachite_base::num::basic::traits::Zero;
 
 use error::ParseIntegerError;
 use integer::Integer;

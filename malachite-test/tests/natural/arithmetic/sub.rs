@@ -1,10 +1,10 @@
 use std::str::FromStr;
 
 use malachite_base::comparison::Max;
-use malachite_base::conversion::{CheckedFrom, WrappingFrom};
 use malachite_base::limbs::limbs_test_zero;
-use malachite_base::num::integers::PrimitiveInteger;
-use malachite_base::num::traits::{One, Zero};
+use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::basic::traits::{One, Zero};
+use malachite_base::num::conversion::traits::{CheckedFrom, WrappingFrom};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::arithmetic::sub::{
     _limbs_sub_same_length_with_borrow_in_in_place_left,

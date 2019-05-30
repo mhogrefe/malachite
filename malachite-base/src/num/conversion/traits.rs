@@ -1,3 +1,5 @@
+use std::num::ParseIntError;
+
 use round::RoundingMode;
 
 /// This trait defines a conversion from another type. If the conversion fails, `None` is returned.
@@ -125,4 +127,66 @@ where
 /// to implement `CheckedFrom` for `T` as well.
 pub trait ConvertibleFrom<T> {
     fn convertible_from(value: T) -> bool;
+}
+
+//TODO
+/// Converts a string slice in a given base to a value.
+///
+/// The string is expected to be an optional `+` sign followed by digits. Leading and trailing
+/// whitespace represent an error. Digits are a subset of these characters, depending on `radix`:
+///
+/// * `0-9`
+/// * `a-z`
+/// * `A-Z`
+pub trait FromStrRadix: Sized {
+    fn from_str_radix(src: &str, radix: u32) -> Result<Self, ParseIntError>;
+}
+
+/// Associates with `Self` a type that's half `Self`'s size.
+pub trait HasHalf {
+    /// The type that's half the size of `Self`.
+    type Half;
+}
+
+/// Provides a function to join two pieces into a value. For example, two `u32`s may be joined to
+/// form a `u64`.
+pub trait JoinHalves: HasHalf {
+    /// Joins two values into a single value; the upper, or most significant half, comes first.
+    fn join_halves(upper: Self::Half, lower: Self::Half) -> Self;
+}
+
+/// Provides functions to split a value into two pieces. For example, a `u64` may be split into two
+/// `u32`s.
+pub trait SplitInHalf: HasHalf {
+    /// Extracts the lower, or least significant half, of `self`.
+    ///
+    fn lower_half(&self) -> Self::Half;
+
+    /// Extracts the upper, or most significant half, of `self`.
+    fn upper_half(&self) -> Self::Half;
+
+    /// Extracts both halves of `self`; the upper, or most significant half, comes first.
+    ///
+    /// Time: worst case O(max(f(n), g(n))), where f(n) is the worst-case time complexity of
+    ///     `Self::lower_half` and g(n) is the worst-case time complexity of `Self::upper_half`.
+    ///
+    /// Additional memory: worst case O(max(f(n), g(n))), where f(n) is the worst-case
+    ///     additional-memory complexity of `Self::lower_half` and g(n) is the worst-case
+    ///     additional-memory complexity of `Self::upper_half.
+    ///
+    #[inline]
+    fn split_in_half(&self) -> (Self::Half, Self::Half) {
+        (self.upper_half(), self.lower_half())
+    }
+}
+
+//TODO doc and test
+pub trait FromU32Slice: Sized {
+    fn from_u32_slice(slice: &[u32]) -> Self;
+
+    fn copy_from_u32_slice(out_slice: &mut [Self], in_slice: &[u32]);
+}
+
+pub trait Assign<Rhs = Self> {
+    fn assign(&mut self, rhs: Rhs);
 }

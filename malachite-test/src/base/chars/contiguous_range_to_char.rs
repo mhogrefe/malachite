@@ -1,5 +1,5 @@
 use malachite_base::chars::contiguous_range_to_char;
-use malachite_base::conversion::WrappingFrom;
+use malachite_base::num::conversion::traits::WrappingFrom;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::unsigneds;

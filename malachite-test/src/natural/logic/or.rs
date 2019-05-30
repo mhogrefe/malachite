@@ -1,7 +1,7 @@
 use std::cmp::{max, min};
 
-use malachite_base::conversion::CheckedFrom;
-use malachite_base::num::traits::SignificantBits;
+use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::natural::logic::or::{
     limbs_or, limbs_or_in_place_either, limbs_or_in_place_left, limbs_or_same_length,
     limbs_or_same_length_in_place_left, limbs_or_same_length_to_out, limbs_or_to_out,

@@ -1,8 +1,9 @@
-use malachite_base::conversion::CheckedFrom;
-use malachite_base::num::traits::{
+use malachite_base::num::arithmetic::traits::{
     CeilingDivAssignMod, CeilingDivMod, CeilingMod, DivAssignMod, DivAssignRem, DivMod, DivRem,
-    DivRound, Mod, SignificantBits,
+    DivRound, Mod,
 };
+use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::round::RoundingMode;
 use malachite_nz::platform::SignedLimb;
 use num::{BigInt, Integer};

@@ -1,11 +1,10 @@
 use std::ops::{Div, DivAssign};
 
 use malachite_base::comparison::Max;
+use malachite_base::num::arithmetic::traits::{DivRem, WrappingAddAssign, WrappingSubAssign};
 #[cfg(feature = "64_bit_limbs")]
-use malachite_base::conversion::WrappingFrom;
-use malachite_base::num::traits::{
-    DivRem, JoinHalves, SplitInHalf, WrappingAddAssign, WrappingSubAssign,
-};
+use malachite_base::num::conversion::traits::WrappingFrom;
+use malachite_base::num::conversion::traits::{JoinHalves, SplitInHalf};
 
 use natural::arithmetic::add_limb::limbs_slice_add_limb_in_place;
 use natural::arithmetic::div_mod_limb::div_mod_by_preinversion;

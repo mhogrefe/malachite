@@ -1,4 +1,5 @@
-use malachite_base::num::traits::{Assign, UnsignedAbs};
+use malachite_base::num::arithmetic::traits::UnsignedAbs;
+use malachite_base::num::conversion::traits::Assign;
 
 use integer::Integer;
 use platform::SignedLimb;
@@ -14,7 +15,7 @@ use platform::SignedLimb;
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::traits::Assign;
+/// use malachite_base::num::conversion::traits::Assign;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {

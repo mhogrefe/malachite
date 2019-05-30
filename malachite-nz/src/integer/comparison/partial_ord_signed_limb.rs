@@ -1,7 +1,7 @@
 use std::cmp::Ordering;
 
-use malachite_base::conversion::WrappingFrom;
-use malachite_base::num::traits::UnsignedAbs;
+use malachite_base::num::arithmetic::traits::UnsignedAbs;
+use malachite_base::num::conversion::traits::WrappingFrom;
 
 use integer::Integer;
 use platform::{Limb, SignedLimb};

@@ -1,5 +1,6 @@
-use malachite_base::conversion::CheckedFrom;
-use malachite_base::num::traits::{DivisibleBy, EqMod, Mod, SignificantBits};
+use malachite_base::num::arithmetic::traits::{DivisibleBy, EqMod, Mod};
+use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::integer::arithmetic::eq_limb_mod_limb::limbs_eq_neg_limb_mod_limb;
 use malachite_nz::platform::Limb;
 

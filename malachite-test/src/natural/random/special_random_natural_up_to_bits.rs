@@ -1,4 +1,4 @@
-use malachite_base::conversion::CheckedFrom;
+use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_nz::natural::random::special_random_natural_up_to_bits::*;
 use rand::{IsaacRng, SeedableRng};
 use rust_wheels::iterators::adaptors::{

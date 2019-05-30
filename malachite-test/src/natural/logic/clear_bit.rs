@@ -1,5 +1,5 @@
-use malachite_base::conversion::CheckedFrom;
-use malachite_base::num::traits::BitAccess;
+use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::logic::traits::BitAccess;
 use malachite_nz::natural::logic::bit_access::limbs_clear_bit;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};

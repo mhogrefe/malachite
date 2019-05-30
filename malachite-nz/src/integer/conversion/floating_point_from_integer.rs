@@ -1,4 +1,4 @@
-use malachite_base::conversion::{CheckedFrom, ConvertibleFrom, RoundingFrom};
+use malachite_base::num::conversion::traits::{CheckedFrom, ConvertibleFrom, RoundingFrom};
 use malachite_base::round::RoundingMode;
 
 use integer::Integer;
@@ -30,7 +30,7 @@ macro_rules! float_impls {
         /// extern crate malachite_base;
         /// extern crate malachite_nz;
         ///
-        /// use malachite_base::conversion::RoundingFrom;
+        /// use malachite_base::num::conversion::traits::RoundingFrom;
         /// use malachite_base::round::RoundingMode;
         /// use malachite_nz::integer::Integer;
         /// use std::str::FromStr;
@@ -86,7 +86,7 @@ macro_rules! float_impls {
         /// extern crate malachite_base;
         /// extern crate malachite_nz;
         ///
-        /// use malachite_base::conversion::RoundingFrom;
+        /// use malachite_base::num::conversion::traits::RoundingFrom;
         /// use malachite_base::round::RoundingMode;
         /// use malachite_nz::integer::Integer;
         /// use std::str::FromStr;
@@ -201,7 +201,7 @@ macro_rules! float_impls {
         /// extern crate malachite_base;
         /// extern crate malachite_nz;
         ///
-        /// use malachite_base::conversion::CheckedFrom;
+        /// use malachite_base::num::conversion::traits::CheckedFrom;
         /// use malachite_nz::integer::Integer;
         /// use std::str::FromStr;
         ///
@@ -234,7 +234,7 @@ macro_rules! float_impls {
         /// extern crate malachite_base;
         /// extern crate malachite_nz;
         ///
-        /// use malachite_base::conversion::CheckedFrom;
+        /// use malachite_base::num::conversion::traits::CheckedFrom;
         /// use malachite_nz::integer::Integer;
         /// use std::str::FromStr;
         ///
@@ -266,7 +266,7 @@ macro_rules! float_impls {
         /// extern crate malachite_base;
         /// extern crate malachite_nz;
         ///
-        /// use malachite_base::conversion::ConvertibleFrom;
+        /// use malachite_base::num::conversion::traits::ConvertibleFrom;
         /// use malachite_nz::integer::Integer;
         /// use std::str::FromStr;
         ///
@@ -298,7 +298,7 @@ macro_rules! float_impls {
         /// extern crate malachite_base;
         /// extern crate malachite_nz;
         ///
-        /// use malachite_base::conversion::ConvertibleFrom;
+        /// use malachite_base::num::conversion::traits::ConvertibleFrom;
         /// use malachite_nz::integer::Integer;
         /// use std::str::FromStr;
         ///

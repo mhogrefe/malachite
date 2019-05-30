@@ -1,8 +1,8 @@
 use std::cmp::max;
 use std::str::FromStr;
 
-use malachite_base::conversion::CheckedFrom;
-use malachite_base::num::traits::Zero;
+use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_nz::integer::logic::and::{
     limbs_and_neg_neg, limbs_and_neg_neg_to_out, limbs_slice_and_neg_neg_in_place_either,
     limbs_slice_and_neg_neg_in_place_left, limbs_vec_and_neg_neg_in_place_either,

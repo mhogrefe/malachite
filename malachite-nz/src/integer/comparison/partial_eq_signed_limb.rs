@@ -1,4 +1,4 @@
-use malachite_base::num::traits::UnsignedAbs;
+use malachite_base::num::arithmetic::traits::UnsignedAbs;
 
 use integer::Integer;
 use platform::SignedLimb;

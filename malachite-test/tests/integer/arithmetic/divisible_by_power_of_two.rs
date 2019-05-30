@@ -1,7 +1,8 @@
 use std::str::FromStr;
 
-use malachite_base::conversion::CheckedFrom;
-use malachite_base::num::traits::{DivisibleByPowerOfTwo, Zero};
+use malachite_base::num::arithmetic::traits::DivisibleByPowerOfTwo;
+use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::{Limb, SignedLimb};
 use rug;

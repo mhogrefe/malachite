@@ -1,4 +1,5 @@
-use malachite_base::num::traits::{DivRound, DivRoundAssign, UnsignedAbs, Zero};
+use malachite_base::num::arithmetic::traits::{DivRound, DivRoundAssign, UnsignedAbs};
+use malachite_base::num::basic::traits::Zero;
 use malachite_base::round::RoundingMode;
 
 use integer::Integer;
@@ -22,7 +23,7 @@ impl DivRound<SignedLimb> for Integer {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::DivRound;
+    /// use malachite_base::num::arithmetic::traits::DivRound;
     /// use malachite_base::round::RoundingMode;
     /// use malachite_nz::integer::Integer;
     ///
@@ -86,7 +87,7 @@ impl<'a> DivRound<SignedLimb> for &'a Integer {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::DivRound;
+    /// use malachite_base::num::arithmetic::traits::DivRound;
     /// use malachite_base::round::RoundingMode;
     /// use malachite_nz::integer::Integer;
     ///
@@ -171,7 +172,7 @@ impl DivRound<Integer> for SignedLimb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::DivRound;
+    /// use malachite_base::num::arithmetic::traits::DivRound;
     /// use malachite_base::round::RoundingMode;
     /// use malachite_nz::integer::Integer;
     ///
@@ -238,7 +239,7 @@ impl<'a> DivRound<&'a Integer> for SignedLimb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::DivRound;
+    /// use malachite_base::num::arithmetic::traits::DivRound;
     /// use malachite_base::round::RoundingMode;
     /// use malachite_nz::integer::Integer;
     ///
@@ -320,7 +321,7 @@ impl DivRoundAssign<SignedLimb> for Integer {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::DivRoundAssign;
+    /// use malachite_base::num::arithmetic::traits::DivRoundAssign;
     /// use malachite_base::round::RoundingMode;
     /// use malachite_nz::integer::Integer;
     ///

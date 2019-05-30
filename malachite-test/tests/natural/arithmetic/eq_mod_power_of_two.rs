@@ -1,7 +1,10 @@
 use std::str::FromStr;
 
-use malachite_base::conversion::CheckedFrom;
-use malachite_base::num::traits::{DivisibleByPowerOfTwo, EqModPowerOfTwo, ModPowerOfTwo, Zero};
+use malachite_base::num::arithmetic::traits::{
+    DivisibleByPowerOfTwo, EqModPowerOfTwo, ModPowerOfTwo,
+};
+use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_nz::natural::arithmetic::eq_mod_power_of_two::limbs_eq_mod_power_of_two;
 use malachite_nz::natural::Natural;
 use rug;

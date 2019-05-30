@@ -1,7 +1,7 @@
 use std::cmp::max;
 use std::str::FromStr;
 
-use malachite_base::num::traits::{NegativeOne, Zero};
+use malachite_base::num::basic::traits::{NegativeOne, Zero};
 use malachite_nz::integer::logic::xor_natural::{
     limbs_xor_pos_neg, limbs_xor_pos_neg_in_place_either, limbs_xor_pos_neg_in_place_left,
     limbs_xor_pos_neg_in_place_right, limbs_xor_pos_neg_to_out,

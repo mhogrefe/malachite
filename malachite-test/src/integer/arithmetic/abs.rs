@@ -1,5 +1,6 @@
-use malachite_base::conversion::CheckedFrom;
-use malachite_base::num::traits::{Abs, AbsAssign, SignificantBits, UnsignedAbs};
+use malachite_base::num::arithmetic::traits::{Abs, AbsAssign, UnsignedAbs};
+use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::logic::traits::SignificantBits;
 use num::Signed;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};

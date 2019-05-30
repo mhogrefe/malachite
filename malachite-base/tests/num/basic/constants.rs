@@ -1,4 +1,4 @@
-use malachite_base::num::integers::PrimitiveInteger;
+use malachite_base::num::basic::integers::PrimitiveInteger;
 
 #[test]
 fn test_constants() {

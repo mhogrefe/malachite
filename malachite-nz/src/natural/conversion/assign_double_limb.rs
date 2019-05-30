@@ -1,4 +1,4 @@
-use malachite_base::num::traits::Assign;
+use malachite_base::num::conversion::traits::Assign;
 
 use natural::Natural;
 use platform::DoubleLimb;
@@ -14,7 +14,7 @@ use platform::DoubleLimb;
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::traits::Assign;
+/// use malachite_base::num::conversion::traits::Assign;
 /// use malachite_nz::natural::Natural;
 ///
 /// fn main() {

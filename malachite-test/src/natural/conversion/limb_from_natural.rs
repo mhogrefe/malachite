@@ -1,7 +1,7 @@
-use malachite_base::conversion::{
+use malachite_base::num::conversion::traits::{
     CheckedFrom, ConvertibleFrom, OverflowingFrom, SaturatingFrom, WrappingFrom,
 };
-use malachite_base::num::traits::SignificantBits;
+use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::platform::Limb;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};

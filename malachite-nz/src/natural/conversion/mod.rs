@@ -1,7 +1,9 @@
 use std::fmt::{self, Debug, Display, Formatter};
 use std::str::FromStr;
 
-use malachite_base::num::traits::{Assign, DivAssignMod, Zero};
+use malachite_base::num::arithmetic::traits::DivAssignMod;
+use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::conversion::traits::Assign;
 
 use error::ParseIntegerError;
 use natural::Natural::{self, Large, Small};

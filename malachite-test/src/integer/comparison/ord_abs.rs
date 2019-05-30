@@ -1,7 +1,8 @@
 use std::cmp::{max, Ordering};
 
-use malachite_base::conversion::CheckedFrom;
-use malachite_base::num::traits::{OrdAbs, SignificantBits};
+use malachite_base::num::comparison::traits::OrdAbs;
+use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::logic::traits::SignificantBits;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::integer::{pairs_of_integers, rm_pairs_of_integers};

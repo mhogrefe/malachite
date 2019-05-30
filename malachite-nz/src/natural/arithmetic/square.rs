@@ -1,7 +1,7 @@
 use std::cmp::max;
 
-use malachite_base::conversion::{CheckedFrom, WrappingFrom};
-use malachite_base::num::integers::PrimitiveInteger;
+use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::conversion::traits::{CheckedFrom, WrappingFrom};
 
 use platform::Limb;
 

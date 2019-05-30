@@ -1,9 +1,10 @@
 use std::str::FromStr;
 
 use malachite_base::comparison::Max;
-use malachite_base::conversion::{CheckedFrom, WrappingFrom};
-use malachite_base::num::traits::{IsPowerOfTwo, One, Zero};
-use malachite_base::num::unsigneds::PrimitiveUnsigned;
+use malachite_base::num::arithmetic::traits::IsPowerOfTwo;
+use malachite_base::num::basic::traits::{One, Zero};
+use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base::num::conversion::traits::{CheckedFrom, WrappingFrom};
 use malachite_nz::natural::arithmetic::shl_u::{
     limbs_shl, limbs_shl_to_out, limbs_shl_with_complement_to_out, limbs_slice_shl_in_place,
     limbs_vec_shl_in_place,

@@ -1,8 +1,11 @@
 use std::str::FromStr;
 
 use malachite_base::comparison::{Max, Min};
-use malachite_base::num::integers::PrimitiveInteger;
-use malachite_base::num::traits::{DivisibleByPowerOfTwo, EqModPowerOfTwo, ModPowerOfTwo, Zero};
+use malachite_base::num::arithmetic::traits::{
+    DivisibleByPowerOfTwo, EqModPowerOfTwo, ModPowerOfTwo,
+};
+use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::basic::traits::Zero;
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::{Limb, SignedLimb};
 use rug;

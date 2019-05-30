@@ -1,5 +1,9 @@
+use std::num::ParseIntError;
+
 use comparison::{Max, Min};
-use conversion::{CheckedFrom, ConvertibleFrom, OverflowingFrom, SaturatingFrom, WrappingFrom};
+use num::conversion::traits::{
+    CheckedFrom, ConvertibleFrom, FromStrRadix, OverflowingFrom, SaturatingFrom, WrappingFrom,
+};
 
 /// This macro defines conversions from a type to itself.
 macro_rules! identity_conversion {
@@ -14,7 +18,7 @@ macro_rules! identity_conversion {
             ///
             /// # Examples
             /// ```
-            /// use malachite_base::conversion::CheckedFrom;
+            /// use malachite_base::num::conversion::traits::CheckedFrom;
             ///
             /// assert_eq!(u8::checked_from(123u8), Some(123));
             /// assert_eq!(i32::checked_from(-5i32), Some(-5));
@@ -35,7 +39,7 @@ macro_rules! identity_conversion {
             ///
             /// # Examples
             /// ```
-            /// use malachite_base::conversion::WrappingFrom;
+            /// use malachite_base::num::conversion::traits::WrappingFrom;
             ///
             /// assert_eq!(u8::wrapping_from(123u8), 123);
             /// assert_eq!(i32::wrapping_from(-5i32), -5);
@@ -56,7 +60,7 @@ macro_rules! identity_conversion {
             ///
             /// # Examples
             /// ```
-            /// use malachite_base::conversion::SaturatingFrom;
+            /// use malachite_base::num::conversion::traits::SaturatingFrom;
             ///
             /// assert_eq!(u8::saturating_from(123u8), 123);
             /// assert_eq!(i32::saturating_from(-5i32), -5);
@@ -78,7 +82,7 @@ macro_rules! identity_conversion {
             ///
             /// # Examples
             /// ```
-            /// use malachite_base::conversion::OverflowingFrom;
+            /// use malachite_base::num::conversion::traits::OverflowingFrom;
             ///
             /// assert_eq!(u8::overflowing_from(123u8), (123, false));
             /// assert_eq!(i32::overflowing_from(-5i32), (-5, false));
@@ -98,7 +102,7 @@ macro_rules! identity_conversion {
             ///
             /// # Examples
             /// ```
-            /// use malachite_base::conversion::ConvertibleFrom;
+            /// use malachite_base::num::conversion::traits::ConvertibleFrom;
             ///
             /// assert!(u8::convertible_from(123u8));
             /// assert!(i32::convertible_from(-5i32));
@@ -124,7 +128,7 @@ macro_rules! lossless_conversion {
         ///
         /// # Examples
         /// ```
-        /// use malachite_base::conversion::CheckedFrom;
+        /// use malachite_base::num::conversion::traits::CheckedFrom;
         ///
         /// assert_eq!(u16::checked_from(123u8), Some(123));
         /// assert_eq!(i64::checked_from(-5i32), Some(-5));
@@ -145,7 +149,7 @@ macro_rules! lossless_conversion {
         ///
         /// # Examples
         /// ```
-        /// use malachite_base::conversion::WrappingFrom;
+        /// use malachite_base::num::conversion::traits::WrappingFrom;
         ///
         /// assert_eq!(u16::wrapping_from(123u8), 123);
         /// assert_eq!(i64::wrapping_from(-5i32), -5);
@@ -166,7 +170,7 @@ macro_rules! lossless_conversion {
         ///
         /// # Examples
         /// ```
-        /// use malachite_base::conversion::SaturatingFrom;
+        /// use malachite_base::num::conversion::traits::SaturatingFrom;
         ///
         /// assert_eq!(u16::saturating_from(123u8), 123);
         /// assert_eq!(i64::saturating_from(-5i32), -5);
@@ -188,7 +192,7 @@ macro_rules! lossless_conversion {
         ///
         /// # Examples
         /// ```
-        /// use malachite_base::conversion::OverflowingFrom;
+        /// use malachite_base::num::conversion::traits::OverflowingFrom;
         ///
         /// assert_eq!(u16::overflowing_from(123u8), (123, false));
         /// assert_eq!(i64::overflowing_from(-5i32), (-5, false));
@@ -208,7 +212,7 @@ macro_rules! lossless_conversion {
         ///
         /// # Examples
         /// ```
-        /// use malachite_base::conversion::ConvertibleFrom;
+        /// use malachite_base::num::conversion::traits::ConvertibleFrom;
         ///
         /// assert!(u16::convertible_from(123u8));
         /// assert!(i64::convertible_from(-5i32));
@@ -235,7 +239,7 @@ macro_rules! lossy_conversion {
         ///
         /// # Examples
         /// ```
-        /// use malachite_base::conversion::CheckedFrom;
+        /// use malachite_base::num::conversion::traits::CheckedFrom;
         ///
         /// assert_eq!(u32::checked_from(5u64), Some(5));
         /// assert_eq!(u8::checked_from(1_000u16), None);
@@ -265,7 +269,7 @@ macro_rules! lossy_conversion {
         ///
         /// # Examples
         /// ```
-        /// use malachite_base::conversion::WrappingFrom;
+        /// use malachite_base::num::conversion::traits::WrappingFrom;
         ///
         /// assert_eq!(u32::wrapping_from(5u64), 5);
         /// assert_eq!(u8::wrapping_from(1_000u16), 232);
@@ -290,7 +294,7 @@ macro_rules! lossy_conversion {
         ///
         /// # Examples
         /// ```
-        /// use malachite_base::conversion::SaturatingFrom;
+        /// use malachite_base::num::conversion::traits::SaturatingFrom;
         ///
         /// assert_eq!(u32::saturating_from(5u64), 5);
         /// assert_eq!(u8::saturating_from(1_000u16), 255);
@@ -325,7 +329,7 @@ macro_rules! lossy_conversion {
         ///
         /// # Examples
         /// ```
-        /// use malachite_base::conversion::OverflowingFrom;
+        /// use malachite_base::num::conversion::traits::OverflowingFrom;
         ///
         /// assert_eq!(u32::overflowing_from(5u64), (5, false));
         /// assert_eq!(u8::overflowing_from(1_000u16), (232, true));
@@ -353,7 +357,7 @@ macro_rules! lossy_conversion {
         ///
         /// # Examples
         /// ```
-        /// use malachite_base::conversion::ConvertibleFrom;
+        /// use malachite_base::num::conversion::traits::ConvertibleFrom;
         ///
         /// assert_eq!(u32::convertible_from(5u64), true);
         /// assert_eq!(u8::convertible_from(1_000u16), false);
@@ -470,3 +474,28 @@ no_containment_conversion!(usize, isize);
 no_containment_conversion!(i32, isize);
 no_containment_conversion!(i64, isize);
 no_containment_conversion!(i128, isize);
+
+/// This macro defines trait implementations that are the same for unsigned and signed types.
+macro_rules! impl_conversion_traits {
+    ($t:ident) => {
+        impl FromStrRadix for $t {
+            #[inline]
+            fn from_str_radix(src: &str, radix: u32) -> Result<Self, ParseIntError> {
+                $t::from_str_radix(src, radix)
+            }
+        }
+    };
+}
+
+impl_conversion_traits!(u8);
+impl_conversion_traits!(u16);
+impl_conversion_traits!(u32);
+impl_conversion_traits!(u64);
+impl_conversion_traits!(u128);
+impl_conversion_traits!(usize);
+impl_conversion_traits!(i8);
+impl_conversion_traits!(i16);
+impl_conversion_traits!(i32);
+impl_conversion_traits!(i64);
+impl_conversion_traits!(i128);
+impl_conversion_traits!(isize);

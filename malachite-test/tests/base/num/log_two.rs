@@ -1,7 +1,8 @@
 use std::{u16, u32, u64, u8};
 
-use malachite_base::num::traits::{CeilingLogTwo, FloorLogTwo, Zero};
-use malachite_base::num::unsigneds::PrimitiveUnsigned;
+use malachite_base::num::arithmetic::traits::{CeilingLogTwo, FloorLogTwo};
+use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use rand::Rand;
 
 use common::test_properties;

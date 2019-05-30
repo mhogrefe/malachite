@@ -1,8 +1,8 @@
 use malachite_base::comparison::Min;
-use malachite_base::conversion::{
+use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::conversion::traits::{
     CheckedFrom, ConvertibleFrom, OverflowingFrom, SaturatingFrom, WrappingFrom,
 };
-use malachite_base::num::integers::PrimitiveInteger;
 
 use integer::Integer;
 use natural::Natural::Small;
@@ -21,7 +21,7 @@ impl CheckedFrom<Integer> for SignedLimb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::conversion::CheckedFrom;
+    /// use malachite_base::num::conversion::traits::CheckedFrom;
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {
@@ -50,7 +50,7 @@ impl<'a> CheckedFrom<&'a Integer> for SignedLimb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::conversion::CheckedFrom;
+    /// use malachite_base::num::conversion::traits::CheckedFrom;
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {
@@ -90,7 +90,7 @@ impl WrappingFrom<Integer> for SignedLimb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::conversion::WrappingFrom;
+    /// use malachite_base::num::conversion::traits::WrappingFrom;
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {
@@ -119,7 +119,7 @@ impl<'a> WrappingFrom<&'a Integer> for SignedLimb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::conversion::WrappingFrom;
+    /// use malachite_base::num::conversion::traits::WrappingFrom;
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {
@@ -156,7 +156,7 @@ impl SaturatingFrom<Integer> for SignedLimb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::conversion::SaturatingFrom;
+    /// use malachite_base::num::conversion::traits::SaturatingFrom;
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {
@@ -193,7 +193,7 @@ impl<'a> SaturatingFrom<&'a Integer> for SignedLimb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::conversion::SaturatingFrom;
+    /// use malachite_base::num::conversion::traits::SaturatingFrom;
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {
@@ -245,7 +245,7 @@ impl OverflowingFrom<Integer> for SignedLimb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::conversion::OverflowingFrom;
+    /// use malachite_base::num::conversion::traits::OverflowingFrom;
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {
@@ -283,7 +283,7 @@ impl<'a> OverflowingFrom<&'a Integer> for SignedLimb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::conversion::OverflowingFrom;
+    /// use malachite_base::num::conversion::traits::OverflowingFrom;
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {
@@ -324,7 +324,7 @@ impl ConvertibleFrom<Integer> for SignedLimb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::conversion::ConvertibleFrom;
+    /// use malachite_base::num::conversion::traits::ConvertibleFrom;
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {
@@ -361,7 +361,7 @@ impl<'a> ConvertibleFrom<&'a Integer> for SignedLimb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::conversion::ConvertibleFrom;
+    /// use malachite_base::num::conversion::traits::ConvertibleFrom;
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {

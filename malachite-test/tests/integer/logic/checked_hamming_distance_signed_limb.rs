@@ -1,8 +1,9 @@
 use std::str::FromStr;
 
 use malachite_base::comparison::{Max, Min};
-use malachite_base::num::integers::PrimitiveInteger;
-use malachite_base::num::traits::{CheckedHammingDistance, NegativeOne, Zero};
+use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::basic::traits::{NegativeOne, Zero};
+use malachite_base::num::logic::traits::CheckedHammingDistance;
 use malachite_nz::integer::logic::checked_hamming_distance_signed_limb::*;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;

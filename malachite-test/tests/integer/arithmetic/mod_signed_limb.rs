@@ -1,9 +1,10 @@
 use std::str::FromStr;
 
-use malachite_base::num::traits::{
-    CeilingDivMod, CeilingMod, CeilingModAssign, DivMod, DivRem, Mod, ModAssign, NegativeOne, One,
-    PartialOrdAbs, UnsignedAbs, Zero,
+use malachite_base::num::arithmetic::traits::{
+    CeilingDivMod, CeilingMod, CeilingModAssign, DivMod, DivRem, Mod, ModAssign, UnsignedAbs,
 };
+use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
+use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::{Limb, SignedLimb};
 use num::BigInt;

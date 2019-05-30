@@ -1,7 +1,8 @@
-use malachite_base::conversion::CheckedFrom;
 use malachite_base::limbs::{limbs_leading_zero_limbs, limbs_test_zero};
-use malachite_base::num::integers::PrimitiveInteger;
-use malachite_base::num::traits::{BitAccess, WrappingAddAssign, WrappingNegAssign};
+use malachite_base::num::arithmetic::traits::{WrappingAddAssign, WrappingNegAssign};
+use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::logic::traits::BitAccess;
 
 use integer::Integer;
 use natural::arithmetic::add_limb::limbs_slice_add_limb_in_place;
@@ -197,8 +198,8 @@ pub fn limbs_vec_clear_bit_neg(limbs: &mut Vec<Limb>, index: u64) {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::traits::BitAccess;
-/// use malachite_base::num::traits::{NegativeOne, Zero};
+/// use malachite_base::num::logic::traits::BitAccess;
+/// use malachite_base::num::basic::traits::{NegativeOne, Zero};
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {
@@ -252,7 +253,7 @@ impl BitAccess for Integer {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::BitAccess;
+    /// use malachite_base::num::logic::traits::BitAccess;
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {
@@ -295,8 +296,8 @@ impl BitAccess for Integer {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::BitAccess;
-    /// use malachite_base::num::traits::Zero;
+    /// use malachite_base::num::logic::traits::BitAccess;
+    /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {
@@ -340,7 +341,7 @@ impl BitAccess for Integer {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::BitAccess;
+    /// use malachite_base::num::logic::traits::BitAccess;
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {

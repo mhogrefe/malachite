@@ -1,10 +1,12 @@
 use std::str::FromStr;
 
-use malachite_base::conversion::CheckedFrom;
-use malachite_base::num::traits::{
+use malachite_base::num::arithmetic::traits::{
     CeilingDivAssignMod, CeilingDivMod, CeilingMod, DivAssignMod, DivAssignRem, DivMod, DivRem,
-    DivRound, Mod, NegativeOne, One, PartialOrdAbs, Zero,
+    DivRound, Mod,
 };
+use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
+use malachite_base::num::comparison::traits::PartialOrdAbs;
+use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_base::round::RoundingMode;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;

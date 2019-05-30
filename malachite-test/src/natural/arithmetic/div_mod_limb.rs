@@ -1,8 +1,9 @@
-use malachite_base::conversion::CheckedFrom;
-use malachite_base::num::traits::{
+use malachite_base::num::arithmetic::traits::{
     CeilingDivAssignNegMod, CeilingDivNegMod, DivAssignMod, DivAssignRem, DivMod, DivRem, DivRound,
-    NegMod, SignificantBits,
+    NegMod,
 };
+use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::round::RoundingMode;
 use malachite_nz::natural::arithmetic::div_mod_limb::{
     limbs_div_limb_in_place_mod, limbs_div_limb_mod, limbs_div_limb_to_out_mod,

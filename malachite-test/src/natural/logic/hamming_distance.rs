@@ -1,8 +1,8 @@
 use std::cmp::max;
 use std::iter::repeat;
 
-use malachite_base::conversion::CheckedFrom;
-use malachite_base::num::traits::{HammingDistance, SignificantBits};
+use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::logic::traits::{HammingDistance, SignificantBits};
 use malachite_nz::natural::logic::hamming_distance::{
     limbs_hamming_distance, limbs_hamming_distance_same_length,
 };

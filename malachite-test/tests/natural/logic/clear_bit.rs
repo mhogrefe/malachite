@@ -1,8 +1,9 @@
 #[cfg(feature = "32_bit_limbs")]
 use std::str::FromStr;
 
-use malachite_base::conversion::CheckedFrom;
-use malachite_base::num::traits::{BitAccess, One};
+use malachite_base::num::basic::traits::One;
+use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::logic::traits::BitAccess;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::logic::bit_access::limbs_clear_bit;
 use malachite_nz::natural::Natural;

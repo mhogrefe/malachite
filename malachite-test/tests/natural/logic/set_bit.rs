@@ -1,7 +1,8 @@
 use std::str::FromStr;
 
-use malachite_base::conversion::CheckedFrom;
-use malachite_base::num::traits::{BitAccess, One};
+use malachite_base::num::basic::traits::One;
+use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::logic::traits::BitAccess;
 use malachite_nz::natural::logic::bit_access::{limbs_slice_set_bit, limbs_vec_set_bit};
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;

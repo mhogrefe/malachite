@@ -1,5 +1,6 @@
-use malachite_base::conversion::CheckedFrom;
-use malachite_base::num::traits::{NextPowerOfTwo, NextPowerOfTwoAssign, SignificantBits};
+use malachite_base::num::arithmetic::traits::{NextPowerOfTwo, NextPowerOfTwoAssign};
+use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::natural::arithmetic::next_power_of_two::{
     limbs_next_power_of_two, limbs_slice_next_power_of_two_in_place,
     limbs_vec_next_power_of_two_in_place,

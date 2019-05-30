@@ -1,4 +1,4 @@
-use malachite_base::num::traits::NotAssign;
+use malachite_base::num::logic::traits::NotAssign;
 
 use common::test_properties_no_limit_exhaustive_no_special;
 use malachite_test::inputs::base::bools;

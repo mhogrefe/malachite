@@ -1,4 +1,4 @@
-use malachite_base::num::traits::{
+use malachite_base::num::arithmetic::traits::{
     CeilingModPowerOfTwo, CeilingModPowerOfTwoAssign, ModPowerOfTwo, ModPowerOfTwoAssign,
     NegModPowerOfTwo, NegModPowerOfTwoAssign, RemPowerOfTwo, RemPowerOfTwoAssign,
 };
@@ -24,7 +24,7 @@ impl ModPowerOfTwo for Integer {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::ModPowerOfTwo;
+    /// use malachite_base::num::arithmetic::traits::ModPowerOfTwo;
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {
@@ -61,7 +61,7 @@ impl<'a> ModPowerOfTwo for &'a Integer {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::ModPowerOfTwo;
+    /// use malachite_base::num::arithmetic::traits::ModPowerOfTwo;
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {
@@ -95,7 +95,7 @@ impl ModPowerOfTwoAssign for Integer {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::ModPowerOfTwoAssign;
+    /// use malachite_base::num::arithmetic::traits::ModPowerOfTwoAssign;
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {
@@ -139,7 +139,7 @@ impl RemPowerOfTwo for Integer {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::RemPowerOfTwo;
+    /// use malachite_base::num::arithmetic::traits::RemPowerOfTwo;
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {
@@ -178,7 +178,7 @@ impl<'a> RemPowerOfTwo for &'a Integer {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::RemPowerOfTwo;
+    /// use malachite_base::num::arithmetic::traits::RemPowerOfTwo;
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {
@@ -214,7 +214,7 @@ impl RemPowerOfTwoAssign for Integer {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::RemPowerOfTwoAssign;
+    /// use malachite_base::num::arithmetic::traits::RemPowerOfTwoAssign;
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {
@@ -252,7 +252,7 @@ impl CeilingModPowerOfTwo for Integer {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::CeilingModPowerOfTwo;
+    /// use malachite_base::num::arithmetic::traits::CeilingModPowerOfTwo;
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {
@@ -292,7 +292,7 @@ impl<'a> CeilingModPowerOfTwo for &'a Integer {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::CeilingModPowerOfTwo;
+    /// use malachite_base::num::arithmetic::traits::CeilingModPowerOfTwo;
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {
@@ -328,7 +328,7 @@ impl CeilingModPowerOfTwoAssign for Integer {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::CeilingModPowerOfTwoAssign;
+    /// use malachite_base::num::arithmetic::traits::CeilingModPowerOfTwoAssign;
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {

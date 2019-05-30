@@ -1,5 +1,5 @@
-use malachite_base::conversion::{CheckedFrom, WrappingFrom};
-use malachite_base::num::traits::SignificantBits;
+use malachite_base::num::conversion::traits::{CheckedFrom, WrappingFrom};
+use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::natural::logic::trailing_zeros::limbs_trailing_zeros;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;

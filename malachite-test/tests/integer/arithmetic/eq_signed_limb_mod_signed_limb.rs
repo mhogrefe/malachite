@@ -1,6 +1,7 @@
 use std::str::FromStr;
 
-use malachite_base::num::traits::{DivisibleBy, EqMod, Mod, NegativeOne, One, Zero};
+use malachite_base::num::arithmetic::traits::{DivisibleBy, EqMod, Mod};
+use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::{Limb, SignedLimb};
 use rug;

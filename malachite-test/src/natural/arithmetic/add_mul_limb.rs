@@ -1,7 +1,8 @@
 use std::cmp::max;
 
-use malachite_base::conversion::CheckedFrom;
-use malachite_base::num::traits::{AddMul, AddMulAssign, SignificantBits};
+use malachite_base::num::arithmetic::traits::{AddMul, AddMulAssign};
+use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::natural::arithmetic::add_mul_limb::{
     limbs_add_mul_limb, limbs_slice_add_mul_limb_greater_in_place_left,
     limbs_slice_add_mul_limb_same_length_in_place_right, limbs_vec_add_mul_limb_in_place_either,

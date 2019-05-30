@@ -1,6 +1,6 @@
 use std::cmp::Ordering;
 
-use malachite_base::num::traits::HammingDistance;
+use malachite_base::num::logic::traits::HammingDistance;
 
 use natural::logic::count_ones::limbs_count_ones;
 use natural::Natural::{self, Large, Small};
@@ -83,7 +83,8 @@ impl<'a, 'b> HammingDistance<&'a Natural> for &'b Natural {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::{HammingDistance, One};
+    /// use malachite_base::num::basic::traits::One;
+    /// use malachite_base::num::logic::traits::HammingDistance;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {

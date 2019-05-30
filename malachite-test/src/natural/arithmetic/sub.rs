@@ -1,7 +1,7 @@
 use std::cmp::{max, min};
 
-use malachite_base::conversion::CheckedFrom;
-use malachite_base::num::traits::SignificantBits;
+use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::natural::arithmetic::sub::{
     limbs_slice_sub_in_place_right, limbs_sub, limbs_sub_in_place_left,
     limbs_sub_same_length_in_place_left, limbs_sub_same_length_in_place_right,

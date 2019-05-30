@@ -1,7 +1,8 @@
 use std::cmp::max;
 
-use malachite_base::conversion::CheckedFrom;
-use malachite_base::num::traits::{SaturatingSub, SaturatingSubAssign, SignificantBits};
+use malachite_base::num::arithmetic::traits::{SaturatingSub, SaturatingSubAssign};
+use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::logic::traits::SignificantBits;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::natural::pairs_of_naturals;

@@ -1,6 +1,7 @@
 use std::str::FromStr;
 
-use malachite_base::num::traits::{DivisibleBy, One, Zero};
+use malachite_base::num::arithmetic::traits::DivisibleBy;
+use malachite_base::num::basic::traits::{One, Zero};
 use malachite_nz::natural::arithmetic::divisible_by_limb::{
     _combined_limbs_divisible_by_limb, limbs_divisible_by_limb,
 };

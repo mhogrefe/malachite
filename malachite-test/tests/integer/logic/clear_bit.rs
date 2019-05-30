@@ -1,6 +1,7 @@
 use std::str::FromStr;
 
-use malachite_base::num::traits::{BitAccess, NotAssign, One};
+use malachite_base::num::basic::traits::One;
+use malachite_base::num::logic::traits::{BitAccess, NotAssign};
 use malachite_nz::integer::logic::bit_access::{
     limbs_slice_clear_bit_neg, limbs_vec_clear_bit_neg,
 };

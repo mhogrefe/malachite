@@ -1,9 +1,9 @@
 use std::{i16, i32, i64, i8, u16, u32, u64, u8};
 
-use malachite_base::conversion::WrappingFrom;
-use malachite_base::num::integers::PrimitiveInteger;
-use malachite_base::num::signeds::PrimitiveSigned;
-use malachite_base::num::unsigneds::PrimitiveUnsigned;
+use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::basic::signeds::PrimitiveSigned;
+use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base::num::conversion::traits::WrappingFrom;
 use rand::Rand;
 
 use common::test_properties;

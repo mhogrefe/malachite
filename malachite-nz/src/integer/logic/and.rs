@@ -561,7 +561,7 @@ impl<'a, 'b> BitAnd<&'a Integer> for &'b Integer {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::traits::NegativeOne;
+/// use malachite_base::num::basic::traits::NegativeOne;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {
@@ -601,7 +601,7 @@ impl BitAndAssign<Integer> for Integer {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::traits::NegativeOne;
+/// use malachite_base::num::basic::traits::NegativeOne;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {

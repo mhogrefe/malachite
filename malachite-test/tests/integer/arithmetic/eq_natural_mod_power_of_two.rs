@@ -1,6 +1,9 @@
 use std::str::FromStr;
 
-use malachite_base::num::traits::{DivisibleByPowerOfTwo, EqModPowerOfTwo, ModPowerOfTwo, Zero};
+use malachite_base::num::arithmetic::traits::{
+    DivisibleByPowerOfTwo, EqModPowerOfTwo, ModPowerOfTwo,
+};
+use malachite_base::num::basic::traits::Zero;
 use malachite_nz::integer::arithmetic::eq_natural_mod_power_of_two::*;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;

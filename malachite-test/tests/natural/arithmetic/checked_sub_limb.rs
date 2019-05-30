@@ -1,8 +1,9 @@
 use std::str::FromStr;
 
 use malachite_base::comparison::Max;
-use malachite_base::conversion::CheckedFrom;
-use malachite_base::num::traits::{CheckedSub, Zero};
+use malachite_base::num::arithmetic::traits::CheckedSub;
+use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 use num::BigUint;

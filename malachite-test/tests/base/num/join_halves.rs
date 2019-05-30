@@ -1,8 +1,8 @@
 use std::{u16, u8};
 
-use malachite_base::num::integers::PrimitiveInteger;
-use malachite_base::num::traits::{JoinHalves, SplitInHalf};
-use malachite_base::num::unsigneds::PrimitiveUnsigned;
+use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base::num::conversion::traits::{JoinHalves, SplitInHalf};
 
 use common::test_properties;
 use malachite_test::inputs::base::{pairs_of_unsigneds, unsigneds};

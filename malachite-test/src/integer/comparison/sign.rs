@@ -1,7 +1,8 @@
 use std::cmp::Ordering;
 
-use malachite_base::conversion::CheckedFrom;
-use malachite_base::num::traits::{Sign, SignificantBits};
+use malachite_base::num::arithmetic::traits::Sign;
+use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::logic::traits::SignificantBits;
 use num::bigint::Sign as NumSign;
 use num::BigInt;
 

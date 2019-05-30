@@ -1,11 +1,12 @@
 use std::cmp::{max, min};
 
 use malachite_base::comparison::Max;
-use malachite_base::conversion::WrappingFrom;
 use malachite_base::limbs::limbs_test_zero;
-use malachite_base::num::traits::{
-    AddMul, AddMulAssign, NegAssign, NotAssign, WrappingAddAssign, WrappingSubAssign,
+use malachite_base::num::arithmetic::traits::{
+    AddMul, AddMulAssign, NegAssign, WrappingAddAssign, WrappingSubAssign,
 };
+use malachite_base::num::conversion::traits::WrappingFrom;
+use malachite_base::num::logic::traits::NotAssign;
 
 use integer::Integer;
 use natural::arithmetic::add_limb::limbs_slice_add_limb_in_place;
@@ -31,7 +32,7 @@ use platform::Limb;
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::traits::AddMul;
+/// use malachite_base::num::arithmetic::traits::AddMul;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {
@@ -74,7 +75,7 @@ impl AddMul<Integer, u32> for Integer {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::traits::AddMul;
+/// use malachite_base::num::arithmetic::traits::AddMul;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {
@@ -117,7 +118,7 @@ impl<'a> AddMul<&'a Integer, u32> for Integer {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::traits::AddMul;
+/// use malachite_base::num::arithmetic::traits::AddMul;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {
@@ -159,7 +160,7 @@ impl<'a> AddMul<Integer, u32> for &'a Integer {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::traits::AddMul;
+/// use malachite_base::num::arithmetic::traits::AddMul;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {
@@ -227,7 +228,7 @@ impl<'a, 'b> AddMul<&'a Integer, u32> for &'b Integer {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::traits::AddMulAssign;
+/// use malachite_base::num::arithmetic::traits::AddMulAssign;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {
@@ -291,7 +292,7 @@ impl AddMulAssign<Integer, u32> for Integer {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::traits::AddMulAssign;
+/// use malachite_base::num::arithmetic::traits::AddMulAssign;
 /// use malachite_nz::integer::Integer;
 ///
 /// fn main() {

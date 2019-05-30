@@ -1,6 +1,6 @@
-use malachite_base::conversion::CheckedFrom;
-use malachite_base::num::integers::PrimitiveInteger;
-use malachite_base::num::traits::SignificantBits;
+use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::natural::arithmetic::mul::fft::{
     _limbs_mul_greater_to_out_fft, _limbs_mul_greater_to_out_fft_input_sizes_threshold,
 };

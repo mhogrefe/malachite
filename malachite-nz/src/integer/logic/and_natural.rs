@@ -2,7 +2,8 @@ use std::cmp::max;
 use std::ops::{BitAnd, BitAndAssign};
 
 use malachite_base::limbs::{limbs_leading_zero_limbs, limbs_set_zero};
-use malachite_base::num::traits::{NotAssign, WrappingNegAssign};
+use malachite_base::num::arithmetic::traits::WrappingNegAssign;
+use malachite_base::num::logic::traits::NotAssign;
 
 use integer::Integer;
 use natural::Natural::{self, Large, Small};
@@ -406,7 +407,7 @@ impl<'a, 'b> BitAnd<&'a Natural> for &'b Integer {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::traits::NegativeOne;
+/// use malachite_base::num::basic::traits::NegativeOne;
 /// use malachite_nz::integer::Integer;
 /// use malachite_nz::natural::Natural;
 ///
@@ -443,7 +444,7 @@ impl BitAndAssign<Natural> for Integer {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::traits::NegativeOne;
+/// use malachite_base::num::basic::traits::NegativeOne;
 /// use malachite_nz::integer::Integer;
 /// use malachite_nz::natural::Natural;
 ///

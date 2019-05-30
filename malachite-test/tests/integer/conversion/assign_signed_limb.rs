@@ -1,7 +1,7 @@
 use std::str::FromStr;
 
 use malachite_base::comparison::{Max, Min};
-use malachite_base::num::traits::Assign;
+use malachite_base::num::conversion::traits::Assign;
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::SignedLimb;
 use num::BigInt;

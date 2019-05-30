@@ -1,7 +1,8 @@
 #[cfg(feature = "32_bit_limbs")]
 use std::str::FromStr;
 
-use malachite_base::num::traits::{DivisibleBy, EqMod, One, Zero};
+use malachite_base::num::arithmetic::traits::{DivisibleBy, EqMod};
+use malachite_base::num::basic::traits::{One, Zero};
 use malachite_nz::natural::arithmetic::eq_limb_mod_limb::{
     _combined_limbs_eq_limb_mod_limb, limbs_eq_limb_mod_limb,
 };

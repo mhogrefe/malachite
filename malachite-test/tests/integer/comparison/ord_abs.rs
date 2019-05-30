@@ -1,6 +1,7 @@
 use std::cmp::Ordering;
 
-use malachite_base::num::traits::{Abs, OrdAbs, PartialOrdAbs};
+use malachite_base::num::arithmetic::traits::Abs;
+use malachite_base::num::comparison::traits::{OrdAbs, PartialOrdAbs};
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::SignedLimb;
 use rug;

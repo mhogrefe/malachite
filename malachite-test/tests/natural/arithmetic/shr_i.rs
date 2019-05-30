@@ -1,6 +1,7 @@
 use std::str::FromStr;
 
-use malachite_base::num::traits::{ShrRound, ShrRoundAssign, Zero};
+use malachite_base::num::arithmetic::traits::{ShrRound, ShrRoundAssign};
+use malachite_base::num::basic::traits::Zero;
 use malachite_base::round::RoundingMode;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;

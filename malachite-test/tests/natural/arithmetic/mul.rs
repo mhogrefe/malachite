@@ -1,7 +1,7 @@
 use std::str::FromStr;
 
 use malachite_base::comparison::Max;
-use malachite_base::num::traits::{One, Zero};
+use malachite_base::num::basic::traits::{One, Zero};
 use malachite_nz::natural::arithmetic::mul::fft::_limbs_mul_greater_to_out_fft;
 #[cfg(feature = "64_bit_limbs")]
 use malachite_nz::natural::arithmetic::mul::fft::{

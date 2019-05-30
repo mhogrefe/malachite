@@ -1,4 +1,4 @@
-use malachite_base::num::traits::{DivisibleBy, DivisibleByPowerOfTwo, Parity};
+use malachite_base::num::arithmetic::traits::{DivisibleBy, DivisibleByPowerOfTwo, Parity};
 
 use natural::arithmetic::eq_limb_mod_limb::limbs_mod_exact_odd_limb;
 use natural::arithmetic::mod_limb::limbs_mod_limb;
@@ -72,7 +72,8 @@ impl<'a> DivisibleBy<Limb> for &'a Natural {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::{DivisibleBy, Zero};
+    /// use malachite_base::num::arithmetic::traits::DivisibleBy;
+    /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
@@ -113,7 +114,8 @@ impl<'a> DivisibleBy<&'a Natural> for Limb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::{DivisibleBy, Zero};
+    /// use malachite_base::num::arithmetic::traits::DivisibleBy;
+    /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {

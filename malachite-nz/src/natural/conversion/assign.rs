@@ -1,4 +1,4 @@
-use malachite_base::num::traits::Assign;
+use malachite_base::num::conversion::traits::Assign;
 
 use natural::Natural;
 
@@ -13,7 +13,7 @@ use natural::Natural;
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::traits::Assign;
+/// use malachite_base::num::conversion::traits::Assign;
 /// use malachite_nz::natural::Natural;
 ///
 /// fn main() {
@@ -42,7 +42,7 @@ impl Assign<Natural> for Natural {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::num::traits::Assign;
+/// use malachite_base::num::conversion::traits::Assign;
 /// use malachite_nz::natural::Natural;
 ///
 /// fn main() {

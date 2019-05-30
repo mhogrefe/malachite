@@ -1,8 +1,9 @@
 use std::str::FromStr;
 
-use malachite_base::num::traits::{
-    One, SaturatingSub, SaturatingSubMul, SaturatingSubMulAssign, Zero,
+use malachite_base::num::arithmetic::traits::{
+    SaturatingSub, SaturatingSubMul, SaturatingSubMulAssign,
 };
+use malachite_base::num::basic::traits::{One, Zero};
 use malachite_nz::natural::Natural;
 
 use common::test_properties;

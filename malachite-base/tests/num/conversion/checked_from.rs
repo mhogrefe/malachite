@@ -1,7 +1,7 @@
 use std::fmt::Debug;
 
 use malachite_base::comparison::{Max, Min};
-use malachite_base::conversion::CheckedFrom;
+use malachite_base::num::conversion::traits::CheckedFrom;
 
 #[test]
 pub fn test_checked_from() {

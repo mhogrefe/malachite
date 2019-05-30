@@ -1,6 +1,7 @@
 use std::str::FromStr;
 
-use malachite_base::num::traits::{CheckedSub, CheckedSubMul, One, Zero};
+use malachite_base::num::arithmetic::traits::{CheckedSub, CheckedSubMul};
+use malachite_base::num::basic::traits::{One, Zero};
 use malachite_nz::natural::Natural;
 
 use common::test_properties;

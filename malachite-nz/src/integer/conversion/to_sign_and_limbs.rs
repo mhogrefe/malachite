@@ -1,6 +1,6 @@
 use std::cmp::Ordering;
 
-use malachite_base::num::traits::Sign;
+use malachite_base::num::arithmetic::traits::Sign;
 
 use integer::Integer;
 use platform::Limb;
@@ -28,7 +28,7 @@ impl Integer {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::Zero;
+    /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::integer::Integer;
     /// use std::cmp::Ordering;
     ///
@@ -69,7 +69,7 @@ impl Integer {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::Zero;
+    /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::integer::Integer;
     /// use std::cmp::Ordering;
     ///
@@ -110,7 +110,7 @@ impl Integer {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::Zero;
+    /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::integer::Integer;
     /// use std::cmp::Ordering;
     ///
@@ -152,7 +152,7 @@ impl Integer {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::Zero;
+    /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::integer::Integer;
     /// use std::cmp::Ordering;
     ///

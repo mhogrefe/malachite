@@ -1,6 +1,6 @@
-use malachite_base::conversion::CheckedFrom;
 use malachite_base::named::Named;
-use malachite_base::num::traits::{ShrRound, ShrRoundAssign, UnsignedAbs};
+use malachite_base::num::arithmetic::traits::{ShrRound, ShrRoundAssign, UnsignedAbs};
+use malachite_base::num::conversion::traits::CheckedFrom;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::natural::{

@@ -1,9 +1,10 @@
 use std::cmp::{max, min, Ordering};
 
 use malachite_base::comparison::Max;
-use malachite_base::conversion::CheckedFrom;
-use malachite_base::num::integers::PrimitiveInteger;
-use malachite_base::num::traits::{JoinHalves, SplitInHalf, WrappingAddAssign, WrappingSubAssign};
+use malachite_base::num::arithmetic::traits::{WrappingAddAssign, WrappingSubAssign};
+use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::conversion::traits::{JoinHalves, SplitInHalf};
 
 use natural::arithmetic::add::limbs_slice_add_same_length_in_place_left;
 use natural::arithmetic::mul::mul_mod::{

@@ -1,5 +1,5 @@
-use malachite_base::conversion::CheckedFrom;
-use malachite_base::num::traits::{Assign, SignificantBits};
+use malachite_base::num::conversion::traits::{Assign, CheckedFrom};
+use malachite_base::num::logic::traits::SignificantBits;
 use num::BigInt;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};

@@ -2,8 +2,9 @@ use std::str::FromStr;
 
 #[cfg(feature = "32_bit_limbs")]
 use malachite_base::comparison::Max;
-use malachite_base::conversion::CheckedFrom;
-use malachite_base::num::traits::{BitAccess, BitScan, Zero};
+use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::logic::traits::{BitAccess, BitScan};
 use malachite_nz::natural::logic::bit_scan::limbs_index_of_next_false_bit;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;

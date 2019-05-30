@@ -1,8 +1,10 @@
 use std::iter::repeat;
 
 use malachite_base::comparison::Max;
-use malachite_base::conversion::CheckedFrom;
-use malachite_base::num::traits::{CheckedHammingDistance, HammingDistance, SignificantBits};
+use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::logic::traits::{
+    CheckedHammingDistance, HammingDistance, SignificantBits,
+};
 use malachite_nz::integer::logic::checked_hamming_distance_signed_limb::*;
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::{Limb, SignedLimb};

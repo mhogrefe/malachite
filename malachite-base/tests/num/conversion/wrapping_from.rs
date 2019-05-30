@@ -1,7 +1,7 @@
 use std::fmt::Debug;
 
 use malachite_base::comparison::{Max, Min};
-use malachite_base::conversion::WrappingFrom;
+use malachite_base::num::conversion::traits::WrappingFrom;
 
 #[test]
 pub fn test_wrapping_from() {

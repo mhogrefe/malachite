@@ -1,6 +1,7 @@
 use std::str::FromStr;
 
-use malachite_base::num::traits::{CheckedSubMul, One, SubMul, SubMulAssign, Zero};
+use malachite_base::num::arithmetic::traits::{CheckedSubMul, SubMul, SubMulAssign};
+use malachite_base::num::basic::traits::{One, Zero};
 use malachite_nz::natural::arithmetic::sub_mul_limb::{
     limbs_sub_mul_limb_greater, limbs_sub_mul_limb_greater_in_place_left,
     limbs_sub_mul_limb_greater_in_place_right, limbs_sub_mul_limb_same_length_in_place_left,

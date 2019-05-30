@@ -1,6 +1,7 @@
 use std::ops::{Mul, MulAssign};
 
-use malachite_base::num::traits::{Assign, Zero};
+use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::conversion::traits::Assign;
 
 use integer::Integer;
 use platform::Limb;
@@ -21,7 +22,7 @@ impl Mul<Limb> for Integer {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::Zero;
+    /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {
@@ -64,7 +65,7 @@ impl<'a> Mul<Limb> for &'a Integer {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::Zero;
+    /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {
@@ -112,7 +113,7 @@ impl Mul<Integer> for Limb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::Zero;
+    /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {
@@ -155,7 +156,7 @@ impl<'a> Mul<&'a Integer> for Limb {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::Zero;
+    /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {
@@ -195,7 +196,7 @@ impl MulAssign<Limb> for Integer {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::traits::NegativeOne;
+    /// use malachite_base::num::basic::traits::NegativeOne;
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {

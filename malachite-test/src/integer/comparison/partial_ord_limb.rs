@@ -1,7 +1,7 @@
 use std::cmp::Ordering;
 
-use malachite_base::conversion::CheckedFrom;
-use malachite_base::num::traits::SignificantBits;
+use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::platform::Limb;
 use num::BigInt;
 

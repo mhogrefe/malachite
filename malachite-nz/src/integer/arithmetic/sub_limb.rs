@@ -1,7 +1,7 @@
 use std::ops::{Sub, SubAssign};
 
-use malachite_base::conversion::CheckedFrom;
-use malachite_base::num::traits::{Assign, NegAssign};
+use malachite_base::num::arithmetic::traits::NegAssign;
+use malachite_base::num::conversion::traits::{Assign, CheckedFrom};
 
 use integer::Integer;
 use natural::Natural;

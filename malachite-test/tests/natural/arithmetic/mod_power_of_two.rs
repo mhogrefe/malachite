@@ -1,10 +1,11 @@
 use std::cmp::min;
 use std::str::FromStr;
 
-use malachite_base::num::traits::{
+use malachite_base::num::arithmetic::traits::{
     DivisibleByPowerOfTwo, ModPowerOfTwo, ModPowerOfTwoAssign, NegModPowerOfTwo,
-    NegModPowerOfTwoAssign, One, RemPowerOfTwo, RemPowerOfTwoAssign, ShrRound, Zero,
+    NegModPowerOfTwoAssign, RemPowerOfTwo, RemPowerOfTwoAssign, ShrRound,
 };
+use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::round::RoundingMode;
 use malachite_nz::natural::arithmetic::mod_power_of_two::{
     limbs_mod_power_of_two, limbs_mod_power_of_two_in_place, limbs_neg_mod_power_of_two,
