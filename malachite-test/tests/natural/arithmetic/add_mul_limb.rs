@@ -3,7 +3,7 @@ use std::str::FromStr;
 use malachite_base::num::arithmetic::traits::{AddMul, AddMulAssign};
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_nz::natural::arithmetic::add_mul_limb::{
-    limbs_add_mul_limb, limbs_slice_add_mul_limb_greater_in_place_left,
+    limbs_add_mul_limb, limbs_slice_add_mul_limb_same_length_in_place_left,
     limbs_slice_add_mul_limb_same_length_in_place_right, limbs_vec_add_mul_limb_in_place_either,
     limbs_vec_add_mul_limb_in_place_left, limbs_vec_add_mul_limb_in_place_right,
 };
@@ -13,7 +13,6 @@ use malachite_nz::platform::Limb;
 use common::test_properties;
 use malachite_test::inputs::base::{
     triples_of_unsigned_vec_unsigned_vec_and_positive_unsigned_var_3,
-    triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_1,
     triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_7,
 };
 use malachite_test::inputs::natural::{
@@ -40,17 +39,17 @@ fn test_limbs_add_mul_limb() {
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-fn test_limbs_slice_add_mul_limb_greater_in_place_left() {
+fn test_limbs_slice_add_mul_limb_same_length_in_place_left() {
     let test = |xs_before: &[Limb], ys: &[Limb], limb: Limb, xs_after: &[Limb], carry: Limb| {
         let mut xs = xs_before.to_vec();
         assert_eq!(
-            limbs_slice_add_mul_limb_greater_in_place_left(&mut xs, ys, limb),
+            limbs_slice_add_mul_limb_same_length_in_place_left(&mut xs, ys, limb),
             carry
         );
         assert_eq!(xs, xs_after);
     };
-    test(&[123, 456], &[123], 4, &[615, 456], 0);
-    test(&[123, 456], &[123], 0xffff_ffff, &[0, 456], 123);
+    test(&[123], &[123], 4, &[615], 0);
+    test(&[123], &[123], 0xffff_ffff, &[0], 123);
     test(&[123, 0], &[0, 123], 4, &[123, 492], 0);
     test(&[123, 456], &[0, 123], 0xffff_ffff, &[123, 333], 123);
 }
@@ -58,8 +57,8 @@ fn test_limbs_slice_add_mul_limb_greater_in_place_left() {
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
-fn limbs_slice_add_mul_limb_greater_in_place_left_fail() {
-    limbs_slice_add_mul_limb_greater_in_place_left(&mut [10], &[10, 10], 10);
+fn limbs_slice_add_mul_limb_same_length_in_place_left_fail() {
+    limbs_slice_add_mul_limb_same_length_in_place_left(&mut [10], &[10, 10], 10);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -197,13 +196,13 @@ fn limbs_add_mul_limb_properties() {
 }
 
 #[test]
-fn limbs_slice_add_mul_limb_greater_in_place_left_properties() {
+fn limbs_slice_add_mul_limb_same_length_in_place_left_properties() {
     test_properties(
-        triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_1,
+        triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_7,
         |&(ref a, ref b, c)| {
             let a_old = a;
             let mut a = a_old.to_vec();
-            let carry = limbs_slice_add_mul_limb_greater_in_place_left(&mut a, b, c);
+            let carry = limbs_slice_add_mul_limb_same_length_in_place_left(&mut a, b, c);
             let len = b.len();
             let mut result = a[..len].to_vec();
             result.push(carry);

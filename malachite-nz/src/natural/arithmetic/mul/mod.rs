@@ -4,7 +4,7 @@ use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::conversion::traits::WrappingFrom;
 
 use natural::arithmetic::add::limbs_slice_add_greater_in_place_left;
-use natural::arithmetic::add_mul_limb::limbs_slice_add_mul_limb_greater_in_place_left;
+use natural::arithmetic::add_mul_limb::limbs_slice_add_mul_limb_same_length_in_place_left;
 use natural::arithmetic::mul::fft::{_limbs_mul_greater_to_out_fft, MUL_FFT_THRESHOLD};
 use natural::arithmetic::mul::toom::{
     _limbs_mul_greater_to_out_toom_22, _limbs_mul_greater_to_out_toom_22_scratch_size,
@@ -425,7 +425,8 @@ pub fn _limbs_mul_greater_to_out_basecase(out: &mut [Limb], xs: &[Limb], ys: &[L
     // Now accumulate the product of xs and the next higher limb from ys.
     for i in 1..ys_len {
         let out = &mut out[i..];
-        out[xs_len] = limbs_slice_add_mul_limb_greater_in_place_left(out, xs, ys[i]);
+        out[xs_len] =
+            limbs_slice_add_mul_limb_same_length_in_place_left(&mut out[..xs_len], xs, ys[i]);
     }
 }
 

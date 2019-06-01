@@ -1,8 +1,8 @@
-use malachite_base::num::arithmetic::traits::{AddMul, AddMulAssign, SubMul, SubMulAssign};
+use malachite_base::num::arithmetic::traits::{
+    AddMul, AddMulAssign, NegAssign, SubMul, SubMulAssign,
+};
 
-use integer::arithmetic::add_mul_limb::{large_aorsmul_ref, large_aorsmul_val};
 use integer::Integer;
-use natural::Natural::Small;
 use platform::Limb;
 
 /// Subs the product of an `Integer` (b) and a `Limb` (c) to an `Integer` (self), taking `self` and
@@ -162,33 +162,17 @@ impl<'a, 'b> SubMul<&'a Integer, Limb> for &'b Integer {
     type Output = Integer;
 
     fn sub_mul(self, b: &'a Integer, c: Limb) -> Integer {
-        if c == 0 {
-            self.clone()
-        } else if self.sign != b.sign {
+        if self.sign != b.sign {
             Integer {
                 sign: self.sign,
                 abs: (&self.abs).add_mul(&b.abs, c),
             }
         } else {
-            if let Small(a) = self.abs {
-                if a == 0 {
-                    return Integer {
-                        sign: b.abs == 0 as Limb,
-                        abs: &b.abs * c,
-                    };
-                } else if let Small(small_b) = b.abs {
-                    if small_b == 0 {
-                        return self.clone();
-                    } else if let Some(product) = small_b.checked_mul(c) {
-                        return if b.sign {
-                            self - product
-                        } else {
-                            self + product
-                        };
-                    }
-                }
+            let (abs, abs_result_sign) = self.abs.add_mul_neg(&b.abs, c);
+            Integer {
+                sign: self.sign == abs_result_sign || abs == 0 as Limb,
+                abs,
             }
-            large_aorsmul_ref(self.sign, &self.abs, b.sign, &b.abs, c, false)
         }
     }
 }
@@ -232,30 +216,7 @@ impl<'a, 'b> SubMul<&'a Integer, u32> for &'b Integer {
 /// ```
 impl SubMulAssign<Integer, Limb> for Integer {
     fn sub_mul_assign(&mut self, b: Integer, c: Limb) {
-        if c == 0 {
-        } else if self.sign != b.sign {
-            self.abs.add_mul_assign(b.abs, c);
-        } else {
-            if let Small(a) = self.abs {
-                if a == 0 {
-                    self.sign = b.abs == 0 as Limb;
-                    self.abs = b.abs * c;
-                    return;
-                } else if let Small(small_b) = b.abs {
-                    if small_b == 0 {
-                        return;
-                    } else if let Some(product) = small_b.checked_mul(c) {
-                        if b.sign {
-                            *self -= product;
-                        } else {
-                            *self += product;
-                        }
-                        return;
-                    }
-                }
-            }
-            large_aorsmul_val(&mut self.sign, &mut self.abs, b.sign, &b.abs, c, false);
-        }
+        self.add_mul_assign(-b, c)
     }
 }
 
@@ -296,29 +257,9 @@ impl SubMulAssign<Integer, u32> for Integer {
 /// ```
 impl<'a> SubMulAssign<&'a Integer, Limb> for Integer {
     fn sub_mul_assign(&mut self, b: &'a Integer, c: Limb) {
-        if c == 0 {
-        } else if self.sign != b.sign {
-            self.abs.add_mul_assign(&b.abs, c);
-        } else {
-            if let Small(a) = self.abs {
-                if a == 0 {
-                    self.abs = &b.abs * c;
-                    self.sign = b.abs == 0 as Limb;
-                    return;
-                } else if let Small(small_b) = b.abs {
-                    if small_b == 0 {
-                    } else if let Some(product) = small_b.checked_mul(c) {
-                        if b.sign {
-                            *self -= product;
-                        } else {
-                            *self += product;
-                        }
-                        return;
-                    }
-                }
-            }
-            large_aorsmul_val(&mut self.sign, &mut self.abs, b.sign, &b.abs, c, false);
-        }
+        self.neg_assign();
+        self.add_mul_assign(b, c);
+        self.neg_assign();
     }
 }
 

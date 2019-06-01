@@ -4,7 +4,7 @@ use malachite_base::num::arithmetic::traits::{AddMul, AddMulAssign};
 use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::natural::arithmetic::add_mul_limb::{
-    limbs_add_mul_limb, limbs_slice_add_mul_limb_greater_in_place_left,
+    limbs_add_mul_limb, limbs_slice_add_mul_limb_same_length_in_place_left,
     limbs_slice_add_mul_limb_same_length_in_place_right, limbs_vec_add_mul_limb_in_place_either,
     limbs_vec_add_mul_limb_in_place_left, limbs_vec_add_mul_limb_in_place_right,
 };
@@ -13,7 +13,6 @@ use malachite_nz::platform::Limb;
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::{
     triples_of_unsigned_vec_unsigned_vec_and_positive_unsigned_var_3,
-    triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_1,
     triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_7,
 };
 use inputs::natural::triples_of_natural_natural_and_unsigned;
@@ -22,7 +21,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limbs_add_mul_limb);
     register_demo!(
         registry,
-        demo_limbs_slice_add_mul_limb_greater_in_place_left
+        demo_limbs_slice_add_mul_limb_same_length_in_place_left
     );
     register_demo!(
         registry,
@@ -41,7 +40,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_bench!(
         registry,
         Small,
-        benchmark_limbs_slice_add_mul_limb_greater_in_place_left
+        benchmark_limbs_slice_add_mul_limb_same_length_in_place_left
     );
     register_bench!(
         registry,
@@ -115,12 +114,12 @@ fn demo_limbs_add_mul_limb(gm: GenerationMode, limit: usize) {
     }
 }
 
-fn demo_limbs_slice_add_mul_limb_greater_in_place_left(gm: GenerationMode, limit: usize) {
-    for (mut a, b, c) in triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_1(gm).take(limit) {
+fn demo_limbs_slice_add_mul_limb_same_length_in_place_left(gm: GenerationMode, limit: usize) {
+    for (mut a, b, c) in triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_7(gm).take(limit) {
         let a_old = a.clone();
-        let carry = limbs_slice_add_mul_limb_greater_in_place_left(&mut a, &b, c);
+        let carry = limbs_slice_add_mul_limb_same_length_in_place_left(&mut a, &b, c);
         println!(
-            "a := {:?}; limbs_slice_add_mul_limb_greater_in_place_left(&mut a, {:?}, {}) = {}; \
+            "a := {:?}; limbs_slice_add_mul_limb_same_length_in_place_left(&mut a, {:?}, {}) = {}; \
              a = {:?}",
             a_old, b, c, carry, a,
         );
@@ -259,15 +258,15 @@ fn benchmark_limbs_add_mul_limb(gm: GenerationMode, limit: usize, file_name: &st
     );
 }
 
-fn benchmark_limbs_slice_add_mul_limb_greater_in_place_left(
+fn benchmark_limbs_slice_add_mul_limb_same_length_in_place_left(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,
 ) {
     m_run_benchmark(
-        "limbs_slice_add_mul_limb_greater_in_place_left(&mut [Limb], &[Limb], Limb)",
+        "limbs_slice_add_mul_limb_same_length_in_place_left(&mut [Limb], &[Limb], Limb)",
         BenchmarkType::Single,
-        triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_1(gm),
+        triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_7(gm),
         gm.name(),
         limit,
         file_name,
@@ -276,7 +275,7 @@ fn benchmark_limbs_slice_add_mul_limb_greater_in_place_left(
         &mut [(
             "malachite",
             &mut (|(mut a, b, c)| {
-                no_out!(limbs_slice_add_mul_limb_greater_in_place_left(
+                no_out!(limbs_slice_add_mul_limb_same_length_in_place_left(
                     &mut a, &b, c
                 ))
             }),

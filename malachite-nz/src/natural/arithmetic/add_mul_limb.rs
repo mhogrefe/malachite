@@ -40,52 +40,51 @@ pub fn limbs_add_mul_limb(xs: &[Limb], ys: &[Limb], limb: Limb) -> Vec<Limb> {
     result
 }
 
-/// Given the limbs of two `Natural`s a and b, and a limb c, computes a + b * c. The lowest
-/// `ys.len()` limbs of the result are written to `xs`, and the highest limb of b * c, plus the
-/// carry-out from the addition, is returned. `xs` must be at least as long as `ys`.
+/// Given the equal-length limbs of two `Natural`s a and b, and a limb c, computes a + b * c. The
+/// lowest `xs.len()` limbs of the result are written to `xs`, and the highest limb of b * c, plus
+/// the carry-out from the addition, is returned.
 ///
 /// Time: worst case O(n)
 ///
 /// Additional memory: worst case O(1)
 ///
-/// where n = `ys.len()`
+/// where n = `xs.len()`
 ///
 /// # Panics
-/// Panics if `xs` is shorter than `ys`.
+/// Panics if `xs` and `ys` have different lengths.
 ///
 /// # Example
 /// ```
 /// use malachite_nz::natural::arithmetic::add_mul_limb::*;
 ///
-/// let xs = &mut [123, 456];
-/// assert_eq!(limbs_slice_add_mul_limb_greater_in_place_left(xs, &[123], 4), 0);
-/// assert_eq!(xs, &[615, 456]);
+/// let xs = &mut [123];
+/// assert_eq!(limbs_slice_add_mul_limb_same_length_in_place_left(xs, &[123], 4), 0);
+/// assert_eq!(xs, &[615]);
 ///
-/// let xs = &mut [123, 456];
-/// assert_eq!(limbs_slice_add_mul_limb_greater_in_place_left(xs, &[123], 0xffff_ffff), 123);
-/// assert_eq!(xs, &[0, 456]);
+/// let xs = &mut [123];
+/// assert_eq!(limbs_slice_add_mul_limb_same_length_in_place_left(xs, &[123], 0xffff_ffff), 123);
+/// assert_eq!(xs, &[0]);
 ///
 /// let xs = &mut [123, 0];
-/// assert_eq!(limbs_slice_add_mul_limb_greater_in_place_left(xs, &[0, 123], 4), 0);
+/// assert_eq!(limbs_slice_add_mul_limb_same_length_in_place_left(xs, &[0, 123], 4), 0);
 /// assert_eq!(xs, &[123, 492]);
 ///
 /// let xs = &mut [123, 456];
-/// assert_eq!(limbs_slice_add_mul_limb_greater_in_place_left(xs, &[0, 123], 0xffff_ffff), 123);
+/// assert_eq!(limbs_slice_add_mul_limb_same_length_in_place_left(xs, &[0, 123], 0xffff_ffff), 123);
 /// assert_eq!(xs, &[123, 333]);
 /// ```
 ///
-/// This is mpn_addmul_1 from mpn/generic/addmul_1.c, but where the first input may be longer than
-/// the second.
-pub fn limbs_slice_add_mul_limb_greater_in_place_left(
+/// This is mpn_addmul_1 from mpn/generic/addmul_1.c.
+pub fn limbs_slice_add_mul_limb_same_length_in_place_left(
     xs: &mut [Limb],
     ys: &[Limb],
     limb: Limb,
 ) -> Limb {
-    let ys_len = ys.len();
-    assert!(xs.len() >= ys_len);
+    let len = xs.len();
+    assert_eq!(ys.len(), len);
     let mut carry = 0;
     let limb_double = DoubleLimb::from(limb);
-    for i in 0..ys_len {
+    for i in 0..len {
         let limb_result = DoubleLimb::from(xs[i]) + DoubleLimb::from(ys[i]) * limb_double + carry;
         xs[i] = limb_result.lower_half();
         carry = limb_result >> Limb::WIDTH;
@@ -184,7 +183,8 @@ pub fn limbs_vec_add_mul_limb_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb], lim
         {
             let (xs_lo, xs_hi) = xs.split_at_mut(xs_len);
             carry = limbs_mul_limb_to_out(xs_hi, ys_hi, limb);
-            let inner_carry = limbs_slice_add_mul_limb_greater_in_place_left(xs_lo, ys_lo, limb);
+            let inner_carry =
+                limbs_slice_add_mul_limb_same_length_in_place_left(xs_lo, ys_lo, limb);
             if inner_carry != 0 && limbs_slice_add_limb_in_place(xs_hi, inner_carry) {
                 carry += 1;
             }
@@ -197,8 +197,8 @@ pub fn limbs_vec_add_mul_limb_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb], lim
 
 // ys.len() > 0, xs.len() >= ys.len(), limb != 0
 fn limbs_vec_add_mul_limb_greater_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb], limb: Limb) {
-    let carry = limbs_slice_add_mul_limb_greater_in_place_left(xs, ys, limb);
     let ys_len = ys.len();
+    let carry = limbs_slice_add_mul_limb_same_length_in_place_left(&mut xs[..ys_len], ys, limb);
     if carry != 0 {
         if xs.len() == ys_len {
             xs.push(carry);

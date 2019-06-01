@@ -3,20 +3,116 @@ use std::cmp::{max, min};
 use malachite_base::comparison::Max;
 use malachite_base::limbs::limbs_test_zero;
 use malachite_base::num::arithmetic::traits::{
-    AddMul, AddMulAssign, NegAssign, WrappingAddAssign, WrappingSubAssign,
+    AddMul, AddMulAssign, WrappingAddAssign, WrappingSubAssign,
 };
-use malachite_base::num::conversion::traits::WrappingFrom;
 use malachite_base::num::logic::traits::NotAssign;
 
 use integer::Integer;
 use natural::arithmetic::add_limb::limbs_slice_add_limb_in_place;
-use natural::arithmetic::add_mul_limb::limbs_slice_add_mul_limb_greater_in_place_left;
-use natural::arithmetic::mul_limb::{limbs_mul_limb_to_out, limbs_mul_limb_with_carry_to_out};
+use natural::arithmetic::mul_limb::limbs_mul_limb_with_carry_to_out;
 use natural::arithmetic::sub_limb::limbs_sub_limb_in_place;
 use natural::arithmetic::sub_mul_limb::limbs_sub_mul_limb_same_length_in_place_left;
 use natural::logic::not::limbs_not_in_place;
-use natural::Natural::{self, Large, Small};
+use natural::Natural::{self, Large};
 use platform::Limb;
+
+pub fn limbs_overflowing_sub_mul_limb(xs: &[Limb], ys: &[Limb], limb: Limb) -> (Vec<Limb>, bool) {
+    let mut xs = xs.to_vec();
+    let sign = limbs_overflowing_sub_mul_limb_in_place_left(&mut xs, ys, limb);
+    (xs, sign)
+}
+
+// limb != 0, xs_len != 0, ys_len != 0
+pub fn limbs_overflowing_sub_mul_limb_in_place_left(
+    xs: &mut Vec<Limb>,
+    ys: &[Limb],
+    limb: Limb,
+) -> bool {
+    let mut sign = true;
+    // xs unaffected if ys == 0 or limb == 0
+    let ys_len = ys.len();
+    let xs_len = xs.len();
+    let mut new_xs_len = max(xs_len, ys_len);
+    xs.resize(new_xs_len + 1, 0);
+    let min_len = min(xs_len, ys_len);
+    // submul of absolute values
+    let mut cy =
+        limbs_sub_mul_limb_same_length_in_place_left(&mut xs[..min_len], &ys[..min_len], limb);
+    if xs_len >= ys_len {
+        // if xs bigger than ys, then propagate borrow through it
+        if xs_len != ys_len {
+            cy = if limbs_sub_limb_in_place(&mut xs[ys_len..xs_len], cy) {
+                1
+            } else {
+                0
+            };
+        }
+
+        if cy != 0 {
+            // Borrow out of xs, take twos complement negative to get absolute value, flip sign
+            // of xs.
+            xs[new_xs_len] = cy.wrapping_sub(1);
+            limbs_not_in_place(&mut xs[..new_xs_len]);
+            new_xs_len += 1;
+            limbs_slice_add_limb_in_place(&mut xs[..new_xs_len], 1);
+            if new_xs_len != 0 {
+                sign.not_assign();
+            }
+        }
+    } else {
+        // xs_len < ys_len
+
+        // ys bigger than xs, so want ys * limb - xs. Submul has given xs-ys*limb, so take twos
+        // complement and use an mpn_mul_1 for the rest.
+
+        // -(-cy*b^n + xs-ys*limb) = (cy-1)*b^n + ~(xs-ys*limb) + 1
+        limbs_not_in_place(&mut xs[..xs_len]);
+        if !limbs_slice_add_limb_in_place(&mut xs[..xs_len], 1) {
+            cy.wrapping_sub_assign(1);
+        }
+
+        // If cy - 1 == -1 then hold that -1 for latter. mpn_submul_1 never returns
+        // cy == MP_LIMB_T_MAX so that value always indicates a -1.
+        let cy2 = if cy == Limb::MAX { 1 } else { 0 };
+        cy.wrapping_add_assign(cy2);
+        cy = limbs_mul_limb_with_carry_to_out(
+            &mut xs[xs_len..ys_len],
+            &ys[xs_len..ys_len],
+            limb,
+            cy,
+        );
+        xs[new_xs_len] = cy;
+        if cy != 0 {
+            new_xs_len += 1;
+        }
+
+        // Apply any -1 from above. The value at wp+xs_len is non-zero because limb != 0 and the
+        // high limb of ys will be non-zero.
+        if cy2 != 0 {
+            limbs_sub_limb_in_place(&mut xs[xs_len..new_xs_len], 1);
+        }
+        if new_xs_len != 0 {
+            sign.not_assign();
+        }
+    }
+    xs.resize(new_xs_len, 0);
+    if limbs_test_zero(xs) {
+        sign = true;
+    }
+    sign
+}
+
+pub fn limbs_overflowing_sub_mul_limb_in_place_either(
+    xs: &mut Vec<Limb>,
+    ys: &mut [Limb],
+    limb: Limb,
+) -> (bool, bool) {
+    //TODO
+    (
+        false,
+        limbs_overflowing_sub_mul_limb_in_place_left(xs, ys, limb),
+    )
+}
 
 /// Adds the product of an `Integer` (b) and a `Limb` (c) to an `Integer` (self), taking `self` and
 /// b by value.
@@ -173,33 +269,17 @@ impl<'a, 'b> AddMul<&'a Integer, Limb> for &'b Integer {
     type Output = Integer;
 
     fn add_mul(self, b: &'a Integer, c: Limb) -> Integer {
-        if c == 0 {
-            self.clone()
-        } else if self.sign == b.sign {
+        if self.sign == b.sign {
             Integer {
                 sign: self.sign,
                 abs: (&self.abs).add_mul(&b.abs, c),
             }
         } else {
-            if let Small(a) = self.abs {
-                if a == 0 {
-                    return Integer {
-                        sign: false,
-                        abs: &b.abs * c,
-                    };
-                } else if let Small(small_b) = b.abs {
-                    if small_b == 0 {
-                        return self.clone();
-                    } else if let Some(product) = small_b.checked_mul(c) {
-                        return if b.sign {
-                            self + product
-                        } else {
-                            self - product
-                        };
-                    }
-                }
+            let (abs, abs_result_sign) = self.abs.add_mul_neg(&b.abs, c);
+            Integer {
+                sign: self.sign == abs_result_sign || abs == 0 as Limb,
+                abs,
             }
-            large_aorsmul_ref(self.sign, &self.abs, b.sign, &b.abs, c, true)
         }
     }
 }
@@ -243,29 +323,15 @@ impl<'a, 'b> AddMul<&'a Integer, u32> for &'b Integer {
 /// ```
 impl AddMulAssign<Integer, Limb> for Integer {
     fn add_mul_assign(&mut self, b: Integer, c: Limb) {
-        if c == 0 {
-        } else if self.sign == b.sign {
+        if self.sign == b.sign {
             self.abs.add_mul_assign(b.abs, c);
         } else {
-            if let Small(a) = self.abs {
-                if a == 0 {
-                    self.abs = b.abs * c;
-                    self.sign = false;
-                    return;
-                } else if let Small(small_b) = b.abs {
-                    if small_b == 0 {
-                        return;
-                    } else if let Some(product) = small_b.checked_mul(c) {
-                        if b.sign {
-                            *self += product;
-                        } else {
-                            *self -= product;
-                        }
-                        return;
-                    }
-                }
+            if !self.abs.add_mul_assign_neg(b.abs, c) {
+                self.sign.not_assign();
             }
-            large_aorsmul_val(&mut self.sign, &mut self.abs, b.sign, &b.abs, c, true);
+            if self.abs == 0 as Limb {
+                self.sign = true;
+            }
         }
     }
 }
@@ -307,29 +373,15 @@ impl AddMulAssign<Integer, u32> for Integer {
 /// ```
 impl<'a> AddMulAssign<&'a Integer, Limb> for Integer {
     fn add_mul_assign(&mut self, b: &'a Integer, c: Limb) {
-        if c == 0 {
-        } else if self.sign == b.sign {
+        if self.sign == b.sign {
             self.abs.add_mul_assign(&b.abs, c);
         } else {
-            if let Small(a) = self.abs {
-                if a == 0 {
-                    self.abs = &b.abs * c;
-                    self.sign = false;
-                    return;
-                } else if let Small(small_b) = b.abs {
-                    if small_b == 0 {
-                        return;
-                    } else if let Some(product) = small_b.checked_mul(c) {
-                        if b.sign {
-                            *self += product;
-                        } else {
-                            *self -= product;
-                        }
-                        return;
-                    }
-                }
+            if !self.abs.add_mul_assign_neg_ref(&b.abs, c) {
+                self.sign.not_assign();
             }
-            large_aorsmul_val(&mut self.sign, &mut self.abs, b.sign, &b.abs, c, true);
+            if self.abs == 0 as Limb {
+                self.sign = true;
+            }
         }
     }
 }
@@ -342,173 +394,112 @@ impl<'a> AddMulAssign<&'a Integer, u32> for Integer {
     }
 }
 
-pub(crate) fn large_aorsmul_val(
-    a_sign: &mut bool,
-    a_abs: &mut Natural,
-    b_sign: bool,
-    b_abs: &Natural,
-    c: Limb,
-    add: bool,
-) {
-    {
-        let mut a_limbs = a_abs.promote_in_place();
-        match *b_abs {
-            Small(small_b) => mpz_aorsmul_1(a_sign, &mut a_limbs, b_sign, &[small_b], c, add),
-            Large(ref b_limbs) => mpz_aorsmul_1(a_sign, &mut a_limbs, b_sign, b_limbs, c, add),
+impl Natural {
+    // self - b * c, returns sign (true means non-negative)
+    pub(crate) fn add_mul_neg(&self, b: &Natural, c: Limb) -> (Natural, bool) {
+        if c == 0 || *b == 0 as Limb {
+            return (self.clone(), true);
         }
-    }
-    a_abs.trim();
-}
-
-pub(crate) fn large_aorsmul_ref(
-    a_sign: bool,
-    a_abs: &Natural,
-    b_sign: bool,
-    b_abs: &Natural,
-    c: Limb,
-    add: bool,
-) -> Integer {
-    let mut result_sign = a_sign;
-    let mut result_limbs = a_abs.to_limbs_asc();
-    match *b_abs {
-        Small(small_b) => mpz_aorsmul_1(
-            &mut result_sign,
-            &mut result_limbs,
-            b_sign,
-            &[small_b],
-            c,
-            add,
-        ),
-        Large(ref b_limbs) => {
-            mpz_aorsmul_1(&mut result_sign, &mut result_limbs, b_sign, b_limbs, c, add)
-        }
-    }
-    let mut result_abs = Natural::Large(result_limbs);
-    result_abs.trim();
-    Integer {
-        sign: result_sign,
-        abs: result_abs,
-    }
-}
-
-pub(crate) fn mpz_aorsmul_1(
-    w_sign: &mut bool,
-    w: &mut Vec<Limb>,
-    x_sign: bool,
-    x: &[Limb],
-    y: Limb,
-    mut sub: bool,
-) {
-    // w unaffected if x == 0 or y == 0
-    let mut xsize = x.len();
-    if xsize == 0 || y == 0 {
-        return;
-    }
-    sub ^= !x_sign;
-    let wsize = w.len();
-    if wsize == 0 {
-        // nothing to add to, just set x * y, `sub` gives the sign
-        w.resize(xsize + 1, 0);
-        let cy = limbs_mul_limb_to_out(w, &x[..xsize], y);
-        w[xsize] = cy;
-        if cy != 0 {
-            xsize += 1;
-        }
-        w.resize(xsize, 0);
-        *w_sign = sub;
-        return;
-    }
-    sub ^= !*w_sign;
-    let mut new_wsize = max(wsize, xsize);
-    w.resize(new_wsize + 1, 0);
-    let min_size = min(wsize, xsize);
-
-    if sub {
-        // addmul of absolute values
-        let mut cy = limbs_slice_add_mul_limb_greater_in_place_left(w, &x[..min_size], y);
-        let mut dsize = isize::wrapping_from(xsize) - isize::wrapping_from(wsize);
-        if dsize != 0 {
-            let cy2 = if dsize > 0 {
-                limbs_mul_limb_to_out(
-                    &mut w[min_size..],
-                    &x[min_size..min_size + usize::wrapping_from(dsize)],
-                    y,
-                )
+        if c == 1 {
+            return if self >= b {
+                (self - b, true)
             } else {
-                dsize.neg_assign();
-                0
+                (b - self, false)
             };
-            cy = cy2
-                + if limbs_slice_add_limb_in_place(
-                    &mut w[min_size..min_size + usize::wrapping_from(dsize)],
-                    cy,
-                ) {
-                    1
-                } else {
-                    0
-                };
         }
-        let dsize = usize::wrapping_from(dsize);
-        w[min_size + dsize] = cy;
-    } else {
-        // submul of absolute values
-        let mut cy =
-            limbs_sub_mul_limb_same_length_in_place_left(&mut w[..min_size], &x[..min_size], y);
-        if wsize >= xsize {
-            // if w bigger than x, then propagate borrow through it
-            if wsize != xsize {
-                cy = if limbs_sub_limb_in_place(&mut w[xsize..wsize], cy) {
-                    1
+        match (self, b) {
+            (Large(ref a_limbs), Large(ref b_limbs)) => {
+                let (limbs, sign) = limbs_overflowing_sub_mul_limb(a_limbs, b_limbs, c);
+                let mut result = Large(limbs);
+                result.trim();
+                (result, sign)
+            }
+            _ => {
+                let bc = b * c;
+                let sign = *self >= bc;
+                return if sign {
+                    (self - bc, true)
                 } else {
-                    0
+                    (bc - self, false)
                 };
             }
+        }
+    }
 
-            if cy != 0 {
-                // Borrow out of w, take twos complement negative to get absolute value, flip sign
-                // of w.
-                w[new_wsize] = !(!cy).wrapping_add(1); // extra limb is 0 - cy
-                limbs_not_in_place(&mut w[..new_wsize]);
-                new_wsize += 1;
-                limbs_slice_add_limb_in_place(&mut w[..new_wsize], 1);
-                if new_wsize != 0 {
-                    w_sign.not_assign();
-                }
+    // self -= b * c, returns sign (true means non-negative)
+    fn add_mul_assign_neg(&mut self, mut b: Natural, c: Limb) -> bool {
+        if c == 0 || b == 0 as Limb {
+            return true;
+        }
+        if c == 1 {
+            let sign = *self >= b;
+            if sign {
+                *self -= b;
+            } else {
+                //TODO right assign
+                self.sub_right_assign_no_panic(&b);
+            }
+            return sign;
+        }
+        let (fallback, (right, mut sign)) = match (&mut *self, &mut b) {
+            (&mut Large(ref mut a_limbs), &mut Large(ref mut b_limbs)) => (
+                false,
+                limbs_overflowing_sub_mul_limb_in_place_either(a_limbs, b_limbs, c),
+            ),
+            _ => (true, (false, false)),
+        };
+        if fallback {
+            let bc = b * c;
+            sign = *self >= bc;
+            if sign {
+                *self -= bc;
+            } else {
+                //TODO right assign
+                self.sub_right_assign_no_panic(&bc);
+            }
+        } else if right {
+            b.trim();
+            *self = b;
+        } else {
+            self.trim();
+        }
+        sign
+    }
+
+    // self -= b * c, returns sign (true means non-negative)
+    fn add_mul_assign_neg_ref(&mut self, b: &Natural, c: Limb) -> bool {
+        if c == 0 || *b == 0 as Limb {
+            return true;
+        }
+        if c == 1 {
+            let sign = *self >= *b;
+            if sign {
+                *self -= b;
+            } else {
+                //TODO this is why we need a public right assign
+                self.sub_right_assign_no_panic(b);
+            }
+            return sign;
+        }
+        let (mut sign, fallback) = match (&mut *self, b) {
+            (&mut Large(ref mut a_limbs), &Large(ref b_limbs)) => (
+                limbs_overflowing_sub_mul_limb_in_place_left(a_limbs, b_limbs, c),
+                false,
+            ),
+            _ => (false, true),
+        };
+        if fallback {
+            let bc = b * c;
+            sign = *self >= bc;
+            if sign {
+                *self -= bc;
+            } else {
+                //TODO right assign
+                self.sub_right_assign_no_panic(&bc);
             }
         } else {
-            // wsize < xsize
-
-            // x bigger than w, so want x*y-w. Submul has given w-x*y, so take twos complement and
-            // use an mpn_mul_1 for the rest.
-
-            // -(-cy*b^n + w-x*y) = (cy-1)*b^n + ~(w-x*y) + 1
-            limbs_not_in_place(&mut w[..wsize]);
-            if !limbs_slice_add_limb_in_place(&mut w[..wsize], 1) {
-                cy.wrapping_sub_assign(1);
-            }
-
-            // If cy - 1 == -1 then hold that -1 for latter. mpn_submul_1 never returns
-            // cy == MP_LIMB_T_MAX so that value always indicates a -1.
-            let cy2 = if cy == Limb::MAX { 1 } else { 0 };
-            cy.wrapping_add_assign(cy2);
-            cy = limbs_mul_limb_with_carry_to_out(&mut w[wsize..xsize], &x[wsize..xsize], y, cy);
-            w[new_wsize] = cy;
-            if cy != 0 {
-                new_wsize += 1;
-            }
-
-            // Apply any -1 from above. The value at wp+wsize is non-zero because y != 0 and the
-            // high limb of x will be non-zero.
-            if cy2 != 0 {
-                limbs_sub_limb_in_place(&mut w[wsize..new_wsize], 1);
-            }
-            if new_wsize != 0 {
-                w_sign.not_assign();
-            }
+            self.trim();
         }
-        w.resize(new_wsize, 0);
-        if limbs_test_zero(w) {
-            *w_sign = true;
-        }
+        sign
     }
 }

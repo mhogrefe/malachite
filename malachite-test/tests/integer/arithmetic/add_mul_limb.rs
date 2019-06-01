@@ -21,7 +21,7 @@ fn test_add_mul_limb() {
 
         let mut a = Integer::from_str(u).unwrap();
         a.add_mul_assign(&Integer::from_str(v).unwrap(), c);
-        assert_eq!(a.to_string(), out);
+        assert_eq!(a.to_string(), out, "{} {} {}", u, v, c);
         assert!(a.is_valid());
 
         let a = Integer::from_str(u)
@@ -84,6 +84,12 @@ fn test_add_mul_limb() {
         1_000_000_000,
         "0",
     );
+    test(
+        "-7671776751",
+        "2017407396563853588311730593327576",
+        2553057608,
+        "5150557302232819461437363666941314271221457",
+    );
 }
 
 #[test]
@@ -99,7 +105,7 @@ fn add_mul_limb_properties() {
             let mut mut_a = a.clone();
             mut_a.add_mul_assign(b, c);
             assert!(mut_a.is_valid());
-            assert_eq!(mut_a, result);
+            assert_eq!(mut_a, result, "{} {} {}", a, b, c);
 
             let result_alt = a.add_mul(b.clone(), c);
             assert!(result_alt.is_valid());
