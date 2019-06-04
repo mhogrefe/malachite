@@ -278,8 +278,10 @@ fn limbs_vec_add_mul_limb_in_place_either_properties() {
             let mut a = a_old.to_vec();
             let mut b = b_old.to_vec();
             let result = if limbs_vec_add_mul_limb_in_place_either(&mut a, &mut b, c) {
+                assert_eq!(a_old, &a);
                 b
             } else {
+                assert_eq!(b_old, &b);
                 a
             };
             assert_eq!(

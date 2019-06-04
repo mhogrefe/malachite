@@ -10,9 +10,10 @@ use platform::{Limb, SignedLimb};
 ///
 /// Time: worst case O(n)
 ///
-/// Additional memory: worst case O(n)
+/// Additional memory: worst case O(m)
 ///
-/// where n = `b.significant_bits()`
+/// where n = max(`a.significant_bits()`, `b.significant_bits()`)
+///       m = `min(self.significant_bits(), b.significant_bits())`
 ///
 /// # Examples
 /// ```
@@ -53,9 +54,10 @@ impl AddMul<Integer, i32> for Integer {
 ///
 /// Time: worst case O(n)
 ///
-/// Additional memory: worst case O(n)
+/// Additional memory: worst case O(m)
 ///
-/// where n = max(`self.significant_bits()`, `b.significant_bits()`)
+/// where n = max(`a.significant_bits()`, `b.significant_bits()`)
+///       m = `b.significant_bits()`
 ///
 /// # Examples
 /// ```
@@ -96,9 +98,10 @@ impl<'a> AddMul<&'a Integer, i32> for Integer {
 ///
 /// Time: worst case O(n)
 ///
-/// Additional memory: worst case O(n)
+/// Additional memory: worst case O(m)
 ///
-/// where n = max(`self.significant_bits()`, `b.significant_bits()`)
+/// where n = max(`a.significant_bits()`, `b.significant_bits()`)
+///       m = `a.significant_bits()`
 ///
 /// # Examples
 /// ```
@@ -183,9 +186,10 @@ impl<'a, 'b> AddMul<&'a Integer, i32> for &'b Integer {
 ///
 /// Time: worst case O(n)
 ///
-/// Additional memory: worst case O(n)
+/// Additional memory: worst case O(m)
 ///
-/// where n = `b.significant_bits()`
+/// where n = max(`a.significant_bits()`, `b.significant_bits()`)
+///       m = `min(self.significant_bits(), b.significant_bits())`
 ///
 /// # Examples
 /// ```
@@ -225,9 +229,10 @@ impl AddMulAssign<Integer, i32> for Integer {
 ///
 /// Time: worst case O(n)
 ///
-/// Additional memory: worst case O(n)
+/// Additional memory: worst case O(m)
 ///
-/// where n = max(`self.significant_bits()`, `b.significant_bits()`)
+/// where n = max(`a.significant_bits()`, `b.significant_bits()`)
+///       m = `b.significant_bits()`
 ///
 /// # Examples
 /// ```

@@ -117,6 +117,44 @@ pub fn limbs_mul_limb_to_out(out: &mut [Limb], in_limbs: &[Limb], limb: Limb) ->
 }
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
+/// limbs of the product of the `Natural` and a `Limb`, plus a carry, to the input slice. Returns
+/// the carry.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = `limbs.len()`
+///
+/// # Example
+/// ```
+/// use malachite_nz::natural::arithmetic::mul_limb::limbs_slice_mul_limb_with_carry_in_place;
+///
+/// let mut limbs = vec![123, 456];
+/// assert_eq!(limbs_slice_mul_limb_with_carry_in_place(&mut limbs, 789, 10), 0);
+/// assert_eq!(limbs, &[97_057, 359_784]);
+///
+/// let mut limbs = vec![0xffff_ffff];
+/// assert_eq!(limbs_slice_mul_limb_with_carry_in_place(&mut limbs, 2, 3), 2);
+/// assert_eq!(limbs, &[1]);
+/// ```
+///
+/// This is mul_1c from gmp-impl.h, where the output is the same as the input.
+pub fn limbs_slice_mul_limb_with_carry_in_place(
+    limbs: &mut [Limb],
+    limb: Limb,
+    mut carry: Limb,
+) -> Limb {
+    let limb = DoubleLimb::from(limb);
+    for x in limbs.iter_mut() {
+        let limb_result = DoubleLimb::from(*x) * limb + DoubleLimb::from(carry);
+        *x = limb_result.lower_half();
+        carry = limb_result.upper_half();
+    }
+    carry
+}
+
+/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
 /// limbs of the product of the `Natural` and a `Limb` to the input slice. Returns the carry.
 ///
 /// Time: worst case O(n)
@@ -137,15 +175,9 @@ pub fn limbs_mul_limb_to_out(out: &mut [Limb], in_limbs: &[Limb], limb: Limb) ->
 /// ```
 ///
 /// This is mpn_mul_1 from mpn/generic/mul_1.c, where rp == up.
+#[inline]
 pub fn limbs_slice_mul_limb_in_place(limbs: &mut [Limb], limb: Limb) -> Limb {
-    let mut carry = 0;
-    let limb = DoubleLimb::from(limb);
-    for x in limbs.iter_mut() {
-        let limb_result = DoubleLimb::from(*x) * limb + DoubleLimb::from(carry);
-        *x = limb_result.lower_half();
-        carry = limb_result.upper_half();
-    }
-    carry
+    limbs_slice_mul_limb_with_carry_in_place(limbs, limb, 0)
 }
 
 /// Interpreting a `Vec` of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the

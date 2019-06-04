@@ -2,7 +2,8 @@ use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::natural::arithmetic::mul_limb::{
     limbs_mul_limb, limbs_mul_limb_to_out, limbs_mul_limb_with_carry_to_out,
-    limbs_slice_mul_limb_in_place, limbs_vec_mul_limb_in_place,
+    limbs_slice_mul_limb_in_place, limbs_slice_mul_limb_with_carry_in_place,
+    limbs_vec_mul_limb_in_place,
 };
 use malachite_nz::platform::Limb;
 use num::BigUint;
@@ -11,6 +12,7 @@ use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, 
 use inputs::base::{
     pairs_of_unsigned_vec_and_unsigned,
     quadruples_of_unsigned_vec_unsigned_vec_unsigned_and_unsigned_var_1,
+    triples_of_unsigned_vec_unsigned_and_unsigned,
     triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_1,
 };
 #[cfg(feature = "64_bit_limbs")]
@@ -24,8 +26,9 @@ use inputs::natural::{pairs_of_natural_and_unsigned, pairs_of_unsigned_and_natur
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limbs_mul_limb);
-    register_demo!(registry, demo_limbs_mul_limb_to_out);
     register_demo!(registry, demo_limbs_mul_limb_with_carry_to_out);
+    register_demo!(registry, demo_limbs_mul_limb_to_out);
+    register_demo!(registry, demo_limbs_slice_mul_limb_with_carry_in_place);
     register_demo!(registry, demo_limbs_slice_mul_limb_in_place);
     register_demo!(registry, demo_limbs_vec_mul_limb_in_place);
     register_demo!(registry, demo_natural_mul_assign_limb);
@@ -34,7 +37,13 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limb_mul_natural);
     register_demo!(registry, demo_limb_mul_natural_ref);
     register_bench!(registry, Small, benchmark_limbs_mul_limb);
+    register_bench!(registry, Small, benchmark_limbs_mul_limb_with_carry_to_out);
     register_bench!(registry, Small, benchmark_limbs_mul_limb_to_out);
+    register_bench!(
+        registry,
+        Small,
+        benchmark_limbs_slice_mul_limb_with_carry_in_place
+    );
     register_bench!(registry, Small, benchmark_limbs_slice_mul_limb_in_place);
     register_bench!(registry, Small, benchmark_limbs_vec_mul_limb_in_place);
     #[cfg(feature = "32_bit_limbs")]
@@ -104,6 +113,19 @@ fn demo_limbs_mul_limb_to_out(gm: GenerationMode, limit: usize) {
         println!(
             "out := {:?}; limbs_mul_limb_to_out(&mut out, {:?}, {}) = {}; out = {:?}",
             out_old, in_limbs, limb, carry, out
+        );
+    }
+}
+
+fn demo_limbs_slice_mul_limb_with_carry_in_place(gm: GenerationMode, limit: usize) {
+    for (limbs, limb, carry) in triples_of_unsigned_vec_unsigned_and_unsigned(gm).take(limit) {
+        let mut limbs = limbs.to_vec();
+        let mut limbs_old = limbs.clone();
+        let carry_out = limbs_slice_mul_limb_with_carry_in_place(&mut limbs, limb, carry);
+        println!(
+            "limbs := {:?}; limbs_slice_mul_limb_with_carry_in_place(&mut limbs, {}, {}) = {}; \
+             limbs = {:?}",
+            limbs_old, limb, carry, carry_out, limbs
         );
     }
 }
@@ -188,6 +210,27 @@ fn benchmark_limbs_mul_limb(gm: GenerationMode, limit: usize, file_name: &str) {
     );
 }
 
+fn benchmark_limbs_mul_limb_with_carry_to_out(gm: GenerationMode, limit: usize, file_name: &str) {
+    m_run_benchmark(
+        "limbs_mul_limb_with_carry_to_out(&mut [Limb], &[Limb], Limb, Limb)",
+        BenchmarkType::Single,
+        quadruples_of_unsigned_vec_unsigned_vec_unsigned_and_unsigned_var_1(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(_, ref in_limbs, _, _)| in_limbs.len()),
+        "in_limbs.len()",
+        &mut [(
+            "malachite",
+            &mut (|(mut out, in_limbs, limb, carry)| {
+                no_out!(limbs_mul_limb_with_carry_to_out(
+                    &mut out, &in_limbs, limb, carry
+                ))
+            }),
+        )],
+    );
+}
+
 fn benchmark_limbs_mul_limb_to_out(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "limbs_mul_limb_to_out(&mut [Limb], &[Limb], Limb)",
@@ -202,6 +245,31 @@ fn benchmark_limbs_mul_limb_to_out(gm: GenerationMode, limit: usize, file_name: 
             "malachite",
             &mut (|(mut out, in_limbs, limb)| {
                 no_out!(limbs_mul_limb_to_out(&mut out, &in_limbs, limb))
+            }),
+        )],
+    );
+}
+
+fn benchmark_limbs_slice_mul_limb_with_carry_in_place(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "limbs_slice_mul_limb_with_carry_in_place(&mut [Limb], Limb, Limb)",
+        BenchmarkType::Single,
+        triples_of_unsigned_vec_unsigned_and_unsigned(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(ref limbs, _, _)| limbs.len()),
+        "limbs.len()",
+        &mut [(
+            "malachite",
+            &mut (|(mut limbs, limb, carry)| {
+                no_out!(limbs_slice_mul_limb_with_carry_in_place(
+                    &mut limbs, limb, carry
+                ))
             }),
         )],
     );

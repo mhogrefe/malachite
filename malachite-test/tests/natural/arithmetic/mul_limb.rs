@@ -4,7 +4,8 @@ use malachite_base::num::arithmetic::traits::DivMod;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_nz::natural::arithmetic::mul_limb::{
     limbs_mul_limb, limbs_mul_limb_to_out, limbs_mul_limb_with_carry_to_out,
-    limbs_slice_mul_limb_in_place, limbs_vec_mul_limb_in_place,
+    limbs_slice_mul_limb_in_place, limbs_slice_mul_limb_with_carry_in_place,
+    limbs_vec_mul_limb_in_place,
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::{DoubleLimb, Limb};
@@ -19,6 +20,7 @@ use malachite_test::common::{natural_to_rug_integer, rug_integer_to_natural};
 use malachite_test::inputs::base::{
     pairs_of_unsigned_vec_and_unsigned, pairs_of_unsigneds,
     quadruples_of_unsigned_vec_unsigned_vec_unsigned_and_unsigned_var_1,
+    triples_of_unsigned_vec_unsigned_and_unsigned,
     triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_1, unsigneds,
 };
 use malachite_test::inputs::natural::{naturals, pairs_of_natural_and_unsigned};
@@ -139,6 +141,22 @@ fn limbs_mul_limb_to_out_fail() {
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
+fn test_limbs_mul_limb_with_carry_in_place() {
+    let test =
+        |limbs_before: &[Limb], limb: Limb, carry: Limb, carry_out: Limb, limbs_after: &[Limb]| {
+            let mut limbs = limbs_before.to_vec();
+            assert_eq!(
+                limbs_slice_mul_limb_with_carry_in_place(&mut limbs, limb, carry),
+                carry_out
+            );
+            assert_eq!(limbs, limbs_after);
+        };
+    test(&[123, 456], 789, 10, 0, &[97_057, 359_784]);
+    test(&[0xffff_ffff], 2, 3, 2, &[1]);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
 fn test_limbs_slice_mul_limb_in_place() {
     let test = |limbs: &[Limb], limb: Limb, carry: Limb, out: &[Limb]| {
         let mut limbs = limbs.to_vec();
@@ -243,6 +261,9 @@ fn limbs_mul_limb_with_carry_to_out_properties() {
             let len = in_limbs.len();
             let mut limbs = n.into_limbs_asc();
             assert_eq!(carry_out != 0, limbs.len() == len + 1);
+            if carry_out != 0 {
+                assert_eq!(*limbs.last().unwrap(), carry_out);
+            }
             limbs.resize(len, 0);
             assert_eq!(limbs, &out[..len]);
             assert_eq!(&out[len..], &old_out[len..]);
@@ -262,9 +283,32 @@ fn limbs_mul_limb_to_out_properties() {
             let len = in_limbs.len();
             let mut limbs = n.into_limbs_asc();
             assert_eq!(carry != 0, limbs.len() == len + 1);
+            if carry != 0 {
+                assert_eq!(*limbs.last().unwrap(), carry);
+            }
             limbs.resize(len, 0);
             assert_eq!(limbs, &out[..len]);
             assert_eq!(&out[len..], &old_out[len..]);
+        },
+    );
+}
+
+#[test]
+fn limbs_slice_mul_limb_with_carry_in_place_properties() {
+    test_properties(
+        triples_of_unsigned_vec_unsigned_and_unsigned,
+        |&(ref limbs, limb, carry)| {
+            let mut limbs = limbs.to_vec();
+            let old_limbs = limbs.clone();
+            let carry_out = limbs_slice_mul_limb_with_carry_in_place(&mut limbs, limb, carry);
+            let n = Natural::from_limbs_asc(&old_limbs) * limb + carry;
+            let mut expected_limbs = n.into_limbs_asc();
+            assert_eq!(carry_out != 0, expected_limbs.len() == limbs.len() + 1);
+            if carry_out != 0 {
+                assert_eq!(*expected_limbs.last().unwrap(), carry_out);
+            }
+            expected_limbs.resize(limbs.len(), 0);
+            assert_eq!(limbs, expected_limbs);
         },
     );
 }
@@ -278,6 +322,9 @@ fn limbs_slice_mul_limb_in_place_properties() {
         let n = Natural::from_limbs_asc(&old_limbs) * limb;
         let mut expected_limbs = n.into_limbs_asc();
         assert_eq!(carry != 0, expected_limbs.len() == limbs.len() + 1);
+        if carry != 0 {
+            assert_eq!(*expected_limbs.last().unwrap(), carry);
+        }
         expected_limbs.resize(limbs.len(), 0);
         assert_eq!(limbs, expected_limbs);
     });

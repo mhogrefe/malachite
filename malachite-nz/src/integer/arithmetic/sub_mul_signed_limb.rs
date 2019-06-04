@@ -8,6 +8,13 @@ use platform::{Limb, SignedLimb};
 /// Adds the product of an `Integer` (b) and a `SignedLimb` (c) to an `Integer` (self), taking
 /// `self` and b by value.
 ///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(m)
+///
+/// where n = max(`a.significant_bits()`, `b.significant_bits()`)
+///       m = `min(self.significant_bits(), b.significant_bits())`
+///
 /// # Examples
 /// ```
 /// extern crate malachite_base;
@@ -44,6 +51,13 @@ impl SubMul<Integer, i32> for Integer {
 
 /// Adds the product of an `Integer` (b) and a `SignedLimb` (c) to an `Integer` (self), taking
 /// `self` by value and b by reference.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(m)
+///
+/// where n = max(`a.significant_bits()`, `b.significant_bits()`)
+///       m = `b.significant_bits()`
 ///
 /// # Examples
 /// ```
@@ -82,6 +96,13 @@ impl<'a> SubMul<&'a Integer, i32> for Integer {
 /// Adds the product of an `Integer` (b) and a `SignedLimb` (c) to an `Integer` (self), taking
 /// `self` by reference and b by value.
 ///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(m)
+///
+/// where n = max(`a.significant_bits()`, `b.significant_bits()`)
+///       m = `a.significant_bits()`
+///
 /// # Examples
 /// ```
 /// extern crate malachite_base;
@@ -117,6 +138,12 @@ impl<'a> SubMul<Integer, i32> for &'a Integer {
 
 /// Adds the product of an `Integer` (b) and a `SignedLimb` (c) to an `Integer` (self), taking
 /// `self` and b by reference.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(n)
+///
+/// where n = max(`self.significant_bits()`, `b.significant_bits()`)
 ///
 /// # Examples
 /// ```
@@ -157,6 +184,13 @@ impl<'a, 'b> SubMul<&'a Integer, i32> for &'b Integer {
 /// Adds the product of an `Integer` (b) and a `SignedLimb` (c) to an `Integer` (self), in place,
 /// taking b by value.
 ///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(m)
+///
+/// where n = max(`a.significant_bits()`, `b.significant_bits()`)
+///       m = `min(self.significant_bits(), b.significant_bits())`
+///
 /// # Examples
 /// ```
 /// extern crate malachite_base;
@@ -178,12 +212,23 @@ impl<'a, 'b> SubMul<&'a Integer, i32> for &'b Integer {
 impl SubMulAssign<Integer, SignedLimb> for Integer {
     #[inline]
     fn sub_mul_assign(&mut self, b: Integer, c: SignedLimb) {
-        self.sub_mul_assign(&b, c);
+        if c >= 0 {
+            self.sub_mul_assign(b, c as Limb);
+        } else {
+            self.add_mul_assign(b, c.unsigned_abs())
+        }
     }
 }
 
 /// Adds the product of an `Integer` (b) and a `SignedLimb` (c) to an `Integer` (self), in place,
 /// taking b by reference.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(m)
+///
+/// where n = max(`a.significant_bits()`, `b.significant_bits()`)
+///       m = `b.significant_bits()`
 ///
 /// # Examples
 /// ```

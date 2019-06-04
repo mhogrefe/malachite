@@ -70,8 +70,8 @@ use rust_wheels::iterators::vecs::{
 
 use common::{GenerationMode, NoSpecialGenerationMode};
 use inputs::common::{
-    permute_1_2_4_3, permute_1_3_2, permute_2_1, reshape_2_1_to_3, reshape_2_2_to_4,
-    reshape_3_1_to_4,
+    permute_1_2_4_3, permute_1_3_2, permute_2_1, reshape_1_2_to_3, reshape_2_1_to_3,
+    reshape_2_2_to_4, reshape_3_1_to_4,
 };
 
 pub fn bools(gm: NoSpecialGenerationMode) -> It<bool> {
@@ -1736,11 +1736,25 @@ pub fn triples_of_unsigned_vec_var_24<T: PrimitiveUnsigned + Rand>(
 pub fn triples_of_unsigned_vec_var_25<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
 ) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
-    Box::new(
-        triples_of_unsigned_vec_min_sizes(gm, 2, 1, 1).filter(|&(ref out, ref xs, ref ys)| {
-            xs.len() == ys.len() && out.len() >= xs.len() + ys.len()
-        }),
-    )
+    let xs: It<(Vec<T>, (Vec<T>, Vec<T>))> = match gm {
+        GenerationMode::Exhaustive => Box::new(sqrt_pairs(
+            exhaustive_vecs_min_length(2, exhaustive_unsigned()),
+            pairs_of_unsigned_vec_var_1(gm),
+        )),
+        GenerationMode::Random(scale) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| random_vecs_min_length(seed, scale, 2, &(|seed_2| random(seed_2)))),
+            &(|seed| pairs_of_unsigned_vec_var_1_with_seed(gm, seed)),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_unsigned_vecs_min_length(seed, scale, 2)),
+            &(|seed| pairs_of_unsigned_vec_var_1_with_seed(gm, seed)),
+        )),
+    };
+    reshape_1_2_to_3(Box::new(xs.filter(|&(ref out, (ref xs, ref ys))| {
+        !xs.is_empty() && xs.len() == ys.len() && out.len() >= xs.len() + ys.len()
+    })))
 }
 
 // All triples of `Vec<T>`, where `T` is unsigned, `xs` and `ys` are nonempty, and `out.len()` is at
@@ -2418,6 +2432,30 @@ fn triples_of_unsigned_vec_unsigned_vec_and_small_unsigned<
             &(|seed| special_random_unsigned_vecs(seed, scale)),
             &(|seed| special_random_unsigned_vecs(seed, scale)),
             &(|seed| u32s_geometric(seed, scale).flat_map(U::checked_from)),
+        )),
+    }
+}
+
+pub fn triples_of_unsigned_vec_unsigned_and_unsigned<T: PrimitiveUnsigned + Rand>(
+    gm: GenerationMode,
+) -> It<(Vec<T>, T, T)> {
+    match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_triples(
+            exhaustive_vecs(exhaustive_unsigned()),
+            exhaustive_unsigned(),
+            exhaustive_unsigned(),
+        )),
+        GenerationMode::Random(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| random_vecs(seed, scale, &(|seed_2| random(seed_2)))),
+            &(|seed| random(seed)),
+            &(|seed| random(seed)),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_unsigned_vecs(seed, scale)),
+            &(|seed| special_random_unsigned(seed)),
+            &(|seed| special_random_unsigned(seed)),
         )),
     }
 }

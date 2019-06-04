@@ -10,9 +10,10 @@ use platform::Limb;
 ///
 /// Time: worst case O(n)
 ///
-/// Subitional memory: worst case O(n)
+/// Additional memory: worst case O(m)
 ///
-/// where n = `b.significant_bits()`
+/// where n = max(`a.significant_bits()`, `b.significant_bits()`)
+///       m = `min(self.significant_bits(), b.significant_bits())`
 ///
 /// # Examples
 /// ```
@@ -53,9 +54,10 @@ impl SubMul<Integer, u32> for Integer {
 ///
 /// Time: worst case O(n)
 ///
-/// Subitional memory: worst case O(n)
+/// Additional memory: worst case O(m)
 ///
-/// where n = max(`self.significant_bits()`, `b.significant_bits()`)
+/// where n = max(`a.significant_bits()`, `b.significant_bits()`)
+///       m = `b.significant_bits()`
 ///
 /// # Examples
 /// ```
@@ -96,9 +98,10 @@ impl<'a> SubMul<&'a Integer, u32> for Integer {
 ///
 /// Time: worst case O(n)
 ///
-/// Subitional memory: worst case O(n)
+/// Additional memory: worst case O(m)
 ///
-/// where n = max(`self.significant_bits()`, `b.significant_bits()`)
+/// where n = max(`a.significant_bits()`, `b.significant_bits()`)
+///       m = `a.significant_bits()`
 ///
 /// # Examples
 /// ```
@@ -119,7 +122,7 @@ impl<'a> SubMul<Integer, Limb> for &'a Integer {
 
     #[inline]
     fn sub_mul(self, b: Integer, c: Limb) -> Integer {
-        self.sub_mul(&b, c)
+        self.add_mul(-b, c)
     }
 }
 
@@ -192,9 +195,10 @@ impl<'a, 'b> SubMul<&'a Integer, u32> for &'b Integer {
 ///
 /// Time: worst case O(n)
 ///
-/// Subitional memory: worst case O(n)
+/// Additional memory: worst case O(m)
 ///
-/// where n = `b.significant_bits()`
+/// where n = max(`a.significant_bits()`, `b.significant_bits()`)
+///       m = `min(self.significant_bits(), b.significant_bits())`
 ///
 /// # Examples
 /// ```
@@ -233,9 +237,10 @@ impl SubMulAssign<Integer, u32> for Integer {
 ///
 /// Time: worst case O(n)
 ///
-/// Subitional memory: worst case O(n)
+/// Additional memory: worst case O(m)
 ///
-/// where n = max(`self.significant_bits()`, `b.significant_bits()`)
+/// where n = max(`a.significant_bits()`, `b.significant_bits()`)
+///       m = `b.significant_bits()`
 ///
 /// # Examples
 /// ```
