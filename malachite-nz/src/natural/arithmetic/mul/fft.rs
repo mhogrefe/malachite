@@ -508,7 +508,7 @@ pub(crate) fn _limbs_mul_fft_best_k(n: usize, square: bool) -> usize {
 
 /// Time: O(n * log(n) * log(log(n)))
 ///
-/// Additional memory: TODO
+/// Additional memory: O(n * log(n))
 ///
 /// where n = `xs.len()`
 ///

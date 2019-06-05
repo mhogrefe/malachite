@@ -77,7 +77,7 @@ pub(crate) fn _limbs_mul_mod_limb_width_to_n_minus_1_scratch_size(
 ///
 /// Time: O(n * log(n) * log(log(n)))
 ///
-/// Additional memory: TODO
+/// Additional memory: O(n * log(n))
 ///
 /// where n = `xs.len()`
 ///
@@ -109,7 +109,7 @@ fn _limbs_mul_mod_limb_width_to_n_minus_1_basecase(
 ///
 /// Time: O(n * log(n) * log(log(n)))
 ///
-/// Additional memory: TODO
+/// Additional memory: O(n * log(n))
 ///
 /// where n = `n`
 ///
@@ -163,7 +163,7 @@ const FFT_FIRST_K: usize = 4;
 ///
 /// Time: O(n * log(n) * log(log(n)))
 ///
-/// Additional memory: TODO
+/// Additional memory: O(n * log(n))
 ///
 /// where n = `xs.len()`
 ///

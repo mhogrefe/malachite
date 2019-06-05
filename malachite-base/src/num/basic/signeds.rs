@@ -26,8 +26,9 @@ pub trait PrimitiveSigned:
     type UnsignedOfEqualWidth: PrimitiveUnsigned;
 }
 
+/// This macro defines basic trait implementations for unsigned types.
 macro_rules! impl_basic_traits {
-    ($t:ident, $ut: ident, $width:expr) => {
+    ($t:ident, $ut: ident) => {
         impl PrimitiveSigned for $t {
             type UnsignedOfEqualWidth = $ut;
         }
@@ -43,9 +44,9 @@ macro_rules! impl_basic_traits {
     };
 }
 
-impl_basic_traits!(i8, u8, 8);
-impl_basic_traits!(i16, u16, 16);
-impl_basic_traits!(i32, u32, 32);
-impl_basic_traits!(i64, u64, 64);
-impl_basic_traits!(i128, u128, 128);
-impl_basic_traits!(isize, usize, 0usize.trailing_zeros());
+impl_basic_traits!(i8, u8);
+impl_basic_traits!(i16, u16);
+impl_basic_traits!(i32, u32);
+impl_basic_traits!(i64, u64);
+impl_basic_traits!(i128, u128);
+impl_basic_traits!(isize, usize);

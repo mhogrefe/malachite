@@ -5,7 +5,7 @@ use num::logic::traits::{
 
 /// This macro defines trait implementations that are the same for unsigned and signed types.
 macro_rules! impl_logic_traits {
-    ($t:ident, $width:expr) => {
+    ($t:ident) => {
         impl CountZeros for $t {
             #[inline]
             fn count_zeros(self) -> u32 {
@@ -92,15 +92,15 @@ macro_rules! impl_logic_traits {
     };
 }
 
-impl_logic_traits!(u8, 8);
-impl_logic_traits!(u16, 16);
-impl_logic_traits!(u32, 32);
-impl_logic_traits!(u64, 64);
-impl_logic_traits!(u128, 128);
-impl_logic_traits!(usize, 0usize.trailing_zeros());
-impl_logic_traits!(i8, 8);
-impl_logic_traits!(i16, 16);
-impl_logic_traits!(i32, 32);
-impl_logic_traits!(i64, 64);
-impl_logic_traits!(i128, 128);
-impl_logic_traits!(isize, 0usize.trailing_zeros());
+impl_logic_traits!(u8);
+impl_logic_traits!(u16);
+impl_logic_traits!(u32);
+impl_logic_traits!(u64);
+impl_logic_traits!(u128);
+impl_logic_traits!(usize);
+impl_logic_traits!(i8);
+impl_logic_traits!(i16);
+impl_logic_traits!(i32);
+impl_logic_traits!(i64);
+impl_logic_traits!(i128);
+impl_logic_traits!(isize);

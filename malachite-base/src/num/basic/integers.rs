@@ -367,7 +367,7 @@ pub trait PrimitiveInteger:
     }
 }
 
-/// This macro defines trait implementations that are the same for unsigned and signed types.
+/// This macro defines basic trait implementations that are the same for unsigned and signed types.
 macro_rules! impl_basic_traits {
     ($t:ident, $width:expr) => {
         /// # Examples

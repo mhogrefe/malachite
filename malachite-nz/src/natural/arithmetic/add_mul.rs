@@ -17,9 +17,12 @@ use platform::Limb;
 /// a + b * c. `xs` should be nonempty and `ys` and `zs` should have length at least 2. None of the
 /// slices should have any trailing zeros. The result will have no trailing zeros.
 ///
-/// Time: TODO
+/// Time: O(m + n * log(n) * log(log(n)))
 ///
-/// Additional memory: TODO
+/// Additional memory: O(m + n * log(n))
+///
+/// where n = max(`ys.len()`, `zs.len()`)
+///       m = `xs.len()`
 ///
 /// # Panics
 /// Panics if `ys` or `zs` are empty.
@@ -60,9 +63,12 @@ pub fn limbs_add_mul(xs: &[Limb], ys: &[Limb], zs: &[Limb]) -> Vec<Limb> {
 /// length at least 2. None of the slices should have any trailing zeros. The result will have no
 /// trailing zeros.
 ///
-/// Time: TODO
+/// Time: O(m + n * log(n) * log(log(n)))
 ///
-/// Additional memory: TODO
+/// Additional memory: O(m + n * log(n))
+///
+/// where n = max(`ys.len()`, `zs.len()`)
+///       m = `xs.len()`
 ///
 /// # Panics
 /// Panics if `ys` or `zs` are empty.
@@ -101,13 +107,12 @@ pub fn limbs_add_mul_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb], zs: &[Limb])
 /// Adds the product of a `Natural` (b) and a `Natural` (c) to a `Natural` (self), taking `self`, b,
 /// and c by value.
 ///
-/// Time: TODO
+/// Time: O(m + n * log(n) * log(log(n)))
 ///
-/// Additional memory: TODO
+/// Additional memory: O(m + n * log(n))
 ///
-/// where m = `a.significant_bits()`,
-///       n = `b.significant_bits()`
-///       p = `c.significant_bits()`
+/// where n = max(`b.significant_bits()`, `c.significant_bits()`)
+///       m = `a.significant_bits()`
 ///
 /// # Examples
 /// ```
@@ -136,13 +141,12 @@ impl<'a> AddMul<Natural, Natural> for Natural {
 /// Adds the product of a `Natural` (b) and a `Natural` (c) to a `Natural` (self), taking `self` and
 /// b by value and c by reference.
 ///
-/// Time: TODO
+/// Time: O(m + n * log(n) * log(log(n)))
 ///
-/// Additional memory: TODO
+/// Additional memory: O(m + n * log(n))
 ///
-/// where m = `a.significant_bits()`,
-///       n = `b.significant_bits()`
-///       p = `c.significant_bits()`
+/// where n = max(`b.significant_bits()`, `c.significant_bits()`)
+///       m = `a.significant_bits()`
 ///
 /// # Examples
 /// ```
@@ -171,13 +175,12 @@ impl<'a> AddMul<Natural, &'a Natural> for Natural {
 /// Adds the product of a `Natural` (b) and a `Natural` (c) to a `Natural` (self), taking `self` and
 /// c by value and b by reference.
 ///
-/// Time: TODO
+/// Time: O(m + n * log(n) * log(log(n)))
 ///
-/// Additional memory: TODO
+/// Additional memory: O(m + n * log(n))
 ///
-/// where m = `a.significant_bits()`,
-///       n = `b.significant_bits()`
-///       p = `c.significant_bits()`
+/// where n = max(`b.significant_bits()`, `c.significant_bits()`)
+///       m = `a.significant_bits()`
 ///
 /// # Examples
 /// ```
@@ -206,13 +209,12 @@ impl<'a> AddMul<&'a Natural, Natural> for Natural {
 /// Adds the product of a `Natural` (b) and a `Natural` (c) to a `Natural` (self), taking `self` by
 /// value and b and c by reference.
 ///
-/// Time: TODO
+/// Time: O(m + n * log(n) * log(log(n)))
 ///
-/// Additional memory: TODO
+/// Additional memory: O(m + n * log(n))
 ///
-/// where m = `a.significant_bits()`,
-///       n = `b.significant_bits()`
-///       p = `c.significant_bits()`
+/// where n = max(`b.significant_bits()`, `c.significant_bits()`)
+///       m = `a.significant_bits()`
 ///
 /// # Examples
 /// ```
@@ -241,13 +243,12 @@ impl<'a, 'b> AddMul<&'a Natural, &'b Natural> for Natural {
 /// Adds the product of a `Natural` (b) and a `Natural` (c) to a `Natural` (self), taking `self`, b,
 /// and c by reference.
 ///
-/// Time: TODO
+/// Time: O(m + n * log(n) * log(log(n)))
 ///
-/// Additional memory: TODO
+/// Additional memory: O(m + n * log(n))
 ///
-/// where m = `a.significant_bits()`,
-///       n = `b.significant_bits()`
-///       p = `c.significant_bits()`
+/// where n = max(`b.significant_bits()`, `c.significant_bits()`)
+///       m = `a.significant_bits()`
 ///
 /// # Examples
 /// ```
@@ -289,13 +290,12 @@ impl<'a, 'b, 'c> AddMul<&'a Natural, &'b Natural> for &'c Natural {
 /// Adds the product of a `Natural` (b) and a `Natural` (c) to a `Natural` (self), in place, taking
 /// b and c by value.
 ///
-/// Time: TODO
+/// Time: O(m + n * log(n) * log(log(n)))
 ///
-/// Additional memory: TODO
+/// Additional memory: O(m + n * log(n))
 ///
-/// where m = `a.significant_bits()`,
-///       n = `b.significant_bits()`
-///       p = `c.significant_bits()`
+/// where n = max(`b.significant_bits()`, `c.significant_bits()`)
+///       m = `a.significant_bits()`
 ///
 /// # Examples
 /// ```
@@ -337,13 +337,12 @@ impl AddMulAssign<Natural, Natural> for Natural {
 /// Adds the product of a `Natural` (b) and a `Natural` (c) to a `Natural` (self), in place, taking
 /// b by value and c by reference.
 ///
-/// Time: TODO
+/// Time: O(m + n * log(n) * log(log(n)))
 ///
-/// Additional memory: TODO
+/// Additional memory: O(m + n * log(n))
 ///
-/// where m = `a.significant_bits()`,
-///       n = `b.significant_bits()`
-///       p = `c.significant_bits()`
+/// where n = max(`b.significant_bits()`, `c.significant_bits()`)
+///       m = `a.significant_bits()`
 ///
 /// # Examples
 /// ```
@@ -385,13 +384,12 @@ impl<'a> AddMulAssign<Natural, &'a Natural> for Natural {
 /// Adds the product of a `Natural` (b) and a `Natural` (c) to a `Natural` (self), in place, taking
 /// b by reference and c by value.
 ///
-/// Time: TODO
+/// Time: O(m + n * log(n) * log(log(n)))
 ///
-/// Additional memory: TODO
+/// Additional memory: O(m + n * log(n))
 ///
-/// where m = `a.significant_bits()`,
-///       n = `b.significant_bits()`
-///       p = `c.significant_bits()`
+/// where n = max(`b.significant_bits()`, `c.significant_bits()`)
+///       m = `a.significant_bits()`
 ///
 /// # Examples
 /// ```
@@ -433,13 +431,12 @@ impl<'a> AddMulAssign<&'a Natural, Natural> for Natural {
 /// Adds the product of a `Natural` (b) and a `Natural` (c) to a `Natural` (self), in place, taking
 /// b and c by reference.
 ///
-/// Time: TODO
+/// Time: O(m + n * log(n) * log(log(n)))
 ///
-/// Additional memory: TODO
+/// Additional memory: O(m + n * log(n))
 ///
-/// where m = `a.significant_bits()`,
-///       n = `b.significant_bits()`
-///       p = `c.significant_bits()`
+/// where n = max(`b.significant_bits()`, `c.significant_bits()`)
+///       m = `a.significant_bits()`
 ///
 /// # Examples
 /// ```

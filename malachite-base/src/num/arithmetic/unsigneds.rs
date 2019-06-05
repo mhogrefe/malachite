@@ -10,7 +10,7 @@ use num::logic::traits::SignificantBits;
 use round::RoundingMode;
 
 macro_rules! impl_arithmetic_traits {
-    ($t:ident, $width:expr) => {
+    ($t:ident) => {
         impl IsPowerOfTwo for $t {
             #[inline]
             fn is_power_of_two(self) -> bool {
@@ -286,12 +286,12 @@ macro_rules! impl_arithmetic_traits {
     };
 }
 
-impl_arithmetic_traits!(u8, 8);
-impl_arithmetic_traits!(u16, 16);
-impl_arithmetic_traits!(u32, 32);
-impl_arithmetic_traits!(u64, 64);
-impl_arithmetic_traits!(u128, 128);
-impl_arithmetic_traits!(usize, 0usize.trailing_zeros());
+impl_arithmetic_traits!(u8);
+impl_arithmetic_traits!(u16);
+impl_arithmetic_traits!(u32);
+impl_arithmetic_traits!(u64);
+impl_arithmetic_traits!(u128);
+impl_arithmetic_traits!(usize);
 
 macro_rules! round_shift_unsigned_unsigned {
     ($t:ident, $u:ident) => {

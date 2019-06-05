@@ -10,7 +10,7 @@ use num::conversion::traits::{CheckedFrom, WrappingFrom};
 use round::RoundingMode;
 
 macro_rules! impl_arithmetic_traits {
-    ($t:ident, $width:expr) => {
+    ($t:ident) => {
         impl CheckedAbs for $t {
             type Output = $t;
 
@@ -233,9 +233,9 @@ macro_rules! impl_arithmetic_traits {
     };
 }
 
-impl_arithmetic_traits!(i8, 8);
-impl_arithmetic_traits!(i16, 16);
-impl_arithmetic_traits!(i32, 32);
-impl_arithmetic_traits!(i64, 64);
-impl_arithmetic_traits!(i128, 128);
-impl_arithmetic_traits!(isize, 0usize.trailing_zeros());
+impl_arithmetic_traits!(i8);
+impl_arithmetic_traits!(i16);
+impl_arithmetic_traits!(i32);
+impl_arithmetic_traits!(i64);
+impl_arithmetic_traits!(i128);
+impl_arithmetic_traits!(isize);

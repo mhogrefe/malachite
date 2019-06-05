@@ -1,7 +1,40 @@
 use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::basic::traits::{NegativeOne, One, Two, Zero};
+
+macro_rules! test_unsigned_constants {
+    ($t: ident) => {
+        assert_eq!($t::ZERO, 0);
+        assert_eq!($t::ONE, 1);
+        assert_eq!($t::TWO, 2);
+    };
+}
+
+macro_rules! test_signed_constants {
+    ($t: ident) => {
+        test_unsigned_constants!($t);
+        assert_eq!($t::NEGATIVE_ONE, -1);
+    };
+}
 
 #[test]
 fn test_constants() {
+    test_unsigned_constants!(u8);
+    test_unsigned_constants!(u16);
+    test_unsigned_constants!(u32);
+    test_unsigned_constants!(u64);
+    test_unsigned_constants!(u128);
+    test_unsigned_constants!(usize);
+
+    test_signed_constants!(i8);
+    test_signed_constants!(i16);
+    test_signed_constants!(i32);
+    test_signed_constants!(i64);
+    test_signed_constants!(i128);
+    test_signed_constants!(isize);
+}
+
+#[test]
+fn test_width_constants() {
     assert_eq!(u8::WIDTH, 8);
     assert_eq!(u8::LOG_WIDTH, 3);
     assert_eq!(u8::WIDTH_MASK, 0x7);

@@ -17,7 +17,7 @@ use round::RoundingMode;
 
 /// This macro defines trait implementations that are the same for unsigned and signed types.
 macro_rules! impl_arithmetic_traits {
-    ($t:ident, $width:expr) => {
+    ($t:ident) => {
         impl CheckedAdd<$t> for $t {
             type Output = $t;
 
@@ -456,18 +456,18 @@ macro_rules! impl_arithmetic_traits {
     };
 }
 
-impl_arithmetic_traits!(u8, 8);
-impl_arithmetic_traits!(u16, 16);
-impl_arithmetic_traits!(u32, 32);
-impl_arithmetic_traits!(u64, 64);
-impl_arithmetic_traits!(u128, 128);
-impl_arithmetic_traits!(usize, 0usize.trailing_zeros());
-impl_arithmetic_traits!(i8, 8);
-impl_arithmetic_traits!(i16, 16);
-impl_arithmetic_traits!(i32, 32);
-impl_arithmetic_traits!(i64, 64);
-impl_arithmetic_traits!(i128, 128);
-impl_arithmetic_traits!(isize, 0usize.trailing_zeros());
+impl_arithmetic_traits!(u8);
+impl_arithmetic_traits!(u16);
+impl_arithmetic_traits!(u32);
+impl_arithmetic_traits!(u64);
+impl_arithmetic_traits!(u128);
+impl_arithmetic_traits!(usize);
+impl_arithmetic_traits!(i8);
+impl_arithmetic_traits!(i16);
+impl_arithmetic_traits!(i32);
+impl_arithmetic_traits!(i64);
+impl_arithmetic_traits!(i128);
+impl_arithmetic_traits!(isize);
 
 macro_rules! round_shift_primitive_signed {
     ($t:ident, $u:ident) => {

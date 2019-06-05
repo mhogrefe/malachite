@@ -4,7 +4,7 @@ use num::arithmetic::traits::UnsignedAbs;
 use num::comparison::traits::OrdAbs;
 
 macro_rules! impl_comparison_traits {
-    ($t:ident, $width:expr) => {
+    ($t:ident) => {
         impl OrdAbs for $t {
             #[inline]
             fn cmp_abs(&self, other: &Self) -> Ordering {
@@ -14,9 +14,9 @@ macro_rules! impl_comparison_traits {
     };
 }
 
-impl_comparison_traits!(i8, 8);
-impl_comparison_traits!(i16, 16);
-impl_comparison_traits!(i32, 32);
-impl_comparison_traits!(i64, 64);
-impl_comparison_traits!(i128, 128);
-impl_comparison_traits!(isize, 0usize.trailing_zeros());
+impl_comparison_traits!(i8);
+impl_comparison_traits!(i16);
+impl_comparison_traits!(i32);
+impl_comparison_traits!(i64);
+impl_comparison_traits!(i128);
+impl_comparison_traits!(isize);

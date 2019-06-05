@@ -2,7 +2,7 @@ use num::basic::integers::PrimitiveInteger;
 use num::logic::traits::{BitAccess, BitScan, SignificantBits};
 
 macro_rules! impl_logic_traits {
-    ($t:ident, $width:expr) => {
+    ($t:ident) => {
         impl SignificantBits for $t {
             /// Returns the number of significant bits of a primitive unsigned integer; this is the
             /// integer's width minus the number of leading zeros.
@@ -170,9 +170,9 @@ macro_rules! impl_logic_traits {
     };
 }
 
-impl_logic_traits!(u8, 8);
-impl_logic_traits!(u16, 16);
-impl_logic_traits!(u32, 32);
-impl_logic_traits!(u64, 64);
-impl_logic_traits!(u128, 128);
-impl_logic_traits!(usize, 0usize.trailing_zeros());
+impl_logic_traits!(u8);
+impl_logic_traits!(u16);
+impl_logic_traits!(u32);
+impl_logic_traits!(u64);
+impl_logic_traits!(u128);
+impl_logic_traits!(usize);

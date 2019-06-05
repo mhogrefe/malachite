@@ -3,7 +3,7 @@ use num::basic::integers::PrimitiveInteger;
 use num::logic::traits::{BitAccess, BitScan, SignificantBits};
 
 macro_rules! impl_logic_traits {
-    ($t:ident, $width:expr) => {
+    ($t:ident) => {
         /// Returns the number of significant bits of a primitive signed integer; this is the
         /// integer's width minus the number of leading zeros of its absolute value.
         ///
@@ -242,9 +242,9 @@ macro_rules! impl_logic_traits {
     };
 }
 
-impl_logic_traits!(i8, 8);
-impl_logic_traits!(i16, 16);
-impl_logic_traits!(i32, 32);
-impl_logic_traits!(i64, 64);
-impl_logic_traits!(i128, 128);
-impl_logic_traits!(isize, 0usize.trailing_zeros());
+impl_logic_traits!(i8);
+impl_logic_traits!(i16);
+impl_logic_traits!(i32);
+impl_logic_traits!(i64);
+impl_logic_traits!(i128);
+impl_logic_traits!(isize);

@@ -5,12 +5,11 @@ use platform::Limb;
 
 /// Multiplies an `Integer` by an `Integer`, taking both `Integer`s by value.
 ///
-/// Time: worst case O(mn)
+/// Time: worst case O(n * log(n) * log(log(n)))
 ///
-/// Additional memory: worst case O(m+n)
+/// Additional memory: worst case O(n * log(n))
 ///
-/// where m = `self.significant_bits()`,
-///       n = `other.significant_bits()`
+/// where n = max(`self.significant_bits()` + `other.significant_bits()`)
 ///
 /// # Examples
 /// ```
@@ -41,12 +40,11 @@ impl Mul<Integer> for Integer {
 /// Multiplies an `Integer` by an `Integer`, taking the left `Integer` by value and the right
 /// `Integer` by reference.
 ///
-/// Time: worst case O(mn)
+/// Time: worst case O(n * log(n) * log(log(n)))
 ///
-/// Additional memory: worst case O(m+n)
+/// Additional memory: worst case O(n * log(n))
 ///
-/// where m = `self.significant_bits()`,
-///       n = `other.significant_bits()`
+/// where n = max(`self.significant_bits()` + `other.significant_bits()`)
 ///
 /// # Examples
 /// ```
@@ -78,12 +76,11 @@ impl<'a> Mul<&'a Integer> for Integer {
 /// Multiplies an `Integer` by an `Integer`, taking the left `Integer` by reference and the right
 /// `Integer` by value.
 ///
-/// Time: worst case O(mn)
+/// Time: worst case O(n * log(n) * log(log(n)))
 ///
-/// Additional memory: worst case O(m+n)
+/// Additional memory: worst case O(n * log(n))
 ///
-/// where m = `self.significant_bits()`,
-///       n = `other.significant_bits()`
+/// where n = max(`self.significant_bits()` + `other.significant_bits()`)
 ///
 /// # Examples
 /// ```
@@ -114,12 +111,11 @@ impl<'a> Mul<Integer> for &'a Integer {
 
 /// Multiplies an `Integer` by an `Integer`, taking both `Integer`s by reference.
 ///
-/// Time: worst case O(mn)
+/// Time: worst case O(n * log(n) * log(log(n)))
 ///
-/// Additional memory: worst case O(m+n)
+/// Additional memory: worst case O(n * log(n))
 ///
-/// where m = `self.significant_bits()`,
-///       n = `other.significant_bits()`
+/// where n = max(`self.significant_bits()` + `other.significant_bits()`)
 ///
 /// # Examples
 /// ```
@@ -153,12 +149,11 @@ impl<'a, 'b> Mul<&'a Integer> for &'b Integer {
 
 /// Multiplies an `Integer` by an `Integer` in place, taking the `Integer` on the RHS by value.
 ///
-/// Time: worst case O(mn)
+/// Time: worst case O(n * log(n) * log(log(n)))
 ///
-/// Additional memory: worst case O(m+n)
+/// Additional memory: worst case O(n * log(n))
 ///
-/// where m = `self.significant_bits()`,
-///       n = `other.significant_bits()`
+/// where n = max(`self.significant_bits()` + `other.significant_bits()`)
 ///
 /// # Examples
 /// ```
@@ -187,12 +182,11 @@ impl MulAssign<Integer> for Integer {
 
 /// Multiplies an `Integer` by an `Integer` in place, taking the `Integer` on the RHS by reference.
 ///
-/// Time: worst case O(mn)
+/// Time: worst case O(n * log(n) * log(log(n)))
 ///
-/// Additional memory: worst case O(m+n)
+/// Additional memory: worst case O(n * log(n))
 ///
-/// where m = `self.significant_bits()`,
-///       n = `other.significant_bits()`
+/// where n = max(`self.significant_bits()` + `other.significant_bits()`)
 ///
 /// # Examples
 /// ```

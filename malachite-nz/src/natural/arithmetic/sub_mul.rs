@@ -15,9 +15,11 @@ use platform::Limb;
 /// false, the result would be `None` and there's no point in calling this function). None of the
 /// slices should have any trailing zeros. The result, if it exists, will have no trailing zeros.
 ///
-/// Time: TODO
+/// Time: O(n * log(n) * log(log(n)))
 ///
-/// Additional memory: TODO
+/// Additional memory: O(n * log(n))
+///
+/// where n = max(`ys.len()`, `zs.len()`)
 ///
 /// # Panics
 /// Panics if `ys` or `zs` have fewer than two elements each, or if `xs.len()` < `ys.len()` +
@@ -52,9 +54,11 @@ pub fn limbs_sub_mul(xs: &[Limb], ys: &[Limb], zs: &[Limb]) -> Option<Vec<Limb>>
 /// this function). None of the slices should have any trailing zeros. The result, if it exists,
 /// will have no trailing zeros.
 ///
-/// Time: TODO
+/// Time: O(n * log(n) * log(log(n)))
 ///
-/// Additional memory: TODO
+/// Additional memory: O(n * log(n))
+///
+/// where n = max(`ys.len()`, `zs.len()`)
 ///
 /// # Panics
 /// Panics if `ys` or `zs` have fewer than two elements each, or if `xs.len()` < `ys.len()` +
@@ -99,9 +103,11 @@ impl SubMul<Natural, Natural> for Natural {
     /// Subtracts the product of a `Natural` (b) and a `Natural` (c) from a `Natural` (self), taking
     /// `self`, b, and c by value.
     ///
-    /// Time: TODO
+    /// Time: O(n * log(n) * log(log(n)))
     ///
-    /// Additional memory: TODO
+    /// Additional memory: O(n * log(n))
+    ///
+    /// where n = max(`b.significant_bits()`, `zs.significant_bits()`)
     ///
     /// # Panics
     /// Panics if `b * c` is greater than `self`.
@@ -135,9 +141,11 @@ impl<'a> SubMul<Natural, &'a Natural> for Natural {
     /// Subtracts the product of a `Natural` (b) and a `Natural` (c) from a `Natural` (self), taking
     /// `self` and b by value and c by reference.
     ///
-    /// Time: TODO
+    /// Time: O(n * log(n) * log(log(n)))
     ///
-    /// Additional memory: TODO
+    /// Additional memory: O(n * log(n))
+    ///
+    /// where n = max(`b.significant_bits()`, `zs.significant_bits()`)
     ///
     /// # Panics
     /// Panics if `b * c` is greater than `self`.
@@ -171,9 +179,11 @@ impl<'a> SubMul<&'a Natural, Natural> for Natural {
     /// Subtracts the product of a `Natural` (b) and a `Natural` (c) from a `Natural` (self), taking
     /// `self` and c value and b by reference.
     ///
-    /// Time: TODO
+    /// Time: O(n * log(n) * log(log(n)))
     ///
-    /// Additional memory: TODO
+    /// Additional memory: O(n * log(n))
+    ///
+    /// where n = max(`b.significant_bits()`, `zs.significant_bits()`)
     ///
     /// # Panics
     /// Panics if `b * c` is greater than `self`.
@@ -207,9 +217,11 @@ impl<'a, 'b> SubMul<&'a Natural, &'b Natural> for Natural {
     /// Subtracts the product of a `Natural` (b) and a `Natural` (c) from a `Natural` (self), taking
     /// `self` by value and b and c by reference.
     ///
-    /// Time: TODO
+    /// Time: O(n * log(n) * log(log(n)))
     ///
-    /// Additional memory: TODO
+    /// Additional memory: O(n * log(n))
+    ///
+    /// where n = max(`b.significant_bits()`, `zs.significant_bits()`)
     ///
     /// # Panics
     /// Panics if `b * c` is greater than `self`.
@@ -243,9 +255,11 @@ impl<'a, 'b, 'c> SubMul<&'a Natural, &'b Natural> for &'c Natural {
     /// Subtracts the product of a `Natural` (b) and a `Natural` (c) from a `Natural` (self), taking
     /// `self`, b, and c by reference.
     ///
-    /// Time: TODO
+    /// Time: O(n * log(n) * log(log(n)))
     ///
-    /// Additional memory: TODO
+    /// Additional memory: O(n * log(n))
+    ///
+    /// where n = max(`b.significant_bits()`, `zs.significant_bits()`)
     ///
     /// # Panics
     /// Panics if `b * c` is greater than `self`.
@@ -278,9 +292,11 @@ impl SubMulAssign<Natural, Natural> for Natural {
     /// Subtracts the product of a `Natural` (b) and a `Natural` (c) from a `Natural` (self), in
     /// place, taking b and c by value.
     ///
-    /// Time: TODO
+    /// Time: O(n * log(n) * log(log(n)))
     ///
-    /// Additional memory: TODO
+    /// Additional memory: O(n * log(n))
+    ///
+    /// where n = max(`b.significant_bits()`, `zs.significant_bits()`)
     ///
     /// # Panics
     /// Panics if `b * c` is greater than `self`.
@@ -314,9 +330,11 @@ impl<'a> SubMulAssign<Natural, &'a Natural> for Natural {
     /// Subtracts the product of a `Natural` (b) and a `Natural` (c) from a `Natural` (self), in
     /// place, taking b by value and c by reference.
     ///
-    /// Time: TODO
+    /// Time: O(n * log(n) * log(log(n)))
     ///
-    /// Additional memory: TODO
+    /// Additional memory: O(n * log(n))
+    ///
+    /// where n = max(`b.significant_bits()`, `zs.significant_bits()`)
     ///
     /// # Panics
     /// Panics if `b * c` is greater than `self`.
@@ -350,9 +368,11 @@ impl<'a> SubMulAssign<&'a Natural, Natural> for Natural {
     /// Subtracts the product of a `Natural` (b) and a `Natural` (c) from a `Natural` (self), in
     /// place, taking b by reference and c by value.
     ///
-    /// Time: TODO
+    /// Time: O(n * log(n) * log(log(n)))
     ///
-    /// Additional memory: TODO
+    /// Additional memory: O(n * log(n))
+    ///
+    /// where n = max(`b.significant_bits()`, `zs.significant_bits()`)
     ///
     /// # Panics
     /// Panics if `b * c` is greater than `self`.
@@ -386,9 +406,11 @@ impl<'a, 'b> SubMulAssign<&'a Natural, &'b Natural> for Natural {
     /// Subtracts the product of a `Natural` (b) and a `Natural` (c) from a `Natural` (self), in
     /// place, taking b and c by reference.
     ///
-    /// Time: TODO
+    /// Time: O(n * log(n) * log(log(n)))
     ///
-    /// Additional memory: TODO
+    /// Additional memory: O(n * log(n))
+    ///
+    /// where n = max(`b.significant_bits()`, `zs.significant_bits()`)
     ///
     /// # Panics
     /// Panics if `b * c` is greater than `self`.

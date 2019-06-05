@@ -54,7 +54,7 @@ macro_rules! split_into_chunks_mut {
 ///
 /// Time: O(n * log(n) * log(log(n)))
 ///
-/// Additional memory: TODO
+/// Additional memory: O(n * log(n))
 ///
 /// where n = `xs.len()`
 ///
@@ -83,7 +83,7 @@ pub fn limbs_mul_greater(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 ///
 /// Time: O(n * log(n) * log(log(n)))
 ///
-/// Additional memory: TODO
+/// Additional memory: O(n * log(n))
 ///
 /// where n = max(`xs.len()`, `ys.len()`)
 ///
@@ -117,7 +117,7 @@ pub fn limbs_mul(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 ///
 /// Time: O(n * log(n) * log(log(n)))
 ///
-/// Additional memory: TODO
+/// Additional memory: O(n * log(n))
 ///
 /// where n = `xs.len()`
 ///
@@ -184,7 +184,7 @@ fn toom44_ok(xs_len: usize, ys_len: usize) -> bool {
 ///
 /// Time: O(n * log(n) * log(log(n)))
 ///
-/// Additional memory: TODO
+/// Additional memory: O(n * log(n))
 ///
 /// where n = `xs.len()`
 ///
@@ -363,7 +363,7 @@ pub fn limbs_mul_greater_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> L
 ///
 /// Time: O(n * log(n) * log(log(n)))
 ///
-/// Additional memory: TODO
+/// Additional memory: O(n * log(n))
 ///
 /// where n = max(`xs.len()`, `ys.len()`)
 ///
@@ -478,9 +478,9 @@ pub fn _limbs_mul_greater_to_out_basecase_mem_opt(out: &mut [Limb], xs: &[Limb],
 ///
 /// Time: worst case O(n * log(n) * log(log(n)))
 ///
-/// Additional memory: worst case TODO
+/// Additional memory: worst case O(n * log(n))
 ///
-/// where n = `self.significant_bits()` + `other.significant_bits()`
+/// where n = max(`self.significant_bits()` + `other.significant_bits()`)
 ///
 /// # Examples
 /// ```
@@ -514,9 +514,9 @@ impl Mul<Natural> for Natural {
 ///
 /// Time: worst case O(n * log(n) * log(log(n)))
 ///
-/// Additional memory: worst case TODO
+/// Additional memory: worst case O(n * log(n))
 ///
-/// where n = `self.significant_bits()` + `other.significant_bits()`
+/// where n = max(`self.significant_bits()` + `other.significant_bits()`)
 ///
 /// # Examples
 /// ```
@@ -550,9 +550,9 @@ impl<'a> Mul<&'a Natural> for Natural {
 ///
 /// Time: worst case O(n * log(n) * log(log(n)))
 ///
-/// Additional memory: worst case TODO
+/// Additional memory: worst case O(n * log(n))
 ///
-/// where n = `self.significant_bits()` + `other.significant_bits()`
+/// where n = max(`self.significant_bits()` + `other.significant_bits()`)
 ///
 /// # Examples
 /// ```
@@ -585,9 +585,9 @@ impl<'a> Mul<Natural> for &'a Natural {
 ///
 /// Time: worst case O(n * log(n) * log(log(n)))
 ///
-/// Additional memory: worst case TODO
+/// Additional memory: worst case O(n * log(n))
 ///
-/// where n = `self.significant_bits()` + `other.significant_bits()`
+/// where n = max(`self.significant_bits()` + `other.significant_bits()`)
 ///
 /// # Examples
 /// ```
@@ -631,9 +631,9 @@ impl<'a, 'b> Mul<&'a Natural> for &'b Natural {
 ///
 /// Time: worst case O(n * log(n) * log(log(n)))
 ///
-/// Additional memory: worst case TODO
+/// Additional memory: worst case O(n * log(n))
 ///
-/// where n = `self.significant_bits()` + `other.significant_bits()`
+/// where n = max(`self.significant_bits()` + `other.significant_bits()`)
 ///
 /// # Examples
 /// ```
@@ -676,9 +676,9 @@ impl MulAssign<Natural> for Natural {
 ///
 /// Time: worst case O(n * log(n) * log(log(n)))
 ///
-/// Additional memory: worst case TODO
+/// Additional memory: worst case O(n * log(n))
 ///
-/// where n = `self.significant_bits()` + `other.significant_bits()`
+/// where n = max(`self.significant_bits()` + `other.significant_bits()`)
 ///
 /// # Examples
 /// ```
