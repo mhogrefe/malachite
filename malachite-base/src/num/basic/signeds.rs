@@ -8,6 +8,7 @@ use num::basic::integers::PrimitiveInteger;
 use num::basic::traits::NegativeOne;
 use num::basic::unsigneds::PrimitiveUnsigned;
 
+/// This trait defines functions on primitive unsigned integral types: ixx and isize.
 pub trait PrimitiveSigned:
     Abs<Output = Self>
     + CeilingMod
@@ -26,7 +27,7 @@ pub trait PrimitiveSigned:
     type UnsignedOfEqualWidth: PrimitiveUnsigned;
 }
 
-/// This macro defines basic trait implementations for unsigned types.
+/// This macro defines basic trait implementations for signed types.
 macro_rules! impl_basic_traits {
     ($t:ident, $ut: ident) => {
         impl PrimitiveSigned for $t {

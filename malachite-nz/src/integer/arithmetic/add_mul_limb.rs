@@ -448,7 +448,7 @@ impl<'a> AddMul<Integer, Limb> for &'a Integer {
                 abs: (&self.abs).add_mul(b.abs, c),
             }
         } else {
-            let abs_result_sign = b.abs.add_mul_right_assign_neg(&self.abs, c);
+            let abs_result_sign = b.abs.add_mul_right_assign_limb_neg(&self.abs, c);
             Integer {
                 sign: b.sign != abs_result_sign || b.abs == 0 as Limb,
                 abs: b.abs,
@@ -500,7 +500,7 @@ impl<'a, 'b> AddMul<&'a Integer, Limb> for &'b Integer {
                 abs: (&self.abs).add_mul(&b.abs, c),
             }
         } else {
-            let (abs, abs_result_sign) = self.abs.add_mul_neg(&b.abs, c);
+            let (abs, abs_result_sign) = self.abs.add_mul_limb_neg(&b.abs, c);
             Integer {
                 sign: self.sign == abs_result_sign || abs == 0 as Limb,
                 abs,
@@ -552,7 +552,7 @@ impl AddMulAssign<Integer, Limb> for Integer {
         if self.sign == b.sign {
             self.abs.add_mul_assign(b.abs, c);
         } else {
-            if !self.abs.add_mul_assign_neg(b.abs, c) {
+            if !self.abs.add_mul_assign_limb_neg(b.abs, c) {
                 self.sign.not_assign();
             }
             if self.abs == 0 as Limb {
@@ -603,7 +603,7 @@ impl<'a> AddMulAssign<&'a Integer, Limb> for Integer {
         if self.sign == b.sign {
             self.abs.add_mul_assign(&b.abs, c);
         } else {
-            if !self.abs.add_mul_assign_neg_ref(&b.abs, c) {
+            if !self.abs.add_mul_assign_limb_neg_ref(&b.abs, c) {
                 self.sign.not_assign();
             }
             if self.abs == 0 as Limb {
@@ -623,7 +623,7 @@ impl<'a> AddMulAssign<&'a Integer, u32> for Integer {
 
 impl Natural {
     // self - b * c, returns sign (true means non-negative)
-    pub(crate) fn add_mul_neg(&self, b: &Natural, c: Limb) -> (Natural, bool) {
+    pub(crate) fn add_mul_limb_neg(&self, b: &Natural, c: Limb) -> (Natural, bool) {
         if c == 0 || *b == 0 as Limb {
             return (self.clone(), true);
         }
@@ -653,16 +653,15 @@ impl Natural {
     }
 
     // self -= b * c, returns sign (true means non-negative)
-    fn add_mul_assign_neg(&mut self, mut b: Natural, c: Limb) -> bool {
+    pub(crate) fn add_mul_assign_limb_neg(&mut self, mut b: Natural, c: Limb) -> bool {
         if c == 0 || b == 0 as Limb {
             return true;
         }
         if c == 1 {
             let sign = *self >= b;
             if sign {
-                *self -= b;
+                self.sub_assign_no_panic(b);
             } else {
-                //TODO right assign
                 self.sub_right_assign_no_panic(&b);
             }
             return sign;
@@ -678,9 +677,8 @@ impl Natural {
             let bc = b * c;
             sign = *self >= bc;
             if sign {
-                *self -= bc;
+                self.sub_assign_no_panic(bc);
             } else {
-                //TODO right assign
                 self.sub_right_assign_no_panic(&bc);
             }
         } else if right {
@@ -693,7 +691,7 @@ impl Natural {
     }
 
     // b = a - b * c, returns sign (true means non-negative). self is b
-    fn add_mul_right_assign_neg(&mut self, a: &Natural, c: Limb) -> bool {
+    fn add_mul_right_assign_limb_neg(&mut self, a: &Natural, c: Limb) -> bool {
         if c == 0 || *self == 0 as Limb {
             self.assign(a);
             return true;
@@ -703,7 +701,7 @@ impl Natural {
             if sign {
                 self.sub_right_assign_no_panic(a);
             } else {
-                *self -= a;
+                self.sub_assign_ref_no_panic(a);
             }
             return sign;
         }
@@ -721,7 +719,7 @@ impl Natural {
             if sign {
                 self.sub_right_assign_no_panic(a);
             } else {
-                *self -= a;
+                self.sub_assign_ref_no_panic(a);
             }
         } else {
             self.trim();
@@ -729,17 +727,16 @@ impl Natural {
         sign
     }
 
-    // self -= b * c, returns sign (true means non-negative)
-    fn add_mul_assign_neg_ref(&mut self, b: &Natural, c: Limb) -> bool {
+    // self -= &b * c, returns sign (true means non-negative)
+    pub(crate) fn add_mul_assign_limb_neg_ref(&mut self, b: &Natural, c: Limb) -> bool {
         if c == 0 || *b == 0 as Limb {
             return true;
         }
         if c == 1 {
             let sign = *self >= *b;
             if sign {
-                *self -= b;
+                self.sub_assign_ref_no_panic(b);
             } else {
-                //TODO this is why we need a public right assign
                 self.sub_right_assign_no_panic(b);
             }
             return sign;
@@ -755,9 +752,8 @@ impl Natural {
             let bc = b * c;
             sign = *self >= bc;
             if sign {
-                *self -= bc;
+                self.sub_assign_no_panic(bc);
             } else {
-                //TODO right assign
                 self.sub_right_assign_no_panic(&bc);
             }
         } else {

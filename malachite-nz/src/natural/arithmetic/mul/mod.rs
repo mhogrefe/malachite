@@ -79,7 +79,9 @@ pub fn limbs_mul_greater(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 }
 
 /// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, returns
-/// the limbs of the product of the `Natural`s. Neither slice can be empty.
+/// the limbs of the product of the `Natural`s. Neither slice can be empty. The length of the
+/// resulting slice is always the sum of the lengths of the input slices, so it may have trailing
+/// zeros.
 ///
 /// Time: O(n * log(n) * log(log(n)))
 ///

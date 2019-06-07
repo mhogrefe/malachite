@@ -171,7 +171,7 @@ impl<'a, 'b> SubMul<&'a Integer, Limb> for &'b Integer {
                 abs: (&self.abs).add_mul(&b.abs, c),
             }
         } else {
-            let (abs, abs_result_sign) = self.abs.add_mul_neg(&b.abs, c);
+            let (abs, abs_result_sign) = self.abs.add_mul_limb_neg(&b.abs, c);
             Integer {
                 sign: self.sign == abs_result_sign || abs == 0 as Limb,
                 abs,

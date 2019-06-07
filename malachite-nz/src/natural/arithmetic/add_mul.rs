@@ -1,15 +1,9 @@
-use std::cmp::{max, Ordering};
 use std::mem::swap;
 
-use malachite_base::limbs::limbs_test_zero;
 use malachite_base::num::arithmetic::traits::{AddMul, AddMulAssign};
-use malachite_base::num::logic::traits::NotAssign;
 
 use natural::arithmetic::add::{limbs_add_greater, limbs_slice_add_greater_in_place_left};
-use natural::arithmetic::add_mul_limb::limbs_vec_add_mul_limb_in_place_left;
-use natural::arithmetic::mul::{limbs_mul_greater_to_out, limbs_mul_to_out};
-use natural::arithmetic::sub::{limbs_slice_sub_in_place_right, limbs_sub_in_place_left};
-use natural::comparison::ord::limbs_cmp;
+use natural::arithmetic::mul::limbs_mul_to_out;
 use natural::Natural::{self, Large, Small};
 use platform::Limb;
 
@@ -65,7 +59,7 @@ pub fn limbs_add_mul(xs: &[Limb], ys: &[Limb], zs: &[Limb]) -> Vec<Limb> {
 ///
 /// Time: O(m + n * log(n) * log(log(n)))
 ///
-/// Additional memory: O(m + n * log(n))
+/// Additional memory: O(n * log(n))
 ///
 /// where n = max(`ys.len()`, `zs.len()`)
 ///       m = `xs.len()`
@@ -109,7 +103,7 @@ pub fn limbs_add_mul_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb], zs: &[Limb])
 ///
 /// Time: O(m + n * log(n) * log(log(n)))
 ///
-/// Additional memory: O(m + n * log(n))
+/// Additional memory: O(n * log(n))
 ///
 /// where n = max(`b.significant_bits()`, `c.significant_bits()`)
 ///       m = `a.significant_bits()`
@@ -143,7 +137,7 @@ impl<'a> AddMul<Natural, Natural> for Natural {
 ///
 /// Time: O(m + n * log(n) * log(log(n)))
 ///
-/// Additional memory: O(m + n * log(n))
+/// Additional memory: O(n * log(n))
 ///
 /// where n = max(`b.significant_bits()`, `c.significant_bits()`)
 ///       m = `a.significant_bits()`
@@ -177,7 +171,7 @@ impl<'a> AddMul<Natural, &'a Natural> for Natural {
 ///
 /// Time: O(m + n * log(n) * log(log(n)))
 ///
-/// Additional memory: O(m + n * log(n))
+/// Additional memory: O(n * log(n))
 ///
 /// where n = max(`b.significant_bits()`, `c.significant_bits()`)
 ///       m = `a.significant_bits()`
@@ -211,7 +205,7 @@ impl<'a> AddMul<&'a Natural, Natural> for Natural {
 ///
 /// Time: O(m + n * log(n) * log(log(n)))
 ///
-/// Additional memory: O(m + n * log(n))
+/// Additional memory: O(n * log(n))
 ///
 /// where n = max(`b.significant_bits()`, `c.significant_bits()`)
 ///       m = `a.significant_bits()`
@@ -292,7 +286,7 @@ impl<'a, 'b, 'c> AddMul<&'a Natural, &'b Natural> for &'c Natural {
 ///
 /// Time: O(m + n * log(n) * log(log(n)))
 ///
-/// Additional memory: O(m + n * log(n))
+/// Additional memory: O(n * log(n))
 ///
 /// where n = max(`b.significant_bits()`, `c.significant_bits()`)
 ///       m = `a.significant_bits()`
@@ -339,7 +333,7 @@ impl AddMulAssign<Natural, Natural> for Natural {
 ///
 /// Time: O(m + n * log(n) * log(log(n)))
 ///
-/// Additional memory: O(m + n * log(n))
+/// Additional memory: O(n * log(n))
 ///
 /// where n = max(`b.significant_bits()`, `c.significant_bits()`)
 ///       m = `a.significant_bits()`
@@ -386,7 +380,7 @@ impl<'a> AddMulAssign<Natural, &'a Natural> for Natural {
 ///
 /// Time: O(m + n * log(n) * log(log(n)))
 ///
-/// Additional memory: O(m + n * log(n))
+/// Additional memory: O(n * log(n))
 ///
 /// where n = max(`b.significant_bits()`, `c.significant_bits()`)
 ///       m = `a.significant_bits()`
@@ -433,7 +427,7 @@ impl<'a> AddMulAssign<&'a Natural, Natural> for Natural {
 ///
 /// Time: O(m + n * log(n) * log(log(n)))
 ///
-/// Additional memory: O(m + n * log(n))
+/// Additional memory: O(n * log(n))
 ///
 /// where n = max(`b.significant_bits()`, `c.significant_bits()`)
 ///       m = `a.significant_bits()`
@@ -472,86 +466,5 @@ impl<'a, 'b> AddMulAssign<&'a Natural, &'b Natural> for Natural {
                 }
             }
         }
-    }
-}
-
-//TODO remove
-pub(crate) fn mpz_aorsmul(
-    w_sign: &mut bool,
-    w: &mut Vec<Limb>,
-    x_sign: bool,
-    x: &[Limb],
-    y_sign: bool,
-    y: &[Limb],
-    mut sub: bool,
-) {
-    // make x the bigger of the two
-    let (x, y) = if y.len() > x.len() { (y, x) } else { (x, y) };
-    let xsize = x.len();
-    let ysize = y.len();
-
-    // w unaffected if x == 0 or y == 0
-    if ysize == 0 {
-        return;
-    }
-    sub ^= y_sign;
-    // use mpn_addmul_1/mpn_submul_1 if possible
-    if y_sign && ysize == 1 {
-        limbs_vec_add_mul_limb_in_place_left(w, x, y[0]);
-        return;
-    }
-    sub ^= x_sign;
-    sub ^= *w_sign;
-    let wsize = w.len();
-    let mut tsize = xsize + ysize;
-    w.resize(max(wsize, tsize) + 1, 0);
-
-    if wsize == 0 {
-        // Nothing to add to, just set w=x*y. No w==x or w==y overlap here, since we know x,y != 0
-        // but w == 0.
-        let high = limbs_mul_greater_to_out(w, x, y);
-        if high == 0 {
-            tsize -= 1;
-        }
-        *w_sign = !sub && tsize != 0;
-        return;
-    }
-
-    let mut t = vec![0; tsize];
-    let high = limbs_mul_greater_to_out(&mut t, x, y);
-    if high == 0 {
-        tsize -= 1;
-    }
-    assert_ne!(t[tsize - 1], 0);
-    if sub {
-        if wsize < tsize {
-            let c = if limbs_slice_add_greater_in_place_left(&mut w[..tsize], &t[..tsize]) {
-                1
-            } else {
-                0
-            };
-            w[tsize] = c;
-        } else {
-            let c = if limbs_slice_add_greater_in_place_left(&mut w[..wsize], &t[..tsize]) {
-                1
-            } else {
-                0
-            };
-            w[wsize] = c;
-        }
-    } else if limbs_cmp(&w[..wsize], &t[..tsize]) == Ordering::Less {
-        if tsize != 0 {
-            w_sign.not_assign();
-        }
-        assert!(!limbs_slice_sub_in_place_right(
-            &t[..tsize],
-            &mut w[..tsize],
-            wsize,
-        ));
-    } else {
-        assert!(!limbs_sub_in_place_left(&mut w[..wsize], &t[..tsize]));
-    }
-    if limbs_test_zero(w) {
-        *w_sign = false;
     }
 }

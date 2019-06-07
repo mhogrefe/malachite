@@ -1,12 +1,77 @@
 use std::str::FromStr;
 
-use malachite_base::num::arithmetic::traits::{AddMul, AddMulAssign};
+use malachite_base::num::arithmetic::traits::{AddMul, AddMulAssign, SubMul, UnsignedAbs};
 use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
+use malachite_nz::integer::arithmetic::add_mul::{
+    limbs_overflowing_sub_mul, limbs_overflowing_sub_mul_in_place_left,
+};
 use malachite_nz::integer::Integer;
+use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 
 use common::test_properties;
+use malachite_test::inputs::base::triples_of_unsigned_vec_var_29;
 use malachite_test::inputs::integer::{integers, pairs_of_integers, triples_of_integers};
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+fn test_limbs_overflowing_sub_mul_and_limbs_overflowing_sub_mul_in_place_left() {
+    let test = |xs_before: &[Limb], ys: &[Limb], zs: &[Limb], result: &[Limb], sign: bool| {
+        let (result_alt, sign_alt) = limbs_overflowing_sub_mul(xs_before, ys, zs);
+        assert_eq!(result_alt, result);
+        assert_eq!(sign_alt, sign);
+        let mut xs = xs_before.to_vec();
+        assert_eq!(
+            limbs_overflowing_sub_mul_in_place_left(&mut xs, ys, zs),
+            sign
+        );
+        assert_eq!(xs, result);
+    };
+    test(
+        &[123, 456],
+        &[123, 789],
+        &[321, 654],
+        &[39360, 333255, 516006],
+        false,
+    );
+    test(
+        &[123, 456, 789, 987, 654],
+        &[123, 789],
+        &[321, 654],
+        &[4294927936, 4294634040, 4294452078, 986, 654],
+        true,
+    );
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_overflowing_sub_mul_fail_1() {
+    limbs_overflowing_sub_mul(&[10, 10], &[], &[10, 10]);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_overflowing_sub_mul_fail_2() {
+    limbs_overflowing_sub_mul(&[10, 10], &[10, 10], &[]);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_overflowing_sub_mul_in_place_left_fail_1() {
+    let mut xs = vec![10, 10];
+    limbs_overflowing_sub_mul_in_place_left(&mut xs, &[], &[10, 10]);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_overflowing_sub_mul_in_place_left_fail_2() {
+    let mut xs = vec![10, 10];
+    limbs_overflowing_sub_mul_in_place_left(&mut xs, &[10, 10], &[]);
+}
 
 #[test]
 fn test_add_mul() {
@@ -271,6 +336,50 @@ fn test_add_mul() {
         "1000000000000",
         "0",
     );
+    test(
+        "-4",
+        "-24227802588",
+        "-14313318194700",
+        "346780247600420147883596",
+    );
+}
+
+#[test]
+fn limbs_overflowing_sub_mul_properties() {
+    test_properties(triples_of_unsigned_vec_var_29, |&(ref a, ref b, ref c)| {
+        let (result_limbs, sign) = limbs_overflowing_sub_mul(a, b, c);
+        let expected_result = Integer::from(Natural::from_limbs_asc(a)).sub_mul(
+            Integer::from(Natural::from_limbs_asc(b)),
+            Integer::from(Natural::from_limbs_asc(c)),
+        );
+        if expected_result != 0 {
+            assert_eq!(sign, expected_result >= 0);
+        }
+        assert_eq!(
+            Natural::from_owned_limbs_asc(result_limbs),
+            expected_result.unsigned_abs()
+        );
+    });
+}
+
+#[test]
+fn limbs_overflowing_sub_mul_in_place_left_properties() {
+    test_properties(triples_of_unsigned_vec_var_29, |&(ref a, ref b, ref c)| {
+        let a_old = a;
+        let mut a = a_old.to_vec();
+        let sign = limbs_overflowing_sub_mul_in_place_left(&mut a, b, c);
+        let expected_result = Integer::from(Natural::from_limbs_asc(a_old)).sub_mul(
+            Integer::from(Natural::from_limbs_asc(b)),
+            Integer::from(Natural::from_limbs_asc(c)),
+        );
+        if expected_result != 0 {
+            assert_eq!(sign, expected_result >= 0);
+        }
+        assert_eq!(
+            Natural::from_owned_limbs_asc(a),
+            expected_result.unsigned_abs()
+        );
+    });
 }
 
 #[test]
@@ -294,7 +403,7 @@ fn add_mul_properties() {
         let mut mut_a = a.clone();
         mut_a.add_mul_assign(b, c);
         assert!(mut_a.is_valid());
-        assert_eq!(mut_a, result);
+        assert_eq!(mut_a, result, "{} {} {}", a, b, c);
 
         let result_alt = a.clone().add_mul(b.clone(), c.clone());
         assert!(result_alt.is_valid());

@@ -1419,7 +1419,8 @@ pub fn triples_of_unsigned_vec_var_1<T: PrimitiveUnsigned + Rand>(
     )
 }
 
-// All triples of `Vec<T>`, where `T` is unsigned and the last `T`s of all `Vec`s are nonzero.
+// All triples of `Vec<T>`, where `T` is unsigned and the for each `Vec`, it is either empty or the
+// last `T` is nonzero.
 pub fn triples_of_unsigned_vec_var_2<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
 ) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
@@ -1795,6 +1796,20 @@ pub fn triples_of_unsigned_vec_var_28<T: PrimitiveUnsigned + Rand>(
                 && *zs.last().unwrap() != T::ZERO
         }),
     )
+}
+
+// All triples of `Vec<T>`, where `T` is unsigned, none of the `Vec`s are empty, and the last `T`s
+// of all `Vec`s are nonzero.
+pub fn triples_of_unsigned_vec_var_29<T: PrimitiveUnsigned + Rand>(
+    gm: GenerationMode,
+) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
+    match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_triples_from_single(
+            exhaustive_vecs(exhaustive_unsigned())
+                .filter(|limbs| !limbs.is_empty() && *limbs.last().unwrap() != T::ZERO),
+        )),
+        _ => Box::new(random_triples_from_single(vecs_of_unsigned_var_1(gm))),
+    }
 }
 
 pub fn quadruples_of_three_unsigned_vecs_and_bool<T: PrimitiveUnsigned + Rand>(

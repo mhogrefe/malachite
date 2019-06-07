@@ -7,8 +7,6 @@ use malachite_base::num::conversion::traits::{CheckedFrom, WrappingFrom};
 use natural::Natural::{self, Large, Small};
 use platform::Limb;
 
-//TODO clean
-
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
 /// limbs of the `Natural` left-shifted by a `Limb`.
 ///
@@ -173,18 +171,6 @@ pub fn limbs_vec_shl_in_place(limbs: &mut Vec<Limb>, bits: u64) {
     }
 }
 
-/// mpn_lshiftc -- Shift left low level with complement.
-/// Shift U (pointed to by xs and n limbs long) bits bits to the left
-/// and store the n least significant limbs of the result at out.
-/// Return the bits shifted out from the most significant limb.
-///
-/// Argument constraints:
-/// 1. 0 < bits < GMP_NUMB_BITS.
-/// 2. If the result is to be written over the input, out must be >= xs.
-///
-/// TODO test
-///
-///
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
 /// limbs of the `Natural` left-shifted by a `Limb`, and complemented, to an output slice. The
 /// output slice must be at least as long as the input slice. The `Limb` must be between 1 and
@@ -338,6 +324,7 @@ macro_rules! impl_natural_shl_unsigned {
                 if other == 0 || *self == 0 as Limb {
                     return;
                 }
+                //TODO use TrueCheckedShl
                 mutate_with_possible_promotion!(
                     self,
                     small,
