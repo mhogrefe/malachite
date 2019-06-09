@@ -28,8 +28,12 @@ pub mod num {
     pub mod conversion {
         pub mod checked_from;
         pub mod convertible_from;
+        pub mod join_halves;
+        pub mod lower_half;
         pub mod overflowing_from;
         pub mod saturating_from;
+        pub mod split_in_half;
+        pub mod upper_half;
         pub mod wrapping_from;
     }
     pub mod logic {

@@ -2,6 +2,13 @@ use std::num::ParseIntError;
 
 use round::RoundingMode;
 
+//TODO test
+/// This trait defines an assignment function that sets a mutable reference of one type to the value
+/// of another.
+pub trait Assign<Rhs = Self> {
+    fn assign(&mut self, rhs: Rhs);
+}
+
 /// This trait defines a conversion from another type. If the conversion fails, `None` is returned.
 /// If `CheckedFrom` is implemented, it usually makes sense to implement `ConvertibleFrom` as well.
 pub trait CheckedFrom<T>: Sized {
@@ -185,8 +192,4 @@ pub trait FromU32Slice: Sized {
     fn from_u32_slice(slice: &[u32]) -> Self;
 
     fn copy_from_u32_slice(out_slice: &mut [Self], in_slice: &[u32]);
-}
-
-pub trait Assign<Rhs = Self> {
-    fn assign(&mut self, rhs: Rhs);
 }
