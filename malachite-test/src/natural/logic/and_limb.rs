@@ -39,7 +39,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
         Large,
         benchmark_natural_and_assign_limb_library_comparison
     );
-    #[cfg(feature = "64_bit_limbs")]
+    #[cfg(not(feature = "32_bit_limbs"))]
     register_bench!(registry, Large, benchmark_natural_and_assign_limb);
     #[cfg(feature = "32_bit_limbs")]
     register_bench!(
@@ -176,7 +176,7 @@ fn benchmark_natural_and_assign_limb_library_comparison(
     );
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 fn benchmark_natural_and_assign_limb(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "Natural &= Limb",

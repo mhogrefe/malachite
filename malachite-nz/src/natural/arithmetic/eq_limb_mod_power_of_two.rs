@@ -74,7 +74,7 @@ impl<'a> EqModPowerOfTwo<Limb> for &'a Natural {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a> EqModPowerOfTwo<u32> for &'a Natural {
     #[inline]
     fn eq_mod_power_of_two(self, other: u32, pow: u64) -> bool {
@@ -115,7 +115,7 @@ impl<'a> EqModPowerOfTwo<&'a Natural> for Limb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a> EqModPowerOfTwo<&'a Natural> for u32 {
     #[inline]
     fn eq_mod_power_of_two(self, other: &'a Natural, pow: u64) -> bool {

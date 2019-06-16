@@ -38,7 +38,7 @@ fn test_checked_hamming_distance_limb() {
         test("4294967295", 0, Some(u64::from(Limb::WIDTH)));
         test("4294967295", Limb::MAX, Some(0));
     }
-    #[cfg(feature = "64_bit_limbs")]
+    #[cfg(not(feature = "32_bit_limbs"))]
     {
         test("18446744073709551615", 0, Some(u64::from(Limb::WIDTH)));
         test("18446744073709551615", Limb::MAX, Some(0));

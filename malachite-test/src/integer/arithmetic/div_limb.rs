@@ -4,7 +4,7 @@ use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::platform::Limb;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 use inputs::integer::nm_pairs_of_integer_and_positive_unsigned;
 #[cfg(feature = "32_bit_limbs")]
 use inputs::integer::nrm_pairs_of_integer_and_positive_unsigned;
@@ -108,7 +108,7 @@ fn benchmark_integer_div_limb_library_comparison(
     );
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 fn benchmark_integer_div_limb_library_comparison(
     gm: GenerationMode,
     limit: usize,

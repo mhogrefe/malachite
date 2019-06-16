@@ -17,7 +17,7 @@ use malachite_test::inputs::natural::pairs_of_natural_and_unsigned;
 #[cfg(feature = "32_bit_limbs")]
 use malachite_test::natural::conversion::assign_double_limb::num_assign_double_limb;
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 fn num_assign_double_limb(x: &mut BigUint, u: DoubleLimb) {
     *x = BigUint::from(u);
 }
@@ -40,7 +40,7 @@ fn test_assign_double_limb() {
         test("123", Limb::MAX.into(), "4294967295");
         test("123", DoubleLimb::MAX, "18446744073709551615");
     }
-    #[cfg(feature = "64_bit_limbs")]
+    #[cfg(not(feature = "32_bit_limbs"))]
     {
         test("123", Limb::MAX.into(), "18446744073709551615");
         test(

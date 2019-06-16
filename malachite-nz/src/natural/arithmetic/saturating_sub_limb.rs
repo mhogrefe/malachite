@@ -1,6 +1,6 @@
 use malachite_base::num::arithmetic::traits::{CheckedSub, SaturatingSub, SaturatingSubAssign};
 use malachite_base::num::basic::traits::Zero;
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 use malachite_base::num::conversion::traits::WrappingFrom;
 
 use natural::Natural;
@@ -43,7 +43,7 @@ impl SaturatingSub<Limb> for Natural {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl SaturatingSub<u32> for Natural {
     type Output = Natural;
 
@@ -89,7 +89,7 @@ impl<'a> SaturatingSub<Limb> for &'a Natural {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a> SaturatingSub<u32> for &'a Natural {
     type Output = Natural;
 
@@ -138,7 +138,7 @@ impl SaturatingSubAssign<Limb> for Natural {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl SaturatingSubAssign<u32> for Natural {
     #[inline]
     fn saturating_sub_assign(&mut self, other: u32) {
@@ -180,7 +180,7 @@ impl SaturatingSub<Natural> for Limb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl SaturatingSub<Natural> for u32 {
     type Output = u32;
 
@@ -224,7 +224,7 @@ impl<'a> SaturatingSub<&'a Natural> for Limb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a> SaturatingSub<&'a Natural> for u32 {
     type Output = u32;
 
@@ -277,7 +277,7 @@ impl SaturatingSubAssign<Natural> for Limb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl SaturatingSubAssign<Natural> for u32 {
     #[inline]
     fn saturating_sub_assign(&mut self, other: Natural) {
@@ -328,7 +328,7 @@ impl<'a> SaturatingSubAssign<&'a Natural> for Limb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a> SaturatingSubAssign<&'a Natural> for u32 {
     #[inline]
     fn saturating_sub_assign(&mut self, other: &'a Natural) {

@@ -37,7 +37,7 @@ fn test_limb_checked_from_integer() {
         test("4294967295", Some(Limb::MAX));
         test("4294967296", None);
     }
-    #[cfg(feature = "64_bit_limbs")]
+    #[cfg(not(feature = "32_bit_limbs"))]
     {
         test("1000000000000", Some(1000000000000));
         test("18446744073709551615", Some(Limb::MAX));
@@ -65,7 +65,7 @@ fn test_limb_wrapping_from_integer() {
         test("-4294967296", 0);
         test("-4294967295", 1);
     }
-    #[cfg(feature = "64_bit_limbs")]
+    #[cfg(not(feature = "32_bit_limbs"))]
     {
         test("-123", 18446744073709551493);
         test("1000000000000", 1000000000000);
@@ -95,7 +95,7 @@ fn test_limb_saturating_from_integer() {
         test("-4294967296", 0);
         test("-4294967295", 0);
     }
-    #[cfg(feature = "64_bit_limbs")]
+    #[cfg(not(feature = "32_bit_limbs"))]
     {
         test("-123", 0);
         test("1000000000000", 1_000_000_000_000);
@@ -125,7 +125,7 @@ fn test_limb_overflowing_from_integer() {
         test("-4294967296", (0, true));
         test("-4294967295", (1, true));
     }
-    #[cfg(feature = "64_bit_limbs")]
+    #[cfg(not(feature = "32_bit_limbs"))]
     {
         test("-123", (18446744073709551493, true));
         test("1000000000000", (1000000000000, false));
@@ -155,7 +155,7 @@ fn test_limb_convertible_from_integer() {
         test("-4294967296", false);
         test("-4294967295", false);
     }
-    #[cfg(feature = "64_bit_limbs")]
+    #[cfg(not(feature = "32_bit_limbs"))]
     {
         test("-123", false);
         test("1000000000000", true);

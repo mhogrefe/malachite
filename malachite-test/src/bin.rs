@@ -3,9 +3,14 @@ extern crate malachite_test;
 use std::env;
 
 use malachite_test::common::{get_gm, get_no_special_gm, DemoBenchRegistry, ScaleType};
+use malachite_test::tune::tune;
 
 pub fn main() {
     let args: Vec<String> = env::args().collect();
+    if args.len() == 3 && args[1] == "tune" {
+        tune(&args[2]);
+        return;
+    }
     if args.len() != 3 && args.len() != 4 {
         panic!("Usage: [exhaustive|random|special_random] [limit] [demo/bench name]");
     }

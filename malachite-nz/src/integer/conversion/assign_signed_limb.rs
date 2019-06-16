@@ -31,7 +31,7 @@ impl Assign<SignedLimb> for Integer {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl Assign<i32> for Integer {
     #[inline]
     fn assign(&mut self, other: i32) {

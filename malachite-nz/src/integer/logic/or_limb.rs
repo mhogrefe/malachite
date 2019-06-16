@@ -169,7 +169,7 @@ impl BitOr<Limb> for Integer {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl BitOr<u32> for Integer {
     type Output = Integer;
 
@@ -216,7 +216,7 @@ impl<'a> BitOr<Limb> for &'a Integer {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a> BitOr<u32> for &'a Integer {
     type Output = Integer;
 
@@ -257,7 +257,7 @@ impl BitOr<Integer> for Limb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl BitOr<Integer> for u32 {
     type Output = Integer;
 
@@ -297,7 +297,7 @@ impl<'a> BitOr<&'a Integer> for Limb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a> BitOr<&'a Integer> for u32 {
     type Output = Integer;
 
@@ -342,7 +342,7 @@ impl BitOrAssign<Limb> for Integer {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl BitOrAssign<u32> for Integer {
     #[inline]
     fn bitor_assign(&mut self, other: u32) {

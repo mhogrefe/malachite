@@ -50,7 +50,7 @@ impl Mod<SignedLimb> for Integer {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl Mod<i32> for Integer {
     type Output = Integer;
 
@@ -109,7 +109,7 @@ impl<'a> Mod<SignedLimb> for &'a Integer {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a> Mod<i32> for &'a Integer {
     type Output = Integer;
 
@@ -170,7 +170,7 @@ impl ModAssign<SignedLimb> for Integer {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl ModAssign<i32> for Integer {
     #[inline]
     fn mod_assign(&mut self, other: i32) {
@@ -225,7 +225,7 @@ impl Mod<Integer> for SignedLimb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl Mod<Integer> for i32 {
     type Output = Integer;
 
@@ -282,7 +282,7 @@ impl<'a> Mod<&'a Integer> for SignedLimb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a> Mod<&'a Integer> for i32 {
     type Output = Integer;
 
@@ -333,7 +333,7 @@ impl Rem<SignedLimb> for Integer {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl Rem<i32> for Integer {
     type Output = Integer;
 
@@ -386,7 +386,7 @@ impl<'a> Rem<SignedLimb> for &'a Integer {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a> Rem<i32> for &'a Integer {
     type Output = Integer;
 
@@ -442,7 +442,7 @@ impl RemAssign<SignedLimb> for Integer {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl RemAssign<i32> for Integer {
     #[inline]
     fn rem_assign(&mut self, other: i32) {
@@ -491,7 +491,7 @@ impl Rem<Integer> for SignedLimb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl Rem<Integer> for i32 {
     type Output = Integer;
 
@@ -543,7 +543,7 @@ impl<'a> Rem<&'a Integer> for SignedLimb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a> Rem<&'a Integer> for i32 {
     type Output = Integer;
 
@@ -595,7 +595,7 @@ impl CeilingMod<SignedLimb> for Integer {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl CeilingMod<i32> for Integer {
     type Output = Integer;
 
@@ -654,7 +654,7 @@ impl<'a> CeilingMod<SignedLimb> for &'a Integer {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a> CeilingMod<i32> for &'a Integer {
     type Output = Integer;
 
@@ -715,7 +715,7 @@ impl CeilingModAssign<SignedLimb> for Integer {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl CeilingModAssign<i32> for Integer {
     #[inline]
     fn ceiling_mod_assign(&mut self, other: i32) {
@@ -772,7 +772,7 @@ impl CeilingMod<Integer> for SignedLimb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl CeilingMod<Integer> for i32 {
     type Output = Integer;
 
@@ -831,7 +831,7 @@ impl<'a> CeilingMod<&'a Integer> for SignedLimb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a> CeilingMod<&'a Integer> for i32 {
     type Output = Integer;
 

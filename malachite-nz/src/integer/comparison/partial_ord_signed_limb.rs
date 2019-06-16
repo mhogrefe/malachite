@@ -41,7 +41,7 @@ impl PartialOrd<SignedLimb> for Integer {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl PartialOrd<i32> for Integer {
     #[inline]
     fn partial_cmp(&self, other: &i32) -> Option<Ordering> {
@@ -84,7 +84,7 @@ impl PartialOrd<Integer> for SignedLimb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl PartialOrd<Integer> for i32 {
     #[inline]
     fn partial_cmp(&self, other: &Integer) -> Option<Ordering> {

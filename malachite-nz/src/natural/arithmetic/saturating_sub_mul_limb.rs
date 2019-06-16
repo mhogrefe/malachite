@@ -40,7 +40,7 @@ impl SaturatingSubMul<Natural, Limb> for Natural {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl SaturatingSubMul<Natural, u32> for Natural {
     type Output = Natural;
 
@@ -84,7 +84,7 @@ impl<'a> SaturatingSubMul<&'a Natural, Limb> for Natural {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a> SaturatingSubMul<&'a Natural, u32> for Natural {
     type Output = Natural;
 
@@ -130,7 +130,7 @@ impl<'a> SaturatingSubMul<Natural, Limb> for &'a Natural {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a> SaturatingSubMul<Natural, u32> for &'a Natural {
     type Output = Natural;
 
@@ -176,7 +176,7 @@ impl<'a, 'b> SaturatingSubMul<&'a Natural, Limb> for &'b Natural {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a, 'b> SaturatingSubMul<&'a Natural, u32> for &'b Natural {
     type Output = Natural;
 
@@ -225,7 +225,7 @@ impl SaturatingSubMulAssign<Natural, Limb> for Natural {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl SaturatingSubMulAssign<Natural, u32> for Natural {
     #[inline]
     fn saturating_sub_mul_assign(&mut self, b: Natural, c: u32) {
@@ -272,7 +272,7 @@ impl<'a> SaturatingSubMulAssign<&'a Natural, Limb> for Natural {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a> SaturatingSubMulAssign<&'a Natural, u32> for Natural {
     #[inline]
     fn saturating_sub_mul_assign(&mut self, b: &'a Natural, c: u32) {

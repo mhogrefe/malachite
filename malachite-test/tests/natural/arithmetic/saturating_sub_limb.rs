@@ -54,7 +54,7 @@ fn test_limb_saturating_sub_natural() {
     test(123, "1000000000000", "0");
     #[cfg(feature = "32_bit_limbs")]
     test(Limb::MAX, "4294967295", "0");
-    #[cfg(feature = "64_bit_limbs")]
+    #[cfg(not(feature = "32_bit_limbs"))]
     test(Limb::MAX, "18446744073709551615", "0");
 }
 

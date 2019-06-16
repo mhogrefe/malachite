@@ -68,7 +68,7 @@ impl<'a> CheckedFrom<&'a Integer> for Limb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a> CheckedFrom<&'a Integer> for u32 {
     #[inline]
     fn checked_from(value: &Integer) -> Option<u32> {
@@ -142,7 +142,7 @@ impl<'a> WrappingFrom<&'a Integer> for Limb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a> WrappingFrom<&'a Integer> for u32 {
     #[inline]
     fn wrapping_from(value: &Integer) -> u32 {
@@ -178,7 +178,7 @@ impl SaturatingFrom<Integer> for Limb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl SaturatingFrom<Integer> for u32 {
     #[inline]
     fn saturating_from(value: Integer) -> u32 {
@@ -220,7 +220,7 @@ impl<'a> SaturatingFrom<&'a Integer> for Limb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a> SaturatingFrom<&'a Integer> for u32 {
     #[inline]
     fn saturating_from(value: &Integer) -> u32 {
@@ -256,7 +256,7 @@ impl OverflowingFrom<Integer> for Limb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl OverflowingFrom<Integer> for u32 {
     #[inline]
     fn overflowing_from(value: Integer) -> (u32, bool) {
@@ -303,7 +303,7 @@ impl<'a> OverflowingFrom<&'a Integer> for Limb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a> OverflowingFrom<&'a Integer> for u32 {
     #[inline]
     fn overflowing_from(value: &'a Integer) -> (u32, bool) {
@@ -341,7 +341,7 @@ impl ConvertibleFrom<Integer> for Limb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl ConvertibleFrom<Integer> for u32 {
     #[inline]
     fn convertible_from(value: Integer) -> bool {
@@ -377,7 +377,7 @@ impl<'a> ConvertibleFrom<&'a Integer> for Limb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a> ConvertibleFrom<&'a Integer> for u32 {
     #[inline]
     fn convertible_from(value: &Integer) -> bool {

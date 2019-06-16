@@ -39,7 +39,7 @@ impl SubMul<Integer, Limb> for Integer {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl SubMul<Integer, u32> for Integer {
     type Output = Integer;
 
@@ -83,7 +83,7 @@ impl<'a> SubMul<&'a Integer, Limb> for Integer {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a> SubMul<&'a Integer, u32> for Integer {
     type Output = Integer;
 
@@ -126,7 +126,7 @@ impl<'a> SubMul<Integer, Limb> for &'a Integer {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a> SubMul<Integer, u32> for &'a Integer {
     type Output = Integer;
 
@@ -180,7 +180,7 @@ impl<'a, 'b> SubMul<&'a Integer, Limb> for &'b Integer {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a, 'b> SubMul<&'a Integer, u32> for &'b Integer {
     type Output = Integer;
 
@@ -224,7 +224,7 @@ impl SubMulAssign<Integer, Limb> for Integer {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl SubMulAssign<Integer, u32> for Integer {
     #[inline]
     fn sub_mul_assign(&mut self, b: Integer, c: u32) {
@@ -268,7 +268,7 @@ impl<'a> SubMulAssign<&'a Integer, Limb> for Integer {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a> SubMulAssign<&'a Integer, u32> for Integer {
     #[inline]
     fn sub_mul_assign(&mut self, b: &'a Integer, c: u32) {

@@ -46,7 +46,7 @@ impl Div<SignedLimb> for Integer {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl Div<i32> for Integer {
     type Output = Integer;
 
@@ -99,7 +99,7 @@ impl<'a> Div<SignedLimb> for &'a Integer {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a> Div<i32> for &'a Integer {
     type Output = Integer;
 
@@ -156,7 +156,7 @@ impl DivAssign<SignedLimb> for Integer {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl DivAssign<i32> for Integer {
     #[inline]
     fn div_assign(&mut self, other: i32) {
@@ -205,7 +205,7 @@ impl Div<Integer> for SignedLimb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl Div<Integer> for i32 {
     type Output = Integer;
 
@@ -256,7 +256,7 @@ impl<'a> Div<&'a Integer> for SignedLimb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a> Div<&'a Integer> for i32 {
     type Output = Integer;
 

@@ -4,7 +4,7 @@ use malachite_nz::platform::SignedLimb;
 use num::BigInt;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 use inputs::integer::nm_pairs_of_integer_and_signed;
 #[cfg(feature = "32_bit_limbs")]
 use inputs::integer::{
@@ -24,7 +24,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
         Large,
         benchmark_integer_mul_assign_signed_limb_library_comparison
     );
-    #[cfg(feature = "64_bit_limbs")]
+    #[cfg(not(feature = "32_bit_limbs"))]
     register_bench!(registry, Large, benchmark_integer_mul_assign_signed_limb);
     register_bench!(
         registry,
@@ -110,7 +110,7 @@ fn benchmark_integer_mul_assign_signed_limb_library_comparison(
     );
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 fn benchmark_integer_mul_assign_signed_limb(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "Integer *= SignedLimb",
@@ -151,7 +151,7 @@ fn benchmark_integer_mul_signed_limb_library_comparison(
     );
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 fn benchmark_integer_mul_signed_limb_library_comparison(
     gm: GenerationMode,
     limit: usize,

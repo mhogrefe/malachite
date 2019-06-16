@@ -48,7 +48,7 @@ impl DivRound<Limb> for Integer {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl DivRound<u32> for Integer {
     type Output = Integer;
 
@@ -115,7 +115,7 @@ impl<'a> DivRound<Limb> for &'a Integer {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a> DivRound<u32> for &'a Integer {
     type Output = Integer;
 
@@ -166,7 +166,7 @@ impl DivRound<Integer> for Limb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl DivRound<Integer> for u32 {
     type Output = Integer;
 
@@ -232,7 +232,7 @@ impl<'a> DivRound<&'a Integer> for Limb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a> DivRound<&'a Integer> for u32 {
     type Output = Integer;
 
@@ -311,7 +311,7 @@ impl DivRoundAssign<Limb> for Integer {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl DivRoundAssign<u32> for Integer {
     #[inline]
     fn div_round_assign(&mut self, other: u32, rm: RoundingMode) {

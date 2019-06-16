@@ -24,7 +24,7 @@ fn test_from_limb() {
     test(123, "123");
     #[cfg(feature = "32_bit_limbs")]
     test(Limb::MAX, "4294967295");
-    #[cfg(feature = "64_bit_limbs")]
+    #[cfg(not(feature = "32_bit_limbs"))]
     test(Limb::MAX, "18446744073709551615");
 }
 

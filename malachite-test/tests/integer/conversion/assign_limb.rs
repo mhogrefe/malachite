@@ -35,7 +35,7 @@ fn test_assign_limb() {
     test("-123", 456, "456");
     #[cfg(feature = "32_bit_limbs")]
     test("123", Limb::MAX, "4294967295");
-    #[cfg(feature = "64_bit_limbs")]
+    #[cfg(not(feature = "32_bit_limbs"))]
     test("123", Limb::MAX, "18446744073709551615");
     test("1000000000000", 123, "123");
 }

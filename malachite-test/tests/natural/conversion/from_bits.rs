@@ -50,7 +50,7 @@ fn test_limbs_asc_from_bits_asc() {
             vec![3_567_587_328, 232],
         );
     }
-    #[cfg(feature = "64_bit_limbs")]
+    #[cfg(not(feature = "32_bit_limbs"))]
     {
         test(
             &[
@@ -115,7 +115,7 @@ fn test_limbs_asc_from_bits_desc() {
             vec![3_567_587_328, 232],
         );
     }
-    #[cfg(feature = "64_bit_limbs")]
+    #[cfg(not(feature = "32_bit_limbs"))]
     {
         test(
             &[

@@ -2,7 +2,7 @@ use malachite_base::num::arithmetic::traits::{
     DivAssignMod, DivMod, DivRound, DivRoundAssign, Parity,
 };
 use malachite_base::num::basic::integers::PrimitiveInteger;
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 use malachite_base::num::conversion::traits::WrappingFrom;
 use malachite_base::round::RoundingMode;
 
@@ -119,7 +119,7 @@ impl DivRound<Limb> for Natural {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl DivRound<u32> for Natural {
     type Output = Natural;
 
@@ -196,7 +196,7 @@ impl<'a> DivRound<Limb> for &'a Natural {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a> DivRound<u32> for &'a Natural {
     type Output = Natural;
 
@@ -245,7 +245,7 @@ impl DivRound<Natural> for Limb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl DivRound<Natural> for u32 {
     type Output = u32;
 
@@ -304,7 +304,7 @@ impl<'a> DivRound<&'a Natural> for Limb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a> DivRound<&'a Natural> for u32 {
     type Output = u32;
 
@@ -396,7 +396,7 @@ impl DivRoundAssign<Limb> for Natural {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl DivRoundAssign<u32> for Natural {
     #[inline]
     fn div_round_assign(&mut self, other: u32, rm: RoundingMode) {
@@ -465,7 +465,7 @@ impl DivRoundAssign<Natural> for Limb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl DivRoundAssign<Natural> for u32 {
     #[inline]
     fn div_round_assign(&mut self, other: Natural, rm: RoundingMode) {
@@ -534,7 +534,7 @@ impl<'a> DivRoundAssign<&'a Natural> for Limb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a> DivRoundAssign<&'a Natural> for u32 {
     #[inline]
     fn div_round_assign(&mut self, other: &'a Natural, rm: RoundingMode) {

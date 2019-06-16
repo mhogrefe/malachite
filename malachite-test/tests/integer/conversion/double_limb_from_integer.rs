@@ -39,7 +39,7 @@ fn test_double_limb_checked_from_integer() {
         test("18446744073709551616", None);
         test("1000000000000000000000", None);
     }
-    #[cfg(feature = "64_bit_limbs")]
+    #[cfg(not(feature = "32_bit_limbs"))]
     {
         test("18446744073709551615", Some(Limb::MAX.into()));
         test(
@@ -85,7 +85,7 @@ fn test_double_limb_wrapping_from_integer() {
         test("-18446744073709551616", 0);
         test("-18446744073709551615", 1);
     }
-    #[cfg(feature = "64_bit_limbs")]
+    #[cfg(not(feature = "32_bit_limbs"))]
     {
         test("-123", 340282366920938463463374607431768211333);
         test("-1000000000000", 340282366920938463463374606431768211456);
@@ -135,7 +135,7 @@ fn test_double_limb_saturating_from_integer() {
         test("-18446744073709551616", 0);
         test("-18446744073709551615", 0);
     }
-    #[cfg(feature = "64_bit_limbs")]
+    #[cfg(not(feature = "32_bit_limbs"))]
     {
         test("-123", 0);
         test("-1000000000000", 0);
@@ -191,7 +191,7 @@ fn test_double_limb_overflowing_from_integer() {
         test("-18446744073709551616", (0, true));
         test("-18446744073709551615", (1, true));
     }
-    #[cfg(feature = "64_bit_limbs")]
+    #[cfg(not(feature = "32_bit_limbs"))]
     {
         test("-123", (340282366920938463463374607431768211333, true));
         test(
@@ -256,7 +256,7 @@ fn test_double_limb_convertible_from_integer() {
         test("-18446744073709551616", false);
         test("-18446744073709551615", false);
     }
-    #[cfg(feature = "64_bit_limbs")]
+    #[cfg(not(feature = "32_bit_limbs"))]
     {
         test("-123", false);
         test("-1000000000000", false);

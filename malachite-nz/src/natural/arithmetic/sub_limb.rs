@@ -1,7 +1,7 @@
 use std::ops::{Sub, SubAssign};
 
 use malachite_base::num::arithmetic::traits::{CheckedSub, OverflowingSubAssign};
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 use malachite_base::num::conversion::traits::WrappingFrom;
 
 use natural::arithmetic::sub::sub_panic;
@@ -162,7 +162,7 @@ impl Sub<Limb> for Natural {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl Sub<u32> for Natural {
     type Output = Natural;
 
@@ -203,7 +203,7 @@ impl<'a> Sub<Limb> for &'a Natural {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a> Sub<u32> for &'a Natural {
     type Output = Natural;
 
@@ -243,7 +243,7 @@ impl SubAssign<Limb> for Natural {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl SubAssign<u32> for Natural {
     #[inline]
     fn sub_assign(&mut self, other: u32) {
@@ -285,7 +285,7 @@ impl Sub<Natural> for Limb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl Sub<Natural> for u32 {
     type Output = u32;
 
@@ -329,7 +329,7 @@ impl<'a> Sub<&'a Natural> for Limb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a> Sub<&'a Natural> for u32 {
     type Output = u32;
 
@@ -377,7 +377,7 @@ impl SubAssign<Natural> for Limb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl SubAssign<Natural> for u32 {
     #[inline]
     fn sub_assign(&mut self, other: Natural) {
@@ -423,7 +423,7 @@ impl<'a> SubAssign<&'a Natural> for Limb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a> SubAssign<&'a Natural> for u32 {
     #[inline]
     fn sub_assign(&mut self, other: &'a Natural) {

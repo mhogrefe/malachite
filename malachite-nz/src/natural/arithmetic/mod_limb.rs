@@ -6,7 +6,7 @@ use malachite_base::num::arithmetic::traits::{
 };
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::traits::Zero;
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 use malachite_base::num::conversion::traits::WrappingFrom;
 use malachite_base::num::conversion::traits::{JoinHalves, SplitInHalf};
 
@@ -235,7 +235,7 @@ impl Mod<Limb> for Natural {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl Mod<u32> for Natural {
     type Output = u32;
 
@@ -276,7 +276,7 @@ impl<'a> Mod<Limb> for &'a Natural {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a> Mod<u32> for &'a Natural {
     type Output = u32;
 
@@ -317,7 +317,7 @@ impl ModAssign<Limb> for Natural {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl ModAssign<u32> for Natural {
     #[inline]
     fn mod_assign(&mut self, other: u32) {
@@ -354,7 +354,7 @@ impl Mod<Natural> for Limb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl Mod<Natural> for u32 {
     type Output = u32;
 
@@ -393,7 +393,7 @@ impl<'a> Mod<&'a Natural> for Limb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a> Mod<&'a Natural> for u32 {
     type Output = u32;
 
@@ -433,7 +433,7 @@ impl ModAssign<Natural> for Limb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl ModAssign<Natural> for u32 {
     #[inline]
     fn mod_assign(&mut self, other: Natural) {
@@ -471,7 +471,7 @@ impl<'a> ModAssign<&'a Natural> for Limb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a> ModAssign<&'a Natural> for u32 {
     #[inline]
     fn mod_assign(&mut self, other: &'a Natural) {
@@ -510,7 +510,7 @@ impl Rem<Limb> for Natural {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl Rem<u32> for Natural {
     type Output = u32;
 
@@ -557,7 +557,7 @@ impl<'a> Rem<Limb> for &'a Natural {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a> Rem<u32> for &'a Natural {
     type Output = u32;
 
@@ -608,7 +608,7 @@ impl RemAssign<Limb> for Natural {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl RemAssign<u32> for Natural {
     #[inline]
     fn rem_assign(&mut self, other: u32) {
@@ -645,7 +645,7 @@ impl Rem<Natural> for Limb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl Rem<Natural> for u32 {
     type Output = u32;
 
@@ -692,7 +692,7 @@ impl<'a> Rem<&'a Natural> for Limb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a> Rem<&'a Natural> for u32 {
     type Output = u32;
 
@@ -731,7 +731,7 @@ impl RemAssign<Natural> for Limb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl RemAssign<Natural> for u32 {
     #[inline]
     fn rem_assign(&mut self, other: Natural) {
@@ -768,7 +768,7 @@ impl<'a> RemAssign<&'a Natural> for Limb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a> RemAssign<&'a Natural> for u32 {
     #[inline]
     fn rem_assign(&mut self, other: &'a Natural) {
@@ -808,7 +808,7 @@ impl NegMod<Limb> for Natural {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl NegMod<u32> for Natural {
     type Output = u32;
 
@@ -854,7 +854,7 @@ impl<'a> NegMod<Limb> for &'a Natural {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a> NegMod<u32> for &'a Natural {
     type Output = u32;
 
@@ -895,7 +895,7 @@ impl NegModAssign<Limb> for Natural {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl NegModAssign<u32> for Natural {
     #[inline]
     fn neg_mod_assign(&mut self, other: u32) {
@@ -939,7 +939,7 @@ impl NegMod<Natural> for Limb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl NegMod<Natural> for u32 {
     type Output = Natural;
 
@@ -985,7 +985,7 @@ impl<'a> NegMod<&'a Natural> for Limb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a> NegMod<&'a Natural> for u32 {
     type Output = Natural;
 

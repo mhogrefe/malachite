@@ -31,7 +31,7 @@ fn test_from_signed_double_limb() {
         test(SignedDoubleLimb::MAX, "9223372036854775807");
         test(SignedDoubleLimb::MIN, "-9223372036854775808");
     }
-    #[cfg(feature = "64_bit_limbs")]
+    #[cfg(not(feature = "32_bit_limbs"))]
     {
         test(
             SignedDoubleLimb::MAX,

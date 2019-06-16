@@ -20,7 +20,7 @@ impl From<Limb> for Natural {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl From<u32> for Natural {
     #[inline]
     fn from(u: u32) -> Natural {

@@ -4,7 +4,7 @@ use malachite_nz::platform::Limb;
 use num::BigInt;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 use inputs::integer::nm_pairs_of_integer_and_unsigned;
 #[cfg(feature = "32_bit_limbs")]
 use inputs::integer::{
@@ -25,7 +25,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
         Large,
         benchmark_integer_sub_assign_limb_library_comparison
     );
-    #[cfg(feature = "64_bit_limbs")]
+    #[cfg(not(feature = "32_bit_limbs"))]
     register_bench!(registry, Large, benchmark_integer_sub_assign_limb);
     register_bench!(
         registry,
@@ -111,7 +111,7 @@ fn benchmark_integer_sub_assign_limb_library_comparison(
     );
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 fn benchmark_integer_sub_assign_limb(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "Integer -= Limb",
@@ -149,7 +149,7 @@ fn benchmark_integer_sub_limb_library_comparison(
     );
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 fn benchmark_integer_sub_limb_library_comparison(
     gm: GenerationMode,
     limit: usize,

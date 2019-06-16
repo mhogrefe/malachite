@@ -62,7 +62,7 @@ impl<'a> HammingDistance<Limb> for &'a Natural {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a> HammingDistance<u32> for &'a Natural {
     #[inline]
     fn hamming_distance(self, other: u32) -> u64 {
@@ -102,7 +102,7 @@ impl<'a> HammingDistance<&'a Natural> for Limb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a> HammingDistance<&'a Natural> for u32 {
     #[inline]
     fn hamming_distance(self, other: &'a Natural) -> u64 {

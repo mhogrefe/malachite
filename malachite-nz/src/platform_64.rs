@@ -5,3 +5,8 @@ pub type SignedLimb = i64;
 pub type SignedHalfLimb = i32;
 pub type SignedDoubleLimb = i128;
 pub type FloatWithLimbWidth = f64;
+
+pub const AORSMUL_FASTER_2AORSLSH: bool = true;
+pub const AORSMUL_FASTER_3AORSLSH: bool = true;
+pub const AORSMUL_FASTER_AORS_AORSLSH: bool = true;
+pub const AORSMUL_FASTER_AORS_2AORSLSH: bool = true;

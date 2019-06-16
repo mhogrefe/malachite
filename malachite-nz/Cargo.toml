@@ -9,10 +9,8 @@ path = "src/lib.rs"
 
 [features]
 
-default = ["32_bit_limbs"]
-
 32_bit_limbs = []
-64_bit_limbs = []
+tune = []
 
 [dependencies]
 malachite-base = { path = "../malachite-base" }

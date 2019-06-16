@@ -26,7 +26,7 @@ fn test_from_double_limb() {
     test(1_000_000_000_000, "1000000000000");
     #[cfg(feature = "32_bit_limbs")]
     test(DoubleLimb::MAX, "18446744073709551615");
-    #[cfg(feature = "64_bit_limbs")]
+    #[cfg(not(feature = "32_bit_limbs"))]
     test(DoubleLimb::MAX, "340282366920938463463374607431768211455");
 }
 

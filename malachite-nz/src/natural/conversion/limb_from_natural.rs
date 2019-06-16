@@ -33,7 +33,7 @@ impl CheckedFrom<Natural> for Limb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl CheckedFrom<Natural> for u32 {
     #[inline]
     fn checked_from(value: Natural) -> Option<u32> {
@@ -70,7 +70,7 @@ impl<'a> CheckedFrom<&'a Natural> for Limb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a> CheckedFrom<&'a Natural> for u32 {
     #[inline]
     fn checked_from(value: &Natural) -> Option<u32> {
@@ -105,7 +105,7 @@ impl WrappingFrom<Natural> for Limb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl WrappingFrom<Natural> for u32 {
     #[inline]
     fn wrapping_from(value: Natural) -> u32 {
@@ -142,7 +142,7 @@ impl<'a> WrappingFrom<&'a Natural> for Limb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a> WrappingFrom<&'a Natural> for u32 {
     #[inline]
     fn wrapping_from(value: &Natural) -> u32 {
@@ -177,7 +177,7 @@ impl SaturatingFrom<Natural> for Limb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl SaturatingFrom<Natural> for u32 {
     #[inline]
     fn saturating_from(value: Natural) -> u32 {
@@ -214,7 +214,7 @@ impl<'a> SaturatingFrom<&'a Natural> for Limb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a> SaturatingFrom<&'a Natural> for u32 {
     #[inline]
     fn saturating_from(value: &'a Natural) -> u32 {
@@ -248,7 +248,7 @@ impl OverflowingFrom<Natural> for Limb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl OverflowingFrom<Natural> for u32 {
     #[inline]
     fn overflowing_from(value: Natural) -> (u32, bool) {
@@ -287,7 +287,7 @@ impl<'a> OverflowingFrom<&'a Natural> for Limb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a> OverflowingFrom<&'a Natural> for u32 {
     #[inline]
     fn overflowing_from(value: &'a Natural) -> (u32, bool) {
@@ -323,7 +323,7 @@ impl ConvertibleFrom<Natural> for Limb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl ConvertibleFrom<Natural> for u32 {
     #[inline]
     fn convertible_from(value: Natural) -> bool {
@@ -360,7 +360,7 @@ impl<'a> ConvertibleFrom<&'a Natural> for Limb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a> ConvertibleFrom<&'a Natural> for u32 {
     #[inline]
     fn convertible_from(value: &Natural) -> bool {

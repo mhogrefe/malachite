@@ -10,7 +10,7 @@ use rug::ops::DivRounding;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::triples_of_unsigned_unsigned_vec_and_rounding_mode_var_1;
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 use inputs::natural::nm_pairs_of_natural_and_positive_unsigned;
 #[cfg(feature = "32_bit_limbs")]
 use inputs::natural::{
@@ -271,7 +271,7 @@ fn benchmark_natural_div_round_limb_floor_library_comparison(
     );
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 fn benchmark_natural_div_round_limb_floor_library_comparison(
     gm: GenerationMode,
     limit: usize,

@@ -12,10 +12,8 @@ name = "malachite_test_main"
 path = "src/bin.rs"
 
 [features]
-default = ["32_bit_limbs"]
 
 32_bit_limbs = ["malachite-nz/32_bit_limbs", "rust-wheels/32_bit_limbs"]
-64_bit_limbs = ["malachite-nz/64_bit_limbs", "rust-wheels/64_bit_limbs"]
 
 [dependencies]
 malachite-base = { path = "../malachite-base" }
@@ -26,6 +24,8 @@ num = "0.2.0"
 rand = "0.3.0"
 serde = "^1.0.0"
 serde_json = "^1.0.32"
+streaming-stats = "0.2.2"
+time = "0.1.40"
 
 [dependencies.rug]
 version = "^1.2.0"

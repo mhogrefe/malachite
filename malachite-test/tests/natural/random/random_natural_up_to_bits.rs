@@ -1,5 +1,5 @@
 use malachite_base::num::logic::traits::SignificantBits;
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 use malachite_nz::natural::random::random_natural_up_to_bits::_transform_32_to_64_bit_limbs;
 use malachite_nz::natural::random::random_natural_up_to_bits::{
     limbs_random_up_to_bits, random_natural_up_to_bits,
@@ -28,7 +28,7 @@ fn test_limbs_random_up_to_bits() {
     test(32, &[2_562_717_490]);
     #[cfg(feature = "32_bit_limbs")]
     test(100, &[2_562_717_490, 103_053_517, 1_930_352_495, 10]);
-    #[cfg(feature = "64_bit_limbs")]
+    #[cfg(not(feature = "32_bit_limbs"))]
     test(100, &[17575370567115077426, 30167824589]);
 }
 
@@ -65,7 +65,7 @@ fn limbs_random_up_to_bits_properties() {
         let mut cloned_rng = rng.clone();
         #[cfg(feature = "32_bit_limbs")]
         let random_limbs = limbs_random_up_to_bits(&mut rng, bits);
-        #[cfg(feature = "64_bit_limbs")]
+        #[cfg(not(feature = "32_bit_limbs"))]
         let random_limbs = _transform_32_to_64_bit_limbs(&limbs_random_up_to_bits(&mut rng, bits));
         assert_eq!(
             Natural::from_owned_limbs_asc(random_limbs),

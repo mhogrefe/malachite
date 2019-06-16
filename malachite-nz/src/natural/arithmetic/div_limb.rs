@@ -2,7 +2,7 @@ use std::ops::{Div, DivAssign};
 
 use malachite_base::comparison::Max;
 use malachite_base::num::arithmetic::traits::{DivRem, WrappingAddAssign, WrappingSubAssign};
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 use malachite_base::num::conversion::traits::WrappingFrom;
 use malachite_base::num::conversion::traits::{JoinHalves, SplitInHalf};
 
@@ -437,7 +437,7 @@ impl Div<Limb> for Natural {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl Div<u32> for Natural {
     type Output = Natural;
 
@@ -484,7 +484,7 @@ impl<'a> Div<Limb> for &'a Natural {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a> Div<u32> for &'a Natural {
     type Output = Natural;
 
@@ -528,7 +528,7 @@ impl DivAssign<Limb> for Natural {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl DivAssign<u32> for Natural {
     #[inline]
     fn div_assign(&mut self, other: u32) {
@@ -565,7 +565,7 @@ impl Div<Natural> for Limb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl Div<Natural> for u32 {
     type Output = u32;
 
@@ -604,7 +604,7 @@ impl<'a> Div<&'a Natural> for Limb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a> Div<&'a Natural> for u32 {
     type Output = u32;
 
@@ -637,7 +637,7 @@ impl DivAssign<Natural> for Limb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl DivAssign<Natural> for u32 {
     #[inline]
     fn div_assign(&mut self, other: Natural) {
@@ -668,7 +668,7 @@ impl<'a> DivAssign<&'a Natural> for Limb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a> DivAssign<&'a Natural> for u32 {
     #[inline]
     fn div_assign(&mut self, other: &'a Natural) {

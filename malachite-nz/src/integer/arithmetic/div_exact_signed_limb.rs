@@ -43,7 +43,7 @@ impl DivExact<SignedLimb> for Integer {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl DivExact<i32> for Integer {
     type Output = Integer;
 
@@ -97,7 +97,7 @@ impl<'a> DivExact<SignedLimb> for &'a Integer {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a> DivExact<i32> for &'a Integer {
     type Output = Integer;
 
@@ -144,7 +144,7 @@ impl DivExactAssign<SignedLimb> for Integer {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl DivExactAssign<i32> for Integer {
     #[inline]
     fn div_exact_assign(&mut self, other: i32) {
@@ -189,7 +189,7 @@ impl DivExact<Integer> for SignedLimb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl DivExact<Integer> for i32 {
     type Output = Integer;
 
@@ -236,7 +236,7 @@ impl<'a> DivExact<&'a Integer> for SignedLimb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a> DivExact<&'a Integer> for i32 {
     type Output = Integer;
 

@@ -49,7 +49,7 @@ impl CheckedSubMul<Natural, Limb> for Natural {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl CheckedSubMul<Natural, u32> for Natural {
     type Output = Natural;
 
@@ -100,7 +100,7 @@ impl<'a> CheckedSubMul<&'a Natural, Limb> for Natural {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a> CheckedSubMul<&'a Natural, u32> for Natural {
     type Output = Natural;
 
@@ -151,7 +151,7 @@ impl<'a> CheckedSubMul<Natural, Limb> for &'a Natural {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a> CheckedSubMul<Natural, u32> for &'a Natural {
     type Output = Natural;
 
@@ -220,7 +220,7 @@ impl<'a, 'b> CheckedSubMul<&'a Natural, Limb> for &'b Natural {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a, 'b> CheckedSubMul<&'a Natural, u32> for &'b Natural {
     type Output = Natural;
 

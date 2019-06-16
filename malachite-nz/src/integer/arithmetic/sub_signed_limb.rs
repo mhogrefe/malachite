@@ -40,7 +40,7 @@ impl Sub<SignedLimb> for Integer {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl Sub<i32> for Integer {
     type Output = Integer;
 
@@ -104,7 +104,7 @@ impl<'a> Sub<SignedLimb> for &'a Integer {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a> Sub<i32> for &'a Integer {
     type Output = Integer;
 
@@ -145,7 +145,7 @@ impl Sub<Integer> for SignedLimb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl Sub<Integer> for i32 {
     type Output = Integer;
 
@@ -186,7 +186,7 @@ impl<'a> Sub<&'a Integer> for SignedLimb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a> Sub<&'a Integer> for i32 {
     type Output = Integer;
 
@@ -252,7 +252,7 @@ impl SubAssign<SignedLimb> for Integer {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl SubAssign<i32> for Integer {
     #[inline]
     fn sub_assign(&mut self, other: i32) {

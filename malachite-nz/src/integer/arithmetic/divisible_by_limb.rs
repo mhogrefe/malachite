@@ -36,7 +36,7 @@ impl<'a> DivisibleBy<Limb> for &'a Integer {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a> DivisibleBy<u32> for &'a Integer {
     #[inline]
     fn divisible_by(self, other: u32) -> bool {
@@ -73,7 +73,7 @@ impl<'a> DivisibleBy<&'a Integer> for Limb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a> DivisibleBy<&'a Integer> for u32 {
     #[inline]
     fn divisible_by(self, other: &'a Integer) -> bool {

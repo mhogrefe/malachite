@@ -70,7 +70,7 @@ impl<'a> EqMod<Limb, Limb> for &'a Integer {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a> EqMod<u32, u32> for &'a Integer {
     #[inline]
     fn eq_mod(self, other: u32, modulus: u32) -> bool {
@@ -112,7 +112,7 @@ impl<'a> EqMod<&'a Integer, Limb> for Limb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a> EqMod<&'a Integer, u32> for u32 {
     #[inline]
     fn eq_mod(self, other: &'a Integer, modulus: u32) -> bool {
@@ -155,7 +155,7 @@ impl<'a> EqMod<Limb, &'a Integer> for Limb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a> EqMod<u32, &'a Integer> for u32 {
     #[inline]
     fn eq_mod(self, other: u32, modulus: &'a Integer) -> bool {

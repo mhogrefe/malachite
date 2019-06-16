@@ -14,6 +14,8 @@ extern crate num;
 extern crate rand;
 extern crate rug;
 extern crate rust_wheels;
+extern crate stats;
+extern crate time;
 
 #[macro_use]
 pub mod common;
@@ -29,6 +31,8 @@ pub mod inputs {
 pub mod base;
 pub mod integer;
 pub mod natural;
+
+pub mod tune;
 
 pub fn register(registry: &mut common::DemoBenchRegistry) {
     base::register(registry);

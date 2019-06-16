@@ -102,7 +102,7 @@ impl fmt::Binary for Natural {
                 loop {
                     #[cfg(feature = "32_bit_limbs")]
                     let result = write!(f, "{:032b}", limbs[i]);
-                    #[cfg(feature = "64_bit_limbs")]
+                    #[cfg(not(feature = "32_bit_limbs"))]
                     let result = write!(f, "{:064b}", limbs[i]);
                     if i == 0 {
                         return result;

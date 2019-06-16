@@ -49,7 +49,7 @@ fn test_signed_double_limb_checked_from_integer() {
         test("-9223372036854775808", Some(SignedDoubleLimb::MIN));
         test("-9223372036854775809", None);
     }
-    #[cfg(feature = "64_bit_limbs")]
+    #[cfg(not(feature = "32_bit_limbs"))]
     {
         test("1000000000000000000000", Some(1000000000000000000000));
         test("-1000000000000000000000", Some(-1000000000000000000000));
@@ -106,7 +106,7 @@ fn test_signed_double_limb_wrapping_from_integer() {
         test("-9223372036854775808", SignedDoubleLimb::MIN);
         test("-9223372036854775809", SignedDoubleLimb::MAX);
     }
-    #[cfg(feature = "64_bit_limbs")]
+    #[cfg(not(feature = "32_bit_limbs"))]
     {
         test("1000000000000000000000", 1000000000000000000000);
         test("-1000000000000000000000", -1000000000000000000000);
@@ -169,7 +169,7 @@ fn test_signed_double_limb_saturating_from_integer() {
         test("-9223372036854775808", SignedDoubleLimb::MIN);
         test("-9223372036854775809", SignedDoubleLimb::MIN);
     }
-    #[cfg(feature = "64_bit_limbs")]
+    #[cfg(not(feature = "32_bit_limbs"))]
     {
         test("1000000000000000000000", 1000000000000000000000);
         test("-1000000000000000000000", -1000000000000000000000);
@@ -241,7 +241,7 @@ fn test_signed_double_limb_overflowing_from_integer() {
         test("-9223372036854775808", (SignedDoubleLimb::MIN, false));
         test("-9223372036854775809", (SignedDoubleLimb::MAX, true));
     }
-    #[cfg(feature = "64_bit_limbs")]
+    #[cfg(not(feature = "32_bit_limbs"))]
     {
         test("1000000000000000000000", (1000000000000000000000, false));
         test("-1000000000000000000000", (-1000000000000000000000, false));
@@ -304,7 +304,7 @@ fn test_signed_double_limb_convertible_from_integer() {
         test("-9223372036854775808", true);
         test("-9223372036854775809", false);
     }
-    #[cfg(feature = "64_bit_limbs")]
+    #[cfg(not(feature = "32_bit_limbs"))]
     {
         test("1000000000000000000000", true);
         test("-1000000000000000000000", true);

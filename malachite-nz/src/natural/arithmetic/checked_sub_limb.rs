@@ -1,6 +1,6 @@
 use malachite_base::num::arithmetic::traits::CheckedSub;
 use malachite_base::num::conversion::traits::CheckedFrom;
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 use malachite_base::num::conversion::traits::WrappingFrom;
 
 use natural::arithmetic::sub_limb::{limbs_sub_limb, limbs_sub_limb_in_place};
@@ -45,7 +45,7 @@ impl CheckedSub<Limb> for Natural {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl CheckedSub<u32> for Natural {
     type Output = Natural;
 
@@ -104,7 +104,7 @@ impl<'a> CheckedSub<Limb> for &'a Natural {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a> CheckedSub<u32> for &'a Natural {
     type Output = Natural;
 
@@ -147,7 +147,7 @@ impl CheckedSub<Natural> for Limb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl CheckedSub<Natural> for u32 {
     type Output = u32;
 
@@ -190,7 +190,7 @@ impl<'a> CheckedSub<&'a Natural> for Limb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a> CheckedSub<&'a Natural> for u32 {
     type Output = u32;
 

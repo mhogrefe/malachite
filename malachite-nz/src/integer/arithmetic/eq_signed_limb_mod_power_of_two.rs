@@ -43,7 +43,7 @@ impl<'a> EqModPowerOfTwo<SignedLimb> for &'a Integer {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a> EqModPowerOfTwo<i32> for &'a Integer {
     #[inline]
     fn eq_mod_power_of_two(self, other: i32, pow: u64) -> bool {
@@ -85,7 +85,7 @@ impl<'a> EqModPowerOfTwo<&'a Integer> for SignedLimb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a> EqModPowerOfTwo<&'a Integer> for i32 {
     #[inline]
     fn eq_mod_power_of_two(self, other: &'a Integer, pow: u64) -> bool {

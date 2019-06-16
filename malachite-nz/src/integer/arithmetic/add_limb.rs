@@ -38,7 +38,7 @@ impl Add<Limb> for Integer {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl Add<u32> for Integer {
     type Output = Integer;
 
@@ -104,7 +104,7 @@ impl<'a> Add<Limb> for &'a Integer {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a> Add<u32> for &'a Integer {
     type Output = Integer;
 
@@ -146,7 +146,7 @@ impl Add<Integer> for Limb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl Add<Integer> for u32 {
     type Output = Integer;
 
@@ -188,7 +188,7 @@ impl<'a> Add<&'a Integer> for Limb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a> Add<&'a Integer> for u32 {
     type Output = Integer;
 
@@ -250,7 +250,7 @@ impl AddAssign<Limb> for Integer {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl AddAssign<u32> for Integer {
     #[inline]
     fn add_assign(&mut self, other: u32) {

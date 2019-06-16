@@ -79,7 +79,7 @@ impl<'a> CheckedHammingDistance<SignedLimb> for &'a Integer {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a> CheckedHammingDistance<i32> for &'a Integer {
     #[inline]
     fn checked_hamming_distance(self, other: i32) -> Option<u64> {
@@ -129,7 +129,7 @@ impl<'a> CheckedHammingDistance<&'a Integer> for SignedLimb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a> CheckedHammingDistance<&'a Integer> for i32 {
     #[inline]
     fn checked_hamming_distance(self, other: &'a Integer) -> Option<u64> {

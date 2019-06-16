@@ -41,7 +41,7 @@ impl Mul<SignedLimb> for Integer {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl Mul<i32> for Integer {
     type Output = Integer;
 
@@ -89,7 +89,7 @@ impl<'a> Mul<SignedLimb> for &'a Integer {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a> Mul<i32> for &'a Integer {
     type Output = Integer;
 
@@ -132,7 +132,7 @@ impl Mul<Integer> for SignedLimb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl Mul<Integer> for i32 {
     type Output = Integer;
 
@@ -174,7 +174,7 @@ impl<'a> Mul<&'a Integer> for SignedLimb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a> Mul<&'a Integer> for i32 {
     type Output = Integer;
 
@@ -222,7 +222,7 @@ impl MulAssign<SignedLimb> for Integer {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl MulAssign<i32> for Integer {
     #[inline]
     fn mul_assign(&mut self, other: i32) {

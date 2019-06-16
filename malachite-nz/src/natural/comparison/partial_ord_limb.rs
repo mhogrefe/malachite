@@ -29,7 +29,7 @@ impl PartialOrd<Limb> for Natural {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl PartialOrd<u32> for Natural {
     fn partial_cmp(&self, other: &u32) -> Option<Ordering> {
         PartialOrd::partial_cmp(self, &Limb::from(*other))
@@ -62,7 +62,7 @@ impl PartialOrd<Natural> for Limb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl PartialOrd<Natural> for u32 {
     fn partial_cmp(&self, other: &Natural) -> Option<Ordering> {
         PartialOrd::partial_cmp(&Limb::from(*self), other)

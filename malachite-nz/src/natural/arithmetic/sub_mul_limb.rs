@@ -297,7 +297,7 @@ impl SubMul<Natural, Limb> for Natural {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl SubMul<Natural, u32> for Natural {
     type Output = Natural;
 
@@ -342,7 +342,7 @@ impl<'a> SubMul<&'a Natural, Limb> for Natural {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a> SubMul<&'a Natural, u32> for Natural {
     type Output = Natural;
 
@@ -387,7 +387,7 @@ impl<'a> SubMul<Natural, Limb> for &'a Natural {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a> SubMul<Natural, u32> for &'a Natural {
     type Output = Natural;
 
@@ -433,7 +433,7 @@ impl<'a, 'b> SubMul<&'a Natural, Limb> for &'b Natural {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a, 'b> SubMul<&'a Natural, u32> for &'b Natural {
     type Output = Natural;
 
@@ -481,7 +481,7 @@ impl SubMulAssign<Natural, Limb> for Natural {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl SubMulAssign<Natural, u32> for Natural {
     #[inline]
     fn sub_mul_assign(&mut self, b: Natural, c: u32) {
@@ -527,7 +527,7 @@ impl<'a> SubMulAssign<&'a Natural, Limb> for Natural {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a> SubMulAssign<&'a Natural, u32> for Natural {
     #[inline]
     fn sub_mul_assign(&mut self, b: &'a Natural, c: u32) {

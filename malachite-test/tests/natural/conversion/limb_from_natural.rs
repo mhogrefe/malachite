@@ -33,7 +33,7 @@ fn test_limb_checked_from_natural() {
         test("4294967295", Some(Limb::MAX));
         test("4294967296", None);
     }
-    #[cfg(feature = "64_bit_limbs")]
+    #[cfg(not(feature = "32_bit_limbs"))]
     {
         test("1000000000000", Some(1_000_000_000_000));
         test("18446744073709551615", Some(Limb::MAX));
@@ -57,7 +57,7 @@ fn test_limb_wrapping_from_natural() {
         test("4294967296", 0);
         test("4294967297", 1);
     }
-    #[cfg(feature = "64_bit_limbs")]
+    #[cfg(not(feature = "32_bit_limbs"))]
     {
         test("1000000000000", 1_000_000_000_000);
         test("18446744073709551616", 0);
@@ -79,7 +79,7 @@ fn test_limb_saturating_from_natural() {
         test("4294967296", 4_294_967_295);
         test("4294967297", 4_294_967_295);
     }
-    #[cfg(feature = "64_bit_limbs")]
+    #[cfg(not(feature = "32_bit_limbs"))]
     {
         test("1000000000000", 1_000_000_000_000);
         test("18446744073709551616", 18_446_744_073_709_551_615);
@@ -101,7 +101,7 @@ fn test_limb_overflowing_from_natural() {
         test("4294967296", (0, true));
         test("4294967297", (1, true));
     }
-    #[cfg(feature = "64_bit_limbs")]
+    #[cfg(not(feature = "32_bit_limbs"))]
     {
         test("1000000000000", (1_000_000_000_000, false));
         test("18446744073709551616", (0, true));
@@ -123,7 +123,7 @@ fn test_limb_convertible_from_natural() {
         test("4294967295", true);
         test("4294967296", false);
     }
-    #[cfg(feature = "64_bit_limbs")]
+    #[cfg(not(feature = "32_bit_limbs"))]
     {
         test("1000000000000", true);
         test("18446744073709551615", true);

@@ -71,7 +71,7 @@ fn test_checked_hamming_distance_signed_limb() {
         test("-2147483647", -1, Some(u64::from(Limb::WIDTH - 2)));
         test("-2147483647", SignedLimb::MIN, Some(1));
     }
-    #[cfg(feature = "64_bit_limbs")]
+    #[cfg(not(feature = "32_bit_limbs"))]
     {
         test("9223372036854775807", 0, Some(u64::from(Limb::WIDTH - 1)));
         test("9223372036854775807", SignedLimb::MAX, Some(0));

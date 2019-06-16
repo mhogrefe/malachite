@@ -8,7 +8,7 @@ use num::BigUint;
 use rug;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 use inputs::natural::nm_pairs_of_natural_and_unsigned;
 #[cfg(feature = "32_bit_limbs")]
 use inputs::natural::{nrm_pairs_of_natural_and_unsigned, rm_pairs_of_unsigned_and_natural};
@@ -128,7 +128,7 @@ fn benchmark_natural_checked_sub_limb_library_comparison(
     );
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 fn benchmark_natural_checked_sub_limb_library_comparison(
     gm: GenerationMode,
     limit: usize,

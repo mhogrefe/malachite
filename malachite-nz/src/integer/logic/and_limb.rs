@@ -39,7 +39,7 @@ impl BitAnd<Limb> for Integer {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl BitAnd<u32> for Integer {
     type Output = u32;
 
@@ -82,7 +82,7 @@ impl<'a> BitAnd<Limb> for &'a Integer {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a> BitAnd<u32> for &'a Integer {
     type Output = u32;
 
@@ -122,7 +122,7 @@ impl BitAnd<Integer> for Limb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl BitAnd<Integer> for u32 {
     type Output = u32;
 
@@ -162,7 +162,7 @@ impl<'a> BitAnd<&'a Integer> for Limb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a> BitAnd<&'a Integer> for u32 {
     type Output = u32;
 
@@ -206,7 +206,7 @@ impl BitAndAssign<Limb> for Integer {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl BitAndAssign<u32> for Integer {
     #[inline]
     fn bitand_assign(&mut self, other: u32) {
@@ -244,7 +244,7 @@ impl BitAndAssign<Integer> for Limb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl BitAndAssign<Integer> for u32 {
     #[inline]
     fn bitand_assign(&mut self, other: Integer) {
@@ -282,7 +282,7 @@ impl<'a> BitAndAssign<&'a Integer> for Limb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a> BitAndAssign<&'a Integer> for u32 {
     #[inline]
     fn bitand_assign(&mut self, other: &'a Integer) {

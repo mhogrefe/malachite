@@ -33,7 +33,7 @@ fn test_serde() {
         );
         test("18446744073709551616", r#"{"Large":[0,0,1]}"#);
     }
-    #[cfg(feature = "64_bit_limbs")]
+    #[cfg(not(feature = "32_bit_limbs"))]
     {
         test(
             "1000000000000000000000000",

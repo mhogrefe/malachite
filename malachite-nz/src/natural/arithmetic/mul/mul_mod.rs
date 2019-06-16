@@ -30,6 +30,7 @@ pub(crate) const MUL_FFT_MODF_THRESHOLD: usize = 396;
 /// Additional memory: O(1)
 ///
 /// This is mpn_mulmod_bnm1_next_size from mpn/generic/mulmod_bnm1.c.
+#[cfg(not(feature = "tune"))]
 pub(crate) fn _limbs_mul_mod_limb_width_to_n_minus_1_next_size(n: usize) -> usize {
     if n < MULMOD_BNM1_THRESHOLD {
         n
@@ -40,6 +41,28 @@ pub(crate) fn _limbs_mul_mod_limb_width_to_n_minus_1_next_size(n: usize) -> usiz
     } else {
         let ceiling_half_n = (n + 1) >> 1;
         if ceiling_half_n < MUL_FFT_MODF_THRESHOLD {
+            (n + 7) >> 3 << 3
+        } else {
+            mpn_fft_next_size(ceiling_half_n, _limbs_mul_fft_best_k(ceiling_half_n, false)) << 1
+        }
+    }
+}
+
+#[cfg(feature = "tune")]
+pub(crate) fn _limbs_mul_mod_limb_width_to_n_minus_1_next_size(
+    n: usize,
+    mulmod_bnm1_threshold: usize,
+    mul_fft_modf_threshold: usize,
+) -> usize {
+    if n < mulmod_bnm1_threshold {
+        n
+    } else if n <= (mulmod_bnm1_threshold - 1) << 2 {
+        (n + 1) >> 1 << 1
+    } else if n <= (mulmod_bnm1_threshold - 1) << 3 {
+        (n + 3) >> 2 << 2
+    } else {
+        let ceiling_half_n = (n + 1) >> 1;
+        if ceiling_half_n < mul_fft_modf_threshold {
             (n + 7) >> 3 << 3
         } else {
             mpn_fft_next_size(ceiling_half_n, _limbs_mul_fft_best_k(ceiling_half_n, false)) << 1

@@ -26,7 +26,7 @@ impl From<SignedLimb> for Integer {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl From<i32> for Integer {
     #[inline]
     fn from(i: i32) -> Integer {

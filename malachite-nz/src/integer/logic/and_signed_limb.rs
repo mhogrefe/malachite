@@ -304,7 +304,7 @@ impl BitAnd<SignedLimb> for Integer {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl BitAnd<i32> for Integer {
     type Output = Integer;
 
@@ -363,7 +363,7 @@ impl<'a> BitAnd<SignedLimb> for &'a Integer {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a> BitAnd<i32> for &'a Integer {
     type Output = Integer;
 
@@ -408,7 +408,7 @@ impl BitAnd<Integer> for SignedLimb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl BitAnd<Integer> for i32 {
     type Output = Integer;
 
@@ -453,7 +453,7 @@ impl<'a> BitAnd<&'a Integer> for SignedLimb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a> BitAnd<&'a Integer> for i32 {
     type Output = Integer;
 
@@ -500,7 +500,7 @@ impl BitAndAssign<SignedLimb> for Integer {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl BitAndAssign<i32> for Integer {
     #[inline]
     fn bitand_assign(&mut self, other: i32) {

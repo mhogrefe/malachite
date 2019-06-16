@@ -3572,7 +3572,7 @@ pub fn _limbs_mul_greater_to_out_toom_8h_input_sizes_valid(xs_len: usize, ys_len
 
 #[cfg(feature = "32_bit_limbs")]
 pub(crate) const BIT_CORRECTION: bool = true;
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 pub(crate) const BIT_CORRECTION: bool = false;
 
 const TOOM_8H_MAYBE_MUL_BASECASE: bool =

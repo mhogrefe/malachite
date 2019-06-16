@@ -20,7 +20,7 @@ impl PartialEq<Limb> for Integer {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl PartialEq<u32> for Integer {
     #[inline]
     fn eq(&self, other: &u32) -> bool {
@@ -47,7 +47,7 @@ impl PartialEq<Integer> for Limb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl PartialEq<Integer> for u32 {
     #[inline]
     fn eq(&self, other: &Integer) -> bool {

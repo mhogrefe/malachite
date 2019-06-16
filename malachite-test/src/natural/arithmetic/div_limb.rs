@@ -14,7 +14,7 @@ use inputs::base::{
     quadruples_of_limb_vec_limb_vec_limb_and_limb_var_3, triples_of_limb_vec_limb_and_limb_var_1,
     triples_of_unsigned_vec_unsigned_vec_and_positive_unsigned_var_1,
 };
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 use inputs::natural::nm_pairs_of_natural_and_positive_unsigned;
 #[cfg(feature = "32_bit_limbs")]
 use inputs::natural::nrm_pairs_of_natural_and_positive_unsigned;
@@ -333,7 +333,7 @@ fn benchmark_natural_div_limb_library_comparison(
     );
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 fn benchmark_natural_div_limb_library_comparison(
     gm: GenerationMode,
     limit: usize,

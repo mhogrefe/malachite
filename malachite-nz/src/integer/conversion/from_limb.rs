@@ -23,7 +23,7 @@ impl From<Limb> for Integer {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl From<u32> for Integer {
     #[inline]
     fn from(u: u32) -> Integer {

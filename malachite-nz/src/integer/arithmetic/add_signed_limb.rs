@@ -40,7 +40,7 @@ impl Add<SignedLimb> for Integer {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl Add<i32> for Integer {
     type Output = Integer;
 
@@ -101,7 +101,7 @@ impl<'a> Add<SignedLimb> for &'a Integer {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a> Add<i32> for &'a Integer {
     type Output = Integer;
 
@@ -143,7 +143,7 @@ impl Add<Integer> for SignedLimb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl Add<Integer> for i32 {
     type Output = Integer;
 
@@ -185,7 +185,7 @@ impl<'a> Add<&'a Integer> for SignedLimb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a> Add<&'a Integer> for i32 {
     type Output = Integer;
 
@@ -246,7 +246,7 @@ impl AddAssign<SignedLimb> for Integer {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl AddAssign<i32> for Integer {
     #[inline]
     fn add_assign(&mut self, other: i32) {

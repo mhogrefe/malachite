@@ -4,7 +4,7 @@ use malachite_base::num::arithmetic::traits::{
     WrappingAddAssign, WrappingSubAssign,
 };
 use malachite_base::num::basic::traits::Zero;
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 use malachite_base::num::conversion::traits::WrappingFrom;
 use malachite_base::num::conversion::traits::{JoinHalves, SplitInHalf};
 
@@ -398,7 +398,7 @@ impl DivMod<Limb> for Natural {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl DivMod<u32> for Natural {
     type DivOutput = Natural;
     type ModOutput = u32;
@@ -459,7 +459,7 @@ impl<'a> DivMod<Limb> for &'a Natural {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a> DivMod<u32> for &'a Natural {
     type DivOutput = Natural;
     type ModOutput = u32;
@@ -517,7 +517,7 @@ impl DivAssignMod<Limb> for Natural {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl DivAssignMod<u32> for Natural {
     type ModOutput = u32;
 
@@ -557,7 +557,7 @@ impl DivMod<Natural> for Limb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl DivMod<Natural> for u32 {
     type DivOutput = u32;
     type ModOutput = u32;
@@ -608,7 +608,7 @@ impl<'a> DivMod<&'a Natural> for Limb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a> DivMod<&'a Natural> for u32 {
     type DivOutput = u32;
     type ModOutput = u32;
@@ -652,7 +652,7 @@ impl DivAssignMod<Natural> for Limb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl DivAssignMod<Natural> for u32 {
     type ModOutput = u32;
 
@@ -698,7 +698,7 @@ impl<'a> DivAssignMod<&'a Natural> for Limb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a> DivAssignMod<&'a Natural> for u32 {
     type ModOutput = u32;
 
@@ -744,7 +744,7 @@ impl DivRem<Limb> for Natural {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl DivRem<u32> for Natural {
     type DivOutput = Natural;
     type RemOutput = u32;
@@ -789,7 +789,7 @@ impl<'a> DivRem<Limb> for &'a Natural {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a> DivRem<u32> for &'a Natural {
     type DivOutput = Natural;
     type RemOutput = u32;
@@ -834,7 +834,7 @@ impl DivAssignRem<Limb> for Natural {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl DivAssignRem<u32> for Natural {
     type RemOutput = u32;
 
@@ -876,7 +876,7 @@ impl DivRem<Natural> for Limb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl DivRem<Natural> for u32 {
     type DivOutput = u32;
     type RemOutput = u32;
@@ -919,7 +919,7 @@ impl<'a> DivRem<&'a Natural> for Limb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a> DivRem<&'a Natural> for u32 {
     type DivOutput = u32;
     type RemOutput = u32;
@@ -963,7 +963,7 @@ impl DivAssignRem<Natural> for Limb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl DivAssignRem<Natural> for u32 {
     type RemOutput = u32;
 
@@ -1006,7 +1006,7 @@ impl<'a> DivAssignRem<&'a Natural> for Limb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a> DivAssignRem<&'a Natural> for u32 {
     type RemOutput = u32;
 
@@ -1050,7 +1050,7 @@ impl CeilingDivNegMod<Limb> for Natural {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl CeilingDivNegMod<u32> for Natural {
     type DivOutput = Natural;
     type ModOutput = u32;
@@ -1099,7 +1099,7 @@ impl<'a> CeilingDivNegMod<Limb> for &'a Natural {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a> CeilingDivNegMod<u32> for &'a Natural {
     type DivOutput = Natural;
     type ModOutput = u32;
@@ -1150,7 +1150,7 @@ impl CeilingDivAssignNegMod<Limb> for Natural {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl CeilingDivAssignNegMod<u32> for Natural {
     type ModOutput = u32;
 
@@ -1192,7 +1192,7 @@ impl CeilingDivNegMod<Natural> for Limb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl CeilingDivNegMod<Natural> for u32 {
     type DivOutput = u32;
     type ModOutput = Natural;
@@ -1241,7 +1241,7 @@ impl<'a> CeilingDivNegMod<&'a Natural> for Limb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a> CeilingDivNegMod<&'a Natural> for u32 {
     type DivOutput = u32;
     type ModOutput = Natural;
@@ -1287,7 +1287,7 @@ impl CeilingDivAssignNegMod<Natural> for Limb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl CeilingDivAssignNegMod<Natural> for u32 {
     type ModOutput = Natural;
 
@@ -1339,7 +1339,7 @@ impl<'a> CeilingDivAssignNegMod<&'a Natural> for Limb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a> CeilingDivAssignNegMod<&'a Natural> for u32 {
     type ModOutput = Natural;
 

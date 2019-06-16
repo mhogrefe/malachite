@@ -8,7 +8,7 @@ use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, 
 use inputs::base::{
     pairs_of_unsigned_vec_and_unsigned, triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_1,
 };
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 use inputs::natural::nm_pairs_of_natural_and_limb_var_1;
 #[cfg(feature = "32_bit_limbs")]
 use inputs::natural::{
@@ -37,7 +37,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
         Large,
         benchmark_natural_sub_assign_limb_library_comparison
     );
-    #[cfg(feature = "64_bit_limbs")]
+    #[cfg(not(feature = "32_bit_limbs"))]
     register_bench!(registry, Large, benchmark_natural_sub_assign_limb);
     register_bench!(
         registry,
@@ -232,7 +232,7 @@ fn benchmark_natural_sub_assign_limb_library_comparison(
     );
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 fn benchmark_natural_sub_assign_limb(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "Natural -= Limb",
@@ -270,7 +270,7 @@ fn benchmark_natural_sub_limb_library_comparison(
     );
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 fn benchmark_natural_sub_limb_library_comparison(
     gm: GenerationMode,
     limit: usize,

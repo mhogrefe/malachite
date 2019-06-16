@@ -680,8 +680,25 @@ pub fn mpn_mu_div_qr_choose_in(qn: usize, dn: usize, k: Limb) -> usize {
 // checked
 // docs preserved
 // mpn_preinv_mu_div_qr_itch from mpn/generic/mu_div_qr.c
+#[cfg(not(feature = "tune"))]
 pub fn mpn_preinv_mu_div_qr_itch(dn: usize, in_size: usize) -> usize {
     let itch_local = _limbs_mul_mod_limb_width_to_n_minus_1_next_size(dn + 1);
+    let itch_out = _limbs_mul_mod_limb_width_to_n_minus_1_scratch_size(itch_local, dn, in_size);
+    itch_local + itch_out
+}
+
+#[cfg(feature = "tune")]
+pub fn mpn_preinv_mu_div_qr_itch(
+    dn: usize,
+    in_size: usize,
+    mulmod_bnm1_threshold: usize,
+    mul_fft_modf_threshold: usize,
+) -> usize {
+    let itch_local = _limbs_mul_mod_limb_width_to_n_minus_1_next_size(
+        dn + 1,
+        mulmod_bnm1_threshold,
+        mul_fft_modf_threshold,
+    );
     let itch_out = _limbs_mul_mod_limb_width_to_n_minus_1_scratch_size(itch_local, dn, in_size);
     itch_local + itch_out
 }

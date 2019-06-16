@@ -3,12 +3,12 @@ use std::str::FromStr;
 use malachite_base::comparison::Max;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_nz::natural::arithmetic::mul::fft::_limbs_mul_greater_to_out_fft;
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 use malachite_nz::natural::arithmetic::mul::fft::{
     _limbs_mul_fft_fft, _limbs_mul_fft_internal, _limbs_mul_fft_inverse,
     _limbs_mul_fft_normalize_mod_f,
 };
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 use malachite_nz::natural::arithmetic::mul::mul_mod::_limbs_mul_mod_limb_width_to_n_minus_1;
 use malachite_nz::natural::arithmetic::mul::toom::{
     _limbs_mul_greater_to_out_toom_22, _limbs_mul_greater_to_out_toom_22_scratch_size,
@@ -248,7 +248,7 @@ fn test_limbs_mul_greater_to_out() {
     );
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 #[test]
 fn test_limbs_mul_greater_to_out() {
     let test = |xs: Vec<Limb>,
@@ -2200,7 +2200,7 @@ fn test_limbs_mul_greater_to_out_toom_43() {
     );
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 #[test]
 fn test_limbs_mul_greater_to_out_toom_43() {
     let test = |xs: Vec<Limb>, ys: Vec<Limb>, out_before: Vec<Limb>, out_after| {
@@ -2457,7 +2457,7 @@ fn test_limbs_mul_greater_to_out_toom_44() {
     );
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 #[test]
 fn test_limbs_mul_greater_to_out_toom_44() {
     let test = |xs: Vec<Limb>, ys: Vec<Limb>, out_before: Vec<Limb>, out_after| {
@@ -2710,7 +2710,7 @@ fn test_limbs_mul_greater_to_out_toom_52() {
     );
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 #[test]
 fn test_limbs_mul_greater_to_out_toom_52() {
     let test = |xs: Vec<Limb>, ys: Vec<Limb>, out_before: Vec<Limb>, out_after| {
@@ -2895,7 +2895,7 @@ fn test_limbs_mul_greater_to_out_toom_53() {
     );
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 #[test]
 fn test_limbs_mul_greater_to_out_toom_53() {
     let test = |xs: Vec<Limb>, ys: Vec<Limb>, out_before: Vec<Limb>, out_after| {
@@ -3636,7 +3636,7 @@ fn test_limbs_mul_greater_to_out_toom_63() {
     );
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 #[test]
 fn test_limbs_mul_greater_to_out_toom_63() {
     let test = |xs: Vec<Limb>, ys: Vec<Limb>, out_before: Vec<Limb>, out_after| {
@@ -4041,7 +4041,7 @@ fn test_limbs_mul_greater_to_out_toom_6h() {
     test(xs, ys, vec![10; out_len]);
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 #[test]
 fn test_limbs_mul_greater_to_out_toom_6h() {
     let test = |xs: Vec<Limb>, ys: Vec<Limb>, out_before: Vec<Limb>| {
@@ -4526,7 +4526,7 @@ fn test_limbs_mul_greater_to_out_toom_8h() {
     test(xs, ys, vec![10; out_len]);
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 #[test]
 fn test_limbs_mul_greater_to_out_toom_8h() {
     let test = |xs: Vec<Limb>, ys: Vec<Limb>, out_before: Vec<Limb>| {
@@ -11652,7 +11652,7 @@ fn test_limbs_mul_greater_to_out_fft() {
     test(xs, ys, vec![10; out_len]);
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 #[test]
 fn test_limbs_mul_mod_limb_width_to_n_minus_1() {
     let test = |out_before: Vec<Limb>,
@@ -15015,7 +15015,7 @@ fn test_limbs_mul_mod_limb_width_to_n_minus_1() {
     test(out, 960, xs, ys, tp, out_after);
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 #[test]
 fn test_limbs_mul_greater_to_out_fft() {
     let test = |xs: Vec<Limb>, ys: Vec<Limb>, out_before: Vec<Limb>| {
@@ -16430,7 +16430,7 @@ fn test_limbs_mul_greater_to_out_fft() {
     test(xs, ys, vec![10; out_len]);
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 #[test]
 fn test_limbs_mul_fft_fft() {
     let test = |ap_before: Vec<Vec<Limb>>,
@@ -16474,7 +16474,7 @@ fn test_limbs_mul_fft_fft() {
     );
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 #[test]
 fn test_limbs_mul_fft_inverse() {
     let test = |ap_before: Vec<Vec<Limb>>,
@@ -16511,7 +16511,7 @@ fn test_limbs_mul_fft_inverse() {
     );
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 #[test]
 fn test_limbs_mul_fft_normalize_mod_f() {
     let test = |rp_before: Vec<Limb>, n: usize, ap: Vec<Limb>, rp_after: Vec<Limb>| {
@@ -16528,7 +16528,7 @@ fn test_limbs_mul_fft_normalize_mod_f() {
     );
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 #[test]
 fn test_limbs_mul_fft_internal() {
     let test = |op_before: Vec<Limb>,

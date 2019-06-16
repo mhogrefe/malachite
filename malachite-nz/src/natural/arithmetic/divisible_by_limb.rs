@@ -6,7 +6,6 @@ use natural::Natural::{self, Large, Small};
 use platform::Limb;
 
 // must be >= 1
-//TODO tune
 const BMOD_1_TO_MOD_1_THRESHOLD: usize = 29;
 
 /// Benchmarks show that this is never faster than just calling `limbs_divisible_by_limb`.
@@ -92,7 +91,7 @@ impl<'a> DivisibleBy<Limb> for &'a Natural {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a> DivisibleBy<u32> for &'a Natural {
     #[inline]
     fn divisible_by(self, other: u32) -> bool {
@@ -134,7 +133,7 @@ impl<'a> DivisibleBy<&'a Natural> for Limb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a> DivisibleBy<&'a Natural> for u32 {
     #[inline]
     fn divisible_by(self, other: &'a Natural) -> bool {

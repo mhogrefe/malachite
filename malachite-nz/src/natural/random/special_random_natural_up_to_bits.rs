@@ -9,7 +9,7 @@ use rand::distributions::{IndependentSample, Range};
 use rand::Rng;
 
 use natural::arithmetic::add_limb::limbs_slice_add_limb_in_place;
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 use natural::random::random_natural_up_to_bits::_transform_32_to_64_bit_limbs;
 use natural::Natural;
 
@@ -124,7 +124,7 @@ pub fn special_random_natural_up_to_bits<R: Rng>(rng: &mut R, bits: u64) -> Natu
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 pub fn special_random_natural_up_to_bits<R: Rng>(rng: &mut R, bits: u64) -> Natural {
     if bits == 0 {
         Natural::ZERO

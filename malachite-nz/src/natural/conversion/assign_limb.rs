@@ -30,7 +30,7 @@ impl Assign<Limb> for Natural {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl Assign<u32> for Natural {
     #[inline]
     fn assign(&mut self, other: u32) {

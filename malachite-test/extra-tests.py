@@ -17,11 +17,11 @@ path = '../malachite-nz/src/natural/arithmetic/mul/mul_mod.rs'
 assert subprocess.call('cp ' + path + ' backup.rs', shell = True) == 0
 substitute_mul_fft_modf_threshold('backup.rs', 'temp.rs', '40')
 assert subprocess.call('mv temp.rs ' + path, shell = True) == 0
-assert subprocess.call('cargo test -- test_limbs_mul_greater_to_out_fft', shell = True) == 0
+assert subprocess.call('cargo test --features 32_bit_limbs -- test_limbs_mul_greater_to_out_fft', shell = True) == 0
 substitute_mul_fft_modf_threshold('backup.rs', 'temp.rs', '4')
 assert subprocess.call('mv temp.rs ' + path, shell = True) == 0
-assert subprocess.call('cargo test -- test_limbs_mul_greater_to_out_fft', shell = True) == 0
+assert subprocess.call('cargo test --features 32_bit_limbs -- test_limbs_mul_greater_to_out_fft', shell = True) == 0
 substitute_mul_fft_modf_threshold('backup.rs', 'temp.rs', '396')
 assert subprocess.call('mv temp.rs ' + path, shell = True) == 0
-assert subprocess.call('cargo test -- test_limbs_mul_greater_to_out_fft', shell = True) == 0
+assert subprocess.call('cargo test --features 32_bit_limbs -- test_limbs_mul_greater_to_out_fft', shell = True) == 0
 assert subprocess.call('mv backup.rs ' + path, shell = True) == 0

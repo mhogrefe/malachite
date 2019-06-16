@@ -3,7 +3,7 @@ use malachite_base::num::arithmetic::traits::{DivExact, DivExactAssign, ModPower
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_base::num::conversion::traits::SplitInHalf;
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 use malachite_base::num::conversion::traits::WrappingFrom;
 
 use natural::arithmetic::div_limb::{
@@ -75,7 +75,7 @@ pub fn limbs_invert_limb(limb: Limb) -> Limb {
     let mut inverse: Limb = INVERT_LIMB_TABLE[usize::checked_from(index).unwrap()].into();
     inverse = (inverse << 1).wrapping_sub((inverse * inverse).wrapping_mul(limb));
     inverse = (inverse << 1).wrapping_sub(inverse.wrapping_mul(inverse).wrapping_mul(limb));
-    if cfg!(feature = "64_bit_limbs") {
+    if !cfg!(feature = "32_bit_limbs") {
         inverse = (inverse << 1).wrapping_sub(inverse.wrapping_mul(inverse).wrapping_mul(limb));
     }
     inverse
@@ -457,7 +457,7 @@ impl DivExact<Limb> for Natural {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl DivExact<u32> for Natural {
     type Output = Natural;
 
@@ -519,7 +519,7 @@ impl<'a> DivExact<Limb> for &'a Natural {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a> DivExact<u32> for &'a Natural {
     type Output = Natural;
 
@@ -582,7 +582,7 @@ impl DivExactAssign<Limb> for Natural {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl DivExactAssign<u32> for Natural {
     #[inline]
     fn div_exact_assign(&mut self, other: u32) {
@@ -627,7 +627,7 @@ impl DivExact<Natural> for Limb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl DivExact<Natural> for u32 {
     type Output = u32;
 
@@ -674,7 +674,7 @@ impl<'a> DivExact<&'a Natural> for Limb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a> DivExact<&'a Natural> for u32 {
     type Output = u32;
 
@@ -713,7 +713,7 @@ impl DivExactAssign<Natural> for Limb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl DivExactAssign<Natural> for u32 {
     #[inline]
     fn div_exact_assign(&mut self, other: Natural) {
@@ -750,7 +750,7 @@ impl<'a> DivExactAssign<&'a Natural> for Limb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a> DivExactAssign<&'a Natural> for u32 {
     #[inline]
     fn div_exact_assign(&mut self, other: &'a Natural) {

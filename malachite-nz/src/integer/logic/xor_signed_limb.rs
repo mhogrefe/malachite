@@ -314,7 +314,7 @@ impl BitXor<SignedLimb> for Integer {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl BitXor<i32> for Integer {
     type Output = Integer;
 
@@ -370,7 +370,7 @@ impl<'a> BitXor<SignedLimb> for &'a Integer {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a> BitXor<i32> for &'a Integer {
     type Output = Integer;
 
@@ -415,7 +415,7 @@ impl BitXor<Integer> for SignedLimb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl BitXor<Integer> for i32 {
     type Output = Integer;
 
@@ -460,7 +460,7 @@ impl<'a> BitXor<&'a Integer> for SignedLimb {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl<'a> BitXor<&'a Integer> for i32 {
     type Output = Integer;
 
@@ -509,7 +509,7 @@ impl BitXorAssign<SignedLimb> for Integer {
     }
 }
 
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 impl BitXorAssign<i32> for Integer {
     #[inline]
     fn bitxor_assign(&mut self, other: i32) {

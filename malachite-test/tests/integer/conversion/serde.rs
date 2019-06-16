@@ -37,7 +37,7 @@ fn test_serde() {
             r#"{"sign":true,"abs":{"Large":[0,0,1]}}"#,
         );
     }
-    #[cfg(feature = "64_bit_limbs")]
+    #[cfg(not(feature = "32_bit_limbs"))]
     {
         test(
             "1000000000000000000000000",
@@ -81,7 +81,7 @@ fn test_serde() {
             r#"{"sign":false,"abs":{"Large":[0,0,1]}}"#,
         );
     }
-    #[cfg(feature = "64_bit_limbs")]
+    #[cfg(not(feature = "32_bit_limbs"))]
     {
         test(
             "-1000000000000000000000000",

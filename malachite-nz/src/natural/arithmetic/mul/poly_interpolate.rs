@@ -28,7 +28,10 @@ use natural::arithmetic::sub::{
 };
 use natural::arithmetic::sub_limb::limbs_sub_limb_in_place;
 use natural::arithmetic::sub_mul_limb::limbs_sub_mul_limb_same_length_in_place_left;
-use platform::Limb;
+use platform::{
+    Limb, AORSMUL_FASTER_2AORSLSH, AORSMUL_FASTER_3AORSLSH, AORSMUL_FASTER_AORS_2AORSLSH,
+    AORSMUL_FASTER_AORS_AORSLSH,
+};
 
 /// Time: worst case O(k)
 ///
@@ -242,7 +245,7 @@ pub(crate) fn _limbs_mul_toom_interpolate_5_points(
 ///
 /// where n = `n`
 ///
-/// This is mpn_toom_interpolate_6pts from mpn/generic/mpn_toom_interpolate_6pts.c, but the argument
+/// This is mpn_toom_interpolate_6pts from mpn/generic/toom_interpolate_6pts.c, but the argument
 /// w0n == `n_high` is moved to immediately after `n`.
 #[allow(clippy::cyclomatic_complexity, clippy::too_many_arguments)]
 pub(crate) fn _limbs_mul_toom_interpolate_6_points(
@@ -462,7 +465,7 @@ const WANT_ASSERT: bool = true;
 ///
 /// where n = `n`
 ///
-/// This is mpn_toom_interpolate_7pts from mpn/generic/mpn_toom_interpolate_7pts.c, but the argument
+/// This is mpn_toom_interpolate_7pts from mpn/generic/toom_interpolate_7pts.c, but the argument
 /// w6n == `n_high` is moved to immediately after `n`.
 #[allow(clippy::cyclomatic_complexity, clippy::too_many_arguments)]
 pub(crate) fn _limbs_mul_toom_interpolate_7_points(
@@ -639,16 +642,14 @@ pub(crate) fn _limbs_mul_toom_interpolate_7_points(
 ///
 /// where n = `ys.len()`
 ///
-/// This is DO_mpn_sublsh_n from mpn/generic/mpn_toom_interpolate_8pts.c.
-fn _limbs_shl_and_sub_same_length(
+/// This is DO_mpn_sublsh_n from mpn/generic/toom_interpolate_8pts.c.
+pub fn _limbs_shl_and_sub_same_length(
     xs: &mut [Limb],
     ys: &[Limb],
     shift: u32,
     scratch: &mut [Limb],
 ) -> Limb {
     let n = ys.len();
-    assert!(scratch.len() >= n);
-    assert!(xs.len() >= n);
     let mut carry = limbs_shl_to_out(scratch, ys, shift);
     if limbs_sub_same_length_in_place_left(&mut xs[..n], &scratch[..n]) {
         carry.wrapping_add_assign(1);
@@ -662,7 +663,7 @@ fn _limbs_shl_and_sub_same_length(
 ///
 /// where n = max(`xs.len()`, `ys.len()`)
 ///
-/// This is DO_mpn_subrsh from mpn/generic/mpn_toom_interpolate_8pts.c.
+/// This is DO_mpn_subrsh from mpn/generic/toom_interpolate_8pts.c.
 fn _limbs_shl_and_sub(xs: &mut [Limb], ys: &[Limb], shift: u32, scratch: &mut [Limb]) {
     assert!(!limbs_sub_limb_in_place(xs, ys[0] >> shift));
     let carry = _limbs_shl_and_sub_same_length(xs, &ys[1..], Limb::WIDTH - shift, scratch);
@@ -715,7 +716,7 @@ fn _limbs_shl_and_sub_special(
 ///
 /// where n = `n`
 ///
-/// This is mpn_toom_interpolate_8pts from mpn/generic/mpn_toom_interpolate_8pts.c, but the argument
+/// This is mpn_toom_interpolate_8pts from mpn/generic/toom_interpolate_8pts.c, but the argument
 /// spt == `s_plus_t` is moved to immediately after `n`.
 pub(crate) fn _limbs_mul_toom_interpolate_8_points(
     out: &mut [Limb],
@@ -832,12 +833,6 @@ fn limbs_div_255_in_place(xs: &mut [Limb]) {
     limbs_div_divisor_of_limb_max_with_carry_in_place(xs, Limb::MAX / 255, 0);
 }
 
-//TODO tune
-const AORSMUL_FASTER_AORS_AORSLSH: bool = false;
-const AORSMUL_FASTER_2AORSLSH: bool = false;
-const AORSMUL_FASTER_3AORSLSH: bool = false;
-const AORSMUL_FASTER_AORS_2AORSLSH: bool = false;
-
 /// Interpolation for Toom-6.5 (or Toom-6), using the evaluation points:
 /// Infinity(6.5 only), +-4, +-2, +-1, +-1/4, +-1/2, 0.
 ///
@@ -871,7 +866,7 @@ const AORSMUL_FASTER_AORS_2AORSLSH: bool = false;
 ///
 /// where n = `n`
 ///
-/// This is mpn_toom_interpolate_12pts from mpn/generic/mpn_toom_interpolate_12pts.c.
+/// This is mpn_toom_interpolate_12pts from mpn/generic/toom_interpolate_12pts.c.
 pub fn _limbs_mul_toom_interpolate_12_points<'a>(
     out: &mut [Limb],
     mut r1: &'a mut [Limb],
@@ -1080,7 +1075,7 @@ pub fn _limbs_mul_toom_interpolate_12_points<'a>(
 
 #[cfg(feature = "32_bit_limbs")]
 const CORRECTED_WIDTH: u32 = 42 - Limb::WIDTH;
-#[cfg(feature = "64_bit_limbs")]
+#[cfg(not(feature = "32_bit_limbs"))]
 const CORRECTED_WIDTH: u32 = 42;
 
 /// Interpolation for Toom-8.5 (or Toom-8), using the evaluation points:
@@ -1119,7 +1114,7 @@ const CORRECTED_WIDTH: u32 = 42;
 ///
 /// where n = `n`
 ///
-/// This is mpn_toom_interpolate_16pts from mpn/generic/mpn_toom_interpolate_16pts.c.
+/// This is mpn_toom_interpolate_16pts from mpn/generic/toom_interpolate_16pts.c.
 pub fn _limbs_mul_toom_interpolate_16_points<'a>(
     out: &mut [Limb],
     r1: &mut [Limb],
