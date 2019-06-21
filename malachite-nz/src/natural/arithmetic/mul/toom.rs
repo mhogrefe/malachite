@@ -15,7 +15,6 @@ use natural::arithmetic::add::{
 };
 use natural::arithmetic::add_limb::{limbs_add_limb_to_out, limbs_slice_add_limb_in_place};
 use natural::arithmetic::add_mul_limb::limbs_slice_add_mul_limb_same_length_in_place_left;
-use natural::arithmetic::mul::fft::MUL_FFT_THRESHOLD;
 use natural::arithmetic::mul::poly_eval::{
     _limbs_mul_toom_evaluate_deg_3_poly_in_1_and_neg_1,
     _limbs_mul_toom_evaluate_deg_3_poly_in_2_and_neg_2,
@@ -45,19 +44,12 @@ use natural::arithmetic::sub::{
 };
 use natural::arithmetic::sub_limb::limbs_sub_limb_in_place;
 use natural::comparison::ord::limbs_cmp_same_length;
-use platform::{Limb, SignedLimb};
+use platform::{
+    Limb, SignedLimb, MUL_FFT_THRESHOLD, MUL_TOOM22_THRESHOLD, MUL_TOOM33_THRESHOLD,
+    MUL_TOOM44_THRESHOLD, MUL_TOOM6H_THRESHOLD, MUL_TOOM8H_THRESHOLD,
+};
 
-//TODO tune all
-pub const MUL_TOOM22_THRESHOLD: usize = 20;
-pub const MUL_TOOM33_THRESHOLD: usize = 65;
-pub const MUL_TOOM44_THRESHOLD: usize = 166;
-pub const MUL_TOOM6H_THRESHOLD: usize = 256;
-pub const MUL_TOOM8H_THRESHOLD: usize = 333;
-pub const MUL_TOOM32_TO_TOOM43_THRESHOLD: usize = 108;
-pub const MUL_TOOM32_TO_TOOM53_THRESHOLD: usize = 122;
-pub const MUL_TOOM42_TO_TOOM53_THRESHOLD: usize = 105;
-pub const MUL_TOOM42_TO_TOOM63_THRESHOLD: usize = 114;
-pub const MUL_TOOM33_THRESHOLD_LIMIT: usize = MUL_TOOM33_THRESHOLD;
+pub(crate) const MUL_TOOM33_THRESHOLD_LIMIT: usize = MUL_TOOM33_THRESHOLD;
 
 /// Helper function for high degree Toom-Cook algorithms.
 ///

@@ -5,7 +5,7 @@ use malachite_nz::natural::arithmetic::sub::limbs_sub_same_length_in_place_left;
 use malachite_nz::natural::arithmetic::sub_mul_limb::limbs_sub_mul_limb_same_length_in_place_left;
 use time::precise_time_ns;
 
-pub fn tune() {
+pub fn tune() -> Vec<String> {
     let mut aorsmul_faster_2aorslsh_vote = 0;
     let mut aorsmul_faster_3aorslsh_vote = 0;
     let mut aorsmul_faster_aors_aorslsh_vote = 0;
@@ -45,20 +45,22 @@ pub fn tune() {
         }
     }
     let half_limit = limit >> 1;
-    println!(
-        "AORSMUL_FASTER_2AORSLSH: {}",
+    let mut lines = Vec::new();
+    lines.push(format!(
+        "pub const AORSMUL_FASTER_2AORSLSH: bool = {};",
         aorsmul_faster_2aorslsh_vote >= half_limit
-    );
-    println!(
-        "AORSMUL_FASTER_3AORSLSH: {}",
+    ));
+    lines.push(format!(
+        "pub const AORSMUL_FASTER_3AORSLSH: bool = {};",
         aorsmul_faster_3aorslsh_vote >= half_limit
-    );
-    println!(
-        "AORSMUL_FASTER_AORS_AORSLSH: {}",
+    ));
+    lines.push(format!(
+        "pub const AORSMUL_FASTER_AORS_AORSLSH: bool = {};",
         aorsmul_faster_aors_aorslsh_vote >= half_limit
-    );
-    println!(
-        "AORSMUL_FASTER_AORS_2AORSLSH: {}",
+    ));
+    lines.push(format!(
+        "pub const AORSMUL_FASTER_AORS_2AORSLSH: bool = {};",
         aorsmul_faster_aors_2aorslsh_vote >= half_limit
-    );
+    ));
+    lines
 }

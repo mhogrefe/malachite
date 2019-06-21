@@ -5,7 +5,8 @@ use malachite_base::num::conversion::traits::WrappingFrom;
 
 use natural::arithmetic::add::limbs_slice_add_greater_in_place_left;
 use natural::arithmetic::add_mul_limb::limbs_slice_add_mul_limb_same_length_in_place_left;
-use natural::arithmetic::mul::fft::{_limbs_mul_greater_to_out_fft, MUL_FFT_THRESHOLD};
+use natural::arithmetic::mul::fft::_limbs_mul_greater_to_out_fft;
+use natural::arithmetic::mul::toom::MUL_TOOM33_THRESHOLD_LIMIT;
 use natural::arithmetic::mul::toom::{
     _limbs_mul_greater_to_out_toom_22, _limbs_mul_greater_to_out_toom_22_scratch_size,
     _limbs_mul_greater_to_out_toom_32, _limbs_mul_greater_to_out_toom_33,
@@ -16,14 +17,16 @@ use natural::arithmetic::mul::toom::{
     _limbs_mul_greater_to_out_toom_6h_scratch_size, _limbs_mul_greater_to_out_toom_8h,
     _limbs_mul_greater_to_out_toom_8h_scratch_size,
     _limbs_mul_same_length_to_out_toom_6h_scratch_size,
-    _limbs_mul_same_length_to_out_toom_8h_scratch_size, MUL_TOOM22_THRESHOLD,
-    MUL_TOOM32_TO_TOOM43_THRESHOLD, MUL_TOOM32_TO_TOOM53_THRESHOLD, MUL_TOOM33_THRESHOLD,
-    MUL_TOOM33_THRESHOLD_LIMIT, MUL_TOOM42_TO_TOOM53_THRESHOLD, MUL_TOOM42_TO_TOOM63_THRESHOLD,
-    MUL_TOOM44_THRESHOLD, MUL_TOOM6H_THRESHOLD, MUL_TOOM8H_THRESHOLD,
+    _limbs_mul_same_length_to_out_toom_8h_scratch_size,
 };
 use natural::arithmetic::mul_limb::limbs_mul_limb_to_out;
 use natural::Natural::{self, Large, Small};
-use platform::Limb;
+use platform::{
+    Limb, MUL_FFT_THRESHOLD, MUL_TOOM22_THRESHOLD, MUL_TOOM32_TO_TOOM43_THRESHOLD,
+    MUL_TOOM32_TO_TOOM53_THRESHOLD, MUL_TOOM33_THRESHOLD, MUL_TOOM42_TO_TOOM53_THRESHOLD,
+    MUL_TOOM42_TO_TOOM63_THRESHOLD, MUL_TOOM44_THRESHOLD, MUL_TOOM6H_THRESHOLD,
+    MUL_TOOM8H_THRESHOLD,
+};
 
 // This doesn't use `chunks_exact` because sometimes `xs_last` is longer than `n`.
 macro_rules! split_into_chunks {
