@@ -1,9 +1,10 @@
+use std::fs::File;
+use std::io::Write;
+
 use malachite_base::named::Named;
 use malachite_nz::platform::{
     DoubleLimb, FloatWithLimbWidth, HalfLimb, Limb, SignedDoubleLimb, SignedHalfLimb, SignedLimb,
 };
-use std::fs::File;
-use std::io::Write;
 
 pub mod aorsmul;
 pub mod compare_two;

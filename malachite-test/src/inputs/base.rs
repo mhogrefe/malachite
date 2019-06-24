@@ -301,6 +301,77 @@ pub fn pairs_of_unsigneds<T: PrimitiveUnsigned + Rand>(gm: GenerationMode) -> It
     }
 }
 
+pub fn pairs_of_unsigned_and_unsigned<T: PrimitiveUnsigned + Rand, U: PrimitiveUnsigned + Rand>(
+    gm: GenerationMode,
+) -> It<(T, U)> {
+    match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_pairs(
+            exhaustive_unsigned(),
+            exhaustive_unsigned(),
+        )),
+        GenerationMode::Random(_) => {
+            Box::new(random_pairs(&EXAMPLE_SEED, &|seed| random(seed), &|seed| {
+                random(seed)
+            }))
+        }
+        GenerationMode::SpecialRandom(_) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &|seed| special_random_unsigned(seed),
+            &|seed| special_random_unsigned(seed),
+        )),
+    }
+}
+
+pub fn pairs_of_signed_and_signed<T: PrimitiveSigned + Rand, U: PrimitiveSigned + Rand>(
+    gm: GenerationMode,
+) -> It<(T, U)>
+where
+    T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
+    U::UnsignedOfEqualWidth: Rand,
+    U: WrappingFrom<<U as PrimitiveSigned>::UnsignedOfEqualWidth>,
+{
+    match gm {
+        GenerationMode::Exhaustive => {
+            Box::new(exhaustive_pairs(exhaustive_signed(), exhaustive_signed()))
+        }
+        GenerationMode::Random(_) => {
+            Box::new(random_pairs(&EXAMPLE_SEED, &|seed| random(seed), &|seed| {
+                random(seed)
+            }))
+        }
+        GenerationMode::SpecialRandom(_) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &|seed| special_random_signed(seed),
+            &|seed| special_random_signed(seed),
+        )),
+    }
+}
+
+pub fn pairs_of_signed_and_unsigned<T: PrimitiveSigned + Rand, U: PrimitiveUnsigned + Rand>(
+    gm: GenerationMode,
+) -> It<(T, U)>
+where
+    T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
+{
+    match gm {
+        GenerationMode::Exhaustive => {
+            Box::new(exhaustive_pairs(exhaustive_signed(), exhaustive_unsigned()))
+        }
+        GenerationMode::Random(_) => {
+            Box::new(random_pairs(&EXAMPLE_SEED, &|seed| random(seed), &|seed| {
+                random(seed)
+            }))
+        }
+        GenerationMode::SpecialRandom(_) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &|seed| special_random_signed(seed),
+            &|seed| special_random_unsigned(seed),
+        )),
+    }
+}
+
 //TODO use subset_pairs
 // All pairs of `T`s where `T` is unsigned and the first `T` is greater than or equal to the second.
 pub fn pairs_of_unsigneds_var_1<T: PrimitiveUnsigned + Rand>(gm: GenerationMode) -> It<(T, T)> {

@@ -31,6 +31,7 @@ pub mod base {
 
     pub mod num {
         pub mod conversion {
+            pub mod assign;
             pub mod checked_from;
             pub mod convertible_from;
             pub mod overflowing_from;

@@ -1,9 +1,10 @@
-use common::GenerationMode;
-use inputs::base::pairs_of_unsigned_vec_var_1;
 use malachite_nz::natural::arithmetic::mul::poly_interpolate::_limbs_shl_and_sub_same_length;
 use malachite_nz::natural::arithmetic::sub::limbs_sub_same_length_in_place_left;
 use malachite_nz::natural::arithmetic::sub_mul_limb::limbs_sub_mul_limb_same_length_in_place_left;
 use time::precise_time_ns;
+
+use common::GenerationMode;
+use inputs::base::pairs_of_unsigned_vec_var_1;
 
 pub fn tune() -> Vec<String> {
     let mut aorsmul_faster_2aorslsh_vote = 0;

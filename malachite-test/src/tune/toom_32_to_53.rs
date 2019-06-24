@@ -1,10 +1,11 @@
-use common::GenerationMode;
-use inputs::base::triples_of_unsigned_vec_var_18;
 use malachite_nz::natural::arithmetic::mul::toom::{
     _limbs_mul_greater_to_out_toom_32, _limbs_mul_greater_to_out_toom_32_scratch_size,
     _limbs_mul_greater_to_out_toom_53, _limbs_mul_greater_to_out_toom_53_scratch_size,
 };
 use malachite_nz::platform::Limb;
+
+use common::GenerationMode;
+use inputs::base::triples_of_unsigned_vec_var_18;
 use tune::compare_two::{compare_two, ComparisonResult};
 
 pub fn tune() -> Vec<String> {

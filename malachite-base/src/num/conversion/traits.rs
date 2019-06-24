@@ -2,7 +2,6 @@ use std::num::ParseIntError;
 
 use round::RoundingMode;
 
-//TODO test
 /// This trait defines an assignment function that sets a mutable reference of one type to the value
 /// of another.
 pub trait Assign<Rhs = Self> {

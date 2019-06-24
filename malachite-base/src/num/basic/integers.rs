@@ -26,8 +26,8 @@ use num::arithmetic::traits::{
 use num::basic::traits::{One, Two, Zero};
 use num::comparison::traits::{OrdAbs, PartialOrdAbs};
 use num::conversion::traits::{
-    CheckedFrom, CheckedInto, OverflowingFrom, OverflowingInto, SaturatingFrom, SaturatingInto,
-    WrappingFrom, WrappingInto,
+    Assign, CheckedFrom, CheckedInto, OverflowingFrom, OverflowingInto, SaturatingFrom,
+    SaturatingInto, WrappingFrom, WrappingInto,
 };
 use num::logic::traits::{
     BitAccess, BitScan, CountOnes, CountZeros, Endian, HammingDistance, LeadingZeros, NotAssign,
@@ -39,6 +39,7 @@ pub trait PrimitiveInteger:
     'static
     + Add<Output = Self>
     + AddAssign<Self>
+    + Assign<Self>
     + Binary
     + BitAccess
     + BitAnd<Output = Self>
