@@ -468,6 +468,58 @@ pub fn pairs_of_limb_and_positive_natural_var_2(gm: GenerationMode) -> It<(Limb,
     )
 }
 
+pub fn pairs_of_natural_and_positive_natural(gm: GenerationMode) -> It<(Natural, Natural)> {
+    match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_pairs(
+            exhaustive_naturals(),
+            exhaustive_positive_naturals(),
+        )),
+        GenerationMode::Random(scale) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| random_naturals(seed, scale)),
+            &(|seed| random_positive_naturals(seed, scale)),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_naturals(seed, scale)),
+            &(|seed| special_random_positive_naturals(seed, scale)),
+        )),
+    }
+}
+
+pub fn rm_pairs_of_natural_and_positive_natural(
+    gm: GenerationMode,
+) -> It<((rug::Integer, rug::Integer), (Natural, Natural))> {
+    Box::new(pairs_of_natural_and_positive_natural(gm).map(|(x, y)| {
+        (
+            (natural_to_rug_integer(&x), natural_to_rug_integer(&y)),
+            (x, y),
+        )
+    }))
+}
+
+pub fn nrm_pairs_of_natural_and_positive_natural(
+    gm: GenerationMode,
+) -> It<(
+    (BigUint, BigUint),
+    (rug::Integer, rug::Integer),
+    (Natural, Natural),
+)> {
+    Box::new(pairs_of_natural_and_positive_natural(gm).map(|(x, y)| {
+        (
+            (natural_to_biguint(&x), natural_to_biguint(&y)),
+            (natural_to_rug_integer(&x), natural_to_rug_integer(&y)),
+            (x, y),
+        )
+    }))
+}
+
+// All pairs of `Natural` and positive `Natural` where the first `Natural` is divisible by the
+// second.
+pub fn pairs_of_natural_and_positive_natural_var_1(gm: GenerationMode) -> It<(Natural, Natural)> {
+    Box::new(pairs_of_natural_and_positive_natural(gm).map(|(n, u)| (n * &u, u)))
+}
+
 fn random_triples_of_natural_natural_and_primitive<T: PrimitiveInteger + Rand>(
     scale: u32,
 ) -> It<(Natural, Natural, T)> {

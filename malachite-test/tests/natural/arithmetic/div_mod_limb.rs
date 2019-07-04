@@ -651,7 +651,10 @@ fn div_mod_limb_properties_helper(n: &Natural, u: Limb) {
     assert_eq!(quotient_alt, quotient);
     assert_eq!(remainder_alt, remainder);
 
-    //TODO assert_eq!(n.div_mod(Natural::from(u)), (quotient.clone(), remainder));
+    assert_eq!(
+        n.div_mod(Natural::from(u)),
+        (quotient.clone(), Natural::from(remainder))
+    );
 
     #[cfg(feature = "32_bit_limbs")]
     {
@@ -736,7 +739,10 @@ fn div_mod_limb_properties() {
             assert_eq!(quotient_alt, quotient);
             assert_eq!(remainder_alt, remainder);
 
-            //TODO assert_eq!((quotient, remainder), Natural::from(u).div_mod(n));
+            assert_eq!(
+                Natural::from(u).div_mod(n),
+                (Natural::from(quotient), Natural::from(remainder))
+            );
 
             if u != 0 && u < *n {
                 assert_eq!(remainder, u);
@@ -793,7 +799,10 @@ fn ceiling_div_neg_mod_limb_properties_helper(n: &Natural, u: Limb) {
     assert_eq!(quotient_alt, quotient);
     assert_eq!(remainder_alt, remainder);
 
-    //TODO assert_eq!(n.ceiling_div_neg_mod(Natural::from(u)), (quotient.clone(), remainder));
+    assert_eq!(
+        n.ceiling_div_neg_mod(Natural::from(u)),
+        (quotient.clone(), Natural::from(remainder))
+    );
 
     #[cfg(feature = "32_bit_limbs")]
     {
@@ -853,7 +862,10 @@ fn ceiling_div_neg_mod_limb_properties() {
             assert_eq!(remainder_alt, remainder);
             assert_eq!(mut_u, quotient);
 
-            //TODO assert_eq!((quotient, remainder), Natural::from(u).ceiling_div_neg_mod(n));
+            assert_eq!(
+                Natural::from(u).ceiling_div_neg_mod(n),
+                (Natural::from(quotient), remainder_alt)
+            );
 
             if u != 0 && u < *n {
                 assert_eq!(remainder, n - u);

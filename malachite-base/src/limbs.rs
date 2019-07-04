@@ -1,4 +1,4 @@
-use num::basic::unsigneds::PrimitiveUnsigned;
+use num::basic::traits::Zero;
 
 /// Tests whether all limbs in a slice are equal to 0.
 ///
@@ -17,7 +17,7 @@ use num::basic::unsigneds::PrimitiveUnsigned;
 /// ```
 ///
 /// This is mpn_zero_p from gmp.h.
-pub fn limbs_test_zero<T: PrimitiveUnsigned>(limbs: &[T]) -> bool {
+pub fn limbs_test_zero<T: Copy + Eq + Zero>(limbs: &[T]) -> bool {
     limbs.iter().all(|&limb| limb == T::ZERO)
 }
 
@@ -40,7 +40,7 @@ pub fn limbs_test_zero<T: PrimitiveUnsigned>(limbs: &[T]) -> bool {
 ///
 /// This is mpn_zero from mpn/generic/zero.c. Note that this is needed less often in Malachite than
 /// in GMP, since Malachite generally initializes new memory with zeros.
-pub fn limbs_set_zero<T: PrimitiveUnsigned>(limbs: &mut [T]) {
+pub fn limbs_set_zero<T: Zero>(limbs: &mut [T]) {
     for limb in limbs.iter_mut() {
         *limb = T::ZERO;
     }
@@ -63,7 +63,7 @@ pub fn limbs_set_zero<T: PrimitiveUnsigned>(limbs: &mut [T]) {
 /// limbs_pad_left::<u32>(&mut limbs, 5, 10);
 /// assert_eq!(limbs, [10, 10, 10, 10, 10, 1, 2, 3]);
 /// ```
-pub fn limbs_pad_left<T: PrimitiveUnsigned>(limbs: &mut Vec<T>, pad_size: usize, pad_limb: T) {
+pub fn limbs_pad_left<T: Clone>(limbs: &mut Vec<T>, pad_size: usize, pad_limb: T) {
     let old_len = limbs.len();
     limbs.resize(old_len + pad_size, pad_limb);
     for i in (0..old_len).rev() {
@@ -91,7 +91,7 @@ pub fn limbs_pad_left<T: PrimitiveUnsigned>(limbs: &mut Vec<T>, pad_size: usize,
 /// limbs_delete_left::<u32>(&mut limbs, 3);
 /// assert_eq!(limbs, [4, 5]);
 /// ```
-pub fn limbs_delete_left<T: PrimitiveUnsigned>(limbs: &mut Vec<T>, delete_size: usize) {
+pub fn limbs_delete_left<T>(limbs: &mut Vec<T>, delete_size: usize) {
     assert!(delete_size <= limbs.len());
     let remaining_size = limbs.len() - delete_size;
     for i in 0..remaining_size {
@@ -115,7 +115,7 @@ pub fn limbs_delete_left<T: PrimitiveUnsigned>(limbs: &mut Vec<T>, delete_size: 
 /// assert_eq!(limbs_leading_zero_limbs(&[1u32, 2, 3]), 0);
 /// assert_eq!(limbs_leading_zero_limbs(&[0u32, 0, 0, 1, 2, 3]), 3);
 /// ```
-pub fn limbs_leading_zero_limbs<T: PrimitiveUnsigned>(limbs: &[T]) -> usize {
+pub fn limbs_leading_zero_limbs<T: Copy + Eq + Zero>(limbs: &[T]) -> usize {
     limbs.iter().take_while(|&&limb| limb == T::ZERO).count()
 }
 
@@ -134,10 +134,17 @@ pub fn limbs_leading_zero_limbs<T: PrimitiveUnsigned>(limbs: &[T]) -> usize {
 /// assert_eq!(limbs_trailing_zero_limbs(&[1u32, 2, 3]), 0);
 /// assert_eq!(limbs_trailing_zero_limbs(&[1u32, 2, 3, 0, 0, 0]), 3);
 /// ```
-pub fn limbs_trailing_zero_limbs<T: PrimitiveUnsigned>(limbs: &[T]) -> usize {
+pub fn limbs_trailing_zero_limbs<T: Copy + Eq + Zero>(limbs: &[T]) -> usize {
     limbs
         .iter()
         .rev()
         .take_while(|&&limb| limb == T::ZERO)
         .count()
+}
+
+//TODO test; replace with copy_within
+pub fn limbs_move_left<T: Copy>(limbs: &mut [T], amount: usize) {
+    for i in 0..limbs.len() - amount {
+        limbs[i] = limbs[i + amount];
+    }
 }
