@@ -174,7 +174,7 @@ fn demo_limbs_div_limb_to_out_mod(gm: GenerationMode, limit: usize) {
         triples_of_unsigned_vec_unsigned_vec_and_positive_unsigned_var_1(gm).take(limit)
     {
         let mut out = out.to_vec();
-        let mut out_old = out.clone();
+        let out_old = out.clone();
         let remainder = limbs_div_limb_to_out_mod(&mut out, &in_limbs, limb);
         println!(
             "out := {:?}; limbs_div_limb_to_out_mod(&mut out, {:?}, {}) = {}; \
@@ -187,7 +187,7 @@ fn demo_limbs_div_limb_to_out_mod(gm: GenerationMode, limit: usize) {
 fn demo_limbs_div_limb_in_place_mod(gm: GenerationMode, limit: usize) {
     for (limbs, limb) in pairs_of_unsigned_vec_and_positive_unsigned_var_1(gm).take(limit) {
         let mut limbs = limbs.to_vec();
-        let mut limbs_old = limbs.clone();
+        let limbs_old = limbs.clone();
         let remainder = limbs_div_limb_in_place_mod(&mut limbs, limb);
         println!(
             "limbs := {:?}; limbs_div_limb_in_place_mod(&mut limbs, {}) = {}; limbs = {:?}",

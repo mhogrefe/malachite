@@ -449,7 +449,7 @@ fn limbs_mul_greater_to_out_basecase_mem_opt_helper(out: &mut [Limb], xs: &[Limb
     let mut triangle_buffer = [0; MUL_TOOM22_THRESHOLD];
     let mut offset = 0;
     for chunk in xs.chunks(MUL_BASECASE_MAX_UN) {
-        let mut out = &mut out[offset..];
+        let out = &mut out[offset..];
         if chunk.len() >= ys_len {
             _limbs_mul_greater_to_out_basecase(out, chunk, ys);
         } else {

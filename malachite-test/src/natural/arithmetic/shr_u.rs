@@ -223,7 +223,7 @@ fn demo_limbs_shr_to_out(gm: GenerationMode, limit: usize) {
     for (out, in_limbs, bits) in triples_of_unsigned_vec_unsigned_vec_and_limb_var_6(gm).take(limit)
     {
         let mut out = out.to_vec();
-        let mut out_old = out.clone();
+        let out_old = out.clone();
         let carry = limbs_shr_to_out(&mut out, &in_limbs, bits);
         println!(
             "out := {:?}; limbs_shr_to_out(&mut out, {:?}, {}) = {}; out = {:?}",
@@ -235,7 +235,7 @@ fn demo_limbs_shr_to_out(gm: GenerationMode, limit: usize) {
 fn demo_limbs_slice_shr_in_place(gm: GenerationMode, limit: usize) {
     for (limbs, bits) in pairs_of_unsigned_vec_and_limb_var_2(gm).take(limit) {
         let mut limbs = limbs.to_vec();
-        let mut limbs_old = limbs.clone();
+        let limbs_old = limbs.clone();
         let carry = limbs_slice_shr_in_place(&mut limbs, bits);
         println!(
             "limbs := {:?}; limbs_slice_shr_in_place(&mut limbs, {}) = {}; limbs = {:?}",
@@ -247,7 +247,7 @@ fn demo_limbs_slice_shr_in_place(gm: GenerationMode, limit: usize) {
 fn demo_limbs_vec_shr_in_place(gm: GenerationMode, limit: usize) {
     for (limbs, bits) in pairs_of_unsigned_vec_and_small_unsigned(gm).take(limit) {
         let mut limbs = limbs.to_vec();
-        let mut limbs_old = limbs.clone();
+        let limbs_old = limbs.clone();
         limbs_vec_shr_in_place(&mut limbs, bits);
         println!(
             "limbs := {:?}; limbs_vec_shr_in_place(&mut limbs, {}); limbs = {:?}",
@@ -259,7 +259,7 @@ fn demo_limbs_vec_shr_in_place(gm: GenerationMode, limit: usize) {
 fn demo_limbs_vec_shr_round_up_in_place(gm: GenerationMode, limit: usize) {
     for (limbs, bits) in pairs_of_unsigned_vec_and_small_unsigned_var_1(gm).take(limit) {
         let mut limbs = limbs.to_vec();
-        let mut limbs_old = limbs.clone();
+        let limbs_old = limbs.clone();
         limbs_vec_shr_round_up_in_place(&mut limbs, bits);
         println!(
             "limbs := {:?}; limbs_vec_shr_round_up_in_place(&mut limbs, {}); limbs = {:?}",
@@ -271,7 +271,7 @@ fn demo_limbs_vec_shr_round_up_in_place(gm: GenerationMode, limit: usize) {
 fn demo_limbs_vec_shr_round_to_nearest_in_place(gm: GenerationMode, limit: usize) {
     for (limbs, bits) in pairs_of_unsigned_vec_and_small_unsigned(gm).take(limit) {
         let mut limbs = limbs.to_vec();
-        let mut limbs_old = limbs.clone();
+        let limbs_old = limbs.clone();
         limbs_vec_shr_round_to_nearest_in_place(&mut limbs, bits);
         println!(
             "limbs := {:?}; limbs_vec_shr_round_to_nearest_in_place(&mut limbs, {}); limbs = {:?}",
@@ -283,7 +283,7 @@ fn demo_limbs_vec_shr_round_to_nearest_in_place(gm: GenerationMode, limit: usize
 fn demo_limbs_vec_shr_exact_in_place(gm: GenerationMode, limit: usize) {
     for (limbs, bits) in pairs_of_unsigned_vec_and_small_unsigned_var_1(gm).take(limit) {
         let mut limbs = limbs.to_vec();
-        let mut limbs_old = limbs.clone();
+        let limbs_old = limbs.clone();
         let result = limbs_vec_shr_exact_in_place(&mut limbs, bits);
         println!(
             "limbs := {:?}; limbs_vec_shr_exact_in_place(&mut limbs, {}) = {}; limbs = {:?}",
@@ -297,7 +297,7 @@ fn demo_limbs_vec_shr_round_in_place(gm: GenerationMode, limit: usize) {
         triples_of_unsigned_vec_small_unsigned_and_rounding_mode_var_1(gm).take(limit)
     {
         let mut limbs = limbs.to_vec();
-        let mut limbs_old = limbs.clone();
+        let limbs_old = limbs.clone();
         let result = limbs_vec_shr_round_in_place(&mut limbs, bits, rm);
         println!(
             "limbs := {:?}; limbs_vec_shr_round_in_place(&mut limbs, {}, {}) = {}; limbs = {:?}",

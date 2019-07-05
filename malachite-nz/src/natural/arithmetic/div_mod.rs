@@ -58,46 +58,54 @@ fn udiv_qrnnd(q: &mut Limb, r: &mut Limb, n_hi: Limb, n_lo: Limb, d: Limb) {
 }
 
 // will remove
-fn invert_limb(invxl: &mut Limb, xl: Limb) {
-    assert_ne!(xl, 0);
-    let mut _dummy = 0;
-    udiv_qrnnd(invxl, &mut _dummy, !xl, Limb::MAX, xl);
-}
-
-// will remove
 fn umul_ppmm(ph: &mut Limb, pl: &mut Limb, m1: Limb, m2: Limb) {
     let (hi, lo) = (DoubleLimb::from(m1) * DoubleLimb::from(m2)).split_in_half();
     *ph = hi;
     *pl = lo;
 }
 
-//TODO test
-// checked
-// docs preserved
-// invert_pi1 from gmp-impl.h
-fn invert_pi1(dinv: &mut Limb, d1: Limb, d0: Limb) {
-    let mut v = 0;
-    invert_limb(&mut v, d1);
-    let mut p = d1.wrapping_mul(v);
-    p.wrapping_add_assign(d0);
-    if p < d0 {
-        v.wrapping_sub_assign(1);
-        let mask = if p >= d1 { Limb::MAX } else { 0 };
-        p.wrapping_sub_assign(d1);
-        v.wrapping_add_assign(mask);
-        p.wrapping_sub_assign(mask & d1);
+/// Computes floor((B ^ 3 - 1) / (`hi` * B + `lo`)) - B, where B = 2 ^ `Limb::WIDTH`, assuming the
+/// highest bit of `hi` is set.
+///
+/// Time: worst case O(1)
+///
+/// Additional memory: worst case O(1)
+///
+/// # Panics
+/// Panics if `hi` is zero.
+///
+/// # Example
+/// ```
+/// use malachite_nz::natural::arithmetic::div_mod::limbs_two_limb_inverse_helper;
+///
+/// assert_eq!(limbs_two_limb_inverse_helper(0x8000_0001, 3), 0xffff_fffb);
+/// assert_eq!(limbs_two_limb_inverse_helper(2325651385, 3907343530), 3636893938);
+/// ```
+///
+/// This is invert_pi1 from gmp-impl.h, where the result is returned instead of being written to
+/// dinv.
+pub fn limbs_two_limb_inverse_helper(hi: Limb, lo: Limb) -> Limb {
+    let mut inverse = (DoubleLimb::join_halves(!hi, Limb::MAX) / DoubleLimb::from(hi)).lower_half();
+    let mut hi_product = hi.wrapping_mul(inverse);
+    hi_product.wrapping_add_assign(lo);
+    if hi_product < lo {
+        inverse.wrapping_sub_assign(1);
+        if hi_product >= hi {
+            hi_product.wrapping_sub_assign(hi);
+            inverse.wrapping_sub_assign(1);
+        }
+        hi_product.wrapping_sub_assign(hi);
     }
-    let mut t1 = 0;
-    let mut t0 = 0;
-    umul_ppmm(&mut t1, &mut t0, d0, v);
-    p.wrapping_add_assign(t1);
-    if p < t1 {
-        v.wrapping_sub_assign(1);
-        if p >= d1 && (p > d1 || t0 >= d0) {
-            v.wrapping_sub_assign(1);
+    let (lo_product_hi, lo_product_lo) =
+        (DoubleLimb::from(lo) * DoubleLimb::from(inverse)).split_in_half();
+    hi_product.wrapping_add_assign(lo_product_hi);
+    if hi_product < lo_product_hi {
+        inverse.wrapping_sub_assign(1);
+        if hi_product > hi || hi_product == hi && lo_product_lo >= lo {
+            inverse.wrapping_sub_assign(1);
         }
     }
-    *dinv = v;
+    inverse
 }
 
 // will remove
@@ -113,9 +121,7 @@ fn add_ssaaaa(sh: &mut Limb, sl: &mut Limb, ah1: Limb, al1: Limb, ah2: Limb, al2
 // checked
 // docs preserved
 // Compute quotient the quotient and remainder for n / d. Requires d >= B^2 / 2 and n < d B. di is
-// the inverse of (?)
-//
-// floor((B^3 - 1) / (d0 + d1 B)) - B.
+// the inverse of [d1, d0] computed by `_limbs_two_limb_inverse_helper`.
 //
 // NOTE: Output variables are updated multiple times.
 // udiv_qr_3by2 from gmp-impl.h
@@ -166,7 +172,7 @@ fn udiv_qr_3by2(
 //TODO test
 // checked
 // docs preserved
-// Divide numerator (np) by denominator (dp) and write the np.len() - 2 least significant quotient
+// Divide numerator (np) by denominator (dp) and write the nn - 2 least significant quotient
 // limbs at qp and the 2-long remainder at np. Return the most significant limb of the quotient;
 // this is always 0 or 1.
 //
@@ -196,10 +202,7 @@ pub fn mpn_divrem_2(qp: &mut [Limb], np: &mut [Limb], nn: usize, dp: &[Limb]) ->
     } else {
         0
     };
-
-    let mut di = 0;
-    invert_pi1(&mut di, d1, d0);
-
+    let di = limbs_two_limb_inverse_helper(d1, d0);
     for i in (0..(nn - 2)).rev() {
         let n0 = np[np_offset - 1];
         let mut q = 0;
@@ -1285,7 +1288,7 @@ pub fn mpn_bc_invertappr(ip: &mut [Limb], dp: &[Limb], xp: &mut [Limb]) -> Limb 
 
     // Compute a base value of r limbs.
     if n == 1 {
-        invert_limb(&mut ip[0], dp[0]);
+        ip[0] = (DoubleLimb::join_halves(!dp[0], Limb::MAX) / DoubleLimb::from(dp[0])).lower_half()
     } else {
         // n > 1 here
         let mut i = n;
@@ -1302,8 +1305,7 @@ pub fn mpn_bc_invertappr(ip: &mut [Limb], dp: &[Limb], xp: &mut [Limb]) -> Limb 
         if n == 2 {
             mpn_divrem_2(ip, &mut xp[..4], 4, dp);
         } else {
-            let mut inv = 0;
-            invert_pi1(&mut inv, dp[n - 1], dp[n - 2]);
+            let inv = limbs_two_limb_inverse_helper(dp[n - 1], dp[n - 2]);
             if !MAYBE_DCP1_DIVAPPR || n < DC_DIVAPPR_Q_THRESHOLD {
                 mpn_sbpi1_divappr_q(ip, &mut xp[..2 * n], &dp[..n], inv);
             } else {
@@ -1858,7 +1860,7 @@ pub fn mpn_tdiv_qr(qp: &mut [Limb], rp: &mut [Limb], np: &[Limb], dp: &[Limb]) {
             if !dp[1].get_highest_bit() {
                 let cnt = dp[1].leading_zeros();
                 let dtmp = &mut [0; 2];
-                let mut d2p = dtmp;
+                let d2p = dtmp;
                 d2p[1] = (dp[1] << cnt) | (dp[0] >> (Limb::WIDTH - cnt));
                 d2p[0] = dp[0] << cnt;
                 let mut n2p = vec![0; nn + 1];
@@ -1912,8 +1914,7 @@ pub fn mpn_tdiv_qr(qp: &mut [Limb], rp: &mut [Limb], np: &[Limb], dp: &[Limb]) {
                     n2p[nn] = 0;
                     nn += adjust;
                 }
-                let mut dinv = 0;
-                invert_pi1(&mut dinv, d2p[dn - 1], d2p[dn - 2]);
+                let dinv = limbs_two_limb_inverse_helper(d2p[dn - 1], d2p[dn - 2]);
                 if dn < DC_DIV_QR_THRESHOLD {
                     _limbs_div_mod_schoolbook(qp, &mut n2p[0..nn], d2p, dinv);
                 } else if dn < MUPI_DIV_QR_THRESHOLD ||   // fast condition
@@ -1999,7 +2000,7 @@ pub fn mpn_tdiv_qr(qp: &mut [Limb], rp: &mut [Limb], np: &[Limb], dp: &[Limb]) {
             let mut ilen = dn - qn;
             let mut n2p_orig;
             let mut d2p_orig;
-            let mut n2p: &mut [Limb];
+            let n2p: &mut [Limb];
             let d2p: &[Limb];
             let cnt;
             if !dp[dn - 1].get_highest_bit() {
@@ -2041,8 +2042,7 @@ pub fn mpn_tdiv_qr(qp: &mut [Limb], rp: &mut [Limb], np: &[Limb], dp: &[Limb]) {
             } else if qn == 2 {
                 mpn_divrem_2(qp, n2p, 4, d2p);
             } else {
-                let mut dinv = 0;
-                invert_pi1(&mut dinv, d2p[qn - 1], d2p[qn - 2]);
+                let dinv = limbs_two_limb_inverse_helper(d2p[qn - 1], d2p[qn - 2]);
                 if qn < DC_DIV_QR_THRESHOLD {
                     _limbs_div_mod_schoolbook(qp, &mut n2p[..2 * qn], &d2p[..qn], dinv);
                 } else if qn < MU_DIV_QR_THRESHOLD {

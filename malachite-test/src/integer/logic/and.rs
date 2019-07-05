@@ -86,7 +86,7 @@ fn demo_limbs_and_neg_neg(gm: GenerationMode, limit: usize) {
 fn demo_limbs_and_neg_neg_to_out(gm: GenerationMode, limit: usize) {
     for (ref out, ref xs, ref ys) in triples_of_limb_vec_var_7(gm).take(limit) {
         let mut out = out.to_vec();
-        let mut out_old = out.clone();
+        let out_old = out.clone();
         let b = limbs_and_neg_neg_to_out(&mut out, xs, ys);
         println!(
             "out := {:?}; limbs_and_neg_neg_to_out(&mut out, {:?}, {:?}) = {}; \
@@ -99,7 +99,7 @@ fn demo_limbs_and_neg_neg_to_out(gm: GenerationMode, limit: usize) {
 fn demo_limbs_slice_and_neg_neg_in_place_left(gm: GenerationMode, limit: usize) {
     for (ref xs, ref ys) in pairs_of_limb_vec_var_2(gm).take(limit) {
         let mut xs = xs.to_vec();
-        let mut xs_old = xs.clone();
+        let xs_old = xs.clone();
         let b = limbs_slice_and_neg_neg_in_place_left(&mut xs, ys);
         println!(
             "xs := {:?}; limbs_slice_and_neg_neg_in_place_left(&mut xs, {:?}) = {}; xs = {:?}",
@@ -111,7 +111,7 @@ fn demo_limbs_slice_and_neg_neg_in_place_left(gm: GenerationMode, limit: usize) 
 fn demo_limbs_vec_and_neg_neg_in_place_left(gm: GenerationMode, limit: usize) {
     for (ref xs, ref ys) in pairs_of_limb_vec_var_1(gm).take(limit) {
         let mut xs = xs.to_vec();
-        let mut xs_old = xs.clone();
+        let xs_old = xs.clone();
         limbs_vec_and_neg_neg_in_place_left(&mut xs, ys);
         println!(
             "xs := {:?}; limbs_vec_and_neg_neg_in_place_left(&mut xs, {:?}); xs = {:?}",
@@ -123,9 +123,9 @@ fn demo_limbs_vec_and_neg_neg_in_place_left(gm: GenerationMode, limit: usize) {
 fn demo_limbs_slice_and_neg_neg_in_place_either(gm: GenerationMode, limit: usize) {
     for (ref xs, ref ys) in pairs_of_limb_vec_var_1(gm).take(limit) {
         let mut xs = xs.to_vec();
-        let mut xs_old = xs.clone();
+        let xs_old = xs.clone();
         let mut ys = ys.to_vec();
-        let mut ys_old = ys.clone();
+        let ys_old = ys.clone();
         let p = limbs_slice_and_neg_neg_in_place_either(&mut xs, &mut ys);
         println!(
             "xs := {:?}; ys := {:?}; limbs_slice_and_neg_neg_in_place_either(&mut xs, &mut ys) = \
@@ -138,9 +138,9 @@ fn demo_limbs_slice_and_neg_neg_in_place_either(gm: GenerationMode, limit: usize
 fn demo_limbs_vec_and_neg_neg_in_place_either(gm: GenerationMode, limit: usize) {
     for (ref xs, ref ys) in pairs_of_limb_vec_var_1(gm).take(limit) {
         let mut xs = xs.to_vec();
-        let mut xs_old = xs.clone();
+        let xs_old = xs.clone();
         let mut ys = ys.to_vec();
-        let mut ys_old = ys.clone();
+        let ys_old = ys.clone();
         let b = limbs_vec_and_neg_neg_in_place_either(&mut xs, &mut ys);
         println!(
             "xs := {:?}; ys := {:?}; limbs_vec_and_neg_neg_in_place_either(&mut xs, &mut ys) = \

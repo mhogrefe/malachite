@@ -126,27 +126,30 @@ fn clone_clone_from_and_assign_properties() {
         assert_eq!(rug_integer_to_natural(&rug_x), *y);
     });
 
-    test_properties(pairs_of_unsigneds::<Limb>, #[allow(unused_assignments)]
-    |&(u, v)| {
-        let x = Natural::from(u);
-        let y = Natural::from(v);
+    test_properties(
+        pairs_of_unsigneds::<Limb>,
+        #[allow(unused_assignments)]
+        |&(u, v)| {
+            let x = Natural::from(u);
+            let y = Natural::from(v);
 
-        let mut mut_u = u;
-        let mut mut_x = x.clone();
-        mut_u.clone_from(&v);
-        mut_x.clone_from(&y);
-        assert_eq!(mut_x, mut_u);
+            let mut mut_u = u;
+            let mut mut_x = x.clone();
+            mut_u.clone_from(&v);
+            mut_x.clone_from(&y);
+            assert_eq!(mut_x, mut_u);
 
-        let mut mut_u = u;
-        let mut mut_x = x.clone();
-        mut_u = v;
-        mut_x.assign(&y);
-        assert_eq!(mut_x, mut_u);
+            let mut mut_u = u;
+            let mut mut_x = x.clone();
+            mut_u = v;
+            mut_x.assign(&y);
+            assert_eq!(mut_x, mut_u);
 
-        let mut mut_u = u;
-        let mut mut_x = x.clone();
-        mut_u = v;
-        mut_x.assign(y);
-        assert_eq!(mut_x, mut_u);
-    });
+            let mut mut_u = u;
+            let mut mut_x = x.clone();
+            mut_u = v;
+            mut_x.assign(y);
+            assert_eq!(mut_x, mut_u);
+        },
+    );
 }

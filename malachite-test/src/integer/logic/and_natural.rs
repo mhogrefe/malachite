@@ -101,7 +101,7 @@ fn demo_limbs_and_pos_neg(gm: GenerationMode, limit: usize) {
 fn demo_limbs_and_pos_neg_to_out(gm: GenerationMode, limit: usize) {
     for (ref out, ref xs, ref ys) in triples_of_limb_vec_var_5(gm).take(limit) {
         let mut out = out.to_vec();
-        let mut out_old = out.clone();
+        let out_old = out.clone();
         limbs_and_pos_neg_to_out(&mut out, xs, ys);
         println!(
             "out := {:?}; limbs_and_pos_neg_to_out(&mut out, {:?}, {:?}); \
@@ -114,7 +114,7 @@ fn demo_limbs_and_pos_neg_to_out(gm: GenerationMode, limit: usize) {
 fn demo_limbs_and_pos_neg_in_place_left(gm: GenerationMode, limit: usize) {
     for (ref xs, ref ys) in pairs_of_limb_vec_var_1(gm).take(limit) {
         let mut xs = xs.to_vec();
-        let mut xs_old = xs.clone();
+        let xs_old = xs.clone();
         limbs_and_pos_neg_in_place_left(&mut xs, ys);
         println!(
             "xs := {:?}; limbs_and_pos_neg_in_place_left(&mut xs, {:?}); xs = {:?}",
@@ -126,7 +126,7 @@ fn demo_limbs_and_pos_neg_in_place_left(gm: GenerationMode, limit: usize) {
 fn demo_limbs_slice_and_pos_neg_in_place_right(gm: GenerationMode, limit: usize) {
     for (ref xs, ref ys) in pairs_of_limb_vec_var_1(gm).take(limit) {
         let mut ys = ys.to_vec();
-        let mut ys_old = ys.clone();
+        let ys_old = ys.clone();
         limbs_slice_and_pos_neg_in_place_right(xs, &mut ys);
         println!(
             "ys := {:?}; limbs_slice_and_pos_neg_in_place_right({:?}, &mut ys); ys = {:?}",
@@ -138,7 +138,7 @@ fn demo_limbs_slice_and_pos_neg_in_place_right(gm: GenerationMode, limit: usize)
 fn demo_limbs_vec_and_pos_neg_in_place_right(gm: GenerationMode, limit: usize) {
     for (ref xs, ref ys) in pairs_of_limb_vec_var_1(gm).take(limit) {
         let mut ys = ys.to_vec();
-        let mut ys_old = ys.clone();
+        let ys_old = ys.clone();
         limbs_vec_and_pos_neg_in_place_right(xs, &mut ys);
         println!(
             "ys := {:?}; limbs_vec_and_pos_neg_in_place_right({:?}, &mut ys); ys = {:?}",

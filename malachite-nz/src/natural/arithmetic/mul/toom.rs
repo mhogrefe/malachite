@@ -3906,8 +3906,7 @@ pub fn _limbs_mul_greater_to_out_toom_8h(
         // 1, -1
         let v_neg_1_neg = {
             let pp_lo = &mut pp_lo[..m];
-            let mut v_neg_1_neg =
-                _limbs_mul_toom_evaluate_poly_in_1_and_neg_1(v2, v0, p, xs, n, pp_lo);
+            let v_neg_1_neg = _limbs_mul_toom_evaluate_poly_in_1_and_neg_1(v2, v0, p, xs, n, pp_lo);
             let flip = if Limb::WIDTH > 36 && q == 3 {
                 _limbs_mul_toom_evaluate_deg_3_poly_in_1_and_neg_1(v3, v1, ys, n, pp_lo)
             } else {

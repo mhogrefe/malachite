@@ -94,7 +94,7 @@ fn demo_limbs_div_limb_to_out(gm: GenerationMode, limit: usize) {
         triples_of_unsigned_vec_unsigned_vec_and_positive_unsigned_var_1(gm).take(limit)
     {
         let mut out = out.to_vec();
-        let mut out_old = out.clone();
+        let out_old = out.clone();
         limbs_div_limb_to_out(&mut out, &in_limbs, limb);
         println!(
             "out := {:?}; limbs_div_limb_to_out(&mut out, {:?}, {}); out = {:?}",
@@ -106,7 +106,7 @@ fn demo_limbs_div_limb_to_out(gm: GenerationMode, limit: usize) {
 fn demo_limbs_div_limb_in_place(gm: GenerationMode, limit: usize) {
     for (limbs, limb) in pairs_of_unsigned_vec_and_positive_unsigned_var_1(gm).take(limit) {
         let mut limbs = limbs.to_vec();
-        let mut limbs_old = limbs.clone();
+        let limbs_old = limbs.clone();
         limbs_div_limb_in_place(&mut limbs, limb);
         println!(
             "limbs := {:?}; limbs_div_limb_in_place(&mut limbs, {}); limbs = {:?}",
@@ -116,11 +116,11 @@ fn demo_limbs_div_limb_in_place(gm: GenerationMode, limit: usize) {
 }
 
 fn demo_limbs_div_divisor_of_limb_max_with_carry_to_out(gm: GenerationMode, limit: usize) {
-    for (out, xs, divisor, mut carry) in
+    for (out, xs, divisor, carry) in
         quadruples_of_limb_vec_limb_vec_limb_and_limb_var_3(gm).take(limit)
     {
         let mut out = out.to_vec();
-        let mut out_old = out.clone();
+        let out_old = out.clone();
         let carry_out =
             limbs_div_divisor_of_limb_max_with_carry_to_out(&mut out, &xs, divisor, carry);
         println!(
@@ -132,9 +132,9 @@ fn demo_limbs_div_divisor_of_limb_max_with_carry_to_out(gm: GenerationMode, limi
 }
 
 fn demo_limbs_div_divisor_of_limb_max_with_carry_in_place(gm: GenerationMode, limit: usize) {
-    for (xs, divisor, mut carry) in triples_of_limb_vec_limb_and_limb_var_1(gm).take(limit) {
+    for (xs, divisor, carry) in triples_of_limb_vec_limb_and_limb_var_1(gm).take(limit) {
         let mut xs = xs.to_vec();
-        let mut xs_old = xs.clone();
+        let xs_old = xs.clone();
         let carry_out = limbs_div_divisor_of_limb_max_with_carry_in_place(&mut xs, divisor, carry);
         println!(
             "xs := {:?}; limbs_div_divisor_of_limb_max_with_carry_in_place(&mut xs, {}, {}) = {}; \

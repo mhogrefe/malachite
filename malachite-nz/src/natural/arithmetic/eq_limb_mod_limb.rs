@@ -20,7 +20,7 @@ pub(crate) fn limbs_mod_exact_odd_limb(limbs: &[Limb], divisor: Limb, mut carry:
     let divisor_double = DoubleLimb::from(divisor);
     let last_index = len - 1;
     for &limb in &limbs[..last_index] {
-        let (mut difference, small_carry) = limb.overflowing_sub(carry);
+        let (difference, small_carry) = limb.overflowing_sub(carry);
         carry = (DoubleLimb::from(difference.wrapping_mul(inverse)) * divisor_double).upper_half();
         if small_carry {
             carry.wrapping_add_assign(1);

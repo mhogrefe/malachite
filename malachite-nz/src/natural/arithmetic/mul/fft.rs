@@ -1070,7 +1070,7 @@ fn _limbs_mul_fft_mul_mod_f_k(xss: &mut [&mut [Limb]], yss: &mut [&mut [Limb]]) 
         for (xs, ys) in xss.iter_mut().zip(yss.iter_mut()) {
             _limbs_mul_fft_normalize(xs);
             _limbs_mul_fft_normalize(ys);
-            let mut residues =
+            let residues =
                 _limbs_mul_fft_decompose(a, two_pow_k, s, xs, p, q_shifted, &mut scratch);
             _limbs_mul_fft_decompose(b, two_pow_k, s, ys, p, q_shifted, &mut scratch);
             xs[n] = if _limbs_mul_fft_internal(
@@ -1168,7 +1168,7 @@ fn _limbs_mul_fft_mul_mod_f_k_square(xss: &mut [&mut [Limb]]) {
         let bit_reverse_table = _limbs_mul_fft_bit_reverse_table(&mut scratch2, k);
         for xs in xss.iter_mut() {
             _limbs_mul_fft_normalize(xs);
-            let mut residues =
+            let residues =
                 _limbs_mul_fft_decompose(a_lo, two_pow_k, s, xs, p, q_shifted, &mut scratch);
             xs[n] = if _limbs_mul_fft_internal(
                 xs,

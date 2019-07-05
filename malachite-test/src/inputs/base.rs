@@ -48,9 +48,9 @@ use rust_wheels::iterators::primitive_ints::{
     exhaustive_positive, exhaustive_signed, exhaustive_unsigned, random_natural_signed,
     random_negative_signed, random_nonzero_signed, random_positive_signed,
     random_positive_unsigned, random_range, random_range_down, range_down_increasing,
-    special_random_natural_signed, special_random_negative_signed, special_random_nonzero_signed,
-    special_random_positive_signed, special_random_positive_unsigned, special_random_signed,
-    special_random_unsigned,
+    range_up_increasing, special_random_natural_signed, special_random_negative_signed,
+    special_random_nonzero_signed, special_random_positive_signed,
+    special_random_positive_unsigned, special_random_signed, special_random_unsigned,
 };
 use rust_wheels::iterators::rounding_modes::{exhaustive_rounding_modes, random_rounding_modes};
 use rust_wheels::iterators::strings::{
@@ -376,6 +376,30 @@ where
 // All pairs of `T`s where `T` is unsigned and the first `T` is greater than or equal to the second.
 pub fn pairs_of_unsigneds_var_1<T: PrimitiveUnsigned + Rand>(gm: GenerationMode) -> It<(T, T)> {
     Box::new(pairs_of_unsigneds(gm).filter(|&(x, y)| x >= y))
+}
+
+// All pairs of `T`s, where `T` is unsigned and the most-significant bit of the first `T` is set.
+pub fn pairs_of_unsigneds_var_2<T: PrimitiveUnsigned + Rand>(gm: GenerationMode) -> It<(T, T)> {
+    match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_pairs(
+            range_up_increasing(T::ONE << (T::WIDTH - 1)),
+            exhaustive_unsigned(),
+        )),
+        GenerationMode::Random(_) => Box::new(
+            random_pairs_from_single(random::<T>(&EXAMPLE_SEED)).map(|(mut u, v)| {
+                u.set_bit(u64::from(T::WIDTH - 1));
+                (u, v)
+            }),
+        ),
+        GenerationMode::SpecialRandom(_) => Box::new(
+            random_pairs_from_single(special_random_unsigned::<T>(&EXAMPLE_SEED)).map(
+                |(mut u, v)| {
+                    u.set_bit(u64::from(T::WIDTH - 1));
+                    (u, v)
+                },
+            ),
+        ),
+    }
 }
 
 pub fn pairs_of_signeds<T: PrimitiveSigned + Rand>(gm: GenerationMode) -> It<(T, T)>

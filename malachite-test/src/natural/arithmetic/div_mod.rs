@@ -3,9 +3,11 @@ use malachite_base::num::arithmetic::traits::{
 };
 use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_base::num::logic::traits::SignificantBits;
+use malachite_nz::natural::arithmetic::div_mod::limbs_two_limb_inverse_helper;
 use num::Integer;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
+use inputs::base::pairs_of_unsigneds_var_2;
 use inputs::natural::{
     nrm_pairs_of_natural_and_positive_natural, pairs_of_natural_and_positive_natural,
     rm_pairs_of_natural_and_positive_natural,
@@ -14,6 +16,7 @@ use inputs::natural::{
 // For `Natural`s, `mod` is equivalent to `rem`.
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
+    register_demo!(registry, demo_limbs_two_limb_inverse_helper);
     register_demo!(registry, demo_natural_div_assign_mod);
     register_demo!(registry, demo_natural_div_assign_mod_ref);
     register_demo!(registry, demo_natural_div_mod);
@@ -90,6 +93,17 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
 pub fn rug_ceiling_div_neg_mod(x: rug::Integer, y: rug::Integer) -> (rug::Integer, rug::Integer) {
     let (quotient, remainder) = x.div_rem_ceil(y);
     (quotient, -remainder)
+}
+
+fn demo_limbs_two_limb_inverse_helper(gm: GenerationMode, limit: usize) {
+    for (hi, lo) in pairs_of_unsigneds_var_2(gm).take(limit) {
+        println!(
+            "limbs_two_limb_inverse_helper({}, {}) = {}",
+            hi,
+            lo,
+            limbs_two_limb_inverse_helper(hi, lo)
+        );
+    }
 }
 
 fn demo_natural_div_assign_mod(gm: GenerationMode, limit: usize) {

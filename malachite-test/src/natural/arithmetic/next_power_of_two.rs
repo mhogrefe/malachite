@@ -54,7 +54,7 @@ fn demo_limbs_next_power_of_two(gm: GenerationMode, limit: usize) {
 fn demo_limbs_slice_next_power_of_two_in_place(gm: GenerationMode, limit: usize) {
     for limbs in vecs_of_unsigned_var_1(gm).take(limit) {
         let mut limbs = limbs.to_vec();
-        let mut limbs_old = limbs.clone();
+        let limbs_old = limbs.clone();
         let carry = limbs_slice_next_power_of_two_in_place(&mut limbs);
         println!(
             "limbs := {:?}; limbs_slice_next_power_of_two_in_place(&mut limbs) = {}; limbs = {:?}",
@@ -66,7 +66,7 @@ fn demo_limbs_slice_next_power_of_two_in_place(gm: GenerationMode, limit: usize)
 fn demo_limbs_vec_next_power_of_two_in_place(gm: GenerationMode, limit: usize) {
     for limbs in vecs_of_unsigned_var_1(gm).take(limit) {
         let mut limbs = limbs.to_vec();
-        let mut limbs_old = limbs.clone();
+        let limbs_old = limbs.clone();
         limbs_vec_next_power_of_two_in_place(&mut limbs);
         println!(
             "limbs := {:?}; limbs_vec_next_power_of_two_in_place(&mut limbs); limbs = {:?}",

@@ -1,24 +1,65 @@
+#[cfg(not(feature = "32_bit_limbs"))]
 use std::str::FromStr;
 
 use malachite_base::num::arithmetic::traits::{
     CeilingDivAssignNegMod, CeilingDivNegMod, DivAssignMod, DivAssignRem, DivMod, DivRem,
 };
+use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::traits::{One, Zero};
+use malachite_base::num::conversion::traits::JoinHalves;
+use malachite_nz::natural::arithmetic::div_mod::limbs_two_limb_inverse_helper;
 use malachite_nz::natural::Natural;
-use malachite_nz::platform::Limb;
+use malachite_nz::platform::{DoubleLimb, Limb};
+#[cfg(not(feature = "32_bit_limbs"))]
 use num::{BigUint, Integer};
+#[cfg(not(feature = "32_bit_limbs"))]
 use rug;
 
 use common::test_properties;
+#[cfg(not(feature = "32_bit_limbs"))]
 use malachite_test::common::{
     biguint_to_natural, natural_to_biguint, natural_to_rug_integer, rug_integer_to_natural,
 };
+use malachite_test::inputs::base::pairs_of_unsigneds_var_2;
+#[cfg(not(feature = "32_bit_limbs"))]
 use malachite_test::inputs::natural::{
     naturals, pairs_of_natural_and_positive_natural, pairs_of_natural_and_positive_natural_var_1,
     positive_naturals,
 };
+#[cfg(not(feature = "32_bit_limbs"))]
 use malachite_test::natural::arithmetic::div_mod::rug_ceiling_div_neg_mod;
 
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+fn test_limbs_two_limb_inverse_helper() {
+    let test = |hi, lo, result| {
+        assert_eq!(limbs_two_limb_inverse_helper(hi, lo), result);
+    };
+    // hi_product >= lo
+    // hi_product >= lo_product_hi
+    test(0x8000_0000, 0, 0xffff_ffff);
+    test(0x8000_0000, 123, 0xffff_ffff);
+    test(0x8000_0123, 1, 0xffff_fb74);
+    test(0xffff_ffff, 0, 1);
+    // hi_product < lo
+    test(0xffff_ffff, 123, 0);
+    test(0xffff_f123, 1, 0xedd);
+    test(0xffff_ffff, 0xffff_ffff, 0);
+    // hi_product < lo_product_hi
+    // !(hi_product > hi || hi_product == hi && lo_product_lo >= lo)
+    test(0x8000_0001, 3, 0xffff_fffb);
+    // hi_product > hi || hi_product == hi && lo_product_lo >= lo
+    test(2325651385, 3907343530, 3636893938);
+}
+
+#[test]
+#[should_panic]
+fn limbs_two_limb_inverse_helper_fail() {
+    limbs_two_limb_inverse_helper(0, 10);
+}
+
+//TODO make 32-bit limbs work too
+#[cfg(not(feature = "32_bit_limbs"))]
 #[test]
 fn test_div_mod() {
     let test = |u, v, quotient, remainder| {
@@ -177,39 +218,32 @@ fn test_div_mod() {
         "232830643708079",
         "3167723695",
     );
-    // ys.len() == 2
-    // ys.len() == 2, !ys[1].get_highest_bit()
     test(
         "1000000000000000000000000",
         "1234567890987",
         "810000006723",
         "530068894399",
     );
-    // ys.len() > 2
-    // ys.len() > 2, !ys[ys.len() - 1].get_highest_bit()
     test(
-        "10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000\
-         00",
+        "100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000\
+        0",
         "1234567890987654321234567890987654321",
         "810000006723000055638900467181273922269593923137018654",
         "779655053998040854338961591319296066",
     );
-    // ys.len() > 2, ys[ys.len() - 1].get_highest_bit()
     test(
-        "10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000\
-         00",
+        "100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000\
+        0",
         "316049380092839506236049380092839506176",
         "3164062526261718967339454949926851258865601262253979",
         "37816691783627670491375998320948925696",
     );
-    // ys.len() == 2, !ys[1].get_highest_bit(), cy == 0
     test(
         "253640751230376270397812803167",
         "2669936877441",
         "94998781946290113",
         "1520301762334",
     );
-    // ys.len() == 2, ys[1].get_highest_bit()
     test(
         "3768477692975601",
         "11447376614057827956",
@@ -316,6 +350,8 @@ fn div_rem_ref_ref_fail() {
     (&Natural::from(10u32)).div_rem(&Natural::ZERO);
 }
 
+//TODO make 32-bit limbs work too
+#[cfg(not(feature = "32_bit_limbs"))]
 #[test]
 fn test_ceiling_div_neg_mod() {
     let test = |u, v, quotient, remainder| {
@@ -518,6 +554,22 @@ fn ceiling_div_neg_mod_ref_ref_fail() {
     (&Natural::from(10u32)).ceiling_div_neg_mod(&Natural::ZERO);
 }
 
+#[test]
+fn limbs_two_limb_inverse_helper_properties() {
+    let b = Natural::ONE << Limb::WIDTH;
+    let b_cubed_minus_1 = (Natural::ONE << (Limb::WIDTH * 3)) - 1 as Limb;
+    test_properties(pairs_of_unsigneds_var_2, |&(hi, lo)| {
+        let result = limbs_two_limb_inverse_helper(hi, lo);
+        let x = Natural::from(DoubleLimb::join_halves(hi, lo));
+        //TODO use /
+        let expected_result = (&b_cubed_minus_1).div_mod(&x).0 - &b;
+        assert_eq!(result, expected_result);
+        assert!(&b_cubed_minus_1 - (result + &b) * &x < x);
+    });
+}
+
+//TODO make 32-bit limbs work too
+#[cfg(not(feature = "32_bit_limbs"))]
 fn div_mod_properties_helper(x: &Natural, y: &Natural) {
     let mut mut_x = x.clone();
     let remainder = mut_x.div_assign_mod(y);
@@ -624,6 +676,8 @@ fn div_mod_properties_helper(x: &Natural, y: &Natural) {
     assert_eq!(quotient * y + remainder, *x);
 }
 
+//TODO make 32-bit limbs work too
+#[cfg(not(feature = "32_bit_limbs"))]
 #[test]
 fn div_mod_properties() {
     test_properties(pairs_of_natural_and_positive_natural, |&(ref x, ref y)| {
@@ -653,6 +707,8 @@ fn div_mod_properties() {
     });
 }
 
+//TODO make 32-bit limbs work too
+#[cfg(not(feature = "32_bit_limbs"))]
 fn ceiling_div_neg_mod_properties_helper(x: &Natural, y: &Natural) {
     let mut mut_x = x.clone();
     let remainder = mut_x.ceiling_div_assign_neg_mod(y);
@@ -708,6 +764,8 @@ fn ceiling_div_neg_mod_properties_helper(x: &Natural, y: &Natural) {
     assert_eq!(quotient * y - remainder, *x);
 }
 
+//TODO make 32-bit limbs work too
+#[cfg(not(feature = "32_bit_limbs"))]
 #[test]
 fn ceiling_div_neg_mod_limb_properties() {
     test_properties(pairs_of_natural_and_positive_natural, |&(ref x, ref y)| {

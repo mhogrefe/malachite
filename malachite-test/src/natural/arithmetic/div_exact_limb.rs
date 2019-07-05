@@ -119,7 +119,7 @@ fn demo_limbs_div_exact_limb_to_out(gm: GenerationMode, limit: usize) {
         triples_of_limb_vec_limb_vec_and_positive_limb_var_2(gm).take(limit)
     {
         let mut out = out.to_vec();
-        let mut out_old = out.clone();
+        let out_old = out.clone();
         limbs_div_exact_limb_to_out(&mut out, &in_limbs, limb);
         println!(
             "out := {:?}; limbs_exact_div_limb_to_out(&mut out, {:?}, {}); \
@@ -132,7 +132,7 @@ fn demo_limbs_div_exact_limb_to_out(gm: GenerationMode, limit: usize) {
 fn demo_limbs_div_exact_limb_in_place(gm: GenerationMode, limit: usize) {
     for (limbs, limb) in pairs_of_limb_vec_and_positive_limb_var_2(gm).take(limit) {
         let mut limbs = limbs.to_vec();
-        let mut limbs_old = limbs.clone();
+        let limbs_old = limbs.clone();
         limbs_div_exact_limb_in_place(&mut limbs, limb);
         println!(
             "limbs := {:?}; limbs_div_exact_limb_in_place(&mut limbs, {}); limbs = {:?}",
@@ -154,7 +154,7 @@ fn demo_limbs_div_exact_3(gm: GenerationMode, limit: usize) {
 fn demo_limbs_div_exact_3_to_out(gm: GenerationMode, limit: usize) {
     for (out, in_limbs) in pairs_of_limb_vec_var_3(gm).take(limit) {
         let mut out = out.to_vec();
-        let mut out_old = out.clone();
+        let out_old = out.clone();
         limbs_div_exact_3_to_out(&mut out, &in_limbs);
         println!(
             "out := {:?}; limbs_exact_div_3_to_out(&mut out, {:?}); \
@@ -167,7 +167,7 @@ fn demo_limbs_div_exact_3_to_out(gm: GenerationMode, limit: usize) {
 fn demo_limbs_div_exact_3_in_place(gm: GenerationMode, limit: usize) {
     for limbs in vecs_of_unsigned_var_5(gm).take(limit) {
         let mut limbs = limbs.to_vec();
-        let mut limbs_old = limbs.clone();
+        let limbs_old = limbs.clone();
         limbs_div_exact_3_in_place(&mut limbs);
         println!(
             "limbs := {:?}; limbs_div_exact_3_in_place(&mut limbs); limbs = {:?}",

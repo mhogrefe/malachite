@@ -74,14 +74,15 @@ fn assign_double_limb_properties() {
         },
     );
 
-    test_properties(pairs_of_unsigneds::<DoubleLimb>, #[allow(
-        unused_assignments
-    )]
-    |&(u, v)| {
-        let mut mut_u = u;
-        let mut mut_n = Natural::from(u);
-        mut_u = v;
-        mut_n.assign(v);
-        assert_eq!(Natural::from(mut_u), mut_n);
-    });
+    test_properties(
+        pairs_of_unsigneds::<DoubleLimb>,
+        #[allow(unused_assignments)]
+        |&(u, v)| {
+            let mut mut_u = u;
+            let mut mut_n = Natural::from(u);
+            mut_u = v;
+            mut_n.assign(v);
+            assert_eq!(Natural::from(mut_u), mut_n);
+        },
+    );
 }

@@ -87,7 +87,7 @@ fn demo_limbs_neg_xor_limb_to_out(gm: GenerationMode, limit: usize) {
         triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_3(gm).take(limit)
     {
         let mut out = out.to_vec();
-        let mut out_old = out.clone();
+        let out_old = out.clone();
         let carry = limbs_neg_xor_limb_to_out(&mut out, &in_limbs, limb);
         println!(
             "out := {:?}; limbs_neg_xor_limb_to_out(&mut out, {:?}, {}) = {}; \
@@ -100,7 +100,7 @@ fn demo_limbs_neg_xor_limb_to_out(gm: GenerationMode, limit: usize) {
 fn demo_limbs_slice_neg_xor_limb_in_place(gm: GenerationMode, limit: usize) {
     for (limbs, limb) in pairs_of_limb_vec_and_limb_var_1(gm).take(limit) {
         let mut limbs = limbs.to_vec();
-        let mut limbs_old = limbs.clone();
+        let limbs_old = limbs.clone();
         let carry = limbs_slice_neg_xor_limb_in_place(&mut limbs, limb);
         println!(
             "limbs := {:?}; limbs_slice_neg_xor_limb_in_place(&mut limbs, {}) = {}; limbs = {:?}",
@@ -112,7 +112,7 @@ fn demo_limbs_slice_neg_xor_limb_in_place(gm: GenerationMode, limit: usize) {
 fn demo_limbs_vec_neg_xor_limb_in_place(gm: GenerationMode, limit: usize) {
     for (limbs, limb) in pairs_of_limb_vec_and_limb_var_1(gm).take(limit) {
         let mut limbs = limbs.to_vec();
-        let mut limbs_old = limbs.clone();
+        let limbs_old = limbs.clone();
         limbs_vec_neg_xor_limb_in_place(&mut limbs, limb);
         println!(
             "limbs := {:?}; limbs_vec_neg_xor_limb_in_place(&mut limbs, {}); limbs = {:?}",

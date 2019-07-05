@@ -66,12 +66,15 @@ fn assign_signed_limb_properties() {
         },
     );
 
-    test_properties(pairs_of_signeds::<SignedLimb>, #[allow(unused_assignments)]
-    |&(i, j)| {
-        let mut mut_i = i;
-        let mut mut_n = Integer::from(i);
-        mut_i = j;
-        mut_n.assign(j);
-        assert_eq!(mut_i, mut_n);
-    });
+    test_properties(
+        pairs_of_signeds::<SignedLimb>,
+        #[allow(unused_assignments)]
+        |&(i, j)| {
+            let mut mut_i = i;
+            let mut mut_n = Integer::from(i);
+            mut_i = j;
+            mut_n.assign(j);
+            assert_eq!(mut_i, mut_n);
+        },
+    );
 }

@@ -60,12 +60,15 @@ fn assign_limb_properties() {
         },
     );
 
-    test_properties(pairs_of_unsigneds::<Limb>, #[allow(unused_assignments)]
-    |&(u, v)| {
-        let mut mut_u = u;
-        let mut mut_n = Integer::from(u);
-        mut_u = v;
-        mut_n.assign(v);
-        assert_eq!(mut_u, mut_n);
-    });
+    test_properties(
+        pairs_of_unsigneds::<Limb>,
+        #[allow(unused_assignments)]
+        |&(u, v)| {
+            let mut mut_u = u;
+            let mut mut_n = Integer::from(u);
+            mut_u = v;
+            mut_n.assign(v);
+            assert_eq!(mut_u, mut_n);
+        },
+    );
 }

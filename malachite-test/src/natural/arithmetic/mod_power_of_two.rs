@@ -72,7 +72,7 @@ fn demo_limbs_mod_power_of_two(gm: GenerationMode, limit: usize) {
 fn demo_limbs_mod_power_of_two_in_place(gm: GenerationMode, limit: usize) {
     for (limbs, pow) in pairs_of_unsigned_vec_and_small_unsigned(gm).take(limit) {
         let mut limbs = limbs.to_vec();
-        let mut limbs_old = limbs.clone();
+        let limbs_old = limbs.clone();
         limbs_mod_power_of_two_in_place(&mut limbs, pow);
         println!(
             "limbs := {:?}; limbs_mod_power_of_two_in_place(&mut limbs, {}); limbs = {:?}",
@@ -95,7 +95,7 @@ fn demo_limbs_neg_mod_power_of_two(gm: GenerationMode, limit: usize) {
 fn demo_limbs_neg_mod_power_of_two_in_place(gm: GenerationMode, limit: usize) {
     for (limbs, pow) in pairs_of_unsigned_vec_and_small_unsigned(gm).take(limit) {
         let mut limbs = limbs.to_vec();
-        let mut limbs_old = limbs.clone();
+        let limbs_old = limbs.clone();
         limbs_neg_mod_power_of_two_in_place(&mut limbs, pow);
         println!(
             "limbs := {:?}; limbs_neg_mod_power_of_two_in_place(&mut limbs, {}); limbs = {:?}",

@@ -119,27 +119,30 @@ fn clone_clone_from_and_assign_properties() {
         assert_eq!(rug_integer_to_integer(&rug_x), *y);
     });
 
-    test_properties(pairs_of_signeds::<SignedLimb>, #[allow(unused_assignments)]
-    |&(i, j)| {
-        let x = Integer::from(i);
-        let y = Integer::from(j);
+    test_properties(
+        pairs_of_signeds::<SignedLimb>,
+        #[allow(unused_assignments)]
+        |&(i, j)| {
+            let x = Integer::from(i);
+            let y = Integer::from(j);
 
-        let mut mut_i = i;
-        let mut mut_x = x.clone();
-        mut_i.clone_from(&j);
-        mut_x.clone_from(&y);
-        assert_eq!(mut_x, mut_i);
+            let mut mut_i = i;
+            let mut mut_x = x.clone();
+            mut_i.clone_from(&j);
+            mut_x.clone_from(&y);
+            assert_eq!(mut_x, mut_i);
 
-        let mut mut_i = i;
-        let mut mut_x = x.clone();
-        mut_i = j;
-        mut_x.assign(&y);
-        assert_eq!(mut_x, mut_i);
+            let mut mut_i = i;
+            let mut mut_x = x.clone();
+            mut_i = j;
+            mut_x.assign(&y);
+            assert_eq!(mut_x, mut_i);
 
-        let mut mut_i = i;
-        let mut mut_x = x.clone();
-        mut_i = j;
-        mut_x.assign(y);
-        assert_eq!(mut_x, mut_i);
-    });
+            let mut mut_i = i;
+            let mut mut_x = x.clone();
+            mut_i = j;
+            mut_x.assign(y);
+            assert_eq!(mut_x, mut_i);
+        },
+    );
 }

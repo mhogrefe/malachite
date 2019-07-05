@@ -93,7 +93,7 @@ fn demo_limbs_mul_limb_with_carry_to_out(gm: GenerationMode, limit: usize) {
         quadruples_of_unsigned_vec_unsigned_vec_unsigned_and_unsigned_var_1(gm).take(limit)
     {
         let mut out = out.to_vec();
-        let mut out_old = out.clone();
+        let out_old = out.clone();
         let carry_out = limbs_mul_limb_with_carry_to_out(&mut out, &in_limbs, limb, carry);
         println!(
             "out := {:?}; limbs_mul_limb_with_carry_to_out(&mut out, {:?}, {}, {}) = {}; \
@@ -108,7 +108,7 @@ fn demo_limbs_mul_limb_to_out(gm: GenerationMode, limit: usize) {
         triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_1(gm).take(limit)
     {
         let mut out = out.to_vec();
-        let mut out_old = out.clone();
+        let out_old = out.clone();
         let carry = limbs_mul_limb_to_out(&mut out, &in_limbs, limb);
         println!(
             "out := {:?}; limbs_mul_limb_to_out(&mut out, {:?}, {}) = {}; out = {:?}",
@@ -120,7 +120,7 @@ fn demo_limbs_mul_limb_to_out(gm: GenerationMode, limit: usize) {
 fn demo_limbs_slice_mul_limb_with_carry_in_place(gm: GenerationMode, limit: usize) {
     for (limbs, limb, carry) in triples_of_unsigned_vec_unsigned_and_unsigned(gm).take(limit) {
         let mut limbs = limbs.to_vec();
-        let mut limbs_old = limbs.clone();
+        let limbs_old = limbs.clone();
         let carry_out = limbs_slice_mul_limb_with_carry_in_place(&mut limbs, limb, carry);
         println!(
             "limbs := {:?}; limbs_slice_mul_limb_with_carry_in_place(&mut limbs, {}, {}) = {}; \
@@ -133,7 +133,7 @@ fn demo_limbs_slice_mul_limb_with_carry_in_place(gm: GenerationMode, limit: usiz
 fn demo_limbs_slice_mul_limb_in_place(gm: GenerationMode, limit: usize) {
     for (limbs, limb) in pairs_of_unsigned_vec_and_unsigned(gm).take(limit) {
         let mut limbs = limbs.to_vec();
-        let mut limbs_old = limbs.clone();
+        let limbs_old = limbs.clone();
         let carry = limbs_slice_mul_limb_in_place(&mut limbs, limb);
         println!(
             "limbs := {:?}; limbs_slice_mul_limb_in_place(&mut limbs, {}) = {}; limbs = {:?}",
@@ -145,7 +145,7 @@ fn demo_limbs_slice_mul_limb_in_place(gm: GenerationMode, limit: usize) {
 fn demo_limbs_vec_mul_limb_in_place(gm: GenerationMode, limit: usize) {
     for (limbs, limb) in pairs_of_unsigned_vec_and_unsigned(gm).take(limit) {
         let mut limbs = limbs.to_vec();
-        let mut limbs_old = limbs.clone();
+        let limbs_old = limbs.clone();
         limbs_vec_mul_limb_in_place(&mut limbs, limb);
         println!(
             "limbs := {:?}; limbs_vec_mul_limb_in_place(&mut limbs, {}); limbs = {:?}",

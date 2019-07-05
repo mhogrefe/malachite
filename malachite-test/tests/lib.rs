@@ -221,8 +221,6 @@ pub mod natural {
         pub mod checked_sub_mul_limb;
         pub mod div_exact_limb;
         pub mod div_limb;
-        //TODO make 32-bit limbs work too
-        #[cfg(not(feature = "32_bit_limbs"))]
         pub mod div_mod;
         pub mod div_mod_limb;
         pub mod div_round_limb;
