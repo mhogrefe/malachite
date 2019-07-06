@@ -7,7 +7,9 @@ use malachite_base::num::arithmetic::traits::{
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::JoinHalves;
-use malachite_nz::natural::arithmetic::div_mod::limbs_two_limb_inverse_helper;
+use malachite_nz::natural::arithmetic::div_mod::{
+    limbs_div_mod_three_limb_by_two_limb, limbs_two_limb_inverse_helper,
+};
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::{DoubleLimb, Limb};
 #[cfg(not(feature = "32_bit_limbs"))]
@@ -20,7 +22,7 @@ use common::test_properties;
 use malachite_test::common::{
     biguint_to_natural, natural_to_biguint, natural_to_rug_integer, rug_integer_to_natural,
 };
-use malachite_test::inputs::base::pairs_of_unsigneds_var_2;
+use malachite_test::inputs::base::{pairs_of_unsigneds_var_2, sextuples_of_limbs_var_1};
 #[cfg(not(feature = "32_bit_limbs"))]
 use malachite_test::inputs::natural::{
     naturals, pairs_of_natural_and_positive_natural, pairs_of_natural_and_positive_natural_var_1,
@@ -29,11 +31,22 @@ use malachite_test::inputs::natural::{
 #[cfg(not(feature = "32_bit_limbs"))]
 use malachite_test::natural::arithmetic::div_mod::rug_ceiling_div_neg_mod;
 
+fn verify_limbs_two_limb_inverse_helper(hi: Limb, lo: Limb, result: Limb) {
+    let b = Natural::ONE << Limb::WIDTH;
+    let b_cubed_minus_1 = (Natural::ONE << (Limb::WIDTH * 3)) - 1 as Limb;
+    let x = Natural::from(DoubleLimb::join_halves(hi, lo));
+    //TODO use /
+    let expected_result = (&b_cubed_minus_1).div_mod(&x).0 - &b;
+    assert_eq!(result, expected_result);
+    assert!(b_cubed_minus_1 - (result + b) * &x < x);
+}
+
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_two_limb_inverse_helper() {
     let test = |hi, lo, result| {
         assert_eq!(limbs_two_limb_inverse_helper(hi, lo), result);
+        verify_limbs_two_limb_inverse_helper(hi, lo, result);
     };
     // hi_product >= lo
     // hi_product >= lo_product_hi
@@ -56,6 +69,57 @@ fn test_limbs_two_limb_inverse_helper() {
 #[should_panic]
 fn limbs_two_limb_inverse_helper_fail() {
     limbs_two_limb_inverse_helper(0, 10);
+}
+
+fn verify_limbs_div_mod_three_limb_by_two_limb(
+    n_2: Limb,
+    n_1: Limb,
+    n_0: Limb,
+    d_1: Limb,
+    d_0: Limb,
+    q: Limb,
+    r: DoubleLimb,
+) {
+    let n = Natural::from_owned_limbs_asc(vec![n_0, n_1, n_2]);
+    let d = Natural::from(DoubleLimb::join_halves(d_1, d_0));
+    let r = Natural::from(r);
+    assert_eq!((&n).div_mod(&d), (Natural::from(q), r.clone()));
+    assert!(r < d);
+    assert_eq!(q * d + r, n);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+fn test_limbs_div_mod_three_limb_by_two_limb() {
+    let test = |n_2, n_1, n_0, d_1, d_0, q, r| {
+        assert_eq!(
+            limbs_div_mod_three_limb_by_two_limb(
+                n_2,
+                n_1,
+                n_0,
+                d_1,
+                d_0,
+                limbs_two_limb_inverse_helper(d_1, d_0)
+            ),
+            (q, r)
+        );
+        verify_limbs_div_mod_three_limb_by_two_limb(n_2, n_1, n_0, d_1, d_0, q, r);
+    };
+    // r < d
+    // r.upper_half() >= q_0
+    test(1, 2, 3, 0x8000_0004, 5, 1, 0x7fff_fffd_ffff_fffe);
+    test(2, 0x4000_0000, 4, 0x8000_0000, 0, 4, 0x4000_0000_0000_0004);
+    // r >= d
+    // r.upper_half() < q_0
+    test(
+        1614123406,
+        3687984980,
+        2695202596,
+        2258238141,
+        1642523191,
+        3069918587,
+        274277675918877623,
+    );
 }
 
 //TODO make 32-bit limbs work too
@@ -556,16 +620,21 @@ fn ceiling_div_neg_mod_ref_ref_fail() {
 
 #[test]
 fn limbs_two_limb_inverse_helper_properties() {
-    let b = Natural::ONE << Limb::WIDTH;
-    let b_cubed_minus_1 = (Natural::ONE << (Limb::WIDTH * 3)) - 1 as Limb;
     test_properties(pairs_of_unsigneds_var_2, |&(hi, lo)| {
         let result = limbs_two_limb_inverse_helper(hi, lo);
-        let x = Natural::from(DoubleLimb::join_halves(hi, lo));
-        //TODO use /
-        let expected_result = (&b_cubed_minus_1).div_mod(&x).0 - &b;
-        assert_eq!(result, expected_result);
-        assert!(&b_cubed_minus_1 - (result + &b) * &x < x);
+        verify_limbs_two_limb_inverse_helper(hi, lo, result);
     });
+}
+
+#[test]
+fn limbs_div_mod_three_limb_by_two_limb_properties() {
+    test_properties(
+        sextuples_of_limbs_var_1,
+        |&(n_2, n_1, n_0, d_1, d_0, inverse)| {
+            let (q, r) = limbs_div_mod_three_limb_by_two_limb(n_2, n_1, n_0, d_1, d_0, inverse);
+            verify_limbs_div_mod_three_limb_by_two_limb(n_2, n_1, n_0, d_1, d_0, q, r);
+        },
+    );
 }
 
 //TODO make 32-bit limbs work too

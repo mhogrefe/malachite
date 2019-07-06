@@ -3,11 +3,13 @@ use malachite_base::num::arithmetic::traits::{
 };
 use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_nz::natural::arithmetic::div_mod::limbs_two_limb_inverse_helper;
+use malachite_nz::natural::arithmetic::div_mod::{
+    limbs_div_mod_three_limb_by_two_limb, limbs_two_limb_inverse_helper,
+};
 use num::Integer;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::base::pairs_of_unsigneds_var_2;
+use inputs::base::{pairs_of_unsigneds_var_2, sextuples_of_limbs_var_1};
 use inputs::natural::{
     nrm_pairs_of_natural_and_positive_natural, pairs_of_natural_and_positive_natural,
     rm_pairs_of_natural_and_positive_natural,
@@ -17,6 +19,7 @@ use inputs::natural::{
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limbs_two_limb_inverse_helper);
+    register_demo!(registry, demo_limbs_div_mod_three_limb_by_two_limb);
     register_demo!(registry, demo_natural_div_assign_mod);
     register_demo!(registry, demo_natural_div_assign_mod_ref);
     register_demo!(registry, demo_natural_div_mod);
@@ -102,6 +105,21 @@ fn demo_limbs_two_limb_inverse_helper(gm: GenerationMode, limit: usize) {
             hi,
             lo,
             limbs_two_limb_inverse_helper(hi, lo)
+        );
+    }
+}
+
+fn demo_limbs_div_mod_three_limb_by_two_limb(gm: GenerationMode, limit: usize) {
+    for (n2, n1, n0, d1, d0, inverse) in sextuples_of_limbs_var_1(gm).take(limit) {
+        println!(
+            "limbs_div_mod_three_limb_by_two_limb({}, {}, {}, {}, {}, {}) = {:?}",
+            n2,
+            n1,
+            n0,
+            d1,
+            d0,
+            inverse,
+            limbs_div_mod_three_limb_by_two_limb(n2, n1, n0, d1, d0, inverse)
         );
     }
 }

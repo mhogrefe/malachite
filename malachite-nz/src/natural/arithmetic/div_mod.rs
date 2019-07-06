@@ -117,56 +117,67 @@ fn add_ssaaaa(sh: &mut Limb, sl: &mut Limb, ah1: Limb, al1: Limb, ah2: Limb, al2
     *sl = lo;
 }
 
-//TODO test
-// checked
-// docs preserved
-// Compute quotient the quotient and remainder for n / d. Requires d >= B^2 / 2 and n < d B. di is
-// the inverse of [d1, d0] computed by `_limbs_two_limb_inverse_helper`.
-//
-// NOTE: Output variables are updated multiple times.
-// udiv_qr_3by2 from gmp-impl.h
-#[allow(clippy::too_many_arguments)]
-fn udiv_qr_3by2(
-    q: &mut Limb,
-    r1: &mut Limb,
-    r0: &mut Limb,
-    n2: Limb,
-    n1: Limb,
-    n0: Limb,
-    d1: Limb,
-    d0: Limb,
-    dinv: Limb,
-) {
-    let mut q0 = 0;
-    umul_ppmm(q, &mut q0, n2, dinv);
-    let old_q = *q;
-    let old_q0 = q0;
-    add_ssaaaa(q, &mut q0, old_q, old_q0, n2, n1);
-
-    // Compute the two most significant limbs of n - q'd
-    *r1 = n1.wrapping_sub(d1.wrapping_mul(*q));
-    let old_r1 = *r1;
-    sub_ddmmss(r1, r0, old_r1, n0, d1, d0);
-    let mut t1 = 0;
-    let mut t0 = 0;
-    umul_ppmm(&mut t1, &mut t0, d0, *q);
-    let old_r1 = *r1;
-    let old_r0 = *r0;
-    sub_ddmmss(r1, r0, old_r1, old_r0, t1, t0);
+/// Computes the quotient and remainder of `[n_2, n_1, n_0]` / `[d_1, d_0]`. Requires the highest
+/// bit of `d_1` to be set, and `[n_2, n_1]` < `[d_1, d_0]`. `inverse` is the inverse of
+/// `[d_1, d_0]` computed by `limbs_two_limb_inverse_helper`.
+///
+/// Time: worst case O(1)
+///
+/// Additional memory: worst case O(1)
+///
+/// # Example
+/// ```
+/// use malachite_nz::natural::arithmetic::div_mod::*;
+///
+/// let d_1 = 0x8000_0004;
+/// let d_0 = 5;
+/// assert_eq!(
+///     limbs_div_mod_three_limb_by_two_limb(
+///         1, 2, 3, d_1, d_0,
+///         limbs_two_limb_inverse_helper(d_1, d_0)),
+///     (1, 0x7fff_fffd_ffff_fffe)
+/// );
+///
+/// let d_1 = 0x8000_0000;
+/// let d_0 = 0;
+/// assert_eq!(
+///     limbs_div_mod_three_limb_by_two_limb(
+///         2, 0x4000_0000, 4, d_1, d_0,
+///         limbs_two_limb_inverse_helper(d_1, d_0)),
+///     (4, 0x4000_0000_0000_0004)
+/// );
+/// ```
+///
+/// This is udiv_qr_3by2 from gmp-impl.h.
+pub fn limbs_div_mod_three_limb_by_two_limb(
+    n_2: Limb,
+    n_1: Limb,
+    n_0: Limb,
+    d_1: Limb,
+    d_0: Limb,
+    inverse: Limb,
+) -> (Limb, DoubleLimb) {
+    let (mut q, q_0) = (DoubleLimb::from(n_2) * DoubleLimb::from(inverse))
+        .wrapping_add(DoubleLimb::join_halves(n_2, n_1))
+        .split_in_half();
+    let d = DoubleLimb::join_halves(d_1, d_0);
+    // Compute the two most significant limbs of n - q * d
+    let mut r = DoubleLimb::join_halves(n_1.wrapping_sub(d_1.wrapping_mul(q)), n_0)
+        .wrapping_sub(d)
+        .wrapping_sub(DoubleLimb::from(d_0) * DoubleLimb::from(q));
     q.wrapping_add_assign(1);
-
     // Conditionally adjust q and the remainders
-    let mask = if *r1 >= q0 { Limb::MAX } else { 0 };
-    q.wrapping_add_assign(mask);
-    let old_r1 = *r1;
-    let old_r0 = *r0;
-    add_ssaaaa(r1, r0, old_r1, old_r0, mask & d1, mask & d0);
-    if *r1 >= d1 && (*r1 > d1 || *r0 >= d0) {
+    if r.upper_half() >= q_0 {
+        let (r_plus_d, overflow) = r.overflowing_add(d);
+        if overflow {
+            q.wrapping_sub_assign(1);
+            r = r_plus_d;
+        }
+    } else if r >= d {
         q.wrapping_add_assign(1);
-        let old_r1 = *r1;
-        let old_r0 = *r0;
-        sub_ddmmss(r1, r0, old_r1, old_r0, d1, d0);
+        r.wrapping_sub_assign(d);
     }
+    (q, r)
 }
 
 //TODO test
@@ -205,10 +216,10 @@ pub fn mpn_divrem_2(qp: &mut [Limb], np: &mut [Limb], nn: usize, dp: &[Limb]) ->
     let di = limbs_two_limb_inverse_helper(d1, d0);
     for i in (0..(nn - 2)).rev() {
         let n0 = np[np_offset - 1];
-        let mut q = 0;
-        let old_r1 = r1;
-        let old_r0 = r0;
-        udiv_qr_3by2(&mut q, &mut r1, &mut r0, old_r1, old_r0, n0, d1, d0, di);
+        let (q, new_r) = limbs_div_mod_three_limb_by_two_limb(r1, r0, n0, d1, d0, di);
+        let (new_r1, new_r0) = new_r.split_in_half();
+        r1 = new_r1;
+        r0 = new_r0;
         np_offset -= 1;
         qp[i] = q;
     }
@@ -255,7 +266,7 @@ pub fn _limbs_div_mod_schoolbook(
 
     for _ in 1..(nn - dn - 1) {
         np_offset -= 1;
-        let mut q = 0;
+        let mut q;
         if n1 == d1 && np[np_offset + 1] == d0 {
             q = Limb::MAX;
             limbs_sub_mul_limb_same_length_in_place_left(
@@ -265,19 +276,17 @@ pub fn _limbs_div_mod_schoolbook(
             );
             n1 = np[np_offset + 1]; // update n1, last loop's value will now be invalid
         } else {
-            let mut n0 = 0;
-            let old_n1 = n1;
-            udiv_qr_3by2(
-                &mut q,
-                &mut n1,
-                &mut n0,
-                old_n1,
+            let (new_q, new_n) = limbs_div_mod_three_limb_by_two_limb(
+                n1,
                 np[np_offset + 1],
                 np[np_offset],
                 d1,
                 d0,
                 dinv,
             );
+            let (new_n1, mut n0) = new_n.split_in_half();
+            q = new_q;
+            n1 = new_n1;
             let mut cy = limbs_sub_mul_limb_same_length_in_place_left(
                 &mut np[np_offset - dn..np_offset],
                 &dp[..dn],
@@ -470,7 +479,7 @@ pub fn mpn_dcpi1_div_qr(qp: &mut [Limb], np: &mut [Limb], dp: &[Limb], dinv: Lim
 
             assert!(n2 < d1 || (n2 == d1 && n1 <= d0));
 
-            let mut q = 0;
+            let mut q;
             if n2 == d1 && n1 == d0 {
                 q = Limb::MAX;
                 let cy = limbs_sub_mul_limb_same_length_in_place_left(
@@ -480,10 +489,11 @@ pub fn mpn_dcpi1_div_qr(qp: &mut [Limb], np: &mut [Limb], dp: &[Limb], dinv: Lim
                 );
                 assert_eq!(cy, n2);
             } else {
-                let old_n1 = n1;
-                let old_n0 = n0;
-                udiv_qr_3by2(&mut q, &mut n1, &mut n0, n2, old_n1, old_n0, d1, d0, dinv);
-
+                let (new_q, new_n) = limbs_div_mod_three_limb_by_two_limb(n2, n1, n0, d1, d0, dinv);
+                q = new_q;
+                let (new_n1, new_n0) = new_n.split_in_half();
+                n1 = new_n1;
+                n0 = new_n0;
                 if dn > 2 {
                     let mut cy = limbs_sub_mul_limb_same_length_in_place_left(
                         &mut np[np_offset - dn..],
@@ -778,8 +788,8 @@ pub fn mpn_sbpi1_divappr_q(qp: &mut [Limb], np: &mut [Limb], dp: &[Limb], dinv: 
     let d0 = dp[dp_offset + dn];
     np_offset -= 2;
     let mut n1 = np[np_offset + 1];
-    let mut q = 0;
-    let mut n0 = 0;
+    let mut q;
+    let mut n0;
     for _ in 0..(qn - dn - 1) {
         np_offset -= 1;
         if n1 == d1 && np[np_offset + 1] == d0 {
@@ -791,8 +801,12 @@ pub fn mpn_sbpi1_divappr_q(qp: &mut [Limb], np: &mut [Limb], dp: &[Limb], dinv: 
             );
             n1 = np[np_offset + 1]; // update n1, last loop's value will now be invalid
         } else {
-            let old_n1 = n1;
-            udiv_qr_3by2(&mut q, &mut n1, &mut n0, old_n1, np[1], np[0], d1, d0, dinv);
+            let (new_q, new_n) =
+                limbs_div_mod_three_limb_by_two_limb(n1, np[1], np[0], d1, d0, dinv);
+            q = new_q;
+            let (new_n1, new_n0) = new_n.split_in_half();
+            n1 = new_n1;
+            n0 = new_n0;
             let mut cy = limbs_sub_mul_limb_same_length_in_place_left(
                 &mut np[np_offset - dn..],
                 &dp[dp_offset..dp_offset + dn],
@@ -847,18 +861,18 @@ pub fn mpn_sbpi1_divappr_q(qp: &mut [Limb], np: &mut [Limb], dp: &[Limb], dinv: 
                 }
                 n1 = np[np_offset + 1];
             } else {
-                let old_n1 = n1;
-                udiv_qr_3by2(
-                    &mut q,
-                    &mut n1,
-                    &mut n0,
-                    old_n1,
+                let (new_q, new_n) = limbs_div_mod_three_limb_by_two_limb(
+                    n1,
                     np[np_offset + 1],
                     np[np_offset],
                     d1,
                     d0,
                     dinv,
                 );
+                q = new_q;
+                let (new_n1, new_n0) = new_n.split_in_half();
+                n1 = new_n1;
+                n0 = new_n0;
 
                 let mut cy = limbs_sub_mul_limb_same_length_in_place_left(
                     &mut np[np_offset - dn..np_offset],
@@ -918,18 +932,18 @@ pub fn mpn_sbpi1_divappr_q(qp: &mut [Limb], np: &mut [Limb], dp: &[Limb], dinv: 
             }
             n1 = np[np_offset + 1];
         } else {
-            let old_n1 = n1;
-            udiv_qr_3by2(
-                &mut q,
-                &mut n1,
-                &mut n0,
-                old_n1,
+            let (new_q, new_n) = limbs_div_mod_three_limb_by_two_limb(
+                n1,
                 np[np_offset + 1],
                 np[np_offset],
                 d1,
                 d0,
                 dinv,
             );
+            q = new_q;
+            let (new_n1, new_n0) = new_n.split_in_half();
+            n1 = new_n1;
+            n0 = new_n0;
 
             np[np_offset + 1] = n1;
             np[np_offset] = n0;
@@ -1082,7 +1096,7 @@ pub fn mpn_dcpi1_divappr_q(qp: &mut [Limb], np: &mut [Limb], dp: &[Limb], dinv: 
             let d1 = dp[dp_offset - 1];
             let d0 = dp[dp_offset - 2];
             assert!(n2 < d1 || (n2 == d1 && n1 <= d0));
-            let mut q = 0;
+            let mut q;
             if n2 == d1 && n1 == d0 {
                 q = Limb::MAX;
                 let cy = limbs_sub_mul_limb_same_length_in_place_left(
@@ -1092,12 +1106,12 @@ pub fn mpn_dcpi1_divappr_q(qp: &mut [Limb], np: &mut [Limb], dp: &[Limb], dinv: 
                 );
                 assert_eq!(cy, n2);
             } else {
-                let old_n1 = n1;
-                let old_n0 = n0;
-                udiv_qr_3by2(&mut q, &mut n1, &mut n0, n2, old_n1, old_n0, d1, d0, dinv);
-
+                let (new_q, new_n) = limbs_div_mod_three_limb_by_two_limb(n2, n1, n0, d1, d0, dinv);
+                q = new_q;
+                let (new_n1, new_n0) = new_n.split_in_half();
+                n1 = new_n1;
+                n0 = new_n0;
                 if dn > 2 {
-                    //mp_limb_t cy, cy1;
                     let mut cy = limbs_sub_mul_limb_same_length_in_place_left(
                         &mut np[np_offset - dn..],
                         &dp[dp_offset - dn..dp_offset - 2],
@@ -1231,7 +1245,7 @@ pub fn mpn_dcpi1_divappr_q(qp: &mut [Limb], np: &mut [Limb], dp: &[Limb], dinv: 
         );
         //TODO use copy_within when stable
         for i in qp_offset..qn + qp_offset {
-            qp[i + 1] = qp[i];
+            qp[i] = qp[i + 1];
         }
         qp[qp_offset + qn] = qsave;
     } else {

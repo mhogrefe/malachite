@@ -12,6 +12,7 @@ use malachite_base::num::conversion::traits::{CheckedFrom, ConvertibleFrom, Wrap
 use malachite_base::num::logic::traits::BitAccess;
 use malachite_base::round::RoundingMode;
 use malachite_nz::integer::logic::bit_access::limbs_vec_clear_bit_neg;
+use malachite_nz::natural::arithmetic::div_mod::limbs_two_limb_inverse_helper;
 use malachite_nz::natural::arithmetic::mul::fft::*;
 use malachite_nz::natural::arithmetic::mul::toom::{
     _limbs_mul_greater_to_out_toom_22_input_sizes_valid,
@@ -291,14 +292,21 @@ float_gen!(
     pairs_of_finite_f64_and_rounding_mode_var_2
 );
 
-pub fn pairs_of_unsigneds<T: PrimitiveUnsigned + Rand>(gm: GenerationMode) -> It<(T, T)> {
+fn pairs_of_unsigneds_with_seed<T: PrimitiveUnsigned + Rand>(
+    gm: GenerationMode,
+    seed: &[u32],
+) -> It<(T, T)> {
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_pairs_from_single(exhaustive_unsigned())),
-        GenerationMode::Random(_) => Box::new(random_pairs_from_single(random(&EXAMPLE_SEED))),
-        GenerationMode::SpecialRandom(_) => Box::new(random_pairs_from_single(
-            special_random_unsigned(&EXAMPLE_SEED),
-        )),
+        GenerationMode::Random(_) => Box::new(random_pairs_from_single(random(seed))),
+        GenerationMode::SpecialRandom(_) => {
+            Box::new(random_pairs_from_single(special_random_unsigned(seed)))
+        }
     }
+}
+
+pub fn pairs_of_unsigneds<T: PrimitiveUnsigned + Rand>(gm: GenerationMode) -> It<(T, T)> {
+    pairs_of_unsigneds_with_seed(gm, &EXAMPLE_SEED)
 }
 
 pub fn pairs_of_unsigned_and_unsigned<T: PrimitiveUnsigned + Rand, U: PrimitiveUnsigned + Rand>(
@@ -378,28 +386,33 @@ pub fn pairs_of_unsigneds_var_1<T: PrimitiveUnsigned + Rand>(gm: GenerationMode)
     Box::new(pairs_of_unsigneds(gm).filter(|&(x, y)| x >= y))
 }
 
-// All pairs of `T`s, where `T` is unsigned and the most-significant bit of the first `T` is set.
-pub fn pairs_of_unsigneds_var_2<T: PrimitiveUnsigned + Rand>(gm: GenerationMode) -> It<(T, T)> {
+fn pairs_of_unsigneds_var_2_with_seed<T: PrimitiveUnsigned + Rand>(
+    gm: GenerationMode,
+    seed: &[u32],
+) -> It<(T, T)> {
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_pairs(
             range_up_increasing(T::ONE << (T::WIDTH - 1)),
             exhaustive_unsigned(),
         )),
-        GenerationMode::Random(_) => Box::new(
-            random_pairs_from_single(random::<T>(&EXAMPLE_SEED)).map(|(mut u, v)| {
+        GenerationMode::Random(_) => Box::new(random_pairs_from_single(random::<T>(seed)).map(
+            |(mut u, v)| {
+                u.set_bit(u64::from(T::WIDTH - 1));
+                (u, v)
+            },
+        )),
+        GenerationMode::SpecialRandom(_) => Box::new(
+            random_pairs_from_single(special_random_unsigned::<T>(seed)).map(|(mut u, v)| {
                 u.set_bit(u64::from(T::WIDTH - 1));
                 (u, v)
             }),
         ),
-        GenerationMode::SpecialRandom(_) => Box::new(
-            random_pairs_from_single(special_random_unsigned::<T>(&EXAMPLE_SEED)).map(
-                |(mut u, v)| {
-                    u.set_bit(u64::from(T::WIDTH - 1));
-                    (u, v)
-                },
-            ),
-        ),
     }
+}
+
+// All pairs of `T`s, where `T` is unsigned and the most-significant bit of the first `T` is set.
+pub fn pairs_of_unsigneds_var_2<T: PrimitiveUnsigned + Rand>(gm: GenerationMode) -> It<(T, T)> {
+    pairs_of_unsigneds_var_2_with_seed(gm, &EXAMPLE_SEED)
 }
 
 pub fn pairs_of_signeds<T: PrimitiveSigned + Rand>(gm: GenerationMode) -> It<(T, T)>
@@ -1271,6 +1284,55 @@ pub fn triples_of_unsigned_unsigned_and_small_unsigned<
             &(|seed| u32s_geometric(seed, scale).flat_map(U::checked_from)),
         )),
     }
+}
+
+// All sextuples of `Limb`s that are valid inputs to `limbs_div_mod_three_limb_by_two_limb`.
+pub fn sextuples_of_limbs_var_1(gm: GenerationMode) -> It<(Limb, Limb, Limb, Limb, Limb, Limb)> {
+    let quads: &Fn(&[u32]) -> It<((Limb, Limb), (Limb, Limb))> = &|seed| {
+        let q: It<((Limb, Limb), (Limb, Limb))> = match gm {
+            GenerationMode::Exhaustive => Box::new(exhaustive_pairs(
+                pairs_of_unsigneds(gm),
+                pairs_of_unsigneds_var_2(gm),
+            )),
+            _ => Box::new(random_pairs(
+                seed,
+                &(|seed_2| pairs_of_unsigneds_with_seed(gm, seed_2)),
+                &(|seed_2| pairs_of_unsigneds_var_2_with_seed(gm, seed_2)),
+            )),
+        };
+        q
+    };
+    let filtered_quads: &Fn(&[u32]) -> It<((Limb, Limb), (Limb, Limb))> = &|seed| {
+        Box::new(
+            quads(seed).filter(|((n_2, n_1), (d_1, d_0))| n_2 < d_1 || n_2 == d_1 && n_1 < d_0),
+        )
+    };
+    let quints: It<(((Limb, Limb), (Limb, Limb)), Limb)> = match gm {
+        GenerationMode::Exhaustive => Box::new(sqrt_pairs(
+            filtered_quads(&EXAMPLE_SEED),
+            exhaustive_unsigned(),
+        )),
+        GenerationMode::Random(_) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| filtered_quads(seed)),
+            &(|seed| random(seed)),
+        )),
+        GenerationMode::SpecialRandom(_) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| filtered_quads(seed)),
+            &(|seed| special_random_unsigned(seed)),
+        )),
+    };
+    Box::new(quints.map(|(((n_2, n_1), (d_1, d_0)), n_0)| {
+        (
+            n_2,
+            n_1,
+            n_0,
+            d_1,
+            d_0,
+            limbs_two_limb_inverse_helper(d_1, d_0),
+        )
+    }))
 }
 
 fn vecs_of_unsigned_with_seed<T: PrimitiveUnsigned + Rand>(
