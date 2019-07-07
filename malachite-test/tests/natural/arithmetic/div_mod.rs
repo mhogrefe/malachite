@@ -8,7 +8,7 @@ use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::JoinHalves;
 use malachite_nz::natural::arithmetic::div_mod::{
-    limbs_div_mod_three_limb_by_two_limb, limbs_two_limb_inverse_helper,
+    limbs_div_mod_by_two_limb, limbs_div_mod_three_limb_by_two_limb, limbs_two_limb_inverse_helper,
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::{DoubleLimb, Limb};
@@ -22,7 +22,9 @@ use common::test_properties;
 use malachite_test::common::{
     biguint_to_natural, natural_to_biguint, natural_to_rug_integer, rug_integer_to_natural,
 };
-use malachite_test::inputs::base::{pairs_of_unsigneds_var_2, sextuples_of_limbs_var_1};
+use malachite_test::inputs::base::{
+    pairs_of_unsigneds_var_2, sextuples_of_limbs_var_1, triples_of_unsigned_vec_var_37,
+};
 #[cfg(not(feature = "32_bit_limbs"))]
 use malachite_test::inputs::natural::{
     naturals, pairs_of_natural_and_positive_natural, pairs_of_natural_and_positive_natural_var_1,
@@ -120,6 +122,101 @@ fn test_limbs_div_mod_three_limb_by_two_limb() {
         3069918587,
         274277675918877623,
     );
+}
+
+fn verify_limbs_div_mod_by_two_limb(
+    quotient_limbs_in: &[Limb],
+    numerator_limbs_in: &[Limb],
+    denominator_limbs: &[Limb],
+    quotient_hi: bool,
+    quotient_limbs_out: &[Limb],
+    numerator_limbs_out: &[Limb],
+) {
+    let numerator = Natural::from_limbs_asc(numerator_limbs_in);
+    let denominator = Natural::from_limbs_asc(denominator_limbs);
+    let (expected_quotient, expected_remainder) = (&numerator).div_mod(&denominator);
+    let base_quotient_length = numerator_limbs_in.len() - 2;
+    let mut quotient_limbs = quotient_limbs_out[..base_quotient_length].to_vec();
+    if quotient_hi {
+        quotient_limbs.push(1);
+    }
+    let quotient = Natural::from_owned_limbs_asc(quotient_limbs);
+    let remainder = Natural::from_limbs_asc(&numerator_limbs_out[..2]);
+    assert_eq!(quotient, expected_quotient);
+    assert_eq!(remainder, expected_remainder);
+    assert_eq!(
+        &quotient_limbs_in[base_quotient_length..],
+        &quotient_limbs_out[base_quotient_length..]
+    );
+    assert_eq!(&numerator_limbs_in[2..], &numerator_limbs_out[2..]);
+
+    assert!(remainder < denominator);
+    assert_eq!(quotient * denominator + remainder, numerator);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+fn test_limbs_div_mod_by_two_limb() {
+    let test = |quotient_limbs_in: &[Limb],
+                numerator_limbs_in: &[Limb],
+                denominator_limbs,
+                quotient_hi,
+                quotient_limbs_out: &[Limb],
+                numerator_limbs_out: &[Limb]| {
+        let mut quotient_limbs = quotient_limbs_in.to_vec();
+        let mut numerator_limbs = numerator_limbs_in.to_vec();
+        assert_eq!(
+            limbs_div_mod_by_two_limb(&mut quotient_limbs, &mut numerator_limbs, denominator_limbs),
+            quotient_hi
+        );
+        assert_eq!(quotient_limbs, quotient_limbs_out);
+        assert_eq!(numerator_limbs, numerator_limbs_out);
+        verify_limbs_div_mod_by_two_limb(
+            quotient_limbs_in,
+            numerator_limbs_in,
+            denominator_limbs,
+            quotient_hi,
+            &quotient_limbs,
+            &numerator_limbs,
+        );
+    };
+    // !most_significant_quotient_limb
+    test(&[10], &[1, 2], &[3, 0x8000_0000], false, &[10], &[1, 2]);
+    test(
+        &[10, 10, 10, 10],
+        &[1, 2, 3, 4, 5],
+        &[3, 0x8000_0000],
+        false,
+        &[4294967241, 7, 10, 10],
+        &[166, 2147483626, 3, 4, 5],
+    );
+    // most_significant_quotient_limb
+    test(
+        &[0, 0],
+        &[4142767597, 2922703399, 3921445909],
+        &[2952867570, 2530544119],
+        true,
+        &[2360708771, 0],
+        &[3037232599, 1218898013, 3921445909],
+    );
+}
+
+#[test]
+#[should_panic]
+fn limbs_div_mod_by_two_limb_fail_1() {
+    limbs_div_mod_by_two_limb(&mut [10], &mut [1, 2], &[3, 4]);
+}
+
+#[test]
+#[should_panic]
+fn limbs_div_mod_by_two_limb_fail_2() {
+    limbs_div_mod_by_two_limb(&mut [10], &mut [1, 2], &[3, 0x8000_0000, 4]);
+}
+
+#[test]
+#[should_panic]
+fn limbs_div_mod_by_two_limb_fail_3() {
+    limbs_div_mod_by_two_limb(&mut [10], &mut [1, 2, 3, 4], &[3, 0x8000_0000]);
 }
 
 //TODO make 32-bit limbs work too
@@ -633,6 +730,30 @@ fn limbs_div_mod_three_limb_by_two_limb_properties() {
         |&(n_2, n_1, n_0, d_1, d_0, inverse)| {
             let (q, r) = limbs_div_mod_three_limb_by_two_limb(n_2, n_1, n_0, d_1, d_0, inverse);
             verify_limbs_div_mod_three_limb_by_two_limb(n_2, n_1, n_0, d_1, d_0, q, r);
+        },
+    );
+}
+
+#[test]
+fn limbs_div_mod_by_two_limb_properties() {
+    test_properties(
+        triples_of_unsigned_vec_var_37,
+        |(quotient_limbs_in, numerator_limbs_in, denominator_limbs)| {
+            let mut quotient_limbs = quotient_limbs_in.clone();
+            let mut numerator_limbs = numerator_limbs_in.clone();
+            let quotient_hi = limbs_div_mod_by_two_limb(
+                &mut quotient_limbs,
+                &mut numerator_limbs,
+                &denominator_limbs,
+            );
+            verify_limbs_div_mod_by_two_limb(
+                &quotient_limbs_in,
+                &numerator_limbs_in,
+                &denominator_limbs,
+                quotient_hi,
+                &quotient_limbs,
+                &numerator_limbs,
+            );
         },
     );
 }

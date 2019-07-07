@@ -32,10 +32,12 @@ pub(crate) fn div_mod_by_preinversion(
     .split_in_half();
     let mut remainder = n_low.wrapping_sub(quotient_high.wrapping_mul(divisor));
     if remainder > quotient_low {
-        quotient_high.wrapping_sub_assign(1);
-        remainder.wrapping_add_assign(divisor);
-    }
-    if remainder >= divisor {
+        let (r_plus_d, overflow) = remainder.overflowing_add(divisor);
+        if overflow {
+            quotient_high.wrapping_sub_assign(1);
+            remainder = r_plus_d;
+        }
+    } else if remainder >= divisor {
         quotient_high.wrapping_add_assign(1);
         remainder -= divisor;
     }

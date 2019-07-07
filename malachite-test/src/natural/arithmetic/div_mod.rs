@@ -4,12 +4,14 @@ use malachite_base::num::arithmetic::traits::{
 use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::natural::arithmetic::div_mod::{
-    limbs_div_mod_three_limb_by_two_limb, limbs_two_limb_inverse_helper,
+    limbs_div_mod_by_two_limb, limbs_div_mod_three_limb_by_two_limb, limbs_two_limb_inverse_helper,
 };
 use num::Integer;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::base::{pairs_of_unsigneds_var_2, sextuples_of_limbs_var_1};
+use inputs::base::{
+    pairs_of_unsigneds_var_2, sextuples_of_limbs_var_1, triples_of_unsigned_vec_var_37,
+};
 use inputs::natural::{
     nrm_pairs_of_natural_and_positive_natural, pairs_of_natural_and_positive_natural,
     rm_pairs_of_natural_and_positive_natural,
@@ -20,6 +22,7 @@ use inputs::natural::{
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limbs_two_limb_inverse_helper);
     register_demo!(registry, demo_limbs_div_mod_three_limb_by_two_limb);
+    register_demo!(registry, demo_limbs_div_mod_by_two_limb);
     register_demo!(registry, demo_natural_div_assign_mod);
     register_demo!(registry, demo_natural_div_assign_mod_ref);
     register_demo!(registry, demo_natural_div_mod);
@@ -38,6 +41,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_natural_ceiling_div_neg_mod_val_ref);
     register_demo!(registry, demo_natural_ceiling_div_neg_mod_ref_val);
     register_demo!(registry, demo_natural_ceiling_div_neg_mod_ref_ref);
+    register_bench!(registry, Small, benchmark_limbs_div_mod_by_two_limb);
     register_bench!(
         registry,
         Large,
@@ -120,6 +124,31 @@ fn demo_limbs_div_mod_three_limb_by_two_limb(gm: GenerationMode, limit: usize) {
             d0,
             inverse,
             limbs_div_mod_three_limb_by_two_limb(n2, n1, n0, d1, d0, inverse)
+        );
+    }
+}
+
+fn demo_limbs_div_mod_by_two_limb(gm: GenerationMode, limit: usize) {
+    for (mut quotient_limbs, mut numerator_limbs, denominator_limbs) in
+        triples_of_unsigned_vec_var_37(gm).take(limit)
+    {
+        let old_quotient_limbs = quotient_limbs.clone();
+        let old_numerator_limbs = numerator_limbs.clone();
+        let quotient_hi = limbs_div_mod_by_two_limb(
+            &mut quotient_limbs,
+            &mut numerator_limbs,
+            &denominator_limbs,
+        );
+        println!(
+            "quotient_limbs := {:?}; numerator_limbs := {:?}; \
+             limbs_div_mod_by_two_limb(&mut quotient_limbs, &mut numerator_limbs, {:?}) = {}; \
+             quotient_limbs = {:?}, numerator_limbs = {:?}",
+            old_quotient_limbs,
+            old_numerator_limbs,
+            denominator_limbs,
+            quotient_hi,
+            quotient_limbs,
+            numerator_limbs
         );
     }
 }
@@ -295,6 +324,29 @@ fn demo_natural_ceiling_div_neg_mod_ref_ref(gm: GenerationMode, limit: usize) {
             (&x).ceiling_div_neg_mod(&y)
         );
     }
+}
+
+fn benchmark_limbs_div_mod_by_two_limb(gm: GenerationMode, limit: usize, file_name: &str) {
+    m_run_benchmark(
+        "limbs_div_mod_by_two_limb(&mut [Limb], &mut [Limb], &[Limb])",
+        BenchmarkType::Single,
+        triples_of_unsigned_vec_var_37(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(_, ref numerator_limbs, _)| numerator_limbs.len()),
+        "numerator_limbs.len()",
+        &mut [(
+            "malachite",
+            &mut (|(mut quotient_limbs, mut numerator_limbs, denominator_limbs)| {
+                no_out!(limbs_div_mod_by_two_limb(
+                    &mut quotient_limbs,
+                    &mut numerator_limbs,
+                    &denominator_limbs
+                ))
+            }),
+        )],
+    );
 }
 
 fn benchmark_natural_div_assign_mod_evaluation_strategy(

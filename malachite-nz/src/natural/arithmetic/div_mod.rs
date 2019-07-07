@@ -41,15 +41,6 @@ use natural::Natural::{self, Large, Small};
 use platform::{DoubleLimb, Limb};
 
 // will remove
-fn sub_ddmmss(sh: &mut Limb, sl: &mut Limb, ah: Limb, al: Limb, bh: Limb, bl: Limb) {
-    let (hi, lo) = DoubleLimb::join_halves(ah, al)
-        .wrapping_sub(DoubleLimb::join_halves(bh, bl))
-        .split_in_half();
-    *sh = hi;
-    *sl = lo;
-}
-
-// will remove
 fn udiv_qrnnd(q: &mut Limb, r: &mut Limb, n_hi: Limb, n_lo: Limb, d: Limb) {
     let n = DoubleLimb::join_halves(n_hi, n_lo);
     let d = DoubleLimb::from(d);
@@ -157,77 +148,99 @@ pub fn limbs_div_mod_three_limb_by_two_limb(
     d_0: Limb,
     inverse: Limb,
 ) -> (Limb, DoubleLimb) {
-    let (mut q, q_0) = (DoubleLimb::from(n_2) * DoubleLimb::from(inverse))
+    let (mut quotient, quotient_low) = (DoubleLimb::from(n_2) * DoubleLimb::from(inverse))
         .wrapping_add(DoubleLimb::join_halves(n_2, n_1))
         .split_in_half();
-    let d = DoubleLimb::join_halves(d_1, d_0);
-    // Compute the two most significant limbs of n - q * d
-    let mut r = DoubleLimb::join_halves(n_1.wrapping_sub(d_1.wrapping_mul(q)), n_0)
-        .wrapping_sub(d)
-        .wrapping_sub(DoubleLimb::from(d_0) * DoubleLimb::from(q));
-    q.wrapping_add_assign(1);
-    // Conditionally adjust q and the remainders
-    if r.upper_half() >= q_0 {
-        let (r_plus_d, overflow) = r.overflowing_add(d);
+    let denominator = DoubleLimb::join_halves(d_1, d_0);
+    // Compute the two most significant limbs of n - quotient * denominator
+    let mut remainder = DoubleLimb::join_halves(n_1.wrapping_sub(d_1.wrapping_mul(quotient)), n_0)
+        .wrapping_sub(denominator)
+        .wrapping_sub(DoubleLimb::from(d_0) * DoubleLimb::from(quotient));
+    quotient.wrapping_add_assign(1);
+    // Conditionally adjust quotient and the remainder
+    if remainder.upper_half() >= quotient_low {
+        let (r_plus_d, overflow) = remainder.overflowing_add(denominator);
         if overflow {
-            q.wrapping_sub_assign(1);
-            r = r_plus_d;
+            quotient.wrapping_sub_assign(1);
+            remainder = r_plus_d;
         }
-    } else if r >= d {
-        q.wrapping_add_assign(1);
-        r.wrapping_sub_assign(d);
+    } else if remainder >= denominator {
+        quotient.wrapping_add_assign(1);
+        remainder.wrapping_sub_assign(denominator);
     }
-    (q, r)
+    (quotient, remainder)
 }
 
-//TODO test
-// checked
-// docs preserved
-// Divide numerator (np) by denominator (dp) and write the nn - 2 least significant quotient
-// limbs at qp and the 2-long remainder at np. Return the most significant limb of the quotient;
-// this is always 0 or 1.
-//
-// Preconditions:
-// 1. dp.len() == 2.
-// 2. The most significant bit of the divisor must be set.
-// 3. np.len() >= 2.
-//
-// mpn_divrem_2 from mpn/generic/divrem_2.c
-pub fn mpn_divrem_2(qp: &mut [Limb], np: &mut [Limb], nn: usize, dp: &[Limb]) -> Limb {
-    assert_eq!(dp.len(), 2);
-    assert!(nn >= 2);
-    assert!(dp[1].get_highest_bit());
-
-    let mut np_offset = 0;
-    np_offset += nn - 2;
-    let d1 = dp[1];
-    let d0 = dp[0];
-    let mut r1 = np[np_offset + 1];
-    let mut r0 = np[np_offset];
-
-    let most_significant_q_limb = if r1 >= d1 && (r1 > d1 || r0 >= d0) {
-        let old_r1 = r1;
-        let old_r0 = r0;
-        sub_ddmmss(&mut r1, &mut r0, old_r1, old_r0, d1, d0);
-        1
-    } else {
-        0
-    };
-    let di = limbs_two_limb_inverse_helper(d1, d0);
-    for i in (0..(nn - 2)).rev() {
-        let n0 = np[np_offset - 1];
-        let (q, new_r) = limbs_div_mod_three_limb_by_two_limb(r1, r0, n0, d1, d0, di);
-        let (new_r1, new_r0) = new_r.split_in_half();
-        r1 = new_r1;
-        r0 = new_r0;
-        np_offset -= 1;
-        qp[i] = q;
+/// Divides `numerator_limbs` by `denominator_limbs` and writes the `numerator_limbs.len()` - 2
+/// least-significant quotient limbs to `quotient_limbs` and the 2-long remainder to
+/// `numerator_limbs`. Returns the most significant limb of the quotient; `true` means 1 and `false`
+/// means 0. `denominator_limbs` must have length 2, `numerator_limbs` must have length at least 2,
+/// and the most significant bit of `denominator[1]` must be set.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = `numerator_limbs.len()`
+///
+/// # Panics
+/// Panics if `denominator_limbs` does not have length 2, `numerator_limbs` has length less than 2,
+/// `quotient_limbs` has length less than `numerator_limbs.len() - 2`, or `denominator[1]` does not
+/// have its highest bit set.
+///
+/// # Example
+/// ```
+/// use malachite_nz::natural::arithmetic::div_mod::limbs_div_mod_by_two_limb;
+///
+/// let quotient_limbs = &mut [10, 10, 10, 10];
+/// let numerator_limbs = &mut [1, 2, 3, 4, 5];
+/// assert_eq!(
+///     limbs_div_mod_by_two_limb(quotient_limbs, numerator_limbs, &[3, 0x8000_0000]),
+///     false
+/// );
+/// assert_eq!(quotient_limbs, &[4294967241, 7, 10, 10]);
+/// assert_eq!(numerator_limbs, &[166, 2147483626, 3, 4, 5]);
+/// ```
+///
+/// This is mpn_divrem_2 from mpn/generic/divrem_2.c.
+pub fn limbs_div_mod_by_two_limb(
+    quotient_limbs: &mut [Limb],
+    numerator_limbs: &mut [Limb],
+    denominator_limbs: &[Limb],
+) -> bool {
+    assert_eq!(denominator_limbs.len(), 2);
+    let numerator_len = numerator_limbs.len();
+    assert!(numerator_len >= 2);
+    let numerator_limit = numerator_len - 2;
+    assert!(denominator_limbs[1].get_highest_bit());
+    let d_1 = denominator_limbs[1];
+    let d_0 = denominator_limbs[0];
+    let denominator = DoubleLimb::join_halves(d_1, d_0);
+    let mut remainder = DoubleLimb::join_halves(
+        numerator_limbs[numerator_limit + 1],
+        numerator_limbs[numerator_limit],
+    );
+    let most_significant_quotient_limb = remainder >= denominator;
+    if most_significant_quotient_limb {
+        remainder.wrapping_sub_assign(denominator);
     }
-
-    np[np_offset + 1] = r1;
-    np[np_offset] = r0;
-
-    most_significant_q_limb
+    let (mut r_1, mut r_0) = remainder.split_in_half();
+    let inverse = limbs_two_limb_inverse_helper(d_1, d_0);
+    for (&numerator_limb, quotient_limb) in numerator_limbs[..numerator_limit]
+        .iter()
+        .zip(quotient_limbs[..numerator_limit].iter_mut())
+        .rev()
+    {
+        let (quotient, remainder) =
+            limbs_div_mod_three_limb_by_two_limb(r_1, r_0, numerator_limb, d_1, d_0, inverse);
+        let (new_r_1, new_r_0) = remainder.split_in_half();
+        r_1 = new_r_1;
+        r_0 = new_r_0;
+        *quotient_limb = quotient;
+    }
+    numerator_limbs[1] = r_1;
+    numerator_limbs[0] = r_0;
+    most_significant_quotient_limb
 }
 
 // checked
@@ -529,12 +542,15 @@ pub fn mpn_dcpi1_div_qr(qp: &mut [Limb], np: &mut [Limb], dp: &[Limb], dinv: Lim
         } else {
             // Do a 2qn / qn division
             qh = if qn == 2 {
-                mpn_divrem_2(
+                if limbs_div_mod_by_two_limb(
                     &mut qp[qp_offset..],
                     &mut np[np_offset - 2..np_offset + 2],
-                    4,
                     &dp[dp_offset - 2..],
-                )
+                ) {
+                    1
+                } else {
+                    0
+                }
             } else if qn < DC_DIV_QR_THRESHOLD {
                 if _limbs_div_mod_schoolbook(
                     &mut qp[qp_offset..],
@@ -1145,12 +1161,15 @@ pub fn mpn_dcpi1_divappr_q(qp: &mut [Limb], np: &mut [Limb], dp: &[Limb], dinv: 
             qp[qp_offset] = q;
         } else {
             qh = if qn == 2 {
-                mpn_divrem_2(
+                if limbs_div_mod_by_two_limb(
                     &mut qp[qp_offset..],
                     &mut np[np_offset - 2..np_offset + 2],
-                    4,
                     &dp[dp_offset - 2..],
-                )
+                ) {
+                    1
+                } else {
+                    0
+                }
             } else if qn < DC_DIV_QR_THRESHOLD {
                 if _limbs_div_mod_schoolbook(
                     &mut qp[qp_offset..],
@@ -1317,7 +1336,7 @@ pub fn mpn_bc_invertappr(ip: &mut [Limb], dp: &[Limb], xp: &mut [Limb]) -> Limb 
 
         // Now xp contains B ^ 2n - dp * B ^ n - 1
         if n == 2 {
-            mpn_divrem_2(ip, &mut xp[..4], 4, dp);
+            limbs_div_mod_by_two_limb(ip, &mut xp[..4], dp);
         } else {
             let inv = limbs_two_limb_inverse_helper(dp[n - 1], dp[n - 2]);
             if !MAYBE_DCP1_DIVAPPR || n < DC_DIVAPPR_Q_THRESHOLD {
@@ -1880,9 +1899,18 @@ pub fn mpn_tdiv_qr(qp: &mut [Limb], rp: &mut [Limb], np: &[Limb], dp: &[Limb]) {
                 let mut n2p = vec![0; nn + 1];
                 let cy = limbs_shl_to_out(&mut n2p, np, cnt);
                 n2p[nn] = cy;
-                let qhl = mpn_divrem_2(qp, &mut n2p, nn + if cy != 0 { 1 } else { 0 }, d2p);
+                let qhl = limbs_div_mod_by_two_limb(
+                    qp,
+                    if cy != 0 {
+                        &mut n2p[..nn + 1]
+                    } else {
+                        &mut n2p[..nn]
+                    },
+                    d2p,
+                );
                 if cy == 0 {
-                    qp[nn - 2] = qhl; // alwadp store nn-2+1 quotient limbs
+                    // always store nn-2+1 quotient limbs
+                    qp[nn - 2] = if qhl { 1 } else { 0 };
                 }
                 rp[0] = (n2p[0] >> cnt) | (n2p[1] << (Limb::WIDTH - cnt));
                 rp[1] = n2p[1] >> cnt;
@@ -1890,8 +1918,9 @@ pub fn mpn_tdiv_qr(qp: &mut [Limb], rp: &mut [Limb], np: &[Limb], dp: &[Limb]) {
                 let d2p = dp;
                 let mut n2p = vec![0; nn];
                 n2p.copy_from_slice(np);
-                let qhl = mpn_divrem_2(qp, &mut n2p, nn, d2p);
-                qp[nn - 2] = qhl; // alwadp store nn-2+1 quotient limbs
+                let qhl = limbs_div_mod_by_two_limb(qp, &mut n2p, d2p);
+                // always store nn-2+1 quotient limbs
+                qp[nn - 2] = if qhl { 1 } else { 0 };
                 rp[0] = n2p[0];
                 rp[1] = n2p[1];
             }
@@ -2054,7 +2083,7 @@ pub fn mpn_tdiv_qr(qp: &mut [Limb], rp: &mut [Limb], np: &[Limb], dp: &[Limb]) {
                 n2p[0] = r0;
                 qp[0] = q0;
             } else if qn == 2 {
-                mpn_divrem_2(qp, n2p, 4, d2p);
+                limbs_div_mod_by_two_limb(qp, n2p, d2p);
             } else {
                 let dinv = limbs_two_limb_inverse_helper(d2p[qn - 1], d2p[qn - 2]);
                 if qn < DC_DIV_QR_THRESHOLD {

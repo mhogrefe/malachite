@@ -2124,6 +2124,36 @@ pub fn triples_of_unsigned_vec_var_36<T: PrimitiveUnsigned + Rand>(
     )
 }
 
+// All triples of `Vec<T>`, where `T` is unsigned and `quotient_limbs`, `numerator_limbs`, and
+// `denominator_limbs` meet the preconditions of `limbs_div_mod_by_two_limb`.
+pub fn triples_of_unsigned_vec_var_37<T: PrimitiveUnsigned + Rand>(
+    gm: GenerationMode,
+) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
+    let ts: It<(Vec<T>, Vec<T>, (T, T))> = match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_triples(
+            exhaustive_vecs(exhaustive_unsigned()),
+            exhaustive_vecs_min_length(2, exhaustive_unsigned()),
+            pairs_of_unsigneds_var_2(gm),
+        )),
+        GenerationMode::Random(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| random_vecs(seed, scale, &(|seed_2| random(seed_2)))),
+            &(|seed| random_vecs_min_length(seed, scale, 2, &(|seed_2| random(seed_2)))),
+            &(|seed| pairs_of_unsigneds_var_2_with_seed(gm, seed)),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_unsigned_vecs(seed, scale)),
+            &(|seed| special_random_unsigned_vecs_min_length(seed, scale, 2)),
+            &(|seed| pairs_of_unsigneds_var_2_with_seed(gm, seed)),
+        )),
+    };
+    Box::new(
+        ts.filter(|(quotient, numerator, _)| quotient.len() >= numerator.len() - 2)
+            .map(|(quotient, numerator, (d_1, d_0))| (quotient, numerator, vec![d_0, d_1])),
+    )
+}
+
 pub fn quadruples_of_three_unsigned_vecs_and_bool<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
 ) -> It<(Vec<T>, Vec<T>, Vec<T>, bool)> {
