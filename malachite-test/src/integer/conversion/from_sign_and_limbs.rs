@@ -1,7 +1,6 @@
-use malachite_nz::integer::Integer;
-
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::pairs_of_ordering_and_vec_of_unsigned_var_1;
+use malachite_nz::integer::Integer;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_integer_from_sign_and_limbs_asc);

@@ -1,12 +1,10 @@
-use std::str::FromStr;
-
+use common::test_properties;
 use malachite_base::num::arithmetic::traits::{SubMul, SubMulAssign};
 use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::Limb;
-
-use common::test_properties;
 use malachite_test::inputs::integer::{integers, pairs_of_integers, triples_of_integers};
+use std::str::FromStr;
 
 #[test]
 fn test_sub_mul() {

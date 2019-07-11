@@ -1,13 +1,3 @@
-use malachite_base::num::arithmetic::traits::{
-    CeilingDivNegMod, DivMod, Mod, ModAssign, NegMod, NegModAssign,
-};
-use malachite_base::num::conversion::traits::CheckedFrom;
-use malachite_base::num::logic::traits::SignificantBits;
-use malachite_nz::natural::arithmetic::mod_limb::limbs_mod_limb;
-use malachite_nz::platform::Limb;
-use num::{BigUint, ToPrimitive};
-use rug::{self, ops::RemRounding};
-
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::pairs_of_unsigned_vec_and_positive_unsigned_var_1;
 #[cfg(feature = "32_bit_limbs")]
@@ -17,6 +7,15 @@ use inputs::natural::{
 use inputs::natural::{
     pairs_of_natural_and_positive_unsigned, pairs_of_unsigned_and_positive_natural,
 };
+use malachite_base::num::arithmetic::traits::{
+    CeilingDivNegMod, DivMod, Mod, ModAssign, NegMod, NegModAssign,
+};
+use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::logic::traits::SignificantBits;
+use malachite_nz::natural::arithmetic::mod_limb::limbs_mod_limb;
+use malachite_nz::platform::Limb;
+use num::{BigUint, ToPrimitive};
+use rug::{self, ops::RemRounding};
 
 // For `Natural`s, `mod` is equivalent to `rem`.
 

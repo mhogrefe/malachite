@@ -1,17 +1,15 @@
-use std::cmp::Ordering;
-use std::str::FromStr;
-
+use common::test_properties;
 use malachite_base::num::comparison::traits::{OrdAbs, PartialOrdAbs};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
-
-use common::test_properties;
 use malachite_test::common::{integer_to_rug_integer, natural_to_rug_integer};
 use malachite_test::inputs::integer::{
     pairs_of_integer_and_natural, triples_of_integer_natural_and_integer,
     triples_of_natural_integer_and_natural,
 };
 use malachite_test::inputs::natural::pairs_of_naturals;
+use std::cmp::Ordering;
+use std::str::FromStr;
 
 #[test]
 fn test_partial_ord_integer_natural() {

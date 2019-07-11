@@ -1,12 +1,10 @@
-use std::fmt::Debug;
-
+use common::test_properties;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{CheckedFrom, ConvertibleFrom, WrappingFrom};
-use rand::Rand;
-
-use common::test_properties;
 use malachite_test::inputs::base::{signeds, unsigneds};
+use rand::Rand;
+use std::fmt::Debug;
 
 fn convertible_from_properties_helper_unsigned<T: PrimitiveUnsigned + Rand, U: Debug + Eq>()
 where

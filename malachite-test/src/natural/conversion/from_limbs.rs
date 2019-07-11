@@ -1,7 +1,6 @@
-use malachite_nz::natural::Natural;
-
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::vecs_of_unsigned;
+use malachite_nz::natural::Natural;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_natural_from_limbs_asc);

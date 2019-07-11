@@ -1,9 +1,7 @@
-use std::str::FromStr;
-
-use malachite_base::round::RoundingMode;
-
 use common::test_properties_no_special;
+use malachite_base::round::RoundingMode;
 use malachite_test::inputs::base::{strings, strings_var_1};
+use std::str::FromStr;
 
 #[test]
 fn test_from_str() {

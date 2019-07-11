@@ -1,12 +1,7 @@
-use std::cmp::Ordering;
-
+use common::{test_cmp_helper, test_properties};
 use malachite_nz::natural::comparison::ord::{limbs_cmp, limbs_cmp_same_length};
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-use num::BigUint;
-use rug;
-
-use common::{test_cmp_helper, test_properties};
 use malachite_test::common::{natural_to_biguint, natural_to_rug_integer};
 use malachite_test::inputs::base::{
     pairs_of_unsigned_vec_var_1, pairs_of_unsigned_vec_var_2, pairs_of_unsigneds,
@@ -14,6 +9,9 @@ use malachite_test::inputs::base::{
     vecs_of_unsigned_var_2,
 };
 use malachite_test::inputs::natural::{naturals, pairs_of_naturals, triples_of_naturals};
+use num::BigUint;
+use rug;
+use std::cmp::Ordering;
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]

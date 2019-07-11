@@ -1,13 +1,11 @@
-use std::cmp::max;
-
-use malachite_base::num::conversion::traits::{Assign, CheckedFrom};
-use malachite_base::num::logic::traits::SignificantBits;
-use rug::Assign as rug_assign;
-
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::integer::{
     integers, nrm_integers, nrm_pairs_of_integers, pairs_of_integers, rm_pairs_of_integers,
 };
+use malachite_base::num::conversion::traits::{Assign, CheckedFrom};
+use malachite_base::num::logic::traits::SignificantBits;
+use rug::Assign as rug_assign;
+use std::cmp::max;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_integer_clone);

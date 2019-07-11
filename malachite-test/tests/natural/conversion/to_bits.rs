@@ -1,16 +1,14 @@
-use std::str::FromStr;
-
+use common::{test_properties, test_properties_no_special};
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-
-use common::{test_properties, test_properties_no_special};
 use malachite_test::inputs::base::small_unsigneds;
 use malachite_test::inputs::natural::{
     naturals, pairs_of_natural_and_small_unsigned, pairs_of_natural_and_vec_of_bool_var_2,
 };
+use std::str::FromStr;
 
 #[test]
 fn test_to_bits_asc() {

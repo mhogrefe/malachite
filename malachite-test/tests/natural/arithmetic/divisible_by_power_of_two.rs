@@ -1,14 +1,10 @@
-use std::str::FromStr;
-
+use common::test_properties;
 use malachite_base::num::arithmetic::traits::DivisibleByPowerOfTwo;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_nz::natural::arithmetic::divisible_by_power_of_two::limbs_divisible_by_power_of_two;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-use rug;
-
-use common::test_properties;
 use malachite_test::common::natural_to_rug_integer;
 use malachite_test::inputs::base::{
     pairs_of_unsigned_and_small_unsigned, pairs_of_unsigned_vec_and_small_unsigned_var_1, unsigneds,
@@ -17,6 +13,8 @@ use malachite_test::inputs::natural::{
     naturals, pairs_of_natural_and_small_unsigned, pairs_of_natural_and_small_unsigned_var_1,
     pairs_of_natural_and_small_unsigned_var_2,
 };
+use rug;
+use std::str::FromStr;
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]

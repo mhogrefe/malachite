@@ -1,6 +1,6 @@
-use std::cmp::max;
-use std::iter::repeat;
-
+use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
+use inputs::base::{pairs_of_unsigned_vec_var_1, pairs_of_unsigned_vec_var_2};
+use inputs::natural::{pairs_of_naturals, rm_pairs_of_naturals};
 use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_base::num::logic::traits::{HammingDistance, SignificantBits};
 use malachite_nz::natural::logic::hamming_distance::{
@@ -9,10 +9,8 @@ use malachite_nz::natural::logic::hamming_distance::{
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 use rug;
-
-use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::base::{pairs_of_unsigned_vec_var_1, pairs_of_unsigned_vec_var_2};
-use inputs::natural::{pairs_of_naturals, rm_pairs_of_naturals};
+use std::cmp::max;
+use std::iter::repeat;
 
 pub fn natural_hamming_distance_alt_1(x: &Natural, y: &Natural) -> u64 {
     let bit_zip: Box<Iterator<Item = (bool, bool)>> =

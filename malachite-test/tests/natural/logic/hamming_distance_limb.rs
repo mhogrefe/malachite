@@ -1,13 +1,10 @@
-use std::str::FromStr;
-
+use common::test_properties;
 use malachite_base::comparison::Max;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::logic::traits::{CheckedHammingDistance, HammingDistance};
 use malachite_nz::natural::logic::hamming_distance_limb::limbs_hamming_distance_limb;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-
-use common::test_properties;
 use malachite_test::inputs::base::{
     pairs_of_nonempty_unsigned_vec_and_unsigned, pairs_of_unsigneds, unsigneds,
 };
@@ -17,6 +14,7 @@ use malachite_test::inputs::natural::{
 use malachite_test::natural::logic::hamming_distance_limb::{
     natural_hamming_distance_limb_alt_1, natural_hamming_distance_limb_alt_2,
 };
+use std::str::FromStr;
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]

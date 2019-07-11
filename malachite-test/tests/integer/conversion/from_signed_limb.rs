@@ -1,13 +1,12 @@
+use common::test_properties;
 use malachite_base::comparison::{Max, Min};
 use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::SignedLimb;
-use num::BigInt;
-use rug;
-
-use common::test_properties;
 use malachite_test::common::{bigint_to_integer, rug_integer_to_integer};
 use malachite_test::inputs::base::signeds;
+use num::BigInt;
+use rug;
 
 #[test]
 fn test_from_signed_limb() {

@@ -1,5 +1,4 @@
-use std::str::FromStr;
-
+use common::test_properties;
 use malachite_base::crement::Crementable;
 use malachite_base::num::arithmetic::traits::Parity;
 use malachite_base::num::basic::traits::{NegativeOne, One, Two, Zero};
@@ -7,14 +6,13 @@ use malachite_base::num::conversion::traits::{CheckedFrom, ConvertibleFrom, Roun
 use malachite_base::num::floats::PrimitiveFloat;
 use malachite_base::round::RoundingMode;
 use malachite_nz::natural::Natural;
-
-use common::test_properties;
 use malachite_test::inputs::natural::{
     naturals, naturals_exactly_equal_to_f32, naturals_exactly_equal_to_f64,
     naturals_not_exactly_equal_to_f32, naturals_not_exactly_equal_to_f64, naturals_var_2_f32,
     naturals_var_2_f64, pairs_of_natural_and_rounding_mode_var_1_f32,
     pairs_of_natural_and_rounding_mode_var_1_f64,
 };
+use std::str::FromStr;
 
 //TODO move
 #[test]

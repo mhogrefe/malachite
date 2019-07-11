@@ -1,5 +1,4 @@
-use std::str::FromStr;
-
+use common::test_properties;
 use malachite_base::num::arithmetic::traits::{
     CeilingDivMod, CeilingMod, CeilingModAssign, DivMod, DivRem, Mod, ModAssign, UnsignedAbs,
 };
@@ -7,11 +6,6 @@ use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
 use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::{Limb, SignedLimb};
-use num::BigInt;
-#[cfg(feature = "32_bit_limbs")]
-use rug::{self, ops::RemRounding};
-
-use common::test_properties;
 use malachite_test::common::{bigint_to_integer, integer_to_bigint};
 #[cfg(feature = "32_bit_limbs")]
 use malachite_test::common::{integer_to_rug_integer, rug_integer_to_integer};
@@ -21,6 +15,10 @@ use malachite_test::inputs::integer::{
     pairs_of_signed_and_nonzero_integer, triples_of_integer_integer_and_nonzero_signed,
 };
 use malachite_test::integer::arithmetic::mod_signed_limb::num_mod_signed_limb;
+use num::BigInt;
+#[cfg(feature = "32_bit_limbs")]
+use rug::{self, ops::RemRounding};
+use std::str::FromStr;
 
 #[test]
 fn test_mod_signed_limb() {

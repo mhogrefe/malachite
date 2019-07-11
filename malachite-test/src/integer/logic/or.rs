@@ -1,5 +1,7 @@
-use std::cmp::max;
-
+use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
+use inputs::base::{pairs_of_limb_vec_var_1, triples_of_limb_vec_var_8};
+use inputs::integer::{pairs_of_integers, rm_pairs_of_integers};
+use integer::logic::{integer_op_bits, integer_op_limbs};
 use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::integer::logic::or::{
@@ -7,11 +9,7 @@ use malachite_nz::integer::logic::or::{
     limbs_slice_or_neg_neg_in_place_left, limbs_vec_or_neg_neg_in_place_left,
 };
 use malachite_nz::integer::Integer;
-
-use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::base::{pairs_of_limb_vec_var_1, triples_of_limb_vec_var_8};
-use inputs::integer::{pairs_of_integers, rm_pairs_of_integers};
-use integer::logic::{integer_op_bits, integer_op_limbs};
+use std::cmp::max;
 
 pub fn integer_or_alt_1(x: &Integer, y: &Integer) -> Integer {
     integer_op_bits(&|a, b| a || b, x, y)

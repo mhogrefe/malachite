@@ -1,10 +1,9 @@
-use malachite_base::num::conversion::traits::CheckedFrom;
-use malachite_base::num::logic::traits::BitAccess;
-
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::natural::{
     pairs_of_natural_and_small_unsigned, rm_pairs_of_natural_and_small_unsigned,
 };
+use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::logic::traits::BitAccess;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_natural_flip_bit);

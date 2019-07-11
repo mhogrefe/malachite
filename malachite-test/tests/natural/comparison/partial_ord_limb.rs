@@ -1,12 +1,6 @@
-use std::cmp::Ordering;
-use std::str::FromStr;
-
+use common::test_properties;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-use num::BigUint;
-use rug;
-
-use common::test_properties;
 use malachite_test::common::{natural_to_biguint, natural_to_rug_integer};
 use malachite_test::inputs::base::pairs_of_unsigneds;
 use malachite_test::inputs::natural::{
@@ -14,6 +8,10 @@ use malachite_test::inputs::natural::{
     triples_of_unsigned_natural_and_unsigned,
 };
 use malachite_test::natural::comparison::partial_ord_limb::num_partial_cmp_limb;
+use num::BigUint;
+use rug;
+use std::cmp::Ordering;
+use std::str::FromStr;
 
 #[test]
 fn test_partial_ord_limb() {

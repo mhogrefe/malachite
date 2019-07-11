@@ -1,15 +1,14 @@
-use malachite_base::num::arithmetic::traits::{EqModPowerOfTwo, ModPowerOfTwo};
-use malachite_base::num::conversion::traits::CheckedFrom;
-use malachite_base::num::logic::traits::SignificantBits;
-use malachite_nz::integer::arithmetic::eq_limb_mod_power_of_two::limbs_eq_mod_power_of_two_neg_limb;
-use malachite_nz::platform::Limb;
-
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::triples_of_unsigned_vec_unsigned_and_small_unsigned_var_2;
 use inputs::integer::{
     rm_triples_of_integer_unsigned_and_small_unsigned,
     triples_of_integer_unsigned_and_small_unsigned, triples_of_unsigned_integer_and_small_unsigned,
 };
+use malachite_base::num::arithmetic::traits::{EqModPowerOfTwo, ModPowerOfTwo};
+use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::logic::traits::SignificantBits;
+use malachite_nz::integer::arithmetic::eq_limb_mod_power_of_two::limbs_eq_mod_power_of_two_neg_limb;
+use malachite_nz::platform::Limb;
 use natural::arithmetic::eq_limb_mod_power_of_two::rug_eq_limb_mod_power_of_two;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {

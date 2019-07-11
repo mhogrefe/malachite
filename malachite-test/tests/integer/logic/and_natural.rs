@@ -1,6 +1,4 @@
-use std::cmp::min;
-use std::str::FromStr;
-
+use common::test_properties;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_nz::integer::logic::and_natural::{
@@ -10,9 +8,6 @@ use malachite_nz::integer::logic::and_natural::{
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-use rug;
-
-use common::test_properties;
 use malachite_test::common::{
     integer_to_rug_integer, natural_to_rug_integer, rug_integer_to_integer,
 };
@@ -21,6 +16,9 @@ use malachite_test::inputs::integer::{
     integers, pairs_of_integer_and_natural, pairs_of_integer_and_unsigned,
 };
 use malachite_test::inputs::natural::{naturals, pairs_of_naturals};
+use rug;
+use std::cmp::min;
+use std::str::FromStr;
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]

@@ -1,13 +1,11 @@
-use std::str::FromStr;
-
+use common::test_properties;
 use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_base::num::logic::traits::BitAccess;
 use malachite_nz::natural::Natural;
-use rug;
-
-use common::test_properties;
 use malachite_test::common::{natural_to_rug_integer, rug_integer_to_natural};
 use malachite_test::inputs::natural::triples_of_natural_small_u64_and_bool;
+use rug;
+use std::str::FromStr;
 
 #[test]
 fn test_assign_bit() {

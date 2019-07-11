@@ -1,3 +1,12 @@
+use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
+use inputs::base::{
+    odd_limbs, pairs_of_limb_vec_and_positive_limb_var_2, pairs_of_limb_vec_var_3,
+    triples_of_limb_vec_limb_vec_and_positive_limb_var_2, vecs_of_unsigned_var_5,
+};
+use inputs::natural::{
+    naturals_var_1, nrm_pairs_of_natural_and_positive_limb_var_1,
+    pairs_of_limb_and_positive_natural_var_2, pairs_of_natural_and_positive_limb_var_1,
+};
 use malachite_base::num::arithmetic::traits::{DivExact, DivExactAssign};
 use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_base::num::logic::traits::SignificantBits;
@@ -8,16 +17,6 @@ use malachite_nz::natural::arithmetic::div_exact_limb::{
 };
 use malachite_nz::platform::Limb;
 use rug;
-
-use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::base::{
-    odd_limbs, pairs_of_limb_vec_and_positive_limb_var_2, pairs_of_limb_vec_var_3,
-    triples_of_limb_vec_limb_vec_and_positive_limb_var_2, vecs_of_unsigned_var_5,
-};
-use inputs::natural::{
-    naturals_var_1, nrm_pairs_of_natural_and_positive_limb_var_1,
-    pairs_of_limb_and_positive_natural_var_2, pairs_of_natural_and_positive_limb_var_1,
-};
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limbs_invert_limb);

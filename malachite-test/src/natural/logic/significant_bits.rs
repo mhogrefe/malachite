@@ -1,10 +1,9 @@
-use malachite_base::num::conversion::traits::CheckedFrom;
-use malachite_base::num::logic::traits::SignificantBits;
-use malachite_nz::natural::logic::significant_bits::limbs_significant_bits;
-
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::vecs_of_unsigned_var_1;
 use inputs::natural::{naturals, nrm_naturals};
+use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::logic::traits::SignificantBits;
+use malachite_nz::natural::logic::significant_bits::limbs_significant_bits;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limbs_significant_bits);

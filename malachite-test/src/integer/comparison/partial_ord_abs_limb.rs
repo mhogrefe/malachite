@@ -1,12 +1,10 @@
-use std::cmp::Ordering;
-
+use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
+use inputs::integer::{pairs_of_integer_and_unsigned, pairs_of_unsigned_and_integer};
 use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::platform::Limb;
-
-use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::integer::{pairs_of_integer_and_unsigned, pairs_of_unsigned_and_integer};
+use std::cmp::Ordering;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_integer_partial_cmp_abs_limb);

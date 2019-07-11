@@ -1,13 +1,12 @@
+use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
+use inputs::integer::integers;
+#[cfg(feature = "32_bit_limbs")]
+use inputs::integer::rm_integers;
 use malachite_base::num::conversion::traits::{
     CheckedFrom, ConvertibleFrom, OverflowingFrom, SaturatingFrom, WrappingFrom,
 };
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::platform::SignedLimb;
-
-use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::integer::integers;
-#[cfg(feature = "32_bit_limbs")]
-use inputs::integer::rm_integers;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_signed_limb_checked_from_integer);

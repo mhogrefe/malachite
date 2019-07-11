@@ -1,12 +1,8 @@
-use std::str::FromStr;
-
+use common::test_properties;
 use malachite_base::num::arithmetic::traits::{DivisibleBy, EqMod, Mod};
 use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::{Limb, SignedLimb};
-use rug;
-
-use common::test_properties;
 use malachite_test::common::integer_to_rug_integer;
 use malachite_test::inputs::base::{pairs_of_signeds, triples_of_signeds};
 use malachite_test::inputs::integer::{
@@ -15,6 +11,8 @@ use malachite_test::inputs::integer::{
     triples_of_signed_signed_and_integer,
 };
 use malachite_test::integer::arithmetic::eq_signed_limb_mod_signed_limb::*;
+use rug;
+use std::str::FromStr;
 
 #[test]
 fn test_eq_signed_limb_mod_signed_limb() {

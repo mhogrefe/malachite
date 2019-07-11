@@ -1,5 +1,10 @@
-use std::cmp::{max, min};
-
+use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
+use inputs::base::{
+    pairs_of_unsigned_vec, pairs_of_unsigned_vec_var_1, pairs_of_unsigned_vec_var_3,
+    triples_of_unsigned_vec_usize_and_unsigned_vec_var_1, triples_of_unsigned_vec_var_3,
+    triples_of_unsigned_vec_var_4, triples_of_unsigned_vec_var_9,
+};
+use inputs::natural::{nrm_pairs_of_naturals, pairs_of_naturals, rm_pairs_of_naturals};
 use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::natural::arithmetic::add::{
@@ -8,14 +13,7 @@ use malachite_nz::natural::arithmetic::add::{
     limbs_slice_add_in_place_either, limbs_slice_add_same_length_in_place_left,
     limbs_vec_add_in_place_either, limbs_vec_add_in_place_left,
 };
-
-use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::base::{
-    pairs_of_unsigned_vec, pairs_of_unsigned_vec_var_1, pairs_of_unsigned_vec_var_3,
-    triples_of_unsigned_vec_usize_and_unsigned_vec_var_1, triples_of_unsigned_vec_var_3,
-    triples_of_unsigned_vec_var_4, triples_of_unsigned_vec_var_9,
-};
-use inputs::natural::{nrm_pairs_of_naturals, pairs_of_naturals, rm_pairs_of_naturals};
+use std::cmp::{max, min};
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limbs_add_greater);

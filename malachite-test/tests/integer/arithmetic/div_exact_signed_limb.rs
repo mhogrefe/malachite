@@ -1,13 +1,9 @@
-use std::str::FromStr;
-
+use common::test_properties;
 use malachite_base::num::arithmetic::traits::{DivExact, DivExactAssign, DivRound};
 use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
 use malachite_base::round::RoundingMode;
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::{Limb, SignedDoubleLimb, SignedLimb};
-use rug;
-
-use common::test_properties;
 use malachite_test::common::{integer_to_rug_integer, rug_integer_to_integer};
 use malachite_test::inputs::base::{
     nonzero_signeds, pairs_of_signed_limb_and_nonzero_signed_limb_var_1,
@@ -17,6 +13,8 @@ use malachite_test::inputs::integer::{
     pairs_of_signed_limb_and_nonzero_integer_var_2,
 };
 use malachite_test::integer::arithmetic::div_exact_signed_limb::rug_div_exact_signed_limb;
+use rug;
+use std::str::FromStr;
 
 #[test]
 fn test_div_exact_signed_limb() {

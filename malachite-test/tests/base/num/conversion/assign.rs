@@ -1,12 +1,11 @@
+use common::test_properties;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{Assign, WrappingFrom};
-use rand::Rand;
-
-use common::test_properties;
 use malachite_test::inputs::base::{
     pairs_of_signed_and_signed, pairs_of_signed_and_unsigned, pairs_of_unsigned_and_unsigned,
 };
+use rand::Rand;
 
 fn assign_properties_helper_unsigned_unsigned<
     T: PrimitiveUnsigned + Rand,

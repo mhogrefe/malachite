@@ -1,14 +1,12 @@
-use std::cmp::Ordering;
-#[cfg(feature = "32_bit_limbs")]
-use std::str::FromStr;
-
+use common::test_properties;
 #[cfg(feature = "32_bit_limbs")]
 use malachite_base::comparison::Max;
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::Limb;
-
-use common::test_properties;
 use malachite_test::inputs::integer::integers;
+use std::cmp::Ordering;
+#[cfg(feature = "32_bit_limbs")]
+use std::str::FromStr;
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]

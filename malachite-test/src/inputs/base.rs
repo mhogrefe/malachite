@@ -48,9 +48,9 @@ use rust_wheels::iterators::primitive_ints::{
     exhaustive_natural_signed, exhaustive_negative_signed, exhaustive_nonzero_signed,
     exhaustive_positive, exhaustive_signed, exhaustive_unsigned, random_natural_signed,
     random_negative_signed, random_nonzero_signed, random_positive_signed,
-    random_positive_unsigned, random_range, random_range_down, range_down_increasing,
-    range_up_increasing, special_random_natural_signed, special_random_negative_signed,
-    special_random_nonzero_signed, special_random_positive_signed,
+    random_positive_unsigned, random_range, random_range_down, random_range_up,
+    range_down_increasing, range_up_increasing, special_random_natural_signed,
+    special_random_negative_signed, special_random_nonzero_signed, special_random_positive_signed,
     special_random_positive_unsigned, special_random_signed, special_random_unsigned,
 };
 use rust_wheels::iterators::rounding_modes::{exhaustive_rounding_modes, random_rounding_modes};
@@ -2287,6 +2287,47 @@ pub fn quadruples_of_limb_vec_limb_vec_limb_and_limb_var_3(
     Box::new(
         quadruples_of_limb_vec_limb_vec_limb_and_limb_var_2(gm)
             .filter(|&(ref out, ref xs, _, _)| out.len() >= xs.len()),
+    )
+}
+
+// All quadruples of `Vec<Limb>`, `Vec<Limb>`, `Vec<Limb>`, and `Limb`, where `quotient_limbs`,
+// `numerator_limbs`, `denominator_limbs`, and `inverse` meet the preconditions of
+// `limbs_div_mod_schoolbook`.
+pub fn quadruples_of_three_unsigned_vecs_and_unsigned_var_1(
+    gm: GenerationMode,
+) -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>, Limb)> {
+    let ts: It<(Vec<Limb>, Vec<Limb>, Vec<Limb>, Limb)> = match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_quadruples(
+            exhaustive_vecs(exhaustive_unsigned()),
+            exhaustive_vecs_min_length(3, exhaustive_unsigned()),
+            exhaustive_vecs_min_length(2, exhaustive_unsigned()),
+            range_up_increasing(1 << (Limb::WIDTH - 1)),
+        )),
+        GenerationMode::Random(scale) => Box::new(random_quadruples(
+            &EXAMPLE_SEED,
+            &(|seed| random_vecs(seed, scale, &(|seed_2| random(seed_2)))),
+            &(|seed| random_vecs_min_length(seed, scale, 3, &(|seed_2| random(seed_2)))),
+            &(|seed| random_vecs_min_length(seed, scale, 2, &(|seed_2| random(seed_2)))),
+            &(|seed| random_range_up(seed, 1 << (Limb::WIDTH - 1))),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_quadruples(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_unsigned_vecs(seed, scale)),
+            &(|seed| special_random_unsigned_vecs_min_length(seed, scale, 3)),
+            &(|seed| special_random_unsigned_vecs_min_length(seed, scale, 2)),
+            &(|seed| random_range_up(seed, 1 << (Limb::WIDTH - 1))),
+        )),
+    };
+    Box::new(
+        ts.filter(|(quotient, numerator, d_init, _)| {
+            numerator.len() > d_init.len() && quotient.len() >= numerator.len() - d_init.len() - 1
+        })
+        .map(|(quotient, numerator, mut d_init, d_last)| {
+            d_init.push(d_last);
+            let inverse =
+                limbs_two_limb_inverse_helper(d_init[d_init.len() - 1], d_init[d_init.len() - 2]);
+            (quotient, numerator, d_init, inverse)
+        }),
     )
 }
 

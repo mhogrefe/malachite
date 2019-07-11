@@ -1,13 +1,11 @@
-use std::cmp::Ordering;
-
+use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
+use inputs::integer::{integers, nrm_integers};
 use malachite_base::num::arithmetic::traits::Sign;
 use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use num::bigint::Sign as NumSign;
 use num::BigInt;
-
-use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::integer::{integers, nrm_integers};
+use std::cmp::Ordering;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_integer_sign);
