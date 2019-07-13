@@ -247,85 +247,126 @@ pub fn limbs_div_mod_by_two_limb(
 
 /// Schoolbook division using the Möller-Granlund 3/2 division algorithm.
 ///
+/// Divides `numerator_limbs` by `denominator_limbs` and writes the `numerator_limbs.len()` -
+/// `denominator_limbs.len()` least-significant quotient limbs to `quotient_limbs` and the
+/// `denominator_limbs.len()` limbs of the remainder to `numerator_limbs`. Returns the most
+/// significant limb of the quotient; `true` means 1 and `false` means 0. `denominator_limbs` must
+/// have length greater than 2, `numerator_limbs` must be at least as long as `denominator_limbs`,
+/// and the most significant bit of `denominator_limbs` must be set. `inverse` should be the result
+/// of `limbs_two_limb_inverse_helper` applied to the two highest limbs of the denominator.
+///
+/// Time: worst case O((n - d) * n + d)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = `numerator_limbs.len()`
+///       d = `denominator_limbs.len()`
+///
+/// # Panics
+/// Panics if `denominator_limbs` has length smaller than 3, `numerator_limbs` is shorter than
+/// `denominator_limbs`, `quotient_limbs` has length less than `numerator_limbs.len()` -
+/// `denominator_limbs.len()`, or the last limb of `denominator_limbs` does not have its highest bit
+/// set.
+///
+/// # Example
+/// ```
+/// use malachite_nz::natural::arithmetic::div_mod::*;
+///
+/// let quotient_limbs = &mut [10, 10, 10, 10];
+/// let numerator_limbs = &mut [1, 2, 3, 4, 5, 6];
+/// let denominator_limbs = &[3, 4, 0x8000_0000];
+/// let d_len = denominator_limbs.len();
+///
+/// assert_eq!(limbs_div_mod_schoolbook(
+///     quotient_limbs,
+///     numerator_limbs,
+///     denominator_limbs,
+///     limbs_two_limb_inverse_helper(denominator_limbs[d_len - 1], denominator_limbs[d_len - 2]),
+/// ), false);
+/// assert_eq!(quotient_limbs, &[4294967207, 9, 12, 10]);
+/// assert_eq!(numerator_limbs, &[268, 328, 2147483575, 4294967251, 5, 6]);
+/// ```
+///
 /// This is mpn_sbpi1_div_qr from mpn/generic/sbpi1_div_qr.c.
-pub fn limbs_div_mod_schoolbook(qp: &mut [Limb], np: &mut [Limb], dp: &[Limb], dinv: Limb) -> bool {
-    let nn = np.len();
-    let mut dn = dp.len();
-
-    assert!(dn > 2);
-    assert!(nn >= dn);
-    assert!(dp[dn - 1].get_highest_bit());
-
-    let mut np_offset = nn;
-
-    let qh = limbs_cmp_same_length(&np[np_offset - dn..np_offset], dp) >= Ordering::Equal;
-    if qh {
-        limbs_sub_same_length_in_place_left(&mut np[np_offset - dn..np_offset], dp);
+pub fn limbs_div_mod_schoolbook(
+    quotient_limbs: &mut [Limb],
+    numerator_limbs: &mut [Limb],
+    denominator_limbs: &[Limb],
+    inverse: Limb,
+) -> bool {
+    let denominator_len = denominator_limbs.len();
+    assert!(denominator_len > 2);
+    let numerator_len = numerator_limbs.len();
+    assert!(numerator_len >= denominator_len);
+    let d_1 = denominator_limbs[denominator_len - 1];
+    assert!(d_1.get_highest_bit());
+    let d_0 = denominator_limbs[denominator_len - 2];
+    let denominator_limbs_except_last = &denominator_limbs[..denominator_len - 1];
+    let denominator_limbs_except_last_two = &denominator_limbs[..denominator_len - 2];
+    let most_significant_quotient_limb;
+    {
+        let numerator_limbs_hi = &mut numerator_limbs[numerator_len - denominator_len..];
+        most_significant_quotient_limb =
+            limbs_cmp_same_length(numerator_limbs_hi, denominator_limbs) >= Ordering::Equal;
+        if most_significant_quotient_limb {
+            limbs_sub_same_length_in_place_left(numerator_limbs_hi, denominator_limbs);
+        }
     }
-
-    let mut qp_offset = nn - dn;
-
-    dn -= 2; // offset dn by 2 for main division loops, saving two iterations in mpn_submul_1.
-    let d1 = dp[dn + 1];
-    let d0 = dp[dn];
-
-    np_offset -= 2;
-
-    let mut n1 = np[np_offset + 1];
-
-    for _ in 1..(nn - dn - 1) {
-        np_offset -= 1;
-        let mut q;
-        if n1 == d1 && np[np_offset + 1] == d0 {
-            q = Limb::MAX;
+    let mut n_1 = numerator_limbs[numerator_len - 1];
+    for i in (denominator_len..numerator_len).rev() {
+        let j = i - denominator_len;
+        let mut quotient_limb;
+        if n_1 == d_1 && numerator_limbs[i - 1] == d_0 {
+            quotient_limb = Limb::MAX;
             limbs_sub_mul_limb_same_length_in_place_left(
-                &mut np[np_offset - dn..np_offset + 2],
-                &dp[..dn + 2],
-                q,
+                &mut numerator_limbs[j..i],
+                denominator_limbs,
+                quotient_limb,
             );
-            n1 = np[np_offset + 1]; // update n1, last loop's value will now be invalid
+            n_1 = numerator_limbs[i - 1]; // update n_1, last loop's value will now be invalid
         } else {
-            let (new_q, new_n) = limbs_div_mod_three_limb_by_two_limb(
-                n1,
-                np[np_offset + 1],
-                np[np_offset],
-                d1,
-                d0,
-                dinv,
-            );
-            let (new_n1, mut n0) = new_n.split_in_half();
-            q = new_q;
-            n1 = new_n1;
-            let mut cy = limbs_sub_mul_limb_same_length_in_place_left(
-                &mut np[np_offset - dn..np_offset],
-                &dp[..dn],
-                q,
-            );
-            let cy1 = if n0 < cy { 1 } else { 0 };
-            n0.wrapping_sub_assign(cy);
-            cy = if n1 < cy1 { 1 } else { 0 };
-            n1.wrapping_sub_assign(cy1);
-            np[np_offset] = n0;
-
-            if cy != 0 {
-                n1.wrapping_add_assign(d1.wrapping_add(
-                    if limbs_slice_add_same_length_in_place_left(
-                        &mut np[np_offset - dn..np_offset + 1],
-                        &dp[..dn + 1],
-                    ) {
-                        1
-                    } else {
-                        0
-                    },
-                ));
-                q.wrapping_sub_assign(1);
+            let carry;
+            {
+                let (numerator_limbs_lo, numerator_limbs_hi) = numerator_limbs.split_at_mut(i - 2);
+                let (new_quotient_limb, new_n) = limbs_div_mod_three_limb_by_two_limb(
+                    n_1,
+                    numerator_limbs_hi[1],
+                    numerator_limbs_hi[0],
+                    d_1,
+                    d_0,
+                    inverse,
+                );
+                let (new_n_1, mut n_0) = new_n.split_in_half();
+                quotient_limb = new_quotient_limb;
+                n_1 = new_n_1;
+                let local_carry_1 = limbs_sub_mul_limb_same_length_in_place_left(
+                    &mut numerator_limbs_lo[j..],
+                    denominator_limbs_except_last_two,
+                    quotient_limb,
+                );
+                let local_carry_2 = n_0 < local_carry_1;
+                n_0.wrapping_sub_assign(local_carry_1);
+                carry = local_carry_2 && n_1 == 0;
+                if local_carry_2 {
+                    n_1.wrapping_sub_assign(1);
+                }
+                numerator_limbs_hi[0] = n_0;
+            }
+            if carry {
+                n_1.wrapping_add_assign(d_1);
+                if limbs_slice_add_same_length_in_place_left(
+                    &mut numerator_limbs[j..i - 1],
+                    denominator_limbs_except_last,
+                ) {
+                    n_1.wrapping_add_assign(1);
+                }
+                quotient_limb.wrapping_sub_assign(1);
             }
         }
-        qp_offset -= 1;
-        qp[qp_offset] = q;
+        quotient_limbs[j] = quotient_limb;
     }
-    np[np_offset + 1] = n1;
-    qh
+    numerator_limbs[denominator_len - 1] = n_1;
+    most_significant_quotient_limb
 }
 
 //TODO tune
