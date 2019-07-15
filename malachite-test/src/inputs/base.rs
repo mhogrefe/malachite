@@ -4,7 +4,7 @@ use std::ops::{Shl, Shr};
 
 use malachite_base::chars::NUMBER_OF_CHARS;
 use malachite_base::limbs::limbs_test_zero;
-use malachite_base::num::arithmetic::traits::{Parity, UnsignedAbs};
+use malachite_base::num::arithmetic::traits::{Parity, ShrRound, UnsignedAbs};
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
@@ -58,10 +58,10 @@ use rust_wheels::iterators::strings::{
     exhaustive_strings, exhaustive_strings_with_chars, random_strings, random_strings_with_chars,
 };
 use rust_wheels::iterators::tuples::{
-    exhaustive_pairs, exhaustive_pairs_from_single, exhaustive_quadruples, exhaustive_triples,
-    exhaustive_triples_from_single, lex_pairs, lex_triples, log_pairs, random_pairs,
-    random_pairs_from_single, random_quadruples, random_triples, random_triples_from_single,
-    sqrt_pairs,
+    exhaustive_pairs, exhaustive_pairs_from_single, exhaustive_quadruples, exhaustive_quintuples,
+    exhaustive_triples, exhaustive_triples_from_single, lex_pairs, lex_triples, log_pairs,
+    random_pairs, random_pairs_from_single, random_quadruples, random_quintuples, random_triples,
+    random_triples_from_single, sqrt_pairs,
 };
 use rust_wheels::iterators::vecs::{
     exhaustive_vecs, exhaustive_vecs_min_length, random_vecs, random_vecs_min_length,
@@ -2292,11 +2292,11 @@ pub fn quadruples_of_limb_vec_limb_vec_limb_and_limb_var_3(
 
 // All quadruples of `Vec<Limb>`, `Vec<Limb>`, `Vec<Limb>`, and `Limb`, where `quotient_limbs`,
 // `numerator_limbs`, `denominator_limbs`, and `inverse` meet the preconditions of
-// `limbs_div_mod_schoolbook`.
+// `_limbs_div_mod_schoolbook`.
 pub fn quadruples_of_three_unsigned_vecs_and_unsigned_var_1(
     gm: GenerationMode,
 ) -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>, Limb)> {
-    let ts: It<(Vec<Limb>, Vec<Limb>, Vec<Limb>, Limb)> = match gm {
+    let qs: It<(Vec<Limb>, Vec<Limb>, Vec<Limb>, Limb)> = match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_quadruples(
             exhaustive_vecs(exhaustive_unsigned()),
             exhaustive_vecs_min_length(3, exhaustive_unsigned()),
@@ -2319,7 +2319,7 @@ pub fn quadruples_of_three_unsigned_vecs_and_unsigned_var_1(
         )),
     };
     Box::new(
-        ts.filter(|(quotient, numerator, d_init, _)| {
+        qs.filter(|(quotient, numerator, d_init, _)| {
             numerator.len() > d_init.len() && quotient.len() >= numerator.len() - d_init.len() - 1
         })
         .map(|(quotient, numerator, mut d_init, d_last)| {
@@ -2327,6 +2327,54 @@ pub fn quadruples_of_three_unsigned_vecs_and_unsigned_var_1(
             let inverse =
                 limbs_two_limb_inverse_helper(d_init[d_init.len() - 1], d_init[d_init.len() - 2]);
             (quotient, numerator, d_init, inverse)
+        }),
+    )
+}
+
+// All quadruples of `Vec<Limb>`, `Vec<Limb>`, `Vec<Limb>`, `Limb`, and `Vec<Limb>`, where
+// `quotient_limbs`, `numerator_limbs`, `denominator_limbs`, `inverse`, and `scratch` meet the
+// preconditions of `_limbs_div_mod_divide_and_conquer_helper`.
+pub fn quintuples_of_three_unsigned_vecs_unsigned_and_unsigned_vec_var_1(
+    gm: GenerationMode,
+) -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>, Limb, Vec<Limb>)> {
+    let qs: It<(Vec<Limb>, Vec<Limb>, Vec<Limb>, Vec<Limb>, Limb)> = match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_quintuples(
+            exhaustive_vecs_min_length(4, exhaustive_unsigned()),
+            exhaustive_vecs_min_length(12, exhaustive_unsigned()),
+            exhaustive_vecs_min_length(5, exhaustive_unsigned()),
+            exhaustive_vecs_min_length(6, exhaustive_unsigned()),
+            range_up_increasing(1 << (Limb::WIDTH - 1)),
+        )),
+        GenerationMode::Random(scale) => Box::new(random_quintuples(
+            &EXAMPLE_SEED,
+            &(|seed| random_vecs_min_length(seed, scale, 4, &(|seed_2| random(seed_2)))),
+            &(|seed| random_vecs_min_length(seed, scale, 12, &(|seed_2| random(seed_2)))),
+            &(|seed| random_vecs_min_length(seed, scale, 5, &(|seed_2| random(seed_2)))),
+            &(|seed| random_vecs_min_length(seed, scale, 6, &(|seed_2| random(seed_2)))),
+            &(|seed| random_range_up(seed, 1 << (Limb::WIDTH - 1))),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_quintuples(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_unsigned_vecs_min_length(seed, scale, 4)),
+            &(|seed| special_random_unsigned_vecs_min_length(seed, scale, 12)),
+            &(|seed| special_random_unsigned_vecs_min_length(seed, scale, 5)),
+            &(|seed| special_random_unsigned_vecs_min_length(seed, scale, 6)),
+            &(|seed| random_range_up(seed, 1 << (Limb::WIDTH - 1))),
+        )),
+    };
+    Box::new(
+        qs.filter(|(quotient, numerator, d_init, scratch, _)| {
+            let d_len = d_init.len() + 1;
+            numerator.len() >= (d_len << 1)
+                && scratch.len() > d_init.len()
+                && quotient.len() > d_len.shr_round(1, RoundingMode::Ceiling)
+                && quotient.len() >= numerator.len() - d_len
+        })
+        .map(|(quotient, numerator, mut d_init, scratch, d_last)| {
+            d_init.push(d_last);
+            let inverse =
+                limbs_two_limb_inverse_helper(d_init[d_init.len() - 1], d_init[d_init.len() - 2]);
+            (quotient, numerator, d_init, inverse, scratch)
         }),
     )
 }

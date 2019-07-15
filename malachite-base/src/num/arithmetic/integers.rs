@@ -477,7 +477,7 @@ macro_rules! round_shift_primitive_signed {
             #[inline]
             fn shl_round(self, other: $u, rm: RoundingMode) -> $t {
                 if other >= 0 {
-                    self << $u::wrapping_from(other)
+                    self << other.unsigned_abs()
                 } else {
                     self.shr_round(other.unsigned_abs(), rm)
                 }
@@ -488,7 +488,7 @@ macro_rules! round_shift_primitive_signed {
             #[inline]
             fn shl_round_assign(&mut self, other: $u, rm: RoundingMode) {
                 if other >= 0 {
-                    *self <<= $u::wrapping_from(other);
+                    *self <<= other.unsigned_abs();
                 } else {
                     self.shr_round_assign(other.unsigned_abs(), rm);
                 }
@@ -501,7 +501,7 @@ macro_rules! round_shift_primitive_signed {
             #[inline]
             fn shr_round(self, other: $u, rm: RoundingMode) -> $t {
                 if other >= 0 {
-                    self.shr_round($u::wrapping_from(other), rm)
+                    self.shr_round(other.unsigned_abs(), rm)
                 } else {
                     self << other.unsigned_abs()
                 }
@@ -512,7 +512,7 @@ macro_rules! round_shift_primitive_signed {
             #[inline]
             fn shr_round_assign(&mut self, other: $u, rm: RoundingMode) {
                 if other >= 0 {
-                    self.shr_round_assign($u::wrapping_from(other), rm);
+                    self.shr_round_assign(other.unsigned_abs(), rm);
                 } else {
                     *self <<= other.unsigned_abs()
                 }
