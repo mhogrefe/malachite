@@ -2331,6 +2331,48 @@ pub fn quadruples_of_three_unsigned_vecs_and_unsigned_var_1(
     )
 }
 
+// All quadruples of `Vec<Limb>`, `Vec<Limb>`, `Vec<Limb>`, and `Limb`, where `quotient_limbs`,
+// `numerator_limbs`, `denominator_limbs`, and `inverse` meet the preconditions of
+// `_limbs_div_mod_divide_and_conquer`.
+pub fn quadruples_of_three_unsigned_vecs_and_unsigned_var_2(
+    gm: GenerationMode,
+) -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>, Limb)> {
+    let qs: It<(Vec<Limb>, Vec<Limb>, Vec<Limb>, Limb)> = match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_quadruples(
+            exhaustive_vecs_min_length(3, exhaustive_unsigned()),
+            exhaustive_vecs_min_length(9, exhaustive_unsigned()),
+            exhaustive_vecs_min_length(5, exhaustive_unsigned()),
+            range_up_increasing(1 << (Limb::WIDTH - 1)),
+        )),
+        GenerationMode::Random(scale) => Box::new(random_quadruples(
+            &EXAMPLE_SEED,
+            &(|seed| random_vecs_min_length(seed, scale, 3, &(|seed_2| random(seed_2)))),
+            &(|seed| random_vecs_min_length(seed, scale, 9, &(|seed_2| random(seed_2)))),
+            &(|seed| random_vecs_min_length(seed, scale, 5, &(|seed_2| random(seed_2)))),
+            &(|seed| random_range_up(seed, 1 << (Limb::WIDTH - 1))),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_quadruples(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_unsigned_vecs_min_length(seed, scale, 3)),
+            &(|seed| special_random_unsigned_vecs_min_length(seed, scale, 9)),
+            &(|seed| special_random_unsigned_vecs_min_length(seed, scale, 5)),
+            &(|seed| random_range_up(seed, 1 << (Limb::WIDTH - 1))),
+        )),
+    };
+    Box::new(
+        qs.filter(|(quotient, numerator, d_init, _)| {
+            let d_len = d_init.len() + 1;
+            numerator.len() >= d_len + 3 && quotient.len() >= numerator.len() - d_len
+        })
+        .map(|(quotient, numerator, mut d_init, d_last)| {
+            d_init.push(d_last);
+            let inverse =
+                limbs_two_limb_inverse_helper(d_init[d_init.len() - 1], d_init[d_init.len() - 2]);
+            (quotient, numerator, d_init, inverse)
+        }),
+    )
+}
+
 // All quadruples of `Vec<Limb>`, `Vec<Limb>`, `Vec<Limb>`, `Limb`, and `Vec<Limb>`, where
 // `quotient_limbs`, `numerator_limbs`, `denominator_limbs`, `inverse`, and `scratch` meet the
 // preconditions of `_limbs_div_mod_divide_and_conquer_helper`.

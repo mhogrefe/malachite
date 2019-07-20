@@ -1,6 +1,7 @@
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::{
     pairs_of_unsigneds_var_2, quadruples_of_three_unsigned_vecs_and_unsigned_var_1,
+    quadruples_of_three_unsigned_vecs_and_unsigned_var_2,
     quintuples_of_three_unsigned_vecs_unsigned_and_unsigned_vec_var_1, sextuples_of_limbs_var_1,
     triples_of_unsigned_vec_var_37,
 };
@@ -14,8 +15,9 @@ use malachite_base::num::arithmetic::traits::{
 use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::natural::arithmetic::div_mod::{
-    _limbs_div_mod_divide_and_conquer_helper, _limbs_div_mod_schoolbook, limbs_div_mod_by_two_limb,
-    limbs_div_mod_three_limb_by_two_limb, limbs_two_limb_inverse_helper,
+    _limbs_div_mod_divide_and_conquer, _limbs_div_mod_divide_and_conquer_helper,
+    _limbs_div_mod_schoolbook, limbs_div_mod_by_two_limb, limbs_div_mod_three_limb_by_two_limb,
+    limbs_two_limb_inverse_helper,
 };
 use num::Integer;
 
@@ -27,6 +29,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limbs_div_mod_by_two_limb);
     register_demo!(registry, demo_limbs_div_mod_schoolbook);
     register_demo!(registry, demo_limbs_div_mod_divide_and_conquer_helper);
+    register_demo!(registry, demo_limbs_div_mod_divide_and_conquer);
     register_demo!(registry, demo_natural_div_assign_mod);
     register_demo!(registry, demo_natural_div_assign_mod_ref);
     register_demo!(registry, demo_natural_div_mod);
@@ -51,6 +54,11 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
         registry,
         Small,
         benchmark_limbs_div_mod_divide_and_conquer_helper
+    );
+    register_bench!(
+        registry,
+        Small,
+        benchmark_limbs_div_mod_divide_and_conquer_algorithms
     );
     register_bench!(
         registry,
@@ -218,6 +226,35 @@ fn demo_limbs_div_mod_divide_and_conquer_helper(gm: GenerationMode, limit: usize
             quotient_limbs,
             numerator_limbs,
             scratch,
+        );
+    }
+}
+
+fn demo_limbs_div_mod_divide_and_conquer(gm: GenerationMode, limit: usize) {
+    for (mut quotient_limbs, mut numerator_limbs, denominator_limbs, inverse) in
+        quadruples_of_three_unsigned_vecs_and_unsigned_var_2(gm).take(limit)
+    {
+        let old_quotient_limbs = quotient_limbs.clone();
+        let old_numerator_limbs = numerator_limbs.clone();
+        let quotient_hi = _limbs_div_mod_divide_and_conquer(
+            &mut quotient_limbs,
+            &mut numerator_limbs,
+            &denominator_limbs,
+            inverse,
+        );
+        println!(
+            "quotient_limbs := {:?}; numerator_limbs := {:?}; \
+             _limbs_div_mod_divide_and_conquer(\
+             &mut quotient_limbs, \
+             &mut numerator_limbs, {:?}, {}\
+             ) = {}; quotient_limbs = {:?}, numerator_limbs = {:?}",
+            old_quotient_limbs,
+            old_numerator_limbs,
+            denominator_limbs,
+            inverse,
+            quotient_hi,
+            quotient_limbs,
+            numerator_limbs
         );
     }
 }
@@ -475,6 +512,47 @@ fn benchmark_limbs_div_mod_divide_and_conquer_helper(
                 ))
             }),
         )],
+    );
+}
+
+fn benchmark_limbs_div_mod_divide_and_conquer_algorithms(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "_limbs_div_mod_divide_and_conquer(&mut [Limb], &mut [Limb], &[Limb], Limb)",
+        BenchmarkType::Algorithms,
+        quadruples_of_three_unsigned_vecs_and_unsigned_var_2(gm.with_scale(128)),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(_, ref numerator_limbs, _, _)| numerator_limbs.len()),
+        "numerator_limbs.len()",
+        &mut [
+            (
+                "Schoolbook",
+                &mut (|(mut quotient_limbs, mut numerator_limbs, denominator_limbs, inverse)| {
+                    no_out!(_limbs_div_mod_schoolbook(
+                        &mut quotient_limbs,
+                        &mut numerator_limbs,
+                        &denominator_limbs,
+                        inverse
+                    ))
+                }),
+            ),
+            (
+                "divide-and-conquer",
+                &mut (|(mut quotient_limbs, mut numerator_limbs, denominator_limbs, inverse)| {
+                    no_out!(_limbs_div_mod_divide_and_conquer(
+                        &mut quotient_limbs,
+                        &mut numerator_limbs,
+                        &denominator_limbs,
+                        inverse
+                    ))
+                }),
+            ),
+        ],
     );
 }
 
