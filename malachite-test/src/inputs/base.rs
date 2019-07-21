@@ -2124,8 +2124,8 @@ pub fn triples_of_unsigned_vec_var_36<T: PrimitiveUnsigned + Rand>(
     )
 }
 
-// All triples of `Vec<T>`, where `T` is unsigned and `quotient_limbs`, `numerator_limbs`, and
-// `denominator_limbs` meet the preconditions of `limbs_div_mod_by_two_limb`.
+// All triples of `Vec<T>`, where `T` is unsigned and `qs`, `ns`, and `ds` meet the preconditions of
+// `limbs_div_mod_by_two_limb`.
 pub fn triples_of_unsigned_vec_var_37<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
 ) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
@@ -2149,8 +2149,8 @@ pub fn triples_of_unsigned_vec_var_37<T: PrimitiveUnsigned + Rand>(
         )),
     };
     Box::new(
-        ts.filter(|(quotient, numerator, _)| quotient.len() >= numerator.len() - 2)
-            .map(|(quotient, numerator, (d_1, d_0))| (quotient, numerator, vec![d_0, d_1])),
+        ts.filter(|(q, n, _)| q.len() >= n.len() - 2)
+            .map(|(q, n, (d_1, d_0))| (q, n, vec![d_0, d_1])),
     )
 }
 
@@ -2290,9 +2290,8 @@ pub fn quadruples_of_limb_vec_limb_vec_limb_and_limb_var_3(
     )
 }
 
-// All quadruples of `Vec<Limb>`, `Vec<Limb>`, `Vec<Limb>`, and `Limb`, where `quotient_limbs`,
-// `numerator_limbs`, `denominator_limbs`, and `inverse` meet the preconditions of
-// `_limbs_div_mod_schoolbook`.
+// All quadruples of `Vec<Limb>`, `Vec<Limb>`, `Vec<Limb>`, and `Limb`, where `qs`, `ns`, `ds`, and
+// `inverse` meet the preconditions of `_limbs_div_mod_schoolbook`.
 pub fn quadruples_of_three_unsigned_vecs_and_unsigned_var_1(
     gm: GenerationMode,
 ) -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>, Limb)> {
@@ -2319,21 +2318,20 @@ pub fn quadruples_of_three_unsigned_vecs_and_unsigned_var_1(
         )),
     };
     Box::new(
-        qs.filter(|(quotient, numerator, d_init, _)| {
-            numerator.len() > d_init.len() && quotient.len() >= numerator.len() - d_init.len() - 1
+        qs.filter(|(q, n, d_init, _)| {
+            n.len() > d_init.len() && q.len() >= n.len() - d_init.len() - 1
         })
-        .map(|(quotient, numerator, mut d_init, d_last)| {
+        .map(|(q, n, mut d_init, d_last)| {
             d_init.push(d_last);
             let inverse =
                 limbs_two_limb_inverse_helper(d_init[d_init.len() - 1], d_init[d_init.len() - 2]);
-            (quotient, numerator, d_init, inverse)
+            (q, n, d_init, inverse)
         }),
     )
 }
 
-// All quadruples of `Vec<Limb>`, `Vec<Limb>`, `Vec<Limb>`, and `Limb`, where `quotient_limbs`,
-// `numerator_limbs`, `denominator_limbs`, and `inverse` meet the preconditions of
-// `_limbs_div_mod_divide_and_conquer`.
+// All quadruples of `Vec<Limb>`, `Vec<Limb>`, `Vec<Limb>`, and `Limb`, where `qs`, `ns`, `ds`, and
+// `inverse` meet the preconditions of `_limbs_div_mod_divide_and_conquer`.
 pub fn quadruples_of_three_unsigned_vecs_and_unsigned_var_2(
     gm: GenerationMode,
 ) -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>, Limb)> {
@@ -2360,22 +2358,22 @@ pub fn quadruples_of_three_unsigned_vecs_and_unsigned_var_2(
         )),
     };
     Box::new(
-        qs.filter(|(quotient, numerator, d_init, _)| {
+        qs.filter(|(q, n, d_init, _)| {
             let d_len = d_init.len() + 1;
-            numerator.len() >= d_len + 3 && quotient.len() >= numerator.len() - d_len
+            n.len() >= d_len + 3 && q.len() >= n.len() - d_len
         })
-        .map(|(quotient, numerator, mut d_init, d_last)| {
+        .map(|(q, n, mut d_init, d_last)| {
             d_init.push(d_last);
             let inverse =
                 limbs_two_limb_inverse_helper(d_init[d_init.len() - 1], d_init[d_init.len() - 2]);
-            (quotient, numerator, d_init, inverse)
+            (q, n, d_init, inverse)
         }),
     )
 }
 
-// All quadruples of `Vec<Limb>`, `Vec<Limb>`, `Vec<Limb>`, `Limb`, and `Vec<Limb>`, where
-// `quotient_limbs`, `numerator_limbs`, `denominator_limbs`, `inverse`, and `scratch` meet the
-// preconditions of `_limbs_div_mod_divide_and_conquer_helper`.
+// All quadruples of `Vec<Limb>`, `Vec<Limb>`, `Vec<Limb>`, `Limb`, and `Vec<Limb>`, where `qs`,
+// `ns`, `ds`, `inverse`, and `scratch` meet the preconditions of
+// `_limbs_div_mod_divide_and_conquer_helper`.
 pub fn quintuples_of_three_unsigned_vecs_unsigned_and_unsigned_vec_var_1(
     gm: GenerationMode,
 ) -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>, Limb, Vec<Limb>)> {
@@ -2405,18 +2403,18 @@ pub fn quintuples_of_three_unsigned_vecs_unsigned_and_unsigned_vec_var_1(
         )),
     };
     Box::new(
-        qs.filter(|(quotient, numerator, d_init, scratch, _)| {
+        qs.filter(|(q, n, d_init, scratch, _)| {
             let d_len = d_init.len() + 1;
-            numerator.len() >= (d_len << 1)
+            n.len() >= (d_len << 1)
                 && scratch.len() > d_init.len()
-                && quotient.len() > d_len.shr_round(1, RoundingMode::Ceiling)
-                && quotient.len() >= numerator.len() - d_len
+                && q.len() > d_len.shr_round(1, RoundingMode::Ceiling)
+                && q.len() >= n.len() - d_len
         })
-        .map(|(quotient, numerator, mut d_init, scratch, d_last)| {
+        .map(|(q, n, mut d_init, scratch, d_last)| {
             d_init.push(d_last);
             let inverse =
                 limbs_two_limb_inverse_helper(d_init[d_init.len() - 1], d_init[d_init.len() - 2]);
-            (quotient, numerator, d_init, inverse, scratch)
+            (q, n, d_init, inverse, scratch)
         }),
     )
 }

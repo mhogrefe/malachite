@@ -147,114 +147,62 @@ fn demo_limbs_div_mod_three_limb_by_two_limb(gm: GenerationMode, limit: usize) {
 }
 
 fn demo_limbs_div_mod_by_two_limb(gm: GenerationMode, limit: usize) {
-    for (mut quotient_limbs, mut numerator_limbs, denominator_limbs) in
-        triples_of_unsigned_vec_var_37(gm).take(limit)
-    {
-        let old_quotient_limbs = quotient_limbs.clone();
-        let old_numerator_limbs = numerator_limbs.clone();
-        let quotient_hi = limbs_div_mod_by_two_limb(
-            &mut quotient_limbs,
-            &mut numerator_limbs,
-            &denominator_limbs,
-        );
+    for (mut qs, mut ns, ds) in triples_of_unsigned_vec_var_37(gm).take(limit) {
+        let old_qs = qs.clone();
+        let old_ns = ns.clone();
+        let q_hi = limbs_div_mod_by_two_limb(&mut qs, &mut ns, &ds);
         println!(
-            "quotient_limbs := {:?}; numerator_limbs := {:?}; \
-             limbs_div_mod_by_two_limb(&mut quotient_limbs, &mut numerator_limbs, {:?}) = {}; \
-             quotient_limbs = {:?}, numerator_limbs = {:?}",
-            old_quotient_limbs,
-            old_numerator_limbs,
-            denominator_limbs,
-            quotient_hi,
-            quotient_limbs,
-            numerator_limbs
+            "qs := {:?}; ns := {:?}; limbs_div_mod_by_two_limb(&mut qs, &mut ns, {:?}) = {}; \
+             qs = {:?}, ns = {:?}",
+            old_qs, old_ns, ds, q_hi, qs, ns
         );
     }
 }
 
 fn demo_limbs_div_mod_schoolbook(gm: GenerationMode, limit: usize) {
-    for (mut quotient_limbs, mut numerator_limbs, denominator_limbs, inverse) in
+    for (mut qs, mut ns, ds, inverse) in
         quadruples_of_three_unsigned_vecs_and_unsigned_var_1(gm).take(limit)
     {
-        let old_quotient_limbs = quotient_limbs.clone();
-        let old_numerator_limbs = numerator_limbs.clone();
-        let quotient_hi = _limbs_div_mod_schoolbook(
-            &mut quotient_limbs,
-            &mut numerator_limbs,
-            &denominator_limbs,
-            inverse,
-        );
+        let old_qs = qs.clone();
+        let old_ns = ns.clone();
+        let q_hi = _limbs_div_mod_schoolbook(&mut qs, &mut ns, &ds, inverse);
         println!(
-            "quotient_limbs := {:?}; numerator_limbs := {:?}; \
-             _limbs_div_mod_schoolbook(&mut quotient_limbs, &mut numerator_limbs, {:?}, {}) = {}; \
-             quotient_limbs = {:?}, numerator_limbs = {:?}",
-            old_quotient_limbs,
-            old_numerator_limbs,
-            denominator_limbs,
-            inverse,
-            quotient_hi,
-            quotient_limbs,
-            numerator_limbs
+            "qs := {:?}; ns := {:?}; _limbs_div_mod_schoolbook(&mut qs, &mut ns, {:?}, {}) = {}; \
+             qs = {:?}, ns = {:?}",
+            old_qs, old_ns, ds, inverse, q_hi, qs, ns
         );
     }
 }
 
 fn demo_limbs_div_mod_divide_and_conquer_helper(gm: GenerationMode, limit: usize) {
-    for (mut quotient_limbs, mut numerator_limbs, denominator_limbs, inverse, mut scratch) in
+    for (mut qs, mut ns, ds, inverse, mut scratch) in
         quintuples_of_three_unsigned_vecs_unsigned_and_unsigned_vec_var_1(gm).take(limit)
     {
-        let old_quotient_limbs = quotient_limbs.clone();
-        let old_numerator_limbs = numerator_limbs.clone();
+        let old_qs = qs.clone();
+        let old_ns = ns.clone();
         let old_scratch = scratch.clone();
-        let quotient_hi = _limbs_div_mod_divide_and_conquer_helper(
-            &mut quotient_limbs,
-            &mut numerator_limbs,
-            &denominator_limbs,
-            inverse,
-            &mut scratch,
-        );
+        let q_hi =
+            _limbs_div_mod_divide_and_conquer_helper(&mut qs, &mut ns, &ds, inverse, &mut scratch);
         println!(
-            "quotient_limbs := {:?}; numerator_limbs := {:?}; scratch = {:?}; \
-             _limbs_div_mod_divide_and_conquer_helper(\
-             &mut quotient_limbs, &mut numerator_limbs, {:?}, {}, &mut scratch\
-             ) = {}; quotient_limbs = {:?}, numerator_limbs = {:?}, scratch = {:?}",
-            old_quotient_limbs,
-            old_numerator_limbs,
-            old_scratch,
-            denominator_limbs,
-            inverse,
-            quotient_hi,
-            quotient_limbs,
-            numerator_limbs,
-            scratch,
+            "qs := {:?}; ns := {:?}; scratch = {:?}; _limbs_div_mod_divide_and_conquer_helper(\
+             &mut qs, &mut ns, {:?}, {}, &mut scratch) = {}; qs = {:?}, ns = {:?}, scratch = {:?}",
+            old_qs, old_ns, old_scratch, ds, inverse, q_hi, qs, ns, scratch,
         );
     }
 }
 
 fn demo_limbs_div_mod_divide_and_conquer(gm: GenerationMode, limit: usize) {
-    for (mut quotient_limbs, mut numerator_limbs, denominator_limbs, inverse) in
+    for (mut qs, mut ns, ds, inverse) in
         quadruples_of_three_unsigned_vecs_and_unsigned_var_2(gm).take(limit)
     {
-        let old_quotient_limbs = quotient_limbs.clone();
-        let old_numerator_limbs = numerator_limbs.clone();
-        let quotient_hi = _limbs_div_mod_divide_and_conquer(
-            &mut quotient_limbs,
-            &mut numerator_limbs,
-            &denominator_limbs,
-            inverse,
-        );
+        let old_qs = qs.clone();
+        let old_ns = ns.clone();
+        let q_hi = _limbs_div_mod_divide_and_conquer(&mut qs, &mut ns, &ds, inverse);
         println!(
-            "quotient_limbs := {:?}; numerator_limbs := {:?}; \
-             _limbs_div_mod_divide_and_conquer(\
-             &mut quotient_limbs, \
-             &mut numerator_limbs, {:?}, {}\
-             ) = {}; quotient_limbs = {:?}, numerator_limbs = {:?}",
-            old_quotient_limbs,
-            old_numerator_limbs,
-            denominator_limbs,
-            inverse,
-            quotient_hi,
-            quotient_limbs,
-            numerator_limbs
+            "qs := {:?}; ns := {:?}; \
+             _limbs_div_mod_divide_and_conquer(&mut qs, &mut ns, {:?}, {}) = {}; \
+             qs = {:?}, ns = {:?}",
+            old_qs, old_ns, ds, inverse, q_hi, qs, ns
         );
     }
 }
@@ -440,17 +388,11 @@ fn benchmark_limbs_div_mod_by_two_limb(gm: GenerationMode, limit: usize, file_na
         gm.name(),
         limit,
         file_name,
-        &(|&(_, ref numerator_limbs, _)| numerator_limbs.len()),
-        "numerator_limbs.len()",
+        &(|&(_, ref ns, _)| ns.len()),
+        "ns.len()",
         &mut [(
             "malachite",
-            &mut (|(mut quotient_limbs, mut numerator_limbs, denominator_limbs)| {
-                no_out!(limbs_div_mod_by_two_limb(
-                    &mut quotient_limbs,
-                    &mut numerator_limbs,
-                    &denominator_limbs
-                ))
-            }),
+            &mut (|(mut qs, mut ns, ds)| no_out!(limbs_div_mod_by_two_limb(&mut qs, &mut ns, &ds))),
         )],
     );
 }
@@ -463,17 +405,12 @@ fn benchmark_limbs_div_mod_schoolbook(gm: GenerationMode, limit: usize, file_nam
         gm.name(),
         limit,
         file_name,
-        &(|&(_, ref numerator_limbs, _, _)| numerator_limbs.len()),
-        "numerator_limbs.len()",
+        &(|&(_, ref ns, _, _)| ns.len()),
+        "ns.len()",
         &mut [(
             "malachite",
-            &mut (|(mut quotient_limbs, mut numerator_limbs, denominator_limbs, inverse)| {
-                no_out!(_limbs_div_mod_schoolbook(
-                    &mut quotient_limbs,
-                    &mut numerator_limbs,
-                    &denominator_limbs,
-                    inverse
-                ))
+            &mut (|(mut qs, mut ns, ds, inverse)| {
+                no_out!(_limbs_div_mod_schoolbook(&mut qs, &mut ns, &ds, inverse))
             }),
         )],
     );
@@ -492,21 +429,15 @@ fn benchmark_limbs_div_mod_divide_and_conquer_helper(
         gm.name(),
         limit,
         file_name,
-        &(|&(_, ref numerator_limbs, _, _, _)| numerator_limbs.len()),
-        "numerator_limbs.len()",
+        &(|&(_, ref ns, _, _, _)| ns.len()),
+        "ns.len()",
         &mut [(
             "malachite",
-            &mut (|(
-                mut quotient_limbs,
-                mut numerator_limbs,
-                denominator_limbs,
-                inverse,
-                mut scratch,
-            )| {
+            &mut (|(mut qs, mut ns, ds, inverse, mut scratch)| {
                 no_out!(_limbs_div_mod_divide_and_conquer_helper(
-                    &mut quotient_limbs,
-                    &mut numerator_limbs,
-                    &denominator_limbs,
+                    &mut qs,
+                    &mut ns,
+                    &ds,
                     inverse,
                     &mut scratch
                 ))
@@ -523,32 +454,24 @@ fn benchmark_limbs_div_mod_divide_and_conquer_algorithms(
     m_run_benchmark(
         "_limbs_div_mod_divide_and_conquer(&mut [Limb], &mut [Limb], &[Limb], Limb)",
         BenchmarkType::Algorithms,
-        quadruples_of_three_unsigned_vecs_and_unsigned_var_2(gm.with_scale(128)),
+        quadruples_of_three_unsigned_vecs_and_unsigned_var_2(gm.with_scale(512)),
         gm.name(),
         limit,
         file_name,
-        &(|&(_, ref numerator_limbs, _, _)| numerator_limbs.len()),
-        "numerator_limbs.len()",
+        &(|&(_, ref ns, _, _)| ns.len()),
+        "ns.len()",
         &mut [
             (
                 "Schoolbook",
-                &mut (|(mut quotient_limbs, mut numerator_limbs, denominator_limbs, inverse)| {
-                    no_out!(_limbs_div_mod_schoolbook(
-                        &mut quotient_limbs,
-                        &mut numerator_limbs,
-                        &denominator_limbs,
-                        inverse
-                    ))
+                &mut (|(mut qs, mut ns, ds, inverse)| {
+                    no_out!(_limbs_div_mod_schoolbook(&mut qs, &mut ns, &ds, inverse))
                 }),
             ),
             (
                 "divide-and-conquer",
-                &mut (|(mut quotient_limbs, mut numerator_limbs, denominator_limbs, inverse)| {
+                &mut (|(mut qs, mut ns, ds, inverse)| {
                     no_out!(_limbs_div_mod_divide_and_conquer(
-                        &mut quotient_limbs,
-                        &mut numerator_limbs,
-                        &denominator_limbs,
-                        inverse
+                        &mut qs, &mut ns, &ds, inverse
                     ))
                 }),
             ),

@@ -124,62 +124,44 @@ fn test_limbs_div_mod_three_limb_by_two_limb() {
 }
 
 fn verify_limbs_div_mod_by_two_limb(
-    quotient_limbs_in: &[Limb],
-    numerator_limbs_in: &[Limb],
-    denominator_limbs: &[Limb],
-    quotient_hi: bool,
-    quotient_limbs_out: &[Limb],
-    numerator_limbs_out: &[Limb],
+    qs_in: &[Limb],
+    ns_in: &[Limb],
+    ds: &[Limb],
+    q_hi: bool,
+    qs_out: &[Limb],
+    ns_out: &[Limb],
 ) {
-    let numerator = Natural::from_limbs_asc(numerator_limbs_in);
-    let denominator = Natural::from_limbs_asc(denominator_limbs);
-    let (expected_quotient, expected_remainder) = (&numerator).div_mod(&denominator);
-    let base_quotient_length = numerator_limbs_in.len() - 2;
-    let mut quotient_limbs = quotient_limbs_out[..base_quotient_length].to_vec();
-    if quotient_hi {
-        quotient_limbs.push(1);
+    let n = Natural::from_limbs_asc(ns_in);
+    let d = Natural::from_limbs_asc(ds);
+    let (expected_q, expected_r) = (&n).div_mod(&d);
+    let base_q_len = ns_in.len() - 2;
+    let mut qs = qs_out[..base_q_len].to_vec();
+    if q_hi {
+        qs.push(1);
     }
-    let quotient = Natural::from_owned_limbs_asc(quotient_limbs);
-    let remainder = Natural::from_limbs_asc(&numerator_limbs_out[..2]);
-    assert_eq!(quotient, expected_quotient);
-    assert_eq!(remainder, expected_remainder);
-    assert_eq!(
-        &quotient_limbs_in[base_quotient_length..],
-        &quotient_limbs_out[base_quotient_length..]
-    );
-    assert_eq!(&numerator_limbs_in[2..], &numerator_limbs_out[2..]);
+    let q = Natural::from_owned_limbs_asc(qs);
+    let r = Natural::from_limbs_asc(&ns_out[..2]);
+    assert_eq!(q, expected_q);
+    assert_eq!(r, expected_r);
+    assert_eq!(&qs_in[base_q_len..], &qs_out[base_q_len..]);
+    assert_eq!(&ns_in[2..], &ns_out[2..]);
 
-    assert!(remainder < denominator);
-    assert_eq!(quotient * denominator + remainder, numerator);
+    assert!(r < d);
+    assert_eq!(q * d + r, n);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_div_mod_by_two_limb() {
-    let test = |quotient_limbs_in: &[Limb],
-                numerator_limbs_in: &[Limb],
-                denominator_limbs,
-                quotient_hi,
-                quotient_limbs_out: &[Limb],
-                numerator_limbs_out: &[Limb]| {
-        let mut quotient_limbs = quotient_limbs_in.to_vec();
-        let mut numerator_limbs = numerator_limbs_in.to_vec();
-        assert_eq!(
-            limbs_div_mod_by_two_limb(&mut quotient_limbs, &mut numerator_limbs, denominator_limbs),
-            quotient_hi
-        );
-        assert_eq!(quotient_limbs, quotient_limbs_out);
-        assert_eq!(numerator_limbs, numerator_limbs_out);
-        verify_limbs_div_mod_by_two_limb(
-            quotient_limbs_in,
-            numerator_limbs_in,
-            denominator_limbs,
-            quotient_hi,
-            &quotient_limbs,
-            &numerator_limbs,
-        );
+    let test = |qs_in: &[Limb], ns_in: &[Limb], ds, q_hi, qs_out: &[Limb], ns_out: &[Limb]| {
+        let mut qs = qs_in.to_vec();
+        let mut ns = ns_in.to_vec();
+        assert_eq!(limbs_div_mod_by_two_limb(&mut qs, &mut ns, ds), q_hi);
+        assert_eq!(qs, qs_out);
+        assert_eq!(ns, ns_out);
+        verify_limbs_div_mod_by_two_limb(qs_in, ns_in, ds, q_hi, &qs, &ns);
     };
-    // !most_significant_quotient_limb
+    // !highest_q
     test(&[10], &[1, 2], &[3, 0x8000_0000], false, &[10], &[1, 2]);
     test(
         &[10, 10, 10, 10],
@@ -189,7 +171,7 @@ fn test_limbs_div_mod_by_two_limb() {
         &[4294967241, 7, 10, 10],
         &[166, 2147483626, 3, 4, 5],
     );
-    // most_significant_quotient_limb
+    // highest_q
     test(
         &[0, 0],
         &[4142767597, 2922703399, 3921445909],
@@ -219,70 +201,48 @@ fn limbs_div_mod_by_two_limb_fail_3() {
 }
 
 fn verify_limbs_div_mod(
-    quotient_limbs_in: &[Limb],
-    numerator_limbs_in: &[Limb],
-    denominator_limbs: &[Limb],
-    quotient_hi: Limb,
-    quotient_limbs_out: &[Limb],
-    numerator_limbs_out: &[Limb],
+    qs_in: &[Limb],
+    ns_in: &[Limb],
+    ds: &[Limb],
+    q_hi: bool,
+    qs_out: &[Limb],
+    ns_out: &[Limb],
 ) {
-    let numerator = Natural::from_limbs_asc(numerator_limbs_in);
-    let denominator = Natural::from_limbs_asc(denominator_limbs);
-    let (expected_quotient, expected_remainder) = (&numerator).div_mod(&denominator);
-    let base_quotient_length = numerator_limbs_in.len() - denominator_limbs.len();
-    let mut quotient_limbs = quotient_limbs_out[..base_quotient_length].to_vec();
-    if quotient_hi != 0 {
-        quotient_limbs.push(quotient_hi);
+    let n = Natural::from_limbs_asc(ns_in);
+    let d = Natural::from_limbs_asc(ds);
+    let (expected_q, expected_r) = (&n).div_mod(&d);
+    let base_q_len = ns_in.len() - ds.len();
+    let mut qs = qs_out[..base_q_len].to_vec();
+    if q_hi {
+        qs.push(1);
     }
-    let quotient = Natural::from_owned_limbs_asc(quotient_limbs);
-    let remainder = Natural::from_limbs_asc(&numerator_limbs_out[..denominator_limbs.len()]);
-    assert_eq!(quotient, expected_quotient);
-    assert_eq!(remainder, expected_remainder,);
-    assert_eq!(
-        &quotient_limbs_in[base_quotient_length..],
-        &quotient_limbs_out[base_quotient_length..]
-    );
-    assert!(remainder < denominator);
-    assert_eq!(quotient * denominator + remainder, numerator);
+    let q = Natural::from_owned_limbs_asc(qs);
+    let r = Natural::from_limbs_asc(&ns_out[..ds.len()]);
+    assert_eq!(q, expected_q);
+    assert_eq!(r, expected_r,);
+    assert_eq!(&qs_in[base_q_len..], &qs_out[base_q_len..]);
+    assert!(r < d);
+    assert_eq!(q * d + r, n);
 }
 
 #[test]
 fn test_limbs_div_mod_schoolbook() {
-    let test = |quotient_limbs_in: &[Limb],
-                numerator_limbs_in: &[Limb],
-                denominator_limbs: &[Limb],
-                quotient_hi,
-                quotient_limbs_out: &[Limb],
-                numerator_limbs_out: &[Limb]| {
-        let mut quotient_limbs = quotient_limbs_in.to_vec();
-        let mut numerator_limbs = numerator_limbs_in.to_vec();
-        let inverse = limbs_two_limb_inverse_helper(
-            denominator_limbs[denominator_limbs.len() - 1],
-            denominator_limbs[denominator_limbs.len() - 2],
-        );
-        assert_eq!(
-            _limbs_div_mod_schoolbook(
-                &mut quotient_limbs,
-                &mut numerator_limbs,
-                denominator_limbs,
-                inverse
-            ),
-            quotient_hi
-        );
-        assert_eq!(quotient_limbs, quotient_limbs_out);
-        assert_eq!(numerator_limbs, numerator_limbs_out);
-        verify_limbs_div_mod(
-            quotient_limbs_in,
-            numerator_limbs_in,
-            denominator_limbs,
-            if quotient_hi { 1 } else { 0 },
-            &quotient_limbs,
-            &numerator_limbs,
-        );
-    };
+    let test =
+        |qs_in: &[Limb], ns_in: &[Limb], ds: &[Limb], q_hi, qs_out: &[Limb], ns_out: &[Limb]| {
+            let mut qs = qs_in.to_vec();
+            let mut ns = ns_in.to_vec();
+            let inverse = limbs_two_limb_inverse_helper(ds[ds.len() - 1], ds[ds.len() - 2]);
+            assert_eq!(
+                _limbs_div_mod_schoolbook(&mut qs, &mut ns, ds, inverse),
+                q_hi
+            );
+            assert_eq!(qs, qs_out);
+            assert_eq!(ns, ns_out);
+            verify_limbs_div_mod(qs_in, ns_in, ds, q_hi, &qs, &ns);
+        };
     #[cfg(feature = "32_bit_limbs")]
     {
-        // !most_significant_quotient_limb
+        // !highest_q
         test(
             &[10],
             &[1, 2, 3],
@@ -291,7 +251,7 @@ fn test_limbs_div_mod_schoolbook() {
             &[10],
             &[1, 2, 3],
         );
-        // !(n_1 == d_1 && numerator_limbs[i - 1] == d_0)
+        // !(n_1 == d_1 && ns[i - 1] == d_0)
         // !carry
         test(
             &[10, 10, 10, 10],
@@ -310,7 +270,7 @@ fn test_limbs_div_mod_schoolbook() {
             &[1],
             &[4294967295, 4294967295, 2147483647, 1],
         );
-        // most_significant_quotient_limb
+        // highest_q
         test(
             &[10; 10],
             &[
@@ -328,7 +288,7 @@ fn test_limbs_div_mod_schoolbook() {
                 1188988289,
             ],
         );
-        // n_1 == d_1 && numerator_limbs[i - 1] == d_0
+        // n_1 == d_1 && ns[i - 1] == d_0
         test(
             &[10; 8],
             &[
@@ -447,47 +407,38 @@ fn test_limbs_div_mod_schoolbook() {
 
 #[test]
 fn test_limbs_div_mod_divide_and_conquer_helper() {
-    let test = |quotient_limbs_in: &[Limb],
-                numerator_limbs_in: &[Limb],
-                denominator_limbs: &[Limb],
+    let test = |qs_in: &[Limb],
+                ns_in: &[Limb],
+                ds: &[Limb],
                 scratch_in: &[Limb],
-                quotient_hi,
-                quotient_limbs_out: &[Limb],
-                numerator_limbs_out: &[Limb],
+                q_hi,
+                qs_out: &[Limb],
+                ns_out: &[Limb],
                 scratch_out: &[Limb]| {
-        let mut quotient_limbs = quotient_limbs_in.to_vec();
-        let mut numerator_limbs = numerator_limbs_in.to_vec();
+        let mut qs = qs_in.to_vec();
+        let mut ns = ns_in.to_vec();
         let mut scratch = scratch_in.to_vec();
-        let inverse = limbs_two_limb_inverse_helper(
-            denominator_limbs[denominator_limbs.len() - 1],
-            denominator_limbs[denominator_limbs.len() - 2],
-        );
+        let inverse = limbs_two_limb_inverse_helper(ds[ds.len() - 1], ds[ds.len() - 2]);
         assert_eq!(
-            _limbs_div_mod_divide_and_conquer_helper(
-                &mut quotient_limbs,
-                &mut numerator_limbs,
-                denominator_limbs,
-                inverse,
-                &mut scratch
-            ),
-            quotient_hi
+            _limbs_div_mod_divide_and_conquer_helper(&mut qs, &mut ns, ds, inverse, &mut scratch),
+            q_hi
         );
-        assert_eq!(quotient_limbs, quotient_limbs_out);
-        assert_eq!(numerator_limbs, numerator_limbs_out);
+        assert_eq!(qs, qs_out);
+        assert_eq!(ns, ns_out);
         assert_eq!(scratch, scratch_out);
     };
     #[cfg(feature = "32_bit_limbs")]
     {
         // hi < DC_DIV_QR_THRESHOLD
-        // most_significant_quotient_limb == 0
+        // !highest_q
         // lo < DC_DIV_QR_THRESHOLD
-        // !quotient_lo
+        // !q_lo
         test(
             &[10; 6],
             &[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
             &[13, 14, 15, 16, 17, 0x8000_0000],
             &[5; 6],
-            0,
+            false,
             &[75085, 25656, 4294965798, 4294966499, 21, 24],
             &[
                 4293991192, 4293582579, 4293501313, 4293412419, 4293313687, 2147082789, 37543,
@@ -515,7 +466,7 @@ fn test_limbs_div_mod_divide_and_conquer_helper() {
                 4244462898, 2669959604, 1812876641, 540444868, 370935699, 3785539585, 3780133203,
                 1773663273, 1379840789, 1410566894,
             ],
-            0,
+            false,
             &[
                 4200257899, 3153780761, 4089908189, 4114439647, 2799123152, 4201558754, 3905055721,
                 1211637777, 2196711975, 1746393581, 848862043,
@@ -530,7 +481,7 @@ fn test_limbs_div_mod_divide_and_conquer_helper() {
                 1900021275, 3616206906, 1410566894,
             ],
         );
-        // most_significant_quotient_limb != 0
+        // highest_q
         test(
             &[
                 1160649470, 1230989586, 512562924, 1373938734, 3299208920, 3401055209, 42251693,
@@ -548,7 +499,7 @@ fn test_limbs_div_mod_divide_and_conquer_helper() {
             &[
                 3464102302, 114904991, 3306074524, 4090773383, 4268119608, 3155351764, 3566536963,
             ],
-            1,
+            true,
             &[
                 32959004, 4135046788, 271859649, 290785547, 2160143013, 2409308839, 444666535,
                 2288005213, 3343756354, 954674868, 3527744494, 1930721795, 3001821203, 3573297662,
@@ -694,7 +645,7 @@ fn test_limbs_div_mod_divide_and_conquer_helper() {
                 441581006, 1485888456, 760592633, 4138362099, 789863623, 2322873479, 546975672,
                 3396104257, 369041505, 1834801989, 3723602184, 3889531017, 1472233087,
             ],
-            0,
+            false,
             &[
                 17173825, 108042902, 3268218522, 2077287814, 2586341653, 4000033719, 728115586,
                 4001266677, 2972089267, 4063721631, 2176226304, 3453763686, 3986789007, 661755479,
@@ -981,7 +932,7 @@ fn test_limbs_div_mod_divide_and_conquer_helper() {
                 1958995251130615636,
                 16946083440253521233,
             ],
-            0,
+            false,
             &[
                 17268182715902625458,
                 3814961318301672608,
@@ -1143,61 +1094,42 @@ fn test_limbs_div_mod_divide_and_conquer_helper() {
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_div_mod_divide_and_conquer() {
-    let test = |quotient_limbs_in: &[Limb],
-                numerator_limbs_in: &[Limb],
-                denominator_limbs: &[Limb],
-                quotient_hi,
-                quotient_limbs_out: &[Limb],
-                numerator_limbs_out: &[Limb]| {
-        let mut quotient_limbs = quotient_limbs_in.to_vec();
-        let mut numerator_limbs = numerator_limbs_in.to_vec();
-        let inverse = limbs_two_limb_inverse_helper(
-            denominator_limbs[denominator_limbs.len() - 1],
-            denominator_limbs[denominator_limbs.len() - 2],
-        );
-        assert_eq!(
-            _limbs_div_mod_divide_and_conquer(
-                &mut quotient_limbs,
-                &mut numerator_limbs,
-                denominator_limbs,
-                inverse
-            ),
-            quotient_hi
-        );
-        assert_eq!(quotient_limbs, quotient_limbs_out);
-        assert_eq!(numerator_limbs, numerator_limbs_out);
-        verify_limbs_div_mod(
-            quotient_limbs_in,
-            numerator_limbs_in,
-            denominator_limbs,
-            quotient_hi,
-            &quotient_limbs,
-            &numerator_limbs,
-        );
-    };
-    // qn <= dn
-    // qn < DC_DIV_QR_THRESHOLD
-    // qn != dn second time
+    let test =
+        |qs_in: &[Limb], ns_in: &[Limb], ds: &[Limb], q_hi, qs_out: &[Limb], ns_out: &[Limb]| {
+            let mut qs = qs_in.to_vec();
+            let mut ns = ns_in.to_vec();
+            let inverse = limbs_two_limb_inverse_helper(ds[ds.len() - 1], ds[ds.len() - 2]);
+            assert_eq!(
+                _limbs_div_mod_divide_and_conquer(&mut qs, &mut ns, ds, inverse),
+                q_hi
+            );
+            assert_eq!(qs, qs_out);
+            assert_eq!(ns, ns_out);
+            verify_limbs_div_mod(qs_in, ns_in, ds, q_hi, &qs, &ns);
+        };
+    // q_len <= d_len
+    // q_len < DC_DIV_QR_THRESHOLD
+    // m != 0
     test(
         &[10, 10, 10, 10],
         &[1, 2, 3, 4, 5, 6, 7, 8, 9],
         &[3, 4, 5, 6, 7, 0x8000_0000],
-        0,
+        false,
         &[4294967057, 15, 18, 10],
         &[718, 910, 1080, 1286, 1492, 2147483434, 4294967176, 8, 9],
     );
-    // cy != 0 third time
+    // carry != 0 second time
     test(
         &[0, 0, 0],
         &[0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0],
         &[0, 0, 0, 0, 1, 0, 0, 2147483648],
-        0,
+        false,
         &[1, 0, 0],
         &[
             0, 0, 0, 0, 4294967295, 4294967295, 4294967295, 2147483647, 1, 0, 0,
         ],
     );
-    // qh != 0 third time
+    // highest_q third time
     test(
         &[
             1341443830, 680228019, 2358294753, 4240552485, 4220791420, 3445360969, 1267691556,
@@ -1232,7 +1164,7 @@ fn test_limbs_div_mod_divide_and_conquer() {
             3647011057, 3965571435, 1551218489, 726151433, 1730753749, 750433250, 2084548637,
             475638490, 3209308986, 1536371286, 3458731894, 451976715, 1463077982, 2401462738,
         ],
-        1,
+        true,
         &[
             4074815036, 3472841870, 921256965, 4240552485, 4220791420, 3445360969, 1267691556,
             3340881424, 992535572, 1421700486, 4136881179,
@@ -1253,12 +1185,12 @@ fn test_limbs_div_mod_divide_and_conquer() {
             1378535283, 1449179549, 515106198,
         ],
     );
-    // qn > dn
-    // qn != 1
-    // 2 < qn < DC_DIV_QR_THRESHOLD
-    // qn != dn first time
-    // qh != 0 second time
-    // cy != 0 second time
+    // q_len > d_len
+    // q_len_mod_d_len == 1
+    // 2 < q_len_mod_d_len < DC_DIV_QR_THRESHOLD
+    // q_len_mod_d_len != d_len
+    // highest_q second time
+    // carry != 0 first time
     test(
         &[
             3656551823, 3383257247, 550091805, 1932339117, 3279901067, 2864941409, 3440756420,
@@ -1275,7 +1207,7 @@ fn test_limbs_div_mod_divide_and_conquer() {
             3226059476, 722714803, 1915993039, 2160412527, 1484228011, 1715426198, 1611850737,
             3097214810,
         ],
-        1,
+        true,
         &[
             3948774568, 277233294, 951139522, 4214130560, 3551225641, 3386184722, 1565143611,
             2922369553, 2764255027, 5466750, 2823931470, 3552636955, 545484857, 803194457,
@@ -1288,7 +1220,7 @@ fn test_limbs_div_mod_divide_and_conquer() {
             2221272200, 1165058179,
         ],
     );
-    // qn >= DC_DIV_QR_THRESHOLD first time
+    // q_len_mod_d_len >= DC_DIV_QR_THRESHOLD
     test(
         &[
             2108009976, 2838126990, 827008974, 4157613011, 3782799311, 839921672, 879731301,
@@ -1412,7 +1344,7 @@ fn test_limbs_div_mod_divide_and_conquer() {
             4029343999, 2816277230, 4098142949, 1987363952, 2732004911, 2516355975, 2365350298,
             1747416524, 3951513077, 3526462790,
         ],
-        0,
+        false,
         &[
             1303670916, 3965736473, 654490008, 3337248200, 112312312, 2506678400, 713192736,
             901474194, 2359721047, 1133557120, 3068598661, 3136858413, 4095957211, 3057328754,
@@ -1518,7 +1450,7 @@ fn test_limbs_div_mod_divide_and_conquer() {
             2090640559, 3458945226, 1831813150, 2874008201,
         ],
     );
-    // qn >= DC_DIV_QR_THRESHOLD second time
+    // q_len >= DC_DIV_QR_THRESHOLD
     test(
         &[
             3333140561, 2349469031, 666934289, 3646788197, 3373340607, 3062489357, 1781577064,
@@ -1686,7 +1618,7 @@ fn test_limbs_div_mod_divide_and_conquer() {
             4276609753, 41976415, 968125282, 853099726, 3675357389, 3545982836, 1237895428,
             88970686, 4259275077,
         ],
-        0,
+        false,
         &[
             2046945960, 1873732058, 883136475, 2335087597, 1091742925, 3913267466, 1586245016,
             4163559950, 1402352044, 2528046476, 1941819469, 2309605638, 3377063311, 3151818591,
@@ -1814,9 +1746,8 @@ fn test_limbs_div_mod_divide_and_conquer() {
             415673865, 3605057547, 4262628477, 3977258034,
         ],
     );
-    // qn == 1
-    // !(n2 == d1 && n1 == d0)
-    // dn > 2
+    // q_len_mod_d_len == 1
+    // !(n_2 == d_1 && n_1 == d_0)
     test(
         &[
             386353625, 2283334827, 253851108, 4279287864, 2561872983, 1000131216, 216965099,
@@ -1847,7 +1778,7 @@ fn test_limbs_div_mod_divide_and_conquer() {
             3712980585, 4273305215, 2588121912, 1482202110, 247010829, 2649827458, 2673293530,
             50266420, 3870816552,
         ],
-        0,
+        false,
         &[
             362121003, 2089507514, 1304606762, 1263278756, 358438501, 2269424948, 3806457519,
             1279073058, 2059434869, 1815692099, 652038027, 526160281, 1238911451, 1042947643,
@@ -1874,7 +1805,7 @@ fn test_limbs_div_mod_divide_and_conquer() {
             2816966573, 103111667, 3966361608, 452216196, 3607393999, 624250586,
         ],
     );
-    // qn == 2
+    // q_len_mod_d_len == 2
     test(
         &[
             3451729766, 1173985848, 93029266, 2489920009, 3973680219, 780152687, 1953113811,
@@ -1941,7 +1872,7 @@ fn test_limbs_div_mod_divide_and_conquer() {
         &[
             3960768807, 1512612890, 3846503597, 4289005374, 3202073567, 4260281911, 4219386150,
         ],
-        0,
+        false,
         &[
             3383011450, 2938966556, 422368941, 3441497106, 3409423652, 2305567488, 3562827580,
             1338876308, 1099736044, 1201047259, 1743369967, 1491174234, 287230448, 3116597437,
@@ -2005,7 +1936,7 @@ fn test_limbs_div_mod_divide_and_conquer() {
             4197498026, 2004997074,
         ],
     );
-    // qh != 0 first time
+    // highest_q first time
     test(
         &[
             1444823481, 1895962470, 1145820971, 951685031, 1619286897, 645659681, 3225126137,
@@ -2028,7 +1959,7 @@ fn test_limbs_div_mod_divide_and_conquer() {
             153522406, 2020517918, 87408861, 541283899, 2327698817, 696800449, 1357243166,
             2373189783,
         ],
-        1,
+        true,
         &[
             4258888914, 1485342244, 864808754, 1855573169, 2779156179, 2884098865, 3015216190,
             233158379, 2131022258, 2947161299, 1457166139, 936993560, 1814334647, 2085655570,
@@ -2046,12 +1977,12 @@ fn test_limbs_div_mod_divide_and_conquer() {
             2051308560, 1920428039, 1466054112, 1143354086,
         ],
     );
-    // cy != 0 first time
+    // carry
     test(
         &[0, 0, 0, 0, 0, 0, 0],
         &[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
         &[0, 0, 0, 1, 0, 2147483648],
-        0,
+        false,
         &[7, 0, 0, 4294967292, 4294967295, 4294967295, 1],
         &[
             0, 0, 0, 4294967289, 4294967295, 2147483647, 4, 0, 0, 4294967294, 4294967295,
@@ -2063,22 +1994,17 @@ fn test_limbs_div_mod_divide_and_conquer() {
 #[cfg(not(feature = "32_bit_limbs"))]
 #[test]
 fn test_mpn_tdiv_qr() {
-    let test = |quotient_limbs_in: &[Limb],
-                remainder_limbs_in: &[Limb],
-                numerator_limbs: &[Limb],
-                denominator_limbs: &[Limb],
-                quotient_limbs_out: &[Limb],
-                remainder_limbs_out: &[Limb]| {
-        let mut quotient_limbs = quotient_limbs_in.to_vec();
-        let mut remainder_limbs = remainder_limbs_in.to_vec();
-        mpn_tdiv_qr(
-            &mut quotient_limbs,
-            &mut remainder_limbs,
-            numerator_limbs,
-            denominator_limbs,
-        );
-        assert_eq!(quotient_limbs, quotient_limbs_out);
-        assert_eq!(remainder_limbs, remainder_limbs_out);
+    let test = |qs_in: &[Limb],
+                rs_in: &[Limb],
+                ns: &[Limb],
+                ds: &[Limb],
+                qs_out: &[Limb],
+                rs_out: &[Limb]| {
+        let mut qs = qs_in.to_vec();
+        let mut rs = rs_in.to_vec();
+        mpn_tdiv_qr(&mut qs, &mut rs, ns, ds);
+        assert_eq!(qs, qs_out);
+        assert_eq!(rs, rs_out);
     };
     test(
         &[
@@ -3065,49 +2991,23 @@ fn limbs_div_mod_three_limb_by_two_limb_properties() {
 
 #[test]
 fn limbs_div_mod_by_two_limb_properties() {
-    test_properties(
-        triples_of_unsigned_vec_var_37,
-        |(quotient_limbs_in, numerator_limbs_in, denominator_limbs)| {
-            let mut quotient_limbs = quotient_limbs_in.clone();
-            let mut numerator_limbs = numerator_limbs_in.clone();
-            let quotient_hi = limbs_div_mod_by_two_limb(
-                &mut quotient_limbs,
-                &mut numerator_limbs,
-                &denominator_limbs,
-            );
-            verify_limbs_div_mod_by_two_limb(
-                &quotient_limbs_in,
-                &numerator_limbs_in,
-                &denominator_limbs,
-                quotient_hi,
-                &quotient_limbs,
-                &numerator_limbs,
-            );
-        },
-    );
+    test_properties(triples_of_unsigned_vec_var_37, |(qs_in, ns_in, ds)| {
+        let mut qs = qs_in.clone();
+        let mut ns = ns_in.clone();
+        let q_hi = limbs_div_mod_by_two_limb(&mut qs, &mut ns, &ds);
+        verify_limbs_div_mod_by_two_limb(&qs_in, &ns_in, &ds, q_hi, &qs, &ns);
+    });
 }
 
 #[test]
 fn limbs_div_mod_schoolbook_properties() {
     test_properties(
         quadruples_of_three_unsigned_vecs_and_unsigned_var_1,
-        |(ref quotient_limbs_in, ref numerator_limbs_in, ref denominator_limbs, inverse)| {
-            let mut quotient_limbs = quotient_limbs_in.clone();
-            let mut numerator_limbs = numerator_limbs_in.clone();
-            let quotient_hi = _limbs_div_mod_schoolbook(
-                &mut quotient_limbs,
-                &mut numerator_limbs,
-                denominator_limbs,
-                *inverse,
-            );
-            verify_limbs_div_mod(
-                quotient_limbs_in,
-                numerator_limbs_in,
-                denominator_limbs,
-                if quotient_hi { 1 } else { 0 },
-                &quotient_limbs,
-                &numerator_limbs,
-            );
+        |(ref qs_in, ref ns_in, ref ds, inverse)| {
+            let mut qs = qs_in.clone();
+            let mut ns = ns_in.clone();
+            let q_hi = _limbs_div_mod_schoolbook(&mut qs, &mut ns, ds, *inverse);
+            verify_limbs_div_mod(qs_in, ns_in, ds, q_hi, &qs, &ns);
         },
     );
 }
@@ -3117,23 +3017,11 @@ fn limbs_div_mod_divide_and_conquer_helper_properties() {
     test_properties_custom_scale(
         128,
         quintuples_of_three_unsigned_vecs_unsigned_and_unsigned_vec_var_1,
-        |(
-            ref quotient_limbs_in,
-            ref numerator_limbs_in,
-            ref denominator_limbs,
-            inverse,
-            ref scratch_in,
-        )| {
-            let mut quotient_limbs = quotient_limbs_in.clone();
-            let mut numerator_limbs = numerator_limbs_in.clone();
+        |(ref qs_in, ref ns_in, ref ds, inverse, ref scratch_in)| {
+            let mut qs = qs_in.clone();
+            let mut ns = ns_in.clone();
             let mut scratch = scratch_in.clone();
-            _limbs_div_mod_divide_and_conquer_helper(
-                &mut quotient_limbs,
-                &mut numerator_limbs,
-                denominator_limbs,
-                *inverse,
-                &mut scratch,
-            );
+            _limbs_div_mod_divide_and_conquer_helper(&mut qs, &mut ns, ds, *inverse, &mut scratch);
         },
     );
 }
@@ -3143,23 +3031,11 @@ fn limbs_div_mod_divide_and_conquer_properties() {
     test_properties_custom_scale(
         128,
         quadruples_of_three_unsigned_vecs_and_unsigned_var_2,
-        |(ref quotient_limbs_in, ref numerator_limbs_in, ref denominator_limbs, inverse)| {
-            let mut quotient_limbs = quotient_limbs_in.clone();
-            let mut numerator_limbs = numerator_limbs_in.clone();
-            let quotient_hi = _limbs_div_mod_divide_and_conquer(
-                &mut quotient_limbs,
-                &mut numerator_limbs,
-                denominator_limbs,
-                *inverse,
-            );
-            verify_limbs_div_mod(
-                quotient_limbs_in,
-                numerator_limbs_in,
-                denominator_limbs,
-                quotient_hi,
-                &quotient_limbs,
-                &numerator_limbs,
-            );
+        |(ref qs_in, ref ns_in, ref ds, inverse)| {
+            let mut qs = qs_in.clone();
+            let mut ns = ns_in.clone();
+            let q_hi = _limbs_div_mod_divide_and_conquer(&mut qs, &mut ns, ds, *inverse);
+            verify_limbs_div_mod(qs_in, ns_in, ds, q_hi, &qs, &ns);
         },
     );
 }
