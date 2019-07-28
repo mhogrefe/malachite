@@ -170,7 +170,7 @@ fn checked_hamming_distance_properties() {
 
     test_properties(pairs_of_natural_and_integer, |&(ref x, ref y)| {
         let distance = x.checked_hamming_distance(y);
-        assert_eq!(Integer::from(x).checked_hamming_distance(y), distance,);
-        assert_eq!(y.checked_hamming_distance(&Integer::from(x)), distance,);
+        assert_eq!(Integer::from(x).checked_hamming_distance(y), distance);
+        assert_eq!(y.checked_hamming_distance(&Integer::from(x)), distance);
     });
 }

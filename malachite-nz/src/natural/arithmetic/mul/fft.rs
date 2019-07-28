@@ -1340,7 +1340,7 @@ pub fn _limbs_mul_fft_internal(
             limbs_sub_limb_in_place(&mut ys[p..], 1);
         }
     } else if carry == 1 {
-        // This branch is untested!
+        // TODO This branch is untested!
         if q >= 2 * p {
             let ys = &mut ys[q - 2 * p..];
             while limbs_slice_add_limb_in_place(ys, 1) {}

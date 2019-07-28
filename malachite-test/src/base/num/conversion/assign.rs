@@ -88,7 +88,7 @@ fn demo_unsigned_assign_unsigned<T: PrimitiveUnsigned + Rand, U: PrimitiveUnsign
         let original_t = t;
         let mut t = t;
         t.assign(u);
-        println!("t = {}; t::assign({}); t = {}", original_t, u, t,);
+        println!("t = {}; t::assign({}); t = {}", original_t, u, t);
     }
 }
 
@@ -106,7 +106,7 @@ fn demo_signed_assign_signed<T: PrimitiveSigned + Rand, U: PrimitiveSigned + Ran
         let original_t = t;
         let mut t = t;
         t.assign(u);
-        println!("t = {}; t::assign({}); t = {}", original_t, u, t,);
+        println!("t = {}; t::assign({}); t = {}", original_t, u, t);
     }
 }
 
@@ -122,7 +122,7 @@ fn demo_signed_assign_unsigned<T: PrimitiveSigned + Rand, U: PrimitiveUnsigned +
         let original_t = t;
         let mut t = t;
         t.assign(u);
-        println!("t = {}; t::assign({}); t = {}", original_t, u, t,);
+        println!("t = {}; t::assign({}); t = {}", original_t, u, t);
     }
 }
 

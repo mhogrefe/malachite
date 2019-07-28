@@ -16,8 +16,8 @@ use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::natural::arithmetic::div_mod::{
     _limbs_div_mod_divide_and_conquer, _limbs_div_mod_divide_and_conquer_helper,
-    _limbs_div_mod_schoolbook, limbs_div_mod_by_two_limb, limbs_div_mod_three_limb_by_two_limb,
-    limbs_two_limb_inverse_helper,
+    _limbs_div_mod_schoolbook, _limbs_div_mod_schoolbook_approx, limbs_div_mod_by_two_limb,
+    limbs_div_mod_three_limb_by_two_limb, limbs_two_limb_inverse_helper,
 };
 use num::Integer;
 
@@ -30,6 +30,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limbs_div_mod_schoolbook);
     register_demo!(registry, demo_limbs_div_mod_divide_and_conquer_helper);
     register_demo!(registry, demo_limbs_div_mod_divide_and_conquer);
+    register_demo!(registry, demo_limbs_div_mod_schoolbook_approx);
     register_demo!(registry, demo_natural_div_assign_mod);
     register_demo!(registry, demo_natural_div_assign_mod_ref);
     register_demo!(registry, demo_natural_div_mod);
@@ -59,6 +60,11 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
         registry,
         Small,
         benchmark_limbs_div_mod_divide_and_conquer_algorithms
+    );
+    register_bench!(
+        registry,
+        Small,
+        benchmark_limbs_div_mod_schoolbook_approx_algorithms
     );
     register_bench!(
         registry,
@@ -201,6 +207,22 @@ fn demo_limbs_div_mod_divide_and_conquer(gm: GenerationMode, limit: usize) {
         println!(
             "qs := {:?}; ns := {:?}; \
              _limbs_div_mod_divide_and_conquer(&mut qs, &mut ns, {:?}, {}) = {}; \
+             qs = {:?}, ns = {:?}",
+            old_qs, old_ns, ds, inverse, q_hi, qs, ns
+        );
+    }
+}
+
+fn demo_limbs_div_mod_schoolbook_approx(gm: GenerationMode, limit: usize) {
+    for (mut qs, mut ns, ds, inverse) in
+        quadruples_of_three_unsigned_vecs_and_unsigned_var_1(gm).take(limit)
+    {
+        let old_qs = qs.clone();
+        let old_ns = ns.clone();
+        let q_hi = _limbs_div_mod_schoolbook_approx(&mut qs, &mut ns, &ds, inverse);
+        println!(
+            "qs := {:?}; ns := {:?}; \
+             _limbs_div_mod_schoolbook_approx(&mut qs, &mut ns, {:?}, {}) = {}; \
              qs = {:?}, ns = {:?}",
             old_qs, old_ns, ds, inverse, q_hi, qs, ns
         );
@@ -471,6 +493,39 @@ fn benchmark_limbs_div_mod_divide_and_conquer_algorithms(
                 "divide-and-conquer",
                 &mut (|(mut qs, mut ns, ds, inverse)| {
                     no_out!(_limbs_div_mod_divide_and_conquer(
+                        &mut qs, &mut ns, &ds, inverse
+                    ))
+                }),
+            ),
+        ],
+    );
+}
+
+fn benchmark_limbs_div_mod_schoolbook_approx_algorithms(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "_limbs_div_mod_schoolbook_approx(&mut [Limb], &mut [Limb], &[Limb], Limb)",
+        BenchmarkType::Algorithms,
+        quadruples_of_three_unsigned_vecs_and_unsigned_var_1(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(_, ref ns, _, _)| ns.len()),
+        "ns.len()",
+        &mut [
+            (
+                "Schoolbook",
+                &mut (|(mut qs, mut ns, ds, inverse)| {
+                    no_out!(_limbs_div_mod_schoolbook(&mut qs, &mut ns, &ds, inverse))
+                }),
+            ),
+            (
+                "Schoolbook approx",
+                &mut (|(mut qs, mut ns, ds, inverse)| {
+                    no_out!(_limbs_div_mod_schoolbook_approx(
                         &mut qs, &mut ns, &ds, inverse
                     ))
                 }),

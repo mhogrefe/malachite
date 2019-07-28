@@ -213,7 +213,7 @@ fn eq_mod_power_of_two_properties() {
         |&(ref x, ref y, pow)| {
             assert!(!x.eq_mod_power_of_two(y, pow));
             assert!(!y.eq_mod_power_of_two(x, pow));
-            assert_ne!(x.mod_power_of_two(pow), y.mod_power_of_two(pow),);
+            assert_ne!(x.mod_power_of_two(pow), y.mod_power_of_two(pow));
         },
     );
 

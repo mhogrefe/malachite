@@ -120,7 +120,7 @@ fn eq_mod_power_of_two_properties() {
             assert!(natural_to_rug_integer(x)
                 .is_congruent_2pow(&natural_to_rug_integer(y), u32::checked_from(pow).unwrap()));
             assert!(y.eq_mod_power_of_two(x, pow));
-            assert_eq!(x.mod_power_of_two(pow), y.mod_power_of_two(pow),);
+            assert_eq!(x.mod_power_of_two(pow), y.mod_power_of_two(pow));
         },
     );
 
@@ -131,7 +131,7 @@ fn eq_mod_power_of_two_properties() {
             assert!(!natural_to_rug_integer(x)
                 .is_congruent_2pow(&natural_to_rug_integer(y), u32::checked_from(pow).unwrap()));
             assert!(!y.eq_mod_power_of_two(x, pow));
-            assert_ne!(x.mod_power_of_two(pow), y.mod_power_of_two(pow),);
+            assert_ne!(x.mod_power_of_two(pow), y.mod_power_of_two(pow));
         },
     );
 

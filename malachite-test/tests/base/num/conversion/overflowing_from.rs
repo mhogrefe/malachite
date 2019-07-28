@@ -14,7 +14,7 @@ where
 {
     test_properties(unsigneds, |&u| {
         let result = U::overflowing_from(u);
-        assert_eq!(result, (U::wrapping_from(u), !U::convertible_from(u),));
+        assert_eq!(result, (U::wrapping_from(u), !U::convertible_from(u)));
     });
 }
 

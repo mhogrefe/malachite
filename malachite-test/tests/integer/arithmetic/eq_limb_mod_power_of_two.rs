@@ -135,7 +135,7 @@ fn eq_limb_mod_power_of_two_properties() {
                 u,
                 pow,
             ));
-            assert_eq!(n.mod_power_of_two(pow), u.mod_power_of_two(pow),);
+            assert_eq!(n.mod_power_of_two(pow), u.mod_power_of_two(pow));
         },
     );
 
@@ -149,7 +149,7 @@ fn eq_limb_mod_power_of_two_properties() {
                 u,
                 pow,
             ));
-            assert_ne!(n.mod_power_of_two(pow), u.mod_power_of_two(pow),);
+            assert_ne!(n.mod_power_of_two(pow), u.mod_power_of_two(pow));
         },
     );
 

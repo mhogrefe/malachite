@@ -2319,7 +2319,8 @@ pub fn quadruples_of_three_unsigned_vecs_and_unsigned_var_1(
     };
     Box::new(
         qs.filter(|(q, n, d_init, _)| {
-            n.len() > d_init.len() && q.len() >= n.len() - d_init.len() - 1
+            let d_len = d_init.len() + 1;
+            n.len() >= d_len && q.len() >= n.len() - d_len
         })
         .map(|(q, n, mut d_init, d_last)| {
             d_init.push(d_last);

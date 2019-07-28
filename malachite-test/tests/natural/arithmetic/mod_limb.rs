@@ -451,7 +451,7 @@ fn mod_limb_properties() {
                 (x + y) % u,
                 (Natural::from(x % u) + Natural::from(y % u)) % u,
             );
-            assert_eq!(x * y % u, Natural::from(x % u) * Natural::from(y % u) % u,);
+            assert_eq!(x * y % u, Natural::from(x % u) * Natural::from(y % u) % u);
         },
     );
 }

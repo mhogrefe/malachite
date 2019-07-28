@@ -120,9 +120,9 @@ fn limbs_divisible_by_limb_properties() {
         pairs_of_unsigned_vec_and_positive_unsigned_var_1,
         |&(ref limbs, limb)| {
             let divisible = limbs_divisible_by_limb(limbs, limb);
-            assert_eq!(Natural::from_limbs_asc(limbs).divisible_by(limb), divisible,);
-            assert_eq!(limbs_mod_limb(limbs, limb) == 0, divisible,);
-            assert_eq!(_combined_limbs_divisible_by_limb(limbs, limb), divisible,);
+            assert_eq!(Natural::from_limbs_asc(limbs).divisible_by(limb), divisible);
+            assert_eq!(limbs_mod_limb(limbs, limb) == 0, divisible);
+            assert_eq!(_combined_limbs_divisible_by_limb(limbs, limb), divisible);
         },
     );
 }

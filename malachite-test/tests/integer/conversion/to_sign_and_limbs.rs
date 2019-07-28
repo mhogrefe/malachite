@@ -96,7 +96,7 @@ fn to_sign_and_limbs_asc_properties() {
         assert_eq!(Integer::from_sign_and_limbs_asc(sign, &limbs), *x);
         assert_eq!(
             x.to_sign_and_limbs_desc(),
-            (sign, limbs.iter().cloned().rev().collect::<Vec<Limb>>(),)
+            (sign, limbs.iter().cloned().rev().collect::<Vec<Limb>>())
         );
         assert_eq!(sign == Ordering::Equal, limbs.is_empty());
         assert_eq!(sign == Ordering::Equal, *x == 0 as Limb);
@@ -115,7 +115,7 @@ fn to_sign_and_limbs_desc_properties() {
         assert_eq!(Integer::from_sign_and_limbs_desc(sign, &limbs), *x);
         assert_eq!(
             x.to_sign_and_limbs_asc(),
-            (sign, limbs.iter().cloned().rev().collect::<Vec<Limb>>(),)
+            (sign, limbs.iter().cloned().rev().collect::<Vec<Limb>>())
         );
         assert_eq!(sign == Ordering::Equal, limbs.is_empty());
         assert_eq!(sign == Ordering::Equal, *x == 0 as Limb);
