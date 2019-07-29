@@ -2050,7 +2050,7 @@ fn test_limbs_div_mod_schoolbook_approx() {
     #[cfg(feature = "32_bit_limbs")]
     {
         // q_len + 1 < d_len
-        // !qh
+        // !highest_q
         test(
             &[10],
             &[1, 2, 3],
@@ -2059,7 +2059,7 @@ fn test_limbs_div_mod_schoolbook_approx() {
             &[10],
             &[1, 2, 3],
         );
-        // n1 < (d1 & flag) second time
+        // !(!flag || n_1 >= d_1) second time
         test(
             &[0],
             &[0; 4],
@@ -2069,8 +2069,8 @@ fn test_limbs_div_mod_schoolbook_approx() {
             &[0, 0, 0, 0],
         );
         // q_len + 1 >= d_len
-        // n1 < (d1 & flag) first time
-        // cy == 0 second time
+        // !(!flag || n_1 >= d_1) first time
+        // !carry second time
         test(
             &[0, 0],
             &[0; 5],
@@ -2079,7 +2079,7 @@ fn test_limbs_div_mod_schoolbook_approx() {
             &[0, 0],
             &[0; 5],
         );
-        // qh
+        // highest_q
         test(
             &[
                 2694350779, 1945458005, 4130424186, 4267238024, 2588565427, 561074857, 3031728663,
@@ -2103,8 +2103,8 @@ fn test_limbs_div_mod_schoolbook_approx() {
                 1188988289,
             ],
         );
-        // !(n1 == d1 && ns[np_offset + 1] == d0)
-        // cy == 0 first time
+        // !(n_1 == d_1 && ns[j] == d_0)
+        // !carry first time
         test(
             &[
                 2678906106, 1133029551, 3498992572, 3960506675, 2156562886, 2180928089, 4027866586,
@@ -2131,9 +2131,9 @@ fn test_limbs_div_mod_schoolbook_approx() {
                 2707761200, 1588607308, 1519717633, 1232770303,
             ],
         );
-        // n1 == d1 && ns[np_offset + 1] == d0
-        // n1 >= (d1 & flag) first time
-        // n == cy
+        // n_1 == d_1 && ns[j] == d_0
+        // !flag || n_1 >= d_1 first time
+        // n_1 == carry
         test(
             &[10, 10, 10, 10],
             &[0, 0, 0, 1, 4, 0x8000_0000],
@@ -2142,7 +2142,7 @@ fn test_limbs_div_mod_schoolbook_approx() {
             &[4294967292, 4294967295, 4294967295, 10],
             &[0, 19, 0, 2147483646, 2147483648, 2147483648],
         );
-        // cy != 0 first time
+        // carry first time
         test(
             &[10, 10, 10, 10, 10],
             &[0, 0, 0, 0, 0, 3],
@@ -2151,8 +2151,8 @@ fn test_limbs_div_mod_schoolbook_approx() {
             &[4294967295, 4294967295, 5, 10, 10],
             &[0, 3, 2147483630, 4294967295, 0, 3],
         );
-        // n1 >= (d1 & flag) second time
-        // !(n1 != cy && n1 < (cy & flag))
+        // !flag || n_1 >= d_1 second time
+        // !(flag && n_1 < carry)
         test(
             &[10, 10, 10, 10],
             &[0, 0, 0, 3, 0xffff_ffff, 0x8000_0000],

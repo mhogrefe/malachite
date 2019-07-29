@@ -582,204 +582,164 @@ pub fn _limbs_div_mod_divide_and_conquer(
 }
 
 /// Schoolbook division using the Möller-Granlund 3/2 division algorithm, returning approximate
-/// quotient. The quotient returned is either correct, or one too large.
+/// quotient.
+///
+/// Divides `ns` by `ds` and writes the `ns.len()` - `ds.len()` least-significant quotient limbs to
+/// `qs`. Returns the most significant limb of the quotient; `true` means 1 and `false` means 0. The
+/// quotient is either correct, or one too large. `ds` must have length greater than 2, `ns` must be
+/// at least as long as `ds`, and the most significant bit of `ds` must be set. `inverse` should be
+/// the result of `limbs_two_limb_inverse_helper` applied to the two highest limbs of the
+/// denominator.
+///
+/// Time: worst case O(n ^ 2)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = `ns.len()`
+///
+/// # Panics
+/// Panics if `ds` has length smaller than 3, `ns` is shorter than `ds`, `qs` has length less than
+/// `ns.len()` - `ds.len()`, or the last limb of `ds` does not have its highest bit set.
 ///
 /// This is mpn_sbpi1_divappr_q from mpn/generic/sbpi1_divappr_q.c.
 pub fn _limbs_div_mod_schoolbook_approx(
     qs: &mut [Limb],
     ns: &mut [Limb],
-    ds: &[Limb],
+    mut ds: &[Limb],
     inverse: Limb,
 ) -> bool {
     let n_len = ns.len();
-    let mut d_len = ds.len();
+    let d_len = ds.len();
     assert!(d_len > 2);
     assert!(n_len >= d_len);
-    assert!(ds[d_len - 1].get_highest_bit());
+    let a = d_len - 1;
+    let d_1 = ds[a];
+    assert!(d_1.get_highest_bit());
+    let b = d_len - 2;
+    let d_0 = ds[b];
     let q_len = n_len - d_len;
-    let dp_offset;
+    assert!(qs.len() >= q_len);
     if q_len + 1 < d_len {
-        dp_offset = d_len - (q_len + 1);
-        d_len = q_len + 1;
-    } else {
-        dp_offset = 0;
+        ds = &ds[d_len - (q_len + 1)..];
     }
-    let highest_q = limbs_cmp_same_length(&ns[n_len - d_len..], &ds[dp_offset..dp_offset + d_len])
-        >= Ordering::Equal;
-    if highest_q {
-        limbs_sub_same_length_in_place_left(
-            &mut ns[n_len - d_len..],
-            &ds[dp_offset..dp_offset + d_len],
-        );
+    let d_len = ds.len();
+    let d_len_minus_1 = d_len - 1;
+    let highest_q;
+    {
+        let ns = &mut ns[n_len - d_len..];
+        highest_q = limbs_cmp_same_length(ns, ds) >= Ordering::Equal;
+        if highest_q {
+            limbs_sub_same_length_in_place_left(ns, ds);
+        }
     }
-    let mut qp_offset = q_len;
-    // offset d_len by 2 for main division loops, saving two iterations in mpn_submul_1
-    let dn = d_len - 1;
-    let mut ds_shifted = &ds[dp_offset..];
-    let d1 = ds_shifted[dn];
-    let d0 = ds[dp_offset + dn - 1];
-    let mut n1 = ns[n_len - 1];
-    let mut np_offset = n_len - 2;
+    let mut n_1 = *ns.last().unwrap();
     let mut q;
-    let mut n0;
-    for _ in 0..q_len - dn {
-        np_offset -= 1;
-        if n1 == d1 && ns[np_offset + 1] == d0 {
+    let mut n_0;
+    for i in (d_len_minus_1..q_len).rev() {
+        let j = i + a;
+        if n_1 == d_1 && ns[j] == d_0 {
             q = Limb::MAX;
-            limbs_sub_mul_limb_same_length_in_place_left(
-                &mut ns[np_offset + 1 - dn..np_offset + 2],
-                &ds_shifted[..dn + 1],
-                q,
-            );
-            n1 = ns[np_offset + 1]; // update n1, last loop's value will now be invalid
+            limbs_sub_mul_limb_same_length_in_place_left(&mut ns[j - d_len_minus_1..j + 1], ds, q);
+            n_1 = ns[j]; // update n_1, last loop's value will now be invalid
         } else {
-            let (new_q, new_n) = limbs_div_mod_three_limb_by_two_limb(
-                n1,
-                ns[np_offset + 1],
-                ns[np_offset],
-                d1,
-                d0,
-                inverse,
-            );
+            let (new_q, new_n) =
+                limbs_div_mod_three_limb_by_two_limb(n_1, ns[j], ns[j - 1], d_1, d_0, inverse);
             q = new_q;
             let (new_n1, new_n0) = new_n.split_in_half();
-            n1 = new_n1;
-            n0 = new_n0;
-            let mut cy = limbs_sub_mul_limb_same_length_in_place_left(
-                &mut ns[np_offset + 1 - dn..np_offset],
-                &ds_shifted[..dn - 1],
+            n_1 = new_n1;
+            n_0 = new_n0;
+            let local_carry_1 = limbs_sub_mul_limb_same_length_in_place_left(
+                &mut ns[j - d_len_minus_1..j - 1],
+                &ds[..d_len_minus_1 - 1],
                 q,
             );
-            let cy1 = if n0 < cy { 1 } else { 0 };
-            n0.wrapping_sub_assign(cy);
-            cy = if n1 < cy1 { 1 } else { 0 };
-            n1.wrapping_sub_assign(cy1);
-            ns[np_offset] = n0;
-            if cy != 0 {
-                n1.wrapping_add_assign(d1.wrapping_add(
-                    if limbs_slice_add_same_length_in_place_left(
-                        &mut ns[np_offset + 1 - dn..np_offset + 1],
-                        &ds_shifted[..dn],
-                    ) {
-                        1
-                    } else {
-                        0
-                    },
-                ));
-                q -= 1;
+            let local_carry_2 = n_0 < local_carry_1;
+            n_0.wrapping_sub_assign(local_carry_1);
+            let carry = local_carry_2 && n_1 == 0;
+            if local_carry_2 {
+                n_1.wrapping_sub_assign(1);
+            }
+            ns[j - 1] = n_0;
+            if carry {
+                n_1.wrapping_add_assign(d_1);
+                if limbs_slice_add_same_length_in_place_left(
+                    &mut ns[j - d_len_minus_1..j],
+                    &ds[..d_len_minus_1],
+                ) {
+                    n_1.wrapping_add_assign(1);
+                }
+                q.wrapping_sub_assign(1);
             }
         }
-        qp_offset -= 1;
-        qs[qp_offset] = q;
+        qs[i] = q;
     }
     let mut flag = true;
-    if dn >= 1 {
-        let mut dn = dn - 1;
-        let limit = dn;
-        for _ in 0..limit {
-            np_offset -= 1;
-            if !flag || n1 >= d1 {
+    if d_len_minus_1 > 0 {
+        for i in (1..d_len_minus_1).rev() {
+            let j = i + a;
+            if !flag || n_1 >= d_1 {
                 q = Limb::MAX;
-                let cy = limbs_sub_mul_limb_same_length_in_place_left(
-                    &mut ns[np_offset - dn..np_offset + 2],
-                    &ds_shifted[..dn + 2],
-                    q,
-                );
-                if n1 != cy {
+                let carry = limbs_sub_mul_limb_same_length_in_place_left(&mut ns[b..j + 1], ds, q);
+                if n_1 != carry {
                     // TODO This branch is untested!
-                    if flag && n1 < cy {
+                    if flag && n_1 < carry {
                         q.wrapping_sub_assign(1);
-                        limbs_slice_add_same_length_in_place_left(
-                            &mut ns[np_offset - dn..np_offset + 2],
-                            &ds_shifted[..dn + 2],
-                        );
+                        limbs_slice_add_same_length_in_place_left(&mut ns[b..j + 1], ds);
                     } else {
                         flag = false;
                     }
                 }
-                n1 = ns[np_offset + 1];
+                n_1 = ns[j];
             } else {
-                let (new_q, new_n) = limbs_div_mod_three_limb_by_two_limb(
-                    n1,
-                    ns[np_offset + 1],
-                    ns[np_offset],
-                    d1,
-                    d0,
-                    inverse,
-                );
+                let (new_q, new_n) =
+                    limbs_div_mod_three_limb_by_two_limb(n_1, ns[j], ns[j - 1], d_1, d_0, inverse);
                 q = new_q;
-                let (new_n1, new_n0) = new_n.split_in_half();
-                n1 = new_n1;
-                n0 = new_n0;
-                let mut cy = limbs_sub_mul_limb_same_length_in_place_left(
-                    &mut ns[np_offset - dn..np_offset],
-                    &ds_shifted[..dn],
-                    q,
-                );
-                let cy1 = if n0 < cy { 1 } else { 0 };
-                n0.wrapping_sub_assign(cy);
-                cy = if n1 < cy1 { 1 } else { 0 };
-                n1.wrapping_sub_assign(cy1);
-                ns[np_offset] = n0;
-                if cy != 0 {
+                let (new_n_1, new_n_0) = new_n.split_in_half();
+                n_1 = new_n_1;
+                n_0 = new_n_0;
+                let local_carry_1 =
+                    limbs_sub_mul_limb_same_length_in_place_left(&mut ns[b..j - 1], &ds[..i], q);
+                let local_carry_2 = n_0 < local_carry_1;
+                n_0.wrapping_sub_assign(local_carry_1);
+                let carry = local_carry_2 && n_1 == 0;
+                if local_carry_2 {
+                    n_1.wrapping_sub_assign(1);
+                }
+                ns[j - 1] = n_0;
+                if carry {
                     // TODO This branch is untested!
-                    n1.wrapping_add_assign(d1.wrapping_add(
-                        if limbs_slice_add_same_length_in_place_left(
-                            &mut ns[np_offset - dn..np_offset + 1],
-                            &ds_shifted[..dn + 1],
-                        ) {
-                            1
-                        } else {
-                            0
-                        },
-                    ));
+                    n_1.wrapping_add_assign(d_1);
+                    if limbs_slice_add_same_length_in_place_left(&mut ns[b..j], &ds[..i + 1]) {
+                        n_1.wrapping_add_assign(1);
+                    }
                     q.wrapping_sub_assign(1);
                 }
             }
-            qp_offset -= 1;
-            qs[qp_offset] = q;
-            // Truncate operands.
-            dn -= 1;
-            ds_shifted = &ds_shifted[1..];
+            qs[i] = q;
+            ds = &ds[1..];
         }
-        np_offset -= 1;
-        if !flag || n1 >= d1 {
+        let ns = &mut ns[b..];
+        if !flag || n_1 >= d_1 {
             q = Limb::MAX;
-            let cy = limbs_sub_mul_limb_same_length_in_place_left(
-                &mut ns[np_offset..np_offset + 2],
-                &ds_shifted[..2],
-                q,
-            );
-            if flag && n1 < cy {
+            let carry = limbs_sub_mul_limb_same_length_in_place_left(&mut ns[..2], &ds[..2], q);
+            if flag && n_1 < carry {
                 // TODO This branch is untested!
                 q.wrapping_sub_assign(1);
-                let (n_hi, n_lo) = DoubleLimb::join_halves(ns[np_offset + 1], ns[np_offset])
-                    .wrapping_add(DoubleLimb::join_halves(ds_shifted[1], ds_shifted[0]))
-                    .split_in_half();
-                ns[np_offset + 1] = n_hi;
-                ns[np_offset] = n_lo;
+                limbs_slice_add_same_length_in_place_left(&mut ns[..2], &ds[..2]);
             }
-            n1 = ns[np_offset + 1];
+            n_1 = ns[1];
         } else {
-            let (new_q, new_n) = limbs_div_mod_three_limb_by_two_limb(
-                n1,
-                ns[np_offset + 1],
-                ns[np_offset],
-                d1,
-                d0,
-                inverse,
-            );
+            let (new_q, new_n) =
+                limbs_div_mod_three_limb_by_two_limb(n_1, ns[1], ns[0], d_1, d_0, inverse);
             q = new_q;
-            let (new_n1, new_n0) = new_n.split_in_half();
-            n1 = new_n1;
-            n0 = new_n0;
-            ns[np_offset + 1] = n1;
-            ns[np_offset] = n0;
+            let (new_n_1, n_0) = new_n.split_in_half();
+            n_1 = new_n_1;
+            ns[1] = n_1;
+            ns[0] = n_0;
         }
-        qp_offset -= 1;
-        qs[qp_offset] = q;
+        qs[0] = q;
     }
-    assert_eq!(ns[np_offset + 1], n1);
+    assert_eq!(ns[a], n_1);
     highest_q
 }
 
