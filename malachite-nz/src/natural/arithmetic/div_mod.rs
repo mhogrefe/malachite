@@ -100,15 +100,6 @@ pub fn limbs_two_limb_inverse_helper(hi: Limb, lo: Limb) -> Limb {
     inverse
 }
 
-// will remove
-fn add_ssaaaa(sh: &mut Limb, sl: &mut Limb, ah1: Limb, al1: Limb, ah2: Limb, al2: Limb) {
-    let (hi, lo) = DoubleLimb::join_halves(ah1, al1)
-        .wrapping_add(DoubleLimb::join_halves(ah2, al2))
-        .split_in_half();
-    *sh = hi;
-    *sl = lo;
-}
-
 /// Computes the quotient and remainder of `[n_2, n_1, n_0]` / `[d_1, d_0]`. Requires the highest
 /// bit of `d_1` to be set, and `[n_2, n_1]` < `[d_1, d_0]`. `inverse` is the inverse of
 /// `[d_1, d_0]` computed by `limbs_two_limb_inverse_helper`.
@@ -605,43 +596,39 @@ pub fn _limbs_div_mod_schoolbook_approx(
     assert!(d_len > 2);
     assert!(n_len >= d_len);
     assert!(ds[d_len - 1].get_highest_bit());
-    let mut np_offset = n_len;
     let q_len = n_len - d_len;
-    let mut dp_offset = 0;
+    let dp_offset;
     if q_len + 1 < d_len {
-        dp_offset += d_len - (q_len + 1);
+        dp_offset = d_len - (q_len + 1);
         d_len = q_len + 1;
+    } else {
+        dp_offset = 0;
     }
-    let qh = limbs_cmp_same_length(
-        &ns[np_offset - d_len..np_offset],
-        &ds[dp_offset..dp_offset + d_len],
-    ) >= Ordering::Equal;
-    if qh {
+    let highest_q = limbs_cmp_same_length(&ns[n_len - d_len..], &ds[dp_offset..dp_offset + d_len])
+        >= Ordering::Equal;
+    if highest_q {
         limbs_sub_same_length_in_place_left(
-            &mut ns[np_offset - d_len..np_offset],
+            &mut ns[n_len - d_len..],
             &ds[dp_offset..dp_offset + d_len],
         );
     }
     let mut qp_offset = q_len;
-    let dn_was_at_least_2 = d_len >= 2;
     // offset d_len by 2 for main division loops, saving two iterations in mpn_submul_1
-    let dn = isize::checked_from(d_len).unwrap() - 2;
-    let d1 = ds[usize::checked_from(isize::checked_from(dp_offset + 1).unwrap() + dn).unwrap()];
-    let d0 = ds[usize::checked_from(isize::checked_from(dp_offset).unwrap() + dn).unwrap()];
-    np_offset -= 2;
-    let mut n1 = ns[np_offset + 1];
+    let dn = d_len - 1;
+    let mut ds_shifted = &ds[dp_offset..];
+    let d1 = ds_shifted[dn];
+    let d0 = ds[dp_offset + dn - 1];
+    let mut n1 = ns[n_len - 1];
+    let mut np_offset = n_len - 2;
     let mut q;
     let mut n0;
-    for _ in 0..(isize::checked_from(q_len).unwrap() - dn - 1) {
+    for _ in 0..q_len - dn {
         np_offset -= 1;
         if n1 == d1 && ns[np_offset + 1] == d0 {
             q = Limb::MAX;
             limbs_sub_mul_limb_same_length_in_place_left(
-                &mut ns[usize::checked_from(isize::checked_from(np_offset).unwrap() - dn).unwrap()
-                    ..np_offset + 2],
-                &ds[dp_offset
-                    ..usize::checked_from(isize::checked_from(dp_offset + 2).unwrap() + dn)
-                        .unwrap()],
+                &mut ns[np_offset + 1 - dn..np_offset + 2],
+                &ds_shifted[..dn + 1],
                 q,
             );
             n1 = ns[np_offset + 1]; // update n1, last loop's value will now be invalid
@@ -659,10 +646,8 @@ pub fn _limbs_div_mod_schoolbook_approx(
             n1 = new_n1;
             n0 = new_n0;
             let mut cy = limbs_sub_mul_limb_same_length_in_place_left(
-                &mut ns[usize::checked_from(isize::checked_from(np_offset).unwrap() - dn).unwrap()
-                    ..np_offset],
-                &ds[dp_offset
-                    ..usize::checked_from(isize::checked_from(dp_offset).unwrap() + dn).unwrap()],
+                &mut ns[np_offset + 1 - dn..np_offset],
+                &ds_shifted[..dn - 1],
                 q,
             );
             let cy1 = if n0 < cy { 1 } else { 0 };
@@ -671,55 +656,45 @@ pub fn _limbs_div_mod_schoolbook_approx(
             n1.wrapping_sub_assign(cy1);
             ns[np_offset] = n0;
             if cy != 0 {
-                n1.wrapping_add_assign(
-                    d1.wrapping_add(
-                        if limbs_slice_add_same_length_in_place_left(
-                            &mut ns[usize::checked_from(
-                                isize::checked_from(np_offset).unwrap() - dn,
-                            )
-                            .unwrap()..np_offset + 1],
-                            &ds[dp_offset
-                                ..usize::checked_from(
-                                    isize::checked_from(dp_offset + 1).unwrap() + dn,
-                                )
-                                .unwrap()],
-                        ) {
-                            1
-                        } else {
-                            0
-                        },
-                    ),
-                );
+                n1.wrapping_add_assign(d1.wrapping_add(
+                    if limbs_slice_add_same_length_in_place_left(
+                        &mut ns[np_offset + 1 - dn..np_offset + 1],
+                        &ds_shifted[..dn],
+                    ) {
+                        1
+                    } else {
+                        0
+                    },
+                ));
                 q -= 1;
             }
         }
         qp_offset -= 1;
         qs[qp_offset] = q;
     }
-
-    let mut flag = Limb::MAX;
-    if dn_was_at_least_2 {
-        let mut dn = usize::checked_from(dn).unwrap();
+    let mut flag = true;
+    if dn >= 1 {
+        let mut dn = dn - 1;
         let limit = dn;
         for _ in 0..limit {
             np_offset -= 1;
-            if n1 >= (d1 & flag) {
+            if !flag || n1 >= d1 {
                 q = Limb::MAX;
                 let cy = limbs_sub_mul_limb_same_length_in_place_left(
                     &mut ns[np_offset - dn..np_offset + 2],
-                    &ds[dp_offset..dp_offset + dn + 2],
+                    &ds_shifted[..dn + 2],
                     q,
                 );
                 if n1 != cy {
                     // TODO This branch is untested!
-                    if n1 < (cy & flag) {
+                    if flag && n1 < cy {
                         q.wrapping_sub_assign(1);
                         limbs_slice_add_same_length_in_place_left(
                             &mut ns[np_offset - dn..np_offset + 2],
-                            &ds[dp_offset..dp_offset + dn + 2],
+                            &ds_shifted[..dn + 2],
                         );
                     } else {
-                        flag = 0;
+                        flag = false;
                     }
                 }
                 n1 = ns[np_offset + 1];
@@ -736,10 +711,9 @@ pub fn _limbs_div_mod_schoolbook_approx(
                 let (new_n1, new_n0) = new_n.split_in_half();
                 n1 = new_n1;
                 n0 = new_n0;
-
                 let mut cy = limbs_sub_mul_limb_same_length_in_place_left(
                     &mut ns[np_offset - dn..np_offset],
-                    &ds[dp_offset..dp_offset + dn],
+                    &ds_shifted[..dn],
                     q,
                 );
                 let cy1 = if n0 < cy { 1 } else { 0 };
@@ -747,13 +721,12 @@ pub fn _limbs_div_mod_schoolbook_approx(
                 cy = if n1 < cy1 { 1 } else { 0 };
                 n1.wrapping_sub_assign(cy1);
                 ns[np_offset] = n0;
-
                 if cy != 0 {
                     // TODO This branch is untested!
                     n1.wrapping_add_assign(d1.wrapping_add(
                         if limbs_slice_add_same_length_in_place_left(
-                            &mut ns[np_offset - dn..=np_offset],
-                            &ds[dp_offset..=dp_offset + dn],
+                            &mut ns[np_offset - dn..np_offset + 1],
+                            &ds_shifted[..dn + 1],
                         ) {
                             1
                         } else {
@@ -765,33 +738,26 @@ pub fn _limbs_div_mod_schoolbook_approx(
             }
             qp_offset -= 1;
             qs[qp_offset] = q;
-
             // Truncate operands.
             dn -= 1;
-            dp_offset += 1;
+            ds_shifted = &ds_shifted[1..];
         }
         np_offset -= 1;
-        if n1 >= (d1 & flag) {
+        if !flag || n1 >= d1 {
             q = Limb::MAX;
             let cy = limbs_sub_mul_limb_same_length_in_place_left(
                 &mut ns[np_offset..np_offset + 2],
-                &ds[dp_offset..dp_offset + 2],
+                &ds_shifted[..2],
                 q,
             );
-            if n1 != cy && n1 < (cy & flag) {
+            if flag && n1 < cy {
                 // TODO This branch is untested!
                 q.wrapping_sub_assign(1);
-                let old_np0 = ns[np_offset];
-                let old_np1 = ns[np_offset + 1];
-                let (np_lo, np_hi) = ns.split_at_mut(np_offset + 1);
-                add_ssaaaa(
-                    &mut np_hi[0],
-                    &mut np_lo[np_offset],
-                    old_np1,
-                    old_np0,
-                    ds[dp_offset + 1],
-                    ds[dp_offset],
-                );
+                let (n_hi, n_lo) = DoubleLimb::join_halves(ns[np_offset + 1], ns[np_offset])
+                    .wrapping_add(DoubleLimb::join_halves(ds_shifted[1], ds_shifted[0]))
+                    .split_in_half();
+                ns[np_offset + 1] = n_hi;
+                ns[np_offset] = n_lo;
             }
             n1 = ns[np_offset + 1];
         } else {
@@ -814,7 +780,7 @@ pub fn _limbs_div_mod_schoolbook_approx(
         qs[qp_offset] = q;
     }
     assert_eq!(ns[np_offset + 1], n1);
-    qh
+    highest_q
 }
 
 //TODO tune
