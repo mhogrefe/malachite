@@ -1018,118 +1018,67 @@ pub fn _limbs_div_mod_divide_and_conquer_approx(
     highest_q
 }
 
-//TODO test
-// checked
-// docs preserved
-// In case k == 0 (automatic choice), we distinguish 3 cases:
-// (a) dn < qn:           in = ceil(qn / ceil(qn / dn))
-// (b) dn / 3 < qn <= dn: in = ceil(qn / 2)
-// (c) qn < dn / 3:       in = qn
-// In all cases we have in <= dn.
-// mpn_mu_div_qr_choose_in from mpn/generic/mu_div_qr.c
-pub fn mpn_mu_div_qr_choose_in(qn: usize, dn: usize, k: Limb) -> usize {
-    if k == 0 {
-        if qn > dn {
-            // Compute an inverse size that is a nice partition of the quotient.
-            let b = (qn - 1) / dn + 1; // ceil(qn / dn), number of blocks
-            (qn - 1) / b + 1 // ceil(qn / b) = ceil(qn / ceil(qn / dn))
-        } else if 3 * qn > dn {
-            (qn - 1) / 2 + 1 // b = 2
-        } else {
-            (qn - 1) + 1 // b = 1
-        }
-    } else {
-        let xn = min(dn, qn);
-        (xn - 1) / usize::checked_from(k).unwrap() + 1
-    }
-}
-
-//TODO test
-// checked
-// docs preserved
-// mpn_preinv_mu_div_qr_itch from mpn/generic/mu_div_qr.c
-pub fn mpn_preinv_mu_div_qr_itch(dn: usize, in_size: usize) -> usize {
-    let itch_local = _limbs_mul_mod_limb_width_to_n_minus_1_next_size(dn + 1);
-    let itch_out = _limbs_mul_mod_limb_width_to_n_minus_1_scratch_size(itch_local, dn, in_size);
-    itch_local + itch_out
-}
-
-//TODO test
-// checked
-// docs preserved
-// mpn_invertappr_itch from gmp-impl.h
-pub fn mpn_invertappr_itch(n: usize) -> usize {
-    2 * n
-}
-
-//TODO test
-// checked
-// docs preserved
-// mpn_mu_div_qr_itch from mpn/generic/mu_div_qr.c
-pub fn mpn_mu_div_qr_itch(nn: usize, dn: usize, mua_k: Limb) -> usize {
-    let in_size = mpn_mu_div_qr_choose_in(nn - dn, dn, mua_k);
-    let itch_preinv = mpn_preinv_mu_div_qr_itch(dn, in_size);
-    let itch_invapp = mpn_invertappr_itch(in_size + 1) + in_size + 2; // 3 * in_size + 4
-
-    assert!(itch_preinv >= itch_invapp);
-    in_size + max(itch_invapp, itch_preinv)
-}
-
 //TODO tune
 const MAYBE_DCP1_DIVAPPR: bool = true;
 
-//TODO test
-// docs preserved
-// mpn_bc_invertappr (ip, dp, scratch), takes the strictly normalised value dp (i.e., most
-// significant bit must be set) as an input, and computes ip of length n: the approximate reciprocal
-// of dp.
-//
-// Let e = mpn_bc_invertappr(ip, dp, scratch) be the returned value; the following conditions are
-// satisfied by the output:
-//   a) 0 <= e <= 1
-//   b) dp * (B ^ n + ip) < B ^ {2n} <= dp * (B ^ n + ip + 1 + e)
-//      i.e. e=0 means that the result ip equals the one given by mpn_invert. e=1 means that the
-//      result may be one less than expected. e=1 most of the time.
-//
-// When the strict result is needed, i.e., e = 0 in the relation above:
-//   dp * (B ^ n + ip) < B ^ {2n} <= dp * (B ^ n + ip + 1)
-// the function mpn_invert(ip, dp, scratch) should be used instead.
-// mpn_bc_invertappr from mpn/generic/invertappr.c
-pub fn mpn_bc_invertappr(ip: &mut [Limb], dp: &[Limb], xp: &mut [Limb]) -> Limb {
-    let n = dp.len();
-    assert_ne!(n, 0);
-    assert!(dp[n - 1].get_highest_bit());
-
-    // Compute a base value of r limbs.
-    if n == 1 {
-        ip[0] = (DoubleLimb::join_halves(!dp[0], Limb::MAX) / DoubleLimb::from(dp[0])).lower_half()
+/// Takes the strictly normalised value ds (i.e., most significant bit must be set) as an input, and
+/// computes the approximate reciprocal of ds, with the same length of ds.
+///
+/// Let result_definitely_exact = _limbs_invert_basecase_approx(is, ds, scratch) be the returned
+/// value. If result_definitely_exact is `true`, the error e is 0; otherwise, it may be 0 or 1. The
+/// following condition is satisfied by the output:
+///
+/// ds * (2 ^ (n * Limb::WIDTH) + is) < 2 ^ (2 * n * Limb::WIDTH) <=
+/// ds * (2 ^ (n * Limb::WIDTH) + is + 1 + e),
+/// where n = `ds.len()`.
+///
+/// When the strict result is needed, i.e., e = 0 in the relation above, the function mpn_invert
+/// (TODO!) should be used instead.
+///
+/// Time: worst case O(n * log(n) ^ 2 * log(log(n)))
+///
+/// Additional memory: worst case O(n * log(n) ^ 2)
+///
+/// where n = `ds.len()`
+///
+/// # Panics
+/// Panics if `ds` is empty, `is` is shorter than `ds`, `scratch` is shorter than twice the length
+/// of `ds`, or the last limb of `ds` does not have its highest bit set.
+///
+/// This is mpn_bc_invertappr from mpn/generic/invertappr.c, where the return value is `true` iff
+/// the return value of mpn_bc_invertappr would be 0.
+pub fn _limbs_invert_basecase_approx(is: &mut [Limb], ds: &[Limb], scratch: &mut [Limb]) -> bool {
+    let d_len = ds.len();
+    assert_ne!(d_len, 0);
+    let highest_d = ds[d_len - 1];
+    assert!(highest_d.get_highest_bit());
+    if d_len == 1 {
+        let d = ds[0];
+        is[0] = (DoubleLimb::join_halves(!d, Limb::MAX) / DoubleLimb::from(d)).lower_half()
     } else {
-        // n > 1 here
-        let mut i = n;
-        loop {
-            i -= 1;
-            xp[i] = Limb::MAX;
-            if i == 0 {
-                break;
+        let scratch = &mut scratch[..d_len << 1];
+        {
+            let (scratch_lo, scratch_hi) = scratch.split_at_mut(d_len);
+            for s in scratch_lo.iter_mut() {
+                *s = Limb::MAX;
             }
+            limbs_not_to_out(scratch_hi, ds);
         }
-        limbs_not_to_out(&mut xp[n..], &dp[..n]);
-
-        // Now xp contains B ^ 2n - dp * B ^ n - 1
-        if n == 2 {
-            limbs_div_mod_by_two_limb(ip, &mut xp[..4], dp);
+        // Now scratch contains 2 ^ (2 * d_len * Limb::WIDTH) - d * 2 ^ (d_len * Limb::WIDTH) - 1
+        if d_len == 2 {
+            limbs_div_mod_by_two_limb(is, scratch, ds);
         } else {
-            let inv = limbs_two_limb_inverse_helper(dp[n - 1], dp[n - 2]);
-            if !MAYBE_DCP1_DIVAPPR || n < DC_DIVAPPR_Q_THRESHOLD {
-                _limbs_div_mod_schoolbook_approx(ip, &mut xp[..2 * n], &dp[..n], inv);
+            let inverse = limbs_two_limb_inverse_helper(highest_d, ds[d_len - 2]);
+            if !MAYBE_DCP1_DIVAPPR || d_len < DC_DIVAPPR_Q_THRESHOLD {
+                _limbs_div_mod_schoolbook_approx(is, scratch, ds, inverse);
             } else {
-                _limbs_div_mod_divide_and_conquer_approx(ip, &mut xp[..2 * n], &dp[..n], inv);
+                _limbs_div_mod_divide_and_conquer_approx(is, scratch, ds, inverse);
             }
-            assert!(!limbs_sub_limb_in_place(&mut ip[..n], 1));
-            return 1;
+            assert!(!limbs_sub_limb_in_place(&mut is[..d_len], 1));
+            return false;
         }
     }
-    0
+    true
 }
 
 //TODO tune all
@@ -1188,7 +1137,7 @@ pub fn mpn_ni_invertappr(ip: &mut [Limb], dp: &[Limb], scratch: &mut [Limb]) -> 
     let ip_offset = n;
 
     // Compute a base value of rn limbs.
-    mpn_bc_invertappr(
+    _limbs_invert_basecase_approx(
         &mut ip[ip_offset - rn..],
         &dp[dp_offset - rn..dp_offset],
         scratch,
@@ -1379,12 +1328,72 @@ fn mpn_invertappr(ip: &mut [Limb], dp: &[Limb], scratch: &mut [Limb]) -> Limb {
     let n = dp.len();
     assert_ne!(n, 0);
     assert!(dp.last().unwrap().get_highest_bit());
-
     if n < INV_NEWTON_THRESHOLD {
-        mpn_bc_invertappr(ip, dp, scratch)
+        if _limbs_invert_basecase_approx(ip, dp, scratch) {
+            0
+        } else {
+            1
+        }
     } else {
         mpn_ni_invertappr(ip, dp, scratch)
     }
+}
+
+//TODO test
+// checked
+// docs preserved
+// In case k == 0 (automatic choice), we distinguish 3 cases:
+// (a) dn < qn:           in = ceil(qn / ceil(qn / dn))
+// (b) dn / 3 < qn <= dn: in = ceil(qn / 2)
+// (c) qn < dn / 3:       in = qn
+// In all cases we have in <= dn.
+// mpn_mu_div_qr_choose_in from mpn/generic/mu_div_qr.c
+pub fn mpn_mu_div_qr_choose_in(qn: usize, dn: usize, k: Limb) -> usize {
+    if k == 0 {
+        if qn > dn {
+            // Compute an inverse size that is a nice partition of the quotient.
+            let b = (qn - 1) / dn + 1; // ceil(qn / dn), number of blocks
+            (qn - 1) / b + 1 // ceil(qn / b) = ceil(qn / ceil(qn / dn))
+        } else if 3 * qn > dn {
+            (qn - 1) / 2 + 1 // b = 2
+        } else {
+            (qn - 1) + 1 // b = 1
+        }
+    } else {
+        let xn = min(dn, qn);
+        (xn - 1) / usize::checked_from(k).unwrap() + 1
+    }
+}
+
+//TODO test
+// checked
+// docs preserved
+// mpn_preinv_mu_div_qr_itch from mpn/generic/mu_div_qr.c
+pub fn mpn_preinv_mu_div_qr_itch(dn: usize, in_size: usize) -> usize {
+    let itch_local = _limbs_mul_mod_limb_width_to_n_minus_1_next_size(dn + 1);
+    let itch_out = _limbs_mul_mod_limb_width_to_n_minus_1_scratch_size(itch_local, dn, in_size);
+    itch_local + itch_out
+}
+
+//TODO test
+// checked
+// docs preserved
+// mpn_invertappr_itch from gmp-impl.h
+pub fn mpn_invertappr_itch(n: usize) -> usize {
+    2 * n
+}
+
+//TODO test
+// checked
+// docs preserved
+// mpn_mu_div_qr_itch from mpn/generic/mu_div_qr.c
+pub fn mpn_mu_div_qr_itch(nn: usize, dn: usize, mua_k: Limb) -> usize {
+    let in_size = mpn_mu_div_qr_choose_in(nn - dn, dn, mua_k);
+    let itch_preinv = mpn_preinv_mu_div_qr_itch(dn, in_size);
+    let itch_invapp = mpn_invertappr_itch(in_size + 1) + in_size + 2; // 3 * in_size + 4
+
+    assert!(itch_preinv >= itch_invapp);
+    in_size + max(itch_invapp, itch_preinv)
 }
 
 pub fn mpn_mu_div_qr2(

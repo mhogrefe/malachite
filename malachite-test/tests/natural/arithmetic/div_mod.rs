@@ -7,8 +7,8 @@ use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::JoinHalves;
 use malachite_nz::natural::arithmetic::div_mod::{
     _limbs_div_mod_divide_and_conquer, _limbs_div_mod_divide_and_conquer_approx,
-    _limbs_div_mod_schoolbook, _limbs_div_mod_schoolbook_approx, limbs_div_mod_by_two_limb,
-    limbs_div_mod_three_limb_by_two_limb, limbs_two_limb_inverse_helper,
+    _limbs_div_mod_schoolbook, _limbs_div_mod_schoolbook_approx, _limbs_invert_basecase_approx,
+    limbs_div_mod_by_two_limb, limbs_div_mod_three_limb_by_two_limb, limbs_two_limb_inverse_helper,
 };
 #[cfg(not(feature = "32_bit_limbs"))]
 use malachite_nz::natural::arithmetic::div_mod::{mpn_ni_invertappr, mpn_tdiv_qr};
@@ -21,7 +21,7 @@ use malachite_test::inputs::base::{
     pairs_of_unsigneds_var_2, quadruples_of_three_unsigned_vecs_and_unsigned_var_1,
     quadruples_of_three_unsigned_vecs_and_unsigned_var_2,
     quadruples_of_three_unsigned_vecs_and_unsigned_var_3, sextuples_of_limbs_var_1,
-    triples_of_unsigned_vec_var_37,
+    triples_of_unsigned_vec_var_37, triples_of_unsigned_vec_var_38,
 };
 use malachite_test::inputs::natural::{
     naturals, pairs_of_natural_and_positive_natural, pairs_of_natural_and_positive_natural_var_1,
@@ -1502,7 +1502,7 @@ fn limbs_div_mod_divide_and_conquer_fail_2() {
 fn limbs_div_mod_divide_and_conquer_fail_3() {
     let ds = &[3, 4, 5, 6, 7, 0x8000_0000];
     let inverse = limbs_two_limb_inverse_helper(ds[ds.len() - 1], ds[ds.len() - 2]);
-    _limbs_div_mod_divide_and_conquer(&mut [10; 2], &mut [1, 2, 3, 4, 5, 6, 7, 8, 9], ds, inverse);
+    _limbs_div_mod_divide_and_conquer(&mut [10, 10], &mut [1, 2, 3, 4, 5, 6, 7, 8, 9], ds, inverse);
 }
 
 #[test]
@@ -5036,7 +5036,7 @@ fn limbs_div_mod_divide_and_conquer_approx_fail_3() {
     let ds = &[3, 4, 5, 6, 7, 0x8000_0000];
     let inverse = limbs_two_limb_inverse_helper(ds[ds.len() - 1], ds[ds.len() - 2]);
     _limbs_div_mod_divide_and_conquer_approx(
-        &mut [10; 2],
+        &mut [10, 10],
         &mut [1, 2, 3, 4, 5, 6, 7, 8, 9],
         ds,
         inverse,
@@ -5054,6 +5054,129 @@ fn limbs_div_mod_divide_and_conquer_approx_fail_4() {
         ds,
         inverse,
     );
+}
+
+fn verify_limbs_invert_approx(
+    is_in: &[Limb],
+    ds: &[Limb],
+    result_definitely_exact: bool,
+    is_out: &[Limb],
+) {
+    let d = Natural::from_limbs_asc(ds);
+    let n = ds.len();
+    let bits = n << Limb::LOG_WIDTH;
+    let product = Natural::ONE << (bits << 1);
+    //TODO compare to limbs_invert
+    let mut expected_i = (&product - 1 as Limb).div_mod(&d).0;
+    let offset = Natural::ONE << bits;
+    expected_i -= &offset;
+    let i = Natural::from_limbs_asc(&is_out[..n]);
+    let x = (&i + &offset) * &d;
+    let result_exact = i == expected_i;
+    if result_definitely_exact {
+        assert!(result_exact);
+    }
+    let y = if result_exact {
+        assert_eq!(i, expected_i);
+        (i + offset + 1 as Limb) * d
+    } else {
+        assert_eq!(&i + 1 as Limb, expected_i);
+        (i + offset + 2 as Limb) * d
+    };
+    assert!(x < product);
+    assert!(product <= y);
+    assert_eq!(&is_in[n..], &is_out[n..]);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+fn test_limbs_invert_basecase_approx() {
+    let test = |is_in: &[Limb], ds: &[Limb], result_definitely_exact, is_out: &[Limb]| {
+        let mut is = is_in.to_vec();
+        let mut scratch = vec![0; is_in.len() << 1];
+        assert_eq!(
+            _limbs_invert_basecase_approx(&mut is, ds, &mut scratch),
+            result_definitely_exact
+        );
+        assert_eq!(is, is_out);
+        verify_limbs_invert_approx(is_in, ds, result_definitely_exact, &is);
+    };
+    // d_len == 1
+    test(&[10; 3], &[0x8000_0000], true, &[4294967295, 10, 10]);
+    // d_len == 2
+    test(
+        &[10; 3],
+        &[0, 0x8000_0000],
+        true,
+        &[4294967295, 4294967295, 10],
+    );
+    // d_len > 2
+    // !MAYBE_DCP1_DIVAPPR || d_len < DC_DIVAPPR_Q_THRESHOLD
+    test(
+        &[10; 3],
+        &[1, 2, 0x8000_0000],
+        false,
+        &[4294967291, 4294967287, 4294967295],
+    );
+    // !(!MAYBE_DCP1_DIVAPPR || d_len < DC_DIVAPPR_Q_THRESHOLD)
+    let mut ds = vec![123; 175];
+    ds.push(0x8000_0000);
+    test(
+        &[10; 176],
+        &ds,
+        false,
+        &[
+            2468656776, 458964117, 2715468315, 1790012879, 3522999749, 4214715874, 561506786,
+            3302400720, 534918344, 1263272887, 3075782921, 2067555491, 746647830, 518406956,
+            2268770356, 199166681, 585200343, 2568074090, 496918528, 707408551, 2864167181,
+            2697486675, 365965986, 566676423, 4243405542, 2529073250, 1738952834, 695156794,
+            4116132056, 240876219, 2603129425, 2192004736, 1342688443, 2964614325, 4249182840,
+            2414593720, 2593965601, 2916418334, 2637652497, 994042154, 3834346320, 2159029599,
+            988365118, 3644217481, 1407533479, 654358021, 2493606292, 4023096448, 1141066521,
+            983459780, 3892764635, 2438657556, 46466645, 374378413, 979049107, 3284790741,
+            3990074329, 928205488, 3007997859, 3046358137, 2915845116, 628001258, 3465083935,
+            4236663285, 474535350, 2027435145, 3567992797, 4283770508, 2324985479, 376140225,
+            777742614, 1991983228, 354120270, 1512293869, 1872844204, 2864777182, 1662657829,
+            3120313116, 1367744326, 3903740266, 1092780358, 4056570813, 2945196325, 187533600,
+            931587688, 2394937291, 1507441207, 345576625, 1601524905, 476504330, 1269949561,
+            3390313417, 881580197, 1002436463, 2217811800, 685849999, 185823896, 1272490189,
+            3967659522, 3205992619, 2860215323, 3472978514, 1224636072, 305126296, 1759643037,
+            3515215216, 4075133951, 1224421257, 774076486, 3594767960, 1443121990, 2854565002,
+            2031006704, 3471036315, 2258092726, 3015513815, 1591867662, 2298829418, 2586837892,
+            4173923545, 3288784297, 1655027454, 674268161, 118227690, 4135574019, 3420877922,
+            3419101194, 2933141174, 801148518, 2138817011, 4265486539, 2610068278, 3432736337,
+            4263393041, 3163494866, 1217674034, 638081175, 1411840480, 38063796, 989590891,
+            457807629, 1412034828, 1103809621, 2233526783, 1436248111, 1917272861, 1485988800,
+            1517198661, 126869, 2315908856, 3274287261, 3670331343, 473008784, 1471036169,
+            231026838, 3870905408, 2284494418, 3904415704, 3550806025, 1919076393, 1355185851,
+            1830925510, 1032027683, 3523514211, 219638593, 1697572843, 1874144044, 3230672849,
+            2851366658, 4206129317, 4265556027, 241571, 120540, 4294966804, 4294966803, 4294967295,
+        ],
+    );
+}
+
+#[test]
+#[should_panic]
+fn limbs_invert_basecase_approx_fail_1() {
+    _limbs_invert_basecase_approx(&mut [10; 3], &[1], &mut [10, 10]);
+}
+
+#[test]
+#[should_panic]
+fn limbs_invert_basecase_approx_fail_2() {
+    _limbs_invert_basecase_approx(&mut [10; 3], &[1, 0x8000_0000], &mut [10; 3]);
+}
+
+#[test]
+#[should_panic]
+fn limbs_invert_basecase_approx_fail_3() {
+    _limbs_invert_basecase_approx(&mut [10; 3], &[], &mut [10; 3]);
+}
+
+#[test]
+#[should_panic]
+fn limbs_invert_basecase_approx_fail_4() {
+    _limbs_invert_basecase_approx(&mut [10; 1], &[1, 0x8000_0000], &mut [10; 4]);
 }
 
 #[cfg(not(feature = "32_bit_limbs"))]
@@ -16360,6 +16483,20 @@ fn limbs_div_mod_divide_and_conquer_approx_properties() {
             let q_highest =
                 _limbs_div_mod_divide_and_conquer_approx(&mut qs, &mut ns, ds, *inverse);
             verify_limbs_div_mod_approx(qs_in, ns_in, ds, q_highest, &qs);
+        },
+    );
+}
+
+#[test]
+fn limbs_invert_basecase_approx_properties() {
+    test_properties_custom_scale(
+        128,
+        triples_of_unsigned_vec_var_38,
+        |(ref is_in, ref ds, ref scratch_in)| {
+            let mut is = is_in.clone();
+            let mut scratch = scratch_in.clone();
+            let result_definitely_exact = _limbs_invert_basecase_approx(&mut is, ds, &mut scratch);
+            verify_limbs_invert_approx(is_in, ds, result_definitely_exact, &is);
         },
     );
 }
