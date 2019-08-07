@@ -2070,27 +2070,66 @@ pub fn triples_of_unsigned_vec_var_37<T: PrimitiveUnsigned + Rand>(
 }
 
 // All triples of `Vec<T>`, where `T` is unsigned, the first `Vec` is at least as long as the
-// second, and the third is at least as long as twice the length of the second.
+// second, the third is at least as long as twice the length of the second, and the second is
+// nonempty and its most significant bit is set.
 pub fn triples_of_unsigned_vec_var_38(gm: GenerationMode) -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>)> {
     let qs: It<(Vec<Limb>, Vec<Limb>, Vec<Limb>, Limb)> = match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_quadruples(
             exhaustive_vecs(exhaustive_unsigned()),
-            exhaustive_vecs(exhaustive_unsigned()),
+            exhaustive_vecs_min_length(2, exhaustive_unsigned()),
             exhaustive_vecs(exhaustive_unsigned()),
             range_up_increasing(1 << (Limb::WIDTH - 1)),
         )),
         GenerationMode::Random(scale) => Box::new(random_quadruples(
             &EXAMPLE_SEED,
             &(|seed| random_vecs(seed, scale, &(|seed_2| random(seed_2)))),
-            &(|seed| random_vecs(seed, scale, &(|seed_2| random(seed_2)))),
+            &(|seed| random_vecs_min_length(seed, scale, 2, &(|seed_2| random(seed_2)))),
             &(|seed| random_vecs(seed, scale, &(|seed_2| random(seed_2)))),
             &(|seed| random_range_up(seed, 1 << (Limb::WIDTH - 1))),
         )),
         GenerationMode::SpecialRandom(scale) => Box::new(random_quadruples(
             &EXAMPLE_SEED,
             &(|seed| special_random_unsigned_vecs(seed, scale)),
+            &(|seed| special_random_unsigned_vecs_min_length(seed, scale, 2)),
             &(|seed| special_random_unsigned_vecs(seed, scale)),
+            &(|seed| random_range_up(seed, 1 << (Limb::WIDTH - 1))),
+        )),
+    };
+    Box::new(
+        qs.filter(|&(ref j, ref scratch, ref d_init, _)| {
+            let ds_len = d_init.len() + 1;
+            j.len() >= ds_len && scratch.len() >= ds_len << 1
+        })
+        .map(|(i, scratch, mut d_init, d_last)| {
+            d_init.push(d_last);
+            (i, d_init, scratch)
+        }),
+    )
+}
+
+// All triples of `Vec<T>`, where `T` is unsigned, the first `Vec` is at least as long as the
+// second, the third is at least as long as twice the length of the second, and the second has
+// length at least 5 and its most significant bit is set.
+pub fn triples_of_unsigned_vec_var_39(gm: GenerationMode) -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>)> {
+    let qs: It<(Vec<Limb>, Vec<Limb>, Vec<Limb>, Limb)> = match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_quadruples(
+            exhaustive_vecs(exhaustive_unsigned()),
+            exhaustive_vecs_min_length(10, exhaustive_unsigned()),
+            exhaustive_vecs_min_length(4, exhaustive_unsigned()),
+            range_up_increasing(1 << (Limb::WIDTH - 1)),
+        )),
+        GenerationMode::Random(scale) => Box::new(random_quadruples(
+            &EXAMPLE_SEED,
+            &(|seed| random_vecs(seed, scale, &(|seed_2| random(seed_2)))),
+            &(|seed| random_vecs_min_length(seed, scale, 10, &(|seed_2| random(seed_2)))),
+            &(|seed| random_vecs_min_length(seed, scale, 4, &(|seed_2| random(seed_2)))),
+            &(|seed| random_range_up(seed, 1 << (Limb::WIDTH - 1))),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_quadruples(
+            &EXAMPLE_SEED,
             &(|seed| special_random_unsigned_vecs(seed, scale)),
+            &(|seed| special_random_unsigned_vecs_min_length(seed, scale, 10)),
+            &(|seed| special_random_unsigned_vecs_min_length(seed, scale, 4)),
             &(|seed| random_range_up(seed, 1 << (Limb::WIDTH - 1))),
         )),
     };

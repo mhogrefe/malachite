@@ -1093,36 +1093,35 @@ fn npows() -> usize {
     }) - usize::checked_from(INV_NEWTON_THRESHOLD.ceiling_log_two()).unwrap()
 }
 
-// Computes the approximate reciprocal using Newton's iterations (at least one).
-//
-// Inspired by Algorithm "ApproximateReciprocal", published in "Modern Computer Arithmetic" by
-// Richard P. Brent and Paul Zimmermann, algorithm 3.5, page 121 in version 0.4 of the book.
-//
-// Some adaptations were introduced, to allow product mod B ^ m - 1 and return the value e.
-//
-// We introduced a correction in such a way that "the value of B ^ {n + h} - T computed at step 8
-// cannot exceed B ^ n - 1" (the book reads "2B ^ n - 1").
-//
-// Maximum scratch needed by this branch <= 2 * n, but have to fit 3 * rn in the scratch, i.e.
-// 3 * rn <= 2 * n: we require n > 4.
-//
-// We use a wrapped product modulo B ^ m - 1. NOTE: is there any normalisation problem for the [0]
-// class? It shouldn't: we compute 2 * |A * X_h - B ^ {n + h}| < B ^ m - 1. We may get [0] if and
-// only if we get AX_h = B ^ {n + h}. This can happen only if A = B ^ {n} / 2, but this implies
-// X_h = B ^ {h} * 2 - 1 i.e., AX_h = B ^ {n + h} - A, then we get into the "negative" branch, where
-// X_h is not incremented (because A < B ^ n).
-// mpn_ni_invertappr from mpn/generic/invertappr.c
-pub fn mpn_ni_invertappr(ip: &mut [Limb], dp: &[Limb], scratch: &mut [Limb]) -> Limb {
-    let mut n = dp.len();
-
-    assert!(n > 4);
-    assert!(dp[n - 1].get_highest_bit());
+/// Computes the approximate reciprocal using Newton's iterations (at least one).
+///
+/// Inspired by Algorithm "ApproximateReciprocal", published in "Modern Computer Arithmetic" by
+/// Richard P. Brent and Paul Zimmermann, algorithm 3.5, page 121 in version 0.4 of the book.
+///
+/// Some adaptations were introduced, to allow product mod B ^ m - 1 and return the value e.
+///
+/// We introduced a correction in such a way that "the value of B ^ {n + h} - T computed at step 8
+/// cannot exceed B ^ n - 1" (the book reads "2B ^ n - 1").
+///
+/// Maximum scratch needed by this branch <= 2 * n, but have to fit 3 * rn in the scratch, i.e.
+/// 3 * rn <= 2 * n: we require n > 4.
+///
+/// We use a wrapped product modulo B ^ m - 1. NOTE: is there any normalisation problem for the [0]
+/// class? It shouldn't: we compute 2 * |A * X_h - B ^ {n + h}| < B ^ m - 1. We may get [0] if and
+/// only if we get AX_h = B ^ {n + h}. This can happen only if A = B ^ {n} / 2, but this implies
+/// X_h = B ^ {h} * 2 - 1 i.e., AX_h = B ^ {n + h} - A, then we get into the "negative" branch,
+/// where X_h is not incremented (because A < B ^ n).
+///
+/// This is mpn_ni_invertappr from mpn/generic/invertappr.c.
+pub fn _limbs_invert_newton_approx(is: &mut [Limb], ds: &[Limb], scratch: &mut [Limb]) -> bool {
+    let mut d_len = ds.len();
+    assert!(d_len > 4);
+    assert!(ds[d_len - 1].get_highest_bit());
     let mut sizes = vec![0; npows()];
     let mut sizp = 0;
-
     // Compute the computation precisions from highest to lowest, leaving the base case size in
     // 'rn'.
-    let mut rn = n;
+    let mut rn = d_len;
     loop {
         sizes[sizp] = rn;
         rn = (rn >> 1) + 1;
@@ -1131,82 +1130,81 @@ pub fn mpn_ni_invertappr(ip: &mut [Limb], dp: &[Limb], scratch: &mut [Limb]) -> 
             break;
         }
     }
-
-    // We search the inverse of 0.dp, we compute it as 1.ip
-    let dp_offset = n;
-    let ip_offset = n;
-
+    // We search the inverse of 0.ds, we compute it as 1.is
+    let dp_offset = d_len;
+    let ip_offset = d_len;
     // Compute a base value of rn limbs.
     _limbs_invert_basecase_approx(
-        &mut ip[ip_offset - rn..],
-        &dp[dp_offset - rn..dp_offset],
+        &mut is[ip_offset - rn..],
+        &ds[dp_offset - rn..dp_offset],
         scratch,
     );
-
     let mut tp = vec![];
     let mut mn = 0;
-    if n >= INV_MULMOD_BNM1_THRESHOLD {
-        mn = _limbs_mul_mod_limb_width_to_n_minus_1_next_size(n + 1);
-        tp = vec![0; _limbs_mul_mod_limb_width_to_n_minus_1_scratch_size(mn, n, (n >> 1) + 1)];
+    if d_len >= INV_MULMOD_BNM1_THRESHOLD {
+        mn = _limbs_mul_mod_limb_width_to_n_minus_1_next_size(d_len + 1);
+        tp = vec![
+            0;
+            _limbs_mul_mod_limb_width_to_n_minus_1_scratch_size(mn, d_len, (d_len >> 1) + 1)
+        ];
     }
     // Use Newton's iterations to get the desired precision.
-
     let mut cy;
     loop {
         sizp -= 1;
-        n = sizes[sizp];
+        d_len = sizes[sizp];
         //
-        // v    n  v
+        // v    d_len  v
         // +----+--+
         // ^ rn ^
         //
         // Compute i_jd
-        let condition = if n < INV_MULMOD_BNM1_THRESHOLD {
+        let condition = if d_len < INV_MULMOD_BNM1_THRESHOLD {
             true
         } else {
-            mn = _limbs_mul_mod_limb_width_to_n_minus_1_next_size(n + 1);
-            mn > n + rn
+            mn = _limbs_mul_mod_limb_width_to_n_minus_1_next_size(d_len + 1);
+            mn > d_len + rn
         };
         if condition {
             limbs_mul_greater_to_out(
                 scratch,
-                &dp[dp_offset - n..dp_offset],
-                &ip[ip_offset - rn..ip_offset],
+                &ds[dp_offset - d_len..dp_offset],
+                &is[ip_offset - rn..ip_offset],
             );
             limbs_slice_add_same_length_in_place_left(
-                &mut scratch[rn..],
-                &dp[dp_offset - n..dp_offset - rn + 1],
+                &mut scratch[rn..d_len + 1],
+                &ds[dp_offset - d_len..dp_offset - rn + 1],
             );
             cy = 1;
-        // Remember we truncated, mod B ^ (n + 1)
-        // We computed (truncated) xp of length n + 1 <- 1.ip * 0.dp
+        // Remember we truncated, mod B ^ (d_len + 1)
+        // We computed (truncated) xp of length d_len + 1 <- 1.is * 0.ds
         } else {
             // Use B ^ mn - 1 wraparound
             _limbs_mul_mod_limb_width_to_n_minus_1(
                 scratch,
                 mn,
-                &dp[dp_offset - n..dp_offset],
-                &ip[ip_offset - rn..ip_offset],
+                &ds[dp_offset - d_len..dp_offset],
+                &is[ip_offset - rn..ip_offset],
                 &mut tp,
             );
-            // We computed {xp,mn} <- {ip,rn} * {dp,n} mod (B^mn-1)
-            // We know that 2*|ip*dp + dp*B^rn - B^{rn+n}| < B^mn-1
-            // Add dp*B^rn mod (B^mn-1)
-            assert!(n >= mn - rn);
+            // We computed {xp,mn} <- {is,rn} * {ds,d_len} mod (B^mn-1)
+            // We know that 2*|is*ds + ds*B^rn - B^{rn+d_len}| < B^mn-1
+            // Add ds*B^rn mod (B^mn-1)
+            assert!(d_len >= mn - rn);
             let mut bcy = limbs_slice_add_same_length_in_place_left(
                 &mut scratch[rn..mn],
-                &dp[dp_offset - n..dp_offset - n + mn - rn],
+                &ds[dp_offset - d_len..dp_offset - d_len + mn - rn],
             );
             bcy = _limbs_add_same_length_with_carry_in_in_place_left(
-                &mut scratch[..n - (mn - rn)],
-                &dp[dp_offset - (n - (mn - rn))..dp_offset],
+                &mut scratch[..d_len - (mn - rn)],
+                &ds[dp_offset - (d_len - (mn - rn))..dp_offset],
                 bcy,
             );
             cy = if bcy { 1 } else { 0 };
-            // Subtract B^{rn+n}, maybe only compensate the carry
+            // Subtract B^{rn+d_len}, maybe only compensate the carry
             scratch[mn] = 1; // set a limit for DECR_U
             assert!(!limbs_sub_limb_in_place(
-                &mut scratch[rn + n - mn..mn + 1],
+                &mut scratch[rn + d_len - mn..mn + 1],
                 WrappingSub::wrapping_sub(1, cy)
             ));
             // if DECR_U eroded xp[mn]
@@ -1217,78 +1215,84 @@ pub fn mpn_ni_invertappr(ip: &mut [Limb], dp: &[Limb], scratch: &mut [Limb]) -> 
             ));
             cy = 0; // Remember we are working Mod B^mn-1
         }
-        if scratch[n] < 2 {
+        if scratch[d_len] < 2 {
             // "positive" residue class
-            let mut cy = scratch[n]; // 0 <= cy <= 1 here.
+            let mut cy = scratch[d_len]; // 0 <= cy <= 1 here.
             if cy != 0
                 && !limbs_sub_same_length_in_place_left(
-                    &mut scratch[..n],
-                    &dp[dp_offset - n..dp_offset],
+                    &mut scratch[..d_len],
+                    &ds[dp_offset - d_len..dp_offset],
                 )
             {
+                // TODO This branch is untested!
                 cy += 1;
                 assert!(limbs_sub_same_length_in_place_left(
-                    &mut scratch[..n],
-                    &dp[dp_offset - n..dp_offset]
+                    &mut scratch[..d_len],
+                    &ds[dp_offset - d_len..dp_offset]
                 ));
                 cy += 1;
             } else {
                 cy += 1;
             }
             // 1 <= cy <= 3 here.
-            if limbs_cmp_same_length(&scratch[..n], &dp[dp_offset - n..dp_offset])
+            if limbs_cmp_same_length(&scratch[..d_len], &ds[dp_offset - d_len..dp_offset])
                 == Ordering::Greater
             {
                 assert!(!limbs_sub_same_length_in_place_left(
-                    &mut scratch[..n],
-                    &dp[dp_offset - n..dp_offset]
+                    &mut scratch[..d_len],
+                    &ds[dp_offset - d_len..dp_offset]
                 ));
                 cy += 1;
             }
-            let cmp = limbs_cmp_same_length(&scratch[..n - rn], &dp[dp_offset - n..dp_offset - rn]);
-            let (scratch_lo, scratch_hi) = scratch.split_at_mut(n);
+            let cmp = limbs_cmp_same_length(
+                &scratch[..d_len - rn],
+                &ds[dp_offset - d_len..dp_offset - rn],
+            );
+            let (scratch_lo, scratch_hi) = scratch.split_at_mut(d_len);
             assert!(!_limbs_sub_same_length_with_borrow_in_to_out(
-                &mut scratch_hi[n - rn..],
-                &dp[dp_offset - rn..dp_offset],
-                &scratch_lo[n - rn..],
+                &mut scratch_hi[d_len - rn..],
+                &ds[dp_offset - rn..dp_offset],
+                &scratch_lo[d_len - rn..],
                 cmp == Ordering::Greater
             ));
             assert!(!limbs_sub_limb_in_place(
-                &mut ip[ip_offset - rn..ip_offset],
+                &mut is[ip_offset - rn..ip_offset],
                 cy
             )); // 1 <= cy <= 4 here
         } else {
             // "negative" residue class
-            assert!(scratch[n] >= Limb::MAX - 1);
-            assert!(!limbs_sub_limb_in_place(&mut scratch[..n + 1], cy));
-            if scratch[n] != Limb::MAX {
+            assert!(scratch[d_len] >= Limb::MAX - 1);
+            assert!(!limbs_sub_limb_in_place(&mut scratch[..d_len + 1], cy));
+            if scratch[d_len] != Limb::MAX {
                 assert!(!limbs_slice_add_limb_in_place(
-                    &mut ip[ip_offset - rn..ip_offset],
+                    &mut is[ip_offset - rn..ip_offset],
                     1
                 ));
                 assert!(limbs_slice_add_same_length_in_place_left(
-                    &mut scratch[..n],
-                    &dp[dp_offset - n..dp_offset]
+                    &mut scratch[..d_len],
+                    &ds[dp_offset - d_len..dp_offset]
                 ));
             }
-            let (scratch_lo, scratch_hi) = scratch.split_at_mut(n);
-            limbs_not_to_out(&mut scratch_hi[n - rn..n], &scratch_lo[n - rn..]);
+            let (scratch_lo, scratch_hi) = scratch.split_at_mut(d_len);
+            limbs_not_to_out(
+                &mut scratch_hi[d_len - rn..d_len],
+                &scratch_lo[d_len - rn..],
+            );
         }
-
         // Compute x_ju_j
         {
-            let (scratch_lo, scratch_hi) = scratch.split_at_mut(2 * n - rn);
+            let (scratch_lo, scratch_hi) = scratch.split_at_mut(2 * d_len - rn);
             limbs_mul_same_length_to_out(
                 scratch_lo,
                 &scratch_hi[..rn],
-                &ip[ip_offset - rn..ip_offset],
+                &is[ip_offset - rn..ip_offset],
             );
         }
         {
-            let (scratch_lo, scratch_hi) = scratch.split_at_mut(3 * rn - n);
+            let (scratch_lo, scratch_hi) = scratch.split_at_mut(3 * rn - d_len);
             cy = if limbs_slice_add_same_length_in_place_left(
                 &mut scratch_lo[rn..],
-                &scratch_hi[3 * n - 4 * rn..2 * (n - rn)],
+                &scratch_hi[3 * d_len - 4 * rn..2 * (d_len - rn)],
             ) {
                 1
             } else {
@@ -1296,9 +1300,9 @@ pub fn mpn_ni_invertappr(ip: &mut [Limb], dp: &[Limb], scratch: &mut [Limb]) -> 
             };
         }
         cy = if _limbs_add_same_length_with_carry_in_to_out(
-            &mut ip[ip_offset - n..],
-            &scratch[3 * rn - n..2 * rn],
-            &scratch[n + rn..2 * n],
+            &mut is[ip_offset - d_len..],
+            &scratch[3 * rn - d_len..2 * rn],
+            &scratch[d_len + rn..2 * d_len],
             cy != 0,
         ) {
             1
@@ -1306,36 +1310,32 @@ pub fn mpn_ni_invertappr(ip: &mut [Limb], dp: &[Limb], scratch: &mut [Limb]) -> 
             0
         };
         assert!(!limbs_slice_add_limb_in_place(
-            &mut ip[ip_offset - rn..ip_offset],
+            &mut is[ip_offset - rn..ip_offset],
             cy
         ));
         if sizp == 0 {
             // Get out of the cycle
             // Check for possible carry propagation from below.
-            cy = if scratch[3 * rn - n - 1] > Limb::MAX - 7 {
+            cy = if scratch[3 * rn - d_len - 1] > Limb::MAX - 7 {
                 1
             } else {
                 0
             }; // Be conservative.
             break;
         }
-        rn = n;
+        rn = d_len;
     }
-    cy
+    cy == 0
 }
 
-fn mpn_invertappr(ip: &mut [Limb], dp: &[Limb], scratch: &mut [Limb]) -> Limb {
+fn mpn_invertappr(ip: &mut [Limb], dp: &[Limb], scratch: &mut [Limb]) -> bool {
     let n = dp.len();
     assert_ne!(n, 0);
     assert!(dp.last().unwrap().get_highest_bit());
     if n < INV_NEWTON_THRESHOLD {
-        if _limbs_invert_basecase_approx(ip, dp, scratch) {
-            0
-        } else {
-            1
-        }
+        _limbs_invert_basecase_approx(ip, dp, scratch)
     } else {
-        mpn_ni_invertappr(ip, dp, scratch)
+        _limbs_invert_newton_approx(ip, dp, scratch)
     }
 }
 

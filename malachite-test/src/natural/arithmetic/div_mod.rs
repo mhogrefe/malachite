@@ -3,7 +3,7 @@ use inputs::base::{
     pairs_of_unsigneds_var_2, quadruples_of_three_unsigned_vecs_and_unsigned_var_1,
     quadruples_of_three_unsigned_vecs_and_unsigned_var_2,
     quadruples_of_three_unsigned_vecs_and_unsigned_var_3, sextuples_of_limbs_var_1,
-    triples_of_unsigned_vec_var_37, triples_of_unsigned_vec_var_38,
+    triples_of_unsigned_vec_var_37, triples_of_unsigned_vec_var_38, triples_of_unsigned_vec_var_39,
 };
 use inputs::natural::{
     nrm_pairs_of_natural_and_positive_natural, pairs_of_natural_and_positive_natural,
@@ -17,7 +17,8 @@ use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::natural::arithmetic::div_mod::{
     _limbs_div_mod_divide_and_conquer, _limbs_div_mod_divide_and_conquer_approx,
     _limbs_div_mod_schoolbook, _limbs_div_mod_schoolbook_approx, _limbs_invert_basecase_approx,
-    limbs_div_mod_by_two_limb, limbs_div_mod_three_limb_by_two_limb, limbs_two_limb_inverse_helper,
+    _limbs_invert_newton_approx, limbs_div_mod_by_two_limb, limbs_div_mod_three_limb_by_two_limb,
+    limbs_two_limb_inverse_helper,
 };
 use num::Integer;
 
@@ -32,6 +33,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limbs_div_mod_schoolbook_approx);
     register_demo!(registry, demo_limbs_div_mod_divide_and_conquer_approx);
     register_demo!(registry, demo_limbs_invert_basecase_approx);
+    register_demo!(registry, demo_limbs_invert_newton_approx);
     register_demo!(registry, demo_natural_div_assign_mod);
     register_demo!(registry, demo_natural_div_assign_mod_ref);
     register_demo!(registry, demo_natural_div_mod);
@@ -68,6 +70,11 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
         benchmark_limbs_div_mod_divide_and_conquer_approx_algorithms
     );
     register_bench!(registry, Small, benchmark_limbs_invert_basecase_approx);
+    register_bench!(
+        registry,
+        Small,
+        benchmark_limbs_invert_newton_approx_algorithms
+    );
     register_bench!(
         registry,
         Large,
@@ -238,6 +245,20 @@ fn demo_limbs_invert_basecase_approx(gm: GenerationMode, limit: usize) {
         println!(
             "is := {:?}; scratch := {:?}; \
              _limbs_invert_basecase_approx(&mut is, {:?}, &mut scratch) = {}; \
+             is = {:?}, scratch = {:?}",
+            old_is, old_scratch, ds, result_definitely_exact, is, scratch
+        );
+    }
+}
+
+fn demo_limbs_invert_newton_approx(gm: GenerationMode, limit: usize) {
+    for (mut is, ds, mut scratch) in triples_of_unsigned_vec_var_39(gm).take(limit) {
+        let old_is = is.clone();
+        let old_scratch = scratch.clone();
+        let result_definitely_exact = _limbs_invert_newton_approx(&mut is, &ds, &mut scratch);
+        println!(
+            "is := {:?}; scratch := {:?}; \
+             _limbs_invert_newton_approx(&mut is, {:?}, &mut scratch) = {}; \
              is = {:?}, scratch = {:?}",
             old_is, old_scratch, ds, result_definitely_exact, is, scratch
         );
@@ -578,6 +599,37 @@ fn benchmark_limbs_invert_basecase_approx(gm: GenerationMode, limit: usize, file
                 no_out!(_limbs_invert_basecase_approx(&mut is, &ds, &mut scratch))
             }),
         )],
+    );
+}
+
+fn benchmark_limbs_invert_newton_approx_algorithms(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "_limbs_invert_newton_approx(&mut [Limb], &[Limb], &mut [Limb])",
+        BenchmarkType::Algorithms,
+        triples_of_unsigned_vec_var_39(gm.with_scale(512)),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(_, ref ds, _)| ds.len()),
+        "ds.len()",
+        &mut [
+            (
+                "basecase",
+                &mut (|(mut is, ds, mut scratch)| {
+                    no_out!(_limbs_invert_basecase_approx(&mut is, &ds, &mut scratch))
+                }),
+            ),
+            (
+                "Newton",
+                &mut (|(mut is, ds, mut scratch)| {
+                    no_out!(_limbs_invert_newton_approx(&mut is, &ds, &mut scratch))
+                }),
+            ),
+        ],
     );
 }
 
