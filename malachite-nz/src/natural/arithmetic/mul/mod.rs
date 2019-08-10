@@ -148,7 +148,6 @@ pub fn limbs_mul_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) 
     let len = xs.len();
     assert_eq!(ys.len(), len);
     assert_ne!(len, 0);
-
     if len < MUL_TOOM22_THRESHOLD {
         _limbs_mul_greater_to_out_basecase(out, xs, ys);
     } else if len < MUL_TOOM33_THRESHOLD {
