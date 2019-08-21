@@ -36,13 +36,13 @@ pub mod xor_natural;
 pub mod xor_signed_limb;
 
 pub(crate) fn integer_op_bits(
-    bit_fn: &Fn(bool, bool) -> bool,
+    bit_fn: &dyn Fn(bool, bool) -> bool,
     x: &Integer,
     y: &Integer,
 ) -> Integer {
     let x_negative = *x < 0 as Limb;
     let y_negative = *y < 0 as Limb;
-    let bit_zip: Box<Iterator<Item = (bool, bool)>> =
+    let bit_zip: Box<dyn Iterator<Item = (bool, bool)>> =
         if x.twos_complement_bits().count() >= y.twos_complement_bits().count() {
             Box::new(
                 x.twos_complement_bits()
@@ -63,13 +63,13 @@ pub(crate) fn integer_op_bits(
 }
 
 pub(crate) fn integer_op_limbs(
-    limb_fn: &Fn(Limb, Limb) -> Limb,
+    limb_fn: &dyn Fn(Limb, Limb) -> Limb,
     x: &Integer,
     y: &Integer,
 ) -> Integer {
     let x_extension = if *x < 0 as Limb { Limb::MAX } else { 0 };
     let y_extension = if *y < 0 as Limb { Limb::MAX } else { 0 };
-    let limb_zip: Box<Iterator<Item = (Limb, Limb)>> =
+    let limb_zip: Box<dyn Iterator<Item = (Limb, Limb)>> =
         if x.twos_complement_limbs().count() >= y.twos_complement_limbs().count() {
             Box::new(
                 x.twos_complement_limbs()

@@ -16,7 +16,7 @@ pub fn integer_checked_hamming_distance_limb_alt_1(n: &Integer, u: Limb) -> Opti
         return None;
     }
     let u = Natural::from(u);
-    let bit_zip: Box<Iterator<Item = (bool, bool)>> =
+    let bit_zip: Box<dyn Iterator<Item = (bool, bool)>> =
         if n.significant_bits() >= u.significant_bits() {
             Box::new(n.twos_complement_bits().zip(u.bits().chain(repeat(false))))
         } else {
@@ -36,7 +36,7 @@ pub fn integer_checked_hamming_distance_limb_alt_2(n: &Integer, u: Limb) -> Opti
         return None;
     }
     let u = Natural::from(u);
-    let limb_zip: Box<Iterator<Item = (Limb, Limb)>> =
+    let limb_zip: Box<dyn Iterator<Item = (Limb, Limb)>> =
         if u64::wrapping_from(n.twos_complement_limbs().count()) >= u.limb_count() {
             Box::new(n.twos_complement_limbs().zip(u.limbs().chain(repeat(0))))
         } else {

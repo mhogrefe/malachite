@@ -8,16 +8,16 @@ use natural::arithmetic::add_mul_limb::limbs_slice_add_mul_limb_same_length_in_p
 use natural::arithmetic::mul::fft::_limbs_mul_greater_to_out_fft;
 use natural::arithmetic::mul::toom::MUL_TOOM33_THRESHOLD_LIMIT;
 use natural::arithmetic::mul::toom::{
-    _limbs_mul_greater_to_out_toom_22, _limbs_mul_greater_to_out_toom_22_scratch_size,
+    _limbs_mul_greater_to_out_toom_22, _limbs_mul_greater_to_out_toom_22_scratch_len,
     _limbs_mul_greater_to_out_toom_32, _limbs_mul_greater_to_out_toom_33,
-    _limbs_mul_greater_to_out_toom_33_scratch_size, _limbs_mul_greater_to_out_toom_42,
+    _limbs_mul_greater_to_out_toom_33_scratch_len, _limbs_mul_greater_to_out_toom_42,
     _limbs_mul_greater_to_out_toom_43, _limbs_mul_greater_to_out_toom_44,
-    _limbs_mul_greater_to_out_toom_44_scratch_size, _limbs_mul_greater_to_out_toom_53,
+    _limbs_mul_greater_to_out_toom_44_scratch_len, _limbs_mul_greater_to_out_toom_53,
     _limbs_mul_greater_to_out_toom_63, _limbs_mul_greater_to_out_toom_6h,
-    _limbs_mul_greater_to_out_toom_6h_scratch_size, _limbs_mul_greater_to_out_toom_8h,
-    _limbs_mul_greater_to_out_toom_8h_scratch_size,
-    _limbs_mul_same_length_to_out_toom_6h_scratch_size,
-    _limbs_mul_same_length_to_out_toom_8h_scratch_size,
+    _limbs_mul_greater_to_out_toom_6h_scratch_len, _limbs_mul_greater_to_out_toom_8h,
+    _limbs_mul_greater_to_out_toom_8h_scratch_len,
+    _limbs_mul_same_length_to_out_toom_6h_scratch_len,
+    _limbs_mul_same_length_to_out_toom_8h_scratch_len,
 };
 use natural::arithmetic::mul_limb::limbs_mul_limb_to_out;
 use natural::Natural::{self, Large, Small};
@@ -152,22 +152,21 @@ pub fn limbs_mul_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) 
         _limbs_mul_greater_to_out_basecase(out, xs, ys);
     } else if len < MUL_TOOM33_THRESHOLD {
         // Allocate workspace of fixed size on stack: fast!
-        let scratch = &mut [0; _limbs_mul_greater_to_out_toom_22_scratch_size(
-            MUL_TOOM33_THRESHOLD_LIMIT - 1,
-        )];
+        let scratch =
+            &mut [0; _limbs_mul_greater_to_out_toom_22_scratch_len(MUL_TOOM33_THRESHOLD_LIMIT - 1)];
         assert!(MUL_TOOM33_THRESHOLD <= MUL_TOOM33_THRESHOLD_LIMIT);
         _limbs_mul_greater_to_out_toom_22(out, xs, ys, scratch);
     } else if len < MUL_TOOM44_THRESHOLD {
-        let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_33_scratch_size(len)];
+        let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_33_scratch_len(len)];
         _limbs_mul_greater_to_out_toom_33(out, xs, ys, &mut scratch);
     } else if len < MUL_TOOM6H_THRESHOLD {
-        let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_44_scratch_size(len)];
+        let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_44_scratch_len(len)];
         _limbs_mul_greater_to_out_toom_44(out, xs, ys, &mut scratch);
     } else if len < MUL_TOOM8H_THRESHOLD {
-        let mut scratch = vec![0; _limbs_mul_same_length_to_out_toom_6h_scratch_size(len)];
+        let mut scratch = vec![0; _limbs_mul_same_length_to_out_toom_6h_scratch_len(len)];
         _limbs_mul_greater_to_out_toom_6h(out, xs, ys, &mut scratch);
     } else if len < MUL_FFT_THRESHOLD {
-        let mut scratch = vec![0; _limbs_mul_same_length_to_out_toom_8h_scratch_size(len)];
+        let mut scratch = vec![0; _limbs_mul_same_length_to_out_toom_8h_scratch_len(len)];
         _limbs_mul_greater_to_out_toom_8h(out, xs, ys, &mut scratch);
     } else {
         // The current FFT code allocates its own space. That should probably change.
@@ -228,8 +227,8 @@ pub fn limbs_mul_greater_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> L
         // `limbs_mul_same_length_to_out` applies, perform basecase multiply directly.
         _limbs_mul_greater_to_out_basecase(out, xs, ys);
     } else if ys_len < MUL_TOOM33_THRESHOLD {
-        let toom_x2_scratch_size = 9 * ys_len / 2 + usize::wrapping_from(Limb::WIDTH) * 2;
-        let mut scratch = vec![0; toom_x2_scratch_size];
+        let toom_x2_scratch_len = 9 * ys_len / 2 + usize::wrapping_from(Limb::WIDTH) * 2;
+        let mut scratch = vec![0; toom_x2_scratch_len];
         if xs_len >= 3 * ys_len {
             _limbs_mul_greater_to_out_toom_42(out, &xs[..ys_len << 1], ys, &mut scratch);
             let two_ys_len = ys_len << 1;
@@ -274,8 +273,8 @@ pub fn limbs_mul_greater_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> L
         // Toom code).
         if ys_len < MUL_TOOM44_THRESHOLD || !toom44_ok(xs_len, ys_len) {
             // Use ToomX3 variants
-            let toom_x3_scratch_size = 4 * ys_len + usize::wrapping_from(Limb::WIDTH);
-            let mut scratch = vec![0; toom_x3_scratch_size];
+            let toom_x3_scratch_len = 4 * ys_len + usize::wrapping_from(Limb::WIDTH);
+            let mut scratch = vec![0; toom_x3_scratch_len];
             if 2 * xs_len >= 5 * ys_len {
                 // The maximum scratch2 usage is for the `limbs_mul_to_out` result.
                 let mut scratch2 = vec![0; 7 * ys_len >> 1];
@@ -342,15 +341,15 @@ pub fn limbs_mul_greater_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> L
             }
         } else {
             if ys_len < MUL_TOOM6H_THRESHOLD {
-                let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_44_scratch_size(xs_len)];
+                let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_44_scratch_len(xs_len)];
                 _limbs_mul_greater_to_out_toom_44(out, xs, ys, &mut scratch);
             } else if ys_len < MUL_TOOM8H_THRESHOLD {
                 let mut scratch =
-                    vec![0; _limbs_mul_greater_to_out_toom_6h_scratch_size(xs_len, ys_len)];
+                    vec![0; _limbs_mul_greater_to_out_toom_6h_scratch_len(xs_len, ys_len)];
                 _limbs_mul_greater_to_out_toom_6h(out, xs, ys, &mut scratch);
             } else {
                 let mut scratch =
-                    vec![0; _limbs_mul_greater_to_out_toom_8h_scratch_size(xs_len, ys_len)];
+                    vec![0; _limbs_mul_greater_to_out_toom_8h_scratch_len(xs_len, ys_len)];
                 _limbs_mul_greater_to_out_toom_8h(out, xs, ys, &mut scratch);
             }
         }

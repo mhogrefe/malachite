@@ -224,7 +224,7 @@ fn test_xor() {
     test("12345678987654321", "314159265358979", "12035174921130034");
 }
 
-fn limbs_xor_helper(f: &mut Fn(&[Limb], &[Limb]) -> Vec<Limb>, xs: &Vec<Limb>, ys: &Vec<Limb>) {
+fn limbs_xor_helper(f: &dyn Fn(&[Limb], &[Limb]) -> Vec<Limb>, xs: &Vec<Limb>, ys: &Vec<Limb>) {
     assert_eq!(
         Natural::from_owned_limbs_asc(f(xs, ys)),
         Natural::from_limbs_asc(xs) ^ Natural::from_limbs_asc(ys)

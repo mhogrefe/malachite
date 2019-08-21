@@ -10,19 +10,19 @@ use malachite_nz::natural::arithmetic::mul::fft::{
 #[cfg(not(feature = "32_bit_limbs"))]
 use malachite_nz::natural::arithmetic::mul::mul_mod::_limbs_mul_mod_limb_width_to_n_minus_1;
 use malachite_nz::natural::arithmetic::mul::toom::{
-    _limbs_mul_greater_to_out_toom_22, _limbs_mul_greater_to_out_toom_22_scratch_size,
-    _limbs_mul_greater_to_out_toom_32, _limbs_mul_greater_to_out_toom_32_scratch_size,
-    _limbs_mul_greater_to_out_toom_33, _limbs_mul_greater_to_out_toom_33_scratch_size,
-    _limbs_mul_greater_to_out_toom_42, _limbs_mul_greater_to_out_toom_42_scratch_size,
-    _limbs_mul_greater_to_out_toom_43, _limbs_mul_greater_to_out_toom_43_scratch_size,
-    _limbs_mul_greater_to_out_toom_44, _limbs_mul_greater_to_out_toom_44_scratch_size,
-    _limbs_mul_greater_to_out_toom_52, _limbs_mul_greater_to_out_toom_52_scratch_size,
-    _limbs_mul_greater_to_out_toom_53, _limbs_mul_greater_to_out_toom_53_scratch_size,
-    _limbs_mul_greater_to_out_toom_54, _limbs_mul_greater_to_out_toom_54_scratch_size,
-    _limbs_mul_greater_to_out_toom_62, _limbs_mul_greater_to_out_toom_62_scratch_size,
-    _limbs_mul_greater_to_out_toom_63, _limbs_mul_greater_to_out_toom_63_scratch_size,
-    _limbs_mul_greater_to_out_toom_6h, _limbs_mul_greater_to_out_toom_6h_scratch_size,
-    _limbs_mul_greater_to_out_toom_8h, _limbs_mul_greater_to_out_toom_8h_scratch_size,
+    _limbs_mul_greater_to_out_toom_22, _limbs_mul_greater_to_out_toom_22_scratch_len,
+    _limbs_mul_greater_to_out_toom_32, _limbs_mul_greater_to_out_toom_32_scratch_len,
+    _limbs_mul_greater_to_out_toom_33, _limbs_mul_greater_to_out_toom_33_scratch_len,
+    _limbs_mul_greater_to_out_toom_42, _limbs_mul_greater_to_out_toom_42_scratch_len,
+    _limbs_mul_greater_to_out_toom_43, _limbs_mul_greater_to_out_toom_43_scratch_len,
+    _limbs_mul_greater_to_out_toom_44, _limbs_mul_greater_to_out_toom_44_scratch_len,
+    _limbs_mul_greater_to_out_toom_52, _limbs_mul_greater_to_out_toom_52_scratch_len,
+    _limbs_mul_greater_to_out_toom_53, _limbs_mul_greater_to_out_toom_53_scratch_len,
+    _limbs_mul_greater_to_out_toom_54, _limbs_mul_greater_to_out_toom_54_scratch_len,
+    _limbs_mul_greater_to_out_toom_62, _limbs_mul_greater_to_out_toom_62_scratch_len,
+    _limbs_mul_greater_to_out_toom_63, _limbs_mul_greater_to_out_toom_63_scratch_len,
+    _limbs_mul_greater_to_out_toom_6h, _limbs_mul_greater_to_out_toom_6h_scratch_len,
+    _limbs_mul_greater_to_out_toom_8h, _limbs_mul_greater_to_out_toom_8h_scratch_len,
 };
 use malachite_nz::natural::arithmetic::mul::{
     _limbs_mul_greater_to_out_basecase, _limbs_mul_greater_to_out_basecase_mem_opt, limbs_mul,
@@ -1119,7 +1119,7 @@ fn limbs_mul_to_out_fail_3() {
 #[test]
 fn test_limbs_mul_greater_to_out_toom_22() {
     let test = |xs: Vec<Limb>, ys: Vec<Limb>, out_before: Vec<Limb>, out_after| {
-        let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_22_scratch_size(xs.len())];
+        let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_22_scratch_len(xs.len())];
         let mut out = out_before.to_vec();
         _limbs_mul_greater_to_out_basecase(&mut out, &xs, &ys);
         assert_eq!(out, out_after);
@@ -1507,7 +1507,7 @@ fn test_limbs_mul_greater_to_out_toom_32() {
         assert_eq!(out, out_after);
         let mut out = out_before.to_vec();
         let mut scratch =
-            vec![0; _limbs_mul_greater_to_out_toom_32_scratch_size(xs.len(), ys.len())];
+            vec![0; _limbs_mul_greater_to_out_toom_32_scratch_len(xs.len(), ys.len())];
         _limbs_mul_greater_to_out_toom_32(&mut out, &xs, &ys, &mut scratch);
         assert_eq!(out, out_after);
     };
@@ -1608,7 +1608,7 @@ fn test_limbs_mul_greater_to_out_toom_32() {
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_32_fail_1() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_32_scratch_size(1, 1)];
+    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_32_scratch_len(1, 1)];
     let mut out = vec![10; 4];
     _limbs_mul_greater_to_out_toom_32(&mut out, &[6], &[1], &mut scratch);
 }
@@ -1617,7 +1617,7 @@ fn limbs_mul_greater_to_out_toom_32_fail_1() {
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_32_fail_2() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_32_scratch_size(3, 4)];
+    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_32_scratch_len(3, 4)];
     let mut out = vec![10; 7];
     let xs = series(6, 3);
     let ys = series(1, 4);
@@ -1628,7 +1628,7 @@ fn limbs_mul_greater_to_out_toom_32_fail_2() {
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_32_fail_3() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_32_scratch_size(5, 4)];
+    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_32_scratch_len(5, 4)];
     let mut out = vec![10; 9];
     let xs = series(6, 5);
     let ys = series(1, 4);
@@ -1639,7 +1639,7 @@ fn limbs_mul_greater_to_out_toom_32_fail_3() {
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_32_fail_4() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_32_scratch_size(6, 3)];
+    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_32_scratch_len(6, 3)];
     let mut out = vec![10; 9];
     let xs = series(6, 6);
     let ys = series(1, 3);
@@ -1650,7 +1650,7 @@ fn limbs_mul_greater_to_out_toom_32_fail_4() {
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_32_fail_5() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_32_scratch_size(3, 0)];
+    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_32_scratch_len(3, 0)];
     let mut out = vec![10; 4];
     let xs = series(6, 3);
     _limbs_mul_greater_to_out_toom_32(&mut out, &xs, &[], &mut scratch);
@@ -1660,7 +1660,7 @@ fn limbs_mul_greater_to_out_toom_32_fail_5() {
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_32_fail_6() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_32_scratch_size(6, 4)];
+    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_32_scratch_len(6, 4)];
     let mut out = vec![10; 9];
     let xs = series(6, 6);
     let ys = series(1, 4);
@@ -1675,7 +1675,7 @@ fn test_limbs_mul_greater_to_out_toom_33() {
         _limbs_mul_greater_to_out_basecase(&mut out, &xs, &ys);
         assert_eq!(out, out_after);
         let mut out = out_before.to_vec();
-        let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_33_scratch_size(xs.len())];
+        let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_33_scratch_len(xs.len())];
         _limbs_mul_greater_to_out_toom_33(&mut out, &xs, &ys, &mut scratch);
         assert_eq!(out, out_after);
     };
@@ -1740,7 +1740,7 @@ fn test_limbs_mul_greater_to_out_toom_33() {
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_33_fail_1() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_33_scratch_size(1)];
+    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_33_scratch_len(1)];
     let mut out = vec![10; 4];
     _limbs_mul_greater_to_out_toom_33(&mut out, &[6], &[1], &mut scratch);
 }
@@ -1749,7 +1749,7 @@ fn limbs_mul_greater_to_out_toom_33_fail_1() {
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_33_fail_2() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_33_scratch_size(5)];
+    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_33_scratch_len(5)];
     let mut out = vec![10; 11];
     let xs = series(6, 5);
     let ys = series(1, 6);
@@ -1760,7 +1760,7 @@ fn limbs_mul_greater_to_out_toom_33_fail_2() {
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_33_fail_3() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_33_scratch_size(5)];
+    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_33_scratch_len(5)];
     let mut out = vec![10; 9];
     let xs = series(6, 5);
     let ys = series(1, 4);
@@ -1771,7 +1771,7 @@ fn limbs_mul_greater_to_out_toom_33_fail_3() {
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_33_fail_4() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_33_scratch_size(5)];
+    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_33_scratch_len(5)];
     let mut out = vec![10; 5];
     let xs = series(6, 5);
     _limbs_mul_greater_to_out_toom_33(&mut out, &xs, &[], &mut scratch);
@@ -1781,7 +1781,7 @@ fn limbs_mul_greater_to_out_toom_33_fail_4() {
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_33_fail_5() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_33_scratch_size(6)];
+    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_33_scratch_len(6)];
     let mut out = vec![10; 9];
     let xs = series(6, 6);
     let ys = series(1, 5);
@@ -1797,7 +1797,7 @@ fn test_limbs_mul_greater_to_out_toom_42() {
         assert_eq!(out, out_after);
         let mut out = out_before.to_vec();
         let mut scratch =
-            vec![0; _limbs_mul_greater_to_out_toom_42_scratch_size(xs.len(), ys.len())];
+            vec![0; _limbs_mul_greater_to_out_toom_42_scratch_len(xs.len(), ys.len())];
         _limbs_mul_greater_to_out_toom_42(&mut out, &xs, &ys, &mut scratch);
         assert_eq!(out, out_after);
     };
@@ -1997,7 +1997,7 @@ fn test_limbs_mul_greater_to_out_toom_42() {
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_42_fail_1() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_42_scratch_size(1, 1)];
+    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_42_scratch_len(1, 1)];
     let mut out = vec![10; 4];
     _limbs_mul_greater_to_out_toom_42(&mut out, &[6], &[1], &mut scratch);
 }
@@ -2006,7 +2006,7 @@ fn limbs_mul_greater_to_out_toom_42_fail_1() {
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_42_fail_2() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_42_scratch_size(5, 6)];
+    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_42_scratch_len(5, 6)];
     let mut out = vec![10; 11];
     let xs = series(6, 5);
     let ys = series(1, 6);
@@ -2017,7 +2017,7 @@ fn limbs_mul_greater_to_out_toom_42_fail_2() {
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_42_fail_3() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_42_scratch_size(3, 2)];
+    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_42_scratch_len(3, 2)];
     let mut out = vec![10; 9];
     let xs = series(6, 3);
     _limbs_mul_greater_to_out_toom_42(&mut out, &xs, &[1, 2], &mut scratch);
@@ -2027,7 +2027,7 @@ fn limbs_mul_greater_to_out_toom_42_fail_3() {
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_42_fail_4() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_42_scratch_size(5, 0)];
+    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_42_scratch_len(5, 0)];
     let mut out = vec![10; 5];
     let xs = series(6, 5);
     _limbs_mul_greater_to_out_toom_42(&mut out, &xs, &[], &mut scratch);
@@ -2037,7 +2037,7 @@ fn limbs_mul_greater_to_out_toom_42_fail_4() {
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_42_fail_5() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_42_scratch_size(4, 2)];
+    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_42_scratch_len(4, 2)];
     let mut out = vec![10; 4];
     let xs = series(6, 4);
     _limbs_mul_greater_to_out_toom_42(&mut out, &xs, &[1, 2], &mut scratch);
@@ -2052,7 +2052,7 @@ fn test_limbs_mul_greater_to_out_toom_43() {
         assert_eq!(out, out_after);
         let mut out = out_before.to_vec();
         let mut scratch =
-            vec![0; _limbs_mul_greater_to_out_toom_43_scratch_size(xs.len(), ys.len())];
+            vec![0; _limbs_mul_greater_to_out_toom_43_scratch_len(xs.len(), ys.len())];
         _limbs_mul_greater_to_out_toom_43(&mut out, &xs, &ys, &mut scratch);
         assert_eq!(out, out_after);
     };
@@ -2207,7 +2207,7 @@ fn test_limbs_mul_greater_to_out_toom_43() {
         assert_eq!(out, out_after);
         let mut out = out_before.to_vec();
         let mut scratch =
-            vec![0; _limbs_mul_greater_to_out_toom_43_scratch_size(xs.len(), ys.len())];
+            vec![0; _limbs_mul_greater_to_out_toom_43_scratch_len(xs.len(), ys.len())];
         _limbs_mul_greater_to_out_toom_43(&mut out, &xs, &ys, &mut scratch);
         assert_eq!(out, out_after);
     };
@@ -2308,7 +2308,7 @@ fn test_limbs_mul_greater_to_out_toom_43() {
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_43_fail_1() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_43_scratch_size(1, 1)];
+    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_43_scratch_len(1, 1)];
     let mut out = vec![10; 4];
     _limbs_mul_greater_to_out_toom_43(&mut out, &[6], &[1], &mut scratch);
 }
@@ -2317,7 +2317,7 @@ fn limbs_mul_greater_to_out_toom_43_fail_1() {
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_43_fail_2() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_43_scratch_size(11, 12)];
+    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_43_scratch_len(11, 12)];
     let mut out = vec![10; 23];
     let xs = series(3, 11);
     let ys = series(2, 12);
@@ -2328,7 +2328,7 @@ fn limbs_mul_greater_to_out_toom_43_fail_2() {
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_43_fail_3() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_43_scratch_size(11, 8)];
+    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_43_scratch_len(11, 8)];
     let mut out = vec![10; 19];
     let xs = series(3, 11);
     let ys = series(2, 8);
@@ -2339,7 +2339,7 @@ fn limbs_mul_greater_to_out_toom_43_fail_3() {
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_43_fail_4() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_43_scratch_size(12, 0)];
+    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_43_scratch_len(12, 0)];
     let mut out = vec![10; 12];
     let xs = series(3, 11);
     _limbs_mul_greater_to_out_toom_43(&mut out, &xs, &[], &mut scratch);
@@ -2349,7 +2349,7 @@ fn limbs_mul_greater_to_out_toom_43_fail_4() {
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_43_fail_5() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_43_scratch_size(4, 2)];
+    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_43_scratch_len(4, 2)];
     let mut out = vec![10; 5];
     let xs = series(3, 10);
     let ys = series(2, 10);
@@ -2364,7 +2364,7 @@ fn test_limbs_mul_greater_to_out_toom_44() {
         _limbs_mul_greater_to_out_basecase(&mut out, &xs, &ys);
         assert_eq!(out, out_after);
         let mut out = out_before.to_vec();
-        let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_44_scratch_size(xs.len())];
+        let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_44_scratch_len(xs.len())];
         _limbs_mul_greater_to_out_toom_44(&mut out, &xs, &ys, &mut scratch);
         assert_eq!(out, out_after);
     };
@@ -2463,7 +2463,7 @@ fn test_limbs_mul_greater_to_out_toom_44() {
         _limbs_mul_greater_to_out_basecase(&mut out, &xs, &ys);
         assert_eq!(out, out_after);
         let mut out = out_before.to_vec();
-        let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_44_scratch_size(xs.len())];
+        let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_44_scratch_len(xs.len())];
         _limbs_mul_greater_to_out_toom_44(&mut out, &xs, &ys, &mut scratch);
         assert_eq!(out, out_after);
     };
@@ -2479,7 +2479,7 @@ fn test_limbs_mul_greater_to_out_toom_44() {
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_44_fail_1() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_44_scratch_size(1)];
+    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_44_scratch_len(1)];
     let mut out = vec![10; 10];
     _limbs_mul_greater_to_out_toom_44(&mut out, &[6], &[1], &mut scratch);
 }
@@ -2488,7 +2488,7 @@ fn limbs_mul_greater_to_out_toom_44_fail_1() {
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_44_fail_2() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_44_scratch_size(4)];
+    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_44_scratch_len(4)];
     let mut out = vec![10; 9];
     let xs = series(3, 4);
     let ys = series(2, 5);
@@ -2499,7 +2499,7 @@ fn limbs_mul_greater_to_out_toom_44_fail_2() {
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_44_fail_3() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_44_scratch_size(3)];
+    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_44_scratch_len(3)];
     let mut out = vec![10; 6];
     let xs = series(3, 3);
     let ys = series(2, 3);
@@ -2510,7 +2510,7 @@ fn limbs_mul_greater_to_out_toom_44_fail_3() {
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_44_fail_4() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_44_scratch_size(11)];
+    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_44_scratch_len(11)];
     let mut out = vec![10; 11];
     let xs = series(3, 11);
     _limbs_mul_greater_to_out_toom_44(&mut out, &xs, &[], &mut scratch);
@@ -2520,7 +2520,7 @@ fn limbs_mul_greater_to_out_toom_44_fail_4() {
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_44_fail_5() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_44_scratch_size(4)];
+    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_44_scratch_len(4)];
     let mut out = vec![10; 7];
     let xs = series(3, 4);
     let ys = series(2, 4);
@@ -2536,7 +2536,7 @@ fn test_limbs_mul_greater_to_out_toom_52() {
         assert_eq!(out, out_after);
         let mut out = out_before.to_vec();
         let mut scratch =
-            vec![0; _limbs_mul_greater_to_out_toom_52_scratch_size(xs.len(), ys.len())];
+            vec![0; _limbs_mul_greater_to_out_toom_52_scratch_len(xs.len(), ys.len())];
         _limbs_mul_greater_to_out_toom_52(&mut out, &xs, &ys, &mut scratch);
         assert_eq!(out, out_after);
     };
@@ -2717,7 +2717,7 @@ fn test_limbs_mul_greater_to_out_toom_52() {
         assert_eq!(out, out_after);
         let mut out = out_before.to_vec();
         let mut scratch =
-            vec![0; _limbs_mul_greater_to_out_toom_52_scratch_size(xs.len(), ys.len())];
+            vec![0; _limbs_mul_greater_to_out_toom_52_scratch_len(xs.len(), ys.len())];
         _limbs_mul_greater_to_out_toom_52(&mut out, &xs, &ys, &mut scratch);
         assert_eq!(out, out_after);
     };
@@ -2733,7 +2733,7 @@ fn test_limbs_mul_greater_to_out_toom_52() {
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_52_fail_1() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_52_scratch_size(1, 1)];
+    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_52_scratch_len(1, 1)];
     let mut out = vec![10; 4];
     _limbs_mul_greater_to_out_toom_52(&mut out, &[6], &[1], &mut scratch);
 }
@@ -2742,7 +2742,7 @@ fn limbs_mul_greater_to_out_toom_52_fail_1() {
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_52_fail_2() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_52_scratch_size(15, 16)];
+    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_52_scratch_len(15, 16)];
     let mut out = vec![10; 9];
     let xs = series(3, 15);
     let ys = series(3, 16);
@@ -2753,7 +2753,7 @@ fn limbs_mul_greater_to_out_toom_52_fail_2() {
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_52_fail_3() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_52_scratch_size(14, 5)];
+    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_52_scratch_len(14, 5)];
     let mut out = vec![10; 6];
     let xs = series(3, 14);
     let ys = series(3, 5);
@@ -2764,7 +2764,7 @@ fn limbs_mul_greater_to_out_toom_52_fail_3() {
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_52_fail_4() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_52_scratch_size(15, 4)];
+    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_52_scratch_len(15, 4)];
     let mut out = vec![10; 7];
     let xs = series(3, 15);
     let ys = series(3, 4);
@@ -2775,7 +2775,7 @@ fn limbs_mul_greater_to_out_toom_52_fail_4() {
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_52_fail_5() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_52_scratch_size(11, 0)];
+    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_52_scratch_len(11, 0)];
     let mut out = vec![10; 12];
     let xs = series(3, 11);
     _limbs_mul_greater_to_out_toom_52(&mut out, &xs, &[], &mut scratch);
@@ -2790,7 +2790,7 @@ fn test_limbs_mul_greater_to_out_toom_53() {
         assert_eq!(out, out_after);
         let mut out = out_before.to_vec();
         let mut scratch =
-            vec![0; _limbs_mul_greater_to_out_toom_53_scratch_size(xs.len(), ys.len())];
+            vec![0; _limbs_mul_greater_to_out_toom_53_scratch_len(xs.len(), ys.len())];
         _limbs_mul_greater_to_out_toom_53(&mut out, &xs, &ys, &mut scratch);
         assert_eq!(out, out_after);
     };
@@ -2902,7 +2902,7 @@ fn test_limbs_mul_greater_to_out_toom_53() {
         assert_eq!(out, out_after);
         let mut out = out_before.to_vec();
         let mut scratch =
-            vec![0; _limbs_mul_greater_to_out_toom_53_scratch_size(xs.len(), ys.len())];
+            vec![0; _limbs_mul_greater_to_out_toom_53_scratch_len(xs.len(), ys.len())];
         _limbs_mul_greater_to_out_toom_53(&mut out, &xs, &ys, &mut scratch);
         assert_eq!(out, out_after);
     };
@@ -2927,7 +2927,7 @@ fn test_limbs_mul_greater_to_out_toom_53() {
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_53_fail_1() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_53_scratch_size(1, 1)];
+    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_53_scratch_len(1, 1)];
     let mut out = vec![10; 4];
     _limbs_mul_greater_to_out_toom_53(&mut out, &[6], &[1], &mut scratch);
 }
@@ -2936,7 +2936,7 @@ fn limbs_mul_greater_to_out_toom_53_fail_1() {
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_53_fail_2() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_53_scratch_size(5, 6)];
+    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_53_scratch_len(5, 6)];
     let mut out = vec![10; 11];
     let xs = series(3, 5);
     let ys = series(3, 6);
@@ -2947,7 +2947,7 @@ fn limbs_mul_greater_to_out_toom_53_fail_2() {
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_53_fail_3() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_53_scratch_size(5, 4)];
+    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_53_scratch_len(5, 4)];
     let mut out = vec![10; 9];
     let xs = series(3, 5);
     let ys = series(3, 4);
@@ -2958,7 +2958,7 @@ fn limbs_mul_greater_to_out_toom_53_fail_3() {
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_53_fail_4() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_53_scratch_size(4, 3)];
+    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_53_scratch_len(4, 3)];
     let mut out = vec![10; 6];
     let xs = series(3, 4);
     let ys = series(3, 3);
@@ -2969,7 +2969,7 @@ fn limbs_mul_greater_to_out_toom_53_fail_4() {
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_53_fail_5() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_53_scratch_size(5, 2)];
+    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_53_scratch_len(5, 2)];
     let mut out = vec![10; 7];
     let xs = series(3, 5);
     _limbs_mul_greater_to_out_toom_53(&mut out, &xs, &[3, 4], &mut scratch);
@@ -2979,7 +2979,7 @@ fn limbs_mul_greater_to_out_toom_53_fail_5() {
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_53_fail_6() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_53_scratch_size(5, 0)];
+    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_53_scratch_len(5, 0)];
     let mut out = vec![10; 12];
     let xs = series(3, 5);
     _limbs_mul_greater_to_out_toom_53(&mut out, &xs, &[], &mut scratch);
@@ -2994,7 +2994,7 @@ fn test_limbs_mul_greater_to_out_toom_54() {
         assert_eq!(out, out_after);
         let mut out = out_before.to_vec();
         let mut scratch =
-            vec![0; _limbs_mul_greater_to_out_toom_54_scratch_size(xs.len(), ys.len())];
+            vec![0; _limbs_mul_greater_to_out_toom_54_scratch_len(xs.len(), ys.len())];
         _limbs_mul_greater_to_out_toom_54(&mut out, &xs, &ys, &mut scratch);
         assert_eq!(out, out_after);
     };
@@ -3137,7 +3137,7 @@ fn test_limbs_mul_greater_to_out_toom_54() {
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_54_fail_1() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_54_scratch_size(1, 1)];
+    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_54_scratch_len(1, 1)];
     let mut out = vec![10; 4];
     _limbs_mul_greater_to_out_toom_54(&mut out, &[6], &[1], &mut scratch);
 }
@@ -3146,7 +3146,7 @@ fn limbs_mul_greater_to_out_toom_54_fail_1() {
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_54_fail_2() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_54_scratch_size(15, 16)];
+    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_54_scratch_len(15, 16)];
     let mut out = vec![10; 31];
     let xs = series(3, 14);
     let ys = series(3, 17);
@@ -3157,7 +3157,7 @@ fn limbs_mul_greater_to_out_toom_54_fail_2() {
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_54_fail_3() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_54_scratch_size(15, 10)];
+    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_54_scratch_len(15, 10)];
     let mut out = vec![10; 25];
     let xs = series(3, 14);
     let ys = series(3, 10);
@@ -3168,7 +3168,7 @@ fn limbs_mul_greater_to_out_toom_54_fail_3() {
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_54_fail_4() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_54_scratch_size(14, 11)];
+    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_54_scratch_len(14, 11)];
     let mut out = vec![10; 25];
     let xs = series(3, 14);
     let ys = series(3, 11);
@@ -3179,7 +3179,7 @@ fn limbs_mul_greater_to_out_toom_54_fail_4() {
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_54_fail_5() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_54_scratch_size(15, 11)];
+    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_54_scratch_len(15, 11)];
     let mut out = vec![10; 25];
     let xs = series(3, 15);
     let ys = series(3, 11);
@@ -3190,7 +3190,7 @@ fn limbs_mul_greater_to_out_toom_54_fail_5() {
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_54_fail_6() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_54_scratch_size(15, 0)];
+    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_54_scratch_len(15, 0)];
     let mut out = vec![10; 15];
     let xs = series(3, 15);
     _limbs_mul_greater_to_out_toom_54(&mut out, &xs, &[], &mut scratch);
@@ -3205,7 +3205,7 @@ fn test_limbs_mul_greater_to_out_toom_62() {
         assert_eq!(out, out_after);
         let mut out = out_before.to_vec();
         let mut scratch =
-            vec![0; _limbs_mul_greater_to_out_toom_62_scratch_size(xs.len(), ys.len())];
+            vec![0; _limbs_mul_greater_to_out_toom_62_scratch_len(xs.len(), ys.len())];
         _limbs_mul_greater_to_out_toom_62(&mut out, &xs, &ys, &mut scratch);
         assert_eq!(out, out_after);
     };
@@ -3478,7 +3478,7 @@ fn test_limbs_mul_greater_to_out_toom_62() {
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_62_fail_1() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_62_scratch_size(1, 1)];
+    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_62_scratch_len(1, 1)];
     let mut out = vec![10; 4];
     _limbs_mul_greater_to_out_toom_62(&mut out, &[6], &[1], &mut scratch);
 }
@@ -3487,7 +3487,7 @@ fn limbs_mul_greater_to_out_toom_62_fail_1() {
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_62_fail_2() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_62_scratch_size(6, 7)];
+    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_62_scratch_len(6, 7)];
     let mut out = vec![10; 13];
     let xs = series(3, 6);
     let ys = series(3, 7);
@@ -3498,7 +3498,7 @@ fn limbs_mul_greater_to_out_toom_62_fail_2() {
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_62_fail_3() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_62_scratch_size(6, 1)];
+    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_62_scratch_len(6, 1)];
     let mut out = vec![10; 7];
     let xs = series(3, 6);
     _limbs_mul_greater_to_out_toom_62(&mut out, &xs, &[3], &mut scratch);
@@ -3508,7 +3508,7 @@ fn limbs_mul_greater_to_out_toom_62_fail_3() {
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_62_fail_4() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_62_scratch_size(5, 2)];
+    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_62_scratch_len(5, 2)];
     let mut out = vec![10; 7];
     let xs = series(3, 5);
     _limbs_mul_greater_to_out_toom_62(&mut out, &xs, &[3, 4], &mut scratch);
@@ -3518,7 +3518,7 @@ fn limbs_mul_greater_to_out_toom_62_fail_4() {
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_62_fail_5() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_62_scratch_size(6, 2)];
+    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_62_scratch_len(6, 2)];
     let mut out = vec![10; 7];
     let xs = series(3, 6);
     _limbs_mul_greater_to_out_toom_62(&mut out, &xs, &[3, 4], &mut scratch);
@@ -3528,7 +3528,7 @@ fn limbs_mul_greater_to_out_toom_62_fail_5() {
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_62_fail_6() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_62_scratch_size(6, 0)];
+    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_62_scratch_len(6, 0)];
     let mut out = vec![10; 6];
     let xs = series(3, 6);
     _limbs_mul_greater_to_out_toom_62(&mut out, &xs, &[], &mut scratch);
@@ -3543,7 +3543,7 @@ fn test_limbs_mul_greater_to_out_toom_63() {
         assert_eq!(out, out_after);
         let mut out = out_before.to_vec();
         let mut scratch =
-            vec![0; _limbs_mul_greater_to_out_toom_63_scratch_size(xs.len(), ys.len())];
+            vec![0; _limbs_mul_greater_to_out_toom_63_scratch_len(xs.len(), ys.len())];
         _limbs_mul_greater_to_out_toom_63(&mut out, &xs, &ys, &mut scratch);
         assert_eq!(out, out_after);
     };
@@ -3643,7 +3643,7 @@ fn test_limbs_mul_greater_to_out_toom_63() {
         assert_eq!(out, out_after);
         let mut out = out_before.to_vec();
         let mut scratch =
-            vec![0; _limbs_mul_greater_to_out_toom_63_scratch_size(xs.len(), ys.len())];
+            vec![0; _limbs_mul_greater_to_out_toom_63_scratch_len(xs.len(), ys.len())];
         _limbs_mul_greater_to_out_toom_63(&mut out, &xs, &ys, &mut scratch);
         assert_eq!(out, out_after);
     };
@@ -3716,7 +3716,7 @@ fn test_limbs_mul_greater_to_out_toom_63() {
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_63_fail_1() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_63_scratch_size(1, 1)];
+    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_63_scratch_len(1, 1)];
     let mut out = vec![10; 4];
     _limbs_mul_greater_to_out_toom_63(&mut out, &[6], &[1], &mut scratch);
 }
@@ -3725,7 +3725,7 @@ fn limbs_mul_greater_to_out_toom_63_fail_1() {
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_63_fail_2() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_63_scratch_size(17, 18)];
+    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_63_scratch_len(17, 18)];
     let mut out = vec![10; 13];
     let xs = series(3, 17);
     let ys = series(3, 18);
@@ -3736,7 +3736,7 @@ fn limbs_mul_greater_to_out_toom_63_fail_2() {
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_63_fail_3() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_63_scratch_size(17, 8)];
+    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_63_scratch_len(17, 8)];
     let mut out = vec![10; 25];
     let xs = series(3, 17);
     let ys = series(3, 8);
@@ -3747,7 +3747,7 @@ fn limbs_mul_greater_to_out_toom_63_fail_3() {
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_63_fail_4() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_63_scratch_size(16, 9)];
+    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_63_scratch_len(16, 9)];
     let mut out = vec![10; 25];
     let xs = series(3, 17);
     let ys = series(3, 9);
@@ -3758,7 +3758,7 @@ fn limbs_mul_greater_to_out_toom_63_fail_4() {
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_63_fail_5() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_63_scratch_size(17, 9)];
+    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_63_scratch_len(17, 9)];
     let mut out = vec![10; 25];
     let xs = series(3, 17);
     let ys = series(3, 9);
@@ -3769,7 +3769,7 @@ fn limbs_mul_greater_to_out_toom_63_fail_5() {
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_63_fail_6() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_63_scratch_size(17, 0)];
+    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_63_scratch_len(17, 0)];
     let mut out = vec![10; 6];
     let xs = series(3, 17);
     _limbs_mul_greater_to_out_toom_63(&mut out, &xs, &[], &mut scratch);
@@ -3784,7 +3784,7 @@ fn test_limbs_mul_greater_to_out_toom_6h() {
         let out_after = out;
         let mut out = out_before.to_vec();
         let mut scratch =
-            vec![0; _limbs_mul_greater_to_out_toom_6h_scratch_size(xs.len(), ys.len())];
+            vec![0; _limbs_mul_greater_to_out_toom_6h_scratch_len(xs.len(), ys.len())];
         _limbs_mul_greater_to_out_toom_6h(&mut out, &xs, &ys, &mut scratch);
         assert_eq!(out, out_after);
     };
@@ -4048,7 +4048,7 @@ fn test_limbs_mul_greater_to_out_toom_6h() {
         let out_after = out;
         let mut out = out_before.to_vec();
         let mut scratch =
-            vec![0; _limbs_mul_greater_to_out_toom_6h_scratch_size(xs.len(), ys.len())];
+            vec![0; _limbs_mul_greater_to_out_toom_6h_scratch_len(xs.len(), ys.len())];
         _limbs_mul_greater_to_out_toom_6h(&mut out, &xs, &ys, &mut scratch);
         assert_eq!(out, out_after);
     };
@@ -4059,7 +4059,7 @@ fn test_limbs_mul_greater_to_out_toom_6h() {
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_6h_fail_1() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_6h_scratch_size(1, 1)];
+    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_6h_scratch_len(1, 1)];
     let mut out = vec![10; 4];
     _limbs_mul_greater_to_out_toom_6h(&mut out, &[6], &[1], &mut scratch);
 }
@@ -4068,7 +4068,7 @@ fn limbs_mul_greater_to_out_toom_6h_fail_1() {
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_6h_fail_2() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_6h_scratch_size(41, 42)];
+    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_6h_scratch_len(41, 42)];
     let mut out = vec![10; 83];
     let xs = series(3, 41);
     let ys = series(3, 42);
@@ -4079,7 +4079,7 @@ fn limbs_mul_greater_to_out_toom_6h_fail_2() {
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_6h_fail_3() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_6h_scratch_size(42, 41)];
+    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_6h_scratch_len(42, 41)];
     let mut out = vec![10; 83];
     let xs = series(3, 42);
     let ys = series(3, 41);
@@ -4090,7 +4090,7 @@ fn limbs_mul_greater_to_out_toom_6h_fail_3() {
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_6h_fail_4() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_6h_scratch_size(41, 41)];
+    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_6h_scratch_len(41, 41)];
     let mut out = vec![10; 82];
     let xs = series(3, 41);
     let ys = series(3, 41);
@@ -4101,7 +4101,7 @@ fn limbs_mul_greater_to_out_toom_6h_fail_4() {
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_6h_fail_5() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_6h_scratch_size(42, 42)];
+    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_6h_scratch_len(42, 42)];
     let mut out = vec![10; 83];
     let xs = series(3, 42);
     let ys = series(3, 42);
@@ -4112,7 +4112,7 @@ fn limbs_mul_greater_to_out_toom_6h_fail_5() {
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_6h_fail_6() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_6h_scratch_size(42, 0)];
+    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_6h_scratch_len(42, 0)];
     let mut out = vec![10; 42];
     let xs = series(3, 42);
     _limbs_mul_greater_to_out_toom_6h(&mut out, &xs, &[], &mut scratch);
@@ -4127,7 +4127,7 @@ fn test_limbs_mul_greater_to_out_toom_8h() {
         let out_after = out;
         let mut out = out_before.to_vec();
         let mut scratch =
-            vec![0; _limbs_mul_greater_to_out_toom_8h_scratch_size(xs.len(), ys.len())];
+            vec![0; _limbs_mul_greater_to_out_toom_8h_scratch_len(xs.len(), ys.len())];
         _limbs_mul_greater_to_out_toom_8h(&mut out, &xs, &ys, &mut scratch);
         assert_eq!(out, out_after);
     };
@@ -4533,7 +4533,7 @@ fn test_limbs_mul_greater_to_out_toom_8h() {
         let out_after = out;
         let mut out = out_before.to_vec();
         let mut scratch =
-            vec![0; _limbs_mul_greater_to_out_toom_8h_scratch_size(xs.len(), ys.len())];
+            vec![0; _limbs_mul_greater_to_out_toom_8h_scratch_len(xs.len(), ys.len())];
         _limbs_mul_greater_to_out_toom_8h(&mut out, &xs, &ys, &mut scratch);
         assert_eq!(out, out_after);
     };
@@ -4731,7 +4731,7 @@ fn test_limbs_mul_greater_to_out_toom_8h() {
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_8h_fail_1() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_8h_scratch_size(1, 1)];
+    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_8h_scratch_len(1, 1)];
     let mut out = vec![10; 4];
     _limbs_mul_greater_to_out_toom_8h(&mut out, &[6], &[1], &mut scratch);
 }
@@ -4740,7 +4740,7 @@ fn limbs_mul_greater_to_out_toom_8h_fail_1() {
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_8h_fail_2() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_8h_scratch_size(85, 86)];
+    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_8h_scratch_len(85, 86)];
     let mut out = vec![10; 171];
     let xs = series(3, 85);
     let ys = series(3, 86);
@@ -4751,7 +4751,7 @@ fn limbs_mul_greater_to_out_toom_8h_fail_2() {
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_8h_fail_3() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_8h_scratch_size(86, 85)];
+    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_8h_scratch_len(86, 85)];
     let mut out = vec![10; 171];
     let xs = series(3, 86);
     let ys = series(3, 85);
@@ -4762,7 +4762,7 @@ fn limbs_mul_greater_to_out_toom_8h_fail_3() {
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_8h_fail_4() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_8h_scratch_size(85, 85)];
+    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_8h_scratch_len(85, 85)];
     let mut out = vec![10; 170];
     let xs = series(3, 85);
     let ys = series(3, 85);
@@ -4773,7 +4773,7 @@ fn limbs_mul_greater_to_out_toom_8h_fail_4() {
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_8h_fail_5() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_8h_scratch_size(86, 86)];
+    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_8h_scratch_len(86, 86)];
     let mut out = vec![10; 171];
     let xs = series(3, 86);
     let ys = series(3, 86);
@@ -4784,7 +4784,7 @@ fn limbs_mul_greater_to_out_toom_8h_fail_5() {
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_8h_fail_6() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_8h_scratch_size(86, 0)];
+    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_8h_scratch_len(86, 0)];
     let mut out = vec![10; 86];
     let xs = series(3, 42);
     _limbs_mul_greater_to_out_toom_8h(&mut out, &xs, &[], &mut scratch);
@@ -15011,6 +15011,553 @@ fn test_limbs_mul_mod_limb_width_to_n_minus_1() {
         11716810196377677056,
     ];
     test(out, 960, xs, ys, tp, out_after);
+    test(
+        vec![
+            14220278540957382380,
+            2341486122221271577,
+            7196589596013057856,
+            1551746986989660725,
+            10730116577084868866,
+            5936722303301071470,
+            10369883251536410381,
+            12850276745016711948,
+            5296892922384710655,
+            17927383456923143639,
+            4297800151447374193,
+            13092886296891104150,
+            4359313044481849916,
+            3298387784200302647,
+            16596015395483459285,
+            6430047254377585078,
+            6434371216959893287,
+            14030068303817750616,
+            17753911968053092798,
+            4279608746592328433,
+            4376377052237075099,
+            41468300827872346,
+            14769069119913127616,
+            9177168551686374492,
+            15140565915751014925,
+            924212491380315180,
+            1560999192236438812,
+            18226600332889405930,
+            13348576723395503060,
+            3609063818274619379,
+            10959876508495766635,
+            1673947094507794325,
+            8930147615298565568,
+            1510138210058461841,
+            138658670646289458,
+            12458879312664552547,
+            2808979850323582450,
+            14034036666484023484,
+            5585848372598666548,
+            4257210144363692139,
+            6338629395801650540,
+            17487850811313620991,
+            11723765031594531899,
+            12058758430990318672,
+            13113234745283246366,
+            14258831759967032298,
+            5702057171550109179,
+            13097449289463197974,
+            4956526745376824433,
+            5705156949115651685,
+            12015733702012855186,
+            8669471405965585399,
+            1905089081593904691,
+            9375413288655317408,
+            2862087246546719140,
+            1438802037360108086,
+            18188344038773760076,
+            6710952137267346735,
+            5113990331512729307,
+            1249942195157804768,
+            12370173123137454524,
+            17270573617823502592,
+            7850217070904007210,
+            15008954292697138434,
+            14323227552451257069,
+            3071194499601430769,
+            1423266339629343645,
+            17719424777360227280,
+            5817741038340475518,
+            2288688081269683349,
+            1294813101366983999,
+            11187697042332288595,
+            16383307749918316156,
+            11964485411396601998,
+            2882482593432453314,
+            9642249517934314115,
+            10542384929787952175,
+            1685709334753615213,
+            9706601754650993843,
+            1704742035456300361,
+            14513229339862334723,
+            6682003045097239025,
+            4714611199273627241,
+            10432585451230614215,
+            5273605414681358823,
+            9969985476182536371,
+            5399491654701460340,
+            13433254437284849384,
+            8737041519297820559,
+            14151041462241779583,
+            12800325041646118168,
+            1054683376318581041,
+            10442674392431772880,
+            1301805922104023475,
+            12991162900765496493,
+            14882797183035693101,
+            4301011085545481404,
+            11250534379510854507,
+            6111542722921923807,
+            16925710356305375375,
+            4650629800913345495,
+            8040250152135495246,
+            6010724734735944849,
+            704649712350181160,
+            12623719311045527320,
+            17274359723691631952,
+            12634456101984828972,
+            18130410107220630156,
+            11889003125474723933,
+            16069412996687629414,
+            14767547198599161992,
+            1104256363303539555,
+        ],
+        112,
+        vec![
+            10900792384749518304,
+            1752565570529908396,
+            3402229115647561238,
+            2472381872242532960,
+            15748089475115162936,
+            1958855681762413475,
+            12100416912810779188,
+            12256578057348862042,
+            6556831077371185734,
+            15914846823057329492,
+            17346954154793811255,
+            17566187606614467459,
+            1433606366066775495,
+            9089332045922722756,
+            10056944581186126460,
+            5324425019386643029,
+            5281765195814058625,
+            1449711238109407238,
+            5903959110668039125,
+            3336955200427408551,
+            751494194154096512,
+            15350321905800137137,
+            12407374450431165353,
+            8705815621686854350,
+            18038286270431178148,
+            11671842546699641930,
+            9343865367071815679,
+            13401838367914321671,
+            18365991333043790435,
+            17428290065100096976,
+            6040216493892400727,
+            4224515713015397505,
+            16578741590625036060,
+            11835373548777581169,
+            18413478850867685366,
+            8453265724386285209,
+            5394500720474148965,
+            1927463313122594080,
+            4177838821929605731,
+            10680620304882583021,
+            180005403771618203,
+            2256408572502279608,
+            11718426532525535626,
+            14260315287467647015,
+            4035759666841010016,
+            16259497729863184485,
+            7772704202422133476,
+            6815813069474359325,
+            11207378575459431371,
+            18308033894506293455,
+            9875145231436590806,
+            15354934628544213986,
+            761822562304640527,
+            7391550101325083295,
+            4023926600201752832,
+            922969942182092752,
+            12110946035817932140,
+            16574399923422896843,
+            7087993004495856759,
+            8299428112066197874,
+            4589434828506762129,
+            13978205413565566735,
+            15675366647238478172,
+            7819770375827015142,
+            6823625407675143456,
+            2042269662440457350,
+            11521115322912473140,
+            13703874674141705702,
+            1295561690992462505,
+            12464082489717915012,
+            11378922861990148970,
+            2076282285705918066,
+            1390689690731346588,
+            13670979351308531000,
+            12980996477862222169,
+            10496970808504864546,
+            14015388605987660396,
+            4171129107047347396,
+            1656857204469415571,
+            17492457435753920912,
+            10132937897450237781,
+            5065601177732655021,
+            17498367701449356268,
+            9552937910825811119,
+            6213399497134928078,
+            12865519292113075754,
+            8548871019474664332,
+            12973212090641168109,
+            3018095992673320728,
+            4102580256148037725,
+            11411505815957245048,
+            8044142604358855954,
+            6163064685377006161,
+            7676133172626151339,
+            15177331097378985405,
+            923128391789363540,
+            8405355494789853124,
+            8409013636286216842,
+            17519952046647436442,
+            12690425880634822079,
+            7295927951214020420,
+            5103171252065286692,
+            4531269626482776566,
+            17509133779966482098,
+            16771567673323510549,
+            9940518318209913958,
+            2566490491730418524,
+            4997841530198583881,
+            11759671980624847072,
+            12804335234851198898,
+        ],
+        vec![
+            564820221219774033,
+            4488711358679422475,
+            10020082426042197380,
+            17225157352286806558,
+            5780768250525361575,
+            1970180556702143116,
+            5857604197270789289,
+            4060596445048742789,
+            4197799076012455571,
+            7044577438443748571,
+            9865458079653433267,
+            16329626967551115891,
+            4152461199188161627,
+            13000775528850398936,
+            7619420622350160180,
+            14900279174214956337,
+            1704825421557733731,
+            47372161928033978,
+            3056759021249434255,
+            16034528189533406528,
+            6435981853629992716,
+            7347416955208902363,
+            7867885339734871956,
+            16003312811447303393,
+            11973054691848315139,
+            4061237791967812067,
+            2991418391396596002,
+            4703879799196538602,
+        ],
+        vec![
+            17578771842269238556,
+            10550562699554142644,
+            8014103604728001619,
+            7390436293466268454,
+            7100508597220429999,
+            13756539744133134331,
+            3525655558627413814,
+            170556856626573274,
+            13733802409149293411,
+            7547658189901533049,
+            10109863308220110581,
+            2718018624165645986,
+            17221869495150324628,
+            1084076247398656329,
+            9986824749465272556,
+            9281213789632200478,
+            8263835511857229414,
+            2738190782342964576,
+            4727749457903038288,
+            5193416305832697137,
+            10922073469544468796,
+            10479120898291460619,
+            16531138594227806551,
+            5669282286095321480,
+            910652003754331469,
+            7613181106845480358,
+            9797364435815597385,
+            2605791728953382133,
+            3252270662152843680,
+            14622379517499579600,
+            15478463498321531331,
+            11333349078754873211,
+            3607338878951398292,
+            13712359136800994328,
+            2877919791629132004,
+            16504311509495367657,
+            3984067008787761258,
+            12750589284505094681,
+            2943531823722430709,
+            13059724297333425458,
+            913829495058925011,
+            18148528311470701517,
+            9740722521202851845,
+            14187622249425297058,
+            18404294373540546372,
+            16126489610510541686,
+            7594528449544330894,
+            7307162781265364836,
+            18291168119091813753,
+            6207931594466286839,
+            4606167418509673090,
+            14995240148627089997,
+            15715313103810577432,
+            18105567578045566655,
+            722560899028528632,
+            7800517321196764697,
+            0,
+            11237865801974219633,
+            8495979800230117621,
+            9987880506353342706,
+            13881397368512772448,
+            16410969001089181498,
+            333374346498930988,
+            4965563385767496990,
+            672660669687292950,
+            15110765557390623369,
+            6227398366445560799,
+            10437883884413763417,
+            186853687685224617,
+            12984935070726568218,
+            17363252202577108630,
+            11014686580262231685,
+            12860125675167553971,
+            5547449898028817740,
+            1954311880857527678,
+            12081499992106861757,
+            14088922543958348561,
+            5962182563926402036,
+            5741569353545905243,
+            4210355652762257668,
+            9053751503514703697,
+            7217335315946897611,
+            6001545942842673798,
+            2462625304327945285,
+            291604632040409357,
+            2217739517798639603,
+            2459684629220685427,
+            3250634546851783096,
+            6059950473822714693,
+            582656439794855702,
+            10281608630795849151,
+            15786006397997472307,
+            16261716592524561399,
+            17594773541694900671,
+            16563607893390940119,
+            15505686658080216809,
+            2051217090370709743,
+            13908204460746584986,
+            10039065459685700894,
+            14729811272925582111,
+            2491677743278343614,
+            2841321092069312904,
+            15064468426708488588,
+            9844013577617278901,
+            15394077255564897694,
+            7846267917227712141,
+            2926235763818832770,
+            3614802673424810100,
+            9439654670958755441,
+            11228283553719081427,
+            300805303577965353,
+            137972366037263628,
+            0,
+            0,
+            17236590422641137780,
+            3624909720816563168,
+            14760980184861256094,
+            12619697833885886701,
+            11158654646608400806,
+            6427394341906398356,
+            14871794339281852631,
+            4436807681521846899,
+            18179949743405593894,
+            13872577160616872141,
+            5825838831881338115,
+            3862312932472761757,
+            138044675074312990,
+            15071993629914359360,
+            17124765792905529105,
+            3248142733680724962,
+            3891075505082712037,
+            6225475960510427854,
+            11369706706515368571,
+            11286728465632095620,
+            5182849661875987731,
+            11179192798752789740,
+            10750517245961749782,
+            9660102259642485054,
+            7905348372980940366,
+            6606241368966986909,
+            10292241739332011027,
+            3848900457088510551,
+            12152591835908862357,
+            4562770772987021222,
+            15938089548127288011,
+            9698047696083781011,
+            13560645597951715331,
+            7732793292629543444,
+            7001973034910440318,
+            409123120027429255,
+            17678180108806694420,
+            12698074214205994356,
+            7447251798260171941,
+            9757491913093219480,
+            10221393982691316695,
+            12294139009925614381,
+            12645218559587650799,
+            1569889406832824935,
+            15186575789336541212,
+            11156326477797897792,
+            3241434575939356910,
+            7753423363217428843,
+            12882554975845472437,
+            8367515576296379496,
+            7308654739706172282,
+            10357093098345630105,
+            7448894655389345071,
+            13033958940183436012,
+            4023926600201752831,
+            922969942182092752,
+            0,
+            0,
+        ],
+        vec![
+            428006685349647609,
+            7204145293518952443,
+            11791003654963925746,
+            2505792214484682253,
+            8108316487989608659,
+            13780196866264665329,
+            9953181804399070508,
+            4136674009057114789,
+            16606729965278593786,
+            17177157337945625561,
+            4837680254021048240,
+            9379658380128247416,
+            3012240265336162150,
+            10902131616911906952,
+            4485885110776748559,
+            11729287033558411069,
+            3601025811236822387,
+            16042927197309963407,
+            15195320086232266472,
+            1335053215979905641,
+            13532069890206403083,
+            18094969954718697842,
+            11554202269641514254,
+            6403207599202754602,
+            5506746445690691110,
+            15578759879114917443,
+            8851198090240221910,
+            33092233213362571,
+            3901122084110515729,
+            1066956798888524232,
+            14634384737761094242,
+            12113217349928728328,
+            9311779266239300758,
+            3954657017302988647,
+            15532948787491930233,
+            7561648003514142824,
+            3533375924863968581,
+            11403256543506170549,
+            14720984883173782359,
+            17386473882517270759,
+            13904760793036335927,
+            1743693703212112035,
+            16080759313684757024,
+            16414994735840739,
+            5271412552749845691,
+            14285133708577039222,
+            2285218927081566054,
+            4416233718641470493,
+            18000037526325532907,
+            9874370178595584823,
+            2431098204987529914,
+            16053941488194364614,
+            13953671515916339883,
+            2042478395473246676,
+            15825222700565763229,
+            215338277757125297,
+            11715801345488940860,
+            15276655380547065511,
+            18173108185582673895,
+            14702410041012894911,
+            17207703913939254166,
+            4048944409583435567,
+            9240704600129021640,
+            10746010074070008578,
+            10882274053549736437,
+            17502803382613798018,
+            17103667474686148623,
+            1210754893985321636,
+            14411333195446047958,
+            9505671694718631767,
+            17438945960504601463,
+            17181086340701682720,
+            2087061119253391199,
+            4309925416075845511,
+            15682876991754565762,
+            1083109033127246208,
+            4261779269652031267,
+            12103546078796301947,
+            11869822949907847429,
+            10776362556491885652,
+            3496260740980747565,
+            1952845492765004055,
+            3956805099328134345,
+            13449597823431522461,
+            1303096111058814577,
+            2380211731709650934,
+            18106526914056683197,
+            11484139358020791769,
+            2127792824095743993,
+            4065001616617210813,
+            16699812364763026472,
+            7039834103740457737,
+            13922378224749177434,
+            3842744781605852390,
+            2881049947442869386,
+            9197037672589549736,
+            16294658006443583090,
+            1354837441772061197,
+            6800107739861512622,
+            7157401423299319780,
+            11344094968696196811,
+            14476284546277236050,
+            5424464793786542079,
+            5963838631551795433,
+            5066844411121684619,
+            17308776236012135105,
+            4153319859448120557,
+            9810663971090332314,
+            4914337127311050195,
+            3998867848399474691,
+            5662987571533822588,
+            879647540404803095,
+        ],
+    );
 }
 
 #[cfg(not(feature = "32_bit_limbs"))]
@@ -16664,7 +17211,7 @@ fn test_mul() {
     );
 }
 
-fn limbs_mul_helper(f: &Fn(&[Limb], &[Limb]) -> Vec<Limb>, xs: &Vec<Limb>, ys: &Vec<Limb>) {
+fn limbs_mul_helper(f: &dyn Fn(&[Limb], &[Limb]) -> Vec<Limb>, xs: &Vec<Limb>, ys: &Vec<Limb>) {
     let result = f(xs, ys);
     assert_eq!(result.len(), xs.len() + ys.len());
     assert_eq!(
@@ -16763,7 +17310,7 @@ fn limbs_mul_greater_to_out_toom_22_properties() {
         |&(ref out, ref xs, ref ys)| {
             let expected_out = limbs_mul_basecase_helper(out, xs, ys);
             let mut out = out.to_vec();
-            let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_22_scratch_size(xs.len())];
+            let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_22_scratch_len(xs.len())];
             _limbs_mul_greater_to_out_toom_22(&mut out, xs, ys, &mut scratch);
             assert_eq!(out, expected_out);
         },
@@ -16779,7 +17326,7 @@ fn limbs_mul_greater_to_out_toom_32_properties() {
             let expected_out = limbs_mul_basecase_helper(out, xs, ys);
             let mut out = out.to_vec();
             let mut scratch =
-                vec![0; _limbs_mul_greater_to_out_toom_32_scratch_size(xs.len(), ys.len())];
+                vec![0; _limbs_mul_greater_to_out_toom_32_scratch_len(xs.len(), ys.len())];
             _limbs_mul_greater_to_out_toom_32(&mut out, xs, ys, &mut scratch);
             assert_eq!(out, expected_out);
         },
@@ -16794,7 +17341,7 @@ fn limbs_mul_greater_to_out_toom_33_properties() {
         |&(ref out, ref xs, ref ys)| {
             let expected_out = limbs_mul_basecase_helper(out, xs, ys);
             let mut out = out.to_vec();
-            let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_33_scratch_size(xs.len())];
+            let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_33_scratch_len(xs.len())];
             _limbs_mul_greater_to_out_toom_33(&mut out, xs, ys, &mut scratch);
             assert_eq!(out, expected_out);
         },
@@ -16810,7 +17357,7 @@ fn limbs_mul_greater_to_out_toom_42_properties() {
             let expected_out = limbs_mul_basecase_helper(out, xs, ys);
             let mut out = out.to_vec();
             let mut scratch =
-                vec![0; _limbs_mul_greater_to_out_toom_42_scratch_size(xs.len(), ys.len())];
+                vec![0; _limbs_mul_greater_to_out_toom_42_scratch_len(xs.len(), ys.len())];
             _limbs_mul_greater_to_out_toom_42(&mut out, xs, ys, &mut scratch);
             assert_eq!(out, expected_out);
         },
@@ -16826,7 +17373,7 @@ fn limbs_mul_greater_to_out_toom_43_properties() {
             let expected_out = limbs_mul_basecase_helper(out, xs, ys);
             let mut out = out.to_vec();
             let mut scratch =
-                vec![0; _limbs_mul_greater_to_out_toom_43_scratch_size(xs.len(), ys.len())];
+                vec![0; _limbs_mul_greater_to_out_toom_43_scratch_len(xs.len(), ys.len())];
             _limbs_mul_greater_to_out_toom_43(&mut out, xs, ys, &mut scratch);
             assert_eq!(out, expected_out);
         },
@@ -16841,7 +17388,7 @@ fn limbs_mul_greater_to_out_toom_44_properties() {
         |&(ref out, ref xs, ref ys)| {
             let expected_out = limbs_mul_basecase_helper(out, xs, ys);
             let mut out = out.to_vec();
-            let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_44_scratch_size(xs.len())];
+            let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_44_scratch_len(xs.len())];
             _limbs_mul_greater_to_out_toom_44(&mut out, xs, ys, &mut scratch);
             assert_eq!(out, expected_out);
         },
@@ -16857,7 +17404,7 @@ fn limbs_mul_greater_to_out_toom_52_properties() {
             let expected_out = limbs_mul_basecase_helper(out, xs, ys);
             let mut out = out.to_vec();
             let mut scratch =
-                vec![0; _limbs_mul_greater_to_out_toom_52_scratch_size(xs.len(), ys.len())];
+                vec![0; _limbs_mul_greater_to_out_toom_52_scratch_len(xs.len(), ys.len())];
             _limbs_mul_greater_to_out_toom_52(&mut out, xs, ys, &mut scratch);
             assert_eq!(out, expected_out);
         },
@@ -16873,7 +17420,7 @@ fn limbs_mul_greater_to_out_toom_53_properties() {
             let expected_out = limbs_mul_basecase_helper(out, xs, ys);
             let mut out = out.to_vec();
             let mut scratch =
-                vec![0; _limbs_mul_greater_to_out_toom_53_scratch_size(xs.len(), ys.len())];
+                vec![0; _limbs_mul_greater_to_out_toom_53_scratch_len(xs.len(), ys.len())];
             _limbs_mul_greater_to_out_toom_53(&mut out, xs, ys, &mut scratch);
             assert_eq!(out, expected_out);
         },
@@ -16889,7 +17436,7 @@ fn limbs_mul_greater_to_out_toom_54_properties() {
             let expected_out = limbs_mul_basecase_helper(out, xs, ys);
             let mut out = out.to_vec();
             let mut scratch =
-                vec![0; _limbs_mul_greater_to_out_toom_54_scratch_size(xs.len(), ys.len())];
+                vec![0; _limbs_mul_greater_to_out_toom_54_scratch_len(xs.len(), ys.len())];
             _limbs_mul_greater_to_out_toom_54(&mut out, xs, ys, &mut scratch);
             assert_eq!(out, expected_out);
         },
@@ -16905,7 +17452,7 @@ fn limbs_mul_greater_to_out_toom_62_properties() {
             let expected_out = limbs_mul_basecase_helper(out, xs, ys);
             let mut out = out.to_vec();
             let mut scratch =
-                vec![0; _limbs_mul_greater_to_out_toom_62_scratch_size(xs.len(), ys.len())];
+                vec![0; _limbs_mul_greater_to_out_toom_62_scratch_len(xs.len(), ys.len())];
             _limbs_mul_greater_to_out_toom_62(&mut out, xs, ys, &mut scratch);
             assert_eq!(out, expected_out);
         },
@@ -16921,7 +17468,7 @@ fn limbs_mul_greater_to_out_toom_63_properties() {
             let expected_out = limbs_mul_basecase_helper(out, xs, ys);
             let mut out = out.to_vec();
             let mut scratch =
-                vec![0; _limbs_mul_greater_to_out_toom_63_scratch_size(xs.len(), ys.len())];
+                vec![0; _limbs_mul_greater_to_out_toom_63_scratch_len(xs.len(), ys.len())];
             _limbs_mul_greater_to_out_toom_63(&mut out, xs, ys, &mut scratch);
             assert_eq!(out, expected_out);
         },
@@ -16937,7 +17484,7 @@ fn limbs_mul_greater_to_out_toom_6h_properties() {
             let expected_out = limbs_mul_basecase_helper(out, xs, ys);
             let mut out = out.to_vec();
             let mut scratch =
-                vec![0; _limbs_mul_greater_to_out_toom_6h_scratch_size(xs.len(), ys.len())];
+                vec![0; _limbs_mul_greater_to_out_toom_6h_scratch_len(xs.len(), ys.len())];
             _limbs_mul_greater_to_out_toom_6h(&mut out, xs, ys, &mut scratch);
             assert_eq!(out, expected_out);
         },
@@ -16953,7 +17500,7 @@ fn limbs_mul_greater_to_out_toom_8h_properties() {
             let expected_out = limbs_mul_basecase_helper(out, xs, ys);
             let mut out = out.to_vec();
             let mut scratch =
-                vec![0; _limbs_mul_greater_to_out_toom_8h_scratch_size(xs.len(), ys.len())];
+                vec![0; _limbs_mul_greater_to_out_toom_8h_scratch_len(xs.len(), ys.len())];
             _limbs_mul_greater_to_out_toom_8h(&mut out, xs, ys, &mut scratch);
             assert_eq!(out, expected_out);
         },

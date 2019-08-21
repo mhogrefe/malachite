@@ -52,7 +52,7 @@ pub(crate) fn _limbs_mul_mod_limb_width_to_n_minus_1_next_size(n: usize) -> usiz
 /// Additional memory: O(1)
 ///
 /// This is mpn_mulmod_bnm1_itch from gmp-impl.h.
-pub(crate) fn _limbs_mul_mod_limb_width_to_n_minus_1_scratch_size(
+pub(crate) fn _limbs_mul_mod_limb_width_to_n_minus_1_scratch_len(
     n: usize,
     xs_len: usize,
     ys_len: usize,
@@ -250,8 +250,8 @@ pub fn _limbs_mul_mod_limb_width_to_n_minus_1(
                     assert!(!limbs_slice_add_limb_in_place(scratch_2, 1));
                 }
                 anp = half_n + usize::checked_from(*scratch_2.last_mut().unwrap()).unwrap();
-
                 if !bp1_is_ys_0 {
+                    let scratch_3 = &mut scratch_3[..m];
                     let (ys_0, ys_1) = ys.split_at(half_n);
                     let carry = limbs_sub_to_out(scratch_3, ys_0, ys_1);
                     *scratch_3.last_mut().unwrap() = 0;
@@ -336,7 +336,6 @@ pub fn _limbs_mul_mod_limb_width_to_n_minus_1(
                 );
             }
         }
-
         // Here the Chinese Remainder Theorem recomposition begins.
         //
         // let xm = (scratch + xm) / 2 = (scratch + xm) * Limb::WIDTH ^ half_n / 2 mod

@@ -42,7 +42,7 @@ pub const CHAR_JUST_ABOVE_SURROGATES: char = '\u{e000}';
 /// ```
 pub fn char_to_contiguous_range(c: char) -> u32 {
     match c {
-        '\u{0}'...CHAR_JUST_BELOW_SURROGATES => c as u32,
+        '\u{0}'..=CHAR_JUST_BELOW_SURROGATES => c as u32,
         _ => c as u32 - SURROGATE_RANGE_SIZE,
     }
 }
@@ -67,8 +67,8 @@ pub fn contiguous_range_to_char(u: u32) -> Option<char> {
     const ONE_BELOW_FIRST_SURROGATE_CODE_POINT: u32 = FIRST_SURROGATE_CODE_POINT - 1;
     const ONE_BELOW_NUMBER_OF_CHARS: u32 = NUMBER_OF_CHARS - 1;
     match u {
-        0...ONE_BELOW_FIRST_SURROGATE_CODE_POINT => char::from_u32(u),
-        FIRST_SURROGATE_CODE_POINT...ONE_BELOW_NUMBER_OF_CHARS => {
+        0..=ONE_BELOW_FIRST_SURROGATE_CODE_POINT => char::from_u32(u),
+        FIRST_SURROGATE_CODE_POINT..=ONE_BELOW_NUMBER_OF_CHARS => {
             char::from_u32(u + SURROGATE_RANGE_SIZE)
         }
         _ => None,

@@ -50,7 +50,7 @@ pub fn test_custom_cmp_helper<T: Debug + FromStr + Ord, F: FnMut(&T, &T) -> Orde
     }
 }
 
-pub fn test_properties<T, G: Fn(GenerationMode) -> Box<Iterator<Item = T>>, F: FnMut(&T)>(
+pub fn test_properties<T, G: Fn(GenerationMode) -> Box<dyn Iterator<Item = T>>, F: FnMut(&T)>(
     gen: G,
     mut test: F,
 ) {
@@ -67,7 +67,7 @@ pub fn test_properties<T, G: Fn(GenerationMode) -> Box<Iterator<Item = T>>, F: F
 
 pub fn test_properties_no_special<
     T,
-    G: Fn(NoSpecialGenerationMode) -> Box<Iterator<Item = T>>,
+    G: Fn(NoSpecialGenerationMode) -> Box<dyn Iterator<Item = T>>,
     F: FnMut(&T),
 >(
     gen: G,
@@ -85,7 +85,7 @@ pub fn test_properties_no_special<
 
 pub fn test_properties_custom_scale<
     T,
-    G: Fn(GenerationMode) -> Box<Iterator<Item = T>>,
+    G: Fn(GenerationMode) -> Box<dyn Iterator<Item = T>>,
     F: FnMut(&T),
 >(
     scale: u32,
@@ -105,7 +105,7 @@ pub fn test_properties_custom_scale<
 
 pub fn test_properties_no_limit_exhaustive_no_special<
     T,
-    G: Fn(NoSpecialGenerationMode) -> Box<Iterator<Item = T>>,
+    G: Fn(NoSpecialGenerationMode) -> Box<dyn Iterator<Item = T>>,
     F: FnMut(&T),
 >(
     gen: G,

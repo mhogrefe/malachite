@@ -1,6 +1,6 @@
 use malachite_nz::natural::arithmetic::mul::toom::{
-    _limbs_mul_greater_to_out_toom_42, _limbs_mul_greater_to_out_toom_42_scratch_size,
-    _limbs_mul_greater_to_out_toom_53, _limbs_mul_greater_to_out_toom_53_scratch_size,
+    _limbs_mul_greater_to_out_toom_42, _limbs_mul_greater_to_out_toom_42_scratch_len,
+    _limbs_mul_greater_to_out_toom_53, _limbs_mul_greater_to_out_toom_53_scratch_len,
 };
 use malachite_nz::platform::Limb;
 
@@ -12,12 +12,12 @@ pub fn tune() -> Vec<String> {
     let result = compare_two(
         &mut (|(mut out, xs, ys): (Vec<Limb>, Vec<Limb>, Vec<Limb>)| {
             let mut scratch =
-                vec![0; _limbs_mul_greater_to_out_toom_42_scratch_size(xs.len(), ys.len())];
+                vec![0; _limbs_mul_greater_to_out_toom_42_scratch_len(xs.len(), ys.len())];
             _limbs_mul_greater_to_out_toom_42(&mut out, &xs, &ys, &mut scratch)
         }),
         &mut (|(mut out, xs, ys): (Vec<Limb>, Vec<Limb>, Vec<Limb>)| {
             let mut scratch =
-                vec![0; _limbs_mul_greater_to_out_toom_53_scratch_size(xs.len(), ys.len())];
+                vec![0; _limbs_mul_greater_to_out_toom_53_scratch_len(xs.len(), ys.len())];
             _limbs_mul_greater_to_out_toom_53(&mut out, &xs, &ys, &mut scratch)
         }),
         triples_of_unsigned_vec_var_36(GenerationMode::Random(1024)),

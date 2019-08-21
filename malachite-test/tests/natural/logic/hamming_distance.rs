@@ -92,7 +92,7 @@ fn test_hamming_distance() {
 }
 
 fn limbs_hamming_distance_helper(
-    f: &mut FnMut(&[Limb], &[Limb]) -> u64,
+    f: &mut dyn FnMut(&[Limb], &[Limb]) -> u64,
     xs: &Vec<Limb>,
     ys: &Vec<Limb>,
 ) {

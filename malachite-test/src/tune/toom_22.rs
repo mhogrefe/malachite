@@ -1,6 +1,6 @@
 use malachite_nz::natural::arithmetic::mul::_limbs_mul_greater_to_out_basecase;
 use malachite_nz::natural::arithmetic::mul::toom::{
-    _limbs_mul_greater_to_out_toom_22, _limbs_mul_greater_to_out_toom_22_scratch_size,
+    _limbs_mul_greater_to_out_toom_22, _limbs_mul_greater_to_out_toom_22_scratch_len,
 };
 use malachite_nz::platform::Limb;
 
@@ -14,7 +14,7 @@ pub fn tune() -> Vec<String> {
             _limbs_mul_greater_to_out_basecase(&mut out, &xs, &ys)
         }),
         &mut (|(mut out, xs, ys): (Vec<Limb>, Vec<Limb>, Vec<Limb>)| {
-            let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_22_scratch_size(xs.len())];
+            let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_22_scratch_len(xs.len())];
             _limbs_mul_greater_to_out_toom_22(&mut out, &xs, &ys, &mut scratch)
         }),
         triples_of_unsigned_vec_var_11(GenerationMode::Random(1024)),

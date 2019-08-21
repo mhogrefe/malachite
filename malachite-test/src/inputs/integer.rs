@@ -111,7 +111,7 @@ pub fn rm_pairs_of_integers(
 pub fn nrm_pairs_of_integers(
     gm: GenerationMode,
 ) -> Box<
-    Iterator<
+    dyn Iterator<
         Item = (
             (BigInt, BigInt),
             (rug::Integer, rug::Integer),

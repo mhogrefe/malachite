@@ -238,7 +238,11 @@ fn test_or() {
     test("12345678987654321", "314159265358979", "12347506587071667");
 }
 
-fn limbs_or_helper(f: &mut FnMut(&[Limb], &[Limb]) -> Vec<Limb>, xs: &Vec<Limb>, ys: &Vec<Limb>) {
+fn limbs_or_helper(
+    f: &mut dyn FnMut(&[Limb], &[Limb]) -> Vec<Limb>,
+    xs: &Vec<Limb>,
+    ys: &Vec<Limb>,
+) {
     assert_eq!(
         Natural::from_owned_limbs_asc(f(xs, ys)),
         Natural::from_limbs_asc(xs) | Natural::from_limbs_asc(ys)

@@ -705,7 +705,7 @@ fn test_add() {
     );
 }
 
-fn limbs_add_helper(f: &Fn(&[Limb], &[Limb]) -> Vec<Limb>, xs: &Vec<Limb>, ys: &Vec<Limb>) {
+fn limbs_add_helper(f: &dyn Fn(&[Limb], &[Limb]) -> Vec<Limb>, xs: &Vec<Limb>, ys: &Vec<Limb>) {
     assert_eq!(
         Natural::from_owned_limbs_asc(f(xs, ys)),
         Natural::from_limbs_asc(xs) + Natural::from_limbs_asc(ys)
@@ -727,8 +727,8 @@ fn limbs_add_properties() {
 }
 
 fn limbs_add_to_out_helper(
-    f: &mut FnMut(&mut [Limb], &[Limb], &[Limb]) -> bool,
-    out_len: &Fn(usize, usize) -> usize,
+    f: &mut dyn FnMut(&mut [Limb], &[Limb], &[Limb]) -> bool,
+    out_len: &dyn Fn(usize, usize) -> usize,
     out: &Vec<Limb>,
     xs: &Vec<Limb>,
     ys: &Vec<Limb>,
@@ -817,7 +817,7 @@ fn limbs_add_to_out_aliased_properties() {
 }
 
 fn limbs_slice_add_in_place_left_helper(
-    f: &mut FnMut(&mut [Limb], &[Limb]) -> bool,
+    f: &mut dyn FnMut(&mut [Limb], &[Limb]) -> bool,
     xs: &Vec<Limb>,
     ys: &Vec<Limb>,
 ) {

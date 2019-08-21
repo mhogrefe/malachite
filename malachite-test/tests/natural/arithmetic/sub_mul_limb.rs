@@ -264,7 +264,7 @@ fn limbs_sub_mul_limb_greater_properties() {
 }
 
 fn limbs_sub_mul_limb_in_place_left_helper(
-    f: &mut FnMut(&mut [Limb], &[Limb], Limb) -> Limb,
+    f: &mut dyn FnMut(&mut [Limb], &[Limb], Limb) -> Limb,
     a: &Vec<Limb>,
     b: &Vec<Limb>,
     c: Limb,

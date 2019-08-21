@@ -10,7 +10,7 @@ use std::iter::repeat;
 
 pub fn natural_hamming_distance_limb_alt_1(n: &Natural, u: Limb) -> u64 {
     let u = Natural::from(u);
-    let bit_zip: Box<Iterator<Item = (bool, bool)>> =
+    let bit_zip: Box<dyn Iterator<Item = (bool, bool)>> =
         if n.significant_bits() >= u.significant_bits() {
             Box::new(n.bits().zip(u.bits().chain(repeat(false))))
         } else {
@@ -27,7 +27,7 @@ pub fn natural_hamming_distance_limb_alt_1(n: &Natural, u: Limb) -> u64 {
 
 pub fn natural_hamming_distance_limb_alt_2(n: &Natural, u: Limb) -> u64 {
     let u = Natural::from(u);
-    let limb_zip: Box<Iterator<Item = (Limb, Limb)>> = if n.limb_count() >= u.limb_count() {
+    let limb_zip: Box<dyn Iterator<Item = (Limb, Limb)>> = if n.limb_count() >= u.limb_count() {
         Box::new(n.limbs().zip(u.limbs().chain(repeat(0))))
     } else {
         Box::new(n.limbs().chain(repeat(0)).zip(u.limbs()))

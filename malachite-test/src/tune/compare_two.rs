@@ -13,11 +13,11 @@ pub enum ComparisonResult {
 }
 
 pub fn compare_two<'a, I: Iterator>(
-    first: &'a mut FnMut(I::Item),
-    second: &'a mut FnMut(I::Item),
+    first: &'a mut dyn FnMut(I::Item),
+    second: &'a mut dyn FnMut(I::Item),
     generator: I,
     limit: usize,
-    bucketing_function: &'a Fn(&I::Item) -> usize,
+    bucketing_function: &'a dyn Fn(&I::Item) -> usize,
 ) -> ComparisonResult
 where
     I::Item: Clone,

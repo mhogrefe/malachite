@@ -58,10 +58,10 @@ use rust_wheels::iterators::strings::{
     exhaustive_strings, exhaustive_strings_with_chars, random_strings, random_strings_with_chars,
 };
 use rust_wheels::iterators::tuples::{
-    exhaustive_pairs, exhaustive_pairs_from_single, exhaustive_quadruples, exhaustive_triples,
-    exhaustive_triples_from_single, lex_pairs, lex_triples, log_pairs, random_pairs,
-    random_pairs_from_single, random_quadruples, random_triples, random_triples_from_single,
-    sqrt_pairs,
+    exhaustive_pairs, exhaustive_pairs_from_single, exhaustive_quadruples, exhaustive_quintuples,
+    exhaustive_triples, exhaustive_triples_from_single, lex_pairs, lex_triples, log_pairs,
+    random_pairs, random_pairs_from_single, random_quadruples, random_quintuples, random_triples,
+    random_triples_from_single, sqrt_pairs,
 };
 use rust_wheels::iterators::vecs::{
     exhaustive_vecs, exhaustive_vecs_min_length, random_vecs, random_vecs_min_length,
@@ -82,7 +82,7 @@ pub fn bools(gm: NoSpecialGenerationMode) -> It<bool> {
     }
 }
 
-pub(crate) type It<T> = Box<Iterator<Item = T>>;
+pub(crate) type It<T> = Box<dyn Iterator<Item = T>>;
 
 pub fn unsigneds<T: PrimitiveUnsigned + Rand>(gm: GenerationMode) -> It<T> {
     match gm {
@@ -1288,7 +1288,7 @@ pub fn triples_of_unsigned_unsigned_and_small_unsigned<
 
 // All sextuples of `Limb`s that are valid inputs to `limbs_div_mod_three_limb_by_two_limb`.
 pub fn sextuples_of_limbs_var_1(gm: GenerationMode) -> It<(Limb, Limb, Limb, Limb, Limb, Limb)> {
-    let quads: &Fn(&[u32]) -> It<((Limb, Limb), (Limb, Limb))> = &|seed| {
+    let quads: &dyn Fn(&[u32]) -> It<((Limb, Limb), (Limb, Limb))> = &|seed| {
         let q: It<((Limb, Limb), (Limb, Limb))> = match gm {
             GenerationMode::Exhaustive => Box::new(exhaustive_pairs(
                 pairs_of_unsigneds(gm),
@@ -1302,7 +1302,7 @@ pub fn sextuples_of_limbs_var_1(gm: GenerationMode) -> It<(Limb, Limb, Limb, Lim
         };
         q
     };
-    let filtered_quads: &Fn(&[u32]) -> It<((Limb, Limb), (Limb, Limb))> = &|seed| {
+    let filtered_quads: &dyn Fn(&[u32]) -> It<((Limb, Limb), (Limb, Limb))> = &|seed| {
         Box::new(
             quads(seed).filter(|((n_2, n_1), (d_1, d_0))| n_2 < d_1 || n_2 == d_1 && n_1 < d_0),
         )
@@ -2286,6 +2286,48 @@ fn factors_of_limb_max() -> Vec<Limb> {
         factors.push(factor);
     }
     factors
+}
+
+// All quadruples of `Vec<Limb>`, where `qs`, `rs`, `ns`, and `ds` meet the preconditions of
+// `_limbs_div_mod_barrett`.
+pub fn quadruples_of_unsigned_vec_var_1(
+    gm: GenerationMode,
+) -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>, Vec<Limb>)> {
+    let qs: It<(Vec<Limb>, Vec<Limb>, Vec<Limb>, Vec<Limb>, Limb)> = match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_quintuples(
+            exhaustive_vecs_min_length(1, exhaustive_unsigned()),
+            exhaustive_vecs_min_length(2, exhaustive_unsigned()),
+            exhaustive_vecs_min_length(3, exhaustive_unsigned()),
+            exhaustive_vecs_min_length(1, exhaustive_unsigned()),
+            range_up_increasing(1 << (Limb::WIDTH - 1)),
+        )),
+        GenerationMode::Random(scale) => Box::new(random_quintuples(
+            &EXAMPLE_SEED,
+            &(|seed| random_vecs_min_length(seed, scale, 1, &(|seed_2| random(seed_2)))),
+            &(|seed| random_vecs_min_length(seed, scale, 2, &(|seed_2| random(seed_2)))),
+            &(|seed| random_vecs_min_length(seed, scale, 3, &(|seed_2| random(seed_2)))),
+            &(|seed| random_vecs_min_length(seed, scale, 1, &(|seed_2| random(seed_2)))),
+            &(|seed| random_range_up(seed, 1 << (Limb::WIDTH - 1))),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_quintuples(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_unsigned_vecs_min_length(seed, scale, 1)),
+            &(|seed| special_random_unsigned_vecs_min_length(seed, scale, 2)),
+            &(|seed| special_random_unsigned_vecs_min_length(seed, scale, 3)),
+            &(|seed| special_random_unsigned_vecs_min_length(seed, scale, 1)),
+            &(|seed| random_range_up(seed, 1 << (Limb::WIDTH - 1))),
+        )),
+    };
+    Box::new(
+        qs.filter(|(q, r, n, d_init, _)| {
+            let d_len = d_init.len() + 1;
+            r.len() >= d_len && n.len() > d_len && q.len() >= n.len() - d_len
+        })
+        .map(|(q, r, n, mut d_init, d_last)| {
+            d_init.push(d_last);
+            (q, r, n, d_init)
+        }),
+    )
 }
 
 fn quadruples_of_unsigned_vec_unsigned_vec_unsigned_and_unsigned<T: PrimitiveUnsigned + Rand>(

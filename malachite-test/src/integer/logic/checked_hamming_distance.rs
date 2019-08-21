@@ -19,7 +19,7 @@ pub fn integer_checked_hamming_distance_alt_1(x: &Integer, y: &Integer) -> Optio
     if negative != (*y < 0 as Limb) {
         return None;
     }
-    let bit_zip: Box<Iterator<Item = (bool, bool)>> =
+    let bit_zip: Box<dyn Iterator<Item = (bool, bool)>> =
         if x.twos_complement_bits().count() >= y.twos_complement_bits().count() {
             Box::new(
                 x.twos_complement_bits()
@@ -50,7 +50,7 @@ pub fn integer_checked_hamming_distance_alt_2(x: &Integer, y: &Integer) -> Optio
         return None;
     }
     let extension = if *x < 0 as Limb { Limb::MAX } else { 0 };
-    let limb_zip: Box<Iterator<Item = (Limb, Limb)>> =
+    let limb_zip: Box<dyn Iterator<Item = (Limb, Limb)>> =
         if x.twos_complement_limbs().count() >= y.twos_complement_limbs().count() {
             Box::new(
                 x.twos_complement_limbs()

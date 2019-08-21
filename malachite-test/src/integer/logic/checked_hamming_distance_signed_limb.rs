@@ -22,7 +22,7 @@ pub fn integer_checked_hamming_distance_signed_limb_alt_1(
         return None;
     }
     let i = Integer::from(i);
-    let bit_zip: Box<Iterator<Item = (bool, bool)>> =
+    let bit_zip: Box<dyn Iterator<Item = (bool, bool)>> =
         if n.twos_complement_bits().count() >= i.twos_complement_bits().count() {
             Box::new(
                 n.twos_complement_bits()
@@ -53,7 +53,7 @@ pub fn integer_checked_hamming_distance_signed_limb_alt_2(
         return None;
     }
     let i = Integer::from(i);
-    let limb_zip: Box<Iterator<Item = (Limb, Limb)>> =
+    let limb_zip: Box<dyn Iterator<Item = (Limb, Limb)>> =
         if n.twos_complement_limbs().count() >= i.twos_complement_limbs().count() {
             Box::new(
                 n.twos_complement_limbs()

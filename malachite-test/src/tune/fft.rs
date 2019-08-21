@@ -1,6 +1,6 @@
 use malachite_nz::natural::arithmetic::mul::fft::_limbs_mul_greater_to_out_fft;
 use malachite_nz::natural::arithmetic::mul::toom::{
-    _limbs_mul_greater_to_out_toom_8h, _limbs_mul_greater_to_out_toom_8h_scratch_size,
+    _limbs_mul_greater_to_out_toom_8h, _limbs_mul_greater_to_out_toom_8h_scratch_len,
 };
 use malachite_nz::platform::Limb;
 
@@ -12,7 +12,7 @@ pub fn tune() -> Vec<String> {
     let result = compare_two(
         &mut (|(mut out, xs, ys): (Vec<Limb>, Vec<Limb>, Vec<Limb>)| {
             let mut scratch =
-                vec![0; _limbs_mul_greater_to_out_toom_8h_scratch_size(xs.len(), ys.len())];
+                vec![0; _limbs_mul_greater_to_out_toom_8h_scratch_len(xs.len(), ys.len())];
             _limbs_mul_greater_to_out_toom_8h(&mut out, &xs, &ys, &mut scratch)
         }),
         &mut (|(mut out, xs, ys): (Vec<Limb>, Vec<Limb>, Vec<Limb>)| {

@@ -22,31 +22,31 @@ use malachite_nz::natural::arithmetic::mul::fft::{
 };
 use malachite_nz::natural::arithmetic::mul::toom::{
     _limbs_mul_greater_to_out_toom_22, _limbs_mul_greater_to_out_toom_22_input_sizes_valid,
-    _limbs_mul_greater_to_out_toom_22_scratch_size, _limbs_mul_greater_to_out_toom_32,
+    _limbs_mul_greater_to_out_toom_22_scratch_len, _limbs_mul_greater_to_out_toom_32,
     _limbs_mul_greater_to_out_toom_32_input_sizes_valid,
-    _limbs_mul_greater_to_out_toom_32_scratch_size, _limbs_mul_greater_to_out_toom_33,
+    _limbs_mul_greater_to_out_toom_32_scratch_len, _limbs_mul_greater_to_out_toom_33,
     _limbs_mul_greater_to_out_toom_33_input_sizes_valid,
-    _limbs_mul_greater_to_out_toom_33_scratch_size, _limbs_mul_greater_to_out_toom_42,
+    _limbs_mul_greater_to_out_toom_33_scratch_len, _limbs_mul_greater_to_out_toom_42,
     _limbs_mul_greater_to_out_toom_42_input_sizes_valid,
-    _limbs_mul_greater_to_out_toom_42_scratch_size, _limbs_mul_greater_to_out_toom_43,
+    _limbs_mul_greater_to_out_toom_42_scratch_len, _limbs_mul_greater_to_out_toom_43,
     _limbs_mul_greater_to_out_toom_43_input_sizes_valid,
-    _limbs_mul_greater_to_out_toom_43_scratch_size, _limbs_mul_greater_to_out_toom_44,
+    _limbs_mul_greater_to_out_toom_43_scratch_len, _limbs_mul_greater_to_out_toom_44,
     _limbs_mul_greater_to_out_toom_44_input_sizes_valid,
-    _limbs_mul_greater_to_out_toom_44_scratch_size, _limbs_mul_greater_to_out_toom_52,
+    _limbs_mul_greater_to_out_toom_44_scratch_len, _limbs_mul_greater_to_out_toom_52,
     _limbs_mul_greater_to_out_toom_52_input_sizes_valid,
-    _limbs_mul_greater_to_out_toom_52_scratch_size, _limbs_mul_greater_to_out_toom_53,
+    _limbs_mul_greater_to_out_toom_52_scratch_len, _limbs_mul_greater_to_out_toom_53,
     _limbs_mul_greater_to_out_toom_53_input_sizes_valid,
-    _limbs_mul_greater_to_out_toom_53_scratch_size, _limbs_mul_greater_to_out_toom_54,
+    _limbs_mul_greater_to_out_toom_53_scratch_len, _limbs_mul_greater_to_out_toom_54,
     _limbs_mul_greater_to_out_toom_54_input_sizes_valid,
-    _limbs_mul_greater_to_out_toom_54_scratch_size, _limbs_mul_greater_to_out_toom_62,
+    _limbs_mul_greater_to_out_toom_54_scratch_len, _limbs_mul_greater_to_out_toom_62,
     _limbs_mul_greater_to_out_toom_62_input_sizes_valid,
-    _limbs_mul_greater_to_out_toom_62_scratch_size, _limbs_mul_greater_to_out_toom_63,
+    _limbs_mul_greater_to_out_toom_62_scratch_len, _limbs_mul_greater_to_out_toom_63,
     _limbs_mul_greater_to_out_toom_63_input_sizes_valid,
-    _limbs_mul_greater_to_out_toom_63_scratch_size, _limbs_mul_greater_to_out_toom_6h,
+    _limbs_mul_greater_to_out_toom_63_scratch_len, _limbs_mul_greater_to_out_toom_6h,
     _limbs_mul_greater_to_out_toom_6h_input_sizes_valid,
-    _limbs_mul_greater_to_out_toom_6h_scratch_size, _limbs_mul_greater_to_out_toom_8h,
+    _limbs_mul_greater_to_out_toom_6h_scratch_len, _limbs_mul_greater_to_out_toom_8h,
     _limbs_mul_greater_to_out_toom_8h_input_sizes_valid,
-    _limbs_mul_greater_to_out_toom_8h_scratch_size,
+    _limbs_mul_greater_to_out_toom_8h_scratch_len,
 };
 use malachite_nz::natural::arithmetic::mul::{
     _limbs_mul_greater_to_out_basecase, _limbs_mul_greater_to_out_basecase_mem_opt, limbs_mul,
@@ -695,7 +695,7 @@ fn benchmark_limbs_mul_greater_to_out_toom_22_algorithms(
                 "Toom22",
                 &mut (|(mut out, xs, ys)| {
                     let mut scratch =
-                        vec![0; _limbs_mul_greater_to_out_toom_22_scratch_size(xs.len())];
+                        vec![0; _limbs_mul_greater_to_out_toom_22_scratch_len(xs.len())];
                     _limbs_mul_greater_to_out_toom_22(&mut out, &xs, &ys, &mut scratch)
                 }),
             ),
@@ -726,7 +726,7 @@ fn benchmark_limbs_mul_greater_to_out_toom_32_algorithms(
                 "Toom32",
                 &mut (|(mut out, xs, ys)| {
                     let mut scratch =
-                        vec![0; _limbs_mul_greater_to_out_toom_32_scratch_size(xs.len(), ys.len())];
+                        vec![0; _limbs_mul_greater_to_out_toom_32_scratch_len(xs.len(), ys.len())];
                     _limbs_mul_greater_to_out_toom_32(&mut out, &xs, &ys, &mut scratch)
                 }),
             ),
@@ -757,7 +757,7 @@ fn benchmark_limbs_mul_greater_to_out_toom_33_algorithms(
                 "Toom33",
                 &mut (|(mut out, xs, ys)| {
                     let mut scratch =
-                        vec![0; _limbs_mul_greater_to_out_toom_33_scratch_size(xs.len())];
+                        vec![0; _limbs_mul_greater_to_out_toom_33_scratch_len(xs.len())];
                     _limbs_mul_greater_to_out_toom_33(&mut out, &xs, &ys, &mut scratch)
                 }),
             ),
@@ -788,7 +788,7 @@ fn benchmark_limbs_mul_greater_to_out_toom_33_same_length_algorithms(
                 "Toom22",
                 &mut (|(mut out, xs, ys)| {
                     let mut scratch =
-                        vec![0; _limbs_mul_greater_to_out_toom_22_scratch_size(xs.len())];
+                        vec![0; _limbs_mul_greater_to_out_toom_22_scratch_len(xs.len())];
                     _limbs_mul_greater_to_out_toom_22(&mut out, &xs, &ys, &mut scratch)
                 }),
             ),
@@ -796,7 +796,7 @@ fn benchmark_limbs_mul_greater_to_out_toom_33_same_length_algorithms(
                 "Toom33",
                 &mut (|(mut out, xs, ys)| {
                     let mut scratch =
-                        vec![0; _limbs_mul_greater_to_out_toom_33_scratch_size(xs.len())];
+                        vec![0; _limbs_mul_greater_to_out_toom_33_scratch_len(xs.len())];
                     _limbs_mul_greater_to_out_toom_33(&mut out, &xs, &ys, &mut scratch)
                 }),
             ),
@@ -827,7 +827,7 @@ fn benchmark_limbs_mul_greater_to_out_toom_42_algorithms(
                 "Toom42",
                 &mut (|(mut out, xs, ys)| {
                     let mut scratch =
-                        vec![0; _limbs_mul_greater_to_out_toom_42_scratch_size(xs.len(), ys.len())];
+                        vec![0; _limbs_mul_greater_to_out_toom_42_scratch_len(xs.len(), ys.len())];
                     _limbs_mul_greater_to_out_toom_42(&mut out, &xs, &ys, &mut scratch)
                 }),
             ),
@@ -858,7 +858,7 @@ fn benchmark_limbs_mul_greater_to_out_toom_43_algorithms(
                 "Toom43",
                 &mut (|(mut out, xs, ys)| {
                     let mut scratch =
-                        vec![0; _limbs_mul_greater_to_out_toom_43_scratch_size(xs.len(), ys.len())];
+                        vec![0; _limbs_mul_greater_to_out_toom_43_scratch_len(xs.len(), ys.len())];
                     _limbs_mul_greater_to_out_toom_43(&mut out, &xs, &ys, &mut scratch)
                 }),
             ),
@@ -885,7 +885,7 @@ fn benchmark_limbs_mul_greater_to_out_toom_32_to_43_algorithms(
                 "Toom32",
                 &mut (|(mut out, xs, ys)| {
                     let mut scratch =
-                        vec![0; _limbs_mul_greater_to_out_toom_32_scratch_size(xs.len(), ys.len())];
+                        vec![0; _limbs_mul_greater_to_out_toom_32_scratch_len(xs.len(), ys.len())];
                     _limbs_mul_greater_to_out_toom_32(&mut out, &xs, &ys, &mut scratch)
                 }),
             ),
@@ -893,7 +893,7 @@ fn benchmark_limbs_mul_greater_to_out_toom_32_to_43_algorithms(
                 "Toom43",
                 &mut (|(mut out, xs, ys)| {
                     let mut scratch =
-                        vec![0; _limbs_mul_greater_to_out_toom_43_scratch_size(xs.len(), ys.len())];
+                        vec![0; _limbs_mul_greater_to_out_toom_43_scratch_len(xs.len(), ys.len())];
                     _limbs_mul_greater_to_out_toom_43(&mut out, &xs, &ys, &mut scratch)
                 }),
             ),
@@ -924,7 +924,7 @@ fn benchmark_limbs_mul_greater_to_out_toom_44_algorithms(
                 "Toom44",
                 &mut (|(mut out, xs, ys)| {
                     let mut scratch =
-                        vec![0; _limbs_mul_greater_to_out_toom_44_scratch_size(xs.len())];
+                        vec![0; _limbs_mul_greater_to_out_toom_44_scratch_len(xs.len())];
                     _limbs_mul_greater_to_out_toom_44(&mut out, &xs, &ys, &mut scratch)
                 }),
             ),
@@ -955,7 +955,7 @@ fn benchmark_limbs_mul_greater_to_out_toom_44_same_length_algorithms(
                 "Toom33",
                 &mut (|(mut out, xs, ys)| {
                     let mut scratch =
-                        vec![0; _limbs_mul_greater_to_out_toom_33_scratch_size(xs.len())];
+                        vec![0; _limbs_mul_greater_to_out_toom_33_scratch_len(xs.len())];
                     _limbs_mul_greater_to_out_toom_33(&mut out, &xs, &ys, &mut scratch)
                 }),
             ),
@@ -963,7 +963,7 @@ fn benchmark_limbs_mul_greater_to_out_toom_44_same_length_algorithms(
                 "Toom44",
                 &mut (|(mut out, xs, ys)| {
                     let mut scratch =
-                        vec![0; _limbs_mul_greater_to_out_toom_44_scratch_size(xs.len())];
+                        vec![0; _limbs_mul_greater_to_out_toom_44_scratch_len(xs.len())];
                     _limbs_mul_greater_to_out_toom_44(&mut out, &xs, &ys, &mut scratch)
                 }),
             ),
@@ -994,7 +994,7 @@ fn benchmark_limbs_mul_greater_to_out_toom_52_algorithms(
                 "Toom52",
                 &mut (|(mut out, xs, ys)| {
                     let mut scratch =
-                        vec![0; _limbs_mul_greater_to_out_toom_52_scratch_size(xs.len(), ys.len())];
+                        vec![0; _limbs_mul_greater_to_out_toom_52_scratch_len(xs.len(), ys.len())];
                     _limbs_mul_greater_to_out_toom_52(&mut out, &xs, &ys, &mut scratch)
                 }),
             ),
@@ -1025,7 +1025,7 @@ fn benchmark_limbs_mul_greater_to_out_toom_53_algorithms(
                 "Toom32",
                 &mut (|(mut out, xs, ys)| {
                     let mut scratch =
-                        vec![0; _limbs_mul_greater_to_out_toom_32_scratch_size(xs.len(), ys.len())];
+                        vec![0; _limbs_mul_greater_to_out_toom_32_scratch_len(xs.len(), ys.len())];
                     _limbs_mul_greater_to_out_toom_32(&mut out, &xs, &ys, &mut scratch)
                 }),
             ),
@@ -1033,7 +1033,7 @@ fn benchmark_limbs_mul_greater_to_out_toom_53_algorithms(
                 "Toom42",
                 &mut (|(mut out, xs, ys)| {
                     let mut scratch =
-                        vec![0; _limbs_mul_greater_to_out_toom_42_scratch_size(xs.len(), ys.len())];
+                        vec![0; _limbs_mul_greater_to_out_toom_42_scratch_len(xs.len(), ys.len())];
                     _limbs_mul_greater_to_out_toom_42(&mut out, &xs, &ys, &mut scratch)
                 }),
             ),
@@ -1041,7 +1041,7 @@ fn benchmark_limbs_mul_greater_to_out_toom_53_algorithms(
                 "Toom53",
                 &mut (|(mut out, xs, ys)| {
                     let mut scratch =
-                        vec![0; _limbs_mul_greater_to_out_toom_53_scratch_size(xs.len(), ys.len())];
+                        vec![0; _limbs_mul_greater_to_out_toom_53_scratch_len(xs.len(), ys.len())];
                     _limbs_mul_greater_to_out_toom_53(&mut out, &xs, &ys, &mut scratch)
                 }),
             ),
@@ -1068,7 +1068,7 @@ fn benchmark_limbs_mul_greater_to_out_toom_42_to_53_algorithms(
                 "Toom42",
                 &mut (|(mut out, xs, ys)| {
                     let mut scratch =
-                        vec![0; _limbs_mul_greater_to_out_toom_42_scratch_size(xs.len(), ys.len())];
+                        vec![0; _limbs_mul_greater_to_out_toom_42_scratch_len(xs.len(), ys.len())];
                     _limbs_mul_greater_to_out_toom_42(&mut out, &xs, &ys, &mut scratch)
                 }),
             ),
@@ -1076,7 +1076,7 @@ fn benchmark_limbs_mul_greater_to_out_toom_42_to_53_algorithms(
                 "Toom53",
                 &mut (|(mut out, xs, ys)| {
                     let mut scratch =
-                        vec![0; _limbs_mul_greater_to_out_toom_53_scratch_size(xs.len(), ys.len())];
+                        vec![0; _limbs_mul_greater_to_out_toom_53_scratch_len(xs.len(), ys.len())];
                     _limbs_mul_greater_to_out_toom_53(&mut out, &xs, &ys, &mut scratch)
                 }),
             ),
@@ -1107,7 +1107,7 @@ fn benchmark_limbs_mul_greater_to_out_toom_54_algorithms(
                 "Toom54",
                 &mut (|(mut out, xs, ys)| {
                     let mut scratch =
-                        vec![0; _limbs_mul_greater_to_out_toom_54_scratch_size(xs.len(), ys.len())];
+                        vec![0; _limbs_mul_greater_to_out_toom_54_scratch_len(xs.len(), ys.len())];
                     _limbs_mul_greater_to_out_toom_54(&mut out, &xs, &ys, &mut scratch)
                 }),
             ),
@@ -1138,7 +1138,7 @@ fn benchmark_limbs_mul_greater_to_out_toom_62_algorithms(
                 "Toom62",
                 &mut (|(mut out, xs, ys)| {
                     let mut scratch =
-                        vec![0; _limbs_mul_greater_to_out_toom_62_scratch_size(xs.len(), ys.len())];
+                        vec![0; _limbs_mul_greater_to_out_toom_62_scratch_len(xs.len(), ys.len())];
                     _limbs_mul_greater_to_out_toom_62(&mut out, &xs, &ys, &mut scratch)
                 }),
             ),
@@ -1169,7 +1169,7 @@ fn benchmark_limbs_mul_greater_to_out_toom_63_algorithms(
                 "Toom42",
                 &mut (|(mut out, xs, ys)| {
                     let mut scratch =
-                        vec![0; _limbs_mul_greater_to_out_toom_42_scratch_size(xs.len(), ys.len())];
+                        vec![0; _limbs_mul_greater_to_out_toom_42_scratch_len(xs.len(), ys.len())];
                     _limbs_mul_greater_to_out_toom_42(&mut out, &xs, &ys, &mut scratch)
                 }),
             ),
@@ -1177,7 +1177,7 @@ fn benchmark_limbs_mul_greater_to_out_toom_63_algorithms(
                 "Toom63",
                 &mut (|(mut out, xs, ys)| {
                     let mut scratch =
-                        vec![0; _limbs_mul_greater_to_out_toom_63_scratch_size(xs.len(), ys.len())];
+                        vec![0; _limbs_mul_greater_to_out_toom_63_scratch_len(xs.len(), ys.len())];
                     _limbs_mul_greater_to_out_toom_63(&mut out, &xs, &ys, &mut scratch)
                 }),
             ),
@@ -1208,7 +1208,7 @@ fn benchmark_limbs_mul_greater_to_out_toom_6h_algorithms(
                 "Toom6h",
                 &mut (|(mut out, xs, ys)| {
                     let mut scratch =
-                        vec![0; _limbs_mul_greater_to_out_toom_6h_scratch_size(xs.len(), ys.len())];
+                        vec![0; _limbs_mul_greater_to_out_toom_6h_scratch_len(xs.len(), ys.len())];
                     _limbs_mul_greater_to_out_toom_6h(&mut out, &xs, &ys, &mut scratch)
                 }),
             ),
@@ -1239,7 +1239,7 @@ fn benchmark_limbs_mul_greater_to_out_toom_6h_same_length_algorithms(
                 "Toom44",
                 &mut (|(mut out, xs, ys)| {
                     let mut scratch =
-                        vec![0; _limbs_mul_greater_to_out_toom_44_scratch_size(xs.len())];
+                        vec![0; _limbs_mul_greater_to_out_toom_44_scratch_len(xs.len())];
                     _limbs_mul_greater_to_out_toom_44(&mut out, &xs, &ys, &mut scratch)
                 }),
             ),
@@ -1247,7 +1247,7 @@ fn benchmark_limbs_mul_greater_to_out_toom_6h_same_length_algorithms(
                 "Toom6h",
                 &mut (|(mut out, xs, ys)| {
                     let mut scratch =
-                        vec![0; _limbs_mul_greater_to_out_toom_6h_scratch_size(xs.len(), ys.len())];
+                        vec![0; _limbs_mul_greater_to_out_toom_6h_scratch_len(xs.len(), ys.len())];
                     _limbs_mul_greater_to_out_toom_6h(&mut out, &xs, &ys, &mut scratch)
                 }),
             ),
@@ -1278,7 +1278,7 @@ fn benchmark_limbs_mul_greater_to_out_toom_8h_algorithms(
                 "Toom8h",
                 &mut (|(mut out, xs, ys)| {
                     let mut scratch =
-                        vec![0; _limbs_mul_greater_to_out_toom_8h_scratch_size(xs.len(), ys.len())];
+                        vec![0; _limbs_mul_greater_to_out_toom_8h_scratch_len(xs.len(), ys.len())];
                     _limbs_mul_greater_to_out_toom_8h(&mut out, &xs, &ys, &mut scratch)
                 }),
             ),
@@ -1309,7 +1309,7 @@ fn benchmark_limbs_mul_greater_to_out_toom_8h_same_length_algorithms(
                 "Toom6h",
                 &mut (|(mut out, xs, ys)| {
                     let mut scratch =
-                        vec![0; _limbs_mul_greater_to_out_toom_6h_scratch_size(xs.len(), ys.len())];
+                        vec![0; _limbs_mul_greater_to_out_toom_6h_scratch_len(xs.len(), ys.len())];
                     _limbs_mul_greater_to_out_toom_6h(&mut out, &xs, &ys, &mut scratch)
                 }),
             ),
@@ -1317,7 +1317,7 @@ fn benchmark_limbs_mul_greater_to_out_toom_8h_same_length_algorithms(
                 "Toom8h",
                 &mut (|(mut out, xs, ys)| {
                     let mut scratch =
-                        vec![0; _limbs_mul_greater_to_out_toom_8h_scratch_size(xs.len(), ys.len())];
+                        vec![0; _limbs_mul_greater_to_out_toom_8h_scratch_len(xs.len(), ys.len())];
                     _limbs_mul_greater_to_out_toom_8h(&mut out, &xs, &ys, &mut scratch)
                 }),
             ),
@@ -1371,7 +1371,7 @@ fn benchmark_limbs_mul_greater_to_out_fft_same_length_algorithms(
                 "Toom8h",
                 &mut (|(mut out, xs, ys)| {
                     let mut scratch =
-                        vec![0; _limbs_mul_greater_to_out_toom_8h_scratch_size(xs.len(), ys.len())];
+                        vec![0; _limbs_mul_greater_to_out_toom_8h_scratch_len(xs.len(), ys.len())];
                     _limbs_mul_greater_to_out_toom_8h(&mut out, &xs, &ys, &mut scratch)
                 }),
             ),

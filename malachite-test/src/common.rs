@@ -74,10 +74,10 @@ pub fn get_no_special_gm(gm_string: &str, scale_type: ScaleType) -> NoSpecialGen
     }
 }
 
-type DemoFn = &'static Fn(GenerationMode, usize) -> ();
-type BenchFn = &'static Fn(GenerationMode, usize, &str) -> ();
-type NoSpecialDemoFn = &'static Fn(NoSpecialGenerationMode, usize) -> ();
-type NoSpecialBenchFn = &'static Fn(NoSpecialGenerationMode, usize, &str) -> ();
+type DemoFn = &'static dyn Fn(GenerationMode, usize) -> ();
+type BenchFn = &'static dyn Fn(GenerationMode, usize, &str) -> ();
+type NoSpecialDemoFn = &'static dyn Fn(NoSpecialGenerationMode, usize) -> ();
+type NoSpecialBenchFn = &'static dyn Fn(NoSpecialGenerationMode, usize, &str) -> ();
 
 #[derive(Default)]
 pub struct DemoBenchRegistry {
@@ -250,9 +250,9 @@ pub fn m_run_benchmark<'a, I: Iterator>(
     generation_mode_name: &'a str,
     limit: usize,
     file_name: &'a str,
-    bucketing_function: &'a Fn(&I::Item) -> usize,
+    bucketing_function: &'a dyn Fn(&I::Item) -> usize,
     bucketing_label: &'a str,
-    series: &mut [(&'a str, &'a mut FnMut(I::Item))],
+    series: &mut [(&'a str, &'a mut dyn FnMut(I::Item))],
 ) where
     I::Item: Clone,
 {

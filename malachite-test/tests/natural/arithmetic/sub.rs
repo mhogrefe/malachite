@@ -767,7 +767,7 @@ fn limbs_sub_properties() {
 }
 
 fn limbs_sub_to_out_helper(
-    f: &mut FnMut(&mut [Limb], &[Limb], &[Limb]) -> bool,
+    f: &mut dyn FnMut(&mut [Limb], &[Limb], &[Limb]) -> bool,
     out: &Vec<Limb>,
     xs: &Vec<Limb>,
     ys: &Vec<Limb>,
@@ -813,7 +813,7 @@ fn limbs_sub_to_out_properties() {
 }
 
 fn limbs_sub_in_place_left_helper(
-    f: &mut FnMut(&mut [Limb], &[Limb]) -> bool,
+    f: &mut dyn FnMut(&mut [Limb], &[Limb]) -> bool,
     xs: &Vec<Limb>,
     ys: &Vec<Limb>,
 ) {

@@ -34,7 +34,7 @@ use natural::arithmetic::mul::{
 use natural::arithmetic::shl_u::{limbs_shl_to_out, limbs_slice_shl_in_place};
 use natural::arithmetic::shr_u::limbs_slice_shr_in_place;
 use natural::arithmetic::square::{
-    _limbs_square_to_out_toom_6_scratch_size, _limbs_square_to_out_toom_8_scratch_size,
+    _limbs_square_to_out_toom_6_scratch_len, _limbs_square_to_out_toom_8_scratch_len,
 };
 use natural::arithmetic::sub::{
     _limbs_sub_same_length_with_borrow_in_in_place_left,
@@ -114,7 +114,7 @@ fn _limbs_toom_couple_handling(
 /// Additional memory: worst case O(1)
 ///
 /// This is mpn_toom22_mul_itch from gmp-impl.h.
-pub const fn _limbs_mul_greater_to_out_toom_22_scratch_size(xs_len: usize) -> usize {
+pub const fn _limbs_mul_greater_to_out_toom_22_scratch_len(xs_len: usize) -> usize {
     2 * (xs_len + Limb::WIDTH as usize)
 }
 
@@ -197,7 +197,7 @@ pub fn _limbs_mul_greater_to_out_toom_22_input_sizes_valid(xs_len: usize, ys_len
 /// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, writes
 /// the `xs.len() + ys.len()` least-significant limbs of the product of the `Natural`s to an output
 /// slice. A "scratch" slice is provided for the algorithm to use. An upper bound for the number of
-/// scratch limbs needed is provided by `_limbs_mul_greater_to_out_toom_22_scratch_size`. The
+/// scratch limbs needed is provided by `_limbs_mul_greater_to_out_toom_22_scratch_len`. The
 /// following restrictions on the input slices must be met:
 /// 1. `out`.len() >= `xs`.len() + `ys`.len()
 /// 2. `xs`.len() >= `ys`.len()
@@ -367,7 +367,7 @@ pub fn _limbs_mul_greater_to_out_toom_22(
 /// Additional memory: worst case O(1)
 ///
 /// This is mpn_toom32_mul_itch from gmp-impl.h.
-pub fn _limbs_mul_greater_to_out_toom_32_scratch_size(xs_len: usize, ys_len: usize) -> usize {
+pub fn _limbs_mul_greater_to_out_toom_32_scratch_len(xs_len: usize, ys_len: usize) -> usize {
     let n = 1 + if 2 * xs_len >= 3 * ys_len {
         (xs_len - 1) / 3
     } else {
@@ -411,7 +411,7 @@ pub fn _limbs_mul_greater_to_out_toom_32_input_sizes_valid(xs_len: usize, ys_len
 /// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, writes
 /// the `xs.len() + ys.len()` least-significant limbs of the product of the `Natural`s to an output
 /// slice. A "scratch" slice is provided for the algorithm to use. An upper bound for the number of
-/// scratch limbs needed is provided by `_limbs_mul_greater_to_out_toom_32_scratch_size`. The
+/// scratch limbs needed is provided by `_limbs_mul_greater_to_out_toom_32_scratch_len`. The
 /// following restrictions on the input slices must be met:
 /// 1. `out`.len() >= `xs`.len() + `ys`.len()
 /// 2. `xs`.len() >= `ys`.len()
@@ -714,7 +714,7 @@ pub fn _limbs_mul_greater_to_out_toom_32(
 /// Additional memory: worst case O(1)
 ///
 /// This is mpn_toom33_mul_itch from gmp-impl.h.
-pub fn _limbs_mul_greater_to_out_toom_33_scratch_size(xs_len: usize) -> usize {
+pub fn _limbs_mul_greater_to_out_toom_33_scratch_len(xs_len: usize) -> usize {
     3 * xs_len + usize::wrapping_from(Limb::WIDTH)
 }
 
@@ -768,7 +768,7 @@ pub fn _limbs_mul_greater_to_out_toom_33_input_sizes_valid(xs_len: usize, ys_len
 /// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, writes
 /// the `xs.len() + ys.len()` least-significant limbs of the product of the `Natural`s to an output
 /// slice. A "scratch" slice is provided for the algorithm to use. An upper bound for the number of
-/// scratch limbs needed is provided by `_limbs_mul_greater_to_out_toom_33_scratch_size`. The
+/// scratch limbs needed is provided by `_limbs_mul_greater_to_out_toom_33_scratch_len`. The
 /// following restrictions on the input slices must be met:
 /// 1. `out`.len() >= `xs`.len() + `ys`.len()
 /// 2. `xs`.len() >= `ys`.len()
@@ -1047,7 +1047,7 @@ pub fn _limbs_mul_greater_to_out_toom_42_input_sizes_valid(xs_len: usize, ys_len
 /// Time: worst case O(1)
 ///
 /// Additional memory: worst case O(1)
-pub fn _limbs_mul_greater_to_out_toom_42_scratch_size(xs_len: usize, ys_len: usize) -> usize {
+pub fn _limbs_mul_greater_to_out_toom_42_scratch_len(xs_len: usize, ys_len: usize) -> usize {
     let n = if xs_len >= 2 * ys_len {
         (xs_len + 3) >> 2
     } else {
@@ -1068,7 +1068,7 @@ pub fn _limbs_mul_same_length_to_out_toom_42_recursive(out: &mut [Limb], xs: &[L
 /// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, writes
 /// the `xs.len() + ys.len()` least-significant limbs of the product of the `Natural`s to an output
 /// slice. A "scratch" slice is provided for the algorithm to use. An upper bound for the number of
-/// scratch limbs needed is provided by `_limbs_mul_greater_to_out_toom_42_scratch_size`. The
+/// scratch limbs needed is provided by `_limbs_mul_greater_to_out_toom_42_scratch_len`. The
 /// following restrictions on the input slices must be met:
 /// 1. `out`.len() >= `xs`.len() + `ys`.len()
 /// 2. `xs`.len() >= `ys`.len()
@@ -1269,7 +1269,7 @@ pub fn _limbs_mul_greater_to_out_toom_43_input_sizes_valid(xs_len: usize, ys_len
 /// Additional memory: worst case O(1)
 ///
 /// This is mpn_toom43_mul_itch from gmp-impl.h.
-pub fn _limbs_mul_greater_to_out_toom_43_scratch_size(xs_len: usize, ys_len: usize) -> usize {
+pub fn _limbs_mul_greater_to_out_toom_43_scratch_len(xs_len: usize, ys_len: usize) -> usize {
     let n = 1 + if 3 * xs_len >= 4 * ys_len {
         (xs_len - 1) >> 2
     } else {
@@ -1281,7 +1281,7 @@ pub fn _limbs_mul_greater_to_out_toom_43_scratch_size(xs_len: usize, ys_len: usi
 /// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, writes
 /// the `xs.len() + ys.len()` least-significant limbs of the product of the `Natural`s to an output
 /// slice. A "scratch" slice is provided for the algorithm to use. An upper bound for the number of
-/// scratch limbs needed is provided by `_limbs_mul_greater_to_out_toom_43_scratch_size`. The
+/// scratch limbs needed is provided by `_limbs_mul_greater_to_out_toom_43_scratch_len`. The
 /// following restrictions on the input slices must be met:
 /// 1. `out`.len() >= `xs`.len() + `ys`.len()
 /// 2. `xs`.len() >= `ys`.len()
@@ -1490,14 +1490,14 @@ pub fn _limbs_mul_greater_to_out_toom_44_input_sizes_valid(xs_len: usize, ys_len
 /// Additional memory: worst case O(1)
 ///
 /// This is mpn_toom44_mul_itch from gmp-impl.h.
-pub fn _limbs_mul_greater_to_out_toom_44_scratch_size(xs_len: usize) -> usize {
+pub fn _limbs_mul_greater_to_out_toom_44_scratch_len(xs_len: usize) -> usize {
     3 * xs_len + usize::wrapping_from(Limb::WIDTH)
 }
 
 /// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, writes
 /// the `xs.len() + ys.len()` least-significant limbs of the product of the `Natural`s to an output
 /// slice. A "scratch" slice is provided for the algorithm to use. An upper bound for the number of
-/// scratch limbs needed is provided by `_limbs_mul_greater_to_out_toom_44_scratch_size`. The
+/// scratch limbs needed is provided by `_limbs_mul_greater_to_out_toom_44_scratch_len`. The
 /// following restrictions on the input slices must be met:
 /// 1. `out`.len() >= `xs`.len() + `ys`.len()
 /// 2. `xs`.len() >= `ys`.len()
@@ -1746,7 +1746,7 @@ pub fn _limbs_mul_greater_to_out_toom_52_input_sizes_valid(xs_len: usize, ys_len
 /// Additional memory: worst case O(1)
 ///
 /// This is mpn_toom52_mul_itch from gmp-impl.h.
-pub fn _limbs_mul_greater_to_out_toom_52_scratch_size(xs_len: usize, ys_len: usize) -> usize {
+pub fn _limbs_mul_greater_to_out_toom_52_scratch_len(xs_len: usize, ys_len: usize) -> usize {
     let n = 1 + if 2 * xs_len >= 5 * ys_len {
         (xs_len - 1) / 5
     } else {
@@ -1758,7 +1758,7 @@ pub fn _limbs_mul_greater_to_out_toom_52_scratch_size(xs_len: usize, ys_len: usi
 /// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, writes
 /// the `xs.len() + ys.len()` least-significant limbs of the product of the `Natural`s to an output
 /// slice. A "scratch" slice is provided for the algorithm to use. An upper bound for the number of
-/// scratch limbs needed is provided by `_limbs_mul_greater_to_out_toom_52_scratch_size`. The
+/// scratch limbs needed is provided by `_limbs_mul_greater_to_out_toom_52_scratch_len`. The
 /// following restrictions on the input slices must be met:
 /// 1. `out`.len() >= `xs`.len() + `ys`.len()
 /// 2. `xs`.len() >= `ys`.len()
@@ -1970,7 +1970,7 @@ pub fn _limbs_mul_greater_to_out_toom_53_input_sizes_valid(xs_len: usize, ys_len
 /// Additional memory: worst case O(1)
 ///
 /// This is mpn_toom53_mul_itch from gmp-impl.h.
-pub fn _limbs_mul_greater_to_out_toom_53_scratch_size(xs_len: usize, ys_len: usize) -> usize {
+pub fn _limbs_mul_greater_to_out_toom_53_scratch_len(xs_len: usize, ys_len: usize) -> usize {
     let n = 1 + if 3 * xs_len >= 5 * ys_len {
         (xs_len - 1) / 5
     } else {
@@ -1982,7 +1982,7 @@ pub fn _limbs_mul_greater_to_out_toom_53_scratch_size(xs_len: usize, ys_len: usi
 /// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, writes
 /// the `xs.len() + ys.len()` least-significant limbs of the product of the `Natural`s to an output
 /// slice. A "scratch" slice is provided for the algorithm to use. An upper bound for the number of
-/// scratch limbs needed is provided by `_limbs_mul_greater_to_out_toom_53_scratch_size`. The
+/// scratch limbs needed is provided by `_limbs_mul_greater_to_out_toom_53_scratch_len`. The
 /// following restrictions on the input slices must be met:
 /// 1. `out`.len() >= `xs`.len() + `ys`.len()
 /// 2. `xs`.len() >= `ys`.len()
@@ -2297,7 +2297,7 @@ pub fn _limbs_mul_greater_to_out_toom_54_input_sizes_valid(xs_len: usize, ys_len
 /// Additional memory: worst case O(1)
 ///
 /// This is mpn_toom54_mul_itch from gmp-impl.h.
-pub fn _limbs_mul_greater_to_out_toom_54_scratch_size(xs_len: usize, ys_len: usize) -> usize {
+pub fn _limbs_mul_greater_to_out_toom_54_scratch_len(xs_len: usize, ys_len: usize) -> usize {
     let n = 1
         + (if 4 * xs_len >= 5 * ys_len {
             (xs_len - 1) / 5
@@ -2328,7 +2328,7 @@ fn _limbs_mul_greater_to_out_toom_54_recursive(p: &mut [Limb], a: &[Limb], b: &[
 /// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, writes
 /// the `xs.len() + ys.len()` least-significant limbs of the product of the `Natural`s to an output
 /// slice. A "scratch" slice is provided for the algorithm to use. An upper bound for the number of
-/// scratch limbs needed is provided by `_limbs_mul_greater_to_out_toom_54_scratch_size`. The
+/// scratch limbs needed is provided by `_limbs_mul_greater_to_out_toom_54_scratch_len`. The
 /// following restrictions on the input slices must be met:
 /// 1. `out`.len() >= `xs`.len() + `ys`.len()
 /// 2. `xs`.len() >= `ys`.len()
@@ -2496,7 +2496,7 @@ pub fn _limbs_mul_greater_to_out_toom_62_input_sizes_valid(xs_len: usize, ys_len
 /// Additional memory: worst case O(1)
 ///
 /// This is mpn_toom62_mul_itch from gmp-impl.h.
-pub fn _limbs_mul_greater_to_out_toom_62_scratch_size(xs_len: usize, ys_len: usize) -> usize {
+pub fn _limbs_mul_greater_to_out_toom_62_scratch_len(xs_len: usize, ys_len: usize) -> usize {
     let n = 1 + if xs_len >= 3 * ys_len {
         (xs_len - 1) / 6
     } else {
@@ -2508,7 +2508,7 @@ pub fn _limbs_mul_greater_to_out_toom_62_scratch_size(xs_len: usize, ys_len: usi
 /// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, writes
 /// the `xs.len() + ys.len()` least-significant limbs of the product of the `Natural`s to an output
 /// slice. A "scratch" slice is provided for the algorithm to use. An upper bound for the number of
-/// scratch limbs needed is provided by `_limbs_mul_greater_to_out_toom_62_scratch_size`. The
+/// scratch limbs needed is provided by `_limbs_mul_greater_to_out_toom_62_scratch_len`. The
 /// following restrictions on the input slices must be met:
 /// 1. `out`.len() >= `xs`.len() + `ys`.len()
 /// 2. `xs`.len() >= `ys`.len()
@@ -2834,7 +2834,7 @@ pub fn _limbs_mul_greater_to_out_toom_63_input_sizes_valid(xs_len: usize, ys_len
 /// Additional memory: worst case O(1)
 ///
 /// This is mpn_toom63_mul_itch from gmp-impl.h.
-pub fn _limbs_mul_greater_to_out_toom_63_scratch_size(xs_len: usize, ys_len: usize) -> usize {
+pub fn _limbs_mul_greater_to_out_toom_63_scratch_len(xs_len: usize, ys_len: usize) -> usize {
     let n = 1 + if xs_len >= 2 * ys_len {
         (xs_len - 1) / 6
     } else {
@@ -2864,7 +2864,7 @@ fn _limbs_mul_greater_to_out_toom_63_recursive(p: &mut [Limb], a: &[Limb], b: &[
 /// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, writes
 /// the `xs.len() + ys.len()` least-significant limbs of the product of the `Natural`s to an output
 /// slice. A "scratch" slice is provided for the algorithm to use. An upper bound for the number of
-/// scratch limbs needed is provided by `_limbs_mul_greater_to_out_toom_63_scratch_size`. The
+/// scratch limbs needed is provided by `_limbs_mul_greater_to_out_toom_63_scratch_len`. The
 /// following restrictions on the input slices must be met:
 /// 1. `out`.len() >= `xs`.len() + `ys`.len()
 /// 2. `xs`.len() >= `ys`.len()
@@ -3128,8 +3128,8 @@ pub fn _limbs_mul_greater_to_out_toom_6h_input_sizes_valid(xs_len: usize, ys_len
         && t <= isize::checked_from(n).unwrap()
         && (half || s + t > 3)
         && n > 2
-        && limit <= _limbs_mul_greater_to_out_toom_6h_scratch_size(xs_len, ys_len)
-        && limit <= _limbs_square_to_out_toom_6_scratch_size(n * 6)
+        && limit <= _limbs_mul_greater_to_out_toom_6h_scratch_len(xs_len, ys_len)
+        && limit <= _limbs_square_to_out_toom_6_scratch_len(n * 6)
 }
 
 const TOOM_6H_MAYBE_MUL_BASECASE: bool =
@@ -3187,11 +3187,11 @@ fn _limbs_mul_toom_6h_min_threshold() -> usize {
 /// Additional memory: worst case O(1)
 ///
 /// This is mpn_toom6_mul_n_itch from gmp-impl.h.
-pub(crate) fn _limbs_mul_same_length_to_out_toom_6h_scratch_size(n: usize) -> usize {
+pub(crate) fn _limbs_mul_same_length_to_out_toom_6h_scratch_len(n: usize) -> usize {
     let itch = (isize::checked_from(n).unwrap() - _limbs_mul_toom_6h_min_threshold() as isize) * 2
         + isize::checked_from(max(
             _limbs_mul_toom_6h_min_threshold() * 2 + usize::wrapping_from(Limb::WIDTH) * 6,
-            _limbs_mul_greater_to_out_toom_44_scratch_size(_limbs_mul_toom_6h_min_threshold()),
+            _limbs_mul_greater_to_out_toom_44_scratch_len(_limbs_mul_toom_6h_min_threshold()),
         ))
         .unwrap();
     usize::checked_from(itch).unwrap()
@@ -3205,15 +3205,15 @@ pub(crate) fn _limbs_mul_same_length_to_out_toom_6h_scratch_size(n: usize) -> us
 /// Additional memory: worst case O(1)
 ///
 /// This is mpn_toom6h_mul_itch from gmp-impl.h.
-pub fn _limbs_mul_greater_to_out_toom_6h_scratch_size(xs_len: usize, ys_len: usize) -> usize {
+pub fn _limbs_mul_greater_to_out_toom_6h_scratch_len(xs_len: usize, ys_len: usize) -> usize {
     let estimated_n = (xs_len + ys_len) / 10 + 1;
-    _limbs_mul_same_length_to_out_toom_6h_scratch_size(6 * estimated_n)
+    _limbs_mul_same_length_to_out_toom_6h_scratch_len(6 * estimated_n)
 }
 
 /// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, writes
 /// the `xs.len() + ys.len()` least-significant limbs of the product of the `Natural`s to an output
 /// slice. A "scratch" slice is provided for the algorithm to use. An upper bound for the number of
-/// scratch limbs needed is provided by `_limbs_mul_greater_to_out_toom_6h_scratch_size`. The
+/// scratch limbs needed is provided by `_limbs_mul_greater_to_out_toom_6h_scratch_len`. The
 /// following restrictions on the input slices must be met:
 /// 1. `out`.len() >= `xs`.len() + `ys`.len()
 /// 2. `xs`.len() >= `ys`.len()
@@ -3326,8 +3326,8 @@ pub fn _limbs_mul_greater_to_out_toom_6h(
     // Also allocate 3 * n + 1 limbs for scratch2. `_limbs_mul_toom_interpolate_12_points` may need
     // all of them.
     let limit = 12 * n + 6;
-    assert!(limit <= _limbs_mul_greater_to_out_toom_6h_scratch_size(xs_len, ys_len));
-    assert!(limit <= _limbs_square_to_out_toom_6_scratch_size(6 * n));
+    assert!(limit <= _limbs_mul_greater_to_out_toom_6h_scratch_len(xs_len, ys_len));
+    assert!(limit <= _limbs_square_to_out_toom_6_scratch_len(6 * n));
 
     let v_neg_2_neg;
     split_into_chunks_mut!(scratch, 3 * n + 1, [r5, r3, r1], scratch2);
@@ -3556,8 +3556,8 @@ pub fn _limbs_mul_greater_to_out_toom_8h_input_sizes_valid(xs_len: usize, ys_len
         && t <= isize::checked_from(n).unwrap()
         && (half || s + t > 3)
         && n > 2
-        && limit <= _limbs_mul_greater_to_out_toom_8h_scratch_size(xs_len, ys_len)
-        && limit <= _limbs_square_to_out_toom_8_scratch_size(n << 3)
+        && limit <= _limbs_mul_greater_to_out_toom_8h_scratch_len(xs_len, ys_len)
+        && limit <= _limbs_square_to_out_toom_8_scratch_len(n << 3)
 }
 
 // Implementation of the multiplication algorithm for Toom-Cook 8.5-way.
@@ -3620,13 +3620,13 @@ fn _limbs_mul_toom_8h_min_threshold() -> usize {
 }
 
 // This is mpn_toom8_mul_n_itch from gmp-impl.h.
-pub(crate) fn _limbs_mul_same_length_to_out_toom_8h_scratch_size(n: usize) -> usize {
+pub(crate) fn _limbs_mul_same_length_to_out_toom_8h_scratch_len(n: usize) -> usize {
     let itch = ((isize::checked_from(n).unwrap() * 15) >> 3)
         - ((_limbs_mul_toom_8h_min_threshold() as isize * 15) >> 3)
         + isize::checked_from(max(
             ((_limbs_mul_toom_8h_min_threshold() * 15) >> 3)
                 + usize::wrapping_from(Limb::WIDTH) * 6,
-            _limbs_mul_same_length_to_out_toom_6h_scratch_size(_limbs_mul_toom_8h_min_threshold()),
+            _limbs_mul_same_length_to_out_toom_6h_scratch_len(_limbs_mul_toom_8h_min_threshold()),
         ))
         .unwrap();
     usize::checked_from(itch).unwrap()
@@ -3640,15 +3640,15 @@ pub(crate) fn _limbs_mul_same_length_to_out_toom_8h_scratch_size(n: usize) -> us
 /// Additional memory: worst case O(1)
 ///
 /// This is mpn_toom8h_mul_itch from gmp-impl.h.
-pub fn _limbs_mul_greater_to_out_toom_8h_scratch_size(xs_len: usize, ys_len: usize) -> usize {
+pub fn _limbs_mul_greater_to_out_toom_8h_scratch_len(xs_len: usize, ys_len: usize) -> usize {
     let estimated_n = (xs_len + ys_len) / 14 + 1;
-    _limbs_mul_same_length_to_out_toom_8h_scratch_size(estimated_n << 3)
+    _limbs_mul_same_length_to_out_toom_8h_scratch_len(estimated_n << 3)
 }
 
 /// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, writes
 /// the `xs.len() + ys.len()` least-significant limbs of the product of the `Natural`s to an output
 /// slice. A "scratch" slice is provided for the algorithm to use. An upper bound for the number of
-/// scratch limbs needed is provided by `_limbs_mul_greater_to_out_toom_8h_scratch_size`. The
+/// scratch limbs needed is provided by `_limbs_mul_greater_to_out_toom_8h_scratch_len`. The
 /// following restrictions on the input slices must be met:
 /// 1. `out`.len() >= `xs`.len() + `ys`.len()
 /// 2. `xs`.len() >= `ys`.len()
@@ -3787,8 +3787,8 @@ pub fn _limbs_mul_greater_to_out_toom_8h(
     // Also allocate 3 * n + 1 limbs for `scratch2`. `_limbs_mul_toom_interpolate_16_points` may
     // need all of them.
     let limit = 5 * r;
-    assert!(limit <= _limbs_mul_greater_to_out_toom_8h_scratch_size(xs_len, ys_len));
-    assert!(limit <= _limbs_square_to_out_toom_8_scratch_size(n << 3));
+    assert!(limit <= _limbs_mul_greater_to_out_toom_8h_scratch_len(xs_len, ys_len));
+    assert!(limit <= _limbs_square_to_out_toom_8_scratch_len(n << 3));
 
     // Evaluation and recursive calls
     let v_neg_4_neg;

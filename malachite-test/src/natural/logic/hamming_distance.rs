@@ -13,7 +13,7 @@ use std::cmp::max;
 use std::iter::repeat;
 
 pub fn natural_hamming_distance_alt_1(x: &Natural, y: &Natural) -> u64 {
-    let bit_zip: Box<Iterator<Item = (bool, bool)>> =
+    let bit_zip: Box<dyn Iterator<Item = (bool, bool)>> =
         if x.significant_bits() >= y.significant_bits() {
             Box::new(x.bits().zip(y.bits().chain(repeat(false))))
         } else {
@@ -29,7 +29,7 @@ pub fn natural_hamming_distance_alt_1(x: &Natural, y: &Natural) -> u64 {
 }
 
 pub fn natural_hamming_distance_alt_2(x: &Natural, y: &Natural) -> u64 {
-    let limb_zip: Box<Iterator<Item = (Limb, Limb)>> = if x.limb_count() >= y.limb_count() {
+    let limb_zip: Box<dyn Iterator<Item = (Limb, Limb)>> = if x.limb_count() >= y.limb_count() {
         Box::new(x.limbs().zip(y.limbs().chain(repeat(0))))
     } else {
         Box::new(x.limbs().chain(repeat(0)).zip(y.limbs()))
