@@ -1020,8 +1020,8 @@ pub fn _limbs_div_mod_divide_and_conquer_approx(
 //TODO tune
 const MAYBE_DCP1_DIVAPPR: bool = true;
 
-/// Takes the strictly normalised value ds (i.e., most significant bit must be set) as an input, and
-/// computes the approximate reciprocal of ds, with the same length of ds. See documentation for
+/// Takes the strictly normalized value ds (i.e., most significant bit must be set) as an input, and
+/// computes the approximate reciprocal of `ds`, with the same length as `ds`. See documentation for
 /// `_limbs_invert_approx` for an explanation of the return value.
 ///
 /// Time: worst case O(n * log(n) ^ 2 * log(log(n)))
@@ -1074,8 +1074,8 @@ pub fn _limbs_invert_basecase_approx(is: &mut [Limb], ds: &[Limb], scratch: &mut
 const INV_NEWTON_THRESHOLD: usize = 170;
 const INV_MULMOD_BNM1_THRESHOLD: usize = 38;
 
-/// Takes the strictly normalised value ds (i.e., most significant bit must be set) as an input, and
-/// computes the approximate reciprocal of ds, with the same length of ds. See documentation for
+/// Takes the strictly normalized value ds (i.e., most significant bit must be set) as an input, and
+/// computes the approximate reciprocal of `ds`, with the same length as `ds`. See documentation for
 /// `_limbs_invert_approx` for an explanation of the return value.
 ///
 /// Uses Newton's iterations (at least one). Inspired by Algorithm "ApproximateReciprocal",
@@ -1266,8 +1266,8 @@ pub fn _limbs_invert_newton_approx(is: &mut [Limb], ds: &[Limb], scratch: &mut [
     unreachable!();
 }
 
-/// Takes the strictly normalised value ds (i.e., most significant bit must be set) as an input, and
-/// computes the approximate reciprocal of ds, with the same length of ds.
+/// Takes the strictly normalized value ds (i.e., most significant bit must be set) as an input, and
+/// computes the approximate reciprocal of `ds`, with the same length as `ds`.
 ///
 /// Let result_definitely_exact = _limbs_invert_basecase_approx(is, ds, scratch) be the returned
 /// value. If result_definitely_exact is `true`, the error e is 0; otherwise, it may be 0 or 1. The
@@ -1497,6 +1497,7 @@ fn _limbs_div_mod_barrett_helper(
         } else {
             let cy = limbs_add_limb_to_out(tp, &ds[d_len - (i_len + 1)..d_len], 1);
             if cy {
+                // TODO This branch is untested!
                 limbs_set_zero(&mut ip[..i_len]);
             } else {
                 let (tp_lo, tp_hi) = tp.split_at_mut(i_len + 1);
@@ -1577,6 +1578,7 @@ pub fn _limbs_div_mod_barrett(
             cy,
         );
         if cy {
+            // TODO This branch is untested!
             if limbs_sub_limb_in_place(&mut qs[..q_len], 1) {
                 assert!(highest_q);
                 highest_q = false;
