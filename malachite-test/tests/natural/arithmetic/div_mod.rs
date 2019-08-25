@@ -7302,6 +7302,42 @@ fn verify_limbs_div_mod_2(
 }
 
 #[test]
+#[should_panic]
+fn limbs_div_mod_barrett_fail_1() {
+    let ns = &[1, 2, 3];
+    let ds = &[0x8000_0000];
+    let mut scratch = vec![0; _limbs_div_mod_barrett_scratch_len(ns.len(), ds.len())];
+    _limbs_div_mod_barrett(&mut [10, 10], &mut [10, 10, 10], ns, ds, &mut scratch);
+}
+
+#[test]
+#[should_panic]
+fn limbs_div_mod_barrett_fail_2() {
+    let ns = &[1, 2];
+    let ds = &[1, 0x8000_0000];
+    let mut scratch = vec![0; _limbs_div_mod_barrett_scratch_len(ns.len(), ds.len())];
+    _limbs_div_mod_barrett(&mut [10, 10], &mut [10, 10, 10], ns, ds, &mut scratch);
+}
+
+#[test]
+#[should_panic]
+fn limbs_div_mod_barrett_fail_3() {
+    let ns = &[1, 2, 3, 4];
+    let ds = &[1, 0x8000_0000];
+    let mut scratch = vec![0; _limbs_div_mod_barrett_scratch_len(ns.len(), ds.len())];
+    _limbs_div_mod_barrett(&mut [10], &mut [10, 10, 10], ns, ds, &mut scratch);
+}
+
+#[test]
+#[should_panic]
+fn limbs_div_mod_barrett_fail_4() {
+    let ns = &[1, 2, 3];
+    let ds = &[1, 2];
+    let mut scratch = vec![0; _limbs_div_mod_barrett_scratch_len(ns.len(), ds.len())];
+    _limbs_div_mod_barrett(&mut [10, 10], &mut [10, 10, 10], ns, ds, &mut scratch);
+}
+
+#[test]
 fn test_limbs_div_mod_barrett() {
     let test = |qs_in: &[Limb],
                 rs_in: &[Limb],
@@ -7325,13 +7361,13 @@ fn test_limbs_div_mod_barrett() {
     {
         // q_len + MU_DIV_QR_SKEW_THRESHOLD >= d_len
         // d_len != i_len in _limbs_div_mod_barrett_helper
-        // !cy in _limbs_div_mod_barrett_helper
-        // !qh in _limbs_div_mod_barrett_preinverted
-        // q_len >= i_len in _limbs_div_mod_barrett_preinverted
+        // !limbs_add_limb_to_out(scratch, &ds[d_len - i_len_plus_1..], 1)
+        //      in _limbs_div_mod_barrett_helper
+        // !highest_q in _limbs_div_mod_barrett_preinverted
+        // i_len == chunk_len in _limbs_div_mod_barrett_preinverted
         // i_len < MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD in _limbs_div_mod_barrett_preinverted
-        // d_len != i_len in _limbs_div_mod_barrett_preinverted
-        // limbs_cmp_same_length(&rs[..d_len], &ds[..d_len]) >= Ordering::Equal
-        //      in _limbs_div_mod_barrett_preinverted
+        // n > 0 in _limbs_div_mod_barrett_preinverted
+        // limbs_cmp_same_length(ns_hi, ds) >= Ordering::Equal in _limbs_div_mod_barrett_preinverted
         test(
             &[10, 10],
             &[10, 10, 10],
@@ -7341,12 +7377,11 @@ fn test_limbs_div_mod_barrett() {
             &[6, 10],
             &[4294967291, 1, 10],
         );
-        // qh in _limbs_div_mod_barrett_preinverted
+        // highest_q in _limbs_div_mod_barrett_preinverted
         // i_len >= MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD in _limbs_div_mod_barrett_preinverted
-        // wn > 0 in _limbs_div_mod_barrett_preinverted
-        // q_len < i_len in _limbs_div_mod_barrett_preinverted
-        // limbs_cmp_same_length(&rs[..d_len], &ds[..d_len]) == Ordering::Less
-        //      in _limbs_div_mod_barrett_preinverted
+        // d_len_plus_i_len > scratch_len in _limbs_div_mod_barrett_preinverted
+        // i_len != chunk_len in _limbs_div_mod_barrett_preinverted
+        // limbs_cmp_same_length(ns_hi, ds) == Ordering::Less in _limbs_div_mod_barrett_preinverted
         test(
             &[
                 3347432287, 667250836, 2974407817, 429996943, 2750501459, 981155607, 2784121354,
@@ -7471,7 +7506,7 @@ fn test_limbs_div_mod_barrett() {
             &[1, 2147483646],
         );
         // d_len == i_len in _limbs_div_mod_barrett_helper
-        // d_len == i_len in _limbs_div_mod_barrett_preinverted
+        // n == 0 in _limbs_div_mod_barrett_preinverted
         test(
             &mut [10; 3],
             &mut [10, 10],
@@ -7483,7 +7518,11 @@ fn test_limbs_div_mod_barrett() {
         );
         // q_len + MU_DIV_QR_SKEW_THRESHOLD < d_len
         // !highest_q
-        // !cy
+        // !_limbs_sub_same_length_with_borrow_in_in_place_left(
+        //            rs_hi,
+        //            scratch_hi,
+        //            limbs_sub_same_length_to_out(rs_lo, ns_lo, scratch_lo),
+        //        )
         test(
             &mut [10; 125],
             &mut [10; 405],

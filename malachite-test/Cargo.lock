@@ -499,7 +499,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "proc-macro2 1.0.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "quote 1.0.2 (registry+https://github.com/rust-lang/crates.io-index)",
- "syn 1.0.3 (registry+https://github.com/rust-lang/crates.io-index)",
+ "syn 1.0.4 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -544,7 +544,7 @@ dependencies = [
 
 [[package]]
 name = "syn"
-version = "1.0.3"
+version = "1.0.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "proc-macro2 1.0.1 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -671,7 +671,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 "checksum sha3 0.8.2 (registry+https://github.com/rust-lang/crates.io-index)" = "dd26bc0e7a2e3a7c959bc494caf58b72ee0c71d67704e9520f736ca7e4853ecf"
 "checksum streaming-stats 0.2.2 (registry+https://github.com/rust-lang/crates.io-index)" = "fd8abbec7f4bc18e9e761572465226e63f88c1cb90ee8b3f403a81631ef9fd50"
 "checksum syn 0.15.44 (registry+https://github.com/rust-lang/crates.io-index)" = "9ca4b3b69a77cbe1ffc9e198781b7acb0c7365a883670e8f1c1bc66fba79a5c5"
-"checksum syn 1.0.3 (registry+https://github.com/rust-lang/crates.io-index)" = "158521e6f544e7e3dcfc370ac180794aa38cb34a1b1e07609376d4adcf429b93"
+"checksum syn 1.0.4 (registry+https://github.com/rust-lang/crates.io-index)" = "c65d951ab12d976b61a41cf9ed4531fc19735c6e6d84a4bb1453711e762ec731"
 "checksum synstructure 0.10.2 (registry+https://github.com/rust-lang/crates.io-index)" = "02353edf96d6e4dc81aea2d8490a7e9db177bf8acb0e951c24940bf866cb313f"
 "checksum time 0.1.42 (registry+https://github.com/rust-lang/crates.io-index)" = "db8dcfca086c1143c9270ac42a2bbd8a7ee477b78ac8e45b19abfb0cbede4b6f"
 "checksum typenum 1.10.0 (registry+https://github.com/rust-lang/crates.io-index)" = "612d636f949607bdf9b123b4a6f6d966dedf3ff669f7f045890d3a4a73948169"

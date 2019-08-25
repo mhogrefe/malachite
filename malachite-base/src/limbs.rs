@@ -91,13 +91,10 @@ pub fn limbs_pad_left<T: Clone>(limbs: &mut Vec<T>, pad_size: usize, pad_limb: T
 /// limbs_delete_left::<u32>(&mut limbs, 3);
 /// assert_eq!(limbs, [4, 5]);
 /// ```
-pub fn limbs_delete_left<T>(limbs: &mut Vec<T>, delete_size: usize) {
-    assert!(delete_size <= limbs.len());
-    let remaining_size = limbs.len() - delete_size;
-    for i in 0..remaining_size {
-        limbs.swap(i, i + delete_size);
-    }
-    limbs.truncate(remaining_size);
+pub fn limbs_delete_left<T: Copy>(limbs: &mut Vec<T>, delete_size: usize) {
+    let old_len = limbs.len();
+    limbs.copy_within(delete_size..old_len, 0);
+    limbs.truncate(old_len - delete_size);
 }
 
 /// Counts the number of zero limbs that a slice starts with.
@@ -142,9 +139,8 @@ pub fn limbs_trailing_zero_limbs<T: Copy + Eq + Zero>(limbs: &[T]) -> usize {
         .count()
 }
 
-//TODO test; replace with copy_within
+//TODO test
+#[inline]
 pub fn limbs_move_left<T: Copy>(limbs: &mut [T], amount: usize) {
-    for i in 0..limbs.len() - amount {
-        limbs[i] = limbs[i + amount];
-    }
+    limbs.copy_within(amount..limbs.len(), 0);
 }

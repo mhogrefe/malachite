@@ -28,8 +28,8 @@ use platform::Limb;
 /// assert_eq!(limbs_is_power_of_two(&[0, 0b1010]), false);
 /// ```
 pub fn limbs_is_power_of_two(limbs: &[Limb]) -> bool {
-    assert!(!limbs.is_empty());
-    limbs_test_zero(&limbs[..limbs.len() - 1]) && limbs.last().unwrap().is_power_of_two()
+    let (limbs_last, limbs_init) = limbs.split_last().unwrap();
+    limbs_test_zero(limbs_init) && limbs_last.is_power_of_two()
 }
 
 impl<'a> IsPowerOfTwo for &'a Natural {

@@ -91,10 +91,11 @@ fn _limbs_toom_couple_handling(
     if y_shift != 0 {
         limbs_slice_shr_in_place(ys, y_shift);
     }
-    if limbs_slice_add_same_length_in_place_left(&mut xs_lo[offset..], &ys[..n - offset]) {
-        assert!(!limbs_add_limb_to_out(xs_hi, &ys[n - offset..], 1));
+    let (ys_lo, ys_hi) = ys.split_at(n - offset);
+    if limbs_slice_add_same_length_in_place_left(&mut xs_lo[offset..], ys_lo) {
+        assert!(!limbs_add_limb_to_out(xs_hi, ys_hi, 1));
     } else {
-        xs_hi[..offset].copy_from_slice(&ys[n - offset..]);
+        xs_hi[..offset].copy_from_slice(ys_hi);
     }
 }
 
@@ -263,13 +264,14 @@ pub fn _limbs_mul_greater_to_out_toom_22(
             }
         } else {
             // n - s == 1
-            if xs_0[s] == 0 && limbs_cmp_same_length(&xs_0[..s], xs_1) == Ordering::Less {
-                limbs_sub_same_length_to_out(asm1, xs_1, &xs_0[..s]);
+            let (xs_0_last, xs_0_init) = xs_0.split_last().unwrap();
+            if *xs_0_last == 0 && limbs_cmp_same_length(xs_0_init, xs_1) == Ordering::Less {
+                limbs_sub_same_length_to_out(asm1, xs_1, xs_0_init);
                 asm1[s] = 0;
                 v_neg_1_neg = true;
             } else {
-                asm1[s] = xs_0[s];
-                if limbs_sub_same_length_to_out(asm1, &xs_0[..s], xs_1) {
+                asm1[s] = *xs_0_last;
+                if limbs_sub_same_length_to_out(asm1, xs_0_init, xs_1) {
                     asm1[s].wrapping_sub_assign(1);
                 }
             }
@@ -283,14 +285,15 @@ pub fn _limbs_mul_greater_to_out_toom_22(
             } else {
                 limbs_sub_same_length_to_out(bsm1, ys_0, ys_1);
             }
-        } else if limbs_test_zero(&ys_0[t..])
-            && limbs_cmp_same_length(&ys_0[..t], ys_1) == Ordering::Less
-        {
-            limbs_sub_same_length_to_out(bsm1, ys_1, &ys_0[..t]);
-            limbs_set_zero(&mut bsm1[t..n]);
-            v_neg_1_neg.not_assign();
         } else {
-            limbs_sub_to_out(bsm1, ys_0, ys_1);
+            let (ys_0_lo, ys_0_hi) = ys_0.split_at(t);
+            if limbs_test_zero(ys_0_hi) && limbs_cmp_same_length(ys_0_lo, ys_1) == Ordering::Less {
+                limbs_sub_same_length_to_out(bsm1, ys_1, ys_0_lo);
+                limbs_set_zero(&mut bsm1[t..n]);
+                v_neg_1_neg.not_assign();
+            } else {
+                limbs_sub_to_out(bsm1, ys_0, ys_1);
+            }
         }
 
         let (v_neg_1, scratch_out) = scratch.split_at_mut(2 * n); // v_neg_1: length 2 * n
@@ -315,20 +318,20 @@ pub fn _limbs_mul_greater_to_out_toom_22(
         // v_0, 2 * n limbs
         _limbs_mul_same_length_to_out_toom_22_recursive(v_0, xs_0, ys_0, scratch_out);
 
+        // L(v_pos_inf) + H(v_pos_inf)
+        let (v_pos_inf_lo, v_pos_inf_hi) = v_pos_inf.split_at_mut(n); // v_pos_inf_lo: length n
+        let (v_0_lo, v_0_hi) = v_0.split_at_mut(n); // v_0_lo: length n, vo_hi: length n
+
         // H(v_0) + L(v_pos_inf)
-        if limbs_slice_add_same_length_in_place_left(&mut v_pos_inf[..n], &v_0[n..]) {
+        if limbs_slice_add_same_length_in_place_left(v_pos_inf_lo, v_0_hi) {
             carry += 1;
         }
 
         // L(v_0) + H(v_0)
         carry2 = carry;
-        let (v_0_lo, v_0_hi) = v_0.split_at_mut(n); // v_0_lo: length n, vo_hi: length n
-        if limbs_add_same_length_to_out(v_0_hi, &v_pos_inf[..n], v_0_lo) {
+        if limbs_add_same_length_to_out(v_0_hi, v_pos_inf_lo, v_0_lo) {
             carry2 += 1;
         }
-
-        // L(v_pos_inf) + H(v_pos_inf)
-        let (v_pos_inf_lo, v_pos_inf_hi) = v_pos_inf.split_at_mut(n); // v_pos_inf_lo: length n
 
         // s + t - n == either ys_len - (xs_len >> 1) or ys_len - (xs_len >> 1) - 2.
         // n == xs_len - (xs_len >> 1) and xs_len >= ys_len.

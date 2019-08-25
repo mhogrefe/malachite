@@ -1,4 +1,4 @@
-use std::cmp::{max, min, Ordering};
+use std::cmp::{min, Ordering};
 use std::mem::swap;
 
 use malachite_base::comparison::Max;
@@ -1302,173 +1302,154 @@ pub fn _limbs_invert_approx(is: &mut [Limb], ds: &[Limb], scratch: &mut [Limb]) 
 
 const MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD: usize = INV_MULMOD_BNM1_THRESHOLD >> 1;
 
+/// Time: O(n * log(d) * log(log(d)))
+///
+/// Additional memory: O(d * log(d))
+///
+/// where n = `ns.len()`, d = `ds.len()`
+///
 /// This is mpn_preinv_mu_div_qr from mpn/generic/mu_div_qr.c.
 fn _limbs_div_mod_barrett_preinverted(
     qs: &mut [Limb],
     rs: &mut [Limb],
     ns: &[Limb],
     ds: &[Limb],
-    is: &[Limb],
+    mut is: &[Limb],
     scratch: &mut [Limb],
 ) -> bool {
     let n_len = ns.len();
     let d_len = ds.len();
-    // rs has length d_len as well
+    assert_eq!(rs.len(), d_len);
     let mut i_len = is.len();
-    let mut q_len = n_len - d_len;
-    let mut np_offset = q_len;
-    let mut qp_offset = q_len;
-    let qh =
-        limbs_cmp_same_length(&ns[np_offset..np_offset + d_len], &ds[..d_len]) >= Ordering::Equal;
-    if qh {
-        limbs_sub_same_length_to_out(rs, &ns[np_offset..np_offset + d_len], &ds[..d_len]);
+    let q_len = n_len - d_len;
+    let qs = &mut qs[..q_len];
+    let (ns_lo, ns_hi) = ns.split_at(q_len);
+    let highest_q = limbs_cmp_same_length(ns_hi, ds) >= Ordering::Equal;
+    if highest_q {
+        limbs_sub_same_length_to_out(rs, ns_hi, ds);
     } else {
-        rs[..d_len].copy_from_slice(&ns[np_offset..np_offset + d_len]);
+        rs.copy_from_slice(ns_hi);
     }
-    let mut ip_offset = 0;
-    while q_len != 0 {
-        if q_len < i_len {
-            ip_offset += i_len - q_len;
-            i_len = q_len;
+    let scratch_len = if i_len < MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD {
+        0
+    } else {
+        _limbs_mul_mod_limb_width_to_n_minus_1_next_size(d_len + 1)
+    };
+    let mut n = d_len - i_len;
+    for (ns, qs) in ns_lo.rchunks(i_len).zip(qs.rchunks_mut(i_len)) {
+        let chunk_len = ns.len();
+        if i_len != chunk_len {
+            // last iteration
+            is = &is[i_len - chunk_len..];
+            i_len = chunk_len;
+            n = d_len - i_len;
         }
-        np_offset -= i_len;
-        qp_offset -= i_len;
-        // Compute the next block of quotient limbs by multiplying the inverse I
-        // by the upper part of the partial remainder R.
-        // mulhi
-        limbs_mul_same_length_to_out(
-            scratch,
-            &rs[d_len - i_len..d_len],
-            &is[ip_offset..ip_offset + i_len],
-        );
-        // I's msb implicit
-        let cy = limbs_add_same_length_to_out(
-            &mut qs[qp_offset..],
-            &scratch[i_len..2 * i_len],
-            &rs[d_len - i_len..d_len],
-        );
-        assert!(!cy);
-        q_len -= i_len;
-        // Compute the product of the quotient block and the divisor D, to be
-        // subtracted from the partial remainder combined with new limbs from the
-        // dividend N.  We only really need the low d_len+1 limbs.
+        let (rs_lo, rs_hi) = rs.split_at_mut(n);
+        // Compute the next block of quotient limbs by multiplying the inverse by the upper part of
+        // the partial remainder.
+        limbs_mul_same_length_to_out(scratch, rs_hi, &is);
+        // The inverse's most significant bit is implicit.
+        assert!(!limbs_add_same_length_to_out(
+            qs,
+            &scratch[i_len..i_len << 1],
+            rs_hi,
+        ));
+        // Compute the product of the quotient block and the divisor, to be subtracted from the
+        // partial remainder combined with new limbs from the dividend. We only really need the low
+        // d_len + 1 limbs.
         if i_len < MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD {
-            // d_len+in limbs, high 'in' cancels
-            limbs_mul_greater_to_out(scratch, &ds[..d_len], &qs[qp_offset..qp_offset + i_len]);
+            limbs_mul_greater_to_out(scratch, ds, qs);
         } else {
-            let tn = _limbs_mul_mod_limb_width_to_n_minus_1_next_size(d_len + 1);
-            let (tp, scratch_out) = scratch.split_at_mut(tn);
-            _limbs_mul_mod_limb_width_to_n_minus_1(
-                tp,
-                tn,
-                &ds[..d_len],
-                &qs[qp_offset..qp_offset + i_len],
-                scratch_out,
-            );
+            let (scratch, scratch_out) = scratch.split_at_mut(scratch_len);
+            _limbs_mul_mod_limb_width_to_n_minus_1(scratch, scratch_len, ds, qs, scratch_out);
             // number of wrapped limbs
-            let wn = isize::checked_from(d_len + i_len).unwrap() - isize::checked_from(tn).unwrap();
-            if wn > 0 {
-                let wn = usize::checked_from(wn).unwrap();
-                let mut cy =
-                    if limbs_sub_same_length_in_place_left(&mut tp[..wn], &rs[d_len - wn..d_len]) {
-                        1
-                    } else {
-                        0
-                    };
-                cy = if limbs_sub_limb_in_place(&mut tp[wn..tn], cy) {
-                    1
+            let d_len_plus_i_len = d_len + i_len;
+            if d_len_plus_i_len > scratch_len {
+                let m = d_len_plus_i_len - scratch_len;
+                // m == i_len + d_len - scratch_len and scratch_len >= d_len, so i_len >= m.
+                let (scratch_lo, scratch_hi) = scratch.split_at_mut(m);
+                let cy = limbs_sub_same_length_in_place_left(scratch_lo, &rs_hi[i_len - m..])
+                    && limbs_sub_limb_in_place(&mut scratch_hi[..scratch_len - m], 1);
+                let cx = limbs_cmp_same_length(
+                    &rs_hi[..scratch_len - d_len],
+                    &scratch[d_len..scratch_len],
+                ) == Ordering::Less;
+                if cx && !cy {
+                    assert!(!limbs_slice_add_limb_in_place(scratch, 1));
                 } else {
-                    0
-                };
-                let cx = if limbs_cmp_same_length(&rs[d_len - i_len..tn - i_len], &tp[d_len..tn])
-                    == Ordering::Less
-                {
-                    1
-                } else {
-                    0
-                };
-                assert!(cx >= cy);
-                assert!(!limbs_slice_add_limb_in_place(tp, cx - cy));
+                    assert_eq!(cx, cy);
+                }
             }
         }
-        let mut r = rs[d_len - i_len].wrapping_sub(scratch[d_len]);
-        // Subtract the product from the partial remainder combined with new
-        // limbs from the dividend N, generating a new partial remainder R.
-        let mut cy;
-        if d_len != i_len {
-            // get next 'in' limbs from N
-            cy = if limbs_sub_same_length_in_place_right(
-                &ns[np_offset..np_offset + i_len],
-                &mut scratch[..i_len],
-            ) {
-                1
-            } else {
-                0
-            };
-            cy = if _limbs_sub_same_length_with_borrow_in_in_place_right(
-                &rs[..d_len - i_len],
-                &mut scratch[i_len..d_len],
-                cy != 0,
-            ) {
-                1
-            } else {
-                0
-            };
-            rs[..d_len].copy_from_slice(&scratch[..d_len]);
+        let mut r = rs_hi[0].wrapping_sub(scratch[d_len]);
+        // Subtract the product from the partial remainder combined with new limbs from the
+        // dividend, generating a new partial remainder.
+        let carry = if n == 0 {
+            // Get next i_len limbs from n.
+            limbs_sub_same_length_to_out(rs, ns, &scratch[..i_len])
         } else {
-            // get next 'in' limbs from N
-            cy = if limbs_sub_same_length_to_out(
-                rs,
-                &ns[np_offset..np_offset + i_len],
-                &scratch[..i_len],
-            ) {
-                1
-            } else {
-                0
-            };
+            let scratch = &mut scratch[..d_len];
+            let (scratch_lo, scratch_hi) = scratch.split_at_mut(i_len);
+            // Get next i_len limbs from n.
+            let carry = _limbs_sub_same_length_with_borrow_in_in_place_right(
+                rs_lo,
+                scratch_hi,
+                limbs_sub_same_length_in_place_right(ns, scratch_lo),
+            );
+            rs.copy_from_slice(scratch);
+            carry
+        };
+        // Check the remainder and adjust the quotient as needed.
+        if carry {
+            r.wrapping_sub_assign(1);
         }
-        // Check the remainder R and adjust the quotient as needed.
-        r -= cy;
         while r != 0 {
-            // We loop 0 times with about 69% probability, 1 time with about 31%
-            // probability, 2 times with about 0.6% probability, if inverse is
-            // computed as recommended.
-            assert!(!limbs_slice_add_limb_in_place(&mut qs[qp_offset..], 1));
-            cy = if limbs_sub_same_length_in_place_left(&mut rs[..d_len], &ds[..d_len]) {
-                1
-            } else {
-                0
-            };
-            r -= cy;
+            // We loop 0 times with about 69% probability, 1 time with about 31% probability, and 2
+            // times with about 0.6% probability, if the inverse is computed as recommended.
+            assert!(!limbs_slice_add_limb_in_place(qs, 1));
+            if limbs_sub_same_length_in_place_left(rs, ds) {
+                r -= 1;
+            }
         }
-        if limbs_cmp_same_length(&rs[..d_len], &ds[..d_len]) >= Ordering::Equal {
+        if limbs_cmp_same_length(rs, ds) >= Ordering::Equal {
             // This is executed with about 76% probability.
-            assert!(!limbs_slice_add_limb_in_place(&mut qs[qp_offset..], 1));
-            limbs_sub_same_length_in_place_left(&mut rs[..d_len], &ds[..d_len]);
+            assert!(!limbs_slice_add_limb_in_place(qs, 1));
+            limbs_sub_same_length_in_place_left(rs, ds);
         }
     }
-    qh
+    highest_q
 }
 
 /// We distinguish 3 cases:
-/// (a) d_len < q_len:              in = ceil(q_len / ceil(q_len / d_len))
-/// (b) d_len / 3 < q_len <= d_len: in = ceil(q_len / 2)
-/// (c) q_len < d_len / 3:          in = q_len
-/// In all cases we have in <= d_len.
+/// (a) d_len < q_len:              i_len = ceil(q_len / ceil(q_len / d_len))
+/// (b) d_len / 3 < q_len <= d_len: i_len = ceil(q_len / 2)
+/// (c) q_len < d_len / 3:          i_len = q_len
+/// In all cases we have i_len <= d_len.
+///
+/// Time: O(1)
+///
+/// Additional memory: O(1)
 ///
 /// This is mpn_mu_div_qr_choose_in from mpn/generic/mu_div_qr.c, where k == 0.
 fn _limbs_div_mod_barrett_is_len(q_len: usize, d_len: usize) -> usize {
+    let q_len_minus_1 = q_len - 1;
     if q_len > d_len {
         // Compute an inverse size that is a nice partition of the quotient.
-        let b = (q_len - 1) / d_len + 1; // ceil(q_len / d_len), number of blocks
-        (q_len - 1) / b + 1 // ceil(q_len / b) = ceil(q_len / ceil(q_len / d_len))
+        let b = q_len_minus_1 / d_len + 1; // ceil(q_len / d_len), number of blocks
+        q_len_minus_1 / b + 1 // ceil(q_len / b) = ceil(q_len / ceil(q_len / d_len))
     } else if 3 * q_len > d_len {
-        (q_len - 1) / 2 + 1 // b = 2
+        q_len_minus_1 / 2 + 1 // b = 2
     } else {
-        (q_len - 1) + 1 // b = 1
+        q_len_minus_1 + 1 // b = 1
     }
 }
 
+/// Time: O(n * log(n) * log(log(n)))
+///
+/// Additional memory: O(n * log(n))
+///
+/// where n = `ns.len()`
+///
 /// This is mpn_mu_div_qr2 from mpn/generic/mu_div_qr.c.
 fn _limbs_div_mod_barrett_helper(
     qs: &mut [Limb],
@@ -1479,6 +1460,7 @@ fn _limbs_div_mod_barrett_helper(
 ) -> bool {
     let n_len = ns.len();
     let d_len = ds.len();
+    assert_eq!(rs.len(), d_len);
     assert!(d_len > 1);
     assert!(n_len > d_len);
     let q_len = n_len - d_len;
@@ -1486,33 +1468,40 @@ fn _limbs_div_mod_barrett_helper(
     let i_len = _limbs_div_mod_barrett_is_len(q_len, d_len);
     assert!(i_len <= d_len);
     {
-        let (ip, tp) = scratch.split_at_mut(i_len + 1);
-        // compute an approximate inverse on (in+1) limbs
+        let i_len_plus_1 = i_len + 1;
+        let (is, scratch) = scratch.split_at_mut(i_len_plus_1);
+        // compute an approximate inverse on i_len + 1 limbs
         if d_len == i_len {
-            tp[1..i_len + 1].copy_from_slice(&ds[..i_len]);
-            tp[0] = 1;
-            let (tp_lo, tp_hi) = tp.split_at_mut(i_len + 1);
-            _limbs_invert_approx(ip, &tp_lo, tp_hi);
-            limbs_move_left(ip, 1);
+            let (scratch_lo, scratch_hi) = scratch.split_at_mut(i_len_plus_1);
+            {
+                let (scratch_first, scratch_lo_tail) = scratch_lo.split_first_mut().unwrap();
+                scratch_lo_tail.copy_from_slice(&ds[..i_len]);
+                *scratch_first = 1;
+            }
+            _limbs_invert_approx(is, &scratch_lo, scratch_hi);
+            limbs_move_left(is, 1);
         } else {
-            let cy = limbs_add_limb_to_out(tp, &ds[d_len - (i_len + 1)..d_len], 1);
-            if cy {
+            if limbs_add_limb_to_out(scratch, &ds[d_len - i_len_plus_1..], 1) {
                 // TODO This branch is untested!
-                limbs_set_zero(&mut ip[..i_len]);
+                limbs_set_zero(&mut is[..i_len]);
             } else {
-                let (tp_lo, tp_hi) = tp.split_at_mut(i_len + 1);
-                _limbs_invert_approx(ip, tp_lo, tp_hi);
-                limbs_move_left(ip, 1);
+                let (scratch_lo, scratch_hi) = scratch.split_at_mut(i_len_plus_1);
+                _limbs_invert_approx(is, scratch_lo, scratch_hi);
+                limbs_move_left(is, 1);
             }
         }
     }
     let (scratch_lo, scratch_hi) = scratch.split_at_mut(i_len);
-    _limbs_div_mod_barrett_preinverted(qs, &mut rs[..d_len], ns, ds, scratch_lo, scratch_hi)
+    _limbs_div_mod_barrett_preinverted(qs, rs, ns, ds, scratch_lo, scratch_hi)
 }
 
 //TODO tune
 const MU_DIV_QR_SKEW_THRESHOLD: usize = 100;
 
+/// Time: O(1)
+///
+/// Additional memory: O(1)
+///
 /// This is mpn_preinv_mu_div_qr_itch from mpn/generic/mu_div_qr.c, but nn is omitted from the
 /// arguments as it is unused.
 fn _limbs_div_mod_barrett_preinverse_scratch_len(d_len: usize, is_len: usize) -> usize {
@@ -1521,20 +1510,46 @@ fn _limbs_div_mod_barrett_preinverse_scratch_len(d_len: usize, is_len: usize) ->
     itch_local + itch_out
 }
 
+/// Time: O(1)
+///
+/// Additional memory: O(1)
+///
 /// This is mpn_invertappr_itch from gmp-impl.h.
 const fn _limbs_invert_approx_scratch_len(is_len: usize) -> usize {
-    2 * is_len
+    is_len << 1
 }
 
+/// Time: O(1)
+///
+/// Additional memory: O(1)
+///
 /// This is mpn_mu_div_qr_itch from mpn/generic/mu_div_qr.c, where mua_k == 0.
 pub fn _limbs_div_mod_barrett_scratch_len(n_len: usize, d_len: usize) -> usize {
     let is_len = _limbs_div_mod_barrett_is_len(n_len - d_len, d_len);
     let itch_preinv = _limbs_div_mod_barrett_preinverse_scratch_len(d_len, is_len);
     let itch_invapp = _limbs_invert_approx_scratch_len(is_len + 1) + is_len + 2; // 3 * is_len + 4
     assert!(itch_preinv >= itch_invapp);
-    is_len + max(itch_invapp, itch_preinv)
+    is_len + itch_preinv
 }
 
+/// Block-wise Barrett division. The idea of the algorithm used herein is to compute a smaller
+/// inverted value than used in the standard Barrett algorithm, and thus save time in the Newton
+/// iterations, and pay just a small price when using the inverted value for developing quotient
+/// bits. This algorithm was presented at ICMS 2006.
+///
+/// `ns` must have length at least 3, `ds` must have length at least 2 and be no longer than `ns`,
+/// and the most significant bit of `ds` must be set.
+///
+/// Time: O(n * log(n) * log(log(n)))
+///
+/// Additional memory: O(n * log(n))
+///
+/// where n = `ns.len()`
+///
+/// # Panics
+/// Panics if `ds` has length smaller than 2, `ns.len()` is less than `ds.len()`, `qs` has length
+/// less than `ns.len()` - `ds.len()`, or the last limb of `ds` does not have its highest bit set.
+///
 /// This is mpn_mu_div_qr from mpn/generic/mu_div_qr.c.
 pub fn _limbs_div_mod_barrett(
     qs: &mut [Limb],
@@ -1545,50 +1560,47 @@ pub fn _limbs_div_mod_barrett(
 ) -> bool {
     let n_len = ns.len();
     let d_len = ds.len();
+    assert!(n_len >= d_len);
     let q_len = n_len - d_len;
-    let mut highest_q;
+    let qs = &mut qs[..q_len];
+    // Test whether 2 * d_len - n_len > MU_DIV_QR_SKEW_THRESHOLD
     if q_len + MU_DIV_QR_SKEW_THRESHOLD < d_len {
-        highest_q = _limbs_div_mod_barrett_helper(
-            qs,
-            &mut rs[n_len - (2 * q_len + 1)..],
-            &ns[n_len - (2 * q_len + 1)..n_len],
-            &ds[d_len - (q_len + 1)..d_len],
-            scratch,
-        );
+        let q_len_plus_one = q_len + 1;
+        let n = n_len - q_len - q_len_plus_one; // 2 * d_len - n_len - 1
+        let (ns_lo, ns_hi) = ns.split_at(n);
+        let (ds_lo, ds_hi) = ds.split_at(d_len - q_len_plus_one);
+        let (rs_lo, rs_hi) = rs.split_at_mut(n);
+        let rs_hi = &mut rs_hi[..q_len_plus_one];
+        let mut highest_q = _limbs_div_mod_barrett_helper(qs, rs_hi, ns_hi, ds_hi, scratch);
         // Multiply the quotient by the divisor limbs ignored above.
-        // prod is d_len-1 limbs
-        limbs_mul_to_out(scratch, &ds[..d_len - (q_len + 1)], &qs[..q_len]);
-        let mut cy = if highest_q {
-            limbs_slice_add_same_length_in_place_left(
-                &mut scratch[q_len..d_len - 1],
-                &ds[..d_len - (q_len + 1)],
-            )
+        // The product is d_len - 1 limbs long.
+        limbs_mul_to_out(scratch, ds_lo, qs);
+        let (scratch_last, scratch_init) = scratch[..d_len].split_last_mut().unwrap();
+        *scratch_last = if highest_q
+            && limbs_slice_add_same_length_in_place_left(&mut scratch_init[q_len..], ds_lo)
+        {
+            1
         } else {
-            false
+            0
         };
-        scratch[d_len - 1] = if cy { 1 } else { 0 };
-        cy = limbs_sub_same_length_to_out(
-            rs,
-            &ns[..n_len - (2 * q_len + 1)],
-            &scratch[..n_len - (2 * q_len + 1)],
-        );
-        cy = _limbs_sub_same_length_with_borrow_in_in_place_left(
-            &mut rs[n_len - (2 * q_len + 1)..n_len - q_len],
-            &scratch[n_len - (2 * q_len + 1)..n_len - q_len],
-            cy,
-        );
-        if cy {
+        let (scratch_lo, scratch_hi) = scratch.split_at(n);
+        let scratch_hi = &scratch_hi[..q_len_plus_one];
+        if _limbs_sub_same_length_with_borrow_in_in_place_left(
+            rs_hi,
+            scratch_hi,
+            limbs_sub_same_length_to_out(rs_lo, ns_lo, scratch_lo),
+        ) {
             // TODO This branch is untested!
-            if limbs_sub_limb_in_place(&mut qs[..q_len], 1) {
+            if limbs_sub_limb_in_place(qs, 1) {
                 assert!(highest_q);
                 highest_q = false;
             }
-            limbs_slice_add_same_length_in_place_left(&mut rs[..d_len], &ds[..d_len]);
+            limbs_slice_add_same_length_in_place_left(&mut rs[..d_len], ds);
         }
+        highest_q
     } else {
-        highest_q = _limbs_div_mod_barrett_helper(qs, rs, &ns[..n_len], &ds[..d_len], scratch);
+        _limbs_div_mod_barrett_helper(qs, &mut rs[..d_len], ns, ds, scratch)
     }
-    highest_q
 }
 
 //TODO tune all
