@@ -1238,7 +1238,7 @@ pub fn _limbs_invert_newton_approx(is: &mut [Limb], ds: &[Limb], scratch: &mut [
             limbs_mul_same_length_to_out(scratch_lo, &scratch_hi[..previous_d], is_hi);
         }
         let a = (previous_d << 1) - diff;
-        let cy = {
+        let carry = {
             let (scratch_lo, scratch_hi) = scratch.split_at_mut(a);
             limbs_slice_add_same_length_in_place_left(
                 &mut scratch_lo[previous_d..],
@@ -1249,7 +1249,7 @@ pub fn _limbs_invert_newton_approx(is: &mut [Limb], ds: &[Limb], scratch: &mut [
             &mut is[d_len - d..],
             &scratch[a..previous_d << 1],
             &scratch[d + previous_d..d << 1],
-            cy,
+            carry,
         ) {
             assert!(!limbs_slice_add_limb_in_place(
                 &mut is[d_len - previous_d..],
@@ -1368,16 +1368,16 @@ fn _limbs_div_mod_barrett_preinverted(
                 let m = d_len_plus_i_len - scratch_len;
                 // m == i_len + d_len - scratch_len and scratch_len >= d_len, so i_len >= m.
                 let (scratch_lo, scratch_hi) = scratch.split_at_mut(m);
-                let cy = limbs_sub_same_length_in_place_left(scratch_lo, &rs_hi[i_len - m..])
+                let carry_1 = limbs_sub_same_length_in_place_left(scratch_lo, &rs_hi[i_len - m..])
                     && limbs_sub_limb_in_place(&mut scratch_hi[..scratch_len - m], 1);
-                let cx = limbs_cmp_same_length(
+                let carry_2 = limbs_cmp_same_length(
                     &rs_hi[..scratch_len - d_len],
                     &scratch[d_len..scratch_len],
                 ) == Ordering::Less;
-                if cx && !cy {
+                if !carry_1 && carry_2 {
                     assert!(!limbs_slice_add_limb_in_place(scratch, 1));
                 } else {
-                    assert_eq!(cx, cy);
+                    assert_eq!(carry_1, carry_2);
                 }
             }
         }
@@ -1608,299 +1608,294 @@ const MUPI_DIV_QR_THRESHOLD: usize = 74;
 const MU_DIV_QR_THRESHOLD: usize = 1442;
 
 // dn > 1
-pub fn mpn_tdiv_qr(qp: &mut [Limb], rp: &mut [Limb], np: &[Limb], dp: &[Limb]) {
-    let mut nn = np.len();
-    let dn = dp.len();
-    assert!(dn > 1 && dp[dn - 1] != 0);
-    match dn {
+pub fn limbs_div_mod(qs: &mut [Limb], rs: &mut [Limb], ns: &[Limb], ds: &[Limb]) {
+    let mut n_len = ns.len();
+    let d_len = ds.len();
+    assert!(d_len > 1 && ds[d_len - 1] != 0);
+    match d_len {
         2 => {
-            if !dp[1].get_highest_bit() {
-                let cnt = dp[1].leading_zeros();
+            if !ds[1].get_highest_bit() {
+                let cnt = ds[1].leading_zeros();
                 let dtmp = &mut [0; 2];
                 let d2p = dtmp;
-                d2p[1] = (dp[1] << cnt) | (dp[0] >> (Limb::WIDTH - cnt));
-                d2p[0] = dp[0] << cnt;
-                let mut n2p = vec![0; nn + 1];
-                let cy = limbs_shl_to_out(&mut n2p, np, cnt);
-                n2p[nn] = cy;
+                d2p[1] = (ds[1] << cnt) | (ds[0] >> (Limb::WIDTH - cnt));
+                d2p[0] = ds[0] << cnt;
+                let mut n2p = vec![0; n_len + 1];
+                let cy = limbs_shl_to_out(&mut n2p, ns, cnt);
+                n2p[n_len] = cy;
                 let qhl = limbs_div_mod_by_two_limb(
-                    qp,
+                    qs,
                     if cy != 0 {
-                        &mut n2p[..nn + 1]
+                        &mut n2p[..n_len + 1]
                     } else {
-                        &mut n2p[..nn]
+                        &mut n2p[..n_len]
                     },
                     d2p,
                 );
                 if cy == 0 {
-                    // always store nn-2+1 quotient limbs
-                    qp[nn - 2] = if qhl { 1 } else { 0 };
+                    // always store n_len-2+1 quotient limbs
+                    qs[n_len - 2] = if qhl { 1 } else { 0 };
                 }
-                rp[0] = (n2p[0] >> cnt) | (n2p[1] << (Limb::WIDTH - cnt));
-                rp[1] = n2p[1] >> cnt;
+                rs[0] = (n2p[0] >> cnt) | (n2p[1] << (Limb::WIDTH - cnt));
+                rs[1] = n2p[1] >> cnt;
             } else {
-                let d2p = dp;
-                let mut n2p = vec![0; nn];
-                n2p.copy_from_slice(np);
-                let qhl = limbs_div_mod_by_two_limb(qp, &mut n2p, d2p);
-                // always store nn-2+1 quotient limbs
-                qp[nn - 2] = if qhl { 1 } else { 0 };
-                rp[0] = n2p[0];
-                rp[1] = n2p[1];
+                let d2p = ds;
+                let mut n2p = vec![0; n_len];
+                n2p.copy_from_slice(ns);
+                let qhl = limbs_div_mod_by_two_limb(qs, &mut n2p, d2p);
+                // always store n_len-2+1 quotient limbs
+                qs[n_len - 2] = if qhl { 1 } else { 0 };
+                rs[0] = n2p[0];
+                rs[1] = n2p[1];
             }
         }
         _ => {
             // conservative tests for quotient size
-            let adjust = if np[nn - 1] >= dp[dn - 1] { 1 } else { 0 };
-            if nn + adjust >= 2 * dn {
-                qp[nn - dn] = 0; // zero high quotient limb
+            let adjust = if ns[n_len - 1] >= ds[d_len - 1] { 1 } else { 0 };
+            if n_len + adjust >= 2 * d_len {
+                qs[n_len - d_len] = 0; // zero high quotient limb
                 let mut n2p_orig;
                 let mut d2p_orig;
                 let mut n2p: &mut [Limb];
                 let d2p: &[Limb];
                 let cnt;
-                if !dp[dn - 1].get_highest_bit() {
+                if !ds[d_len - 1].get_highest_bit() {
                     // normalize divisor
-                    cnt = dp[dn - 1].leading_zeros();
-                    d2p_orig = vec![0; dn];
-                    limbs_shl_to_out(&mut d2p_orig, dp, cnt);
+                    cnt = ds[d_len - 1].leading_zeros();
+                    d2p_orig = vec![0; d_len];
+                    limbs_shl_to_out(&mut d2p_orig, ds, cnt);
                     d2p = &d2p_orig;
-                    n2p_orig = vec![0; nn + 1];
+                    n2p_orig = vec![0; n_len + 1];
                     n2p = &mut n2p_orig;
-                    let cy = limbs_shl_to_out(&mut n2p, np, cnt);
-                    n2p[nn] = cy;
-                    nn += adjust;
+                    let cy = limbs_shl_to_out(&mut n2p, ns, cnt);
+                    n2p[n_len] = cy;
+                    n_len += adjust;
                 } else {
                     cnt = 0;
-                    d2p = dp;
-                    n2p_orig = vec![0; nn + 1];
+                    d2p = ds;
+                    n2p_orig = vec![0; n_len + 1];
                     n2p = &mut n2p_orig;
-                    n2p[0..nn].copy_from_slice(np);
-                    n2p[nn] = 0;
-                    nn += adjust;
+                    n2p[0..n_len].copy_from_slice(ns);
+                    n2p[n_len] = 0;
+                    n_len += adjust;
                 }
-                let dinv = limbs_two_limb_inverse_helper(d2p[dn - 1], d2p[dn - 2]);
-                if dn < DC_DIV_QR_THRESHOLD {
-                    _limbs_div_mod_schoolbook(qp, &mut n2p[..nn], d2p, dinv);
+                let dinv = limbs_two_limb_inverse_helper(d2p[d_len - 1], d2p[d_len - 2]);
+                if d_len < DC_DIV_QR_THRESHOLD {
+                    _limbs_div_mod_schoolbook(qs, &mut n2p[..n_len], d2p, dinv);
                     if cnt != 0 {
-                        limbs_shr_to_out(rp, &n2p[..dn], cnt);
+                        limbs_shr_to_out(rs, &n2p[..d_len], cnt);
                     } else {
-                        rp[..dn].copy_from_slice(&n2p[..dn]);
+                        rs[..d_len].copy_from_slice(&n2p[..d_len]);
                     }
-                } else if dn < MUPI_DIV_QR_THRESHOLD ||   // fast condition
-             nn < 2 * MU_DIV_QR_THRESHOLD || // fast condition
-             (2 * (MU_DIV_QR_THRESHOLD - MUPI_DIV_QR_THRESHOLD)) as f64 * dn as f64 // slow...
-             + MUPI_DIV_QR_THRESHOLD as f64 * nn as f64 > dn as f64 * nn as f64
+                } else if d_len < MUPI_DIV_QR_THRESHOLD
+                    || n_len < 2 * MU_DIV_QR_THRESHOLD
+                    || (2 * (MU_DIV_QR_THRESHOLD - MUPI_DIV_QR_THRESHOLD)) as f64 * d_len as f64
+                        + MUPI_DIV_QR_THRESHOLD as f64 * n_len as f64
+                        > d_len as f64 * n_len as f64
                 {
-                    // ...condition
-                    _limbs_div_mod_divide_and_conquer(qp, &mut n2p[..nn], &d2p[..dn], dinv);
-
+                    _limbs_div_mod_divide_and_conquer(qs, &mut n2p[..n_len], &d2p[..d_len], dinv);
                     if cnt != 0 {
-                        limbs_shr_to_out(rp, &n2p[..dn], cnt);
+                        limbs_shr_to_out(rs, &n2p[..d_len], cnt);
                     } else {
-                        rp[..dn].copy_from_slice(&n2p[..dn]);
+                        rs[..d_len].copy_from_slice(&n2p[..d_len]);
                     }
                 } else {
-                    let itch = _limbs_div_mod_barrett_scratch_len(nn, dn);
+                    let itch = _limbs_div_mod_barrett_scratch_len(n_len, d_len);
                     let mut scratch = vec![0; itch];
-                    _limbs_div_mod_barrett(qp, rp, &n2p[..nn], &d2p[..dn], &mut scratch);
+                    _limbs_div_mod_barrett(qs, rs, &n2p[..n_len], &d2p[..d_len], &mut scratch);
                     if cnt != 0 {
-                        limbs_slice_shr_in_place(&mut rp[..dn], cnt);
+                        // TODO This branch is untested!
+                        limbs_slice_shr_in_place(&mut rs[..d_len], cnt);
                     }
                 }
                 return;
             }
-
             // When we come here, the numerator/partial remainder is less
             // than twice the size of the denominator.
-
+            //
             //  Problem:
-
-            //  Divide a numerator N with nn limbs by a denominator D with dn
-            //  limbs forming a quotient of qn=nn-dn+1 limbs.  When qn is small
-            //  compared to dn, conventional division algorithms perform poorly.
+            //
+            //  Divide a numerator N with n_len limbs by a denominator D with d_len
+            //  limbs forming a quotient of q_len=n_len-d_len+1 limbs.  When q_len is small
+            //  compared to d_len, conventional division algorithms perform poorly.
             //  We want an algorithm that has an expected running time that is
-            //  dependent only on qn.
-
+            //  dependent only on q_len.
+            //
             //  Algorithm (very informally stated):
-
-            //  1) Divide the 2 x qn most significant limbs from the numerator
-            // by the qn most significant limbs from the denominator.  Call
+            //
+            //  1) Divide the 2 x q_len most significant limbs from the numerator
+            // by the q_len most significant limbs from the denominator.  Call
             // the result qest.  This is either the correct quotient, but
             // might be 1 or 2 too large.  Compute the remainder from the
             // division.  (This step is implemented by an mpn_divrem call.)
-
+            //
             //  2) Is the most significant limb from the remainder < p, where p
             // is the product of the most significant limb from the quotient
             // and the next(d)?  (Next(d) denotes the next ignored limb from
             // the denominator.)  If it is, decrement qest, and adjust the
             // remainder accordingly.
-
+            //
             //  3) Is the remainder >= qest?  If it is, qest is the desired
             // quotient.  The algorithm terminates.
-
+            //
             //  4) Subtract qest x next(d) from the remainder.  If there is
             // borrow out, decrement qest, and adjust the remainder
             // accordingly.
-
+            //
             //  5) Skip one word from the denominator (i.e., let next(d) denote
             // the next less significant limb.
-
-            let mut qn = nn - dn;
-            qp[qn] = 0; // zero high quotient limb
-            qn += adjust; // qn cannot become bigger
-
-            if qn == 0 {
-                rp[..dn].copy_from_slice(&np[..dn]);
+            let mut q_len = n_len - d_len;
+            qs[q_len] = 0; // zero high quotient limb
+            q_len += adjust;
+            if q_len == 0 {
+                rs[..d_len].copy_from_slice(&ns[..d_len]);
                 return;
             }
-
             // (at least partially) ignored # of limbs in ops
             // Normalize denominator by shifting it to the left such that its
             // most significant bit is set.  Then shift the numerator the same
             // amount, to mathematically preserve quotient.
-            let mut ilen = dn - qn;
+            let mut i_len = d_len - q_len;
             let mut n2p_orig;
             let mut d2p_orig;
             let n2p: &mut [Limb];
             let d2p: &[Limb];
             let cnt;
-            if !dp[dn - 1].get_highest_bit() {
-                cnt = dp[dn - 1].leading_zeros();
-                d2p_orig = vec![0; qn];
-                limbs_shl_to_out(&mut d2p_orig, &dp[ilen..ilen + qn], cnt);
-                d2p_orig[0] |= dp[ilen - 1] >> (Limb::WIDTH - cnt);
+            if !ds[d_len - 1].get_highest_bit() {
+                cnt = ds[d_len - 1].leading_zeros();
+                d2p_orig = vec![0; q_len];
+                limbs_shl_to_out(&mut d2p_orig, &ds[i_len..i_len + q_len], cnt);
+                d2p_orig[0] |= ds[i_len - 1] >> (Limb::WIDTH - cnt);
                 d2p = &d2p_orig;
-                n2p_orig = vec![0; 2 * qn + 1];
-                let cy = limbs_shl_to_out(&mut n2p_orig, &np[nn - 2 * qn..nn], cnt);
+                n2p_orig = vec![0; 2 * q_len + 1];
+                let cy = limbs_shl_to_out(&mut n2p_orig, &ns[n_len - 2 * q_len..n_len], cnt);
                 if adjust != 0 {
-                    n2p_orig[2 * qn] = cy;
+                    n2p_orig[2 * q_len] = cy;
                     n2p = &mut n2p_orig[1..];
                 } else {
                     n2p = &mut n2p_orig;
-                    n2p[0] |= np[nn - 2 * qn - 1] >> (Limb::WIDTH - cnt);
+                    n2p[0] |= ns[n_len - 2 * q_len - 1] >> (Limb::WIDTH - cnt);
                 }
             } else {
                 cnt = 0;
-                d2p = &dp[ilen..];
-
-                n2p_orig = vec![0; 2 * qn + 1];
-                n2p_orig[..2 * qn].copy_from_slice(&np[nn - 2 * qn..nn]);
+                d2p = &ds[i_len..];
+                n2p_orig = vec![0; 2 * q_len + 1];
+                n2p_orig[..2 * q_len].copy_from_slice(&ns[n_len - 2 * q_len..n_len]);
                 if adjust != 0 {
-                    n2p_orig[2 * qn] = 0;
+                    n2p_orig[2 * q_len] = 0;
                     n2p = &mut n2p_orig[1..];
                 } else {
                     n2p = &mut n2p_orig;
                 }
             }
-
             // Get an approximate quotient using the extracted operands.
-            if qn == 1 {
+            if q_len == 1 {
                 let mut q0 = 0;
                 let mut r0 = 0;
                 udiv_qrnnd(&mut q0, &mut r0, n2p[1], n2p[0], d2p[0]);
                 n2p[0] = r0;
-                qp[0] = q0;
-            } else if qn == 2 {
-                limbs_div_mod_by_two_limb(qp, n2p, d2p);
+                qs[0] = q0;
+            } else if q_len == 2 {
+                limbs_div_mod_by_two_limb(qs, n2p, d2p);
             } else {
-                let dinv = limbs_two_limb_inverse_helper(d2p[qn - 1], d2p[qn - 2]);
-                if qn < DC_DIV_QR_THRESHOLD {
-                    _limbs_div_mod_schoolbook(qp, &mut n2p[..2 * qn], &d2p[..qn], dinv);
-                } else if qn < MU_DIV_QR_THRESHOLD {
-                    _limbs_div_mod_divide_and_conquer(qp, &mut n2p[..2 * qn], &d2p[..qn], dinv);
+                let inverse = limbs_two_limb_inverse_helper(d2p[q_len - 1], d2p[q_len - 2]);
+                if q_len < DC_DIV_QR_THRESHOLD {
+                    _limbs_div_mod_schoolbook(qs, &mut n2p[..2 * q_len], &d2p[..q_len], inverse);
+                } else if q_len < MU_DIV_QR_THRESHOLD {
+                    _limbs_div_mod_divide_and_conquer(
+                        qs,
+                        &mut n2p[..2 * q_len],
+                        &d2p[..q_len],
+                        inverse,
+                    );
                 } else {
-                    let itch = _limbs_div_mod_barrett_scratch_len(2 * qn, qn);
+                    // TODO This branch is untested!
+                    let itch = _limbs_div_mod_barrett_scratch_len(2 * q_len, q_len);
                     let mut scratch = vec![0; itch];
                     // If N and R share space, put ...
                     // intermediate remainder at N's upper end.
-                    // if np == r2p {
-                    //     r2p += nn - qn;
+                    // if ns == r2p {
+                    //     r2p += n_len - q_len;
                     // }
-                    _limbs_div_mod_barrett(qp, rp, &n2p[..2 * qn], &d2p[..qn], &mut scratch);
-                    n2p[..qn].copy_from_slice(&rp[..qn]);
+                    _limbs_div_mod_barrett(qs, rs, &n2p[..2 * q_len], &d2p[..q_len], &mut scratch);
+                    n2p[..q_len].copy_from_slice(&rs[..q_len]);
                 }
             }
-
-            let mut rn = qn;
+            let mut rn = q_len;
             // Multiply the first ignored divisor limb by the most significant
             // quotient limb.  If that product is > the partial remainder's
             // most significant limb, we know the quotient is too large.  This
             // test quickly catches most cases where the quotient is too large;
             // it catches all cases where the quotient is 2 too large.
 
-            let dl = if isize::checked_from(ilen).unwrap() - 2 < 0 {
+            let dl = if isize::checked_from(i_len).unwrap() - 2 < 0 {
                 0
             } else {
-                dp[ilen - 2]
+                ds[i_len - 2]
             };
-            let x = (dp[ilen - 1] << cnt) | ((dl >> 1) >> ((!cnt) & Limb::WIDTH_MASK));
+            let x = (ds[i_len - 1] << cnt) | ((dl >> 1) >> ((!cnt) & Limb::WIDTH_MASK));
             let mut h = 0;
             let mut dummy = 0;
-            umul_ppmm(&mut h, &mut dummy, x, qp[qn - 1]);
-
-            if n2p[qn - 1] < h {
-                assert!(!limbs_sub_limb_in_place(qp, 1));
-                let cy = limbs_slice_add_same_length_in_place_left(&mut n2p[..qn], &d2p[..qn]);
+            umul_ppmm(&mut h, &mut dummy, x, qs[q_len - 1]);
+            if n2p[q_len - 1] < h {
+                assert!(!limbs_sub_limb_in_place(qs, 1));
+                let cy =
+                    limbs_slice_add_same_length_in_place_left(&mut n2p[..q_len], &d2p[..q_len]);
                 if cy {
                     // The partial remainder is safely large.
-                    n2p[qn] = if cy { 1 } else { 0 };
+                    n2p[q_len] = if cy { 1 } else { 0 };
                     rn += 1;
                 }
             }
-
             let mut quotient_too_large = false;
             if cnt != 0 {
                 // Append partially used numerator limb to partial remainder.
                 let cy1 = limbs_slice_shl_in_place(&mut n2p[..rn], Limb::WIDTH - cnt);
-                n2p[0] |= np[ilen - 1] & (Limb::MAX >> cnt);
-
+                n2p[0] |= ns[i_len - 1] & (Limb::MAX >> cnt);
                 // Update partial remainder with partially used divisor limb.
                 let cy2 = limbs_sub_mul_limb_same_length_in_place_left(
-                    &mut n2p[..qn],
-                    &qp[..qn],
-                    dp[ilen - 1] & (Limb::MAX >> cnt),
+                    &mut n2p[..q_len],
+                    &qs[..q_len],
+                    ds[i_len - 1] & (Limb::MAX >> cnt),
                 );
-                if qn != rn {
-                    assert!(n2p[qn] >= cy2);
-                    n2p[qn].wrapping_sub_assign(cy2);
+                if q_len != rn {
+                    assert!(n2p[q_len] >= cy2);
+                    n2p[q_len].wrapping_sub_assign(cy2);
                 } else {
-                    n2p[qn] = cy1.wrapping_sub(cy2);
+                    n2p[q_len] = cy1.wrapping_sub(cy2);
                     quotient_too_large = cy1 < cy2;
                     rn += 1;
                 }
-                ilen -= 1;
+                i_len -= 1;
             }
             // True: partial remainder now is neutral, i.e., it is not shifted up.
-
-            let mut tp = vec![0; dn];
-
+            let mut tp = vec![0; d_len];
             let mut goto_foo = false;
-            if ilen < qn {
-                if ilen == 0 {
-                    rp[..rn].copy_from_slice(&n2p[..rn]);
-                    assert_eq!(rn, dn);
+            if i_len < q_len {
+                if i_len == 0 {
+                    rs[..rn].copy_from_slice(&n2p[..rn]);
+                    assert_eq!(rn, d_len);
                     goto_foo = true;
                 } else {
-                    limbs_mul_greater_to_out(&mut tp, &qp[..qn], &dp[..ilen]);
+                    limbs_mul_greater_to_out(&mut tp, &qs[..q_len], &ds[..i_len]);
                 }
             } else {
-                limbs_mul_greater_to_out(&mut tp, &dp[..ilen], &qp[..qn]);
+                limbs_mul_greater_to_out(&mut tp, &ds[..i_len], &qs[..q_len]);
             }
             if !goto_foo {
-                let mut cy = limbs_sub_in_place_left(&mut n2p[..rn], &tp[ilen..ilen + qn]);
-                rp[ilen..dn].copy_from_slice(&n2p[..dn - ilen]);
+                let mut cy = limbs_sub_in_place_left(&mut n2p[..rn], &tp[i_len..i_len + q_len]);
+                rs[i_len..d_len].copy_from_slice(&n2p[..d_len - i_len]);
                 quotient_too_large |= cy;
-                cy = limbs_sub_same_length_to_out(rp, &np[..ilen], &tp[..ilen]);
+                cy = limbs_sub_same_length_to_out(rs, &ns[..i_len], &tp[..i_len]);
                 cy = limbs_sub_limb_in_place(
-                    &mut rp[ilen..min(dp.len(), ilen + rn)],
+                    &mut rs[i_len..min(ds.len(), i_len + rn)],
                     if cy { 1 } else { 0 },
                 );
                 quotient_too_large |= cy;
             }
             if quotient_too_large {
-                assert!(!limbs_sub_limb_in_place(qp, 1));
-                limbs_slice_add_same_length_in_place_left(&mut rp[..dn], &dp[..dn]);
+                assert!(!limbs_sub_limb_in_place(qs, 1));
+                limbs_slice_add_same_length_in_place_left(&mut rs[..d_len], &ds[..d_len]);
             }
         }
     }
@@ -2017,7 +2012,7 @@ impl<'a> DivAssignMod<&'a Natural> for Natural {
                 (&mut Large(ref mut xs), Large(ref ys)) => {
                     let mut qp = vec![0; xs.len() - ys.len() + 1];
                     let mut rp = vec![0; ys.len()];
-                    mpn_tdiv_qr(&mut qp, &mut rp, xs, ys);
+                    limbs_div_mod(&mut qp, &mut rp, xs, ys);
                     (qp, rp)
                 }
             };

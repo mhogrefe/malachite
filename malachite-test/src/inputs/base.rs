@@ -7,6 +7,7 @@ use malachite_base::limbs::limbs_test_zero;
 use malachite_base::num::arithmetic::traits::{Parity, UnsignedAbs};
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
+use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{CheckedFrom, ConvertibleFrom, WrappingFrom};
 use malachite_base::num::logic::traits::BitAccess;
@@ -2328,6 +2329,41 @@ pub fn quadruples_of_unsigned_vec_var_1(
             (q, r, n, d_init)
         }),
     )
+}
+
+// All quadruples of `Vec<Limb>`, where `qs`, `rs`, `ns`, and `ds` meet the preconditions of
+// `_limbs_div_mod`.
+pub fn quadruples_of_unsigned_vec_var_2(
+    gm: GenerationMode,
+) -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>, Vec<Limb>)> {
+    let qs: It<(Vec<Limb>, Vec<Limb>, Vec<Limb>, Vec<Limb>)> = match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_quadruples(
+            exhaustive_vecs_min_length(1, exhaustive_unsigned()),
+            exhaustive_vecs_min_length(2, exhaustive_unsigned()),
+            exhaustive_vecs_min_length(2, exhaustive_unsigned()),
+            exhaustive_vecs_min_length(2, exhaustive_unsigned()),
+        )),
+        GenerationMode::Random(scale) => Box::new(random_quadruples(
+            &EXAMPLE_SEED,
+            &(|seed| random_vecs_min_length(seed, scale, 1, &(|seed_2| random(seed_2)))),
+            &(|seed| random_vecs_min_length(seed, scale, 2, &(|seed_2| random(seed_2)))),
+            &(|seed| random_vecs_min_length(seed, scale, 2, &(|seed_2| random(seed_2)))),
+            &(|seed| random_vecs_min_length(seed, scale, 2, &(|seed_2| random(seed_2)))),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_quadruples(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_unsigned_vecs_min_length(seed, scale, 1)),
+            &(|seed| special_random_unsigned_vecs_min_length(seed, scale, 2)),
+            &(|seed| special_random_unsigned_vecs_min_length(seed, scale, 2)),
+            &(|seed| special_random_unsigned_vecs_min_length(seed, scale, 2)),
+        )),
+    };
+    Box::new(qs.filter(|(q, r, n, d)| {
+        *d.last().unwrap() != Limb::ZERO
+            && r.len() >= d.len()
+            && n.len() >= d.len()
+            && q.len() >= n.len() - d.len() + 1
+    }))
 }
 
 fn quadruples_of_unsigned_vec_unsigned_vec_unsigned_and_unsigned<T: PrimitiveUnsigned + Rand>(

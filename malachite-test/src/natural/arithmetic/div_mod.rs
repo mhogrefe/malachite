@@ -3,8 +3,8 @@ use inputs::base::{
     pairs_of_unsigneds_var_2, quadruples_of_three_unsigned_vecs_and_unsigned_var_1,
     quadruples_of_three_unsigned_vecs_and_unsigned_var_2,
     quadruples_of_three_unsigned_vecs_and_unsigned_var_3, quadruples_of_unsigned_vec_var_1,
-    sextuples_of_limbs_var_1, triples_of_unsigned_vec_var_37, triples_of_unsigned_vec_var_38,
-    triples_of_unsigned_vec_var_39,
+    quadruples_of_unsigned_vec_var_2, sextuples_of_limbs_var_1, triples_of_unsigned_vec_var_37,
+    triples_of_unsigned_vec_var_38, triples_of_unsigned_vec_var_39,
 };
 use inputs::natural::{
     nrm_pairs_of_natural_and_positive_natural, pairs_of_natural_and_positive_natural,
@@ -19,8 +19,8 @@ use malachite_nz::natural::arithmetic::div_mod::{
     _limbs_div_mod_barrett, _limbs_div_mod_barrett_scratch_len, _limbs_div_mod_divide_and_conquer,
     _limbs_div_mod_divide_and_conquer_approx, _limbs_div_mod_schoolbook,
     _limbs_div_mod_schoolbook_approx, _limbs_invert_approx, _limbs_invert_basecase_approx,
-    _limbs_invert_newton_approx, limbs_div_mod_by_two_limb, limbs_div_mod_three_limb_by_two_limb,
-    limbs_two_limb_inverse_helper,
+    _limbs_invert_newton_approx, limbs_div_mod, limbs_div_mod_by_two_limb,
+    limbs_div_mod_three_limb_by_two_limb, limbs_two_limb_inverse_helper,
 };
 use num::Integer;
 
@@ -38,6 +38,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limbs_invert_newton_approx);
     register_demo!(registry, demo_limbs_invert_approx);
     register_demo!(registry, demo_limbs_div_mod_barrett);
+    register_demo!(registry, demo_limbs_div_mod);
     register_demo!(registry, demo_natural_div_assign_mod);
     register_demo!(registry, demo_natural_div_assign_mod_ref);
     register_demo!(registry, demo_natural_div_mod);
@@ -81,6 +82,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     );
     register_bench!(registry, Small, benchmark_limbs_invert_approx_algorithms);
     register_bench!(registry, Small, benchmark_limbs_div_mod_barrett);
+    register_bench!(registry, Small, benchmark_limbs_div_mod);
     register_bench!(
         registry,
         Large,
@@ -295,6 +297,19 @@ fn demo_limbs_div_mod_barrett(gm: GenerationMode, limit: usize) {
             "qs := {:?}; rs := {:?}; _limbs_div_mod_barrett(&mut qs, &mut ns, {:?}, {:?}) = {}; \
              qs = {:?}, rs = {:?}",
             old_qs, old_rs, ns, ds, highest_q, qs, rs
+        );
+    }
+}
+
+fn demo_limbs_div_mod(gm: GenerationMode, limit: usize) {
+    for (mut qs, mut rs, ns, ds) in quadruples_of_unsigned_vec_var_2(gm).take(limit) {
+        let old_qs = qs.clone();
+        let old_rs = rs.clone();
+        limbs_div_mod(&mut qs, &mut rs, &ns, &ds);
+        println!(
+            "qs := {:?}; rs := {:?}; limbs_div_mod(&mut qs, &mut ns, {:?}, {:?}); qs = {:?}, \
+             rs = {:?}",
+            old_qs, old_rs, ns, ds, qs, rs
         );
     }
 }
@@ -696,7 +711,7 @@ fn benchmark_limbs_invert_approx_algorithms(gm: GenerationMode, limit: usize, fi
 
 fn benchmark_limbs_div_mod_barrett(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
-        "_limbs_div_mod_barrett(&mut [Limb], &mut [Limb], &[Limb], &[Limb])",
+        "_limbs_div_mod_barrett(&mut [Limb], &mut [Limb], &[Limb], &[Limb], &mut Limb)",
         BenchmarkType::Single,
         quadruples_of_unsigned_vec_var_1(gm),
         gm.name(),
@@ -716,6 +731,23 @@ fn benchmark_limbs_div_mod_barrett(gm: GenerationMode, limit: usize, file_name: 
                     &mut scratch
                 ))
             }),
+        )],
+    );
+}
+
+fn benchmark_limbs_div_mod(gm: GenerationMode, limit: usize, file_name: &str) {
+    m_run_benchmark(
+        "limbs_div_mod(&mut [Limb], &mut [Limb], &[Limb], &[Limb])",
+        BenchmarkType::Single,
+        quadruples_of_unsigned_vec_var_2(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(_, _, _, ref ds)| ds.len()),
+        "ds.len()",
+        &mut [(
+            "malachite",
+            &mut (|(mut qs, mut rs, ns, ds)| no_out!(limbs_div_mod(&mut qs, &mut rs, &ns, &ds))),
         )],
     );
 }
