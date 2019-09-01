@@ -9,7 +9,7 @@ use malachite_nz::natural::arithmetic::div_mod::{
     _limbs_div_mod_barrett, _limbs_div_mod_barrett_scratch_len, _limbs_div_mod_divide_and_conquer,
     _limbs_div_mod_divide_and_conquer_approx, _limbs_div_mod_schoolbook,
     _limbs_div_mod_schoolbook_approx, _limbs_invert_approx, _limbs_invert_basecase_approx,
-    _limbs_invert_newton_approx, limbs_div_mod, limbs_div_mod_by_two_limb,
+    _limbs_invert_newton_approx, limbs_div_mod, limbs_div_mod_by_two_limb_normalized,
     limbs_div_mod_three_limb_by_two_limb, limbs_two_limb_inverse_helper,
 };
 use malachite_nz::natural::Natural;
@@ -124,7 +124,7 @@ fn test_limbs_div_mod_three_limb_by_two_limb() {
     );
 }
 
-fn verify_limbs_div_mod_by_two_limb(
+fn verify_limbs_div_mod_by_two_limb_normalized(
     qs_in: &[Limb],
     ns_in: &[Limb],
     ds: &[Limb],
@@ -153,14 +153,17 @@ fn verify_limbs_div_mod_by_two_limb(
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-fn test_limbs_div_mod_by_two_limb() {
+fn test_limbs_div_mod_by_two_limb_normalized() {
     let test = |qs_in: &[Limb], ns_in: &[Limb], ds, q_highest, qs_out: &[Limb], ns_out: &[Limb]| {
         let mut qs = qs_in.to_vec();
         let mut ns = ns_in.to_vec();
-        assert_eq!(limbs_div_mod_by_two_limb(&mut qs, &mut ns, ds), q_highest);
+        assert_eq!(
+            limbs_div_mod_by_two_limb_normalized(&mut qs, &mut ns, ds),
+            q_highest
+        );
         assert_eq!(qs, qs_out);
         assert_eq!(ns, ns_out);
-        verify_limbs_div_mod_by_two_limb(qs_in, ns_in, ds, q_highest, &qs, &ns);
+        verify_limbs_div_mod_by_two_limb_normalized(qs_in, ns_in, ds, q_highest, &qs, &ns);
     };
     // !highest_q
     test(&[10], &[1, 2], &[3, 0x8000_0000], false, &[10], &[1, 2]);
@@ -185,20 +188,20 @@ fn test_limbs_div_mod_by_two_limb() {
 
 #[test]
 #[should_panic]
-fn limbs_div_mod_by_two_limb_fail_1() {
-    limbs_div_mod_by_two_limb(&mut [10], &mut [1, 2], &[3, 4]);
+fn limbs_div_mod_by_two_limb_normalized_fail_1() {
+    limbs_div_mod_by_two_limb_normalized(&mut [10], &mut [1, 2], &[3, 4]);
 }
 
 #[test]
 #[should_panic]
-fn limbs_div_mod_by_two_limb_fail_2() {
-    limbs_div_mod_by_two_limb(&mut [10], &mut [1, 2], &[3, 0x8000_0000, 4]);
+fn limbs_div_mod_by_two_limb_normalized_fail_2() {
+    limbs_div_mod_by_two_limb_normalized(&mut [10], &mut [1, 2], &[3, 0x8000_0000, 4]);
 }
 
 #[test]
 #[should_panic]
-fn limbs_div_mod_by_two_limb_fail_3() {
-    limbs_div_mod_by_two_limb(&mut [10], &mut [1, 2, 3, 4], &[3, 0x8000_0000]);
+fn limbs_div_mod_by_two_limb_normalized_fail_3() {
+    limbs_div_mod_by_two_limb_normalized(&mut [10], &mut [1, 2, 3, 4], &[3, 0x8000_0000]);
 }
 
 fn verify_limbs_div_mod_1(
@@ -8532,8 +8535,8 @@ fn test_limbs_div_mod() {
     #[cfg(feature = "32_bit_limbs")]
     {
         // d_len == 2
-        // !ds[1].get_highest_bit()
-        // cy == 0
+        // bits != 0 in _limbs_div_mod_by_two_limb
+        // carry == 0 in _limbs_div_mod_by_two_limb
         test(
             &[10; 4],
             &[10; 4],
@@ -8550,7 +8553,7 @@ fn test_limbs_div_mod() {
             &[2576980377, 0, 10, 10],
             &[2576980381, 2, 10, 10],
         );
-        // ds[1].get_highest_bit()
+        // bits == 0 in _limbs_div_mod_by_two_limb
         test(
             &[10; 4],
             &[10; 4],
@@ -8559,27 +8562,27 @@ fn test_limbs_div_mod() {
             &[6, 0, 10, 10],
             &[4294967273, 1, 10, 10],
         );
-        // n_len + adjust < 2 * d_len
-        // q_len == 0
+        // adjusted_n_len < 2 * d_len
+        // q_len == 0 in _limbs_div_mod_balanced
         test(&[10], &[10; 3], &[0; 3], &[0, 0, 1], &[0], &[0; 3]);
-        // q_len > 0
-        // !ds[d_len - 1].get_highest_bit() in unbalanced
-        // adjust != 0 first time
-        // q_len == 1
-        // i_len >= 2
-        // n2p[q_len - 1] >= h
-        // cnt != 0 in unbalanced
-        // q_len == rn
-        // i_len >= q_len
-        // !goto_foo
-        // !quotient_too_large
+        // _q_len > 0 in _limbs_div_mod_balanced
+        // adjust in _limbs_div_mod_balanced
+        // q_len == 0 in _limbs_div_mod_balanced
+        // i_len >= 2 in _limbs_div_mod_balanced
+        // ns_shifted[q_len - 1] >=
+        //      (DoubleLimb::from(x) * DoubleLimb::from(qs[q_len - 1])).upper_half()
+        //      in _limbs_div_mod_balanced
+        // bits != 0 _limbs_div_mod_balanced
+        // q_len == r_len in _limbs_div_mod_balanced
+        // do_extra_cleanup in _limbs_div_mod_balanced
+        // !quotient_too_large in _limbs_div_mod_balanced
         test(&[10], &[10; 3], &[0, 0, 1], &[0, 0, 1], &[1], &[0; 3]);
-        // adjust == 0 first time
+        // !adjust in _limbs_div_mod_balanced
         test(&[10, 10], &[10; 3], &[0; 4], &[0, 0, 1], &[0, 0], &[0; 3]);
-        // quotient_too_large
+        // quotient_too_large in _limbs_div_mod_balanced
         test(&[10], &[10; 3], &[0, 0, 1], &[0, 1, 1], &[0], &[0, 0, 1]);
-        // !ds[d_len - 1].get_highest_bit()
-        // cnt != 0 in Schoolbook
+        // bits != 0 in _limbs_div_mod_unbalanced
+        // bits != 0 and Schoolbook condition in _limbs_div_mod_unbalanced
         test(
             &[10; 264],
             &[10; 30],
@@ -8662,7 +8665,7 @@ fn test_limbs_div_mod() {
                 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10,
             ],
         );
-        // cy != 0
+        // carry != 0 in _limbs_div_mod_by_two_limb
         test(
             &[10; 148],
             &[10; 215],
@@ -8717,10 +8720,8 @@ fn test_limbs_div_mod() {
                 10, 10, 10, 10, 10, 10, 10, 10, 10,
             ],
         );
-        // ds[d_len - 1].get_highest_bit() in unbalanced
-        // adjust != 0 second time
-        // q_len == 2
-        // cnt == 0 in unbalanced
+        // bits == 0 in _limbs_div_mod_balanced
+        // q_len == 2 in _limbs_div_mod_balanced
         test(
             &[10; 373],
             &[10; 178],
@@ -8768,9 +8769,8 @@ fn test_limbs_div_mod() {
                 10, 10, 10, 10,
             ],
         );
-        // adjust == 0 second time
-        // q_len > 2
-        // q_len < DC_DIV_QR_THRESHOLD
+        // q_len > 2 in _limbs_div_mod_balanced
+        // q_len < DC_DIV_QR_THRESHOLD in _limbs_div_mod_balanced
         test(
             &[10; 4],
             &[10; 6],
@@ -8779,9 +8779,8 @@ fn test_limbs_div_mod() {
             &[4294967057, 15, 18, 0],
             &[718, 910, 1080, 1286, 1492, 2147483434],
         );
-        // i_len < 2
-        // i_len < q_len
-        // i_len > 0
+        // i_len < 2 in _limbs_div_mod_balanced
+        // i_len_alt > 0 in _limbs_div_mod_balanced
         test(
             &[10; 3],
             &[10; 4],
@@ -8790,8 +8789,8 @@ fn test_limbs_div_mod() {
             &[4294967295, 4294967295, 0],
             &[3, 4, 4294967292, 2147483647],
         );
-        // i_len == 0
-        // goto_foo
+        // i_len_alt == 0 in _limbs_div_mod_balanced
+        // !do_extra_cleanup in _limbs_div_mod_balanced
         test(
             &[10; 10],
             &[10; 10],
@@ -8800,9 +8799,11 @@ fn test_limbs_div_mod() {
             &[4192427024, 33881415, 0, 10, 10, 10, 10, 10, 10, 10],
             &[3497463394, 501014622, 297308821, 10, 10, 10, 10, 10, 10, 10],
         );
-        // n2p[q_len - 1] < h
-        // cy
-        // q_len != rn
+        // ns_shifted[q_len - 1] <
+        //      (DoubleLimb::from(x) * DoubleLimb::from(qs[q_len - 1])).upper_half()
+        //      in _limbs_div_mod_balanced
+        // carry in _limbs_div_mod_balanced
+        // q_len != rn in _limbs_div_mod_balanced
         test(
             &[10; 25],
             &[10; 20],
@@ -8827,7 +8828,7 @@ fn test_limbs_div_mod() {
                 321699454, 1968063162, 10, 10, 10, 10,
             ],
         );
-        // !cy
+        // carry in _limbs_div_mod_balanced
         test(
             &[10, 10],
             &[10; 3],
@@ -8836,8 +8837,8 @@ fn test_limbs_div_mod() {
             &[3800268463, 0],
             &[0, 0, 0],
         );
-        // divide-and-conquer condition
-        // cnt != 0 in divide-and-conquer
+        // divide-and-conquer condition in _limbs_div_mod_unbalanced
+        // bits != 0 and divide-and-conquer condition in _limbs_div_mod_unbalanced
         test(
             &[10; 674],
             &[10; 255],
@@ -9034,7 +9035,7 @@ fn test_limbs_div_mod() {
                 10, 10, 10, 10,
             ],
         );
-        // DC_DIV_QR_THRESHOLD <= q_len < MU_DIV_QR_THRESHOLD
+        // DC_DIV_QR_THRESHOLD <= q_len < MU_DIV_QR_THRESHOLD in _limbs_div_mod_unbalanced
         test(
             &[10; 62],
             &[10; 1098],
@@ -9170,7 +9171,7 @@ fn test_limbs_div_mod() {
                 10, 10, 10, 10, 10,
             ],
         );
-        // cnt == 0 in divide-and-conquer
+        // bits == 0 and divide-and-conquer condition in _limbs_div_mod_unbalanced
         test(
             &[10; 320],
             &[10; 915],
@@ -9311,8 +9312,8 @@ fn test_limbs_div_mod() {
                 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10,
             ],
         );
-        // Barrett condition
-        // cnt == 0 in Barrett
+        // Barrett condition in _limbs_div_mod_unbalanced
+        // bits == 0 in Barrett condition in _limbs_div_mod_unbalanced
         test(
             &[10; 1459],
             &[10; 1458],
@@ -10373,10 +10374,10 @@ fn test_limbs_div_mod() {
     #[cfg(not(feature = "32_bit_limbs"))]
     {
         // d_len > 2
-        // n_len + adjust >= 2 * d_len
-        // ds[d_len - 1].get_highest_bit()
-        // Schoolbook condition
-        // cnt == 0 in Schoolbook
+        // adjusted_n_len >= 2 * d_len
+        // bits == 0 in _limbs_div_mod_unbalanced
+        // Schoolbook condition in _limbs_div_mod_unbalanced
+        // bits == 0 and Schoolbook condition in _limbs_div_mod_unbalanced
         test(
             &[10; 17],
             &[10; 17],
@@ -19835,12 +19836,12 @@ fn limbs_div_mod_three_limb_by_two_limb_properties() {
 }
 
 #[test]
-fn limbs_div_mod_by_two_limb_properties() {
+fn limbs_div_mod_by_two_limb_normalized_properties() {
     test_properties(triples_of_unsigned_vec_var_37, |(qs_in, ns_in, ds)| {
         let mut qs = qs_in.clone();
         let mut ns = ns_in.clone();
-        let q_highest = limbs_div_mod_by_two_limb(&mut qs, &mut ns, &ds);
-        verify_limbs_div_mod_by_two_limb(&qs_in, &ns_in, &ds, q_highest, &qs, &ns);
+        let q_highest = limbs_div_mod_by_two_limb_normalized(&mut qs, &mut ns, &ds);
+        verify_limbs_div_mod_by_two_limb_normalized(&qs_in, &ns_in, &ds, q_highest, &qs, &ns);
     });
 }
 

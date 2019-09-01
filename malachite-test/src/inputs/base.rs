@@ -2041,7 +2041,7 @@ pub fn triples_of_unsigned_vec_var_36<T: PrimitiveUnsigned + Rand>(
 }
 
 // All triples of `Vec<T>`, where `T` is unsigned and `qs`, `ns`, and `ds` meet the preconditions of
-// `limbs_div_mod_by_two_limb`.
+// `limbs_div_mod_by_two_limb_normalized`.
 pub fn triples_of_unsigned_vec_var_37<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
 ) -> It<(Vec<T>, Vec<T>, Vec<T>)> {

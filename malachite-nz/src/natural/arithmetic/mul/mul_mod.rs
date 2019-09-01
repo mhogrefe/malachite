@@ -29,6 +29,8 @@ pub(crate) const MUL_FFT_MODF_THRESHOLD: usize = 396;
 ///
 /// Additional memory: O(1)
 ///
+/// Result is O(`n`)
+///
 /// This is mpn_mulmod_bnm1_next_size from mpn/generic/mulmod_bnm1.c.
 pub(crate) fn _limbs_mul_mod_limb_width_to_n_minus_1_next_size(n: usize) -> usize {
     if n < MULMOD_BNM1_THRESHOLD {
@@ -50,6 +52,8 @@ pub(crate) fn _limbs_mul_mod_limb_width_to_n_minus_1_next_size(n: usize) -> usiz
 /// Time: O(1)
 ///
 /// Additional memory: O(1)
+///
+/// Result is O(`n`)
 ///
 /// This is mpn_mulmod_bnm1_itch from gmp-impl.h.
 pub(crate) fn _limbs_mul_mod_limb_width_to_n_minus_1_scratch_len(
