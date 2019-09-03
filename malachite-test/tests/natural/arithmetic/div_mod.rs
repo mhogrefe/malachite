@@ -10,7 +10,7 @@ use malachite_nz::natural::arithmetic::div_mod::{
     _limbs_div_mod_divide_and_conquer_approx, _limbs_div_mod_schoolbook,
     _limbs_div_mod_schoolbook_approx, _limbs_invert_approx, _limbs_invert_basecase_approx,
     _limbs_invert_newton_approx, limbs_div_mod, limbs_div_mod_by_two_limb_normalized,
-    limbs_div_mod_three_limb_by_two_limb, limbs_two_limb_inverse_helper,
+    limbs_div_mod_three_limb_by_two_limb, limbs_div_mod_to_out, limbs_two_limb_inverse_helper,
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::{DoubleLimb, Limb};
@@ -18,7 +18,8 @@ use malachite_test::common::{
     biguint_to_natural, natural_to_biguint, natural_to_rug_integer, rug_integer_to_natural,
 };
 use malachite_test::inputs::base::{
-    pairs_of_unsigneds_var_2, quadruples_of_three_unsigned_vecs_and_unsigned_var_1,
+    pairs_of_unsigned_vec_var_9, pairs_of_unsigneds_var_2,
+    quadruples_of_three_unsigned_vecs_and_unsigned_var_1,
     quadruples_of_three_unsigned_vecs_and_unsigned_var_2,
     quadruples_of_three_unsigned_vecs_and_unsigned_var_3, quadruples_of_unsigned_vec_var_1,
     quadruples_of_unsigned_vec_var_2, sextuples_of_limbs_var_1, triples_of_unsigned_vec_var_37,
@@ -8517,6 +8518,21 @@ fn verify_limbs_div_mod_3(
     assert_eq!(q * d + r, n);
 }
 
+fn verify_limbs_div_mod_4(ns: &[Limb], ds: &[Limb], qs: &[Limb], rs: &[Limb]) {
+    let n = Natural::from_limbs_asc(ns);
+    let d = Natural::from_limbs_asc(ds);
+    let (expected_q, expected_r) = (&n).div_mod(&d);
+    let q = Natural::from_limbs_asc(qs);
+    let r = Natural::from_limbs_asc(rs);
+    assert_eq!(q, expected_q);
+    assert_eq!(r, expected_r);
+    assert!(r < d);
+    assert_eq!(q * d + r, n);
+    let d_len = ds.len();
+    assert_eq!(qs.len(), ns.len() - d_len + 1);
+    assert_eq!(rs.len(), d_len);
+}
+
 #[test]
 fn test_limbs_div_mod() {
     let test = |qs_in: &[Limb],
@@ -8527,10 +8543,20 @@ fn test_limbs_div_mod() {
                 rs_out: &[Limb]| {
         let mut qs = qs_in.to_vec();
         let mut rs = rs_in.to_vec();
-        limbs_div_mod(&mut qs, &mut rs, ns, ds);
+        limbs_div_mod_to_out(&mut qs, &mut rs, ns, ds);
         assert_eq!(qs, qs_out);
         assert_eq!(rs, rs_out);
-        verify_limbs_div_mod_3(qs_in, rs_in, ns, ds, &qs, &rs);
+
+        let (qs, rs) = limbs_div_mod(ns, ds);
+        let d_len = ds.len();
+        let qs_limit = ns.len() - d_len + 1;
+        assert_eq!(qs, &qs_out[..qs_limit]);
+        assert_eq!(&qs_in[qs_limit..], &qs_out[qs_limit..]);
+        let rs_limit = d_len;
+        assert_eq!(rs, &rs_out[..rs_limit]);
+        assert_eq!(&rs_in[rs_limit..], &rs_out[rs_limit..]);
+
+        verify_limbs_div_mod_3(qs_in, rs_in, ns, ds, qs_out, rs_out);
     };
     #[cfg(feature = "32_bit_limbs")]
     {
@@ -19295,33 +19321,51 @@ fn test_limbs_div_mod() {
 #[test]
 #[should_panic]
 fn limbs_div_mod_fail_1() {
-    let ns = &[1, 2, 3];
-    let ds = &[4];
-    limbs_div_mod(&mut [10; 4], &mut [10; 4], ns, ds);
+    limbs_div_mod(&[1, 2, 3], &[4]);
 }
 
 #[test]
 #[should_panic]
 fn limbs_div_mod_fail_2() {
-    let ns = &[1];
-    let ds = &[4, 5];
-    limbs_div_mod(&mut [10; 4], &mut [10; 4], ns, ds);
+    limbs_div_mod(&[1], &[4, 5]);
 }
 
 #[test]
 #[should_panic]
 fn limbs_div_mod_fail_3() {
-    let ns = &[1, 2, 3, 4];
-    let ds = &[4, 5];
-    limbs_div_mod(&mut [10], &mut [10; 4], ns, ds);
+    limbs_div_mod(&[1, 2, 3], &[4, 0]);
 }
 
 #[test]
 #[should_panic]
-fn limbs_div_mod_fail_4() {
+fn limbs_div_mod_to_out_fail_1() {
+    let ns = &[1, 2, 3];
+    let ds = &[4];
+    limbs_div_mod_to_out(&mut [10; 4], &mut [10; 4], ns, ds);
+}
+
+#[test]
+#[should_panic]
+fn limbs_div_mod_to_out_fail_2() {
+    let ns = &[1];
+    let ds = &[4, 5];
+    limbs_div_mod_to_out(&mut [10; 4], &mut [10; 4], ns, ds);
+}
+
+#[test]
+#[should_panic]
+fn limbs_div_mod_to_out_fail_3() {
+    let ns = &[1, 2, 3, 4];
+    let ds = &[4, 5];
+    limbs_div_mod_to_out(&mut [10], &mut [10; 4], ns, ds);
+}
+
+#[test]
+#[should_panic]
+fn limbs_div_mod_to_out_fail_4() {
     let ns = &[1, 2, 3];
     let ds = &[4, 0];
-    limbs_div_mod(&mut [10; 4], &mut [10; 4], ns, ds);
+    limbs_div_mod_to_out(&mut [10; 4], &mut [10; 4], ns, ds);
 }
 
 #[test]
@@ -19959,13 +20003,21 @@ fn limbs_div_mod_barrett_properties() {
 
 #[test]
 fn limbs_div_mod_properties() {
+    test_properties_custom_scale(512, pairs_of_unsigned_vec_var_9, |(ref ns, ref ds)| {
+        let (qs, rs) = limbs_div_mod(ns, ds);
+        verify_limbs_div_mod_4(ns, ds, &qs, &rs);
+    });
+}
+
+#[test]
+fn limbs_div_mod_to_out_properties() {
     test_properties_custom_scale(
         512,
         quadruples_of_unsigned_vec_var_2,
         |(ref qs_in, ref rs_in, ref ns, ref ds)| {
             let mut qs = qs_in.clone();
             let mut rs = rs_in.clone();
-            limbs_div_mod(&mut qs, &mut rs, ns, ds);
+            limbs_div_mod_to_out(&mut qs, &mut rs, ns, ds);
             verify_limbs_div_mod_3(qs_in, rs_in, ns, ds, &qs, &rs);
         },
     );

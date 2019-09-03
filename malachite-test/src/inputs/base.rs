@@ -1474,7 +1474,7 @@ pub fn pairs_of_unsigned_vec_var_5<T: PrimitiveUnsigned + Rand>(
 
 // All pairs of `Vec<T>` where `T` is unsigned and both elements are nonempty and don't only contain
 // zeros.
-pub fn pairs_of_limb_vec_var_1<T: PrimitiveUnsigned + Rand>(
+pub fn pairs_of_unsigned_vec_var_6<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
 ) -> It<(Vec<T>, Vec<T>)> {
     Box::new(
@@ -1485,7 +1485,7 @@ pub fn pairs_of_limb_vec_var_1<T: PrimitiveUnsigned + Rand>(
 
 // All pairs of `Vec<T>` where `T` is unsigned, both elements are nonempty and don't only contain
 // zeros, and the first element is at least as long as the second.
-pub fn pairs_of_limb_vec_var_2<T: PrimitiveUnsigned + Rand>(
+pub fn pairs_of_unsigned_vec_var_7<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
 ) -> It<(Vec<T>, Vec<T>)> {
     Box::new(pairs_of_unsigned_vec(gm).filter(|&(ref xs, ref ys)| {
@@ -1495,12 +1495,28 @@ pub fn pairs_of_limb_vec_var_2<T: PrimitiveUnsigned + Rand>(
 
 // All pairs of `Vec<Limb>`, where the first `Vec` is at least as long as the second and the second
 // `Vec` is nonempty and represents a `Natural` divisible by 3.
-pub fn pairs_of_limb_vec_var_3(gm: GenerationMode) -> It<(Vec<Limb>, Vec<Limb>)> {
+pub fn pairs_of_unsigned_vec_var_8(gm: GenerationMode) -> It<(Vec<Limb>, Vec<Limb>)> {
     Box::new(
         pairs_of_unsigned_vec(gm)
             .map(|(out, in_limbs)| (out, limbs_mul_limb(&in_limbs, 3)))
             .filter(|(ref out, ref in_limbs)| out.len() >= in_limbs.len() && in_limbs.len() > 0),
     )
+}
+
+// All pairs of `Vec<Limb>`, where `ns` and `ds` meet the preconditions of `_limbs_div_mod`.
+pub fn pairs_of_unsigned_vec_var_9(gm: GenerationMode) -> It<(Vec<Limb>, Vec<Limb>)> {
+    let qs: It<(Vec<Limb>, Vec<Limb>)> = match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_pairs_from_single(
+            exhaustive_vecs_min_length(2, exhaustive_unsigned()),
+        )),
+        GenerationMode::Random(scale) => Box::new(random_pairs_from_single(
+            random_vecs_min_length(&EXAMPLE_SEED, scale, 2, &(|seed_2| random(seed_2))),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_pairs_from_single(
+            special_random_unsigned_vecs_min_length(&EXAMPLE_SEED, scale, 2),
+        )),
+    };
+    Box::new(qs.filter(|(n, d)| *d.last().unwrap() != Limb::ZERO && n.len() >= d.len()))
 }
 
 fn pairs_of_unsigned_vec_and_bool<T: PrimitiveUnsigned + Rand>(
@@ -2332,7 +2348,7 @@ pub fn quadruples_of_unsigned_vec_var_1(
 }
 
 // All quadruples of `Vec<Limb>`, where `qs`, `rs`, `ns`, and `ds` meet the preconditions of
-// `_limbs_div_mod`.
+// `_limbs_div_mod_to_out`.
 pub fn quadruples_of_unsigned_vec_var_2(
     gm: GenerationMode,
 ) -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>, Vec<Limb>)> {

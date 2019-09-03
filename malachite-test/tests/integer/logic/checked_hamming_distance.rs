@@ -5,7 +5,7 @@ use malachite_nz::integer::logic::checked_hamming_distance::limbs_hamming_distan
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_test::common::integer_to_rug_integer;
-use malachite_test::inputs::base::pairs_of_limb_vec_var_1;
+use malachite_test::inputs::base::pairs_of_unsigned_vec_var_6;
 use malachite_test::inputs::integer::{
     integers, pairs_of_integers, pairs_of_natural_and_integer, triples_of_natural_integers,
 };
@@ -102,7 +102,7 @@ fn test_checked_hamming_distance() {
 
 #[test]
 fn limbs_hamming_distance_neg_properties() {
-    test_properties(pairs_of_limb_vec_var_1, |&(ref xs, ref ys)| {
+    test_properties(pairs_of_unsigned_vec_var_6, |&(ref xs, ref ys)| {
         assert_eq!(
             Some(limbs_hamming_distance_neg(xs, ys)),
             (-Natural::from_limbs_asc(xs)).checked_hamming_distance(&-Natural::from_limbs_asc(ys)),

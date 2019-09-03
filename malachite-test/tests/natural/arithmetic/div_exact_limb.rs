@@ -12,7 +12,7 @@ use malachite_nz::platform::Limb;
 use malachite_test::common::{natural_to_rug_integer, rug_integer_to_natural};
 use malachite_test::inputs::base::{
     odd_limbs, pairs_of_limb_and_positive_limb_var_1, pairs_of_limb_vec_and_positive_limb_var_2,
-    pairs_of_limb_vec_var_3, positive_unsigneds,
+    pairs_of_unsigned_vec_var_8, positive_unsigneds,
     triples_of_limb_vec_limb_vec_and_positive_limb_var_2, vecs_of_unsigned_var_5,
 };
 use malachite_test::inputs::natural::{
@@ -435,7 +435,7 @@ fn limbs_div_exact_3_properties() {
 
 #[test]
 fn limbs_div_exact_3_to_out_properties() {
-    test_properties(pairs_of_limb_vec_var_3, |&(ref out, ref in_limbs)| {
+    test_properties(pairs_of_unsigned_vec_var_8, |&(ref out, ref in_limbs)| {
         let mut out = out.to_vec();
         let old_out = out.clone();
         limbs_div_exact_3_to_out(&mut out, in_limbs);

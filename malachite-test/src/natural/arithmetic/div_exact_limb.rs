@@ -1,6 +1,6 @@
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::{
-    odd_limbs, pairs_of_limb_vec_and_positive_limb_var_2, pairs_of_limb_vec_var_3,
+    odd_limbs, pairs_of_limb_vec_and_positive_limb_var_2, pairs_of_unsigned_vec_var_8,
     triples_of_limb_vec_limb_vec_and_positive_limb_var_2, vecs_of_unsigned_var_5,
 };
 use inputs::natural::{
@@ -151,7 +151,7 @@ fn demo_limbs_div_exact_3(gm: GenerationMode, limit: usize) {
 }
 
 fn demo_limbs_div_exact_3_to_out(gm: GenerationMode, limit: usize) {
-    for (out, in_limbs) in pairs_of_limb_vec_var_3(gm).take(limit) {
+    for (out, in_limbs) in pairs_of_unsigned_vec_var_8(gm).take(limit) {
         let mut out = out.to_vec();
         let out_old = out.clone();
         limbs_div_exact_3_to_out(&mut out, &in_limbs);
@@ -318,7 +318,7 @@ fn benchmark_limbs_div_exact_3_to_out_algorithms(
     m_run_benchmark(
         "limbs_div_exact_limb_to_out(&mut [Limb], 3)",
         BenchmarkType::Algorithms,
-        pairs_of_limb_vec_var_3(gm),
+        pairs_of_unsigned_vec_var_8(gm),
         gm.name(),
         limit,
         file_name,

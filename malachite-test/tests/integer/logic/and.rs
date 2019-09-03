@@ -11,7 +11,8 @@ use malachite_nz::natural::Natural;
 use malachite_nz::platform::{Limb, SignedLimb};
 use malachite_test::common::{integer_to_rug_integer, rug_integer_to_integer};
 use malachite_test::inputs::base::{
-    pairs_of_limb_vec_var_1, pairs_of_limb_vec_var_2, pairs_of_signeds, triples_of_limb_vec_var_7,
+    pairs_of_signeds, pairs_of_unsigned_vec_var_6, pairs_of_unsigned_vec_var_7,
+    triples_of_limb_vec_var_7,
 };
 use malachite_test::inputs::integer::{
     integers, pairs_of_integer_and_natural, pairs_of_integer_and_unsigned, pairs_of_integers,
@@ -481,7 +482,7 @@ fn test_and() {
 
 #[test]
 fn limbs_and_neg_neg_properties() {
-    test_properties(pairs_of_limb_vec_var_1, |&(ref xs, ref ys)| {
+    test_properties(pairs_of_unsigned_vec_var_6, |&(ref xs, ref ys)| {
         assert_eq!(
             -Natural::from_owned_limbs_asc(limbs_and_neg_neg(xs, ys)),
             -Natural::from_limbs_asc(xs) & -Natural::from_limbs_asc(ys)
@@ -509,7 +510,7 @@ fn limbs_and_neg_neg_to_out_properties() {
 
 #[test]
 fn limbs_slice_and_neg_neg_in_place_left_properties() {
-    test_properties(pairs_of_limb_vec_var_2, |&(ref xs, ref ys)| {
+    test_properties(pairs_of_unsigned_vec_var_7, |&(ref xs, ref ys)| {
         let mut xs = xs.to_vec();
         let xs_old = xs.clone();
         let b = limbs_slice_and_neg_neg_in_place_left(&mut xs, ys);
@@ -527,7 +528,7 @@ fn limbs_slice_and_neg_neg_in_place_left_properties() {
 
 #[test]
 fn limbs_vec_and_neg_neg_in_place_left_properties() {
-    test_properties(pairs_of_limb_vec_var_1, |&(ref xs, ref ys)| {
+    test_properties(pairs_of_unsigned_vec_var_6, |&(ref xs, ref ys)| {
         let mut xs = xs.to_vec();
         let xs_old = xs.clone();
         limbs_vec_and_neg_neg_in_place_left(&mut xs, ys);
@@ -540,7 +541,7 @@ fn limbs_vec_and_neg_neg_in_place_left_properties() {
 
 #[test]
 fn limbs_slice_and_neg_neg_in_place_either_properties() {
-    test_properties(pairs_of_limb_vec_var_1, |&(ref xs, ref ys)| {
+    test_properties(pairs_of_unsigned_vec_var_6, |&(ref xs, ref ys)| {
         let mut xs = xs.to_vec();
         let xs_old = xs.clone();
         let mut ys = ys.to_vec();
@@ -566,7 +567,7 @@ fn limbs_slice_and_neg_neg_in_place_either_properties() {
 
 #[test]
 fn limbs_vec_and_neg_neg_in_place_either_properties() {
-    test_properties(pairs_of_limb_vec_var_1, |&(ref xs, ref ys)| {
+    test_properties(pairs_of_unsigned_vec_var_6, |&(ref xs, ref ys)| {
         let mut xs = xs.to_vec();
         let xs_old = xs.clone();
         let mut ys = ys.to_vec();

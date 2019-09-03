@@ -9,7 +9,7 @@ use malachite_nz::integer::logic::xor_natural::{
 use malachite_nz::integer::Integer;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::base::{pairs_of_limb_vec_var_1, triples_of_limb_vec_var_7};
+use inputs::base::{pairs_of_unsigned_vec_var_6, triples_of_limb_vec_var_7};
 use inputs::integer::{
     pairs_of_integer_and_natural, pairs_of_natural_and_integer, rm_pairs_of_integer_and_natural,
     rm_pairs_of_natural_and_integer,
@@ -78,7 +78,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
 }
 
 fn demo_limbs_xor_pos_neg(gm: GenerationMode, limit: usize) {
-    for (ref xs, ref ys) in pairs_of_limb_vec_var_1(gm).take(limit) {
+    for (ref xs, ref ys) in pairs_of_unsigned_vec_var_6(gm).take(limit) {
         println!(
             "limbs_xor_pos_neg({:?}, {:?}) = {:?}",
             xs,
@@ -102,7 +102,7 @@ fn demo_limbs_xor_pos_neg_to_out(gm: GenerationMode, limit: usize) {
 }
 
 fn demo_limbs_xor_pos_neg_in_place_left(gm: GenerationMode, limit: usize) {
-    for (ref xs, ref ys) in pairs_of_limb_vec_var_1(gm).take(limit) {
+    for (ref xs, ref ys) in pairs_of_unsigned_vec_var_6(gm).take(limit) {
         let mut xs = xs.to_vec();
         let xs_old = xs.clone();
         limbs_xor_pos_neg_in_place_left(&mut xs, ys);
@@ -114,7 +114,7 @@ fn demo_limbs_xor_pos_neg_in_place_left(gm: GenerationMode, limit: usize) {
 }
 
 fn demo_limbs_xor_pos_neg_in_place_right(gm: GenerationMode, limit: usize) {
-    for (ref xs, ref ys) in pairs_of_limb_vec_var_1(gm).take(limit) {
+    for (ref xs, ref ys) in pairs_of_unsigned_vec_var_6(gm).take(limit) {
         let mut ys = ys.to_vec();
         let ys_old = ys.clone();
         limbs_xor_pos_neg_in_place_right(xs, &mut ys);
@@ -126,7 +126,7 @@ fn demo_limbs_xor_pos_neg_in_place_right(gm: GenerationMode, limit: usize) {
 }
 
 fn demo_limbs_xor_pos_neg_in_place_either(gm: GenerationMode, limit: usize) {
-    for (ref xs, ref ys) in pairs_of_limb_vec_var_1(gm).take(limit) {
+    for (ref xs, ref ys) in pairs_of_unsigned_vec_var_6(gm).take(limit) {
         let mut xs = xs.to_vec();
         let xs_old = xs.clone();
         let mut ys = ys.to_vec();
@@ -216,7 +216,7 @@ fn benchmark_limbs_xor_pos_neg(gm: GenerationMode, limit: usize, file_name: &str
     m_run_benchmark(
         "limbs_xor_pos_neg(&[Limb], &[Limb])",
         BenchmarkType::Single,
-        pairs_of_limb_vec_var_1(gm),
+        pairs_of_unsigned_vec_var_6(gm),
         gm.name(),
         limit,
         file_name,
@@ -250,7 +250,7 @@ fn benchmark_limbs_xor_pos_neg_in_place_left(gm: GenerationMode, limit: usize, f
     m_run_benchmark(
         "limbs_xor_pos_neg_in_place_left(&mut Vec<Limb>, &[Limb])",
         BenchmarkType::Single,
-        pairs_of_limb_vec_var_1(gm),
+        pairs_of_unsigned_vec_var_6(gm),
         gm.name(),
         limit,
         file_name,
@@ -267,7 +267,7 @@ fn benchmark_limbs_xor_pos_neg_in_place_right(gm: GenerationMode, limit: usize, 
     m_run_benchmark(
         "limbs_xor_pos_neg_in_place_right(&[Limb], &mut Vec<Limb>)",
         BenchmarkType::Single,
-        pairs_of_limb_vec_var_1(gm),
+        pairs_of_unsigned_vec_var_6(gm),
         gm.name(),
         limit,
         file_name,
@@ -284,7 +284,7 @@ fn benchmark_limbs_xor_pos_neg_in_place_either(gm: GenerationMode, limit: usize,
     m_run_benchmark(
         "limbs_xor_pos_neg_in_place_either(&mut [Limb], &mut [Limb])",
         BenchmarkType::Single,
-        pairs_of_limb_vec_var_1(gm),
+        pairs_of_unsigned_vec_var_6(gm),
         gm.name(),
         limit,
         file_name,

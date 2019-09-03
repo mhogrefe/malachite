@@ -717,9 +717,8 @@ impl DivRem<Limb> for Natural {
     type RemOutput = Limb;
 
     /// Divides a `Natural` by a `Limb`, taking the `Natural` by value and returning the quotient
-    /// and remainder. The quotient is rounded towards negative infinity. The quotient and remainder
-    /// satisfy `self` = q * `other` + r and 0 <= r < `other`. For `Natural`s, rem is equivalent to
-    /// mod.
+    /// and remainder. The quotient is rounded towards zero. The quotient and remainder satisfy
+    /// `self` = q * `other` + r and 0 <= r < `other`. For `Natural`s, rem is equivalent to mod.
     ///
     /// Time: worst case O(n)
     ///
@@ -762,9 +761,9 @@ impl<'a> DivRem<Limb> for &'a Natural {
     type RemOutput = Limb;
 
     /// Divides a `Natural` by a `Limb`, taking the `Natural` by reference and returning the
-    /// quotient and remainder. The quotient is rounded towards negative infinity. The quotient and
-    /// remainder satisfy `self` = q * `other` + r and 0 <= r < `other`. For `Natural`s, rem is
-    /// equivalent to mod.
+    /// quotient and remainder. The quotient is rounded towards zero. The quotient and remainder
+    /// satisfy `self` = q * `other` + r and 0 <= r < `other`. For `Natural`s, rem is equivalent to
+    /// mod.
     ///
     /// Time: worst case O(n)
     ///
@@ -806,8 +805,8 @@ impl DivAssignRem<Limb> for Natural {
     type RemOutput = Limb;
 
     /// Divides a `Natural` by a `Limb` in place, returning the remainder. The quotient is rounded
-    /// towards negative infinity. The quotient and remainder satisfy `self` = q * `other` + r and
-    /// 0 <= r < `other`.For `Natural`s, rem is equivalent to mod.
+    /// towards zero. The quotient and remainder satisfy `self` = q * `other` + r and
+    /// 0 <= r < `other`. For `Natural`s, rem is equivalent to mod.
     ///
     /// Time: worst case O(n)
     ///
@@ -851,9 +850,8 @@ impl DivRem<Natural> for Limb {
     type RemOutput = Limb;
 
     /// Divides a `Limb` by a `Natural`, taking the `Natural` by value and returning the quotient
-    /// and remainder. The quotient is rounded towards negative infinity. The quotient and remainder
-    /// satisfy `self` = q * `other` + r and 0 <= r < `other`. For `Natural`s, rem is equivalent to
-    /// mod.
+    /// and remainder. The quotient is rounded towards zero. The quotient and remainder satisfy
+    /// `self` = q * `other` + r and 0 <= r < `other`. For `Natural`s, rem is equivalent to mod.
     ///
     /// Time: worst case O(1)
     ///
@@ -894,9 +892,9 @@ impl<'a> DivRem<&'a Natural> for Limb {
     type RemOutput = Limb;
 
     /// Divides a `Limb` by a `Natural`, taking the `Natural` by reference and returning the
-    /// quotient and remainder. The quotient is rounded towards negative infinity. The quotient and
-    /// remainder satisfy `self` = q * `other` + r and 0 <= r < `other`. For `Natural`s, rem is
-    /// equivalent to mod.
+    /// quotient and remainder. The quotient is rounded towards zero. The quotient and remainder
+    /// satisfy `self` = q * `other` + r and 0 <= r < `other`. For `Natural`s, rem is equivalent to
+    /// mod.
     ///
     /// Time: worst case O(1)
     ///
@@ -936,9 +934,8 @@ impl DivAssignRem<Natural> for Limb {
     type RemOutput = Limb;
 
     /// Divides a `Limb` by a `Natural` in place, taking the `Natural` by value and returning the
-    /// remainder. The quotient is rounded towards negative infinity. The quotient and remainder
-    /// satisfy `self` = q * `other` + r and 0 <= r < `other`. For `Natural`s, rem is equivalent to
-    /// mod.
+    /// remainder. The quotient is rounded towards zero. The quotient and remainder satisfy
+    /// `self` = q * `other` + r and 0 <= r < `other`. For `Natural`s, rem is equivalent to mod.
     ///
     /// Time: worst case O(1)
     ///
@@ -979,9 +976,8 @@ impl<'a> DivAssignRem<&'a Natural> for Limb {
     type RemOutput = Limb;
 
     /// Divides a `Limb` by a `Natural` in place, taking the `Natural` by reference and returning
-    /// the remainder. The quotient is rounded towards negative infinity. The quotient and remainder
-    /// satisfy `self` = q * `other` + r and 0 <= r < `other`. For `Natural`s, rem is equivalent to
-    /// mod.
+    /// the remainder. The quotient is rounded towards zero. The quotient and remainder satisfy
+    /// `self` = q * `other` + r and 0 <= r < `other`. For `Natural`s, rem is equivalent to mod.
     ///
     /// Time: worst case O(1)
     ///

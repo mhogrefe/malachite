@@ -10,7 +10,7 @@ use malachite_nz::platform::{Limb, SignedLimb};
 use malachite_test::common::{
     integer_to_rug_integer, natural_to_rug_integer, rug_integer_to_integer,
 };
-use malachite_test::inputs::base::{pairs_of_limb_vec_var_1, triples_of_limb_vec_var_7};
+use malachite_test::inputs::base::{pairs_of_unsigned_vec_var_6, triples_of_limb_vec_var_7};
 use malachite_test::inputs::integer::{
     integers, pairs_of_integer_and_natural, pairs_of_integer_and_unsigned,
 };
@@ -278,7 +278,7 @@ fn test_xor_natural() {
 
 #[test]
 fn limbs_xor_pos_neg_properties() {
-    test_properties(pairs_of_limb_vec_var_1, |&(ref xs, ref ys)| {
+    test_properties(pairs_of_unsigned_vec_var_6, |&(ref xs, ref ys)| {
         assert_eq!(
             -Natural::from_owned_limbs_asc(limbs_xor_pos_neg(xs, ys)),
             Integer::from(Natural::from_limbs_asc(xs)) ^ -Natural::from_limbs_asc(ys)
@@ -303,7 +303,7 @@ fn limbs_xor_pos_neg_to_out_properties() {
 
 #[test]
 fn limbs_xor_pos_neg_in_place_left_properties() {
-    test_properties(pairs_of_limb_vec_var_1, |&(ref xs, ref ys)| {
+    test_properties(pairs_of_unsigned_vec_var_6, |&(ref xs, ref ys)| {
         let mut xs = xs.to_vec();
         let xs_old = xs.clone();
         limbs_xor_pos_neg_in_place_left(&mut xs, ys);
@@ -316,7 +316,7 @@ fn limbs_xor_pos_neg_in_place_left_properties() {
 
 #[test]
 fn limbs_xor_pos_neg_in_place_right_properties() {
-    test_properties(pairs_of_limb_vec_var_1, |&(ref xs, ref ys)| {
+    test_properties(pairs_of_unsigned_vec_var_6, |&(ref xs, ref ys)| {
         let mut ys = ys.to_vec();
         let ys_old = ys.clone();
         limbs_xor_pos_neg_in_place_right(xs, &mut ys);
@@ -329,7 +329,7 @@ fn limbs_xor_pos_neg_in_place_right_properties() {
 
 #[test]
 fn limbs_xor_pos_neg_in_place_either_properties() {
-    test_properties(pairs_of_limb_vec_var_1, |&(ref xs, ref ys)| {
+    test_properties(pairs_of_unsigned_vec_var_6, |&(ref xs, ref ys)| {
         let mut xs = xs.to_vec();
         let xs_old = xs.clone();
         let mut ys = ys.to_vec();

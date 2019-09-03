@@ -12,7 +12,7 @@ use malachite_nz::platform::Limb;
 use malachite_nz::platform::SignedLimb;
 use malachite_test::common::{integer_to_rug_integer, rug_integer_to_integer};
 use malachite_test::inputs::base::{
-    pairs_of_limb_vec_var_1, pairs_of_signeds, triples_of_limb_vec_var_8,
+    pairs_of_signeds, pairs_of_unsigned_vec_var_6, triples_of_limb_vec_var_8,
 };
 use malachite_test::inputs::integer::{
     integers, pairs_of_integer_and_natural, pairs_of_integer_and_signed, pairs_of_integers,
@@ -339,7 +339,7 @@ fn test_or() {
 
 #[test]
 fn limbs_or_neg_neg_properties() {
-    test_properties(pairs_of_limb_vec_var_1, |&(ref xs, ref ys)| {
+    test_properties(pairs_of_unsigned_vec_var_6, |&(ref xs, ref ys)| {
         assert_eq!(
             -Natural::from_owned_limbs_asc(limbs_or_neg_neg(xs, ys)),
             -Natural::from_limbs_asc(xs) | -Natural::from_limbs_asc(ys)
@@ -381,7 +381,7 @@ macro_rules! limbs_slice_or_neg_neg_in_place_left_helper {
 #[test]
 fn limbs_slice_or_neg_neg_in_place_left_properties() {
     test_properties(
-        pairs_of_limb_vec_var_1,
+        pairs_of_unsigned_vec_var_6,
         limbs_slice_or_neg_neg_in_place_left_helper!(limbs_slice_or_neg_neg_in_place_left, xs, ys),
     );
 }
@@ -389,14 +389,14 @@ fn limbs_slice_or_neg_neg_in_place_left_properties() {
 #[test]
 fn limbs_vec_or_neg_neg_in_place_left_properties() {
     test_properties(
-        pairs_of_limb_vec_var_1,
+        pairs_of_unsigned_vec_var_6,
         limbs_slice_or_neg_neg_in_place_left_helper!(limbs_vec_or_neg_neg_in_place_left, xs, ys),
     );
 }
 
 #[test]
 fn limbs_or_neg_neg_in_place_either_properties() {
-    test_properties(pairs_of_limb_vec_var_1, |&(ref xs, ref ys)| {
+    test_properties(pairs_of_unsigned_vec_var_6, |&(ref xs, ref ys)| {
         let mut xs = xs.to_vec();
         let xs_old = xs.clone();
         let mut ys = ys.to_vec();
